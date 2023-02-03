@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,22 +94,23 @@ public class L2073 extends TradeBuffer {
 		String wkCustUKey = "";
 		// 統編有輸入 先查結清戶檔的原統編是否存在,在查客戶主檔統編
 		if (!iCustId.isEmpty()) {
-			slCustDataCtrl = sCustDataCtrlService.findCustId(iCustId, this.index, this.limit, titaVo);
+			slCustDataCtrl = sCustDataCtrlService.applMarkCustId(Arrays.asList(1, 3), iCustId, this.index, this.limit,
+					titaVo);
 			if (slCustDataCtrl == null) {
 				tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
-				if (tCustMain != null) {
-					wkCustUKey = tCustMain.getCustUKey();
-					slCustDataCtrl = sCustDataCtrlService.findCustUKey(wkCustUKey, this.index, this.limit, titaVo);
-				} else {
-					throw new LogicException(titaVo, "E0001", "L2073" + "指定統編不存在於客戶主檔。");
+				if (tCustMain == null) {
+					throw new LogicException(titaVo, "E0001", "指定統編不存在於客戶主檔。");
 				}
+				wkCustUKey = tCustMain.getCustUKey();
+				slCustDataCtrl = sCustDataCtrlService.applMarkCustUKey(Arrays.asList(1, 3), wkCustUKey, this.index,
+						this.limit, titaVo);
 			}
-
 		} else {
 			if (iCustNo > 0) {
-				slCustDataCtrl = sCustDataCtrlService.findCustNo(iCustNo, this.index, this.limit, titaVo);
+				slCustDataCtrl = sCustDataCtrlService.applMarkCustNo(Arrays.asList(1, 3), iCustNo, this.index,
+						this.limit, titaVo);
 			} else {
-				slCustDataCtrl = sCustDataCtrlService.findAll(this.index, this.limit, titaVo);
+				slCustDataCtrl = sCustDataCtrlService.applMarkAll(Arrays.asList(1, 3), this.index, this.limit, titaVo);
 			}
 		}
 
@@ -170,7 +172,8 @@ public class L2073 extends TradeBuffer {
 			searchTXCDs.add("L2703");
 			searchTXCDs.add("L2073");
 
-			TxDataLog txDataLog = sTxDataLogService.findByMrKeyFirst("CustUKey:" + tCustMain.getCustUKey(), searchTXCDs, titaVo);
+			TxDataLog txDataLog = sTxDataLogService.findByMrKeyFirst("CustUKey:" + tCustMain.getCustUKey(), searchTXCDs,
+					titaVo);
 
 			Boolean hasLog = txDataLog != null;
 
@@ -187,6 +190,7 @@ public class L2073 extends TradeBuffer {
 			occurslist.putParam("OOSetDate", parse.timeStampToString(tCustDataCtrl.getSetDate()));
 			occurslist.putParam("OOReSetEmpNo", tCustDataCtrl.getReSetEmpNo());
 			occurslist.putParam("OOReSetDate", parse.timeStampToString(tCustDataCtrl.getReSetDate()));
+
 			occurslist.putParam("OOHasHistory", hasLog ? 1 : 0);
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occurslist);

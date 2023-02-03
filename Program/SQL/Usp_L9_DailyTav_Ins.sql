@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE "Usp_L9_DailyTav_Ins" 
+create or replace PROCEDURE "Usp_L9_DailyTav_Ins" 
 (
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
@@ -18,43 +18,60 @@ BEGIN
     -- 記錄程式起始時間
     JOB_START_TIME := SYSTIMESTAMP;
 
+    DELETE FROM "DailyTav"
+    WHERE "AcDate" = TBSDYF
+    ;
+
     -- 寫入資料
     INSERT INTO "DailyTav" (
-        "AcDate" -- 會計日期
+        "AcctCode"
+      , "AcDate" -- 會計日期
       , "CustNo" -- 借款人戶號
       , "FacmNo" -- 額度編號
       , "SelfUseFlag" -- 額度自用記號
       , "TavBal" -- 暫收款餘額
       , "LatestFlag" -- 最新記號
-      , "AcctCode"
       , "CreateDate"
       , "CreateEmpNo"
       , "LastUpdate"
       , "LastUpdateEmpNo"
     )
-    SELECT TBSDYF                 AS "AcDate"
+    WITH AR AS (  -- 2022-12-08 Wei 增加 from Lai
+      SELECT "AcctCode"             AS "AcctCode"
+           , "CustNo"               AS "CustNo"
+           , "FacmNo"               AS "FacmNo"
+           , SUM("RvBal")           AS "TavBal"
+           , MAX("LastUpdate")      AS "LastUpdate"
+           , MAX("LastUpdateEmpNo") AS "LastUpdateEmpNo"
+      FROM "AcReceivable"
+      WHERE "AcctCode" IN ('TAV','TAM','TSL','TLD','T10','T11','T12','T13')
+      GROUP BY "AcctCode"
+             , "CustNo"
+             , "FacmNo"
+    )
+    SELECT -- 2022-12-08 Wei 增加 from Lai
+           AR."AcctCode"          AS "AcctCode"
+         , TBSDYF                 AS "AcDate"
          , AR."CustNo"            AS "CustNo"
          , AR."FacmNo"            AS "FacmNo"
          , CASE
              WHEN NVL(LFT."CustNo",0) != 0
              THEN 'Y'
            ELSE 'N' END           AS "SelfUseFlag"
-         , AR."RvBal"             AS "TavBal"
+         , AR."TavBal"            AS "TavBal"
          , 'Y'                    AS "LatestFlag"
-         -- 2022-12-08 Wei 增加 from Lai
-         , AR."AcctCode"          AS "AcctCode"
          , AR."LastUpdate"        AS "CreateDate"
          , AR."LastUpdateEmpNo"   AS "CreateEmpNo"
          , AR."LastUpdate"        AS "LastUpdate"
          , AR."LastUpdateEmpNo"   AS "LastUpdateEmpNo"
-    FROM "AcReceivable" AR
+    FROM AR
     LEFT JOIN "DailyTav" DT ON DT."CustNo" = AR."CustNo"
                            AND DT."FacmNo" = AR."FacmNo"
+                           AND DT."AcctCode" = AR."AcctCode"
                            AND DT."LatestFlag" = 'Y'
     LEFT JOIN "LoanFacTmp" LFT ON LFT."CustNo" = AR."CustNo"
                               AND LFT."FacmNo" = AR."FacmNo"
-    WHERE AR."AcctCode" IN ('TAV','TAM','TSL','TLD','T10','T11','T12','T13')
-      AND NVL(DT."TavBal",0) != AR."RvBal"
+    WHERE NVL(DT."TavBal",0) != AR."TavBal"
     ;
 
     -- 記錄寫入筆數
@@ -64,12 +81,14 @@ BEGIN
     MERGE INTO "DailyTav" T
     USING (
       SELECT "AcDate"
+           , "AcctCode"
            , "CustNo"
            , "FacmNo"
            , ROW_NUMBER ()
              OVER (
                PARTITION BY "CustNo"
                           , "FacmNo"
+                          , "AcctCode"
                ORDER BY "AcDate" DESC
              ) AS "Seq"
       FROM "DailyTav"
@@ -77,6 +96,7 @@ BEGIN
     ) S
     ON (
       S."AcDate" = T."AcDate"
+      AND S."AcctCode" = T."AcctCode"
       AND S."CustNo" = T."CustNo"
       AND S."FacmNo" = T."FacmNo"
       AND S."Seq" >= 2

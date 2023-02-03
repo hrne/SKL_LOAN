@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L9;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
@@ -12,9 +13,11 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 
 import com.st1.itx.util.common.MakeExcel;
+import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
-
+import com.st1.itx.util.parse.Parse;
 
 @Component("L9135Report")
 @Scope("prototype")
@@ -23,6 +26,9 @@ public class L9135Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
+
+	@Autowired
+	MakeFile makeFile;
 
 	@Autowired
 	DateUtil dateUtil;
@@ -56,7 +62,7 @@ public class L9135Report extends MakeReport {
 	public void printHeader() {
 		this.setFontSize(10);
 		this.setCharSpaces(0);
-		
+
 		int rNum = 3;
 		int lNum = 146;
 		int cNum = this.getMidXAxis();
@@ -122,67 +128,18 @@ public class L9135Report extends MakeReport {
 	 * @param titaVo
 	 * @param l9135Result 資料串
 	 * @param iAcDate     會計日
+	 * @return
+	 * @throws LogicException
 	 */
 
-	public List<Map<String, String>> exec(TitaVo titaVo, List<Map<String, String>> l9135Result, int iAcDate)
-			throws LogicException {
+	public void exec(TitaVo titaVo, List<Map<String, String>> l9135Result, int iAcDate) throws LogicException {
 
 		this.info("L9135Report exec");
 
-		List<Map<String, String>> l9135List = l9135Result;
-
-		this.iAcDate = String.valueOf(iAcDate);
-
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), tradeNo, tradeName, "", "A4", "L");
-
-		// 記錄筆數
-		int count = 0;
-
-		if (l9135List != null && l9135List.size() != 0) {
-
-			for (Map<String, String> r : l9135List) {
-
-				count++;
-
-				// 判斷子目不同分隔
-				if (!f1.equals(r.get("AcSubCode"))) {
-
-					if (count > 1) {
-						reportTot();
-
-					}
-
-					f0 = r.get("AcNoCode").toString();
-					f1 = r.get("AcSubCode").toString();
-
-				}
-
-				report(r);
-
-				// 超過40行 換新頁
-				if (this.NowRow >= 40) {
-					
-					this.print(2, 80, this.nextPageText, "C");
-					this.newPage();
-
-				}
-
-			}
-
-			if (this.getNowPage() > 0 && count == l9135List.size()) {
-				ptfg = 9;
-				reportTot();
-
-				this.print(-45, 80, this.endText, "C");
-			}
-
-		} else {
-			this.print(1, 1, "本日無資料");
-		}
-
-		this.close();
-
-		return l9135List;
+		// 銀行存款媒體明細表
+		exportExcel(titaVo, l9135Result, iAcDate);
+		// 媒體檔
+		exportTxt(titaVo, l9135Result, iAcDate);
 
 	}
 
@@ -212,5 +169,187 @@ public class L9135Report extends MakeReport {
 		tmpAmtCr += Integer.valueOf(r.get("CrTxAmt"));
 	}
 
+	public void exportExcel(TitaVo titaVo, List<Map<String, String>> l9135Result, int iAcDate) throws LogicException {
+
+//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), tradeNo, tradeName, "", "A4", "L");
+		String txcd = titaVo.getTxCode();
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String reportItem = tradeName;
+		String security = "";
+		String pageSize = "A4";
+		String pageOrientation = "L";
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(reportItem).setSecurity(security).setRptSize(pageSize).setPageOrientation(pageOrientation)
+				.build();
+		this.open(titaVo, reportVo);
+
+		// 記錄筆數
+		int count = 0;
+
+		if (l9135Result != null && l9135Result.size() != 0) {
+
+			for (Map<String, String> r : l9135Result) {
+
+				count++;
+
+				// 判斷子目不同分隔
+				if (!f1.equals(r.get("AcSubCode"))) {
+
+					if (count > 1) {
+						reportTot();
+
+					}
+
+					f0 = r.get("AcNoCode").toString();
+					f1 = r.get("AcSubCode").toString();
+
+				}
+
+				report(r);
+
+				// 超過40行 換新頁
+				if (this.NowRow >= 40) {
+
+					this.print(2, 80, this.nextPageText, "C");
+					this.newPage();
+
+				}
+
+			}
+
+			if (this.getNowPage() > 0 && count == l9135Result.size()) {
+				ptfg = 9;
+				reportTot();
+
+				this.print(-45, 80, this.endText, "C");
+			}
+
+		} else {
+			this.print(1, 1, "本日無資料");
+		}
+
+		this.close();
+	}
+
+	public void exportTxt(TitaVo titaVo, List<Map<String, String>> l9135Result, int iAcDate) throws LogicException {
+
+		BigDecimal amtDb = BigDecimal.ZERO;
+		BigDecimal amtCr = BigDecimal.ZERO;
+		BigDecimal amt = BigDecimal.ZERO;
+		DecimalFormat df = new DecimalFormat("0.00#");
+
+		int date = iAcDate;
+		String brno = titaVo.getBrno();
+		String fileCode = titaVo.getTxcd();
+		String fileItem = "銀行存款媒體檔";
+		String fileName = "銀行存款媒體檔.txt";
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(date).setBrno(brno).setRptCode(fileCode).setRptItem(fileItem)
+				.build();
+
+		makeFile.open(titaVo, reportVo, fileName, 2);
+
+		if (l9135Result.size() > 0) {
+
+			for (Map<String, String> r : l9135Result) {
+//				this.info("r.get(\"DbTxAmt\") =" + r.get("DbTxAmt"));
+//				this.info("r.get(\"DbTxAmt\") =" + r.get("CrTxAmt"));
+				amtDb = new BigDecimal(r.get("DbTxAmt") == null ? "0" : r.get("DbTxAmt"));
+				amtCr = new BigDecimal(r.get("CrTxAmt") == null ? "0" : r.get("CrTxAmt"));
+
+				// 借貸合計金額
+				amt = amtCr.add(amtDb);
+				// 格式化
+				BigDecimal iamt = new BigDecimal(df.format(amt));
+
+				// 日期
+				String iDate = String.valueOf(iAcDate);
+				// 帳號
+				String iAcctItem = r.get("AcctItem2") == null ? "          " : r.get("AcctItem2");
+				// 借貸別 C = 3, D = 4
+				String iDbCr = "C".equals(r.get("DbCr")) ? "3" : "4";
+				// 金額
+				String amtText = fillUpWord(iamt.toString(), 13, "0", "L");
+				// 傳票號碼
+				String iSlipNo = fillUpWord(r.get("SlipNo"), 5, "0", "L");
+
+				// 日期(7) + 帳號(10) + 借貸別(1) + 金額(13) + 傳票號碼(5)
+				String text = iDate + iAcctItem + iDbCr + amtText + iSlipNo;
+				this.info("text = " + text);
+				makeFile.put(text);
+			}
+		}
+		makeFile.close();
+
+	}
+
+	/**
+	 * 文字內容處理
+	 * 
+	 * @param text 文字
+	 * @param all  上限位數
+	 * @param word 要補滿的符號或文字(單字佳)
+	 * @param pos  向左補齊(L)/向右補齊(R) 如果文字字數大於上限位數 自動截斷
+	 *
+	 */
+
+	private String fillUpWord(String text, int allCount, String word, String pos) {
+
+		int[] num = new int[text.length()];
+
+		String tmpText = "";
+
+		for (int i = 0; i < num.length; i++) {
+
+			tmpText = text.substring(i, i + 1);
+			// 中文字數為2，非中文為1
+			if (tmpText.matches("[\\u4E00-\\u9FA5]+")) {
+				num[i] = 2;
+			} else if (tmpText.matches("[\\u0391-\\uFFE5]+")) {
+				num[i] = 2;
+			} else {
+				num[i] = 1;
+			}
+
+		}
+
+		// 計算用
+		int tmpAllCount = 0;
+		// 截斷位置用
+		int tmpI = 0;
+		// 最終文字數
+		int tmpHaveCount = 0;
+
+		for (int i = 0; i < num.length; i++) {
+			tmpAllCount = tmpAllCount + num[i];
+			if (allCount >= tmpAllCount) {
+				tmpI = i;
+				tmpHaveCount = tmpAllCount;
+			}
+		}
+
+		String str = text.substring(0, tmpI + 1);
+		String lstr = "";
+
+		// 總字數 減去 目前有的字數 = 空的字數
+		int emptyCount = 0;
+		emptyCount = allCount - tmpHaveCount;
+
+		// 重新組合
+		for (int i = 0; i < emptyCount; i++) {
+			if (pos == "L") {
+				lstr += word;
+			} else {
+				str += word;
+			}
+		}
+		if (pos == "L") {
+			str = lstr + text;
+		}
+
+		return str;
+	}
 
 }

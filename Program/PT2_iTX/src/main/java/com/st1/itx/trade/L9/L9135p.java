@@ -58,19 +58,14 @@ public class L9135p extends TradeBuffer {
 		l9135Report.setParentTranCode(parentTranCode);
 
 		List<Map<String, String>> l9135List = null;
-		List<Map<String, String>> l9135List2 = null;
-		// 帳務日(西元)
-//		int tbsdy = this.txBuffer.getTxCom().getTbsdyf();
 
 		int acDate = Integer.valueOf(titaVo.getParam("AcDate"));
 
 		this.info("acDate=" + acDate);
-//		this.info("tlrno=" + titaVo.getParam("TLRNO"));
 
 		try {
 
 			l9135List = l9135ServiceImpl.findAll(titaVo);
-			l9135List2 = l9135ServiceImpl2.findAll(titaVo);
 
 		} catch (Exception e) {
 
@@ -81,9 +76,9 @@ public class L9135p extends TradeBuffer {
 		if (l9135List != null && !l9135List.isEmpty()) {
 
 			this.info("active L9135report data detail");
+			infoNotification = "L9135 銀行存款媒體明細表(總帳) 及媒體檔";
 			l9135Report.exec(titaVo,l9135List, acDate);
-			infoNotification = "L9135 銀行存款媒體明細表(總帳)";
-			l9135Report2.exec(titaVo,l9135List2, acDate);
+	
 
 		} else {
 

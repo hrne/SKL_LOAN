@@ -104,6 +104,13 @@ BEGIN
         FROM "PO$AARP" 
       ) S 
     ) 
+    , txData AS {
+      SELECT DISTINCT
+             TRXDAT
+           , TRXNMT
+           , TRXMEM
+      FROM LA$TRXP
+    }
     SELECT MBK."TRXIDT"                   AS "EntryDate"           -- 入帳日期 Decimald 8 0 
           ,MBK."LMSACN"                   AS "CustNo"              -- 戶號 DECIMAL 7 0 
           ,MBK."MBKAPN"                   AS "FacmNo"              -- 額度 DECIMAL 3 0 
@@ -147,15 +154,15 @@ BEGIN
            ELSE '2' END                   AS "MediaKind"           -- 媒體別 VARCHAR2 1 0 
           ,NVL(PDM."MediaSeq",0)          AS "MediaSeq"            -- 媒體序號 DECIMAL 6 0 
           ,MBK."TRXDAT"                   AS "AcDate"              -- 會計日期 Decimald 8 0 
-          ,'999999'                       AS "TitaTlrNo"           -- 經辦 VARCHAR2 6 
+          ,NVL(AEM."EmpNo",'999999')      AS "TitaTlrNo"           -- 經辦 VARCHAR2 6 
           ,MBK."TRXNMT"                   AS "TitaTxtNo"           -- 交易序號 VARCHAR2 8 
           ,''                             AS "AmlRsp"              -- AML回應碼 VARCHAR2 1 0 
           ,MBK."MBKRSN"                   AS "ReturnCode"          -- 回應代碼 VARCHAR2 2 0 
           ,''                             AS "JsonFields"          -- jason格式紀錄欄 nvarchar2 300 
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE   
-          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
+          ,NVL(AEM."EmpNo",'999999')      AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
           ,JOB_START_TIME                 AS "LastUpdate"          -- 異動日期 DATE 0 0 
-          ,'999999'                       AS "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 0 
+          ,NVL(AEM."EmpNo",'999999')      AS "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 0 
     FROM "LA$MBKP" MBK 
     LEFT JOIN aplpData ad ON ad."LMSACN" = MBK."LMSACN" 
                          AND ad."LMSPCN" = MBK."LMSPCN" 
@@ -180,6 +187,9 @@ BEGIN
                        AND PDM."RepayAmt" = MBK."MBKAMT" 
                        AND PDM."AcDate" = MBK."TRXDAT" 
                        AND PDM."IntEndDate" = MBK."TRXIED" 
+    LEFT JOIN txData td ON td.TRXDAT = MBK.TRXDAT
+                       AND td.TRXNMT = MBK.TRXNMT
+    LEFT JOIN "As400EmpNoMapping" AEM ON AEM."As400TellerNo" = td.TRXMEM
     WHERE MBK."LMSPBK" = '3' -- 只抓郵局 
       AND CASE -- 排除一筆在AH$MBKP成功扣到,在LA$MBKP沒扣到火險費的資料 
             WHEN MBK."TRXIDT" = 20180813 
@@ -322,8 +332,12 @@ BEGIN
           ,''                             AS "AmlRsp"              -- AML回應碼 VARCHAR2 1 0 
           ,MBK."MBKRSN"                   AS "ReturnCode"          -- 回應代碼 VARCHAR2 2 0 
           ,''                             AS "JsonFields"          -- jason格式紀錄欄 nvarchar2 300 
-          ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE   
-          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
+          ,CASE 
+             WHEN MBK."CHGDTM" > 0 
+             THEN TO_DATE(MBK."CHGDTM",'YYYYMMDDHH24MISS') 
+           ELSE JOB_START_TIME 
+           END                            AS "CreateDate"          -- 建檔日期時間 DATE   
+          ,NVL(AEM."EmpNo",'999999')      AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
           ,CASE 
              WHEN MBK."CHGDTM" > 0 
              THEN TO_DATE(MBK."CHGDTM",'YYYYMMDDHH24MISS') 

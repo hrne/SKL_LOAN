@@ -96,6 +96,9 @@ public class L7300ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                                        WHEN LBM.\"Status\" IN (2,6,7) ";
 		sql += "                                                        THEN '990' ";
 		sql += "                                                      ELSE f.\"AcctCode\" END ";
+		sql += "                                and ar.\"CustNo\" = LBM.\"CustNo\" ";
+		sql += "                                and ar.\"FacmNo\" = LBM.\"FacmNo\" ";
+		sql += "                                and ar.\"RvNo\" = LPAD(LBM.\"BormNo\",3,'0') ";
 		sql += "   WHERE LBM.\"Status\" IN (0,2,4,6,7) ";
 		sql += "   GROUP BY LBM.\"CustNo\" ";
 		sql += "          , LBM.\"FacmNo\" ";

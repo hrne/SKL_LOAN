@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -510,13 +513,13 @@ em = null;
     this.info("prevInsuNoFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " prevInsuNo_2 : " +  prevInsuNo_2);
     Optional<InsuRenew> insuRenewT = null;
     if (dbName.equals(ContentName.onDay))
-      insuRenewT = insuRenewReposDay.findTopByCustNoIsAndFacmNoIsAndPrevInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(custNo_0, facmNo_1, prevInsuNo_2);
+      insuRenewT = insuRenewReposDay.findTopByCustNoIsAndFacmNoIsAndPrevInsuNoIsOrderByInsuEndDateDescInsuStartDateAscEndoInsuNoAsc(custNo_0, facmNo_1, prevInsuNo_2);
     else if (dbName.equals(ContentName.onMon))
-      insuRenewT = insuRenewReposMon.findTopByCustNoIsAndFacmNoIsAndPrevInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(custNo_0, facmNo_1, prevInsuNo_2);
+      insuRenewT = insuRenewReposMon.findTopByCustNoIsAndFacmNoIsAndPrevInsuNoIsOrderByInsuEndDateDescInsuStartDateAscEndoInsuNoAsc(custNo_0, facmNo_1, prevInsuNo_2);
     else if (dbName.equals(ContentName.onHist))
-      insuRenewT = insuRenewReposHist.findTopByCustNoIsAndFacmNoIsAndPrevInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(custNo_0, facmNo_1, prevInsuNo_2);
+      insuRenewT = insuRenewReposHist.findTopByCustNoIsAndFacmNoIsAndPrevInsuNoIsOrderByInsuEndDateDescInsuStartDateAscEndoInsuNoAsc(custNo_0, facmNo_1, prevInsuNo_2);
     else 
-      insuRenewT = insuRenewRepos.findTopByCustNoIsAndFacmNoIsAndPrevInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(custNo_0, facmNo_1, prevInsuNo_2);
+      insuRenewT = insuRenewRepos.findTopByCustNoIsAndFacmNoIsAndPrevInsuNoIsOrderByInsuEndDateDescInsuStartDateAscEndoInsuNoAsc(custNo_0, facmNo_1, prevInsuNo_2);
 
     return insuRenewT.isPresent() ? insuRenewT.get() : null;
   }
@@ -619,13 +622,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("findL4962A " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0 + " insuYearMonth_1 : " +  insuYearMonth_1);
     if (dbName.equals(ContentName.onDay))
-      slice = insuRenewReposDay.findAllByInsuYearMonthGreaterThanEqualAndInsuYearMonthLessThanEqualOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, insuYearMonth_1, pageable);
+      slice = insuRenewReposDay.findAllByInsuYearMonthGreaterThanEqualAndInsuYearMonthLessThanEqualOrderByCustNoAscInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, insuYearMonth_1, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = insuRenewReposMon.findAllByInsuYearMonthGreaterThanEqualAndInsuYearMonthLessThanEqualOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, insuYearMonth_1, pageable);
+      slice = insuRenewReposMon.findAllByInsuYearMonthGreaterThanEqualAndInsuYearMonthLessThanEqualOrderByCustNoAscInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, insuYearMonth_1, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = insuRenewReposHist.findAllByInsuYearMonthGreaterThanEqualAndInsuYearMonthLessThanEqualOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, insuYearMonth_1, pageable);
+      slice = insuRenewReposHist.findAllByInsuYearMonthGreaterThanEqualAndInsuYearMonthLessThanEqualOrderByCustNoAscInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, insuYearMonth_1, pageable);
     else 
-      slice = insuRenewRepos.findAllByInsuYearMonthGreaterThanEqualAndInsuYearMonthLessThanEqualOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, insuYearMonth_1, pageable);
+      slice = insuRenewRepos.findAllByInsuYearMonthGreaterThanEqualAndInsuYearMonthLessThanEqualOrderByCustNoAscInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, insuYearMonth_1, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

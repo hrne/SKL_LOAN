@@ -40,7 +40,8 @@ BEGIN
     INSERT INTO "CustDataCtrl" 
     SELECT "CustMain"."CustNo"            AS "CustNo"              -- 借款人戶號 DECIMAL 7  
           ,"CustMain"."CustUKey"          AS "CustUKey"            -- 客戶識別碼 VARCHAR2 32  
-          ,0                              AS "ApplMark"            -- 申請記號 DECIMAL 1  
+          -- 2023-02-02 Wei from Lai 固定1
+          ,1                              AS "ApplMark"            -- 申請記號 DECIMAL 1  
           ,''                             AS "Reason"              -- 解除原因 VARCHAR2 50   
           ,CASE 
              WHEN PDCP."CRTDTM" > 0 

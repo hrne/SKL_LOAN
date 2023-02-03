@@ -3,11 +3,14 @@ package com.st1.itx.db.repository.online;
 
 import java.util.Optional;
 
+import java.math.BigDecimal;
+import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,7 +68,7 @@ public interface InsuRenewRepository extends JpaRepository<InsuRenew, InsuRenewI
   public Slice<InsuRenew> findAllByInsuEndDateGreaterThanEqualAndInsuEndDateLessThanEqualOrderByInsuEndDateDescOrigInsuNoAscEndoInsuNoAsc(int insuEndDate_0, int insuEndDate_1, Pageable pageable);
 
   // CustNo = ,AND FacmNo = ,AND PrevInsuNo = 
-  public Optional<InsuRenew> findTopByCustNoIsAndFacmNoIsAndPrevInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(int custNo_0, int facmNo_1, String prevInsuNo_2);
+  public Optional<InsuRenew> findTopByCustNoIsAndFacmNoIsAndPrevInsuNoIsOrderByInsuEndDateDescInsuStartDateAscEndoInsuNoAsc(int custNo_0, int facmNo_1, String prevInsuNo_2);
 
   // InsuYearMonth = ,AND CustNo = ,AND FacmNo = 
   public Slice<InsuRenew> findAllByInsuYearMonthIsAndCustNoIsAndFacmNoIsOrderByInsuEndDateDescInsuStartDateAsc(int insuYearMonth_0, int custNo_1, int facmNo_2, Pageable pageable);
@@ -77,7 +80,7 @@ public interface InsuRenewRepository extends JpaRepository<InsuRenew, InsuRenewI
   public Slice<InsuRenew> findAllByInsuYearMonthIsAndRenewCodeIsAndAcDateGreaterThanEqualAndAcDateLessThanEqualOrderByInsuEndDateDescInsuStartDateAsc(int insuYearMonth_0, int renewCode_1, int acDate_2, int acDate_3, Pageable pageable);
 
   // InsuYearMonth >= ,AND InsuYearMonth <= 
-  public Slice<InsuRenew> findAllByInsuYearMonthGreaterThanEqualAndInsuYearMonthLessThanEqualOrderByInsuEndDateDescInsuStartDateAsc(int insuYearMonth_0, int insuYearMonth_1, Pageable pageable);
+  public Slice<InsuRenew> findAllByInsuYearMonthGreaterThanEqualAndInsuYearMonthLessThanEqualOrderByCustNoAscInsuEndDateDescInsuStartDateAsc(int insuYearMonth_0, int insuYearMonth_1, Pageable pageable);
 
   // ClCode1 = ,AND ClCode2 = ,AND ClNo = ,AND NowInsuNo = 
   public Optional<InsuRenew> findTopByClCode1IsAndClCode2IsAndClNoIsAndNowInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(int clCode1_0, int clCode2_1, int clNo_2, String nowInsuNo_3);

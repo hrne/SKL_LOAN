@@ -15,12 +15,15 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanBorMainId;
 import com.st1.itx.db.domain.LoanBorTx;
 import com.st1.itx.db.domain.LoanBorTxId;
 import com.st1.itx.db.domain.LoanOverdue;
 import com.st1.itx.db.domain.LoanOverdueId;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.LoanOverdueService;
@@ -62,6 +65,8 @@ public class L3731 extends TradeBuffer {
 	public LoanOverdueService loanOverdueService;
 	@Autowired
 	public LoanBorMainService loanBorMainService;
+	@Autowired
+	public CdCodeService cdCodeService;
 
 	@Autowired
 	Parse parse;
@@ -129,7 +134,7 @@ public class L3731 extends TradeBuffer {
 		iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
 		iBormNo = this.parse.stringToInteger(titaVo.getParam("BormNo"));
 		iStatusCode = this.parse.stringToInteger(titaVo.get("StatusCode"));
-		
+
 		// 設定額度撥款起止序號
 		if (iFacmNo > 0) {
 			wkFacmNoStart = iFacmNo;
@@ -158,6 +163,19 @@ public class L3731 extends TradeBuffer {
 // L3230使用
 	public void CaseCloseNormalRoutine(int cCustNo, int cFacmNo, int cBormNo, TitaVo titaVo) throws LogicException {
 		this.info("CaseCloseNormalRoutine ...");
+
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(cCustNo, cFacmNo,
+				cFacmNo > 0 ? cFacmNo : 999, cBormNo, cBormNo > 0 ? cBormNo : 900, 0, Integer.MAX_VALUE, titaVo);
+		if (slLoanBorMain == null) {
+			throw new LogicException(titaVo, "E0001", "放款主檔"); // 查詢資料不存在
+		}
+		for (LoanBorMain t : slLoanBorMain.getContent()) {
+			if (t.getStatus() != 6) {
+				throw new LogicException(titaVo, "E0015", "戶況不為呆帳戶" + "，" + parse.IntegerToString(t.getCustNo(), 7)
+						+ "-" + parse.IntegerToString(t.getFacmNo(), 3) + "-" + parse.IntegerToString(t.getBormNo(), 3)
+						+ " 戶況為" + getCdCodeX("Status", parse.IntegerToString(t.getStatus(), 2), titaVo)); // 檢查錯誤
+			}
+		}
 		List<Integer> lStatus = new ArrayList<Integer>(); // 1:催收 2:部分轉呆 3:呆帳 4:催收回復 5.
 		lStatus.add(3);
 		Slice<LoanOverdue> slLoanOverdue = loanOverdueService.ovduCustNoRange(cCustNo, cFacmNo,
@@ -165,7 +183,7 @@ public class L3731 extends TradeBuffer {
 				Integer.MAX_VALUE);
 		lLoanOverdue = slLoanOverdue == null ? null : slLoanOverdue.getContent();
 		if (lLoanOverdue == null || lLoanOverdue.size() == 0) {
-			throw new LogicException(titaVo, "E0015", "戶況不為呆帳戶"); // 檢查錯誤
+			throw new LogicException(titaVo, "E0001", "催呆檔"); // 查詢資料不存在
 		}
 		for (LoanOverdue od : lLoanOverdue) {
 			wkCustNo = od.getCustNo();
@@ -345,9 +363,9 @@ public class L3731 extends TradeBuffer {
 		tLoanBorTx = new LoanBorTx();
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, wkCustNo, wkFacmNo, wkBormNo, wkBorxNo, titaVo);
-		if(iStatusCode==8) {
+		if (iStatusCode == 8) {
 			tLoanBorTx.setTxDescCode("3732"); // 3732 轉債權轉讓戶
-		}else {
+		} else {
 			tLoanBorTx.setTxDescCode("3731"); // 3731 轉呆帳結案戶
 		}
 		tLoanBorTx.setEntryDate(iEntryDate);
@@ -373,4 +391,8 @@ public class L3731 extends TradeBuffer {
 		}
 	}
 
+	public String getCdCodeX(String defCode, String cdCode, TitaVo titaVo) throws LogicException {
+		CdCode tCdCode = cdCodeService.findById(new CdCodeId(defCode, cdCode), titaVo);
+		return tCdCode == null ? "" : tCdCode.getItem();
+	}
 }

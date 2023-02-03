@@ -68,12 +68,7 @@ BEGIN
         CO."CustNo" = CDC."CustNo"
         AND CO."CustUKey" = CDC."CustUKey"
     )
-    -- 若該戶號已存在且申請記號不是1跟2,更新為2:滿五年自動寫入,並更新最後更新日期時間及最後更新人員
-    WHEN MATCHED THEN UPDATE
-    SET "ApplMark" = 2
-      , "LastUpdate" = SYSTIMESTAMP
-      , "LastUpdateEmpNo" = '999999'
-    -- 資料不存在,寫入
+     -- 資料不存在,寫入
     WHEN NOT MATCHED THEN INSERT (
         "CustNo"
         , "CustUKey"

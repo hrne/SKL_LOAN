@@ -26,7 +26,7 @@ import com.st1.itx.util.http.WebClient;
  * @version 1.0.0
  */
 public class L9135 extends TradeBuffer {
-	
+
 	@Autowired
 	L9135Report l9135Report;
 	@Autowired
@@ -43,32 +43,28 @@ public class L9135 extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("active L9135p ");
+		this.info("active L9135 ");
 
 		this.totaVo.init(titaVo);
 
-		this.info("L9135p titaVo.getTxcd() = " + titaVo.getTxcd());
+		this.info("L9135 titaVo.getTxcd() = " + titaVo.getTxcd());
 
 		String infoNotification = "";
 
 		String parentTranCode = titaVo.getTxcd();
 
 		l9135Report.setParentTranCode(parentTranCode);
-//		l9135Report2.setParentTranCode(parentTranCode);
+
 		List<Map<String, String>> l9135List = null;
-		List<Map<String, String>> l9135List2 = null;
-		// 帳務日(西元)
-//		int tbsdy = this.txBuffer.getTxCom().getTbsdyf();
 
 		int acDate = Integer.valueOf(titaVo.getParam("AcDate"));
 
 		this.info("acDate=" + acDate);
-//		this.info("tlrno=" + titaVo.getParam("TLRNO"));
 
 		try {
 
 			l9135List = l9135ServiceImpl.findAll(titaVo);
-			l9135List2 = l9135ServiceImpl2.findAll(titaVo);
+
 		} catch (Exception e) {
 
 			this.info("L9135ServiceImpl.LoanBorTx error = " + e.toString());
@@ -78,23 +74,8 @@ public class L9135 extends TradeBuffer {
 		if (l9135List != null && !l9135List.isEmpty()) {
 
 			this.info("active L9135report data detail");
-			l9135Report.exec(titaVo,l9135List, acDate);
-			infoNotification = "L9135 銀行存款媒體明細表(總帳)";
-			
-
-		} else {
-
-			infoNotification = "L9135 查無資料";
-
-		}
-		
-
-		if (l9135List2 != null && !l9135List2.isEmpty()) {
-
-			this.info("active L9135report2 data detail");
-			l9135Report2.exec(titaVo,l9135List2, acDate);
-			infoNotification = "L9135 銀行存款媒體明細表(總帳)";
-			
+			infoNotification = "L9135 銀行存款媒體明細表(總帳) 及媒體檔";
+			l9135Report.exec(titaVo, l9135List, acDate);
 
 		} else {
 
