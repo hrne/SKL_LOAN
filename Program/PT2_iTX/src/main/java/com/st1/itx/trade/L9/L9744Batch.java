@@ -1,18 +1,17 @@
 package com.st1.itx.trade.L9;
 
-import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.scope.context.ChunkContext;
-import org.springframework.batch.core.step.tasklet.Tasklet;
-import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.beans.factory.InitializingBean;
+import java.util.ArrayList;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdWorkMonth;
 import com.st1.itx.db.service.CdWorkMonthService;
-import com.st1.itx.tradeService.BatchBase;
+import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
 
@@ -23,11 +22,11 @@ import com.st1.itx.util.http.WebClient;
  * @version 1.0.0
  */
 @Service("L9744Batch")
-@Scope("step")
-public class L9744Batch extends BatchBase implements Tasklet, InitializingBean {
+@Scope("prototype")
+public class L9744Batch extends TradeBuffer {
 
 	@Autowired
-	L9744Report L9744Report;
+	L9744Report l9744Report;
 
 	@Autowired
 	CdWorkMonthService sCdWorkMonthService;
@@ -41,20 +40,16 @@ public class L9744Batch extends BatchBase implements Tasklet, InitializingBean {
 	String tranCode = "L9744";
 	String tranName = "三階放款明細統計";
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		;
-	}
 
 	@Override
-	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		L9744Report.setParentTranCode(this.getParent());
-		return this.exec(contribution, "D");
-	}
+	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
+		this.info("active L9744Batch");
+		this.totaVo.init(titaVo);
 
-	@Override
-	public void run() throws LogicException {
-		this.info("active L9744Batch ");
+		this.info(tranCode + "p titaVo.getTxcd() = " + titaVo.getTxcd());
+		String parentTranCode = titaVo.getTxcd();
+
+		l9744Report.setParentTranCode(parentTranCode);
 
 		int tbsdyf = this.txBuffer.getTxCom().getTbsdyf();
 
@@ -73,6 +68,15 @@ public class L9744Batch extends BatchBase implements Tasklet, InitializingBean {
 		titaVo.putParam("facmNo", 0);
 		titaVo.putParam("Introducer","");
 		
-		L9744Report.exec(titaVo);
+		boolean isFinish = l9744Report.exec(titaVo);
+
+		if (isFinish) {
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), tranCode + tranName + "已完成", titaVo);
+		} else {
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), tranCode + tranName + "查無資料", titaVo);
+		}
+
+		this.addList(this.totaVo);
+		return this.sendList();
 	}
 }

@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -23,6 +26,7 @@ import com.st1.itx.db.repository.hist.TxTranCodeRepositoryHist;
 import com.st1.itx.db.service.TxTranCodeService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -33,332 +37,353 @@ import com.st1.itx.eum.ContentName;
 @Service("txTranCodeService")
 @Repository
 public class TxTranCodeServiceImpl extends ASpringJpaParm implements TxTranCodeService, InitializingBean {
-	@Autowired
-	private BaseEntityManager baseEntityManager;
+  @Autowired
+  private BaseEntityManager baseEntityManager;
 
-	@Autowired
-	private TxTranCodeRepository txTranCodeRepos;
+  @Autowired
+  private TxTranCodeRepository txTranCodeRepos;
 
-	@Autowired
-	private TxTranCodeRepositoryDay txTranCodeReposDay;
+  @Autowired
+  private TxTranCodeRepositoryDay txTranCodeReposDay;
 
-	@Autowired
-	private TxTranCodeRepositoryMon txTranCodeReposMon;
+  @Autowired
+  private TxTranCodeRepositoryMon txTranCodeReposMon;
 
-	@Autowired
-	private TxTranCodeRepositoryHist txTranCodeReposHist;
+  @Autowired
+  private TxTranCodeRepositoryHist txTranCodeReposHist;
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		org.junit.Assert.assertNotNull(txTranCodeRepos);
-		org.junit.Assert.assertNotNull(txTranCodeReposDay);
-		org.junit.Assert.assertNotNull(txTranCodeReposMon);
-		org.junit.Assert.assertNotNull(txTranCodeReposHist);
-	}
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    org.junit.Assert.assertNotNull(txTranCodeRepos);
+    org.junit.Assert.assertNotNull(txTranCodeReposDay);
+    org.junit.Assert.assertNotNull(txTranCodeReposMon);
+    org.junit.Assert.assertNotNull(txTranCodeReposHist);
+  }
 
-	@Override
-	public TxTranCode findById(String tranNo, TitaVo... titaVo) {
-		String dbName = "";
+  @Override
+  public TxTranCode findById(String tranNo, TitaVo... titaVo) {
+    String dbName = "";
 
-		if (titaVo.length != 0)
-			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		this.info("findById " + dbName + " " + tranNo);
-		Optional<TxTranCode> txTranCode = null;
-		if (dbName.equals(ContentName.onDay))
-			txTranCode = txTranCodeReposDay.findById(tranNo);
-		else if (dbName.equals(ContentName.onMon))
-			txTranCode = txTranCodeReposMon.findById(tranNo);
-		else if (dbName.equals(ContentName.onHist))
-			txTranCode = txTranCodeReposHist.findById(tranNo);
-		else
-			txTranCode = txTranCodeRepos.findById(tranNo);
-		TxTranCode obj = txTranCode.isPresent() ? txTranCode.get() : null;
-		if (obj != null) {
-			EntityManager em = this.baseEntityManager.getCurrentEntityManager(dbName);
-			em.detach(obj);
-			em = null;
-		}
-		return obj;
-	}
+    if (titaVo.length != 0)
+    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("findById " + dbName + " " + tranNo);
+    Optional<TxTranCode> txTranCode = null;
+    if (dbName.equals(ContentName.onDay))
+      txTranCode = txTranCodeReposDay.findById(tranNo);
+    else if (dbName.equals(ContentName.onMon))
+      txTranCode = txTranCodeReposMon.findById(tranNo);
+    else if (dbName.equals(ContentName.onHist))
+      txTranCode = txTranCodeReposHist.findById(tranNo);
+    else 
+      txTranCode = txTranCodeRepos.findById(tranNo);
+    TxTranCode obj = txTranCode.isPresent() ? txTranCode.get() : null;
+      if(obj != null) {
+        EntityManager em = this.baseEntityManager.getCurrentEntityManager(dbName);
+        em.detach(obj);
+em = null;
+}
+    return obj;
+  }
 
-	@Override
-	public Slice<TxTranCode> findAll(int index, int limit, TitaVo... titaVo) {
-		String dbName = "";
-		Slice<TxTranCode> slice = null;
-		if (titaVo.length != 0)
-			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		Pageable pageable = null;
-		if (limit == Integer.MAX_VALUE)
-			pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "TranNo"));
-		else
-			pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "TranNo"));
-		this.info("findAll " + dbName);
-		if (dbName.equals(ContentName.onDay))
-			slice = txTranCodeReposDay.findAll(pageable);
-		else if (dbName.equals(ContentName.onMon))
-			slice = txTranCodeReposMon.findAll(pageable);
-		else if (dbName.equals(ContentName.onHist))
-			slice = txTranCodeReposHist.findAll(pageable);
-		else
-			slice = txTranCodeRepos.findAll(pageable);
+  @Override
+  public Slice<TxTranCode> findAll(int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<TxTranCode> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    Pageable pageable = null;
+    if(limit == Integer.MAX_VALUE)
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "TranNo"));
+    else
+         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "TranNo"));
+    this.info("findAll " + dbName);
+    if (dbName.equals(ContentName.onDay))
+      slice = txTranCodeReposDay.findAll(pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = txTranCodeReposMon.findAll(pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = txTranCodeReposHist.findAll(pageable);
+    else 
+      slice = txTranCodeRepos.findAll(pageable);
 
-		if (slice != null)
+		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
 
-		return slice != null && !slice.isEmpty() ? slice : null;
-	}
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
 
-	@Override
-	public Slice<TxTranCode> TranNoLike(String tranNo_0, int index, int limit, TitaVo... titaVo) {
-		String dbName = "";
-		Slice<TxTranCode> slice = null;
-		if (titaVo.length != 0)
-			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		Pageable pageable = null;
+  @Override
+  public Slice<TxTranCode> TranNoLike(String tranNo_0, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<TxTranCode> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
 
-		if (limit == Integer.MAX_VALUE)
+    if(limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		else
-			pageable = PageRequest.of(index, limit);
-		this.info("TranNoLike " + dbName + " : " + "tranNo_0 : " + tranNo_0);
-		if (dbName.equals(ContentName.onDay))
-			slice = txTranCodeReposDay.findAllByTranNoLikeOrderByTranNoAsc(tranNo_0, pageable);
-		else if (dbName.equals(ContentName.onMon))
-			slice = txTranCodeReposMon.findAllByTranNoLikeOrderByTranNoAsc(tranNo_0, pageable);
-		else if (dbName.equals(ContentName.onHist))
-			slice = txTranCodeReposHist.findAllByTranNoLikeOrderByTranNoAsc(tranNo_0, pageable);
-		else
-			slice = txTranCodeRepos.findAllByTranNoLikeOrderByTranNoAsc(tranNo_0, pageable);
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("TranNoLike " + dbName + " : " + "tranNo_0 : " + tranNo_0);
+    if (dbName.equals(ContentName.onDay))
+      slice = txTranCodeReposDay.findAllByTranNoLikeOrderByTranNoAsc(tranNo_0, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = txTranCodeReposMon.findAllByTranNoLikeOrderByTranNoAsc(tranNo_0, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = txTranCodeReposHist.findAllByTranNoLikeOrderByTranNoAsc(tranNo_0, pageable);
+    else 
+      slice = txTranCodeRepos.findAllByTranNoLikeOrderByTranNoAsc(tranNo_0, pageable);
 
-		if (slice != null)
+		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
 
-		return slice != null && !slice.isEmpty() ? slice : null;
-	}
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
 
-	@Override
-	public TxTranCode holdById(String tranNo, TitaVo... titaVo) {
-		String dbName = "";
-		if (titaVo.length != 0)
-			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		this.info("Hold " + dbName + " " + tranNo);
-		Optional<TxTranCode> txTranCode = null;
-		if (dbName.equals(ContentName.onDay))
-			txTranCode = txTranCodeReposDay.findByTranNo(tranNo);
-		else if (dbName.equals(ContentName.onMon))
-			txTranCode = txTranCodeReposMon.findByTranNo(tranNo);
-		else if (dbName.equals(ContentName.onHist))
-			txTranCode = txTranCodeReposHist.findByTranNo(tranNo);
-		else
-			txTranCode = txTranCodeRepos.findByTranNo(tranNo);
-		return txTranCode.isPresent() ? txTranCode.get() : null;
-	}
+  @Override
+  public TxTranCode holdById(String tranNo, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("Hold " + dbName + " " + tranNo);
+    Optional<TxTranCode> txTranCode = null;
+    if (dbName.equals(ContentName.onDay))
+      txTranCode = txTranCodeReposDay.findByTranNo(tranNo);
+    else if (dbName.equals(ContentName.onMon))
+      txTranCode = txTranCodeReposMon.findByTranNo(tranNo);
+    else if (dbName.equals(ContentName.onHist))
+      txTranCode = txTranCodeReposHist.findByTranNo(tranNo);
+    else 
+      txTranCode = txTranCodeRepos.findByTranNo(tranNo);
+    return txTranCode.isPresent() ? txTranCode.get() : null;
+  }
 
-	@Override
-	public TxTranCode holdById(TxTranCode txTranCode, TitaVo... titaVo) {
-		String dbName = "";
-		if (titaVo.length != 0)
-			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		this.info("Hold " + dbName + " " + txTranCode.getTranNo());
-		Optional<TxTranCode> txTranCodeT = null;
-		if (dbName.equals(ContentName.onDay))
-			txTranCodeT = txTranCodeReposDay.findByTranNo(txTranCode.getTranNo());
-		else if (dbName.equals(ContentName.onMon))
-			txTranCodeT = txTranCodeReposMon.findByTranNo(txTranCode.getTranNo());
-		else if (dbName.equals(ContentName.onHist))
-			txTranCodeT = txTranCodeReposHist.findByTranNo(txTranCode.getTranNo());
-		else
-			txTranCodeT = txTranCodeRepos.findByTranNo(txTranCode.getTranNo());
-		return txTranCodeT.isPresent() ? txTranCodeT.get() : null;
-	}
+  @Override
+  public TxTranCode holdById(TxTranCode txTranCode, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("Hold " + dbName + " " + txTranCode.getTranNo());
+    Optional<TxTranCode> txTranCodeT = null;
+    if (dbName.equals(ContentName.onDay))
+      txTranCodeT = txTranCodeReposDay.findByTranNo(txTranCode.getTranNo());
+    else if (dbName.equals(ContentName.onMon))
+      txTranCodeT = txTranCodeReposMon.findByTranNo(txTranCode.getTranNo());
+    else if (dbName.equals(ContentName.onHist))
+      txTranCodeT = txTranCodeReposHist.findByTranNo(txTranCode.getTranNo());
+    else 
+      txTranCodeT = txTranCodeRepos.findByTranNo(txTranCode.getTranNo());
+    return txTranCodeT.isPresent() ? txTranCodeT.get() : null;
+  }
 
-	@Override
-	public TxTranCode insert(TxTranCode txTranCode, TitaVo... titaVo) throws DBException {
-		String dbName = "";
+  @Override
+  public TxTranCode insert(TxTranCode txTranCode, TitaVo... titaVo) throws DBException {
+     String dbName = "";
 		String empNot = "";
 
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-			empNot = empNot.isEmpty() ? "System" : empNot;
-		}
-		this.info("Insert..." + dbName + " " + txTranCode.getTranNo());
-		if (this.findById(txTranCode.getTranNo()) != null)
-			throw new DBException(2);
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
 
-		if (!empNot.isEmpty())
-			txTranCode.setCreateEmpNo(empNot);
+    this.info("Insert..." + dbName + " " + txTranCode.getTranNo());
+    if (this.findById(txTranCode.getTranNo(), titaVo) != null)
+      throw new DBException(2);
 
-		if (txTranCode.getLastUpdateEmpNo() == null || txTranCode.getLastUpdateEmpNo().isEmpty())
-			txTranCode.setLastUpdateEmpNo(empNot);
+    if (!empNot.isEmpty())
+      txTranCode.setCreateEmpNo(empNot);
 
-		if (dbName.equals(ContentName.onDay))
-			return txTranCodeReposDay.saveAndFlush(txTranCode);
-		else if (dbName.equals(ContentName.onMon))
-			return txTranCodeReposMon.saveAndFlush(txTranCode);
-		else if (dbName.equals(ContentName.onHist))
-			return txTranCodeReposHist.saveAndFlush(txTranCode);
-		else
-			return txTranCodeRepos.saveAndFlush(txTranCode);
-	}
+    if(txTranCode.getLastUpdateEmpNo() == null || txTranCode.getLastUpdateEmpNo().isEmpty())
+      txTranCode.setLastUpdateEmpNo(empNot);
 
-	@Override
-	public TxTranCode update(TxTranCode txTranCode, TitaVo... titaVo) throws DBException {
-		String dbName = "";
+    if (dbName.equals(ContentName.onDay))
+      return txTranCodeReposDay.saveAndFlush(txTranCode);	
+    else if (dbName.equals(ContentName.onMon))
+      return txTranCodeReposMon.saveAndFlush(txTranCode);
+    else if (dbName.equals(ContentName.onHist))
+      return txTranCodeReposHist.saveAndFlush(txTranCode);
+    else 
+    return txTranCodeRepos.saveAndFlush(txTranCode);
+  }
+
+  @Override
+  public TxTranCode update(TxTranCode txTranCode, TitaVo... titaVo) throws DBException {
+     String dbName = "";
 		String empNot = "";
 
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-		this.info("Update..." + dbName + " " + txTranCode.getTranNo());
-		if (!empNot.isEmpty())
-			txTranCode.setLastUpdateEmpNo(empNot);
+		} else
+       empNot = ThreadVariable.getEmpNot();
 
-		if (dbName.equals(ContentName.onDay))
-			return txTranCodeReposDay.saveAndFlush(txTranCode);
-		else if (dbName.equals(ContentName.onMon))
-			return txTranCodeReposMon.saveAndFlush(txTranCode);
-		else if (dbName.equals(ContentName.onHist))
-			return txTranCodeReposHist.saveAndFlush(txTranCode);
-		else
-			return txTranCodeRepos.saveAndFlush(txTranCode);
-	}
+    this.info("Update..." + dbName + " " + txTranCode.getTranNo());
+    if (!empNot.isEmpty())
+      txTranCode.setLastUpdateEmpNo(empNot);
 
-	@Override
-	public TxTranCode update2(TxTranCode txTranCode, TitaVo... titaVo) throws DBException {
-		String dbName = "";
+    if (dbName.equals(ContentName.onDay))
+      return txTranCodeReposDay.saveAndFlush(txTranCode);	
+    else if (dbName.equals(ContentName.onMon))
+      return txTranCodeReposMon.saveAndFlush(txTranCode);
+    else if (dbName.equals(ContentName.onHist))
+      return txTranCodeReposHist.saveAndFlush(txTranCode);
+    else 
+    return txTranCodeRepos.saveAndFlush(txTranCode);
+  }
+
+  @Override
+  public TxTranCode update2(TxTranCode txTranCode, TitaVo... titaVo) throws DBException {
+     String dbName = "";
 		String empNot = "";
 
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-		this.info("Update..." + dbName + " " + txTranCode.getTranNo());
-		if (!empNot.isEmpty())
-			txTranCode.setLastUpdateEmpNo(empNot);
+		} else
+       empNot = ThreadVariable.getEmpNot();
 
-		if (dbName.equals(ContentName.onDay))
-			txTranCodeReposDay.saveAndFlush(txTranCode);
-		else if (dbName.equals(ContentName.onMon))
-			txTranCodeReposMon.saveAndFlush(txTranCode);
-		else if (dbName.equals(ContentName.onHist))
-			txTranCodeReposHist.saveAndFlush(txTranCode);
-		else
-			txTranCodeRepos.saveAndFlush(txTranCode);
-		return this.findById(txTranCode.getTranNo());
-	}
+    this.info("Update..." + dbName + " " + txTranCode.getTranNo());
+    if (!empNot.isEmpty())
+      txTranCode.setLastUpdateEmpNo(empNot);
 
-	@Override
-	public void delete(TxTranCode txTranCode, TitaVo... titaVo) throws DBException {
-		String dbName = "";
-		if (titaVo.length != 0)
-			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		this.info("Delete..." + dbName + " " + txTranCode.getTranNo());
-		if (dbName.equals(ContentName.onDay)) {
-			txTranCodeReposDay.delete(txTranCode);
-			txTranCodeReposDay.flush();
-		} else if (dbName.equals(ContentName.onMon)) {
-			txTranCodeReposMon.delete(txTranCode);
-			txTranCodeReposMon.flush();
-		} else if (dbName.equals(ContentName.onHist)) {
-			txTranCodeReposHist.delete(txTranCode);
-			txTranCodeReposHist.flush();
-		} else {
-			txTranCodeRepos.delete(txTranCode);
-			txTranCodeRepos.flush();
-		}
-	}
+    if (dbName.equals(ContentName.onDay))
+      txTranCodeReposDay.saveAndFlush(txTranCode);	
+    else if (dbName.equals(ContentName.onMon))
+      txTranCodeReposMon.saveAndFlush(txTranCode);
+    else if (dbName.equals(ContentName.onHist))
+        txTranCodeReposHist.saveAndFlush(txTranCode);
+    else 
+      txTranCodeRepos.saveAndFlush(txTranCode);	
+    return this.findById(txTranCode.getTranNo());
+  }
 
-	@Override
-	public void insertAll(List<TxTranCode> txTranCode, TitaVo... titaVo) throws DBException {
-		if (txTranCode == null || txTranCode.size() == 0)
-			throw new DBException(6);
-		String dbName = "";
+  @Override
+  public void delete(TxTranCode txTranCode, TitaVo... titaVo) throws DBException {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("Delete..." + dbName + " " + txTranCode.getTranNo());
+    if (dbName.equals(ContentName.onDay)) {
+      txTranCodeReposDay.delete(txTranCode);	
+      txTranCodeReposDay.flush();
+    }
+    else if (dbName.equals(ContentName.onMon)) {
+      txTranCodeReposMon.delete(txTranCode);	
+      txTranCodeReposMon.flush();
+    }
+    else if (dbName.equals(ContentName.onHist)) {
+      txTranCodeReposHist.delete(txTranCode);
+      txTranCodeReposHist.flush();
+    }
+    else {
+      txTranCodeRepos.delete(txTranCode);
+      txTranCodeRepos.flush();
+    }
+   }
+
+  @Override
+  public void insertAll(List<TxTranCode> txTranCode, TitaVo... titaVo) throws DBException {
+    if (txTranCode == null || txTranCode.size() == 0)
+      throw new DBException(6);
+     String dbName = "";
 		String empNot = "";
 
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-			empNot = empNot.isEmpty() ? "System" : empNot;
-		}
-		this.info("InsertAll...");
-		for (TxTranCode t : txTranCode) {
-			if (!empNot.isEmpty())
-				t.setCreateEmpNo(empNot);
-			if (t.getLastUpdateEmpNo() == null || t.getLastUpdateEmpNo().isEmpty())
-				t.setLastUpdateEmpNo(empNot);
-		}
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
 
-		if (dbName.equals(ContentName.onDay)) {
-			txTranCode = txTranCodeReposDay.saveAll(txTranCode);
-			txTranCodeReposDay.flush();
-		} else if (dbName.equals(ContentName.onMon)) {
-			txTranCode = txTranCodeReposMon.saveAll(txTranCode);
-			txTranCodeReposMon.flush();
-		} else if (dbName.equals(ContentName.onHist)) {
-			txTranCode = txTranCodeReposHist.saveAll(txTranCode);
-			txTranCodeReposHist.flush();
-		} else {
-			txTranCode = txTranCodeRepos.saveAll(txTranCode);
-			txTranCodeRepos.flush();
-		}
-	}
+    this.info("InsertAll...");
+    for (TxTranCode t : txTranCode){ 
+      if (!empNot.isEmpty())
+        t.setCreateEmpNo(empNot);
+      if(t.getLastUpdateEmpNo() == null || t.getLastUpdateEmpNo().isEmpty())
+        t.setLastUpdateEmpNo(empNot);
+}		
 
-	@Override
-	public void updateAll(List<TxTranCode> txTranCode, TitaVo... titaVo) throws DBException {
-		String dbName = "";
+    if (dbName.equals(ContentName.onDay)) {
+      txTranCode = txTranCodeReposDay.saveAll(txTranCode);	
+      txTranCodeReposDay.flush();
+    }
+    else if (dbName.equals(ContentName.onMon)) {
+      txTranCode = txTranCodeReposMon.saveAll(txTranCode);	
+      txTranCodeReposMon.flush();
+    }
+    else if (dbName.equals(ContentName.onHist)) {
+      txTranCode = txTranCodeReposHist.saveAll(txTranCode);
+      txTranCodeReposHist.flush();
+    }
+    else {
+      txTranCode = txTranCodeRepos.saveAll(txTranCode);
+      txTranCodeRepos.flush();
+    }
+    }
+
+  @Override
+  public void updateAll(List<TxTranCode> txTranCode, TitaVo... titaVo) throws DBException {
+     String dbName = "";
 		String empNot = "";
 
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-		this.info("UpdateAll...");
-		if (txTranCode == null || txTranCode.size() == 0)
-			throw new DBException(6);
+		} else
+       empNot = ThreadVariable.getEmpNot();
 
-		for (TxTranCode t : txTranCode)
-			if (!empNot.isEmpty())
-				t.setLastUpdateEmpNo(empNot);
+    this.info("UpdateAll...");
+    if (txTranCode == null || txTranCode.size() == 0)
+      throw new DBException(6);
 
-		if (dbName.equals(ContentName.onDay)) {
-			txTranCode = txTranCodeReposDay.saveAll(txTranCode);
-			txTranCodeReposDay.flush();
-		} else if (dbName.equals(ContentName.onMon)) {
-			txTranCode = txTranCodeReposMon.saveAll(txTranCode);
-			txTranCodeReposMon.flush();
-		} else if (dbName.equals(ContentName.onHist)) {
-			txTranCode = txTranCodeReposHist.saveAll(txTranCode);
-			txTranCodeReposHist.flush();
-		} else {
-			txTranCode = txTranCodeRepos.saveAll(txTranCode);
-			txTranCodeRepos.flush();
-		}
-	}
+    for (TxTranCode t : txTranCode) 
+    if (!empNot.isEmpty())
+        t.setLastUpdateEmpNo(empNot);
+		
 
-	@Override
-	public void deleteAll(List<TxTranCode> txTranCode, TitaVo... titaVo) throws DBException {
-		this.info("DeleteAll...");
-		String dbName = "";
+    if (dbName.equals(ContentName.onDay)) {
+      txTranCode = txTranCodeReposDay.saveAll(txTranCode);	
+      txTranCodeReposDay.flush();
+    }
+    else if (dbName.equals(ContentName.onMon)) {
+      txTranCode = txTranCodeReposMon.saveAll(txTranCode);	
+      txTranCodeReposMon.flush();
+    }
+    else if (dbName.equals(ContentName.onHist)) {
+      txTranCode = txTranCodeReposHist.saveAll(txTranCode);
+      txTranCodeReposHist.flush();
+    }
+    else {
+      txTranCode = txTranCodeRepos.saveAll(txTranCode);
+      txTranCodeRepos.flush();
+    }
+    }
 
-		if (titaVo.length != 0)
-			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		if (txTranCode == null || txTranCode.size() == 0)
-			throw new DBException(6);
-		if (dbName.equals(ContentName.onDay)) {
-			txTranCodeReposDay.deleteAll(txTranCode);
-			txTranCodeReposDay.flush();
-		} else if (dbName.equals(ContentName.onMon)) {
-			txTranCodeReposMon.deleteAll(txTranCode);
-			txTranCodeReposMon.flush();
-		} else if (dbName.equals(ContentName.onHist)) {
-			txTranCodeReposHist.deleteAll(txTranCode);
-			txTranCodeReposHist.flush();
-		} else {
-			txTranCodeRepos.deleteAll(txTranCode);
-			txTranCodeRepos.flush();
-		}
-	}
+  @Override
+  public void deleteAll(List<TxTranCode> txTranCode, TitaVo... titaVo) throws DBException {
+    this.info("DeleteAll...");
+    String dbName = "";
+    
+    if (titaVo.length != 0)
+    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    if (txTranCode == null || txTranCode.size() == 0)
+      throw new DBException(6);
+    if (dbName.equals(ContentName.onDay)) {
+      txTranCodeReposDay.deleteAll(txTranCode);	
+      txTranCodeReposDay.flush();
+    }
+    else if (dbName.equals(ContentName.onMon)) {
+      txTranCodeReposMon.deleteAll(txTranCode);	
+      txTranCodeReposMon.flush();
+    }
+    else if (dbName.equals(ContentName.onHist)) {
+      txTranCodeReposHist.deleteAll(txTranCode);
+      txTranCodeReposHist.flush();
+    }
+    else {
+      txTranCodeRepos.deleteAll(txTranCode);
+      txTranCodeRepos.flush();
+    }
+  }
 
 }

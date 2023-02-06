@@ -92,7 +92,8 @@ BEGIN
            ELSE 'N' END                   AS "FinancialFlag"       -- 理財型房貸 VARCHAR2 1 0
           -- 參考資料:利率代碼整理.xlsx 利率別代號為黃色底為員工優惠貸款
           ,CASE
-             WHEN TRIM(TO_SINGLE_BYTE("TB$TBLP"."IN$COD")) IN ('1','11','1A','38','EM','EN','EO','EP','EQ','ER','ES') THEN 'Y'
+             WHEN TRIM(TO_SINGLE_BYTE("TB$TBLP"."IN$COD")) IN ('1','11','13','1A','1E','1F','38','EM','EN','EO','EP','EQ','ER','ES')
+             THEN 'Y'
            ELSE 'N' END                   AS "EmpFlag"             -- 員工優惠貸款 VARCHAR2 1 0
           ,CASE
              WHEN NVL("TB$TBLP"."PSNBCD",0) > 0 THEN 'Y' -- 2021-03-22 修改為Y/N

@@ -52,56 +52,56 @@ import com.st1.itx.util.parse.Parse;
  */
 public class L5500Batch extends TradeBuffer {
 	@Autowired
-	public Parse parse;
+	private Parse parse;
 
 	@Autowired
-	public DateUtil dateUtil;
+	private DateUtil dateUtil;
 
 	@Autowired
-	public HlAreaDataService hlAreaDataService;
+	private HlAreaDataService hlAreaDataService;
 
 	@Autowired
-	public HlCusDataService hlCusDataService;
+	private HlCusDataService hlCusDataService;
 
 	@Autowired
-	public HlEmpLnYg5PtService hlEmpLnYg5PtService;
+	private HlEmpLnYg5PtService hlEmpLnYg5PtService;
 
 	@Autowired
-	public HlAreaLnYg6PtService hlAreaLnYg6PtService;
+	private HlAreaLnYg6PtService hlAreaLnYg6PtService;
 
 	@Autowired
-	public HlThreeLaqhcpService hlThreeLaqhcpService;
+	private HlThreeLaqhcpService hlThreeLaqhcpService;
 
 	@Autowired
-	public HlThreeDetailService hlThreeDetailService;
+	private HlThreeDetailService hlThreeDetailService;
 
 	@Autowired
-	CdWorkMonthService cdWorkMonthService;
+	private CdWorkMonthService cdWorkMonthService;
 
 	@Autowired
-	public L5500ServiceImpl l5500ServiceImpl;
+	private L5500ServiceImpl l5500ServiceImpl;
 
 	@Autowired
-	public WebClient webClient;
+	private WebClient webClient;
 		
 	
 	/**
 	 * 三階放款明細統計（T9410051）
 	 */
 	@Autowired
-	public L9744Batch l9744Batch;
+	private L9744Batch l9744Batch;
 	
 	/**
 	 * 放款專員明細統計（T9410052）
 	 */
 	@Autowired
-	public L9745Batch l9745Batch;
+	private L9745Batch l9745Batch;
 	
 	/**
 	 * 介紹人換算業績報酬檢核表
 	 * */
 	@Autowired
-	public L9746Batch l9746Batch;
+	private L9746Batch l9746Batch;
 
 	private int entday;
 	private int bworkmonth = 0;
@@ -159,9 +159,9 @@ public class L5500Batch extends TradeBuffer {
 
 		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", msg, titaVo);
 
-		l9744Batch.run();
-		l9745Batch.run();
-		l9746Batch.run();
+		l9744Batch.run(titaVo);
+		l9745Batch.run(titaVo);
+		l9746Batch.run(titaVo);
 		
 		this.addList(this.totaVo);
 		return this.sendList();
