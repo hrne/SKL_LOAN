@@ -153,9 +153,9 @@ public class CheckAuth extends CommBuffer {
 				checkAuthVo.setCanUpdate(true);
 			}
 		} else if ((actFg == 2 || actFg == 4) && txTeller.getLevelFg() == 1) {
-			if (txAuthority.getAuthFg() == 2) {
-				checkAuthVo.setCanUpdate(true);
-			}
+			checkAuthVo.setCanUpdate(true);
+//			if (txAuthority.getAuthFg() == 2) 
+//				checkAuthVo.setCanUpdate(true);
 		}
 
 		return checkAuthVo;

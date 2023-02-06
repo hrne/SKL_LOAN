@@ -44,6 +44,7 @@ BEGIN
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
           ,0 AS "ActualFilingDate"
           ,NULL AS "ActualFilingMark"
+          ,0 AS "JcicReportDate"
     FROM "TBJCICZ040"
     ;
 

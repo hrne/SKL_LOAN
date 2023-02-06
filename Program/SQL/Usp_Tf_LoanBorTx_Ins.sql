@@ -147,10 +147,10 @@ BEGIN
                  +
                  -- 2023-01-30 智偉增加 from 賴桑 : 交易金額不含支票兌現
                  CASE
-                   WHEN TR1."TRXCRC" IN ('1','3')  AND TR1."TRXNTX" != 0
-                   THEN TR1."TRXNTX"
-                   WHEN TR1."TRXNTX" != 0
-                   THEN 0 - TR1."TRXNTX"
+                   WHEN S1."TRXCRC" IN ('1','3') AND S1."TRXNTX" != 0
+                   THEN S1."TRXNTX"
+                   WHEN S1."TRXNTX" != 0
+                   THEN 0 - S1."TRXNTX"
                  ELSE 0
                  END   
                  )     AS "TRXAMT" -- 計算交易總金額 

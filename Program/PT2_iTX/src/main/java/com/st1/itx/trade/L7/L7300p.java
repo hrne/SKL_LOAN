@@ -104,7 +104,9 @@ public class L7300p extends TradeBuffer {
 		}
 
 		String icsVersion = titaVo.getParam("IcsVersion");
-		int dataDate = parse.stringToInteger(titaVo.getParam("DataDate"));
+		int dataMonth = parse.stringToInteger(titaVo.getParam("DataMonth"));
+		int lastMonthEndDate = this.txBuffer.getTxBizDate().getLmnDy();
+		int dataDate = titaVo.getEntDyI();
 
 		if (icsVersion != null) {
 			icsVersion = icsVersion.toUpperCase();
@@ -112,15 +114,24 @@ public class L7300p extends TradeBuffer {
 
 		switch (icsVersion) {
 		case "V0":
+			break;
 		case "V1":
 		case "V2":
+			// V1 V2 固定上月底日資料
+			dataMonth = (lastMonthEndDate / 100);
+			dataDate = lastMonthEndDate;
+			break;
 		case "V3":
+			// 找指定月份月底日
+			dataDate = getMonthEndDate(dataMonth);
 			break;
 		default:
 			this.error("L7300 ICS Version 參數限為V0、V1、V2、V3");
 			sendWebMsg("L7300 ICS Version 參數限為V0、V1、V2、V3");
 			break;
 		}
+
+		this.info("dataDate = " + dataDate);
 
 		stockDate = rptUtil.showBcDate(dataDate, 3);
 
@@ -140,17 +151,15 @@ public class L7300p extends TradeBuffer {
 		tranSerialSeq = "LN_" + icsVersion + "_" + rptUtil.showBcDate(dataDate, 2) + "_"
 				+ FormatUtil.pad9("" + seqL7300, 2);
 
-		String yearMonth = "" + ((dataDate + 19110000) / 100);
-
 		// doQuery
 		List<Map<String, String>> resultList = null;
-		
+
 		if (icsVersion.equals("V0")) {
 			// V0 傳送當下即時資料
-			resultList = sL7300ServiceImpl.findNow( titaVo);
+			resultList = sL7300ServiceImpl.findNow(titaVo);
 		} else {
 			// V1 V2 V3 傳月底日資料
-			resultList = sL7300ServiceImpl.findAll(yearMonth, titaVo);
+			resultList = sL7300ServiceImpl.findAll(dataMonth, titaVo);
 		}
 
 		if (resultList == null || resultList.isEmpty()) {
@@ -167,6 +176,25 @@ public class L7300p extends TradeBuffer {
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+
+	/**
+	 * 
+	 * @param yearMonth 民國年月5碼(YYYMM)
+	 * @return 民國月底日期(YYYMMDD)
+	 * @throws LogicException
+	 */
+	private int getMonthEndDate(int yearMonth) throws LogicException {
+		int monthEndDate = 0;
+		monthEndDate = yearMonth * 100 + 1; // ex. 1110101
+		dDateUtil.init();
+		dDateUtil.setDate_1(monthEndDate);
+		dDateUtil.setMons(1);
+		monthEndDate = dDateUtil.getCalenderDay(); // ex.1110201
+		dDateUtil.init();
+		monthEndDate = dDateUtil.getbussDate(monthEndDate + 19110000, -1); // ex.20220131
+		monthEndDate = monthEndDate - 19110000; // 1110131
+		return monthEndDate;
 	}
 
 	private void setApiUrl(TitaVo titaVo) throws LogicException {

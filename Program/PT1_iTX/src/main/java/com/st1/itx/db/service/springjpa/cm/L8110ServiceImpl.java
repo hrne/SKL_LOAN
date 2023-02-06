@@ -67,8 +67,8 @@ public class L8110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    FROM \"LoanBorTx\" ";
 		sql += "    WHERE \"TitaTxCd\" = 'L3200' ";
 		sql += "      AND \"TitaHCode\" = '0' ";
-		sql += "      AND \"Principal\" + \"ExtraRepay\" > 0 "; // 還本
-		sql += "      AND JSON_VALUE(\"OtherFields\",'$.RepayCode') = '1' "; // 1:匯款
+		sql += "      AND \"ExtraRepay\" > 0 "; // 還本
+		sql += "      AND \"RepayCode\" in  (1 , 11) "; // 1:匯款 11:大額匯款手工增入入帳
 		sql += "    GROUP BY \"CustNo\" ";
 		sql += "           , \"FacmNo\" ";
 		sql += ") ";
@@ -97,12 +97,12 @@ public class L8110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    SELECT NVL(F.\"CreditSysNo\", L.\"CustNo\") ";
 		sql += "                                AS \"CustNo\" "; // 戶號
 		sql += "		 , SUM(CASE "; 
-		sql += "                 WHEN P.\"BreachFlag\" = 'N' "; // 同一戶號下且未約定「限制清償期間」的客戶才計算
+		sql += "                 WHEN F.\"BreachFlag\" = 'N' "; // 同一戶號下且未約定「限制清償期間」的客戶才計算
 		sql += "		         THEN T.repayAmtIn3Years ";
 		sql += "		       ELSE 0 ";
 		sql += "		       END)             AS repayAmtIn3Years "; // 三年內還本的匯款金額 
 		sql += "		 , SUM(CASE ";
-		sql += "                 WHEN P.\"BreachFlag\" = 'N' "; // 同一戶號下且未約定「限制清償期間」的客戶才計算
+		sql += "                 WHEN F.\"BreachFlag\" = 'N' "; // 同一戶號下且未約定「限制清償期間」的客戶才計算
 		sql += "		         THEN T.repayAmtIn5Years ";
 		sql += "		       ELSE 0 ";
 		sql += "		       END)             AS repayAmtIn5Years "; // 五年內還本的匯款金額 
@@ -120,7 +120,6 @@ public class L8110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    ) L ";
 		sql += "    LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = L.\"CustNo\" ";
 		sql += "		                   AND F.\"FacmNo\" = L.\"FacmNo\" ";
-		sql += "    LEFT JOIN \"FacProd\" P ON P.\"ProdNo\" = F.\"ProdNo\" ";
 		sql += "    LEFT JOIN txData T ON T.\"CustNo\" = L.\"CustNo\" ";
 		sql += "                      AND T.\"FacmNo\" = L.\"FacmNo\" ";
 		sql += "    GROUP BY NVL(F.\"CreditSysNo\", L.\"CustNo\") ";

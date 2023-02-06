@@ -283,15 +283,6 @@ public class L6101 extends TradeBuffer {
 				}
 			}
 
-			// MsgCode=06 檢查是否有未放行交易 , 其他由9-放款檢查
-			txFlowCnt = 0;
-			if (cClsFg == 1) {
-				txFlowCnt = findTxFlow("  ", txFlowCnt, titaVo);
-				if (txFlowCnt > 0) {
-					cMsgCode = cMsgCode + 1;
-				}
-			}
-
 			// MsgCode=07 檢查會計銷帳檔是否有應銷未銷資料
 			if (cClsFg == 1) {
 				acReceivableCnt = findAcReceivable(acReceivableCnt, titaVo);

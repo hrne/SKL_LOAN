@@ -26,7 +26,7 @@ public class L7300ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(String yearMonth, TitaVo titaVo) {
+	public List<Map<String, String>> findAll(int yearMonth, TitaVo titaVo) {
 		this.info("L7300ServiceImpl findAll ");
 
 		this.info("yearMonth = " + yearMonth);

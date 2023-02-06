@@ -321,9 +321,11 @@ HELP(#CaseStatus55Help)
 @T(3,@CaseStatusX,)
 V(H,#CaseStatus55Help)
 C(3,#CaseStatus,1,T(F,@OutstandAmt,1),T(F,@OutstandAmt,0))
-C(3,#CaseStatus,3,T(2,@FdPayDate,*)T(2,@FdPayEndDate,*)T(2,@FdPeriod,*)T(2,@FdRate,*)T(F,@PayDate,1)T(F,@PayEndDate,1)T(F,@Period,1)T(F,@Rate,1)
-                ,T(2,@FdPayDate, )T(2,@FdPayEndDate, )T(2,@FdPeriod, )T(2,@FdRate, )T(F,@PayDate,0)T(F,@PayEndDate,0)T(F,@Period,0)T(F,@Rate,0))
+C(3,#CaseStatus,3,T(2,@FdPayDate,*)T(2,@FdPayEndDate,*)T(2,@FdPeriod,*)T(2,@FdRate,*)T(2,@FdIsImplement,*)T(F,@PayDate,1)T(F,@PayEndDate,1)T(F,@Period,1)T(F,@Rate,1)
+                , T(2,@FdPayDate, )T(2,@FdPayEndDate, )T(2,@FdPeriod, )T(2,@FdRate, )T(2,@FdIsImplement, )T(F,@PayDate,0)T(F,@PayEndDate,0)T(F,@Period,0)T(F,@Rate,0))
 C(2,#CaseStatus,T(F,@SubAmt,0),T(F,@SubAmt,0),T(F,@SubAmt,0),T(F,@SubAmt,0),T(F,@SubAmt,1),T(F,@SubAmt,1),T(F,@SubAmt,0))
+
+
 
 
 #CaseStatusX=X,40,L
@@ -474,20 +476,6 @@ V(H,#YesNoHelp)
 #ClaimStatus2X=X,2,L
 T(H,@ClaimStatus2X,#ClaimStatus2,#YesNoHelp)
 
-!是否依更生條件履行 22
-#IsImplement=X,1,I
-C(5,#TranKey_Tmp,5,s,$)
-C(5,#TranKey_Tmp,4,s,$)
-C(3,#CaseStatus,3,$,s)
-C(5,#TranKey,D,T(2,@IsImplement,#L8r27IsImplement),$)
-C(5,#TranKey,D,s,$)
-HELP(#YesNoHelp)
-@T(3,@IsImplementX,)
-V(H,#YesNoHelp)
-
-#IsImplementX=X,2,L
-T(H,@IsImplementX,#IsImplement,#YesNoHelp)
-
 !保全處分撤銷日
 #SaveEndDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
@@ -496,6 +484,23 @@ C(5,#TranKey,D,T(2,@SaveEndDate,#L8r27SaveEndDate),$)
 C(5,#TranKey,D,s,$)
 D(8)
 @A(DATE,0,#SaveEndDate)
+
+
+!是否依更生條件履行 22
+#IsImplement=X,1,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+
+C(5,#TranKey,D,T(2,@IsImplement,#L8r27IsImplement),$)
+C(5,#TranKey,D,s,$)
+HELP(#YesNoHelp)
+@T(3,@IsImplementX,)
+C(3,#CaseStatus,3,V(H,#YesNoHelp),C(4,#IsImplement,$,V(H,#YesNoHelp)))
+
+
+#IsImplementX=X,2,L
+T(H,@IsImplementX,#IsImplement,#YesNoHelp)
+
 
 
 

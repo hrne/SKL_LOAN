@@ -38,7 +38,48 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[180,820];printer.width=[20,20];">
 [
 ["[L7300]                                 ICS資產資料傳輸"],
+["#FdIcsVersion+@版本",#IcsVersion,#IcsVersionX],
+["#FdDataMonth+@資料年月",#DataMonth],
 ]
+
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+#Show=x,1,S
+INVOKEJS(SHOW,p1,2,2,0)
+
+#CodeIcsVersion=x,30,S
+T(3,CdCode.IcsVersion)
+
+#IcsVersionHelp=x,1000,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CodeIcsVersion)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@IcsVersionHelp,#HelpDesc1)
+
+#FdIcsVersion=X,2,L
+T(3,*)
+
+#FdDataMonth=X,2,L
+T(3,*)
+
+#IcsVersion=X,2,I
+HELP(#IcsVersionHelp)
+@T(3,@IcsVersionX,)
+V(H,#IcsVersionHelp)
+INVOKEJS(SHOW,p1,2,2,0)
+
+#IcsVersionX=x,50,L
+T(H,#IcsVersion,#IcsVersionHelp)
+
+#DataMonth=A,5,I
+IF(#IcsVersion=="V3",$,S)
+INVOKEJS(SHOW,p1,2,2,1)
+@V(2,0)
+A(YM,1,#DataMonth)
 
 </sub>
 
@@ -68,6 +109,8 @@ T(3,1)ASGN(LOOP$)
 
 !------ 上行電文 ------
 <sub type="TIM">
+#IcsVersion
+#DataMonth
 </sub>
 
 
@@ -77,6 +120,7 @@ TXFORM=L7300
 #TranStatus
 ^
 <include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 
 <sub type="PART" name="L7300" layout="cols=1;screen.width=[200,700];printer.width=[15,30,15,30];order=1">
