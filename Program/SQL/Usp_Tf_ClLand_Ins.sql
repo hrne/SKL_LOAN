@@ -19,7 +19,36 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "ClLand" ENABLE PRIMARY KEY'; 
  
     -- 寫入資料 
-    INSERT INTO "ClLand" 
+    INSERT INTO "ClLand" (
+         "ClCode1"             -- 擔保品代號1 DECIMAL 1  
+       , "ClCode2"             -- 擔保品代號2 DECIMAL 2  
+       , "ClNo"                -- 擔保品編號 DECIMAL 7  
+       , "LandSeq"             -- 土地序號 DECIMAL 3 
+       , "CityCode"            -- 縣市 VARCHAR2 2  
+       , "AreaCode"            -- 鄉鎮市區 VARCHAR2 3  
+       , "IrCode"              -- 段小段代碼 VARCHAR2 5  
+       , "LandNo1"             -- 地號 VARCHAR2 4  
+       , "LandNo2"             -- 地號(子號) VARCHAR2 4  
+       , "LandLocation"        -- 土地座落 NVARCHAR2 150  
+       , "LandCode"            -- 地目 VARCHAR2 2  
+       , "Area"                -- 面積 DECIMAL 9 2 
+       , "LandZoningCode"      -- 土地使用區分 VARCHAR2 2  
+       , "LandUsageType"       -- 使用地類別 VARCHAR2 2  
+       , "LandUsageCode"       -- 土地使用別 VARCHAR2 1  
+       , "PostedLandValue"     -- 公告土地現值 DECIMAL 16 2 
+       , "PostedLandValueYearMonth" -- 公告土地現值年月 DECIMAL 6  
+       , "TransferedYear"      -- 移轉年度 DECIMAL 4  
+       , "LastTransferedAmt"   -- 前次移轉金額 DECIMAL 16 2 
+       , "LVITax"              -- 土地增值稅 DECIMAL 16 2 
+       , "LVITaxYearMonth"     -- 土地增值稅年月 DECIMAL 6  
+       , "EvaUnitPrice"        -- 鑑價單價/坪 DECIMAL 16 2 
+       , "LandRentStartDate"   -- 土地租約起日 decimald 8  
+       , "LandRentEndDate"     -- 土地租約到期日 decimald 8  
+       , "CreateDate"          -- 建檔日期時間 DATE   
+       , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
+       , "LastUpdate"          -- 最後更新日期時間 DATE   
+       , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6  
+    )
     SELECT S1."ClCode1"                   AS "ClCode1"             -- 擔保品代號1 DECIMAL 1  
           ,S1."ClCode2"                   AS "ClCode2"             -- 擔保品代號2 DECIMAL 2  
           ,S1."ClNo"                      AS "ClNo"                -- 擔保品編號 DECIMAL 7  
@@ -249,7 +278,36 @@ BEGIN
     INS_CNT := INS_CNT + sql%rowcount; 
  
     -- 從建物檔將建物的土地資料寫入土地檔寫入資料 
-    INSERT INTO "ClLand" 
+    INSERT INTO "ClLand"  (
+         "ClCode1"             -- 擔保品代號1 DECIMAL 1  
+       , "ClCode2"             -- 擔保品代號2 DECIMAL 2  
+       , "ClNo"                -- 擔保品編號 DECIMAL 7  
+       , "LandSeq"             -- 土地序號 DECIMAL 3 
+       , "CityCode"            -- 縣市 VARCHAR2 2  
+       , "AreaCode"            -- 鄉鎮市區 VARCHAR2 3  
+       , "IrCode"              -- 段小段代碼 VARCHAR2 5  
+       , "LandNo1"             -- 地號 VARCHAR2 4  
+       , "LandNo2"             -- 地號(子號) VARCHAR2 4  
+       , "LandLocation"        -- 土地座落 NVARCHAR2 150  
+       , "LandCode"            -- 地目 VARCHAR2 2  
+       , "Area"                -- 面積 DECIMAL 9 2 
+       , "LandZoningCode"      -- 土地使用區分 VARCHAR2 2  
+       , "LandUsageType"       -- 使用地類別 VARCHAR2 2  
+       , "LandUsageCode"       -- 土地使用別 VARCHAR2 1  
+       , "PostedLandValue"     -- 公告土地現值 DECIMAL 16 2 
+       , "PostedLandValueYearMonth" -- 公告土地現值年月 DECIMAL 6  
+       , "TransferedYear"      -- 移轉年度 DECIMAL 4  
+       , "LastTransferedAmt"   -- 前次移轉金額 DECIMAL 16 2 
+       , "LVITax"              -- 土地增值稅 DECIMAL 16 2 
+       , "LVITaxYearMonth"     -- 土地增值稅年月 DECIMAL 6  
+       , "EvaUnitPrice"        -- 鑑價單價/坪 DECIMAL 16 2 
+       , "LandRentStartDate"   -- 土地租約起日 decimald 8  
+       , "LandRentEndDate"     -- 土地租約到期日 decimald 8  
+       , "CreateDate"          -- 建檔日期時間 DATE   
+       , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
+       , "LastUpdate"          -- 最後更新日期時間 DATE   
+       , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6  
+    )
     WITH S1 AS ( 
          SELECT DISTINCT 
                 B0."ClCode1" 

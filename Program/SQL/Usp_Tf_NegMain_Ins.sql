@@ -22,7 +22,49 @@ BEGIN
     DELETE FROM "NegMain";
 
     -- 寫入資料
-    INSERT INTO "NegMain"
+    INSERT INTO "NegMain" (
+        "CustNo"              -- 戶號 DECIMAL 7 0
+      , "CaseSeq"             -- 案件序號 DECIMAL 3 0
+      , "CaseKindCode"        -- 案件種類 VARCHAR2 1 0
+      , "Status"              -- 戶況 VARCHAR2 1 0
+      , "CustLoanKind"        -- 債權戶別 VARCHAR2 1 0
+      , "PayerCustNo"         -- 付款人戶號 DECIMAL 7 -- 2021-11-19 智偉修改
+      , "DeferYMStart"        -- 延期繳款年月(起) DECIMAL 6 0
+      , "DeferYMEnd"          -- 延期繳款年月(訖) DECIMAL 6 0
+      , "ApplDate"           -- 協商申請日 DecimalD 8 0
+      , "DueAmt"              -- 月付金(期款) DECIMAL 16 2
+      , "TotalPeriod"         -- 期數 DECIMAL 3 0
+      , "IntRate"             -- 計息條件(利率) DECIMAL 6 4
+      , "FirstDueDate"        -- 首次應繳日 DecimalD 8 0
+      , "LastDueDate"         -- 還款結束日 DecimalD 8 0
+      , "IsMainFin"           -- 是否最大債權 VARCHAR2 1 0
+      , "TotalContrAmt"       -- 簽約總金額 DECIMAL 16 2
+      , "MainFinCode"         -- 最大債權機構 VARCHAR2 8 0
+      , "PrincipalBal"        -- 總本金餘額 DECIMAL 16 2
+      , "AccuTempAmt"         -- 累暫收金額 DECIMAL 16 2
+      , "AccuOverAmt"         -- 累溢收金額 DECIMAL 16 2
+      , "AccuDueAmt"          -- 累期款金額 DECIMAL 16 2
+      , "AccuSklShareAmt"     -- 累新壽分攤金額 DECIMAL 16 2
+      , "RepaidPeriod"        -- 已繳期數 DECIMAL 3 0
+      , "TwoStepCode"         -- 二階段註記 VARCHAR2 1 0
+      , "ChgCondDate"         -- 申請變更還款條件日 DecimalD 8 0
+      , "NextPayDate"         -- 下次應繳日 DecimalD 8 0
+      , "PayIntDate"          -- 繳息迄日 DecimalD 8 0
+      , "RepayPrincipal"      -- 還本本金 DECIMAL 14 0
+      , "RepayInterest"       -- 還本利息 DECIMAL 14 0
+      , "StatusDate"          -- 戶況日期 DecimalD 8 0
+      , "CourCode"            -- 受理調解機構代號 VARCHAR2(3 BYTE)
+      , "ThisAcDate"          -- 本次會計日期 NUMBER(8,0) 
+      , "ThisTitaTlrNo"       -- 本次經辦 VARCHAR2(6 BYTE) 
+      , "ThisTitaTxtNo"       -- 本次交易序號 NUMBER(8,0)
+      , "LastAcDate"          -- 上次會計日期 NUMBER(8,0)
+      , "LastTitaTlrNo"       -- 上次經辦 VARCHAR2(6 BYTE)
+      , "LastTitaTxtNo"       -- 上次交易序號 NUMBER(8,0)
+      , "CreateDate"          -- 建檔日期時間 DATE 8 0
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+      , "LastUpdate"          -- 最後更新日期時間 DATE 8 0
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+    )
     SELECT JM.RC_ACCOUNT                  AS "CustNo"              -- 戶號 DECIMAL 7 0
           ,ROW_NUMBER() OVER (PARTITION BY JM.RC_ACCOUNT
                               ORDER BY JM.RC_ACCOUNT,JM.RC_DATE)

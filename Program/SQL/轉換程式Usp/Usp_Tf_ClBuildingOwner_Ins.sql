@@ -19,7 +19,19 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "ClBuildingOwner" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "ClBuildingOwner"
+    INSERT INTO "ClBuildingOwner" (
+        "ClCode1"             -- 擔保品代號1 DECIMAL 1 
+      , "ClCode2"             -- 擔保品代號2 DECIMAL 2 
+      , "ClNo"                -- 擔保品編號 DECIMAL 7 
+      , "OwnerCustUKey"       -- 所有權人客戶識別碼 VARCHAR2 32 
+      , "OwnerRelCode"        -- 與授信戶關係 VARCHAR2 2
+      , "OwnerPart"           -- 持分比率(分子) DECIMAL 10
+      , "OwnerTotal"          -- 持分比率(分母) DECIMAL 10
+      , "CreateDate"          -- 建檔日期時間 DATE  
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+      , "LastUpdate"          -- 最後更新日期時間 DATE  
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+    )
     SELECT DISTINCT
            CNM."ClCode1"                  AS "ClCode1"             -- 擔保品代號1 DECIMAL 1 
           ,CNM."ClCode2"                  AS "ClCode2"             -- 擔保品代號2 DECIMAL 2 

@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_PostAuthLog_Ins" 
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_PostAuthLog_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -34,7 +34,41 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "PostAuthLog" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "PostAuthLog"
+    INSERT INTO "PostAuthLog" (
+        "AuthCreateDate"      -- 建檔日期 Decimald 8 0
+      , "AuthApplCode"        -- 申請代號，狀態碼 VARCHAR2 1 0
+      , "CustNo"              -- 戶號 DECIMAL 7 0
+      , "PostDepCode"         -- 帳戶別 VARCHAR2 1 0
+      , "RepayAcct"           -- 儲金帳號 VARCHAR2 14 0
+      , "AuthCode"            -- 授權方式 VARCHAR2 1 0
+      , "FacmNo"              -- 額度 DECIMAL 3 0
+      , "CustId"              -- 統一編號 VARCHAR2 10 0
+      , "RepayAcctSeq"        -- 帳號碼 VARCHAR2 2 0
+      , "ProcessDate"         -- 處理日期 Decimald 8 0
+      , "StampFinishDate"     -- 核印完成日期 Decimald 8 0
+      , "StampCancelDate"     -- 核印取消日期 Decimald 8 0
+      , "StampCode"           -- 核印註記 VARCHAR2 1 0
+      , "PostMediaCode"       -- 媒體碼 VARCHAR2 1 0
+      , "AuthErrorCode"       -- 狀況代號，授權狀態 VARCHAR2 2 0
+      , "FileSeq"             -- 媒體檔流水編號 DECIMAL 6 0
+      , "PropDate"            -- 提出日期 Decimald 8 0
+      , "RetrDate"            -- 提回日期 Decimald 8 0
+      , "DeleteDate"          -- 暫停授權日期 Decimald 8 0
+      , "RelationCode"        -- 與借款人關係 VARCHAR2 2 0
+      , "RelAcctName"         -- 第三人帳戶戶名 NVARCHAR2 100 0
+      , "RelationId"          -- 第三人身分證字號 VARCHAR2 10 0
+      , "RelAcctBirthday"     -- 第三人出生日期 Decimald 8 0
+      , "RelAcctGender"       -- 第三人性別 VARCHAR2 1 0
+      , "AmlRsp"              -- AML回應碼 VARCHAR2 1 0
+      , "TitaTxCd"            -- 交易代號 VARCHAR2 5 
+      , "CreateEmpNo"         -- 建立者櫃員編號 VARCHAR2 6 0
+      , "CreateDate"          -- 建檔日期 DATE 0 0
+      , "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 0
+      , "LastUpdate"          -- 異動日期 DATE 0 0
+      , "ProcessTime"         -- 處理時間 Decimal 6 0
+      , "LimitAmt"
+      , "AuthMeth"
+    )
     SELECT "PO$AARP"."CUSCDT"             AS "AuthCreateDate"      -- 建檔日期 Decimald 8 0
           ,'1'                            AS "AuthApplCode"        -- 申請代號，狀態碼 VARCHAR2 1 0
           ,"PO$AARP"."LMSACN"             AS "CustNo"              -- 戶號 DECIMAL 7 0
@@ -106,16 +140,87 @@ BEGIN
     INS_CNT := INS_CNT + sql%rowcount;
     
     -- LA$APLP有授權帳號資料，PO$AARP沒資料的資料補寫入
-    INSERT INTO "PostAuthLog"
+    INSERT INTO "PostAuthLog" (
+        "AuthCreateDate"      -- 建檔日期 Decimald 8 0
+      , "AuthApplCode"        -- 申請代號，狀態碼 VARCHAR2 1 0
+      , "CustNo"              -- 戶號 DECIMAL 7 0
+      , "PostDepCode"         -- 帳戶別 VARCHAR2 1 0
+      , "RepayAcct"           -- 儲金帳號 VARCHAR2 14 0
+      , "AuthCode"            -- 授權方式 VARCHAR2 1 0
+      , "FacmNo"              -- 額度 DECIMAL 3 0
+      , "CustId"              -- 統一編號 VARCHAR2 10 0
+      , "RepayAcctSeq"        -- 帳號碼 VARCHAR2 2 0
+      , "ProcessDate"         -- 處理日期 Decimald 8 0
+      , "StampFinishDate"     -- 核印完成日期 Decimald 8 0
+      , "StampCancelDate"     -- 核印取消日期 Decimald 8 0
+      , "StampCode"           -- 核印註記 VARCHAR2 1 0
+      , "PostMediaCode"       -- 媒體碼 VARCHAR2 1 0
+      , "AuthErrorCode"       -- 狀況代號，授權狀態 VARCHAR2 2 0
+      , "FileSeq"             -- 媒體檔流水編號 DECIMAL 6 0
+      , "PropDate"            -- 提出日期 Decimald 8 0
+      , "RetrDate"            -- 提回日期 Decimald 8 0
+      , "DeleteDate"          -- 暫停授權日期 Decimald 8 0
+      , "RelationCode"        -- 與借款人關係 VARCHAR2 2 0
+      , "RelAcctName"         -- 第三人帳戶戶名 NVARCHAR2 100 0
+      , "RelationId"          -- 第三人身分證字號 VARCHAR2 10 0
+      , "RelAcctBirthday"     -- 第三人出生日期 Decimald 8 0
+      , "RelAcctGender"       -- 第三人性別 VARCHAR2 1 0
+      , "AmlRsp"              -- AML回應碼 VARCHAR2 1 0
+      , "TitaTxCd"            -- 交易代號 VARCHAR2 5 
+      , "CreateEmpNo"         -- 建立者櫃員編號 VARCHAR2 6 0
+      , "CreateDate"          -- 建檔日期 DATE 0 0
+      , "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 0
+      , "LastUpdate"          -- 異動日期 DATE 0 0
+      , "ProcessTime"         -- 處理時間 Decimal 6 0
+      , "LimitAmt"
+      , "AuthMeth"
+    )
+    WITH BAA AS (
+        SELECT BAA."CustNo"
+              ,BAA."PostDepCode"
+              ,BAA."RepayAcct"
+              ,CASE
+                 WHEN BAA."AuthType" = '01'
+                 THEN '1'
+               ELSE '2' END                   AS "AuthCode"            -- 授權方式 VARCHAR2 1 0
+              ,BAA."FacmNo"
+              ,BAA."CreateEmpNo"
+              ,BAA."CreateDate"
+              ,BAA."LastUpdateEmpNo"
+              ,BAA."LastUpdate"
+              ,BAA."LimitAmt"
+              ,ROW_NUMBER()
+               OVER (
+                PARTITION BY BAA."CustNo"
+                           , BAA."PostDepCode"
+                           , BAA."RepayAcct"
+                           , CASE
+                               WHEN BAA."AuthType" = '01'
+                               THEN '1'
+                             ELSE '2' END
+                ORDER BY BAA."FacmNo"
+               ) AS "BAASeq"
+        FROM "BankAuthAct" BAA
+        LEFT JOIN "PostAuthLog" PAL ON PAL."AuthCreateDate" = "TbsDyF"
+                                   AND PAL."AuthApplCode" = '1'
+                                   AND PAL."CustNo" = BAA."CustNo"
+                                   AND PAL."PostDepCode" = BAA."PostDepCode"
+                                   AND PAL."RepayAcct" = BAA."RepayAcct"
+                                   AND PAL."AuthCode" = CASE
+                                                         WHEN BAA."AuthType" = '01'
+                                                         THEN '1'
+                                                       ELSE '2' END
+        WHERE BAA."Status" = ' ' -- 空白:未授權
+          AND BAA."RepayBank" = '700' -- 郵局
+          AND BAA."PostDepCode" IS NOT NULL
+          AND NVL(PAL."CustNo",0) = 0 -- 不存在的才寫入
+    )
     SELECT "TbsDyF"                       AS "AuthCreateDate"      -- 建檔日期 Decimald 8 0
           ,'1'                            AS "AuthApplCode"        -- 申請代號，狀態碼 VARCHAR2 1 0
           ,BAA."CustNo"                   AS "CustNo"              -- 戶號 DECIMAL 7 0
           ,BAA."PostDepCode"              AS "PostDepCode"         -- 帳戶別 VARCHAR2 1 0
           ,BAA."RepayAcct"                AS "RepayAcct"           -- 儲金帳號 VARCHAR2 14 0
-          ,CASE
-             WHEN BAA."AuthType" = '01'
-             THEN '1'
-           ELSE '2' END                   AS "AuthCode"            -- 授權方式 VARCHAR2 1 0
+          ,BAA."AuthCode"                 AS "AuthCode"            -- 授權方式 VARCHAR2 1 0
           ,BAA."FacmNo"                   AS "FacmNo"              -- 額度 DECIMAL 3 0
           ,CM."CustId"                    AS "CustId"              -- 統一編號 VARCHAR2 10 0
           ,''                             AS "RepayAcctSeq"        -- 帳號碼 VARCHAR2 2 0
@@ -123,7 +228,7 @@ BEGIN
           ,0                              AS "StampFinishDate"     -- 核印完成日期 Decimald 8 0
           ,0                              AS "StampCancelDate"     -- 核印取消日期 Decimald 8 0
           ,''                             AS "StampCode"           -- 核印註記 VARCHAR2 1 0
-          ,' '                            AS "PostMediaCode"       -- 媒體碼 VARCHAR2 1 0
+          ,''                             AS "PostMediaCode"       -- 媒體碼 VARCHAR2 1 0
           ,' '                            AS "AuthErrorCode"       -- 狀況代號，授權狀態 VARCHAR2 2 0
           ,0                              AS "FileSeq"             -- 媒體檔流水編號 DECIMAL 6 0
           ,0                              AS "PropDate"            -- 提出日期 Decimald 8 0
@@ -143,7 +248,7 @@ BEGIN
           ,0                              AS "ProcessTime"         -- 處理時間 Decimal 6 0
           ,BAA."LimitAmt"                 AS "LimitAmt"
           ,'A'                            AS "AuthMeth"
-    FROM "BankAuthAct" BAA
+    FROM BAA
     LEFT JOIN "CustMain" CM ON CM."CustNo" = BAA."CustNo"
     LEFT JOIN (
       SELECT DISTINCT
@@ -160,21 +265,10 @@ BEGIN
              ) AS "SEQ"
       FROM "LA$APLP"
       WHERE "LMSPYS" = 2
-    ) FACM ON FACM."LMSACN" = S1."LMSACN"
-          AND FACM."LMSPCN" = S1."LMSPCN"
+    ) FACM ON FACM."LMSACN" = BAA."CustNo"
+          AND FACM."LMSPCN" = BAA."RepayAcct"
           AND FACM."SEQ" = 1
-    LEFT JOIN "PostAuthLog" PAL ON PAL."AuthCreateDate" = "TbsDyF"
-                               AND PAL."AuthApplCode" = '1'
-                               AND PAL."CustNo" = BAA."CustNo"
-                               AND PAL."PostDepCode" = BAA."PostDepCode"
-                               AND PAL."RepayAcct" = BAA."RepayAcct"
-                               AND PAL."AuthCode" = CASE
-                                                      WHEN BAA."AuthType" = '01'
-                                                      THEN '1'
-                                                    ELSE '2' END
-    WHERE BAA."Status" = ' ' -- 空白:未授權
-      AND BAA."RepayBank" = '700' -- 郵局
-      AND NVL(PAL."CustNo",0) = 0 -- 不存在的才寫入
+    WHERE BAA."BAASeq" = 1 -- 只取一筆
     ;
 
     -- 記錄寫入筆數
@@ -192,6 +286,5 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_PostAuthLog_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
-
 
 /

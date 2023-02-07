@@ -24,7 +24,27 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "InsuOrignal" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "InsuOrignal"
+    INSERT INTO "InsuOrignal" (
+        "ClCode1"         -- 擔保品-代號1 DECIMAL 1 0
+      , "ClCode2"         -- 擔保品-代號2 DECIMAL 2 0
+      , "ClNo"            -- 擔保品編號 DECIMAL 7 0
+      , "OrigInsuNo"      -- 原始保險單號碼 VARCHAR2 17 0
+      , "EndoInsuNo"      -- 批單號碼 VARCHAR2 17 0
+      , "InsuCompany"     -- 保險公司 VARCHAR2 2 0
+      , "InsuTypeCode"    -- 保險類別 VARCHAR2 2 0
+      , "FireInsuCovrg"   -- 火災險保險金額 DECIMAL 16 2
+      , "EthqInsuCovrg"   -- 地震險保險金額 DECIMAL 16 2
+      , "FireInsuPrem"    -- 火災險保費 DECIMAL 16 2
+      , "EthqInsuPrem"    -- 地震險保費 DECIMAL 16 2
+      , "InsuStartDate"   -- 保險起日 DECIMAL 8 0
+      , "InsuEndDate"     -- 保險迄日 DECIMAL 8 0
+      , "CommericalFlag"  -- 住宅險改商業險註記 VARCHAR2 1
+      , "Remark"          -- 備註 VARCHAR2 50
+      , "CreateDate"      -- 建檔日期時間 DATE  
+      , "CreateEmpNo"     -- 建檔人員 VARCHAR2 6 
+      , "LastUpdate"      -- 最後更新日期時間 DATE  
+      , "LastUpdateEmpNo" -- 最後更新人員 VARCHAR2 6 
+    )
     WITH NOW_INSUNO AS (
       SELECT DISTINCT 
              "INSNUM2"

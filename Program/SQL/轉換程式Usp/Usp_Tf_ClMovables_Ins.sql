@@ -19,7 +19,50 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "ClMovables" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "ClMovables"
+    INSERT INTO "ClMovables" (
+        "ClCode1"             -- 擔保品代號1 DECIMAL 1 
+      , "ClCode2"             -- 擔保品代號2 DECIMAL 2 
+      , "ClNo"                -- 擔保品編號 DECIMAL 7 
+      , "OwnerCustUKey"       -- 所有權人客戶識別碼 VARCHAR2 32 
+      , "ServiceLife"         -- 耐用年限 DECIMAL 2 
+      , "ProductSpec"         -- 形式/規格 VARCHAR2 20 
+      , "ProductType"         -- 產品代碼/型號 VARCHAR2 10 
+      , "ProductBrand"        -- 品牌/廠牌/船名 VARCHAR2 20 
+      , "ProductCC"           -- 排氣量 VARCHAR2 10 
+      , "ProductColor"        -- 顏色 VARCHAR2 10 
+      , "EngineSN"            -- 引擎號碼 VARCHAR2 50 
+      , "LicenseNo"           -- 牌照號碼 VARCHAR2 10 
+      , "LicenseTypeCode"     -- 牌照類別 VARCHAR2 1 
+      , "LicenseUsageCode"    -- 牌照用途 VARCHAR2 1 
+      , "LiceneIssueDate"     -- 發照日期 decimald 8 
+      , "MfgYearMonth"        -- 製造年月 DECIMAL 6 
+      , "VehicleTypeCode"     -- 車別 VARCHAR2 2 
+      , "VehicleStyleCode"    -- 車身樣式 VARCHAR2 2 
+      , "VehicleOfficeCode"   -- 監理站 VARCHAR2 3 
+      , "Currency"            -- 幣別 VARCHAR2 2 
+      , "ExchangeRate"        -- 匯率 DECIMAL 8 5
+      , "Insurance"           -- 投保註記 VARCHAR2 1 
+      , "LoanToValue"         -- 貸放成數(%) DECIMAL 5 2
+      , "ScrapValue"          -- 殘值 DECIMAL 16 2
+      , "MtgCode"             -- 抵押權註記 VARCHAR2 1 
+      , "MtgCheck"            -- 最高限額抵押權之擔保債權種類-票據 VARCHAR2 1 
+      , "MtgLoan"             -- 最高限額抵押權之擔保債權種類-借款 VARCHAR2 1 
+      , "MtgPledge"           -- 最高限額抵押權之擔保債權種類-保證債務 VARCHAR2 1 
+      , "SettingStat"	       -- 設定狀態 VARCHAR2(1 BYTE)
+      , "ClStat"	             -- 擔保品狀態 VARCHAR2(1 BYTE)
+      , "SettingDate"	       -- 設定日期 NUMBER(8,0)
+      , "SettingAmt"          -- 抵押設定金額 DECIMAL 16 2
+      , "ReceiptNo"           -- 收件字號 VARCHAR2 20 
+      , "MtgNo"               -- 抵押登記字號 VARCHAR2 20 
+      , "ReceivedDate"        -- 抵押收件日 decimald 8 
+      , "MortgageIssueStartDate" -- 抵押登記起日 decimald 8 
+      , "MortgageIssueEndDate" -- 抵押登記迄日 decimald 8 
+      , "Remark"              -- 備註 NVARCHAR2 120 
+      , "CreateDate"          -- 建檔日期時間 DATE 0 
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+      , "LastUpdate"          -- 最後更新日期時間 DATE 0 
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+    )
     SELECT S1."ClCode1"                   AS "ClCode1"             -- 擔保品代號1 DECIMAL 1 
           ,S1."ClCode2"                   AS "ClCode2"             -- 擔保品代號2 DECIMAL 2 
           ,S1."ClNo"                      AS "ClNo"                -- 擔保品編號 DECIMAL 7 

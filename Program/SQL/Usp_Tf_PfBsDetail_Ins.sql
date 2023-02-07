@@ -24,7 +24,30 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "PfBsDetail" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "PfBsDetail"
+    INSERT INTO "PfBsDetail" (
+        "LogNo"
+      , "PerfDate"            -- 業績日期 DecimalD 8 0
+      , "CustNo"              -- 戶號 DECIMAL 7 0
+      , "FacmNo"              -- 額度編號 DECIMAL 3 0
+      , "BormNo"              -- 撥款序號 DECIMAL 3 0
+      , "RepayType"           -- 還款類別 DECIMAL 1 0
+      , "BsOfficer"           -- 房貸專員 VARCHAR2 6 0
+      , "DeptCode"            -- 部室代號 VARCHAR2 6 0
+      , "DrawdownDate"        -- 撥款日 DecimalD 8 0
+      , "ProdCode"            -- 商品代碼 VARCHAR2 5 0
+      , "PieceCode"           -- 計件代碼 VARCHAR2 1 0
+      , "DrawdownAmt"         -- 撥款金額 DECIMAL 16 2
+      , "PerfCnt"             -- 件數 DECIMAL 2 1
+      , "PerfAmt"             -- 業績金額 DECIMAL 16 2
+      , "AdjPerfCnt"          -- 調整加減件數 DECIMAL 5 1 by eric 2021.11.4
+      , "AdjPerfAmt"          -- 調整加減業績金額 DECIMAL 16 2 by eric 2021.11.4
+      , "WorkMonth"           -- 工作月 DECIMAL 6 0
+      , "WorkSeason"          -- 工作季 DECIMAL 5 0
+      , "CreateDate"          -- 建檔日期時間 DATE 8 0
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+      , "LastUpdate"          -- 最後更新日期時間 DATE 8 0
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+    )
     SELECT "PfBsDetail_SEQ".nextval       AS "LogNo"
          , NVL(BOR."DrawdownDate",S1."LMSLLD")
                                           AS "PerfDate"            -- 業績日期 DecimalD 8 0

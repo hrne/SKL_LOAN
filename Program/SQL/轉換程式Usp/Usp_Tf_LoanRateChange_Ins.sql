@@ -47,7 +47,29 @@ BEGIN
         2022/5/6修改 
         不排除早於帳號撥款日的利率、加碼利率 
     */ 
-    INSERT INTO "LoanRateChange" 
+    INSERT INTO "LoanRateChange" (
+        "CustNo"              -- 借款人戶號 DECIMAL 7 0 
+      , "FacmNo"              -- 額度編號 DECIMAL 3 0 
+      , "BormNo"              -- 撥款序號 DECIMAL 3 0 
+      , "EffectDate"          -- 生效日期 DECIMALD 8 0 
+      , "Status"              -- 狀態 DECIMAL 1 0             Lai 2021/1/14 
+      , "RateCode"            -- 利率區分 VARCHAR2 1 0 
+      , "ProdNo"              -- 商品代碼 VARCHAR2 5 0        Lai 2021/1/14 Wei 2021/4/13 
+      , "BaseRateCode"        -- 指標利率代碼 VARCHAR2 2 0    Lai 2021/1/14 
+      , "IncrFlag"            -- 加減碼是否依合約 VARCHAR2 1 0 
+      , "RateIncr"            -- 加碼利率 DECIMAL 6 4 
+      , "IndividualIncr"      -- 個別加碼利率 DECIMAL 6 4 
+      , "FitRate"             -- 適用利率 DECIMAL 6 4 
+      , "Remark"              -- 備註 NVARCHAR2 60 0 
+      , "AcDate"              -- 交易序號-會計日期 DECIMALD 8 0 
+      , "TellerNo"            -- 交易序號-櫃員別 VARCHAR2 6 0 
+      , "TxtNo"               -- 交易序號-流水號 VARCHAR2 8 0 
+      , "CreateDate"          -- 建檔日期時間 DATE 8 0 
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0 
+      , "LastUpdate"          -- 最後更新日期時間 DATE 8 0 
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0 
+      , "OtherFields"         -- JsonFields VARCHAR2 2000 
+    )
     SELECT R."LMSACN"                     AS "CustNo"              -- 借款人戶號 DECIMAL 7 0 
           ,R."LMSAPN"                     AS "FacmNo"              -- 額度編號 DECIMAL 3 0 
           ,R."LMSASQ"                     AS "BormNo"              -- 撥款序號 DECIMAL 3 0 
@@ -129,7 +151,29 @@ BEGIN
      * 2022/5/6修改 
      * 不排除早於帳號撥款日的利率、加碼利率 
     */ 
-    INSERT INTO "LoanRateChange" 
+    INSERT INTO "LoanRateChange"  (
+        "CustNo"              -- 借款人戶號 DECIMAL 7 0 
+      , "FacmNo"              -- 額度編號 DECIMAL 3 0 
+      , "BormNo"              -- 撥款序號 DECIMAL 3 0 
+      , "EffectDate"          -- 生效日期 DECIMALD 8 0 
+      , "Status"              -- 狀態 DECIMAL 1 0             Lai 2021/1/14 
+      , "RateCode"            -- 利率區分 VARCHAR2 1 0 
+      , "ProdNo"              -- 商品代碼 VARCHAR2 5 0        Lai 2021/1/14 Wei 2021/4/13 
+      , "BaseRateCode"        -- 指標利率代碼 VARCHAR2 2 0    Lai 2021/1/14 
+      , "IncrFlag"            -- 加減碼是否依合約 VARCHAR2 1 0 
+      , "RateIncr"            -- 加碼利率 DECIMAL 6 4 
+      , "IndividualIncr"      -- 個別加碼利率 DECIMAL 6 4 
+      , "FitRate"             -- 適用利率 DECIMAL 6 4 
+      , "Remark"              -- 備註 NVARCHAR2 60 0 
+      , "AcDate"              -- 交易序號-會計日期 DECIMALD 8 0 
+      , "TellerNo"            -- 交易序號-櫃員別 VARCHAR2 6 0 
+      , "TxtNo"               -- 交易序號-流水號 VARCHAR2 8 0 
+      , "CreateDate"          -- 建檔日期時間 DATE 8 0 
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0 
+      , "LastUpdate"          -- 最後更新日期時間 DATE 8 0 
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0 
+      , "OtherFields"         -- JsonFields VARCHAR2 2000 
+    )
     WITH rawData AS ( 
       SELECT LA."LMSACN" 
            , LA."LMSAPN" 

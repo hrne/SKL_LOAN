@@ -24,7 +24,21 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "AcLoanRenew" ENABLE PRIMARY KEY'; 
  
     -- 寫入資料 
-    INSERT INTO "AcLoanRenew" 
+    INSERT INTO "AcLoanRenew" (
+        "CustNo"              -- 戶號 DECIMAL 3 
+      , "NewFacmNo"           -- 新額度編號 DECIMAL 3 
+      , "NewBormNo"           -- 新撥款序號 DECIMAL 3 
+      , "OldFacmNo"           -- 舊額度編號 DECIMAL 6 
+      , "OldBormNo"           -- 舊撥款序號 DECIMAL 6 
+      , "RenewCode"           -- 展期記號 VARCHAR2 1 (1:一般 2:協議) 
+      , "MainFlag"            -- 主要記號 VARCHAR2 1 (Y:新撥款對到舊撥款最早的一筆 ) 
+      , "AcDate"              -- 會計日期 DECIMAL 8 -- 新撥款序號在放款主檔的撥款日期 -- 2021-12-23 綺萍要求改為交易明細檔做撥款的會計日期 
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
+      , "CreateDate"          -- 建檔日期時間 DATE   
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6  
+      , "LastUpdate"          -- 最後更新日期時間 DATE   
+      , "OtherFields" 
+    )
     WITH TX AS ( 
       SELECT LMSACN 
            , LMSAPN 

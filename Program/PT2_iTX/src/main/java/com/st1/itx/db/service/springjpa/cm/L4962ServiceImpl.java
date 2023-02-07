@@ -49,12 +49,18 @@ public class L4962ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 		this.info("L4962.findAll");
+		int iDrawdownDateFrom = Integer.parseInt(titaVo.getParam("DrawdownDateFrom"));
+		int iDrawdownDateTo = Integer.parseInt(titaVo.getParam("DrawdownDateTo"));
+		int iInsuEndMonthFrom2 = Integer.parseInt(titaVo.getParam("InsuEndMonthFrom2"));
+		int iInsuEndMonthTo2 = Integer.parseInt(titaVo.getParam("InsuEndMonthTo2"));
+
 
 		String sql = " select                                                    ";
 		sql += "  coll.\"CustNo\"                                        AS F0   ";
 		sql += " ,coll.\"FacmNo\"                                        AS F1   ";
 		sql += " ,c.\"CustName\"                                         AS F2   ";
-		sql += " ,NVL(f.\"FirstDrawdownDate\",0)                         AS F3   ";
+		sql += " ,NVL(LB.\"DrawdownDate\",0)                             AS F3   ";
+//		sql += " ,NVL(f.\"FirstDrawdownDate\",0)                         AS F3   ";
 		sql += " ,cf.\"ClCode1\"                                         AS F4   ";
 		sql += " ,cf.\"ClCode2\"                                         AS F5   ";
 		sql += " ,cf.\"ClNo\"                                            AS F6   ";
@@ -62,7 +68,8 @@ public class L4962ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,NVL(rn.\"InsuStartDate\",NVL(og.\"InsuStartDate\",0))  AS F8   ";
 		sql += " ,NVL(rn.\"InsuEndDate\",NVL(og.\"InsuEndDate\",0))      AS F9   ";
 		sql += " ,NVL(rn.\"PrevInsuNo\",NVL(og.\"OrigInsuNo\",''))       AS F10  ";
-		sql += " ,coll.\"Status\"                                        AS F11   ";
+		sql += " ,coll.\"Status\"                                        AS F11  ";
+		sql += " ,NVL(rn.\"InsuYearMonth\",0)                            AS F12  ";
 		sql += " from(                                                           ";
 		sql += "   select                                                        ";
 		sql += "    \"CustNo\"                                                   ";
@@ -76,11 +83,14 @@ public class L4962ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " left join \"CustMain\" c on  c.\"CustNo\" = coll.\"CustNo\"     ";
 		sql += " left join \"FacMain\"  f on  f.\"CustNo\" = coll.\"CustNo\"     ";
 		sql += "                       and  f.\"FacmNo\" = coll.\"FacmNo\"       ";
+		sql += " left join \"LoanBorMain\"  LB on  LB.\"CustNo\" = coll.\"CustNo\" ";
+		sql += "                              and  LB.\"FacmNo\" = coll.\"FacmNo\" ";
 		sql += " left join (                                                     ";
 		sql += "     select                                                      ";
 		sql += "     \"ClCode1\"                                                 ";
 		sql += "    ,\"ClCode2\"                                                 ";
 		sql += "    ,\"ClNo\"                                                    ";
+		sql += "    ,\"InsuYearMonth\"                                           ";
 		sql += "    ,\"InsuStartDate\"                                           ";
 		sql += "    ,\"InsuEndDate\"                                             ";
 		sql += "    ,\"PrevInsuNo\"                                              ";
@@ -111,12 +121,34 @@ public class L4962ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  where NVL(f.\"FirstDrawdownDate\",0) != 0                      ";
 		sql += "    and cf.\"ClCode1\" = 1                                       ";
 
+		if (iDrawdownDateFrom > 0) {//撥款區間
+			sql += "   and NVL(LB.\"DrawdownDate\",0) >= :drawdownDateFrom ";
+			sql += "   and NVL(LB.\"DrawdownDate\",0) <= :drawdownDateTo ";
+			sql += " ORDER BY coll.\"CustNo\" ASC , coll.\"FacmNo\" ASC , LB.\"DrawdownDate\" ASC ";  
+		}
+
+		if (iInsuEndMonthFrom2 > 0) {//火險年月
+			sql += "   and NVL(rn.\"InsuYearMonth\",0)  >= :insuEndMonthFrom2 ";
+			sql += "   and NVL(rn.\"InsuYearMonth\",0)  <= :insuEndMonthTo2 ";
+			sql += " ORDER BY coll.\"CustNo\" ASC , coll.\"FacmNo\" ASC , rn.\"InsuYearMonth\" ASC ";  
+		}
+		
+
 		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
 
+		if (iDrawdownDateFrom > 0) {
+			query.setParameter("drawdownDateFrom", iDrawdownDateFrom + 19110000);
+			query.setParameter("drawdownDateTo", iDrawdownDateTo + 19110000);
+		}
+		if (iInsuEndMonthFrom2 > 0) {
+			query.setParameter("insuEndMonthFrom2", iInsuEndMonthFrom2 + 191100);
+			query.setParameter("insuEndMonthTo2", iInsuEndMonthTo2 + 191100);
+		}
+		
 		cnt = query.getResultList().size();
 		this.info("Total cnt ..." + cnt);
 

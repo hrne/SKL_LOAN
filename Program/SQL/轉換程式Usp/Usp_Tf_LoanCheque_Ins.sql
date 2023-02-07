@@ -24,7 +24,42 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "LoanCheque" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "LoanCheque"
+    INSERT INTO "LoanCheque" (
+        "CustNo"              -- 借款人戶號 DECIMAL 7 
+      , "ChequeAcct"          -- 支票帳號 DECIMAL 9 
+      , "ChequeNo"            -- 支票號碼 DECIMAL 7 
+      , "StatusCode"          -- 票據狀況碼 VARCHAR2 1 
+      , "ProcessCode"         -- 處理代碼 VARCHAR2 1 
+      , "AcDate"              -- 交易序號-會計日期 DECIMALD 8 
+      , "Kinbr"               -- 交易單位 VARCHAR2 4 
+      , "TellerNo"            -- 交易序號-櫃員 VARCHAR2 6 
+      , "TxtNo"               -- 交易序號-流水號 VARCHAR2 8 
+      , "ReceiveDate"         -- 收票日 DECIMALD 8  
+      , "EntryDate"           -- 入帳日 DECIMALD 8 
+      , "CurrencyCode"        -- 幣別 VARCHAR2 3 
+      , "ChequeAmt"           -- 支票金額 DECIMAL 16 2
+      , "ChequeName"          -- 發票人姓名 VARCHAR2 60 
+      , "ChequeDate"          -- 支票到期日 DECIMALD 8 
+      , "AreaCode"            -- 交換區號 VARCHAR2 2  
+      , "BankCode"            -- 行庫代號 VARCHAR2 7 
+      , "OutsideCode"         -- 本埠外埠 VARCHAR2 1 
+      , "BktwFlag"            -- 是否為台支 VARCHAR2 1 
+      , "TsibFlag"            -- 是否為台新 VARCHAR2 1 
+      , "MediaFlag"           -- 入媒體檔 VARCHAR2 1 
+      , "UsageCode"           -- 支票用途 VARCHAR2 2 
+      , "ServiceCenter"       -- 服務中心別 VARCHAR2 1 
+      , "CreditorId"          -- 債權統一編號 VARCHAR2 10 
+      , "CreditorBankCode"    -- 債權機構 VARCHAR2 7 
+      , "OtherAcctCode"       -- 對方業務科目 VARCHAR2 3 
+      , "ReceiptNo"           -- 收據號碼 VARCHAR2 5 
+      , "RepaidAmt"           -- 已入帳金額 DECIMAL 16 2
+      , "CreateDate"          -- 建檔日期時間 DATE  
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+      , "LastUpdate"          -- 最後更新日期時間 DATE  
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+      , "BankItem"
+      , "BranchItem"
+    )
     WITH txEmpData AS (
       SELECT DISTINCT
              TRXDAT

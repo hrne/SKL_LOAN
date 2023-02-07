@@ -34,7 +34,36 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "AchAuthLogHistory" ENABLE PRIMARY KEY'; 
  
     -- 寫入資料 
-    INSERT INTO "AchAuthLogHistory" 
+    INSERT INTO "AchAuthLogHistory" (
+           "LogNo" 
+          ,"CustNo"              -- 戶號 DECIMAL 7  
+          ,"FacmNo"              -- 額度號碼 DECIMAL 3  
+          ,"AuthCreateDate"      -- 建檔日期 Decimald 8  
+          ,"RepayBank"           -- 扣款銀行 VARCHAR2 3  
+          ,"RepayAcct"           -- 扣款帳號 VARCHAR2 14  
+          ,"CreateFlag"          -- 新增或取消 VARCHAR2 1  
+          ,"ProcessDate"         -- 處理日期時間 Decimald 8    
+          ,"StampFinishDate"     -- 核印完成日期時間 Decimald 8    
+          ,"AuthStatus"          -- 授權狀態 VARCHAR2 1  
+          ,"AuthMeth"            -- 授權方式 VARCHAR2 1  
+          ,"MediaCode"           -- 媒體碼 VARCHAR2 1  
+          ,"BatchNo"             -- 批號 VARCHAR2 6  
+          ,"PropDate"            -- 提出日期 Decimald 8  
+          ,"RetrDate"            -- 提回日期 Decimald 8  
+          ,"DeleteDate"          -- 刪除日期 Decimald 8  
+          ,"RelationCode"        -- 與借款人關係 VARCHAR2 2  
+          ,"RelAcctName"         -- 第三人帳戶戶名 NVARCHAR2 100  
+          ,"RelationId"          -- 第三人身分證字號 VARCHAR2 10 0 
+          ,"RelAcctBirthday"     -- 第三人出生日期 Decimald 8  
+          ,"RelAcctGender"       -- 第三人性別 VARCHAR2 1  
+          ,"AmlRsp"              -- AML回應碼 VARCHAR2 1 
+          ,"CreateEmpNo"         -- 建立者櫃員編號 VARCHAR2 6 0 
+          ,"CreateDate"          -- 建檔日期 DATE 0 0 
+          ,"LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 0 
+          ,"LastUpdate"          -- 異動日期 DATE 0 0 
+          ,"ProcessTime" 
+          ,"LimitAmt"            -- 每筆扣款限額 DECIMAL 14  
+    )
     SELECT "AchAuthLogHistory_SEQ".nextval AS "LogNo" 
           ,S1."CustNo"                    AS "CustNo"              -- 戶號 DECIMAL 7  
           ,S1."FacmNo"                    AS "FacmNo"              -- 額度號碼 DECIMAL 3  

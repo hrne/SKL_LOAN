@@ -24,7 +24,19 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "CustNotice" ENABLE PRIMARY KEY'; 
  
     -- 寫入資料 
-    INSERT INTO "CustNotice" 
+    INSERT INTO "CustNotice" (
+        "CustNo"              -- 戶號 DECIMAL 7  
+      , "FacmNo"              -- 額度編號 DECIMAL 3  
+      , "FormNo"              -- 報表代號 VARCHAR2 10  
+      , "PaperNotice"         -- 書面通知與否 VARCHAR2 1  
+      , "MsgNotice"           -- 簡訊發送與否 VARCHAR2 1  
+      , "EmailNotice"         -- 電子郵件發送與否 VARCHAR2 1  
+      , "ApplyDate"           -- 申請日期 decimald 8  
+      , "CreateDate"          -- 建檔日期時間 DATE   
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
+      , "LastUpdate"          -- 最後更新日期時間 DATE   
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6  
+    )
     WITH orderedData AS (
         SELECT NP."LMSACN"                    AS "CustNo"              -- 戶號 DECIMAL 7  
               ,FAC."FacmNo"                   AS "FacmNo"              -- 額度編號 DECIMAL 3  

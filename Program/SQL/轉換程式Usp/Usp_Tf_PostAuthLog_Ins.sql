@@ -34,7 +34,41 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "PostAuthLog" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "PostAuthLog"
+    INSERT INTO "PostAuthLog" (
+        "AuthCreateDate"      -- 建檔日期 Decimald 8 0
+      , "AuthApplCode"        -- 申請代號，狀態碼 VARCHAR2 1 0
+      , "CustNo"              -- 戶號 DECIMAL 7 0
+      , "PostDepCode"         -- 帳戶別 VARCHAR2 1 0
+      , "RepayAcct"           -- 儲金帳號 VARCHAR2 14 0
+      , "AuthCode"            -- 授權方式 VARCHAR2 1 0
+      , "FacmNo"              -- 額度 DECIMAL 3 0
+      , "CustId"              -- 統一編號 VARCHAR2 10 0
+      , "RepayAcctSeq"        -- 帳號碼 VARCHAR2 2 0
+      , "ProcessDate"         -- 處理日期 Decimald 8 0
+      , "StampFinishDate"     -- 核印完成日期 Decimald 8 0
+      , "StampCancelDate"     -- 核印取消日期 Decimald 8 0
+      , "StampCode"           -- 核印註記 VARCHAR2 1 0
+      , "PostMediaCode"       -- 媒體碼 VARCHAR2 1 0
+      , "AuthErrorCode"       -- 狀況代號，授權狀態 VARCHAR2 2 0
+      , "FileSeq"             -- 媒體檔流水編號 DECIMAL 6 0
+      , "PropDate"            -- 提出日期 Decimald 8 0
+      , "RetrDate"            -- 提回日期 Decimald 8 0
+      , "DeleteDate"          -- 暫停授權日期 Decimald 8 0
+      , "RelationCode"        -- 與借款人關係 VARCHAR2 2 0
+      , "RelAcctName"         -- 第三人帳戶戶名 NVARCHAR2 100 0
+      , "RelationId"          -- 第三人身分證字號 VARCHAR2 10 0
+      , "RelAcctBirthday"     -- 第三人出生日期 Decimald 8 0
+      , "RelAcctGender"       -- 第三人性別 VARCHAR2 1 0
+      , "AmlRsp"              -- AML回應碼 VARCHAR2 1 0
+      , "TitaTxCd"            -- 交易代號 VARCHAR2 5 
+      , "CreateEmpNo"         -- 建立者櫃員編號 VARCHAR2 6 0
+      , "CreateDate"          -- 建檔日期 DATE 0 0
+      , "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 0
+      , "LastUpdate"          -- 異動日期 DATE 0 0
+      , "ProcessTime"         -- 處理時間 Decimal 6 0
+      , "LimitAmt"
+      , "AuthMeth"
+    )
     SELECT "PO$AARP"."CUSCDT"             AS "AuthCreateDate"      -- 建檔日期 Decimald 8 0
           ,'1'                            AS "AuthApplCode"        -- 申請代號，狀態碼 VARCHAR2 1 0
           ,"PO$AARP"."LMSACN"             AS "CustNo"              -- 戶號 DECIMAL 7 0
@@ -106,7 +140,41 @@ BEGIN
     INS_CNT := INS_CNT + sql%rowcount;
     
     -- LA$APLP有授權帳號資料，PO$AARP沒資料的資料補寫入
-    INSERT INTO "PostAuthLog"
+    INSERT INTO "PostAuthLog" (
+        "AuthCreateDate"      -- 建檔日期 Decimald 8 0
+      , "AuthApplCode"        -- 申請代號，狀態碼 VARCHAR2 1 0
+      , "CustNo"              -- 戶號 DECIMAL 7 0
+      , "PostDepCode"         -- 帳戶別 VARCHAR2 1 0
+      , "RepayAcct"           -- 儲金帳號 VARCHAR2 14 0
+      , "AuthCode"            -- 授權方式 VARCHAR2 1 0
+      , "FacmNo"              -- 額度 DECIMAL 3 0
+      , "CustId"              -- 統一編號 VARCHAR2 10 0
+      , "RepayAcctSeq"        -- 帳號碼 VARCHAR2 2 0
+      , "ProcessDate"         -- 處理日期 Decimald 8 0
+      , "StampFinishDate"     -- 核印完成日期 Decimald 8 0
+      , "StampCancelDate"     -- 核印取消日期 Decimald 8 0
+      , "StampCode"           -- 核印註記 VARCHAR2 1 0
+      , "PostMediaCode"       -- 媒體碼 VARCHAR2 1 0
+      , "AuthErrorCode"       -- 狀況代號，授權狀態 VARCHAR2 2 0
+      , "FileSeq"             -- 媒體檔流水編號 DECIMAL 6 0
+      , "PropDate"            -- 提出日期 Decimald 8 0
+      , "RetrDate"            -- 提回日期 Decimald 8 0
+      , "DeleteDate"          -- 暫停授權日期 Decimald 8 0
+      , "RelationCode"        -- 與借款人關係 VARCHAR2 2 0
+      , "RelAcctName"         -- 第三人帳戶戶名 NVARCHAR2 100 0
+      , "RelationId"          -- 第三人身分證字號 VARCHAR2 10 0
+      , "RelAcctBirthday"     -- 第三人出生日期 Decimald 8 0
+      , "RelAcctGender"       -- 第三人性別 VARCHAR2 1 0
+      , "AmlRsp"              -- AML回應碼 VARCHAR2 1 0
+      , "TitaTxCd"            -- 交易代號 VARCHAR2 5 
+      , "CreateEmpNo"         -- 建立者櫃員編號 VARCHAR2 6 0
+      , "CreateDate"          -- 建檔日期 DATE 0 0
+      , "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 0
+      , "LastUpdate"          -- 異動日期 DATE 0 0
+      , "ProcessTime"         -- 處理時間 Decimal 6 0
+      , "LimitAmt"
+      , "AuthMeth"
+    )
     WITH BAA AS (
         SELECT BAA."CustNo"
               ,BAA."PostDepCode"

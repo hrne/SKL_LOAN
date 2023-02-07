@@ -1,0 +1,232 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+!<include src="COM.icf::BFHEAD.dec"/>
+
+#ReviewTypeH=x,100,S
+T(3,H:高風險;M:中風險;L:低風險)
+
+</sub>
+
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[200,600];printer.width=[40,60];">
+[
+["[L8102]                                 AML定審資料分類"],
+["#Fd+定審日期",#DataDt],
+["#Fd+資料來源",#DataSource,#DataSourceX],
+]
+!---------- AP Button AREA ----------
+
+
+#DataSourceH=X,100,S
+T(3,1:AML;2:自行輸入)
+INVOKEJS(SHOW,p2,0)
+
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#Fd=X,2,L
+T(3, * )
+
+#NTXBUF=x,41,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#AmlIsStautsT=x,30,S
+T(3,CdCode.AmlIsStatus)
+
+#AmlConfirmStautsT=x,30,S
+T(3,CdCode.AmlConfirmStatus)
+
+#IsStatusH=x,500,S
+
+#ConfirmStatusH=x,100,S
+
+#HR=X,1,S
+S(XXR99,01,#AmlIsStautsT,#AmlConfirmStautsT)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@IsStatusH,#HelpDesc1)
+T(2,@ConfirmStatusH,#HelpDesc2)
+
+!日曆日
+#DATE=D,8,S
+T(4,#SYSCDATE)
+
+#DataDt=D,7,I
+!E(0,#SYSDATE)
+E(0,#DATE)
+@
+V(2,0)
+A(DATE,0,#DataDt)
+
+#DataSource=A,1,I
+T(3,1)
+@
+V(H,#DataSourceH)
+C(3,#DataSource,2,INVOKEJS(SHOW,p2,1),INVOKEJS(SHOW,p2,0))
+
+#DataSourceX=X,8,L
+T(H,#DataSource,#DataSourceH)
+</sub>
+
+<sub type="DC" name="p2" layout="cols=1;screen.width=[200,600];printer.width=[40,60];">
+[
+["自行輸入定審資料"],
+["#grid#,{id:1,expand:true,loop:10,row_height:1}","　",
+["證號","AML流水號","評級","單位代號","定審狀態","名單類型"],
+[#CustKey1,#RRSeq1,#ReviewType1,#Unit1,#IsStatus1,#ConfirmStatus1]
+],
+]
+
+#Data=X,1,S
+C(3,#DataSource,2,$,S)
+!T(3,@CustKey1,22099131)
+!T(3,@RRSeq1,0000000001)
+!T(3,@ReviewType1,H)
+!T(3,@Unit1,10HC00)
+!T(3,@IsStatus1,01)
+!T(3,@ConfirmStatus1,0)
+
+!T(3,@CustKey2,86995619)
+!T(3,@RRSeq2,0000000002)
+!T(3,@ReviewType2,L)
+!T(3,@Unit2,10HC00)
+!T(3,@IsStatus2,02)
+!T(3,@ConfirmStatus2,1)
+
+!T(3,@CustKey3,A123456789)
+!T(3,@RRSeq3,0000000003)
+!T(3,@ReviewType3,M)
+!T(3,@Unit3,10HC00)
+!T(3,@IsStatus3,03)
+!T(3,@ConfirmStatus3,3)
+
+!T(3,@CustKey4,A121396477)
+!T(3,@RRSeq4,0000000004)
+!T(3,@ReviewType4,H)
+!T(3,@Unit4,10HC00)
+!T(3,@IsStatus4,04)
+!T(3,@ConfirmStatus4,4)
+
+!T(3,@CustKey5,A119100578)
+!T(3,@RRSeq5,0000000005)
+!T(3,@ReviewType5,M)
+!T(3,@Unit5,10HC00)
+!T(3,@IsStatus5,05)
+!T(3,@ConfirmStatus5,5)
+
+!T(3,@CustKey6,J123456787)
+!T(3,@RRSeq6,0000000006)
+!T(3,@ReviewType6,H)
+!T(3,@Unit6,10HC00)
+!T(3,@IsStatus6,06)
+!T(3,@ConfirmStatus6,6)
+
+!T(3,@CustKey7,A220220225)
+!T(3,@RRSeq7,0000000007)
+!T(3,@ReviewType7,L)
+!T(3,@Unit7,10HC00)
+!T(3,@ConfirmStatus7,7)
+
+!T(3,@CustKey8,T222255553)
+!T(3,@RRSeq8,0000000008)
+!T(3,@ReviewType8,H)
+!T(3,@Unit8,10HC00)
+!T(3,@IsStatus8,06)
+!T(3,@ConfirmStatus8,7)
+
+##loop {times:10,i:1}
+
+#CustKey{i}=X,10,I
+C(3,#DataSource,2,$,S)
+
+#RRSeq{i}=A,10,I
+C(3,#DataSource,2,$,S)
+C(4,#CustKey{i},S,$)
+
+#ReviewType{i}=X,1,I
+C(3,#DataSource,2,$,S)
+C(4,#CustKey{i},S,$)
+HELP(#ReviewTypeH)
+@V(H,#ReviewTypeH)
+
+#Unit{i}=X,6,I
+C(3,#DataSource,2,$,S)
+C(4,#CustKey{i},S,$)
+@V(7)
+
+#IsStatus{i}=X,2,I
+C(3,#DataSource,2,$,S)
+C(4,#CustKey{i},S,$)
+HELP(#IsStatusH)
+@V(H,#IsStatusH)
+
+#ConfirmStatus{i}=A,1,I
+C(3,#DataSource,2,$,S)
+C(4,#CustKey{i},S,$)
+HELP(#ConfirmStatusH)
+@V(H,#ConfirmStatusH)
+
+##end
+
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L8102 ----------
+<sub type="FORM" name="L8102">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L8102,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L8102] AML定審中低風險處理)
+
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#DataDt
+#DataSource
+##loop {times:10,i:1}
+#CustKey{i}
+#RRSeq{i}
+#ReviewType{i}
+#Unit{i}
+#IsStatus{i}
+#ConfirmStatus{i}
+##end
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L8102
+
+^
+
+<include src="COM.icf::TRCTL.tom"/>
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

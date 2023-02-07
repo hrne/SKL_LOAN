@@ -34,7 +34,18 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "CdBaseRate" ENABLE PRIMARY KEY'; 
  
     -- 寫入資料 (02:中華郵政二年期定儲機動利率) 
-    INSERT INTO "CdBaseRate" 
+    INSERT INTO "CdBaseRate" (
+        "CurrencyCode"        -- 幣別 VARCHAR2 3 
+      , "BaseRateCode"        -- 利率代碼 VARCHAR2 2 
+      , "EffectDate"          -- 生效日期 DECIMALD 8 
+      , "BaseRate"            -- 利率 DECIMAL 6 4 
+      , "Remark"              -- 備註 VARCHAR2 40 
+      , "EffectFlag"          -- 生效記號 DECIMAL 1 (0:建檔 1:已生效不可刪除) 
+      , "CreateDate"          -- 建檔日期時間 DATE   
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
+      , "LastUpdate"          -- 最後更新日期時間 DATE   
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6  
+    )
     SELECT 'TWD'                          AS "CurrencyCode"        -- 幣別 VARCHAR2 3 
           ,'02'                           AS "BaseRateCode"        -- 利率代碼 VARCHAR2 2 
           ,"TB$POIP"."IN$ADT"             AS "EffectDate"          -- 生效日期 DECIMALD 8 
@@ -55,7 +66,18 @@ BEGIN
     INS_CNT := INS_CNT + sql%rowcount; 
  
     -- 寫入資料 (01:保單分紅利率) 
-    INSERT INTO "CdBaseRate" 
+    INSERT INTO "CdBaseRate"  (
+        "CurrencyCode"        -- 幣別 VARCHAR2 3 
+      , "BaseRateCode"        -- 利率代碼 VARCHAR2 2 
+      , "EffectDate"          -- 生效日期 DECIMALD 8 
+      , "BaseRate"            -- 利率 DECIMAL 6 4 
+      , "Remark"              -- 備註 VARCHAR2 40 
+      , "EffectFlag"          -- 生效記號 DECIMAL 1 (0:建檔 1:已生效不可刪除) 
+      , "CreateDate"          -- 建檔日期時間 DATE   
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
+      , "LastUpdate"          -- 最後更新日期時間 DATE   
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6  
+    )
     SELECT 'TWD'                          AS "CurrencyCode"        -- 幣別 VARCHAR2 3 
           ,'01'                           AS "BaseRateCode"        -- 利率代碼 VARCHAR2 2 
           ,"TB$IRTP"."IN$ADT"             AS "EffectDate"          -- 生效日期 DECIMALD 8 
@@ -77,7 +99,18 @@ BEGIN
     INS_CNT := INS_CNT + sql%rowcount; 
  
     -- 寫入資料 (03:台北金融業拆款定盤利率) 
-    INSERT INTO "CdBaseRate" 
+    INSERT INTO "CdBaseRate"  (
+        "CurrencyCode"        -- 幣別 VARCHAR2 3 
+      , "BaseRateCode"        -- 利率代碼 VARCHAR2 2 
+      , "EffectDate"          -- 生效日期 DECIMALD 8 
+      , "BaseRate"            -- 利率 DECIMAL 6 4 
+      , "Remark"              -- 備註 VARCHAR2 40 
+      , "EffectFlag"          -- 生效記號 DECIMAL 1 (0:建檔 1:已生效不可刪除) 
+      , "CreateDate"          -- 建檔日期時間 DATE   
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
+      , "LastUpdate"          -- 最後更新日期時間 DATE   
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6  
+    )
     SELECT 'TWD'                          AS "CurrencyCode"        -- 幣別 VARCHAR2 3 
           ,'03'                           AS "BaseRateCode"        -- 利率代碼 VARCHAR2 2 
           ,"TB$IRTP"."IN$ADT"             AS "EffectDate"          -- 生效日期 DECIMALD 8 
@@ -99,7 +132,18 @@ BEGIN
     INS_CNT := INS_CNT + sql%rowcount; 
  
     -- 寫入資料 (99:自訂利率) 
-    INSERT INTO "CdBaseRate" 
+    INSERT INTO "CdBaseRate"  (
+        "CurrencyCode"        -- 幣別 VARCHAR2 3 
+      , "BaseRateCode"        -- 利率代碼 VARCHAR2 2 
+      , "EffectDate"          -- 生效日期 DECIMALD 8 
+      , "BaseRate"            -- 利率 DECIMAL 6 4 
+      , "Remark"              -- 備註 VARCHAR2 40 
+      , "EffectFlag"          -- 生效記號 DECIMAL 1 (0:建檔 1:已生效不可刪除) 
+      , "CreateDate"          -- 建檔日期時間 DATE   
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
+      , "LastUpdate"          -- 最後更新日期時間 DATE   
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6  
+    )
     SELECT 'TWD'                          AS "CurrencyCode"        -- 幣別 VARCHAR2 3 
           ,'99'                           AS "BaseRateCode"        -- 利率代碼 VARCHAR2 2 
           ,19110101                       AS "EffectDate"          -- 生效日期 DECIMALD 8 

@@ -22,7 +22,21 @@ BEGIN
     DELETE FROM "NegFinShareLog";
 
     -- 寫入資料
-    INSERT INTO "NegFinShareLog"
+    INSERT INTO "NegFinShareLog" (
+        "CustNo"              -- 債務人戶號 DECIMAL 7 0
+      , "CaseSeq"             -- 案件序號 DECIMAL 3 0
+      , "Seq"                 -- 歷程序號 DECIMAL 3
+      , "FinCode"             -- 債權機構 VARCHAR2 8 0
+      , "ContractAmt"         -- 簽約金額 DECIMAL 16 2
+      , "AmtRatio"            -- 債權比例%  DECIMAL 5 2
+      , "DueAmt"              -- 期款 DECIMAL 16 2
+      , "CancelDate"          -- 註銷日期 DecimalD 8 0
+      , "CancelAmt"           -- 註銷本金 DECIMAL 16 2
+      , "CreateDate"          -- 建檔日期時間 DATE 8 0
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+      , "LastUpdate"          -- 最後更新日期時間 DATE 8 0
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+    )
     SELECT M."CustNo"                         AS "CustNo"              -- 債務人戶號 DECIMAL 7 0
           ,M."CaseSeq"                        AS "CaseSeq"             -- 案件序號 DECIMAL 3 0
           ,1                                  AS "Seq"                 -- 歷程序號 DECIMAL 3

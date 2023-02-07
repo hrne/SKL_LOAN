@@ -47,7 +47,29 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "InnReCheck" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "InnReCheck"
+    INSERT INTO "InnReCheck" (
+        "YearMonth"           -- 資料年月 Decimal 6 0
+      , "ConditionCode"       -- 條件代碼 Decimal 2 0
+      , "CustNo"              -- 借款人戶號 Decimal 7 0
+      , "FacmNo"              -- 額度號碼 Decimal 3 0
+      , "ReCheckCode"         -- 覆審記號 VARCHAR2 1 0
+      , "FollowMark"          -- 追蹤記號 VARCHAR2 1 0
+      , "ReChkYearMonth"      -- 覆審年月 Decimal 6 0
+      , "DrawdownDate"        -- 撥款日期 DecimalD 8 0
+      , "LoanBal"             -- 貸放餘額 Decimal 16 2
+      , "Evaluation"          -- 評等 Decimal 2 0       須從eLoan匯入
+      , "CustTypeItem"        -- 客戶別 NVARCHAR2 10 0
+      , "UsageItem"           -- 用途別 NVARCHAR2 10 0
+      , "CityItem"            -- 地區別 NVARCHAR2 10 0
+      , "ReChkUnit"           -- 應覆審單位 NVARCHAR2 10 0
+      , "SpecifyFg"           -- 指定複審記號 VARCHAR2 2	 Y-指定覆審 null-非指定
+      , "Remark"              -- 備註 NVARCHAR2 60 0
+      , "TraceMonth"          -- 追蹤年月 Decimal 6 FollowMark=2時輸入
+      , "CreateDate"          -- 建檔日期時間 DATE 0 0
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+      , "LastUpdate"          -- 最後更新日期時間 DATE 0 0
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+    )
     SELECT TRUNC("tLmnDyf" / 100)         AS "YearMonth"           -- 資料年月 Decimal 6 0
           ,S0."DA$RTP"                    AS "ConditionCode"       -- 條件代碼 Decimal 2 0
           ,S0."LMSACN"                    AS "CustNo"              -- 借款人戶號 Decimal 7 0
@@ -126,7 +148,29 @@ BEGIN
 
     -- 寫入6:土地
     -- 寫入資料
-    INSERT INTO "InnReCheck"
+    INSERT INTO "InnReCheck" (
+        "YearMonth"           -- 資料年月 Decimal 6 0
+      , "ConditionCode"       -- 條件代碼 Decimal 2 0
+      , "CustNo"              -- 借款人戶號 Decimal 7 0
+      , "FacmNo"              -- 額度號碼 Decimal 3 0
+      , "ReCheckCode"         -- 覆審記號 VARCHAR2 1 0
+      , "FollowMark"          -- 追蹤記號 VARCHAR2 1 0
+      , "ReChkYearMonth"      -- 覆審年月 Decimal 6 0
+      , "DrawdownDate"        -- 撥款日期 DecimalD 8 0
+      , "LoanBal"             -- 貸放餘額 Decimal 16 2
+      , "Evaluation"          -- 評等 Decimal 2 0       須從eLoan匯入
+      , "CustTypeItem"        -- 客戶別 NVARCHAR2 10 0
+      , "UsageItem"           -- 用途別 NVARCHAR2 10 0
+      , "CityItem"            -- 地區別 NVARCHAR2 10 0
+      , "ReChkUnit"           -- 應覆審單位 NVARCHAR2 10 0
+      , "SpecifyFg"           -- 指定複審記號 VARCHAR2 2	 Y-指定覆審 null-非指定
+      , "Remark"              -- 備註 NVARCHAR2 60 0
+      , "TraceMonth"          -- 追蹤年月 Decimal 6 FollowMark=2時輸入
+      , "CreateDate"          -- 建檔日期時間 DATE 0 0
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+      , "LastUpdate"          -- 最後更新日期時間 DATE 0 0
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+    )
     SELECT TRUNC("tLmnDyf" / 100)         AS "YearMonth"           -- 資料年月 Decimal 6 0
           ,6                              AS "ConditionCode"       -- 條件代碼 Decimal 2 0
           ,S0."LMSACN"                    AS "CustNo"              -- 借款人戶號 Decimal 7 0

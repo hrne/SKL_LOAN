@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_EmpDeductDtl_Ins" 
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_EmpDeductDtl_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -24,7 +24,45 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "EmpDeductDtl" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "EmpDeductDtl"
+    INSERT INTO "EmpDeductDtl" (
+        "EntryDate"           -- 入帳日期 DECIMAL 8 0
+      , "CustNo"              -- 戶號 DECIMAL 7 0
+      , "AchRepayCode"        -- 入帳扣款別 VARCHAR2 1 0
+      , "PerfMonth"           -- 業績年月 DECIMAL 6 0
+      , "ProcCode"            -- 流程別 VARCHAR2 1 0
+      , "RepayCode"           -- 扣款代碼 VARCHAR2 1 0
+      , "AcctCode"            -- 科目 VARCHAR2 12 0
+      , "FacmNo"              -- 額度編號 NUMBER(3,0)
+      , "BormNo"              -- 撥款編號 NUMBER(3,0)
+      , "EmpNo"               -- 員工代號 VARCHAR2 6 0
+      , "CustId"              -- 統一編號 VARCHAR2 10 0
+      , "TxAmt"               -- 交易金額 DECIMAL 14 0
+      , "ErrMsg"              -- 失敗原因 NVARCHAR2 20 0
+      , "Acdate"              -- 會計日期 DECIMAL 8 0
+      , "TitaTlrNo"           -- 經辦 VARCHAR2 6 0
+      , "TitaTxtNo"           -- 交易序號 VARCHAR2 8 0
+      , "BatchNo"             -- 批次號碼 VARCHAR2 6 0
+      , "RepayAmt"            -- 應扣金額 DECIMAL 14 0
+      , "ResignCode"          -- 離職代碼 VARCHAR2 2 0
+      , "DeptCode"            -- 部室代號 VARCHAR2 6 0
+      , "UnitCode"            -- 單位代號 VARCHAR2 6 0
+      , "IntStartDate"        -- 計息起日 DECIMAL 8 0
+      , "IntEndDate"          -- 計息迄日 DECIMAL 8 0
+      , "PositCode"           -- 職務代號 VARCHAR2 2 0
+      , "Principal"           -- 本金 DECIMAL 14 0
+      , "Interest"            -- 利息 DECIMAL 14 0
+      , "SumOvpayAmt"         -- 累溢短收 DECIMAL 14 0
+      , "JsonFields"
+      , "CurrIntAmt"          -- 當期利息 DECIMAL 14 0
+      , "CurrPrinAmt"         -- 當期本金 DECIMAL 14 0
+      , "MediaDate"           -- decimal 8 0
+      , "MediaKind"           -- varchar2 1
+      , "MediaSeq"            -- decimal 6 0
+      , "CreateDate"          -- 建檔日期時間 DATE  
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+      , "LastUpdate"          -- 最後更新日期時間 DATE  
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+    )
     SELECT S1."TRXIDT"              AS "EntryDate"           -- 入帳日期 DECIMAL 8 0
           ,S1."LMSACN"              AS "CustNo"              -- 戶號 DECIMAL 7 0
           ,CASE S1."MBKTRX"
@@ -89,7 +127,7 @@ BEGIN
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
-    FROM "LNMSLP" 
+    FROM "LNMSLP" S1
     ;
 
     -- 記錄寫入筆數
@@ -106,7 +144,5 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_EmpDeductDtl_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
-
-
 
 /

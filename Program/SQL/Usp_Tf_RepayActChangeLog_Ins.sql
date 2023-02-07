@@ -20,7 +20,7 @@ BEGIN
 
     -- 寫入資料
     INSERT INTO "RepayActChangeLog" (
-     "LogNo"
+        "LogNo"
       , "CustNo"
       , "FacmNo"
       , "RepayCode"

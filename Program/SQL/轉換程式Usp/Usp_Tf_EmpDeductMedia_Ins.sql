@@ -24,7 +24,30 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "EmpDeductMedia" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "EmpDeductMedia"
+    INSERT INTO "EmpDeductMedia" (
+        "MediaDate"           -- decimal 8 0
+      , "MediaKind"           -- varchar2 1
+      , "MediaSeq"            -- decimal 6 0
+      , "CustNo"              -- 戶號 DECIMAL 7 0
+      , "RepayCode"           -- 入帳扣款別 VARCHAR2 1 0
+      , "PerfRepayCode"       -- 扣款代碼 VARCHAR2 1 0
+      , "RepayAmt"            -- 應扣金額 DECIMAL 14 0
+      , "PerfMonth"           -- 業績年月 DECIMAL 6 0
+      , "FlowCode"            -- 流程別 VARCHAR2 1 0
+      , "UnitCode"            -- 單位別 VARCHAR2 6 0
+      , "CustId"              -- 統一編號 VARCHAR2 10 0
+      , "EntryDate"           -- 入帳日期 DECIMAL 8 0
+      , "TxAmt"               -- 交易金額 DECIMAL 14 0
+      , "ErrMsg"              -- 失敗原因 NVARCHAR2 20 0
+      , "AcctCode"            -- 科目 VARCHAR2 12 0
+      , "Acdate"              -- 會計日期 DECIMAL 8 0
+      , "BatchNo"             -- 批次號碼 VARCHAR2 6 0
+      , "DetailSeq"           -- 明細序號 DECIMAL 6 0
+      , "CreateDate"          -- 建檔日期時間 DATE  
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+      , "LastUpdate"          -- 最後更新日期時間 DATE  
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+    )
     SELECT S1."TRXIDT"                    AS "MediaDate"           -- decimal 8 0
           ,CASE
              WHEN S1."FLWCOD" IN ('4','5')

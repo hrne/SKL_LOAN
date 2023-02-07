@@ -24,24 +24,47 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "CustRmk" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "CustRmk"
+    INSERT INTO "CustRmk" (
+        "CustNo"              -- 借款人戶號 DECIMAL 7 
+      , "RmkNo"               -- 備忘錄序號 DECIMAL 3 
+      , "CustUKey"            -- 客戶識別碼 VARCHAR2 32 
+      , "RmkCode"             -- 備忘錄代碼 VARCHAR2 3
+      , "RmkDesc"             -- 備忘錄說明 NVARCHAR2 120 
+      , "CreateDate"          -- 建檔日期時間 DATE  
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+      , "LastUpdate"          -- 最後更新日期時間 DATE  
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+    )
     SELECT S1."LMSACN"                    AS "CustNo"              -- 借款人戶號 DECIMAL 7 
           ,ROW_NUMBER()
            OVER (
                PARTITION BY S1."LMSACN"
-               ORDER BY S1."TRXTDT"
+               ORDER BY CASE
+                          -- 2022-10-17 Wei 由葛經理回覆Email同意更正
+                          WHEN S1."LMSACN" = 1412658
+                               AND S1."TRXTDT" = 30180522
+                          THEN 20180522
+                        ELSE S1."TRXTDT" END
                       , S1."DOCSEQ"
            )                              AS "RmkNo"               -- 備忘錄序號 DECIMAL 3 
           ,"CustMain"."CustUKey"          AS "CustUKey"            -- 客戶識別碼 VARCHAR2 32 
           ,'999'                          AS "RmkCode"             -- 備忘錄代碼 VARCHAR2 3
           ,S1."DOCTXT"                    AS "RmkDesc"             -- 備忘錄說明 NVARCHAR2 120 
           ,CASE
+             -- 2022-10-17 Wei 由葛經理回覆Email同意更正
+             WHEN S1."LMSACN" = 1412658
+                  AND S1."TRXTDT" = 30180522
+             THEN TO_DATE('20180522','YYYYMMDD')
              WHEN S1."TRXTDT" > 0
              THEN TO_DATE(S1."TRXTDT",'YYYYMMDD')
            ELSE JOB_START_TIME
            END                            AS "CreateDate"          -- 建檔日期時間 DATE  
           ,NVL(AEM1."EmpNo",'999999')     AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,CASE
+             -- 2022-10-17 Wei 由葛經理回覆Email同意更正
+             WHEN S1."LMSACN" = 1412658
+                  AND S1."TRXTDT" = 30180522
+             THEN TO_DATE('20180522','YYYYMMDD')
              WHEN S1."TRXTDT" > 0
              THEN TO_DATE(S1."TRXTDT",'YYYYMMDD')
            ELSE JOB_START_TIME

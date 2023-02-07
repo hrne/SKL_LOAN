@@ -24,7 +24,17 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "EmpDeductSchedule" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "EmpDeductSchedule"
+    INSERT INTO "EmpDeductSchedule" (
+        "WorkMonth"           -- 工作年月 DECIMAL 6 0
+      , "AgType1"             -- 流程/制度別 VARCHAR2 1 0
+      , "EntryDate"           -- 入賬日期 DECIMAL 8 0
+      , "MediaDate"           -- 媒體日期 DECIMAL 8 0
+      , "RepayEndDate"        -- 應繳截止日 DECIMAL 8 0
+      , "CreateDate"          -- 建檔日期時間 DATE  
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+      , "LastUpdate"          -- 最後更新日期時間 DATE  
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+    )
     SELECT S1."YGYYMM"                    AS "WorkMonth"           -- 工作年月 DECIMAL 6 0
           ,S1."FLWCOD"                    AS "AgType1"             -- 流程/制度別 VARCHAR2 1 0
           ,S1."TRXIDT"                    AS "EntryDate"           -- 入賬日期 DECIMAL 8 0

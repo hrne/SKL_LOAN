@@ -19,7 +19,31 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "AcAcctCheck" ENABLE PRIMARY KEY'; 
  
     -- 寫入資料 
-    INSERT INTO "AcAcctCheck" 
+    INSERT INTO "AcAcctCheck" (
+        "AcDate"              -- 會計日期 Decimald 8  
+      , "BranchNo"            -- 單位別 VARCHAR2 4  
+      , "CurrencyCode"        -- 幣別 VARCHAR2 3  
+      , "AcSubBookCode" 
+      , "AcctCode"            -- 業務科目代號 VARCHAR2 3  
+      , "AcctItem"            -- 業務科目名稱 NVARCHAR2 20  
+      , "TdBal"               -- 本日餘額 DECIMAL 18 2 
+      , "TdCnt"               -- 本日件數 DECIMAL 8  
+      , "TdNewCnt"            -- 本日開戶件數 DECIMAL 8  
+      , "TdClsCnt"            -- 本日結清件數 DECIMAL 8  
+      , "TdExtCnt"            -- 本日展期件數 DECIMAL 8  
+      , "TdExtAmt"            -- 本日展期金額 DECIMAL 18 2 
+      , "ReceivableBal"       -- 銷帳檔餘額 DECIMAL 18 2 
+      , "AcctMasterBal"       -- 業務檔餘額 DECIMAL 18 2 
+      , "YdBal"               -- 前日餘額 DECIMAL 18 2
+      , "DbAmt"               -- 借方金額 DECIMAL 18 2
+      , "CrAmt"               -- 貸方金額 DECIMAL 18 2
+      , "CoreDbAmt"           -- 核心借方金額 DECIMAL 18 2
+      , "CoreCrAmt"           -- 核心貸方金額 DECIMAL 18 2
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
+      , "CreateDate"          -- 建檔日期時間 DATE   
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6  
+      , "LastUpdate"          -- 最後更新日期時間 DATE 
+    )
     SELECT S1."TRXDAT"                    AS "AcDate"              -- 會計日期 Decimald 8  
           ,'0000'                         AS "BranchNo"            -- 單位別 VARCHAR2 4  
           ,'TWD'                          AS "CurrencyCode"        -- 幣別 VARCHAR2 3  

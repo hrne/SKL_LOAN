@@ -19,7 +19,45 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "ClStock" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "ClStock"
+    INSERT INTO "ClStock" (
+        "ClCode1"             -- 擔保品代號1 DECIMAL 1 
+      , "ClCode2"             -- 擔保品代號2 DECIMAL 2 
+      , "ClNo"                -- 擔保品號碼 DECIMAL 7 
+      , "StockCode"           -- 股票代號 VARCHAR2 10 
+      , "ListingType"         -- 掛牌別 VARCHAR2 2 
+      , "StockType"           -- 股票種類 VARCHAR2 1 
+      , "CompanyId"           -- 發行公司統一編號 VARCHAR2 10 
+      , "DataYear"            -- 資料年度 DECIMAL 4 
+      , "IssuedShares"        -- 發行股數 DECIMAL 16 2
+      , "NetWorth"            -- 非上市(櫃)每股淨值 DECIMAL 16 2
+      , "EvaStandard"         -- 每股單價鑑估標準 VARCHAR2 12 
+      , "ParValue"            -- 每股面額 DECIMAL 16 2
+      , "MonthlyAvg"          -- 一個月平均價 DECIMAL 16 2
+      , "YdClosingPrice"      -- 前日收盤價 DECIMAL 16 2
+      , "ThreeMonthAvg"       -- 三個月平均價 DECIMAL 16 2
+      , "EvaUnitPrice"        -- 鑑定單價 DECIMAL 16 2
+      , "OwnerCustUKey"       -- 所有權人客戶識別碼 VARCHAR2 32 
+      , "InsiderJobTitle"     -- 公司內部人職稱 VARCHAR2 2 
+      , "InsiderPosition"     -- 公司內部人身分註記 VARCHAR2 2 
+      , "LegalPersonId"       -- 法定關係人統編 VARCHAR2 10 
+      , "LoanToValue"         -- 貸放成數(%) DECIMAL 5 2
+      , "ClMtr"               -- 擔保維持率(%) DECIMAL 5 2
+      , "NoticeMtr"           -- 通知追繳維持率(%) DECIMAL 5 2
+      , "ImplementMtr"        -- 實行職權維持率(%) DECIMAL 5 2
+      , "AcMtr"               -- 全戶維持率(%) DECIMAL 5 2
+      , "PledgeNo"            -- 質權設定書號 VARCHAR2 14 
+      , "ComputeMTR"          -- 計算維持率 VARCHAR2 1 
+      , "SettingStat"	       -- 設定狀態 VARCHAR2(1 BYTE)
+      , "ClStat"	             -- 擔保品狀態 VARCHAR2(1 BYTE)
+      , "SettingDate"         -- 股票設解(質)日期 decimald 8 
+      , "SettingBalance"      -- 設質股數餘額 DECIMAL 16 2
+      , "MtgDate"             -- 擔保債權確定日期 decimald 8 
+      , "CustodyNo"           -- 保管條號碼 VARCHAR2 5 
+      , "CreateDate"          -- 建檔日期時間 DATE  
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+      , "LastUpdate"          -- 最後更新日期時間 DATE  
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+    )
     SELECT S1."ClCode1"                   AS "ClCode1"             -- 擔保品代號1 DECIMAL 1 
           ,S1."ClCode2"                   AS "ClCode2"             -- 擔保品代號2 DECIMAL 2 
           ,S1."ClNo"                      AS "ClNo"                -- 擔保品號碼 DECIMAL 7 

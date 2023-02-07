@@ -24,7 +24,32 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "PfReward" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "PfReward"
+    INSERT INTO "PfReward" (
+        "LogNo"
+      , "PerfDate"            -- 業績日期 DecimalD 8 0
+      , "CustNo"              -- 戶號 DECIMAL 7 0
+      , "FacmNo"              -- 額度編號 DECIMAL 3 0
+      , "BormNo"              -- 撥款序號 DECIMAL 3 0
+      , "RepayType"           -- 還款類別 DECIMAL 1 0
+      , "PieceCode"           -- 計件代碼 VARCHAR2 1 0
+      , "ProdCode"            -- 商品代碼 VARCHAR2 5 0
+      , "Introducer"          -- 介紹人員編 VARCHAR2 6 0
+      , "Coorgnizer"          -- 協辦人員編 VARCHAR2 6 0
+      , "InterviewerA"        -- 晤談一員編 VARCHAR2 6 0
+      , "InterviewerB"        -- 晤談二員編 VARCHAR2 6 0
+      , "IntroducerBonus"     -- 介紹人介紹獎金 decimal 16 2
+      , "IntroducerBonusDate" -- 介紹獎金發放日 decimal(8,0)	
+      , "IntroducerAddBonus"  -- 介紹人加碼獎勵津貼 decimal 16 2
+      , "IntroducerAddBonusDate"
+      , "CoorgnizerBonus"     -- 協辦人員協辦獎金 decimal 16 2
+      , "CoorgnizerBonusDate" -- 協辦獎金發放日 decimal(8,0)	
+      , "WorkMonth"           -- 工作月 decimal 6 0
+      , "WorkSeason"          -- 工作季 decimal 5 0
+      , "CreateDate"          -- 建檔日期時間 DATE 8 0
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+      , "LastUpdate"          -- 最後更新日期時間 DATE 8 0
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+    )
     WITH rawData AS (
       SELECT DISTINCT
              QTAP."PRZCMD"

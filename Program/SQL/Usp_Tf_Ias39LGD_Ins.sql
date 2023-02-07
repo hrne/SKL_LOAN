@@ -28,7 +28,17 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "Ias39LGD" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "Ias39LGD"
+    INSERT INTO "Ias39LGD" (
+        "Date"                -- 生效日期 Decimald 8  
+      , "Type"                -- 類別           VARCHAR2 2  
+      , "TypeDesc"            -- 類別說明       NVARCHAR2 30  
+      , "LGDPercent"          -- 違約損失率％   Decimal 7 5 
+      , "Enable"              -- 啟用記號 VARCHAR2 1   Y:啟用 , N:未啟用
+      , "CreateDate"          -- 建檔日期時間 DATE  
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+      , "LastUpdate"          -- 最後更新日期時間 DATE  
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+    )
     SELECT LGDP.LGDADT                    AS "Date"                -- 生效日期 Decimald 8  
          , LGDP.LGDTYP                    AS "Type"                -- 類別           VARCHAR2 2  
          , LGDP.LGDDSC                    AS "TypeDesc"            -- 類別說明       NVARCHAR2 30  

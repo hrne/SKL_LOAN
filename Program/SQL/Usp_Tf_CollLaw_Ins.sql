@@ -24,7 +24,26 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "CollLaw" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "CollLaw"
+    INSERT INTO "CollLaw" (
+        "CaseCode"            -- 案件種類 VARCHAR2 1 0
+      , "ClCode1"             -- 擔保品代號1 DECIMAL 1 0
+      , "ClCode2"             -- 擔保品代號2 DECIMAL 2 0
+      , "ClNo"                -- 擔保品編號 DECIMAL 7 0
+      , "CustNo"              -- 借款人戶號 DECIMAL 7 0
+      , "FacmNo"              -- 額度編號 DECIMAL 3 0
+      , "AcDate"              -- 作業日期 DecimalD 8 0
+      , "TitaTlrNo"           -- 經辦 VARCHAR2 6 0
+      , "TitaTxtNo"           -- 交易序號 VARCHAR2 8 0
+      , "RecordDate"          -- 記錄日期 DecimalD 8 0
+      , "LegalProg"           -- 法務進度 VARCHAR2 3 0
+      , "Amount"              -- 金額 DECIMAL 16 2
+      , "Remark"              -- 其他記錄 VARCHAR2 1 0
+      , "Memo"               -- 其他紀錄內容 VARCHAR2 500 0
+      , "CreateDate"          -- 建檔日期時間 DATE 8 0
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+      , "LastUpdate"          -- 最後更新日期時間 DATE 8 0
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+    )
     SELECT '1'                            AS "CaseCode"            -- 案件種類 VARCHAR2 1 0
           ,NVL(CF."ClCode1",0)            AS "ClCode1"             -- 擔保品代號1 DECIMAL 1 0
           ,NVL(CF."ClCode2",0)            AS "ClCode2"             -- 擔保品代號2 DECIMAL 2 0

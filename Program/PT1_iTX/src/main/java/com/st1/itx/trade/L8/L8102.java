@@ -29,6 +29,7 @@ import com.st1.itx.db.service.TxToDoMainService;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.CustMainService;
 
+import com.st1.itx.db.domain.CustTelNo;
 import com.st1.itx.db.service.CustTelNoService;
 
 import com.st1.itx.db.domain.CdBcm;
@@ -45,6 +46,7 @@ import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.CustNoticeCom;
+import com.st1.itx.util.common.MakeExcel;
 
 @Service("L8102")
 @Scope("prototype")
@@ -111,9 +113,14 @@ public class L8102 extends TradeBuffer {
 		this.info("active L8102 ");
 		this.totaVo.init(titaVo);
 
-		int dataSource = parse.stringToInteger(titaVo.get("DataSource"));
-
-		dataDt7 = parse.stringToInteger(titaVo.get("DataDt"));
+		int dataSource = 1;
+		if (titaVo.get("DataSource") != null) {
+			dataSource = parse.stringToInteger(titaVo.get("DataSource"));
+		}
+		dataDt7 = parse.stringToInteger(titaVo.getCalDy());
+		if (titaVo.get("DataDt") != null) {
+			dataDt7 = parse.stringToInteger(titaVo.get("DataDt"));
+		}
 		dataDt8 = dataDt7 + 19110000;
 
 		// delete TxAmlCredit

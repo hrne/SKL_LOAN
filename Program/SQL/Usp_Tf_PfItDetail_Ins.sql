@@ -24,7 +24,40 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "PfItDetail" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "PfItDetail"
+    INSERT INTO "PfItDetail" (
+        "LogNo"
+      , "PerfDate"            -- 業績日期 DecimalD 8 0
+      , "CustNo"              -- 戶號 DECIMAL 7 0
+      , "FacmNo"              -- 額度編號 DECIMAL 3 0
+      , "BormNo"              -- 撥款序號 DECIMAL 3 0
+      , "RepayType"           -- 還款類別 DECIMAL 1 0
+      , "DrawdownDate"        -- 撥款日 DecimalD 8 0
+      , "ProdCode"            -- 商品代碼 VARCHAR2 5 0
+      , "PieceCode"           -- 計件代碼 VARCHAR2 1 0
+      , "CntingCode"          -- 是否計件 VARCHAR2 1 0
+      , "DrawdownAmt"         -- 撥款金額 DECIMAL 16 2
+      , "UnitCode"            -- 單位代號 VARCHAR2 6 0
+      , "DistCode"            -- 區部代號 VARCHAR2 6 0
+      , "DeptCode"            -- 部室代號 VARCHAR2 6 0
+      , "Introducer"          -- 介紹人 NVARCHAR2 8 0
+      , "UnitManager"         -- 處經理 NVARCHAR2 8 0
+      , "DistManager"         -- 區經理 NVARCHAR2 8 0
+      , "DeptManager"         -- 部經理 NVARCHAR2 8 0
+      , "PerfCnt"             -- 件數 DECIMAL 5 1
+      , "PerfEqAmt"           -- 換算業績 DECIMAL 16 2
+      , "PerfReward"          -- 業務報酬 DECIMAL 16 2
+      , "PerfAmt"             -- 業績金額 DECIMAL 16 2
+      , "WorkMonth"           -- 工作月 DECIMAL 6 0
+      , "WorkSeason"          -- 工作季 DECIMAL 5 0
+      , "RewardDate"          -- 換算業績、業務報酬發放日 DECIMAL 8 0
+      , "MediaDate"           -- 產出媒體日期 DECIMAL 8 0
+      , "MediaFg"             -- 產出媒體檔記號 DECIMAL 1 0
+      , "AdjRange"            -- 調整記號 DECIMAL 1 0:無調整 1:調整本月 2:調整本月及季累計
+      , "CreateDate"          -- 建檔日期時間 DATE 8 0
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+      , "LastUpdate"          -- 最後更新日期時間 DATE 8 0
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+    )
     SELECT "PfItDetail_SEQ".nextval       AS "LogNo"
          , S1."LMSLLD"                    AS "PerfDate"            -- 業績日期 DecimalD 8 0
          , S1."LMSACN"                    AS "CustNo"              -- 戶號 DECIMAL 7 0

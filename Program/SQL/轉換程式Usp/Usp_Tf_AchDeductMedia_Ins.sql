@@ -24,7 +24,35 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "AchDeductMedia" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "AchDeductMedia"
+    INSERT INTO "AchDeductMedia" (
+        "MediaDate"           -- 媒體日期 DECIMAL 8 
+      , "MediaKind"           -- 媒體別 VARCHAR2 1 
+      , "MediaSeq"            -- 媒體序號 DECIMAL 6 
+      , "CustNo"              -- 戶號 DECIMAL 7 
+      , "FacmNo"              -- 額度號碼 DECIMAL 3 
+      , "RepayType"           -- 還款類別 DECIMAL 2 
+      , "RepayAmt"            -- 扣款金額,還款金額 DECIMAL 14 
+      , "ReturnCode"          -- 退件理由代號 VARCHAR2 2 
+      , "EntryDate"           -- 入帳日期 DECIMAL 8 
+      , "PrevIntDate"         -- 繳息迄日 DECIMAL 8 
+      , "RepayBank"           -- 扣款銀行 VARCHAR2 3 
+      , "RepayAcctNo"         -- 扣款帳號 VARCHAR2 14 
+      , "AchRepayCode"        -- 入帳扣款別 VARCHAR2 1 
+      , "AcctCode"            -- 科目 VARCHAR2 3 
+      , "IntStartDate"        -- 計息起日 DECIMAL 8 
+      , "IntEndDate"          -- 計息迄日 DECIMAL 8 
+      , "DepCode"             -- 存摺代號 VARCHAR2 2 
+      , "RelationCode"        -- 與借款人關係 VARCHAR2 2 
+      , "RelCustName"         -- 帳戶戶名 NVARCHAR2 100 
+      , "RelCustId"           -- 身分證字號 VARCHAR2 10 
+      , "AcDate"              -- 會計日期 DECIMAL 8 
+      , "BatchNo"             -- 批號 VARCHAR2 6 
+      , "DetailSeq"           -- 明細序號 DECIMAL 6 
+      , "CreateDate"          -- 建檔日期時間 DATE  
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+      , "LastUpdate"          -- 異動日期 DATE 0 0
+      , "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 0
+    )
     WITH rawData AS (
       SELECT MAX(TRXIDT) AS LastTRXIDT
       FROM "AH$MBKP" MBK

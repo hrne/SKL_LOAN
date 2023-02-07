@@ -34,7 +34,21 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "BankAuthAct" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "BankAuthAct"
+    INSERT INTO "BankAuthAct" (
+        "CustNo"              -- 戶號 DECIMAL 7 
+      , "FacmNo"              -- 額度 DECIMAL 3 
+      , "AuthType"            -- 授權類別 VARCHAR2 2 
+      , "RepayBank"           -- 扣款銀行 VARCHAR2 3 
+      , "PostDepCode"         -- 郵局存款別 VARCHAR2 1 
+      , "RepayAcct"           -- 扣款帳號 VARCHAR2 14 
+      , "Status"              -- 狀態碼 VARCHAR2 1 
+      , "AcctSeq"             -- 帳號碼 VARCHAR2 2 
+      , "CreateDate"          -- 建檔日期時間 DATE  
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+      , "LastUpdate"          -- 最後更新日期時間 DATE  
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+      , "LimitAmt"            -- 每筆扣款限額 DECIMAL 14 
+    )
     WITH haveRecordData AS (
       -- 找出在授權紀錄檔有資料的戶號跟帳號
       SELECT DISTINCT
@@ -86,7 +100,21 @@ BEGIN
     -- 記錄寫入筆數
     INS_CNT := INS_CNT + sql%rowcount;
 
-    INSERT INTO "BankAuthAct"
+    INSERT INTO "BankAuthAct" (
+        "CustNo"              -- 戶號 DECIMAL 7 
+      , "FacmNo"              -- 額度 DECIMAL 3 
+      , "AuthType"            -- 授權類別 VARCHAR2 2 
+      , "RepayBank"           -- 扣款銀行 VARCHAR2 3 
+      , "PostDepCode"         -- 郵局存款別 VARCHAR2 1 
+      , "RepayAcct"           -- 扣款帳號 VARCHAR2 14 
+      , "Status"              -- 狀態碼 VARCHAR2 1 
+      , "AcctSeq"             -- 帳號碼 VARCHAR2 2 
+      , "CreateDate"          -- 建檔日期時間 DATE  
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+      , "LastUpdate"          -- 最後更新日期時間 DATE  
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+      , "LimitAmt"            -- 每筆扣款限額 DECIMAL 14 
+    )
     WITH haveRecordData AS (
       -- 找出在授權紀錄檔有資料的戶號跟帳號
       SELECT DISTINCT

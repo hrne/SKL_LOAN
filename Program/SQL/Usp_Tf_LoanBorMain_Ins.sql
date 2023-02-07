@@ -34,7 +34,83 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "LoanBorMain" ENABLE PRIMARY KEY'; 
  
     -- 寫入資料 
-    INSERT INTO "LoanBorMain" 
+    INSERT INTO "LoanBorMain" (
+        "CustNo"              -- 借款人戶號 DECIMAL 7  
+      , "FacmNo"              -- 額度編號 DECIMAL 3  
+      , "BormNo"              -- 撥款序號, 預約序號 DECIMAL 3  
+      , "LastBorxNo"          -- 已編BorTx流水號 DECIMAL 4  
+      , "LastOvduNo"          -- 已編Overdue流水號 DECIMAL 3  
+      , "Status"              -- 戶況 DECIMAL 2  
+      , "RateIncr"            -- 加碼利率 DECIMAL 6 4 
+      , "IndividualIncr"      -- 個別加碼利率 DECIMAL 6 4 
+      , "ApproveRate"         -- 核准利率 DECIMAL 6 4 
+      , "StoreRate"           -- 實際計息利率 DECIMAL 6 4 
+      , "RateCode"            -- 利率區分 VARCHAR2 1  
+      , "RateAdjFreq"         -- 利率調整週期 DECIMAL 2  
+      , "DrawdownCode"        -- 撥款方式 VARCHAR2 1  
+      , "CurrencyCode"        -- 幣別 VARCHAR2 3  
+      , "DrawdownAmt"         -- 撥款金額 DECIMAL 16 2 
+      , "LoanBal"             -- 放款餘額 DECIMAL 16 2 
+      , "DrawdownDate"        -- 撥款日期, 預約日期 DECIMALD 8  
+      , "LoanTermYy"          -- 貸款期間年 DECIMAL 2  
+      , "LoanTermMm"          -- 貸款期間月 DECIMAL 2  
+      , "LoanTermDd"          -- 貸款期間日 DECIMAL 3  
+      , "MaturityDate"        -- 到期日 DECIMALD 8  
+      , "IntCalcCode" 
+      , "AmortizedCode"       -- 攤還方式 VARCHAR2 1  
+      , "FreqBase"            -- 週期基準 DECIMAL 1  
+      , "PayIntFreq"          -- 繳息週期 DECIMAL 2  
+      , "RepayFreq"           -- 還本週期 DECIMAL 2  
+      , "TotalPeriod"         -- 總期數 DECIMAL 3  
+      , "RepaidPeriod"        -- 已還本期數 DECIMAL 3  
+      , "PaidTerms"           -- 已繳息期數 DECIMAL 3  
+      , "PrevPayIntDate"      -- 上次繳息日,繳息迄日 DECIMALD 8  
+      , "PrevRepaidDate"      -- 上次還本日,最後還本日 DECIMALD 8  
+      , "NextPayIntDate"      -- 下次繳息日,應繳息日 DECIMALD 8  
+      , "NextRepayDate"       -- 下次還本日,應還本日 DECIMALD 8  
+      , "DueAmt"              -- 每期攤還金額 DECIMAL 16 2 
+      , "GracePeriod"         -- 寬限期 DECIMAL 3  
+      , "GraceDate"           -- 寬限到期日 DECIMALD 8  
+      , "SpecificDd"          -- 指定應繳日 DECIMAL 2  
+      , "SpecificDate"        -- 指定基準日期 DECIMALD 8  
+      , "FirstDueDate"        -- 首次應繳日 DECIMALD 8  
+      , "FirstAdjRateDate"    -- 首次利率調整日期 DECIMALD 8  
+      , "NextAdjRateDate"     -- 下次利率調整日期 DECIMALD 8  
+      , "AcctFee"             -- 帳管費 DECIMAL 16 2 
+      , "HandlingFee"         -- 手續費 DECIMAL 16 2 
+      , "FinalBal"            -- 最後一期本金餘額 DECIMAL 16 2 
+      , "NotYetFlag"          -- 未齊件 VARCHAR2 1  
+      , "RenewFlag"           -- 借新還舊 DECIMAL 1  
+      , "PieceCode"           -- 計件代碼 VARCHAR2 1  
+      , "PieceCodeSecond" 
+      , "PieceCodeSecondAmt" 
+      , "UsageCode"           -- 資金用途別 VARCHAR2 2  
+      , "SyndNo"              -- 聯貸案序號 DECIMAL 6 
+      , "RelationCode"        -- 與借款人關係 VARCHAR2 2  
+      , "RelationName"        -- 第三人帳戶戶名 NVARCHAR2 100  
+      , "RelationId"          -- 第三人身份證字號 VARCHAR2 10 
+      , "RelationBirthday"    -- 第三人生日 DECIMALD 8  
+      , "RelationGender"      -- 第三人性別 VARCHAR2 1  
+      , "ActFg"               -- 交易進行記號 DECIMAL 1  
+      , "LastEntDy"           -- 上次交易日 DECIMALD 8  
+      , "LastKinbr"           -- 上次交易行別 VARCHAR2 4  
+      , "LastTlrNo"           -- 上次櫃員編號 VARCHAR2 6  
+      , "LastTxtNo"           -- 上次交易序號 VARCHAR2 8  
+      , "RemitBank"           -- 匯款銀行 VARCHAR2 3  
+      , "RemitBranch"         -- 匯款分行 VARCHAR2 4  
+      , "RemitAcctNo"         -- 匯款帳號 DECIMAL 14  
+      , "CompensateAcct"      -- 代償專戶 NVARCHAR2 60  
+      , "PaymentBank"         -- 解付單位代號 VARCHAR2 7  
+      , "Remark"              -- 附言 NVARCHAR2 40  
+      , "AcDate"              -- 會計日期 DECIMALD 8  
+      , "NextAcDate"          -- 次日交易會計日期 DECIMALD 8  
+      , "BranchNo" 
+      , "CreateDate"          -- 建檔日期時間 DATE   
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
+      , "LastUpdate"          -- 最後更新日期時間 DATE   
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6  
+      , "GraceFlag"           -- 寬限區分 DECIMAL 1 
+    )
     WITH T1 AS ( 
       SELECT DISTINCT 
              S1."LMSACN" 

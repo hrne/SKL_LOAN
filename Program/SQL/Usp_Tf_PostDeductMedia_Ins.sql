@@ -1,4 +1,9 @@
-create or replace NONEDITIONABLE PROCEDURE "Usp_Tf_PostDeductMedia_Ins" 
+--------------------------------------------------------
+--  DDL for Procedure Usp_Tf_PostDeductMedia_Ins
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_PostDeductMedia_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -19,7 +24,29 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "PostDeductMedia" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "PostDeductMedia"
+    INSERT INTO "PostDeductMedia" (
+        "MediaDate"           -- 媒體日期 DECIMAL 8 
+      , "MediaSeq"            -- 媒體序號 DECIMAL 6 
+      , "CustNo"              -- 戶號 DECIMAL 7 
+      , "FacmNo"              -- 額度號碼 DECIMAL 3 
+      , "RepayType"           -- 還款類別 DECIMAL 2 
+      , "RepayAmt"            -- 扣款金額,還款金額 DECIMAL 14 
+      , "ProcNoteCode"        -- 處理說明 VARCHAR2 單格空白:成功 其他:參照需求書
+      , "PostDepCode"         -- 帳戶別 VARCHAR2 1 P:存簿 G:劃撥
+      , "OutsrcCode"          -- 委託機構代號 VARCHAR2 3
+      , "DistCode"            -- 區處代號 VARCHAR 4
+      , "TransDate"           -- 轉帳日期 DECIMAL 8
+      , "RepayAcctNo"         -- 儲金帳號 VARCHAR2 14 0
+      , "PostUserNo"          -- 用戶編號 VARCHAR2 20 0 右靠左補空，大寫英數字，不得填寫中文(扣款人ID+郵局存款別(POSCDE)+戶號)預計補2位帳號碼
+      , "OutsrcRemark"        -- 委託機構使用欄 NVARCHAR2 20 預計為計息迄日+額度編號+入帳扣款別
+      , "AcDate"              -- 會計日期 DECIMAL 8 
+      , "BatchNo"             -- 批號 VARCHAR2 6 
+      , "DetailSeq"           -- 明細序號 DECIMAL 6 
+      , "CreateDate"          -- 建檔日期時間 DATE  
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+      , "LastUpdate"          -- 最後更新日期時間 DATE  
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+    )
     WITH rawData AS (
       SELECT MAX(TRXIDT) AS LastTRXIDT
       FROM "LA$MBKP" MBK
@@ -161,3 +188,5 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_PostDeductMedia_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
+
+/

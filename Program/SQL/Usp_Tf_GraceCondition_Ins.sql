@@ -24,7 +24,15 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "GraceCondition" ENABLE PRIMARY KEY'; 
  
     -- 寫入資料 
-    INSERT INTO "GraceCondition" 
+    INSERT INTO "GraceCondition" (
+        "CustNo"              -- 借款人戶號 DECIMAL 7 0 
+      , "FacmNo"              -- 額度編號 DECIMAL 3 0 
+      , "ActUse"              -- 使用碼 VARCHAR2 1 0 
+      , "CreateDate"          -- 建檔日期時間 DATE 0 0 
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0 
+      , "LastUpdate"          -- 最後更新日期時間 DATE 0 0 
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0 
+    )
     SELECT GRPP."LMSACN"                  AS "CustNo"              -- 借款人戶號 DECIMAL 7 0 
           ,GRPP."LMSAPN"                  AS "FacmNo"              -- 額度編號 DECIMAL 3 0 
           ,GRPP."ACTUSE"                  AS "ActUse"              -- 使用碼 VARCHAR2 1 0 

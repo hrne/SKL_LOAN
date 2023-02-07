@@ -19,7 +19,42 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "ClOther" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "ClOther"
+    INSERT INTO "ClOther" (
+        "ClCode1"             -- 擔保品代號1 DECIMAL 1 
+      , "ClCode2"             -- 擔保品代號2 DECIMAL 2 
+      , "ClNo"                -- 擔保品編號 DECIMAL 7 
+      , "PledgeStartDate"     -- 保證起日 decimald 8 
+      , "PledgeEndDate"       -- 保證迄日 decimald 8 
+      , "PledgeBankCode"      -- 保證銀行 VARCHAR2 2 
+      , "PledgeNO"            -- 保證書字號 VARCHAR2 30 
+      , "OwnerCustUKey"       -- 所有權人客戶識別碼 VARCHAR2 32 
+      , "IssuingId"           -- 發行機構統編 VARCHAR2 10 
+      , "IssuingCounty"       -- 發行機構所在國別 VARCHAR2 3 
+      , "DocNo"               -- 憑證編號 VARCHAR2 30 
+      , "LoanToValue"	       -- 貸放成數 DECIMAL 5 2
+      , "SecuritiesType"      -- 有價證券類別 varchar2 2 
+      , "Listed"              -- 掛牌交易所 varchar2 2
+      , "OfferingDate"        -- 發行日 decimald 8
+      , "ExpirationDate"      -- 到期日 decimald 8
+      , "TargetIssuer"        -- 發行者對象別 varchar2 2
+      , "SubTargetIssuer"     -- 發行者次對象別 varchar2 2
+      , "CreditDate"          -- 評等日期 decimald 8
+      , "Credit"              -- 評等公司 varchar2 2
+      , "ExternalCredit"      -- 外部評等 varchar2 3
+      , "Index"               -- 主要指數 varchar2 2
+      , "TradingMethod"       -- 交易方法 varchar2 1
+      , "Compensation"        -- 受償順位 varchar2 3
+      , "Investment"          -- 投資內容 nvarchar2 300
+      , "PublicValue"         -- 公開價值 nvarchar2 300
+      , "SettingStat"	       -- 設定狀態 VARCHAR2(1 BYTE)
+      , "ClStat"	           -- 擔保品狀態 VARCHAR2(1 BYTE)
+      , "SettingDate"	       -- 設定日期 NUMBER(8,0)
+      , "SettingAmt"	       -- 設定金額 NUMBER(16,2)
+      , "CreateDate"          -- 建檔日期時間 DATE  
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+      , "LastUpdate"          -- 最後更新日期時間 DATE  
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+    )
     SELECT S1."ClCode1"                   AS "ClCode1"             -- 擔保品代號1 DECIMAL 1 
           ,S1."ClCode2"                   AS "ClCode2"             -- 擔保品代號2 DECIMAL 2 
           ,S1."ClNo"                      AS "ClNo"                -- 擔保品編號 DECIMAL 7 

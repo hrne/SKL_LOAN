@@ -20,7 +20,22 @@ BEGIN
 
     -- 寫入資料
     -- 擔保品號碼NULL者 找出舊的擔保品關係 依照其群組號碼 找出該轉入的那筆 寫入
-    INSERT INTO "ClFac"
+    INSERT INTO "ClFac" (
+        "ClCode1"             -- 擔保品代號1 DECIMAL 1 
+      , "ClCode2"             -- 擔保品代號2 DECIMAL 2 
+      , "ClNo"                -- 擔保品編號 DECIMAL 7 
+      , "ApproveNo"           -- 核准號碼 DECIMAL 7 
+      , "CustNo"              -- 借款人戶號 DECIMAL 7 
+      , "FacmNo"              -- 額度編號 DECIMAL 3 
+      , "MainFlag"            -- 主要擔保品記號 VARCHAR2 1
+      , "FacShareFlag"        -- 共用額度記號 DECIMAL 1 -- 0:非共用額度 1:主要額度 2:共用額度
+      , "ShareAmt"            -- 分配金額 DECIMAL 16 2
+      , "OriSettingAmt"       -- 設定金額 DECIMAL 16 2 擔保品與額度綁定當下的設定金額
+      , "CreateDate"          -- 建檔日期時間 DATE 0 
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+      , "LastUpdate"          -- 最後更新日期時間 DATE 0 
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+    )
     SELECT DISTINCT 
            M."ClCode1"                    AS "ClCode1"             -- 擔保品代號1 DECIMAL 1 
           ,M."ClCode2"                    AS "ClCode2"             -- 擔保品代號2 DECIMAL 2 

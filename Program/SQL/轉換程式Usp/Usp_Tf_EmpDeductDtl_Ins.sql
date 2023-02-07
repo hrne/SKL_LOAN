@@ -24,7 +24,45 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "EmpDeductDtl" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "EmpDeductDtl"
+    INSERT INTO "EmpDeductDtl" (
+        "EntryDate"           -- 入帳日期 DECIMAL 8 0
+      , "CustNo"              -- 戶號 DECIMAL 7 0
+      , "AchRepayCode"        -- 入帳扣款別 VARCHAR2 1 0
+      , "PerfMonth"           -- 業績年月 DECIMAL 6 0
+      , "ProcCode"            -- 流程別 VARCHAR2 1 0
+      , "RepayCode"           -- 扣款代碼 VARCHAR2 1 0
+      , "AcctCode"            -- 科目 VARCHAR2 12 0
+      , "FacmNo"              -- 額度編號 NUMBER(3,0)
+      , "BormNo"              -- 撥款編號 NUMBER(3,0)
+      , "EmpNo"               -- 員工代號 VARCHAR2 6 0
+      , "CustId"              -- 統一編號 VARCHAR2 10 0
+      , "TxAmt"               -- 交易金額 DECIMAL 14 0
+      , "ErrMsg"              -- 失敗原因 NVARCHAR2 20 0
+      , "Acdate"              -- 會計日期 DECIMAL 8 0
+      , "TitaTlrNo"           -- 經辦 VARCHAR2 6 0
+      , "TitaTxtNo"           -- 交易序號 VARCHAR2 8 0
+      , "BatchNo"             -- 批次號碼 VARCHAR2 6 0
+      , "RepayAmt"            -- 應扣金額 DECIMAL 14 0
+      , "ResignCode"          -- 離職代碼 VARCHAR2 2 0
+      , "DeptCode"            -- 部室代號 VARCHAR2 6 0
+      , "UnitCode"            -- 單位代號 VARCHAR2 6 0
+      , "IntStartDate"        -- 計息起日 DECIMAL 8 0
+      , "IntEndDate"          -- 計息迄日 DECIMAL 8 0
+      , "PositCode"           -- 職務代號 VARCHAR2 2 0
+      , "Principal"           -- 本金 DECIMAL 14 0
+      , "Interest"            -- 利息 DECIMAL 14 0
+      , "SumOvpayAmt"         -- 累溢短收 DECIMAL 14 0
+      , "JsonFields"
+      , "CurrIntAmt"          -- 當期利息 DECIMAL 14 0
+      , "CurrPrinAmt"         -- 當期本金 DECIMAL 14 0
+      , "MediaDate"           -- decimal 8 0
+      , "MediaKind"           -- varchar2 1
+      , "MediaSeq"            -- decimal 6 0
+      , "CreateDate"          -- 建檔日期時間 DATE  
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+      , "LastUpdate"          -- 最後更新日期時間 DATE  
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+    )
     SELECT S1."TRXIDT"              AS "EntryDate"           -- 入帳日期 DECIMAL 8 0
           ,S1."LMSACN"              AS "CustNo"              -- 戶號 DECIMAL 7 0
           ,CASE S1."MBKTRX"

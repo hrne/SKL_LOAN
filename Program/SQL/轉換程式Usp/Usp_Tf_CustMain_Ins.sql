@@ -47,7 +47,83 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "CustMain" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "CustMain"
+    INSERT INTO "CustMain" (
+            "CustUKey"            -- 客戶識別碼 VARCHAR2 32 
+          , "CustId"              -- 身份證字號/統一編號 VARCHAR2 10 
+          , "CustNo"              -- 戶號 DECIMAL 7 
+          , "BranchNo"            -- 單位別 VARCHAR2 4 
+          , "CustName"            -- 戶名/公司名稱 NVARCHAR2 100 
+          , "Birthday"            -- 出生年月日/設立日期 decimald 8 
+          , "Sex"                 -- 性別 VARCHAR2 1 
+          , "CustTypeCode"        -- 客戶別 VARCHAR2 2 
+          , "IndustryCode"        -- 行業別 VARCHAR2 6 -- 2021-07-22修改: 位數不足6碼者，前補零
+          , "NationalityCode"     -- 自然人:出生地國籍 / 法人:註冊地國籍 VARCHAR2 2 
+          , "BussNationalityCode" -- 自然人:居住地國籍 / 法人:營業地國籍 VARCHAR2 2 
+          , "SpouseId"            -- 配偶身份證號/負責人身分證 VARCHAR2 10 
+          , "SpouseName"          -- 配偶姓名/負責人姓名 NVARCHAR2 100 
+          , "RegZip3"             -- 戶籍-郵遞區號前三碼 VARCHAR2 3 
+          , "RegZip2"             -- 戶籍-郵遞區號後兩碼 VARCHAR2 2 
+          , "RegCityCode"         -- 戶籍-縣市代碼 VARCHAR2 2 
+          , "RegAreaCode"         -- 戶籍-鄉鎮市區代碼 VARCHAR2 3 
+          , "RegRoad"             -- 戶籍-路名 NVARCHAR2 40 
+          , "RegSection"          -- 戶籍-段 VARCHAR2 5 
+          , "RegAlley"            -- 戶籍-巷 VARCHAR2 5 
+          , "RegLane"             -- 戶籍-弄 VARCHAR2 5 
+          , "RegNum"              -- 戶籍-號 VARCHAR2 5 
+          , "RegNumDash"          -- 戶籍-號之 VARCHAR2 5 
+          , "RegFloor"            -- 戶籍-樓 VARCHAR2 5 
+          , "RegFloorDash"        -- 戶籍-樓之 VARCHAR2 5 
+          , "CurrZip3"            -- 通訊-郵遞區號前三碼 VARCHAR2 3 
+          , "CurrZip2"            -- 通訊-郵遞區號後兩碼 VARCHAR2 2 
+          , "CurrCityCode"        -- 通訊-縣市代碼 VARCHAR2 2 
+          , "CurrAreaCode"        -- 通訊-鄉鎮市區代碼 VARCHAR2 3 
+          , "CurrRoad"            -- 通訊-路名 NVARCHAR2 40 
+          , "CurrSection"         -- 通訊-段 VARCHAR2 5 
+          , "CurrAlley"           -- 通訊-巷 VARCHAR2 5 
+          , "CurrLane"            -- 通訊-弄 VARCHAR2 5 
+          , "CurrNum"             -- 通訊-號 VARCHAR2 5 
+          , "CurrNumDash"         -- 通訊-號之 VARCHAR2 5 
+          , "CurrFloor"           -- 通訊-樓 VARCHAR2 5 
+          , "CurrFloorDash"       -- 通訊-樓之 VARCHAR2 5 
+          , "CuscCd"              -- 身份別 VARCHAR2 1 
+          , "EntCode"             -- 企金別 VARCHAR2 1 
+          , "EmpNo"               -- 員工代號 VARCHAR2 6 
+          , "EName"               -- 英文姓名 VARCHAR2 20 
+          , "EduCode"             -- 教育程度代號 VARCHAR2 1 
+          , "OwnedHome"           -- 自有住宅有無 VARCHAR2 1 
+          , "CurrCompName"        -- 任職機構名稱 NVARCHAR2 60 
+          , "CurrCompId"          -- 任職機構統編 VARCHAR2 8 
+          , "CurrCompTel"         -- 任職機構電話 VARCHAR2 16 
+          , "JobTitle"            -- 職位名稱 NVARCHAR2 20 
+          , "JobTenure"           -- 服務年資 VARCHAR2 2 
+          , "IncomeOfYearly"      -- 年收入 DECIMAL 9 
+          , "IncomeDataDate"      -- 年收入資料年月 VARCHAR2 6 
+          , "PassportNo"          -- 護照號碼 VARCHAR2 20 
+          , "AMLJobCode"          -- AML職業別 VARCHAR2 3 
+          , "AMLGroup"            -- AML組織 VARCHAR2 3 
+          , "IndigenousName"      -- 原住民姓名 NVARCHAR2 100 
+          , "LastFacmNo"          -- 已編額度編號 DECIMAL 3 
+          , "LastSyndNo"          -- 已編聯貸案序號 DECIMAL  
+          , "AllowInquire"        -- 開放查詢 VARCHAR2 1 
+          , "Email"               -- Email Address VARCHAR2 50 
+          , "ActFg"               -- 交易進行記號 DECIMAL 1 
+          , "Introducer"          -- 介紹人 VARCHAR2 6 
+          , "BusinessOfficer"     -- 房貸專員/企金人員 VARCHAR2 6
+          , "IsSuspected"         -- 是否為金控「疑似準利害關係人」名單 VARCHAR2 1 
+          , "IsSuspectedCheck"    -- 是否為金控疑似準利害關係人 VARCHAR2 1 
+          , "IsSuspectedCheckType"-- 是否為金控疑似準利害關係人_確認狀態 VARCHAR2 1 
+          , "DataStatus"          -- 資料狀態 DECIMAL 1 
+          , "TypeCode"            -- 建檔身分別 DECIMAL 1 
+          , "Station"              -- 站別 VARCHAR2 3
+          , "CreateDate"          -- 建檔日期時間 DATE  
+          , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+          , "LastUpdate"          -- 最後更新日期時間 DATE  
+          , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          , "IsLimit"
+          , "IsRelated"
+          , "IsLnrelNear"
+          , "IsDate"
+    )
     SELECT TF."CustUKey"                  AS "CustUKey"            -- 客戶識別碼 VARCHAR2 32 
           ,CASE
              WHEN CUSP."LMSACN" = 601776 -- 2021-12-10 智偉修改 from Linda

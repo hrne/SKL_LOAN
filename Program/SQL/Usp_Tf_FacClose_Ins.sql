@@ -41,7 +41,37 @@ CloseReasonCode 需左補0 (2)
 */
 
     -- 寫入資料
-    INSERT INTO "FacClose"
+    INSERT INTO "FacClose" (
+        "CustNo"              -- 戶號 DECIMAL 7 0
+      , "CloseNo"             -- 清償序號 DECIMAL 3 0
+      , "FacmNo"              -- 額度編號 DECIMAL 3 0
+      , "ActFlag"             -- 登放記號 DECIMAL 1 0
+      , "FunCode"             -- 功能 VARCHAR2 1 0
+      , "CarLoan"             -- 車貸 DECIMAL 1 0
+      , "ApplDate"            -- 申請日期 DecimalD 8 0
+      , "CloseDate"           -- 結案日期 DecimalD 8 0
+      , "CloseInd"            -- 結案區分 VARCHAR2 1
+      , "CloseReasonCode"     -- 清償原因 VARCHAR2 2 0
+      , "CloseAmt"            -- 還清金額 DECIMAL 16 2
+      , "CollectFlag"         -- 是否領取清償證明 VARCHAR2 1
+      , "CollectWayCode"      -- 領取方式 VARCHAR2 2 0
+      , "ReceiveDate"         -- 領取日期 DecimalD 8 0
+      , "TelNo1"              -- 連絡電話1 VARCHAR2 15 0
+      , "TelNo2"              -- 連絡電話2 VARCHAR2 15 0
+      , "TelNo3"              -- 連絡電話3 VARCHAR2 15 0
+      , "EntryDate"           -- 入帳日期 DECIMALD 8 0
+      , "AgreeNo"             -- 塗銷同意書編號 VARCHAR2 10 0
+      , "DocNo"               -- 公文編號 DECIMAL 7 0
+      , "ClsNo"               -- 銷號欄 NVARCHAR2 18 0
+      , "Rmk"                 -- 備註 NVARCHAR2 100 0
+      , "ReceiveFg"           -- 領取記號 DECIMAL 1
+      , "CreateDate"          -- 建檔日期時間 DATE 0 0
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+      , "LastUpdate"          -- 最後更新日期時間 DATE 0 0
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+      , "PostAddress"
+      , "DocNoE"              -- 公文編號(迄) DECIMAL 4 0
+    )
     SELECT E."LMSACN"                     AS "CustNo"              -- 戶號 DECIMAL 7 0
           ,ROW_NUMBER()
            OVER (
@@ -82,9 +112,6 @@ CloseReasonCode 需左補0 (2)
           ,0                              AS "DocNo"               -- 公文編號 DECIMAL 7 0
           ,u''                            AS "ClsNo"               -- 銷號欄 NVARCHAR2 18 0
           ,E."NGRRMK40"                   AS "Rmk"                 -- 備註 NVARCHAR2 100 0
-          ,0                              AS "ClCode1"
-          ,0                              AS "ClCode2"
-          ,0                              AS "ClNo"
           ,0                              AS "ReceiveFg"           -- 領取記號 DECIMAL 1
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 0 0
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0

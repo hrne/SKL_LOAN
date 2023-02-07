@@ -79,7 +79,7 @@ public class L9134Report3 extends MakeReport {
 			 */
 			for (Map<String, String> r : list) {
 				row++;
-				makeExcel.setValue(row, 1, r.get("AcNoCode"));
+				//makeExcel.setValue(row, 1, r.get("AcNoCode"));
 				
 				String AcNameCode = "";
 				if(r.get("AcNoCode").equals("20222010000")) {
@@ -98,8 +98,8 @@ public class L9134Report3 extends MakeReport {
 					AcNameCode = r.get("AcNoCode")+"－前置調解  ";
 				}
 				
-				
-				makeExcel.setValue(row, 2, AcNameCode);
+				makeExcel.setValue(row, 1, AcNameCode);//!
+				makeExcel.setValue(row, 2, r.get("AcSubCode"));//!
 				makeExcel.setValue(row, 3, r.get("AcDtlCode"));
 				makeExcel.setValue(row, 4, r.get("AcctItem"));
 				makeExcel.setValue(row, 5, r.get("CustNo"));

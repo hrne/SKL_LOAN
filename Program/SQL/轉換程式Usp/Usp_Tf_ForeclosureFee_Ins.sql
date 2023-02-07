@@ -68,7 +68,29 @@ BEGIN
     -- SELECT MAX("RecordNo") INTO "d_MaxRecordNo" FROM "ForeclosureFee";
 
     -- 寫入資料
-    INSERT INTO "ForeclosureFee"
+    INSERT INTO "ForeclosureFee" (
+        "RecordNo"            -- 記錄號碼 DECIMAL 7 
+      , "CustNo"              -- 借款人戶號 DECIMAL 7 
+      , "FacmNo"              -- 額度編號 DECIMAL 3 
+      , "ReceiveDate"         -- 收件日期 DecimalD 8 
+      , "DocDate"             -- 單據日期 DecimalD 8 
+      , "OpenAcDate"          -- 起帳日期 DecimalD 8 
+      , "CloseDate"           -- 銷號日期 DecimalD 8 
+      , "Fee"                 -- 法拍費用 DECIMAL 16 2
+      , "FeeCode"             -- 科目 VARCHAR2 2 
+      , "LegalStaff"          -- 法務人員 VARCHAR2 6 
+      , "CloseNo"             -- 銷帳編號 DECIMAL 6 
+      , "Rmk"                 -- 備註 NVARCHAR2 60 
+      , "CaseCode"            -- 件別 DECIMAL 1 
+      , "RemitBranch"         -- 匯款單位 VARCHAR2 3 
+      , "Remitter"            -- 匯款人 VARCHAR2 10 
+      , "CaseNo"              -- 案號 VARCHAR2 3
+      , "OverdueDate"         -- 轉催收日 DecimalD 8 
+      , "CreateDate"          -- 建檔日期時間 DATE  
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+      , "LastUpdate"          -- 最後更新日期時間 DATE  
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+    )
     SELECT S1."RECNUM"                    AS "RecordNo"            -- 記錄號碼 DECIMAL 7 
           ,S1."LMSACN"                    AS "CustNo"              -- 借款人戶號 DECIMAL 7 
           ,NVL(S3."FacmNo",1)             AS "FacmNo"              -- 額度編號 DECIMAL 3 

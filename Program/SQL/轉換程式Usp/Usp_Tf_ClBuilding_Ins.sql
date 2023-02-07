@@ -19,7 +19,50 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "ClBuilding" ENABLE PRIMARY KEY'; 
  
     -- 寫入資料 
-    INSERT INTO "ClBuilding" 
+    INSERT INTO "ClBuilding" (
+        "ClCode1"             -- 擔保品代號1 DECIMAL 1  
+      , "ClCode2"             -- 擔保品代號2 DECIMAL 2  
+      , "ClNo"                -- 擔保品編號 DECIMAL 7  
+      , "CityCode"            -- 縣市 VARCHAR2 2  
+      , "AreaCode"            -- 鄉鎮市區 VARCHAR2 3  
+      , "IrCode"              -- 段小段代碼 VARCHAR2 4  
+      , "Road"                -- 路名 NVARCHAR2 40  
+      , "Section"             -- 段 VARCHAR2 5  
+      , "Alley"               -- 巷 VARCHAR2 5  
+      , "Lane"                -- 弄 VARCHAR2 5  
+      , "Num"                 -- 號 VARCHAR2 5  
+      , "NumDash"             -- 號之 VARCHAR2 5  
+      , "Floor"               -- 樓 VARCHAR2 5  
+      , "FloorDash"           -- 樓之 VARCHAR2 5  
+      , "BdNo1"               -- 建號 VARCHAR2 5  
+      , "BdNo2"               -- 建號(子號) VARCHAR2 3  
+      , "BdLocation"          -- 建物門牌 VARCHAR2 150  
+      , "BdMainUseCode"       -- 建物主要用途 VARCHAR2 2  
+      , "BdUsageCode"         -- 建物使用別 VARCHAR2 1  
+      , "BdMtrlCode"          -- 建物主要建材 VARCHAR2 2  
+      , "BdTypeCode"          -- 建物類別 VARCHAR2 2  
+      , "TotalFloor"          -- 總樓層 DECIMAL 3  
+      , "FloorNo"             -- 擔保品所在樓層 VARCHAR2 7 
+      , "FloorArea"           -- 擔保品所在樓層面積 DECIMAL 8 2 
+      , "EvaUnitPrice"        -- 鑑價單價/坪 DECIMAL 16 2 
+      , "RoofStructureCode"   -- 屋頂結構 VARCHAR2 2  
+      , "BdDate"              -- 建築完成日期 decimald 8  
+      , "BdSubUsageCode"      -- 附屬建物用途 VARCHAR2 2  
+      , "BdSubArea"           -- 附屬建物面積 DECIMAL 8 2 
+      , "SellerId"            -- 賣方統編 VARCHAR2 10  
+      , "SellerName"          -- 賣方姓名 VARCHAR2 10  
+      , "ContractPrice"       -- 買賣契約價格 DECIMAL 16 2 
+      , "ContractDate"        -- 買賣契約日期 decimald 8  
+      , "ParkingTypeCode"     -- 停車位形式 VARCHAR2 1  
+      , "ParkingArea"         -- 登記面積(坪) DECIMAL 16 2 
+      , "ParkingProperty"     -- 獨立產權車位註記 VARCHAR2 1  
+      , "HouseTaxNo"          -- 房屋稅籍號碼 VARCHAR2 12  
+      , "HouseBuyDate"        -- 房屋取得日期 decimald 8  
+      , "CreateDate"          -- 建檔日期時間 DATE   
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
+      , "LastUpdate"          -- 最後更新日期時間 DATE   
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6  
+    )
     SELECT S1."ClCode1"                   AS "ClCode1"             -- 擔保品代號1 DECIMAL 1  
           ,S1."ClCode2"                   AS "ClCode2"             -- 擔保品代號2 DECIMAL 2  
           ,S1."ClNo"                      AS "ClNo"                -- 擔保品編號 DECIMAL 7  

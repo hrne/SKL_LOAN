@@ -19,7 +19,21 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "ClBuildingPublic" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "ClBuildingPublic"
+    INSERT INTO "ClBuildingPublic" (
+        "ClCode1"             -- 擔保品-代號1 DECIMAL 1 0
+      , "ClCode2"             -- 擔保品-代號2 DECIMAL 2 0
+      , "ClNo"                -- 擔保品編號 DECIMAL 7 0
+      , "PublicSeq"           -- 公設序號 DECIMAL 7 0
+      , "PublicBdNo1"         -- 公設建號 DECIMAL 5 0
+      , "PublicBdNo2"         -- 公設建號(子號) DECIMAL 3 0
+      , "Area"                -- 登記面積(坪) DECIMAL 16 2
+      , "OwnerId"             -- 所有權人統編 VARCHAR2 10 0
+      , "OwnerName"           -- 所有權人姓名 NVARCHAR2 100 0
+      , "CreateDate"          -- 建檔日期時間 DATE 0 0
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+      , "LastUpdate"          -- 最後更新日期時間 DATE 0 0
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+    )
     WITH TMP_PHGP AS (
       SELECT "GDRID1"
            , "GDRID2"

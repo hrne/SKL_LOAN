@@ -21,7 +21,21 @@ BEGIN
     -- 刪除舊資料
 
     -- 寫入資料
-    INSERT INTO "AcLoanRenew"
+    INSERT INTO "AcLoanRenew" (
+        "CustNo"              -- 戶號 DECIMAL 3
+      , "NewFacmNo"           -- 新額度編號 DECIMAL 3
+      , "NewBormNo"           -- 新撥款序號 DECIMAL 3
+      , "OldFacmNo"           -- 舊額度編號 DECIMAL 6
+      , "OldBormNo"           -- 舊撥款序號 DECIMAL 6
+      , "ReNewCode"           -- 展期記號 VARCHAR2 1 (1:一般 2:協議)
+      , "MainFlag"            -- 主要記號 VARCHAR2 1 (Y:新撥款對到舊撥款最早的一筆 )
+      , "AcDate"              -- 會計日期 DECIMAL 8
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+      , "CreateDate"          -- 建檔日期時間 DATE  
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+      , "LastUpdate"          -- 最後更新日期時間 DATE  
+      , "OtherFields"
+    )
     SELECT S0."CustNo"                    AS "CustNo"              -- 戶號 DECIMAL 3
           ,S0."RenewFacmNo"               AS "NewFacmNo"           -- 新額度編號 DECIMAL 3
           ,S0."RenewBormNo"               AS "NewBormNo"           -- 新撥款序號 DECIMAL 3

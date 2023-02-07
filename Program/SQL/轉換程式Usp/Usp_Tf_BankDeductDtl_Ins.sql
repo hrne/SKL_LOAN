@@ -28,7 +28,43 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "BankDeductDtl" ENABLE PRIMARY KEY'; 
  
     -- 寫入資料 
-    INSERT INTO "BankDeductDtl" 
+    INSERT INTO "BankDeductDtl" (
+        "EntryDate"           -- 入帳日期 Decimald 8 0 
+      , "CustNo"              -- 戶號 DECIMAL 7 0 
+      , "FacmNo"              -- 額度 DECIMAL 3 0 
+      , "RepayType"           -- 還款類別 DECIMAL 2 0 
+      , "PayIntDate"          -- 應繳日 Decimald 8 0 
+      , "PrevIntDate"         -- 繳息迄日 Decimald 8 0 
+      , "AcctCode"            -- 科目 VARCHAR2 3 0 
+      , "RepayBank"           -- 扣款銀行 VARCHAR2 3 0 
+      , "RepayAcctNo"         -- 扣款帳號 VARCHAR2 14 0 
+      , "RepayAcctSeq"        -- 帳號碼 VARCHAR2 2 0 
+      , "UnpaidAmt"           -- 應扣金額 DECIMAL 14 0 
+      , "TempAmt"             -- 暫收抵繳金額 DECIMAL 14 0 
+      , "RepayAmt"            -- 扣款金額 DECIMAL 14 0 
+      , "IntStartDate"        -- 計息起日 Decimald 8 0 
+      , "IntEndDate"          -- 計息迄日 Decimald 8 0 
+      , "PostCode"            -- 郵局存款別 VARCHAR2 1 0 
+      , "MediaCode"           -- 媒體碼 VARCHAR2 1 0 
+      , "RelationCode"        -- 與借款人關係 VARCHAR2 2 0 
+      , "RelCustName"         -- 第三人帳戶戶名 NVARCHAR2 100 0 
+      , "RelCustId"           -- 第三人身分證字號 VARCHAR2 10 0 
+      , "RelAcctBirthday"     -- 第三人出生日期 decimal 8 0 
+      , "RelAcctGender"       -- 第三人性別 varchar2 1 
+      , "MediaDate"           -- 媒體日期 DECIMAL 8  
+      , "MediaKind"           -- 媒體別 VARCHAR2 1 0 
+      , "MediaSeq"            -- 媒體序號 DECIMAL 6 0 
+      , "AcDate"              -- 會計日期 Decimald 8 0 
+      , "TitaTlrNo"           -- 經辦 VARCHAR2 6 
+      , "TitaTxtNo"           -- 交易序號 VARCHAR2 8 
+      , "AmlRsp"              -- AML回應碼 VARCHAR2 1 0 
+      , "ReturnCode"          -- 回應代碼 VARCHAR2 2 0 
+      , "JsonFields"          -- jason格式紀錄欄 nvarchar2 300 
+      , "CreateDate"          -- 建檔日期時間 DATE   
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
+      , "LastUpdate"          -- 異動日期 DATE 0 0 
+      , "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 0 
+    )
     WITH rawPDM AS ( 
       SELECT "MediaDate" 
             ,"MediaSeq" 
@@ -205,7 +241,43 @@ BEGIN
     INS_CNT := INS_CNT + sql%rowcount; 
  
     -- 寫入資料 
-    INSERT INTO "BankDeductDtl" 
+    INSERT INTO "BankDeductDtl"  (
+        "EntryDate"           -- 入帳日期 Decimald 8 0 
+      , "CustNo"              -- 戶號 DECIMAL 7 0 
+      , "FacmNo"              -- 額度 DECIMAL 3 0 
+      , "RepayType"           -- 還款類別 DECIMAL 2 0 
+      , "PayIntDate"          -- 應繳日 Decimald 8 0 
+      , "PrevIntDate"         -- 繳息迄日 Decimald 8 0 
+      , "AcctCode"            -- 科目 VARCHAR2 3 0 
+      , "RepayBank"           -- 扣款銀行 VARCHAR2 3 0 
+      , "RepayAcctNo"         -- 扣款帳號 VARCHAR2 14 0 
+      , "RepayAcctSeq"        -- 帳號碼 VARCHAR2 2 0 
+      , "UnpaidAmt"           -- 應扣金額 DECIMAL 14 0 
+      , "TempAmt"             -- 暫收抵繳金額 DECIMAL 14 0 
+      , "RepayAmt"            -- 扣款金額 DECIMAL 14 0 
+      , "IntStartDate"        -- 計息起日 Decimald 8 0 
+      , "IntEndDate"          -- 計息迄日 Decimald 8 0 
+      , "PostCode"            -- 郵局存款別 VARCHAR2 1 0 
+      , "MediaCode"           -- 媒體碼 VARCHAR2 1 0 
+      , "RelationCode"        -- 與借款人關係 VARCHAR2 2 0 
+      , "RelCustName"         -- 第三人帳戶戶名 NVARCHAR2 100 0 
+      , "RelCustId"           -- 第三人身分證字號 VARCHAR2 10 0 
+      , "RelAcctBirthday"     -- 第三人出生日期 decimal 8 0 
+      , "RelAcctGender"       -- 第三人性別 varchar2 1 
+      , "MediaDate"           -- 媒體日期 DECIMAL 8  
+      , "MediaKind"           -- 媒體別 VARCHAR2 1 0 
+      , "MediaSeq"            -- 媒體序號 DECIMAL 6 0 
+      , "AcDate"              -- 會計日期 Decimald 8 0 
+      , "TitaTlrNo"           -- 經辦 VARCHAR2 6 
+      , "TitaTxtNo"           -- 交易序號 VARCHAR2 8 
+      , "AmlRsp"              -- AML回應碼 VARCHAR2 1 0 
+      , "ReturnCode"          -- 回應代碼 VARCHAR2 2 0 
+      , "JsonFields"          -- jason格式紀錄欄 nvarchar2 300 
+      , "CreateDate"          -- 建檔日期時間 DATE   
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
+      , "LastUpdate"          -- 異動日期 DATE 0 0 
+      , "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 0 
+    )
     WITH rawADM AS ( 
       SELECT "MediaDate" 
             ,"MediaKind" 

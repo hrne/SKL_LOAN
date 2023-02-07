@@ -24,7 +24,27 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "CollMeet" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "CollMeet"
+    INSERT INTO "CollMeet" (
+        "CaseCode"            -- 案件種類 VARCHAR2 1 0
+      , "CustNo"              -- 借款人戶號 DECIMAL 7 0
+      , "FacmNo"              -- 額度編號 DECIMAL 3 0
+      , "AcDate"              -- 作業日期 DecimalD 8 0
+      , "TitaTlrNo"           -- 經辦 VARCHAR2 6 0
+      , "TitaTxtNo"           -- 交易序號 VARCHAR2 8 0
+      , "MeetDate"            -- 面催日期 DecimalD 8 0
+      , "MeetTime"            -- 面催時間 VARCHAR2 4 0
+      , "ContactCode"         -- 聯絡對象 VARCHAR2 1 0
+      , "MeetPsnCode"         -- 面晤人 VARCHAR2 1 0
+      , "CollPsnCode"         -- 催收人員 VARCHAR2 1 0
+      , "CollPsnName"         -- 催收人員姓名 NVARCHAR2 8 0
+      , "MeetPlaceCode"       -- 面催地點選項 DECIMAL 1 0
+      , "MeetPlace"           -- 面催地點 NVARCHAR2 60 0
+      , "Remark"              -- 其他記錄 NVARCHAR2 500 0
+      , "CreateDate"          -- 建檔日期時間 DATE 8 0
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+      , "LastUpdate"          -- 最後更新日期時間 DATE 8 0
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+    )
     SELECT '1'                            AS "CaseCode"            -- 案件種類 VARCHAR2 1 0
           ,M.LMSACN                       AS "CustNo"              -- 借款人戶號 DECIMAL 7 0
           ,M.LMSAPN                       AS "FacmNo"              -- 額度編號 DECIMAL 3 0

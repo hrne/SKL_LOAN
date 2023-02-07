@@ -34,7 +34,7 @@ BEGIN
 
     -- 寫入資料
     INSERT INTO "YearlyHouseLoanInt"(
-      "YearMonth"             -- 資料年月 DECIMAL 6 0
+        "YearMonth"             -- 資料年月 DECIMAL 6 0
       , "CustNo"              -- 戶號 DECIMAL 7 0
       , "FacmNo"              -- 額度編號 DECIMAL 3 0
       , "UsageCode"           -- 資金用途別 VARCHAR2 2 0

@@ -22,7 +22,18 @@ BEGIN
     DELETE FROM "NegFinShare";
 
     -- 寫入資料
-    INSERT INTO "NegFinShare"
+    INSERT INTO "NegFinShare" (
+        "CustNo"              -- 債務人戶號 DECIMAL 7 0
+      , "CaseSeq"             -- 案件序號 DECIMAL 3 0
+      , "FinCode"             -- 債權機構 VARCHAR2 8 0
+      , "ContractAmt"         -- 簽約金額 DECIMAL 16 2
+      , "AmtRatio"            -- 債權比例%  DECIMAL 5 2
+      , "DueAmt"              -- 期款 DECIMAL 16 2
+      , "CreateDate"          -- 建檔日期時間 DATE 8 0
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+      , "LastUpdate"          -- 最後更新日期時間 DATE 8 0
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+    )
     SELECT M."CustNo"                         AS "CustNo"              -- 債務人戶號 DECIMAL 7 0
           ,M."CaseSeq"                        AS "CaseSeq"             -- 案件序號 DECIMAL 3 0
           ,NVL(S.CREDIT_CODE,' ')             AS "FinCode"             -- 債權機構 VARCHAR2 8 0

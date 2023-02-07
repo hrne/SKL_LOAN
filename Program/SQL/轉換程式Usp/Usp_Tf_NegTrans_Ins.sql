@@ -22,7 +22,50 @@ BEGIN
     DELETE FROM "NegTrans";
 
     -- 寫入資料ACCOUNT_DATE
-    INSERT INTO "NegTrans"
+    INSERT INTO "NegTrans" (
+        "AcDate"          -- 會計日期 DecimalD 8 0
+      , "TitaTlrNo"       -- 經辦 VARCHAR2 6 0
+      , "TitaTxtNo"       -- 交易序號 DECIMAL 8 0
+      , "CustNo"          -- 戶號 DECIMAL 7 0
+      , "CaseSeq"         -- 案件序號 DECIMAL 3 0
+      , "EntryDate"       -- 入帳日期 DecimalD 8 0
+      , "TxStatus"        -- 交易狀態 DECIMAL 1 0
+      , "TxKind"          -- 交易別 VARCHAR2 1 0
+      , "TxAmt"           -- 交易金額 DECIMAL 16 2
+      , "PrincipalBal"    -- 本金餘額 DECIMAL 16 2
+      , "ReturnAmt"       -- 退還金額 DECIMAL 16 2
+      , "SklShareAmt"     -- 新壽攤分 DECIMAL 16 2
+      , "ApprAmt"         -- 撥付金額 DECIMAL 16 2
+      , "ExportDate"      -- 撥付製檔日 DecimalD 8 0
+      , "ExportAcDate"    -- 撥付出帳日 DecimalD 8 0
+      , "TempRepayAmt"    -- 暫收抵繳金額 DECIMAL 16 2
+      , "OverRepayAmt"    -- 溢收抵繳金額 DECIMAL 16 2
+      , "PrincipalAmt"    -- 本金金額 DECIMAL 16 2
+      , "InterestAmt"     -- 利息金額 DECIMAL 16 2
+      , "OverAmt"         -- 轉入溢收金額 DECIMAL 16 2
+      , "IntStartDate"    -- 繳息起日 DecimalD 8 0
+      , "IntEndDate"      -- 繳息迄日 DecimalD 8 0
+      , "RepayPeriod"     -- 還款期數 DECIMAL 3 0
+      , "RepayDate"       -- 入帳還款日期 DecimalD 8 0
+      , "OrgAccuOverAmt"  -- 累溢繳款(交易前) DECIMAL 16 2
+      , "AccuOverAmt"     -- 累溢繳款(交易後) DECIMAL 16 2
+      , "ShouldPayPeriod" -- 本次應還期數 DECIMAL 3 0
+      , "DueAmt"          -- 期金 DECIMAL 16 2
+      , "ThisEntdy"       -- 本次交易日 NUMBER(8,0)
+      , "ThisKinbr"       -- 本次分行別 VARCHAR2(4 BYTE)
+      , "ThisTlrNo"       -- 本次交易員代號 VARCHAR2(6 BYTE)
+      , "ThisTxtNo"       -- 本次交易序號 VARCHAR2(8 BYTE)
+      , "ThisSeqNo"       -- 本次序號 VARCHAR2(30 BYTE)
+      , "LastEntdy"       -- 上次交易日 NUMBER(8,0)
+      , "LastKinbr"       -- 上次分行別 VARCHAR2(4 BYTE)
+      , "LastTlrNo"       -- 上次交易員代號 VARCHAR2(6 BYTE)
+      , "LastTxtNo"       -- 上次交易序號 VARCHAR2(8 BYTE)
+      , "LastSeqNo"       -- 上次序號 VARCHAR2(30 BYTE)
+      , "CreateDate"      -- 建檔日期時間 DATE 8 0
+      , "CreateEmpNo"     -- 建檔人員 VARCHAR2 6 0
+      , "LastUpdate"      -- 最後更新日期時間 DATE 8 0
+      , "LastUpdateEmpNo" -- 最後更新人員 VARCHAR2 6 0
+    )
     SELECT MAP."AcDate"                            AS "AcDate"          -- 會計日期 DecimalD 8 0
           ,MAP."TitaTlrNo"                         AS "TitaTlrNo"       -- 經辦 VARCHAR2 6 0
           ,MAP."TitaTxtNo"                         AS "TitaTxtNo"       -- 交易序號 DECIMAL 8 0

@@ -34,7 +34,36 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "AchAuthLog" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "AchAuthLog"
+    INSERT INTO "AchAuthLog" (
+        "AuthCreateDate"      -- 建檔日期 Decimald 8 
+      , "CustNo"  
+      , "RepayBank"           -- 扣款銀行 VARCHAR2 3 
+      , "RepayAcct"           -- 扣款帳號 VARCHAR2 14 
+      , "CreateFlag"          -- 新增或取消 VARCHAR2 1 
+      , "FacmNo"              -- 額度號碼 DECIMAL 3 
+      , "ProcessDate"         -- 處理日期 Decimald 8   
+      , "StampFinishDate"     -- 核印完成日期時間 Decimald 8   
+      , "AuthStatus"          -- 授權狀態 VARCHAR2 1 
+      , "AuthMeth"            -- 授權方式 VARCHAR2 1 
+      , "MediaCode"           -- 媒體碼 VARCHAR2 1 
+      , "BatchNo"             -- 批號 VARCHAR2 6 
+      , "PropDate"            -- 提出日期 Decimald 8 
+      , "RetrDate"            -- 提回日期 Decimald 8 
+      , "DeleteDate"          -- 刪除日期 Decimald 8 
+      , "RelationCode"        -- 與借款人關係 VARCHAR2 2 
+      , "RelAcctName"         -- 第三人帳戶戶名 NVARCHAR2 100 
+      , "RelationId"          -- 第三人身分證字號 VARCHAR2 10 0
+      , "RelAcctBirthday"     -- 第三人出生日期 Decimald 8 
+      , "RelAcctGender"       -- 第三人性別 VARCHAR2 1 
+      , "AmlRsp"              -- AML回應碼 VARCHAR2 1
+      , "TitaTxCd"            -- 交易代號 VARCHAR2 5
+      , "CreateEmpNo"         -- 建立者櫃員編號 VARCHAR2 6 0
+      , "CreateDate"          -- 建檔日期 DATE 0 0
+      , "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 0
+      , "LastUpdate"          -- 異動日期 DATE 0 0
+      , "ProcessTime"
+      , "LimitAmt"            -- 每筆扣款限額 DECIMAL 14 
+    )
     SELECT S2."CUSCDT"                    AS "AuthCreateDate"      -- 建檔日期 Decimald 8 
           ,S2."LMSACN"                    AS "CustNo"              -- 戶號 DECIMAL 7 
           -- 左補0,長度3
@@ -119,7 +148,36 @@ BEGIN
 
     -- 寫入資料
     -- 2022-02-14 智偉新增: 寫入"送出授權待回覆"的資料
-    INSERT INTO "AchAuthLog"
+    INSERT INTO "AchAuthLog" (
+        "AuthCreateDate"      -- 建檔日期 Decimald 8 
+      , "CustNo"  
+      , "RepayBank"           -- 扣款銀行 VARCHAR2 3 
+      , "RepayAcct"           -- 扣款帳號 VARCHAR2 14 
+      , "CreateFlag"          -- 新增或取消 VARCHAR2 1 
+      , "FacmNo"              -- 額度號碼 DECIMAL 3 
+      , "ProcessDate"         -- 處理日期 Decimald 8   
+      , "StampFinishDate"     -- 核印完成日期時間 Decimald 8   
+      , "AuthStatus"          -- 授權狀態 VARCHAR2 1 
+      , "AuthMeth"            -- 授權方式 VARCHAR2 1 
+      , "MediaCode"           -- 媒體碼 VARCHAR2 1 
+      , "BatchNo"             -- 批號 VARCHAR2 6 
+      , "PropDate"            -- 提出日期 Decimald 8 
+      , "RetrDate"            -- 提回日期 Decimald 8 
+      , "DeleteDate"          -- 刪除日期 Decimald 8 
+      , "RelationCode"        -- 與借款人關係 VARCHAR2 2 
+      , "RelAcctName"         -- 第三人帳戶戶名 NVARCHAR2 100 
+      , "RelationId"          -- 第三人身分證字號 VARCHAR2 10 0
+      , "RelAcctBirthday"     -- 第三人出生日期 Decimald 8 
+      , "RelAcctGender"       -- 第三人性別 VARCHAR2 1 
+      , "AmlRsp"              -- AML回應碼 VARCHAR2 1
+      , "TitaTxCd"            -- 交易代號 VARCHAR2 5
+      , "CreateEmpNo"         -- 建立者櫃員編號 VARCHAR2 6 0
+      , "CreateDate"          -- 建檔日期 DATE 0 0
+      , "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 0
+      , "LastUpdate"          -- 異動日期 DATE 0 0
+      , "ProcessTime"
+      , "LimitAmt"            -- 每筆扣款限額 DECIMAL 14 
+    )
     SELECT TRUNC(S1."CRTDTM" / 1000000)      AS "AuthCreateDate"      -- 建檔日期 Decimald 8 
           ,S1."LMSACN"                       AS "CustNo"              -- 戶號 DECIMAL 7 
           -- 左補0,長度3
@@ -204,7 +262,36 @@ BEGIN
     INS_CNT := INS_CNT + sql%rowcount;
 
     -- LA$APLP有授權帳號資料，AH$ACHP、AH$ACRP都沒資料的資料補寫入
-    INSERT INTO "AchAuthLog"
+    INSERT INTO "AchAuthLog" (
+        "AuthCreateDate"      -- 建檔日期 Decimald 8 
+      , "CustNo"  
+      , "RepayBank"           -- 扣款銀行 VARCHAR2 3 
+      , "RepayAcct"           -- 扣款帳號 VARCHAR2 14 
+      , "CreateFlag"          -- 新增或取消 VARCHAR2 1 
+      , "FacmNo"              -- 額度號碼 DECIMAL 3 
+      , "ProcessDate"         -- 處理日期 Decimald 8   
+      , "StampFinishDate"     -- 核印完成日期時間 Decimald 8   
+      , "AuthStatus"          -- 授權狀態 VARCHAR2 1 
+      , "AuthMeth"            -- 授權方式 VARCHAR2 1 
+      , "MediaCode"           -- 媒體碼 VARCHAR2 1 
+      , "BatchNo"             -- 批號 VARCHAR2 6 
+      , "PropDate"            -- 提出日期 Decimald 8 
+      , "RetrDate"            -- 提回日期 Decimald 8 
+      , "DeleteDate"          -- 刪除日期 Decimald 8 
+      , "RelationCode"        -- 與借款人關係 VARCHAR2 2 
+      , "RelAcctName"         -- 第三人帳戶戶名 NVARCHAR2 100 
+      , "RelationId"          -- 第三人身分證字號 VARCHAR2 10 0
+      , "RelAcctBirthday"     -- 第三人出生日期 Decimald 8 
+      , "RelAcctGender"       -- 第三人性別 VARCHAR2 1 
+      , "AmlRsp"              -- AML回應碼 VARCHAR2 1
+      , "TitaTxCd"            -- 交易代號 VARCHAR2 5
+      , "CreateEmpNo"         -- 建立者櫃員編號 VARCHAR2 6 0
+      , "CreateDate"          -- 建檔日期 DATE 0 0
+      , "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 0
+      , "LastUpdate"          -- 異動日期 DATE 0 0
+      , "ProcessTime"
+      , "LimitAmt"            -- 每筆扣款限額 DECIMAL 14 
+    )
     WITH BAA AS (
     SELECT BAA."CustNo"
           ,BAA."RepayBank"

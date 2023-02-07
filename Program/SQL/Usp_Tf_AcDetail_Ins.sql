@@ -34,7 +34,52 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "AcDetail" ENABLE PRIMARY KEY'; 
  
     -- 寫入資料 
-    INSERT INTO "AcDetail" 
+    INSERT INTO "AcDetail" (
+            "RelDy"               -- 登放日期 Decimald 8 0 
+          , "RelTxseq"            -- 登放序號 VARCHAR2 18 0 
+          , "AcSeq"               -- 分錄序號 DECIMAL 4 0 
+          , "AcDate"              -- 會計日期 Decimald 8 0 
+          , "BranchNo"            -- 單位別 VARCHAR2 4 0 
+          , "CurrencyCode"        -- 幣別 VARCHAR2 3 0 
+          , "AcNoCode"            -- 科目代號 VARCHAR2 11 0 -- 2021-07-15 修改為新版11碼 
+          , "AcSubCode"           -- 子目代號 VARCHAR2 5 0 
+          , "AcDtlCode"           -- 細目代號 VARCHAR2 2 0 
+          , "AcctCode"            -- 業務科目代號 VARCHAR2 3 0 
+          , "DbCr"                -- 借貸別 VARCHAR2 1 0 
+          , "TxAmt"               -- 記帳金額 DECIMAL 16 2 
+          , "EntAc"               -- 入總帳記號 DECIMAL 1 0 
+          , "CustNo"              -- 戶號 DECIMAL 7 0 
+          , "FacmNo"              -- 額度編號 DECIMAL 3 0 
+          , "BormNo"              -- 撥款序號 DECIMAL 3 0 
+          , "RvNo"                -- 銷帳編號 VARCHAR2 30 0 
+          , "AcctFlag"            -- 業務科目記號 DECIMAL 1 0 
+          , "ReceivableFlag"      -- 銷帳科目記號 DECIMAL 1 0 
+          , "AcBookFlag"          -- 帳冊別記號 DECIMAL 1 0 
+          , "AcBookCode"          -- 帳冊別 VARCHAR2 3  -- 2021-07-15 舊資料固定為000:全公司 
+          , "AcSubBookCode"       -- 區隔帳冊 VARCHAR2 3 0 -- 2021-07-15 新增欄位,00A傳統帳冊、201利變帳冊 
+          , "SumNo"               -- 彙總別 VARCHAR2 3 0 
+          , "DscptCode"           -- 摘要代號 VARCHAR2 4 0 
+          , "SlipNote"            -- 傳票摘要 NVARCHAR2 80 0 
+          , "SlipBatNo"           -- 傳票批號 DECIMAL 2 0 
+          , "SlipNo"              -- 傳票號碼 DECIMAL 6 0 
+          , "TitaKinbr"           -- 登錄單位別 VARCHAR2 4 0 
+          , "TitaTlrNo"           -- 登錄經辦 VARCHAR2 6 0 
+          , "TitaTxtNo"           -- 登錄交易序號 DECIMAL 8 0 
+          , "TitaTxCd"            -- 交易代號 VARCHAR2 5 0 
+          , "TitaSecNo"           -- 業務類別 VARCHAR2 2 0 
+          , "TitaBatchNo"         -- 整批批號 VARCHAR2 6 0 
+          , "TitaBatchSeq"        -- 整批明細序號 VARCHAR2 6 0 
+          , "TitaSupNo"           -- 核准主管 VARCHAR2 6 0 
+          , "TitaRelCd"           -- 作業模式 DECIMAL 1 0 
+          , "JsonFields"          -- jason格式紀錄欄 VARCHAR2 300 0 
+          , "CreateDate"          -- 建檔日期時間 DATE 0 0 
+          , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0 
+          , "LastUpdate"          -- 最後更新日期時間 DATE 0 0 
+          , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0 
+          , "SlipSumNo" 
+          , "TitaHCode" 
+          , "MediaSlipNo"
+    )
     WITH ATF AS ( 
       SELECT "TRXTRN" 
            , "ACTACT" 
@@ -447,7 +492,52 @@ BEGIN
     ; 
  
     -- 寫入資料 
-    INSERT INTO "AcDetail" 
+    INSERT INTO "AcDetail" (
+            "RelDy"               -- 登放日期 Decimald 8 0 
+          , "RelTxseq"            -- 登放序號 VARCHAR2 18 0 
+          , "AcSeq"               -- 分錄序號 DECIMAL 4 0 
+          , "AcDate"              -- 會計日期 Decimald 8 0 
+          , "BranchNo"            -- 單位別 VARCHAR2 4 0 
+          , "CurrencyCode"        -- 幣別 VARCHAR2 3 0 
+          , "AcNoCode"            -- 科目代號 VARCHAR2 11 0 -- 2021-07-15 修改為新版11碼 
+          , "AcSubCode"           -- 子目代號 VARCHAR2 5 0 
+          , "AcDtlCode"           -- 細目代號 VARCHAR2 2 0 
+          , "AcctCode"            -- 業務科目代號 VARCHAR2 3 0 
+          , "DbCr"                -- 借貸別 VARCHAR2 1 0 
+          , "TxAmt"               -- 記帳金額 DECIMAL 16 2 
+          , "EntAc"               -- 入總帳記號 DECIMAL 1 0 
+          , "CustNo"              -- 戶號 DECIMAL 7 0 
+          , "FacmNo"              -- 額度編號 DECIMAL 3 0 
+          , "BormNo"              -- 撥款序號 DECIMAL 3 0 
+          , "RvNo"                -- 銷帳編號 VARCHAR2 30 0 
+          , "AcctFlag"            -- 業務科目記號 DECIMAL 1 0 
+          , "ReceivableFlag"      -- 銷帳科目記號 DECIMAL 1 0 
+          , "AcBookFlag"          -- 帳冊別記號 DECIMAL 1 0 
+          , "AcBookCode"          -- 帳冊別 VARCHAR2 3  -- 2021-07-15 舊資料固定為000:全公司 
+          , "AcSubBookCode"       -- 區隔帳冊 VARCHAR2 3 0 -- 2021-07-15 新增欄位,00A傳統帳冊、201利變帳冊 
+          , "SumNo"               -- 彙總別 VARCHAR2 3 0 
+          , "DscptCode"           -- 摘要代號 VARCHAR2 4 0 
+          , "SlipNote"            -- 傳票摘要 NVARCHAR2 80 0 
+          , "SlipBatNo"           -- 傳票批號 DECIMAL 2 0 
+          , "SlipNo"              -- 傳票號碼 DECIMAL 6 0 
+          , "TitaKinbr"           -- 登錄單位別 VARCHAR2 4 0 
+          , "TitaTlrNo"           -- 登錄經辦 VARCHAR2 6 0 
+          , "TitaTxtNo"           -- 登錄交易序號 DECIMAL 8 0 
+          , "TitaTxCd"            -- 交易代號 VARCHAR2 5 0 
+          , "TitaSecNo"           -- 業務類別 VARCHAR2 2 0 
+          , "TitaBatchNo"         -- 整批批號 VARCHAR2 6 0 
+          , "TitaBatchSeq"        -- 整批明細序號 VARCHAR2 6 0 
+          , "TitaSupNo"           -- 核准主管 VARCHAR2 6 0 
+          , "TitaRelCd"           -- 作業模式 DECIMAL 1 0 
+          , "JsonFields"          -- jason格式紀錄欄 VARCHAR2 300 0 
+          , "CreateDate"          -- 建檔日期時間 DATE 0 0 
+          , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0 
+          , "LastUpdate"          -- 最後更新日期時間 DATE 0 0 
+          , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0 
+          , "SlipSumNo" 
+          , "TitaHCode" 
+          , "MediaSlipNo"
+    )
     WITH BOKOTHERS AS ( 
         SELECT CORACC 
              , CORACS 

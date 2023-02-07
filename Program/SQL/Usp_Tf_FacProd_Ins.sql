@@ -24,7 +24,38 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "FacProd" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "FacProd"
+    INSERT INTO "FacProd" (
+        "ProdNo"              -- 商品代碼 VARCHAR2 5 0
+      , "ProdName"            -- 商品名稱 NVARCHAR2 60 0
+      , "StartDate"           -- 商品生效日期 DECIMALD 8 0
+      , "EndDate"             -- 商品截止日期 DECIMALD 8 0
+      , "StatusCode"          -- 商品狀態 VARCHAR2 1 0
+      , "AgreementFg"         -- 是否為協議商品 VARCHAR2 1 0 (Y:是 N:否)
+      , "EnterpriseFg"        -- 企金可使用記號 VARCHAR2 1 0
+      , "CurrencyCode"        -- 幣別 VARCHAR2 3 0
+      , "BaseRateCode"        -- 指標利率代碼 VARCHAR2 2 0
+      , "ProdIncr"            -- 商品加碼利率 DECIMAL 6 4
+      , "LowLimitRate"        -- 利率下限 DECIMAL 6 4
+      , "IncrFlag"            -- 加減碼是否依合約 VARCHAR2 1 0
+      , "RateCode"            -- 利率區分 VARCHAR2 1 0
+      , "GovOfferFlag"        -- 政府優惠房貸 VARCHAR2 1 0
+      , "FinancialFlag"       -- 理財型房貸 VARCHAR2 1 0
+      , "EmpFlag"             -- 員工優惠貸款 VARCHAR2 1 0
+      , "BreachFlag"          -- 是否限制清償 VARCHAR2 1 0
+      , "BreachCode"          -- 違約適用方式 VARCHAR2 3 0
+      , "BreachGetCode"       -- 違約金收取方式 VARCHAR2 1 0
+      , "ProhibitMonth"        -- 限制清償年限 DECIMAL 2 0
+      , "BreachPercent"       -- 違約金百分比 DECIMAL 3 2
+      , "BreachDecreaseMonth" -- 違約金分段月數 DECIMAL 3 0
+      , "BreachDecrease"      -- 分段遞減百分比 DECIMAL 2 0
+      , "BreachStartPercent"  -- 還款起算比例% decimal 5 2
+      , "Ifrs9StepProdCode"   -- IFRS階梯商品別 varchar2 1
+      , "Ifrs9ProdCode"       -- IFRS產品別 varchar2 2
+      , "CreateDate"          -- 建檔日期時間 DATE 8 0
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+      , "LastUpdate"          -- 最後更新日期時間 DATE 8 0
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+    )
     SELECT "TB$TBLP"."IN$COD"             AS "ProdNo"              -- 商品代碼 VARCHAR2 5 0
           ,REPLACE(REPLACE(TRIM(TO_SINGLE_BYTE("TB$TBLP"."IN$DSC")),'Ⅱ','II'),'','') -- 10/19 Wei修改:將控制字元SI REPLACE為空
                                           AS "ProdName"            -- 商品名稱 NVARCHAR2 60 0

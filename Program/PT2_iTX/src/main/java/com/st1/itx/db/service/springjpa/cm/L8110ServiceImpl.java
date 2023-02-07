@@ -94,7 +94,7 @@ public class L8110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     , :TlrNo        AS \"LastUpdateEmpNo\" "; // 最後更新人員
 		sql += "FROM ( ";
 		// 2022-10-18 Wei修改 FROM QC:2055 珮琪:此資料KEY值為LA$APLP.CASNUM3案件編號,當無案件編號時才帶戶號
-		sql += "    SELECT NVL(F.\"CreditSysNo\", L.\"CustNo\") ";
+		sql += "    SELECT CASE WHEN NVL(F.\"CreditSysNo\",0) = 0 THEN L.\"CustNo\" ELSE F.\"CreditSysNo\" END ";
 		sql += "                                AS \"CustNo\" "; // 戶號
 		sql += "		 , SUM(CASE "; 
 		sql += "                 WHEN F.\"BreachFlag\" = 'N' "; // 同一戶號下且未約定「限制清償期間」的客戶才計算
@@ -122,7 +122,7 @@ public class L8110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		                   AND F.\"FacmNo\" = L.\"FacmNo\" ";
 		sql += "    LEFT JOIN txData T ON T.\"CustNo\" = L.\"CustNo\" ";
 		sql += "                      AND T.\"FacmNo\" = L.\"FacmNo\" ";
-		sql += "    GROUP BY NVL(F.\"CreditSysNo\", L.\"CustNo\") ";
+		sql += "    GROUP BY CASE WHEN NVL(F.\"CreditSysNo\",0) = 0 THEN L.\"CustNo\" ELSE F.\"CreditSysNo\" END ";
 		sql += ") S1 ";
 
 		this.info("sql=" + sql);

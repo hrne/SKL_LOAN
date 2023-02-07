@@ -34,7 +34,32 @@ BEGIN
     ; 
  
     -- 寫入資料 
-    INSERT INTO "AcMain" 
+    INSERT INTO "AcMain" (
+        "AcBookCode"          -- 帳冊別 VARCHAR2 3 0 
+      , "AcSubBookCode"       -- 區隔帳冊 VARCHAR2 3 0 -- 2021-07-15 新增 
+      , "BranchNo"            -- 單位別 VARCHAR2 4 0 
+      , "CurrencyCode"        -- 幣別 VARCHAR2 3 0 
+      , "AcNoCode"            -- 科目代號 VARCHAR2 11 0 -- 2021-07-15 修改 取11碼會科 
+      , "AcSubCode"           -- 子目代號 VARCHAR2 5 0 
+      , "AcDtlCode"           -- 細目代號 VARCHAR2 2 0 
+      , "AcDate"              -- 會計日期 Decimald 8 0 
+      , "YdBal"               -- 前日餘額 DECIMAL 16 2 
+      , "TdBal"               -- 本日餘額 DECIMAL 16 2 
+      , "DbCnt"               -- 借方筆數 DECIMAL 8 0 
+      , "DbAmt"               -- 借方金額 DECIMAL 16 2 
+      , "CrCnt"               -- 貸方筆數 DECIMAL 8 0 
+      , "CrAmt"               -- 貸方金額 DECIMAL 16 2 
+      , "CoreDbCnt"           -- 核心借方筆數 DECIMAL 8 0 
+      , "CoreDbAmt"           -- 核心借方金額 DECIMAL 16 2 
+      , "CoreCrCnt"           -- 核心貸方筆數 DECIMAL 8 0 
+      , "CoreCrAmt"           -- 核心貸方金額 DECIMAL 16 2 
+      , "AcctCode"            -- 業務科目代號 VARCHAR2 3 0 
+      , "MonthEndYm"          -- 月底年月 DECIMAL 6 0 
+      , "CreateDate"          -- 建檔日期時間 DATE 0 0 
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0 
+      , "LastUpdate"          -- 最後更新日期時間 DATE 0 0 
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0 
+    )
     SELECT '000'                          AS "AcBookCode"          -- 帳冊別 VARCHAR2 3 0 
           ,CASE 
              WHEN NVL(S2."ACTFSC",' ') = 'A' 

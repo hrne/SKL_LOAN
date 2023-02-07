@@ -24,7 +24,27 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "CollLetter" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "CollLetter"
+    INSERT INTO "CollLetter" (
+        "CaseCode"            -- 案件種類 VARCHAR2 1 0
+      , "CustNo"              -- 借款人戶號 DECIMAL 7 0
+      , "FacmNo"              -- 額度編號 DECIMAL 3 0
+      , "AcDate"              -- 作業日期 DecimalD 8 0
+      , "TitaTlrNo"           -- 經辦 VARCHAR2 6 0
+      , "TitaTxtNo"           -- 交易序號 VARCHAR2 8 0
+      , "MailTypeCode"        -- 發函種類 VARCHAR2 1 0
+      , "MailDate"            -- 發函日期 DecimalD 8 0
+      , "MailObj"             -- 發函對象 VARCHAR2 1 0
+      , "CustName"            -- 姓名 NVARCHAR2 100 0
+      , "DelvrYet"            -- 送達否 VARCHAR2 1 0
+      , "DelvrCode"           -- 送達方式 VARCHAR2 1 0
+      , "AddressCode"         -- 寄送地點選項 DECIMAL 1 0
+      , "Address"             -- 寄送地點 NVARCHAR2 60 0
+      , "Remark"              -- 其他記錄 NVARCHAR2 500 0
+      , "CreateDate"          -- 建檔日期時間 DATE 8 0
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+      , "LastUpdate"          -- 最後更新日期時間 DATE 8 0
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+    )
     SELECT '1'                            AS "CaseCode"            -- 案件種類 VARCHAR2 1 0
           ,M.LMSACN                       AS "CustNo"              -- 借款人戶號 DECIMAL 7 0
           ,M.LMSAPN                       AS "FacmNo"              -- 額度編號 DECIMAL 3 0

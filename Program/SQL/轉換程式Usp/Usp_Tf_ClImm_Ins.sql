@@ -19,7 +19,43 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "ClImm" ENABLE PRIMARY KEY'; 
  
     -- 寫入資料 
-    INSERT INTO "ClImm" 
+    INSERT INTO "ClImm" (
+        "ClCode1"             -- 擔保品代號1 DECIMAL 1  
+      , "ClCode2"             -- 擔保品代號2 DECIMAL 2  
+      , "ClNo"                -- 擔保品編號 DECIMAL 7  
+      , "EvaNetWorth"         -- 評估淨值 DECIMAL 16 2 
+      , "LVITax"              -- 土地增值稅 DECIMAL 16 2 
+      , "RentEvaValue"        -- 出租評估淨值 DECIMAL 16 2 
+      , "RentPrice"           -- 押租金 DECIMAL 16 2 
+      , "OwnershipCode"       -- 權利種類 VARCHAR2 1  
+      , "MtgCode"             -- 抵押權註記 VARCHAR2 1  
+      , "MtgCheck"            -- 最高限額抵押權之擔保債權種類-票據 VARCHAR2 1  
+      , "MtgLoan"             -- 最高限額抵押權之擔保債權種類-借款 VARCHAR2 1  
+      , "MtgPledge"           -- 最高限額抵押權之擔保債權種類-保證債務 VARCHAR2 1  
+      , "Agreement"           -- 檢附同意書 VARCHAR2 1  
+      , "EvaCompanyCode"      -- 鑑價公司 VARCHAR2 2  
+      , "LimitCancelDate"     -- 限制塗銷日期 decimald 8  
+      , "ClCode"              -- 擔保註記 VARCHAR2 1  
+      , "LoanToValue"         -- 貸放成數(%) DECIMAL 5 2 
+      , "OtherOwnerTotal"     -- 其他債權人設定總額 DECIMAL 16 2 
+      , "CompensationCopy"    -- 代償後謄本 VARCHAR2 1  
+      , "BdRmk"               -- 建物標示備註 NVARCHAR2 40  
+      , "MtgReasonCode"       -- 最高抵押權確定事由 VARCHAR2 1 
+      , "ReceivedDate"        -- 收文日期 decimald 8 
+      , "ReceivedNo"          -- 收文案號 VARCHAR2 20 
+      , "CancelDate"          -- 撤銷日期 decimald 8 
+      , "CancelNo"            -- 撤銷案號 VARCHAR2 20 
+      , "SettingStat"         -- 設定狀態 VARCHAR2 1 
+      , "ClStat"              -- 擔保品狀態 VARCHAR2 1 
+      , "SettingDate"         -- 設定日期 decimald 8  
+      , "SettingAmt"          -- 設定金額 DECIMAL 16 2 
+      , "ClaimDate"           -- 擔保債權確定日期 decimald 8  
+      , "SettingSeq"          -- 設定順位(1~4) VARCHAR2 1  
+      , "CreateDate"          -- 建檔日期時間 DATE   
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
+      , "LastUpdate"          -- 最後更新日期時間 DATE   
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6  
+    )
     SELECT S1."ClCode1"                   AS "ClCode1"             -- 擔保品代號1 DECIMAL 1  
           ,S1."ClCode2"                   AS "ClCode2"             -- 擔保品代號2 DECIMAL 2  
           ,S1."ClNo"                      AS "ClNo"                -- 擔保品編號 DECIMAL 7  
@@ -82,18 +118,6 @@ BEGIN
           ,NVL(S2."GDTRDT",0)             AS "ClaimDate"           -- 擔保債權確定日期 decimald 8  
           ,CASE WHEN NVL(S2."GDTPTY",0) <> 0 THEN TO_CHAR(S2."GDTPTY") ELSE '' END 
                                           AS "SettingSeq"          -- 設定順位(1~4) VARCHAR2 1  
-          -- ,CASE WHEN NVL(S2."GDTP1M",' ') <> ' ' THEN S2."GDTP1M" ELSE '' END 
-          --                                 AS "FirstCreditor"       -- 前一順位債權人 NVARCHAR2 10  
-          -- ,CASE WHEN NVL(S2."GDTP1A",0) > 0 THEN S2."GDTP1A" ELSE 0 END 
-          --                                 AS "FirstAmt"            -- 前一順位金額 DECIMAL 16 2 
-          -- ,CASE WHEN NVL(S2."GDTP2M",' ') <> ' ' THEN S2."GDTP2M" ELSE '' END 
-          --                                 AS "SecondCreditor"      -- 前二順位債權人 NVARCHAR2 10  
-          -- ,CASE WHEN NVL(S2."GDTP2A",0) > 0 THEN S2."GDTP2A" ELSE 0 END 
-          --                                 AS "SecondAmt"           -- 前二順位金額 DECIMAL 16 2 
-          -- ,CASE WHEN NVL(S2."GDTP3M",' ') <> ' ' THEN S2."GDTP3M" ELSE '' END 
-          --                                 AS "ThirdCreditor"       -- 前三順位債權人 NVARCHAR2 10  
-          -- ,CASE WHEN NVL(S2."GDTP3A",0) > 0 THEN S2."GDTP3A" ELSE 0 END 
-          --                                 AS "ThirdAmt"            -- 前三順位金額 DECIMAL 16 2 
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE   
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE   

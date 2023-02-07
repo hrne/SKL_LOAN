@@ -24,7 +24,28 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "CollTel" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "CollTel"
+    INSERT INTO "CollTel" (
+        "CaseCode"            -- 案件種類 VARCHAR2 1 0
+      , "CustNo"              -- 借款人戶號 DECIMAL 7 0
+      , "FacmNo"              -- 額度編號 DECIMAL 3 0
+      , "AcDate"              -- 系統日期 DecimalD 8 0
+      , "TitaTlrNo"           -- 經辦 VARCHAR2 6 0
+      , "TitaTxtNo"           -- 交易序號 VARCHAR2 8 0
+      , "TelDate"             -- 電催日期 DecimalD 8 0
+      , "TelTime"             -- 電催時間 VARCHAR2 4 0
+      , "ContactCode"         -- 聯絡對象 VARCHAR2 1 0
+      , "RecvrCode"           -- 接話人 VARCHAR2 1 0
+      , "TelArea"            -- 連絡電話 VARCHAR2 5 0
+      , "TelNo"            -- 連絡電話 VARCHAR2 10 0
+      , "TelExt"            -- 連絡電話 VARCHAR2 5 0
+      , "ResultCode"          -- 通話結果 VARCHAR2 1 0
+      , "Remark"              -- 其他記錄 NVARCHAR2 500 0
+      , "CallDate"            -- 通話日期 DecimalD 8 0
+      , "CreateDate"          -- 建檔日期時間 DATE 8 0
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+      , "LastUpdate"          -- 最後更新日期時間 DATE 8 0
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+    )
     SELECT '1'                            AS "CaseCode"            -- 案件種類 VARCHAR2 1 0
           ,S0.LMSACN                      AS "CustNo"              -- 借款人戶號 DECIMAL 7 0
           ,S0.LMSAPN                      AS "FacmNo"              -- 額度編號 DECIMAL 3 0

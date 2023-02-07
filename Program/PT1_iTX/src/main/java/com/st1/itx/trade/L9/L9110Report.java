@@ -596,7 +596,7 @@ public class L9110Report extends MakeReport {
 			this.print(1, 5, "員工代號 ..... " + tL9110.get("F9"));
 			CdEmp tCdEmp = sCdEmpService.findById(tL9110.get("F9"), titaVo);
 			if (tCdEmp != null) {
-				if (employeeCom.isDay15Salary(tCdEmp, titaVo)) {
+				if (employeeCom.isDay15Employee(tCdEmp, titaVo)) {
 					this.print(0, 50, "15 日薪 ...... " + "十五日薪");
 				} else {
 					this.print(0, 50, "15 日薪 ...... " + "非十五日薪");

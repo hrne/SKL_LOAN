@@ -23,7 +23,7 @@ BEGIN
 
     -- 寫入資料
     INSERT INTO "NegFinAcct" (
-      "FinCode" -- 債權機構代號 VARCHAR2 8 0
+        "FinCode" -- 債權機構代號 VARCHAR2 8 0
       , "FinItem" -- 債權機構名稱 NVARCHAR2 60 0
       , "RemitBank" -- 匯款銀行 VARCHAR2 7 0
       , "RemitAcct" -- 匯款帳號 VARCHAR2 16 0

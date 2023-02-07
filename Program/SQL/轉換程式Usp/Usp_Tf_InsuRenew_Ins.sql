@@ -51,7 +51,42 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "InsuRenew" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "InsuRenew"
+    INSERT INTO "InsuRenew" (
+        "ClCode1"             -- 擔保品-代號1 DECIMAL 1 0
+      , "ClCode2"             -- 擔保品-代號2 DECIMAL 2 0
+      , "ClNo"                -- 擔保品編號 DECIMAL 7 0
+      , "PrevInsuNo"          -- 原保單號碼 VARCHAR2 17 0
+      , "EndoInsuNo"          -- 批單號碼 VARCHAR2 17 0
+      , "InsuYearMonth"       -- 火險到期年月 DECIMAL 6 0
+      , "CustNo"              -- 借款人戶號 DECIMAL 7 0
+      , "FacmNo"              -- 額度 DECIMAL 3 0
+      , "NowInsuNo"           -- 保險單號碼 VARCHAR2 17 0
+      , "OrigInsuNo"          -- 原始保險單號碼 VARCHAR2 17 0
+      , "RenewCode"           -- 是否續保 DECIMAL 1 0
+      , "InsuCompany"         -- 保險公司 VARCHAR2 2 0
+      , "InsuTypeCode"        -- 保險類別 VARCHAR2 2 0
+      , "RepayCode"           -- 繳款方式 DECIMAL 1 0
+      , "FireInsuCovrg"       -- 火災險保險金額 DECIMAL 14 0
+      , "EthqInsuCovrg"       -- 地震險保險金額 DECIMAL 14 0
+      , "FireInsuPrem"        -- 火災險保費 DECIMAL 14 0
+      , "EthqInsuPrem"        -- 地震險保費 DECIMAL 14 0
+      , "InsuStartDate"       -- 保險起日 Decimald 8 0
+      , "InsuEndDate"         -- 保險迄日 Decimald 8 0
+      , "TotInsuPrem"         -- 總保費 DECIMAL 14 0
+      , "AcDate"              -- 會計日期 Decimald 8 0
+      , "TitaTlrNo"           -- 經辦 VARCHAR2 6 0
+      , "TitaTxtNo"           -- 交易序號 VARCHAR2 8 0
+      , "NotiTempFg"          -- 入通知檔 VARCHAR2 1 0
+      , "StatusCode"          -- 處理代碼 DECIMAL 1 0
+      , "OvduDate"            -- 轉催收日 DECIMAL 8 0
+      , "OvduNo"              -- 轉催編號 DECIMAL 10 0
+      , "CommericalFlag"      -- 住宅險改商業險註記 VARCHAR2 1
+      , "Remark"              -- 備註 VARCHAR2 50
+      , "CreateDate"          -- 建檔日期時間 DATE  
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+      , "LastUpdate"          -- 最後更新日期時間 DATE  
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+    )
     WITH txData AS (
       SELECT TX.TRXDAT
            , TX.TRXNMT

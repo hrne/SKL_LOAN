@@ -22,7 +22,31 @@ BEGIN
     DELETE FROM "NegAppr01";
 
     -- 寫入資料
-    INSERT INTO "NegAppr01"
+    INSERT INTO "NegAppr01" (
+        "AcDate"              -- 會計日期 DecimalD 8 0
+      , "TitaTlrNo"           -- 經辦 VARCHAR2 6 0
+      , "TitaTxtNo"           -- 交易序號 DECIMAL 8 0
+      , "FinCode"             -- 債權機構代號 VARCHAR2 10 0
+      , "CustNo"              -- 戶號 DECIMAL 7 0
+      , "CaseSeq"             -- 案件序號 DECIMAL 3 0
+      , "CaseKindCode"        -- 案件種類 VARCHAR2 1 0
+      , "ApprAmt"             -- 撥付金額 DECIMAL 16 2
+      , "AccuApprAmt"         -- 累計撥付金額 DECIMAL 16 2
+      , "AmtRatio"            -- 撥付比例 DECIMAL 5 2
+      , "ExportDate"          -- 製檔日期 DecimalD 8 0
+      , "ApprDate"            -- 撥付日期 DecimalD 8 0
+      , "BringUpDate"         -- 提兌日 DecimalD 8 0
+      , "RemitBank"           -- 匯款銀行 VARCHAR2 7 0
+      , "RemitAcct"           -- 匯款帳號 VARCHAR2 16 0
+      , "DataSendUnit"        -- 資料傳送單位 VARCHAR2 8 0
+      , "ApprAcDate"          -- 撥付傳票日 DecimalD 8 0
+      , "ReplyCode"           -- 回應代碼 VARCHAR2 4 0
+      , "BatchTxtNo"           -- Batch交易序號 VARCHAR2 10 0
+      , "CreateDate"          -- 建檔日期時間 DATE 8 0
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+      , "LastUpdate"          -- 最後更新日期時間 DATE 8 0
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+    )
     SELECT T."AcDate"                     AS "AcDate"              -- 會計日期 DecimalD 8 0
           ,T."TitaTlrNo"                  AS "TitaTlrNo"           -- 經辦 VARCHAR2 6 0
           ,T."TitaTxtNo"                  AS "TitaTxtNo"           -- 交易序號 DECIMAL 8 0

@@ -362,7 +362,24 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "CustTelNo" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "CustTelNo"
+    INSERT INTO "CustTelNo" (
+        "TelNoUKey"           -- 電話識別碼 VARCHAR2 32 
+      , "CustUKey"            -- 客戶識別碼 VARCHAR2 32 
+      , "TelTypeCode"         -- 電話種類 VARCHAR2 2 
+      , "TelArea"             -- 電話區碼 VARCHAR2 5 
+      , "TelNo"               -- 電話號碼 VARCHAR2 10
+      , "TelExt"              -- 分機號碼 VARCHAR2 6 
+      , "TelChgRsnCode"       -- 異動原因 VARCHAR2 2 
+      , "RelationCode"        -- 與借款人關係 VARCHAR2 2 
+      , "LiaisonName"         -- 聯絡人姓名 NVARCHAR2 100 
+      , "Rmk"                 -- 備註 NVARCHAR2 40 
+      , "StopReason"          -- 停用原因 NVARCHAR2 40 
+      , "Enable"              -- 啟用記號 VARCHAR2 1 
+      , "CreateDate"          -- 建檔日期時間 DATE  
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+      , "LastUpdate"          -- 最後更新日期時間 DATE  
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+    )
     SELECT SYS_GUID()                     AS "TelNoUKey"           -- 電話識別碼 VARCHAR2 32 
          , CM."CustUKey"                  AS "CustUKey"            -- 客戶識別碼 VARCHAR2 32 
          , S1."TelTypeCode"               AS "TelTypeCode"         -- 電話種類 VARCHAR2 2 

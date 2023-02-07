@@ -22,22 +22,24 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "CustDataCtrl" DISABLE PRIMARY KEY CASCADE'; 
     EXECUTE IMMEDIATE 'TRUNCATE TABLE "CustDataCtrl" DROP STORAGE'; 
     EXECUTE IMMEDIATE 'ALTER TABLE "CustDataCtrl" ENABLE PRIMARY KEY'; 
- 
+  
     -- 寫入資料 
-    -- INSERT INTO "CustDataCtrl" 
-    -- SELECT "CU$MRKP"."LMSACN"             AS "CustNo"              -- 借款人戶號 DECIMAL 7  
-    --       ,"CustMain"."CustUKey"          AS "CustUKey"            -- 客戶識別碼 VARCHAR2 32  
-    --       ,'Y'                            AS "Enable"              -- 啟用記號 VARCHAR2 1  
-    --       ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE   
-    --       ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
-    --       ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE   
-    --       ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6  
-    -- FROM "CU$MRKP" 
-    -- LEFT JOIN "CustMain" on "CustMain"."CustNo" = "CU$MRKP"."LMSACN" 
-    -- ; 
- 
-    -- 寫入資料 
-    INSERT INTO "CustDataCtrl" 
+    INSERT INTO "CustDataCtrl"  (
+        "CustNo"              -- 借款人戶號 DECIMAL 7  
+      , "CustUKey"            -- 客戶識別碼 VARCHAR2 32  
+      , "ApplMark"            -- 申請記號 DECIMAL 1  
+      , "Reason"              -- 解除原因 VARCHAR2 50   
+      , "CreateDate"          -- 建檔日期時間 DATE   
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
+      , "LastUpdate"          -- 最後更新日期時間 DATE   
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6  
+      , "CustId" 
+      , "CustName"  
+      , "SetDate"  
+      , "SetEmpNo"  
+      , "ReSetDate"  
+      , "ReSetEmpNo"  
+    )
     SELECT "CustMain"."CustNo"            AS "CustNo"              -- 借款人戶號 DECIMAL 7  
           ,"CustMain"."CustUKey"          AS "CustUKey"            -- 客戶識別碼 VARCHAR2 32  
           -- 2023-02-02 Wei from Lai 固定1

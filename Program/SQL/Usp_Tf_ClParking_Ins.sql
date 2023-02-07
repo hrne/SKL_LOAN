@@ -19,7 +19,30 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "ClParking" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "ClParking"
+    INSERT INTO "ClParking" (
+        "ClCode1"             -- 擔保品-代號1 DECIMAL 1 0
+      , "ClCode2"             -- 擔保品-代號2 DECIMAL 2 0
+      , "ClNo"                -- 擔保品編號 DECIMAL 7 0
+      , "ParkingSeqNo"        -- 車位資料序號 DECIMAL 5 0
+      , "ParkingNo"           -- 車位編號 NVARCHAR2 20
+      , "ParkingQty"          -- 車位數量 DECIMAL 5 0
+      , "ParkingTypeCode"     -- 停車位形式 VARCHAR2 1
+      , "OwnerPart"           -- 持份比率(分子) DECIMAL 10 0
+      , "OwnerTotal"          -- 持份比率(分母) DECIMAL 10 0
+      , "CityCode"            -- 縣市 VARCHAR2 2 
+      , "AreaCode"            -- 鄉鎮市區 VARCHAR2 3 
+      , "IrCode"              -- 段小段代碼 VARCHAR2 5
+      , "BdNo1"               -- 建號 VARCHAR2 4 
+      , "BdNo2"               -- 建號(子號) VARCHAR2 4 
+      , "LandNo1"             -- 地號 VARCHAR2 4 
+      , "LandNo2"             -- 地號(子號) VARCHAR2 4 
+      , "ParkingArea"         -- 車位面積(坪) DECIMAL 16 2
+      , "Amount"              -- 價格(元) decimal 16 2;
+      , "CreateDate"          -- 建檔日期時間 DATE 0 0
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+      , "LastUpdate"          -- 最後更新日期時間 DATE 0 0
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+    )
     SELECT CB."ClCode1"                   AS "ClCode1"             -- 擔保品-代號1 DECIMAL 1 0
          , CB."ClCode2"                   AS "ClCode2"             -- 擔保品-代號2 DECIMAL 2 0
          , CB."ClNo"                      AS "ClNo"                -- 擔保品編號 DECIMAL 7 0

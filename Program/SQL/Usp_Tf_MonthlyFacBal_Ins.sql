@@ -35,7 +35,65 @@ BEGIN
         EXECUTE IMMEDIATE 'ALTER TABLE "MonthlyFacBal" ENABLE PRIMARY KEY';
 
         -- 寫入資料
-        INSERT INTO "MonthlyFacBal"
+        INSERT INTO "MonthlyFacBal" (
+            "YearMonth"           -- 資料年月 DECIMAL 6 0
+          , "CustNo"              -- 戶號 DECIMAL 7 0
+          , "FacmNo"              -- 額度 DECIMAL 3 0
+          , "PrevIntDate"         -- 繳息迄日 DecimalD 8 0
+          , "NextIntDate"         -- 應繳息日 DecimalD 8 0
+          , "DueDate"             -- 最近應繳日
+          , "OvduTerm"            -- 逾期期數 DECIMAL 3 0
+          , "OvduDays"            -- 逾期天數 DECIMAL 6 0
+          , "CurrencyCode"        -- 幣別 VARCHAR2 3 0
+          , "PrinBalance"         -- 本金餘額 DECIMAL 16 2
+          , "BadDebtBal"          -- 呆帳餘額 DECIMAL 16 2
+          , "AccCollPsn"          -- 催收員 VARCHAR2 6 0
+          , "LegalPsn"            -- 法務人員 VARCHAR2 6 0
+          , "Status"              -- 戶況 DECIMAL 2 0
+          , "AcctCode"            -- 業務科目代號 VARCHAR2 3 0
+          , "FacAcctCode"         -- 額度業務科目 VARCHAR2 3 0
+          , "ClCustNo"            -- 同擔保品戶號 DECIMAL 7 0
+          , "ClFacmNo"            -- 同擔保品額度 DECIMAL 3 0
+          , "ClRowNo"             -- 同擔保品序列號 DECIMAL 3 0
+          , "RenewCode"           -- 展期記號 VARCHAR2 1 0
+          , "ProdNo"              -- 商品代碼
+          , "AcBookCode"          -- 帳冊別 VARCHAR2 3 0
+          , "EntCode"             -- 企金別 VARCHAR2 1 
+          , "RelsCode"            -- (準)利害關係人職稱 VARCHAR2 2 0
+          , "DepartmentCode"      -- 案件隸屬單位 VARCHAR2 1 0
+          , "UnpaidPrincipal"     -- 已到期回收本金 DECIMAL 16 2
+          , "UnpaidInterest"      -- 已到期利息 DECIMAL 16 2
+          , "UnpaidBreachAmt"     -- 已到期違約金 DECIMAL 16 2
+          , "UnpaidDelayInt"      -- 已到期延滯息 DECIMAL 16 2
+          , "AcdrPrincipal"       -- 未到期回收本金 DECIMAL 16 2
+          , "AcdrInterest"        -- 未到期利息 DECIMAL 16 2
+          , "AcdrBreachAmt"       -- 未到期違約金 DECIMAL 16 2
+          , "AcdrDelayInt"        -- 未到期延滯息 DECIMAL 16 2
+          , "FireFee"             -- 火險費用 DECIMAL 16 2
+          , "LawFee"              -- 法務費用 DECIMAL 16 2
+          , "ModifyFee"           -- 契變手續費 DECIMAL 16 2
+          , "AcctFee"             -- 帳管費用 DECIMAL 16 2
+          , "ShortfallPrin"       -- 短繳本金 DECIMAL 16 2
+          , "ShortfallInt"        -- 短繳利息 DECIMAL 16 2
+          , "TempAmt"             -- 暫收金額 DECIMAL 16 2
+          , "ClCode1"             -- 主要擔保品代號1 DECIMAL 1 
+          , "ClCode2"             -- 主要擔保品代號2 DECIMAL 2 
+          , "ClNo"                -- 主要擔保品編號 DECIMAL 7 0
+          , "CityCode"            -- 主要擔保品地區別 VARCHAR2 2 
+          , "OvduDate"            -- 轉催收日期 DECIMALD 8 0
+          , "OvduPrinBal"         -- 催收本金餘額 DECIMAL 16 2
+          , "OvduIntBal"          -- 催收利息餘額 DECIMAL 16 2
+          , "OvduBreachBal"       -- 催收違約金餘額 DECIMAL 16 2
+          , "OvduBal"             -- 催收餘額 DECIMAL 16 2
+          , "LawAmount"           -- 法催擔保金額 DECIMAL 16 2
+          , "AssetClass"          -- 資產五分類代號 VARCHAR2 2 0
+          , "StoreRate"           -- 計息利率 DECIMAL 6 4
+          , "CreateDate"          -- 建檔日期時間 DATE 8 0
+          , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+          , "LastUpdate"          -- 最後更新日期時間 DATE 8 0
+          , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+          , "AcSubBookCode"        -- 區隔帳冊別 VARCHAR2 3 0
+        )
         SELECT DLY."ADTYMT"                   AS "YearMonth"           -- 資料年月 DECIMAL 6 0
               ,DLY."LMSACN"                   AS "CustNo"              -- 戶號 DECIMAL 7 0
               ,DLY."LMSAPN"                   AS "FacmNo"              -- 額度 DECIMAL 3 0
@@ -118,7 +176,65 @@ BEGIN
         INS_CNT := INS_CNT + sql%rowcount;
 
         -- 寫入資料
-        INSERT INTO "MonthlyFacBal"
+        INSERT INTO "MonthlyFacBal" (
+            "YearMonth"           -- 資料年月 DECIMAL 6 0
+          , "CustNo"              -- 戶號 DECIMAL 7 0
+          , "FacmNo"              -- 額度 DECIMAL 3 0
+          , "PrevIntDate"         -- 繳息迄日 DecimalD 8 0
+          , "NextIntDate"         -- 應繳息日 DecimalD 8 0
+          , "DueDate"             -- 最近應繳日
+          , "OvduTerm"            -- 逾期期數 DECIMAL 3 0
+          , "OvduDays"            -- 逾期天數 DECIMAL 6 0
+          , "CurrencyCode"        -- 幣別 VARCHAR2 3 0
+          , "PrinBalance"         -- 本金餘額 DECIMAL 16 2
+          , "BadDebtBal"          -- 呆帳餘額 DECIMAL 16 2
+          , "AccCollPsn"          -- 催收員 VARCHAR2 6 0
+          , "LegalPsn"            -- 法務人員 VARCHAR2 6 0
+          , "Status"              -- 戶況 DECIMAL 2 0
+          , "AcctCode"            -- 業務科目代號 VARCHAR2 3 0
+          , "FacAcctCode"         -- 額度業務科目 VARCHAR2 3 0
+          , "ClCustNo"            -- 同擔保品戶號 DECIMAL 7 0
+          , "ClFacmNo"            -- 同擔保品額度 DECIMAL 3 0
+          , "ClRowNo"             -- 同擔保品序列號 DECIMAL 3 0
+          , "RenewCode"           -- 展期記號 VARCHAR2 1 0
+          , "ProdNo"              -- 商品代碼
+          , "AcBookCode"          -- 帳冊別 VARCHAR2 3 0
+          , "EntCode"             -- 企金別 VARCHAR2 1 
+          , "RelsCode"            -- (準)利害關係人職稱 VARCHAR2 2 0
+          , "DepartmentCode"      -- 案件隸屬單位 VARCHAR2 1 0
+          , "UnpaidPrincipal"     -- 已到期回收本金 DECIMAL 16 2
+          , "UnpaidInterest"      -- 已到期利息 DECIMAL 16 2
+          , "UnpaidBreachAmt"     -- 已到期違約金 DECIMAL 16 2
+          , "UnpaidDelayInt"      -- 已到期延滯息 DECIMAL 16 2
+          , "AcdrPrincipal"       -- 未到期回收本金 DECIMAL 16 2
+          , "AcdrInterest"        -- 未到期利息 DECIMAL 16 2
+          , "AcdrBreachAmt"       -- 未到期違約金 DECIMAL 16 2
+          , "AcdrDelayInt"        -- 未到期延滯息 DECIMAL 16 2
+          , "FireFee"             -- 火險費用 DECIMAL 16 2
+          , "LawFee"              -- 法務費用 DECIMAL 16 2
+          , "ModifyFee"           -- 契變手續費 DECIMAL 16 2
+          , "AcctFee"             -- 帳管費用 DECIMAL 16 2
+          , "ShortfallPrin"       -- 短繳本金 DECIMAL 16 2
+          , "ShortfallInt"        -- 短繳利息 DECIMAL 16 2
+          , "TempAmt"             -- 暫收金額 DECIMAL 16 2
+          , "ClCode1"             -- 主要擔保品代號1 DECIMAL 1 
+          , "ClCode2"             -- 主要擔保品代號2 DECIMAL 2 
+          , "ClNo"                -- 主要擔保品編號 DECIMAL 7 0
+          , "CityCode"            -- 主要擔保品地區別 VARCHAR2 2 
+          , "OvduDate"            -- 轉催收日期 DECIMALD 8 0
+          , "OvduPrinBal"         -- 催收本金餘額 DECIMAL 16 2
+          , "OvduIntBal"          -- 催收利息餘額 DECIMAL 16 2
+          , "OvduBreachBal"       -- 催收違約金餘額 DECIMAL 16 2
+          , "OvduBal"             -- 催收餘額 DECIMAL 16 2
+          , "LawAmount"           -- 法催擔保金額 DECIMAL 16 2
+          , "AssetClass"          -- 資產五分類代號 VARCHAR2 2 0
+          , "StoreRate"           -- 計息利率 DECIMAL 6 4
+          , "CreateDate"          -- 建檔日期時間 DATE 8 0
+          , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+          , "LastUpdate"          -- 最後更新日期時間 DATE 8 0
+          , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+          , "AcSubBookCode"        -- 區隔帳冊別 VARCHAR2 3 0
+        )
         SELECT S0."ADTYMT"                    AS "YearMonth"           -- 資料年月 DECIMAL 6 0
               ,S0."LMSACN"                    AS "CustNo"              -- 戶號 DECIMAL 7 0
               ,S0."LMSAPN"                    AS "FacmNo"              -- 額度 DECIMAL 3 0
@@ -259,7 +375,65 @@ BEGIN
         INS_CNT := INS_CNT + sql%rowcount;
 
         -- 寫入資料
-        INSERT INTO "MonthlyFacBal"
+        INSERT INTO "MonthlyFacBal" (
+            "YearMonth"           -- 資料年月 DECIMAL 6 0
+          , "CustNo"              -- 戶號 DECIMAL 7 0
+          , "FacmNo"              -- 額度 DECIMAL 3 0
+          , "PrevIntDate"         -- 繳息迄日 DecimalD 8 0
+          , "NextIntDate"         -- 應繳息日 DecimalD 8 0
+          , "DueDate"             -- 最近應繳日
+          , "OvduTerm"            -- 逾期期數 DECIMAL 3 0
+          , "OvduDays"            -- 逾期天數 DECIMAL 6 0
+          , "CurrencyCode"        -- 幣別 VARCHAR2 3 0
+          , "PrinBalance"         -- 本金餘額 DECIMAL 16 2
+          , "BadDebtBal"          -- 呆帳餘額 DECIMAL 16 2
+          , "AccCollPsn"          -- 催收員 VARCHAR2 6 0
+          , "LegalPsn"            -- 法務人員 VARCHAR2 6 0
+          , "Status"              -- 戶況 DECIMAL 2 0
+          , "AcctCode"            -- 業務科目代號 VARCHAR2 3 0
+          , "FacAcctCode"         -- 額度業務科目 VARCHAR2 3 0
+          , "ClCustNo"            -- 同擔保品戶號 DECIMAL 7 0
+          , "ClFacmNo"            -- 同擔保品額度 DECIMAL 3 0
+          , "ClRowNo"             -- 同擔保品序列號 DECIMAL 3 0
+          , "RenewCode"           -- 展期記號 VARCHAR2 1 0
+          , "ProdNo"              -- 商品代碼
+          , "AcBookCode"          -- 帳冊別 VARCHAR2 3 0
+          , "EntCode"             -- 企金別 VARCHAR2 1 
+          , "RelsCode"            -- (準)利害關係人職稱 VARCHAR2 2 0
+          , "DepartmentCode"      -- 案件隸屬單位 VARCHAR2 1 0
+          , "UnpaidPrincipal"     -- 已到期回收本金 DECIMAL 16 2
+          , "UnpaidInterest"      -- 已到期利息 DECIMAL 16 2
+          , "UnpaidBreachAmt"     -- 已到期違約金 DECIMAL 16 2
+          , "UnpaidDelayInt"      -- 已到期延滯息 DECIMAL 16 2
+          , "AcdrPrincipal"       -- 未到期回收本金 DECIMAL 16 2
+          , "AcdrInterest"        -- 未到期利息 DECIMAL 16 2
+          , "AcdrBreachAmt"       -- 未到期違約金 DECIMAL 16 2
+          , "AcdrDelayInt"        -- 未到期延滯息 DECIMAL 16 2
+          , "FireFee"             -- 火險費用 DECIMAL 16 2
+          , "LawFee"              -- 法務費用 DECIMAL 16 2
+          , "ModifyFee"           -- 契變手續費 DECIMAL 16 2
+          , "AcctFee"             -- 帳管費用 DECIMAL 16 2
+          , "ShortfallPrin"       -- 短繳本金 DECIMAL 16 2
+          , "ShortfallInt"        -- 短繳利息 DECIMAL 16 2
+          , "TempAmt"             -- 暫收金額 DECIMAL 16 2
+          , "ClCode1"             -- 主要擔保品代號1 DECIMAL 1 
+          , "ClCode2"             -- 主要擔保品代號2 DECIMAL 2 
+          , "ClNo"                -- 主要擔保品編號 DECIMAL 7 0
+          , "CityCode"            -- 主要擔保品地區別 VARCHAR2 2 
+          , "OvduDate"            -- 轉催收日期 DECIMALD 8 0
+          , "OvduPrinBal"         -- 催收本金餘額 DECIMAL 16 2
+          , "OvduIntBal"          -- 催收利息餘額 DECIMAL 16 2
+          , "OvduBreachBal"       -- 催收違約金餘額 DECIMAL 16 2
+          , "OvduBal"             -- 催收餘額 DECIMAL 16 2
+          , "LawAmount"           -- 法催擔保金額 DECIMAL 16 2
+          , "AssetClass"          -- 資產五分類代號 VARCHAR2 2 0
+          , "StoreRate"           -- 計息利率 DECIMAL 6 4
+          , "CreateDate"          -- 建檔日期時間 DATE 8 0
+          , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+          , "LastUpdate"          -- 最後更新日期時間 DATE 8 0
+          , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+          , "AcSubBookCode"        -- 區隔帳冊別 VARCHAR2 3 0
+        )
         SELECT S0."ADTYMT"                    AS "YearMonth"           -- 資料年月 DECIMAL 6 0
               ,S0."LMSACN"                    AS "CustNo"              -- 戶號 DECIMAL 7 0
               ,S0."LMSAPN"                    AS "FacmNo"              -- 額度 DECIMAL 3 0
@@ -456,10 +630,3 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_MonthlyFacBal_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
-
-
-
-
-
-
-/

@@ -24,7 +24,14 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "ConstructionCompany" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "ConstructionCompany"
+    INSERT INTO "ConstructionCompany" (
+        "CustNo"              -- 戶號 DECIMAL 7 0
+      , "BuilderStatus"       -- 建商狀況 VARCHAR2 20 0
+      , "CreateDate"          -- 建檔日期時間 DATE 0 
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+      , "LastUpdate"          -- 最後更新日期時間 DATE 0 
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+    )
     SELECT BUDP."LMSACN"                  AS "CustNo"              -- 戶號 DECIMAL 7 0
          , BUDP."LU$STAT"                 AS "BuilderStatus"       -- 建商狀況 VARCHAR2 20 0
          , CASE
