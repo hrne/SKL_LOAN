@@ -59,8 +59,7 @@ public class LM030Report extends MakeReport {
 
 //		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM030", "轉催收明細總表", "LM030轉催收案件明細_核定總表",
 //				"LM030轉催收案件明細_核定總表.xlsx", "11005");
-		
-		
+
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "LM030";
@@ -74,9 +73,7 @@ public class LM030Report extends MakeReport {
 
 		// 開啟報表
 		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
-		
-		
-		
+
 		String yy = titaVo.get("ENTDY").substring(1, 4);
 		String mm = titaVo.get("ENTDY").substring(4, 6);
 		makeExcel.setSheet("11005", yy + mm);
@@ -147,22 +144,21 @@ public class LM030Report extends MakeReport {
 		// block 4
 		makeExcel.setFontType(1);
 		if (listLM030 == null || listLM030.isEmpty()) {
-			makeExcel.setValue(row + 1, 1, "一、經查本月逾期放款，無清償期屆滿六個\r\n" + "    月需轉列催收款之案件。\r\n" + "二、陳核。 ");
+			makeExcel.setMergedRegionValue(row + 1, row + 1, 1, 7, "一、經查本月逾期放款，無清償期屆滿六個月需轉列催收款之案件。\r\n" + "二、陳核。 ");
 		} else {
-			makeExcel.setValue(row + 1, 1, "一、經查本月逾期放款清償期屆滿六個月案件\r\n" + "    ，依規將本金及應收利息轉列催收款項，\r\n" + "    金額共計 $"
-					+ FormatUtil.formatAmt(total, 0) + "元。");
-			makeExcel.setValue(row + 2, 1, "二、本月轉入催收款案件未發生『撥款後繳款\r\n" + "    期數未滿18個月即轉入催收戶』之情事。\r\n" + "三、陳核。 ");
+			makeExcel.setMergedRegionValue(row + 1, row + 1, 1, 7,
+					"一、經查本月逾期放款清償期屆滿六個月案件，依規將本金及應收利息轉列催收款項，金額共計 $" + FormatUtil.formatAmt(total, 0) + "元。 \r\n"
+							+ "二、本月轉入催收款案件未發生『撥款後繳款期數未滿18個月即轉入催收戶』之情事。\r\n" + "三、陳核。 ");
 		}
 		makeExcel.setColor("RED");
 		makeExcel.setValue(row + 3, 5, listLM030.size(), "C");
 		makeExcel.setColor("RED");
 		makeExcel.setValue(row + 3, 7, total, "#,##0");
 		makeExcel.setValue(row + 5, 1, "一、李案為年期延長後再協議案件，因未符合免列報逾放條件，故轉列催收款項。");
-		makeExcel.setValue(row + 13, 5, listLM030.size());
-		makeExcel.setValue(row + 13, 7, total, "#,##0");
+//		makeExcel.setValue(row + 13, 5, listLM030.size());
+//		makeExcel.setValue(row + 13, 7, total, "#,##0");
 
 		makeExcel.close();
-		// makeExcel.toExcel(sno);
 	}
 
 }

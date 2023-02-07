@@ -53,7 +53,7 @@ public class L6402 extends TradeBuffer {
 		String iFunCode = titaVo.get("FunCode").trim();
 		String iTranNo = titaVo.get("TranNo").trim();
 
-		TxTranCode tTxTranCode = txTranCodeService.holdById(iTranNo);
+		TxTranCode tTxTranCode = txTranCodeService.holdById(iTranNo, titaVo);
 
 		if (tTxTranCode == null) {
 			if ("2".equals(iFunCode)) {
@@ -61,13 +61,10 @@ public class L6402 extends TradeBuffer {
 			} else if ("4".equals(iFunCode)) {
 				throw new LogicException(titaVo, "E0004", "交易代碼:" + iTranNo);
 			}
-
 			tTxTranCode = new TxTranCode();
 			tTxTranCode = MoveToDb(iTranNo, tTxTranCode, titaVo);
-			tTxTranCode.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-			tTxTranCode.setCreateEmpNo(titaVo.getTlrNo());
 			try {
-				txTranCodeService.insert(tTxTranCode);
+				txTranCodeService.insert(tTxTranCode, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增資料已存在
 			}
@@ -78,17 +75,12 @@ public class L6402 extends TradeBuffer {
 			try {
 				if ("2".equals(iFunCode)) {
 					TxTranCode tTxTranCode2 = (TxTranCode) dataLog.clone(tTxTranCode);
-
 					tTxTranCode = MoveToDb(iTranNo, tTxTranCode, titaVo);
-					tTxTranCode.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-					tTxTranCode.setLastUpdateEmpNo(titaVo.getTlrNo());
 					txTranCodeService.update2(tTxTranCode, titaVo);
-
 					dataLog.setEnv(titaVo, tTxTranCode2, tTxTranCode); ////
 					dataLog.exec("修改交易控制檔"); ////
-
 				} else if ("4".equals(iFunCode)) {
-					txTranCodeService.delete(tTxTranCode);
+					txTranCodeService.delete(tTxTranCode, titaVo);
 				}
 			} catch (DBException e) {
 				if ("2".equals(iFunCode)) {
@@ -121,6 +113,7 @@ public class L6402 extends TradeBuffer {
 		tTxTranCode.setSubmitFg(Integer.valueOf(titaVo.get("SubmitFg")));
 		tTxTranCode.setCustDataCtrlFg(Integer.valueOf(titaVo.getParam("CustDataCtrlFg")));
 		tTxTranCode.setCustRmkFg(Integer.parseInt(titaVo.getParam("CustRmkFg")));
+		tTxTranCode.setChainTranMsg(titaVo.getParam("ChainTranMsg"));
 
 		return tTxTranCode;
 

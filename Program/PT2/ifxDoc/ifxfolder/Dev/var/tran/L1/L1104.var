@@ -638,13 +638,27 @@ T(H,#BussNationalityCodeAft,#NationalityCodeHelp)
 #BussNationalityCodeInd=_,_,L
 IF(#BussNationalityCodeAft==#BussNationalityCodeBef || #NationalityCodeAft == "",T(3,),T(3,X))
 
+#checkIdlen=A,2,S
+
 !負責人身分證
 #SpouseIdBef=X,10,L
 
 #SpouseIdInd=X,1,L
 
 #SpouseIdAft=X,10,I
+
+
+!@
+!C(5,#NationalityCode,TW,T(2,@SpouseIdAft,)C(4,#SpouseIdAft,V(P,當公司註冊地為TW時，不可空白),$),$)
 @
+!V(7)
+!P(1,@checkIdlen,#SpouseIdAft)
+P(1,@checkIdlen,#NationalityCodeAft)
+C(5,#NationalityCodeAft,TW,C(4,#SpouseIdAft,V(P,當公司註冊地為TW時，不可空白),$),$)
+!C(3,#checkIdlen,10,$,V(P,當公司註冊地為TW時，不可空白))
+C(4,#SpouseIdAft,1,A(ID_UNINO,0,#SpouseIdAft),s)
+
+!@
 C(5,#FdSpouseId,*,V(7),$)
 C(4,#SpouseIdAft,S,A(ID_UNINO,0,#SpouseIdAft))
 

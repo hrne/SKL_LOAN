@@ -60,7 +60,6 @@ public class L6R24 extends TradeBuffer {
 
 	private void MoveTota(TxTranCode tTxTranCode) {
 		this.info("L6R24 MoveTota");
-
 		this.totaVo.putParam("TranItem", tTxTranCode.getTranItem());
 		this.totaVo.putParam("Desc", tTxTranCode.getDesc());
 		this.totaVo.putParam("TypeFg", tTxTranCode.getTypeFg());
@@ -73,6 +72,7 @@ public class L6R24 extends TradeBuffer {
 		this.totaVo.putParam("SubmitFg", tTxTranCode.getSubmitFg());
 		this.totaVo.putParam("CustDataCtrlFg", tTxTranCode.getCustDataCtrlFg());
 		this.totaVo.putParam("CustRmkFg", tTxTranCode.getCustRmkFg());
+		this.totaVo.putParam("ChainTranMsg", tTxTranCode.getChainTranMsg());
 	}
 
 }

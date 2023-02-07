@@ -15,12 +15,16 @@ import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.FacCaseAppl;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacShareAppl;
+import com.st1.itx.db.domain.TxAmlRating;
+import com.st1.itx.db.domain.TxAmlRatingAppl;
 import com.st1.itx.db.service.CdGseqService;
 import com.st1.itx.db.service.CustDataCtrlService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacCaseApplService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.FacShareApplService;
+import com.st1.itx.db.service.TxAmlRatingApplService;
+import com.st1.itx.db.service.TxAmlRatingService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.GSeqCom;
 import com.st1.itx.util.data.DataLog;
@@ -58,6 +62,10 @@ public class L2111 extends TradeBuffer {
 	@Autowired
 	public CustDataCtrlService sCustDataCtrlService;
 	@Autowired
+	public TxAmlRatingService txAmlRatingService;
+	@Autowired
+	public TxAmlRatingApplService txAmlRatingApplService;
+	@Autowired
 	public DataLog iDataLog;
 
 	@Autowired
@@ -71,6 +79,7 @@ public class L2111 extends TradeBuffer {
 	private TitaVo titaVo = new TitaVo();
 	private int iFuncCode;
 	private int iApplNo;
+	private String iCaseNo;
 	private String iCustId;
 	private String iGroupId;
 
@@ -98,7 +107,7 @@ public class L2111 extends TradeBuffer {
 		iApplNo = this.parse.stringToInteger(titaVo.getParam("ApplNo"));
 		iCustId = titaVo.getParam("CustId").trim();
 		iGroupId = titaVo.getParam("GroupId").trim();
-
+		iCaseNo = titaVo.getParam("CreditSysNo");
 		CustMain tCustMain = custMainService.custIdFirst(iCustId);
 		if (tCustMain == null) {
 			throw new LogicException(titaVo, "E2003", "客戶資料主檔" + iCustId); // 查無資料
@@ -235,14 +244,11 @@ public class L2111 extends TradeBuffer {
 					} else {
 						for (int i = 1; i <= 2; i++) {
 							tFacShareAppl = new FacShareAppl();
-
 							if (i == 1) {
-
 								tFacShareAppl.setApplNo(iFacShareApplNo);
 								tFacShareAppl.setCustNo(mCustNo);
 								tFacShareAppl.setFacmNo(mFacmNo);
 							} else {
-
 								tFacShareAppl.setApplNo(wkApplNo);
 								tFacShareAppl.setCustNo(0);
 								tFacShareAppl.setFacmNo(0);
@@ -257,12 +263,14 @@ public class L2111 extends TradeBuffer {
 								throw new LogicException("E0005", "共同借款人" + e.getErrorMsg());
 							}
 						}
-
 					}
-
 				}
 			}
 
+//			寫入TxAmlRatingAppl
+			if (!"0".equals(iCaseNo) && !iCaseNo.isEmpty()) {
+				inserttxAmlRating();
+			}
 			break;
 		case 2: /*
 				 * 修改 案件核准後,只可修改專辦,協辦, 核決主管,介紹人及駐區資料 非本日所建資料不可修改 非建檔之放款站或櫃員,不可修改
@@ -358,4 +366,74 @@ public class L2111 extends TradeBuffer {
 		}
 
 	}
+
+	private void inserttxAmlRating() throws LogicException {
+		this.info("inserttxAmlRating ...");
+		TxAmlRating tTxAmlRating = txAmlRatingService.caseNoDescFirst(iCaseNo, titaVo);
+		if (tTxAmlRating != null) {
+			TxAmlRatingAppl txAmlRatingAppl = new TxAmlRatingAppl();
+			txAmlRatingAppl.setUnit(tTxAmlRating.getUnit());
+			txAmlRatingAppl.setAcceptanceUnit(tTxAmlRating.getAcceptanceUnit());
+			txAmlRatingAppl.setRoleId(tTxAmlRating.getRoleId());
+			txAmlRatingAppl.setTransactionId(tTxAmlRating.getTransactionId());
+			txAmlRatingAppl.setAcctNo(tTxAmlRating.getAcctNo());
+			txAmlRatingAppl.setCaseNo(tTxAmlRating.getCaseNo());
+			txAmlRatingAppl.setAcctId(tTxAmlRating.getAcctId());
+			txAmlRatingAppl.setInsurCount(tTxAmlRating.getInsurCount());
+			txAmlRatingAppl.setBirthEstDt(tTxAmlRating.getBirthEstDt());
+			txAmlRatingAppl.setSourceId(tTxAmlRating.getSourceId());
+			txAmlRatingAppl.setModifyDate(tTxAmlRating.getModifyDate());
+			txAmlRatingAppl.setOcupCd(tTxAmlRating.getOcupCd());
+			txAmlRatingAppl.setOrgType(tTxAmlRating.getOrgType());
+			txAmlRatingAppl.setBcode(tTxAmlRating.getBcode());
+			txAmlRatingAppl.setOcupNote(tTxAmlRating.getOcupNote());
+			txAmlRatingAppl.setPayMethod(tTxAmlRating.getPayMethod());
+			txAmlRatingAppl.setPayType(tTxAmlRating.getPayType());
+			txAmlRatingAppl.setChannel(tTxAmlRating.getChannel());
+			txAmlRatingAppl.setPolicyType(tTxAmlRating.getPolicyType());
+			txAmlRatingAppl.setInsuranceCurrency(tTxAmlRating.getInsuranceCurrency());
+			txAmlRatingAppl.setInsuranceAmount(tTxAmlRating.getInsuranceAmount());
+			txAmlRatingAppl.setAddnCd(tTxAmlRating.getAddnCd());
+			txAmlRatingAppl.setInsrStakesCd(tTxAmlRating.getInsrStakesCd());
+			txAmlRatingAppl.setBnfcryNHdrGrpCd(tTxAmlRating.getBnfcryNHdrGrpCd());
+			txAmlRatingAppl.setAgentTradeCd(tTxAmlRating.getAgentTradeCd());
+			txAmlRatingAppl.setFstPayerNHdrGrpCd(tTxAmlRating.getFstPayerNHdrGrpCd());
+			txAmlRatingAppl.setFstPayerNHdrStksCd(tTxAmlRating.getFstPayerNHdrStksCd());
+			txAmlRatingAppl.setFstPrmOvrseaAcctCd(tTxAmlRating.getFstPrmOvrseaAcctCd());
+			txAmlRatingAppl.setTotalAmtCd(tTxAmlRating.getTotalAmtCd());
+			txAmlRatingAppl.setDeclinatureCd(tTxAmlRating.getDeclinatureCd());
+			txAmlRatingAppl.setFstInsuredCd(tTxAmlRating.getFstInsuredCd());
+			txAmlRatingAppl.setTWAddrHoldCd(tTxAmlRating.getTWAddrHoldCd());
+			txAmlRatingAppl.setTWAddrLegalCd(tTxAmlRating.getTWAddrLegalCd());
+			txAmlRatingAppl.setDurationCd(tTxAmlRating.getDurationCd());
+			txAmlRatingAppl.setSpecialIdentity(tTxAmlRating.getSpecialIdentity());
+			txAmlRatingAppl.setLawForceWarranty(tTxAmlRating.getLawForceWarranty());
+			txAmlRatingAppl.setMovableGrnteeCd(tTxAmlRating.getMovableGrnteeCd());
+			txAmlRatingAppl.setBearerScursGrnteeCd(tTxAmlRating.getBearerScursGrnteeCd());
+			txAmlRatingAppl.setAgreeDefaultFineCd(tTxAmlRating.getAgreeDefaultFineCd());
+			txAmlRatingAppl.setNonBuyingRealEstateCd(tTxAmlRating.getNonBuyingRealEstateCd());
+			txAmlRatingAppl.setNonStkHolderGrnteeCd(tTxAmlRating.getNonStkHolderGrnteeCd());
+			txAmlRatingAppl.setReachCase(tTxAmlRating.getReachCase());
+			txAmlRatingAppl.setAccountTypeCd(tTxAmlRating.getAccountTypeCd());
+			txAmlRatingAppl.setQueryType(tTxAmlRating.getQueryType());
+			txAmlRatingAppl.setIdentityCd(tTxAmlRating.getIdentityCd());
+			txAmlRatingAppl.setRspRequestId(tTxAmlRating.getRspRequestId());
+			txAmlRatingAppl.setRspStatus(tTxAmlRating.getRspStatus());
+			txAmlRatingAppl.setRspStatusCode(tTxAmlRating.getRspStatusCode());
+			txAmlRatingAppl.setRspStatusDesc(tTxAmlRating.getRspStatusDesc());
+			txAmlRatingAppl.setRspUnit(tTxAmlRating.getRspUnit());
+			txAmlRatingAppl.setRspTransactionId(tTxAmlRating.getRspTransactionId());
+			txAmlRatingAppl.setRspAcctNo(tTxAmlRating.getRspAcctNo());
+			txAmlRatingAppl.setRspCaseNo(tTxAmlRating.getRspCaseNo());
+			txAmlRatingAppl.setRspInsurCount(tTxAmlRating.getRspInsurCount());
+			txAmlRatingAppl.setRspTotalRatingsScore(tTxAmlRating.getRspTotalRatingsScore());
+			txAmlRatingAppl.setRspTotalRatings(tTxAmlRating.getRspTotalRatings());
+			try {
+				txAmlRatingApplService.insert(txAmlRatingAppl, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0005", "Eloan評級案件申請留存檔" + e.getErrorMsg());
+			}
+		}
+	}
+
 }

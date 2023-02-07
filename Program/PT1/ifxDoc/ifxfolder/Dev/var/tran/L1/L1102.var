@@ -603,15 +603,21 @@ C(5,#NationalityCode,TW,T(2,#FdSpouseId,*),V(7),$)
 #BussNationalityCodex=X,40,L
 T(H,#BussNationalityCode,#NationalityCodeHelp)
 
+#checkIdlen=A,2,S
 
 !負責人身分證字號
 #SpouseId=X,10,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
+C(3,#FunCd,1,T(F,@SpouseId,1),T(F,@SpouseId,0))
+!@
+!C(5,#NationalityCode,TW,T(2,@SpouseId,)C(4,#SpouseId,V(P,當公司註冊地為TW時，不可空白),$),$)
 @
-C(5,#NationalityCode,TW,T(2,@SpouseId,)C(4,#SpouseId,V(P,當公司註冊地為TW時，不可空白),s),s)
-!C(5,#NationalityCode,TW,T(2,#FdSpouseId,*),V(7),$)
-C(4,#SpouseId,$,A(ID_UNINO,0,#SpouseId))
+!V(7)
+P(1,@checkIdlen,#SpouseId)
+C(5,#NationalityCode,TW,C(4,#SpouseId,V(P,當公司註冊地為TW時，不可空白),$),$)
+!C(3,#checkIdlen,10,$,V(P,當公司註冊地為TW時，不可空白))
+C(4,#SpouseId,1,A(ID_UNINO,0,#SpouseId),s)
 
 !負責人姓名
 #SpouseName=x,100,I

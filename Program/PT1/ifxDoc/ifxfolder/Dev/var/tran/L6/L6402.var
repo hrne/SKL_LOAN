@@ -30,6 +30,7 @@
 ["#FdSubmitFg+登錄需提交",#SubmitFg,#SubmitFgX],
 ["#FdCustDataCtrlFg+結清戶個資控管",#CustDataCtrlFg,#CustDataCtrlFgX],
 ["#FdCustRmkFg+顧客控管警訊記號",#CustRmkFg,#CustRmkFgX],
+[#<->#,"#FdChainTranMsg+入口交易提示訊息",#ChainTranMsg],
 ]
 
 !---------- AP Button AREA ----------
@@ -112,6 +113,7 @@ T(3,0:否;1:是;2:自動)
 #FdSubmitFg=X,2,L
 #FdCustDataCtrlFg=X,2,L
 #FdCustRmkFg=X,2,L
+#FdChainTranMsg=X,2,L
 
 #ShowFd1=X,1,S
 C(3,#CHAIN,1,T(3,@FdFunCode, ),T(3,@FdFunCode,*))
@@ -371,6 +373,8 @@ V(H,#CustRmkFgHelp)
 #CustRmkFgX=X,10,L
 T(H,#CustRmkFg,#CustRmkFgHelp)
 
+#ChainTranMsg=x,100,I
+
 #MRKEY=_,_,S
 T(2,CODE:+#TranNo)
 
@@ -385,8 +389,21 @@ T(2,CODE:+#TranNo)
 
 !------ 上行電文TIM：BASIC LABEL + AP TEXT AREA + AP TEXT ------
 <sub type="TIM">
-#FunCode#TranNo#TranItem#Desc#TypeFg#Status#CancelFg#ModifyFg
-#MenuNo#SubMenuNo#MenuFg#SubmitFg#CustDataCtrlFg#CustRmkFg
+#FunCode
+#TranNo
+#TranItem
+#Desc
+#TypeFg
+#Status
+#CancelFg
+#ModifyFg
+#MenuNo
+#SubMenuNo
+#MenuFg
+#SubmitFg
+#CustDataCtrlFg
+#CustRmkFg
+#ChainTranMsg
 #END
 </sub>
 
@@ -397,8 +414,19 @@ T(2,CODE:+#TranNo)
 TXFORM=L6402^
 
 TXFORM=L6R24
-#TranItem#Desc#TypeFg#Status#CancelFg#ModifyFg
-#MenuNo#SubMenuNo#MenuFg#SubmitFg#CustDataCtrlFg#CustRmkFg
+#TranItem
+#Desc
+#TypeFg
+#Status
+#CancelFg
+#ModifyFg
+#MenuNo
+#SubMenuNo
+#MenuFg
+#SubmitFg
+#CustDataCtrlFg
+#CustRmkFg
+#ChainTranMsg
 ^
 </sub>
 
