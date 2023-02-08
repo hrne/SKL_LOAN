@@ -81,7 +81,7 @@ public class L4601Report2 extends MakeReport {
 
 		
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getBrno()).
-				setRptCode(titaVo.getTxCode()).setRptItem("LN5811P").build();
+				setRptCode(titaVo.getTxCode()).setRptItem("LN5811P(保單險種不足明細表)").build();
 
 		makeFile.open(titaVo, reportVo, fileName, 2);
 
@@ -159,8 +159,6 @@ public class L4601Report2 extends MakeReport {
 			
 			CdCode tCdCode = cdCodeService.findById(new CdCodeId("CommericalFlag", tInsuRenew.getCommericalFlag()),
 					titaVo);
-			
-			
 			String CommericalFlagX = "";
 			if (tCdCode != null) {
 				CommericalFlagX = tCdCode.getItem();

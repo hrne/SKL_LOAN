@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L4;
 
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -207,7 +208,7 @@ public class L4962 extends TradeBuffer {
 		if ("Y".equals(flagB)) {
 //			totaB.init(titaVo);
 //				1.CollList額度之戶況為0247者
-//				2.clfac 1(房地)打頭者
+//				2.clfac 1(房地)打頭者	
 //				3.於original檔無資料者
 			List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 
@@ -276,7 +277,6 @@ public class L4962 extends TradeBuffer {
 				} 
 			}
 
-		}
 
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
@@ -351,6 +351,10 @@ public class L4962 extends TradeBuffer {
 		
 		makeExcel.close();
 
+		}
+		if("N".equals(flagA) && "N".equals(flagB) && "N".equals(CommericalFlag)) {
+	         throw new LogicException("E0019", ("檢核表要擇一選擇為Y"));
+		}
 
 		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
 				titaVo.getTlrNo() + "L4962", "L4962保險單資料檢核作業完成", titaVo);

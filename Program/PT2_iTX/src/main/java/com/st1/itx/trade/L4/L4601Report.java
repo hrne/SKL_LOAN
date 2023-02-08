@@ -252,7 +252,7 @@ public class L4601Report extends MakeReport {
 					
 					this.print(0, 125, CommericalFlagX);
 
-					
+				
 					this.print(1, 0, "");
 
 					ClBuildingId clBuildingId = new ClBuildingId();
