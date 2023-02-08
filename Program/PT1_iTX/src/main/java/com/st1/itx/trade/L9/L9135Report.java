@@ -133,11 +133,12 @@ public class L9135Report extends MakeReport {
 	 */
 
 	public void exec(TitaVo titaVo, List<Map<String, String>> l9135Result, int iAcDate) throws LogicException {
-
 		this.info("L9135Report exec");
-
+		this.info("L9135Report exportExcel");
 		// 銀行存款媒體明細表
 		exportExcel(titaVo, l9135Result, iAcDate);
+		
+		this.info("L9135Report exportTxt");
 		// 媒體檔
 		exportTxt(titaVo, l9135Result, iAcDate);
 
@@ -277,7 +278,7 @@ public class L9135Report extends MakeReport {
 
 				// 日期(7) + 帳號(10) + 借貸別(1) + 金額(13) + 傳票號碼(5)
 				String text = iDate + iAcctItem + iDbCr + amtText + iSlipNo;
-				this.info("text = " + text);
+//				this.info("text = " + text);
 				makeFile.put(text);
 			}
 		}

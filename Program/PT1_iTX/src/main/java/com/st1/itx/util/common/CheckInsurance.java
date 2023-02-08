@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
@@ -62,7 +63,8 @@ public class CheckInsurance extends TradeBuffer {
 
 	@Autowired
 	private SystemParasService sSystemParasService;
-	
+
+	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("CheckInsurance run ... ");
 		return null;
@@ -331,6 +333,21 @@ public class CheckInsurance extends TradeBuffer {
 
 	public Document convertStringToXml(String xmlstring) {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
+		try {
+			factory.setNamespaceAware(true);
+			factory.setIgnoringComments(true);
+			factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+			factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+			factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+			factory.setXIncludeAware(false);
+			factory.setExpandEntityReferences(false);
+		} catch (ParserConfigurationException e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.warn("Set DocumentBuilderFactory Env Error");
+			this.warn(errors.toString());
+		}
 
 		DocumentBuilder builder = null;
 		try {

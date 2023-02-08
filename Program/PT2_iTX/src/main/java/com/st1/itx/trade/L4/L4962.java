@@ -130,7 +130,8 @@ public class L4962 extends TradeBuffer {
 
 			sInsuRenew = insuRenewService.findL4962A(iInsuEndMonthFrom, iInsuEndMonthTo, 0, Integer.MAX_VALUE, titaVo);
 
-			this.info("sInsuRenew =" + sInsuRenew.toString());
+			
+			
 
 			int reportDate = titaVo.getEntDyI() + 19110000;
 			String brno = titaVo.getBrno();
@@ -152,7 +153,7 @@ public class L4962 extends TradeBuffer {
 			if (sInsuRenew == null || sInsuRenew.isEmpty()) {
 				makeExcel.setValue(2, 1, "本日無資料", "L");
 			} else{				
-
+				this.info("sInsuRenew =" + sInsuRenew.toString());
 				// 調整欄寬
 				makeExcel.setWidth(1, 10);
 				makeExcel.setWidth(2, 24);

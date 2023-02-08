@@ -25,7 +25,7 @@ BEGIN
 
     -- 寫入資料
     INSERT INTO "InnFundApl" (
-        "Acdate"              -- 日期 DecimalD 8 0
+        "AcDate"              -- 日期 DecimalD 8 0
       , "ResrvStndrd"         -- 責任準備金 DECIMAL 14 0
       , "PosbleBorPsn"        -- 可放款比率% DECIMAL 7 4
       , "PosbleBorAmt"        -- 可放款金額 DECIMAL 16 2

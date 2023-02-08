@@ -26,7 +26,7 @@ BEGIN
     -- 寫入資料
     INSERT INTO "ConstructionCompany" (
         "CustNo"              -- 戶號 DECIMAL 7 0
-      , "BuilderStatus"       -- 建商狀況 VARCHAR2 20 0
+      , "DeleteFlag"          -- 建商狀況 VARCHAR2 20 0
       , "CreateDate"          -- 建檔日期時間 DATE 0 
       , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
       , "LastUpdate"          -- 最後更新日期時間 DATE 0 

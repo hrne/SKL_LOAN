@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
@@ -77,6 +78,7 @@ public class CheckAml extends TradeBuffer {
 	// connect AML status
 	private boolean connectSuccess;
 
+	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("CheckAml run ... ");
 
@@ -558,8 +560,7 @@ public class CheckAml extends TradeBuffer {
 		SvcRq = appendChildElement(doc, SvcRq, "Notify_Email", checkAmlVo.getNotifyEmail());
 		SvcRq = appendChildElement(doc, SvcRq, "Query_Id", checkAmlVo.getQueryId());
 		SvcRq = appendChildElement(doc, SvcRq, "Source_Id", checkAmlVo.getSourceId());
-		SvcRq = appendChildElement(doc, SvcRq, "Modify_Date",
-				String.format("%08d%06d", dateUtil.getNowIntegerRoc(), dateUtil.getNowIntegerForBC()));
+		SvcRq = appendChildElement(doc, SvcRq, "Modify_Date", String.format("%08d%06d", dateUtil.getNowIntegerRoc(), dateUtil.getNowIntegerForBC()));
 		SvcRq = appendChildElement(doc, SvcRq, "InsrNHdr_Same", checkAmlVo.getInsrNHdrSame());
 		SvcRq = appendChildElement(doc, SvcRq, "Role_Status", checkAmlVo.getRoleStatus());
 
@@ -683,7 +684,20 @@ public class CheckAml extends TradeBuffer {
 	 */
 	public Document convertStringToXml(String xmlstring) {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-
+		try {
+			factory.setNamespaceAware(true);
+			factory.setIgnoringComments(true);
+			factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+			factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+			factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+			factory.setXIncludeAware(false);
+			factory.setExpandEntityReferences(false);
+		} catch (ParserConfigurationException e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.warn("Set DocumentBuilderFactory Env Error");
+			this.warn(errors.toString());
+		}
 		DocumentBuilder builder = null;
 		try {
 			builder = factory.newDocumentBuilder();

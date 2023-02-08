@@ -11,7 +11,9 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.AcAcctCheck;
+import com.st1.itx.db.domain.AcMain;
 import com.st1.itx.db.service.AcAcctCheckService;
+import com.st1.itx.db.service.AcMainService;
 import com.st1.itx.tradeService.CommBuffer;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.data.ReportVo;
@@ -23,6 +25,9 @@ public class L9133Report extends CommBuffer {
 	/* DB服務注入 */
 	@Autowired
 	private AcAcctCheckService sAcAcctCheckService;
+
+	@Autowired
+	private AcMainService sAcMainService;
 
 	@Autowired
 	private MakeExcel makeExcel;
@@ -67,10 +72,44 @@ public class L9133Report extends CommBuffer {
 
 			String acSubBookCode = tAcAcctCheck.getAcSubBookCode();// 區隔帳冊
 			String acctCode = tAcAcctCheck.getAcctCode();// 科目
-			String acctItem = tAcAcctCheck.getAcctItem();// 科目
+			String acctItem = tAcAcctCheck.getAcctItem();// 科目中文
 			BigDecimal acMainBal = tAcAcctCheck.getTdBal();// 會計帳餘額
 			BigDecimal receivableBal = tAcAcctCheck.getReceivableBal();// 銷帳檔餘額
 			BigDecimal masterBal = tAcAcctCheck.getAcctMasterBal();// 主檔餘額
+
+//			this.info("reportDate = " + reportDate);
+//			this.info("acctCode = " + acctCode);
+
+			Slice<AcMain> sAcMain = sAcMainService.acctCodeEq(reportDate, acctCode, 0, 1, titaVo);
+
+			BigDecimal ydBal = BigDecimal.ZERO;// 前日餘額
+			BigDecimal addAmt = BigDecimal.ZERO;// 加
+			BigDecimal subAmt = BigDecimal.ZERO;// 減
+			BigDecimal netAmt = BigDecimal.ZERO;// 淨增減
+
+			String tmpFirstAcctCode = "";
+			if (sAcMain != null) {
+				tmpFirstAcctCode = sAcMain.getContent().get(0).getAcNoCode().substring(0, 1);
+
+				this.info("tmpFirstAcctCode = " + tmpFirstAcctCode.toString());
+				ydBal = sAcMain.getContent().get(0).getYdBal();
+
+				// 科目開頭為1 5 6 9 借為正，貸為負
+				if ("1".equals(tmpFirstAcctCode) || "5".equals(tmpFirstAcctCode) || "6".equals(tmpFirstAcctCode)
+						|| "9".equals(tmpFirstAcctCode)) {
+					addAmt = sAcMain.getContent().get(0).getDbAmt();
+					subAmt = sAcMain.getContent().get(0).getCrAmt();
+					netAmt = addAmt.subtract(subAmt);// 淨增減 (借方為正，貸方為負)
+				} else {
+					addAmt = sAcMain.getContent().get(0).getCrAmt();
+					subAmt = sAcMain.getContent().get(0).getDbAmt();
+					netAmt = addAmt.subtract(subAmt);// 淨增減 (借方為負，貸方為正)
+				}
+			}
+
+			this.info("addAmt = " + addAmt);
+			this.info("subAmt = " + subAmt);
+
 			int sheet = 0;
 			// 明細資料新的一行
 			if (acctCode != null && !acctCode.isEmpty()) {
@@ -145,14 +184,31 @@ public class L9133Report extends CommBuffer {
 					isDiff = true;
 				}
 			}
-			makeExcel.setValue(rowCursor, 1, acSubBookCode); // 區隔帳冊
-			makeExcel.setValue(rowCursor, 2, acctCode + " " + acctItem); // 科目
-			makeExcel.setValue(rowCursor, 3, acMainBal, "#,##0"); // 業務科目或銷帳科目才顯示會計帳餘額
-			makeExcel.setValue(rowCursor, 4, receivableBal, "#,##0"); // 銷帳檔餘額
-			makeExcel.setValue(rowCursor, 5, masterBal, "#,##0"); // 主檔餘額
-			makeExcel.setValue(rowCursor, 6, diffAcAmt, "#,##0"); // 會計檔與主檔差額
-			makeExcel.setValue(rowCursor, 7, diffReceivableAmt, "#,##0"); // 銷帳檔與主檔差額
+			// 工作表為第三張(未銷帳)
+			if (sheet == 3) {
 
+				makeExcel.setValue(rowCursor, 1, acSubBookCode); // 區隔帳冊
+				makeExcel.setValue(rowCursor, 2, acctCode + " " + acctItem); // 科目
+				makeExcel.setValue(rowCursor, 3, receivableBal, "#,##0"); // 銷帳檔餘額
+				makeExcel.setValue(rowCursor, 4, masterBal, "#,##0"); // 主檔餘額
+				makeExcel.setValue(rowCursor, 5, diffReceivableAmt, "#,##0"); // 銷帳檔與主檔差額
+			} else {
+
+				// 工作表為第一、二張(檢核表、應收應付)
+				makeExcel.setValue(rowCursor, 1, acSubBookCode); // 區隔帳冊
+				makeExcel.setValue(rowCursor, 2, acctCode + " " + acctItem); // 科目
+				makeExcel.setValue(rowCursor, 3, acMainBal, "#,##0"); // 業務科目或銷帳科目才顯示會計帳餘額
+
+				makeExcel.setValue(rowCursor, 4, ydBal, "#,##0"); // 前日餘額
+				makeExcel.setValue(rowCursor, 5, addAmt, "#,##0"); // 加
+				makeExcel.setValue(rowCursor, 6, subAmt, "#,##0"); // 減
+				makeExcel.setValue(rowCursor, 7, netAmt, "#,##0"); // 淨增減
+
+				makeExcel.setValue(rowCursor, 8, receivableBal, "#,##0"); // 銷帳檔餘額
+				makeExcel.setValue(rowCursor, 9, masterBal, "#,##0"); // 主檔餘額
+				makeExcel.setValue(rowCursor, 10, diffAcAmt, "#,##0"); // 會計檔與主檔差額
+				makeExcel.setValue(rowCursor, 11, diffReceivableAmt, "#,##0"); // 銷帳檔與主檔差額
+			}
 		}
 		long excelNo = makeExcel.close();
 

@@ -38,9 +38,9 @@ BEGIN
       , "CustId"              -- 統一編號 VARCHAR2 10 0
       , "EntryDate"           -- 入帳日期 DECIMAL 8 0
       , "TxAmt"               -- 交易金額 DECIMAL 14 0
-      , "ErrMsg"              -- 失敗原因 NVARCHAR2 20 0
+      , "ErrorCode"           -- 失敗原因 NVARCHAR2 20 0
       , "AcctCode"            -- 科目 VARCHAR2 12 0
-      , "Acdate"              -- 會計日期 DECIMAL 8 0
+      , "AcDate"              -- 會計日期 DECIMAL 8 0
       , "BatchNo"             -- 批次號碼 VARCHAR2 6 0
       , "DetailSeq"           -- 明細序號 DECIMAL 6 0
       , "CreateDate"          -- 建檔日期時間 DATE  

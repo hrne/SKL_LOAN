@@ -338,9 +338,10 @@ BEGIN
           ,LPAD(APLP.APLPAC,3,'0')        AS "BreachCode"          -- 違約適用方式
           ,'2'                            AS "BreachGetCode"       -- 違約金收取方式
           ,APLP.APLNER * 12               AS "ProhibitMonth"       -- 限制清償期限
-          ,PROD."BreachPercent"           AS "BreachPercent"       -- 違約金百分比
-          ,PROD."BreachDecreaseMonth"     AS "BreachDecreaseMonth" -- 違約金分段月數
-          ,PROD."BreachDecreaseMonth"     AS "BreachDecrease"      -- 分段遞減百分比
+          ,NVL(PROD."BreachPercent",0)    AS "BreachPercent"       -- 違約金百分比
+          ,NVL(PROD."BreachDecreaseMonth",0)
+                                          AS "BreachDecreaseMonth" -- 違約金分段月數
+          ,NVL(PROD."BreachDecrease",0)   AS "BreachDecrease"      -- 分段遞減百分比
           ,0                              AS "BreachStartPercent"  -- 還款起算比例%
     FROM "LA$APLP" APLP 
     LEFT JOIN "CU$CUSP" CUSP ON CUSP."LMSACN" = APLP."LMSACN" 

@@ -1,6 +1,7 @@
 package com.st1.itx.util.format;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,58 @@ public class StringCut {
 		}
 
 		return cutString;
+	}
+	
+	/**
+	 * String Cut for Real Byte
+	 * 
+	 * @param text    Context Text
+	 * @param code    ex.uTF-8
+	 * @param byteLen Byte Lenght
+	 * @return String
+	 * @throws Exception When is Error
+	 */
+	public static String stringCutFRB(String text, String code, int byteLen) throws Exception {
+		if (ThreadVariable.isLogger())
+			logger.info("stringCutForByte text : [" + text + "], code : [" + code + "], byteLen : [" + byteLen + "]");
+
+		if ((Objects.isNull(text) || Objects.isNull(code)) && byteLen > 0)
+			return FormatUtil.padX("", byteLen);
+
+		if (byteLen <= 0)
+			return "";
+
+		int orgLen = text.getBytes(code).length;
+
+		if (orgLen < byteLen) {
+			while (true) {
+				text += " ";
+				if (text.getBytes(code).length >= byteLen)
+					break;
+			}
+			return text;
+		} else if (orgLen == byteLen)
+			return text;
+		else if (orgLen > byteLen) {
+			while (true) {
+				text = text.substring(0, text.length() - 1);
+				if (text.getBytes(code).length <= byteLen)
+					break;
+			}
+
+			if (text.getBytes(code).length == byteLen)
+				return text;
+			else {
+				while (true) {
+					text += " ";
+					if (text.getBytes(code).length >= byteLen)
+						break;
+				}
+				return text;
+			}
+		}
+
+		return text;
 	}
 
 	/**

@@ -81,27 +81,27 @@ public class L9134Report3 extends MakeReport {
 				row++;
 				//makeExcel.setValue(row, 1, r.get("AcNoCode"));
 				
-				String AcNameCode = "";
-				if(r.get("AcNoCode").equals("20222010000")) {
-					AcNameCode = r.get("AcNoCode")+"－火險保費 ";
-				}
-				if(r.get("AcNoCode").equals("20222020000")) {
-					AcNameCode = r.get("AcNoCode")+"－擔保放款  ";
-				}
-				if(r.get("AcNoCode").equals("20222180000")) {
-					AcNameCode = r.get("AcNoCode")+"－債權協商  ";
-				}
-				if(r.get("AcNoCode").equals("20222180100")) {
-					AcNameCode = r.get("AcNoCode")+"－更生統一收付   ";
-				}
-				if(r.get("AcNoCode").equals("20222180200")) {
-					AcNameCode = r.get("AcNoCode")+"－前置調解  ";
-				}
+//				String AcNameCode = "";
+//				if(r.get("AcNoCode").equals("20222010000")) {
+//					AcNameCode = r.get("AcNoCode")+"－火險保費 ";
+//				}
+//				if(r.get("AcNoCode").equals("20222020000")) {
+//					AcNameCode = r.get("AcNoCode")+"－擔保放款  ";
+//				}
+//				if(r.get("AcNoCode").equals("20222180000")) {
+//					AcNameCode = r.get("AcNoCode")+"－債權協商  ";
+//				}
+//				if(r.get("AcNoCode").equals("20222180100")) {
+//					AcNameCode = r.get("AcNoCode")+"－更生統一收付   ";
+//				}
+//				if(r.get("AcNoCode").equals("20222180200")) {
+//					AcNameCode = r.get("AcNoCode")+"－前置調解  ";
+//				}
 				
-				makeExcel.setValue(row, 1, AcNameCode);//!
+				makeExcel.setValue(row, 1, r.get("AcNoCode"));//!
 				makeExcel.setValue(row, 2, r.get("AcSubCode"));//!
 				makeExcel.setValue(row, 3, r.get("AcDtlCode"));
-				makeExcel.setValue(row, 4, r.get("AcctItem"));
+				makeExcel.setValue(row, 4, r.get("AcNoItem"));
 				makeExcel.setValue(row, 5, r.get("CustNo"));
 				makeExcel.setValue(row, 6, r.get("FacmNo"));
 				makeExcel.setValue(row, 7, r.get("OpenAcDate"));

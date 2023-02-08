@@ -167,6 +167,7 @@ public class L3240 extends TradeBuffer {
 		// 暫收款
 		this.info("TempAmt=" + wkTempAmt + " ,OverAmt=" + wkOverAmt);
 		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo, 0, 0, 99, BigDecimal.ZERO, titaVo); // 99-費用全部
+		int wkFacmNo = baTxCom.getOverRpFacmNo();
 		// 溢收金額
 		for (BaTxVo ba : this.baTxList) {
 			if (ba.getDataKind() == 3 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
@@ -224,31 +225,58 @@ public class L3240 extends TradeBuffer {
 		if (slAcList != null) {
 			for (AcDetail ac : slAcList.getContent()) {
 				if ("D".equals(ac.getDbCr())) {
+					acDetail = new AcDetail();
+					acDetail.setDbCr("C");
+					acDetail.setAcctCode(ac.getAcctCode());
+					acDetail.setCustNo(iCustNo);
+					acDetail.setFacmNo(0);
+					acDetail.setTxAmt(ac.getTxAmt());
+					String sumNo = "";
+					String rvNo = "";
 					if ("P03".equals(ac.getAcctCode()) || "C01".equals(ac.getAcctCode())
-							|| "P01".equals(ac.getAcctCode()) || "TEM".equals(ac.getAcctCode())
-							|| "TCK".equals(ac.getAcctCode())) {
-						String sumNo = "";
-						sumNo = "10" + wkRepayCode;
-						String rvNo = "";
+							|| "P01".equals(ac.getAcctCode())) {
+						if ("P03".equals(ac.getAcctCode())) {
+							sumNo = "101";
+						} else {
+							sumNo = "102";
+						}
 						if ("C01".equals(ac.getAcctCode())) {
 							rvNo = "0010060" + titaVo.getOrgEntdyI();
 						}
-						acDetail = new AcDetail();
-						acDetail.setDbCr("C");
-						acDetail.setAcctCode(ac.getAcctCode());
-						acDetail.setSumNo(sumNo);
-						acDetail.setTxAmt(ac.getTxAmt());
-						acDetail.setCustNo(iCustNo);
-						acDetail.setFacmNo(0);
-						lAcDetail.add(acDetail);
-						acDetail.setRvNo(rvNo);
-						lAcDetail.add(acDetail);
 					}
+					if ("TAV".equals(ac.getAcctCode())) {
+						sumNo = "090";
+						acDetail.setFacmNo(wkFacmNo);
+					}
+					acDetail.setSumNo(sumNo);
+					acDetail.setRvNo(rvNo);
+					lAcDetail.add(acDetail);
 				}
 			}
 		}
-		// 累溢收入帳(暫收貸)
-		acRepayCom.settleOverflow(tLoanBorTx, lAcDetail, titaVo);
+
+		BigDecimal wkOverflow = BigDecimal.ZERO;
+
+		// 借貸差
+		for (AcDetail ac : this.lAcDetail) {
+			if ("D".equals(ac.getDbCr())) {
+				wkOverflow = wkOverflow.add(ac.getTxAmt());
+			} else {
+				wkOverflow = wkOverflow.subtract((ac.getTxAmt()));
+			}
+		}
+
+		if (wkOverflow.compareTo(BigDecimal.ZERO) > 0) {
+			AcDetail acDetail = new AcDetail();
+			acDetail.setDbCr("C");
+			acDetail.setAcctCode("TAV");
+			acDetail.setTxAmt(wkOverflow);
+			acDetail.setCustNo(iCustNo);
+			acDetail.setFacmNo(wkFacmNo);
+			acDetail.setBormNo(0);
+			acDetail.setSumNo("092"); // 暫收轉帳
+			this.lAcDetail.add(acDetail);
+		}
 
 		// 產生會計分錄
 		this.txBuffer.setAcDetailList(lAcDetail);

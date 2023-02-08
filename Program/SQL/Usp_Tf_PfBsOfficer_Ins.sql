@@ -31,7 +31,7 @@ BEGIN
       , "AreaCode"            -- 區域中心 VARCHAR2 6 0
       , "AreaItem"            -- 中心中文 NVARCHAR2 6 0 -- 待刪除
       , "DeptCode"            -- 部室代號 VARCHAR2 6 0
-      , "DepartItem"          -- 部室中文 NVARCHAR2 12 0
+      , "DepItem"          -- 部室中文 NVARCHAR2 12 0
       , "DistCode"            -- 區部代號 VARCHAR2 6 0
       , "DistItem"            -- 區部中文 NVARCHAR2 30 0
       , "StationName"         -- 駐在地 NVARCHAR2 30 0

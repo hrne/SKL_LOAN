@@ -28,8 +28,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 
-import com.st1.itx.db.service.NegFinShareService;
-import com.st1.itx.db.service.NegMainService;
+
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
@@ -41,6 +40,7 @@ import com.st1.itx.db.domain.JcicZ048;
 import com.st1.itx.db.domain.JcicZ048Id;
 import com.st1.itx.db.domain.JcicZ062;
 import com.st1.itx.db.domain.JcicZ062Id;
+import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.NegFinAcct;
 import com.st1.itx.db.domain.NegFinShare;
 import com.st1.itx.db.domain.NegFinShareId;
@@ -56,6 +56,10 @@ import com.st1.itx.db.service.JcicZ048Service;
 import com.st1.itx.db.service.JcicZ062Service;
 import com.st1.itx.db.service.NegFinAcctService;
 import com.st1.itx.db.service.NegFinShareLogService;
+import com.st1.itx.db.service.NegFinShareService;
+import com.st1.itx.db.service.NegMainService;
+import com.st1.itx.db.service.LoanBorMainService;
+
 import com.st1.itx.util.common.FileCom;
 import com.st1.itx.util.common.NegCom;
 import com.st1.itx.util.data.DataLog;
@@ -92,6 +96,9 @@ public class L5706 extends TradeBuffer {
 	public JcicZ062Service sJcicZ062Service;
 	@Autowired
 	public NegFinAcctService sNegFinAcctService;
+	@Autowired
+	public LoanBorMainService loanBorMainService;
+
 	@Autowired
 	public NegCom negCom;
 
@@ -837,25 +844,37 @@ public class L5706 extends TradeBuffer {
 			t2NegMain.setTotalContrAmt(StringToBigDecimal(TOTAL_AMT, titaVo));// 簽約總金額
 			totalContrAmt = t2NegMain.getTotalContrAmt();// 分攤檔金額檢核使用
 			dueAmt = t2NegMain.getDueAmt();// 分攤檔金額檢核使用
-			CustMain tCustMain = sCustMainService.custIdFirst(IDN_BAN, titaVo);
-			String CustLoanKind = "";
-			if (tCustMain != null) {
-				List<String> CustTypeCode = new ArrayList<String>();
-				CustTypeCode.add("05");
-				// 戶別
-				if (CustTypeCode.contains(tCustMain.getCustTypeCode())) {
-					// 是保貸戶
-					CustLoanKind = "2";
-				} else {
-					CustLoanKind = "1";
-				}
-			} else {
-				if (errorMsg == 1) {
-					// E0001 查詢資料不存在
-					throw new LogicException(titaVo, "E0001", "查無客戶主檔資料[" + IDN_BAN + "]");
-				}
+//			CustMain tCustMain = sCustMainService.custIdFirst(IDN_BAN, titaVo);
 
+			// CustLoanKind:有撥款資料則為1放款戶,其他為2保貸戶(2023/2/8更新)
+			String CustLoanKind = "";
+
+			Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(CustNo, 0, 999,
+					0, 999, 0, Integer.MAX_VALUE, titaVo);
+			List<LoanBorMain> lLoanBorMain = slLoanBorMain == null ? null : new ArrayList<LoanBorMain>(slLoanBorMain.getContent());
+			if (lLoanBorMain == null || lLoanBorMain.size() == 0) {
+				// 是保貸戶
+				CustLoanKind = "2";
+			}else {
+				CustLoanKind = "1";
 			}
+			
+//			if (tCustMain != null) {
+//				List<String> CustTypeCode = new ArrayList<String>();
+//				CustTypeCode.add("05");
+//				// 戶別
+//				if (CustTypeCode.contains(tCustMain.getCustTypeCode())) {
+//					// 是保貸戶
+//					CustLoanKind = "2";
+//				} else {
+//					CustLoanKind = "1";
+//				}
+//			} else {
+//				if (errorMsg == 1) {
+//					// E0001 查詢資料不存在
+//					throw new LogicException(titaVo, "E0001", "查無客戶主檔資料[" + IDN_BAN + "]");
+//				}
+//			}
 			t2NegMain.setCaseKindCode("1");// 案件種類 1:協商;2:調解;3:更生;4:清算
 			t2NegMain.setStatus("0");// 債權戶況 0:正常 1:已變更 2:毀諾 3:結案 4:未生效
 			t2NegMain.setCustLoanKind(CustLoanKind);// 債權戶別"1:放款戶 ;2:保貸戶;客戶主檔:保貸別

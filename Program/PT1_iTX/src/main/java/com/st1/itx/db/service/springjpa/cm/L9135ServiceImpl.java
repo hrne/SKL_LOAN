@@ -244,10 +244,15 @@ public class L9135ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ) R";
 		sql += "     LEFT JOIN \"CdAcCode\" E ON E.\"AcNoCode\" = R.\"AcNoCode\"";
 		sql += "     						 AND E.\"AcSubCode\" = '     '";
-		sql += " ORDER BY R.\"AcNoCode\" ASC";
-		sql += "		 ,R.\"AcSubCode\" ASC";
-		sql += "         ,R.\"AcDtlCode\" ASC";
-		sql += " 		 ,R.\"SlipNo\" ASC";
+		sql += " ORDER BY  R.\"AcNoCode\" ASC";
+		sql += "	      ,CASE";
+		sql += "		     WHEN R.\"AcSubCode\" = '01004' THEN 99999  ";	
+		sql += "		      ELSE TO_NUMBER(R.\"AcSubCode\") ";
+		sql += "	       END ASC";
+		sql += "          ,R.\"AcDtlCode\" ASC";
+		sql += "	      ,CASE";
+		sql += "		     WHEN R.\"SlipNo\" > 90000 THEN R.\"SlipNo\" - 99999  ";	
+		sql += "	       END ASC";
 		
 		this.info("sql=" + sql);
 		Query query;

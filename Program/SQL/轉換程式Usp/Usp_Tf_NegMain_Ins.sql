@@ -53,7 +53,7 @@ BEGIN
       , "RepayPrincipal"      -- 還本本金 DECIMAL 14 0
       , "RepayInterest"       -- 還本利息 DECIMAL 14 0
       , "StatusDate"          -- 戶況日期 DecimalD 8 0
-      , "CourCode"            -- 受理調解機構代號 VARCHAR2(3 BYTE)
+      , "CourtCode"            -- 受理調解機構代號 VARCHAR2(3 BYTE)
       , "ThisAcDate"          -- 本次會計日期 NUMBER(8,0) 
       , "ThisTitaTlrNo"       -- 本次經辦 VARCHAR2(6 BYTE) 
       , "ThisTitaTxtNo"       -- 本次交易序號 NUMBER(8,0)

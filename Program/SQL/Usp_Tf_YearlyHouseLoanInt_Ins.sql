@@ -52,7 +52,7 @@ BEGIN
       , "LastUpdate"          -- 最後更新日期時間 DATE 0 
       , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
     )
-    WITH taxData (
+    WITH taxData AS (
       -- 資料年月+戶號+額度
       SELECT DISTINCT
              ADTYMT
