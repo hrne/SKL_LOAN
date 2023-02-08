@@ -3,18 +3,17 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.st1</groupId>
-	<artifactId>ifxweb2</artifactId>
-	<name>ifxweb2</name>
+	<artifactId>iFX</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
-	<version>2018-0903-CodeViewCMD</version>
+	
 	<properties>
 		<Java-Ver>1.8</Java-Ver>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<JUnit-Ver>4.12</JUnit-Ver>
 		<JavaServer-API-Ver>2.3.3</JavaServer-API-Ver>
-		<ibm.mq.version>7.5.0.1</ibm.mq.version>
-
+		
 		<Netty.all-Ver>4.1.44.Final</Netty.all-Ver>
 		
 		<axis2-Ver>1.7.9</axis2-Ver>
@@ -71,11 +70,6 @@
 
 		<!-- 潘 systemPath 已經無效棄用 -->
 		<!-- mvn install:install-file -Dfile=./TBConvert.jar -DgroupId=com.AStar -DartifactId=TBConvert -Dversion=1.0.0 -Dpackaging=jar -->
-		<dependency>
-			<groupId>com.AStar</groupId>
-			<artifactId>TBConvert</artifactId>
-			<version>1.0.0</version>
-		</dependency>
 
         <!-- axis2 -->
 		<!-- https://mvnrepository.com/artifact/org.apache.axis2/axis2-kernel -->
@@ -134,6 +128,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>iFX</finalName>
 		<plugins>
 			<plugin>
 				<artifactId>maven-eclipse-plugin</artifactId>
@@ -174,7 +169,7 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<!-- <version>2.4</version> -->
 				<configuration>
-					<outputDirectory>C:\Users\Adam\Desktop\</outputDirectory>
+					<outputDirectory>C:\war\SKL\</outputDirectory>
 				</configuration>
 			</plugin>
 		</plugins>

@@ -469,7 +469,7 @@ var IfxHelp = (function() {
 			console.log("pos.top:" + pos.top);
 			console.log("c height:" + $("#" + currHelpFieldId).height());
 			console.log("props.y:" + props.y);
-			
+
 			if(isDrawRight)
 				$div.css({
 					left: pos.left + props.x + $("#" + currHelpFieldId).width() + 16,
@@ -533,7 +533,7 @@ var IfxHelp = (function() {
 				var pos = $("#" + controlId).offset();
 				$divTooltip.css({
 					left: pos.left - 6 + props.x,
-					top: pos.top - ($("#" + controlId).height() * 3 + props.y), // 柯更改成減 ()*3
+					top: ifx.dcFields[ifx.currentIndex].multiline ? pos.top - $("#" + controlId).height() + 125 : pos.top - ($("#" + controlId).height() * 3 + props.y), // 柯更改成減 ()*3
 					width: props.w,
 					height: props.h
 				}).show();

@@ -275,9 +275,9 @@ function addHotTab(title, url, bClosable) {
 function addTran(txcode, url, prefix, noclose) {
 	// $('#tt').tabs('select', 'Menu'); //TODO 註解後確認有無影響
 	// 計算tabs數量
-	var maxtabs = 10; // 交易開啟上限
+	var maxtabs = 20; // 交易開啟上限
 	var tabsconut = $('.tabs-wrap >ul >li').size();
-	if (tabsconut > maxtabs) {
+	if (tabsconut > maxtabs && url.indexOf("chain") == -1) {
 		alert("同時開啟頁籤超過上限(" + maxtabs + ") 請關閉頁籤後再試。");
 		return;
 	}
@@ -296,8 +296,14 @@ function addMenu() {
 		menuFrame = $('#menuFrame');
 	}
 }
+
 var menuFrame;
-// 目前無用?
+var whiteMenuLi = [];
+
+function isInMenu(txCode) {
+	return whiteMenuLi.indexOf(txCode) != -1;
+}
+
 function handle_txcode() {
 	$('#txcode').change(function () {
 		console.log("handle_txcode!!");
@@ -870,6 +876,7 @@ function loadmenu() {
 						$("#menu" + x.sbtype.substring(0, 2)).append(t);
 					}
 					t = '<button class="dropdown-item" type="button" onclick=\"addTran(\'' + x.txcd + '\',\'tran2.jsp?txcode=' + x.txcd + '\');\">' + x.txcd + '.' + $.trim(x.txnm) + '</button>';
+					whiteMenuLi.push(x.txcd.trim());
 					$("#" + x.sbtype).append(t);
 				} else
 					temp[x.sbtype] = x.sbtype.substring(2, 3) + "." + $.trim(x.txnm);
@@ -889,6 +896,7 @@ function loadmenu() {
 				}
 				*/
 			});
+
 			$("#sklMenu").append("</ul>");
 		},
 		error: function (e) {

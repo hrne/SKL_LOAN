@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -130,7 +131,7 @@ public class HostTran {
 				} else {
 					logger.info("Do Not change seq, set seq 0!");
 					tita = putSeqToTita(tita, 0);
-					this.titaVo.putSequenceToTita(0); // also change this.key
+					this.titaVo.putSequenceToTita(0); // also change this.key					
 				}
 			} else {
 				if (msgMode == 1) {
@@ -174,7 +175,7 @@ public class HostTran {
 			logger.info("* * * send key:" + FilterUtils.escape(sendKey));
 			try {
 				totaVoLi = sockSender.send(this.titaVo, titaTxcd);
-			} catch (InterruptedException | ConnectTimeoutException e) {
+			} catch (RuntimeException | InterruptedException | ConnectTimeoutException e) {
 				StringWriter errors = new StringWriter();
 				e.printStackTrace(new PrintWriter(errors));
 				logger.error(errors.toString());
@@ -189,13 +190,27 @@ public class HostTran {
 					session.setAttribute(GlobalValues.SESSION_SYSVAR_MAP, sessionMap);
 					session.setAttribute(GlobalValues.SESSION_SYSVAR, sessionasjson);
 				}
-				message = TTError.TT997 + "傳送失敗-" + e.getMessage() + "(socket)";
+				message = "中心連接失敗-" + (e instanceof RuntimeException ? TTError.TT995 + " 90s TimeOut" : e.getMessage());
 				writeLog(logFile, message, "TOTA");
 				TotaVo totaVo = new TotaVo(this.titaVo);
 				totaVo.setErrorMsg(message);
 				totaVoLi = new ArrayList<TotaVo>();
 				totaVoLi.add(totaVo);
 				this.updateJournal(false, "TT997", message, this.titaVo.getMrKey());
+				return false;
+			} catch (ConnectException e) {
+				StringWriter errors = new StringWriter();
+				e.printStackTrace(new PrintWriter(errors));
+				logger.error(errors.toString());
+				sockSender.closeChannel();
+
+				message = "中心連線失敗-Connection Failed";
+				writeLog(logFile, message, "TOTA");
+				TotaVo totaVo = new TotaVo(this.titaVo);
+				totaVo.setErrorMsg(message);
+				totaVoLi = new ArrayList<TotaVo>();
+				totaVoLi.add(totaVo);
+				this.updateJournal(false, "TT998", message, titaVo.getMrKey());
 				return false;
 			} catch (Exception e) {
 				StringWriter errors = new StringWriter();
@@ -214,7 +229,7 @@ public class HostTran {
 			}
 
 			if (Objects.isNull(totaVoLi)) {
-				message = TTError.TT999 + " 交易序號 : [" + seq + "] TotaVoLi Is Null";
+				message = TTError.TT999 + " 交易序號 : [" + seq + "] 中心無回應";
 				writeLog(logFile, message, "TOTA");
 				this.updateJournal(false, "TT999", message, this.titaVo.getMrKey());
 				return false;
@@ -266,6 +281,16 @@ public class HostTran {
 	private int getNextSeqAndSave(String lastSeq) {
 		logger.info("getNextSeqAndSave:" + FilterUtils.escape(lastSeq) + ".");
 		int seq = Integer.parseInt(lastSeq);
+		/*
+		if (GlobalValues.getEntDy() == null || GlobalValues.getEntDy().trim().isEmpty())
+			if (!Objects.isNull(this.titaVo.getEntDy()) && !this.titaVo.getEntDy().trim().isEmpty())
+				GlobalValues.setEntDy(this.titaVo.getEntDy().trim());
+		if (GlobalValues.getEntDy() != null && !GlobalValues.getEntDy().trim().isEmpty() && !Objects.isNull(this.titaVo.getEntDy()) && !this.titaVo.getEntDy().trim().isEmpty()
+				&& !GlobalValues.getEntDy().equals(this.titaVo.getEntDy().trim())) {
+			seq = 0;
+			GlobalValues.setEntDy(this.titaVo.getEntDy().trim());
+		}
+		*/
 		seq++;
 		if (seq > ContentName.maxHostSeq)
 			seq = ContentName.minHostSeq;

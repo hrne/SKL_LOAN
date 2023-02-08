@@ -194,6 +194,8 @@ var IfxHost = (function () {
 			_ifx.setValue("#TXTNO", settxtno);
 		}
 		var tita = buildTita(txcd, bRim, text);
+		try { tita = JSON.parse(text).ACTFG == "2" && JSON.parse(text).HCODE == "0" ? text : buildTita(txcd, bRim, text); } catch (e) { tita = buildTita(txcd, bRim, text); }
+
 		console.log("send times:" + sendTimes + ", msg mode:" + msgMode + "\ntita:" + tita);
 		// start 小柯 增 只是不想junal id 太多，故 此LCR07 比照 XX005 辦理不需要更新TXTNO
 		if (txcd == "LCR07") {
@@ -519,11 +521,7 @@ var IfxHost = (function () {
 				if (msgMode == 1) {
 					return false;
 				}
-				if (txcd[0] == "X") {
-					return (txcd[2] != "R");
-				} else {
-					return (txcd[1] != "R");
-				}
+				return (txcd[2] != "R");
 			}
 			// end
 			if (!bRim && jnlId == -1) { // first time

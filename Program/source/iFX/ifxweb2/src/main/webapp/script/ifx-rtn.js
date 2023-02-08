@@ -441,7 +441,7 @@
 		}
 
 		function valid(n) {
-			return (n % 10 == 0) ? true : false;
+			return (n % 5 == 0) ? true : false;
 		}
 
 		function cal(n) {
@@ -1819,7 +1819,13 @@
 					console.log("after //4->'' , //7->'  ' ");
 					ifx.setValue(target, IfxUtl.stringFormatter(tosetdata, ifx.getField(target).len));
 				} else {
-					ifx.setValue(target, ifx.getField(source).substing(offset - 1, len));
+					if (ifx.getField(target).dlen > 0) {
+						var dlen = ifx.getField(target).dlen;
+						var bAmt = ifx.getField(source).substing(offset - 1, len).substring(0, len - dlen);
+						var aAmt = ifx.getField(source).substing(offset - 1, len).slice(dlen * -1);
+						ifx.setValue(target, bAmt + "." + aAmt);
+					} else
+						ifx.setValue(target, ifx.getField(source).substing(offset - 1, len));
 				}
 				break;
 			case "2BIG":
@@ -3043,7 +3049,7 @@
 			ip = location.host.split(":"),
 			port = ip.length > 1 ? ip[1].substring(0, 3) + "5" : "7005";
 
-		var url = "http://" + ip[0] + ":" + port + "/iTX/mvc/hnd/download/file/" + value + "/1/_";
+		var url = "http://" + ip[0] + ":" + port + "/iTX/mvc/hnd/download/file/" + ifx.getValue('TLRNO$') + "/" + value + "/1/_";
 		//		var url = (ip == "192.168.10.8:7003" ?
 		//				"http://" + ip.substring(0, ip.length - 1) + "5/iTX/mvc/hnd/download/file/" + value + "/1" : "http://" + ip + ":7005/iTX/mvc/hnd/download/file/" + value + "/1");
 		$("#pdf-container").empty();
@@ -3057,31 +3063,37 @@
 		var loadingTask = pdfjsLib.getDocument(url);
 		loadingTask.promise.then(function (pdf) {
 			console.log('PDF loaded');
+			pdfSync();
 			// Fetch the first page
-			for (var pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
-				pdf.getPage(pageNumber).then(function (page) {
-					console.log('Page loaded');
-					var scale = 1.5;
-					var viewport = page.getViewport({
-						scale: scale
+			async function pdfSync() {
+				for (var pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+					await new Promise((resolve, reject) => {
+						pdf.getPage(pageNumber).then(function (page) {
+							console.log('Page loaded');
+							var scale = 1.5;
+							var viewport = page.getViewport({
+								scale: scale
+							});
+							// Prepare canvas using PDF page dimensions
+							//    var canvas = document.getElementById('the-canvas')
+							var canvas = document.createElement('canvas');
+							var context = canvas.getContext('2d');
+							canvas.height = viewport.height;
+							canvas.width = viewport.width;
+							// Render PDF page into canvas context
+							var renderContext = {
+								canvasContext: context,
+								viewport: viewport
+							};
+							var renderTask = page.render(renderContext);
+							renderTask.promise.then(function () {
+								console.log('Page rendered');
+								document.getElementById('pdf-container').appendChild(canvas);
+								resolve();
+							});
+						});
 					});
-					// Prepare canvas using PDF page dimensions
-					//    var canvas = document.getElementById('the-canvas')
-					var canvas = document.createElement('canvas');
-					var context = canvas.getContext('2d');
-					canvas.height = viewport.height;
-					canvas.width = viewport.width;
-					// Render PDF page into canvas context
-					var renderContext = {
-						canvasContext: context,
-						viewport: viewport
-					};
-					var renderTask = page.render(renderContext);
-					renderTask.promise.then(function () {
-						console.log('Page rendered');
-						document.getElementById('pdf-container').appendChild(canvas);
-					});
-				});
+				}
 			}
 		}, function (reason) {
 			// PDF loading error

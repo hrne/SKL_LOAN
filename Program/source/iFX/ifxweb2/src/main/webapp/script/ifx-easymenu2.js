@@ -1,8 +1,8 @@
 var MyMenu = MyMenu || {};
 MyMenu.tranUrl = 'tran2.jsp';
-MyMenu.getUrl = function(txcode) { 
-	return MyMenu.tranUrl + "?txcode=" + txcode; 
-};	
+MyMenu.getUrl = function(txcode) {
+	return MyMenu.tranUrl + "?txcode=" + txcode;
+};
 
 // BUG:chrome top.frames bug
 MyMenu.getTabFn = function(name) {
@@ -15,9 +15,9 @@ MyMenu.init = function() {
 	  var rootMenu = ["type,sbtype,enabled,txcd,txnm,dbucd,hodecd,chopcd,obucd,passcd,secno,tlrfg,drelcd,orelcd", "0,A,0,A    ,會計,0,0,0,0,0,0,0,0,0", "0,C,0,C    ,控制,0,0,0,0,0,0,0,0,0", "0,D,0,D    ,額度,0,0,0,0,0,0,0,0,0", "0,E,0,E    ,OBU債券,0,0,0,0,0,0,0,0,0", "0,F,0,F    ,資金,0,0,0,0,0,0,0,0,0", "0,G,0,G    ,共同,0,0,0,0,0,0,0,0,0", "0,H,0,H    ,SWIFT,0,0,0,0,0,0,0,0,0", "0,I,0,I    ,匯兌,0,0,0,0,0,0,0,0,0", "0,M,0,M    ,進口,0,0,0,0,0,0,0,0,0", "0,N,0,N    ,出口,0,0,0,0,0,0,0,0,0", "0,Q,0,P    ,存款,0,0,0,0,0,0,0,0,0", "0,Y,0,Y    ,測試,0,0,0,0,0,0,0,0,0", "0,Z,0,Z    ,放款,0,0,0,0,0,0,0,0,0"];
       //var url = "http://localhost:8080/ifxweb2/mvc/hnd/menu2/jsonp?menu=";
       var url = _contextPath+"/mvc/hnd/menu2/jsonp?menu=";
-      
+
       var $rootGetter = $.get(url);
-      
+
       $rootGetter.done(function(data){
     	  IfxMenu.setup('#tabs', url);
 //        IfxMenu.buildRoot(data); // 潘 首頁選單產生 改為樹狀選單
@@ -27,37 +27,37 @@ MyMenu.init = function() {
           var fn = MyMenu.getTabFn('registerIfxMenu');
           fn(IfxMenu);
       });
-      
+
       $rootGetter.fail(function(){
     	  alert("無法建立主選單, 請重新整理!");
       });
-     
-      
+
+
 };
 
 
 MyMenu.initTxCode = function() {
 	var jqTxcode = $('#txcode'),
-		fn = MyMenu.getTabFn('registerTran');
-	
-	
+		fn = MyMenu.getTabFn('registerTran'),
+		isInMenu = MyMenu.getTabFn('isInMenu');
+
+
+
 	fn('MENU', 'refresh', focusIt);
 	fn('MENU', 'resize', MyMenu.adjust );
 	setTimeout(function() {
 		jqTxcode.focus();
-	
+
 	}, 600);
 
-	
+
 	function focusIt() {
 		setTimeout(function() {
 			jqTxcode.focus();
-			MyMenu.adjust();				
+			MyMenu.adjust();
 		}, 100);
 
 	}
-	
-
 
 	jqTxcode.change(function() {
 		var s = $(this).val().toUpperCase();
@@ -71,8 +71,10 @@ MyMenu.initTxCode = function() {
 			$(this).val('');
 			$(this).blur();
 			console.log("uu:"+u+" ss:"+s);
-			parent.addTran(s, u);
-
+			if (isInMenu(s) || s.substring(0,2) == "LC")
+			  parent.addTran(s, u);
+			else
+				alert("無此交易或無此交易權限 " + s);
 		}
 
 	}).keyup(function() {  //keypress 改 keyup Chrome 和  IE還是一樣有問題 只改善"按住"的BUG
@@ -98,7 +100,7 @@ MyMenu.initSideBar = function() {
 		top : 42
 	}, function() {
 		// end
-		
+
 
 		sidemenu.enableAll(false);
 		sidemenu.enable("toggle_help_list");
@@ -120,7 +122,7 @@ var cache = {};
 MyMenu.autoComplete = function() {
 	var txcodeSource = [],
 		jqTxcode = $("#txcode");
-	
+
 	console.log("build txcodeSource");
 //	for ( var k in _tranMap) {
 //		var o = _tranMap[k];
@@ -135,7 +137,7 @@ MyMenu.autoComplete = function() {
 //		return 0;
 //
 //	});
-//	
+//
 	var ip = location.host.split(":");
 	var port = ip.length > 1 ? ip[1].substring(0, 3) + "5" : "7005";
 	var searchUrl = "http://" + ip[0] + ":" + port + "/iTX/mvc/hnd/txcd/jsonp";
@@ -173,7 +175,7 @@ MyMenu.autoComplete = function() {
 			          });
 			          console.log("data3 "+data );
 			          cache[ term ] = data.data;
-			          //柯 新增 start 
+			          //柯 新增 start
 			          if(term.length == 5){
 			          	jqTxcode.trigger("change");
 			          	}
@@ -197,7 +199,7 @@ MyMenu.autoComplete = function() {
 //	          });
 //	          console.log("data3 "+data );
 //	          cache[ term ] = data;
-//	          //柯 新增 start 
+//	          //柯 新增 start
 //	          if(term.length == 5){
 //	          	jqTxcode.trigger("change");
 //	          	}
@@ -226,7 +228,7 @@ MyMenu.autoComplete = function() {
 };
 MyMenu.adjust = function(){
 	console.log("menu adjust doc height1:"+$(document.body).height() );
-	
+
 	 var theFrame = $('#menuFrame', parent.document.body);
 	 var theCenter = $('#center', parent.document.body);
 	 console.log('center height:' + theCenter.height());
@@ -234,15 +236,15 @@ MyMenu.adjust = function(){
 	 console.log("menu iframe height1:"+theFrame.height() );
 	 theFrame.height(theCenter.height() - 30);
 	 console.log("menu iframe height2:"+theFrame.height() );
-	 
+
 };
 $(function() {
 	// startingPoint();
 	MyMenu.init();
 	$(window).resize(function() {
-		MyMenu.adjust();		
+		MyMenu.adjust();
 	});
-	
+
 	MyMenu.initTxCode();
 	MyMenu.autoComplete();
 });

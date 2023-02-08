@@ -202,6 +202,14 @@ public class TitaVo extends LinkedHashMap<String, String> {
 		this.put(ContentName.level, level);
 	}
 
+	public String getEntDy() {
+		return this.get(ContentName.entDy);
+	}
+
+	public void setEntDy(String entDy) {
+		this.put(ContentName.entDy, entDy);
+	}
+
 	public String getOrgTitaVO() {
 		return orgTitaVO;
 	}

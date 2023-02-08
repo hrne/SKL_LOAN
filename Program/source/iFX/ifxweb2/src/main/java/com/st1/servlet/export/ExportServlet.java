@@ -65,14 +65,9 @@ public class ExportServlet extends HttpServlet {
 
 			String title = URLDecoder.decode(request.getParameter("title"), "UTF-8");
 
-			logger.info(FilterUtils.escape("oper:" + oper));
-			logger.info(FilterUtils.escape("title:" + title));
-			logger.info(FilterUtils.escape("data:\n" + data));
-
-			if (data != null && data.length() > 0) {
+			if (data != null && data.length() > 0)
 				// cols = jsonParser.parse(data).getAsJsonArray();
 				cols = gson.fromJson(data, String[][].class);
-			}
 
 			if (oper != null && oper.length() > 0 && oper.equals("excel")) {
 				title = title.replaceAll("\\s+", "");

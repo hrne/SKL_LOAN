@@ -1,4 +1,4 @@
-var IfxGrid = (function() {
+var IfxGrid = (function () {
 	var data = null,
 		fieldMap = {},
 		gridDef = {},
@@ -30,19 +30,19 @@ var IfxGrid = (function() {
 		hiddengrid: false,
 	};
 	var cfg = {};
-	Grid.prototype.render = function(panel, controls, fnResize) {
+	Grid.prototype.render = function (panel, controls, fnResize) {
 		id = controls["grid"];
 		grid = $(id);
-		$(panel).slideDown(function() {
+		$(panel).slideDown(function () {
 			afterShow(controls);
 			if (fnResize != null && typeof fnResize == 'function') {
 				setTimeout(fnResize, 0);
 			}
 		});
 	};
-	Grid.prototype.refreshGrid = function(panel, newData, goLastPage, nouse) {
-		var id = data[data.length-1].id;
-		for(var i =0; i < newData.length; i++){
+	Grid.prototype.refreshGrid = function (panel, newData, goLastPage, nouse) {
+		var id = data[data.length - 1].id;
+		for (var i = 0; i < newData.length; i++) {
 			id++;
 			newData[i].id = id;
 		}
@@ -82,14 +82,14 @@ var IfxGrid = (function() {
 
 		$(panel).slideDown();
 	};
-	Grid.prototype.getCheckedRow = function(controls) {
+	Grid.prototype.getCheckedRow = function (controls) {
 		grid = $(controls["grid"]);
 		var ss = grid.jqGrid('getGridParam', 'selarrrow');
 		var selectedData = [];
 		var len = ss.length;
 		var thisdata = grid.jqGrid('getRowData');
-		$.each(ss, function(i, x) {
-			$.each(thisdata, function(j, v) {
+		$.each(ss, function (i, x) {
+			$.each(thisdata, function (j, v) {
 				if (v.id == x) {
 					selectedData.push(v);
 				}
@@ -100,26 +100,26 @@ var IfxGrid = (function() {
 		// });
 		return selectedData;
 	};
-	Grid.prototype.deleterowGrid = function(rows) {
+	Grid.prototype.deleterowGrid = function (rows) {
 		console.log("delRowData" + rows);
 		grid.jqGrid("delRowData", rows);
 	};
 
 	function injectBtnActions() {
-		$('.chainAction').unbind().click(function() {
+		$('.chainAction').unbind().click(function () {
 			callChain($(this));
 		});
 	}
-	Grid.prototype.unload = function() {
+	Grid.prototype.unload = function () {
 		grid.GridUnload2(id);
 	};
 	// add grid map back
 	var _mapBack = null;
-	Grid.prototype.setMapper = function(m) {
+	Grid.prototype.setMapper = function (m) {
 		_mapBack = m;
 	};
 	var _ifxHandlerMap = {};
-	Grid.prototype.registerHandler = function(handlerMap) {
+	Grid.prototype.registerHandler = function (handlerMap) {
 		_ifxHandlerMap = handlerMap;
 	};
 
@@ -137,7 +137,7 @@ var IfxGrid = (function() {
 		doclick(controls);
 		// TODO 使用
 	}
-	window.dupGrid = function() {
+	window.dupGrid = function () {
 		return {
 			gridDef: gridDef,
 			fieldMap: fieldMap,
@@ -173,7 +173,7 @@ var IfxGrid = (function() {
 				hidden: true
 			};
 		result.push(id);
-		_.each(gridDef.fields, function(x) {
+		_.each(gridDef.fields, function (x) {
 			result.push((colNames[i++] == undefined) ? hidden : toModelItem(x));
 		});
 		return result;
@@ -186,16 +186,16 @@ var IfxGrid = (function() {
 			prefix: ""
 		}
 	};
-	var initDatepicker = function(elem) {
+	var initDatepicker = function (elem) {
 		$(elem).datepicker({
 			dateFormat: 'yy/mm/dd',
 			autoSize: true,
 			changeYear: true,
 			changeMonth: true,
 			showButtonPanel: true,
-			onSelect: function(dateText, inst) {
+			onSelect: function (dateText, inst) {
 				if (this.id.substr(0, 3) === "gs_") {
-					setTimeout(function() {
+					setTimeout(function () {
 						grid[0].triggerToolbar();
 					}, 50);
 				} else {
@@ -210,7 +210,7 @@ var IfxGrid = (function() {
 		$(".ui-datepicker").draggable();
 		$(".ui-datepicker").resizable();
 	};
-	var initROCDatepicker = function(elem) {
+	var initROCDatepicker = function (elem) {
 		$(elem).datepicker({
 			dateFormat: 'yy/mm/dd',
 			autoSize: true,
@@ -218,7 +218,7 @@ var IfxGrid = (function() {
 			changeMonth: true,
 			showButtonPanel: true,
 			showWeek: false,
-			onSelect: function(dateText, inst) {
+			onSelect: function (dateText, inst) {
 				var ss = dateText.split('/');
 				var newVal = '' + (parseInt(ss[0], 10) - 1911) + '/' + ss[1] + '/' + ss[2];
 				$(elem).val(newVal);
@@ -277,11 +277,16 @@ var IfxGrid = (function() {
 				index: x.name,
 				sortable: true,
 				canExport: true,
+				exportValue: "",
 				align: (numeric ? 'right' : 'left'),
 			};
 		// 原本應該要給var設定,但怕sa遺漏,故還是幫忙加入
 		// 別的型態是否也要幫忙擋住canExport ?
 		if (x.opt && x.opt.formatter && x.opt.formatter.indexOf("bind-button") != -1) {
+			if (o['canExport'] == true) {
+				var exportValue = x.opt.formatter.substring(x.opt.formatter.indexOf("bind-button:") + 12).split(";");
+				o['exportValue'] = exportValue ? exportValue[0] : "";
+			}
 			o['canExport'] = false; // default 'text'
 		}
 		if (x.formatter == 'checkbox') alert("check:" + x.name);
@@ -299,31 +304,31 @@ var IfxGrid = (function() {
 		return _.extend(o, opt);
 	}
 	var custFormatterMapper = {
-		trimZero: function(x) {
+		trimZero: function (x) {
 			return x.replace(/^(0)+/, '');
 		},
-		ltrimZero: function(x) {
+		ltrimZero: function (x) {
 			return x.replace(/^(0)+?\d/, '');
 		},
-		rtrimZero: function(x) {
+		rtrimZero: function (x) {
 			return x.replace(/(0)+$/, '');
 		},
-		editpat: function(x, arr) {
+		editpat: function (x, arr) {
 			return editpatFormatter(x, arr.join(''));
 		},
-		action_link: function(x, arr, options, rowObject) {
+		action_link: function (x, arr, options, rowObject) {
 			return actionFormater('link', x, arr, options, rowObject);
 		},
-		action_button: function(x, arr, options, rowObject) {
+		action_button: function (x, arr, options, rowObject) {
 			return actionFormater('button', x, arr, options, rowObject);
 		},
-		chain: function(x, arr, options, rowObject) {
+		chain: function (x, arr, options, rowObject) {
 			return chainFormater(x, arr, options, rowObject);
 		},
-		'bind-button': function(x, arr, options, rowObject) {
+		'bind-button': function (x, arr, options, rowObject) {
 			return bindFormater('button', x, arr, options, rowObject);
 		},
-		openNew: function(x, arr, options, rowObject) {
+		openNew: function (x, arr, options, rowObject) {
 			return openNewFormatter(x, arr, options, rowObject);
 		}
 	};
@@ -331,7 +336,7 @@ var IfxGrid = (function() {
 	function editpatFormatter(value, pat) {
 		var r = '',
 			offset = 0;
-		_.each(pat.split(''), function(x) {
+		_.each(pat.split(''), function (x) {
 			r += (x == '#') ? value.charAt(offset++) : x;
 		});
 		return r;
@@ -455,7 +460,7 @@ var IfxGrid = (function() {
 	function argv2map(argv, rowObject) {
 		var o = {},
 			p;
-		_.each(argv, function(x) {
+		_.each(argv, function (x) {
 			p = makepair(x);
 			if (p.snd.charAt(0) == '#') p.snd = rowObject[p.snd];
 			o[p.fst] = p.snd;
@@ -473,7 +478,7 @@ var IfxGrid = (function() {
 
 	function actionFormater(uiType, cellvalue, argv, options, rowObject) {
 		var drawer = (uiType == 'link') ? drawLink : drawButton,
-			result = _.map(argv, function(x) {
+			result = _.map(argv, function (x) {
 				return drawer(makepair(x), rowObject);
 			});
 		return result.join('');
@@ -485,7 +490,7 @@ var IfxGrid = (function() {
 			alert("no such cust:formatter:" + x);
 			return null;
 		}
-		var fn = function(cellvalue, options, rowObject) {
+		var fn = function (cellvalue, options, rowObject) {
 			return realFn(cellvalue, arr, options, rowObject);
 		};
 		return fn;
@@ -524,10 +529,10 @@ var IfxGrid = (function() {
 		var ie = /MSIE/.test(navigator.userAgent);
 		var oldFrom = $.jgrid.from,
 			lastSelected;
-		$.jgrid.from = function(source, initalQuery) {
+		$.jgrid.from = function (source, initalQuery) {
 			var result = oldFrom.call(this, source, initalQuery),
 				old_select = result.select;
-			result.select = function(f) {
+			result.select = function (f) {
 				lastSelected = old_select.call(this, f);
 				return lastSelected;
 			};
@@ -536,7 +541,7 @@ var IfxGrid = (function() {
 		colNames = _.pluck(gridDef.fields, 'caption');
 		var getValuefn = getIfxFn('getValue');
 		// 柯 新增 grid 欄位名稱可帶入變數
-		$.each(colNames, function(i, x) {
+		$.each(colNames, function (i, x) {
 			if (x) {
 				var fldid = x.toString().trim();
 				if (fldid.slice(0, 1) == "#") {
@@ -549,25 +554,25 @@ var IfxGrid = (function() {
 		var rowList = [];
 		if (ie) {
 			colModel = makeModel(colNames);
-			_.each(cfg.rowList, function(r) {
+			_.each(cfg.rowList, function (r) {
 				rowList.push(r);
 			});
 		} else {
 			if (colModel == undefined) colModel = makeModel(colNames);
 			rowList = cfg.rowList;
 		}
-		_.each(colModel, function(o) {
+		_.each(colModel, function (o) {
 			console.dir(o);
 			console.dir(o.searchoptions);
 		});
 		mydata = [];
-		_.each(data, function(d) {
+		_.each(data, function (d) {
 			mydata.push(d);
 		});
 		/* 潘 為了折返後追加之前的資料長度 */
 		rId = mydata.length;
 		var footerRowWanted = false;
-		$.each(colModel, function(i, x) {
+		$.each(colModel, function (i, x) {
 			if (x.sum) {
 				footerRowWanted = true;
 				return false;
@@ -614,7 +619,7 @@ var IfxGrid = (function() {
 			multiselect: cfg.ifxBatch || false,
 			hiddengrid: cfg.hiddengrid,
 			footerrow: footerRowWanted,
-			loadComplete: function(data) {
+			loadComplete: function (data) {
 				// TODO 可能需要限定不能取消勾選
 				/*
 				 * var cbs = $("tr.jqgrow > td > input.cbox:even", grid[0]); cbs.attr("disabled",
@@ -624,16 +629,16 @@ var IfxGrid = (function() {
 				this.p.lastSelected = lastSelected; // set this.p.lastSelected
 				injectBtnActions();
 			},
-			beforeSelectRow: function(id, e) {
+			beforeSelectRow: function (id, e) {
 				if (cfg.setSelectAll && cfg.noCancel) {
 					return false;
 				}
 				return true;
 			},
-			onSelectRow: function(id) {
+			onSelectRow: function (id) {
 				if (_mapBack) { // 潘
 					var fn = getIfxFn('mapBack');
-					if(id.indexOf("jqg") != -1){
+					if (id.indexOf("jqg") != -1) {
 						var ss = id.replace("jqg", "");
 						ss = parseInt(ss, 10);
 						ss = ss + rId - 2;
@@ -647,17 +652,17 @@ var IfxGrid = (function() {
 				}
 				// grid.jqGrid('setSelection',id, true);
 			}, // 給特殊雙表格使用
-			onSelectAll: function(id, status) {
+			onSelectAll: function (id, status) {
 				if (_specialsum) {
 					setCrdbenAmt();
 				}
 			},
-			onSortCol: function() {},
-			gridComplete: function() {
+			onSortCol: function () { },
+			gridComplete: function () {
 				// injectBtnActions();
 				if (footerRowWanted) {
 					var colName, colSum, nv;
-					$.each(colModel, function(i, x) {
+					$.each(colModel, function (i, x) {
 						if (!x.sum) return true;
 						colName = x.name;
 						nv = {};
@@ -683,7 +688,7 @@ var IfxGrid = (function() {
 				if (cfg.setSelect && cfg.ifxBatch) {
 					var allRowsInGrid = grid.jqGrid('getGridParam', 'data');
 					var thisdata = grid.jqGrid('getRowData');
-					$.each(allRowsInGrid, function(i, x) {
+					$.each(allRowsInGrid, function (i, x) {
 						if (x[cfg.setSelect].toUpperCase() == "Y") {
 							grid.jqGrid('setSelection', x.id, true);
 						}
@@ -727,7 +732,7 @@ var IfxGrid = (function() {
 			modal: false,
 			loadOnStart: false,
 			resize: true,
-			beforeShowSearch: function($form) {
+			beforeShowSearch: function ($form) {
 				// because beforeShowSearch will be called on all open Search Dialog,
 				// but the old dialog can be only hidden and not destroyed
 				// we test whether we already bound the 'keydown' event
@@ -738,7 +743,7 @@ var IfxGrid = (function() {
 						return;
 					}
 				}
-				$('.vdata', $form).keydown(function(e) {
+				$('.vdata', $form).keydown(function (e) {
 					var key = e.charCode ? e.charCode : e.keyCode ? e.keyCode : 0;
 					if (e.which == 13) { // save
 						// $(".ui-search", $form).click();
@@ -794,8 +799,8 @@ var IfxGrid = (function() {
 
 	function initButtons(controls) {
 		// 柯 增 start
-		for(var i = 0; i < 10; i++)
-			  $(controls.batch + i).hide();
+		for (var i = 0; i < 10; i++)
+			$(controls.batch + i).hide();
 
 		if (cfg.ifxBatch) {
 			var btnName = cfg.ifxBatch.name.split(";");
@@ -803,26 +808,26 @@ var IfxGrid = (function() {
 
 			btnName.forEach((x) => {
 				$(controls.batch + btnIndex).attr("disabled", false);
-			  $(controls.batch + btnIndex).attr("style", "color:blue");
-			  $(controls.batch + btnIndex).show();
-			  btnIndex++;
-            })
+				$(controls.batch + btnIndex).attr("style", "color:blue");
+				$(controls.batch + btnIndex).show();
+				btnIndex++;
+			})
 			// $('#btn_yn').hide();
-		}else
-			for(var i = 0; i < 10; i++)
-			  $(controls.batch + i).hide();
+		} else
+			for (var i = 0; i < 10; i++)
+				$(controls.batch + i).hide();
 
 
 		// end
 		if (cfg.search) {
 			$(controls.search).button().show();
-			$(controls.search).off("click").click(function() {
+			$(controls.search).off("click").click(function () {
 				grid.jqGrid('searchGrid', {
 					sopt: ['cn', 'bw', 'eq', 'ne', 'lt', 'gt', 'ew']
 				});
 			});
 			$(controls.reset).button().show();
-			$(controls.reset).off("click").click(function() {
+			$(controls.reset).off("click").click(function () {
 				grid.jqGrid('setGridParam', {
 					search: false
 				});
@@ -839,7 +844,7 @@ var IfxGrid = (function() {
 		if (cfg.viewInNewWindow) {
 			if (controls.newWin) {
 				$(controls.newWin).button().show();
-				$(controls.newWin).off("click").click(function() {
+				$(controls.newWin).off("click").click(function () {
 					var $jq = $(this),
 						url = $jq.attr('data-url');
 					var settings = 'menubar=no, toolbar=no, location, directories, status, scrollbars, resizable, dependent, width=1400, height=900, left=0, top=0';
@@ -853,7 +858,7 @@ var IfxGrid = (function() {
 		// KE:目前功能只FOR表格1使用 匯出 XML檔案
 		if (cfg.exportXml && controls.exportXml && controls.exportXml.slice(-1) != "2") {
 			$(controls.exportXml).button().show();
-			$(controls.exportXml).off("click").click(function() {
+			$(controls.exportXml).off("click").click(function () {
 				var dataFromGrid = {
 					gridRow: grid.jqGrid('getGridParam', 'data')
 				};
@@ -865,7 +870,7 @@ var IfxGrid = (function() {
 				// XE973 特殊規格 友達獨立輸出
 				var ex2eachxml = cfg.ex2eachxml;
 				if (ex2eachxml) {
-					$.each(dataFromGrid.gridRow, function(i, x) {
+					$.each(dataFromGrid.gridRow, function (i, x) {
 						makexmldata([x], (i + 1).toString(), parseInt(ex2eachxml, 10)); // 柯:
 						// 給他括號
 						// 統一(typeof(v)
@@ -906,13 +911,13 @@ var IfxGrid = (function() {
 		// KE:目前功能只FOR表格1使用 匯出 EXCEL檔案
 		if (cfg.exportExcel && controls.exportExcel && controls.exportExcel.slice(-1) != "2") {
 			$(controls.exportExcel).button().show();
-			$(controls.exportExcel).off("click").click(function() {
+			$(controls.exportExcel).off("click").click(function () {
 				var $jq = $(this),
 					url = $jq.attr('data-url');
 				var a = getExportData();
 				if ($(controls.queryHeader).is(":visible")) {
 					var temp2 = null;
-					temp2 = $(controls.queryHeader + ' tbody  tr').map(function() {
+					temp2 = $(controls.queryHeader + ' tbody  tr').map(function () {
 						// $(this) is used more than once; cache it
 						// for performance.
 						var $row = $(this);
@@ -926,12 +931,12 @@ var IfxGrid = (function() {
 						// var datatext =
 						// $row.find(':nth-child(2)').find(':input').val();
 						var datatext = "";
-						$row.find(':nth-child(2)').children().each(function() { // 柯:右邊只找"欄位"(INPUT)
+						$row.find(':nth-child(2)').children().each(function () { // 柯:右邊只找"欄位"(INPUT)
 							datatext += $(this).val() || $(this).text();
 						});
 						var datahead2 = $row.find(':nth-child(3)').text();
 						var datatext2 = "";
-						$row.find(':nth-child(4)').children().each(function() { // 柯:右邊只找"欄位"(INPUT)
+						$row.find(':nth-child(4)').children().each(function () { // 柯:右邊只找"欄位"(INPUT)
 							datatext2 += $(this).val() || $(this).text();
 						});
 						if (datahead) {
@@ -1000,10 +1005,10 @@ var IfxGrid = (function() {
 		if (getIfxFn('moreData')) {
 			var $btnMoreData = $(controls.moreData);
 			$btnMoreData.button().show();
-			setTimeout(function() {
+			setTimeout(function () {
 				$btnMoreData.effect('pulsate', {}, 2000);
 			}, 0);
-			$btnMoreData.off("click").click(function() {
+			$btnMoreData.off("click").click(function () {
 				var fn = getIfxFn('moreData');
 				fn();
 			});
@@ -1031,7 +1036,7 @@ var IfxGrid = (function() {
 			//			}
 			var btnIndex = 0;
 			btnName.forEach((x) => {
-				$(controls.batch + btnIndex).val(x).button().show().off("click").click(function(btn) {
+				$(controls.batch + btnIndex).val(x).button().show().off("click").click(function (btn) {
 					var ss = grid.jqGrid('getGridParam', 'selarrrow');
 					var selectedData = [];
 					var len = ss.length;
@@ -1052,9 +1057,15 @@ var IfxGrid = (function() {
 							return;
 						}
 					}
+					
+					//排序
+					ss.sort((a, b) => {
+						return parseInt(a, 10) - parseInt(b, 10);
+					});
+					
 					// 20171222 待測試
-					$.each(ss, function(i, x) {
-						$.each(mydata, function(j, v) {
+					$.each(ss, function (i, x) {
+						$.each(mydata, function (j, v) {
 							if (v.id == x) {
 								selectedData.push(v);
 							}
@@ -1064,7 +1075,7 @@ var IfxGrid = (function() {
 					// $.each(ss,function(i,x){
 					// selectedData.push(mydata[x]);
 					// });
-					$.each(selectedData, function(i, x) {
+					$.each(selectedData, function (i, x) {
 						console.dir(x);
 						// 柯 新增 for 上傳交易的每行狀態 start
 						if (cfg.ifxBatch.type == "5") {
@@ -1111,18 +1122,27 @@ var IfxGrid = (function() {
 				type.push(fieldMap[m.name]);
 			}
 		}
-		var result = _.map(data, function(d) {
+		var result = _.map(data, function (d) {
 			// return _.pick(d, names);
 			var r = [];
-			_.each(names, function(n) {
-				// r.push((d[n] != null) ? d[n].replace(/\4/g, '').replace(/\7/g, ''):"");
-				// //移除表格匯出時,var沒有使用c型態時所產生的問題
-				r.push(d[n]);
+			_.each(names, function (n) {
+				try {
+					if (typeof d[n] == "object" || typeof JSON.parse(d[n]) == "object") {
+						colModel.forEach((x) => {
+							if (x.name == n) {
+								r.push(x.exportValue);
+							}
+						});
+					} else
+						r.push(d[n]);
+				} catch (e) {
+					r.push(d[n]);
+				}
 			});
 			return r;
 		});
 		var r = [];
-		_.map(type, function(d) {
+		_.map(type, function (d) {
 			r.push(d.type);
 		});
 		result.push(r);
@@ -1131,7 +1151,7 @@ var IfxGrid = (function() {
 	}
 
 	function myXmlJsonClass(o, tab, notify) {
-		var toXml = function(v, name, ind, notify) {
+		var toXml = function (v, name, ind, notify) {
 			var xml = "";
 			var i, n;
 			if (v instanceof Array) {
@@ -1143,7 +1163,7 @@ var IfxGrid = (function() {
 						xml += sXml;
 					}
 				}
-			} else if (typeof(v) === "object") {
+			} else if (typeof (v) === "object") {
 				var hasChild = false;
 				if (!notify) {
 					xml += ind + "<" + name;
@@ -1205,7 +1225,7 @@ var IfxGrid = (function() {
 					}
 					xml += "\n";
 				}
-			} else if (typeof(v) === "function") {
+			} else if (typeof (v) === "function") {
 				xml += ind + "<" + name + ">" + "<![CDATA[" + v + "]]>" + "</" + name + ">";
 			} else {
 				if (v.toString() === "\"\"" || v.toString().length === 0) {

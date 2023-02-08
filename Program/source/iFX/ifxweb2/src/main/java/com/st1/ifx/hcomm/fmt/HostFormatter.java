@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.st1.ifx.twnb.AStarLoadUtils;
 import com.st1.servlet.GlobalValues;
 
 public class HostFormatter {
@@ -139,12 +138,8 @@ public class HostFormatter {
 		String t = "", label = "";
 		byte[] bb = null;
 		try {
-			if (GlobalValues.bR6) {
-				bb = AStarLoadUtils.convertUnicodeStrToIBM937Bytes(text);
-			} else {
-				// bb = text.getBytes("big5");
-				bb = text.getBytes("UTF-8");
-			}
+			// bb = text.getBytes("big5");
+			bb = text.getBytes("UTF-8");
 			logger.info("text:" + text + ",bb:" + bb);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();

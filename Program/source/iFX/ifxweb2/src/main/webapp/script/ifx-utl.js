@@ -1894,7 +1894,7 @@ function blockIt(title, message) {
 		title: title,
 		message: message
 	});
-	setTimeout($.unblockUI, 70 * 1000);
+	setTimeout($.unblockUI, 100 * 1000);
 }
 
 function blockAWhile(message, timeout, css) {

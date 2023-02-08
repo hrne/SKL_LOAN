@@ -281,7 +281,7 @@ _fldFn.formatValue = function (v) {
 			if (!o.status) {
 				console.log("checkChinese too len:" + this.name);
 				if (this.attr != "O" && this.attr != "S") { // 潘 type S or O 不用丟訊息直接截掉
-					if (confirm("輸入資料超過限制(限" + (this.skipln || this.len) + "字元),是否刪除多餘字串?" + "\n刪除後字串:[" + o.cut + "]")) {
+					if (confirm("輸入資料超過限制(限" + (this.skipln || this.len) + "字元，全形字佔２字元),是否刪除多餘字串?" + "\n刪除後字串:[" + o.cut + "]")) {
 						console.log(this.name + " -len: " + v + " -> " + o.cut);
 						v = o.cut;
 					} else {

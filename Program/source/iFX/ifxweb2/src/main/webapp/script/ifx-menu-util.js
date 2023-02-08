@@ -3,14 +3,14 @@ var IfxMenu = (function($) {
 	var _m = {};
 	var _url;
 	var _loaded = {};
-	
+
 	$(document).keydown(function(evt){
 	    console.log(evt);
 	    if(evt.key == "F4"){
 	      parent.addTran("LC101", MyMenu.getUrl("LC101"));
 	    }
 	});
-	
+
 	function setup(divName, url) {
 		$divMenu = $(divName);
 		_url = url;
@@ -171,12 +171,12 @@ var IfxMenu = (function($) {
 			return sortroot[a.sbtype] - sortroot[b.sbtype]
 		});
 		//createMainTab(root); 	//潘
-		
+
 		var temp ={};
 		$.each(root, function(i, x) {
 			temp[$.trim(x.txcd)] = $.trim(x.txcd) + "." + $.trim(x.txnm);
 		});
-		
+
 		return temp;
 	}
 

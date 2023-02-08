@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PostConstruct;
@@ -143,6 +144,7 @@ public class SockSender {
 		String result = null;
 
 		this.channel = nettyChannelPool.syncGetChannel(titaVo.getTxCode());
+		IntegerFactory.getInstance().compareAndSet(maxHostTranC, 0);
 		int seq = IntegerFactory.getInstance().incrementAndGet();
 		ChannelUtils.putCallback2DataMap(channel, seq, callbackService);
 
@@ -156,13 +158,13 @@ public class SockSender {
 			this.channel.writeAndFlush(byteBuf);
 
 			logger.info("Befor Wait CallbackService.....");
-			callbackService.wait(80000);
+			callbackService.wait(90000);
 			logger.info("After Wait CallbackService.....");
 
 			ByteBuf resbytes = callbackService.result;
 
 			if (Objects.isNull(resbytes))
-				return null;
+				throw new RuntimeException("Over 90s No Response");
 
 			int rSeq = resbytes.readInt();
 			int rLen = resbytes.readInt();

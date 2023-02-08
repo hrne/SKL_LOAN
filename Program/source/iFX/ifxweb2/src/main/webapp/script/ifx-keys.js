@@ -82,6 +82,8 @@ var IfxKeys = (function () {
 				}
 			} else if (kcode == Keys.K_TAB && oEvent.shiftKey) {
 				return "S.TAB";
+			} else if (kcode == Keys.K_ENTER && oEvent.shiftKey) {
+				return "S.ENT";
 			}
 			// ���B�z Alt,Ctrl, Shift  + key
 			return 0;
@@ -189,6 +191,9 @@ var IfxKeys = (function () {
 		this.map[Keys.K_F7] = Keys.VK_RESUME;
 		this.map[Keys.K_F9] = Keys.VK_EXPLAIN;//開起說明網頁 ifx/runtime/explain/交易代號
 		this.map[Keys.K_F10] = Keys.VK_SUBMIT;  //送出交易
+
+		this.map["S.ENT"] = Keys.VK_NEXTFIELD;
+
 		this.map["C.F7"] = Keys.VK_DUMP1;
 		this.map["C.F8"] = Keys.VK_DUMP2;
 		this.map["C.F6"] = Keys.VK_DUMP3;
@@ -227,9 +232,11 @@ var IfxKeys = (function () {
 				return;
 			}
 
-			if ($target.is("textarea") && (event.keyCode == Keys.K_ENTER || event.keyCode == Keys.K_DOWN)) {
+			if ($target.is("textarea") && (event.shiftKey && event.keyCode == Keys.K_ENTER || event.keyCode == Keys.K_DOWN)) {
 				console.log("textarea");
 				if (!IfxUtl.atLastLine(event, $target, event.keyCode == Keys.K_ENTER)) {
+					if (event.keyCode == Keys.K_ENTER)
+						$target.val().substring(0, $target[0].selectionStart) + "\n" + $target.val().substring($target[0].selectionStart);
 					return;
 				}
 				event.preventDefault();

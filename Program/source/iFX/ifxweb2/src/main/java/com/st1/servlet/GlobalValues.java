@@ -120,6 +120,7 @@ public class GlobalValues {
 	private static String envFile = "env.txt";
 	private static String menuHtml;
 	private static String fileRepos;
+	private static String entDy;
 
 	// 中文轉數字
 	public static HashMap<Integer, String> fourcoCode;
@@ -190,6 +191,14 @@ public class GlobalValues {
 
 	public static void setOtherMqAddr(String otherMqAddr) {
 		GlobalValues.otherMqAddr = otherMqAddr;
+	}
+
+	public static String getEntDy() {
+		return entDy;
+	}
+
+	public static void setEntDy(String entDy) {
+		GlobalValues.entDy = entDy;
 	}
 
 	public static void setIfxFolder(String fxworkFile, String fxtxWrite) {

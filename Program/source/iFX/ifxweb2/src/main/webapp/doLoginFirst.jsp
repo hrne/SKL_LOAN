@@ -241,8 +241,8 @@ td:last-child{
 	%>
 	    </tr>
 	    <tr><td colspan="2" align="right"><input class="button" type="submit" name="submit0" id="submit0" value="確定"/></td></tr>
-	    <input type="text" id="user" name="user" value="<%= user%>" style="display:none"/>
-	    <input type="text" id="password" name="password" value="<%= password%>" style="display:none"/>
+	    <input type="text" id="user" name="user" value="" style="display:none"/>
+	    <input type="text" id="password" name="password" value="" style="display:none"/>
 	    <input type="text" id="AuthNo" name="AuthNo" value="" style="display:none"/>
 	    <input type="text" id="AuthItem" name="AuthItem" value="" style="display:none"/>
 	    <input type="text" id="AgentNo" name="AgentNo" value="" style="display:none"/>
@@ -254,7 +254,12 @@ td:last-child{
 </body>
 <script>
 	var count = "<%= li.size()%>";
+	var pawd = "<%= password%>";
+	var ur = "<%= user%>";
 	function init(){
+	  $("#user").val(ur);
+	  $("#password").val(pawd);
+		
 	  $("#AuthNo").val($("#radio0").val());
 	  $("#AgentNo").val($("#AgentNo0").val());
     $("#AuthItem").val($("input[type='radio']:checked").parent().text().trim());

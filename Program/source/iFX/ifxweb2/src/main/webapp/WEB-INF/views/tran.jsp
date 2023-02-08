@@ -95,7 +95,7 @@
             <div id="swift_text"></div>
         </div>
     </div>
-    <div id="dialog-notice" style="font-family:Microsoft JhengHei; display: none;"></div>
+    <div id="dialog-notice" style="font-family:細明體; display: none;"></div>
     <div id="dialog-message" title="Eror" style='display: none'>
         <p>
             <span class="ui-icon ui-icon-circle-check" style="float: left; margin: 0 7px 50px 0;"></span>
@@ -205,8 +205,8 @@
 				"_IFX_<%=request.getContextPath()%>/css/site.css",
 
 				// "_IFX_<%=request.getContextPath() %>/script/watermark.js",
-				"_IFX_<%=request.getContextPath() %>/script/pdfjs-2.4.456/pdf.js",
-				"_IFX_<%=request.getContextPath() %>/script/pdfjs-2.4.456/pdf.worker.js",
+				"_IFX_<%=request.getContextPath() %>/script/pdfjs-3.3.122/pdf.js",
+				"_IFX_<%=request.getContextPath() %>/script/pdfjs-3.3.122/pdf.worker.js",
 				"_IFX_<%=request.getContextPath() %>/script/datePickerTW/JQueryDatePickerTW.js",
 				"_IFX_<%=request.getContextPath() %>/script/alertify/src/alertify.js",
 				"<%=request.getContextPath() %>/script/alertify/css/alertify.css",

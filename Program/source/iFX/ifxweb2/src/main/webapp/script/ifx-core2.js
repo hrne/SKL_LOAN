@@ -77,6 +77,7 @@ var Ifx = (function ($) {
 		this.initFields();
 		this.pageScrollHeight = 0;
 		this.tradeReason = "";
+		this.superVisorR = "";
 		this.ntxbufT = {};
 		var self = this;
 		this.def.docs = refactorPfns();
@@ -1297,6 +1298,9 @@ var Ifx = (function ($) {
 		_self.timeoutt(0);
 		console.log("this.istimeout:" + this.istimeout);
 		if (_self.currentIndex == _self.ynIndex) {
+			if (_self.getValue("#HCODE") == 1)
+				_self.setValue("#TRMTYP", "00");
+
 			// 顯示提示警告文字，含確定取消功能
 			if (checkWarnbefore()) {
 				return;
@@ -1305,13 +1309,7 @@ var Ifx = (function ($) {
 			if (checkSupervisorOvr()) {
 				return;
 			}
-			// 潘 電文放行驗證碼檢核 綁定xw200 xw400 #queue變數
-			if (_self.txcd == "XW200" || _self.txcd == "XW400") {
-				if (_self.getValue('#QUEUE') != "A" && !Captcha()) {
-					this.focus();
-					return;
-				}
-			}
+
 			console.log("Maybe first block!!!!");
 			_self.block("Submit ...."); // 柯 經測試可能不出現
 			_self.diyblock("Submit ...."); // 補這行
@@ -1908,13 +1906,15 @@ var Ifx = (function ($) {
 
 	function ovrTransmit(supId, rqspReasons) {
 		_rqspReasons = rqspReasons.join(";");
+		_self.superVisorR = _rqspReasons;
+		_self.setValue("RQSP$", _rqspReasons);
 		_self.setValue("SUPNO$", supId);
 		// LAI提新增 KINBR進去給原先前面四位空白
 		var kinbrstr = _self.getValue("#KINBR");
 		_self.setValue("#EMPNOS", supId);
-		if (_self.hostOvrMode) {
+		if (_self.hostOvrMode)
 			_self.setValue("#HSUPCD", 1);
-		}
+
 		// 此段給有可能 主管放行後才需要特殊功能 START
 		_self.block("Submit ...."); // 柯 經測試可能不出現
 		_self.diyblock("Submit ...."); // 補這行
@@ -2599,7 +2599,7 @@ var Ifx = (function ($) {
 		var port = ip.length > 1 ? ip[1].substring(0, 3) + "5" : "7005";
 		var url;
 		if (fileType != "")
-			url = "http://" + ip[0] + ":" + port + "/iTX/mvc/hnd/download/file/" + sno + "/" + fileType + "/" + encodeURI(itemN);
+			url = "http://" + ip[0] + ":" + port + "/iTX/mvc/hnd/download/file/" + _self.getValue('TLRNO$') + "/" + sno + "/" + fileType + "/" + encodeURI(itemN);
 		else
 			url = "http://" + ip[0] + ":" + port + "/iTX/mvc/hnd/download/file/" + sno;
 		var win = window.open(url);
@@ -2922,7 +2922,6 @@ var Ifx = (function ($) {
 					if (x.isWarnning()) {
 						console.log("Warnning Errmsg:" + x.getWarnMsg());
 						w.push(w.length + 1 + "." + x.getWarnMsg());
-
 					} else {
 						console.log("good from Warnning");
 						console.log("##### rom:" + x.text);
@@ -3064,10 +3063,14 @@ var Ifx = (function ($) {
 		//resultJson += '"' + "NNBSDY" + '"' + ":" + '"' + _self.getValue("NNBSDY$") + '",';
 
 		// 潘 退回理由
-		if (_self.getValue("#Reject").trim() != "") resultJson += '"' + "Reject" + '"' + ":" + '"' + _self.getValue("#Reject").trim().replace(/\r\n|\n/g, "$n") + '",';
+		if (_self.getValue("#Reject").trim() != "")
+		  resultJson += '"' + "Reject" + '"' + ":" + '"' + _self.getValue("#Reject").trim().replace(/\r\n|\n/g, "$n") + '",';
 		// 潘 交易理由
 		if (_self.tradeReason.trim() != "")
 			resultJson += '"' + "TxReason" + '"' + ":" + '"' + _self.tradeReason.trim().replace(/\r\n|\n/g, "$n") + '",';
+
+		if (_self.getValue("SPANDY$").trim() != "")
+			resultJson += '"' + "SPANDY" + '"' + ":" + '"' + _self.getValue("SPANDY$").trim() + '",';
 
 		if (resultJson != "{") resultJson = resultJson.substr(0, resultJson.length - 1) + "}";
 		else resultJson = "";
@@ -3691,7 +3694,7 @@ var Ifx = (function ($) {
 					_self.printReport(val);
 					//$.dialogPrinter(val);
 				} else {
-					if (x.printNo.trim().length > 1) {
+					if (x.printNo && x.printNo.trim().length > 1) {
 						var val = _self.getValue("#" + x.printNo.trim()).trim();
 						if (val != "") {
 							val = val.split('+');
@@ -4263,6 +4266,10 @@ var Ifx = (function ($) {
 	Ifx.fn.isUpdatedTran = function (txcdtmp) {
 		var chktxcd = this.txcd;
 		if (txcdtmp) chktxcd = txcdtmp;
+		
+		if(chktxcd.trim() == "L8501")
+		  return true;
+		
 		if ((chktxcd[2] != "9" && chktxcd[2] != "R" && chktxcd[2] != "0")) {
 			if (_self.getValue("#FUNCIND") != "5") return true;
 			else return false;
@@ -5127,7 +5134,20 @@ var Ifx = (function ($) {
 				_self.sendRim(rimCode, text, function (totaList) {
 					var oTota = totaList[0];
 					// 柯:整批放行時調rim取全部(XI110過長)
-					var ototatemp = oTota.getTextArray();
+					oTota.obj.EC.KINBR = _self.getValue("#KINBR");
+					oTota.obj.EC.TLRNO = _self.getValue("#TLRNO");
+					if (rimCode == "LCR03") {
+						oTota.obj.EC.rim = "0";
+						oTota.obj.EC.AUTHNO = _self.getValue("#AUTHNO");
+						oTota.obj.EC.EMPNOT = _self.getValue("#TLRNO");
+						oldTxcd = oTota.obj.EC.TXCD;
+						oTota.obj.EC.HCODE = "0";
+						oTota.obj.EC["selectTotal"] = "" + rows.length;
+						oTota.obj.EC["selectIndex"] = "" + checkcont;
+						//oTota.obj.EC.EMPNOS = _self.getValue("#TLRNO");
+						//oTota.obj.EC.SUPNO = _self.getValue("#TLRNO");
+					}
+					var ototatemp = JSON.stringify(oTota.obj.EC);
 					console.log("good ototatemp:" + ototatemp);
 					oRow.tim = ototatemp;
 					// callback(null, oTota.text);
@@ -5159,12 +5179,8 @@ var Ifx = (function ($) {
 						text = _self.ifxHost.buildTitaLabelForRim(oldTxcd);
 					}
 					text += oldTranText;
-				} else if (btype == "1") { // 少TITA LABEL 需補足
-					fakerim = false; // 只有5 OR 自行設定的batchCfg.fakerim 才會是true
-					var arr = ["#KINBR", "#TLRNO"];
-					var changeText = _self.buildText(arr)[0];
-					var changeLen = changeText.length;
-					text = changeText + oldTranText.slice(changeLen);
+				} if (btype == "1") { // 少TITA LABEL 需補足
+					text = oldTranText;
 					console.log("new batchCfg tran text:" + text);
 				}
 				console.log("_server_os ,1 : R6, 0: Windows::?" + _server_os);
@@ -5195,7 +5211,7 @@ var Ifx = (function ($) {
 					_self.ifxHost.initSend();
 					// 因為在整批時 會導致 ifx-ims-host.js中 data['updTx'] = "1"; 無法更改
 					// type 5 固定自己組前180
-					_ajaxSender = _self.ifxHost.send(oldTxcd, (btype == "5") ? false : fakerim, text, function (totaList) {
+					_ajaxSender = _self.ifxHost.send(oldTxcd, (btype == "5" || btype == "1") ? false : fakerim, text, function (totaList) {
 						// alert("success");
 						var oBatchBag = {
 							"hi": "1"
@@ -5341,6 +5357,10 @@ var Ifx = (function ($) {
 					console.log("row" + i);
 					console.log("mapSeries;" + i + "=>" + x);
 					var resultarray = x.split("|||"); // 使用陣列分開
+					var totaObj;
+					try {
+						totaObj = JSON.parse(resultarray[3]);
+					} catch (e) { console.error(e); }
 					if (resultarray[0] == "OK") {
 						// alert(i + " is error:"+ x);
 						okCounts++;
@@ -5351,6 +5371,9 @@ var Ifx = (function ($) {
 						oRow['#batch-row-status-show'] = ''; // 錯誤記號
 						oRow['#batch-row-id'] = oRow.id + 1;
 						oRow['.tran-success'] = true; // 不知是啥
+						if (totaObj)
+							if (txtData)
+								oRow[txtData] = totaObj[txtData.substring(1)];
 					} else {
 						errorCounts++;
 						oRow['#batch-row-txtno'] = '';
@@ -5360,6 +5383,9 @@ var Ifx = (function ($) {
 						oRow['#batch-row-status-show'] = "失敗";
 						oRow['#batch-row-id'] = oRow.id + 1;
 						oRow['.tran-success'] = false;
+						if (totaObj)
+							if (txtData)
+								oRow[txtData] = totaObj[txtData.substring(1)];
 						// alert(i + " is " + x);
 					}
 				});
@@ -5389,6 +5415,12 @@ var Ifx = (function ($) {
 			}
 			_self.batchMode = false;
 			console.log("batchMode done");
+
+			for (var i = 0; i < batchCfg.name.split(";").length; i++) {
+				$("#btnBatch_" + i).attr('disabled', true);
+				$("#btnBatch_" + i).attr("style", "color:gray");
+			}
+
 			_self.unblock();
 			_self.postTran();
 		});
@@ -6730,7 +6762,7 @@ var Ifx = (function ($) {
 		var tt = getPromptByFkey(fkey);
 		if (tt == null) tt = "登錄";
 		if (fkey == 1) {
-			o['ec'] = "[更正]";
+			o['ec'] = "[訂正]";
 		} else {
 			o['normal'] = "[" + tt + "]";
 		}
@@ -8439,6 +8471,7 @@ var Ifx = (function ($) {
 
 			_self.chainNext();
 			_self.tradeReason = "";
+			_self.superVisorR = "";
 			_self.watermark({});
 		}
 		this.rtn.callHandler.stop_countdown();
@@ -8534,7 +8567,7 @@ var Ifx = (function ($) {
 		return this.bindHandler(bindMap);
 	};
 	var flowMapper = {
-		"EC": ["更正", 1],
+		"EC": ["訂正", 1],
 		"APPROVAL": ["放行", 2],
 		"REVIEW": ["審核/在途登錄", 3],
 		"ECRELOAD": ["訂正重登", 5],

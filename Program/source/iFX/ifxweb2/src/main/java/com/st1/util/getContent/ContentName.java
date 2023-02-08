@@ -42,6 +42,7 @@ public class ContentName {
 	public static final String txAmt = "TXAMT";
 	public static final String empnot = "EMPNOT";
 	public static final String empnos = "EMPNOS";
+	public static final String entDy = "ENTDY";
 	public static final String caldy = "CALDY";
 	public static final String caltm = "CALTM";
 	public static final String mldry = "MLDRY";

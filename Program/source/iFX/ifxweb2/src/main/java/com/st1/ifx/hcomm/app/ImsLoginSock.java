@@ -215,7 +215,6 @@ public class ImsLoginSock extends ImsTran {
 		return totaVo;
 	}
 
-	@SuppressWarnings("unused")
 	private boolean perform_c1200() {
 		sessionMap.touch();
 		List<TotaVo> totaVoLi = null;

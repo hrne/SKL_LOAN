@@ -173,6 +173,13 @@ table.pageTable tbody {
 	font-style: normal;
 }
 
+@font-face {
+    font-family: EUDC;
+    src: url('./font/EUDC.woff?v=1.0.0');
+    src: url('./font/EUDC.woff?v=1.0.0') format('woff'),
+    url('./font/EUDC.ttf?v=1.0.0') format('truetype');
+}
+
 h1,
 h2,
 h3 {
@@ -358,7 +365,7 @@ form #submit {
 	padding-top: 2px;
 	font-size: 14px;
 	color: white;
-	font-family: 細明體, '細明體', 'ColaborateLightRegular', Arial, sans-serif;
+	font-family: 細明體, '細明體', 'EUDC', 'ColaborateLightRegular', Arial, sans-serif;
     background-color: #cd1919;
 }
 
@@ -378,7 +385,7 @@ form #submit {
 	padding-top: 3px;
 	font-size: 14px;
 	color: white;
-	font-family: 細明體, '細明體', 'ColaborateLightRegular', Arial, sans-serif;
+	font-family: 細明體, '細明體', 'EUDC', 'ColaborateLightRegular', Arial, sans-serif;
 	background-color: #6D7B8D;
 }
 
@@ -658,7 +665,7 @@ form #submit {
 
 span.ui-button {
 	font-size: 14px;
-	font-family: 細明體, '細明體';
+	font-family: 細明體, '細明體', 'EUDC';
 	font-weight: 600;
 	text-align: center;
 	padding: 0px;
@@ -671,7 +678,7 @@ span.ui-button {
 
 #entryArea {
 	width: 100%;
-	font-family: 細明體, '細明體', "Courier New", Courier, monospace;
+	font-family: 細明體, '細明體', "Courier New", 'EUDC', Courier, monospace;
 	vertical-align: baseline;
 	font-size: 14px;
 	margin: 5px;
@@ -747,7 +754,7 @@ span.ui-button {
 	padding-bottom: 3px;
 	/*line-height: 24px;*/
 	color: black;
-	font-family: 細明體, '細明體', "Courier New", Courier, monospace;
+	font-family: 細明體, '細明體', "Courier New", 'EUDC', Courier, monospace;
 	font-size: 14px;
 	border-radius: 3px;
 	margin: 0px;
@@ -840,10 +847,12 @@ span.ui-button {
 	border: none;
 	font-size: 14px;
 	font-weight: 500;
-	text-align: left;
+}
+/*
+    text-align: left;
 	padding: 0px;
 	margin: 0px;
-}
+*/
 
 #btn_yn:focus {
 	background-color: maroon;
@@ -1193,7 +1202,7 @@ table.altrowstable td {
 	height: 40px;
 	line-height: 18px;
 	font-size: 14px;
-	font-family: 細明體, '細明體';
+	font-family: 細明體, '細明體', 'EUDC';
 	padding: 5px 10px;
 	margin-left: 1px;
 	margin-top: 8px;
@@ -1231,7 +1240,7 @@ table.altrowstable td {
 	color: black;
 	background-color: rgba(215, 215, 215, 1);
 	;
-	font-family: 細明體;
+	font-family: 細明體, 'EUDC';
 	font-size: 14px;
 	margin-top: 20px;
 	margin-left: 20px;
@@ -1248,13 +1257,13 @@ table.altrowstable td {
 	padding-bottom: 40px;
 }
 
-table .doctor: #333333;
+table.doctor{ 
+color: #333333;
 border-width: 1 px;
 border-color: #a9c6c9;
 padding: 20 px;
 margin: 10 px;
-font-family: 細明體;
-
+font-family: 細明體, 'EUDC';
 }
 .oddcolor {
 	background-color: #d4e3e5;
@@ -1767,7 +1776,7 @@ font-family: 細明體;
 /*grid column name font-size*/
 .ui-jqgrid tr.jqgrow td {
 	font-size: 14px;
-	font-family: "細明體"
+	font-family: "細明體", 'EUDC'
 }
 
 /*修改表格内容font*/
@@ -1786,14 +1795,14 @@ font-family: 細明體;
 .ui-jqgrid tr.footrow td {
 	font-weight: normal;
 	font-size: 14px;
-	font-family: "細明體";
+	font-family: "細明體", 'EUDC';
 	color: blue;
 	padding-top: 2px;
 	padding-bottom: 3px;
 }
 #queryHeader {
 	width: 100%;
-	font-family: 細明體, '細明體', "Courier New", Courier, monospace;
+	font-family: 細明體, '細明體', "Courier New", 'EUDC', Courier, monospace;
 	vertical-align: baseline;
 	font-size: 14px;
 	margin: 21px;
@@ -1836,7 +1845,7 @@ font-family: 細明體;
 	background-color: #FFF;
 	padding: 1px;
 	color: black;
-	font-family: 細明體, '細明體', "Courier New", Courier, monospace;
+	font-family: 細明體, '細明體', "Courier New", 'EUDC', Courier, monospace;
 	font-size: 14px;
 	border-radius: 3px;
 	margin: 0px;

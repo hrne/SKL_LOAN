@@ -60,7 +60,6 @@
 		<Apache-HttpClient-Ver>4.5.8</Apache-HttpClient-Ver>
 
 		<Querydsl-JPA-Support-Ver>4.2.1</Querydsl-JPA-Support-Ver>
-		<!-- <ibm.mq.version>7.5.0.1</ibm.mq.version> -->
 	</properties>
 
 	<dependencies>
@@ -277,7 +276,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<dependency>			<!-- optional -->
+		<dependency>			
 			<groupId>joda-time</groupId>
 			<artifactId>joda-time</artifactId>
 			<version>${Joda-Time-Ver}</version>

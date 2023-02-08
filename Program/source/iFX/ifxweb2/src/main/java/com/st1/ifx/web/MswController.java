@@ -90,7 +90,7 @@ public class MswController {
 	@RequestMapping(value = "systemTalk/{talker}/{to}/{message}", method = { RequestMethod.POST, RequestMethod.GET })
 	@ResponseBody
 	public void sendSystemTalk(@PathVariable String talker, @PathVariable String to, @PathVariable String message) {
-		message = message.replaceAll("_", " ");
+		message = message.replaceAll("_", " ").replaceAll("\\@", ".");
 		logger.info(FilterUtils.escape("sendSystemTalk....,talker:" + talker + "to:" + to + ", message:" + message));
 
 		String vDate = message.substring(0, 8);
