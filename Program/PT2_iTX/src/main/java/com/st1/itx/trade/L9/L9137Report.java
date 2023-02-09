@@ -60,7 +60,7 @@ public class L9137Report extends MakeReport {
 
 		this.setCharSpaces(0);
 
-		this.print(-1, 1, "程式ID：" + this.getParentTranCode());
+		this.print(-1, 1, "程式ID：" + this.getRptCode());
 		this.print(-1, 84, "新光人壽保險股份有限公司", "C");
 		this.print(-1, 146, "機密等級：" + this.getRptSecurity());
 		this.print(-2, 1, "報　表：" + this.getRptCode());
@@ -460,7 +460,7 @@ public class L9137Report extends MakeReport {
 		print(0, 163, fundsC, "R"); // 占資金比率
 //		print(0, 147, formatAmt(percentOfTotal(subTotalC), 2), "R"); // 各項比率
 //		print(0, 163, formatAmt(percentOfFunds(subTotalC), 2), "R"); // 占資金比率
-		print(1, 1, "└──────────────────────────────┴────────────┴──────────────────────┴──────┴───────┘");
+		print(1, 1, "└─────────────────┴────────────┴────────────┴──────────────────────┴──────┴───────┘");
 		/**
 		 *
 		 * ------------------------------------------------------------------------------------------------------------1

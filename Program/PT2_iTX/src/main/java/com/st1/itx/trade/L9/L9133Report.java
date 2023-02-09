@@ -61,6 +61,14 @@ public class L9133Report extends CommBuffer {
 		int rowCursorUnpaid = 1;
 		int rowCursorReceivable = 1;
 
+		BigDecimal totalAcMainBal = BigDecimal.ZERO;// 會計帳餘額小計
+		BigDecimal totalReceivableBal = BigDecimal.ZERO;// 銷帳檔餘額小計
+		BigDecimal totalMasterBal = BigDecimal.ZERO;// 主檔餘額小計
+		BigDecimal totalDiffAcAmt = BigDecimal.ZERO;// 會計檔與主檔差額
+		BigDecimal totalDiffReceivableAmt = BigDecimal.ZERO;// 銷帳檔與主黨差額小計
+
+		String tmpAcctCode = "";
+
 		for (AcAcctCheck tAcAcctCheck : lAcAcctCheck) {
 
 			// 2022-03-16 智偉新增判斷:會計帳&銷帳檔&主檔 皆為0者不顯示
@@ -169,6 +177,7 @@ public class L9133Report extends CommBuffer {
 			}
 			BigDecimal diffAcAmt = BigDecimal.ZERO;
 			BigDecimal diffReceivableAmt = BigDecimal.ZERO;
+
 			// 有差額就把記號改為true
 			if (sheet == 1 || sheet == 2) {
 				if (acMainBal.subtract(masterBal).compareTo(BigDecimal.ZERO) != 0) {
@@ -193,6 +202,51 @@ public class L9133Report extends CommBuffer {
 				makeExcel.setValue(rowCursor, 4, masterBal, "#,##0"); // 主檔餘額
 				makeExcel.setValue(rowCursor, 5, diffReceivableAmt, "#,##0"); // 銷帳檔與主檔差額
 			} else {
+
+				// 只會有shee1(檢核表)使用到小計
+				if (sheet == 1) {
+					// 當會計科目不一樣的時候歸零
+					if (!tmpAcctCode.equals(acctCode)) {
+
+						// 排除不是一開始就要換行
+						if (tmpAcctCode != "") {
+
+							makeExcel.setValue(rowCursor, 2, "小計");
+							makeExcel.setValue(rowCursor, 3, totalAcMainBal, "#,##0"); // 業務科目或銷帳科目才顯示會計帳餘額小計
+							makeExcel.setValue(rowCursor, 8, totalReceivableBal, "#,##0"); // 銷帳檔餘額小計
+							makeExcel.setValue(rowCursor, 9, totalMasterBal, "#,##0"); // 主檔餘額小計
+							makeExcel.setValue(rowCursor, 10, totalDiffAcAmt, "#,##0"); // 會計檔與主檔差額小計
+							makeExcel.setValue(rowCursor, 11, totalDiffReceivableAmt, "#,##0"); // 銷帳檔與主檔差額小計
+
+							totalAcMainBal = BigDecimal.ZERO;// 會計帳餘額小計
+							totalReceivableBal = BigDecimal.ZERO;// 銷帳檔餘額小計
+							totalMasterBal = BigDecimal.ZERO;// 主檔餘額小計
+							totalDiffAcAmt = BigDecimal.ZERO;// 會計檔與主檔差額
+							totalDiffReceivableAmt = BigDecimal.ZERO;// 銷帳檔與主黨差額小計
+
+							rowCursor++;
+						} else {
+							// 僅為第一次的金額需小計
+							totalAcMainBal = totalAcMainBal.add(acMainBal);// 會計帳餘額小計
+							totalReceivableBal = totalReceivableBal.add(receivableBal);// 銷帳檔餘額小計
+							totalMasterBal = totalMasterBal.add(masterBal);// 主檔餘額小計
+							totalDiffAcAmt = totalDiffAcAmt.add(diffAcAmt);// 會計檔與主檔差額小計
+							totalDiffReceivableAmt = totalDiffReceivableAmt.add(diffReceivableAmt);// 銷帳檔與主黨差額小計
+
+						}
+
+						tmpAcctCode = acctCode;
+
+					} else {
+
+						totalAcMainBal = totalAcMainBal.add(acMainBal);// 會計帳餘額小計
+						totalReceivableBal = totalReceivableBal.add(receivableBal);// 銷帳檔餘額小計
+						totalMasterBal = totalMasterBal.add(masterBal);// 主檔餘額小計
+						totalDiffAcAmt = totalDiffAcAmt.add(diffAcAmt);// 會計檔與主檔差額小計
+						totalDiffReceivableAmt = totalDiffReceivableAmt.add(diffReceivableAmt);// 銷帳檔與主黨差額小計
+
+					}
+				}
 
 				// 工作表為第一、二張(檢核表、應收應付)
 				makeExcel.setValue(rowCursor, 1, acSubBookCode); // 區隔帳冊

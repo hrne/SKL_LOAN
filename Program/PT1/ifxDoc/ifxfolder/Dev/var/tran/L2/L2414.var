@@ -382,6 +382,17 @@ T(2,#L2r07CustName)
 #APPCHECK=X,1,L
 C(3,#ApplNo,0,INVOKEJS(SHOW,p1,13,13,0)T(2,@OwnerRelCode,  ),INVOKEJS(SHOW,p1,13,13,1))
 
+#RimL2R52=X,1,S
+C(3,#FunCd,1,S,$)
+C(3,#FunCd,4,S,$)
+C(3,#ApplNo,0,S,$)
+RESET_RIM(#RimL2R52,L2R52)
+E(0,@ApproveNo,#ApplNo)
+S(L2R52,1,#FunCd,#ClCode1,#ClCode2,#ClNo,#ApproveNo)
+R(1,L2R52)
+T(2,@OwnerRelCode,#L2r52OwnerRelCode1)
+
+
 ! [擔保品代號1]
 #ClCode1=A,1,L
 C(3,#FunCd,1,$,s)
@@ -500,6 +511,14 @@ E(0,@ClStat,#L2r26ClStat)
 E(0,@SettingDate,#L2r26SettingDate)
 E(0,@SettingBal,#L2r26SettingAmt)
 
+#RimL1r09C=X,1,S
+E(0,@RimFunCd,5)
+T(2,@RimCustId,#OwnerId)
+E(0,@RimCustNo,0)
+RESET_RIM(#RimL1r09,L1R09)
+S(L1R09,1,#RimFunCd,#RimCustId,#RimCustNo)
+R(1,L1R09)
+T(2,@OwnerName,#L1r09CustName)
 
 ! [擔保品類別]
 #ClTypeCode=X,3,I
@@ -567,15 +586,6 @@ T(H,#CityCode,#L6r03ResultCity)
 #ApproveNo=A,7,L
 
 <include src="ROM.icf::L2R52.dec"/>
-#RimL2R52=X,1,S
-C(3,#FunCd,1,S,$)
-C(3,#FunCd,4,S,$)
-C(3,#ApplNo,0,S,$)
-RESET_RIM(#RimL2R52,L2R52)
-E(0,@ApproveNo,#ApplNo)
-S(L2R52,1,#FunCd,#ClCode1,#ClCode2,#ClNo,#ApproveNo)
-R(1,L2R52)
-T(2,@OwnerRelCode,#L2r52OwnerRelCode1)
 
 
 ! [鑑估日期]
@@ -651,6 +661,7 @@ IF(#FunCd==4,s,$)
 
 
 #RimL1r09=X,1,S
+IF(#OwnerId==#L2r26OwnerId,S,$)
 T(2,@L1r09CustName,)
 E(0,@RimFunCd,5)
 T(2,@RimCustId,#OwnerId)
@@ -658,10 +669,9 @@ E(0,@RimCustNo,0)
 RESET_RIM(#RimL1r09,L1R09)
 S(L1R09,1,#RimFunCd,#RimCustId,#RimCustNo)
 R(1,L1R09)
+T(2,@OwnerName,#L1r09CustName)
 
 
-#CheckL1R09=X,1,S
-C(4,#L1r09CustName,$,T(2,@OwnerName,#L1r09CustName))
 
 
 
@@ -908,11 +918,12 @@ V(2,0)
 
 #SendL2R41=X,1,S
 C(3,#FunCd,2,$,S)
+IF(#ClTypeCode >= 998,E(0,@RimEvaAmt,#PledgeAmt),E(0,@RimEvaAmt,#EvaAmt))
+C(3,#RimEvaAmt,#L2r22EvaAmt,C(3,#LoanToValue,#L2r26LoanToValue,C(3,#SettingBal,#L2r26SettingAmt,S,$),$),$)
 E(0,@RimFunCd,5)
 E(0,@RimClCode1,#ClCode1)
 E(0,@RimClCode2,#ClCode2)
 E(0,@RimClNo,#ClNo)
-IF(#ClTypeCode >= 998,E(0,@RimEvaAmt,#PledgeAmt),E(0,@RimEvaAmt,#EvaAmt))
 ! E(0,@RimEvaAmt,#EvaAmt)
 ! E(0,@RimEvaNetWorth,#EvaNetWorth)
 E(0,@RimLoanToValue,#LoanToValue)

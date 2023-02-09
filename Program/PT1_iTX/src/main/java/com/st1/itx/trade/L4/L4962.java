@@ -1,6 +1,5 @@
 package com.st1.itx.trade.L4;
 
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -130,9 +129,6 @@ public class L4962 extends TradeBuffer {
 
 			sInsuRenew = insuRenewService.findL4962A(iInsuEndMonthFrom, iInsuEndMonthTo, 0, Integer.MAX_VALUE, titaVo);
 
-			
-			
-
 			int reportDate = titaVo.getEntDyI() + 19110000;
 			String brno = titaVo.getBrno();
 			String txcd = "L4962";
@@ -141,18 +137,16 @@ public class L4962 extends TradeBuffer {
 				fileItem = "保費、保單未完成檢核表(查無資料)";
 			}
 
-			
 			String fileName = "L4962-保費、保單未完成檢核表";
 			row = 1; // 列數:記錄印到第幾列
 			ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
 					.setRptItem(fileItem).build();
 			// 開啟報表
 			makeExcel.open(titaVo, reportVo, fileName);
-			
-			
+
 			if (sInsuRenew == null || sInsuRenew.isEmpty()) {
 				makeExcel.setValue(2, 1, "本日無資料", "L");
-			} else{				
+			} else {
 				this.info("sInsuRenew =" + sInsuRenew.toString());
 				// 調整欄寬
 				makeExcel.setWidth(1, 10);
@@ -193,11 +187,10 @@ public class L4962 extends TradeBuffer {
 						}
 					}
 
-				}				
-				
-				
+				}
+
 			}
-			
+
 			makeExcel.close();
 		}
 
@@ -223,7 +216,6 @@ public class L4962 extends TradeBuffer {
 
 			exportExcelB(titaVo, resultList);// 產excel檔
 
-
 		}
 
 		if (!"N".equals(CommericalFlag)) {
@@ -232,8 +224,6 @@ public class L4962 extends TradeBuffer {
 					titaVo);
 
 			if (sInsuRenew != null) {
-
-			
 
 				for (InsuRenew tInsuRenew : sInsuRenew.getContent()) {
 					// 險種註記不為全部時 篩出特定種類資料
@@ -275,86 +265,86 @@ public class L4962 extends TradeBuffer {
 						exportExcelC2(tInsuOrignal, titaVo);
 					}
 
-				} 
+				}
 			}
 
+			int reportDate = titaVo.getEntDyI() + 19110000;
+			String brno = titaVo.getBrno();
+			String txcd = "L4962";
+			String fileItem = "住宅險改商業險註記表";
 
-		int reportDate = titaVo.getEntDyI() + 19110000;
-		String brno = titaVo.getBrno();
-		String txcd = "L4962";
-		String fileItem = "住宅險改商業險註記表";
-		
-		if (resultListC == null || resultListC.isEmpty()) {
-			fileItem = "住宅險改商業險註記表(查無資料)";
-		}
-		
-		String fileName = "L4962-住宅險改商業險註記表";
-		row = 1; // 列數:記錄印到第幾列
-		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
-				.setRptItem(fileItem).build();
+			if (resultListC == null || resultListC.isEmpty()) {
+				fileItem = "住宅險改商業險註記表(查無資料)";
+			}
 
-		// 開啟報表
-		makeExcel.open(titaVo, reportVo, fileName);
-		
-		if (resultListC == null || resultListC.isEmpty()) {
-			makeExcel.setValue(2, 1, "本日無資料", "L");
-		} else {
-			// 調整欄寬
-			makeExcel.setWidth(1, 10);
-			makeExcel.setWidth(2, 10);
-			makeExcel.setWidth(3, 10);
-			makeExcel.setWidth(4, 24);
-			makeExcel.setWidth(5, 24);
-			makeExcel.setWidth(6, 10);
-			makeExcel.setWidth(7, 10);
-			makeExcel.setWidth(8, 24);
+			String fileName = "L4962-住宅險改商業險註記表";
+			row = 1; // 列數:記錄印到第幾列
+			ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+					.setRptItem(fileItem).build();
 
-			ExcelFontStyleVo headerStyleVo = new ExcelFontStyleVo();
-			headerStyleVo.setBold(true);
-			// 表頭
-			// 年月、戶號、額度、戶名、保單號碼、保險起日、保險迄日、險種註記
-			makeExcel.setValue(row, 1, "年月", "C", headerStyleVo);
-			makeExcel.setValue(row, 2, "戶號", "C", headerStyleVo);
-			makeExcel.setValue(row, 3, "額度", "C", headerStyleVo);
-			makeExcel.setValue(row, 4, "戶名", "C", headerStyleVo);
-			makeExcel.setValue(row, 5, "保單號碼", "C", headerStyleVo);
-			makeExcel.setValue(row, 6, "保險起日", "C", headerStyleVo);
-			makeExcel.setValue(row, 7, "保險迄日", "C", headerStyleVo);
-			makeExcel.setValue(row, 8, "險種註記", "C", headerStyleVo);
+			// 開啟報表
+			makeExcel.open(titaVo, reportVo, fileName);
 
-			row++;
-			
-			resultListC.sort((c1, c2) -> {
-				int result = 0;
-				if (c1.get("YearMonth") != c2.get("YearMonth")) {
-					result = Integer.valueOf(c1.get("YearMonth").compareTo(c2.get("YearMonth")));
-				} else {
-					result = 0;
-				}
-				
-				return result;
-			});
-			
-			for (Map<String, String> r : resultListC) {
-				
-				makeExcel.setValue(row, 1, r.get("YearMonth"), "C");; // 年月
-				makeExcel.setValue(row, 2, r.get("CustNo"), "C"); // 戶號
-				makeExcel.setValue(row, 3, r.get("FacmNo"), "C"); // 額度
-				makeExcel.setValue(row, 4, r.get("CustName"), "L"); // 戶名
-				makeExcel.setValue(row, 5, r.get("PrevInsuNo"), "C"); // 原保單號碼
-				makeExcel.setValue(row, 6, r.get("InsuStartDate"), "L"); // 保險起日
-				makeExcel.setValue(row, 7, r.get("InsuEndDate"), "L"); // 保險迄日
-				makeExcel.setValue(row, 8, r.get("CommericalFlagX"), "L"); // 險種註記			
+			if (resultListC == null || resultListC.isEmpty()) {
+				makeExcel.setValue(2, 1, "本日無資料", "L");
+			} else {
+				// 調整欄寬
+				makeExcel.setWidth(1, 10);
+				makeExcel.setWidth(2, 10);
+				makeExcel.setWidth(3, 10);
+				makeExcel.setWidth(4, 24);
+				makeExcel.setWidth(5, 24);
+				makeExcel.setWidth(6, 10);
+				makeExcel.setWidth(7, 10);
+				makeExcel.setWidth(8, 24);
+
+				ExcelFontStyleVo headerStyleVo = new ExcelFontStyleVo();
+				headerStyleVo.setBold(true);
+				// 表頭
+				// 年月、戶號、額度、戶名、保單號碼、保險起日、保險迄日、險種註記
+				makeExcel.setValue(row, 1, "年月", "C", headerStyleVo);
+				makeExcel.setValue(row, 2, "戶號", "C", headerStyleVo);
+				makeExcel.setValue(row, 3, "額度", "C", headerStyleVo);
+				makeExcel.setValue(row, 4, "戶名", "C", headerStyleVo);
+				makeExcel.setValue(row, 5, "保單號碼", "C", headerStyleVo);
+				makeExcel.setValue(row, 6, "保險起日", "C", headerStyleVo);
+				makeExcel.setValue(row, 7, "保險迄日", "C", headerStyleVo);
+				makeExcel.setValue(row, 8, "險種註記", "C", headerStyleVo);
+
 				row++;
 
+				resultListC.sort((c1, c2) -> {
+					int result = 0;
+					if (c1.get("YearMonth") != c2.get("YearMonth")) {
+						result = Integer.valueOf(c1.get("YearMonth").compareTo(c2.get("YearMonth")));
+					} else {
+						result = 0;
+					}
+
+					return result;
+				});
+
+				for (Map<String, String> r : resultListC) {
+
+					makeExcel.setValue(row, 1, r.get("YearMonth"), "C");
+					; // 年月
+					makeExcel.setValue(row, 2, r.get("CustNo"), "C"); // 戶號
+					makeExcel.setValue(row, 3, r.get("FacmNo"), "C"); // 額度
+					makeExcel.setValue(row, 4, r.get("CustName"), "L"); // 戶名
+					makeExcel.setValue(row, 5, r.get("PrevInsuNo"), "C"); // 原保單號碼
+					makeExcel.setValue(row, 6, r.get("InsuStartDate"), "L"); // 保險起日
+					makeExcel.setValue(row, 7, r.get("InsuEndDate"), "L"); // 保險迄日
+					makeExcel.setValue(row, 8, r.get("CommericalFlagX"), "L"); // 險種註記
+					row++;
+
+				}
 			}
-		}
-		
-		makeExcel.close();
+
+			makeExcel.close();
 
 		}
-		if("N".equals(flagA) && "N".equals(flagB) && "N".equals(CommericalFlag)) {
-	         throw new LogicException("E0019", ("檢核表要擇一選擇為Y"));
+		if ("N".equals(flagA) && "N".equals(flagB) && "N".equals(CommericalFlag)) {
+			throw new LogicException("E0019", ("檢核表要擇一選擇為Y"));
 		}
 
 		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
@@ -426,7 +416,7 @@ public class L4962 extends TradeBuffer {
 
 //	B.額度無保單檢核表
 	private void exportExcelB(TitaVo titaVo, List<Map<String, String>> resultList) throws LogicException {
-		this.info("L4962 exportExcel2");
+		this.info("L4962 exportExcelB");
 
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
@@ -477,6 +467,7 @@ public class L4962 extends TradeBuffer {
 		if (resultList == null || resultList.isEmpty()) {
 			makeExcel.setValue(2, 1, "本日無資料", "L");
 		} else {
+
 			for (Map<String, String> result : resultList) {
 				String note = "";
 				int startDate = parse.stringToInteger(result.get("F8"));
@@ -488,6 +479,7 @@ public class L4962 extends TradeBuffer {
 					if (endDate < insuStartDate) {
 						note = "保單資料已到期";
 					}
+
 				}
 
 				if (!"".equals(note)) {
@@ -541,7 +533,14 @@ public class L4962 extends TradeBuffer {
 					makeExcel.setValue(row, 11, note, "L"); // 原因狀況
 
 					row++;
+
 				}
+
+			}
+
+			// 排除有資料且到期，不列印資料的情況
+			if (row == 2) {
+				makeExcel.setValue(2, 1, "本日無資料", "L");
 			}
 		}
 

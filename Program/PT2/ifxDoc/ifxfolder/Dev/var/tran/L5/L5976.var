@@ -1153,8 +1153,6 @@ INVOKEJS(SHOW,grd1,{i},{i},0)
 #NegFinShareContractAmt{i}
 #NegFinShareAmtRatio{i}
 #NegFinShareDueAmt{i}
-!#NegFinShareCancelDate{i}
-!#NegFinShareCancelAmt{i}
 ##end
 </sub>
 

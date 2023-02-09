@@ -234,35 +234,35 @@ public class L9137ServiceImpl extends ASpringJpaParm implements InitializingBean
 		
 		
 		sql += " FROM (  SELECT CASE ";
-		sql += "                  WHEN D.\"AcctCode\" = '310' AND C.\"IsRelated\" = 'Y'          THEN 1";
-		sql += "                  WHEN D.\"AcctCode\" = '310' AND C.\"EntCode\" IN ('1')         THEN 1"; // EntCode = 2
-		// 為企金自然人,算在個人戶
-		sql += "                  WHEN D.\"AcctCode\" = '310'                                    THEN 2";
-		sql += "                  WHEN D.\"AcctCode\" = '320' AND C.\"IsRelated\" = 'Y'          THEN 3";
-		sql += "                  WHEN D.\"AcctCode\" = '320' AND C.\"EntCode\" IN ('1')         THEN 3"; // EntCode = 2
-		// 為企金自然人,算在個人戶
-		sql += "                  WHEN D.\"AcctCode\" = '320'                                    THEN 4";
-		sql += "                  WHEN D.\"AcctCode\" = '330' AND C.\"IsRelated\" = 'Y'          THEN 5";
-		sql += "                  WHEN D.\"AcctCode\" = '330' AND C.\"EntCode\" IN ('1')         THEN 5"; // EntCode = 2
-		// 為企金自然人,算在個人戶
-		sql += "                  WHEN D.\"AcctCode\" = '330'                                    THEN 6";
-		sql += "                  WHEN D.\"AcctCode\" = '990' AND D.\"FacAcctCode\" <> '340'     THEN 7";
-		sql += "                  WHEN D.\"AcctCode\" = '340'                                    THEN 8";
-		sql += "                  WHEN D.\"AcctCode\" = '990' AND D.\"FacAcctCode\" = '340'      THEN 9";
-		sql += " 			   	ELSE 99 END AS \"DetailSeq\" ";
+////		sql += "                  WHEN D.\"AcctCode\" = '310' AND C.\"IsRelated\" = 'Y'          THEN 1";
+//		sql += "                  WHEN D.\"AcctCode\" = '310' AND C.\"EntCode\" IN ('1')         THEN 1"; // EntCode = 2
+//		// 為企金自然人,算在個人戶
+//		sql += "                  WHEN D.\"AcctCode\" = '310'                                    THEN 2";
+////		sql += "                  WHEN D.\"AcctCode\" = '320' AND C.\"IsRelated\" = 'Y'          THEN 3";
+//		sql += "                  WHEN D.\"AcctCode\" = '320' AND C.\"EntCode\" IN ('1')         THEN 3"; // EntCode = 2
+//		// 為企金自然人,算在個人戶
+//		sql += "                  WHEN D.\"AcctCode\" = '320'                                    THEN 4";
+////		sql += "                  WHEN D.\"AcctCode\" = '330' AND C.\"IsRelated\" = 'Y'          THEN 5";
+//		sql += "                  WHEN D.\"AcctCode\" = '330' AND C.\"EntCode\" IN ('1')         THEN 5"; // EntCode = 2
+//		// 為企金自然人,算在個人戶
+//		sql += "                  WHEN D.\"AcctCode\" = '330'                                    THEN 6";
+//		sql += "                  WHEN D.\"AcctCode\" = '990' AND D.\"FacAcctCode\" <> '340'     THEN 7";
+//		sql += "                  WHEN D.\"AcctCode\" = '340'                                    THEN 8";
+//		sql += "                  WHEN D.\"AcctCode\" = '990' AND D.\"FacAcctCode\" = '340'      THEN 9";
+//		sql += " 			   	ELSE 99 END AS \"DetailSeq\" ";
 		
-//		sql += " CASE WHEN C.\"IsRelated\" = 'Y' ";
-//		sql += "                     THEN CASE WHEN D.\"AcctCode\" = '310' AND C.\"EntCode\" IN ('1')         THEN 1 ";
-//		sql += "                               WHEN D.\"AcctCode\" = '310'                                    THEN 2 ";
-//		sql += " 						       WHEN D.\"AcctCode\" = '320' AND C.\"EntCode\" IN ('1')         THEN 3 ";
-//		sql += "                               WHEN D.\"AcctCode\" = '320'                                    THEN 4 ";
-//		sql += " 						       WHEN D.\"AcctCode\" = '330' AND C.\"EntCode\" IN ('1')         THEN 5 ";
-//		sql += "                               WHEN D.\"AcctCode\" = '330'                                    THEN 6 ";
-//		sql += "                               WHEN D.\"AcctCode\" = '990' AND D.\"FacAcctCode\" <> '340'     THEN 7 ";
-//		sql += "                               WHEN D.\"AcctCode\" = '340'                                    THEN 8 ";
-//		sql += "                               WHEN D.\"AcctCode\" = '990' AND D.\"FacAcctCode\" = '340'      THEN 9 ";
-//		sql += "                          ELSE 990 END ";
-//		sql += " 			   	     ELSE 99 END AS \"DetailSeq\" ";
+		sql += " 				   WHEN C.\"IsRelated\" = 'Y' ";
+		sql += "                     THEN CASE WHEN D.\"AcctCode\" = '310' AND C.\"EntCode\" IN ('1')         THEN 1 ";
+		sql += "                               WHEN D.\"AcctCode\" = '310'                                    THEN 2 ";
+		sql += " 						       WHEN D.\"AcctCode\" = '320' AND C.\"EntCode\" IN ('1')         THEN 4 ";
+		sql += "                               WHEN D.\"AcctCode\" = '320'                                    THEN 5 ";
+		sql += " 						       WHEN D.\"AcctCode\" = '330' AND C.\"EntCode\" IN ('1')         THEN 7 ";
+		sql += "                               WHEN D.\"AcctCode\" = '330'                                    THEN 8 ";
+		sql += "                               WHEN D.\"AcctCode\" = '340' AND C.\"EntCode\" IN ('1')         THEN 7 ";
+		sql += "                               WHEN D.\"AcctCode\" = '340'                                    THEN 8 ";
+//		sql += "                               WHEN D.\"AcctCode\" = '990' AND D.\"FacAcctCode\" <> '340'     THEN 9 ";
+		sql += "                          ELSE 990 END ";
+		sql += " 			   	     ELSE 99 END AS \"DetailSeq\" ";
 		
 		sql += "               ,1 AS \"Counts\" ";
 		sql += "               ,D.\"LoanBalance\" ";

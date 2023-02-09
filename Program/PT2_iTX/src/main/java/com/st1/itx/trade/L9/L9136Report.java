@@ -153,7 +153,7 @@ public class L9136Report extends MakeReport {
 
 				// 要排除的字段
 				String[] word = { "最後更新日期時間", "最後更新人員", "建檔日期時間", "交易進行記號", "上次櫃員編號", "上次交易序號", "已編BorTx流水號", "上次會計日",
-						"會計日期", "上次交易行別", "上次交易日" };
+						"會計日期", "上次交易行別", "上次交易日", "經辦合理性說明" };
 
 				List<String> tmpWord = new ArrayList<String>(Arrays.asList(word));
 				List<String> tmp1 = new ArrayList<String>(Arrays.asList(tmpUpdateItem));
@@ -233,12 +233,12 @@ public class L9136Report extends MakeReport {
 						this.newPage();
 
 					}
-					
+
 					tmpCount = count;
 				}
 			}
 
-			//沒有增加筆數表示此表無資料
+			// 沒有增加筆數表示此表無資料
 			if (tmpCount != count) {
 				this.print(1, 1, "本日無資料");
 			}
@@ -272,7 +272,7 @@ public class L9136Report extends MakeReport {
 				}
 
 			}
-			//沒有增加筆數表示此表無資料
+			// 沒有增加筆數表示此表無資料
 			if (tmpCount != count) {
 				this.print(1, 1, "本日無資料");
 			}

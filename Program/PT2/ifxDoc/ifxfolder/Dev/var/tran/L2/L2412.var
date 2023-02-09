@@ -386,13 +386,11 @@ T(F,@MfgYearMonth,0)
 T(F,@VehicleTypeCode,0)
 T(F,@VehicleStyleCode,0)
 T(F,@VehicleOfficeCode,0)
-
 T(F,@Currency,0)
 T(3,@Currency,TWD)
 T(H,@CurrencyX,#Currency,#CurrencyHelp)
 T(F,@ExchangeRate,0)
 E(0,@ExchangeRate,1)
-
 T(F,@Insurance,0)
 T(F,@LoanToValue,0)
 T(F,@MtgCode,0)
@@ -438,10 +436,6 @@ E(0,#FunCd)
 T(H,#FunCd,#FunCdHelp)
 C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢))
 
-
-
-
-
 #IF_FUNCD_2=X,1,S
 IF (#FunCd==2,T(F,@CustId,0)T(F,@CustNo,0)T(F,@ClCode1,0)T(F,@ClCode2,0)T(F,@ClNo,0)T(F,@ClTypeCode,0)T(F,@CityCode,0),$)
 
@@ -450,7 +444,6 @@ IF(#FunCd==4,$,S)
 T(F,@CustId,0)
 T(F,@CustNo,0)
 T(F,@ClCode1,0)
-
 T(F,@ClCode2,0)
 T(F,@ClNo,0)
 T(F,@ClTypeCode,0)
@@ -731,7 +724,6 @@ T(2,@Insurance,#L2r24Insurance)
 E(0,@LoanToValue,#L2r24LoanToValue)
 E(0,@ScrapValue,#L2r24ScrapValue)
 E(0,@MtgCode,#L2r24MtgCode)
-
 T(2,@MtgCheck,#L2r24MtgCheck)
 IF(#MtgCheck == "Y",T(3,@MtgCheckbtn,V)T(3,@MtgCheckfg,V),T(3,@MtgCheckbtn,)T(3,@MtgCheckfg,))
 T(2,@MtgLoan,#L2r24MtgLoan)
@@ -739,7 +731,6 @@ IF(#MtgLoan == "Y",T(3,@MtgLoanbtn,V)T(3,@MtgLoanfg,V),T(3,@MtgLoanbtn,)T(3,@Mtg
 T(2,@MtgPledge,#L2r24MtgPledge)
 IF(#MtgPledge == "Y",T(3,@MtgPledgebtn,V)T(3,@MtgPledgefg,V),T(3,@MtgPledgebtn,)T(3,@MtgPledgefg,))
 IF(#MtgCheck == "Y" && #MtgLoan == "Y" && #MtgPledge == "Y",T(3,@MtgAllbtn,V)T(3,@MtgAllfg,V),T(3,@MtgAllbtn,)T(3,@MtgAllfg,))
-
 E(0,@ClStat,#L2r24ClStat)
 E(0,@SettingStat,#L2r24SettingStat)
 E(0,@SettingAmt,#L2r24SettingAmt)
@@ -752,6 +743,16 @@ T(2,@Remark,#L2r24Remark)
 IF(#L2r24MtgCheck == "Y",$,s)
 IF(#L2r24MtgLoan == "Y",$,s)
 IF(#L2r24MtgPledge == "Y",$,s)
+
+#RimL1r09C=X,1,S
+T(2,@L1r09CustName,)
+E(0,@RimFunCd,5)
+T(2,@RimCustId,#OwnerId)
+E(0,@RimCustNo,0)
+RESET_RIM(#RimL1r09C,L1R09)
+S(L1R09,1,#RimFunCd,#RimCustId,#RimCustNo)
+R(1,L1R09)
+T(2,@OwnerName,#L1r09CustName)
 
 
 !擔保品類別
@@ -819,6 +820,7 @@ A(ID_UNINO,0,#OwnerId)
 
 
 #RimL1r09=X,1,S
+IF(#OwnerId==#L2r24OwnerId,S,$)
 T(2,@L1r09CustName,)
 E(0,@RimFunCd,5)
 T(2,@RimCustId,#OwnerId)
@@ -1181,6 +1183,7 @@ IF(#FunCd==4,s,$)
 
 #SendL2R41=X,1,S
 C(3,#FunCd,2,$,S)
+C(3,#LoanToValue,#L2r24LoanToValue,C(3,#SettingAmt,#L2r24SettingAmt,C(3,#EvaAmt,#L2r22EvaAmt,S,$),$),$)
 E(0,@RimFunCd,5)
 E(0,@RimClCode1,#ClCode1)
 E(0,@RimClCode2,#ClCode2)
@@ -1191,9 +1194,9 @@ E(0,@RimLoanToValue,#LoanToValue)
 E(0,@RimSettingAmt,#SettingAmt)
 T(2,@RimSettingStat,#SettingStat)
 T(2,@RimClStat,#ClStat)
-RESET_RIM(#SendL2R41,L2R41)
 S(L2R41,1,#RimFunCd,#RimClCode1,#RimClCode2,#RimClNo,#RimEvaAmt,#RimEvaNetWorth,#RimLoanToValue,#RimSettingAmt,#RimSettingStat,#RimClStat)
 R(1,L2R41)
+
 !收件字號
 #ReceiptNo=X,20,I
 IF(#FunCd==4,s,$)

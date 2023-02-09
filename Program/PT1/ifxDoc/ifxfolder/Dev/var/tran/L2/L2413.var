@@ -462,6 +462,16 @@ R(1,L2R07)
 C(3,#ApplNo,0,S,$)
 T(2,#L2r07CustName)
 
+#RimL2R52=X,1,S
+C(3,#FunCd,1,S,$)
+C(3,#FunCd,4,S,$)
+C(3,#ApplNo,0,S,$)
+RESET_RIM(#RimL2R52,L2R52)
+E(0,@ApproveNo,#ApplNo)
+S(L2R52,1,#FunCd,#ClCode1,#ClCode2,#ClNo,#ApproveNo)
+R(1,L2R52)
+T(2,@OwnerRelCode,#L2r52OwnerRelCode1)
+
 #APPCHECK=X,1,L
 C(3,#ApplNo,0,INVOKEJS(SHOW,p1,15,15,0)T(2,@OwnerRelCode,  ),INVOKEJS(SHOW,p1,15,15,1))
 
@@ -599,6 +609,13 @@ T(H,@SettingStatX,#SettingStat,#SettingStatHelp)
 T(H,@ComputeMTRX,#ComputeMTR,#YNHelp)
 
 
+#RimL2r18C=X,1,S
+T(2,@RimStockCode,#StockCode)
+RESET_RIM(#RimL2r18C,L2R18)
+S(L2R18,1,#RimStockCode)
+R(1,L2R18)
+T(2,@StockCodeX,#L2r18StockCodeX)
+
 ! [擔保品類別]
 #ClTypeCode=X,3,I
 C(3,#FunCd,1,$,s)
@@ -649,15 +666,7 @@ BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L6064; ntxbuf=#BUF2;ntxbuf5=type<-1:StockCod
 #ApproveNo=A,7,L
 
 <include src="ROM.icf::L2R52.dec"/>
-#RimL2R52=X,1,S
-C(3,#FunCd,1,S,$)
-C(3,#FunCd,4,S,$)
-C(3,#ApplNo,0,S,$)
-RESET_RIM(#RimL2R52,L2R52)
-E(0,@ApproveNo,#ApplNo)
-S(L2R52,1,#FunCd,#ClCode1,#ClCode2,#ClNo,#ApproveNo)
-R(1,L2R52)
-T(2,@OwnerRelCode,#L2r52OwnerRelCode1)
+
 
 ! [股票代號]
 #StockCode=X,10,I
@@ -671,6 +680,7 @@ V(7)
 <include src="ROM.icf::L2R18.dec"/>
 !RIM取股票代碼
 #RimL2r18=X,1,S
+IF(#StockCode == #L2r25StockCode,s,$)
 T(2,@RimStockCode,#StockCode)
 RESET_RIM(#RimL2r18,L2R18)
 S(L2R18,1,#RimStockCode)
@@ -806,6 +816,7 @@ IF(#FunCd==4,s,$)
 
 
 #RimL1r09=X,1,S
+IF(#OwnerId==#L2r25OwnerId,s,$)
 T(2,@L1r09CustName,)
 E(0,@RimFunCd,5)
 T(2,@RimCustId,#OwnerId)
@@ -813,10 +824,9 @@ E(0,@RimCustNo,0)
 RESET_RIM(#RimL1r09,L1R09)
 S(L1R09,1,#RimFunCd,#RimCustId,#RimCustNo)
 R(1,L1R09)
-
-
-#CheckL1R09=X,1,S
 T(2,@OwnerName,#L1r09CustName)
+
+
 
 
 
@@ -1016,6 +1026,13 @@ E(0,#EvaUnitPrice*#SettingBalance)
 
 #SendL2R41=X,1,S
 C(3,#FunCd,2,$,S)
+C(3,#EvaAmt,#L2r22EvaAmt,
+    C(3,#LoanToValue,#L2r25LoanToValue,
+        C(3,#EvaUnitPrice,#L2r25EvaUnitPrice,
+            C(3,#SettingBalance,#L2r25SettingBalance,S,$),
+            $),
+        $),
+    $)
 E(0,@RimFunCd,5)
 E(0,@RimClCode1,#ClCode1)
 E(0,@RimClCode2,#ClCode2)

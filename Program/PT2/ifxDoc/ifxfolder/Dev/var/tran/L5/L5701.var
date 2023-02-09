@@ -37,8 +37,8 @@ E(0,0)
 [#<->#,"@",#BTNK,#BtnConnect,#BTND,#BTNF,#BTNE,#BTNG,#BTNH,#BTNI,#BTNJ,#BTNL],
 ["#grid#,{id:1,expand:true,loop:30,row_height:1,s_cols:[], p_cols:[]}","","",
 ["債權機構","","機構名稱","簽約金額","債權比例% ","期款","註銷日期","註銷本金"],
-[[#NegFinShareFinCode1],[#BtnBankCode1],[#FinCodeName1],[#NegFinShareContractAmt1],[#NegFinShareAmtRatio1],[#NegFinShareDueAmt1],[#NegFinShareCancelDate1],[#NegFinShareCancelAmt1],
-]],
+[[#NegFinShareFinCode1],[#BtnBankCode1],[#FinCodeName1],[#NegFinShareContractAmt1],[#NegFinShareAmtRatio1],[#NegFinShareDueAmt1],[#NegFinShareCancelDate1],[#NegFinShareCancelAmt1],]
+],
 ]
 
 #HidePayerCustNo=@,1,S
@@ -888,6 +888,7 @@ IF(#Test{i}=="0",S,$)
 IF({i}==1,$,C(4,#NegFinShareFinCode{j},INVOKEJS(SHOW,grd1_{i},0),INVOKEJS(SHOW,grd1_{i},1)))
 @IF({i}==1,$,IF(#NegFinShareFinCode{i}=="",S,$))
 C(4,#NegFinShareFinCode1,V(7),$)
+IF(#CustLoanKind==2,IF(#NegFinShareFinCode{i}=="458",V(P,保貸戶的債權機構不可輸入458),$),$)
 C(4,#NegFinShareFinCode{i},INVOKEJS(SHOW,grd1,{i},0),INVOKEJS(SHOW,grd1,{k},1))
 !檢核不可重複債權機構
 C(3,{i},2,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1)),$)

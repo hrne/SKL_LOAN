@@ -120,15 +120,15 @@ public class L4601Report extends MakeReport {
 		// 同戶號額度才show
 		reporttype = 1;
 		reportName = "火險詢價重複投保報表";
-		Report(titaVo, slInsuRenewMediaTemp);
+		report(titaVo, slInsuRenewMediaTemp);
 		//
 		reporttype = 2;
 		reportName = "火險重複投保－戶號建物";
-		Report(titaVo, slInsuRenewMediaTemp);
+		report(titaVo, slInsuRenewMediaTemp);
 
 	}
 
-	private void Report(TitaVo titaVo, Slice<InsuRenewMediaTemp> sL4601List) throws LogicException {
+	private void report(TitaVo titaVo, Slice<InsuRenewMediaTemp> sL4601List) throws LogicException {
 
 		// 戶號額度
 		HashMap<tmpCF, Integer> infor = new HashMap<>();
@@ -138,9 +138,9 @@ public class L4601Report extends MakeReport {
 
 		this.open(titaVo, reportVo);
 
-		String tempcustno = "";
-		String tempseq = "";
-		int rowcount = 0;
+		String tempCustNo = "";
+		String tempSeq = "";
+		int rowCount = 0;
 		if (sL4601List != null) {
 			this.info("List is true");
 			// 比較戶號額度 + 分隔線
@@ -189,16 +189,16 @@ public class L4601Report extends MakeReport {
 
 			if (lTemp.size() != 0) {
 
-				tempcustno = lTemp.get(0).getCustNo();
-				tempseq = lTemp.get(0).getSeq();
+				tempCustNo = lTemp.get(0).getCustNo();
+				tempSeq = lTemp.get(0).getSeq();
 				for (InsuRenewMediaTemp t : lTemp) {
 
-					if (rowcount != 0) { // 換頁第一筆不判斷
+					if (rowCount != 0) { // 換頁第一筆不判斷
 
-						if (!tempcustno.equals(t.getCustNo()) || !tempseq.equals(t.getSeq())) {
+						if (!tempCustNo.equals(t.getCustNo()) || !tempSeq.equals(t.getSeq())) {
 							this.print(1, 0,
 									"------------------------------------------------------------------------------------------------------------------------------------------------");
-							rowcount = rowcount + 1;
+							rowCount = rowCount + 1;
 						}
 
 					}
@@ -278,22 +278,22 @@ public class L4601Report extends MakeReport {
 						}
 
 					}
-					rowcount = rowcount + 2;
-					tempcustno = t.getCustNo();
-					tempseq = t.getSeq();
+					rowCount = rowCount + 2;
+					tempCustNo = t.getCustNo();
+					tempSeq = t.getSeq();
 					count++;
 
 					if (listsize == count) { // 最後一筆
 						this.print(1, 0,
 								"------------------------------------------------------------------------------------------------------------------------------------------------");
-						rowcount++;
-						this.print(pageIndex - rowcount - 2, this.getMidXAxis(), "=====報表結束=====", "C");
+						rowCount++;
+						this.print(pageIndex - rowCount - 2, this.getMidXAxis(), "=====報表結束=====", "C");
 					}
 
-					if (rowcount >= 30) { // 超過30筆自動換頁 並印出當前的代碼
+					if (rowCount >= 30) { // 超過30筆自動換頁 並印出當前的代碼
 
-						this.print(pageIndex - rowcount - 2, this.getMidXAxis(), "=====續下頁=====", "C");
-						rowcount = 0;
+						this.print(pageIndex - rowCount - 2, this.getMidXAxis(), "=====續下頁=====", "C");
+						rowCount = 0;
 						newPage();
 					}
 

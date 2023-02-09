@@ -6,6 +6,7 @@ set define off;
   CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_MonthlyFacBal_Ins" 
 (
     -- 參數
+    "ExecSeq"      IN  INT,       --執行序號
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
     JOB_END_TIME   OUT TIMESTAMP, --程式結束時間
     INS_CNT        OUT INT,       --新增資料筆數
@@ -20,7 +21,8 @@ BEGIN
 
     DECLARE 
         "TbsDyF" DECIMAL(8); --西元帳務日
-        "DateStart" DECIMAL(6) := 201601 ; -- 資料擷取起日
+        "DateStart" DECIMAL(6) := 0 ; -- 資料擷取起日
+        "DateEnd"   DECIMAL(6) := 0 ; -- 資料擷取止日
     BEGIN
 
         SELECT "TbsDy" + 19110000
@@ -30,9 +32,23 @@ BEGIN
         ;
 
         -- 刪除舊資料
-        EXECUTE IMMEDIATE 'ALTER TABLE "MonthlyFacBal" DISABLE PRIMARY KEY CASCADE';
-        EXECUTE IMMEDIATE 'TRUNCATE TABLE "MonthlyFacBal" DROP STORAGE';
-        EXECUTE IMMEDIATE 'ALTER TABLE "MonthlyFacBal" ENABLE PRIMARY KEY';
+        IF "ExecSeq" = 1 THEN
+          EXECUTE IMMEDIATE 'ALTER TABLE "MonthlyFacBal" DISABLE PRIMARY KEY CASCADE';
+          EXECUTE IMMEDIATE 'TRUNCATE TABLE "MonthlyFacBal" DROP STORAGE';
+          EXECUTE IMMEDIATE 'ALTER TABLE "MonthlyFacBal" ENABLE PRIMARY KEY';
+        END IF;
+
+        SELECT "StartMonth"
+        INTO "DateStart"
+        FROM "TfByYear"
+        WHERE "Seq" = "ExecSeq"
+        ;
+
+        SELECT "EndMonth"
+        INTO "DateEnd"
+        FROM "TfByYear"
+        WHERE "Seq" = "ExecSeq"
+        ;
 
         -- 寫入資料
         INSERT INTO "MonthlyFacBal" (
@@ -170,6 +186,7 @@ BEGIN
                              AND NVL(CF."ClNo",0) > 0
         LEFT JOIN "LA$ACTP" ACT ON ACT."LMSACN" = DLY."LMSACN"
         WHERE DLY."ADTYMT" >= "DateStart"
+          AND DLY."ADTYMT" <= "DateEnd"
         ;
 
         -- 記錄寫入筆數
@@ -327,6 +344,7 @@ BEGIN
                     ,SUM("LMSTPN") AS "LMSTPN" -- 催收還款金額
               FROM "LA$MSTP"
               WHERE "ADTYMT" >= "DateStart"
+                AND "ADTYMT" <= "DateEnd"
                 AND "ACTACT" = '990' 
                 AND "LMSFBD" > 0 -- 催收開始日不為0
               GROUP BY "ADTYMT"
@@ -347,6 +365,7 @@ BEGIN
                                             ) AS "Seq"
                    FROM "LA$MSTP"
                    WHERE "ADTYMT" >= "DateStart"
+                     AND "ADTYMT" <= "DateEnd"
                      AND "ACTACT" = '990' 
                      AND "LMSFBD" > 0 -- 催收開始日不為0
                   ) S1 ON S1."ADTYMT" = S0."ADTYMT"
@@ -357,6 +376,7 @@ BEGIN
                                AND DLY."LMSACN" = S0."LMSACN"
                                AND DLY."LMSAPN" = S0."LMSAPN"
                                AND DLY."ADTYMT" >= "DateStart"
+                               AND DLY."ADTYMT" <= "DateEnd"
         LEFT JOIN "CustMain" CU ON CU."CustNo" = S0."LMSACN"
         LEFT JOIN "FacMain" FAC ON FAC."CustNo" = S0."LMSACN"
                                AND FAC."FacmNo" = S0."LMSAPN"
@@ -511,6 +531,7 @@ BEGIN
                                            AND MFB."CustNo" = MSTP."LMSACN"
                                            AND MFB."FacmNo" = MSTP."LMSAPN"
               WHERE MSTP."ADTYMT" >= "DateStart"
+                AND MSTP."ADTYMT" <= "DateEnd"
                 AND NVL(MFB."YearMonth",0) = 0 -- 沒寫入過的資料
               GROUP BY MSTP."ADTYMT"
                       ,MSTP."LMSACN"

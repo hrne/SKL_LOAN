@@ -1,5 +1,6 @@
 package com.st1.itx.trade.BS;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
@@ -19,6 +21,7 @@ import com.st1.itx.db.domain.BankRmtf;
 import com.st1.itx.db.domain.DailyTav;
 import com.st1.itx.db.domain.DailyTavId;
 import com.st1.itx.db.domain.NegAppr02;
+import com.st1.itx.db.domain.NegAppr02Id;
 import com.st1.itx.db.domain.NegMain;
 import com.st1.itx.db.domain.NegTrans;
 import com.st1.itx.db.domain.NegTransId;
@@ -94,21 +97,27 @@ public class BST03 extends TradeBuffer {
 			if (t.getReconCode().equals("A6") || t.getReconCode().equals("A7")) {
 				if (!t.getTitaTlrNo().isEmpty()) {
 					this.info(t.toString());
-					int custNo = getAppr02CustNo(t, titaVo);
+					int custNo = getAppr02CustNo(t, titaVo);// 債協主檔戶號
 					t.setCustNo(custNo);
-					// 暫收存入、暫收轉入，產生債協入帳明細
-					String acctCode = getAcctCode(t.getCustNo(), titaVo);
-					/* 貸：債協暫收款－抵繳款 */
-					AcDetail acDetail = new AcDetail();
-					acDetail.setDbCr("C");
-					acDetail.setAcctCode(acctCode);
-					acDetail.setTxAmt(t.getRepayAmt()); //
-					acDetail.setCustNo(t.getCustNo());// 戶號
-					lAcDetail.add(acDetail);
+					// 一般債權不寫AcDetail但要維護NegTrans
+					NegMain tNegMain = new NegMain();
+					tNegMain = negMainService.statusFirst("0", custNo, titaVo); // 0-正常
+					if (tNegMain != null) {
+						if ("Y".equals(tNegMain.getIsMainFin())) {
+							// 暫收存入、暫收轉入，產生債協入帳明細
+							String acctCode = getAcctCode(t.getCustNo(), titaVo);
+							/* 貸：債協暫收款－抵繳款 */
+							AcDetail acDetail = new AcDetail();
+							acDetail.setDbCr("C");
+							acDetail.setAcctCode(acctCode);
+							acDetail.setTxAmt(t.getRepayAmt()); //
+							acDetail.setCustNo(t.getCustNo());// 戶號
+							lAcDetail.add(acDetail);
+						}
+						updateNegTrans(t, titaVo);
+						// dailyTav(acctCode, t, titaVo);
 
-					updateNegTrans(t, titaVo);
-					// dailyTav(acctCode, t, titaVo);
-
+					}
 				}
 			}
 		}
