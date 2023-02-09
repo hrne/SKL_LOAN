@@ -323,7 +323,7 @@ public class CheckAml extends TradeBuffer {
 
 		if ("1".equals(checkAmlVo.getIdentityCd()) && checkAmlVo.getSex().isEmpty()) {
 // 			throw new LogicException("EC004", "CheckAml.CheckVo : 身份別為自然人時,參數 Sex 不可為空白");
-			checkAmlVo.setIdentityCd("M");
+			checkAmlVo.setSex("M");
 		} else if ("2".equals(checkAmlVo.getIdentityCd())) {
 			checkAmlVo.setSex("");
 		}

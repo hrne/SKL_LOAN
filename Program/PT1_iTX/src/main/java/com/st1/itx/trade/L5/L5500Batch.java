@@ -159,6 +159,10 @@ public class L5500Batch extends TradeBuffer {
 
 		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", msg, titaVo);
 
+		l9744Batch.setTxBuffer(this.getTxBuffer());
+		l9745Batch.setTxBuffer(this.getTxBuffer());
+		l9746Batch.setTxBuffer(this.getTxBuffer());
+		
 		l9744Batch.run(titaVo);
 		l9745Batch.run(titaVo);
 		l9746Batch.run(titaVo);

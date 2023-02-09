@@ -50,6 +50,11 @@ E(0,0)
 #button=x,1,S
 K(MODIFYBUTTON,查詢)
 
+! 2021-07-28 智偉增加
+#FUNCIND=_,_,S
+E(0,5)
+<include src="COM.icf::CheckAuth.rtn"/>
+
 !---------- AP TEXT AREA Variables ----------
 
 #FdReportDate=X,2,L

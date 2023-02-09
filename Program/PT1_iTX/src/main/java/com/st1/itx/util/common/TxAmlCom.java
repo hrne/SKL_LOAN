@@ -506,7 +506,7 @@ public class TxAmlCom extends TradeBuffer {
 			checkAmlVo.setCustKey("");
 		// 身份別 1:自然人 2:法人
 		// EntCode 企金別 0:個金 1:企金 2:企金自然人""
-		if (tCustMain.getEntCode() != null || "1".equals(tCustMain.getEntCode()))
+		if (tCustMain.getEntCode() != null && "1".equals(tCustMain.getEntCode()))
 			checkAmlVo.setIdentityCd("2");
 		else
 			checkAmlVo.setIdentityCd("1");

@@ -366,8 +366,10 @@ public class LoanAvailableAmt extends TradeBuffer {
 				} else {
 					ClMain tClMain1 = clMainService.findById(new ClMainId(t.getClCode1(), t.getClCode2(), t.getClNo()),
 							titaVo);
-					t.setShareAmt(tClMain1.getShareTotal());
-					t.setFacShareFlag(1);
+					if (tClMain1 != null) {
+						t.setShareAmt(tClMain1.getShareTotal());
+						t.setFacShareFlag(1);
+					}
 				}
 				for (ClFac c : lClFac) {
 					if (c.getClCode1() == t.getClCode1() && c.getClCode2() == t.getClCode2()

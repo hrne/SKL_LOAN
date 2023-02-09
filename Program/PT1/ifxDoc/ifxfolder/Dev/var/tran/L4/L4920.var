@@ -364,11 +364,12 @@ T(3,)T(H,#OOProcCode,#ProcCodeHelp)
 T(1,@OOTxtNo,#OOTxSn,11,8)
 
 #OOBTN_TXT=X,8,O
-SWITCH(#OOProcStsCode,5,T(2,查詢),
-                   6,T(2,查詢),
-                   7,T(2,查詢),
-				   C(3,#OORepayCode,1,IF(#OORepayAmt>0||#OORepayAmt==0,T(2,維護),IF(#OOTxtNo >= 0, T(2,查詢),T(2,維護))),T(2,查詢))
-				   )
+!SWITCH(#OOProcStsCode,5,T(2,查詢),
+!                   6,T(2,查詢),
+!                   7,T(2,查詢),
+!				   C(3,#OORepayCode,1,IF(#OORepayAmt>0||#OORepayAmt==0,T(2,維護),IF(#OOTxtNo >= 0, T(2,查詢),T(2,維護))),T(2,查詢))
+!				   )
+           IF(#OOProcStsCode > 4 || #OORepayCode > 1, T(2,查詢) ,  T(2,維護))
 #OOBTN_TXTB=X,8,O
 SWITCH(#OOProcStsCode,5,T(2,分錄),
                    6,T(2,分錄),
@@ -415,7 +416,7 @@ IF(#OOBTN_TXT == "查詢",T(2,5+#AcDate+#OOBatchNo+#OODetailSeq),T(2,2+#AcDate+#
 T(2,#AcDate+0000000+#OOTxSn)
 
 #OOBTN_A=A,2,O
-IF(#OOProcStsCode==5||#OOProcStsCode==6||#OOProcStsCode==7,C(5,#CtrlSearch,RESV,BIND(grid,cancel),$)C(5,#CtrlSearch,RESV,s,$)SWITCH(#OORepayCode,01,BIND(grid,{ cmd=CHAIN; ntxcd=L4201; text=#OOBTN_TXT; ntxbuf=#OOBUF_L4201}),
+IF(#OOProcStsCode==5||#OOProcStsCode==6||#OOProcStsCode==7,C(5,#CtrlSearch,REVV,BIND(grid,cancel),$)C(5,#CtrlSearch,REVV,s,$)SWITCH(#OORepayCode,01,BIND(grid,{ cmd=CHAIN; ntxcd=L4201; text=#OOBTN_TXT; ntxbuf=#OOBUF_L4201}),
                                             02,C(5,#OOReconCode,P01,BIND(grid,{ cmd=CHAIN; ntxcd=L4203; text=#OOBTN_TXT; ntxbuf=#OOBUF_L4203}),
                                                                   BIND(grid,{ cmd=CHAIN; ntxcd=L4202; text=#OOBTN_TXT; ntxbuf=#OOBUF_L4202})),
                                             03,BIND(grid,{ cmd=CHAIN; ntxcd=L4204; text=#OOBTN_TXT; ntxbuf=#OOBUF_L4204}),
@@ -425,7 +426,7 @@ IF(#OOProcStsCode==5||#OOProcStsCode==6||#OOProcStsCode==7,C(5,#CtrlSearch,RESV,
                                             07,BIND(grid,{ cmd=CHAIN; ntxcd=L4210; text=#OOBTN_TXT; ntxbuf=#OOBUF_L4210}),
                                             09,BIND(grid,{ cmd=CHAIN; ntxcd=L4210; text=#OOBTN_TXT; ntxbuf=#OOBUF_L4210}),
                                             11,BIND(grid,{ cmd=CHAIN; ntxcd=L4210; text=#OOBTN_TXT; ntxbuf=#OOBUF_L4210}),
-                                               BIND(grid,cancel)),C(5,#CtrlSearch,RESV,BIND(grid,cancel),$)C(5,#CtrlSearch,RESV,s,$)
+                                               BIND(grid,cancel)),C(5,#CtrlSearch,REVV,BIND(grid,cancel),$)C(5,#CtrlSearch,REVV,s,$)
                         SWITCH(#OORepayCode,01,BIND(grid,{ cmd=CHAIN; ntxcd=L4201; text=#OOBTN_TXT; ntxbuf=#OOBUF_L4201}),
                                             02,C(5,#OOReconCode,P01,BIND(grid,{ cmd=CHAIN; ntxcd=L4203; text=#OOBTN_TXT; ntxbuf=#OOBUF_L4203}),
                                                                   BIND(grid,{ cmd=CHAIN; ntxcd=L4202; text=#OOBTN_TXT; ntxbuf=#OOBUF_L4202})),
