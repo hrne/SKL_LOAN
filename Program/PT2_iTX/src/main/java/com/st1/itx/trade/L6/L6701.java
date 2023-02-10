@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
@@ -19,15 +20,6 @@ import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
-
-/*
- * Tita
- * FuncCode=9,1
- * BankCode=X,3
- * BranchCode=X,4
- * BankItem=X,100
- * BranchItem=X,100
- */
 
 @Service("L6701")
 @Scope("prototype")
@@ -124,8 +116,18 @@ public class L6701 extends TradeBuffer {
 
 		case 4: // 刪除
 			tCdBank = sCdBankService.holdById(new CdBankId(iBankCode, iBranchCode));
+			// 刪除總行需底下無分行才可刪除
 			if (tCdBank != null) {
-
+				if (tCdBank.getBranchItem().trim().isEmpty()) {
+					Slice<CdBank> slCdBank = sCdBankService.branchCodeLike(iBankCode, iBranchCode.trim() + "%", 0,
+							Integer.MAX_VALUE, titaVo);
+					for (CdBank t : slCdBank.getContent()) {
+						if (!t.getBranchItem().trim().isEmpty()) {
+							throw new LogicException(titaVo, "E0015",
+									"總行：" + tCdBank.getBankCode() + " " + tCdBank.getBankItem() + " 尚有其他分行不可刪除"); // 檢查錯誤
+						}
+					}
+				}
 				// 刪除須刷主管卡
 				if (titaVo.getEmpNos().trim().isEmpty()) {
 					sendRsp.addvReason(this.txBuffer, titaVo, "0004", ""); // 交易需主管核可

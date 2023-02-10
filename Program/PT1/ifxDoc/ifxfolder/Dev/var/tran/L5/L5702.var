@@ -310,8 +310,6 @@ T(2,@MainFinCodeX,#L5r12BankItem)
 
 ! 身分證字號
 #CustId=X,10,L
-@C(4,#CustId,S,$)
-A(ID_UNINO,0,#CustId)
 
 ! 案件序號-NegMain
 #CaseSeqR=X,3,L

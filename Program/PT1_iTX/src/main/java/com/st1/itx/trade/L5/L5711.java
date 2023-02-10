@@ -2,6 +2,8 @@ package com.st1.itx.trade.L5;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
+
 /* 套件 */
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -10,8 +12,11 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.DBException;
 /* 錯誤處理 */
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.AcDetail;
+import com.st1.itx.db.domain.NegAppr;
 import com.st1.itx.db.domain.NegAppr01;
 import com.st1.itx.db.domain.NegAppr01Id;
 import com.st1.itx.db.domain.NegMain;
@@ -85,12 +90,12 @@ public class L5711 extends TradeBuffer {
 
 		int iCustNo = Integer.parseInt(titaVo.getParam("CustNo"));
 		int iCaseSeq = Integer.parseInt(titaVo.getParam("CaseSeq"));
-		int iPayerCustNo = 0;
-		NegMain tNegMain = sNegMainService.findById(new NegMainId(iCustNo, iCaseSeq), titaVo);
-
-		if (tNegMain != null) {
-			iPayerCustNo = tNegMain.getPayerCustNo();//保證人的付款人戶號
-		}
+//		int iPayerCustNo = 0;//出帳使用,本交易改為不出帳
+//		NegMain tNegMain = sNegMainService.findById(new NegMainId(iCustNo, iCaseSeq), titaVo);
+//
+//		if (tNegMain != null) {
+//			iPayerCustNo = tNegMain.getPayerCustNo();//保證人的付款人戶號
+//		}
 
 		
 		for (int i = 1; i <= 30; i++) {
@@ -103,7 +108,7 @@ public class L5711 extends TradeBuffer {
 			if (("458").equals(iFinCode)) {
 
 				BigDecimal ApprAmt = parse.stringToBigDecimal(titaVo.getParam("ApprAmt" + i));// 分攤金額
-				updateNegTrans(iAcDAte, iTlrNo, iTxtNo, ApprAmt, iPayerCustNo, titaVo);
+				updateNegTrans(iAcDAte, iTlrNo, iTxtNo, ApprAmt, iCustNo, titaVo);
 
 				BigDecimal AccuApprAmt = parse.stringToBigDecimal(titaVo.getParam("AccuApprAmt" + i));// 累積分攤金額
 				updateNegMain(AccuApprAmt, titaVo);
@@ -127,7 +132,7 @@ public class L5711 extends TradeBuffer {
 					throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 				}
 				dataLog.setEnv(titaVo, beforeNegAppr01,mNegAppr01);
-				dataLog.exec("修改最大債權撥付資料檔");
+				dataLog.exec("修改最大債權撥付資料檔-債權機構="+iFinCode);
 			}
 		}
 
@@ -142,6 +147,7 @@ public class L5711 extends TradeBuffer {
 	public void updateNegTrans(int mAcDAte, String mTlrNo, int mTxtNo, BigDecimal mApprAmt,int iPayerCustNo, TitaVo titaVo) throws LogicException {
 		this.info("into updateNegTrans ");
 		NegTrans iNegTrans = sNegTransService.findById(new NegTransId(mAcDAte, mTlrNo, mTxtNo), titaVo);
+		NegTrans beforeNegTrans = (NegTrans) dataLog.clone(iNegTrans);
 
 		if (iNegTrans != null) {
 			if (mApprAmt.compareTo(iNegTrans.getSklShareAmt()) == 0) {
@@ -156,6 +162,8 @@ public class L5711 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", "債務協商交易檔"); // 更新資料時，發生錯誤
 			}
+			dataLog.setEnv(titaVo, beforeNegTrans,iNegTrans);
+			dataLog.exec("債務協商交易檔");
 
 		}
 	}
@@ -167,6 +175,7 @@ public class L5711 extends TradeBuffer {
 		int iCaseSeq = Integer.parseInt(titaVo.getParam("CaseSeq"));
 
 		NegMain tNegMain = sNegMainService.findById(new NegMainId(iCustNo, iCaseSeq), titaVo);
+		NegMain beforeNegMain = (NegMain) dataLog.clone(tNegMain);
 
 		if (tNegMain != null) {
 
@@ -182,6 +191,8 @@ public class L5711 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
+			dataLog.setEnv(titaVo, beforeNegMain,tNegMain);
+			dataLog.exec("債務協商案件主檔");
 		}
 	}
 

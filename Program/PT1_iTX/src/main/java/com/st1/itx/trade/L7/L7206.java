@@ -165,6 +165,9 @@ public class L7206 extends TradeBuffer {
 
 		int CountAll = occursList.size();
 		int CountS = 0;
+
+		this.info("iFunctionName.occursList = " + occursList.toString());
+
 		// 0:人壽利關人職員名單[LA$RLTP] ;csv xlsx xls
 		if (iFunctionCode == 0) {
 
@@ -395,6 +398,8 @@ public class L7206 extends TradeBuffer {
 	 */
 	public void setValueFromFile(ArrayList<String> lineList, int repoNo) {
 		int row = 0;
+		// repno=2 判斷欄位用
+		int s = 0;
 		// 依照行數擷取明細資料
 		for (String thisLine : lineList) {
 
@@ -442,14 +447,14 @@ public class L7206 extends TradeBuffer {
 					// 2:人壽負利關人職員名單[T07_2]
 				} else if (repoNo == 2) {
 
-					int s = 0;
-					for (int i = 0; i < thisColumn.length; i++) {
-						if ((thisColumn[i].length() == 10 || thisColumn[i].length() == 8) && row == 2) {
-							s = i;
-							this.info("start col =" + s);
-							break;
-						}
-					}
+					s = 2;
+//					for (int i = 0; i < thisColumn.length; i++) {
+//						if ((thisColumn[i].length() == 10 || thisColumn[i].length() == 8) && row == 2) {
+//							s = i;
+//							this.info("start col =" + s);
+//							break;
+//						}
+//					}
 
 					occursList.putParam("EmpId", thisColumn[s + 0]);
 					occursList.putParam("EmpName", thisColumn[s + 1]);
@@ -710,7 +715,7 @@ public class L7206 extends TradeBuffer {
 			resText = decimalFormat.toPlainString();
 		} else if (text.contains("-") || text.length() == 0) {
 			resText = "-";
-		}else {
+		} else {
 			resText = text;
 		}
 

@@ -171,7 +171,7 @@ T(2,#ST_DTS)
 @
 C(3,#ST_DT,0,S,A(4,0,#ST_DT))
 V(5,#ST_DT,#SYSCDATE)
-IF(#ST_DT>=#DT,V(P,會計起日不能大於會計日),$)
+
 
 #ED_DT=D,7,I
 C(3,#CHAIN,1,s,$)
@@ -182,6 +182,8 @@ D(8)
 V(7)
 A(4,0,#ED_DT)
 V(5,#ST_DT,#ED_DTS)
+IF(#ST_DT>#ED_DT,V(P,會計起日不能大於會計訖日),$)
+
 
 #SX_DT=D,7,I
 C(3,#CHAIN,1,s,$)

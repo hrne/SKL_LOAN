@@ -33,7 +33,7 @@ T(3,0:無權限;1:有權限)
 ![      "#Fd4+AD認證",              #AdFg,#AdFgX],
 [      "#Fd5+姓名",                #TlrItem],
 [      "#Fd3+權限等級",            #LevelFg,#LevelFgX],
-[      "#FdAllowFg+主管等級",      #AllowFg],
+[      "#FdAllowFg+主管等級",      #AllowFg,#AllowFgX],
 [      "#FdBrNo+使用單位",         #BrNo,#BrNoX],
 [      "#Fd9+課組別",              #GroupNo,#GroupNoX],
 [      "#FdStation+站別",          #Station,#StationX],
@@ -99,19 +99,36 @@ T(3,CdCode.Station)
 
 #StationHelp=x,1000,S
 
+![經辦/使用者等級]
+#LevelHelp=X,100,S
+T(3,1:主管;3:經辦)
+
+#AllowFgCode=x,14,S
+T(3,CdCode.AllowFg)
+#AllowHelp=x,1000,S
+
+!#AllowHelp=x,1000,S
+!T(3,1:課主管;2:部門主管;3:副總經理)
+!T(3,CdCode.AllowFg)
+
+
+!#AllowFgX=X,4,L
+!T(H,#AllowFg,#AllowHelp)
+
+
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#H1,#H2,#CODEFuncCode2,#StationCode)
+S(XXR99,01,#H1,#H2,#CODEFuncCode2,#StationCode,#AllowFgCode)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@BrHelp,#HelpDesc1)
 T(2,@AuthHelp,#HelpDesc2)
 T(2,@FuncCode2Help,#HelpDesc3)
 T(2,@StationHelp,#HelpDesc4)
+T(2,@AllowHelp,#HelpDesc5)
 
-![經辦/使用者等級]
-#LevelHelp=X,100,S
-T(3,1:主管;3:經辦)
+
 
 !AD認證
 #YnHelp=X,20,S
@@ -216,6 +233,8 @@ T(F,@AllowFg,#ShowFrame2)
 T(F,@Station,#ShowFrame2)
 T(F,@AdminFg,#ShowFrame2)
 T(F,@EmailAddress,#ShowFrame2)
+T(F,@AllowFg,#ShowFrame2)
+
 ##loop {times:40,i:1}
 T(F,@AuthNo{i},#ShowFrame2)
 ##end
@@ -254,6 +273,7 @@ T(2,@TlrItem,#L6R17Fullname)
 
 #TT=X,1,S
 T(H,@LevelFgX,#LevelFg,#LevelHelp)
+T(H,@AllowFgX,#AllowFg,#AllowHelp)
 T(H,@AdFgX,#AdFg,#YnHelp)
 T(H,@BrNoX,#BrNo,#BrHelp)
 T(H,@StatusX,#Status,#StatusHelp)
@@ -358,15 +378,40 @@ C(2,#FunCode,s,$,$,s,s,s)
 HELP(#LevelHelp)
 @T(3,@LevelFgX,)
 V(H,#LevelHelp)
+!C(5,#LevelFg,1,#AllowFg)
 
 #LevelFgX=X,4,L
 T(H,#LevelFg,#LevelHelp)
 
+!#AllowFg=A,1,I
+!C(2,#FunCode,s,$,$,s,s,s)
+!C(3,#LevelFg,1,$,S)
+!@
+!V(5,1,5)
+
+!主管等級20230210修改
 #AllowFg=A,1,I
+!C(5,#LevelFg,1, ,s)
+!C(5,#LevelFg,3, ,S)
+C(3,#LevelFg,1,#AllowFg,S)
+!C(3,#LevelFg,1,T(F,@AllowFg,0),$)
 C(2,#FunCode,s,$,$,s,s,s)
-C(3,#LevelFg,1,$,S)
-@
-V(5,1,5)
+HELP(#AllowHelp)
+@T(3,@AllowFgX,)
+!@T(3,CdCode.AllowFg)
+!#AllowHelp=x,1024,S
+C(4,#AllowFg,T(3,@AllowFg,000),$)
+@V(H,#AllowHelp)
+
+#AllowFgX=X,8,L
+C(3,#LevelFg,1,#AllowFgX,S)
+T(H,#AllowFg,#AllowHelp)
+
+
+
+
+
+
 
 ![AD認證]
 !輸入後會將AD伺服器回傳的人員名稱傳到#Desc欄位

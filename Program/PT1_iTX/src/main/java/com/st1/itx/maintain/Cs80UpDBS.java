@@ -377,6 +377,7 @@ public class Cs80UpDBS extends CommBuffer {
 					tTxFlow.setFlowBrNo(tTxFlow.getConBrNo());
 					tTxFlow.setFlowGroupNo(tTxFlow.getConGroupNo());
 				}
+				tTxFlow.setRejectReason("");
 			}
 			break;
 		case 3:
@@ -393,6 +394,7 @@ public class Cs80UpDBS extends CommBuffer {
 				tTxFlow.setTxNo4("");
 			} else {
 				tTxFlow.setTxNo4(this.titaVo.getKinbr() + this.titaVo.getTlrNo() + this.titaVo.getTxtNo());
+				tTxFlow.setRejectReason("");
 			}
 			break;
 		}
