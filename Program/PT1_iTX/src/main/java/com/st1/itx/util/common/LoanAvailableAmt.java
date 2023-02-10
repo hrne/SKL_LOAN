@@ -114,8 +114,8 @@ public class LoanAvailableAmt extends TradeBuffer {
 
 		// 可用額度(擔保品)
 		this.availableCl = compClAvailable(tFacMain, titaVo);
-		// 擔保品共用記號 1-擔保品可使用小於額度可使用金額, 2-無關聯擔保品
-		if (this.availableCl.compareTo(this.availableAmt) < 0) {
+		// 擔保品共用記號 1-擔保品可使用額度小於0, 2-無關聯擔保品
+		if (this.availableCl.compareTo(BigDecimal.ZERO) < 0) {
 			if (lClFac.size() == 0) {
 				this.clShareFlag = "2";
 			} else {

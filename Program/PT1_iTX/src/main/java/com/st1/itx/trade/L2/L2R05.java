@@ -102,6 +102,7 @@ public class L2R05 extends TradeBuffer {
 	private String sProdNo;
 	private String wkCloseFg = "N"; // 未齊件未消註記
 	private BigDecimal wkAcctFee = BigDecimal.ZERO;
+	private BigDecimal wkRenewBal = BigDecimal.ZERO;
 	private FacProd tFacProd;
 	private FacMain tFacMain;
 	private CustMain tCustMain;
@@ -141,7 +142,7 @@ public class L2R05 extends TradeBuffer {
 		iFacmNo = this.parse.stringToInteger(titaVo.getParam("RimFacmNo"));
 		iApplNo = this.parse.stringToInteger(titaVo.getParam("RimApplNo"));
 		iCaseNo = this.parse.stringToInteger(titaVo.getParam("RimCaseNo"));
-		this.info("iCustNo   = " + iCustNo);
+
 		List<LoanNotYet> lLoanNotYet = new ArrayList<LoanNotYet>();
 
 		// 檢查輸入資料
@@ -251,6 +252,7 @@ public class L2R05 extends TradeBuffer {
 										+ df.format(tFacMain.getLineAmt()) + " 已動用額度餘額 = "
 										+ df.format(tFacMain.getUtilBal())); // 該筆額度編號沒有可用額度
 					}
+					wkRenewBal = tAcReceivable.getAcBal();
 				}
 			}
 		}
@@ -311,6 +313,7 @@ public class L2R05 extends TradeBuffer {
 								+ tFacMain.getFacmNo() + " 核准額度 = " + df.format(tFacMain.getLineAmt()) + " 已動用額度餘額 = "
 								+ df.format(tFacMain.getUtilBal()) + " 已預約撥款金額 = " + df.format(wkRvDrawdownAmt)); // 該筆額度編號沒有可用額度
 					}
+					wkRenewBal = tAcReceivable.getAcBal();
 				}
 			}
 		}
@@ -461,7 +464,7 @@ public class L2R05 extends TradeBuffer {
 		this.totaVo.putParam("L2r05BreachDecreaseMonth", tFacMain.getBreachDecreaseMonth());
 		this.totaVo.putParam("L2r05BreachDecrease", tFacMain.getBreachDecrease());
 		this.totaVo.putParam("L2r05BreachStartPercent", tFacMain.getBreachStartPercent());
-		
+
 		this.totaVo.putParam("L2r05CreditScore", tFacMain.getCreditScore());
 		this.totaVo.putParam("L2r05GuaranteeDate", tFacMain.getGuaranteeDate());
 		this.totaVo.putParam("L2r05ContractNo", tFacMain.getContractNo());
@@ -486,9 +489,12 @@ public class L2R05 extends TradeBuffer {
 		BigDecimal wkAvailableAmt = loanAvailableAmt.caculate(tFacMain, titaVo); // 可用額度
 		// 限額計算方式 F-核准額度, C-擔保品 S-合併額度控管
 		String wkLimitFlag = loanAvailableAmt.getLimitFlag();
+		BigDecimal wkAvailableCl = loanAvailableAmt.getAvailableCl();
 		// 借新還舊處理
-		this.totaVo.putParam("L2r05AvailableAmt", tAcReceivable == null ? wkAvailableAmt : tAcReceivable.getAcBal());
-		this.totaVo.putParam("L2r05RenewFlag", tAcReceivable == null ? "N" : "Y");
+		this.totaVo.putParam("L2r05AvailableAmt", wkAvailableAmt.add(wkRenewBal));
+		this.totaVo.putParam("L2r05AvailableCl", wkAvailableCl);
+
+		this.totaVo.putParam("L2r05RenewFlag", wkRenewBal.compareTo(BigDecimal.ZERO) > 0 ? "Y" : "N");
 		this.totaVo.putParam("L2r05LimitFlag", wkLimitFlag);
 
 		// 綠色授信
@@ -508,6 +514,7 @@ public class L2R05 extends TradeBuffer {
 		} else {
 			this.totaVo.putParam("L2r05StarBuildingYM", tFacMain.getStarBuildingYM());
 		}		
+
 
 	}
 
@@ -651,7 +658,7 @@ public class L2R05 extends TradeBuffer {
 		this.totaVo.putParam("L2r05BreachGetCode", "");
 		this.totaVo.putParam("L2r05ProdBreachFlag", "");
 		this.totaVo.putParam("L2r05BreachFlag", "");
-		this.totaVo.putParam("L2r05ProhibitMonth",0);
+		this.totaVo.putParam("L2r05ProhibitMonth", 0);
 		this.totaVo.putParam("L2r05BreachPercent", 0);
 		this.totaVo.putParam("L2r05BreachDecreaseMonth", 0);
 		this.totaVo.putParam("L2r05BreachDecrease", 0);
@@ -708,6 +715,5 @@ public class L2R05 extends TradeBuffer {
 		//購地貸款相關
 		this.totaVo.putParam("L2r05PreStarBuildingYM", 0);
 		this.totaVo.putParam("L2r05StarBuildingYM", 0);
-		
 	}
 }

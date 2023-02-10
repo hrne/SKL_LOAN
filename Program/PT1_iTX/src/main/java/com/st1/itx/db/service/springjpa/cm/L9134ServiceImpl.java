@@ -98,6 +98,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          , AD.\"AcNoCode\" ";
 		sql += "          , AD.\"AcSubCode\" ";
 		sql += "          , AD.\"AcDtlCode\" ";
+		sql += "          , C.\"AcNoItem\"  ";
 		sql += "          , C.\"AcctItem\" ";
 		sql += "          , CASE ";
 		sql += "              WHEN AD.\"DbCr\" = 'D' ";
@@ -172,7 +173,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// sql += " WHERE AC.\"AcNoCode\" IN ('20222010000','20222020000','20222180000',
 		// '20222180100' ,'20222180200') ";
 		//sql += "     WHERE AC.\"AcNoCode\" LIKE '20222%' ";
-		sql += "    WHERE  AC.\"AcNoCode\" in ('TAV','TCK','TEM','TAM','TRO','TLD') ";
+		sql += "    WHERE  AC.\"AcctCode\" in ('TAV','TCK','TEM','TAM','TRO','TLD') ";
 		sql += "       AND AC.\"RvBal\" > 0 ";
 		sql += "     ORDER BY AC.\"AcNoCode\" ASC ";
 		sql += "            , AC.\"AcSubCode\" ASC ";
@@ -188,7 +189,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 	
 	/**
-	 * L9134 暫收款對帳-日調結表(可抵繳暫收款)
+	 * L9134 暫收款對帳-日調結表(可抵繳暫收款) L9134 暫收款對帳-日調結表(不可抵繳暫收款)1
 	 * 
 	 * @param titaVo TitaVo
 	 * @return 查詢結果
@@ -203,8 +204,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("idx  = " + idx);
 		String itdx = itdate.substring(0,6);
 		this.info("itdx   = " + itdx);
-//		int idateday = parse.stringToInteger(parse.IntegerToString(idate,0).substring(6,2));
-//		this.info("idateday  = " + idateday);
+
 		String sql = " ";
 		sql += " select \"AcDate\" ";
 		sql += " , sum(\"TdBal\") as \"TdBal\"   ";
@@ -225,6 +225,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,\"YdBal\" ";
 		sql += " from \"AcMain\" ";
 		sql += " where \"AcDate\" = :itdate ";
+		sql += "   and \"AcctCode\" in ('TAV','TAM','TLD','T11','T13','T12','T10') ";
 		sql += " ) ";
 		sql += " group by \"AcDate\" ";
 		sql += " order by \"AcDate\" ";
@@ -233,33 +234,91 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("itdate", itdate);
-//		for (int i = idx; i != 0; i--) {
-//			String iddx = parse.IntegerToString(idx,2);
-//			String itdxx = itdx+iddx;
-//		query.setParameter("itdxx" , itdxx);
-//		}
 		return this.convertToMap(query);
 	}
 	/**
-	 * L9134 暫收款對帳-日調結表(不可抵繳暫收款)
+	 * L9134 暫收款對帳-日調結表(可抵繳暫收款) L9134 暫收款對帳-日調結表(不可抵繳暫收款) 2
 	 * 
 	 * @param titaVo TitaVo
 	 * @return 查詢結果
 	 */
-	public List<Map<String, String>> doQueryL9134_4_1(TitaVo titaVo) {
+	public List<Map<String, String>> doQueryL9134_4_1(TitaVo titaVo, int idate) throws LogicException {
 		this.info("L9134_4_1 Start");
+		this.info("idate   = " + idate );
+		String itdate =  parse.IntegerToString(idate+19110000, 8);
+		this.info("itdate   =" +itdate);
+		int idx = parse.stringToInteger(titaVo.getParam("StartDate").trim().substring(5,7));
+		this.info("idx  = " + idx);
+		String itdx = itdate.substring(0,6);
+		this.info("itdx   = " + itdx);
+		
+		
 		
 		String sql = " ";
-		sql += " select  ";
-		sql += " sum(\"TdBal\") as \"TdBal\", ";
-		sql += " sum(\"TdBal\") - sum(\"YdBal\") as \"difTdBal\" ";
+		sql += " select \"AcDate\" ";
+		sql += " , sum(\"TdBal\") as \"TdBal\"   ";
+		sql += " , sum(\"TdBal\") - sum(\"YdBal\") as \"DifTdBal\"  ";
+		sql += " , sum(\"didTdal\") as \"didTdBal\"  ";
+		sql += " , sum(\"didTdal\") - sum(\"didYdBal\") as \"didDifTdBal\" ";
+		sql += " from ";
+		sql += " ( ";
+		sql += " select";
+		sql += "  20220101||'~'||20220131 as \"AcDate\" ";
+		sql += "  ,sum(\"YdBal\") as \"YdBal\" ";
+		sql += "  ,sum(\"TdBal\") as \"TdBal\" ";
+		sql += "  ,0 as \"didYdBal\"";
+		sql += "  ,0 as \"didTdal\" ";
 		sql += " from \"AcMain\" ";
-		sql += " where \"AcctCode\" in ('TCK')   ";
-
+		sql += " where \"AcDate\" >= 20220101 and \"AcDate\" <= 20220131 ";
+		sql += "   and \"AcctCode\" in ('TAV','TAM','TLD','T11','T13','T12','T10') ";
+		sql += " union all ";
+		sql += " select ";
+		sql += "  20220101||'~'||20220131 as \"AcDate\", ";
+		sql += "  0 as \"YdBal\" ";
+		sql += " ,0 as \"TdBal\" ";
+		sql += " ,sum(\"YdBal\") as \"didYdBal\" ";
+		sql += " ,sum(\"TdBal\") as \"didTdal\" ";
+		sql += " from \"AcMain\" ";
+		sql += " where \"AcDate\" >= 20220101 and \"AcDate\" <= 20220131 ";
+		sql += " and \"AcctCode\" in ('TCK')  ";
+		sql += " union all ";
+		for (int i = 1; i <= idx; i++) {
+		sql += " select ";
+		sql += " to_char("+ itdx +  parse.IntegerToString(i, 2) +")  as \"AcDate\" ";
+		sql += " ,0 as \"YdBal\" ";
+		sql += " ,0 as \"TdBal\" ";
+		sql += " ,0 as \"didYdBal\" ";
+		sql += " ,0 as \"didTdal\" ";
+		sql += " from dual ";
+		sql += " union all ";
+		}
+		sql += " select  ";
+		sql += " to_char(\"AcDate\") as \"AcDate\" ";
+		sql += " ,\"TdBal\"";
+		sql += " ,\"YdBal\" ";
+		sql += " , 0 as \"didYdBal\" ";
+		sql += " , 0 as \"didTdal\" ";
+		sql += " from \"AcMain\" ";
+		sql += " where \"AcDate\" = :itdate ";
+		sql += "   and \"AcctCode\" in ('TAV','TAM','TLD','T11','T13','T12','T10') ";
+		sql += " union all ";
+		sql += " select ";
+		sql += " to_char(\"AcDate\") as \"AcDate\" ";
+		sql += " , 0 as \"YdBal\"";
+		sql += " , 0 as \"TdBal\"";
+		sql += " , \"YdBal\" as \"didYdBal\"";
+		sql += " , \"TdBal\" as \"didTdal\"";
+		sql += " from \"AcMain\" ";
+		sql += " where \"AcctCode\" in ('TCK') ";
+		sql += " and  \"AcDate\" =:itdate ";
+		sql += " ) ";
+		sql += " group by \"AcDate\" ";
+		sql += " order by \"AcDate\" ";
 		this.info("doQueryL9134_4_1 sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
+		query.setParameter("itdate", itdate);
 		return this.convertToMap(query);
 	}
 

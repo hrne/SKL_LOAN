@@ -16,6 +16,7 @@ import com.st1.itx.db.service.AcAcctCheckService;
 import com.st1.itx.db.service.AcMainService;
 import com.st1.itx.tradeService.CommBuffer;
 import com.st1.itx.util.common.MakeExcel;
+import com.st1.itx.util.common.SortMapListCom;
 import com.st1.itx.util.common.data.ReportVo;
 
 @Component("L9133Report")
@@ -31,6 +32,9 @@ public class L9133Report extends CommBuffer {
 
 	@Autowired
 	private MakeExcel makeExcel;
+
+	@Autowired
+	SortMapListCom sortMapListCom;
 
 	private String reportCode = "L9133";
 	private String reportItem = "會計與主檔餘額檢核表";
@@ -69,6 +73,36 @@ public class L9133Report extends CommBuffer {
 
 		String tmpAcctCode = "";
 
+		int tmpCount = 0;
+
+		// 紀錄sheet1(檢核表)科目筆數
+		int tmpSheet1Count = 0;
+
+		// 為sheet1(檢核表)的最後一筆列印小計 先跑一遍做筆數紀錄
+		for (AcAcctCheck tAcAcctCheck : lAcAcctCheck) {
+
+			BigDecimal total = tAcAcctCheck.getTdBal().add(tAcAcctCheck.getReceivableBal())
+					.add(tAcAcctCheck.getAcctMasterBal());
+			if (total.compareTo(BigDecimal.ZERO) == 0) {
+				continue;
+			}
+
+			switch (tAcAcctCheck.getAcctCode()) {
+			case "310":
+			case "320":
+			case "330":
+			case "340":
+			case "990":
+				tmpSheet1Count++;
+				break;
+			default:
+				break;
+			}
+
+		}
+
+		this.info("tmpSheet1Count = " + tmpSheet1Count);
+
 		for (AcAcctCheck tAcAcctCheck : lAcAcctCheck) {
 
 			// 2022-03-16 智偉新增判斷:會計帳&銷帳檔&主檔 皆為0者不顯示
@@ -95,16 +129,16 @@ public class L9133Report extends CommBuffer {
 			BigDecimal subAmt = BigDecimal.ZERO;// 減
 			BigDecimal netAmt = BigDecimal.ZERO;// 淨增減
 
-			String tmpFirstAcctCode = "";
+			String tmpFirstAcNoCode = "";
 			if (sAcMain != null) {
-				tmpFirstAcctCode = sAcMain.getContent().get(0).getAcNoCode().substring(0, 1);
+				tmpFirstAcNoCode = sAcMain.getContent().get(0).getAcNoCode().substring(0, 1);
 
-				this.info("tmpFirstAcctCode = " + tmpFirstAcctCode.toString());
+				this.info("tmpFirstAcNoCode = " + tmpFirstAcNoCode.toString());
 				ydBal = sAcMain.getContent().get(0).getYdBal();
 
 				// 科目開頭為1 5 6 9 借為正，貸為負
-				if ("1".equals(tmpFirstAcctCode) || "5".equals(tmpFirstAcctCode) || "6".equals(tmpFirstAcctCode)
-						|| "9".equals(tmpFirstAcctCode)) {
+				if ("1".equals(tmpFirstAcNoCode) || "5".equals(tmpFirstAcNoCode) || "6".equals(tmpFirstAcNoCode)
+						|| "9".equals(tmpFirstAcNoCode)) {
 					addAmt = sAcMain.getContent().get(0).getDbAmt();
 					subAmt = sAcMain.getContent().get(0).getCrAmt();
 					netAmt = addAmt.subtract(subAmt);// 淨增減 (借方為正，貸方為負)
@@ -117,6 +151,8 @@ public class L9133Report extends CommBuffer {
 
 			this.info("addAmt = " + addAmt);
 			this.info("subAmt = " + subAmt);
+
+			this.info("AcctCode = " + acctCode);
 
 			int sheet = 0;
 			// 明細資料新的一行
@@ -205,6 +241,10 @@ public class L9133Report extends CommBuffer {
 
 				// 只會有shee1(檢核表)使用到小計
 				if (sheet == 1) {
+
+					// 紀錄筆數
+					tmpCount++;
+
 					// 當會計科目不一樣的時候歸零
 					if (!tmpAcctCode.equals(acctCode)) {
 
@@ -224,8 +264,20 @@ public class L9133Report extends CommBuffer {
 							totalDiffAcAmt = BigDecimal.ZERO;// 會計檔與主檔差額
 							totalDiffReceivableAmt = BigDecimal.ZERO;// 銷帳檔與主黨差額小計
 
+							// 僅為第一次的金額需小計
+							totalAcMainBal = totalAcMainBal.add(acMainBal);// 會計帳餘額小計
+							totalReceivableBal = totalReceivableBal.add(receivableBal);// 銷帳檔餘額小計
+							totalMasterBal = totalMasterBal.add(masterBal);// 主檔餘額小計
+							totalDiffAcAmt = totalDiffAcAmt.add(diffAcAmt);// 會計檔與主檔差額小計
+							totalDiffReceivableAmt = totalDiffReceivableAmt.add(diffReceivableAmt);// 銷帳檔與主黨差額小計
+
+							// 有小計的時候就要多加一列
+							rowCursorMain++;
+
+							// 因應小計後下方 繼續makeSetValue
 							rowCursor++;
 						} else {
+
 							// 僅為第一次的金額需小計
 							totalAcMainBal = totalAcMainBal.add(acMainBal);// 會計帳餘額小計
 							totalReceivableBal = totalReceivableBal.add(receivableBal);// 銷帳檔餘額小計
@@ -262,6 +314,24 @@ public class L9133Report extends CommBuffer {
 				makeExcel.setValue(rowCursor, 9, masterBal, "#,##0"); // 主檔餘額
 				makeExcel.setValue(rowCursor, 10, diffAcAmt, "#,##0"); // 會計檔與主檔差額
 				makeExcel.setValue(rowCursor, 11, diffReceivableAmt, "#,##0"); // 銷帳檔與主檔差額
+
+				// 紀錄列數
+//				rowCursor++;
+
+				// 最後一筆的時候輸出
+				// 只會有shee1(檢核表)使用到小計
+				this.info("AcctCode = " + acctCode + ",tmpCount = " + tmpCount + " ==" + tmpSheet1Count);
+				if (sheet == 1 && tmpCount == tmpSheet1Count) {
+					rowCursor++;
+					makeExcel.setValue(rowCursor, 2, "小計");
+					makeExcel.setValue(rowCursor, 3, totalAcMainBal, "#,##0"); // 業務科目或銷帳科目才顯示會計帳餘額小計
+					makeExcel.setValue(rowCursor, 8, totalReceivableBal, "#,##0"); // 銷帳檔餘額小計
+					makeExcel.setValue(rowCursor, 9, totalMasterBal, "#,##0"); // 主檔餘額小計
+					makeExcel.setValue(rowCursor, 10, totalDiffAcAmt, "#,##0"); // 會計檔與主檔差額小計
+					makeExcel.setValue(rowCursor, 11, totalDiffReceivableAmt, "#,##0"); // 銷帳檔與主檔差額小計
+
+				}
+
 			}
 		}
 		long excelNo = makeExcel.close();

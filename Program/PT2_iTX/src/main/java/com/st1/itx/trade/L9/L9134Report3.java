@@ -53,7 +53,7 @@ public class L9134Report3 extends MakeReport {
 		makeExcel.setValue(1, 1, "科目", "C");
 		makeExcel.setValue(1, 2, "子目", "C");
 		makeExcel.setValue(1, 3, "細目", "C");
-		makeExcel.setValue(1, 4, "科目代號", "C");
+		makeExcel.setValue(1, 4, "科目名稱", "C");
 		makeExcel.setValue(1, 5, "戶號", "C");
 		makeExcel.setValue(1, 6, "額度", "C");
 		makeExcel.setValue(1, 7, "起帳日期", "C");

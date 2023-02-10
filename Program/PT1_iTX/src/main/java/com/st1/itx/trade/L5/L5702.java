@@ -17,6 +17,7 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
+import com.st1.itx.db.domain.CdCl;
 import com.st1.itx.db.domain.NegAppr02;
 import com.st1.itx.db.domain.NegMain;
 import com.st1.itx.db.domain.NegMainId;
@@ -152,9 +153,9 @@ public class L5702 extends TradeBuffer {
 				sNegCom.trialNegtrans(tNegTrans, "2", TransTxKind, titaVo);
 				// 會計帳
 				if (Arrays.asList(new String[] { "0", "1", "2", "3", "4", "5" }).contains(TransTxKind)) {
-					if ("N".equals(tNegMain.getIsMainFin())) {//一般債權才做
-						UpdAcDB(tNegTransId, iPayerCustNo, titaVo);
-					}
+//					if ("N".equals(tNegMain.getIsMainFin())) {// 一般債權才做- 2023/2/8取消出帳,改由L3210出
+//						UpdAcDB(tNegTransId, iPayerCustNo, titaVo);
+//					}
 				}
 //				updateNegAppr02(tNegTransId, titaVo);// 維護NegAppr02,2022-3-22取消L5712暫收解入功能
 
@@ -211,6 +212,7 @@ public class L5702 extends TradeBuffer {
 		// 異動會計分錄檔
 		/* 帳務 */
 		// 經辦登帳非訂正交易
+		// 2023/2/8一般債權原要出帳,改為L4200整批入帳發動L3210時出帳,專戶直接入借款戶的暫收可抵繳,故以下不做
 		this.info("UpdAcDB Run");
 
 		if (this.txBuffer.getTxCom().isBookAcYes()) {
@@ -222,7 +224,7 @@ public class L5702 extends TradeBuffer {
 			AcDetail acDetail = new AcDetail();
 			acDetail.setDbCr("D");
 			acDetail.setAcctCode(acNegCom.getAcctCode(tNegTrans.getCustNo(), titaVo));
-			acDetail.setTxAmt(tNegTrans.getSklShareAmt()); // 新壽攤分金額 
+			acDetail.setTxAmt(tNegTrans.getSklShareAmt()); // 新壽攤分金額
 			acDetail.setCustNo(tNegTrans.getCustNo());// 客戶戶號
 			acDetailList.add(acDetail);
 			/* 貸：暫收可抵繳科目 */

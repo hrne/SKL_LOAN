@@ -3,6 +3,7 @@ package com.st1.itx.trade.LM;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+
 import java.util.List;
 import java.util.Map;
 
@@ -13,25 +14,28 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM050ServiceImpl;
+
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
-public class LM050Report extends MakeReport {
+
+
+
+
+public class LM050Report extends MakeReport {	
 
 	@Autowired
 	LM050ServiceImpl lM050ServiceImpl;
 
 	@Autowired
 	MakeExcel makeExcel;
-
+	
+	
 	// 淨值
 	BigDecimal equity = BigDecimal.ZERO;
-
-	// 取千元
-	BigDecimal thousand = getBigDecimal("1000");
 
 	// 明細加總
 	BigDecimal detailTotal = BigDecimal.ZERO;
@@ -48,8 +52,12 @@ public class LM050Report extends MakeReport {
 	// 放款總額
 	BigDecimal total = BigDecimal.ZERO;
 
-	public void exec(TitaVo titaVo) throws LogicException {
 
+	
+
+
+	public void exec(TitaVo titaVo) throws LogicException {
+		this.info("LM050Report exec");
 //		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(),
 //				"LM050", "放款保險法第3條利害關係人放款餘額表_限額控管", 
 //				"LM050放款保險法第3條利害關係人放款餘額表_限額控管",
@@ -79,6 +87,7 @@ public class LM050Report extends MakeReport {
 		List<Map<String, String>> equityList = null;
 
 		try {
+			
 			equityList = lM050ServiceImpl.fnEquity(titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
@@ -99,14 +108,15 @@ public class LM050Report extends MakeReport {
 
 		fnAll(titaVo);
 
-		long sno = makeExcel.close();
+		makeExcel.close();
 
-		makeExcel.toExcel(sno);
 	}
+	
+
 
 	private BigDecimal formatThousand(BigDecimal amt) {
 
-		return this.computeDivide(amt, thousand, 3);
+		return this.computeDivide(amt, getBigDecimal("1000"), 3);
 	}
 
 	private void fnAll(TitaVo titaVo) throws LogicException {
@@ -114,6 +124,7 @@ public class LM050Report extends MakeReport {
 		List<Map<String, String>> listLM050 = null;
 
 		try {
+			
 			listLM050 = lM050ServiceImpl.findAll(titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
@@ -123,12 +134,12 @@ public class LM050Report extends MakeReport {
 
 		exportExcel(listLM050);
 	}
-
+//
 	private void exportExcel(List<Map<String, String>> listLM050) throws LogicException {
 		this.info("LM050Report exportExcel");
 
 		if (listLM050 == null || listLM050.isEmpty()) {
-			makeExcel.setValue(4, 2, "本日無資料", "L");
+			makeExcel.setValue(4, 2, "本日無資料", "C");
 			return;
 		}
 

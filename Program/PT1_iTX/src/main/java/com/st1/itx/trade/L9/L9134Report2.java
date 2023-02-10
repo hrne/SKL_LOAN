@@ -102,7 +102,7 @@ public class L9134Report2 extends MakeReport {
 		makeExcel.setValue(2, 2, "會計科目", "C");
 		makeExcel.setValue(2, 3, "子目", "C");
 		makeExcel.setValue(2, 4, "細目", "C");
-		makeExcel.setValue(2, 5, "科目代號", "C");
+		makeExcel.setValue(2, 5, "科目名稱", "C");
 		makeExcel.setValue(2, 6, "傳票借方金額", "C");
 		makeExcel.setValue(2, 7, "傳票貸方金額", "C");
 		makeExcel.setValue(2, 8, "傳票號碼", "C");
@@ -129,31 +129,31 @@ public class L9134Report2 extends MakeReport {
 			for (Map<String, String> r : list) {
 				row++;
 
-				makeExcel.setValue(row, 1, r.get("AcDate"));
+				
 				
 
-				String AcNameCode = "";
-				if(r.get("AcNoCode").equals("20222010000")) {
-					AcNameCode = r.get("AcNoCode")+"－火險保費 ";
-				}
-				if(r.get("AcNoCode").equals("20222020000")) {
-					AcNameCode = r.get("AcNoCode")+"－擔保放款  ";
-				}
-				if(r.get("AcNoCode").equals("20222180000")) {
-					AcNameCode = r.get("AcNoCode")+"－債權協商  ";
-				}
-				if(r.get("AcNoCode").equals("20222180100")) {
-					AcNameCode = r.get("AcNoCode")+"－更生統一收付   ";
-				}
-				if(r.get("AcNoCode").equals("20222180200")) {
-					AcNameCode = r.get("AcNoCode")+"－前置調解  ";
-				}
+//				String AcNameCode = "";
+//				if(r.get("AcNoCode").equals("20222010000")) {
+//					AcNameCode = r.get("AcNoCode")+"－火險保費 ";
+//				}
+//				if(r.get("AcNoCode").equals("20222020000")) {
+//					AcNameCode = r.get("AcNoCode")+"－擔保放款  ";
+//				}
+//				if(r.get("AcNoCode").equals("20222180000")) {
+//					AcNameCode = r.get("AcNoCode")+"－債權協商  ";
+//				}
+//				if(r.get("AcNoCode").equals("20222180100")) {
+//					AcNameCode = r.get("AcNoCode")+"－更生統一收付   ";
+//				}
+//				if(r.get("AcNoCode").equals("20222180200")) {
+//					AcNameCode = r.get("AcNoCode")+"－前置調解  ";
+//				}
 				
-				
-				makeExcel.setValue(row, 2, AcNameCode);
+				makeExcel.setValue(row, 1, r.get("AcDate"));
+				makeExcel.setValue(row, 2, r.get("AcNoCode"));
 				makeExcel.setValue(row, 3, r.get("AcSubCode"));
 				makeExcel.setValue(row, 4, r.get("AcDtlCode"));
-				makeExcel.setValue(row, 5, r.get("AcctItem"));
+				makeExcel.setValue(row, 5, r.get("AcNoItem"));
 				makeExcel.setValue(row, 6, r.get("DrAmt").isEmpty() ? BigDecimal.ZERO : new BigDecimal(r.get("DrAmt")),
 						"#,##0", "R");
 				makeExcel.setValue(row, 7, r.get("CrAmt").isEmpty() ? BigDecimal.ZERO : new BigDecimal(r.get("CrAmt")),

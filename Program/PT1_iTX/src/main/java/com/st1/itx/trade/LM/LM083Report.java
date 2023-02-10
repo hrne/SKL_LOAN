@@ -140,6 +140,10 @@ public class LM083Report extends MakeReport {
 				// F10 到期日
 				String maturityDate = tLDVo.get("F10");
 				makeExcel.setValue(rowCursor, 12, maturityDate);
+				
+				// F11 區隔帳冊
+				String acSubBookCode = tLDVo.get("F11");
+				makeExcel.setValue(rowCursor, 13, acSubBookCode);
 
 				rowCursor++;
 

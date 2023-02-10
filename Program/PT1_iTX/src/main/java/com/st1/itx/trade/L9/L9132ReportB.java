@@ -32,7 +32,6 @@ public class L9132ReportB extends MakeReport {
 	private int reportDate = 0;
 	private String brno = "";
 	private String reportCode = "L9132B";
-//	private String reportItem = "傳票媒體明細表-交易序號";
 	private String reportItem = "傳票媒體明細表-傳票號碼";
 	private String security = "機密";
 	private String pageSize = "A4";
@@ -80,8 +79,8 @@ public class L9132ReportB extends MakeReport {
 //		print(1, 1, "交易序號　傳票號碼　會計科目／名稱　　　　　　　　　　　　　　　　　　　　　　　　區隔帳冊　　　　　　　借方金額　　　　　　　貸方金額　　戶號　　戶名　　　經辦");
 //		print(1, 1, "－－－－　－－－－　－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－－－－－－　－－－－－－－－－－　－－－－　－－－－　－－－－");
 		
-		print(1, 1, "交易序號　          傳票號碼  會計科目／名稱　　　　　　　　　　　　　　　　　　　　區隔帳冊　　　　　　　借方金額　　　　　　　貸方金額　　戶號　　 戶名　　　經辦    ");
-		print(1, 1, "－－－－－－－－－  －－－－  －－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－－－－－－　－－－－－－－－－－　－－－－　－－－　 －－－－  ");
+		print(1, 1, "交易序號　          傳票號碼  會計科目／名稱　　　　　　　　　　　　　　　　　　　　 區隔帳冊   　　　　　　借方金額　　　　　　貸方金額　　戶號　　 戶名　　　經辦    ");
+		print(1, 1, "－－－－－－－－－  －－－－  －－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－－　－－－－－－－－－　－－－－　－－－　 －－－－  ");
 		// -------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
 		// ----------12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234
 	}
@@ -99,7 +98,6 @@ public class L9132ReportB extends MakeReport {
 		this.nowDate = dDateUtil.getNowStringRoc();
 		this.nowTime = dDateUtil.getNowStringTime();
 
-//		open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate)
 				.setBrno(brno).setRptCode(reportCode).setRptItem(reportItem).setSecurity(security)
 				.setRptSize(pageSize).setPageOrientation(pageOrientation).build();
@@ -138,7 +136,7 @@ public class L9132ReportB extends MakeReport {
 				print(0, 29, slipNo, "R");
 				print(0, 31, acNo);
 				print(0, 85, acSubBookItem);
-				print(0, 115, formatAmt(dbAmt, 0), "R");
+				print(0, 117, formatAmt(dbAmt, 0), "R");
 				print(0, 137, formatAmt(crAmt, 0), "R");
 				print(0, 147, custNo, "R");
 				print(0, 149, custName);
@@ -155,10 +153,10 @@ public class L9132ReportB extends MakeReport {
 			print(1, 1, "本日無資料");
 		}
 		// 印總計
-		print(1, 1, "－－－－－－－－－  －－－－  －－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－－－－－－　－－－－－－－－－－　－－－－　－－－　 －－－－  ");
+		print(1, 1, "－－－－－－－－－  －－－－  －－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－－　－－－－－－－－－　－－－－　－－－　 －－－－  ");
 		print(1, 1, "　合　　　　　計：　　　　　　　　　筆");
 		print(0, 32, formatAmt(cnt, 0), "R");
-		print(0, 113, formatAmt(dbAmtTotal, 0), "R");
-		print(0, 135, formatAmt(crAmtTotal, 0), "R");
+		print(0, 117, formatAmt(dbAmtTotal, 0), "R");
+		print(0, 137, formatAmt(crAmtTotal, 0), "R");
 	}
 }

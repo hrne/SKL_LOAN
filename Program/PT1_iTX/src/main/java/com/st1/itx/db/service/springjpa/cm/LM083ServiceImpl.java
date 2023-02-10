@@ -46,7 +46,7 @@ public class LM083ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           , CASE ";
 		sql += "               WHEN NVL(cl.\"EvaNetWorth\", 0) = 0";
 		sql += "               THEN 0 ";
-		sql += "             ELSE ROUND(f.\"LineAmt\" / cl.\"EvaNetWorth\" * 100, 2)";
+		sql += "             ELSE TRUNC(f.\"LineAmt\" / cl.\"EvaNetWorth\" * 100, 2)";
 		sql += "             END                        AS F3 "; // 貸款成數
 		sql += "           , CASE ";
 		sql += "               WHEN m.\"OvduTerm\" >= 1 ";
@@ -69,6 +69,7 @@ public class LM083ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           , m.\"PrinBalance\"          AS F8"; // 帳上剩餘金額
 		sql += "           , f.\"FirstDrawdownDate\"    AS F9"; // 撥款日期
 		sql += "           , f.\"MaturityDate\"         AS F10"; // 到期日
+		sql += "           , \"Fn_GetCdCode\"('AcSubBookCode',m.\"AcSubBookCode\")          AS F11"; // 區隔帳冊
 		sql += "      FROM \"MonthlyFacBal\"  m";
 		sql += "      LEFT JOIN \"CustMain\" c ON c.\"CustNo\" = m.\"CustNo\"";
 		sql += "      LEFT JOIN \"FacMain\"  f ON f.\"CustNo\" = m.\"CustNo\"";
@@ -79,6 +80,7 @@ public class LM083ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		sql += "      WHERE m.\"Status\" IN (0,2,4,6,7) ";
 		sql += "      WHERE m.\"PrinBalance\" != 0 ";
 		sql += "        AND m.\"YearMonth\" = :yearMonth";
+		sql += "        ORDER BY m.\"AcSubBookCode\",m.\"CustNo\",m.\"FacmNo\"  ";
 
 		this.info("sql=" + sql);
 

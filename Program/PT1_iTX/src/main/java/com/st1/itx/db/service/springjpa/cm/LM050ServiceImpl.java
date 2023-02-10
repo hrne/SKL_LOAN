@@ -25,7 +25,7 @@ public class LM050ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
-
+	
 	public List<Map<String, String>> fnEquity(TitaVo titaVo) throws Exception {
 		String entdy = String.valueOf(titaVo.getEntDyI() + 19110000);
 		String yy = entdy.substring(0, 4);
@@ -68,7 +68,8 @@ public class LM050ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 
 	}
-
+	
+	
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 		int inputYearMonth = (titaVo.getEntDyI() + 19110000) / 100;
@@ -77,11 +78,11 @@ public class LM050ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String sql = " ";
 		sql += " SELECT CASE ";
-		sql += "          WHEN NVL(S1.\"RptId\",' ') != ' ' ";
-		sql += "          THEN '1' "; // -- 保險業利害關係人放款管理辦法第3條利害關係人
-		sql += "          WHEN CM.\"EmpNo\" IS NOT NULL ";
+		sql += "          WHEN NVL(S1.\"Rel\",' ') = ' ' ";
+		sql += "          THEN '3' "; // -- 一般客戶
+		sql += "          WHEN S1.\"Rel\" = 'N' ";
 		sql += "          THEN '2' "; // -- 職員
-		sql += "        ELSE '3' "; // -- 一般客戶
+		sql += "        ELSE '1' "; // -- 保險業利害關係人放款管理辦法第3條利害關係人
 		sql += "        END               AS \"RptType\" "; // F0
 		sql += "      , CASE ";
 		sql += "          WHEN NVL(S1.\"RptId\",' ') != ' ' ";
@@ -100,24 +101,21 @@ public class LM050ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        GROUP BY \"CustNo\" ";
 		sql += "      ) S0 ";
 		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = S0.\"CustNo\" ";
-		sql += " LEFT JOIN ( SELECT TO_CHAR(\"CusId\") AS \"RptId\" ";
-		sql += "             FROM \"RptRelationSelf\" ";
-		sql += "             WHERE \"LAW005\" = '1' ";
+		sql += " LEFT JOIN ( SELECT TO_CHAR(\"HeadId\") AS \"RptId\",";
+		sql += "                      \"RelWithCompany\" AS \"Rel\"  ";
+		sql += "             FROM \"LifeRelHead\" ";		            
 		sql += "             UNION ";
-		sql += "             SELECT TO_CHAR(\"RlbID\") AS \"RptId\" ";
-		sql += "             FROM \"RptRelationFamily\" ";
-		sql += "             WHERE \"LAW005\" = '1' ";
-		sql += "             UNION ";
-		sql += "             SELECT TO_CHAR(\"ComNo\") AS \"RptId\" ";
-		sql += "             FROM \"RptRelationCompany\" ";
-		sql += "             WHERE \"LAW005\" = '1' ";
+		sql += "             SELECT TO_CHAR(\"EmpId\") AS \"RptId\" ,";
+		sql += "                      'N' AS \"Rel\"  ";
+		sql += "             FROM \"LifeRelEmp\" ";	
+		
 		sql += "           ) S1 ON S1.\"RptId\" = CM.\"CustId\" ";
 		sql += " GROUP BY CASE ";
-		sql += "            WHEN NVL(S1.\"RptId\",' ') != ' ' ";
-		sql += "            THEN '1' "; // -- 保險業利害關係人放款管理辦法第3條利害關係人
-		sql += "            WHEN CM.\"EmpNo\" IS NOT NULL ";
+		sql += "            WHEN NVL(S1.\"Rel\",' ') = ' ' ";
+		sql += "            THEN '3' "; // -- 一般客戶
+		sql += "            WHEN S1.\"Rel\" ='N' ";
 		sql += "            THEN '2' "; // -- 職員
-		sql += "          ELSE '3' "; // -- 一般客戶
+		sql += "          ELSE '1' "; // -- 保險業利害關係人放款管理辦法第3條利害關係人
 		sql += "          END ";
 		sql += "        , CASE ";
 		sql += "            WHEN NVL(S1.\"RptId\",' ') != ' ' ";
@@ -130,12 +128,15 @@ public class LM050ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ORDER BY \"RptType\" ";
 		sql += "        , \"LoanBal\" DESC  ";
 		this.info("sql=" + sql);
+	
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("inputYearMonth", inputYearMonth);
 		return this.convertToMap(query);
+
 	}
+	
 
 }

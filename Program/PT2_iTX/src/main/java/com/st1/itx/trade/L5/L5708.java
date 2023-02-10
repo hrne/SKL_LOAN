@@ -134,6 +134,7 @@ public class L5708 extends TradeBuffer {
 
 				Map<Integer, BigDecimal> apprAmtCustNoMap = new HashMap<Integer, BigDecimal>();
 				Map<Integer, BigDecimal> sklAmtCustNoMap = new HashMap<Integer, BigDecimal>();
+				Map<Integer, BigDecimal> returnAmtCustNoMap = new HashMap<Integer, BigDecimal>();
 				Map<Integer, Integer> tempCustNoMap = new HashMap<Integer, Integer>();
 				for (NegTransId NegTransIdVO : DistinctNegTransId) {
 					NegTrans NegTransVO = sNegTransService.findById(NegTransIdVO, titaVo);
@@ -160,10 +161,12 @@ public class L5708 extends TradeBuffer {
 								if (!apprAmtCustNoMap.containsKey(CustNo)) {
 									apprAmtCustNoMap.put(CustNo, NegTransVO.getApprAmt());
 									sklAmtCustNoMap.put(CustNo, NegTransVO.getSklShareAmt());
+									returnAmtCustNoMap.put(CustNo, NegTransVO.getReturnAmt());
 									
 								} else {
 									apprAmtCustNoMap.put(CustNo, apprAmtCustNoMap.get(CustNo).add(NegTransVO.getApprAmt()));
 									sklAmtCustNoMap.put(CustNo, sklAmtCustNoMap.get(CustNo).add(NegTransVO.getSklShareAmt()));
+									returnAmtCustNoMap.put(CustNo, returnAmtCustNoMap.get(CustNo).add(NegTransVO.getReturnAmt()));
 								}
 
 								int ExportDate = NegTransVO.getExportDate();
@@ -198,6 +201,7 @@ public class L5708 extends TradeBuffer {
 					for (int CustNo : apprAmtCustNoMap.keySet()) {
 						BigDecimal apprAmt = apprAmtCustNoMap.get(CustNo);
 						BigDecimal sklAmt = sklAmtCustNoMap.get(CustNo);
+						BigDecimal returnAmt = returnAmtCustNoMap.get(CustNo);
 					/* 帳務 */
 						// 經辦登帳非訂正交易
 						if (this.txBuffer.getTxCom().isBookAcYes()) {
@@ -207,7 +211,7 @@ public class L5708 extends TradeBuffer {
 							AcDetail acDetail = new AcDetail();
 							acDetail.setDbCr("D");
 							acDetail.setAcctCode(acNegCom.getAcctCode(CustNo, titaVo));
-							acDetail.setTxAmt(apprAmt.add(sklAmt)); // 撥付+新壽攤分金額
+							acDetail.setTxAmt(apprAmt.add(sklAmt).add(returnAmt)); // 撥付+新壽攤分金額+結清退還款
 							acDetail.setCustNo(CustNo);// 戶號
 							acDetailList.add(acDetail);
 
@@ -215,7 +219,7 @@ public class L5708 extends TradeBuffer {
 							acDetail = new AcDetail();
 							acDetail.setDbCr("C");
 							acDetail.setAcctCode(acNegCom.getApprAcctCode(CustNo, titaVo));
-							acDetail.setTxAmt(apprAmt.add(sklAmt)); // 撥付+新壽攤分金額
+							acDetail.setTxAmt(apprAmt.add(sklAmt).add(returnAmt)); // 撥付+新壽攤分金額+結清退還款
 							acDetail.setCustNo(CustNo);// 戶號
 							acDetailList.add(acDetail);
 
@@ -251,7 +255,26 @@ public class L5708 extends TradeBuffer {
 							acDetail.setCustNo(tempCustNoMap.get(CustNo));//實際借款人戶號
 							acDetail.setFacmNo(parse.stringToInteger(tTempVo.getParam("FacmNo")));
 							acDetail.setAcctCode(tTempVo.getParam("AcctCode"));
-							acDetail.setTxAmt(sklAmt); // 新壽攤分金額
+							acDetail.setTxAmt(sklAmt); // 結清退還款
+							acDetailList.add(acDetail);
+
+							/* 借：應付代收款 */
+							acDetail = new AcDetail();
+							acDetail.setDbCr("D");
+							acDetail.setAcctCode(acNegCom.getApprAcctCode(CustNo, titaVo));
+							acDetail.setTxAmt(returnAmt); // 結清退還款
+							acDetail.setCustNo(CustNo);// 戶號
+							acDetailList.add(acDetail);
+							
+							/* 貸：暫收可抵繳科目 */
+							acDetail = new AcDetail();
+							acDetail.setDbCr("C");
+							TempVo tTempVo2 = new TempVo();
+							tTempVo2 = acNegCom.getReturnAcctCode(tempCustNoMap.get(CustNo), titaVo);
+							acDetail.setCustNo(tempCustNoMap.get(CustNo));//實際借款人戶號
+							acDetail.setFacmNo(parse.stringToInteger(tTempVo2.getParam("FacmNo")));
+							acDetail.setAcctCode(tTempVo.getParam("AcctCode"));
+							acDetail.setTxAmt(returnAmt); // 新壽攤分金額
 							acDetailList.add(acDetail);
 
 							this.txBuffer.addAllAcDetailList(acDetailList);
