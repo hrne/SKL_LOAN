@@ -19,13 +19,28 @@ BEGIN
     JOB_START_TIME := SYSTIMESTAMP;
 
     DECLARE 
-        "DateStart" DECIMAL(6) := 201601 ; -- 資料擷取起日
+        "DateStart" DECIMAL(6) := 0 ; -- 資料擷取起日
+        "DateEnd"   DECIMAL(6) := 0 ; -- 資料擷取止日
     BEGIN
 
       -- 刪除舊資料
-      EXECUTE IMMEDIATE 'ALTER TABLE "MonthlyLoanBal" DISABLE PRIMARY KEY CASCADE';
-      EXECUTE IMMEDIATE 'TRUNCATE TABLE "MonthlyLoanBal" DROP STORAGE';
-      EXECUTE IMMEDIATE 'ALTER TABLE "MonthlyLoanBal" ENABLE PRIMARY KEY';
+      IF "ExecSeq" = 1 THEN
+        EXECUTE IMMEDIATE 'ALTER TABLE "MonthlyLoanBal" DISABLE PRIMARY KEY CASCADE';
+        EXECUTE IMMEDIATE 'TRUNCATE TABLE "MonthlyLoanBal" DROP STORAGE';
+        EXECUTE IMMEDIATE 'ALTER TABLE "MonthlyLoanBal" ENABLE PRIMARY KEY';
+      END IF;
+
+      SELECT "StartMonth"
+      INTO "DateStart"
+      FROM "TfByYear"
+      WHERE "Seq" = "ExecSeq"
+      ;
+
+      SELECT "EndMonth"
+      INTO "DateEnd"
+      FROM "TfByYear"
+      WHERE "Seq" = "ExecSeq"
+      ;
 
       -- 寫入資料
       INSERT INTO "MonthlyLoanBal" (
@@ -139,6 +154,7 @@ BEGIN
                             AND S6."ADTYMT" = S0."ADTYMT"
       LEFT JOIN "LA$ACTP" S7 ON S7."LMSACN" = S0."LMSACN"
       WHERE S0.ADTYMT >= "DateStart"
+        AND S0.ADTYMT <= "DateEnd"
       ;
 
     END;

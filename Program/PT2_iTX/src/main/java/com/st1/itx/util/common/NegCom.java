@@ -438,6 +438,7 @@ public class NegCom extends CommBuffer {
 //			}
 //		}
 
+		
 		// 用客戶繳款日期去算到本期為止應該還幾期
 		if (mainNextPayDate == 0) {
 			// E5009 資料檢核錯誤

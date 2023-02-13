@@ -189,7 +189,8 @@ public class NegReportCom extends CommBuffer {
 	}
 
 	@SuppressWarnings("resource")
-	public List<String[]> BatchTx04(TitaVo titaVo, String FilePath, String BringUpDate) throws LogicException, IOException {
+	public List<String[]> BatchTx04(TitaVo titaVo, String FilePath, String BringUpDate)
+			throws LogicException, IOException {
 		int DataLength[] = { 8, 19, 15 };
 		File file = new File(FilePath);
 		this.info("BatchTx04 FilePath = [" + FilePath + "]");
@@ -343,7 +344,8 @@ public class NegReportCom extends CommBuffer {
 	}
 
 	@SuppressWarnings("resource")
-	public StringBuffer BatchTx02(TitaVo titaVo, String FilePath, String BringUpDate) throws LogicException, IOException {
+	public StringBuffer BatchTx02(TitaVo titaVo, String FilePath, String BringUpDate)
+			throws LogicException, IOException {
 		StringBuffer sbBatchTx03 = new StringBuffer();
 		int DataLength[] = { 8, 14, 8 };
 		File file = new File(FilePath);
@@ -688,6 +690,8 @@ public class NegReportCom extends CommBuffer {
 						// 2999:其他錯誤
 						tNegAppr02.setStatusCode(StatusCode);
 						NegAppr02 NegAppr02Trial = sNegAppr02Service.holdById(tNegAppr02Id, titaVo);
+						NegAppr02 beforeNegAppr02 = (NegAppr02) dataLog.clone(NegAppr02Trial);
+
 						// tNegAppr02Id
 						if (NegAppr02Trial != null) {
 							try {
@@ -696,6 +700,9 @@ public class NegReportCom extends CommBuffer {
 								// E0007 更新資料時，發生錯誤
 								throw new LogicException(titaVo, "E0007", "一般債權撥付資料檔");
 							}
+							dataLog.setEnv(titaVo, beforeNegAppr02, tNegAppr02);
+							dataLog.exec("修改一般債權撥付資料檔");
+
 						} else {
 							try {
 								sNegAppr02Service.insert(tNegAppr02, titaVo);
@@ -754,9 +761,11 @@ public class NegReportCom extends CommBuffer {
 
 						String End6 = LRFormat(String.format("%2.2f", SumTranAmt).replace(".", ""), 15, "R", "0");// 交易總金額
 						String End7 = LRFormat(String.valueOf(SumTranCount), 10, "R", "0");// 交易總筆數
-						String End8 = LRFormat(String.format("%2.2f", SumSuccessTranAmt).replace(".", ""), 15, "R", "0");// 成交總金額
+						String End8 = LRFormat(String.format("%2.2f", SumSuccessTranAmt).replace(".", ""), 15, "R",
+								"0");// 成交總金額
 						String End9 = LRFormat(String.valueOf(SumSuccessTranCount), 10, "R", "0");// 成交總筆數
-						String End10 = LRFormat(String.format("%2.2f", SumUnSuccessTranAmt).replace(".", ""), 15, "R", "0");// 未成交總金額
+						String End10 = LRFormat(String.format("%2.2f", SumUnSuccessTranAmt).replace(".", ""), 15, "R",
+								"0");// 未成交總金額
 						String End11 = LRFormat(String.valueOf(SumUnSuccessTranCount), 10, "R", "0");// 未成交總筆數
 						String End12 = "      ";// 保留欄位
 						sbEndBatchTx03.append(End1);
@@ -814,13 +823,16 @@ public class NegReportCom extends CommBuffer {
 				this.info("pKindCode 1==" + pKindCode);
 
 				tNegApprOrg = tNegAppr;
+				NegAppr beforeNegAppr = (NegAppr) dataLog.clone(tNegApprOrg);
 				if (tNegAppr != null) {
 					// this.info("tNegAppr.getExportDate()=[" + tNegAppr.getExportDate() + "] ,
 					// String.valueOf(tNegAppr.getExportDate()).length()=[" +
 					// String.valueOf(tNegAppr.getExportDate()).length()
 					// + "]");
-					this.info("CheckNegArrp IntDate=[" + IntDateRoc + "]" + ",[製檔 " + tNegAppr.getExportMark() + "," + tNegAppr.getExportDate() + "]" + ",[傳票 " + tNegAppr.getApprAcMark() + ","
-							+ tNegAppr.getApprAcDate() + "]" + ",[提兌 " + tNegAppr.getBringUpMark() + "," + tNegAppr.getBringUpDate() + "]");
+					this.info("CheckNegArrp IntDate=[" + IntDateRoc + "]" + ",[製檔 " + tNegAppr.getExportMark() + ","
+							+ tNegAppr.getExportDate() + "]" + ",[傳票 " + tNegAppr.getApprAcMark() + ","
+							+ tNegAppr.getApprAcDate() + "]" + ",[提兌 " + tNegAppr.getBringUpMark() + ","
+							+ tNegAppr.getBringUpDate() + "]");
 					if (Status == 1) {
 
 						// 撥付製檔
@@ -932,12 +944,11 @@ public class NegReportCom extends CommBuffer {
 					}
 					try {
 						sNegApprService.update2(tNegAppr, titaVo);
-						dataLog.setEnv(titaVo, tNegApprOrg, tNegAppr);// 資料異動後-2
-						dataLog.exec();// 資料異動後-3
 					} catch (DBException e) {
 
 					}
-
+					dataLog.setEnv(titaVo, beforeNegAppr, tNegAppr);// 資料異動後-2
+					dataLog.exec("修改撥付日期設定:"+tNegAppr.getYyyyMm()+"-"+tNegAppr.getKindCode());// 資料異動後-3
 				}
 			}
 		} else {
@@ -953,7 +964,7 @@ public class NegReportCom extends CommBuffer {
 	public List<NegAppr01> InsUpdNegApprO1(int intbringupdate, int Status, TitaVo titaVo) throws LogicException {
 		// IntDate =交易畫面輸入的提兌日-西元年
 		String pKindCode = CheckNegArrp(intbringupdate, Status, titaVo);// 資料檢核
-		this.info("pKindCode  2==" + pKindCode);
+		//this.info("pKindCode  2==" + pKindCode);
 
 		List<NegAppr01> lNegAppr01 = new ArrayList<NegAppr01>();
 		// 找出最大債權,已入帳,未製檔
@@ -996,7 +1007,8 @@ public class NegReportCom extends CommBuffer {
 			throw new LogicException(titaVo, "E5003", "");
 		}
 		try {
-			Data = l597AServiceImpl.FindL597A(l597AServiceImpl.FindData(this.index, this.limit, sql, titaVo, intdate, IsMainFin, State, Detail, ExportDateYN, IsBtn), "L597A");
+			Data = l597AServiceImpl.FindL597A(l597AServiceImpl.FindData(this.index, this.limit, sql, titaVo, intdate,
+					IsMainFin, State, Detail, ExportDateYN, IsBtn), "L597A");
 		} catch (Exception e) {
 			// E5004 讀取DB時發生問題
 			this.info("L5051 ErrorForDB=" + e);
@@ -1018,16 +1030,20 @@ public class NegReportCom extends CommBuffer {
 					tNegTransId.setTitaTlrNo(TitaTlrNo);
 					tNegTransId.setTitaTxtNo(Integer.parseInt(TitaTxtNo));
 					NegTrans tNegTrans = sNegTransService.holdById(tNegTransId, titaVo);
+					NegTrans beforeNegTrans = (NegTrans) dataLog.clone(tNegTrans);
+
 					if (tNegTrans != null) {
 						// 直接找NEGAPPR01即可 ,原使用SumCustNo改用FindTrans
 						this.info("no1  = " + tNegTrans.getCustNo());
 						this.info("seq1  = " + tNegTrans.getCaseSeq());
-						Slice<NegAppr01> sNegAppr01 = sNegAppr01Service.findTrans(Integer.parseInt(AcDate), TitaTlrNo, Integer.parseInt(TitaTxtNo), 0, Integer.MAX_VALUE, titaVo);
+						Slice<NegAppr01> sNegAppr01 = sNegAppr01Service.findTrans(Integer.parseInt(AcDate), TitaTlrNo,
+								Integer.parseInt(TitaTxtNo), 0, Integer.MAX_VALUE, titaVo);
 						List<NegAppr01> lTempNegAppr01 = sNegAppr01 == null ? null : sNegAppr01.getContent();
 
 						if (lTempNegAppr01 != null && lTempNegAppr01.size() != 0) {
 							lNegAppr01.addAll(lTempNegAppr01);
 							for (NegAppr01 tNegAppr01 : lTempNegAppr01) {
+								NegAppr01 beforeNegAppr01 = (NegAppr01) dataLog.clone(tNegAppr01);
 								if (Status == 1) {
 									// 撥付製檔
 									int ExportDate = 0;
@@ -1049,7 +1065,7 @@ public class NegReportCom extends CommBuffer {
 											throw new LogicException(titaVo, "E5009", "戶號" + tNegAppr01.getCustNo()
 													+ "匯款銀行" + tNegAppr01.getRemitBank() + "的匯款帳號有誤:" + tRemitAcct);
 										}
-										
+
 									} else {
 										// 逆向
 										ExportDate = 0;
@@ -1103,15 +1119,16 @@ public class NegReportCom extends CommBuffer {
 									tNegAppr01.setBringUpDate(BringUpDate);
 								}
 
+								NegAppr01 NegAppr01Org = sNegAppr01Service.holdById(tNegAppr01, titaVo);
+
 								try {
-									NegAppr01 NegAppr01Org = sNegAppr01Service.holdById(tNegAppr01, titaVo);
-									sNegAppr01Service.update2(tNegAppr01, titaVo);
-									dataLog.setEnv(titaVo, NegAppr01Org, tNegAppr01);// 資料異動後-2
-									dataLog.exec();
+									tNegAppr01 = sNegAppr01Service.update2(tNegAppr01, titaVo);
 								} catch (DBException e) {
 									// E0007 更新資料時，發生錯誤
 									throw new LogicException(titaVo, "E0007", "最大債權撥付資料檔");
 								}
+								dataLog.setEnv(titaVo, beforeNegAppr01, tNegAppr01);// 資料異動後-2
+								dataLog.exec("修改最大債權撥付資料檔:"+tNegAppr01.getCustNo()+"-"+tNegAppr01.getAcDate()+"-"+tNegAppr01.getFinCode());
 							}
 
 						} else {
@@ -1153,6 +1170,9 @@ public class NegReportCom extends CommBuffer {
 								// E0007 更新資料時，發生錯誤
 								throw new LogicException(titaVo, "E0007", "債務協商交易檔");
 							}
+							dataLog.setEnv(titaVo, beforeNegTrans, tNegTrans);// 資料異動後-2
+							dataLog.exec("修改債務協商交易檔:"+tNegTrans.getCustNo()+"-"+tNegTrans.getAcDate()+"-"+tNegTrans.getTitaTlrNo()+"-"+tNegTrans.getTitaTxtNo());
+
 						}
 					} else {
 						// E0006 鎖定資料時，發生錯誤
@@ -1237,14 +1257,14 @@ public class NegReportCom extends CommBuffer {
 							String ToFinCode = tNegAppr01.getRemitBank();// 債權機構代號-需放實際匯出帳號的匯款銀行
 
 							// 轉帳類別(同檔案一致)-Order3
-							String tCaseKindCode = tNegMain.getCaseKindCode();//取自NegMain的案件種類
+							String tCaseKindCode = tNegMain.getCaseKindCode();// 取自NegMain的案件種類
 							String TransAccCode = "";// 轉帳類別
 							if (("1").equals(tCaseKindCode) || ("2").equals(tCaseKindCode)) {
-								TransAccCode ="02960";//債協與調解的轉帳類別
-							}else {
-								TransAccCode ="02950";//更生與清算的轉帳類別
+								TransAccCode = "02960";// 債協與調解的轉帳類別
+							} else {
+								TransAccCode = "02950";// 更生與清算的轉帳類別
 							}
-							
+
 //							// 入/扣帳日(同檔案一致)-Order4
 //							int AssigeDate = tNegAppr01.getExportDate();//
 //							if(AssigeDate!=0) {
@@ -1257,14 +1277,18 @@ public class NegReportCom extends CommBuffer {
 							// 或是由L5704 NegAppr 找出
 
 							// 批號-同一發件單位、轉帳類別、入/扣帳日,批號不得重複
-							String Key = FromFinCode + ConnectWord + ToFinCode + ConnectWord + TransAccCode + ConnectWord + String.valueOf(AssigeDate);
-							this.info("NegReportCom Key FromFinCode=[" + FromFinCode + "] ToFinCode=[" + ToFinCode + "] TransAccCode=[" + TransAccCode + "] AssigeDate=[" + AssigeDate + "]");
+							String Key = FromFinCode + ConnectWord + ToFinCode + ConnectWord + TransAccCode
+									+ ConnectWord + String.valueOf(AssigeDate);
+							this.info("NegReportCom Key FromFinCode=[" + FromFinCode + "] ToFinCode=[" + ToFinCode
+									+ "] TransAccCode=[" + TransAccCode + "] AssigeDate=[" + AssigeDate + "]");
 							if (!lKey.contains(Key)) {
 								lKey.add(Key);
-								this.info("NegReportCom FromFinCode=[" + FromFinCode + "] ToFinCode=[" + ToFinCode + "] TransAccCode=[" + TransAccCode + "] AssigeDate=[" + AssigeDate + "]");
+								this.info("NegReportCom FromFinCode=[" + FromFinCode + "] ToFinCode=[" + ToFinCode
+										+ "] TransAccCode=[" + TransAccCode + "] AssigeDate=[" + AssigeDate + "]");
 							}
 
-							CustMain tCustMain = sCustMainService.custNoFirst(tNegMainId.getCustNo(), tNegMainId.getCustNo(), titaVo);
+							CustMain tCustMain = sCustMainService.custNoFirst(tNegMainId.getCustNo(),
+									tNegMainId.getCustNo(), titaVo);
 
 							String Detail16 = "";// 銷帳編號
 
@@ -1307,22 +1331,22 @@ public class NegReportCom extends CommBuffer {
 							case "02120":
 								// 市水水號(10位)
 								break;
-							case "02950"://更生與清算
-								if(("3").equals(tCaseKindCode)) {//更生多加A
+							case "02950":// 更生與清算
+								if (("3").equals(tCaseKindCode)) {// 更生多加A
 									Detail16 = "A";
 								}
-								if(("4").equals(tCaseKindCode)) {//清算多加B
+								if (("4").equals(tCaseKindCode)) {// 清算多加B
 									Detail16 = "B";
 								}
 								break;
-							case "02960"://債協與調解
+							case "02960":// 債協與調解
 								// 還款狀況-0:正常,1:溢繳,2:短繳,3:大額還本,4:結清
 								Detail16 = tNegTrans.getTxKind();// tNegTrans-交易別
 								if (("5").equals(Detail16)) {// tNegTrans-交易別=5:提前清償
 									Detail16 = "4";
 								}
-								if(("2").equals(tCaseKindCode)) {//調解需多加B
-									Detail16 = Detail16 +"B";
+								if (("2").equals(tCaseKindCode)) {// 調解需多加B
+									Detail16 = Detail16 + "B";
 								}
 								break;
 							case "02970":
@@ -1371,7 +1395,7 @@ public class NegReportCom extends CommBuffer {
 			List<String> lTrialTrans1AccCode = new ArrayList<String>();
 			lTrialTrans1AccCode.add("02960");
 			lTrialTrans1AccCode.add("02970");
-			lTrialTrans1AccCode.add("02950");//更生與清算
+			lTrialTrans1AccCode.add("02950");// 更生與清算
 
 			// Detail14-轉帳帳號-特殊條件
 			List<String> lTrialTrans2AccCode = new ArrayList<String>();
@@ -1399,7 +1423,8 @@ public class NegReportCom extends CommBuffer {
 					String TransAccCode = ValueKey[2];// 轉帳類別
 					// String AssigeDate = ValueKey[3];// 入/扣帳日
 
-					this.info("BatchTx01 FromFinCode=[" + FromFinCode + "],ToFinCode=[" + ToFinCode + "],TransAccCode=[" + TransAccCode + "],AssigeDate=[" + AssigeDate + "]");
+					this.info("BatchTx01 FromFinCode=[" + FromFinCode + "],ToFinCode=[" + ToFinCode + "],TransAccCode=["
+							+ TransAccCode + "],AssigeDate=[" + AssigeDate + "]");
 					String CompanyId = "";
 					if (("458").equals(FromFinCode)) {
 						CompanyId = "03458902";// 公司統編
@@ -1475,7 +1500,8 @@ public class NegReportCom extends CommBuffer {
 							// 1.由發件單位自訂.同一[發件單位、轉帳類別、入/扣帳日、批號]不得重複.
 							// 2.編碼原則:第一碼固定為[0],第二碼及第三碼為批號,應與首錄之批號欄位相同,後七碼由發件單位自訂.
 							DetailListSeries++;
-							String Detail6 = "0" + strOrderStart + LRFormat(String.valueOf(DetailListSeries), 7, "R", "0");
+							String Detail6 = "0" + strOrderStart
+									+ LRFormat(String.valueOf(DetailListSeries), 7, "R", "0");
 							// 檢核欄位-固定為[+]
 							String Detail7 = "+";
 							// 交易金額
@@ -1554,6 +1580,8 @@ public class NegReportCom extends CommBuffer {
 							// TempData[13];//NegAppr01 Id
 							NegAppr01Id tNegAppr01Id = StringToNegAppr01Id(TempData[13]);
 							NegAppr01 tNegAppr01 = sNegAppr01Service.holdById(tNegAppr01Id, titaVo);
+//							NegAppr01 beforeNegAppr01 = (NegAppr01) dataLog.clone(tNegAppr01);
+
 							if (tNegAppr01 != null) {
 								// 把BatchTx01的交易序號寫入 以利BatchTx04使用
 								tNegAppr01.setBatchTxtNo(Detail6);// 交易序號
@@ -1563,6 +1591,9 @@ public class NegReportCom extends CommBuffer {
 									// E0007 更新資料時，發生錯誤
 									throw new LogicException(titaVo, "E0007", "最大債權撥付資料檔");
 								}
+//								dataLog.setEnv(titaVo, beforeNegAppr01, tNegAppr01);
+//								dataLog.exec("修改最大債權撥付資料檔:"+tNegAppr01.getCustNo()+"-"+tNegAppr01.getAcDate()+"-"+tNegAppr01.getFinCode());
+
 							} else {
 								// E0006 鎖定資料時，發生錯誤
 								throw new LogicException(titaVo, "E0006", "最大債權撥付資料檔");
@@ -1753,7 +1784,8 @@ public class NegReportCom extends CommBuffer {
 	public String NegAppr01KeyToString(NegAppr01 tNegAppr01) {
 		String str = "";
 		if (tNegAppr01 != null) {
-			str = tNegAppr01.getNegAppr01Id().getAcDate() + CombineWord + tNegAppr01.getNegAppr01Id().getFinCode() + CombineWord + tNegAppr01.getNegAppr01Id().getTitaTlrNo() + CombineWord
+			str = tNegAppr01.getNegAppr01Id().getAcDate() + CombineWord + tNegAppr01.getNegAppr01Id().getFinCode()
+					+ CombineWord + tNegAppr01.getNegAppr01Id().getTitaTlrNo() + CombineWord
 					+ tNegAppr01.getNegAppr01Id().getTitaTxtNo();
 		}
 		return str;

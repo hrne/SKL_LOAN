@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L4;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -524,7 +525,7 @@ public class L4600Batch extends TradeBuffer {
 			occursList.putParam("LoanCustName", FormatUtil.padX("", 10));
 		}
 
-		BigDecimal mainArea = BigDecimal.ZERO;
+		String mainArea = "";
 		BigDecimal subArea = BigDecimal.ZERO;
 		BigDecimal parkArea = BigDecimal.ZERO;
 		BigDecimal publicArea = BigDecimal.ZERO;
@@ -538,11 +539,13 @@ public class L4600Batch extends TradeBuffer {
 				}
 			}
 
-			mainArea = tClBuilding.getFloorArea();
+			DecimalFormat decimalFormat = new DecimalFormat("0000000.00");
+			mainArea = FormatUtil.padX(decimalFormat.format(tClBuilding.getFloorArea()).replaceAll("[.]",""), 9);
+			
 			subArea = tClBuilding.getBdSubArea();
 			occursList.putParam("PostalCode", FormatUtil.padX("" + findZipCode(tCustMain, titaVo), 5));
 			occursList.putParam("Address", FormatUtil.padX(replaceComma(tClBuilding.getBdLocation()), 56));
-			occursList.putParam("BuildingSquare", FormatUtil.pad9(chgDot(mainArea), 9));
+			occursList.putParam("BuildingSquare", mainArea);
 			occursList.putParam("BuildingCode", FormatUtil.pad9("" + tClBuilding.getBdMtrlCode(), 2));
 			occursList.putParam("BuildingYears", FormatUtil.pad9(("" + tClBuilding.getBdDate()), 7).substring(0, 3));
 			occursList.putParam("BuildingFloors", FormatUtil.pad9("" + tClBuilding.getTotalFloor(), 2));
@@ -561,9 +564,7 @@ public class L4600Batch extends TradeBuffer {
 		occursList.putParam("ClCode1", FormatUtil.padX("" + t.getClCode1(), 1));
 		occursList.putParam("ClCode2", FormatUtil.pad9("" + t.getClCode2(), 2));
 		occursList.putParam("ClNo", FormatUtil.pad9("" + t.getClNo(), 7));
-
-//				19	Seq					序號			X	2	???
-		occursList.putParam("Seq", FormatUtil.pad9("1", 2)); // ???
+		occursList.putParam("Seq", FormatUtil.pad9("1", 2));
 		occursList.putParam("InsuNo", FormatUtil.padX("" + t.getPrevInsuNo(), 16));
 
 		int b4StartDate = 0;

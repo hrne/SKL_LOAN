@@ -2,6 +2,7 @@ package com.st1.itx.trade.L9;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.TxBizDate;
+import com.st1.itx.db.service.TxBizDateService;
 import com.st1.itx.db.service.springjpa.cm.L9134ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.data.ReportVo;
@@ -23,6 +26,8 @@ public class L9134Report4 extends MakeExcel {
 
 	@Autowired
 	L9134ServiceImpl l9134ServiceImpl;
+	@Autowired
+	private TxBizDateService iTxBizDateService;
 
 	@Autowired
 	MakeExcel makeExcel;
@@ -54,9 +59,16 @@ public class L9134Report4 extends MakeExcel {
 
 		makeExcel.open(titaVo, reportVo, FILE_NAME, DEFAULT_EXCEL, "工作表1");
 		List<Map<String, String>> findList = new ArrayList<>();
+		
+		TxBizDate tTxBizDate = new TxBizDate();
+		tTxBizDate = iTxBizDateService.findById("TW", titaVo);
+		int iLmnDy    = tTxBizDate.getLmnDy();
+		int iTbsDy    = tTxBizDate.getTbsDy();
+		this.info("iLmnDy    = "+ tTxBizDate.getLmnDy());
+		this.info("iTbsDy    = "+ tTxBizDate.getTbsDy());
+		
 		try {
-//			findList = l9134ServiceImpl.doQueryL9134_4(titaVo, idate);
-			findList = l9134ServiceImpl.doQueryL9134_4_1(titaVo, idate);
+			findList = l9134ServiceImpl.doQueryL9134_4_1(titaVo, idate , iLmnDy, iTbsDy);
 			
 			this.info("findList    = " + findList);
 		} catch (Exception e) {
@@ -69,23 +81,25 @@ public class L9134Report4 extends MakeExcel {
 		this.info("Size = " + findList.size());
 		makeExcel.setShiftRow(row, size-1);
 			for (Map<String, String> r : findList) {
-				int iTdBal = parse.stringToInteger(r.get("TdBal"));
-				int iDifTdBal =parse.stringToInteger(r.get("DifTdBal"));
-				int didTdBal = parse.stringToInteger(r.get("didTdBal"));
-				int didDifTdBal = parse.stringToInteger(r.get("didDifTdBal"));
-				int drAmt = parse.stringToInteger(r.get("DrAmt"));
-				int crAmt = parse.stringToInteger(r.get("CrAmt"));
+				BigDecimal iTdBal = parse.stringToBigDecimal(r.get("TdBal"));
+				BigDecimal iDifTdBal =parse.stringToBigDecimal(r.get("DifTdBal"));
+				BigDecimal didTdBal = parse.stringToBigDecimal(r.get("didTdBal"));
+				BigDecimal didDifTdBal = parse.stringToBigDecimal(r.get("didDifTdBal"));
+				BigDecimal drAmt = parse.stringToBigDecimal(r.get("DrAmt"));
+				BigDecimal crAmt = parse.stringToBigDecimal(r.get("CrAmt"));
 //				int AcDate = parse.stringToInteger(r.get("AcDate"));
 
 				makeExcel.setValue(row, 1, iTdBal ,"R");
 				makeExcel.setValue(row, 2, iDifTdBal,"R");
 				makeExcel.setValue(row, 3, didTdBal,"R");
 				makeExcel.setValue(row, 4, didDifTdBal,"R");
-				makeExcel.setValue(row, 5, iDifTdBal+didDifTdBal,"R");
+				makeExcel.setValue(row, 5, iDifTdBal.add(didDifTdBal),"R");
 				makeExcel.setValue(row, 6, r.get("AcDate"),"R");	
 				makeExcel.setValue(row, 12, drAmt);	
 				makeExcel.setValue(row, 13, crAmt);	
-				if(drAmt - crAmt >=0) {
+				BigDecimal ix = drAmt.subtract(crAmt);
+				BigDecimal io = BigDecimal.ZERO;
+				if(ix.compareTo(io)==0) {
 					makeExcel.setValue(row, 14, "V");
 				}else {
 					makeExcel.setValue(row, 14, "X");

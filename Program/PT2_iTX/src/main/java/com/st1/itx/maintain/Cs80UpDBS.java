@@ -333,21 +333,18 @@ public class Cs80UpDBS extends CommBuffer {
 		}
 
 		// eric 2020.08.17 1 > 3
-		if (tTxFlow.getFlowStep() == 1 && tTxFlow.getFlowType() == 2 && this.txBuffer.getTxCom().getSubmitFg() == 1) {
+		if (tTxFlow.getFlowStep() == 1 && tTxFlow.getFlowType() == 2 && this.txBuffer.getTxCom().getSubmitFg() == 1)
 			tTxFlow.setFlowMode(3);
-		} else if (tTxFlow.getFlowStep() == 1 || tTxFlow.getFlowStep() == 3) {
+		else if (tTxFlow.getFlowStep() == 1 && tTxFlow.getFlowType() == 2 && this.txBuffer.getTxCom().getSubmitFg() == 2) // Adma 2022.12.27
 			tTxFlow.setFlowMode(1);
-		} else if (tTxFlow.getFlowStep() == 1 && tTxFlow.getFlowType() == 3) {
+		else if (tTxFlow.getFlowStep() == 1 || tTxFlow.getFlowStep() == 3)
+			tTxFlow.setFlowMode(1);
+		else if (tTxFlow.getFlowStep() == 1 && tTxFlow.getFlowType() == 3)
 			tTxFlow.setFlowMode(2);
-		} else if (tTxFlow.getFlowStep() == 2 && tTxFlow.getFlowType() == 4) {
+		else if (tTxFlow.getFlowStep() == 2 && tTxFlow.getFlowType() == 4)
 			tTxFlow.setFlowMode(2);
-		} else {
+		else
 			tTxFlow.setFlowMode(0);
-		}
-
-		// Adma 2022.12.27
-//		if (this.txBuffer.getTxCom().getSubmitFg() == 2)
-//			tTxFlow.setFlowMode(1);
 
 		switch (this.titaVo.getActFgI()) {
 		case 1:

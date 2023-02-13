@@ -54,22 +54,26 @@ public class LM004Report2 extends MakeReport {
 //				"LM004長中短期放款到期追蹤表.xls", "10806", );
 
 		int row = 3;
-		int num = 1;
+		int num = 0;
 		makeExcel.setValue(1, 1, showDate(entdy, 2) + "長中短期放款到期追蹤表");
 
-		makeExcel.setShiftRow(3, LDList.size() > 25 ? LDList.size() - 25 : 1);
+//		makeExcel.setShiftRow(3, LDList.size() > 25 ? LDList.size() - 25 : 1);
 
 		for (Map<String, String> tLDVo : LDList) {
+
+			num++;
+			if (num != tLDVo.size()) {
+				makeExcel.setShiftRow(row, 1);
+			}
 
 			int col = 0;
 
 			for (col = 0; col < tLDVo.size(); col++) {
-
 				switch (col) {
 				case 1:
 					// 序號
 					makeExcel.setValue(row, col, num);
-					num++;
+
 					break;
 				case 2:
 					// 經辦單位
@@ -135,6 +139,7 @@ public class LM004Report2 extends MakeReport {
 				default:
 
 					break;
+
 				}
 			}
 			row++;

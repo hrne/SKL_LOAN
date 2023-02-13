@@ -139,6 +139,14 @@ E(0,#CustNo1)
 @V(5,#CustNo1,9999999)
 
 
+#TimCustNo=A,7,S
+E(0,@RmkCustNo,0)
+E(0,@TimCustNo,0)
+C(4,#CustId,$,E(0,#L2r07CustNo))
+IF(#CustNo1>0,C(3,#CustNo1,#CustNo2,E(0,#CustNo1),$),$)
+E(0,@RmkCustNo,#TimCustNo)
+<include src="COM.icf::CustRmk.rtn"/>
+
 ![額度編號]
 #FdFacmNo=X,2,L
 C(3,#CHAIN,1,s,$)
@@ -371,7 +379,7 @@ TXFORM=L2015
 #OOAcctCodeX=業務科目
 {width:150,align:'center'}
 
-#OOLastUpdate=最後修改日
+#OOLastUpdate=最後修改日期
 {width:130,align:'center'}
 
 #OOLastEmp=最後修改人員

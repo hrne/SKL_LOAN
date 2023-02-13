@@ -199,16 +199,30 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @param titaVo TitaVo
 	 * @return 查詢結果
 	 */
-	public List<Map<String, String>> doQueryL9134_4_1(TitaVo titaVo, int idate) throws LogicException {
+	public List<Map<String, String>> doQueryL9134_4_1(TitaVo titaVo, int idate , int iLmnDy, int iTbsDy) throws LogicException {
 		this.info("L9134_4_1 Start");
 		this.info("idate   = " + idate);
 		String itdate = parse.IntegerToString(idate + 19110000, 8);
 		this.info("itdate   =" + itdate);
-		int idx = parse.stringToInteger(titaVo.getParam("StartDate").trim().substring(5, 7));
-		this.info("idx  = " + idx);
+//		int idx = parse.stringToInteger(titaVo.getParam("StartDate").trim().substring(5, 7));
 		String itdx = itdate.substring(0, 6);
 		this.info("itdx   = " + itdx);
-
+		String ixLmnDy = parse.IntegerToString(iLmnDy  , 7);
+		String ixTbsDy = parse.IntegerToString(iTbsDy  , 7);
+		String ixLmnDy8 = parse.IntegerToString(iLmnDy + 19110000 , 8);
+		String ixTbsDy8 = parse.IntegerToString(iTbsDy + 19110000 , 8);
+		String ixLmnDy6 = ixLmnDy.substring(0,6);
+		String idx = ixTbsDy.substring(5,7);
+		int indx = parse.stringToInteger(idx);
+		this.info("ixLmnDy    = " + ixLmnDy); //1101130 上個月底日 
+		this.info("ixTbsDy    = " + ixTbsDy); //1101231 本月月底日 
+		this.info("ixLmnDy8   = " + ixLmnDy8); //2021 11 30
+		this.info("ixTbsDy8   = " + ixTbsDy8); //2021 12 31
+		this.info("ixLmnDy6   = " + ixLmnDy6);
+		this.info("idx  = " + idx);
+		
+		
+		
 		String sql = " ";
 		sql += " select \"AcDate\" ";
 		sql += " , sum(\"TdBal\") as \"TdBal\"   ";
@@ -219,7 +233,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " from ";
 		sql += " ( ";
 		sql += " select";
-		sql += "  20220101||'~'||20220131 as \"AcDate\" ";
+		sql += "  "+ixLmnDy6+"01  ||'~'|| "+ixLmnDy+" as \"AcDate\" ";
 		sql += "  ,sum(\"YdBal\") as \"YdBal\" ";
 		sql += "  ,sum(\"TdBal\") as \"TdBal\" ";
 		sql += "  ,0 as \"didYdBal\"";
@@ -230,8 +244,8 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   and \"AcctCode\" in ('TAV','TAM','TLD','T11','T13','T12','T10') ";
 		sql += " union all ";
 		sql += " select ";
-		sql += "  20220101||'~'||20220131 as \"AcDate\", ";
-		sql += "  0 as \"YdBal\" ";
+		sql += "  "+ixLmnDy6+"01  ||'~'|| "+ixLmnDy+" as \"AcDate\" ";
+		sql += " , 0 as \"YdBal\" ";
 		sql += " ,0 as \"TdBal\" ";
 		sql += " ,sum(\"YdBal\") as \"didYdBal\" ";
 		sql += " ,sum(\"TdBal\") as \"didTdal\" ";
@@ -240,7 +254,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " where \"AcDate\" >= 20220101 and \"AcDate\" <= 20220131 ";
 		sql += " and \"AcctCode\" in ('TCK')  ";
 		sql += " union all ";
-		for (int i = 1; i <= idx; i++) {
+		for (int i = 1; i <= indx; i++) {
 			sql += " select ";
 			sql += " to_char(" + itdx + parse.IntegerToString(i, 2) + ")  as \"AcDate\" ";
 			sql += " ,0 as \"YdBal\" ";
@@ -307,7 +321,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "   AND  AD.\"AcctCode\" in ('TAV','TCK','TEM','TAM','TRO','TLD') ";
 //			sql += " group by \"AcDate\" " ;
 			sql += " ) ";	
-			if (idx != i) {
+			if (indx != i) {
 				sql += " union all ";
 			}
 		}
