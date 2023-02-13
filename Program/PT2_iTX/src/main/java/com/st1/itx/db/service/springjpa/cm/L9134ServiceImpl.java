@@ -23,7 +23,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -60,8 +60,9 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     FROM \"AcDetail\" ";
 		sql += "     WHERE \"AcDate\" >= :startDate ";
 		sql += "       AND \"AcDate\" <= :endDate ";
-		sql += "       AND \"AcNoCode\" IN ('20222010000','20222020000','20222180000', '20222180100' ,'20222180200') ";
+//		sql += "       AND \"AcNoCode\" IN ('20222010000','20222020000','20222180000', '20222180100' ,'20222180200') ";
 		// sql += " AND \"AcNoCode\" LIKE '20222%' ";
+		sql += "    AND  \"AcctCode\" in ('TAV','TCK','TEM','TAM','TRO','TLD') ";
 		sql += "     GROUP BY \"AcDate\" ";
 		sql += "            , \"AcNoCode\" ";
 		sql += " ) ";
@@ -123,8 +124,12 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                             AND C.\"AcDtlCode\" = AD.\"AcDtlCode\" ";
 		sql += "     WHERE AD.\"AcDate\" >= :startDate ";
 		sql += "       AND AD.\"AcDate\" <= :endDate ";
-		sql += "       AND AD.\"AcNoCode\" IN ('20222010000','20222020000','20222180000', '20222180100' ,'20222180200') ";
+//		sql += "       AND AD.\"AcNoCode\" IN ('20222010000','20222020000','20222180000', '20222180100' ,'20222180200') ";
 		// sql += " AND AD.\"AcNoCode\" LIKE '20222%' ";
+		// sql += " WHERE AC.\"AcNoCode\" IN ('20222010000','20222020000','20222180000',
+		// '20222180100' ,'20222180200') ";
+		// sql += " WHERE AC.\"AcNoCode\" LIKE '20222%' ";
+		sql += "    AND  AD.\"AcctCode\" in ('TAV','TCK','TEM','TAM','TRO','TLD') ";
 		sql += "     ORDER BY AD.\"AcDate\" ";
 		sql += "            , AD.\"AcNoCode\" ASC ";
 		sql += "            , AD.\"AcSubCode\" ASC ";
@@ -172,7 +177,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                              AND CO.\"FacmNo\" = AC.\"FacmNo\" ";
 		// sql += " WHERE AC.\"AcNoCode\" IN ('20222010000','20222020000','20222180000',
 		// '20222180100' ,'20222180200') ";
-		//sql += "     WHERE AC.\"AcNoCode\" LIKE '20222%' ";
+		// sql += " WHERE AC.\"AcNoCode\" LIKE '20222%' ";
 		sql += "    WHERE  AC.\"AcctCode\" in ('TAV','TCK','TEM','TAM','TRO','TLD') ";
 		sql += "       AND AC.\"RvBal\" > 0 ";
 		sql += "     ORDER BY AC.\"AcNoCode\" ASC ";
@@ -187,79 +192,30 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		return this.convertToMap(query);
 	}
-	
-	/**
-	 * L9134 暫收款對帳-日調結表(可抵繳暫收款) L9134 暫收款對帳-日調結表(不可抵繳暫收款)1
-	 * 
-	 * @param titaVo TitaVo
-	 * @return 查詢結果
-	 * @throws LogicException 
-	 */
-	public List<Map<String, String>> doQueryL9134_4(TitaVo titaVo, int idate) throws LogicException {
-		this.info("L9134_4 Start");
-		this.info("idate   = " + idate );
-		String itdate =  parse.IntegerToString(idate+19110000, 8);
-		this.info("itdate   =" +itdate);
-		int idx = parse.stringToInteger(titaVo.getParam("StartDate").trim().substring(5,7));
-		this.info("idx  = " + idx);
-		String itdx = itdate.substring(0,6);
-		this.info("itdx   = " + itdx);
 
-		String sql = " ";
-		sql += " select \"AcDate\" ";
-		sql += " , sum(\"TdBal\") as \"TdBal\"   ";
-		sql += " , sum(\"TdBal\") - sum(\"YdBal\") as \"DifTdBal\"  ";
-		sql += " from ";
-		sql += " ( ";
-		for (int i = 1; i <= idx; i++) {
-		sql += " select ";
-		sql +=  itdx +  parse.IntegerToString(i, 2) + " as \"AcDate\" ";
-		sql += " ,0 as \"YdBal\" ";
-		sql += " ,0 as \"TdBal\" ";
-		sql += " from dual ";
-		sql += " union all ";
-		}
-		sql += " select  ";
-		sql += " \"AcDate\" ";
-		sql += " ,\"TdBal\"";
-		sql += " ,\"YdBal\" ";
-		sql += " from \"AcMain\" ";
-		sql += " where \"AcDate\" = :itdate ";
-		sql += "   and \"AcctCode\" in ('TAV','TAM','TLD','T11','T13','T12','T10') ";
-		sql += " ) ";
-		sql += " group by \"AcDate\" ";
-		sql += " order by \"AcDate\" ";
-		this.info("doQueryL9134_4 sql=" + sql);
-		Query query;
-		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-		query = em.createNativeQuery(sql);
-		query.setParameter("itdate", itdate);
-		return this.convertToMap(query);
-	}
 	/**
-	 * L9134 暫收款對帳-日調結表(可抵繳暫收款) L9134 暫收款對帳-日調結表(不可抵繳暫收款) 2
+	 * L9134 暫收款對帳-日調結表(可抵繳暫收款) L9134 暫收款對帳-日調結表(不可抵繳暫收款) 
 	 * 
 	 * @param titaVo TitaVo
 	 * @return 查詢結果
 	 */
 	public List<Map<String, String>> doQueryL9134_4_1(TitaVo titaVo, int idate) throws LogicException {
 		this.info("L9134_4_1 Start");
-		this.info("idate   = " + idate );
-		String itdate =  parse.IntegerToString(idate+19110000, 8);
-		this.info("itdate   =" +itdate);
-		int idx = parse.stringToInteger(titaVo.getParam("StartDate").trim().substring(5,7));
+		this.info("idate   = " + idate);
+		String itdate = parse.IntegerToString(idate + 19110000, 8);
+		this.info("itdate   =" + itdate);
+		int idx = parse.stringToInteger(titaVo.getParam("StartDate").trim().substring(5, 7));
 		this.info("idx  = " + idx);
-		String itdx = itdate.substring(0,6);
+		String itdx = itdate.substring(0, 6);
 		this.info("itdx   = " + itdx);
-		
-		
-		
+
 		String sql = " ";
 		sql += " select \"AcDate\" ";
 		sql += " , sum(\"TdBal\") as \"TdBal\"   ";
 		sql += " , sum(\"TdBal\") - sum(\"YdBal\") as \"DifTdBal\"  ";
 		sql += " , sum(\"didTdal\") as \"didTdBal\"  ";
 		sql += " , sum(\"didTdal\") - sum(\"didYdBal\") as \"didDifTdBal\" ";
+		sql += " , sum(\"DrAmt\") as \"DrAmt\" , sum(\"CrAmt\") as \"CrAmt\" ";
 		sql += " from ";
 		sql += " ( ";
 		sql += " select";
@@ -268,6 +224,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  ,sum(\"TdBal\") as \"TdBal\" ";
 		sql += "  ,0 as \"didYdBal\"";
 		sql += "  ,0 as \"didTdal\" ";
+		sql += " , 0 as \"DrAmt\" , 0 as \"CrAmt\" ";
 		sql += " from \"AcMain\" ";
 		sql += " where \"AcDate\" >= 20220101 and \"AcDate\" <= 20220131 ";
 		sql += "   and \"AcctCode\" in ('TAV','TAM','TLD','T11','T13','T12','T10') ";
@@ -278,39 +235,82 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,0 as \"TdBal\" ";
 		sql += " ,sum(\"YdBal\") as \"didYdBal\" ";
 		sql += " ,sum(\"TdBal\") as \"didTdal\" ";
+		sql += " ,0 as \"DrAmt\" , 0 as \"CrAmt\" ";
 		sql += " from \"AcMain\" ";
 		sql += " where \"AcDate\" >= 20220101 and \"AcDate\" <= 20220131 ";
 		sql += " and \"AcctCode\" in ('TCK')  ";
 		sql += " union all ";
 		for (int i = 1; i <= idx; i++) {
-		sql += " select ";
-		sql += " to_char("+ itdx +  parse.IntegerToString(i, 2) +")  as \"AcDate\" ";
-		sql += " ,0 as \"YdBal\" ";
-		sql += " ,0 as \"TdBal\" ";
-		sql += " ,0 as \"didYdBal\" ";
-		sql += " ,0 as \"didTdal\" ";
-		sql += " from dual ";
-		sql += " union all ";
+			sql += " select ";
+			sql += " to_char(" + itdx + parse.IntegerToString(i, 2) + ")  as \"AcDate\" ";
+			sql += " ,0 as \"YdBal\" ";
+			sql += " ,0 as \"TdBal\" ";
+			sql += " ,0 as \"didYdBal\" ";
+			sql += " ,0 as \"didTdal\" ";
+			sql += " ,0 as \"DrAmt\" , 0 as \"CrAmt\" ";
+			sql += " from dual ";
+			sql += " union all ";
+			sql += " select  ";
+			sql += " to_char(\"AcDate\") as \"AcDate\" ";
+			sql += " ,\"TdBal\"";
+			sql += " ,\"YdBal\" ";
+			sql += " , 0 as \"didYdBal\" ";
+			sql += " , 0 as \"didTdal\" ";
+			sql += " , 0 as \"DrAmt\" , 0 as \"CrAmt\" ";
+			sql += " from \"AcMain\" ";
+//		sql += " where \"AcDate\" = :itdate ";
+			sql += " where \"AcDate\" = " + itdx + parse.IntegerToString(i, 2) + "";
+			sql += "   and \"AcctCode\" in ('TAV','TAM','TLD','T11','T13','T12','T10') ";
+			sql += " union all ";
+			sql += " select ";
+			sql += " to_char(\"AcDate\") as \"AcDate\" ";
+			sql += " ,0 as \"YdBal\" ";
+			sql += " ,0 as \"TdBal\" ";
+			sql += " , \"YdBal\" as \"didYdBal\"";
+			sql += " , \"TdBal\" as \"didTdal\"";
+			sql += " ,0 as \"DrAmt\" , 0 as \"CrAmt\" ";
+			sql += " from \"AcMain\" ";
+			sql += " where \"AcctCode\" in ('TCK') ";
+//		sql += " and  \"AcDate\" =:itdate ";
+			sql += " and \"AcDate\" = " + itdx + parse.IntegerToString(i, 2) + " ";
+			sql += " union all ";
+			sql += " select ";
+			sql += " to_char(" + itdx + parse.IntegerToString(i, 2) + ")  as \"AcDate\" ";
+			sql += " ,0 as \"YdBal\" ";
+			sql += " ,0 as \"TdBal\" ";
+			sql += " ,0 as \"didYdBal\" ";
+			sql += " ,0 as \"didTdal\" ";
+//			sql += " ,sum(\"DrAmt\") as \"DrAmt\" , sum(\"CrAmt\") as \"CrAmt\" ";
+			sql += " ,\"DrAmt\" as \"DrAmt\" , \"CrAmt\" as \"CrAmt\" ";
+			sql += " from ( ";
+			sql += " select ";
+			sql += "   CASE";
+			sql += "     WHEN AD.\"DbCr\" = 'D' ";
+			sql += "     THEN AD.\"TxAmt\" ";
+			sql += "   ELSE 0 END AS \"DrAmt\"";
+			sql += " , CASE ";
+			sql += "     WHEN AD.\"DbCr\" = 'C' ";
+			sql += "     THEN AD.\"TxAmt\" ";
+			sql += "   ELSE 0 END AS \"CrAmt\" ";
+			sql += " FROM \"AcDetail\" AD  ";
+			sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = AD.\"CustNo\" ";
+			sql += "                           AND AD.\"CustNo\" != 0 ";
+			sql += " LEFT JOIN \"CdCode\" CC ON CC.\"DefCode\" = 'AcSubBookCode' ";
+			sql += "                         AND CC.\"Code\" = AD.\"AcSubBookCode\" ";
+			sql += " LEFT JOIN \"CdAcCode\" C ON C.\"AcNoCode\" = AD.\"AcNoCode\" ";
+			sql += "                          AND C.\"AcSubCode\" = AD.\"AcSubCode\"  ";
+			sql += "                          AND C.\"AcDtlCode\" = AD.\"AcDtlCode\" ";
+//			sql += " WHERE AD.\"AcDate\" >= :startDate  ";
+//			sql += "   AND AD.\"AcDate\" <= :endDate ";
+			sql += " WHERE AD.\"AcDate\" >=" + itdx + parse.IntegerToString(i, 2) + " ";
+			sql += "   AND AD.\"AcDate\" <=" + itdx + parse.IntegerToString(i, 2) + " ";
+			sql += "   AND  AD.\"AcctCode\" in ('TAV','TCK','TEM','TAM','TRO','TLD') ";
+//			sql += " group by \"AcDate\" " ;
+			sql += " ) ";	
+			if (idx != i) {
+				sql += " union all ";
+			}
 		}
-		sql += " select  ";
-		sql += " to_char(\"AcDate\") as \"AcDate\" ";
-		sql += " ,\"TdBal\"";
-		sql += " ,\"YdBal\" ";
-		sql += " , 0 as \"didYdBal\" ";
-		sql += " , 0 as \"didTdal\" ";
-		sql += " from \"AcMain\" ";
-		sql += " where \"AcDate\" = :itdate ";
-		sql += "   and \"AcctCode\" in ('TAV','TAM','TLD','T11','T13','T12','T10') ";
-		sql += " union all ";
-		sql += " select ";
-		sql += " to_char(\"AcDate\") as \"AcDate\" ";
-		sql += " , 0 as \"YdBal\"";
-		sql += " , 0 as \"TdBal\"";
-		sql += " , \"YdBal\" as \"didYdBal\"";
-		sql += " , \"TdBal\" as \"didTdal\"";
-		sql += " from \"AcMain\" ";
-		sql += " where \"AcctCode\" in ('TCK') ";
-		sql += " and  \"AcDate\" =:itdate ";
 		sql += " ) ";
 		sql += " group by \"AcDate\" ";
 		sql += " order by \"AcDate\" ";
@@ -318,7 +318,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("itdate", itdate);
+		// query.setParameter("itdate", itdate);
 		return this.convertToMap(query);
 	}
 
