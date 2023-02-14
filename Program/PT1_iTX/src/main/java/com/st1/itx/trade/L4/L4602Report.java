@@ -22,6 +22,8 @@ import com.st1.itx.util.format.FormatUtil;
 /**
  * L4602Report
  * 
+ * 輸出檔案：出單明細表
+ * 
  * @author Chih Wei
  *
  */
@@ -57,10 +59,7 @@ public class L4602Report extends MakeReport {
 				.setRptCode(txcd).setRptItem(txName).build();
 
 		makeExcel.open(titaVo, reportVo,txcd + "_" + txName);
-		
-//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txcd, txName, txcd + "_" + txName);
-//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txCode, reportName, "", "A4", "L");
-		
+
 		// 輸出表頭
 		printL4602Header();
 

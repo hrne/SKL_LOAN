@@ -32,7 +32,12 @@ import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
-
+/**
+ * 輸出檔案：重複投保
+ * 
+ * L4601Report
+ * 
+ * */
 @Component("L4601Report")
 @Scope("prototype")
 public class L4601Report extends MakeReport {

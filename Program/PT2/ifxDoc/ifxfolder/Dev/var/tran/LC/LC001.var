@@ -11,7 +11,7 @@
 #INQHD=n,3,S
 E(0,0)ASGN(INQHD$)
 
-![每筆資料明細(OCCURS)長度] 
+![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
 E(0,172)ASGN(INQLEN$)
 
@@ -72,7 +72,7 @@ D(8)
 @V(7)A(DATE,0,#iEntdy)
 
 #iBrNo=X,4,L
-T(2,#KINBR) 
+T(2,#KINBR)
 
 #iTlrNo=X,6,I
 T(2,#TLRNO)
@@ -144,6 +144,7 @@ C(3,#TxAmt1,0,T(3,)T(3,@CurName,),X(#TxAmt1)) ! 金額為0時隱藏幣別與金�
 #TypeX=X,8,S
 C(2,#FlowStep,T(3,登錄),T(3,登錄),T(3,放行),T(3,審核),T(3,審核放行))
 
+#RejectReason=X,200,S
 
 #SupRelease=A,1,S
 #OOOrgEntdy=D,7,S
@@ -165,8 +166,6 @@ C(3,#AcCnt,1,C(3,#Status,0,T(3,1),T(3,0)),T(3,0))
 
 #BTN2=X,1,S
 C(3,#AcCnt,0,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L6901; ntxbuf=#RimData2; text=分錄; visible=#btn_visible2}))
-
-
 
 </sub>
 
@@ -198,6 +197,7 @@ TXFORM=LC001
 #FlowNo
 #AcCnt
 #Status
+#RejectReason
 ^
 <include src="COM.icf::TRCTL.tom"/>
 </sub>
@@ -249,6 +249,8 @@ TXFORM=LC001
 #TypeX=類別
 {width:80,align:'center'}
 
+#RejectReason=
+{width:200,align:'left'}
 
 ^
 

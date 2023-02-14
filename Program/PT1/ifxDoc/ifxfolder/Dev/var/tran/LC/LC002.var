@@ -137,6 +137,8 @@ C(3,#TxAmt1,0,T(3,)T(3,@CurName,),X(#TxAmt1)) ! 金額為0時隱藏幣別與金�
 #TypeX=X,8,S
 C(2,#FlowStep,$,T(3,登錄),T(3,放行),T(3,審核),T(3,審核放行))
 
+#RejectReason=X,200,S
+
 #RimData=x,100,S
 T(6A,#Entdy+#TxNo)
 
@@ -171,6 +173,7 @@ TXFORM=LC002
 #FlowType
 #FlowStep
 #SupRelease
+#RejectReason
 ^
 <include src="COM.icf::TRCTL.tom"/>
 </sub>
@@ -218,6 +221,10 @@ TXFORM=LC002
 
 #TypeX=類別
 {width:80,align:'center'}
+
+#RejectReason=
+{width:200,align:'left'}
+
 
 ^
 

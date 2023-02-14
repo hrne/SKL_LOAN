@@ -145,8 +145,10 @@ public class L4605 extends TradeBuffer {
 
 				if (iInsuEndMonth != parse.stringToInteger(tempOccursList.get("FireInsuMonth"))) {
 					error.put(tmp, 1);
+					this.info("iInsuEndMonth="+iInsuEndMonth+",FireInsuMonth="+parse.stringToInteger(tempOccursList.get("FireInsuMonth")));
 					continue;
 				}
+				
 
 				InsuRenew tInsuRenew = insuRenewService.prevInsuNoFirst(
 						parse.stringToInteger(tempOccursList.get("CustNo").trim()),
@@ -315,8 +317,8 @@ public class L4605 extends TradeBuffer {
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "L4605";
-		String fileItem = "火險最終保單";
-		String fileName = "L4605-火險最終保單上傳作業";
+		String fileItem = "火險最終保單(錯誤清單)";
+		String fileName = "L4605-火險最終保單上傳作業(錯誤清單)";
 		int row = 1; // 列數:記錄印到第幾列
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
 				.setRptItem(fileItem).build();
@@ -348,7 +350,7 @@ public class L4605 extends TradeBuffer {
 		makeExcel.setValue(row, 8, "原因狀況", "C", headerStyleVo);
 
 		row++;
-
+		boolean nodata=true;
 		// 明細
 		if (tempList == null || tempList.isEmpty()) {
 			makeExcel.setValue(3, 1, "本日無資料", "L");
@@ -450,10 +452,14 @@ public class L4605 extends TradeBuffer {
 
 //					this.totaVo.addOccursList(occursList);
 					row++;
-
+					nodata=false;
 				} else {
 					continue;
+					
 				}
+			}
+			if(nodata) {
+			makeExcel.setValue(3, 1, "本日無錯誤資料", "L");
 			}
 		}
 

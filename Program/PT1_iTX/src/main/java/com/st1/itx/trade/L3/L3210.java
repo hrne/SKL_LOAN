@@ -26,7 +26,9 @@ import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.LoanChequeService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.AcDetailCom;
 import com.st1.itx.util.common.AcNegCom;
+import com.st1.itx.util.common.AcPaymentCom;
 import com.st1.itx.util.common.AcRepayCom;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.LoanCom;
@@ -74,6 +76,10 @@ public class L3210 extends TradeBuffer {
 	BaTxCom baTxCom;
 	@Autowired
 	LoanCom loanCom;
+	@Autowired
+	AcPaymentCom acPaymentCom;
+	@Autowired
+	AcDetailCom acDetailCom;
 
 	private TitaVo titaVo;
 	private int iCustNo;
@@ -196,7 +202,21 @@ public class L3210 extends TradeBuffer {
 
 		// 暫收款交易新增帳務及更新放款交易內容檔
 		if (titaVo.isHcodeNormal()) {
-			acRepayCom.settleTempRun(this.lLoanBorTx, this.baTxList, this.lAcDetail, titaVo);
+			if (iTempReasonCode == 3 || iTempReasonCode == 6) {
+				// 借方 應收票據
+				this.txBuffer.addAllAcDetailList(lAcDetail);
+				// 貸方 收付欄
+				acPaymentCom.setTxBuffer(this.getTxBuffer());
+				acPaymentCom.run(titaVo);
+
+				// 產生會計分錄
+				acDetailCom.setTxBuffer(this.txBuffer);
+				acDetailCom.run(titaVo);
+				this.setTxBuffer(acDetailCom.getTxBuffer());
+
+			} else {
+				acRepayCom.settleTempRun(this.lLoanBorTx, this.baTxList, this.lAcDetail, titaVo);
+			}
 		}
 
 		this.addList(this.totaVo);
@@ -264,81 +284,81 @@ public class L3210 extends TradeBuffer {
 	// 帳務處理
 	private void AcDetailRoutine() throws LogicException {
 		this.info("AcDetailRoutine ...");
-			// 貸方 暫收及待結轉帳項-擔保放款
-			switch (iTempReasonCode) {
-			case 0: // 債協暫收款
-				// 貸方 債協暫收款
-				acDetail = new AcDetail();
-				acDetail.setDbCr("C");
-				acDetail.setAcctCode(acNegCom.getAcctCode(iCustNo, titaVo));
-				acDetail.setSumNo("094"); // 轉債協暫收款
-				acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
-				acDetail.setTxAmt(iTempAmt);
-				acDetail.setCustNo(iCustNo);
-				lAcDetail.add(acDetail);
-				this.info("SlipNote = " + acDetail.getSlipNote());
-				addLoanBorTxRoutine(acDetail);
-				/* 5.找債協專戶的匯入款，為一般債權人撥付款 */
-				if (iCustNo == this.txBuffer.getSystemParas().getNegDeptCustNo()) {
-					List<AcDetail> lAcDetailApp02 = new ArrayList<AcDetail>();
-					lAcDetailApp02 = acNegCom.getNegAppr02CustNo(iEntryDate, iTempAmt, iCustNo, titaVo);
-					if (lAcDetailApp02.size() > 0) {
-						acDetail = new AcDetail();
-						acDetail.setDbCr("D");
-						acDetail.setAcctCode(acNegCom.getAcctCode(iCustNo, titaVo));
-						acDetail.setSumNo("094"); // 轉債協暫收款
-						acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
-						acDetail.setTxAmt(iTempAmt);
-						acDetail.setCustNo(iCustNo);
-						lAcDetail.add(acDetail);
-						// 貸 : 一般債權人撥付款
-						lAcDetail.addAll(lAcDetailApp02);
-						this.info("SlipNote2 = " + acDetail.getSlipNote());
-					}
+		// 貸方 暫收及待結轉帳項-擔保放款
+		switch (iTempReasonCode) {
+		case 0: // 債協暫收款
+			// 貸方 債協暫收款
+			acDetail = new AcDetail();
+			acDetail.setDbCr("C");
+			acDetail.setAcctCode(acNegCom.getAcctCode(iCustNo, titaVo));
+			acDetail.setSumNo("094"); // 轉債協暫收款
+			acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
+			acDetail.setTxAmt(iTempAmt);
+			acDetail.setCustNo(iCustNo);
+			lAcDetail.add(acDetail);
+			this.info("SlipNote = " + acDetail.getSlipNote());
+			addLoanBorTxRoutine(acDetail);
+			/* 5.找債協專戶的匯入款，為一般債權人撥付款 */
+			if (iCustNo == this.txBuffer.getSystemParas().getNegDeptCustNo()) {
+				List<AcDetail> lAcDetailApp02 = new ArrayList<AcDetail>();
+				lAcDetailApp02 = acNegCom.getNegAppr02CustNo(iEntryDate, iTempAmt, iCustNo, titaVo);
+				if (lAcDetailApp02.size() > 0) {
+					acDetail = new AcDetail();
+					acDetail.setDbCr("D");
+					acDetail.setAcctCode(acNegCom.getAcctCode(iCustNo, titaVo));
+					acDetail.setSumNo("094"); // 轉債協暫收款
+					acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
+					acDetail.setTxAmt(iTempAmt);
+					acDetail.setCustNo(iCustNo);
+					lAcDetail.add(acDetail);
+					// 貸 : 一般債權人撥付款
+					lAcDetail.addAll(lAcDetailApp02);
+					this.info("SlipNote2 = " + acDetail.getSlipNote());
 				}
-
-				break;
-			case 3: // 期票
-			case 6: // 即期票
-				acDetail = new AcDetail();
-				acDetail.setDbCr("D");
-				acDetail.setAcctCode("RCK");
-				acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
-				acDetail.setTxAmt(iTempAmt);
-				acDetail.setCustNo(iCustNo);
-				lAcDetail.add(acDetail);
-				addLoanBorTxRoutine(acDetail);
-				break;
-			case 8: // 兌現票入帳
-				FacMain tFacMain = facMainService.findById(new FacMainId(iCustNo, iFacmNo), titaVo);
-				if (tFacMain == null) {
-					throw new LogicException(titaVo, "E0001", "額度主檔 借款人戶號 = " + iCustNo + " 額度編號 = " + iFacmNo); // 查詢資料不存在
-				}
-				if (tFacMain.getActFg() == 1) {
-					throw new LogicException(titaVo, "E0021",
-							"額度檔 戶號 = " + tFacMain.getCustNo() + " 額度編號 =  " + tFacMain.getFacmNo()); // 該筆資料待放行中
-				}
-				// 應繳試算
-				settleUnpaid();
-
-				break;
-			case 10: // AML凍結／未確定
-				// 貸方 TAM
-				acDetail = new AcDetail();
-				acDetail.setDbCr("C");
-				acDetail.setAcctCode("TAM");
-				acDetail.setSumNo("092"); // 暫收款
-				acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
-				acDetail.setTxAmt(iTempAmt);
-				acDetail.setCustNo(iCustNo);
-				lAcDetail.add(acDetail);
-				addLoanBorTxRoutine(acDetail);
-				break;
-			default:
-				// 應繳試算
-				settleUnpaid();
-				break;
 			}
+
+			break;
+		case 3: // 期票
+		case 6: // 即期票
+			acDetail = new AcDetail();
+			acDetail.setDbCr("D");
+			acDetail.setAcctCode("RCK"); // 應收票據－一般票據－非核心
+			acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
+			acDetail.setTxAmt(iTempAmt);
+			acDetail.setCustNo(iCustNo);
+			lAcDetail.add(acDetail);
+			addLoanBorTxRoutine(acDetail);
+			break;
+		case 8: // 兌現票入帳
+			FacMain tFacMain = facMainService.findById(new FacMainId(iCustNo, iFacmNo), titaVo);
+			if (tFacMain == null) {
+				throw new LogicException(titaVo, "E0001", "額度主檔 借款人戶號 = " + iCustNo + " 額度編號 = " + iFacmNo); // 查詢資料不存在
+			}
+			if (tFacMain.getActFg() == 1) {
+				throw new LogicException(titaVo, "E0021",
+						"額度檔 戶號 = " + tFacMain.getCustNo() + " 額度編號 =  " + tFacMain.getFacmNo()); // 該筆資料待放行中
+			}
+			// 應繳試算
+			settleUnpaid();
+
+			break;
+		case 10: // AML凍結／未確定
+			// 貸方 TAM
+			acDetail = new AcDetail();
+			acDetail.setDbCr("C");
+			acDetail.setAcctCode("TAM");
+			acDetail.setSumNo("092"); // 暫收款
+			acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
+			acDetail.setTxAmt(iTempAmt);
+			acDetail.setCustNo(iCustNo);
+			lAcDetail.add(acDetail);
+			addLoanBorTxRoutine(acDetail);
+			break;
+		default:
+			// 應繳試算
+			settleUnpaid();
+			break;
+		}
 	}
 
 	// 應繳試算
@@ -438,7 +458,13 @@ public class L3210 extends TradeBuffer {
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 
 		this.lLoanBorTx.add(tLoanBorTx);
-
+		if (iTempReasonCode == 3 || iTempReasonCode == 6) {
+			try {
+				loanBorTxService.insertAll(this.lLoanBorTx);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
+			}
+		}
 	}
 
 }

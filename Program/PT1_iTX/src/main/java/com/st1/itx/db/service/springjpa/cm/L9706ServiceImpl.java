@@ -52,10 +52,10 @@ public class L9706ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             , F.\"LoanTermYy\"                 \"LoanTermYy\"  ";
 		sql += "             , F.\"LoanTermMm\"                 \"LoanTermMm\"  ";
 		sql += "             , F.\"LoanTermDd\"                 \"LoanTermDd\"  ";
-		sql += "             , F.\"LineAmt\"                    \"LineAmt\"  ";
+		sql += "             , sum(F.\"LineAmt\")               \"LineAmt\"  ";
 		sql += "             , M.\"CustNo\"                     \"CustNo\"  ";
 		sql += "             , M.\"FacmNo\"                     \"FacmNo\"  ";
-		sql += "             , M.\"LoanBal\"                    \"LoanBal\"  ";
+		sql += "             , sum(M.\"LoanBal\")               \"LoanBal\"  ";
 		sql += "             , C.\"CustId\"                     \"CustId\"  ";
 		sql += "             , C.\"CuscCd\"                     \"CuscCd\"  ";
 		sql += "             , F.\"ProdNo\"                     \"ProdNo\"  ";
@@ -102,6 +102,10 @@ public class L9706ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (iFacmNo != 0) {
 			sql += "     and M.\"FacmNo\" = :iFacmNo  ";
 		}
+		sql += "group by \"Fn_ParseEOL\"(c.\"CustName\", 0), f.\"FirstDrawdownDate\", f.\"LoanTermYy\", f.\"LoanTermMm\", f.\"LoanTermDd\", ";
+		sql += "	    m.\"CustNo\", M.\"FacmNo\", c.\"CustId\", c.\"CuscCd\", f.\"ProdNo\", ";
+		sql += "        p.\"GovOfferFlag\", p.\"ProdName\", F.\"ApplNo\" ";
+		
 		sql += " order by \"FacmNo\" ";
 
 		this.info("L9706 Simplsql=" + sql);

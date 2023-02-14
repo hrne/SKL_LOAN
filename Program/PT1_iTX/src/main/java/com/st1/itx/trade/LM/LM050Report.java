@@ -22,18 +22,14 @@ import com.st1.itx.util.common.data.ReportVo;
 @Component
 @Scope("prototype")
 
-
-
-
-public class LM050Report extends MakeReport {	
+public class LM050Report extends MakeReport {
 
 	@Autowired
 	LM050ServiceImpl lM050ServiceImpl;
 
 	@Autowired
 	MakeExcel makeExcel;
-	
-	
+
 	// 淨值
 	BigDecimal equity = BigDecimal.ZERO;
 
@@ -51,10 +47,6 @@ public class LM050Report extends MakeReport {
 
 	// 放款總額
 	BigDecimal total = BigDecimal.ZERO;
-
-
-	
-
 
 	public void exec(TitaVo titaVo) throws LogicException {
 		this.info("LM050Report exec");
@@ -75,19 +67,20 @@ public class LM050Report extends MakeReport {
 
 		// 開啟報表
 		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
-		
-		
+
 		// 取得民國年帳務日
 		String entdy = titaVo.getEntDy();
 
 		makeExcel.setSheet("108.04", entdy.substring(1, 4) + "." + entdy.substring(4, 6));
-		makeExcel.setValue(1, 2, entdy.substring(1, 4) + "年" + entdy.substring(4, 6) + "月" + entdy.substring(6, 8) + "日依「保險業利害關係人放款管理辦法」第3條利害關係人放款餘額表");
-		makeExcel.setValue(2, 4, entdy.substring(1, 4) + "." + entdy.substring(4, 6) + "." + entdy.substring(6, 8) + " 淨值（核閱數）");
+		makeExcel.setValue(1, 2, entdy.substring(1, 4) + "年" + entdy.substring(4, 6) + "月" + entdy.substring(6, 8)
+				+ "日依「保險業利害關係人放款管理辦法」第3條利害關係人放款餘額表");
+		makeExcel.setValue(2, 4,
+				entdy.substring(1, 4) + "." + entdy.substring(4, 6) + "." + entdy.substring(6, 8) + " 淨值（核閱數）");
 
 		List<Map<String, String>> equityList = null;
 
 		try {
-			
+
 			equityList = lM050ServiceImpl.fnEquity(titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
@@ -111,8 +104,6 @@ public class LM050Report extends MakeReport {
 		makeExcel.close();
 
 	}
-	
-
 
 	private BigDecimal formatThousand(BigDecimal amt) {
 
@@ -124,7 +115,7 @@ public class LM050Report extends MakeReport {
 		List<Map<String, String>> listLM050 = null;
 
 		try {
-			
+
 			listLM050 = lM050ServiceImpl.findAll(titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
@@ -134,6 +125,7 @@ public class LM050Report extends MakeReport {
 
 		exportExcel(listLM050);
 	}
+
 //
 	private void exportExcel(List<Map<String, String>> listLM050) throws LogicException {
 		this.info("LM050Report exportExcel");
@@ -145,26 +137,32 @@ public class LM050Report extends MakeReport {
 
 		int rowCursor = 4;
 
-		if (listLM050.size() > 1) {
-			makeExcel.setShiftRow(rowCursor + 1, listLM050.size() - 1);
-		}
+		int pos = 0;
 
 		for (Map<String, String> tLM050 : listLM050) {
 			String rptType = tLM050.get("F0");
 			BigDecimal loanBal = getBigDecimal(tLM050.get("F3"));
 
 			if (rptType.equals("1")) { // 保險業利害關係人放款管理辦法第3條利害關係人
+
 				String custNo = tLM050.get("F1");
 				String custName = tLM050.get("F2");
+				String remark=tLM050.get("remark");
+
+				if (rptType.equals(listLM050.get(pos + 1).get("F1"))) {
+					makeExcel.setShiftRow(rowCursor, 1);
+				}
 
 				makeExcel.setValue(rowCursor, 2, custNo);
 				makeExcel.setValue(rowCursor, 3, custName);
 				makeExcel.setValue(rowCursor, 4, formatThousand(loanBal), "#,##0");
 				makeExcel.setValue(rowCursor, 5, this.computeDivide(loanBal, equity, 4), "#,##0.00%");
 				makeExcel.setValue(rowCursor, 6, "2%"); // 限額標準 ???
+				makeExcel.setValue(rowCursor, 7, remark); // 備註
 
 				detailTotal = detailTotal.add(loanBal);
 				rowCursor++;
+				pos++;
 			} else if (rptType.equals("2")) { // 職員
 				empLoanBal = empLoanBal.add(loanBal);
 			} else if (rptType.equals("3")) { // 一般客戶

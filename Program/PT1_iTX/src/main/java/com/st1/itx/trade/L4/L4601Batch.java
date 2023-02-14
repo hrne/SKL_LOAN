@@ -37,7 +37,6 @@ import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.FileCom;
 import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.data.InsuRenewFileVo;
-import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.http.WebClient;
@@ -259,7 +258,9 @@ public class L4601Batch extends TradeBuffer {
 		} else {
 			// 產重複投保報表
 			l4601Report.exec(titaVo);
-			l4601Report2(titaVo);
+
+			// 產險種不足LNM5811P
+			l4601Report2.exec(titaVo);
 
 			String sendMsg = "L4601-報表已完成";
 
@@ -575,14 +576,12 @@ public class L4601Batch extends TradeBuffer {
 	}
 
 	/**
-	 * 出表：保單險種不足明細表/LN5811P.CSV
 	 * 
 	 * @param titaVo
 	 * @throws LogicException
 	 * 
 	 */
-	public void l4601Report2(TitaVo titaVo) throws LogicException {
-		this.info("active l4601Report2 ");
+	public void l4601Report2Data(TitaVo titaVo) throws LogicException {
 		this.totaVo.init(titaVo);
 
 		iInsuEndMonth = parse.stringToInteger(titaVo.getParam("InsuEndMonth")) + 191100;
@@ -645,67 +644,39 @@ public class L4601Batch extends TradeBuffer {
 		}
 		// 把明細資料容器裝到檔案資料容器內
 		insuRenewFileVo.setOccursList(tmpList);
+
 		// 轉換資料格式
-		ArrayList<String> file = insuRenewFileVo.toFile();
-
-		if (file.isEmpty()) {
-			webClient.sendPost(dateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009",
-					titaVo.getTlrNo() + "L4602", "L4602火險到期檔查無資料", titaVo);
-		} else {
-
-			ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getBrno())
-					.setRptCode(titaVo.getTxCode()).setRptItem("LNM01P"+ "(火險到期檔)").build();
-
-			makeFile.open(titaVo, reportVo, "LNM01P.txt", 2);
-
-//			this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txCode, reportName, "", "A4", "L");
-//			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
-//					titaVo.getTxCode() + "-火險到期檔", "LNM01P.txt", 2);
-
-			for (String line : file) {
-				makeFile.put(line);
-			}
-
-			long sno = makeFile.close();
-
-			this.info("sno : " + sno);
-			makeFile.toFile(sno);
-
-//		totaVo.put("PdfSnoM", "" + sno);
-
-			// TXT製作完成，發MESSAGE
-			webClient.sendPost(dateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009",
-					titaVo.getTlrNo() + "L4602", "L4602火險到期檔LNM01P.txt已完成", titaVo);
-		}
+//		ArrayList<String> file = insuRenewFileVo.toFile();
+//
+//		if (file.isEmpty()) {
+//			webClient.sendPost(dateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009",
+//					titaVo.getTlrNo() + "L4602", "L4602火險到期檔查無資料", titaVo);
+//		} else {
+//
+//			ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getBrno())
+//					.setRptCode(titaVo.getTxCode()).setRptItem("LNM01P"+ "(火險到期檔)").build();
+//
+//			makeFile.open(titaVo, reportVo, "LNM01P.txt", 2);
+//
+//			for (String line : file) {
+//				makeFile.put(line);
+//			}
+//
+//			long sno = makeFile.close();
+//
+//			this.info("sno : " + sno);
+//			makeFile.toFile(sno);
+//
+//
+//			// TXT製作完成，發MESSAGE
+//			webClient.sendPost(dateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009",
+//					titaVo.getTlrNo() + "L4602", "L4602火險到期檔LNM01P.txt已完成", titaVo);
+//		}
 
 		// 2021-11-09 智偉修改， 原本在L4600產生 改為在L4602產生,並將報表程式改名
 		// 2022-11-02楷杰修改，需求：原L4602產生此表，改成在L4601產生
-		l4601Report2.exec(titaVo);
+//		l4601Report2.exec(titaVo,insuRenewFileVo);
 
 	}
-
-//	private int calYear(int today, int year) throws LogicException {
-//		int resultMonth = 0;
-//	10801
-//	201901
-//	1080101
-//	trans today = Bc format
-//		if (today < 100000) {
-//			today = parse.stringToInteger((today + 191100) + "01");
-//		} else if (today < 1000000) {
-//			today = parse.stringToInteger(today + "01");
-//		} else if (today < 10000000) {
-//			today = today + 19110000;
-//		}
-//
-//		dateUtil.init();
-//		dateUtil.setDate_1(today);
-//		dateUtil.setYears(year);
-//		today = dateUtil.getCalenderDay();
-//
-//		resultMonth = parse.stringToInteger((today + "").substring(0, 6));
-//
-//		return resultMonth;
-//	}
 
 }

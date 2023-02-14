@@ -53,6 +53,7 @@ public class LC002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ",NVL(E.\"FlowStep\",0) AS \"FlowStep2\"";
 		sql += ",NVL(E.\"SubmitFg\",0) AS \"SubmitFg\"";
 		sql += ",NVL(E.\"FlowMode\",0) AS \"FlowMode\"";
+		sql += ",E.\"RejectReason\" as \"RejectReason\"";
 		sql += " from \"TxRecord\" A";
 		sql += " left join \"TxTranCode\" B on B.\"TranNo\"=A.\"TranNo\"";
 		sql += " left join \"CdBranch\" C on C.\"BranchNo\"=A.\"BrNo\"";

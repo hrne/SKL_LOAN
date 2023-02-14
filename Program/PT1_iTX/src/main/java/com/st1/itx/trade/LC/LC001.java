@@ -5,6 +5,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -124,6 +125,7 @@ public class LC001 extends TradeBuffer {
 					occursList.putParam("FlowType", daFlowType);
 					occursList.putParam("FlowStep", daFlowStep);
 					occursList.putParam("SupRelease", supRelease);
+					occursList.putParam("RejectReason", Objects.isNull(lc001Vo.get("RejectReason")) || lc001Vo.get("RejectReason").isEmpty() ? "" : "退回原因 : " + lc001Vo.get("RejectReason"));
 					if (daOrgEntdy > 0 && daOrgEntdy != daEntdy) {
 						occursList.putParam("OOOrgEntdy", daOrgEntdy - 19110000);
 					} else {

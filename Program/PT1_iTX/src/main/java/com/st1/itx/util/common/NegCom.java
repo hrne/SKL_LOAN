@@ -1111,7 +1111,6 @@ public class NegCom extends CommBuffer {
 			tJcicZ573Id.setPayDate(tNegTrans.getEntryDate());
 			tJcicZ573Id.setSubmitKey(tNegMain.getMainFinCode());
 			JcicZ573 tJcicZ573 = sJcicZ573Service.holdById(tJcicZ573Id, titaVo);
-			JcicZ573 beforeJcicZ573 = (JcicZ573) dataLog.clone(tJcicZ573);
 
 			String tranKey = "";
 			BigDecimal payAmt = tNegTrans.getTxAmt().subtract(transReturnAmt); // 本次繳款金額減退還金額
@@ -1119,6 +1118,7 @@ public class NegCom extends CommBuffer {
 			if (titaVo.isHcodeNormal()) {
 				// 正向
 				if (tJcicZ573 != null) {
+					JcicZ573 beforeJcicZ573 = (JcicZ573) dataLog.clone(tJcicZ573);
 					// Update
 
 					tJcicZ573.setPayAmt(tJcicZ573.getPayAmt() + payAmt.intValue());
@@ -1159,6 +1159,7 @@ public class NegCom extends CommBuffer {
 				if (tJcicZ573 == null) {
 					throw new LogicException(titaVo, "E0003", "更生債務人繳款資料");
 				}
+				JcicZ573 beforeJcicZ573 = (JcicZ573) dataLog.clone(tJcicZ573);
 				// 訂正最後一筆
 				if (tJcicZ573.getPayAmt() == payAmt.intValue()) {
 					if (tJcicZ573.getOutJcicTxtDate() != 0 || !("A").equals(tJcicZ573.getTranKey())) { // 已報送過聯徵,則改報刪除
@@ -1284,7 +1285,6 @@ public class NegCom extends CommBuffer {
 			tJcicZ450Id.setSubmitKey(tNegMain.getMainFinCode());
 
 			JcicZ450 tJcicZ450 = sJcicZ450Service.holdById(tJcicZ450Id, titaVo);
-			JcicZ450 beforeJcicZ450 = (JcicZ450) dataLog.clone(tJcicZ450);
 
 			BigDecimal payAmt = tNegTrans.getTxAmt().subtract(transReturnAmt); // 本次繳款金額減退還金額
 			String payStatus = ""; // 債權結案註記 Y N
@@ -1301,6 +1301,7 @@ public class NegCom extends CommBuffer {
 				// 正向
 				if (tJcicZ450 != null) {
 					// Update
+					JcicZ450 beforeJcicZ450 = (JcicZ450) dataLog.clone(tJcicZ450);
 					tJcicZ450.setPayAmt(tJcicZ450.getPayAmt() + payAmt.intValue());// 本次繳款金額
 					tJcicZ450.setPayStatus(payStatus);// 債權結案註記 Y N
 					tJcicZ450.setSumRepayActualAmt(tJcicZ450.getSumRepayActualAmt() + payAmt.intValue());// 累計實際還款金額
@@ -1344,6 +1345,7 @@ public class NegCom extends CommBuffer {
 				if (tJcicZ450 == null) {
 					throw new LogicException(titaVo, "E0003", "前置調解債務人繳款資料");// E0003 修改資料不存在
 				}
+				JcicZ450 beforeJcicZ450 = (JcicZ450) dataLog.clone(tJcicZ450);
 				payStatus = tJcicZ450.getPayStatus(); // 訂正前交易別
 				// 訂正最後一筆
 				if (tJcicZ450.getPayAmt() == payAmt.intValue()) {
@@ -1400,7 +1402,6 @@ public class NegCom extends CommBuffer {
 		tJcicZ050Id.setRcDate(tNegMain.getApplDate()); // 協商申請日-NegMain協商申請日
 		tJcicZ050Id.setSubmitKey(tNegMain.getMainFinCode());
 		JcicZ050 tJcicZ050 = sJcicZ050Service.holdById(tJcicZ050Id, titaVo);
-		JcicZ050 beforeJcicZ050 = (JcicZ050) dataLog.clone(tJcicZ050);
 
 		BigDecimal payAmt = tNegTrans.getTxAmt().subtract(transReturnAmt); // 本次繳款金額減退還金額
 		String payStatus = ""; // 債權結案註記 Y N
@@ -1419,6 +1420,7 @@ public class NegCom extends CommBuffer {
 		if (titaVo.isHcodeNormal()) {
 			// 正向
 			if (tJcicZ050 != null) {
+				JcicZ050 beforeJcicZ050 = (JcicZ050) dataLog.clone(tJcicZ050);
 				tJcicZ050.setPayAmt(tJcicZ050.getPayAmt() + payAmt.intValue());
 				tJcicZ050.setSumRepayActualAmt(tJcicZ050.getSumRepayActualAmt() + payAmt.intValue());
 				tJcicZ050.setStatus(payStatus);
@@ -1461,6 +1463,7 @@ public class NegCom extends CommBuffer {
 			if (tJcicZ050 == null) {
 				throw new LogicException(titaVo, "E0003", "債務人繳款資料");
 			}
+			JcicZ050 beforeJcicZ050 = (JcicZ050) dataLog.clone(tJcicZ050);
 			payStatus = tJcicZ050.getStatus(); // 訂正前交易別
 			// 訂正最後一筆
 			if (tJcicZ050.getPayAmt() == payAmt.intValue()) {

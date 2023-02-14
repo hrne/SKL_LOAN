@@ -202,7 +202,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> doQueryL9134_4_1(TitaVo titaVo, int idate , int iLmnDy, int iTbsDy) throws LogicException {
 		this.info("L9134_4_1 Start");
 		this.info("idate   = " + idate);
-		String itdate = parse.IntegerToString(idate + 19110000, 8);
+		String itdate = parse.IntegerToString(iTbsDy + 19110000, 8);
 		this.info("itdate   =" + itdate);
 //		int idx = parse.stringToInteger(titaVo.getParam("StartDate").trim().substring(5, 7));
 		String itdx = itdate.substring(0, 6);

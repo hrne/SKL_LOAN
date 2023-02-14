@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
@@ -102,6 +103,7 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " 	 ,ROW_NUMBER() OVER (Partition By \"CustNo\"             				";
 		sql += "       ,CASE WHEN \"AcctCode\" IN ('T11','T12','T13','T21','T22','T23') THEN 1  "; // 債協科目分開控管
 		sql += "             WHEN NVL(JSON_VALUE(\"OtherFields\", '$.ReconCode'),' ')  IN ('A6') THEN 1 "; // 債協入帳分開控管
+		sql += "             WHEN NVL(JSON_VALUE(\"OtherFields\", '$.TempReasonCode'),' ')  IN ('3','6','03','06') THEN 2 "; // 期票入帳分開控管
 		sql += "             ELSE 0 END";
 		sql += " 	   ORDER BY \"AcDate\" Desc 											";
 		sql += "               ,\"TitaCalDy\" Desc	                    					";
@@ -271,7 +273,8 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     \"LoanBorTx\".* 					    			                    ";
 		sql += " 	 ,ROW_NUMBER() OVER (Partition By \"CustNo\"             				";
 		sql += "       ,CASE WHEN \"AcctCode\" IN ('T11','T12','T13','T21','T22','T23') THEN 1  "; // 債協科目分開控管
-		sql += "             WHEN NVL(JSON_VALUE(\"OtherFields\", '$.ReconCode'),' ')  IN ('A6') THEN 1 "; // 債協入帳分開控管
+		sql += "             WHEN NVL(JSON_VALUE(\"OtherFields\", '$.ReconCode'),' ')  IN ('A6','A7') THEN 1 "; // 債協入帳分開控管
+		sql += "             WHEN NVL(JSON_VALUE(\"OtherFields\", '$.TempReasonCode'),' ')  IN ('3','6','03','06') THEN 2 "; // 期票入帳分開控管
 		sql += "             ELSE 0 END";
 		sql += " 	   ORDER BY \"AcDate\" Desc 											";
 		sql += "               ,\"TitaCalDy\" Desc	                    					";

@@ -25,14 +25,8 @@ public class LM004Report2 extends MakeReport {
 	public MakeExcel makeExcel;
 
 	public void exec(TitaVo titaVo, List<Map<String, String>> LM004List) throws LogicException {
+		this.info("LM004Report2 exec");
 
-		if (LM004List.size() != 0) {
-			exportExcel(titaVo, LM004List);
-		}
-	}
-
-	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LDList) throws LogicException {
-		this.info("===========in testExcel");
 		String entdy = titaVo.get("ENTDY").toString();
 
 		int reportDate = titaVo.getEntDyI() + 19110000;
@@ -50,107 +44,109 @@ public class LM004Report2 extends MakeReport {
 		// 開啟報表
 		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
 		makeExcel.setSheet(defaultSheet, newSheetName);
-//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM004", "長中短期放款到期追蹤表", "LM004長中短期放款到期追蹤表",
-//				"LM004長中短期放款到期追蹤表.xls", "10806", );
 
 		int row = 3;
-		int num = 0;
+		int num = 1;
 		makeExcel.setValue(1, 1, showDate(entdy, 2) + "長中短期放款到期追蹤表");
 
-//		makeExcel.setShiftRow(3, LDList.size() > 25 ? LDList.size() - 25 : 1);
+		if (LM004List.size() != 0) {
 
-		for (Map<String, String> tLDVo : LDList) {
+			makeExcel.setShiftRow(3, LM004List.size() - 1);
 
-			num++;
-			if (num != tLDVo.size()) {
-				makeExcel.setShiftRow(row, 1);
-			}
+			for (Map<String, String> tLDVo : LM004List) {
 
-			int col = 0;
+				num++;
 
-			for (col = 0; col < tLDVo.size(); col++) {
-				switch (col) {
-				case 1:
-					// 序號
-					makeExcel.setValue(row, col, num);
+				int col = 0;
 
-					break;
-				case 2:
-					// 經辦單位
-					makeExcel.setValue(row, col, tLDVo.get("F14"));
-					break;
-				case 3:
-					// 押品地區
-					makeExcel.setValue(row, col, tLDVo.get("F3"));
-					break;
-				case 4:
-					// 經辦人
-					makeExcel.setValue(row, col, tLDVo.get("F4"));
-					break;
-				case 5:
-					// 戶名
-					makeExcel.setValue(row, col, tLDVo.get("F7"));
-					break;
-				case 6:
-					// 戶號
-					makeExcel.setValue(row, col, tLDVo.get("F5"));
-					break;
-				case 7:
-					// 額度
-					makeExcel.setValue(row, col, tLDVo.get("F6"));
-					break;
-				case 8:
+				for (col = 0; col < tLDVo.size(); col++) {
+					switch (col) {
+					case 1:
+						// 序號
+						makeExcel.setValue(row, col, num);
 
-					// 到期日
-					makeExcel.setValue(row, col, Integer.valueOf(tLDVo.get("F8")));
-					break;
-				case 9:
-					// 應完成日
-					makeExcel.setValue(row, col, Integer.valueOf(tLDVo.get("F9")));
-					break;
-				case 10:
-					// 金額
-					makeExcel.setValue(row, col, new BigDecimal(tLDVo.get("F10").toString()), "#,##0");
-					break;
-				case 11:
-					// 介紹人
-					makeExcel.setValue(row, col, tLDVo.get("F12"));
-					break;
-				case 12:
-					// 部室
-					makeExcel.setValue(row, col, tLDVo.get("F14"));
-					break;
-				case 13:
-					// 區部
-					makeExcel.setValue(row, col, tLDVo.get("F15"));
-					break;
-				case 14:
-					// 通訊處
-					makeExcel.setValue(row, col, tLDVo.get("F16"));
-					break;
-				case 15:
-					// 追蹤日期
-					makeExcel.setValue(row, col, tLDVo.get("F11"));
-					break;
-				case 16:
-					// 處理情形
+						break;
+					case 2:
+						// 經辦單位
+						makeExcel.setValue(row, col, tLDVo.get("F14"));
+						break;
+					case 3:
+						// 押品地區
+						makeExcel.setValue(row, col, tLDVo.get("F3"));
+						break;
+					case 4:
+						// 經辦人
+						makeExcel.setValue(row, col, tLDVo.get("F4"));
+						break;
+					case 5:
+						// 戶名
+						makeExcel.setValue(row, col, tLDVo.get("F7"));
+						break;
+					case 6:
+						// 戶號
+						makeExcel.setValue(row, col, tLDVo.get("F5"));
+						break;
+					case 7:
+						// 額度
+						makeExcel.setValue(row, col, tLDVo.get("F6"));
+						break;
+					case 8:
 
-					break;
-				default:
+						// 到期日
+						makeExcel.setValue(row, col, new BigDecimal(tLDVo.get("F8").toString()), "00000000");
+						break;
+					case 9:
+						// 應完成日
+						makeExcel.setValue(row, col, new BigDecimal(tLDVo.get("F9").toString()), "00000000");
+						break;
+					case 10:
+						// 金額
+						makeExcel.setValue(row, col, new BigDecimal(tLDVo.get("F10").toString()), "#,##0");
+						break;
+					case 11:
+						// 介紹人
+						makeExcel.setValue(row, col, tLDVo.get("F12"));
+						break;
+					case 12:
+						// 部室
+						makeExcel.setValue(row, col, tLDVo.get("F14"));
+						break;
+					case 13:
+						// 區部
+						makeExcel.setValue(row, col, tLDVo.get("F15"));
+						break;
+					case 14:
+						// 通訊處
+						makeExcel.setValue(row, col, tLDVo.get("F16"));
+						break;
+					case 15:
+						// 追蹤日期
+						makeExcel.setValue(row, col, tLDVo.get("F11"));
+						break;
+					case 16:
+						// 處理情形
 
-					break;
+						break;
+					default:
 
+						break;
+
+					}
 				}
+				row++;
 			}
-			row++;
+		} else {
+			makeExcel.setValue(3, 1, "本日無資料");
 		}
+
+		makeExcel.setAddRengionBorder("A", 3, "P", row - 1, 1);
 
 		makeExcel.close();
 
 	}
 
 	private String showDate(String date, int iType) {
-		this.info("MakeReport.toPdf showRocDate1 = " + date);
+//		this.info("MakeReport.toPdf showRocDate1 = " + date);
 		if (date == null || date.equals("") || date.equals("0")) {
 			return "";
 		}
@@ -159,7 +155,7 @@ public class LM004Report2 extends MakeReport {
 			rocdate -= 19110000;
 		}
 		String rocdatex = String.valueOf(rocdate);
-		this.info("MakeReport.toPdf showRocDate2 = " + rocdatex);
+//		this.info("MakeReport.toPdf showRocDate2 = " + rocdatex);
 		if (iType == 1) {
 			if (rocdatex.length() == 6) {
 				return rocdatex.substring(0, 4);

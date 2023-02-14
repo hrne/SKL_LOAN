@@ -23,7 +23,7 @@ import com.st1.itx.util.parse.Parse;
 @Service("L4601")
 @Scope("prototype")
 /**
- * 
+ * 出表：重複投保 及 險種不足LN5811P
  * 
  * @author Zi-Jun,Huang
  * @version 1.0.0
@@ -119,7 +119,7 @@ public class L4601 extends TradeBuffer {
 			// 產重複投保報表
 			MySpring.newTask("L4601Batch", this.txBuffer, titaVo);
 		}
-		
+
 		this.info("totavoList L4601  = " + this.sendList());
 
 		return this.sendList();
@@ -156,7 +156,6 @@ public class L4601 extends TradeBuffer {
 		errorACnt = errorACnt + 1;
 		return totaA;
 	}
-
 
 	private TotaVo errorReportC(InsuRenewMediaTemp t, int errorCode, TitaVo titaVo) throws LogicException {
 		this.info("ReportC Start, errorCode :" + +errorCode);

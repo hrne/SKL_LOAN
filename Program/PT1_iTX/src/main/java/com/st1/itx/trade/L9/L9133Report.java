@@ -75,9 +75,8 @@ public class L9133Report extends CommBuffer {
 		BigDecimal totalDiffAcAmt = BigDecimal.ZERO;// 會計檔與主檔差額
 		BigDecimal totalDiffReceivableAmt = BigDecimal.ZERO;// 銷帳檔與主黨差額小計
 		String tmpAcctCode = "";
-		
 
-		//紀錄筆數
+		// 紀錄筆數
 		int tmpCount = 0;
 
 		// 紀錄sheet1(檢核表)科目筆數
@@ -108,21 +107,18 @@ public class L9133Report extends CommBuffer {
 
 		}
 
-		this.info("tmpSheet1Count = " + tmpSheet1Count);
+//		this.info("tmpSheet1Count = " + tmpSheet1Count);
 
-		
 		int tmpAcctCodeCount = 0;
 
 		for (AcAcctCheck tAcAcctCheck : lAcAcctCheck) {
 
 			// 判斷帳冊別 1 為 00A,2為201
-			if(tmpAcctCodeCount == 2){
+			if (tmpAcctCodeCount == 2) {
 				tmpAcctCodeCount = 0;
 			}
-			
+
 			tmpAcctCodeCount++;
-			
-			
 
 			// 2022-03-16 智偉新增判斷:會計帳&銷帳檔&主檔 皆為0者不顯示
 			BigDecimal total = tAcAcctCheck.getTdBal().add(tAcAcctCheck.getReceivableBal())
@@ -138,8 +134,7 @@ public class L9133Report extends CommBuffer {
 			BigDecimal receivableBal = tAcAcctCheck.getReceivableBal();// 銷帳檔餘額
 			BigDecimal masterBal = tAcAcctCheck.getAcctMasterBal();// 主檔餘額
 
-
-			Slice<AcMain> sAcMain = sAcMainService.acctCodeEq(reportDate, acctCode, 0, 1, titaVo);
+			Slice<AcMain> sAcMain = sAcMainService.acctCodeEq(reportDate, acctCode, 0, Integer.MAX_VALUE, titaVo);
 			List<AcMain> lAcMain = sAcMain == null ? null : sAcMain.getContent();
 
 			BigDecimal ydBal = BigDecimal.ZERO;// 前日餘額
@@ -155,11 +150,12 @@ public class L9133Report extends CommBuffer {
 
 					rAcSubBookCode = tmpAcctCodeCount == 1 ? "00A" : "201";
 
+//					this.info("rAcSubBookCode= " + rAcSubBookCode.toString());
+//					this.info("getAcSubBookCode= " + r.getAcSubBookCode().toString());
 					if (rAcSubBookCode.equals(r.getAcSubBookCode())) {
 
 						tmpFirstAcNoCode = r.getAcNoCode().substring(0, 1);
-
-						this.info("tmpFirstAcNoCode = " + tmpFirstAcNoCode.toString());
+//						this.info("tmpFirstAcNoCode = " + tmpFirstAcNoCode.toString());
 						ydBal = r.getYdBal();
 
 						// 科目開頭為1 5 6 9 借為正，貸為負
