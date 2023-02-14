@@ -61,7 +61,7 @@ public class L9134Report4 extends MakeExcel {
 		List<Map<String, String>> findList = new ArrayList<>();
 		
 		TxBizDate tTxBizDate = new TxBizDate();
-		tTxBizDate = iTxBizDateService.findById("TW", titaVo);
+		tTxBizDate = iTxBizDateService.findById("ONLINE", titaVo);
 		int iLmnDy    = tTxBizDate.getLmnDy();
 		int iTbsDy    = tTxBizDate.getTbsDy();
 		this.info("iLmnDy    = "+ tTxBizDate.getLmnDy());

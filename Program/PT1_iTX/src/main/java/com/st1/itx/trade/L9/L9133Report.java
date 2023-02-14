@@ -76,15 +76,20 @@ public class L9133Report extends CommBuffer {
 		BigDecimal totalDiffReceivableAmt = BigDecimal.ZERO;// 銷帳檔與主黨差額小計
 		String tmpAcctCode = "";
 
+		
+		
 		// 紀錄筆數
 		int tmpCount = 0;
 
 		// 紀錄sheet1(檢核表)科目筆數
 		int tmpSheet1Count = 0;
 
+		
+
 		// 為sheet1(檢核表)的最後一筆列印小計 先跑一遍做筆數紀錄
 		for (AcAcctCheck tAcAcctCheck : lAcAcctCheck) {
-
+			
+			
 			BigDecimal total = tAcAcctCheck.getTdBal().add(tAcAcctCheck.getReceivableBal())
 					.add(tAcAcctCheck.getAcctMasterBal());
 
@@ -107,18 +112,10 @@ public class L9133Report extends CommBuffer {
 
 		}
 
-//		this.info("tmpSheet1Count = " + tmpSheet1Count);
-
-		int tmpAcctCodeCount = 0;
 
 		for (AcAcctCheck tAcAcctCheck : lAcAcctCheck) {
 
-			// 判斷帳冊別 1 為 00A,2為201
-			if (tmpAcctCodeCount == 2) {
-				tmpAcctCodeCount = 0;
-			}
 
-			tmpAcctCodeCount++;
 
 			// 2022-03-16 智偉新增判斷:會計帳&銷帳檔&主檔 皆為0者不顯示
 			BigDecimal total = tAcAcctCheck.getTdBal().add(tAcAcctCheck.getReceivableBal())
@@ -134,25 +131,28 @@ public class L9133Report extends CommBuffer {
 			BigDecimal receivableBal = tAcAcctCheck.getReceivableBal();// 銷帳檔餘額
 			BigDecimal masterBal = tAcAcctCheck.getAcctMasterBal();// 主檔餘額
 
-			Slice<AcMain> sAcMain = sAcMainService.acctCodeEq(reportDate, acctCode, 0, Integer.MAX_VALUE, titaVo);
-			List<AcMain> lAcMain = sAcMain == null ? null : sAcMain.getContent();
-
 			BigDecimal ydBal = BigDecimal.ZERO;// 前日餘額
 			BigDecimal addAmt = BigDecimal.ZERO;// 加
 			BigDecimal subAmt = BigDecimal.ZERO;// 減
 			BigDecimal netAmt = BigDecimal.ZERO;// 淨增減
+			
+			Slice<AcMain> sAcMain = sAcMainService.acctCodeEq(reportDate, acctCode, 0, Integer.MAX_VALUE, titaVo);
+			List<AcMain> lAcMain = sAcMain == null ? null : sAcMain.getContent();
+
+
 
 			String tmpFirstAcNoCode = "";
 			String rAcSubBookCode = "";
-
+//			this.info(" rAcSubBookCode = " + rAcSubBookCode);
+//			this.info(" acctCode = " + acctCode);
 			if (lAcMain != null && lAcMain.size() > 0) {
+				this.info(" lAcMain.size() = " + lAcMain.size());
 				for (AcMain r : lAcMain) {
 
-					rAcSubBookCode = tmpAcctCodeCount == 1 ? "00A" : "201";
-
-//					this.info("rAcSubBookCode= " + rAcSubBookCode.toString());
-//					this.info("getAcSubBookCode= " + r.getAcSubBookCode().toString());
-					if (rAcSubBookCode.equals(r.getAcSubBookCode())) {
+					this.info("inside rAcSubBookCode = " + rAcSubBookCode.toString());
+					this.info("inside getAcSubBookCode = " + r.getAcSubBookCode().toString());
+					this.info("result = " + rAcSubBookCode.equals(r.getAcSubBookCode()));
+					if (acSubBookCode.equals(r.getAcSubBookCode())) {
 
 						tmpFirstAcNoCode = r.getAcNoCode().substring(0, 1);
 //						this.info("tmpFirstAcNoCode = " + tmpFirstAcNoCode.toString());

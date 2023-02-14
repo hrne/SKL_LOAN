@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Objects;
 
 import javax.annotation.PostConstruct;
 
@@ -20,10 +21,7 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.TxApLog;
-import com.st1.itx.db.domain.TxTranCode;
-import com.st1.itx.db.service.TxApLogListService;
 import com.st1.itx.db.service.TxApLogService;
-import com.st1.itx.db.service.TxTranCodeService;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.log.SysLogger;
 
@@ -31,16 +29,10 @@ import com.st1.itx.util.log.SysLogger;
 public class LogAspect extends SysLogger {
 
 	@Autowired
-	TxApLogService txApLogService;
+	private TxApLogService txApLogService;
 
 	@Autowired
-	TxApLogListService txApLogListService;
-
-	@Autowired
-	TxTranCodeService txTranCodeService;
-
-	@Autowired
-	DateUtil dateUtil;
+	private DateUtil dateUtil;
 
 	@Value("${url}")
 	private String url = "";
@@ -89,46 +81,51 @@ public class LogAspect extends SysLogger {
 
 		TitaVo titaVo = (TitaVo) args[0];
 
-//		TxApLogList txApLogList = txApLogListService.findById(titaVo.getTxCode());
+		if (!titaVo.isAplogOn())
+			return;
 
-//		if (txApLogList != null) {
+		if (titaVo.isRim() && !titaVo.getTxCode().equals(titaVo.getAplogRim()))
+			return;
+
 		TxApLog txApLog = new TxApLog();
 		txApLog.setEntdy(dateUtil.getNowIntegerForBC());
-		txApLog.setTlrNo(titaVo.getTlrNo());
-		txApLog.setAct("Query");
-		txApLog.setActTime(dateUtil.getNowStringTime());
-		txApLog.setIp(titaVo.getIp());
-		txApLog.setSystemName("iTX");
-		txApLog.setServerIp(url);
-		txApLog.setServerName(hostName);
+		txApLog.setUserID(titaVo.getTlrNo());
+//		txApLog.setIDNumber              ();
+		txApLog.setIDName(titaVo.getEmpNm());
 
-		TxTranCode txTranCode = txTranCodeService.findById(titaVo.getTxCode());
-		txApLog.setActName(txTranCode == null ? titaVo.getTxCode() : txTranCode.getTranItem());
+		int event = -1;
+		if (titaVo.isFuncindCopy() || titaVo.isFuncindModify())
+			event = 3;
+		else if (titaVo.isFuncindNew())
+			event = 1;
+		else if (titaVo.isFuncindDel())
+			event = 2;
+		else if (titaVo.isFuncindInquire())
+			event = 4;
 
-		txApLog.setPgName(joinPoint.getTarget().getClass().getName());
+		if (titaVo.isTxcdSpecial() && titaVo.getTxCode().equals("LC100"))
+			event = 8;
+		if (titaVo.isTxcdSpecial() && titaVo.getTxCode().equals("LC101"))
+			event = 9;
+
+		txApLog.setActionEvent(event);
+		txApLog.setUserIP(titaVo.getIp());
+		txApLog.setSystemName("放款帳務系統");
+		txApLog.setOperationName(titaVo.getTxCodeNM());
+		txApLog.setProgramName(titaVo.getTxCode());
 		txApLog.setMethodName("run");
-
-		try {
-			txApLog.setInParam(titaVo.getJsonString());
-		} catch (LogicException e) {
-			txApLog.setInParam("get TitaVo String Error...");
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.error(errors.toString());
-		}
-
-		if (result == null)
-			txApLog.setResultStatus("E");
-		else
-			txApLog.setResultStatus("S");
+		txApLog.setServerName(hostName);
+		txApLog.setServerIP(url);
+		txApLog.setInputDataforXMLorJson(titaVo.getJsonString());
+		txApLog.setOutputDataforXMLorJson("");
+		txApLog.setEnforcementResult(Objects.isNull(result) ? 1 : 0);
+		txApLog.setMessage("");
 
 		try {
 			txApLogService.insert(txApLog);
 		} catch (DBException e) {
 			this.error(e.getErrorMsg());
 		}
-//		}
-
 	}
 
 	@AfterThrowing(pointcut = "execution(* com.st1.itx.trade..run(..))", throwing = "error")

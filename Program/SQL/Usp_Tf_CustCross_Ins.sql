@@ -26,7 +26,7 @@ BEGIN
     -- 寫入資料
     INSERT INTO "CustCross" (
         "CustUKey"            -- 客戶識別碼 VARCHAR2 32 
-      , "SubCompanyCode"      -- 子公司代碼 DECIMAL 2 
+      , "SubCompanyCode"      -- 子公司代碼 VARCHAR2 2 
       , "CrossUse"            -- 交互運用 VARCHAR2 1
       , "CreateDate"          -- 建檔日期時間 DATE  
       , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
@@ -34,14 +34,14 @@ BEGIN
       , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
     )
     SELECT TMP."CustUKey"                 AS "CustUKey"            -- 客戶識別碼 VARCHAR2 32 
-          ,TMP."SubCompanyCode"           AS "SubCompanyCode"      -- 子公司代碼 DECIMAL 2 
+          ,TMP."SubCompanyCode"           AS "SubCompanyCode"      -- 子公司代碼 VARCHAR2 2 
           ,TMP."CrossUse"                 AS "CrossUse"            -- 交互運用 VARCHAR2 1
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
     FROM (SELECT S2."CustUKey"
-                ,1             AS "SubCompanyCode"
+                ,'01'             AS "SubCompanyCode"
                 ,CASE
                    WHEN LENGTHB(S1."CUSMKU") = 6 AND SUBSTR(S1."CUSMKU",1,1) = '1' THEN 'Y'
                  ELSE 'N' END  AS "CrossUse"
@@ -50,7 +50,7 @@ BEGIN
           LEFT JOIN "CustMain" S2 ON S2."CustId" = S1."CUSID1"
           UNION ALL
           SELECT S2."CustUKey"
-                ,2             AS "SubCompanyCode"
+                ,'02'             AS "SubCompanyCode"
                 ,CASE
                    WHEN LENGTHB(S1."CUSMKU") = 6 AND SUBSTR(S1."CUSMKU",2,1) = '1' THEN 'Y'
                  ELSE 'N' END  AS "CrossUse"
@@ -59,7 +59,7 @@ BEGIN
           LEFT JOIN "CustMain" S2 ON S2."CustId" = S1."CUSID1"
           UNION ALL
           SELECT S2."CustUKey"
-                ,3             AS "SubCompanyCode"
+                ,'03'             AS "SubCompanyCode"
                 ,CASE
                    WHEN LENGTHB(S1."CUSMKU") = 6 AND SUBSTR(S1."CUSMKU",3,1) = '1' THEN 'Y'
                  ELSE 'N' END  AS "CrossUse"
@@ -68,7 +68,7 @@ BEGIN
           LEFT JOIN "CustMain" S2 ON S2."CustId" = S1."CUSID1"
           UNION ALL
           SELECT S2."CustUKey"
-                ,4             AS "SubCompanyCode"
+                ,'04'             AS "SubCompanyCode"
                 ,CASE
                    WHEN LENGTHB(S1."CUSMKU") = 6 AND SUBSTR(S1."CUSMKU",4,1) = '1' THEN 'Y'
                  ELSE 'N' END  AS "CrossUse"
@@ -77,7 +77,7 @@ BEGIN
           LEFT JOIN "CustMain" S2 ON S2."CustId" = S1."CUSID1"
           UNION ALL
           SELECT S2."CustUKey"
-                ,5             AS "SubCompanyCode"
+                ,'05'             AS "SubCompanyCode"
                 ,CASE
                    WHEN LENGTHB(S1."CUSMKU") = 6 AND SUBSTR(S1."CUSMKU",5,1) = '1' THEN 'Y'
                  ELSE 'N' END  AS "CrossUse"
@@ -86,7 +86,7 @@ BEGIN
           LEFT JOIN "CustMain" S2 ON S2."CustId" = S1."CUSID1"
           UNION ALL
           SELECT S2."CustUKey"
-                ,6             AS "SubCompanyCode"
+                ,'06'             AS "SubCompanyCode"
                 ,CASE
                    WHEN LENGTHB(S1."CUSMKU") = 6 AND SUBSTR(S1."CUSMKU",6,1) = '1' THEN 'Y'
                  ELSE 'N' END  AS "CrossUse"

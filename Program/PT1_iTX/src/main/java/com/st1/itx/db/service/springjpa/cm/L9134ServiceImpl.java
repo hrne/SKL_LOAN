@@ -211,7 +211,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String ixTbsDy = parse.IntegerToString(iTbsDy  , 7);
 		String ixLmnDy8 = parse.IntegerToString(iLmnDy + 19110000 , 8);
 		String ixTbsDy8 = parse.IntegerToString(iTbsDy + 19110000 , 8);
-		String ixLmnDy6 = ixLmnDy.substring(0,6);
+		String ixLmnDy6 = ixLmnDy.substring(0,5);
 		String idx = ixTbsDy.substring(5,7);
 		int indx = parse.stringToInteger(idx);
 		this.info("ixLmnDy    = " + ixLmnDy); //1101130 上個月底日 

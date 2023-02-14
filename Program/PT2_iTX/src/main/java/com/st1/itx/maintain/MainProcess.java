@@ -523,6 +523,11 @@ public class MainProcess extends SysLogger {
 		} else {
 			if (tTxTranCode == null)
 				throw new LogicException("EC001", "交易控制檔(TxTranCode):" + this.titaVo.getTxCode());
+			else {
+				this.titaVo.putParam(ContentName.apLogFlag, tTxTranCode.getApLogFlag());
+				this.titaVo.putParam(ContentName.apLogRim, tTxTranCode.getApLogRim());
+				this.titaVo.putParam(ContentName.txCodeNM, tTxTranCode.getTranItem());
+			}
 
 			if (tTxTranCode.getStatus() == 1)
 				throw new LogicException("EC008", "交易代號 " + this.titaVo.getTxCode() + " 已停用");

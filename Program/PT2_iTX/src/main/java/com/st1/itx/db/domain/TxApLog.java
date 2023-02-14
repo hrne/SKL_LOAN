@@ -1,6 +1,8 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -27,436 +29,503 @@ import com.st1.itx.Exception.LogicException;
 @Table(name = "`TxApLog`")
 public class TxApLog implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 3339527689296505281L;
 
-	// 序號
-	@Id
-	@Column(name = "`AutoSeq`")
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "`TxApLog_SEQ`")
-	@SequenceGenerator(name = "`TxApLog_SEQ`", sequenceName = "`TxApLog_SEQ`", allocationSize = 1)
-	private Long autoSeq = 0L;
+  // 序號
+  @Id
+  @Column(name = "`AutoSeq`")
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "`TxApLog_SEQ`")
+  @SequenceGenerator(name = "`TxApLog_SEQ`", sequenceName = "`TxApLog_SEQ`", allocationSize = 1)
+  private Long autoSeq = 0L;
 
-	// 查詢日
-	@Column(name = "`Entdy`")
-	private int entdy = 0;
+  // 使用者員編
+  @Column(name = "`UserID`", length = 8)
+  private String userID;
 
-	// 員工編號
-	@Column(name = "`TlrNo`", length = 6)
-	private String tlrNo;
+  // 使用者身份證字號
+  @Column(name = "`IDNumber`", length = 12)
+  private String iDNumber;
 
-	// 動作
-	@Column(name = "`Act`", length = 10)
-	private String act;
+  // 使用者姓名
+  @Column(name = "`IDName`", length = 24)
+  private String iDName;
 
-	// 動作時間
-	@Column(name = "`ActTime`", length = 8)
-	private String actTime;
+  // Action事件
+  @Column(name = "`ActionEvent`")
+  private int actionEvent = 0;
 
-	// 使用著IP位置
-	@Column(name = "`Ip`", length = 14)
-	private String ip;
+  // 使用者IP
+  @Column(name = "`UserIP`", length = 50)
+  private String userIP;
 
-	// 系統名稱
-	@Column(name = "`SystemName`", length = 20)
-	private String systemName;
+  // 系統名稱
+  @Column(name = "`SystemName`", length = 20)
+  private String systemName;
 
-	// 伺服器IP
-	@Column(name = "`ServerIp`", length = 15)
-	private String serverIp;
+  // 作業名稱
+  @Column(name = "`OperationName`", length = 20)
+  private String operationName;
 
-	// 伺服器名稱
-	@Column(name = "`ServerName`", length = 20)
-	private String serverName;
+  // 程式名稱
+  @Column(name = "`ProgramName`", length = 50)
+  private String programName;
 
-	// 作業名稱
-	@Column(name = "`ActName`", length = 50)
-	private String actName;
+  // 方法名稱
+  @Column(name = "`MethodName`", length = 50)
+  private String methodName;
 
-	// 程式名稱
-	@Column(name = "`PgName`", length = 50)
-	private String pgName;
+  // 伺服器名稱
+  @Column(name = "`ServerName`", length = 60)
+  private String serverName;
 
-	// 方法名稱
-	@Column(name = "`MethodName`", length = 50)
-	private String methodName;
+  // 伺服器IP
+  @Column(name = "`ServerIP`", length = 50)
+  private String serverIP;
 
-	// 輸入參數
-	@Column(name = "`InParam`", length = 3000)
-	private String inParam;
+  // 輸入的參數
+  @Column(name = "`InputDataforXMLorJson`", length = 3000)
+  private String inputDataforXMLorJson;
 
-	// 執行結果
-	@Column(name = "`ResultStatus`", length = 1)
-	private String resultStatus;
+  // 輸出的結果
+  @Column(name = "`OutputDataforXMLorJson`", length = 3000)
+  private String outputDataforXMLorJson;
 
-	// 建檔日期時間
-	@CreatedDate
-	@Column(name = "`CreateDate`")
-	private java.sql.Timestamp createDate;
+  // 事件執行結果
+  @Column(name = "`EnforcementResult`")
+  private int enforcementResult = 0;
 
-	// 建檔人員
-	@Column(name = "`CreateEmpNo`", length = 6)
-	private String createEmpNo;
+  // 備註
+  @Column(name = "`Message`", length = 200)
+  private String message;
 
-	// 最後更新日期時間
-	@LastModifiedDate
-	@Column(name = "`LastUpdate`")
-	private java.sql.Timestamp lastUpdate;
+  // 交易日期
+  @Column(name = "`Entdy`")
+  private int entdy = 0;
 
-	// 最後更新人員
-	@Column(name = "`LastUpdateEmpNo`", length = 6)
-	private String lastUpdateEmpNo;
+  // 建檔日期時間
+  @CreatedDate
+  @Column(name = "`CreateDate`")
+  private java.sql.Timestamp createDate;
 
-	/**
-	 * 序號<br>
-	 * 
-	 * @return Long
-	 */
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	public Long getAutoSeq() {
-		return this.autoSeq;
-	}
+  // 建檔人員
+  @Column(name = "`CreateEmpNo`", length = 6)
+  private String createEmpNo;
 
-	/**
-	 * 序號<br>
-	 * 
-	 *
-	 * @param autoSeq 序號
-	 */
-	public void setAutoSeq(Long autoSeq) {
-		this.autoSeq = autoSeq;
-	}
+  // 最後更新日期時間
+  @LastModifiedDate
+  @Column(name = "`LastUpdate`")
+  private java.sql.Timestamp lastUpdate;
 
-	/**
-	 * 查詢日<br>
-	 * 
-	 * @return Integer
-	 */
-	public int getEntdy() {
-		return StaticTool.bcToRoc(this.entdy);
-	}
+  // 最後更新人員
+  @Column(name = "`LastUpdateEmpNo`", length = 6)
+  private String lastUpdateEmpNo;
 
-	/**
-	 * 查詢日<br>
-	 * 
-	 *
-	 * @param entdy 查詢日
-	 * @throws LogicException when Date Is Warn
-	 */
-	public void setEntdy(int entdy) throws LogicException {
-		this.entdy = StaticTool.rocToBc(entdy);
-	}
 
-	/**
-	 * 員工編號<br>
-	 * 
-	 * @return String
-	 */
-	public String getTlrNo() {
-		return this.tlrNo == null ? "" : this.tlrNo;
-	}
+/**
+	* 序號<br>
+	* 
+	* @return Long
+	*/
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  public Long getAutoSeq() {
+    return this.autoSeq;
+  }
 
-	/**
-	 * 員工編號<br>
-	 * 
-	 *
-	 * @param tlrNo 員工編號
-	 */
-	public void setTlrNo(String tlrNo) {
-		this.tlrNo = tlrNo;
-	}
+/**
+	* 序號<br>
+	* 
+  *
+  * @param autoSeq 序號
+	*/
+  public void setAutoSeq(Long autoSeq) {
+    this.autoSeq = autoSeq;
+  }
 
-	/**
-	 * 動作<br>
-	 * 
-	 * @return String
-	 */
-	public String getAct() {
-		return this.act == null ? "" : this.act;
-	}
+/**
+	* 使用者員編<br>
+	* 
+	* @return String
+	*/
+  public String getUserID() {
+    return this.userID == null ? "" : this.userID;
+  }
 
-	/**
-	 * 動作<br>
-	 * 
-	 *
-	 * @param act 動作
-	 */
-	public void setAct(String act) {
-		this.act = act;
-	}
+/**
+	* 使用者員編<br>
+	* 
+  *
+  * @param userID 使用者員編
+	*/
+  public void setUserID(String userID) {
+    this.userID = userID;
+  }
 
-	/**
-	 * 動作時間<br>
-	 * 
-	 * @return String
-	 */
-	public String getActTime() {
-		return this.actTime == null ? "" : this.actTime;
-	}
+/**
+	* 使用者身份證字號<br>
+	* 
+	* @return String
+	*/
+  public String getIDNumber() {
+    return this.iDNumber == null ? "" : this.iDNumber;
+  }
 
-	/**
-	 * 動作時間<br>
-	 * 
-	 *
-	 * @param actTime 動作時間
-	 */
-	public void setActTime(String actTime) {
-		this.actTime = actTime;
-	}
+/**
+	* 使用者身份證字號<br>
+	* 
+  *
+  * @param iDNumber 使用者身份證字號
+	*/
+  public void setIDNumber(String iDNumber) {
+    this.iDNumber = iDNumber;
+  }
 
-	/**
-	 * 使用著IP位置<br>
-	 * 
-	 * @return String
-	 */
-	public String getIp() {
-		return this.ip == null ? "" : this.ip;
-	}
+/**
+	* 使用者姓名<br>
+	* 
+	* @return String
+	*/
+  public String getIDName() {
+    return this.iDName == null ? "" : this.iDName;
+  }
 
-	/**
-	 * 使用著IP位置<br>
-	 * 
-	 *
-	 * @param ip 使用著IP位置
-	 */
-	public void setIp(String ip) {
-		this.ip = ip;
-	}
+/**
+	* 使用者姓名<br>
+	* 
+  *
+  * @param iDName 使用者姓名
+	*/
+  public void setIDName(String iDName) {
+    this.iDName = iDName;
+  }
 
-	/**
-	 * 系統名稱<br>
-	 * 
-	 * @return String
-	 */
-	public String getSystemName() {
-		return this.systemName == null ? "" : this.systemName;
-	}
+/**
+	* Action事件<br>
+	* 
+	* @return Integer
+	*/
+  public int getActionEvent() {
+    return this.actionEvent;
+  }
 
-	/**
-	 * 系統名稱<br>
-	 * 
-	 *
-	 * @param systemName 系統名稱
-	 */
-	public void setSystemName(String systemName) {
-		this.systemName = systemName;
-	}
+/**
+	* Action事件<br>
+	* 
+  *
+  * @param actionEvent Action事件
+	*/
+  public void setActionEvent(int actionEvent) {
+    this.actionEvent = actionEvent;
+  }
 
-	/**
-	 * 伺服器IP<br>
-	 * 
-	 * @return String
-	 */
-	public String getServerIp() {
-		return this.serverIp == null ? "" : this.serverIp;
-	}
+/**
+	* 使用者IP<br>
+	* 
+	* @return String
+	*/
+  public String getUserIP() {
+    return this.userIP == null ? "" : this.userIP;
+  }
 
-	/**
-	 * 伺服器IP<br>
-	 * 
-	 *
-	 * @param serverIp 伺服器IP
-	 */
-	public void setServerIp(String serverIp) {
-		this.serverIp = serverIp;
-	}
+/**
+	* 使用者IP<br>
+	* 
+  *
+  * @param userIP 使用者IP
+	*/
+  public void setUserIP(String userIP) {
+    this.userIP = userIP;
+  }
 
-	/**
-	 * 伺服器名稱<br>
-	 * 
-	 * @return String
-	 */
-	public String getServerName() {
-		return this.serverName == null ? "" : this.serverName;
-	}
+/**
+	* 系統名稱<br>
+	* 
+	* @return String
+	*/
+  public String getSystemName() {
+    return this.systemName == null ? "" : this.systemName;
+  }
 
-	/**
-	 * 伺服器名稱<br>
-	 * 
-	 *
-	 * @param serverName 伺服器名稱
-	 */
-	public void setServerName(String serverName) {
-		this.serverName = serverName;
-	}
+/**
+	* 系統名稱<br>
+	* 
+  *
+  * @param systemName 系統名稱
+	*/
+  public void setSystemName(String systemName) {
+    this.systemName = systemName;
+  }
 
-	/**
-	 * 作業名稱<br>
-	 * 
-	 * @return String
-	 */
-	public String getActName() {
-		return this.actName == null ? "" : this.actName;
-	}
+/**
+	* 作業名稱<br>
+	* 
+	* @return String
+	*/
+  public String getOperationName() {
+    return this.operationName == null ? "" : this.operationName;
+  }
 
-	/**
-	 * 作業名稱<br>
-	 * 
-	 *
-	 * @param actName 作業名稱
-	 */
-	public void setActName(String actName) {
-		this.actName = actName;
-	}
+/**
+	* 作業名稱<br>
+	* 
+  *
+  * @param operationName 作業名稱
+	*/
+  public void setOperationName(String operationName) {
+    this.operationName = operationName;
+  }
 
-	/**
-	 * 程式名稱<br>
-	 * 
-	 * @return String
-	 */
-	public String getPgName() {
-		return this.pgName == null ? "" : this.pgName;
-	}
+/**
+	* 程式名稱<br>
+	* 
+	* @return String
+	*/
+  public String getProgramName() {
+    return this.programName == null ? "" : this.programName;
+  }
 
-	/**
-	 * 程式名稱<br>
-	 * 
-	 *
-	 * @param pgName 程式名稱
-	 */
-	public void setPgName(String pgName) {
-		this.pgName = pgName;
-	}
+/**
+	* 程式名稱<br>
+	* 
+  *
+  * @param programName 程式名稱
+	*/
+  public void setProgramName(String programName) {
+    this.programName = programName;
+  }
 
-	/**
-	 * 方法名稱<br>
-	 * 
-	 * @return String
-	 */
-	public String getMethodName() {
-		return this.methodName == null ? "" : this.methodName;
-	}
+/**
+	* 方法名稱<br>
+	* 
+	* @return String
+	*/
+  public String getMethodName() {
+    return this.methodName == null ? "" : this.methodName;
+  }
 
-	/**
-	 * 方法名稱<br>
-	 * 
-	 *
-	 * @param methodName 方法名稱
-	 */
-	public void setMethodName(String methodName) {
-		this.methodName = methodName;
-	}
+/**
+	* 方法名稱<br>
+	* 
+  *
+  * @param methodName 方法名稱
+	*/
+  public void setMethodName(String methodName) {
+    this.methodName = methodName;
+  }
 
-	/**
-	 * 輸入參數<br>
-	 * 
-	 * @return String
-	 */
-	public String getInParam() {
-		return this.inParam == null ? "" : this.inParam;
-	}
+/**
+	* 伺服器名稱<br>
+	* 
+	* @return String
+	*/
+  public String getServerName() {
+    return this.serverName == null ? "" : this.serverName;
+  }
 
-	/**
-	 * 輸入參數<br>
-	 * 
-	 *
-	 * @param inParam 輸入參數
-	 */
-	public void setInParam(String inParam) {
-		this.inParam = inParam;
-	}
+/**
+	* 伺服器名稱<br>
+	* 
+  *
+  * @param serverName 伺服器名稱
+	*/
+  public void setServerName(String serverName) {
+    this.serverName = serverName;
+  }
 
-	/**
-	 * 執行結果<br>
-	 * 
-	 * @return String
-	 */
-	public String getResultStatus() {
-		return this.resultStatus == null ? "" : this.resultStatus;
-	}
+/**
+	* 伺服器IP<br>
+	* 
+	* @return String
+	*/
+  public String getServerIP() {
+    return this.serverIP == null ? "" : this.serverIP;
+  }
 
-	/**
-	 * 執行結果<br>
-	 * 
-	 *
-	 * @param resultStatus 執行結果
-	 */
-	public void setResultStatus(String resultStatus) {
-		this.resultStatus = resultStatus;
-	}
+/**
+	* 伺服器IP<br>
+	* 
+  *
+  * @param serverIP 伺服器IP
+	*/
+  public void setServerIP(String serverIP) {
+    this.serverIP = serverIP;
+  }
 
-	/**
-	 * 建檔日期時間<br>
-	 * 
-	 * @return java.sql.Timestamp
-	 */
-	public java.sql.Timestamp getCreateDate() {
-		return this.createDate;
-	}
+/**
+	* 輸入的參數<br>
+	* 
+	* @return String
+	*/
+  public String getInputDataforXMLorJson() {
+    return this.inputDataforXMLorJson == null ? "" : this.inputDataforXMLorJson;
+  }
 
-	/**
-	 * 建檔日期時間<br>
-	 * 
-	 *
-	 * @param createDate 建檔日期時間
-	 */
-	public void setCreateDate(java.sql.Timestamp createDate) {
-		this.createDate = createDate;
-	}
+/**
+	* 輸入的參數<br>
+	* 
+  *
+  * @param inputDataforXMLorJson 輸入的參數
+	*/
+  public void setInputDataforXMLorJson(String inputDataforXMLorJson) {
+    this.inputDataforXMLorJson = inputDataforXMLorJson;
+  }
 
-	/**
-	 * 建檔人員<br>
-	 * 
-	 * @return String
-	 */
-	public String getCreateEmpNo() {
-		return this.createEmpNo == null ? "" : this.createEmpNo;
-	}
+/**
+	* 輸出的結果<br>
+	* 
+	* @return String
+	*/
+  public String getOutputDataforXMLorJson() {
+    return this.outputDataforXMLorJson == null ? "" : this.outputDataforXMLorJson;
+  }
 
-	/**
-	 * 建檔人員<br>
-	 * 
-	 *
-	 * @param createEmpNo 建檔人員
-	 */
-	public void setCreateEmpNo(String createEmpNo) {
-		this.createEmpNo = createEmpNo;
-	}
+/**
+	* 輸出的結果<br>
+	* 
+  *
+  * @param outputDataforXMLorJson 輸出的結果
+	*/
+  public void setOutputDataforXMLorJson(String outputDataforXMLorJson) {
+    this.outputDataforXMLorJson = outputDataforXMLorJson;
+  }
 
-	/**
-	 * 最後更新日期時間<br>
-	 * 
-	 * @return java.sql.Timestamp
-	 */
-	public java.sql.Timestamp getLastUpdate() {
-		return this.lastUpdate;
-	}
+/**
+	* 事件執行結果<br>
+	* 
+	* @return Integer
+	*/
+  public int getEnforcementResult() {
+    return this.enforcementResult;
+  }
 
-	/**
-	 * 最後更新日期時間<br>
-	 * 
-	 *
-	 * @param lastUpdate 最後更新日期時間
-	 */
-	public void setLastUpdate(java.sql.Timestamp lastUpdate) {
-		this.lastUpdate = lastUpdate;
-	}
+/**
+	* 事件執行結果<br>
+	* 
+  *
+  * @param enforcementResult 事件執行結果
+	*/
+  public void setEnforcementResult(int enforcementResult) {
+    this.enforcementResult = enforcementResult;
+  }
 
-	/**
-	 * 最後更新人員<br>
-	 * 
-	 * @return String
-	 */
-	public String getLastUpdateEmpNo() {
-		return this.lastUpdateEmpNo == null ? "" : this.lastUpdateEmpNo;
-	}
+/**
+	* 備註<br>
+	* 
+	* @return String
+	*/
+  public String getMessage() {
+    return this.message == null ? "" : this.message;
+  }
 
-	/**
-	 * 最後更新人員<br>
-	 * 
-	 *
-	 * @param lastUpdateEmpNo 最後更新人員
-	 */
-	public void setLastUpdateEmpNo(String lastUpdateEmpNo) {
-		this.lastUpdateEmpNo = lastUpdateEmpNo;
-	}
+/**
+	* 備註<br>
+	* 
+  *
+  * @param message 備註
+	*/
+  public void setMessage(String message) {
+    this.message = message;
+  }
 
-	@Override
-	public String toString() {
-		return "TxApLog [autoSeq=" + autoSeq + ", entdy=" + entdy + ", tlrNo=" + tlrNo + ", act=" + act + ", actTime=" + actTime + ", ip=" + ip + ", systemName=" + systemName + ", serverIp="
-				+ serverIp + ", serverName=" + serverName + ", actName=" + actName + ", pgName=" + pgName + ", methodName=" + methodName + ", inParam=" + inParam + ", resultStatus=" + resultStatus
-				+ ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
-	}
+/**
+	* 交易日期<br>
+	* 
+	* @return Integer
+	*/
+  public int getEntdy() {
+    return StaticTool.bcToRoc(this.entdy);
+  }
+
+/**
+	* 交易日期<br>
+	* 
+  *
+  * @param entdy 交易日期
+  * @throws LogicException when Date Is Warn	*/
+  public void setEntdy(int entdy) throws LogicException {
+    this.entdy = StaticTool.rocToBc(entdy);
+  }
+
+/**
+	* 建檔日期時間<br>
+	* 
+	* @return java.sql.Timestamp
+	*/
+  public java.sql.Timestamp getCreateDate() {
+    return this.createDate;
+  }
+
+/**
+	* 建檔日期時間<br>
+	* 
+  *
+  * @param createDate 建檔日期時間
+	*/
+  public void setCreateDate(java.sql.Timestamp createDate) {
+    this.createDate = createDate;
+  }
+
+/**
+	* 建檔人員<br>
+	* 
+	* @return String
+	*/
+  public String getCreateEmpNo() {
+    return this.createEmpNo == null ? "" : this.createEmpNo;
+  }
+
+/**
+	* 建檔人員<br>
+	* 
+  *
+  * @param createEmpNo 建檔人員
+	*/
+  public void setCreateEmpNo(String createEmpNo) {
+    this.createEmpNo = createEmpNo;
+  }
+
+/**
+	* 最後更新日期時間<br>
+	* 
+	* @return java.sql.Timestamp
+	*/
+  public java.sql.Timestamp getLastUpdate() {
+    return this.lastUpdate;
+  }
+
+/**
+	* 最後更新日期時間<br>
+	* 
+  *
+  * @param lastUpdate 最後更新日期時間
+	*/
+  public void setLastUpdate(java.sql.Timestamp lastUpdate) {
+    this.lastUpdate = lastUpdate;
+  }
+
+/**
+	* 最後更新人員<br>
+	* 
+	* @return String
+	*/
+  public String getLastUpdateEmpNo() {
+    return this.lastUpdateEmpNo == null ? "" : this.lastUpdateEmpNo;
+  }
+
+/**
+	* 最後更新人員<br>
+	* 
+  *
+  * @param lastUpdateEmpNo 最後更新人員
+	*/
+  public void setLastUpdateEmpNo(String lastUpdateEmpNo) {
+    this.lastUpdateEmpNo = lastUpdateEmpNo;
+  }
+
+
+  @Override
+  public String toString() {
+    return "TxApLog [autoSeq=" + autoSeq + ", userID=" + userID + ", iDNumber=" + iDNumber + ", iDName=" + iDName + ", actionEvent=" + actionEvent + ", userIP=" + userIP
+           + ", systemName=" + systemName + ", operationName=" + operationName + ", programName=" + programName + ", methodName=" + methodName + ", serverName=" + serverName + ", serverIP=" + serverIP
+           + ", inputDataforXMLorJson=" + inputDataforXMLorJson + ", outputDataforXMLorJson=" + outputDataforXMLorJson + ", enforcementResult=" + enforcementResult + ", message=" + message + ", entdy=" + entdy + ", createDate=" + createDate
+           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+  }
 }

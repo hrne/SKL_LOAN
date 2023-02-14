@@ -1446,5 +1446,32 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	public boolean isSpanDy() {
 		return Integer.parseInt(this.getSpanDy()) != 0;
 	}
+	
+	/**
+	 * 是否為敏感性資料交易
+	 * 
+	 * @return is aplogFg on return true
+	 */
+	public boolean isAplogOn() {
+		return !Objects.isNull(this.get(ContentName.apLogFlag)) && this.get(ContentName.apLogFlag).equals("1");
+	}
+
+	/**
+	 * 取得敏感性資料交易Rim名稱
+	 * 
+	 * @return String
+	 */
+	public String getAplogRim() {
+		return Objects.isNull(this.get(ContentName.apLogRim)) ? "" : this.get(ContentName.apLogRim);
+	}
+
+	/**
+	 * 取得交易名稱
+	 * 
+	 * @return String
+	 */
+	public String getTxCodeNM() {
+		return Objects.isNull(this.get(ContentName.txCodeNM)) ? "" : this.get(ContentName.txCodeNM);
+	}
 
 }

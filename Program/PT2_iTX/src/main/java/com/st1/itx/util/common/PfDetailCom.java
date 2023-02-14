@@ -226,7 +226,7 @@ public class PfDetailCom extends TradeBuffer {
 		if (titaVo.getEntDyI() > this.txBuffer.getTxBizDate().getTbsDy()) {
 			return null;
 		}
-		
+
 		// 業績日期(中曆)=輸入業績日期/系統營業日(會計日期)
 		if (iPf.getPerfDate() > 0) {
 			perfDate = iPf.getPerfDate();
@@ -1404,8 +1404,22 @@ public class PfDetailCom extends TradeBuffer {
 			pf.setDistCode(tCdBcm.getDistCode()); // 區部代號(介紹人)
 			pf.setDeptCode(tCdBcm.getDeptCode()); // 部室代號(介紹人)
 			pf.setUnitManager(tCdBcm.getUnitManager()); // 處經理代號(介紹人)
-			pf.setDistManager(tCdBcm.getDistManager()); // 區經理代號(介紹人)
 			pf.setDeptManager(tCdBcm.getDeptManager()); // 部經理代號(介紹人)
+			pf.setDistManager(tCdBcm.getDistManager()); // 區經理代號(介紹人)
+			// 區經理 : CdEmp(員工資料檔)的AgLevel(業務人員職等)第一碼為'H'為區經理
+			// 介紹人本身為區經理,否則依序找上層主管直到找到區經理
+			String employeeNo = pf.getIntroducer();
+			for (int i = 0; i <= 4; i++) {
+				CdEmp tCdEmp = cdEmpService.findById(employeeNo, titaVo);
+				if (tCdEmp == null) {
+					break;
+				}
+				if (tCdEmp.getAgLevel().length() >= 1 && "H".equals(tCdEmp.getAgLevel().substring(0, 1))) {
+					pf.setDistManager(employeeNo);
+					break;
+				}
+				employeeNo = tCdEmp.getDirectorId();
+			}
 		}
 
 		// 還款、.計件代碼變更、重轉時更新記號=N => 抓最新房貸專員及所屬部室(變動 by L5502房貸專員業績案件維護)

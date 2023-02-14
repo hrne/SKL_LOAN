@@ -121,5 +121,11 @@ public class ContentName {
 
 	/* custno Area */
 	public static final int negDepartmentCustNo = 601776; // 戶號(前置協商收款專戶) ;
+	
+	/* ApLog */
+	public static final String apLogFlag = "apLogFlag";
+	public static final String apLogRim = "apLogRim";
+	public static final String apLogTxName = "apLogTxName";
+	public static final String txCodeNM = "TxCodeNM";
 
 }

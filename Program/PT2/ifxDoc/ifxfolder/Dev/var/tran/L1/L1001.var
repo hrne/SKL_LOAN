@@ -199,7 +199,6 @@ C(4,#Mobile,SHOW(#BTN2),HIDE(#BTN2))
 C(4,#Mobile,$,V(9))
 !T(3,@FdMobile,*)
 
-
 ! 行業別
 #IndustryCode=X,6,I
 C(3,#CustNoEd,0,$,S)
@@ -412,8 +411,8 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L2036; ntxbuf=#OOBUF11})
 IF(#OOCustRelBTNFg==0,BIND(grid,cancel),$)
 
 !交互運用
-#OOBUF12=X,11,S
-T(2,2+#OOCustId)
+#OOBUF12=X,118,S
+T(2,2+#OOCustId+#CustName+#OOCustNo)
 
 #OOBTN12=X,1,S
 C(2,#OOCustCrossBTNFg,BIND(grid,{ cmd=CHAIN; ntxcd=L1109; text=未設定; ntxbuf=#OOBUF12}),
