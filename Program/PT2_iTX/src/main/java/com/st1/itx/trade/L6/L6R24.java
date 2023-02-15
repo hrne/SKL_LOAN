@@ -73,6 +73,8 @@ public class L6R24 extends TradeBuffer {
 		this.totaVo.putParam("CustDataCtrlFg", tTxTranCode.getCustDataCtrlFg());
 		this.totaVo.putParam("CustRmkFg", tTxTranCode.getCustRmkFg());
 		this.totaVo.putParam("ChainTranMsg", tTxTranCode.getChainTranMsg());
+		this.totaVo.putParam("ApLogFlag", tTxTranCode.getApLogFlag());
+		this.totaVo.putParam("ApLogRim", tTxTranCode.getApLogRim());
 	}
 
 }

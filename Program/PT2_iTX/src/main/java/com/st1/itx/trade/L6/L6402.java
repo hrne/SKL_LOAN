@@ -114,6 +114,8 @@ public class L6402 extends TradeBuffer {
 		tTxTranCode.setCustDataCtrlFg(Integer.valueOf(titaVo.getParam("CustDataCtrlFg")));
 		tTxTranCode.setCustRmkFg(Integer.parseInt(titaVo.getParam("CustRmkFg")));
 		tTxTranCode.setChainTranMsg(titaVo.getParam("ChainTranMsg"));
+		tTxTranCode.setApLogFlag(Integer.valueOf(titaVo.getParam("ApLogFlag")));
+		tTxTranCode.setApLogRim(titaVo.getParam("ApLogRim"));
 
 		return tTxTranCode;
 

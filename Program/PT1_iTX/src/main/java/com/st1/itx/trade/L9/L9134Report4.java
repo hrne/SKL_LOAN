@@ -63,12 +63,12 @@ public class L9134Report4 extends MakeExcel {
 		TxBizDate tTxBizDate = new TxBizDate();
 		tTxBizDate = iTxBizDateService.findById("ONLINE", titaVo);
 		int iLmnDy    = tTxBizDate.getLmnDy();
-		int iTbsDy    = tTxBizDate.getTbsDy();
+		int iTmnDy    = tTxBizDate.getTmnDy();
 		this.info("iLmnDy    = "+ tTxBizDate.getLmnDy());
-		this.info("iTbsDy    = "+ tTxBizDate.getTbsDy());
+		this.info("iTmnDy    = "+ tTxBizDate.getTbsDy());
 		
 		try {
-			findList = l9134ServiceImpl.doQueryL9134_4_1(titaVo, idate , iLmnDy, iTbsDy);
+			findList = l9134ServiceImpl.doQueryL9134_4_1(titaVo, idate , iLmnDy, iTmnDy);
 			
 			this.info("findList    = " + findList);
 		} catch (Exception e) {

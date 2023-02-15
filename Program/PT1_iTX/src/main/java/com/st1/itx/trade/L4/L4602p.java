@@ -71,6 +71,8 @@ public class L4602p extends TradeBuffer {
 	@Autowired
 	L4602Report l4602Report;
 
+	@Autowired
+	L4602Report2 l4602Report2;
 
 	private ArrayList<InsuRenewMediaTemp> lInsuRenewMediaTemp = new ArrayList<>();
 	private ArrayList<OccursList> tmpList = new ArrayList<>();
@@ -88,10 +90,10 @@ public class L4602p extends TradeBuffer {
 		Slice<InsuRenewMediaTemp> slInsuRenewMediaTemp = insuRenewMediaTempService.fireInsuMonthRg("" + iInsuEndMonth,
 				"" + iInsuEndMonth, 0, Integer.MAX_VALUE, titaVo);
 		if (slInsuRenewMediaTemp != null) {
-			
-			List<InsuRenewMediaTemp> lInsuRenewMediaTemp = new ArrayList<InsuRenewMediaTemp>(); 
+
+			List<InsuRenewMediaTemp> lInsuRenewMediaTemp = new ArrayList<InsuRenewMediaTemp>();
 			lInsuRenewMediaTemp = slInsuRenewMediaTemp.getContent();
-			
+
 			try {
 				insuRenewMediaTempService.deleteAll(lInsuRenewMediaTemp, titaVo);
 			} catch (DBException e) {
@@ -162,13 +164,15 @@ public class L4602p extends TradeBuffer {
 		}
 		// 報表製作完成，發MESSAGE
 		if (isFinished) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo()+"L4602",
-					"L4602火險出單明細表已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009",
+					titaVo.getTlrNo() + "L4602", "L4602火險出單明細表已完成", titaVo);
 		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo()+"L4602",
-					"L4602火險出單明細表查無資料", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009",
+					titaVo.getTlrNo() + "L4602", "L4602火險出單明細表查無資料", titaVo);
 		}
 
+		this.info("lInsuRenewMediaTemp.size() =" + lInsuRenewMediaTemp.size());
+		
 		if (lInsuRenewMediaTemp.size() > 0) {
 			try {
 				insuRenewMediaTempService.insertAll(lInsuRenewMediaTemp, titaVo);
@@ -176,8 +180,15 @@ public class L4602p extends TradeBuffer {
 				throw new LogicException("E0005", "InsuRenew : " + e.getErrorMsg());
 			}
 		}
+		
+		this.info("lInsuRenewMediaTemp.size()2 =" + lInsuRenewMediaTemp.size());
 //		// 把明細資料容器裝到檔案資料容器內
-//		insuRenewFileVo.setOccursList(tmpList);
+		insuRenewFileVo.setOccursList(tmpList);
+
+		this.info("lInsuRenewMediaTemp.size()3 =" + lInsuRenewMediaTemp.size());
+		
+		l4602Report2.exec(titaVo, insuRenewFileVo);
+
 //		// 轉換資料格式
 //		ArrayList<String> file = insuRenewFileVo.toFile();
 //

@@ -34,8 +34,10 @@ import com.google.gson.Gson;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.TxAttachment;
 import com.st1.itx.db.domain.TxFile;
+import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.TxAttachmentService;
 import com.st1.itx.db.service.TxFileService;
+import com.st1.itx.db.service.TxTranCodeService;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.eum.ThreadVariable;
 import com.st1.itx.util.MySpring;
@@ -53,6 +55,9 @@ public class AjaxController extends SysLogger {
 
 	@Autowired
 	private MenuBuilder menuBuilder;
+	
+	@Autowired
+	private TxTranCodeService txTranCodeService;
 
 	@Autowired
 	private TxFileService txFileService;
@@ -86,6 +91,25 @@ public class AjaxController extends SysLogger {
 
 		if (!term.trim().isEmpty())
 			map.put("data", menuBuilder.buildAutoCP(authNo, term));
+
+		map.put("status", true);
+		return makeJsonResponse(map, true);
+	}
+	
+	@RequestMapping(value = "txcd/chainTranMsg", method = RequestMethod.GET)
+	public ResponseEntity<String> getChainTranMsg(@RequestParam String txCode, HttpSession session, HttpServletResponse response) {
+		ThreadVariable.setObject(ContentName.loggerFg, true);
+		Map<String, Object> map = new HashMap<String, Object>();
+
+		TxTranCode txTranCode = null;
+
+		if (!Objects.isNull(txCode) && !txCode.isEmpty())
+			txTranCode = txTranCodeService.findById(txCode);
+
+		if (!Objects.isNull(txTranCode))
+			map.put("data", txTranCode.getChainTranMsg());
+		else
+			map.put("data", "");
 
 		map.put("status", true);
 		return makeJsonResponse(map, true);

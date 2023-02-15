@@ -55,7 +55,7 @@ public class LC005 extends TradeBuffer {
 
 	@Autowired
 	public CdBranchService cdBranchService;
-
+	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active LC005 ");
@@ -66,17 +66,18 @@ public class LC005 extends TradeBuffer {
 		titaVo.get("iGroupNo").trim();
 		String iTranNo = titaVo.get("iTranNo").trim();
 
+		
 		TxTeller tTxTeller = txTellerService.findById(titaVo.getTlrNo(), titaVo);
-		if (tTxTeller == null) {
+		if(tTxTeller==null) {
 			throw new LogicException(titaVo, "E0001", "經辦資料");
 		}
-
+		
 		this.info("LC005 TlrNo = " + titaVo.getTlrNo() + "/" + tTxTeller.getGroupNo());
-
+		
 		List<String> groupNoList = new ArrayList<String>();
 
 		groupNoList.add(tTxTeller.getGroupNo());
-
+		
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		 */
@@ -116,25 +117,25 @@ public class LC005 extends TradeBuffer {
 				occursList.putParam("CalTime", tTxRecord.getCalTime());
 				occursList.putParam("Entdy", tTxRecord.getEntdy());
 				occursList.putParam("TxNo", tTxRecord.getTxNo());
-
+				
 				String tran = tTxRecord.getTranNo();
 				TxTranCode txTranCode = txTranCodeService.findById(tTxRecord.getTranNo(), titaVo);
 				if (txTranCode != null) {
 					tran += " " + txTranCode.getTranItem();
 				}
 				occursList.putParam("TranNo", tran);
-
+				
 				occursList.putParam("MrKey", tTxRecord.getMrKey());
 				occursList.putParam("CurName", tTxRecord.getCurName());
 				occursList.putParam("TxAmt", tTxRecord.getTxAmt());
-
+				
 				String br = tTxRecord.getBrNo();
 				CdBranch cdBranch = cdBranchService.findById(tTxRecord.getBrNo(), titaVo);
 				if (cdBranch != null) {
 					br += " " + cdBranch.getBranchShort();
 				}
 				occursList.putParam("BrNo", br);
-
+				
 				String tTlrItem = tTxRecord.getTlrNo();
 				CdEmp cdEmp = cdEmpService.findById(tTxRecord.getTlrNo(), titaVo);
 				if (cdEmp != null) {
@@ -144,7 +145,7 @@ public class LC005 extends TradeBuffer {
 
 				occursList.putParam("FlowType", tTxFlow.getFlowType());
 				occursList.putParam("FlowStep", tTxFlow.getFlowStep());
-				occursList.putParam("RejectReason", tTxFlow.getRejectReason());
+				occursList.putParam("RejectReason", "退回原因:"+tTxFlow.getRejectReason());
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}

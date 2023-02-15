@@ -89,7 +89,7 @@ public class L9136Report extends MakeReport {
 			this.print(-7, 121, "更  改  前  內  容");
 			this.print(-7, 148, "更  改  後  內  容");
 		} else {
-			this.print(-7, 140, "內  容");
+			this.print(-7, 138, "內  容");
 		}
 		this.print(-7, 177, "經辦");
 		this.print(-7, 186, "授權主管");
@@ -377,7 +377,7 @@ public class L9136Report extends MakeReport {
 
 		} else {
 			tmpUpdateItem = r.get("TranNo") + " " + r.get("TranItem");
-			this.print(0, 97, tmpUpdateItem.length() == 0 ? " " : fillUpWord(tmpUpdateItem, 36, " ", "R"));
+			this.print(0, 97, tmpUpdateItem.length() == 0 ? " " : fillUpWord(tmpUpdateItem, 34, " ", "R"));
 		}
 
 //		String bfContent = tmpNewContent.trim().length() == 0 ? " "
@@ -395,7 +395,7 @@ public class L9136Report extends MakeReport {
 
 		} else {
 
-			this.print(0, 140, afContent.length() == 0 ? " " : afContent);
+			this.print(0, 138, afContent.length() == 0 ? " " : afContent);
 
 		}
 

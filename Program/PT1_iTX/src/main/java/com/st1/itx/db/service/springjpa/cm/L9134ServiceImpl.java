@@ -62,7 +62,9 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       AND \"AcDate\" <= :endDate ";
 //		sql += "       AND \"AcNoCode\" IN ('20222010000','20222020000','20222180000', '20222180100' ,'20222180200') ";
 		// sql += " AND \"AcNoCode\" LIKE '20222%' ";
-		sql += "    AND  \"AcctCode\" in ('TAV','TCK','TEM','TAM','TRO','TLD') ";
+//		sql += "    AND  \"AcctCode\" in ('TAV','TCK','TEM','TAM','TRO','TLD') ";
+		sql += "    AND  \"AcctCode\" in ('T10','T11','T12','T13','TAM','TAV','TCK','TEM','THC','TLD','TMI','TRO','TSL') ";
+		sql += "    AND  \"EntAc\" > 0";
 		sql += "     GROUP BY \"AcDate\" ";
 		sql += "            , \"AcNoCode\" ";
 		sql += " ) ";
@@ -129,7 +131,9 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// sql += " WHERE AC.\"AcNoCode\" IN ('20222010000','20222020000','20222180000',
 		// '20222180100' ,'20222180200') ";
 		// sql += " WHERE AC.\"AcNoCode\" LIKE '20222%' ";
-		sql += "    AND  AD.\"AcctCode\" in ('TAV','TCK','TEM','TAM','TRO','TLD') ";
+//		sql += "    AND  AD.\"AcctCode\" in ('TAV','TCK','TEM','TAM','TRO','TLD') ";
+		sql += "    AND  AD.\"AcctCode\" in ('T10','T11','T12','T13','TAM','TAV','TCK','TEM','THC','TLD','TMI','TRO','TSL') ";
+		sql += "    AND  AD.\"EntAc\" > 0";
 		sql += "     ORDER BY AD.\"AcDate\" ";
 		sql += "            , AD.\"AcNoCode\" ASC ";
 		sql += "            , AD.\"AcSubCode\" ASC ";
@@ -178,7 +182,8 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// sql += " WHERE AC.\"AcNoCode\" IN ('20222010000','20222020000','20222180000',
 		// '20222180100' ,'20222180200') ";
 		// sql += " WHERE AC.\"AcNoCode\" LIKE '20222%' ";
-		sql += "    WHERE  AC.\"AcctCode\" in ('TAV','TCK','TEM','TAM','TRO','TLD') ";
+//		sql += "    WHERE  AC.\"AcctCode\" in ('TAV','TCK','TEM','TAM','TRO','TLD') ";
+		sql += "    AND  AC.\"AcctCode\" in ('T10','T11','T12','T13','TAM','TAV','TCK','TEM','THC','TLD','TMI','TRO','TSL') ";
 		sql += "       AND AC.\"RvBal\" > 0 ";
 		sql += "     ORDER BY AC.\"AcNoCode\" ASC ";
 		sql += "            , AC.\"AcSubCode\" ASC ";
@@ -199,23 +204,26 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @param titaVo TitaVo
 	 * @return 查詢結果
 	 */
-	public List<Map<String, String>> doQueryL9134_4_1(TitaVo titaVo, int idate , int iLmnDy, int iTbsDy) throws LogicException {
+	public List<Map<String, String>> doQueryL9134_4_1(TitaVo titaVo, int idate , int iLmnDy, int iTmnDy) throws LogicException {
 		this.info("L9134_4_1 Start");
 		this.info("idate   = " + idate);
-		String itdate = parse.IntegerToString(iTbsDy + 19110000, 8);
+		String itdate1911 = parse.IntegerToString(iTmnDy + 19110000, 8);
+		String itdate = parse.IntegerToString(iTmnDy , 6);
 		this.info("itdate   =" + itdate);
 //		int idx = parse.stringToInteger(titaVo.getParam("StartDate").trim().substring(5, 7));
-		String itdx = itdate.substring(0, 6);
+		String itdx = itdate.substring(0, 5);
+		String itdx1911 = itdate1911.substring(0, 6);
 		this.info("itdx   = " + itdx);
+		this.info("itdx1911  = " + itdx1911);
 		String ixLmnDy = parse.IntegerToString(iLmnDy  , 7);
-		String ixTbsDy = parse.IntegerToString(iTbsDy  , 7);
+		String ixiTmnDy = parse.IntegerToString(iTmnDy  , 7);
 		String ixLmnDy8 = parse.IntegerToString(iLmnDy + 19110000 , 8);
-		String ixTbsDy8 = parse.IntegerToString(iTbsDy + 19110000 , 8);
+		String ixTbsDy8 = parse.IntegerToString(iTmnDy + 19110000 , 8);
 		String ixLmnDy6 = ixLmnDy.substring(0,5);
-		String idx = ixTbsDy.substring(5,7);
+		String idx = ixiTmnDy.substring(5,7);
 		int indx = parse.stringToInteger(idx);
 		this.info("ixLmnDy    = " + ixLmnDy); //1101130 上個月底日 
-		this.info("ixTbsDy    = " + ixTbsDy); //1101231 本月月底日 
+		this.info("ixTbsDy    = " + iTmnDy); //1101231 本月月底日 
 		this.info("ixLmnDy8   = " + ixLmnDy8); //2021 11 30
 		this.info("ixTbsDy8   = " + ixTbsDy8); //2021 12 31
 		this.info("ixLmnDy6   = " + ixLmnDy6);
@@ -265,7 +273,8 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " from dual ";
 			sql += " union all ";
 			sql += " select  ";
-			sql += " to_char(\"AcDate\") as \"AcDate\" ";
+//			sql += " to_char(\"AcDate\") as \"AcDate\" ";
+			sql += " to_char(" + itdx + parse.IntegerToString(i, 2) + ")  as \"AcDate\" ";
 			sql += " ,\"TdBal\"";
 			sql += " ,\"YdBal\" ";
 			sql += " , 0 as \"didYdBal\" ";
@@ -273,11 +282,13 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " , 0 as \"DrAmt\" , 0 as \"CrAmt\" ";
 			sql += " from \"AcMain\" ";
 //		sql += " where \"AcDate\" = :itdate ";
-			sql += " where \"AcDate\" = " + itdx + parse.IntegerToString(i, 2) + "";
+//			sql += " where \"AcDate\" = " + itdx + parse.IntegerToString(i, 2) + "";
+			sql += " where \"AcDate\" = " + itdx1911 + parse.IntegerToString(i, 2) + "";
 			sql += "   and \"AcctCode\" in ('TAV','TAM','TLD','T11','T13','T12','T10') ";
 			sql += " union all ";
 			sql += " select ";
-			sql += " to_char(\"AcDate\") as \"AcDate\" ";
+//			sql += " to_char(\"AcDate\") as \"AcDate\" ";
+			sql += " to_char(" + itdx + parse.IntegerToString(i, 2) + ")  as \"AcDate\" ";
 			sql += " ,0 as \"YdBal\" ";
 			sql += " ,0 as \"TdBal\" ";
 			sql += " , \"YdBal\" as \"didYdBal\"";
@@ -286,7 +297,8 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " from \"AcMain\" ";
 			sql += " where \"AcctCode\" in ('TCK') ";
 //		sql += " and  \"AcDate\" =:itdate ";
-			sql += " and \"AcDate\" = " + itdx + parse.IntegerToString(i, 2) + " ";
+//			sql += " and \"AcDate\" = " + itdx + parse.IntegerToString(i, 2) + " ";
+			sql += " and \"AcDate\" = " + itdx1911 + parse.IntegerToString(i, 2) + " ";
 			sql += " union all ";
 			sql += " select ";
 			sql += " to_char(" + itdx + parse.IntegerToString(i, 2) + ")  as \"AcDate\" ";
@@ -316,8 +328,10 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "                          AND C.\"AcDtlCode\" = AD.\"AcDtlCode\" ";
 //			sql += " WHERE AD.\"AcDate\" >= :startDate  ";
 //			sql += "   AND AD.\"AcDate\" <= :endDate ";
-			sql += " WHERE AD.\"AcDate\" >=" + itdx + parse.IntegerToString(i, 2) + " ";
-			sql += "   AND AD.\"AcDate\" <=" + itdx + parse.IntegerToString(i, 2) + " ";
+//			sql += " WHERE AD.\"AcDate\" >=" + itdx + parse.IntegerToString(i, 2) + " ";
+//			sql += "   AND AD.\"AcDate\" <=" + itdx + parse.IntegerToString(i, 2) + " ";
+			sql += " WHERE AD.\"AcDate\" >=" + itdx1911 + parse.IntegerToString(i, 2) + " ";
+			sql += "   AND AD.\"AcDate\" <=" + itdx1911 + parse.IntegerToString(i, 2) + " ";
 			sql += "   AND  AD.\"AcctCode\" in ('TAV','TCK','TEM','TAM','TRO','TLD') ";
 //			sql += " group by \"AcDate\" " ;
 			sql += " ) ";	

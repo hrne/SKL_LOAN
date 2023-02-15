@@ -98,7 +98,7 @@ public class LM050ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      ,decode(s1.\"BusTitle\",NULL,decode(\"RelName\",NULL";
 		sql += "      ,'為本公司負責人' || \"HeadTitle\" ";
 		sql += "      ,'為本公司負責人' ||'('|| \"HeadTitle\" || \"HeadName\" || ')' ||'之'||\"RelTitle\")  ";
-		sql += "      ,'該公司' ||\"BusTitle\" ||'('|| \"RelName\" || ')'||'為本公司'||\"HeadTitle\" ||'之'||\"RelTitle\" )AS 	\"Remark\"'  ";
+		sql += "      ,'該公司' ||\"BusTitle\" ||'('|| \"RelName\" || ')'||'為本公司'||\"HeadTitle\" ||'之'||\"RelTitle\" )AS 	\"Remark\"  ";
 		sql += " FROM ( SELECT \"CustNo\" ";
 		sql += "             , SUM(\"LoanBalance\") AS \"LoanBal\" ";
 		sql += "        FROM \"MonthlyLoanBal\" ";

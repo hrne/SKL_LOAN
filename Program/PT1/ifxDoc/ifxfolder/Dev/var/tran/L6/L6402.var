@@ -13,7 +13,8 @@
 <include src="COM.icf::BFHEAD2.dec"/>
 </sub>
 
-<sub type="DC" name="p1" layout="cols=2;screen.width=[160,250,180,400];printer.width=[20,30,15,45];order=1;">
+<sub type="DC" name="p1" layout="cols=2;screen.width=[200,250,200,400];printer.width=[20,30,15,45];order=1;">
+!<sub type="DC" name="p1" layout="cols=2;screen.width=[160,250,180,400];printer.width=[20,30,15,45];order=1;">
 [
 ["[L6402]                                 交易控制檔維護"],
 [#<->#,"#FdFunCode+功能",#FunCodeX],
@@ -30,6 +31,8 @@
 ["#FdSubmitFg+登錄需提交",#SubmitFg,#SubmitFgX],
 ["#FdCustDataCtrlFg+結清戶個資控管",#CustDataCtrlFg,#CustDataCtrlFgX],
 ["#FdCustRmkFg+顧客控管警訊記號",#CustRmkFg,#CustRmkFgX],
+["#FdApLogFlag+敏感性資料記錄記號",#ApLogFlag,#ApLogFlagX],
+["#FdApLogRim+敏感性資料記錄Rim代碼",#ApLogRim],
 [#<->#,"#FdChainTranMsg+入口交易提示訊息",#ChainTranMsg],
 ]
 
@@ -76,9 +79,14 @@ T(3,CdCode.ReviseType)
 T(3,CdCode.CustDataCtrlFg)
 #CustDataCtrlFgHelp=X,100,S
 
+!ApLogFlag(0:否;1:是)
+#CDCODEApLogFlag=x,20,S                  
+T(3,CdCode.ApLogFlag) 
+#ApLogFlagHelp=X,100,S
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDCODEFuncCode1,#CDCODEMenu,#CDCODETranType,#CDCODECancelType,#CDCODEReviseType,#CustDataCtrlFgHelpRim)
+S(XXR99,01,#CDCODEFuncCode1,#CDCODEMenu,#CDCODETranType,#CDCODECancelType,#CDCODEReviseType,#CustDataCtrlFgHelpRim,#CDCODEApLogFlag)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@FunCodeH,#HelpDesc1)
@@ -87,6 +95,7 @@ T(2,@TypeHelp,#HelpDesc3)
 T(2,@CancelHelp,#HelpDesc4)
 T(2,@ModifyHelp,#HelpDesc5)
 T(2,@CustDataCtrlFgHelp,#HelpDesc6)
+T(2,@ApLogFlagHelp,#HelpDesc7)
 
 #StatusHelp=X,50,S
 T(3,0:正常;1:停用)
@@ -114,6 +123,8 @@ T(3,0:否;1:是;2:自動)
 #FdCustDataCtrlFg=X,2,L
 #FdCustRmkFg=X,2,L
 #FdChainTranMsg=X,2,L
+#FdApLogFlag=X,2,L	
+#FdApLogRim=X,2,L
 
 #ShowFd1=X,1,S
 C(3,#CHAIN,1,T(3,@FdFunCode, ),T(3,@FdFunCode,*))
@@ -172,6 +183,9 @@ T(F,@MenuFg,#ShowFrame)
 T(F,@SubmitFg,#ShowFrame)
 T(F,@CustDataCtrlFg,#ShowFrame)
 T(F,@CustRmkFg,#ShowFrame)
+T(F,@ApLogFlag,#ShowFrame)
+T(F,@ApLogRim,#ShowFrame)
+T(F,@ChainTranMsg,#ShowFrame)
 
 ![業務/交易代碼]
 #TranNo=X,5,I
@@ -270,6 +284,8 @@ T(H,@SubmitFgX,#SubmitFg,#YesNoHelp2)
 T(H,@SubMenuNoX,#SubMenuNo,#SubMenuHelp)
 T(H,@CustDataCtrlFgX,#CustDataCtrlFg,#CustDataCtrlFgHelp)
 T(H,@CustRmkFgX,#CustRmkFg,#CustRmkFgHelp)
+T(H,@ApLogFlagX,#ApLogFlag,#ApLogFlagHelp)
+
 
 
 #TranItem=x,40,I
@@ -299,6 +315,7 @@ V(H,#StatusHelp)
 
 #StatusX=X,4,L
 T(H,#Status,#StatusHelp)
+
 
 !-------------------
 #CancelFg=A,1,I
@@ -373,7 +390,23 @@ V(H,#CustRmkFgHelp)
 #CustRmkFgX=X,10,L
 T(H,#CustRmkFg,#CustRmkFgHelp)
 
+!-------------------EM2661
+#ApLogFlag=A,1,I
+C(2,#FunCode,s,$,$,s,s,s)
+HELP(#ApLogFlagHelp)
+@T(3,@ApLogFlagX,)
+V(H,#ApLogFlagHelp)
+
+#ApLogFlagX=X,8,L
+T(H,#ApLogFlag,#ApLogFlagHelp)
+
+#ApLogRim=X,5,I
+C(2,#FunCode,s,$,$,s,s,s)
+
 #ChainTranMsg=x,100,I
+C(2,#FunCode,s,$,$,s,s,s)
+
+
 
 #MRKEY=_,_,S
 T(2,CODE:+#TranNo)
@@ -404,6 +437,8 @@ T(2,CODE:+#TranNo)
 #CustDataCtrlFg
 #CustRmkFg
 #ChainTranMsg
+#ApLogFlag
+#ApLogRim
 #END
 </sub>
 
@@ -427,6 +462,8 @@ TXFORM=L6R24
 #CustDataCtrlFg
 #CustRmkFg
 #ChainTranMsg
+#ApLogFlag
+#ApLogRim
 ^
 </sub>
 

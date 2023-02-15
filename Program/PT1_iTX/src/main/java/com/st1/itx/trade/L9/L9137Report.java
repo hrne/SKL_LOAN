@@ -376,26 +376,26 @@ public class L9137Report extends MakeReport {
 		print(1, 1, "│　　　　　　　科　　　　　　 　　　　　 　　　目　　　　　　│　　　戶　　　　數　　　│　　　　　金　　　　　　　　　　額　　　　　│　各項比率　│　占資金比率　│");
 		print(1, 1, "├─────────────────┬────────────┼────────────┼──────────────────────┼──────┼───────┤");
 		print(1, 1, "│　　　　　短　期　擔　保　　　　　｜　　公　　司　　戶　　　│　　　　　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　│　　　　　　│　　　　　　　│");
+		print(0, 86, formatAmt(listL9137r.get(0).get("F1"), 0), "R"); // 戶數
+		print(0, 130, formatAmt(listL9137r.get(0).get("F2"), 0), "R"); // 金額
+		print(0, 147, formatAmt(percentOfTotal(listL9137r.get(0).get("F2")), 2), "R"); // 各項比率
+		print(0, 163, formatAmt(percentOfFunds(listL9137r.get(0).get("F2")), 2), "R"); // 占資金比率
+		print(1, 1, "│　　　　　　　　　　　　　　　　　├────────────┼────────────┼──────────────────────┼──────┼───────┤");
+		print(1, 1, "│　　　　　　　放　款　　　　　　　｜　　個　　人　　戶　　　│　　　　　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　│　　　　　　│　　　　　　　│");
 		print(0, 86, formatAmt(listL9137r.get(1).get("F1"), 0), "R"); // 戶數
 		print(0, 130, formatAmt(listL9137r.get(1).get("F2"), 0), "R"); // 金額
 		print(0, 147, formatAmt(percentOfTotal(listL9137r.get(1).get("F2")), 2), "R"); // 各項比率
 		print(0, 163, formatAmt(percentOfFunds(listL9137r.get(1).get("F2")), 2), "R"); // 占資金比率
 		print(1, 1, "│　　　　　　　　　　　　　　　　　├────────────┼────────────┼──────────────────────┼──────┼───────┤");
-		print(1, 1, "│　　　　　　　放　款　　　　　　　｜　　個　　人　　戶　　　│　　　　　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　│　　　　　　│　　　　　　　│");
-		print(0, 86, formatAmt(listL9137r.get(2).get("F1"), 0), "R"); // 戶數
-		print(0, 130, formatAmt(listL9137r.get(2).get("F2"), 0), "R"); // 金額
-		print(0, 147, formatAmt(percentOfTotal(listL9137r.get(2).get("F2")), 2), "R"); // 各項比率
-		print(0, 163, formatAmt(percentOfFunds(listL9137r.get(2).get("F2")), 2), "R"); // 占資金比率
-		print(1, 1, "│　　　　　　　　　　　　　　　　　├────────────┼────────────┼──────────────────────┼──────┼───────┤");
 		print(1, 1, "│　　　　　　　　　　　　　　　　　｜　　　小　　　計　（Ａ）│　　　　　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　│　　　　　　│　　　　　　　│");
 		print(0, 86, formatAmt(subTotalCountA, 0), "R"); // 戶數
 		print(0, 130, formatAmt(subTotalA, 0), "R"); // 金額
 
-		BigDecimal t1A = percentOfTotal(listL9137r.get(1).get("F2"));
-		BigDecimal t2A = percentOfTotal(listL9137r.get(2).get("F2"));
+		BigDecimal t1A = percentOfTotal(listL9137r.get(0).get("F2"));
+		BigDecimal t2A = percentOfTotal(listL9137r.get(1).get("F2"));
 
-		BigDecimal f1A = percentOfFunds(listL9137r.get(1).get("F2"));
-		BigDecimal f2A = percentOfFunds(listL9137r.get(2).get("F2"));
+		BigDecimal f1A = percentOfFunds(listL9137r.get(0).get("F2"));
+		BigDecimal f2A = percentOfFunds(listL9137r.get(1).get("F2"));
 
 		String totalA = formatAmt(t1A.add(t2A), 2);
 		String fundsA = formatAmt(f1A.add(f2A), 2);
@@ -406,25 +406,25 @@ public class L9137Report extends MakeReport {
 //		print(0, 163, formatAmt(percentOfFunds(subTotalA), 2), "R"); // 占資金比率
 		print(1, 1, "├─────────────────┼────────────┼────────────┼──────────────────────┼──────┼───────┤");
 		print(1, 1, "│　　　　　中　期　擔　保　　　　　｜　　公　　司　　戶　　　│　　　　　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　│　　　　　　│　　　　　　　│");
-		print(0, 86, formatAmt(listL9137r.get(4).get("F1"), 0), "R"); // 戶數
-		print(0, 130, formatAmt(listL9137r.get(4).get("F2"), 0), "R"); // 金額
-		print(0, 147, formatAmt(percentOfTotal(listL9137r.get(4).get("F2")), 2), "R"); // 各項比率
-		print(0, 163, formatAmt(percentOfFunds(listL9137r.get(4).get("F2")), 2), "R"); // 占資金比率
+		print(0, 86, formatAmt(listL9137r.get(3).get("F1"), 0), "R"); // 戶數
+		print(0, 130, formatAmt(listL9137r.get(3).get("F2"), 0), "R"); // 金額
+		print(0, 147, formatAmt(percentOfTotal(listL9137r.get(2).get("F2")), 2), "R"); // 各項比率
+		print(0, 163, formatAmt(percentOfFunds(listL9137r.get(2).get("F2")), 2), "R"); // 占資金比率
 		print(1, 1, "│　　　　　　　　　　　　　　　　　├────────────┼────────────┼──────────────────────┼──────┼───────┤");
 		print(1, 1, "│　　　　　　　放　款　　　　　　　｜　　個　　人　　戶　　　│　　　　　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　│　　　　　　│　　　　　　　│");
-		print(0, 86, formatAmt(listL9137r.get(5).get("F1"), 0), "R"); // 戶數
-		print(0, 130, formatAmt(listL9137r.get(5).get("F2"), 0), "R"); // 金額
-		print(0, 147, formatAmt(percentOfTotal(listL9137r.get(5).get("F2")), 2), "R"); // 各項比率
-		print(0, 163, formatAmt(percentOfFunds(listL9137r.get(5).get("F2")), 2), "R"); // 占資金比率
+		print(0, 86, formatAmt(listL9137r.get(4).get("F1"), 0), "R"); // 戶數
+		print(0, 130, formatAmt(listL9137r.get(4).get("F2"), 0), "R"); // 金額
+		print(0, 147, formatAmt(percentOfTotal(listL9137r.get(3).get("F2")), 2), "R"); // 各項比率
+		print(0, 163, formatAmt(percentOfFunds(listL9137r.get(3).get("F2")), 2), "R"); // 占資金比率
 		print(1, 1, "│　　　　　　　　　　　　　　　　　├────────────┼────────────┼──────────────────────┼──────┼───────┤");
 		print(1, 1, "│　　　　　　　　　　　　　　　　　｜　　　小　　　計　（Ｂ）│　　　　　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　│　　　　　　│　　　　　　　│");
 		print(0, 86, formatAmt(subTotalCountB, 0), "R"); // 戶數
 		print(0, 130, formatAmt(subTotalB, 0), "R"); // 金額
-		BigDecimal t1B = percentOfTotal(listL9137r.get(4).get("F2"));
-		BigDecimal t2B = percentOfTotal(listL9137r.get(5).get("F2"));
+		BigDecimal t1B = percentOfTotal(listL9137r.get(2).get("F2"));
+		BigDecimal t2B = percentOfTotal(listL9137r.get(3).get("F2"));
 
-		BigDecimal f1B = percentOfFunds(listL9137r.get(4).get("F2"));
-		BigDecimal f2B = percentOfFunds(listL9137r.get(5).get("F2"));
+		BigDecimal f1B = percentOfFunds(listL9137r.get(2).get("F2"));
+		BigDecimal f2B = percentOfFunds(listL9137r.get(3).get("F2"));
 
 		String totalB = formatAmt(t1B.add(t2B), 2);
 		String fundsB = formatAmt(f1B.add(f2B), 2);
@@ -434,25 +434,25 @@ public class L9137Report extends MakeReport {
 //		print(0, 163, formatAmt(percentOfFunds(subTotalB), 2), "R"); // 占資金比率
 		print(1, 1, "├─────────────────┼────────────┼────────────┼──────────────────────┼──────┼───────┤");
 		print(1, 1, "│　　　　　長　期　擔　保　　　　　｜　　公　　司　　戶　　　│　　　　　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　│　　　　　　│　　　　　　　│");
-		print(0, 86, formatAmt(listL9137r.get(7).get("F1"), 0), "R"); // 戶數
-		print(0, 130, formatAmt(listL9137r.get(7).get("F2"), 0), "R"); // 金額
-		print(0, 147, formatAmt(percentOfTotal(listL9137r.get(7).get("F2")), 2), "R"); // 各項比率
-		print(0, 163, formatAmt(percentOfFunds(listL9137r.get(7).get("F2")), 2), "R"); // 占資金比率
+		print(0, 86, formatAmt(listL9137r.get(6).get("F1"), 0), "R"); // 戶數
+		print(0, 130, formatAmt(listL9137r.get(6).get("F2"), 0), "R"); // 金額
+		print(0, 147, formatAmt(percentOfTotal(listL9137r.get(4).get("F2")), 2), "R"); // 各項比率
+		print(0, 163, formatAmt(percentOfFunds(listL9137r.get(4).get("F2")), 2), "R"); // 占資金比率
 		print(1, 1, "│　　　　　　　　　　　　　　　　　├────────────┼────────────┼──────────────────────┼──────┼───────┤");
 		print(1, 1, "│　　　　　　　放　款　　　　　　　｜　　個　　人　　戶　　　│　　　　　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　│　　　　　　│　　　　　　　│");
-		print(0, 86, formatAmt(listL9137r.get(8).get("F1"), 0), "R"); // 戶數
-		print(0, 130, formatAmt(listL9137r.get(8).get("F2"), 0), "R"); // 金額
-		print(0, 147, formatAmt(percentOfTotal(listL9137r.get(8).get("F2")), 2), "R"); // 各項比率
-		print(0, 163, formatAmt(percentOfFunds(listL9137r.get(8).get("F2")), 2), "R"); // 占資金比率
+		print(0, 86, formatAmt(listL9137r.get(7).get("F1"), 0), "R"); // 戶數
+		print(0, 130, formatAmt(listL9137r.get(7).get("F2"), 0), "R"); // 金額
+		print(0, 147, formatAmt(percentOfTotal(listL9137r.get(5).get("F2")), 2), "R"); // 各項比率
+		print(0, 163, formatAmt(percentOfFunds(listL9137r.get(5).get("F2")), 2), "R"); // 占資金比率
 		print(1, 1, "│　　　　　　　　　　　　　　　　　├────────────┼────────────┼──────────────────────┼──────┼───────┤");
 		print(1, 1, "│　　　　　　　　　　　　　　　　　｜　　　小　　　計　（Ｃ）│　　　　　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　│　　　　　　│　　　　　　　│");
 		print(0, 86, formatAmt(subTotalCountC, 0), "R"); // 戶數
 		print(0, 130, formatAmt(subTotalC, 0), "R"); // 金額
-		BigDecimal t1C = percentOfTotal(listL9137r.get(7).get("F2"));
-		BigDecimal t2C = percentOfTotal(listL9137r.get(8).get("F2"));
+		BigDecimal t1C = percentOfTotal(listL9137r.get(4).get("F2"));
+		BigDecimal t2C = percentOfTotal(listL9137r.get(5).get("F2"));
 
-		BigDecimal f1C = percentOfFunds(listL9137r.get(7).get("F2"));
-		BigDecimal f2C = percentOfFunds(listL9137r.get(8).get("F2"));
+		BigDecimal f1C = percentOfFunds(listL9137r.get(4).get("F2"));
+		BigDecimal f2C = percentOfFunds(listL9137r.get(5).get("F2"));
 
 		String totalC = formatAmt(t1C.add(t2C), 2);
 		String fundsC = formatAmt(f1C.add(f2C), 2);

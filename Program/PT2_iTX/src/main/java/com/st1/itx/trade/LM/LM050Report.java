@@ -137,6 +137,7 @@ public class LM050Report extends MakeReport {
 
 		int rowCursor = 4;
 
+		String tmpCustNo="";
 		int pos = 0;
 
 		for (Map<String, String> tLM050 : listLM050) {
@@ -151,6 +152,13 @@ public class LM050Report extends MakeReport {
 
 				if (rptType.equals(listLM050.get(pos + 1).get("F1"))) {
 					makeExcel.setShiftRow(rowCursor, 1);
+				}
+				
+				
+				if(!custNo.equals(tmpCustNo)) {
+					tmpCustNo=custNo;
+				}else {
+					continue;
 				}
 
 				makeExcel.setValue(rowCursor, 2, custNo);
