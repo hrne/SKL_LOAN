@@ -441,6 +441,8 @@ HIDE(#UsFinalBal,#UsPieceCodeSecondAmt,#LbUsAcctFee,#UsDrawdownAmt,#UsHandlingFe
 #BeforeDrawdownAmt=m,14.2,S
 C(3,#FKEY,7,T(2,@BeforeDrawdownAmt,#TimDrawdownAmt),$)
 
+#FKEY7DrawdownCode=A,1,S
+C(3,#FKEY,7,E(0,#DrawdownCode),$)
 ! 系統日
 #wksyscdate=D,7,S
 E(0,#SYSCDATE)
@@ -770,7 +772,6 @@ E(0,@LoanTermDd,#L2r05LoanTermDd)
 E(0,@RateCode,#L2r05RateCode)
 T(2,@IntCalcCode,#L2r05IntCalcCode)
 E(0,@AcctCode,#L2r05AcctCode)
-! T(2,@CustTypeCode,#L2r05CustTypeCode)
 E(0,@RepayCode,#L2r05RepayCode)
 E(0,@RepayAcctNo,#L2r05RepayAcctNo)
 T(2,@RepayBank,#L2r05RepayBank)
@@ -799,8 +800,6 @@ E(0,@TwHandlingFee,#L2r05HandlingFee)
 E(0,@UsHandlingFee,#L2r05HandlingFee)
 E(0,@UsageCode,#L2r05UsageCode)
 T(2,@PieceCode,#L2r05PieceCode)
-! E(0,@TwDrawdownAmt,#L2r05DuePayAmt)
-! E(0,@UsDrawdownAmt,#L2r05DuePayAmt)
 IF(#FKEY==0,E(0,@BormNo,#L2r05BormNo+1),$)
 T(2,@NotYetFlag,#L2r05CloseFg)
 T(2,@CompensateFlag,#L2r05CompensateFlag)
@@ -822,7 +821,6 @@ T(H,@RateCodeX,#RateCode,#FacmRateCodeHelp)
 T(H,@AcctCodeX,#AcctCode,#FacmAcctCodeHelp)
 T(H,@AmortizedCodeX,#AmortizedCode,#FacmAmortizedCodeHelp)
 T(H,@FreqBaseX,#FreqBase,#FreqBase2Help)
-! T(H,@CustTypeCodeX,#CustTypeCode,#CustTypeCodeHelp)
 T(H,@NotYetFlagX,#NotYetFlag,#YNHelp)
 T(H,@CompensateFlagX,#CompensateFlag,#YNHelp)
 T(H,@RepayCodeX,#RepayCode,#RepayCodeHelp)
@@ -833,7 +831,6 @@ T(H,@RelationCodeX,#RelationCode,#RelationCodeHelp)
 T(H,@IntCalcCodeX,#IntCalcCode,#ProdIntCalcCodeHelp)
 T(H,@PayIntFreqX,#FreqBase,#FreqBase2Help)
 T(H,@RepayFreqX,#FreqBase,#FreqBase2Help)
-!T(A,@RELACCTERRX,#RELACCTERR,L3DEF,ACCTERRDEF,ACCTERR,ACCTERRX)
 
 #SendL2r01=X,1,S
 E(0,@RimFuncCode,5)
@@ -847,18 +844,6 @@ T(2,@ProdName,#L2r01ProdName)
 #EffectDate=D,7,S
 E(0,#SYSDATE)
 
-#SendL2r06=X,1,S
-T(2,@RimCurrencyCode,#L2r05CurrencyCode)
-T(2,@RimBaseRateCode,#BaseRateCode)
-E(0,@RimEffectDate,#EffectDate)
-E(0,@RimEffectTime,0)
-RESET_RIM(#SendL2r06,L2R06)
-S(L2R06,1,#RimTxCode,#RimCurrencyCode,#RimBaseRateCode,#RimEffectDate,#RimEffectTime)
-R(1,L2R06)
-E(0,@BaseRate,#L2r06Rate)
-E(0,@ProdRate,#BaseRate+#L2r01ProdIncr)
-E(0,@ApproveRate,#BaseRate+#RateIncr)
-C(3,#BaseRateCode,99,E(0,@ApproveRate,#L2r05ApproveRate),$)
 
 #SendL2r09A=X,1,S
 C(3,#RepayCode,2,$,S)
@@ -917,10 +902,8 @@ E(0,@TwFinalBal,0)
 E(0,@UsFinalBal,0)
 HIDE(#TwDrawdownAmt,#UsDrawdownAmt,#TwAcctFee,#UsAcctFee,#GraceDate)
 SHOW(#DrawdownAmtX,#GraceDateX,#LbAcctFee)
-! CALL2(#ADJUSTDOT,#PRECISION,#L2r05DuePayAmt,#DrawdownAmtX)
 
 #WKHIDEAMT=X,1,S
-! C(5,#L2r01CharCode,2,S,$)
 C(3,#PRECISION,0,SHOW(#TwDrawdownAmt,#TwAcctFee,#TwHandlingFee,#TwFinalBal,#TwPieceCodeSecondAmt)
                  HIDE(#UsDrawdownAmt,#UsAcctFee,#UsHandlingFee,#UsFinalBal,#UsPieceCodeSecondAmt,#LbAcctFee)
                 ,HIDE(#TwDrawdownAmt,#TwAcctFee,#TwHandlingFee,#TwFinalBal,#TwPieceCodeSecondAmt,#LbAcctFee)
@@ -937,10 +920,6 @@ HIDE(#TwAcctFee,#UsAcctFee)
 C(3,#PRECISION,0,X(#LbTwAcctFee),X(#LbUsAcctFee))
 P(L,#LbAcctFee)
 
-
-
-
-
 ![業務科目]
 !依核准額度自動顯示不必輸入 L2R05
 #FdAcctCode=X,2,L
@@ -956,9 +935,11 @@ T(H,#AcctCode,#FacmAcctCodeHelp)
 
 #DrawdownCode=A,1,I
 C(3,#HIDE4FG,0,CALL(#HIDEP4),$)
+C(3,#FKEY,7,C(3,#FKEY7DrawdownCode,3,s,$),$)
 HELP(#DrawdownCodeHelp)
 C(3,#FKEY,0,E(0,1),$)
 @V(H,#DrawdownCodeHelp)
+C(3,#FKEY,7,C(3,#FKEY7DrawdownCode,3,$,V(2,3)),$)
 
 #DrawdownCodeX=X,10,L
 C(3,#DrawdownCode,0,S,$)T(H,#DrawdownCode,#DrawdownCodeHelp)
@@ -974,6 +955,12 @@ C(3,#DrawdownCode,0,S,$)T(H,#DrawdownCode,#DrawdownCodeHelp)
 #Available=+m,14.2,S
 E(0,#L2r05AvailableAmt+#BeforeDrawdownAmt-#L2r05RvDrawdownAmt)
 ! E(0,#L2r05AvailableAmt+#BeforeDrawdownAmt-#L2r05RvDrawdownAmt)
+#AvailableCl=+m,14.2,S
+E(0,#L2r05AvailableCl)
+#AvailableClX=X,22,S
+CALL2(#ADJUSTDOT,#PRECISION,#AvailableCl,#AvailableClX)
+#AvailableClXX=X,100,S
+T(2,擔保品限額：+#AvailableClX)
 
 #AvailableX=X,22,S
 CALL2(#ADJUSTDOT,#PRECISION,#Available,#AvailableX)
@@ -981,7 +968,7 @@ CALL2(#ADJUSTDOT,#PRECISION,#Available,#AvailableX)
 #AvailableXX=X,100,S
 T(2,可使用額度：+#AvailableX)
 IF(#L2r05LimitFlag=="F",T(2,F：核准額度限額：+#AvailableX),$)
-IF(#L2r05LimitFlag=="C",T(2,C：擔保品限額：+#AvailableX),$)
+IF(#L2r05LimitFlag=="C",T(2,C：擔保品限額：+#AvailableCl),$)
 IF(#L2r05LimitFlag=="S",T(2,S：合併額度控管限額：+#AvailableX),$)
 
 ![撥款金額]
@@ -991,12 +978,15 @@ IF(#L2r05LimitFlag=="S",T(2,S：合併額度控管限額：+#AvailableX),$)
 #TwDrawdownAmt=m,14,I
 C(3,#PRECISION,0,$,S)
 C(5,#L2r01CharCode,2,s,$)
+C(3,#FKEY,7,s,$)
 @V(2,0)
 IF(#TwDrawdownAmt>#Available,V(P,#AvailableXX),$)
+IF(#TwDrawdownAmt>#AvailableCl,ALERT(#AvailableClXX),$)
 
 #UsDrawdownAmt=m,14.2,I
 C(3,#PRECISION,0,S,$)
 C(5,#L2r01CharCode,2,s,$)
+C(3,#FKEY,7,s,$)
 @V(2,0)
 IF(#UsDrawdownAmt>#Available,V(P,#AvailableXX),$)
 
@@ -1035,6 +1025,18 @@ C(3,#DrawdownCode,3,E(0,#DrawdownDate)ASGN(SPANDY$),E(0,0)ASGN(SPANDY$))
 E(0,#DrawdownDate)
 ASGN(SPANDY$)
 
+#SendL2r06=X,1,S
+T(2,@RimCurrencyCode,#L2r05CurrencyCode)
+T(2,@RimBaseRateCode,#BaseRateCode)
+E(0,@RimEffectDate,#DrawdownDate)
+E(0,@RimEffectTime,0)
+RESET_RIM(#SendL2r06,L2R06)
+S(L2R06,1,#RimTxCode,#RimCurrencyCode,#RimBaseRateCode,#RimEffectDate,#RimEffectTime)
+R(1,L2R06)
+E(0,@BaseRate,#L2r06Rate)
+E(0,@ProdRate,#BaseRate+#L2r01ProdIncr)
+E(0,@ApproveRate,#BaseRate+#RateIncr)
+C(3,#BaseRateCode,99,E(0,@ApproveRate,#L2r05ApproveRate),$)
 
 #WKFADJDATE=D,8,S
 D(7,2,#DrawdownDate,#FirstRateAdjFreq,0)

@@ -1021,6 +1021,7 @@ public class NegReportCom extends CommBuffer {
 				String AcDate = lData[8];// 會計日
 				String TitaTlrNo = lData[21];// 經辦
 				String TitaTxtNo = lData[22];// 交易序號
+				int custno = Integer.parseInt(lData[4]);//戶號
 
 				// ---L5707 不計算只壓日期
 				if ("NegTrans".equals(UseDb)) {
@@ -1029,6 +1030,7 @@ public class NegReportCom extends CommBuffer {
 					tNegTransId.setAcDate(Integer.parseInt(AcDate));
 					tNegTransId.setTitaTlrNo(TitaTlrNo);
 					tNegTransId.setTitaTxtNo(Integer.parseInt(TitaTxtNo));
+					tNegTransId.setCustNo(custno); // 戶號
 					NegTrans tNegTrans = sNegTransService.holdById(tNegTransId, titaVo);
 					NegTrans beforeNegTrans = (NegTrans) dataLog.clone(tNegTrans);
 
@@ -1236,6 +1238,7 @@ public class NegReportCom extends CommBuffer {
 				tNegTransId.setAcDate(tNegAppr01.getNegAppr01Id().getAcDate());
 				tNegTransId.setTitaTlrNo(tNegAppr01.getNegAppr01Id().getTitaTlrNo());
 				tNegTransId.setTitaTxtNo(tNegAppr01.getNegAppr01Id().getTitaTxtNo());
+				tNegTransId.setCustNo(tNegAppr01.getCustNo()); // 戶號
 				this.info("NegReportCom BatchTx01 tNegAppr01=[" + tNegAppr01.getNegAppr01Id().toString() + "]");
 				this.info("NegReportCom BatchTx01 tNegTransId=[" + tNegTransId.toString() + "]");
 				NegTrans tNegTrans = sNegTransService.findById(tNegTransId, titaVo);

@@ -126,6 +126,7 @@ public class L5708 extends TradeBuffer {
 					NegTransIdVO.setAcDate(NegAppr01VO.getAcDate());
 					NegTransIdVO.setTitaTlrNo(NegAppr01VO.getTitaTlrNo());
 					NegTransIdVO.setTitaTxtNo(NegAppr01VO.getTitaTxtNo());
+					NegTransIdVO.setCustNo(NegAppr01VO.getCustNo());
 
 					if (!DistinctNegTransId.contains(NegTransIdVO)) {
 						DistinctNegTransId.add(NegTransIdVO);

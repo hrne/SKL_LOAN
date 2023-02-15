@@ -207,6 +207,7 @@ public class L597A extends TradeBuffer {
 					NegTransIdVO.setAcDate(parse.stringToInteger(DcToRoc(lData[8])));
 					NegTransIdVO.setTitaTlrNo(lData[21]);
 					NegTransIdVO.setTitaTxtNo(parse.stringToInteger(lData[22]));
+					NegTransIdVO.setCustNo(parse.stringToInteger(lData[4]));
 
 					NegTrans NegTransVO = new NegTrans();
 					NegTransVO = sNegTransService.findById(NegTransIdVO, titaVo);

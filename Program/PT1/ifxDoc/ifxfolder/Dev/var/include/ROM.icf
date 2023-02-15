@@ -1856,6 +1856,7 @@ TXFORM=L2R04
 #L2r05BormNo=A,3,S
 #L2r05DueAmt=m,14.2,S
 #L2r05AvailableAmt=+m,14.2,S
+#L2r05AvailableCl=+m,14.2,S
 #L2r05LimitFlag=X,1,S
 #L2r05BaseRate=n,2.4,S
 #L2r05CloseFg=X,1,S
@@ -1986,6 +1987,7 @@ TXFORM=L2R05
 #L2r05BormNo
 #L2r05DueAmt
 #L2r05AvailableAmt
+#L2r05AvailableCl
 #L2r05LimitFlag
 #L2r05BaseRate
 #L2r05CloseFg
@@ -2104,8 +2106,8 @@ TXFORM=L2R08
 
 !尋找行庫資料檔
 <L2R09.dec>
-#L2r09BankItem=X,50,S
-#L2r09BranchItem=X,50,S
+#L2r09BankItem=x,50,S
+#L2r09BranchItem=x,50,S
 </L2R09.dec>
 
 <L2R09.tom>
@@ -8870,8 +8872,8 @@ TXFORM=L5R38
 <L6R01.dec>
 #L6R01BankCode=X,3,S
 #L6R01BranchCode=X,4,S
-#L6R01BankItem=X,100,S
-#L6R01BranchItem=X,100,S
+#L6R01BankItem=x,100,S
+#L6R01BranchItem=x,100,S
 </L6R01.dec>
 
 <L6R01.tom>
@@ -9601,7 +9603,10 @@ TXFORM=L6R27
 #L6R28AcctCode320B=N,3,S
 #L6R28AcctCode330A=N,3,S
 #L6R28AcctCode330B=N,3,S
-#L6R28ReduceAmtLimit=N,5,S
+#L6R28ReduceAmtLimit1=N,5,S
+#L6R28ReduceAmtLimit2=N,5,S
+#L6R28ReduceAmtLimit3=N,5,S
+#L6R28CoreRemitLimit=m,14,S
 #L6R28PreRepayTerms=N,3,S
 #L6R28PreRepayTermsBatch=N,3,S
 #L6R28ShortPrinPercent=N,3,S
@@ -9659,7 +9664,10 @@ TXFORM=L6R28
 #L6R28AcctCode320B
 #L6R28AcctCode330A
 #L6R28AcctCode330B
-#L6R28ReduceAmtLimit
+#L6R28ReduceAmtLimit1
+#L6R28ReduceAmtLimit2
+#L6R28ReduceAmtLimit3
+#L6R28CoreRemitLimit
 #L6R28PreRepayTerms
 #L6R28PreRepayTermsBatch
 #L6R28ShortPrinPercent

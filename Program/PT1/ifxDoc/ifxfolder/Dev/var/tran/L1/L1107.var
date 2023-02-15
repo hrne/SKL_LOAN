@@ -289,7 +289,7 @@ T(3,CdCode.OfficeType)
 #CDDEF0006=x,20,S
 T(3,CdCode.ChangeReason)
 #ChangeReasonHelp=x,1024,S
- 
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
 S(XXR99,01,#CDDEF0001,#CDDEF0002,#CDDEF0003,#CDDEF0004,#CDDEF0005,#CDDEF0006)
@@ -301,7 +301,6 @@ T(2,@ReportTypeHelp,#HelpDesc3)
 T(2,@OpinionHelp,#HelpDesc4)
 T(2,@OfficeTypeHelp,#HelpDesc5)
 T(2,@ChangeReasonHelp,#HelpDesc6)
-
 
 !功能 下拉式選單 1: 新增 2:修改 3:複製 4:刪除;5:查詢
 #FunCd=A,1,S
@@ -469,11 +468,11 @@ CALL(#ReviewInterestCoverageRatio2Proc)
 #RimCustNo=A,7,S
 #RimDataYear=A,7,S
 #RimFunCd=A,1,S
-
+ALERT(#FunCd)
 !統一編號
 #CustId=X,8,I
-C(3,#FunCd,1,$,s)
-C(3,#FunCd,3,$,s)
+C(3,#FunCd,1,I,s)
+!C(5,#FunCd,3,$,s)
 @
 V(7)
 A(ID_UNINO,0,#CustId)
@@ -1435,7 +1434,7 @@ C(4,#ChangeReason,$,V(H,#ChangeReasonHelp))
 T(H,#ChangeReason,#ChangeReasonHelp)
 
 #init6=x,1,S
-IF(#FunCd==1 || #FunCd==2,s,$)
+IF(#FunCd==1 || #FunCd==2 || #FunCd==3,s,$)
 HIDE(#ReportType)
 HIDE(#Opinion)
 HIDE(#IsCheck)

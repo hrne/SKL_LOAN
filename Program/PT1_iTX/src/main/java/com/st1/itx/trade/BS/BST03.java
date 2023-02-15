@@ -222,6 +222,7 @@ public class BST03 extends TradeBuffer {
 		tNegTransId.setAcDate(t.getAcDate());
 		tNegTransId.setTitaTlrNo(t.getTitaTlrNo());
 		tNegTransId.setTitaTxtNo(parse.stringToInteger(t.getTitaTxtNo()));
+		tNegTransId.setCustNo(t.getCustNo()); // 戶號
 		tNegTrans.setNegTransId(tNegTransId);
 		// 正常交易新增、訂正交易要刪除
 		if (this.txBuffer.getTxCom().getBookAcHcode() == 0) { // 帳務訂正記號 AcHCode 0.正常 1.訂正 2.3.沖正
@@ -229,7 +230,6 @@ public class BST03 extends TradeBuffer {
 			if (tNegMain == null) {
 				throw new LogicException(titaVo, "E6003", "BST03 非債協戶 " + t.getCustNo());
 			}
-			tNegTrans.setCustNo(t.getCustNo()); // 戶號
 			tNegTrans.setCaseSeq(tNegMain.getCaseSeq()); // 案件序號
 			tNegTrans.setEntryDate(t.getEntryDate()); // 入帳日期
 			tNegTrans.setTxStatus(0); // 交易狀態 0:未入帳

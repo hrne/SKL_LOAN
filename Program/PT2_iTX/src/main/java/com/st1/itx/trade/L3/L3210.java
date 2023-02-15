@@ -287,14 +287,26 @@ public class L3210 extends TradeBuffer {
 		// 貸方 暫收及待結轉帳項-擔保放款
 		switch (iTempReasonCode) {
 		case 0: // 債協暫收款
-			// 貸方 債協暫收款
+			// 貸方 :最大債權 => 債協暫收款、一般債權 => 暫收可抵繳
+			String acctCode = acNegCom.getAcctCode(iCustNo, titaVo);
 			acDetail = new AcDetail();
 			acDetail.setDbCr("C");
-			acDetail.setAcctCode(acNegCom.getAcctCode(iCustNo, titaVo));
-			acDetail.setSumNo("094"); // 轉債協暫收款
+			acDetail.setAcctCode(acctCode);
 			acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
 			acDetail.setTxAmt(iTempAmt);
 			acDetail.setCustNo(iCustNo);
+			if ("TAV".equals(acctCode)) {
+				TempVo tempVo = new TempVo();
+				tempVo = acNegCom.getReturnAcctCode(iCustNo, titaVo);
+				acDetail.setCustNo(parse.stringToInteger(tempVo.getParam("CustNo")));
+				acDetail.setFacmNo(parse.stringToInteger(tempVo.getParam("FacmNo")));
+				acDetail.setSumNo("092"); // 轉暫收款可抵繳
+				acDetail.setSlipNote("一般債權");
+				//acDetail.setJsonFields(tTempVo.getJsonString());
+
+			} else {
+				acDetail.setSumNo("094"); // 轉債協暫收款
+			}
 			lAcDetail.add(acDetail);
 			this.info("SlipNote = " + acDetail.getSlipNote());
 			addLoanBorTxRoutine(acDetail);
@@ -303,15 +315,6 @@ public class L3210 extends TradeBuffer {
 				List<AcDetail> lAcDetailApp02 = new ArrayList<AcDetail>();
 				lAcDetailApp02 = acNegCom.getNegAppr02CustNo(iEntryDate, iTempAmt, iCustNo, titaVo);
 				if (lAcDetailApp02.size() > 0) {
-					acDetail = new AcDetail();
-					acDetail.setDbCr("D");
-					acDetail.setAcctCode(acNegCom.getAcctCode(iCustNo, titaVo));
-					acDetail.setSumNo("094"); // 轉債協暫收款
-					acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
-					acDetail.setTxAmt(iTempAmt);
-					acDetail.setCustNo(iCustNo);
-					lAcDetail.add(acDetail);
-					// 貸 : 一般債權人撥付款
 					lAcDetail.addAll(lAcDetailApp02);
 					this.info("SlipNote2 = " + acDetail.getSlipNote());
 				}

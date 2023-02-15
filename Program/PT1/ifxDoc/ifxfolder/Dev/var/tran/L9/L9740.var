@@ -47,15 +47,15 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,750];printer.width=[20,20];">
 [
 ["[L9740]                                 公會無自用住宅利率報送"],
-["","@@@@@(Q9309141)新撥款之借戶"],
+["","@@@@@新撥款之借戶"],
 ["@撥款期間",#DrawDownDateA1,"～",#DrawDownDateA2],
 ["@業務科目",#AcctCodeA,#AcctCodeAX],
 ["@是否排除借新還舊",#RenewFlagA,#RenewFlagAX],
-["","@@@@@(Q9309142)續期放款利率 最低、最高"],
+["","@@@@@續期放款利率 最低、最高"],
 ["@撥款日期前(含)",#DrawDownDateB1],
 ["@業務科目",#AcctCodeB,#AcctCodeBX],
 ["@戶況",#StatusB,#StatusBX],
-["","@@@@@(Q9309143)利率超過之借戶"],
+["","@@@@@利率超過之借戶"],
 ["@撥款日期前(含)",#DrawDownDateC1],
 ["@業務科目",#AcctCodeC,#AcctCodeCX],
 ["@戶況",#StatusC,#StatusCX],

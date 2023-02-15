@@ -46,7 +46,10 @@ E(0,0)
 [#<->#,"#FdAcctCode310A+擔保放款年限","短期",#AcctCode310A,"年～",#AcctCode310B,"年 ， 中期"
                                             ,#AcctCode320A,"年以上～",#AcctCode320B,"年 ， 長期"
                                             ,#AcctCode330A,"年以上～",#AcctCode330B,"年"],
-[#<->#,"#FdReduceAmtLimit+減免金額限額",#ReduceAmtLimit],
+[#<->#,"#FdReduceAmtLimit1+經辦減免金額限額",#ReduceAmtLimit1],
+[#<->#,"#FdReduceAmtLimit2+課主管金額限額",#ReduceAmtLimit2],
+[#<->#,"#FdReduceAmtLimit3+部主管金額限額",#ReduceAmtLimit3],
+[#<->#,"#FdCoreRemitLimit+核心匯款金額上限",#CoreRemitLimit],
 ["#FdPreRepayTerms+單筆預收期數",#PreRepayTerms],["#FdPreRepayTermsBatch+批次預收期數",#PreRepayTermsBatch],
 ["#FdShortPrinPercent+回收時可短繳本金金額之百分比",#ShortPrinPercent," 限額",#ShortPrinLimit],
 ["#FdShortIntPercent+回收時可短繳利息金額之百分比",#ShortIntPercent],
@@ -118,7 +121,13 @@ T(3,*)
 !!T(3,*)
 #FdEmpNoList=X,2,L
 T(3,*)
-#FdReduceAmtLimit=X,2,L
+#FdReduceAmtLimit1=X,2,L
+T(3,*)
+#FdReduceAmtLimit2=X,2,L
+T(3,*)
+#FdReduceAmtLimit3=X,2,L
+T(3,*)
+#FdCoreRemitLimit=X,2,L
 T(3,*)
 #FdPreRepayTerms=X,2,L
 T(3,*)
@@ -269,7 +278,10 @@ E(0,@AcctCode320A,#L6R28AcctCode320A)
 E(0,@AcctCode320B,#L6R28AcctCode320B)
 E(0,@AcctCode330A,#L6R28AcctCode330A)
 E(0,@AcctCode330B,#L6R28AcctCode330B)
-E(0,@ReduceAmtLimit,#L6R28ReduceAmtLimit)
+E(0,@ReduceAmtLimit1,#L6R28ReduceAmtLimit1)
+E(0,@ReduceAmtLimit2,#L6R28ReduceAmtLimit2)
+E(0,@ReduceAmtLimit3,#L6R28ReduceAmtLimit3)
+E(0,@CoreRemitLimit,#L6R28CoreRemitLimit)
 E(0,@PreRepayTerms,#L6R28PreRepayTerms)
 E(0,@PreRepayTermsBatch,#L6R28PreRepayTermsBatch)
 E(0,@ShortPrinPercent,#L6R28ShortPrinPercent)
@@ -434,8 +446,15 @@ T(H,#PostDeductMethod,#DeductMethodHelp)
 #AcctCode330B=N,3,I
 @V(5,#AcctCode330A,999)
 
-! 減免金額限額
-#ReduceAmtLimit=N,5,I
+! 經辦減免金額限額
+#ReduceAmtLimit1=N,5,I
+! 課主管減免金額限額
+#ReduceAmtLimit2=N,5,I
+! 部主管減免金額限額
+#ReduceAmtLimit3=N,5,I
+
+!核心匯款金額上限
+#CoreRemitLimit=m,14,I
 
 ! 單筆預收期數
 #PreRepayTerms=N,3,I
@@ -558,7 +577,10 @@ T(3,[L6501] 系統變數及系統值設定)
 #AcctCode320B
 #AcctCode330A
 #AcctCode330B
-#ReduceAmtLimit
+#ReduceAmtLimit1
+#ReduceAmtLimit2
+#ReduceAmtLimit3
+#CoreRemitLimit
 #PreRepayTerms
 #PreRepayTermsBatch
 #ShortPrinPercent

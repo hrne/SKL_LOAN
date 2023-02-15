@@ -60,13 +60,14 @@ public class L5R03 extends TradeBuffer {
 		String RimTitaTxtNo = titaVo.getParam("RimTitaTxtNo").trim();// 交易序號NegTrans-Key
 		String RimTrialFunc = titaVo.getParam("RimTrialFunc").trim();// 測試是否為一開始的,還是後面修改後的調Rim 0:一開始試算 1:異動後 試算 2:UPDATE
 		String RimTxKind = titaVo.getParam("RimTxKind").trim();// 交易別
-
+		int RimCustNo = parse.stringToInteger(titaVo.getParam("RimCustNo").trim());
 		// 1.得到NegTrans資料取用NegMains資料
 		NegTransId NegTransIdVO = new NegTransId();
 		int AcDate = parse.stringToInteger(RimAcDate);
 		NegTransIdVO.setAcDate(AcDate);
 		NegTransIdVO.setTitaTlrNo(RimTitaTlrNo);
 		NegTransIdVO.setTitaTxtNo(parse.stringToInteger(RimTitaTxtNo));
+		NegTransIdVO.setCustNo(RimCustNo);
 		this.info("L5R03 NegTransIdVO AcDate=[" + AcDate + "],TitaTlrNo=[" + RimTitaTlrNo + "],TitaTxtNo=[" + RimTitaTxtNo + "]");
 
 		NegTrans NegTransVO = new NegTrans();

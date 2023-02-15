@@ -1564,6 +1564,7 @@ public class NegCom extends CommBuffer {
 			tNegTransId.setAcDate(tranAcDate);// 會計日期
 			tNegTransId.setTitaTlrNo(tranTitaTlrNo);// 經辦
 			tNegTransId.setTitaTxtNo(tranTitaTxtNo);// 交易序號
+			tNegTransId.setCustNo(custNo); // 戶號
 			NegTrans tNegTrans = sNegTransService.holdById(tNegTransId, titaVo);
 			if (tNegTrans == null) {
 				throw new LogicException(titaVo, "E0006", "債務協商交易檔");

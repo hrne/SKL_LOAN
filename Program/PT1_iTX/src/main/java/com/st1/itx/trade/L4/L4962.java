@@ -584,7 +584,7 @@ public class L4962 extends TradeBuffer {
 						: String.valueOf(tInsuRenew.getInsuYearMonth())); // 年月
 		data.put("CustNo", String.valueOf(tInsuRenew.getCustNo()));// 戶號
 		data.put("FacmNo", String.valueOf(tInsuRenew.getFacmNo()));// 額度
-		data.put("CustName", String.valueOf(StringCut.replaceLineUp(tCustMain.getCustName())));// 戶名
+		data.put("CustName", StringCut.replaceLineUp(tCustMain.getCustName()));// 戶名
 		data.put("PrevInsuNo", String.valueOf(tInsuRenew.getPrevInsuNo()));// 原保單號碼
 		data.put("InsuStartDate", String.valueOf(tInsuRenew.getInsuStartDate()));// 保險起日
 		data.put("InsuEndDate", String.valueOf(tInsuRenew.getInsuEndDate()));// 保險迄日
@@ -640,7 +640,7 @@ public class L4962 extends TradeBuffer {
 		data.put("YearMonth", String.valueOf(tInsuOrignal.getInsuEndDate() / 100)); // 年月
 		data.put("CustNo", String.valueOf(custno));// 戶號
 		data.put("FacmNo", String.valueOf(facmno));// 額度
-		data.put("CustName", String.valueOf(StringCut.replaceLineUp(tCustMain.getCustName())));// 戶名
+		data.put("CustName", StringCut.replaceLineUp(tCustMain.getCustName()));// 戶名
 		data.put("PrevInsuNo", String.valueOf(tInsuOrignal.getOrigInsuNo()));// 原保單號碼
 		data.put("InsuStartDate", String.valueOf(tInsuOrignal.getInsuStartDate()));// 保險起日
 		data.put("InsuEndDate", String.valueOf(tInsuOrignal.getInsuEndDate()));// 保險迄日

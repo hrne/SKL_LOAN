@@ -298,25 +298,25 @@ public class L9706Report extends MakeReport {
 
 		switch (tL9706Vo.get("ProdNo").trim().toUpperCase()) {
 		case "IA":
-			loanKind = "青年優專房屋貸款暨信用保證專案";
+			loanKind = "  青年優專房屋貸款暨信用保證專案";
 			break;
 		case "IB":
-			loanKind = "四千億元優惠購物專案貸款";
+			loanKind = "  四千億元優惠購物專案貸款";
 			break;
 		case "IC":
-			loanKind = "續辦二千億元優惠購屋專案貸款";
+			loanKind = "  續辦二千億元優惠購屋專案貸款";
 			break;
 		case "ID":
 		case "IE":
-			loanKind = "續辦四千八百億元優惠購屋專案貸款";
+			loanKind = "  續辦四千八百億元優惠購屋專案貸款";
 			break;
 		case "IF":
 		case "IG":
-			loanKind = "續辦六千億元優惠購屋專案貸款";
+			loanKind = "  續辦六千億元優惠購屋專案貸款";
 			break;
 		case "IH":
 		case "II":
-			loanKind = "增撥新台幣四千億元優惠購屋專案貸款";
+			loanKind = "  增撥新台幣四千億元優惠購屋專案貸款";
 			break;
 		default:
 			break;
@@ -324,7 +324,7 @@ public class L9706Report extends MakeReport {
 
 		if (!loanKind.isEmpty()) {
 			this.print(1, 0, "");
-			this.print(1, 3, "本案為政府優惠房屋貸款 ： " + loanKind);
+			this.print(1, 3, "  本案為政府優惠房屋貸款 ： " + loanKind);
 		}
 
 		this.print(1, 0, "");

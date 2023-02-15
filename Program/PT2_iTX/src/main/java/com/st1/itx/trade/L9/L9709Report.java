@@ -33,18 +33,23 @@ public class L9709Report extends MakeReport {
 	@Override
 	public void printHeader() {
 
-		// this.setFontSize(13);
-		this.print(-2, 23, "暫收放貸核心傳票檔資料");
-		this.print(-2, 50, "印表日期：" + showRocDate(this.nowDate, 1));
-		this.print(-3, 1, "會計日期：" + showRocDate(startDate, 1) + " ~ " + showRocDate(endDate, 1));
-		this.print(-3, 50, "印表時間：" + showTime(this.nowTime));
+		this.print(-2, this.getMidXAxis(), "暫收放貸核心傳票檔資料","C");
+		this.print(-2, 80, "印表日期：" + showRocDate(this.nowDate, 1));
+		this.print(-3, 2, "會計日期：" + showRocDate(startDate, 1) + " ~ " + showRocDate(endDate, 1));
+		this.print(-3, 80, "印表時間：" + showTime(this.nowTime));
 //		this.print(-5, 1, "  科目             借方金額           貸方金額");
-		this.print(-5, 1, "會計日期");
-		this.print(-5, 13, " 會計科目");
-		this.print(-5, 39, "借方金額","R");
-		this.print(-5, 57, "貸方金額","R");
+//		this.print(-5, 1, "會計日期");
+//		this.print(-6, 1, "－－－－");
+		this.print(-5, 2, " 會計科目");
+		this.print(-6, 2, "－－－－－－－－－－－－－－－－－－－－－－－－");
+		this.print(-5, 59, "借方金額", "R");
+		this.print(-6, 61, "－－－－－－", "R");
+		this.print(-5, 77, "貸方金額", "R");
+		this.print(-6, 79, "－－－－－－", "R");
+		this.print(-5, 94, "合計金額", "R");
+		this.print(-6, 96, "－－－－－－", "R");
 		// 明細起始列(自訂亦必須)
-		this.setBeginRow(6);
+		this.setBeginRow(7);
 
 		// 設定明細列數(自訂亦必須)
 		this.setMaxRows(45);
@@ -75,21 +80,19 @@ public class L9709Report extends MakeReport {
 			return;
 		}
 
-		
-
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
 				.setRptCode("L9709").setRptItem("暫收放貸核心傳票檔資料").setSecurity("").setRptSize("A4").setPageOrientation("P")
 				.build();
 
 		this.open(titaVo, reportVo);
-//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9709", "暫收放貸核心傳票檔資料", "", "A4", "P");
 
-		
+		// 明細起始列(自訂亦必須)
 		for (Map<String, String> tL9709Vo : l9709List) {
-			this.print(1, 1, showRocDate(tL9709Vo.get("AcDate"), 1)); //會計日期
-			this.print(0, 13, tL9709Vo.get("AcNoCode")); // 會計科目
-			this.print(0, 39, formatAmt(tL9709Vo.get("DrAmt"), 0), "R"); // 借方金額
-			this.print(0, 57, formatAmt(tL9709Vo.get("CrAmt"), 0), "R"); // 貸方金額
+//			this.print(1, 1, showRocDate(tL9709Vo.get("AcDate"), 1)); // 會計日期
+			this.print(1, 2, tL9709Vo.get("AcNoCode") + "  " + tL9709Vo.get("AcNoItem")); // 會計科目 + 會計科目中文
+			this.print(0, 61, formatAmt(tL9709Vo.get("DbAmt"), 0), "R"); // 借方金額
+			this.print(0, 79, formatAmt(tL9709Vo.get("CrAmt"), 0), "R"); // 貸方金額
+			this.print(0, 96, formatAmt(tL9709Vo.get("Total"), 0), "R"); // 小計金額
 		}
 
 		this.close();

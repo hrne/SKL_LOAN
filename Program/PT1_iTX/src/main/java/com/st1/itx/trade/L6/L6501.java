@@ -18,17 +18,6 @@ import com.st1.itx.util.parse.Parse;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.common.SendRsp;
 
-/**
- * Tita FuncCode=9,1 BusinessType=X,2 GraceDays=9,2 AchAuthOneTime=X,1
- * AchDeductFlag=9,1 PostDeductFlag=9,1 DeductDD1=9,2 DeductDD2=9,2
- * DeductDD3=9,2 DeductDD4=9,2 DeductDD5=9,2 SecondDeductDays=9,2
- * DeductMethod=9,1 LoanDeptCustNo=9,7 NegDeptCustNo=9,7 PerfBackRepayAmt=9,14.2
- * PerfBackPeriodS=9,3 PerfBackPeriodE=9,3 AcctCode310A=9,3 AcctCode310B=9,3
- * AcctCode320A=9,3 AcctCode320B=9,3 AcctCode330A=9,3 AcctCode330B=9,3
- * ReduceAmtLimit=9,5 PreRepayTerms=9,3 ShortPrinPercent=9,3 ShortIntPercent=9,3
- * AmlFg=9,1 AmlUrl=x,50 PerfDate=9,7 AcBookAdjDate=9,7 END=X,1
- */
-
 @Service("L6501")
 @Scope("prototype")
 /**
@@ -161,7 +150,10 @@ public class L6501 extends TradeBuffer {
 		mSystemParas.setAcctCode320B(this.parse.stringToInteger(titaVo.getParam("AcctCode320B")));
 		mSystemParas.setAcctCode330A(this.parse.stringToInteger(titaVo.getParam("AcctCode330A")));
 		mSystemParas.setAcctCode330B(this.parse.stringToInteger(titaVo.getParam("AcctCode330B")));
-		mSystemParas.setReduceAmtLimit(this.parse.stringToInteger(titaVo.getParam("ReduceAmtLimit")));
+		mSystemParas.setReduceAmtLimit1(this.parse.stringToInteger(titaVo.getParam("ReduceAmtLimit1")));
+		mSystemParas.setReduceAmtLimit2(this.parse.stringToInteger(titaVo.getParam("ReduceAmtLimit2")));
+		mSystemParas.setReduceAmtLimit3(this.parse.stringToInteger(titaVo.getParam("ReduceAmtLimit3")));
+		mSystemParas.setCoreRemitLimit(this.parse.stringToBigDecimal(titaVo.getParam("CoreRemitLimit")));
 		mSystemParas.setPreRepayTerms(this.parse.stringToInteger(titaVo.getParam("PreRepayTerms")));
 		mSystemParas.setPreRepayTermsBatch(this.parse.stringToInteger(titaVo.getParam("PreRepayTermsBatch")));
 		mSystemParas.setShortPrinPercent(this.parse.stringToInteger(titaVo.getParam("ShortPrinPercent")));
@@ -173,17 +165,19 @@ public class L6501 extends TradeBuffer {
 
 		mSystemParas.setPerfDate(this.parse.stringToInteger(titaVo.getParam("PerfDate")));
 		mSystemParas.setAcBookAdjDate(this.parse.stringToInteger(titaVo.getParam("AcBookAdjDate")));
-		
+
 		mSystemParas.setLoanMediaFtpUrl(titaVo.getParam("FtpUrl"));
 		mSystemParas.setSmsFtpUrl(titaVo.getParam("SmsFtpUrl"));
 		mSystemParas.setEbsUrl(titaVo.getParam("EbsUrl"));
 		mSystemParas.setIcsUrl(titaVo.getParam("IcsUrl"));
 
 		if (mFuncCode != 2) {
-			mSystemParas.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+			mSystemParas.setCreateDate(
+					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			mSystemParas.setCreateEmpNo(titaVo.getTlrNo());
 		}
-		mSystemParas.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+		mSystemParas
+				.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 		mSystemParas.setLastUpdateEmpNo(titaVo.getTlrNo());
 	}
 }

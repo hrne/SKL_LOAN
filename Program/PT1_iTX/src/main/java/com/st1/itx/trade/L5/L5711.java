@@ -145,7 +145,7 @@ public class L5711 extends TradeBuffer {
 
 	public void updateNegTrans(int mAcDAte, String mTlrNo, int mTxtNo, BigDecimal mApprAmt,int iPayerCustNo, TitaVo titaVo) throws LogicException {
 		this.info("into updateNegTrans ");
-		NegTrans iNegTrans = sNegTransService.findById(new NegTransId(mAcDAte, mTlrNo, mTxtNo), titaVo);
+		NegTrans iNegTrans = sNegTransService.findById(new NegTransId(mAcDAte, mTlrNo, mTxtNo,iPayerCustNo), titaVo);
 		NegTrans beforeNegTrans = (NegTrans) dataLog.clone(iNegTrans);
 
 		if (iNegTrans != null) {

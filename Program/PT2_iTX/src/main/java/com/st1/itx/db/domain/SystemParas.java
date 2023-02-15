@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -182,10 +183,20 @@ public class SystemParas implements Serializable {
   @Column(name = "`AcctCode330B`")
   private int acctCode330B = 0;
 
-  // 減免金額限額
-  /* 超過時需主管刷卡L6501維護預設值=200 */
-  @Column(name = "`ReduceAmtLimit`")
-  private int reduceAmtLimit = 0;
+  // 經辦減免限額
+  /* 超過時需課主管以上刷卡L6501維護預設值=200 */
+  @Column(name = "`ReduceAmtLimit1`")
+  private int reduceAmtLimit1 = 0;
+
+  // 課主管減免限額
+  /* 超過時需部主管以上刷卡L6501維護預設值=3000 */
+  @Column(name = "`ReduceAmtLimit2`")
+  private int reduceAmtLimit2 = 0;
+
+  // 部主管減免限額
+  /* 超過時需副總以上主管刷卡L6501維護預設值=10000 */
+  @Column(name = "`ReduceAmtLimit3`")
+  private int reduceAmtLimit3 = 0;
 
   // 單筆預收期數
   /* L6501維護預設值=0 */
@@ -341,6 +352,11 @@ public class SystemParas implements Serializable {
   /* 範例格式:02-23895858#7279 */
   @Column(name = "`JcicMU1Tel`", length = 16)
   private String jcicMU1Tel;
+
+  // 核心匯款金額上限
+  /* 預設1500萬 */
+  @Column(name = "`CoreRemitLimit`")
+  private BigDecimal coreRemitLimit = new BigDecimal("0");
 
   // 建檔日期時間
   @CreatedDate
@@ -1031,26 +1047,72 @@ N:一日多批
   }
 
 /**
-	* 減免金額限額<br>
-	* 超過時需主管刷卡
+	* 經辦減免限額<br>
+	* 超過時需課主管以上刷卡
 L6501維護
 預設值=200
 	* @return Integer
 	*/
-  public int getReduceAmtLimit() {
-    return this.reduceAmtLimit;
+  public int getReduceAmtLimit1() {
+    return this.reduceAmtLimit1;
   }
 
 /**
-	* 減免金額限額<br>
-	* 超過時需主管刷卡
+	* 經辦減免限額<br>
+	* 超過時需課主管以上刷卡
 L6501維護
 預設值=200
   *
-  * @param reduceAmtLimit 減免金額限額
+  * @param reduceAmtLimit1 經辦減免限額
 	*/
-  public void setReduceAmtLimit(int reduceAmtLimit) {
-    this.reduceAmtLimit = reduceAmtLimit;
+  public void setReduceAmtLimit1(int reduceAmtLimit1) {
+    this.reduceAmtLimit1 = reduceAmtLimit1;
+  }
+
+/**
+	* 課主管減免限額<br>
+	* 超過時需部主管以上刷卡
+L6501維護
+預設值=3000
+	* @return Integer
+	*/
+  public int getReduceAmtLimit2() {
+    return this.reduceAmtLimit2;
+  }
+
+/**
+	* 課主管減免限額<br>
+	* 超過時需部主管以上刷卡
+L6501維護
+預設值=3000
+  *
+  * @param reduceAmtLimit2 課主管減免限額
+	*/
+  public void setReduceAmtLimit2(int reduceAmtLimit2) {
+    this.reduceAmtLimit2 = reduceAmtLimit2;
+  }
+
+/**
+	* 部主管減免限額<br>
+	* 超過時需副總以上主管刷卡
+L6501維護
+預設值=10000
+	* @return Integer
+	*/
+  public int getReduceAmtLimit3() {
+    return this.reduceAmtLimit3;
+  }
+
+/**
+	* 部主管減免限額<br>
+	* 超過時需副總以上主管刷卡
+L6501維護
+預設值=10000
+  *
+  * @param reduceAmtLimit3 部主管減免限額
+	*/
+  public void setReduceAmtLimit3(int reduceAmtLimit3) {
+    this.reduceAmtLimit3 = reduceAmtLimit3;
   }
 
 /**
@@ -1699,6 +1761,25 @@ N:不啟用
   }
 
 /**
+	* 核心匯款金額上限<br>
+	* 預設1500萬
+	* @return BigDecimal
+	*/
+  public BigDecimal getCoreRemitLimit() {
+    return this.coreRemitLimit;
+  }
+
+/**
+	* 核心匯款金額上限<br>
+	* 預設1500萬
+  *
+  * @param coreRemitLimit 核心匯款金額上限
+	*/
+  public void setCoreRemitLimit(BigDecimal coreRemitLimit) {
+    this.coreRemitLimit = coreRemitLimit;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -1782,12 +1863,13 @@ N:不啟用
            + ", postDeductDD1=" + postDeductDD1 + ", postDeductDD2=" + postDeductDD2 + ", postDeductDD3=" + postDeductDD3 + ", postDeductDD4=" + postDeductDD4 + ", postDeductDD5=" + postDeductDD5 + ", postSecondDeductDays=" + postSecondDeductDays
            + ", postDeductMethod=" + postDeductMethod + ", loanDeptCustNo=" + loanDeptCustNo + ", negDeptCustNo=" + negDeptCustNo + ", perfBackRepayAmt=" + perfBackRepayAmt + ", perfBackPeriodS=" + perfBackPeriodS + ", perfBackPeriodE=" + perfBackPeriodE
            + ", empNoList=" + empNoList + ", acctCode310A=" + acctCode310A + ", acctCode310B=" + acctCode310B + ", acctCode320A=" + acctCode320A + ", acctCode320B=" + acctCode320B + ", acctCode330A=" + acctCode330A
-           + ", acctCode330B=" + acctCode330B + ", reduceAmtLimit=" + reduceAmtLimit + ", preRepayTerms=" + preRepayTerms + ", preRepayTermsBatch=" + preRepayTermsBatch + ", shortPrinPercent=" + shortPrinPercent + ", shortPrinLimit=" + shortPrinLimit
-           + ", shortIntPercent=" + shortIntPercent + ", amlFg=" + amlFg + ", amlUrl=" + amlUrl + ", perfDate=" + perfDate + ", acBookCode=" + acBookCode + ", acSubBookCode=" + acSubBookCode
-           + ", acBookAdjDate=" + acBookAdjDate + ", ebsFg=" + ebsFg + ", ebsUrl=" + ebsUrl + ", ebsAuth=" + ebsAuth + ", loanMediaFtpUrl=" + loanMediaFtpUrl + ", loanMediaFtpAuth=" + loanMediaFtpAuth
-           + ", smsFtpUrl=" + smsFtpUrl + ", smsFtpAuth=" + smsFtpAuth + ", smsFtpFlag=" + smsFtpFlag + ", jcicEmpName=" + jcicEmpName + ", jcicEmpTel=" + jcicEmpTel + ", autoBatchFg=" + autoBatchFg
-           + ", batchFireFeeFg=" + batchFireFeeFg + ", icsFg=" + icsFg + ", icsUrl=" + icsUrl + ", icsBatchMaxCount=" + icsBatchMaxCount + ", insuSettleDate=" + insuSettleDate + ", jcicZDep=" + jcicZDep
-           + ", jcicZName=" + jcicZName + ", jcicZTel=" + jcicZTel + ", jcicMU1Dep=" + jcicMU1Dep + ", jcicMU1Name=" + jcicMU1Name + ", jcicMU1Tel=" + jcicMU1Tel + ", createDate=" + createDate
-           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", acctCode330B=" + acctCode330B + ", reduceAmtLimit1=" + reduceAmtLimit1 + ", reduceAmtLimit2=" + reduceAmtLimit2 + ", reduceAmtLimit3=" + reduceAmtLimit3 + ", preRepayTerms=" + preRepayTerms + ", preRepayTermsBatch=" + preRepayTermsBatch
+           + ", shortPrinPercent=" + shortPrinPercent + ", shortPrinLimit=" + shortPrinLimit + ", shortIntPercent=" + shortIntPercent + ", amlFg=" + amlFg + ", amlUrl=" + amlUrl + ", perfDate=" + perfDate
+           + ", acBookCode=" + acBookCode + ", acSubBookCode=" + acSubBookCode + ", acBookAdjDate=" + acBookAdjDate + ", ebsFg=" + ebsFg + ", ebsUrl=" + ebsUrl + ", ebsAuth=" + ebsAuth
+           + ", loanMediaFtpUrl=" + loanMediaFtpUrl + ", loanMediaFtpAuth=" + loanMediaFtpAuth + ", smsFtpUrl=" + smsFtpUrl + ", smsFtpAuth=" + smsFtpAuth + ", smsFtpFlag=" + smsFtpFlag + ", jcicEmpName=" + jcicEmpName
+           + ", jcicEmpTel=" + jcicEmpTel + ", autoBatchFg=" + autoBatchFg + ", batchFireFeeFg=" + batchFireFeeFg + ", icsFg=" + icsFg + ", icsUrl=" + icsUrl + ", icsBatchMaxCount=" + icsBatchMaxCount
+           + ", insuSettleDate=" + insuSettleDate + ", jcicZDep=" + jcicZDep + ", jcicZName=" + jcicZName + ", jcicZTel=" + jcicZTel + ", jcicMU1Dep=" + jcicMU1Dep + ", jcicMU1Name=" + jcicMU1Name
+           + ", jcicMU1Tel=" + jcicMU1Tel + ", coreRemitLimit=" + coreRemitLimit + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

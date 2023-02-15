@@ -38,17 +38,25 @@ public class L9709ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String sql = " ";
 		sql += " SELECT A.\"AcNoCode\"";
-		sql += "      , A.\"AcDate\"";
+		sql += "      , C.\"AcNoItem\"";
 		sql += "      , SUM(NVL(A.\"DbAmt\",0)) AS \"DbAmt\" ";
 		sql += "      , SUM(NVL(A.\"CrAmt\",0)) AS \"CrAmt\" ";
+		sql += "      , SUM( ";
+		sql += "		  CASE ";
+		sql += "      	    WHEN SUBSTR(A.\"AcNoCode\",1,1) IN ('1','5','6','9')";
+		sql += "            THEN NVL(A.\"DbAmt\",0) - NVL(A.\"CrAmt\",0)";
+		sql += "            ELSE NVL(A.\"CrAmt\",0) - NVL(A.\"DbAmt\",0)";
+		sql += "          END ) AS \"Total\"";
 		sql += " FROM   \"AcMain\" A ";
+		sql += " LEFT JOIN \"CdAcCode\" C ON C.\"AcNoCode\" = A.\"AcNoCode\" ";
+		sql += "   						 AND C.\"AcSubCode\" = '     ' ";
+		sql += "   						 AND C.\"AcDtlCode\" = '  ' ";
 		sql += " WHERE A.\"AcDate\" >= :startDate ";
 		sql += "   AND A.\"AcDate\" <= :endDate ";
 		sql += "   AND A.\"AcNoCode\" IN ('20222180000', '20222180100', '20222180200','20222060000') ";
-		sql += " GROUP BY A.\"AcDate\" ";
-		sql += " 		 ,A.\"AcNoCode\" ";
-		sql += " ORDER BY A.\"AcDate\" ";
-		sql += " 		 ,A.\"AcNoCode\" ";
+		sql += " GROUP BY A.\"AcNoCode\" ";
+		sql += " 		 ,C.\"AcNoItem\" ";
+		sql += " ORDER BY A.\"AcNoCode\" ASC";
 		this.info("sql=" + sql);
 		Query query;
 

@@ -114,7 +114,10 @@ public class L6R28 extends TradeBuffer {
 		this.totaVo.putParam("L6R28AcctCode320B", mSystemParas.getAcctCode320B());
 		this.totaVo.putParam("L6R28AcctCode330A", mSystemParas.getAcctCode330A());
 		this.totaVo.putParam("L6R28AcctCode330B", mSystemParas.getAcctCode330B());
-		this.totaVo.putParam("L6R28ReduceAmtLimit", mSystemParas.getReduceAmtLimit());
+		this.totaVo.putParam("L6R28ReduceAmtLimit1", mSystemParas.getReduceAmtLimit1());
+		this.totaVo.putParam("L6R28ReduceAmtLimit2", mSystemParas.getReduceAmtLimit2());
+		this.totaVo.putParam("L6R28ReduceAmtLimit3", mSystemParas.getReduceAmtLimit3());
+		this.totaVo.putParam("L6R28CoreRemitLimit", mSystemParas.getCoreRemitLimit());
 		this.totaVo.putParam("L6R28PreRepayTerms", mSystemParas.getPreRepayTerms());
 		this.totaVo.putParam("L6R28PreRepayTermsBatch", mSystemParas.getPreRepayTermsBatch());
 		this.totaVo.putParam("L6R28ShortPrinPercent", mSystemParas.getShortPrinPercent());

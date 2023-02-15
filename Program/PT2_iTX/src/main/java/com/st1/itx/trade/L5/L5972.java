@@ -162,6 +162,7 @@ public class L5972 extends TradeBuffer {
 				NegTransIdVO.setAcDate(IntAcDate);
 				NegTransIdVO.setTitaTlrNo(TitaTlrNo);
 				NegTransIdVO.setTitaTxtNo(parse.stringToInteger(TitaTxtNo));
+				NegTransIdVO.setCustNo(iCustNo);
 
 				NegTrans NegTransVO = sNegTransService.findById(NegTransIdVO, titaVo);
 				if (NegTransVO != null) {

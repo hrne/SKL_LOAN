@@ -118,7 +118,7 @@ public class L5702 extends TradeBuffer {
 				TransTitaTlrNo = titaVo.getParam("OOTitaTlrNo").trim();
 				TransTitaTxtNo = titaVo.getParam("OOTitaTxtNo").trim();
 				TransTxKind = titaVo.getParam("OONewtransTxKind").trim();
-
+				icustNo = parse.stringToInteger(titaVo.getParam("CustNo").trim());
 			} else {
 
 				TrialFunc = titaVo.getParam("TrialFunc").trim();
@@ -126,7 +126,7 @@ public class L5702 extends TradeBuffer {
 				TransTitaTlrNo = titaVo.getParam("TransTitaTlrNo").trim();
 				TransTitaTxtNo = titaVo.getParam("TransTitaTxtNo").trim();
 				TransTxKind = titaVo.getParam("NewTransTxKind").trim();
-
+				icustNo = parse.stringToInteger(titaVo.getParam("CustNo").trim());
 			}
 
 			NegTransId tNegTransId = new NegTransId();
@@ -134,12 +134,13 @@ public class L5702 extends TradeBuffer {
 			tNegTransId.setAcDate(AcDate);
 			tNegTransId.setTitaTlrNo(TransTitaTlrNo);
 			tNegTransId.setTitaTxtNo(parse.stringToInteger(TransTitaTxtNo));
+			tNegTransId.setCustNo(icustNo); // 戶號
 			tNegTrans = sNegTransService.findById(tNegTransId, titaVo);
 			if (tNegTrans == null) {
 				throw new LogicException(titaVo, "E0001", "債務協商交易檔");
 			}
 			// 找付款人戶號
-			icustNo = tNegTrans.getCustNo();
+			//icustNo = tNegTrans.getCustNo();
 			icaseSeq = tNegTrans.getCaseSeq();
 			tNegMainId.setCaseSeq(icaseSeq);
 			tNegMainId.setCustNo(icustNo);
@@ -187,12 +188,14 @@ public class L5702 extends TradeBuffer {
 			TransTitaTlrNo = titaVo.getParam("TransTitaTlrNo").trim();
 			TransTitaTxtNo = titaVo.getParam("TransTitaTxtNo").trim();
 			TransTxKind = titaVo.getParam("NewTransTxKind").trim();
+			icustNo = parse.stringToInteger(titaVo.getParam("CustNo").trim());
 
 			NegTransId tNegTransId = new NegTransId();
 			int AcDate = parse.stringToInteger(TransAcDate);
 			tNegTransId.setAcDate(AcDate);
 			tNegTransId.setTitaTlrNo(TransTitaTlrNo);
 			tNegTransId.setTitaTxtNo(parse.stringToInteger(TransTitaTxtNo));
+			tNegTransId.setCustNo(icustNo); // 戶號
 			tNegTrans = sNegTransService.findById(tNegTransId, titaVo);
 			if (tNegTrans == null) {
 				throw new LogicException(titaVo, "E0001", "債務協商交易檔");
