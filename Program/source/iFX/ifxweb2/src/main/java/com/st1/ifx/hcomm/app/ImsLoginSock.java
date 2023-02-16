@@ -52,7 +52,7 @@ public class ImsLoginSock extends ImsTran {
 
 	String proxy;
 	String user;
-	String password;
+	String pwd;
 	String authNo;
 	String authItem;
 	String agentNo;
@@ -81,8 +81,8 @@ public class ImsLoginSock extends ImsTran {
 		logger.info("setHi " + hi);
 	}
 
-	public ImsLoginSock(String proxy, String user, String password, String address) {
-		// init(proxy, user, password, address);
+	public ImsLoginSock(String proxy, String user, String pwd, String address) {
+		// init(proxy, user, pwd, address);
 	}
 
 	public SessionMap getSession() {
@@ -193,11 +193,11 @@ public class ImsLoginSock extends ImsTran {
 
 					WsSKLAuthenticationSoap port = ss.getWsSKLAuthenticationSoap();
 
-					this.setAdStatus(port.adIsAuthenticated(this.getUser().trim(), this.getPassword().trim()));
+					this.setAdStatus(port.adIsAuthenticated(this.getUser().trim(), this.getPwd().trim()));
 
 					logger.info("Ad驗證 : " + this.getAdUrl());
 					logger.info("USER : " + this.getUser());
-					logger.info("PWD  : " + this.getPassword());
+					logger.info("PWD  : " + this.getPwd());
 					logger.info("Ad Is Good ? " + this.isAdStatus());
 				}
 			} catch (Exception e2) {
@@ -387,7 +387,7 @@ public class ImsLoginSock extends ImsTran {
 		Map<String, String> map = initTitaLabel();
 		map.put("TLRNO", user.substring(0, 6));
 		map.put("EMPNOT", user.substring(0, 6));
-		map.put("PSWD", password);
+		map.put("PSWD", pwd);
 		map.put("AUTHNO", this.getAuthNo());
 		map.put("AGENT", this.getAgentNo());
 		map.put("IP", this.getIp());
@@ -460,12 +460,12 @@ public class ImsLoginSock extends ImsTran {
 		this.user = user;
 	}
 
-	public String getPassword() {
-		return password;
+	public String getPwd() {
+		return pwd;
 	}
 
-	public void setPassword(String password) {
-		this.password = password;
+	public void setPwd(String pwd) {
+		this.pwd = pwd;
 	}
 
 	public String getAddress() {

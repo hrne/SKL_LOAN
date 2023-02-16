@@ -73,10 +73,29 @@ MyMenu.initTxCode = function() {
 			console.log("uu:"+u+" ss:"+s);
 			if (isInMenu(s) || s.substring(0,2) == "LC")
 			  parent.addTran(s, u);
-			else
-				alert("無此交易或無此交易權限 " + s);
+			else{
+				var ip = location.host.split(":");
+				var port = ip.length > 1 ? ip[1].substring(0, 3) + "5" : "7005";
+				var url = "http://" + ip[0] + ":" + port + "/iTX/mvc/hnd/txcd/chainTranMsg?txCode=";
+				$.ajax({
+					type: "get",
+					url: url + $.trim(s),
+					async: false,
+					dataType: "json",
+					jsonpCallback: "callback",
+					success: function (res) {
+						if(res.data != "")
+							alert(res.data);
+						else
+							parent.addTran(s, u);
+					},
+					error: function (e) {
+						console.log("fail,," + e.toString());
+						console.dir(e);
+					}
+				});
+			}	
 		}
-
 	}).keyup(function() {  //keypress 改 keyup Chrome 和  IE還是一樣有問題 只改善"按住"的BUG
 		var s = $(this).val();
 		if (s.length == 5){

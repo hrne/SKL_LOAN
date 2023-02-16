@@ -25,7 +25,7 @@
 	String message = "";
 	String user = StringEscapeUtils.escapeXml10(request.getParameter("user"));
 	user = user.toUpperCase();//小潘改user id轉大寫
-	String password = request.getParameter("password");
+	String pwd = request.getParameter("pwd");
 	String addr = request.getRemoteAddr(); //127.0.0.1
 	
 	String authNo = request.getParameter("AuthNo");
@@ -35,8 +35,8 @@
 	
 	if(user == null)
 	  user = (String) request.getAttribute("user");
-	if(password == null)
-	  password = (String) request.getAttribute("password");
+	if(pwd == null)
+	  pwd = (String) request.getAttribute("pwd");
 	if(authNo == null)
 	  authNo = (String) request.getAttribute("AuthNo");
 	if(authItem == null)
@@ -58,13 +58,13 @@
 	if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip))
 	    ip = request.getRemoteAddr();
 	  
-	//Login login = new Login(com.st1.servlet.GlobalValues.proxy, user,	password, addr);
+	//Login login = new Login(com.st1.servlet.GlobalValues.proxy, user,	pwd, addr);
 	logger.info(FilterUtils.escape("user   : " + user));
 	logger.info(FilterUtils.escape("addr:" + addr));
 
 	ImsLoginSock login = MySpring.getLoginHostBean();
 	login.setUser(user);
-	login.setPassword(password);
+	login.setPwd(pwd);
 	login.setAuthNo(authNo);
 	login.setAuthItem(authItem);
 	login.setAgentNo(agentNo);

@@ -118,7 +118,6 @@ public class MswCenter {
 			userPub.addUser(newUser);
 			userPub.dump();
 			sendTo(scriptSession.getId(), callbackMethod, OK, newUser.toLine());
-
 		} else {
 			sendTo(scriptSession.getId(), callbackMethod, ERROR, "something wrong");
 		}

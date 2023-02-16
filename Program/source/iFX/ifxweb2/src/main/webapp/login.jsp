@@ -92,7 +92,7 @@ if (top.window != window) {
 
 function cb(o) {
     $('#user').val(o.name);
-    $('#password').val(o.password);
+    $('#pwd').val(o.pwd);
 }
 
 function getJsonp() {
@@ -122,7 +122,7 @@ $(function() {
                 //rangelength: [6, 6],
                 //ckfakeuser: true
             },
-            password: {
+            pwd: {
                 required: true,
                 //rangelength: [6, 20]
                     //密碼長度統一更長,中心還沒改
@@ -135,7 +135,7 @@ $(function() {
                 //rangelength: '使用者ID應為6位數字.',
                 //ckfakeuser: "登入帳號第5碼不可英文,請輸入正確帳號!"
             },
-            password: {
+            pwd: {
                 required: '',
                 //rangelength: '密碼最少6位.'
             }
@@ -162,9 +162,9 @@ $(function() {
 				$("#user").focus();
 				return false;
 			}
-			if($("#password").val()=="") {
-				alert("please supply password");
-				$("#password").focus();
+			if($("#pwd").val()=="") {
+				alert("please supply pwd");
+				$("#pwd").focus();
 				return false;
 			}
 
@@ -200,17 +200,17 @@ function openall() {
     //openall();
 $(function(){
 	var b = [];
-	$('#fakpassword').keyup(function(){
-		  var a = Array.from($("#fakpassword").val());
-		  $("#password").val('');
+	$('#fakpwd').keyup(function(){
+		  var a = Array.from($("#fakpwd").val());
+		  $("#pwd").val('');
 		  for(var i = 0; i < a.length; i++){
 		    if(a[i] != "*"){
 		      b[i] = a[i];
 		      a[i] = "*";
 		    }	    
 		  }
-		  $("#fakpassword").val(a.join(''));
-		  $("#password").val(b.join(''));
+		  $("#fakpwd").val(a.join(''));
+		  $("#pwd").val(b.join(''));
 		  
 	});
 });
@@ -273,8 +273,8 @@ $(function(){
                     <td align="right">&nbsp;</td>
                     <td>密碼&nbsp;&nbsp;
                         <input type="text" id="winname" name="winname" style="display:none"/>
-                        <input type="text" id="password" name="password" style="display:none">
-                        <input class="input" id="fakpassword" type="text" size="30" maxlength="20" title='請輸入密碼' />
+                        <input type="text" id="pwd" name="pwd" style="display:none">
+                        <input class="input" id="fakpwd" type="text" size="30" maxlength="20" title='請輸入密碼' />
                         <input class="button" type="submit" name="submit" id="submit" value="登入" />
                     </td>
                     <td>&nbsp;</td>

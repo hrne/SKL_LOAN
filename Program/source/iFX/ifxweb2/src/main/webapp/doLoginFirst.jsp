@@ -28,17 +28,17 @@
 	String message = "";
 	String user = StringEscapeUtils.escapeXml10(request.getParameter("user") == null ? (String) session.getAttribute("user") : request.getParameter("user"));
 	user = user.toUpperCase();//小潘改user id轉大寫
-	String password = request.getParameter("password")  == null ? (String) session.getAttribute("password") : request.getParameter("password");
+	String pwd = request.getParameter("pwd")  == null ? (String) session.getAttribute("pwd") : request.getParameter("pwd");
 	String addr = request.getRemoteAddr(); //127.0.0.1
 	logger.info("client:" + request.getRemoteAddr());
 
-	//Login login = new Login(com.st1.servlet.GlobalValues.proxy, user,	password, addr);
+	//Login login = new Login(com.st1.servlet.GlobalValues.proxy, user,	pwd, addr);
 	logger.info(FilterUtils.escape("user:" + user));
 	logger.info("addr:" + addr);
 
 	ImsLoginSock login = MySpring.getLoginHostBean();
 	login.setUser(user);
-	login.setPassword(password);
+	login.setPwd(pwd);
 	login.setAddress(addr);
 	
 	UserPub pub = UserPub.getInstance();
@@ -76,7 +76,7 @@
 			session.setAttribute("currentSession", session.getId());
 			session.setAttribute("oldSession", oldSessionId);
 			session.setAttribute("user", user);
-			session.setAttribute("password", password);
+			session.setAttribute("pwd", pwd);
 			response.sendRedirect("duplicateLogin.jsp");
 			return;
 		}
@@ -112,7 +112,7 @@
 	try{
 		if(li.size() == 1){
 		  request.setAttribute("user", user);
-		  request.setAttribute("password", password);
+		  request.setAttribute("pwd", pwd);
 		  request.setAttribute("AuthNo", li.get(0).get("AuthNo"));
 		  request.setAttribute("AuthItem", li.get(0).get("AuthItem"));
 		  request.setAttribute("AgentNo", li.get(0).get("AgentNo"));
@@ -242,7 +242,7 @@ td:last-child{
 	    </tr>
 	    <tr><td colspan="2" align="right"><input class="button" type="submit" name="submit0" id="submit0" value="確定"/></td></tr>
 	    <input type="text" id="user" name="user" value="" style="display:none"/>
-	    <input type="text" id="password" name="password" value="" style="display:none"/>
+	    <input type="text" id="pwd" name="pwd" value="" style="display:none"/>
 	    <input type="text" id="AuthNo" name="AuthNo" value="" style="display:none"/>
 	    <input type="text" id="AuthItem" name="AuthItem" value="" style="display:none"/>
 	    <input type="text" id="AgentNo" name="AgentNo" value="" style="display:none"/>
@@ -254,11 +254,11 @@ td:last-child{
 </body>
 <script>
 	var count = "<%= li.size()%>";
-	var pawd = "<%= password%>";
+	var pawd = "<%= pwd%>";
 	var ur = "<%= user%>";
 	function init(){
 	  $("#user").val(ur);
-	  $("#password").val(pawd);
+	  $("#pwd").val(pawd);
 		
 	  $("#AuthNo").val($("#radio0").val());
 	  $("#AgentNo").val($("#AgentNo0").val());

@@ -5137,13 +5137,16 @@ var Ifx = (function ($) {
 					oTota.obj.EC.KINBR = _self.getValue("#KINBR");
 					oTota.obj.EC.TLRNO = _self.getValue("#TLRNO");
 					if (rimCode == "LCR03") {
+						_self.setValue("SUPNO$", _self.getValue("#TLRNO"));
+						_self.setValue("#EMPNOS", _self.getValue("#TLRNO"));
 						oTota.obj.EC.rim = "0";
 						oTota.obj.EC.AUTHNO = _self.getValue("#AUTHNO");
-						oTota.obj.EC.EMPNOT = _self.getValue("#TLRNO");
+						oTota.obj.EC.EMPNOS = _self.getValue("#TLRNO");
+						oTota.obj.EC.SUPNO = _self.getValue("#TLRNO");
 						oldTxcd = oTota.obj.EC.TXCD;
 						oTota.obj.EC.HCODE = "0";
 						oTota.obj.EC["selectTotal"] = "" + rows.length;
-						oTota.obj.EC["selectIndex"] = "" + checkcont;
+						oTota.obj.EC["selectIndex"] = "" + checkcont;						
 						//oTota.obj.EC.EMPNOS = _self.getValue("#TLRNO");
 						//oTota.obj.EC.SUPNO = _self.getValue("#TLRNO");
 					}
