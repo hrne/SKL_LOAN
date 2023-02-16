@@ -149,10 +149,10 @@
 					<tasklet ref="LM030Batch" />
 				</step>
 			</flow>
-			<!-- Batch: LM031Batch 企業動用率 -->
+			<!-- Batch: LM031 企業動用率 -->
 			<flow>
-				<step id="sLM031Batch" parent="parentStep">
-					<tasklet ref="LM031Batch" />
+				<step id="sLM031" parent="parentStep">
+					<tasklet ref="LM031" />
 				</step>
 			</flow>
 			<!-- Step: LM032 逾期案件滾動率明細 -->

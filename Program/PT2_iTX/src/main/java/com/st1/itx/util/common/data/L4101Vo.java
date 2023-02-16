@@ -12,6 +12,7 @@ import com.st1.itx.db.domain.BankRemit;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.util.format.FormatUtil;
+import com.st1.itx.util.format.StringCut;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -151,77 +152,90 @@ public class L4101Vo extends FileVo {
 //			撥款:戶號-額度-撥款(15)
 //			退款:員編(6)+交易序號(8)
 			if (t.getDrawdownCode() == 1) { // 相關號碼 VARCHAR2 15
-				thisLine = thisLine + "," + FormatUtil.pad9("" + t.getCustNo(), 7) + "-" + FormatUtil.pad9("" + t.getFacmNo(), 3) + "-" + FormatUtil.pad9("" + t.getBormNo(), 3);
+				thisLine = thisLine + "," + FormatUtil.pad9("" + t.getCustNo(), 7) + "-"
+						+ FormatUtil.pad9("" + t.getFacmNo(), 3) + "-" + FormatUtil.pad9("" + t.getBormNo(), 3);
 			} else {
-				thisLine = thisLine + "," + FormatUtil.pad9("" + t.getTitaTlrNo(), 6) + "-" + FormatUtil.pad9("" + t.getTitaTxtNo(), 8);
+				thisLine = thisLine + "," + FormatUtil.pad9("" + t.getTitaTlrNo(), 6) + "-"
+						+ FormatUtil.pad9("" + t.getTitaTxtNo(), 8);
 			}
 			if (t.getCustName().length() > 40) {
 				wkCustNm = t.getCustName().substring(0, 40);
 			} else {
 				wkCustNm = t.getCustName();
 			}
-			thisLine = thisLine + "," + wkCustNm // 受款人 VARCHAR2 40
-					+ "," + "新壽放款"// 付款摘要 VARCHAR2 45 TODO:未來可能需要判斷是否為代償件 清河:先預設放新壽放款
-					+ "," + ""// 支票格式 VARCHAR2 1
-					+ "," + ""// 支票號碼 VARCHAR2 9
-					+ "," + t.getAcDate()// 支票(匯款)日期 Date 7
-					+ "," + ""// 兌領日期 Date 7
-					+ "," + ""// 開票日期/匯款日期 Date 7
-					+ "," + t.getRemitBank()// 受款總行 VARCHAR2 3
-					+ "," + t.getRemitBranch()// 受款分行 VARCHAR2 4
-					+ "," + t.getRemitAcctNo()// 受款人帳號 VARCHAR2 16
-					+ "," + t.getRemitAmt()// 付款金額 NUMBER (12,2) TODO:是否需做超過10位處理
-					+ "," + ""// 程式代碼 VARCHAR2 8
-					+ "," + ""// 功能碼/變更項目別 VARCHAR2 2
-					+ "," + ""// 作業者 VARCHAR2 8
-					+ "," + ""// 作業日期 Date 7
-					+ "," + ""// 處理日期 Date 7
-					+ "," + ""// 開票者/匯款者 VARCHAR2 8
-					+ "," + ""// 請款單批號(付款憑單批號) NUMBER 10
-					+ "," + ""// 最近異動最遠票日 Date 7
-					+ "," + ""// 掛號型態 VARCHAR2 1
-					+ "," + ""// 支票郵寄通知單型式 VARCHAR2 1
-					+ "," + ""// 郵寄標籤 VARCHAR2 1
-					+ "," + ""// 郵寄通知人(單位)代號 VARCHAR2 12
-					+ "," + ""// 請款單位代號 VARCHAR2 6
-					+ "," + ""// 扣匯款手續費 VARCHAR2 1
-					+ "," + ""// 缺單據 VARCHAR2 1
-					+ "," + ""// 缺單據原因 VARCHAR2 1
-					+ "," + ""// 業務員代號 VARCHAR2 12
-					+ "," + "t"// 付款來源 VARCHAR2 1
-					+ "," + ""// 傳輸匯款通知 VARCHAR2 1
-					+ "," + ""// 傳輸匯款通知單位 VARCHAR2 6
-					+ "," + ""// 匯款磁片編號 NUMBER 10
-					+ "," + ""// 付款銀行 VARCHAR2 7
-					+ "," + ""// 類別碼(簡碼) VARCHAR2 10
-					+ "," + ""// 支票郵寄日 Date 7
-					+ "," + ""// 入帳號碼 VARCHAR2 12
-					+ "," + ""// 到期作業指示 VARCHAR2 1
-					+ "," + ""// 郵遞區號 VARCHAR2 5
-					+ "," + ""// 寄達地址 VARCHAR2 80
-					+ "," + ""// 付款開票格式 VARCHAR2 1
-					+ "," + wkCustId// 受款人ID VARCHAR2 10
-					+ "," + ""// 前期建檔號碼 VARCHAR2 12
-					+ "," + ""// 付款單位代送 VARCHAR2 1
-					+ "," + ""// 取消建檔原因碼 VARCHAR2 2
-					+ "," + ""// 群組請款序號 VARCHAR2 12
-					+ "," + ""// 合併付款群組號碼 VARCHAR2 12
-					+ "," + ""// 權責單位(請款單位)覆核日 Date 7
-					+ "," + ""// 權責單位(請款單位)覆核者 VARCHAR2 8
-					+ "," + ""// 付款單位(出納)覆核日 Date 7
-					+ "," + ""// 付款單位(出納)覆核者 VARCHAR2 8
-					+ "," + ""// 服務中心-匯款彙總批號 NUMBER 10
-					+ "," + ""// 付款單位-覆核批號 NUMBER 10
-					+ "," + ""// 帳號錯誤通知單位/人 VARCHAR2 8
-					+ "," + "NTD"// 幣別 VARCHAR2 3
-					+ "," + ""// 櫃檯支票簽收類別 VARCHAR2 1
-					+ "," + ""// 櫃檯支票簽收者ID VARCHAR2 10
-					+ "," + ""// 櫃檯支票簽收者姓名 VARCHAR2 40
-					+ "," + ""// 批次櫃台指示碼(件類別) VARCHAR2 1
-					+ "," + ""// 支票寄達單位 VARCHAR2 6
-					+ "," + ""// 批號付款序號 NUMBER 10
 
-			;
+			try {
+				thisLine = thisLine + "," + wkCustNm // 受款人 VARCHAR2 40
+						+ "," + FormatUtil.pad9("" + t.getCustNo(), 7) + FormatUtil.pad9("" + t.getFacmNo(), 3)
+						+ FormatUtil.pad9("" + t.getBormNo(), 3) + StringCut.stringCutFRB(t.getRemark(), "UTF-8", 30)// 付款摘要
+																														// VARCHAR2
+																														// 45
+						// TODO:未來可能需要判斷是否為代償件 2023/2/7
+						// 1-13(戶號額度撥款)14-43(附言)
+						+ "," + ""// 支票格式 VARCHAR2 1
+						+ "," + ""// 支票號碼 VARCHAR2 9
+						+ "," + t.getAcDate()// 支票(匯款)日期 Date 7
+						+ "," + ""// 兌領日期 Date 7
+						+ "," + ""// 開票日期/匯款日期 Date 7
+						+ "," + t.getRemitBank()// 受款總行 VARCHAR2 3
+						+ "," + t.getRemitBranch()// 受款分行 VARCHAR2 4
+						+ "," + t.getRemitAcctNo()// 受款人帳號 VARCHAR2 16
+						+ "," + t.getRemitAmt()// 付款金額 NUMBER (12,2) TODO:是否需做超過10位處理
+						+ "," + ""// 程式代碼 VARCHAR2 8
+						+ "," + ""// 功能碼/變更項目別 VARCHAR2 2
+						+ "," + ""// 作業者 VARCHAR2 8
+						+ "," + ""// 作業日期 Date 7
+						+ "," + ""// 處理日期 Date 7
+						+ "," + ""// 開票者/匯款者 VARCHAR2 8
+						+ "," + ""// 請款單批號(付款憑單批號) NUMBER 10
+						+ "," + ""// 最近異動最遠票日 Date 7
+						+ "," + ""// 掛號型態 VARCHAR2 1
+						+ "," + ""// 支票郵寄通知單型式 VARCHAR2 1
+						+ "," + ""// 郵寄標籤 VARCHAR2 1
+						+ "," + ""// 郵寄通知人(單位)代號 VARCHAR2 12
+						+ "," + ""// 請款單位代號 VARCHAR2 6
+						+ "," + ""// 扣匯款手續費 VARCHAR2 1
+						+ "," + ""// 缺單據 VARCHAR2 1
+						+ "," + ""// 缺單據原因 VARCHAR2 1
+						+ "," + ""// 業務員代號 VARCHAR2 12
+						+ "," + "t"// 付款來源 VARCHAR2 1
+						+ "," + ""// 傳輸匯款通知 VARCHAR2 1
+						+ "," + ""// 傳輸匯款通知單位 VARCHAR2 6
+						+ "," + ""// 匯款磁片編號 NUMBER 10
+						+ "," + ""// 付款銀行 VARCHAR2 7
+						+ "," + ""// 類別碼(簡碼) VARCHAR2 10
+						+ "," + ""// 支票郵寄日 Date 7
+						+ "," + ""// 入帳號碼 VARCHAR2 12
+						+ "," + ""// 到期作業指示 VARCHAR2 1
+						+ "," + ""// 郵遞區號 VARCHAR2 5
+						+ "," + ""// 寄達地址 VARCHAR2 80
+						+ "," + ""// 付款開票格式 VARCHAR2 1
+						+ "," + wkCustId// 受款人ID VARCHAR2 10
+						+ "," + ""// 前期建檔號碼 VARCHAR2 12
+						+ "," + ""// 付款單位代送 VARCHAR2 1
+						+ "," + ""// 取消建檔原因碼 VARCHAR2 2
+						+ "," + ""// 群組請款序號 VARCHAR2 12
+						+ "," + ""// 合併付款群組號碼 VARCHAR2 12
+						+ "," + ""// 權責單位(請款單位)覆核日 Date 7
+						+ "," + ""// 權責單位(請款單位)覆核者 VARCHAR2 8
+						+ "," + ""// 付款單位(出納)覆核日 Date 7
+						+ "," + ""// 付款單位(出納)覆核者 VARCHAR2 8
+						+ "," + ""// 服務中心-匯款彙總批號 NUMBER 10
+						+ "," + ""// 付款單位-覆核批號 NUMBER 10
+						+ "," + ""// 帳號錯誤通知單位/人 VARCHAR2 8
+						+ "," + "NTD"// 幣別 VARCHAR2 3
+						+ "," + ""// 櫃檯支票簽收類別 VARCHAR2 1
+						+ "," + ""// 櫃檯支票簽收者ID VARCHAR2 10
+						+ "," + ""// 櫃檯支票簽收者姓名 VARCHAR2 40
+						+ "," + ""// 批次櫃台指示碼(件類別) VARCHAR2 1
+						+ "," + ""// 支票寄達單位 VARCHAR2 6
+						+ "," + ""// 批號付款序號 NUMBER 10
+
+				;
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 			result.add(thisLine);
 		}

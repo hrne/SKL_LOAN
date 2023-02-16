@@ -78,6 +78,10 @@ public class L4961ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,i.\"RepayCode\"       as F7                              ";
 		sql += " ,i.\"StatusCode\"      as F8                              ";
 		sql += " ,i.\"AcDate\"          as F9                              ";
+		sql += " ,i.\"FireInsuCovrg\"   as F10                              ";
+		sql += " ,i.\"FireInsuPrem\"    as F11                              ";
+		sql += " ,i.\"EthqInsuCovrg\"   as F12                              ";
+		sql += " ,i.\"EthqInsuPrem\"    as F13                              ";
 		sql += " from \"InsuRenew\" i                                      ";
 		sql += " left join \"CustMain\" c on c.\"CustNo\" = i.\"CustNo\"   ";
 		// 查詢方式: 1.火險到期年月 2.報表年月 3.未銷全部
@@ -97,7 +101,8 @@ public class L4961ServiceImpl extends ASpringJpaParm implements InitializingBean
 		switch (intSearchOption) {
 		case 0: // 0:正常未繳 0:正常
 			if (intSearchFlag == 2) {
-				sql += " and (substr(LPAD(i.\"AcDate\" - 19110000, 7, 0), 1, 5) > " + intReportYearMonth + " or i.\"AcDate\" = 0) ";
+				sql += " and (substr(LPAD(i.\"AcDate\" - 19110000, 7, 0), 1, 5) > " + intReportYearMonth
+						+ " or i.\"AcDate\" = 0) ";
 			}
 			sql += "   and i.\"RenewCode\" = 2                             ";
 			sql += "   and i.\"StatusCode\" = 0                            ";
@@ -107,7 +112,8 @@ public class L4961ServiceImpl extends ASpringJpaParm implements InitializingBean
 			break;
 		case 1: // 1:正常已繳 0:正常
 			if (intSearchFlag == 2) {
-				sql += " and substr(LPAD(i.\"AcDate\" - 19110000, 7, 0), 1, 5) <= " + intReportYearMonth + "and i.\"AcDate\" > 0";
+				sql += " and substr(LPAD(i.\"AcDate\" - 19110000, 7, 0), 1, 5) <= " + intReportYearMonth
+						+ "and i.\"AcDate\" > 0";
 			}
 			sql += "   and i.\"RenewCode\" = 2                             ";
 			sql += "   and i.\"StatusCode\" = 0                            ";
@@ -125,7 +131,8 @@ public class L4961ServiceImpl extends ASpringJpaParm implements InitializingBean
 			break;
 		case 4: // 4:催收未繳 2:催收 未入帳
 			if (intSearchFlag == 2) {
-				sql += " and substr(LPAD(i.\"AcDate\" - 19110000, 7, 0), 1, 5) <= " + intReportYearMonth + "and i.\"AcDate\" = 0";
+				sql += " and substr(LPAD(i.\"AcDate\" - 19110000, 7, 0), 1, 5) <= " + intReportYearMonth
+						+ "and i.\"AcDate\" = 0";
 			}
 			sql += "   and i.\"RenewCode\" = 2                             ";
 			sql += "   and i.\"StatusCode\" = 2                            ";
@@ -153,7 +160,7 @@ public class L4961ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("sql=" + sql);
 		Query query;
 
-		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
 		cnt = query.getResultList().size();

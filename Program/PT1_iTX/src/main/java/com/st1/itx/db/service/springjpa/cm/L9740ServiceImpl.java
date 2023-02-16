@@ -145,17 +145,43 @@ public class L9740ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = " ";
 		sql += "	SELECT M.\"CustNo\"";
 		sql += "		  ,M.\"FacmNo\"";
-		sql += "		  ,M.\"BormNo\"";
-		sql += "		  ,M.\"DrawdownDate\"";
-		sql += "		  ,M.\"DrawdownAmt\"";
-		sql += "		  ,M.\"StoreRate\"";
-		sql += "		  ,M.\"NextPayIntDate\"";
+//		sql += "		  ,MIN(M.\"BormNo\") AS \"BormNo\"";
+		sql += "		  ,MIN(M.\"DrawdownDate\" - 19110000) AS \"DrawdownDate\"";
+		sql += "		  ,SUM(M.\"DrawdownAmt\") AS \"DrawdownAmt\"";
+		sql += "		  ,MIN(L.\"FitRate\") AS \"ShortRate\"";
+		sql += "		  ,MIN(M.\"NextPayIntDate\" - 19110000) AS \"NextPayIntDate\"";
 		sql += "	FROM \"LoanBorMain\" M";
 		sql += "	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\"";
 		sql += "						   AND F.\"FacmNo\" = M.\"FacmNo\"";
+
+		sql += "	LEFT JOIN ( ";
+		sql += "		SELECT R1.\"CustNo\"";
+		sql += "			  ,R1.\"FacmNo\"";
+		sql += "			  ,R1.\"BormNo\"";
+		sql += "			  ,R2.\"FitRate\"";
+		sql += "		FROM (";
+		sql += "			SELECT \"CustNo\"";
+		sql += "				  ,\"FacmNo\"";
+		sql += "				  ,\"BormNo\"";
+		sql += "				  ,MAX(\"EffectDate\") AS \"EffectDate\"";
+		sql += "			FROM \"LoanRateChange\" ";
+		sql += "			WHERE \"EffectDate\" <= :endDate";
+		sql += "			GROUP BY \"CustNo\"";
+		sql += "					,\"FacmNo\"";
+		sql += "					,\"BormNo\"";
+		sql += "		) R1 ";
+		sql += "		LEFT JOIN \"LoanRateChange\" R2 ON R2.\"CustNo\" = R1.\"CustNo\"";
+		sql += "	  								   AND R2.\"FacmNo\" = R1.\"FacmNo\"";
+		sql += "	  								   AND R2.\"BormNo\" = R1.\"BormNo\"";
+		sql += "	  								   AND R2.\"EffectDate\" = R1.\"EffectDate\"";		
+		sql += "	) L  ON L.\"CustNo\" = M.\"CustNo\"";
+		sql += "	    AND L.\"FacmNo\" = M.\"FacmNo\"";
+		sql += "	    AND L.\"BormNo\" = M.\"BormNo\"";		
+
 		sql += "	WHERE M.\"DrawdownAmt\" <= :endDate";
 		sql += "	  AND M.\"StoreRate\" > :rate ";
 		sql += "	  AND F.\"AcctCode\" = :acctCode ";
+
 		//status 0:正常戶 2:催收戶
 		if("0".equals(statusCode)) {
 			sql += "	  AND M.\"Status\" IN (0)";
@@ -164,9 +190,11 @@ public class L9740ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}else {
 			sql += "	  AND M.\"Status\" IN (0,2)";
 		}
-		sql += "	ORDER BY M.\"CustNo\" ASC";
-		sql += "			,M.\"FacmNo\" ASC";
-		sql += "			,M.\"BormNo\" ASC";
+		sql += "	GROUP BY M.\"CustNo\"";
+		sql += "			,M.\"FacmNo\"";
+		sql += "	ORDER BY \"CustNo\" ASC";
+		sql += "			,\"FacmNo\" ASC";
+//		sql += "			,\"BormNo\" ASC";
 
 		this.info("date =" + date);
 		this.info("acctCode =" + acctCode);

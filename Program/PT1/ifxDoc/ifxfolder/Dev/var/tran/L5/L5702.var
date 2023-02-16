@@ -138,16 +138,17 @@ T(2,@StatusHelp,#HelpDesc3)
 T(2,@CustLoanKindHelp,#HelpDesc4)
 
 ! NegMain-Key-CustNo(7),CaseSeq(3)
-! 轉入L5702用的東東 NegTrans-Key-AcDate(7),TitaTlrNo(6),TitaTxtNo(8)
+! 轉入L5702用的東東 NegTrans-Key-AcDate(7),TitaTlrNo(6),TitaTxtNo(8),2023/2/14增加CustNo(7)
 ! #OONegTransKey=X,21,O
 ! T(2,#OOAcctDate+#OOTitaTlrNo+#OOTitaTxtNo)
 
 <include src="ROM.icf::L5R12.dec"/>
-#NegTransKey=X,21,S
+#NegTransKey=X,28,S
 IF(#CHAIN==1,T(4,NTXBUF$),S)
 T(1,@TransAcDate,#NegTransKey,1,7)
 T(1,@TransTitaTlrNo,#NegTransKey,8,6)
 T(1,@TransTitaTxtNo,#NegTransKey,14,8)
+T(1,@TransCustNo,#NegTransKey,22,7)
 
 ! 第一次調RIM
 
@@ -168,7 +169,7 @@ T(1,@TransTitaTxtNo,#NegTransKey,14,8)
 T(2,0)
 #RimTxKind=A,1,S
 #RimReturnAmt=m,14,S
-
+#RimCustNo=A,7,S
 
 
 ! Rim L5R03.java
@@ -191,8 +192,9 @@ T(2,@RimAcDate,#TransAcDate)
 T(2,@RimTitaTlrNo,#TransTitaTlrNo)
 T(2,@RimTitaTxtNo,#TransTitaTxtNo)
 T(2,@RimTrialFunc,0)
+T(2,@RimCustNo,#TransCustNo)
 RESET_RIM(#RimL5r03,L5R03)
-S(L5R03,1,#RimAcDate,#RimTitaTlrNo,#RimTitaTxtNo,#RimTrialFunc,#RimTxKind,#RimReturnAmt)
+S(L5R03,1,#RimAcDate,#RimTitaTlrNo,#RimTitaTxtNo,#RimTrialFunc,#RimTxKind,#RimReturnAmt,#RimCustNo)
 R(1,L5R03)
 T(2,@CustId,#L5r03CustId)
 T(2,@CaseSeqR,#L5r03CaseSeq)
@@ -490,8 +492,9 @@ T(2,@RimTitaTxtNo,#TransTitaTxtNo)
 T(2,@RimTxKind,#NewTransTxKind)
 T(2,@RimReturnAmt,#NewTransReturnAmt)
 T(2,@RimTrialFunc,1)
+T(2,@RimCustNo,#TransCustNo)
 RESET_RIM(#RimL5r03,L5R03)
-S(L5R03,1,#RimAcDate,#RimTitaTlrNo,#RimTitaTxtNo,#RimTrialFunc,#RimTxKind,#RimReturnAmt)
+S(L5R03,1,#RimAcDate,#RimTitaTlrNo,#RimTitaTxtNo,#RimTrialFunc,#RimTxKind,#RimReturnAmt,#RimCustNo)
 R(1,L5R03)
 T(2,@CustId,#L5r03CustId)
 T(2,@CaseSeqR,#L5r03CaseSeq)

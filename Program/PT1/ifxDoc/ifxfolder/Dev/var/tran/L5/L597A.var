@@ -422,11 +422,11 @@ T(2,暫收解入)
 ! <查詢>	L5971-債務協商交易資料查詢
 
 ! [查詢]
-! 轉入L5702用的東東 NegTrans-Key-AcDate(7),TitaTlrNo(6),TitaTxtNo(8)
-#OONegTransKey=X,21,O
-T(2,#OOAcctDate+#OOTitaTlrNo+#OOTitaTxtNo)
+! 轉入L5702用的東東 NegTrans-Key-AcDate(7),TitaTlrNo(6),TitaTxtNo(8),2023/2/14增加CustNo(7)
+#OONegTransKey=X,28,O
+T(2,#OOAcctDate+#OOTitaTlrNo+#OOTitaTxtNo+#OOCustNo)
 
-#OOBufSearch=X,21,O
+#OOBufSearch=X,28,O
 T(2,#OONegTransKey)
 !暫收解入,#OORemark=FinCode+TxSeq : 項目18執行L5712使用
 #Remark2=X,18,S
@@ -632,7 +632,7 @@ T(1,#OORemark,9,10)
 
 ! 逐筆傳送的資料
 #secret-no=x,1000,S
-T(6A,#TrialFunc+#AcDate+#IsMainFin+#SearchOption+#SearchDetail+#Export+#IsBtn+#OOAcctDate+#OOTitaTlrNo+#OOTitaTxtNo+#OONewtransTxKind)
+T(6A,#TrialFunc+#AcDate+#IsMainFin+#SearchOption+#SearchDetail+#Export+#IsBtn+#OOAcctDate+#OOTitaTlrNo+#OOTitaTxtNo+#OONewtransTxKind+#CustNo)
 
 
 #TXCDCHAIN=X,5,S

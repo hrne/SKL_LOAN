@@ -49,10 +49,10 @@ public class L9740Report extends MakeReport {
 	// PageSize : 紙張大小;
 	// PageOrientation : 紙張方向
 	// P:Portrait Orientation (直印) , L:Landscape Orientation(橫印)
-	private int reportDate = 0;
+//	private int reportDate = 0;
 	private String reportCode = "L9740";
 	private String reportItem = "公會無自用住宅放款檢核清單";
-	private String security = "機密";
+	private String security = "密";
 	private String pageSize = "A4";
 	private String pageOrientation = "P";
 

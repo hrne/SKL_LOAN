@@ -174,7 +174,7 @@ E(0,@RimClCode1,#ClCode1)
 E(0,@RimClCode2,#ClCode2)
 RESET_RIM(#SendL6R05,L6R05)
 S(L6R05,1,#RimFuncCode,#RimTxCode,#RimClCode1,#RimClCode2)
-S(L6R05,1,#RimFuncCode,#RimTxCode,#RimClCode1)
+!S(L6R05,1,#RimFuncCode,#RimTxCode,#RimClCode1)
 R(1,L6R05)
 
 #RL6R05=X,1,S
