@@ -89,14 +89,14 @@ public class L9134Report4 extends MakeExcel {
 				BigDecimal crAmt = parse.stringToBigDecimal(r.get("CrAmt"));
 //				int AcDate = parse.stringToInteger(r.get("AcDate"));
 
-				makeExcel.setValue(row, 1, iTdBal ,"R");
-				makeExcel.setValue(row, 2, iDifTdBal,"R");
-				makeExcel.setValue(row, 3, didTdBal,"R");
-				makeExcel.setValue(row, 4, didDifTdBal,"R");
-				makeExcel.setValue(row, 5, iDifTdBal.add(didDifTdBal),"R");
+				makeExcel.setValue(row, 1, iTdBal , "#,##0");
+				makeExcel.setValue(row, 2, iDifTdBal, "#,##0");
+				makeExcel.setValue(row, 3, didTdBal, "#,##0");
+				makeExcel.setValue(row, 4, didDifTdBal, "#,##0");
+				makeExcel.setValue(row, 5, iDifTdBal.add(didDifTdBal), "#,##0");
 				makeExcel.setValue(row, 6, r.get("AcDate"),"R");	
-				makeExcel.setValue(row, 12, drAmt);	
-				makeExcel.setValue(row, 13, crAmt);	
+				makeExcel.setValue(row, 12, drAmt , "#,##0");	
+				makeExcel.setValue(row, 13, crAmt , "#,##0");	
 				BigDecimal ix = drAmt.subtract(crAmt);
 				BigDecimal io = BigDecimal.ZERO;
 				if(ix.compareTo(io)==0) {

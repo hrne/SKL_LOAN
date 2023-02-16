@@ -446,14 +446,14 @@ public class NegCom extends CommBuffer {
 		}
 
 		int lastpaydate = getRepayDate(mainNextPayDate, -1, titaVo);// 上個月應繳日
-
+		int daydd = Integer.valueOf(String.valueOf(mainNextPayDate).substring(5));
 		if (transEntryDate > mainNextPayDate) { // 客戶逾期繳款應收2期利息(上期與本期)或以上
 			if (transEntryDate > mainLastDueDate) {
 				transShouldPayPeriod = DiffMonth(1, mainNextPayDate, mainLastDueDate) + 1;// 期數計算到還款結束日
 			} else {
 				String itransEntryDatex = String.valueOf(transEntryDate).substring(5);
 				int itransEntryDatedd = Integer.valueOf(itransEntryDatex);
-				if (itransEntryDatedd == 10) {// 繳款日為10號
+				if (itransEntryDatedd == daydd) {// 繳款日為10號
 					transShouldPayPeriod = DiffMonth(1, mainNextPayDate, transEntryDate) + 1;
 				} else {
 					transShouldPayPeriod = DiffMonth(1, mainNextPayDate, transEntryDate) + 2;

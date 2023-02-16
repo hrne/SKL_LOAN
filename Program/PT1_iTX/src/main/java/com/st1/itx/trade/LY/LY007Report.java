@@ -40,20 +40,11 @@ public class LY007Report extends MakeReport {
 	private BigDecimal totalEquity = BigDecimal.ZERO;
 	private String equityDataMonthOutput = "";
 
-	public void exec(TitaVo titaVo) throws LogicException {
+	public boolean exec(TitaVo titaVo) throws LogicException {
 
 		this.info("LY007Report exec");
-		int entdyf = titaVo.getEntDyI() + 19110000;
 
-		int iYear = entdyf / 10000;
-
-		int iMonth = entdyf % 10000;
-
-		if (iMonth != 12) {
-			iYear = iYear - 1;
-		}
-
-		int inputYearMonth = (iYear * 100) + 12;
+		int inputYearMonth = (Integer.valueOf(titaVo.getParam("RocYear")) + 1911) * 100 + 12;
 
 		CdVarValue tCdVarValue = sCdVarValueService.findYearMonthFirst(inputYearMonth, titaVo);
 
@@ -87,7 +78,7 @@ public class LY007Report extends MakeReport {
 		String brno = titaVo.getBrno();
 		String txcd = "LY007";
 		String fileItem = "Z100關係人交易明細表";
-		String fileName = "LY007-Z100關係人交易明細表_" + ((reportDate - 19110000) / 100);
+		String fileName = "LY007-Z100關係人交易明細表_" + ((inputYearMonth - 191100));
 		String defaultExcel = "LY007_底稿_Z100關係人交易明細表.xlsx";
 		String defaultSheet = "Z100關係人交易明細表";
 
@@ -98,9 +89,9 @@ public class LY007Report extends MakeReport {
 		// 開啟報表
 		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
 
-		int entdy = reportDate / 100;
+//		int entdy = reportDate / 100;
 
-		makeExcel.setValue(2, 2, entdy, "L"); // 申報年月
+		makeExcel.setValue(2, 2, inputYearMonth, "L"); // 申報年月
 
 //		ExcelFontStyleVo headerStyleVo = new ExcelFontStyleVo();
 //		headerStyleVo.setBold(true);
@@ -108,24 +99,26 @@ public class LY007Report extends MakeReport {
 		// 通用處理
 		// 設定表中顯示的日期
 
-		makeExcel.setValue(1, 16, this.showRocDate(entdy, 6)); // 資料日期
+		makeExcel.setValue(6, 15, showRocDate(inputYearMonth*100+31,6)); // 資料日期
 
-		makeExcel.setValue(1, 17, equityDataMonthOutput, "C"); // 核閱數資料日期
+//		makeExcel.setValue(6, 16, equityDataMonthOutput, "C"); // 核閱數資料日期
 
-		makeExcel.setValue(2, 17, totalEquity, "#,##0"); // 核閱數
+		makeExcel.setValue(7, 15, totalEquity, "#,##0"); // 核閱數
 
 
 		eptExcel(lY007List, titaVo);
 		
 		
 		makeExcel.close();
+		
+		return true;
 
 	}
 
 	private void eptExcel(List<Map<String, String>> lY007List, TitaVo titaVo) throws LogicException {
 
-		int entdyf = titaVo.getEntDyI();
-		int iYear = entdyf / 10000;
+		
+		int iYear =Integer.valueOf(titaVo.getParam("RocYear"));
 
 		if (lY007List != null && !lY007List.isEmpty()) {
 

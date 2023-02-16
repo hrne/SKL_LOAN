@@ -1,0 +1,112 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+#TXCD=_,_,S
+T(3,LY005)
+
+</sub>
+<sub type="PREDC" name="PreDC">
+<include src="COM.icf::TITLE-RUN.pre"/>
+</sub>
+
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+
+
+</sub>
+
+
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=3;screen.width=[140,300,110,200];printer.width=[20,20,20,20];order=1;">
+[
+["[LY005]                                  LY005非RBC_表20_會計部年度檢查報表"],
+["@年度",#RocYear],
+]
+
+!---------- AP TEXT AREA Variables ----------
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#NTXBUF=X,3,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+!T(1,@FUNCD,#NTXBUF,1,1)
+!T(1,@TLR,#NTXBUF,2,2)
+!T(2,@FKEY,7)
+
+
+!-----------------------------------------------------
+
+#DT=D,8,S
+D(7,3,#SYSDATE,1,0)
+
+#RocYear=A,3,I
+T(1,@RocYear,#DT,2,3)
+@V(5,0,999)
+
+!#RocYear=A,3,I
+!T(1,#DT,001,003)
+
+</sub>
+
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+
+
+
+</sub>
+
+
+!---------- TXFORM = C5100 ----------
+<sub type="FORM" name="LY005">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,C5100,$,S)
+
+#SCRTIL=_,_,S
+T(3,[LY005] LY005 非RBC_表20_會計部年度檢查報表)
+
+</sub>
+
+!---------- TXFORM = LY005 ----------
+<sub type="FORM" name="LY005">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,LY005,$,S)
+
+#SCRTIL=_,_,S
+T(3,[LY005] LY005介紹人排行)
+
+
+#OEMPNOS=X,6,S
+IF(#KINBR=="0009"||#KINBR=="0008",T(2,#KINBR+#TlrNoNO),T(2,#EMPNOS))
+
+</sub>
+
+
+!------ 上行電文TIM：BASIC LABEL + AP TEXT AREA + AP TEXT ------
+<sub type="TIM">
+#RocYear
+#END
+</sub>
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+
+TXFORM=LY005
+^
+
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>
+

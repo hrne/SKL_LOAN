@@ -148,7 +148,7 @@ public class L9740ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		sql += "		  ,MIN(M.\"BormNo\") AS \"BormNo\"";
 		sql += "		  ,MIN(M.\"DrawdownDate\" - 19110000) AS \"DrawdownDate\"";
 		sql += "		  ,SUM(M.\"DrawdownAmt\") AS \"DrawdownAmt\"";
-		sql += "		  ,MIN(L.\"FitRate\") AS \"ShortRate\"";
+		sql += "		  ,MIN(L.\"FitRate\") AS \"StoreRate\"";
 		sql += "		  ,MIN(M.\"NextPayIntDate\" - 19110000) AS \"NextPayIntDate\"";
 		sql += "	FROM \"LoanBorMain\" M";
 		sql += "	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\"";

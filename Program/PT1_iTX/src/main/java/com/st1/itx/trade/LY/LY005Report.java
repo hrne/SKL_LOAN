@@ -19,6 +19,7 @@ import com.st1.itx.db.service.CdVarValueService;
 import com.st1.itx.db.service.springjpa.cm.LY005ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.parse.Parse;
 
 @Component
@@ -40,27 +41,19 @@ public class LY005Report extends MakeReport {
 	private BigDecimal totalEquity = BigDecimal.ZERO;
 	private String equityDataMonthOutput = "";
 
-	public void exec(TitaVo titaVo) throws LogicException {
+	public boolean exec(TitaVo titaVo) throws LogicException {
 
-		int entdyf = titaVo.getEntDyI() + 19110000;
 
-		int iYear = entdyf / 10000;
-
-		int iMonth = entdyf % 10000;
-
-		if (iMonth != 12) {
-			iYear = iYear - 1;
-		}
-
-		int inputYearMonth = (iYear * 100) + 12;
+		
+		int inputYearMonth = (Integer.valueOf(titaVo.getParam("RocYear")) + 1911) * 100 + 12;
 
 		CdVarValue tCdVarValue = sCdVarValueService.findYearMonthFirst(inputYearMonth, titaVo);
 
 		if (tCdVarValue != null) {
-			int equityDataMonth = tCdVarValue.getYearMonth() - 191100;
+			int equityDataMonth = (tCdVarValue.getYearMonth() - 191100);
 			totalEquity = tCdVarValue.getTotalequity();
 			equityDataMonthOutput = String.valueOf(equityDataMonth);
-			equityDataMonthOutput = equityDataMonthOutput.substring(0, 3) + "." + equityDataMonthOutput.substring(3);
+			equityDataMonthOutput = equityDataMonthOutput.substring(0, 3) + "." + equityDataMonthOutput.substring(3)+".31";
 		}
 
 		List<Map<String, String>> lY005List = null;
@@ -72,24 +65,40 @@ public class LY005Report extends MakeReport {
 			e.printStackTrace(new PrintWriter(errors));
 			this.error("LY005ServiceImpl.findAll error = " + errors.toString());
 		}
+		
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LY005";
+		String fileItem = "非RBC_表20_會計部年度檢查報表";
+		String fileName = "LY005_非RBC_表20_會計部年度檢查報表_"+showRocDate(inputYearMonth*100+31, 6) ;
+		String defaultExcel = "LY005_底稿_非RBC_表20_會計部年度檢查報表.xlsx";
+		String defaultSheet = "YYY.MM";
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LY005", "非RBC_表20_會計部年度檢查報表", "LY005_非RBC_表20_會計部年度檢查報表", "LY005_底稿_非RBC_表20_會計部年度檢查報表.xlsx", "YYY.MM");
+		this.info("reportVo open");
 
-		String entdy = titaVo.getEntDy();
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
 
-		String year = entdy.substring(1, 4);
-		String month = entdy.substring(4, 6);
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		//makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LY005", "非RBC_表20_會計部年度檢查報表", "LY005_非RBC_表20_會計部年度檢查報表", "LY005_底稿_非RBC_表20_會計部年度檢查報表.xlsx", "YYY.MM");
+
+		String entdy = String.valueOf(inputYearMonth-191100);
+
+		String year = entdy.substring(0, 3);
+		String month = entdy.substring(3, 5);
 
 		makeExcel.setSheet("YYY.MM", year + "." + month);
 
 		// 通用處理
 		// 設定表中顯示的日期
+		makeExcel.setValue(1, 2,"新光人壽股份有限公司 "+ titaVo.getParam("RocYear")+"年度(季)報表"); 
 
-		makeExcel.setValue(1, 16, this.showRocDate(entdy, 6)); // 資料日期
+		makeExcel.setValue(1, 16, showRocDate(inputYearMonth*100+31, 6)); // 資料日期
 
-		makeExcel.setValue(1, 17, equityDataMonthOutput, "C"); // 核閱數資料日期
+		makeExcel.setValue(2, 17, equityDataMonthOutput, "C"); // 核閱數資料日期
 
-		makeExcel.setValue(2, 17, totalEquity, "#,##0"); // 核閱數
+		makeExcel.setValue(3, 17, totalEquity, "#,##0"); // 核閱數
 
 		if (lY005List != null && !lY005List.isEmpty()) {
 
@@ -137,6 +146,7 @@ public class LY005Report extends MakeReport {
 						makeExcel.setValue(rowCursor, columnCursor, this.showBcDate(valueStr, 0));
 						break;
 					case 7:
+						makeExcel.setValue(rowCursor, columnCursor,valueNum);
 						txAmtTotal = txAmtTotal.add(valueNum); // 交易金額加總
 					case 8:
 					case 9:
@@ -148,7 +158,8 @@ public class LY005Report extends MakeReport {
 						break;
 					case 11:
 						// 交易金額占業主權益比率%
-						valueNum = valueNum.multiply(getBigDecimal(100));
+						valueNum = (valueNum.divide(totalEquity)).multiply(getBigDecimal(100));
+						
 						makeExcel.setValue(rowCursor, columnCursor, valueNum, "#,##0.00");
 						break;
 					default:
@@ -165,7 +176,7 @@ public class LY005Report extends MakeReport {
 			// 交易金額 total 輸出
 			makeExcel.setValue(rowCursor, 10, txAmtTotal, "#,##0");
 
-			makeExcel.setValue(rowCursor + 1, 2, equityDataMonthOutput + " 淨值: " + formatAmt(totalEquity, 0) + "元 (核閱數)", "L");
+//			makeExcel.setValue(rowCursor + 1, 2, equityDataMonthOutput + " 淨值: " + formatAmt(totalEquity, 0) + "元 (核閱數)", "L");
 		} else {
 			// 無資料時處理
 			makeExcel.setValue(5, 5, "本日無資料", "L");
@@ -173,6 +184,8 @@ public class LY005Report extends MakeReport {
 
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);
+		
+		return true;
 
 	}
 
@@ -203,7 +216,7 @@ public class LY005Report extends MakeReport {
 			}
 		}
 
-		gCustName += "等" + counts + "筆";
+		gCustName += "等 " + counts + "筆";
 
 		BigDecimal gPercent = this.computeDivide(gTxAmt, totalEquity, 5);
 
