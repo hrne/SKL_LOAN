@@ -3,6 +3,7 @@ package com.st1.itx.trade.LY;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -158,7 +159,7 @@ public class LY005Report extends MakeReport {
 						break;
 					case 11:
 						// 交易金額占業主權益比率%
-						valueNum = (valueNum.divide(totalEquity)).multiply(getBigDecimal(100));
+						valueNum = (valueNum.divide(totalEquity,2,RoundingMode.HALF_UP)).multiply(getBigDecimal(100));
 						
 						makeExcel.setValue(rowCursor, columnCursor, valueNum, "#,##0.00");
 						break;

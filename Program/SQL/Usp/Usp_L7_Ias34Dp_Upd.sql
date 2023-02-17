@@ -91,7 +91,7 @@ BEGIN
             , "BormNo"                AS "BormNo"            -- 撥款序號 
             , "FinishedDate"          AS "FinishedDate"      -- 法拍完成日
       FROM  FF_TEMP
-      WHERE "FFSeq"  =  1
+      --WHERE "FFSeq"  =  1
         )
 
     , LT AS (                        -- 找最後一筆撥款計息迄日
@@ -513,6 +513,13 @@ BEGIN
     	                      , LR."BormNo"
     	           ORDER BY LR."EffectDate" DESC
     	       ) AS "Seq"
+    	     , ROW_NUMBER()
+    	       OVER (
+    	       		 PARTITION BY LR."CustNo"
+    	                      , LR."FacmNo"
+    	                      , LR."BormNo"
+    	           ORDER BY LR."EffectDate" ASC
+    	       ) AS "Seq1"
     	FROM "Ias34Dp" M
       LEFT JOIN "LoanRateChange" LR ON LR."CustNo"  = M."CustNo"
                                    AND LR."FacmNo"  = M."FacmNo"
@@ -1194,7 +1201,9 @@ BEGIN
          -- 減損發生月的科目若為990則不計算利息(2022/12/12 FROM Goldie)
          , CASE
              WHEN NVL(ML."AcctCode",'0') = '990'  THEN 0
-             WHEN M."DerDate" != 0      -- 減損發生日
+             WHEN M."DerDate" != 0  AND M."OvduDate" = 0                        -- 減損發生日,2022/12/6若無轉催日則計算起日為第一筆利率生效日
+             THEN "Fn_CalculateDerogationInterest"(M."CustNo",M."FacmNo",M."BormNo",NVL(ML."LoanBalance",0),NVL(LR."FitRate",0),LR1."EffectDate",M."DerDate")
+             WHEN M."DerDate" != 0  AND M."OvduDate" > 0                        -- 減損發生日,若有轉催日則計算起日為繳息迄日
              THEN "Fn_CalculateDerogationInterest"(M."CustNo",M."FacmNo",M."BormNo",NVL(ML."LoanBalance",0),NVL(LR."FitRate",0),LT."IntEndDate",M."DerDate")
            ELSE 0 END                       AS  "IntAmt"          -- 減損發生日月底 應收利息
          -- 2022-12-27 Wei 修改 from Linda
@@ -1377,6 +1386,11 @@ BEGIN
                   AND LR."FacmNo"  = M."FacmNo"
                   AND LR."BormNo"  = M."BormNo"
                   AND LR."Seq" = 1
+      -- 取減損發生日前之第一筆計息生效日
+      LEFT JOIN LR LR1 ON LR1."CustNo"  = M."CustNo"
+                      AND LR1."FacmNo"  = M."FacmNo"
+                      AND LR1."BormNo"  = M."BormNo"
+                      AND LR1."Seq1" = 1
       LEFT JOIN AvgFeeDataFinal AF ON AF."CustNo" = M."CustNo"
                                   AND AF."FacmNo" = M."FacmNo"
                                   AND AF."BormNo" = M."BormNo"

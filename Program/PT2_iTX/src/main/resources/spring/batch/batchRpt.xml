@@ -526,10 +526,11 @@
 			<tasklet ref="LY004" />
 		</step>
 	</job>	
+	<!--  
 	<job id="jLY005" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="sLY005" parent="parentStep">
 			<tasklet ref="LY005" />
 		</step>
 	</job>	
-
+    -->
 </beans>

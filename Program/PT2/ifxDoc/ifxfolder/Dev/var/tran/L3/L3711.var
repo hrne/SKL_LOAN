@@ -560,7 +560,7 @@ E(0,0)
 C(3,#Precision,0,E(0,#TwReduceAmt),E(0,#UsReduceAmt))
 
 #ReduceLimit=N,3,S
-E(0,#L6R28ReduceAmtLimit)
+E(0,#L6R28ReduceAmtLimit1)
 
 #WkReduceAmt=m,14.2,S
 E(0,#TimReduceAmt-#ReduceLimit)

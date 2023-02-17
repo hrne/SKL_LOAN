@@ -31,10 +31,63 @@
 			</flow>
 			<!-- Step: LY005 表20_會計部年度檢查報表 --> 
 			<flow>
-				<step id="sLY005" parent="parentStep">
-					<tasklet ref="LY005" />
+				<step id="sLY005Batch" parent="parentStep">
+					<tasklet ref="LY005Batch" />
+				</step>
+			</flow><?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+	<!-- 作業名稱 -->
+	<job id="yearlyRptFlow" parent="parentJob"
+		xmlns="http://www.springframework.org/schema/batch">
+		<!-- 年底報表產表批次 -->
+		<split id="yearlyRptSplit" task-executor="taskExecutor">
+			<!-- 年報 LY -->
+			<!-- Batch: LY002Batch 表14-1_會計部年度檢查報表 --> 
+			<flow>
+				<step id="sLY002Batch" parent="parentStep">
+					<tasklet ref="LY002Batch" />
 				</step>
 			</flow>
+			<!-- Batch: LY003Batch 表14-2_會計部年度檢查報表 --> 
+			<flow>
+				<step id="sLY003Batch" parent="parentStep">
+					<tasklet ref="LY003Batch" />
+				</step>
+			</flow>
+			<!-- Step: LY004 表14-4_會計部年度檢查報表 --> 
+			<flow>
+				<step id="sLY004Batch" parent="parentStep">
+					<tasklet ref="LY004Batch" />
+				</step>
+			</flow>
+			<!-- Step: LY005 表20_會計部年度檢查報表 --> 
+			<flow>
+				<step id="sLY005Batch" parent="parentStep">
+					<tasklet ref="LY005Batch" />
+				</step>
+			</flow>
+			<!-- Step: B117關係人明細表 --> 
+			<flow>
+				<step id="sLY006" parent="parentStep">
+					<tasklet ref="LY006" />
+				</step>
+			</flow>
+			
+			<!-- Step: Z100關係人交易明細表 --> 
+			<flow>
+				<step id="sLY007Batch" parent="parentStep">
+					<tasklet ref="LY007Batch" />
+				</step>
+			</flow>
+		</split>
+	</job>
+
+</beans>
 
 		</split>
 	</job>

@@ -65,8 +65,11 @@ public class LM032ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,\"W08DLY01\""; // F14 當期逾期天數
 		sql += "       ,CASE WHEN \"W08DLY01\" = 0 AND \"STATUS\" <> '轉催' THEN '0'";
 		sql += "        ELSE \"ACTACT\" END \"ACTACT\""; // F15 當期業務科目
-		sql += " FROM \"MonthlyLM032\" L";
-		sql += " WHERE L.\"ADTYMT\" = \"Fn_GetLastMonth\"(:thisYearMonth) ";
+		sql += " FROM \"MonthlyLM032\" ";
+		sql += " WHERE \"ADTYMT\" = \"Fn_GetLastMonth\"(:thisYearMonth) ";
+		sql += " ORDER BY \"W08PPR\" ASC";
+		sql += "       ,\"LMSACN\"  ASC"; // 前期戶號
+		sql += "       ,\"LMSAPN\"  ASC"; // 前期額度號碼
 		this.info("sql=" + sql);
 
 		Query query;

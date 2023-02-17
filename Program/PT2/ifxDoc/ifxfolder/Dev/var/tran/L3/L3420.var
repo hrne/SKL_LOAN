@@ -841,7 +841,7 @@ C(3,#WkReduceAmt,0,S,$)
 C(3,#Precision,0,E(0,#TwReduceAmt),E(0,#UsReduceAmt))
 
 #ReduceLimit=N,3,S
-E(0,#L6R28ReduceAmtLimit)
+E(0,#L6R28ReduceAmtLimit1)
 
 #WKMAMT=m,14.2,S
 E(0,#TimReduceAmt-#ReduceLimit)

@@ -74,7 +74,9 @@ public class L6023 extends TradeBuffer {
 				Timestamp lastUpdateTime = parse.StringToSqlDateO(result.get("LastUpdate"), result.get("LastUpdate"));
 
 				occurslist.putParam("OOCityCode", result.get("CityCode"));
+				occurslist.putParam("OOCityItem", result.get("CityItem"));
 				occurslist.putParam("OOLandOfficeCode", result.get("LandOfficeCode"));
+				occurslist.putParam("OOLandOfficeItem", result.get("LandOfficeItem"));
 				occurslist.putParam("OORecWord", result.get("RecWord"));
 				occurslist.putParam("OORecWordItem", result.get("RecWordItem"));
 				occurslist.putParam("OOLastUpdate", parse.timeStampToStringDate(lastUpdateTime)+ " " +parse.timeStampToStringTime(lastUpdateTime));

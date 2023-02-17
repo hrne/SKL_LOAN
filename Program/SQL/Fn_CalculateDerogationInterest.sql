@@ -41,7 +41,7 @@ BEGIN
           ;
 
           IF haveRateChange = 0 THEN
-              RETURN TRUNC("InputLoanBal" * "InputFitRate" * 120 / 360 / 100);
+              RETURN ROUND("InputLoanBal" * "InputFitRate" * 120 / 360 / 100,0);
           END IF;
      END;
 
@@ -74,12 +74,12 @@ BEGIN
           FROM rawData
      )
      SELECT SUM(
-               TRUNC(
+               ROUND(
                     "InputLoanBal"
                     * nowRow."FitRate"
                     * (TO_DATE(nextRow."EffectDate",'yyyymmdd') - TO_DATE(nowRow."EffectDate",'yyyymmdd'))
                     / 360
-                    / 100
+                    / 100 , 0
                )
      )
      INTO "Interest"

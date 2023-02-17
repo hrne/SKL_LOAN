@@ -60,16 +60,21 @@ public class L6023ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int wkFacmNoStart = 0;
 
 		String sql = "SELECT";
-		sql += "  MIN(cl.\"CityCode\") AS \"CityCode\", ";
-		sql += "  MIN(co.\"LandOfficeCode\") AS \"LandOfficeCode\", ";
+		sql += "  		MIN(cl.\"CityCode\") AS \"CityCode\", ";
+		sql += "  		NVL(MIN(cc.\"CityItem\"),MIN(code1.\"Item\")) AS \"CityItem\", ";
+		sql += "  		MIN(cl.\"LandOfficeCode\") AS \"LandOfficeCode\", ";
+		sql += "  		MIN(cl.\"LandOfficeItem\") AS \"LandOfficeItem\", ";
 		sql += " 	    MIN(co.\"RecWord\") AS \"RecWord\", ";
 		sql += " 	    MIN(co.\"RecWordItem\") AS \"RecWordItem\", ";
 		sql += " 	    MIN(co.\"LastUpdate\") AS \"LastUpdate\", ";
 		sql += " 	    MIN(co.\"LastUpdateEmpNo\") AS \"LastUpdateEmpNo\" ";
 		sql += " 	FROM ";
 		sql += " 	    \"CdLandOffice\"    co ";
-		sql += " 	    LEFT JOIN \"CdLand\"   cl ON co.\"LandOfficeCode\" = cl.\"LandOfficeCode\" ";
+		sql += " 	    LEFT JOIN \"CdLand\"   cl ON cl.\"LandOfficeCode\" = co.\"LandOfficeCode\" ";
 		sql += " 	    and cl.\"CityCode\" = co.\"CityCode\"  ";
+		sql += " 	    LEFT JOIN \"CdCity\"   cc ON cc.\"CityCode\" = co.\"CityCode\"  ";
+		sql += " 	    LEFT JOIN \"CdCode\"   code1 ON code1.\"DefCode\" = 'ClOtherRightsCityCd'  ";
+		sql += " 	    and code1.\"Code\" = co.\"CityCode\"  ";
 
 		if (!iCityCode.isEmpty() || !iLandOfficeCode.isEmpty() || !iRecWord.isEmpty()) {
 			sql += " 	WHERE ";

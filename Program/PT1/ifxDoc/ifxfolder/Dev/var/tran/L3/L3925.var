@@ -478,7 +478,7 @@ P(R,#IncludeExtraX)
 
 #IncludeExtraXX=X,38,S
 C(3,#OExtraRepay,0,S,$)
-T(2,#IncludeExtraX+#WkBracket)
+T(B,#IncludeExtraX+#WkBracket)
 P(L,#IncludeExtraXX)
 
 #OPrincipal=m,14.2,S
@@ -487,8 +487,8 @@ P(L,#IncludeExtraXX)
 CALL2(#ADJUSTDOT,#Precision,#OPrincipal,#OPrincipalX)
 P(R,#OPrincipalX)
 
-#OPrincipalXX=X,61,L
-T(2,#OPrincipalX+  +#IncludeExtraXX)
+#OPrincipalXX=X,51,L
+T(B,#OPrincipalX+  +#IncludeExtraXX)
 P(L,#OPrincipalXX)
 
 #OInterest=m,14.2,S
@@ -505,6 +505,12 @@ CALL2(#ADJUSTDOT,#Precision,#ODelayInt,#ODelayIntX)
 
 #OBreachAmtX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#OBreachAmt,#OBreachAmtX)
+
+#OReduceAmt=m,14.2,S
+
+#OReduceAmtX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#OReduceAmt,#OReduceAmtX)
+P(R,#OReduceAmtX)
 
 #OTempTax=m,14.2,S
 
@@ -646,6 +652,7 @@ P(R,#OODelayIntX)
 CALL2(#ADJUSTDOT,#Precision,#OOBreachAmt,#OOBreachAmtX)
 P(R,#OOBreachAmtX)
 
+
 #OOCloseBreachAmt=m,14.2,S
 
 #OOCloseBreachAmtX=X,22,L
@@ -675,7 +682,7 @@ P(R,#OOLoanBalX)
 TXFORM=L3925
 #OPrincipal#OIntStartDate#OIntEndDate#ORate
 #OInterest#ODelayInt#OBreachAmt#OCloseBreachAmt
-#OTempTax
+#OTempTax#OReduceAmt
 #OShortfall#OShortfallInt#OShortfallPrin#OShortCloseBreach#OExcessive
 #OExtraRepay#OLoanBal#ONewDueAmt#OLeftTerms
 #OOFacmNo#OOBormNo#OOIntStartDate#OOIntEndDate#OOAmount#OORate
@@ -705,7 +712,7 @@ TXFORM=L3925
 ["@本金",#OPrincipalXX],["@放款餘額",#OLoanBalX],
 ["@利息",#OInterestX],["@新攤還金額",#ONewDueAmtX],
 ["@延遲息",#ODelayIntX],["@剩餘期數",#OLeftTermsX],
-[#<->#,"@違約金",#OBreachAmtX],
+["@違約金",#OBreachAmtX],["@減免金額",#OReduceAmtX],
 ]
 </sub>
 

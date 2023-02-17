@@ -172,7 +172,8 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          , CC.\"Item\"";
 		sql += "          , NVL(CO.\"RenewCode\",' ') AS \"RenewCode\"";
 		sql += "     FROM \"AcReceivable\" AC ";
-		sql += "     LEFT JOIN \"CdAcCode\" C ON C.\"AcNoCode\" = AC.\"AcNoCode\" ";
+//		sql += "     LEFT JOIN \"CdAcCode\" C ON C.\"AcNoCode\" = AC.\"AcNoCode\" ";
+		sql += "     LEFT JOIN \"CdAcCode\" C ON C.\"AcctCode\" = AC.\"AcctCode\"";
 		sql += "                             AND C.\"AcSubCode\" = AC.\"AcSubCode\" ";
 		sql += "                             AND C.\"AcDtlCode\" = AC.\"AcDtlCode\" ";
 		sql += "     LEFT JOIN \"CdCode\" CC ON CC.\"DefCode\" = 'AcSubBookCode' ";

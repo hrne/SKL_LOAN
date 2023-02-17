@@ -148,10 +148,11 @@ public class LM050Report extends MakeReport {
 
 				String custNo = tLM050.get("F1");
 				String custName = tLM050.get("F2");
-				String remark=tLM050.get("remark");
+				String remark=tLM050.get("Remark");
 
-				if (rptType.equals(listLM050.get(pos + 1).get("F1"))) {
-					makeExcel.setShiftRow(rowCursor, 1);
+				if (tLM050.size() > 1) {
+					makeExcel.setShiftRow(rowCursor+1, tLM050.size() - 1);
+					
 				}
 				
 				

@@ -10,6 +10,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.parse.Parse;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.CdEmpService;
@@ -31,6 +32,9 @@ public class LCR07 extends TradeBuffer {
 	@Autowired
 	public CdEmpService cdEmpService;
 
+	@Autowired
+	private Parse parse;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active LCR07 ");
@@ -38,9 +42,12 @@ public class LCR07 extends TradeBuffer {
 
 		TxTeller tTxTeller = sTxTellerService.findById(titaVo.getParam("SUPID"));
 		if (tTxTeller != null) {
-			if (tTxTeller.getLevelFg() != 1) {
+			if (tTxTeller.getLevelFg() != 1)
 				throw new LogicException("EC004", "員編: " + titaVo.getParam("SUPID") + " 非主管");
-			}
+
+			if (tTxTeller.getAllowFg() <= parse.stringToInteger(titaVo.getParam("ALLOWFG")))
+				throw new LogicException("EC000", "主管編號 : " + titaVo.getParam("SUPID") + " 許可權限不足");
+
 		} else {
 			throw new LogicException("EC001", "員編:" + titaVo.getParam("SUPID"));
 		}

@@ -474,24 +474,7 @@
 		</step>
 	</job>
 
-	<!-- 年報 -->
-	<job id="jLY005" parent="parentJob"
-		xmlns="http://www.springframework.org/schema/batch">
-		<step id="sLY005" parent="parentStep">
-			<tasklet ref="LY005" />
-		</step>
-	</job>
-	<job id="jLY006" parent="parentJob"
-		xmlns="http://www.springframework.org/schema/batch">
-		<step id="sLY006" parent="parentStep">
-			<tasklet ref="LY006" />
-		</step>
-	</job>
-	<job id="jLY007" parent="parentJob"
-		xmlns="http://www.springframework.org/schema/batch">
-		<step id="sLY007" parent="parentStep">
-			<tasklet ref="LY007" />
-		</step>
-	</job>
+	
+	
 
 </beans>
