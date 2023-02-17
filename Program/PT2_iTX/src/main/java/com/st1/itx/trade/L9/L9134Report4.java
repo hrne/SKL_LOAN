@@ -76,6 +76,7 @@ public class L9134Report4 extends MakeExcel {
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("l9134ServiceImpl.doQueryL9134_4 error = " + errors.toString());
 		}
+		
 		int row=5;
 		int size = findList.size();
 		this.info("Size = " + findList.size());

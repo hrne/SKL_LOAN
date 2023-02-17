@@ -257,7 +257,8 @@ BEGIN
                , MSTP.LMSACN
                , MSTP.LMSAPN
                , LMSP.LMSSTS
-               , ROW_NUMBER (
+               , ROW_NUMBER ()
+                 OVER (
                    PARTITION BY MSTP.ADTYMT
                               , MSTP.LMSACN
                               , MSTP.LMSAPN
@@ -267,6 +268,24 @@ BEGIN
           LEFT JOIN LA$LMSP LMSP ON LMSP.LMSACN = MSTP.LMSACN
                                 AND LMSP.LMSAPN = MSTP.LMSAPN
                                 AND TRUNC(LMSP.LMSLLD / 100) <= MSTP.ADTYMT
+        )
+        , badData AS (
+          SELECT MSTP.ADTYMT
+               , MSTP.LMSACN
+               , MSTP.LMSAPN
+               , LMSP.LMSSTS
+               , ROW_NUMBER ()
+                 OVER (
+                   PARTITION BY MSTP.ADTYMT
+                              , MSTP.LMSACN
+                              , MSTP.LMSAPN
+                   ORDER BY LMSP.LMSASQ DESC
+                 ) AS "Seq"
+          FROM LA$MSTP MSTP
+          LEFT JOIN LA$LMSP LMSP ON LMSP.LMSACN = MSTP.LMSACN
+                                AND LMSP.LMSAPN = MSTP.LMSAPN
+                                AND TRUNC(LMSP.LMSLLD / 100) <= MSTP.ADTYMT
+          WHERE LMSP.LMSSTS = 6
         )
         SELECT S0."ADTYMT"                    AS "YearMonth"           -- 資料年月 DECIMAL 6 0
               ,S0."LMSACN"                    AS "CustNo"              -- 戶號 DECIMAL 7 0
@@ -343,35 +362,41 @@ BEGIN
                  WHEN NVL(ACT."ACTFSC",' ') = 'A' THEN '201'
                ELSE '00A' END                 AS "AcSubBookCode"        -- 區隔帳冊別 VARCHAR2 3 0
         FROM (-- 子查詢:找出催收戶資料
-              SELECT "ADTYMT"
-                    ,"LMSACN"
-                    ,"LMSAPN"
+              SELECT MSTP."ADTYMT"
+                    ,MSTP."LMSACN"
+                    ,MSTP."LMSAPN"
                     -- 2:催收戶
                     -- 6:呆帳戶
                     ,MAX(
                       CASE
+                        WHEN NVL(badData.LMSSTS,0) != 0 -- 呆帳戶判斷
+                        THEN NVL(badData.LMSSTS,0)
                         WHEN NVL(stsData.LMSSTS,0) != 0
                         THEN NVL(stsData.LMSSTS,0)
-                        WHEN "LMSFDB" = 0 -- 轉呆金額為0,才是催收戶
+                        WHEN MSTP."LMSFDB" = 0 -- 轉呆金額為0,才是催收戶
                         THEN 2
                       ELSE 6 END
-                     )             AS "Status"
-                    ,SUM("LMSLBL") AS "LMSLBL" -- 本金餘額
-                    ,SUM("LMSFPN") AS "LMSFPN" -- 轉催收本金
-                    ,SUM("LMSFIN") AS "LMSFIN" -- 轉催收利息
-                    ,SUM("LMSTPN") AS "LMSTPN" -- 催收還款金額
-              FROM "LA$MSTP"
+                     )                  AS "Status"
+                    ,SUM(MSTP."LMSLBL") AS "LMSLBL" -- 本金餘額
+                    ,SUM(MSTP."LMSFPN") AS "LMSFPN" -- 轉催收本金
+                    ,SUM(MSTP."LMSFIN") AS "LMSFIN" -- 轉催收利息
+                    ,SUM(MSTP."LMSTPN") AS "LMSTPN" -- 催收還款金額
+              FROM "LA$MSTP" MSTP
               LEFT JOIN stsData ON stsData.ADTYMT = MSTP.ADTYMT
                                AND stsData.LMSACN = MSTP.LMSACN
                                AND stsData.LMSAPN = MSTP.LMSAPN
                                AND stsData."Seq" = 1
-              WHERE "ADTYMT" >= "DateStart"
-                AND "ADTYMT" <= "DateEnd"
-                AND "ACTACT" = '990' 
-                AND "LMSFBD" > 0 -- 催收開始日不為0
-              GROUP BY "ADTYMT"
-                      ,"LMSACN"
-                      ,"LMSAPN"
+              LEFT JOIN badData ON badData.ADTYMT = MSTP.ADTYMT
+                               AND badData.LMSACN = MSTP.LMSACN
+                               AND badData.LMSAPN = MSTP.LMSAPN
+                               AND badData."Seq" = 1
+              WHERE MSTP."ADTYMT" >= "DateStart"
+                AND MSTP."ADTYMT" <= "DateEnd"
+                AND MSTP."ACTACT" = '990' 
+                AND MSTP."LMSFBD" > 0 -- 催收開始日不為0
+              GROUP BY MSTP."ADTYMT"
+                     , MSTP."LMSACN"
+                     , MSTP."LMSAPN"
              ) S0
         LEFT JOIN (SELECT "ADTYMT"
                          ,"LMSACN"

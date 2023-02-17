@@ -75,7 +75,7 @@ public class L9740Report extends MakeReport {
 		this.setBeginRow(4);
 
 		// 設定明細列數(自訂亦必須)
-		this.setMaxRows(35);
+		this.setMaxRows(55);
 
 	}
 
@@ -223,10 +223,10 @@ public class L9740Report extends MakeReport {
 		this.print(1, 8, "戶號");
 		this.print(0, 18, "額度");
 //		this.print(0, 25, "撥款");
-		this.print(0, 25, "撥款日期");
-		this.print(0, 39, "撥款金額");
-		this.print(0, 49, "利率");
-		this.print(0, 57, "繳息迄日");
+		this.print(0, 27, "撥款日期");
+		this.print(0, 45, "撥款金額");
+		this.print(0, 59, "利率");
+		this.print(0, 70, "繳息迄日");
 		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－ ");
 //		this.print(1, 1, " ");
 
@@ -239,12 +239,12 @@ public class L9740Report extends MakeReport {
 				this.print(0, 18, r3.get("FacmNo"));
 //				this.print(0, 25, r3.get("BormNo"));
 				this.print(0, 27, this.showBcDate(r3.get("DrawdownDate"), 0));
-				this.print(0, 39, this.formatAmt(r3.get("DrawdownAmt"), 0));
+				this.print(0, 43, this.formatAmt(r3.get("DrawdownAmt"), 0));
 				BigDecimal rate = r3.get("StoreRate").isEmpty() ? BigDecimal.ZERO : new BigDecimal(r3.get("StoreRate"));
-				this.print(0, 49, fillUpWord(String.valueOf(rate), 6, "0", "R"));
-				this.print(0, 57, this.showBcDate(r3.get("NextPayIntDate"), 0));
+				this.print(0, 57, fillUpWord(String.valueOf(rate), 6, "0", "R"));
+				this.print(0, 69, this.showBcDate(r3.get("NextPayIntDate"), 0));
 
-				if (count == 27) {
+				if (count == 50) {
 					this.newPage();
 					count = 1;
 				}

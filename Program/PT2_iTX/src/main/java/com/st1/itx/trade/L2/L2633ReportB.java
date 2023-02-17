@@ -263,8 +263,9 @@ public class L2633ReportB extends MakeReport {
 				} else {
 					print(0, 81, collectWayCode); // 領取方式
 				}
-
-				print(0, 95, FormatUtil.padX("" + rmk, 20)); // 備註欄
+				if ("20".equals(collectWayCode)) {
+					print(0, 95, FormatUtil.padX("" + rmk, 20)); // 備註欄
+				}
 				print(0, 117, FormatUtil.padX("" + telNo1, 20)); // 連絡電話1
 				this.info("docNoE = " + docNoE);
 				if (!"0".equals(docNoE)) {

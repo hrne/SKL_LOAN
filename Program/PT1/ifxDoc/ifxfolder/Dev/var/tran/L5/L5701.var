@@ -33,7 +33,7 @@ E(0,0)
 ["#FdFirstDueDate+首次應繳日",#FirstDueDate],["#FdLastDueDate+還款結束日",#LastDueDate],
 ["#FdFieldName+#FieldName",#TotalContrAmt],["#FdNextPayDate+下次應繳日",#NextPayDate],
 [#<->#,"#FdMainFinCode+最大債權機構",#MainFinCode,#BTNM,#MainFinCodeName],
-["#FdTwoStepCode+二階段註記",#TwoStepCode,#TwoStepCodeX],
+["#FdTwoStepCode+階段註記",#TwoStepCode,#TwoStepCodeX],
 [#<->#,"@",#BTNK,#BtnConnect,#BTND,#BTNF,#BTNE,#BTNG,#BTNH,#BTNI,#BTNJ,#BTNL],
 ["#grid#,{id:1,expand:true,loop:30,row_height:1,s_cols:[], p_cols:[]}","","",
 ["債權機構","","機構名稱","簽約金額","債權比例% ","期款","註銷日期","註銷本金"],
@@ -128,7 +128,7 @@ HIDE(#BTND,#BTNF,#BTNE,#BTNG,#BTNH,#BTNI,#BTNJ,#BTNL,#BTNM)
 #BTNE=X,1,S,ui:button;value:取消毀諾;enable:1;tabbable:0
 #BTNG=X,1,S,ui:button;value:變更還款條件;enable:1;tabbable:0
 #BTNH=X,1,S,ui:button;value:喘息期;enable:1;tabbable:0
-#BTNI=X,1,S,ui:button;value:二階段新增;enable:1;tabbable:0
+#BTNI=X,1,S,ui:button;value:階段新增;enable:1;tabbable:0
 #BTNJ=X,1,S,ui:button;value:債權異動歷程;enable:1;tabbable:0
 #BTNK=X,1,S,ui:button;value:債務人聯絡電話;enable:1;tabbable:0
 #BTNL=X,1,S,ui:button;value:喘息期歷程;enable:1;tabbable:0
@@ -440,7 +440,7 @@ IF (#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode
 IF (#FunctionCode=="01",T(F,@Status,0),$) 
 !喘息期只能改此二欄位
 IF (#FunctionCode=="02" || #FunctionCode=="10",T(F,@DeferYMStartX,1)T(F,@DeferYMEndX,1),$) 
-!變更還款條件&二階段新增:不能改的欄位
+!變更還款條件&階段新增:不能改的欄位
 IF (#FunctionCode=="09"||#FunctionCode=="11",T(F,@IsMainFin,0)T(F,@CaseKindCode,0)T(F,@Status,0)T(F,@ApplDate,0),$)
  
 #WKTF2=A,1,S
@@ -578,7 +578,7 @@ V(2,0)
 ! 2:毀諾
 ! 3:結案
 ! 4:未生效
-!預設值不可改:新增時預設=0,變更還款條件時預設=0,二階段新增時預設=4
+!預設值不可改:新增時預設=0,變更還款條件時預設=0,階段新增時預設=4
 
 #SendL2r07=X,1,S
 C(3,#PayerCustNo,0,S,$)
@@ -763,9 +763,10 @@ T(2,@MainFinCodeName,#L5r12BankItem)
 IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
 HELP(#YNHelp)
 @T(3,@TwoStepCodeX,)
-V(3,Y,N,1,2)
+V(3,Y,N,1,2,3)
 IF(#TwoStepCode=="Y",T(2,1),$)
-IF(#L5r01TwoStepCode==1 && #FunctionCode==11,T(2,2),s)
+IF(#L5r01TwoStepCode==1 && #FunctionCode==11,T(2,2),$)
+IF(#L5r01TwoStepCode==2 && #FunctionCode==11,T(2,3),s)
 
 #TwoStepCodeX=x,18,L
 SWITCH(#TwoStepCode,
@@ -842,12 +843,12 @@ T(2,10+#BufKey)
 BIND(#BTNH,click, {cmd=CHAIN; ntxcd=L5701; ntxbuf=#BUFH})
 !L8XXX
 
-! <二階段新增>
+! <階段新增>
 #BUFI=X,22,S
 T(2,11+#BufKey)
 #BINDI=X,1,S
 BIND(#BTNI,click, {cmd=CHAIN; ntxcd=L5701; ntxbuf=#BUFI})
-! UPDATE TwoStepCode=Y 2階段註記
+! UPDATE TwoStepCode=Y 階段註記
 
 
 ! 交易Key值=戶號(7)+案件序號(3)

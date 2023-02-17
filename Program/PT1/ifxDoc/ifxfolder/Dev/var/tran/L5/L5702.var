@@ -54,7 +54,7 @@ E(0,1)
 ["累應還金額",#OrgAccuDueAmt,#NewAccuDueAmt],["累新壽分攤金額",#OrgAccuSklShareAmt,#NewAccuSklShareAmt],
 [#<->#,"下次應繳日",#OrgNextPayDate,#NewNextPayDate],
 ["償還本金",#OrgRepayPrincipal,#NewRepayPrincipal],["償還利息",#OrgRepayInterest,#NewRepayInterest],
-["二階段註記",#TwoStepCode],["申請變更還款條件日",#ChgCondDate],
+["階段註記",#TwoStepCode],["申請變更還款條件日",#ChgCondDate],
 ["戶況日期",#OrgStatusDate,#NewStatusDate],
 [#<->#,"@","債務協商交易檔資料"],
 ["會計日期",#TransAcDate],["經辦",#TransTitaTlrNo],
@@ -398,7 +398,7 @@ T(2,@MainFinCodeX,#L5r12BankItem)
 ! Org還本利息
 #OrgRepayInterest=+m,14,L
 #NewRepayInterest=+m,14,L
-! Org二階段註記
+! Org階段註記
 #TwoStepCode=X,1,L
 ! 申請變更還款條件日
 #ChgCondDate=D,7,L

@@ -148,29 +148,31 @@ E(0,0)
 C(4,#TRN_CODE2,T(F,@TRN_CODE2,0),T(F,@TRN_CODE2,1))
 
 ! 作業日期
-#DATE=D,8,S
-T(4,DATE$)
+!#DATE=D,8,S
+!T(4,DATE$)
 
 #DT=D,7,S
-T(1,#DATE,2,7)
+!T(1,#DATE,2,7)
 
-#DT_MONTH=A,5,S
-T(1,#DATE,2,5)
+!#DT_MONTH=A,5,S
+!T(1,#DATE,2,5)
 
-#DT_01=A,2,S
-E(0,1)
+!#DT_01=A,2,S
+!E(0,1)
 
 #ST_DTS=D,7,S
-T(2,#DT_MONTH+#DT_01)
+!T(2,#DT_MONTH+#DT_01)
 #ED_DTS=D,7,S
 E(0,#DT)
 
 #ST_DT=D,7,I
 C(3,#CHAIN,1,s,$)
-T(2,#ST_DTS)
+!T(2,#ST_DTS)
+!@
+!C(3,#ST_DT,0,S,A(4,0,#ST_DT))
+!V(5,#ST_DT,#SYSCDATE)
 @
-C(3,#ST_DT,0,S,A(4,0,#ST_DT))
-V(5,#ST_DT,#SYSCDATE)
+A(4,0,#ST_DT)
 
 
 #ED_DT=D,7,I
@@ -181,8 +183,9 @@ D(8)
 @
 V(7)
 A(4,0,#ED_DT)
-V(5,#ST_DT,#ED_DTS)
-IF(#ST_DT>#ED_DT,V(P,會計起日不能大於會計訖日),$)
+!V(5,#ST_DT,#ED_DTS)
+!IF(#ST_DT>#ED_DT,V(P,會計起日不能大於會計訖日),$)
+IF(#ST_DT>#ED_DT,V(P,會計訖日不能小於會計起日),$)
 
 
 #SX_DT=D,7,I
@@ -201,10 +204,10 @@ C(3,#CHAIN,1,s,$)
 C(3,#SX_DT,0,S,$)
 C(3,#EX_DT,0,E(0,#SX_DT),$)
 @
-V(7)
 A(4,0,#EX_DT)
-V(5,#SX_DT,#SYSCDATE)
-IF(#EX_DT>#DT,V(P,交易迄日不能大於會計日),$)
+!V(5,#SX_DT,#SYSCDATE)
+!IF(#EX_DT>#DT,V(P,交易迄日不能大於會計日),$)
+IF(#SX_DT>#EX_DT,V(P,交易迄日不能小於交易起日),$)
 
 !交易序號
 #TxtNo=X,18,I

@@ -79,8 +79,8 @@ BEGIN
           ,CASE
              WHEN LM."LMSSTS" = 6      THEN 3 -- 呆帳
              WHEN LM."LMSSTS" = 7      THEN 2 -- 部分轉呆
-             WHEN LM."LMSSTS" = 5      THEN 5 -- 催收結案 = 催收收回
-             WHEN LM."LMSSTS" = 9      THEN 3 -- 呆帳結案 = 呆帳
+             WHEN LM."LMSSTS" = 5      THEN 5 -- 催收結案 = 催呆結案
+             WHEN LM."LMSSTS" = 9      THEN 5 -- 呆帳結案 = 催呆結案
              WHEN LM."LMSSTS" IN (1,3) THEN 4 -- 正常戶,結案戶 = 催收回復
            ELSE 1 END                     AS "Status"              -- 狀態 DECIMAL 1 
           ,'990'                          AS "AcctCode"            -- 帳務科目 VARCHAR2 3 

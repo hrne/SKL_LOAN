@@ -212,6 +212,7 @@ T(H,#OOFunCode,#FunCodeHelp)
 
 #OOFacmNo=A,3,L
 
+! 序號->清償序號 20230216 QC2321修改名稱
 #OOCloseNo=A,3,L
 
 #OOCloseReasonCode=X,2,S
@@ -419,7 +420,7 @@ TXFORM=L2077
 #OOApplDate=申請日期
 {width:100,align:'center'}
 
-#OOCloseNo=序號
+#OOCloseNo=清償序號
 {width:80,align:'center'}
 
 #OOFunCodX=作業項目

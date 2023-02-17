@@ -355,10 +355,10 @@ TXFORM=L5075
 {width:95,align:'right'}
 #OOCustName=戶名
 {width:65,align:'center'}
-#OOBtnA=
+#OOBtnA=毀諾
 {search:false,formatter:'cust:bind-button:毀諾;L5701 債權維護',align:'center',canExport:false,width:35}
-#OOBtnH=
-{search:false,formatter:'cust:bind-button:二階段新增;L5701 債權維護',align:'center',canExport:false,width:80}
+#OOBtnH=階段新增
+{search:false,formatter:'cust:bind-button:階段新增;L5701 債權維護',align:'center',canExport:false,width:80}
 #OODueAmt=期款金額
 {width:95,align:'right'}
 #OOPayIntDate=繳息迄日
@@ -387,11 +387,11 @@ TXFORM=L5075
 {width:120,align:'center'}
 #OOCustComAddr=債務人通訊地址
 {width:200,align:'left'}
-#OOBtnB=
+#OOBtnB=電話
 {search:false,formatter:'cust:bind-button:電話;L1905 顧客連絡電話查詢',align:'center',canExport:false,width:35}
-#OOBtnC=
-{search:false,formatter:'cust:bind-button:已繳;L5972 債務協商入帳明細查詢',align:'center',canExport:false,width:35}
-#OOBtnG=
+#OOBtnC=入帳明細
+{search:false,formatter:'cust:bind-button:已繳;L5972 債務協商入帳明細查詢',align:'center',canExport:false,width:70}
+#OOBtnG=法催紀錄
 {search:false,formatter:'cust:bind-button:法催紀錄;L5960 案件資料查詢',align:'center',canExport:false,width:70}
 ^
 <include src="PRT.icf::INQ04.sel" map="i=L5075;cpi=15"/>

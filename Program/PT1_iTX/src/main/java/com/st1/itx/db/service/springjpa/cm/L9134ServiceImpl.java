@@ -184,7 +184,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// sql += " WHERE AC.\"AcNoCode\" LIKE '20222%' ";
 //		sql += "    WHERE  AC.\"AcctCode\" in ('TAV','TCK','TEM','TAM','TRO','TLD') ";
 		sql += "    where  AC.\"AcctCode\" in ('T10','T11','T12','T13','TAM','TAV','TCK','TEM','THC','TLD','TMI','TRO','TSL') ";
-		sql += "       AND AC.\"RvBal\" > 0 ";
+		sql += "       AND AC.\"RvBal\" > 0 ";	
 		sql += "     ORDER BY AC.\"AcNoCode\" ASC ";
 		sql += "            , AC.\"AcSubCode\" ASC ";
 		sql += "            , AC.\"AcDtlCode\" ASC ";
@@ -251,7 +251,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " select";
 //		sql += "  "+ixLmnDy6+"/01  ||'~'|| "+ixxLmnDy+" as \"AcDate\" ";
 //		sql += "  to_char("+ixxLmnDy+") as \"AcDate\" ";
-		sql += " '"+ixLmnDy3+" "+'/'+" "+ixLmnDy12+" "+'/'+" "+ ixLmnDy2 +"'  as \"AcDate\" ";
+		sql += " '"+ixLmnDy3+""+'/'+" "+ixLmnDy12+""+'/'+""+ ixLmnDy2 +"'  as \"AcDate\" ";
 		sql += "  ,sum(\"YdBal\") as \"YdBal\" ";
 		sql += "  ,sum(\"TdBal\") as \"TdBal\" ";
 		sql += "  ,0 as \"didYdBal\"";
@@ -264,7 +264,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " select ";
 //		sql += "  "+ixLmnDy6+"/01  ||'~'|| "+ixxLmnDy+" as \"AcDate\" ";
 //		sql += "  to_char("+ixxLmnDy+") as \"AcDate\" ";
-		sql += " '"+ixLmnDy3+" "+'/'+" "+ixLmnDy12+" "+'/'+" "+ ixLmnDy2 +"'  as \"AcDate\" ";
+		sql += " '"+ixLmnDy3+""+'/'+""+ixLmnDy12+""+'/'+""+ ixLmnDy2 +"'  as \"AcDate\" ";
 		sql += " , 0 as \"YdBal\" ";
 		sql += " ,0 as \"TdBal\" ";
 		sql += " ,sum(\"YdBal\") as \"didYdBal\" ";
@@ -277,7 +277,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		for (int i = 1; i <= indx; i++) {
 			sql += " select ";
 //			sql += " to_char(" + itdx + parse.IntegerToString(i, 2) + ")  as \"AcDate\" ";
-			sql += " '"+itdx3+" "+'/'+" "+itdx2+" "+'/'+" " + parse.IntegerToString(i, 2) + "' as \"AcDate\" ";
+			sql += " '"+itdx3+""+'/'+""+itdx2+""+'/'+"" + parse.IntegerToString(i, 2) + "' as \"AcDate\" ";
 			sql += " ,0 as \"YdBal\" ";
 			sql += " ,0 as \"TdBal\" ";
 			sql += " ,0 as \"didYdBal\" ";
@@ -288,7 +288,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " select  ";
 //			sql += " to_char(\"AcDate\") as \"AcDate\" ";
 //			sql += " to_char(" + itdx + parse.IntegerToString(i, 2) + ")  as \"AcDate\" ";
-			sql += " '"+itdx3+" "+'/'+" "+itdx2+" "+'/'+" " + parse.IntegerToString(i, 2) + "'  as \"AcDate\" ";
+			sql += " '"+itdx3+""+'/'+""+itdx2+""+'/'+"" + parse.IntegerToString(i, 2) + "'  as \"AcDate\" ";
 			sql += " ,\"TdBal\"";
 			sql += " ,\"YdBal\" ";
 			sql += " , 0 as \"didYdBal\" ";
@@ -304,7 +304,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " select ";
 //			sql += " to_char(\"AcDate\") as \"AcDate\" ";
 //			sql += " to_char(" + itdx + parse.IntegerToString(i, 2) + ")  as \"AcDate\" ";
-			sql += " '"+itdx3+" "+'/'+" "+itdx2+" "+'/'+" " + parse.IntegerToString(i, 2) + "'  as \"AcDate\" ";
+			sql += " '"+itdx3+""+'/'+" "+itdx2+""+'/'+"" + parse.IntegerToString(i, 2) + "'  as \"AcDate\" ";
 			sql += " ,0 as \"YdBal\" ";
 			sql += " ,0 as \"TdBal\" ";
 			sql += " , \"YdBal\" as \"didYdBal\"";
@@ -317,13 +317,11 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " and \"AcDate\" = " + itdx1911 + parse.IntegerToString(i, 2) + " ";
 			sql += " union all ";
 			sql += " select ";
-//			sql += " to_char(" + itdx + parse.IntegerToString(i, 2) + ")  as \"AcDate\" ";
-			sql += " '"+itdx3+" "+'/'+" "+itdx2+" "+'/'+" " + parse.IntegerToString(i, 2) + "' as \"AcDate\" ";
+			sql += " '"+itdx3+""+'/'+""+itdx2+""+'/'+"" + parse.IntegerToString(i, 2) + "' as \"AcDate\" ";
 			sql += " ,0 as \"YdBal\" ";
 			sql += " ,0 as \"TdBal\" ";
 			sql += " ,0 as \"didYdBal\" ";
 			sql += " ,0 as \"didTdal\" ";
-//			sql += " ,sum(\"DrAmt\") as \"DrAmt\" , sum(\"CrAmt\") as \"CrAmt\" ";
 			sql += " ,\"DrAmt\" as \"DrAmt\" , \"CrAmt\" as \"CrAmt\" ";
 			sql += " from ( ";
 			sql += " select ";
