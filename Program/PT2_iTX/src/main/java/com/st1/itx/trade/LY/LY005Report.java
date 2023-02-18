@@ -101,11 +101,14 @@ public class LY005Report extends MakeReport {
 
 		makeExcel.setValue(3, 17, totalEquity, "#,##0"); // 核閱數
 
+		int iYear =Integer.valueOf(titaVo.getParam("RocYear"));
 		if (lY005List != null && !lY005List.isEmpty()) {
 
 			// 與本公司關係為G者 合併為一筆
 			lY005List = groupG(lY005List);
-
+			
+			makeExcel.setValue(2, 15, iYear + ".12.31", "C");
+			makeExcel.setValue(3, 15, formatAmt(totalEquity, 0), "C");
 			int rowCursor = 5; // 列指標
 
 			// 新增明細行數
@@ -121,55 +124,25 @@ public class LY005Report extends MakeReport {
 
 			for (Map<String, String> tLDVo : lY005List) {
 
-				String valueStr = "";
-				BigDecimal valueNum = BigDecimal.ZERO;
-
 				makeExcel.setValue(rowCursor, 2, seq, "C"); // 列號
+				
+				BigDecimal loanBal = getBigDecimal(tLDVo.get("LoanBal"));
+				BigDecimal gPercent = this.computeDivide(loanBal, totalEquity, 4);
+				makeExcel.setValue(rowCursor, 1, tLDVo.get("Rel"));// 與本公司之關係
+				makeExcel.setValue(rowCursor, 2, tLDVo.get("CustNo"));// 交易對象代號
+				makeExcel.setValue(rowCursor, 3, tLDVo.get("CustName"));// 交易對象名稱
+				makeExcel.setValue(rowCursor, 4, tLDVo.get("F3"));// 交易種類
+				makeExcel.setValue(rowCursor, 5, tLDVo.get("F4"));// 交易型態
+				makeExcel.setValue(rowCursor, 6, tLDVo.get("BdLoaction"));// 交易標的內容
+				makeExcel.setValue(rowCursor, 7, tLDVo.get("DrawdownDate"));// 交易日期
+				makeExcel.setValue(rowCursor, 8, loanBal);// 交易金額
+				makeExcel.setValue(rowCursor, 9, tLDVo.get("F8"));// 最近交易日之參考市價
+				makeExcel.setValue(rowCursor, 10, tLDVo.get("F9"));// 已實現損益
+				makeExcel.setValue(rowCursor, 11, tLDVo.get("F10"));// 未實現損益
+				makeExcel.setValue(rowCursor, 12, gPercent, "C");// 交易金額占業主權益比率%
+				makeExcel.setValue(rowCursor, 13, tLDVo.get("Supervisor"), "C");// 最後決定權人員
+				makeExcel.setValue(rowCursor, 14, tLDVo.get("F13"));// 備註
 
-				for (int i = 0; i <= 13; i++) {
-					valueStr = tLDVo.get("F" + i);
-
-					if (valueStr == null || valueStr.isEmpty()) {
-						continue;
-					}
-
-					if (parse.isNumeric(valueStr)) {
-						valueNum = getBigDecimal(valueStr);
-					} else {
-						valueNum = BigDecimal.ZERO;
-					}
-
-					int columnCursor = 3 + i; // 欄指標
-
-					switch (i) {
-					case 6:
-						// 交易日期
-						makeExcel.setValue(rowCursor, columnCursor, this.showBcDate(valueStr, 0));
-						break;
-					case 7:
-						makeExcel.setValue(rowCursor, columnCursor,valueNum);
-						txAmtTotal = txAmtTotal.add(valueNum); // 交易金額加總
-					case 8:
-					case 9:
-					case 10:
-						// 金額欄位
-						if (valueNum.compareTo(BigDecimal.ZERO) != 0) {
-							makeExcel.setValue(rowCursor, columnCursor, valueNum, "#,##0");
-						}
-						break;
-					case 11:
-						// 交易金額占業主權益比率%
-						valueNum = (valueNum.divide(totalEquity,2,RoundingMode.HALF_UP)).multiply(getBigDecimal(100));
-						
-						makeExcel.setValue(rowCursor, columnCursor, valueNum, "#,##0.00");
-						break;
-					default:
-						if (valueStr != null && !valueStr.isEmpty()) {
-							makeExcel.setValue(rowCursor, columnCursor, valueStr);
-						}
-						break;
-					}
-				}
 				rowCursor++;
 				seq++;
 			}
@@ -206,11 +179,11 @@ public class LY005Report extends MakeReport {
 		List<Map<String, String>> result = new ArrayList<>();
 
 		for (Map<String, String> m : lY005List) {
-			String f0 = m.get("F0");
+			String rel = m.get("Rel");
 
-			if (f0.equals("G")) {
-				gCustName = m.get("F2"); // 後蓋前取最後一筆姓名
-				gTxAmt = gTxAmt.add(getBigDecimal(m.get("F7")));
+			if (rel.equals("N")) {
+				gCustName = m.get("CustName"); // 後蓋前取最後一筆姓名
+				gTxAmt = gTxAmt.add(getBigDecimal(m.get("LoanBal")));
 				counts++;
 			} else {
 				result.add(m);
@@ -228,19 +201,19 @@ public class LY005Report extends MakeReport {
 
 		Map<String, String> gMap = new HashMap<>();
 
-		gMap.put("F0", "G"); // 與本公司關係
-		gMap.put("F1", ""); // 交易對象代號
-		gMap.put("F2", gCustName); // 交易對象名稱
+		gMap.put("Rel", "G"); // 與本公司關係
+		gMap.put("CustNo", ""); // 交易對象代號
+		gMap.put("CustName", gCustName); // 交易對象名稱
 		gMap.put("F3", "A"); // 交易種類
 		gMap.put("F4", "C"); // 交易型態
-		gMap.put("F5", "合併列示不另表述"); // 交易標的內容
-		gMap.put("F6", ""); // 交易日期
+		gMap.put("BdLoaction", "合併列示不另表述"); // 交易標的內容
+		gMap.put("DrawdownDate", ""); // 交易日期
 		gMap.put("F7", gTxAmt.toString()); // 交易金額
 		gMap.put("F8", ""); // 最近交易日之市價
 		gMap.put("F9", ""); // 已實現損益
 		gMap.put("F10", ""); // 未實現損益
 		gMap.put("F11", gPercent.toString()); // 交易金額佔業主權益比率%
-		gMap.put("F12", ""); // 最後決定權人員
+		gMap.put("Supervisor", ""); // 最後決定權人員
 		gMap.put("F13", ""); // 備註
 
 		result.add(gMap);

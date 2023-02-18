@@ -134,11 +134,16 @@ public class LM050Report extends MakeReport {
 			makeExcel.setValue(4, 2, "本日無資料", "C");
 			return;
 		}
+		
 
 		int rowCursor = 4;
 
 		String tmpCustNo="";
-		int pos = 0;
+		
+		if (listLM050.size() > 1) {
+			makeExcel.setShiftRow(rowCursor+1, listLM050.size() - 1);
+			
+		}
 
 		for (Map<String, String> tLM050 : listLM050) {
 			String rptType = tLM050.get("F0");
@@ -150,12 +155,7 @@ public class LM050Report extends MakeReport {
 				String custName = tLM050.get("F2");
 				String remark=tLM050.get("Remark");
 
-				if (tLM050.size() > 1) {
-					makeExcel.setShiftRow(rowCursor+1, tLM050.size() - 1);
 					
-				}
-				
-				
 				if(!custNo.equals(tmpCustNo)) {
 					tmpCustNo=custNo;
 				}else {
@@ -171,7 +171,7 @@ public class LM050Report extends MakeReport {
 
 				detailTotal = detailTotal.add(loanBal);
 				rowCursor++;
-				pos++;
+				
 			} else if (rptType.equals("2")) { // 職員
 				empLoanBal = empLoanBal.add(loanBal);
 			} else if (rptType.equals("3")) { // 一般客戶

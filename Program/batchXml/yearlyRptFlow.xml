@@ -73,8 +73,8 @@
 			</flow>
 			<!-- Step: B117關係人明細表 --> 
 			<flow>
-				<step id="sLY006" parent="parentStep">
-					<tasklet ref="LY006" />
+				<step id="sLY006Batch" parent="parentStep">
+					<tasklet ref="LY006Batch" />
 				</step>
 			</flow>
 			

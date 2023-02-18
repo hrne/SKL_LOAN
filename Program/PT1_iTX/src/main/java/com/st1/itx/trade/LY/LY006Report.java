@@ -43,26 +43,18 @@ public class LY006Report extends MakeReport {
 	//初始列
 	int row=8;
 
-	public void exec(TitaVo titaVo) throws LogicException {
+	public boolean exec(TitaVo titaVo) throws LogicException {
 		this.info("LY006Report");
-		int entdyf = titaVo.getEntDyI() + 19110000;
-
-		int iYear = entdyf / 10000;
 		
-		int iMonth = entdyf % 10000;
 		
-		if(iMonth != 12) {
-			iYear = iYear - 1;
-		}
-		
-		int inputYearMonth = (iYear * 100) + 12;
+		int inputYearMonth = (Integer.valueOf(titaVo.getParam("RocYear")) + 1911) * 100 + 12;
 		
 		
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "LY006";
 		String fileItem = "B117關係人明細表";
-		String fileName = "LY006 B117關係人明細表_"+titaVo.getEntDyI()/100;
+		String fileName = "LY006 B117關係人明細表_"+titaVo.getParam("RocYear");
 		String defaultExcel = "LY006_底稿_B117關係人明細表.xlsx";
 		String defaultSheet = "B117關係人明細表";
 
@@ -71,9 +63,9 @@ public class LY006Report extends MakeReport {
 		
 		makeExcel.open(titaVo, reportVo, fileName,defaultExcel,defaultSheet);
 		
-		int rdate=reportDate/100;
-		makeExcel.setValue(2, 2, rdate);
-		this.info("rdate   = " + rdate);
+		
+		makeExcel.setValue(2, 2, inputYearMonth);
+		this.info("rdate   = " + inputYearMonth);
 
 				ExcelFontStyleVo headerStyleVo = new ExcelFontStyleVo();
 				headerStyleVo.setBold(true);
@@ -93,7 +85,7 @@ public class LY006Report extends MakeReport {
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("LY006erviceImpl.exportExcel error = " + errors.toString());
 		}
-		
+		return true;
 
 	}
 	private void eptExcel(List<Map<String, String>> lY006List) throws LogicException {
