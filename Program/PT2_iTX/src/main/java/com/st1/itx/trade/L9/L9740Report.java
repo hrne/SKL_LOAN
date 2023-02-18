@@ -42,6 +42,11 @@ public class L9740Report extends MakeReport {
 	// 製表時間
 	private String nowTime;
 
+	// 1 = Q9309141 新撥款之戶號
+	// 2 = Q9309142 續期放款利率 最低、最高
+	// 3 = Q9309143 利率超過 X.XX% 之借戶
+	private int reportType = 1;
+
 	// ReportDate : 報表日期(帳務日)
 	// ReportCode : 報表編號
 	// ReportItem : 報表名稱
@@ -72,17 +77,37 @@ public class L9740Report extends MakeReport {
 //		this.printDetailHeader();
 
 		// 明細起始列(自訂亦必須)
-		this.setBeginRow(4);
+		this.setBeginRow(6);
 
 		// 設定明細列數(自訂亦必須)
 		this.setMaxRows(55);
+
+		if (reportType == 3) {
+
+			this.print(2, 8, "戶號");
+			this.print(0, 18, "額度");
+//			this.print(0, 25, "撥款");
+			this.print(0, 29, "撥款日期");
+			this.print(0, 45, "撥款金額");
+			this.print(0, 63, "利率");
+			this.print(0, 71, "繳息迄日");
+			print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－ ");
+
+		} else {
+			print(2, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－ ");
+		}
 
 	}
 
 	@Override
 	public void printContinueNext() {
-//		this.print(1, this.getMidXAxis(), "=====　續　　下　　頁　=====", "C");
+		this.print(-55, this.getMidXAxis(), "=====　續　　下　　頁　=====", "C");
 	}
+
+//	@Override
+//	public void printFooter() {
+//		this.print(-53, this.getMidXAxis(), "=====　報　表　結　束　=====", "C");
+//	}
 
 	/**
 	 * 執行報表輸出
@@ -170,29 +195,30 @@ public class L9740Report extends MakeReport {
 
 		this.reportItem = "公會無自用住宅放款檢核清單(新撥款之戶號)";
 
+		this.reportType = 1;
+
 		// 開啟報表
 		this.open(titaVo, reportVo);
 
 		this.setFont(1, 12);
 
 		if (listL9740Data1.size() > 0) {
-			print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－ ");
 
 			// 因此表User說目前還沒看到過有資料，所以暫不確定有資料的格式(各個欄位的項目)
 		} else {
-//			this.print(1, 10, "利率");
-			print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－ ");
 			this.print(1, 3, "本日無資料");
-//			this.print(3, 3, "No records in query report.");
 		}
 
+//		printContinueNext();
+
 		/*-----------------------------------------------------------------------------*/
+
+		this.reportType = 2;
 
 		this.reportItem = "公會無自用住宅放款檢核清單(續期放款利率 最低、最高)";
 		this.newPage();
 
 		if (listL9740Data2.size() > 0) {
-			print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－ ");
 
 			this.print(1, 10, "利率");
 
@@ -208,43 +234,33 @@ public class L9740Report extends MakeReport {
 		} else {
 			this.print(1, 10, "利率");
 
-//			this.print(3, 3, "No records in query report.");
 			this.print(1, 3, "本日無資料");
 		}
 
-//		this.print(1, 3, "＊＊＊＊＊＊＊＊    End of report    ＊＊＊＊＊＊＊＊ ");
-
+//		printContinueNext();
 		/*-----------------------------------------------------------------------------*/
+
+		this.reportType = 3;
 
 		this.reportItem = "公會無自用住宅放款檢核清單(利率超過 " + this.rate + " 之借戶)";
 		this.newPage();
-
-		this.print(1, 1, " ");
-		this.print(1, 8, "戶號");
-		this.print(0, 18, "額度");
-//		this.print(0, 25, "撥款");
-		this.print(0, 27, "撥款日期");
-		this.print(0, 45, "撥款金額");
-		this.print(0, 59, "利率");
-		this.print(0, 70, "繳息迄日");
-		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－ ");
-//		this.print(1, 1, " ");
 
 		if (listL9740Data3.size() > 0) {
 			int count = 1;
 			for (Map<String, String> r3 : listL9740Data3) {
 				count++;
 
-				this.print(1, 8, r3.get("CustNo"));
-				this.print(0, 18, r3.get("FacmNo"));
+				this.print(2, 12, r3.get("CustNo"), "R");
+				this.print(0, 22, r3.get("FacmNo"), "R");
 //				this.print(0, 25, r3.get("BormNo"));
-				this.print(0, 27, this.showBcDate(r3.get("DrawdownDate"), 0));
-				this.print(0, 43, this.formatAmt(r3.get("DrawdownAmt"), 0));
+				this.print(0, 36, this.showRocDate(r3.get("DrawdownDate"), 1), "R");
+				this.print(0, 52, this.formatAmt(r3.get("DrawdownAmt"), 0), "R");
 				BigDecimal rate = r3.get("StoreRate").isEmpty() ? BigDecimal.ZERO : new BigDecimal(r3.get("StoreRate"));
-				this.print(0, 57, fillUpWord(String.valueOf(rate), 6, "0", "R"));
-				this.print(0, 69, this.showBcDate(r3.get("NextPayIntDate"), 0));
+				this.print(0, 66, fillUpWord(String.valueOf(rate), 6, "0", "R"), "R");
+				this.print(0, 78, this.showRocDate(r3.get("PrevPayIntDate"), 1), "R");
 
 				if (count == 50) {
+					printContinueNext();
 					this.newPage();
 					count = 1;
 				}
@@ -253,11 +269,10 @@ public class L9740Report extends MakeReport {
 
 		} else {
 
-//			this.print(3, 3, "No records in query report.");
-			this.print(1, 3, "本日無資料");
+			this.print(2, 3, "本日無資料");
 		}
 
-//		this.print(1, 3, "＊＊＊＊＊＊＊＊    End of report    ＊＊＊＊＊＊＊＊ ");
+		printFooter();
 
 		// 關閉報表
 		this.close();

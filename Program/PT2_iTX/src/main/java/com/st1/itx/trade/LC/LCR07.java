@@ -45,8 +45,8 @@ public class LCR07 extends TradeBuffer {
 			if (tTxTeller.getLevelFg() != 1)
 				throw new LogicException("EC004", "員編: " + titaVo.getParam("SUPID") + " 非主管");
 
-			if (tTxTeller.getAllowFg() <= parse.stringToInteger(titaVo.getParam("ALLOWFG")))
-				throw new LogicException("EC000", "主管編號 : " + titaVo.getParam("SUPID") + " 許可權限不足");
+//			if (tTxTeller.getAllowFg() <= parse.stringToInteger(titaVo.getParam("ALLOWFG")))
+//				throw new LogicException("EC000", "主管編號 : " + titaVo.getParam("SUPID") + " 許可權限不足");
 
 		} else {
 			throw new LogicException("EC001", "員編:" + titaVo.getParam("SUPID"));

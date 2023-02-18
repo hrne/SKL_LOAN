@@ -458,11 +458,11 @@ T(2,#KINBR+#TLRNO+#TXTNO)
 T(6A,#Entdy+#TxNo)
 
 !#FKEY 0:登錄,1:更正,2:放行,3:審核/在途登錄,5:更正重登,6:在途設定,7修改,9檢視journal
-#button=x,100,S
-C(3,#FuncCode,4,s,$)
-T(2,{ cmd=SendOut;once=1; ntxcd=L8203; txno=#RimData;rim=LCR05;auto=true})ASGN(BTN_NEW1$)
-C(2,#FKEY,$,S,S,S,S,S,S,S,S,S,S)
-K(MODIFYBUTTON,1,提交)
+!#button=x,100,S
+!C(3,#FuncCode,4,s,$)
+!T(2,{ cmd=SendOut;once=1; ntxcd=L8203; txno=#RimData;rim=LCR05;auto=true})ASGN(BTN_NEW1$)
+!C(2,#FKEY,$,S,S,S,S,S,S,S,S,S,S)
+!K(MODIFYBUTTON,1,提交)
 
 
 </sub>

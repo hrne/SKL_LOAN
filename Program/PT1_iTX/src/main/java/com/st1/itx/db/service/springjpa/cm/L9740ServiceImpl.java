@@ -52,7 +52,7 @@ public class L9740ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	FROM \"LoanBorMain\" M";
 		sql += "	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\"";
 		sql += "						   AND F.\"FacmNo\" = M.\"FacmNo\"";
-		sql += "	WHERE M.\"DrawdownAmt\" BETWEEN :startDate AND :endDate";
+		sql += "	WHERE M.\"DrawdownDate\" BETWEEN :startDate AND :endDate";
 		//RenewFlag 0:正常 1:展期撥款 2:借新還舊撥款
 		if("Y".equals(renewFlag)) {
 			sql += "	  AND M.\"RenewFlag\" <> 1 ";		
@@ -102,7 +102,7 @@ public class L9740ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	FROM \"LoanBorMain\" M";
 		sql += "	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\"";
 		sql += "						   AND F.\"FacmNo\" = M.\"FacmNo\"";
-		sql += "	WHERE M.\"DrawdownAmt\" <= :endDate";
+		sql += "	WHERE M.\"DrawdownDate\" <= :endDate";
 		sql += "	  AND F.\"AcctCode\" = :acctCode ";
 
 		//status 0:正常戶 2:催收戶
@@ -149,7 +149,7 @@ public class L9740ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  ,MIN(M.\"DrawdownDate\" - 19110000) AS \"DrawdownDate\"";
 		sql += "		  ,SUM(M.\"DrawdownAmt\") AS \"DrawdownAmt\"";
 		sql += "		  ,MIN(L.\"FitRate\") AS \"StoreRate\"";
-		sql += "		  ,MIN(M.\"NextPayIntDate\" - 19110000) AS \"NextPayIntDate\"";
+		sql += "		  ,MIN(M.\"PrevPayIntDate\" - 19110000) AS \"PrevPayIntDate\"";
 		sql += "	FROM \"LoanBorMain\" M";
 		sql += "	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\"";
 		sql += "						   AND F.\"FacmNo\" = M.\"FacmNo\"";
@@ -178,7 +178,7 @@ public class L9740ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	    AND L.\"FacmNo\" = M.\"FacmNo\"";
 		sql += "	    AND L.\"BormNo\" = M.\"BormNo\"";		
 
-		sql += "	WHERE M.\"DrawdownAmt\" <= :endDate";
+		sql += "	WHERE M.\"DrawdownDate\" <= :endDate";
 		sql += "	  AND M.\"StoreRate\" > :rate ";
 		sql += "	  AND F.\"AcctCode\" = :acctCode ";
 
