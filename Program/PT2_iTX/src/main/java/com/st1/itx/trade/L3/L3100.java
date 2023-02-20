@@ -851,8 +851,6 @@ public class L3100 extends TradeBuffer {
 			if (titaVo.isHcodeNormal()) {
 				tLoanBorTx.setTitaEmpNoS(titaVo.getTlrNo());
 			} else {
-				// 放行訂正先記錄被沖正，經辦修改或訂正時再覆蓋
-				tLoanBorTx.setTitaHCode("2"); // 被沖正
 				tLoanBorTx.setCorrectSeq(parse.IntegerToString(titaVo.getEntDyI() + 19110000, 8) + titaVo.getTxSeq());
 			}
 			try {
@@ -883,36 +881,25 @@ public class L3100 extends TradeBuffer {
 			if (tLoanBorTx == null) {
 				throw new LogicException(titaVo, "E0006", "放款交易內容檔"); // 鎖定資料時，發生錯誤
 			}
-			if ("2".equals(tLoanBorTx.getTitaHCode())) {
-				// 放行後訂正
-				loanCom.setLoanBorTxHcode(iCustNo, iFacmNo, wkBormNo, wkBorxNo, wkBorxNo + 1, iDrawdownAmt, titaVo);
-				// 新增放款交易內容檔
-				tLoanBorTx = new LoanBorTx();
-				tLoanBorTxId = new LoanBorTxId();
-				loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, wkBormNo, wkBorxNo + 2, titaVo);
-				moveLoanBorTx();
-				try {
-					loanBorTxService.insert(tLoanBorTx, titaVo);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
-				}
-
-			} else {
-				moveLoanBorTx();
-				try {
-					loanBorTxService.update(tLoanBorTx);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0007", "放款交易內容檔 " + e.getErrorMsg()); // 更新資料時，發生錯誤
-				}
+			// 不可修正帳務日期及金額
+			if (tLoanBorTx.getAcDate() != titaVo.getEntDyI()) {
+				throw new LogicException(titaVo, "E0015", "不可修正帳務日期"); // 檢查錯誤
+			}
+			if (tLoanBorTx.getTxAmt().compareTo(iDrawdownAmt) != 0) {
+				throw new LogicException(titaVo, "E0015", "撥款修正金額"); // 檢查錯誤
+			}
+			moveLoanBorTx();
+			try {
+				loanBorTxService.update(tLoanBorTx);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", "放款交易內容檔 " + e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 		}
-
 		if (titaVo.isHcodeErase()) {
 			// 刪除放款交易內容檔
 			// 註記交易內容檔
 			loanCom.setLoanBorTxHcode(iCustNo, iFacmNo, wkBormNo, wkBorxNo, wkBorxNo + 1, iDrawdownAmt, titaVo);
 		}
-
 	}
 
 	private void AcDetailRoutine() throws LogicException {
@@ -1168,7 +1155,7 @@ public class L3100 extends TradeBuffer {
 		tLoanBorTx.setEntryDate(tLoanBorMain.getDrawdownDate());
 		tLoanBorTx.setTxAmt(this.parse.stringToBigDecimal(titaVo.getTxAmt()));
 		tLoanBorTx.setLoanBal(iDrawdownAmt);
-		tLoanBorTx.setRepayCode(tFacMain.getRepayCode());
+		tLoanBorTx.setRepayCode(0);
 		tLoanBorTx.setRate(tLoanBorMain.getStoreRate());
 		tLoanBorTx.setDisplayflag("A");
 		// 其他欄位

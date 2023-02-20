@@ -52,7 +52,7 @@ K(MODIFYBUTTON,查詢)
 ["[L6023]                                 收件字代碼查詢"],
 ["#FdCityCode+縣市別",#CityCode,#CityCodeX],
 ["#FdLandOfficeCode+地政別",#LandOfficeCode,#LandOfficeCodeX],
-["#FdRecWord+收件字",#RecWord],
+["#FdRecWord+收件字代碼",#RecWord],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -112,7 +112,7 @@ T(B,@L6r49ResultCity,#L6r49Result+;+#ClOtherRightsCityHelp)
 
 #CityCode=X,4,I
 HELP(#L6r49ResultCity)
-@V(H,#L6r49ResultCity)
+@C(4,#CityCode,$,V(H,#L6r49ResultCity))
 ! @C(4,#CityCode,S,V(H,#L6r49ResultCity))
 
 #CityCodeX=X,20,L
@@ -121,6 +121,7 @@ T(H,#CityCode,#L6r49ResultCity)
 
 ! 依縣市別組地政下拉選單
 #RimL6r49CityB=X,1,S
+C(4,#CityCode,S,$)
 E(0,@RimFunCd,2)
 T(2,@RimCityCode,#CityCode)
 RESET_RIM(#RimL6r49CityB,L6R49)
@@ -131,6 +132,7 @@ T(2,@LoanOfficeHelp,#L6r49Result)
 
 !地政別代碼
 #LandOfficeCode=X,2,I
+C(4,#CityCode,S,$)
 C(4,#LoanOfficeHelp,S,HELP(#LoanOfficeHelp))
 C(3,#CHAIN,1,s,$)
 @T(3,@LandOfficeCodeX,)
@@ -143,6 +145,7 @@ T(H,#LandOfficeCode,#LoanOfficeHelp)
 
 !收件字代碼
 #RecWord=X,3,I
+C(4,#CityCode,S,$)
 C(3,#CHAIN,1,s,$)
 
 #RPTFG=A,1,S
@@ -179,13 +182,13 @@ T(3,[L6023] 收件字代碼查詢)
 #LOOP=X,1,S
 T(3,1)ASGN(LOOP$)
 #OOCityCode=X,4,L
+#OOCityItem=X,60,L
 ! 地政別代碼
 #OOLandOfficeCode=X,2,L
-
+#OOLandOfficeItem=X,60,L
 ! 收件字代碼
 
 #OORecWord=X,3,L
-
 ! 收件字說明
 
 #OORecWordItem=x,60,L
@@ -233,7 +236,9 @@ BIND(grid,{cmd=CHAIN;ntxcd=L6203;text=刪除;ntxbuf=#OOBUF4})
 <sub type="TOM">
 TXFORM=L6023
 #OOCityCode
+#OOCityItem
 #OOLandOfficeCode
+#OOLandOfficeItem
 #OORecWord
 #OORecWordItem
 #OOLastUpdate
@@ -264,7 +269,13 @@ TXFORM=L6023
 #OOBTN4=刪除
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN4',align:'center',canExport:false}
 
+#OOCityCode=縣市代碼
+{width:100,align:'center'}
+#OOCityItem=縣市說明
+{width:100,align:'center'}
 #OOLandOfficeCode=地政別代碼
+{width:100,align:'center'}
+#OOLandOfficeItem=地政別說明
 {width:100,align:'center'}
 
 #OORecWord=收件字代碼
@@ -284,7 +295,13 @@ TXFORM=L6023
 #RPTFG2=2,QUERY.GRID,L6023
 #any={detail:true, header:'L6023.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
+#OOCityCode=縣市代碼
+{width:100,align:'center'}
+#OOCityItem=縣市說明
+{width:100,align:'center'}
 #OOLandOfficeCode=地政別代碼
+{width:100,align:'center'}
+#OOLandOfficeItem=地政別說明
 {width:100,align:'center'}
 
 #OORecWord=收件字代碼

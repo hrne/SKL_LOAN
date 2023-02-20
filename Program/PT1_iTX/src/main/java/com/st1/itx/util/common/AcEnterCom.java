@@ -26,54 +26,60 @@ import com.st1.itx.util.parse.Parse;
 //*      
 //*   一、執行流程 
 //* 
-//*    1.正常交易   
-//*      A.登帳(一段式、二段式登錄)
-//*                     ApCtl CALL TxPgm      ---->   ApCtl CALL AcEnter(0.正常) 
-//*                     1).產生交易會計分錄           1).執行分錄處理 
-//*                     2).TxPgm Call AcPayment
-//*                        a.產生收付欄會計分錄
-//*                        b.維護撥款匯款檔
-//* 
-//*      B.主管放行(二段式) 
-//*                     ApCtl CALL TxPgm      ---->   ApCtl CALL AcEnter(0.正常) 
-//*                     1).X                          1).執行分錄處理(原分錄)  
-//* 
-//*    2.修正交易，執行兩次  
-//*                     ApCtl CALL AcEnter(1.訂正)   ---->    ApCtl CALL TxPgm      ---->   ApCtl CALL AcEnter(0.正常)
-//*                     1).執行分錄處理(原分錄訂正)   1).產生交易會計分錄                    1).執行分錄處理(新分錄)   
-//*                                                   2).TxPgm Call AcPayment 
-//*                                                      a.產生收付欄會計分錄
-//*                                                      b.維護撥款匯款檔
-//*    3.訂正(二段式、同傳票批號)
-//*      A.主管放行訂正(二段式) 
-//*                     ApCtl CALL TxPgm       ---->  ApCtl CALL AcEnter(1.訂正) 
-//*                     1).X                          1).執行分錄處理 
-//* 
-//*      B.登帳訂正(一段式、二段式登錄)
-//*                     ApCtl CALL TxPgm       ---->  ApCtl CALL AcEnter(1.訂正)
-//*                     1).TxPgm Call AcPayment
-//*                        a.維護撥款匯款檔 
-//* 
-//*    4.沖正   
-//*      A.沖正自動設為一段式，需主管刷卡
-//*                     ApCtl CALL TxPgm       ---->  ApCtl CALL AcEnter(2.沖正) 
-//*                     1).X                          1).原分錄->入總帳記號:2-被沖正
-//*                                                   2).執行新分錄處理->入總帳記號:3-沖正
-//*                                                      a.依原分錄產生借貸相反之新分錄
-//*                                                      b.借方整批入帳來源科目不回沖，轉至'暫收款－可抵繳'科目(TAV)
-//*                                                        新增放款交易內容檔(入帳金額轉暫收款-冲正產生), call loanCom.addFacmBorTxNextDateErase
-//*                                                      
-//*    5.訂正不同傳票批號，視同沖正；經辦需續作訂正(不可修正)；		
-//*      A.主管放行訂正(二段式) ，視同一段式交易，主管放行訂正不處理
-//*                     ApCtl CALL TxPgm       ---->  ApCtl CALL AcEnter(1.訂正) 
-//*                     1).X                          1).顯示<訂正前批關帳傳票，出沖正帳務；經辦需續作訂正(不可修正)>訊息
-//* 
-//*      B.登帳訂正(一段式、二段式登錄)，產生借貸相反分錄
-//*                     ApCtl CALL TxPgm       ---->  ApCtl CALL AcEnter(1.訂正)
-//*                     1).TxPgm Call AcPayment       1).顯示<訂正前批關帳傳票，出沖正帳務>訊息
-//*                        a.維護撥款匯款檔                     2).設定 2.沖正
-//*                                                   3).原分錄->入總帳記號:2-被沖正
-//*                                                   4).依原分錄產生借貸相反之新分錄->入總帳記號:3-沖正
+//*    A.一段式交易
+//*      1.登錄
+//*        step 1: ApCtl CALL TxPgm      
+//*                     1).產生交易會計分錄         
+//*                     2).維護撥款匯款檔(退款)
+//*        step 2: ApCtl CALL AcEnter(0.正常) 
+//*                     1).新增正常分錄(EntAc=1.已入帳)
+//*                     2).產生分錄清單
+//*      2.帳務訂正(同會計日、同批號、訂正經辦登錄交易)
+//*        step 1: ApCtl CALL TxPgm      
+//*                     1).維護撥款匯款檔(退款)
+//*        step 2: ApCtl CALL AcEnter(1.當日訂正  2.隔日訂正) 
+//*                     1).更新正常分錄(同會計日、同批號、訂正經辦登錄交易=>EntAc=0.未入帳，else 1.已入帳) 
+//*                     2).產生反向分錄(同會計日、同批號、訂正經辦登錄交易=>EntAc=0.未入帳，else 1.已入帳) 
+//*                     3).產生分錄清單(反向)
+//*   B.二段式交易(經辦)
+//*      1.經辦登錄
+//*        step 1: ApCtl CALL TxPgm      
+//*                     1).產生交易會計分錄(EntAc=0.未入帳)         
+//*                     2).維護撥款匯款檔(撥款)
+//*        step 2: ApCtl CALL AcEnter(0.正常) 
+//*                     1).新增正常分錄(EntAc=0.未入帳)
+//*                     2).產生分錄清單
+//*      2.經辦修正(限同會計日、同分錄科目金額=>交易控制)
+//*        step 1: ApCtl CALL AcEnter(1.當日訂正) 
+//*                     1).更新正常分錄(EntAc=4 修正暫留) 
+//*                     2).不產生分錄清單(反向) 
+//*        step 2: ApCtl CALL TxPgm      
+//*                     1).維護撥款匯款檔(撥款)
+//*        step 3: ApCtl CALL AcEnter(0.正常) 
+//*                     1).刪除正常分錄(EntAc=4 修正暫留)  
+//*                     2).新增正常分錄(EntAc=0.未入帳)
+//*                     3).產生分錄清單
+//*      3.經辦訂正
+//*        step 1: ApCtl CALL TxPgm      
+//*                     1).維護撥款匯款檔(撥款)
+//*        step 2: ApCtl CALL AcEnter(0.正常) 
+//*                     1).更新正常分錄(同會計日、同批號、訂正經辦登錄交易=>EntAc=0.未入帳，else 1.已入帳) 
+//*                     2).產生反向分錄(同會計日、同批號、訂正經辦登錄交易=>EntAc=0.未入帳，else 1.已入帳) 
+//*                     3).產生分錄清單(反向)
+//*   C.二段式交易(主管)
+//*    1.主管放行 
+//*        step 1: ApCtl CALL TxPgm      
+//*                     1).維護撥款匯款檔(撥款)
+//*        step 2: ApCtl CALL AcEnter(0.正常) 
+//*                     1).更新正常分錄(1.已入帳) 
+//*                     2).產生分錄清單
+//*    2.主管放行訂正
+//*        step 1: ApCtl CALL TxPgm      
+//*                     1).維護撥款匯款檔(撥款)
+//*        step 2: ApCtl CALL AcEnter(0.正常) 
+//*                     1).更新正常分錄(同會計日、同批號、訂正經辦登錄交易=>EntAc=0.未入帳，else 1.已入帳) 
+//*                     2).產生反向分錄(同會計日、同批號、訂正經辦登錄交易=>EntAc=0.未入帳，else 1.已入帳)，不更新DB 
+//*                     3).不產生分錄清單
 //* 
 //*   二、處理時機                         
 //*                                            登帳(一段式、二段式登錄)     入帳(一段式、二段式放行)    
@@ -83,8 +89,8 @@ import com.st1.itx.util.parse.Parse;
 //*    4.call AcNegCom 債協暫收款會計帳務明細檔      V
 //*    5.call AcMainCom 總帳入帳處理    	                                   V
 //*    6.call AcTxFormCom 交易分錄清單  	         V                         V   
-//*    7.call AcCollListCom 更新法催紀錄清單檔                                                      V
-//*    8.AcDetail(會計帳務明細檔)更新                        V                         V                        
+//*    7.AcDetail(會計帳務明細檔)更新                        V                         V                        
+//*    8.call AcCollListCom 更新法催紀錄清單檔                                                      V
 //* 
 //*   三、業務關帳檢核                     
 //* 
@@ -194,20 +200,27 @@ public class AcEnterCom extends TradeBuffer {
 	private AcClose tAcClose = new AcClose();
 	private AcCloseId acCloseId = new AcCloseId();
 
-	private int AcHCode = 0; // 帳務訂正記號 0-正常 1-訂正(刪除帳務) 2-沖正帳務(要入帳) 3-沖正帳務(要入帳)
+	private int AcHCode = 0; // 帳務訂正記號 0-正常 1-訂正(刪除帳務) 2-沖正帳務(要入帳) 3-沖正帳務(訂正、不入帳)
 	private int RelDy = 0; // 登放日期
 	private String RelTxseq; // 登放序號
 	private int AcDate = 0; // 會計日期
 
 	private int SlipBatNo = 0; // 傳票批號
 	private int SlipNo = 0; // 傳票號碼
+	private int SlipBatNoModify = 0; // 訂正前傳票批號
+	private int SlipNoModify = 0; // 訂正前傳票號碼
 	private String SecNo = ""; // 業務類別
 	private int acSeq; // 分錄序號
-	private String actFg; // 交易進行記號
+	private String TitaBatchNoModify; // 整批批號
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.titaVo = titaVo;
+
+		// AcHCode 帳務訂正記號
+		AcHCode = this.txBuffer.getTxCom().getBookAcHcode();
+
+		this.info("AcEnterCom.... : AcHCode=" + AcHCode);
 
 		// 開帳狀態檢核(非提存入賬)
 		if (!"L618D".equals(titaVo.getTxcd())) {
@@ -241,12 +254,6 @@ public class AcEnterCom extends TradeBuffer {
 		RelDy = this.txBuffer.getTxCom().getReldy() + 19110000; // 登放日期
 		RelTxseq = this.txBuffer.getTxCom().getRelNo(); // 登放序號
 
-		// 帳務訂正記號
-		AcHCode = this.txBuffer.getTxCom().getBookAcHcode();
-
-		this.info("AcEnterCom.... : AcHCode=" + AcHCode);
-//		帳務訂正記號  AcHCode   0.正常     1.訂正     2.沖正             
-
 		// 交易進行狀態
 //		    titaVo.getActFgS()                         
 //		    1STEP TX -> 0 , 2STEP TX -> 1,2
@@ -261,26 +268,43 @@ public class AcEnterCom extends TradeBuffer {
 //		    titaVo.isAcHCodeModify()     修改交易           2
 
 		// 1.prepare acList
-//	    	1.沖正，create 借貸相反之新分錄 
+//          1.修改交易刪除舊分錄，新增新分錄(沿用修改前傳票批號、傳票號碼、分錄序號、整批批號)
 //          2.訂正或主管放行， Load from AcDetail DB 
-//          3.正常交易，from txBuffer
+//	    	3.沖正產生借貸相反之新分錄 
+//          4.正常交易，from txBuffer
 		Slice<AcDetail> slAcList = acDetailService.acdtlRelTxseqEq(RelDy, RelTxseq, this.index, Integer.MAX_VALUE,
 				titaVo); // findByTxseq
 		if (slAcList != null) {
-			for (AcDetail ac : slAcList.getContent()) {
-				// 沖正及被沖正不loand
-				if ("0".equals(ac.getTitaHCode())) {
-					acList.add(ac);
+			//
+			if (titaVo.isHcodeModify() && AcHCode == 0) {
+				for (AcDetail ac : slAcList.getContent()) {
+					if (ac.getEntAc() == 4) {
+						if (SlipBatNoModify == 0) {
+							SlipBatNoModify = ac.getSlipBatNo();
+							SlipNoModify = ac.getSlipNo() - 1;
+							TitaBatchNoModify = ac.getTitaBatchNo();
+							acSeq = ac.getAcSeq() - 1;
+						}
+						acList.add(ac);
+					}
+					this.info("AcDetail delete " + ac.toString());
 				}
-				// 分錄序號由已入帳交易續編
-				if (ac.getEntAc() > 0) {
+				try {
+					acDetailService.deleteAll(acList, titaVo); // delete AcDetail
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E6003", "AcDetail delete " + e.getErrorMsg());
+				}
+			} else
+				for (AcDetail ac : slAcList.getContent()) {
 					acSeq++;
+					// load 0.正常分錄
+					if ("0".equals(ac.getTitaHCode())) {
+						acList.add(ac);
+					}
 				}
-				this.info("1 acseq" + acSeq + ac.toString());
-			}
 		}
 
-		// 起帳，分錄序號由已入帳交易續編
+		// 起帳，分錄序號續編
 		if (AcHCode == 0 && !titaVo.isActfgSuprele()) {
 			acList = this.txBuffer.getAcDetailList();
 			if (acList != null) {
@@ -289,6 +313,7 @@ public class AcEnterCom extends TradeBuffer {
 					ac.setAcSeq(acSeq);
 					ac.getAcDetailId().setAcSeq(acSeq);
 					ac.setTitaHCode("0");
+
 					this.info("2 acseq" + acSeq + ac.toString());
 				}
 			}
@@ -325,20 +350,22 @@ public class AcEnterCom extends TradeBuffer {
 		// 會計日期
 		AcDate = titaVo.getEntDyI();
 
-		// AcHcode 帳務訂正記號 0-正常 1-刪除帳務 2-沖正帳務(沖正、要入帳) 3-沖正帳務(訂正、不入帳)
-		if (AcHCode == 1 && acList.get(0).getEntAc() == 1) {
-			AcHCode = 2;
-			getAcHCode(); // AcHcode 2,3
+// AcHCode 帳務訂正記號 0-正常 1-訂正(刪除帳務) 2-沖正帳務(要入帳) 3-沖正帳務(訂正、不入帳)
+// ApControl => 0.正常 1.訂正(本日訂正) 2.沖正(隔日訂正)
+		// 本日訂正
+		// 1. 經辦修正的訂正交易 AcHCode = 1
+		// 2,3 經辦訂正
+
+		if (AcHCode == 1) {
+			if (titaVo.isHcodeModify()) {
+				AcHCode = 1;
+			} else {
+				AcHCode = 2;
+				getAcHCode(); // AcHcode 2,3
+			}
 			this.txBuffer.getTxCom().setBookAcHcode(AcHCode);
 		}
-
-		// 沖正：放行起分錄
-		if (AcHCode >= 2) {
-			procAcHCode2(acList);
-			acList = this.txBuffer.getAcDetailList(); // 沖正分錄
-		}
-
-		// // 核准主管: 訂正或主管放行
+		// 核准主管: 訂正或主管放行
 		if (AcHCode == 1 || titaVo.isActfgSuprele()) {
 			for (AcDetail ac : acList) {
 				if (titaVo.isActfgSuprele()) {
@@ -349,48 +376,26 @@ public class AcEnterCom extends TradeBuffer {
 			this.txBuffer.setAcDetailList(acList);
 		}
 
-		// 原交易進行狀態
-		actFg = titaVo.getParam("ACTFG");
-
-		// 主管放行訂正不處理，於經辦修改或訂正時處理(視為一段式交易)
-		if (AcHCode >= 2) {
-			if (titaVo.isActfgSuprele()) {
-				acTxFormCom.setTxBuffer(this.txBuffer);
-				this.addAllList(acTxFormCom.run(titaVo));
-				this.info("AcEnterCom.... : AcHCode= 1 , isActfgSuprele Return");
-				return this.sendList();
-			} else {
-				titaVo.putParam("ACTFG", "0");
-			}
+		// 入帳更新(以正常分錄入帳)
+		if (AcHCode == 0 || AcHCode == 1) {
+			this.txBuffer.setAcDetailList(acList);
+			this.procUdate();
 		}
 
-		// 入帳更新
-		this.procUdate();
+		// 入帳更新(以沖正分錄入帳)
+		if (AcHCode == 2 || AcHCode == 3) {
+			procAcHCode2(acList);
+			acList = this.txBuffer.getAcDetailList(); // 沖正分錄
+			// 入帳更新(以沖正分錄更新)
+			this.txBuffer.setAcDetailList(acList);
+			this.procUdate();
+		}
 
 		// 11.交易分錄清單 AcTxFormCom 登帳
-		// 整批入帳及修改交易之訂正修改前，不印交易分錄清單
-		// 印錄含修正的沖正分錄
-		if (!(titaVo.isTrmtypBatch() || (titaVo.isHcodeModify() && AcHCode == 1))) {
-			List<AcDetail> acListAll = new ArrayList<AcDetail>();
-			if (slAcList != null && titaVo.isHcodeModify()) {
-				for (AcDetail ac : slAcList.getContent()) {
-					// 修正的沖正分錄紀錄主管
-					if (ac.getTitaTlrNo().equals(titaVo.getTlrNo())
-							&& parse.IntegerToString(ac.getTitaTxtNo(), 8).equals(titaVo.getTxtNo())) {
-						ac.setTitaSupNo(titaVo.getParam("EraseSupNo"));
-						acListAll.add(ac);
-					}
-				}
-				if (acListAll.size() > 0) {
-					try {
-						acDetailService.updateAll(acListAll, titaVo); // update AcDetail
-					} catch (DBException e) {
-						throw new LogicException(titaVo, "E6003", "AcDetail update " + e.getErrorMsg());
-					}
-				}
-			}
-			acListAll.addAll(acList);
-			this.txBuffer.setAcDetailList(acListAll);
+		// 整批入帳、修改及主管的訂正交易不印交易分錄清單
+		if (titaVo.isTrmtypBatch() || ((titaVo.isHcodeModify() || titaVo.isActfgSuprele()) && AcHCode > 0)) {
+		} else {
+			this.txBuffer.setAcDetailList(acList);
 			acTxFormCom.setTxBuffer(this.txBuffer);
 			this.addAllList(acTxFormCom.run(titaVo));
 		}
@@ -399,9 +404,6 @@ public class AcEnterCom extends TradeBuffer {
 		if (titaVo.isHcodeModify() && AcHCode > 0) {
 			this.txBuffer.setAcDetailList(new ArrayList<AcDetail>());
 		}
-
-		// 放回原交易進行狀態
-		titaVo.putParam("ACTFG", actFg);
 
 		// Process End
 		return this.sendList();
@@ -448,7 +450,7 @@ public class AcEnterCom extends TradeBuffer {
 		// 8.總帳入帳處理 AcMainCom 入帳
 		if (titaVo.isActfgRelease()) {
 			acMainCom.setTxBuffer(this.txBuffer);
-			acMainCom.upd(AcHCode, acList, titaVo); // 入帳更新
+			acMainCom.upd(this.txBuffer.getTxCom().getBookAcHcode(), this.txBuffer.getAcDetailList(), titaVo); // 入帳更新
 		}
 
 		// 9.會計帳務明細 登帳,入帳, 主管放行
@@ -495,9 +497,10 @@ public class AcEnterCom extends TradeBuffer {
 			}
 		}
 		SlipNo = tAcClose.getSlipNo(); // 傳票號碼
-		// 登帳且非訂正=>更新傳票號碼
-		if (titaVo.isActfgEntry() && AcHCode != 1)
+		// 登帳且非修正且非主管=>更新傳票號碼
+		if (titaVo.isActfgEntry() && !titaVo.isHcodeModify() && !titaVo.isActfgSuprele()) {
 			tAcClose.setSlipNo(SlipNo + acList.size());
+		}
 		try {
 			acCloseService.update(tAcClose, titaVo); // update AcClose
 		} catch (DBException e) {
@@ -541,9 +544,11 @@ public class AcEnterCom extends TradeBuffer {
 					throw new LogicException(titaVo, "E6003", "Acclose insert " + e.getErrorMsg());
 				}
 			} else {
-				if (tAcClose.getClsFg() == 1)
+				if (tAcClose.getClsFg() == 1) {
 					throw new LogicException(titaVo, "E6003", "個別業務已關帳  " + SecNo);
-				if (titaVo.isActfgEntry() && AcHCode != 1) {// 登帳且非訂正=>更新傳票號碼
+				}
+				// 登帳且非修改=>更新傳票號碼
+				if (titaVo.isActfgEntry() && !titaVo.isHcodeModify()) {
 					tAcClose.setSlipNo(tAcClose.getSlipNo() + acList.size());
 					try {
 						acCloseService.update(tAcClose, titaVo);
@@ -593,7 +598,7 @@ public class AcEnterCom extends TradeBuffer {
 	private void procAcDetailUpdate() throws LogicException {
 //      訂正記號                                                                                 入總帳記號     
 //	     0.正常             入帳  titaVo.isActfgRelease()            1:已入帳                                                          
-//	     1.訂正      主管放行  titaVo.isActfgSuprele()        0:未入帳
+//	     1.訂正      主管放行  titaVo.isActfgSuprele()            0:未入帳
 //	     2.沖正             新分錄                                                             3.沖正
 //                                                            
 ///	                                
@@ -605,59 +610,74 @@ public class AcEnterCom extends TradeBuffer {
 //   1.02:支票繳款 => 固定 11
 //   2.其他             => 放款傳票批號		
 // 傳票號碼             => 放款傳票號碼
+// 登帳且非修改=>更新傳票批號、傳票號碼、 修正的正常分錄沿用原傳票批號、傳票號碼 
+// EntAc  0.未入帳 1.已入帳   4-訂正(出分錄清單用)
 
-// EntAc  0.未入帳 1.已入帳   4-訂正(出分錄清單用，帳務明細刪除)
-
-		for (int i = 0; i < acList.size(); i++) {
+		// AcHCode=0,1=>以正常分錄入帳、2,3=>以沖正分錄入帳
+		int j = 0;
+		for (AcDetail ac : acList) {
 			if (AcHCode == 0 && titaVo.isActfgRelease()) {
-				acList.get(i).setEntAc(1);
+				ac.setEntAc(1);
 			}
 			if (AcHCode == 1 && titaVo.isActfgEntry()) {
-				acList.get(i).setEntAc(4);
+				ac.setEntAc(4);
 			}
 			if (AcHCode == 1 && titaVo.isActfgSuprele()) {
-				acList.get(i).setEntAc(0);
+				ac.setEntAc(0);
 			}
 			if (AcHCode == 2) {
-				acList.get(i).setEntAc(1);
+				ac.setEntAc(1);
 			}
 			if (AcHCode == 3) {
-				acList.get(i).setEntAc(0);
+				ac.setEntAc(0);
 			}
-			if (titaVo.isActfgEntry() && AcHCode != 1) {
-				acList.get(i).setSlipBatNo(SlipBatNo);
-				acList.get(i).setSlipNo(SlipNo + i + 1);
+			j++;
+			// 登帳且非修改=>更新傳票批號、傳票號碼
+			if (titaVo.isActfgEntry() && !titaVo.isHcodeModify()) {
+				ac.setSlipBatNo(SlipBatNo);
+				ac.setSlipNo(SlipNo + j);
+			}
+			// 修正的正常分錄沿用原傳票批號、傳票號碼、整批批號
+			if (titaVo.isHcodeModify() && AcHCode == 0) {
+				ac.setSlipBatNo(SlipBatNoModify);
+				ac.setSlipNo(SlipNoModify + j);
+				ac.setTitaBatchNo(TitaBatchNoModify);
 			}
 			if (titaVo.isActfgSuprele()) {
-				acList.get(i).setTitaSupNo(titaVo.getTlrNo());
+				ac.setTitaSupNo(titaVo.getTlrNo());
 			}
-			this.info("procAcDetailUpdate" + acList.get(i).toString());
+			this.info("procAcDetailUpdate" + ac.toString());
 		}
+
+		// 主管放行，更新正常分錄，不新增沖正分錄
 		if (titaVo.isActfgSuprele()) {
-			try {
-				acDetailService.updateAll(acList, titaVo); // update AcDetail
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E6003", "AcDetail update " + e.getErrorMsg());
-			}
-		} else {
-			if (titaVo.isActfgEntry()) {
-				if (AcHCode == 1) {
-					try {
-						acDetailService.deleteAll(acList, titaVo); // delete AcDetail
-					} catch (DBException e) {
-						throw new LogicException(titaVo, "E6003", "AcDetail delete " + e.getErrorMsg());
-					}
-				} else {
-					try {
-						acDetailService.insertAll(acList, titaVo); // insert AcDetail
-					} catch (DBException e) {
-						throw new LogicException(titaVo, "E6003", "AcDetail insert " + e.getErrorMsg());
-					}
+			if (titaVo.isHcodeNormal()) {
+				try {
+					acDetailService.updateAll(acList, titaVo); // update AcDetail
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E6003", "AcDetail update " + e.getErrorMsg());
 				}
-
 			}
+			return;
 		}
 
+		// 經辦登錄或訂正 => 更新(2段式修改的訂正)、新增
+		if (titaVo.isActfgEntry()) {
+			if (AcHCode == 1) {
+				try {
+					acDetailService.updateAll(acList, titaVo); // update AcDetail
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E6003", "AcDetail update " + e.getErrorMsg());
+				}
+			} else {
+				try {
+					acDetailService.insertAll(acList, titaVo); // insert AcDetail
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E6003", "AcDetail insert " + e.getErrorMsg());
+				}
+			}
+
+		}
 	}
 
 	/* 沖正帳務是否要入帳 */
@@ -700,58 +720,56 @@ public class AcEnterCom extends TradeBuffer {
 
 	/* 處理沖正 */
 	private void procAcHCode2(List<AcDetail> acList0) throws LogicException {
-//	     1.自動設定為一段式交易
-//	     2.原分錄入總帳記號皆設定為 2:被沖正 
+//	     1.更新入總帳記號
+//	     2.主管放行訂正不更新訂正別
 //	     3.依原分錄產生借貸相反之新分錄
 		AcDetail acDetail = new AcDetail();
 		List<AcDetail> acList2 = new ArrayList<AcDetail>();
 
 		this.info("AcEnterCom procAcHCode2 AcHCode=" + AcHCode);
 		for (int i = acList0.size() - 1; i >= 0; i--) {
-			if (acList0.get(i).getEntAc() == 1) {
-				AcDetail ac = acList0.get(i);
-				if (AcHCode == 3) {
-					ac.setEntAc(0); // 未入帳
-				} else {
-					ac.setEntAc(1); // 已入帳
-				}
-				this.info("procAcHCode2 ac=" + ac.toString());
+			AcDetail ac = acList0.get(i);
+			// 原分錄
+			if (AcHCode == 3) {
+				ac.setEntAc(0); // 未入帳
+			} else {
+				ac.setEntAc(1); // 已入帳
+			}
+			// 主管放行訂正不更新訂正別(於經辦定正時更新)
+			if (!titaVo.isActfgSuprele()) {
 				if (titaVo.getEntDyI() == titaVo.getOrgEntdyI()) {
 					ac.setTitaHCode("2"); // 訂正別 2:被訂正
 				} else {
 					ac.setTitaHCode("4"); // 訂正別 4:被沖正
 				}
-				// 產生新分錄，入總帳記號3.沖正
-				acSeq++;
-				acDetail = new AcDetail();
-				moveAcDetail(ac, acDetail);
-				acDetail.setAcSeq(acSeq);
-				if (ac.getDbCr().equals("D")) {
-					acDetail.setDbCr("C");
-				} else {
-					acDetail.setDbCr("D");
-				}
-				acList2.add(acDetail);
+			}
+			this.info("procAcHCode2 ac=" + ac.toString());
+			// 產生新分錄，入總帳記號3.沖正
+			acSeq++;
+			acDetail = new AcDetail();
+			moveAcDetail(ac, acDetail);
+			acDetail.setAcSeq(acSeq);
+			if (ac.getDbCr().equals("D")) {
+				acDetail.setDbCr("C");
+			} else {
+				acDetail.setDbCr("D");
+			}
+			acList2.add(acDetail);
+		}
+		// AcHCode=2,3=>以沖正分錄入帳(正常分錄在此更新)
+		if (AcHCode == 2 || AcHCode == 3) {
+			try {
+				acDetailService.updateAll(acList0, titaVo); // update AcDetail
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E6003", "procAcHCode2 update " + e.getErrorMsg());
 			}
 		}
-		this.txBuffer.setAcDetailList(acList2);
 
 		/* 產生會計分錄 */
+		this.txBuffer.setAcDetailList(acList2);
 		acDetailCom.setTxBuffer(this.txBuffer);
 		acDetailCom.run(titaVo);
-
 		this.setTxBuffer(acDetailCom.getTxBuffer());
-		// 兩段式主管訂正不更新
-		if (AcHCode > 0 && titaVo.isActfgSuprele()) {
-			return;
-		}
-		// 更新原分錄
-		try {
-			acDetailService.updateAll(acList0, titaVo); // update AcDetail
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E6003", "procAcHCode2 update " + e.getErrorMsg());
-		}
-
 	}
 
 	private void moveAcDetail(AcDetail ac, AcDetail acDetail) {
