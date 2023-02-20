@@ -107,8 +107,6 @@ public class LY005Report extends MakeReport {
 			// 與本公司關係為G者 合併為一筆
 			lY005List = groupG(lY005List);
 			
-			makeExcel.setValue(2, 15, iYear + ".12.31", "C");
-			makeExcel.setValue(3, 15, formatAmt(totalEquity, 0), "C");
 			int rowCursor = 5; // 列指標
 
 			// 新增明細行數
@@ -128,20 +126,20 @@ public class LY005Report extends MakeReport {
 				
 				BigDecimal loanBal = getBigDecimal(tLDVo.get("LoanBal"));
 				BigDecimal gPercent = this.computeDivide(loanBal, totalEquity, 4);
-				makeExcel.setValue(rowCursor, 1, tLDVo.get("Rel"));// 與本公司之關係
-				makeExcel.setValue(rowCursor, 2, tLDVo.get("CustNo"));// 交易對象代號
-				makeExcel.setValue(rowCursor, 3, tLDVo.get("CustName"));// 交易對象名稱
-				makeExcel.setValue(rowCursor, 4, tLDVo.get("F3"));// 交易種類
-				makeExcel.setValue(rowCursor, 5, tLDVo.get("F4"));// 交易型態
-				makeExcel.setValue(rowCursor, 6, tLDVo.get("BdLoaction"));// 交易標的內容
-				makeExcel.setValue(rowCursor, 7, tLDVo.get("DrawdownDate"));// 交易日期
-				makeExcel.setValue(rowCursor, 8, loanBal);// 交易金額
-				makeExcel.setValue(rowCursor, 9, tLDVo.get("F8"));// 最近交易日之參考市價
-				makeExcel.setValue(rowCursor, 10, tLDVo.get("F9"));// 已實現損益
-				makeExcel.setValue(rowCursor, 11, tLDVo.get("F10"));// 未實現損益
-				makeExcel.setValue(rowCursor, 12, gPercent, "C");// 交易金額占業主權益比率%
-				makeExcel.setValue(rowCursor, 13, tLDVo.get("Supervisor"), "C");// 最後決定權人員
-				makeExcel.setValue(rowCursor, 14, tLDVo.get("F13"));// 備註
+				makeExcel.setValue(rowCursor, 3, tLDVo.get("Rel"));// 與本公司之關係
+				makeExcel.setValue(rowCursor, 4, tLDVo.get("CustNo"));// 交易對象代號
+				makeExcel.setValue(rowCursor, 5, tLDVo.get("CustName"));// 交易對象名稱
+				makeExcel.setValue(rowCursor, 6, tLDVo.get("F3"));// 交易種類
+				makeExcel.setValue(rowCursor, 7, tLDVo.get("F4"));// 交易型態
+				makeExcel.setValue(rowCursor, 8, tLDVo.get("BdLoaction"));// 交易標的內容
+				makeExcel.setValue(rowCursor, 9, tLDVo.get("DrawdownDate"));// 交易日期
+				makeExcel.setValue(rowCursor, 10, loanBal);// 交易金額
+				makeExcel.setValue(rowCursor, 11, tLDVo.get("F8"));// 最近交易日之參考市價
+				makeExcel.setValue(rowCursor, 12, tLDVo.get("F9"));// 已實現損益
+				makeExcel.setValue(rowCursor, 13, tLDVo.get("F10"));// 未實現損益
+				makeExcel.setValue(rowCursor, 14, gPercent, "C");// 交易金額占業主權益比率%
+				makeExcel.setValue(rowCursor, 15, tLDVo.get("Supervisor"), "C");// 最後決定權人員
+				makeExcel.setValue(rowCursor, 16, tLDVo.get("F13"));// 備註
 
 				rowCursor++;
 				seq++;

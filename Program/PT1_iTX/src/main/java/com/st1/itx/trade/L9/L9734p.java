@@ -71,10 +71,10 @@ public class L9734p extends TradeBuffer {
 		if (isFinish) {
 			tradeName = tradeName.substring(0, tradeName.length() - 1);
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), txCD + txName + "(" + tradeName + ")已完成", titaVo);
+					titaVo.getParam("TLRNO") + txCD, txCD + txName + "(" + tradeName + ")已完成", titaVo);
 		} else {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), txCD + txName + "查無資料", titaVo);
+					titaVo.getParam("TLRNO") + txCD, txCD + txName + "查無資料", titaVo);
 		}
 
 		this.addList(this.totaVo);

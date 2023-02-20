@@ -70,25 +70,30 @@ E(0,5)
 ! 取得系統會計日期
 #DT1=D,8,S
 T(4,DATE$)
-D(7,2,#DT1,2,0)
-
-#WkDate=X,8,S
-T(1,#DT1,2,5)
-T(B,#WkDate+01)
 
 #DT2=D,7,S
-E(0,#WkDate)
+T(1,#DT1,2,7)
+
+
+
 
 
 ![----------------------------]第一張報表欄位-開始----------------------------]]
-#DrawDownDateA1=D,7,I
-A(DATE,0,#DT1)
-E(0,#DT1)
 
+!撥款期間-起日
+#DrawDownDateA1=D,7,I
+T(2,#DT2)
+@V(7)
+V(5,0,#DT2)
+A(DATE,0,#DrawDownDateA1)
+
+!撥款期間-迄日
 #DrawDownDateA2=D,7,I
-A(DATE,0,#DT1)
-E(0,#DT1)
-V(5,#DT1, 9999999)
+T(2,#DT2)
+@V(7)
+V(5,#DrawDownDateA1,#DT2)
+A(DATE,0,#DrawDownDateA2)
+
 
 ! Help
 
@@ -132,9 +137,13 @@ T(H,#RenewFlagA,#RenewFlagAHelp)
 
 
 ![----------------------------]第二張報表欄位-開始----------------------------]]
+
+!撥款日期前
 #DrawDownDateB1=D,7,I
-A(DATE,0,#DT1)
-E(0,#DT1)
+T(2,#DT2)
+@V(7)
+V(5,0,#DT2)
+A(DATE,0,#DrawDownDateB1)
 
 #AcctCodeBHelp=X,100,S
 T(3,
@@ -164,10 +173,13 @@ T(H,#StatusB,#StatusBHelp)
 
 
 ![----------------------------]第三張報表欄位-開始----------------------------]]
+
+!撥款日期前
 #DrawDownDateC1=D,7,I
-E(0,#DT1)
+T(2,#DT2)
 @V(7)
-A(DATE,0,#DT1)
+V(5,0,#DT2)
+A(DATE,0,#DrawDownDateC1)
 
 #AcctCodeCHelp=X,100,S
 T(3,

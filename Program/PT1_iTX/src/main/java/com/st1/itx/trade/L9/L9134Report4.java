@@ -76,7 +76,6 @@ public class L9134Report4 extends MakeExcel {
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("l9134ServiceImpl.doQueryL9134_4 error = " + errors.toString());
 		}
-		
 		int row=5;
 		int size = findList.size();
 		this.info("Size = " + findList.size());
@@ -99,8 +98,9 @@ public class L9134Report4 extends MakeExcel {
 				makeExcel.setValue(row, 12, drAmt , "#,##0");	
 				makeExcel.setValue(row, 13, crAmt , "#,##0");	
 				BigDecimal ix = drAmt.subtract(crAmt);
+				BigDecimal iy = ix.subtract(didDifTdBal);
 				BigDecimal io = BigDecimal.ZERO;
-				if(ix.compareTo(io)==0) {
+				if(iy.compareTo(io)==0) {
 					makeExcel.setValue(row, 14, "V");
 				}else {
 					makeExcel.setValue(row, 14, "X");

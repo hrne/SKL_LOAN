@@ -443,6 +443,7 @@ T(2,#CurrencyCode)
 
 #ORepayAmtX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#TimRepayAmt,#ORepayAmtX)
+P(R,#ORepayAmtX)
 
 #OBreachFlagX=X,6,L
 T(2,#BreachFlagX)
@@ -471,10 +472,14 @@ C(3,#OBormNo,0,T(3,溢繳金額),T(3,部分償還本金))
 
 #OExtraRepayX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#OExtraRepay,#OExtraRepayX)
+T(2,@OExtraRepayXB,#OExtraRepayX)
+P(R,#OExtraRepayX)
+
+#OExtraRepayXB=X,22,L
 
 #IncludeExtraX=X,37,S
-T(2,[含部分償還金額 +#OExtraRepayX)
-P(R,#IncludeExtraX)
+T(2,[含部分償還金額 +#OExtraRepayXB)
+P(L,#IncludeExtraX)
 
 #IncludeExtraXX=X,38,S
 C(3,#OExtraRepay,0,S,$)
@@ -495,16 +500,19 @@ P(L,#OPrincipalXX)
 
 #OInterestX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#OInterest,#OInterestX)
+P(R,#OInterestX)
 
 #ODelayInt=m,14.2,S
 
 #ODelayIntX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#ODelayInt,#ODelayIntX)
+P(R,#ODelayIntX)
 
 #OBreachAmt=m,14.2,S
 
 #OBreachAmtX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#OBreachAmt,#OBreachAmtX)
+P(R,#OBreachAmtX)
 
 #OReduceAmt=m,14.2,S
 
@@ -516,11 +524,13 @@ P(R,#OReduceAmtX)
 
 #OTempTaxX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#OTempTax,#OTempTaxX)
+P(R,#OTempTaxX)
 
 #OShortfall=m,14.2,S
 
 #OShortfallX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#OShortfall,#OShortfallX)
+P(R,#OShortfallX)
 
 #OShortfallInt=m,14.2,S
 
@@ -579,21 +589,25 @@ P(L,#OShortfallXX)
 
 #OExcessiveX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#OExcessive,#OExcessiveX)
+P(R,#OExcessiveX)
 
 #OCloseBreachAmt=m,14.2,S
 
 #OCloseBreachAmtX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#OCloseBreachAmt,#OCloseBreachAmtX)
+P(R,#OCloseBreachAmtX)
 
 #OLoanBal=m,14.2,S
 
 #OLoanBalX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#OLoanBal,#OLoanBalX)
+P(R,#OLoanBalX)
 
 #ONewDueAmt=m,14.2,S
 
 #ONewDueAmtX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#ONewDueAmt,#ONewDueAmtX)
+P(R,#ONewDueAmtX)
 
 #OLeftTerms=N,3,S
 

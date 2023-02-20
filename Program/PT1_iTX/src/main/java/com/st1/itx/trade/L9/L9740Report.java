@@ -82,7 +82,7 @@ public class L9740Report extends MakeReport {
 		// 設定明細列數(自訂亦必須)
 		this.setMaxRows(55);
 
-		if (reportType == 3) {
+		if (reportType == 1 || reportType == 3) {
 
 			this.print(2, 8, "戶號");
 			this.print(0, 18, "額度");
@@ -106,7 +106,7 @@ public class L9740Report extends MakeReport {
 
 //	@Override
 //	public void printFooter() {
-//		this.print(-53, this.getMidXAxis(), "=====　報　表　結　束　=====", "C");
+//		this.print(-56, this.getMidXAxis(), "=====　報　表　結　束　=====", "C");
 //	}
 
 	/**
@@ -203,10 +203,31 @@ public class L9740Report extends MakeReport {
 		this.setFont(1, 12);
 
 		if (listL9740Data1.size() > 0) {
-
+			this.print(1, 1,"");
 			// 因此表User說目前還沒看到過有資料，所以暫不確定有資料的格式(各個欄位的項目)
+			int count = 1;
+			for (Map<String, String> r3 : listL9740Data3) {
+				count++;
+
+				this.print(1, 12, r3.get("CustNo"), "R");
+				this.print(0, 22, r3.get("FacmNo"), "R");
+//				this.print(0, 25, r3.get("BormNo"));
+				this.print(0, 36, this.showRocDate(r3.get("DrawdownDate"), 1), "R");
+				this.print(0, 52, this.formatAmt(r3.get("DrawdownAmt"), 0), "R");
+				BigDecimal rate = r3.get("StoreRate").isEmpty() ? BigDecimal.ZERO : new BigDecimal(r3.get("StoreRate"));
+				this.print(0, 66, fillUpWord(String.valueOf(rate), 6, "0", "R"), "R");
+				this.print(0, 78, this.showRocDate(r3.get("PrevPayIntDate"), 1), "R");
+
+				if (count == 50) {
+					printContinueNext();
+					this.newPage();
+					count = 1;
+				}
+
+			}
+
 		} else {
-			this.print(1, 3, "本日無資料");
+			this.print(2, 3, "本日無資料");
 		}
 
 //		printContinueNext();
@@ -246,11 +267,12 @@ public class L9740Report extends MakeReport {
 		this.newPage();
 
 		if (listL9740Data3.size() > 0) {
+			this.print(1, 1,"");
 			int count = 1;
 			for (Map<String, String> r3 : listL9740Data3) {
 				count++;
 
-				this.print(2, 12, r3.get("CustNo"), "R");
+				this.print(1, 12, r3.get("CustNo"), "R");
 				this.print(0, 22, r3.get("FacmNo"), "R");
 //				this.print(0, 25, r3.get("BormNo"));
 				this.print(0, 36, this.showRocDate(r3.get("DrawdownDate"), 1), "R");
@@ -272,7 +294,7 @@ public class L9740Report extends MakeReport {
 			this.print(2, 3, "本日無資料");
 		}
 
-		printFooter();
+		this.print(-56, this.getMidXAxis(), "=====　報　表　結　束　=====", "C");
 
 		// 關閉報表
 		this.close();

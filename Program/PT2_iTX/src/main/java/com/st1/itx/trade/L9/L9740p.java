@@ -45,30 +45,16 @@ public class L9740p extends TradeBuffer {
 
 		l9740Report.setParentTranCode(parentTranCode);
 
-//		int DrawDownDate1 = Integer.valueOf(titaVo.getParam("DrawDownDate1")) + 19110000;
-
-		
-//		int DrawDownDate2 = Integer.valueOf(titaVo.getParam("DrawDownDate2")) + 19110000;
-
-		
-//		int DrawDownDate3 = Integer.valueOf(titaVo.getParam("DrawDownDate3")) + 19110000;
-//		BigDecimal rate = new BigDecimal(titaVo.getParam("Rate"));
-
-//		this.info("DrawDownDate1 = " + DrawDownDate1);
-//		this.info("DrawDownDate2 = " + DrawDownDate2);
-//		this.info("DrawDownDate3 = " + DrawDownDate3);
-//		this.info("rate = " + rate);
-
 		boolean isFinish = false;
 
 		isFinish = l9740Report.exec(titaVo);
 
 		if (isFinish) {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), txCD + txName + " 已完成", titaVo);
+					 titaVo.getTlrNo()+txCD, txCD + txName + " 已完成", titaVo);
 		} else {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), txCD + txName + " 查無資料", titaVo);
+					 titaVo.getTlrNo()+txCD, txCD + txName + " 查無資料", titaVo);
 		}
 
 		this.addList(this.totaVo);

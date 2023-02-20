@@ -33,26 +33,34 @@ public class L9709Report extends MakeReport {
 	@Override
 	public void printHeader() {
 
-		this.print(-2, this.getMidXAxis(), "暫收放貸核心傳票檔資料","C");
+		this.print(-2, 1, "　程式ID：" + this.getParentTranCode());
+		this.print(-3, 1, "　報　表：" + this.getRptCode());
+
+		this.print(-2, this.getMidXAxis(), "暫收放貸核心傳票檔資料", "C");
 		this.print(-2, 80, "印表日期：" + showRocDate(this.nowDate, 1));
-		this.print(-3, 2, "會計日期：" + showRocDate(startDate, 1) + " ~ " + showRocDate(endDate, 1));
+		this.print(-5, 2, "會計日期：" + showRocDate(startDate, 1) + " ~ " + showRocDate(endDate, 1));
 		this.print(-3, 80, "印表時間：" + showTime(this.nowTime));
 //		this.print(-5, 1, "  科目             借方金額           貸方金額");
 //		this.print(-5, 1, "會計日期");
 //		this.print(-6, 1, "－－－－");
-		this.print(-5, 2, " 會計科目");
-		this.print(-6, 2, "－－－－－－－－－－－－－－－－－－－－－－－－");
-		this.print(-5, 59, "借方金額", "R");
-		this.print(-6, 61, "－－－－－－", "R");
-		this.print(-5, 77, "貸方金額", "R");
-		this.print(-6, 79, "－－－－－－", "R");
-		this.print(-5, 94, "合計金額", "R");
-		this.print(-6, 96, "－－－－－－", "R");
+		this.print(-6, 2, " 會計科目");
+		this.print(-7, 2, "－－－－－－－－－－－－－－－－－－－－－－－－");
+		this.print(-6, 59, "借方金額", "R");
+		this.print(-7, 61, "－－－－－－", "R");
+		this.print(-6, 77, "貸方金額", "R");
+		this.print(-7, 79, "－－－－－－", "R");
+		this.print(-6, 94, "合計金額", "R");
+		this.print(-7, 96, "－－－－－－", "R");
 		// 明細起始列(自訂亦必須)
-		this.setBeginRow(7);
+		this.setBeginRow(8);
 
 		// 設定明細列數(自訂亦必須)
-		this.setMaxRows(45);
+		this.setMaxRows(60);
+	}
+
+	@Override
+	public void printFooter() {
+		this.print(-61, this.getMidXAxis(), "=====　報　表　結　束　=====", "C");
 	}
 
 	public void exec(TitaVo titaVo) throws LogicException {

@@ -108,7 +108,7 @@ public class L9734Report extends MakeReport {
 		String txcd = "L9734";
 		String fileItem = itemName + "-" + iYearMonth;
 		String fileName = txcd + "_" + itemName + "-" + iYearMonth;
-		String defaultExcel = "底稿_個金3000萬以上.xls";
+		String defaultExcel = txCD + "_底稿_個金3000萬以上.xls";
 		String defaultSheet = "簡表";
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
@@ -136,12 +136,12 @@ public class L9734Report extends MakeReport {
 		makeExcel.setValue(1, 10, "機密等級：機密\n" + (iYear - 1911) + "." + String.format("%02d", iMonth), "R");
 
 		List<Map<String, String>> fnAllList = new ArrayList<>();
-		List<Map<String, String>> fnAllList2 = new ArrayList<>();
+//		List<Map<String, String>> fnAllList2 = new ArrayList<>();
 
 		try {
 
 			fnAllList = l9734ServiceImpl.findAll(titaVo, yearMonth, condition);
-			fnAllList2 = l9734ServiceImpl.findList(titaVo, yearMonth, condition);
+//			fnAllList2 = l9734ServiceImpl.findList(titaVo, yearMonth, condition);
 		} catch (Exception e) {
 
 			StringWriter errors = new StringWriter();
@@ -287,10 +287,9 @@ public class L9734Report extends MakeReport {
 			makeExcel.setValue(3, 2, "本日無資料");
 		}
 
-		dataList(fnAllList2, itemName);
+//		dataList(fnAllList2, itemName);
 
 		makeExcel.close();
-		// makeExcel.toExcel(sno);
 
 	}
 
@@ -318,7 +317,7 @@ public class L9734Report extends MakeReport {
 		String txcd = "L9734";
 		String fileItem = itemName + "-" + iYearMonth;
 		String fileName = txcd + "_" + itemName + "-" + iYearMonth;
-		String defaultExcel = "底稿_企金3000萬以上.xls";
+		String defaultExcel = txCD + "_底稿_企金3000萬以上.xls";
 		String defaultSheet = "簡表";
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
@@ -346,12 +345,12 @@ public class L9734Report extends MakeReport {
 		makeExcel.setValue(1, 10, "機密等級：機密\n" + (iYear - 1911) + "." + String.format("%02d", iMonth), "R");
 
 		List<Map<String, String>> fnAllList = new ArrayList<>();
-		List<Map<String, String>> fnAllList2 = new ArrayList<>();
+//		List<Map<String, String>> fnAllList2 = new ArrayList<>();
 
 		try {
 
 			fnAllList = l9734ServiceImpl.findAll(titaVo, yearMonth, condition);
-			fnAllList2 = l9734ServiceImpl.findList(titaVo, yearMonth, condition);
+//			fnAllList2 = l9734ServiceImpl.findList(titaVo, yearMonth, condition);
 
 		} catch (Exception e) {
 
@@ -490,7 +489,7 @@ public class L9734Report extends MakeReport {
 			makeExcel.setValue(3, 2, "本日無資料");
 		}
 
-		dataList(fnAllList2, itemName);
+//		dataList(fnAllList2, itemName);
 
 		makeExcel.close();
 
@@ -507,9 +506,6 @@ public class L9734Report extends MakeReport {
 	public void exportCond03(TitaVo titaVo, int yearMonth, int condition) throws LogicException {
 		this.info("L9734Report exec");
 
-		// 取得會計日(同頁面上會計日)
-		// 年月日
-//		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
 		// 年
 		int iYear = yearMonth / 100;
 		// 月
@@ -526,7 +522,7 @@ public class L9734Report extends MakeReport {
 		String txcd = "L9734";
 		String fileItem = itemName + "-" + iYearMonth;
 		String fileName = txcd + "_" + itemName + "-" + iYearMonth;
-		String defaultExcel = "底稿_個金2000萬以上小於3000萬.xls";
+		String defaultExcel = txCD + "_底稿_個金2000萬以上小於3000萬.xls";
 		String defaultSheet = "簡表";
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
@@ -556,12 +552,12 @@ public class L9734Report extends MakeReport {
 		makeExcel.setValue(1, 12, "機密等級：機密\n" + (iYear - 1911) + "." + String.format("%02d", iMonth), "R");
 
 		List<Map<String, String>> fnAllList = new ArrayList<>();
-		List<Map<String, String>> fnAllList2 = new ArrayList<>();
+//		List<Map<String, String>> fnAllList2 = new ArrayList<>();
 
 		try {
 
 			fnAllList = l9734ServiceImpl.findAll(titaVo, yearMonth, condition);
-			fnAllList2 = l9734ServiceImpl.findList(titaVo, yearMonth, condition);
+//			fnAllList2 = l9734ServiceImpl.findList(titaVo, yearMonth, condition);
 
 		} catch (Exception e) {
 
@@ -719,7 +715,7 @@ public class L9734Report extends MakeReport {
 			makeExcel.setValue(3, 2, "本日無資料");
 		}
 
-		dataList(fnAllList2, itemName);
+//		dataList(fnAllList2, itemName);
 
 		makeExcel.close();
 
@@ -751,7 +747,7 @@ public class L9734Report extends MakeReport {
 		String txcd = "L9734";
 		String fileItem = itemName + "-" + iYearMonth;
 		String fileName = txcd + "_" + itemName + "-" + iYearMonth;
-		String defaultExcel = "底稿_個金100萬以上小於2000萬.xls";
+		String defaultExcel = txCD + "_底稿_個金100萬以上小於2000萬.xls";
 		String defaultSheet = "簡表";
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
@@ -780,12 +776,12 @@ public class L9734Report extends MakeReport {
 		makeExcel.setValue(1, 12, "機密等級：機密\n" + (iYear - 1911) + "." + String.format("%02d", iMonth), "R");
 
 		List<Map<String, String>> fnAllList = new ArrayList<>();
-		List<Map<String, String>> fnAllList2 = new ArrayList<>();
+//		List<Map<String, String>> fnAllList2 = new ArrayList<>();
 
 		try {
 
 			fnAllList = l9734ServiceImpl.findAll(titaVo, yearMonth, condition);
-			fnAllList2 = l9734ServiceImpl.findList(titaVo, yearMonth, condition);
+//			fnAllList2 = l9734ServiceImpl.findList(titaVo, yearMonth, condition);
 
 		} catch (Exception e) {
 
@@ -938,7 +934,7 @@ public class L9734Report extends MakeReport {
 		// 設定高度
 		makeExcel.setHeight(3, 30);
 
-		dataList(fnAllList2, itemName);
+//		dataList(fnAllList2, itemName);
 
 		makeExcel.close();
 
@@ -970,7 +966,7 @@ public class L9734Report extends MakeReport {
 		String txcd = "L9734";
 		String fileItem = itemName + "-" + iYearMonth;
 		String fileName = txcd + "_" + itemName + "-" + iYearMonth;
-		String defaultExcel = "底稿_企金未達3000萬.xls";
+		String defaultExcel = txCD + "_底稿_企金未達3000萬.xls";
 		String defaultSheet = "簡表";
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
@@ -1001,12 +997,12 @@ public class L9734Report extends MakeReport {
 		makeExcel.setValue(1, 13, "機密等級：機密\n" + (iYear - 1911) + "." + String.format("%02d", iMonth), "R");
 
 		List<Map<String, String>> fnAllList = new ArrayList<>();
-		List<Map<String, String>> fnAllList2 = new ArrayList<>();
+//		List<Map<String, String>> fnAllList2 = new ArrayList<>();
 
 		try {
 
 			fnAllList = l9734ServiceImpl.findAll(titaVo, yearMonth, condition);
-			fnAllList2 = l9734ServiceImpl.findList(titaVo, yearMonth, condition);
+//			fnAllList2 = l9734ServiceImpl.findList(titaVo, yearMonth, condition);
 
 		} catch (Exception e) {
 
@@ -1197,7 +1193,7 @@ public class L9734Report extends MakeReport {
 			makeExcel.setValue(3, 2, "本日無資料");
 		}
 
-		dataList(fnAllList2, itemName);
+//		dataList(fnAllList2, itemName);
 
 		makeExcel.close();
 
@@ -1228,7 +1224,7 @@ public class L9734Report extends MakeReport {
 		String txcd = "L9734";
 		String fileItem = itemName + "-" + iYearMonth;
 		String fileName = txcd + "_" + itemName + "-" + iYearMonth;
-		String defaultExcel = "底稿_土地追蹤.xls";
+		String defaultExcel = txCD + "_底稿_土地追蹤.xls";
 		String defaultSheet = "簡表";
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
@@ -1261,11 +1257,11 @@ public class L9734Report extends MakeReport {
 		makeExcel.setValue(1, 16, "機密等級：機密\n" + (iYear - 1911) + "." + String.format("%02d", iMonth), "R");
 
 		List<Map<String, String>> fnAllList = new ArrayList<>();
-		List<Map<String, String>> fnAllList2 = new ArrayList<>();
+//		List<Map<String, String>> fnAllList2 = new ArrayList<>();
 
 		try {
 			fnAllList = l9734ServiceImpl.findAll(titaVo, yearMonth, condition);
-			fnAllList2 = l9734ServiceImpl.findList(titaVo, yearMonth, condition);
+//			fnAllList2 = l9734ServiceImpl.findList(titaVo, yearMonth, condition);
 
 		} catch (Exception e) {
 
@@ -1292,7 +1288,6 @@ public class L9734Report extends MakeReport {
 
 			String date = "";
 			for (Map<String, String> tLDVo : fnAllList) {
-//				this.info("tLDVo-------->" + tLDVo.toString());
 
 				row++;
 
@@ -1439,7 +1434,7 @@ public class L9734Report extends MakeReport {
 			makeExcel.setValue(3, 2, "本日無資料");
 		}
 
-		dataList(fnAllList2, itemName);
+//		dataList(fnAllList2, itemName);
 
 		makeExcel.close();
 

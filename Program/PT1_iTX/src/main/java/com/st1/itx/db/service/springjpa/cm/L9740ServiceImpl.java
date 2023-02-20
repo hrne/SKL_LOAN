@@ -45,8 +45,8 @@ public class L9740ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = " ";
 		sql += "	SELECT M.\"CustNo\"";
 		sql += "		  ,M.\"FacmNo\"";
-		sql += "		  ,M.\"BormNo\"";
-		sql += "		  ,M.\"DrawdownDate\"";
+//		sql += "		  ,M.\"BormNo\"";
+		sql += "		  ,M.\"DrawdownDate\" - 19110000 AS \"DrawdownDate\"";
 		sql += "		  ,M.\"DrawdownAmt\"";
 		sql += "		  ,M.\"StoreRate\"";
 		sql += "	FROM \"LoanBorMain\" M";
@@ -62,7 +62,7 @@ public class L9740ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	  AND F.\"AcctCode\" = :acctCode ";
 		sql += "	ORDER BY M.\"CustNo\" ASC";
 		sql += "			,M.\"FacmNo\" ASC";
-		sql += "			,M.\"BormNo\" ASC";
+//		sql += "			,M.\"BormNo\" ASC";
 
 		
 		this.info("sDate =" + sDate);

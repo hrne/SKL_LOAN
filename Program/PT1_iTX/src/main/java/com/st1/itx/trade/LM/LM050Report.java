@@ -140,14 +140,16 @@ public class LM050Report extends MakeReport {
 
 		String tmpCustNo="";
 		
-		if (listLM050.size() > 1) {
-			makeExcel.setShiftRow(rowCursor+1, listLM050.size() - 1);
-			
-		}
+		
 
 		for (Map<String, String> tLM050 : listLM050) {
 			String rptType = tLM050.get("F0");
 			BigDecimal loanBal = getBigDecimal(tLM050.get("F3"));
+			
+			if (listLM050.size() > 1) {
+				makeExcel.setShiftRow(rowCursor+1, listLM050.size() - 1);
+				
+			}
 
 			if (rptType.equals("1")) { // 保險業利害關係人放款管理辦法第3條利害關係人
 
