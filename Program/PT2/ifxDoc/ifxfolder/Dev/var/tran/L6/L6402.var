@@ -405,6 +405,8 @@ C(2,#FunCode,s,$,$,s,s,s)
 
 #ChainTranMsg=x,100,I
 C(2,#FunCode,s,$,$,s,s,s)
+C(3,#MenuFg,0,$,S)
+@V(7)
 
 
 

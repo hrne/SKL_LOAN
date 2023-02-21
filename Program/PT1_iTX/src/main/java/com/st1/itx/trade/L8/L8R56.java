@@ -37,13 +37,13 @@ public class L8R56 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 		String iRimHeadOfficeCode = titaVo.getParam("RimHeadOfficeCode");
 		String iRimBranchCode = titaVo.getParam("RimBranchCode");
-		int iRimDataDate = Integer.valueOf(titaVo.getParam("RimDataDate")) + 19110000;
+	//	int iRimDataDate = Integer.valueOf(titaVo.getParam("RimDataDate")) + 19110000;
 		String iRimEmpId = titaVo.getParam("RimEmpId");
 
 		TbJcicMu01 iTbJcicMu01 = new TbJcicMu01();
 		TbJcicMu01Id iTbJcicMu01Id = new TbJcicMu01Id();
 		iTbJcicMu01Id.setBranchCode(iRimBranchCode);
-		iTbJcicMu01Id.setDataDate(iRimDataDate);
+	//	iTbJcicMu01Id.setDataDate(iRimDataDate);
 		iTbJcicMu01Id.setEmpId(iRimEmpId);
 		iTbJcicMu01Id.setHeadOfficeCode(iRimHeadOfficeCode);
 		iTbJcicMu01 = iTbJcicMu01Service.findById(iTbJcicMu01Id, titaVo);
@@ -65,6 +65,8 @@ public class L8R56 extends TradeBuffer {
 		this.totaVo.putParam("L8R56AuthItemReview", iTbJcicMu01.getAuthItemReview());
 		this.totaVo.putParam("L8R56AuthItemOther", iTbJcicMu01.getAuthItemOther());
 		this.totaVo.putParam("L8R56AuthStartDay", iTbJcicMu01.getAuthStartDay());
+		//日期傳送var有問題之後要改
+		this.totaVo.putParam("L8R56DataDate", iTbJcicMu01.getDataDate());
 
 		String iAuthMgrIdS = iTbJcicMu01.getAuthMgrIdS();
 		if (iAuthMgrIdS.trim().isEmpty()) {

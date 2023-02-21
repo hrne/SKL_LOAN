@@ -1349,9 +1349,10 @@ E(0,#L6R28ReduceAmtLimit1)
 #WKMAMT=m,14.2,S
 E(0,#TimReduceAmt-#ReduceLimit)
 
-!0007 減免金額超過限額，需主管核可
+!0007 減免金額，需主管核可
 #RqspFlag=X,1,S
-C(1,#WKMAMT,T(3,N),T(3,N),T(3,Y))
+! C(1,#WKMAMT,T(3,N),T(3,N),T(3,Y))
+C(1,#TimReduceAmt,T(3,N),T(3,N),T(3,Y))
 
 ! #ReduceInt=m,14.2,S
 ! IF(#TimReduceAmt > #TimExtraCloseBreachAmt,E(0,#TimReduceAmt-#TimExtraCloseBreachAmt),E(0,0))

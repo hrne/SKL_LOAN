@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM002ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.parse.Parse;
 
 @Component
@@ -52,9 +53,24 @@ public class LM002Report extends MakeReport {
 		// 民國年
 		int rocYY = parse.stringToInteger(titaVo.get("ENTDY").substring(0, 4));
 		int currentYear = rocYY + 1911;
+		
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LM002";
+		String fileItem = "專案放款";
+		String fileName = "LM002-專案放款" ;
+		String defaultExcel = "LM002_專案放款.xls";
+		String defaultSheet = "預警申請表";
+
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
 
 		// 打開excel
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM002", "專案放款", "LM002-專案放款", "LM002_專案放款.xls", "預警申請表");
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM002", "專案放款", "LM002-專案放款", "LM002_專案放款.xls", "預警申請表");
 		// 工作表更名
 		makeExcel.setSheet("預警申請表", rocYY + "預警");
 
@@ -111,7 +127,7 @@ public class LM002Report extends MakeReport {
 		}
 
 		makeExcel.close();
-		// makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 
 	}
 

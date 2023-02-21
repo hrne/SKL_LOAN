@@ -98,7 +98,8 @@ public class L9134Report4 extends MakeExcel {
 				makeExcel.setValue(row, 12, drAmt , "#,##0");	
 				makeExcel.setValue(row, 13, crAmt , "#,##0");	
 				BigDecimal ix = drAmt.subtract(crAmt);
-				BigDecimal iy = ix.subtract(didDifTdBal);
+				BigDecimal ii = iDifTdBal.add(didDifTdBal);
+				BigDecimal iy = ix.subtract(ii);
 				BigDecimal io = BigDecimal.ZERO;
 				if(iy.compareTo(io)==0) {
 					makeExcel.setValue(row, 14, "V");

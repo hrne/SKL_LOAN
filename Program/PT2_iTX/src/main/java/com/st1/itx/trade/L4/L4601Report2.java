@@ -11,12 +11,18 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdCodeId;
+import com.st1.itx.db.domain.InsuRenew;
+import com.st1.itx.db.service.CdCodeService;
+import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.db.service.springjpa.cm.L4600ServiceImpl;
 import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
+import com.st1.itx.util.parse.Parse;
 
 /**
  *  輸出檔案：險種不足LN5811P
@@ -48,42 +54,51 @@ public class L4601Report2 extends MakeReport {
 
 	@Autowired
 	L4600ServiceImpl l4600ServiceImpl;
+	
+	@Autowired
+	Parse parse;
+	
+	@Autowired
+	public InsuRenewService insuRenewService;
+	
+	@Autowired
+	public CdCodeService cdCodeService;
+	
+
+	
+
 
 	String fileName = "LN5811P.csv";
 
-	private static final String fileHeader = "到期年月,戶號,額度,姓名,保單號碼,保險起日,保險迄日,火險保額,地震險保額,坪數(含建築物、公設等),建議火險保額 (e-loan),備註";
+	private static final String fileHeader = "到期年月,戶號,額度,姓名,保單號碼,保險起日,保險迄日,火險保額,地震險保額,坪數(含建築物、公設等),建議火險保額 (e-loan),備註, 險種註記";
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
-		this.info("L4601Report2 exec ");
+		this.info("L4601Report2 exec start");
 
 		List<String> file = getData(titaVo);
 
-		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getBrno())
-				.setRptCode(titaVo.getTxCode()).setRptItem(titaVo.getTxCode() + "-LN5811P.CSV").build();
+		
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getBrno()).
+				setRptCode(titaVo.getTxCode()).setRptItem("LN5811P(保單險種不足明細表)").build();
 
 		makeFile.open(titaVo, reportVo, fileName, 2);
-				
-//		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
-//				titaVo.getTxCode() + "-LN5811P.CSV", fileName, 2);
 
 		for (String line : file) {
 			makeFile.put(line);
 		}
 
-		long sno = makeFile.close();
+		makeFile.close();
 
 
-		makeFile.toFile(sno);
 
 		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo()+"L4601",
 				titaVo.getTxCode() + " 已產生LN5811P.CSV", titaVo);
 	}
 
-	
-	private List<String> getData(TitaVo titaVo) {
+	private List<String> getData(TitaVo titaVo) throws LogicException {
 
-		this.info("L460Report2.getData start");
+		this.info("L4601Report2 getData start");
 
 		List<String> result = new ArrayList<>();
 
@@ -102,6 +117,10 @@ public class L4601Report2 extends MakeReport {
 			return result;
 		}
 
+		
+
+		
+		
 		for (Map<String, String> m : list) {
 
 			String line = "";
@@ -128,6 +147,21 @@ public class L4601Report2 extends MakeReport {
 			line += m.get("AdviseFireInsuCovrg");
 			line += ",";
 			line += m.get("Remark");
+			line += ",";
+			
+			//險種註記
+			InsuRenew tInsuRenew = insuRenewService.prevInsuNoFirst(
+					parse.stringToInteger(m.get("CustNo").trim()),
+					parse.stringToInteger(m.get("FacmNo").trim()), m.get("PrevInsuNo").trim(), titaVo);
+			
+			CdCode tCdCode = cdCodeService.findById(new CdCodeId("CommericalFlag", tInsuRenew.getCommericalFlag()),
+					titaVo);
+			String CommericalFlagX = "";
+			if (tCdCode != null) {
+				CommericalFlagX = tCdCode.getItem();
+			}
+		
+			line += CommericalFlagX;
 
 			this.info(line);
 
@@ -137,4 +171,7 @@ public class L4601Report2 extends MakeReport {
 
 		return result;
 	}
+	
+
+
 }

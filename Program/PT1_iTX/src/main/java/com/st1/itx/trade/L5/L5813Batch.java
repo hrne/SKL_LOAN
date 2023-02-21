@@ -24,6 +24,7 @@ import com.st1.itx.db.service.ClBuildingService;
 import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.YearlyHouseLoanIntService;
+import com.st1.itx.db.service.springjpa.cm.L5811ServiceImpl;
 import com.st1.itx.db.service.springjpa.cm.L5813ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.MakeExcel;
@@ -119,7 +120,7 @@ public class L5813Batch extends TradeBuffer {
 		// 上傳國稅局
 		this.info("into doIR");
 
-		int tYear = Integer.parseInt(titaVo.getParam("Year")) + 1;
+		int tYear = Integer.parseInt(titaVo.getParam("Year"));
 		String fileCode = "L5813";
 		String fileItem = "國稅局申報(國稅局-LNM57M1P)";
 		String fileName = "LNM57M1P-" + tYear + "年度.csv";
@@ -326,7 +327,7 @@ public class L5813Batch extends TradeBuffer {
 		// 上傳官網 -- SQL不挑用途別撈該年度全部資料
 		this.info("into doOW");
 
-		int tYear = Integer.parseInt(titaVo.getParam("Year")) + 1;
+		int tYear = Integer.parseInt(titaVo.getParam("Year")) ;
 		String fileCode = "L5813";
 		String fileItem = "國稅局申報(官網-LNM572P)";
 		String fileName = "LNM572P-" + tYear + "年度.csv";

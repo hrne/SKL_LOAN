@@ -101,7 +101,7 @@ public class L9740Report extends MakeReport {
 
 	@Override
 	public void printContinueNext() {
-		this.print(-55, this.getMidXAxis(), "=====　續　　下　　頁　=====", "C");
+		this.print(-57, this.getMidXAxis(), "=====　續　　下　　頁　=====", "C");
 	}
 
 //	@Override
@@ -203,7 +203,7 @@ public class L9740Report extends MakeReport {
 		this.setFont(1, 12);
 
 		if (listL9740Data1.size() > 0) {
-			this.print(1, 1,"");
+			this.print(1, 1," ");
 			// 因此表User說目前還沒看到過有資料，所以暫不確定有資料的格式(各個欄位的項目)
 			int count = 1;
 			for (Map<String, String> r3 : listL9740Data3) {
@@ -221,6 +221,7 @@ public class L9740Report extends MakeReport {
 				if (count == 50) {
 					printContinueNext();
 					this.newPage();
+					this.print(1, 1," ");
 					count = 1;
 				}
 
@@ -267,7 +268,7 @@ public class L9740Report extends MakeReport {
 		this.newPage();
 
 		if (listL9740Data3.size() > 0) {
-			this.print(1, 1,"");
+			this.print(1, 1," ");
 			int count = 1;
 			for (Map<String, String> r3 : listL9740Data3) {
 				count++;
@@ -284,6 +285,7 @@ public class L9740Report extends MakeReport {
 				if (count == 50) {
 					printContinueNext();
 					this.newPage();
+					this.print(1, 1," ");
 					count = 1;
 				}
 

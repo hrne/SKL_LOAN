@@ -1103,22 +1103,27 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		this.info("   EffectDate        = " + tLoanRateChange.getEffectDate());
 		this.info("   FitRate           = " + tLoanRateChange.getFitRate());
 
-		dDateUtil.init();
-		dDateUtil.setDate_1(tLoanRateChange.getEffectDate());
-		dDateUtil.setDays(1);
-		tLoanRateChange = loanRateChangeService.rateChangeEffectDateAscFirst(iCustNo, iFacmNo, iBormNo,
-				dDateUtil.getCalenderDay() + 19110000, titaVo);
-		// 利率相同跳過、找下一筆
-		if (tLoanRateChange != null && tLoanRateChange.getFitRate().compareTo(wkFitRate) == 0) {
+		// 利息提存未到期利息以最後一段利率計算
+		if (iIntEndCode == 2 && iIntEndDate > 0) {
+			wkNextEffectDate = 9991231;
+			wkNextFitRate = wkFitRate;
+		} else {
 			dDateUtil.init();
 			dDateUtil.setDate_1(tLoanRateChange.getEffectDate());
 			dDateUtil.setDays(1);
 			tLoanRateChange = loanRateChangeService.rateChangeEffectDateAscFirst(iCustNo, iFacmNo, iBormNo,
 					dDateUtil.getCalenderDay() + 19110000, titaVo);
+			// 利率相同跳過、找下一筆
+			if (tLoanRateChange != null && tLoanRateChange.getFitRate().compareTo(wkFitRate) == 0) {
+				dDateUtil.init();
+				dDateUtil.setDate_1(tLoanRateChange.getEffectDate());
+				dDateUtil.setDays(1);
+				tLoanRateChange = loanRateChangeService.rateChangeEffectDateAscFirst(iCustNo, iFacmNo, iBormNo,
+						dDateUtil.getCalenderDay() + 19110000, titaVo);
+			}
+			wkNextEffectDate = tLoanRateChange != null ? tLoanRateChange.getEffectDate() : 9991231;
+			wkNextFitRate = tLoanRateChange != null ? tLoanRateChange.getFitRate() : wkFitRate;
 		}
-		wkNextEffectDate = tLoanRateChange != null ? tLoanRateChange.getEffectDate() : 9991231;
-		wkNextFitRate = tLoanRateChange != null ? tLoanRateChange.getFitRate() : wkFitRate;
-
 		this.info("findRateChangeRoutine end");
 	}
 

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.service.JobMainService;
 import com.st1.itx.db.service.springjpa.cm.L5811ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -110,7 +111,7 @@ public class L5811Batch extends TradeBuffer {
 	public void makeExcel(String iYear, int iYYYYMM, int iCustNo, String iAcctCode, int iStartMonth, int iEndMonth,
 			TitaVo titaVo) throws LogicException {
 
-		int excelYear = Integer.parseInt(iYear) + 1;
+		int excelYear = Integer.parseInt(iYear) ;
 		List<Map<String, String>> resultList = null;
 
 		try {

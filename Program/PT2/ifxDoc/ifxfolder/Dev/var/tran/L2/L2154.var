@@ -185,7 +185,6 @@ CALL(#CALLGRID)
 ##loop{times:10,n:1,k:2}
 !如UpdateCode==1會秀下一行,如非1則不顯示下行
 C(3,#UpdateCode,1,IF(#StepMonthE{n}==0 && {n}!=1,INVOKEJS(SHOW,grd4_{n},0),INVOKEJS(SHOW,grd4_{n},1)),IF(#StepMonthE{n}==0,INVOKEJS(SHOW,grd4_{n},0),INVOKEJS(SHOW,grd4_{n},1)))
-
 ##end
 
 !--- P2 利率
@@ -222,7 +221,6 @@ C(3,#Hide3Fg,1,CALL(#HideP3),$)
 C(3,#Hide7Fg,1,CALL(#HideP7),$)
 CALL(#Klight)
 
-
 !--- P9 階梯式利率
 #HideP3=@,1,S
 C(3,#ExpandFg,1,CALL(#Expand),$)
@@ -240,8 +238,6 @@ C(3,#Hide9Fg,1,CALL(#HideP9),$)
 C(3,#Hide7Fg,1,CALL(#HideP7),$)
 CALL(#Klight)
 CALL(#showgrd1)
-
-
 
 !--- P4 代碼類
 #HideP4=@,1,S
@@ -1418,8 +1414,6 @@ C(3,#UpdateCode,1,SHOW(#ApprovedLevel)
 #FdCustId=X,2,L
 
 #CustId=X,10,L
-@C(4,#CustId,S,$)
-A(ID_UNINO,0,#CustId)
 
 #CustIdX=X,100,L
 
@@ -2627,7 +2621,10 @@ T(H,#RateAdjNoticeCode,#RateAdjNoticeCodeHelp)
 C(3,#UpdateCode,1,$,s)
 C(3,#Hide4Fg,0,CALL(#HideP4),$)
 HELP(#PieceCodeHelp)
-@V(7)V(H,#PieceCodeHelp)
+@
+IF(#PieceCode==#L2r05PieceCode,s,$)
+V(7)
+V(H,#PieceCodeHelp)
 
 #PieceCodeX=X,20,L
 C(4,#PieceCode,S,$)
@@ -3237,7 +3234,9 @@ C(3,#UpdateCode,1,C(3,#ApprovedLevel,9,T(F,@Supervisor,0)T(3,@FdSupervisor,),T(F
 C(3,#UpdateCode,1,$,s)
 C(3,#Hide6Fg,0,CALL(#HideP6),$)
 C(3,#ApprovedLevel,9,S,$)
-@V(7)
+@
+IF(#Supervisor==#L2r05Supervisor,s,$)
+V(7)
 
 #SupervisorLb=X,6,L
 

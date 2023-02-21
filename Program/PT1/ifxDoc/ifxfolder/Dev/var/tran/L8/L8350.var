@@ -130,15 +130,16 @@ T(1,@EmpId,#NTXBUF,16,6)
 
 #RimHeadOfficeCode=X,3,S
 #RimBranchCode=X,4,S
-#RimDataDate=X,7,S
+!#RimDataDate=X,7,S
 #RimEmpId=X,6,S
 C(3,#FunCd,1,S,$)
 T(2,@RimHeadOfficeCode,#HeadOfficeCode)
 T(2,@RimBranchCode,#BranchCode)
-T(2,@RimDataDate,#DataDate)
+!T(2,@RimDataDate,#DataDate)
 T(2,@RimEmpId,#EmpId)
 RESET_RIM(#RimL8R56,L8R56)
-S(L8R56,1,#RimHeadOfficeCode,#RimBranchCode,#RimDataDate,#RimEmpId)
+!S(L8R56,1,#RimHeadOfficeCode,#RimBranchCode,#RimDataDate,#RimEmpId)
+S(L8R56,1,#RimHeadOfficeCode,#RimBranchCode,#RimEmpId)
 R(1,L8R56)
 T(2,@EmpName,#L8R56EmpName)
 T(2,@Title,#L8R56Title)
@@ -157,6 +158,7 @@ T(2,@EmailAccount,#L8R56EmailAccount)
 E(0,@OutJcicTxtDate,#L8R56OutJcictxtDate)
 T(F,@BranchCode,0)T(F,@EmpId,0)
 T(2,@FdBranchCode, )T(2,@FdEmpId, )
+!T(2,@DataDate,#L8R56DataDate)
 
 #FunCd=A,1,S
 
