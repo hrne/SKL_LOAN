@@ -15,94 +15,90 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM071ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
-
 public class LM071Report extends MakeReport {
 
 	@Autowired
-	LM071ServiceImpl lm071ServiceImpl;
+	private LM071ServiceImpl lM071ServiceImpl;
 
 	@Autowired
-	MakeExcel makeExcel;
+	private MakeExcel makeExcel;
 
-	@Override
-	public void printTitle() {
+	private static final String REPORT_CODE = "LM071";
+	private static final String REPORT_ITEM = "推展_退休員工利率名單";
+	private static final String DEFAULT_EXCEL = "LM071_底稿_推展_退休員工利率名單.xls";
+	private static final String DEFAULT_SHEET = "退休員工利率";
 
-	}
-
-	/**
-	 * 執行報表輸出
-	 * 
-	 * @param titaVo
-	 * @param yearMonth 西元年月
-	 * 
-	 */
 	public void exec(TitaVo titaVo, int yearMonth) throws LogicException {
 
-		List<Map<String, String>> fnAllList = new ArrayList<>();
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM071", "推展_退休員工利率名單", "LM071_推展_退休員工利率名單", "LM071_底稿_推展_退休員工利率名單.xls", "退休員工利率");
+		List<Map<String, String>> queryResultList = new ArrayList<>();
+
+		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getKinbr()).setRptDate(titaVo.getEntDyI())
+				.setRptCode(REPORT_CODE).setRptItem(REPORT_ITEM).build();
+
+		makeExcel.open(titaVo, reportVo, REPORT_CODE + "_" + REPORT_ITEM, DEFAULT_EXCEL, DEFAULT_SHEET);
 
 		try {
-			fnAllList = lm071ServiceImpl.findAll(titaVo, yearMonth);
+			queryResultList = lM071ServiceImpl.findAll(titaVo, yearMonth);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
-			this.info("LM071ServiceImpl.findAll error = " + errors.toString());
+			this.info("lM071ServiceImpl findAll error = " + errors.toString());
 		}
 
-		if (fnAllList.size() > 0) {
+		if (queryResultList != null && !queryResultList.isEmpty()) {
 			String fdnm = "";
 			int row = 1;
 
-			for (Map<String, String> tLDVo : fnAllList) {
-				this.info("tLDVo-------->" + tLDVo.toString());
+			for (Map<String, String> queryResult : queryResultList) {
 				row++;
-				for (int i = 0; i < tLDVo.size(); i++) {
-					fdnm = "F" + String.valueOf(i);
+				for (int i = 0; i < queryResult.size(); i++) {
+					fdnm = "F" + i;
 					switch (i) {
 					case 0:
-						makeExcel.setValue(row, i + 1, tLDVo.get(fdnm));
+						makeExcel.setValue(row, i + 1, queryResult.get(fdnm));
 						break;
 					case 1:
 					case 3:
 						// 字串左靠
-						makeExcel.setValue(row, i + 1, tLDVo.get(fdnm), "L");
+						makeExcel.setValue(row, i + 1, queryResult.get(fdnm), "L");
 						break;
 					case 10:
 						// 利率
-						if (tLDVo.get(fdnm).equals("")) {
+						if (queryResult.get(fdnm).equals("")) {
 							makeExcel.setValue(row, i + 1, 0.00, "#0.00");
 						} else {
-							makeExcel.setValue(row, i + 1, Float.valueOf(tLDVo.get(fdnm)), "#0.00");
+							makeExcel.setValue(row, i + 1, Float.valueOf(queryResult.get(fdnm)), "#0.00");
 						}
 						break;
 					case 11:
 					case 12:
 						// 金額
-						if (tLDVo.get(fdnm).equals("")) {
+						if (queryResult.get(fdnm).equals("")) {
 							makeExcel.setValue(row, i + 1, 0, "#,##0");
 						} else {
-							makeExcel.setValue(row, i + 1, Float.valueOf(tLDVo.get(fdnm)), "#,##0");
+							makeExcel.setValue(row, i + 1, Float.valueOf(queryResult.get(fdnm)), "#,##0");
 						}
 						break;
 					case 7:
 					case 8:
 					case 9:
 						// 日期
-						if (tLDVo.get(fdnm).equals("")) {
+						if (queryResult.get(fdnm).equals("")) {
 							makeExcel.setValue(row, i + 1, 0);
 						} else {
-							makeExcel.setValue(row, i + 1, Integer.valueOf(tLDVo.get(fdnm)));
+							makeExcel.setValue(row, i + 1, Integer.valueOf(queryResult.get(fdnm)));
 						}
 						break;
 					default:
 						// 戶號(數字右靠)
-						if (tLDVo.get(fdnm).equals("")) {
+						if (queryResult.get(fdnm).equals("")) {
 							makeExcel.setValue(row, i + 1, 0);
 						} else {
-							makeExcel.setValue(row, i + 1, Integer.valueOf(tLDVo.get(fdnm)));
+							makeExcel.setValue(row, i + 1, Integer.valueOf(queryResult.get(fdnm)));
 						}
 						break;
 					}
@@ -113,7 +109,5 @@ public class LM071Report extends MakeReport {
 		}
 
 		makeExcel.close();
-		// makeExcel.toExcel(sno);
-
 	}
 }

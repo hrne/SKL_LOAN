@@ -17,7 +17,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 
 @Service
 @Repository
-/* 逾期放款明細 */
 public class LM071ServiceImpl extends ASpringJpaParm implements InitializingBean {
 
 	@Autowired
@@ -28,76 +27,64 @@ public class LM071ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	}
 
-	/**
-	 * 查詢結果
-	 * 
-	 * @param titaVo
-	 * @param yearMonth 西元年月
-	 * 
-	 */
+	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth) {
 
-	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth) throws Exception {
+		this.info("LM071ServiceImpl.findAll yearMonth=" + yearMonth);
 
-		// 年
-//		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
-		// 月
-//		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
-
-//		String iYearMonth = String.valueOf((iYear * 100) + iMonth);
-
-		this.info("LM071.findAll yearMonth=" + yearMonth);
-
-		String sql = "SELECT M.\"ProdNo\" AS F0"; // 商品代碼
-		sql += "			,C.\"CustId\" AS F1";
-		sql += "			,E.\"QuitDate\" AS F2"; // 離職/停約日
-		sql += "			,\"Fn_ParseEOL\"(C.\"CustName\",0) AS F3"; // 戶名/公司名稱
-		sql += "			,L.\"CustNo\" AS F4"; // 借款人戶號
-		sql += "			,L.\"FacmNo\" AS F5"; // 額度編號
-		sql += "			,L.\"BormNo\" AS F6"; // 撥款序號, 預約序號
-		sql += "			,L.\"DrawdownDate\" AS F7"; // 撥款日期, 預約日期
-		sql += "			,L.\"MaturityDate\" AS F8"; // 到期日
-		sql += "			,RES.\"EffectDate\" AS F9"; // 最新利率生效起日
-		sql += "			,RES.\"FitRate\" AS F10"; // 最新利率
-		sql += "			,L.\"DrawdownAmt\" AS F11"; // 撥款金額
-		sql += "			,L.\"LoanBal\" AS F12"; // 放款餘額
-		sql += "	  FROM \"LoanBorMain\" L";
-		sql += "	  LEFT JOIN \"MonthlyLoanBal\" M ON M.\"YearMonth\" = :iyymm";
-		sql += "									AND M.\"CustNo\" = L.\"CustNo\"";
-		sql += "									AND M.\"FacmNo\" = L.\"FacmNo\"";
-		sql += "									AND M.\"BormNo\" = L.\"BormNo\"";
-		sql += "	  LEFT JOIN \"FacProd\" P ON P.\"ProdNo\" = M.\"ProdNo\"";
-		sql += "	  LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = L.\"CustNo\"";
-		sql += "	  LEFT JOIN \"CdEmp\" E ON E.\"EmployeeNo\" = C.\"EmpNo\"";
-		sql += "	  LEFT JOIN (SELECT \"CustNo\"";
-		sql += "					   ,\"FacmNo\"";
-		sql += "					   ,\"BormNo\"";
-		sql += "					   ,\"EffectDate\"";
-		sql += "					   ,\"FitRate\"";
-		sql += "					   ,ROW_NUMBER() OVER (PARTITION BY \"CustNo\"";
-		sql += "													   ,\"FacmNo\"";
-		sql += "													   ,\"BormNo\"";
-		sql += "										       ORDER BY \"EffectDate\" DESC) AS \"SEQ\"";
-		sql += "				 FROM \"LoanRateChange\" )RES ON RES.\"CustNo\" = L.\"CustNo\"";
-		sql += "				    						 AND RES.\"FacmNo\" = L.\"FacmNo\"";
-		sql += "								  			 AND REs.\"BormNo\" = L.\"BormNo\"";
-		sql += "								  			 AND REs.\"SEQ\" = 1";
-		sql += "	  WHERE L.\"Status\" IN(0,4)";
-		sql += "		AND M.\"ProdNo\" = '11'";
-//		sql += "		AND M.\"ProdNo\" IN ('11','1F')";
-		sql += " 		AND P.\"EmpFlag\" = 'Y'";
-		sql += "	  ORDER BY L.\"CustNo\"";
-		sql += "			  ,L.\"FacmNo\"";
-		sql += "			  ,L.\"BormNo\"";
-		// sql += " AND E.\"CommLineType\" = '4'";
-		// sql += " AND E.\"QuitDate\" <= :iday";
+		String sql = "";
+		sql += " WITH RES AS ( ";
+		sql += "     SELECT \"CustNo\" ";
+		sql += "          , \"FacmNo\" ";
+		sql += "          , \"BormNo\" ";
+		sql += "          , \"EffectDate\" ";
+		sql += "          , \"FitRate\" ";
+		sql += "          , ROW_NUMBER() ";
+		sql += "            OVER ( ";
+		sql += "              PARTITION BY \"CustNo\" ";
+		sql += "                         , \"FacmNo\" ";
+		sql += "                         , \"BormNo\" ";
+		sql += "              ORDER BY \"EffectDate\" DESC ";
+		sql += "            ) AS \"Seq\" ";
+		sql += "     FROM \"LoanRateChange\" ";
+		sql += " ) ";
+		sql += " SELECT M.\"ProdNo\"                      AS F0 "; // 商品代碼
+		sql += "      , C.\"CustId\"                      AS F1 ";
+		sql += "      , Q.\"QuitDate\"                    AS F2 "; // 離職/停約日
+		sql += "      , \"Fn_ParseEOL\"(C.\"CustName\",0) AS F3 "; // 戶名/公司名稱
+		sql += "      , L.\"CustNo\"                      AS F4 "; // 借款人戶號
+		sql += "      , L.\"FacmNo\"                      AS F5 "; // 額度編號
+		sql += "      , L.\"BormNo\"                      AS F6 "; // 撥款序號, 預約序號
+		sql += "      , L.\"DrawdownDate\"                AS F7 "; // 撥款日期, 預約日期
+		sql += "      , L.\"MaturityDate\"                AS F8 "; // 到期日
+		sql += "      , RES.\"EffectDate\"                AS F9 "; // 最新利率生效起日
+		sql += "      , RES.\"FitRate\"                   AS F10 "; // 最新利率
+		sql += "      , L.\"DrawdownAmt\"                 AS F11 "; // 撥款金額
+		sql += "      , L.\"LoanBal\"                     AS F12 "; // 放款餘額
+		sql += " FROM \"LoanBorMain\" L ";
+		sql += " LEFT JOIN \"MonthlyLoanBal\" M ON M.\"YearMonth\" = :inputYearMonth ";
+		sql += "                               AND M.\"CustNo\" = L.\"CustNo\" ";
+		sql += "                               AND M.\"FacmNo\" = L.\"FacmNo\" ";
+		sql += "                               AND M.\"BormNo\" = L.\"BormNo\" ";
+		sql += " LEFT JOIN \"FacProd\" P ON P.\"ProdNo\" = M.\"ProdNo\" ";
+		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = L.\"CustNo\" ";
+		sql += " LEFT JOIN \"QuitEmp\" Q ON Q.\"EmpNo\" = C.\"EmpNo\" ";
+		sql += " LEFT JOIN RES ON RES.\"CustNo\" = L.\"CustNo\" ";
+		sql += "              AND RES.\"FacmNo\" = L.\"FacmNo\" ";
+		sql += "              AND RES.\"BormNo\" = L.\"BormNo\" ";
+		sql += "              AND RES.\"Seq\" = 1 ";
+		sql += " WHERE L.\"Status\" IN (0,4) ";
+		sql += "   AND M.\"ProdNo\" = '11' ";
+		sql += "   AND P.\"EmpFlag\" = 'Y' ";
+		sql += " ORDER BY L.\"CustNo\" ";
+		sql += "         ,L.\"FacmNo\" ";
+		sql += "         ,L.\"BormNo\" ";
 
 		this.info("sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
-		query.setParameter("iyymm", yearMonth);
-//		query.setParameter("iday", iDAY);
+		query.setParameter("inputYearMonth", yearMonth);
 		return this.convertToMap(query);
 	}
 }

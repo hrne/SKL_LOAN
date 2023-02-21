@@ -269,11 +269,36 @@ BEGIN
                                 AND LMSP.LMSAPN = MSTP.LMSAPN
                                 AND TRUNC(LMSP.LMSLLD / 100) <= MSTP.ADTYMT
         )
+        , tx3037Data AS (
+          SELECT LMSACN
+               , MAX(TRXDAT) AS TRXDAT
+          FROM LA$TRXP
+          WHERE TRXTRN = '3037'
+          GROUP BY LMSACN
+        )
+        , badDeptCloseData AS (
+          SELECT DISTINCT
+                 LMSACN
+               , LMSAPN
+          FROM LA$LMSP
+          WHERE LMSSTS = 9
+        )
+        , badDeptCloseDateData AS (
+          SELECT b.LMSACN
+               , b.LMSAPN
+               , t.TRXDAT
+          FROM badDeptCloseData b
+          LEFT JOIN tx3037Data t ON t.LMSACN = b.LMSACN
+        )
         , badData AS (
           SELECT MSTP.ADTYMT
                , MSTP.LMSACN
                , MSTP.LMSAPN
-               , LMSP.LMSSTS
+               , CASE
+                   WHEN LMSP.LMSSTS = 9
+                        AND NVL(bd.TRXDAT,0) != 0
+                   THEN 6
+                 ELSE LMSP.LMSSTS END      AS LMSSTS
                , ROW_NUMBER ()
                  OVER (
                    PARTITION BY MSTP.ADTYMT
@@ -285,7 +310,10 @@ BEGIN
           LEFT JOIN LA$LMSP LMSP ON LMSP.LMSACN = MSTP.LMSACN
                                 AND LMSP.LMSAPN = MSTP.LMSAPN
                                 AND TRUNC(LMSP.LMSLLD / 100) <= MSTP.ADTYMT
-          WHERE LMSP.LMSSTS = 6
+          LEFT JOIN badDeptCloseDateData bd ON bd.LMSACN = MSTP.LMSACN
+                                           AND bd.LMSAPN = MSTP.LMSAPN
+                                           AND TRUNC(bd.TRXDAT / 100) >= MSTP.ADTYMT
+          WHERE LMSP.LMSSTS IN (6,9)
         )
         SELECT S0."ADTYMT"                    AS "YearMonth"           -- 資料年月 DECIMAL 6 0
               ,S0."LMSACN"                    AS "CustNo"              -- 戶號 DECIMAL 7 0

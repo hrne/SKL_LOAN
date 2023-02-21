@@ -77,9 +77,13 @@ public class LM083ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      LEFT JOIN \"ClImm\"   cl ON cl.\"ClCode1\" = m.\"ClCode1\"";
 		sql += "                              AND cl.\"ClCode2\" = m.\"ClCode2\"";
 		sql += "                              AND cl.\"ClNo\" = m.\"ClNo\"";
-		sql += "      WHERE m.\"Status\" IN (0,2,4,6,7) ";
-		// sql += "      WHERE m.\"PrinBalance\" != 0 ";
-		sql += "        AND m.\"YearMonth\" = :yearMonth";
+		sql += "      WHERE m.\"YearMonth\" = :yearMonth ";
+		sql += "        AND CASE ";
+		sql += "              WHEN m.\"Status\" IN (6,7) ";
+		sql += "              THEN 1 "; // case 1:呆帳戶、部呆戶
+		sql += "              WHEN m.\"PrinBalance\" != 0 ";
+		sql += "              THEN 2 "; // case 2:餘額不為0
+		sql += "            ELSE 0 END != 0 ";
 		sql += "        ORDER BY m.\"AcSubBookCode\",m.\"CustNo\",m.\"FacmNo\"  ";
 
 		this.info("sql=" + sql);

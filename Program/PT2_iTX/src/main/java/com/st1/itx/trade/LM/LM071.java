@@ -14,16 +14,10 @@ import com.st1.itx.tradeService.BatchBase;
 
 @Service("LM071")
 @Scope("step")
-/**
- * 
- * 
- * @author Eric Chang
- * @version 1.0.0
- */
 public class LM071 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Autowired
-	LM071Report lm071report;
+	private LM071Report rpt;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -58,7 +52,7 @@ public class LM071 extends BatchBase implements Tasklet, InitializingBean {
 
 		thisYM = iYear * 100 + iMonth;
 
-		lm071report.exec(titaVo, thisYM);
+		rpt.exec(titaVo, thisYM);
 	}
 
 }

@@ -231,7 +231,6 @@ T(2,@CustNo,#CustNo2)
 T(3,#CustNoX,)
 E(0,@Flag,1)
 
-
 #SendL2r07A=X,1,S
 C(4,#CustNo,S,$)
 T(3,@RimCustId, )
@@ -244,7 +243,7 @@ R(1,L2R07)
 C(4,#CustNo,S,T(2,#L2r07CustName))
 
 #WKBTN1=X,1,S
-E(0,@FacmNo,0)
+
 
 #BUF2A=X,100,S
 
@@ -364,6 +363,7 @@ HELP(#TempReasonCodeHelp)
 @V(H,#TempReasonCodeHelp)
 E(0,@TwTempAmt,0)
 E(0,@UsTempAmt,0)
+IF(#TempReasonCode==0||#TempReasonCode==3||#TempReasonCode==6,E(0,@FacmNo,0),$)
 
 
 ![業務別] 01:撥款匯款(含暫收退還且非退票) 02:支票繳款 03:債協 09:放款
@@ -390,7 +390,7 @@ CALL(#HIDEP2)
 #InitValue=X,1,S
 E(0,@EntryDate,0)
 ! C(4,#ApplNo,E(0,@FacmNo,0),$)
-C(3,#ChequeFlag,1,$,E(0,@FacmNo,0))
+! C(3,#ChequeFlag,1,$,E(0,@FacmNo,0))
 T(3,@CurrencyCode,TWD)
 E(0,@TwTempAmt,0)
 E(0,@UsTempAmt,0)
@@ -500,7 +500,6 @@ T(2,#TimCustNo+#FacmNo+#RepayCode)
 
 #BIND4A=X,1,S
 BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L492A; ntxbuf=#BUF4A;ntxbuf5=type<-1
-:FacmNo<-OOFacmNo
 :L492aFacmNo<-OOFacmNo
 :EntryDate<-OOEntryDate
 :DetailSeq<-OODetailSeq

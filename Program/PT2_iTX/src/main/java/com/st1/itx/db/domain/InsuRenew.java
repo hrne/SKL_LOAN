@@ -154,6 +154,10 @@ public class InsuRenew implements Serializable {
   @Column(name = "`CommericalFlag`", length = 2)
   private String commericalFlag;
 
+  // 保單收件日
+  @Column(name = "`InsuReceiptDate`")
+  private int insuReceiptDate = 0;
+
   // 備註
   @Column(name = "`Remark`", length = 50)
   private String remark;
@@ -779,6 +783,25 @@ null:待通知
   }
 
 /**
+	* 保單收件日<br>
+	* 
+	* @return Integer
+	*/
+  public int getInsuReceiptDate() {
+    return StaticTool.bcToRoc(this.insuReceiptDate);
+  }
+
+/**
+	* 保單收件日<br>
+	* 
+  *
+  * @param insuReceiptDate 保單收件日
+  * @throws LogicException when Date Is Warn	*/
+  public void setInsuReceiptDate(int insuReceiptDate) throws LogicException {
+    this.insuReceiptDate = StaticTool.rocToBc(insuReceiptDate);
+  }
+
+/**
 	* 備註<br>
 	* 
 	* @return String
@@ -880,7 +903,7 @@ null:待通知
            + ", custNo=" + custNo + ", facmNo=" + facmNo + ", nowInsuNo=" + nowInsuNo + ", origInsuNo=" + origInsuNo + ", renewCode=" + renewCode + ", insuCompany=" + insuCompany
            + ", insuTypeCode=" + insuTypeCode + ", repayCode=" + repayCode + ", fireInsuCovrg=" + fireInsuCovrg + ", ethqInsuCovrg=" + ethqInsuCovrg + ", fireInsuPrem=" + fireInsuPrem + ", ethqInsuPrem=" + ethqInsuPrem
            + ", insuStartDate=" + insuStartDate + ", insuEndDate=" + insuEndDate + ", totInsuPrem=" + totInsuPrem + ", acDate=" + acDate + ", titaTlrNo=" + titaTlrNo + ", titaTxtNo=" + titaTxtNo
-           + ", notiTempFg=" + notiTempFg + ", statusCode=" + statusCode + ", ovduDate=" + ovduDate + ", ovduNo=" + ovduNo + ", commericalFlag=" + commericalFlag + ", remark=" + remark
-           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", notiTempFg=" + notiTempFg + ", statusCode=" + statusCode + ", ovduDate=" + ovduDate + ", ovduNo=" + ovduNo + ", commericalFlag=" + commericalFlag + ", insuReceiptDate=" + insuReceiptDate
+           + ", remark=" + remark + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

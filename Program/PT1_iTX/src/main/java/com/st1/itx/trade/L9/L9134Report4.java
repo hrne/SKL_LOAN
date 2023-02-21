@@ -97,7 +97,7 @@ public class L9134Report4 extends MakeExcel {
 				makeExcel.setValue(row, 6, r.get("AcDate"),"R");	
 				makeExcel.setValue(row, 12, drAmt , "#,##0");	
 				makeExcel.setValue(row, 13, crAmt , "#,##0");	
-				BigDecimal ix = drAmt.subtract(crAmt);
+				BigDecimal ix = crAmt.subtract(drAmt);
 				BigDecimal ii = iDifTdBal.add(didDifTdBal);
 				BigDecimal iy = ix.subtract(ii);
 				BigDecimal io = BigDecimal.ZERO;
