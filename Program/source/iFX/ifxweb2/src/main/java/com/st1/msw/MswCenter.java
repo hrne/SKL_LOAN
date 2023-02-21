@@ -178,7 +178,7 @@ public class MswCenter {
 		sendTo(scriptSession.getId(), callbackMethod, OK, users);
 	}
 
-	public void getSupervisors(String callbackMethod, String txcd, Integer obufgch) {
+	public void getSupervisors(String callbackMethod, String txcd, Integer obufgch, int supLevel) {
 		logger.info("enter getSupervisors");
 		if (callbackMethod == null)
 			callbackMethod = "__getSupervisorsDone";
@@ -186,11 +186,10 @@ public class MswCenter {
 		UserInfo userInfo = (UserInfo) session.getAttribute(GlobalValues.SESSION_USER_INFO);
 		String userkey = userInfo.brno + userInfo.id;
 
-		Object[] supervisors = userPub.getSupervisor(userInfo.getBrno(), txcd, obufgch, userkey, userInfo.getCldept()); // 柯
+		Object[] supervisors = userPub.getSupervisor(userInfo.getBrno(), txcd, obufgch, userkey, userInfo.getCldept(), supLevel); // 柯
 		// 新增判斷
 		logger.info("supervisors:" + supervisors.length);
 		sendTo(WebContextFactory.get().getScriptSession().getId(), callbackMethod, OK, supervisors);
-
 	}
 
 	public void sendOvrReq(String supervisorId, final OvrData ovrData) {

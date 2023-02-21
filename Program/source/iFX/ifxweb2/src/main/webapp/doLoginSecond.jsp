@@ -167,7 +167,8 @@
 		String cldept = (String) sessionMap.get("CLDEPT");
 
 		String pswd = (String) sessionMap.get("PSWD");
-		UserInfo u = new UserInfo(brn, tlrno, level, name, session.getId(), dapKnd, oapKnd, cldept, pswd);
+		String allowFg = (String) sessionMap.get("AllowFg");
+		UserInfo u = new UserInfo(brn, tlrno, level, name, session.getId(), dapKnd, oapKnd, cldept, pswd, Integer.parseInt(allowFg));
 
 		/*
 		JournalService jnlService = MySpring.getJournalService();

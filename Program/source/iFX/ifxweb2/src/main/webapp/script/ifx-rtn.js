@@ -3058,7 +3058,7 @@
 		// Loaded via <script> tag, create shortcut to access PDF.js exports.
 		var pdfjsLib = window['pdfjs-dist/build/pdf'];
 		// The workerSrc property shall be specified.
-		pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdfjs-2.4.456/pdf.worker.js';
+		pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdfjs-3.3.122/pdf.worker.js';
 		// Asynchronous download of PDF
 		var loadingTask = pdfjsLib.getDocument(url);
 		loadingTask.promise.then(function (pdf) {

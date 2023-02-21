@@ -286,6 +286,7 @@ public class ImsLoginSock extends ImsTran {
 		sessionMap.put("FINBRNO", totaVo.get("FINBRNO"));
 		sessionMap.put("OBUBRNO", totaVo.get("OBUBRNO"));
 		sessionMap.put("LEVEL", totaVo.get("LEVEL"));
+		sessionMap.put("AllowFg", Objects.isNull(totaVo.get("AllowFg")) ? "0" : totaVo.get("AllowFg"));
 
 		sessionMap.put("EMPNM", totaVo.get("NAME"));
 		if (agentItem != null && !agentItem.trim().isEmpty())

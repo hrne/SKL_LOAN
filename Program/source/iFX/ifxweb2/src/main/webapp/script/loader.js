@@ -23,7 +23,7 @@ Modernizr.load([
 			"script/shareTool.js",
 			"script/jqueryui/js/jquery-ui-1.8.19.custom.min.js",
 			"script/easyui/jquery.easyui.min.js",
-			"script/pdfjs-2.4.456/pdf.js"
+			"script/pdfjs-3.3.122/pdf.js"
         ],
         complete : function() {
         	starting_point();

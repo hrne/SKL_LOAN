@@ -15,6 +15,8 @@ function OvrReq(oTranData){
 		if(!v) return supervisor;
 		supervisor = v; 
 	}
+	
+	var supIndex = ["0007", "0017", "0027"];
 	function init() {
 		myDeferred = new $.Deferred();
 		var remotePage = oTranData['remotePage'];
@@ -50,7 +52,7 @@ function OvrReq(oTranData){
 			$('#btnSupervisors').button()
 				.off('click').on('click',function() {
 					console.log("btnSupervisors click!");
-				ovrGetSupervisor(txcd , obufgch);
+					ovrGetSupervisor(txcd, obufgch, supIndex.indexOf(reasons.substring(0, 4)));
 			} ).trigger('click');
 			
 			$('#btnSendReq').button().off('click').on('click',function() {
@@ -200,9 +202,9 @@ function buildSelect(elementId, list) {
       }, 10);
 }
 
-function ovrGetSupervisor(txcd , obufgch){
+function ovrGetSupervisor(txcd , obufgch, supLevel){
 	console.log("in ovrGetSupervisor!");
-	MswCenter.getSupervisors("ovrGetSupervisorDone",txcd ,obufgch);  //柯 給交易代號和權限
+	MswCenter.getSupervisors("ovrGetSupervisorDone", txcd, obufgch, supLevel ? supLevel : 0);  //柯 給交易代號和權限
 }
 function ovrGetSupervisorDone(retval, m) {
 	console.log("in ovrGetSupervisorDone!");

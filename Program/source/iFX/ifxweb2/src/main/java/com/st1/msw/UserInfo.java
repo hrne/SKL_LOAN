@@ -24,6 +24,7 @@ public class UserInfo implements Serializable {
 	String cldept;
 	String pswd;
 	String ovrToken;
+	int allowFg = 0;
 	int lastJnlSeq = -1;
 
 	LinkedBlockingDeque<String> scriptSessionIdList = new LinkedBlockingDeque<String>();
@@ -32,7 +33,7 @@ public class UserInfo implements Serializable {
 
 	}
 
-	public UserInfo(String brno, String id, String level, String name, String httpSessionId, String dapKnd, String oapKnd, String cldept, String pswd) {
+	public UserInfo(String brno, String id, String level, String name, String httpSessionId, String dapKnd, String oapKnd, String cldept, String pswd, int allowFg) {
 		this.brno = brno;
 		this.id = id;
 		this.level = level;
@@ -43,6 +44,7 @@ public class UserInfo implements Serializable {
 		this.oapKnd = oapKnd;
 		this.cldept = cldept;
 		this.pswd = pswd;
+		this.allowFg = allowFg;
 	}
 
 	public String getFullId() {
@@ -172,6 +174,14 @@ public class UserInfo implements Serializable {
 
 	public void setLastJnlSeq(int lastJnlSeq) {
 		this.lastJnlSeq = lastJnlSeq;
+	}
+
+	public int getAllowFg() {
+		return allowFg;
+	}
+
+	public void setAllowFg(int allowFg) {
+		this.allowFg = allowFg;
 	}
 
 	public LinkedBlockingDeque<String> getScriptSessionIdList() {

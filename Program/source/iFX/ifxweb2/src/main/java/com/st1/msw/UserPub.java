@@ -184,12 +184,12 @@ public class UserPub {
 	// logger.info("getBySessionId null:" + sessionId );
 	// return null;
 	// }
-	public Object[] getSupervisor(String brn, String txcd, Integer obufgch, String userkey, String cldept) {
+	public Object[] getSupervisor(String brn, String txcd, Integer obufgch, String userkey, String cldept, int supLevel) {
 		logger.info("getSupervisor!!!");
 		List<String> supervisors = new ArrayList<String>();
 
 		logger.info("getBySessionId!!! brn:" + brn);
-		List<UserPubd> rtnUserpubs = userPubService.findSupervisor("USER", brn, cldept);
+		List<UserPubd> rtnUserpubs = userPubService.findSupervisor("USER", brn, cldept, supLevel);
 		int number;
 		char word;
 		int newnumber = 0;
@@ -523,6 +523,8 @@ public class UserPub {
 		// b.setPswd();
 		b.setOvrToken(userInfo.getOvrToken());
 		b.setLastJnlSeq(-1);
+		b.setAllowFg(userInfo.getAllowFg());
+
 		b.setLocate(GlobalValues.getLocalAddr());
 //		logger.info("getLocalAddr:" + FilterUtils.escape(GlobalValues.getLocalAddr()));
 //		logger.info("strUserinfo len:" + FilterUtils.escape(strUserinfo.length() + "," + strUserinfo));
