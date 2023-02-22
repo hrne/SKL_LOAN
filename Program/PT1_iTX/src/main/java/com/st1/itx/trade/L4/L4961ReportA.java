@@ -15,10 +15,14 @@ import com.st1.itx.db.service.springjpa.cm.L4961ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.format.FormatUtil;
+import com.st1.itx.util.http.WebClient;
 
 @Component
 @Scope("prototype")
 public class L4961ReportA extends MakeReport {
+	
+	@Autowired
+	WebClient webClient;
 
 	@Autowired
 	L4961ServiceImpl l4961ServiceImpl;
@@ -52,20 +56,20 @@ public class L4961ReportA extends MakeReport {
 	// 自訂表頭
 	@Override
 	public void printHeader() {
-		this.print(-1, 1, "程式ID：" + this.getParentTranCode());
+		this.print(-1, 2, "程式ID：" + this.getParentTranCode());
 		this.print(-1, this.getMidXAxis(), "新光人壽保險股份有限公司", "C");
 		this.print(-1, 145, "機密等級：" + this.security);
-		this.print(-2, 1, "報　表：" + this.reportCode);
+		this.print(-2, 2, "報　表：" + this.reportCode);
 //		this.print(-2, this.getMidXAxis(), this.reportItem, "C");
 		this.print(-2, 145, "日　　期：" + showBcDate(this.nowDate, 1));	
-//		this.print(-3, 1, "來源別：放款服務課");
+//		this.print(-3, 2, "來源別：放款服務課");
 		this.print(-3, 145, "時　　間：" + showTime(this.nowTime));
-		this.print(-4,1,"會計日期:"+showRocDate(titaVo.getEntDyI(),1));
+		this.print(-4,2,"會計日期:"+showRocDate(titaVo.getEntDyI(),1));
 		this.print(-4, 145, "頁　　次：" + this.getNowPage());
 		this.print(-5, 145, "單　　位：元");
 //		this.print(-4, this.getMidXAxis(), showRocDate(this.reportDate), "C");
 		this.print(-2, this.getMidXAxis(), this.reportItem, "C");
-		this.print(-5,1,"到期日期:"+this.InsuYearMonth+"-"+this.InsuYearMonthEnd);
+		this.print(-5,2,"到期日期:"+this.InsuYearMonth+"-"+this.InsuYearMonthEnd);
 
 		// 印明細表頭
 		this.printDetailHeader();
@@ -74,13 +78,9 @@ public class L4961ReportA extends MakeReport {
 		this.setBeginRow(9);
 
 		// 設定明細列數(自訂亦必須)
-		this.setMaxRows(34);
+		this.setMaxRows(40);
 	}
 
-	@Override
-	public void printContinueNext() {
-		this.print(1, this.getMidXAxis(), "=====　續　　下　　頁　=====", "C");
-	}
 
 	private void printDetailHeader() {
 
@@ -130,6 +130,11 @@ public class L4961ReportA extends MakeReport {
 
 		if (resultList != null && !resultList.isEmpty()) {
 			for (Map<String, String> result : resultList) {
+				
+				if(this.NowRow == 48) {
+					print(1, 1, "└————┴————┴———————————————┴——————┴————————┴————————┴————————┴————————┴————————┘");
+				}
+				
 //				print(1, 1, "｜　　　　　　　　　　　　　｜　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　｜　　　　　　　　｜　　　　　　　　　　　　　｜");
 				print(1, 1, "├————┼————┼———————————————┼——————┼————————┼————————┼————————┼————————┼————————┤");
 
@@ -167,13 +172,16 @@ public class L4961ReportA extends MakeReport {
 			print(0, 121, formatAmt(fireInsuPremTotal, 0), "R");// F11
 			print(0, 155, formatAmt(ethqInsuPremTotal, 0), "R");// F13
 			print(1, 1, "└—————————┴——————————————————————┴————————┴————————┴————————┴————————┴————————┘");
-			print(1, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　經理：　　　　　　　　　　　　　　　經辦：");
+			print(2, this.getMidXAxis(), "經理：　　　　　　　　　　　　　　　經辦：","C");
 
+			webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y", "LC009",
+					titaVo.getTlrNo() + "L4961", reportCode +"-報表已完成", titaVo);
 		} else {
 			print(1, 1, "├————┴————┴———————————————┴——————┴————————┴————————┴————————┴————————┴————————┤");
 			print(1, 1, "｜　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　｜");
 			print(0, 1, "　　本　日　無　資　料　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
 			print(1, 1, "└—————————————————————————————————————————————————————————————————————————————┘");
 		}
+		
 	}
 }

@@ -154,8 +154,8 @@ public class LY005Report extends MakeReport {
 			makeExcel.setValue(5, 5, "本日無資料", "L");
 		}
 
-		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		makeExcel.close();
+		
 		
 		return true;
 

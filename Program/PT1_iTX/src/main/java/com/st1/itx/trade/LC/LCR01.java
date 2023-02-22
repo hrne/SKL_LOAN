@@ -65,9 +65,9 @@ public class LCR01 extends TradeBuffer {
 				throw new LogicException(titaVo, "EC004", "帳務日:" + entday + ",交易序號:" + txno + "已修正");
 			}
 
-			if (tTxRecord.getFlowType() > 1) {
+			if (tTxRecord.getFlowType() > 1) 
 				checkTxFlow(titaVo, tTxRecord.getEntdy(), tTxRecord.getFlowNo(), tTxRecord.getFlowStep());
-			}
+			
 			try {
 				TitaVo tita2 = titaVo.getVo(tTxRecord.getTranData());
 				tita2.put("OrgEntdy", String.valueOf(tTxRecord.getEntdy()));

@@ -128,7 +128,7 @@ public class LY007Report extends MakeReport {
 			// 新增明細行數
 			if (lY007List.size() > 1) {
 				// 將表格往下移，移出空間
-				makeExcel.setShiftRow(rowCursor + 1, lY007List.size() - 1);
+				makeExcel.setShiftRow(7, lY007List.size());
 			}
 
 			for (Map<String, String> r : lY007List) {

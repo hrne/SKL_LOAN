@@ -286,8 +286,8 @@ T(H,#TelChgRsnCode,#TelChgRsnCodeHelp)
 #RelationCode=X,2,I
 HELP(#RelationCodeHelp)
 @
-IF(#RelationCode == "00" || #RelationCode == "",INVOKEJS(SHOW,p1,9,9,0)T(2,@FdLiaisonNam, ),INVOKEJS(SHOW,p1,9,9,1)T(2,@FdLiaisonNam,*))
-IF(#TelTypeCode == "06" || #TelTypeCode == "09",V(H,#RelationCodeHelp),C(4,#RelationCode,$,V(H,#RelationCodeHelp)))
+!IF(#RelationCode == "00" || #RelationCode == "",INVOKEJS(SHOW,p1,9,9,0)T(2,@FdLiaisonNam, ),INVOKEJS(SHOW,p1,9,9,1)T(2,@FdLiaisonNam,*))
+!IF(#TelTypeCode == "06" || #TelTypeCode == "09",V(H,#RelationCodeHelp),C(4,#RelationCode,$,V(H,#RelationCodeHelp)))
 
 ! 與借款人關係中文
 #RelationItem=X,10,L
@@ -295,7 +295,7 @@ C(4,#RelationCode,S,T(H,#RelationCode,#RelationCodeHelp))
 
 ! 聯絡人姓名
 #LiaisonName=x,100,I
-C(4,#RelationCode,S,S)
+!C(4,#RelationCode,S,S)
 !T(2,#L1r09CustName)
 !IF(#RelationCode == "00",T(2,#L1r09CustName),$)
 !IF(#RelationCode == "00",s,$)

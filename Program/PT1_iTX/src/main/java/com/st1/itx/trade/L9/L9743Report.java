@@ -34,31 +34,34 @@ public class L9743Report extends MakeReport {
 
 		this.info("MakeReport.printHeader");
 
+		this.setCharSpaces(0);
+		
+		this.setFontSize(12);
+		
 		printHeaderP();
 
 		// 明細起始列(自訂亦必須)
 		this.setBeginRow(10);
 
 		// 設定明細列數(自訂亦必須)
-		this.setMaxRows(50);
+		this.setMaxRows(30);
 
 	}
 
 	public void printHeaderP() {
-		this.print(-1, 108, "新 光 人 壽 保 險 股 份 有 限 公 司", "R");
-		this.print(-3, 89, "_  還 本", "R");
-		this.print(-4, 109, "收 據 ( 支 票 件 )", "R");
-		this.print(-5, 89, "_  繳 息", "R");
+		this.print(-1, this.getMidXAxis(), "新 光 人 壽 保 險 股 份 有 限 公 司", "C");
+		this.print(-3, this.getMidXAxis(), "_  還 本  ", "R");
+		this.print(-4, this.getMidXAxis(), "  收 據 ( 支 票 件 )", "L");
+		this.print(-5, this.getMidXAxis(), "_  繳 息  ", "R");
 		this.print(-7, 1, " 借 款 人 戶 號  . . . ");
 		this.print(-7, 25, custNo, "R");
 		this.print(-7, 27, chequeName);
-		this.print(-9, 1, "支 票 帳 號　　支 票 號 碼　　　　支 票 金 額 　　　收 票 日　　　　到 期 日　　支 票 銀 行　　支 票 分 行");
+		this.print(-9, 1, "支 票 帳 號　　支 票 號 碼　　　　　　支 票 金 額 　　　收 票 日　　　　到 期 日　　　　支 票 銀 行　　支 票 分 行");
 
 	}
 
 	public Boolean exec(TitaVo titaVo) throws LogicException {
-		// 讀取VAR參數
-		this.setCharSpaces(0);
+
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
 				.setRptCode("L9743").setRptItem("暫收支票收據列印(個人戶)").setSecurity("").setRptSize("A4")
@@ -119,38 +122,32 @@ public class L9743Report extends MakeReport {
 
 				BigDecimal f4 = getBigDecimal(listL9743.get(i).get("F4"));
 
-				this.print(0, 46, formatAmt(f4, 0), "R");
+				this.print(0, 50, formatAmt(f4, 0), "R");
 
-				this.print(0, 60, this.showRocDate(listL9743.get(i).get("F5"), 1), "R");
-				this.print(0, 76, this.showRocDate(listL9743.get(i).get("F6"), 1), "R");
+				this.print(0, 65, this.showRocDate(listL9743.get(i).get("F5"), 1), "R");
+				this.print(0, 81, this.showRocDate(listL9743.get(i).get("F6"), 1), "R");
 
-				if (listL9743.get(i).get("F7") != null && listL9743.get(i).get("F7").length() >= 4) {
-					this.print(0, 92, listL9743.get(i).get("F7").substring(0, 4), "R");
-				} else {
-					this.print(0, 92, listL9743.get(i).get("F7"), "R");
-				}
-				this.print(0, 107, listL9743.get(i).get("F8"), "R");
+		
+				this.print(0, 100, listL9743.get(i).get("F7"), "R");
+			
+				this.print(0, 115, listL9743.get(i).get("F8"), "R");
 				temp++;
 
-				CheckRow();
+//				CheckRow();
 
 				if (i == listL9743.size() - 1) {
 					printSum(temp);
-					CheckRow();
+
 
 				}
 			}
 
 		} else {
 			// 本日無資料
-			this.print(-7, 1, " 借 款 人 戶 號  . . . ");
-			this.print(-7, 25, custNo, "R");
-			this.print(-7, 27, chequeName);
-			this.print(-9, 1, "支 票 帳 號　　支 票 號 碼　　　　支 票 金 額 　　　收 票 日　　　　到 期 日　　支 票 銀 行　　支 票 分 行");
 			this.print(1, 1, "本日無資料	");
-			this.print(1, 50, "===== 報 表 結 束 =====", "C");
+			
 		}
-
+		this.print(1, this.getMidXAxis(), "===== 報 表 結 束 =====", "C");
 		this.close();
 		// this.toPdf(sno);
 
@@ -160,15 +157,8 @@ public class L9743Report extends MakeReport {
 	private void printSum(int temp) {
 		this.print(1, 1, "");
 		this.print(1, 1, "共計 " + parse.IntegerToString(temp, 3) + " 件");
-		this.print(1, 50, "===== 報 表 結 束 =====", "C");
-	}
-
-	// 預設列印格式
-	private void CheckRow() {
-		if (this.NowRow >= 30) {
-			newPage();
-		}
 
 	}
+
 
 }

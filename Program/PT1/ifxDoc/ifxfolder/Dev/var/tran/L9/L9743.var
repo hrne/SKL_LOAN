@@ -47,6 +47,7 @@ T(3,L9743)
 
 #inputCustNo=A,7,I
 E(0,0)
+@V(4,0000000)
 
 #inputDate=D,7,I
 E(0,@inputDate,#SYSDATE)
