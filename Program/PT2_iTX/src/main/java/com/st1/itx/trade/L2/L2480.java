@@ -2,9 +2,11 @@ package com.st1.itx.trade.L2;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.DBException;
@@ -13,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.ClEva;
 import com.st1.itx.db.domain.ClEvaId;
+import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.ClImm;
 import com.st1.itx.db.domain.ClImmId;
 import com.st1.itx.db.domain.ClMain;
@@ -77,6 +80,7 @@ public class L2480 extends TradeBuffer {
 	BigDecimal shareTotal = BigDecimal.ZERO;
 
 	String wkWarningMsg = "";
+	BigDecimal wkAvailable = BigDecimal.ZERO;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -152,14 +156,13 @@ public class L2480 extends TradeBuffer {
 			tClEva.setEvaReason(parse.stringToInteger(titaVo.getParam("EvaReason")));
 			tClEva.setOtherReason(titaVo.getParam("EvaReasonX").trim());
 
-			sCheckClEva.checkAmt(titaVo, iClNo);
-
 			try {
 				sClEvaService.insert(tClEva, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", "擔保品重評資料檔");
 			}
 
+			wkAvailable = sCheckClEva.checkAmt(titaVo, iClNo);
 			// 變更前
 			ClMain beforeClMain = (ClMain) dataLog.clone(tClMain);
 
@@ -175,6 +178,7 @@ public class L2480 extends TradeBuffer {
 			shareTotal = parse.stringToBigDecimal(titaVo.getParam("EvaAmt")).multiply(tClImm.getLoanToValue())
 					.divide(new BigDecimal(100)).setScale(0, BigDecimal.ROUND_HALF_UP);
 
+			BigDecimal oldShareTotal = tClMain.getShareTotal();
 			tClMain.setShareTotal(shareTotal);
 			tClMain.setEvaDate(parse.stringToInteger(titaVo.getParam("EvaDate")));
 			tClMain.setEvaAmt(parse.stringToBigDecimal(titaVo.getParam("EvaAmt")));
@@ -190,6 +194,12 @@ public class L2480 extends TradeBuffer {
 				throw new LogicException("E0007", "擔保品主檔");
 			}
 
+			this.info("原可分配金額 = " + oldShareTotal);
+			if (shareTotal.subtract(oldShareTotal).compareTo(BigDecimal.ZERO) < 0) {
+				this.totaVo.init(titaVo);
+				this.totaVo.setWarnMsg("可分配金額不足，新評估總價*貸放成數 = " + shareTotal + "，" + "原可分配金額=" + oldShareTotal);
+				this.addList(this.totaVo);
+			}
 			// 紀錄變更前變更後
 			dataLog.setEnv(titaVo, beforeClMain, tClMain);
 			dataLog.exec("修改擔保品主檔資料");
@@ -248,7 +258,7 @@ public class L2480 extends TradeBuffer {
 			// 最新的序號 == 目前序號
 			if (tClEva.getEvaNo() == iEvaNo) {
 
-				sCheckClEva.checkAmt(titaVo, iClNo);
+				wkAvailable = sCheckClEva.checkAmt(titaVo, iClNo);
 
 				tClMain = sClMainService.holdById(ClMainId, titaVo);
 				// 變更前
@@ -265,7 +275,7 @@ public class L2480 extends TradeBuffer {
 
 				shareTotal = parse.stringToBigDecimal(titaVo.getParam("EvaAmt")).multiply(tClImm.getLoanToValue())
 						.divide(new BigDecimal(100)).setScale(0, BigDecimal.ROUND_HALF_UP);
-
+				BigDecimal oldShareTotal = tClMain.getShareTotal();
 				tClMain.setEvaDate(parse.stringToInteger(titaVo.getParam("EvaDate")));
 				tClMain.setEvaAmt(parse.stringToBigDecimal(titaVo.getParam("EvaAmt")));
 				tClMain.setShareTotal(shareTotal);
@@ -301,6 +311,12 @@ public class L2480 extends TradeBuffer {
 					throw new LogicException("E0007", "擔保品不動產檔");
 				}
 
+				this.info("原可分配金額 = " + oldShareTotal);
+				if (shareTotal.subtract(oldShareTotal).compareTo(BigDecimal.ZERO) < 0) {
+					this.totaVo.init(titaVo);
+					this.totaVo.setWarnMsg("可分配金額不足，新評估總價*貸放成數 = " + shareTotal + "，" + "原可分配金額=" + oldShareTotal);
+					this.addList(this.totaVo);
+				}
 				// 紀錄變更前變更後
 				dataLog.setEnv(titaVo, beforeClImm, tClImm);
 				dataLog.exec("修改擔保品不動產檔資料");
@@ -319,7 +335,7 @@ public class L2480 extends TradeBuffer {
 
 			if (tClEva == null) { // 沒資料抓正刪除的這一筆資料更新
 
-				sCheckClEva.checkAmt(titaVo, iClNo);
+				wkAvailable = sCheckClEva.checkAmt(titaVo, iClNo);
 
 				tClMain = sClMainService.holdById(ClMainId, titaVo);
 
@@ -376,7 +392,7 @@ public class L2480 extends TradeBuffer {
 				dataLog.exec("修改擔保品不動產檔資料");
 			} else {
 
-				sCheckClEva.checkAmt(titaVo, iClNo);
+				wkAvailable = sCheckClEva.checkAmt(titaVo, iClNo);
 
 				tClMain = sClMainService.holdById(ClMainId, titaVo);
 				// 變更前
@@ -428,8 +444,10 @@ public class L2480 extends TradeBuffer {
 
 			} // else
 		}
-
-		this.totaVo.putParam("OWarningMsg", wkWarningMsg);
+		this.info("wkAvailable =" + wkAvailable);
+		if (wkAvailable.compareTo(BigDecimal.ZERO) < 0) {
+			this.totaVo.setWarnMsg("擔保品可分配金額不足" + wkAvailable);
+		}
 
 		this.addList(this.totaVo);
 		return this.sendList();

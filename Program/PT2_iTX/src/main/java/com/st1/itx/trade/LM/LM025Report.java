@@ -14,6 +14,7 @@ import com.st1.itx.db.service.springjpa.cm.LM025ServiceImpl;
 
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component("lM025Report")
 @Scope("prototype")
@@ -33,7 +34,23 @@ public class LM025Report extends MakeReport {
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM025", "減損系統有效利率資料查核", "LM025減損系統有效利率資料查核", "LM025_底稿_減損系統有效利率資料查核.xls", "201903-固定");
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LM025";
+		String fileItem = "減損系統有效利率資料查核";
+		String fileName = "LM025減損系統有效利率資料查核" ;
+		String defaultExcel = "LM025_底稿_減損系統有效利率資料查核.xls";
+		String defaultSheet = "201903-固定";
+
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM025", "減損系統有效利率資料查核", "LM025減損系統有效利率資料查核", "LM025_底稿_減損系統有效利率資料查核.xls", "201903-固定");
 
 		String entdy = String.valueOf((Integer.valueOf(titaVo.get("ENTDY").toString()) + 19110000) / 100);
 
@@ -44,7 +61,7 @@ public class LM025Report extends MakeReport {
 		exportExcel(titaVo, 1);
 
 		makeExcel.close();
-		// makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 
 	/**

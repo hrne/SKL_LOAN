@@ -16,6 +16,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM012ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
@@ -116,8 +117,22 @@ public class LM012Report extends MakeReport {
 		BigDecimal bRateMinimum = getBigDecimal(sRateMinimum);
 		BigDecimal bRateMaximum = getBigDecimal(sRateMaximum);
 		BigDecimal bRateRange = getBigDecimal(sRateRange);
+		
+		String txcd = titaVo.getTxCode();
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String reportItem = "LM012";
+		String security = "放款利率分佈表";
+		String pageSize = "A4";
+		String pageOrientation = "L";
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM012", "放款利率分佈表", "", "A4", "L");
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(reportItem).setSecurity(security).setRptSize(pageSize).setPageOrientation(pageOrientation)
+				.build();
+		this.open(titaVo, reportVo);
+
+
+//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM012", "放款利率分佈表", "", "A4", "L");
 
 		List<Map<String, String>> listLM012 = null;
 

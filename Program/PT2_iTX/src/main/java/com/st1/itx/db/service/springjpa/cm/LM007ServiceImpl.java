@@ -31,11 +31,14 @@ public class LM007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("lM007 findAll acSubBookCode = " + acSubBookCode);
 		String entdy = String.valueOf(iTbsdyf / 10000);
 		String sql = "SELECT S1.\"AcMonth\"";
-		sql += "            ,SUM(CASE WHEN S1.\"AcctCode\" = '310' AND S1.\"EntCode\" <> '0' THEN S1.\"TxAmt\" ELSE 0 END) AS \"IC1EntAmt\"";
+		sql += "            ,SUM(CASE WHEN S1.\"AcctCode\" = '310' AND S1.\"EntCode\" = '1' THEN S1.\"TxAmt\" ELSE 0 END) AS \"IC1EntAmt\"";
+		sql += "            ,SUM(CASE WHEN S1.\"AcctCode\" = '310' AND S1.\"EntCode\" = '2' THEN S1.\"TxAmt\" ELSE 0 END) AS \"IC1EntAmtN\"";
 		sql += "            ,SUM(CASE WHEN S1.\"AcctCode\" = '310' AND S1.\"EntCode\" = '0' THEN S1.\"TxAmt\" ELSE 0 END) AS \"IC1Amt\"";
-		sql += "            ,SUM(CASE WHEN S1.\"AcctCode\" = '320' AND S1.\"EntCode\" <> '0' THEN S1.\"TxAmt\" ELSE 0 END) AS \"IC2EntAmt\"";
+		sql += "            ,SUM(CASE WHEN S1.\"AcctCode\" = '320' AND S1.\"EntCode\" = '1' THEN S1.\"TxAmt\" ELSE 0 END) AS \"IC2EntAmt\"";
+		sql += "            ,SUM(CASE WHEN S1.\"AcctCode\" = '320' AND S1.\"EntCode\" = '2' THEN S1.\"TxAmt\" ELSE 0 END) AS \"IC2EntAmtN\"";
 		sql += "            ,SUM(CASE WHEN S1.\"AcctCode\" = '320' AND S1.\"EntCode\" = '0' THEN S1.\"TxAmt\" ELSE 0 END) AS \"IC2Amt\"";
-		sql += "            ,SUM(CASE WHEN S1.\"AcctCode\" = '330' AND S1.\"EntCode\" <> '0' THEN S1.\"TxAmt\" ELSE 0 END) AS \"IC3EntAmt\"";
+		sql += "            ,SUM(CASE WHEN S1.\"AcctCode\" = '330' AND S1.\"EntCode\" = '1' THEN S1.\"TxAmt\" ELSE 0 END) AS \"IC3EntAmt\"";
+		sql += "            ,SUM(CASE WHEN S1.\"AcctCode\" = '330' AND S1.\"EntCode\" = '2' THEN S1.\"TxAmt\" ELSE 0 END) AS \"IC3EntAmtN\"";
 		sql += "            ,SUM(CASE WHEN S1.\"AcctCode\" = '330' AND S1.\"EntCode\" = '0' THEN S1.\"TxAmt\" ELSE 0 END) AS \"IC3Amt\"";
 		sql += "            ,SUM(CASE WHEN S1.\"AcctCode\" = '340' THEN S1.\"TxAmt\" ELSE 0 END) AS \"IC4EntAmt\"";
 		sql += "            ,SUM(0) AS \"IC4Amt\"";

@@ -18,6 +18,7 @@ import com.st1.itx.db.service.springjpa.cm.LM008ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ExcelFontStyleVo;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 
 /**
@@ -126,7 +127,21 @@ public class LM008Report extends MakeReport {
 
 		this.titaVo = titaVo;
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM008", "應收利息明細表", "LM008-應收利息明細表");
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LM008";
+		String fileItem = "應收利息明細表";
+		String fileName = "LM008-應收利息明細表" ;
+
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName);
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM008", "應收利息明細表", "LM008-應收利息明細表");
 
 		List<Map<String, String>> acctCodeGroupList = null;
 
@@ -205,7 +220,7 @@ public class LM008Report extends MakeReport {
 		printTotal();
 
 		makeExcel.close();
-		// makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 
 	private void resetSubtotal() {

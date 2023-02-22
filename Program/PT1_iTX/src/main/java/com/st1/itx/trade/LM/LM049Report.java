@@ -20,6 +20,7 @@ import com.st1.itx.db.service.springjpa.cm.LM049ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ExcelFontStyleVo;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.format.FormatUtil;
 
 @Component
@@ -78,7 +79,23 @@ public class LM049Report extends MakeReport {
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> listLM049) throws LogicException {
 		this.info("LM049Report exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM049", "放款金控法第44條利害關係人放款餘額表", "LM049放款金控法第44條利害關係人放款餘額表_限額控管", "LM049_底稿_放款金控法第44條利害關係人放款餘額表_限額控管.xlsx", "108.04金控子公司表7-1");
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LM049";
+		String fileItem = "放款金控法第44條利害關係人放款餘額表";
+		String fileName = "LM049放款金控法第44條利害關係人放款餘額表_限額控管" ;
+		String defaultExcel = "LM049_底稿_放款金控法第44條利害關係人放款餘額表_限額控管.xlsx";
+		String defaultSheet = "108.04金控子公司表7-1";
+
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM049", "放款金控法第44條利害關係人放款餘額表", "LM049放款金控法第44條利害關係人放款餘額表_限額控管", "LM049_底稿_放款金控法第44條利害關係人放款餘額表_限額控管.xlsx", "108.04金控子公司表7-1");
 
 		String entdy = titaVo.getEntDy();
 

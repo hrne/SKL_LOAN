@@ -297,7 +297,7 @@ public class CheckClEva extends CommBuffer {
 		}
 	}
 
-	public void checkAmt(TitaVo titaVo, int iClNo) throws LogicException {
+	public BigDecimal checkAmt(TitaVo titaVo, int iClNo) throws LogicException {
 
 		/*
 		 * loanToValue 貸放成數 shareTotal 可分配金額 settingAmt 設定金額 evaAmt 鑑估總價 shareAmtSum
@@ -352,24 +352,7 @@ public class CheckClEva extends CommBuffer {
 
 		wkAvailable = loanAvailableAmt.checkClAvailable(iClCode1, iClCode2, iClNo, shareTotal, titaVo); // 可用額度
 
-		if (wkAvailable.compareTo(BigDecimal.ZERO) < 0) {
-			this.info("errormsg 可分配金額不足");
-			wkWarningMsg = "可分配金額不足 ： = " + wkAvailable;
-		}
-
-		Slice<ClFac> slClFac = sClFacService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE);
-		List<ClFac> lClFac = slClFac == null ? null : slClFac.getContent();
-
-		// 加總
-		if (lClFac != null && lClFac.size() > 0) {
-			for (ClFac tmpClFac : lClFac) {
-				shareAmtSum = shareAmtSum.add(tmpClFac.getShareAmt());
-			}
-		}
-		this.info("擔保品關聯檔分配金額加總 = " + shareAmtSum);
-		if (shareTotal.subtract(shareAmtSum).compareTo(BigDecimal.ZERO) < 0) {
-			throw new LogicException("E2033", "評估總價*貸放成數 = " + shareTotal + "," + "擔保品與額度關聯檔的分配金額加總=" + shareAmtSum);
-		}
+		return wkAvailable;
 
 	}
 

@@ -40,7 +40,7 @@ E(0,0)
 ["#FdAcDate+會計日期",#AcDate],["#FdTitaTxtNo+交易序號",#TitaTxtNo],
 ["#FdOvduDate+轉催收日",#OvduDate],["#FdOvduNo+轉催編號",#OvduNo],
 [#<->#,"#FdCommericalFlag+險種註記",#CommericalFlag,#CommericalFlagX],
-["#FdInsuReceiptDate+原保件單日",#InsuReceiptDate],["#FdInsuReceiptDate2+修改後保件單日",#InsuReceiptDateX],
+["#FdInsuReceiptDate+原保單收件日",#InsuReceiptDate],["#FdInsuReceiptDate2+維護後-保單收件日",#InsuReceiptDateX],
 [#<->#,"#FdRemark+備註",#Remark],
 ]
 
@@ -136,10 +136,19 @@ C(3,#FunctionCode,1,INVOKEJS(SHOW,p1,16,18,0),INVOKEJS(SHOW,p1,16,18,1))
 #Function1=X,1,S
 IF(#FunctionCode==1,$,S)
 T(F,@NowInsuNo,0)
+T(F,@StatusCode,0)
 !T(F,@InsuReceiptDateX,0)
 !HIDE(#InsuReceiptDateX)
 HIDE(#NewCustNo)
 HIDE(#NewFacmNo)
+
+#Function6=X,1,S
+IF(#FunctionCode==6,$,S)
+T(F,@StatusCode,0)
+HIDE(#NewCustNo)
+HIDE(#NewFacmNo)
+SHOW(#HIDECustNo)
+SHOW(#HIDEFacmNo)
 
 #Function2=X,1,S
 IF(#FunctionCode==2 || #FunctionCode==6,$,S)
@@ -161,14 +170,8 @@ T(F,@InsuReceiptDate,0)
 HIDE(#HIDECustNo)
 HIDE(#HIDEFacmNo)
 
-IF(#FunctionCode==6,$,S)
-T(F,@RenewCode,0)
-E(0,@RenewCode,1)
-HIDE(#NewCustNo)
-HIDE(#NewFacmNo)
-SHOW(#HIDECustNo)
-SHOW(#HIDEFacmNo)
-INVOKEJS(SHOW,p1,16,18,0)
+C(5,#FunctionCode,2,T(F,@InsuReceiptDateX,0)HIDE(#InsuReceiptDateX),S)
+!INVOKEJS(SHOW,p1,16,18,0)
 
 #Function4=X,1,S
 IF(#FunctionCode==4 || #FunctionCode==5,$,S)
@@ -359,8 +362,10 @@ E(0,@NewFacmNo,#FacmNo)
 
 !維護後-借款人戶號 
 #NewCustNo=A,7,I
+C(5,#FunctionCode,6,T(F,@NewCustNo,0)T(F,@NewFacmNo,0),$)
+C(3,#FunctionCode,6,S,$)
 C(3,#FunctionCode,2,$,S)
-E(0,#CustNo)
+!E(0,#CustNo)
 
 
 #HIDECustNo=A,7,L
@@ -578,10 +583,14 @@ T(H,#InsuTypeCode,#InsuTypeCodeHelp)
 ! QC 497 可維護 & + 結案
 !處理代碼
 #StatusCode=A,1,I
-C(3,#FunctionCode,1,E(0,0),$)
+C(3,#FunctionCode,5,s,I)
+C(3,#FunctionCode,4,s,I)
+!C(3,#FunctionCode,2,s,I)
+!C(3,#FunctionCode,1,E(0,0),$)
+!C(3,#FunctionCode,6,E(0,0)T(F,#StatusCode,0),$)
 C(3,#FunctionCode,1,s,$)
-!C(3,#FunctionCode,6,s,$)
-IF(#FunctionCode==2,$,s)
+C(3,#FunctionCode,6,s,$)
+IF(#FunctionCode == 1 || #FunctionCode == 6 ,E(0,0),$)
 HELP(0:正常;1:借支;2:催收;3:呆帳;4:結案)
 @V(1,0,1,2,3,4)
 
@@ -625,6 +634,7 @@ T(H,#CommericalFlag,#CommericalFlagHelp)
 !修改後保件單日
 #InsuReceiptDateX=X,16,I
 T(2,#VIEW_SYSDATE)
+C(4,#InsuReceiptDate,$,T(2,#InsuReceiptDate))
 C(3,#FunctionCode,5,s,I)
 C(3,#FunctionCode,4,s,I)
 C(3,#FunctionCode,2,s,I)

@@ -96,6 +96,7 @@ public class L4R18 extends TradeBuffer {
 			this.totaVo.putParam("L4r18InsuTypeCode", tInsuRenew.getInsuTypeCode());
 			this.totaVo.putParam("L4r18CommericalFlag", tInsuRenew.getCommericalFlag());
 			this.totaVo.putParam("L4r18Remark", tInsuRenew.getRemark());
+			this.totaVo.putParam("L4r18InsuReceiptDate", tInsuRenew.getInsuReceiptDate());
 		} else {
 //			傳回前端，由前端判斷
 			this.totaVo.putParam("L4r18CustNo", 0);
@@ -121,6 +122,7 @@ public class L4R18 extends TradeBuffer {
 			this.totaVo.putParam("L4r18InsuTypeCode", 0);
 			this.totaVo.putParam("L4r18CommericalFlag", "");
 			this.totaVo.putParam("L4r18Remark", "");
+			this.totaVo.putParam("L4r18InsuReceiptDate", 0);
 		}
 
 		this.addList(this.totaVo);

@@ -12,6 +12,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM009ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 
 @Component
@@ -52,7 +53,24 @@ public class LM009Report extends MakeReport {
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM009", "應收利息總表", "機密", "A4", "P");
+//		String txcd = titaVo.getTxCode();
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String reportCode = "LM009";
+		String reportItem = "應收利息總表";		
+		String security = "密";
+		String pageSize = "A4";
+		String pageOrientation = "P";
+
+//		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+//				.setRptItem(reportItem).setSecurity(security).setRptSize(pageSize).setPageOrientation(pageOrientation)
+//				.build();
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(reportCode)
+				.setRptItem(reportItem).setSecurity(security).setRptSize(pageSize).setPageOrientation(pageOrientation)
+				.build();
+		this.open(titaVo, reportVo);
+		
+//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM009", "應收利息總表", "機密", "A4", "P");
 
 		List<Map<String, String>> LM009List = null;
 		try {

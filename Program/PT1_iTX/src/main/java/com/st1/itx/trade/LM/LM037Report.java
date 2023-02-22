@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM037ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.parse.Parse;
 
 @Component
@@ -27,7 +28,7 @@ public class LM037Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
-
+	
 	@Autowired
 	Parse parse;
 
@@ -35,7 +36,6 @@ public class LM037Report extends MakeReport {
 	public void printTitle() {
 
 	}
-
 	/**
 	 * 執行報表輸出
 	 * 
@@ -48,7 +48,7 @@ public class LM037Report extends MakeReport {
 		List<Map<String, String>> LM037List = null;
 
 		try {
-			LM037List = lM037ServiceImpl.findAll(titaVo, yearMonth);
+			LM037List = lM037ServiceImpl.findAll(titaVo,yearMonth);
 			exportExcel(titaVo, LM037List);
 
 		} catch (Exception e) {
@@ -61,7 +61,25 @@ public class LM037Report extends MakeReport {
 
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LMList) throws LogicException {
 		this.info("LM037Report exportExcel");
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM037", "地區別催收總金額", "LM037地區別催收總金額", "LM037地區別催收總金額.xlsx", "D9206092");
+		
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LM037";
+		String fileItem = "地區別催收總金額";
+		String fileName = "LM037地區別催收總金額" ;
+		String defaultExcel = "LM037地區別催收總金額.xlsx";
+		String defaultSheet = "D9206092";
+
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM037", "地區別催收總金額", "LM037地區別催收總金額", "LM037地區別催收總金額.xlsx", "D9206092");
 		if (LMList.size() == 0) {
 			makeExcel.setValue(3, 1, "本日無資料");
 		}
@@ -141,7 +159,7 @@ public class LM037Report extends MakeReport {
 		makeExcel.setValue(row, 3, thirdTotal.add(secondTotal.add(firstTotal)), "#,##0");
 
 		makeExcel.close();
-		// makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 
 }

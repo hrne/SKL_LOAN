@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM019ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.parse.Parse;
 
 @Component
@@ -27,7 +28,7 @@ public class LM019Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
-
+	
 	@Autowired
 	Parse parse;
 
@@ -36,7 +37,24 @@ public class LM019Report extends MakeReport {
 	}
 
 	public void exec(TitaVo titaVo) throws LogicException {
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM019", "利息收入明細表(印花稅)", "LM019-利息收入明細表(印花稅)", "LM019印花稅.xlsx", "10912明細");
+		
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LM019";
+		String fileItem = "利息收入明細表(印花稅)";
+		String fileName = "LM019-利息收入明細表(印花稅)" ;
+		String defaultExcel = "LM019印花稅.xlsx";
+		String defaultSheet = "10912明細";
+
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM019", "利息收入明細表(印花稅)", "LM019-利息收入明細表(印花稅)", "LM019印花稅.xlsx", "10912明細");
 		int yyyMM = parse.stringToInteger(titaVo.get("ENTDY").toString()) / 100;
 		// sheet: 明細
 		makeExcel.setSheet("10912明細", yyyMM + "明細");
@@ -74,7 +92,7 @@ public class LM019Report extends MakeReport {
 			this.info("LM019ServiceImpl.testExcel error = " + errors.toString());
 		}
 		makeExcel.close();
-		// makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> lDList) throws LogicException {

@@ -258,7 +258,8 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " , 0 as \"DrAmt\" , 0 as \"CrAmt\" ";
 		sql += " from \"AcMain\" ";
 		sql += " where \"AcDate\" = "+ixLmnDy8+" ";//抓上個月的月底日
-		sql += "   and \"AcctCode\" in ('TAV','TAM','TLD','T11','T13','T12','T10') ";
+//		sql += "   and \"AcctCode\" in ('TAV','TAM','TLD','T11','T13','T12','T10') ";
+		sql += "   AND  \"AcctCode\" in ('TAV','T10') ";
 		sql += " union all ";
 		sql += " select ";
 //		sql += "  "+ixLmnDy6+"/01  ||'~'|| "+ixxLmnDy+" as \"AcDate\" ";

@@ -183,6 +183,10 @@ public class L4611 extends TradeBuffer {
 			tInsuRenew.setAcDate(0);
 			tInsuRenew.setTitaTlrNo(this.getTxBuffer().getTxCom().getRelTlr());
 			tInsuRenew.setTitaTxtNo("" + this.getTxBuffer().getTxCom().getRelTno());
+			
+			this.info("InsuReceiptDate     = "+ parse.stringToInteger(titaVo.getParam("InsuReceiptDateX")));
+			tInsuRenew.setInsuReceiptDate(parse.stringToInteger(titaVo.getParam("InsuReceiptDateX")));
+			
 			if (tInsuRenew.getRenewCode() == 2) {
 				if (insuYearMonth <= noticeYearMonth) {
 					tInsuRenew.setNotiTempFg("N"); // N:未入(通知作業後新增)
@@ -254,6 +258,8 @@ public class L4611 extends TradeBuffer {
 			totPrem = parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem"))
 					.add(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
 			tInsuRenew.setTotInsuPrem(totPrem);
+			
+			
 			if (tInsuRenew.getRenewCode() == 2) {
 				if (insuYearMonth <= noticeYearMonth) {
 					if ("Y".equals(oldInsuRenew.getNotiTempFg())) {
@@ -327,6 +333,8 @@ public class L4611 extends TradeBuffer {
 			totPrem = parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem"))
 					.add(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
 			tInsuRenew.setTotInsuPrem(totPrem);
+			this.info("InsuReceiptDate     = "+ parse.stringToInteger(titaVo.getParam("InsuReceiptDateX")));
+			tInsuRenew.setInsuReceiptDate(parse.stringToInteger(titaVo.getParam("InsuReceiptDateX")));
 			try {
 				insuRenewService.update(tInsuRenew, titaVo);
 			} catch (DBException e) {
@@ -397,6 +405,8 @@ public class L4611 extends TradeBuffer {
 			result = t2InsuRenew.getOrigInsuNo();
 		} else {
 			result = tInsuOrignal.getOrigInsuNo();
+			this.info("setInsuReceiptDate   = " + parse.stringToInteger(titaVo.getParam("InsuReceiptDate").trim()));
+			tInsuOrignal.setInsuReceiptDate(parse.stringToInteger(titaVo.getParam("InsuReceiptDate").trim()));
 		}
 
 		return result;
