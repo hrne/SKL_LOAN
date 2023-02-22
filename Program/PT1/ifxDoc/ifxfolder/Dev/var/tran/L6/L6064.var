@@ -143,18 +143,28 @@ C(3,#CHAIN,1,s,$)
 HELP(#DefTypeH)
 @T(3,@DefTypeX,)
 C(4,#DefType,$,V(H,#DefTypeH))
-
 #DefTypeX=x,20,L
 C(4,#DefType,S,T(H,#DefType,#DefTypeH))
+
+
+#b2buf=x,200,S
+T(2,#DefType+#DefCode)
+#b2=X,1,S
+BIND(#CodeBTN,click, {cmd=CHAIN; ntxcd=L6069; ntxbuf=#b2buf;ntxbuf5=type<-1:DefType<-OOType:DefCode<-OOCode:DefItemX<-OOItem})
+
 
 !代碼檔代號
 #DefCode=x,20,I
 C(3,#CHAIN,1,s,$)
+! C(4,#DefCode,C(4,))
 !HELP(#DefCodeH)
 !@C(4,#DefCode,$,V(H,#DefCodeH))
 !IF(#DefItem!="" & #DefCode!="",C(4,#DefType,s,S),I)
-
 !處理
+#b3buf=x,200,S
+T(2,#DefType+#DefCode)
+#b3=X,1,S
+BIND(#CodeBTN,click, {cmd=CHAIN; ntxcd=L6069; ntxbuf=#b3buf;ntxbuf5=type<-1:DefType<-OOType:DefCode<-OOCode:DefItemX<-OOItem})
 
 #Rim6R33DefType=X,2,S
 
@@ -183,7 +193,7 @@ C(4,#DefCode,S,T(H,#DefCode,#DefCodeH))
 !C(4,#DefCode,S,T(H,#DefCode,#DefCodeH))
 @
 IF(#DefType=="" & #DefCode=="" & #DefItem== "",V(P,業務類別、代碼類別代號、代碼類別檔名稱需擇一輸入),$)
-C(4,#DefItem,SHOW(#DefType)SHOW(#DefTypeX),HIDE(#DefType)HIDE(#DefTypeX))
+!C(4,#DefItem,SHOW(#DefType)SHOW(#DefTypeX),HIDE(#DefType)HIDE(#DefTypeX))
 
 !代碼
 #Code=x,20,I

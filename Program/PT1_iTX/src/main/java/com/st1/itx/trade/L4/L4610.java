@@ -147,7 +147,9 @@ public class L4610 extends TradeBuffer {
 					tNewInsuRenew.setInsuEndDate(parse.stringToInteger(titaVo.getParam("InsuEndDate")));
 					tNewInsuRenew.setCommericalFlag(titaVo.getParam("CommericalFlag").trim());
 					tNewInsuRenew.setRemark(titaVo.getParam("Remark").trim());
-
+					tNewInsuRenew.setInsuReceiptDate(parse.stringToInteger(titaVo.getParam("InsuReceiptDate"))); //保單收件日
+					
+					
 					if (parse.stringToInteger(titaVo.getParam("InsuEndDate")) != tOldInsuRenew.getInsuEndDate()) {
 						throw new LogicException(titaVo, "E0007", "L4610 登打批單號碼時，保險迄日需相同");
 					}
@@ -160,7 +162,8 @@ public class L4610 extends TradeBuffer {
 					tNewInsuRenew.setOvduDate(0);
 					tNewInsuRenew.setOvduNo(BigDecimal.ZERO);
 
-					totPrem = parse.stringToBigDecimal(titaVo.getParam("FireInsuPrem")).add(parse.stringToBigDecimal(titaVo.getParam("EthqInsuPrem")));
+					totPrem = parse.stringToBigDecimal(titaVo.getParam("FireInsuPrem"))
+							.add(parse.stringToBigDecimal(titaVo.getParam("EthqInsuPrem")));
 
 					tNewInsuRenew.setTotInsuPrem(totPrem);
 
@@ -198,6 +201,7 @@ public class L4610 extends TradeBuffer {
 					tNewInsuOrignal.setInsuEndDate(parse.stringToInteger(titaVo.getParam("InsuEndDate").trim()));
 					tNewInsuOrignal.setCommericalFlag(titaVo.getParam("CommericalFlag").trim());
 					tNewInsuOrignal.setRemark(titaVo.getParam("Remark").trim());
+					tNewInsuOrignal.setInsuReceiptDate(parse.stringToInteger(titaVo.getParam("InsuReceiptDate"))); //保單收件日
 					if (parse.stringToInteger(titaVo.getParam("InsuEndDate")) != tOldInsuOrignal.getInsuEndDate()) {
 						throw new LogicException(titaVo, "E0007", "L4610 登打批單號碼時，保險迄日需相同");
 					}
@@ -222,6 +226,7 @@ public class L4610 extends TradeBuffer {
 				tInsuOrignal.setInsuEndDate(parse.stringToInteger(titaVo.getParam("InsuEndDate").trim()));
 				tInsuOrignal.setCommericalFlag(titaVo.getParam("CommericalFlag").trim());
 				tInsuOrignal.setRemark(titaVo.getParam("Remark").trim());
+				tInsuOrignal.setInsuReceiptDate(parse.stringToInteger(titaVo.getParam("InsuReceiptDate"))); //保單收件日
 				try {
 					insuOrignalService.insert(tInsuOrignal, titaVo);
 				} catch (DBException e) {
@@ -244,6 +249,7 @@ public class L4610 extends TradeBuffer {
 			editInsuOrignal.setInsuEndDate(parse.stringToInteger(titaVo.getParam("InsuEndDate").trim()));
 			editInsuOrignal.setCommericalFlag(titaVo.getParam("CommericalFlag").trim());
 			editInsuOrignal.setRemark(titaVo.getParam("Remark").trim());
+			editInsuOrignal.setInsuReceiptDate(parse.stringToInteger(titaVo.getParam("InsuReceiptDate"))); //保單收件日
 			try {
 				// 送出到DB
 				insuOrignalService.update(editInsuOrignal, titaVo);

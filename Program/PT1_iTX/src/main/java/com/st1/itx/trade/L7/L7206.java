@@ -190,7 +190,7 @@ public class L7206 extends TradeBuffer {
 				StakeholdersStaff sStakeholdersStaff = new StakeholdersStaff();
 
 				sStakeholdersStaff.setStaffId(id);
-				sStakeholdersStaff.setStaffName(name);
+				sStakeholdersStaff.setStaffName(maskData(name));
 				sStakeholdersStaff.setLoanAmount(loanAmount);
 				instakeholdersStaff.add(sStakeholdersStaff);
 
@@ -248,15 +248,12 @@ public class L7206 extends TradeBuffer {
 				LifeRelHead sLifeRelHead = new LifeRelHead();
 				sLifeRelHead.setLifeRelHeadId(sLifeRelHeadId);
 				sLifeRelHead.setRelWithCompany(iRelWithCompany);
-//				sLifeRelHead.setHeadId(iHeadId);
-				sLifeRelHead.setHeadName(iHeadName);
+				sLifeRelHead.setHeadName(maskData(iHeadName));
 				sLifeRelHead.setHeadTitle(iHeadTitle);
-//				sLifeRelHead.setRelId(iRelId);
-				sLifeRelHead.setRelName(iRelName);
+				sLifeRelHead.setRelName(maskData(iRelName));
 				sLifeRelHead.setRelKinShip(iRelKinShip);
 				sLifeRelHead.setRelTitle(iRelTitle);
-//				sLifeRelHead.setBusId(iBusId);
-				sLifeRelHead.setBusName(iBusName);
+				sLifeRelHead.setBusName(maskData(iBusName));
 				sLifeRelHead.setShareHoldingRatio(iShareHoldingRatio.intValue());
 				sLifeRelHead.setBusTitle(iBusTitle);
 				sLifeRelHead.setLineAmt(iLineAmt);
@@ -303,7 +300,7 @@ public class L7206 extends TradeBuffer {
 
 				LifeRelEmp sLifeRelEmp = new LifeRelEmp();
 				sLifeRelEmp.setEmpId(iEmpId);
-				sLifeRelEmp.setEmpName(iEmpName);
+				sLifeRelEmp.setEmpName(maskData(iEmpName));
 				sLifeRelEmp.setLoanBalance(iLoanBalance);
 
 				inLifeRelEmp.add(sLifeRelEmp);
@@ -348,9 +345,9 @@ public class L7206 extends TradeBuffer {
 				BigDecimal iLoanBalance = new BigDecimal(tempOccursList.get("LoanBalance"));
 
 				FinHoldRel sFinHoldRel = new FinHoldRel();
-				sFinHoldRel.setCompanyName(iCompanyName);
+				sFinHoldRel.setCompanyName(maskData(iCompanyName));
 				sFinHoldRel.setId(iId);
-				sFinHoldRel.setName(iName);
+				sFinHoldRel.setName(maskData(iName));
 				sFinHoldRel.setBusTitle(iBusTitle);
 				sFinHoldRel.setLineAmt(iLineAmt);
 				sFinHoldRel.setLoanBalance(iLoanBalance);
@@ -720,6 +717,24 @@ public class L7206 extends TradeBuffer {
 		}
 
 		this.info("text after = " + resText);
+		return resText;
+	}
+
+	private String maskData(String text) {
+		String resText = "";
+		int textCount = text.length();
+		String tmpChar = "";
+		for (int i = 0; i < textCount; i++) {
+
+			if ((i + 1) % 2 == 0) {
+				tmpChar = "Ｏ";
+			} else {
+				tmpChar = text.substring(i, i + 1);
+			}
+
+			resText = resText + tmpChar;
+		}
+
 		return resText;
 	}
 
