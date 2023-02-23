@@ -39,6 +39,8 @@ T(2,{cmd=CHAIN; ntxcd=L4451; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
 K(MODIFYBUTTON,1,新增扣款資料)
 K(MODIFYBUTTON,查詢)
 
+
+
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
@@ -208,8 +210,17 @@ INVOKEJS(SHOW,L4943_5,1),$)
 ! 戶號
 #CustNo=A,7,I
 C(3,#CHAIN,1,s,$)
-C(3,#FunctionCode,1,$,s)
+C(3,#FunctionCode,1,$,S)
 @C(3,#CustNo,0,V(P,請輸入戶號),$)
+
+#BUF2=X,100,S
+T(2,1)
+C(3,#FunctionCode,1,$,s)
+T(2,1+       +#CustNo)
+#button2=x,100,S
+C(3,#FunctionCode,1,$,s)
+T(2,{ cmd=CHAIN; ntxcd=L4451; ntxbuf=#BUF2})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,新增扣款資料)
 
 #MRKEY=_,_,S
 C(3,#CustNo,0,S,T(2,#CustNo))
@@ -257,11 +268,11 @@ V(7)A(DATE,0,#EntryDateFm)
 
 ! 入帳日期
 #EntryDateTo=D,7,I
-E(0,#EntryDateFm)
+C(3,#EntryDateTo,0,E(0,#EntryDateFm),$)
 C(3,#CHAIN,1,s,$)
 C(3,#FunctionCode,7,s,$)
 @V(7)A(DATE,0,#EntryDateTo)
-IF(#EntryDateTo<#EntryDateFm,V(P,起日不可大於迄日),$)
+IF(#EntryDateTo<#EntryDateFm,V(P,迄日不可小於起日),$)
 
 #OpItem=A,1,I
 C(3,#CHAIN,1,s,$)

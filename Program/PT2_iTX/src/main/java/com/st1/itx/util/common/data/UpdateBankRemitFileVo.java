@@ -70,19 +70,29 @@ public class UpdateBankRemitFileVo extends FileVo {
 //				8	OccReceiveDate兌領日期	 	        96-103  X(7)
 //				9	OccPaymentDate開票日期/匯款日期	 	103-110 X(7)
 
-				if (thisLine.length() < 110) {
+				String[] thisColumn = thisLine.split(",");
+				if (thisColumn != null && thisColumn.length >= 8) {
+					occursList.putParam("OccSeq", thisColumn[0]);
+					occursList.putParam("OccNum", thisColumn[1]);
+					occursList.putParam("OccPayStatus", thisColumn[2]);
+					occursList.putParam("OccPayModifyDate", thisColumn[3]);
+					occursList.putParam("OccRelNum", thisColumn[4]);
+					occursList.putParam("OccPayName", thisColumn[5]);
+					occursList.putParam("OccChequeNum", thisColumn[6]);
+					occursList.putParam("OccReceiveDate", thisColumn[7]);
+					occursList.putParam("OccPaymentDate", thisColumn[8]);
+					this.info("Seq = " + thisColumn[0]);
+					this.info("Num = " + thisColumn[1]);
+					this.info("PayStatus = " + thisColumn[2]);
+					this.info("PayModifyDate = " + thisColumn[3]);
+					this.info("RelNum = " + thisColumn[4]);
+					this.info("PayName = " + thisColumn[5]);
+					this.info("ChequeNum = " + thisColumn[6]);
+					this.info("ReceiveDate = " + thisColumn[7]);
+					this.info("PaymentDate = " + thisColumn[8]);
+				} else {
 					throw new LogicException("E0014", "資料長度與規格不相符");
 				}
-
-				occursList.putParam("OccSeq", split(thisLine, 0, 12));
-				occursList.putParam("OccNum", split(thisLine, 12, 24));
-				occursList.putParam("OccPayStatus", split(thisLine, 24, 25));
-				occursList.putParam("OccPayModifyDate", split(thisLine, 25, 32));
-				occursList.putParam("OccRelNum", split(thisLine, 32, 47));
-				occursList.putParam("OccPayName", split(thisLine, 47, 87));
-				occursList.putParam("OccChequeNum", split(thisLine, 87, 96));
-				occursList.putParam("OccReceiveDate", split(thisLine, 96, 103));
-				occursList.putParam("OccPaymentDate", split(thisLine, 103, 110));
 
 				this.occursList.add(occursList);
 			}
@@ -125,8 +135,10 @@ public class UpdateBankRemitFileVo extends FileVo {
 //			8	OccReceiveDate兌領日期	 	        96-103  X(7)
 //			9	OccPaymentDate開票日期/匯款日期	 	103-110 X(7)
 
-			String thisLine = "" + occursList.get("OccSeq") + occursList.get("OccNum") + occursList.get("OccPayStatus") + occursList.get("OccPayModifyDate") + occursList.get("OccRelNum")
-					+ occursList.get("OccPayName") + occursList.get("OccChequeNum") + occursList.get("OccReceiveDate") + occursList.get("OccPaymentDate");
+			String thisLine = "" + occursList.get("OccSeq") + occursList.get("OccNum") + occursList.get("OccPayStatus")
+					+ occursList.get("OccPayModifyDate") + occursList.get("OccRelNum") + occursList.get("OccPayName")
+					+ occursList.get("OccChequeNum") + occursList.get("OccReceiveDate")
+					+ occursList.get("OccPaymentDate");
 			result.add(thisLine);
 		}
 

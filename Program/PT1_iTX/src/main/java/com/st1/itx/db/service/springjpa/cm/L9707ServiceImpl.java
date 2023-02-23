@@ -74,8 +74,9 @@ public class L9707ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                              AND M.\"OvduDays\" > 0";
 		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = F.\"CustNo\" ";
 		sql += " WHERE A.\"ApproveDate\" BETWEEN :StartDate AND :EndDate ";
-		sql += " ORDER BY NVL(M.\"YearMonth\", 0) ";
-		sql += "         ,F.\"FacmNo\" ";
+		sql += " ORDER BY NVL(M.\"YearMonth\", 0) ASC";
+		sql += "         ,F.\"CustNo\" ASC";
+		sql += "         ,F.\"FacmNo\" ASC";
 
 		this.info("sql=" + sql);
 

@@ -17,7 +17,6 @@ import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.parse.Parse;
 
 @Component("L9135Report")
 @Scope("prototype")
@@ -286,71 +285,6 @@ public class L9135Report extends MakeReport {
 
 	}
 
-	/**
-	 * 文字內容處理
-	 * 
-	 * @param text 文字
-	 * @param all  上限位數
-	 * @param word 要補滿的符號或文字(單字佳)
-	 * @param pos  向左補齊(L)/向右補齊(R) 如果文字字數大於上限位數 自動截斷
-	 *
-	 */
-
-	private String fillUpWord(String text, int allCount, String word, String pos) {
-
-		int[] num = new int[text.length()];
-
-		String tmpText = "";
-
-		for (int i = 0; i < num.length; i++) {
-
-			tmpText = text.substring(i, i + 1);
-			// 中文字數為2，非中文為1
-			if (tmpText.matches("[\\u4E00-\\u9FA5]+")) {
-				num[i] = 2;
-			} else if (tmpText.matches("[\\u0391-\\uFFE5]+")) {
-				num[i] = 2;
-			} else {
-				num[i] = 1;
-			}
-
-		}
-
-		// 計算用
-		int tmpAllCount = 0;
-		// 截斷位置用
-		int tmpI = 0;
-		// 最終文字數
-		int tmpHaveCount = 0;
-
-		for (int i = 0; i < num.length; i++) {
-			tmpAllCount = tmpAllCount + num[i];
-			if (allCount >= tmpAllCount) {
-				tmpI = i;
-				tmpHaveCount = tmpAllCount;
-			}
-		}
-
-		String str = text.substring(0, tmpI + 1);
-		String lstr = "";
-
-		// 總字數 減去 目前有的字數 = 空的字數
-		int emptyCount = 0;
-		emptyCount = allCount - tmpHaveCount;
-
-		// 重新組合
-		for (int i = 0; i < emptyCount; i++) {
-			if (pos == "L") {
-				lstr += word;
-			} else {
-				str += word;
-			}
-		}
-		if (pos == "L") {
-			str = lstr + text;
-		}
-
-		return str;
-	}
+	
 
 }

@@ -250,13 +250,13 @@ E(0,#OOFeeAmt)
 E(0,#SYSNDATE)
 
 !Y/N
-#OOHasL4943=X,1,S
+#OOIsBankDeduct=X,1,S
 
 !銀扣
 #OOBUF6=X,70,S
-T(2,01+#OOCustNo+00000+#OOAcDate+0000000+00000000000000+00000000000000+00000000000000)
+T(2,01+#OOCustNo+00000+#OOAcDate+9991231+00000000000000+00000000000000+00000000000000)
 #OOBTN6=X,1,S
-C(5,#OOHasL4943,"Y",BIND(grid,{ cmd=CHAIN; ntxcd=L4943; ntxbuf=#OOBUF6}),BIND(grid,cancel))
+C(5,#OOIsBankDeduct,"Y",BIND(grid,{ cmd=CHAIN; ntxcd=L4943; ntxbuf=#OOBUF6}),BIND(grid,cancel))
 
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 
@@ -282,7 +282,7 @@ TXFORM=L2061
 #OOContractChgCode
 #OOCurrencyCode
 #OOFeeAmt
-#OOHasL4943
+#OOIsBankDeduct
 ^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="ROM.icf::L1R01.tom"/>

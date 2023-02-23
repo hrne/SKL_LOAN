@@ -2,7 +2,6 @@ package com.st1.itx.trade.L2;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -15,7 +14,10 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcReceivable;
+import com.st1.itx.db.domain.FacMain;
+import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.service.AcReceivableService;
+import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.springjpa.cm.L4943ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
@@ -34,6 +36,8 @@ public class L2061 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public AcReceivableService acReceivableService;
+	@Autowired
+	public FacMainService facMainService;
 
 	/* 日期工具 */
 	@Autowired
@@ -42,7 +46,7 @@ public class L2061 extends TradeBuffer {
 	/* 轉換工具 */
 	@Autowired
 	public Parse parse;
-	
+
 	@Autowired
 	L4943ServiceImpl l4943ServiceImpl;
 
@@ -69,7 +73,8 @@ public class L2061 extends TradeBuffer {
 		// new ArrayList
 		List<AcReceivable> lAcReceivable = new ArrayList<AcReceivable>();
 
-		Slice<AcReceivable> slAcReceivable = acReceivableService.useL2062Eq("F29", iCustNo, iFacmNo, iFacmNo, ClsFlag, ClsFlag, this.index, this.limit, titaVo);
+		Slice<AcReceivable> slAcReceivable = acReceivableService.useL2062Eq("F29", iCustNo, iFacmNo, iFacmNo, ClsFlag,
+				ClsFlag, this.index, this.limit, titaVo);
 		lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 		if (slAcReceivable != null && slAcReceivable.hasNext()) {
@@ -100,30 +105,14 @@ public class L2061 extends TradeBuffer {
 			occursList.putParam("OOContractChgCode", contractChgCode);
 			occursList.putParam("OOCurrencyCode", tmpAcReceivable.getCurrencyCode());
 			occursList.putParam("OOFeeAmt", tmpAcReceivable.getRvAmt());
-			
-			// L4943 需要的欄位
-			titaVo.putParam("CustNo", iCustNo);
-			titaVo.putParam("EntryDateFm", tmpAcReceivable.getLastAcDate());
-			titaVo.putParam("EntryDateTo", tmpAcReceivable.getLastAcDate());
-			titaVo.putParam("FunctionCode", 1);
-			
-			titaVo.putParam("BankCode", "");
-			titaVo.putParam("OpItem", 0);
-			titaVo.putParam("RepayType", 0);
-			titaVo.putParam("PostLimitAmt", 0);
-			titaVo.putParam("SingleLimit", 0);
-			titaVo.putParam("LowLimit", 0);
-			
-			List<Map<String, String>> l4943Vo = null;
-			
-			try {
-				l4943Vo = l4943ServiceImpl.querySummary(titaVo);
-			} catch (Exception e) {
-				this.error("L2061 Exception when L4943ServiceImpl: " + e.getMessage());
-				throw new LogicException("E0013", "L4943ServiceImpl");
+
+			occursList.putParam("OOIsBankDeduct", "N");
+			FacMain tFacMain = facMainService.findById(new FacMainId(iCustNo, iFacmNo), titaVo);
+			if (tFacMain != null) {
+				if (tFacMain.getRepayCode() == 2) {
+					occursList.putParam("OOIsBankDeduct", "Y");
+				}
 			}
-			
-			occursList.putParam("OOHasL4943", l4943Vo != null && !l4943Vo.isEmpty() ? "Y" : "N");
 
 			this.info("occursList L2061" + occursList);
 			this.totaVo.addOccursList(occursList);

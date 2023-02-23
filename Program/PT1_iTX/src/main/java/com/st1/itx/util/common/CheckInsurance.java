@@ -342,21 +342,23 @@ public class CheckInsurance extends TradeBuffer {
 			factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
 			factory.setXIncludeAware(false);
 			factory.setExpandEntityReferences(false);
+			DocumentBuilder builder = null;
+			try {
+				builder = factory.newDocumentBuilder();
+				Document doc = builder.parse(new InputSource(new StringReader(xmlstring)));
+				return doc;
+			} catch (Exception e) {
+				return null;
+			}
 		} catch (ParserConfigurationException e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.warn("Set DocumentBuilderFactory Env Error");
 			this.warn(errors.toString());
-		}
-
-		DocumentBuilder builder = null;
-		try {
-			builder = factory.newDocumentBuilder();
-			Document doc = builder.parse(new InputSource(new StringReader(xmlstring)));
-			return doc;
-		} catch (Exception e) {
 			return null;
 		}
+
+		
 	}
 
 	public String getXmlValue(Document doc, String tagName) {

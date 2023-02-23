@@ -23,6 +23,7 @@ import com.st1.itx.db.service.springjpa.cm.L4961ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.format.FormatUtil;
+import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
 @Component
@@ -30,20 +31,22 @@ import com.st1.itx.util.parse.Parse;
 public class L4961ReportB extends MakeReport {
 
 	@Autowired
+	WebClient webClient;
+
+	@Autowired
 	L4961ServiceImpl l4961ServiceImpl;
-	
+
 	@Autowired
 	public CollListService collListService;
-	
+
 	@Autowired
 	public Parse parse;
 
 	@Autowired
 	public InsuRenewService insuRenewService;
-	
+
 	@Autowired
 	public CdCodeService cdCodeService;
-
 
 	// ReportDate : 報表日期(帳務日)
 	// ReportCode : 報表編號
@@ -66,51 +69,38 @@ public class L4961ReportB extends MakeReport {
 	private String nowDate;
 	// 製表時間
 	private String nowTime;
-	
+
 	String InsuYearMonth;
 	String InsuYearMonthEnd;
 
 	// 自訂表頭
 	@Override
 	public void printHeader() {
-		this.print(-1, 1, "程式ID：" + this.getParentTranCode());
-		this.print(-1, this.getMidXAxis(), "新光人壽保險股份有限公司", "C");
-		this.print(-1, 145, "機密等級：" + this.security);
-		this.print(-2, 1, "報　表：" + this.reportCode);
+		this.print(-2, 2, "程式ID：" + this.getParentTranCode());
+		this.print(-2, this.getMidXAxis(), "新光人壽保險股份有限公司", "C");
+		this.print(-2, 145, "機密等級：" + this.security);
+		this.print(-3, 2, "報　表：" + this.reportCode);
 //		this.print(-2, this.getMidXAxis(), this.reportItem, "C");
-		this.print(-2, 145, "日　　期：" + showBcDate(this.nowDate, 1));	
+		this.print(-3, 145, "日　　期：" + showBcDate(this.nowDate, 1));
 //		this.print(-3, 1, "來源別：放款服務課");
-		this.print(-3, 145, "時　　間：" + showTime(this.nowTime));
-		this.print(-4,1,"會計日期:"+showRocDate(titaVo.getEntDyI(),1));		
-		this.print(-4, 145, "頁　　次：" + this.getNowPage());
-		this.print(-5, 145, "單　　位：元");
+		this.print(-4, 145, "時　　間：" + showTime(this.nowTime));
+		this.print(-5, 2, "會計日期:" + showRocDate(titaVo.getEntDyI(), 1));
+		this.print(-5, 145, "頁　　次：" + this.getNowPage());
+		this.print(-6, 145, "單　　位：元");
 //		this.print(-4, this.getMidXAxis(), showRocDate(this.reportDate), "C");
-		this.print(-2, this.getMidXAxis(), this.reportItem, "C");
-		this.print(-5,1,"到期日期:"+this.InsuYearMonth+"-"+this.InsuYearMonthEnd);
-		 
+		this.print(-3, this.getMidXAxis(), this.reportItem, "C");
+		this.print(-6, 2, "到期日期:" + this.InsuYearMonth + "-" + this.InsuYearMonthEnd);
+
 		// 印明細表頭
-		this.printDetailHeader();
+		this.print(-7, 1, "┌————┬————┬—————┬——————┬——————┬————————┬——————┬————————┬————————┬——————————┬—————┐");
+		this.print(-8, 1, "｜　戶號　｜　額度　｜　被保人　｜　續單年月　｜　 總保費 　｜　　火險保額　　｜　火險保費　｜　 地震險保額 　｜　 地震險保費 　｜　 保單號碼 　　　　｜　 戶況 　｜");
 
 		// 明細起始列(自訂亦必須)
 		this.setBeginRow(9);
 
 		// 設定明細列數(自訂亦必須)
-		this.setMaxRows(34);
-	}
+		this.setMaxRows(37);
 
-	@Override
-	public void printContinueNext() {
-		this.print(1, this.getMidXAxis(), "=====　續　　下　　頁　=====", "C");
-	}
-
-	private void printDetailHeader() {
-
-		print(1, 1, "");
-		print(1, 1, "┌————┬————┬—————┬——————┬————————┬——————┬————————┬————————┬————————┬——————————┬—————┐");
-		print(1, 1, "｜　戶號　｜　額度　｜　被保人　｜　續單年月　｜　 總保費 　｜　　火險保額　　｜　　火險保費　　｜　 地震險保額 　｜　 地震險保費 　｜　 保單號碼 　　　　｜　 戶況 　｜");
-//		print(1, 1, "├—————————————┼—————————————————————————————————————————┼————————┼—————————————┤");
-		// -------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
-		// ----------12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234
 	}
 
 	public void exec(TitaVo titaVo) throws LogicException {
@@ -125,10 +115,11 @@ public class L4961ReportB extends MakeReport {
 
 		this.nowDate = dDateUtil.getNowStringRoc();
 		this.nowTime = dDateUtil.getNowStringTime();
-		
-		this.InsuYearMonth = titaVo.getParam("InsuYearMonth").substring(0, 3)+"/"+titaVo.getParam("InsuYearMonth").substring(3,5);
-		this.InsuYearMonthEnd = titaVo.getParam("InsuYearMonthEnd").substring(0, 3)+"/"+titaVo.getParam("InsuYearMonthEnd").substring(3,5);
-		
+
+		this.InsuYearMonth = titaVo.getParam("InsuYearMonth").substring(0, 3) + "/"
+				+ titaVo.getParam("InsuYearMonth").substring(3, 5);
+		this.InsuYearMonthEnd = titaVo.getParam("InsuYearMonthEnd").substring(0, 3) + "/"
+				+ titaVo.getParam("InsuYearMonthEnd").substring(3, 5);
 
 		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 
@@ -139,24 +130,26 @@ public class L4961ReportB extends MakeReport {
 			this.error("l4961ServiceImpl findByCondition " + e.getMessage());
 			throw new LogicException("E0013", e.getMessage());
 		}
-		
+
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(reportCode)
-				.setRptItem(reportItem + (resultList.size() > 0 ? "" : "(本日無資料)")).setSecurity(security).setRptSize(pageSize).setPageOrientation(pageOrientation)
-				.build();
+				.setRptItem(reportItem + (resultList.size() > 0 ? "" : "(本日無資料)")).setSecurity(security)
+				.setRptSize(pageSize).setPageOrientation(pageOrientation).build();
 		this.open(titaVo, reportVo);
 		setCharSpaces(0);
-		
-		
 
 		BigDecimal totInsuPremTotal = BigDecimal.ZERO;
 		BigDecimal fireInsuPremTotal = BigDecimal.ZERO;
 		BigDecimal ethqInsuPremTotal = BigDecimal.ZERO;
-		
 
 		if (resultList != null && !resultList.isEmpty()) {
 			for (Map<String, String> result : resultList) {
+
+				if (this.NowRow == 44) {
+					print(1, 1, "└————┴————┴—————┴——————┴——————┴————————┴——————┴————————┴————————┴——————————┴—————┘");
+				}
+
 //				print(1, 1, "｜　　　　　　　　　　　　　｜　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　｜　　　　　　　　｜　　　　　　　　　　　　　｜");
-				print(1, 1, "├————┼————┼—————┼——————┼——————┼————————┼————————┼————————┼————————┼——————————┼—————┤");
+				print(1, 1, "├————┼————┼—————┼——————┼——————┼————————┼——————┼————————┼————————┼——————————┼—————┤");
 
 				BigDecimal totInsuPrem = getBigDecimal(result.get("F6"));
 				BigDecimal fireInsuPrem = getBigDecimal(result.get("F11"));
@@ -171,19 +164,19 @@ public class L4961ReportB extends MakeReport {
 
 				print(0, 7, FormatUtil.pad9(String.valueOf(result.get("F3")), 7), "C"); // 戶號
 				print(0, 17, FormatUtil.pad9(String.valueOf(result.get("F4")), 3), "C"); // 額度
-				print(0, 21, result.get("F5"), "L"); // 戶名
-				print(0, 52, "" + insuYearMonth, "C"); // 到期年月
-				print(0, 75, formatAmt(result.get("F6"), 0), "R");// 總保費
-				print(0, 91, formatAmt(result.get("F10"), 0), "R");// 火險保額
-				print(0, 109, formatAmt(result.get("F11"), 0), "R");// 火險保費
-				print(0, 127, formatAmt(result.get("F12"), 0), "R");// 地震險保額
-				print(0, 143, formatAmt(result.get("F13"), 0), "R");// 地震險保費
-				print(0, 173, formatAmt(result.get("F2"), 0), "R");// 保單號碼	
-				
-				//戶況
+				print(0, 25, result.get("F5"), "L"); // 戶名
+				print(0, 43, "" + insuYearMonth, "C"); // 到期年月
+				print(0, 60, formatAmt(result.get("F6"), 0), "R");// 總保費
+				print(0, 78, formatAmt(result.get("F10"), 0), "R");// 火險保額
+				print(0, 92, formatAmt(result.get("F11"), 0), "R");// 火險保費
+				print(0, 110, formatAmt(result.get("F12"), 0), "R");// 地震險保額
+				print(0, 126, formatAmt(result.get("F13"), 0), "R");// 地震險保費
+				print(0, 150, formatAmt(result.get("F2"), 0), "R");// 保單號碼
+
+				// 戶況
 				String colStatus = "99";
-				CollList tCollList = collListService.findById(new CollListId(Integer.valueOf(result.get("F3")), Integer.valueOf(result.get("F4"))),
-						titaVo);
+				CollList tCollList = collListService.findById(
+						new CollListId(Integer.valueOf(result.get("F3")), Integer.valueOf(result.get("F4"))), titaVo);
 				if (tCollList != null) {
 					colStatus = parse.IntegerToString(tCollList.getStatus(), 2);
 				}
@@ -196,8 +189,8 @@ public class L4961ReportB extends MakeReport {
 				if (tCdCode != null) {
 					colStatusX = tCdCode.getItem();
 				}
-				
-				print(0, 183, formatAmt(colStatusX, 0), "R");// 戶況
+
+				print(0, 160, formatAmt(colStatusX, 0), "R");// 戶況
 
 				// 加總
 				totInsuPremTotal = totInsuPremTotal.add(totInsuPrem);
@@ -206,19 +199,22 @@ public class L4961ReportB extends MakeReport {
 
 			}
 			// 印總計
-			print(1, 1, "├————┴————┼—————┴——————┴——————┼————————┴————————┼————————┴————————┼——————————┼—————┤");
-			print(1, 1, "｜　合　　　　　計　｜　　　　　　　　　　　　　　　　　　　　｜　　　　　　　　｜　　　　　　　　｜　　　　　　　　｜　　　　　　　　｜　　　　　　　　｜　　　　　　｜");
-			print(0, 85, formatAmt(totInsuPremTotal, 0), "R");// F6
-			print(0, 121, formatAmt(fireInsuPremTotal, 0), "R");// F11
-			print(0, 155, formatAmt(ethqInsuPremTotal, 0), "R");// F13
-			print(1, 1, "└—————————┴————————————┴——————┴————————┴————————┴————————┴————————┴——————————┴—————┘");
-			print(1, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　經理：　　　　　　　　　　　　　　　經辦：");
+			print(1, 1, "├————┴————┼—————┴——————┴——————┼————————┴——————┼————————┴————————┼——————————┼—————┤");
+			print(1, 1, "｜　合　　　　　計　｜　　　　　　　　　　　　｜　　　　　　｜　　　　　　　　｜　　　　　　｜　　　　　　　　｜　　　　　　　　｜　　　　　　　　　　　　　　　｜");
+			print(0, 69, formatAmt(totInsuPremTotal, 0), "R");// F6
+			print(0, 105, formatAmt(fireInsuPremTotal, 0), "R");// F11
+			print(0, 139, formatAmt(ethqInsuPremTotal, 0), "R");// F13
+			print(1, 1, "└—————————┴————————————┴——————┴————————┴——————┴————————┴————————┴——————————┴—————┘");
+			print(2, this.getMidXAxis(), "經理：　　　　　　　　　　　　　　　經辦：", "C");
 
-		} else {
-			print(1, 1, "├————┴————┴—————┴——————┴——————┴————————┴————————┴————————┴————————┴——————————┴—————┤");
-			print(1, 1, "｜　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　｜");
+			webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y",
+					"LC009", titaVo.getTlrNo() + "L4961", reportCode + "-報表已完成", titaVo);
+		} else {	
+			print(1, 1, "｜　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　｜");
 			print(0, 1, "　　本　日　無　資　料　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
-			print(1, 1, "└——————————————————————————————————————————————————————————————————————————————————┘");
+			print(1, 1, "└————————————————————————————————————————————————————————————————————————————————┘");
+
 		}
+
 	}
 }

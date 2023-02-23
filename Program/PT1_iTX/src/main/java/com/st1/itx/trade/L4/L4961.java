@@ -67,17 +67,17 @@ public class L4961 extends TradeBuffer {
 //		[繳款方式],01:匯款轉帳;02:銀行扣款;03:員工扣薪;04:支票兌現;99:全部
 //		[查詢選項],0:正常未繳;1:正常已繳;2:借支;7:續保;8:自保;9:全部  (1:火險到期年月)
 //		查詢續保檔(InsuReNew)
-		if (iSearchOption == 0) {
+		if (iSearchOption == 0 && this.index == 0) {
 			// 0:正常未繳產出火險保費明細表
 			l4961ReportC.setParentTranCode(parentTranCode);
 			l4961ReportC.exec(titaVo);
 			l4961ReportC.close();
-		} else if (iSearchOption == 2) {
+		} else if (iSearchOption == 2 && this.index == 0) {
 			// 2:火險保費借支未銷明細表
 			l4961ReportA.setParentTranCode(parentTranCode);
 			l4961ReportA.exec(titaVo);
 			l4961ReportA.close();
-		} else if (iSearchOption == 3) {
+		} else if (iSearchOption == 3 && this.index == 0) {
 			// 3:催收款項-火險費明細表
 			l4961ReportB.setParentTranCode(parentTranCode);
 			l4961ReportB.exec(titaVo);

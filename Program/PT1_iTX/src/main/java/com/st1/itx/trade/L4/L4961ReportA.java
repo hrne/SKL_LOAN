@@ -56,41 +56,34 @@ public class L4961ReportA extends MakeReport {
 	// 自訂表頭
 	@Override
 	public void printHeader() {
-		this.print(-1, 2, "程式ID：" + this.getParentTranCode());
-		this.print(-1, this.getMidXAxis(), "新光人壽保險股份有限公司", "C");
-		this.print(-1, 145, "機密等級：" + this.security);
-		this.print(-2, 2, "報　表：" + this.reportCode);
-//		this.print(-2, this.getMidXAxis(), this.reportItem, "C");
-		this.print(-2, 145, "日　　期：" + showBcDate(this.nowDate, 1));	
-//		this.print(-3, 2, "來源別：放款服務課");
-		this.print(-3, 145, "時　　間：" + showTime(this.nowTime));
-		this.print(-4,2,"會計日期:"+showRocDate(titaVo.getEntDyI(),1));
-		this.print(-4, 145, "頁　　次：" + this.getNowPage());
-		this.print(-5, 145, "單　　位：元");
-//		this.print(-4, this.getMidXAxis(), showRocDate(this.reportDate), "C");
-		this.print(-2, this.getMidXAxis(), this.reportItem, "C");
-		this.print(-5,2,"到期日期:"+this.InsuYearMonth+"-"+this.InsuYearMonthEnd);
+		this.print(-2, 2, "程式ID：" + this.getParentTranCode());
+		this.print(-2, this.getMidXAxis(), "新光人壽保險股份有限公司", "C");
+		this.print(-2, 145, "機密等級：" + this.security);
+		this.print(-3, 2, "報　表：" + this.reportCode);
+//		this.print(-3, this.getMidXAxis(), this.reportItem, "C");
+		this.print(-3, 145, "日　　期：" + showBcDate(this.nowDate, 1));	
+//		this.print(-4, 2, "來源別：放款服務課");
+		this.print(-4, 145, "時　　間：" + showTime(this.nowTime));
+		this.print(-5,2,"會計日期:"+showRocDate(titaVo.getEntDyI(),1));
+		this.print(-5, 145, "頁　　次：" + this.getNowPage());
+		this.print(-6, 145, "單　　位：元");
+//		this.print(-5, this.getMidXAxis(), showRocDate(this.reportDate), "C");
+		this.print(-3, this.getMidXAxis(), this.reportItem, "C");
+		this.print(-6,2,"到期日期:"+this.InsuYearMonth+"-"+this.InsuYearMonthEnd);
 
 		// 印明細表頭
-		this.printDetailHeader();
+		this.print(-7, 1, "┌————┬————┬———————————————┬——————┬————————┬————————┬————————┬————————┬————————┐");
+		this.print(-8, 1, "｜　戶號　｜　額度　｜　被保人　　　　　　　　　　　｜　續單年月　｜　　 總保費 　　｜　　火險保額　　｜　　火險保費　　｜　 地震險保額 　｜　 地震險保費 　｜");
 
 		// 明細起始列(自訂亦必須)
 		this.setBeginRow(9);
 
 		// 設定明細列數(自訂亦必須)
-		this.setMaxRows(40);
+		this.setMaxRows(37);
 	}
 
 
-	private void printDetailHeader() {
 
-		print(1, 1, "");
-		print(1, 1, "┌————┬————┬———————————————┬——————┬————————┬————————┬————————┬————————┬————————┐");
-		print(1, 1, "｜　戶號　｜　額度　｜　被保人　　　　　　　　　　　｜　續單年月　｜　　 總保費 　　｜　　火險保額　　｜　　火險保費　　｜　 地震險保額 　｜　 地震險保費 　｜");
-//		print(1, 1, "├—————————————┼—————————————————————————————————————————┼————————┼—————————————┤");
-		// -------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
-		// ----------12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234
-	}
 
 	public void exec(TitaVo titaVo) throws LogicException {
 		this.info("L4961ReportC exec ...");
@@ -131,7 +124,7 @@ public class L4961ReportA extends MakeReport {
 		if (resultList != null && !resultList.isEmpty()) {
 			for (Map<String, String> result : resultList) {
 				
-				if(this.NowRow == 48) {
+				if(this.NowRow == 44) {
 					print(1, 1, "└————┴————┴———————————————┴——————┴————————┴————————┴————————┴————————┴————————┘");
 				}
 				

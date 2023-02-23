@@ -149,16 +149,22 @@ public class L9R99 extends TradeBuffer {
 
 			this.info("prodIncrRate =" + prodIncrRate);
 			this.info("basePostRate =" + basePostRate);
-
-
-			this.info("listL9739.get(i).get(\"JsonFields\").toString() =" + listL9739.get(i).get("JsonFields").toString());
-			this.info("listL9739.get(i).get(\"lJsonFields\").toString() =" + listL9739.get(i).get("lJsonFields").toString());
 			
-			thisJS = new JSONObject(listL9739.get(i).get("JsonFields").toString());
-			lastJS = new JSONObject(listL9739.get(i).get("lJsonFields").toString());
+			
+			if( !"0".equals(listL9739.get(i).get("JsonFields").toString())) {
+				this.info("listL9739.get(i).get(\"JsonFields\").toString() =" + listL9739.get(i).get("JsonFields").toString());	
+				thisJS = new JSONObject(listL9739.get(i).get("JsonFields").toString());
+				thisRate = new BigDecimal(thisJS.get("SubsidyRate" + seq).toString());
+			}
+			
+			if(!"0".equals(listL9739.get(i).get("lJsonFields").toString())) {
 
-			thisRate = new BigDecimal(thisJS.get("SubsidyRate" + seq).toString());
-			lastRate = new BigDecimal(lastJS.get("SubsidyRate" + seq).toString());
+				this.info("listL9739.get(i).get(\"lJsonFields\").toString() =" + listL9739.get(i).get("lJsonFields").toString());
+				lastJS = new JSONObject(listL9739.get(i).get("lJsonFields").toString());
+				lastRate = new BigDecimal(lastJS.get("SubsidyRate" + seq).toString());
+			}
+			
+
 
 			this.info("thisRate =" + thisRate);
 			this.info("lastRate =" + lastRate);
@@ -170,8 +176,7 @@ public class L9R99 extends TradeBuffer {
 			rate = basePostRate.add(prodIncrRate).add(diffRate).setScale(2, RoundingMode.HALF_DOWN);
 
 			this.totaVo.putParam("OOFitRate" + t, rate);
-//			this.info("EffectDate" + t + "=" + Integer.valueOf(listL9739.get(i).get("EffectDate")));
-//			this.info("FitRate" + t + "=" + listL9739.get(i).get("FitRate"));
+
 		}
 	}
 

@@ -43,12 +43,12 @@ public class L9739ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	SELECT P.\"ProdNo\"";
 		sql += "		  ,P.\"ProdName\"";
 		sql += "		  ,P.\"ProdIncr\"";
-		sql += "		  ,S.\"EffectDate\"";
-		sql += "		  ,S.\"JsonFields\"";
-		sql += "		  ,S.\"lJsonFields\"";
+		sql += "		  ,NVL(S.\"EffectDate\",0) AS \"EffectDate\"";
+		sql += "		  ,NVL(S.\"JsonFields\",'0') AS \"JsonFields\"";
+		sql += "		  ,NVL(S.\"lJsonFields\",'0') AS \"lJsonFields\"";
 		sql += "		  ,ROW_NUMBER()OVER(ORDER BY P.\"ProdNo\" ASC) as \"Seq\"";
-		sql += "		  ,B.\"EffectDate\" AS \"BaseEffectDate\"";
-		sql += "		  ,B.\"BaseRate\"";
+		sql += "		  ,NVL(B.\"EffectDate\",0) AS \"BaseEffectDate\"";
+		sql += "		  ,NVL(B.\"BaseRate\",0) AS \"BaseRate\"";
 		sql += "	FROM \"FacProd\" P";
 		sql += "	LEFT JOIN (";
 		sql += "		SELECT MAX(DECODE(R.\"Seq\",1,R.\"EffectDate\",0)) AS \"EffectDate\"";

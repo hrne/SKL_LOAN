@@ -84,6 +84,7 @@ public class AchAuthFileVo extends FileVo {
 				occursList.putParam("CustNo", thisLine.substring(50, 70));
 				occursList.putParam("FacmNo", thisLine.substring(93, 96));
 				occursList.putParam("RepayBank", thisLine.substring(19, 22));
+				occursList.putParam("BankCode", thisLine.substring(19, 26));
 				occursList.putParam("RepayAcct", thisLine.substring(26, 40));
 				occursList.putParam("CreateFlag", thisLine.substring(70, 71));
 

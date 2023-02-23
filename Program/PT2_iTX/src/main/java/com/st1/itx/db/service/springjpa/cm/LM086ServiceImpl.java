@@ -50,6 +50,8 @@ public class LM086ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " , M.\"StoreRate\" ";
 		sql += " , \"Fn_GetCdCode\"('ClCode2' || M.\"ClCode1\" , LPAD(M.\"ClCode2\",2,'0')) AS \"ClItem\" ";
 		sql += " , CI.\"IndustryItem\" ";
+		sql += " , CI.\"IndustryCode\" ";
+		sql += " , FM.\"RuleCode\" ";
 		sql += " FROM \"MonthlyFacBal\" M ";
 		sql += " LEFT JOIN \"CdAcCode\" CAC ON CAC.\"AcctCode\" = M.\"AcctCode\" ";
 		sql += " LEFT JOIN \"FacMain\" FM ON FM.\"CustNo\" = M.\"CustNo\" ";

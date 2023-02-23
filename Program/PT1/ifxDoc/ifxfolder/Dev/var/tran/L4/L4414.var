@@ -160,6 +160,7 @@ C(3,#OOAuthStatusA,0,
         C(5,#OOCreateFlagA,A,T(2,成功授權),T(2,))),
 T(3,)T(H,#OOAuthStatusA,#AuthStatusHelp))
 
+#OOCheckResultA=x,50,O
 !SWITCH(#OOAuthStatusA,
 !0,T(2,成功新增或取消授權扣款),
 !1,T(2,印鑑不符),
@@ -223,6 +224,7 @@ C(3,#OOAuthStatusB,0,
     C(5,#OOCreateFlagB,D,T(2,取消授權扣款),
         C(5,#OOCreateFlagB,A,T(2,成功新增),T(2,))),
 T(3,)T(H,#OOAuthStatusB,#AuthStatusHelp))
+#OOCheckResultB=x,50,O
 !SWITCH(#OOAuthStatusB,
 !0,T(2,成功新增或取消授權扣款),
 !1,T(2,印鑑不符),
@@ -306,7 +308,7 @@ T(3,)T(H,#OOAuthErrorCodeC,#AuthErrorCodeHelp)
 !                       19,T(3,19-編號非英數),
 !                       91,T(3,91-期限未扣款),
 !                       98,T(3,98-其他),T(2,))
-
+#OOCheckResultC=x,50,O
 ! --------------POST--------------
 ![防止二次單據]
 E(0,@L444APRT,0)
@@ -337,6 +339,7 @@ TXFORM=L444A
 #OORepayAcctA
 #OOCreateFlagA
 #OOAuthStatusA
+#OOCheckResultA
 ^
 TXFORM=L444B
 #OROCDateB
@@ -353,6 +356,7 @@ TXFORM=L444B
 #OORepayAcctB
 #OOCreateFlagB
 #OOAuthStatusB
+#OOCheckResultB
 ^
 TXFORM=L444C
 #OROCDateC
@@ -368,6 +372,7 @@ TXFORM=L444C
 #OORepayAcctC
 #OOStampCodeC
 #OOAuthErrorCodeC
+#OOCheckResultC
 ^
 </sub>
 
@@ -385,6 +390,7 @@ TXFORM=L444C
 #OOCustNameA
 #OORepayAcctA
 #OOAuthStatusAX
+#OOCheckResultA
 @
 #OTotalCntA
 #OFinishCntA
@@ -401,6 +407,7 @@ TXFORM=L444C
 #OORepayBankXB
 #OORepayAcctB
 #OOAuthStatusBX
+#OOCheckResultB
 @
 #OTotalCntB
 #OFinishCntB
@@ -417,6 +424,7 @@ TXFORM=L444C
 #OORepayAcctC
 #OOStampCodeCX
 #OOAuthErrorCodeCX
+#OOCheckResultC
 @
 #OTotalCntC
 #OFinishCntC

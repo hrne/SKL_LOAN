@@ -102,6 +102,21 @@ public class L4414 extends TradeBuffer {
 	private String nowDate;
 	private String nowTime;
 
+	int fCustNo = 0;
+	int fFacmNo = 0;
+	String fRepayBank = "";
+	String fRepayAcct = "";
+	int fPropDate = 0;
+	String fAuthStatus = "";
+	String fCreateFlag = "";
+	String fBankCode = "";
+	String fPostDepCode = "";
+	String fOrgCode = "";
+	String fAuthApplCode = "";
+	String fStampCode = "";
+	String fAuthErrorCode = "";
+	Boolean finishFg = true;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4414 ");
@@ -144,7 +159,8 @@ public class L4414 extends TradeBuffer {
 			this.info("filename.substring(0, 1).indexOf(\"P\") >= 0 =" + filename.substring(0, 1).indexOf("P"));
 			if (filename.substring(0, 1).indexOf("A") >= 0) {
 //					filePath1 = "D:\\temp\\TestingInPut\\AHP21P_授回.txt";
-				String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo() + File.separatorChar + filename;
+				String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
+						+ File.separatorChar + filename;
 
 				achCnt = achCnt + 1;
 
@@ -171,7 +187,8 @@ public class L4414 extends TradeBuffer {
 //					POST
 //					暫定路徑 待討論過後決定抓取路徑方法
 //					filePath1 = "D:\\temp\\TestingInPut\\PO$P21P_846授權回.txt";
-				String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo() + File.separatorChar + filename;
+				String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
+						+ File.separatorChar + filename;
 
 				postCnt = postCnt + 1;
 
@@ -254,7 +271,9 @@ public class L4414 extends TradeBuffer {
 				return result;
 			});
 
+			String checkResult = "";
 			for (OccursList tempOccursList : uploadFile) {
+				finishFg = true;
 				AchAuthLog tAchAuthLog = new AchAuthLog();
 				AchAuthLogId tAchAuthLogId = new AchAuthLogId();
 
@@ -262,33 +281,33 @@ public class L4414 extends TradeBuffer {
 				this.info(" @@##$$!! authCheck :" + authCheck);
 
 				if ("R".equals(authCheck)) {
-//					tAchAuthLogId.setAuthCreateDate(parse.stringToInteger(tempOccursList.get("AuthCreateDate")));// TODO:改為提出日期
-//					tAchAuthLogId.setCustNo(parse.stringToInteger(tempOccursList.get("CustNo")));
-//					tAchAuthLogId.setRepayBank(tempOccursList.get("RepayBank"));
-//					tAchAuthLogId.setRepayAcct(tempOccursList.get("RepayAcct"));
-//					tAchAuthLogId.setCreateFlag(tempOccursList.get("CreateFlag"));
+					checkResult = "上傳成功";
+					fCustNo = parse.stringToInteger(tempOccursList.get("CustNo"));
+					fFacmNo = parse.stringToInteger(tempOccursList.get("FacmNo"));
+					fRepayBank = tempOccursList.get("RepayBank");
+					fRepayAcct = tempOccursList.get("RepayAcct");
+					fPropDate = parse.stringToInteger(tempOccursList.get("PropDate"));
+					fAuthStatus = tempOccursList.get("AuthStatus");
+					fCreateFlag = tempOccursList.get("CreateFlag");
+					fBankCode = tempOccursList.get("BankCode");
+					this.info("CustNo :" + fCustNo);
+					this.info("FacmNo :" + fFacmNo);
+					this.info("RepayBank :" + fRepayBank);
+					this.info("RepayAcct :" + fRepayAcct);
+					this.info("PropDate :" + fPropDate);
 
-					this.info("CustNo :" + parse.stringToInteger(tempOccursList.get("CustNo")));
-					this.info("FacmNo :" + parse.stringToInteger(tempOccursList.get("FacmNo")));
-					this.info("RepayBank :" + tempOccursList.get("RepayBank"));
-					this.info("RepayAcct :" + tempOccursList.get("RepayAcct"));
-					this.info("PropDate :" + parse.stringToInteger(tempOccursList.get("PropDate")));
-
-					tAchAuthLog = achAuthLogService.facmNoPropDateFirst(parse.stringToInteger(tempOccursList.get("CustNo")), parse.stringToInteger(tempOccursList.get("FacmNo")),
-							tempOccursList.get("RepayBank"), tempOccursList.get("RepayAcct"), parse.stringToInteger(tempOccursList.get("PropDate")) + 19110000, titaVo);
-
-					if (tAchAuthLog != null) {
+					tAchAuthLog = achAuthLogService.facmNoPropDateFirst(fCustNo, fFacmNo, fRepayBank, fRepayAcct,
+							fPropDate + 19110000, titaVo);
+					if (tAchAuthLog == null) {
+						checkResult = "ACH授權記錄檔查無資料，請確認檔案";
+						finishFg = false;
+					} else {
 						tAchAuthLog.setRetrDate(dateUtil.getNowIntegerForBC());
-						tAchAuthLog.setAuthStatus(tempOccursList.get("AuthStatus"));
-
-						this.info("AuthStatus : " + tempOccursList.get("AuthStatus"));
-
-						if ("0".equals("" + tempOccursList.get("AuthStatus"))) {
+						tAchAuthLog.setAuthStatus(fAuthStatus);
+						this.info("AuthStatus : " + fAuthStatus);
+						if ("0".equals(fAuthStatus)) {
 							this.info("Update StampFinishDate !!!");
 							tAchAuthLog.setStampFinishDate(headRocTxday);
-
-						} else {
-
 						}
 
 						try {
@@ -298,12 +317,10 @@ public class L4414 extends TradeBuffer {
 						}
 //						變更帳號檔
 						achToBankAuthAct(tAchAuthLog, titaVo);
-//						輸出
-						setOutput(tAchAuthLog, titaVo);
-
-					} else {
-						throw new LogicException("E0014", "ACH授權記錄檔查無資料，請確認檔案");
 					}
+//					輸出
+					setOutput(tAchAuthLog, checkResult, titaVo);
+
 				} else {
 					throw new LogicException("E0014", "請確認是否為提回檔案");
 				}
@@ -316,7 +333,7 @@ public class L4414 extends TradeBuffer {
 	private void setPostAuthLog(PostAuthFileVo postAuthFileVo, TitaVo titaVo) throws LogicException {
 
 		ArrayList<OccursList> uploadFile = postAuthFileVo.getOccursList();
-
+		String checkResult = "";
 		String authCode = "";
 
 		if (uploadFile != null && uploadFile.size() != 0) {
@@ -333,29 +350,54 @@ public class L4414 extends TradeBuffer {
 				throw new LogicException("E0014", "請確認是否為提回檔案");
 			}
 			for (OccursList tempOccursList : uploadFile) {
-				if ("846".equals(tempOccursList.get("OccOrgCode"))) {
+				checkResult = "上傳成功";
+				finishFg = true;
+				fCustNo = parse.stringToInteger(tempOccursList.get("CustNo"));
+				fFacmNo = parse.stringToInteger(tempOccursList.get("FacmNo"));
+				fRepayBank = tempOccursList.get("RepayBank");
+				fRepayAcct = tempOccursList.get("RepayAcct");
+				fPropDate = parse.stringToInteger(tempOccursList.get("PropDate"));
+				fAuthStatus = tempOccursList.get("AuthStatus");
+				fCreateFlag = tempOccursList.get("CreateFlag");
+				fBankCode = tempOccursList.get("BankCode");
+				fPostDepCode = tempOccursList.get("PostDepCode");
+				fOrgCode = tempOccursList.get("OccOrgCode");
+				fAuthApplCode = tempOccursList.get("AuthApplCode");
+				fStampCode = FormatUtil.pad9(tempOccursList.get("StampCode"), 1);
+				fAuthErrorCode = FormatUtil.pad9(tempOccursList.get("AuthErrorCode").trim(), 2);
+				if ("846".equals(fOrgCode)) {
 					authCode = "1";
-				} else if ("53N".equals(tempOccursList.get("OccOrgCode"))) {
+				} else if ("53N".equals(fOrgCode)) {
 					authCode = "2";
 				}
-				PostAuthLog tPostAuthLog = postAuthLogService.repayAcctFirst(parse.stringToInteger(tempOccursList.get("CustNo")), tempOccursList.get("PostDepCode"), tempOccursList.get("RepayAcct"),
+				PostAuthLog tPostAuthLog = postAuthLogService.repayAcctFirst(fCustNo, fPostDepCode, fRepayAcct,
 						authCode, titaVo);
 				if (tPostAuthLog == null) {
-					throw new LogicException("E0014", "郵局授權記錄檔查無資料，請確認檔案");
+					checkResult = "郵局授權記錄檔查無資料，請確認檔案";
+//					輸出
+					finishFg = false;
+					setOutput(tPostAuthLog, checkResult, titaVo);
+					continue;
 				}
 				tPostAuthLog = postAuthLogService.holdById(tPostAuthLog, titaVo);
-				switch (tempOccursList.get("AuthApplCode")) {
+				switch (fAuthApplCode) {
 				case "1": // 1.申請
 					if (!"1".equals(tPostAuthLog.getAuthApplCode())) {
-						throw new LogicException("E0014", "申請，郵局授權記錄檔申請代號<>1，" + tPostAuthLog.getAuthApplCode());
+//						throw new LogicException("E0014", "申請，郵局授權記錄檔申請代號<>1，" + tPostAuthLog.getAuthApplCode());
+
+						checkResult = "申請，郵局授權記錄檔申請代號<>1";
+//						輸出
+						finishFg = false;
+						setOutput(tPostAuthLog, checkResult, titaVo);
+						continue;
 					}
 					tPostAuthLog.setRetrDate(dateUtil.getNowIntegerForBC());
-					tPostAuthLog.setStampCode(FormatUtil.pad9(tempOccursList.get("StampCode"), 1));
-					this.info("StampCode==" + tempOccursList.get("StampCode").trim());
-					this.info("AuthErrorCode==" + tempOccursList.get("AuthErrorCode").trim());
+					tPostAuthLog.setStampCode(fStampCode);
+					this.info("StampCode==" + fStampCode);
+					this.info("AuthErrorCode==" + fAuthErrorCode);
 
-					tPostAuthLog.setAuthErrorCode(FormatUtil.pad9(tempOccursList.get("AuthErrorCode").trim(), 2));
-					if ("00".equals(FormatUtil.pad9("" + tempOccursList.get("AuthErrorCode"), 2))) {
+					tPostAuthLog.setAuthErrorCode(fAuthErrorCode);
+					if ("00".equals(fAuthErrorCode)) {
 						this.info("Update StampFinishDate !!!");
 //						申請UP核印完成日期,清空核印取消日期
 						tPostAuthLog.setStampFinishDate(headRocTxday);
@@ -366,7 +408,8 @@ public class L4414 extends TradeBuffer {
 						cancelCntC++;
 					}
 //					檢查期款、火險需同時成功或失敗才更新帳號檔
-					PostAuthLog tPostAuthLog3 = postAuthLogService.repayAcctFirst(tPostAuthLog.getCustNo(), tPostAuthLog.getPostDepCode(), tPostAuthLog.getRepayAcct(),
+					PostAuthLog tPostAuthLog3 = postAuthLogService.repayAcctFirst(tPostAuthLog.getCustNo(),
+							tPostAuthLog.getPostDepCode(), tPostAuthLog.getRepayAcct(),
 							tPostAuthLog.getAuthCode().equals("1") ? "2" : "1", titaVo);
 					if (tPostAuthLog3 != null) {
 						if (tPostAuthLog3.getAuthErrorCode().equals(tPostAuthLog.getAuthErrorCode())) {
@@ -383,10 +426,15 @@ public class L4414 extends TradeBuffer {
 
 				case "2": // 2.終止
 					if (!"2".equals(tPostAuthLog.getAuthApplCode())) {
-						throw new LogicException("E0014", "終止，郵局授權記錄檔申請代號<>2，" + tPostAuthLog.getAuthApplCode());
+//						throw new LogicException("E0014", "終止，郵局授權記錄檔申請代號<>2，" + tPostAuthLog.getAuthApplCode());
+						checkResult = "終止，郵局授權記錄檔申請代號<>2";
+//						輸出
+						finishFg = false;
+						setOutput(tPostAuthLog, checkResult, titaVo);
+						continue;
 					}
 					tPostAuthLog.setRetrDate(dateUtil.getNowIntegerForBC());
-					tPostAuthLog.setAuthErrorCode(FormatUtil.pad9(tempOccursList.get("AuthErrorCode").trim(), 2));
+					tPostAuthLog.setAuthErrorCode(fAuthErrorCode);
 //					終止UP核印取消日期,清空核印完成日期
 					tPostAuthLog.setStampCancelDate(dateUtil.getNowIntegerForBC());
 					tPostAuthLog.setStampFinishDate(0);
@@ -403,7 +451,12 @@ public class L4414 extends TradeBuffer {
 
 				case "3": // 3.郵局終止
 					if (!"1".equals(tPostAuthLog.getAuthApplCode())) {
-						throw new LogicException("E0014", "郵局終止，郵局授權記錄檔申請代號<>1，" + tPostAuthLog.getAuthApplCode());
+//						throw new LogicException("E0014", "郵局終止，郵局授權記錄檔申請代號<>1，" + tPostAuthLog.getAuthApplCode());
+						checkResult = "郵局終止，郵局授權記錄檔申請代號<>1";
+//						輸出
+						finishFg = false;
+						setOutput(tPostAuthLog, checkResult, titaVo);
+						continue;
 					}
 					PostAuthLog tPostAuthLog2 = new PostAuthLog();
 					PostAuthLogId tPostAuthLogId = new PostAuthLogId();
@@ -430,7 +483,7 @@ public class L4414 extends TradeBuffer {
 					tPostAuthLog2.setRelAcctBirthday((tPostAuthLog.getRelAcctBirthday()));
 					tPostAuthLog2.setRelAcctGender(tPostAuthLog.getRelAcctGender());
 					tPostAuthLog2.setRetrDate(dateUtil.getNowIntegerForBC());
-					tPostAuthLog2.setAuthErrorCode(FormatUtil.pad9(tempOccursList.get("AuthErrorCode").trim(), 2));
+					tPostAuthLog2.setAuthErrorCode(fAuthErrorCode);
 					tPostAuthLog.setStampFinishDate(0);
 					tPostAuthLog.setStampCancelDate(dateUtil.getNowIntegerForBC());
 					// 變更帳號檔
@@ -446,13 +499,16 @@ public class L4414 extends TradeBuffer {
 
 				case "4": // 4.誤終止
 					if (!"3".equals(tPostAuthLog.getAuthApplCode())) {
-						throw new LogicException("E0014", "誤終止，郵局授權記錄檔申請代號<>1，" + tPostAuthLog.getAuthApplCode());
+//						throw new LogicException("E0014", "誤終止，郵局授權記錄檔申請代號<>1，" + tPostAuthLog.getAuthApplCode());
+						checkResult = "誤終止，郵局授權記錄檔申請代號<>1";
+//						輸出
+						finishFg = false;
+						setOutput(tPostAuthLog, checkResult, titaVo);
+						continue;
 					}
-
 					tPostAuthLog.setAuthApplCode("4");
 					tPostAuthLog.setStampFinishDate(headRocTxday);
 					tPostAuthLog.setStampCancelDate(0);
-
 					// 變更帳號檔
 					postToBankAuthAct(tPostAuthLog, titaVo);
 					try {
@@ -460,13 +516,11 @@ public class L4414 extends TradeBuffer {
 					} catch (DBException e) {
 						throw new LogicException("E0005", "L4414 PostAuthLog " + e.getErrorMsg());
 					}
-
 					finishCntC++;
 					break;
 				}
-
 //						輸出
-				setOutput(tPostAuthLog, titaVo);
+				setOutput(tPostAuthLog, checkResult, titaVo);
 			}
 		}
 	}
@@ -490,8 +544,9 @@ public class L4414 extends TradeBuffer {
 		List<CdBank> lCdBank = new ArrayList<CdBank>();
 
 		lCdBank = sCdBank == null ? null : sCdBank.getContent();
-
-		result = lCdBank.get(0).getBankItem();
+		if (lCdBank != null) {
+			result = lCdBank.get(0).getBankItem();
+		}
 
 		if (result != null) {
 			result = result.trim();
@@ -499,60 +554,68 @@ public class L4414 extends TradeBuffer {
 		return result;
 	}
 
-	private void setOutput(AchAuthLog tAchAuthLog, TitaVo titaVo) throws LogicException {
-		if ("103".equals(tAchAuthLog.getRepayBank())) {
+	private void setOutput(AchAuthLog tAchAuthLog, String checkResult, TitaVo titaVo) throws LogicException {
+		if ("103".equals(fRepayBank)) {
 			OccursList occursList = new OccursList();
-			occursList.putParam("OOCustNoA", tAchAuthLog.getCustNo());
-			occursList.putParam("OOCustNameA", loanCom.getCustNameByNo(tAchAuthLog.getCustNo()));
-			occursList.putParam("OOFacmNoA", tAchAuthLog.getFacmNo());
-			occursList.putParam("OORepayAcctA", tAchAuthLog.getRepayAcct());
-			occursList.putParam("OOAuthStatusA", tAchAuthLog.getAuthStatus());
-			occursList.putParam("OOCreateFlagA", tAchAuthLog.getCreateFlag());
 
-			totaA.putParam("OHeadRocTxdayA", tAchAuthLog.getPropDate()); // 資料建檔日期
+			occursList.putParam("OOCustNoA", fCustNo);
+			occursList.putParam("OOCustNameA", loanCom.getCustNameByNo(fCustNo));
+			occursList.putParam("OOFacmNoA", fFacmNo);
+			occursList.putParam("OORepayAcctA", fRepayAcct);
+			occursList.putParam("OOAuthStatusA", fAuthStatus);
+			occursList.putParam("OOCreateFlagA", fCreateFlag);
+			occursList.putParam("OOCheckResultA", checkResult);
+
+			totaA.putParam("OHeadRocTxdayA", fPropDate); // 資料建檔日期
 			this.totaA.addOccursList(occursList);
-			if ("0".equals(tAchAuthLog.getAuthStatus())) {
-				finishCntA++;
-			} else {
+
+			if (!finishFg || !"0".equals(fAuthStatus)) {
 				cancelCntA++;
+			} else {
+				finishCntA++;
 			}
 			cntA++;
 		} else {
 			OccursList occursList = new OccursList();
-			occursList.putParam("OOCustNoB", tAchAuthLog.getCustNo());
-			occursList.putParam("OOCustNameB", loanCom.getCustNameByNo(tAchAuthLog.getCustNo()));
-			occursList.putParam("OOFacmNoB", tAchAuthLog.getFacmNo());
-			if (bankX(tAchAuthLog.getRepayBank(), titaVo).length() > 8) {
-				occursList.putParam("OORepayBankXB", bankX(tAchAuthLog.getRepayBank(), titaVo).substring(0, 8));
+			occursList.putParam("OOCustNoB", fCustNo);
+			occursList.putParam("OOCustNameB", loanCom.getCustNameByNo(fCustNo));
+			occursList.putParam("OOFacmNoB", fFacmNo);
+			if (bankX(fBankCode, titaVo).length() > 8) {
+				occursList.putParam("OORepayBankXB", bankX(fBankCode, titaVo).substring(0, 8));
 			} else {
-				occursList.putParam("OORepayBankXB", bankX(tAchAuthLog.getRepayBank(), titaVo));
+				occursList.putParam("OORepayBankXB", bankX(fBankCode, titaVo));
 			}
-			occursList.putParam("OORepayAcctB", tAchAuthLog.getRepayAcct());
-			occursList.putParam("OOAuthStatusB", tAchAuthLog.getAuthStatus());
-			occursList.putParam("OOCreateFlagB", tAchAuthLog.getCreateFlag());
+			occursList.putParam("OORepayAcctB", fRepayAcct);
+			occursList.putParam("OOAuthStatusB", fAuthStatus);
+			occursList.putParam("OOCreateFlagB", fCreateFlag);
+			occursList.putParam("OOCheckResultB", checkResult);
 
-			totaB.putParam("OHeadRocTxdayB", tAchAuthLog.getPropDate()); // 資料建檔日期
+			totaB.putParam("OHeadRocTxdayB", fPropDate); // 資料建檔日期
 			this.totaB.addOccursList(occursList);
 
-			if ("0".equals(tAchAuthLog.getAuthStatus())) {
-				finishCntB++;
-			} else {
+			if (!finishFg || !"0".equals(fAuthStatus)) {
 				cancelCntB++;
+			} else {
+				finishCntB++;
 			}
 			cntB++;
 		}
 	}
 
-	private void setOutput(PostAuthLog tPostAuthLog, TitaVo titaVo) throws LogicException {
+	private void setOutput(PostAuthLog tPostAuthLog, String checkResult, TitaVo titaVo) throws LogicException {
 		OccursList occursList = new OccursList();
-		occursList.putParam("OOCustNoC", tPostAuthLog.getCustNo());
-		occursList.putParam("OOFacmNoC", tPostAuthLog.getFacmNo());
-		occursList.putParam("OOCustNameC", loanCom.getCustNameByNo(tPostAuthLog.getCustNo()));
-		occursList.putParam("OORepayAcctC", tPostAuthLog.getRepayAcct());
-		occursList.putParam("OOStampCodeC", tPostAuthLog.getStampCode());
-		occursList.putParam("OOAuthErrorCodeC", tPostAuthLog.getAuthErrorCode());
-		totaC.putParam("OFootCreateDateC", tPostAuthLog.getPropDate()); // 資料建檔日期
+		occursList.putParam("OOCustNoC", fCustNo);
+		occursList.putParam("OOFacmNoC", fFacmNo);
+		occursList.putParam("OOCustNameC", loanCom.getCustNameByNo(fCustNo));
+		occursList.putParam("OORepayAcctC", fRepayAcct);
+		occursList.putParam("OOStampCodeC", fStampCode);
+		occursList.putParam("OOAuthErrorCodeC", fAuthErrorCode);
+		occursList.putParam("OOCheckResultC", checkResult);
 
+		totaC.putParam("OFootCreateDateC", fPropDate); // 資料建檔日期
+		if (!finishFg) {
+			cancelCntC++;
+		}
 		/* 將每筆資料放入Tota的OcList */
 		this.totaC.addOccursList(occursList);
 		cntC++;

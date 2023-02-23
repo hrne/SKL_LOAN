@@ -20,6 +20,7 @@ import com.st1.itx.db.service.springjpa.cm.L9707ServiceImpl;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.parse.Parse;
 
 @Component
@@ -46,7 +47,7 @@ public class L9707Report extends MakeReport {
 
 			List<Map<String, String>> L9707List = l9707ServiceImpl.findAll(titaVo, ACCTDATE_ST, ACCTDATE_ED);
 
-			testExcel(titaVo, L9707List, txbuffer);
+			exportExcel(titaVo, L9707List, txbuffer);
 
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
@@ -55,9 +56,25 @@ public class L9707Report extends MakeReport {
 		}
 	}
 
-	private void testExcel(TitaVo titaVo, List<Map<String, String>> LDList, TxBuffer txbuffer) throws LogicException {
+	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LDList, TxBuffer txbuffer) throws LogicException {
 		this.info("===========in testExcel");
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9707", "新增逾放案件明細", "L9707-新增逾放案件明細", "新增逾放案件明細.xlsx", "工作表1");
+
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "L9707";
+		String fileItem = "新增逾放案件明細";
+		String fileName = "L9707-新增逾放案件明細";
+		String defaultExcel = "新增逾放案件明細.xlsx";
+		String defaultSheet = "D9701212";
+
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9707", "新增逾放案件明細", "L9707-新增逾放案件明細", "新增逾放案件明細.xlsx", "D9701212");
 		// F0 申請日期
 		// F1 准駁日期
 		// F2 借款人戶號
@@ -90,28 +107,34 @@ public class L9707Report extends MakeReport {
 			for (Map<String, String> tLDVo : LDList) {
 				String ad = "";
 				int col = 0;
-				for (int i = 0; i < tLDVo.size(); i++) {
+
+				for (int i = 0; i < 14; i++) {
 					ad = "F" + String.valueOf(col);
 					col++;
 					switch (i) {
 					case 2:
 						// 資料筆數
 						totalDataCount = totalDataCount.add(new BigDecimal(1));
-						makeExcel.setValue(row, col, tLDVo.get(ad) == null || tLDVo.get(ad) == "" ? "0" : tLDVo.get(ad), "R");
+						makeExcel.setValue(row, col, tLDVo.get(ad) == null || tLDVo.get(ad) == "" ? "0" : tLDVo.get(ad),
+								"R");
 						break;
 					case 5:
 						// 貸出金額
 						totalLoanAmt = totalLoanAmt.add(new BigDecimal(tLDVo.get(ad) == "" ? "0" : tLDVo.get(ad)));
-						makeExcel.setValue(row, col, tLDVo.get(ad) == null || tLDVo.get(ad) == "" ? "0" : tLDVo.get(ad), "R");
+						makeExcel.setValue(row, col, tLDVo.get(ad) == null || tLDVo.get(ad) == "" ? "0" : tLDVo.get(ad),
+								"R");
 						break;
 					case 11:
-						makeExcel.setValue(row, col, tLDVo.get(ad) == null || tLDVo.get(ad) == "" ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(ad)), "R");
+						makeExcel.setValue(row, col, tLDVo.get(ad) == null || tLDVo.get(ad) == "" ? BigDecimal.ZERO
+								: new BigDecimal(tLDVo.get(ad)), "R");
 						break;
 					case 14:
-						makeExcel.setValue(row, col, tLDVo.get(ad) == null || tLDVo.get(ad) == "" ? "0" : tLDVo.get(ad), "L");
+						makeExcel.setValue(row, col, tLDVo.get(ad) == null || tLDVo.get(ad) == "" ? "0" : tLDVo.get(ad),
+								"L");
 						break;
 					default:
-						makeExcel.setValue(row, col, tLDVo.get(ad) == null || tLDVo.get(ad) == "" ? "0" : tLDVo.get(ad), "R");
+						makeExcel.setValue(row, col, tLDVo.get(ad) == null || tLDVo.get(ad) == "" ? "0" : tLDVo.get(ad),
+								"R");
 						break;
 					}
 				}
@@ -135,9 +158,11 @@ public class L9707Report extends MakeReport {
 
 		/* 天數差 */
 
-		Date fromDate1 = simpleFormat.parse(date1.substring(0, 4) + "-" + date1.substring(4, 6) + "-" + date1.substring(6, 8) + " 00:00");
+		Date fromDate1 = simpleFormat
+				.parse(date1.substring(0, 4) + "-" + date1.substring(4, 6) + "-" + date1.substring(6, 8) + " 00:00");
 
-		Date toDate1 = simpleFormat.parse(date2.substring(0, 4) + "-" + date2.substring(4, 6) + "-" + date2.substring(6, 8) + " 00:00");
+		Date toDate1 = simpleFormat
+				.parse(date2.substring(0, 4) + "-" + date2.substring(4, 6) + "-" + date2.substring(6, 8) + " 00:00");
 
 		long from1 = fromDate1.getTime();
 
