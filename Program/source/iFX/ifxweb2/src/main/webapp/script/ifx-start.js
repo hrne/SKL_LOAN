@@ -11,7 +11,7 @@ function makeIfx() {
 	try {
 	var tranDef = getTranDef();
 	} catch (e) {
-		alert("交易代號不存在或資料處理異常，請重新輸入。(" + _txcd + ")。\nError : " + e);
+		alert(_txcd + " 無此交易代號");
 		var _tabKey = window.parent['getTitleById'](_changeSysVar["__tid"]);
     window.parent['closeTab'](_tabKey, true);
 		return false;

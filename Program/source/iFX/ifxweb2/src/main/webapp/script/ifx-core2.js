@@ -2051,7 +2051,7 @@ var Ifx = (function ($) {
 			var text = {
 				SUPID: supid + "",
 				PW: password + "",
-				ALLOWFG: supIndex.indexOf(reasons.substring(0, 4)) + ""
+				ALLOWFG: supIndex.indexOf(reasons[0].substring(0, 4)) + ""
 			}
 			text = JSON.stringify(text).substring(1);
 			//var text = "\"SUPID\":\"" + supid + "\", \"PW\":\"" + password + "\"}";

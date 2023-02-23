@@ -84,8 +84,10 @@ MyMenu.initTxCode = function() {
 					dataType: "json",
 					jsonpCallback: "callback",
 					success: function (res) {
-						if(res.data != "")
+						if(res.data != "" && res.data != "non")
 							alert(res.data);
+						else if(res.data == "non")
+							alert($.trim(s) + " 無此交易代號");
 						else
 							parent.addTran(s, u);
 					},
