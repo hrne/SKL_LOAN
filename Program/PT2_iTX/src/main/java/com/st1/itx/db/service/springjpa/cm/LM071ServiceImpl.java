@@ -65,7 +65,6 @@ public class LM071ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                               AND M.\"CustNo\" = L.\"CustNo\" ";
 		sql += "                               AND M.\"FacmNo\" = L.\"FacmNo\" ";
 		sql += "                               AND M.\"BormNo\" = L.\"BormNo\" ";
-		sql += " LEFT JOIN \"FacProd\" P ON P.\"ProdNo\" = M.\"ProdNo\" ";
 		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = L.\"CustNo\" ";
 		sql += " LEFT JOIN \"QuitEmp\" Q ON Q.\"EmpNo\" = C.\"EmpNo\" ";
 		sql += " LEFT JOIN RES ON RES.\"CustNo\" = L.\"CustNo\" ";
@@ -74,7 +73,6 @@ public class LM071ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              AND RES.\"Seq\" = 1 ";
 		sql += " WHERE L.\"Status\" IN (0,4) ";
 		sql += "   AND M.\"ProdNo\" = '11' ";
-		sql += "   AND P.\"EmpFlag\" = 'Y' ";
 		sql += " ORDER BY L.\"CustNo\" ";
 		sql += "         ,L.\"FacmNo\" ";
 		sql += "         ,L.\"BormNo\" ";

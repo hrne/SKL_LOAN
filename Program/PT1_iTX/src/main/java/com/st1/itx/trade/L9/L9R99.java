@@ -2,10 +2,14 @@ package com.st1.itx.trade.L9;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -59,7 +63,12 @@ public class L9R99 extends TradeBuffer {
 
 		switch (tranCode) {
 		case "L9739":
-			l9739DataProcessing(titaVo);
+			try {
+				l9739DataProcessing(titaVo);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			break;
 
 		case "L9741":
@@ -92,13 +101,13 @@ public class L9R99 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private void l9739DataProcessing(TitaVo titaVo) {
+	private void l9739DataProcessing(TitaVo titaVo) throws JSONException {
 
 		List<Map<String, String>> listL9739 = null;
 
 		try {
 
-			listL9739 = l9739ServiceImpl.findStandard(titaVo, "0");
+			listL9739 = l9739ServiceImpl.findStandard(titaVo, titaVo.getEntDyI() + 19110000);
 
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
@@ -108,15 +117,61 @@ public class L9R99 extends TradeBuffer {
 
 		this.info("listL9739Title =" + listL9739.size());
 
+		// 政府補貼利率前期
+		BigDecimal lastRate = BigDecimal.ZERO;
+		// 政府補貼利率當期
+		BigDecimal thisRate = BigDecimal.ZERO;
+		// 前期-當期
+		BigDecimal diffRate = BigDecimal.ZERO;
+		// 郵局利率
+		BigDecimal basePostRate = BigDecimal.ZERO;
+		// 商品加碼
+		BigDecimal prodIncrRate = BigDecimal.ZERO;
+		// 使用利率
+		BigDecimal rate = BigDecimal.ZERO;
+
+		JSONObject thisJS;
+		JSONObject lastJS;
+
 		for (int i = 0; i < listL9739.size(); i++) {
 			int t = i + 1;
 
 			this.totaVo.putParam("OOProdNo" + t, listL9739.get(i).get("ProdNo"));
 			this.totaVo.putParam("OOProdName" + t, listL9739.get(i).get("ProdName"));
 			this.totaVo.putParam("OOEffectDate" + t, Integer.valueOf(listL9739.get(i).get("EffectDate")) - 19110000);
-			this.totaVo.putParam("OOFitRate" + t, listL9739.get(i).get("FitRate"));
-			this.info("EffectDate" + t + "=" + Integer.valueOf(listL9739.get(i).get("EffectDate")));
-			this.info("FitRate" + t + "=" + listL9739.get(i).get("FitRate"));
+
+			int seq = Integer.valueOf(listL9739.get(i).get("Seq"));
+
+			this.info("seq =" + seq);
+			
+			prodIncrRate = new BigDecimal(listL9739.get(i).get("ProdIncr").toString());
+			basePostRate = new BigDecimal(listL9739.get(i).get("BaseRate").toString());
+
+			this.info("prodIncrRate =" + prodIncrRate);
+			this.info("basePostRate =" + basePostRate);
+
+
+			this.info("listL9739.get(i).get(\"JsonFields\").toString() =" + listL9739.get(i).get("JsonFields").toString());
+			this.info("listL9739.get(i).get(\"lJsonFields\").toString() =" + listL9739.get(i).get("lJsonFields").toString());
+			
+			thisJS = new JSONObject(listL9739.get(i).get("JsonFields").toString());
+			lastJS = new JSONObject(listL9739.get(i).get("lJsonFields").toString());
+
+			thisRate = new BigDecimal(thisJS.get("SubsidyRate" + seq).toString());
+			lastRate = new BigDecimal(lastJS.get("SubsidyRate" + seq).toString());
+
+			this.info("thisRate =" + thisRate);
+			this.info("lastRate =" + lastRate);
+
+			diffRate = lastRate.subtract(thisRate);
+
+			this.info("diffRate =" + diffRate);
+
+			rate = basePostRate.add(prodIncrRate).add(diffRate).setScale(2, RoundingMode.HALF_DOWN);
+
+			this.totaVo.putParam("OOFitRate" + t, rate);
+//			this.info("EffectDate" + t + "=" + Integer.valueOf(listL9739.get(i).get("EffectDate")));
+//			this.info("FitRate" + t + "=" + listL9739.get(i).get("FitRate"));
 		}
 	}
 
@@ -149,7 +204,7 @@ public class L9R99 extends TradeBuffer {
 			this.totaVo.putParam("OOCustNo", "0000000");
 			this.totaVo.putParam("OOSearchOption", SearchOption);
 			this.addList(this.totaVo);
-	
+
 			throw new LogicException(titaVo, "E0001", "查無資料");
 		} else {
 			this.totaVo.putParam("OOInsuYearMonth", intInsuYearMonth);

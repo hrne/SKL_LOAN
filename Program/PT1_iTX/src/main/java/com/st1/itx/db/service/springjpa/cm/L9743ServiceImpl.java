@@ -48,8 +48,8 @@ public class L9743ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                       AND B.\"BranchCode\" = SUBSTR(L.\"BankCode\", 4, 7) "; // 這邊用 CONCAT 會變成全表掃描
 		sql += " WHERE L.\"ReceiveDate\" = :inputDate ";
 		sql += "   AND L.\"CustNo\" = :inputCustNo ";
-		sql += " ORDER BY L.\"CustNo\" ";
-		sql += "         ,L.\"ChequeDate\" ";
+		sql += " ORDER BY L.\"CustNo\" ASC";
+		sql += "         ,L.\"ChequeNo\" ASC";
 
 		this.info("sql=" + sql);
 

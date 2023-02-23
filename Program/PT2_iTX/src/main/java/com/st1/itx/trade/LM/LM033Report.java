@@ -13,6 +13,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM033ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -45,7 +46,24 @@ public class LM033Report extends MakeReport {
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> listLM033) throws LogicException {
 		this.info("LM033Report exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM033", "新撥案件明細", "LM033-新撥案件明細", "LM033-新撥案件明細.xlsx", "D9701211");
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LM033";
+		String fileItem = "新撥案件明細";
+		String fileName = "LM033-新撥案件明細";
+		String defaultExcel = "LM033_底稿_新撥案件明細";
+		String defaultSheet = "D9701211";
+
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM033", "新撥案件明細", "LM033-新撥案件明細", "LM033-新撥案件明細.xlsx", "D9701211");
 
 		if (listLM033 == null || listLM033.isEmpty()) {
 			makeExcel.setValue(2, 1, "本日無資料");
@@ -99,7 +117,7 @@ public class LM033Report extends MakeReport {
 		makeExcel.formulaCaculate(1, 7);
 
 		makeExcel.close();
-		// makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 
 }

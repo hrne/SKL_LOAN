@@ -27,38 +27,56 @@ public class L9739ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	/**
-	 * 執行報表輸出(放款餘額明細表)
+	 * 執行報表輸出
 	 * 
 	 * @param titaVo
+	 * @param reportDate 帳務日
 	 * @return
 	 * @throws Exception
 	 */
-	public List<Map<String, String>> findStandard(TitaVo titaVo, String prodCode) throws Exception {
+	public List<Map<String, String>> findStandard(TitaVo titaVo, int reportDate) throws Exception {
 		this.info("l9739.findAll ");
 
+		this.info("getEntDyI ="+reportDate);
+		
 		String sql = " ";
 		sql += "	SELECT P.\"ProdNo\"";
 		sql += "		  ,P.\"ProdName\"";
-		sql += "		  ,R.\"EffectDate\"";
-		sql += "		  ,R.\"FitRate\"";
+		sql += "		  ,P.\"ProdIncr\"";
+		sql += "		  ,S.\"EffectDate\"";
+		sql += "		  ,S.\"JsonFields\"";
+		sql += "		  ,S.\"lJsonFields\"";
+		sql += "		  ,ROW_NUMBER()OVER(ORDER BY P.\"ProdNo\" ASC) as \"Seq\"";
+		sql += "		  ,B.\"EffectDate\" AS \"BaseEffectDate\"";
+		sql += "		  ,B.\"BaseRate\"";
 		sql += "	FROM \"FacProd\" P";
 		sql += "	LEFT JOIN (";
-		sql += "		SELECT DISTINCT \"ProdNo\"";
-		sql += "			  ,\"FitRate\"";
-		sql += "			  ,\"EffectDate\"";
-		sql += "		FROM \"LoanRateChange\"";
-		sql += "		WHERE REGEXP_LIKE(\"ProdNo\",'I[A-I]')";
-		sql += "		  AND \"EffectDate\" = (";
-		sql += "			SELECT MAX(\"EffectDate\") AS \"EffectDate\"";
-		sql += "			FROM \"LoanRateChange\"";
-		sql += "			WHERE REGEXP_LIKE(\"ProdNo\",'I[A-I]')";
-		sql += "		)";
-		sql += "	) R ON R.\"ProdNo\" = P.\"ProdNo\"";
-		if ("0".equals(prodCode)) {
-			sql += "	WHERE REGEXP_LIKE(P.\"ProdNo\",'I[A-I]')";
-		} else {
-			sql += "	WHERE REGEXP_LIKE(P.\"ProdNo\",'" + prodCode + "')";
-		}
+		sql += "		SELECT MAX(DECODE(R.\"Seq\",1,R.\"EffectDate\",0)) AS \"EffectDate\"";
+		sql += "			  ,MAX(DECODE(R.\"Seq\",1,R.\"JsonFields\",'')) AS \"JsonFields\"";
+		sql += "			  ,MAX(DECODE(R.\"Seq\",1,0,R.\"EffectDate\")) AS \"lEffectDate\"";
+		sql += "			  ,MAX(DECODE(R.\"Seq\",1,'',R.\"JsonFields\")) AS \"lJsonFields\"";
+		sql += "		FROM (";
+		sql += "			SELECT \"EffectDate\"";
+		sql += "				  ,\"JsonFields\"";
+		sql += "				  ,ROW_NUMBER()OVER(ORDER BY \"EffectDate\" DESC) as \"Seq\"";
+		sql += "			FROM \"CdComm\"";
+		sql += "			WHERE \"CdType\" = '01'";
+		sql += "			  AND \"CdItem\" = '01'";
+		sql += "			  AND \"EffectDate\" <= :entdy ";
+		sql += "		) R ";
+		sql += "		WHERE R.\"Seq\" <= 2";
+		sql += "	) S ON S.\"EffectDate\" > 0";
+		sql += "	LEFT JOIN (";
+		sql += "		SELECT \"EffectDate\"";
+		sql += "			  ,\"BaseRate\"";
+		sql += "		FROM \"CdBaseRate\"";
+		sql += "		WHERE \"EffectDate\" = (";
+		sql += "					SELECT MAX(\"EffectDate\") ";
+		sql += "					FROM \"CdBaseRate\"";
+		sql += "					WHERE \"EffectDate\" <= :entdy )";
+		sql += "		  AND \"BaseRateCode\" = '02' " ; //--郵局儲蓄利率
+		sql += "	) B ON B.\"EffectDate\" > 0";
+		sql += "	WHERE REGEXP_LIKE(P.\"ProdNo\",'I[A-I]')";
 		sql += "	ORDER BY P.\"ProdNo\" ASC";
 
 		this.info("sql1=" + sql);
@@ -67,6 +85,7 @@ public class L9739ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		Query query;
 		query = em.createNativeQuery(sql);
+		query.setParameter("entdy", reportDate);
 		return this.convertToMap(query);
 	}
 
@@ -122,7 +141,7 @@ public class L9739ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	ORDER BY L.\"CustNo\" ASC";
 		sql += "			,L.\"FacmNo\" ASC";
 		sql += "			,L.\"BormNo\" ASC";
-
+		//LoanBorMain Status= 0  join LoanRateChange  MAX(生效日期)<=今天(系統日)
 		this.info("sql2=" + sql);
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);

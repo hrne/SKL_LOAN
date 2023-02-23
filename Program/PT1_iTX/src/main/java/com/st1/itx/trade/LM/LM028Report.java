@@ -15,6 +15,7 @@ import com.st1.itx.db.domain.MonthlyLM028;
 import com.st1.itx.db.service.MonthlyLM028Service;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -51,7 +52,24 @@ public class LM028Report extends MakeReport {
 	private void exportExcel(TitaVo titaVo, List<MonthlyLM028> lMonthlyLM028) throws LogicException {
 		this.info("LM028Report exportExcel start ...");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM028", "預估現金流量", "LM028預估現金流量", "預估現金流量.xlsx", "DEL5");
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LM028";
+		String fileItem = "預估現金流量";
+		String fileName = "LM028-預估現金流量";
+		String defaultExcel = "LM028_底稿_預估現金流量.xlsx";
+		String defaultSheet = "DEL5";
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM028", "預估現金流量", "LM028預估現金流量", "預估現金流量.xlsx",
+//				"DEL5");
+		
 		if (lMonthlyLM028 == null || lMonthlyLM028.isEmpty()) {
 			makeExcel.setValue(2, 1, "本日無資料");
 		} else {

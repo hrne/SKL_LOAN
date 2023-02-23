@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9739ServiceImpl;
-import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
@@ -37,8 +36,6 @@ public class L9739Report extends MakeReport {
 	@Autowired
 	Parse parse;
 
-	@Autowired
-	MakeExcel makeExcel;
 
 	String txcd = "L9739";
 	String txname = "檢核政府優惠房貸利率脫勾";
@@ -80,7 +77,7 @@ public class L9739Report extends MakeReport {
 		List<Map<String, String>> listL9739Detail = null;
 		try {
 
-			listL9739Title = l9739ServiceImpl.findStandard(titaVo,"0");
+			listL9739Title = l9739ServiceImpl.findStandard(titaVo, reportDate);
 			listL9739Detail = l9739ServiceImpl.findAll(titaVo, iYearMonth);
 
 			exportData(listL9739Title, listL9739Detail);
@@ -113,11 +110,18 @@ public class L9739Report extends MakeReport {
 		this.setFont(1, 12);
 		this.print(1, 1, " ");
 		// 標題
-		for (Map<String, String> t : listL9739Title) {
-			String text = t.get("ProdNo") + "     " + fillUpWord(t.get("ProdName"), 22, " ", "R")
-					+ this.showRocDate(t.get("EffectDate"), 1) + "     " + fillUpWord(t.get("FitRate"), 6, "0", "R");
 
-			this.print(1, this.getMidXAxis(), text, "C");
+		if (listL9739Title.size() > 0) {
+			for (Map<String, String> t : listL9739Title) {
+				String text = t.get("ProdNo") + "     " + fillUpWord(t.get("ProdName"), 22, " ", "R")
+						+ this.showRocDate(t.get("EffectDate"), 1) + "     "
+						+ fillUpWord(t.get("FitRate"), 6, "0", "R");
+
+				this.print(1, this.getMidXAxis(), text, "C");
+			}
+		}else {
+			this.print(9, this.getMidXAxis(), " ", "C");
+			
 		}
 		this.print(1, 1, " ");
 		this.print(1, 3, "不符者，產出明細欄位如下");

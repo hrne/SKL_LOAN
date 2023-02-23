@@ -26,7 +26,8 @@ BEGIN
      -- 若此區間有不同利率則以分段計算
      -- 發生日時餘額 * (利率生效日、發生日)時利率 * 天數(繳息迄日~利率生效日~發生日 分段) / 360 / 100
      -- 2022-12-6:無轉催日,傳入之起日改為第一筆利率生效日
-
+     -- 2023-2-22:取消固定120天的計算公式
+		 
      DECLARE
           haveRateChange NUMBER;
      BEGIN
@@ -40,9 +41,9 @@ BEGIN
             AND LRC."EffectDate" < "InputDerogationDate"
           ;
 
-          IF haveRateChange = 0 THEN
-              RETURN ROUND("InputLoanBal" * "InputFitRate" * 120 / 360 / 100,0);
-          END IF;
+--          IF haveRateChange = 0 THEN
+--              RETURN ROUND("InputLoanBal" * "InputFitRate" * 120 / 360 / 100,0);
+--          END IF;
      END;
 
      WITH rawData AS (
