@@ -350,7 +350,8 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		oInterest = BigDecimal.ZERO;
 		oDelayInt = BigDecimal.ZERO;
 		oExtraAmt = BigDecimal.ZERO;
-		oRepaidPeriod = 0;
+		oRepaidPeriod = 0;		
+		oPaidTerms = 0;
 		oDueAmt = iDueAmt;
 		oCalcCount = 0;
 		// work
@@ -376,13 +377,18 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		wkLastTermNo = 0;
 		wkTermIndex = 0;
 		wkFitRate = BigDecimal.ZERO;
+		wkRateIncr = BigDecimal.ZERO;
+		wkIndividualIncr = BigDecimal.ZERO;
 		wkNextEffectDate = 0;
 		wkNextFitRate = BigDecimal.ZERO;
 		wkProcessCode = 0;
-		isRateChange = false;
 		wkInterestFlag = "1".equals(iIntCalcCode) ? 1 : 2; // 1:按日計息 2:按月計息
 		wkExtraRepay = iExtraRepay;
 		wkTotalExtraRepay = BigDecimal.ZERO;
+		wkDuraInt = BigDecimal.ZERO;
+		wkTermEndDate = 0;
+		wkCalcVoCount = 0;
+
 		// 結案記號 = Y 時，部分償還本金是否內含利息 Y:是
 		if ("Y".equals(iCaseCloseFlag)) {
 			iExtraRepayFlag = "Y";

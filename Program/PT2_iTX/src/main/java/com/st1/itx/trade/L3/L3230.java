@@ -404,19 +404,22 @@ public class L3230 extends TradeBuffer {
 
 		// 借：暫收款
 		for (BaTxVo ba : this.baTxList) {
-			if (ba.getDataKind() == 3 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
-				AcDetail acDetail = new AcDetail();
-				acDetail.setDbCr("D");
-				acDetail.setTxAmt(ba.getAcctAmt());
-				acDetail.setSumNo("06".equals(iTempItemCode) ? "092" : "090"); // 暫收轉帳 / 暫收抵繳
-				acDetail.setRvNo(ba.getRvNo());
-				acDetail.setAcctCode(ba.getAcctCode());
-				acDetail.setCurrencyCode(iCurrencyCode);
-				acDetail.setCustNo(iCustNo);
-				acDetail.setFacmNo(ba.getFacmNo());
-				lAcDetail.add(acDetail);
+			if (ba.getDataKind() == 3 || ba.getDataKind() == 9) {
+				if (ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
+					AcDetail acDetail = new AcDetail();
+					acDetail.setDbCr("D");
+					acDetail.setTxAmt(ba.getAcctAmt());
+					acDetail.setSumNo("06".equals(iTempItemCode) ? "092" : "090"); // 暫收轉帳 / 暫收抵繳
+					acDetail.setRvNo(ba.getRvNo());
+					acDetail.setAcctCode(ba.getAcctCode());
+					acDetail.setCurrencyCode(iCurrencyCode);
+					acDetail.setCustNo(iCustNo);
+					acDetail.setFacmNo(ba.getFacmNo());
+					lAcDetail.add(acDetail);
+				}
 			}
 		}
+
 	}
 
 	// 貸: 作業項目對應的應繳費用，業務科目、金額需相同

@@ -2635,6 +2635,8 @@ public class BaTxCom extends TradeBuffer {
 		if (rvList != null) {
 			for (AcReceivable rv : rvList) {
 				baTxVo = new BaTxVo();
+				baTxVo.setDataKind(9);
+				baTxVo.setRepayType(0);
 				baTxVo.setReceivableFlag(rv.getReceivableFlag()); // 1:會計銷帳科目(應收) 2:業務銷帳科目(應收) 3:未收費用 4:短繳期金 5.另收欠款
 				baTxVo.setCustNo(rv.getCustNo());
 				baTxVo.setFacmNo(rv.getFacmNo());
@@ -2776,7 +2778,7 @@ public class BaTxCom extends TradeBuffer {
 										}
 										if (insuYearMonth <= (iPayIntDate / 100)) {
 											baTxVo.setDataKind(1); // 1.應收費用+未收費用+短繳期金
-											if (insuYearMonth < (iPayIntDate / 100)) {
+											if (iRepayType == 5 || insuYearMonth < (iPayIntDate / 100)) {
 												baTxVo.setRepayPriority(2); // 2.應收費用
 											} else {
 												baTxVo.setRepayPriority(3); // 3.未收費用
@@ -2826,9 +2828,6 @@ public class BaTxCom extends TradeBuffer {
 									baTxVo.setCloseBreachAmt(rv.getRvBal());
 									this.shortCloseBreach = this.shortCloseBreach.add(rv.getRvBal());
 									break;
-								default:
-									baTxVo.setDataKind(9);
-									baTxVo.setRepayType(0);
 								}
 							}
 						}

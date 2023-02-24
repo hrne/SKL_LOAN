@@ -160,7 +160,7 @@ public class L4961ReportB extends MakeReport {
 				if (!result.get("F0").isEmpty() && Integer.parseInt(result.get("F0")) > 0) {
 					insuYearMonth = Integer.parseInt(result.get("F0")) - 191100;
 				}
-				print(1, 1, "｜　　　　｜　　　　｜　　　　　｜　　　　　　｜　　　　　　｜　　　　　　　　｜　　　　　　　　｜　　　　　　　　｜　　　　　　　　｜　　　　　　　　　　｜　　　　　｜");
+				print(1, 1, "｜　　　　｜　　　　｜　　　　　｜　　　　　　｜　　　　　　｜　　　　　　　　｜　　　　　　｜　　　　　　　　｜　　　　　　　　｜　　　　　　　　　　｜　　　　　｜");
 
 				print(0, 7, FormatUtil.pad9(String.valueOf(result.get("F3")), 7), "C"); // 戶號
 				print(0, 17, FormatUtil.pad9(String.valueOf(result.get("F4")), 3), "C"); // 額度

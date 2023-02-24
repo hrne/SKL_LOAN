@@ -2,6 +2,7 @@ package com.st1.itx.trade.L3;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -80,11 +81,10 @@ public class L3R05 extends TradeBuffer {
 							|| (iTempReasonCode == 3 && ba.getAcctCode().substring(0, 2).equals("T2"))
 							|| (iTempReasonCode == 4 && ba.getAcctCode().equals("TAM"))) {
 						wkTempAmt = wkTempAmt.add(ba.getUnPaidAmt());
-
 					}
 				}
 			}
-
+			oExcessiveAll = wkTempAmt;
 		}
 
 		if ("L3220".equals(iTxCode) && (iTempItemCode == 4 || iTempItemCode == 5 || iTempItemCode == 11)
@@ -97,6 +97,7 @@ public class L3R05 extends TradeBuffer {
 
 		this.totaVo.putParam("L3r05TempAmt", wkTempAmt);
 		this.totaVo.putParam("L3r05TmpFacmNoX", wkTmpFacmNoX);
+
 		this.totaVo.putParam("L3r05ExcessiveAll", oExcessiveAll);
 
 		this.addList(this.totaVo);

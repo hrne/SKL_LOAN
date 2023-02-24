@@ -73,7 +73,8 @@ public class L9739ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		WHERE \"EffectDate\" = (";
 		sql += "					SELECT MAX(\"EffectDate\") ";
 		sql += "					FROM \"CdBaseRate\"";
-		sql += "					WHERE \"EffectDate\" <= :entdy )";
+		sql += "					WHERE \"EffectDate\" <= :entdy ";
+		sql += "					  AND \"BaseRateCode\" = '02' )";
 		sql += "		  AND \"BaseRateCode\" = '02' " ; //--郵局儲蓄利率
 		sql += "	) B ON B.\"EffectDate\" > 0";
 		sql += "	WHERE REGEXP_LIKE(P.\"ProdNo\",'I[A-I]')";

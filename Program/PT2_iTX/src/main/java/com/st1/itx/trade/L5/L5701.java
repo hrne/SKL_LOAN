@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+
 /* 套件 */
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -153,6 +155,10 @@ public class L5701 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 		this.titaVo = titaVo;
 		this.info("L5701 Run");
+		
+		//EM2661 02230223  檢核 簽約金額、債權比率、期款
+		checkContractAmt();
+		
 		String FunctionCode = titaVo.getParam("FunctionCode").trim(); // 功能代碼
 
 		String CustId = titaVo.getParam("CustId").trim(); // 身份證號
@@ -501,9 +507,12 @@ public class L5701 extends TradeBuffer {
 	}
 
 	public void UpdInsertNegMain(NegMainId NegMainIdVO, NegMain InputNegMain, String FunctionCode) throws LogicException {
+	
+				
 		if (NegMainIdVO.getCaseSeq() == 0) {
 			throw new LogicException(titaVo, "", "發生未預期的錯誤");
 		}
+		
 		InputNegMain.setNegMainId(NegMainIdVO);
 		NegMain NegMainVO = sNegMainService.findById(NegMainIdVO, titaVo);
 
@@ -705,9 +714,94 @@ public class L5701 extends TradeBuffer {
 
 		}
 	}
+	
+	/**
+	 * 01.檢核 簽約金額、債權比率、期款	
+	 * A.簽約總金額 = 債務協商債權分攤檔(簽約金額) +  債務協商債權分攤檔歷程檔(簽約金額)
+	 * B.債權比率 = 100%
+	 * C.期款 = 債務協商債權分攤檔(期款)
+	 */
+	public void checkContractAmt() throws LogicException {	
+
+		String isMainFin = titaVo.getParam("IsMainFin").trim(); // 最大債權 Y N		
+		if ("N".equals(isMainFin)) { return; } // 最大債權為N，不用檢核
+		
+		Integer custNo = parse.stringToInteger(titaVo.getParam("CustNo").trim()); // 戶號-MainKey
+		Integer caseSeq =  parse.stringToInteger(titaVo.getParam("CaseSeq").trim()); // 案件序號-MainKey
+		
+		BigDecimal totalContrAmt = parse.stringToBigDecimal(titaVo.getParam("TotalContrAmt").trim()); // 簽約(新壽)總金額
+		BigDecimal dueAmt = parse.stringToBigDecimal(titaVo.getParam("DueAmt").trim()); // 期款 (月付金)		
+
+		List<BigDecimal> negFinShareContractAmt = new ArrayList<BigDecimal>(); // 簽約金額
+		List<BigDecimal> negFinShareAmtRatio = new ArrayList<BigDecimal>(); // 債權比例%
+		List<BigDecimal> negFinShareDueAmt = new ArrayList<BigDecimal>(); // 期款
+
+		for (int i = 0; i < NegFinShareL; i++) {
+			int Row = i + 1;
+			negFinShareContractAmt.add(parse.stringToBigDecimal(titaVo.getParam("NegFinShareContractAmt" + Row + "").trim())); // 簽約金額
+			negFinShareAmtRatio.add((parse.stringToBigDecimal(titaVo.getParam("NegFinShareAmtRatio" + Row + "").trim()))); // 債權比例%
+			negFinShareDueAmt.add((parse.stringToBigDecimal(titaVo.getParam("NegFinShareDueAmt" + Row + "").trim()))); // 期款
+		}
+		
+		//01.債務協商債權分攤檔 累計 (簽約金額、債權比率、期款)
+		BigDecimal sumContractAmt = negFinShareContractAmt.stream().reduce(BigDecimal.ZERO, (total, amt) -> total.add(amt));
+		BigDecimal sumAmtRatio = negFinShareAmtRatio.stream().reduce(BigDecimal.ZERO, (total, amt) -> total.add(amt));
+		BigDecimal sumDueAmt = negFinShareDueAmt.stream().reduce(BigDecimal.ZERO, (total, amt) -> total.add(amt));		
+		
+		//02.債務協商債權分攤檔歷程檔  累計 (簽約金額)
+		BigDecimal sumContractAmtLog = getContractAmtFromLog(custNo, caseSeq);		
+		
+		//03.債務協商分攤檔 + 債務協商分攤歷程檔  累計(簽約金額)
+		BigDecimal totalContractAmt =new BigDecimal(0); 
+		totalContractAmt =totalContractAmt.add(sumContractAmt);
+		totalContractAmt =totalContractAmt.add(sumContractAmtLog);
+		
+		this.info( "--------------------------------------");
+		this.info( "index："+ this.index +",limit:"+this.limit);			
+		this.info( "簽約金額合計錯誤，總金額："+totalContrAmt+"，合計金額："+totalContractAmt+"，債務協商分攤檔合計金額："+sumContractAmt+"，債務協商分攤歷程檔合計金額："+sumContractAmtLog);
+		this.info( "債權比率合計錯誤，合計債權比例："+sumContractAmt);
+		this.info( "期款金額合計錯誤，期款："+dueAmt+"，合計期款："+sumContractAmt);
+		this.info( "--------------------------------------");
+		
+		if (totalContrAmt.compareTo(totalContractAmt) != 0 ) {			
+			if(sumContractAmtLog.compareTo(new BigDecimal(0)) >0 ) {
+				throw new LogicException(titaVo, "E0015", "簽約金額合計錯誤，總金額："+totalContrAmt+"，合計金額："+totalContractAmt+"，債務協商分攤檔合計金額："+sumContractAmt+"，債務協商分攤歷程檔合計金額："+sumContractAmtLog);
+			}else {
+				throw new LogicException(titaVo, "E0015", "簽約金額合計錯誤，總金額："+totalContrAmt+"，合計金額："+totalContractAmt);
+			}
+		}
+		
+		if (new BigDecimal(100).compareTo(sumAmtRatio) != 0 ) {
+			throw new LogicException(titaVo, "E0015", "債權比率合計錯誤，合計債權比例："+sumAmtRatio);
+		}
+		
+		if (dueAmt.compareTo(sumDueAmt) != 0 ) {
+			throw new LogicException(titaVo, "E0015", "期款金額合計錯誤，期款："+dueAmt+"，合計期款："+sumContractAmt);
+		}
+		
+	}
+
+	private BigDecimal getContractAmtFromLog(Integer custNo, Integer caseSeq) {
+		
+		Slice<NegFinShareLog> sNegFinShareLog = sNegFinShareLogService.findFinCodeAll(custNo, caseSeq, this.index, this.limit, titaVo);
+		List<NegFinShareLog> lNegFinShareLog = sNegFinShareLog == null ? null : sNegFinShareLog.getContent();		
+		
+		BigDecimal sumContractAmtLog =new BigDecimal(0); //01.債務協商分攤歷程檔 累計(簽約金額)
+		if (lNegFinShareLog != null) {
+			sumContractAmtLog =lNegFinShareLog.stream().filter(s->s.getCancelDate() >0).map(s->s.getContractAmt()).reduce(BigDecimal.ZERO, (total, amt) -> total.add(amt));
+        	this.info( "NegFinShareLog 資料筆數："+lNegFinShareLog.size());
+        	this.info( "歷程檔，累計簽約金額："+sumContractAmtLog);
+		}
+		return sumContractAmtLog;
+	}
+
 
 	public void InsertShareLog(int mCustNo, int mCaseSeq, String tFunctionCode) throws LogicException {
 
+		//EM2661 20230223 判斷最大債權為N時，不寫入NegFinShareLog資訊
+		String isMainFin = titaVo.getParam("IsMainFin").trim(); // 最大債權 Y N
+		if ("N".equals(isMainFin)) { return; } // 最大債權為N，不用檢核
+				
 		for (int i = 0; i < NegFinShareL; i++) {
 
 			int Row = i + 1;
@@ -754,6 +848,10 @@ public class L5701 extends TradeBuffer {
 
 	public void UpdateShareLog(int mCustNo, int mCaseSeq, String tFunctionCode) throws LogicException {
 
+		//EM2661 20230223 判斷最大債權為N時，不寫入NegFinShareLog資訊
+		String isMainFin = titaVo.getParam("IsMainFin").trim(); // 最大債權 Y N
+		if ("N".equals(isMainFin)) { return; } // 最大債權為N，不用檢核
+		
 		ArrayList<String> InArraylist;
 		InArraylist = new ArrayList<String>();
 		// 輸入資料

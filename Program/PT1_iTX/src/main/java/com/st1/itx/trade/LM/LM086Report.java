@@ -63,18 +63,7 @@ public class LM086Report extends MakeReport {
 				"   戶    號    戶    名         客戶別    貸款餘額  利率 %  擔保品別     規定管制代碼    行業別                           ");
 		this.print(-8, 0,
 				"  ===================================================================================================================  ");
-		this.print(-9, 3, "005241-007");
-		this.print(-9, 14, "元利建設企業股份");
-		this.print(-9, 32, "一般");
-		this.print(-9, 50, "400,000,000", "R");
-		this.print(-9, 58, "0.0000", "R");
-		this.print(-9, 60, "土地-工業區");
-		this.print(-9, 78, "09");
-
-		String tmpName = "00000:不動產開發業不動產開發業不動";
-		String cdInName = tmpName.length() < 13 ? tmpName : tmpName.substring(0, 12) + "...";
-		this.print(-9, 90, cdInName, "L");
-
+		
 		// 明細起始列(自訂亦必須)
 		this.setBeginRow(9);
 
@@ -133,16 +122,21 @@ public class LM086Report extends MakeReport {
 
 				print(1, 0, "");
 				print(0, 3, result.get("CustNo"));
-				print(0, 16, result.get("CustName"));
-				print(0, 34, result.get("CustType"));
-				print(0, 58, formatAmt(bal, 0), "R");
-				print(0, 69, formatAmt(result.get("StoreRate"), 4), "R");
-				print(0, 75, result.get("ClItem"));
-				print(0, 75, result.get("RuleCode"));
+				print(0, 14, result.get("CustName"));
+				print(0, 32, result.get("CustType"));
+				print(0, 50, formatAmt(bal, 0), "R");
+				print(0, 58, formatAmt(result.get("StoreRate"), 4), "R");
+				print(0, 60, result.get("ClItem"));
+				print(0, 78, result.get("RuleCode"));
+				
+				//行業別擷取長度
+				String tmpName = result.get("IndustryCode") + ":" + result.get("IndustryItem");
+				String cdInName = tmpName.length() < 13 ? tmpName : tmpName.substring(0, 12) + "...";
+				
 				if (result.get("IndustryCode").equals("06000")) {
-					print(0, 91, "");
+					print(0, 90, "","L");
 				} else {
-					print(0, 91, result.get("IndustryCode") + ":" + result.get("IndustryItem"));
+					print(0, 90, cdInName,"L");
 				}
 
 				countByAcct++;

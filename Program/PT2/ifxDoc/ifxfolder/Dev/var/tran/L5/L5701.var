@@ -512,15 +512,16 @@ IF({i}==1,INVOKEJS(SHOW,grd1,{i},{i},1),C(4,#NegFinShareFinCode{i},INVOKEJS(SHOW
 #IsMainFinIsN=@,1,S
 INVOKEJS(SHOW,grd1,0)
 
-##loop {times:30,i:1}
-T(2,@NegFinShareFinCode{i},)
-T(2,@FinCodeName{i},)
-E(0,@NegFinShareContractAmt{i},0)
-E(0,@NegFinShareAmtRatio{i},0)
-E(0,@NegFinShareDueAmt{i},0)
-E(0,@NegFinShareCancelDate{i},0)
-E(0,@NegFinShareCancelAmt{i},0)
-##end
+!EM2661 調整為不清空grd1  
+!##loop {times:30,i:1}
+!T(2,@NegFinShareFinCode{i},)
+!T(2,@FinCodeName{i},)
+!E(0,@NegFinShareContractAmt{i},0)
+!E(0,@NegFinShareAmtRatio{i},0)
+!E(0,@NegFinShareDueAmt{i},0)
+!E(0,@NegFinShareCancelDate{i},0)
+!E(0,@NegFinShareCancelAmt{i},0)
+!##end
 
 ! 案件種類
 #CaseKindCode=X,1,I
@@ -882,7 +883,7 @@ IF({i}!=1,$,s)
 IF(#NegFinShareFinCode{j}=="",T(3,0),T(3,1))
 
 #NegFinShareFinCode{i}=X,8,I
-IF(#CaseKindCode=="1",s,$)
+!IF(#CaseKindCode=="1",s,$) !EM2661 調整案件種類=1:債協，顯示Grid債權機構等相關名稱
 IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
 IF(#IsMainFin=="Y",$,S)
 IF(#Test{i}=="0",S,$)
@@ -934,8 +935,8 @@ R(1,L5R12)
 T(2,@FinCodeName{i},#L5r12BankItem)
 
 #NegFinShareContractAmt{i}=m,14,I
-C(4,#NegFinShareFinCode{i},S,$)
-IF(#CaseKindCode=="1",s,$)
+C(4,#NegFinShareFinCode{i},S,$) 
+!IF(#CaseKindCode=="1",s,$) !EM2661 調整案件種類=1:債協 可修改簽約金額
 IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
 IF(#IsMainFin=="Y",$,S)
 IF(#Test{i}=="0",S,$)
@@ -944,7 +945,7 @@ IF(#NegFinShareFinCode{i}=="",S,$)
 
 #CountShareRatio{i}=X,1,S
 C(4,#NegFinShareFinCode{i},S,$)
-IF(#CaseKindCode=="1",s,$)
+!IF(#CaseKindCode=="1",s,$) !EM2661 調整案件種類=1:債協 可修改
 IF(#IsMainFin=="Y",$,S)
 IF(#FunctionCode=="01" || #FunctionCode=="09" || #FunctionCode=="11",E(0,@NegFinShareAmtRatio{i},#NegFinShareContractAmt{i}/#TotalContrAmt*100),$)
 IF(#FunctionCode=="02",C(3,#NegFinShareContractAmt{i},#L5r01NegFinShareContractAmt{i},C(3,#TotalContrAmt,#L5r01TotalContrAmt,E(0,@NegFinShareAmtRatio{i},#L5r01NegFinShareAmtRatio{i}),E(0,@NegFinShareAmtRatio{i},#NegFinShareContractAmt{i}/#RimContractAmtX*100)),E(0,@NegFinShareAmtRatio{i},#NegFinShareContractAmt{i}/#RimContractAmtX*100)),$)
@@ -953,14 +954,14 @@ IF(#FunctionCode=="02",C(3,#NegFinShareContractAmt{i},#L5r01NegFinShareContractA
 
 #NegFinShareAmtRatio{i}=m,3.2,I
 C(4,#NegFinShareFinCode{i},S,$)
-IF(#CaseKindCode=="1",s,$)
+!IF(#CaseKindCode=="1",s,$) !EM2661 調整案件種類=1:債協 可修改債權比率
 IF(#IsMainFin=="Y",$,S)
 IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="06"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
 @V(2,0)
 
 #CountShareDueAmt{i}=X,1,S
 C(4,#NegFinShareFinCode{i},S,$)
-IF(#CaseKindCode=="1",s,$)
+!IF(#CaseKindCode=="1",s,$) !EM2661 調整案件種類=1:債協 可修改
 IF(#IsMainFin=="Y",$,S)
 IF(#FunctionCode=="01" || #FunctionCode=="02" || #FunctionCode=="09" || #FunctionCode=="11"|| #FunctionCode=="06",E(0,@NegFinShareDueAmt{i},#NegFinShareAmtRatio{i}*#DueAmt/100),$)
 IF(#FunctionCode=="02",C(3,#NegFinShareAmtRatio{i},#L5r01NegFinShareAmtRatio{i},E(0,@NegFinShareDueAmt{i},#L5r01NegFinShareDueAmt{i}),E(0,@NegFinShareDueAmt{i},#NegFinShareAmtRatio{i}*#DueAmt/100)),$)
@@ -969,7 +970,7 @@ IF(#FunctionCode=="02",C(3,#NegFinShareAmtRatio{i},#L5r01NegFinShareAmtRatio{i},
 
 
 #NegFinShareDueAmt{i}=m,14,I
-IF(#CaseKindCode=="1",s,$)
+!IF(#CaseKindCode=="1",s,$) !EM2661 調整案件種類=1:債協 可修改期款
 IF(#IsMainFin=="Y",$,S)
 C(4,#NegFinShareFinCode{i},S,$)
 IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="06"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
@@ -980,7 +981,7 @@ CALL2(#ADJUSTDOT,0,#L5r01NegFinShareContractAmt{i},#NegFinShareContractAmtX{i})
 #VPmsg{i}=X,100,S
 T(2,註銷不可修改簽約金額，原簽約金額+#NegFinShareContractAmtX{i})
 #NegFinShareCancelDate{i}=D,7,I
-IF(#CaseKindCode=="1",s,$)
+!IF(#CaseKindCode=="1",s,$)  !EM2661 調整案件種類=1:債協 可修改
 IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="06"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
 IF(#IsMainFin=="Y",$,S)
 IF(#Test{i}=="0",S,$)
@@ -1000,7 +1001,7 @@ IF(#FunctionCode=="02"
 
 
 #NegFinShareCancelAmt{i}=m,14,O
-IF(#CaseKindCode=="1",s,$)
+!IF(#CaseKindCode=="1",s,$) !EM2661 調整案件種類=1:債協 可修改
 IF(#NegFinShareCancelDate{i}>0,$,S)
 IF(#FunctionCode=="01"||#FunctionCode=="09"||#FunctionCode=="11",E(0,#NegFinShareContractAmt{i}),$)
 IF(#FunctionCode=="02"||#FunctionCode=="06",C(3,#RimContractAmtX,0,E(0,#NegFinShareContractAmt{i}),E(0,#NegFinShareAmtRatio{i}*#PrincipalBal/100)),$)
@@ -1045,7 +1046,7 @@ IF(#FunctionCode=="02",IF(#L5r01TotalContrAmt!=#TotalContrAmt,E(0,#TotalContrAmt
 !簽約金額計算(不包含註銷金額)
 #Amt1{i}=X,1,S
 IF(#IsMainFin=="Y",$,S)
-IF(#CaseKindCode=="1",s,$)
+!IF(#CaseKindCode=="1",s,$) !EM2661 調整案件種類=1:債協 可修改
 C(3,#NegFinShareCancelDate{i},0,$,s)
 E(0,@CountContractAmtX,#CountContractAmtX+#NegFinShareContractAmt{i})
 
@@ -1109,13 +1110,13 @@ T(2,簽約金額合計錯誤，原債權機構簽約金額合計為+#OLDTOTAL1)
 
 #CContracAmt1=X,1,S
 IF(#IsMainFin=="Y",$,S)
-IF(#CaseKindCode=="1",s,$)
+!IF(#CaseKindCode=="1",s,$) !EM2661 調整案件種類=1:債協 可修改
 IF(#FunctionCode=="01"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
 C(3,#CountCancelAmtX,0,IF(#CountContractAmtX!=#ContractAmtX,V(P,簽約金額合計錯誤),$),IF(#CountContractAmtX!=#ContractAmtX-#CountCancelAmtX,V(P,簽約金額合計錯誤),$))
 
 #CContracAmt2=X,1,S
 IF(#IsMainFin=="Y",$,S)
-IF(#CaseKindCode=="1",s,$)
+!IF(#CaseKindCode=="1",s,$) !EM2661 調整案件種類=1:債協 可修改
 IF(#FunctionCode=="02",$,s)
 IF(#L5r01TotalContrAmt!=#TotalContrAmt,$,s)
 C(3,#CountCancelAmtX,0,IF(#CountContractAmtX!=#ContractAmtX,V(P,#ERRMSG1),$),IF(#CountContractAmtX!=#ContractAmtX-#CountCancelAmtX,V(P,#ERRMSG1),$))
@@ -1123,7 +1124,7 @@ C(3,#CountCancelAmtX,0,IF(#CountContractAmtX!=#ContractAmtX,V(P,#ERRMSG1),$),IF(
 
 #CContracAmt3=X,1,S
 IF(#IsMainFin=="Y",$,S)
-IF(#CaseKindCode=="1",s,$)
+!IF(#CaseKindCode=="1",s,$) !EM2661 調整案件種類=1:債協 可修改
 IF(#FunctionCode=="02",$,s)
 ##loop {times:30,i:1}
 C(3,#NegFinShareContractAmt{i},#L5r01NegFinShareContractAmt{i},$,C(3,#CountCancelAmtX,0,IF(#CountContractAmtX!=#ContractAmtX,V(P,#ERRMSG1),$),IF(#CountContractAmtX!=#ContractAmtX-#CountCancelAmtX,V(P,#ERRMSG1),$)))
@@ -1132,7 +1133,7 @@ C(3,#NegFinShareContractAmt{i},#L5r01NegFinShareContractAmt{i},$,C(3,#CountCance
 
 #CAmtRatio=X,1,S
 IF(#IsMainFin=="Y",$,S)
-IF(#CaseKindCode=="1",s,$)
+!IF(#CaseKindCode=="1",s,$)  !EM2661 調整案件種類=1:債協 可修改
 IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="06"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
 IF(#CountAmtRatioX!=100,V(P,債權比例總和錯誤),$)
 
@@ -1140,7 +1141,7 @@ IF(#CountAmtRatioX!=100,V(P,債權比例總和錯誤),$)
 
 #CAmtDueAmt=X,1,S
 IF(#IsMainFin=="Y",$,S)
-IF(#CaseKindCode=="1",s,$)
+!IF(#CaseKindCode=="1",s,$)  !EM2661 調整案件種類=1:債協 可修改
 IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="06"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
 IF(#CountDueAmtX!=#DueAmt,V(P,期款總和錯誤),$)
 
