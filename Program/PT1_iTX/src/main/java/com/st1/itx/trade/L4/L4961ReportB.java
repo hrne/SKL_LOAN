@@ -92,8 +92,8 @@ public class L4961ReportB extends MakeReport {
 		this.print(-6, 2, "到期日期:" + this.InsuYearMonth + "-" + this.InsuYearMonthEnd);
 
 		// 印明細表頭
-		this.print(-7, 1, "┌————┬————┬—————┬——————┬——————┬————————┬——————┬————————┬————————┬——————————┬—————┐");
-		this.print(-8, 1, "｜　戶號　｜　額度　｜　被保人　｜　續單年月　｜　 總保費 　｜　　火險保額　　｜　火險保費　｜　 地震險保額 　｜　 地震險保費 　｜　 保單號碼 　　　　｜　 戶況 　｜");
+		this.print(-7, 1, "┌————┬————┬———————┬————┬——————┬————————┬——————┬————————┬————————┬——————————┬—————┐");
+		this.print(-8, 1, "｜　戶號　｜　額度　｜　被保人　　　｜續單年月｜　 總保費 　｜　　火險保額　　｜　火險保費　｜　 地震險保額 　｜　 地震險保費 　｜　 保單號碼 　　　　｜　 戶況 　｜");
 
 		// 明細起始列(自訂亦必須)
 		this.setBeginRow(9);
@@ -145,11 +145,11 @@ public class L4961ReportB extends MakeReport {
 			for (Map<String, String> result : resultList) {
 
 				if (this.NowRow == 44) {
-					print(1, 1, "└————┴————┴—————┴——————┴——————┴————————┴——————┴————————┴————————┴——————————┴—————┘");
+					print(1, 1, "└————┴————┴———————┴————┴——————┴————————┴——————┴————————┴————————┴——————————┴—————┘");
 				}
 
 //				print(1, 1, "｜　　　　　　　　　　　　　｜　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　｜　　　　　　　　｜　　　　　　　　　　　　　｜");
-				print(1, 1, "├————┼————┼—————┼——————┼——————┼————————┼——————┼————————┼————————┼——————————┼—————┤");
+				print(1, 1, "├————┼————┼———————┼————┼——————┼————————┼——————┼————————┼————————┼——————————┼—————┤");
 
 				BigDecimal totInsuPrem = getBigDecimal(result.get("F6"));
 				BigDecimal fireInsuPrem = getBigDecimal(result.get("F11"));
@@ -160,18 +160,18 @@ public class L4961ReportB extends MakeReport {
 				if (!result.get("F0").isEmpty() && Integer.parseInt(result.get("F0")) > 0) {
 					insuYearMonth = Integer.parseInt(result.get("F0")) - 191100;
 				}
-				print(1, 1, "｜　　　　｜　　　　｜　　　　　｜　　　　　　｜　　　　　　｜　　　　　　　　｜　　　　　　｜　　　　　　　　｜　　　　　　　　｜　　　　　　　　　　｜　　　　　｜");
+				print(1, 1, "｜　　　　｜　　　　｜　　　　　　　｜　　　　｜　　　　　　｜　　　　　　　　｜　　　　　　｜　　　　　　　　｜　　　　　　　　｜　　　　　　　　　　｜　　　　　｜");
 
 				print(0, 7, FormatUtil.pad9(String.valueOf(result.get("F3")), 7), "C"); // 戶號
 				print(0, 17, FormatUtil.pad9(String.valueOf(result.get("F4")), 3), "C"); // 額度
-				print(0, 25, result.get("F5"), "L"); // 戶名
-				print(0, 43, "" + insuYearMonth, "C"); // 到期年月
+				print(0, 22, result.get("F5"), "L"); // 戶名
+				print(0, 44, "" + insuYearMonth, "C"); // 到期年月
 				print(0, 60, formatAmt(result.get("F6"), 0), "R");// 總保費
 				print(0, 78, formatAmt(result.get("F10"), 0), "R");// 火險保額
 				print(0, 92, formatAmt(result.get("F11"), 0), "R");// 火險保費
 				print(0, 110, formatAmt(result.get("F12"), 0), "R");// 地震險保額
 				print(0, 126, formatAmt(result.get("F13"), 0), "R");// 地震險保費
-				print(0, 150, formatAmt(result.get("F2"), 0), "R");// 保單號碼
+				print(0, 150, result.get("F2"), "R");// 保單號碼
 
 				// 戶況
 				String colStatus = "99";
@@ -190,7 +190,7 @@ public class L4961ReportB extends MakeReport {
 					colStatusX = tCdCode.getItem();
 				}
 
-				print(0, 160, formatAmt(colStatusX, 0), "R");// 戶況
+				print(0, 160, colStatusX, "R");// 戶況
 
 				// 加總
 				totInsuPremTotal = totInsuPremTotal.add(totInsuPrem);
@@ -199,20 +199,25 @@ public class L4961ReportB extends MakeReport {
 
 			}
 			// 印總計
-			print(1, 1, "├————┴————┼—————┴——————┴——————┼————————┴——————┼————————┴————————┼——————————┼—————┤");
-			print(1, 1, "｜　合　　　　　計　｜　　　　　　　　　　　　｜　　　　　　｜　　　　　　　　｜　　　　　　｜　　　　　　　　｜　　　　　　　　｜　　　　　　　　　　　　　　　｜");
+			print(1, 1, "├————┴————┼———————┴————┴——————┼————————┴——————┼————————┴————————┼——————————┼—————┤");
+			print(1, 1, "｜　合　　　　　計　｜　　　　　　　　　　　　｜　　　　　　｜　　　　　　　　｜　　　　　　｜　　　　　　　　｜　　　　　　　　｜　　　　　　　　　　｜　　　　　｜");
 			print(0, 69, formatAmt(totInsuPremTotal, 0), "R");// F6
 			print(0, 105, formatAmt(fireInsuPremTotal, 0), "R");// F11
 			print(0, 139, formatAmt(ethqInsuPremTotal, 0), "R");// F13
 			print(1, 1, "└—————————┴————————————┴——————┴————————┴——————┴————————┴————————┴——————————┴—————┘");
+			if(resultList.size()+1%18==0) {
+				print(1, this.getMidXAxis(), "經理：　　　　　　　　　　　　　　　經辦：", "C");
+			}else
 			print(2, this.getMidXAxis(), "經理：　　　　　　　　　　　　　　　經辦：", "C");
 
 			webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y",
 					"LC009", titaVo.getTlrNo() + "L4961", reportCode + "-報表已完成", titaVo);
 		} else {	
+			print(1, 1, "├————┴————┴———————┴————┴——————┴————————┴——————┴————————┴————————┴——————————┴—————┤");
 			print(1, 1, "｜　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　｜");
 			print(0, 1, "　　本　日　無　資　料　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
 			print(1, 1, "└————————————————————————————————————————————————————————————————————————————————┘");
+			
 
 		}
 

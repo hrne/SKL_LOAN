@@ -90,6 +90,7 @@ public class L597A extends TradeBuffer {
 		// this.limit=Integer.MAX_VALUE;//查全部
 		this.limit = 50;// 查全部
 
+		
 		String sql = "";
 		List<String[]> Data = null;
 		try {

@@ -258,7 +258,8 @@ public class L4611 extends TradeBuffer {
 			totPrem = parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem"))
 					.add(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
 			tInsuRenew.setTotInsuPrem(totPrem);
-			
+			this.info("InsuReceiptDate     = "+ parse.stringToInteger(titaVo.getParam("InsuReceiptDateX")));
+			tInsuRenew.setInsuReceiptDate(parse.stringToInteger(titaVo.getParam("InsuReceiptDateX")));
 			
 			if (tInsuRenew.getRenewCode() == 2) {
 				if (insuYearMonth <= noticeYearMonth) {

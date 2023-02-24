@@ -64,7 +64,7 @@ public class L9707Report extends MakeReport {
 		String txcd = "L9707";
 		String fileItem = "新增逾放案件明細";
 		String fileName = "L9707-新增逾放案件明細";
-		String defaultExcel = "新增逾放案件明細.xlsx";
+		String defaultExcel = "L9707_底稿_新增逾放案件明細.xlsx";
 		String defaultSheet = "D9701212";
 
 		this.info("reportVo open");

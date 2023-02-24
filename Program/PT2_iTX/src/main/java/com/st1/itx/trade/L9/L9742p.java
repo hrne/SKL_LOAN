@@ -45,7 +45,14 @@ public class L9742p extends TradeBuffer {
 
 		l9742Report.setParentTranCode(parentTranCode);
 
-		boolean isFinish = l9742Report.exec(titaVo);
+		boolean isFinish = true;
+		int option =Integer.valueOf(titaVo.getParam("inputOption"));
+		if(option==0) {
+			 isFinish = l9742Report.exec(titaVo,1);
+			 isFinish = isFinish && l9742Report.exec(titaVo,2);
+		}else {
+			isFinish = l9742Report.exec(titaVo,option);
+		}
 
 		if (isFinish) {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), tranCode + tranName + "已完成", titaVo);

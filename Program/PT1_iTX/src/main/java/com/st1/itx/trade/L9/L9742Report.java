@@ -39,25 +39,25 @@ public class L9742Report extends MakeReport {
 
 	}
 
-	public Boolean exec(TitaVo titaVo) throws LogicException {
+	public Boolean exec(TitaVo titaVo,int option) throws LogicException {
 		// 讀取VAR參數
 		this.setFontSize(16);
 		this.setCharSpaces(0);
 		List<Map<String, String>> listL9742 = null;
 		try {
-			listL9742 = l9742ServiceImpl.findAll(titaVo);
+			listL9742 = l9742ServiceImpl.findAll(titaVo,option);
 		} catch (Exception e) {
 			this.info("l9742ServiceImpl.findAll error = " + e.toString());
 			return false;
 		}
-		makeReport(titaVo, listL9742);
+		makeReport(titaVo, listL9742,option);
 
 		return true;
 	}
 
-	public void makeReport(TitaVo titaVo, List<Map<String, String>> listL9742) throws LogicException {
+	public void makeReport(TitaVo titaVo, List<Map<String, String>> listL9742,int option) throws LogicException {
 
-		String formName = "1".equals(titaVo.getParam("inputOption")) ? "還本收據" : "繳息收據";
+		String formName = option==1 ? "支出收入傳票" : "還本繳息收據";
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
 				.setRptCode("L9742").setRptItem("企金戶還本收據及繳息收據(" + formName + ")").setSecurity("").setRptSize("A4")
@@ -88,16 +88,16 @@ public class L9742Report extends MakeReport {
 
 				this.print(1, 33, "新光人壽保險股份有限公司");
 				this.print(1, 2, "傳票號碼　.....　");
-				this.print(0, 19, rowL9742.get("F0"), "L");
+				this.print(0, 26, padStart(rowL9742.get("F0").toString(), 6, "0"), "R");
 
-				if (titaVo.getParam("inputOption").equals("1")) {
+				if (option==1) {
 					this.print(0, 41, "還本收據");
 				} else {
 					this.print(0, 41, "繳息收據");
 				}
 
 				this.print(1, 2, "交易序號　.....　");
-				this.print(0, 26, padStart(rowL9742.get("F1").toString(), 7, "0"), "R");
+				this.print(0, 26, padStart(rowL9742.get("F1").toString(), 8, "0"), "R");
 
 				this.print(0, 56, "科目：　");
 				this.print(0, 64, rowL9742.get("F2"));
@@ -131,9 +131,13 @@ public class L9742Report extends MakeReport {
 				
 			
 				if(repayCode==4) {
-					this.print(1, 3, "現金　　電匯　　票據 Ｖ 調整");
+					this.print(1, 3, "銀扣　　電匯　　票據 Ｖ 其他");
+				}else if(repayCode==2) {
+					this.print(1, 3, "銀扣 Ｖ 電匯　　票據　　其他");
+				}else if(repayCode==1) {
+					this.print(1, 3, "銀扣 　 電匯  Ｖ 票據　　其他");
 				}else {
-					this.print(1, 3, "現金 Ｖ 電匯　　票據　　調整");
+					this.print(1, 3, "銀扣 　 電匯   　票據　　其他 Ｖ");
 				}
 
 				if (acChineseNameWrap.size() >= 2) {
@@ -183,7 +187,7 @@ public class L9742Report extends MakeReport {
 				// 先輸出到最大三十字，如果將來有更長的戶名需要輸出，
 				// 這裡可以考慮改成for迴圈
 
-				this.print(1, 1, "│　　　　　　　　　　│　計算時間：　　　　　　　　　　　　│　　　　　　　　　│");
+				this.print(1, 1, "│　　　　　　　　　　│　計算期間：　　　　　　　　　　　　│　　　　　　　　　│");
 				this.print(0, 34,
 						showDate(rowL9742.get("F11").toString(), 1) + " - " + showDate(rowL9742.get("F12").toString(), 1));
 				this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
@@ -222,7 +226,7 @@ public class L9742Report extends MakeReport {
 			this.print(1, 1, "│　　　　　　　　　　│　戶名：　　　　　　　　　　　　　　│　　　　　　　　　│");
 			this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
 			this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
-			this.print(1, 1, "│　　　　　　　　　　│　計算時間：　　　　　　　　　　　　│　　　　　　　　　│");
+			this.print(1, 1, "│　　　　　　　　　　│　計算期間：　　　　　　　　　　　　│　　　　　　　　　│");
 			this.print(0, 43, "-");
 			this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
 			this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");

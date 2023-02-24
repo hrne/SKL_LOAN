@@ -122,7 +122,7 @@ public class LM086Report extends MakeReport {
 
 				print(1, 0, "");
 				print(0, 3, result.get("CustNo"));
-				print(0, 14, result.get("CustName"));
+				print(0, 15, result.get("CustName"));
 				print(0, 32, result.get("CustType"));
 				print(0, 50, formatAmt(bal, 0), "R");
 				print(0, 58, formatAmt(result.get("StoreRate"), 4), "R");
@@ -133,7 +133,7 @@ public class LM086Report extends MakeReport {
 				String tmpName = result.get("IndustryCode") + ":" + result.get("IndustryItem");
 				String cdInName = tmpName.length() < 13 ? tmpName : tmpName.substring(0, 12) + "...";
 				
-				if (result.get("IndustryCode").equals("06000")) {
+				if (result.get("IndustryCode").equals("060000")) {
 					print(0, 90, "","L");
 				} else {
 					print(0, 90, cdInName,"L");

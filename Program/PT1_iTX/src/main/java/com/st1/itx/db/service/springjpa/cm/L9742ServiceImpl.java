@@ -30,7 +30,7 @@ public class L9742ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo,int option) throws Exception {
 		this.info("L9742.findAll ");
 
 		String sql = "";
@@ -90,7 +90,7 @@ public class L9742ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("inputSlipNoEnd", titaVo.getParam("inputSlipNoEnd"));
 		query.setParameter("inputTitaTxtNoStart", titaVo.getParam("inputTitaTxtNoStart"));
 		query.setParameter("inputTitaTxtNoEnd", titaVo.getParam("inputTitaTxtNoEnd"));
-		query.setParameter("inputOption", titaVo.getParam("inputOption"));
+		query.setParameter("inputOption", option);
 
 		return this.convertToMap(query);
 	}

@@ -43,6 +43,7 @@ public class L4R18 extends TradeBuffer {
 		int iClNo = parse.stringToInteger(titaVo.getParam("RimClNo"));
 		String iPrevInsuNo = titaVo.getParam("RimPrevInsuNo");
 		String iEndoInsuNo = titaVo.getParam("RimEndoInsuNo");
+		
 
 		if ("".equals(iEndoInsuNo)) {
 			iEndoInsuNo = " ";
@@ -96,7 +97,12 @@ public class L4R18 extends TradeBuffer {
 			this.totaVo.putParam("L4r18InsuTypeCode", tInsuRenew.getInsuTypeCode());
 			this.totaVo.putParam("L4r18CommericalFlag", tInsuRenew.getCommericalFlag());
 			this.totaVo.putParam("L4r18Remark", tInsuRenew.getRemark());
-			this.totaVo.putParam("L4r18InsuReceiptDate", tInsuRenew.getInsuReceiptDate());
+			String iInsuReceiptDate = parse.IntegerToString(tInsuRenew.getInsuReceiptDate(),7);
+			if(("0000000").equals(iInsuReceiptDate)) {
+				iInsuReceiptDate = " ";
+			}
+			this.totaVo.putParam("L4r18InsuReceiptDate", iInsuReceiptDate);
+
 		} else {
 //			傳回前端，由前端判斷
 			this.totaVo.putParam("L4r18CustNo", 0);
@@ -122,7 +128,8 @@ public class L4R18 extends TradeBuffer {
 			this.totaVo.putParam("L4r18InsuTypeCode", 0);
 			this.totaVo.putParam("L4r18CommericalFlag", "");
 			this.totaVo.putParam("L4r18Remark", "");
-			this.totaVo.putParam("L4r18InsuReceiptDate", 0);
+			this.totaVo.putParam("L4r18InsuReceiptDate", "");
+			this.totaVo.putParam("L4r18InsuReceiptDateX","");
 		}
 
 		this.addList(this.totaVo);

@@ -128,7 +128,6 @@ T(1,@ClCode2,#NTXBUF,3,2)
 T(1,@ClNo,#NTXBUF,5,7)
 T(1,@PrevInsuNo,#NTXBUF,12,16)
 T(1,@EndoInsuNo,#NTXBUF,28,16)
-T(1,@InsuReceiptDate,#NTXBUF,44,16)
 
 #INIT=X,1,S
 C(3,#FunctionCode,1,INVOKEJS(SHOW,p1,16,18,0),INVOKEJS(SHOW,p1,16,18,1))
@@ -136,19 +135,8 @@ C(3,#FunctionCode,1,INVOKEJS(SHOW,p1,16,18,0),INVOKEJS(SHOW,p1,16,18,1))
 #Function1=X,1,S
 IF(#FunctionCode==1,$,S)
 T(F,@NowInsuNo,0)
-T(F,@StatusCode,0)
-!T(F,@InsuReceiptDateX,0)
-!HIDE(#InsuReceiptDateX)
 HIDE(#NewCustNo)
 HIDE(#NewFacmNo)
-
-#Function6=X,1,S
-IF(#FunctionCode==6,$,S)
-T(F,@StatusCode,0)
-HIDE(#NewCustNo)
-HIDE(#NewFacmNo)
-SHOW(#HIDECustNo)
-SHOW(#HIDEFacmNo)
 
 #Function2=X,1,S
 IF(#FunctionCode==2 || #FunctionCode==6,$,S)
@@ -170,8 +158,14 @@ T(F,@InsuReceiptDate,0)
 HIDE(#HIDECustNo)
 HIDE(#HIDEFacmNo)
 
-C(5,#FunctionCode,2,T(F,@InsuReceiptDateX,0)HIDE(#InsuReceiptDateX),S)
-!INVOKEJS(SHOW,p1,16,18,0)
+IF(#FunctionCode==6,$,S)
+T(F,@RenewCode,0)
+E(0,@RenewCode,1)
+HIDE(#NewCustNo)
+HIDE(#NewFacmNo)
+SHOW(#HIDECustNo)
+SHOW(#HIDEFacmNo)
+INVOKEJS(SHOW,p1,16,18,0)
 
 #Function4=X,1,S
 IF(#FunctionCode==4 || #FunctionCode==5,$,S)
@@ -216,7 +210,6 @@ HIDE(#NewFacmNo)
 #RimClNo=A,7,S
 #RimPrevInsuNo=x,16,S
 #RimEndoInsuNo=x,16,S
-#RimInsuReceiptDate=x,16,S
 
 ! 塞值調rim，無值提error
 #RimL4r18=X,1,S
@@ -226,10 +219,7 @@ T(1,@RimClCode2,#NTXBUF,3,2)
 T(1,@RimClNo,#NTXBUF,5,7)
 T(1,@RimPrevInsuNo,#NTXBUF,12,16)
 T(1,@RimEndoInsuNo,#NTXBUF,28,16)
-!T(1,@RimInsuReceiptDate,#NTXBUF,44,16)
-
 RESET_RIM(#RimL4r18,L4R18)
-!S(L4R18,1,#RimClCode1,#RimClCode2,#RimClNo,#RimPrevInsuNo,#RimEndoInsuNo,#RimInsuReceiptDate)
 S(L4R18,1,#RimClCode1,#RimClCode2,#RimClNo,#RimPrevInsuNo,#RimEndoInsuNo)
 R(1,L4R18)
 
@@ -258,7 +248,7 @@ E(0,@RenewCode,#L4r18RenewCode)
 T(2,@InsuCompany,#L4r18InsuCompany)
 T(2,@InsuTypeCode,#L4r18InsuTypeCode)
 T(2,@CommericalFlag,#L4r18CommericalFlag)
-E(0,@InsuReceiptDate,#L4r18InsuReceiptDate)
+C(3,#L4r18InsuReceiptDate,0,$,T(2,@InsuReceiptDate,#L4r18InsuReceiptDate))
 T(2,@Remark,#L4r18Remark)
 
 #SelfInsuCodeHelp2=x,30,S
@@ -276,6 +266,7 @@ HELP(1:新增;2:修改;4:刪除;5:查詢;6:自保)
 @V(1,1,2,4,5,6)
 C(3,#FunctionCode,6,s,$)
  E(0,@FUNCIND,#FunctionCode)
+
 
 #FunctionCodeX=X,4,L
 C(2,#FunctionCode,T(3,),
@@ -313,10 +304,6 @@ E(0,@NewEthqInsuCovrg,#EthqInsuCovrg)
 E(0,@NewEthqInsuPrem,#EthqInsuPrem)
 C(3,#FunctionCode,6,C(4,#L4r18NowInsuNo,E(0,@NewInsuStartDate,#InsuStartDate),E(0,@NewInsuStartDate,#InsuEndDate)),E(0,@NewInsuStartDate,#InsuStartDate))
 C(3,#FunctionCode,6,C(4,#L4r18NowInsuNo,E(0,@NewInsuEndDate,#InsuEndDate),E(0,@NewInsuEndDate,#InsuEndDate+10000)),E(0,@NewInsuEndDate,#InsuEndDate))
-
-!C(3,#FunctionCode,6,C(4,#L4r18InsuReceiptDateX,E(0,@NewInsuStartDate,#InsuStartDate),E(0,@NewInsuStartDate,#InsuEndDate)),E(0,@NewInsuStartDate,#InsuStartDate))
-!C(3,#FunctionCode,6,C(4,#L4r18InsuReceiptDateX,E(0,@NewInsuEndDate,#InsuEndDate),E(0,@NewInsuEndDate,#InsuEndDate+10000)),E(0,@NewInsuEndDate,#InsuEndDate))
-
 E(0,@TotalPrem,#EthqInsuPrem+#FireInsuPrem)
 SWITCH(#StatusCode,0,T(3,@StatusCodeX,正常),1,T(3,@StatusCodeX,借支),2,T(3,@StatusCodeX,催收),3,T(3,@StatusCodeX,呆帳),T(3,@StatusCodeX, ))
 
@@ -332,9 +319,6 @@ C(3,#InsuTypeCode,0,S,$)
 T(H,#InsuTypeCode,#InsuTypeCodeHelp)
 T(2,@InsuTypeCodeX,#InsuTypeCodePreX)
 
-#VIEW_SYSDATE=X,8,S
-D(7,2,#SYSDATE,0,0)
-T(1,#VIEW_SYSDATE,2,7)
 
 !借款人戶號 
 #CustNo=A,7,I
@@ -348,12 +332,6 @@ C(3,#L4r18CustNo,0,$,s)
 
 #CustName=X,10,L
 
-!原本保單日
-#InsuReceiptDate=X,16,I
-C(3,#FunctionCode,1,$,s)
-@V(7)
-
-
 #InitId=A,1,L
 C(3,#FunctionCode,2,$,S)	
 E(0,@NewCustNo,#CustNo)
@@ -362,14 +340,11 @@ E(0,@NewFacmNo,#FacmNo)
 
 !維護後-借款人戶號 
 #NewCustNo=A,7,I
-C(5,#FunctionCode,6,T(F,@NewCustNo,0)T(F,@NewFacmNo,0),$)
-C(3,#FunctionCode,6,S,$)
 C(3,#FunctionCode,2,$,S)
-!E(0,#CustNo)
+E(0,#CustNo)
 
 
 #HIDECustNo=A,7,L
-
 
 
 !維護後-額度
@@ -391,8 +366,6 @@ E(0,#FacmNo)
 C(3,#FunctionCode,2,$,s)
 E(0,@RimCustNo,#NewCustNo)
 E(0,@RimFacmNo,#NewFacmNo)
-!E(0,@RimInsuReceiptDate,#InsuReceiptDateX)
-
 S(L2R14,1,#RimCustNo,#RimFacmNo)
 R(1,L2R14)
 
@@ -446,12 +419,6 @@ C(3,#L4r18CustNo,0,$,s)
 #NowInsuNo=X,16,I
 IF(#FunctionCode==2 || #FunctionCode==6,$,s)
 @IF(#FunctionCode==6,V(7),$)
-
-!#InsuReceiptDateX=X,16,I
-!C(3,#FunctionCode,2,s,L)
-!C(3,#FunctionCode,4,s,L)
-!C(3,#FunctionCode,5,s,L)
-!@V(2,0)
 
 <include src="ROM.icf::L4R26.dec"/>
 ! 塞值調rim，無值提error
@@ -548,11 +515,17 @@ IF(#FunctionCode==1 || #FunctionCode==2 || #FunctionCode==6,$,s)
 #RenewCode=A,1,I
 C(3,#FunctionCode,5,s,I)
 C(3,#FunctionCode,4,s,I)
+IF(#FunctionCode==1 || #FunctionCode==2 ,$,s)
 HELP(#SelfInsuCodeHelp2)
 @V(H,#SelfInsuCodeHelp2)
 ! 自保續保
 #RenewCodeX=_,_,L
 T(3,)T(H,#RenewCode,#SelfInsuCodeHelp2)
+IF(#RenewCode==1,SHOW(#InsuReceiptDateX),HIDE(#InsuReceiptDateX))
+
+#InsuReceiptDateX=D,7,S
+IF(#RenewCode==1,$,S)
+C(3,#RenewCode,1,C(4,#InsuReceiptDate,,T(2,#InsuReceiptDate)),s,S)
 
 !總保費
 #TotalPrem=m,14,L
@@ -583,14 +556,10 @@ T(H,#InsuTypeCode,#InsuTypeCodeHelp)
 ! QC 497 可維護 & + 結案
 !處理代碼
 #StatusCode=A,1,I
-C(3,#FunctionCode,5,s,I)
-C(3,#FunctionCode,4,s,I)
-!C(3,#FunctionCode,2,s,I)
-!C(3,#FunctionCode,1,E(0,0),$)
-!C(3,#FunctionCode,6,E(0,0)T(F,#StatusCode,0),$)
+C(3,#FunctionCode,1,E(0,0),$)
 C(3,#FunctionCode,1,s,$)
 C(3,#FunctionCode,6,s,$)
-IF(#FunctionCode == 1 || #FunctionCode == 6 ,E(0,0),$)
+IF(#FunctionCode==2,$,s)
 HELP(0:正常;1:借支;2:催收;3:呆帳;4:結案)
 @V(1,0,1,2,3,4)
 
@@ -631,13 +600,19 @@ C(4,#CommericalFlag,S,$)
 T(H,#CommericalFlag,#CommericalFlagHelp)
 
 
+!原本保件單日
+#InsuReceiptDate=D,7,L
+C(3,#FunctionCode,1,I,s)
+@V(7)
+
 !修改後保件單日
-#InsuReceiptDateX=X,16,I
-T(2,#VIEW_SYSDATE)
-C(4,#InsuReceiptDate,$,T(2,#InsuReceiptDate))
-C(3,#FunctionCode,5,s,I)
-C(3,#FunctionCode,4,s,I)
-C(3,#FunctionCode,2,s,I)
+!#InsuReceiptDateX=X,16,I
+#InsuReceiptDateX=_,_,I
+C(3,#RenewCode,1,O,S)
+C(3,#FunctionCode,4,O,$)
+C(3,#FunctionCode,5,O,$)
+C(2,#FunctionCode,$,$,$,$,s,s)
+!C(3,#RenewCode,1,C(4,#InsuReceiptDate,T(2,#VIEW_SYSDATE),T(2,#InsuReceiptDate)),s,S)
 
 #Remark=X,50,I
 C(2,#FunctionCode,s,$,$,s,s,s)
