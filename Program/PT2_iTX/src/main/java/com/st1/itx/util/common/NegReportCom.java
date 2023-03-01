@@ -982,7 +982,7 @@ public class NegReportCom extends CommBuffer {
 		int State = 4;// 已入帳
 		int Detail = 0;
 		int ExportDateYN = -1;// 撥付製檔
-		int IsBtn = 0;// 不是按鈕
+
 		if (Status == 1) {
 			// 撥付製檔
 			// L5707
@@ -1000,7 +1000,7 @@ public class NegReportCom extends CommBuffer {
 		String sql = "";
 		List<String[]> Data = null;
 		try {
-			sql = l597AServiceImpl.FindL597A(titaVo, intdate, IsMainFin, State, Detail, ExportDateYN, IsBtn, pKindCode);
+			sql = l597AServiceImpl.FindL597A(titaVo, intdate, IsMainFin, State, Detail, ExportDateYN, pKindCode);
 		} catch (Exception e) {
 			// E5003 組建SQL語法發生問題
 			this.info("NegReportCom ErrorForSql=" + e);
@@ -1008,7 +1008,7 @@ public class NegReportCom extends CommBuffer {
 		}
 		try {
 			Data = l597AServiceImpl.FindL597A(l597AServiceImpl.FindData(this.index, this.limit, sql, titaVo, intdate,
-					IsMainFin, State, Detail, ExportDateYN, IsBtn), "L597A");
+					IsMainFin, State, Detail, ExportDateYN), "L597A");
 		} catch (Exception e) {
 			// E5004 讀取DB時發生問題
 			this.info("L5051 ErrorForDB=" + e);
@@ -1018,9 +1018,9 @@ public class NegReportCom extends CommBuffer {
 		if (Data != null && Data.size() != 0) {
 			for (String[] lData : Data) {
 				String UseDb = lData[0];// 使用資料庫
-				String AcDate = lData[8];// 會計日
-				String TitaTlrNo = lData[21];// 經辦
-				String TitaTxtNo = lData[22];// 交易序號
+				String AcDate = lData[7];// 會計日
+				String TitaTlrNo = lData[20];// 經辦
+				String TitaTxtNo = lData[21];// 交易序號
 				int custno = Integer.parseInt(lData[4]);//戶號
 
 				// ---L5707 不計算只壓日期

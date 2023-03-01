@@ -166,7 +166,7 @@ public class L4961ReportC extends MakeReport {
 			print(0, 121, formatAmt(fireInsuPremTotal, 0), "R");// F11
 			print(0, 155, formatAmt(ethqInsuPremTotal, 0), "R");// F13
 			print(1, 1, "└—————————┴——————————————————————┴————————┴————————┴————————┴————————┴————————┘");
-			if(resultList.size()+1%18==0) {
+			if((resultList.size()+1)%18==0) {
 				print(1, this.getMidXAxis(), "經理：　　　　　　　　　　　　　　　經辦：", "C");
 			}else {
 				print(2, this.getMidXAxis(), "經理：　　　　　　　　　　　　　　　經辦：", "C");

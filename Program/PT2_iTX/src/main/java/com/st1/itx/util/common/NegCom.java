@@ -1805,17 +1805,17 @@ public class NegCom extends CommBuffer {
 		return;
 	}
 
-	public String[] NegServiceList1(int AcDate, int IsMainFin, int State, int Detail, int ExportDateYN, int IsBtn,
+	public String[] NegServiceList1(int AcDate, int IsMainFin, int State, int Detail, int ExportDateYN,
 			TitaVo titaVo) throws LogicException {
-		checkData(AcDate, IsMainFin, State, Detail, ExportDateYN, IsBtn);
+		checkData(AcDate, IsMainFin, State, Detail, ExportDateYN);
 		this.info("NegService AcDate=[" + AcDate + "],IsMainFin=[" + IsMainFin + "],State=[" + State + "],Detail=["
-				+ Detail + "],ExportDateYN=[" + ExportDateYN + "],IsBtn=[" + IsBtn + "]");
+				+ Detail + "],ExportDateYN=[" + ExportDateYN );
 		String data[] = new String[2];// 筆數,總金額
 
 		String sql = "";
 		List<String[]> Data = null;
 		try {
-			sql = l597AServiceImpl.FindL597A(titaVo, AcDate, IsMainFin, State, Detail, ExportDateYN, IsBtn, "");
+			sql = l597AServiceImpl.FindL597A(titaVo, AcDate, IsMainFin, State, Detail, ExportDateYN, "");
 			sql = l597AServiceImpl.FindL5074(sql);
 		} catch (Exception e) {
 			// E5003 組建SQL語法發生問題
@@ -1824,7 +1824,7 @@ public class NegCom extends CommBuffer {
 		}
 		try {
 			Data = l597AServiceImpl.FindL597A(l597AServiceImpl.FindData(this.index, this.limit, sql, titaVo, AcDate,
-					IsMainFin, State, Detail, ExportDateYN, IsBtn), "L5074");
+					IsMainFin, State, Detail, ExportDateYN), "L5074");
 		} catch (Exception e) {
 			// E5004 讀取DB時發生問題
 			this.info("L5051 ErrorForDB=" + e);
@@ -1854,11 +1854,10 @@ public class NegCom extends CommBuffer {
 	 * @param State        選項
 	 * @param Detail       細項 無,債協,調解,更生,清算
 	 * @param ExportDateYN 製檔與否
-	 * @param IsBtn        是否為Btn,1是0否
 	 * @throws LogicException 交易程式需承接LogicException
 	 * @author Jacky Lu
 	 */
-	public void checkData(int AcDate, int IsMainFin, int State, int Detail, int ExportDateYN, int IsBtn)
+	public void checkData(int AcDate, int IsMainFin, int State, int Detail, int ExportDateYN)
 			throws LogicException {
 		if (AcDate >= 0) {
 
@@ -1892,12 +1891,6 @@ public class NegCom extends CommBuffer {
 			throw new LogicException(titaVo, "E5009", "[是否製檔(" + ExportDateYN + ")]輸入有誤");
 		}
 
-		if (0 <= IsBtn && IsBtn <= 1) {
-
-		} else {
-			// E5009 資料檢核錯誤
-			throw new LogicException(titaVo, "E5009", "[是否為按鈕(" + IsBtn + ")]輸入有誤");
-		}
 	}
 
 	/**

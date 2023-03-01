@@ -452,18 +452,17 @@ T(2,#OOAcctDate+#OOTitaTlrNo+#OOTitaTxtNo+#OOCustNo)
 #OOBufSearch=X,28,O
 T(2,#OONegTransKey)
 !暫收解入,#OORemark=FinCode+TxSeq : 項目18執行L5712使用
-!#Remark2=X,18,S
+#Remark2=X,18,S
 !T(1,#OORemark,1,18)
-!#OOBufSearch2=X,156,O
+#OOBufSearch2=X,156,O
 !T(2,#OOCustId+#OOCustNo+#OOEntryDate+#Remark2+#OOPayAmt+#OOCustName)
 
-! IF(#OOSeq==1,BIND(grid,{ cmd=CHAIN;ntxcd=L5702; text=#OOBtnSearchValue; ntxbuf=#OOBufSearch}),BIND(grid,cancel))
 #OOBtnSearch=A,1,O
-!IF (#SearchOption=="18",BIND(grid,{ cmd=CHAIN;ntxcd=L5712; text=#OOBtnSearchValue2; ntxbuf=#OOBufSearch2}),
-!    BIND(grid,{ cmd=CHAIN;ntxcd=L5702; text=#OOBtnSearchValue; ntxbuf=#OOBufSearch}) )
-BIND(grid,{ cmd=CHAIN;ntxcd=L5702; text=#OOBtnSearchValue; ntxbuf=#OOBufSearch})
+IF (#SearchOption=="18",BIND(grid,{ cmd=CHAIN;ntxcd=L5712; text=#OOBtnSearchValue2; ntxbuf=#OOBufSearch2}),
+    BIND(grid,{ cmd=CHAIN;ntxcd=L5702; text=#OOBtnSearchValue; ntxbuf=#OOBufSearch}) )
+!BIND(grid,{ cmd=CHAIN;ntxcd=L5702; text=#OOBtnSearchValue; ntxbuf=#OOBufSearch})
 IF (#OOTxSts==9,S,$)
-!IF (#SearchOption=="18",S,$)
+IF (#SearchOption=="18",S,$)
 BIND(grid,cancel)
 
 

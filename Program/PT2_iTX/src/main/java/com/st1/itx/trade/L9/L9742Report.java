@@ -131,13 +131,13 @@ public class L9742Report extends MakeReport {
 				
 			
 				if(repayCode==4) {
-					this.print(1, 3, "銀扣　　電匯　　票據 Ｖ 其他");
+					this.print(1, 3, "銀扣 　 電匯　　票據 Ｖ 其他");
 				}else if(repayCode==2) {
 					this.print(1, 3, "銀扣 Ｖ 電匯　　票據　　其他");
 				}else if(repayCode==1) {
-					this.print(1, 3, "銀扣 　 電匯  Ｖ 票據　　其他");
+					this.print(1, 3, "銀扣 　 電匯 Ｖ 票據　　其他");
 				}else {
-					this.print(1, 3, "銀扣 　 電匯   　票據　　其他 Ｖ");
+					this.print(1, 3, "銀扣 　 電匯 　 票據　　其他 Ｖ");
 				}
 
 				if (acChineseNameWrap.size() >= 2) {

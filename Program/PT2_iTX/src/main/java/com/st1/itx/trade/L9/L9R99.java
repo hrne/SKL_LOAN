@@ -142,29 +142,48 @@ public class L9R99 extends TradeBuffer {
 
 			int seq = Integer.valueOf(listL9739.get(i).get("Seq"));
 
+			switch (seq) {
+			// ID、IE同一組利率
+			case 4:
+			case 5:
+				seq = 4;
+				break;
+			// IF、IG同一組利率
+			case 6:
+			case 7:
+				seq = 5;
+				break;
+			// IH、II同一組利率
+			case 8:
+			case 9:
+				seq = 6;
+				break;
+			default:
+				break;
+			}
+
 			this.info("seq =" + seq);
-			
+
 			prodIncrRate = new BigDecimal(listL9739.get(i).get("ProdIncr").toString());
 			basePostRate = new BigDecimal(listL9739.get(i).get("BaseRate").toString());
 
 			this.info("prodIncrRate =" + prodIncrRate);
 			this.info("basePostRate =" + basePostRate);
-			
-			
-			if( !"0".equals(listL9739.get(i).get("JsonFields").toString())) {
-				this.info("listL9739.get(i).get(\"JsonFields\").toString() =" + listL9739.get(i).get("JsonFields").toString());	
+
+			if (!"0".equals(listL9739.get(i).get("JsonFields").toString())) {
+				this.info("listL9739.get(i).get(\"JsonFields\").toString() ="
+						+ listL9739.get(i).get("JsonFields").toString());
 				thisJS = new JSONObject(listL9739.get(i).get("JsonFields").toString());
 				thisRate = new BigDecimal(thisJS.get("SubsidyRate" + seq).toString());
 			}
-			
-			if(!"0".equals(listL9739.get(i).get("lJsonFields").toString())) {
 
-				this.info("listL9739.get(i).get(\"lJsonFields\").toString() =" + listL9739.get(i).get("lJsonFields").toString());
+			if (!"0".equals(listL9739.get(i).get("lJsonFields").toString())) {
+
+				this.info("listL9739.get(i).get(\"lJsonFields\").toString() ="
+						+ listL9739.get(i).get("lJsonFields").toString());
 				lastJS = new JSONObject(listL9739.get(i).get("lJsonFields").toString());
 				lastRate = new BigDecimal(lastJS.get("SubsidyRate" + seq).toString());
 			}
-			
-
 
 			this.info("thisRate =" + thisRate);
 			this.info("lastRate =" + lastRate);

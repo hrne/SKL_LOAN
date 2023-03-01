@@ -48,7 +48,7 @@ E(0,0)
 ["@",[#BtnAllShell1,"@全選"]],"",
 ], 
 
-["#grid#,{id:2,expand:false,loop:9,row_height:0}","","",
+["#grid#,{id:2,expand:false,loop:1,row_height:0}","","",
 [],[#BtnShell1,#TradeCode1,#TradeName1,#TradeSub1],
 ], 
 
@@ -75,7 +75,7 @@ E(0,0)
 
 ! 總項目數 8
 #TotalItem=N,3,S
-E(0,9)
+E(0,1)
 
 ! 總分類數 1
 #TotalCat=N,1,S
@@ -147,7 +147,7 @@ T(3,1/0/LD010/介紹人換算業績報酬檢核表)
 !---------- TRADE DICTIONARY SPLIT AND ASSIGN -----------
 
 ! 修改這裡的 loop times
-##loop{times:9,i:1}
+##loop{times:1,i:1}
 
 ! TradeCat: 1st byte of TradeDic. Trade's category.
 #TradeCat{i}=X,1,S
@@ -178,7 +178,7 @@ T(1,#TradeDic{i},11,40)
 ! How many trades are there, how many buttons should be made.
 
 ! 修改這裡的 loop times
-##loop{times:9,i:1}
+##loop{times:1,i:1}
 
 
 !---------- BUTTON VISUAL -----------
@@ -303,7 +303,7 @@ C(5,#BtnExpShell{i},＋,CALL(#FuncFoldCat),CALL(#FuncExpandCat))
 
 ! 修改這裡的 2 個 loop times
 #FuncSelectEverything=@,1,S
-##loop{times:9,i:1}
+##loop{times:1,i:1}
 C(5,#BtnAllShell0,V,T(3,@BtnShell{i},V),T(3,@BtnShell{i},　),$)
 ##end
 ##loop{times:1,i:1}
@@ -316,7 +316,7 @@ C(5,#BtnAllShell0,V,T(3,@BtnAllShell{i},V),T(3,@BtnAllShell{i},　))
 
 ! 修改這裡的 loop times
 #FuncSelectCat=@,1,S
-##loop{times:9,k:1}
+##loop{times:1,k:1}
 C(5,#TradeCat{k},#tmpTargetCat,T(3,@BtnShell{k},V),$)
 ##end
 
@@ -324,7 +324,7 @@ C(5,#TradeCat{k},#tmpTargetCat,T(3,@BtnShell{k},V),$)
 
 ! 修改這裡的 loop times
 #FuncUnselectCat=@,1,S
-##loop{times:9,i:1}
+##loop{times:1,i:1}
 C(5,#TradeCat{i},#tmpTargetCat,T(3,@BtnShell{i},　),$)
 ##end
 
@@ -375,7 +375,7 @@ T(3,@BtnAllShell0,　)
 ! 修改這裡的 loop times
 <sub type="TIM">
 #TotalItem
-##loop{times:9,i:1}
+##loop{times:1,i:1}
 #BtnShell{i}
 #TradeCode{i}
 #TradeSub{i}

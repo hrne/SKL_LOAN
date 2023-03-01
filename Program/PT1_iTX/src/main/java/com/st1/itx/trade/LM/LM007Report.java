@@ -36,13 +36,13 @@ public class LM007Report extends MakeReport {
 	Boolean hasOutputtedAnything = false;
 
 	// 合計總合
-	BigDecimal[] sumCounters = new BigDecimal[12];
+	BigDecimal[] sumCounters = new BigDecimal[15];
 	
 	// 合計的合計（for 全部類輸出）
 	ArrayList<BigDecimal[]> totalTotal = new ArrayList<BigDecimal[]>();
 
 	// 各欄位的輸出座標
-	private static final int[] outputPos = new int[] { 8, 19, 32, 47, 60, 75, 88, 103, 116, 131, 146, 162 };
+	private static final int[] outputPos = new int[] { 8, 15, 25, 39, 49, 59, 73, 83, 93, 107, 120, 131, 140, 150, 162 };
 	
 	// 千元單位
 	final static BigDecimal thousand = new BigDecimal("1000");
@@ -61,9 +61,9 @@ public class LM007Report extends MakeReport {
 		this.print(-4, 148, "頁　數：" + this.getNowPage());
 		this.print(-5, 85, getshowRocDate(this.getReportDate()).substring(0, 10), "C");
 		this.print(-5, 148, "單　位：仟元");
-		this.print(-7, 2, "　　　　　　　 短期擔保放款　　　　　　　　  中期擔保放款　　　　　　　　  長期擔保放款　　　　　    30年房貸");
-		this.print(-8, 2, "　　　　------------------------　  ------------------------　  ------------------------  　----------");
-		this.print(-9, 2, "月份　　　　    企金　　　 　 房貸　　　　 　企金　 　　　  房貸  　　　　　 企金 　　　　房貸  　　　　　  房貸 　　　　 車貸　　　　 轉催收 　　　　　 合計 　　　　　各月累計");
+		this.print(-7, 2, "　　　　　　　　　 短期擔保放款　　　　　　　　 　　　  中期擔保放款　　　　　　　　 　　   長期擔保放款　　　　　　　　　　　30年房貸");
+		this.print(-8, 2, "　　　　	　----------------------------　　　----------------------------　　　----------------------------    　　----------");
+		this.print(-9, 2, "月份　　　 企金　　企金自然人　　　　房貸　　　　企金　　企金自然人　　　　房貸　　　　企金　　企金自然人　　　　房貸  　　　　 房貸 　　　車貸　　轉催收 　　　合計 　　 各月累計");
 		this.print(-10, 0, " ---------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 
 		this.setBeginRow(11);
@@ -106,9 +106,9 @@ public class LM007Report extends MakeReport {
 		boolean isFirstPage = true;
 		
 		// 初始化 totalTotal
-		for (int i = 0; i <= 12; i++) // 0為dummy 1到12對應月份
+		for (int i = 0; i <= 15; i++) // 0為dummy 1到12對應月份
 		{
-			BigDecimal[] bMonth = new BigDecimal[12];
+			BigDecimal[] bMonth = new BigDecimal[15];
 			Arrays.fill(bMonth, BigDecimal.ZERO);
 			totalTotal.add(bMonth); // 0為dummy 1到11放各項金額
 		}
@@ -175,7 +175,7 @@ public class LM007Report extends MakeReport {
 
 			BigDecimal monthlyTotal = BigDecimal.ZERO; // 每月合計
 
-			for (int i = 1; i <= 9; i++) {
+			for (int i = 1; i <= 12; i++) {
 				String valueStr = tLDVo.get("F" + i);
 				BigDecimal valueBd = isTotal ? totalTotalMonth[i] : getBigDecimal(valueStr); // 出【全部】類時，取 totalTotal，否則取 Query
 				valueBd = isTotal ? valueBd : computeDivide(valueBd, thousand, 0);
@@ -192,15 +192,15 @@ public class LM007Report extends MakeReport {
 				
 				totalTotalMonth[i] = totalTotalMonth[i].add(valueBd); // 【全部】頁合計用
 
-				// 特殊處理: F9(每月合計前的最後一項細項)時, 處理月小計與跨月小計
-				if (i == 9) {
-					sumCounters[10] = sumCounters[10].add(monthlyTotal); // 在每頁最底下合計時使用
-					this.print(0, outputPos[10], formatAmt(monthlyTotal, 0), "R"); // 每月小計
-					sumCounters[11] = sumCounters[11].add(monthlyTotal); // 跨月小計
-					this.print(0, outputPos[11], formatAmt(sumCounters[11], 0), "R");
+				// 特殊處理: F12(每月合計前的最後一項細項)時, 處理月小計與跨月小計
+				if (i == 12) {
+					sumCounters[13] = sumCounters[13].add(monthlyTotal); // 在每頁最底下合計時使用
+					this.print(0, outputPos[13], formatAmt(monthlyTotal, 0), "R"); // 每月小計
+					sumCounters[14] = sumCounters[14].add(monthlyTotal); // 跨月小計
+					this.print(0, outputPos[14], formatAmt(sumCounters[14], 0), "R");
 					
-					totalTotalMonth[10] = totalTotalMonth[10].add(monthlyTotal);
-					totalTotalMonth[11] = totalTotalMonth[11].add(sumCounters[11]);
+					totalTotalMonth[13] = totalTotalMonth[13].add(monthlyTotal);
+					totalTotalMonth[14] = totalTotalMonth[14].add(sumCounters[14]);
 				}
 			}
 
@@ -211,7 +211,7 @@ public class LM007Report extends MakeReport {
 		this.print(1, 1, " 合計");
 
 		// 11是跨月合計 參考樣張不出
-		for (int i = 1; i <= 10; i++) {
+		for (int i = 1; i <= 13; i++) {
 			this.print(0, outputPos[i], formatAmt(sumCounters[i], 0), "R");
 		}
 

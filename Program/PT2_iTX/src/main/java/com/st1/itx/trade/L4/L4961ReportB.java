@@ -164,7 +164,7 @@ public class L4961ReportB extends MakeReport {
 
 				print(0, 7, FormatUtil.pad9(String.valueOf(result.get("F3")), 7), "C"); // 戶號
 				print(0, 17, FormatUtil.pad9(String.valueOf(result.get("F4")), 3), "C"); // 額度
-				print(0, 22, result.get("F5"), "L"); // 戶名
+				print(0, 23, result.get("F5"), "L"); // 戶名
 				print(0, 44, "" + insuYearMonth, "C"); // 到期年月
 				print(0, 60, formatAmt(result.get("F6"), 0), "R");// 總保費
 				print(0, 78, formatAmt(result.get("F10"), 0), "R");// 火險保額
@@ -205,10 +205,12 @@ public class L4961ReportB extends MakeReport {
 			print(0, 105, formatAmt(fireInsuPremTotal, 0), "R");// F11
 			print(0, 139, formatAmt(ethqInsuPremTotal, 0), "R");// F13
 			print(1, 1, "└—————————┴————————————┴——————┴————————┴——————┴————————┴————————┴——————————┴—————┘");
-			if(resultList.size()+1%18==0) {
+			if((resultList.size()+1)%18==0) {
 				print(1, this.getMidXAxis(), "經理：　　　　　　　　　　　　　　　經辦：", "C");
-			}else
-			print(2, this.getMidXAxis(), "經理：　　　　　　　　　　　　　　　經辦：", "C");
+			}else {
+				print(2, this.getMidXAxis(), "經理：　　　　　　　　　　　　　　　經辦：", "C");
+			}
+			
 
 			webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y",
 					"LC009", titaVo.getTlrNo() + "L4961", reportCode + "-報表已完成", titaVo);

@@ -70,7 +70,7 @@ public class L597A extends TradeBuffer {
 		int SearchOption = Integer.parseInt(titaVo.getParam("SearchOption").trim()); //
 		int SearchDetail = Integer.parseInt(titaVo.getParam("SearchDetail").trim()); //
 		int Export = Integer.parseInt(titaVo.getParam("Export").trim()); //
-		int IsBtn = Integer.parseInt(titaVo.getParam("IsBtn").trim()); //
+		//int IsBtn = Integer.parseInt(titaVo.getParam("IsBtn").trim()); //
 		String TransTxKind = titaVo.getParam("TransTxKind").trim(); //
 
 		int IsMainFin = 0;
@@ -90,18 +90,17 @@ public class L597A extends TradeBuffer {
 		// this.limit=Integer.MAX_VALUE;//查全部
 		this.limit = 50;// 查全部
 
-		
 		String sql = "";
 		List<String[]> Data = null;
 		try {
-			sql = l597AServiceImpl.FindL597A(titaVo, AcDate, IsMainFin, SearchOption, SearchDetail, Export, IsBtn, "");
+			sql = l597AServiceImpl.FindL597A(titaVo, AcDate, IsMainFin, SearchOption, SearchDetail, Export, "");
 		} catch (Exception e) {
 			// E5003 組建SQL語法發生問題
 			this.info("L5051 ErrorForSql=" + e);
 			throw new LogicException(titaVo, "E5003", "");
 		}
 		try {
-			Data = l597AServiceImpl.FindL597A(l597AServiceImpl.FindData(this.index, this.limit, sql, titaVo, AcDate, IsMainFin, SearchOption, SearchDetail, Export, IsBtn), "L597A");
+			Data = l597AServiceImpl.FindL597A(l597AServiceImpl.FindData(this.index, this.limit, sql, titaVo, AcDate, IsMainFin, SearchOption, SearchDetail, Export), "L597A");
 		} catch (Exception e) {
 			// E5004 讀取DB時發生問題
 			this.info("L5051 ErrorForDB=" + e);
@@ -205,9 +204,9 @@ public class L597A extends TradeBuffer {
 
 				if (SearchOption == 2 || SearchOption == 3 || SearchOption == 12) {
 					NegTransId NegTransIdVO = new NegTransId();
-					NegTransIdVO.setAcDate(parse.stringToInteger(DcToRoc(lData[8])));
-					NegTransIdVO.setTitaTlrNo(lData[21]);
-					NegTransIdVO.setTitaTxtNo(parse.stringToInteger(lData[22]));
+					NegTransIdVO.setAcDate(parse.stringToInteger(DcToRoc(lData[7])));
+					NegTransIdVO.setTitaTlrNo(lData[20]);
+					NegTransIdVO.setTitaTxtNo(parse.stringToInteger(lData[21]));
 					NegTransIdVO.setCustNo(parse.stringToInteger(lData[4]));
 
 					NegTrans NegTransVO = new NegTrans();
@@ -315,22 +314,22 @@ public class L597A extends TradeBuffer {
 						occursList1.putParam("OOCustNo", lData[4]);// 戶號
 						occursList1.putParam("OOCustName", StringCut.replaceLineUp(lData[5]));// 戶名
 						occursList1.putParam("OOTxSts", TxKind);// 交易別
-						occursList1.putParam("OORemark", lData[7]);// 備註
-						occursList1.putParam("OOAcctDate", DcToRoc(lData[8]));// 會計日
-						occursList1.putParam("OOEntryDate", DcToRoc(lData[9]));// 入帳日
-						occursList1.putParam("OORepayDate", DcToRoc(lData[10]));// 入帳還款日
-						occursList1.putParam("OOTmpAmt", lData[11]);// 暫收金額
-						occursList1.putParam("OOOverPayAmt", lData[12]);// 溢繳款
-						occursList1.putParam("OOPayPeriod", lData[13]);// 繳期數
-						occursList1.putParam("OOPayAmt", lData[14]);// 還款金額
-						occursList1.putParam("OORevivPeriod", lData[15]);// 應還期數
-						occursList1.putParam("OORevivAmt", lData[16]);// 應還金額
-						occursList1.putParam("OOAcumTmpAmt", lData[17]);// 累溢短收
-						occursList1.putParam("OOSklShareAmt", lData[18]);// 新壽攤分
-						occursList1.putParam("OOApprAmt", lData[19]);// 撥付金額
-						occursList1.putParam("OOReturnAmt", lData[20]);// 退還金額
-						occursList1.putParam("OOTitaTlrNo", lData[21]);// 經辦
-						occursList1.putParam("OOTitaTxtNo", lData[22]);// 交易序號
+						//occursList1.putParam("OORemark", lData[7]);// 備註
+						occursList1.putParam("OOAcctDate", DcToRoc(lData[7]));// 會計日
+						occursList1.putParam("OOEntryDate", DcToRoc(lData[8]));// 入帳日
+						occursList1.putParam("OORepayDate", DcToRoc(lData[9]));// 入帳還款日
+						occursList1.putParam("OOTmpAmt", lData[10]);// 暫收金額
+						occursList1.putParam("OOOverPayAmt", lData[11]);// 溢繳款
+						occursList1.putParam("OOPayPeriod", lData[12]);// 繳期數
+						occursList1.putParam("OOPayAmt", lData[13]);// 還款金額
+						occursList1.putParam("OORevivPeriod", lData[14]);// 應還期數
+						occursList1.putParam("OORevivAmt", lData[15]);// 應還金額
+						occursList1.putParam("OOAcumTmpAmt", lData[16]);// 累溢短收
+						occursList1.putParam("OOSklShareAmt", lData[17]);// 新壽攤分
+						occursList1.putParam("OOApprAmt", lData[18]);// 撥付金額
+						occursList1.putParam("OOReturnAmt", lData[19]);// 退還金額
+						occursList1.putParam("OOTitaTlrNo", lData[20]);// 經辦
+						occursList1.putParam("OOTitaTxtNo", lData[21]);// 交易序號
 
 						occursList1.putParam("OONewtransTxKind", NewtransTxKind);// 試算交易別
 
@@ -436,22 +435,22 @@ public class L597A extends TradeBuffer {
 					occursList1.putParam("OOCustNo", lData[4]);// 戶號
 					occursList1.putParam("OOCustName", StringCut.replaceLineUp(lData[5]));// 戶名
 					occursList1.putParam("OOTxSts", TxKind);// 交易別
-					occursList1.putParam("OORemark", lData[7]);// 備註
-					occursList1.putParam("OOAcctDate", DcToRoc(lData[8]));// 會計日
-					occursList1.putParam("OOEntryDate", DcToRoc(lData[9]));// 入帳日
-					occursList1.putParam("OORepayDate", DcToRoc(lData[10]));// 入帳還款日
-					occursList1.putParam("OOTmpAmt", lData[11]);// 暫收金額
-					occursList1.putParam("OOOverPayAmt", lData[12]);// 溢繳款
-					occursList1.putParam("OOPayPeriod", lData[13]);// 繳期數
-					occursList1.putParam("OOPayAmt", lData[14]);// 還款金額
-					occursList1.putParam("OORevivPeriod", lData[15]);// 應還期數
-					occursList1.putParam("OORevivAmt", lData[16]);// 應還金額
-					occursList1.putParam("OOAcumTmpAmt", lData[17]);// 累溢短收
-					occursList1.putParam("OOSklShareAmt", lData[18]);// 新壽攤分
-					occursList1.putParam("OOApprAmt", lData[19]);// 撥付金額
-					occursList1.putParam("OOReturnAmt", lData[20]);// 退還金額
-					occursList1.putParam("OOTitaTlrNo", lData[21]);// 經辦
-					occursList1.putParam("OOTitaTxtNo", lData[22]);// 交易序號
+					//occursList1.putParam("OORemark", lData[7]);// 備註
+					occursList1.putParam("OOAcctDate", DcToRoc(lData[7]));// 會計日
+					occursList1.putParam("OOEntryDate", DcToRoc(lData[8]));// 入帳日
+					occursList1.putParam("OORepayDate", DcToRoc(lData[9]));// 入帳還款日
+					occursList1.putParam("OOTmpAmt", lData[10]);// 暫收金額
+					occursList1.putParam("OOOverPayAmt", lData[11]);// 溢繳款
+					occursList1.putParam("OOPayPeriod", lData[12]);// 繳期數
+					occursList1.putParam("OOPayAmt", lData[13]);// 還款金額
+					occursList1.putParam("OORevivPeriod", lData[14]);// 應還期數
+					occursList1.putParam("OORevivAmt", lData[15]);// 應還金額
+					occursList1.putParam("OOAcumTmpAmt", lData[16]);// 累溢短收
+					occursList1.putParam("OOSklShareAmt", lData[17]);// 新壽攤分
+					occursList1.putParam("OOApprAmt", lData[18]);// 撥付金額
+					occursList1.putParam("OOReturnAmt", lData[19]);// 退還金額
+					occursList1.putParam("OOTitaTlrNo", lData[20]);// 經辦
+					occursList1.putParam("OOTitaTxtNo", lData[21]);// 交易序號
 
 					occursList1.putParam("OONewtransTxKind", NewtransTxKind);// 試算交易別
 

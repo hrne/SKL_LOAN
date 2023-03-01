@@ -51,7 +51,7 @@ public class LM033Report extends MakeReport {
 		String txcd = "LM033";
 		String fileItem = "新撥案件明細";
 		String fileName = "LM033-新撥案件明細";
-		String defaultExcel = "LM033_底稿_新撥案件明細";
+		String defaultExcel = "LM033_底稿_新撥案件明細.xlsx";
 		String defaultSheet = "D9701211";
 
 		this.info("reportVo open");

@@ -107,13 +107,13 @@ public class L3240 extends TradeBuffer {
 	private BigDecimal wkTxAmt = BigDecimal.ZERO;
 	private int wkRepayCode = 0;
 	private String wkReconCode = "";
+	private int wkFacmNo = 0;
 	private FacProd tFacProd;
 	private FacMain tFacMain;
 	private LoanBorMain tLoanBorMain;
 	private LoanOverdue tLoanOverdue;
 	// work area
 	private AcDetail acDetail;
-	private LoanBorTx tLoanBorTx;
 	private List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 	private List<AcReceivable> lAcReceivableDelete = new ArrayList<AcReceivable>();
 	private List<AcReceivable> lAcReceivableInsert = new ArrayList<AcReceivable>();
@@ -167,7 +167,9 @@ public class L3240 extends TradeBuffer {
 		// 暫收款
 		this.info("TempAmt=" + wkTempAmt + " ,OverAmt=" + wkOverAmt);
 		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo, 0, 0, 99, BigDecimal.ZERO, titaVo); // 99-費用全部
-		int wkFacmNo = baTxCom.getOverRpFacmNo();
+		if (wkFacmNo == 0) {
+			wkFacmNo = baTxCom.getOverRpFacmNo();
+		}
 		// 溢收金額
 		for (BaTxVo ba : this.baTxList) {
 			if (ba.getDataKind() == 3 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
@@ -179,7 +181,7 @@ public class L3240 extends TradeBuffer {
 					acctAmt = wkOverAmt;
 					wkOverAmt = BigDecimal.ZERO;
 				}
-				if (wkOverAmt.compareTo(BigDecimal.ZERO) > 0) {
+				if (acctAmt.compareTo(BigDecimal.ZERO) > 0) {
 					AcDetail acDetail = new AcDetail();
 					acDetail.setDbCr("D");
 					acDetail.setAcctCode(ba.getAcctCode());
@@ -266,11 +268,16 @@ public class L3240 extends TradeBuffer {
 			}
 		}
 
-		if (wkOverflow.compareTo(BigDecimal.ZERO) > 0) {
+		if (wkOverflow.compareTo(BigDecimal.ZERO) != 0) {
 			AcDetail acDetail = new AcDetail();
-			acDetail.setDbCr("C");
+			if (wkOverflow.compareTo(BigDecimal.ZERO) > 0) {
+				acDetail.setDbCr("C");
+				acDetail.setTxAmt(wkOverflow);
+			} else {
+				acDetail.setDbCr("D");
+				acDetail.setTxAmt(BigDecimal.ZERO.subtract(wkOverflow));
+			}
 			acDetail.setAcctCode("TAV");
-			acDetail.setTxAmt(wkOverflow);
 			acDetail.setCustNo(iCustNo);
 			acDetail.setFacmNo(wkFacmNo);
 			acDetail.setBormNo(0);
@@ -325,7 +332,11 @@ public class L3240 extends TradeBuffer {
 			wkRepayCode = tx.getRepayCode();
 			wkTxAmt = wkTxAmt.add(tx.getTxAmt());
 			wkTempAmt = wkTempAmt.add(tx.getTempAmt());
-			wkOverAmt = wkOverAmt.add(tx.getOverflow());
+			if (tx.getOverflow().compareTo(BigDecimal.ZERO) > 0) {
+				wkFacmNo = tx.getFacmNo();
+				wkOverAmt = wkOverAmt.add(tx.getOverflow());
+			}
+
 			wkBorxNo = tx.getBorxNo();
 			tTempVo = new TempVo();
 			tTempVo = tTempVo.getVo(tx.getOtherFields());
@@ -357,7 +368,6 @@ public class L3240 extends TradeBuffer {
 				// 欠繳金額處理
 				unUpaidRoutine(tx);
 			}
-			tLoanBorTx = tx;
 		}
 	}
 

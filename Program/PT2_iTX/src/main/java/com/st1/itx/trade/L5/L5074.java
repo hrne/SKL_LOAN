@@ -148,15 +148,15 @@ public class L5074 extends TradeBuffer {
 					Detail = 0;// 無
 					ExportDateYN = 0;// 無
 					try {
-						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, IsBtn, titaVo);
+						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, titaVo);
 					} catch (LogicException e) {
 						// E5004 讀取DB時發生問題
 						this.info("L5051 ErrorForDB=" + e);
 						throw new LogicException(titaVo, "E5004", "");
 					}
 					// 前日匯入(總筆數)-(未入帳,待處理)
-					// TodayWorkCnt = Data[0];// 筆數
-					// TodayWorkAmt = Data[1];// 金額
+					//TodayWorkCnt = Data[0];// 筆數
+					//TodayWorkAmt = Data[1];// 金額
 					TodayWorkCnt = "0";// 筆數
 					TodayWorkAmt = "0";// 金額
 
@@ -169,7 +169,7 @@ public class L5074 extends TradeBuffer {
 					Detail = 0;// 無
 					ExportDateYN = 0;// 無
 					try {
-						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, IsBtn, titaVo);
+						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, titaVo);
 					} catch (LogicException e) {
 						// E5004 讀取DB時發生問題
 						this.info("L5051 ErrorForDB=" + e);
@@ -194,7 +194,7 @@ public class L5074 extends TradeBuffer {
 					Detail = 0;// 無
 					ExportDateYN = 0;// 無
 					try {
-						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, IsBtn, titaVo);
+						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, titaVo);
 					} catch (LogicException e) {
 						// E5004 讀取DB時發生問題
 						this.info("L5051 ErrorForDB=" + e);
@@ -220,7 +220,7 @@ public class L5074 extends TradeBuffer {
 					Detail = 0;// 無
 					ExportDateYN = 0;// 0:無(左側),1:已製檔,2:未製檔
 					try {
-						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, IsBtn, titaVo);
+						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, titaVo);
 					} catch (LogicException e) {
 						// E5004 讀取DB時發生問題
 						this.info("L5051 ErrorForDB=" + e);
@@ -234,7 +234,7 @@ public class L5074 extends TradeBuffer {
 					Detail = 0;// 00:無,01:債協,02:調解,03:更生,04:清算
 					ExportDateYN = 1;// 0:無(左側),1:已製檔,2:未製檔
 					try {
-						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, IsBtn, titaVo);
+						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, titaVo);
 					} catch (LogicException e) {
 						// E5004 讀取DB時發生問題
 						this.info("L5051 ErrorForDB=" + e);
@@ -252,7 +252,7 @@ public class L5074 extends TradeBuffer {
 					Detail = 0;// 00:無,01:債協,02:調解,03:更生,04:清算
 					ExportDateYN = 2;// 0:無(左側),1:已製檔,2:未製檔
 					try {
-						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, IsBtn, titaVo);
+						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, titaVo);
 					} catch (LogicException e) {
 						// E5004 讀取DB時發生問題
 						this.info("L5051 ErrorForDB=" + e);
@@ -320,7 +320,7 @@ public class L5074 extends TradeBuffer {
 						Detail = UseDetail(i, ThisRow);// 00:無,01:債協,02:調解,03:更生,04:清算
 						this.info("L5074 i=[" + i + "] Detail=[" + Detail + "]");
 						try {
-							Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, IsBtn, titaVo);
+							Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, titaVo);
 						} catch (LogicException e) {
 							// E5004 讀取DB時發生問題
 							this.info("L5051 ErrorForDB=" + e);
@@ -369,7 +369,7 @@ public class L5074 extends TradeBuffer {
 					Detail = 0;// 00:無,01:債協,02:調解,03:更生,04:清算
 					ExportDateYN = 0;
 					try {
-						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, IsBtn, titaVo);
+						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, titaVo);
 					} catch (LogicException e) {
 						// E5004 讀取DB時發生問題
 						this.info("L5051 ErrorForDB=" + e);
@@ -383,7 +383,7 @@ public class L5074 extends TradeBuffer {
 					Detail = 0;// 00:無,01:債協,02:調解,03:更生,04:清算
 					ExportDateYN = 0;
 					try {
-						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, IsBtn, titaVo);
+						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, titaVo);
 					} catch (LogicException e) {
 						// E5004 讀取DB時發生問題
 						this.info("L5051 ErrorForDB=" + e);
@@ -400,7 +400,7 @@ public class L5074 extends TradeBuffer {
 					Detail = 0;// 00:無,01:債協,02:調解,03:更生,04:清算
 					ExportDateYN = 0;
 					try {
-						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, IsBtn, titaVo);
+						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, titaVo);
 					} catch (LogicException e) {
 						// E5004 讀取DB時發生問題
 						this.info("L5051 ErrorForDB=" + e);
@@ -414,7 +414,7 @@ public class L5074 extends TradeBuffer {
 					Detail = 0;// 00:無,01:債協,02:調解,03:更生,04:清算
 					ExportDateYN = 0;
 					try {
-						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, IsBtn, titaVo);
+						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, titaVo);
 					} catch (LogicException e) {
 						// E5004 讀取DB時發生問題
 						this.info("L5051 ErrorForDB=" + e);
@@ -431,7 +431,7 @@ public class L5074 extends TradeBuffer {
 					Detail = 0;// 00:無,01:債協,02:調解,03:更生,04:清算
 					ExportDateYN = 0;
 					try {
-						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, IsBtn, titaVo);
+						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, titaVo);
 					} catch (LogicException e) {
 						// E5004 讀取DB時發生問題
 						this.info("L5051 ErrorForDB=" + e);
@@ -445,7 +445,7 @@ public class L5074 extends TradeBuffer {
 					Detail = 0;// 00:無,01:債協,02:調解,03:更生,04:清算
 					ExportDateYN = 0;
 					try {
-						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, IsBtn, titaVo);
+						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, titaVo);
 					} catch (LogicException e) {
 						// E5004 讀取DB時發生問題
 						this.info("L5051 ErrorForDB=" + e);
@@ -462,7 +462,7 @@ public class L5074 extends TradeBuffer {
 					Detail = 0;// 00:無,01:債協,02:調解,03:更生,04:清算
 					ExportDateYN = 0;
 					try {
-						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, IsBtn, titaVo);
+						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, titaVo);
 					} catch (LogicException e) {
 						// E5004 讀取DB時發生問題
 						this.info("L5051 ErrorForDB=" + e);
@@ -491,7 +491,7 @@ public class L5074 extends TradeBuffer {
 					Detail = 0;// 00:無,01:債協,02:調解,03:更生,04:清算
 					ExportDateYN = 0;
 					try {
-						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, IsBtn, titaVo);
+						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, titaVo);
 					} catch (LogicException e) {
 						// E5004 讀取DB時發生問題
 						this.info("L5051 ErrorForDB=" + e);
@@ -502,13 +502,13 @@ public class L5074 extends TradeBuffer {
 					BufToday = BufValue(IsMainFin, State, Detail, ExportDateYN, 0);
 				} else if (i == 20) {
 					LabelB = ColB[4];
-					// LabelE = ColE[5];
+					//LabelE = ColE[5];
 					// 檢核成功(左)
 					State = 14;
 					Detail = 0;// 00:無,01:債協,02:調解,03:更生,04:清算
 					ExportDateYN = 0;
 					try {
-						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, IsBtn, titaVo);
+						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, titaVo);
 					} catch (LogicException e) {
 						// E5004 讀取DB時發生問題
 						this.info("L5051 ErrorForDB=" + e);
@@ -545,7 +545,7 @@ public class L5074 extends TradeBuffer {
 					Detail = 0;// 00:無,01:債協,02:調解,03:更生,04:清算
 					ExportDateYN = 0;
 					try {
-						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, IsBtn, titaVo);
+						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, titaVo);
 					} catch (LogicException e) {
 						// E5004 讀取DB時發生問題
 						this.info("L5051 ErrorForDB=" + e);
@@ -562,7 +562,7 @@ public class L5074 extends TradeBuffer {
 					Detail = 0;// 00:無,01:債協,02:調解,03:更生,04:清算
 					ExportDateYN = 0;
 					try {
-						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, IsBtn, titaVo);
+						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, titaVo);
 					} catch (LogicException e) {
 						// E5004 讀取DB時發生問題
 						this.info("L5051 ErrorForDB=" + e);
@@ -586,7 +586,7 @@ public class L5074 extends TradeBuffer {
 					State = 16;// 放款暫收
 					Detail = 0;// 00:無,01:債協,02:調解,03:更生,04:清算
 					try {
-						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, IsBtn, titaVo);
+						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, titaVo);
 					} catch (LogicException e) {
 						// E5004 讀取DB時發生問題
 						this.info("L5051 ErrorForDB=" + e);
@@ -601,7 +601,7 @@ public class L5074 extends TradeBuffer {
 					Detail = 0;// 00:無,01:債協,02:調解,03:更生,04:清算
 					ExportDateYN = 0;
 					try {
-						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, IsBtn, titaVo);
+						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, titaVo);
 					} catch (LogicException e) {
 						// E5004 讀取DB時發生問題
 						this.info("L5051 ErrorForDB=" + e);

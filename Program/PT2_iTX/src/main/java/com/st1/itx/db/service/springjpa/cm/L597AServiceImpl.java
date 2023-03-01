@@ -41,7 +41,7 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
 //注意異動此邊欄位,或SQL語法 請檢查L5074,L597A,L5708
-	private String slectDataHeaderName[] = { "使用表格", "合計資料", "身分證號", "案件序號", "戶號", "戶名", "交易別", "備註", "會計日", "入帳日", "入帳還款日", "暫收金額", "溢繳款", "繳期數", "還款金額", "應還期數", "應還金額", "累溢短收", "新壽攤分", "撥付金額",
+	private String slectDataHeaderName[] = { "使用表格", "合計資料", "身分證號", "案件序號", "戶號", "戶名", "交易別", "會計日", "入帳日", "入帳還款日", "暫收金額", "溢繳款", "繳期數", "還款金額", "應還期數", "應還金額", "累溢短收", "新壽攤分", "撥付金額",
 			"退還金額", "經辦", "交易序號" };
 	private String slectSummaryDataHeaderName[] = { "筆數", "合計" };
 	// private String StatusCodeValue[][] = { { "4001", "入/扣帳成功", "0" }, { "4505",
@@ -54,8 +54,7 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 		return sql;
 	}
 
-	
-	public String FindL597A(TitaVo titaVo, int AcDate, int IsMainFin, int State, int Detail, int ExportDateYN, int IsBtn, String KindCode) throws LogicException {
+	public String FindL597A(TitaVo titaVo, int AcDate, int IsMainFin, int State, int Detail, int ExportDateYN, String KindCode) throws LogicException {
 		String sqlSelect = "";
 		String sqlFrom = "";
 		String sqlLeftJoin = "";
@@ -68,7 +67,6 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 17:本月放款(非最大債權機構)
 		// Detail 細項 0:無,1:債協,2:調解,3:更生,4:清算
 		// ExportDateYN 製檔與否 0:無,1:已製檔,2:未製檔,3:撥付製檔,4:撥付傳票,5:撥付提兌
-		// IsBtn 是否為Btn,1:Y是0:N否
 
 		this.info("pKindCode  3==" + KindCode);
 		String sqlCaseKindCode = "AND (";
@@ -151,7 +149,6 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 			sqlSelect += "c.\"CustNo\" AS \"戶號\",";
 			sqlSelect += "c.\"CustName\" AS \"戶名\",";
 			sqlSelect += "' ' AS \"交易別\",";
-			sqlSelect += "' ' AS \"備註\",";
 			sqlSelect += "'' AS \"會計日\",";
 			sqlSelect += "acRec.\"OpenAcDate\" AS \"入帳日\",";
 			sqlSelect += "'' AS \"入帳還款日\",";
@@ -162,10 +159,10 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 			sqlSelect += "'' AS \"應還期數\",";
 			sqlSelect += "'' AS \"應還金額\",";
 			sqlSelect += "'' AS \"累溢短收\",";
-			sqlSelect += "acRec.\"RvAmt\" AS \"新壽攤分\",";
+			sqlSelect += "acRec.\"RvBal\" AS \"新壽攤分\",";
 			sqlSelect += "'' AS \"撥付金額\",";
 			sqlSelect += "'' AS \"退還金額\",";
-			sqlSelect += "'' AS \"經辦\",";
+			sqlSelect += "acRec.\"TitaTlrNo\" AS \"經辦\",";
 			sqlSelect += "acRec.\"TitaTxtNo\" AS \"交易序號\" ";
 
 			sqlFrom += "FROM \"AcReceivable\" acRec ";
@@ -178,11 +175,10 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 			sqlWhere += "AND acRec.\"RvBal\">0 ";
 
 			sqlOrder += "";
-		} else if (State == 13 || State == 14 || State == 15 || State == 18) {
+		} else if (State == 13 || State == 14 || State == 15 ) {
 			// 撥入筆數 13
 			// 檢核成功 14
 			// 檢核失敗 15
-			// 檢核成功-暫收解入 18
 			sqlSelect += "SELECT ";
 			sqlSelect += "'NegAppr02' AS \"使用表格\",";
 			sqlSelect += "NegAp02.\"TxAmt\" AS \"合計資料\",";
@@ -191,7 +187,6 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 			sqlSelect += "NegAp02.\"CustNo\" AS \"戶號\",";
 			sqlSelect += "c.\"CustName\" AS \"戶名\",";
 			sqlSelect += "' ' AS \"交易別\",";
-			sqlSelect += "RPAD(NegAp02.\"FinCode\",8,' ') || NegAp02.\"TxSeq\" AS \"備註\",";
 			sqlSelect += "NegAp02.\"AcDate\" AS \"會計日\",";
 			sqlSelect += "NegAp02.\"BringUpDate\" AS \"入帳日\",";
 			sqlSelect += "'' AS \"入帳還款日\",";
@@ -260,7 +255,6 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 			sqlSelect += "NegTran.\"CustNo\" AS \"戶號\",";
 			sqlSelect += "c.\"CustName\" AS \"戶名\",";
 			sqlSelect += "NegTran.\"TxKind\" AS \"交易別\",";
-			sqlSelect += "' ' AS \"備註\",";
 			sqlSelect += "NegTran.\"AcDate\" AS \"會計日\",";
 			sqlSelect += "NegTran.\"EntryDate\" AS \"入帳日\",";
 			sqlSelect += "NegTran.\"RepayDate\" AS \"入帳還款日\",";
@@ -354,7 +348,7 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 					sqlWhere += "AND NegTran.\"RepayDate\" = :AcDate ";
 				}
 				// 20201127 發現已經沒有CustMain.CustTypeCode[10 保貸戶] 用[05 保戶]取代-Jacky
-				String CustTypeCode = "05";
+				String CustTypeCode = "XX"; // 2023/1/17改為全部都劃分在放款攤分,沒有保單攤分,以XX沒有的代碼代替
 				if (State == 6 || State == 9) {
 					// 06:放款攤分
 					// 09:本月放款
@@ -453,7 +447,7 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 		return sql;
 	}
 
-	public List<Map<String, String>> FindData(int index, int limit, String sql, TitaVo titaVo, int AcDate, int IsMainFin, int State, int Detail, int ExportDateYN, int IsBtn) throws LogicException {
+	public List<Map<String, String>> FindData(int index, int limit, String sql, TitaVo titaVo, int AcDate, int IsMainFin, int State, int Detail, int ExportDateYN) throws LogicException {
 		this.info("FindData");
 
 		// *** 折返控制相關 ***

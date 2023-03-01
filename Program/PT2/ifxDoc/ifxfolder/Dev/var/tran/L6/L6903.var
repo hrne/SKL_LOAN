@@ -65,8 +65,13 @@ K(MODIFYBUTTON,查詢)
 T(4,CHAIN$)
 T(2,@RimTxCode,#TXCD)
 
-#NTXBUF=X,31,S
+!從L9742帶值進來並自動查詢
+#NTXBUF=X,1,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
+E(0,@CustNo,0)
+E(0,@AcDateSt,#SYSDATE)
+E(0,@AcDateEd,#SYSDATE)
+XMT()
 
 #CHAIN_AcBookCode=X,3,S
 T(1,#NTXBUF,1,3)
@@ -162,8 +167,7 @@ T(3,TWD)
 #BIND1A=X,1,S
 BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L6061; ntxbuf=#BUF1A;ntxbuf5=type<-1:
 AcNoCode<-OOAcNoCode:
-AcSubCode<-OOAcSubCode:
-AcDtlCode<-OOAcDtlCode})
+AcSubCode<-OOAcSubCode})
 
 
 !科子細目 AUTO COMPLETE，必須輸入
@@ -222,6 +226,8 @@ C(3,#CHAIN,1,XMT(),$)
 T(2,#DT)
 @V(7)A(4,0,#AcDateEd)V(5,#AcDateSt,#DT)
 
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L6R23.dec"/>
 
@@ -413,21 +419,25 @@ TXFORM=L6903
 
 #RPTFG=0,QUERY.GRID,L6903
 #any={detail:true, header:'L6903.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
-!會計日期
+
 #OOAcDate=會計日期
 {width:80,align:'center'}
-#OOAcNoCode=科目
-{width:80,align:'center'}
-#OOAcSubCode=子目
-{width:50,align:'center'}
-#OOAcDtlCode=細目
-{width:50,align:'center'}
+#OOSlipNo=傳票號碼
+{width:70,align:'center'}
+#OOAcNoItem=科子細目名稱
+{width:200,align:'left'}
 #OOCustNoX=戶號
 {width:120,align:'center'}
 #OODbAmtX=借方金額
 {width:140,align:'right'}
 #OOCrAmtX=貸方金額
 {width:140,align:'right'}
+#OOAcNoCode=科目
+{width:80,align:'center'}
+#OOAcSubCode=子目
+{width:50,align:'center'}
+#OOAcDtlCode=細目
+{width:50,align:'center'}
 #OOSlipBatNo=傳票批號
 {width:80,align:'center'}
 #OOSlipSumNo=彙總批號
@@ -438,24 +448,20 @@ TXFORM=L6903
 {width:80,align:'center'}
 #OORvNo=銷帳碼
 {width:80,align:'center'}
+#OOTitaTlrNoX=經辦
+{width:100,align:'center'}
+#OOTitaTxtNo=交易序號
+{width:80,align:'center'}
+#OOTitaSupNoX=主管
+{width:100,align:'center'}
+#OOSlipNote=傳票摘要
+{width:100,align:'left'}
+#OOTitaTxCdX=交易代號
+{width:150,align:'left'}
 #OOLastDate=交易日期
 {width:80,align:'center'}
 #OOLastTime=時間
 {width:80,align:'center'}
-#OOSlipNote=摘要
-{width:200,align:'left'}
-#OOTitaTxCdX=交易代號
-{width:150,align:'left'}
-#OOTitaTlrNoX=經辦
-{width:100,align:'center'}
-#OOTitaSupNoX=主管
-{width:100,align:'center'}
-#OOTitaTxtNo=交易序號
-{width:80,align:'center'}
-#OOAcNoItem=科子細目名稱
-{width:300,align:'left'}
-#OOSlipNo=傳票號碼
-{width:70,align:'center'}
 #OOLastUpdate=最後修改日期
 {width:150,align:'center'}
 #OOLastEmpX=最後修改人員
