@@ -61,7 +61,7 @@ R(1,L9R99)
 #OOProdNo{i}=X,2,L
 #OOProdName{i}=X,80,L
 #OOEffectDate{i}=X,8,L
-#OOFitRate{i}=n,4.2,L
+#OOFitRate{i}=n,4.3,L
 ##end
 
 #ProdGroup1=X,25,S
@@ -97,8 +97,8 @@ T(1,#ProdGroup{i},4,25)
 #EffectDate{i}=X,15,L
 IF(#OOEffectDate{i} >= 0,E(0,#OOEffectDate{i}),E(0,0))
 
-#FitRate{i}=n,10.2,L
-IF(#OOFitRate{i} >= 0,E(0,#OOFitRate{i}),E(0,0.00))
+#FitRate{i}=n,10.3,L
+IF(#OOFitRate{i} >= 0,E(0,#OOFitRate{i}),E(0,0.000))
 
 ##end
 
@@ -116,7 +116,7 @@ IF(#OOFitRate{i} >= 0,E(0,#OOFitRate{i}),E(0,0.00))
 !T(2,#OOProdName)
 !#EffectDate=X,8,S
 !E(0,#OOEffectDate)
-!#FitRate=X,4.2,S
+!#FitRate=X,4.3,S
 !E(0,#OOFitRate)
 
 
@@ -149,14 +149,18 @@ T(3,1)ASGN(LOOP$)
 !------ 上行電文 ------
 <sub type="TIM">
 #tranNo
-
+##loop{times:9,i:1}
+#ProdNo{i}
+#ProdName{i}
+#EffectDate{i}
+#FitRate{i}
+##end
 </sub>
 
 
 !------ 下行電文TOM ------
 <sub type="TOM">
 TXFORM=L9739
-
 
 ^
 TXFORM=L9R99

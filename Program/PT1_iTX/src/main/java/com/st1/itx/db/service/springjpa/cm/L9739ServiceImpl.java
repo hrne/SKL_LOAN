@@ -105,40 +105,40 @@ public class L9739ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	SELECT L.\"CustNo\"";
 		sql += "		  ,L.\"FacmNo\"";
 		sql += "		  ,L.\"BormNo\"";
-		sql += " 		  ,NVL(ML.\"StoreRate\",0.00) AS \"StoreRate\"";
-		sql += " 		  ,NVL(LC.\"EffectDate\",0) AS \"EffectDate\"";
+		sql += " 		  ,TO_CHAR(NVL(L.\"StoreRate\",0),'0.000') AS \"StoreRate\"";
+//		sql += " 		  ,NVL(LC.\"EffectDate\",0) AS \"EffectDate\"";
 		sql += "		  ,F.\"ProdNo\"";
 		sql += "	FROM \"LoanBorMain\" L";
 		sql += "	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = L.\"CustNo\"";
 		sql += "						   AND F.\"FacmNo\" = L.\"FacmNo\"";
-		sql += "	LEFT JOIN \"MonthlyLoanBal\" ML ON ML.\"CustNo\" = L.\"CustNo\"";
-		sql += "								   AND ML.\"FacmNo\" = L.\"FacmNo\"";
-		sql += "								   AND ML.\"BormNo\" = L.\"BormNo\"";
-		sql += "								   AND ML.\"YearMonth\" = :yearmonth ";
+//		sql += "	LEFT JOIN \"MonthlyLoanBal\" ML ON ML.\"CustNo\" = L.\"CustNo\"";
+//		sql += "								   AND ML.\"FacmNo\" = L.\"FacmNo\"";
+//		sql += "								   AND ML.\"BormNo\" = L.\"BormNo\"";
+//		sql += "								   AND ML.\"YearMonth\" = :yearmonth ";
 		// --確認最新訂定生效日
 		sql += "	LEFT JOIN \"FacProd\" P ON P.\"ProdNo\" = F.\"ProdNo\"";
-		// --確認戶號撥款最新商品生效日
-		sql += "	LEFT JOIN (";
-		sql += "		SELECT \"CustNo\"";
-		sql += "			  ,\"FacmNo\"";
-		sql += "			  ,\"BormNo\"";
-		sql += "			  ,MAX(\"EffectDate\") AS \"EffectDate\"";
-		sql += "		FROM \"LoanRateChange\"";
-		sql += "		WHERE REGEXP_LIKE(\"ProdNo\",'I[A-I]')";
-		sql += "		GROUP BY \"CustNo\"";
-		sql += "				,\"FacmNo\"";
-		sql += "				,\"BormNo\"";
-		sql += "	)LC ON LC.\"CustNo\" = L.\"CustNo\"";
-		sql += "	   AND LC.\"FacmNo\" = L.\"FacmNo\"";
-		sql += "	   AND LC.\"BormNo\" = L.\"BormNo\"";
-		sql += "	LEFT JOIN \"LoanRateChange\" LRC ON LRC.\"CustNo\" = LC.\"CustNo\"";
-		sql += "								    AND LRC.\"FacmNo\" = LC.\"FacmNo\"";
-		sql += "								    AND LRC.\"BormNo\" = LC.\"BormNo\"";
-		sql += "								    AND LRC.\"EffectDate\" = LC.\"EffectDate\"";
+//		// --確認戶號撥款最新商品生效日
+//		sql += "	LEFT JOIN (";
+//		sql += "		SELECT \"CustNo\"";
+//		sql += "			  ,\"FacmNo\"";
+//		sql += "			  ,\"BormNo\"";
+//		sql += "			  ,MAX(\"EffectDate\") AS \"EffectDate\"";
+//		sql += "		FROM \"LoanRateChange\"";
+//		sql += "		WHERE REGEXP_LIKE(\"ProdNo\",'I[A-I]')";
+//		sql += "		GROUP BY \"CustNo\"";
+//		sql += "				,\"FacmNo\"";
+//		sql += "				,\"BormNo\"";
+//		sql += "	)LC ON LC.\"CustNo\" = L.\"CustNo\"";
+//		sql += "	   AND LC.\"FacmNo\" = L.\"FacmNo\"";
+//		sql += "	   AND LC.\"BormNo\" = L.\"BormNo\"";
+//		sql += "	LEFT JOIN \"LoanRateChange\" LRC ON LRC.\"CustNo\" = LC.\"CustNo\"";
+//		sql += "								    AND LRC.\"FacmNo\" = LC.\"FacmNo\"";
+//		sql += "								    AND LRC.\"BormNo\" = LC.\"BormNo\"";
+//		sql += "								    AND LRC.\"EffectDate\" = LC.\"EffectDate\"";
 		sql += "	WHERE L.\"Status\" = 0";
 		sql += "	  AND REGEXP_LIKE(P.\"ProdNo\",'I[A-I]')";
-		sql += "	  AND P.\"StartDate\" = LC.\"EffectDate\"";
-		sql += "	  AND LRC.\"FitRate\" <> ML.\"StoreRate\"";
+//		sql += "	  AND P.\"StartDate\" = LC.\"EffectDate\"";
+//		sql += "	  AND LRC.\"FitRate\" <> ML.\"StoreRate\"";
 		sql += "	ORDER BY L.\"CustNo\" ASC";
 		sql += "			,L.\"FacmNo\" ASC";
 		sql += "			,L.\"BormNo\" ASC";
@@ -149,7 +149,7 @@ public class L9739ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		Query query;
 		query = em.createNativeQuery(sql);
-		query.setParameter("yearmonth", yearMonth);
+//		query.setParameter("yearmonth", yearMonth);
 		return this.convertToMap(query);
 	}
 }

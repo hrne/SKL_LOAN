@@ -164,7 +164,12 @@ public class L4961ReportB extends MakeReport {
 
 				print(0, 7, FormatUtil.pad9(String.valueOf(result.get("F3")), 7), "C"); // 戶號
 				print(0, 17, FormatUtil.pad9(String.valueOf(result.get("F4")), 3), "C"); // 額度
-				print(0, 23, result.get("F5"), "L"); // 戶名
+				
+				//戶名擷取長度
+				String tmpName = result.get("F5");
+				String cdInName = tmpName.length() < 13 ? tmpName : tmpName.substring(0, 12) + "...";
+				
+				print(0, 22, cdInName, "L"); // 戶名
 				print(0, 44, "" + insuYearMonth, "C"); // 到期年月
 				print(0, 60, formatAmt(result.get("F6"), 0), "R");// 總保費
 				print(0, 78, formatAmt(result.get("F10"), 0), "R");// 火險保額
@@ -190,7 +195,7 @@ public class L4961ReportB extends MakeReport {
 					colStatusX = tCdCode.getItem();
 				}
 
-				print(0, 160, colStatusX, "R");// 戶況
+				print(0, 164, colStatusX, "R");// 戶況
 
 				// 加總
 				totInsuPremTotal = totInsuPremTotal.add(totInsuPrem);
@@ -201,9 +206,9 @@ public class L4961ReportB extends MakeReport {
 			// 印總計
 			print(1, 1, "├————┴————┼———————┴————┴——————┼————————┴——————┼————————┴————————┼——————————┼—————┤");
 			print(1, 1, "｜　合　　　　　計　｜　　　　　　　　　　　　｜　　　　　　｜　　　　　　　　｜　　　　　　｜　　　　　　　　｜　　　　　　　　｜　　　　　　　　　　｜　　　　　｜");
-			print(0, 69, formatAmt(totInsuPremTotal, 0), "R");// F6
-			print(0, 105, formatAmt(fireInsuPremTotal, 0), "R");// F11
-			print(0, 139, formatAmt(ethqInsuPremTotal, 0), "R");// F13
+			print(0, 60, formatAmt(totInsuPremTotal, 0), "R");// F6
+			print(0, 92, formatAmt(fireInsuPremTotal, 0), "R");// F11
+			print(0, 126, formatAmt(ethqInsuPremTotal, 0), "R");// F13
 			print(1, 1, "└—————————┴————————————┴——————┴————————┴——————┴————————┴————————┴——————————┴—————┘");
 			if((resultList.size()+1)%18==0) {
 				print(1, this.getMidXAxis(), "經理：　　　　　　　　　　　　　　　經辦：", "C");

@@ -173,8 +173,6 @@ T(3,CdCode.CaseKindCode)
 T(3,CdCode.FunctionCode)
 #FunctionCodeHelp=x,1024,S
 
-
-
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
 S(XXR99,01,#StatusCode,#CustLoanKindCode,#CaseKindCodeCode,#FunctionCodeCode)
@@ -229,7 +227,9 @@ T(1,@CustId,#NTXBUF,3,10)
 T(1,@CustNo,#NTXBUF,13,7)
 T(1,@CaseSeq,#NTXBUF,20,3)
 
-
+!EM2661 2023033 判斷輸入次數
+#L5701Flag=X,1,S
+T(2,A)
 
 !控制錯誤訊息0:不報錯;1:報錯
 #L5R43Flag=A,1,S
@@ -252,7 +252,7 @@ C(3,#CaseSeq,0,S,$)
 T(2,@RimCustId,#CustId)
 T(2,@RimCustNo,#CustNo)
 T(2,@RimCaseSeq,#CaseSeq)
-RESET_RIM(#SEND_L5R01,L5R01)
+RESET_RIM(#SendL5r01,L5R01)
 S(L5R01,1,#FunctionCode,#RimCustId,#RimCustNo,#RimCaseSeq)
 R(1,L5R01)
 T(2,@CustId,#L5r01CustId)
@@ -493,19 +493,41 @@ IF(#FunctionCode=="01"||#FunctionCode=="02",$,s)
 HELP(#YNHelp)
 @V(H,#YNHelp)
 C(5,#IsMainFin,Y,T(2,@FieldName,簽約總金額),T(2,@FieldName,新壽總金額))
+IF(#L5r01IsMainFin!=#IsMainFin,T(2,@L5701Flag,B),$)
 IF(#FunctionCode==02 || #FunctionCode==01,C(5,#IsMainFin,Y,T(2,@MainFinCode,458)T(2,@MainFinCodeName,),$),$)
 IF(#FunctionCode==02 || #FunctionCode==01|| #FunctionCode==09|| #FunctionCode==11,C(5,#IsMainFin,Y,HIDE(#BTNM),SHOW(#BTNM)),HIDE(#BTNM))
 IF(#FunctionCode==02 || #FunctionCode==01,C(5,#IsMainFin,N,IF(#MainFinCode=="458",T(2,@MainFinCode,)T(2,@MainFinCodeName,),$),$),$)
 IF(#FunctionCode==02 || #FunctionCode==01,C(5,#IsMainFin,Y,CALL(#IsMainFinIsY),CALL(#IsMainFinIsN)),$)
 
+
 #IsMainFinIsY=@,1,S
 INVOKEJS(SHOW,grd1,1)
 IF(#FunctionCode==02 || #FunctionCode==01,CALL(#CheckgrdA),INVOKEJS(SHOW,grd1,2,31,0))
-
 #CheckgrdA=@,1,S
+!EM2661 20230331 調整每次切換最大債權為Y，需調用一次RIM
+#SendL5r01A=X,1,S
+IF(#FunctionCode=="01"||#FunctionCode=="02",$,S)
+IF(#L5701Flag=="A",s,$)
+C(4,#CustId,S,$)
+C(3,#CustNo,0,S,$)
+C(3,#CaseSeq,0,S,$)
+T(2,@RimCustId,#CustId)
+T(2,@RimCustNo,#CustNo)
+T(2,@RimCaseSeq,#CaseSeq)
+RESET_RIM(#SendL5r01A,L5R01)
+S(L5R01,1,#FunctionCode,#RimCustId,#RimCustNo,#RimCaseSeq)
+R(1,L5R01)
+##loop {times:30,i:1}
+T(2,@NegFinShareFinCode{i},#L5r01NegFinShareFinCode{i})
+T(2,@FinCodeName{i},#L5r01NegFinShareFinName{i})
+E(0,@NegFinShareContractAmt{i},#L5r01NegFinShareContractAmt{i})
+E(0,@NegFinShareAmtRatio{i},#L5r01NegFinShareAmtRatio{i})
+E(0,@NegFinShareDueAmt{i},#L5r01NegFinShareDueAmt{i})
+##end
 ##loop {times:30,i:1}
 IF({i}==1,INVOKEJS(SHOW,grd1,{i},{i},1),C(4,#NegFinShareFinCode{i},INVOKEJS(SHOW,grd1,{i},{i},0),INVOKEJS(SHOW,grd1,{i},{i},1)))
 ##end
+
 
 ! INVOKEJS(SHOW,grd1,1,31,1)
 
@@ -513,15 +535,15 @@ IF({i}==1,INVOKEJS(SHOW,grd1,{i},{i},1),C(4,#NegFinShareFinCode{i},INVOKEJS(SHOW
 INVOKEJS(SHOW,grd1,0)
 
 !EM2661 調整為不清空grd1  
-!##loop {times:30,i:1}
-!T(2,@NegFinShareFinCode{i},)
-!T(2,@FinCodeName{i},)
-!E(0,@NegFinShareContractAmt{i},0)
-!E(0,@NegFinShareAmtRatio{i},0)
-!E(0,@NegFinShareDueAmt{i},0)
-!E(0,@NegFinShareCancelDate{i},0)
-!E(0,@NegFinShareCancelAmt{i},0)
-!##end
+##loop {times:30,i:1}
+T(2,@NegFinShareFinCode{i},)
+T(2,@FinCodeName{i},)
+E(0,@NegFinShareContractAmt{i},0)
+E(0,@NegFinShareAmtRatio{i},0)
+E(0,@NegFinShareDueAmt{i},0)
+E(0,@NegFinShareCancelDate{i},0)
+E(0,@NegFinShareCancelAmt{i},0)
+##end
 
 ! 案件種類
 #CaseKindCode=X,1,I

@@ -723,7 +723,7 @@ public class L5701 extends TradeBuffer {
 	 */
 	public void checkContractAmt() throws LogicException {	
 
-		String isMainFin = titaVo.getParam("IsMainFin").trim(); // 最大債權 Y N		
+		String isMainFin = titaVo.getParam("IsMainFin").trim(); // 最大債權 Y N	
 		if ("N".equals(isMainFin)) { return; } // 最大債權為N，不用檢核
 		
 		Integer custNo = parse.stringToInteger(titaVo.getParam("CustNo").trim()); // 戶號-MainKey
@@ -797,10 +797,6 @@ public class L5701 extends TradeBuffer {
 
 
 	public void InsertShareLog(int mCustNo, int mCaseSeq, String tFunctionCode) throws LogicException {
-
-		//EM2661 20230223 判斷最大債權為N時，不寫入NegFinShareLog資訊
-		String isMainFin = titaVo.getParam("IsMainFin").trim(); // 最大債權 Y N
-		if ("N".equals(isMainFin)) { return; } // 最大債權為N，不用檢核
 				
 		for (int i = 0; i < NegFinShareL; i++) {
 
@@ -847,11 +843,7 @@ public class L5701 extends TradeBuffer {
 	}
 
 	public void UpdateShareLog(int mCustNo, int mCaseSeq, String tFunctionCode) throws LogicException {
-
-		//EM2661 20230223 判斷最大債權為N時，不寫入NegFinShareLog資訊
-		String isMainFin = titaVo.getParam("IsMainFin").trim(); // 最大債權 Y N
-		if ("N".equals(isMainFin)) { return; } // 最大債權為N，不用檢核
-		
+	
 		ArrayList<String> InArraylist;
 		InArraylist = new ArrayList<String>();
 		// 輸入資料

@@ -69,32 +69,13 @@ public class L9739p extends TradeBuffer {
 			iYearMonth = mfbsdsy / 100;
 		}
 
-//		List<Map<String, String>> listL9739Detail = null;
-//		try {
-//
-//			listL9739Detail = l9739ServiceImpl.findAll(titaVo, iYearMonth);
-//
-//		} catch (Exception e) {
-//			StringWriter errors = new StringWriter();
-//			e.printStackTrace(new PrintWriter(errors));
-//			this.error(txcd + "ServiceImpl.findAll error = " + errors.toString());
-//		}
-//
-//		if (listL9739Detail.size() > 0) {
-//			for (int i = 0; i < listL9739Detail.size(); i++) {
-//
-//				this.totaVo.putParam("OCustNo" , listL9739Detail.get(i).get("CustNo"));
-//				this.totaVo.putParam("OFacmNo", listL9739Detail.get(i).get("FacmNo"));
-//				this.totaVo.putParam("OBormNo" , listL9739Detail.get(i).get("BormNo"));
-//				this.totaVo.putParam("OFitRate", listL9739Detail.get(i).get("FitRate"));
-//				this.totaVo.putParam("OEffectDate" + i, listL9739Detail.get(i).get("EffectDate"));
-//				this.totaVo.putParam("OProdNo", listL9739Detail.get(i).get("ProdNo"));
-//		
-//			}
-//		} 
+
+		//貸款種類數量
+		int loanTypeCount = 9;
+		
 		boolean isFinish = false;
 
-		isFinish = l9739Report.exec(titaVo,iYearMonth);
+		isFinish = l9739Report.exec(titaVo,iYearMonth,loanTypeCount);
 
 		if (isFinish) {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
