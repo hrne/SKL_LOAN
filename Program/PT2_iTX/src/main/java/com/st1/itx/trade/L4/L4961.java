@@ -77,7 +77,7 @@ public class L4961 extends TradeBuffer {
 			l4961ReportA.setParentTranCode(parentTranCode);
 			l4961ReportA.exec(titaVo);
 			l4961ReportA.close();
-		} else if (iSearchOption == 3 && this.index == 0) {
+		} else if (iSearchOption == 4 && this.index == 0) {
 			// 3:催收款項-火險費明細表
 			l4961ReportB.setParentTranCode(parentTranCode);
 			l4961ReportB.exec(titaVo);

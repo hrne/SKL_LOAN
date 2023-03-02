@@ -468,7 +468,7 @@ CALL(#ReviewInterestCoverageRatio2Proc)
 #RimCustNo=A,7,S
 #RimDataYear=A,7,S
 #RimFunCd=A,1,S
-ALERT(#FunCd)
+
 !統一編號
 #CustId=X,8,I
 C(3,#FunCd,1,I,s)

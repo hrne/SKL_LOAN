@@ -86,7 +86,7 @@ T(2,@AuthStatusHelp,#HelpDesc2)
 T(2,@CreateFlagHelp2,#HelpDesc3) 
 
 #FunctionHelp=x,50,S
-T(3,1:篩選資料;2:產出媒體檔;3:重製媒體碼)
+T(3,1:篩選資料;2:產出媒體檔;3:重置媒體碼)
 
 #CreateFlagHelp=x,50,S
 T(3,1:新增授權;2:再次授權;3:取消授權)

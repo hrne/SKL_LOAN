@@ -169,12 +169,12 @@ public class L4961ReportB extends MakeReport {
 				String tmpName = result.get("F5");
 				String cdInName = tmpName.length() < 13 ? tmpName : tmpName.substring(0, 12) + "...";
 				
-				print(0, 22, cdInName, "L"); // 戶名
-				print(0, 44, "" + insuYearMonth, "C"); // 到期年月
-				print(0, 60, formatAmt(result.get("F6"), 0), "R");// 總保費
-				print(0, 78, formatAmt(result.get("F10"), 0), "R");// 火險保額
-				print(0, 92, formatAmt(result.get("F11"), 0), "R");// 火險保費
-				print(0, 110, formatAmt(result.get("F12"), 0), "R");// 地震險保額
+				print(0, 23, cdInName, "L"); // 戶名
+				print(0, 43, "" + insuYearMonth, "C"); // 到期年月
+				print(0, 58, formatAmt(result.get("F6"), 0), "R");// 總保費
+				print(0, 76, formatAmt(result.get("F10"), 0), "R");// 火險保額
+				print(0, 91, formatAmt(result.get("F11"), 0), "R");// 火險保費
+				print(0, 108, formatAmt(result.get("F12"), 0), "R");// 地震險保額
 				print(0, 126, formatAmt(result.get("F13"), 0), "R");// 地震險保費
 				print(0, 150, result.get("F2"), "R");// 保單號碼
 
@@ -195,7 +195,7 @@ public class L4961ReportB extends MakeReport {
 					colStatusX = tCdCode.getItem();
 				}
 
-				print(0, 164, colStatusX, "R");// 戶況
+				print(0, 163, colStatusX, "R");// 戶況
 
 				// 加總
 				totInsuPremTotal = totInsuPremTotal.add(totInsuPrem);
@@ -206,8 +206,8 @@ public class L4961ReportB extends MakeReport {
 			// 印總計
 			print(1, 1, "├————┴————┼———————┴————┴——————┼————————┴——————┼————————┴————————┼——————————┼—————┤");
 			print(1, 1, "｜　合　　　　　計　｜　　　　　　　　　　　　｜　　　　　　｜　　　　　　　　｜　　　　　　｜　　　　　　　　｜　　　　　　　　｜　　　　　　　　　　｜　　　　　｜");
-			print(0, 60, formatAmt(totInsuPremTotal, 0), "R");// F6
-			print(0, 92, formatAmt(fireInsuPremTotal, 0), "R");// F11
+			print(0, 58, formatAmt(totInsuPremTotal, 0), "R");// F6
+			print(0, 91, formatAmt(fireInsuPremTotal, 0), "R");// F11
 			print(0, 126, formatAmt(ethqInsuPremTotal, 0), "R");// F13
 			print(1, 1, "└—————————┴————————————┴——————┴————————┴——————┴————————┴————————┴——————————┴—————┘");
 			if((resultList.size()+1)%18==0) {
