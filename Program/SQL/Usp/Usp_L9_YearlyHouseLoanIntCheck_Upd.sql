@@ -1,8 +1,8 @@
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L9_YearlyHouseLoanIntCheck_Upd"
+(
 -- 程式功能：維護 YearlyHouseLoanIntCheck 每年房屋擔保借款繳息檢核檔
 -- 執行時機：執行L5811產生檢核檔時
--- 執行方式：EXEC "Usp_L9_YearlyHouseLoanIntCheck_Upd"(20201231,'999999',0,0,0,'');
-create or replace PROCEDURE "Usp_L9_YearlyHouseLoanIntCheck_Upd"
-(
+-- 執行方式：EXEC "Usp_L9_YearlyHouseLoanIntCheck_Upd"(20201231,'999999',202012,0,0,0,'');
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
     EmpNo          IN  VARCHAR2,   -- 經辦
@@ -199,8 +199,16 @@ BEGIN
             WHEN NVL(AcctCode,' ') = ' '
             THEN 1
           ELSE 0 END = 1
-      AND NVL(JSON_VALUE(Y."JsonFields",  '$.StartMonth'),0) = StartMonth  
-      AND NVL(JSON_VALUE(Y."JsonFields",  '$.EndMonth'),0) = EndMonth  
+      AND CASE 
+            WHEN NVL(JSON_VALUE(Y."JsonFields",  '$.StartMonth'),0) = StartMonth THEN 1
+            WHEN StartMonth = 0 
+              AND NVL(JSON_VALUE(Y."JsonFields",  '$.StartMonth'),0) = TRUNC(YYYYMM / 100) * 100 + 01 THEN 1
+          ELSE 0 END = 1
+      AND CASE
+            WHEN NVL(JSON_VALUE(Y."JsonFields",  '$.EndMonth'),0) = EndMonth THEN 1 
+            WHEN EndMonth = 0 
+              AND NVL(JSON_VALUE(Y."JsonFields",  '$.EndMonth'),0) = TRUNC(YYYYMM / 100) * 100 + 12 THEN 1 
+          ELSE 0 END = 1
     ;
 
     INS_CNT := INS_CNT + sql%rowcount;

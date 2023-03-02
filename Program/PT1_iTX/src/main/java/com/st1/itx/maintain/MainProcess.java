@@ -139,7 +139,7 @@ public class MainProcess extends SysLogger {
 			ThreadVariable.setObject(ContentName.dataBase, this.titaVo.getDataBase());
 			ThreadVariable.setObject(ContentName.loggerFg, tTxTeller.getLoggerFg() == 1 ? true : false);
 			ThreadVariable.setObject(ContentName.txtno, this.titaVo.getTxtNo());
-			
+
 			this.info(">[" + this.titaVo.getTlrNo() + "]<");
 			// ThreadVariable.setObject(ContentName.empnot, this.titaVo.getEmpNot());
 			ThreadVariable.setObject(ContentName.empnot, this.titaVo.getTlrNo());
@@ -335,9 +335,7 @@ public class MainProcess extends SysLogger {
 		}
 
 		/* 交易權限檢核 */
-		if (!this.titaVo.isTxcdRim()) {
-			this.checkTranCode();
-		}
+		this.checkTranCode();
 
 		if (this.titaVo.isTxcdInq()) {
 			return;
@@ -513,7 +511,14 @@ public class MainProcess extends SysLogger {
 		TxCom txCom = this.txBuffer.getTxCom();
 
 		/* 交易控制 */
-		TxTranCode tTxTranCode = txTranCodeService.findById(this.titaVo.getTxCode());
+		TxTranCode tTxTranCode = this.titaVo.isTxcdRim() ? txTranCodeService.findById(this.titaVo.getTxcd()) : txTranCodeService.findById(this.titaVo.getTxCode());
+
+		if (this.titaVo.isTxcdRim() && !Objects.isNull(tTxTranCode)) {
+			this.titaVo.putParam(ContentName.apLogFlag, tTxTranCode.getApLogFlag());
+			this.titaVo.putParam(ContentName.apLogRim, tTxTranCode.getApLogRim());
+			this.titaVo.putParam(ContentName.txCodeNM, tTxTranCode.getTranItem());
+			return;
+		}
 
 		if (this.titaVo.isTxcdSpecial()) {
 			txCom.setCanCancel(0);

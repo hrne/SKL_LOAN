@@ -35,6 +35,7 @@ public class L8350 extends TradeBuffer {
 	@Autowired
 	public DataLog iDataLog;
 
+	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8350 ");

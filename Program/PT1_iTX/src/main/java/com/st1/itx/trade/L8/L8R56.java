@@ -40,6 +40,7 @@ public class L8R56 extends TradeBuffer {
 	//	int iRimDataDate = Integer.valueOf(titaVo.getParam("RimDataDate")) + 19110000;
 		String iRimEmpId = titaVo.getParam("RimEmpId");
 
+		
 		TbJcicMu01 iTbJcicMu01 = new TbJcicMu01();
 		TbJcicMu01Id iTbJcicMu01Id = new TbJcicMu01Id();
 		iTbJcicMu01Id.setBranchCode(iRimBranchCode);

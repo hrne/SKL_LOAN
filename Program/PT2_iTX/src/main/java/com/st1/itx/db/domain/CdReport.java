@@ -1,6 +1,8 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -9,6 +11,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.Id;
 import javax.persistence.Column;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * CdReport 報表代號對照檔<br>
@@ -95,6 +99,11 @@ public class CdReport implements Serializable {
   /* 0:普通1:密2:機密3:極機密 */
   @Column(name = "`Confidentiality`", length = 1)
   private String confidentiality;
+
+  // 敏感性資料記錄記號
+  /* 0-否1-是 */
+  @Column(name = "`ApLogFlag`")
+  private int apLogFlag = 0;
 
   // 建檔日期時間
   @CreatedDate
@@ -423,6 +432,27 @@ public class CdReport implements Serializable {
   }
 
 /**
+	* 敏感性資料記錄記號<br>
+	* 0-否
+1-是
+	* @return Integer
+	*/
+  public int getApLogFlag() {
+    return this.apLogFlag;
+  }
+
+/**
+	* 敏感性資料記錄記號<br>
+	* 0-否
+1-是
+  *
+  * @param apLogFlag 敏感性資料記錄記號
+	*/
+  public void setApLogFlag(int apLogFlag) {
+    this.apLogFlag = apLogFlag;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -503,7 +533,7 @@ public class CdReport implements Serializable {
   public String toString() {
     return "CdReport [formNo=" + formNo + ", formName=" + formName + ", cycle=" + cycle + ", sendCode=" + sendCode + ", letterFg=" + letterFg + ", messageFg=" + messageFg
            + ", emailFg=" + emailFg + ", letter=" + letter + ", message=" + message + ", email=" + email + ", usageDesc=" + usageDesc + ", signCode=" + signCode
-           + ", watermarkFlag=" + watermarkFlag + ", enable=" + enable + ", confidentiality=" + confidentiality + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", watermarkFlag=" + watermarkFlag + ", enable=" + enable + ", confidentiality=" + confidentiality + ", apLogFlag=" + apLogFlag + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
+           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

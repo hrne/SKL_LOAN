@@ -69,6 +69,7 @@ public class L5813ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	,cb.\"BdLocation\"     \r\n";
 		sql += "    ,CC.\"Item\"           \r\n";
 		sql += "	from  \"YearlyHouseLoanInt\"  y      \r\n";
+		sql += "    LEFT JOIN \"CustMain\" C ON C.\"CustNo\" =  Y.\"CustNo\" ";
 		sql += "	left join  \"ClFac\" cl on cl.\"CustNo\" = y.\"CustNo\"      \r\n";
 		sql += "	                       and cl.\"FacmNo\" = y.\"FacmNo\"      \r\n";
 		sql += "	                       and cl.\"MainFlag\" = 'Y'             \r\n";
@@ -83,6 +84,11 @@ public class L5813ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    		               AND CC.\"Code\" = UD.\"UsageCode\"  \r\n";
 		
 		sql += "	where \"YearMonth\"= :iYYYYMM ";
+		sql += "      AND C.\"CuscCd\" = 1 "; // 自然人,2023/3/2調整
+		sql += "      AND CASE "; //須有房地擔保品故建號需有值,2023/3/2調整
+		sql += "            WHEN  cb.\"BdNo1\" > 0  THEN 1";
+		sql += "            WHEN  cb.\"BdNo2\" > 0  THEN 1";
+		sql += "          ELSE 0 END = 1";
 		sql += "	order by \"CustNo\",\"FacmNo\" , \"UsageCode\" DESC ";
 
 		this.info("sql=" + sql);

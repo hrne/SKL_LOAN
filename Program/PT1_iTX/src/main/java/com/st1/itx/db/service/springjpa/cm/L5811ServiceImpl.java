@@ -90,12 +90,17 @@ public class L5811ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  ON CA.\"CityCode\" = CB.\"CityCode\" ";
 		sql += " AND CA.\"AreaCode\" = CB.\"AreaCode\" ";
 		sql += " WHERE Y.\"YearMonth\" = :iYYYYMM ";
-		sql += " AND CASE "; // 自然人或房地擔保品
-		sql += "       WHEN C.\"CuscCd\" = 1 ";
-		sql += "       THEN 1 ";
-		sql += "       WHEN CL.\"ClCode1\" = 1 ";
-		sql += "       THEN 1";
-		sql += "     ELSE 0 END = 1 ";
+		sql += " AND C.\"CuscCd\" = 1 "; // 自然人,2023/3/2調整
+		//sql += "       WHEN C.\"CuscCd\" = 1 ";
+		//sql += "       THEN 1 ";
+		//sql += "       WHEN CL.\"ClCode1\" = 1 ";
+		//sql += "       THEN 1";
+		//sql += "     ELSE 0 END = 1 ";
+		sql += " AND CASE "; //須有房地擔保品故建號需有值,2023/3/2調整
+		sql += "       WHEN  CB.\"BdNo1\" > 0  THEN 1";
+		sql += "       WHEN  CB.\"BdNo2\" > 0  THEN 1";
+		sql += "     ELSE 0 END = 1";
+		
 		sql += " AND CASE "; // L5810連動有值時，依值篩選
 		sql += "       WHEN :CustNo != 0";
 		sql += "            AND Y.\"CustNo\" = :CustNo ";
@@ -110,8 +115,16 @@ public class L5811ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       WHEN NVL(:AcctCode,' ') = ' '";
 		sql += "       THEN 1 ";
 		sql += "     ELSE 0 END = 1 ";
-		sql += " and NVL(JSON_VALUE(Y.\"JsonFields\", '$.StartMonth'),0) = :StartMonth ";
-		sql += " and NVL(JSON_VALUE(Y.\"JsonFields\", '$.EndMonth'),0) = :EndMonth ";
+		sql += " AND CASE "; // 2023/3/2調整
+		sql += "       WHEN NVL(JSON_VALUE(Y.\"JsonFields\", '$.StartMonth'),0) = :StartMonth THEN 1 ";
+		sql += "       WHEN :StartMonth = 0 AND NVL(JSON_VALUE(Y.\"JsonFields\", '$.StartMonth'),0) = TRUNC(:iYYYYMM / 100) * 100 + 01 THEN 1 ";
+		sql += "     ELSE 0 END = 1 ";
+
+		sql += " AND CASE "; // 2023/3/2調整
+		sql += "       WHEN NVL(JSON_VALUE(Y.\"JsonFields\", '$.EndMonth'),0) = :EndMonth THEN 1";
+		sql += "       WHEN :EndMonth = 0 AND NVL(JSON_VALUE(Y.\"JsonFields\", '$.EndMonth'),0) = TRUNC(:iYYYYMM / 100) * 100 + 12 THEN 1";
+		sql += "     ELSE 0 END = 1 ";
+
 		sql += " ORDER BY Y.\"CustNo\"  ";
 		sql += "        , Y.\"FacmNo\"";
 

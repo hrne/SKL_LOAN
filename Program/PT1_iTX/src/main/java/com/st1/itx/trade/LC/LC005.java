@@ -145,7 +145,12 @@ public class LC005 extends TradeBuffer {
 
 				occursList.putParam("FlowType", tTxFlow.getFlowType());
 				occursList.putParam("FlowStep", tTxFlow.getFlowStep());
-				occursList.putParam("RejectReason", "退回原因:"+tTxFlow.getRejectReason());
+				this.info("tTxFlow.getRejectReason().trim()   = " + tTxFlow.getRejectReason().trim());
+				if(!"".equals((tTxFlow.getRejectReason().trim()))) {
+					occursList.putParam("RejectReason", "退回原因:"+tTxFlow.getRejectReason());					
+				}else {
+					occursList.putParam("RejectReason", tTxFlow.getRejectReason());						
+				}
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}

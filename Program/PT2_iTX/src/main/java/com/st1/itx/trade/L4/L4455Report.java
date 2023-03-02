@@ -70,7 +70,7 @@ public class L4455Report extends MakeReport {
 	private String acctcode = "";
 	private String acctcodex = "";
 	private String tCustName = "";
-	private String repaybankX= "";
+	private String repaybankX = "";
 
 	// 合計
 
@@ -184,22 +184,23 @@ public class L4455Report extends MakeReport {
 		} else {
 			this.print(-6, 3, "扣款日期：");
 		}
+		this.info("RepayBank" + titaVo.get("RepayBank"));
 		for (CdCode tCdCode : lCdCode) {
-			this.info("RepayBank" +  titaVo.get("RepayBank"));
 			if (titaVo.get("RepayBank").equals(tCdCode.getCode())) {
 				bank = tCdCode.getItem();
 				repaybank = titaVo.get("RepayBank").trim();
 				repaybankX = titaVo.get("RepayBankX").trim();
-				this.info("RepayBankX     = "    + repaybankX);
+				this.info("RepayBankX     = " + repaybankX);
 			}
 		}
 		if (dataSize == 0) {
-			//repaybank = "";
-			repaybank = titaVo.get("RepayBank")+' '+titaVo.get("RepayBankX");
+			// repaybank = "";
+			repaybank = titaVo.get("RepayBank") + ' ' + titaVo.get("RepayBankX");
 			bank = "";
 		}
-
-		this.print(-6, 35, "扣款銀行：" + bank +" "+ repaybank );
+		if (!"998".equals(repaybank)) {
+			this.print(-6, 35, "扣款銀行：" + bank + " " + repaybank);
+		}
 
 		this.print(-8, 1,
 				"戶號              戶名           扣款金額    作帳金額        計息起迄日                本金          利息        暫付款        違約金        暫收借        暫收貸          短繳        ");
@@ -225,7 +226,7 @@ public class L4455Report extends MakeReport {
 			this.error("L4455ServiceImpl findByCondition " + e.getMessage());
 			throw new LogicException("E0013", "L4455");
 		}
-		Report(titaVo, L4455List, funcd);
+		execReport(titaVo, L4455List, funcd);
 
 		L4455List = new ArrayList<Map<String, String>>();
 		this.info("L4455Report AcctFee + LawFee");
@@ -236,7 +237,7 @@ public class L4455Report extends MakeReport {
 			this.error("L4455ServiceImpl findByCondition " + e.getMessage());
 			throw new LogicException("E0013", "L4455");
 		}
-		Report(titaVo, L4455List, funcd);
+		execReport(titaVo, L4455List, funcd);
 
 		this.info("L4455Report ModifyFee");
 		funcd = 3;
@@ -246,7 +247,7 @@ public class L4455Report extends MakeReport {
 			this.error("L4455ServiceImpl findByCondition " + e.getMessage());
 			throw new LogicException("E0013", "L4455");
 		}
-		Report(titaVo, L4455List, funcd);
+		execReport(titaVo, L4455List, funcd);
 
 		this.info("L4455Report FireFee");
 		funcd = 4;
@@ -256,7 +257,7 @@ public class L4455Report extends MakeReport {
 			this.error("L4455ServiceImpl findByCondition " + e.getMessage());
 			throw new LogicException("E0013", "L4455");
 		}
-		Report(titaVo, L4455List, funcd);
+		execReport(titaVo, L4455List, funcd);
 
 		this.info("L4455Report Collist");
 		funcd = 5;
@@ -266,10 +267,10 @@ public class L4455Report extends MakeReport {
 			this.error("L4455ServiceImpl findByCondition " + e.getMessage());
 			throw new LogicException("E0013", "L4455");
 		}
-		Report(titaVo, L4455List, funcd);
+		execReport(titaVo, L4455List, funcd);
 	}
 
-	private void Report(TitaVo titaVo, List<Map<String, String>> L4455List, int function) throws LogicException {
+	private void execReport(TitaVo titaVo, List<Map<String, String>> L4455List, int function) throws LogicException {
 
 		// 是否有資料
 		dataSize = L4455List.size() > 0 && !L4455List.isEmpty() ? L4455List.size() : 0;
@@ -337,7 +338,6 @@ public class L4455Report extends MakeReport {
 
 			this.info("repaybank old = " + L4455List.get(i).get("RepayBank"));
 			if (!repaybank.equals(L4455List.get(i).get("RepayBank"))) {
-
 				repaybank = L4455List.get(i).get("RepayBank");
 				for (CdCode tCdCode : lCdCode) {
 					if (repaybank.equals(tCdCode.getCode())) {
@@ -360,8 +360,38 @@ public class L4455Report extends MakeReport {
 				acctcode = L4455List.get(i).get("AcctCode");
 			}
 
+			// 計數用
+			int tmpCount = 0;
+
 			for (int j = 1; j <= L4455List.size(); j++) {
+				tmpCount++;
 				i = j - 1;
+
+				//給 998 ACH扣款 判斷加的
+				if ("998".equals(titaVo.get("RepayBank")) || !repaybank.equals(L4455List.get(i).get("RepayBank"))) {
+					repaybank = L4455List.get(i).get("RepayBank");
+					for (CdCode tCdCode : lCdCode) {
+						if (repaybank.equals(tCdCode.getCode())) {
+							bank = tCdCode.getItem();
+
+						}
+					}
+					
+					//第一頁
+					if(tmpCount == 1) {
+						this.print(-6, 35, "扣款銀行：" + bank + " " + repaybank);
+					}
+
+					if (this.getNowPage() > 1) {
+						this.info("getNowPage  = " + this.getNowPage());
+						this.info("NowRow  = " + this.NowRow);
+						this.info("newPage  = " + L4455List.get(i).get("RepayBank"));
+						this.newPage();
+						
+						this.print(-6, 35, "扣款銀行：" + bank + " " + repaybank);
+						
+					}
+				}
 
 //				每頁筆數相加
 				pageCnt++;
@@ -517,7 +547,7 @@ public class L4455Report extends MakeReport {
 						continue;
 
 					}
-					//銀行扣款總傳票明細表(火險費)
+					// 銀行扣款總傳票明細表(火險費)
 					if (funcd != 4) {
 						if (!L4455List.get(i).get("AcctCode").equals(acctcode)) { // 科目不同 科目合計
 							this.print(1, 1,

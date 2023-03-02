@@ -626,6 +626,7 @@ T(H,#BussNationalityCodeBef,#NationalityCodeHelp)
 #BussNationalityCodeInd=X,1,L
 
 #BussNationalityCodeAft=X,2,I
+C(4,#BussNationalityCodeAft,T(3,TW),$)
 HELP(#NationalityCodeHelp)
 @
 C(5,#BussNationalityCodeAft,#BussNationalityCodeBef,s,$)
@@ -934,6 +935,7 @@ T(2,@CurrNumAft,#RegNumAft)
 T(2,@CurrNumDashAft,#RegNumDashAft)
 T(2,@CurrFloorAft,#RegFloorAft)
 T(2,@CurrFloorDashAft,#RegFloorDashAft)
+T(2,@RimAreaCode,#CurrAreaCodeAft)
 !T(2,@CurraddressAft,#RegaddressAft)
 
 #CurrCityCodeInd=X,1,L
@@ -956,15 +958,16 @@ IF(#CurrCityCodeAft==#CurrCityCodeBef,T(3,),T(3,X))
 #RimL6r03Area1=X,1,S
 C(5,#SameReg,Y,s,$)
 C(4,#CurrCityCodeAft,S,$)
+C(4,#CurrAreaCodeAft,S,$)
 E(0,@RimFunCd,2)
 T(2,@RimCityCode,#CurrCityCodeAft)
-T(2,@RimAreaCode,)
+T(2,@RimAreaCode,#CurrAreaCodeAft)
 RESET_RIM(#RimL6r03Area1,L6R03)
 S(L6R03,1,#RimFunCd,#RimCityCode,#RimAreaCode)
 R(1,L6R03)
 
 !通訊-鄉鎮市區代碼的下拉選單
-#AreaHelp2=X,1000,S
+#AreaHelp2=X,2000,S
 T(2,#L6r03Result)
 
 !通訊-鄉鎮市區代碼
@@ -985,8 +988,20 @@ C(5,#CurrCityCodeBef,#CurrCityCodeAft,C(5,#CurrAreaCodeBef,#CurrAreaCodeAft,s,$)
 V(H,#AreaHelp2)
 
 !通訊 鄉鎮市區代碼的對應名稱
+!#CurrAreaItemAft=X,20,L
+!T(2,@RimAreaCode,#CurrAreaItemAft)
+!T(H,#CurrAreaItemAft,#AreaHelp2)
+!T(H,#CurrAreaCodeAft,#AreaHelp2)
+
+!通訊 鄉鎮市區代碼的對應名稱
 #CurrAreaItemAft=X,20,L
-T(H,#CurrAreaCodeAft,#AreaHelp2)
+!T(H,#CurrAreaItemAft,#AreaHelp2)
+T(2,#CurrAreaCodeAft)
+!T(H,#CurrAreaCodeAft,#AreaHelp2)
+ALERT(#CurrCityCodeAft)
+ALERT(#CurrAreaCodeAft)
+ALERT(#CurrAreaItemAft)
+ALERT(#AreaHelp2)
 
 #CurrAreaCodeInd=_,_,L
 IF(#CurrCityCodeInd=="X",T(3,X),IF(#CurrAreaCodeAft==#CurrAreaCodeBef,T(3,),T(3,X)))

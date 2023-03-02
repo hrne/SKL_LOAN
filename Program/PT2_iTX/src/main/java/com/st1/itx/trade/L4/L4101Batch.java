@@ -322,7 +322,7 @@ public class L4101Batch extends TradeBuffer {
 		makeFile.open(titaVo, iAcDate + 19110000, titaVo.getKinbr(), titaVo.getTxCode(),
 				titaVo.getTxCode() + reportItem, titaVo.getTlrNo() + "_disb_"
 						+ (this.getTxBuffer().getTxBizDate().getTbsDy() + 19110000) + "_" + nowBatchNo + "_secret.csv",
-				2);
+				1);
 
 		for (String line : file) {
 			makeFile.put(line);

@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +17,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM035ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.parse.Parse;
 
 @Component
@@ -32,156 +34,199 @@ public class LM035Report extends MakeReport {
 	@Autowired
 	Parse parse;
 
-	private static final BigDecimal million = new BigDecimal(1000000);
-	private static final BigDecimal hundred = new BigDecimal(100);
-
-	@Override
-	public void printTitle() {
-
-	}
-
-	int col = 2;
+	private static final BigDecimal million = new BigDecimal("1000000");
+	private static final BigDecimal hundred = new BigDecimal("100");
 
 	public void exec(TitaVo titaVo) throws LogicException {
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM035", "地區逾放比", "LM035地區逾放比", "LM035地區逾放比.xlsx", "10804");
-		int yearSeasonWalker = (parse.stringToInteger(titaVo.get("ENTDY")) + 19110000) / 100;
-		int yearSeasonWalkTarget = 0;
+		this.info("LM035Report exportExcel");
 
-		List<Integer> yearSeason = new ArrayList<Integer>();
-		this.info("entdy1 = " + yearSeasonWalker);
+		int bcYearMonth = (parse.stringToInteger(titaVo.get("ENTDY")) + 19110000) / 100;
+		int bcYear = (parse.stringToInteger(titaVo.get("ENTDY")) + 19110000) / 10000;
+		int bcMonth = (parse.stringToInteger(titaVo.get("ENTDY")) + 19110000) / 100 % 100;
 
-		// yearSeason:
-		// 包括出表當月,
-		// 出到 5 年前的Q4為止
-		// 假如entdy1是 202111, 則出表範圍為:
+		List<Integer> yearMonthList = new ArrayList<Integer>();
 
-		// 202111
-		// 202109
-		// 202106
-		// 202103
-		// 202012
-		// 202009
-		// 202006
-		// 202003
-		// 201912
-		// 201812
-		// 201712
-		// 201612
+		// 出表範圍為舉例:
+		// 202301、202212、202209、202206
+		// 202203、202009、202006、202003
+		// 201912、201812、201712、201612
 
-		// 加入當月
-		yearSeason.add(yearSeasonWalker);
+		int thisYM_3 = bcYear * 100 + 3;
+		int thisYM_6 = bcYear * 100 + 6;
+		int thisYM_9 = bcYear * 100 + 9;
 
-		// 先向前跳到這個月所屬的Q
-		this.info("Start from: " + yearSeasonWalker);
-		this.info("Shift: +" + yearSeasonWalker / 100 % 3);
-		yearSeasonWalker += yearSeasonWalker / 100 % 3;
+		int lastYM_3 = (bcYear - 1) * 100 + 3;
+		int lastYM_6 = (bcYear - 1) * 100 + 6;
+		int lastYM_9 = (bcYear - 1) * 100 + 9;
+		int lastYM_12 = (bcYear - 1) * 100 + 12;
 
-		// 回去求 n 及 n-1 年的所有Q
-		yearSeasonWalkTarget = yearSeasonWalker - 100;
-		yearSeasonWalkTarget -= yearSeasonWalkTarget % 100;
+		int lastY_2 = (bcYear - 2) * 100 + 12;
+		int lastY_3 = (bcYear - 3) * 100 + 12;
+		int lastY_4 = (bcYear - 4) * 100 + 12;
+		int lastY_5 = (bcYear - 5) * 100 + 12;
 
-		this.info("2 year ago: " + yearSeasonWalkTarget);
+		// 目前年月
+		yearMonthList.add(bcYearMonth);
 
-		do {
-
-			if (yearSeasonWalker % 100 == 3) {
-				// 跳到前一年
-				yearSeasonWalker -= 91;
-			} else {
-				// 繼續在今年
-				yearSeasonWalker -= 3;
-			}
-
-			yearSeason.add(yearSeasonWalker);
-
-		} while (yearSeasonWalker > yearSeasonWalkTarget);
-
-		// 這時候 yearSeasonWalker 會停在 n-2 年Q4, 且已經加入yearSeason
-		// 再加上前三年即可
-
-		for (int i = 1; i <= 3; i++) {
-			yearSeasonWalker -= 100;
-			yearSeason.add(yearSeasonWalker);
+		// 根據目前月份決定需加多少季的年月
+		switch (bcMonth) {
+		case 4:
+		case 5:
+		case 6:
+			yearMonthList.add(thisYM_3);
+			break;
+		case 7:
+		case 8:
+		case 9:
+			yearMonthList.add(thisYM_3);
+			yearMonthList.add(thisYM_6);
+			break;
+		case 10:
+		case 11:
+		case 12:
+			yearMonthList.add(thisYM_3);
+			yearMonthList.add(thisYM_6);
+			yearMonthList.add(thisYM_9);
+			break;
 		}
 
-		this.info("yearSeason = " + yearSeason);
+		// 去年整年度四個季度年月
+		yearMonthList.add(lastYM_3);
+		yearMonthList.add(lastYM_6);
+		yearMonthList.add(lastYM_9);
+		yearMonthList.add(lastYM_12);
+		// 前2~5年的季度年月(只顯示最後一個季度年月)
+		yearMonthList.add(lastY_2);
+		yearMonthList.add(lastY_3);
+		yearMonthList.add(lastY_4);
+		yearMonthList.add(lastY_5);
 
-		List<Map<String, String>> LM035List = null;
+		// 排序
+		Collections.sort(yearMonthList);
 
-		// iterate 時倒過來, 在 excel 上輸出才會是愈新的年份在愈右
-		for (int i = yearSeason.size() - 1; i >= 0; i--) {
+		List<Map<String, String>> findData = null;
 
-			// 年月輸出
-			// 只有最後一年會是 YYYMM
-			// 其他都是 YYYQQ
-			if (i == 0) {
-				makeExcel.setValue(2, col, yearSeason.get(i) - 191100);
-			} else {
-				int year = yearSeason.get(i) / 100 - 1911;
-				int month = yearSeason.get(i) % 100;
-				makeExcel.setValue(2, col, year + "Q" + ((month - 1) / 3 + 1));
-			}
+		try {
 
-			// 產年月下方的數字
-			try {
-				LM035List = lM035ServiceImpl.findAll(titaVo, yearSeason.get(i));
-				exportExcel(titaVo, LM035List, i);
+			findData = lM035ServiceImpl.findAll(titaVo, yearMonthList);
 
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				StringWriter errors = new StringWriter();
-				e.printStackTrace(new PrintWriter(errors));
-				this.info("LM035ServiceImpl.testExcel error = " + errors.toString());
-			}
-			col++;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.info("LM035ServiceImpl.exportExcel error = " + errors.toString());
 		}
 
-		// 最後寫一下最右邊的說明欄
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LM035";
+		String fileItem = "地區逾放比";
+		String fileName = "LM035-地區逾放比";
+		String defaultExcel = "LM035_底稿_地區逾放比.xlsx";
+		String defaultSheet = "10804";
 
-		makeExcel.setValue(1, yearSeason.size() + 2, "單位：百萬元");
-		makeExcel.setValue(2, yearSeason.size() + 2, "放款餘額");
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		// 工作表命名
+		makeExcel.setSheet(defaultSheet, bcYearMonth - 191100 + "");
+
+		// 表頭文字
+		String textYMQ = "";
+		// 民國年
+		int tmpRocYear = 0;
+		// 月
+		int tmpRocMonth = 0;
+		// 季
+		int tmpRocQ = 0;
+		// 輸出季度和年份表頭
+		for (int i = 0; i < yearMonthList.size(); i++) {
+
+			tmpRocYear = (yearMonthList.get(i) / 100) - 1911;
+			tmpRocMonth = yearMonthList.get(i) % 100;
+			tmpRocQ = tmpRocMonth / 3;
+
+			if (tmpRocQ > 0) {
+				textYMQ = tmpRocYear + "Q" + tmpRocQ;
+			} else {
+				textYMQ = String.valueOf(tmpRocYear * 100 + tmpRocMonth);
+			}
+
+			makeExcel.setValue(2, i + 2, textYMQ);
+
+		}
+
+		makeExcel.setValue(1, yearMonthList.size() + 2, "單位：百萬元");
+		makeExcel.setValue(2, yearMonthList.size() + 2, "放款餘額");
+
+		// 資料輸出
+		exportData(titaVo, findData, bcYearMonth);
 
 		makeExcel.close();
 		// makeExcel.toExcel(sno);
 	}
 
-	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LDList, int timesLeft) throws LogicException {
-		this.info("LM035Report exportExcel");
+	private void exportData(TitaVo titaVo, List<Map<String, String>> data, int thisYM) throws LogicException {
+
 		BigDecimal ovduBal = BigDecimal.ZERO;
 		BigDecimal total = BigDecimal.ZERO;
-		int row = 3;
-		int count = 1;
+		int row = 2;// 起始列
+		int col = 1;// 起始欄
+		int yymm = 0;// 年月
+		String cityCode = "00";// 地區別代碼
 
-		for (Map<String, String> tLDVo : LDList) {
+		for (Map<String, String> r : data) {
 
-			// 原本的做法是用 excel format "0.00%", 但實際輸出時不會穩定輸出百分比格式
-			// 這邊改成完整用字串組好後輸出, 實際輸出後 excel grids 不會跳綠箭頭
-
-			makeExcel.setValue(row, col, getBigDecimal(tLDVo.get("F5")).multiply(hundred).setScale(2) + "%", "C");
-			if (timesLeft == 0) {
-				// 最後一次輸出 (產表當年月份的資料)
-				makeExcel.setValue(row, col + 1, computeDivide(getBigDecimal(tLDVo.get("F2")), million, 2), "#,##0.00", "R");
+			// 年月不一樣就換欄
+			if (yymm != Integer.valueOf(r.get("YearMonth"))) {
+				yymm = Integer.valueOf(r.get("YearMonth"));
+				col++;
+				row = 2;
 			}
-			total = total.add(getBigDecimal(tLDVo.get("F2")));
-			ovduBal = ovduBal.add(getBigDecimal(tLDVo.get("F3"))).add(getBigDecimal(tLDVo.get("F4")));
-			row++;
-			if (count == LDList.size()) {
+
+			// 第二round的時候需要做地區平均
+			if (row == 2 && col > 2) {
+
 				if (total.compareTo(BigDecimal.ZERO) > 0) {
 					BigDecimal division = computeDivide(ovduBal, total, 4);
-					this.info("Print Avg !!!" + "    row = " + row + "    col = " + col + "    value = " + division);
-					makeExcel.setValue(row, col, division.multiply(hundred).setScale(2) + "%", "C");
+//					this.info("Print Avg !!!" + "    row = " + row + "    col = " + col + "    value = " + division);
+					makeExcel.setValue(22, col - 1, division.multiply(hundred).setScale(2) + "%", "C");
 				} else {
-					this.info("Print Avg0 !!!" + "    row = " + row + "    col = " + col + "    value = " + BigDecimal.ZERO);
-					makeExcel.setValue(row, col, BigDecimal.ZERO.setScale(2) + "%", "C");
+//					this.info("Print Avg0 !!!" + "    row = " + row + "    col = " + col + "    value = "
+//							+ BigDecimal.ZERO);
+					makeExcel.setValue(22, col - 1, BigDecimal.ZERO.setScale(2) + "%", "C");
 				}
+
+				ovduBal = BigDecimal.ZERO;
+				total = BigDecimal.ZERO;
 			}
-			count++;
+
+			if (!cityCode.equals(r.get("CityCode").toString())) {
+				cityCode = r.get("CityCode").toString();
+				row++;
+			}
+			// 原本的做法是用 excel format "0.00%", 但實際輸出時不會穩定輸出百分比格式
+			// 這邊改成完整用字串組好後輸出, 實際輸出後 excel grids 不會跳綠箭頭
+			makeExcel.setValue(row, col, getBigDecimal(r.get("Ratio")).multiply(hundred).setScale(2) + "%", "C");
+
+			// 表示為最後一輪輸出 (當前年月 == 資料年月)
+			if (thisYM == yymm) {
+				makeExcel.setValue(row, col + 1, computeDivide(getBigDecimal(r.get("LoanBal")), million, 2), "#,##0.00",
+						"R");
+			}
+
+			// 放款餘額加總
+			total = total.add(getBigDecimal(r.get("LoanBal")));
+			// 逾期餘額加總
+			ovduBal = ovduBal.add(getBigDecimal(r.get("OvduBal"))).add(getBigDecimal(r.get("ColBal")));
+
 		}
 
-		if (timesLeft == 0) {
-			// 最後的最後, 輸出放款餘額的累積
-			makeExcel.setValue(row, col + 1, computeDivide(total, million, 0), "#,##0", "R");
-		}
+		// 最後的最後, 輸出放款餘額的累積
+		makeExcel.setValue(row, col + 1, computeDivide(total, million, 0), "#,##0", "R");
+
 	}
 
 }
