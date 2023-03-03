@@ -146,9 +146,9 @@ public class LM035Report extends MakeReport {
 
 			tmpRocYear = (yearMonthList.get(i) / 100) - 1911;
 			tmpRocMonth = yearMonthList.get(i) % 100;
-			tmpRocQ = tmpRocMonth / 3;
+			tmpRocQ = tmpRocMonth % 3;
 
-			if (tmpRocQ > 0) {
+			if (tmpRocQ == 0) {
 				textYMQ = tmpRocYear + "Q" + tmpRocQ;
 			} else {
 				textYMQ = String.valueOf(tmpRocYear * 100 + tmpRocMonth);
@@ -224,8 +224,16 @@ public class LM035Report extends MakeReport {
 
 		}
 
+		
+		if (total.compareTo(BigDecimal.ZERO) > 0) {
+			BigDecimal division = computeDivide(ovduBal, total, 4);
+			makeExcel.setValue(row + 1, col, division.multiply(hundred).setScale(2) + "%", "C");
+		} else {
+			makeExcel.setValue(row + 1, col, BigDecimal.ZERO.setScale(2) + "%", "C");
+		}
+
 		// 最後的最後, 輸出放款餘額的累積
-		makeExcel.setValue(row, col + 1, computeDivide(total, million, 0), "#,##0", "R");
+		makeExcel.setValue(row + 1, col + 1, computeDivide(total, million, 0), "#,##0", "R");
 
 	}
 

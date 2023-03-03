@@ -132,7 +132,7 @@ public class L8350 extends TradeBuffer {
 			}
 
 			iDataLog.setEnv(titaVo, oTbJcicMu01Id, nTbJcicMu01);
-			iDataLog.exec("L8350修改");
+			iDataLog.exec("L8350修改MU1人員名冊報送");
 			break;
 		}
 

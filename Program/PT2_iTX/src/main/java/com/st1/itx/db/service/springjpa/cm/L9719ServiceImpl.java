@@ -27,11 +27,9 @@ public class L9719ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
+	
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 		this.info("l9719.findAll ");
-
-//		LocalDate inputYearMonth = LocalDate.of(Integer.parseInt(titaVo.getParam("inputYear")) + 1911, Integer.parseInt(titaVo.getParam("inputMonth")), 1);
-//		LocalDate inputlastYearMonth = inputYearMonth.minusMonths(1);
 
 		int iYear = Integer.valueOf(titaVo.getParam("inputYear")) + 1911;
 		int iMonth = Integer.valueOf(titaVo.getParam("inputMonth"));
@@ -80,22 +78,22 @@ public class L9719ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      ),";
 		sql += "      roundData AS (";
 		sql += "      SELECT \"AcctCode\"";
-		sql += "            ,CASE WHEN \"LnAmt\" < 0";
-		sql += "                  THEN CASE WHEN REPLACE(REGEXP_SUBSTR(\"LnAmt\", '\\.\\d'), '.', '') >= 5 THEN TRUNC(\"LnAmt\")+1 ";
-		sql += "                            WHEN REPLACE(REGEXP_SUBSTR(\"LnAmt\", '\\.\\d'), '.', '') BETWEEN 0 AND 4 THEN TRUNC(\"LnAmt\")-1";
-		sql += "                            ELSE 0 END ";
-		sql += "                  WHEN \"LnAmt\" > 0";
-		sql += "                  THEN ROUND(\"LnAmt\")";
-		sql += "                  ELSE 0 END ";
-		sql += "             AS \"LnAmt\"";
-		sql += "            ,CASE WHEN \"OvAmt\" < 0";
-		sql += "                  THEN CASE WHEN REPLACE(REGEXP_SUBSTR(\"OvAmt\", '\\.\\d'), '.', '') >= 5 THEN TRUNC(\"OvAmt\")+1 ";
-		sql += "                            WHEN REPLACE(REGEXP_SUBSTR(\"OvAmt\", '\\.\\d'), '.', '') BETWEEN 0 AND 4 THEN TRUNC(\"OvAmt\")-1";
-		sql += "                            ELSE 0 END ";
-		sql += "                  WHEN \"OvAmt\" > 0";
-		sql += "                  THEN ROUND(\"OvAmt\")";
-		sql += "                  ELSE 0 END ";
-		sql += "             AS \"OvAmt\"";
+//		sql += "            ,CASE WHEN \"LnAmt\" < 0";
+//		sql += "                  THEN CASE WHEN REPLACE(REGEXP_SUBSTR(\"LnAmt\", '\\.\\d'), '.', '') >= 5 THEN TRUNC(\"LnAmt\")+1 ";
+//		sql += "                            WHEN REPLACE(REGEXP_SUBSTR(\"LnAmt\", '\\.\\d'), '.', '') BETWEEN 0 AND 4 THEN TRUNC(\"LnAmt\")-1";
+//		sql += "                            ELSE 0 END ";
+//		sql += "                  WHEN \"LnAmt\" > 0";
+//		sql += "                  THEN ROUND(\"LnAmt\")";
+//		sql += "                  ELSE 0 END ";
+		sql += "            ,ROUND(\"LnAmt\") AS \"LnAmt\"";
+//		sql += "            ,CASE WHEN \"OvAmt\" < 0";
+//		sql += "                  THEN CASE WHEN REPLACE(REGEXP_SUBSTR(\"OvAmt\", '\\.\\d'), '.', '') >= 5 THEN TRUNC(\"OvAmt\")+1 ";
+//		sql += "                            WHEN REPLACE(REGEXP_SUBSTR(\"OvAmt\", '\\.\\d'), '.', '') BETWEEN 0 AND 4 THEN TRUNC(\"OvAmt\")-1";
+//		sql += "                            ELSE 0 END ";
+//		sql += "                  WHEN \"OvAmt\" > 0";
+//		sql += "                  THEN ROUND(\"OvAmt\")";
+//		sql += "                  ELSE 0 END ";
+		sql += "            ,ROUND(\"OvAmt\") AS \"OvAmt\"";
 		sql += "      FROM rawData";
 		sql += "      ),";
 		sql += "      totalData AS (";
@@ -165,8 +163,6 @@ public class L9719ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		query = em.createNativeQuery(sql);
 
-//		query.setParameter("inputYearMonth", Integer.toString(inputYearMonth.getYear()) + String.format("%02d", inputYearMonth.getMonthValue()));
-//		query.setParameter("lastYearMonth", Integer.toString(inputlastYearMonth.getYear()) + String.format("%02d", inputlastYearMonth.getMonthValue()));
 		query.setParameter("inputYearMonth", iYear * 100 + iMonth);
 		query.setParameter("lastYearMonth", ilYear * 100 + ilMonth);
 		return this.convertToMap(query);

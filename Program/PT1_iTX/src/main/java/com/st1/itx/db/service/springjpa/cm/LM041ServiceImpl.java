@@ -50,7 +50,7 @@ public class LM041ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,ViableCusts.\"CustNo\" ";
 		sql += "       ,ViableCusts.\"FacmNo\" ";
 		sql += "       ,ViableCusts.\"Status\" ";
-		sql += "       ,\"Fn_ParseEOL\"(C.\"CustName\",0) ";
+		sql += "       ,\"Fn_ParseEOL\"(C.\"CustName\",0) AS \"CustName\"";
 		sql += "       ,A.\"RvBal\" ";
 		sql += " FROM ( SELECT \"CityCode\" ";
 		sql += "              ,MAX(\"Status\") \"Status\" ";

@@ -172,6 +172,7 @@ TXFORM=LC005
 <include src="COM.icf::TRCTL.tom"/>
 </sub>
 
+
 !--------- OUTPUT畫面 --------
 
 !---------- 單據輸出組合 ----------
@@ -216,7 +217,7 @@ TXFORM=LC005
 #TypeX=類別
 {width:80,align:'center'}
 
-#RejectReason=主管退回原因
+#RejectReason=
 {width:200,align:'left'}
 
 ^

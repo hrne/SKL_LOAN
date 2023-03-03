@@ -37,8 +37,7 @@ public class LM033ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("inputDateStart - inputDateEnd:");
 		this.info(titaVo.getParam("inputDateStart") + " - " + titaVo.getParam("inputDateEnd"));
 
-		String sql = "SELECT FC.\"BranchNo\""; // 單位別
-		sql += "            ,FC.\"ApplDate\""; // 申請日期
+		String sql = "SELECT FC.\"ApplDate\""; // 申請日期
 		sql += "            ,FC.\"ApproveDate\""; // 准駁日期
 		sql += "            ,FM.\"CustNo\""; // 戶號
 		sql += "            ,FM.\"FacmNo\""; // 額度號碼
@@ -49,7 +48,7 @@ public class LM033ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,FM.\"RecycleDeadline\""; // 循環動用期限
 		sql += "            ,CL.\"ClCode1\""; // 擔保品代號1
 		sql += "            ,FM.\"ApproveRate\""; // 核准利率
-		sql += "            ,CM.\"EntCode\""; // 企金別
+		sql += "            ,DECODE(CM.\"EntCode\",2,1,CM.\"EntCode\") AS \"EntCode\""; // 企金別
 		sql += "            ,FC.\"PieceCode\""; // 計件代碼
 		sql += "      FROM \"FacCaseAppl\" FC ";
 		sql += "      LEFT JOIN \"FacMain\" FM ON FM.\"ApplNo\" = FC.\"ApplNo\"";
@@ -58,11 +57,10 @@ public class LM033ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                               AND CM.\"BranchNo\" = FC.\"BranchNo\"";
 		sql += "      LEFT JOIN \"ClFac\" CL ON CL.\"ApproveNo\" = FC.\"ApplNo\"";
 		sql += "                            AND CL.\"MainFlag\" = 'Y'"; // 主要擔保品
-		sql += "      WHERE FC.\"BranchNo\" = '0000'"; // 單位別
-		sql += "        AND FC.\"ApproveDate\" > 0"; // 已有准駁日期
-		sql += "        AND FC.\"ApproveDate\" BETWEEN :inputDateStart AND :inputDateEnd"; // 准駁日期為輸入區間
+		sql += "      WHERE FC.\"ApproveDate\" BETWEEN :inputDateStart AND :inputDateEnd"; // 准駁日期為輸入區間
 		sql += "        AND FC.\"ProcessCode\" = '1'"; // 處理情形=1:准
-		sql += "        AND NVL(FM.\"CustNo\",0) <> 0"; // 額度檔之戶號不為0
+		sql += "        AND FM.\"PieceCode\" NOT IN ('3','C','5','E','7')"; // 首次新撥款案件不含(不含3 C_原額度動支  5 E_展期 7._服務件)
+		sql += "        AND FM.\"FacmNo\" > 0 ";
 		sql += "      ORDER BY FM.\"CustNo\"";
 		sql += "              ,FM.\"FacmNo\"";
 		this.info("sql=" + sql);

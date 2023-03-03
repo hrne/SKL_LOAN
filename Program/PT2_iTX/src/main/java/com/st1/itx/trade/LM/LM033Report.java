@@ -62,9 +62,6 @@ public class LM033Report extends MakeReport {
 		// 開啟報表
 		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
 
-		
-//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM033", "新撥案件明細", "LM033-新撥案件明細", "LM033-新撥案件明細.xlsx", "D9701211");
-
 		if (listLM033 == null || listLM033.isEmpty()) {
 			makeExcel.setValue(2, 1, "本日無資料");
 		} else {
@@ -80,9 +77,9 @@ public class LM033Report extends MakeReport {
 					int col = i + 1;
 
 					switch (i) {
-					case 1: // 申請日期
-					case 2: // 准駁日期
-					case 9: // 循環動用期限
+					case 0: // 申請日期
+					case 1: // 准駁日期
+					case 8: // 循環動用期限
 
 						// 日期類,顯示西曆日期yyyymmdd,無值時顯示0
 
@@ -92,16 +89,16 @@ public class LM033Report extends MakeReport {
 							makeExcel.setValue(row, col, "0");
 						}
 						break;
-					case 5: // 核准金額
-					case 6: // 撥款金額
-					case 7: // 已用額度
+					case 4: // 核准金額
+					case 5: // 撥款金額
+					case 6: // 已用額度
 						// 金額
 						makeExcel.setValue(row, col, getBigDecimal(value), "0", "R");
 						break;
-					case 11: // 利率
+					case 10: // 利率
 						makeExcel.setValue(row, col, getBigDecimal(value), "0.0000", "R");
 						break;
-					case 14: // 已刪除的欄位,不顯示
+					case 13: // 已刪除的欄位,不顯示
 						break;
 					default:
 						makeExcel.setValue(row, col, value);
@@ -117,7 +114,6 @@ public class LM033Report extends MakeReport {
 		makeExcel.formulaCaculate(1, 7);
 
 		makeExcel.close();
-		//makeExcel.toExcel(sno);
 	}
 
 }

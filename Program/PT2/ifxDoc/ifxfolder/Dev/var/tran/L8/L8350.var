@@ -280,6 +280,10 @@ T(2,@AuthMgrNameE,#L8R58Fullname)
 !轉JCIC文字檔日期
 #OutJcicTxtDate=D,7,L
 
+!參考編號
+#MRKEY=_,_,S
+T(2,#EmpId)
+
 #RPTFG=A,1,S
 </sub>
 

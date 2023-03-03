@@ -46,8 +46,10 @@ public class LM041Report extends MakeReport {
 	 * 
 	 */
 	public void exec(TitaVo titaVo, int yearMonth) throws LogicException {
+		
 		List<Map<String, String>> LM041List = null;
 		try {
+			
 			LM041List = lM041ServiceImpl.findAll(titaVo, yearMonth);
 
 		} catch (Exception e) {
@@ -61,9 +63,7 @@ public class LM041Report extends MakeReport {
 
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LMList, int yearMonth) throws LogicException {
 		this.info("LM041Report exportExcel");
-//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM041", 
-//				"催收及呆帳戶暫收款明細表", "LM041催收及呆帳戶暫收款明細表",
-//				"LM041_底稿_催收及呆帳戶暫收款明細表.xlsx", "D961211M");
+
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "LM041";
@@ -107,9 +107,6 @@ public class LM041Report extends MakeReport {
 
 				row++;
 			} // for
-//			int entdy = parse.stringToInteger(titaVo.get("ENTDY"));
-//			int year = entdy / 10000;
-//			int month = entdy / 100 % 100;
 			
 			int year = yearMonth / 100;
 			int month = yearMonth % 100;
@@ -123,7 +120,6 @@ public class LM041Report extends MakeReport {
 		}
 
 		makeExcel.close();
-		// makeExcel.toExcel(sno);
 	}
 
 }
