@@ -10,7 +10,7 @@ create table "TxApLog" (
   "ActionEvent" decimal(1, 0) default 0 not null,
   "UserIP" varchar2(50),
   "SystemName" nvarchar2(20),
-  "OperationName" nvarchar2(20),
+  "OperationName" nvarchar2(50),
   "ProgramName" varchar2(50),
   "MethodName" varchar2(50),
   "ServerName" varchar2(60),
