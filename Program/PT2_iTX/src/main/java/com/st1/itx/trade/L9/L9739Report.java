@@ -42,8 +42,8 @@ public class L9739Report extends MakeReport {
 
 	private boolean result = false;
 
-	String txcd = "L9739";
-	String txname = "檢核政府優惠房貸利率脫勾";
+	private String txcd = "L9739";
+	private String txname = "檢核政府優惠房貸利率脫勾";
 
 	@Override
 	public void printHeader() {
@@ -58,7 +58,7 @@ public class L9739Report extends MakeReport {
 	 * @param titaVo
 	 * @param iYearMonth    西元年月
 	 * @param loanTypeCount 貸款種類數量<BR>
-	 * 						目前(IA~II)共9個
+	 *                      目前(IA~II)共9個
 	 * @return
 	 * @throws LogicException
 	 *
@@ -87,14 +87,13 @@ public class L9739Report extends MakeReport {
 
 		try {
 
-			listL9739Detail = l9739ServiceImpl.findAll(titaVo, iYearMonth);
-
 			// 商品利率比對用
 			this.tmpProdNoMap = new HashMap<String, String>();
 
 			for (int i = 1; i <= loanTypeCount; i++) {
 
-				this.tmpProdNoMap.put(titaVo.getParam("ProdNo" + i), titaVo.getParam("FitRate" + i));
+				this.tmpProdNoMap.put(titaVo.getParam("ProdNo" + i) + "Rate", titaVo.getParam("FitRate" + i));
+				this.tmpProdNoMap.put(titaVo.getParam("ProdNo" + i) + "EffectDate", titaVo.getParam("EffectDate" + i));
 
 				// 資料來源為畫面上顯示的資料
 				tmpAll = new HashMap<String, String>();
@@ -105,6 +104,8 @@ public class L9739Report extends MakeReport {
 				listL9739Title.add(tmpAll);
 
 			}
+
+			listL9739Detail = l9739ServiceImpl.findAll(titaVo, iYearMonth);
 
 			exportData(listL9739Title, listL9739Detail);
 
@@ -117,14 +118,20 @@ public class L9739Report extends MakeReport {
 		// 關閉報表
 		this.close();
 
-		this.result = false;
-
 		return this.result;
 
 	}
 
 	private void exportData(List<Map<String, String>> listL9739Title, List<Map<String, String>> listL9739Detail)
 			throws LogicException {
+
+		this.setFont(1, 12);
+
+		String tim = String.format("%02d", Integer.parseInt(dateUtil.getNowStringBc().substring(4, 6)));
+		this.print(-2, 69, "日　期：" + tim + "/" + dateUtil.getNowStringBc().substring(6, 8) + "/"
+				+ dateUtil.getNowStringBc().substring(2, 4));
+		this.print(-3, 69, "時　間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
+				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6));
 
 		this.setFont(1, 18);
 		this.print(1, this.getMidXAxis(), "逐項檢核政府優惠房貸利率不符當時利率", "C");
@@ -137,37 +144,44 @@ public class L9739Report extends MakeReport {
 			for (Map<String, String> t : listL9739Title) {
 				String text = t.get("ProdNo") + "     " + fillUpWord(t.get("ProdName"), 22, " ", "R")
 						+ this.showRocDate(t.get("EffectDate"), 1) + "     "
-						+ fillUpWord(t.get("FitRate"), 6, "0", "R");
+						+ fillUpWord(t.get("FitRate"), 5, "0", "R");
 				this.print(1, this.getMidXAxis(), text, "C");
 			}
 		} else {
+
 			this.print(9, this.getMidXAxis(), " ", "C");
 
 		}
 
 		this.print(1, 1, " ");
 		this.print(1, 3, "不符者，產出明細欄位如下");
-		this.print(1, 13, "戶號");
-		this.print(0, 23, "額度");
+
+		this.print(1, 10, "戶號");
+		this.print(0, 20, "額度");
 		this.print(0, 30, "額度");
-		this.print(0, 37, "利率");
-		this.print(0, 45, "生效日期");
-		this.print(0, 60, "基本利率代碼");
+		this.print(0, 40, "利率");
+		this.print(0, 53, "生效日期");
+		this.print(0, 66, "基本利率代碼");
 
 		if (listL9739Detail.size() > 0) {
 
 			int tmpCount = 0;
 			for (Map<String, String> r : listL9739Detail) {
 
-				if (!this.tmpProdNoMap.get(r.get("ProdNo").toString()).equals(r.get("StoreRate").toString())) {
+				this.info("tmpEffectDate = " + this.tmpProdNoMap.get(r.get("ProdNo").toString() + "EffectDate"));
+				this.info("tmpRate = " + this.tmpProdNoMap.get(r.get("ProdNo").toString() + " Rate"));
+				this.info("nowEffectDate = " + r.get("EffectDate").toString());
+				this.info("nowRate = " + r.get("ProdNo").toString());
+
+				if (!this.tmpProdNoMap.get(r.get("ProdNo").toString() + "Rate").equals(r.get("StoreRate").toString())) {
 					tmpCount++;
 
-					this.print(1, 13, r.get("CustNo"));
-					this.print(0, 23, r.get("FacmNo"));
-					this.print(0, 30, r.get("BormNo"));
-					this.print(0, 37, r.get("StoreRate"));
-					this.print(0, 45, showBcDate(r.get("EffectDate"), 0));
-					this.print(0, 60, r.get("ProdNo"));
+					this.print(1, 13, r.get("CustNo"), "R");
+					this.print(0, 23, r.get("FacmNo"), "R");
+					this.print(0, 33, r.get("BormNo"), "R");
+					this.print(0, 43, r.get("StoreRate"), "R");
+					this.print(0, 60, showRocDate(Integer.valueOf(r.get("EffectDate")), 1), "R");
+					this.print(0, 77, r.get("ProdNo"), "R");
 				}
 
 			}
@@ -184,7 +198,7 @@ public class L9739Report extends MakeReport {
 
 		}
 
-		this.print(-55, this.getMidXAxis(), "＊＊＊＊＊＊＊＊    報  表  結  束    ＊＊＊＊＊＊＊＊ ","C");
+		this.print(-55, this.getMidXAxis(), "＊＊＊＊＊＊＊＊    報  表  結  束    ＊＊＊＊＊＊＊＊ ", "C");
 
 	}
 

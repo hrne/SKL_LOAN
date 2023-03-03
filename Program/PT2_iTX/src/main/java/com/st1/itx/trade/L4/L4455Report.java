@@ -184,21 +184,27 @@ public class L4455Report extends MakeReport {
 		} else {
 			this.print(-6, 3, "扣款日期：");
 		}
-		this.info("RepayBank" + titaVo.get("RepayBank"));
-		for (CdCode tCdCode : lCdCode) {
-			if (titaVo.get("RepayBank").equals(tCdCode.getCode())) {
-				bank = tCdCode.getItem();
-				repaybank = titaVo.get("RepayBank").trim();
-				repaybankX = titaVo.get("RepayBankX").trim();
-				this.info("RepayBankX     = " + repaybankX);
+
+		this.info("RepayBank = " + titaVo.get("RepayBank"));
+		// 排除998 ACH
+		if (!"998".equals(titaVo.get("RepayBank"))) {
+			for (CdCode tCdCode : lCdCode) {
+				if (titaVo.get("RepayBank").equals(tCdCode.getCode())) {
+					bank = tCdCode.getItem();
+					repaybank = titaVo.get("RepayBank").trim();
+					repaybankX = titaVo.get("RepayBankX").trim();
+					this.info("RepayBankX = " + repaybankX);
+				}
 			}
 		}
+
 		if (dataSize == 0) {
-			// repaybank = "";
 			repaybank = titaVo.get("RepayBank") + ' ' + titaVo.get("RepayBankX");
 			bank = "";
 		}
-		if (!"998".equals(repaybank)) {
+
+		// 排除998 ACH
+		if (!"998".equals(titaVo.get("RepayBank"))) {
 			this.print(-6, 35, "扣款銀行：" + bank + " " + repaybank);
 		}
 
@@ -336,7 +342,6 @@ public class L4455Report extends MakeReport {
 				entrydate = String.valueOf(parse.stringToInteger(L4455List.get(i).get("EntryDate")) - 19110000);
 			}
 
-			this.info("repaybank old = " + L4455List.get(i).get("RepayBank"));
 			if (!repaybank.equals(L4455List.get(i).get("RepayBank"))) {
 				repaybank = L4455List.get(i).get("RepayBank");
 				for (CdCode tCdCode : lCdCode) {
@@ -345,8 +350,7 @@ public class L4455Report extends MakeReport {
 
 					}
 				}
-				this.info("repaybank new  = " + repaybank);
-				this.info("bank  = " + bank);
+
 				if (this.getNowPage() > 1) {
 					this.info("getNowPage  = " + this.getNowPage());
 					this.info("NowRow  = " + this.NowRow);
@@ -367,31 +371,36 @@ public class L4455Report extends MakeReport {
 				tmpCount++;
 				i = j - 1;
 
-				//給 998 ACH扣款 判斷加的
-				if ("998".equals(titaVo.get("RepayBank")) || !repaybank.equals(L4455List.get(i).get("RepayBank"))) {
-					repaybank = L4455List.get(i).get("RepayBank");
-					for (CdCode tCdCode : lCdCode) {
-						if (repaybank.equals(tCdCode.getCode())) {
-							bank = tCdCode.getItem();
+				// 給 998 ACH扣款 判斷加的
+				if ("998".equals(titaVo.get("RepayBank"))) {
+
+					if (!repaybank.equals(L4455List.get(i).get("RepayBank"))) {
+						repaybank = L4455List.get(i).get("RepayBank");
+						for (CdCode tCdCode : lCdCode) {
+							if (repaybank.equals(tCdCode.getCode())) {
+								bank = tCdCode.getItem();
+							}
+						}
+
+						// 第一頁
+						if (tmpCount == 1) {
+							this.print(-6, 35, "扣款銀行：" + bank + " " + repaybank);
+						}
+
+						if (this.getNowPage() > 1) {
+							this.info("getNowPage  = " + this.getNowPage());
+							this.info("NowRow  = " + this.NowRow);
+							this.info("newPage  = " + L4455List.get(i).get("RepayBank"));
+							this.newPage();
+
+							this.print(-6, 35, "扣款銀行：" + bank + " " + repaybank);
 
 						}
 					}
-					
-					//第一頁
-					if(tmpCount == 1) {
-						this.print(-6, 35, "扣款銀行：" + bank + " " + repaybank);
-					}
-
-					if (this.getNowPage() > 1) {
-						this.info("getNowPage  = " + this.getNowPage());
-						this.info("NowRow  = " + this.NowRow);
-						this.info("newPage  = " + L4455List.get(i).get("RepayBank"));
-						this.newPage();
-						
-						this.print(-6, 35, "扣款銀行：" + bank + " " + repaybank);
-						
-					}
 				}
+
+				this.info(tmpCount + " repaybank  = " + repaybank);
+				this.info(tmpCount + " bank  = " + bank);
 
 //				每頁筆數相加
 				pageCnt++;
@@ -402,11 +411,11 @@ public class L4455Report extends MakeReport {
 				this.print(1, 1, " ");
 				this.print(0, 1, L4455List.get(i).get("CustNo"));// 戶號
 
-				if (!tCustName.equals(limitLength(L4455List.get(i).get("CustName"), 20))) {
-					this.print(0, 19, limitLength(L4455List.get(i).get("CustName"), 20));// 戶名
+				if (!tCustName.equals(fillUpWord(L4455List.get(i).get("CustName"), 20, " ", "R"))) {
+					this.print(0, 19, fillUpWord(L4455List.get(i).get("CustName"), 20, " ", "R"));// 戶名
 				}
 
-				tCustName = limitLength(L4455List.get(i).get("CustName"), 20);
+				tCustName = fillUpWord(L4455List.get(i).get("CustName"), 20, " ", "R");
 
 				if (parse.stringToInteger(L4455List.get(i).get("TxSeq")) == 1) {
 					if (parse.stringToBigDecimal(L4455List.get(i).get("RepayAmt"))
@@ -636,30 +645,7 @@ public class L4455Report extends MakeReport {
 		this.toPdf(sno);
 	}
 
-	private String limitLength(String str, int pos) {
-		byte[] input = str.getBytes();
 
-		int inputLength = input.length;
-
-		this.info("str ..." + str);
-		this.info("inputLength ..." + inputLength);
-
-		int resultLength = inputLength;
-
-		if (inputLength > pos) {
-			resultLength = pos;
-		}
-
-		String result = "";
-
-		if (resultLength > 0) {
-			byte[] resultBytes = new byte[resultLength];
-			System.arraycopy(input, 0, resultBytes, 0, resultLength);
-			result = new String(resultBytes);
-		}
-
-		return result;
-	}
 
 	private void init() {
 		RepayAmt = new BigDecimal("0");

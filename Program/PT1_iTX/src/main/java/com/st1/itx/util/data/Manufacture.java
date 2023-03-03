@@ -1,5 +1,9 @@
 package com.st1.itx.util.data;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Objects;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
@@ -7,8 +11,15 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.tradeService.CommBuffer;
+import com.st1.itx.db.domain.CdReport;
+import com.st1.itx.db.domain.TxApLog;
 import com.st1.itx.db.domain.TxFile;
+import com.st1.itx.db.domain.TxTeller;
+import com.st1.itx.db.service.CdReportService;
+import com.st1.itx.db.service.TxApLogService;
 import com.st1.itx.db.service.TxFileService;
+import com.st1.itx.db.service.TxTellerService;
+import com.st1.itx.eum.ContentName;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.MakeReport;
@@ -25,7 +36,16 @@ import com.st1.itx.util.date.DateUtil;
 public class Manufacture extends CommBuffer {
 	/* DB服務注入 */
 	@Autowired
-	public TxFileService sTxFileService;
+	private TxApLogService txApLogService;
+
+	@Autowired
+	private TxFileService sTxFileService;
+
+	@Autowired
+	private CdReportService cdReportService;
+
+	@Autowired
+	private TxTellerService txTellerService;
 
 	@Autowired
 	public MakeReport makeReport;
@@ -38,6 +58,9 @@ public class Manufacture extends CommBuffer {
 
 	@Autowired
 	public DateUtil dateUtil;
+	
+	@Value("${url}")
+	private String url = "";
 
 	@Value("${iTXOutFolder}")
 	private String OutFolder = "";
@@ -88,6 +111,35 @@ public class Manufacture extends CommBuffer {
 			}
 
 			this.setFilename(this.OutFolder + this.getFilename());
+			
+			CdReport cdReport = cdReportService.findById(tTxFile.getFileCode().trim());
+			if (!Objects.isNull(cdReport) && cdReport.getApLogFlag() == 1) {
+				titaVo.putParam(ContentName.txCodeNM, cdReport.getFormName());
+				titaVo.putParam(ContentName.txCode, cdReport.getFormNo());
+				
+				TxTeller txTeller = txTellerService.findById(titaVo.getTlrNo());
+				TxApLog txApLog = new TxApLog();
+				txApLog.setEntdy(dateUtil.getNowIntegerForBC());
+				txApLog.setUserID(titaVo.getTlrNo());
+//				txApLog.setIDNumber              ();
+				txApLog.setIDName(Objects.isNull(txTeller) ? titaVo.getEmpNm():txTeller.getTlrItem());
+				txApLog.setActionEvent(6);
+				txApLog.setUserIP(titaVo.getIp());
+				txApLog.setSystemName("放款帳務系統");
+				txApLog.setOperationName(titaVo.getTxCodeNM());
+				txApLog.setProgramName(titaVo.getTxCode());
+				txApLog.setMethodName("exec");
+				try {
+					txApLog.setServerName(InetAddress.getLocalHost().getHostName().toString());
+				} catch (UnknownHostException e) {
+					txApLog.setServerName("");
+				}
+				txApLog.setServerIP(url);
+				txApLog.setInputDataforXMLorJson(titaVo.getJsonString());
+				txApLog.setOutputDataforXMLorJson("");
+				txApLog.setEnforcementResult(1);
+				txApLog.setMessage("");
+			}
 		}
 	}
 

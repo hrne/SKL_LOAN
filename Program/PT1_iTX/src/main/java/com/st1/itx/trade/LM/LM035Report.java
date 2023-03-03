@@ -146,9 +146,9 @@ public class LM035Report extends MakeReport {
 
 			tmpRocYear = (yearMonthList.get(i) / 100) - 1911;
 			tmpRocMonth = yearMonthList.get(i) % 100;
-			tmpRocQ = tmpRocMonth % 3;
+			tmpRocQ = tmpRocMonth / 3;
 
-			if (tmpRocQ == 0) {
+			if (tmpRocMonth != 3 || tmpRocMonth != 6 || tmpRocMonth != 9 || tmpRocMonth != 12) {
 				textYMQ = tmpRocYear + "Q" + tmpRocQ;
 			} else {
 				textYMQ = String.valueOf(tmpRocYear * 100 + tmpRocMonth);
@@ -224,7 +224,6 @@ public class LM035Report extends MakeReport {
 
 		}
 
-		
 		if (total.compareTo(BigDecimal.ZERO) > 0) {
 			BigDecimal division = computeDivide(ovduBal, total, 4);
 			makeExcel.setValue(row + 1, col, division.multiply(hundred).setScale(2) + "%", "C");

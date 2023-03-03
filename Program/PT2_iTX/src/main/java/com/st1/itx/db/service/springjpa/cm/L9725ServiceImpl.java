@@ -53,5 +53,42 @@ public class L9725ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		return this.convertToMap(query.getResultList());
 	}
+	@SuppressWarnings("unchecked")
+	public List<Map<String, String>> findAll2(TitaVo titaVo) throws Exception {
+		this.info("l9725.findAll2 ");
+		int dateInputEnd = Integer.valueOf(titaVo.getParam("DateInputEnd")+19110000)/100;
+
+		String sql = "SELECT ml.\"CustNo\" AS \"CustNo\"";
+		sql += "            ,ml.\"FacmNo\" AS \"FacmNo\"";
+		sql += "            ,ml.\"BormNo\" AS \"BormNo\"";
+		sql += "            ,fm.\"ProdNo\" AS \"ProdNo\"";
+		sql += "            ,lb.\"DrawdownDate\" AS \"DrawdownDate\"";
+		sql += "            ,lb.\"MaturityDate\" AS \"MaturityDate\"";
+		sql += "            ,fm.\"LineAmt\" AS \"LineAmt\"";
+		sql += "            ,lb.\"LoanBal\" AS \"LoanBal\"";
+		sql += "            ,lb.\"PieceCode\" AS \"PieceCode\"";
+		sql += "            ,cm.\"CuscCd\" AS \"CuscCd\"";
+		sql += "            ,cm.\"EntCode\" AS \"EntCode\"";	
+		sql += "      FROM  \"MonthlyLoanBal\" ml";
+		sql += "      LEFT JOIN \"LoanBorMain\" lb ON lb.\"CustNo\" = ml.\"CustNo\"  ";
+		sql += "                                  AND lb.\"FacmNo\" = ml.\"FacmNo\"  ";
+		sql += "                                  AND lb.\"BormNo\" = ml.\"BormNo\"  ";
+		sql += "      LEFT JOIN \"FacMain\" fm ON fm.\"CustNo\" = ml.\"CustNo\"  ";
+		sql += "                                  AND fm.\"FacmNo\" = ml.\"FacmNo\"  ";
+		sql += "      LEFT JOIN \"CustMain\" cm ON cm.\"CustNo\" = ml.\"CustNo\"  ";
+		sql += "      WHERE ml.\"YearMonth\"=:DateInputEnd";
+		sql += "        AND ml.\"LoanBalance\">0";
+		sql += "      ORDER BY \"CustNo\",\"FacmNo\",\"BormNo\"";
+
+		this.info("sql=" + sql);
+
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+
+		Query query;
+		query = em.createNativeQuery(sql);
+		query.setParameter("DateInputEnd", dateInputEnd);
+
+		return this.convertToMap(query.getResultList());
+	}
 
 }

@@ -15,11 +15,13 @@ import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,19 +57,34 @@ public class AjaxController extends SysLogger {
 
 	@Autowired
 	private MenuBuilder menuBuilder;
-	
+
 	@Autowired
 	private TxTranCodeService txTranCodeService;
 
 	@Autowired
 	private TxFileService txFileService;
-	
+
 	@Autowired
 	private DateUtil dateUtil;
+
+	@Value("${iTXResourceFolder}")
+	private String iTXResourceFolder = "";
 
 	@PostConstruct
 	public void init() {
 		this.mustInfo("AjaxController Init....");
+	}
+
+	@RequestMapping(value = "modifyCharForDB", method = { RequestMethod.GET, RequestMethod.POST })
+	public String modifyCharForOracle(HttpSession session, HttpServletResponse response) {
+		List<File> files = new ArrayList<File>();
+		files.add(new File(iTXResourceFolder + "cuapList.txt"));
+		files.add(new File(iTXResourceFolder + "cuspList.txt"));
+		files.add(new File(iTXResourceFolder + "hgtpList.txt"));
+		files.add(new File(iTXResourceFolder + "lgtpList.txt"));
+		files.add(new File(iTXResourceFolder + "jcicz048List.txt"));
+
+		return null;
 	}
 
 	@RequestMapping(value = "menu2/jsonp", method = RequestMethod.GET)
@@ -95,7 +112,7 @@ public class AjaxController extends SysLogger {
 		map.put("status", true);
 		return makeJsonResponse(map, true);
 	}
-	
+
 	@RequestMapping(value = "txcd/chainTranMsg", method = RequestMethod.GET)
 	public ResponseEntity<String> getChainTranMsg(@RequestParam String txCode, HttpSession session, HttpServletResponse response) {
 		ThreadVariable.setObject(ContentName.loggerFg, true);
@@ -109,7 +126,7 @@ public class AjaxController extends SysLogger {
 		if (!Objects.isNull(txTranCode))
 			map.put("data", txTranCode.getChainTranMsg());
 		else
-			map.put("data", "");
+			map.put("data", "non");
 
 		map.put("status", true);
 		return makeJsonResponse(map, true);
@@ -154,7 +171,7 @@ public class AjaxController extends SysLogger {
 	}
 
 	@RequestMapping(value = "download/file/{tlrNo}/{sno}/{fileType}/{name}")
-	public void getFile(@PathVariable String tlrNo, @PathVariable String sno, @PathVariable String fileType, String name, HttpServletResponse response) throws Exception {
+	public void getFile(@PathVariable String tlrNo, @PathVariable String sno, @PathVariable String fileType, String name,HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ThreadVariable.setObject(ContentName.loggerFg, true);
 		this.mustInfo("getFile...");
 
@@ -189,6 +206,7 @@ public class AjaxController extends SysLogger {
 		}
 
 		TitaVo titaVo = new TitaVo();
+		titaVo.putParam("IP", request.getRemoteAddr());
 		titaVo.putParam(ContentName.tlrno, tlrNo);
 		titaVo.putParam("fileno", sno);
 		titaVo.putParam(ContentName.caldy, dateUtil.getNowStringRoc());

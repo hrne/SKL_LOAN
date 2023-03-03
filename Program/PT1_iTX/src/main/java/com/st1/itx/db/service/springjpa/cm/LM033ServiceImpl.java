@@ -61,6 +61,7 @@ public class LM033ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        AND FC.\"ProcessCode\" = '1'"; // 處理情形=1:准
 		sql += "        AND FM.\"PieceCode\" NOT IN ('3','C','5','E','7')"; // 首次新撥款案件不含(不含3 C_原額度動支  5 E_展期 7._服務件)
 		sql += "        AND FM.\"FacmNo\" > 0 ";
+		sql += "        AND FM.\"UtilAmt\" > 0 ";
 		sql += "      ORDER BY FM.\"CustNo\"";
 		sql += "              ,FM.\"FacmNo\"";
 		this.info("sql=" + sql);

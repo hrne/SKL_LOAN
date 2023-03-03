@@ -81,10 +81,10 @@ public class LogAspect extends SysLogger {
 
 		TitaVo titaVo = (TitaVo) args[0];
 
-		if (!titaVo.isAplogOn())
+		if (!titaVo.isAplogOn() && !titaVo.isTxcdSpecial())
 			return;
 
-		if (titaVo.isRim() && !titaVo.getTxCode().equals(titaVo.getAplogRim()))
+		if (titaVo.isRim() && !titaVo.getTxCode().equals(titaVo.getAplogRim()) && !titaVo.isTxcdSpecial())
 			return;
 
 		TxApLog txApLog = new TxApLog();
@@ -107,6 +107,9 @@ public class LogAspect extends SysLogger {
 			event = 8;
 		if (titaVo.isTxcdSpecial() && titaVo.getTxCode().equals("LC101"))
 			event = 9;
+
+		if (event == -1)
+			return;
 
 		txApLog.setActionEvent(event);
 		txApLog.setUserIP(titaVo.getIp());

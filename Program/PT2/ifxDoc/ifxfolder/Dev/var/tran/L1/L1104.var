@@ -77,7 +77,8 @@ E(0,0)
 ["#FdRegZipBef+公司-郵遞區號",#RegZip3Bef,#RegZip2Bef],
 ["#RegZip2Ind",#RegZip3Aft,#RegZip2Aft],
 [#<->#,"#FdCurrAdrBef+修改前-通訊地址",#CurrAddressBef],
-[#<->#,"#FdCurrAdrAft+修改後-通訊地址",#SameReg,#SameRegX,"</br>",#CurrCityCodeAft,#CurrCityItemAft,#CurrAreaCodeAft,#CurrAreaItemAft,"</br>",#CurrRoadAft,"</br>",#CurrSectionAft,"段",#CurrAlleyAft,"巷",#CurrLaneAft,"弄",#CurrNumAft,"號","之",#CurrNumDashAft,",",#CurrFloorAft,"樓","之",#CurrFloorDashAft],
+[#<->#,"#FdCurrAdrAft+修改後-通訊地址",#SameReg,#SameRegX],
+[#<->#,"@@",#CurrCityCodeAft,#CurrCityItemAft,#CurrAreaCodeAft,#CurrAreaItemAft,"</br>",#CurrRoadAft,"</br>",#CurrSectionAft,"段",#CurrAlleyAft,"巷",#CurrLaneAft,"弄",#CurrNumAft,"號","之",#CurrNumDashAft,",",#CurrFloorAft,"樓","之",#CurrFloorDashAft],
 [#<->#,"#CurrAddressInd",#CurrAddressAft],
 ["#FdCurrZipBef+通訊-郵遞區號",#CurrZip3Bef,#CurrZip2Bef],
 ["#CurrZip2Ind",#CurrZip3Aft,#CurrZip2Aft],
@@ -922,6 +923,7 @@ V(H,#SameRegHelp)
 
 #SameRegX=X,30,L
 T(H,#SameReg,#SameRegHelp)
+C(5,#SameReg,Y,INVOKEJS(SHOW,p1,23,23,0),INVOKEJS(SHOW,p1,23,23,1))
 C(5,#SameReg,Y,$,s)
 T(2,@CurrZip3Aft,#RegZip3Aft)
 T(2,@CurrZip2Aft,#RegZip2Aft)
@@ -936,7 +938,7 @@ T(2,@CurrNumDashAft,#RegNumDashAft)
 T(2,@CurrFloorAft,#RegFloorAft)
 T(2,@CurrFloorDashAft,#RegFloorDashAft)
 T(2,@RimAreaCode,#CurrAreaCodeAft)
-!T(2,@CurraddressAft,#RegaddressAft)
+T(2,@CurrAddressAft,#RegAddressAft)
 
 #CurrCityCodeInd=X,1,L
 
@@ -956,7 +958,6 @@ IF(#CurrCityCodeAft==#CurrCityCodeBef,T(3,),T(3,X))
 
 ! 調RIM取鄉鎮市區代碼
 #RimL6r03Area1=X,1,S
-C(5,#SameReg,Y,s,$)
 C(4,#CurrCityCodeAft,S,$)
 C(4,#CurrAreaCodeAft,S,$)
 E(0,@RimFunCd,2)
@@ -996,19 +997,15 @@ V(H,#AreaHelp2)
 !通訊 鄉鎮市區代碼的對應名稱
 #CurrAreaItemAft=X,20,L
 !T(H,#CurrAreaItemAft,#AreaHelp2)
-T(2,#CurrAreaCodeAft)
-!T(H,#CurrAreaCodeAft,#AreaHelp2)
-ALERT(#CurrCityCodeAft)
-ALERT(#CurrAreaCodeAft)
-ALERT(#CurrAreaItemAft)
-ALERT(#AreaHelp2)
+!T(2,#CurrAreaCodeAft)
+T(H,#CurrAreaCodeAft,#AreaHelp2)
+
 
 #CurrAreaCodeInd=_,_,L
 IF(#CurrCityCodeInd=="X",T(3,X),IF(#CurrAreaCodeAft==#CurrAreaCodeBef,T(3,),T(3,X)))
 
 ! 調RIM取鄉鎮市區代碼B
 #RimL1r10B=X,1,S
-C(5,#SameReg,Y,s,$)
 C(4,#CurrCityCodeAft,S,$)
 C(4,#CurrAreaCodeAft,S,$)
 T(2,@RimCityCode,#CurrCityCodeAft)
@@ -1119,9 +1116,11 @@ C(5,#SameReg,Y,s,$)
 #CurrFloorDashInd=_,_,L
 IF(#CurrFloorDashAft==#CurrFloorDashBef,T(3,),T(3,X))
 
+
 !通訊-地址
 #CurrAddressAft=x,115,L
-C(4,#CurrCityCodeAft,S,$)
+!C(4,#CurrCityCodeAft,S,$)
+C(5,#SameReg,Y,T(2,#RegAddressAft),$)
 
 #RimL1r12AddressB=X,1,S
 C(4,#CurrCityCodeAft,S,$)
@@ -1140,10 +1139,16 @@ T(2,@RimFloorDash,#CurrFloorDashAft)
 RESET_RIM(#RimL1r12AddressB,L1R12)
 S(L1R12,1,#RimCityCode,#RimAreaCode,#RimRoad,#RimSection,#RimAlley,#RimLane,#RimNum,#RimNumDash,#RimFloor,#RimFloorDash)
 R(1,L1R12)
+!T(2,@CurrAddressAft,#L1r12Address)
+
+!通訊地址
+#CheckL1R12B=X,1,S
+C(5,#SameReg,Y,s,$)
+C(4,#CurrCityCodeAft,S,$)
 T(2,@CurrAddressAft,#L1r12Address)
 
 #CurrAddressInd=X,27,L
-IF(#CurrAddressAft==#CurrAddressBef,T(3,),T(3,                         X))
+IF(#CurrAddressAft==T(2,#CurrAddressBef),T(3,),T(3,                         X))
 
 !通訊-郵遞區號前三碼
 #CurrZip3Bef=X,3,L

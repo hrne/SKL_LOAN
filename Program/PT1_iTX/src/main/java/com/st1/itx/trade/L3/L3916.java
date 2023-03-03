@@ -160,7 +160,6 @@ public class L3916 extends TradeBuffer {
 		}
 		int Prohibitperiod = 0;
 
-
 		if (tFacMain.getProhibitMonth() > 0 && tFacMain.getFirstDrawdownDate() > 0) {
 			dDateUtil.init();
 			dDateUtil.setDate_1(tFacMain.getFirstDrawdownDate());
@@ -190,6 +189,9 @@ public class L3916 extends TradeBuffer {
 		this.totaVo.putParam("PROHIBITPERIOD", Prohibitperiod);
 		this.totaVo.putParam("AcctCode", tFacMain.getAcctCode());
 		this.totaVo.putParam("Status", tLoanBorMain.getStatus());
+		if (tLoanBorMain.getStatus() == 2 || tLoanBorMain.getStatus() >= 5 && tLoanBorMain.getStatus() < 90) {
+			this.totaVo.putParam("AcctCode", 990);
+		}
 		this.totaVo.putParam("CurrencyCode", tLoanBorMain.getCurrencyCode());
 		this.totaVo.putParam("DrawdownAmt", tLoanBorMain.getDrawdownAmt());
 		this.totaVo.putParam("LoanBal", tLoanBorMain.getLoanBal());

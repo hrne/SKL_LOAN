@@ -500,13 +500,9 @@ IF(#FunctionCode==02 || #FunctionCode==01,C(5,#IsMainFin,N,IF(#MainFinCode=="458
 IF(#FunctionCode==02 || #FunctionCode==01,C(5,#IsMainFin,Y,CALL(#IsMainFinIsY),CALL(#IsMainFinIsN)),$)
 
 
-#IsMainFinIsY=@,1,S
-INVOKEJS(SHOW,grd1,1)
-IF(#FunctionCode==02 || #FunctionCode==01,CALL(#CheckgrdA),INVOKEJS(SHOW,grd1,2,31,0))
-#CheckgrdA=@,1,S
 !EM2661 20230331 調整每次切換最大債權為Y，需調用一次RIM
 #SendL5r01A=X,1,S
-IF(#FunctionCode=="01"||#FunctionCode=="02",$,S)
+IF(#FunctionCode=="02",$,S)
 IF(#L5701Flag=="A",s,$)
 C(4,#CustId,S,$)
 C(3,#CustNo,0,S,$)
@@ -517,6 +513,12 @@ T(2,@RimCaseSeq,#CaseSeq)
 RESET_RIM(#SendL5r01A,L5R01)
 S(L5R01,1,#FunctionCode,#RimCustId,#RimCustNo,#RimCaseSeq)
 R(1,L5R01)
+
+#IsMainFinIsY=@,1,S
+INVOKEJS(SHOW,grd1,1)
+IF(#FunctionCode==02 || #FunctionCode==01,CALL(#CheckgrdA),INVOKEJS(SHOW,grd1,2,31,0))
+
+#CheckgrdA=@,1,S
 ##loop {times:30,i:1}
 T(2,@NegFinShareFinCode{i},#L5r01NegFinShareFinCode{i})
 T(2,@FinCodeName{i},#L5r01NegFinShareFinName{i})
@@ -534,7 +536,7 @@ IF({i}==1,INVOKEJS(SHOW,grd1,{i},{i},1),C(4,#NegFinShareFinCode{i},INVOKEJS(SHOW
 #IsMainFinIsN=@,1,S
 INVOKEJS(SHOW,grd1,0)
 
-!EM2661 調整為不清空grd1  
+!清空grd1  
 ##loop {times:30,i:1}
 T(2,@NegFinShareFinCode{i},)
 T(2,@FinCodeName{i},)
