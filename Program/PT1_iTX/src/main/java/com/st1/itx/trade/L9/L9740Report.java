@@ -206,17 +206,17 @@ public class L9740Report extends MakeReport {
 			this.print(1, 1," ");
 			// 因此表User說目前還沒看到過有資料，所以暫不確定有資料的格式(各個欄位的項目)
 			int count = 1;
-			for (Map<String, String> r3 : listL9740Data3) {
+			for (Map<String, String> r : listL9740Data1) {
 				count++;
 
-				this.print(1, 12, r3.get("CustNo"), "R");
-				this.print(0, 22, r3.get("FacmNo"), "R");
+				this.print(1, 12, r.get("CustNo"), "R");
+				this.print(0, 22, r.get("FacmNo"), "R");
 //				this.print(0, 25, r3.get("BormNo"));
-				this.print(0, 36, this.showRocDate(r3.get("DrawdownDate"), 1), "R");
-				this.print(0, 52, this.formatAmt(r3.get("DrawdownAmt"), 0), "R");
-				BigDecimal rate = r3.get("StoreRate").isEmpty() ? BigDecimal.ZERO : new BigDecimal(r3.get("StoreRate"));
+				this.print(0, 36, this.showRocDate(r.get("DrawdownDate"), 1), "R");
+				this.print(0, 52, this.formatAmt(r.get("DrawdownAmt"), 0), "R");
+				BigDecimal rate = r.get("StoreRate").isEmpty() ? BigDecimal.ZERO : new BigDecimal(r.get("StoreRate"));
 				this.print(0, 66, fillUpWord(String.valueOf(rate), 6, "0", "R"), "R");
-				this.print(0, 78, this.showRocDate(r3.get("PrevPayIntDate"), 1), "R");
+				this.print(0, 78, this.showRocDate(r.get("PrevPayIntDate"), 1), "R");
 
 				if (count == 50) {
 					printContinueNext();

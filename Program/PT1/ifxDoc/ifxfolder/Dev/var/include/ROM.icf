@@ -9735,6 +9735,7 @@ TXFORM=L6R29
 #L6R31LetterFg=X,1,S
 #L6R31MessageFg=X,1,S
 #L6R31EmailFg=X,1,S
+#L6R31ApLogFlag=X,1,S
 </L6R31.dec>
 
 <L6R31.tom>
@@ -9754,6 +9755,7 @@ TXFORM=L6R31
 #L6R31LetterFg
 #L6R31MessageFg
 #L6R31EmailFg
+#L6R31ApLogFlag
 ^
 </L6R31.tom>
 

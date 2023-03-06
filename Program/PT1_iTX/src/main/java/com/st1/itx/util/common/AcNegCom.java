@@ -228,7 +228,7 @@ public class AcNegCom extends TradeBuffer {
 	/**
 	 * 以戶號取得債協退還款科目入帳acDetail.setAcctCode(acNegCom.getReturnAcctCode(CustNo,titaVo));
 	 * 
-	 * @param custNo 戶號
+	 * @param iCustNo 戶號
 	 * @param titaVo TitaVo
 	 * @return 債協退還款科目
 	 * @throws LogicException LogicException

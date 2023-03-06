@@ -65,6 +65,11 @@ BEGIN
       , "LastUpdate"          -- 最後更新日期時間 DATE 8 0
       , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
     )
+    WITH LBM AS (
+      SELECT DISTINCT
+             "CustNo"
+      FROM "LoanBorMain"
+    )
     SELECT JM.RC_ACCOUNT                  AS "CustNo"              -- 戶號 DECIMAL 7 0
           ,ROW_NUMBER() OVER (PARTITION BY JM.RC_ACCOUNT
                               ORDER BY JM.RC_ACCOUNT,JM.RC_DATE)
@@ -96,9 +101,10 @@ BEGIN
              THEN '2'
            ELSE JM.CustStatus END         AS "Status"              -- 戶況 VARCHAR2 1 0
           ,CASE
-             WHEN CM."CustTypeCode" = '05'
-             THEN '2'
-           ELSE '1' END                   AS "CustLoanKind"        -- 債權戶別 VARCHAR2 1 0
+             -- 2023-03-06 Wei 修改 from Linda : 如果該戶有撥款(LoanBorMain)則為1放款戶,其他為2保貸戶
+             WHEN NVL(LBM."CustNo",0) != 0
+             THEN '1'
+           ELSE '2' END                   AS "CustLoanKind"        -- 債權戶別 VARCHAR2 1 0
           ,0                              AS "PayerCustNo"         -- 付款人戶號 DECIMAL 7 -- 2021-11-19 智偉修改
           ,0                              AS "DeferYMStart"        -- 延期繳款年月(起) DECIMAL 6 0
           ,0                              AS "DeferYMEnd"          -- 延期繳款年月(訖) DECIMAL 6 0
@@ -213,6 +219,7 @@ BEGIN
           AND Z046."RC_DATE" = JM.RC_DATE
           AND Z046."Seq" = 1
     LEFT JOIN "CustMain" CM ON CM."CustNo" = JM.RC_ACCOUNT
+    LEFT JOIN LBM ON LBM."CustNo" = JM.RC_ACCOUNT
     ;
 
     -- 記錄寫入筆數

@@ -22,6 +22,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.TxApLog;
 import com.st1.itx.db.service.TxApLogService;
+import com.st1.itx.eum.ContentName;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.log.SysLogger;
 
@@ -103,10 +104,14 @@ public class LogAspect extends SysLogger {
 		else if (titaVo.isFuncindInquire())
 			event = 4;
 
-		if (titaVo.isTxcdSpecial() && titaVo.getTxCode().equals("LC100"))
+		if (titaVo.isTxcdSpecial() && titaVo.getTxCode().equals("LC100")) {
 			event = 8;
-		if (titaVo.isTxcdSpecial() && titaVo.getTxCode().equals("LC101"))
+			titaVo.putParam(ContentName.txCodeNM, "登入");
+		}
+		if (titaVo.isTxcdSpecial() && titaVo.getTxCode().equals("LC101")) {
 			event = 9;
+			titaVo.putParam(ContentName.txCodeNM, "登出");
+		}
 
 		if (event == -1)
 			return;

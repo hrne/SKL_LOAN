@@ -79,8 +79,12 @@ T(3,CdCode.EnableFg)
 #Confidentiality=x,1000,S
 T(3,CdCode.Confidentiality)
 
+#ApLogFlag=x,1000,S
+T(3,CdCode.ApLogFlag)
+
+
 #RIM1=X,1,S
-S(XXR99,01,#RptCycle,#RptSendCode,#RptSignCode,#EnableFg,#RptWaterCode,#Confidentiality)
+S(XXR99,01,#RptCycle,#RptSendCode,#RptSignCode,#EnableFg,#RptWaterCode,#Confidentiality,#ApLogFlag)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@RptCycle,#HelpDesc1)
@@ -89,6 +93,7 @@ T(2,@RptSignCode,#HelpDesc3)
 T(2,@EnableFg,#HelpDesc4)
 T(2,@RptWaterCode,#HelpDesc5)
 T(2,@Confidentiality,#HelpDesc6)
+T(2,@ApLogFlag,#HelpDesc7)
 !---------------------------------
 
 #CHAIN=A,1,S
@@ -195,6 +200,12 @@ T(H,#OOEnable,#EnableFg)
 #OOConfidentialityX=X,20,L
 T(H,#OOConfidentiality,#Confidentiality)
 
+!敏感性資料記錄記號(TOTA)
+#OOApLogFlag=X,1,L
+#OOApLogFlagX=X,20,L
+T(H,#OOApLogFlag,#ApLogFlag)
+
+
 !最後修改人員&日期
 #OOLastUpdate=x,20,S
 
@@ -204,8 +215,8 @@ T(H,#OOConfidentiality,#Confidentiality)
 #OOFunc2=A,1,S
 E(0,2)
 
-#OOBUF2=X,180,S
-T(2,#OOFunc2+#OOFormNo+#OOFormName+#OOCycle+#OOSendCode+#OOLetter+#OOMessage+#OOEmail+#OOSignCode+#OOUsageDesc+#OOEnable+#OOConfidentiality)
+#OOBUF2=X,181,S
+T(2,#OOFunc2+#OOFormNo+#OOFormName+#OOCycle+#OOSendCode+#OOLetter+#OOMessage+#OOEmail+#OOSignCode+#OOUsageDesc+#OOEnable+#OOConfidentiality+#OOApLogFlag)
 
 #OOBTN2=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L6608;text=修改;ntxbuf=#OOBUF2})
@@ -215,7 +226,7 @@ BIND(grid,{cmd=CHAIN;ntxcd=L6608;text=修改;ntxbuf=#OOBUF2})
 E(0,4)
 
 #OOBUF4=X,180,S
-T(2,#OOFunc4+#OOFormNo+#OOFormName+#OOCycle+#OOSendCode+#OOLetter+#OOMessage+#OOEmail+#OOSignCode+#OOUsageDesc+#OOEnable+#OOConfidentiality)
+T(2,#OOFunc4+#OOFormNo+#OOFormName+#OOCycle+#OOSendCode+#OOLetter+#OOMessage+#OOEmail+#OOSignCode+#OOUsageDesc+#OOEnable+#OOConfidentiality+#OOApLogFlag)
 
 #OOBTN4=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L6608;text=刪除;ntxbuf=#OOBUF4})
@@ -248,6 +259,7 @@ TXFORM=L6068
 #OOWatermarkFlag
 #OOEnable
 #OOConfidentiality
+#OOApLogFlag
 #OOLastUpdate
 #OOLastEmp
 ^
@@ -308,6 +320,9 @@ TXFORM=L6068
 
 #OOConfidentialityX=機密等級
 {width:70,align:'left'}
+
+#OOApLogFlagX=敏感性資料
+{width:90,align:'left'}
 
 #OOLastUpdate=最後修改日期
 {width:150,align:'center'}

@@ -140,10 +140,7 @@ public class LM050Report extends MakeReport {
 
 		String tmpCustNo="";
 		
-		if (listLM050.size() > 1) {
-			makeExcel.setShiftRow(rowCursor+1, listLM050.size() - 1);
-			
-		}
+		
 
 		for (Map<String, String> tLM050 : listLM050) {
 			String rptType = tLM050.get("F0");
@@ -152,7 +149,7 @@ public class LM050Report extends MakeReport {
 			
 
 			if (rptType.equals("1")) { // 保險業利害關係人放款管理辦法第3條利害關係人
-
+				makeExcel.setShiftRow(rowCursor+1,  1);
 				String custNo = tLM050.get("F1");
 				String custName = tLM050.get("F2");
 				String remark=tLM050.get("Remark");
@@ -160,6 +157,7 @@ public class LM050Report extends MakeReport {
 					
 				if(!custNo.equals(tmpCustNo)) {
 					tmpCustNo=custNo;
+					
 				}else {
 					continue;
 				}

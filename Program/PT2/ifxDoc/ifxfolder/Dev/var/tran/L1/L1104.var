@@ -415,6 +415,9 @@ IF(#TypeCodeAft==#TypeCodeBef,T(3,),T(3,X))
 
 !Fd
 
+!#WKSTAR=X,1,S
+!C(2,#FunCd,S,T(3,*),T(3,*),T(3,*),T(3,*),T(3,*)S)
+
 #FdCustName1=X,2,L
 #FdCustName2=X,2,L
 T(3,*)
@@ -423,34 +426,34 @@ T(3,*)
 T(3,*)
 
 #FdCustType=X,2,L
-C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
+C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,*),T(3,*),T(3,*))
 
 #FdEntcode=X,2,L
 #FdIndustry=X,2,L
-C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
+C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,*),T(3,*),T(3,*))
 
 #FdNationalityCode=X,2,L
-C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
+C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,*),T(3,*),T(3,*))
 
 #FdBussNationalityCode=X,2,L
-C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
+C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,*),T(3,*),T(3,*))
 
 #FdSpouseId=X,2,L
-C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
+C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,*),T(3,*),T(3,*))
 
 #FdSpouseName1=X,2,L
 
 #FdSpouseName2=X,2,L
-C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
+C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,*),T(3,*),T(3,*))
 
 #FdRegAdrBef=X,2,L
 #FdRegAdrAft=X,2,L
-C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
+C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,*),T(3,*),T(3,*))
 #FdRegZipBef=X,2,L
 
 #FdCurrAdrBef=X,2,L
 #FdCurrAdrAft=X,2,L
-C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
+C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,*),T(3,*),T(3,*))
 #FdCurrZipBef=X,2,L
 
 #FdEmail=X,2,L

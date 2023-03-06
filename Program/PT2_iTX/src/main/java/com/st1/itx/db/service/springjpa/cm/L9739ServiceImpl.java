@@ -126,8 +126,12 @@ public class L9739ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	   AND LC.\"FacmNo\" = L.\"FacmNo\"";
 		sql += "	   AND LC.\"BormNo\" = L.\"BormNo\"";
 		sql += "	   AND LC.\"EffectDate\" = L.\"EffectDate\"";
+		sql += "	LEFT JOIN \"LoanBorMain\" M ON M.\"CustNo\" = L.\"CustNo\"";
+		sql += "							   AND M.\"FacmNo\" = L.\"FacmNo\"";
+		sql += "							   AND M.\"BormNo\" = L.\"BormNo\"";
 		sql += "	WHERE REGEXP_LIKE(L.\"ProdNo\",'I[A-I]')";
 		sql += "	  AND L.\"EffectDate\" <= :entdy ";
+		sql += "	  AND M.\"Status\" = 0 ";
 		sql += "	  AND LC.\"CustNo\" IS NOT NULL ";
 		sql += "	ORDER BY L.\"CustNo\" ASC";
 		sql += "			,L.\"FacmNo\" ASC";

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
+import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.tradeService.CommBuffer;
 import com.st1.itx.db.domain.CdReport;
@@ -139,6 +140,12 @@ public class Manufacture extends CommBuffer {
 				txApLog.setOutputDataforXMLorJson("");
 				txApLog.setEnforcementResult(1);
 				txApLog.setMessage("");
+				
+				try {
+					txApLogService.insert(txApLog);
+				} catch (DBException e) {
+					this.error(e.getErrorMsg());
+				}
 			}
 		}
 	}

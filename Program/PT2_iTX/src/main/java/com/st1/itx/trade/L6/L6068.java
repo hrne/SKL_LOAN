@@ -84,6 +84,7 @@ public class L6068 extends TradeBuffer {
 			occursList.putParam("OOWatermarkFlag", tCdReport.getWatermarkFlag());
 			occursList.putParam("OOEnable", tCdReport.getEnable());
 			occursList.putParam("OOConfidentiality", tCdReport.getConfidentiality());
+			occursList.putParam("OOApLogFlag", tCdReport.getApLogFlag());
 			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdReport.getLastUpdate())+ " " +parse.timeStampToStringTime(tCdReport.getLastUpdate()));
 			occursList.putParam("OOLastEmp", tCdReport.getLastUpdateEmpNo() + " " + empName(titaVo, tCdReport.getLastUpdateEmpNo()));
 

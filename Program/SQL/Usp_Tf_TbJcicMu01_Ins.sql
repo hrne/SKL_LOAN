@@ -58,9 +58,10 @@ BEGIN
          , T.MODIFYUSERID                 AS "ModifyUserId"        -- 異動人員ID VARCHAR2 10
          , NVL(T.JCICEXPORTDATE,0)        AS "OutJcictxtDate"      -- 轉出JCIC文字檔日期 Decimald 8
          , T.LASTUPDATEDATE               AS "CreateDate"          -- 建檔日期時間 DATE 8 0
-         , T.EMP_ID                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+         -- 2023-03-06 Wei 修改 from Linda Usp_Tf_TbJcicMu01_Ins修改CreateEmpNo與LastUpdateEmpNo,改使用T.MODIFYUSERID(QC.2323)
+         , T.MODIFYUSERID                 AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
          , T.LASTUPDATEDATE               AS "LastUpdate"          -- 最後更新日期時間 DATE 8 0
-         , T.EMP_ID                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+         , T.MODIFYUSERID                 AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
     FROM REMIN_TBJCICMU01 T
     ;
 

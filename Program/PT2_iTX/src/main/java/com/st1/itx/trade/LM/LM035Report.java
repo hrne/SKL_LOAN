@@ -148,7 +148,7 @@ public class LM035Report extends MakeReport {
 			tmpRocMonth = yearMonthList.get(i) % 100;
 			tmpRocQ = tmpRocMonth / 3;
 
-			if (tmpRocMonth != 3 || tmpRocMonth != 6 || tmpRocMonth != 9 || tmpRocMonth != 12) {
+			if (tmpRocMonth == 3 || tmpRocMonth == 6 || tmpRocMonth == 9 || tmpRocMonth == 12) {
 				textYMQ = tmpRocYear + "Q" + tmpRocQ;
 			} else {
 				textYMQ = String.valueOf(tmpRocYear * 100 + tmpRocMonth);

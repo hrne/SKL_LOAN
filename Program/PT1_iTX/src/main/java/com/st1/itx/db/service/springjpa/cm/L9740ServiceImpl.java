@@ -179,7 +179,7 @@ public class L9740ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	    AND L.\"BormNo\" = M.\"BormNo\"";		
 
 		sql += "	WHERE M.\"DrawdownDate\" <= :endDate";
-		sql += "	  AND M.\"StoreRate\" > :rate ";
+		sql += "	  AND L.\"FitRate\" > :rate ";
 		sql += "	  AND F.\"AcctCode\" = :acctCode ";
 
 		//status 0:正常戶 2:催收戶

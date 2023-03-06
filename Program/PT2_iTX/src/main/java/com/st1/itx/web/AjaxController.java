@@ -208,6 +208,7 @@ public class AjaxController extends SysLogger {
 		TitaVo titaVo = new TitaVo();
 		titaVo.putParam("IP", request.getRemoteAddr());
 		titaVo.putParam(ContentName.tlrno, tlrNo);
+		titaVo.putParam(ContentName.empnot, tlrNo);
 		titaVo.putParam("fileno", sno);
 		titaVo.putParam(ContentName.caldy, dateUtil.getNowStringRoc());
 		titaVo.putParam(ContentName.caltm, dateUtil.getNowStringTime());

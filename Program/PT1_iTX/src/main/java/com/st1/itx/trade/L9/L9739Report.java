@@ -105,6 +105,8 @@ public class L9739Report extends MakeReport {
 
 			}
 
+			this.info("	this.tmpProdNoMap = " + this.tmpProdNoMap.toString());
+
 			listL9739Detail = l9739ServiceImpl.findAll(titaVo, iYearMonth);
 
 			exportData(listL9739Title, listL9739Detail);
@@ -169,9 +171,9 @@ public class L9739Report extends MakeReport {
 			for (Map<String, String> r : listL9739Detail) {
 
 				this.info("tmpEffectDate = " + this.tmpProdNoMap.get(r.get("ProdNo").toString() + "EffectDate"));
-				this.info("tmpRate = " + this.tmpProdNoMap.get(r.get("ProdNo").toString() + " Rate"));
+				this.info("tmpRate = " + this.tmpProdNoMap.get(r.get("ProdNo").toString() + "Rate"));
 				this.info("nowEffectDate = " + r.get("EffectDate").toString());
-				this.info("nowRate = " + r.get("ProdNo").toString());
+				this.info("nowRate = " + r.get("StoreRate").toString());
 
 				if (!this.tmpProdNoMap.get(r.get("ProdNo").toString() + "Rate").equals(r.get("StoreRate").toString())) {
 					tmpCount++;

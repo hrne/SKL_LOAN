@@ -56,8 +56,8 @@ public class L9725ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll2(TitaVo titaVo) throws Exception {
 		this.info("l9725.findAll2 ");
-		int dateInputEnd = Integer.valueOf(titaVo.getParam("DateInputEnd")+19110000)/100;
-
+		int dateInputEnd = (Integer.valueOf(titaVo.getParam("DateInputEnd"))+19110000)/100;
+		this.info("dateInputEnd =  "+ dateInputEnd);
 		String sql = "SELECT ml.\"CustNo\" AS \"CustNo\"";
 		sql += "            ,ml.\"FacmNo\" AS \"FacmNo\"";
 		sql += "            ,ml.\"BormNo\" AS \"BormNo\"";

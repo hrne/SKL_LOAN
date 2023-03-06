@@ -21,9 +21,9 @@ public class L4606Report4 extends MakeReport {
 		
 		this.print(-1, 1, "程式ID：" + "L4606");
 		this.print(-1, 70, "新光人壽保險股份有限公司", "C");
-		String tim = String.valueOf(Integer.parseInt(dDateUtil.getNowStringBc().substring(4, 6)));
 
-		this.print(-1, 130, "日　　期： " + tim + "/" + dDateUtil.getNowStringBc().substring(4, 6) + "/"
+
+		this.print(-1, 130, "日　　期： " + dDateUtil.getNowStringBc().substring(6, 8) + "/" + dDateUtil.getNowStringBc().substring(4, 6) + "/"
 				+ dDateUtil.getNowStringBc().substring(2, 4), "R");
 		this.print(-2, 1, "報　表：" + "L4606");
 		this.print(-2, 70, "佣金媒體檔錯誤清單", "C");

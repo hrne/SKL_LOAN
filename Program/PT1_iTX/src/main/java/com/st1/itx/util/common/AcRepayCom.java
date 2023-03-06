@@ -282,11 +282,17 @@ public class AcRepayCom extends TradeBuffer {
 				tx.setTxAmt(this.wkTxAmtRemaind);
 				tx.setTempAmt(this.wkTempAmtRemaind);
 				// 貸方：溢收款
-				overflow = settleOverflow(tx, this.lAcDetail, titaVo);
-				tx.setOverflow(overflow);
-				this.wkTxAmtRemaind = BigDecimal.ZERO;
-				this.wkTempAmtRemaind = BigDecimal.ZERO;
-				overFacmNo = this.lAcDetail.get(this.lAcDetail.size() - 1).getFacmNo();
+				int iTempReasonCode = this.parse.stringToInteger(titaVo.getParam("TempReasonCode"));
+				// 0: 債協暫收款 10: AML凍結／未確定
+				if (iTempReasonCode == 0 || iTempReasonCode == 10) {
+					tx.setOverflow(tx.getTxAmt());
+				} else {
+					overflow = settleOverflow(tx, this.lAcDetail, titaVo);
+					tx.setOverflow(overflow);
+					this.wkTxAmtRemaind = BigDecimal.ZERO;
+					this.wkTempAmtRemaind = BigDecimal.ZERO;
+					overFacmNo = this.lAcDetail.get(this.lAcDetail.size() - 1).getFacmNo();
+				}
 			}
 			this.lLoanBorTx.add(tx);
 		}

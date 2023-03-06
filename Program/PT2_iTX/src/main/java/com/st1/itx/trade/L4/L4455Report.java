@@ -103,6 +103,9 @@ public class L4455Report extends MakeReport {
 
 	private int dataSize = 0;
 
+	private String tmpBank = "";
+	private String tmpBankX = "";
+
 	@Override
 	public void printHeader() {
 
@@ -186,6 +189,7 @@ public class L4455Report extends MakeReport {
 		}
 
 		this.info("RepayBank = " + titaVo.get("RepayBank"));
+		
 		// 排除998 ACH
 		if (!"998".equals(titaVo.get("RepayBank"))) {
 			for (CdCode tCdCode : lCdCode) {
@@ -203,8 +207,14 @@ public class L4455Report extends MakeReport {
 			bank = "";
 		}
 
-		// 排除998 ACH
-		if (!"998".equals(titaVo.get("RepayBank"))) {
+		//998 ACH個別處理
+		if ("998".equals(titaVo.get("RepayBank"))) {
+			if (dataSize == 0) {
+				this.print(-6, 35, "扣款銀行：" + titaVo.get("RepayBank") + " " + titaVo.get("RepayBankX"));
+			} else {
+				this.print(-6, 35, "扣款銀行：" + tmpBank + " " + tmpBankX);
+			}
+		} else {
 			this.print(-6, 35, "扣款銀行：" + bank + " " + repaybank);
 		}
 
@@ -212,6 +222,7 @@ public class L4455Report extends MakeReport {
 				"戶號              戶名           扣款金額    作帳金額        計息起迄日                本金          利息        暫付款        違約金        暫收借        暫收貸          短繳        ");
 		this.print(-9, 1,
 				"----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+
 	}
 
 	public void exec(TitaVo titaVo) throws LogicException {
@@ -312,13 +323,6 @@ public class L4455Report extends MakeReport {
 		Slice<CdCode> slCdCode2 = sCdCodeDefService.defItemEq("AcctCode", "%", this.index, this.limit, titaVo);
 		lCdCode2 = slCdCode2 == null ? null : slCdCode2.getContent();
 
-		// 設定報表格式
-		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-				.setRptCode("L4455").setRptItem(tradeReportName).setSecurity("").setRptSize("A4")
-				.setPageOrientation("L").build();
-		// 開啟報表
-		this.open(titaVo, reportVo);
-
 		if (titaVo.getParam("BatchNo") != null) {
 			this.info("BatchNo   = " + titaVo.getParam("BatchNo"));
 		}
@@ -360,9 +364,26 @@ public class L4455Report extends MakeReport {
 
 			}
 
+			if ("998".equals(titaVo.get("RepayBank"))) {
+				tmpBank = L4455List.get(0).get("RepayBank");
+				for (CdCode tCdCode : lCdCode) {
+					if (tmpBank.equals(tCdCode.getCode())) {
+						tmpBankX = tCdCode.getItem();
+
+					}
+				}
+			}
+
 			if (!acctcode.equals(L4455List.get(i).get("AcctCode"))) {
 				acctcode = L4455List.get(i).get("AcctCode");
 			}
+
+			// 設定報表格式
+			ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
+					.setRptCode("L4455").setRptItem(tradeReportName).setSecurity("").setRptSize("A4")
+					.setPageOrientation("L").build();
+			// 開啟報表
+			this.open(titaVo, reportVo);
 
 			// 計數用
 			int tmpCount = 0;
@@ -374,33 +395,37 @@ public class L4455Report extends MakeReport {
 				// 給 998 ACH扣款 判斷加的
 				if ("998".equals(titaVo.get("RepayBank"))) {
 
-					if (!repaybank.equals(L4455List.get(i).get("RepayBank"))) {
-						repaybank = L4455List.get(i).get("RepayBank");
+					if (!tmpBank.equals(L4455List.get(i).get("RepayBank"))) {
+						tmpBank = L4455List.get(i).get("RepayBank");
 						for (CdCode tCdCode : lCdCode) {
-							if (repaybank.equals(tCdCode.getCode())) {
-								bank = tCdCode.getItem();
+							if (tmpBank.equals(tCdCode.getCode())) {
+								tmpBankX = tCdCode.getItem();
 							}
 						}
 
 						// 第一頁
-						if (tmpCount == 1) {
-							this.print(-6, 35, "扣款銀行：" + bank + " " + repaybank);
-						}
+//						if (tmpCount == 1) {
+//							this.info("first print header");
+//							this.print(-6, 35, "扣款銀行：" + tmpBank + " " + tmpBankX);
+//						}
 
 						if (this.getNowPage() > 1) {
 							this.info("getNowPage  = " + this.getNowPage());
 							this.info("NowRow  = " + this.NowRow);
-							this.info("newPage  = " + L4455List.get(i).get("RepayBank"));
+							this.info("newPage  = " + tmpBank + "  " + tmpBankX);
 							this.newPage();
 
-							this.print(-6, 35, "扣款銀行：" + bank + " " + repaybank);
+//							this.print(-6, 35, "扣款銀行：" + bank + " " + repaybank);
 
 						}
 					}
+					
+					this.info(tmpCount + " repaybank  = " + tmpBank);
+					this.info(tmpCount + " bank  = " + tmpBankX);
 				}
 
-				this.info(tmpCount + " repaybank  = " + repaybank);
-				this.info(tmpCount + " bank  = " + bank);
+//				this.info(tmpCount + " repaybank  = " + repaybank);
+//				this.info(tmpCount + " bank  = " + bank);
 
 //				每頁筆數相加
 				pageCnt++;
@@ -644,8 +669,6 @@ public class L4455Report extends MakeReport {
 
 		this.toPdf(sno);
 	}
-
-
 
 	private void init() {
 		RepayAmt = new BigDecimal("0");
