@@ -303,9 +303,21 @@ public class L3440 extends TradeBuffer {
 		this.info("ReplyNormaloutine ...");
 
 		// 減免金額超過限額，需主管核可
-		if (iRqspFlag.equals("Y")) {
-			if (!titaVo.getHsupCode().equals("1")) {
-				sendRsp.addvReason(this.txBuffer, titaVo, "0007", "");
+		if (titaVo.isHcodeNormal()) {
+			// 減免金額超過限額，需主管核可
+			if (iRqspFlag.equals("Y")) {
+				String iSupvReasonCode = "0007";
+				if (!titaVo.getHsupCode().equals("1")) {
+					if (iReduceAmt.compareTo(new BigDecimal(this.txBuffer.getSystemParas().getReduceAmtLimit3())) > 0) {
+						iSupvReasonCode = "0027";
+					} else if (iReduceAmt
+							.compareTo(new BigDecimal(this.txBuffer.getSystemParas().getReduceAmtLimit2())) > 0) {
+						iSupvReasonCode = "0017";
+					} else {
+						iSupvReasonCode = "0007";
+					}
+					sendRsp.addvReason(this.txBuffer, titaVo, iSupvReasonCode, "");
+				}
 			}
 		}
 

@@ -160,7 +160,7 @@ public class L9739Report extends MakeReport {
 
 		this.print(1, 10, "戶號");
 		this.print(0, 20, "額度");
-		this.print(0, 30, "額度");
+		this.print(0, 30, "撥款");
 		this.print(0, 40, "利率");
 		this.print(0, 53, "生效日期");
 		this.print(0, 66, "基本利率代碼");

@@ -189,7 +189,7 @@ public class L4455Report extends MakeReport {
 		}
 
 		this.info("RepayBank = " + titaVo.get("RepayBank"));
-		
+
 		// 排除998 ACH
 		if (!"998".equals(titaVo.get("RepayBank"))) {
 			for (CdCode tCdCode : lCdCode) {
@@ -207,7 +207,7 @@ public class L4455Report extends MakeReport {
 			bank = "";
 		}
 
-		//998 ACH個別處理
+		// 998 ACH個別處理
 		if ("998".equals(titaVo.get("RepayBank"))) {
 			if (dataSize == 0) {
 				this.print(-6, 35, "扣款銀行：" + titaVo.get("RepayBank") + " " + titaVo.get("RepayBankX"));
@@ -345,25 +345,6 @@ public class L4455Report extends MakeReport {
 					.equals(String.valueOf(parse.stringToInteger(L4455List.get(i).get("EntryDate")) - 19110000))) {
 				entrydate = String.valueOf(parse.stringToInteger(L4455List.get(i).get("EntryDate")) - 19110000);
 			}
-
-			if (!repaybank.equals(L4455List.get(i).get("RepayBank"))) {
-				repaybank = L4455List.get(i).get("RepayBank");
-				for (CdCode tCdCode : lCdCode) {
-					if (repaybank.equals(tCdCode.getCode())) {
-						bank = tCdCode.getItem();
-
-					}
-				}
-
-				if (this.getNowPage() > 1) {
-					this.info("getNowPage  = " + this.getNowPage());
-					this.info("NowRow  = " + this.NowRow);
-					this.info("newPage  = " + L4455List.get(i).get("RepayBank"));
-					this.newPage();
-				}
-
-			}
-
 			if ("998".equals(titaVo.get("RepayBank"))) {
 				tmpBank = L4455List.get(0).get("RepayBank");
 				for (CdCode tCdCode : lCdCode) {
@@ -371,6 +352,24 @@ public class L4455Report extends MakeReport {
 						tmpBankX = tCdCode.getItem();
 
 					}
+				}
+			} else {
+				if (!repaybank.equals(L4455List.get(i).get("RepayBank"))) {
+					repaybank = L4455List.get(i).get("RepayBank");
+					for (CdCode tCdCode : lCdCode) {
+						if (repaybank.equals(tCdCode.getCode())) {
+							bank = tCdCode.getItem();
+
+						}
+					}
+
+					if (this.getNowPage() > 1) {
+						this.info("getNowPage  = " + this.getNowPage());
+						this.info("NowRow  = " + this.NowRow);
+						this.info("newPage  = " + L4455List.get(i).get("RepayBank"));
+						this.newPage();
+					}
+
 				}
 			}
 
@@ -419,7 +418,7 @@ public class L4455Report extends MakeReport {
 
 						}
 					}
-					
+
 					this.info(tmpCount + " repaybank  = " + tmpBank);
 					this.info(tmpCount + " bank  = " + tmpBankX);
 				}

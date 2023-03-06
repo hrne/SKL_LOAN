@@ -195,8 +195,14 @@ public class L3916 extends TradeBuffer {
 		this.totaVo.putParam("CurrencyCode", tLoanBorMain.getCurrencyCode());
 		this.totaVo.putParam("DrawdownAmt", tLoanBorMain.getDrawdownAmt());
 		this.totaVo.putParam("LoanBal", tLoanBorMain.getLoanBal());
+
+		CdBank tCdBank1 = cdBankService.findById(new CdBankId(tLoanBorMain.getRemitBank(), tLoanBorMain.getRemitBranch()), titaVo);
 		this.totaVo.putParam("RemitBank", tLoanBorMain.getRemitBank());
 		this.totaVo.putParam("RemitBranch", tLoanBorMain.getRemitBranch());
+		if (tCdBank1 != null) {
+			this.totaVo.putParam("RemitBank", tLoanBorMain.getRemitBank() + " " + tCdBank1.getBankItem());
+			this.totaVo.putParam("RemitBranch", tLoanBorMain.getRemitBranch() + " " + tCdBank1.getBranchItem());
+		}
 		this.totaVo.putParam("RemitAcctNo", tLoanBorMain.getRemitAcctNo());
 		this.totaVo.putParam("PaymentBank", tLoanBorMain.getPaymentBank());
 		this.totaVo.putParam("CompensateAcct", tLoanBorMain.getCompensateAcct());

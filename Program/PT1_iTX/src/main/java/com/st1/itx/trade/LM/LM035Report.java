@@ -101,8 +101,16 @@ public class LM035Report extends MakeReport {
 		yearMonthList.add(lastY_4);
 		yearMonthList.add(lastY_5);
 
+//		String tmp = "";
 		// 排序
 		Collections.sort(yearMonthList);
+//		this.info("size = " + yearMonthList.size());
+//		for (int i = 0; i < yearMonthList.size(); i++) {
+//			this.info(i + " = " + yearMonthList.get(i));
+//			tmp = tmp + yearMonthList.get(i) + ",";
+//		}
+//
+//		this.info("tmp = " + tmp);
 
 		List<Map<String, String>> findData = null;
 

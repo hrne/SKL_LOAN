@@ -6652,6 +6652,10 @@ TXFORM=L5R26
 #L5r27AdjCntingCode=X,1,S
 #L5r27AdjRange=A,1,S
 #L5r27AdjLogNo=A,8,S
+#L5r27UnitManager=X,6,S
+#L5r27UnitManagerName=X,50,S
+#L5r27DistManager=X,6,S
+#L5r27DistManagerName=X,50,S
 </L5R27.dec>
 
 <L5R27.tom>
@@ -6672,12 +6676,17 @@ TXFORM=L5R27
 #L5r27AdjCntingCode
 #L5r27AdjRange
 #L5r27AdjLogNo
+#L5r27UnitManager
+#L5r27UnitManagerName
+#L5r27DistManager
+#L5r27DistManagerName
 ^
 </L5R27.tom>
 
 <L5R28.dec>
 #L5r28FullName=X,40,S
 </L5R28.dec>
+
 
 <L5R28.tom>
 TXFORM=L5R28

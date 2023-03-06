@@ -15,9 +15,12 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
+import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.domain.PfIntranetAdjust;
 import com.st1.itx.db.domain.PfItDetail;
 import com.st1.itx.db.domain.PfItDetailAdjust;
 import com.st1.itx.db.domain.TxControl;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.PfItDetailService;
 import com.st1.itx.db.service.TxControlService;
 import com.st1.itx.db.service.PfItDetailAdjustService;
@@ -74,12 +77,28 @@ public class L5501 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0010", "已產生媒體檔");
 		}
 
-		if ("2".equals(titaVo.getParam("FunCode"))) {
-			updateAdj(titaVo);
-		} else if ("4".equals(titaVo.getParam("FunCode"))) {
-			deleteAdj(titaVo);
-		} else {
-			throw new LogicException(titaVo, "E0010", "");
+		if (Integer.valueOf(titaVo.getParam("Option").trim()) == 1) {// 人員異動
+			pfItDetail = pfItDetailService.holdById(logNo, titaVo);
+			PfItDetail pfItDetailOrg = (PfItDetail) dataLog.clone(pfItDetail);
+			pfItDetail.setIntroducer(titaVo.getParam("Introducer").trim());
+			pfItDetail.setUnitManager(titaVo.getParam("UnitManager").trim());
+			pfItDetail.setDistManager(titaVo.getParam("DistManager").trim());
+			try {
+				pfItDetail = pfItDetailService.update(pfItDetail, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+			}
+			dataLog.setEnv(titaVo, pfItDetailOrg, pfItDetail);
+			dataLog.exec("修改介紹人業績檔人員資料");
+		} else {// 修改介紹人業績案件
+
+			if ("2".equals(titaVo.getParam("FunCode"))) {
+				updateAdj(titaVo);
+			} else if ("4".equals(titaVo.getParam("FunCode"))) {
+				deleteAdj(titaVo);
+			} else {
+				throw new LogicException(titaVo, "E0010", "");
+			}
 		}
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -92,7 +111,8 @@ public class L5501 extends TradeBuffer {
 		int bormNo = Integer.valueOf(titaVo.getParam("BormNo").trim()); // 撥款序號
 		int workMonth = Integer.valueOf(titaVo.getParam("WorkMonth").trim()) + 191100; // 額度編號
 
-		PfItDetailAdjust pfItDetailAdjust = pfItDetailAdjustService.findCustFacmBormFirst(custNo, facmNo, bormNo, titaVo);
+		PfItDetailAdjust pfItDetailAdjust = pfItDetailAdjustService.findCustFacmBormFirst(custNo, facmNo, bormNo,
+				titaVo);
 		if (pfItDetailAdjust == null) {
 			pfItDetailAdjust = new PfItDetailAdjust();
 			pfItDetailAdjust.setCustNo(custNo);
@@ -113,7 +133,7 @@ public class L5501 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0006", "");
 			}
 		}
-
+		
 		if (pfItDetailAdjust.getAdjRange() == 0) {
 			this.info("L5501 PfItDetail zero = " + pfItDetail.getCntingCode() + "/" + pfItDetail.getPerfEqAmt() + "/" + pfItDetail.getPerfReward() + "/" + pfItDetail.getPerfAmt());
 
@@ -138,7 +158,7 @@ public class L5501 extends TradeBuffer {
 
 		try {
 			pfItDetailAdjust = pfItDetailAdjustService.update2(pfItDetailAdjust, titaVo);
-
+			
 			dataLog.setEnv(titaVo, pfItDetailAdjust2, pfItDetailAdjust);
 			dataLog.exec("修改介紹人業績案件");
 
@@ -174,5 +194,6 @@ public class L5501 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0008", e.getErrorMsg());
 		}
 	}
+
 
 }

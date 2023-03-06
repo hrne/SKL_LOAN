@@ -166,7 +166,7 @@ public class LQ007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 
 		query.setParameter("entYearMonth", entdy / 100);
-		query.setParameter("entYear", entdy / 10000);
+		
 
 		return this.convertToMap(query);
 	}

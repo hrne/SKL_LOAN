@@ -289,8 +289,6 @@ E(0,1)ASGN(LOOP$)
 #OORepayTypeX=x,20,S
 T(H,@OORepayType,#RepayTypeHelp)
 
-#OOLog=A,1,S
-
 #OOMediaDate=X,9,S
 
 #OOLastUpdate=X,20,S
@@ -319,7 +317,6 @@ T(2,4+#OOLogNo)
 #OOBtnC=A,2,O
 C(5,#OOAdjRange,0,BIND(grid,cancel),
 BIND(grid,{ cmd=CHAIN; ntxcd=L5501; text=刪除; ntxbuf=#OOBufC}))
-!IF(#OOLog==1||#OOLog==2,$,BIND(grid,cancel))
 C(5,#OOAdjRange,9,BIND(grid,cancel),$)
 C(3,#OOCanModify,1,$,BIND(grid,cancel))
 
@@ -386,7 +383,6 @@ TXFORM=L5051
 #OOWorkMonth
 #OOCanModify
 #OORepayType
-#OOLog
 #OOMediaDate
 #OOLastUpdate
 #OOLastEmp

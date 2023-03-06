@@ -16,6 +16,8 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.TxControl;
+import com.st1.itx.db.service.TxControlService;
 import com.st1.itx.db.service.springjpa.cm.L5051ServiceImpl;
 import com.st1.itx.db.service.springjpa.cm.L6932ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -104,7 +106,8 @@ public class L5051 extends TradeBuffer {
 		for (Map<String, String> d : L5051List) {
 
 			if ("Y".equals(SumByFacm)) {
-				if (first || !Introducer.equals(d.get("Introducer").trim()) || !CustNo.equals(d.get("CustNo").trim()) || !FacmNo.equals(d.get("FacmNo").trim())) {
+				if (first || !Introducer.equals(d.get("Introducer").trim()) || !CustNo.equals(d.get("CustNo").trim())
+						|| !FacmNo.equals(d.get("FacmNo").trim())) {
 					if (!first) {
 						putTota(dd, WorkMonth, DrawdownAmt, PerfEqAmt, PerfReward, PerfAmt, cnt, 1, SumByFacm, titaVo);
 					}
@@ -152,7 +155,8 @@ public class L5051 extends TradeBuffer {
 				if (d.get("MediaFg") == null || "".equals(d.get("MediaFg"))) {
 					canmodify = 1;
 				}
-				putTota(d, d.get("WorkMonth"), new BigDecimal(d.get("DrawdownAmt")), PerfEqAmt, PerfReward, PerfAmt, 1, canmodify, SumByFacm, titaVo);
+				putTota(d, d.get("WorkMonth"), new BigDecimal(d.get("DrawdownAmt")), PerfEqAmt, PerfReward, PerfAmt, 1,
+						canmodify, SumByFacm, titaVo);
 			}
 
 			dd.clear();
@@ -179,8 +183,9 @@ public class L5051 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private void putTota(Map<String, String> d, String WorkMonth, BigDecimal DrawdownAmt, BigDecimal PerfEqAmt, BigDecimal PerfReward, BigDecimal PerfAmt, int cnt, int canModify, String SumByFacm,
-			TitaVo titaVo) throws LogicException {
+	private void putTota(Map<String, String> d, String WorkMonth, BigDecimal DrawdownAmt, BigDecimal PerfEqAmt,
+			BigDecimal PerfReward, BigDecimal PerfAmt, int cnt, int canModify, String SumByFacm, TitaVo titaVo)
+			throws LogicException {
 		OccursList occursList = new OccursList();
 
 		occursList.putParam("OOLogNo", d.get("LogNo"));
@@ -227,7 +232,7 @@ public class L5051 extends TradeBuffer {
 		occursList.putParam("OORepayType", d.get("RepayType"));
 		occursList.putParam("OOWorkMonth", WorkMonth);
 
-		occursList.putParam("OOLog", d.get("LOGCNT"));
+//		occursList.putParam("OOLog", d.get("LOGCNT"));
 
 		occursList.putParam("OOMediaDate", parse.stringToStringDate(d.get("MediaDate")));
 		occursList.putParam("OOLastUpdate", parse.stringToStringDateTime(d.get("LastUpdate")));

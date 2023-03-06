@@ -192,7 +192,7 @@ public class L9R99 extends TradeBuffer {
 
 			this.info("diffRate =" + diffRate);
 
-			rate = basePostRate.add(prodIncrRate).add(diffRate).setScale(2, RoundingMode.HALF_DOWN);
+			rate = basePostRate.add(prodIncrRate).add(diffRate).setScale(3, RoundingMode.HALF_DOWN);
 
 			this.totaVo.putParam("OOFitRate" + t, rate);
 

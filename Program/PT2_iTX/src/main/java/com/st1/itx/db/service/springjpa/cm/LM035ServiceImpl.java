@@ -27,18 +27,17 @@ public class LM035ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo, List<Integer> ymList) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, List<Integer> yearMonthList) throws Exception {
 
-		String yearMonthList = "";
+		String tmp = "";
 
-		for (int i = 0; i < ymList.size(); i++) {
-
-			yearMonthList += ymList.get(i) + ",";
-
+		for (int i = 0; i < yearMonthList.size(); i++) {
+			this.info(i + " = " + yearMonthList.get(i));
+			tmp = tmp + yearMonthList.get(i) + ",";
 		}
-		yearMonthList = yearMonthList.substring(0, ymList.size() - 1);
 
-		this.info("yearMonthList = " + yearMonthList);
+		tmp = tmp.substring(0, tmp.length() - 1);
+		this.info("yearMonthList = " + tmp);
 
 		String sql = "SELECT S1.\"YearMonth\"";
 		sql += "			,DECODE(S1.\"CityCode\", '85', '96', S1.\"CityCode\") AS \"CityCode\"";
@@ -66,14 +65,14 @@ public class LM035ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                         AND F.\"FacmNo\" = M.\"FacmNo\"";
 		sql += "                                         AND F.\"YearMonth\" = M.\"YearMonth\"";
 		sql += "            LEFT JOIN \"CdCity\" C ON C.\"CityCode\" = F.\"CityCode\"";
-		sql += "            WHERE  M.\"YearMonth\" IN (" + yearMonthList + ")";
+		sql += "            WHERE  M.\"YearMonth\" IN (" + tmp + ")";
 		sql += "              AND DECODE(M.\"DepartmentCode\", '1', 1, 0) <> 1";
 		sql += "              AND M.\"ClCode1\" IN (1, 2)";
 		sql += "              AND TO_NUMBER(C.\"CityCode\") < 96";
 		sql += "            GROUP BY M.\"YearMonth\", F.\"CityCode\",  C.\"CityItem\"";
-		for (int i = 0; i < ymList.size(); i++) {
+		for (int i = 0; i < yearMonthList.size(); i++) {
 			sql += "            UNION ALL";
-			sql += "            SELECT " + ymList.get(i) + " AS \"YearMonth\"";
+			sql += "            SELECT " + yearMonthList.get(i) + " AS \"YearMonth\"";
 			sql += "				  ,C.\"CityCode\" AS \"CityCode\"";
 			sql += "                  ,C.\"CityItem\" AS \"CityItem\"";
 			sql += "                  ,0 AS \"LoanBal\"";
@@ -86,7 +85,7 @@ public class LM035ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " 	  	) S1";
 		sql += "      GROUP BY S1.\"YearMonth\",S1.\"CityCode\", S1.\"CityItem\"";
 		sql += "      ORDER BY S1.\"YearMonth\" ASC, \"CityCode\" ASC";
-		this.info("sql=" + sql); 
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);

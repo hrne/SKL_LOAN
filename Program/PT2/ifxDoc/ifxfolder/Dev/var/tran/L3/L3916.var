@@ -596,10 +596,10 @@ CALL2(#ADJUSTDOT,#Precision,#DrawdownAmt,#DrawdownAmtX)
 CALL2(#ADJUSTDOT,#Precision,#LoanBal,#LoanBalX)
 
 ![匯款銀行]
-#RemitBank=X,20,L
+#RemitBank=X,40,L
 
 ![匯款分行]
-#RemitBranch=X,10,L
+#RemitBranch=X,40,L
 
 ![匯款帳號]
 #RemitAcctNo=A,14,L
@@ -887,7 +887,6 @@ T(H,#RelationGender,#SexHelp)
 
 !------ 上行電文 ------
 <sub type="TIM">
-
 #CaseNo#TimCustNo#CustId#ApplNo#FacmNo#BormNo
 
 </sub>

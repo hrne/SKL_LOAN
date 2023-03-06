@@ -304,7 +304,7 @@ public class L4601Batch extends TradeBuffer {
 		if (tInsuRenew.getEndoInsuNo().trim().isEmpty()) {
 			acReceivable.setRvNo(tInsuRenew.getPrevInsuNo()); // 銷帳編號
 		} else {
-			acReceivable.setRvNo(FormatUtil.pad9(tInsuRenew.getPrevInsuNo(), 17) + tInsuRenew.getEndoInsuNo()); // 銷帳編號(17)+批單號碼(1)
+			acReceivable.setRvNo(FormatUtil.padX(tInsuRenew.getPrevInsuNo(), 17) + tInsuRenew.getEndoInsuNo()); // 銷帳編號(17)+批單號碼(1)
 		}
 		acReceivable.setOpenAcDate(tInsuRenew.getInsuStartDate());
 		TempVo tTempVo = new TempVo();
