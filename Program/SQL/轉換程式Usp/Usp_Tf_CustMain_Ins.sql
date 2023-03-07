@@ -119,10 +119,10 @@ BEGIN
           , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           , "LastUpdate"          -- 最後更新日期時間 DATE  
           , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
-          , "IsLimit"
-          , "IsRelated"
-          , "IsLnrelNear"
-          , "IsDate"
+          , "IsLimit"             -- 是否為授信限制對象
+          , "IsRelated"           -- 是否為利害關係人
+          , "IsLnrelNear"         -- 是否為準利害關係人
+          , "IsDate"              -- 是否資訊日期
     )
     SELECT TF."CustUKey"                  AS "CustUKey"            -- 客戶識別碼 VARCHAR2 32 
           ,CASE
@@ -155,6 +155,9 @@ BEGIN
            ELSE TRIM(CUSP."CUSECD") END
                                           AS "CustTypeCode"        -- 客戶別 VARCHAR2 2 
           ,CASE
+             -- 2023-03-07 Wei from QC:2091
+             WHEN NVL(QC2091.NEW_CUSOCD,' ') != ' '
+             THEN LPAD(QC2091.NEW_CUSOCD,6,'0')
              -- 2022-08-10 from Linda & SKL 珮琪 
              -- 職業類別:資料轉換經過清理後，會有自然人不是060000？如果不會為什麼不是直接取客戶檔的職業類別
              WHEN NVL(ENPP."ENPUSE",' ') = 'Y' -- 在企金自然人檔有值者，且啟用記號為Y者，為企金自然人
@@ -213,6 +216,9 @@ BEGIN
            ELSE '1'
            END                            AS "CuscCd"              -- 身份別 VARCHAR2 1 
           ,CASE
+             -- 2023-03-07 Wei 修改 from QC:2091
+             WHEN NVL(QC2091.NEW_CUSENT,0) != 0
+             THEN TO_CHAR(QC2091.NEW_CUSENT)
              -- 在企金自然人檔有值者，且啟用記號為Y者，為企金自然人
              WHEN NVL(ENPP."ENPUSE",' ') = 'Y'         THEN '2'
              WHEN TRIM(CUSP."CUSENT") IN ('0','1','2') THEN TRIM(CUSP."CUSENT")
@@ -289,6 +295,7 @@ BEGIN
                                              THEN 'A111111131'
                                            ELSE REPLACE(TRIM(CUSP."CUSID1"),CHR(26),'')
                                            END
+    LEFT JOIN "TfQC2091" QC2091 ON QC2091.CUSID1 = CUSP."CUSID1"
     ;
 
     -- 記錄寫入筆數

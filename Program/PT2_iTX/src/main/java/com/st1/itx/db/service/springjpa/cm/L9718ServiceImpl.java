@@ -126,7 +126,7 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "LEFT JOIN (SELECT \"CustNo\"";
 		sql += "                 ,\"FacmNo\"";
 		sql += "                 ,MAX(\"IntEndDate\")  AS \"IntEndDate\"";
-		sql += "                 ,SUM(\"Principal\" + \"Interest\" +  \"DelayInt\" + \"BreachAmt\")) AS \"OvTxAmt\"";
+		sql += "                 ,SUM(\"Principal\" + \"Interest\" +  \"DelayInt\" + \"BreachAmt\") AS \"OvTxAmt\"";
 		sql += "                 ,MAX(\"EntryDate\") AS \"OvEntryDate\"";
 		sql += "                 ,SUM(\"Principal\" + \"Interest\" +  \"DelayInt\" + \"BreachAmt\") AS \"LnTxAmt\"";
 		sql += "                 ,MAX(\"EntryDate\") AS \"LnEntryDate\"";

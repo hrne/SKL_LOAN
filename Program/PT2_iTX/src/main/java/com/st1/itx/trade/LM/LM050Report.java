@@ -161,7 +161,7 @@ public class LM050Report extends MakeReport {
 				}else {
 					continue;
 				}
-				makeExcel.setShiftRow(rowCursor+1, 1);
+				makeExcel.setShiftRow(rowCursor-1, 1);
 
 				makeExcel.setValue(rowCursor, 2, custNo);
 				makeExcel.setValue(rowCursor, 3, custName);

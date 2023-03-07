@@ -42,7 +42,8 @@ T(3,L9742)
 !會計明細按鈕
 #BUF2=X,6,S
 #BIND2=X,1,S
-BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L6903; ntxbuf=#BUF2;ntxbuf5=type<-1:
+!BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L6903; ntxbuf=#BUF2;ntxbuf5=type<-1:
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L6905; ntxbuf=#BUF2;ntxbuf5=type<-1:
 inputSlipNoStart<-OOSlipNo:
 inputSlipNoEnd<-OOSlipNo:
 inputTitaTxtNoStart<-OOTitaTxtNo:

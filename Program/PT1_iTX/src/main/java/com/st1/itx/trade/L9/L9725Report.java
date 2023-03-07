@@ -168,12 +168,12 @@ public class L9725Report extends MakeReport {
 			int row = 2;
 
 			for (Map<String, String> tLDVo : lList) {
-				makeExcel.setValue(row, 1,Integer.valueOf(tLDVo.get("CustNo")),"R");
-				makeExcel.setValue(row, 2,Integer.valueOf(tLDVo.get("FacmNo")),"R");
-				makeExcel.setValue(row, 3,Integer.valueOf(tLDVo.get("BormNo")),"R");
+				makeExcel.setValue(row, 1,tLDVo.get("CustNo"),"R");
+				makeExcel.setValue(row, 2,tLDVo.get("FacmNo"),"R");
+				makeExcel.setValue(row, 3,tLDVo.get("BormNo"),"R");
 				makeExcel.setValue(row, 4,tLDVo.get("ProdNo"),"L");
-				makeExcel.setValue(row, 5,Integer.valueOf(tLDVo.get("DrawdownDate")),"C");
-				makeExcel.setValue(row, 6,Integer.valueOf(tLDVo.get("MaturityDate")),"C");
+				makeExcel.setValue(row, 5,tLDVo.get("DrawdownDate"),"C");
+				makeExcel.setValue(row, 6,tLDVo.get("MaturityDate"),"C");
 				makeExcel.setValue(row, 7,new BigDecimal(tLDVo.get("LineAmt")),"R");
 				makeExcel.setValue(row, 8,new BigDecimal(tLDVo.get("LoanBal")),"R");
 				makeExcel.setValue(row, 9,tLDVo.get("PieceCode"),"L");
