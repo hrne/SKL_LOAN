@@ -50,7 +50,7 @@ E(0,0)
 ["#FdCustId+統一編號",#CustId],
 ["#FdTypeCode+建檔身分別",#TypeCode,#TypeCodeX],
 [#<->#,"#FdCustName+公司名稱",#CustName],
-[#<->#,"#FdEName+英文名稱",#EName],
+[#<->#,"#FdEName+英文姓名",#EName],
 [#<->#,"#FdBirthday+設立日期",#Birthday],
 [#<->#,"#FdCustTypeCode+客戶別",#CustTypeCode,#CustTypeCodeX],
 ["#FdEntCode+企金別",#EntCode,#EntCodeX],

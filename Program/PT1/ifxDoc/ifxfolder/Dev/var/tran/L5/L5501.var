@@ -213,6 +213,18 @@ E(0,2)
 IF(#FunCode != 2,s,$)
 IF(#FunCode == 2 ,$,S)
 @V(3,1,2)
+T(2,@Introducer,#L5r27Introducer)
+T(2,@IntroducerName,#L5r27IntroducerName)
+T(2,@UnitManager,#L5r27UnitManager)
+T(2,@UnitManagerName,#L5r27UnitManagerName)
+T(2,@DistManager,#L5r27DistManager)
+T(2,@DistManagerName,#L5r27DistManagerName)
+E(0,@AdjPerfEqAmt,#L5r27AdjPerfEqAmt)
+E(0,@AdjPerfReward,#L5r27AdjPerfReward)
+E(0,@AdjPerfAmt,#L5r27AdjPerfAmt)
+T(2,@AdjCntingCode,#L5r27AdjCntingCode)
+T(2,@AdjRange,#L5r27AdjRange)
+
 #OptionX=x,18,L
 SWITCH(#Option,
     1,T(2,人員異動),
@@ -220,8 +232,10 @@ SWITCH(#Option,
 )
 
 #InitApplCode=A,1,S
-IF(#FunCode != 2 || #Option == 2 ,E(0,1),S)
-HIDE(#BTNA,#BTNB,#BTNC)
+IF(#FunCode != 2 || #Option == 2,E(0,1),S)
+#checkApplcode=X,1,S
+C(3,#InitApplCode,1,HIDE(#BTNA,#BTNB,#BTNC),SHOW(#BTNA,#BTNB,#BTNC))
+
 
 #Tf2=x,1,S
 C(3,#FunCode,2,$,S)

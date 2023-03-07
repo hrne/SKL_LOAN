@@ -86,7 +86,8 @@ public class L2036 extends TradeBuffer {
 //			lCustMain = sCustMainService.findById(Ukey, titaVo);
 
 			int tCustNo = rReltMain.getCustNo();
-			lCustMain = sCustMainService.custNoFirst(tCustNo, tCustNo, titaVo);
+//			lCustMain = sCustMainService.custNoFirst(tCustNo, tCustNo, titaVo);
+			lCustMain = sCustMainService.findById(rReltMain.getReltUKey(), titaVo);
 			this.info("lCustMain    = " + lCustMain);
 			
 			if (lCustMain == null) {

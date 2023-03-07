@@ -35,14 +35,14 @@ public class LM041ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
+	 * @param entdy 會計日
 	 * @return 
 	 * @throws Exception 
 	 * 
 	 */
-	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth, int entdy) throws Exception {
 		this.info("lM041.findAll ");
 
-//		int yearMonth = parse.stringToInteger(titaVo.get("ENTDY")) / 100 + 191100;
 
 		String sql = "";
 		sql += " SELECT CT.\"CityItem\" ";
@@ -62,10 +62,12 @@ public class LM041ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        GROUP BY \"CityCode\" ";
 		sql += "                ,\"CustNo\" ) ViableCusts ";
 		sql += " LEFT JOIN ( SELECT \"CustNo\" ";
-		sql += "                   ,SUM(\"RvBal\") \"RvBal\" ";
-		sql += "             FROM \"AcReceivable\" ";
+		sql += "                   ,\"TxAmt\" AS  \"RvBal\" ";
+		sql += "             FROM \"AcDetail\" ";
 		sql += "             WHERE \"AcctCode\" = 'TAV' ";
-		sql += "             GROUP BY \"CustNo\" ) A ON A.\"CustNo\" = ViableCusts.\"CustNo\" ";
+		sql += "               AND \"DbCr\" = 'D' ";
+		sql += "               AND \"AcDate\" = :entdy ";
+		sql += "             ) A ON A.\"CustNo\" = ViableCusts.\"CustNo\" ";
 		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = ViableCusts.\"CustNo\" ";
 		sql += " LEFT JOIN \"CdCity\" CT  ON CT.\"CityCode\" = ViableCusts.\"CityCode\" ";
 		sql += " WHERE NVL(A.\"RvBal\", 0) > 0 ";
@@ -75,6 +77,7 @@ public class LM041ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("yearMonth", yearMonth);
+		query.setParameter("entdy", entdy);
 		return this.convertToMap(query);
 	}
 

@@ -93,7 +93,7 @@ public class LM033Report extends MakeReport {
 					case 5: // 撥款金額
 					case 6: // 已用額度
 						// 金額
-						makeExcel.setValue(row, col, getBigDecimal(value), "0", "R");
+						makeExcel.setValue(row, col, getBigDecimal(value), "#,##0", "R");
 						break;
 					case 10: // 利率
 						makeExcel.setValue(row, col, getBigDecimal(value), "0.0000", "R");
@@ -109,9 +109,9 @@ public class LM033Report extends MakeReport {
 			} // for
 		}
 
-		makeExcel.formulaCaculate(1, 4);
+		makeExcel.formulaCaculate(1, 3);
+		makeExcel.formulaCaculate(1, 5);
 		makeExcel.formulaCaculate(1, 6);
-		makeExcel.formulaCaculate(1, 7);
 
 		makeExcel.close();
 	}

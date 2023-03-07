@@ -23,16 +23,16 @@ public class L4606Report4 extends MakeReport {
 		this.print(-1, 70, "新光人壽保險股份有限公司", "C");
 
 
-		this.print(-1, 130, "日　　期： " + dDateUtil.getNowStringBc().substring(6, 8) + "/" + dDateUtil.getNowStringBc().substring(4, 6) + "/"
-				+ dDateUtil.getNowStringBc().substring(2, 4), "R");
+		this.print(-1, 120, "日　　期： " + dDateUtil.getNowStringBc().substring(6, 8) + "/" + dDateUtil.getNowStringBc().substring(4, 6) + "/"
+				+ dDateUtil.getNowStringBc().substring(2, 4), "L");
 		this.print(-2, 1, "報　表：" + "L4606");
 		this.print(-2, 70, "佣金媒體檔錯誤清單", "C");
-		this.print(-2, 130,"時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
+		this.print(-2, 120,"時　　間： " + dDateUtil.getNowStringTime().substring(0, 2) + ":"
 				+ dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6),
-				"R");
+				"L");
 		this.print(-3, 70,
 				titaVo.get("InsuEndMonth").substring(0, 3) + "/" + titaVo.get("InsuEndMonth").substring(3, 5), "C");
-		this.print(-3, 130, "頁　　次：" + this.getNowPage(), "R");
+		this.print(-3, 120, "頁　　次：" + this.getNowPage(), "L");
 		this.print(-4, 1, "Seq.  火險單編號                   姓名                                         "); // fix
 		this.print(-5, 1,
 				"-------------------------------------------------------------------------------------------------------------------------------------------------------------");

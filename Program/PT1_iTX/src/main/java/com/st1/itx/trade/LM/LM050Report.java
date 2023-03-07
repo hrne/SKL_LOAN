@@ -149,7 +149,7 @@ public class LM050Report extends MakeReport {
 			
 
 			if (rptType.equals("1")) { // 保險業利害關係人放款管理辦法第3條利害關係人
-				makeExcel.setShiftRow(rowCursor+1,  1);
+				
 				String custNo = tLM050.get("F1");
 				String custName = tLM050.get("F2");
 				String remark=tLM050.get("Remark");
@@ -161,11 +161,12 @@ public class LM050Report extends MakeReport {
 				}else {
 					continue;
 				}
+				makeExcel.setShiftRow(rowCursor+1, 1);
 
 				makeExcel.setValue(rowCursor, 2, custNo);
 				makeExcel.setValue(rowCursor, 3, custName);
 				makeExcel.setValue(rowCursor, 4, formatThousand(loanBal), "#,##0");
-				makeExcel.setValue(rowCursor, 5, this.computeDivide(loanBal, equity, 4), "#,##0.00%");
+				makeExcel.setValue(rowCursor, 5, this.computeDivide(loanBal.multiply(new BigDecimal("100")), equity, 4), "#,##0.00%");
 				makeExcel.setValue(rowCursor, 6, "2%"); // 限額標準 ???
 				makeExcel.setValue(rowCursor, 7, remark); // 備註
 

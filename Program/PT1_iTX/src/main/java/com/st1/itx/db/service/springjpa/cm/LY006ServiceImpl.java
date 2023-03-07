@@ -33,7 +33,19 @@ public class LY006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " \"RelWithCompany\", ";
 		sql += " \"HeadId\", ";
 		sql += " \"HeadName\", ";
-		sql += " \"HeadTitle\", ";
+		sql += " CASE ";
+		sql += " WHEN \"HeadTitle\"='董事長' THEN 'A' ";
+		sql += " WHEN \"HeadTitle\"='副董事長' THEN 'B' ";
+		sql += " WHEN \"HeadTitle\" LIKE'%董事' THEN 'C' ";
+		sql += " WHEN \"HeadTitle\"='監事' THEN 'D' ";
+		sql += " WHEN \"HeadTitle\"='總經理' THEN 'E' ";
+		sql += " WHEN \"HeadTitle\"='副總經理' THEN 'F' ";
+		sql += " WHEN \"HeadTitle\" LIKE '%協理' THEN 'G' ";
+		sql += " WHEN \"HeadTitle\"='經理' THEN 'H' ";
+		sql += " WHEN \"HeadTitle\"='副理' THEN 'I' ";
+		sql += " WHEN \"HeadTitle\" is NULL THEN ' ' ";
+		sql += " ELSE 'J' ";
+		sql += " END AS\"HeadTitle\", ";
 		sql += " \"RelId\", ";
 		sql += " \"RelName\", ";
 		sql += " \"RelKinShip\", ";
@@ -41,7 +53,19 @@ public class LY006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " \"BusId\", ";
 		sql += " \"BusName\", ";
 		sql += " \"ShareHoldingRatio\", ";
-		sql += " \"BusTitle\", ";
+		sql += " CASE ";
+		sql += " WHEN \"BusTitle\"='副董事長' THEN 'B' ";
+		sql += " WHEN \"BusTitle\" LIKE'%董事' THEN 'C' ";
+		sql += " WHEN \"BusTitle\"='監事' OR \"BusTitle\"='監察人' OR \"BusTitle\" LIKE '(團體)%' THEN 'D' ";
+		sql += " WHEN \"BusTitle\"='董事長' OR \"BusTitle\" LIKE '%人'THEN 'A' ";
+		sql += " WHEN \"BusTitle\"='總經理' THEN 'E' ";
+		sql += " WHEN \"BusTitle\"='副總經理' THEN 'F' ";
+		sql += " WHEN \"BusTitle\" LIKE '%協理' THEN 'G' ";
+		sql += " WHEN \"BusTitle\"='經理' THEN 'H' ";
+		sql += " WHEN \"BusTitle\"='副理' THEN 'I' ";
+		sql += " WHEN \"BusTitle\" is NULL THEN ' ' ";
+		sql += " ELSE 'J' ";
+		sql += " END AS\"BusTitle\", ";
 		sql += " \"LineAmt\", ";
 		sql += " \"LoanBalance\" ";
 		sql += " from \"LifeRelHead\" ";
@@ -52,6 +76,8 @@ public class LY006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "else 6 \r\n" ; 
 		sql += "end\r\n" ; 
 		sql += "),\"RelWithCompany\" asc";
+		sql += ",\"HeadId\" asc";
+		sql += ",\"BusId\" asc";
 		
 		
 

@@ -42,15 +42,16 @@ public class LM041Report extends MakeReport {
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
-	 * @throws LogicException 
+	 * @param mfbsdy    月底日(西元)
+	 * @throws LogicException
 	 * 
 	 */
-	public void exec(TitaVo titaVo, int yearMonth) throws LogicException {
-		
+	public void exec(TitaVo titaVo, int yearMonth, int mfbsdy) throws LogicException {
+
 		List<Map<String, String>> LM041List = null;
 		try {
-			
-			LM041List = lM041ServiceImpl.findAll(titaVo, yearMonth);
+
+			LM041List = lM041ServiceImpl.findAll(titaVo, yearMonth, mfbsdy);
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -77,7 +78,6 @@ public class LM041Report extends MakeReport {
 
 		// 開啟報表
 		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
-		
 
 		if (LMList == null || LMList.isEmpty()) {
 
@@ -107,7 +107,7 @@ public class LM041Report extends MakeReport {
 
 				row++;
 			} // for
-			
+
 			int year = yearMonth / 100;
 			int month = yearMonth % 100;
 

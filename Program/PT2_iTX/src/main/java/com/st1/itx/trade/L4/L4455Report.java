@@ -333,6 +333,23 @@ public class L4455Report extends MakeReport {
 			repaybank = titaVo.getParam("RepayBank");
 
 		}
+		// 先抓第一筆的銀行 在open前放到表頭
+		if ("998".equals(titaVo.get("RepayBank"))) {
+			tmpBank = L4455List.get(0).get("RepayBank");
+			for (CdCode tCdCode : lCdCode) {
+				if (tmpBank.equals(tCdCode.getCode())) {
+					tmpBankX = tCdCode.getItem();
+
+				}
+			}
+		}
+
+		// 設定報表格式
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
+				.setRptCode("L4455").setRptItem(tradeReportName).setSecurity("").setRptSize("A4")
+				.setPageOrientation("L").build();
+		// 開啟報表
+		this.open(titaVo, reportVo);
 
 		if (L4455List.size() > 0) {
 			int i = 0, pageCnt = 0;
@@ -345,15 +362,8 @@ public class L4455Report extends MakeReport {
 					.equals(String.valueOf(parse.stringToInteger(L4455List.get(i).get("EntryDate")) - 19110000))) {
 				entrydate = String.valueOf(parse.stringToInteger(L4455List.get(i).get("EntryDate")) - 19110000);
 			}
-			if ("998".equals(titaVo.get("RepayBank"))) {
-				tmpBank = L4455List.get(0).get("RepayBank");
-				for (CdCode tCdCode : lCdCode) {
-					if (tmpBank.equals(tCdCode.getCode())) {
-						tmpBankX = tCdCode.getItem();
+			if (!"998".equals(titaVo.get("RepayBank"))) {
 
-					}
-				}
-			} else {
 				if (!repaybank.equals(L4455List.get(i).get("RepayBank"))) {
 					repaybank = L4455List.get(i).get("RepayBank");
 					for (CdCode tCdCode : lCdCode) {
@@ -376,13 +386,6 @@ public class L4455Report extends MakeReport {
 			if (!acctcode.equals(L4455List.get(i).get("AcctCode"))) {
 				acctcode = L4455List.get(i).get("AcctCode");
 			}
-
-			// 設定報表格式
-			ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-					.setRptCode("L4455").setRptItem(tradeReportName).setSecurity("").setRptSize("A4")
-					.setPageOrientation("L").build();
-			// 開啟報表
-			this.open(titaVo, reportVo);
 
 			// 計數用
 			int tmpCount = 0;
@@ -543,7 +546,8 @@ public class L4455Report extends MakeReport {
 					if (!L4455List.get(i).get("BatchNo").equals(batchno)
 							|| !String.valueOf(parse.stringToInteger(L4455List.get(i).get("EntryDate")) - 19110000)
 									.equals(entrydate)
-							|| !L4455List.get(i).get("RepayBank").equals(repaybank)) {
+							|| !L4455List.get(i).get("RepayBank")
+									.equals("998".equals(titaVo.get("RepayBank")) ? tmpBank : repaybank)) {
 						this.info("Not Match...");
 						// 換頁科目合計
 						this.print(1, 1,
