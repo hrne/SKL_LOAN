@@ -30,13 +30,14 @@ import com.st1.itx.db.service.TxFlowService;
  * @version 1.0.0
  */
 public class LCR01 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(LCR01.class);
 
 	@Autowired
 	public TxRecordService txRecordService;
 
 	@Autowired
 	public TxFlowService txFlowService;
+
+	private int suprelease = 0;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -64,10 +65,9 @@ public class LCR01 extends TradeBuffer {
 			} else if (tTxRecord.getActionFg() == 2) {
 				throw new LogicException(titaVo, "EC004", "帳務日:" + entday + ",交易序號:" + txno + "已修正");
 			}
-
-			if (tTxRecord.getFlowType() > 1) 
+			if (tTxRecord.getFlowType() > 1) {
 				checkTxFlow(titaVo, tTxRecord.getEntdy(), tTxRecord.getFlowNo(), tTxRecord.getFlowStep());
-			
+			}
 			try {
 				TitaVo tita2 = titaVo.getVo(tTxRecord.getTranData());
 				tita2.put("OrgEntdy", String.valueOf(tTxRecord.getEntdy()));
@@ -75,6 +75,11 @@ public class LCR01 extends TradeBuffer {
 				tita2.put("ORGTLR", tTxRecord.getTlrNo());
 				tita2.put("ORGTNO", tTxRecord.getTxSeq());
 				tita2.put("HCODE", "1");
+				// L3100訂正改為一段式(經辦直接訂正)
+				if ("L3100".equals(tita2.getTxcd()) && suprelease == 1) {
+					tita2.put("RELCD", "1");
+					tita2.put("ACTFG", "0");
+				}
 				totaVo.setEcTitaVo(tita2);
 			} catch (Throwable e) {
 				StringWriter errors = new StringWriter();
@@ -90,7 +95,6 @@ public class LCR01 extends TradeBuffer {
 
 	private void checkTxFlow(TitaVo titaVo, int entdy, String flowno, int flowstep) throws LogicException {
 		this.info("checkTxFlow = " + entdy + "/" + flowno + "/" + flowstep);
-
 		TxFlowId tTxFlowId = new TxFlowId();
 
 		tTxFlowId.setEntdy(entdy);
@@ -104,6 +108,10 @@ public class LCR01 extends TradeBuffer {
 		if (tTxFlow.getFlowStep() > flowstep) {
 			switch (tTxFlow.getFlowStep()) {
 			case 2:
+				if ("L3100".equals(tTxFlow.getTranNo())) {
+					suprelease = 1;
+					break;
+				}
 				throw new LogicException(titaVo, "EC008", "交易已放行");
 			case 3:
 				throw new LogicException(titaVo, "EC008", "交易已審核");

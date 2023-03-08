@@ -86,6 +86,7 @@ BEGIN
       , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
       , "LastUpdate"          -- 最後更新日期時間 DATE  
       , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+      , "InsuReceiptDate"
     )
     WITH txData AS (
       SELECT TX.TRXDAT
@@ -146,6 +147,7 @@ BEGIN
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,0                              AS "InsuReceiptDate"
     FROM (
       SELECT CNM."ClCode1"                  AS "ClCode1"             -- 擔保品-代號1 DECIMAL 1 0
            , CNM."ClCode2"                  AS "ClCode2"             -- 擔保品-代號2 DECIMAL 2 0

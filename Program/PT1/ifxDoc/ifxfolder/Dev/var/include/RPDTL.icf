@@ -236,7 +236,7 @@ C(2,#RPFG,E(0,0),
           IF(#RPTYPZ==01||#RPTYPZ==02||#RPTYPZ==03||#RPTYPZ==04||#RPTYPZ==06||#RPTYPZ==07||#RPTYPZ==09||#RPTYPZ==11||#RPTYPZ==90,E(0,1),E(0,0)),
           IF(#RPTYPZ==01||#RPTYPZ==02||#RPTYPZ==03||#RPTYPZ==04||#RPTYPZ==06||#RPTYPZ==07||#RPTYPZ==09||#RPTYPZ==11||#RPTYPZ==90||#RPTYPZ==91,E(0,1),E(0,0)),
           IF(#RPTYPZ==93,E(0,4),E(0,0)),
-          IF(#RPTYPZ==01||#RPTYPZ==02,E(0,2),E(0,0)),
+          IF(#RPTYPZ==01||#RPTYPZ==02||#RPTYPZ==03,E(0,2),E(0,0)),
           IF(#RPTYPZ==04||#RPTYPZ==05||#RPTYPZ==11,E(0,2),E(0,0)),
           IF(#RPTYPZ==91,E(0,5),E(0,0)),
           IF(#RPTYPZ==92,E(0,3),
@@ -595,8 +595,9 @@ SWITCH(#RpCode{i},
 93,T(2,@RpCodeX{i},暫收支票),T(2,@RpCodeX{i},))
 ,
 SWITCH(#RpCode{i},
-01,T(2,@RpCodeX{i},整批匯款),
-02,T(2,@RpCodeX{i},單筆匯款),
+01,T(2,@RpCodeX{i},核心匯款),
+02,T(2,@RpCodeX{i},整批匯款),
+03,T(2,@RpCodeX{i},單筆匯款),
 04,T(2,@RpCodeX{i},退款他行),
 05,T(2,@RpCodeX{i},核心退款),
 11,T(2,@RpCodeX{i},退款新光),
@@ -664,7 +665,7 @@ IF(#GRD_SKFG{i}==1&&#RpAmt{z}>0&&#RPTOTF{z}>0,
                IF(#RPFG==2,E(0,@RpCode{i},90)CALL(#COL_DIS_CALL{i}),$)
                IF(#RPFG==3,E(0,@RpCode{i},93),$)
                IF(#RPFG==6,E(0,@RpCode{i},01),$)
-               INVOKEJS(SHOW,grd9_{i},1),INVOKEJS(SHOW,grd9_{i},1))
+               INVOKEJS(SHOW,grd9_{i},1),INVOKEJS(SHOW,grd9_{i},0))
      IF(#DF2=={i}&&#RPTOTF{z}>0,$,$),s))
 IF(#RPFG==4||#RPFG==5||#RPFG==8,s,$)
 C(3,#RP_IND,1,IF(#RpCode{i}==90||#RpCode{i}==91,$,$),$)

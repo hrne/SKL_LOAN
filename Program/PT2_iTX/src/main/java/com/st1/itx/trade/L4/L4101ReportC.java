@@ -25,6 +25,7 @@ import com.st1.itx.db.service.CdBankService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.SlipMediaService;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -132,8 +133,17 @@ public class L4101ReportC extends MakeReport {
 	public void printFooter() {
 		this.print(-41, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
 		this.print(-42, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
-		this.print(-43, 1, "　　　　　　　　　　　　　　協理：　　　　　　　　經理：　　　　　　　　襄理：　　　　　　　　　　　　　　製表人：　　　　　　　　　　　　　　　　　");
-		this.print(-44, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
+		if ("RT".equals(batchNo.substring(0, 2))) {
+			this.print(-43, 1, "　　　　　　　　　　放款部　協理：　　　　　　　　經理：　　　　　　　　襄理：　　　　　　　　　　　　　　製表人：　　　　　　　　　　　　　　　　　");
+			this.print(-44, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
+
+			this.print(-43, 1, "　　　　　　　　　　財務部　協理：　　　　　　　　經理：　　　　　　　　襄理：　　　　　　　　　　　　　　製表人：　　　　　　　　　　　　　　　　　");
+			this.print(-44, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
+		} else {
+			this.print(-43, 1, "　　　　　　　　　　　　　　協理：　　　　　　　　經理：　　　　　　　　襄理：　　　　　　　　　　　　　　製表人：　　　　　　　　　　　　　　　　　");
+			this.print(-44, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
+
+		}
 	}
 
 	public void exec(TitaVo titaVo) throws LogicException {
@@ -159,7 +169,6 @@ public class L4101ReportC extends MakeReport {
 		} else if ("RT".equals(batchNo.substring(0, 2))) {
 			reportItem = "退款傳票明細表";
 		}
-		reportItem = reportItem;
 		String wkName = "";
 		String wkBankCode = "";
 		String wkBranchCode = "";
@@ -173,17 +182,18 @@ public class L4101ReportC extends MakeReport {
 				acDate, batchNo, 0, Integer.MAX_VALUE, titaVo);
 		lAcDetail = slAcDetail == null ? null : new ArrayList<AcDetail>(slAcDetail.getContent());
 
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(reportCode)
+				.setRptItem(reportItem + "-" + batchNo).setSecurity(security).setRptSize(pageSize)
+				.setPageOrientation(pageOrientation).build();
+		this.open(titaVo, reportVo);
+
 		if (lAcDetail == null || lAcDetail.isEmpty()) {
 			// 出空表
-			this.open(titaVo, reportDate, brno, reportCode, reportItem + "-" + batchNo, security, pageSize,
-					pageOrientation);
 			this.setCharSpaces(0);
 			print(1, 1, "本日無資料");
 			return;
 		}
 
-		this.open(titaVo, reportDate, brno, reportCode, reportItem + "-" + batchNo, security, pageSize,
-				pageOrientation);
 		// 統一大小
 		this.setFont(1, 10);
 

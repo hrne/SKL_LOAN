@@ -37,7 +37,7 @@ import com.st1.itx.util.report.RemitForm;
 
 /**
  * 收付欄處理<BR>
- * 1.run 收付欄(含溢收)出帳 call by L3XXX<BR>
+ * 1.run 收付欄(應付)出帳 call by L3100、L3220<BR>
  * 2.remit 撥款匯款檔處理 call by L3100、L3220<BR>
  * 3.printRemitForm 產出單筆匯款單、存入憑條call by L3100、L3220<BR>
  * 
@@ -154,16 +154,17 @@ public class AcPaymentCom extends TradeBuffer {
 		}
 
 // 2-應付
-//		201:整批匯款                        P02 銀行存款－新光       
-//		202:單筆匯款                        P02 銀行存款－新光
-//		204:退款他行(匯款單)           P02 銀行存款－台新
-//		205:核心匯款(整批匯款)        P02 銀行存款－新光
-//		211:退款新光(存款憑條)        P03 銀行存款－新光
+//		201:核心匯款				OPR	其他應付款－放款       
+//		202:整批匯款				P02	銀行存款－新光
+//		203:單筆匯款				P02	銀行存款－新光
+//		204:退款他行(匯款單)		P02	銀行存款－台新
+//		205:核心匯款(整批匯款)	P02	銀行存款－新光
+//		211:退款新光(存款憑條)	P03	銀行存款－新光
 //		
 
 // 0-共用
-//      091:借新還舊            TRO 暫收款－借新還舊
-//	    093:繳抽退票                       TCK 暫收款－支票
+//      091:借新還舊				TRO 暫收款－借新還舊
+//	    093:繳抽退票				TCK 暫收款－支票
 		if (titaVo.get("BATCHNO") != null && titaVo.get("BATCHNO").trim().length() == 6
 				&& "RESV00".equals(titaVo.get("BATCHNO"))) {
 			acDetail.setSumNo("099");
@@ -201,9 +202,12 @@ public class AcPaymentCom extends TradeBuffer {
 			acDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("RpFacmNo" + i)));
 			break;
 		case "201":
-			acDetail.setAcctCode("P02");
+			acDetail.setAcctCode("OPR");
 			break;
 		case "202":
+			acDetail.setAcctCode("P02");
+			break;
+		case "203":
 			acDetail.setAcctCode("P02");
 			break;
 		case "204":

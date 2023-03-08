@@ -62,7 +62,7 @@ public class L4001 extends TradeBuffer {
 
 		int acDateFrom = parse.stringToInteger(titaVo.getParam("AcDateFrom")) + 19110000;
 		int acDateTo = parse.stringToInteger(titaVo.getParam("AcDateTo")) + 19110000;
-		int iItemCode = parse.stringToInteger(titaVo.getParam("ItemCode")); // 1.撥款 2.退款
+		int iItemCode = parse.stringToInteger(titaVo.getParam("ItemCode")); // 1:撥款（核心匯款）;2:撥款（整批匯款）;3:退款（核心匯款）
 
 		Slice<BankRemit> slBankRemit = bankRemitService.findL4001A(acDateFrom, acDateTo, this.index, this.limit);
 
@@ -72,15 +72,20 @@ public class L4001 extends TradeBuffer {
 
 		// put
 		for (BankRemit tBankRemit : slBankRemit.getContent()) {
-			// 作業項目為1.撥款時把退款篩選掉
-			if (iItemCode == 1) {
-				if (tBankRemit.getDrawdownCode() == 4 || tBankRemit.getDrawdownCode() == 5 || tBankRemit.getDrawdownCode() == 11) {
+			// 作業項目為1.撥款時把退款篩選掉 98.撥款全部
+			if (iItemCode == 1 || iItemCode == 2 || iItemCode == 98) {
+				if (tBankRemit.getDrawdownCode() == 4 || tBankRemit.getDrawdownCode() == 5
+						|| tBankRemit.getDrawdownCode() == 11) {
+					continue;
+				}
+				if (iItemCode == 1 && tBankRemit.getDrawdownCode() != 1
+						|| iItemCode == 2 && tBankRemit.getDrawdownCode() != 2) {
 					continue;
 				}
 			}
 
-			// 作業項目為2.退款時把撥款篩選掉
-			if (iItemCode == 2) {
+			// 作業項目為2.退款時把撥款篩選掉 退款全部
+			if (iItemCode == 3 || iItemCode == 99) {
 				if (tBankRemit.getDrawdownCode() == 1 || tBankRemit.getDrawdownCode() == 2) {
 					continue;
 				}
@@ -128,7 +133,8 @@ public class L4001 extends TradeBuffer {
 	private void add(int statusCode, BankRemit tBankRemit, TitaVo titaVo) throws LogicException {
 		oRemitAmt = tBankRemit.getRemitAmt();
 
-		L4001Vo tmpL4001 = new L4001Vo(tBankRemit.getAcDate(), tBankRemit.getBatchNo(), tBankRemit.getDrawdownCode(), statusCode);
+		L4001Vo tmpL4001 = new L4001Vo(tBankRemit.getAcDate(), tBankRemit.getBatchNo(), tBankRemit.getDrawdownCode(),
+				statusCode);
 
 		if (L4001VoCnt.containsKey(tmpL4001)) {
 			L4001VoCnt.put(tmpL4001, L4001VoCnt.get(tmpL4001) + 1);
@@ -195,7 +201,8 @@ class L4001Vo implements Comparable<L4001Vo> {
 		if (obj == null || getClass() != obj.getClass())
 			return false;
 		L4001Vo l4001Vo = (L4001Vo) obj;
-		return oAcDate == l4001Vo.getoAcDate() && oBatchNo.equals(l4001Vo.getoBatchNo()) && oDrawdownCode == l4001Vo.getoDrawdownCode() && oStatusCode == l4001Vo.getoStatusCode();
+		return oAcDate == l4001Vo.getoAcDate() && oBatchNo.equals(l4001Vo.getoBatchNo())
+				&& oDrawdownCode == l4001Vo.getoDrawdownCode() && oStatusCode == l4001Vo.getoStatusCode();
 	}
 
 	public int hashCode() {

@@ -32,6 +32,7 @@ import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.SlipMediaService;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -161,7 +162,6 @@ public class L4101ReportB extends MakeReport {
 				reportItem = "整批退款單";
 			}
 
-		reportItem = reportItem;
 		// 批號查全部
 		List<BankRemit> lBankRemit = new ArrayList<BankRemit>();
 		Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(iAcDate + 19110000, batchNo, 00, 99, 0, 0, 0,
@@ -171,10 +171,12 @@ public class L4101ReportB extends MakeReport {
 		}
 		lBankRemit = slBankRemit == null ? null : new ArrayList<BankRemit>(slBankRemit.getContent());
 
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(reportCode)
+				.setRptItem(reportItem + "-" + batchNo).setSecurity(security).setRptSize(pageSize)
+				.setPageOrientation(pageOrientation).build();
+		this.open(titaVo, reportVo);
 		if (lBankRemit == null || lBankRemit.isEmpty()) {
 			// 出空表
-			this.open(titaVo, reportDate, brno, reportCode, reportItem + "-" + batchNo, security, pageSize,
-					pageOrientation);
 			this.setCharSpaces(0);
 			print(1, 1, "本日無資料");
 			return;
@@ -188,13 +190,6 @@ public class L4101ReportB extends MakeReport {
 		String wkFullName = "";
 		String wkAmlRspItem = "";
 		lBankRemit.get(0).getCurrencyCode();
-
-//		this.nowAcBookCode = lAcDetail.get(0).getSlipMediaId().getAcBookCode();
-//		this.nowAcBookItem = lAcDetail.get(0).getAcBookItem();
-//		this.slipNo = lAcDetail.get(0).getSlipMediaId().getMediaSlipNo();
-
-		this.open(titaVo, reportDate, brno, reportCode, reportItem + "-" + batchNo, security, pageSize,
-				pageOrientation);
 
 		this.setCharSpaces(0);
 		this.setFont(1, 10);

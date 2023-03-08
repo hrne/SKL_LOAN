@@ -1210,8 +1210,13 @@ public class LoanCom extends TradeBuffer {
 			if (tTxRecord != null) {
 				s = ", " + tTxRecord.getTranNo() + (tTxRecord.getFlowStep() == 2 ? "主管放行" : "");
 			}
-			throw new LogicException(titaVo, "E3088", "最近一筆交易序號 = " + ln.getLastEntDy() + "-" + ln.getLastKinbr() + "-"
-					+ ln.getLastTlrNo() + "-" + ln.getLastTxtNo() + s); // 放款交易訂正須由最後一筆交易開始訂正
+			// L3100訂正改為一段式(經辦直接訂正)
+			if ("L3100".equals(titaVo.getTxcd())) {
+				this.totaVo.setWarnMsg("主管放行，執行訂正");
+			} else {
+				throw new LogicException(titaVo, "E3088", "最近一筆交易序號 = " + ln.getLastEntDy() + "-" + ln.getLastKinbr()
+						+ "-" + ln.getLastTlrNo() + "-" + ln.getLastTxtNo() + s); // 放款交易訂正須由最後一筆交易開始訂正
+			}
 		}
 		// 登錄訂正
 		if (titaVo.isActfgEntry() && titaVo.isHcodeErase()) {

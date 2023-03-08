@@ -78,7 +78,7 @@ public class LY007Report extends MakeReport {
 		String brno = titaVo.getBrno();
 		String txcd = "LY007";
 		String fileItem = "Z100關係人交易明細表";
-		String fileName = "LY007-Z100關係人交易明細表_" + ((inputYearMonth - 191100));
+		String fileName = "LY007_Z100關係人交易明細表_" + ((inputYearMonth - 191100));
 		String defaultExcel = "LY007_底稿_Z100關係人交易明細表.xlsx";
 		String defaultSheet = "Z100關係人交易明細表";
 

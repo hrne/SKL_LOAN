@@ -78,7 +78,7 @@ public class LY007Report extends MakeReport {
 		String brno = titaVo.getBrno();
 		String txcd = "LY007";
 		String fileItem = "Z100關係人交易明細表";
-		String fileName = "LY007-Z100關係人交易明細表_" + ((inputYearMonth - 191100));
+		String fileName = "LY007_Z100關係人交易明細表_" + ((inputYearMonth - 191100));
 		String defaultExcel = "LY007_底稿_Z100關係人交易明細表.xlsx";
 		String defaultSheet = "Z100關係人交易明細表";
 
@@ -128,7 +128,7 @@ public class LY007Report extends MakeReport {
 			// 新增明細行數
 			if (lY007List.size() > 1) {
 				// 將表格往下移，移出空間
-				makeExcel.setShiftRow(rowCursor + 1, lY007List.size() - 1);
+				makeExcel.setShiftRow(7, lY007List.size());
 			}
 
 			for (Map<String, String> r : lY007List) {

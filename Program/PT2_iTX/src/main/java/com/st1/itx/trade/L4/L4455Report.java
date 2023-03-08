@@ -333,8 +333,9 @@ public class L4455Report extends MakeReport {
 			repaybank = titaVo.getParam("RepayBank");
 
 		}
+
 		// 先抓第一筆的銀行 在open前放到表頭
-		if ("998".equals(titaVo.get("RepayBank"))) {
+		if ("998".equals(titaVo.get("RepayBank")) && L4455List.size() > 0) {
 			tmpBank = L4455List.get(0).get("RepayBank");
 			for (CdCode tCdCode : lCdCode) {
 				if (tmpBank.equals(tCdCode.getCode())) {

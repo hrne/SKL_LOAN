@@ -12,6 +12,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.LoanNotYetService;
 import com.st1.itx.db.service.springjpa.cm.L9708ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -104,9 +105,10 @@ public class L4101ReportE extends MakeReport {
 		batchNo = titaVo.getBacthNo();
 		reportCode = titaVo.getTxcd();
 		reportCode = reportCode + "-E";
-		reportItem = reportItem;
 
-		this.open(titaVo, acDateF , titaVo.getKinbr(), reportCode, reportItem + "-" + batchNo, "", "A4", "L");
+		ReportVo reportVo = ReportVo.builder().setRptDate(acDateF).setBrno(titaVo.getKinbr()).setRptCode(reportCode)
+				.setRptItem(reportItem).setSecurity(security).setRptSize("A4").setPageOrientation("L").build();
+		this.open(titaVo, reportVo);
 
 		List<Map<String, String>> l9708List = null;
 		try {

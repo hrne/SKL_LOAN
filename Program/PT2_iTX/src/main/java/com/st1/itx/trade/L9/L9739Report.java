@@ -158,12 +158,18 @@ public class L9739Report extends MakeReport {
 		this.print(1, 1, " ");
 		this.print(1, 3, "不符者，產出明細欄位如下");
 
-		this.print(1, 10, "戶號");
-		this.print(0, 20, "額度");
-		this.print(0, 30, "撥款");
-		this.print(0, 40, "利率");
-		this.print(0, 53, "生效日期");
-		this.print(0, 66, "基本利率代碼");
+//		this.print(1, 10, "戶號");
+//		this.print(0, 20, "額度");
+//		this.print(0, 30, "撥款");
+//		this.print(0, 40, "利率");
+//		this.print(0, 53, "生效日期");
+//		this.print(0, 66, "基本利率代碼");
+		this.print(1, 10, "基本利率代碼");
+		this.print(0, 23, "戶號");
+		this.print(0, 33, "額度");
+		this.print(0, 43, "撥款");
+		this.print(0, 53, "利率");
+		this.print(0, 66, "生效日期");
 
 		if (listL9739Detail.size() > 0) {
 
@@ -178,12 +184,12 @@ public class L9739Report extends MakeReport {
 				if (!this.tmpProdNoMap.get(r.get("ProdNo").toString() + "Rate").equals(r.get("StoreRate").toString())) {
 					tmpCount++;
 
-					this.print(1, 13, r.get("CustNo"), "R");
-					this.print(0, 23, r.get("FacmNo"), "R");
-					this.print(0, 33, r.get("BormNo"), "R");
-					this.print(0, 43, r.get("StoreRate"), "R");
-					this.print(0, 60, showRocDate(Integer.valueOf(r.get("EffectDate")), 1), "R");
-					this.print(0, 77, r.get("ProdNo"), "R");
+					this.print(0, 21, r.get("ProdNo"), "R");
+					this.print(1, 26, r.get("CustNo"), "R");
+					this.print(0, 36, r.get("FacmNo"), "R");
+					this.print(0, 46, r.get("BormNo"), "R");
+					this.print(0, 56, r.get("StoreRate"), "R");
+					this.print(0, 73, showRocDate(Integer.valueOf(r.get("EffectDate")), 1), "R");
 				}
 
 			}

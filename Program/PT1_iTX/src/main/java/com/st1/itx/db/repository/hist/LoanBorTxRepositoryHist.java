@@ -3,12 +3,14 @@ package com.st1.itx.db.repository.hist;
 
 import java.util.Optional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,6 +66,9 @@ public interface LoanBorTxRepositoryHist extends JpaRepository<LoanBorTx, LoanBo
 
   // CustNo = ,AND TitaHCode = ,AND TitaTxCd ^i
   public Optional<LoanBorTx> findTopByCustNoIsAndTitaHCodeIsAndTitaTxCdInOrderByAcDateDescTitaCalDyDescTitaCalTmDescTitaTxtNoDescAcSeqDesc(int custNo_0, String titaHCode_1, List<String> titaTxCd_2);
+
+  // AcDate = ,AND TitaKinBr = ,AND TitaTlrNo = ,AND TitaTxtNo =
+  public Slice<LoanBorTx> findAllByAcDateIsAndTitaKinBrIsAndTitaTlrNoIsAndTitaTxtNoIsOrderByCustNoAscFacmNoAscBormNoAsc(int acDate_0, String titaKinBr_1, String titaTlrNo_2, String titaTxtNo_3, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

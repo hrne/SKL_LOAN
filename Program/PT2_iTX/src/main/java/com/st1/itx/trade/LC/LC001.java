@@ -26,7 +26,7 @@ import com.st1.itx.db.service.springjpa.cm.LC001ServiceImpl;
 @Scope("prototype")
 /**
  * 訂正查詢
- * 
+ *
  * @author eric chang
  * @version 1.0.0
  */
@@ -98,17 +98,28 @@ public class LC001 extends TradeBuffer {
 					String daHcode = lc001Vo.get("F17"); // sql += ",A.\"Hcode\"";
 					String daActionFg = lc001Vo.get("F18"); // sql += ",A.\"ActionFg\"";
 					int daAcCnt = X2N(lc001Vo.get("F19")); // sql += ",A.\"AcCnt\"";
+					int iLevelFg = X2N(lc001Vo.get("LevelFg"));
+					String daTranNo = lc001Vo.get("TranNo");
 
-					// 兩段式以上的登錄交易==>主管已放行，不顯示<修正>按鈕
 					int supRelease = 0;
-					if (daFlowType > 1 && daEntdy < tbsdy) {
-						// 非一段式交易,不可訂正非本日交易
-						supRelease = 1;
-					} else if (daFlowType > 1 && daFlowStep == 1) {
-						if (daFlowStep != daFlowStep2 || (daFlowStep == 1 && daSubmitFg == 1 && daFlowMode != 3)) {
-							supRelease = 1; // 1的時候 按鈕不開
+					//L3100 由經辦執行訂正
+					if (daTranNo.equals("L3100")) {
+						if (iLevelFg == 1) {
+							supRelease = 1;
+						} else {
+							supRelease = 0;
 						}
+					} else {
+						// 兩段式以上的登錄交易==>主管已放行，不顯示<修正>按鈕
+						if (daFlowType > 1 && daEntdy < tbsdy) {
+							// 非一段式交易,不可訂正非本日交易
+							supRelease = 1;
+						} else if (daFlowType > 1 && daFlowStep == 1) {
+							if (daFlowStep != daFlowStep2 || (daFlowStep == 1 && daSubmitFg == 1 && daFlowMode != 3)) {
+								supRelease = 1; // 1的時候 按鈕不開
+							}
 
+						}
 					}
 
 					OccursList occursList = new OccursList();
@@ -125,7 +136,9 @@ public class LC001 extends TradeBuffer {
 					occursList.putParam("FlowType", daFlowType);
 					occursList.putParam("FlowStep", daFlowStep);
 					occursList.putParam("SupRelease", supRelease);
-					occursList.putParam("RejectReason", Objects.isNull(lc001Vo.get("RejectReason")) || lc001Vo.get("RejectReason").isEmpty() ? "" : "退回原因 : " + lc001Vo.get("RejectReason"));
+					occursList.putParam("RejectReason",
+							Objects.isNull(lc001Vo.get("RejectReason")) || lc001Vo.get("RejectReason").isEmpty() ? ""
+									: "退回原因 : " + lc001Vo.get("RejectReason"));
 					if (daOrgEntdy > 0 && daOrgEntdy != daEntdy) {
 						occursList.putParam("OOOrgEntdy", daOrgEntdy - 19110000);
 					} else {

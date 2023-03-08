@@ -54,7 +54,7 @@ public class LY006Report extends MakeReport {
 		String brno = titaVo.getBrno();
 		String txcd = "LY006";
 		String fileItem = "B117關係人明細表";
-		String fileName = "LY006 B117關係人明細表_"+titaVo.getParam("RocYear");
+		String fileName = "LY006_B117關係人明細表_"+titaVo.getParam("RocYear");
 		String defaultExcel = "LY006_底稿_B117關係人明細表.xlsx";
 		String defaultSheet = "B117關係人明細表";
 
@@ -95,9 +95,6 @@ public class LY006Report extends MakeReport {
 		makeExcel.setShiftRow(8, shiftCounts);
 		for (Map<String, String> r : lY006List) {
 			makeExcel.setValue(row, 1,r.get("F0"));//與本公司之關係
-			if(r.get("F0")=="C"&& r.get("F0")=="D" && r.get("F0")=="F") {
-				
-			};
 			makeExcel.setValue(row, 2,r.get("F1"));//關係人代號
 			makeExcel.setValue(row, 3,r.get("F2"));//關係人名稱
 			makeExcel.setValue(row, 4,r.get("F3"));//關係人職稱
@@ -107,49 +104,13 @@ public class LY006Report extends MakeReport {
 			makeExcel.setValue(row, 8,r.get("F7"));//親屬稱謂
 			makeExcel.setValue(row, 9,r.get("F8"));//所屬事業代號
 			makeExcel.setValue(row, 10,r.get("F9"));//所屬事業名稱
-			makeExcel.setValue(row, 11,r.get("F10"));//所屬事業持股比率%
+			makeExcel.setValue(row, 11,(Integer.valueOf(r.get("F10"))/100),"#0.0000");//所屬事業持股比率%
 			makeExcel.setValue(row, 12,r.get("F11"));//所屬事業待任要職
 			//makeExcel.setValue(row, 13,r.get("F12"));//備註
-			//makeExcel.setValue(1, 14,r.get("F13"));
 			row++;
 		}
 		makeExcel.close();
 	}
 }
 
-//// 年月底
-//int endOfYearMonth = (Integer.valueOf(titaVo.getParam("RocYear")) + 1911) * 100 + 12;
-//
-//int rocYear = Integer.valueOf(titaVo.getParam("RocYear"));
-//int rocMonth = 12;		
-//// 調整欄寬
-//makeExcel.setWidth(1, 10);
-//makeExcel.setWidth(2, 10);
-//makeExcel.setWidth(3, 10);
-//makeExcel.setWidth(4, 28);
-//makeExcel.setWidth(5, 12);
-//makeExcel.setWidth(6, 12);
-//makeExcel.setWidth(7, 24);
-//makeExcel.setWidth(8, 24);
-//// 表頭
-//
-//makeExcel.setValue(row, 1, "與本公司之關係", "C", headerStyleVo);
-//makeExcel.setValue(row, 2, "關係人代號", "C", headerStyleVo);
-//makeExcel.setValue(row, 3, "關係人名稱", "C", headerStyleVo);
-//makeExcel.setValue(row, 4, "關係人職稱", "C", headerStyleVo);
-//makeExcel.setValue(row, 5, "親屬代號, ","C", headerStyleVo);
-//makeExcel.setValue(row, 6, "親屬姓名", "C", headerStyleVo);
-//makeExcel.setValue(row, 7, "親屬親筆","C", headerStyleVo);
-//makeExcel.setValue(row, 8, "親屬稱謂", "C", headerStyleVo);
-//makeExcel.setValue(row, 9, "所屬事業代號", "C", headerStyleVo);
-//makeExcel.setValue(row, 10, "所屬事業名稱", "C", headerStyleVo);
-//makeExcel.setValue(row, 11, "所屬事業持股比率%", "C", headerStyleVo);
-//makeExcel.setValue(row, 12, "所屬事業待任要職", "C", headerStyleVo);
-//makeExcel.setValue(row, 13, "備註", "C", headerStyleVo);
 
-
-//
-//makeExcel.setValue(1, 1, "報表種類");
-//makeExcel.setValue(1, 2, "申報年月");
-//makeExcel.setValue(1, 3, "公司名稱");
-//makeExcel.setValue(1, 4, "報表名稱");

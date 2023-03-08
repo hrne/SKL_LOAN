@@ -246,7 +246,7 @@ BEGIN
                   AND MFB."FacmNo" = A."FacmNo"
 
     WHERE NVL(F."AcctCode",' ') != ' '
-      --AND A."YearlyInt" > 0 -- 利息為0不需寫入=>改由JAVA產媒體檔時剔除
+      AND A."YearlyInt" > 0 -- 利息為0不需寫入
     ;
 
     INS_CNT := INS_CNT + sql%rowcount;

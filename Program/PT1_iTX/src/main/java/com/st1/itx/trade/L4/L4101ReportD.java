@@ -16,6 +16,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.LoanNotYetService;
 import com.st1.itx.db.service.springjpa.cm.L4101ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -111,7 +112,6 @@ public class L4101ReportD extends MakeReport {
 		batchNo = titaVo.getBacthNo();
 		reportCode = titaVo.getTxcd();
 		reportCode = reportCode + "-D";
-		reportItem = reportItem;
 
 		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 		try {
@@ -122,7 +122,9 @@ public class L4101ReportD extends MakeReport {
 			this.info("L4101ServiceImpl.findAll error = " + errors.toString());
 		}
 
-		this.open(titaVo, reportDate, titaVo.getKinbr(), reportCode, reportItem + "-" + batchNo, "", "A4", "L");
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(titaVo.getKinbr()).setRptCode(reportCode)
+				.setRptItem(reportItem).setSecurity(security).setRptSize("A4").setPageOrientation("L").build();
+		this.open(titaVo, reportVo);
 		// 統一大小
 		this.setFont(1, 10);
 

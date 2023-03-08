@@ -78,7 +78,8 @@ T(3,0:正常;1:產檔後修正;2:產檔後更正;3:未放行;9:全部)
 T(3,Y:是;N:否)
 
 #ItemCodeHelp=x,1024,S
-T(3,1:撥款;2:退款)
+T(3,1:撥款（核心匯款）;2:撥款（整批匯款）;3:退款（核心匯款）)
+
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
@@ -106,16 +107,16 @@ T(4,TLRNO$)
 HELP(#ItemCodeHelp)
 @V(H,#ItemCodeHelp)
 
-#ItemCodeX=X,10,L
+#ItemCodeX=X,20,L
 T(3,)
 T(H,#ItemCode,#ItemCodeHelp)
-IF(#ItemCode=="1",INVOKEJS(SHOW,L4101,3,3,1),INVOKEJS(SHOW,L4101,3,3,0))
+IF(#ItemCode=="1" || #ItemCode=="2",INVOKEJS(SHOW,L4101,3,3,1),INVOKEJS(SHOW,L4101,3,3,0))
 
 
 
 !是否檢核未放行
 #ReleaseCheck=X,1,I
-IF(#ItemCode=="1",$,S)
+IF(#ItemCode=="1" || #ItemCode=="2",$,S)
 C(4,#ReleaseCheck,T(3,Y),$)
 HELP(#ReleaseCheckHELP)
 @V(H,#ReleaseCheckHELP)

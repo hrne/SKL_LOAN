@@ -22,6 +22,7 @@ import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.CdAcCodeService;
 import com.st1.itx.db.service.SlipMediaService;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -149,7 +150,7 @@ public class L4101ReportA extends MakeReport {
 			}
 		reportCode = titaVo.getTxcd();
 		reportCode = reportCode + "-A";
-		reportItem = reportItem;
+
 		// 分錄
 		List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 		this.info("L4101ReportA BatchNo = " + batchNo);
@@ -158,17 +159,17 @@ public class L4101ReportA extends MakeReport {
 
 		lAcDetail = slAcDetail == null ? null : new ArrayList<AcDetail>(slAcDetail.getContent());
 
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(reportCode)
+				.setRptItem(reportItem + "-" + batchNo).setSecurity(security).setRptSize(pageSize)
+				.setPageOrientation(pageOrientation).build();
+		this.open(titaVo, reportVo);
+
 		if (lAcDetail == null || lAcDetail.isEmpty()) {
 			// 出空表
-			this.open(titaVo, reportDate, brno, reportCode, reportItem + "-" + batchNo, security, pageSize,
-					pageOrientation);
 			this.setCharSpaces(0);
 			print(1, 1, "本日無資料");
 			return;
 		}
-
-		this.open(titaVo, reportDate, brno, reportCode, reportItem + "-" + batchNo, security, pageSize,
-				pageOrientation);
 
 		this.setCharSpaces(0);
 		tempList = procReportA(lAcDetail, titaVo);

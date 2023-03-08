@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM032ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -51,7 +52,22 @@ public class LM032Report extends MakeReport {
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LDList) throws LogicException {
 
 		this.info("LM032Report exportExcel");
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM032", "逾期案件滾動率明細", "LM032逾期案件滾動率明細", "逾期案件滾動率明細.xlsx", "D9612263");
+		
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LM032";
+		String fileItem = "逾期案件滾動率明細";
+		String fileName = "LM032-逾期案件滾動率明細";
+		String defaultExcel = "LM032_底稿_逾期案件滾動率明細.xlsx";
+		String defaultSheet = "D9612263";
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM032", "逾期案件滾動率明細", "LM032逾期案件滾動率明細",
+//				"逾期案件滾動率明細.xlsx", "D9612263");
 		if (LDList == null || LDList.isEmpty()) {
 			makeExcel.setValue(3, 1, "本日無資料");
 		} else {
@@ -101,7 +117,7 @@ public class LM032Report extends MakeReport {
 		}
 
 		makeExcel.close();
-		// makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 
 }

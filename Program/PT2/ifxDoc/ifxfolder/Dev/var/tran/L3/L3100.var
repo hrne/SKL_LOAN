@@ -13,17 +13,15 @@ T(3,01)
 T(2,@RimTxCode,#TXCD)
 E(0,@RimFKey,#FKEY)
 
-!#FKEY 0:登錄,1:更正,2:放行,3:審核/在途登錄,5:更正重登,6:在途設定,7修改,9檢視journal
+!#FKEY 0:登錄,1:訂正,2:放行,3:審核/在途登錄,5:更正重登,6:在途設定,7修改,9檢視journal
 ![一段式/二段式/三段式]
 #RELCD=_,_,S
 C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)
 E(0,2)
-C(3,#TxBormNo,0,$,E(0,1))
 
 #ACTFG=_,_,S
 C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)
 E(0,1)
-C(3,#TxBormNo,0,$,E(0,0))
 
 ![借貸別 (1:借 2:貸)]
 #CRDB=_,_,S
@@ -35,6 +33,9 @@ E(0,1)
 </sub>
 
 <sub type="DC" name="BFHEAD">
+#shcode=X,1,S
+C(3,#FKEY,1,E(0,@TR_HCODECD,1),$)
+
 <include src="COM.icf::BFHEAD.dec"/>
 !起始交易記號  0:起始交易,1:非起始交易
 #ORGFG=_,_,S
@@ -400,6 +401,7 @@ T(3,CdCode.RenewFlag)
 #RenewFlagHelp=x,1024,S
 
 #HelpRim=X,1,S
+IF(#FKEY==0 || #FKEY==7,$,s)
 RESET_RIM(#HelpRim,XXR99)
 S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05,#CDDEF06,#CDDEF07,#CDDEF08,#CDDEF09,#CDDEF10)
 R(1,XXR99)
@@ -416,6 +418,7 @@ T(2,@BaseRateCodeHelp,#HelpDesc9)
 T(2,@CurrencyCodeHelp,#HelpDesc10)
 
 #HelpRim2=X,1,S
+IF(#FKEY==0 || #FKEY==7,$,s)
 RESET_RIM(#HelpRim2,XXR99)
 S(XXR99,01,#CDDEF11,#CDDEF12,#CDDEF13,#CDDEF14,#CDDEF15,#CDDEF16,#CDDEF17,#CDDEF18,#CDDEF19,#CDDEF20)
 R(1,XXR99)
@@ -676,6 +679,7 @@ T(2,@ApplNoX,#L2r07CustName)
 C(4,#ApplNo,S,$)
 
 #SendL6r28=X,1,S
+IF(#FKEY==0 || #FKEY==7,$,s)
 E(0,@RimFuncCode,5)
 T(2,@RimBusinessType,LN)
 RESET_RIM(#SendL6r28,L6R28)
@@ -740,6 +744,7 @@ R(1,L2R05)
 
 !取案件申請資料
 #SendL2r02A=X,1,S
+IF(#FKEY==0 || #FKEY==7,$,s)
 E(0,@RimApplNo,#L2r05ApplNo)
 E(0,@RimFuncCode,5)
 T(2,@RimCustId,#L2r05CustId)
@@ -833,6 +838,7 @@ T(H,@PayIntFreqX,#FreqBase,#FreqBase2Help)
 T(H,@RepayFreqX,#FreqBase,#FreqBase2Help)
 
 #SendL2r01=X,1,S
+IF(#FKEY==0 || #FKEY==7,$,s)
 E(0,@RimFuncCode,5)
 T(2,@RimProdNo,#ProdNo)
 RESET_RIM(#SendL2r01,L2R01)
@@ -846,6 +852,7 @@ E(0,#SYSDATE)
 
 
 #SendL2r09A=X,1,S
+IF(#FKEY==0 || #FKEY==7,$,s)
 C(3,#RepayCode,2,$,S)
 C(4,#RepayBank,S,$)
 T(2,@RimBankCode,#RepayBank)
@@ -935,11 +942,11 @@ T(H,#AcctCode,#FacmAcctCodeHelp)
 
 #DrawdownCode=A,1,I
 C(3,#HIDE4FG,0,CALL(#HIDEP4),$)
-C(3,#FKEY,7,C(3,#FKEY7DrawdownCode,3,s,$),$)
+! C(3,#FKEY,7,C(3,#FKEY7DrawdownCode,3,s,$),$)
 HELP(#DrawdownCodeHelp)
 C(3,#FKEY,0,E(0,1),$)
 @V(H,#DrawdownCodeHelp)
-C(3,#FKEY,7,C(3,#FKEY7DrawdownCode,3,$,V(2,3)),$)
+! C(3,#FKEY,7,C(3,#FKEY7DrawdownCode,3,$,V(2,3)),$)
 
 #DrawdownCodeX=X,10,L
 C(3,#DrawdownCode,0,S,$)T(H,#DrawdownCode,#DrawdownCodeHelp)
@@ -992,6 +999,9 @@ IF(#UsDrawdownAmt>#Available,V(P,#AvailableXX),$)
 
 #TimDrawdownAmt=m,14.2,S
 C(3,#PRECISION,0,E(0,#TwDrawdownAmt),E(0,#UsDrawdownAmt))
+@
+C(3,#DrawdownCode,1,$,s)
+IF(#TimDrawdownAmt>#L6R28CoreRemitLimit,V(P,撥款方式為核心匯款時，金額不可大於核心匯款金額),$)
 
 #DrawdownAmtX=X,22,L
 CALL2(#ADJUSTDOT,#PRECISION,#TimDrawdownAmt,#DrawdownAmtX)
@@ -1012,20 +1022,30 @@ E(0,#TimDrawdownAmt)
 ! 預約撥款上送欄位
 
 #DrawdownDate=D,7,I
-C(3,#DrawdownDate,0,C(3,#DrawdownCode,3,E(0,#NBSDY),E(0,#SYSDATE)),$)
+! C(3,#DrawdownDate,0,C(3,#DrawdownCode,3,E(0,#NBSDY),E(0,#SYSDATE)),$)
+E(0,#SYSDATE)
 D(8)
 @V(7)A(DATE,0,#DrawdownDate)
-C(3,#DrawdownCode,3,IF(#DrawdownDate<=#wksysdate,V(P,預撥日期不可小於等於會計日),$),V(5,0010101,#SYSDATE))
+! C(3,#DrawdownCode,3,IF(#DrawdownDate<=#wksysdate,V(P,預撥日期不可小於等於會計日),$),V(5,0010101,#SYSDATE))
+#TxtSysDate=x,20,L
+#EffectDateX=X,10,S
+CALL2(#AdjustDate,#EffectDate,#EffectDateX)
+#IsRv=A,1,S
+IF(#DrawdownDate>#EffectDate,E(0,1),E(0,0))
+C(3,#IsRv,1,T(2,@TxtSysDate,會計日期：+#EffectDateX),T(2,@TxtSysDate,))
+K(LIGHT,#TxtSysDate,TXTRED,0)
 
 #checkDrawdownCode3=D,7,S
-C(3,#DrawdownCode,3,E(0,#DrawdownDate)ASGN(SPANDY$),E(0,0)ASGN(SPANDY$))
-
+C(3,#IsRv,1,E(0,#DrawdownDate)ASGN(SPANDY$),E(0,0)ASGN(SPANDY$),$)
+! C(3,#DrawdownCode,3,E(0,#DrawdownDate)ASGN(SPANDY$),E(0,0)ASGN(SPANDY$))
+!檢查是否為預撥 0.否 1.是 
 
 #checkDrawdownCode3H=D,7,S
 E(0,#DrawdownDate)
 ASGN(SPANDY$)
 
 #SendL2r06=X,1,S
+IF(#FKEY==0 || #FKEY==7,$,s)
 T(2,@RimCurrencyCode,#L2r05CurrencyCode)
 T(2,@RimBaseRateCode,#BaseRateCode)
 E(0,@RimEffectDate,#DrawdownDate)
@@ -1485,6 +1505,7 @@ E(0,#FirstDueDate)
 E(0,#TimDrawdownAmt-1)
 
 ! #SendL3r13=X,1,S
+! IF(#FKEY==0 || #FKEY==7,$,s)
 ! C(3,#FixAdjDd,0,S,$)
 ! E(0,@RimFixAdjDd,#FixAdjDd)
 ! E(0,@RimRateAdjFreq,#RateAdjFreq)
@@ -2058,9 +2079,9 @@ T(2,#CurrencyCode)
 IF(#RenewFlag=="1"||#RenewFlag=="2",E(0,@RPFG,6),E(0,@RPFG,4))
 ! C(5,#RenewFlag,Y,E(0,@RPFG,6),E(0,@RPFG,4))
 
-!撥款方式
+!撥款方式 1.核心匯款，2.整批匯款，3.單筆匯款
 #TMPRPTYP=X,1,S
-IF(#RenewFlag=="1"||#RenewFlag=="2",E(0,@RPTYPZ,91),C(3,#DrawdownCode,3,E(0,@RPTYPZ,1),E(0,@RPTYPZ,#DrawdownCode)))
+IF(#RenewFlag=="1"||#RenewFlag=="2",E(0,@RPTYPZ,91),E(0,@RPTYPZ,#DrawdownCode))
 ! C(5,#RenewFlag,Y,E(0,@RPTYPZ,91),E(0,@RPTYPZ,#DrawdownCode))
 
 !應收付總金額,撥款金額
@@ -2225,7 +2246,7 @@ C(3,#EXPANDFG,0,CALL(#EXPAND),$)
 ["#FdDrawdownCode+撥款方式",#DrawdownCode,#DrawdownCodeX],
 ["#FdCurrencyCode+幣別",#CurrencyCode],
 ["#FdDrawdownAmt+撥款金額",#TwDrawdownAmt,#UsDrawdownAmt,#DrawdownAmtX],
-["#FdDrawdownDate+撥款日期",#DrawdownDate],
+["#FdDrawdownDate+撥款日期",#DrawdownDate,#TxtSysDate],
 ["#FdMaturityDate+到期日",#MaturityDate],
 ["#FdIntCalcCode+計息方式",#IntCalcCodeX],
 ["#FdAmortizedCode+攤還方式",#AmortizedCode,#AmortizedCodeX],
@@ -2396,7 +2417,9 @@ C(3,#DSnoF,0,E(0,0),E(0,1))
 #NotYetFlag#PieceCode#PieceCodeSecond#TimPieceCodeSecondAmt#UsageCode#RenewFlag#SyndNo#CompensateFlag
 #RelationCode#RelationBirthday#RelationGender
 #TxBormNo
+#IsRv
 #END
+#TxtSysDate
 #AcctCodeX
 #DrawdownCodeX
 #TwDrawdownAmt

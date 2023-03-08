@@ -6,6 +6,7 @@ set define off;
 CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_AcDetail_Ins" 
 ( 
     -- 參數 
+    "ExecSeq"      IN  INT,       --執行序號
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間 
     JOB_END_TIME   OUT TIMESTAMP, --程式結束時間 
     INS_CNT        OUT INT,       --新增資料筆數 
@@ -20,6 +21,8 @@ BEGIN
  
     DECLARE  
         "TbsDyF" DECIMAL(8); --西元帳務日 
+        "DateStart" DECIMAL(6) := 0 ; -- 資料擷取起日
+        "DateEnd"   DECIMAL(6) := 0 ; -- 資料擷取止日
     BEGIN 
  
     SELECT "TbsDy" + 19110000 
@@ -29,10 +32,24 @@ BEGIN
     ; 
  
     -- 刪除舊資料 
-    EXECUTE IMMEDIATE 'ALTER TABLE "AcDetail" DISABLE PRIMARY KEY CASCADE'; 
-    EXECUTE IMMEDIATE 'TRUNCATE TABLE "AcDetail" DROP STORAGE'; 
-    EXECUTE IMMEDIATE 'ALTER TABLE "AcDetail" ENABLE PRIMARY KEY'; 
- 
+    IF "ExecSeq" = 1 THEN
+        EXECUTE IMMEDIATE 'ALTER TABLE "AcDetail" DISABLE PRIMARY KEY CASCADE'; 
+        EXECUTE IMMEDIATE 'TRUNCATE TABLE "AcDetail" DROP STORAGE'; 
+        EXECUTE IMMEDIATE 'ALTER TABLE "AcDetail" ENABLE PRIMARY KEY'; 
+    END IF;
+
+    SELECT "StartMonth"
+    INTO "DateStart"
+    FROM "TfByYear"
+    WHERE "Seq" = "ExecSeq"
+    ;
+
+    SELECT "EndMonth"
+    INTO "DateEnd"
+    FROM "TfByYear"
+    WHERE "Seq" = "ExecSeq"
+    ;
+
     -- 寫入資料 
     INSERT INTO "AcDetail" (
             "RelDy"               -- 登放日期 Decimald 8 0 
@@ -183,7 +200,8 @@ BEGIN
                    AND ACN."LMSAPN1" = TR1."LMSAPN" 
                    AND ACN."LMSASQ1" = TR1."LMSASQ" 
       WHERE TR1."LMSACN" <> 0 
-        AND TR1."TRXDAT" > 20190101 
+        AND TR1."TRXDAT" >= "DateStart"
+        AND TR1."TRXDAT" <= "DateEnd"
       GROUP BY TR1."TRXDAT" 
               ,TR1."TRXNMT" 
               ,TR1."TRXTRN" 
@@ -315,7 +333,8 @@ BEGIN
         AND NVL(S3."AGLACC",' ') != ' ' -- 2021-12-08 新增判斷 有串到最新的11碼會科才寫入 
         AND NVL(S5."AcNoCode",' ') != ' ' -- 2021-07-15 新增判斷 有串到最新的11碼會科才寫入 
         AND S1."JLNCRC" = '0' 
-        AND S1."TRXDAT" >= 20190101 
+        AND S1."TRXDAT" >= "DateStart"
+        AND S1."TRXDAT" <= "DateEnd"
 --        AND S1."TRXDAT" <= "TbsDyF" 
         AND CASE 
               WHEN NVL(S5."AcctCode",' ') IN ('310','320','330','340','990' 
@@ -664,6 +683,8 @@ BEGIN
                        AND BOKOTHERS."TRXDAT" = JORP."TRXDAT" 
                        AND BOKOTHERS."TRXATP" = JORP."TRXATP" 
     WHERE NVL(S5."AcNoCode",' ') != ' ' -- 2021-07-15 新增判斷 有串到最新的11碼會科才寫入 
+      AND JORP."TRXDAT" >= "DateStart"
+      AND JORP."TRXDAT" <= "DateEnd"
     ; 
  
     MERGE INTO "AcDetail" T 

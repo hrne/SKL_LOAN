@@ -44,6 +44,7 @@ import com.st1.itx.util.common.data.BankRemitFileVo;
 import com.st1.itx.util.common.data.L4101OldVo;
 import com.st1.itx.util.common.data.L4101Vo;
 import com.st1.itx.util.common.data.RemitFormVo;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
@@ -121,6 +122,8 @@ public class L4101Batch extends TradeBuffer {
 	@Autowired
 	L4101ReportE l4101ReportE;
 	@Autowired
+	L4101ReportG l4101ReportG;
+	@Autowired
 	L4101Vo l4101Vo;
 	@Autowired
 	L4101OldVo l4101OldVo;
@@ -137,7 +140,7 @@ public class L4101Batch extends TradeBuffer {
 		this.info("active L4101Batch ");
 
 		iAcDate = parse.stringToInteger(titaVo.getParam("AcDate"));
-		int iItemCode = parse.stringToInteger(titaVo.getParam("ItemCode")); // 1.撥款 2.退款
+		int iItemCode = parse.stringToInteger(titaVo.getParam("ItemCode")); // 1.撥款核心匯款 2.撥款整批匯款 3.退款
 		batchNo = this.getBatchNo(iItemCode, titaVo);
 
 		String wkbatchNo = titaVo.getBacthNo();
@@ -154,18 +157,23 @@ public class L4101Batch extends TradeBuffer {
 		for (BankRemit t : slBankRemit.getContent()) {
 			// 作業項目為1.撥款時把退款篩選掉
 			if (iItemCode == 1) {
-				if (t.getDrawdownCode() == 4 || t.getDrawdownCode() == 5 || t.getDrawdownCode() == 11) {
+				if (t.getDrawdownCode() == 2 || t.getDrawdownCode() == 3 || t.getDrawdownCode() == 4
+						|| t.getDrawdownCode() == 5 || t.getDrawdownCode() == 11) {
 					continue;
 				}
 			}
-
-			// 作業項目為2.退款時把撥款篩選掉
 			if (iItemCode == 2) {
-				if (t.getDrawdownCode() == 1 || t.getDrawdownCode() == 2) {
+				if (t.getDrawdownCode() == 1 || t.getDrawdownCode() == 3 || t.getDrawdownCode() == 4
+						|| t.getDrawdownCode() == 5 || t.getDrawdownCode() == 11) {
 					continue;
 				}
 			}
-
+			// 作業項目為3.退款時把撥款篩選掉
+			if (iItemCode == 3) {
+				if (t.getDrawdownCode() == 1 || t.getDrawdownCode() == 2 || t.getDrawdownCode() == 3) {
+					continue;
+				}
+			}
 			if (t.getActFg() != 1) {
 				lBankRemit.add(t);
 			}
@@ -229,20 +237,26 @@ public class L4101Batch extends TradeBuffer {
 		for (BankRemit t : lBankRemit) {
 			// 作業項目為1.撥款時把退款篩選掉
 			if (iItemCode == 1) {
-				if (t.getDrawdownCode() == 4 || t.getDrawdownCode() == 5 || t.getDrawdownCode() == 11) {
+				if (t.getDrawdownCode() == 2 || t.getDrawdownCode() == 4 || t.getDrawdownCode() == 5
+						|| t.getDrawdownCode() == 11) {
 					continue;
 				}
-				if (t.getRemitAmt().compareTo(new BigDecimal(15000000)) > 0) {
-					lBankRemit3.add(t);
-				} else {
-					lBankRemit4.add(t);
+				// 核心匯款
+				lBankRemit4.add(t);
+			}
+			if (iItemCode == 2) {
+				if (t.getDrawdownCode() == 1 || t.getDrawdownCode() == 4 || t.getDrawdownCode() == 5
+						|| t.getDrawdownCode() == 11) {
+					continue;
 				}
+				// 整批匯款
+				lBankRemit3.add(t);
 
 			}
 
 			// 作業項目為2.退款時把撥款篩選掉
-			if (iItemCode == 2) {
-				if (t.getDrawdownCode() == 1 || t.getDrawdownCode() == 2) {
+			if (iItemCode == 3) {
+				if (t.getDrawdownCode() == 1 || t.getDrawdownCode() == 2 || t.getDrawdownCode() == 3) {
 					continue;
 				}
 			}
@@ -252,25 +266,20 @@ public class L4101Batch extends TradeBuffer {
 		totaVo.put("PdfSnoM", "");
 		totaVo.put("PdfSnoF", "");
 
+//		step1.產出媒體檔
 		if (iItemCode == 1) {
-//			step1.產出媒體檔
 			procBankRemitMedia(lBankRemit4, titaVo);
-//		1500萬以上需產舊格式
-			if (lBankRemit3.size() != 0) {
-				String reportItem = "-撥款匯款媒體檔(舊格式1500萬)";
-				procBankRemitMediaOld(lBankRemit3, reportItem, titaVo);
-			}
-		} else {
-//			step1.產出媒體檔
-			procBankRemitMedia(lBankRemit2, titaVo);
+		} else if (iItemCode == 2) {
+			String reportItem = "-撥款匯款媒體檔(整批匯款)";
+			procBankRemitMediaOld(lBankRemit3, reportItem, titaVo);
 		}
 
-		if (batchNo.length() > 2) {
-			String reportItem = "-撥款匯款媒體檔(舊格式)";
-			if ("LN".equals(batchNo.substring(0, 2))) {
-				procBankRemitMediaOld(lBankRemit2, reportItem, titaVo);
-			}
-		}
+//		if (batchNo.length() > 2) {
+//			String reportItem = "-撥款匯款媒體檔(整批匯款)";
+//			if ("LN".equals(batchNo.substring(0, 2))) {
+//				procBankRemitMediaOld(lBankRemit2, reportItem, titaVo);
+//			}
+//		}
 //			step2產出撥款傳票
 //		totaA.init(titaVo);
 		doRptA(titaVo);
@@ -289,7 +298,7 @@ public class L4101Batch extends TradeBuffer {
 //			5.傳票明細表
 		doRptC(titaVo);
 
-		if (iItemCode == 1) {
+		if (iItemCode == 1 || iItemCode == 2) {
 //			6.撥款未齊件表
 			doRptD(titaVo);
 //			7.貸款自動轉帳申請書明細表
@@ -298,8 +307,8 @@ public class L4101Batch extends TradeBuffer {
 
 		String checkMsg = "撥款匯款產檔已完成。   批號 = " + batchNo;
 
-		webClient.sendPost("" + iAcDate, "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L4101", checkMsg,
-				titaVo);
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+				titaVo.getTlrNo() + "L4101", checkMsg, titaVo);
 
 		return this.sendList();
 	}
@@ -307,20 +316,23 @@ public class L4101Batch extends TradeBuffer {
 	private void procBankRemitMedia(List<BankRemit> lBankRemit, TitaVo titaVo) throws LogicException {
 		this.info("procBankRemitMedia ...");
 //		String path = outFolder + "LNM24p.txt";
-
+		doRptG(lBankRemit, titaVo);
 		l4101Vo.setOccursList(lBankRemit, titaVo);
 
 		// 轉換資料格式
 		ArrayList<String> file = l4101Vo.toFile();
 // 檔案產生者員編_disb_送匯日期_3碼檔案序號_secret.csv
 
-		String reportItem = "-撥款匯款媒體檔";
+		String reportItem = "-撥款匯款媒體檔(核心匯款)";
 		if (batchNo.length() > 2)
 			if ("RT".equals(batchNo.substring(0, 2))) {
 				reportItem = "-退款匯款媒體檔";
 			}
-		makeFile.open(titaVo, iAcDate + 19110000, titaVo.getKinbr(), titaVo.getTxCode(),
-				titaVo.getTxCode() + reportItem, titaVo.getTlrNo() + "_disb_"
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(iAcDate + 19110000).setBrno(titaVo.getKinbr())
+				.setRptCode(titaVo.getTxCode()).setRptItem(titaVo.getTxCode() + reportItem).build();
+		makeFile.open(
+				titaVo, reportVo, titaVo.getTlrNo() + "_disb_"
 						+ (this.getTxBuffer().getTxBizDate().getTbsDy() + 19110000) + "_" + nowBatchNo + "_secret.csv",
 				1);
 
@@ -349,8 +361,9 @@ public class L4101Batch extends TradeBuffer {
 		// 轉換資料格式
 		ArrayList<String> file = l4101OldVo.toFile();
 
-		makeFile.open(titaVo, iAcDate + 19110000, titaVo.getKinbr(), titaVo.getTxCode(),
-				titaVo.getTxCode() + reportItem, "LNM24p.txt", 2);
+		ReportVo reportVo = ReportVo.builder().setRptDate(iAcDate + 19110000).setBrno(titaVo.getKinbr())
+				.setRptCode(titaVo.getTxCode()).setRptItem(titaVo.getTxCode() + reportItem).build();
+		makeFile.open(titaVo, reportVo, "LNM24p.txt", 2);
 
 		for (String line : file) {
 			makeFile.put(line);
@@ -472,7 +485,7 @@ public class L4101Batch extends TradeBuffer {
 
 //				01:整批匯款 02:單筆匯款 04:退款台新(存款憑條) 05:退款他行(整批匯款) 11:退款新光(存款憑條)
 //				跳過單筆
-				if (tBankRemit.getDrawdownCode() == 2 || tBankRemit.getDrawdownCode() == 4
+				if (tBankRemit.getDrawdownCode() == 3 || tBankRemit.getDrawdownCode() == 4
 						|| tBankRemit.getDrawdownCode() == 11) {
 					this.info("Continue... DrawdownCode = " + tBankRemit.getDrawdownCode());
 					continue;
@@ -660,6 +673,27 @@ public class L4101Batch extends TradeBuffer {
 		l4101ReportE.toPdf(rptNod);
 
 		this.info("L4101E doRpt finished.");
+
+	}
+
+	public void doRptG(List<BankRemit> lBankRemit, TitaVo titaVo) throws LogicException {
+		this.info("L4101G doRpt started.");
+		l4101ReportG.setTxBuffer(txBuffer);
+		String parentTranCode = titaVo.getTxcd();
+//		acDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
+
+		l4101ReportG.setParentTranCode(parentTranCode);
+
+		// 撈資料組報表
+		l4101ReportG.exec(lBankRemit, titaVo);
+
+		// 寫產檔記錄到TxReport
+		long rptNod = l4101ReportG.close();
+
+		// 產生PDF檔案
+		l4101ReportG.toPdf(rptNod);
+
+		this.info("L4101G doRpt finished.");
 
 	}
 

@@ -17,14 +17,9 @@ import com.st1.itx.db.domain.AcClose;
 import com.st1.itx.db.domain.AcCloseId;
 import com.st1.itx.db.domain.BankRemit;
 import com.st1.itx.db.service.AcCloseService;
-import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.BankRemitService;
-import com.st1.itx.db.service.CdAcCodeService;
 import com.st1.itx.db.service.CdBankService;
-import com.st1.itx.db.service.CdBcmService;
 import com.st1.itx.db.service.CdEmpService;
-import com.st1.itx.db.service.CustMainService;
-import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.FileCom;
@@ -72,27 +67,11 @@ public class L4101 extends TradeBuffer {
 
 	@Autowired
 	public BankRemitService bankRemitService;
+	@Autowired
+	public AcCloseService acCloseService;
 
 	@Autowired
 	public BankRemitFileVo bankRemitFileVo;
-
-	@Autowired
-	public AcDetailService acDetailService;
-
-	@Autowired
-	public CdAcCodeService cdAcCodeService;
-
-	@Autowired
-	public CustMainService custMainService;
-
-	@Autowired
-	public FacMainService facMainService;
-
-	@Autowired
-	public CdBcmService cdBcmService;
-
-	@Autowired
-	public AcCloseService acCloseService;
 
 	@Autowired
 	public MakeFile makeFile;
@@ -121,63 +100,84 @@ public class L4101 extends TradeBuffer {
 		this.info("active L4101 ");
 		this.totaVo.init(titaVo);
 
-		totaWarnMsg.putParam("MSGID", "L410W");
-		totaB.putParam("MSGID", "L410B");
+		// 登錄
+		if (titaVo.isHcodeNormal()) {
 
-		iAcDate = parse.stringToInteger(titaVo.getParam("AcDate")) ;
-		int iItemCode = parse.stringToInteger(titaVo.getParam("ItemCode")); // 1.撥款 2.退款
-		batchNo = FormatUtil.padX(this.getBatchNo(iItemCode, titaVo), 6);
+			totaWarnMsg.putParam("MSGID", "L410W");
+			totaB.putParam("MSGID", "L410B");
 
-		List<BankRemit> lBankRemit = new ArrayList<BankRemit>();
-		List<BankRemit> unReleaselBankRemit = new ArrayList<BankRemit>();
-		Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(iAcDate+ 19110000, batchNo, 00, 99, 0, 0, 0, Integer.MAX_VALUE,
-				titaVo);
-		if (slBankRemit == null) {
-			throw new LogicException(titaVo, "E0001", "查無資料");
-		}
+			iAcDate = parse.stringToInteger(titaVo.getParam("AcDate"));
+			int iItemCode = parse.stringToInteger(titaVo.getParam("ItemCode")); // 1.撥款(核心匯款)，2.撥款(整批匯款)，3.退款(核心匯款)。
+			batchNo = FormatUtil.padX(this.getBatchNo(iItemCode, titaVo), 6);
 
-		int unReleaseCnt = 0;
-		for (BankRemit t : slBankRemit.getContent()) {
-			// 作業項目為1.撥款時把退款篩選掉
-			if (iItemCode == 1) {
-				if (t.getDrawdownCode() == 4 || t.getDrawdownCode() == 5 || t.getDrawdownCode() == 11) {
-					continue;
+			List<BankRemit> lBankRemit = new ArrayList<BankRemit>();
+			List<BankRemit> unReleaselBankRemit = new ArrayList<BankRemit>();
+			Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(iAcDate + 19110000, batchNo, 00, 99, 0, 0, 0,
+					Integer.MAX_VALUE, titaVo);
+			if (slBankRemit == null) {
+				throw new LogicException(titaVo, "E0001", "查無資料");
+			}
+
+			int unReleaseCnt = 0;
+			for (BankRemit t : slBankRemit.getContent()) {
+				// 1.撥款(核心匯款)，2.撥款(整批匯款)，3.退款(核心匯款)。
+				// 作業項目為1.2撥款時把退款篩選掉
+				if (iItemCode == 1) {
+					if (t.getDrawdownCode() == 2 || t.getDrawdownCode() == 3 || t.getDrawdownCode() == 4
+							|| t.getDrawdownCode() == 5 || t.getDrawdownCode() == 11) {
+						continue;
+					}
+				}
+				if (iItemCode == 2) {
+					if (t.getDrawdownCode() == 1 || t.getDrawdownCode() == 3 || t.getDrawdownCode() == 4
+							|| t.getDrawdownCode() == 5 || t.getDrawdownCode() == 11) {
+						continue;
+					}
+				}
+				// 作業項目為3.退款時把撥款篩選掉
+				if (iItemCode == 3) {
+					if (t.getDrawdownCode() == 1 || t.getDrawdownCode() == 2 || t.getDrawdownCode() == 3) {
+						continue;
+					}
+				}
+
+				if (t.getActFg() == 1) {
+					unReleaseCnt++;
+					unReleaselBankRemit.add(t);
+				} else {
+					lBankRemit.add(t);
 				}
 			}
-
-			// 作業項目為2.退款時把撥款篩選掉
-			if (iItemCode == 2) {
-				if (t.getDrawdownCode() == 1 || t.getDrawdownCode() == 2) {
-					continue;
-				}
+			if (lBankRemit.size() == 0) {
+				throw new LogicException(titaVo, "E0001", "查無資料");
 			}
 
-			if (t.getActFg() == 1) {
-				unReleaseCnt++;
-				unReleaselBankRemit.add(t);
-			} else {
-				lBankRemit.add(t);
-			}
-		}
-		if (lBankRemit.size() == 0) {
-			throw new LogicException(titaVo, "E0001", "查無資料");
-		}
-
-		if (unReleaseCnt > 0) {
-
-			// tota 未放行清單
-			for (BankRemit t : unReleaselBankRemit) {
-				setTota(t, titaVo);
-			}
-
-			this.addList(totaB);
-		}
-
-//		[是否檢核未放行]為Y時 , 若有未放行資料，則提示訊息 不出媒體檔 顯示未放行清單
-		if ("Y".equals(titaVo.get("ReleaseCheck"))) {
 			if (unReleaseCnt > 0) {
-				this.totaA.setWarnMsg("有未放行資料不產生媒體檔");
-				this.addList(totaA);
+
+				// tota 未放行清單
+				for (BankRemit t : unReleaselBankRemit) {
+					setTota(t, titaVo);
+				}
+
+				this.addList(totaB);
+			}
+
+//			[是否檢核未放行]為Y時 , 若有未放行資料，則提示訊息 不出媒體檔 顯示未放行清單
+			if ("Y".equals(titaVo.get("ReleaseCheck"))) {
+				if (unReleaseCnt > 0) {
+					this.totaA.setWarnMsg("有未放行資料不產生媒體檔");
+					this.addList(totaA);
+				} else {
+
+					// 執行交易
+					// 更新批號
+					newBatchNo = this.updBatchNo(batchNo, titaVo);
+					this.info("batchNo = " + batchNo);
+					this.info("titaVo = " + titaVo.toString());
+					MySpring.newTask("L4101Batch", this.txBuffer, titaVo);
+
+					this.totaWarnMsg.setWarnMsg("背景作業中,待處理完畢訊息通知");
+				}
 			} else {
 
 				// 執行交易
@@ -189,20 +189,17 @@ public class L4101 extends TradeBuffer {
 
 				this.totaWarnMsg.setWarnMsg("背景作業中,待處理完畢訊息通知");
 			}
-		} else {
+			this.addList(this.totaWarnMsg);
+			totaVo.put("OBatchNo", newBatchNo);
+			this.info("totaB = " + totaB.toString());
 
-			// 執行交易
-			// 更新批號
-			newBatchNo = this.updBatchNo(batchNo, titaVo);
-			this.info("batchNo = " + batchNo);
-			this.info("titaVo = " + titaVo.toString());
-			MySpring.newTask("L4101Batch", this.txBuffer, titaVo);
-
-			this.totaWarnMsg.setWarnMsg("背景作業中,待處理完畢訊息通知");
 		}
-		this.addList(this.totaWarnMsg);
-		totaVo.put("OBatchNo", newBatchNo);
-		this.info("totaB = " + totaB.toString());
+
+		// 訂正
+		if (titaVo.isHcodeErase()) {
+//			EntryEraseRoutine();
+		}
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
@@ -217,11 +214,9 @@ public class L4101 extends TradeBuffer {
 		if (tAcClose == null) {
 			throw new LogicException(titaVo, "E0001", "無帳務資料"); // 查詢資料不存在
 		}
-		if (iItemCode == 1) {
-
+		if (iItemCode == 1 || iItemCode == 2) {
 			batchNo = "LN" + parse.IntegerToString(tAcClose.getClsNo() + 1, 2) + "  ";
 		} else {
-
 			batchNo = "RT" + parse.IntegerToString(tAcClose.getClsNo() + 1, 2) + "  ";
 		}
 		return batchNo;
@@ -276,5 +271,4 @@ public class L4101 extends TradeBuffer {
 
 		return dbDate.substring(11, 19);
 	}
-
 }

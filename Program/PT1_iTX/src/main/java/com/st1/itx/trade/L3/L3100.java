@@ -889,6 +889,9 @@ public class L3100 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0015", "撥款修正金額"); // 檢查錯誤
 			}
 			moveLoanBorTx();
+			tLoanBorTx.setTitaKinBr(titaVo.getKinbr());
+			tLoanBorTx.setTitaTlrNo(titaVo.getTlrNo());
+			tLoanBorTx.setTitaTxtNo(titaVo.getTxtNo());			
 			try {
 				loanBorTxService.update(tLoanBorTx);
 			} catch (DBException e) {
