@@ -279,14 +279,14 @@ public class AcRepayCom extends TradeBuffer {
 			// 暫收款登錄溢收
 			if ("L3210".equals(titaVo.getTxcd())) {
 				updBorTxAcDetail(tx, this.lAcDetail, titaVo); // 更新放款明細檔及帳務明細檔關聯欄
-				tx.setTxAmt(this.wkTxAmtRemaind);
-				tx.setTempAmt(this.wkTempAmtRemaind);
-				// 貸方：溢收款
 				int iTempReasonCode = this.parse.stringToInteger(titaVo.getParam("TempReasonCode"));
 				// 0: 債協暫收款 10: AML凍結／未確定
 				if (iTempReasonCode == 0 || iTempReasonCode == 10) {
 					tx.setOverflow(tx.getTxAmt());
 				} else {
+					tx.setTxAmt(this.wkTxAmtRemaind);
+					tx.setTempAmt(this.wkTempAmtRemaind);
+					// 貸方：溢收款
 					overflow = settleOverflow(tx, this.lAcDetail, titaVo);
 					tx.setOverflow(overflow);
 					this.wkTxAmtRemaind = BigDecimal.ZERO;

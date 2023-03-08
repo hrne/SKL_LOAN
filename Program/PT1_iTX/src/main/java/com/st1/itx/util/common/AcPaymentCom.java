@@ -214,7 +214,7 @@ public class AcPaymentCom extends TradeBuffer {
 			acDetail.setAcctCode("P02");
 			break;
 		case "205":
-			acDetail.setAcctCode("P02");
+			acDetail.setAcctCode("OPR");
 			break;
 		case "211":
 			acDetail.setAcctCode("P03");

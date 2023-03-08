@@ -400,8 +400,6 @@ IF(#CollectWayCode==21||#CollectWayCode==26||#CollectWayCode==27,$,S)
 C(3,#FunCode,4,s,$)
 C(3,#FunCode,5,s,$)
 
-
-
 ! ["備註欄"],
 #Rmk=x,100,I
 C(3,#FunCode,4,s,$)

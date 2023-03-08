@@ -26,7 +26,6 @@ public class L9725ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 		this.info("l9725.findAll ");
 
@@ -51,9 +50,9 @@ public class L9725ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		query = em.createNativeQuery(sql);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
-	@SuppressWarnings("unchecked")
+	
 	public List<Map<String, String>> findAll2(TitaVo titaVo) throws Exception {
 		this.info("l9725.findAll2 ");
 		int dateInputEnd = (Integer.valueOf(titaVo.getParam("DateInputEnd"))+19110000)/100;
@@ -76,8 +75,8 @@ public class L9725ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      LEFT JOIN \"FacMain\" fm ON fm.\"CustNo\" = ml.\"CustNo\"  ";
 		sql += "                                  AND fm.\"FacmNo\" = ml.\"FacmNo\"  ";
 		sql += "      LEFT JOIN \"CustMain\" cm ON cm.\"CustNo\" = ml.\"CustNo\"  ";
-		sql += "      WHERE ml.\"YearMonth\"=:DateInputEnd";
-		sql += "        AND ml.\"LoanBalance\">0";
+		sql += "      WHERE ml.\"YearMonth\" = :DateInputEnd ";
+		sql += "        AND ml.\"LoanBalance\" > 0 ";
 		sql += "      ORDER BY \"CustNo\",\"FacmNo\",\"BormNo\"";
 
 		this.info("sql=" + sql);
@@ -88,7 +87,7 @@ public class L9725ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setParameter("DateInputEnd", dateInputEnd);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 }

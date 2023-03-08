@@ -2,9 +2,6 @@ package com.st1.itx.trade.LY;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.domain.CdVarValue;
 import com.st1.itx.db.service.CdVarValueService;
 
 import com.st1.itx.db.service.springjpa.cm.LY006ServiceImpl;
@@ -104,7 +100,7 @@ public class LY006Report extends MakeReport {
 			makeExcel.setValue(row, 8,r.get("F7"));//親屬稱謂
 			makeExcel.setValue(row, 9,r.get("F8"));//所屬事業代號
 			makeExcel.setValue(row, 10,r.get("F9"));//所屬事業名稱
-			makeExcel.setValue(row, 11,(Integer.valueOf(r.get("F10"))/100),"#0.0000");//所屬事業持股比率%
+			makeExcel.setValue(row, 11,(Integer.valueOf(r.get("F10"))/100.0),"#0.0000");//所屬事業持股比率%
 			makeExcel.setValue(row, 12,r.get("F11"));//所屬事業待任要職
 			//makeExcel.setValue(row, 13,r.get("F12"));//備註
 			row++;

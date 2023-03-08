@@ -416,6 +416,7 @@ public class L4455Report extends MakeReport {
 							this.info("getNowPage  = " + this.getNowPage());
 							this.info("NowRow  = " + this.NowRow);
 							this.info("newPage  = " + tmpBank + "  " + tmpBankX);
+							pageCnt = 0;
 							this.newPage();
 
 //							this.print(-6, 35, "扣款銀行：" + bank + " " + repaybank);
@@ -425,6 +426,7 @@ public class L4455Report extends MakeReport {
 
 					this.info(tmpCount + " repaybank  = " + tmpBank);
 					this.info(tmpCount + " bank  = " + tmpBankX);
+
 				}
 
 //				this.info(tmpCount + " repaybank  = " + repaybank);
@@ -613,6 +615,38 @@ public class L4455Report extends MakeReport {
 							init(); // 業務科目金額歸0
 
 						}
+					}
+
+					// 給 998 ACH扣款 判斷加的
+					if ("998".equals(titaVo.get("RepayBank"))) {
+
+						if (!tmpBank.equals(L4455List.get(i).get("RepayBank"))) {
+							this.print(1, 1,
+									"----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+							this.print(1, 1,
+									"                                                                                                                                                                               ");
+							for (CdCode tCdCode : lCdCode2) {
+								if (L4455List.get(i).get("AcctCode").equals(tCdCode.getCode())) {
+									acctcodex = tCdCode.getItem();
+								}
+							}
+							if (funcd != 1) {
+								acctcodex = "暫收款";
+							}
+							this.print(0, 1, acctcodex);
+							this.print(0, 19, "小計");
+
+							amt();
+
+							this.print(2, 1,
+									"----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+							pageCnt = pageCnt + 4;
+
+							amttototal(); // 業務科目金額to總和
+							init(); // 業務科目金額歸0
+						}
+
+
 					}
 //					每頁第38筆 跳頁 
 					if (pageCnt >= 34) {

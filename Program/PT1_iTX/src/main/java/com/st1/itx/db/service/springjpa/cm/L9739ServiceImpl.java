@@ -133,7 +133,8 @@ public class L9739ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	  AND L.\"EffectDate\" <= :entdy ";
 		sql += "	  AND M.\"Status\" = 0 ";
 		sql += "	  AND LC.\"CustNo\" IS NOT NULL ";
-		sql += "	ORDER BY L.\"CustNo\" ASC";
+		sql += "	ORDER BY L.\"ProdNo\" ASC";
+		sql += "		    ,L.\"CustNo\" ASC";
 		sql += "			,L.\"FacmNo\" ASC";
 		sql += "			,L.\"BormNo\" ASC";
 		

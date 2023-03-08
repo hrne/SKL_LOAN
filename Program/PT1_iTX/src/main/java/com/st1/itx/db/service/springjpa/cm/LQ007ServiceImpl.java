@@ -41,7 +41,7 @@ public class LQ007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 副query: 所有需要輸出的工作月/月份 - 同年一月到當月
 		sql += " WITH \"OutputMonths\" AS ( ";
 		sql += " SELECT distinct \"YearMonth\" ";
-		sql += "               ,FLOOR(\"YearMonth\"/100)*100+CEIL(MOD(\"YearMonth\",100)/3)*3";
+		sql += "               ,FLOOR(\"YearMonth\"/100)*100+MOD(\"YearMonth\",100)";
 		sql += "               \"VisibleMonth\" ";
 		sql += " FROM \"MonthlyLoanBal\" ";
 		sql += " WHERE \"YearMonth\" BETWEEN trunc(:entYearMonth/100-3) * 100 + 1 AND :entYearMonth ";

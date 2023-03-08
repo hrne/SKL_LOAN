@@ -148,7 +148,7 @@ public class LM050Report extends MakeReport {
 			}
 
 		}
-		makeExcel.setShiftRow(rowCursor, size - 1);
+		makeExcel.setShiftRow(rowCursor, size - 2);
 
 		for (Map<String, String> tLM050 : listLM050) {
 

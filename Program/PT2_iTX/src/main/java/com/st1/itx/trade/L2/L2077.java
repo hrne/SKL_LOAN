@@ -215,7 +215,11 @@ public class L2077 extends TradeBuffer {
 				} else {
 					occursList.putParam("OOCreateDate", 0);
 				}
-				occursList.putParam("OORmk", result.get("Rmk"));
+				if ("20".equals(result.get("CollectWayCode"))) {
+					occursList.putParam("OORmk", result.get("Rmk"));
+				} else {
+					occursList.putParam("OORmk", "");
+				}
 				occursList.putParam("OOTelNo1", result.get("TelNo1"));
 				occursList.putParam("OODocNo", result.get("DocNo"));
 				occursList.putParam("OOAgreeNo", result.get("AgreeNo"));
