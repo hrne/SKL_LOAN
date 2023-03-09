@@ -15,6 +15,8 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.CustTelNo;
 import com.st1.itx.db.service.CustTelNoService;
+import com.st1.itx.db.domain.TxDataLog;
+import com.st1.itx.db.domain.TxDataLogId;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.TxDataLogService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -42,7 +44,7 @@ public class L1104 extends TradeBuffer {
 
 	@Autowired
 	public DataLog iDataLog;
-
+	
 	@Autowired
 	public SendRsp sendRsp;
 
@@ -58,21 +60,21 @@ public class L1104 extends TradeBuffer {
 		if (tCustMain == null) {
 			throw new LogicException("E1003", "客戶資料主檔");
 		}
-
+		
 		if (!titaVo.getHsupCode().equals("1")) {
 			sendRsp.addvReason(this.txBuffer, titaVo, "0101", "");
 		}
-
+		
 		// 鎖定這筆
 		iCustMainService.holdById(tCustMain);
 
-		mntCust(titaVo, tCustMain);
+		mntCust(titaVo,tCustMain);
 
 		this.addList(this.totaVo);
 		return this.sendList();
 
 	}
-
+	
 	private void mntCust(TitaVo titaVo, CustMain tCustMain) throws LogicException {
 		// 變更前
 		CustMain BefCustMain = (CustMain) iDataLog.clone(tCustMain);
@@ -268,12 +270,29 @@ public class L1104 extends TradeBuffer {
 			tCustMain.setIncomeOfYearly(iParse.stringToInteger(titaVo.getParam("IncomeofyearlyAft")));
 		}
 
+		// 介紹人
+		if (titaVo.getParam("IntroducerInd").equals("X")) {
+			tCustMain.setIntroducer(titaVo.getParam("IntroducerAft"));
+		}
+
+		// 房貸專員
+		if (titaVo.getParam("BusinessOfficerInd").equals("X")) {
+			tCustMain.setBusinessOfficer(titaVo.getParam("BusinessOfficerAft"));
+		}
+
+		// 站別
+		if (titaVo.getParam("StationInd").equals("X")) {
+			tCustMain.setStation(titaVo.getParam("StationAft"));
+		}
+		
+		
 		// 年收入資料年月
 		if (titaVo.getParam("IncomeDataDateInd").equals("X")) {
 			if (titaVo.getParam("IncomeDataDateAft").equals("")) {
 				tCustMain.setIncomeDataDate("");
 			} else {
-				tCustMain.setIncomeDataDate("" + (iParse.stringToInteger(titaVo.getParam("IncomeDataDateAft")) + 191100));
+				tCustMain.setIncomeDataDate(
+						"" + (iParse.stringToInteger(titaVo.getParam("IncomeDataDateAft")) + 191100));
 			}
 
 		}
@@ -316,10 +335,10 @@ public class L1104 extends TradeBuffer {
 				}
 			}
 		}
-
+		
 	}
-
-	// 原二段式交易
+	
+	//原二段式交易
 	public ArrayList<TotaVo> run2(TitaVo titaVo) throws LogicException {
 		this.info("active L1104 ");
 		this.totaVo.init(titaVo);
@@ -331,7 +350,7 @@ public class L1104 extends TradeBuffer {
 		if (tCustMain == null) {
 			throw new LogicException("E1003", "客戶資料主檔");
 		}
-
+		
 		if (!titaVo.getHsupCode().equals("1")) {
 			sendRsp.addvReason(this.txBuffer, titaVo, "0101", "身份證號／統一編號變更");
 		}
@@ -395,10 +414,10 @@ public class L1104 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0017", " "); // 該筆交易狀態非待放行，不可做交易放行
 			}
 
-			mntCust(titaVo, tCustMain);
+			mntCust(titaVo,tCustMain);
 
 		}
-
+		
 		// 放行訂正
 		if (titaVo.isActfgSuprele() && titaVo.isHcodeErase()) {
 			this.info("放行訂正");
@@ -591,7 +610,8 @@ public class L1104 extends TradeBuffer {
 				if (titaVo.getParam("IncomeDataDateBef").equals("")) {
 					tCustMain.setIncomeDataDate("");
 				} else {
-					tCustMain.setIncomeDataDate("" + (iParse.stringToInteger(titaVo.getParam("IncomeDataDateBef")) + 191100));
+					tCustMain.setIncomeDataDate(
+							"" + (iParse.stringToInteger(titaVo.getParam("IncomeDataDateBef")) + 191100));
 				}
 
 			}

@@ -71,7 +71,7 @@ public class LY007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          LEFT JOIN (";
 		sql += "              SELECT decode(\"BusId\",'-',decode(\"RelId\",'-',\"HeadName\",\"RelName\"),\"BusName\") AS \"CustName\" ";
 		sql += "                    ,to_char(decode(\"BusId\",'-',decode(\"RelId\",'-',\"HeadId\",\"RelId\"),\"BusId\")) AS \"RptId\" ";
-		sql += "                    ,decode(\"BusId\",'-',decode(\"RelId\",'-',decode(\"RelWithCompany\",'A','A;G'),\"RelWithCompany\",'Z'),'Z') AS \"Rel\" ";
+		sql += "                    ,decode(\"BusId\",'-',decode(\"RelId\",'-',decode(\"RelWithCompany\",'A','A;G',\"RelWithCompany\"),'Z'),'Z') AS \"Rel\" ";
 		sql += "                    ,\"HeadName\" ";
 		sql += "                    ,\"HeadTitle\" ";
 		sql += "                    ,\"RelName\" ";

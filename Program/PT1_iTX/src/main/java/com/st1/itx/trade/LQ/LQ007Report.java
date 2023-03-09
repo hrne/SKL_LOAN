@@ -80,8 +80,7 @@ public class LQ007Report extends MakeReport {
 		}
 
 		int YearMonth = reportDate / 10000;
-		int col = 2;
-		int row1 = 0;
+		
 		makeExcel.setSheet("YYYMM", String.valueOf(titaVo.getEntDyI() / 100));
 
 		if (LQ007List != null && !LQ007List.isEmpty()) {
@@ -102,70 +101,129 @@ public class LQ007Report extends MakeReport {
 					}
 
 					if (visibleMonth % 100 == 12) {
-						if ((visibleMonth - 191100) == YearMonth - 3) {
+						if ((visibleMonth /100) == YearMonth - 3) {
 							makeExcel.setValue(3, 2, (visibleMonth - 191100) / 100 + '年');
 							if (LQ007Vo.get("F0").equals("AA")) {
-								makeExcel.setValue(5, 2, LQ007Vo.get("F2"), "C");
-								BigDecimal intS = getBigDecimal(LQ007Vo.get("F3"));
-								intTotal = intTotal.add(intS);
-								makeExcel.setValue(5, 3, formatAmt(intTotal.add(intAATotal), 3, 8), "C");
-								intAATotal = BigDecimal.ZERO;
+								makeExcel.setValue(5, 2, formatAmt(LQ007Vo.get("F2"),3,8), "C");								
+								makeExcel.setValue(5, 3, formatAmt(intAATotal, 3, 8), "C");
+								
 							} else {
-								row1=6;
-								makeExcel.setValue(row1, 2, LQ007Vo.get("F2"), "C");
-								row1++;
-								for (int row = 6; row <= 12; row++) {
-									BigDecimal intSum = getBigDecimal(LQ007Vo.get("F3"));
-									totleIntSum = totleIntSum.add(intSum);
-									makeExcel.setValue(6, 3, formatAmt(totleIntSum.add(intIITotal), 3, 8), "C");
+								switch (LQ007Vo.get("F0")) {
+								case "IA":
+									makeExcel.setValue(6, 2, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+									break;
+								case "IB":
+									makeExcel.setValue(7, 2, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+									break;
+								case "IC":
+									makeExcel.setValue(8, 2, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+									break;
+								case "ID":
+									makeExcel.setValue(9, 2, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+									break;
+								case "IF":
+									makeExcel.setValue(10, 2, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+									break;
+								case "IH":
+									makeExcel.setValue(11, 2, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+									break;
+								case "ZZ":
+									makeExcel.setValue(12, 2, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+									makeExcel.setValue(6, 3, formatAmt(intIITotal, 3, 8), "C");
+									makeExcel.setValue(13, 3, formatAmt(intAATotal.add(intIITotal), 3, 8), "C");
+									intAATotal = BigDecimal.ZERO;
 									intIITotal = BigDecimal.ZERO;
-								}
+									break;
 
+								default:
+									break;
+								}					
 							}
-							totalAll(13, 2, LQ007Vo.get("F2"), LQ007Vo.get("F3"));
-						} else if ((visibleMonth - 191100) == YearMonth - 2) {
+							
+							totalAll(13, 2, formatAmt(LQ007Vo.get("F2"),3,8));
+						} else if ((visibleMonth/100) == YearMonth - 2) {
 							makeExcel.setValue(3, 4, (visibleMonth - 191100) / 100 + '年');
 							if (LQ007Vo.get("F0").equals("AA")) {
-								makeExcel.setValue(5, 4, LQ007Vo.get("F2"), "C");
+								makeExcel.setValue(5, 4, formatAmt(LQ007Vo.get("F2"),3,8), "C");
 								BigDecimal intS = getBigDecimal(LQ007Vo.get("F3"));
 								intTotal = intTotal.add(intS);
 								makeExcel.setValue(5, 5, formatAmt(intTotal.add(intAATotal), 3, 8), "C");
-								intAATotal = BigDecimal.ZERO;
+								
 							} else {
-								row1 = 6;
-								makeExcel.setValue(row1, 4, LQ007Vo.get("F2"), "C");
-								row1++;
-								for (int row = 6; row <= 12; row++) {
-									BigDecimal intSum = getBigDecimal(LQ007Vo.get("F3"));
-									totleIntSum = totleIntSum.add(intSum);
-									makeExcel.setValue(6, 5, formatAmt(totleIntSum.add(intIITotal), 3, 8), "C");
+								switch (LQ007Vo.get("F0")) {
+								case "IA":
+									makeExcel.setValue(6, 4, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+									break;
+								case "IB":
+									makeExcel.setValue(7, 4, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+									break;
+								case "IC":
+									makeExcel.setValue(8, 4, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+									break;
+								case "ID":
+									makeExcel.setValue(9, 4, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+									break;
+								case "IF":
+									makeExcel.setValue(10, 4, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+									break;
+								case "IH":
+									makeExcel.setValue(11, 4, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+									break;
+								case "ZZ":
+									makeExcel.setValue(12, 4, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+									makeExcel.setValue(6, 5, formatAmt(intIITotal, 3, 8), "C");
+									makeExcel.setValue(13, 5, formatAmt(intAATotal.add(intIITotal), 3, 8), "C");
+									intAATotal = BigDecimal.ZERO;
 									intIITotal = BigDecimal.ZERO;
+									break;
+
+								default:
+									break;
 								}
-
 							}
-							totalAll(13, 4, LQ007Vo.get("F2"), LQ007Vo.get("F3"));
+							totalAll(13, 4, formatAmt(LQ007Vo.get("F2"),3,8));
 
-						} else if ((visibleMonth - 191100) == YearMonth - 1) {
+						} else if ((visibleMonth/100) == YearMonth - 1) {
 							makeExcel.setValue(3, 6, (visibleMonth - 191100) / 100 + '年');
 							if (LQ007Vo.get("F0").equals("AA")) {
-								makeExcel.setValue(5, 6, LQ007Vo.get("F2"), "C");
+								makeExcel.setValue(5, 6, formatAmt(LQ007Vo.get("F2"),3,8), "C");
 								BigDecimal intS = getBigDecimal(LQ007Vo.get("F3"));
 								intTotal = intTotal.add(intS);
 								makeExcel.setValue(5, 7, formatAmt(intTotal.add(intAATotal), 3, 8), "C");
 								intAATotal = BigDecimal.ZERO;
 							} else {
-								row1 = 6;
-								makeExcel.setValue(row1, 6, LQ007Vo.get("F2"), "C");
-								row1++;
-								for (int row = 6; row <= 12; row++) {
-									BigDecimal intSum = getBigDecimal(LQ007Vo.get("F3"));
-									totleIntSum = totleIntSum.add(intSum);
-									makeExcel.setValue(6, 7, formatAmt(totleIntSum.add(intIITotal), 3, 8), "C");
+								switch (LQ007Vo.get("F0")) {
+								case "IA":
+									makeExcel.setValue(6, 6, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+									break;
+								case "IB":
+									makeExcel.setValue(7, 6, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+									break;
+								case "IC":
+									makeExcel.setValue(8, 6, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+									break;
+								case "ID":
+									makeExcel.setValue(9, 6, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+									break;
+								case "IF":
+									makeExcel.setValue(10, 6, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+									break;
+								case "IH":
+									makeExcel.setValue(11, 6, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+									break;
+								case "ZZ":
+									makeExcel.setValue(12, 6, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+									makeExcel.setValue(6,7, formatAmt(intIITotal, 3, 8), "C");
+									makeExcel.setValue(13, 7, formatAmt(intAATotal.add(intIITotal), 3, 8), "C");
+									intAATotal = BigDecimal.ZERO;
 									intIITotal = BigDecimal.ZERO;
-								}
+									break;
 
+								default:
+									break;
+								}
 							}
-							totalAll(13, 6, LQ007Vo.get("F2"), LQ007Vo.get("F3"));
+							totalAll(13, 6, formatAmt(LQ007Vo.get("F2"),3,8));
 						}
 
 					}
@@ -223,60 +281,162 @@ public class LQ007Report extends MakeReport {
 					case 3:						
 						makeExcel.setValue(3, 8,(visibleMonth - 191100) / 100 + "年3月");
 						if (LQ007Vo.get("F0").equals("AA")) {
-							makeExcel.setValue(5, 8, LQ007Vo.get("F2") , "C");
+							makeExcel.setValue(5, 8, formatAmt(LQ007Vo.get("F2"),3,8) , "C");
 							makeExcel.setValue(5, 9,  formatAmt(intAATotal3, 3,8), "C");
 							
 						} else {
-							row1 = 6;
-							makeExcel.setValue(row1, 8, LQ007Vo.get("F2") , "C");
-							row1++;
-							makeExcel.setValue(6, 9, formatAmt(intIITotal3, 3, 8) ,"C");
-							
+							switch (LQ007Vo.get("F0")) {
+							case "IA":
+								makeExcel.setValue(6, 8, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+								break;
+							case "IB":
+								makeExcel.setValue(7, 8, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+								break;
+							case "IC":
+								makeExcel.setValue(8, 8, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+								break;
+							case "ID":
+								makeExcel.setValue(9, 8, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+								break;
+							case "IF":
+								makeExcel.setValue(10, 8, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+								break;
+							case "IH":
+								makeExcel.setValue(11, 8, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+								break;
+							case "ZZ":
+								makeExcel.setValue(12, 8, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+								makeExcel.setValue(6, 9, formatAmt(intIITotal3, 3, 8), "C");
+								makeExcel.setValue(13, 9, formatAmt(intAATotal3.add(intIITotal3), 3, 8), "C");
+								
+								break;
 
+							default:
+								break;
+							}
 						}
-						totalAll(13, 8, LQ007Vo.get("F2"), LQ007Vo.get("F3"));
+						totalAll(13, 8, formatAmt(LQ007Vo.get("F2"),3,8));
 
 					case 6:
 						makeExcel.setValue(3, 10,(visibleMonth - 191100) / 100 + "年6月");
 						if (LQ007Vo.get("F0").equals("AA")) {
-							makeExcel.setValue(5, 10, LQ007Vo.get("F2") , "C");
+							makeExcel.setValue(5, 10, formatAmt(LQ007Vo.get("F2"),3,8) , "C");
 							makeExcel.setValue(5, 11,  formatAmt(intAATotal6, 3, 8), "C");
 							
 						} else {
-							row1 = 6;
-							makeExcel.setValue(row1, 10, LQ007Vo.get("F2") , "C");
-							row1++;
-							makeExcel.setValue(6, 11, formatAmt(intIITotal6, 3, 8) ,"C");
+							switch (LQ007Vo.get("F0")) {
+							case "IA":
+								makeExcel.setValue(6, 10, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+								break;
+							case "IB":
+								makeExcel.setValue(7, 10, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+								break;
+							case "IC":
+								makeExcel.setValue(8, 10, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+								break;
+							case "ID":
+								makeExcel.setValue(9, 10, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+								break;
+							case "IF":
+								makeExcel.setValue(10, 10, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+								break;
+							case "IH":
+								makeExcel.setValue(11, 10, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+								break;
+							case "ZZ":
+								makeExcel.setValue(12, 10, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+								makeExcel.setValue(6, 11, formatAmt(intIITotal6, 3, 8), "C");
+								makeExcel.setValue(13, 11, formatAmt(intAATotal6.add(intIITotal6), 3, 8), "C");
+								
+								break;
+
+							default:
+								break;
+							}
+						
 						}
-						totalAll(13, 10, LQ007Vo.get("F2"), LQ007Vo.get("F3"));
+						totalAll(13, 10, formatAmt(LQ007Vo.get("F2"),3,8));
 				
 					case 9:
 						makeExcel.setValue(3, 12,(visibleMonth - 191100) / 100 + "年9月");
 						if (LQ007Vo.get("F0").equals("AA")) {
-							makeExcel.setValue(5, 12, LQ007Vo.get("F2") , "C");
+							makeExcel.setValue(5, 12, formatAmt(LQ007Vo.get("F2"),3,8) , "C");
 							makeExcel.setValue(5, 13,  formatAmt(intAATotal9, 3,8), "C");
 							
 						} else {
-							row1 = 6;
-							makeExcel.setValue(row1, 12, LQ007Vo.get("F2") , "C");
-							row1++;
-							makeExcel.setValue(6, 13, formatAmt(intIITotal9, 3, 8) ,"C");
+							switch (LQ007Vo.get("F0")) {
+							case "IA":
+								makeExcel.setValue(6, 12, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+								break;
+							case "IB":
+								makeExcel.setValue(7, 12, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+								break;
+							case "IC":
+								makeExcel.setValue(8, 12, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+								break;
+							case "ID":
+								makeExcel.setValue(9, 12, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+								break;
+							case "IF":
+								makeExcel.setValue(10, 12, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+								break;
+							case "IH":
+								makeExcel.setValue(11, 12, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+								break;
+							case "ZZ":
+								makeExcel.setValue(12, 12, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+								makeExcel.setValue(6, 13, formatAmt(intIITotal9, 3, 8), "C");
+								makeExcel.setValue(13, 13, formatAmt(intAATotal9.add(intIITotal9), 3, 8), "C");
+								intAATotal = BigDecimal.ZERO;
+								intIITotal = BigDecimal.ZERO;
+								break;
+
+							default:
+								break;
+							}
+							
 						}
-						totalAll(13, 12, LQ007Vo.get("F2"), LQ007Vo.get("F3"));
+						totalAll(13, 12, formatAmt(LQ007Vo.get("F2"),3,8));
 
 					case 12:
 						makeExcel.setValue(3, 14,(visibleMonth - 191100) / 100 + "年12月");
 						if (LQ007Vo.get("F0").equals("AA")) {
-							makeExcel.setValue(5, 14, LQ007Vo.get("F2") , "C");
+							makeExcel.setValue(5, 14, formatAmt(LQ007Vo.get("F2"),3,8) , "C");
 							makeExcel.setValue(5, 15,  formatAmt(intAATotal12, 3,8), "C");
 							
 						} else {
-							row1 = 6;
-							makeExcel.setValue(row1, 14, LQ007Vo.get("F2") , "C");
-							row1++;
-							makeExcel.setValue(6, 15, formatAmt(intIITotal12, 3, 8) ,"C");
+							switch (LQ007Vo.get("F0")) {
+							case "IA":
+								makeExcel.setValue(6, 14, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+								break;
+							case "IB":
+								makeExcel.setValue(7, 14, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+								break;
+							case "IC":
+								makeExcel.setValue(8, 14, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+								break;
+							case "ID":
+								makeExcel.setValue(9, 14, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+								break;
+							case "IF":
+								makeExcel.setValue(10, 14, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+								break;
+							case "IH":
+								makeExcel.setValue(11, 14, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+								break;
+							case "ZZ":
+								makeExcel.setValue(12, 14, formatAmt(LQ007Vo.get("F2"),3,8), "C");
+								makeExcel.setValue(6, 15, formatAmt(intIITotal12, 3, 8), "C");
+								makeExcel.setValue(13, 15, formatAmt(intAATotal12.add(intIITotal12), 3, 8), "C");
+								intAATotal = BigDecimal.ZERO;
+								intIITotal = BigDecimal.ZERO;
+								break;
+
+							default:
+								break;
+							}
 						}
-						totalAll(13, 14, LQ007Vo.get("F2"), LQ007Vo.get("F3"));
+						totalAll(13, 14, formatAmt(LQ007Vo.get("F2"),3,8));
 
 					}
 				}
@@ -285,18 +445,40 @@ public class LQ007Report extends MakeReport {
 
 					if (LQ007Vo.get("F0").equals("AA")) {
 						makeExcel.setValue(5, 17, LQ007Vo.get("F2"), "C");
-						makeExcel.setValue(5, 18,formatAmt(intAATotal12, 3, 8) , "C");
+						makeExcel.setValue(5, 18,intAATotal12 , "C");
 					} else {
-						row1 = 6;
-						makeExcel.setValue(row1, 17, LQ007Vo.get("F2"), "C");
-						row1++;
-						makeExcel.setValue(6, 18, formatAmt(intIITotal12, 3, 8), "C");
-						
+						switch (LQ007Vo.get("F0")) {
+						case "IA":
+							makeExcel.setValue(6, 17, LQ007Vo.get("F2"), "C");
+							break;
+						case "IB":
+							makeExcel.setValue(7, 17, LQ007Vo.get("F2"), "C");
+							break;
+						case "IC":
+							makeExcel.setValue(8, 17, LQ007Vo.get("F2"), "C");
+							break;
+						case "ID":
+							makeExcel.setValue(9, 17, LQ007Vo.get("F2"), "C");
+							break;
+						case "IF":
+							makeExcel.setValue(10, 17, LQ007Vo.get("F2"), "C");
+							break;
+						case "IH":
+							makeExcel.setValue(11, 17, LQ007Vo.get("F2"), "C");
+							break;
+						case "ZZ":
+							makeExcel.setValue(12, 17, LQ007Vo.get("F2"), "C");
+							makeExcel.setValue(6, 18, intIITotal12, "C");
+							makeExcel.setValue(13, 18, intAATotal12.add(intIITotal12), "C");
+							
+							break;
+
+						default:
+							break;
+						}	
 					}
-					totalAll(13, 17, LQ007Vo.get("F2"), LQ007Vo.get("F3"));
-
+					totalAll(13, 17, LQ007Vo.get("F2"));
 				}
-
 			}
 
 		} else {
@@ -327,14 +509,14 @@ public class LQ007Report extends MakeReport {
 //
 //						makeExcel.setValue(3, col, (visibleMonth - 191100) / 100 + '年');
 //						if (LQ007Vo.get("F0").equals("AA")) {
-//							makeExcel.setValue(5, col, LQ007Vo.get("F2"), "C");
+//							makeExcel.setValue(5, col, ma, "C");
 //							BigDecimal intS = getBigDecimal(LQ007Vo.get("F3"));
 //							intTotal = intTotal.add(intS);
 //							makeExcel.setValue(5, col + 1, formatAmt(intTotal.add(intAATotal), 3, 8), "C");
 //							intAATotal = BigDecimal.ZERO;
 //						} else {
 //							int row1 = 6;
-//							makeExcel.setValue(row1, col, LQ007Vo.get("F2"), "C");
+//							makeExcel.setValue(row1, col, formatAmt(LQ007Vo.get("F2"),3,8), "C");
 //							for (int row = 6; row <= 12; row++) {
 //								BigDecimal intSum = getBigDecimal(LQ007Vo.get("F3"));
 //								totleIntSum = totleIntSum.add(intSum);
@@ -345,8 +527,8 @@ public class LQ007Report extends MakeReport {
 //							row1++;
 //
 //						}
-//						totalAll(13, col, LQ007Vo.get("F2"), LQ007Vo.get("F3"));
-////						BigDecimal bal = getBigDecimal(LQ007Vo.get("F2"));
+//						totalAll(13, col, formatAmt(LQ007Vo.get("F2"),3,8), LQ007Vo.get("F3"));
+////						BigDecimal bal = getBigDecimal(formatAmt(LQ007Vo.get("F2"),3,8));
 ////						balTotal = balTotal.add(bal);
 ////						BigDecimal intS = getBigDecimal(LQ007Vo.get("F3"));
 ////						intTotal = intTotal.add(intS);
@@ -363,11 +545,11 @@ public class LQ007Report extends MakeReport {
 //					makeExcel.setValue(3, col + (2 * tmpCol),
 //							(visibleMonth - 191100) / 100 + "年" + (visibleMonth - 191100) % 100 + '月');
 //					if (LQ007Vo.get("F0").equals("AA")) {
-//						makeExcel.setValue(5, col + (2 * tmpCol), (mon == 0) ? LQ007Vo.get("F2") : 0, "C");
+//						makeExcel.setValue(5, col + (2 * tmpCol), (mon == 0) ? formatAmt(LQ007Vo.get("F2"),3,8) : 0, "C");
 //						makeExcel.setValue(5, col + (2 * tmpCol) + 1, (mon == 0) ? LQ007Vo.get("F3") : 0, "C");
 //					} else {
 //						int row1 = 6;
-//						makeExcel.setValue(row1, col + (2 * tmpCol), (mon == 0) ? LQ007Vo.get("F2") : 0, "C");
+//						makeExcel.setValue(row1, col + (2 * tmpCol), (mon == 0) ? formatAmt(LQ007Vo.get("F2"),3,8) : 0, "C");
 //						for (int row = 6; row <= 12; row++) {
 //							BigDecimal IntSum = getBigDecimal(LQ007Vo.get("F3"));
 //							totleIntSum = totleIntSum.add(IntSum);
@@ -377,10 +559,10 @@ public class LQ007Report extends MakeReport {
 //						row1++;
 //
 //					}
-//					totalAll(13, col + (2 * tmpCol), LQ007Vo.get("F2"), LQ007Vo.get("F3"));
-////					BigDecimal bal = getBigDecimal(LQ007Vo.get("F2"));
+//					totalAll(13, col + (2 * tmpCol), formatAmt(LQ007Vo.get("F2"),3,8), LQ007Vo.get("F3"));
+////					BigDecimal bal = getBigDecimal(formatAmt(LQ007Vo.get("F2"),3,8));
 ////					balTotal = balTotal.add(bal);
-////					BigDecimal intS = getBigDecimal(LQ007Vo.get("F2"));
+////					BigDecimal intS = getBigDecimal(formatAmt(LQ007Vo.get("F2"),3,8));
 ////					intTotal = intTotal.add(intS);
 ////					makeExcel.setValue(13, col + (2 * tmpCol), (mon==0)?formatAmt(balTotal, 3, 8):0, "C");
 ////
@@ -391,11 +573,11 @@ public class LQ007Report extends MakeReport {
 //				if (visibleMonth == reportDate / 100) {
 //
 //					if (LQ007Vo.get("F0").equals("AA")) {
-//						makeExcel.setValue(5, 17, LQ007Vo.get("F2"), "C");
+//						makeExcel.setValue(5, 17, formatAmt(LQ007Vo.get("F2"),3,8), "C");
 //						makeExcel.setValue(5, 18, LQ007Vo.get("F3"), "C");
 //					} else {
 //						int row1 = 6;
-//						makeExcel.setValue(row1, 17, LQ007Vo.get("F2"), "C");
+//						makeExcel.setValue(row1, 17, formatAmt(LQ007Vo.get("F2"),3,8), "C");
 //						for (int row = 6; row <= 12; row++) {
 //
 //							BigDecimal IntSum = getBigDecimal(LQ007Vo.get("F3"));
@@ -404,10 +586,10 @@ public class LQ007Report extends MakeReport {
 //						}
 //						row1++;
 //					}
-//					totalAll(13, 17, LQ007Vo.get("F2"), LQ007Vo.get("F3"));
-////					BigDecimal bal = getBigDecimal(LQ007Vo.get("F2"));
+//					totalAll(13, 17, formatAmt(LQ007Vo.get("F2"),3,8), LQ007Vo.get("F3"));
+////					BigDecimal bal = getBigDecimal(formatAmt(LQ007Vo.get("F2"),3,8));
 ////					balTotal = balTotal.add(bal);
-////					BigDecimal intS = getBigDecimal(LQ007Vo.get("F2"));
+////					BigDecimal intS = getBigDecimal(formatAmt(LQ007Vo.get("F2"),3,8));
 ////					intTotal = intTotal.add(intS);
 ////					makeExcel.setValue(13, col + 8, formatAmt(balTotal, 3, 8), "C");
 ////
@@ -428,14 +610,12 @@ public class LQ007Report extends MakeReport {
 	}
 
 	// 合計
-	public void totalAll(int row, int col, String balSum, String intSum) throws LogicException {
+	public void totalAll(int row, int col, String balSum) throws LogicException {
 		BigDecimal bal = getBigDecimal(balSum);
 		balTotal = balTotal.add(bal);
-		BigDecimal intS = getBigDecimal(intSum);
-		intTotal = intTotal.add(intS);
+		
 		makeExcel.setValue(row, col, formatAmt(balTotal, 3, 8), "C");
 
-		makeExcel.setValue(row, col + 1, formatAmt(intTotal, 3, 8), "C");
 	}
 
 }

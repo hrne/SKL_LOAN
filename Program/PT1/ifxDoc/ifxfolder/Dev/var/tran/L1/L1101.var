@@ -200,6 +200,9 @@ T(3, *    員工代號)
 #FdAMLGroup=X,2,L
 #FdIndigenousName=X,2,L
 #FdSubCompanyFg=X,2,L
+#FdIntroducer=X,2,L
+#FdBusinessOfficer=X,2,L
+#FdStation=X,2,L
 
 ! 永遠為必輸欄位
 #FdFunCd=X,2,L
@@ -437,6 +440,12 @@ S(L1R01,1,#RimCustId,#RimCustNo,#RimFunCd)
 R(1,L1R01)
 C(4,#L1r01CustName,$,T(2,@CustName,#L1r01CustName))
 C(4,#L1r01CustName,$,T(2,@TypeCode,#L1r01TypeCode))
+T(2,@Introducer,#L1r01Introducer)
+T(2,@IntroducerX,#L1r01IntroducerX)
+T(2,@BusinessOfficer,#L1r01BusinessOfficer)
+T(2,@BusinessOfficerX,#L1r01BusinessOfficerX)
+T(2,@Station,#L1r01Station)
+T(H,@StationX,#Station,#StationHelp)
 
 #TypeCode=A,1,I
 C(3,#FunCd,5,s,$)
@@ -1197,6 +1206,9 @@ T(H,#IsSuspectedCheckType,#IsSuspectedCheckTypeHelp)
 ["#FdAMLJobCode+AML職業別",#AMLJobCode,#AMLJobCodeX],
 ["#FdAMLGroup+AML組織",#AMLGroup,#AMLGroupX],
 [#<->#,"#FdIndigenousName+原住民姓名",#IndigenousName],
+["#FdIntroducer+介紹人",#Introducer,#IntroducerX],
+["#FdBusinessOfficer+房貸專員",#BusinessOfficer,#BusinessOfficerX],
+["#FdStation+站別",#Station,#StationX],
 [#<->#,"#FdSubCompanyFg+交互運用同意書",#SubCompanyFg,#SubCompanyFgX],
 ]
 
@@ -1306,6 +1318,43 @@ T(H,#AMLGroup,#AMLCodeHelp)
 #IndigenousName=x,100,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
+
+!2023/3/7新增
+!介紹人
+#Introducer=X,6,I
+#IntroducerX=X,20,L
+
+#RIM_L2R08b=X,1,S
+T(3,@IntroducerX,)
+C(4,#Introducer,S,$)
+RESET_RIM(#RIM_L2R08b,L2R08)
+T(2,@RimEmployeeNo,#Introducer)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+T(2,@IntroducerX,#L2r08FullName)
+
+!房貸專員
+#BusinessOfficer=X,6,I
+#BusinessOfficerX=X,20,L
+
+#RIM_L2R08c=X,1,S
+T(3,@BusinessOfficerX,)
+C(4,#BusinessOfficer,S,$)
+RESET_RIM(#RIM_L2R08c,L2R08)
+T(2,@RimEmployeeNo,#BusinessOfficer)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+T(2,@BusinessOfficerX,#L2r08FullName)
+
+!站別
+#Station=X,3,I
+HELP(#StationHelp)
+@
+C(4,#Station,S,$)
+V(H,#StationHelp)
+
+#StationX=X,20,L
+T(H,#Station,#StationHelp)
 
 #SubCompanyFgHelp=X,200,S
 T(3,Y:同意提供申請人之帳務、信用、投資及保險資料作為共同行銷之用;N:不同意)
@@ -1541,7 +1590,7 @@ T(H,#OAMLGroup,#AMLCodeHelp)
 #OIndigenousName=x,100,L
 !介紹人
 #OIntroducerX=X,50,L
-!房貸專員
+!房貸專員 目前只有L1103有
 #OBusinessOfficerX=X,50,L
 !站別
 #OStation=X,3,L
@@ -1679,6 +1728,9 @@ T(H,#OOEnable,#EnableHelp)
 #IsSuspected
 #IsSuspectedCheck
 #IsSuspectedCheckType
+#Introducer
+#BusinessOfficer
+#Station
 </sub>
 
 !------ 下行電文TOM ------
@@ -1742,6 +1794,9 @@ TXFORM=L1101
 #OIntroducerX
 #OBusinessOfficerX
 #OStation
+#Introducer
+#BusinessOfficer
+
 ^
 <include src="ROM.icf::L1R01.tom"/>
 <include src="ROM.icf::L1R05.tom"/>

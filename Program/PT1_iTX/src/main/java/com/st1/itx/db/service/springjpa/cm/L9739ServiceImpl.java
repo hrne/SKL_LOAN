@@ -37,8 +37,8 @@ public class L9739ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> findStandard(TitaVo titaVo, int reportDate) throws Exception {
 		this.info("l9739.findAll ");
 
-		this.info("getEntDyI ="+reportDate);
-		
+		this.info("getEntDyI =" + reportDate);
+
 		String sql = " ";
 		sql += "	SELECT P.\"ProdNo\"";
 		sql += "		  ,P.\"ProdName\"";
@@ -75,7 +75,7 @@ public class L9739ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "					FROM \"CdBaseRate\"";
 		sql += "					WHERE \"EffectDate\" <= :entdy ";
 		sql += "					  AND \"BaseRateCode\" = '02' )";
-		sql += "		  AND \"BaseRateCode\" = '02' " ; //--郵局儲蓄利率
+		sql += "		  AND \"BaseRateCode\" = '02' "; // --郵局儲蓄利率
 		sql += "	) B ON B.\"EffectDate\" > 0";
 		sql += "	WHERE REGEXP_LIKE(P.\"ProdNo\",'I[A-I]')";
 		sql += "	ORDER BY P.\"ProdNo\" ASC";
@@ -94,14 +94,14 @@ public class L9739ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 執行報表輸出(放款餘額明細表)
 	 * 
 	 * @param titaVo
-	 * @param yearMonth 西元年月
+	 * @param tmpEffectDate 西元年月日
 	 * @return
 	 * @throws Exception
 	 */
-	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, int tmpEffectDate) throws Exception {
 		this.info("l9739.findAll ");
 
-		int iEntDy = titaVo.getEntDyI() + 19110000;
+		this.info("tmpEffectDate = " + tmpEffectDate);
 
 		String sql = " ";
 		sql += "	SELECT L.\"CustNo\"";
@@ -137,15 +137,15 @@ public class L9739ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		    ,L.\"CustNo\" ASC";
 		sql += "			,L.\"FacmNo\" ASC";
 		sql += "			,L.\"BormNo\" ASC";
-		
-		//LoanBorMain Status= 0  join LoanRateChange  MAX(生效日期)<=今天(系統日)
+
+		// LoanBorMain Status= 0 join LoanRateChange MAX(生效日期)<=今天(系統日)
 		this.info("sql2=" + sql);
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 
 		Query query;
 		query = em.createNativeQuery(sql);
-		query.setParameter("entdy", iEntDy);
+		query.setParameter("entdy", tmpEffectDate);
 		return this.convertToMap(query);
 	}
 }

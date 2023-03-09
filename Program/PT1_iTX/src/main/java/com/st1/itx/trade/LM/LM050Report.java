@@ -148,7 +148,7 @@ public class LM050Report extends MakeReport {
 			}
 
 		}
-		makeExcel.setShiftRow(rowCursor, size - 2);
+		makeExcel.setShiftRow(rowCursor, size - 1);
 
 		for (Map<String, String> tLM050 : listLM050) {
 
@@ -191,7 +191,7 @@ public class LM050Report extends MakeReport {
 
 		total = relLoanBal.add(custLoanBal);
 
-		printTotal(rowCursor);
+		printTotal(rowCursor+1);
 	}
 
 	private void printTotal(int rowCursor) throws LogicException {

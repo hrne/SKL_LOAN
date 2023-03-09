@@ -86,6 +86,7 @@ public class L9739Report extends MakeReport {
 		List<Map<String, String>> listL9739Detail = new ArrayList<Map<String, String>>();
 
 		try {
+			int tmpEffectDate = 0;
 
 			// 商品利率比對用
 			this.tmpProdNoMap = new HashMap<String, String>();
@@ -94,6 +95,10 @@ public class L9739Report extends MakeReport {
 
 				this.tmpProdNoMap.put(titaVo.getParam("ProdNo" + i) + "Rate", titaVo.getParam("FitRate" + i));
 				this.tmpProdNoMap.put(titaVo.getParam("ProdNo" + i) + "EffectDate", titaVo.getParam("EffectDate" + i));
+
+				if (tmpEffectDate != Integer.valueOf(titaVo.getParam("EffectDate" + i))) {
+					tmpEffectDate = Integer.valueOf(titaVo.getParam("EffectDate" + i));
+				}
 
 				// 資料來源為畫面上顯示的資料
 				tmpAll = new HashMap<String, String>();
@@ -107,7 +112,7 @@ public class L9739Report extends MakeReport {
 
 			this.info("	this.tmpProdNoMap = " + this.tmpProdNoMap.toString());
 
-			listL9739Detail = l9739ServiceImpl.findAll(titaVo, iYearMonth);
+			listL9739Detail = l9739ServiceImpl.findAll(titaVo, tmpEffectDate);
 
 			exportData(listL9739Title, listL9739Detail);
 
@@ -175,7 +180,9 @@ public class L9739Report extends MakeReport {
 				this.info("nowEffectDate = " + r.get("EffectDate").toString());
 				this.info("nowRate = " + r.get("StoreRate").toString());
 
-				if (!this.tmpProdNoMap.get(r.get("ProdNo").toString() + "Rate").equals(r.get("StoreRate").toString())) {
+				if (!this.tmpProdNoMap.get(r.get("ProdNo").toString() + "Rate").equals(r.get("StoreRate").toString())
+						|| !this.tmpProdNoMap.get(r.get("ProdNo").toString() + "EffectDate")
+								.equals(r.get("EffectDate").toString())) {
 					tmpCount++;
 
 					this.print(1, 6, r.get("ProdNo"), "L");

@@ -16,13 +16,9 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdAcCode;
 import com.st1.itx.db.domain.LoanFacTmp;
-import com.st1.itx.db.service.AcReceivableService;
-import com.st1.itx.db.service.CdAcCodeService;
-import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.LoanFacTmpService;
 import com.st1.itx.db.service.springjpa.cm.L6907ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -37,21 +33,12 @@ import com.st1.itx.util.parse.Parse;
 public class L6907 extends TradeBuffer {
 
 	/* DB服務注入 */
-	@Autowired
-	public AcReceivableService sAcReceivableService;
 
-	@Autowired
-	public CdAcCodeService cdAcCodeService;
-
-	@Autowired
-	public CdEmpService cdEmpService;
 	@Autowired
 	public LoanFacTmpService loanFacTmpService;
 
 	@Autowired
 	public L6907ServiceImpl l6907ServiceImpl;
-	@Autowired
-	public LoanCom loanCom;
 
 	/* 日期工具 */
 	@Autowired
@@ -76,7 +63,7 @@ public class L6907 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = Integer.MAX_VALUE; // 45 * 200 = 9000
+		this.limit = 200; // 45 * 200 = 9000
 
 		List<Map<String, String>> L6907List = null;
 
@@ -116,7 +103,7 @@ public class L6907 extends TradeBuffer {
 				if (slLoanFacTmp == null) {
 					checkSkip = 1;
 				} else if (istmpfacmno) {
-					// 指定額度只有該額度為溢收款，其他皆顯示 ==> 20221215  指定額度可使用自已及非指定額度
+					// 指定額度只有該額度為溢收款，其他皆顯示 ==> 20221215 指定額度可使用自已及非指定額度
 					if (iTmpFacmNo == parse.stringToInteger(tAcReceivable.get("FacmNo"))) {
 						checkSkip = 1;
 					} else {
@@ -129,7 +116,7 @@ public class L6907 extends TradeBuffer {
 						}
 						if (!isDataFacmNoTmp) {
 							checkSkip = 1;
-						}						
+						}
 					}
 				} else {
 					// 非指定額度該全部非指定額度為溢收款，指定額度顯示 ==> 20221215 非指定額度可使用非指定額度
@@ -144,7 +131,7 @@ public class L6907 extends TradeBuffer {
 						checkSkip = 1;
 					}
 				}
-				if ( checkSkip ==0) {
+				if (checkSkip == 0) {
 					continue;
 				}
 
@@ -201,7 +188,7 @@ public class L6907 extends TradeBuffer {
 			occursList.putParam("OOLastUpdate", parse.stringToStringDateTime(tAcReceivable.get("LastUpdate")));
 			// 最後修改人員 OOLastEmp
 			occursList.putParam("OOLastEmp", tAcReceivable.get("LastUpdateEmpNo"));
-			
+
 			occursList.putParam("OOGetFeeTxt", "");
 			if (parse.stringToInteger(tAcReceivable.get("ReceivableFlag")) >= 3
 					&& parse.stringToBigDecimal(tAcReceivable.get("RvBal")).compareTo(BigDecimal.ZERO) > 0) {

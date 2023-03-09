@@ -8,6 +8,7 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.DBException;
@@ -141,7 +142,6 @@ public class L3210 extends TradeBuffer {
 		iTempReasonCode = this.parse.stringToInteger(titaVo.getParam("TempReasonCode"));
 		iTempSourceCode = this.parse.stringToInteger(titaVo.getParam("TempSourceCode"));
 		iTempAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimTempAmt"));
-		iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
 		if (titaVo.get("RpCode1") != null) {
 			iRpCode = this.parse.stringToInteger(titaVo.getParam("RpCode1"));
 		}
@@ -196,8 +196,17 @@ public class L3210 extends TradeBuffer {
 
 		// 訂正處理
 		if (titaVo.isHcodeErase()) {
-			loanCom.checkEraseCustNoTxSeqNo(iCustNo, titaVo);// 檢查到同戶帳務交易需由最近一筆交易開始訂正
-			loanCom.setFacmBorTxHcodeByTx(iCustNo, titaVo); // 訂正放款交易內容檔by交易
+			Slice<LoanBorTx> slLoanBortx = loanBorTxService.acDateTxtNoEq(titaVo.getOrgEntdyI() + 19110000,
+					titaVo.getOrgKin(), titaVo.getOrgTlr(), titaVo.getOrgTno(), 0, Integer.MAX_VALUE, titaVo);
+			this.lLoanBorTx = slLoanBortx == null ? null : slLoanBortx.getContent();
+			if (lLoanBorTx == null || lLoanBorTx.size() == 0) {
+				throw new LogicException(titaVo, "E0001", "交易明細暫存檔 分行別 = " + titaVo.getOrgKin() + " 經辦代號 = "
+						+ titaVo.getOrgTlr() + " 交易序號 = " + titaVo.getOrgTno()); // 查詢資料不存在
+			}
+			for (LoanBorTx tx : lLoanBorTx) {
+				loanCom.checkEraseCustNoTxSeqNo(tx.getCustNo(), titaVo);// 檢查到同戶帳務交易需由最近一筆交易開始訂正
+				loanCom.setFacmBorTxHcode(tx.getCustNo(), tx.getFacmNo(), tx.getBorxNo(), titaVo);
+			}
 		}
 
 		// 暫收款交易新增帳務及更新放款交易內容檔
@@ -288,38 +297,47 @@ public class L3210 extends TradeBuffer {
 		switch (iTempReasonCode) {
 		case 0: // 債協暫收款
 			// 貸方 :最大債權 => 債協暫收款、一般債權 => 暫收可抵繳
-			String acctCode = acNegCom.getAcctCode(iCustNo, titaVo);
-			acDetail = new AcDetail();
-			acDetail.setDbCr("C");
-			acDetail.setAcctCode(acctCode);
-			acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
-			acDetail.setTxAmt(iTempAmt);
-			acDetail.setCustNo(iCustNo);
-			if ("TAV".equals(acctCode)) {
-				TempVo tempVo = new TempVo();
-				tempVo = acNegCom.getReturnAcctCode(iCustNo, titaVo);
-				acDetail.setCustNo(parse.stringToInteger(tempVo.getParam("CustNo")));
-				acDetail.setFacmNo(parse.stringToInteger(tempVo.getParam("FacmNo")));
-				acDetail.setSumNo("092"); // 轉暫收款可抵繳
-				acDetail.setSlipNote("一般債權");
-				//acDetail.setJsonFields(tTempVo.getJsonString());
 
-			} else {
-				acDetail.setSumNo("094"); // 轉債協暫收款
-			}
-			lAcDetail.add(acDetail);
-			this.info("SlipNote = " + acDetail.getSlipNote());
-			addLoanBorTxRoutine(acDetail);
 			/* 5.找債協專戶的匯入款，為一般債權人撥付款 */
+			boolean havedata = false;
 			if (iCustNo == this.txBuffer.getSystemParas().getNegDeptCustNo()) {
 				List<AcDetail> lAcDetailApp02 = new ArrayList<AcDetail>();
 				lAcDetailApp02 = acNegCom.getNegAppr02CustNo(iEntryDate, iTempAmt, iCustNo, titaVo);
 				if (lAcDetailApp02.size() > 0) {
+					havedata = true;
 					lAcDetail.addAll(lAcDetailApp02);
-					this.info("SlipNote2 = " + acDetail.getSlipNote());
+					acDetail = new AcDetail();
+					for (int i = 0; i < lAcDetailApp02.size(); i++) {
+						acDetail = lAcDetailApp02.get(i);
+						addLoanBorTxRoutine(acDetail);
+						this.info("SlipNote2 = " + acDetail.getSlipNote());
+					}
 				}
 			}
+			if (!havedata) {// 專戶若找不到一般債權資料,則須出T10入暫收款
+				acDetail = new AcDetail();
+				String acctCode = acNegCom.getAcctCode(iCustNo, titaVo);
+				acDetail.setDbCr("C");
+				acDetail.setAcctCode(acctCode);
+				acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
+				acDetail.setTxAmt(iTempAmt);
+				acDetail.setCustNo(iCustNo);
+				if ("TAV".equals(acctCode)) {
+					TempVo tempVo = new TempVo();
+					tempVo = acNegCom.getReturnAcctCode(iCustNo, titaVo);
+					acDetail.setCustNo(parse.stringToInteger(tempVo.getParam("CustNo")));
+					acDetail.setFacmNo(parse.stringToInteger(tempVo.getParam("FacmNo")));
+					acDetail.setSumNo("092"); // 轉暫收款可抵繳
+					acDetail.setSlipNote("一般債權");
+					// acDetail.setJsonFields(tTempVo.getJsonString());
 
+				} else {
+					acDetail.setSumNo("094"); // 轉債協暫收款
+				}
+				lAcDetail.add(acDetail);
+				this.info("SlipNote = " + acDetail.getSlipNote());
+				addLoanBorTxRoutine(acDetail);
+			}
 			break;
 		case 3: // 期票
 		case 6: // 即期票
@@ -410,8 +428,9 @@ public class L3210 extends TradeBuffer {
 		tTempVo.clear();
 		tLoanBorTx = new LoanBorTx();
 		tLoanBorTxId = new LoanBorTxId();
-		loanCom.setFacmBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, titaVo);
-// TempReasonCode
+		loanCom.setFacmBorTx(tLoanBorTx, tLoanBorTxId, ac.getCustNo(), ac.getFacmNo(), titaVo);
+
+		// TempReasonCode
 //		00	債協暫收款
 //		01	溢繳
 //		02	不足利息
@@ -454,6 +473,11 @@ public class L3210 extends TradeBuffer {
 		//
 		tLoanBorTx.setDisplayflag("A"); // A:帳務
 		tLoanBorTx.setAcctCode(ac.getAcctCode()); // 業務科目
+
+		// 0: 債協暫收款 10: AML凍結／未確定
+		if (iTempReasonCode == 0 || iTempReasonCode == 10) {
+			tLoanBorTx.setTxAmt(ac.getTxAmt());
+		}
 
 		// 其他欄位
 		tTempVo.putParam("TempReasonCode", iTempReasonCode);

@@ -30,6 +30,7 @@ import com.st1.itx.db.service.CustTelNoService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BankRelationCom;
+import com.st1.itx.util.common.CustCom;
 import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.common.data.BankRelationVo;
@@ -62,6 +63,8 @@ public class L1102 extends TradeBuffer {
 	@Autowired
 	public CustNoticeCom custNoticeCom;
 	@Autowired
+	public CustCom custCom;
+	@Autowired
 	public BankRelationCom bankRelationCom;
 	@Autowired
 	public CustCrossService iCustCrossService;
@@ -87,7 +90,7 @@ public class L1102 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L1102 ");
 		this.totaVo.init(titaVo);
-
+		this.info("titaVo   = " +titaVo);
 		// isEloan
 		if (titaVo.isEloan() || "ELTEST".equals(titaVo.getTlrNo())) {
 			this.isEloan = true;
@@ -125,6 +128,12 @@ public class L1102 extends TradeBuffer {
 
 		}
 
+		
+		//2023/3/8 銘傑修改
+		String iIntroducer = titaVo.get("Introducer");
+		String iBusinessOfficer = titaVo.get("BusinessOfficer");
+		String iStation = titaVo.get("Station");
+		
 		// 新增
 		if (funcd.equals("1")) {
 
@@ -137,6 +146,9 @@ public class L1102 extends TradeBuffer {
 			// 產生一組新的識別碼
 			tCustMain.setCustUKey(UUID.randomUUID().toString().toUpperCase().replaceAll("-", ""));
 			tCustMain.setCustId(CustId);
+			tCustMain.setIntroducer(iIntroducer);
+			tCustMain.setBusinessOfficer(iBusinessOfficer);
+			tCustMain.setStation(iStation);
 			tCustMain.setCuscCd("2");
 
 			setCstMain(titaVo);
@@ -165,14 +177,15 @@ public class L1102 extends TradeBuffer {
 			}
 			// 紀錄變更前變更後
 			iDataLog.setEnv(titaVo, beforeCustMain, tCustMain);
-			iDataLog.exec();
+			iDataLog.exec("修改顧客資料", "CustUKey:" + tCustMain.getCustUKey());
 
 			// by eric 2021.7.31
 			setCustCross(titaVo, tCustMain);
 
 		} else if ("5".equals(funcd)) {
 
-			if (funcd.equals("5") && "1".equals(tCustMain.getAllowInquire()) && !titaVo.getKinbr().equals("0000") && !titaVo.getKinbr().equals(tCustMain.getBranchNo())) {
+			if (funcd.equals("5") && "1".equals(tCustMain.getAllowInquire()) && !titaVo.getKinbr().equals("0000")
+					&& !titaVo.getKinbr().equals(tCustMain.getBranchNo())) {
 				throw new LogicException("E0015", "已設定不開放查詢,限總公司及原建檔單位查詢");
 			}
 
@@ -185,7 +198,7 @@ public class L1102 extends TradeBuffer {
 //				if (iChkFg != 0)
 //					iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "已結清滿5年");
 //			}
-
+			
 		}
 
 //			刪除功能
@@ -201,7 +214,8 @@ public class L1102 extends TradeBuffer {
 
 		this.info("tCustMain = " + tCustMain);
 		// 用客戶識別碼取電話資料
-		Slice<CustTelNo> slCustTelNo = sCustTelNoService.findCustUKey(tCustMain.getCustUKey(), 0, Integer.MAX_VALUE, titaVo);
+		Slice<CustTelNo> slCustTelNo = sCustTelNoService.findCustUKey(tCustMain.getCustUKey(), 0, Integer.MAX_VALUE,
+				titaVo);
 		List<CustTelNo> lCustTelNo = slCustTelNo == null ? null : slCustTelNo.getContent();
 
 		// 查詢行業別代號資料檔
@@ -328,7 +342,11 @@ public class L1102 extends TradeBuffer {
 		tCustMain.setTypeCode(iParse.stringToInteger(titaVo.getParam("TypeCode")));
 		tCustMain.setCustName(titaVo.getParam("CustName"));
 		tCustMain.setBirthday(iParse.stringToInteger(titaVo.getParam("Birthday")));
-		tCustMain.setCustTypeCode(titaVo.getParam("CustTypeCode"));
+		String custTypeCode = titaVo.getParam("CustTypeCode");
+		if (isEloan) {
+			custTypeCode = custCom.eLoanCustTypeCode(titaVo, custTypeCode);
+		}
+		tCustMain.setCustTypeCode(custTypeCode);
 		tCustMain.setIndustryCode(titaVo.getParam("IndustryCode"));
 		tCustMain.setNationalityCode(titaVo.getParam("NationalityCode"));
 		tCustMain.setBussNationalityCode(titaVo.getParam("BussNationalityCode"));
@@ -378,6 +396,7 @@ public class L1102 extends TradeBuffer {
 		tCustMain.setDataStatus(0);
 		tCustMain.setAllowInquire("2");
 	}
+
 
 	// by eric 2021.7.31
 	private void setCustCross(TitaVo titaVo, CustMain custMain) throws LogicException {

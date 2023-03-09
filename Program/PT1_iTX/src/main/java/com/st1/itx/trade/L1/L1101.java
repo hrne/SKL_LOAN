@@ -150,6 +150,11 @@ public class L1101 extends TradeBuffer {
 		}
 
 		this.info("L1101 funcd = " + funcd);
+		
+		//2023/3/8 銘傑修改
+		String iIntroducer = titaVo.get("Introducer");
+		String iBusinessOfficer = titaVo.get("BusinessOfficer");
+		String iStation = titaVo.get("Station");
 
 		switch (funcd) {
 		case "1": // 新增
@@ -159,6 +164,9 @@ public class L1101 extends TradeBuffer {
 			// 產生一組新的識別碼
 			tCustMain.setCustUKey(UUID.randomUUID().toString().toUpperCase().replaceAll("-", ""));
 			tCustMain.setCustId(iCustId);
+			tCustMain.setIntroducer(iIntroducer);
+			tCustMain.setBusinessOfficer(iBusinessOfficer);
+			tCustMain.setStation(iStation);
 			tCustMain.setCuscCd("1");
 			/* 存入DB */
 			try {
@@ -231,7 +239,8 @@ public class L1101 extends TradeBuffer {
 			break;
 		case "5": // 查詢
 
-			if (funcd.equals("5") && "1".equals(tCustMain.getAllowInquire()) && !titaVo.getKinbr().equals("0000") && !titaVo.getKinbr().equals(tCustMain.getBranchNo())) {
+			if (funcd.equals("5") && "1".equals(tCustMain.getAllowInquire()) && !titaVo.getKinbr().equals("0000")
+					&& !titaVo.getKinbr().equals(tCustMain.getBranchNo())) {
 				throw new LogicException("E0015", "已設定不開放查詢,限總公司及原建檔單位查詢");
 			}
 
@@ -275,7 +284,8 @@ public class L1101 extends TradeBuffer {
 	private void setTota(TitaVo titaVo) throws LogicException {
 		this.info("tCustMain = " + tCustMain);
 		// 用客戶識別碼取電話資料
-		Slice<CustTelNo> slCustTelNo = sCustTelNoService.findCustUKey(tCustMain.getCustUKey(), this.index, this.limit, titaVo);
+		Slice<CustTelNo> slCustTelNo = sCustTelNoService.findCustUKey(tCustMain.getCustUKey(), this.index, this.limit,
+				titaVo);
 		List<CustTelNo> lCustTelNo = slCustTelNo == null ? null : slCustTelNo.getContent();
 
 		// 查詢行業別代號資料檔
@@ -339,6 +349,7 @@ public class L1101 extends TradeBuffer {
 		this.totaVo.putParam("OJobTitle", tCustMain.getJobTitle());
 		this.totaVo.putParam("OJobTenure", tCustMain.getJobTenure());
 		this.totaVo.putParam("OIncomeOfYearly", tCustMain.getIncomeOfYearly());
+		this.totaVo.putParam("OBranchNo", tCustMain.getBranchNo());
 		if (tCustMain.getIncomeDataDate().equals("") || tCustMain.getIncomeDataDate().equals("0")) {
 			this.totaVo.putParam("OIncomeDataDate", "");
 		} else {
@@ -438,7 +449,8 @@ public class L1101 extends TradeBuffer {
 	}
 
 	private void setCstMain(TitaVo titaVo) throws LogicException {
-
+		
+		tCustMain.setBranchNo(titaVo.getParam("KINBR"));
 		tCustMain.setTypeCode(iParse.stringToInteger(titaVo.getParam("TypeCode")));
 		tCustMain.setCustName(titaVo.getParam("CustName"));
 		tCustMain.setBirthday(iParse.stringToInteger(titaVo.getParam("Birthday")));
@@ -448,6 +460,7 @@ public class L1101 extends TradeBuffer {
 			if (!custTypeCode.isEmpty()) {
 				custTypeCode = custCom.eLoanCustTypeCode(titaVo, custTypeCode);
 			}
+			tCustMain.setBranchNo(titaVo.getParam("BranchNo"));
 		}
 		tCustMain.setCustTypeCode(custTypeCode);
 		tCustMain.setIndustryCode(titaVo.getParam("IndustryCode"));
@@ -503,14 +516,14 @@ public class L1101 extends TradeBuffer {
 		tCustMain.setAMLJobCode(titaVo.getParam("AMLJobCode"));
 		tCustMain.setAMLGroup(titaVo.getParam("AMLGroup"));
 		tCustMain.setIndigenousName(titaVo.getParam("IndigenousName"));
-		if (beforeCustMain == null & (beforeCustMain.getIntroducer() == null || "".equals(beforeCustMain.getIntroducer()))) {
+		if (beforeCustMain == null
+				& (beforeCustMain.getIntroducer() == null || "".equals(beforeCustMain.getIntroducer()))) {
 			tCustMain.setIntroducer("");
 		} else {
 			tCustMain.setIntroducer(beforeCustMain.getIntroducer());
 		}
 //		Introducer
 
-		tCustMain.setBranchNo(titaVo.getParam("KINBR"));
 
 		tCustMain.setIsSuspected(titaVo.getParam("IsSuspected"));
 		tCustMain.setIsSuspectedCheck(titaVo.getParam("IsSuspectedCheck"));

@@ -83,6 +83,9 @@ E(0,0)
 ["#FdCurrZipBef+通訊-郵遞區號",#CurrZip3Bef,#CurrZip2Bef],
 ["#CurrZip2Ind",#CurrZip3Aft,#CurrZip2Aft],
 ["#FdEmail+電子信箱",#EmailBef],[#EmailInd,#EmailAft],
+["#FdIntroducer+介紹人",#IntroducerBef,#IntroducerBefX],[#IntroducerInd,#IntroducerAft,#BtnCdEmp2,#IntroducerAftX],
+["#FdBusinessOfficer+房貸專員",#BusinessOfficerBef,#BusinessOfficerBefX],[#BusinessOfficerInd,#BusinessOfficerAft,#BtnCdEmp3,#BusinessOfficerAftX],
+["#FdStation+站別",#StationBef,#StationBefX],[#StationInd,#StationAft,#StationAftX],
 ["#FdIncomeOfYearly+年收入",#IncomeofyearlyBef,"仟元"],[#IncomeofyearlyInd,#IncomeofyearlyAft,"仟元"],
 ["#FdIncomeDataDate+年收入資料年月",#IncomeDataDateBef],[#IncomeDataDateInd,#IncomeDataDateAft],
 ]
@@ -96,6 +99,21 @@ E(0,0)
 !#BTN3=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
 #BUF1=X,42,S
 !ENABLE(#BTN1)ENABLE(#BTN2)ENABLE(#BTN3)
+
+![Buttom資料查詢]
+!#BtnCdEmp=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L6088 員工資料檔查詢;
+!#BindCdEmp=X,1,S
+!BIND(#BtnCdEmp,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=;ntxbuf5=type<-1:EmpnoAft<-OOEmployeeNo:EmpnameAft<-OOFullname})
+
+#BtnCdEmp2=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L6088 員工資料檔查詢;
+#BindCdEmp2=X,1,S
+BIND(#BtnCdEmp2,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=;ntxbuf5=type<-1:IntroducerAft<-OOEmployeeNo:IntroducerAftX<-OOFullname})
+
+#BtnCdEmp3=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L6088 員工資料檔查詢;
+#BindCdEmp3=X,1,S
+BIND(#BtnCdEmp3,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=;ntxbuf5=type<-1:BusinessOfficerAft<-OOEmployeeNo:BusinessOfficerAftX<-OOFullname})
+
+
 
 #Submit=A,1,S
 K(MODIFYBUTTON,修改)
@@ -155,6 +173,9 @@ T(3,CdCode.EntCode)
 
 #EntCodeHelp=x,1024,S
 
+#StationCode=x,14,S
+T(3,CdCode.Station)
+
 !是否下拉選單
 #CDDEF04=x,20,S
 T(3,CdCode.YesNo)
@@ -163,13 +184,14 @@ T(3,CdCode.YesNo)
 
 #CustTypeCodeHelpRim=X,1,S
 RESET_RIM(#CustTypeCodeHelpRim,XXR99)
-S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#StationCode)
 R(1,XXR99)
 CALL(#HelpProc)
 !T(2,@CustTypeCodeHelp,#HelpDesc1)
 T(2,@NationalityCodeHelp,#HelpDesc2)
 T(2,@EntCodeHelp,#HelpDesc3)
 T(2,@YesNoHelp,#HelpDesc4)
+T(2,@StationHelp,#HelpDesc5)
 
 ! 調RIM取縣市代碼
 #RimL6r03City=X,1,S
@@ -183,6 +205,8 @@ R(1,L6R03)
 ! 縣市代碼的下拉選單
 #CityHelp=X,10000,S
 T(2,#L6r03Result)
+
+#StationHelp=x,1024,S
 
 #TemFuncd=A,1,S
 E(0,2)
@@ -305,6 +329,18 @@ T(2,@RegAddressBef,#L1r01RegAddress)
 T(2,@CurrAddressBef,#L1r01CurrAddress)
 T(2,@TypeCodeBef,#L1r01TypeCode)
 T(2,@TypeCodeAft,#L1r01TypeCode)
+T(2,@IntroducerBef,#L1r01Introducer)
+T(2,@IntroducerAft,#L1r01Introducer)
+T(2,@IntroducerBefX,#L1r01IntroducerX)
+T(2,@IntroducerAftX,#L1r01IntroducerX)
+T(2,@BusinessOfficerBef,#L1r01BusinessOfficer)
+T(2,@BusinessOfficerAft,#L1r01BusinessOfficer)
+T(2,@BusinessOfficerBefX,#L1r01BusinessOfficerX)
+T(2,@BusinessOfficerAftX,#L1r01BusinessOfficerX)
+T(2,@StationBef,#L1r01Station)
+T(H,@StationBefX,#StationBef,#StationHelp)
+T(2,@StationAft,#L1r01Station)
+T(H,@StationAftX,#StationAft,#StationHelp)
 
 #ErrSkip=A,1,S
 E(0,1)
@@ -319,6 +355,8 @@ S(L6R06,1,#RimFuncCode,#RimTxCode,#RimIndustryCode,#ErrSkip)
 R(1,L6R06)
 T(2,@IndustryBefX,#L6R06IndustryItem)
 T(2,@IndustryAftX,#L6R06IndustryItem)
+
+
 
 ! #RL6R06AA=X,1,S
 ! T(2,@IndustryBefX,#L6R06IndustryItem) 
@@ -459,6 +497,10 @@ C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,*),T(3,*),T(3,*))
 #FdEmail=X,2,L
 #FdIncomeOfYearly=X,2,L
 #FdIncomeDataDate=X,2,L
+
+#FdIntroducer=X,2,L
+#FdBusinessOfficer=X,2,L
+#FdStation=X,2,L
 
 !公司名稱
 #CustNameBef=x,100,L
@@ -1206,6 +1248,66 @@ IF(#EmailAft==#EmailBef,T(3,),T(3,X))
 #IsRelatedXAft=X,2,L
 #IsLnrelNearXAft=X,2,L
 
+!2023/3/8 新增
+!介紹人
+#IntroducerBef=X,6,L
+#IntroducerBefX=X,20,L
+#IntroducerAft=X,6,I
+
+#RIM_L2R08b=X,1,S
+C(5,#IntroducerAft,#IntroducerBef,S,$)
+T(3,@IntroducerAftX,)
+C(4,#IntroducerAft,S,$)
+RESET_RIM(#RIM_L2R08b,L2R08)
+T(2,@RimEmployeeNo,#IntroducerAft)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+T(2,@IntroducerAftX,#L2r08FullName)
+
+#IntroducerAftX=X,20,L
+C(5,#IntroducerAft,#IntroducerBef,T(2,#IntroducerBefX),$)
+
+#IntroducerInd=X,1,L
+C(5,#IntroducerAft,#IntroducerBef,T(3,),T(3,X))
+
+!房貸專員
+#BusinessOfficerBef=X,6,L
+#BusinessOfficerBefX=X,20,L
+#BusinessOfficerAft=X,6,I
+
+#RIM_L2R08c=X,1,S
+C(5,#BusinessOfficerAft,#BusinessOfficerBef,S,$)
+T(3,@BusinessOfficerAftX,)
+C(4,#BusinessOfficerAft,S,$)
+RESET_RIM(#RIM_L2R08c,L2R08)
+T(2,@RimEmployeeNo,#BusinessOfficerAft)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+T(2,@BusinessOfficerAftX,#L2r08FullName)
+
+#BusinessOfficerAftX=X,20,L
+C(5,#BusinessOfficerAft,#BusinessOfficerBef,T(2,#BusinessOfficerBefX),$)
+
+#BusinessOfficerInd=X,1,L
+C(5,#BusinessOfficerAft,#BusinessOfficerBef,T(3,),T(3,X))
+
+!站別
+#StationBef=X,3,L
+#StationBefX=X,20,L
+#StationAft=X,3,I
+HELP(#StationHelp)
+@
+C(4,#StationAft,S,$)
+C(5,#StationAft,StationBef,s,$)
+V(H,#StationHelp)
+
+#StationAftX=X,20,L
+C(4,#StationAft,S,$)
+C(5,#StationAft,StationBef,s,$)
+T(H,#StationAft,#StationHelp)
+
+#StationInd=X,1,L
+C(5,#StationAft,#StationBef,T(3,),T(3,X))
 
 
 !年收入
@@ -1394,6 +1496,13 @@ T(3,[L1104] 顧客基本資料變更-法人)
 #IncomeDataDateBef
 #IncomeDataDateInd
 #IncomeDataDateAft
+#IntroducerInd
+#IntroducerAft
+#BusinessOfficerInd
+#BusinessOfficerAft
+#StationInd
+#StationAft
+#END
 </sub>
 
 
@@ -1408,6 +1517,7 @@ TXFORM=L1104
 <include src="ROM.icf::L1R17.tom"/>
 <include src="ROM.icf::L6R03.tom"/>
 <include src="ROM.icf::L6R06.tom"/>
+<include src="ROM.icf::L2R08.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
 </sub>

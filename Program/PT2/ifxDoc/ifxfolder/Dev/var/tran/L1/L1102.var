@@ -157,6 +157,7 @@ IF(#RegFg==0,$,s)
 <include src="ROM.icf::L1R01.dec"/>
 <include src="ROM.icf::L1R10.dec"/>
 <include src="ROM.icf::L2Rim.dec"/>
+<include src="ROM.icf::L2R08.dec"/>
 <include src="ROM.icf::L6R06.dec"/>
 <include src="ROM.icf::L6R11Rim.dec"/>
 
@@ -204,6 +205,9 @@ IF(#RegFg==0,$,s)
 #FdIsSuspected=X,2,L
 #FdIsSuspected2=X,2,S
 #FdSubCompanyFg=X,2,L
+#FdIntroducer=X,2,L
+#FdBusinessOfficer=X,2,L
+#FdStation=X,2,L
 
 ! 永遠為必輸欄位
 #FdFunCd=X,2,L
@@ -267,9 +271,14 @@ T(3,CdCode.SubCompanyCode)
 
 #SubCompanyCodeHelp=x,1024,S
 
+#StationCode=x,14,S
+T(3,CdCode.Station)
+
+#StationHelp=x,1024,S
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF0001,#CDDEF0002,#CDDEF0003,#CDDEF0004,#CDDEF0005,#CDDEF0006,#CDDEF0007)
+S(XXR99,01,#CDDEF0001,#CDDEF0002,#CDDEF0003,#CDDEF0004,#CDDEF0005,#CDDEF0006,#CDDEF0007,#StationCode)
 R(1,XXR99)
 CALL(#HelpProc)
 !T(2,@CustTypeCodeHelp,#HelpDesc1)
@@ -279,6 +288,7 @@ T(2,@TelTypeCodeHelp,#HelpDesc4)
 T(2,@RelationCodeHelp,#HelpDesc5)
 T(2,@YesNoHelp,#HelpDesc6)
 T(2,@SubCompanyCodeHelp,#HelpDesc7)
+T(2,@StationHelp,#HelpDesc8)
 
 #X1=X,1,S
 T(HELP,@CustTypeCodeHelp,#CustTypeCodeHelp,-,01)
@@ -1122,6 +1132,9 @@ T(3, :請選擇;Y:確認核對無誤)
 [""],
 [#<->#,"#FdIncomeOfYearly+年收入",#IncomeOfYearly,"仟元"],
 [#<->#,"#FdIncomeDataDate+年收入資料年月",#IncomeDataDate],
+["#FdIntroducer+介紹人",#Introducer,#IntroducerX],
+["#FdBusinessOfficer+房貸專員",#BusinessOfficer,#BusinessOfficerX],
+["#FdStation+站別",#Station,#StationX],
 [#<->#,"#FdSubCompanyFg+交互運用同意書",#SubCompanyFg,#SubCompanyFgX],
 ]
 
@@ -1141,6 +1154,43 @@ IF(#IncomeDataDate > #Ed ,V(P,年收入資料年月不可大於日曆日年月�
 !C(4,#IncomeDataDate,S,V(9))
 !T(1,@MANU_MM,#IncomeDataDate,4,5)
 !IF(#MANU_MM==0 || #MANU_MM >= 13,V(P,請輸入年月，格式yyyMM),$)
+
+!2023/3/7新增
+!介紹人
+#Introducer=X,6,I
+#IntroducerX=X,20,L
+
+#RIM_L2R08b=X,1,S
+T(3,@IntroducerX,)
+C(4,#Introducer,S,$)
+RESET_RIM(#RIM_L2R08b,L2R08)
+T(2,@RimEmployeeNo,#Introducer)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+T(2,@IntroducerX,#L2r08FullName)
+
+!房貸專員
+#BusinessOfficer=X,6,I
+#BusinessOfficerX=X,20,L
+
+#RIM_L2R08c=X,1,S
+T(3,@BusinessOfficerX,)
+C(4,#BusinessOfficer,S,$)
+RESET_RIM(#RIM_L2R08c,L2R08)
+T(2,@RimEmployeeNo,#BusinessOfficer)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+T(2,@BusinessOfficerX,#L2r08FullName)
+
+!站別
+#Station=X,3,I
+HELP(#StationHelp)
+@
+C(4,#Station,S,$)
+V(H,#StationHelp)
+
+#StationX=X,20,L
+T(H,#Station,#StationHelp)
 
 #SubCompanyFgHelp=X,200,S
 T(3,Y:同意提供申請人之帳務、信用、投資及保險資料作為共同行銷之用;N:不同意)
@@ -1380,12 +1430,25 @@ T(H,#OORelationCode,#RelationCodeHelp)
 #OOLiaisonName=x,100,S
 
 
+!介紹人
+#OIntroducerX=X,50,L
+!房貸專員 目前只有L1103有
+#OBusinessOfficerX=X,50,L
+!站別
+#OStation=X,3,L
+#OStationX=X,20,L
+T(H,#OStation,#StationHelp)
+
+
 
 !啟用記號
 #OOEnable=X,1,S
 
 #OOEnableX=X,4,L
 T(H,#OOEnable,#EnableHelp)
+
+
+
              
 
 !備註
@@ -1447,6 +1510,9 @@ T(H,#OOEnable,#EnableHelp)
 #SubCompanyCode{n}
 #CrossUse{n}
 ##end
+#Introducer
+#BusinessOfficer
+#Station
 </sub>
 
 !------ 下行電文TOM ------
@@ -1490,6 +1556,9 @@ TXFORM=L1102
 #OOLiaisonName
 #OOEnable
 #OORmk
+#Introducer
+#BusinessOfficer
+#Station
 ^
 <include src="ROM.icf::L1R01.tom"/>
 <include src="ROM.icf::L1R16.tom"/>
@@ -1499,6 +1568,7 @@ TXFORM=L1102
 <include src="ROM.icf::L6R03.tom"/>
 <include src="ROM.icf::L6R06.tom"/>
 <include src="ROM.icf::L1R06.tom"/>
+<include src="ROM.icf::L2R08.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
@@ -1533,6 +1603,9 @@ TXFORM=L1102
 [#<->#,"．是否為準利害關係人",#OIsLnrelNearX],
 [#<->#,"年收入",#OIncomeOfYearly,"仟元"],
 [#<->#,"年收入資料年月",#OIncomeDataDate],
+["介紹人",#OIntroducerX],
+["房貸專員",#OBusinessOfficerX],
+["站別",#OStation,#OStationX],
 [#<->#,"同意提供申請人之帳務、信用、投資及保險資料作為共同行銷之用",#OSubCompanyItem1,#OCrossUseX1,"<br>",#OSubCompanyItem2,#OCrossUseX2,
             "<br>",#OSubCompanyItem3,#OCrossUseX3,"<br>",#OSubCompanyItem4,#OCrossUseX4,
             "<br>",#OSubCompanyItem5,#OCrossUseX5,"<br>",#OSubCompanyItem6,#OCrossUseX6,

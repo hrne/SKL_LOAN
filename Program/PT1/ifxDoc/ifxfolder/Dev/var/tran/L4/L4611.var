@@ -518,14 +518,21 @@ C(3,#FunctionCode,4,s,I)
 IF(#FunctionCode==1 || #FunctionCode==2 ,$,s)
 HELP(#SelfInsuCodeHelp2)
 @V(H,#SelfInsuCodeHelp2)
+
+#DATE=D,8,S
+T(4,DATE$)
+
 ! 自保續保
 #RenewCodeX=_,_,L
 T(3,)T(H,#RenewCode,#SelfInsuCodeHelp2)
 IF(#RenewCode==1,SHOW(#InsuReceiptDateX),HIDE(#InsuReceiptDateX))
 
 #InsuReceiptDateX=D,7,S
-IF(#RenewCode==1,$,S)
-C(3,#RenewCode,1,C(4,#InsuReceiptDate,,T(2,#InsuReceiptDate)),s,S)
+!IF(#RenewCode==1,$,S)
+IF(#FunctionCode==1 ,T(1,#DATE,2,7),$)
+IF(#FunctionCode==2 && #InsuReceiptDate==0,T(1,#DATE,2,7),$)
+!C(2,#FunctionCode,s,$,$,s,s,s)
+C(3,#RenewCode,1,C(4,#InsuReceiptDate,#DATE,T(2,#InsuReceiptDate)),s,S)
 
 !總保費
 #TotalPrem=m,14,L

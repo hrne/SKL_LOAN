@@ -406,20 +406,12 @@ public class L4455Report extends MakeReport {
 							}
 						}
 
-						// 第一頁
-//						if (tmpCount == 1) {
-//							this.info("first print header");
-//							this.print(-6, 35, "扣款銀行：" + tmpBank + " " + tmpBankX);
-//						}
-
 						if (this.getNowPage() > 1) {
 							this.info("getNowPage  = " + this.getNowPage());
 							this.info("NowRow  = " + this.NowRow);
 							this.info("newPage  = " + tmpBank + "  " + tmpBankX);
 							pageCnt = 0;
 							this.newPage();
-
-//							this.print(-6, 35, "扣款銀行：" + bank + " " + repaybank);
 
 						}
 					}
@@ -428,9 +420,6 @@ public class L4455Report extends MakeReport {
 					this.info(tmpCount + " bank  = " + tmpBankX);
 
 				}
-
-//				this.info(tmpCount + " repaybank  = " + repaybank);
-//				this.info(tmpCount + " bank  = " + bank);
 
 //				每頁筆數相加
 				pageCnt++;
@@ -619,8 +608,10 @@ public class L4455Report extends MakeReport {
 
 					// 給 998 ACH扣款 判斷加的
 					if ("998".equals(titaVo.get("RepayBank"))) {
-
-						if (!tmpBank.equals(L4455List.get(i).get("RepayBank"))) {
+						this.info("998小計.....");
+						// 現在的銀行與下一筆銀行代碼不同就必須輸出小計
+						if (!tmpBank.equals(
+								L4455List.get((L4455List.size() - 1) == (i + 1) ? i : i + 1).get("RepayBank"))) {
 							this.print(1, 1,
 									"----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 							this.print(1, 1,
@@ -645,9 +636,8 @@ public class L4455Report extends MakeReport {
 							amttototal(); // 業務科目金額to總和
 							init(); // 業務科目金額歸0
 						}
-
-
 					}
+
 //					每頁第38筆 跳頁 
 					if (pageCnt >= 34) {
 						this.print(pageIndex - pageCnt - 2, this.getMidXAxis(), "=====續下頁=====", "C");
