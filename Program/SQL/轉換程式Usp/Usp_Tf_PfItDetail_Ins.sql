@@ -135,6 +135,7 @@ BEGIN
                                 WHEN S3.CUSID1 = S1.ID1X
                                 THEN 1
                               ELSE 0 END
+                              = 1 
     LEFT JOIN "LN$DTYP" S4 ON S4.CUSID1 = S1.ID7X -- 處經理
     LEFT JOIN "CdBcm" S5 ON S5."UnitCode" = S1."BCMCOD"
     WHERE S1."Seq" = 1

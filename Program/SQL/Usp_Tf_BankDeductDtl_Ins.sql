@@ -191,7 +191,7 @@ BEGIN
           ,NVL(PDM."MediaSeq",0)          AS "MediaSeq"            -- 媒體序號 DECIMAL 6 0 
           ,MBK."TRXDAT"                   AS "AcDate"              -- 會計日期 Decimald 8 0 
           ,NVL(AEM."EmpNo",'999999')      AS "TitaTlrNo"           -- 經辦 VARCHAR2 6 
-          ,MBK."TRXNMT"                   AS "TitaTxtNo"           -- 交易序號 VARCHAR2 8 
+          ,LPAD(MBK."TRXNMT",8,'0')       AS "TitaTxtNo"           -- 交易序號 VARCHAR2 8 
           ,''                             AS "AmlRsp"              -- AML回應碼 VARCHAR2 1 0 
           ,MBK."MBKRSN"                   AS "ReturnCode"          -- 回應代碼 VARCHAR2 2 0 
           ,''                             AS "JsonFields"          -- jason格式紀錄欄 nvarchar2 300 
@@ -351,6 +351,13 @@ BEGIN
         FROM "PO$AARP" 
       ) S 
     ) 
+    , txData AS {
+      SELECT DISTINCT
+             TRXDAT
+           , TRXNMT
+           , TRXMEM
+      FROM LA$TRXP
+    }
     SELECT MBK."TRXIDT"                   AS "EntryDate"           -- 入帳日期 Decimald 8 0 
           ,MBK."LMSACN"                   AS "CustNo"              -- 戶號 DECIMAL 7 0 
           ,MBK."MBKAPN"                   AS "FacmNo"              -- 額度 DECIMAL 3 0 
@@ -400,7 +407,7 @@ BEGIN
           ,NVL(ADM."MediaSeq",0)          AS "MediaSeq"            -- 媒體序號 DECIMAL 6 0 
           ,MBK."TRXDAT"                   AS "AcDate"              -- 會計日期 Decimald 8 0 
           ,NVL(AEM."EmpNo",'999999')      AS "TitaTlrNo"           -- 經辦 VARCHAR2 6 
-          ,MBK."TRXNMT"                   AS "TitaTxtNo"           -- 交易序號 VARCHAR2 8 
+          ,LPAD(MBK."TRXNMT",8,'0')       AS "TitaTxtNo"           -- 交易序號 VARCHAR2 8 
           ,''                             AS "AmlRsp"              -- AML回應碼 VARCHAR2 1 0 
           ,MBK."MBKRSN"                   AS "ReturnCode"          -- 回應代碼 VARCHAR2 2 0 
           ,''                             AS "JsonFields"          -- jason格式紀錄欄 nvarchar2 300 
@@ -443,7 +450,9 @@ BEGIN
                        AND ADM."RepayAmt" = MBK."MBKAMT" 
                        AND ADM."RepayAcctNo" = MBK."LMSPCN" 
                        AND ADM."IntEndDate" = MBK."TRXIED" 
-    LEFT JOIN "As400EmpNoMapping" AEM ON AEM."As400TellerNo" = MBK."CHGEMP" 
+    LEFT JOIN txData td ON td.TRXDAT = MBK.TRXDAT
+                       AND td.TRXNMT = MBK.TRXNMT
+    LEFT JOIN "As400EmpNoMapping" AEM ON AEM."As400TellerNo" = td.TRXMEM
     -- WHERE NVL(MBK.MBKCDE,' ') = 'Y' 
     WHERE TRUNC(MBK."TRXIDT" / 100) >= "DateStart" 
     ; 

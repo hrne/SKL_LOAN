@@ -27,7 +27,7 @@ BEGIN
       , "NewBormNo"           -- 新撥款序號 DECIMAL 3
       , "OldFacmNo"           -- 舊額度編號 DECIMAL 6
       , "OldBormNo"           -- 舊撥款序號 DECIMAL 6
-      , "ReNewCode"           -- 展期記號 VARCHAR2 1 (1:一般 2:協議)
+      , "RenewCode"           -- 展期記號 VARCHAR2 1 (1:一般 2:協議)
       , "MainFlag"            -- 主要記號 VARCHAR2 1 (Y:新撥款對到舊撥款最早的一筆 )
       , "AcDate"              -- 會計日期 DECIMAL 8
       , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
@@ -41,7 +41,7 @@ BEGIN
           ,S0."RenewBormNo"               AS "NewBormNo"           -- 新撥款序號 DECIMAL 3
           ,S0."CloseFacmNo"               AS "OldFacmNo"           -- 舊額度編號 DECIMAL 6
           ,S0."CloseBormNo"               AS "OldBormNo"           -- 舊撥款序號 DECIMAL 6
-          ,'1'                            AS "ReNewCode"           -- 展期記號 VARCHAR2 1 (1:一般 2:協議)
+          ,'1'                            AS "RenewCode"           -- 展期記號 VARCHAR2 1 (1:一般 2:協議)
           ,CASE
              WHEN S0."Seq" = 1 -- 新撥款對到舊撥款 最早的一筆 為Y
              THEN 'Y'

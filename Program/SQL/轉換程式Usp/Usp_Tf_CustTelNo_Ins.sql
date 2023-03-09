@@ -213,10 +213,14 @@ BEGIN
                      THEN SUBSTR("CUSTEL",0,INSTR("CUSTEL",'-') - 1) || SUBSTR("CUSTEL",INSTR("CUSTEL",'-') + 1)
                      WHEN INSTR("CUSTEL",'-') > 0 AND INSTR("CUSTEL",'-') > 5
                      THEN SUBSTR("CUSTEL",0,INSTR("CUSTEL",'-') - 1)
+                     WHEN LENGTHB("CUSTEL") > 10
+                     THEN SUBSTR("CUSTEL",0,10)
                    ELSE "CUSTEL" END
         ,"TelExt" = CASE
                      WHEN INSTR("CUSTEL",'-') > 0 AND INSTR("CUSTEL",'-') > 5
                      THEN SUBSTR("CUSTEL",INSTR("CUSTEL",'-') + 1)
+                     WHEN LENGTHB("CUSTEL") > 10
+                     THEN SUBSTR("CUSTEL",11)
                    ELSE '' END
      WHERE "TelTypeCode" = '04'
      ;

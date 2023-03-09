@@ -83,7 +83,7 @@ BEGIN
           ,S1."FALCOD"                    AS "ErrMsg"              -- 失敗原因 NVARCHAR2 20 0
           ,S1."TRXDAT"                    AS "Acdate"              -- 會計日期 DECIMAL 8 0
           ,S1."EMPCOD"                    AS "TitaTlrNo"           -- 經辦 VARCHAR2 6 0
-          ,S1."TRXNMT"                    AS "TitaTxtNo"           -- 交易序號 VARCHAR2 8 0
+          ,LPAD(S1."TRXNMT",8,'0')        AS "TitaTxtNo"           -- 交易序號 VARCHAR2 8 0
           ,S1."BSTBTN"                    AS "BatchNo"             -- 批次號碼 VARCHAR2 6 0
           ,S1."TPAYAMT"                   AS "RepayAmt"            -- 應扣金額 DECIMAL 14 0
           ,S1."M06QCD"                    AS "ResignCode"          -- 離職代碼 VARCHAR2 2 0

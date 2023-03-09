@@ -60,8 +60,10 @@ public class L5811ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      ,Y.\"MaturityDate\" - 19110000      AS F26 "; // 貸款迄日
 		sql += "     , Y.\"LoanBal\"                      AS F27 "; // 本期未償還本金額
 		sql += "     , CASE ";
-		sql += "         WHEN TRUNC(Y.\"FirstDrawdownDate\" / 100 ) < :iYYYYMM "; // 2022-03-18 智偉修改
-		sql += "         THEN (TRUNC( :iYYYYMM / 100) - 1911) * 100 + 01 "; // 首撥日小於查詢區間起月時放查詢區間起月
+		sql += "         WHEN :StartMonth = 0 AND TRUNC(Y.\"FirstDrawdownDate\" / 100 ) <= TRUNC(:iYYYYMM / 100) * 100 + 01 "; 
+		sql += "           THEN (TRUNC( :iYYYYMM / 100) - 1911) * 100 + 01 "; // 首撥日不大於資料年的01月份則放資料年的01月份
+		sql += "         WHEN TRUNC(Y.\"FirstDrawdownDate\" / 100 ) < :StartMonth "; // 2022-03-18 智偉修改
+		sql += "           THEN  :StartMonth  - 191100             "; // 首撥日小於查詢區間起月時放查詢區間起月
 		sql += "         ELSE TRUNC(Y.\"FirstDrawdownDate\" / 100 ) - 191100 "; // 否則放首撥日月份
 		sql += "       END                                AS F28 "; // 繳息所屬年月(起)
 		sql += "     , Y.\"YearMonth\" - 191100           AS F29 "; // 繳息所屬年月(止)

@@ -604,10 +604,8 @@ public class L4455Report extends MakeReport {
 							init(); // 業務科目金額歸0
 
 						}
-					}
-
-					// 給 998 ACH扣款 判斷加的
-					if ("998".equals(titaVo.get("RepayBank"))) {
+					} else if ("998".equals(titaVo.get("RepayBank"))) {
+						// 給 998 ACH扣款 判斷加的
 						this.info("998小計.....");
 						// 現在的銀行與下一筆銀行代碼不同就必須輸出小計
 						if (!tmpBank.equals(
@@ -636,6 +634,7 @@ public class L4455Report extends MakeReport {
 							amttototal(); // 業務科目金額to總和
 							init(); // 業務科目金額歸0
 						}
+
 					}
 
 //					每頁第38筆 跳頁 

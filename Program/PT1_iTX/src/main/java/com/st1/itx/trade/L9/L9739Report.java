@@ -112,7 +112,7 @@ public class L9739Report extends MakeReport {
 
 			this.info("	this.tmpProdNoMap = " + this.tmpProdNoMap.toString());
 
-			listL9739Detail = l9739ServiceImpl.findAll(titaVo, tmpEffectDate);
+			listL9739Detail = l9739ServiceImpl.findAll(titaVo, tmpEffectDate + 19110000);
 
 			exportData(listL9739Title, listL9739Detail);
 

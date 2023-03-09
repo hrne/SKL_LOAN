@@ -3,9 +3,10 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_MonthlyLoanBal_Ins" 
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_MonthlyLoanBal_Ins"  
 (
     -- 參數
+    "ExecSeq"      IN  INT,       --執行序號
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
     JOB_END_TIME   OUT TIMESTAMP, --程式結束時間
     INS_CNT        OUT INT,       --新增資料筆數

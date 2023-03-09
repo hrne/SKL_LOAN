@@ -90,7 +90,7 @@ BEGIN
                                                   WHEN S2."CORACC" IN ('40903300','20232020','20232182','20232180','20232181','40907400') 
                                                        AND NVL(S2."CORACS",'     ') = '     ' 
                                                   THEN '01' 
-                                                ELSE '  ' END 
+                                                ELSE '  ' END  
     WHERE S1."TRXDAT" >= 20190101 
       AND NVL(S2."CORACC",' ') <> ' ' -- 有串到新會科才寫入 
       AND NVL(S3."AcctCode",' ') <> ' ' 

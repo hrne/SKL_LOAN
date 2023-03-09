@@ -503,7 +503,6 @@ SWITCH(#RpCode{i}
 ,92,T(2,@RpCodeX{i},暫收轉帳)
 ,93,T(2,@RpCodeX{i},暫收支票)
 ,94,T(2,@RpCodeX{i},轉債協暫收款)
-,95,T(2,@RpCodeX{i},轉債協退還款)
 ,T(2,@RpCodeX{i},)))
 HIDE(#GRD_COLL{i},#GRD_COLM{i},#GRD_COLO{i},#GRD_COLP{i},#GRD_COLQ{i},#GRD_COLR{i},#RpCustNo{i},#RpFacmNo{i},#BTN_GRD_B{i},#BTN_GRD_B{i},#RpRemitBankX{i},#RpDetailSeq{i},#RpEntryDate{i},#BTN_GRD_A{i},#RpRemitAcctNo{i},#RpType{i},#RpTypeX{i},#RpCustName{i},#NOTE{i},#RpRemark{i})
 IF(#RPFG==1||#RPFG==2,
@@ -540,11 +539,11 @@ IF(#RPFG==2,s,$)
 IF(#RPFG==1,s,$)
 C(3,#GRD_SKFG{i},1,$,C(3,#RPFG,7,$,s))
 C(3,#RPFG,6,HELP(01:整批匯款;91:展期／借新還舊),
-C(3,#RPFG,7,HELP(92:暫收轉帳;94:轉債協暫收款;95:轉債協退還款)))
+C(3,#RPFG,7,HELP(92:暫收轉帳;94:轉債協暫收款)))
 IF(#RPFG==7,IF(#RPTOTF{z}>0,INVOKEJS(SHOW,grd9_{i},1)CALL(#COL_DIS_CALL{i}),INVOKEJS(SHOW,grd9_{i},0))IF(#RPTOTF{z}>0,$,s),$)
 @SWITCH(#RPFG,
 6,V(1,01,91),
-7,V(1,92,94,95),
+7,V(1,92,94),
 V(1,90,91))
 
 ! #BIND_GRD_A瀏覽按鈕帶入值
@@ -604,8 +603,7 @@ SWITCH(#RpCode{i},
 91,T(2,@RpCodeX{i},展期／借新還舊),
 92,T(2,@RpCodeX{i},暫收轉帳),
 93,T(2,@RpCodeX{i},暫收支票),
-94,T(2,@RpCodeX{i},轉債協暫收款),
-95,T(2,@RpCodeX{i},轉債協退還款),T(2,@RpCodeX{i},)))
+94,T(2,@RpCodeX{i},轉債協暫收款),T(2,@RpCodeX{i},)))
 
 ! 欄位顯示
 #COL_DIS{i}=A,1,S

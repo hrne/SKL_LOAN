@@ -84,7 +84,7 @@ BEGIN
          , EXGP.LMSASQ                         AS "BormNo" -- 撥款序號 DECIMAL 3
          , LBM."CompensateAcct"                AS "CustName" -- 收款戶名 NVARCHAR2 100
          , LBM."RelationId"                    AS "CustId" -- 收款人ID VARCHAR2 10
-         , LBM."RelationBirthday"              AS "CustBirthday" -- 收款人出生日期 DECIMALD 8
+         , NVL(LBM."RelationBirthday",0)       AS "CustBirthday" -- 收款人出生日期 DECIMALD 8
          , LBM."RelationGender"                AS "CustGender" -- 收款人性別 VARCHAR2 1
          , EXGP.M24070                         AS "Remark" -- 附言 NVARCHAR2 100
          , 'TWD'                               AS "CurrencyCode" -- 幣別 VARCHAR2 3

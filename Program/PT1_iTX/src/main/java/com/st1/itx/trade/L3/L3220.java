@@ -211,7 +211,7 @@ public class L3220 extends TradeBuffer {
 		if (titaVo.isHcodeNormal()) {
 			acRepayCom.settleTempRun(this.lLoanBorTx, this.baTxList, this.lAcDetail, titaVo);
 		}
-		
+
 		this.totaVo.put("PdfSnoF", "" + sno);
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -292,8 +292,8 @@ public class L3220 extends TradeBuffer {
 		if (tLoanCheque.getReceiveDate() == this.txBuffer.getTxCom().getTbsdy()) {
 
 			AcClose tAcClose = new AcClose();
-			AcCloseId tAcCloseId = new AcCloseId();
 
+			AcCloseId tAcCloseId = new AcCloseId();
 			tAcCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
 			tAcCloseId.setBranchNo(titaVo.getAcbrNo());
 			tAcCloseId.setSecNo("02"); // 業務類別: 01-撥款匯款 02-支票繳款 09-放款
@@ -358,6 +358,7 @@ public class L3220 extends TradeBuffer {
 			acDetail = new AcDetail();
 			acDetail.setDbCr("C");
 			acDetail.setAcctCode("BCK");
+			acDetail.setRvNo(parse.IntegerToString(iChequeNo, 7));
 			acDetail.setCurrencyCode(iCurrencyCode);
 			acDetail.setTxAmt(wkChequeAmt);
 			acDetail.setCustNo(iCustNo);

@@ -251,40 +251,42 @@ BEGIN
     FROM rawData 
     WHERE NVL("CbSeq",1) = 1 
     ; 
- 
+
+    -- 2023-03-09 Wei from 會議中SKL User珮瑜說明:原AS400系統可修改[適用利率]所以
+    -- [指標利率]+[加碼利率]≠[適用利率]是正常的，轉換時不應該重算[加碼利率]。
     /* 更新 "LoanRateChange"."IndividualIncr" "IncrFlag" = "N" 個別加碼利率 DECIMAL 6 4 */ 
-    MERGE INTO "LoanRateChange" T1 
-    USING ( 
-      SELECT L."CustNo"              -- 借款人戶號 DECIMAL 7 0 
-            ,L."FacmNo"              -- 額度編號 DECIMAL 3 0 
-            ,L."BormNo"              -- 撥款序號 DECIMAL 3 0 
-            ,L."EffectDate"          -- 生效日期 DECIMALD 8 0 
-            ,L."FitRate" - L."BaseRate" AS "IndividualIncr" -- 個別加碼利率 DECIMAL 6 4 
-      FROM ( SELECT         
-               R."CustNo"              AS "CustNo"  
-              ,R."FacmNo"              AS "FacmNo"  
-              ,R."BormNo"              AS "BormNo" 
-              ,R."EffectDate"          AS "EffectDate"   
-              ,R."FitRate"             AS "FitRate" 
-              ,C."BaseRate"            AS "BaseRate" 
-              ,ROW_NUMBER() OVER (PARTITION BY   R."CustNo", R."FacmNo" ,R."BormNo" ,R."EffectDate" 
-                                  ORDER BY C."EffectDate" DESC) AS "Seq" 
-             FROM "LoanRateChange" R 
-             LEFT JOIN "CdBaseRate" C ON C."BaseRateCode" = R."BaseRateCode" 
-                                     AND C."EffectFlag" = 1 
-                                     AND C."EffectDate" <= R."EffectDate" 
-             WHERE R."BaseRateCode"  IN ('01','02')   
-              AND  R."IncrFlag" = 'N' 
-            ) L 
-       WHERE L."Seq" = 1 
-    ) S1 ON (    S1."CustNo" = T1."CustNo" 
-             AND S1."FacmNo" = T1."FacmNo" 
-             AND S1."BormNo" = T1."BormNo" 
-             AND S1."EffectDate" = T1."EffectDate" 
-             AND S1."IndividualIncr" IS NOT NULL) 
-    WHEN MATCHED THEN UPDATE SET 
-    T1."IndividualIncr" = S1."IndividualIncr" 
-    ; 
+    -- MERGE INTO "LoanRateChange" T1 
+    -- USING ( 
+    --   SELECT L."CustNo"              -- 借款人戶號 DECIMAL 7 0 
+    --         ,L."FacmNo"              -- 額度編號 DECIMAL 3 0 
+    --         ,L."BormNo"              -- 撥款序號 DECIMAL 3 0 
+    --         ,L."EffectDate"          -- 生效日期 DECIMALD 8 0 
+    --         ,L."FitRate" - L."BaseRate" AS "IndividualIncr" -- 個別加碼利率 DECIMAL 6 4 
+    --   FROM ( SELECT         
+    --            R."CustNo"              AS "CustNo"  
+    --           ,R."FacmNo"              AS "FacmNo"  
+    --           ,R."BormNo"              AS "BormNo" 
+    --           ,R."EffectDate"          AS "EffectDate"   
+    --           ,R."FitRate"             AS "FitRate" 
+    --           ,C."BaseRate"            AS "BaseRate" 
+    --           ,ROW_NUMBER() OVER (PARTITION BY   R."CustNo", R."FacmNo" ,R."BormNo" ,R."EffectDate" 
+    --                               ORDER BY C."EffectDate" DESC) AS "Seq" 
+    --          FROM "LoanRateChange" R 
+    --          LEFT JOIN "CdBaseRate" C ON C."BaseRateCode" = R."BaseRateCode" 
+    --                                  AND C."EffectFlag" = 1 
+    --                                  AND C."EffectDate" <= R."EffectDate" 
+    --          WHERE R."BaseRateCode"  IN ('01','02')   
+    --           AND  R."IncrFlag" = 'N' 
+    --         ) L 
+    --    WHERE L."Seq" = 1 
+    -- ) S1 ON (    S1."CustNo" = T1."CustNo" 
+    --          AND S1."FacmNo" = T1."FacmNo" 
+    --          AND S1."BormNo" = T1."BormNo" 
+    --          AND S1."EffectDate" = T1."EffectDate" 
+    --          AND S1."IndividualIncr" IS NOT NULL) 
+    -- WHEN MATCHED THEN UPDATE SET 
+    -- T1."IndividualIncr" = S1."IndividualIncr" 
+    -- ; 
  
     /* 更新 "RateIncr" if  "RateIncr" = 0  "IncrFlag" = "N" 加碼利率 DECIMAL 6 4 */ 
     MERGE INTO "LoanRateChange" T1 
@@ -326,40 +328,42 @@ BEGIN
      T1."RateIncr"  = S1."RateIncr"  
     ; 
  
+    -- 2023-03-09 Wei from 會議中SKL User珮瑜說明:原AS400系統可修改[適用利率]所以
+    -- [指標利率]+[加碼利率]≠[適用利率]是正常的，轉換時不應該重算[加碼利率]。
    /* 更新 "LoanRateChange"."RateIncr" if  "RateIncr" = 0  "IncrFlag" = "Y"  -- 加碼利率 DECIMAL 6 4 */ 
-    MERGE INTO "LoanRateChange" T1 
-    USING ( 
-      SELECT L."CustNo"              -- 借款人戶號 DECIMAL 7 0 
-            ,L."FacmNo"              -- 額度編號 DECIMAL 3 0 
-            ,L."BormNo"              -- 撥款序號 DECIMAL 3 0 
-            ,L."EffectDate"          -- 生效日期 DECIMALD 8 0 
-            ,L."FitRate" - L."BaseRate" AS "RateIncr" -- 加碼利率 DECIMAL 6 4 
-      FROM ( SELECT         
-               R."CustNo"              AS "CustNo"  
-              ,R."FacmNo"              AS "FacmNo"  
-              ,R."BormNo"              AS "BormNo" 
-              ,R."EffectDate"          AS "EffectDate"   
-              ,R."FitRate"             AS "FitRate" 
-              ,C."BaseRate"            AS "BaseRate" 
-              ,ROW_NUMBER() OVER (PARTITION BY R."CustNo", R."FacmNo" ,R."BormNo" ,R."EffectDate" 
-                                  ORDER BY C."EffectDate" DESC) AS "Seq" 
-             FROM "LoanRateChange" R 
-             LEFT JOIN "CdBaseRate" C ON C."BaseRateCode" = R."BaseRateCode" 
-                                     AND C."EffectFlag" = 1 
-                                     AND C."EffectDate" <= R."EffectDate" 
-             WHERE R."BaseRateCode"  IN ('01','02')   
-              AND  R."RateIncr" = 0                   
-              AND  R."IncrFlag" = 'Y'                   
-            ) L 
-       WHERE L."Seq" = 1 
-    ) S1 ON (    S1."CustNo" = T1."CustNo" 
-             AND S1."FacmNo" = T1."FacmNo" 
-             AND S1."BormNo" = T1."BormNo" 
-             AND S1."EffectDate" = T1."EffectDate" 
-             AND S1."RateIncr" IS NOT NULL) 
-    WHEN MATCHED THEN UPDATE SET 
-    T1."RateIncr"  = S1."RateIncr"  
-    ; 
+    -- MERGE INTO "LoanRateChange" T1 
+    -- USING ( 
+    --   SELECT L."CustNo"              -- 借款人戶號 DECIMAL 7 0 
+    --         ,L."FacmNo"              -- 額度編號 DECIMAL 3 0 
+    --         ,L."BormNo"              -- 撥款序號 DECIMAL 3 0 
+    --         ,L."EffectDate"          -- 生效日期 DECIMALD 8 0 
+    --         ,L."FitRate" - L."BaseRate" AS "RateIncr" -- 加碼利率 DECIMAL 6 4 
+    --   FROM ( SELECT         
+    --            R."CustNo"              AS "CustNo"  
+    --           ,R."FacmNo"              AS "FacmNo"  
+    --           ,R."BormNo"              AS "BormNo" 
+    --           ,R."EffectDate"          AS "EffectDate"   
+    --           ,R."FitRate"             AS "FitRate" 
+    --           ,C."BaseRate"            AS "BaseRate" 
+    --           ,ROW_NUMBER() OVER (PARTITION BY R."CustNo", R."FacmNo" ,R."BormNo" ,R."EffectDate" 
+    --                               ORDER BY C."EffectDate" DESC) AS "Seq" 
+    --          FROM "LoanRateChange" R 
+    --          LEFT JOIN "CdBaseRate" C ON C."BaseRateCode" = R."BaseRateCode" 
+    --                                  AND C."EffectFlag" = 1 
+    --                                  AND C."EffectDate" <= R."EffectDate" 
+    --          WHERE R."BaseRateCode"  IN ('01','02')   
+    --           AND  R."RateIncr" = 0                   
+    --           AND  R."IncrFlag" = 'Y'                   
+    --         ) L 
+    --    WHERE L."Seq" = 1 
+    -- ) S1 ON (    S1."CustNo" = T1."CustNo" 
+    --          AND S1."FacmNo" = T1."FacmNo" 
+    --          AND S1."BormNo" = T1."BormNo" 
+    --          AND S1."EffectDate" = T1."EffectDate" 
+    --          AND S1."RateIncr" IS NOT NULL) 
+    -- WHEN MATCHED THEN UPDATE SET 
+    -- T1."RateIncr"  = S1."RateIncr"  
+    -- ; 
  
     -- 2022-03-23 智偉新增 
     -- 將預調利率更新為前一筆利率的數字 
