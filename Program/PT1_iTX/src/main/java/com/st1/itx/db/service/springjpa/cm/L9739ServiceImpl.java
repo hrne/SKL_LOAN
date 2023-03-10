@@ -77,7 +77,7 @@ public class L9739ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "					  AND \"BaseRateCode\" = '02' )";
 		sql += "		  AND \"BaseRateCode\" = '02' "; // --郵局儲蓄利率
 		sql += "	) B ON B.\"EffectDate\" > 0";
-		sql += "	WHERE REGEXP_LIKE(P.\"ProdNo\",'I[A-I]')";
+		sql += "	WHERE P.\"GovOfferFlag\" = 'Y' ";
 		sql += "	ORDER BY P.\"ProdNo\" ASC";
 
 		this.info("sql1=" + sql);

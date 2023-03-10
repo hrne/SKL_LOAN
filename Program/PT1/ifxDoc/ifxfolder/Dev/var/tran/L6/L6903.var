@@ -66,8 +66,8 @@ T(4,CHAIN$)
 T(2,@RimTxCode,#TXCD)
 
 !從L9742帶值進來並自動查詢
-!#NTXBUF=X,1,S
-!C(3,#CHAIN,1,T(4,NTXBUF$),S)
+#NTXBUF=X,1,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
 !E(0,@CustNo,0)
 !E(0,@AcDateSt,#SYSDATE)
 !E(0,@AcDateEd,#SYSDATE)

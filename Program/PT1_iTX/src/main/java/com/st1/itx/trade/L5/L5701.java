@@ -760,7 +760,7 @@ public class L5701 extends TradeBuffer {
 		this.info( "index："+ this.index +",limit:"+this.limit);			
 		this.info( "簽約金額合計錯誤，總金額："+totalContrAmt+"，合計金額："+totalContractAmt+"，債務協商分攤檔合計金額："+sumContractAmt+"，債務協商分攤歷程檔合計金額："+sumContractAmtLog);
 		this.info( "債權比率合計錯誤，合計債權比例："+sumContractAmt);
-		this.info( "期款金額合計錯誤，期款："+dueAmt+"，合計期款："+sumContractAmt);
+		this.info( "期款金額合計錯誤，期款："+dueAmt+"，合計期款："+sumDueAmt);
 		this.info( "--------------------------------------");
 		
 		if (totalContrAmt.compareTo(totalContractAmt) != 0 ) {			
@@ -776,7 +776,7 @@ public class L5701 extends TradeBuffer {
 		}
 		
 		if (dueAmt.compareTo(sumDueAmt) != 0 ) {
-			throw new LogicException(titaVo, "E0015", "期款金額合計錯誤，期款："+dueAmt+"，合計期款："+sumContractAmt);
+			throw new LogicException(titaVo, "E0015", "期款金額合計錯誤，期款："+dueAmt+"，合計期款："+sumDueAmt);
 		}
 		
 	}

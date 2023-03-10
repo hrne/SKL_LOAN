@@ -50,7 +50,7 @@ E(0,@AcDate,#SYSCDATE)
 ["#FdAcDate+會計日期",#AcDate,#BTNNDate],
 ["#FdEmpNm+經辦姓名",#EmpName],
 ["#FdRmkCode+備忘錄代碼",#LoanRmkCode,#RmkCodeX],
-["#FdRmkDesc+備忘錄說明",#RmkDesc,"Shift+Enter換行，Enter跳一下欄位"],
+["#FdRmkDesc+備忘錄說明",#RmkDesc,#Msg],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -143,6 +143,9 @@ C(3,#FunCd,5,HIDE(#BTNNDate),$)
 #ShowFd=X,1,S
 C(2,#FunCd,T(3, ),T(3,*),T(3,*),T(3,*),T(3, ),T(3, ))
 T(2,@FdRmkDesc,#ShowFd)
+C(2,#FunCd,T(3,@Msg, ),T(3,@Msg,Shift+Enter換行，Enter跳一下欄位),T(3,@Msg,Shift+Enter換行，Enter跳一下欄位),T(3,@Msg,Shift+Enter換行，Enter跳一下欄位),T(3,@Msg, ),T(3,@Msg, ))
+
+
 
 !新增時顯示必輸記號*
 #WKSTAR=X,2,L
@@ -273,6 +276,8 @@ T(H,#LoanRmkCode,#RmkCodeHelp)
 !2022.3.18 QC1698皆必須輸入
 !#RmkDesc=c,120,I
 !#RmkDesc=x,10.50,I
+#Msg=x,50,L
+
 #RmkDesc=c,6.40,I
 ! TOOLTIP(Shift+Enter換行，Enter跳一下欄位)
 C(3,#FunCd,4,s,$)

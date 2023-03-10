@@ -633,6 +633,9 @@ public class L4455Report extends MakeReport {
 
 							amttototal(); // 業務科目金額to總和
 							init(); // 業務科目金額歸0
+							
+							this.newPage();
+							continue;
 						}
 
 					}

@@ -175,10 +175,7 @@ public class L9739Report extends MakeReport {
 			int tmpCount = 0;
 			for (Map<String, String> r : listL9739Detail) {
 
-				this.info("tmpEffectDate = " + this.tmpProdNoMap.get(r.get("ProdNo").toString() + "EffectDate"));
-				this.info("tmpRate = " + this.tmpProdNoMap.get(r.get("ProdNo").toString() + "Rate"));
-				this.info("nowEffectDate = " + r.get("EffectDate").toString());
-				this.info("nowRate = " + r.get("StoreRate").toString());
+				this.info("tmpRate = " + this.tmpProdNoMap.get(r.get("ProdNo").toString() + "Rate") + ",nowRate = " + r.get("StoreRate").toString());
 
 				if (!this.tmpProdNoMap.get(r.get("ProdNo").toString() + "Rate").equals(r.get("StoreRate").toString())
 						|| !this.tmpProdNoMap.get(r.get("ProdNo").toString() + "EffectDate")

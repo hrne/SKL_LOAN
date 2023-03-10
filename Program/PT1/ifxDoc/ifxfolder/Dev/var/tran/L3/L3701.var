@@ -86,6 +86,9 @@ E(0,#P3S1+3)
 
 !已繳期款需隱藏 27
 #P3S2=A,2,S
+E(0,#P3S+5)
+
+#P3S3=A,2,S
 E(0,#P3S+6)
 
 #P3E2=A,2,S
@@ -93,7 +96,6 @@ E(0,#P3S2+3)
 
 #P3E=A,2,S
 E(0,#P3S+9)
-
 
 #P6S=A,2,S
 E(0,#P3E+1)
@@ -120,7 +122,6 @@ C(3,#HIDE3FG,1,CALL(#HIDEP3),$)
 C(3,#HIDE6FG,1,CALL(#HIDEP6),$)
 CALL(#KLIGHT)
 
-
 !--- P3 金額日期
 #HIDEP3=@,1,S
 C(3,#EXPANDFG,1,CALL(#EXPAND),$)
@@ -128,6 +129,7 @@ C(3,#HIDE3FG,1,E(0,@HIDE3FG,0),E(0,@HIDE3FG,1))
 INVOKEJS(SHOW,p1,#P3S,#P3E,#HIDE3FG)
 C(5,#OvduFlag,Y,INVOKEJS(SHOW,p1,#P3S1,#P3E1,0),$)
 C(5,#PaidFlag,Y,INVOKEJS(SHOW,p1,#P3S2,#P3E2,0),$)
+C(5,#ChackBormNoFg,Y,$,INVOKEJS(SHOW,p1,28,28,0)INVOKEJS(SHOW,p1,24,24,#HIDE3FG))
 C(3,#HIDE3FG,1,K(LIGHT,#BTNHIDEP3,TXTRED,0),K(LIGHT,#BTNHIDEP3,TXTRED,-1))
 C(3,#HIDE3FG,1,$,s)
 C(3,#HIDE2FG,1,CALL(#HIDEP2),$)
@@ -232,8 +234,7 @@ C(3,#FKEY,2,T(H,@ACTFGX,#ACTFG,#ActFgHelp),$)
 ! ["#FdPieceCodeSecond+計件代碼2",#PieceCodeSecond1,#PieceCodeSecond1X],[#PieceCodeSecondY,#PieceCodeSecond2,#PieceCodeSecond2X],
 ["#FdRemark+催收備註",#Remark1],[#RemarkY,#Remark2],
 ["#FdProcessDate+催收備註日期",#ProcessDate1X],[#ProcessDateY,#ProcessDate2],
-[#<->#,"變更理由",#Reason,#ReasonX],
-[#<->#,"@",#Remark],
+[#<->#,"變更理由",#Reason,#Remark],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -1490,8 +1491,7 @@ ASGN(NTXBUF$)
 !帳管費已達帳,不可修改
 #AcctFee2=X,17,I
 C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
-C(5,#PaidFlag,Y,S,$)
-C(5,#ChackBormNoFg,Y,S,$)
+C(5,#ChackBormNoFg,Y,$,S)
 
 #TwAcctFee2N=n,17,S
 C(3,#Precision,0,$,S)
@@ -1863,15 +1863,18 @@ C(5,#ProcessDateY,X,E(0,1),$)
 C(3,#CHECKCHANGE,1,$,V(P,內容變更，必須至少變更一個項目))
 HELP(#ReasonHelp,cols:2)
 @C(4,#Reason,S,V(H,#ReasonHelp))
-IF(#Reason==99,$,s)
-T(F,@Remark,1)
+IF(#Reason==99,T(F,@Remark,1),T(F,@Remark,0))
 
-#ReasonX=X,100,L
-T(3,)T(H,#Reason,#ReasonHelp)
+! #ReasonX=X,100,L
+! T(3,)T(H,#Reason,#ReasonHelp)
+! T(2,@Remark,#ReasonX)
 ! IF(#Reason==99,T(3,@Remark,)SHOW(#Remark),T(2,@Remark,#ReasonX)HIDE(#Remark))
-
+#OldReason=X,2,S
 
 #Remark=x,100,I
+C(4,#Remark,T(H,#Reason,#ReasonHelp),C(5,#OldReason,#Reason,$,T(H,#Reason,#ReasonHelp)))
+T(2,@OldReason,#Reason)
+IF(#Reason==99,T(F,@Remark,1),T(F,@Remark,0))
 IF(#Reason==99,$,s)
 @V(7)
 
