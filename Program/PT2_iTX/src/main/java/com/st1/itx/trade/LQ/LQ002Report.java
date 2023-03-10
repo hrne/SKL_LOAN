@@ -17,13 +17,12 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LQ002ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
 
 public class LQ002Report extends MakeReport {
-	// private static final Logger logger =
-	// LoggerFactory.getLogger(LQ002Report.class);
 
 	@Autowired
 	LQ002ServiceImpl LQ002ServiceImpl;
@@ -67,7 +66,22 @@ public class LQ002Report extends MakeReport {
 	private void exportExcel_1(TitaVo titaVo, int year, int month, int qq) throws LogicException {
 		this.info("===========in exportExcel_1");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LQ002", "營建署季報貸款成數", "LQ002營建署季報貸款成數", "營建署季報-貸款成數結果.xls", "108年第3季營建署季報-貸款成數明細");
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LQ002";
+		String fileItem = "營建署季報貸款成數";
+		String fileName = "LQ002營建署季報貸款成數";
+		String defaultExcel = "營建署季報-貸款成數結果.xls";
+		String defaultSheet = "108年第3季營建署季報-貸款成數明細";
+
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LQ002", "營建署季報貸款成數", "LQ002營建署季報貸款成數", "營建署季報-貸款成數結果.xls", "108年第3季營建署季報-貸款成數明細");
 
 		makeExcel.setSheet("108年第3季營建署季報-貸款成數明細", year + "年第" + qq + "季營建署季報-貸款成數明細");
 
@@ -101,8 +115,7 @@ public class LQ002Report extends MakeReport {
 		double ltv = 0.00000000;
 		if (findList.size() > 0) {
 
-			// 格式
-			DecimalFormat fm1 = new DecimalFormat("#,##0");
+			new DecimalFormat("#,##0");
 
 			for (Map<String, String> tLDVo : findList) {
 				// 押品別1

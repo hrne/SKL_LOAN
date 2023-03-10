@@ -62,7 +62,7 @@ public class LD008Report extends MakeReport {
 
 		this.print(-1, 1, "程式ID：" + this.getParentTranCode());
 		this.print(-1, 84, "新光人壽保險股份有限公司", "C");
-		this.print(-1, 146, "機密等級：" + this.getRptSecurity());
+		this.print(-1, 146, "機密等級：" + this.getSecurity());
 		this.print(-2, 1, "報　表：" + this.getRptCode());
 		this.print(-2, 84, this.getRptItem() + "--" + rptTypeItem, "C");
 		this.print(-2, 146, "日　　期：" + exportDate);

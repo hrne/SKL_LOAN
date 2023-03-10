@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LY004ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.parse.Parse;
 
 @Component
@@ -35,13 +36,13 @@ public class LY004Report extends MakeReport {
 		int entdyf = titaVo.getEntDyI() + 19110000;
 
 		int iYear = entdyf / 10000;
-
+		
 		int iMonth = entdyf % 10000;
-
-		if (iMonth != 12) {
+		
+		if(iMonth != 12) {
 			iYear = iYear - 1;
 		}
-
+		
 		int inputYearMonth = (iYear * 100) + 12;
 
 		List<Map<String, String>> lY004List = null;
@@ -54,13 +55,28 @@ public class LY004Report extends MakeReport {
 			this.error("LY004ServiceImpl.testExcel error = " + errors.toString());
 		}
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LY004", "非RBC_表14-4_會計部年度檢查報表", "LY004-非RBC_表14-4_會計部年度檢查報表", "LY004_底稿_非RBC_表14-4_會計部年度檢查報表.xlsx", "表14-4");
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LY004";
+		String fileItem = "非RBC_表14-4_會計部年度檢查報表";
+		String fileName = "LY004-非RBC_表14-4_會計部年度檢查報表";
+		String defaultExcel = "LY004_底稿_非RBC_表14-4_會計部年度檢查報表.xlsx";
+		String defaultSheet = "表14-4";
+
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LY004", "非RBC_表14-4_會計部年度檢查報表", "LY004-非RBC_表14-4_會計部年度檢查報表", "LY004_底稿_非RBC_表14-4_會計部年度檢查報表.xlsx", "表14-4");
 
 		// 通用處理
 		// 設定年月份
-		String iRoc = String.valueOf(inputYearMonth / 100 - 1911);
-		String iMon = String.valueOf(inputYearMonth % 100);
-		makeExcel.setValue(1, 1, String.format("新光人壽保險股份有限公司  %s年度(%s月)報表", iRoc, iMon));
+		String iRoc = String.valueOf(inputYearMonth/100 - 1911);
+		String iMon =String.valueOf(inputYearMonth% 100);
+		makeExcel.setValue(1, 1, String.format("新光人壽保險股份有限公司  %s年度(%s月)報表", iRoc,iMon));
 
 		if (lY004List != null && !lY004List.isEmpty()) {
 			// 有資料時處理
@@ -93,13 +109,13 @@ public class LY004Report extends MakeReport {
 		} else {
 			// 無資料時處理
 			makeExcel.setValue(6, 2, "本日無資料!!");
-
+			
 			return false;
 		}
 
-		makeExcel.close();
-
-		return true;
+		 makeExcel.close();
+		 
+		 return true;
 
 	}
 }

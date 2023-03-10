@@ -17,6 +17,7 @@ import com.st1.itx.db.service.springjpa.cm.LM059ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ExcelFontStyleVo;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -36,7 +37,7 @@ public class LM059Report extends MakeReport {
 	 * @param yearMonth    西元年月
 	 * @param yearMonthEnd 月底日
 	 */
-	public void exec(TitaVo titaVo, int yearMonth, int yearMonthEnd, int lyearMonth) throws LogicException {
+	public void exec(TitaVo titaVo, int yearMonth, int yearMonthEnd,int lyearMonth) throws LogicException {
 
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 
@@ -48,8 +49,24 @@ public class LM059Report extends MakeReport {
 		int iYYYMM = yearMonth - 191100;
 		int iDay = (yearMonthEnd - 19110000) % 100;
 		int ilYearMonth = lyearMonth;
+		
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LM059";
+		String fileItem = "表F22_會計部申報表";
+		String fileName = "LM059-表F22_會計部申報表_" + iYYYMM;
+		String defaultExcel = "LM059_底稿_表F22_會計部申報表.xlsx";
+		String defaultSheet = "108.04.30";
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM059", "表F22_會計部申報表", "LM059-表F22_會計部申報表_" + iYYYMM, "LM059_底稿_表F22_會計部申報表.xlsx", "108.04.30");
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM059", "表F22_會計部申報表",
+//				"LM059-表F22_會計部申報表_" + iYYYMM, "LM059_底稿_表F22_會計部申報表.xlsx", "108.04.30");
 
 		makeExcel.setSheet("108.04.30", iYear + "." + iMonth + "." + iDay);
 
@@ -62,7 +79,7 @@ public class LM059Report extends MakeReport {
 		makeExcel.setValue(2, 5, "民國" + iYear + "年" + iMonth + "月" + iDay + "日", tmpStyle);
 
 		try {
-			fnAllList = lM059ServiceImpl.findAll(titaVo, yearMonth, ilYearMonth);
+			fnAllList = lM059ServiceImpl.findAll(titaVo, yearMonth,ilYearMonth);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -80,9 +97,12 @@ public class LM059Report extends MakeReport {
 		if (fnAllList.size() > 0) {
 			Map<String, String> tLDVo = fnAllList.get(0);
 
-			BigDecimal loanBal = tLDVo.get("F0") == null || tLDVo.get("F0").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F0"));
-			BigDecimal badDebt = tLDVo.get("F1") == null || tLDVo.get("F1").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F1"));
-			BigDecimal loanNet = tLDVo.get("F2") == null || tLDVo.get("F2").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F2"));
+			BigDecimal loanBal = tLDVo.get("F0") == null || tLDVo.get("F0").isEmpty() ? BigDecimal.ZERO
+					: new BigDecimal(tLDVo.get("F0"));
+			BigDecimal badDebt = tLDVo.get("F1") == null || tLDVo.get("F1").isEmpty() ? BigDecimal.ZERO
+					: new BigDecimal(tLDVo.get("F1"));
+			BigDecimal loanNet = tLDVo.get("F2") == null || tLDVo.get("F2").isEmpty() ? BigDecimal.ZERO
+					: new BigDecimal(tLDVo.get("F2"));
 
 			makeExcel.setValue(45, 4, loanBal, "#,##0", "R", tmpStyle2);
 			makeExcel.setValue(46, 4, loanBal, "#,##0", "R", tmpStyle2);

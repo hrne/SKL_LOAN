@@ -63,7 +63,7 @@ public class LM084Report extends MakeReport {
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String reportItem = this.txnm;
-		String security = "";
+		String security = this.getSecurity();
 		String pageSize = "A4";
 		String pageOrientation = "P";
 

@@ -421,9 +421,15 @@ T(3,CdCode.Currency)
 
 #CurrencyHelp=x,1024,S
 
+#CDDEF10=x,26,S
+T(3,CdCode.GovOfferCode)
+
+#GovOfferCodeHelp=x,1024,S
+
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05,#CDDEF06,#CDDEF07,#CDDEF08,#CDDEF09)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05,#CDDEF06,#CDDEF07,#CDDEF08,#CDDEF09,#CDDEF10)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@EnableFgHelp,#HelpDesc1)
@@ -435,6 +441,7 @@ T(2,@StatusCodeHelp,#HelpDesc6)
 T(2,@RateTypeHelp,#HelpDesc7)
 T(2,@CurrPrecisionHelp,#HelpDesc8)
 T(2,@CurrencyHelp,#HelpDesc9)
+T(2,@GovOfferCodeHelp,#HelpDesc10)
 
 !FuncCode
 #FuncCodeHelp=x,30,S
@@ -668,7 +675,7 @@ T(H,@StepRateTypeX{n},#StepRateType{n},#RateTypeHelp)
 ##end
 T(H,@AgreementFgX,#AgreementFg,#YesNoHelp) 
 T(H,@EnterpriseFgX,#EnterpriseFg,#EnterpriseHELP)
-T(H,@GovOfferFlagX,#GovOfferFlag,#YesNoHelp) 
+T(H,@GovOfferFlagX,#GovOfferFlag,#GovOfferCodeHelp) 
 T(H,@FinancialFlagX,#FinancialFlag,#YesNoHelp) 
 T(H,@BreachGetCodeX,#BreachGetCode,#BreachGetCodeHelp)
 T(H,@BreachCodeX,#BreachCode,#ProdBreachCodeHelp)
@@ -888,7 +895,7 @@ T(F,@UsHandlingFee{n},0)
 ##end
 
 #INITP2=X,1,S
-T(H,@GovOfferFlagX,#GovOfferFlag,#YesNoHelp) 
+T(H,@GovOfferFlagX,#GovOfferFlag,#GovOfferCodeHelp) 
 T(H,@FinancialFlagX,#FinancialFlag,#YesNoHelp) 
 T(H,@EmpFlagX,#EmpFlag,#YesNoHelp) 
 
@@ -1027,8 +1034,6 @@ C(3,#FuncCode,1,T(3,TWD),$)
 
 #Precision=N,1,S
 T(H,#CurrencyCode,#CurrPrecisionHelp)
-
-
 ![政府優惠房貸]
 #FdGovOfferFlag=X,2,L
 
@@ -1036,12 +1041,12 @@ T(H,#CurrencyCode,#CurrPrecisionHelp)
 C(3,#UpdateCode,1,$,s)
 C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#HIDE2FG,0,CALL(#HIDEP2),$)
-HELP(#YesNoHelp)
+HELP(#GovOfferCodeHelp)
 C(3,#FuncCode,1,C(4,#GovOfferFlag,T(3,N),$),$)
-@V(H,#YesNoHelp)
+@V(H,#GovOfferCodeHelp)
 
-#GovOfferFlagX=X,2,L
-T(H,#GovOfferFlag,#YesNoHelp) 
+#GovOfferFlagX=x,40,L
+T(H,#GovOfferFlag,#GovOfferCodeHelp) 
 
 
 ![理財型房貸]

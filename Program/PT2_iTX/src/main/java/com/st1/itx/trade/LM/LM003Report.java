@@ -267,7 +267,7 @@ public class LM003Report extends MakeReport {
 
 		this.setFontSize(7);
 
-		this.print(-5, rightPos, "機密等級：密");
+		this.print(-5, rightPos, "機密等級："+this.getSecurity());
 
 		this.print(-6, rightPos, "單位：億元");
 

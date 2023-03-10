@@ -79,7 +79,7 @@ public class LM008Report extends MakeReport {
 		headerStyleVo.setBold(true);
 
 		// 第1列
-		makeExcel.setValue(row, 9, "機密等級：密", "L", headerStyleVo);// col:8
+		makeExcel.setValue(row, 9, "機密等級："+this.getSecurity(), "L", headerStyleVo);// col:8
 		row++;
 
 		// 第2列

@@ -38,7 +38,7 @@ public class LM009Report extends MakeReport {
 	private void printHeaderP() {
 		this.print(-1, 1, "程式ID：" + this.getParentTranCode());
 		this.print(-1, 50, "新光人壽保險股份有限公司", "C");
-		this.print(-1, 80, "機密等級：機密");
+		this.print(-1, 80, "機密等級："+this.getSecurity());
 		this.print(-2, 1, "報  表：" + this.getRptCode());
 		this.print(-2, 50, "應 收 利 息 總 表", "C");
 		this.print(-2, 80, "日　　期：" + this.showBcDate(dDateUtil.getNowStringBc(), 1));
@@ -58,7 +58,7 @@ public class LM009Report extends MakeReport {
 		String brno = titaVo.getBrno();
 		String reportCode = "LM009";
 		String reportItem = "應收利息總表";		
-		String security = "密";
+		String security = this.getSecurity();
 		String pageSize = "A4";
 		String pageOrientation = "P";
 

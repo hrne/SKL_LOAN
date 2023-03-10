@@ -102,7 +102,7 @@ public class LM044Report extends MakeReport {
 		makeExcel.setSheet("10804_地區逾放比", iEntdy / 100 + "_地區逾放比");
 
 		makeExcel.setValue(1, 2,
-				iEntdy / 100 + "  地區 / 區域中心逾比及分級管理逾放比明細表                                                   密等:密");
+				iEntdy / 100 + "  地區 / 區域中心逾比及分級管理逾放比明細表                                                   密等:"+this.getSecurity());
 		int thirdMonth = iEntdy / 100;
 		int secondMonth = thirdMonth - 1;
 		if (secondMonth % 13 == 0) {

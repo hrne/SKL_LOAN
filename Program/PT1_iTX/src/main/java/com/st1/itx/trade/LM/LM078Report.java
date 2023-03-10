@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM078ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -26,7 +27,7 @@ public class LM078Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
-
+	
 	private static final BigDecimal hundredMillion = new BigDecimal("100000000");
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
@@ -38,7 +39,7 @@ public class LM078Report extends MakeReport {
 		List<Map<String, String>> lLM078 = null;
 
 		try {
-			lLM078 = lM077ServiceImpl.findAll(titaVo, iAcDate / 100);
+			lLM078 = lM077ServiceImpl.findAll(titaVo, iAcDate/100);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -59,10 +60,25 @@ public class LM078Report extends MakeReport {
 
 		this.info("LM078Report exportExcel");
 		int entdy = date - 19110000; // expects date to be in BC Date format.
-		String YearMonth = entdy / 10000 + " 年 " + String.format("%02d", date / 100 % 100) + " 月";
+		String YearMonth = entdy/10000 + " 年 " + String.format("%02d", date / 100 % 100) + " 月";
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM078", "B044「借款戶向金融機構申請並經錄案」之不動產抵押貸款案件辦理情形", "LM078_B044「借款戶向金融機構申請並經錄案」之不動產抵押貸款案件辦理情形" + showRocDate(entdy, 0).substring(0, 7),
-				"LM078_底稿_B044「借款戶向金融機構申請並經錄案」之不動產抵押貸款案件辦理情形.xlsx", 1, "FOA");
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LD010";
+		String fileItem = "B044「借款戶向金融機構申請並經錄案」之不動產抵押貸款案件辦理情形";
+		String fileName = "LM078_B044「借款戶向金融機構申請並經錄案」之不動產抵押貸款案件辦理情形" + showRocDate(entdy, 0).substring(0, 7);
+		String defaultExcel = "LM078_底稿_B044「借款戶向金融機構申請並經錄案」之不動產抵押貸款案件辦理情形.xlsx";
+		String defaultSheet = "FOA";
+
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM078", "B044「借款戶向金融機構申請並經錄案」之不動產抵押貸款案件辦理情形", "LM078_B044「借款戶向金融機構申請並經錄案」之不動產抵押貸款案件辦理情形" + showRocDate(entdy, 0).substring(0, 7),
+//				"LM078_底稿_B044「借款戶向金融機構申請並經錄案」之不動產抵押貸款案件辦理情形.xlsx", 1, "FOA");
 
 		// 資料期間 E3
 		makeExcel.setValue(3, 5, "民國 " + YearMonth, "R");
@@ -91,8 +107,9 @@ public class LM078Report extends MakeReport {
 						// 07 - col 7~8 (+4)
 						// 08 - col 9~10 (+6)
 						// 09 - col 11~12 (+8)
-						// 10 - col 13~14 (+10)
-						switch (value) {
+						// 10 - col 13~14 (+10)						
+						switch (value)
+						{
 						case "01":
 						case "02":
 						case "03":
@@ -135,6 +152,6 @@ public class LM078Report extends MakeReport {
 		}
 
 		makeExcel.close();
-		// makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 }

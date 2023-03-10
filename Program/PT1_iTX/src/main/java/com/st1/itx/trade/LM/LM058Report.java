@@ -16,6 +16,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM058ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -37,20 +38,38 @@ public class LM058Report extends MakeReport {
 	 * 執行報表輸出
 	 * 
 	 * @param titaVo
-	 * @param yearMonth    西元年月
+	 * @param yearMonth 西元年月
 	 * @param yearMonthEnd 西元月底日
 	 */
-	public void exec(TitaVo titaVo, int yearMonth, int yearMonthEnd) throws LogicException {
+	public void exec(TitaVo titaVo, int yearMonth ,int yearMonthEnd) throws LogicException {
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 
 		this.info("LM058Report exec");
+
 
 		// 1110331
 		String dateRocYMD = String.valueOf(yearMonthEnd - 19110000);
 
 		this.info("dateRocYMD=" + dateRocYMD);
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM058", "表A19_會計部申報表", "LM058_表A19_會計部申報表_" + dateRocYMD.substring(0, 5), "LM058_底稿_表A19_會計部申報表.xlsx", "108.04");
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LM058";
+		String fileItem = "表A19_會計部申報表";
+		String fileName = "LM058_表A19_會計部申報表_" + dateRocYMD.substring(0, 5);
+		String defaultExcel = "LM058_底稿_表A19_會計部申報表.xlsx";
+		String defaultSheet = "108.04";
+
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM058", "表A19_會計部申報表",
+//				"LM058_表A19_會計部申報表_" + dateRocYMD.substring(0, 5), "LM058_底稿_表A19_會計部申報表.xlsx", "108.04");
 		makeExcel.setSheet("108.04", dateRocYMD.substring(0, 3) + "." + dateRocYMD.substring(3, 5));
 
 		try {
@@ -62,8 +81,9 @@ public class LM058Report extends MakeReport {
 		}
 
 		// 民國年月日
-		String date = "民國" + dateRocYMD.substring(0, 3).replaceFirst("^0", "") + "年" + dateRocYMD.substring(3, 5).replaceFirst("^0", "") + "月" + dateRocYMD.substring(5, 7).replaceFirst("^0", "")
-				+ "日";
+		String date = "民國" + dateRocYMD.substring(0, 3).replaceFirst("^0", "") + "年"
+				+ dateRocYMD.substring(3, 5).replaceFirst("^0", "") + "月"
+				+ dateRocYMD.substring(5, 7).replaceFirst("^0", "") + "日";
 
 		makeExcel.setValue(2, 2, date);
 

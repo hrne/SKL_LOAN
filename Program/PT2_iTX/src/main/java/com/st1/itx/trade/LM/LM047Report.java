@@ -14,6 +14,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM047ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.parse.Parse;
 
 @Component
@@ -37,11 +38,27 @@ public class LM047Report extends MakeReport {
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM047", "放款分期協議案件明細_內部控管", "LM047_放款分期協議案件明細_內部控管", "LM047放款分期協議案件明細_內部控管.xlsx", "協議控管表");
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LM047";
+		String fileItem = "介紹人換算業績報酬檢核表";
+		String fileName = "LM047_放款分期協議案件明細_內部控管";
+		String defaultExcel = "LM047放款分期協議案件明細_內部控管.xlsx";
+		String defaultSheet = "協議控管表";
+
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM047", "放款分期協議案件明細_內部控管",
+//				"LM047_放款分期協議案件明細_內部控管", "LM047放款分期協議案件明細_內部控管.xlsx", "協議控管表");
 
 		int iEntdy = parse.stringToInteger(titaVo.get("ENTDY"));
 		makeExcel.setValue(1, 2, "         " + iEntdy / 10000 + "年 " + iEntdy / 100 % 100 + "月 分期協議案件明細表");
-		makeExcel.setValue(1, 23, "機密等級：密\n單位：元\n" + this.showRocDate(6) + "止");
+		makeExcel.setValue(1, 23, "機密等級："+this.getSecurity()+"\n單位：元\n" + this.showRocDate(6) + "止");
 
 		List<Map<String, String>> LM047List = null;
 
@@ -56,7 +73,7 @@ public class LM047Report extends MakeReport {
 		}
 		exportExcel(LM047List);
 		makeExcel.close();
-		// makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 
 	private void exportExcel(List<Map<String, String>> LDList) throws LogicException {

@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM074ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.parse.Parse;
 
 @Component
@@ -24,13 +25,13 @@ public class LM074Report extends MakeReport {
 
 	@Autowired
 	LM074ServiceImpl lM074ServiceImpl;
-
+	
 	@Autowired
 	Parse parse;
 
 	@Autowired
 	MakeExcel makeExcel;
-
+	
 	private static final BigDecimal hundredMillion = new BigDecimal("100000000");
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
@@ -42,7 +43,7 @@ public class LM074Report extends MakeReport {
 		List<Map<String, String>> lLM074 = null;
 
 		try {
-			lLM074 = lM074ServiceImpl.findAll(titaVo, iAcDate / 100);
+			lLM074 = lM074ServiceImpl.findAll(titaVo, iAcDate/100);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -63,10 +64,25 @@ public class LM074Report extends MakeReport {
 
 		this.info("LM074Report exportExcel");
 		int entdy = date - 19110000; // expects date to be in BC Date format.
-		String YearMonth = entdy / 10000 + " 年 " + String.format("%02d", date / 100 % 100) + " 月";
+		String YearMonth = entdy / 10000 + " 年 " + String.format("%02d", date/100%100) + " 月";
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM074", "B040金融機構承作｢公司法人購置住宅貸款｣統計表", "LM074_B040金融機構承作｢公司法人購置住宅貸款｣統計表" + showRocDate(entdy, 0).substring(0, 7),
-				"LM074_底稿_B040金融機構承作｢公司法人購置住宅貸款｣統計表.xlsx", 1, "FOA");
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LM074";
+		String fileItem = "B040金融機構承作｢公司法人購置住宅貸款｣統計表";
+		String fileName = "LM074_B040金融機構承作｢公司法人購置住宅貸款｣統計表" + showRocDate(entdy, 0).substring(0, 7);
+		String defaultExcel = "LM074_底稿_B040金融機構承作｢公司法人購置住宅貸款｣統計表.xlsx";
+		String defaultSheet = "FOA";
+
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM074", "B040金融機構承作｢公司法人購置住宅貸款｣統計表", "LM074_B040金融機構承作｢公司法人購置住宅貸款｣統計表" + showRocDate(entdy, 0).substring(0, 7),
+//				"LM074_底稿_B040金融機構承作｢公司法人購置住宅貸款｣統計表.xlsx", 1, "FOA");
 
 		// 資料期間 E3
 		makeExcel.setValue(3, 5, "民國 " + YearMonth, "R");
@@ -136,6 +152,6 @@ public class LM074Report extends MakeReport {
 		}
 
 		makeExcel.close();
-		// makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 }

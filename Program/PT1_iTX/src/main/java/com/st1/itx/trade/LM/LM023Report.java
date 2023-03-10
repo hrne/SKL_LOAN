@@ -3,6 +3,7 @@ package com.st1.itx.trade.LM;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +16,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM023ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -34,7 +36,23 @@ public class LM023Report extends MakeReport {
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM023", "利息收入", "LM023_利息收入", "LM023_底稿_利息收入.xlsx", "利息收入");
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LM023";
+		String fileItem = "利息收入";
+		String fileName = "LM023_利息收入";
+		String defaultExcel = "LM023_底稿_利息收入.xlsx";
+		String defaultSheet = "利息收入";
+
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM023", "利息收入", "LM023_利息收入",
+//				"LM023_底稿_利息收入.xlsx", "利息收入");
 
 		List<Map<String, String>> lM023List = null;
 
@@ -77,7 +95,8 @@ public class LM023Report extends MakeReport {
 				dataSeq = Integer.valueOf(lM023List.get(i).get("F0")).toString();
 
 				// 利息金額
-				tempAmt = lM023List.get(i).get("F3").isEmpty() ? BigDecimal.ZERO : new BigDecimal(lM023List.get(i).get("F3"));
+				tempAmt = lM023List.get(i).get("F3").isEmpty() ? BigDecimal.ZERO
+						: new BigDecimal(lM023List.get(i).get("F3"));
 
 				// 欄位(月份判斷)
 				col = Integer.valueOf(lM023List.get(i).get("F2")) + 1;
@@ -127,7 +146,7 @@ public class LM023Report extends MakeReport {
 
 		}
 		makeExcel.close();
-		// makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 
 }

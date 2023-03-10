@@ -13,6 +13,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM052ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Service
 @Scope("prototype")
@@ -60,10 +61,28 @@ public class LM052Report extends MakeReport {
 		} else {
 			lastYM = thisYM - 1;
 		}
-
+		
 		List<Map<String, String>> lM052List = null;
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM052", "放款資產分類-會計部備呆計提", "LM052_放款資產分類-會計部備呆計提", "LM052_底稿_放款資產分類-會計部備呆計提.xlsx", "總表");
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LM052";
+		String fileItem = "放款資產分類-會計部備呆計提";
+		String fileName = "LM052_放款資產分類-會計部備呆計提";
+		String defaultExcel = "LM052_底稿_放款資產分類-會計部備呆計提.xlsx";
+		String defaultSheet = "總表";
+
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM052", "放款資產分類-會計部備呆計提", "LM052_放款資產分類-會計部備呆計提",
+//				"LM052_底稿_放款資產分類-會計部備呆計提.xlsx", "總表");
+
 
 		makeExcel.setValue(12, 9, iMonth + "月月報表數", "C");
 		makeExcel.setValue(14, 5, thisMonthEndDate, "C");
@@ -86,6 +105,7 @@ public class LM052Report extends MakeReport {
 				exportExcel2(lM052List, i);
 			}
 		}
+
 
 		makeExcel.close();
 

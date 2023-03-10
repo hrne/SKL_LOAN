@@ -15,13 +15,12 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM034ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
 
 public class LM034Report extends MakeReport {
-	// private static final Logger logger =
-	// LoggerFactory.getLogger(LM034Report.class);
 
 	@Autowired
 	LM034ServiceImpl lM034ServiceImpl;
@@ -43,8 +42,24 @@ public class LM034Report extends MakeReport {
 
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> listLM034) throws LogicException {
 		this.info("LM034Report exportExcel");
+		
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LM034";
+		String fileItem = "新增逾放案件明細";
+		String fileName = "LM034-新增逾放案件明細";
+		String defaultExcel = "LM034-新增逾放案件明細.xlsx";
+		String defaultSheet = "工作表1";
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM034", "新增逾放案件明細", "LM034-新增逾放案件明細", "LM034-新增逾放案件明細.xlsx", "工作表1", "D9701212");
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		makeExcel.setSheet(defaultSheet, "D9701212");
+
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM034", "新增逾放案件明細", "LM034-新增逾放案件明細", "LM034-新增逾放案件明細.xlsx", "工作表1", "D9701212");
 
 		// 今日
 		if (listLM034 != null && listLM034.size() != 0) {
@@ -78,14 +93,5 @@ public class LM034Report extends MakeReport {
 		}
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);
-	}
-
-	private boolean isStringCanBeParsedToInteger(String str) {
-		try {
-			Integer.parseInt(str);
-			return true;
-		} catch (NumberFormatException e) {
-			return false;
-		}
 	}
 }

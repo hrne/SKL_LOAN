@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM046ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.parse.Parse;
 
 @Component
@@ -41,7 +42,23 @@ public class LM046Report extends MakeReport {
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM046", "年度擔保放款信用風險分析_內部控管", "LM046_年度擔保放款信用風險分析_內部控管", "LM046年度擔保放款信用風險分析_內部控管.xlsx", "衡式");
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LM046";
+		String fileItem = "年度擔保放款信用風險分析_內部控管";
+		String fileName = "LM046_年度擔保放款信用風險分析_內部控管";
+		String defaultExcel = "LM046年度擔保放款信用風險分析_內部控管.xlsx";
+		String defaultSheet = "衡式";
+
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM046", "年度擔保放款信用風險分析_內部控管",
+//				"LM046_年度擔保放款信用風險分析_內部控管", "LM046年度擔保放款信用風險分析_內部控管.xlsx", "衡式");
 
 		String yy = titaVo.get("ENTDY").substring(1, 4);
 		String mm = titaVo.get("ENTDY").substring(4, 6);
@@ -93,9 +110,11 @@ public class LM046Report extends MakeReport {
 
 			makeExcel.setValue(4 + count, 1, tLDVo.get("F0"));
 			makeExcel.setValue(4 + count, 3, computeDivide(bd[2].add(bd[8]), thousand, 0), "#,##0");
-			makeExcel.setValue(4 + count, 6, computeDivide(bd[4].add(bd[6]).add(bd[10]).add(bd[12]), thousand, 0), "#,##0");
+			makeExcel.setValue(4 + count, 6, computeDivide(bd[4].add(bd[6]).add(bd[10]).add(bd[12]), thousand, 0),
+					"#,##0");
 			makeExcel.setValue(4 + count, 9, bd[3].add(bd[5]).add(bd[9]).add(bd[11]), "#,##0");
-			makeExcel.setValue(4 + count, 11, computeDivide(bd[4].add(bd[6]).add(bd[10]).add(bd[12]), bd[2].add(bd[8]), 5), "0.00%");
+			makeExcel.setValue(4 + count, 11,
+					computeDivide(bd[4].add(bd[6]).add(bd[10]).add(bd[12]), bd[2].add(bd[8]), 5), "0.00%");
 
 			// 第二區塊
 

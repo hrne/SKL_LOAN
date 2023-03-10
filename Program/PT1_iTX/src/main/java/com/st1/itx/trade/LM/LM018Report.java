@@ -14,6 +14,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM018ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -30,35 +31,36 @@ public class LM018Report extends MakeReport {
 
 	@Autowired
 	Parse parse;
-
+	
+	
 	// 調整的訣竅:
 	// 先對準表格, 再對準字
 	// 字的位置會被表格Shift影響到
-
+	
 	// 字體大小
 	private int fontSize = 10;
-
+	
 	// 最左欄寬度
 	private int shiftFromLegends = 22;
-
+	
 	// 每季寬度
 	private int shiftPerSeason = 20;
-
+	
 	// 主表格與最後小計表格之間的留白
 	private int shiftBeforeSum = 14;
-
+	
 	// 主表格餘額shift (負數:因為是先向右畫好表格再回頭填數字)
 	private int shiftMainBal = -14;
-
+	
 	// 主表格利收shift (負數:因為是先向右畫好表格再回頭填數字)
 	private int shiftMainInt = -4;
-
+	
 	// 主表格年月shift
 	private int shiftYearMonth = 11;
-
+	
 	// 小計表格餘額shift
 	private int shiftSumBal = 9;
-
+	
 	// 小計表格利收shift
 	private int shiftSumInt = 25;
 
@@ -79,7 +81,7 @@ public class LM018Report extends MakeReport {
 
 		this.setFontSize(fontSize);
 
-		this.print(-5, 138, "機密等級：密", "R");
+		this.print(-5, 138, "機密等級："+this.getSecurity(), "R");
 		this.print(-6, 138, "單位：億元　", "R");
 
 		this.setCharSpaces(0);
@@ -87,7 +89,8 @@ public class LM018Report extends MakeReport {
 	}
 
 	private static enum subject {
-		AA("AA", -17, false), IA("IA", -20, true), IB("IB", -23, true), IC("IC", -26, true), ID("ID", -29, true), IF("IF", -32, true), IH("IH", -35, true), ZZ("ZZ", -38, true);
+		AA("AA", -17, false), IA("IA", -20, true), IB("IB", -23, true), IC("IC", -26, true), ID("ID", -29, true),
+		IF("IF", -32, true), IH("IH", -35, true), ZZ("ZZ", -38, true);
 
 		String name;
 		int printY;
@@ -114,7 +117,15 @@ public class LM018Report extends MakeReport {
 	}
 
 	public void exec(TitaVo titaVo) throws LogicException {
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM018", "專案放款餘額及利息收入", "密", "", "L");
+		
+		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
+				.setRptCode("LM018").setRptItem("專案放款餘額及利息收入").setRptSize("A4")
+				.setSecurity(this.getSecurity()).setPageOrientation("L").build();
+
+		
+		this.open(titaVo, reportVo);
+		
+//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM018", "專案放款餘額及利息收入", "密", "", "L");
 
 		List<Map<String, String>> LM018List = null;
 		try {
@@ -139,7 +150,7 @@ public class LM018Report extends MakeReport {
 
 		// draw start of the form
 
-		this.print(-9, xPivot + xShift, "┌──────────");
+		this.print(-9,  xPivot + xShift, "┌──────────");
 		this.print(-10, xPivot + xShift, "│　　　　　　　　　　");
 		this.print(-11, xPivot + xShift, "│　　　　　　　　　　");
 		this.print(-12, xPivot + xShift, "├──────────");
@@ -191,7 +202,10 @@ public class LM018Report extends MakeReport {
 						this.print(-9, xPivot + xShift, "┬─────────");
 						this.print(-10, xPivot + xShift, "│　　　　　　　　　");
 						this.print(-11, xPivot + xShift, "│　　　　　　　　　");
-						this.print(-11, xPivot + xShift + shiftYearMonth, (parse.stringToInteger(LM018Vo.get("F1").substring(0, 4)) - 1911) + "年" + LM018Vo.get("F1").substring(4) + "月", "C");
+						this.print(-11, xPivot + xShift + shiftYearMonth,
+								(parse.stringToInteger(LM018Vo.get("F1").substring(0, 4)) - 1911) + "年"
+										+ LM018Vo.get("F1").substring(4) + "月",
+								"C");
 						this.print(-12, xPivot + xShift, "┼────┬────");
 						this.print(-13, xPivot + xShift, "│　　　　│　　　　");
 						this.print(-14, xPivot + xShift, "│　餘額　│　利收　");
@@ -231,7 +245,10 @@ public class LM018Report extends MakeReport {
 						this.print(-9, xPivot + xShift, "┬─────────");
 						this.print(-10, xPivot + xShift, "│　　　　　　　　　");
 						this.print(-11, xPivot + xShift, "│　　　　　　　　　");
-						this.print(-11, xPivot + xShift + shiftYearMonth, (parse.stringToInteger(LM018Vo.get("F1").substring(0, 4)) - 1911) + "年" + LM018Vo.get("F1").substring(4) + "月", "C");
+						this.print(-11, xPivot + xShift + shiftYearMonth,
+								(parse.stringToInteger(LM018Vo.get("F1").substring(0, 4)) - 1911) + "年"
+										+ LM018Vo.get("F1").substring(4) + "月",
+								"C");
 						this.print(-12, xPivot + xShift, "┼────┬────");
 						this.print(-13, xPivot + xShift, "│　　　　│　　　　");
 						this.print(-14, xPivot + xShift, "│　餘額　│　利收　");
@@ -331,7 +348,7 @@ public class LM018Report extends MakeReport {
 
 		// draw the end of the form and right-side total
 
-		this.print(-9, xPivot + xShift, "┐");
+		this.print(-9 , xPivot + xShift, "┐");
 		this.print(-10, xPivot + xShift, "│");
 		this.print(-11, xPivot + xShift, "│");
 		this.print(-12, xPivot + xShift, "┤");

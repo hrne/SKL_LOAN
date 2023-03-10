@@ -17,6 +17,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM061ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -50,16 +51,33 @@ public class LM061Report extends MakeReport {
 		int iDay = (yearMonthEnd - 19110000) % 100;
 //		int iYYYMM = yearMonth - 191100;
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM061", "逾清償期二年案件追蹤控管表", "LM061_逾清償期二年案件追蹤控管表", "LM061-逾清償期二年案件追蹤控管表.xlsx", "1080430");
+		
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LM061";
+		String fileItem = "逾清償期二年案件追蹤控管表";
+		String fileName = "LM061_逾清償期二年案件追蹤控管表";
+		String defaultExcel = "LM061-逾清償期二年案件追蹤控管表.xlsx";
+		String defaultSheet = "1080430";
+
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM061", "逾清償期二年案件追蹤控管表", "LM061_逾清償期二年案件追蹤控管表",
+//				"LM061-逾清償期二年案件追蹤控管表.xlsx", "1080430");
 
 		String iENTDY = titaVo.get("ENTDY");
 
 		makeExcel.setSheet("1080430", iENTDY.substring(1, 8));
 
-		makeExcel.setValue(1, 23, "機密等級：機密\n單位：元\n" + iYear + "." + iMonth + "." + iDay + "止");
+		makeExcel.setValue(1, 23, "機密等級："+this.getSecurity()+"\n單位：元\n" + iYear + "." + iMonth + "." + iDay + "止");
 
 		try {
-			fnAllList = lM061ServiceImpl.findAll(titaVo, yearMonth, yearMonthEnd);
+			fnAllList = lM061ServiceImpl.findAll(titaVo,yearMonth,yearMonthEnd);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -111,7 +129,8 @@ public class LM061Report extends MakeReport {
 				makeExcel.setValue(row, 2, num);
 
 				// 轉催收金額
-				BigDecimal ovduBal = tLDVo.get("F3") == null || tLDVo.get("F3").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F3"));
+				BigDecimal ovduBal = tLDVo.get("F3") == null || tLDVo.get("F3").isEmpty() ? BigDecimal.ZERO
+						: new BigDecimal(tLDVo.get("F3"));
 
 				this.info("tLDVo:" + tLDVo);
 
@@ -120,33 +139,43 @@ public class LM061Report extends MakeReport {
 //						tLDVo.get("F0").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F0")), "R");
 
 				// 額度
-				makeExcel.setValue(row, 4, tLDVo.get("F1").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F1")), "R");
+				makeExcel.setValue(row, 4,
+						tLDVo.get("F1").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F1")), "R");
 
 				// 戶名
 //				makeExcel.setValue(row, 5, tLDVo.get("F2"), "R");
 
 				// 核貸金額
-				makeExcel.setValue(row, 6, tLDVo.get("F3").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F3")), "$* #,##0", "R");
+				makeExcel.setValue(row, 6,
+						tLDVo.get("F3").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F3")), "$* #,##0", "R");
 
 				// 轉催收本息
-				makeExcel.setValue(row, 7, tLDVo.get("F4").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F4")), "$* #,##0", "R");
+				makeExcel.setValue(row, 7,
+						tLDVo.get("F4").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F4")), "$* #,##0", "R");
 
 				// 催收款餘額
-				makeExcel.setValue(row, 8, tLDVo.get("F5").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F5")), "$* #,##0", "R");
+				makeExcel.setValue(row, 8,
+						tLDVo.get("F5").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F5")), "$* #,##0", "R");
 
 				// 繳息迄日
-				makeExcel.setValue(row, 9, tLDVo.get("F6").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F6")), "R");
+				makeExcel.setValue(row, 9,
+						tLDVo.get("F6").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F6")), "R");
 
 				// 利率
-				makeExcel.setValue(row, 10, tLDVo.get("F7").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F7")), "0.0000", "R");
+				makeExcel.setValue(row, 10,
+						tLDVo.get("F7").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F7")), "0.0000", "R");
 
 				// 到期日
-				makeExcel.setValue(row, 11, tLDVo.get("F8").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F8")), "R");
+				makeExcel.setValue(row, 11,
+						tLDVo.get("F8").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F8")), "R");
 				// 轉催收日
-				makeExcel.setValue(row, 12, tLDVo.get("F9").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F9")), "R");
+				makeExcel.setValue(row, 12,
+						tLDVo.get("F9").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F9")), "R");
 
 				// 轉呆金額
-				makeExcel.setValue(row, 17, tLDVo.get("F13").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F13")), "$* #,##0", "R");
+				makeExcel.setValue(row, 17,
+						tLDVo.get("F13").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F13")), "$* #,##0",
+						"R");
 
 				// 擔保品坐落
 				makeExcel.setValue(row, 20, tLDVo.get("F14"), "R");
@@ -177,12 +206,16 @@ public class LM061Report extends MakeReport {
 				// 代號 77 協議達成
 				if (tLDVo.get("F12").equals("077")) {
 					makeExcel.setValue(row, 18, " ", "C");
-					makeExcel.setValue(row, 19, tLDVo.get("F11").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F11")), "$* #,##0", "R");
+					makeExcel.setValue(row, 19,
+							tLDVo.get("F11").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F11")), "$* #,##0",
+							"R");
 				}
 
 				// 代號 901 拍定不足額
 				if (tLDVo.get("F12").equals("901")) {
-					makeExcel.setValue(row, 16, tLDVo.get("F11").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F11")), "$* #,##0", "R");
+					makeExcel.setValue(row, 16,
+							tLDVo.get("F11").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F11")), "$* #,##0",
+							"R");
 				}
 
 				row++;

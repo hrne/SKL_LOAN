@@ -61,7 +61,7 @@ public class LD009Report extends MakeReport {
 		this.print(-1, 1, "程式ID  ：" + this.getParentTranCode());
 		this.print(-2, 1, "報表代號：" + this.getRptCode());
 
-		this.print(-1, 150, "機密等級：" + this.getRptSecurity());
+		this.print(-1, 150, "機密等級：" + this.getSecurity());
 		this.print(-2, 150, "日　　期：" + showBcDate(this.nowDate, 1));
 		this.print(-3, 150, "時　　間：" + showTime(this.nowTime));
 		this.print(-4, 150, "頁　　數：" + this.getNowPage());

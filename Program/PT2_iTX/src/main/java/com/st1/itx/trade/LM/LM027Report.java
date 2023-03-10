@@ -16,6 +16,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM027ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 
 @Component
@@ -58,9 +59,24 @@ public class LM027Report extends MakeReport {
 		String ROCyymmdd = titaVo.get("ENTDY").substring(1, 4) + "." + titaVo.get("ENTDY").substring(4, 6) + "." + titaVo.get("ENTDY").substring(6, 8);
 
 		this.info("ROCyymm=" + ROCyymm);
+		
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LM027";
+		String fileItem = "轉銷呆帳備忘錄";
+		String fileName = "LM027_轉銷呆帳備忘錄";
+		String defaultSheet = sheetROCyymm;
+
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName);
+		makeExcel.setSheet("LM027", defaultSheet);
 
 //		"LM027轉銷呆帳備忘錄.xls"
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM027", "轉銷呆帳備忘錄", "LM027_轉銷呆帳備忘錄", sheetROCyymm);
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM027", "轉銷呆帳備忘錄", "LM027_轉銷呆帳備忘錄", sheetROCyymm);
 
 		// 調整欄寬
 		makeExcel.setWidth(1, 18);
@@ -142,7 +158,7 @@ public class LM027Report extends MakeReport {
 					custNo = String.format("%07d", Integer.parseInt(tLM027Vo.get("F0")));
 //					this.info("custNo=" + custNo); 65000 64000
 
-					makeExcel.setValue(row, 1, Integer.parseInt(tLM027Vo.get("F0")), "0000000", "C");
+					makeExcel.setValue(row, 1, Integer.parseInt(tLM027Vo.get("F0")),"0000000", "C");
 
 					makeExcel.setValue(row, 2, tLM027Vo.get("F1"), "C");
 
@@ -247,7 +263,7 @@ public class LM027Report extends MakeReport {
 		makeExcel.setMergedRegionValue(row + 13, row + 13, 1, 4, "", "C");
 
 		makeExcel.close();
-		// makeExcel.toExcel(closeExcel);
+		//makeExcel.toExcel(closeExcel);
 
 	}
 

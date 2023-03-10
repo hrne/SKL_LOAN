@@ -114,8 +114,6 @@ T(1,@CustNo,#NTXBUF,11,7)
 ! INVOKEJS(SHOW,L4041_4,1),
 ! INVOKEJS(SHOW,L4041_4,0))
 
-
-
 ! 功能
 #FunctionCode=A,1,I
 HELP(#FunctionHelp)
@@ -299,7 +297,7 @@ T(6A,#OOAuthCreateDate+#OOAuthApplCode+#OOCustNo+#OOPostDepCode+#OORepayAcct+#OO
 #batch-rows-error=X,2,S
 
 !#batch-row-status 該列傳送狀態
-#batch-row-status=X,50,S
+#batch-row-status=X,100,S
 
 !#batch-row-txtno 該列傳送序號
 #batch-row-txtno=X,18,O
@@ -354,8 +352,8 @@ ifxBatch:{
 	rim:'L441A',
 	txtno:'#secret-no',
 	pfnx:"L4041.PFNX",
-	col_captions:["交易序號","取消狀態"],
-	col_names:["#batch-row-txtno","#batch-row-status"]
+	col_captions:["戶號","額度","帳戶別","扣款帳號","取消狀態"],
+	col_names:["#OOCustNo","#OOFacmNo","#OOPostDepCodeX","#OORepayAcct","#batch-row-status"]
 	}
 }
 #secret-no
@@ -384,8 +382,8 @@ ifxBatch:{
 	rim:'L441A',
 	txtno:'#secret-no',
 	pfnx:"L4041.PFNX",
-	col_captions:["交易序號","交易狀態"],
-	col_names:["#batch-row-txtno","#batch-row-status"]
+	col_captions:["戶號","額度","帳戶別","扣款帳號","交易狀態"],
+	col_names:["#OOCustNo","#OOFacmNo","#OOPostDepCodeX","#OORepayAcct","#batch-row-status"]
 	}
 }
 #secret-no
@@ -415,8 +413,8 @@ ifxBatch:{
 	rim:'L441A',
 	txtno:'#secret-no',
 	pfnx:"L4041.PFNX",
-	col_captions:["交易序號","交易狀態"],
-	col_names:["#batch-row-txtno","#batch-row-status"]
+	col_captions:["戶號","額度","帳戶別","扣款帳號","交易狀態"],
+	col_names:["#OOCustNo","#OOFacmNo","#OOPostDepCodeX","#OORepayAcct","#batch-row-status"]
 	}
 }
 #secret-no

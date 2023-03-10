@@ -15,14 +15,13 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM017ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 
 @Component
 @Scope("prototype")
 
 public class LM017Report extends MakeReport {
-	// private static final Logger logger =
-	// LoggerFactory.getLogger(LM017Report.class);
 
 	@Autowired
 	LM017ServiceImpl lM017ServiceImpl;
@@ -44,7 +43,7 @@ public class LM017Report extends MakeReport {
 	}
 
 	public void printHeaderL() {
-		this.print(-3, 95, "本表每月5日上午10時前報送　機密等級：密");
+		this.print(-3, 95, "本表每月5日上午10時前報送　機密等級："+this.getSecurity());
 		this.print(-4, 8, "新光人壽承作「購置高價住宅貸款」統計表（包含自然人及公司法人）　");
 		this.print(-6, 4, "資料期間：　　　　" + showRocDate(this.getReportDate()).substring(0, 7));
 		this.print(-8, 4, "表號：　　　　　　" + this.getRptCode());
@@ -52,7 +51,14 @@ public class LM017Report extends MakeReport {
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM017", "金融機構承作購置高價住宅貸款統計", "密", "", "L");
+		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
+				.setRptCode("LM017").setRptItem("金融機構承作購置高價住宅貸款統計").setRptSize("A4")
+				.setSecurity(this.getSecurity()).setPageOrientation("L").build();
+
+		
+		this.open(titaVo, reportVo);
+		
+//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM017", "金融機構承作購置高價住宅貸款統計", "密", "", "L");
 
 		List<Map<String, String>> LM017List = null;
 		try {

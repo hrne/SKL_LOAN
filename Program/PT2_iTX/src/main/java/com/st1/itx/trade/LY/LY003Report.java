@@ -3,6 +3,7 @@ package com.st1.itx.trade.LY;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +16,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LY003ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component("LY003Report")
 @Scope("prototype")
@@ -36,7 +38,23 @@ public class LY003Report extends MakeReport {
 
 		this.info("LY003.exportExcel active");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LY003", "非RBC_表14-2_會計部年度檢查報表", "LY003-非RBC_表14-2_會計部年度檢查報表", "LY003_底稿_非RBC_表14-2_會計部年度檢查報表.xlsx", "表14-2");
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LY003";
+		String fileItem = "非RBC_表14-2_會計部年度檢查報表";
+		String fileName = "LY003-非RBC_表14-2_會計部年度檢查報表";
+		String defaultExcel = "LY003_底稿_非RBC_表14-2_會計部年度檢查報表.xlsx";
+		String defaultSheet = "表14-2";
+
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LY003", "非RBC_表14-2_會計部年度檢查報表",
+//				"LY003-非RBC_表14-2_會計部年度檢查報表", "LY003_底稿_非RBC_表14-2_會計部年度檢查報表.xlsx", "表14-2");
 
 		int rocYear = Integer.valueOf(titaVo.getParam("RocYear"));
 		int rocMonth = 12;
@@ -51,28 +69,29 @@ public class LY003Report extends MakeReport {
 
 		try {
 			int recordNo = 0;
-
+			
 			for (int f = 1; f <= 3; f++) {
 
 				lY003List = lY003ServiceImpl.findAll(titaVo, f, endOfYearMonth);
-
+			
 				if (lY003List.size() == 0) {
 
 					recordNo++;
 
 					isNotEmpty = recordNo == 3 ? false : true;
 				}
-
+				
 				exportExcel(lY003List, f);
 
 			}
-
+			
+			
 			lY003List = lY003ServiceImpl.findAll2(titaVo, endOfYearMonth);
 			reportExcel14_2(lY003List);
-
+			
 			lY003List = lY003ServiceImpl.findAll3(titaVo, endOfYearMonth);
 			reportExcelA142(lY003List);
-
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			StringWriter errors = new StringWriter();
@@ -90,6 +109,8 @@ public class LY003Report extends MakeReport {
 
 		int row = 0;
 
+
+
 		// 估計總值為人工
 //		BigDecimal evaAmt = BigDecimal.ZERO;
 		BigDecimal lineAmt = BigDecimal.ZERO;
@@ -99,13 +120,17 @@ public class LY003Report extends MakeReport {
 
 			switch (formNum) {
 			case 1:
-				row = "A".equals(tLDVo.get("TYPE")) ? 6 : "B".equals(tLDVo.get("TYPE")) ? 7 : "C".equals(tLDVo.get("TYPE")) ? 8 : "D".equals(tLDVo.get("TYPE")) ? 9 : 10;
+				row = "A".equals(tLDVo.get("TYPE")) ? 6
+						: "B".equals(tLDVo.get("TYPE")) ? 7
+								: "C".equals(tLDVo.get("TYPE")) ? 8 : "D".equals(tLDVo.get("TYPE")) ? 9 : 10;
 				break;
 			case 2:
-				row = "A".equals(tLDVo.get("TYPE")) ? 14 : "B".equals(tLDVo.get("TYPE")) ? 15 : "C".equals(tLDVo.get("TYPE")) ? 16 : 17;
+				row = "A".equals(tLDVo.get("TYPE")) ? 14
+						: "B".equals(tLDVo.get("TYPE")) ? 15 : "C".equals(tLDVo.get("TYPE")) ? 16 : 17;
 				break;
 			case 3:
-				row = "A".equals(tLDVo.get("TYPE")) ? 19 : "B".equals(tLDVo.get("TYPE")) ? 20 : "C".equals(tLDVo.get("TYPE")) ? 21 : 22;
+				row = "A".equals(tLDVo.get("TYPE")) ? 19
+						: "B".equals(tLDVo.get("TYPE")) ? 20 : "C".equals(tLDVo.get("TYPE")) ? 21 : 22;
 				break;
 
 			default:
@@ -116,6 +141,7 @@ public class LY003Report extends MakeReport {
 			lineAmt = tLDVo.get("LineAmt").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("LineAmt"));
 			loanAmt = tLDVo.get("LoanBalance").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("LoanBalance"));
 
+		
 //			makeExcel.setValue(row, 4, evaAmt, "#,##0");
 			makeExcel.setValue(row, 5, lineAmt, "#,##0");
 			makeExcel.setValue(row, 8, loanAmt, "#,##0");
@@ -148,7 +174,7 @@ public class LY003Report extends MakeReport {
 		}
 
 		// 重整公式 下方表格
-
+		
 		for (int y = 3; y <= 9; y++) {
 			makeExcel.formulaCalculate(y, 83);
 			makeExcel.formulaCalculate(y, 84);
@@ -156,7 +182,8 @@ public class LY003Report extends MakeReport {
 			makeExcel.formulaCalculate(y, 86);
 			makeExcel.formulaCalculate(y, 87);
 		}
-
+		
+		
 		for (int x = 3; x <= 10; x++) {
 			makeExcel.formulaCalculate(88, x);
 		}
@@ -164,18 +191,22 @@ public class LY003Report extends MakeReport {
 			makeExcel.formulaCalculate(y, 10);
 		}
 
+			
+	
+		
+		
+
 		// 暫缺 列68 列69 的值 (從LM054 55找)
 		// 缺壽險貸款
 		// 擔保品 壽險貸款
 		// 缺業主權益 資金總額 上年度業主權益
 
 	}
-
+	
 	/**
 	 * 報表輸出 表14-2
-	 * 
 	 * @param listData
-	 */
+	 * */
 	private void reportExcel14_2(List<Map<String, String>> listData) throws LogicException {
 
 		this.info("LY003report.reportExcel14_2");
@@ -185,6 +216,7 @@ public class LY003Report extends MakeReport {
 		int row = 0;
 		int col = 0;
 		BigDecimal tempAmt = BigDecimal.ZERO;
+
 
 		for (Map<String, String> lY003Vo : listData) {
 
@@ -241,6 +273,7 @@ public class LY003Report extends MakeReport {
 
 		makeExcel.setSheet("A142放款餘額彙總表");
 
+		
 		int col = 0;
 		int row = 0;
 
@@ -278,10 +311,13 @@ public class LY003Report extends MakeReport {
 				break;
 			}
 
-			col = kind + 5;
+		col = kind + 5;
 
-			makeExcel.setValue(row, col, amount, "#,##0");
+
+		makeExcel.setValue(row, col, amount, "#,##0");
 		}
+		
+		
 
 	}
 

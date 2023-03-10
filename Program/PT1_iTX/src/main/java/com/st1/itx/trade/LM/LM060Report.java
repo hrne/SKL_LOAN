@@ -19,6 +19,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TxCom;
 import com.st1.itx.db.service.springjpa.cm.LM060ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 
 @Component
@@ -84,13 +85,20 @@ public class LM060Report extends MakeReport {
 
 		int lastMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime())) - 19110000;
 
-		this.info("lM060.findAll YYMM=" + iYear + String.format("%02d", iMonth) + ",LYYMM=" + lastMonthEndDate / 100 + ",lday" + lastMonthEndDate);
+		this.info("lM060.findAll YYMM=" + iYear + String.format("%02d", iMonth) + ",LYYMM=" + lastMonthEndDate / 100
+				+ ",lday" + lastMonthEndDate);
 
 		String iENTDY = thisMonthEndDate / 10000 + "." + (thisMonthEndDate / 100) % 100 + "." + thisMonthEndDate % 100;
 
 		String iLMONDY = lastMonthEndDate / 10000 + "." + (lastMonthEndDate / 100) % 100 + "." + lastMonthEndDate % 100;
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM060", "暫付款金額調節表_內部控管", "密", "A4", "P");
+		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
+				.setRptCode("LM060").setRptItem("暫付款金額調節表_內部控管").setRptSize("A4").setSecurity(this.getSecurity())
+				.setPageOrientation("P").build();
+
+		this.open(titaVo, reportVo);
+
+//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM060", "暫付款金額調節表_內部控管", "密", "A4", "P");
 
 		try {
 			fnAllList = lm060ServiceImpl.findAll(titaVo, yearMonth);

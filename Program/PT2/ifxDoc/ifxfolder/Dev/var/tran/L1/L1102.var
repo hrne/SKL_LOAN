@@ -1158,6 +1158,8 @@ IF(#IncomeDataDate > #Ed ,V(P,年收入資料年月不可大於日曆日年月�
 !2023/3/7新增
 !介紹人
 #Introducer=X,6,I
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
 #IntroducerX=X,20,L
 
 #RIM_L2R08b=X,1,S
@@ -1171,6 +1173,8 @@ T(2,@IntroducerX,#L2r08FullName)
 
 !房貸專員
 #BusinessOfficer=X,6,I
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
 #BusinessOfficerX=X,20,L
 
 #RIM_L2R08c=X,1,S
@@ -1184,6 +1188,8 @@ T(2,@BusinessOfficerX,#L2r08FullName)
 
 !站別
 #Station=X,3,I
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
 HELP(#StationHelp)
 @
 C(4,#Station,S,$)
@@ -1383,6 +1389,16 @@ T(H,#OEntCode,#EntCodeHelp)
 !年收入資料年月
 #OIncomeDataDate=X,6,L
 #HideGrid=X,1,S
+
+!介紹人
+#OIntroducerX=X,50,L
+!房貸專員 目前只有L1103有
+#OBusinessOfficerX=X,50,L
+!站別
+#OStation=X,3,L
+#OStationX=X,20,L
+T(H,#OStation,#StationHelp)
+
 ##loop{times:20,n:1}
 #OSubCompanyCode{n}=A,2,L
 #OSubCompanyItem{n}=X,60,L
@@ -1428,16 +1444,6 @@ T(H,#OORelationCode,#RelationCodeHelp)
 
 !聯絡人姓名
 #OOLiaisonName=x,100,S
-
-
-!介紹人
-#OIntroducerX=X,50,L
-!房貸專員 目前只有L1103有
-#OBusinessOfficerX=X,50,L
-!站別
-#OStation=X,3,L
-#OStationX=X,20,L
-T(H,#OStation,#StationHelp)
 
 
 
@@ -1502,6 +1508,9 @@ T(H,#OOEnable,#EnableHelp)
 #EName
 #IncomeOfYearly
 #IncomeDataDate
+#Introducer
+#BusinessOfficer
+#Station
 #IsSuspected
 #IsSuspectedCheck
 #IsSuspectedCheckType
@@ -1510,9 +1519,6 @@ T(H,#OOEnable,#EnableHelp)
 #SubCompanyCode{n}
 #CrossUse{n}
 ##end
-#Introducer
-#BusinessOfficer
-#Station
 </sub>
 
 !------ 下行電文TOM ------
@@ -1544,6 +1550,9 @@ TXFORM=L1102
 #OEName
 #OIncomeOfYearly
 #OIncomeDataDate
+#OIntroducerX
+#OBusinessOfficerX
+#OStation
 ##loop{times:20,n:1}
 #OSubCompanyCode{n}
 #OCrossUse{n}
@@ -1556,9 +1565,6 @@ TXFORM=L1102
 #OOLiaisonName
 #OOEnable
 #OORmk
-#Introducer
-#BusinessOfficer
-#Station
 ^
 <include src="ROM.icf::L1R01.tom"/>
 <include src="ROM.icf::L1R16.tom"/>
@@ -1573,10 +1579,7 @@ TXFORM=L1102
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 
-!--------- OUTPUT畫面 --------
-![#<->#,"是否為授信限制對象",#OIsLimitX],
-![#<->#,"是否為利害關係人",#OIsRelatedX],
-![#<->#,"是否為準利害關係人",#OIsLnrelNearX],
+
 <sub type="PART" name="O1" layout="cols=3;screen.width=[250,250,150,250];printer.width=[20,20,20,20];order=1">
 [
 ["[L1102]                                 顧客基本資料-法人"],
@@ -1603,9 +1606,9 @@ TXFORM=L1102
 [#<->#,"．是否為準利害關係人",#OIsLnrelNearX],
 [#<->#,"年收入",#OIncomeOfYearly,"仟元"],
 [#<->#,"年收入資料年月",#OIncomeDataDate],
-["介紹人",#OIntroducerX],
-["房貸專員",#OBusinessOfficerX],
-["站別",#OStation,#OStationX],
+[#<->#,"介紹人",#OIntroducerX],
+[#<->#,"房貸專員",#OBusinessOfficerX],
+[#<->#,"站別",#OStation,#OStationX],
 [#<->#,"同意提供申請人之帳務、信用、投資及保險資料作為共同行銷之用",#OSubCompanyItem1,#OCrossUseX1,"<br>",#OSubCompanyItem2,#OCrossUseX2,
             "<br>",#OSubCompanyItem3,#OCrossUseX3,"<br>",#OSubCompanyItem4,#OCrossUseX4,
             "<br>",#OSubCompanyItem5,#OCrossUseX5,"<br>",#OSubCompanyItem6,#OCrossUseX6,

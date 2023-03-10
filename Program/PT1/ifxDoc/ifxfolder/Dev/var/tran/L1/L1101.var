@@ -1322,6 +1322,8 @@ C(3,#FunCd,5,s,$)
 !2023/3/7新增
 !介紹人
 #Introducer=X,6,I
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
 #IntroducerX=X,20,L
 
 #RIM_L2R08b=X,1,S
@@ -1335,6 +1337,8 @@ T(2,@IntroducerX,#L2r08FullName)
 
 !房貸專員
 #BusinessOfficer=X,6,I
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
 #BusinessOfficerX=X,20,L
 
 #RIM_L2R08c=X,1,S
@@ -1348,6 +1352,8 @@ T(2,@BusinessOfficerX,#L2r08FullName)
 
 !站別
 #Station=X,3,I
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
 HELP(#StationHelp)
 @
 C(4,#Station,S,$)
@@ -1778,7 +1784,8 @@ TXFORM=L1101
 #OAMLJobCode
 #OAMLGroup
 #OIndigenousName
-#OIntroducerX
+
+
 ##loop{times:20,n:1}
 #OSubCompanyCode{n}
 #OCrossUse{n}
@@ -1791,11 +1798,11 @@ TXFORM=L1101
 #OOLiaisonName
 #OOEnable
 #OORmk
+#Introducer
+#BusinessOfficer
 #OIntroducerX
 #OBusinessOfficerX
 #OStation
-#Introducer
-#BusinessOfficer
 
 ^
 <include src="ROM.icf::L1R01.tom"/>

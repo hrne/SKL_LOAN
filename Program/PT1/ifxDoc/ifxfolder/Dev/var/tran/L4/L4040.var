@@ -283,7 +283,7 @@ T(6A,#OOAuthCreateDate+#OOCustNo+#OORepayBank+#OORepayAcct+#OOCreateFlag+#Create
 #batch-rows-error=X,2,S
 
 !#batch-row-status 該列傳送狀態
-#batch-row-status=X,50,S
+#batch-row-status=X,100,S
 
 !#batch-row-txtno 該列傳送序號
 #batch-row-txtno=X,18,O
@@ -357,8 +357,8 @@ ifxBatch:{
 	rim:'L440A',
 	txtno:'#secret-no',
 	pfnx:"L4040.PFNX",
-	col_captions:["交易序號","取消狀態"],
-	col_names:["#batch-row-txtno","#batch-row-status"]
+	col_captions:["戶號","額度","銀行名稱","扣款帳號","取消狀態"],
+	col_names:["#OOCustNo","#OOFacmNo","#OORepayBankX","#OORepayAcct","#batch-row-status"]
 	}
 }
 #secret-no
@@ -386,8 +386,8 @@ ifxBatch:{
 	rim:'L440A',
 	txtno:'#secret-no',
 	pfnx:"L4040.PFNX",
-	col_captions:["交易序號","交易狀態"],
-	col_names:["#batch-row-txtno","#batch-row-status"]
+	col_captions:["戶號","額度","銀行名稱","扣款帳號","交易狀態"],
+	col_names:["#OOCustNo","#OOFacmNo","#OORepayBankX","#OORepayAcct","#batch-row-status"]
 	}
 }
 #secret-no
@@ -416,8 +416,8 @@ ifxBatch:{
 	rim:'L440A',
 	txtno:'#secret-no',
 	pfnx:"L4040.PFNX",
-	col_captions:["交易序號","交易狀態"],
-	col_names:["#batch-row-txtno","#batch-row-status"]
+	col_captions:["戶號","額度","銀行名稱","扣款帳號","交易狀態"],
+	col_names:["#OOCustNo","#OOFacmNo","#OORepayBankX","#OORepayAcct","#batch-row-status"]
 	}
 }
 #secret-no

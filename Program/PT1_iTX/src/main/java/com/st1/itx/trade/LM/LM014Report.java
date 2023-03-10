@@ -67,7 +67,7 @@ public class LM014Report extends MakeReport {
 		// 設定字體大小
 		this.setFontSize(8);
 
-		this.print(-1, 148, "機密等級：密");
+		this.print(-1, 148, "機密等級："+this.getSecurity());
 
 		this.print(-2, 3, "程式ＩＤ：" + this.getParentTranCode());
 		this.print(-2, 85, "新光人壽保險股份有限公司", "C");

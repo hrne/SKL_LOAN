@@ -2,11 +2,9 @@ package com.st1.itx.trade.L2;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.DBException;
@@ -15,7 +13,6 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.ClEva;
 import com.st1.itx.db.domain.ClEvaId;
-import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.ClImm;
 import com.st1.itx.db.domain.ClImmId;
 import com.st1.itx.db.domain.ClMain;
@@ -198,7 +195,7 @@ public class L2480 extends TradeBuffer {
 			if (shareTotal.subtract(oldShareTotal).compareTo(BigDecimal.ZERO) < 0) {
 				this.totaVo.init(titaVo);
 				this.totaVo.setWarnMsg("可分配金額不足，新評估總價*貸放成數 = " + shareTotal + "，" + "原可分配金額=" + oldShareTotal);
-				this.addList(this.totaVo);
+				
 			}
 			// 紀錄變更前變更後
 			dataLog.setEnv(titaVo, beforeClMain, tClMain);
@@ -315,7 +312,7 @@ public class L2480 extends TradeBuffer {
 				if (shareTotal.subtract(oldShareTotal).compareTo(BigDecimal.ZERO) < 0) {
 					this.totaVo.init(titaVo);
 					this.totaVo.setWarnMsg("可分配金額不足，新評估總價*貸放成數 = " + shareTotal + "，" + "原可分配金額=" + oldShareTotal);
-					this.addList(this.totaVo);
+					
 				}
 				// 紀錄變更前變更後
 				dataLog.setEnv(titaVo, beforeClImm, tClImm);

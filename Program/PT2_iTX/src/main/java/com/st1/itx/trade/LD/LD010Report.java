@@ -12,6 +12,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LD010ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -45,8 +46,24 @@ public class LD010Report extends MakeReport {
 
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> dataList) throws LogicException {
 		this.info("exportExcel ... ");
+		
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LD010";
+		String fileItem = "介紹人換算業績報酬檢核表";
+		String fileName = "LD010介紹人換算業績報酬檢核表";
+		String defaultExcel = "LD010_底稿_介紹人換算業績報酬檢核表.xlsx";
+		String defaultSheet = "介紹人換算業績報酬檢核表";
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LD010", "介紹人換算業績報酬檢核表", "LD010介紹人換算業績報酬檢核表", "LD010_底稿_介紹人換算業績報酬檢核表.xlsx", "介紹人換算業績報酬檢核表");
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LD010", "介紹人換算業績報酬檢核表", "LD010介紹人換算業績報酬檢核表",
+//				"LD010_底稿_介紹人換算業績報酬檢核表.xlsx", "介紹人換算業績報酬檢核表");
 
 		// 有標題列，從第二列開始塞值
 		int row = 2;

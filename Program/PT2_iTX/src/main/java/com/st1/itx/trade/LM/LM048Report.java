@@ -19,6 +19,7 @@ import com.st1.itx.db.service.CdVarValueService;
 import com.st1.itx.db.service.springjpa.cm.LM048ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -196,11 +197,28 @@ public class LM048Report extends MakeReport {
 		makeExcel.toExcel(sno);
 	}
 
-	private void exportSheet1(int inputYearMonth, TitaVo titaVo, List<Map<String, String>> listLM048) throws LogicException {
+	private void exportSheet1(int inputYearMonth, TitaVo titaVo, List<Map<String, String>> listLM048)
+			throws LogicException {
 
 		this.info("LM048Report exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM048", "企業放款風險承擔限額控管表", "LM048企業放款風險承擔限額控管表", "LM048_底稿_企業放款風險承擔限額控管表.xlsx", "明細總表108.04");
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LM048";
+		String fileItem = "企業放款風險承擔限額控管表";
+		String fileName = "LM048企業放款風險承擔限額控管表";
+		String defaultExcel = "LM048_底稿_企業放款風險承擔限額控管表.xlsx";
+		String defaultSheet = "明細總表108.04";
+
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM048", "企業放款風險承擔限額控管表", "LM048企業放款風險承擔限額控管表",
+//				"LM048_底稿_企業放款風險承擔限額控管表.xlsx", "明細總表108.04");
 
 		String outputYearMonth = "";
 		if (inputYearMonth > 191100) {

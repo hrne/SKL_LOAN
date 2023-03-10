@@ -13,6 +13,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LD007ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.format.StringCut;
 import com.st1.itx.util.parse.Parse;
 
@@ -51,8 +52,22 @@ public class LD007Report extends MakeReport {
 
 	private void testExcel(TitaVo titaVo, List<Map<String, String>> LD007List) throws LogicException {
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LD007", "房貸專員明細統計", "LD007房貸專員明細統計",
-				"LD007房貸專員明細統計.xls", "房貸專員明細統計");
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LD007";
+		String fileItem = "房貸專員明細統計";
+		String fileName = "LD007房貸專員明細統計";
+		String defaultExcel = "LD007房貸專員明細統計.xls";
+		String defaultSheet = "房貸專員明細統計";
+
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LD007", "房貸專員明細統計", "LD007房貸專員明細統計",
+//				"LD007房貸專員明細統計.xls", "房貸專員明細統計");
 
 		int row = 2;
 		BigDecimal total = BigDecimal.ZERO;

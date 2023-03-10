@@ -16,6 +16,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM056ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -47,7 +48,23 @@ public class LM056Report extends MakeReport {
 		List<Map<String, String>> findList2 = new ArrayList<>();
 		List<Map<String, String>> findList3 = new ArrayList<>();
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM056", "表14-1、14-2會計部申報表", "LM056-表14-1、14-2_會計部申報表", "LM056_底稿_表14-1、14-2_會計部申報表.xlsx", "YYYMM");
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LM056";
+		String fileItem = "表14-1、14-2會計部申報表";
+		String fileName = "LM056-表14-1、14-2_會計部申報表";
+		String defaultExcel = "LM056_底稿_表14-1、14-2_會計部申報表.xlsx";
+		String defaultSheet = "YYYMM";
+
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM056", "表14-1、14-2會計部申報表",
+//				"LM056-表14-1、14-2_會計部申報表", "LM056_底稿_表14-1、14-2_會計部申報表.xlsx", "YYYMM");
 
 		try {
 
@@ -163,14 +180,12 @@ public class LM056Report extends MakeReport {
 		for (Map<String, String> r : listData) {
 
 			col = enToNumber(r.get("F0").toString().substring(0, 1));
-			// 排除N欄以後不設值 略過
-			if (col > 12) {
-				break;
-			}
 			row = Integer.valueOf(r.get("F0").toString().substring(1, 3));
 			amt = getBigDecimal(r.get("F1").toString());
-
-			makeExcel.setValue(row, col, amt, "#,##0", "R");
+			// 排除L欄以後不設值 略過
+			if (col < 12) {
+				makeExcel.setValue(row, col, amt, "#,##0", "R");
+			}
 
 		}
 
@@ -203,6 +218,8 @@ public class LM056Report extends MakeReport {
 		for (char token : tokens) {
 			col = Integer.valueOf(token) - 64;
 		}
+
+		this.info("column:" + colTxt + "=>" + col);
 
 		return col;
 

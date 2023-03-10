@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LQ005ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.format.FormatUtil;
 
 @Component
@@ -80,7 +81,22 @@ public class LQ005Report extends MakeReport {
 	private void exportExcel(List<Map<String, String>> listLQ005, TitaVo titaVo) throws LogicException {
 		this.info("exportExcel ... ");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LQ005", "表A18_會計部申報表", "LQ005表A18_會計部申報表", "表A18_會計部申報表.xlsx", "108.03.31");
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LQ005";
+		String fileItem = "表A18_會計部申報表";
+		String fileName = "LQ005表A18_會計部申報表";
+		String defaultExcel = "表A18_會計部申報表.xlsx";
+		String defaultSheet = "108.03.31";
+
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LQ005", "表A18_會計部申報表", "LQ005表A18_會計部申報表", "表A18_會計部申報表.xlsx", "108.03.31");
 
 		makeExcel.setSheet("108.03.31", this.showRocDate(titaVo.getEntDyI(), 6));
 

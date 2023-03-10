@@ -18,10 +18,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.domain.CdReport;
 import com.st1.itx.db.domain.TxFile;
 import com.st1.itx.db.domain.TxPrinter;
 import com.st1.itx.db.domain.TxPrinterId;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdReportService;
 import com.st1.itx.db.service.TxFileService;
 import com.st1.itx.db.service.TxPrinterService;
@@ -60,6 +63,9 @@ public class MakeReport extends CommBuffer {
 
 	@Autowired
 	private CdReportService cdReportService;
+
+	@Autowired
+	private CdCodeService cdCodeService;
 
 	@Autowired
 	private TxPrinterService txPrinterService;
@@ -1661,15 +1667,15 @@ public class MakeReport extends CommBuffer {
 			this.info("checkLeftRows 剩餘明細列數足夠,繼續列印明細.");
 		}
 	}
-	
-	
+
 	/**
 	 * 文字內容處理
 	 * 
-	 * @param text 文字
-	 * @param all  上限位數
-	 * @param word 要補滿的符號或文字(單字佳)
-	 * @param pos  向左補齊(L)/向右補齊(R) 如果文字字數大於上限位數 自動截斷
+	 * @param text     文字
+	 * @param allCount 上限位數
+	 * @param word     要補滿的符號或文字(單字佳)
+	 * @param pos      向左補齊(L)/向右補齊(R) 如果文字字數大於上限位數 自動截斷
+	 * @return str 處理後文字
 	 *
 	 */
 
@@ -1729,4 +1735,30 @@ public class MakeReport extends CommBuffer {
 
 		return str;
 	}
+
+	/**
+	 * 取得此報表的機密等級
+	 * 
+	 * @return SecurityItem 機密等級中文
+	 *
+	 */
+	public String getSecurity() {
+
+		this.info("getSecurity.RptCode = " + reportVo.getRptCode());
+		CdReport tCdReport = cdReportService.findById(reportVo.getRptCode());
+		CdCodeId tCdCodeId = new CdCodeId();
+		tCdCodeId.setDefCode("Confidentiality");
+		
+		String tConfidentiality = "0";
+		if (tCdReport != null) {
+			tConfidentiality = tCdReport.getConfidentiality();
+		}
+
+		tCdCodeId.setCode(tConfidentiality);
+		CdCode tCdCode = cdCodeService.findById(tCdCodeId, titaVo);
+
+		this.info("getSecurity.getItem = " + tCdCode.getItem());
+		return tCdCode.getItem();
+	}
+
 }

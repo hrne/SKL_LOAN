@@ -48,7 +48,7 @@ public class LM086Report extends MakeReport {
 		this.print(-2, 3, "程式ID：" + this.getParentTranCode());
 		this.print(-3, 3, "報　表：" + this.getRptCode());
 
-		this.print(-1, 98, "機密等級：" + this.getRptSecurity());
+		this.print(-1, 98, "機密等級：" + this.getSecurity());
 		this.print(-2, 98, "日　　期：" + this.showBcDate(titaVo.getEntDyI(), 1));
 		this.print(-3, 98, "時　　間：" + showTime(this.getNowTime()));
 		this.print(-4, 98, "頁　　數：" + this.getNowPage());
@@ -94,7 +94,7 @@ public class LM086Report extends MakeReport {
 		}
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-				.setRptCode("LM086").setRptItem("放款餘額明細表").setSecurity("密").setRptSize("A4").setPageOrientation("P")
+				.setRptCode("LM086").setRptItem("放款餘額明細表").setSecurity(this.getSecurity()).setRptSize("A4").setPageOrientation("P")
 				.build();
 
 		if (resultList != null && !resultList.isEmpty()) {

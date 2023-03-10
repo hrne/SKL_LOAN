@@ -14,6 +14,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM015ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 
 @Component
@@ -31,7 +32,7 @@ public class LM015Report extends MakeReport {
 	public void printHeader() {
 		this.info("MakeReport.printHeader");
 
-		this.print(-2, 80, "機密等級：密");
+		this.print(-2, 80, "機密等級："+this.getSecurity());
 		this.print(-3, 1, "程式ID：" + this.getParentTranCode());
 		this.print(-3, 50, "新光人壽保險股份有限公司", "C");
 		this.print(-4, 1, "報  表：" + this.getRptCode());
@@ -50,7 +51,15 @@ public class LM015Report extends MakeReport {
 	}
 
 	public void exec(TitaVo titaVo) throws LogicException {
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM015", "信用曝險分佈報表", "密", "A4", "P");
+		
+		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
+				.setRptCode("LM015").setRptItem("信用曝險分佈報表").setRptSize("A4")
+				.setSecurity(this.getSecurity()).setPageOrientation("P").build();
+
+		
+		this.open(titaVo, reportVo);
+		
+//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM015", "信用曝險分佈報表", "密", "A4", "P");
 		List<Map<String, String>> lm015List = new ArrayList<>();
 
 		try {
@@ -59,7 +68,7 @@ public class LM015Report extends MakeReport {
 		} catch (Exception e) {
 			this.info("lM015ServiceImpl.findAll error = " + e.toString());
 		}
-		// Ted 2021/01/22
+		//Ted 2021/01/22
 		if (lm015List.size() > 0) {
 			// 格式
 			DecimalFormat df1 = new DecimalFormat("#,##0");
@@ -176,7 +185,7 @@ public class LM015Report extends MakeReport {
 			noData();
 		}
 		this.close();
-		// this.toPdf(sno);
+		//this.toPdf(sno);
 	}
 
 	// 無資料列印格式

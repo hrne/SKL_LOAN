@@ -14,6 +14,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LQ006ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -35,7 +36,7 @@ public class LQ006Report extends MakeReport {
 
 		List<Map<String, String>> lQ006List = null;
 		List<Map<String, String>> lQ006List_Total = null;
-
+		
 		try {
 			lQ006List = lQ006ServiceImpl.findAll(titaVo);
 			lQ006List_Total = lQ006ServiceImpl.findTotal(titaVo);
@@ -51,7 +52,23 @@ public class LQ006Report extends MakeReport {
 
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LDList, List<Map<String, String>> LDListTotal) throws LogicException {
 		this.info("exportExcel---------");
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LQ006", "已逾期未減損-帳齡分析", "LQ006已逾期未減損-帳齡分析", "LQ006已逾期未減損-帳齡分析.xlsx", "已逾期未減損-帳齡分析");
+		
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LQ006";
+		String fileItem = "已逾期未減損-帳齡分析";
+		String fileName = "LQ006已逾期未減損-帳齡分析";
+		String defaultExcel = "LQ006已逾期未減損-帳齡分析.xlsx";
+		String defaultSheet = "已逾期未減損-帳齡分析";
+
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LQ006", "已逾期未減損-帳齡分析", "LQ006已逾期未減損-帳齡分析", "LQ006已逾期未減損-帳齡分析.xlsx", "已逾期未減損-帳齡分析");
 
 		// 起始列
 		int row = 2;
@@ -79,29 +96,31 @@ public class LQ006Report extends MakeReport {
 				row++;
 
 			}
-
-			makeExcel.formulaCaculate(1, 5);
-
-			// 換去做 Sheet1
-			if (LDListTotal != null && !LDListTotal.isEmpty()) {
-				makeExcel.setSheet("Sheet1");
-
-				row = 4; // 開始行, 1-based
-
-				for (Map<String, String> tLDVo : LDListTotal) {
-					// 日期
-					makeExcel.setValue(row, 1, tLDVo.get("F0"), "L");
-					// 31-60 天金額
-					makeExcel.setValue(row, 2, getBigDecimal(tLDVo.get("F1")), "#,##0", "R");
-					// 61-90 天金額
-					makeExcel.setValue(row, 3, getBigDecimal(tLDVo.get("F2")), "#,##0", "R");
-					// 合計
-					makeExcel.setValue(row, 4, getBigDecimal(tLDVo.get("F3")), "#,##0", "R");
-
-					row++;
-				}
+		
+		makeExcel.formulaCaculate(1, 5);
+			
+		// 換去做 Sheet1
+		if (LDListTotal != null && !LDListTotal.isEmpty())
+		{
+			makeExcel.setSheet("Sheet1");
+			
+			row = 4; // 開始行, 1-based
+			
+			for (Map<String, String> tLDVo : LDListTotal)
+			{
+				// 日期
+				makeExcel.setValue(row, 1, tLDVo.get("F0"), "L");
+				// 31-60 天金額
+				makeExcel.setValue(row, 2, getBigDecimal(tLDVo.get("F1")), "#,##0", "R");
+				// 61-90 天金額
+				makeExcel.setValue(row, 3, getBigDecimal(tLDVo.get("F2")), "#,##0", "R");
+				// 合計
+				makeExcel.setValue(row, 4, getBigDecimal(tLDVo.get("F3")), "#,##0", "R");
+				
+				row++;
 			}
-
+		}
+		
 		} else {
 			makeExcel.setValue(2, 1, "本日無資料");
 		}

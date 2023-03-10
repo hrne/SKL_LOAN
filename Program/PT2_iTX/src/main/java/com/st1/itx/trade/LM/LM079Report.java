@@ -16,6 +16,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM079ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.parse.Parse;
 
 @Component
@@ -28,12 +29,12 @@ public class LM079Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
-
+	
 	@Autowired
 	Parse parse;
-
+	
 	boolean hasOutputted = false;
-
+	
 	private static BigDecimal hundredMillion = new BigDecimal("100000000");
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
@@ -43,11 +44,11 @@ public class LM079Report extends MakeReport {
 		this.info("LM079Report exec AcDate = " + iAcDate);
 
 		List<List<Map<String, String>>> lLM079List = new ArrayList<List<Map<String, String>>>();
-
+		
 		try {
-			lLM079List.add(lM079ServiceImpl.findAll(titaVo, iAcDate / 100, 20210319, 20210923));
-			lLM079List.add(lM079ServiceImpl.findAll(titaVo, iAcDate / 100, 20210924, 20211216));
-			lLM079List.add(lM079ServiceImpl.findAll(titaVo, iAcDate / 100, 20211217, 99999999));
+			lLM079List.add(lM079ServiceImpl.findAll(titaVo, iAcDate/100, 20210319, 20210923));
+			lLM079List.add(lM079ServiceImpl.findAll(titaVo, iAcDate/100, 20210924, 20211216));
+			lLM079List.add(lM079ServiceImpl.findAll(titaVo, iAcDate/100, 20211217, 99999999));
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -63,43 +64,60 @@ public class LM079Report extends MakeReport {
 	private void exportExcel(TitaVo titaVo, List<List<Map<String, String>>> foundList, int date) throws LogicException {
 
 		// pivot position for data inputs
-
+		
 		this.info("LM079Report exportExcel");
 		int entdy = date - 19110000; // expects date to be in BC Date format.
-		String YearMonth = entdy / 10000 + " 年 " + String.format("%02d", entdy / 100 % 100) + " 月";
+		String YearMonth = entdy/10000 + " 年 " + String.format("%02d", entdy/100%100) + " 月";
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM079", "B045金融機構承作「工業區閒置土地抵押貸款」統計表", "LM079_B045金融機構承作「工業區閒置土地抵押貸款」統計表" + showRocDate(entdy, 0).substring(0, 7),
-				"LM079_底稿_B045金融機構承作「工業區閒置土地抵押貸款」統計表.xlsx", 1, "FOA");
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LM079";
+		String fileItem = "B045金融機構承作「工業區閒置土地抵押貸款」統計表";
+		String fileName = "LM079_B045金融機構承作「工業區閒置土地抵押貸款」統計表" + showRocDate(entdy, 0).substring(0, 7);
+		String defaultExcel = "LM079_底稿_B045金融機構承作「工業區閒置土地抵押貸款」統計表.xlsx";
+		String defaultSheet = "FOA";
+
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM079", "B045金融機構承作「工業區閒置土地抵押貸款」統計表", "LM079_B045金融機構承作「工業區閒置土地抵押貸款」統計表" + showRocDate(entdy, 0).substring(0, 7),
+//				"LM079_底稿_B045金融機構承作「工業區閒置土地抵押貸款」統計表.xlsx", 1, "FOA");
 
 		// 資料期間 C2
 		makeExcel.setValue(3, 6, "民國 " + YearMonth, "R");
 
 		if (foundList != null && !foundList.isEmpty()) {
-
-			for (int i = 0; i < foundList.size(); i++) {
-				doOutput(foundList.get(i), 3 + 3 * i);
+			
+			for (int i = 0; i < foundList.size(); i++)
+			{
+				doOutput(foundList.get(i), 3 + 3*i);
 			}
 			for (int i = 3; i < 3 + foundList.size() * 3; i++) {
 				makeExcel.formulaCaculate(12, i);
 			}
 		}
-
+		
 		if (!hasOutputted)
 			makeExcel.setValue(4, 1, "本月無資料");
 		else
-			makeExcel.formulaRangeCalculate(7, 14, 12, 32);
-
-		// long sno =
+			makeExcel.formulaRangeCalculate(7,14,12,32);
+		
+		// long sno = 
 		makeExcel.close();
-		// makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
-
-	private void doOutput(List<Map<String, String>> list, int startColumn) throws LogicException {
+	
+	private void doOutput(List<Map<String, String>> list, int startColumn) throws LogicException
+	{
 		if (list == null || list.isEmpty())
 			return;
-
+		
 		hasOutputted = true;
-
+		
 		for (Map<String, String> tLDVo : list) {
 			int colShift = 0;
 			int rowShift = 0;

@@ -44,7 +44,7 @@ public class LM012Report extends MakeReport {
 	@Override
 	public void printHeader() {
 
-		this.print(-1, 123, "機密等級：密");
+		this.print(-1, 123, "機密等級："+this.getSecurity());
 		this.print(-2, 1, "　 程式ID：" + this.getParentTranCode());
 		this.print(-2, 68, "新光人壽保險股份有限公司", "C");
 		this.print(-2, 123, "日　期：" + this.showBcDate(dateUtil.getNowStringBc(), 1));

@@ -17,6 +17,10 @@ import com.st1.itx.db.service.FacProdService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
+/*
+ * Tita
+ * ProdNo=X,5
+ */
 /**
  * L2001 商品參數明細資料查詢
  * 
@@ -75,12 +79,23 @@ public class L2001 extends TradeBuffer {
 		// 政府優惠房貸處理邏輯
 		if ("Y".equals(iGovOfferFlag)) {
 			lGovOfferFlag.add("Y");
+			lGovOfferFlag.add("1");
+			lGovOfferFlag.add("2");
+			lGovOfferFlag.add("3");
+			lGovOfferFlag.add("4");
+			lGovOfferFlag.add("5");
+			lGovOfferFlag.add("6");
 		} else if ("N".equals(iGovOfferFlag)) {
 			lGovOfferFlag.add("N");
 		} else {
 			lGovOfferFlag.add("Y");
+			lGovOfferFlag.add("1");
+			lGovOfferFlag.add("2");
+			lGovOfferFlag.add("3");
+			lGovOfferFlag.add("4");
+			lGovOfferFlag.add("5");
+			lGovOfferFlag.add("6");
 			lGovOfferFlag.add("N");
-			lGovOfferFlag.add("");
 		}
 		// 理財型房貸處理邏輯
 		if ("Y".equals(iFinancialFlag)) {
@@ -90,7 +105,6 @@ public class L2001 extends TradeBuffer {
 		} else {
 			lFinancialFlag.add("Y");
 			lFinancialFlag.add("N");
-			lFinancialFlag.add("");
 		}
 		// 員工專案處理邏輯
 		if ("Y".equals(iEmpFlag)) {
@@ -100,15 +114,16 @@ public class L2001 extends TradeBuffer {
 		} else {
 			lEmpFlag.add("Y");
 			lEmpFlag.add("N");
-			lEmpFlag.add("");
 		}
 
 		// 空白為全部 Y企金可使用
 		if ("Y".equals(iEnterpriseFg)) {
 			lEnterpriseFg.add("Y");
-			slFacProd = facProdService.fildProdNo(iProdNo.trim() + "%", lStatusCode, lEnterpriseFg, lGovOfferFlag, lFinancialFlag, lEmpFlag, this.index, this.limit, titaVo);
+			slFacProd = facProdService.fildProdNo(iProdNo.trim() + "%", lStatusCode, lEnterpriseFg, lGovOfferFlag,
+					lFinancialFlag, lEmpFlag, this.index, this.limit, titaVo);
 		} else {
-			slFacProd = facProdService.fildStatus(iProdNo.trim() + "%", lStatusCode, lGovOfferFlag, lFinancialFlag, lEmpFlag, this.index, this.limit, titaVo);
+			slFacProd = facProdService.fildStatus(iProdNo.trim() + "%", lStatusCode, lGovOfferFlag, lFinancialFlag,
+					lEmpFlag, this.index, this.limit, titaVo);
 		}
 
 		// 查詢商品參數檔
@@ -120,16 +135,19 @@ public class L2001 extends TradeBuffer {
 		for (FacProd tFacProd : lFacProd) {
 			// 當商品狀態輸入1生效時,生效日>日曆日(未生效) 或 截止日>0時,截止日<日曆日的跳過(
 			if ("1".equals(iStatusCode)
-					&& (parse.stringToInteger(titaVo.getCalDy()) < tFacProd.getStartDate() || (tFacProd.getEndDate() > 0 && tFacProd.getEndDate() <= parse.stringToInteger(titaVo.getCalDy())))) {
+					&& (parse.stringToInteger(titaVo.getCalDy()) < tFacProd.getStartDate() || (tFacProd.getEndDate() > 0
+							&& tFacProd.getEndDate() <= parse.stringToInteger(titaVo.getCalDy())))) {
 				this.info("非生效");
 				continue;
 			}
-			if ("2".equals(iStatusCode)
-					&& (parse.stringToInteger(titaVo.getCalDy()) >= tFacProd.getStartDate() || (tFacProd.getEndDate() > 0 && tFacProd.getEndDate() <= parse.stringToInteger(titaVo.getCalDy())))) {
+			if ("2".equals(iStatusCode) && (parse.stringToInteger(titaVo.getCalDy()) >= tFacProd.getStartDate()
+					|| (tFacProd.getEndDate() > 0
+							&& tFacProd.getEndDate() <= parse.stringToInteger(titaVo.getCalDy())))) {
 				this.info("非未生效");
 				continue;
 			}
-			if ("3".equals(iStatusCode) && !((tFacProd.getEndDate() > 0) && (tFacProd.getEndDate() < parse.stringToInteger(titaVo.getCalDy())))) {
+			if ("3".equals(iStatusCode) && !((tFacProd.getEndDate() > 0)
+					&& (tFacProd.getEndDate() < parse.stringToInteger(titaVo.getCalDy())))) {
 				this.info("非已截止");
 				continue;
 			}

@@ -70,7 +70,7 @@ public class L9739Report extends MakeReport {
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String reportItem = txname;
 		String brno = titaVo.getBrno();
-		String security = "";
+		String security = this.getSecurity();
 		String pageSize = "A4";
 		String pageOrientation = "P";
 
@@ -175,11 +175,15 @@ public class L9739Report extends MakeReport {
 			int tmpCount = 0;
 			for (Map<String, String> r : listL9739Detail) {
 
-				this.info("tmpRate = " + this.tmpProdNoMap.get(r.get("ProdNo").toString() + "Rate") + ",nowRate = " + r.get("StoreRate").toString());
+				//資料庫撈出來的資料(當前有效日期)
+				int tmpNowEffectDate = Integer.valueOf(r.get("EffectDate")) + -19110000;
+
+//				this.info("tmpRate = " + this.tmpProdNoMap.get(r.get("ProdNo").toString() + "Rate") + ",nowRate = "
+//						+ r.get("StoreRate").toString());
 
 				if (!this.tmpProdNoMap.get(r.get("ProdNo").toString() + "Rate").equals(r.get("StoreRate").toString())
 						|| !this.tmpProdNoMap.get(r.get("ProdNo").toString() + "EffectDate")
-								.equals(r.get("EffectDate").toString())) {
+								.equals(String.valueOf(tmpNowEffectDate))) {
 					tmpCount++;
 
 					this.print(1, 6, r.get("ProdNo"), "L");

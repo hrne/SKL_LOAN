@@ -16,13 +16,12 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LQ001ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
 
 public class LQ001Report extends MakeReport {
-	// private static final Logger logger =
-	// LoggerFactory.getLogger(LQ001Report.class);
 
 	@Autowired
 	LQ001ServiceImpl LQ001ServiceImpl;
@@ -42,7 +41,23 @@ public class LQ001Report extends MakeReport {
 
 	private void exportExcel(TitaVo titaVo) throws LogicException {
 		this.info("===========in exportExcel");
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LQ001", "營建署季報_購置住宅貸款餘額", "LQ001營建署季報_購置住宅貸款餘額", "購置住宅貸款餘額.xlsx", "LNM53P");
+		
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LQ001";
+		String fileItem = "營建署季報_購置住宅貸款餘額";
+		String fileName = "LQ001營建署季報_購置住宅貸款餘額";
+		String defaultExcel = "購置住宅貸款餘額.xlsx";
+		String defaultSheet = "LNM53P";
+
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LQ001", "營建署季報_購置住宅貸款餘額", "LQ001營建署季報_購置住宅貸款餘額", "購置住宅貸款餘額.xlsx", "LNM53P");
 
 		List<Map<String, String>> findList = new ArrayList<>();
 
