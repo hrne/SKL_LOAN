@@ -80,7 +80,7 @@ public class L9711Report2 extends MakeReport {
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String reportItem = "放款本息攤還表暨繳息通知單";
-		String security = "密";
+		String security =this.getSecurity();
 		String pageSize = "A4";
 		String pageOrientation = "P";
 

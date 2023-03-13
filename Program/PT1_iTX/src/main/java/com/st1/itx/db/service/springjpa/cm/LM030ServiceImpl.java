@@ -35,76 +35,41 @@ public class LM030ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("lM030.findAll ");
 
 		this.info("YearMonth = " + titaVo.getParam("YearMonth"));
-//		this.info("CustNo = " + titaVo.getParam("CustNo"));
-//		this.info("DelayCondition = " + titaVo.getParam("DelayCondition"));
-//		this.info("OvduDayMin = " + titaVo.getParam("OvduDayMin"));
-//		this.info("OvduDayMax =" + titaVo.getParam("OvduDayMax"));
-//		this.info("OvduDayMin = " + titaVo.getParam("OvduTermMin"));
-//		this.info("OvduDayMax = " + titaVo.getParam("OvduTermMax"));
-//		this.info("PayMethod = " + titaVo.getParam("PayMethod"));
-//		this.info("EntCode = " + titaVo.getParam("EntCode"));
-		
+
 		String sql = " ";
 		sql += "	SELECT CD.\"CityItem\"";
 		sql += "          ,\"Fn_GetEmpName\"(MF.\"AccCollPsn\", 1) \"AccCollPsn\" ";
-		sql += "       	  ,L.\"CustNo\" ";
-		sql += "          ,L.\"FacmNo\" ";
+		sql += "       	  ,MF.\"CustNo\" ";
+		sql += "          ,MF.\"FacmNo\" ";
 		sql += "          ,\"Fn_ParseEOL\"(CM.\"CustName\",0) AS \"CustName\" ";
-		sql += "       	  ,MAX(M.\"DrawdownDate\") AS \"DrawdownDate\" ";
-		sql += " 		  ,SUM(L.\"Principal\") AS \"LoanBal\"";
-		sql += " 		  ,SUM(L.\"Interest\") AS \"Interest\"";
-		sql += "       	  ,MAX(L.\"Rate\") AS \"StoreRate\" ";
-		sql += "       	  ,MAX(MF.\"PrevIntDate\") AS \"PrevPayIntDate\" ";
-		sql += "       	  ,MAX(MF.\"NextIntDate\") AS \"NextPayIntDate\" ";
-		sql += "          ,TO_NUMBER(TO_CHAR(ADD_MONTHS(TO_DATE(TO_CHAR(MF.\"NextIntDate\"),'YYYYMMDD'),6),'YYYYMMDD')) \"OvduDate\" ";
-		sql += "	FROM \"LoanBorTx\" L";
-		sql += "    LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = L.\"CustNo\" ";
-		sql += "    LEFT JOIN \"LoanBorMain\" M ON M.\"CustNo\" = L.\"CustNo\" ";
-		sql += "                               AND M.\"FacmNo\" = L.\"FacmNo\" ";
-		sql += "                               AND M.\"BormNo\" = L.\"BormNo\" ";
-		sql += "    LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = L.\"CustNo\" ";
-		sql += "                           AND F.\"FacmNo\" = L.\"FacmNo\" ";
-		sql += "    LEFT JOIN \"MonthlyFacBal\" MF ON MF.\"CustNo\" = L.\"CustNo\" ";
-		sql += "                                  AND MF.\"FacmNo\" = L.\"FacmNo\" ";
-		sql += "                                  AND MF.\"YearMonth\" = :yymm ";
+		sql += "       	  ,F.\"FirstDrawdownDate\" - 19110000 AS \"DrawdownDate\" ";
+		sql += " 		  ,MF.\"PrinBalance\" AS \"LoanBal\"";
+		sql += " 		  ,0 AS \"Interest\"";
+		sql += "       	  ,ML.\"StoreRate\" AS \"StoreRate\" ";
+		sql += "       	  ,MF.\"PrevIntDate\" - 19110000 AS \"PrevPayIntDate\" ";
+		sql += "          ,TO_NUMBER(TO_CHAR(";
+		sql += " 					ADD_MONTHS(TO_DATE(TO_CHAR(MF.\"DueDate\"),'YYYYMMDD'),1)";
+		sql += "					,'YYYYMMDD')) AS  \"DueDate\" ";
+		sql += "	FROM \"MonthlyFacBal\" MF";
 		sql += "    LEFT JOIN \"CdCity\" CD ON CD.\"CityCode\" = MF.\"CityCode\" ";
-		sql += "    WHERE L.\"TxDescCode\" = '3423' ";
-		sql += "      AND L.\"TitaHCode\" = 0 ";
-		sql += "      AND TRUNC(L.\"AcDate\" / 100 ) = :yymm ";
-
-//		if (!"0".equals(titaVo.getParam("CustNo"))) {
-//			sql += "      AND L.\"CustNo\" = "+ titaVo.getParam("CustNo");
-//		}
-		// 滯繳條件 1.期數 2.日數
-//		if ("1".equals(titaVo.getParam("DelayCondition"))) {
-//			sql += "	  AND MF.\"OvduTerm\" BETWEEN TO_NUMBER(" + titaVo.getParam("OvduTermMin") + ") AND TO_NUMBER("
-//					+ titaVo.getParam("OvduTermMax") + ")";
-//		} else {
-//			sql += "	  AND MF.\"OvduDays\" BETWEEN TO_NUMBER(" + titaVo.getParam("OvduDayMin") + ") AND TO_NUMBER("
-//					+ titaVo.getParam("OvduDayMax") + ")";
-//		}
-
-		// 繳款方式 9其他 0全部
-//		if ("0".equals(titaVo.getParam("PayMethod"))) {
-//			sql += "	 ";
-//		} else if ("9".equals(titaVo.getParam("PayMethod"))) {
-//			sql += "	  AND F.\"RepayCode\" IN (5,6,7,8) ";
-//		} else {
-//			sql += "	  AND F.\"RepayCode\" = " + Integer.valueOf(titaVo.getParam("PayMethod"));
-//		}
-
-//		if ("1".equals(titaVo.getParam("EntCode"))) {
-//			sql += "	  AND CM.\"EntCode\" IN (0,2) ";
-//		} else if ("2".equals(titaVo.getParam("EntCode"))) {
-//			sql += "	  AND CM.\"EntCode\" IN (1) ";
-//		}
-		
-		sql += "    GROUP BY CD.\"CityItem\"";
-		sql += "            ,\"Fn_GetEmpName\"(MF.\"AccCollPsn\", 1)";
-		sql += "       	    ,L.\"CustNo\" ";
-		sql += "            ,L.\"FacmNo\" ";
-		sql += "            ,\"Fn_ParseEOL\"(CM.\"CustName\",0)";
-		sql += "            ,TO_NUMBER(TO_CHAR(ADD_MONTHS(TO_DATE(TO_CHAR(MF.\"NextIntDate\"),'YYYYMMDD'),6),'YYYYMMDD')) ";
+		sql += "    LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = MF.\"CustNo\" ";
+		sql += "    LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = MF.\"CustNo\" ";
+		sql += "                           AND F.\"FacmNo\" = MF.\"FacmNo\" ";
+		sql += "    LEFT JOIN (SELECT \"CustNo\"";
+		sql += "					  ,\"FacmNo\"";
+		sql += " 					 ,MAX(\"StoreRate\") AS \"StoreRate\"";
+		sql += "			   FROM \"MonthlyLoanBal\"";
+		sql += "               WHERE \"YearMonth\" = :yymm ";
+		sql += "                 AND \"LoanBalance\" > 0 ";
+		sql += "               GROUP BY \"CustNo\"";
+		sql += "               		   ,\"FacmNo\"";
+		sql += "              ) ML ON ML.\"CustNo\" = MF.\"CustNo\" AND ML.\"FacmNo\" = MF.\"FacmNo\"";
+		sql += "    WHERE MF.\"YearMonth\" = :yymm ";
+		// --找餘5期 跟 餘4期是1號
+		sql += "      AND (MF.\"OvduTerm\" = 5 ";
+		sql += "      	OR (MF.\"OvduTerm\" = 4 AND SUBSTR(MF.\"PrevIntDate\",7,2) = '01' ))";
+		sql += "    ORDER BY MF.\"PrevIntDate\" ASC ";
+		sql += "    	    ,F.\"FirstDrawdownDate\" ASC ";
 
 
 		this.info("sql=" + sql);
@@ -114,17 +79,7 @@ public class LM030ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 
 		query.setParameter("yymm", parse.stringToInteger(titaVo.getParam("YearMonth")) + 191100);
-//		query.setParameter("CustNo", titaVo.getParam("CustNo"));
-//		query.setParameter("FacmNo", titaVo.getParam("FacmNo"));
-//		query.setParameter("DelayCondition", titaVo.getParam("DelayCondition"));
-//		query.setParameter("OvduDayMin", titaVo.getParam("OvduDayMin"));
-//		query.setParameter("OvduTermMin", titaVo.getParam("OvduTermMin"));
-//		query.setParameter("OvduDayMax", titaVo.getParam("OvduDayMax"));
-//		query.setParameter("OvduTermMax", titaVo.getParam("OvduTermMax"));
-//		query.setParameter("PayMethod", titaVo.getParam("PayMethod"));
-//		query.setParameter("EntCode", titaVo.getParam("EntCode"));
 
-		
 		return this.convertToMap(query);
 	}
 

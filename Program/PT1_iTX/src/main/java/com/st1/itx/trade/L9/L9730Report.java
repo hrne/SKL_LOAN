@@ -14,6 +14,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9730ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -47,7 +48,8 @@ public class L9730Report extends MakeReport {
 		int inputEndDateNext = parse.stringToInteger(titaVo.get("InputEndDateNext")) + 19110000;
 
 		try {
-			listL9730 = l9730ServiceImpl.findAll(inputStartDateFirst, inputEndDateFirst, inputStartDateNext, inputEndDateNext, titaVo);
+			listL9730 = l9730ServiceImpl.findAll(inputStartDateFirst, inputEndDateFirst, inputStartDateNext,
+					inputEndDateNext, titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -61,7 +63,11 @@ public class L9730Report extends MakeReport {
 		if (listL9730 == null || listL9730.isEmpty())
 			return false;
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txcd, txName, txcd + "_" + txName, txcd + "_" + txName + ".xlsx", "X800");
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getBrno()).setRptCode(txcd)
+				.setRptItem(txName).build();
+
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, txcd + "_" + txName, txcd + "_" + txName + ".xlsx", "X800");
 
 		int row = 2;
 
@@ -77,7 +83,8 @@ public class L9730Report extends MakeReport {
 			String thisBormNo = l9730Vo.get("BormNo");
 			String thisLRCRateIncr = l9730Vo.get("LRCRateIncr");
 
-			if (lastCustNo.equals(thisCustNo) && lastFacmNo.equals(thisFacmNo) && lastBormNo.equals(thisBormNo) && lastLRCRateIncr.equals(thisLRCRateIncr)) {
+			if (lastCustNo.equals(thisCustNo) && lastFacmNo.equals(thisFacmNo) && lastBormNo.equals(thisBormNo)
+					&& lastLRCRateIncr.equals(thisLRCRateIncr)) {
 				// 賴桑指示: 連續相同 RateIncr 時，不重覆出
 				continue;
 			} else {

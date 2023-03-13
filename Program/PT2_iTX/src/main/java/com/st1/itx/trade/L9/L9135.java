@@ -30,8 +30,6 @@ public class L9135 extends TradeBuffer {
 	@Autowired
 	L9135Report l9135Report;
 	@Autowired
-	L9135Report2 l9135Report2;
-	@Autowired
 	L9135ServiceImpl l9135ServiceImpl;
 	@Autowired
 	L9135ServiceImpl2 l9135ServiceImpl2;

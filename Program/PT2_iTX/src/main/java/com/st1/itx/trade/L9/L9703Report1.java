@@ -77,7 +77,7 @@ public class L9703Report1 extends MakeReport {
 
 		this.setFontSize(8);
 
-		this.print(-1, 150, "機密等級：密");
+		this.print(-1, 150, "機密等級："+this.getSecurity());
 
 		this.print(-2, 3, "程式ID：" + this.getParentTranCode());
 		this.print(-2, 80, "新光人壽保險股份有限公司", "C");
@@ -123,7 +123,7 @@ public class L9703Report1 extends MakeReport {
 //		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), tran, "滯繳客戶明細表", "密", "A4", "");
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-				.setRptCode(tran).setRptItem("滯繳客戶明細表").setSecurity("密").setRptSize("A4").setPageOrientation("")
+				.setRptCode(tran).setRptItem("滯繳客戶明細表").setSecurity(this.getSecurity()).setRptSize("A4").setPageOrientation("")
 				.build();
 
 		this.open(titaVo, reportVo);
@@ -369,27 +369,5 @@ public class L9703Report1 extends MakeReport {
 		return sno;
 	}
 
-//	private int getCashDay(int date, int days) throws LogicException {
-//		int bussCnt = 0;
-//		int tdate = date;
-//		int iPayDate = 0;
-//		int tdays = days;
-//		while (tdays > 0) {
-//			dateUtil.init();
-//			dateUtil.setDate_1(tdate);
-//			dateUtil.setDays(1);
-//			iPayDate = dateUtil.getCalenderDay();
-//			dateUtil.init();
-//			dateUtil.setDate_2(iPayDate);
-//			tdate = iPayDate;
-//			if (dateUtil.isHoliDay()) {
-//				bussCnt++;
-//			}
-//			tdays--;
-//		}
-//
-//		return days - bussCnt + 1;
-//
-//	}
 
 }

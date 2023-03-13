@@ -14,6 +14,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9733ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -56,10 +57,24 @@ public class L9733Report extends MakeReport {
 	}
 
 	public boolean exportExcel(List<Map<String, String>> listL9733, TitaVo titaVo) throws LogicException {
-
+		
 		boolean result = true;
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txcd, txName, txcd + "_" + txName, "L9733_底稿_利率調整檢核-下調日為月底日.xlsx", "X817");
+		
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = this.txcd;
+		String fileItem = this.txName;
+		String fileName = txcd + "_" + fileItem;
+		String defaultExcel = "L9733_底稿_利率調整檢核-下調日為月底日.xlsx";
+		String defaultSheet = "X817";
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
 
 		int row = 2;
 

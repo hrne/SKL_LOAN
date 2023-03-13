@@ -62,7 +62,7 @@ public class L9137Report extends MakeReport {
 
 		this.print(-1, 1, "程式ID：" + this.getRptCode());
 		this.print(-1, 84, "新光人壽保險股份有限公司", "C");
-		this.print(-1, 146, "機密等級：" + this.getRptSecurity());
+		this.print(-1, 146, "機密等級：" + this.getSecurity());
 		this.print(-2, 1, "報　表：" + this.getRptCode());
 		this.print(-2, 84, this.getRptItem() + "--" + rptTypeItem, "C");
 		this.print(-2, 146, "日　　期：" + exportDate);
@@ -102,7 +102,7 @@ public class L9137Report extends MakeReport {
 		}
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-				.setRptCode("L9137").setRptItem((findRelatedOnly ? "關係人放款餘額總表" : "放款餘額總表")).setSecurity("密")
+				.setRptCode("L9137").setRptItem((findRelatedOnly ? "關係人放款餘額總表" : "放款餘額總表")).setSecurity(this.getSecurity())
 				.setRptSize("A4").setPageOrientation("L").build();
 
 		this.open(titaVo, reportVo);

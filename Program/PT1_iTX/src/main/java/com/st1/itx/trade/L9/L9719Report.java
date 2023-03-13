@@ -14,6 +14,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9719ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component("L9719Report")
 @Scope("prototype")
@@ -33,7 +34,7 @@ public class L9719Report extends MakeReport {
 	private String brno = "";
 	private String reportCode = "L9719";
 	private String reportItem = "放款利息法折溢價攤銷表";
-	private String security = "密";
+//	private String security = "密";
 	private String pageSize = "A4";
 	private String pageOrientation = "L";
 
@@ -54,7 +55,7 @@ public class L9719Report extends MakeReport {
 
 		this.info("L9719Report.printHeader");
 
-		this.print(-1, 145, "機密等級：" + this.security);
+		this.print(-1, 145, "機密等級：" + this.getSecurity());
 		this.print(-2, 85, this.reportItem, "C");
 
 		// 明細表頭
@@ -164,7 +165,8 @@ public class L9719Report extends MakeReport {
 				F13 = formatAmt(tLDVo.get("F13"), 0);
 			}
 
-		} else {
+		} else
+		{
 			print(-2, 4, "本月無資料!!");
 		}
 
@@ -176,7 +178,12 @@ public class L9719Report extends MakeReport {
 	}
 
 	public void makePdf(TitaVo titaVo) throws LogicException {
-		this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno)
+				.setRptCode(reportCode).setRptItem(reportItem).setSecurity(this.getSecurity()).setRptSize(pageSize)
+				.setPageOrientation(pageOrientation).build();
+
+		this.open(titaVo, reportVo);
 
 		this.setCharSpaces(0);
 

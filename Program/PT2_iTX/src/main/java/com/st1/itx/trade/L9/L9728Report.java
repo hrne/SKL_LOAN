@@ -13,6 +13,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9728ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
@@ -103,7 +104,17 @@ public class L9728Report extends MakeReport {
 
 		this.info("L9728Report exportPdf");
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txcd, txname, "", "A4", "L");
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String security = this.getSecurity();
+		String pageSize = "A4";
+		String pageOrientation = "L";
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(txname).setSecurity(security).setRptSize(pageSize).setPageOrientation(pageOrientation)
+				.build();
+		this.open(titaVo, reportVo);
+
 	
 		if (list == null || list.isEmpty())
 		{

@@ -105,14 +105,13 @@ public class L9131Report extends MakeReport {
 
 	private void setReportVo() throws LogicException {
 		this.reportVo = ReportVo.builder().setRptDate(Integer.valueOf(titaVo.getParam("AcDate")) + 19110000)
-				.setBrno(titaVo.getBrno()).setRptCode("L9131").setRptItem("總帳日結單代傳票列印").setSecurity("機密")
+				.setBrno(titaVo.getBrno()).setRptCode("L9131").setRptItem("總帳日結單代傳票列印").setSecurity(this.getSecurity())
 				.setRptSize("A4").setPageOrientation("L").build();
 	}
 
 	public void exec(TitaVo titaVo) throws LogicException {
 		this.info("L9131Report exec ...");
 
-		// setting titaVo
 		this.titaVo = titaVo;
 
 		setReportVo();

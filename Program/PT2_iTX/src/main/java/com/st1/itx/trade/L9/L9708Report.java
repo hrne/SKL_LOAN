@@ -11,6 +11,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9708ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 
 @Component
@@ -29,7 +30,7 @@ public class L9708Report extends MakeReport {
 
 	private String reportCode = "L9708";
 	private String reportItem = "貸款自動轉帳申請書明細表";
-	private String security = "機密";
+//	private String security = "機密";
 
 	// 製表日期
 	private String nowDate;
@@ -45,7 +46,7 @@ public class L9708Report extends MakeReport {
 
 		this.print(-1, 1, "程式ID：" + this.getParentTranCode());
 		this.print(-1, 68, "新光人壽保險股份有限公司", "C");
-		this.print(-1, 123, "機密等級：" + this.security);
+		this.print(-1, 123, "機密等級：" + this.getSecurity());
 		this.print(-2, 1, "報　表：" + this.reportCode);
 		this.print(-2, 68, this.reportItem, "C");
 		this.print(-2, 123, "日　　期：" + showBcDate(this.nowDate, 1));
@@ -59,7 +60,8 @@ public class L9708Report extends MakeReport {
 		 */
 
 		print(2, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
-		print(1, 1, "扣款銀行　　　　              撥款日期　　　　　　　　戶 號　　　　　　額度　       　首次應繳日　　　　　　　扣款帳號 　　　　　　公 司 名 稱      　　          ");
+		print(1, 1,
+				"扣款銀行　　　　              撥款日期　　　　　　　　戶 號　　　　　　額度　       　首次應繳日　　　　　　　扣款帳號 　　　　　　公 司 名 稱      　　          ");
 		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 
 		// 明細起始列(自訂亦必須)
@@ -84,7 +86,16 @@ public class L9708Report extends MakeReport {
 		this.nowDate = dDateUtil.getNowStringRoc();
 		this.nowTime = dDateUtil.getNowStringTime();
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9708", "貸款自動轉帳申請書明細表", "", "A4", "L");
+
+		String brno =titaVo.getBrno();
+
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(brno)
+				.setRptCode(reportCode).setRptItem(reportItem).setSecurity(this.getSecurity()).setRptSize("A4")
+				.setPageOrientation("L").build();
+
+		this.open(titaVo, reportVo);
+
 
 		List<Map<String, String>> l9708List = null;
 		try {

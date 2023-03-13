@@ -66,7 +66,7 @@ public class L9702Report extends MakeReport {
 
 		String today = dDateUtil.getNowStringBc();
 
-		this.print(-1, 116, "機密等級：　密", "R");
+		this.print(-1, 116, "機密等級：　"+ this.getSecurity(), "R");
 		this.print(-2, 120, "日　　期：" + this.showBcDate(today, 1), "R");
 
 		this.print(-2, 3, "報　表：" + this.getRptCode());
@@ -143,7 +143,7 @@ public class L9702Report extends MakeReport {
 
 			ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
 					.setRptCode("L9702").setRptItem(reportName + "(" + ("4".equals(type) ? "總表" : subName) + ")")
-					.setSecurity("密").setRptSize("A4").setPageOrientation("L").build();
+					.setSecurity(this.getSecurity()).setRptSize("A4").setPageOrientation("L").build();
 
 			this.open(titaVo, reportVo);
 
@@ -291,7 +291,6 @@ public class L9702Report extends MakeReport {
 					}
 				}
 			}
-//			this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9702", "放款餘額及財收統計表-通路別", "", "A4", "");
 
 			ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
 					.setRptCode("L9702").setRptItem(reportName + "(" + ("4".equals(type) ? "通路別" : subName) + ")")
@@ -551,8 +550,6 @@ public class L9702Report extends MakeReport {
 		// 開啟報表
 		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
 
-//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9702", "利息收入明細檔LNW63A3P", "LNW63A3P",
-//				"LNW63A3P.xlsx", "LNW63A3P");
 
 		this.info("LDList =" + LDList);
 		if (LDList.size() == 0) {

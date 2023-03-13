@@ -83,6 +83,8 @@ public class L1107 extends TradeBuffer {
 	String iCustUKey;
 	String iUKey;
 	int iStartYY;
+	int iStartMM;
+	int iEndMM;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -94,19 +96,22 @@ public class L1107 extends TradeBuffer {
 		iCustUKey = titaVo.getParam("CustUKey");
 		iUKey = titaVo.getParam("UKey");
 		iStartYY = Integer.valueOf(titaVo.getParam("StartYY"));
+		iStartMM = Integer.valueOf(titaVo.getParam("StartMM"));
+		iEndMM = Integer.valueOf(titaVo.getParam("EndMM"));
 
 		CustMain custMain = custMainService.custIdFirst(iCustId, titaVo);
 		if (custMain == null) {
 			throw new LogicException("E1003", "客戶資料主檔 : " + iCustId);
 		}
-		
+
 		titaVo.putParam("CustNo", custMain.getCustNo());
-		
+
 		if ("1".equals(iFunCd)) { // 新增
-			
+
 			iCustUKey = custMain.getCustUKey();
 			iUKey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
-			FinReportDebt finReportDebt = finReportDebtService.findCustUKeyYearFirst(iCustUKey, iStartYY, titaVo);
+			FinReportDebt finReportDebt = finReportDebtService.findCustUKeyYearFirst(iCustUKey, iStartYY + 1911,
+					titaVo);
 			if (finReportDebt != null) {
 				throw new LogicException("E0002", iStartYY + "年度財務報表 ");
 			}
@@ -135,6 +140,14 @@ public class L1107 extends TradeBuffer {
 			finReportDebtId.setCustUKey(iCustUKey);
 			finReportDebtId.setUkey(iUKey);
 
+			FinReportDebt finReportDebt3 = finReportDebtService.findCustUKeyYearFirst(iCustUKey, iStartYY + 1911,titaVo);
+			
+			if (finReportDebt3 != null) {
+				if(finReportDebt3.getStartMM() == iStartMM && finReportDebt3.getEndMM() == iEndMM) {
+				throw new LogicException("E0012", iStartYY + "年度財務報表 ");
+				}
+			}
+				
 			FinReportDebt finReportDebt = finReportDebtService.holdById(finReportDebtId, titaVo);
 
 			if (finReportDebt == null) {
@@ -144,6 +157,7 @@ public class L1107 extends TradeBuffer {
 			FinReportDebt finReportDebt2 = (FinReportDebt) dataLog.clone(finReportDebt);
 
 			finReportDebt = setFinReportDebt(titaVo, finReportDebt);
+			
 
 			try {
 				boolean diff = false;
@@ -157,7 +171,7 @@ public class L1107 extends TradeBuffer {
 
 				if (diff) {
 					dataLog.setEnv(titaVo, finReportDebt2, finReportDebt);
-					dataLog.exec("修改顧客/" + iStartYY + " 年度財務報表.資產負債表", "CustUKey:" + iCustUKey);
+					dataLog.exec("修改顧客" + iStartYY + " 年度財務報表.資產負債表", "CustUKey:" + iCustUKey);
 				}
 
 			} catch (DBException e) {
@@ -169,10 +183,20 @@ public class L1107 extends TradeBuffer {
 			mntFinReportCashFlow(titaVo);
 			mntFinReportRate(titaVo);
 			mntFinReportQuality(titaVo);
-		}else if ("3".equals(iFunCd)) { // 複製
+		} else if ("3".equals(iFunCd)) { // 複製
 			iCustUKey = custMain.getCustUKey();
 			iUKey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
-			FinReportDebt finReportDebt = finReportDebtService.findCustUKeyYearFirst(iCustUKey, iStartYY, titaVo);
+
+			FinReportDebt finReportDebt3 = finReportDebtService.findCustUKeyYearFirst(iCustUKey, iStartYY + 1911,titaVo);
+			
+			if (finReportDebt3 != null) {
+				if(finReportDebt3.getStartMM() == iStartMM && finReportDebt3.getEndMM() == iEndMM) {
+				throw new LogicException("E0012", iStartYY + "年度財務報表 ");
+				}
+			}
+			
+			FinReportDebt finReportDebt = finReportDebtService.findCustUKeyYearFirst(iCustUKey, iStartYY + 1911,
+					titaVo);
 			if (finReportDebt != null) {
 				throw new LogicException("E0002", iStartYY + "年度財務報表 ");
 			}
@@ -595,7 +619,7 @@ public class L1107 extends TradeBuffer {
 
 				if (diff) {
 					dataLog.setEnv(titaVo, finReportProfit2, finReportProfit);
-					dataLog.exec("修改顧客/" + iStartYY + " 年度財務報表.損益表","CustUKey:" + iCustUKey);
+					dataLog.exec("修改顧客/" + iStartYY + " 年度財務報表.損益表", "CustUKey:" + iCustUKey);
 				}
 
 			} catch (DBException e) {

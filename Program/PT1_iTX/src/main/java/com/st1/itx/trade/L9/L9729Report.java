@@ -14,6 +14,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9729ServiceImpl;
 import com.st1.itx.db.service.springjpa.cm.L9729ServiceImpl.WorkType;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.StringCut;
 import com.st1.itx.util.parse.Parse;
@@ -69,7 +70,8 @@ public class L9729Report extends MakeReport {
 		this.print(-1, 123, "日  期：" + this.showBcDate(dateUtil.getNowStringBc(), 1));
 		this.print(-2, 1, "  報  表：" + this.getRptCode());
 		this.print(-2, 68, "歷史封存資料搬運結果明細", "C");
-		this.print(-2, 123, "時  間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6));
+		this.print(-2, 123, "時  間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
+				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6));
 		this.print(-3, 123, "頁  數：" + this.getNowPage());
 		this.print(-5, 1, String.format("  封存對象... %s ", workType.getDesc()));
 		this.print(-4, 1, String.format("  執行日期... %s ", this.showRocDate(inputDate, 1))); // YYY/MM/DD
@@ -78,7 +80,8 @@ public class L9729Report extends MakeReport {
 		 * ---------------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 		 */
 		this.print(-7, 1, "   執行批次  封存／復原　資料表名              戶號     額度  撥款編號  結果  搬運結果說明");
-		this.print(-8, 1, "  ========================================================================================================================================");
+		this.print(-8, 1,
+				"  ========================================================================================================================================");
 
 		this.setBeginRow(9);
 
@@ -91,7 +94,9 @@ public class L9729Report extends MakeReport {
 
 		this.info("L9729Report exportPdf");
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txcd, txname, "", "A4", "L");
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getBrno()).setRptCode(txcd)
+				.setRptItem(txname).setSecurity(this.getSecurity()).setRptSize("A4").setPageOrientation("L").build();
+		this.open(titaVo, reportVo);
 
 		if (list == null || list.isEmpty()) {
 			// 本日無資料

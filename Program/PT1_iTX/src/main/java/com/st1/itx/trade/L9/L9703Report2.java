@@ -91,13 +91,9 @@ public class L9703Report2 extends MakeReport {
 
 		String tran = titaVo.getTxCode().isEmpty() ? "L9703" : titaVo.getTxCode();
 
-//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9703A", "放款本息攤還表暨繳息通知單", "密", "8.5,12", "P");
-//		openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(),
-//				titaVo.getTxCode().isEmpty() ? tran + "B" : titaVo.getTxCode() + "B", rptitem, "inch,8.5,12", "P");
-
 		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
 				.setRptCode(titaVo.getTxCode().isEmpty() ? tran + "B" : titaVo.getTxCode() + "B").setRptItem(rptitem)
-				.setRptSize("inch,8.5,12").setSecurity("").setPageOrientation("P").build();
+				.setRptSize("inch,8.5,12").setSecurity(this.getSecurity()).setPageOrientation("P").build();
 
 		this.openForm(titaVo, reportVo);
 
@@ -129,8 +125,6 @@ public class L9703Report2 extends MakeReport {
 
 		long sno = this.close();
 
-		// 測試用
-//		this.toPdf(sno);
 
 		return sno;
 	}
@@ -138,7 +132,6 @@ public class L9703Report2 extends MakeReport {
 	private void report(Map<String, String> tL9703Vo, TxBuffer txbuffer, TitaVo titaVo) throws LogicException {
 		ArrayList<BaTxVo> lBaTxVo = new ArrayList<>();
 		ArrayList<BaTxVo> listBaTxVo = new ArrayList<>();
-//		int termStart = parse.stringToInteger(titaVo.getParam("UnpaidTermSt"));
 		int termEnd = 0;
 
 		if (titaVo.getParam("UnpaidTermEd") != null) {

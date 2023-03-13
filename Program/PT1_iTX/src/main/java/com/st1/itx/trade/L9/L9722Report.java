@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9722ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -64,7 +65,14 @@ public class L9722Report extends MakeReport {
 
 		this.info(txcd + "Report exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txcd, txName, txcd + "_" + txName, txcd + "_底稿_" + txName + ".xlsx", 1, sheetName);
+		
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getBrno()).setRptCode(txcd)
+				.setRptItem(txName).build();
+
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, txcd + "_" + txName,  txcd + "_底稿_" + txName + ".xlsx",1 );
+		
+		makeExcel.setSheet(sheetName);
 
 		if (lList != null && lList.size() != 0) {
 

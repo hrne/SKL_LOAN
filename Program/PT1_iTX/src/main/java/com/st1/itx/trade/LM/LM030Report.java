@@ -66,7 +66,7 @@ public class LM030Report extends MakeReport {
 		String fileItem = "轉催收明細總表";
 		String fileName = "LM030轉催收案件明細_核定總表";
 		String defaultExcel = "LM030_底稿_轉催收案件明細_核定總表.xlsx";
-		String defaultSheet = "11005";
+		String defaultSheet = "YYYMM";
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
 				.setRptItem(fileItem).build();
@@ -74,10 +74,20 @@ public class LM030Report extends MakeReport {
 		// 開啟報表
 		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
 
-		String yy = titaVo.get("ENTDY").substring(1, 4);
-		String mm = titaVo.get("ENTDY").substring(4, 6);
-		makeExcel.setSheet("11005", yy + mm);
-		makeExcel.setValue(1, 1, yy + "." + mm + "  轉催收明細總表");
+		int yy = Integer.valueOf(titaVo.getParam("YearMonth")) / 100;
+		int mm = Integer.valueOf(titaVo.getParam("YearMonth")) % 100;
+
+		if (mm == 12) {
+			mm = 1;
+			yy = yy + 1;
+		} else {
+			mm = mm + 1;
+		}
+
+		int rocYM = yy * 100 + mm;
+
+		makeExcel.setSheet("YYYMM", rocYM + "");
+		makeExcel.setValue(1, 1, yy + "年 " + mm + " 月轉催收明細總表");
 		BigDecimal total = BigDecimal.ZERO;
 
 		int row = 3;
@@ -101,11 +111,12 @@ public class LM030Report extends MakeReport {
 								parse.isNumeric(value) ? parse.stringToInteger(this.showRocDate(value, 3)) : value);
 						break;
 					case 6:
-					case 7:
 						// 金額
 						BigDecimal bd = getBigDecimal(value);
 						makeExcel.setValue(row, col, bd, "#,##0");
 						total = total.add(bd);
+						break;
+					case 7:// 利息金額(不顯示)
 						break;
 					case 8:
 						// 利率
@@ -155,8 +166,6 @@ public class LM030Report extends MakeReport {
 		makeExcel.setColor("RED");
 		makeExcel.setValue(row + 3, 7, total, "#,##0");
 		makeExcel.setValue(row + 5, 1, "一、李案為年期延長後再協議案件，因未符合免列報逾放條件，故轉列催收款項。");
-//		makeExcel.setValue(row + 13, 5, listLM030.size());
-//		makeExcel.setValue(row + 13, 7, total, "#,##0");
 
 		makeExcel.close();
 	}

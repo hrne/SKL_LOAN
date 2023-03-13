@@ -58,7 +58,7 @@ public class L9715Report extends MakeReport {
 
 		this.setFontSize(8);
 		this.setCharSpaces(0);
-		this.print(-1, 184, "機密等級：機密");
+		this.print(-1, 184, "機密等級："+this.getSecurity());
 		this.print(-2, 184, "基　礎：" + showBcDate(fundDay, 0));
 		this.print(-3, 8, "程式ID：" + this.getParentTranCode());
 		this.print(-3, 100, "新光人壽保險股份有限公司", "C");
@@ -107,7 +107,7 @@ public class L9715Report extends MakeReport {
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String reportItem = "業務專案照顧十八個月明細表";
-		String security = "密";
+		String security =this.getSecurity();
 		String pageSize = "A4";
 		String pageOrientation = "L";
 

@@ -55,9 +55,6 @@ public class L9744Report extends MakeReport {
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> L9744List) throws LogicException {
 		this.info("exportExcel ... ");
 
-//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9744", "三階放款明細統計", "L9744三階放款明細統計",
-//				"L9744_底稿_三階放款明細統計.xls", "三階放款明細統計");
-		
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "L9744";

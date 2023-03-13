@@ -16,12 +16,11 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9720ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component("L9720Report")
 @Scope("prototype")
 public class L9720Report extends MakeReport {
-	// private static final Logger logger =
-	// LoggerFactory.getLogger(L9720Report.class);
 
 	@Autowired
 	L9720ServiceImpl l9720ServiceImpl;
@@ -65,15 +64,31 @@ public class L9720Report extends MakeReport {
 		// YYYMM續約檢核結果(YYYMM及YYYMM月).xlsx
 
 		String EntDy = Integer.toString(titaVo.getEntDyI() + 19110000);
-		LocalDate validDatePivot = LocalDate.of(Integer.parseInt(EntDy.substring(0, 4)), Integer.parseInt(EntDy.substring(4, 6)), Integer.parseInt(EntDy.substring(6)));
+		LocalDate validDatePivot = LocalDate.of(Integer.parseInt(EntDy.substring(0, 4)),
+				Integer.parseInt(EntDy.substring(4, 6)), Integer.parseInt(EntDy.substring(6)));
 		LocalDate validDateFirst = validDatePivot.minusMonths(10);
 		LocalDate validDateSecond = validDatePivot.minusMonths(22);
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), TXCD, TXName,
-				TXCD + "_" + Integer.toString(validDatePivot.getYear() - 1911) + String.format("%02d", validDatePivot.getMonthValue()) + "續約檢核結果(" + Integer.toString(validDateFirst.getYear() - 1911)
-						+ String.format("%02d", validDateFirst.getMonthValue()) + "及" + Integer.toString(validDateSecond.getYear() - 1911) + String.format("%02d", validDateSecond.getMonthValue())
-						+ "月)",
-				TXCD + "_底稿_" + TXName + ".xlsx", 1, SheetName);
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = TXCD;
+		String fileItem = TXName;
+		String fileName = TXCD + "_" + Integer.toString(validDatePivot.getYear() - 1911)
+				+ String.format("%02d", validDatePivot.getMonthValue()) + "續約檢核結果("
+				+ Integer.toString(validDateFirst.getYear() - 1911)
+				+ String.format("%02d", validDateFirst.getMonthValue()) + "及"
+				+ Integer.toString(validDateSecond.getYear() - 1911)
+				+ String.format("%02d", validDateSecond.getMonthValue()) + "月)";
+		String defaultExcel = TXCD + "_底稿_" + TXName + ".xlsx";
+//		String defaultSheet = "la$w30p";
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, 1);
+
+		makeExcel.setSheet(1, SheetName);
 
 		if (lList != null && lList.size() != 0) {
 

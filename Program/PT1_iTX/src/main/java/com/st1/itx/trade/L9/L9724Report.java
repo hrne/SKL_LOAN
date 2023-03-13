@@ -14,6 +14,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9724ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -67,21 +68,29 @@ public class L9724Report extends MakeReport {
 
 	}
 
-	private void exportExcel(TitaVo titaVo, List<Map<String, String>> lList, boolean newExcel, boolean closeExcel, String SheetName) throws LogicException {
+	private void exportExcel(TitaVo titaVo, List<Map<String, String>> lList, boolean newExcel, boolean closeExcel,
+			String SheetName) throws LogicException {
 
 		this.info("L9724Report exportExcel");
 
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getBrno()).setRptCode(TXCD)
+				.setRptItem(TXName).build();
 		if (newExcel == true) {
-			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), TXCD, TXName, TXCD + "_" + TXName, TXCD + "_底稿_" + TXName + ".xlsx", SheetName, SheetName);
+
+			// 開啟報表
+			makeExcel.open(titaVo, reportVo, TXCD + "_" + TXName, TXCD + "_底稿_" + TXName + ".xlsx", SheetName);
+
 		} else {
 			makeExcel.setSheet(SheetName);
 		}
 
 		// fill in inputDate with proper format
-		String targetDate = parse.IntegerToString(parse.stringToInteger(titaVo.getParam("inputEndOfMonthDate")) + 19110000, 1); // YYYYMMDD
+		String targetDate = parse
+				.IntegerToString(parse.stringToInteger(titaVo.getParam("inputEndOfMonthDate")) + 19110000, 1); // YYYYMMDD
 
 		// at F1
-		makeExcel.setValue(1, 6, String.format("月差 %s/%s/%s", targetDate.substring(0, 4), targetDate.substring(4, 6), targetDate.substring(6)));
+		makeExcel.setValue(1, 6, String.format("月差 %s/%s/%s", targetDate.substring(0, 4), targetDate.substring(4, 6),
+				targetDate.substring(6)));
 
 		if (lList != null && !lList.isEmpty()) {
 
@@ -122,7 +131,8 @@ public class L9724Report extends MakeReport {
 					case 4:
 						tmpValue = tLDVo.get("F" + col);
 						// format to YYYY/M/DD
-						makeExcel.setValue(row, col + pivotCol, String.format("%s/%s/%s", tmpValue.substring(0, 4), parse.stringToInteger(tmpValue.substring(4, 6)), tmpValue.substring(6)), "R");
+						makeExcel.setValue(row, col + pivotCol, String.format("%s/%s/%s", tmpValue.substring(0, 4),
+								parse.stringToInteger(tmpValue.substring(4, 6)), tmpValue.substring(6)), "R");
 						break;
 					case 5:
 						// month diff

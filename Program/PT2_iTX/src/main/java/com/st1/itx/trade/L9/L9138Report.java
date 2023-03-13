@@ -61,7 +61,7 @@ public class L9138Report extends MakeReport {
 		this.print(-1, 1, "程式ID  ：" + this.getParentTranCode());
 		this.print(-2, 1, "報表代號：" + this.getRptCode());
 
-		this.print(-1, 150, "機密等級：" + this.getRptSecurity());
+		this.print(-1, 150, "機密等級：" + this.getSecurity());
 		this.print(-2, 150, "日　　期：" + showBcDate(this.nowDate, 1));
 		this.print(-3, 150, "時　　間：" + showTime(this.nowTime));
 		this.print(-4, 150, "頁　　數：" + this.getNowPage());
@@ -115,9 +115,6 @@ public class L9138Report extends MakeReport {
 		 * -------------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6-----
 		 * ----------------123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345
 		 */
-//		this.print(-7, 1, "　　　　　　　　　　　　　　　　件　　　　　　　　　　　數　　　　　　　　　　　　　　　　　　 金 　　　　　　　　　　　　　　　　　　 額");
-//		this.print(-8, 1, "　　　　　　　　　　　 ----------------------------------------------　------------------------------------------------------------------------------------------");
-//		this.print(-9, 1, "業務科目                　前日　　加　　減　展入　展出　淨值　　本日　　　　前　　日　　　　　　　加　　　　　　　減　　　　淨增減　　　　本　　日　　　　　　展　期");
 
 		if (lL9138 != null && lL9138.size() != 0) {
 
@@ -242,7 +239,7 @@ public class L9138Report extends MakeReport {
 	public void makePdf(TitaVo titaVo,int acdate) throws LogicException {
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI() + 19110000).setBrno(titaVo.getBrno())
-				.setRptCode("L9138").setRptItem("放款授信日報表").setSecurity("密").setRptSize("A4").setPageOrientation("L")
+				.setRptCode("L9138").setRptItem("放款授信日報表").setSecurity(this.getSecurity()).setRptSize("A4").setPageOrientation("L")
 				.build();
 		this.open(titaVo, reportVo);
 
@@ -251,8 +248,6 @@ public class L9138Report extends MakeReport {
 		fillData(titaVo,acdate);
 
 		this.close();
-
-		// this.toPdf(sno, reportCode + "_" + reportItem);
 
 	}
 

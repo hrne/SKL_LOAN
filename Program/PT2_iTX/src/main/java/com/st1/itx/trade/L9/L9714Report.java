@@ -13,6 +13,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9714ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -43,13 +44,7 @@ public class L9714Report extends MakeReport {
 
 	@Override
 	public void printHeader() {
-		this.info("printHeader-----------");
-		// this.setFontSize(13);
 		this.setCharSpaces(0);
-
-//		if (f0.equals("")) {
-//			return;
-//		}
 
 		this.setBeginRow(3);
 
@@ -62,7 +57,7 @@ public class L9714Report extends MakeReport {
 		this.print(-6, colCount + 6, "房　屋　擔　保　借　款　繳　息　清　單");
 		this.print(-7, colCount + 6, "￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣");
 
-		this.print(-2, colCount + 67, "  機密等級：密");
+		this.print(-2, colCount + 67, "  機密等級：" + this.getSecurity());
 		this.print(-3, colCount + 67, "┌─┬─────────────┐");
 		this.print(-4, colCount + 67, "│　│房屋擔保借款繳息證明專用章│");
 		this.print(-5, colCount + 67, "│戳├─────────────┤");
@@ -74,25 +69,33 @@ public class L9714Report extends MakeReport {
 		this.print(-11, colCount + 67, "└─┴─────────────┘");
 
 		this.print(-13, colCount + 1, "┌────┬──────┬────────┬───────────────────────────┐");
-		this.print(-14, colCount + 1, "│借戶姓名│            │房屋所有權人姓名│※                                                    │");
+		this.print(-14, colCount + 1,
+				"│借戶姓名│            │房屋所有權人姓名│※                                                    │");
 		this.print(-15, colCount + 1, "├────┼──────┼────────┼───────────────────────────┤");
-		this.print(-16, colCount + 1, "│統一編號│            │統一編號        │※                                                    │");
+		this.print(-16, colCount + 1,
+				"│統一編號│            │統一編號        │※                                                    │");
 		this.print(-17, colCount + 1, "├────┼──────┼────────┼───────────────────────────┤");
-		this.print(-18, colCount + 1, "│房屋稅籍│※          │房屋坐落        │※                                                    │");
+		this.print(-18, colCount + 1,
+				"│房屋稅籍│※          │房屋坐落        │※                                                    │");
 		this.print(-19, colCount + 1, "└────┴──────┴────────┴───────────────────────────┘");
 
 		this.print(-21, colCount + 1, "┌──────┬───────┬─────────┬──────┬──────┬─────────┐");
-		this.print(-22, colCount + 1, "│房屋所有權　│              │                  │            │            │      本期未償還　│");
+		this.print(-22, colCount + 1,
+				"│房屋所有權　│              │                  │            │            │      本期未償還　│");
 		this.print(-23, colCount + 1, "│取得日※    │ 貸款帳號     │     最初貸款金額 │   貸款起日 │   貸款迄日 │      本金額（元）│");
 		this.print(-24, colCount + 1, "├──────┼───────┼─────────┼──────┼──────┼─────────┤");
-		this.print(-25, colCount + 1, "│            │              │                  │            │            │                  │");
+		this.print(-25, colCount + 1,
+				"│            │              │                  │            │            │                  │");
 		this.print(-26, colCount + 1, "└──────┴───────┴─────────┴──────┴──────┴─────────┘");
 
 		this.print(-28, colCount + 1, "┌──────────────┬────────────────┬────────────────┐");
-		this.print(-29, colCount + 1, "│繳息所屬年月                │                      繳息金額　│                        用途別  │");
+		this.print(-29, colCount + 1,
+				"│繳息所屬年月                │                      繳息金額　│                        用途別  │");
 		this.print(-30, colCount + 1, "├──────────────┼────────────────┼────────────────┤");
-		this.print(-31, colCount + 1, "│自                          │                                │                                │");
-		this.print(-32, colCount + 1, "│至                          │                                │                                │");
+		this.print(-31, colCount + 1,
+				"│自                          │                                │                                │");
+		this.print(-32, colCount + 1,
+				"│至                          │                                │                                │");
 
 		String tmp;
 
@@ -145,7 +148,13 @@ public class L9714Report extends MakeReport {
 			return false;
 		}
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9714", "繳息證明單", "", "A4", "P");
+		String tradeNo = "L9714";
+		String tradeName = "繳息證明單";
+		String brno = titaVo.getBrno();
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(brno).setRptCode(tradeNo)
+				.setRptItem(tradeName).setSecurity(this.getSecurity()).setRptSize("A4").setPageOrientation("P").build();
+
+		this.open(titaVo, reportVo);
 
 		if (l9714List.size() > 0) {
 			for (Map<String, String> tL9714Vo : l9714List) {

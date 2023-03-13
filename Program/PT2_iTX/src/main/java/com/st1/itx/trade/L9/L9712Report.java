@@ -13,6 +13,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9712ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 
 @Component
@@ -37,7 +38,7 @@ public class L9712Report extends MakeReport {
 		this.setFontSize(10);
 		this.setCharSpaces(0);
 
-		this.print(-1, 146, "機密案件：密");
+		this.print(-1, 146, "機密案件："+this.getSecurity());
 		this.print(-2, 3, "程式ID：" + this.getParentTranCode());
 		this.print(-2, 80, "新光人壽保險股份有限公司", "C");
 		this.print(-3, 3, "報  表：" + this.getRptCode());
@@ -69,7 +70,16 @@ public class L9712Report extends MakeReport {
 
 		this.info("L9712Report exec");
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9712", "利息違約金減免明細表", "", "A4", "L");
+		String tradeNo = "L9712";
+		String tradeName = "利息違約金減免明細表";
+		String brno =titaVo.getBrno();
+
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(brno)
+				.setRptCode(tradeNo).setRptItem(tradeName).setSecurity(this.getSecurity()).setRptSize("A4")
+				.setPageOrientation("L").build();
+
+		this.open(titaVo, reportVo);
 
 		try {
 			List<Map<String, String>> l9712List = l9712ServiceImpl.findAll(titaVo);
@@ -105,7 +115,7 @@ public class L9712Report extends MakeReport {
 
 		this.close();
 
-		// this.toPdf(sno);
+		//this.toPdf(sno);
 	}
 
 	private void report1(Map<String, String> tL9712Vo) throws LogicException {
@@ -137,9 +147,9 @@ public class L9712Report extends MakeReport {
 		totalBreachAmtReceive += Integer.parseInt((tL9712Vo.get("F5")));
 
 //		double amt = Double.parseDouble(tL9712Vo.get("F7"));
-		// 減免 利息
+		//減免 利息
 		int amt1 = Integer.valueOf(tL9712Vo.get("F6"));
-		// 減免 違約金
+		//減免 違約金
 		int amt2 = Integer.valueOf(tL9712Vo.get("F7"));
 //
 //		if (amt > amt2) {
@@ -168,7 +178,7 @@ public class L9712Report extends MakeReport {
 		}
 
 //		 tL9712Vo.get("F8")
-		String txtNo = tL9712Vo.get("F8");
+		String txtNo =tL9712Vo.get("F8");
 		// 授權主管
 		this.print(0, 147, txtNo);
 	}

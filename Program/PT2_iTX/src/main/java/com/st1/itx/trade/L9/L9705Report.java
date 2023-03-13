@@ -103,9 +103,6 @@ public class L9705Report extends MakeReport {
 
 		String tran = titaVo.getTxCode().isEmpty() ? "L9705" : titaVo.getTxCode();
 
-//		List<Map<String, String>> listA3 = new ArrayList<Map<String, String>>();
-//		List<Map<String, String>> list = new ArrayList<Map<String, String>>();
-
 		this.custNo = 0;
 		this.facmNo = 0;
 
@@ -124,14 +121,12 @@ public class L9705Report extends MakeReport {
 			// 開啟報表
 			ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
 					.setRptCode(tran + "A" + recocodeToFrom).setRptItem(rptitem + recocodeToFrom).setRptSize("A4")
-					.setSecurity("").setPageOrientation("P").build();
+					.setSecurity(this.getSecurity()).setPageOrientation("P").build();
 
 			this.openForm(titaVo, reportVo);
-//			this.open(titaVo, reportVo);
 
 			this.info("conditionCode = " + titaVo.get("CONDITION1"));
 
-//			int tmpListSize = 0;
 			boolean isLast = false;
 
 			for (Map<String, String> r : l9705List) {

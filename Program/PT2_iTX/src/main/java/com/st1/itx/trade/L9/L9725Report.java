@@ -139,7 +139,6 @@ public class L9725Report extends MakeReport {
 		String txcd = TXCD;
 		String fileItem = TXName + "(D1110505B)";
 		String fileName = TXCD + "_" + TXName + "(D1110505B)";
-//		String defaultExcel = TXCD + "_底稿_" + TXName + ".xlsx";
 		String defaultSheet = "D1110505B";
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)

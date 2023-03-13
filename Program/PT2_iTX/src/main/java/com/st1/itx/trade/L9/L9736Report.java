@@ -12,6 +12,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9736ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -47,7 +48,22 @@ public class L9736Report extends MakeReport {
 		List<Map<String, String>> resultList = l9736ServiceImpl.getNormalCustomerLoanData(inputDrawdownDate, titaVo);
 
 		// open excel
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txCD, txName, txCD + "_" + txName, "L9736_底稿_正常戶餘額明細.xlsx", "yyymmdd", titaVo.getParam("DrawdownDate"));
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = this.txCD;
+		String fileItem = this.txName;
+		String fileName = txcd + "_" + fileItem;
+		String defaultExcel = "L9736_底稿_正常戶餘額明細.xlsx";
+		String defaultSheet = "yyymmdd";
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+
+		makeExcel.setSheet(defaultSheet, titaVo.getParam("DrawdownDate"));
+
 
 		int row = 2;
 

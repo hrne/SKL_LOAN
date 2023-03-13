@@ -16,6 +16,7 @@ import com.st1.itx.db.service.springjpa.cm.L9704ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ExcelFontStyleVo;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.format.FormatUtil;
 
 @Component("L9704Report")
@@ -62,19 +63,34 @@ public class L9704Report extends MakeReport {
 	private void exportExcel(int thisMonth, List<Map<String, String>> listL9704, TitaVo titaVo) throws LogicException {
 		this.info("L9704 exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9704", "催收款明細表", "L9704催收款明細表", "L9704_底稿_催收款明細表.xlsx", "工作表1", this.showRocDate(thisMonth * 100 + 1, 5));
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "L9704";
+		String fileItem = "催收款明細表";
+		String fileName = "L9704-催收款明細表";
+		String defaultExcel = "L9704_底稿_催收款明細表.xlsx";
+		String defaultSheet = "工作表1";
 
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
+		makeExcel.setSheet(defaultSheet, this.showRocDate(thisMonth * 100 + 1, 5));
+		
 		fontStyleVo = new ExcelFontStyleVo();
 
 		fontStyleVo.setFont((short) 1); // 字體 : 標楷體
 
 		fontStyleVo.setSize((short) 12); // 字體大小 : 12
-
+		
 		String today = dDateUtil.getNowStringBc();
-
+		
 		// 表頭
 		makeExcel.setValue(2, 15, "日　　期：" + this.showBcDate(today, 1));
-		makeExcel.setValue(3, 15, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":" + dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
+		makeExcel.setValue(3, 15, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
+				+ dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
 
 		int printRow = 7; // 從這行開始印
 
@@ -201,7 +217,7 @@ public class L9704Report extends MakeReport {
 		makeExcel.setAddRengionBorder("A", 1, "P", printRow, 1);
 
 		makeExcel.close();
-		// makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 
 	// 印小計

@@ -70,9 +70,7 @@ public class L9747Report extends MakeReport {
 
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LMList, int dataDate) throws LogicException {
 		this.info("L9747Report exportExcel");
-//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9747", 
-//				"催收及呆帳戶暫收款明細表", "L9747催收及呆帳戶暫收款明細表",
-//				"L9747_底稿_催收及呆帳戶暫收款明細表.xlsx", "D961211M");
+
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "L9747";

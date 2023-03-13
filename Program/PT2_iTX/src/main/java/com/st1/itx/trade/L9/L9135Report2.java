@@ -14,6 +14,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 
 import com.st1.itx.util.common.MakeFile;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.parse.Parse;
 
 @Component("L9135Report2")
@@ -33,21 +34,28 @@ public class L9135Report2 extends MakeFile {
 		BigDecimal amtDb;
 		BigDecimal amtCr;
 		BigDecimal amt;
-		int date;
-		String brno;
-		String fileCode;
-		String fileItem;
-		String fileName;
+
 		this.iAcDate = String.valueOf(iAcDate);
 		List<Map<String, String>> l9135List = l9135Result;
 
 		if (l9135List.size() > 0) {
-			date = Integer.valueOf(titaVo.getEntDy());
-			brno = titaVo.getBrno();
-			fileCode = "L9135";
-			fileItem = "銀行存款媒體明細表";
-			fileName = "銀行存款媒體明細表（總帳）.txt";
-			this.open(titaVo, date, brno, fileCode, fileItem, fileName, 2);
+
+			
+			int reportDate = titaVo.getEntDyI() + 19110000;
+			String brno = titaVo.getBrno();
+			String txcd = "L9135";
+			String fileItem = "銀行存款媒體明細表";
+			String fileName = "L9135-銀行存款媒體明細表";
+//			String exportFile = "L9135-銀行存款媒體明細表（總帳）.txt";
+
+
+			ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+					.setRptItem(fileItem).build();
+
+			
+			
+			
+			this.open(titaVo, reportVo,fileName, 2);
 
 			for (Map<String, String> r : l9135List) {
 

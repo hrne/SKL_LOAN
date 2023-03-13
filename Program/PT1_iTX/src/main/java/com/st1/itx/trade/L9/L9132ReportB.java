@@ -99,7 +99,7 @@ public class L9132ReportB extends MakeReport {
 		this.nowTime = dDateUtil.getNowStringTime();
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate)
-				.setBrno(brno).setRptCode(reportCode).setRptItem(reportItem).setSecurity(security)
+				.setBrno(brno).setRptCode(reportCode).setRptItem(reportItem).setSecurity(this.getSecurity())
 				.setRptSize(pageSize).setPageOrientation(pageOrientation).build();
 		
 		this.open(titaVo, reportVo);

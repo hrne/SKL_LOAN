@@ -30,12 +30,9 @@ public class L9134Report3 extends MakeReport {
 	// PageOrientation : 紙張方向
 	// P:Portrait Orientation (直印) , L:Landscape Orientation(橫印)
 	private int reportDate = 0;
-//	private String brno = "";
 	private String reportCode = "L9134";
 	private String reportItem = "放款暫收款對帳明細表";
-//	private String security = "";
-//	private String pageSize = "A4";
-//	private String pageOrientation = "L";
+
 
 	@Autowired
 	public MakeExcel makeExcel;
@@ -46,23 +43,18 @@ public class L9134Report3 extends MakeReport {
 		this.reportDate = endDate;
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(titaVo.getBrno()).setRptCode(reportCode)
-				.setRptItem(reportItem).setSecurity("security").build();
+				.setRptItem(reportItem).setSecurity(this.getSecurity()).build();
 
 		makeExcel.open(titaVo, reportVo, reportItem);
 
-//		makeExcel.setValue(1, 1, "科目", "C");
-//		makeExcel.setValue(1, 2, "子目", "C");
-//		makeExcel.setValue(1, 3, "細目", "C");
+
 		makeExcel.setValue(1, 1, "暫收款名稱", "C");
 		makeExcel.setValue(1, 2, "戶號", "C");
 		makeExcel.setValue(1, 3, "額度", "C");
 		makeExcel.setValue(1, 4, "起帳日期", "C");
 		makeExcel.setValue(1, 5, "最後交易日", "C");
 		makeExcel.setValue(1, 6, "暫收款餘額", "C");
-//		makeExcel.setValue(1, 6, "未銷帳餘額", "C");
-//		makeExcel.setValue(1, 7, "會計帳餘額", "C");
-//		makeExcel.setValue(1, 11, "區隔帳冊", "C");
-//		makeExcel.setValue(1, 12, "展期記號", "C");
+
 
 		List<Map<String, String>> list = l9134ServiceImpl.doQueryL9134_3(titaVo);
 
@@ -80,41 +72,14 @@ public class L9134Report3 extends MakeReport {
 			 */
 			for (Map<String, String> r : list) {
 				row++;
-				//makeExcel.setValue(row, 1, r.get("AcNoCode"));
-				
-//				String AcNameCode = "";
-//				if(r.get("AcNoCode").equals("20222010000")) {
-//					AcNameCode = r.get("AcNoCode")+"－火險保費 ";
-//				}
-//				if(r.get("AcNoCode").equals("20222020000")) {
-//					AcNameCode = r.get("AcNoCode")+"－擔保放款  ";
-//				}
-//				if(r.get("AcNoCode").equals("20222180000")) {
-//					AcNameCode = r.get("AcNoCode")+"－債權協商  ";
-//				}
-//				if(r.get("AcNoCode").equals("20222180100")) {
-//					AcNameCode = r.get("AcNoCode")+"－更生統一收付   ";
-//				}
-//				if(r.get("AcNoCode").equals("20222180200")) {
-//					AcNameCode = r.get("AcNoCode")+"－前置調解  ";
-//				}
-				
-//				makeExcel.setValue(row, 1, r.get("AcNoCode"));//!
-//				makeExcel.setValue(row, 2, r.get("AcSubCode"));//!
-//				makeExcel.setValue(row, 3, r.get("AcDtlCode"));
+
 				makeExcel.setValue(row, 1, r.get("AcNoItem"));
 				makeExcel.setValue(row, 2, r.get("CustNo"));
 				makeExcel.setValue(row, 3, r.get("FacmNo"));
 				makeExcel.setValue(row, 4, r.get("OpenAcDate"));
 				makeExcel.setValue(row, 5, r.get("LastTxDate"));
-//				makeExcel.setValue(row, 6, r.get("AcBal").isEmpty() ? BigDecimal.ZERO : new BigDecimal(r.get("AcBal")),
-//						"#,##0", "R");
 				makeExcel.setValue(row, 6, r.get("RvBal").isEmpty() ? BigDecimal.ZERO : new BigDecimal(r.get("RvBal")),
 						"#,##0", "R");
-//				makeExcel.setValue(row, 11, r.get("Item"));
-//				String textRenewCode = "1".equals(r.get("RenewCode").trim()) ? "一般"
-//						: "2".equals(r.get("RenewCode").trim()) ? "協議" : " ";
-//				makeExcel.setValue(row, 12, textRenewCode);
 
 			}
 

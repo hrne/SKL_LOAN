@@ -15,6 +15,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -110,7 +111,15 @@ public class L9713Report extends MakeReport {
 		iday5 = addDate(iday, 12);
 
 		// open pdf
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9713", "應收票據之帳齡分析表", "", "A4", "L");
+
+		String tradeNo = "L9713";
+		String tradeName = "應收票據之帳齡分析表";
+		String brno = titaVo.getBrno();
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(brno).setRptCode(tradeNo)
+				.setRptItem(tradeName).setSecurity(this.getSecurity()).setRptSize("A4").setPageOrientation("L").build();
+
+		this.open(titaVo, reportVo);
 
 		// 當日 西元年月日 20210208
 		String iCALDY = String.valueOf(Integer.valueOf(titaVo.get("CALDY")) + 19110000);
@@ -164,7 +173,8 @@ public class L9713Report extends MakeReport {
 
 					// 此陣列大小必為3
 					if (tmpDate.length == 3) {
-						tday = Integer.valueOf(tmpDate[0] + String.format("%02d", Integer.parseInt(tmpDate[1])) + String.format("%02d", Integer.parseInt(tmpDate[2]))) - 19110000;
+						tday = Integer.valueOf(tmpDate[0] + String.format("%02d", Integer.parseInt(tmpDate[1]))
+								+ String.format("%02d", Integer.parseInt(tmpDate[2]))) - 19110000;
 					}
 
 					// 金額
@@ -250,8 +260,9 @@ public class L9713Report extends MakeReport {
 		// 以下為字體大小12 以12字體 橫的最右為140
 		this.setFontSize(12);
 
-		this.print(-2, 138, "機密等級：密", "R");
-		this.print(-3, 138, "製表日期：" + iCALDY.substring(0, 4) + "/" + iCALDY.substring(4, 6) + "/" + iCALDY.substring(6), "R");
+		this.print(-2, 138, "機密等級：" + this.getSecurity(), "R");
+		this.print(-3, 138, "製表日期：" + iCALDY.substring(0, 4) + "/" + iCALDY.substring(4, 6) + "/" + iCALDY.substring(6),
+				"R");
 		this.print(-9, 128, "單位：元", "R");
 
 		// 以下為字體大小20點
@@ -281,10 +292,12 @@ public class L9713Report extends MakeReport {
 		tmp = iday3.substring(0, 3) + "/" + iday3.substring(3, 5) + "月";
 		this.print(-13 - startRow, 24, "60日~90日(" + tmp + ")", "C");
 
-		tmp = iday4_1.substring(0, 3) + "/" + iday4_1.substring(3, 5) + "~" + iday4.substring(0, 3) + "/" + iday4.substring(3, 5) + "月";
+		tmp = iday4_1.substring(0, 3) + "/" + iday4_1.substring(3, 5) + "~" + iday4.substring(0, 3) + "/"
+				+ iday4.substring(3, 5) + "月";
 		this.print(-15 - startRow, 24, "4~6個月(" + tmp + ")", "C");
 
-		tmp = iday5_1.substring(0, 3) + "/" + iday5_1.substring(3, 5) + "~" + iday5.substring(0, 3) + "/" + iday5.substring(3, 5) + "月";
+		tmp = iday5_1.substring(0, 3) + "/" + iday5_1.substring(3, 5) + "~" + iday5.substring(0, 3) + "/"
+				+ iday5.substring(3, 5) + "月";
 		this.print(-17 - startRow, 24, "7~12個月(" + tmp + ")", "C");
 		this.print(-19 - startRow, 24, "1年以上", "C");
 		this.print(-21 - startRow, 24, "合           計", "C");

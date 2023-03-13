@@ -48,7 +48,7 @@ public class L9710Report extends MakeReport {
 
 		this.setFontSize(10);
 		this.setCharSpaces(0);
-		this.print(-1, 146, "機密等級：普通");
+		this.print(-1, 146, "機密等級："+this.getSecurity());
 		this.print(-2, 3, "　程式ID：" + this.getParentTranCode());
 		this.print(-2, 80, "新光人壽保險股份有限公司", "C");
 		this.print(-3, 3, "　報　表：" + this.getRptCode());
@@ -106,12 +106,11 @@ public class L9710Report extends MakeReport {
 
 		}
 
-//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9710", "寬限到期明細表", "", "A4", "L");
 		String txcd = titaVo.getTxcd();
 		String reportName = "寬限到期明細表";
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-				.setRptCode(txcd).setRptItem(reportName).setSecurity("").setRptSize("A4").setPageOrientation("L")
+				.setRptCode(txcd).setRptItem(reportName).setSecurity(this.getSecurity()).setRptSize("A4").setPageOrientation("L")
 				.build();
 
 		this.open(titaVo, reportVo);

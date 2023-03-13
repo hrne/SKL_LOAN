@@ -40,9 +40,6 @@ public class L9709Report extends MakeReport {
 		this.print(-2, 80, "印表日期：" + showRocDate(this.nowDate, 1));
 		this.print(-5, 2, "會計日期：" + showRocDate(startDate, 1) + " ~ " + showRocDate(endDate, 1));
 		this.print(-3, 80, "印表時間：" + showTime(this.nowTime));
-//		this.print(-5, 1, "  科目             借方金額           貸方金額");
-//		this.print(-5, 1, "會計日期");
-//		this.print(-6, 1, "－－－－");
 		this.print(-6, 2, " 會計科目");
 		this.print(-7, 2, "－－－－－－－－－－－－－－－－－－－－－－－－");
 		this.print(-6, 59, "借方金額", "R");
@@ -89,7 +86,7 @@ public class L9709Report extends MakeReport {
 		}
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-				.setRptCode("L9709").setRptItem("暫收放貸核心傳票檔資料").setSecurity("").setRptSize("A4").setPageOrientation("P")
+				.setRptCode("L9709").setRptItem("暫收放貸核心傳票檔資料").setSecurity(this.getSecurity()).setRptSize("A4").setPageOrientation("P")
 				.build();
 
 		this.open(titaVo, reportVo);

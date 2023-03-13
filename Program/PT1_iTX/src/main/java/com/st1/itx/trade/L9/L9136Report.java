@@ -60,7 +60,7 @@ public class L9136Report extends MakeReport {
 		int lNum = 182;
 		int cNum = this.getMidXAxis();
 
-		this.print(-1, lNum, "機密等級：普通");
+		this.print(-1, lNum, "機密等級：" + this.getSecurity());
 		this.print(-2, rNum, "　程式ID：" + this.getParentTranCode());
 		this.print(-2, cNum, "新光人壽保險股份有限公司", "C");
 		this.print(-3, rNum, "　報　表：" + this.getRptCode());
@@ -129,7 +129,7 @@ public class L9136Report extends MakeReport {
 		this.dataSource = 1;
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-				.setRptCode(tradeNo).setRptItem(tradeName).setSecurity("").setRptSize("A4").setPageOrientation("L")
+				.setRptCode(tradeNo).setRptItem(tradeName).setSecurity(this.getSecurity()).setRptSize("A4").setPageOrientation("L")
 				.build();
 
 		this.open(titaVo, reportVo);
@@ -380,9 +380,7 @@ public class L9136Report extends MakeReport {
 			this.print(0, 97, tmpUpdateItem.length() == 0 ? " " : fillUpWord(tmpUpdateItem, 32, " ", "R"));
 		}
 
-//		String bfContent = tmpNewContent.trim().length() == 0 ? " "
-//				: String.format("%03d", Integer.valueOf(r.get("FacmNo"))) + "-"
-//						+ String.format("%03d", Integer.valueOf(r.get("BormNo"))) + " " + tmpOldContent;
+
 		// 更改前內容
 		this.print(0, 122, tmpOldContent.length() == 0 ? " " : fillUpWord(tmpOldContent, 22, " ", "R"));
 
@@ -404,7 +402,6 @@ public class L9136Report extends MakeReport {
 
 		// 授權主管
 		this.print(0, 186, supNoName);
-//		this.print(0, 186, "1234567");
 
 	}
 

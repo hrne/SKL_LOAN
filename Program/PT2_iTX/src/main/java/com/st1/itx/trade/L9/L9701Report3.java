@@ -23,6 +23,8 @@ public class L9701Report3 extends MakeReport {
 	@Autowired
 	L9701ServiceImpl l9701ServiceImpl;
 
+
+	
 	// 製表日期
 	private String nowDate;
 	// 製表時間
@@ -32,6 +34,8 @@ public class L9701Report3 extends MakeReport {
 	private String facmNo;
 
 	public int tempPage = 0;
+	
+	
 
 	String nextPageText = "=====  續下頁  =====";
 	String endText = "=====  報  表  結  束  =====";
@@ -97,6 +101,7 @@ public class L9701Report3 extends MakeReport {
 
 	private void printDataHeader() {
 
+
 		String tmpFacmNo = String.format("%03d", Integer.valueOf(facmNo));
 
 		this.print(1, 1, " ");
@@ -104,7 +109,7 @@ public class L9701Report3 extends MakeReport {
 		divider();
 		this.print(1, 2, "撥款");
 		this.print(0, 10, "入帳日期");
-		this.print(0, 28, "交易內容", "C");
+		this.print(0, 28, "交易內容","C");
 		this.print(0, 40, "交易金額");
 		this.print(0, 59, "暫收借");
 		this.print(0, 76, "本金");
@@ -126,7 +131,7 @@ public class L9701Report3 extends MakeReport {
 	public void divider() {
 		this.print(1, 2, "－－");
 		this.print(0, 9, "－－－－－");
-		this.print(0, 28, "－－－－－－", "C");
+		this.print(0, 28, "－－－－－－","C");
 		this.print(0, 38, "－－－－－－");
 		this.print(0, 56, "－－－－－－");
 		this.print(0, 72, "－－－－－－");
@@ -164,15 +169,15 @@ public class L9701Report3 extends MakeReport {
 
 		String tradeReportName = "客戶往來交易明細表";
 
-		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr()).setRptCode("L9701").setRptItem(tradeReportName).setSecurity("").setRptSize("A4")
-				.setPageOrientation("L").build();
-
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
+				.setRptCode("L9701").setRptItem(tradeReportName).setSecurity(this.getSecurity())
+				.setRptSize("A4").setPageOrientation("L").build();
+		
 		this.open(titaVo, reportVo);
 
 		if (listL9701 != null && listL9701.size() > 0) {
 
 			for (Map<String, String> tL9701Vo : listL9701) {
-//				this.info("nowrow=" + this.NowRow);
 				if (this.NowRow - 7 >= 40) {
 					this.print(1, this.getMidXAxis(), nextPageText, "C");
 					this.newPage();
@@ -183,15 +188,14 @@ public class L9701Report3 extends MakeReport {
 					// 無交易明細且無餘額
 					if (detailCounts == 0) {
 						if (tL9701Vo.get("DB").equals("2")) {
-							BigDecimal unpaidLoanBal = tL9701Vo.get("Amount").isEmpty() || tL9701Vo.get("Amount") == null ? BigDecimal.ZERO : new BigDecimal(tL9701Vo.get("Amount"));
+							BigDecimal unpaidLoanBal = tL9701Vo.get("Amount").isEmpty()
+									|| tL9701Vo.get("Amount") == null ? BigDecimal.ZERO
+											: new BigDecimal(tL9701Vo.get("Amount"));
 							if (unpaidLoanBal.compareTo(BigDecimal.ZERO) == 0) {
 								continue;
 							}
 						}
 					}
-//					if (detailCounts > 0) {
-//						reportTotal();
-//					}
 					this.custName = tL9701Vo.get("CustName");
 					this.facmNo = tL9701Vo.get("FacmNo");
 					if (isFirst) {
@@ -204,12 +208,7 @@ public class L9701Report3 extends MakeReport {
 						isFirst = true;
 					}
 				}
-//
-//				if (this.getNowPage() > tempPage && tempPage > 0) {
-//					this.print(1, 1, " ");
-//					tempPage = getNowPage();
-//				}
-//				this.info("tempPage=" +tempPage);
+
 
 				if (tL9701Vo.get("DB").equals("1")) {
 					printDetail1(tL9701Vo);
@@ -238,10 +237,7 @@ public class L9701Report3 extends MakeReport {
 		this.print(0, 49, formatAmt(tL9701Vo.get("TxAmt"), 0), "R"); //
 
 		// 暫收借
-//		BigDecimal tempAmt = new BigDecimal(tL9701Vo.get("TempAmt"));
-//		BigDecimal tempDbAmt = tempAmt.compareTo(BigDecimal.ZERO) > 0 ? tempAmt : BigDecimal.ZERO;
-//		BigDecimal tempCrAmt = tempAmt.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO.subtract(tempAmt)
-//				: BigDecimal.ZERO;
+
 		this.print(0, 67, formatAmt(tL9701Vo.get("TempAmt"), 0), "R");
 		// 本金
 		this.print(0, 83, formatAmt(tL9701Vo.get("Principal"), 0), "R");

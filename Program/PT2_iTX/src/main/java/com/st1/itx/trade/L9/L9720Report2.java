@@ -14,14 +14,13 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9720ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.format.StringCut;
 
 @Component("L9720Report2")
 @Scope("prototype")
 public class L9720Report2 extends MakeReport {
-	// private static final Logger logger =
-	// LoggerFactory.getLogger(L9720Report2.class);
 
 	@Autowired
 	L9720ServiceImpl l9720ServiceImpl;
@@ -37,7 +36,7 @@ public class L9720Report2 extends MakeReport {
 	private String brno = "";
 	private String reportCode = "L9720";
 	private String reportItem = "理財型商品續約檢核報表";
-	private String security = "機密";
+//	private String security = "機密";
 	private String pageSize = "A4";
 	private String pageOrientation = "L";
 
@@ -56,7 +55,7 @@ public class L9720Report2 extends MakeReport {
 
 		this.print(-1, 1, "程式ID：" + this.getParentTranCode());
 		this.print(-1, 85, "新光人壽保險股份有限公司", "C");
-		this.print(-1, 145, "機密等級：" + this.security);
+		this.print(-1, 145, "機密等級：" + this.getSecurity());
 
 		this.print(-2, 1, "報　表：" + this.getRptCode());
 		this.print(-2, 85, this.reportItem, "C");
@@ -162,7 +161,11 @@ public class L9720Report2 extends MakeReport {
 		LocalDate validDateFirst = validDatePivot.minusMonths(10);
 		LocalDate validDateSecond = validDatePivot.minusMonths(22);
 
-		this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(reportCode)
+				.setRptItem(reportItem).setSecurity( this.getSecurity()).setRptSize(pageSize).setPageOrientation(pageOrientation)
+				.build();
+		this.open(titaVo, reportVo);
+	
 
 		this.setCharSpaces(0);
 

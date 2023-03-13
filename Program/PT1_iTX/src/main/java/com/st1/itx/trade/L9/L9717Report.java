@@ -36,7 +36,7 @@ public class L9717Report extends MakeReport {
 	private String brno = "";
 	private String reportCode = "L9717";
 	private String reportItem = "";
-	private String security = "機密";
+//	private String security = this.getSecurity();
 	private String pageSize = "A4";
 	private String pageOrientation = "L";
 
@@ -108,7 +108,7 @@ public class L9717Report extends MakeReport {
 			break;
 		}
 
-		this.print(-1, newBorder.length() - 20, "機密等級：" + this.security);
+		this.print(-1, newBorder.length() - 20, "機密等級：" + this.getSecurity());
 		this.print(-2, newBorder.length() - 20, "基　　礎：" + showBcDate(this.nowDate, 0)); // longest; length 20
 		this.print(-3, newBorder.length() - 20, "日　　期：" + showBcDate(this.nowDate, 1));
 		this.print(-4, newBorder.length() - 20, "時　　間：" + showTime(this.nowTime));
@@ -127,8 +127,10 @@ public class L9717Report extends MakeReport {
 			 * ---------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
 			 * ------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 			 */
-			this.print(-6, 1, " 　　　　　 　 　     　　逾　一　期      　逾　二　期     　 逾　三　期　　　　逾　四　期　　　　逾　五　期　　　　逾　六　期　　　　轉　催　收　　　 合　　　　計");
-			this.print(-7, 1, " 員工編號　經辦　　     件數    　金額 　 件數　  　金額 　 件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　 件數　　　　金額");
+			this.print(-6, 1,
+					" 　　　　　 　 　     　　逾　一　期      　逾　二　期     　 逾　三　期　　　　逾　四　期　　　　逾　五　期　　　　逾　六　期　　　　轉　催　收　　　 合　　　　計");
+			this.print(-7, 1,
+					" 員工編號　經辦　　     件數    　金額 　 件數　  　金額 　 件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　 件數　　　　金額");
 			this.print(-8, 1, newBorder);
 
 			// 明細起始列(自訂亦必須)
@@ -145,8 +147,10 @@ public class L9717Report extends MakeReport {
 			 * ---------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
 			 * ------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 			 */
-			this.print(-6, 1, " 　　　　　 　 　     　　逾　一　期      　逾　二　期     　 逾　三　期　　　　逾　四　期　　　　逾　五　期　　　　逾　六　期　　　　轉　催　收　　　 合　　　　計");
-			this.print(-7, 1, " 員工編號　經辦　　     件數    　金額 　 件數　  　金額 　 件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　 件數　　　　金額");
+			this.print(-6, 1,
+					" 　　　　　 　 　     　　逾　一　期      　逾　二　期     　 逾　三　期　　　　逾　四　期　　　　逾　五　期　　　　逾　六　期　　　　轉　催　收　　　 合　　　　計");
+			this.print(-7, 1,
+					" 員工編號　經辦　　     件數    　金額 　 件數　  　金額 　 件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　 件數　　　　金額");
 			this.print(-8, 1, newBorder);
 
 			// 明細起始列(自訂亦必須)
@@ -163,8 +167,10 @@ public class L9717Report extends MakeReport {
 			 * ---------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
 			 * ------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 			 */
-			this.print(-6, 1, " 　　　　　 　 　     　　逾　一　期      　逾　二　期     　 逾　三　期　　　　逾　四　期　　　　逾　五　期　　　　逾　六　期　　　　轉　催　收　　　 合　　　　計");
-			this.print(-7, 1, " 員工編號　經辦　　     件數    　金額 　 件數　  　金額 　 件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　 件數　　　　金額");
+			this.print(-6, 1,
+					" 　　　　　 　 　     　　逾　一　期      　逾　二　期     　 逾　三　期　　　　逾　四　期　　　　逾　五　期　　　　逾　六　期　　　　轉　催　收　　　 合　　　　計");
+			this.print(-7, 1,
+					" 員工編號　經辦　　     件數    　金額 　 件數　  　金額 　 件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　 件數　　　　金額");
 			this.print(-8, 1, newBorder);
 			this.print(-8, 1, newBorder);
 
@@ -397,7 +403,10 @@ public class L9717Report extends MakeReport {
 
 				for (int i = 0; i < columnList.size(); i++) {
 					this.info(currentSort + " [" + i + "]: " + tLDVo.get("F" + i));
-					this.print(0, columnList.get(i).getPos(), columnList.get(i).getIsAmount() == true ? formatAmt(tLDVo.get("F" + i), 0) : tLDVo.get("F" + i), columnList.get(i).getSort());
+					this.print(0, columnList.get(i).getPos(),
+							columnList.get(i).getIsAmount() == true ? formatAmt(tLDVo.get("F" + i), 0)
+									: tLDVo.get("F" + i),
+							columnList.get(i).getSort());
 				}
 
 				// 合計以上所有件數及金額的各期小計處理
@@ -507,7 +516,7 @@ public class L9717Report extends MakeReport {
 			int countX = 0;
 			int amtX = 0;
 
-			// 是否需要加入各期小計
+			//是否需要加入各期小計
 			boolean isAddCal = false;
 			switch (currentSort) {
 			case Agent:
@@ -534,7 +543,7 @@ public class L9717Report extends MakeReport {
 				break;
 			}
 
-			// 是否需要加入各期小計
+			//是否需要加入各期小計
 			if (isAddCal) {
 
 				this.print(1, 1, newBorder);
@@ -589,8 +598,9 @@ public class L9717Report extends MakeReport {
 		// this.open(titaVo, reportDate, brno, reportCode, reportItem, security,
 		// pageSize, pageOrientation);
 
-		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(reportCode).setRptItem(reportItem).setSecurity(security).setRptSize(pageSize)
-				.setPageOrientation(pageOrientation).build();
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(reportCode)
+				.setRptItem(reportItem).setSecurity(this.getSecurity()).setRptSize(pageSize).setPageOrientation(pageOrientation)
+				.build();
 
 		this.open(titaVo, reportVo);
 

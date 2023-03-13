@@ -66,7 +66,7 @@ public class L9135Report extends MakeReport {
 		int lNum = 146;
 		int cNum = this.getMidXAxis();
 
-		this.print(-1, lNum, "機密等級：密");
+		this.print(-1, lNum, "機密等級：" + this.getSecurity());
 		this.print(-2, rNum, "　程式ID：" + this.getParentTranCode());
 		this.print(-2, cNum, "新光人壽保險股份有限公司", "C");
 		this.print(-3, rNum, "　報　表：" + this.getRptCode());
@@ -136,7 +136,7 @@ public class L9135Report extends MakeReport {
 		this.info("L9135Report exportExcel");
 		// 銀行存款媒體明細表
 		exportExcel(titaVo, l9135Result, iAcDate);
-		
+
 		this.info("L9135Report exportTxt");
 		// 媒體檔
 		exportTxt(titaVo, l9135Result, iAcDate);
@@ -176,7 +176,7 @@ public class L9135Report extends MakeReport {
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String reportItem = tradeName;
-		String security = "";
+		String security = this.getSecurity();
 		String pageSize = "A4";
 		String pageOrientation = "L";
 
@@ -284,7 +284,5 @@ public class L9135Report extends MakeReport {
 		makeFile.close();
 
 	}
-
-	
 
 }

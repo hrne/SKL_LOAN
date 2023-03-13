@@ -16,6 +16,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9718ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -68,8 +69,22 @@ public class L9718Report extends MakeReport {
 
 		this.info(TXCD + "Report exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), TXCD, typeText + TXName, TXCD + "_" + typeText + TXName, TXCD + "_底稿_" + typeText + "成果統計表" + ".xlsx", 1,
-				titaVo.getParam("inputYearMonth").substring(0, 3) + "年" + titaVo.getParam("inputYearMonth").substring(3) + "月" + typeText);
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = this.TXCD;
+		String fileItem = typeText + TXName;
+		String fileName = txcd + "_" + typeText + TXName;
+		String defaultExcel = txcd + "_底稿_" + typeText + "成果統計表" + ".xlsx";
+//		String defaultSheet = "la$w30p";
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, 1);
+
+		makeExcel.setSheet(1, titaVo.getParam("inputYearMonth").substring(0, 3) + "年"
+				+ titaVo.getParam("inputYearMonth").substring(3) + "月" + typeText);
 
 		if (lList != null && lList.size() != 0) {
 
@@ -109,7 +124,11 @@ public class L9718Report extends MakeReport {
 						case "O":
 							// percentage
 							if (Integer.parseInt(tLDVo.get("F9")) != 0) {
-								makeExcel.setValue(row, col, Double.toString(Math.floor(Integer.parseInt(tLDVo.get("F11")) / Integer.parseInt(tLDVo.get("F9"))) * 100) + '%', "R");
+								makeExcel.setValue(row, col,
+										Double.toString(Math.floor(
+												Integer.parseInt(tLDVo.get("F11")) / Integer.parseInt(tLDVo.get("F9")))
+												* 100) + '%',
+										"R");
 							} else {
 								makeExcel.setValue(row, col, "", "R");
 							}
@@ -149,7 +168,11 @@ public class L9718Report extends MakeReport {
 						case "Q":
 							// percentage
 							if (Integer.parseInt(tLDVo.get("F12")) != 0) {
-								makeExcel.setValue(row, col, Double.toString(Math.floor(Integer.parseInt(tLDVo.get("F14")) / Integer.parseInt(tLDVo.get("F12"))) * 100) + '%', "R");
+								makeExcel.setValue(row, col,
+										Double.toString(Math.floor(
+												Integer.parseInt(tLDVo.get("F14")) / Integer.parseInt(tLDVo.get("F12")))
+												* 100) + '%',
+										"R");
 							} else {
 								makeExcel.setValue(row, col, "", "R");
 							}

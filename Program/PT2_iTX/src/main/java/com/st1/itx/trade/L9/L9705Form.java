@@ -72,10 +72,9 @@ public class L9705Form extends MakeReport {
 
 		if (l9705List.size() > 0) {
 			int count = 0;
-//			int cnt = 0;
 			ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
 					.setRptCode("L9705".equals(titaVo.getTxcd()) ? "L9705B" : tran + "C").setRptItem("存入憑條")
-					.setRptSize("cm,20,9.31333").setSecurity("").setPageOrientation("P").build();
+					.setRptSize("cm,20,9.31333").setSecurity(this.getSecurity()).setPageOrientation("P").build();
 			this.openForm(titaVo, reportVo);
 
 			for (Map<String, String> tL9Vo : l9705List) {
@@ -97,7 +96,6 @@ public class L9705Form extends MakeReport {
 				int custNo = 0;
 				int facmNo = 0;
 				int entryDate = parse.stringToInteger(titaVo.getParam("ENTDY"));
-//				String repayCode = "";
 				String custName = "";
 
 				if (tL9Vo.get("CustNo") != null) {
@@ -122,9 +120,6 @@ public class L9705Form extends MakeReport {
 				try {
 //
 					listBaTxVo = dBaTxCom.termsPay(entryDate, custNo, facmNo, 0, terms, 0, titaVo);
-//					listBaTxVo = dBaTxCom.addByPayintDate(lBaTxVo, titaVo);
-//					this.info("listBaTxVo = " + listBaTxVo.toString());
-//					this.info("listBaTxVo.size = " + listBaTxVo.size());
 				} catch (LogicException e) {
 					this.info("listBaTxVo ErrorMsg :" + e.getMessage());
 				}

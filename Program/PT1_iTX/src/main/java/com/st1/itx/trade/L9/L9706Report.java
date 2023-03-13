@@ -105,7 +105,7 @@ public class L9706Report extends MakeReport {
 		iENTDAY = tranDate(titaVo.getCalDy());
 
 		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getKinbr()).setRptDate(titaVo.getEntDyI())
-				.setSecurity("普通").setRptCode("L9706").setRptItem("貸款餘額證明書").setPageOrientation("P")
+				.setSecurity(this.getSecurity()).setRptCode("L9706").setRptItem("貸款餘額證明書").setPageOrientation("P")
 				.setUseDefault(false).build();
 
 		this.open(titaVo, reportVo);

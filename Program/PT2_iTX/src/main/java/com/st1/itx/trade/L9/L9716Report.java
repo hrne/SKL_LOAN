@@ -56,7 +56,6 @@ public class L9716Report extends MakeReport {
 		exportExcel2(titaVo, lL9716_2);
 
 		makeExcel.close();
-		// makeExcel.toExcel(sno);
 
 		return true;
 
@@ -68,9 +67,6 @@ public class L9716Report extends MakeReport {
 		String tmpValue = "";
 
 		this.info(TXCD + "Report exportExcel");
-
-//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), TXCD, TXName, TXCD + "_" + TXName,
-//				TXCD + "_底稿_" + TXName + ".xlsx", 1, SheetName);
 
 		// L9716
 		String txcd = TXCD;

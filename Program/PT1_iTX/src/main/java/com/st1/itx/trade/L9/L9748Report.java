@@ -18,7 +18,6 @@ import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.http.WebClient;
-import com.st1.itx.util.parse.Parse;
 import com.st1.itx.util.report.ReportUtil;
 
 @Component
@@ -43,8 +42,6 @@ public class L9748Report extends CommBuffer {
 	@Autowired
 	private DateUtil dDateUtil;
 
-	@Autowired
-	private Parse parse;
 
 	private final String tranCode = "L9748";
 	private final String tranName = "金檢查核火險資料";
