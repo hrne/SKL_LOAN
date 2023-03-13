@@ -13,9 +13,11 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdBaseRate;
 import com.st1.itx.db.domain.FacProd;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanRateChange;
+import com.st1.itx.db.service.CdBaseRateService;
 import com.st1.itx.db.service.FacProdService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanBorTxService;
@@ -48,6 +50,8 @@ public class L3932 extends TradeBuffer {
 	public LoanBorTxService loanBorTxService;
 	@Autowired
 	public LoanRateChangeService loanRateChangeService;
+	@Autowired
+	public CdBaseRateService cdBaseRateService;
 
 	@Autowired
 	Parse parse;
@@ -61,8 +65,6 @@ public class L3932 extends TradeBuffer {
 		int iCustNo = this.parse.stringToInteger(titaVo.getParam("TimCustNo"));
 		int iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
 		int iBormNo = this.parse.stringToInteger(titaVo.getParam("BormNo"));
-
-		int iCustDataCtrl = this.getTxBuffer().getTxCom().getCustDataCtrl();
 
 		// work area
 		int wkFacmNoStart = 1;
@@ -154,10 +156,15 @@ public class L3932 extends TradeBuffer {
 				if ("99".equals(r.getBaseRateCode()) || r.getEffectDate() > effectBatchDate) {
 					wkBaseRate = BigDecimal.ZERO;
 				} else {
-					wkBaseRate = r.getFitRate()
-							.subtract(r.getIncrFlag().equals("Y") ? r.getRateIncr() : r.getIndividualIncr());
+					CdBaseRate tCdBaseRate = cdBaseRateService.baseRateCodeDescFirst(ln.getCurrencyCode(),
+							r.getBaseRateCode(), 0, r.getEffectDate() + 19110000, titaVo);
+					if (tCdBaseRate != null) {
+						wkBaseRate = tCdBaseRate.getBaseRate();
+					} else {
+						wkBaseRate = r.getFitRate()
+								.subtract(r.getIncrFlag().equals("Y") ? r.getRateIncr() : r.getIndividualIncr());
+					}
 				}
-
 				// 未生效利率
 				if (!"99".equals(r.getBaseRateCode()) && r.getEffectDate() > effectBatchDate) {
 					wkFitRate = BigDecimal.ZERO;

@@ -610,6 +610,13 @@ public class L4455Report extends MakeReport {
 						// 現在的銀行與下一筆銀行代碼不同就必須輸出小計
 						if (!tmpBank.equals(
 								L4455List.get((L4455List.size() - 1) == (i + 1) ? i : i + 1).get("RepayBank"))) {
+
+							tmpBank = L4455List.get((L4455List.size() - 1) == (i + 1) ? i : i + 1).get("RepayBank");
+							for (CdCode tCdCode : lCdCode) {
+								if (tmpBank.equals(tCdCode.getCode())) {
+									tmpBankX = tCdCode.getItem();
+								}
+							}
 							this.print(1, 1,
 									"----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 							this.print(1, 1,

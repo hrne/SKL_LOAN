@@ -84,8 +84,6 @@ public class L4321Batch extends TradeBuffer {
 	private int custType2 = 0;
 	private int wkConfirmFlag = 0;
 	private Boolean flag = true;
-	private BigDecimal rateIncr = BigDecimal.ZERO;
-	private BigDecimal individualIncr = BigDecimal.ZERO;
 
 //	輸入畫面 戶別 CustType 1:個金;2:企金（含企金自然人）
 //	客戶檔 0:個金1:企金2:企金自然人
@@ -471,15 +469,9 @@ public class L4321Batch extends TradeBuffer {
 		this.info("setLoanRateChange ...");
 		// 更新記號 0:新增 1:更新 2.刪除
 		int updateFg = 0;
-		rateIncr = BigDecimal.ZERO;
-		individualIncr = BigDecimal.ZERO;
-		if (!"99".equals(tBatxRateChange.getBaseRateCode())) {
-			if (tBatxRateChange.getIncrFlag().equals("Y")) {
-				rateIncr = tBatxRateChange.getAdjustedRate().subtract(tBatxRateChange.getCurrBaseRate());
-			} else {
-				rateIncr = tBatxRateChange.getContrRateIncr();
-				individualIncr = tBatxRateChange.getAdjustedRate().subtract(tBatxRateChange.getCurrBaseRate());
-			}
+		BigDecimal individualIncr = BigDecimal.ZERO;
+		if (!"99".equals(tBatxRateChange.getBaseRateCode()) && !tBatxRateChange.getIncrFlag().equals("Y")) {
+			individualIncr = tBatxRateChange.getAdjustedRate().subtract(tBatxRateChange.getCurrBaseRate());
 		}
 		LoanRateChange tLoanRateChange = new LoanRateChange();
 		LoanRateChangeId tLoanRateChangeId = new LoanRateChangeId();
@@ -513,7 +505,7 @@ public class L4321Batch extends TradeBuffer {
 			tLoanRateChange.setProdNo(tBatxRateChange.getProdNo());
 			tLoanRateChange.setBaseRateCode(tBatxRateChange.getBaseRateCode());
 			tLoanRateChange.setIncrFlag(tBatxRateChange.getIncrFlag());
-			tLoanRateChange.setRateIncr(rateIncr);
+			tLoanRateChange.setRateIncr(tBatxRateChange.getContrRateIncr());
 			tLoanRateChange.setIndividualIncr(individualIncr);
 			tLoanRateChange.setFitRate(tBatxRateChange.getAdjustedRate());
 			tLoanRateChange.setRemark("");
@@ -529,15 +521,12 @@ public class L4321Batch extends TradeBuffer {
 		// 更新
 		if (updateFg == 1) {
 			if (this.iConfirmFlag == 1) {
-				this.tTempVo.putParam("RateIncr", tLoanRateChange.getRateIncr());
 				this.tTempVo.putParam("IndividualIncr", tLoanRateChange.getIndividualIncr());
 				this.tTempVo.putParam("FitRate", tLoanRateChange.getFitRate());
-				tLoanRateChange.setRateIncr(rateIncr);
 				tLoanRateChange.setIndividualIncr(individualIncr);
 				tLoanRateChange.setFitRate(tBatxRateChange.getAdjustedRate());
 				tLoanRateChange.setRemark("");
 			} else {
-				tLoanRateChange.setRateIncr(parse.stringToBigDecimal(this.tTempVo.getParam("RateIncr")));
 				tLoanRateChange.setIndividualIncr(parse.stringToBigDecimal(this.tTempVo.getParam("IndividualIncr")));
 				tLoanRateChange.setFitRate(parse.stringToBigDecimal(this.tTempVo.getParam("FitRate")));
 			}
@@ -585,8 +574,10 @@ public class L4321Batch extends TradeBuffer {
 			tLoanRateChange.setProdNo(tBatxRateChange.getProdNo());
 			tLoanRateChange.setBaseRateCode(tBatxRateChange.getBaseRateCode());
 			tLoanRateChange.setIncrFlag(tBatxRateChange.getIncrFlag());
-			tLoanRateChange.setRateIncr(rateIncr);
-			tLoanRateChange.setIndividualIncr(individualIncr);
+			tLoanRateChange.setRateIncr(tBatxRateChange.getContrRateIncr());
+			if (!"99".equals(tBatxRateChange.getBaseRateCode()) && !tBatxRateChange.getIncrFlag().equals("Y")) {
+				tLoanRateChange.setIndividualIncr(tBatxRateChange.getAdjustedRate().subtract(tBatxRateChange.getCurrBaseRate()));
+			}
 			tLoanRateChange.setFitRate(tBatxRateChange.getAdjustedRate());
 			tLoanRateChange.setRemark("預調利率");
 			tLoanRateChange.setAcDate(this.getTxBuffer().getTxCom().getTbsdy());
@@ -617,17 +608,21 @@ public class L4321Batch extends TradeBuffer {
 		}
 		// 生效起日
 		int effectDateS = 0;
-		// 指標利率
+		// 指標利率，含政府補貼利率，以適用利率減利率加減碼計算
 		BigDecimal baseRate = BigDecimal.ZERO;
-		// 確認時，生效起日＝本次生效日， 適用利率＝指標利率(本次指標率) + (利率加減碼or個別加減碼)
+		// 確認時，生效起日＝本次生效日， 適用利率＝指標利率(本次指標率) + (合約利率加減碼or個別加減碼)
 		if (this.iConfirmFlag == 1) {
 			effectDateS = tBatxRateChange.getCurtEffDate();
-			baseRate = tBatxRateChange.getCurrBaseRate();
+			if ("Y".equals(tBatxRateChange.getIncrFlag())) { // 加減碼是否依合約
+				baseRate = tBatxRateChange.getAdjustedRate().subtract(tBatxRateChange.getContrRateIncr());
+			} else {
+				baseRate = tBatxRateChange.getAdjustedRate().subtract(tBatxRateChange.getIndividualIncr());
+			}
 		} else {
-			// 取消確認時，生效起日＝目前生效日， 指標利率＝目前利率 - (利率加減碼or個別加減碼)
+			// 取消確認時，生效起日＝目前生效日， 指標利率＝目前利率 - (合約利率加減碼or個別加減碼)
 			effectDateS = tBatxRateChange.getPresEffDate();
 			if ("Y".equals(tBatxRateChange.getIncrFlag())) { // 加減碼是否依合約
-				baseRate = tBatxRateChange.getPresentRate().subtract(tBatxRateChange.getRateIncr());
+				baseRate = tBatxRateChange.getPresentRate().subtract(tBatxRateChange.getContrRateIncr());
 			} else {
 				baseRate = tBatxRateChange.getPresentRate().subtract(tBatxRateChange.getIndividualIncr());
 			}

@@ -150,6 +150,7 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   ,NVL(tx.\"EntryDate\", 0)                     as \"EntryDate\" "; // 入帳日期
 		sql += "   ,NVL(tot.\"TotBalance\",0)                    as \"TotBalance\"  "; // 全戶餘額
 		sql += "   ,b.\"ActFg\"                                  as \"ActFg\"  "; // 交易進行記號
+		sql += "   ,p.\"GovOfferFlag\"                           as \"GovOfferFlag\"  "; // 政府優惠房貸記號
 		sql += " from \"LoanBorMain\" b                                 ";
 		sql += " left join \"FacMain\"  f on  f.\"CustNo\" = b.\"CustNo\"      ";
 		sql += "                         and  f.\"FacmNo\" = b.\"FacmNo\"      ";
@@ -476,16 +477,18 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            THEN 1 ";
 		sql += "          ELSE 0 END = 1";
 		sql += ") ";
-		sql += "SELECT \"CustNo\" ";
-		sql += "     , \"FacmNo\" ";
-		sql += "     , \"BormNo\" ";
-		sql += "     , \"EffectDate\" ";
-		sql += "     , \"ProdNo\" ";
-		sql += "     , \"IncrFlag\" ";
-		sql += "     , \"RateIncr\" ";
-		sql += "     , \"IndividualIncr\" ";
-		sql += "     , \"FitRate\" ";
-		sql += "FROM rawData ";
+		sql += "SELECT r.\"CustNo\" ";
+		sql += "     , r.\"FacmNo\" ";
+		sql += "     , r.\"BormNo\" ";
+		sql += "     , r.\"EffectDate\" ";
+		sql += "     , r.\"ProdNo\" ";
+		sql += "     , r.\"IncrFlag\" ";
+		sql += "     , r.\"RateIncr\" ";
+		sql += "     , r.\"IndividualIncr\" ";
+		sql += "     , r.\"FitRate\" ";
+		sql += "     , p.\"GovOfferFlag\" "; // 政府優惠房貸記號
+		sql += "FROM rawData r ";
+		sql += " left join \"FacProd\"  p on  p.\"ProdNo\" = r.\"ProdNo\"      ";
 		sql += "WHERE \"Seq\" = 1 ";
 		this.info("sql=" + sql);
 

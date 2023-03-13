@@ -2,18 +2,24 @@ package com.st1.itx.trade.L4;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.BatxRateChange;
 import com.st1.itx.db.domain.BatxRateChangeId;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanBorMainId;
+import com.st1.itx.db.domain.LoanRateChange;
+import com.st1.itx.db.domain.LoanRateChangeId;
 import com.st1.itx.db.service.BatxRateChangeService;
 import com.st1.itx.db.service.CdBaseRateService;
 import com.st1.itx.db.service.LoanBorMainService;
@@ -151,15 +157,9 @@ public class L431A extends TradeBuffer {
 			break;
 		}
 
-		// 加碼利率，自訂利率時：0、指標利率時：擬調利率(已調整時為調整後利率)減合約指標利率
+		// 加碼值，自訂利率時：0、指標利率時：擬調利率(已調整時為調整後利率)減合約指標利率
 		if ("99".equals(tBatxRateChange.getBaseRateCode())) {
-			if (tBatxRateChange.getRateKeyInCode() == 1) {
-				tBatxRateChange
-						.setRateIncr(tBatxRateChange.getAdjustedRate().subtract(tBatxRateChange.getPresentRate()));
-			} else {
-				tBatxRateChange
-						.setRateIncr(tBatxRateChange.getProposalRate().subtract(tBatxRateChange.getPresentRate()));
-			}
+			tBatxRateChange.setRateIncr(BigDecimal.ZERO);
 		} else {
 			if (tBatxRateChange.getRateKeyInCode() == 1) {
 				tBatxRateChange

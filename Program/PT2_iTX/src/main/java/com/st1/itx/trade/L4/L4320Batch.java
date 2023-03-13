@@ -22,11 +22,13 @@ import com.st1.itx.db.domain.BatxRateChange;
 import com.st1.itx.db.domain.BatxRateChangeId;
 import com.st1.itx.db.domain.CdBaseRate;
 import com.st1.itx.db.domain.CdBaseRateId;
+import com.st1.itx.db.domain.CdComm;
 import com.st1.itx.db.domain.LoanRateChange;
 import com.st1.itx.db.service.BatxBaseRateChangeService;
 import com.st1.itx.db.service.BatxRateChangeService;
 import com.st1.itx.db.service.CdBaseRateService;
 import com.st1.itx.db.service.CdCityService;
+import com.st1.itx.db.service.CdCommService;
 import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.ClMainService;
 import com.st1.itx.db.service.FacMainService;
@@ -86,6 +88,9 @@ public class L4320Batch extends TradeBuffer {
 	public CdBaseRateService cdBaseRateService;
 
 	@Autowired
+	public CdCommService cdCommService;
+
+	@Autowired
 	public L4320ServiceImpl l4320BatchServiceImpl;
 
 	@Autowired
@@ -115,6 +120,7 @@ public class L4320Batch extends TradeBuffer {
 	private int facmNo = 0;
 	private int bormNo = 0;
 	private Boolean flag = true;
+	private TempVo subsidyRateVo = new TempVo();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -157,6 +163,13 @@ public class L4320Batch extends TradeBuffer {
 
 //		正常
 		if (titaVo.isHcodeNormal()) {
+			// 政府補貼利率(郵局指標利率)
+			if ("02".equals(iBaseRateCode)) {
+				CdComm tCdComm = cdCommService.CdTypeDescFirst("01", "01", 0, iEffectDate + 19110000, titaVo);
+				if (tCdComm != null) {
+					subsidyRateVo = subsidyRateVo.getVo(tCdComm.getJsonFields());
+				}
+			}
 			// 2022-05-13 ST1 Wei 新增
 			// 若作業項目為1:定期機動調整
 			// 且 指標利率生效日=本次利率調整生效月份
@@ -495,7 +508,7 @@ public class L4320Batch extends TradeBuffer {
 				dateUtil.setDate_1(nextAdjRateDate);
 				dateUtil.setMons(rateAdjFreq); // 調整周期(單位固定為月)
 				preNextAdjDate = dateUtil.getCalenderDay();
-                int preDD = preNextAdjDate % 100; 
+				int preDD = preNextAdjDate % 100;
 				// 預定下次利率調整日月底日
 				dateUtil.init();
 				dateUtil.setDate_1(preNextAdjDate);
@@ -640,8 +653,17 @@ public class L4320Batch extends TradeBuffer {
 		case 2:
 			// 本次生效日 = 指標利率生效日
 			effDateCurt = iEffectDate;
-			// 本次利率 = 本次指標利率 + 目前合約加減碼
-			rateProp = iBaseRate.add(rateIncr);
+			// 本次利率 = 本次指標利率 + 目前合約加減碼-政府補貼利率
+			// 政府補貼利率(郵局指標利率)
+			BigDecimal subsidyRate = BigDecimal.ZERO;
+			if ("02".equals(iBaseRateCode)) {
+				subsidyRate = getSubsidyRate(s.get("GovOfferFlag"));
+				if (!"N".equals(s.get("GovOfferFlag"))) {
+					warnMsg += ", 政府補貼利率:" + subsidyRate;
+					tTempVo.putParam("SubsidyRate", subsidyRate);
+				}
+			}
+			rateProp = iBaseRate.add(rateIncr).subtract(subsidyRate);
 			// 1.自動調整
 			adjCode = 1;
 			break;
@@ -783,9 +805,9 @@ public class L4320Batch extends TradeBuffer {
 				b.setRateKeyInCode(9);
 			}
 		}
-		// 加碼值，自訂利率時：擬調利率(已調整時為調整後利率)減目前利率、指標利率時：擬調利率(已調整時為調整後利率)減合約指標利率
+		// 加碼值：自訂利率時為0、指標利率時為擬調利率(已調整時為調整後利率)減合約指標利率
 		if ("99".equals(baseRateCode)) {
-			b.setRateIncr(b.getProposalRate().subtract(b.getPresentRate()));
+			b.setRateIncr(BigDecimal.ZERO);
 		} else {
 			b.setRateIncr(b.getProposalRate().subtract(b.getContrBaseRate()));
 		}
@@ -816,7 +838,19 @@ public class L4320Batch extends TradeBuffer {
 		}
 	}
 
-//	暫時紀錄戶號額度
+	// 政府補貼利率
+	private BigDecimal getSubsidyRate(String govOfferFlag) throws LogicException {
+		BigDecimal subsidyRate = BigDecimal.ZERO;
+		if (!"N".equals(govOfferFlag)) {
+			String jsonfield = "SubsidyRate" + govOfferFlag;
+			if (subsidyRateVo.get(jsonfield) != null) {
+				subsidyRate = parse.stringToBigDecimal(subsidyRateVo.get(jsonfield));
+			}
+		}
+		return subsidyRate;
+	}
+
+	// 暫時紀錄戶號額度
 	private class tmpBorm {
 
 		@Override
@@ -1074,7 +1108,6 @@ public class L4320Batch extends TradeBuffer {
 					if (t.getBaseRateCode().equals(iBaseRateCode) && !"2".equals(t.getRateCode())) {
 						LoanRateChange tLoanRateChange = sLoanRateChangeService.holdById(t.getLoanRateChangeId(),
 								titaVo);
-						// 更新適用利率
 						if ("Y".equals(tLoanRateChange.getIncrFlag())) { // 加減碼是否依合約
 							newFitRate = iBaseRate.add(tLoanRateChange.getRateIncr());
 						} else {
