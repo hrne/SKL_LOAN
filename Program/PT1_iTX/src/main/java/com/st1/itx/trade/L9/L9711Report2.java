@@ -30,6 +30,9 @@ public class L9711Report2 extends MakeReport {
 
 	@Autowired
 	public CustMainService custMainService;
+	
+	@Autowired
+	L9711Report4 l9711report4;
 
 	@Autowired
 	CustNoticeCom custNoticeCom;
@@ -80,7 +83,6 @@ public class L9711Report2 extends MakeReport {
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String reportItem = "放款本息攤還表暨繳息通知單";
-		String security =this.getSecurity();
 		String pageSize = "A4";
 		String pageOrientation = "P";
 
@@ -138,6 +140,8 @@ public class L9711Report2 extends MakeReport {
 		}
 
 		long sno = this.close();
+		
+		l9711report4.exec(titaVo,L9711List);
 
 		return sno;
 	}

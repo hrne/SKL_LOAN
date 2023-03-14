@@ -49,6 +49,7 @@ public class L9711p extends TradeBuffer {
 		String parentTranCode = titaVo.getTxcd();
 
 		l9711report.setParentTranCode(parentTranCode);
+		
 
 		List<Map<String, String>> l9711List = l9711report.exec(titaVo);
 

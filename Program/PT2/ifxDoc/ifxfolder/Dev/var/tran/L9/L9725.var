@@ -56,34 +56,27 @@ T(4,DATE$)
 #DT=D,7,S
 T(1,#DATE,2,7)
 
-
-
 #TodayYear=A,3,S
 T(1,#DT,1,3)
 
-
-
-!#InputYear=A,3,S
-!E(0,#TodayYear)
-!@V(2,0)
-!V(5,0,#TodayYear)
+#Year=A,3,S
+E(0,#TodayYear-1)
 
 #DefaultStartDate=A,7,S
-T(2,#TodayYear+0101)
+T(2,#Year+0101)
+#DefaulEndDate=A,7,S
+T(2,#Year+1231)
 
-#DateInputStr=D,7,O
+#DateInputStr=D,7,I
 T(1,#DefaultStartDate,1,7)
-
-
+@V(7)A(4,0,#DateInputStr)
 
 #DateInputEnd=D,7,I
-T(1,#DT,1,7)
+T(1,#DefaulEndDate,1,7)
 @V(7)A(4,0,#DateInputEnd)
-IF(#DateInputEnd > #DT,V(P,不可大於會計日),$)
+IF(#DateInputEnd < #DateInputStr,V(P,起始日不可大於結束日),$)
 
-#InputYear=A,3,S
-E(0,#DateInputEnd/10000)
-@T(2,@DateInputStr,#InputYear+0101)
+
 
 
 </sub>

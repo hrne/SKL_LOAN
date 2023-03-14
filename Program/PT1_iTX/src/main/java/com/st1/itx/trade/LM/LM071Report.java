@@ -83,6 +83,17 @@ public class LM071Report extends MakeReport {
 							makeExcel.setValue(row, i + 1, Float.valueOf(queryResult.get(fdnm)), "#,##0");
 						}
 						break;
+					case 2:
+						// 西曆轉國曆
+						String v = queryResult.get(fdnm);
+						if (v != null && !v.isEmpty()) {
+							int rocDate = Integer.parseInt(v);
+							if (rocDate >= 19110000) {
+								rocDate -= 19110000;
+							}
+							makeExcel.setValue(row, i + 1, rocDate);
+						}
+						break;
 					case 7:
 					case 8:
 					case 9:

@@ -15,6 +15,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.db.domain.CdBranch;
 import com.st1.itx.db.domain.CdBranchGroup;
 import com.st1.itx.db.service.CdBranchService;
+import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.CdBcm;
 import com.st1.itx.db.service.CdBcmService;
 import com.st1.itx.db.service.CdBranchGroupService;
@@ -398,9 +399,11 @@ public class XXR99 extends TradeBuffer {
 		List<CdBranchGroup> lCdBranchGroup = tCdBranchGroup == null ? null : tCdBranchGroup.getContent();
 		if (lCdBranchGroup != null) {
 			for (CdBranchGroup Cdbg : lCdBranchGroup) {
-				s += Cdbg.getGroupNo().trim() + ":" + Cdbg.getGroupItem().trim();
+				s += Cdbg.getGroupNo().trim() + ":" + Cdbg.getGroupItem().trim() + ";";
 			}
 		}
+
+		s = "0:未設定;" + s.substring(0, s.length() - 1);
 
 		return s;
 	}
@@ -482,7 +485,8 @@ public class XXR99 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = Integer.MAX_VALUE;
 
-		Slice<TxAuthGroup> slTxAuthGroup = sTxAuthGroupService.BranchAll(branchNo, Integer.valueOf(levelFg), this.index, this.limit);
+		Slice<TxAuthGroup> slTxAuthGroup = sTxAuthGroupService.BranchAll(branchNo, Integer.valueOf(levelFg), this.index,
+				this.limit);
 		List<TxAuthGroup> lTxAuthGroup = slTxAuthGroup == null ? null : slTxAuthGroup.getContent();
 
 		if (lTxAuthGroup != null) {

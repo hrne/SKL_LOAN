@@ -24,6 +24,9 @@ public class L9711Report extends MakeReport {
 
 	@Autowired
 	L9711ServiceImpl l9711ServiceImpl;
+	
+	@Autowired
+	L9711Report3 l9711report3;
 
 	@Autowired
 	BaTxCom dBaTxCom;
@@ -121,8 +124,7 @@ public class L9711Report extends MakeReport {
 		String txcd = titaVo.getTxcd();
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
-		String reportItem = "放款到期明細表";
-		
+		String reportItem = "放款到期明細表";		
 		String pageSize = "A4";
 		String pageOrientation = "P";
 
@@ -160,12 +162,16 @@ public class L9711Report extends MakeReport {
 			this.print(1, startPos, "本日無資料");
 
 		}
-
+		
 		long sno = this.close();
 
 		this.toPdf(sno);
+		
+		l9711report3.exec(titaVo,l9711List);
 
 		return l9711List;
+		
+		
 
 	}
 

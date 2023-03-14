@@ -82,9 +82,12 @@ T(3,CdCode.Confidentiality)
 #ApLogFlag=x,1000,S
 T(3,CdCode.ApLogFlag)
 
+#GroupNo=x,1000,S
+T(3,GROP0000)
+
 
 #RIM1=X,1,S
-S(XXR99,01,#RptCycle,#RptSendCode,#RptSignCode,#EnableFg,#RptWaterCode,#Confidentiality,#ApLogFlag)
+S(XXR99,01,#RptCycle,#RptSendCode,#RptSignCode,#EnableFg,#RptWaterCode,#Confidentiality,#ApLogFlag,#GroupNo)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@RptCycle,#HelpDesc1)
@@ -94,6 +97,7 @@ T(2,@EnableFg,#HelpDesc4)
 T(2,@RptWaterCode,#HelpDesc5)
 T(2,@Confidentiality,#HelpDesc6)
 T(2,@ApLogFlag,#HelpDesc7)
+T(2,@GroupNo,#HelpDesc8)
 !---------------------------------
 
 #CHAIN=A,1,S
@@ -205,6 +209,11 @@ T(H,#OOConfidentiality,#Confidentiality)
 #OOApLogFlagX=X,20,L
 T(H,#OOApLogFlag,#ApLogFlag)
 
+!課組別
+#OOGroupNo=X,1,L
+#OOGroupNoX=X,20,L
+T(H,#OOGroupNo,#GroupNo)
+
 
 !最後修改人員&日期
 #OOLastUpdate=x,20,S
@@ -216,7 +225,7 @@ T(H,#OOApLogFlag,#ApLogFlag)
 E(0,2)
 
 #OOBUF2=X,181,S
-T(2,#OOFunc2+#OOFormNo+#OOFormName+#OOCycle+#OOSendCode+#OOLetter+#OOMessage+#OOEmail+#OOSignCode+#OOUsageDesc+#OOEnable+#OOConfidentiality+#OOApLogFlag)
+T(2,#OOFunc2+#OOFormNo+#OOFormName+#OOCycle+#OOSendCode+#OOLetter+#OOMessage+#OOEmail+#OOSignCode+#OOUsageDesc+#OOEnable+#OOConfidentiality+#OOApLogFlag+#OOGroupNo)
 
 #OOBTN2=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L6608;text=修改;ntxbuf=#OOBUF2})
@@ -226,7 +235,7 @@ BIND(grid,{cmd=CHAIN;ntxcd=L6608;text=修改;ntxbuf=#OOBUF2})
 E(0,4)
 
 #OOBUF4=X,180,S
-T(2,#OOFunc4+#OOFormNo+#OOFormName+#OOCycle+#OOSendCode+#OOLetter+#OOMessage+#OOEmail+#OOSignCode+#OOUsageDesc+#OOEnable+#OOConfidentiality+#OOApLogFlag)
+T(2,#OOFunc4+#OOFormNo+#OOFormName+#OOCycle+#OOSendCode+#OOLetter+#OOMessage+#OOEmail+#OOSignCode+#OOUsageDesc+#OOEnable+#OOConfidentiality+#OOApLogFlag+#OOGroupNo)
 
 #OOBTN4=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L6608;text=刪除;ntxbuf=#OOBUF4})
@@ -260,6 +269,7 @@ TXFORM=L6068
 #OOEnable
 #OOConfidentiality
 #OOApLogFlag
+#OOGroupNo
 #OOLastUpdate
 #OOLastEmp
 ^
@@ -322,6 +332,9 @@ TXFORM=L6068
 {width:70,align:'left'}
 
 #OOApLogFlagX=敏感性資料
+{width:90,align:'left'}
+
+#OOGroupNoX=所屬單位
 {width:90,align:'left'}
 
 #OOLastUpdate=最後修改日期

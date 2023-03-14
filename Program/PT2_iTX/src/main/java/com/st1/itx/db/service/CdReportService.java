@@ -90,6 +90,18 @@ public interface CdReportService {
   public CdReport FormNoFirst(String formNo_0, TitaVo... titaVo);
 
   /**
+   * GroupNo=, AND FormNo %
+   *
+   * @param groupNo_0 groupNo_0
+   * @param formNo_1 formNo_1
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice CdReport CdReport of List
+   */
+  public Slice<CdReport> findRptGroupNo(String groupNo_0, String formNo_1, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By CdReport
    * 
    * @param formNo key

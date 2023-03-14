@@ -97,7 +97,7 @@ public class L6R31 extends TradeBuffer {
 		this.totaVo.putParam("L6R31Enable", mCdReport.getEnable());
 		this.totaVo.putParam("L6R31Confidentiality", mCdReport.getConfidentiality());
 		this.totaVo.putParam("L6R31ApLogFlag", mCdReport.getApLogFlag());
-		
+		this.totaVo.putParam("L6R31GroupNo", mCdReport.getGroupNo());
 		this.totaVo.putParam("L6R31LetterFg", mCdReport.getLetterFg());
 		this.totaVo.putParam("L6R31MessageFg", mCdReport.getMessageFg());
 		this.totaVo.putParam("L6R31EmailFg", mCdReport.getEmailFg());

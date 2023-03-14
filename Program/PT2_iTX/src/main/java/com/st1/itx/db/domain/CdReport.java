@@ -105,6 +105,11 @@ public class CdReport implements Serializable {
   @Column(name = "`ApLogFlag`")
   private int apLogFlag = 0;
 
+  // 課組別
+  /* CdBranchGroup：BranchNo單位別：0000放款管理課：1放款服務課：2放款推展課：3放款審查課：4投資資訊規劃課：5專案管理課：6軟體測試課：7 */
+  @Column(name = "`GroupNo`", length = 1)
+  private String groupNo;
+
   // 建檔日期時間
   @CreatedDate
   @Column(name = "`CreateDate`")
@@ -453,6 +458,41 @@ public class CdReport implements Serializable {
   }
 
 /**
+	* 課組別<br>
+	* CdBranchGroup：
+BranchNo單位別：0000
+放款管理課：1
+放款服務課：2
+放款推展課：3
+放款審查課：4
+投資資訊規劃課：5
+專案管理課：6
+軟體測試課：7
+	* @return String
+	*/
+  public String getGroupNo() {
+    return this.groupNo == null ? "" : this.groupNo;
+  }
+
+/**
+	* 課組別<br>
+	* CdBranchGroup：
+BranchNo單位別：0000
+放款管理課：1
+放款服務課：2
+放款推展課：3
+放款審查課：4
+投資資訊規劃課：5
+專案管理課：6
+軟體測試課：7
+  *
+  * @param groupNo 課組別
+	*/
+  public void setGroupNo(String groupNo) {
+    this.groupNo = groupNo;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -533,7 +573,7 @@ public class CdReport implements Serializable {
   public String toString() {
     return "CdReport [formNo=" + formNo + ", formName=" + formName + ", cycle=" + cycle + ", sendCode=" + sendCode + ", letterFg=" + letterFg + ", messageFg=" + messageFg
            + ", emailFg=" + emailFg + ", letter=" + letter + ", message=" + message + ", email=" + email + ", usageDesc=" + usageDesc + ", signCode=" + signCode
-           + ", watermarkFlag=" + watermarkFlag + ", enable=" + enable + ", confidentiality=" + confidentiality + ", apLogFlag=" + apLogFlag + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
-           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", watermarkFlag=" + watermarkFlag + ", enable=" + enable + ", confidentiality=" + confidentiality + ", apLogFlag=" + apLogFlag + ", groupNo=" + groupNo + ", createDate=" + createDate
+           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

@@ -124,13 +124,15 @@ public class L6608 extends TradeBuffer {
 		mCdReport.setEnable(titaVo.getParam("Enable"));
 		mCdReport.setConfidentiality(titaVo.getParam("Confidentiality"));
 		mCdReport.setApLogFlag(this.parse.stringToInteger(titaVo.getParam("ApLogFlag")));
-		
+		mCdReport.setGroupNo(titaVo.getParam("GroupNo"));
+
 		mCdReport.setLetterFg(titaVo.getParam("LetterFg"));
 		mCdReport.setMessageFg(titaVo.getParam("MessageFg"));
 		mCdReport.setEmailFg(titaVo.getParam("EmailFg"));
 
 		if (mFuncCode != 2) {
-			mCdReport.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+			mCdReport.setCreateDate(
+					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			mCdReport.setCreateEmpNo(titaVo.getTlrNo());
 		}
 		mCdReport.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
