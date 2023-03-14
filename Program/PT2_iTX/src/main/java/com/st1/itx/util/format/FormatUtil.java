@@ -97,7 +97,9 @@ public class FormatUtil {
 		}
 	}
 
-	public static boolean isChinese(char c) {
+	private static boolean isChinese(char c) {
+		if("「」".indexOf(c) != -1)
+			return false;
 		Character.UnicodeBlock ub = Character.UnicodeBlock.of(c);
 		if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS || ub == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS || ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A
 				|| ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B || ub == Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION
@@ -108,6 +110,8 @@ public class FormatUtil {
 	}
 
 	private static boolean IsPrintableAsciiChar(char ch) {
+		if("「」".indexOf(ch) != -1)
+			return true;
 		if (32 <= ch && ch <= 126)
 			return true;
 		return false;

@@ -162,7 +162,7 @@ public class L9720Report2 extends MakeReport {
 		LocalDate validDateSecond = validDatePivot.minusMonths(22);
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(reportCode)
-				.setRptItem(reportItem).setSecurity( this.getSecurity()).setRptSize(pageSize).setPageOrientation(pageOrientation)
+				.setRptItem(reportItem).setRptSize(pageSize).setPageOrientation(pageOrientation)
 				.build();
 		this.open(titaVo, reportVo);
 	

@@ -17,6 +17,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LH001ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -77,7 +78,22 @@ public class LH001Report extends MakeReport {
 			listC = new ArrayList<>();
 		}
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LH001", "表A07_會計部申報表", "LH001表A07_會計部申報表", "LH001_底稿_表A07_會計部申報表.xlsx", "新表7(108.03.31)");
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LH001";
+		String fileItem = "表A07_會計部申報表";
+		String fileName = "LH001表A07_會計部申報表";
+		String defaultExcel = "LH001_底稿_表A07_會計部申報表.xlsx";
+		String defaultSheet = "新表7(108.03.31)";
+
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LH001", "表A07_會計部申報表", "LH001表A07_會計部申報表", "LH001_底稿_表A07_會計部申報表.xlsx", "新表7(108.03.31)");
 
 		int bcAcDate = titaVo.getEntDyI() + 19110000;
 

@@ -123,7 +123,7 @@ public class L9703Report1 extends MakeReport {
 //		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), tran, "滯繳客戶明細表", "密", "A4", "");
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-				.setRptCode(tran).setRptItem("滯繳客戶明細表").setSecurity(this.getSecurity()).setRptSize("A4").setPageOrientation("")
+				.setRptCode(tran).setRptItem("滯繳客戶明細表").setRptSize("A4").setPageOrientation("")
 				.build();
 
 		this.open(titaVo, reportVo);

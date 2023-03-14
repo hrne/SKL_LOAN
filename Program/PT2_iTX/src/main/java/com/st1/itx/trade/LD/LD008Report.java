@@ -102,7 +102,7 @@ public class LD008Report extends MakeReport {
 		}
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-				.setRptCode("LD008").setRptItem((findRelatedOnly ? "關係人放款餘額總表" : "放款餘額總表")).setSecurity("密")
+				.setRptCode("LD008").setRptItem((findRelatedOnly ? "關係人放款餘額總表" : "放款餘額總表"))
 				.setRptSize("A4").setPageOrientation("L").build();
 
 		this.open(titaVo, reportVo);

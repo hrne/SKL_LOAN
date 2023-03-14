@@ -17,6 +17,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LP002ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -89,8 +90,25 @@ public class LP002Report extends MakeReport {
 	public void exec(TitaVo titaVo) throws LogicException {
 
 		this.info("LP002Report exec");
+		
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LP002";
+		String fileItem = "部室、區部、通訊處業績";
+		String fileName = "LP002部室、區部、通訊處業績";
+		String defaultExcel = "LP002_底稿_推展_部室、區部、通訊處業績.xlsx";
+		String defaultSheet = "部室";
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP002", "部室、區部、通訊處業績", "LP002部室、區部、通訊處業績", "LP002_底稿_推展_部室、區部、通訊處業績.xlsx", "部室");
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+
+
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP002", "部室、區部、通訊處業績", "LP002部室、區部、通訊處業績",
+//				"LP002_底稿_推展_部室、區部、通訊處業績.xlsx", "部室");
 
 		List<Map<String, String>> wkSsnList = new ArrayList<>();
 
@@ -300,7 +318,8 @@ public class LP002Report extends MakeReport {
 						makeExcel.setWidth(startCol, 10);
 						makeExcel.setWidth(startCol + 1, 15);
 
-						makeExcel.setMergedRegionValue(row2, row2, startCol, startCol + 1, "第1~" + lastWkMonth + "工作月累計", "C");
+						makeExcel.setMergedRegionValue(row2, row2, startCol, startCol + 1,
+								"第1~" + lastWkMonth + "工作月累計", "C");
 
 						makeExcel.setValue(row3, startCol, "累計\n件數", "C");
 						makeExcel.setValue(row3, startCol + 1, "累　　計\n達成金額", "C");
@@ -344,7 +363,8 @@ public class LP002Report extends MakeReport {
 	 * @param lastWkMonth 上季末工作月
 	 * 
 	 */
-	private void setDept(TitaVo titaVo, Map<String, String> wkSsnVo, int wkMonth, int lastWkMonth) throws LogicException {
+	private void setDept(TitaVo titaVo, Map<String, String> wkSsnVo, int wkMonth, int lastWkMonth)
+			throws LogicException {
 		this.info("===========exportExcelDept");
 
 		try {
@@ -402,8 +422,10 @@ public class LP002Report extends MakeReport {
 
 			for (Map<String, String> tLDVo : findList) {
 //				this.info("list" + tLDVo);
-				BigDecimal tmpCnt = tLDVo.get("F4") == null || tLDVo.get("F4").length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F4"));
-				BigDecimal tmpAmt = tLDVo.get("F5") == null || tLDVo.get("F5").length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F5"));
+				BigDecimal tmpCnt = tLDVo.get("F4") == null || tLDVo.get("F4").length() == 0 ? BigDecimal.ZERO
+						: new BigDecimal(tLDVo.get("F4"));
+				BigDecimal tmpAmt = tLDVo.get("F5") == null || tLDVo.get("F5").length() == 0 ? BigDecimal.ZERO
+						: new BigDecimal(tLDVo.get("F5"));
 
 				if (!deptcode.equals(tLDVo.get("F6"))) {
 
@@ -483,7 +505,8 @@ public class LP002Report extends MakeReport {
 
 						// 第一次 建立累計欄位
 						if (firstCreate) {
-							this.info("建立累計欄位, tRow = " + tRow + " , scol = " + scol + " ,cntTotal = " + cntTotal + " ,amtTotal = " + amtTotal);
+							this.info("建立累計欄位, tRow = " + tRow + " , scol = " + scol + " ,cntTotal = " + cntTotal
+									+ " ,amtTotal = " + amtTotal);
 
 							makeExcel.setValue(tRow, scol, cntTotal, "#,##0", "R");
 							makeExcel.setValue(tRow, scol + 1, amtTotal, "#,##0", "R");
@@ -496,7 +519,8 @@ public class LP002Report extends MakeReport {
 						cntRowTotal = cntRowTotal.add(tmpCnt);
 						amtRowTotal = amtRowTotal.add(tmpAmt);
 
-						this.info("累計+陸續工作月的 總計, tRow = " + tRow + " , scol = " + scol + " ,tmpCnt = " + tmpCnt + " ,tmpAmt = " + tmpAmt);
+						this.info("累計+陸續工作月的 總計, tRow = " + tRow + " , scol = " + scol + " ,tmpCnt = " + tmpCnt
+								+ " ,tmpAmt = " + tmpAmt);
 
 						makeExcel.setValue(tRow, scol, tmpCnt, "#,##0", "R");
 						makeExcel.setValue(tRow, scol + 1, tmpAmt, "#,##0", "R");
@@ -565,7 +589,8 @@ public class LP002Report extends MakeReport {
 	 * @param lastWkMonth 上季末工作月
 	 * 
 	 */
-	private void setDist(TitaVo titaVo, Map<String, String> wkSsnVo, int wkMonth, int lastWkMonth) throws LogicException {
+	private void setDist(TitaVo titaVo, Map<String, String> wkSsnVo, int wkMonth, int lastWkMonth)
+			throws LogicException {
 		this.info("===========exportExcelDist");
 
 		try {
@@ -622,8 +647,10 @@ public class LP002Report extends MakeReport {
 			for (Map<String, String> tLDVo : findList) {
 //				this.info("list" + tLDVo);
 
-				BigDecimal tmpCnt = tLDVo.get("F5") == null || tLDVo.get("F5").length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F5"));
-				BigDecimal tmpAmt = tLDVo.get("F6") == null || tLDVo.get("F6").length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F6"));
+				BigDecimal tmpCnt = tLDVo.get("F5") == null || tLDVo.get("F5").length() == 0 ? BigDecimal.ZERO
+						: new BigDecimal(tLDVo.get("F5"));
+				BigDecimal tmpAmt = tLDVo.get("F6") == null || tLDVo.get("F6").length() == 0 ? BigDecimal.ZERO
+						: new BigDecimal(tLDVo.get("F6"));
 
 				if (!distcode.equals(tLDVo.get("F7"))) {
 
@@ -796,7 +823,8 @@ public class LP002Report extends MakeReport {
 	 * @param lastWkMonth 上季末工作月
 	 * 
 	 */
-	private void setUnit(TitaVo titaVo, Map<String, String> wkSsnVo, int wkMonth, int lastWkMonth, String unitCode) throws LogicException {
+	private void setUnit(TitaVo titaVo, Map<String, String> wkSsnVo, int wkMonth, int lastWkMonth, String unitCode)
+			throws LogicException {
 		this.info("===========exportExcelUnit");
 
 		try {
@@ -851,8 +879,10 @@ public class LP002Report extends MakeReport {
 
 			for (Map<String, String> tLDVo : findList) {
 //				this.info("list" + tLDVo);
-				BigDecimal tmpCnt = tLDVo.get("F4") == null || tLDVo.get("F4").length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F4"));
-				BigDecimal tmpAmt = tLDVo.get("F5") == null || tLDVo.get("F5").length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F5"));
+				BigDecimal tmpCnt = tLDVo.get("F4") == null || tLDVo.get("F4").length() == 0 ? BigDecimal.ZERO
+						: new BigDecimal(tLDVo.get("F4"));
+				BigDecimal tmpAmt = tLDVo.get("F5") == null || tLDVo.get("F5").length() == 0 ? BigDecimal.ZERO
+						: new BigDecimal(tLDVo.get("F5"));
 
 				if (!unitcode.equals(tLDVo.get("F7"))) {
 

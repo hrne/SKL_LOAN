@@ -122,12 +122,12 @@ public class L9711Report extends MakeReport {
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String reportItem = "放款到期明細表";
-		String security = this.getSecurity();
+		
 		String pageSize = "A4";
 		String pageOrientation = "P";
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
-				.setRptItem(reportItem).setSecurity(security).setRptSize(pageSize).setPageOrientation(pageOrientation)
+				.setRptItem(reportItem).setRptSize(pageSize).setPageOrientation(pageOrientation)
 				.build();
 		this.open(titaVo, reportVo);
 

@@ -110,7 +110,7 @@ public class L9710Report extends MakeReport {
 		String reportName = "寬限到期明細表";
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-				.setRptCode(txcd).setRptItem(reportName).setSecurity(this.getSecurity()).setRptSize("A4").setPageOrientation("L")
+				.setRptCode(txcd).setRptItem(reportName).setRptSize("A4").setPageOrientation("L")
 				.build();
 
 		this.open(titaVo, reportVo);

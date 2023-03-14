@@ -16,6 +16,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LP001ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 
 @Component
@@ -37,13 +38,14 @@ public class LP001Report extends MakeReport {
 
 		this.info("MakeReport.printHeader");
 
-		this.print(-2, 145, "機密等級：密");
+		this.print(-2, 145, "機密等級：" + this.getSecurity());
 		this.print(-3, 2, "程式ID：" + this.getParentTranCode());
 		this.print(-3, 80, "新光人壽保險股份有限公司", "C");
 		this.print(-4, 2, "報  表：" + this.getRptCode());
 		this.print(-4, 80, "工作月放款審查課各區業績累計", "C");
 		this.print(-3, 145, "日　　期：" + this.showBcDate(dDateUtil.getNowStringBc(), 1));
-		this.print(-4, 145, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":" + dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
+		this.print(-4, 145, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
+				+ dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
 		this.print(-5, 145, "頁　　次：" + this.getNowPage());
 		String yearMon = this.showRocDate(this.getReportDate());
 		this.print(-6, 80, yearMon, "C");
@@ -85,18 +87,24 @@ public class LP001Report extends MakeReport {
 
 	}
 
-	private int reportDate = 0;
-	private String brno = "";
 	private String reportCode = "LP001";
 	private String reportItem = "工作月放款審查課各區業績累計";
-	private String security = "密";
+
 	private String pageSize = "A4";
 	private String pageOrientation = "L";
 
-	private void exportReport(TitaVo titaVo, Map<String, String> wkVo, List<Map<String, String>> fnAllList) throws LogicException {
+	private void exportReport(TitaVo titaVo, Map<String, String> wkVo, List<Map<String, String>> fnAllList)
+			throws LogicException {
 		this.info("===========in PDF");
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), reportCode, reportItem, security, pageSize, pageOrientation);
+		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
+				.setRptCode(reportCode).setRptItem(reportItem).setRptSize(pageSize)
+				.setPageOrientation(pageOrientation).build();
+
+		this.open(titaVo, reportVo);
+
+//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), reportCode, reportItem, security, pageSize,
+//				pageOrientation);
 
 		this.setCharSpaces(0);
 
@@ -394,18 +402,21 @@ public class LP001Report extends MakeReport {
 
 			// 間距
 			int columnInterval = 110;
-			this.drawLine(x2 + columnInterval * (x - 1), 370 + startColumn, x2 + columnInterval * (x - 1), 565 + startColumn); // y4
+			this.drawLine(x2 + columnInterval * (x - 1), 370 + startColumn, x2 + columnInterval * (x - 1),
+					565 + startColumn); // y4
 
 			this.drawLine(x3 + columnInterval * x, 345 + startColumn, x3 + columnInterval * x, 565 + startColumn); // y5
 		}
 
 	}
 
-	private void exportExcel(TitaVo titaVo, Map<String, String> wkVo, List<Map<String, String>> fnAllList) throws LogicException {
+	private void exportExcel(TitaVo titaVo, Map<String, String> wkVo, List<Map<String, String>> fnAllList)
+			throws LogicException {
 
 		this.info("===========in Excel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), reportCode, reportItem, reportCode + "_" + reportItem, "LP001_底稿_區域中心業績累計.xlsx", "10805");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), reportCode, reportItem,
+				reportCode + "_" + reportItem, "LP001_底稿_區域中心業績累計.xlsx", "10805");
 
 		int iYEAR = 0;
 		int iMM = 0;

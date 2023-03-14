@@ -242,9 +242,10 @@ S(L1R09,1,#RimCustId,#RimCustNo,#RimFunCd)
 R(1,L1R09)
 
 #checkL1r09=X,1,S
+C(3,#CustNo,0,T(2,@CustNo,#L1r09CustNo),$)
 C(3,#CustNo,0,$,T(2,@CustNameA,#L1r09CustName))
 C(4,#CustId,$,T(2,@CustNameB,#L1r09CustName))
-
+C(4,#CustId,T(2,@CustId,#L1r09CustId),$)
 ! 電話種類
 #TelTypeCode=A,2,I
 HELP(#TelTypeCodeHelp)

@@ -180,7 +180,7 @@ public class L9719Report extends MakeReport {
 	public void makePdf(TitaVo titaVo) throws LogicException {
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno)
-				.setRptCode(reportCode).setRptItem(reportItem).setSecurity(this.getSecurity()).setRptSize(pageSize)
+				.setRptCode(reportCode).setRptItem(reportItem).setRptSize(pageSize)
 				.setPageOrientation(pageOrientation).build();
 
 		this.open(titaVo, reportVo);

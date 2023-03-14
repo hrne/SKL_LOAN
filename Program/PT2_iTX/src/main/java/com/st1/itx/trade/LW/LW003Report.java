@@ -17,6 +17,7 @@ import com.st1.itx.db.service.springjpa.cm.LW003ServiceImpl;
 
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -98,7 +99,25 @@ public class LW003Report extends MakeReport {
 		 * @param sheetnanme 新建Sheet名稱
 		 * @throws LogicException LogicException
 		 */
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LW003", "房貸獎勵費用率統計表", "LW003房貸獎勵費用率", "LW003_底稿_房貸獎勵費用率" + q + ".xls", "獎勵費用率");
+		
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LW003";
+		String fileItem = "房貸獎勵費用率統計表";
+		String fileName = "LW003房貸獎勵費用率";
+		String defaultExcel = "LW003_底稿_房貸獎勵費用率" + q + ".xls";
+		String defaultSheet = "獎勵費用率";
+
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LW003", "房貸獎勵費用率統計表", "LW003房貸獎勵費用率",
+//				"LW003_底稿_房貸獎勵費用率" + q + ".xls", "獎勵費用率");
 
 		this.info("use excel LW003_底稿房貸獎勵費用率" + q);
 
@@ -166,7 +185,8 @@ public class LW003Report extends MakeReport {
 
 	}
 
-	private void exportExcel(List<Map<String, String>> data, int wkYear, int wkMonth, int Quarter, int form) throws LogicException {
+	private void exportExcel(List<Map<String, String>> data, int wkYear, int wkMonth, int Quarter, int form)
+			throws LogicException {
 
 		this.info("exportExcel...");
 		// 個金總業績
@@ -189,7 +209,7 @@ public class LW003Report extends MakeReport {
 		}
 		// 區部 獎勵金額
 		if (form == 2) {
-
+	
 			// 列數
 			int row = 0;
 			int col = 0;
@@ -199,7 +219,8 @@ public class LW003Report extends MakeReport {
 				// 工作季Quarter
 				int quarter = Integer.valueOf(lw003Vo.get("F1"));
 				// 獎勵金Bonus
-				BigDecimal bonus = lw003Vo.get("F2").isEmpty() ? BigDecimal.ZERO : new BigDecimal(lw003Vo.get("F2").toString());
+				BigDecimal bonus = lw003Vo.get("F2").isEmpty() ? BigDecimal.ZERO
+						: new BigDecimal(lw003Vo.get("F2").toString());
 
 				// 判斷列數
 				switch (deptCode) {
@@ -226,13 +247,14 @@ public class LW003Report extends MakeReport {
 
 				makeExcel.setValue(row, col, bonus, "#,##0");
 
+
 			}
 
 		}
 
 		// 通訊處 獎勵金
 		if (form == 3) {
-
+	
 			// 列數
 			int row = 0;
 			int col = 0;
@@ -243,7 +265,8 @@ public class LW003Report extends MakeReport {
 				// 工作季Quarter
 				int quarter = Integer.valueOf(lw003Vo.get("F1"));
 				// 獎勵金Bonus
-				BigDecimal bonus = lw003Vo.get("F2").isEmpty() ? BigDecimal.ZERO : new BigDecimal(lw003Vo.get("F2").toString());
+				BigDecimal bonus = lw003Vo.get("F2").isEmpty() ? BigDecimal.ZERO
+						: new BigDecimal(lw003Vo.get("F2").toString());
 
 				// 判斷列數
 				switch (deptCode) {
@@ -270,6 +293,7 @@ public class LW003Report extends MakeReport {
 
 				makeExcel.setValue(row, col, bonus, "#,##0");
 
+
 			}
 		}
 
@@ -279,7 +303,8 @@ public class LW003Report extends MakeReport {
 			for (Map<String, String> lw003Vo : data) {
 
 				// 總業績金
-				BigDecimal performance = lw003Vo.get("F1").isEmpty() ? BigDecimal.ZERO : new BigDecimal(lw003Vo.get("F1").toString());
+				BigDecimal performance = lw003Vo.get("F1").isEmpty() ? BigDecimal.ZERO
+						: new BigDecimal(lw003Vo.get("F1").toString());
 
 				makeExcel.setValue(19, 3 + num, performance, "#,##0");
 
@@ -293,7 +318,7 @@ public class LW003Report extends MakeReport {
 
 		// 專銷制單位
 		if (form == 5) {
-
+	
 			// 列數
 			int row = 20;
 			int col = 0;
@@ -302,7 +327,8 @@ public class LW003Report extends MakeReport {
 				// 工作季Quarter
 				int quarter = Integer.valueOf(lw003Vo.get("F0"));
 				// 獎勵金Bonus
-				BigDecimal bonus = lw003Vo.get("F1").isEmpty() ? BigDecimal.ZERO : new BigDecimal(lw003Vo.get("F1").toString());
+				BigDecimal bonus = lw003Vo.get("F1").isEmpty() ? BigDecimal.ZERO
+						: new BigDecimal(lw003Vo.get("F1").toString());
 
 				// 判斷欄位
 				col = Quarter == 1 ? 6 : Quarter == 2 ? 9 : Quarter == 3 ? 12 : Quarter == 4 ? 15 : 16;

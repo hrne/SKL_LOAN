@@ -152,7 +152,7 @@ public class L9714Report extends MakeReport {
 		String tradeName = "繳息證明單";
 		String brno = titaVo.getBrno();
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(brno).setRptCode(tradeNo)
-				.setRptItem(tradeName).setSecurity(this.getSecurity()).setRptSize("A4").setPageOrientation("P").build();
+				.setRptItem(tradeName).setRptSize("A4").setPageOrientation("P").build();
 
 		this.open(titaVo, reportVo);
 

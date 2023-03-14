@@ -294,17 +294,12 @@ public class L1108 extends TradeBuffer {
 						}
 						oCustNotice = tranDesc(oCustNotice);
 						CustNotice nCustNotice = tranDesc(tCustNotice);
-						try {
-						sCdReportService.update(cdReport, titaVo);
-						} catch (DBException e) {
-							throw new LogicException("E0005", "L1908申請不列印書面通知書");
-						}
+						
 						iDataLog.setEnv(titaVo, oCdReport, cdReport);
-						iDataLog.exec("L1908異動",cdReport.getFormNo());
+						iDataLog.exec("與報表設定比對,通知書:",cdReport.getFormNo()+" "+formx);
 						
 						iDataLog.setEnv(titaVo, oCustNotice, nCustNotice);
-						iDataLog.exec("修改顧客/" + oCustNotice.getFormNo() + " " + formx + " 通知設定",
-								"CustUKey:" + custMain.getCustUKey());
+						iDataLog.exec("修改客戶通知設定,通知書:" + oCustNotice.getFormNo() + " " + formx );
 					}
 				}
 			}

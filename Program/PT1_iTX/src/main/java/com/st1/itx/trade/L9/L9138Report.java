@@ -239,7 +239,7 @@ public class L9138Report extends MakeReport {
 	public void makePdf(TitaVo titaVo,int acdate) throws LogicException {
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI() + 19110000).setBrno(titaVo.getBrno())
-				.setRptCode("L9138").setRptItem("放款授信日報表").setSecurity(this.getSecurity()).setRptSize("A4").setPageOrientation("L")
+				.setRptCode("L9138").setRptItem("放款授信日報表").setRptSize("A4").setPageOrientation("L")
 				.build();
 		this.open(titaVo, reportVo);
 

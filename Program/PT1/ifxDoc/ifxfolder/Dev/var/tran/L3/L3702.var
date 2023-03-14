@@ -311,6 +311,8 @@ T(2,#CustNo)
 
 #SCRTIL=_,_,S
 T(3,[L3702] 帳戶備忘錄資料維護)
+#hideDate=X,1,S
+HIDE(#BTNNDate,#Msg)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------

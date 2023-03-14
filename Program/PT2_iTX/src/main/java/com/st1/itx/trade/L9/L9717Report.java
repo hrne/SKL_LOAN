@@ -36,7 +36,7 @@ public class L9717Report extends MakeReport {
 	private String brno = "";
 	private String reportCode = "L9717";
 	private String reportItem = "";
-//	private String security = this.getSecurity();
+//	private 
 	private String pageSize = "A4";
 	private String pageOrientation = "L";
 
@@ -599,7 +599,7 @@ public class L9717Report extends MakeReport {
 		// pageSize, pageOrientation);
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(reportCode)
-				.setRptItem(reportItem).setSecurity(this.getSecurity()).setRptSize(pageSize).setPageOrientation(pageOrientation)
+				.setRptItem(reportItem).setRptSize(pageSize).setPageOrientation(pageOrientation)
 				.build();
 
 		this.open(titaVo, reportVo);

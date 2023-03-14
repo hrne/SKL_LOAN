@@ -140,14 +140,30 @@ public class L1107 extends TradeBuffer {
 			finReportDebtId.setCustUKey(iCustUKey);
 			finReportDebtId.setUkey(iUKey);
 
-			FinReportDebt finReportDebt3 = finReportDebtService.findCustUKeyYearFirst(iCustUKey, iStartYY + 1911,titaVo);
-			
-			if (finReportDebt3 != null) {
-				if(finReportDebt3.getStartMM() == iStartMM && finReportDebt3.getEndMM() == iEndMM) {
-				throw new LogicException("E0012", iStartYY + "年度財務報表 ");
+//			FinReportDebt finReportDebt3 = finReportDebtService.findCustUKeyYearFirst(iCustUKey, iStartYY + 1911,
+//					titaVo);
+			FinReportDebt finReportDebt3 = finReportDebtService.holdById(finReportDebtId, titaVo);
+
+			if (finReportDebt3.getStartMM() == iStartMM && finReportDebt3.getEndMM() == iEndMM) {
+				this.info("finReportDebt3.getStartMM()   =" + finReportDebt3.getStartMM());
+				this.info("finReportDebt3.getEndMM()     =" + finReportDebt3.getEndMM());
+				FinReportDebt finReportDebt4 = finReportDebtService.findCustUKeyYearFirst(iCustUKey, iStartYY + 1911,
+						titaVo);
+				if (finReportDebt4 != null) {
+					throw new LogicException("E0012", iStartYY + "年度財務報表 ");
 				}
 			}
-				
+			
+			if (finReportDebt3.getStartMM() != iStartMM || finReportDebt3.getEndMM() != iEndMM) {
+				this.info("finReportDebt3.getStartMM()   =" + finReportDebt3.getStartMM());
+				this.info("finReportDebt3.getEndMM()     =" + finReportDebt3.getEndMM());
+				FinReportDebt finReportDebt5 = finReportDebtService.findCustUKeyYearFirst(iCustUKey, iStartYY + 1911,
+						titaVo);
+				if (finReportDebt5 != null) {
+					throw new LogicException("E0012", iStartYY + "年度財務報表 ");
+				}
+			}
+
 			FinReportDebt finReportDebt = finReportDebtService.holdById(finReportDebtId, titaVo);
 
 			if (finReportDebt == null) {
@@ -157,7 +173,6 @@ public class L1107 extends TradeBuffer {
 			FinReportDebt finReportDebt2 = (FinReportDebt) dataLog.clone(finReportDebt);
 
 			finReportDebt = setFinReportDebt(titaVo, finReportDebt);
-			
 
 			try {
 				boolean diff = false;
@@ -183,17 +198,36 @@ public class L1107 extends TradeBuffer {
 			mntFinReportCashFlow(titaVo);
 			mntFinReportRate(titaVo);
 			mntFinReportQuality(titaVo);
-		} else if ("3".equals(iFunCd)) { // 複製
-			iCustUKey = custMain.getCustUKey();
-			iUKey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
-
-			FinReportDebt finReportDebt3 = finReportDebtService.findCustUKeyYearFirst(iCustUKey, iStartYY + 1911,titaVo);
-			
-			if (finReportDebt3 != null) {
-				if(finReportDebt3.getStartMM() == iStartMM && finReportDebt3.getEndMM() == iEndMM) {
-				throw new LogicException("E0012", iStartYY + "年度財務報表 ");
+		} else if ("3".equals(iFunCd)) { // 複製			
+			FinReportDebtId finReportDebtId2 = new FinReportDebtId();
+			finReportDebtId2.setCustUKey(iCustUKey);
+			finReportDebtId2.setUkey(iUKey);
+			this.info("FinReportDebtId   = " + finReportDebtId2);
+			FinReportDebt finReportDebt3 = finReportDebtService.holdById(finReportDebtId2, titaVo);
+			if (finReportDebt3.getStartMM() == iStartMM && finReportDebt3.getEndMM() == iEndMM) {
+				this.info("finReportDebt3.getStartMM()   =" + finReportDebt3.getStartMM());
+				this.info("finReportDebt3.getEndMM()     =" + finReportDebt3.getEndMM());
+				FinReportDebt finReportDebt4 = finReportDebtService.findCustUKeyYearFirst(iCustUKey, iStartYY + 1911,
+						titaVo);
+				if (finReportDebt4 != null) {
+					throw new LogicException("E0012", iStartYY + "年度財務報表 ");
 				}
 			}
+			
+			if (finReportDebt3.getStartMM() != iStartMM || finReportDebt3.getEndMM() != iEndMM) {
+				this.info("finReportDebt3.getStartMM()   =" + finReportDebt3.getStartMM());
+				this.info("finReportDebt3.getEndMM()     =" + finReportDebt3.getEndMM());
+				FinReportDebt finReportDebt5 = finReportDebtService.findCustUKeyYearFirst(iCustUKey, iStartYY + 1911,
+						titaVo);
+				if (finReportDebt5 != null) {
+					throw new LogicException("E0012", iStartYY + "年度財務報表 ");
+				}
+			}
+
+			
+			iCustUKey = custMain.getCustUKey();
+			iUKey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
+			
 			
 			FinReportDebt finReportDebt = finReportDebtService.findCustUKeyYearFirst(iCustUKey, iStartYY + 1911,
 					titaVo);

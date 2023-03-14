@@ -121,7 +121,7 @@ public class L9705Report extends MakeReport {
 			// 開啟報表
 			ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
 					.setRptCode(tran + "A" + recocodeToFrom).setRptItem(rptitem + recocodeToFrom).setRptSize("A4")
-					.setSecurity(this.getSecurity()).setPageOrientation("P").build();
+					.setPageOrientation("P").build();
 
 			this.openForm(titaVo, reportVo);
 
@@ -341,7 +341,7 @@ public class L9705Report extends MakeReport {
 		} else {
 
 			ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
-					.setRptCode(tran + "A").setRptItem(rptitem).setRptSize("inch,8.5,12").setSecurity("")
+					.setRptCode(tran + "A").setRptItem(rptitem).setRptSize("inch,8.5,12")
 					.setPageOrientation("P").build();
 
 			this.openForm(titaVo, reportVo);

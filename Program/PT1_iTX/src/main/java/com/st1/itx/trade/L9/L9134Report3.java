@@ -43,7 +43,7 @@ public class L9134Report3 extends MakeReport {
 		this.reportDate = endDate;
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(titaVo.getBrno()).setRptCode(reportCode)
-				.setRptItem(reportItem).setSecurity(this.getSecurity()).build();
+				.setRptItem(reportItem).build();
 
 		makeExcel.open(titaVo, reportVo, reportItem);
 

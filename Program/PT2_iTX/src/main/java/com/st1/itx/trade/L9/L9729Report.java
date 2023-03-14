@@ -95,7 +95,7 @@ public class L9729Report extends MakeReport {
 		this.info("L9729Report exportPdf");
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getBrno()).setRptCode(txcd)
-				.setRptItem(txname).setSecurity(this.getSecurity()).setRptSize("A4").setPageOrientation("L").build();
+				.setRptItem(txname).setRptSize("A4").setPageOrientation("L").build();
 		this.open(titaVo, reportVo);
 
 		if (list == null || list.isEmpty()) {

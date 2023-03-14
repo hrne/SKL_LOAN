@@ -98,7 +98,7 @@ public class L9132ReportD extends MakeReport {
 
 //		open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate)
-				.setBrno(brno).setRptCode(reportCode).setRptItem(reportItem).setSecurity(this.getSecurity())
+				.setBrno(brno).setRptCode(reportCode).setRptItem(reportItem)
 				.setRptSize(pageSize).setPageOrientation(pageOrientation).build();
 		
 		this.open(titaVo, reportVo);

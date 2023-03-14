@@ -18,6 +18,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LP003ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -34,7 +35,24 @@ public class LP003Report extends MakeReport {
 
 	public void exec(TitaVo titaVo) throws LogicException {
 		this.info("LP003Report exec");
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP003", "部專暨房專業績累計表", "LP003部專暨房專業績累計表", "LP003_底稿_部專暨房專業績累計表.xlsx", "部專");
+		
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LP003";
+		String fileItem = "部專暨房專業績累計表";
+		String fileName = "LP003部專暨房專業績累計表";
+		String defaultExcel = "LP003_底稿_部專暨房專業績累計表.xlsx";
+		String defaultSheet = "部專";
+
+		this.info("reportVo open");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP003", "部專暨房專業績累計表", "LP003部專暨房專業績累計表", "LP003_底稿_部專暨房專業績累計表.xlsx", "部專");
 		List<Map<String, String>> wkSsnList = new ArrayList<>();
 		try {
 			wkSsnList = lP003ServiceImpl.wkSsn(titaVo);
@@ -59,7 +77,7 @@ public class LP003Report extends MakeReport {
 		String rocYear;
 		// 當前工作月
 		int wkMonth;
-
+		
 		// 找上個工作月
 		if (Integer.parseInt(wkSsnVo.get("F1")) == 1) {
 			rocYear = String.valueOf(Integer.parseInt(wkSsnVo.get("F0")) - 1912);

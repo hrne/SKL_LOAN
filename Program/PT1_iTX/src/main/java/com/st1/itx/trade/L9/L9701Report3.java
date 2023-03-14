@@ -170,7 +170,7 @@ public class L9701Report3 extends MakeReport {
 		String tradeReportName = "客戶往來交易明細表";
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-				.setRptCode("L9701").setRptItem(tradeReportName).setSecurity(this.getSecurity())
+				.setRptCode("L9701").setRptItem(tradeReportName)
 				.setRptSize("A4").setPageOrientation("L").build();
 		
 		this.open(titaVo, reportVo);

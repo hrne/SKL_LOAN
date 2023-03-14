@@ -74,7 +74,7 @@ public class L9705Form extends MakeReport {
 			int count = 0;
 			ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
 					.setRptCode("L9705".equals(titaVo.getTxcd()) ? "L9705B" : tran + "C").setRptItem("存入憑條")
-					.setRptSize("cm,20,9.31333").setSecurity(this.getSecurity()).setPageOrientation("P").build();
+					.setRptSize("cm,20,9.31333").setPageOrientation("P").build();
 			this.openForm(titaVo, reportVo);
 
 			for (Map<String, String> tL9Vo : l9705List) {
@@ -317,7 +317,7 @@ public class L9705Form extends MakeReport {
 		} else {
 			ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
 					.setRptCode("L9705".equals(titaVo.getTxcd()) ? "L9705B" : tran + "C").setRptItem("存入憑條")
-					.setRptSize("cm,20,9.31333").setSecurity("").setPageOrientation("P").build();
+					.setRptSize("cm,20,9.31333").setPageOrientation("P").build();
 
 			this.openForm(titaVo, reportVo);
 			this.setRptItem("存入憑條(無符合資料)");

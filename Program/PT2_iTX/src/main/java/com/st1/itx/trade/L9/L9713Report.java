@@ -117,7 +117,7 @@ public class L9713Report extends MakeReport {
 		String brno = titaVo.getBrno();
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(brno).setRptCode(tradeNo)
-				.setRptItem(tradeName).setSecurity(this.getSecurity()).setRptSize("A4").setPageOrientation("L").build();
+				.setRptItem(tradeName).setRptSize("A4").setPageOrientation("L").build();
 
 		this.open(titaVo, reportVo);
 

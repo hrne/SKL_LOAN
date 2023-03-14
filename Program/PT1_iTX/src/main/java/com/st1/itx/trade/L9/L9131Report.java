@@ -60,7 +60,7 @@ public class L9131Report extends MakeReport {
 
 		this.print(-1, 2, "程式ID：" + this.getParentTranCode());
 		this.print(-1, 85, "新光人壽保險股份有限公司", "C");
-		this.print(-1, 145, "機密等級：" + reportVo.getSecurity());
+		this.print(-1, 145, "機密等級：" + this.getSecurity());
 		this.print(-2, 2, "報　表：" + reportVo.getRptCode());
 		this.print(-2, 85, reportVo.getRptItem(), "C");
 		this.print(-2, 145, "日　　期：" + showBcDate(this.nowDate, 1));
@@ -105,7 +105,7 @@ public class L9131Report extends MakeReport {
 
 	private void setReportVo() throws LogicException {
 		this.reportVo = ReportVo.builder().setRptDate(Integer.valueOf(titaVo.getParam("AcDate")) + 19110000)
-				.setBrno(titaVo.getBrno()).setRptCode("L9131").setRptItem("總帳日結單代傳票列印").setSecurity(this.getSecurity())
+				.setBrno(titaVo.getBrno()).setRptCode("L9131").setRptItem("總帳日結單代傳票列印")
 				.setRptSize("A4").setPageOrientation("L").build();
 	}
 

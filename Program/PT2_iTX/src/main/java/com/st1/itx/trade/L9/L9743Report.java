@@ -64,7 +64,7 @@ public class L9743Report extends MakeReport {
 
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-				.setRptCode("L9743").setRptItem("暫收支票收據列印(個人戶)").setSecurity(this.getSecurity()).setRptSize("A4")
+				.setRptCode("L9743").setRptItem("暫收支票收據列印(個人戶)").setRptSize("A4")
 				.setPageOrientation("L").build();
 
 		this.open(titaVo, reportVo);

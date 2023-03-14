@@ -457,6 +457,7 @@ T(2,#H2+#BrNo+#LevelFg)
 T(2,#GroupT+#BrNo)
 #AuthGroupHelp=X,1024,S
 RESET_RIM(#AuthGroupHelp,XXR99)
+C(5,#TlrNo,001703,ALERT(#AuthGroupT),$)
 S(XXR99,01,#AuthGroupT)
 R(1,XXR99)
 CALL(#HelpProc)

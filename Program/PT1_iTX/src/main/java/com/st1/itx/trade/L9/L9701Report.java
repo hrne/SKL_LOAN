@@ -165,7 +165,7 @@ public class L9701Report extends MakeReport {
 
 	
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-				.setRptCode("L9701").setRptItem(tradeReportName).setSecurity(this.getSecurity())
+				.setRptCode("L9701").setRptItem(tradeReportName)
 				.setRptSize("A4").setPageOrientation("L").build();
 		
 		

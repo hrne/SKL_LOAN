@@ -143,7 +143,7 @@ public class L9702Report extends MakeReport {
 
 			ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
 					.setRptCode("L9702").setRptItem(reportName + "(" + ("4".equals(type) ? "總表" : subName) + ")")
-					.setSecurity(this.getSecurity()).setRptSize("A4").setPageOrientation("L").build();
+					.setRptSize("A4").setPageOrientation("L").build();
 
 			this.open(titaVo, reportVo);
 
@@ -294,7 +294,7 @@ public class L9702Report extends MakeReport {
 
 			ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
 					.setRptCode("L9702").setRptItem(reportName + "(" + ("4".equals(type) ? "通路別" : subName) + ")")
-					.setSecurity("密").setRptSize("A4").setPageOrientation("L").build();
+					.setRptSize("A4").setPageOrientation("L").build();
 
 			this.open(titaVo, reportVo);
 

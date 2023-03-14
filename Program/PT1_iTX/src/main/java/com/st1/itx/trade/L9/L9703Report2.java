@@ -93,7 +93,7 @@ public class L9703Report2 extends MakeReport {
 
 		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
 				.setRptCode(titaVo.getTxCode().isEmpty() ? tran + "B" : titaVo.getTxCode() + "B").setRptItem(rptitem)
-				.setRptSize("inch,8.5,12").setSecurity(this.getSecurity()).setPageOrientation("P").build();
+				.setRptSize("inch,8.5,12").setPageOrientation("P").build();
 
 		this.openForm(titaVo, reportVo);
 

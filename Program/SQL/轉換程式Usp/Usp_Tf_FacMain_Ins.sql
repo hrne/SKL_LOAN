@@ -331,18 +331,503 @@ BEGIN
           ,APLP."APLSDT"                  AS "SettingDate"         -- 額度設定日 DECIMALD 8 
           ,NVL(APLP.APLPSC,0)             AS "PreStarBuildingYM"   -- 約定動工年月 DECIMAL 6
           ,NVL(APLP.APLRSC,0)             AS "StarBuildingYM"      -- 實際興建年月 DECIMAL 6
+          -- 2023-03-14 Wei 修改 from QC2339
           ,CASE
-             WHEN NVL(APLP.APLPAC,0) != 0
+             WHEN APLP.APLPAC = 1
+                  AND APLP.APLNER = 0 
+             THEN 'N'
+             WHEN APLP.APLPAC = 1
+                  AND APLP.APLNER > 0 
              THEN 'Y'
-           ELSE 'N' END                   AS "BreachFlag"          -- 是否綁約
-          ,LPAD(APLP.APLPAC,3,'0')        AS "BreachCode"          -- 違約適用方式
-          ,'2'                            AS "BreachGetCode"       -- 違約金收取方式
-          ,APLP.APLNER * 12               AS "ProhibitMonth"       -- 限制清償期限
-          ,NVL(PROD."BreachPercent",0)    AS "BreachPercent"       -- 違約金百分比
-          ,NVL(PROD."BreachDecreaseMonth",0)
-                                          AS "BreachDecreaseMonth" -- 違約金分段月數
-          ,NVL(PROD."BreachDecrease",0)   AS "BreachDecrease"      -- 分段遞減百分比
-          ,0                              AS "BreachStartPercent"  -- 還款起算比例%
+             WHEN APLP.APLPAC = 2
+                  AND APLP.APLNER = 0 
+             THEN 'N'
+             WHEN APLP.APLPAC = 2
+                  AND APLP.APLNER > 0 
+             THEN 'Y'
+             WHEN APLP.APLPAC = 3
+                  AND APLP.APLNER = 0 
+             THEN 'N'
+             WHEN APLP.APLPAC = 3
+                  AND APLP.APLNER > 0 
+             THEN 'Y'
+             WHEN APLP.APLPAC = 4
+                  AND APLP.APLNER = 0 
+             THEN 'N'
+             WHEN APLP.APLPAC = 4
+                  AND APLP.APLNER > 0 
+             THEN 'Y'
+             WHEN APLP.APLPAC = 5
+                  AND APLP.APLNER = 0 
+             THEN 'N'
+             WHEN APLP.APLPAC = 5
+                  AND APLP.APLNER > 0 
+             THEN 'Y'
+             WHEN APLP.APLPAC = 6
+                  AND APLP.APLNER = 0 
+             THEN 'N'
+             WHEN APLP.APLPAC = 6
+                  AND APLP.APLNER > 0 
+             THEN 'Y'
+             WHEN APLP.APLPAC = 7
+                  AND APLP.APLNER = 0 
+             THEN 'N'
+             WHEN APLP.APLPAC = 7
+                  AND APLP.APLNER > 0 
+             THEN 'Y'
+             WHEN APLP.APLPAC = 8
+                  AND APLP.APLNER = 0 
+             THEN 'N'
+             WHEN APLP.APLPAC = 8
+                  AND APLP.APLNER > 0 
+             THEN 'Y'
+             WHEN APLP.APLPAC = 9
+                  AND APLP.APLNER = 0 
+             THEN 'N'
+             WHEN APLP.APLPAC = 9
+                  AND APLP.APLNER > 0 
+             THEN 'Y'
+             WHEN APLP.APLPAC = 0
+                  AND APLP.APLNER = 0 
+             THEN 'N'
+             WHEN APLP.APLPAC = 0
+                  AND APLP.APLNER > 0 
+             THEN 'Y'
+           ELSE '?' END                   AS "BreachFlag"          -- 是否綁約
+          ,CASE
+             WHEN APLP.APLPAC = 1
+                  AND APLP.APLNER = 0 
+             THEN '901'
+             WHEN APLP.APLPAC = 1
+                  AND APLP.APLNER > 0 
+             THEN '901'
+             WHEN APLP.APLPAC = 2
+                  AND APLP.APLNER = 0 
+             THEN '902'
+             WHEN APLP.APLPAC = 2
+                  AND APLP.APLNER > 0 
+             THEN '902'
+             WHEN APLP.APLPAC = 3
+                  AND APLP.APLNER = 0 
+             THEN '903'
+             WHEN APLP.APLPAC = 3
+                  AND APLP.APLNER > 0 
+             THEN '903'
+             WHEN APLP.APLPAC = 4
+                  AND APLP.APLNER = 0 
+             THEN '904'
+             WHEN APLP.APLPAC = 4
+                  AND APLP.APLNER > 0 
+             THEN '904'
+             WHEN APLP.APLPAC = 5
+                  AND APLP.APLNER = 0 
+             THEN '905'
+             WHEN APLP.APLPAC = 5
+                  AND APLP.APLNER > 0 
+             THEN '905'
+             WHEN APLP.APLPAC = 6
+                  AND APLP.APLNER = 0 
+             THEN '906'
+             WHEN APLP.APLPAC = 6
+                  AND APLP.APLNER > 0 
+             THEN '906'
+             WHEN APLP.APLPAC = 7
+                  AND APLP.APLNER = 0 
+             THEN '907'
+             WHEN APLP.APLPAC = 7
+                  AND APLP.APLNER > 0 
+             THEN '907'
+             WHEN APLP.APLPAC = 8
+                  AND APLP.APLNER = 0 
+             THEN '908'
+             WHEN APLP.APLPAC = 8
+                  AND APLP.APLNER > 0 
+             THEN '908'
+             WHEN APLP.APLPAC = 9
+                  AND APLP.APLNER = 0 
+             THEN '909'
+             WHEN APLP.APLPAC = 9
+                  AND APLP.APLNER > 0 
+             THEN '909'
+             WHEN APLP.APLPAC = 0
+                  AND APLP.APLNER = 0 
+             THEN '900'
+             WHEN APLP.APLPAC = 0
+                  AND APLP.APLNER > 0 
+             THEN '002'
+           ELSE '???' END                AS "BreachCode"          -- 違約適用方式
+          ,CASE
+             WHEN APLP.APLPAC = 1
+                  AND APLP.APLNER = 0 
+             THEN '2'
+             WHEN APLP.APLPAC = 1
+                  AND APLP.APLNER > 0 
+             THEN '2'
+             WHEN APLP.APLPAC = 2
+                  AND APLP.APLNER = 0 
+             THEN '2'
+             WHEN APLP.APLPAC = 2
+                  AND APLP.APLNER > 0 
+             THEN '2'
+             WHEN APLP.APLPAC = 3
+                  AND APLP.APLNER = 0 
+             THEN '2'
+             WHEN APLP.APLPAC = 3
+                  AND APLP.APLNER > 0 
+             THEN '2'
+             WHEN APLP.APLPAC = 4
+                  AND APLP.APLNER = 0 
+             THEN '2'
+             WHEN APLP.APLPAC = 4
+                  AND APLP.APLNER > 0 
+             THEN '2'
+             WHEN APLP.APLPAC = 5
+                  AND APLP.APLNER = 0 
+             THEN '2'
+             WHEN APLP.APLPAC = 5
+                  AND APLP.APLNER > 0 
+             THEN '2'
+             WHEN APLP.APLPAC = 6
+                  AND APLP.APLNER = 0 
+             THEN '2'
+             WHEN APLP.APLPAC = 6
+                  AND APLP.APLNER > 0 
+             THEN '2'
+             WHEN APLP.APLPAC = 7
+                  AND APLP.APLNER = 0 
+             THEN '2'
+             WHEN APLP.APLPAC = 7
+                  AND APLP.APLNER > 0 
+             THEN '2'
+             WHEN APLP.APLPAC = 8
+                  AND APLP.APLNER = 0 
+             THEN '2'
+             WHEN APLP.APLPAC = 8
+                  AND APLP.APLNER > 0 
+             THEN '2'
+             WHEN APLP.APLPAC = 9
+                  AND APLP.APLNER = 0 
+             THEN '2'
+             WHEN APLP.APLPAC = 9
+                  AND APLP.APLNER > 0 
+             THEN '2'
+             WHEN APLP.APLPAC = 0
+                  AND APLP.APLNER = 0 
+             THEN '2'
+             WHEN APLP.APLPAC = 0
+                  AND APLP.APLNER > 0 
+             THEN '2'
+           ELSE null END                  AS "BreachGetCode"       -- 違約金收取方式
+          ,CASE
+             WHEN APLP.APLPAC = 1
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 1
+                  AND APLP.APLNER > 0 
+             THEN APLP.APLNER * 12
+             WHEN APLP.APLPAC = 2
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 2
+                  AND APLP.APLNER > 0 
+             THEN APLP.APLNER * 12
+             WHEN APLP.APLPAC = 3
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 3
+                  AND APLP.APLNER > 0 
+             THEN APLP.APLNER * 12
+             WHEN APLP.APLPAC = 4
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 4
+                  AND APLP.APLNER > 0 
+             THEN APLP.APLNER * 12
+             WHEN APLP.APLPAC = 5
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 5
+                  AND APLP.APLNER > 0 
+             THEN APLP.APLNER * 12
+             WHEN APLP.APLPAC = 6
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 6
+                  AND APLP.APLNER > 0 
+             THEN APLP.APLNER * 12
+             WHEN APLP.APLPAC = 7
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 7
+                  AND APLP.APLNER > 0 
+             THEN APLP.APLNER * 12
+             WHEN APLP.APLPAC = 8
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 8
+                  AND APLP.APLNER > 0 
+             THEN APLP.APLNER * 12
+             WHEN APLP.APLPAC = 9
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 9
+                  AND APLP.APLNER > 0 
+             THEN APLP.APLNER * 12
+             WHEN APLP.APLPAC = 0
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 0
+                  AND APLP.APLNER > 0 
+             THEN APLP.APLNER * 12
+           ELSE null END                  AS "ProhibitMonth"       -- 限制清償期限
+          ,CASE
+             WHEN APLP.APLPAC = 1
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 1
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 2
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 2
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 3
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 3
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 4
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 4
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 5
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 5
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 6
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 6
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 7
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 7
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 8
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 8
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 9
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 9
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 0
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 0
+                  AND APLP.APLNER > 0 
+             THEN 1
+           ELSE null END                  AS "BreachPercent"       -- 違約金百分比
+          ,CASE
+             WHEN APLP.APLPAC = 1
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 1
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 2
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 2
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 3
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 3
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 4
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 4
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 5
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 5
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 6
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 6
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 7
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 7
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 8
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 8
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 9
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 9
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 0
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 0
+                  AND APLP.APLNER > 0 
+             THEN 6
+           ELSE null END                  AS "BreachDecreaseMonth" -- 違約金分段月數
+          ,CASE
+             WHEN APLP.APLPAC = 1
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 1
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 2
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 2
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 3
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 3
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 4
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 4
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 5
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 5
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 6
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 6
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 7
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 7
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 8
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 8
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 9
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 9
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 0
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 0
+                  AND APLP.APLNER > 0 
+             THEN 0.1
+           ELSE null END                  AS "BreachDecrease"      -- 分段遞減百分比
+          ,CASE
+             WHEN APLP.APLPAC = 1
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 1
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 2
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 2
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 3
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 3
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 4
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 4
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 5
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 5
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 6
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 6
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 7
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 7
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 8
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 8
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 9
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 9
+                  AND APLP.APLNER > 0 
+             THEN 0
+             WHEN APLP.APLPAC = 0
+                  AND APLP.APLNER = 0 
+             THEN 0
+             WHEN APLP.APLPAC = 0
+                  AND APLP.APLNER > 0 
+             THEN 0
+           ELSE null END                  AS "BreachStartPercent"  -- 還款起算比例%
     FROM "LA$APLP" APLP 
     LEFT JOIN "CU$CUSP" CUSP ON CUSP."LMSACN" = APLP."LMSACN" 
     LEFT JOIN "FacCaseAppl" APPL ON APPL."ApplNo" = APLP."APLNUM" 

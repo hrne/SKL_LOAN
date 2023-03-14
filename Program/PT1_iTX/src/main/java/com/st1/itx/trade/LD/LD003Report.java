@@ -68,7 +68,7 @@ public class LD003Report extends MakeReport {
 	public void exportResult(TitaVo titaVo, List<Map<String, String>> LD003List) throws LogicException {
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-				.setRptCode("LD003").setRptItem("放款明細餘額總表(日)").setSecurity("機密").setRptSize("A4")
+				.setRptCode("LD003").setRptItem("放款明細餘額總表(日)").setRptSize("A4")
 				.setPageOrientation("P").build();
 
 		this.open(titaVo, reportVo);

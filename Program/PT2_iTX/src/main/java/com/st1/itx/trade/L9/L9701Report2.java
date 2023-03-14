@@ -168,7 +168,7 @@ public class L9701Report2 extends MakeReport {
 		String tradeReportName = "客戶往來本息明細表（撥款）";
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-				.setRptCode("L9701").setRptItem(tradeReportName).setSecurity(this.getSecurity())
+				.setRptCode("L9701").setRptItem(tradeReportName)
 				.setRptSize("A4").setPageOrientation("L").build();
 		
 		

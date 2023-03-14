@@ -60,7 +60,7 @@ public class L9742Report extends MakeReport {
 		String formName = option==1 ? "支出收入傳票" : "還本繳息收據";
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-				.setRptCode("L9742").setRptItem("企金戶還本收據及繳息收據(" + formName + ")").setSecurity(this.getSecurity()).setRptSize("A4")
+				.setRptCode("L9742").setRptItem("企金戶還本收據及繳息收據(" + formName + ")").setRptSize("A4")
 				.setPageOrientation("L").build();
 
 		this.open(titaVo, reportVo);
