@@ -143,26 +143,27 @@ public class L1107 extends TradeBuffer {
 //			FinReportDebt finReportDebt3 = finReportDebtService.findCustUKeyYearFirst(iCustUKey, iStartYY + 1911,
 //					titaVo);
 			FinReportDebt finReportDebt3 = finReportDebtService.holdById(finReportDebtId, titaVo);
-
-			if (finReportDebt3.getStartMM() == iStartMM && finReportDebt3.getEndMM() == iEndMM) {
-				this.info("finReportDebt3.getStartMM()   =" + finReportDebt3.getStartMM());
-				this.info("finReportDebt3.getEndMM()     =" + finReportDebt3.getEndMM());
-				FinReportDebt finReportDebt4 = finReportDebtService.findCustUKeyYearFirst(iCustUKey, iStartYY + 1911,
-						titaVo);
+//			this.info("finReportDebt3getStartMM  = "  + finReportDebt3.getStartMM());
+//			this.info("finReportDebt3getEndMM  = "  + finReportDebt3.getEndMM());
+//			this.info("iStartMM   = "  + iStartMM);
+//			this.info("iEndMM     = " + iEndMM);
+			this.info("finReportDebt3    = " + finReportDebt3.getStartYY());
+			this.info("iStartYY    = " + iStartYY);
+			if (finReportDebt3.getStartYY() != (iStartYY+1911)) {
+				FinReportDebt finReportDebt4 = finReportDebtService.findCustUKeyYearFirst(iCustUKey, iStartYY + 1911,titaVo);
 				if (finReportDebt4 != null) {
 					throw new LogicException("E0012", iStartYY + "年度財務報表 ");
 				}
 			}
 			
-			if (finReportDebt3.getStartMM() != iStartMM || finReportDebt3.getEndMM() != iEndMM) {
-				this.info("finReportDebt3.getStartMM()   =" + finReportDebt3.getStartMM());
-				this.info("finReportDebt3.getEndMM()     =" + finReportDebt3.getEndMM());
-				FinReportDebt finReportDebt5 = finReportDebtService.findCustUKeyYearFirst(iCustUKey, iStartYY + 1911,
-						titaVo);
-				if (finReportDebt5 != null) {
-					throw new LogicException("E0012", iStartYY + "年度財務報表 ");
-				}
-			}
+//			if ((finReportDebt3.getStartMM() != iStartMM || finReportDebt3.getEndMM() != iEndMM)
+//					&& finReportDebt3.getStartYY() != iStartYY ) {
+//				FinReportDebt finReportDebt5 = finReportDebtService.findCustUKeyYearFirst(iCustUKey, iStartYY + 1911,
+//						titaVo);
+//				if (finReportDebt5 != null) {
+//					throw new LogicException("E0012", iStartYY + "年度財務報表 ");
+//				}
+//			}
 
 			FinReportDebt finReportDebt = finReportDebtService.holdById(finReportDebtId, titaVo);
 
@@ -204,25 +205,20 @@ public class L1107 extends TradeBuffer {
 			finReportDebtId2.setUkey(iUKey);
 			this.info("FinReportDebtId   = " + finReportDebtId2);
 			FinReportDebt finReportDebt3 = finReportDebtService.holdById(finReportDebtId2, titaVo);
-			if (finReportDebt3.getStartMM() == iStartMM && finReportDebt3.getEndMM() == iEndMM) {
-				this.info("finReportDebt3.getStartMM()   =" + finReportDebt3.getStartMM());
-				this.info("finReportDebt3.getEndMM()     =" + finReportDebt3.getEndMM());
-				FinReportDebt finReportDebt4 = finReportDebtService.findCustUKeyYearFirst(iCustUKey, iStartYY + 1911,
-						titaVo);
+			if (finReportDebt3.getStartYY() != (iStartYY+1911)) {
+				FinReportDebt finReportDebt4 = finReportDebtService.findCustUKeyYearFirst(iCustUKey, iStartYY + 1911,titaVo);
 				if (finReportDebt4 != null) {
 					throw new LogicException("E0012", iStartYY + "年度財務報表 ");
 				}
 			}
-			
-			if (finReportDebt3.getStartMM() != iStartMM || finReportDebt3.getEndMM() != iEndMM) {
-				this.info("finReportDebt3.getStartMM()   =" + finReportDebt3.getStartMM());
-				this.info("finReportDebt3.getEndMM()     =" + finReportDebt3.getEndMM());
-				FinReportDebt finReportDebt5 = finReportDebtService.findCustUKeyYearFirst(iCustUKey, iStartYY + 1911,
-						titaVo);
-				if (finReportDebt5 != null) {
-					throw new LogicException("E0012", iStartYY + "年度財務報表 ");
-				}
-			}
+//			if ((finReportDebt3.getStartMM() != iStartMM || finReportDebt3.getEndMM() != iEndMM)
+//					&& finReportDebt3.getStartYY() != iStartYY+1911	){
+//				FinReportDebt finReportDebt5 = finReportDebtService.findCustUKeyYearFirst(iCustUKey, iStartYY + 1911,
+//						titaVo);
+//				if (finReportDebt5 != null) {
+//					throw new LogicException("E0012", iStartYY + "年度財務報表 ");
+//				}
+//			}
 
 			
 			iCustUKey = custMain.getCustUKey();

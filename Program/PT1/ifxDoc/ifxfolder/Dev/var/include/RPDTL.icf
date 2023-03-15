@@ -34,13 +34,14 @@
 ! 03:員工扣款           04:退款台新
 ! 04:支票兌現           05:退款他行
 ! 05:法院扣薪           11:退款新光
-! 06:理賠金             91:展期／借新還舊
-! 07:代收款－債權協商   92:暫收轉帳
+! 06:理賠金             91:借新還舊
+! 07:代收款－債權協商    92:暫收轉帳
 ! 09:其他               93:暫收支票
-! 11:匯款轉帳預先作業   94:轉債協暫收款
-! 90:暫收抵繳           95:轉債協退還款
-! 91:展期／借新還舊
+! 11:匯款轉帳預先作業    94:轉債協暫收款
+! 90:暫收抵繳           95:展期
+! 91:借新還舊
 ! 93:暫收支票
+! 95:展期
 
 ! 登打邏輯
 ! RPFG=1 , RPTYPZ=RpCode1(<=90)    , RpCode2~5=90
@@ -48,8 +49,8 @@
 ! RPFG=3 , RPTYPZ=RpCode1(93)      , RpCode2~5=Can't Type
 ! RPFG=4 , RPTYPZ=RpCode1(01,02)   , RpCode2~5=Can't Type
 ! RPFG=5 , RPTYPZ=RpCode1(04,05,11), RpCode2~5=Can't Type
-! RPFG=6 , RPTYPZ=RpCode1(91)      , RpCode2~5=(01,91)
-! RPFG=7 , RPTYPZ=RpCode1(92,94,95), RpCode2~5=Can't Type
+! RPFG=6 , RPTYPZ=RpCode1(91,95)      , RpCode2~5=(01,91,95)
+! RPFG=7 , RPTYPZ=RpCode1(92,94), RpCode2~5=Can't Type
 ! RPFG=8 , RPTYPZ=RpCode1(93)      , RpCode2~5=Can't Type
 
 
@@ -234,13 +235,13 @@ E(3,#RPTOT+#RPAMTZ)
 #RP_IND=A,1,S
 C(2,#RPFG,E(0,0),
           IF(#RPTYPZ==01||#RPTYPZ==02||#RPTYPZ==03||#RPTYPZ==04||#RPTYPZ==06||#RPTYPZ==07||#RPTYPZ==09||#RPTYPZ==11||#RPTYPZ==90,E(0,1),E(0,0)),
-          IF(#RPTYPZ==01||#RPTYPZ==02||#RPTYPZ==03||#RPTYPZ==04||#RPTYPZ==06||#RPTYPZ==07||#RPTYPZ==09||#RPTYPZ==11||#RPTYPZ==90||#RPTYPZ==91,E(0,1),E(0,0)),
+          IF(#RPTYPZ==01||#RPTYPZ==02||#RPTYPZ==03||#RPTYPZ==04||#RPTYPZ==06||#RPTYPZ==07||#RPTYPZ==09||#RPTYPZ==11||#RPTYPZ==90||#RPTYPZ==91||#RPTYPZ==95,E(0,1),E(0,0)),
           IF(#RPTYPZ==93,E(0,4),E(0,0)),
           IF(#RPTYPZ==01||#RPTYPZ==02||#RPTYPZ==03,E(0,2),E(0,0)),
           IF(#RPTYPZ==04||#RPTYPZ==05||#RPTYPZ==11,E(0,2),E(0,0)),
-          IF(#RPTYPZ==91,E(0,5),E(0,0)),
+          IF(#RPTYPZ==91||#RPTYPZ==95,E(0,5),E(0,0)),
           IF(#RPTYPZ==92,E(0,3),
-             IF(#RPTYPZ==94 || #RPTYPZ==95,E(0,3),E(0,0))),
+             IF(#RPTYPZ==94 ,E(0,3),E(0,0))),
           IF(#RPTYPZ==93,E(0,4),E(0,0)))
 C(3,#AMT,0,E(0,0),$)
 
@@ -401,7 +402,7 @@ CALL(#TOT_NAMING{i})
 IF(#DF6>{j},IF(#RpAmt{i}>0&&#RPTOTF>0,E(0,@GRD_SKFG{j},1),
 IF(#DF1=={i},E(0,@GRD_SKFG{j},1),E(0,@GRD_SKFG{j},0))CALL(#CLEAN_COL{j})),s)
 SWITCH(#RP_IND,
-2,C(3,#RpCode{i},91,$,s),
+2,IF(#RpCode{i}==91||#RpCode{i}==95,$,s),
 4,IF(#RPFG==3,s,IF(#DF1=={i},$,s)),
 5,C(3,#DF1,{i},$,s),
 1,$)
@@ -448,7 +449,7 @@ IF(#RPTOTF{z}>0&&#DF1=={i},
    IF(#RPTOTF{z}>0&&#RpAmt{i}>0,INVOKEJS(SHOW,grd9_{j},1),INVOKEJS(SHOW,grd9_{j},0)))
 ! IF(#RPTOTF>0,$,s)
 IF(#it1 > {j},$,s)
-IF(#RPFG==1&&#RPTOTF{z}>0&&#RpAmt{i}>0,E(0,@RpCode{j},90),IF(#RPFG==1&&#DF1=={i}&&#RPTOTF{z}>0&&#RpAmt{i}==0,E(0,@RpCode{j},90),E(0,@RpCode{j},90)))
+IF(#RPFG==1&&#RPTOTF{z}>0&&#RpAmt{i}>0,E(0,@RpCode{j},90),IF(#RPFG==1&&#DF1=={i}&&#RPTOTF{z}>0&&#RpAmt{i}==0,E(0,@RpCode{j},90),$))
 IF(#RPFG==2&&#RPTOTF{z}>0&&#RpAmt{i}>0,E(0,@RpCode{j},90),IF(#RPFG==2&&#DF1=={i}&&#RPTOTF{z}>0&&#RpAmt{i}==0,E(0,@RpCode{j},90),$))
 IF(#RPFG==3&&#RPTOTF{z}>0&&#RpAmt{i}>0,E(0,@RpCode{j},93),IF(#RPFG==3&&#DF1=={i}&&#RPTOTF{z}>0&&#RpAmt{i}==0,E(0,@RpCode{j},93),$))
 IF(#RPFG==4&&#RPTOTF{z}>0&&#RpAmt{i}>0,E(0,@RpCode{j},02),IF(#RPFG==4&&#DF1=={i}&&#RPTOTF{z}>0&&#RpAmt{i}==0,E(0,@RpCode{j},02),$))
@@ -490,8 +491,9 @@ SWITCH(#RpCode{i}
 ,09,T(2,@RpCodeX{i},其他)
 ,11,T(2,@RpCodeX{i},匯款轉帳預先作業)
 ,90,T(2,@RpCodeX{i},暫收抵繳)
-,91,T(2,@RpCodeX{i},展期／借新還舊)
+,91,T(2,@RpCodeX{i},借新還舊)
 ,93,T(2,@RpCodeX{i},暫收支票)
+,95,T(2,@RpCodeX{i},展期)
 ,T(2,@RpCodeX{i},))
 ,SWITCH(#RpCode{i}
 ,01,T(2,@RpCodeX{i},整批匯款)
@@ -499,18 +501,19 @@ SWITCH(#RpCode{i}
 ,04,T(2,@RpCodeX{i},退款他行)
 ,05,T(2,@RpCodeX{i},核心退款)
 ,11,T(2,@RpCodeX{i},退款新光)
-,91,T(2,@RpCodeX{i},展期／借新還舊)
+,91,T(2,@RpCodeX{i},借新還舊)
 ,92,T(2,@RpCodeX{i},暫收轉帳)
 ,93,T(2,@RpCodeX{i},暫收支票)
 ,94,T(2,@RpCodeX{i},轉債協暫收款)
+,95,T(2,@RpCodeX{i},展期)
 ,T(2,@RpCodeX{i},)))
 HIDE(#GRD_COLL{i},#GRD_COLM{i},#GRD_COLO{i},#GRD_COLP{i},#GRD_COLQ{i},#GRD_COLR{i},#RpCustNo{i},#RpFacmNo{i},#BTN_GRD_B{i},#BTN_GRD_B{i},#RpRemitBankX{i},#RpDetailSeq{i},#RpEntryDate{i},#BTN_GRD_A{i},#RpRemitAcctNo{i},#RpType{i},#RpTypeX{i},#RpCustName{i},#NOTE{i},#RpRemark{i})
 IF(#RPFG==1||#RPFG==2,
-C(3,#RpCode{i},91,SHOW(#GRD_COLM{i},#RpFacmNo{i}),
+IF(#RpCode{i}==91||#RpCode{i}==95,SHOW(#GRD_COLM{i},#RpFacmNo{i}),
 C(3,#RpCode{i},90,SHOW(#GRD_COLM{i},#RpFacmNo{i},#BTN_GRD_A{i}),
 SHOW(#GRD_COLO{i},#GRD_COLP{i},#GRD_COLQ{i},#RpDetailSeq{i},#RpEntryDate{i},#RpType{i},#RpTypeX{i},#NOTE{i}))),$)
 IF(#RPFG==3||#RPFG==8,SHOW(#GRD_COLM{i},#GRD_COLQ{i},#RpFacmNo{i},#NOTE{i}),$)
-IF(#RPFG==4||#RPFG==5||#RPFG==6,C(3,#RpCode{i},91,SHOW(#GRD_COLM{i},#RpFacmNo{i},#BTN_GRD_A{i}),SHOW(#GRD_COLM{i},#GRD_COLO{i},#GRD_COLR{i},#GRD_COLQ{i},#BTN_GRD_B{i},#RpRemitBankX{i},#RpRemitAcctNo{i},#RpCustName{i},#RpRemark{i})),$)
+IF(#RPFG==4||#RPFG==5||#RPFG==6,IF(#RpCode{i}==91||#RpCode{i}==95,SHOW(#GRD_COLM{i},#RpFacmNo{i},#BTN_GRD_A{i}),SHOW(#GRD_COLM{i},#GRD_COLO{i},#GRD_COLR{i},#GRD_COLQ{i},#BTN_GRD_B{i},#RpRemitBankX{i},#RpRemitAcctNo{i},#RpCustName{i},#RpRemark{i})),$)
 IF(#RPFG==7,
 C(3,#RpCode{i},92,SHOW(#GRD_COLL{i},#RpCustNo{i},#RpFacmNo{i}),
 SHOW(#GRD_COLL{i},#RpCustNo{i})HIDE(#RpFacmNo{i})),$)
@@ -519,11 +522,11 @@ SHOW(#GRD_COLL{i},#RpCustNo{i})HIDE(#RpFacmNo{i})),$)
 #PRE_COL_DIS{i}=A,1,S
 HIDE(#GRD_COLL{i},#GRD_COLM{i},#GRD_COLO{i},#GRD_COLP{i},#GRD_COLQ{i},#GRD_COLR{i},#RpCustNo{i},#RpFacmNo{i},#BTN_GRD_B{i},#BTN_GRD_B{i},#RpRemitBankX{i},#RpDetailSeq{i},#RpEntryDate{i},#BTN_GRD_A{i},#RpRemitAcctNo{i},#RpType{i},#RpTypeX{i},#RpCustName{i},#NOTE{i},#RpRemark{i})
 IF(#RPFG==1||#RPFG==2,
-C(3,#RpCode{i},91,SHOW(#GRD_COLM{i},#RpFacmNo{i}),
+IF(#RpCode{i}==91||#RpCode{i}==95,SHOW(#GRD_COLM{i},#RpFacmNo{i}),
 C(3,#RpCode{i},90,SHOW(#GRD_COLM{i},#RpFacmNo{i},#BTN_GRD_A{i}),
 SHOW(#GRD_COLO{i},#GRD_COLP{i},#GRD_COLQ{i},#RpDetailSeq{i},#RpEntryDate{i},#RpType{i},#RpTypeX{i},#NOTE{i}))),$)
 IF(#RPFG==3||#RPFG==8,SHOW(#GRD_COLM{i},#GRD_COLQ{i},#RpFacmNo{i},#NOTE{i}),$)
-IF(#RPFG==4||#RPFG==5||#RPFG==6,C(3,#RpCode{i},91,SHOW(#GRD_COLM{i},#RpFacmNo{i},#BTN_GRD_A{i}),SHOW(#GRD_COLM{i},#BTN_GRD_B{i},#GRD_COLO{i},#GRD_COLR{i},#GRD_COLQ{i},#BTN_GRD_B{i},#RpRemitBankX{i},#RpRemitAcctNo{i},#RpCustName{i},#RpRemark{i})),$)
+IF(#RPFG==4||#RPFG==5||#RPFG==6,IF(#RpCode{i}==91||#RpCode{i}==95,SHOW(#GRD_COLM{i},#RpFacmNo{i},#BTN_GRD_A{i}),SHOW(#GRD_COLM{i},#BTN_GRD_B{i},#GRD_COLO{i},#GRD_COLR{i},#GRD_COLQ{i},#BTN_GRD_B{i},#RpRemitBankX{i},#RpRemitAcctNo{i},#RpCustName{i},#RpRemark{i})),$)
 IF(#RPFG==7,
 C(3,#RpCode{i},92,SHOW(#GRD_COLL{i},#RpCustNo{i},#RpFacmNo{i}),
 SHOW(#GRD_COLL{i},#RpCustNo{i})),$)
@@ -538,21 +541,25 @@ C(3,#RP_IND,1,$,C(3,#RP_IND,5,$,C(3,#RP_IND,3,$,s)))
 IF(#RPFG==2,s,$)
 IF(#RPFG==1,s,$)
 C(3,#GRD_SKFG{i},1,$,C(3,#RPFG,7,$,s))
-C(3,#RPFG,6,HELP(01:整批匯款;91:展期／借新還舊),
+C(3,#RPFG,6,HELP(01:整批匯款;91:借新還舊;95:展期),
 C(3,#RPFG,7,HELP(92:暫收轉帳;94:轉債協暫收款)))
 IF(#RPFG==7,IF(#RPTOTF{z}>0,INVOKEJS(SHOW,grd9_{i},1)CALL(#COL_DIS_CALL{i}),INVOKEJS(SHOW,grd9_{i},0))IF(#RPTOTF{z}>0,$,s),$)
 @SWITCH(#RPFG,
-6,V(1,01,91),
+6,V(1,01,91,95),
 7,V(1,92,94),
-V(1,90,91))
+V(1,90,91,95))
 
 ! #BIND_GRD_A瀏覽按鈕帶入值
 #BUF_GRD_A{i}=X,97,S
 SWITCH(#RpCode{i},
 91,
 T(2,10H+   +0000+TWD+                  +#RpCustNo1+000+TRO),
+95,
+T(2,10H+   +0000+TWD+                  +#RpCustNo1+000+TRE),
 90,
 T(2,10H+   +0000+TWD+                  +#RpCustNo1+000+TAV+#RP_TXCD+#RP_TMPFACMNO+#RP_TMPFACMNOX))
+
+
 
 #BIND_GRD_A{i}=X,1,S
 BIND(#BTN_GRD_A{i},click, {cmd=CHAIN; ntxcd=L6907; ntxbuf=#BUF_GRD_A{i};ntxbuf5=type<-1:RpFacmNo{i}<-OOFacmNo:RpAmt{i}<-OORvBal1})
@@ -571,9 +578,9 @@ T(2,@RpRemark{i},#RP_MEMO)
 ! A.LABAL COLM增加 額度號碼
 ! B.若回收之第一筆金額為0，第二筆以暫收抵繳還款的話，第一筆隱藏
 #COL_CHECK{i}=A,1,S
-IF(#RpCode{i}==90||#RpCode{i}==91,T(3,@GRD_COLM{i},額度號碼:),$)
+IF(#RpCode{i}==90||#RpCode{i}==91||#RpCode{i}==95,T(3,@GRD_COLM{i},額度號碼:),$)
 IF(#RPFG==1||#RPFG==2,$,s)
-IF(#RpCode{i}==90||#RpCode{i}==91,$,IF(#RpAmt1==0,INVOKEJS(SHOW,grd9_1,0),INVOKEJS(SHOW,grd9_1,1)))
+IF(#RpCode{i}==90||#RpCode{i}==91||#RpCode{i}==95,$,IF(#RpAmt1==0,INVOKEJS(SHOW,grd9_1,0),INVOKEJS(SHOW,grd9_1,1)))
 
 ! 還款來源中文
 #RpCodeX{i}=X,16,L
@@ -590,8 +597,9 @@ SWITCH(#RpCode{i},
 09,T(2,@RpCodeX{i},其他),
 11,T(2,@RpCodeX{i},匯款轉帳預先作業),
 90,T(2,@RpCodeX{i},暫收抵繳),
-91,T(2,@RpCodeX{i},展期／借新還舊),
-93,T(2,@RpCodeX{i},暫收支票),T(2,@RpCodeX{i},))
+91,T(2,@RpCodeX{i},借新還舊),
+93,T(2,@RpCodeX{i},暫收支票),
+95,T(2,@RpCodeX{i},展期),T(2,@RpCodeX{i},))
 ,
 SWITCH(#RpCode{i},
 01,T(2,@RpCodeX{i},核心匯款),
@@ -600,19 +608,20 @@ SWITCH(#RpCode{i},
 04,T(2,@RpCodeX{i},退款他行),
 05,T(2,@RpCodeX{i},核心退款),
 11,T(2,@RpCodeX{i},退款新光),
-91,T(2,@RpCodeX{i},展期／借新還舊),
+91,T(2,@RpCodeX{i},借新還舊),
 92,T(2,@RpCodeX{i},暫收轉帳),
 93,T(2,@RpCodeX{i},暫收支票),
-94,T(2,@RpCodeX{i},轉債協暫收款),T(2,@RpCodeX{i},)))
+94,T(2,@RpCodeX{i},轉債協暫收款),
+95,T(2,@RpCodeX{i},展期),T(2,@RpCodeX{i},)))
 
 ! 欄位顯示
 #COL_DIS{i}=A,1,S
 IF(#RPFG==1||#RPFG==2,
-C(3,#RpCode{i},91,SHOW(#GRD_COLM{i},#RpFacmNo{i}),
+IF(#RpCode{i}==91||#RpCode{i}==95,1,SHOW(#GRD_COLM{i},#RpFacmNo{i}),
 C(3,#RpCode{i},90,SHOW(#GRD_COLM{i},#RpFacmNo{i},#BTN_GRD_A{i}),
 SHOW(#GRD_COLO{i},#GRD_COLP{i},#GRD_COLQ{i},#RpDetailSeq{i},#RpEntryDate{i},#RpType{i},#RpTypeX{i},#NOTE{i}))),$)
 IF(#RPFG==3||#RPFG==8,SHOW(#GRD_COLM{i},#GRD_COLQ{i},#RpFacmNo{i},#NOTE{i}),$)
-IF(#RPFG==4||#RPFG==5||#RPFG==6,C(3,#RpCode{i},91,SHOW(#GRD_COLM{i},#RpFacmNo{i},#BTN_GRD_A{i}),SHOW(#GRD_COLM{i},#GRD_COLO{i},#GRD_COLR{i},#GRD_COLQ{i},#BTN_GRD_B{i},#RpRemitBankX{i},#RpRemitAcctNo{i},#RpCustName{i},#RpRemark{i})),$)
+IF(#RPFG==4||#RPFG==5||#RPFG==6,IF(#RpCode{i}==91||#RpCode{i}==95,SHOW(#GRD_COLM{i},#RpFacmNo{i},#BTN_GRD_A{i}),SHOW(#GRD_COLM{i},#GRD_COLO{i},#GRD_COLR{i},#GRD_COLQ{i},#BTN_GRD_B{i},#RpRemitBankX{i},#RpRemitAcctNo{i},#RpCustName{i},#RpRemark{i})),$)
 IF(#RPFG==7,
 C(3,#RpCode{i},92,SHOW(#GRD_COLL{i},#RpCustNo{i},#RpFacmNo{i}),
 SHOW(#GRD_COLL{i},#RpCustNo{i})HIDE(#RpFacmNo{i})),$)
@@ -647,7 +656,7 @@ T(2,金額不可高於+#RpXtypeRpTotF{i})
 C(3,#RP_IND,0,s,$)
 IF(#DF1=={i},$,IF(#RpAmt{z}==0,s,$))
 C(3,#RpCode{i},90,C(1,#RpAmt{i},$,$,INVOKEJS(SHOW,grd9_1,1)),$)
-C(3,#RpCode{i},91,IF(#RpAmt{i}>#RPTOTF{z},E(0,@RpAmt{i},#RPTOTF{z}),$),$)
+IF(#RpCode{i}==91||#RpCode{i}==95,IF(#RpAmt{i}>#RPTOTF{z},E(0,@RpAmt{i},#RPTOTF{z}),$),$)
 ! C(3,#RpCode{i},90,C(1,#RPTOTF{i},s,s,$),$)
 C(3,#RpCode{i},90,C(1,#RpAmt{i},E(0,0),E(0,0),$),$)
 IF(#DF1=={i},INVOKEJS(SHOW,grd9_{i},1),
@@ -666,9 +675,9 @@ IF(#GRD_SKFG{i}==1&&#RpAmt{z}>0&&#RPTOTF{z}>0,
                INVOKEJS(SHOW,grd9_{i},1),INVOKEJS(SHOW,grd9_{i},0))
      IF(#DF2=={i}&&#RPTOTF{z}>0,$,$),s))
 IF(#RPFG==4||#RPFG==5||#RPFG==8,s,$)
-C(3,#RP_IND,1,IF(#RpCode{i}==90||#RpCode{i}==91,$,$),$)
-C(3,#RP_IND,1,IF(#RpCode{i}==90||#RpCode{i}==91,$,CALL(#RPTOT_DIS{i},6)),$)
-C(3,#RP_IND,1,IF(#RpCode{i}==90||#RpCode{i}==91,$,$),$)
+C(3,#RP_IND,1,IF(#RpCode{i}==90||#RpCode{i}==91||#RpCode{i}==95,$,$),$)
+C(3,#RP_IND,1,IF(#RpCode{i}==90||#RpCode{i}==91||#RpCode{i}==95,$,CALL(#RPTOT_DIS{i},6)),$)
+C(3,#RP_IND,1,IF(#RpCode{i}==90||#RpCode{i}==91||#RpCode{i}==95,$,$),$)
 CALL(#RPTOTBALX{i})
 IF(#RPFG==7,IF(#RPTOTF{z}>0,$,s),$)
 @
@@ -676,7 +685,7 @@ IF(#RpAmt{i}>0,
   IF(#RPFG==1||#RPFG==2,
     IF(#RpCode{i}==90,C(3,#RpFacmNo{i},0,V(P,需有額度號碼，請先點選[未銷帳查詢]),$),$)
                       IF(#RpAmt{i}>#RPTOTF{z},$,$),
-    IF(#RPFG==6 && #RpCode{i}==91,C(3,#RpFacmNo{i},0,V(P,需有額度號碼，請先點選[未銷帳查詢]),$),$)
+    IF(#RPFG==6 && (#RpCode{i}==91||#RpCode{i}==95),C(3,#RpFacmNo{i},0,V(P,需有額度號碼，請先點選[未銷帳查詢]),$),$)
     ),IF(#DF1!={i},E(0,@RpCode{i},0)INVOKEJS(SHOW,grd9_{i},0),INVOKEJS(SHOW,grd9_{i},0)))
 IF(#RPFG==3,IF(#RpAmt{i}>#RPTOTF,V(P,#RpAmtComfirmB{i}),IF(#RpAmt{i}<#RPTOTF && #DF5=={i},V(P,#RpAmtComfirmA{i}),$)),$)
 
@@ -693,10 +702,10 @@ C(3,#RP_IND,0,S,$)
 C(3,#RPFG,2,s,$)
 C(3,#RpCode{i},1,s,$)
 IF(#DF1=={i},IF(#RPFG==3||#RPFG==7,
-IF(#RpCode{i}==94 || #RpCode{i}==95 ,s,$),s),
+IF(#RpCode{i}==94,s,$),s),
 IF(#GRD_SKFG{i}==1&&#RpAmt{i}>0,$,s))
 IF(#RPFG==7,IF(#RPTOTF{z}>0,$,s),$)
-IF(#RpCode{i}==94 || #RpCode{i}==95 ,s,$)
+IF(#RpCode{i}==94,s,$)
 @
 IF(#RPFG==3||#RPFG==7,CALL(#RPTOT_DIS{i},6),s)
 
@@ -714,7 +723,7 @@ RpRemitBankX{i}<-OOItem})
 #RpRemitAcctNo{i}=A,14,I
 C(3,#RP_IND,0,s,$)
 C(3,#RP_IND,2,$,C(3,#RP_IND,5,$,s))
-C(3,#RpCode{i},91,s,$)
+IF(#RpCode{i}==91||#RpCode{i}==95,s,$)
 IF(#DF1=={i},$,IF(#GRD_SKFG{i}==1&&#RpAmt{i}>0,$,s))
 @C(3,#RpRemitAcctNo{i},0,V(P,請輸入匯款帳號),C(4,#RpRemitBankX{i},V(P,請點選行庫資料查詢，選取匯款銀行),s))
 
@@ -748,7 +757,7 @@ IF(#RP_IND==1,$,S)
 #RpCustName{i}=x,100,I
 C(3,#RP_IND,0,S,$)
 C(3,#RP_IND,2,$,C(3,#RP_IND,5,$,s))
-C(3,#RpCode{i},91,s,$)
+IF(#RpCode{i}==91||#RpCode{i}==95,s,$)
 IF(#DF1=={i},$,IF(#GRD_SKFG{i}==1&&#RpAmt{i}>0,$,s))
 @C(4,#RpCustName{i},V(P,請輸入戶名),$)
 C(4,#RpCustName{i},s,T(2,@RP_AmlCheckName,#RpCustName{i}))
@@ -782,7 +791,7 @@ IF(#DF1=={i},$,IF(#GRD_SKFG{i}==1&&#RpAmt{i}>0,$,s))
 #RpRemark{i}=X,100,I
 C(3,#RP_IND,0,S,$)
 C(3,#RP_IND,2,$,C(3,#RP_IND,5,$,s))
-C(3,#RpCode{i},91,s,$)
+IF(#RpCode{i}==91||#RpCode{i}==95,s,$)
 IF(#DF1=={i},$,IF(#GRD_SKFG{i}==1&&#RpAmt{i}>0,$,s))
 @
 ! IF(#DF1<{i}&&#RP_IND==5,CALL(#RPTOT_DIS{i},6),$)

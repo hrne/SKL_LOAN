@@ -70,12 +70,12 @@ public class L9739Report extends MakeReport {
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String reportItem = txname;
 		String brno = titaVo.getBrno();
-		String security = this.getSecurity();
+		
 		String pageSize = "A4";
 		String pageOrientation = "P";
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
-				.setRptItem(reportItem).setSecurity(security).setRptSize(pageSize).setPageOrientation(pageOrientation)
+				.setRptItem(reportItem).setRptSize(pageSize).setPageOrientation(pageOrientation)
 				.build();
 		// 開啟報表
 		this.open(titaVo, reportVo);

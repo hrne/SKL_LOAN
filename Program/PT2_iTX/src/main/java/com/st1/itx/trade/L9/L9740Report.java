@@ -69,7 +69,7 @@ public class L9740Report extends MakeReport {
 
 		this.print(-2, 1, "報　表：" + this.reportCode);
 		this.print(-2, this.getMidXAxis(), this.reportItem, "C");
-		this.print(-1, 67, "機密等級：" + this.security);
+		this.print(-1, 67, "機密等級：" + this.getSecurity());
 		this.print(-2, 67, "日　　期：" + this.nowDate);
 		this.print(-3, 67, "時　　間：" + showTime(this.nowTime));
 
@@ -190,7 +190,7 @@ public class L9740Report extends MakeReport {
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getKinbr();
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(this.reportCode)
-				.setRptItem(reportItem).setSecurity(security).setRptSize(pageSize).setPageOrientation(pageOrientation)
+				.setRptItem(reportItem).setRptSize(pageSize).setPageOrientation(pageOrientation)
 				.build();
 
 		this.reportItem = "公會無自用住宅放款檢核清單(新撥款之戶號)";
@@ -203,7 +203,7 @@ public class L9740Report extends MakeReport {
 		this.setFont(1, 12);
 
 		if (listL9740Data1.size() > 0) {
-			this.print(1, 1," ");
+			this.print(1, 1, " ");
 			// 因此表User說目前還沒看到過有資料，所以暫不確定有資料的格式(各個欄位的項目)
 			int count = 1;
 			for (Map<String, String> r : listL9740Data1) {
@@ -221,7 +221,7 @@ public class L9740Report extends MakeReport {
 				if (count == 50) {
 					printContinueNext();
 					this.newPage();
-					this.print(1, 1," ");
+					this.print(1, 1, " ");
 					count = 1;
 				}
 
@@ -268,7 +268,7 @@ public class L9740Report extends MakeReport {
 		this.newPage();
 
 		if (listL9740Data3.size() > 0) {
-			this.print(1, 1," ");
+			this.print(1, 1, " ");
 			int count = 1;
 			for (Map<String, String> r3 : listL9740Data3) {
 				count++;
@@ -285,7 +285,7 @@ public class L9740Report extends MakeReport {
 				if (count == 50) {
 					printContinueNext();
 					this.newPage();
-					this.print(1, 1," ");
+					this.print(1, 1, " ");
 					count = 1;
 				}
 
@@ -302,6 +302,5 @@ public class L9740Report extends MakeReport {
 		this.close();
 
 	}
-
 
 }
