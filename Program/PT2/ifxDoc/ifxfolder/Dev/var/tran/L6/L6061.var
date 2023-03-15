@@ -203,8 +203,8 @@ C(2,#OOAcctFlag,T(3,一般科目),
 #OOReceivableFlag=A,1,S
 #OOReceivableFlagX=X,14,L
 C(2,#OOReceivableFlag,T(3,非銷帳科目),
-                      T(3,會計銷帳科目),
-                      T(3,業務銷帳科目),T(3,),T(3,),T(3,),T(3,),T(3,),T(3,核心銷帳碼科目))
+                      T(3,),
+                      T(3,業務銷帳科目),T(3,),T(3,),T(3,),T(3,),T(3,),T(3,總帳銷帳碼科目))
 
 ! 日結餘額檢查(TOTA)
 #OOClsChkFlag=A,1,S
@@ -215,7 +215,7 @@ C(2,#OOClsChkFlag,T(3,不檢查),
                   T(3,應等於零),
                   T(3,應小於等於零))
 
-! 放款部使用(TOTA)
+! 使用記號(TOTA)
 #OOInuseFlag=A,1,S
 #OOInuseFlagX=X,12,L
 C(2,#OOInuseFlag,T(3,可以使用),
@@ -345,7 +345,7 @@ TXFORM=L6061
 #OOClsChkFlagX=日結餘額</br>檢查
 {width:90,align:'left'}
 
-#OOInuseFlagX=放款部</br>使用
+#OOInuseFlagX=使用</br>記號
 {width:70,align:'center'}
 
 #OOAcNoItem=科子細目名稱
@@ -356,6 +356,7 @@ TXFORM=L6061
 
 #OOLastEmp=最後修改人員
 {width:110,align:'center'}
+
 ^
 
 
