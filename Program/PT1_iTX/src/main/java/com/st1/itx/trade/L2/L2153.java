@@ -205,12 +205,13 @@ public class L2153 extends TradeBuffer {
 			ReleaseRoutine();
 		}
 		// 銀扣授權帳號檔
+		if ("02".equals(titaVo.getParam("RepayCode"))) {
+			bankAuthActCom.add("A", titaVo);
+		}
 		if (titaVo.isActfgRelease()) {
 //			bankAuthActCom.add("A",titaVo);
 			// 新還款帳號(含還款方式)刪除
-			if ("02".equals(titaVo.getParam("RepayCode"))) {
-				bankAuthActCom.add("A", titaVo);
-			} else {
+			if (!"02".equals(titaVo.getParam("RepayCode"))) {
 				txtitaVo = new TitaVo();
 				txtitaVo = (TitaVo) titaVo.clone();
 				txtitaVo.putParam("RepayCode", titaVo.getParam("RepayCode"));
@@ -490,7 +491,7 @@ public class L2153 extends TradeBuffer {
 			if (titaVo.get("StarBuildingYM") != null) {
 				tFacMain.setStarBuildingYM(this.parse.stringToInteger(titaVo.get("StarBuildingYM")));
 			}
-			
+
 		} else {
 			tFacMain.setBaseRateCode(titaVo.getParam("BaseRateCode"));
 			tFacMain.setGrcd(titaVo.getParam("Grcd"));
@@ -498,15 +499,15 @@ public class L2153 extends TradeBuffer {
 			tFacMain.setEsGcd(titaVo.getParam("EsGcd"));
 			tFacMain.setEsGKind(titaVo.getParam("EsGKind"));
 			tFacMain.setEsGcnl(titaVo.getParam("EsGcnl"));
-			if(this.parse.stringToInteger(titaVo.get("PreStarBuildingYM")) >0 ) {
+			if (this.parse.stringToInteger(titaVo.get("PreStarBuildingYM")) > 0) {
 				tFacMain.setPreStarBuildingYM(this.parse.stringToInteger(titaVo.get("PreStarBuildingYM")) + 191100);
-			}else {
+			} else {
 				tFacMain.setPreStarBuildingYM(this.parse.stringToInteger(titaVo.get("PreStarBuildingYM")));
 			}
-			if(this.parse.stringToInteger(titaVo.get("StarBuildingYM")) > 0) {
+			if (this.parse.stringToInteger(titaVo.get("StarBuildingYM")) > 0) {
 				tFacMain.setStarBuildingYM(this.parse.stringToInteger(titaVo.get("StarBuildingYM")) + 191100);
-			}else {
-				tFacMain.setStarBuildingYM(this.parse.stringToInteger(titaVo.get("StarBuildingYM")) );
+			} else {
+				tFacMain.setStarBuildingYM(this.parse.stringToInteger(titaVo.get("StarBuildingYM")));
 			}
 		}
 		if ("N".equals(tFacProd.getIncrFlag())) {
@@ -549,7 +550,7 @@ public class L2153 extends TradeBuffer {
 				custTypeCode = custCom.eLoanCustTypeCode(titaVo, custTypeCode);
 			}
 			tFacMain.setBreachFlag(titaVo.getParam("BreachFlag"));
-			tFacMain.setBreachCode(parse.IntegerToString(parse.stringToInteger(titaVo.getParam("BreachCode")), 3));
+			tFacMain.setBreachCode(titaVo.getParam("BreachCode"));
 			tFacMain.setBreachGetCode(titaVo.getParam("BreachGetCode"));
 			tFacMain.setProhibitMonth(parse.stringToInteger(titaVo.getParam("ProhibitMonth")));
 			tFacMain.setBreachPercent(parse.stringToBigDecimal(titaVo.getParam("BreachPercent")));
@@ -597,7 +598,7 @@ public class L2153 extends TradeBuffer {
 			titaVo.putParam("Breach", loanCloseBreachCom.getFacBreachDescription(tFacMain, titaVo));
 		}
 		tFacMain.setBreachDescription(titaVo.getParam("Breach"));
-		
+
 		tFacMain.setCreditScore(this.parse.stringToInteger(titaVo.getParam("CreditScore")));
 		tFacMain.setGuaranteeDate(this.parse.stringToInteger(titaVo.getParam("GuaranteeDate")));
 		tFacMain.setContractNo("");

@@ -1,0 +1,2 @@
+Insert into "CdAcCode" ("AcNoCode","AcSubCode","AcDtlCode","AcNoItem","AcctCode","AcctItem","ClassCode","AcBookFlag","DbCr","AcctFlag","ReceivableFlag","ClsChkFlag","InuseFlag","CreateDate","CreateEmpNo","LastUpdate","LastUpdateEmpNo","AcNoCodeOld") 
+values ('20222020000','     ','09','暫收及待結轉帳項－擔保放款－展期','TRE','暫收款－展期',0,0,'C',0,2,3,0,to_date('30-11月-21','DD-MON-RR'),'999999',to_date('30-11月-21','DD-MON-RR'),'001714','20232020');

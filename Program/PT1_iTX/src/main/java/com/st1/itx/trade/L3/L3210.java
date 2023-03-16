@@ -396,6 +396,9 @@ public class L3210 extends TradeBuffer {
 		if (iTempAmt.compareTo(BigDecimal.ZERO) > 0) {
 			AcDetail acDetail = new AcDetail();
 			acDetail.setAcctCode("TAV");
+			acDetail.setCustNo(iCustNo);
+			acDetail.setFacmNo(iFacmNo);
+
 			// 新增放款交易內容檔
 			addLoanBorTxRoutine(acDetail);
 		}

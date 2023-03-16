@@ -31,6 +31,7 @@ import com.st1.itx.db.service.springjpa.cm.L9110ServiceImpl;
 import com.st1.itx.util.common.AuthLogCom;
 import com.st1.itx.util.common.EmployeeCom;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -49,7 +50,7 @@ public class L9110Report extends MakeReport {
 	private String brno = "";
 	private String reportCode = "L9110";
 	private String reportItem = "首次撥款審核資料表";
-	private String security = "機密";
+//	private String security = "機密";
 	private String pageSize = "A4";
 	private String pageOrientation = "L";
 
@@ -846,8 +847,12 @@ public class L9110Report extends MakeReport {
 	public void makePdf(TitaVo titaVo, TotaVo totaVo) throws LogicException {
 		// 名稱固定為查詢的第一筆額度編號
 		String fileReportItem = reportItem.concat(titaVo.getParam("APPLNO1"));
-
-		this.open(titaVo, reportDate, brno, reportCode, fileReportItem, security, pageSize, pageOrientation);
+		
+		ReportVo reportVo = ReportVo.builder().setBrno(brno).setRptDate(reportDate)
+				.setRptCode(reportCode).setRptItem(fileReportItem).setRptSize(pageSize)
+				.setPageOrientation(pageOrientation).build();
+		this.open(titaVo, reportVo);
+//		this.open(titaVo, reportDate, brno, reportCode, fileReportItem, security, pageSize, pageOrientation);
 		this.setCharSpaces(0);
 
 		// 2022-06-17 Wei:應珮琪要求照AS400畫面增加欄位"列印條件選擇"
@@ -1136,7 +1141,7 @@ public class L9110Report extends MakeReport {
 		this.print(-2, 1, "報　表：" + this.getRptCode());
 
 		int rpad = 18;
-		this.print(-1, newBorder.length() - rpad, "機密等級：" + this.security);
+		this.print(-1, newBorder.length() - rpad, "機密等級：" + this.getSecurity());
 		this.print(-2, newBorder.length() - rpad, "日　　期：" + showBcDate(this.nowDate, 1));
 		this.print(-3, newBorder.length() - rpad, "時　　間：" + showTime(this.nowTime));
 		this.print(-4, newBorder.length() - rpad, "頁　　數：" + this.getNowPage());

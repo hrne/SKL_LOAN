@@ -42,44 +42,17 @@ E(0,0)
 
 [
 ["[L9801]                                 日報"],
-["#R1+@會計日期",#ACCTDATE],
-
-["#grid#,{id:1,expand:true,loop:0,row_height:1,s_cols:[150,100], p_cols:[8,8]}","","",
-["@",[#BtnAllShell1,"@全選"]],"",
+["@會計日期",#ACCTDATE],
+["#grid#,{id:1,expand:true,loop:0,row_height:1,s_cols:[150,100,120], p_cols:[16,8,8]}","","",
+[[#BtnAllShell1,"@全選"]],
 ], 
+["#grid#,{id:2,expand:true,loop:50,row_height:1}","","",
+[],[#BtnShell1,#TradeCode1,#TradeName1]
+],
 
-["#grid#,{id:2,expand:false,loop:1,row_height:0}","","",
-[],[#BtnShell1,#TradeCode1,#TradeName1,#TradeSub1],
-], 
-
-["@"],
 ]
 
-!---------- 要新增交易時 -----------
-! 有小工具可以比較方便完成
-! 請參考 NAS\SKL\雜項文件\xiangwei\小工具\定期報表產表介面修改說明.txt
 
-! 或是 ...
-! 1. 交易畫面修改
-
-! 2. 在 TRADE DICTIONARY 中依據格式新增交易
-
-! 3. 在這份檔案裡搜尋:
-!
-!    修改這裡
-!
-!    這四個字, 就能夠找到所有需要修改的 loop times 數字; 可能會相隔幾行
-!    將這些 times 值修改為對應的正確數字, 通常是交易總數或是分類總數
-
-! 4. 這裡的 TotalItem 與 TotalCat 作修改
-
-! 總項目數 8
-#TotalItem=N,3,S
-E(0,1)
-
-! 總分類數 1
-#TotalCat=N,1,S
-E(0,1)
 
 !---------- PREMADE VARIABLES ----------
 
@@ -94,13 +67,6 @@ E(0,5)
 
 #tmpLineCounter=N,3,S
 
-! 必輸出欄位
-! legacy from old version.
-##loop{times:1,i:1}
-#R{i}=X,1,L
-INVOKEJS(SHOW,#R{i},0)
-K(LIGHT,#R{i},TXTRED,0)
-##end
 
 ! 會計日期
 ! legacy from old version.
@@ -115,249 +81,65 @@ T(2,#DT2)
 @V(7)A(DATE,0,#ACCTDATE)
 V(5,0,#DT2)
 
-!---------- TRADE DICTIONARY -----------
-! TradeDic: The trade that button points to. Notice it's raw data for input only.
-! format is [tradeCat]/[tradeCode]/[tradeName] without brackets.
+!需手動調整，配合此交易內所有報表的數量而訂
+#TotalItem =A,3,S
+#OOTotalRptSize =A,3,S
 
-! 這裡的編號順序要跟畫面輸出一樣
-! 並且每種種類依序放在一起
-! 也不可以跳號
+!全選勾選功能 start..........
 
-#TradeDic1=X,35,S
-T(3,1/0/LD003/放款明細餘額總表（日）)
-#TradeDic2=X,35,S
-T(3,1/0/LD004/企金戶還本收據及繳息收據)
-#TradeDic3=X,40,S
-T(3,1/0/LD005/暫收支票收據列印（個人戶）)
-#TradeDic4=X,40,S
-T(3,1/0/LD006/三階放款明細統計（T9410051）)
-#TradeDic5=X,40,S
-T(3,1/0/LD007/放款專員明細統計（T9410052）)
-#TradeDic6=X,35,S
-T(3,1/0/LD008/放款餘額總表)
-#TradeDic7=X,35,S
-T(3,1/1/LD008/關係人放款餘額總表)
-#TradeDic8=X,25,S
-T(3,1/0/LD009/放款授信日報表)
-#TradeDic9=X,35,S
-T(3,1/0/LD010/介紹人換算業績報酬檢核表)
+#BtnAllShell1=X,1,I,ui:button;value:  ;enable:1;tabbable:0
 
+#ApAllBIND1=X,1,S
+BIND(#BtnAllShell1,click, {cmd=CALLSEND;DOCODE=ApAllBtnProc1})
 
-
-!---------- TRADE DICTIONARY SPLIT AND ASSIGN -----------
-
-! 修改這裡的 loop times
+#ApAllBtnProc1=@,1,S
+C(5,#BtnAllShell1,V,T(3,@BtnAllShell1,  ),T(3,@BtnAllShell1,V))
 ##loop{times:1,i:1}
+C(5,#BtnShell{i},V,T(3,@BtnShell{i},  ),T(3,@BtnShell{i},V))
+##end
 
-! TradeCat: 1st byte of TradeDic. Trade's category.
+!全選勾選功能 end..........
+
+
+##loop{times:50,i:1}
+!權限勾選按鈕
+#BtnShell{i}=X,1,I,ui:button;value:  ;enable:1;tabbable:0
+
+#Ap1GBIND{i}=X,1,S
+BIND(#BtnShell{i},click, {cmd=CALLSEND;DOCODE=Ap1GBtnProc{i}})
+
+#Ap1GBtnProc{i}=@,1,S
+C(5,#BtnShell{i},V,T(3,@BtnShell{i},  ),T(3,@BtnShell{i},V))
+
 #TradeCat{i}=X,1,S
-T(1,#TradeDic{i},1,1)
-
-
+#TradeCode{i}=X,5,L
+#TradeName{i}=X,100,L
 #TradeSub{i}=X,1,S
-T(1,#TradeDic{i},3,1)
 HIDE(#TradeSub{i})
 
-
-! TradeCode: 3-7 th bytes of TradeDic. The TXCD of a trade.
-#TradeCode{i}=X,5,L
-T(1,#TradeDic{i},5,5)
-
-! TradeName: all bytes after 8th in TradeDic. The Chinese Name of a trade.
-#TradeName{i}=X,40,L
-T(1,#TradeDic{i},11,40)
-
+#OOGroupNo{i}=X,1,S
+#OOTradeCode{i}=X,5,L
+#OOTradeName{i}=X,100,L
+#OOTradeSub{i}=X,1,S
 ##end
 
-!---------- TRADE DICTIONARY ENDS -----------
-
-
-!---------- TRADE ----------
-
-!---------- BUTTON MAKING -----------
-! How many trades are there, how many buttons should be made.
-
-! 修改這裡的 loop times
-##loop{times:1,i:1}
-
-
-!---------- BUTTON VISUAL -----------
-
-! BtnShell: Creates visual of button.
-#BtnShell{i}=X,2,I,ui:button;value:　;enable:1;tabbable:0
-
-!---------- BUTTON BINDER -----------
-
-! BtnBind: Bind button to its state machine processor.
-#BtnBind{i}=X,1,S
-BIND(#BtnShell{i},click,{cmd=CALLSEND;DOCODE=Btn{i}FSMP})
-
-!---------- BUTTON STATE MACHINE PROCESSOR -----------
-
-! BtnFSMP: Button Finite-State Machine Processor
-
-! What happens when Button is Clicked?
-! Button State, GoTo, State Visual
-
-! 1, 0, V, also makes its category's Select All go to state 0.
-! 0, 1, empty
-#Btn{i}FSMP=@,1,S
-C(5,#BtnShell{i},V,T(3,@BtnShell{i},　)T(1,@tmpTargetCat,#TradeCat{i},1,1)CALL(#FuncClearSelectAll),T(3,@BtnShell{i},V))
-
-!---------- TRADE ENDS ----------
-
+!JAVA回傳的資料賦值
+#tranNo=X,5,S
+T(3,L9801)
+S(L9R99,0,#tranNo)
+R(1,L9R99)
+E(0,@TotalItem,#OOTotalRptSize)
+##loop{times:50,i:1}
+T(2,@TradeCode{i},#OOTradeCode{i})
+T(2,@TradeName{i},#OOTradeName{i})
+E(0,@TradeSub{i},#OOTradeSub{i})
+E(0,@TradeCat{i},#OOGroupNo{i})
 ##end
 
-
-!---------- CATEGORY ----------
-
-!---------- BUTTON MAKING ----------
-!---------- Everything Button -----------
-
-! BtnAllShell0: Visual of SELECT EVERYTHING button.
-#BtnAllShell0=X,2,S,ui:button;value:　;enable:1;tabbable:0
-
-! BtnAllBind: Bind button to its state machine processor.
-#BtnAllBind0=X,1,S
-BIND(#BtnAllShell0,click,{cmd=CALLSEND;DOCODE=BtnAll0FSMP})
-
-! BtnFSMP: Button Finite-State Machine Processor
-
-! What happens when Button is Clicked?
-! Button State, GoTo, State Visual, Description
-
-! 1, 0, V, makes all trade FSMPs go to state 0; makes all SELECT ALL button go to state 0.
-! 0, 1, empty, makes all trade FSMPs go to state 1; makes all SELECT ALL button go to state 1.
-#BtnAll0FSMP=@,1,S
-C(5,#BtnAllShell0,V,T(3,@BtnAllShell0,　),T(3,@BtnAllShell0,V))
-CALL(#FuncSelectEverything)
-
-
-!---------- Category loops -----------
-! How many categories are there, how many buttons should be made.
-
-! 修改這裡的 loop times
-##loop{times:1,i:1}
-
-!---------- EXPAND/FOLD TEXT ----------
-
-! System default is expanded, but FuncInit will be called to make them all folded. 
-#ExpText{i}=X,6,L
-T(3,　收縮)
-
-!---------- BUTTON SHELL ----------
-
-! BtnAllShell: Visual of SELECT ALL button.
-#BtnAllShell{i}=X,2,I,ui:button;value:　;enable:1;tabbable:0
-
-! BtnExpShell: Visual of EXPAND button.
-#BtnExpShell{i}=X,2,S,ui:button;value:　;enable:1;tabbable:0
-
-! Everything is opened at default.
-#BtnExpShellDef{i}=X,1,S
-T(3,#BtnExpShell{i},－)
-
-!---------- BUTTON BINDER -----------
-
-! BtnAllBind: Bind button to its state machine processor.
-#BtnAllBind{i}=X,1,S
-BIND(#BtnAllShell{i},click,{cmd=CALLSEND;DOCODE=BtnAll{i}FSMP})
-
-! BtnExpBind: Bind button to its state machine processor.
-#BtnExpBind{i}=X,1,S
-BIND(#BtnExpShell{i},click,{cmd=CALLSEND;DOCODE=BtnExp{i}FSMP})
-
-!---------- BUTTON STATE MACHINE PROCESSOR -----------
-
-! BtnFSMP: Button Finite-State Machine Processor
-
-! What happens when Button is Clicked?
-! Button State, GoTo, State Visual, Description
-
-! 1, 0, V, also makes all trade FSMPs under this category go to state 0. also changes BtnAllSelect0.
-! 0, 1, empty, also makes all trade FSMPs under this category go to state 1.
-#BtnAll{i}FSMP=@,1,S
-T(3,@tmpTargetCat,{i})
-C(5,#BtnAllShell{i},V,T(3,@BtnAllShell{i},　),T(3,@BtnAllShell{i},V))
-C(5,#BtnAllShell{i},V,CALL(#FuncSelectCat),CALL(#FuncUnselectCat)CALL(#FuncClearSelectEverything))
-
-! 1, 0, -, folds the category. also changes ExpandText.
-! 0, 1, +, expands the category. also changes ExpandText.
-#BtnExp{i}FSMP=@,1,S
-T(3,@tmpTargetCat,{i})
-C(5,#BtnExpShell{i},－,T(3,@BtnExpShell{i},＋),T(3,@BtnExpShell{i},－))
-C(5,#ExpText{i},　收縮,T(3,@ExpText{i},　展開),T(3,@ExpText{i},　收縮))
-C(5,#BtnExpShell{i},＋,CALL(#FuncFoldCat),CALL(#FuncExpandCat))
-
-
-!---------- SELECT ALL AND UNSELECT ALL -----------
-
+!多餘行數的不顯示
+##loop{times:50,i:1}
+IF(#TradeCat{i}==0,INVOKEJS(SHOW,grd2_{i},0),INVOKEJS(SHOW,grd2_{i},1))
 ##end
-
-!---------- CATEGORY ENDS ----------
-
-
-!---------- Functions ----------
-
-! Select Everything
-
-! 修改這裡的 2 個 loop times
-#FuncSelectEverything=@,1,S
-##loop{times:1,i:1}
-C(5,#BtnAllShell0,V,T(3,@BtnShell{i},V),T(3,@BtnShell{i},　),$)
-##end
-##loop{times:1,i:1}
-C(5,#BtnAllShell0,V,T(3,@BtnAllShell{i},V),T(3,@BtnAllShell{i},　))
-##end
-
-! Category Functions
-
-! Select All in a category
-
-! 修改這裡的 loop times
-#FuncSelectCat=@,1,S
-##loop{times:1,k:1}
-C(5,#TradeCat{k},#tmpTargetCat,T(3,@BtnShell{k},V),$)
-##end
-
-! Unselect All in a category
-
-! 修改這裡的 loop times
-#FuncUnselectCat=@,1,S
-##loop{times:1,i:1}
-C(5,#TradeCat{i},#tmpTargetCat,T(3,@BtnShell{i},　),$)
-##end
-
-#tmpGrd=x,3,S
-T(3,grd)
-
-#tmpGrdId=x,4,S
-
-! Expand (show all in category)
-! Trade grid id = Category * 2
-#FuncExpandCat=@,1,S
-E(0,@tmpTargetCat,#tmpTargetCat*2)
-T(2,@tmpGrdId,#tmpGrd+#tmpTargetCat)
-INVOKEJS(SHOW,#tmpGrdId,1)
-
-! Fold (hide all in category)
-#FuncFoldCat=@,1,S
-E(0,@tmpTargetCat,#tmpTargetCat*2)
-T(2,@tmpGrdId,#tmpGrd+#tmpTargetCat)
-INVOKEJS(SHOW,#tmpGrdId,0)
-
-! Clearing the SELECT ALL button, for unselecting a single trade
-! 修改這裡的 loop times
-#FuncClearSelectAll=@,1,S
-##loop{times:1,i:1}
-C(5,#tmpTargetCat,{i},T(3,@BtnAllShell{i},　)T(3,@BtnAllShell0,　),$)
-##end
-
-! Clearing the SELECT EVERYTHING button, for unselecting a whole category
-#FuncClearSelectEverything=@,1,S
-T(3,@BtnAllShell0,　)
-
-</sub>
 
 !---------- 輸出共用變數宣告區 ----------
 <sub type="RTN" name="AFXMT">
@@ -375,10 +157,11 @@ T(3,@BtnAllShell0,　)
 ! 修改這裡的 loop times
 <sub type="TIM">
 #TotalItem
-##loop{times:1,i:1}
+##loop{times:50,i:1}
 #BtnShell{i}
-#TradeCode{i}
+#TradeCat{i}
 #TradeSub{i}
+#TradeCode{i}
 #TradeName{i}
 ##end
 </sub>
@@ -387,6 +170,16 @@ T(3,@BtnAllShell0,　)
 !------ 下行電文TOM ------
 <sub type="TOM">
 TXFORM=L9801^
+
+TXFORM=L9R99
+#OOTotalRptSize
+##loop{times:50,i:1}
+#OOGroupNo{i}
+#OOTradeCode{i}
+#OOTradeName{i}
+#OOTradeSub{i}
+##end
+^
 <include src="COM.icf::TRCTL.tom"/>
 </sub>
 

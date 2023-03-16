@@ -102,6 +102,18 @@ public interface CdReportService {
   public Slice<CdReport> findRptGroupNo(String groupNo_0, String formNo_1, int index, int limit, TitaVo... titaVo);
 
   /**
+   * Cycle=, AND GroupNo %
+   *
+   * @param cycle_0 cycle_0
+   * @param groupNo_1 groupNo_1
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice CdReport CdReport of List
+   */
+  public Slice<CdReport> findRptCycleGrp(int cycle_0, String groupNo_1, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By CdReport
    * 
    * @param formNo key

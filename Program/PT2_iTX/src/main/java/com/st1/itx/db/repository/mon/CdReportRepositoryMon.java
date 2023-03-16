@@ -42,6 +42,9 @@ public interface CdReportRepositoryMon extends JpaRepository<CdReport, String> {
   // GroupNo=, AND FormNo %
   public Slice<CdReport> findAllByGroupNoIsAndFormNoLikeOrderByGroupNoAscFormNoAsc(String groupNo_0, String formNo_1, Pageable pageable);
 
+  // Cycle=, AND GroupNo %
+  public Slice<CdReport> findAllByCycleIsAndGroupNoLikeOrderByGroupNoAscFormNoAsc(int cycle_0, String groupNo_1, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

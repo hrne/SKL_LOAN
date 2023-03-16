@@ -43,7 +43,7 @@ BEGIN
          , '999999'                  AS "CreateEmpNo"     -- 建檔人員 VARCHAR2 6
          , JOB_START_TIME            AS "LastUpdate"      -- 最後更新日期時間 DATE 
          , '999999'                  AS "LastUpdateEmpNo" -- 最後更新人員 VARCHAR2 6
-    FROM "TfClOtherRightsFacMap" TFM
+    FROM "TfClOtherRightsMap" TFM
     LEFT JOIN LA$APLP APLP ON APLP.LMSACN = TFM.LMSACN
                           AND APLP.LMSAPN = TFM.LMSAPN
     ;

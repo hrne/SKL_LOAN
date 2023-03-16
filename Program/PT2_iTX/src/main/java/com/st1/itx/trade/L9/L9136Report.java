@@ -129,7 +129,7 @@ public class L9136Report extends MakeReport {
 		this.dataSource = 1;
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-				.setRptCode(tradeNo).setRptItem(tradeName).setSecurity(this.getSecurity()).setRptSize("A4").setPageOrientation("L")
+				.setRptCode(tradeNo).setRptItem(tradeName).setRptSize("A4").setPageOrientation("L")
 				.build();
 
 		this.open(titaVo, reportVo);

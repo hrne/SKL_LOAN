@@ -58,7 +58,7 @@ public class LM009Report extends MakeReport {
 		String brno = titaVo.getBrno();
 		String reportCode = "LM009";
 		String reportItem = "應收利息總表";		
-		String security = this.getSecurity();
+//		String security = this.getSecurity();
 		String pageSize = "A4";
 		String pageOrientation = "P";
 
@@ -66,7 +66,7 @@ public class LM009Report extends MakeReport {
 //				.setRptItem(reportItem).setSecurity(security).setRptSize(pageSize).setPageOrientation(pageOrientation)
 //				.build();
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(reportCode)
-				.setRptItem(reportItem).setSecurity(security).setRptSize(pageSize).setPageOrientation(pageOrientation)
+				.setRptItem(reportItem).setRptSize(pageSize).setPageOrientation(pageOrientation)
 				.build();
 		this.open(titaVo, reportVo);
 		

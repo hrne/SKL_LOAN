@@ -107,7 +107,7 @@ public class L9715Report extends MakeReport {
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String reportItem = "業務專案照顧十八個月明細表";
-		String security =this.getSecurity();
+		
 		String pageSize = "A4";
 		String pageOrientation = "L";
 

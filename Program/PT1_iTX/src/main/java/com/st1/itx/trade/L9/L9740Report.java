@@ -57,7 +57,7 @@ public class L9740Report extends MakeReport {
 //	private int reportDate = 0;
 	private String reportCode = "L9740";
 	private String reportItem = "公會無自用住宅放款檢核清單";
-	private String security = "密";
+//	private String security = "密";
 	private String pageSize = "A4";
 	private String pageOrientation = "P";
 

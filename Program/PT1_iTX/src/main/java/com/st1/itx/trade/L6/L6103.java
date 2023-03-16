@@ -51,7 +51,7 @@ public class L6103 extends TradeBuffer {
 //		if (!titaVo.getHsupCode().equals("1")) {
 //			sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 //		} else {
-		toDo(titaVo);
+			toDo(titaVo);
 //		}
 
 		this.addList(this.totaVo);
@@ -71,12 +71,12 @@ public class L6103 extends TradeBuffer {
 		if (iFUNCD == 0)
 			titaVo.setDataBaseOnLine();
 		else if (iFUNCD == 1) {
-			// throw new LogicException("EC001", "日報環境尚未開放!");
+//			throw new LogicException("EC001", "日報環境未開放!");
 			titaVo.setDataBaseOnDay();
 		} else if (iFUNCD == 2)
 			titaVo.setDataBaseOnMon();
 		else if (iFUNCD == 3) {
-//			throw new LogicException("EC001", "歷史資料環境尚未開放!");
+//      throw new LogicException("EC001", "歷史資料環境尚未開放!");
 			titaVo.setDataBaseOnHist();
 		}
 		TxBizDate txBizDate = txBizDateService.findById("ONLINE", titaVo);

@@ -23,7 +23,7 @@ BEGIN
           "ClCode1"
         , "ClCode2"
         , "ClNo"
-        . GDTRDT
+        , GDTRDT
         , "Seq"
         , GDRID1
         , GDRID2
@@ -40,8 +40,8 @@ BEGIN
              , G.GDRID1
              , G.GDRID2
              , G.GDRNUM
-             , A.LMSACN
-             , A.LMSAPN
+             , NVL(A.LMSACN,0)      AS LMSACN
+             , NVL(A.LMSAPN,0)      AS LMSAPN
         FROM "ClNoMap" CNM
         LEFT JOIN LA$GDTP G ON G.GDRID1 = CNM."GdrId1"
                            AND G.GDRID2 = CNM."GdrId2"
@@ -50,6 +50,8 @@ BEGIN
                            AND A.GDRID2 = G.GDRID2
                            AND A.GDRNUM = G.GDRNUM
         WHERE CNM."ClCode1" != 0
+          AND NVL(A.LMSACN,0) != 0
+          AND NVL(A.LMSAPN,0) != 0
     )
     SELECT "ClCode1"
          , "ClCode2"

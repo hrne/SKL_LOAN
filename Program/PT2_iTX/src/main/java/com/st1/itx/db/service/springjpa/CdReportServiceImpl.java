@@ -272,6 +272,34 @@ em = null;
   }
 
   @Override
+  public Slice<CdReport> findRptCycleGrp(int cycle_0, String groupNo_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<CdReport> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findRptCycleGrp " + dbName + " : " + "cycle_0 : " + cycle_0 + " groupNo_1 : " +  groupNo_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = cdReportReposDay.findAllByCycleIsAndGroupNoLikeOrderByGroupNoAscFormNoAsc(cycle_0, groupNo_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = cdReportReposMon.findAllByCycleIsAndGroupNoLikeOrderByGroupNoAscFormNoAsc(cycle_0, groupNo_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = cdReportReposHist.findAllByCycleIsAndGroupNoLikeOrderByGroupNoAscFormNoAsc(cycle_0, groupNo_1, pageable);
+    else 
+      slice = cdReportRepos.findAllByCycleIsAndGroupNoLikeOrderByGroupNoAscFormNoAsc(cycle_0, groupNo_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
   public CdReport holdById(String formNo, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

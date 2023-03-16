@@ -33,7 +33,7 @@ public class L9132ReportA extends MakeReport {
 	private String brno = "";
 	private String reportCode = "L9132A";
 	private String reportItem = "傳票媒體總表(總帳)";
-	private String security = "機密";
+//	private String security = "機密";
 	private String pageSize = "A4";
 	private String pageOrientation = "L";
 
@@ -49,7 +49,7 @@ public class L9132ReportA extends MakeReport {
 	public void printHeader() {
 		this.print(-1, 1, "程式ID：" + this.getParentTranCode());
 		this.print(-1, this.getMidXAxis(), "新光人壽保險股份有限公司", "C");
-		this.print(-1, 145, "機密等級：" + this.security);
+		this.print(-1, 145, "機密等級：" + this.getSecurity());
 		this.print(-2, 1, "報　表：" + this.reportCode);
 		this.print(-2, this.getMidXAxis(), this.reportItem, "C");
 		this.print(-2, 145, "日　　期：" + showBcDate(this.nowDate, 1));

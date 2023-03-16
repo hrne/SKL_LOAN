@@ -51,20 +51,21 @@ public class L9739ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  ,NVL(B.\"BaseRate\",0) AS \"BaseRate\"";
 		sql += "	FROM \"FacProd\" P";
 		sql += "	LEFT JOIN (";
-		sql += "		SELECT MAX(DECODE(R.\"Seq\",1,R.\"EffectDate\",0)) AS \"EffectDate\"";
-		sql += "			  ,MAX(DECODE(R.\"Seq\",1,R.\"JsonFields\",'')) AS \"JsonFields\"";
-		sql += "			  ,MAX(DECODE(R.\"Seq\",1,0,R.\"EffectDate\")) AS \"lEffectDate\"";
-		sql += "			  ,MAX(DECODE(R.\"Seq\",1,'',R.\"JsonFields\")) AS \"lJsonFields\"";
+		sql += "		SELECT MAX(DECODE(R.\"NewSeq\",1,R.\"EffectDate\",0)) AS \"EffectDate\"";
+		sql += "			  ,MAX(DECODE(R.\"NewSeq\",1,R.\"JsonFields\",'')) AS \"JsonFields\"";
+		sql += "			  ,MAX(DECODE(R.\"OldSeq\",1,R.\"EffectDate\",0)) AS \"lEffectDate\"";
+		sql += "			  ,MAX(DECODE(R.\"OldSeq\",1,R.\"JsonFields\",'')) AS \"lJsonFields\"";
 		sql += "		FROM (";
 		sql += "			SELECT \"EffectDate\"";
 		sql += "				  ,\"JsonFields\"";
-		sql += "				  ,ROW_NUMBER()OVER(ORDER BY \"EffectDate\" DESC) as \"Seq\"";
+		sql += "				  ,ROW_NUMBER()OVER(ORDER BY \"EffectDate\" DESC) as \"NewSeq\"";
+		sql += "				  ,ROW_NUMBER()OVER(ORDER BY \"EffectDate\" ASC) as \"OldSeq\"";
 		sql += "			FROM \"CdComm\"";
 		sql += "			WHERE \"CdType\" = '01'";
 		sql += "			  AND \"CdItem\" = '01'";
 		sql += "			  AND \"EffectDate\" <= :entdy ";
 		sql += "		) R ";
-		sql += "		WHERE R.\"Seq\" <= 2";
+		sql += "		WHERE R.\"NewSeq\" = 1 OR R.\"OldSeq\" = 1";//--用正序跟反序找最新和最舊(固定)利率
 		sql += "	) S ON S.\"EffectDate\" > 0";
 		sql += "	LEFT JOIN (";
 		sql += "		SELECT \"EffectDate\"";

@@ -279,7 +279,7 @@ public class L9R99 extends TradeBuffer {
 			this.totaVo.putParam("OOGroupNo" + i, i);
 		}
 		this.totaVo.putParam("OOGroupNoAllSize", lCdBranchGroup.size());
-		
+
 		String ld = "LD%";
 		String lh = "LH%";
 		String lm = "LM%";
@@ -295,36 +295,39 @@ public class L9R99 extends TradeBuffer {
 		String g3 = "3";
 
 		if ("L9801".equals(tranCode)) {
-
+			findReport(titaVo, g2, 1);
+			fullColumn(this.no);
 		}
 		if ("L9802".equals(tranCode)) {
-
+			findReport(titaVo, g3, 3);
+			fullColumn(this.no);
 		}
 		if ("L9803".equals(tranCode)) {
 			// 1 放款管理課
-			findReport(titaVo, g1, lm);
+			findReport(titaVo, g1, 2);
 			fullColumn(this.no);
 
 			// 2放款服務課
-			findReport(titaVo, g2, lm);
+			findReport(titaVo, g2, 2);
 			fullColumn(this.no);
 
 			// 3放款審查課
-
-			findReport(titaVo, g3, lm);
-			findReport(titaVo, g3, lp);
-
+			findReport(titaVo, g3, 2);
 			fullColumn(this.no);
 
 		}
 		if ("L9804".equals(tranCode)) {
-
+			findReport(titaVo, g3, 4);
+			findReport(titaVo, g2, 4);
+			fullColumn(this.no);
 		}
 		if ("L9805".equals(tranCode)) {
-
+			findReport(titaVo, g1, 5);
+			fullColumn(this.no);
 		}
 		if ("L9806".equals(tranCode)) {
-
+			findReport(titaVo, g1, 6);
+			fullColumn(this.no);
 		}
 
 		this.totaVo.putParam("OOTotalRptSize", this.no);
@@ -351,12 +354,18 @@ public class L9R99 extends TradeBuffer {
 		}
 
 	}
-
-	private void findReport(TitaVo titaVo, String groupNo, String rptCodeLike) throws LogicException {
+	/**
+	 * 查詢報表清單
+	 *  @param titaVo
+	 *  @param groupNo 課組別
+	 *  @param cycle 報表週期
+	 **/
+	private void findReport(TitaVo titaVo, String groupNo, int cycle) throws LogicException {
 		int sTradeSub = 0;
 		Slice<CdReport> slCdReport;
 		// 1 放款服務課
-		slCdReport = sCdReportService.findRptGroupNo(groupNo, rptCodeLike, this.index, Integer.MAX_VALUE, titaVo);
+
+		slCdReport = sCdReportService.findRptCycleGrp(cycle, groupNo, this.index, Integer.MAX_VALUE, titaVo);
 		List<CdReport> lCdReport = slCdReport == null ? null : slCdReport.getContent();
 
 		// 查無資料

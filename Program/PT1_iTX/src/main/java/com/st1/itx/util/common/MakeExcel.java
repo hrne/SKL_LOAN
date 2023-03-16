@@ -116,6 +116,9 @@ public class MakeExcel extends CommBuffer {
 		if ("".equals(fileName)) {
 			throw new LogicException("EC004", "(MakeExcel)輸出檔名(outfile)必須有值(MakeExcel)");
 		}
+
+		checkCdReport(titaVo, reportVo.getRptCode());
+
 		this.outputFileName = fileName;
 		reportVo = ReportVo.builder().setRptDate(date).setBrno(brno).setRptCode(fileCode).setRptItem(fileItem).build();
 	}
@@ -139,6 +142,9 @@ public class MakeExcel extends CommBuffer {
 		if ("".equals(fileName)) {
 			throw new LogicException("EC004", "(MakeExcel)輸出檔名(outfile)必須有值(MakeExcel)");
 		}
+
+		checkCdReport(titaVo, reportVo.getRptCode());
+
 		this.outputFileName = fileName;
 		this.reportVo = reportVo;
 	}
@@ -1362,13 +1368,13 @@ public class MakeExcel extends CommBuffer {
 		try {
 			txCode = titaVo.getTxCode();
 
-			if (txCode.contains("L98")){
+			if (txCode.contains("L98")) {
 
 				txCode = reportVo.getRptCode();
 			}
 
 			this.info("2getSecurity.getItem = " + txCode);
-			
+
 			CdReport tCdReport = cdReportService.findById(txCode);
 			CdCodeId tCdCodeId = new CdCodeId();
 			tCdCodeId.setDefCode("Confidentiality");
@@ -1391,5 +1397,27 @@ public class MakeExcel extends CommBuffer {
 		this.info("getSecurity.getItem = " + securityItem);
 
 		return securityItem;
+	}
+
+	/**
+	 * 檢查報表對照檔是否有設定資料<BR>檢查寄送方式
+	 * 
+	 * 
+	 * @return SecurityItem 機密等級中文
+	 * @throws LogicException
+	 *
+	 */
+	private void checkCdReport(TitaVo titaVo, String rptCode) throws LogicException {
+
+		this.info("checkCdReport.rptCode=" + rptCode);
+		CdReport tCdReport = cdReportService.findById(rptCode, titaVo);
+		if (tCdReport == null) {
+			throw new LogicException("EC0009", "未設定報表代號：" + rptCode + "，請至L6068報表代號對照檔設定此報表代號 ");
+		} else {
+			if ("N".equals(tCdReport.getLetterFg())) {
+				// EC0015檢查錯誤
+				throw new LogicException("EC0015", "交易：" + tCdReport.getFormNo() + "，書面寄送設定為否，需調整請至L6068報表設定檔。 ");
+			}
+		}
 	}
 }

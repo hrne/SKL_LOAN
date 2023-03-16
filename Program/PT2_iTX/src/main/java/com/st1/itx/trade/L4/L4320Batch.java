@@ -653,17 +653,19 @@ public class L4320Batch extends TradeBuffer {
 		case 2:
 			// 本次生效日 = 指標利率生效日
 			effDateCurt = iEffectDate;
-			// 本次利率 = 本次指標利率 + 目前合約加減碼-政府補貼利率
-			// 政府補貼利率(郵局指標利率)
-			BigDecimal subsidyRate = BigDecimal.ZERO;
+			// 加碼值 = 目前合約加減碼-政府補貼利率差額
+			// 擬調利率 = 本次指標利率 + 加碼值
+			BigDecimal subsidyRateDiff = BigDecimal.ZERO;
 			if ("02".equals(iBaseRateCode)) {
-				subsidyRate = getSubsidyRate(s.get("GovOfferFlag"));
+				// 政府補貼利率差額(郵局指標利率)
+				subsidyRateDiff = getSubsidyRateDiff(s.get("GovOfferFlag"), presentEffectDate, titaVo);
 				if (!"N".equals(s.get("GovOfferFlag"))) {
-					warnMsg += ", 政府補貼利率:" + subsidyRate;
-					tTempVo.putParam("SubsidyRate", subsidyRate);
+					warnMsg += ", 政府補貼利率差額:" + subsidyRateDiff;
+					tTempVo.putParam("SubsidyRateDiff", subsidyRateDiff);
 				}
+				rateIncr = rateIncr.subtract(subsidyRateDiff);
 			}
-			rateProp = iBaseRate.add(rateIncr).subtract(subsidyRate);
+			rateProp = iBaseRate.add(rateIncr);
 			// 1.自動調整
 			adjCode = 1;
 			break;
@@ -838,16 +840,33 @@ public class L4320Batch extends TradeBuffer {
 		}
 	}
 
-	// 政府補貼利率
-	private BigDecimal getSubsidyRate(String govOfferFlag) throws LogicException {
-		BigDecimal subsidyRate = BigDecimal.ZERO;
+	// 政府補貼利率差額
+	private BigDecimal getSubsidyRateDiff(String govOfferFlag, int presEffDate, TitaVo titaVo) throws LogicException {
 		if (!"N".equals(govOfferFlag)) {
-			String jsonfield = "SubsidyRate" + govOfferFlag;
-			if (subsidyRateVo.get(jsonfield) != null) {
-				subsidyRate = parse.stringToBigDecimal(subsidyRateVo.get(jsonfield));
-			}
+			return BigDecimal.ZERO;
 		}
-		return subsidyRate;
+
+		String jsFieldName = "SubsidyRate" + govOfferFlag;
+		if (subsidyRateVo.get(jsFieldName) == null) {
+			return BigDecimal.ZERO;
+		}
+
+		BigDecimal subsidyRateNow = parse.stringToBigDecimal(subsidyRateVo.get(jsFieldName));
+
+		CdComm tCdComm = cdCommService.CdTypeDescFirst("01", "01", 0, presEffDate + 19110000, titaVo);
+		if (tCdComm == null) {
+			return BigDecimal.ZERO;
+		}
+
+		TempVo oldTempVo = new TempVo();
+		oldTempVo.getVo(tCdComm.getJsonFields());
+		if (oldTempVo.get(jsFieldName) == null) {
+			return BigDecimal.ZERO;
+		}
+
+		BigDecimal subsidyRateOld = parse.stringToBigDecimal(oldTempVo.get(jsFieldName));
+
+		return subsidyRateNow.subtract(subsidyRateOld);
 	}
 
 	// 暫時紀錄戶號額度

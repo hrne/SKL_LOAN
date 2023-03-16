@@ -119,15 +119,16 @@ public class CustRmkCom extends TradeBuffer {
 			List<CustRmk> lCustRmk = slCustRmk == null ? null : slCustRmk.getContent();
 			if (lCustRmk != null && lCustRmk.size() > 0) {
 				String s = "{red-s}{b-s}顧客控管警訊：{b-e}{red-e}<br><br>";
-				s += FormatUtil.padX("建立日期", 12) + FormatUtil.padX("備忘錄代碼", 12) + FormatUtil.padX("備忘錄說明", 50) + FormatUtil.padX("經辦", 20) + "<br>";
+				s += FormatUtil.padX("建立日期", 12) + FormatUtil.padX("備忘錄代碼", 12) + FormatUtil.padX("備忘錄中文", 14) + FormatUtil.padX("備忘錄說明", 50) + FormatUtil.padX("經辦", 20) + "<br>";
 				for (CustRmk custRmk : lCustRmk) {
 					CdEmp cdEmp = cdEmpService.findById(custRmk.getLastUpdateEmpNo(), titaVo);
+					CdCode cdCode = cdCodeService.findById(new CdCodeId("RmkCode", custRmk.getRmkCode().trim()));
 					String emp = custRmk.getLastUpdateEmpNo();
 					if (cdEmp != null) {
 						emp += " " + cdEmp.getFullname();
 					}
-					s += FormatUtil.padX(parse.timeStampToStringDate(custRmk.getLastUpdate()), 12) + FormatUtil.padX(custRmk.getRmkCode(), 12) + FormatUtil.padX(custRmk.getRmkDesc().trim(), 50)
-							+ FormatUtil.padX(emp.trim(), 20) + "<br>";
+					s += FormatUtil.padX(parse.timeStampToStringDate(custRmk.getLastUpdate()), 12) + FormatUtil.padX(custRmk.getRmkCode(), 12)
+							+ FormatUtil.padX(Objects.isNull(cdCode) ? "" : cdCode.getItem(), 14) + FormatUtil.padX(custRmk.getRmkDesc().trim(), 50) + FormatUtil.padX(emp.trim(), 20) + "<br>";
 				}
 				totaVo.setHtmlContent(s);
 			}

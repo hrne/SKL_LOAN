@@ -67,17 +67,17 @@ public class L2R53 extends TradeBuffer {
 			CreateFlag.add("1");
 			CreateFlag.add("2");
 			Slice<PostAuthLog> slPostAuthLog = null;
-			slPostAuthLog = postAuthLogService.custNoAuthErrorCodeEq(iCustNo, CreateFlag, wkAuthStatus, 0, Integer.MAX_VALUE, titaVo);
+			slPostAuthLog = postAuthLogService.custNoAuthErrorCodeEq(iCustNo, CreateFlag, wkAuthStatus, 0,
+					Integer.MAX_VALUE, titaVo);
 
 			List<PostAuthLog> lPostAuthLog = slPostAuthLog == null ? null : slPostAuthLog.getContent();
+			List<PostAuthLog> lPostAuthLog2 = new ArrayList<PostAuthLog>();
 
 			if (lPostAuthLog == null || lPostAuthLog.size() == 0) {
 
 				this.info("lPostAuthLog =  null");
 			} else {
 				this.info("lPostAuthLog =  " + lPostAuthLog);
-				int listSize = lPostAuthLog.size();
-				int i = 1;
 				for (PostAuthLog t : lPostAuthLog) {
 					deleteFg = false;
 					if (!wkOldRepayAcct.equals(t.getRepayAcct())) {
@@ -87,8 +87,22 @@ public class L2R53 extends TradeBuffer {
 						if ("2".equals(t.getAuthApplCode())) {
 							deleteFg = false;
 						}
+						if (t.getDeleteDate() > 0) {
+							deleteFg = false;
+						}
 					}
+
 					if (deleteFg) {
+						lPostAuthLog2.add(t);
+					}
+				}
+
+				if (lPostAuthLog2 == null || lPostAuthLog2.size() == 0) {
+					this.info("lPostAuthLog =  null");
+				} else {
+					int listSize = lPostAuthLog2.size();
+					int i = 1;
+					for (PostAuthLog t : lPostAuthLog2) {
 						String wkRepayAcct = t.getRepayAcct();
 						Help = Help + FormatUtil.pad9(wkRepayAcct, 14) + ":" + "";
 						if (i < listSize) {
@@ -96,13 +110,12 @@ public class L2R53 extends TradeBuffer {
 							this.info("Help = " + Help);
 						}
 
+						if (i == listSize) {
+							Help = Help + "" + ":" + "";
+							this.info("Help = " + Help);
+						}
+						i++;
 					}
-					if (i == listSize) {
-						Help = Help + "" + ":" + "";
-						this.info("Help = " + Help);
-					}
-					i++;
-
 				}
 
 			}
@@ -111,15 +124,15 @@ public class L2R53 extends TradeBuffer {
 			CreateFlag.add("A");
 			CreateFlag.add("D");
 			Slice<AchAuthLog> slAchAuthLog = null;
-			slAchAuthLog = achAuthLogService.custNoRepayBankEq(iCustNo, iRepayBank, wkAuthStatus, CreateFlag, 0, Integer.MAX_VALUE, titaVo);
+			slAchAuthLog = achAuthLogService.custNoRepayBankEq(iCustNo, iRepayBank, wkAuthStatus, CreateFlag, 0,
+					Integer.MAX_VALUE, titaVo);
 			List<AchAuthLog> lAchAuthLog = slAchAuthLog == null ? null : slAchAuthLog.getContent();
+			List<AchAuthLog> lAchAuthLog2 = new ArrayList<AchAuthLog>();
 			if (lAchAuthLog == null || lAchAuthLog.size() == 0) {
 				this.info("lAchAuthLog =  null");
 
 			} else {
 				this.info("lAchAuthLog = " + lAchAuthLog);
-				int listSize = lAchAuthLog.size();
-				int i = 1;
 				for (AchAuthLog t : lAchAuthLog) {
 
 					deleteFg = false;
@@ -130,21 +143,32 @@ public class L2R53 extends TradeBuffer {
 						if ("D".equals(t.getCreateFlag())) {
 							deleteFg = false;
 						}
+						if (t.getDeleteDate() > 0) {
+							deleteFg = false;
+						}
 					}
 					if (deleteFg) {
+						lAchAuthLog2.add(t);
+					}
+				}
+				if (lAchAuthLog2 == null || lAchAuthLog2.size() == 0) {
+					this.info("lAchAuthLog2 =  null");
+				} else {
+					int listSize = lAchAuthLog2.size();
+					int i = 1;
+					for (AchAuthLog t : lAchAuthLog2) {
 						String wkRepayAcct = t.getRepayAcct();
 						Help = Help + FormatUtil.pad9(wkRepayAcct, 14) + ":" + "";
 						if (i < listSize) {
 							Help = Help + ";";
 							this.info("Help = " + Help);
 						}
-
+						if (i == listSize) {
+							Help = Help + "" + ":" + "";
+							this.info("Help = " + Help);
+						}
+						i++;
 					}
-					if (i == listSize) {
-						Help = Help + "" + ":" + "";
-						this.info("Help = " + Help);
-					}
-					i++;
 				}
 
 			}

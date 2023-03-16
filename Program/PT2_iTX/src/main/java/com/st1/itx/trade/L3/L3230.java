@@ -425,6 +425,7 @@ public class L3230 extends TradeBuffer {
 					acDetail.setSumNo("06".equals(iTempItemCode) ? "092" : "090"); // 暫收轉帳 / 暫收抵繳
 					acDetail.setRvNo(ba.getRvNo());
 					acDetail.setAcctCode(ba.getAcctCode());
+					wkAcctCode = ba.getAcctCode();
 					acDetail.setCurrencyCode(iCurrencyCode);
 					acDetail.setCustNo(iCustNo);
 					acDetail.setFacmNo(ba.getFacmNo());
@@ -519,7 +520,7 @@ public class L3230 extends TradeBuffer {
 			acDetail.setCustNo(iRpCustNo);
 			acDetail.setSumNo("094");
 			acDetail.setTxAmt(iRpAmt);
-			//由債協專戶入一般債權TAV ?? 2023/3/8修改,待確認 ,是做92還是94?
+			//由債協專戶入一般債權TAV 
 			if (iCustNo == this.txBuffer.getSystemParas().getNegDeptCustNo()
 					&& iRpCustNo != this.txBuffer.getSystemParas().getLoanDeptCustNo()) {
 				if (acNegCom.getAcctCode(iRpCustNo, titaVo).equals("TAV")) {

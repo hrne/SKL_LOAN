@@ -758,6 +758,9 @@ public class BankAuthActCom extends TradeBuffer {
 				acctSeq = getNewAcctSeq(titaVo); // 新帳號碼
 			} else {
 				if ("1".equals(tPostAuthLog.getAuthApplCode()) && "00".equals(tPostAuthLog.getAuthErrorCode())) {
+					if (tPostAuthLog.getDeleteDate() > 0) {
+						throw new LogicException("E0015", "此扣款帳號已暫停授權"); // 檢查錯誤
+					}
 					status = "0";
 					acctSeq = tPostAuthLog.getRepayAcctSeq();
 				} else if ("1".equals(tPostAuthLog.getAuthApplCode())
@@ -776,6 +779,9 @@ public class BankAuthActCom extends TradeBuffer {
 				this.isNewLog = true;
 			} else {
 				if ("A".equals(tAchAuthLog.getCreateFlag()) && "0".equals(tAchAuthLog.getAuthStatus())) {
+					if (tAchAuthLog.getDeleteDate() > 0) {
+						throw new LogicException("E0015", "此扣款帳號已暫停授權"); // 檢查錯誤
+					}
 					status = "0";
 				} else if ("A".equals(tAchAuthLog.getCreateFlag()) && "".equals(tAchAuthLog.getAuthStatus().trim())) {
 					if ("L4410".equals(iTitaTxCd)) {
@@ -807,7 +813,10 @@ public class BankAuthActCom extends TradeBuffer {
 		default:
 			throw new LogicException("E0015", "此扣款帳號狀態碼錯誤");
 		}
-
+		// 經辦登錄不更新僅檢查
+		if (titaVo.getActFgI() == 1) {
+			return;
+		}
 		addRepayActChangeLog(status, titaVo);// 新增還款帳號變更(含還款方式)紀錄檔
 		if ("700".equals(iRepayBank)) {
 			if (this.isNewAct) {

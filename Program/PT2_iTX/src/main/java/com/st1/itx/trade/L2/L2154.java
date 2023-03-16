@@ -183,7 +183,10 @@ public class L2154 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0010", "刪除後不可訂正"); // 功能選擇錯誤
 			}
 			ReleaseRoutine();
+
 		}
+		// 銀扣授權帳號檔
+		bankAuthActRoutine();
 
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -415,8 +418,6 @@ public class L2154 extends TradeBuffer {
 				}
 			}
 		}
-		// 銀扣授權帳號檔
-		bankAuthActRoutine();
 	}
 
 	// 刪除更新案件申請檔
@@ -882,29 +883,30 @@ public class L2154 extends TradeBuffer {
 
 			return;
 		}
-
-		// 舊還款帳號(含還款方式)刪除
-		if ("02".equals(titaVo.getParam("OldRepayCode"))) {
-			txtitaVo = new TitaVo();
-			txtitaVo = (TitaVo) titaVo.clone();
-			txtitaVo.putParam("RepayCode", titaVo.getParam("OldRepayCode"));
-			txtitaVo.putParam("PostCode", titaVo.getParam("OldPostCode"));
-			txtitaVo.putParam("RepayAcctNo", titaVo.getParam("OldAcctNo"));
-			txtitaVo.putParam("RelationCode", titaVo.getParam("OldRelationCode"));
-			txtitaVo.putParam("RelationName", titaVo.getParam("OldRelationName"));
-			txtitaVo.putParam("RelationBirthday", titaVo.getParam("OldRelationBirthday"));
-			txtitaVo.putParam("RelationGender", titaVo.getParam("OldRelationGender"));
-			txtitaVo.putParam("RelationId", titaVo.getParam("OldRelationId"));
-			txtitaVo.putParam("RepayBank", titaVo.getParam("OldRepayBank"));
-			bankAuthActCom.del("A", txtitaVo);
-
+		if (titaVo.isActfgSuprele()) {
+			// 舊還款帳號(含還款方式)刪除
+			if ("02".equals(titaVo.getParam("OldRepayCode"))) {
+				txtitaVo = new TitaVo();
+				txtitaVo = (TitaVo) titaVo.clone();
+				txtitaVo.putParam("RepayCode", titaVo.getParam("OldRepayCode"));
+				txtitaVo.putParam("PostCode", titaVo.getParam("OldPostCode"));
+				txtitaVo.putParam("RepayAcctNo", titaVo.getParam("OldAcctNo"));
+				txtitaVo.putParam("RelationCode", titaVo.getParam("OldRelationCode"));
+				txtitaVo.putParam("RelationName", titaVo.getParam("OldRelationName"));
+				txtitaVo.putParam("RelationBirthday", titaVo.getParam("OldRelationBirthday"));
+				txtitaVo.putParam("RelationGender", titaVo.getParam("OldRelationGender"));
+				txtitaVo.putParam("RelationId", titaVo.getParam("OldRelationId"));
+				txtitaVo.putParam("RepayBank", titaVo.getParam("OldRepayBank"));
+				bankAuthActCom.del("A", txtitaVo);
+			}
+			// 新還款帳號(含還款方式)刪除
+			if (!"02".equals(titaVo.getParam("RepayCode"))) {
+				bankAuthActCom.addRepayActChangeLog(titaVo);
+			}
 		}
-		// 新還款帳號(含還款方式)刪除
-		if ("02".equals(titaVo.getParam("RepayCode"))) {
-			bankAuthActCom.add("A", titaVo);
-		} else {
-			bankAuthActCom.addRepayActChangeLog(titaVo);
-		}
+		//新還款帳號(含還款方式)
+		bankAuthActCom.add("A", titaVo);
+
 	}
 
 	// 更新階梯式利率
