@@ -44,7 +44,7 @@ public class LM022Report extends MakeReport {
 	}
 
 	public void printHeaderL() {
-		this.print(-3, 120, "機密等級："+this.getSecurity());
+		this.print(-3, 120, "機密等級："+makeExcel.getSecurity());
 		this.print(-5, 3, showDate(titaVo.get("ENTDY").toString(), 1));
 		this.print(-6, 7, "戶號　額度　撥款　公司名稱　　放款餘額　　　繳息迄日　　利率＝＝＞　利率");
 

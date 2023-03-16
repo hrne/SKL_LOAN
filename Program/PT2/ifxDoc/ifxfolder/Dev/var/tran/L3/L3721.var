@@ -99,9 +99,9 @@ C(3,#FKEY,2,T(H,@ACTFGX,#ACTFG,#ActFgHelp),$)
 ["#FdBaseRateCode2+指標利率代碼",#BaseRateCode2,#BaseRateCode2X], 
 ["#FdBaseRate2+指標利率",#BaseRate2X],
 [#<->#,"變動合約加減碼",#ChangFg,#ChangFgX],
+["#FdRateIncr2+利率加減碼",#RateIncr2,"@%"], 
 ["#FdFitRate2+適用利率",#FitRate2,"@%"],
 ! ["#FdProdRate2+商品利率",#ProdRate2X],
-["#FdRateIncr2+利率加減碼",#RateIncr2,"@%"], 
 ! ["#FdIndividualIncr2+個別加碼利率",#IndividualIncr2X],
 [#<->#,"#FdRemark+備註",#Remark],
 [#<->#,"#FdNextRateAdjDate2+下次利率調整日",#NextRateAdjDate2],
@@ -815,6 +815,18 @@ V(H,#YNHelp)
 T(3,)
 T(H,#ChangFg,#YNHelp)
 
+
+![加碼利率]
+!當加減碼別=1時必須輸入否則不必輸入
+#FdRateIncr2=X,2,L
+
+#RateIncr2=n,2.4,I
+C(5,#DeleteFg,Y,s,$)
+C(4,#ChangFg,IF(#BaseRateCode2==99,C(3,#RateCode2,2,S,$),$),$)
+#wkFitRate2=X,1,S
+C(5,#DeleteFg,Y,s,$)
+C(5,#ChangFg,Y,$,C(3,#FitRate2,0,E(0,@FitRate2,#RateIncr2+#BaseRate2),$))
+
 ![適用利率]
 !自動顯示不必輸入
 #FdFitRate2=X,2,L
@@ -826,22 +838,12 @@ C(4,#ChangFg,IF(#BaseRateCode2<99,C(3,#RateCode2,2,$,S),$),$)
 ! C(5,#effFg,Y,IF(#BaseRateCode2<99,C(3,#RateCode2,2,$,S),$),$)
 #wkRateIncr2=X,1,S
 C(5,#DeleteFg,Y,s,$)
-C(5,#ChangFg,Y,$,E(0,@RateIncr2,#FitRate2-#BaseRate2))
+C(5,#ChangFg,Y,$,C(3,#RateIncr2,0,E(0,@RateIncr2,#FitRate2-#BaseRate2),$))
 
-![加碼利率]
-!當加減碼別=1時必須輸入否則不必輸入
-#FdRateIncr2=X,2,L
-
-#RateIncr2=n,2.4,I
-C(5,#DeleteFg,Y,s,$)
-C(4,#ChangFg,IF(#BaseRateCode2==99,C(3,#RateCode2,2,S,$),$),$)
 
 ! C(5,#IncrFlag2,Y,$,S)
 ! C(5,#effFg,Y,IF(#BaseRateCode2<99,C(3,#RateCode2,2,S,$),S),S)
 ! E(0,#FitRate2-#BaseRate2)
-#wkFitRate2=X,1,S
-C(5,#DeleteFg,Y,s,$)
-C(5,#ChangFg,Y,$,E(0,@FitRate2,#RateIncr2+#BaseRate2))
 
 
 ! #WkRate24=X,7,S

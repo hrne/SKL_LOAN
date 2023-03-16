@@ -12,14 +12,21 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdBranchGroup;
+import com.st1.itx.db.domain.CdReport;
+import com.st1.itx.db.service.CdBranchGroupService;
+import com.st1.itx.db.service.CdBranchService;
+import com.st1.itx.db.service.CdReportService;
 import com.st1.itx.db.service.springjpa.cm.L9739ServiceImpl;
 import com.st1.itx.db.service.springjpa.cm.L9741ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.SortMapListCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
@@ -40,6 +47,13 @@ public class L9R99 extends TradeBuffer {
 	@Autowired
 	L9741ServiceImpl l9741ServiceImpl;
 
+	/* DB服務注入 */
+	@Autowired
+	private CdReportService sCdReportService;
+
+	@Autowired
+	private CdBranchGroupService sCdBranchGroupService;
+
 	@Autowired
 	DateUtil dDateUtil;
 
@@ -48,6 +62,8 @@ public class L9R99 extends TradeBuffer {
 
 	@Autowired
 	private Parse parse;
+
+	private int no = 0;
 
 	String txcd = "L9R99";
 
@@ -73,6 +89,16 @@ public class L9R99 extends TradeBuffer {
 
 		case "L9741":
 			l9741DataProcessing(titaVo);
+			break;
+
+		case "L9801":
+		case "L9802":
+		case "L9803":
+		case "L9804":
+		case "L9805":
+		case "L9806":
+			l98XXDataProcessing(titaVo, tranCode);
+
 			break;
 
 		default:
@@ -237,4 +263,119 @@ public class L9R99 extends TradeBuffer {
 		}
 
 	}
+
+	private void l98XXDataProcessing(TitaVo titaVo, String tranCode) throws LogicException {
+
+		Slice<CdBranchGroup> sCdBranchGroup;
+		sCdBranchGroup = sCdBranchGroupService.findByBranchNo("0000", this.index, Integer.MAX_VALUE, titaVo);
+		List<CdBranchGroup> lCdBranchGroup = sCdBranchGroup == null ? null : sCdBranchGroup.getContent();
+
+		// 查無資料
+		if (lCdBranchGroup == null || lCdBranchGroup.size() == 0) {
+			throw new LogicException(titaVo, "E0001", "報表代號對照檔");
+		}
+
+		for (int i = 1; i <= lCdBranchGroup.size(); i++) {
+			this.totaVo.putParam("OOGroupNo" + i, i);
+		}
+		this.totaVo.putParam("OOGroupNoAllSize", lCdBranchGroup.size());
+		
+		String ld = "LD%";
+		String lh = "LH%";
+		String lm = "LM%";
+		String lp = "LP%";
+		String lq = "LQ%";
+		String lw = "LW%";
+		String ly = "LY%";
+		/*
+		 * 放款管理課：1 放款服務課：2 放款推展課：3 放款審查課：4 投資資訊規劃課：5 專案管理課：6 軟體測試課：7
+		 */
+		String g1 = "1";
+		String g2 = "2";
+		String g3 = "3";
+
+		if ("L9801".equals(tranCode)) {
+
+		}
+		if ("L9802".equals(tranCode)) {
+
+		}
+		if ("L9803".equals(tranCode)) {
+			// 1 放款管理課
+			findReport(titaVo, g1, lm);
+			fullColumn(this.no);
+
+			// 2放款服務課
+			findReport(titaVo, g2, lm);
+			fullColumn(this.no);
+
+			// 3放款審查課
+
+			findReport(titaVo, g3, lm);
+			findReport(titaVo, g3, lp);
+
+			fullColumn(this.no);
+
+		}
+		if ("L9804".equals(tranCode)) {
+
+		}
+		if ("L9805".equals(tranCode)) {
+
+		}
+		if ("L9806".equals(tranCode)) {
+
+		}
+
+		this.totaVo.putParam("OOTotalRptSize", this.no);
+
+	}
+
+	/**
+	 * 每課組別的報表目前上限設定為50份
+	 */
+	private void fullColumn(int nowNo) {
+
+		int maxNo = 50;
+		if (nowNo > maxNo) {
+			nowNo = nowNo % maxNo;
+		} else if (nowNo == maxNo) {
+			return;
+		}
+		for (int i = nowNo + 1; i <= maxNo; i++) {
+			this.no++;
+			this.totaVo.putParam("OOTradeCode" + this.no, " ");
+			this.totaVo.putParam("OOTradeName" + this.no, " ");
+			this.totaVo.putParam("OOTradeSub" + this.no, 0);
+			this.totaVo.putParam("OOGroupNo" + this.no, 0);
+		}
+
+	}
+
+	private void findReport(TitaVo titaVo, String groupNo, String rptCodeLike) throws LogicException {
+		int sTradeSub = 0;
+		Slice<CdReport> slCdReport;
+		// 1 放款服務課
+		slCdReport = sCdReportService.findRptGroupNo(groupNo, rptCodeLike, this.index, Integer.MAX_VALUE, titaVo);
+		List<CdReport> lCdReport = slCdReport == null ? null : slCdReport.getContent();
+
+		// 查無資料
+		if (lCdReport == null || lCdReport.size() == 0) {
+			throw new LogicException(titaVo, "E0001", "報表代號對照檔");
+		}
+
+		// 如有找到資料
+		for (CdReport tCdReport : lCdReport) {
+
+			this.no++;
+
+			this.totaVo.putParam("OOTradeCode" + this.no, tCdReport.getFormNo());
+			this.totaVo.putParam("OOTradeName" + this.no, tCdReport.getFormName());
+			sTradeSub = tCdReport.getFormNo().length() > 5 ? Integer.valueOf(tCdReport.getFormNo().substring(6, 7)) : 0;
+			this.totaVo.putParam("OOTradeSub" + this.no, sTradeSub);
+			this.totaVo.putParam("OOGroupNo" + this.no, tCdReport.getGroupNo());
+
+		}
+	}
+
 }

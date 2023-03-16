@@ -79,7 +79,7 @@ public class LM008Report extends MakeReport {
 		headerStyleVo.setBold(true);
 
 		// 第1列
-		makeExcel.setValue(row, 9, "機密等級："+this.getSecurity(), "L", headerStyleVo);// col:8
+		makeExcel.setValue(row, 9, "機密等級：" + makeExcel.getSecurity(), "L", headerStyleVo);// col:8
 		row++;
 
 		// 第2列
@@ -93,7 +93,8 @@ public class LM008Report extends MakeReport {
 		makeExcel.setValue(row, 1, "報　表：", "L", headerStyleVo);
 		makeExcel.setValue(row, 2, makeExcel.getFileCode(), "L", headerStyleVo);
 		makeExcel.setValue(row, 3, "應收利息明細表", "C", headerStyleVo);
-		makeExcel.setValue(row, 9, "時　間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "L",
+		makeExcel.setValue(row, 9, "時　間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
+				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "L",
 				headerStyleVo);// col:8
 		row++;
 
@@ -131,7 +132,7 @@ public class LM008Report extends MakeReport {
 		String brno = titaVo.getBrno();
 		String txcd = "LM008";
 		String fileItem = "應收利息明細表";
-		String fileName = "LM008-應收利息明細表" ;
+		String fileName = "LM008-應收利息明細表";
 
 		this.info("reportVo open");
 
@@ -140,7 +141,7 @@ public class LM008Report extends MakeReport {
 
 		// 開啟報表
 		makeExcel.open(titaVo, reportVo, fileName);
-		
+
 //		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM008", "應收利息明細表", "LM008-應收利息明細表");
 
 		List<Map<String, String>> acctCodeGroupList = null;
@@ -220,7 +221,7 @@ public class LM008Report extends MakeReport {
 		printTotal();
 
 		makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
 
 	private void resetSubtotal() {

@@ -848,7 +848,8 @@ E(0,#TimReduceAmt-#ReduceLimit)
 
 !0007 減免金額超過限額，需主管核可
 #RqspFlag=X,1,S
-C(1,#WKMAMT,T(3,N),T(3,N),T(3,Y))
+! C(1,#WKMAMT,T(3,N),T(3,N),T(3,Y))
+C(1,#TimReduceAmt,T(3,N),T(3,N),T(3,Y))
 
 ![提前清償原因]
 !轉列呆帳時,固定為9:其他
@@ -1121,7 +1122,8 @@ C(3,#CaseCloseCode,6,E(0,@RPFG,2),$)
 #TMPRPTYP=X,1,S
 ! IF(#CaseCloseCode==1 || #CaseCloseCode==2,E(0,@RPTYPZ,91),E(0,@RPTYPZ,#L492aRepayCode))
 C(3,#L492aRepayCode,0,E(0,@RPTYPZ,90),E(0,@RPTYPZ,#L492aRepayCode))
-IF(#CaseCloseCode==1 || #CaseCloseCode==2,E(0,@RPTYPZ,91),$)
+IF(#CaseCloseCode==1,E(0,@RPTYPZ,95),$)
+IF(#CaseCloseCode==2,E(0,@RPTYPZ,91),$)
 
 !Principal,本金
 !Interest,利息

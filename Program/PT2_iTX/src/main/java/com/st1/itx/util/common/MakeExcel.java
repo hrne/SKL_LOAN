@@ -33,7 +33,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdCodeId;
+import com.st1.itx.db.domain.CdReport;
 import com.st1.itx.db.domain.TxFile;
+import com.st1.itx.db.service.CdCodeService;
+import com.st1.itx.db.service.CdReportService;
 import com.st1.itx.db.service.TxFileService;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.CommBuffer;
@@ -49,6 +54,7 @@ import com.st1.itx.util.report.ReportUtil;
  * @author eric chang
  *
  */
+
 @Component("makeExcel")
 @Scope("prototype")
 public class MakeExcel extends CommBuffer {
@@ -66,6 +72,12 @@ public class MakeExcel extends CommBuffer {
 
 	@Autowired
 	private ExcelGenerator excelGenerator;
+
+	@Autowired
+	private CdReportService cdReportService;
+
+	@Autowired
+	private CdCodeService cdCodeService;
 
 	private Workbook openedWorkbook = null;
 
@@ -1335,5 +1347,49 @@ public class MakeExcel extends CommBuffer {
 		map.put("t", "C");
 		map.put("pw", pw);
 		listMap.add(map);
+	}
+
+	/**
+	 * 取得此報表的機密等級
+	 * 
+	 * @return SecurityItem 機密等級中文
+	 *
+	 */
+	public String getSecurity() {
+		String securityItem = "機密";
+		String txCode = "";
+
+		try {
+			txCode = titaVo.getTxCode();
+
+			if (txCode.contains("L98")){
+
+				txCode = reportVo.getRptCode();
+			}
+
+			this.info("2getSecurity.getItem = " + txCode);
+			
+			CdReport tCdReport = cdReportService.findById(txCode);
+			CdCodeId tCdCodeId = new CdCodeId();
+			tCdCodeId.setDefCode("Confidentiality");
+
+			String tConfidentiality = "2";
+			if (tCdReport != null) {
+				tConfidentiality = tCdReport.getConfidentiality();
+			}
+
+			tCdCodeId.setCode(tConfidentiality);
+			CdCode tCdCode = cdCodeService.findById(tCdCodeId, titaVo);
+
+			securityItem = tCdCode.getItem();
+
+		} catch (Exception e) {
+
+			this.error("makeReport.getSecurity error = " + e.getMessage());
+		}
+
+		this.info("getSecurity.getItem = " + securityItem);
+
+		return securityItem;
 	}
 }

@@ -135,7 +135,7 @@ public class AcReceivableCom extends TradeBuffer {
 					wkRvFg = 0;
 				else
 					wkRvFg = 1;
-				if (ac.getAcctCode().equals("TRO")) {
+				if (ac.getAcctCode().equals("TRO")||ac.getAcctCode().equals("TRE")) {
 					if (wkRvFg == 0)
 						wkRvFg = 1;
 					else

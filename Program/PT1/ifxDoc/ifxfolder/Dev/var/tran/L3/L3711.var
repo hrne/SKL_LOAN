@@ -567,7 +567,8 @@ E(0,#TimReduceAmt-#ReduceLimit)
 
 ! !0007 減免金額超過限額，需主管核可
 #RqspFlag=X,1,S
-C(1,#WkReduceAmt,T(3,N),T(3,N),T(3,Y))
+! C(1,#WkReduceAmt,T(3,N),T(3,N),T(3,Y))
+C(1,#TimReduceAmt,T(3,N),T(3,N),T(3,Y))
 
 #MRKEY=_,_,S
 C(3,#FacmNo,0,T(2,#TimCustNo),T(2,#TimCustNo+-+#FacmNo))

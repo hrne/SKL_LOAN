@@ -74,7 +74,7 @@ public class LM061Report extends MakeReport {
 
 		makeExcel.setSheet("1080430", iENTDY.substring(1, 8));
 
-		makeExcel.setValue(1, 23, "機密等級："+this.getSecurity()+"\n單位：元\n" + iYear + "." + iMonth + "." + iDay + "止");
+		makeExcel.setValue(1, 23, "機密等級："+makeExcel.getSecurity()+"\n單位：元\n" + iYear + "." + iMonth + "." + iDay + "止");
 
 		try {
 			fnAllList = lM061ServiceImpl.findAll(titaVo,yearMonth,yearMonthEnd);

@@ -279,20 +279,14 @@ public class AcRepayCom extends TradeBuffer {
 			// 暫收款登錄溢收
 			if ("L3210".equals(titaVo.getTxcd())) {
 				updBorTxAcDetail(tx, this.lAcDetail, titaVo); // 更新放款明細檔及帳務明細檔關聯欄
-				int iTempReasonCode = this.parse.stringToInteger(titaVo.getParam("TempReasonCode"));
-				// 0: 債協暫收款 10: AML凍結／未確定
-				if (iTempReasonCode == 0 || iTempReasonCode == 10) {
-					tx.setOverflow(tx.getTxAmt());
-				} else {
-					tx.setTxAmt(this.wkTxAmtRemaind);
-					tx.setTempAmt(this.wkTempAmtRemaind);
-					// 貸方：溢收款
-					overflow = settleOverflow(tx, this.lAcDetail, titaVo);
-					tx.setOverflow(overflow);
-					this.wkTxAmtRemaind = BigDecimal.ZERO;
-					this.wkTempAmtRemaind = BigDecimal.ZERO;
-					overFacmNo = this.lAcDetail.get(this.lAcDetail.size() - 1).getFacmNo();
-				}
+				tx.setTxAmt(this.wkTxAmtRemaind);
+				tx.setTempAmt(this.wkTempAmtRemaind);
+				// 貸方：溢收款
+				overflow = settleOverflow(tx, this.lAcDetail, titaVo);
+				tx.setOverflow(overflow);
+				this.wkTxAmtRemaind = BigDecimal.ZERO;
+				this.wkTempAmtRemaind = BigDecimal.ZERO;
+				overFacmNo = this.lAcDetail.get(this.lAcDetail.size() - 1).getFacmNo();
 			}
 			this.lLoanBorTx.add(tx);
 		}
@@ -548,7 +542,12 @@ public class AcRepayCom extends TradeBuffer {
 			break;
 		case "094": // 已由L3230程式處理
 			break;
-		case "095": // 已由L3230程式處理
+		case "095":
+			acDetail.setAcctCode("TRE");
+			// 1:應收 L3410 結案 D 500,000 FacmNo002 原額度002
+			// 2:應付 L3100 撥貸 C 500,000 FacmNo002 新額度004，原額度002
+			acDetail.setRvNo("FacmNo" + titaVo.getMrKey().substring(8, 11));
+			acDetail.setFacmNo(parse.stringToInteger(titaVo.getMrKey().substring(8, 11)));
 			break;
 		case "101": // 101.匯款轉帳
 			acDetail.setAcctCode("P03");

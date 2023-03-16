@@ -406,7 +406,7 @@ T(3,)T(H,#OORateCode,#RateCodeHelp)
 
 #OOBaseRateCode=X,2,O
 #OOBaseRateCodeItem=X,40,S
-T(H,#OOBaseRateCode,#BaseRateHelp)
+T(3,)T(H,#OOBaseRateCode,#BaseRateHelp)
 #OOBaseRateCodeX=x,45,O
 T(2,#OOBaseRateCode+-+#OOBaseRateCodeItem)
 

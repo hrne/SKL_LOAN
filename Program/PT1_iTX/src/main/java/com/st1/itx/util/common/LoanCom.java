@@ -1201,7 +1201,9 @@ public class LoanCom extends TradeBuffer {
 		this.info("   OrgKin       = " + titaVo.getOrgKin());
 		this.info("   OrgTlr       = " + titaVo.getOrgTlr());
 		this.info("   OrgTno       = " + titaVo.getOrgTno());
-
+		this.info(ln.getLastEntDy() + " " + titaVo.getOrgEntdyI() + "|" + ln.getLastKinbr() + " " + titaVo.getOrgKin()
+				+ "|" + ln.getLastTlrNo() + " " + titaVo.getOrgTlr() + "|" + ln.getLastTxtNo() + " "
+				+ titaVo.getOrgTno());
 		if (ln.getLastEntDy() != titaVo.getOrgEntdyI() || !ln.getLastKinbr().equals(titaVo.getOrgKin())
 				|| !ln.getLastTlrNo().equals(titaVo.getOrgTlr()) || !ln.getLastTxtNo().equals(titaVo.getOrgTno())) {
 			TxRecord tTxRecord = txRecordService.findById(new TxRecordId(ln.getLastEntDy() + 19110000,
@@ -1211,8 +1213,8 @@ public class LoanCom extends TradeBuffer {
 				s = ", " + tTxRecord.getTranNo() + (tTxRecord.getFlowStep() == 2 ? "主管放行" : "");
 			}
 			// L3100訂正改為一段式(經辦直接訂正)
+			this.info("titaVo.getTxcd() = " + titaVo.getTxcd());
 			if ("L3100".equals(titaVo.getTxcd())) {
-				this.totaVo.setWarnMsg("主管放行，執行訂正");
 			} else {
 				throw new LogicException(titaVo, "E3088", "最近一筆交易序號 = " + ln.getLastEntDy() + "-" + ln.getLastKinbr()
 						+ "-" + ln.getLastTlrNo() + "-" + ln.getLastTxtNo() + s); // 放款交易訂正須由最後一筆交易開始訂正

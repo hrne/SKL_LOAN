@@ -1736,6 +1736,7 @@ public class MakeReport extends CommBuffer {
 		return str;
 	}
 
+
 	/**
 	 * 取得此報表的機密等級
 	 * 
@@ -1743,22 +1744,41 @@ public class MakeReport extends CommBuffer {
 	 *
 	 */
 	public String getSecurity() {
+		String securityItem = "機密";
+		String txCode = "";
 
-		this.info("getSecurity.RptCode = " + reportVo.getRptCode());
-		CdReport tCdReport = cdReportService.findById(reportVo.getRptCode());
-		CdCodeId tCdCodeId = new CdCodeId();
-		tCdCodeId.setDefCode("Confidentiality");
+		try {
+			txCode = titaVo.getTxCode();
+
+
+			if (txCode.contains("L98")) {
 		
-		String tConfidentiality = "0";
-		if (tCdReport != null) {
-			tConfidentiality = tCdReport.getConfidentiality();
+				txCode = reportVo.getRptCode();
+			}
+			this.info("getSecurity.getItem = " + txCode);
+
+			CdReport tCdReport = cdReportService.findById(txCode);
+			CdCodeId tCdCodeId = new CdCodeId();
+			tCdCodeId.setDefCode("Confidentiality");
+
+			String tConfidentiality = "2";
+			if (tCdReport != null) {
+				tConfidentiality = tCdReport.getConfidentiality();
+			}
+
+			tCdCodeId.setCode(tConfidentiality);
+			CdCode tCdCode = cdCodeService.findById(tCdCodeId, titaVo);
+
+			securityItem = tCdCode.getItem();
+
+		} catch (Exception e) {
+
+			this.error("makeReport.getSecurity error = " + e.getMessage());
 		}
 
-		tCdCodeId.setCode(tConfidentiality);
-		CdCode tCdCode = cdCodeService.findById(tCdCodeId, titaVo);
+		this.info("getSecurity.getItem = " + securityItem);
 
-		this.info("getSecurity.getItem = " + tCdCode.getItem());
-		return tCdCode.getItem();
+		return securityItem;
 	}
 
 }

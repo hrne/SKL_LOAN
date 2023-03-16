@@ -598,7 +598,8 @@ E(0,#TimReduceAmt-#ReduceLimit)
 
 !0007 減免金額超過限額，需主管核可
 #RqspFlag=X,1,S
-C(1,#WKMAMT,T(3,N),T(3,N),T(3,Y))
+! C(1,#WKMAMT,T(3,N),T(3,N),T(3,Y))
+C(1,#TimReduceAmt,T(3,N),T(3,N),T(3,Y))
 
 !---------------------------------------------------------
 !應收付類別,1:還款

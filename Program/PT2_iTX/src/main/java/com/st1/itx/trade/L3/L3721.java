@@ -164,7 +164,7 @@ public class L3721 extends TradeBuffer {
 		}
 		// 指標利率
 		else {
-			//變動合約加減碼 Y/N
+			// 變動合約加減碼 Y/N
 			if ("Y".equals(iChangFg)) {
 				// 利率按合約
 				if ("Y".equals(iIncrFlag)) {
@@ -183,8 +183,8 @@ public class L3721 extends TradeBuffer {
 					iRateIncr = this.parse.stringToBigDecimal(titaVo.getParam("RateIncr2"));
 					iFitRate = this.parse.stringToBigDecimal(titaVo.getParam("FitRate2"));
 				} else {
-					iRateIncr = this.parse.stringToBigDecimal(titaVo.getParam("RateIncr1"));
 					iIndividualIncr = this.parse.stringToBigDecimal(titaVo.getParam("RateIncr2"));
+					iRateIncr = this.parse.stringToBigDecimal(titaVo.getParam("RateIncr1"));
 					iFitRate = this.parse.stringToBigDecimal(titaVo.getParam("FitRate2"));
 				}
 			}

@@ -2081,7 +2081,10 @@ IF(#RenewFlag=="1"||#RenewFlag=="2",E(0,@RPFG,6),E(0,@RPFG,4))
 
 !撥款方式 1.核心匯款，2.整批匯款，3.單筆匯款
 #TMPRPTYP=X,1,S
-IF(#RenewFlag=="1"||#RenewFlag=="2",E(0,@RPTYPZ,91),E(0,@RPTYPZ,#DrawdownCode))
+E(0,@RPTYPZ,#DrawdownCode)
+C(3,#RenewFlag,1,E(0,@RPTYPZ,95),$)
+C(3,#RenewFlag,2,E(0,@RPTYPZ,91),$)
+! IF(#RenewFlag=="1"||#RenewFlag=="2",E(0,@RPTYPZ,91),E(0,@RPTYPZ,#DrawdownCode))
 ! C(5,#RenewFlag,Y,E(0,@RPTYPZ,91),E(0,@RPTYPZ,#DrawdownCode))
 
 !應收付總金額,撥款金額

@@ -76,7 +76,8 @@ public class AcLoanRenewCom extends TradeBuffer {
 		int mainFacmNo = 0;
 		BigDecimal mainAmt = BigDecimal.ZERO;
 		for (AcDetail ac : this.txBuffer.getAcDetailList()) {
-			if (ac.getAcctCode().equals("TRO") && ac.getDbCr().equals("C")) { // 借新還舊 撥款
+			if ((ac.getAcctCode().equals("TRO") || ac.getAcctCode().equals("TRE")) && ac.getDbCr().equals("C")) { // 借新還舊
+																													// 撥款
 				if (ac.getTxAmt().compareTo(mainAmt) > 0) {
 					mainAmt = ac.getTxAmt();
 					mainFacmNo = ac.getFacmNo();
@@ -85,10 +86,11 @@ public class AcLoanRenewCom extends TradeBuffer {
 		}
 
 		for (AcDetail ac : this.txBuffer.getAcDetailList()) {
-			if (ac.getAcctCode().equals("TRO") && ac.getDbCr().equals("C")) { // 借新還舊 撥款
+			if ((ac.getAcctCode().equals("TRO") || ac.getAcctCode().equals("TRE")) && ac.getDbCr().equals("C")) { // 借新還舊
+																													// 撥款
 				iNewFacmNo = parse.stringToInteger(titaVo.getMrKey().substring(8, 11)); // 0123456-890-234
 				iNewBormNo = parse.stringToInteger(titaVo.getMrKey().substring(12, 15));
-				if (this.txBuffer.getTxCom().getBookAcHcode() == 0) // 帳務訂正記號 帳務訂正記號  AcHCode   0.正常     1.訂正     2.3.沖正   
+				if (this.txBuffer.getTxCom().getBookAcHcode() == 0) // 帳務訂正記號 帳務訂正記號 AcHCode 0.正常 1.訂正 2.3.沖正
 					procInsert(ac, mainFacmNo, titaVo);
 				else
 					procDelete(ac, titaVo);
@@ -118,14 +120,16 @@ public class AcLoanRenewCom extends TradeBuffer {
 			}
 		}
 		tNegNo = tNegNo + 1;
-		
+
 		// ClsFlag = 1,AND CustNo = ,AND AcctFlag = 1,AND FacmNo >= ,AND FacmNo <=
 		// 找戶號、額度下已銷的資負明細科目(放款、催收)，且結案區分為展期或借新還舊
 		// 主要額度之借新還舊結案的第一筆撥款，主要記號=Y
-		Slice<AcReceivable> acRvList = acReceivableService.acrvFacmNoRange(1, ac.getCustNo(), 1, ac.getFacmNo(), ac.getFacmNo(), this.index, Integer.MAX_VALUE, titaVo);
+		Slice<AcReceivable> acRvList = acReceivableService.acrvFacmNoRange(1, ac.getCustNo(), 1, ac.getFacmNo(),
+				ac.getFacmNo(), this.index, Integer.MAX_VALUE, titaVo);
 		String mainFlag = "Y";
 		if (acRvList == null) {
-			throw new LogicException("E6003", "AcLoanRenewCom 銷帳檔不存在 CustNo=" + ac.getCustNo() + ", FacmNo=" + ac.getFacmNo());
+			throw new LogicException("E6003",
+					"AcLoanRenewCom 銷帳檔不存在 CustNo=" + ac.getCustNo() + ", FacmNo=" + ac.getFacmNo());
 		}
 		for (AcReceivable acRv : acRvList.getContent()) {
 			tTempVo = new TempVo();
@@ -144,7 +148,7 @@ public class AcLoanRenewCom extends TradeBuffer {
 				tAcLoanRenew = new AcLoanRenew();
 				tAcLoanRenew.setAcLoanRenewId(tAcLoanRenewId);
 				tAcLoanRenew.setRenewCode(tTempVo.get("RenewCode"));
-				if ("2".equals(tTempVo.get("RenewCode"))) {//協議件需寫協議編號
+				if ("2".equals(tTempVo.get("RenewCode"))) {// 協議件需寫協議編號
 					tTempVo = new TempVo();
 					tTempVo.putParam("NegNo", tNegNo);
 					tAcLoanRenew.setOtherFields(tTempVo.getJsonString());
@@ -170,7 +174,8 @@ public class AcLoanRenewCom extends TradeBuffer {
 
 	/* ----------- delete ----------- */
 	private void procDelete(AcDetail ac, TitaVo titaVo) throws LogicException {
-		Slice<AcLoanRenew> sacRenewList = acLoanRenewService.NewFacmNoNoRange(ac.getCustNo(), iNewFacmNo, iNewFacmNo, iNewBormNo, iNewBormNo, this.index, Integer.MAX_VALUE, titaVo);
+		Slice<AcLoanRenew> sacRenewList = acLoanRenewService.NewFacmNoNoRange(ac.getCustNo(), iNewFacmNo, iNewFacmNo,
+				iNewBormNo, iNewBormNo, this.index, Integer.MAX_VALUE, titaVo);
 		List<AcLoanRenew> acRenewList = sacRenewList == null ? null : sacRenewList.getContent();
 		if (acRenewList != null) {
 			try {

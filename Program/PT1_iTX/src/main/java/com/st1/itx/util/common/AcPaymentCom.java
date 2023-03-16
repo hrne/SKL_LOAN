@@ -165,6 +165,7 @@ public class AcPaymentCom extends TradeBuffer {
 // 0-共用
 //      091:借新還舊				TRO 暫收款－借新還舊
 //	    093:繳抽退票				TCK 暫收款－支票
+//      095:展期					TRE 暫收款－展期
 		if (titaVo.get("BATCHNO") != null && titaVo.get("BATCHNO").trim().length() == 6
 				&& "RESV00".equals(titaVo.get("BATCHNO"))) {
 			acDetail.setSumNo("099");
@@ -193,6 +194,14 @@ public class AcPaymentCom extends TradeBuffer {
 			acDetail.setAcctCode("TRO");
 // 1:應收     L3410  結案   D       500,000     FacmNo002    原額度002
 // 2:應付     L3100  撥貸   C       500,000     FacmNo002    新額度004，原額度002
+			acDetail.setRvNo("FacmNo" + titaVo.getParam("RpFacmNo" + i));
+			acDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("RpFacmNo" + i)));
+			acDetail.setSlipNote("新額度" + titaVo.getMrKey().substring(8, 11) + "，原額度" + titaVo.getParam("RpFacmNo" + i));
+			break;
+		case "095":
+			acDetail.setAcctCode("TRE");
+// 1:應收	L3410  結案   D       500,000     FacmNo002    原額度002
+// 2:應付	L3100  撥貸   C       500,000     FacmNo002    新額度004，原額度002
 			acDetail.setRvNo("FacmNo" + titaVo.getParam("RpFacmNo" + i));
 			acDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("RpFacmNo" + i)));
 			acDetail.setSlipNote("新額度" + titaVo.getMrKey().substring(8, 11) + "，原額度" + titaVo.getParam("RpFacmNo" + i));

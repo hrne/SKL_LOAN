@@ -58,7 +58,7 @@ public class LM047Report extends MakeReport {
 
 		int iEntdy = parse.stringToInteger(titaVo.get("ENTDY"));
 		makeExcel.setValue(1, 2, "         " + iEntdy / 10000 + "年 " + iEntdy / 100 % 100 + "月 分期協議案件明細表");
-		makeExcel.setValue(1, 23, "機密等級："+this.getSecurity()+"\n單位：元\n" + this.showRocDate(6) + "止");
+		makeExcel.setValue(1, 23, "機密等級："+makeExcel.getSecurity()+"\n單位：元\n" + this.showRocDate(6) + "止");
 
 		List<Map<String, String>> LM047List = null;
 

@@ -277,6 +277,7 @@ public class L3200 extends TradeBuffer {
 		loanSetRepayIntCom.setTxBuffer(this.txBuffer);
 		baTxCom.setTxBuffer(this.txBuffer);
 		acRepayCom.setTxBuffer(this.getTxBuffer());
+		acReceivableCom.setTxBuffer(this.txBuffer);
 
 		// 取得輸入資料
 		iCustNo = this.parse.stringToInteger(titaVo.getParam("TimCustNo"));
@@ -1159,11 +1160,13 @@ public class L3200 extends TradeBuffer {
 		BigDecimal wkTotalCloseBreach = BigDecimal.ZERO;
 
 		// 銷帳檔全銷(減免導致與入帳金額不一致，需自行銷帳)
+		
 		for (BaTxVo ba : this.baTxList) {
+			
 			if (ba.getCloseBreachAmt().compareTo(BigDecimal.ZERO) > 0 && (iFacmNo == 0 || iFacmNo == ba.getFacmNo())
 					&& (iBormNo == 0 || iBormNo == ba.getBormNo())) {
 				wkTotalCloseBreach = wkTotalCloseBreach.add(ba.getCloseBreachAmt());
-				wkFacmNo = ba.getCustNo();
+				wkCustNo = ba.getCustNo();
 				wkFacmNo = ba.getFacmNo();
 				wkBormNo = ba.getBormNo();
 				wkCloseBreachAmt = BigDecimal.ZERO;
@@ -1193,6 +1196,9 @@ public class L3200 extends TradeBuffer {
 				this.lLoanBorTx.add(addBreachBorTxRoutine(ba));
 
 				// 更新銷帳檔
+				if (wkCloseBreachAmt.compareTo(ba.getCloseBreachAmt()) != 0) {
+
+				}
 				tAcReceivable = new AcReceivable();
 				tAcReceivable.setReceivableFlag(ba.getReceivableFlag());
 				tAcReceivable.setAcctCode(ba.getAcctCode());
@@ -1226,6 +1232,7 @@ public class L3200 extends TradeBuffer {
 			wkCustNo = tx.getCustNo();
 			wkFacmNo = tx.getFacmNo();
 			wkBormNo = tx.getBormNo();
+			wkBorxNo = tx.getBorxNo();
 			wkCloseBreachAmt = tx.getCloseBreachAmt();
 			// 還原撥款主檔
 			if (wkBormNo > 0) {

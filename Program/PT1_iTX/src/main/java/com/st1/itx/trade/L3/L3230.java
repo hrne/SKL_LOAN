@@ -233,7 +233,7 @@ public class L3230 extends TradeBuffer {
 					iRpFacmNo = parse.stringToInteger(titaVo.getParam("RpFacmNo" + i));
 					iRpCode = parse.stringToInteger(titaVo.getParam("RpCode" + i));
 					iRpAmt = parse.stringToBigDecimal(titaVo.getParam("RpAmt" + i));
-					// 新贈分錄、放款交易明細
+					// 新增分錄、放款交易明細
 					settingUnPaid06();
 					this.txBuffer.setAcDetailList(lAcDetail);
 				}
@@ -288,19 +288,32 @@ public class L3230 extends TradeBuffer {
 		}
 		// 訂正放款交易內容檔by交易
 		if (titaVo.isHcodeErase()) {
-			loanCom.checkEraseCustNoTxSeqNo(iCustNo, titaVo);// 檢查到同戶帳務交易需由最近一筆交易開始訂正
-			loanCom.setFacmBorTxHcodeByTx(iCustNo, titaVo);
-			if ("06".equals(iTempItemCode)) {
-				for (int i = 1; i <= 50; i++) {
-					if (titaVo.get("RpCode" + i) == null || parse.stringToInteger(titaVo.getParam("RpCode" + i)) == 0)
-						break;
-					iRpCustNo = parse.stringToInteger(titaVo.getParam("RpCustNo" + i));
-					if (iRpCustNo != iCustNo) {
-						loanCom.checkEraseCustNoTxSeqNo(iRpCustNo, titaVo);// 檢查到同戶帳務交易需由最近一筆交易開始訂正
-						loanCom.setFacmBorTxHcodeByTx(iRpCustNo, titaVo);
-					}
-				}
+			//此段訂正點調原先程式,改為比照L3210訂正?? 2023/3/8修改,待確認
+			Slice<LoanBorTx> slLoanBortx = loanBorTxService.acDateTxtNoEq(titaVo.getOrgEntdyI() + 19110000,
+					titaVo.getOrgKin(), titaVo.getOrgTlr(), titaVo.getOrgTno(), 0, Integer.MAX_VALUE, titaVo);
+			this.lLoanBorTx = slLoanBortx == null ? null : slLoanBortx.getContent();
+			if (lLoanBorTx == null || lLoanBorTx.size() == 0) {
+				throw new LogicException(titaVo, "E0001", "交易明細暫存檔 分行別 = " + titaVo.getOrgKin() + " 經辦代號 = "
+						+ titaVo.getOrgTlr() + " 交易序號 = " + titaVo.getOrgTno()); // 查詢資料不存在
 			}
+			for (LoanBorTx tx : lLoanBorTx) {
+				loanCom.checkEraseCustNoTxSeqNo(tx.getCustNo(), titaVo);// 檢查到同戶帳務交易需由最近一筆交易開始訂正
+				loanCom.setFacmBorTxHcode(tx.getCustNo(), tx.getFacmNo(), tx.getBorxNo(), titaVo);
+			}
+
+//			loanCom.checkEraseCustNoTxSeqNo(iCustNo, titaVo);// 檢查到同戶帳務交易需由最近一筆交易開始訂正
+//			loanCom.setFacmBorTxHcodeByTx(iCustNo, titaVo);
+//			if ("06".equals(iTempItemCode)) {
+//				for (int i = 1; i <= 50; i++) {
+//					if (titaVo.get("RpCode" + i) == null || parse.stringToInteger(titaVo.getParam("RpCode" + i)) == 0)
+//						break;
+//					iRpCustNo = parse.stringToInteger(titaVo.getParam("RpCustNo" + i));
+//					if (iRpCustNo != iCustNo) {
+//						loanCom.checkEraseCustNoTxSeqNo(iRpCustNo, titaVo);// 檢查到同戶帳務交易需由最近一筆交易開始訂正
+//						loanCom.setFacmBorTxHcodeByTx(iRpCustNo, titaVo);
+//					}
+//				}
+//			}
 		}
 
 		// 暫收款交易新增帳務及更新放款交易內容檔
@@ -502,17 +515,32 @@ public class L3230 extends TradeBuffer {
 		case 94: // 轉債協暫收款
 			acDetail = new AcDetail();
 			acDetail.setDbCr("C");
-			acDetail.setCustNo(iRpCustNo);
 			acDetail.setAcctCode(acNegCom.getAcctCode(iRpCustNo, titaVo));
+			acDetail.setCustNo(iRpCustNo);
 			acDetail.setSumNo("094");
 			acDetail.setTxAmt(iRpAmt);
+			//由債協專戶入一般債權TAV ?? 2023/3/8修改,待確認 ,是做92還是94?
+			if (iCustNo == this.txBuffer.getSystemParas().getNegDeptCustNo()
+					&& iRpCustNo != this.txBuffer.getSystemParas().getLoanDeptCustNo()) {
+				if (acNegCom.getAcctCode(iRpCustNo, titaVo).equals("TAV")) {
+					TempVo tempVo = new TempVo();
+					tempVo = acNegCom.getReturnAcctCode(iRpCustNo, titaVo);
+					acDetail.setCustNo(parse.stringToInteger(tempVo.getParam("CustNo")));
+					acDetail.setFacmNo(parse.stringToInteger(tempVo.getParam("FacmNo")));
+					acDetail.setAcctCode("TAV");
+					acDetail.setSumNo("092");
+					acDetail.setSlipNote("一般債權");
+					acDetail.setJsonFields(tempVo.getJsonString());//記錄實際借款人戶號對應之匯款人戶號
+				}
+			}
 			lAcDetail.add(acDetail);
 			break;
 		case 95: // 轉債協退還款
 			throw new LogicException(titaVo, "E0015", "需使用放款暫收款帳戶 "); // 檢查錯誤
 		}
 		wkAcctCode = acDetail.getAcctCode();
-		addLoanBorTx06Routine(iRpCustNo, iRpFacmNo, iRpAmt);
+//		addLoanBorTx06Routine(iRpCustNo, iRpFacmNo, iRpAmt);  ?? 2023/3/8修改,待確認
+		addLoanBorTx06Routine(acDetail.getCustNo(), acDetail.getFacmNo(), iRpAmt);
 	}
 
 	// 借:暫收可抵繳 貸:利息收入(3200億專案息)

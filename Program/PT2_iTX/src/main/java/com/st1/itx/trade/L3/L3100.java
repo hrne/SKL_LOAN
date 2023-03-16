@@ -273,6 +273,7 @@ public class L3100 extends TradeBuffer {
 //			撥款傳票主管審核
 			doRptA(titaVo);
 		}
+
 		this.totaVo.putParam("BormNo", wkBormNo);
 		this.totaVo.put("PdfSnoF", "" + sno);
 		this.addList(this.totaVo);
@@ -891,7 +892,7 @@ public class L3100 extends TradeBuffer {
 			moveLoanBorTx();
 			tLoanBorTx.setTitaKinBr(titaVo.getKinbr());
 			tLoanBorTx.setTitaTlrNo(titaVo.getTlrNo());
-			tLoanBorTx.setTitaTxtNo(titaVo.getTxtNo());			
+			tLoanBorTx.setTitaTxtNo(titaVo.getTxtNo());
 			try {
 				loanBorTxService.update(tLoanBorTx);
 			} catch (DBException e) {

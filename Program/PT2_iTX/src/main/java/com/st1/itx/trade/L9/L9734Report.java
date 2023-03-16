@@ -132,7 +132,8 @@ public class L9734Report extends MakeReport {
 		makeExcel.setIBU("B");
 
 		// 機密等級及基準日期
-		makeExcel.setValue(1, 10, "機密等級：機密\n" + (iYear - 1911) + "." + String.format("%02d", iMonth), "R");
+		makeExcel.setValue(1, 10,
+				"機密等級：" + makeExcel.getSecurity() + "\n" + (iYear - 1911) + "." + String.format("%02d", iMonth), "R");
 
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 //		List<Map<String, String>> fnAllList2 = new ArrayList<>();
