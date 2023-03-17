@@ -387,169 +387,100 @@ BEGIN
              THEN 0 - TR."Overflow" 
            ELSE TR."Overflow" 
            END                            AS "Overflow"            -- 溢收 DECIMAL 16 2 
-          ,'{' 
-          || '"TRXNM2":"' 
-          || TR1."TRXNM2" 
-          || '"' 
-          -- 結案區分 
-          || CASE 
-               WHEN TR1."TRXTCT" IS NOT NULL 
-               THEN ',"CaseCloseCode":"' 
-                    || CASE 
-                         WHEN TR1."TRXTCT" = '1' AND ACN."IsSameFac" = 1 
-                                                 THEN '2' 
-                         WHEN TR1."TRXTCT" = '1' THEN '1' 
-                         WHEN TR1."TRXTCT" = '2' THEN '3' 
-                         WHEN TR1."TRXTCT" = '3' THEN '4' 
-                         WHEN TR1."TRXTCT" = '4' THEN '5' 
-                         WHEN TR1."TRXTCT" = '5' THEN '6' 
-                         WHEN TR1."TRXTCT" = '6' THEN '7' 
-                       ELSE TR1."TRXTCT" END 
-                    || '"' -- 結案區分 
-             ELSE '' END 
-           || CASE 
-                WHEN JL."AcctCode" = 'F10' -- 實收帳管費 
-                THEN ',"AcctFee":"'  
-                     || CASE 
-                          WHEN TR1."TRXCRC" IN ('1','3') 
-                          THEN TO_CHAR(0 - JL."JLNAMT") 
-                        ELSE TO_CHAR(JL."JLNAMT") 
-                        END 
-                     || '"' 
-                WHEN JL."AcctCode" = 'F29' -- 實收契變手續費 
-                THEN ',"ModifyFee":"'  
-                     || CASE 
-                          WHEN TR1."TRXCRC" IN ('1','3') 
-                          THEN TO_CHAR(0 - JL."JLNAMT") 
-                        ELSE TO_CHAR(JL."JLNAMT") 
-                        END 
-                     || '"' 
-                WHEN JL."AcctCode" = 'TMI' -- 實收火險保費  
-                THEN ',"FireFee":"'  
-                     || CASE 
-                          WHEN TR1."TRXCRC" IN ('1','3') 
-                          THEN TO_CHAR(0 - JL."JLNAMT") 
-                        ELSE TO_CHAR(JL."JLNAMT") 
-                        END 
-                     || '"' 
-                WHEN JL."AcctCode" = 'F07' -- 實收法拍費用 
-                THEN ',"LawFee":"'  
-                     || CASE 
-                          WHEN TR1."TRXCRC" IN ('1','3') 
-                          THEN TO_CHAR(0 - JL."JLNAMT") 
-                        ELSE TO_CHAR(JL."JLNAMT") 
-                        END 
-                     || '"' 
-              ELSE '' END 
-           || CASE -- 減免金額 
-                WHEN TR1."TRXCRC" IN ('1','3') 
-                     AND TR1."TRXDAM" != 0 
-                THEN ',"ReduceAmt":"' 
-                     || TO_CHAR(0 - TR1."TRXDAM") 
-                     || '"' 
-                WHEN TR1."TRXDAM" != 0 
-                THEN ',"ReduceAmt":"' 
-                     || TO_CHAR(TR1."TRXDAM") 
-                     || '"' 
-              ELSE '' 
-              END 
-           || CASE --  減免違約金 
-                WHEN TR1."TRXCRC" IN ('1','3') 
-                     AND TR1."TRXDBC" != 0 
-                THEN ',"ReduceBreachAmt":"' 
-                     || TO_CHAR(0 - TR1."TRXDBC") 
-                     || '"' 
-                WHEN TR1."TRXDBC" != 0 
-                THEN ',"ReduceBreachAmt":"' 
-                     || TO_CHAR(TR1."TRXDBC") 
-                     || '"' 
-              ELSE '' 
-              END 
-           || CASE  
-                --  免印花稅金額 
-                WHEN NVL(TO_CHAR(TR1."TRXNTX"),'0') != '0' 
-                THEN ',"StampFreeAmt":"'  
-                     || NVL(TO_CHAR(TR1."TRXNTX"),'0') 
-                     || '"' 
-              ELSE '' 
-              END 
-           || CASE  
-                --  暫收原因 
-                WHEN TR1.TRXTRN IN ('3036','3037','3082','3083')
-                THEN ',"TempReasonCode":"'  
-                     || LPAD(NVL(TR1."LMSRSN",0),2,'0') 
-                     || '"' 
-              ELSE '' 
-              END 
-           || CASE  
-                --  新每期攤還金額 2022-12-20 Wei新增
-                WHEN TR1.TRXNPA != 0
-                THEN ',"NewDueAmt":"'
-                     || TR1.TRXNPA
-                     || '"' 
-              ELSE '' 
-              END 
-           || CASE  
-                --  新繳款總期數 2022-12-20 Wei新增
-                WHEN TR1.TRXNPR != 0
-                THEN ',"NewTotalPeriod":"'
-                     || TR1.TRXNPR
-                     || '"' 
-              ELSE '' 
-              END 
-           || CASE  
-                --  支票帳號 2022-12-20 Wei新增
-                WHEN TR1.CHKACN != 0
-                THEN ',"ChequeAcctNo":"'
-                     || TR1.CHKACN
-                     || '"' 
-              ELSE '' 
-              END 
-           || CASE  
-                --  支票號碼 2022-12-20 Wei新增
-                WHEN TR1.CHKASQ != 0
-                THEN ',"ChequeNo":"'
-                     || TR1.CHKASQ
-                     || '"' 
-              ELSE '' 
-              END
-           || CASE  
-                --  匯款序號 2022-12-20 Wei新增
-                WHEN TR1.DPSSEQ != 0
-                THEN ',"RemitSeq":"'
-                     || TR1.DPSSEQ
-                     || '"' 
-              ELSE '' 
-              END
-           || CASE  
-                --  帳戶區分 2022-12-20 Wei新增
-                WHEN TR1.TRXACD >= 0
-                THEN ',"AcctDivisionCode":"'
-                     || TR1.TRXACD
-                     || '"' 
-              ELSE ''
-              END
-           || CASE
-                --  扣款銀行 2022-12-20 Wei新增
-                WHEN TR1.LMSPBK >= 0
-                THEN ',"RepayBank":"'
-                     || TR1.LMSPBK
-                     || '"'
-              ELSE ''
-              END
-           || --  收據號碼 2022-12-20 Wei新增
-              ',"RECPNO":"'
-              || TR1.RECPNO
-              || '"' 
-           || --  代收繳款方式 2022-12-20 Wei新增
-              ',"PAYCOD":"'
-              || TR1.PAYCOD
-              || '"'
-           || --  累溢短收 2022-12-22 Wei新增
-              ',"Excessive":"'
-              || TR1.TRXAOS
-              || '"'
-           || '}'                         AS "OtherFields"         -- 其他欄位 VARCHAR2 1000  
+          ,JSON_OBJECT(
+               'TRXNM2' VALUE TO_CHAR(TR1.TRXNM2) ,
+               'CaseCloseCode' VALUE TO_CHAR(CASE -- 結案區分
+                                       WHEN TR1."TRXTCT" = '1' AND ACN."IsSameFac" = 1 
+                                                               THEN '2' 
+                                       WHEN TR1."TRXTCT" = '1' THEN '1' 
+                                       WHEN TR1."TRXTCT" = '2' THEN '3' 
+                                       WHEN TR1."TRXTCT" = '3' THEN '4' 
+                                       WHEN TR1."TRXTCT" = '4' THEN '5' 
+                                       WHEN TR1."TRXTCT" = '5' THEN '6' 
+                                       WHEN TR1."TRXTCT" = '6' THEN '7' 
+                                     ELSE TR1."TRXTCT" END) ,
+               'AcctFee' VALUE CASE -- 實收帳管費
+                                 WHEN JL."AcctCode" = 'F10'
+                                      AND TR1."TRXCRC" IN ('1','3') 
+                                 THEN TO_CHAR(0 - JL."JLNAMT") 
+                                 WHEN JL."AcctCode" = 'F10'
+                                 THEN TO_CHAR(JL."JLNAMT") 
+                               ELSE NULL END ABSENT ON NULL ,
+               'ModifyFee' VALUE CASE -- 實收契變手續費
+                                 WHEN JL."AcctCode" = 'F29'
+                                      AND TR1."TRXCRC" IN ('1','3') 
+                                 THEN TO_CHAR(0 - JL."JLNAMT") 
+                                 WHEN JL."AcctCode" = 'F29'
+                                 THEN TO_CHAR(JL."JLNAMT") 
+                               ELSE NULL END ABSENT ON NULL ,
+               'FireFee' VALUE CASE -- 實收火險保費
+                                 WHEN JL."AcctCode" = 'TMI'
+                                      AND TR1."TRXCRC" IN ('1','3') 
+                                 THEN TO_CHAR(0 - JL."JLNAMT") 
+                                 WHEN JL."AcctCode" = 'TMI'
+                                 THEN TO_CHAR(JL."JLNAMT") 
+                               ELSE NULL END ABSENT ON NULL ,
+               'LawFee' VALUE CASE -- 實收法拍費用
+                                WHEN JL."AcctCode" = 'F07'
+                                     AND TR1."TRXCRC" IN ('1','3') 
+                                THEN TO_CHAR(0 - JL."JLNAMT") 
+                                WHEN JL."AcctCode" = 'F07'
+                                THEN TO_CHAR(JL."JLNAMT") 
+                              ELSE NULL END ABSENT ON NULL ,
+               'ReduceAmt' VALUE CASE -- 減免金額
+                                   WHEN TR1."TRXDAM" != 0
+                                        AND TR1."TRXCRC" IN ('1','3')
+                                   THEN TO_CHAR(0 - TR1."TRXDAM") 
+                                   WHEN TR1."TRXDAM" != 0 
+                                   THEN TO_CHAR(TR1."TRXDAM") 
+                                 ELSE NULL END ABSENT ON NULL ,
+               'ReduceBreachAmt' VALUE CASE -- 減免違約金
+                                         WHEN TR1."TRXDBC" != 0
+                                              AND TR1."TRXCRC" IN ('1','3')
+                                         THEN TO_CHAR(0 - TR1."TRXDBC") 
+                                         WHEN TR1."TRXDBC" != 0 
+                                         THEN TO_CHAR(TR1."TRXDBC") 
+                                       ELSE NULL END ABSENT ON NULL ,
+               'StampFreeAmt' VALUE CASE -- 免印花稅金額
+                                      WHEN NVL(TO_CHAR(TR1."TRXNTX"),'0') != '0'
+                                      THEN NVL(TO_CHAR(TR1."TRXNTX"),'0')
+                                    ELSE NULL END ABSENT ON NULL ,
+               'TempReasonCode' VALUE CASE -- 暫收原因
+                                        WHEN TR1.TRXTRN IN ('3036','3037','3082','3083')
+                                        THEN LPAD(NVL(TR1."LMSRSN",0),2,'0') 
+                                      ELSE NULL END ABSENT ON NULL ,
+               'NewDueAmt' VALUE CASE -- 新每期攤還金額 2022-12-20 Wei新增
+                                   WHEN TR1.TRXNPA != 0
+                                   THEN TO_CHAR(TR1.TRXNPA)
+                                 ELSE NULL END ABSENT ON NULL ,
+               'NewTotalPeriod' VALUE CASE -- 新繳款總期數 2022-12-20 Wei新增
+                                        WHEN TR1.TRXNPR != 0
+                                        THEN TO_CHAR(TR1.TRXNPR)
+                                      ELSE NULL END ABSENT ON NULL ,
+               'ChequeAcctNo' VALUE CASE -- 支票帳號 2022-12-20 Wei新增
+                                        WHEN TR1.CHKACN != 0
+                                        THEN TO_CHAR(TR1.CHKACN)
+                                      ELSE NULL END ABSENT ON NULL ,
+               'ChequeNo' VALUE CASE -- 支票號碼 2022-12-20 Wei新增
+                                  WHEN TR1.CHKASQ != 0
+                                  THEN TO_CHAR(TR1.CHKASQ)
+                                ELSE NULL END ABSENT ON NULL ,
+               'RemitSeq' VALUE CASE -- 匯款序號 2022-12-20 Wei新增
+                                  WHEN TR1.DPSSEQ != 0
+                                  THEN TO_CHAR(TR1.DPSSEQ)
+                                ELSE NULL END ABSENT ON NULL ,
+               'AcctDivisionCode' VALUE CASE -- 帳戶區分 2022-12-20 Wei新增
+                                          WHEN TR1.TRXACD >= 0
+                                          THEN TO_CHAR(TR1.TRXACD)
+                                        ELSE NULL END ABSENT ON NULL ,
+               'RepayBank' VALUE CASE -- 扣款銀行 2022-12-20 Wei新增
+                                   WHEN TR1.LMSPBK >= 0
+                                   THEN TO_CHAR(TR1.LMSPBK)
+                                 ELSE NULL END ABSENT ON NULL ,
+               'RECPNO' VALUE TO_CHAR(TR1.RECPNO) , -- 收據號碼 2022-12-20 Wei新增
+               'PAYCOD' VALUE TO_CHAR(TR1.PAYCOD) , -- 代收繳款方式 2022-12-20 Wei新增
+               'Excessive' VALUE TO_CHAR(TR1.TRXAOS) -- 累溢短收 2022-12-20 Wei新增
+          )                               AS "OtherFields"         -- 其他欄位 VARCHAR2 1000
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE   
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE   

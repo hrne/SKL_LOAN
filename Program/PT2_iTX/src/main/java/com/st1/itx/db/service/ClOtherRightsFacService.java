@@ -90,18 +90,6 @@ public interface ClOtherRightsFacService {
   public Slice<ClOtherRightsFac> findClCodeRange(int clCode1_0, int clCode1_1, int clCode2_2, int clCode2_3, int clNo_4, int clNo_5, int index, int limit, TitaVo... titaVo);
 
   /**
-   * ChoiceDate = ,AND LastUpdateEmpNo =
-   *
-   * @param choiceDate_0 choiceDate_0
-   * @param lastUpdateEmpNo_1 lastUpdateEmpNo_1
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice ClOtherRightsFac ClOtherRightsFac of List
-   */
-  public Slice<ClOtherRightsFac> findChoiceDateEq(ClOtherRightsFacId choiceDate_0, String lastUpdateEmpNo_1, int index, int limit, TitaVo... titaVo);
-
-  /**
    * hold By ClOtherRightsFac
    * 
    * @param clOtherRightsFacId key
