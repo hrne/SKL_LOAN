@@ -168,7 +168,8 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("inputEntryDateMax",
 				Integer.toString(Integer.parseInt(titaVo.getParam("inputEntryDateMax")) + 19110000));
 		query.setParameter("inputYearMonth", iYear + String.format("%02d", iMonth));
-		query.setParameter("inputCollector", titaVo.getParam("inputCollector"));
+		query.setParameter("inputCollector",
+				titaVo.getParam("inputCollector").length() == 0 ? "999999" : titaVo.getParam("inputCollector"));
 		query.setParameter("inputDrawdownDate",
 				Integer.toString(Integer.parseInt(titaVo.getParam("inputDrawdownDate")) + 19110000));
 

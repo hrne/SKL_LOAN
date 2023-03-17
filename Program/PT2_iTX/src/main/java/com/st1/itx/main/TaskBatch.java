@@ -52,14 +52,16 @@ public class TaskBatch extends CommBuffer implements Runnable {
 			if (!"apControl".equals(this.getBeanName()))
 				batchTransaction.rollBackEnd();
 			errMsg = e.getErrorMsg();
+			isOK = false;
 		} catch (Throwable e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.error(errors.toString());
 			if (!"apControl".equals(this.getBeanName()))
 				batchTransaction.rollBackEnd();
-			isOK = !isOK;
+			isOK = false;
 		} finally {
+			this.info("Error is " + errMsg);
 			if (!isOK)
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", this.getBeanName(), titaVo.getTlrNo(), this.getBeanName() + "執行失敗 " + errMsg, titaVo);
 		}

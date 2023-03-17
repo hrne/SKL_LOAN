@@ -163,7 +163,7 @@ public class L4701Report extends MakeReport {
 		ArrayList<OccursList> tmp = new ArrayList<>();
 
 		sLoanCheque = loanChequeService.receiveDateRange(this.getTxBuffer().getTxCom().getTbsdyf(),
-				this.getTxBuffer().getTxCom().getTbsdyf(), lStatus, this.index, this.limit);
+				this.getTxBuffer().getTxCom().getTbsdyf(), lStatus, 0, Integer.MAX_VALUE, titaVo);
 
 		lLoanCheque = sLoanCheque == null ? null : sLoanCheque.getContent();
 

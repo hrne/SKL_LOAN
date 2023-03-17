@@ -133,6 +133,17 @@ public class L9718Report extends MakeReport {
 								makeExcel.setValue(row, col, "", "R");
 							}
 							break;
+
+						case "Q":
+						case "R":
+						case "S":
+						case "T":
+							try {
+								makeExcel.setValue(row, col + 1, new BigDecimal(tmpValue), "R");
+							} catch (Exception e) {
+								makeExcel.setValue(row, col + 1, tmpValue, "R");
+							}
+							break;
 						default:
 							try {
 								makeExcel.setValue(row, col, new BigDecimal(tmpValue), "R");

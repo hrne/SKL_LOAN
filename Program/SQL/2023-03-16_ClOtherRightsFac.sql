@@ -16,7 +16,7 @@ create table "ClOtherRightsFac" (
 
 alter table "ClOtherRightsFac" add constraint "ClOtherRightsFac_PK" primary key("ClCode1", "ClCode2", "ClNo", "Seq", "CustNo", "FacmNo");
 
-alter table "ClOtherRightsFac" add constraint "ClOtherRightsFac_ClOtherRight_FK1" foreign key ("ClCode1", "ClCode2", "ClNo", "Seq") references "ClOtherRight" ("ClCode1", "ClCode2", "ClNo", "Seq") on delete cascade;
+alter table "ClOtherRightsFac" add constraint "ClOtherRightsFac_ClOtherRights_FK1" foreign key ("ClCode1", "ClCode2", "ClNo", "Seq") references "ClOtherRights" ("ClCode1", "ClCode2", "ClNo", "Seq") on delete cascade;
 
 alter table "ClOtherRightsFac" add constraint "ClOtherRightsFac_FacCaseAppl_FK2" foreign key ("ApproveNo") references "FacCaseAppl" ("ApplNo") on delete cascade;
 
