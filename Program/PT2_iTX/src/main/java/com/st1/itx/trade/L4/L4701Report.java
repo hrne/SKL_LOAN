@@ -14,16 +14,20 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.CdBank;
+import com.st1.itx.db.domain.CdBankId;
 import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.LoanCheque;
 import com.st1.itx.db.service.AcCloseService;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.CdAcCodeService;
+import com.st1.itx.db.service.CdBankService;
 import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.LoanChequeService;
 import com.st1.itx.db.service.SlipMediaService;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -45,6 +49,8 @@ public class L4701Report extends MakeReport {
 	LoanChequeService loanChequeService;
 	@Autowired
 	CdCodeService cdCodeService;
+	@Autowired
+	CdBankService cdBankService;
 
 	@Autowired
 	LoanCom loanCom;
@@ -98,14 +104,16 @@ public class L4701Report extends MakeReport {
 		this.print(-3, 2, "來源別：放款服務課");
 		this.print(-3, 145, "時　　間：" + showTime(this.nowTime));
 		this.print(-4, 2, "批號：" + "01");
+		this.print(-4, 85, this.showRocDate(this.getTxBuffer().getTxCom().getTbsdyf(), 0), "C");
 		this.print(-4, 145, "頁　　次：" + this.getNowPage());
+		this.print(-5, 145, "單　　位：" + "元");
 
 		// 頁首帳冊別判斷
-//		print(-4, 10, this.nowAcBookCode);
-//		print(-4, 14, this.nowAcBookItem);
+		// print(-4, 10, this.nowAcBookCode);
+		// print(-4, 14, this.nowAcBookItem);
 
 		// 明細起始列(自訂亦必須)
-		this.setBeginRow(9);
+		this.setBeginRow(10);
 
 		// 設定明細列數(自訂亦必須)
 		this.setMaxRows(28);
@@ -115,9 +123,9 @@ public class L4701Report extends MakeReport {
 		 * 1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 		 */
 		print(2, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
-		print(1, 1, "　戶號　　戶名　　　　　　　　支票銀行　　　支票分行　　　　　帳號　　　票號　　　　　　票面金額　　　　　　埠別　　　到期日　　交換區號　");
-		print(1, 1, "　　　　　　　　　　　　　　　發票人ID　　　發票人姓名　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
-		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
+		print(1, 1, "　戶號　　戶名　　　　　　　　支票銀行　　　　　　　支票分行　　　　　帳號　　　票號　　　　　　票面金額　　　　　　埠別　　　到期日　　交換區號　");
+		print(1, 1, "　　　　　　　　　　　　　　　發票人ID　　　　　　　發票人姓名　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
+		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 
 	}
 
@@ -154,19 +162,26 @@ public class L4701Report extends MakeReport {
 
 		ArrayList<OccursList> tmp = new ArrayList<>();
 
-		sLoanCheque = loanChequeService.receiveDateRange(this.getTxBuffer().getTxCom().getTbsdyf(), this.getTxBuffer().getTxCom().getTbsdyf(), lStatus, this.index, this.limit);
+		sLoanCheque = loanChequeService.receiveDateRange(this.getTxBuffer().getTxCom().getTbsdyf(),
+				this.getTxBuffer().getTxCom().getTbsdyf(), lStatus, this.index, this.limit);
 
 		lLoanCheque = sLoanCheque == null ? null : sLoanCheque.getContent();
 
 		if (lLoanCheque == null || lLoanCheque.isEmpty()) {
 			// 出空表
-			this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
+			ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(reportCode)
+					.setRptItem(reportItem).setSecurity(security).setRptSize(pageSize)
+					.setPageOrientation(pageOrientation).build();
+			this.open(titaVo, reportVo);
 			this.setCharSpaces(0);
 			print(1, 1, "本日無資料");
 			return;
 		}
 
-		this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(reportCode)
+				.setRptItem(reportItem).setSecurity(security).setRptSize(pageSize).setPageOrientation(pageOrientation)
+				.build();
+		this.open(titaVo, reportVo);
 
 		this.setCharSpaces(0);
 //		測試
@@ -190,29 +205,37 @@ public class L4701Report extends MakeReport {
 			print(1, 1, "　　");
 			print(0, 1, FormatUtil.pad9("" + tLoanCheque.getCustNo(), 7)); // 戶號
 			print(0, 11, FormatUtil.padX(loanCom.getCustNameByNo(tLoanCheque.getCustNo()), 16)); // 戶名
-			print(0, 31, FormatUtil.pad9(tLoanCheque.getBankCode(), 7).substring(0, 3)); // 支票銀行
-			print(0, 45, FormatUtil.pad9(tLoanCheque.getBankCode(), 7).substring(3, 7));// 支票分行
-			print(0, 61, FormatUtil.padX("" + tLoanCheque.getChequeAcct(), 9));// 帳號
-			print(0, 72, FormatUtil.padX("" + tLoanCheque.getChequeNo(), 7));// 票號
-			this.print(0, 102, df.format(tLoanCheque.getChequeAmt()), "R");// 票面金額
+			CdBank tCdBank = cdBankService
+					.findById(new CdBankId(FormatUtil.pad9(tLoanCheque.getBankCode(), 7).substring(0, 3),
+							FormatUtil.pad9(tLoanCheque.getBankCode(), 7).substring(3, 7)), titaVo);
+			if (tCdBank == null) {
+				print(0, 31, FormatUtil.pad9(tLoanCheque.getBankCode(), 7).substring(0, 3)); // 支票銀行
+				print(0, 53, FormatUtil.pad9(tLoanCheque.getBankCode(), 7).substring(3, 7));// 支票分行
+			} else {
+				print(0, 31, tCdBank.getBankItem()); // 支票銀行
+				print(0, 53, tCdBank.getBranchItem());// 支票分行
+			}
+			print(0, 69, FormatUtil.padX("" + tLoanCheque.getChequeAcct(), 9));// 帳號
+			print(0, 80, FormatUtil.padX("" + tLoanCheque.getChequeNo(), 7));// 票號
+			this.print(0, 110, df.format(tLoanCheque.getChequeAmt()), "R");// 票面金額
 			tCdCode = new CdCode();
 			tCdCode = cdCodeService.getItemFirst(3, "OutsideCode", tLoanCheque.getOutsideCode(), titaVo);
 			if (tCdCode != null) {
-				print(0, 109, tCdCode.getItem());// 埠別
+				print(0, 117, tCdCode.getItem());// 埠別
 			} else {
-				print(0, 109, FormatUtil.padX("" + tLoanCheque.getOutsideCode(), 1));// 埠別
+				print(0, 117, FormatUtil.padX("" + tLoanCheque.getOutsideCode(), 1));// 埠別
 			}
 
-			print(0, 117, this.showBcDate((tLoanCheque.getChequeDate() + 19110000), 0));// 到期日
+			print(0, 125, this.showBcDate((tLoanCheque.getChequeDate() + 19110000), 0));// 到期日
 			tCdCode = new CdCode();
 			tCdCode = cdCodeService.getItemFirst(3, "AreaCode", tLoanCheque.getAreaCode(), titaVo);
 			if (tCdCode != null) {
-				print(0, 131, tCdCode.getItem());// 交換區號
+				print(0, 139, FormatUtil.pad9("" + tLoanCheque.getAreaCode(), 2) + " " + tCdCode.getItem());// 交換區號
 			} else {
-				print(0, 131, FormatUtil.pad9("" + tLoanCheque.getAreaCode(), 2));// 交換區號
+				print(0, 139, FormatUtil.pad9("" + tLoanCheque.getAreaCode(), 2));// 交換區號
 			}
 			print(1, 31, FormatUtil.padX("", 10));// 發票人ID
-			print(0, 45, FormatUtil.padX(tLoanCheque.getChequeName(), 60));// 發票人姓名
+			print(0, 53, FormatUtil.padX(tLoanCheque.getChequeName(), 60));// 發票人姓名
 
 			chequeCnt = chequeCnt + 1;
 			if ("2".equals(tLoanCheque.getOutsideCode())) {
@@ -224,11 +247,13 @@ public class L4701Report extends MakeReport {
 			chequeTotAmt = chequeTotAmt.add(tLoanCheque.getChequeAmt());
 		}
 
-		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
+		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 		print(1, 1, "　　　　　　           ");
 
-		print(0, 1, "支票 ： 共  " + FormatUtil.pad9("" + chequeCnt, 3) + "  張　　本埠 ： " + FormatUtil.pad9("" + chequeInCnt, 3) + "  張　　外埠 ： " + FormatUtil.pad9("" + chequeOutCnt, 3) + "  張　　總計 ： "
-				+ df.format(chequeTotAmt));
+		print(0, 1,
+				"支票 ： 共  " + FormatUtil.pad9("" + chequeCnt, 3) + "  張　　本埠 ： " + FormatUtil.pad9("" + chequeInCnt, 3)
+						+ "  張　　外埠 ： " + FormatUtil.pad9("" + chequeOutCnt, 3) + "  張　　總計 ： "
+						+ df.format(chequeTotAmt));
 
 	}
 

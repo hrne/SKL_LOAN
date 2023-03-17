@@ -224,7 +224,8 @@ BEGIN
              WHEN TRIM(CUSP."CUSENT") IN ('0','1','2') THEN TRIM(CUSP."CUSENT")
            ELSE TRIM(CUSP."CUSENT") END
                                           AS "EntCode"             -- 企金別 VARCHAR2 1 
-          ,CUSP."CUSEMP"                  AS "EmpNo"               -- 員工代號 VARCHAR2 6 
+          ,NVL(CUSP."CUSEMP",EmpFix."EmpNo")
+                                          AS "EmpNo"               -- 員工代號 VARCHAR2 6 
           ,TRIM(CUAP."CUSENM")            AS "EName"               -- 英文姓名 VARCHAR2 20 
           ,CASE
              WHEN TRIM(CUAP."CUSEDU") IN ('1','2','3','4','5','6','7')
@@ -296,6 +297,7 @@ BEGIN
                                            ELSE REPLACE(TRIM(CUSP."CUSID1"),CHR(26),'')
                                            END
     LEFT JOIN "TfQC2091" QC2091 ON QC2091.CUSID1 = CUSP."CUSID1"
+    LEFT JOIN "TfCustMainEmpNoFix" EmpFix ON EmpFix."CustNo" = CUSP.LMSACN
     ;
 
     -- 記錄寫入筆數

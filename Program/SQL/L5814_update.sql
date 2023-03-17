@@ -1,0 +1,2 @@
+delete from  "TxTranCode"  where "TranNo" ='L5814';
+Insert into "TxTranCode" ("TranNo","TranItem","Desc","TypeFg","CancelFg","ModifyFg","MenuNo","SubMenuNo","MenuFg","Status","CreateDate","CreateEmpNo","LastUpdate","LastUpdateEmpNo","SubmitFg","CustDataCtrlFg","CustRmkFg","ChainTranMsg","ApLogFlag","ApLogRim") values ('L5814','供維護國稅局申報資料初貸金額','供維護國稅局申報資料初貸金額',2,1,1,'L5','7',1,0,to_timestamp('02-3月 -23 01.52.24.846000000 下午','DD-MON-RR HH.MI.SSXFF AM'),'EM2661',to_timestamp('02-3月 -23 01.57.18.161000000 下午','DD-MON-RR HH.MI.SSXFF AM'),'EM2661',0,0,0,null,0,null);

@@ -235,6 +235,37 @@ BEGIN
       LEFT JOIN ATF ON ATF."TRXTRN" = TR."TRXTRN" 
                    AND ATF."ACTACT" = TR."ACTACT" 
     ) 
+    , acMap as (
+      SELECT ACNACC
+           , ACNACS
+           , ACNASS
+           , "AcNoCode"
+           , "AcSubCode"
+           , "AcDtlCode"
+      FROM "TfActblMapping"
+      UNION
+      SELECT L.ACNACC
+           , L.ACNACS
+           , L.ACNASS
+           , C."AcNoCode"
+           , C."AcSubCode"
+           , C."AcDtlCode"
+      FROM "TB$LCDP" L
+      LEFT JOIN "CdAcCode" C ON C."AcNoCodeOld" = L."CORACC" 
+                            AND C."AcSubCode" = NVL(L."CORACS",'     ') 
+                            AND C."AcDtlCode" = CASE 
+                                                  WHEN L."CORACC" IN ('40903300' -- 放款帳管費 2022-06-30 Wei From Lai Email: 
+                                                                     ,'20232020' -- 2022-09-08 Wei FROM yoko line 
+                                                                     ,'20232182' -- 2022-09-08 Wei fix bug 
+                                                                     ,'20232180' -- 2022-09-08 Wei fix bug 
+                                                                     ,'20232181' -- 2022-09-08 Wei fix bug 
+                                                                     ,'40907400'  -- 2022-09-08 Wei fix bug 
+                                                                     )
+                                                       AND NVL(L."CORACS",'     ') = '     ' 
+                                                  THEN '01' 
+                                                ELSE '  ' END
+      WHERE NVL(C."AcNoCode",' ') != ' '
+    )
     , S AS ( 
       SELECT DISTINCT 
              S1."TRXDAT" 
@@ -266,39 +297,12 @@ BEGIN
       LEFT JOIN "LA$JLNP" S2 ON S2."TRXDAT" = S1."TRXDAT" 
                             AND S2."JLNOVN" = S1."JLNVNO" -- 串取訂正資料 
                             AND S2."JLNVNO" = 0 
-      LEFT JOIN "TB$LCDP" S3 ON S3."ACNACC" = S1."ACNACC" 
+      LEFT JOIN acMap S3 ON S3."ACNACC" = S1."ACNACC" 
                             AND NVL(S3."ACNACS",' ') = NVL(S1."ACNACS",' ') 
                             AND NVL(S3."ACNASS",' ') = NVL(S1."ACNASS",' ') 
-      LEFT JOIN "CdAcCode" S5 ON S5."AcNoCodeOld" = S3."CORACC" 
-                             AND S5."AcSubCode" = NVL(S3."CORACS",'     ') 
-                             AND S5."AcDtlCode" = CASE 
-                                                    WHEN S3."CORACC" = '40903300' 
-                                                         AND NVL(S3."CORACS",'     ') = '     ' 
-                                                    THEN '01' -- 放款帳管費 
-                                                    -- 2022-06-30 Wei From Lai Email: 
-                                                    -- AcNoCode = 20222020000 
-                                                    -- 轉 AcDtlCode = 01 
-                                                    --    and AcctCode = TAV 
-                                                    WHEN S3."CORACC" = '20232020' 
-                                                         AND NVL(S3."CORACS",'     ') = '     ' 
-                                                    THEN '01' 
-                                                    -- 2022-09-08 Wei FROM yoko line 
-                                                    WHEN S3."CORACC" = '20232182' 
-                                                         AND NVL(S3."CORACS",'     ') = '     ' 
-                                                    THEN '01' 
-                                                    -- 2022-09-08 Wei fix bug 
-                                                    WHEN S3."CORACC" = '20232180' 
-                                                         AND NVL(S3."CORACS",'     ') = '     ' 
-                                                    THEN '01' 
-                                                    -- 2022-09-08 Wei fix bug 
-                                                    WHEN S3."CORACC" = '20232181' 
-                                                         AND NVL(S3."CORACS",'     ') = '     ' 
-                                                    THEN '01' 
-                                                    -- 2022-09-08 Wei fix bug 
-                                                    WHEN S3."CORACC" = '40907400' 
-                                                         AND NVL(S3."CORACS",'     ') = '     ' 
-                                                    THEN '01' 
-                                                  ELSE '  ' END 
+      LEFT JOIN "CdAcCode" S5 ON S5."AcNoCode" = S3."AcNoCode" 
+                             AND S5."AcSubCode" = NVL(S3."AcSubCode",'     ') 
+                             AND S5."AcDtlCode" = NVL(S3."AcDtlCode",'  ') 
       LEFT JOIN ATF ON ATF."ACNACC"          = S1."ACNACC" 
                    AND NVL(ATF."ACNACS",' ') = NVL(S1."ACNACS",' ') 
                    AND NVL(ATF."ACNASS",' ') = NVL(S1."ACNASS",' ') 
@@ -329,8 +333,6 @@ BEGIN
       WHERE NVL(S1."TRXDAT",0) > 0      -- 傳票檔會計日期不為0 *日期為0者為問題資料,則排除 
         AND NVL(S1."JLNVNO",0) > 0      -- 傳票檔傳票號碼不為0 *傳票號碼為0者為訂正資料,則排除 
         AND NVL(S2."TRXDAT",0) = 0      -- 若在S2有資料,表示S1此筆為被訂正資料,則排除 
-        AND NVL(S3."CORACC",' ') != ' ' -- 有串到新會科才寫入 
-        AND NVL(S3."AGLACC",' ') != ' ' -- 2021-12-08 新增判斷 有串到最新的11碼會科才寫入 
         AND NVL(S5."AcNoCode",' ') != ' ' -- 2021-07-15 新增判斷 有串到最新的11碼會科才寫入 
         AND S1."JLNCRC" = '0' 
         AND S1."TRXDAT" >= "DateStart"
