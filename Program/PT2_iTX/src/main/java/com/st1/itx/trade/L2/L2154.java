@@ -445,7 +445,6 @@ public class L2154 extends TradeBuffer {
 		tTempVo.clear();
 		tTempVo.putParam("LastBormNo", tFacMain.getLastBormNo());
 		tTempVo.putParam("LastBormRvNo", tFacMain.getLastBormRvNo());
-//		tTempVo.putParam("CustUKey", tFacMain.getCustUKey());
 		tTempVo.putParam("ApplNo", tFacMain.getApplNo());
 		tTempVo.putParam("AnnualIncr", tFacMain.getAnnualIncr());
 		tTempVo.putParam("EmailIncr", tFacMain.getEmailIncr());
@@ -456,7 +455,6 @@ public class L2154 extends TradeBuffer {
 		tTempVo.putParam("AcctCode", tFacMain.getAcctCode());
 		tTempVo.putParam("FirstDrawdownDate", tFacMain.getFirstDrawdownDate());
 		tTempVo.putParam("MaturityDate", tFacMain.getMaturityDate());
-//		tTempVo.putParam("CopyFlag", tFacMain.getCopyFlag());
 		tTempVo.putParam("CreditScore", tFacMain.getCreditScore());
 		tTempVo.putParam("GuaranteeDate", tFacMain.getGuaranteeDate());
 		tTempVo.putParam("ContractNo", tFacMain.getContractNo());
@@ -478,15 +476,11 @@ public class L2154 extends TradeBuffer {
 		tTempVo.putParam("LoanTermMm", tFacMain.getLoanTermMm());
 		tTempVo.putParam("LoanTermDd", tFacMain.getLoanTermDd());
 		tTempVo.putParam("AmortizedCode", tFacMain.getAmortizedCode());
-//		tTempVo.putParam("CancelCode", tFacMain.getCancelCode());
 		tTempVo.putParam("FreqBase", tFacMain.getFreqBase());
 		tTempVo.putParam("PayIntFreq", tFacMain.getPayIntFreq());
 		tTempVo.putParam("RepayFreq", tFacMain.getRepayFreq());
 		tTempVo.putParam("UtilDeadline", tFacMain.getUtilDeadline());
 		tTempVo.putParam("GracePeriod", tFacMain.getGracePeriod());
-//		tTempVo.putParam("DuePayAmt", tFacMain.getDuePayAmt());
-//		tTempVo.putParam("DuePayLimit", tFacMain.getDuePayLimit());
-//		tTempVo.putParam("PayIntLimit", tFacMain.getPayIntLimit());
 		tTempVo.putParam("AcctFee", tFacMain.getAcctFee());
 		tTempVo.putParam("HandlingFee", tFacMain.getHandlingFee());
 		tTempVo.putParam("GuaranteeDate", tFacMain.getGuaranteeDate());
@@ -503,6 +497,16 @@ public class L2154 extends TradeBuffer {
 		tTempVo.putParam("RateAdjNoticeCode", tFacMain.getRateAdjNoticeCode());
 		tTempVo.putParam("PieceCode", tFacMain.getPieceCode());
 		tTempVo.putParam("ProdBreachFlag", tFacMain.getProdBreachFlag());
+
+		tTempVo.putParam("BreachFlag", tFacMain.getBreachFlag());
+		tTempVo.putParam("BreachCode", tFacMain.getBreachCode());
+		tTempVo.putParam("BreachGetCode", tFacMain.getBreachGetCode());
+		tTempVo.putParam("ProhibitMonth", tFacMain.getProhibitMonth());
+		tTempVo.putParam("BreachPercent", tFacMain.getBreachPercent());
+		tTempVo.putParam("BreachDecreaseMonth", tFacMain.getBreachDecreaseMonth());
+		tTempVo.putParam("BreachDecrease", tFacMain.getBreachDecrease());
+		tTempVo.putParam("BreachStartPercent", tFacMain.getBreachStartPercent());
+
 		tTempVo.putParam("Breach", tFacMain.getBreachDescription());
 		tTempVo.putParam("CreditScore", tFacMain.getCreditScore());
 		tTempVo.putParam("RepayCode", tFacMain.getRepayCode());
@@ -514,11 +518,7 @@ public class L2154 extends TradeBuffer {
 		tTempVo.putParam("RelationId", titaVo.getParam("OldRelationId"));
 		tTempVo.putParam("RelationBirthday", titaVo.getParam("OldRelationBirthday"));
 		tTempVo.putParam("RelationGender", titaVo.getParam("OldRelationGender"));
-//		tTempVo.putParam("AchAuthCode", tFacMain.getAchAuthCode());
-//		tTempVo.putParam("AchBank", tFacMain.getAchBank());
-//		tTempVo.putParam("AchAuthNo", tFacMain.getAchAuthNo());
 		tTempVo.putParam("Introducer", tFacMain.getIntroducer());
-//		tTempVo.putParam("Prohibityear", tFacMain.getProhibityear());
 		tTempVo.putParam("District", tFacMain.getDistrict());
 		tTempVo.putParam("FireOfficer", tFacMain.getFireOfficer());
 		tTempVo.putParam("Estimate", tFacMain.getEstimate());
@@ -531,9 +531,6 @@ public class L2154 extends TradeBuffer {
 		tTempVo.putParam("EstimateReview", tFacMain.getEstimateReview());
 		tTempVo.putParam("Coorgnizer", tFacMain.getCoorgnizer());
 		tTempVo.putParam("AdvanceCloseCode", tFacMain.getAdvanceCloseCode());
-//		tTempVo.putParam("BreachCode", tFacMain.getBreachCode());
-//		tTempVo.putParam("BreachGetCode", tFacMain.getBreachGetCode());
-//		tTempVo.putParam("DecreaseFlag", tFacMain.getDecreaseFlag());
 		tTempVo.putParam("ActFg", tFacMain.getActFg());
 		tTempVo.putParam("LastAcctDate", tFacMain.getLastAcctDate());
 		tTempVo.putParam("LastKinbr", tFacMain.getLastKinbr());
@@ -567,15 +564,11 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setLoanTermMm(this.parse.stringToInteger(titaVo.getParam("LoanTermMm")));
 		tFacMain.setLoanTermDd(this.parse.stringToInteger(titaVo.getParam("LoanTermDd")));
 		tFacMain.setAmortizedCode(titaVo.getParam("AmortizedCode"));
-//		tFacMain.setCancelCode(this.parse.stringToInteger(titaVo.getParam("CancelCode")));
 		tFacMain.setFreqBase(titaVo.getParam("FreqBase"));
 		tFacMain.setPayIntFreq(this.parse.stringToInteger(titaVo.getParam("PayIntFreq")));
 		tFacMain.setRepayFreq(this.parse.stringToInteger(titaVo.getParam("RepayFreq")));
 		tFacMain.setUtilDeadline(this.parse.stringToInteger(titaVo.getParam("UtilDeadline")));
 		tFacMain.setGracePeriod(this.parse.stringToInteger(titaVo.getParam("GracePeriod")));
-//		tFacMain.setDuePayAmt(this.parse.stringToBigDecimal(titaVo.getParam("TimDuePayAmt")));
-//		tFacMain.setDuePayLimit(this.parse.stringToBigDecimal(titaVo.getParam("TimDuePayLimit")));
-//		tFacMain.setPayIntLimit(this.parse.stringToBigDecimal(titaVo.getParam("TimPayIntLimit")));
 		tFacMain.setAcctFee(this.parse.stringToBigDecimal(titaVo.getParam("TimAcctFee")));
 		tFacMain.setHandlingFee(this.parse.stringToBigDecimal(titaVo.getParam("TimHandlingFee")));
 		tFacMain.setGuaranteeDate(this.parse.stringToInteger(titaVo.getParam("GuaranteeDate")));
@@ -592,25 +585,23 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setRateAdjNoticeCode(titaVo.getParam("RateAdjNoticeCode"));
 		tFacMain.setPieceCode(titaVo.getParam("PieceCode"));
 		tFacMain.setProdBreachFlag(titaVo.getParam("ProdBreachFlag"));
+
+		tFacMain.setBreachFlag(titaVo.getParam("BreachFlag"));
+		tFacMain.setBreachCode(titaVo.getParam("BreachCode"));
+		tFacMain.setBreachGetCode(titaVo.getParam("BreachGetCode"));
+		tFacMain.setProhibitMonth(parse.stringToInteger(titaVo.getParam("ProhibitMonth")));
+		tFacMain.setBreachPercent(parse.stringToBigDecimal(titaVo.getParam("BreachPercent")));
+		tFacMain.setBreachDecreaseMonth(parse.stringToInteger(titaVo.getParam("BreachDecreaseMonth")));
+		tFacMain.setBreachDecrease(parse.stringToBigDecimal(titaVo.getParam("BreachDecrease")));
+		tFacMain.setBreachStartPercent(parse.stringToInteger(titaVo.getParam("BreachStartPercent")));
+
 		// ProdBreachFlag為N時寫入
 		if ("N".equals(tFacMain.getProdBreachFlag())) {
 			tFacMain.setBreachDescription(tTempVo.getParam("Breach"));
 		}
 		tFacMain.setCreditScore(this.parse.stringToInteger(titaVo.getParam("CreditScore")));
 		tFacMain.setRepayCode(this.parse.stringToInteger(titaVo.getParam("RepayCode")));
-//		tFacMain.setRepayBank(titaVo.getParam("RepayBank"));
-//		tFacMain.setRepayAcctNo(this.parse.stringToBigDecimal(titaVo.getParam("RepayAcctNo")));
-//		tFacMain.setPostCode(titaVo.getParam("PostCode"));
-//		tFacMain.setRelationCode(titaVo.getParam("RelationCode"));
-//		tFacMain.setRelationName(titaVo.getParam("RelationName"));
-//		tFacMain.setRelationId(titaVo.getParam("RelationId"));
-//		tFacMain.setRelationBirthday(this.parse.stringToInteger(titaVo.getParam("RelationBirthday")));
-//		tFacMain.setRelationGender(titaVo.getParam("RelationGender"));
-//		tFacMain.setAchAuthCode(titaVo.getParam("AchAuthCode"));
-//		tFacMain.setAchBank(this.parse.stringToInteger(titaVo.getParam("AchBank")));
-//		tFacMain.setAchAuthNo(titaVo.getParam("AchAuthNo"));
 		tFacMain.setIntroducer(titaVo.getParam("Introducer"));
-//		tFacMain.setProhibityear(parse.stringToInteger(titaVo.getParam("Prohibityear")));
 		tFacMain.setDistrict(titaVo.getParam("District"));
 		tFacMain.setFireOfficer(titaVo.getParam("FireOfficer"));
 		tFacMain.setEstimate(titaVo.getParam("Estimate"));
@@ -622,10 +613,6 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setInvestigateOfficer(titaVo.getParam("InvestigateOfficer"));
 		tFacMain.setEstimateReview(titaVo.getParam("EstimateReview"));
 		tFacMain.setCoorgnizer(titaVo.getParam("Coorgnizer"));
-//		tFacMain.setAdvanceCloseCode(titaVo.getParam("AdvanceCloseCode"));
-//		tFacMain.setBreachCode(titaVo.getParam("BreachCode"));
-//		tFacMain.setBreachGetCode(titaVo.getParam("BreachGetCode"));
-//		tFacMain.setDecreaseFlag(titaVo.getParam("DecreaseFlag"));
 		tFacMain.setActFg(titaVo.getActFgI());
 		tFacMain.setLastAcctDate(titaVo.getEntDyI());
 		tFacMain.setLastKinbr(titaVo.getKinbr());
@@ -676,15 +663,11 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setLoanTermMm(this.parse.stringToInteger(tTempVo.getParam("LoanTermMm")));
 		tFacMain.setLoanTermDd(this.parse.stringToInteger(tTempVo.getParam("LoanTermDd")));
 		tFacMain.setAmortizedCode(tTempVo.getParam("AmortizedCode"));
-//		tFacMain.setCancelCode(tTempVo.getParam("CancelCode"));
 		tFacMain.setFreqBase(tTempVo.getParam("FreqBase"));
 		tFacMain.setPayIntFreq(this.parse.stringToInteger(tTempVo.getParam("PayIntFreq")));
 		tFacMain.setRepayFreq(this.parse.stringToInteger(tTempVo.getParam("RepayFreq")));
 		tFacMain.setUtilDeadline(this.parse.stringToInteger(tTempVo.getParam("UtilDeadline")));
 		tFacMain.setGracePeriod(this.parse.stringToInteger(tTempVo.getParam("GracePeriod")));
-//		tFacMain.setDuePayAmt(this.parse.stringToBigDecimal(tTempVo.getParam("DuePayAmt")));
-//		tFacMain.setDuePayLimit(this.parse.stringToBigDecimal(tTempVo.getParam("DuePayLimit")));
-//		tFacMain.setPayIntLimit(this.parse.stringToBigDecimal(tTempVo.getParam("PayIntLimit")));
 		tFacMain.setAcctFee(this.parse.stringToBigDecimal(tTempVo.getParam("AcctFee")));
 		tFacMain.setHandlingFee(this.parse.stringToBigDecimal(tTempVo.getParam("HandlingFee")));
 		tFacMain.setGuaranteeDate(this.parse.stringToInteger(tTempVo.getParam("GuaranteeDate")));
@@ -701,25 +684,23 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setRateAdjNoticeCode(tTempVo.getParam("RateAdjNoticeCode"));
 		tFacMain.setPieceCode(tTempVo.getParam("PieceCode"));
 		tFacMain.setProdBreachFlag(tTempVo.getParam("ProdBreachFlag"));
+
+		tFacMain.setBreachFlag(tTempVo.getParam("BreachFlag"));
+		tFacMain.setBreachCode(tTempVo.getParam("BreachCode"));
+		tFacMain.setBreachGetCode(tTempVo.getParam("BreachGetCode"));
+		tFacMain.setProhibitMonth(parse.stringToInteger(tTempVo.getParam("ProhibitMonth")));
+		tFacMain.setBreachPercent(parse.stringToBigDecimal(tTempVo.getParam("BreachPercent")));
+		tFacMain.setBreachDecreaseMonth(parse.stringToInteger(tTempVo.getParam("BreachDecreaseMonth")));
+		tFacMain.setBreachDecrease(parse.stringToBigDecimal(tTempVo.getParam("BreachDecrease")));
+		tFacMain.setBreachStartPercent(parse.stringToInteger(tTempVo.getParam("BreachStartPercent")));
+
 		// ProdBreachFlag為N時寫入
 		if ("N".equals(tFacMain.getProdBreachFlag())) {
 			tFacMain.setBreachDescription(tTempVo.getParam("Breach"));
 		}
 		tFacMain.setCreditScore(this.parse.stringToInteger(tTempVo.getParam("CreditScore")));
 		tFacMain.setRepayCode(this.parse.stringToInteger(tTempVo.getParam("RepayCode")));
-//		tFacMain.setRepayBank(tTempVo.getParam("RepayBank"));
-//		tFacMain.setRepayAcctNo(this.parse.stringToBigDecimal(tTempVo.getParam("RepayAcctNo")));
-//		tFacMain.setPostCode(tTempVo.getParam("PostCode"));
-//		tFacMain.setRelationCode(tTempVo.getParam("RelationCode"));
-//		tFacMain.setRelationName(tTempVo.getParam("RelationName"));
-//		tFacMain.setRelationId(tTempVo.getParam("RelationId"));
-//		tFacMain.setRelationBirthday(this.parse.stringToInteger(tTempVo.getParam("RelationBirthday")));
-//		tFacMain.setRelationGender(tTempVo.getParam("RelationGender"));
-//		tFacMain.setAchAuthCode(tTempVo.getParam("AchAuthCode"));
-//		tFacMain.setAchBank(this.parse.stringToInteger(tTempVo.getParam("AchBank")));
-//		tFacMain.setAchAuthNo(tTempVo.getParam("AchAuthNo"));
 		tFacMain.setIntroducer(tTempVo.getParam("Introducer"));
-//		tFacMain.setProhibityear(this.parse.stringToInteger(tTempVo.getParam("Prohibityear")));
 		tFacMain.setDistrict(tTempVo.getParam("District"));
 		tFacMain.setFireOfficer(tTempVo.getParam("FireOfficer"));
 		tFacMain.setEstimate(tTempVo.getParam("Estimate"));
@@ -731,10 +712,6 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setInvestigateOfficer(tTempVo.getParam("InvestigateOfficer"));
 		tFacMain.setEstimateReview(tTempVo.getParam("EstimateReview"));
 		tFacMain.setCoorgnizer(tTempVo.getParam("Coorgnizer"));
-//		tFacMain.setAdvanceCloseCode(tTempVo.getParam("AdvanceCloseCode"));
-//		tFacMain.setBreachCode(tTempVo.getParam("BreachCode"));
-//		tFacMain.setBreachGetCode(tTempVo.getParam("BreachGetCode"));
-//		tFacMain.setDecreaseFlag(tTempVo.getParam("DecreaseFlag"));
 		tFacMain.setActFg(this.parse.stringToInteger(tTempVo.getParam("ActFg")));
 		tFacMain.setLastAcctDate(this.parse.stringToInteger(tTempVo.getParam("LastAcctDate")));
 		tFacMain.setLastKinbr(tTempVo.getParam("LastKinbr"));
@@ -765,7 +742,6 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setFacMainId(tFacMainId);
 		tFacMain.setLastBormNo(this.parse.stringToInteger(tTempVo.getParam("LastBormNo")));
 		tFacMain.setLastBormRvNo(this.parse.stringToInteger(tTempVo.getParam("LastBormRvNo")));
-//		tFacMain.setCustUKey(tTempVo.getParam("CustUKey"));
 		tFacMain.setApplNo(this.parse.stringToInteger(tTempVo.getParam("ApplNo")));
 		tFacMain.setAnnualIncr(this.parse.stringToBigDecimal(tTempVo.getParam("AnnualIncr")));
 		tFacMain.setEmailIncr(this.parse.stringToBigDecimal(tTempVo.getParam("EmailIncr")));
@@ -775,7 +751,6 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setUtilBal(this.parse.stringToBigDecimal(tTempVo.getParam("UtilBal")));
 		tFacMain.setFirstDrawdownDate(this.parse.stringToInteger(tTempVo.getParam("FirstDrawdownDate")));
 		tFacMain.setMaturityDate(this.parse.stringToInteger(tTempVo.getParam("MaturityDate")));
-//		tFacMain.setCopyFlag(tTempVo.getParam("CopyFlag"));
 		tFacMain.setCreditScore(this.parse.stringToInteger(tTempVo.getParam("CreditScore")));
 		tFacMain.setGuaranteeDate(this.parse.stringToInteger(tTempVo.getParam("GuaranteeDate")));
 		tFacMain.setContractNo(tTempVo.getParam("ContractNo"));
@@ -818,23 +793,23 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setRateAdjNoticeCode(tTempVo.getParam("RateAdjNoticeCode"));
 		tFacMain.setPieceCode(tTempVo.getParam("PieceCode"));
 		tFacMain.setProdBreachFlag(tTempVo.getParam("ProdBreachFlag"));
+
+		tFacMain.setBreachFlag(tTempVo.getParam("BreachFlag"));
+		tFacMain.setBreachCode(tTempVo.getParam("BreachCode"));
+		tFacMain.setBreachGetCode(tTempVo.getParam("BreachGetCode"));
+		tFacMain.setProhibitMonth(parse.stringToInteger(tTempVo.getParam("ProhibitMonth")));
+		tFacMain.setBreachPercent(parse.stringToBigDecimal(tTempVo.getParam("BreachPercent")));
+		tFacMain.setBreachDecreaseMonth(parse.stringToInteger(tTempVo.getParam("BreachDecreaseMonth")));
+		tFacMain.setBreachDecrease(parse.stringToBigDecimal(tTempVo.getParam("BreachDecrease")));
+		tFacMain.setBreachStartPercent(parse.stringToInteger(tTempVo.getParam("BreachStartPercent")));
+
 		// ProdBreachFlag為N時寫入
 		if ("N".equals(tFacMain.getProdBreachFlag())) {
 			tFacMain.setBreachDescription(tTempVo.getParam("Breach"));
 		}
 		tFacMain.setCreditScore(this.parse.stringToInteger(tTempVo.getParam("CreditScore")));
 		tFacMain.setRepayCode(this.parse.stringToInteger(tTempVo.getParam("RepayCode")));
-//		tFacMain.setRepayBank(tTempVo.getParam("RepayBank"));
-//		tFacMain.setRepayAcctNo(this.parse.stringToBigDecimal(tTempVo.getParam("RepayAcctNo")));
-//		tFacMain.setPostCode(tTempVo.getParam("PostCode"));
-//		tFacMain.setRelationCode(tTempVo.getParam("RelationCode"));
-//		tFacMain.setRelationName(tTempVo.getParam("RelationName"));
-//		tFacMain.setRelationId(tTempVo.getParam("RelationId"));
-//		tFacMain.setRelationBirthday(this.parse.stringToInteger(tTempVo.getParam("RelationBirthday")));
-//		tFacMain.setRelationGender(tTempVo.getParam("RelationGender"));
-//		tFacMain.setAchAuthCode(tTempVo.getParam("AchAuthCode"));
-//		tFacMain.setAchBank(this.parse.stringToInteger(tTempVo.getParam("AchBank")));
-//		tFacMain.setAchAuthNo(tTempVo.getParam("AchAuthNo"));
+
 		tFacMain.setIntroducer(tTempVo.getParam("Introducer"));
 		tFacMain.setDistrict(tTempVo.getParam("District"));
 		tFacMain.setFireOfficer(tTempVo.getParam("FireOfficer"));
@@ -847,10 +822,7 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setInvestigateOfficer(tTempVo.getParam("InvestigateOfficer"));
 		tFacMain.setEstimateReview(tTempVo.getParam("EstimateReview"));
 		tFacMain.setCoorgnizer(tTempVo.getParam("Coorgnizer"));
-//		tFacMain.setAdvanceCloseCode(tTempVo.getParam("AdvanceCloseCode"));
-//		tFacMain.setBreachCode(tTempVo.getParam("BreachCode"));
-//		tFacMain.setBreachGetCode(tTempVo.getParam("BreachGetCode"));
-//		tFacMain.setDecreaseFlag(tTempVo.getParam("DecreaseFlag"));
+
 		tFacMain.setActFg(titaVo.getActFgI());
 		tFacMain.setLastAcctDate(this.parse.stringToInteger(tTempVo.getParam("LastAcctDate")));
 		tFacMain.setLastKinbr(tTempVo.getParam("LastKinbr"));
@@ -904,7 +876,7 @@ public class L2154 extends TradeBuffer {
 				bankAuthActCom.addRepayActChangeLog(titaVo);
 			}
 		}
-		//新還款帳號(含還款方式)
+		// 新還款帳號(含還款方式)
 		bankAuthActCom.add("A", titaVo);
 
 	}
@@ -917,22 +889,16 @@ public class L2154 extends TradeBuffer {
 		// 更新階梯式利率
 		FacProdStepRate tFacProdStepRate = new FacProdStepRate();
 
-//			if (iFuncCode == 1 || iFuncCode == 2 || iFuncCode == 3) {
+
 		for (int i = 1; i <= 10; i++) {
 			if (this.parse.stringToDouble(titaVo.getParam("StepMonthE" + i)) > 0) {
 				tFacProdStepRate.setProdNo(sProdNo);
 				tFacProdStepRate.setMonthStart(this.parse.stringToInteger(titaVo.getParam("StepMonthS" + i)));
 				tFacProdStepRate.setFacProdStepRateId(
 						new FacProdStepRateId(sProdNo, this.parse.stringToInteger(titaVo.getParam("StepMonthS" + i))));
-//				if (i == 10) {
-//					tFacProdStepRate.setMonthEnd(999);
-//				} else {
-//					if (this.parse.stringToInteger(titaVo.getParam("StepMonthS" + (i + 1))) == 0) {
-//						tFacProdStepRate.setMonthEnd(999);
-//					} else {
+
 				tFacProdStepRate.setMonthEnd(this.parse.stringToInteger(titaVo.getParam("StepMonthE" + i)));
-//					}
-//				}
+
 				tFacProdStepRate.setRateType(titaVo.getParam("StepRateType" + i));
 				tFacProdStepRate.setRateIncr(this.parse.stringToBigDecimal(titaVo.getParam("StepRateIncr" + i)));
 				tFacProdStepRate.setCreateDate(
@@ -951,7 +917,6 @@ public class L2154 extends TradeBuffer {
 				break;
 			}
 		}
-//			}
 
 	}
 

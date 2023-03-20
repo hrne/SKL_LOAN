@@ -672,9 +672,10 @@ public class MakeReport extends CommBuffer {
 	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String security)
 			throws LogicException {
 
+		this.titaVo = titaVo;
+
 		this.checkParm(date, brno, rptCode, rptItem);
 
-		this.titaVo = titaVo;
 
 		this.date = date;
 		this.brno = brno;
@@ -742,7 +743,8 @@ public class MakeReport extends CommBuffer {
 	@Deprecated
 	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String security,
 			String defaultPdf) throws LogicException {
-
+		this.titaVo = titaVo;
+		
 		this.checkParm(date, brno, rptCode, rptItem);
 
 		if ("".equals(defaultPdf)) {
@@ -757,7 +759,7 @@ public class MakeReport extends CommBuffer {
 			throw new LogicException("EC004", "(MakeReport)預設PDF底稿:" + filename + "不存在");
 		}
 
-		this.titaVo = titaVo;
+
 
 		this.date = date;
 		this.brno = brno;
@@ -788,9 +790,9 @@ public class MakeReport extends CommBuffer {
 	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security,
 			String pageSize, String pageOrientation) throws LogicException {
 
-		this.checkParm(date, brno, rptCode, rptItem);
-
 		this.titaVo = titaVo;
+
+		this.checkParm(date, brno, rptCode, rptItem);
 
 		this.date = date;
 		this.brno = brno;
@@ -1785,8 +1787,8 @@ public class MakeReport extends CommBuffer {
 	}
 
 	/**
-	 * 檢查報表對照檔是否有設定資料<BR>
-	 * 檢查寄送方式
+	 * 1.檢查報表對照檔是否有設定資料<br>
+	 * 2.檢查是否要書面寄送<br>
 	 * 
 	 * 
 	 * @return SecurityItem 機密等級中文
@@ -1794,18 +1796,16 @@ public class MakeReport extends CommBuffer {
 	 *
 	 */
 	private void checkCdReport(TitaVo titaVo, String rptCode) throws LogicException {
-
 		rptCode = rptCode.length() > 5 ? rptCode.substring(0, 5) : rptCode;
-
 		this.info("checkCdReport.rptCode=" + rptCode);
 		CdReport tCdReport = cdReportService.findById(rptCode, titaVo);
 		if (tCdReport == null) {
-			throw new LogicException("E0009", "未設定報表代號：" + rptCode + "，請至L6068報表代號對照檔設定此報表代號 ");
+			throw new LogicException("EC0009", "未設定報表代號：" + rptCode + "，請至L6068報表代號對照檔設定此報表代號 ");
 		} else {
 			this.info("checkCdReport.getLetterFg=" + tCdReport.getLetterFg());
 			if ("N".equals(tCdReport.getLetterFg())) {
-				// E0015檢查錯誤
-				throw new LogicException("E0015", "交易：" + tCdReport.getFormNo() + "，書面寄送設定為否，需調整請至L6068報表設定檔。 ");
+				// EC0015檢查錯誤
+				throw new LogicException("EC0015", "交易：" + tCdReport.getFormNo() + "，書面寄送設定為否，需調整請至L6068報表設定檔。 ");
 			}
 		}
 	}

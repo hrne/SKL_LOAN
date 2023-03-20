@@ -23,6 +23,7 @@ import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacShareApplService;
 import com.st1.itx.db.service.GuarantorService;
+import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.db.service.springjpa.cm.L9706ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
@@ -52,6 +53,10 @@ public class L9706Report extends MakeReport {
 
 	@Autowired
 	private ClBuildingService clBuildingService;
+	
+	@Autowired
+	private CustNoticeCom custNoticeCom;
+	
 
 	@Autowired
 	private Parse parse;
@@ -140,6 +145,20 @@ public class L9706Report extends MakeReport {
 			this.print(1, 1, "");
 			this.print(1, 1, "");
 			this.print(1, 1, "");
+		}
+		int custNo = 0;
+		int facmNo = 0;
+
+		if (titaVo.get("CustNo") != null) {
+			custNo = parse.stringToInteger(titaVo.get("CustNo"));
+		}
+		if (titaVo.get("FacmNo") != null) {
+			facmNo = parse.stringToInteger(titaVo.get("FacmNo"));
+		}
+		String tran = titaVo.getTxCode().isEmpty() ? "L9706" : titaVo.getTxCode();
+
+		if (!custNoticeCom.checkIsLetterSendable(titaVo.get("CUSTNO"), custNo, facmNo, tran, titaVo)) {
+			throw new LogicException("E0005", "無郵件寄號");
 		}
 		long sno = this.close();
 

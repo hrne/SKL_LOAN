@@ -105,20 +105,23 @@ BIND(#BtnAllShell{i},click, {cmd=CALLSEND;DOCODE=ApAllBtnProc{i}})
 
 #ApAllBtnProc1=@,1,S
 C(5,#BtnAllShell1,V,T(3,@BtnAllShell1,  ),T(3,@BtnAllShell1,V))
-##loop{times:32,i:1}
-C(5,#BtnShell{i},V,T(3,@BtnShell{i},  ),T(3,@BtnShell{i},V))
+##loop{times:50,i:1}
+!全勾選前，先排除沒有交易代號行數不勾選
+C(5,#TradeCode{i},     ,T(3,@BtnShell{i},  ),C(5,#BtnAllShell1,V,T(3,@BtnShell{i},V),T(3,@BtnShell{i},  )))
 ##end
 
 #ApAllBtnProc2=@,1,S
 C(5,#BtnAllShell2,V,T(3,@BtnAllShell2,  ),T(3,@BtnAllShell2,V))
-##loop{times:38,i:51}
-C(5,#BtnShell{i},V,T(3,@BtnShell{i},  ),T(3,@BtnShell{i},V))
+##loop{times:50,i:51}
+!全勾選前，先排除沒有交易代號行數不勾選
+C(5,#TradeCode{i},     ,T(3,@BtnShell{i},  ),C(5,#BtnAllShell2,V,T(3,@BtnShell{i},V),T(3,@BtnShell{i},  )))
 ##end
 
 #ApAllBtnProc3=@,1,S
 C(5,#BtnAllShell3,V,T(3,@BtnAllShell3,  ),T(3,@BtnAllShell3,V))
-##loop{times:6,i:101}
-C(5,#BtnShell{i},V,T(3,@BtnShell{i},  ),T(3,@BtnShell{i},V))
+##loop{times:50,i:101}
+!全勾選前，先排除沒有交易代號行數不勾選
+C(5,#TradeCode{i},     ,T(3,@BtnShell{i},  ),C(5,#BtnAllShell3,V,T(3,@BtnShell{i},V),T(3,@BtnShell{i},  )))
 ##end
 !全選勾選功能 end..........
 

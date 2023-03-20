@@ -14,8 +14,10 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.service.springjpa.cm.L9710ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
+import com.st1.itx.util.parse.Parse;
 
 @Service("L9710p")
 @Scope("prototype")
@@ -41,6 +43,13 @@ public class L9710p extends TradeBuffer {
 	
 	@Autowired
 	DateUtil dDateUtil;
+	
+	@Autowired
+	private CustNoticeCom custNoticeCom;
+	
+
+	@Autowired
+	private Parse parse;
 
 	@Autowired
 	public WebClient webClient;
@@ -90,7 +99,20 @@ public class L9710p extends TradeBuffer {
 			}
 
 			this.info("active L9710report(form type by l9711) notice");
-			
+			int custNo = 0;
+			int facmNo = 0;
+
+			if (titaVo.get("CustNo") != null) {
+				custNo = parse.stringToInteger(titaVo.get("CustNo"));
+			}
+			if (titaVo.get("FacmNo") != null) {
+				facmNo = parse.stringToInteger(titaVo.get("FacmNo"));
+			}
+			String tran = titaVo.getTxCode().isEmpty() ? "L9706" : titaVo.getTxCode();
+
+			if (!custNoticeCom.checkIsLetterSendable(titaVo.get("CUSTNO"), custNo, facmNo, tran, titaVo)) {
+				throw new LogicException("E0005", "無郵件寄號");
+			}
 			l9710NoticeTol9711.exec(titaVo, txbuffer, l9710List,"L9710A");
 			
 			infoNotification = "L9710 通知單已完成";

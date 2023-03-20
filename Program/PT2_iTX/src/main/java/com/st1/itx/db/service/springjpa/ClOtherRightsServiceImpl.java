@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -236,13 +239,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("findChoiceDateEq " + dbName + " : " + "choiceDate_0 : " + choiceDate_0 + " lastUpdateEmpNo_1 : " +  lastUpdateEmpNo_1);
     if (dbName.equals(ContentName.onDay))
-      slice = clOtherRightsReposDay.findAllByChoiceDateIsAndLastUpdateEmpNoIsOrderByCustNoAscCloseNoAsc(choiceDate_0, lastUpdateEmpNo_1, pageable);
+      slice = clOtherRightsReposDay.findAllByChoiceDateIsAndLastUpdateEmpNoIsOrderByCloseNoAsc(choiceDate_0, lastUpdateEmpNo_1, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = clOtherRightsReposMon.findAllByChoiceDateIsAndLastUpdateEmpNoIsOrderByCustNoAscCloseNoAsc(choiceDate_0, lastUpdateEmpNo_1, pageable);
+      slice = clOtherRightsReposMon.findAllByChoiceDateIsAndLastUpdateEmpNoIsOrderByCloseNoAsc(choiceDate_0, lastUpdateEmpNo_1, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = clOtherRightsReposHist.findAllByChoiceDateIsAndLastUpdateEmpNoIsOrderByCustNoAscCloseNoAsc(choiceDate_0, lastUpdateEmpNo_1, pageable);
+      slice = clOtherRightsReposHist.findAllByChoiceDateIsAndLastUpdateEmpNoIsOrderByCloseNoAsc(choiceDate_0, lastUpdateEmpNo_1, pageable);
     else 
-      slice = clOtherRightsRepos.findAllByChoiceDateIsAndLastUpdateEmpNoIsOrderByCustNoAscCloseNoAsc(choiceDate_0, lastUpdateEmpNo_1, pageable);
+      slice = clOtherRightsRepos.findAllByChoiceDateIsAndLastUpdateEmpNoIsOrderByCloseNoAsc(choiceDate_0, lastUpdateEmpNo_1, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

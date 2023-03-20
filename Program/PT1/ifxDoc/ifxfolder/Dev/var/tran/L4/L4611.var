@@ -256,6 +256,7 @@ T(3,1:自保;2:續保)
 
 ! 自保續保
 #RenewCodeX=x,4,L
+IF(#FunctionCode==6,T(2,#RenewCode,1),s)
 T(3,)T(H,#RenewCode,#SelfInsuCodeHelp2)
 
 !功能 下拉式選單 2.修改 5.查詢

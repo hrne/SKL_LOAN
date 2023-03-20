@@ -1400,7 +1400,8 @@ public class MakeExcel extends CommBuffer {
 	}
 
 	/**
-	 * 檢查報表對照檔是否有設定資料<BR>檢查寄送方式
+	 * 1.檢查報表對照檔是否有設定資料<br>
+	 * 2.檢查是否要書面寄送<br>
 	 * 
 	 * 
 	 * @return SecurityItem 機密等級中文
@@ -1408,7 +1409,6 @@ public class MakeExcel extends CommBuffer {
 	 *
 	 */
 	private void checkCdReport(TitaVo titaVo, String rptCode) throws LogicException {
-
 		rptCode = rptCode.length() > 5 ? rptCode.substring(0, 5) : rptCode;
 		this.info("checkCdReport.rptCode=" + rptCode);
 		CdReport tCdReport = cdReportService.findById(rptCode, titaVo);

@@ -128,7 +128,7 @@ public class L2634ReportA extends MakeReport {
 			int wkClCode1 = t.getClCode1();
 			int wkClCode2 = t.getClCode2();
 			int wkClNo = t.getClNo();
-			int wkClOtherSeq = t.getSeq();
+			String wkClOtherSeq = t.getSeq();
 			reportItem = "抵押權塗銷同意書,戶號 :" + iCustNo;
 
 			// 自動取公文編號
@@ -180,13 +180,19 @@ public class L2634ReportA extends MakeReport {
 
 			// 縣市
 			String wkCity = "";
-			if ("".equals(t.getOtherCity())) {
-				CdCity tCdCity = cdCityService.findById(t.getCity(), titaVo);
-				if (tCdCity != null) {
-					wkCity = tCdCity.getCityItem();
+			if (!"AAAA".equals(t.getCity())) {
+				if ("".equals(t.getOtherCity())) {
+					CdCity tCdCity = cdCityService.findById(t.getCity(), titaVo);
+					if (tCdCity != null) {
+						wkCity = tCdCity.getCityItem();
+					} else {
+						CdCode tCdCode = cdCodeService.findById(new CdCodeId("ClOtherRightsCityCd", t.getCity()),
+								titaVo);
+						wkCity = tCdCode.getItem();
+					}
+				} else {
+					wkCity = t.getOtherCity();
 				}
-			} else {
-				wkCity = t.getOtherCity();
 			}
 			// 地政
 			String wkLandAdm = "";
@@ -273,11 +279,18 @@ public class L2634ReportA extends MakeReport {
 
 			this.print(1, 10, "茲因                債務清償，同意       縣(市)      地政事務所");
 			this.print(0, 14, CustName);
-			if (wkCity.length() > 3) {
-				this.print(0, 44, wkCity.substring(0, 3));
+			if (wkCity.length() > 3 && wkCity.length() <= 10) {
+				this.setFont(1, 10);
+				this.print(0, 54, wkCity.substring(0, wkCity.length()));
 			} else {
-				this.print(0, 44, wkCity);
+				if (wkCity.length() > 10) {
+					this.setFont(1, 8);
+					this.print(0, 44, wkCity.substring(0, 10));
+				} else {
+					this.print(0, 44, wkCity);
+				}
 			}
+			this.setFont(1, 14);
 			if (wkLandAdm.length() > 3) {
 				this.print(0, 57, wkLandAdm.substring(0, 3));
 			} else {
@@ -432,7 +445,7 @@ public class L2634ReportA extends MakeReport {
 		}
 	}
 
-	public int getSelecTotal(int custNo, int closeNo, int clCode1, int clCode2, int clNo, int seq,
+	public int getSelecTotal(int custNo, int closeNo, int clCode1, int clCode2, int clNo, String seq,
 			List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
 		int selecTotal = 0;
 		int cnt = 0;
@@ -441,7 +454,7 @@ public class L2634ReportA extends MakeReport {
 			if (custNo == t.getReceiveCustNo() && closeNo == t.getCloseNo()) {
 				selecTotal++;
 				if (clCode1 == t.getClCode1() && clCode2 == t.getClCode2() && clNo == t.getClNo()
-						&& seq == t.getSeq()) {
+						&& seq.equals(t.getSeq())) {
 					this.info("size =   " + cnt + "," + lClOtherRights.size());
 					if (cnt == lClOtherRights.size()) {
 						isLast = true;

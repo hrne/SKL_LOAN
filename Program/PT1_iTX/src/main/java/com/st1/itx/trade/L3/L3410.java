@@ -300,15 +300,15 @@ public class L3410 extends TradeBuffer {
 	}
 
 	private void checkInputRoutine() throws LogicException {
-		// 本金不可短收
-		if (this.parse.stringToInteger(titaVo.getParam("OverRpFg")) == 1
-				&& this.parse.stringToBigDecimal(titaVo.getParam("OverRpAmt")).compareTo(BigDecimal.ZERO) > 0) {
-			throw new LogicException(titaVo, "E3071", "本金不可短收"); // 金額不足
-		}
+//		// 本金不可短收
+//		if (this.parse.stringToInteger(titaVo.getParam("OverRpFg")) == 1
+//				&& this.parse.stringToBigDecimal(titaVo.getParam("OverRpAmt")).compareTo(BigDecimal.ZERO) > 0) {
+//			throw new LogicException(titaVo, "E3071", "本金不可短收"); // 金額不足
+//		}
 		// 延遲息、違約金需全額減免
-		if (iReduceAmt.compareTo(iDelayInt.add(iBreachAmt)) < 0) {
-			throw new LogicException(titaVo, "E3071", "延遲息、違約金需全額減免"); // 金額不足
-		}
+//		if (iReduceAmt.compareTo(iDelayInt.add(iBreachAmt)) < 0) {
+//			throw new LogicException(titaVo, "E3071", "延遲息、違約金需全額減免"); // 金額不足
+//		}
 
 	}
 

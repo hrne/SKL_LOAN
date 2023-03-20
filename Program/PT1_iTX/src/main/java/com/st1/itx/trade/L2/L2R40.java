@@ -24,7 +24,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2R40 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2R40.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -58,11 +57,13 @@ public class L2R40 extends TradeBuffer {
 
 		// 錯誤處理
 		if (tClFac == null) {
-			throw new LogicException("E2020", "擔保品與額度關聯檔"); // 查無資料
+			throw new LogicException("E0001", "擔保品與額度關聯檔"); // 查無資料
 		}
 
 		// 存入tota
 		this.totaVo.putParam("L2r40ShareAmt", tClFac.getShareAmt().toString());
+		this.totaVo.putParam("L2r40CustNo", tClFac.getCustNo());
+		this.totaVo.putParam("L2r40FacmNo", tClFac.getFacmNo());
 
 		this.addList(this.totaVo);
 		return this.sendList();

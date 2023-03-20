@@ -2,10 +2,10 @@ package com.st1.itx.trade.L6;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
@@ -16,10 +16,9 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
-import com.st1.itx.db.domain.CdCode;
-import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdEmpService;
+import com.st1.itx.db.service.springjpa.cm.L6064ServiceImpl;
 
 /**
  * Tita<br>
@@ -46,6 +45,8 @@ public class L6064 extends TradeBuffer {
 	@Autowired
 	public CdEmpService cdEmpService;
 	@Autowired
+	public L6064ServiceImpl l6064ServiceImpls;
+	@Autowired
 	Parse parse;
 
 	@Override
@@ -55,86 +56,56 @@ public class L6064 extends TradeBuffer {
 
 		// 取得輸入資料
 		String iDefType = titaVo.getParam("DefType");
-		String iDefCode = titaVo.getParam("DefCode").trim();
-		String iDefItem = titaVo.getParam("DefItem").trim();
+		String iDefCode = titaVo.getParam("DefCode");
 		String iCode = titaVo.getParam("Code");
 		String iCodeItem = titaVo.getParam("CodeItem");
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = 100; // 217 * 200 = 43400
-
-		Slice<CdCode> slCdCode = null;
-		if (iDefCode.length() > 0 || iDefType.equals("") || iDefItem.length() > 0) {
-			if (iDefItem.length() > 0) {
-				slCdCode = sCdCodeDefService.defItemEq("CodeType", "%" + iDefItem + "%", this.index, this.limit, titaVo);
-			} else if (("").equals(iCode)) {
-				slCdCode = sCdCodeDefService.defItemEq(iDefCode, "%" + iCodeItem + "%", index, limit, titaVo);
-			} else {
-				slCdCode = sCdCodeDefService.defCodeEq(iDefCode, "%" + iCode + "%", this.index, this.limit, titaVo);
+		this.limit =Integer.MAX_VALUE ; // 217 * 200 = 43400
+		List<Map<String, String>> L6064DateList = null;
+		try {
+			L6064DateList = l6064ServiceImpls.findAll(iDefType,iDefCode,iCode,iCodeItem,this.index,this.limit,titaVo);
+		} catch (Exception e) {
+			throw new LogicException(titaVo, "E0001", "SQL ERROR");
+		}
+		int idx = 0;
+		int cnt = 0;
+		if(L6064DateList != null ) {
+			for (Map<String, String> t : L6064DateList) {
+				idx++;
+				if (this.index > 0 && this.index > idx) {
+					continue;
+				}
+				cnt++;
+				if (cnt > this.limit) {
+					break;
+				}
+				OccursList occursList = new OccursList();
+				occursList.putParam("OODefCode",t.get("DefCode"));
+				occursList.putParam("OOCode",t.get("Code"));
+				occursList.putParam("OOItem",t.get("Item"));
+				occursList.putParam("OOType",t.get("DefType"));
+				occursList.putParam("OOEnable",t.get("Enable"));
+				occursList.putParam("OOLastUpdate",t.get("LastUpdate"));
+				occursList.putParam("OOLastEmp",t.get("LastUpdateEmpNo")+" "+t.get("Fullname"));
+				/* 將每筆資料放入Tota的OcList */
+				this.totaVo.addOccursList(occursList);
 			}
-		} else {
-			int iDefType9 = Integer.parseInt(iDefType);
-			slCdCode = sCdCodeDefService.DefTypeEq("CodeType", iDefType9, iCode + "%", iCodeItem + "%", this.index, this.limit, titaVo);
 		}
-		List<CdCode> lCdCode = slCdCode == null ? null : slCdCode.getContent();
-
-		if (lCdCode == null || lCdCode.size() == 0) {
-			throw new LogicException(titaVo, "E0001", "各類代碼檔檔"); // 查無資料
+		this.info("L6064DateList.size = " + L6064DateList.size() + "/" + idx);
+		
+		if (L6064DateList != null && idx < L6064DateList.size()) {
+			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
+			titaVo.setReturnIndex(idx);
+			if ("".equals(titaVo.getParam("TlrNo")) && "".equals(titaVo.getParam("TranNo"))) {
+				this.totaVo.setMsgEndToEnter();// 手動折返
+			} else {
+				this.totaVo.setMsgEndToAuto();// 自動折返
+			}
 		}
-		// 如有找到資料
-		for (CdCode tCdCode : lCdCode) {
-
-//			if (iDefItem.length() > 0) {
-//				Slice<CdCode> m1CdCode = sCdCodeDefService.defCodeEq(tCdCode.getCode(), "%" + iCode + "%", index, limit, titaVo);
-//				List<CdCode> m2CdCode = m1CdCode == null ? null : m1CdCode.getContent();
-//				if (m2CdCode != null) {
-//					this.info("m2CdCode==" + m2CdCode);
-//					for (CdCode m3CdCode : m2CdCode) {
-//						OccursList occursList = new OccursList();
-//						occursList.putParam("OODefCode", m3CdCode.getDefCode());
-//						occursList.putParam("OOCode", m3CdCode.getCode());
-//						occursList.putParam("OOItem", m3CdCode.getItem());
-//						occursList.putParam("OOType", m3CdCode.getDefType());
-//						occursList.putParam("OOEnable", m3CdCode.getEnable());
-//						this.totaVo.addOccursList(occursList);
-//					}
-//				}
-
-//			} else {
-			OccursList occursList = new OccursList();
-			occursList.putParam("OODefCode", tCdCode.getDefCode());
-			occursList.putParam("OOCode", tCdCode.getCode());
-			occursList.putParam("OOItem", tCdCode.getItem());
-			occursList.putParam("OOType", tCdCode.getDefType());
-			occursList.putParam("OOEnable", tCdCode.getEnable());
-			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdCode.getLastUpdate()) + " " + parse.timeStampToStringTime(tCdCode.getLastUpdate()));
-			occursList.putParam("OOLastEmp", tCdCode.getLastUpdateEmpNo() + " " + empName(titaVo, tCdCode.getLastUpdateEmpNo()));
-			this.totaVo.addOccursList(occursList);
-		}
-
-		/* 將每筆資料放入Tota的OcList */
-
-//		}
-
-		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-		if (slCdCode != null && slCdCode.hasNext()) {
-			titaVo.setReturnIndex(this.setIndexNext());
-			this.totaVo.setMsgEndToEnter();// 手動折返
-		}
-
 		this.addList(this.totaVo);
 		return this.sendList();
-	}
-
-	private String empName(TitaVo titaVo, String empNo) throws LogicException {
-		String rs = empNo;
-
-		CdEmp cdEmp = cdEmpService.findById(empNo, titaVo);
-		if (cdEmp != null) {
-			rs = cdEmp.getFullname();
-		}
-		return rs;
 	}
 }

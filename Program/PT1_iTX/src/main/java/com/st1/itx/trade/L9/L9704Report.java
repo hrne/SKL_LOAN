@@ -91,7 +91,7 @@ public class L9704Report extends MakeReport {
 		makeExcel.setValue(2, 15, "日　　期：" + this.showBcDate(today, 1));
 		makeExcel.setValue(3, 15, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
 				+ dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
-
+		makeExcel.setValue(4, 15, "單　　位：  元");
 		int printRow = 7; // 從這行開始印
 
 		if (listL9704 == null || listL9704.isEmpty()) {

@@ -73,6 +73,7 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sqlCaseKindCode1 = "";
 		String sqlCaseKindCode3 = "";
 		String sqlCaseKindCode4 = "";
+		boolean havekincode = false;
 
 		if (ExportDateYN == 3 && State == 4) {
 
@@ -94,22 +95,22 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 					sqlCaseKindCode4 = "\"CaseKindCode\" ='4'";
 				}
 			}
-			if (!sqlCaseKindCode1.isEmpty()) {
+			if (!sqlCaseKindCode1.isEmpty()) {// CaseKindCode=1或2有值
+				havekincode = true;
 				sqlCaseKindCode += sqlCaseKindCode1;
 			}
-
-			if (!sqlCaseKindCode3.isEmpty() && !sqlCaseKindCode1.isEmpty()) {
-				sqlCaseKindCode += " OR " + sqlCaseKindCode3;
-			} else if (!sqlCaseKindCode3.isEmpty() && sqlCaseKindCode1.isEmpty()) {
+			if (havekincode && (!sqlCaseKindCode3.isEmpty() || !sqlCaseKindCode4.isEmpty())) {
+				sqlCaseKindCode += " OR ";
+			}
+			if (!sqlCaseKindCode3.isEmpty()) {
 				sqlCaseKindCode += sqlCaseKindCode3;
 			}
-
-			if (!sqlCaseKindCode3.isEmpty() && !sqlCaseKindCode4.isEmpty()) {
-				sqlCaseKindCode += " OR " + sqlCaseKindCode4;
-			} else if (!sqlCaseKindCode.isEmpty() && sqlCaseKindCode3.isEmpty() && !sqlCaseKindCode4.isEmpty()) {
-				sqlCaseKindCode += " OR " + sqlCaseKindCode4;
-			} else if (sqlCaseKindCode1.isEmpty() && sqlCaseKindCode3.isEmpty() && !sqlCaseKindCode4.isEmpty()) {
-				sqlCaseKindCode += sqlCaseKindCode4;
+			if (!sqlCaseKindCode4.isEmpty()) {
+				if (sqlCaseKindCode3.isEmpty()) {
+					sqlCaseKindCode += sqlCaseKindCode4;
+				} else {
+					sqlCaseKindCode += " OR " + sqlCaseKindCode4;
+				}
 			}
 		}
 		this.info("sqlCaseKindCode==" + sqlCaseKindCode);

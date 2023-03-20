@@ -80,7 +80,7 @@ public class L4703 extends TradeBuffer {
 
 	@Autowired
 	public L9703ServiceImpl l9703ServiceImpl;
-	
+
 	@Autowired
 	public WebClient webClient;
 
@@ -147,19 +147,23 @@ public class L4703 extends TradeBuffer {
 				tempVo = new TempVo();
 				tempVo = custNoticeCom.getCustNotice("L9703", custNo, facmNo, titaVo);
 
-				noticePhoneNo = tempVo.getParam("MessagePhoneNo");
-				noticeEmail = tempVo.getParam("EmailAddress");
-				if ("2".equals(titaVo.getParam("NoticeFlag"))) {
-					if (!"".equals(noticePhoneNo)) {
-						setTextFileVO(custNo, facmNo, titaVo);
-					}
-				}
-				if ("3".equals(titaVo.getParam("NoticeFlag"))) {
-					if (!"".equals(noticeEmail)) {
-						setEMailFileVO(custNo, facmNo, titaVo);
-					}
-				}
+				String tran = titaVo.getTxCode().isEmpty() ? "L9705" : titaVo.getTxCode();
 
+				if (custNoticeCom.checkIsLetterSendable(titaVo.get("CUSTNO"), custNo, facmNo, tran, titaVo)) {
+
+					noticePhoneNo = tempVo.getParam("MessagePhoneNo");
+					noticeEmail = tempVo.getParam("EmailAddress");
+					if ("2".equals(titaVo.getParam("NoticeFlag"))) {
+						if (!"".equals(noticePhoneNo)) {
+							setTextFileVO(custNo, facmNo, titaVo);
+						}
+					}
+					if ("3".equals(titaVo.getParam("NoticeFlag"))) {
+						if (!"".equals(noticeEmail)) {
+							setEMailFileVO(custNo, facmNo, titaVo);
+						}
+					}
+				}
 //		2.整批
 //		若設定寄送簡訊或mail，則額外多寄，但信依舊要寄
 			case 2:
@@ -281,6 +285,7 @@ public class L4703 extends TradeBuffer {
 			}
 		}
 	}
+
 //	刪除TxToDoDetail 同L4454 須同步更改
 	private void dele(String itemCode, TitaVo titaVo) throws LogicException {
 //		刪除未處理

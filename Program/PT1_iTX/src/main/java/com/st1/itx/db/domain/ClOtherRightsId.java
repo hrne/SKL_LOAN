@@ -2,8 +2,12 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * ClOtherRights 擔保品他項權利檔<br>
@@ -16,12 +20,7 @@ import javax.persistence.Embeddable;
 public class ClOtherRightsId implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -1037013325377555130L;
-
-// 擔保品代號1
+  // 擔保品代號1
   /* 擔保品代號檔CdCl */
   @Column(name = "`ClCode1`")
   private int clCode1 = 0;
@@ -35,15 +34,15 @@ public class ClOtherRightsId implements Serializable {
   @Column(name = "`ClNo`")
   private int clNo = 0;
 
-  // 他項權利序號
-  /* ex：001 */
-  @Column(name = "`Seq`")
-  private int seq = 0;
+  // 他項權利登記次序
+  /* ex：0002-000資料轉換:固定為9999-nnn同一擔保品由001開始續編 */
+  @Column(name = "`Seq`", length = 8)
+  private String seq = " ";
 
   public ClOtherRightsId() {
   }
 
-  public ClOtherRightsId(int clCode1, int clCode2, int clNo, int seq) {
+  public ClOtherRightsId(int clCode1, int clCode2, int clNo, String seq) {
     this.clCode1 = clCode1;
     this.clCode2 = clCode2;
     this.clNo = clNo;
@@ -108,21 +107,23 @@ public class ClOtherRightsId implements Serializable {
   }
 
 /**
-	* 他項權利序號<br>
-	* ex：001
-	* @return Integer
+	* 他項權利登記次序<br>
+	* ex：0002-000
+資料轉換:固定為9999-nnn同一擔保品由001開始續編
+	* @return String
 	*/
-  public int getSeq() {
-    return this.seq;
+  public String getSeq() {
+    return this.seq == null ? "" : this.seq;
   }
 
 /**
-	* 他項權利序號<br>
-	* ex：001
+	* 他項權利登記次序<br>
+	* ex：0002-000
+資料轉換:固定為9999-nnn同一擔保品由001開始續編
   *
-  * @param seq 他項權利序號
+  * @param seq 他項權利登記次序
 	*/
-  public void setSeq(int seq) {
+  public void setSeq(String seq) {
     this.seq = seq;
   }
 
@@ -139,7 +140,7 @@ public class ClOtherRightsId implements Serializable {
     if(obj == null || getClass() != obj.getClass())
       return false;
     ClOtherRightsId clOtherRightsId = (ClOtherRightsId) obj;
-    return clCode1 == clOtherRightsId.clCode1 && clCode2 == clOtherRightsId.clCode2 && clNo == clOtherRightsId.clNo && seq == clOtherRightsId.seq;
+    return clCode1 == clOtherRightsId.clCode1 && clCode2 == clOtherRightsId.clCode2 && clNo == clOtherRightsId.clNo && seq.equals(clOtherRightsId.seq);
   }
 
   @Override

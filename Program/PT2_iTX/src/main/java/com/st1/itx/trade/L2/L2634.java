@@ -101,7 +101,6 @@ public class L2634 extends TradeBuffer {
 //				類別 1 申請書及其他
 				if (iType == 1) {
 					doReport1(titaVo);
-
 					String checkMsg = "申請書及其他-整批列印已完成。";
 					webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
 							titaVo.getTlrNo() + "L2634", checkMsg, titaVo);
@@ -155,7 +154,7 @@ public class L2634 extends TradeBuffer {
 		int clCode1 = 0;
 		int clCode2 = 0;
 		int clNo = 0;
-		String clOtherRightsSeq = "0";
+		String clOtherRightsSeq = "";
 		if (titaVo.get("OOClCode1") != null || !titaVo.get("OOClCode1").isEmpty()) {
 			clCode1 = parse.stringToInteger(titaVo.get("OOClCode1"));
 		}
@@ -170,7 +169,7 @@ public class L2634 extends TradeBuffer {
 		}
 
 		ClOtherRights tClOtherRights = ClOtherRightsService
-				.holdById(new ClOtherRightsId(clCode1, clCode2, clNo, parse.stringToInteger(clOtherRightsSeq)), titaVo);
+				.holdById(new ClOtherRightsId(clCode1, clCode2, clNo, clOtherRightsSeq), titaVo);
 		if (tClOtherRights != null) {
 
 			if (tClOtherRights.getChoiceDate() == 0) {

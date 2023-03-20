@@ -42,6 +42,10 @@ public class L9130 extends TradeBuffer {
 	private L9135 tranL9135;
 	@Autowired
 	private L9136 tranL9136;
+	@Autowired
+	private L9137 tranL9137;
+	@Autowired
+	private L9138 tranL9138;
 
 	@Autowired
 	private WebClient webClient;
@@ -117,93 +121,122 @@ public class L9130 extends TradeBuffer {
 			this.addList(this.totaVo);
 			return this.sendList();
 		}
+		this.info("exec start = " + titaVo.getTxcd());
+		if ("L6101".equals(titaVo.getTxcd())) {
 
-		doRpt(titaVo);
+			doRpt(titaVo);
 
-		// MSG帶入預設值
-		String ntxbuf = titaVo.getTlrNo() + FormatUtil.padX("L9130", 60) + iAcDate;
+			// MSG帶入預設值
+			String ntxbuf = titaVo.getTlrNo() + FormatUtil.padX("L9130", 60) + iAcDate;
 
-		this.info("ntxbuf = " + ntxbuf);
+			this.info("ntxbuf = " + ntxbuf);
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf,
-				"L9130總帳傳票媒體檔產生已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf,
+					"L9130總帳傳票媒體檔產生已完成", titaVo);
 
-		try {
-			tranL9131.run(titaVo);
-		} catch (Exception e) {
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.error("L9130產生L9131總帳日結單代傳票時發生錯誤 = " + errors.toString());
-		}
-
-		// 2022-05-13 ST1 Wei 新增:
-		// from Linda : 珮瑜產生批號90~99時，只需上傳傳票，產生L9131報表，後面的報表不產
-		if (iBatchNo >= 90 && iBatchNo <= 99) {
-			this.addList(this.totaVo);
-			return this.sendList();
-		}
-
-		try {
-			tranL9132.run(titaVo);
-		} catch (Exception e) {
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.error("L9130產生L9132傳票媒體總表(總帳)時發生錯誤 = " + errors.toString());
-		}
-
-		String doL9133 = "N";
-
-		if (titaVo.containsKey("DoL9133")) {
-			this.info("titaVo.containsKey : DoL9133 , value = " + titaVo.getParam("DoL9133"));
-			doL9133 = titaVo.getParam("DoL9133");
-		}
-
-		this.info("doL9133 = " + doL9133);
-
-		if (doL9133.equals("Y")) {
 			try {
-				tranL9133.run(titaVo);
+				tranL9131.run(titaVo);
 			} catch (Exception e) {
 				StringWriter errors = new StringWriter();
 				e.printStackTrace(new PrintWriter(errors));
-				this.error("L9130產生L9133放款會計與主檔餘額檢核表時發生錯誤 = " + errors.toString());
+				this.error("L9130產生L9131總帳日結單代傳票時發生錯誤 = " + errors.toString());
 			}
-		}
 
-		titaVo.putParam("StartDate", iAcDate);
-		titaVo.putParam("EndDate", iAcDate);
+			// 2022-05-13 ST1 Wei 新增:
+			// from Linda : 珮瑜產生批號90~99時，只需上傳傳票，產生L9131報表，後面的報表不產
+			if (iBatchNo >= 90 && iBatchNo <= 99) {
+				this.addList(this.totaVo);
+				return this.sendList();
+			}
 
-		try {
-			tranL9134.run(titaVo);
-		} catch (Exception e) {
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.error("L9130產生L9134暫收款傳票金額表時發生錯誤 = " + errors.toString());
-		}
-		// 2022/08/03 Ted新增 L9135 L9136
-		try {
-			tranL9135.run(titaVo);
-		} catch (Exception e) {
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.error("L9130產生L9135銀行存款媒體明細表(總帳)時發生錯誤 = " + errors.toString());
-		}
+			try {
+				tranL9132.run(titaVo);
+			} catch (Exception e) {
+				StringWriter errors = new StringWriter();
+				e.printStackTrace(new PrintWriter(errors));
+				this.error("L9130產生L9132傳票媒體總表(總帳)時發生錯誤 = " + errors.toString());
+			}
 
-		try {
-			tranL9136.run(titaVo);
-		} catch (Exception e) {
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.error("L9130產生L9136檔案資料變更日報表時發生錯誤 = " + errors.toString());
-		}
+			String doL9133 = "N";
 
-		StringBuilder backgroundJobs = new StringBuilder();
-		
-		backgroundJobs.append("jLD008;");
-		backgroundJobs.append("jLD009;");
-		
-		backgroundJobs.setLength(backgroundJobs.length() - 1); // delete out the last ; symbol.
-		titaVo.setBatchJobId(backgroundJobs.toString());
+			if (titaVo.containsKey("DoL9133")) {
+				this.info("titaVo.containsKey : DoL9133 , value = " + titaVo.getParam("DoL9133"));
+				doL9133 = titaVo.getParam("DoL9133");
+			}
+
+			this.info("doL9133 = " + doL9133);
+
+			if (doL9133.equals("Y")) {
+				try {
+					tranL9133.run(titaVo);
+				} catch (Exception e) {
+					StringWriter errors = new StringWriter();
+					e.printStackTrace(new PrintWriter(errors));
+					this.error("L9130產生L9133放款會計與主檔餘額檢核表時發生錯誤 = " + errors.toString());
+				}
+			}
+
+			titaVo.putParam("StartDate", iAcDate);
+			titaVo.putParam("EndDate", iAcDate);
+
+			try {
+				tranL9134.run(titaVo);
+			} catch (Exception e) {
+				StringWriter errors = new StringWriter();
+				e.printStackTrace(new PrintWriter(errors));
+				this.error("L9130產生L9134暫收款傳票金額表時發生錯誤 = " + errors.toString());
+			}
+			// 2022/08/03 Ted新增 L9135 L9136
+			try {
+				tranL9135.run(titaVo);
+			} catch (Exception e) {
+				StringWriter errors = new StringWriter();
+				e.printStackTrace(new PrintWriter(errors));
+				this.error("L9130產生L9135銀行存款媒體明細表(總帳)時發生錯誤 = " + errors.toString());
+			}
+
+			try {
+				tranL9136.run(titaVo);
+			} catch (Exception e) {
+				StringWriter errors = new StringWriter();
+				e.printStackTrace(new PrintWriter(errors));
+				this.error("L9130產生L9136檔案資料變更日報表時發生錯誤 = " + errors.toString());
+			}
+
+			try {
+				tranL9137.run(titaVo);
+			} catch (Exception e) {
+				StringWriter errors = new StringWriter();
+				e.printStackTrace(new PrintWriter(errors));
+				this.error("L9130產生L9137放款餘額總表時發生錯誤 = " + errors.toString());
+			}
+
+			try {
+				tranL9138.run(titaVo);
+			} catch (Exception e) {
+				StringWriter errors = new StringWriter();
+				e.printStackTrace(new PrintWriter(errors));
+				this.error("L9130產生L9138放款授信日報表時發生錯誤 = " + errors.toString());
+			}
+		} else {
+			doRpt(titaVo);
+
+			// MSG帶入預設值
+			String ntxbuf = titaVo.getTlrNo() + FormatUtil.padX("L9130", 60) + iAcDate;
+
+			this.info("ntxbuf = " + ntxbuf);
+
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf,
+					"L9130總帳傳票媒體檔產生已完成", titaVo);
+
+		}
+//		StringBuilder backgroundJobs = new StringBuilder();
+//
+//		backgroundJobs.append("jLD008;");
+//		backgroundJobs.append("jLD009;");
+//
+//		backgroundJobs.setLength(backgroundJobs.length() - 1); // delete out the last ; symbol.
+//		titaVo.setBatchJobId(backgroundJobs.toString());
 
 		this.addList(this.totaVo);
 		return this.sendList();

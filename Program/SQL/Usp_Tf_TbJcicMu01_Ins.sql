@@ -40,6 +40,28 @@ BEGIN
         , "LastUpdate"          -- 最後更新日期時間 DATE 8 0
         , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
     )
+    WITH pkData AS (
+        SELECT HEADOFFICE_CODE
+             , BRANCH_CODE
+             , DATA_DATE
+             , EMP_ID
+             , ROW_NUMBER()
+               OVER (
+                PARTITION BY HEADOFFICE_CODE
+                           , BRANCH_CODE
+                           , EMP_ID
+                ORDER BY DATA_DATE DESC
+               ) AS "Seq"
+        FROM REMIN_TBJCICMU01
+    )
+    , pkDataSeq1 AS (
+        SELECT HEADOFFICE_CODE
+             , BRANCH_CODE
+             , DATA_DATE
+             , EMP_ID
+        FROM pkData
+        WHERE "Seq" = 1
+    )
     SELECT T.HEADOFFICE_CODE              AS "HeadOfficeCode"      -- 總行代號 VARCHAR2 3
          , T.BRANCH_CODE                  AS "BranchCode"          -- 分行代號 VARCHAR2 4
          , T.DATA_DATE                    AS "DataDate"            -- 資料日期 Decimald 8
@@ -62,7 +84,11 @@ BEGIN
          , T.MODIFYUSERID                 AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
          , T.LASTUPDATEDATE               AS "LastUpdate"          -- 最後更新日期時間 DATE 8 0
          , T.MODIFYUSERID                 AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
-    FROM REMIN_TBJCICMU01 T
+    FROM pkDataSeq1 P
+    LEFT JOIN REMIN_TBJCICMU01 T ON T.HEADOFFICE_CODE = P.HEADOFFICE_CODE
+                                AND T.BRANCH_CODE = P.BRANCH_CODE
+                                AND T.DATA_DATE = P.DATA_DATE
+                                AND T.EMP_ID = P.EMP_ID
     ;
 
     -- 記錄寫入筆數

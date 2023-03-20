@@ -3212,11 +3212,15 @@ TXFORM=L2R39
 !    L2R40 : 用擔保品編號和核准號碼查擔保品與額度關聯檔
 <L2R40.dec>
 #L2r40ShareAmt=m,14,S
+#L2r40CustNo=A,7,S
+#L2r40FacmNo=A,3,S
 </L2R40.dec>
 
 <L2R40.tom>
 TXFORM=L2R40
 #L2r40ShareAmt
+#L2r40CustNo
+#L2r40FacmNo
 ^
 </L2R40.tom>
 !    L2R41 :
@@ -3346,7 +3350,7 @@ TXFORM=L2R45
 
 !    L2R46 : 依擔保品編號取他項權利資料
 <L2R46.dec>
-#L2r46Seq=X,7,S
+#L2r46Seq=X,8,S
 #L2r46City=X,4,S
 #L2r46OtherCity=x,20,S
 #L2r46LandAdm=X,2,S
@@ -3357,8 +3361,10 @@ TXFORM=L2R45
 #L2r46RecNumber=c,6,S
 #L2r46RightsNote=X,2,S
 #L2r46SecuredTotal=m,14.2,S
-#L2r46CustNo=A,7,S
 #L2r46Cnt=X,3,S
+##loop{times:10,n:1}
+#L2r46ApplNo{n}=A,7,S
+##end
 </L2R46.dec>
 
 <L2R46.tom>
@@ -3374,8 +3380,10 @@ TXFORM=L2R46
 #L2r46RecNumber
 #L2r46RightsNote
 #L2r46SecuredTotal
-#L2r46CustNo
 #L2r46Cnt
+##loop{times:10,n:1}
+#L2r46ApplNo{n}
+##end
 ^
 </L2R46.tom>
 
@@ -5699,7 +5707,7 @@ TXFORM=L4R28
 #L4R29IntEndDate=D,7,S
 #L4R29ErrMsg=X,80,S
 #L4R29Acdate=D,7,S
-#L4R29TitaTxtNo=A,7,S
+#L4R29TitaTxtNo=A,8,S
 </L4R29.dec>
 
 <L4R29.tom>

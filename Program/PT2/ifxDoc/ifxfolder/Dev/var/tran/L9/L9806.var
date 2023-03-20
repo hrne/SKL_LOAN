@@ -101,10 +101,11 @@ BIND(#BtnAllShell1,click, {cmd=CALLSEND;DOCODE=ApAllBtnProc1})
 
 #ApAllBtnProc1=@,1,S
 C(5,#BtnAllShell1,V,T(3,@BtnAllShell1,  ),T(3,@BtnAllShell1,V))
-##loop{times:6,i:1}
-C(5,#BtnShell{i},V,T(3,@BtnShell{i},  ),T(3,@BtnShell{i},V))
-##end
 
+##loop{times:50,i:1}
+!全勾選前，先排除沒有交易代號行數不勾選
+C(5,#TradeCode{i},     ,T(3,@BtnShell{i},  ),C(5,#BtnAllShell1,V,T(3,@BtnShell{i},V),T(3,@BtnShell{i},  )))
+##end
 !全選勾選功能 end..........
 
 ##loop{times:50,i:1}

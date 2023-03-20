@@ -456,6 +456,7 @@ public class MakeFile extends CommBuffer {
 	 *
 	 */
 	private void checkCdReport(TitaVo titaVo, String rptCode) throws LogicException {
+
 		rptCode = rptCode.length() > 5 ? rptCode.substring(0, 5) : rptCode;
 		this.info("checkCdReport.rptCode=" + rptCode);
 		CdReport tCdReport = cdReportService.findById(rptCode, titaVo);

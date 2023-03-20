@@ -96,8 +96,8 @@ public class L2918ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " MIN(clor.\"SecuredTotal\") AS \"SecuredTotal\", ";
 		sql += " nvl(MIN(clor.\"OtherCity\"), NVL(MIN(ccity.\"CityItem\"),MIN(ccode2.\"Item\"))) AS \"CityItem\", ";
 		sql += " nvl(MIN(clor.\"OtherLandAdm\"), MIN(ccode.\"Item\")) AS \"LandAdm\", ";
-		sql += " nvl(MIN(clor.\"OtherRecWord\"), MIN(clo.\"RecWordItem\")) AS \"RecWordItem\", ";
-		sql += " MIN(clor.\"CustNo\") AS \"CustNo\" ";
+		sql += " nvl(MIN(clor.\"OtherRecWord\"), MIN(clo.\"RecWordItem\")) AS \"RecWordItem\" ";
+//		sql += " MIN(clor.\"CustNo\") AS \"CustNo\" ";
 		sql += " FROM ";
 		sql += " ( ";
 		sql += " SELECT ";
@@ -113,17 +113,17 @@ public class L2918ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "AND \"ClNo\" <= :clNoE ";
 		sql += ") clor ";
 		sql += "LEFT JOIN \"ClFac\"    cf ON clor.\"ClCode1\" = cf.\"ClCode1\" ";
-		sql += " AND clor.\"ClCode2\" = cf.\"ClCode2\" ";
-		sql += " AND clor.\"ClNo\" = cf.\"ClNo\" ";
+		sql += "                         AND clor.\"ClCode2\" = cf.\"ClCode2\" ";
+		sql += "                         AND clor.\"ClNo\" = cf.\"ClNo\" ";
 		sql += " LEFT JOIN \"CdCity\"   ccity ON ccity.\"CityCode\" = clor.\"City\" ";
 		sql += " LEFT JOIN \"CdCode\" ccode ON ccode.\"DefCode\"='LandOfficeCode' ";
-		sql += " AND ccode.\"Code\" =clor.\"LandAdm\" ";
+		sql += "                             AND ccode.\"Code\" =clor.\"LandAdm\" ";
 		sql += " LEFT JOIN \"CdLandOffice\" clo ON clo.\"LandOfficeCode\" = clor.\"LandAdm\" ";
-		sql += " AND clo.\"RecWord\" = clor.\"RecWord\" ";
-		sql += " AND clo.\"CityCode\" = clor.\"City\" ";
+		sql += "                                      AND clo.\"RecWord\" = clor.\"RecWord\" ";
+		sql += "                                     AND clo.\"CityCode\" = clor.\"City\" ";
 
 		sql += " LEFT JOIN \"CdCode\" ccode2 ON ccode2.\"Code\" = clor.\"City\" ";
-		sql += " AND ccode2.\"DefCode\" = 'ClOtherRightsCityCd' ";
+		sql += "                         AND ccode2.\"DefCode\" = 'ClOtherRightsCityCd' ";
 		if (iCustNo > 0) {
 			sql += " WHERE ";
 			sql += " cf.\"CustNo\" = :custNo ";

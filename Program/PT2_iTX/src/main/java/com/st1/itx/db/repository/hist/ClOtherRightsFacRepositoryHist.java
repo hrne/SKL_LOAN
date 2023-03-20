@@ -37,6 +37,9 @@ public interface ClOtherRightsFacRepositoryHist extends JpaRepository<ClOtherRig
   // ClCode1 >= ,AND ClCode1 <= ,AND ClCode2 >= ,AND ClCode2 <= ,AND ClNo >= ,AND ClNo <=
   public Slice<ClOtherRightsFac> findAllByClCode1GreaterThanEqualAndClCode1LessThanEqualAndClCode2GreaterThanEqualAndClCode2LessThanEqualAndClNoGreaterThanEqualAndClNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscSeqAsc(int clCode1_0, int clCode1_1, int clCode2_2, int clCode2_3, int clNo_4, int clNo_5, Pageable pageable);
 
+  // ClCode1 = ,AND ClCode2 = ,AND ClNo = ,AND Seq = 
+  public Slice<ClOtherRightsFac> findAllByClCode1IsAndClCode2IsAndClNoIsAndSeqIsOrderByApproveNoAsc(int clCode1_0, int clCode2_1, int clNo_2, String seq_3, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

@@ -29,8 +29,8 @@ E(0,1)ASGN(LOOPHEIGHT$)
 #INQPRT=n,2,S
 E(0,40)ASGN(INQPRT$)
 
-#BUF1=X,18,S
-T(2,1+0+00+0000000+0000000)
+#BUF1=X,19,S
+T(2,1+0+00+0000000+0000+-+000)
 
 #button=x,100,S
 T(2,{ cmd=CHAIN; ntxcd=L2418; ntxbuf=#BUF1})ASGN(BTN_NEW1$)
@@ -172,7 +172,7 @@ C(3,#CHAIN,1,s,$)
 C(4,#CustNo,$,S)
 HELP(#ClCode1Help)
 @V(H,#ClCode1Help)
-T(2,@BUF1,1+#ClCode1+#ClCode2+#ClNo+0000000)
+T(2,@BUF1,1+#ClCode1+#ClCode2+#ClNo+00000000)
 
 #ClCode1A=A,1,S
 C(4,#ClCode1,S,$)
@@ -199,7 +199,7 @@ C(3,#ClCode1,3,V(H,#ClCode23Help),$)
 C(3,#ClCode1,4,V(H,#ClCode24Help),$)
 C(3,#ClCode1,5,V(H,#ClCode25Help),$)
 C(3,#ClCode1,9,V(H,#ClCode29Help),$)
-T(2,@BUF1,1+#ClCode1+#ClCode2+#ClNo+0000000)
+T(2,@BUF1,1+#ClCode1+#ClCode2+#ClNo+0000+-+000)
 
 #ClCode2A=A,2,S
 
@@ -220,7 +220,7 @@ C(4,#CustNo,$,S)
 @
 E(0,@ClNoA,#ClNo)
 T(2,@ClNo,#ClNoA)
-T(2,@BUF1,1+#ClCode1+#ClCode2+#ClNo+0000000)
+T(2,@BUF1,1+#ClCode1+#ClCode2+#ClNo+0000+-+000)
 
 #ClNoA=A,7,S
 
@@ -230,7 +230,7 @@ E(0,0)
 
 !L2418 
 #button=_,_,S
-T(2,@BUF1,1+#ClCode1+#ClCode2+#ClNo+0000000)
+T(2,@BUF1,1+#ClCode1+#ClCode2+#ClNo+0000+-+000)
 
 #QuickXMT=A,1,S
 C(3,#CHAIN,1,$,s)
@@ -266,7 +266,7 @@ T(3,1)ASGN(LOOP$)
 #OOClNo=A,7,S
 #OOCl=X,12,L
 T(2,#OOClCode1+-+#OOClCode2+-+#OOClNo)
-#OOClSeq=X,7,S
+#OOClSeq=X,8,S
 !縣市
 #OOCityItem=x,20,L
 !地政
@@ -293,7 +293,8 @@ T(H,#OORightsNote,#ClRightsNoteHelp)
 CALL2(#ADJUSTDOT,#Precision,#OOSecuredTotal,#OOSecuredTotalX)
 P(R,#OOSecuredTotalX)
 
-#OOCustNo=A,7,L
+!2023/3/19拿掉OOCustNo-他項擔保品已拿掉戶號欄位
+!#OOCustNo=A,7,L
 
 #FUNC2=A,1,S
 E(0,2)
@@ -350,7 +351,6 @@ TXFORM=L2918
 #OORecNumber
 #OORightsNote
 #OOSecuredTotal
-#OOCustNo
 ^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="ROM.icf::L1R09.tom"/>
@@ -379,7 +379,6 @@ TXFORM=L2918
 {width:40,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
 
 
-#OOCustNo
 #OOCl=擔保品號碼
 {width:100,align:'center'}
 #OOClSeq=他項權利序號
@@ -396,7 +395,7 @@ TXFORM=L2918
 {width:80,align:'center'}
 #OORightsNoteX=權利價值說明
 {width:150,align:'center'}
-#OOSecuredTotalX=擔保債權總金額(萬元)
+#OOSecuredTotalX=擔保債權總金額（萬元）
 {width:200,align:'center'}
 
 ^

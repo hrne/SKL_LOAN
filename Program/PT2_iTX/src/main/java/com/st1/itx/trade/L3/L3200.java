@@ -562,10 +562,11 @@ public class L3200 extends TradeBuffer {
 				if (c1.getStatus() != c2.getStatus()) {
 					return c1.getStatus() - c2.getStatus();
 				}
-				// 整批入帳
-				if (titaVo.isTrmtypBatch()) {
-					// 回收金額 > 0時排序(批次：應繳日由小到大、利率由大到小、額度由大到小、期金由大到小
-					if (iRepayType == 1) {
+				// 期款
+				if (iRepayType == 1) {
+					// 整批入帳
+					if (titaVo.isTrmtypBatch()) {
+						// 回收金額 > 0時排序(批次：應繳日由小到大、利率由大到小、額度由大到小、期金由大到小
 						if (c1.getNextPayIntDate() != c2.getNextPayIntDate()) {
 							return c1.getNextPayIntDate() - c2.getNextPayIntDate();
 						}
@@ -578,52 +579,52 @@ public class L3200 extends TradeBuffer {
 						if (c1.getDueAmt().compareTo(c2.getDueAmt()) != 0) {
 							return c2.getDueAmt().compareTo(c1.getDueAmt());
 						}
-					}
-					// 部分償還金額 > 0時排序
-//					利率高至低>用途別>由額度編號大至小、撥款由大到小
-//					用途別為9->1->3->4->5->6->2
-//					欄位代碼       欄位說明     
-//					1            週轉金    
-//					2            購置不動產
-//					3            營業用資產
-//					4            固定資產  
-//					5            企業投資  
-//					6            購置動產
-//					9            其他					
-					if (iRepayType == 2) {
-						if (c1.getStoreRate().compareTo(c2.getStoreRate()) != 0) {
-							return (c1.getStoreRate().compareTo(c2.getStoreRate()) > 0 ? -1 : 1);
-						}
-						// 若用途別不同
-						if (!c1.getUsageCode().equals(c2.getUsageCode())) {
-							int c1UsageCode = Integer.parseInt(c1.getUsageCode());
-							int c2UsageCode = Integer.parseInt(c2.getUsageCode());
-
-							// C1優先的特殊情況
-							if (c1UsageCode == 9 || c2UsageCode == 2) {
-								return -1;
-							}
-							// C2優先的特殊情況
-							if (c1UsageCode == 2 || c2UsageCode == 9) {
-								return 1;
-							}
-							// 一般情況
-							return c1UsageCode - c2UsageCode;
-						}
+					} else {
+						// 人工：額度由小到大、撥款由小到大)
 						if (c1.getFacmNo() != c2.getFacmNo()) {
-							return c2.getFacmNo() - c1.getFacmNo();
+							return c1.getFacmNo() - c2.getFacmNo();
 						}
 						if (c1.getBormNo() != c2.getBormNo()) {
-							return c2.getBormNo() - c1.getBormNo();
+							return c1.getBormNo() - c2.getBormNo();
 						}
 					}
-					// 人工：額度由小到大、撥款由小到大)
-				} else {
+				}
+				// 部分償還
+//				利率高至低>用途別>由額度編號大至小、撥款由大到小
+//				用途別為9->1->3->4->5->6->2
+//				欄位代碼       欄位說明     
+//				1            週轉金    
+//				2            購置不動產
+//				3            營業用資產
+//				4            固定資產  
+//				5            企業投資  
+//				6            購置動產
+//				9            其他					
+				if (iRepayType == 2) {
+					if (c1.getStoreRate().compareTo(c2.getStoreRate()) != 0) {
+						return (c1.getStoreRate().compareTo(c2.getStoreRate()) > 0 ? -1 : 1);
+					}
+					// 若用途別不同
+					if (!c1.getUsageCode().equals(c2.getUsageCode())) {
+						int c1UsageCode = Integer.parseInt(c1.getUsageCode());
+						int c2UsageCode = Integer.parseInt(c2.getUsageCode());
+
+						// C1優先的特殊情況
+						if (c1UsageCode == 9 || c2UsageCode == 2) {
+							return -1;
+						}
+						// C2優先的特殊情況
+						if (c1UsageCode == 2 || c2UsageCode == 9) {
+							return 1;
+						}
+						// 一般情況
+						return c1UsageCode - c2UsageCode;
+					}
 					if (c1.getFacmNo() != c2.getFacmNo()) {
-						return c1.getFacmNo() - c2.getFacmNo();
+						return c2.getFacmNo() - c1.getFacmNo();
 					}
 					if (c1.getBormNo() != c2.getBormNo()) {
-						return c1.getBormNo() - c2.getBormNo();
+						return c2.getBormNo() - c1.getBormNo();
 					}
 				}
 				return 0;
@@ -1160,9 +1161,9 @@ public class L3200 extends TradeBuffer {
 		BigDecimal wkTotalCloseBreach = BigDecimal.ZERO;
 
 		// 銷帳檔全銷(減免導致與入帳金額不一致，需自行銷帳)
-		
+
 		for (BaTxVo ba : this.baTxList) {
-			
+
 			if (ba.getCloseBreachAmt().compareTo(BigDecimal.ZERO) > 0 && (iFacmNo == 0 || iFacmNo == ba.getFacmNo())
 					&& (iBormNo == 0 || iBormNo == ba.getBormNo())) {
 				wkTotalCloseBreach = wkTotalCloseBreach.add(ba.getCloseBreachAmt());

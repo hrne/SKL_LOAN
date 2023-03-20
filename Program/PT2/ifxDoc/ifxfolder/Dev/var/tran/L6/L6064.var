@@ -65,17 +65,18 @@ K(MODIFYBUTTON,查詢)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
 ["[L6064]                                 各類代碼檔查詢"],
-["#FdDate+業務類別","代碼類別代號、代碼類別名稱，需擇一輸入"],
+["#FdDate","業務類別、代碼類別代號、代碼、代碼說明，需擇一輸入"],
 ["#FdDefType+．業務類別",#DefType,#DefTypeX],
 !["#FdDefCode+．代碼類別代號",#DefCode,#CodeBTN],
 ["#FdDefCode+．代碼類別代號",#DefCode,#CodeBTN,#DefItemX],
-["#FdDefItem+．代碼類別名稱",#DefItem],
+!["#FdDefItem+．代碼類別名稱",#DefItem],
 ["#FdCode+代碼",#Code],
 ["#FdCodeItem+代碼說明",#CodeItem],
 !["#FdRPTFG+顯示方式",
 !<include src="COM.icf::RPTFG.scr"/>
 !],
 ]
+
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
 !#BTN1=X,15,I,ui:button;value:新增代碼檔代碼;enable:1;tabbable:0;title:L6604 各類代碼檔維護
@@ -83,7 +84,7 @@ K(MODIFYBUTTON,查詢)
 
 #FdDefType=X,2,L
 #FdDefCode=X,2,L
-#FdDefItem=X,2,L
+!#FdDefItem=X,2,L
 #FdCode=X,2,L
 #FdCodeItem=X,2,L
 #FdDate=X,2,L
@@ -95,7 +96,7 @@ T(3,*)
 
 #b1=X,1,S
 BIND(#CodeBTN,click, {cmd=CHAIN; ntxcd=L6069; ntxbuf=#DefCode;ntxbuf5=type<-1:DefType<-OOType:DefCode<-OOCode:DefItemX<-OOItem})
-
+!BIND(#CodeBTN,click, {cmd=CHAIN; ntxcd=L6069; ntxbuf=#DefCode;ntxbuf5=type<-1:DefType<-OOType:DefCode<-OOCode})
 !---------- AP TEXT AREA Variables ----------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 
@@ -131,7 +132,7 @@ C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@DefType,#NTXBUF,1,2)
 T(1,@DefCode,#NTXBUF,3,20)
 T(1,@Code,#NTXBUF,23,20)
-T(1,@DefItem,#NTXBUF,43,20)
+!T(1,@DefItem,#NTXBUF,43,20)
 HIDE(#CodeBTN)
 
 #WKTF=X,1,S
@@ -150,28 +151,25 @@ C(4,#DefType,S,T(H,#DefType,#DefTypeH))
 #b2buf=x,200,S
 T(2,#DefType+#DefCode)
 #b2=X,1,S
-BIND(#CodeBTN,click, {cmd=CHAIN; ntxcd=L6069; ntxbuf=#b2buf;ntxbuf5=type<-1:DefType<-OOType:DefCode<-OOCode:DefItemX<-OOItem})
+BIND(#CodeBTN,click, {cmd=CHAIN; ntxcd=L6069; ntxbuf=#b2buf;ntxbuf5=type<-1:DefType<-OOType:DefCode<-OOCode})
 
 
 !代碼檔代號
 #DefCode=x,20,I
 C(3,#CHAIN,1,s,$)
-! C(4,#DefCode,C(4,))
-!HELP(#DefCodeH)
-!@C(4,#DefCode,$,V(H,#DefCodeH))
-!IF(#DefItem!="" & #DefCode!="",C(4,#DefType,s,S),I)
+
 !處理
 #b3buf=x,200,S
 T(2,#DefType+#DefCode)
 #b3=X,1,S
-BIND(#CodeBTN,click, {cmd=CHAIN; ntxcd=L6069; ntxbuf=#b3buf;ntxbuf5=type<-1:DefType<-OOType:DefCode<-OOCode:DefItemX<-OOItem})
+BIND(#CodeBTN,click, {cmd=CHAIN; ntxcd=L6069; ntxbuf=#b3buf;ntxbuf5=type<-1:DefType<-OOType:DefCode<-OOCode})
 
 #Rim6R33DefType=X,2,S
 
 #Rim6R33DefCode=x,20,S
 
 #SendL6R33=X,1,S
-IF(#DefType!=""&& #DefCode!="",$,S)
+IF(#DefType !=""&& #DefCode !="",$,S)
 T(2,@Rim6R33DefType,#DefType)
 T(2,@Rim6R33DefCode,#DefCode)
 RESET_RIM(#SendL6R33,L6R33)
@@ -180,32 +178,25 @@ R(1,L6R33)
 E(0,@RimFlag,#L6R33Flag)
 
 #RimFlag=9,1,S
-IF(#DefType!=""&& #DefCode!="",$,S)
+IF(#DefType !=""&& #DefCode !="",$,S)
 C(3,#RimFlag,0,V(P,業務類別有誤),S)
 
 
 !代碼檔名稱
 #DefItemX=x,80,L
-!C(3,#CHAIN,1,s,$)
 C(4,#DefCode,S,T(H,#DefCode,#DefCodeH))
-
-#DefItem=x,80,I
-!C(4,#DefCode,S,T(H,#DefCode,#DefCodeH))
-@
-IF(#DefType=="" & #DefCode=="" & #DefItem== "",V(P,業務類別、代碼類別代號、代碼類別檔名稱需擇一輸入),$)
-!C(4,#DefItem,SHOW(#DefType)SHOW(#DefTypeX),HIDE(#DefType)HIDE(#DefTypeX))
 
 !代碼
 #Code=x,20,I
-!C(3,#CHAIN,1,s,$)
-C(4,#DefItem,$,S)
 
 #CodeItem=x,50,I
-C(4,#DefItem,$,S)
-C(4,#Code,$,S)
+!C(4,#Code,$,S)
+
+@
+IF(#DefType=="" & #DefCode=="" & #Code=="" & #CodeItem=="",V(P,業務類別、代碼類別代號、代碼、代碼說明需擇一輸入),$)
 
 #RPTFG=A,1,S
-C(4,#DefItem,E(0,0),E(0,1))
+!C(4,#DefItem,E(0,0),E(0,1))
 
 !<include src="COM.icf::RPTFG.dec"/>
 <include src="ROM.icf::L6R33.dec"/>
@@ -293,7 +284,10 @@ BIND(grid,{cmd=CHAIN;ntxcd=L6604;text=刪除;ntxbuf=#OOBUF4})
 
 !------ 上行電文 ------
 <sub type="TIM">
-#DefType#DefCode#DefItem#Code#CodeItem
+#DefType
+#DefCode
+#Code
+#CodeItem
 #END
 </sub>
 

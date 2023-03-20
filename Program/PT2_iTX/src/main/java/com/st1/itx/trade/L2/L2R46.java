@@ -14,8 +14,10 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.ClMain;
 import com.st1.itx.db.domain.ClMainId;
 import com.st1.itx.db.domain.ClOtherRights;
+import com.st1.itx.db.domain.ClOtherRightsFac;
 import com.st1.itx.db.domain.ClOtherRightsId;
 import com.st1.itx.db.service.ClMainService;
+import com.st1.itx.db.service.ClOtherRightsFacService;
 import com.st1.itx.db.service.ClOtherRightsService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
@@ -36,6 +38,8 @@ public class L2R46 extends TradeBuffer {
 	public ClMainService sClMainService;
 	@Autowired
 	public ClOtherRightsService sClOtherRightsService;
+	@Autowired
+	public ClOtherRightsFacService sClOtherRightsFacService;
 
 	@Autowired
 	public DateUtil dateUtil;
@@ -46,6 +50,10 @@ public class L2R46 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2R46 ");
 		this.totaVo.init(titaVo);
+		/* 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值 */
+		this.index = 0;
+		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
+		this.limit = Integer.MAX_VALUE;// 查全部
 		// tita
 		// 功能
 		int iFunCd = parse.stringToInteger(titaVo.getParam("FUNCIND"));
@@ -53,7 +61,8 @@ public class L2R46 extends TradeBuffer {
 		int iClCode2 = parse.stringToInteger(titaVo.getParam("RimClCode2"));
 		int iClNo = parse.stringToInteger(titaVo.getParam("RimClNo"));
 		// 他項權利序號
-		int iClSeq = parse.stringToInteger(titaVo.getParam("RimClSeq"));
+//		int iClSeq = parse.stringToInteger(titaVo.getParam("RimClSeq"));
+		String iClSeq = titaVo.getParam("RimClSeq");// 20230315
 
 		// WK
 		ClMain tClMain = new ClMain();
@@ -85,18 +94,19 @@ public class L2R46 extends TradeBuffer {
 
 		if (tClOtherRights == null) {
 			if (iFunCd == 1) {
-				String seq = "0000001";
+//				String seq = "0000001"; 
+//				String seq = "";
 				int cnt = 1;
 				Slice<ClOtherRights> slClOtherRights = null;
 				slClOtherRights = sClOtherRightsService.findClNo(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE,
 						titaVo);
-				// 取此擔保品編號最大序號續編+1
+				// 取此擔保品編號最大序號續編+1,//20230319改為自行輸入:9999-999
 				if (slClOtherRights != null) {
 					List<ClOtherRights> lClOtherRights = slClOtherRights == null ? null : slClOtherRights.getContent();
-					seq = parse.IntegerToString(tClMain.getLastClOtherSeq() + 1, 7);
+//					seq = parse.IntegerToString(tClMain.getLastClOtherSeq() + 1, 7);
 					cnt += lClOtherRights.size();
 				}
-				this.totaVo.putParam("L2r46Seq", seq);
+				this.totaVo.putParam("L2r46Seq", iClSeq);
 				this.totaVo.putParam("L2r46City", "");
 				this.totaVo.putParam("L2r46OtherCity", "");
 				this.totaVo.putParam("L2r46LandAdm", "");
@@ -107,8 +117,9 @@ public class L2R46 extends TradeBuffer {
 				this.totaVo.putParam("L2r46RecNumber", "");
 				this.totaVo.putParam("L2r46RightsNote", "");
 				this.totaVo.putParam("L2r46SecuredTotal", 0);
-				this.totaVo.putParam("L2r46CustNo", 0);
 				this.totaVo.putParam("L2r46Cnt", cnt);
+				this.totaVo.putParam("L2r46SecuredDate", 0);// 20230315新增
+				this.totaVo.putParam("L2r46Location", "");// 20230315新增
 
 			} else {
 				throw new LogicException(titaVo, "E0001",
@@ -135,10 +146,39 @@ public class L2R46 extends TradeBuffer {
 				this.totaVo.putParam("L2r46RecNumber", tClOtherRights.getRecNumber());
 				this.totaVo.putParam("L2r46RightsNote", tClOtherRights.getRightsNote());
 				this.totaVo.putParam("L2r46SecuredTotal", tClOtherRights.getSecuredTotal());
-				this.totaVo.putParam("L2r46CustNo", tClOtherRights.getCustNo());
+				// this.totaVo.putParam("L2r46CustNo", tClOtherRights.getCustNo());//20230315
 				this.totaVo.putParam("L2r46Cnt", 0);
+				this.totaVo.putParam("L2r46SecuredDate", tClOtherRights.getSecuredDate());// 20230315新增
+				this.totaVo.putParam("L2r46Location", tClOtherRights.getLocation());// 20230315新增
 			}
 		}
+
+		Slice<ClOtherRightsFac> slClOtherRightsFac = sClOtherRightsFacService.findClNoSeq(iClCode1, iClCode2, iClNo,
+				iClSeq, this.index, this.limit, titaVo);
+//		Slice<ClOtherRightsFac> slClOtherRightsFac = sClOtherRightsFacService.findClNo(iClCode1, iClCode2, iClNo,
+//				 this.index, this.limit, titaVo);
+		List<ClOtherRightsFac> lClOtherRightsFac = slClOtherRightsFac == null ? null : slClOtherRightsFac.getContent();
+		int lClOtherRightsFacS = 0;
+//		int j = 0;
+		if (lClOtherRightsFac != null && lClOtherRightsFac.size() != 0) {
+			lClOtherRightsFacS = lClOtherRightsFac.size();
+			this.info("L2R46 lClOtherRightsFacS=" + lClOtherRightsFacS);
+			for (int i = 0; i < lClOtherRightsFacS; i++) {
+				ClOtherRightsFac ClOtherRightsFaceVO = lClOtherRightsFac.get(i);
+//				if (iClSeq.equals(ClOtherRightsFaceVO.getSeq())) {
+				int Row = i + 1;
+//					int Row = j + 1;
+//					j=j+1;
+				totaVo.putParam("L2r46ApplNo" + Row + "", ClOtherRightsFaceVO.getApproveNo());// 核准編號
+//				}
+			}
+		}
+
+		for (int i = lClOtherRightsFacS + 1; i <= 10; i++) {
+//		for ( int i = j + 1; i <= 10; i++) {
+			totaVo.putParam("L2r46ApplNo" + i + "", "");// 核准編號
+		}
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

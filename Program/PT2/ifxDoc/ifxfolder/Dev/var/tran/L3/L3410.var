@@ -560,9 +560,9 @@ C(3,#CaseCloseCode,1,IF(#NewApplNo==#TimApplNo,V(P,不可為同額度之核准�
 !用新核准號碼(NewApplNo)調L2R05
 #SendL2r05C=X,1,S
 E(0,@RimFuncCode,5)
-E(0,@RimCustNo,#TimCustNo)
+E(0,@RimCustNo,0)
 E(0,@RimFacmNo,0)
-E(0,@RimApplNo,0)
+E(0,@RimApplNo,#NewApplNo)
 E(0,@RimCaseNo,0)
 RESET_RIM(#SendL2r05C,L2R05)
 S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo,#NewApplNo)
@@ -611,7 +611,8 @@ E(0,#TimReduceAmt-#ReduceLimit)
 
 !0007 減免金額超過限額，需主管核可
 #RqspFlag=X,1,S
-C(1,#WKMAMT,T(3,N),T(3,N),T(3,Y))
+! C(1,#WKMAMT,T(3,N),T(3,N),T(3,Y))
+C(1,#TimReduceAmt,T(3,N),T(3,N),T(3,Y))
 
 ![提前清償原因]
 !固定值=08,不須輸入
@@ -629,11 +630,11 @@ E(0,@RPFG,2)
 
 !還款來源,91:借新還舊
 #TMPRPTYP=X,1,S
-E(0,@RPTYPZ,91)
+C(3,#CaseCloseCode,2,E(0,@RPTYPZ,91),E(0,@RPTYPZ,95))
 
 !應收付總金額,轉暫收金額
 #TMPRPTOT=X,1,S
-E(3,@RPTOT,#Principal)
+E(3,@RPTOT,#Principal+#Interest+#DelayInt+#BreachAmt+#Shortfall+#AcctFee+#ModifyFee+#FireFee+#LawFee-#TimReduceAmt)
 
 !實際收付金額,轉暫收金額
 #TMPRPAMT=X,1,S

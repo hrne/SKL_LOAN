@@ -782,16 +782,22 @@ T(3,CdCode.GrKind)
 T(3,CdCode.EsGKind)
 
 #EsGKindHelp=x,1024,S
+!ProdBreachCode
+#CDDEF35=x,30,S
+T(3,CdCode.ProdBreachCode)
+
+#ProdBreachCodeHelp=x,1024,S
 
 #HelpRim4=X,1,S
 RESET_RIM(#HelpRim4,XXR99)
-S(XXR99,01,#CDDEF31,#CDDEF32,#CDDEF33,#CDDEF34)
+S(XXR99,01,#CDDEF31,#CDDEF32,#CDDEF33,#CDDEF34,#CDDEF35)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@ClTypeCodeHelp,#HelpDesc1)
 T(2,@FreqBase2Help,#HelpDesc2)
 T(2,@GrKindHelp,#HelpDesc3)
 T(2,@EsGKindHelp,#HelpDesc4)
+T(2,@ProdBreachCodeHelp,#HelpDesc5)
 
 #FuncCodeHelp=x,40,S
 T(3,1:新增;2:修改;4:刪除;5:查詢)
@@ -1089,9 +1095,15 @@ T(2,@Coorgnizer,#L2r05Coorgnizer)
 T(2,@CoorgnizerLb,#L2r05Coorgnizer)
 T(2,@DepartmentCode,#L2r05DepartmentCode)
 T(H,@DepartmentCodeX,#DepartmentCode,#DepartmentCodeHelp)
-! E(0,@BreachCode,#L2r05BreachCode)
 C(4,#L2r05ProdBreachFlag,T(3,@ProdBreachFlag,Y),T(2,@ProdBreachFlag,#L2r05ProdBreachFlag))
 C(5,#L2r05ProdBreachFlag,N,T(2,@Breach,#L2r05Breach),$)
+T(2,@BreachCode,#L2r05BreachCode)
+T(2,@BreachGetCode,#L2r05BreachGetCode)
+E(0,@ProhibitMonth,#L2r05ProhibitMonth)
+E(0,@BreachPercent,#L2r05BreachPercent)
+E(0,@BreachDecreaseMonth,#L2r05BreachDecreaseMonth)
+E(0,@BreachDecrease,#L2r05BreachDecrease)
+E(0,@BreachStartPercent,#L2r05BreachStartPercent)
 E(0,@CreditScore,#L2r05CreditScore)
 E(0,@GuaranteeDate,#L2r05GuaranteeDate)
 T(2,@ContractNo,#L2r05ContractNo)
@@ -1213,18 +1225,18 @@ C(3,#L2r01RecycleCode,9,$,E(0,@RecycleCode,#L2r01RecycleCode))
 T(H,@RecycleCodeX,#RecycleCode,#FacmRecycleCodeHelp) 
 C(3,#L2r01GracePeriod,999,$,E(0,@GracePeriod,#L2r01GracePeriod))
 T(2,@ProdBreachFlag,#L2r05ProdBreachFlag)
-C(5,#L2r05ProdBreachFlag,N,T(2,@Breach,#L2r05Breach),T(2,@Breach,#L2r01Breach))
-C(5,#L2r05ProdBreachFlag,N,T(2,@LbBreach,#L2r05Breach),T(2,@LbBreach,#L2r01Breach))
-C(5,#L2r05ProdBreachFlag,N,C(4,#L2r05Breach,T(3,@BreachFlag,N),T(3,@BreachFlag,Y)),C(4,#L2r01Breach,T(3,@BreachFlag,N),T(3,@BreachFlag,Y)))
+C(5,#L2r05ProdBreachFlag,N,T(2,@Breach,#L2r05Breach),T(2,@Breach,#L2r05Breach))
+C(5,#L2r05ProdBreachFlag,N,T(2,@LbBreach,#L2r05Breach),T(2,@LbBreach,#L2r05Breach))
+C(5,#L2r05ProdBreachFlag,N,C(4,#L2r05Breach,T(3,@BreachFlag,N),T(3,@BreachFlag,Y)),C(4,#L2r05Breach,T(3,@BreachFlag,N),T(3,@BreachFlag,Y)))
 ! T(2,@BreachFlag,#L2r01BreachFlag)
 ! T(2,@Breach,#L2r01Breach)
 ! T(2,@Breach1,#L2r01Breach)
 
 
 #RcvL2r01B=X,1,S
-C(5,#L2r05ProdBreachFlag,N,T(2,@Breach,#L2r05Breach),T(2,@Breach,#L2r01Breach))
-C(5,#L2r05ProdBreachFlag,N,T(2,@LbBreach,#L2r05Breach),T(2,@LbBreach,#L2r01Breach))
-C(5,#L2r05ProdBreachFlag,N,C(4,#L2r05Breach,T(3,@BreachFlag,N),T(3,@BreachFlag,Y)),C(4,#L2r01Breach,T(3,@BreachFlag,N),T(3,@BreachFlag,Y)))
+C(5,#L2r05ProdBreachFlag,N,T(2,@Breach,#L2r05Breach),T(2,@Breach,#L2r05Breach))
+C(5,#L2r05ProdBreachFlag,N,T(2,@LbBreach,#L2r05Breach),T(2,@LbBreach,#L2r05Breach))
+C(5,#L2r05ProdBreachFlag,N,C(4,#L2r05Breach,T(3,@BreachFlag,N),T(3,@BreachFlag,Y)),C(4,#L2r05Breach,T(3,@BreachFlag,N),T(3,@BreachFlag,Y)))
 ! T(2,@BreachFlag,#L2r01BreachFlag)
 ! T(2,@Breach,#L2r01Breach)
 ! T(2,@Breach1,#L2r01Breach)
@@ -3224,8 +3236,6 @@ C(4,#ApprovedLevel,S,$)
 T(H,#ApprovedLevel,#ApprovedLevelHelp)
 C(3,#UpdateCode,1,C(3,#ApprovedLevel,9,T(F,@Supervisor,0)T(3,@FdSupervisor,),T(F,@Supervisor,1)T(3,@FdSupervisor,*)),$)
 
-
-
 ![核決主管]
 !修改時自動顯示可修改,其他自動顯示不必須輸入
 #FdSupervisor=X,2,L
@@ -3525,8 +3535,8 @@ T(H,#BreachFlag,#YesNoHelp)
 C(3,#Hide8Fg,0,CALL(#HideP8),$)
 C(3,#UpdateCode,1,$,s)
 C(3,#DepartmentCode,0,s,$)
-C(5,#BreachFlag,#L2r01BreachFlag,C(5,#BreachFlag,Y,C(4,#Breach,T(2,@Breach,#L2r01Breach),$),T(F,@ProdBreachFlag,0)),T(F,@ProdBreachFlag,0))
-C(5,#BreachFlag,#L2r01BreachFlag,C(5,#BreachFlag,Y,C(4,#Breach,T(2,@Breach,#L2r01Breach),$),s),s)
+C(5,#BreachFlag,#L2r05BreachFlag,C(5,#BreachFlag,Y,C(4,#Breach,T(2,@Breach,#L2r05Breach),$),T(F,@ProdBreachFlag,0)),T(F,@ProdBreachFlag,0))
+C(5,#BreachFlag,#L2r05BreachFlag,C(5,#BreachFlag,Y,C(4,#Breach,T(2,@Breach,#L2r05Breach),$),s),s)
 HELP(#YesNoHelp)
 @V(H,#YesNoHelp)
 
@@ -3535,14 +3545,105 @@ HELP(#YesNoHelp)
 C(4,#ProdBreachFlag,S,$)
 T(H,#ProdBreachFlag,#YesNoHelp)
 
-! #Breach1=x,200,L
+!違約適用方式
+#FdBreachCode=X,2,L
+#BreachCode=X,3,I
+C(5,#BreachFlag,N,S,$)
+C(3,#UpdateCode,1,$,s)
+C(3,#Hide8Fg,0,CALL(#HideP8),$)
+HELP(#ProdBreachCodeHelp)
+@V(H,#ProdBreachCodeHelp)
+IF(#BreachCode=="001"||#BreachCode=="005",T(3,@FdBreachDecreaseMonth,)T(F,@BreachDecreaseMonth,0),T(3,@FdBreachDecreaseMonth,*)T(F,@BreachDecreaseMonth,1))
+IF(#BreachCode=="001",E(0,@BreachDecreaseMonth,12),$)
+IF(#BreachCode=="005",E(0,@BreachDecreaseMonth,0),$)
+
+#BreachCodeX=X,40,L
+T(H,#BreachCode,#ProdBreachCodeHelp)
+C(5,#BreachFlag,N,T(3,無),$)
+
+!綁約期間
+#FdProhibitMonth=X,2,L
+#ProhibitMonth=A,3,I
+C(5,#BreachFlag,N,S,$)
+C(3,#UpdateCode,1,$,s)
+C(3,#Hide8Fg,0,CALL(#HideP8),$)
+@
+V(2,0)
+
+!違約金收取方式
+#FdBreachGetCode=X,2,L
+#BreachGetCode=X,1,I
+C(5,#BreachFlag,N,S,$)
+C(3,#UpdateCode,1,$,s)
+C(3,#Hide8Fg,0,CALL(#HideP8),$)
+HELP(#BreachGetCodeHelp)
+@V(H,#BreachGetCodeHelp)
+
+#BreachGetCodeX=X,20,L
+T(H,#BreachGetCode,#BreachGetCodeHelp)
+C(5,#BreachFlag,N,T(3,@BreachGetCodeX,無),$)
+C(5,#BreachGetCode,0,T(3,@BreachGetCodeX,無),$)
+
+!違約金百分比
+#FdBreachPercent=X,2,L
+#BreachPercent=n,3.2,I
+C(5,#BreachFlag,N,S,$)
+C(3,#UpdateCode,1,$,s)
+@V(2,0)
+V(5,0,100)
+
+!違約金分段月數
+#FdBreachDecreaseMonth=X,2,L
+#BreachDecreaseMonth=n,3,I
+C(5,#BreachFlag,N,S,$)
+C(3,#UpdateCode,1,$,s)
+IF(#BreachCode=="001",E(0,@BreachDecreaseMonth,12),$)
+IF(#BreachCode=="001",s,$)
+IF(#BreachCode=="005",E(0,@BreachDecreaseMonth,0),$)
+IF(#BreachCode=="005",s,$)
+@
+IF(#BreachCode=="002",V(2,0),$)
+
+!分段遞減百分比
+#FdBreachDecrease=X,2,L
+#BreachDecrease=n,3.2,I
+C(5,#BreachFlag,N,S,$)
+C(3,#BreachDecreaseMonth,0,INVOKEJS(SHOW,p6,7,7,0),INVOKEJS(SHOW,p6,7,7,1))
+C(3,#BreachDecreaseMonth,0,S,$)
+C(3,#UpdateCode,1,$,s)
+@V(2,0)
+V(5,0,100)
+IF(#BreachDecrease>#BreachPercent,V(P,不可大於違約金百分比),$)
+
+!還款起算比例
+#FdBreachStartPercent=X,2,L
+#BreachStartPercent=n,3,I
+C(5,#BreachFlag,N,S,$)
+C(3,#UpdateCode,1,$,s)
+@V(5,0,100)
+
+
+#RcvL2r56B=X,1,S
+C(3,#UpdateCode,1,$,S)
+C(5,#BreachFlag,#L2r05BreachFlag
+,C(5,#BreachCode,#L2r05BreachCode
+,C(5,#ProhibitMonth,#L2r05ProhibitMonth
+,C(5,#BreachGetCode,#L2r05BreachGetCode
+,C(5,#BreachPercent,#L2r05BreachPercent
+,C(5,#BreachDecreaseMonth,#L2r05BreachDecreaseMonth
+,C(5,#BreachDecrease,#L2r05BreachDecrease
+,C(5,#BreachStartPercent,#L2r05BreachStartPercent,S,$),$),$),$),$),$),$),$)
+RESET_RIM(#RcvL2r56B,L2R56)
+S(L2R56,1,#BreachFlag,#BreachCode,#ProhibitMonth,#BreachGetCode,#BreachPercent,#BreachDecreaseMonth,#BreachDecrease,#BreachStartPercent)
+R(1,L2R56)
+T(2,@Breach,#L2r56Breach)
+T(2,@LbBreach,#L2r56Breach)
 
 #Breach=X,4.50,I
 C(3,#Hide8Fg,0,CALL(#HideP8),$)
 C(3,#UpdateCode,1,$,s)
-! IF(#ProdBreachFlag=="Y"||#ProdBreachFlag=="",T(F,@Breach,0),T(F,@Breach,1))
 IF(#BreachFlag=="N",S,$)
-IF(#ProdBreachFlag=="Y",T(2,@Breach,#L2r01Breach),$)
+! IF(#ProdBreachFlag=="Y",T(2,@Breach,#L2r05Breach),$)
 C(5,#ProdBreachFlag,Y,s,$)
 C(4,#ProdBreachFlag,s,$)
 
@@ -3765,6 +3866,7 @@ C(3,#CheckCode,0,$,S)
 <include src="ROM.icf::L2R11.dec"/>
 <include src="ROM.icf::L2R13.dec"/>
 <include src="ROM.icf::L2R44.dec"/>
+<include src="ROM.icf::L2R56.dec"/>
 <include src="ROM.icf::L6R28.dec"/>
 <include src="ROM.icf::L4R22.dec"/>
 
@@ -3881,6 +3983,13 @@ C(3,#CheckCode,0,$,S)
 ["<font color=red>清償金類型　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　"],
 [#<->#,"#FdBreachFlag+是否限制清償",#BreachFlag,#BreachFlagX],
 [#<->#,"#FdProdBreachFlag+違約適用方式是否按商品設定",#ProdBreachFlag,#ProdBreachFlagX],
+[#<->#,"#FdBreachCode+違約適用方式",#BreachCode,#BreachCodeX],
+[#<->#,"#FdProhibitMonth+綁約期間",#ProhibitMonth,"月"],
+[#<->#,"#FdBreachGetCode+違約金收取方式",#BreachGetCode,#BreachGetCodeX],
+[#<->#,"#FdBreachPercent+違約金百分比",#BreachPercent,"@%"],
+[#<->#,"#FdBreachDecreaseMonth+違約金分段月數",#BreachDecreaseMonth],
+[#<->#,"#FdBreachDecrease+分段遞減百分比",#BreachDecrease,"@%"],
+[#<->#,"#FdBreachStartPercent+還款起算比例",#BreachStartPercent,"@%"],
 [#<->#,"@",#Breach,#LbBreach],
 ]
 </sub>
@@ -3928,7 +4037,9 @@ T(3,[L2154] 額度資料維護)
 #Introducer#District#FireOfficer#Estimate
 #CreditOfficer#BusinessOfficer#ApprovedLevel#Supervisor
 #InvestigateOfficer#EstimateReview#Coorgnizer
-#BreachFlag#ProdBreachFlag#Breach
+#BreachFlag#ProdBreachFlag#BreachCode#ProhibitMonth
+#BreachGetCode#BreachPercent
+#BreachDecreaseMonth#BreachDecrease#BreachStartPercent#Breach
 #CreditScore#ContractNo
 #CreditSysNo
 #RelationCode#RelationName#RelationId#RELACCTERR
@@ -3972,6 +4083,7 @@ TXFORM=L2154
 <include src="ROM.icf::L2R13.tom"/>
 <include src="ROM.icf::L2R44.tom"/>
 <include src="ROM.icf::L2R53.tom"/>
+<include src="ROM.icf::L2R56.tom"/>
 <include src="ROM.icf::L6R28.tom"/>
 <include src="ROM.icf::L4R22.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>

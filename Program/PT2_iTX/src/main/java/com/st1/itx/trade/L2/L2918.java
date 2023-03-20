@@ -120,7 +120,7 @@ public class L2918 extends TradeBuffer {
 				recNumber = result.get("RecNumber");
 				rightsNote = result.get("RightsNote");
 				securedTotal = result.get("SecuredTotal");
-				custNo = parse.stringToInteger(result.get("CustNo"));
+//				custNo = parse.stringToInteger(result.get("CustNo"));
 
 				moveOccursList(titaVo);
 			}
@@ -136,7 +136,7 @@ public class L2918 extends TradeBuffer {
 	}
 
 	private void moveOccursList(TitaVo titaVo) throws LogicException {
-
+		
 		occurslist.putParam("OOClCode1", clCode1);
 		occurslist.putParam("OOClCode2", clCode2);
 		occurslist.putParam("OOClNo", clNo);
@@ -148,11 +148,11 @@ public class L2918 extends TradeBuffer {
 		occurslist.putParam("OORecNumber", recNumber);
 		occurslist.putParam("OORightsNote", rightsNote);
 		occurslist.putParam("OOSecuredTotal", securedTotal);
-		occurslist.putParam("OOCustNo", custNo);
-
+//		occurslist.putParam("OOCustNo", custNo);
+		
 		/* 將每筆資料放入Tota的OcList */
 		this.totaVo.addOccursList(occurslist);
-
+		
 	}
 
 }

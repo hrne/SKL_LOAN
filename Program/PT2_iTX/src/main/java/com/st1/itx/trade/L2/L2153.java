@@ -558,14 +558,14 @@ public class L2153 extends TradeBuffer {
 			tFacMain.setBreachDecrease(parse.stringToBigDecimal(titaVo.getParam("BreachDecrease")));
 			tFacMain.setBreachStartPercent(parse.stringToInteger(titaVo.getParam("BreachStartPercent")));
 		} else {
-			tFacMain.setBreachFlag(tFacProd.getBreachFlag());
-			tFacMain.setBreachCode(tFacProd.getBreachCode());
-			tFacMain.setBreachGetCode(tFacProd.getBreachGetCode());
-			tFacMain.setProhibitMonth(tFacProd.getProhibitMonth());
-			tFacMain.setBreachPercent(tFacProd.getBreachPercent());
-			tFacMain.setBreachDecreaseMonth(tFacProd.getBreachDecreaseMonth());
-			tFacMain.setBreachDecrease(tFacProd.getBreachDecrease());
-			tFacMain.setBreachStartPercent(tFacProd.getBreachStartPercent());
+			tFacMain.setBreachFlag(titaVo.getParam("BreachFlag"));
+			tFacMain.setBreachCode(titaVo.getParam("BreachCode"));
+			tFacMain.setBreachGetCode(titaVo.getParam("BreachGetCode"));
+			tFacMain.setProhibitMonth(parse.stringToInteger(titaVo.getParam("ProhibitMonth")));
+			tFacMain.setBreachPercent(parse.stringToBigDecimal(titaVo.getParam("BreachPercent")));
+			tFacMain.setBreachDecreaseMonth(parse.stringToInteger(titaVo.getParam("BreachDecreaseMonth")));
+			tFacMain.setBreachDecrease(parse.stringToBigDecimal(titaVo.getParam("BreachDecrease")));
+			tFacMain.setBreachStartPercent(parse.stringToInteger(titaVo.getParam("BreachStartPercent")));
 		}
 		tFacMain.setCustTypeCode(custTypeCode);
 		tFacMain.setRuleCode(titaVo.getParam("RuleCode"));

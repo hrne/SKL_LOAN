@@ -90,6 +90,20 @@ public interface ClOtherRightsFacService {
   public Slice<ClOtherRightsFac> findClCodeRange(int clCode1_0, int clCode1_1, int clCode2_2, int clCode2_3, int clNo_4, int clNo_5, int index, int limit, TitaVo... titaVo);
 
   /**
+   * ClCode1 = ,AND ClCode2 = ,AND ClNo = ,AND Seq = 
+   *
+   * @param clCode1_0 clCode1_0
+   * @param clCode2_1 clCode2_1
+   * @param clNo_2 clNo_2
+   * @param seq_3 seq_3
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice ClOtherRightsFac ClOtherRightsFac of List
+   */
+  public Slice<ClOtherRightsFac> findClNoSeq(int clCode1_0, int clCode2_1, int clNo_2, String seq_3, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By ClOtherRightsFac
    * 
    * @param clOtherRightsFacId key

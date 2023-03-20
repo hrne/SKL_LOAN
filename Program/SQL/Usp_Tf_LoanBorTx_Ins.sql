@@ -201,7 +201,7 @@ BEGIN
       FROM LA$TRXP 
       WHERE TRXTRN = '3037' 
     ) 
-    , JL AS ( 
+    , JLData AS ( 
       SELECT T.TRXDAT 
            , T.TRXNMT 
            , T.TRXAMT 
@@ -257,6 +257,15 @@ BEGIN
                               ,'F30' -- 呆帳戶法務費墊付
                               ) 
     ) 
+    , JLSeq1 AS ( 
+      SELECT TRXDAT 
+           , TRXNMT 
+           , TRXAMT 
+           , JLNAMT 
+           , "AcctCode" 
+      FROM JLData
+      WHERE "Seq" = 1
+    ) 
     , correctTx AS ( 
       SELECT DISTINCT 
              TRXDAT 
@@ -264,6 +273,18 @@ BEGIN
            , TRXMEM 
       FROM LA$TRXP 
     ) 
+    , AcnpData AS ( 
+      SELECT "LMSACN" 
+            ,"LMSAPN1" 
+            ,"LMSASQ1" 
+            ,MAX(CASE 
+                   WHEN "LMSAPN" = "LMSAPN1" THEN 1 
+                 ELSE 0 END) AS "IsSameFac" 
+      FROM "LNACNP" 
+      GROUP BY "LMSACN" 
+              ,"LMSAPN1" 
+              ,"LMSASQ1" 
+    )
     SELECT TR1."LMSACN"                   AS "CustNo"              -- 借款人戶號 DECIMAL 7  
           ,TR1."LMSAPN"                   AS "FacmNo"              -- 額度編號 DECIMAL 3  
           ,TR1."LMSASQ"                   AS "BormNo"              -- 撥款序號 DECIMAL 3  
@@ -405,78 +426,78 @@ BEGIN
                                  THEN TO_CHAR(0 - JL."JLNAMT") 
                                  WHEN JL."AcctCode" = 'F10'
                                  THEN TO_CHAR(JL."JLNAMT") 
-                               ELSE NULL END ABSENT ON NULL ,
+                               ELSE NULL END ,
                'ModifyFee' VALUE CASE -- 實收契變手續費
                                  WHEN JL."AcctCode" = 'F29'
                                       AND TR1."TRXCRC" IN ('1','3') 
                                  THEN TO_CHAR(0 - JL."JLNAMT") 
                                  WHEN JL."AcctCode" = 'F29'
                                  THEN TO_CHAR(JL."JLNAMT") 
-                               ELSE NULL END ABSENT ON NULL ,
+                               ELSE NULL END ,
                'FireFee' VALUE CASE -- 實收火險保費
                                  WHEN JL."AcctCode" = 'TMI'
                                       AND TR1."TRXCRC" IN ('1','3') 
                                  THEN TO_CHAR(0 - JL."JLNAMT") 
                                  WHEN JL."AcctCode" = 'TMI'
                                  THEN TO_CHAR(JL."JLNAMT") 
-                               ELSE NULL END ABSENT ON NULL ,
+                               ELSE NULL END ,
                'LawFee' VALUE CASE -- 實收法拍費用
                                 WHEN JL."AcctCode" = 'F07'
                                      AND TR1."TRXCRC" IN ('1','3') 
                                 THEN TO_CHAR(0 - JL."JLNAMT") 
                                 WHEN JL."AcctCode" = 'F07'
                                 THEN TO_CHAR(JL."JLNAMT") 
-                              ELSE NULL END ABSENT ON NULL ,
+                              ELSE NULL END ,
                'ReduceAmt' VALUE CASE -- 減免金額
                                    WHEN TR1."TRXDAM" != 0
                                         AND TR1."TRXCRC" IN ('1','3')
                                    THEN TO_CHAR(0 - TR1."TRXDAM") 
                                    WHEN TR1."TRXDAM" != 0 
                                    THEN TO_CHAR(TR1."TRXDAM") 
-                                 ELSE NULL END ABSENT ON NULL ,
+                                 ELSE NULL END ,
                'ReduceBreachAmt' VALUE CASE -- 減免違約金
                                          WHEN TR1."TRXDBC" != 0
                                               AND TR1."TRXCRC" IN ('1','3')
                                          THEN TO_CHAR(0 - TR1."TRXDBC") 
                                          WHEN TR1."TRXDBC" != 0 
                                          THEN TO_CHAR(TR1."TRXDBC") 
-                                       ELSE NULL END ABSENT ON NULL ,
+                                       ELSE NULL END ,
                'StampFreeAmt' VALUE CASE -- 免印花稅金額
                                       WHEN NVL(TO_CHAR(TR1."TRXNTX"),'0') != '0'
                                       THEN NVL(TO_CHAR(TR1."TRXNTX"),'0')
-                                    ELSE NULL END ABSENT ON NULL ,
+                                    ELSE NULL END ,
                'TempReasonCode' VALUE CASE -- 暫收原因
                                         WHEN TR1.TRXTRN IN ('3036','3037','3082','3083')
                                         THEN LPAD(NVL(TR1."LMSRSN",0),2,'0') 
-                                      ELSE NULL END ABSENT ON NULL ,
+                                      ELSE NULL END ,
                'NewDueAmt' VALUE CASE -- 新每期攤還金額 2022-12-20 Wei新增
                                    WHEN TR1.TRXNPA != 0
                                    THEN TO_CHAR(TR1.TRXNPA)
-                                 ELSE NULL END ABSENT ON NULL ,
+                                 ELSE NULL END ,
                'NewTotalPeriod' VALUE CASE -- 新繳款總期數 2022-12-20 Wei新增
                                         WHEN TR1.TRXNPR != 0
                                         THEN TO_CHAR(TR1.TRXNPR)
-                                      ELSE NULL END ABSENT ON NULL ,
+                                      ELSE NULL END ,
                'ChequeAcctNo' VALUE CASE -- 支票帳號 2022-12-20 Wei新增
                                         WHEN TR1.CHKACN != 0
                                         THEN TO_CHAR(TR1.CHKACN)
-                                      ELSE NULL END ABSENT ON NULL ,
+                                      ELSE NULL END ,
                'ChequeNo' VALUE CASE -- 支票號碼 2022-12-20 Wei新增
                                   WHEN TR1.CHKASQ != 0
                                   THEN TO_CHAR(TR1.CHKASQ)
-                                ELSE NULL END ABSENT ON NULL ,
+                                ELSE NULL END ,
                'RemitSeq' VALUE CASE -- 匯款序號 2022-12-20 Wei新增
                                   WHEN TR1.DPSSEQ != 0
                                   THEN TO_CHAR(TR1.DPSSEQ)
-                                ELSE NULL END ABSENT ON NULL ,
+                                ELSE NULL END ,
                'AcctDivisionCode' VALUE CASE -- 帳戶區分 2022-12-20 Wei新增
                                           WHEN TR1.TRXACD >= 0
                                           THEN TO_CHAR(TR1.TRXACD)
-                                        ELSE NULL END ABSENT ON NULL ,
+                                        ELSE NULL END ,
                'RepayBank' VALUE CASE -- 扣款銀行 2022-12-20 Wei新增
                                    WHEN TR1.LMSPBK >= 0
                                    THEN TO_CHAR(TR1.LMSPBK)
-                                 ELSE NULL END ABSENT ON NULL ,
+                                 ELSE NULL END ,
                'RECPNO' VALUE TO_CHAR(TR1.RECPNO) , -- 收據號碼 2022-12-20 Wei新增
                'PAYCOD' VALUE TO_CHAR(TR1.PAYCOD) , -- 代收繳款方式 2022-12-20 Wei新增
                'Excessive' VALUE TO_CHAR(TR1.TRXAOS) -- 累溢短收 2022-12-20 Wei新增
@@ -606,56 +627,15 @@ BEGIN
     LEFT JOIN "TmpLMSP" TL ON TL."LMSACN" = TR1."LMSACN" 
                           AND TL."LMSAPN" = TR1."LMSAPN" 
                           AND TL."LMSASQ" = TR1."LMSASQ" 
-    LEFT JOIN (
-        SELECT "LMSACN" 
-              ,"LMSAPN" 
-              ,"LMSASQ" 
-              ,"TRXISD" 
-              ,NVL(RC."FitRate",LBM."StoreRate") AS "FitRate" -- 適用利率 
-              ,ROW_NUMBER() OVER (PARTITION BY TX."LMSACN"  
-                                              ,TX."LMSAPN" 
-                                              ,TX."LMSASQ" 
-                                              ,TX."TRXISD" 
-                                  ORDER BY NVL(RC."EffectDate",0) DESC) AS "Seq" 
-        FROM ( 
-            SELECT DISTINCT 
-                  "LMSACN" 
-                 ,"LMSAPN" 
-                 ,"LMSASQ" 
-                 ,"TRXISD" 
-            FROM "LA$TRXP" 
-            WHERE "TRXISD" > 0 
-        ) TX 
-        LEFT JOIN "LoanRateChange" RC ON RC."CustNo" = TX."LMSACN" 
-                                     AND RC."FacmNo" = TX."LMSAPN" 
-                                     AND RC."BormNo" = TX."LMSASQ" 
-                                     AND RC."EffectDate" <= TX."TRXISD" 
-        LEFT JOIN "LoanBorMain" LBM ON LBM."CustNo" = TX."LMSACN" 
-                                   AND LBM."FacmNo" = TX."LMSAPN" 
-                                   AND LBM."BormNo" = TX."LMSASQ" 
-        WHERE NVL(RC."FitRate",LBM."StoreRate") > 0 
-    ) RC ON RC."LMSACN" = TR1."LMSACN" 
-        AND RC."LMSAPN" = TR1."LMSAPN" 
-        AND RC."LMSASQ" = TR1."LMSASQ" 
-        AND RC."TRXISD" = TR1."TRXISD" 
-        AND RC."Seq" = 1 
-    LEFT JOIN ( 
-        SELECT "LMSACN" 
-              ,"LMSAPN1" 
-              ,"LMSASQ1" 
-              ,MAX(CASE 
-                     WHEN "LMSAPN" = "LMSAPN1" THEN 1 
-                   ELSE 0 END) AS "IsSameFac" 
-        FROM "LNACNP" 
-        GROUP BY "LMSACN" 
-                ,"LMSAPN1" 
-                ,"LMSASQ1" 
-    ) ACN ON ACN."LMSACN" = TR1."LMSACN" 
-         AND ACN."LMSAPN1" = TR1."LMSAPN" 
-         AND ACN."LMSASQ1" = TR1."LMSASQ" 
-    LEFT JOIN JL ON JL."TRXDAT" = TR."TRXDAT" 
-                AND JL."TRXNMT" = TR."TRXNMT" 
-                AND JL."Seq" = 1 
+    LEFT JOIN "TfRcData" RC ON RC."LMSACN" = TR1."LMSACN" 
+                           AND RC."LMSAPN" = TR1."LMSAPN" 
+                           AND RC."LMSASQ" = TR1."LMSASQ" 
+                           AND RC."TRXISD" = TR1."TRXISD" 
+    LEFT JOIN AcnpData ACN ON ACN."LMSACN" = TR1."LMSACN" 
+                          AND ACN."LMSAPN1" = TR1."LMSAPN" 
+                          AND ACN."LMSASQ1" = TR1."LMSASQ" 
+    LEFT JOIN JLSeq1 JL ON JL."TRXDAT" = TR."TRXDAT" 
+                       AND JL."TRXNMT" = TR."TRXNMT" 
     LEFT JOIN "As400EmpNoMapping" AEM1 ON AEM1."As400TellerNo" = TR1."TRXMEM" 
     LEFT JOIN "As400EmpNoMapping" AEM2 ON AEM2."As400TellerNo" = TR1."TRXSID" 
     LEFT JOIN "TB$TCDP" TCD ON TCD."TRXTRN" = TR."TRXTRN" 

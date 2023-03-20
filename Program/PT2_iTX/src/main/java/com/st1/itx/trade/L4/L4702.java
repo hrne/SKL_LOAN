@@ -13,10 +13,13 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdReport;
+import com.st1.itx.db.service.CdReportService;
 import com.st1.itx.db.service.springjpa.cm.L4702ServiceImpl;
 import com.st1.itx.trade.L9.L9705Report;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
+import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -41,7 +44,13 @@ public class L4702 extends TradeBuffer {
 
 	@Autowired
 	public L4702ServiceImpl l4702ServiceImpl;
-
+	
+	@Autowired
+	public CustNoticeCom custNoticeCom;
+	
+	@Autowired
+	CdReportService sCdReportService;
+	
 	@Autowired
 	L9705Report l9705Report;
 
@@ -88,16 +97,22 @@ public class L4702 extends TradeBuffer {
 //			2.procCode = 6
 			this.info("L4702 Start ...");
 
+			String formNo = "L4702";
+			CdReport tCdReport = new CdReport();
+			tCdReport = sCdReportService.findById(formNo, titaVo);
+			String Fg = tCdReport.getLetterFg();
+			if ("Y".equals(Fg)) {
+				
 			iACCTDATE_ST = parse.stringToInteger(titaVo.getParam("ACCTDATE_ST")) + 19110000;
 			iACCTDATE_ED = parse.stringToInteger(titaVo.getParam("ACCTDATE_ED")) + 19110000;
-			iCUSTNO = parse.stringToInteger(titaVo.getParam("CUSTNO"));
+			iCUSTNO = parse.stringToInteger(titaVo.getParam("CUSTNO")); // #CUSTNOB 在 VAR 已經塞好了
 			iCONDITION1 = titaVo.getParam("CONDITION1");
 			iCONDITION2 = parse.stringToInteger(titaVo.getParam("CONDITION2"));
 			iID_TYPE = parse.stringToInteger(titaVo.getParam("ID_TYPE"));
 			iCORP_IND = parse.stringToInteger(titaVo.getParam("CORP_IND"));
 			iAPNO = parse.stringToInteger(titaVo.getParam("APNO"));
 			execL9705(titaVo);
-
+			}
 //			存入憑條
 
 			break;

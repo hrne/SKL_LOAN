@@ -226,6 +226,34 @@ em = null;
   }
 
   @Override
+  public Slice<ClOtherRightsFac> findClNoSeq(int clCode1_0, int clCode2_1, int clNo_2, String seq_3, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<ClOtherRightsFac> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findClNoSeq " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2 + " seq_3 : " +  seq_3);
+    if (dbName.equals(ContentName.onDay))
+      slice = clOtherRightsFacReposDay.findAllByClCode1IsAndClCode2IsAndClNoIsAndSeqIsOrderByApproveNoAsc(clCode1_0, clCode2_1, clNo_2, seq_3, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = clOtherRightsFacReposMon.findAllByClCode1IsAndClCode2IsAndClNoIsAndSeqIsOrderByApproveNoAsc(clCode1_0, clCode2_1, clNo_2, seq_3, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = clOtherRightsFacReposHist.findAllByClCode1IsAndClCode2IsAndClNoIsAndSeqIsOrderByApproveNoAsc(clCode1_0, clCode2_1, clNo_2, seq_3, pageable);
+    else 
+      slice = clOtherRightsFacRepos.findAllByClCode1IsAndClCode2IsAndClNoIsAndSeqIsOrderByApproveNoAsc(clCode1_0, clCode2_1, clNo_2, seq_3, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
   public ClOtherRightsFac holdById(ClOtherRightsFacId clOtherRightsFacId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

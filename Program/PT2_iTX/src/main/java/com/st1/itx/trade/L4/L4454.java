@@ -137,6 +137,7 @@ public class L4454 extends TradeBuffer {
 	String iRepayBank = "";
 	private int totalCnt = 0;
 	private int deleteCnt = 0;
+
 	private List<TxToDoDetailReserve> lTxToDoDetailReserve = new ArrayList<TxToDoDetailReserve>();
 
 	@Override
@@ -262,6 +263,7 @@ public class L4454 extends TradeBuffer {
 		repayType = parse.stringToInteger(t.get("RepayType"));
 		repayAmt = parse.stringToBigDecimal(t.get("RepayAmt"));
 		prevIntDate = parse.stringToInteger(t.get("PrevIntDate"));
+		
 		int collPrevIntDate = parse.stringToInteger(t.get("PrevIntDate"));
 		tTempVo = tTempVo.getVo(t.get("JsonFields"));
 		this.info("InsuYearMonth=" + t.get("InsuYearMonth"));
@@ -343,6 +345,14 @@ public class L4454 extends TradeBuffer {
 
 		if (functionCode == 1) // 個別
 		{
+			int iFacmNo = parse.stringToInteger(t.get("FacmNo"));
+			String inputCustNo = titaVo.get("CustNo");
+			String recordCustNoString = t.get("CustNo");
+			int recordCustNo = parse.stringToInteger(recordCustNoString);
+			if (!custNoticeCom.checkIsLetterSendable(inputCustNo, recordCustNo, iFacmNo, "L4454", titaVo)) {
+				this.error("查無資料");
+			}
+
 			CustMain tCustMain = sCustMainService.custNoFirst(custNo, custNo, titaVo);
 			CdReport tCdReport = sCdReportService.findById("L4454", titaVo);
 

@@ -150,8 +150,8 @@ public class L1101 extends TradeBuffer {
 		}
 
 		this.info("L1101 funcd = " + funcd);
-		
-		//2023/3/8 銘傑修改
+
+		// 2023/3/8 銘傑修改
 		String iIntroducer = titaVo.get("Introducer");
 		String iBusinessOfficer = titaVo.get("BusinessOfficer");
 		String iStation = titaVo.get("Station");
@@ -449,11 +449,14 @@ public class L1101 extends TradeBuffer {
 	}
 
 	private void setCstMain(TitaVo titaVo) throws LogicException {
-		
+
 		tCustMain.setBranchNo(titaVo.getParam("KINBR"));
 		tCustMain.setTypeCode(iParse.stringToInteger(titaVo.getParam("TypeCode")));
 		tCustMain.setCustName(titaVo.getParam("CustName"));
 		tCustMain.setBirthday(iParse.stringToInteger(titaVo.getParam("Birthday")));
+		if (titaVo.get("Sex") == null || titaVo.get("Sex").trim().isEmpty()) {
+			throw new LogicException("E0015", "性別必須輸入");// 檢查錯誤
+		}
 		tCustMain.setSex(titaVo.getParam("Sex"));
 		String custTypeCode = titaVo.getParam("CustTypeCode");
 		if (isEloan) {
@@ -523,7 +526,6 @@ public class L1101 extends TradeBuffer {
 			tCustMain.setIntroducer(beforeCustMain.getIntroducer());
 		}
 //		Introducer
-
 
 		tCustMain.setIsSuspected(titaVo.getParam("IsSuspected"));
 		tCustMain.setIsSuspectedCheck(titaVo.getParam("IsSuspectedCheck"));
