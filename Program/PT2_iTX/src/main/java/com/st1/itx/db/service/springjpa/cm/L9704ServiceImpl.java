@@ -77,10 +77,10 @@ public class L9704ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                       ORDER BY \"YearMonth\" DESC) \"Seq\" ";
 		sql += "             FROM \"MonthlyFacBal\" ";
 		sql += "             WHERE \"PrevIntDate\" > 0 ";
-		sql += "               AND \"YearMonth\" <= :lastMonth ) MFBOrder ON MFBOrder.\"Seq\" = 1 "; // 因為有可能上個月催收、這個月還款解催收了
+		sql += "               AND \"YearMonth\" <= :lastMonth ) MFBOrder ON MFBOrder.\"Seq\" = 1 ";               // 因為有可能上個月催收、這個月還款解催收了
 		sql += "                                                         AND MFBOrder.\"CustNo\" = F.\"CustNo\" "; // 這種情況取 thisMonth 的日期就會不對
 		sql += "                                                         AND MFBOrder.\"FacmNo\" = F.\"FacmNo\" "; // 如果依然還是催收，表示 thisMonth 這欄位會是 0
-		sql += " LEFT JOIN \"CdCity\" CT ON CT.\"CityCode\" = NVL(LASTM.\"CityCode\", THISM.\"CityCode\") "; // 所以在任何情況下，都是從 lastMonth 開始往回取第一個非 0 的 PrevIntDate
+		sql += " LEFT JOIN \"CdCity\" CT ON CT.\"CityCode\" = NVL(LASTM.\"CityCode\", THISM.\"CityCode\") ";       // 所以在任何情況下，都是從 lastMonth 開始往回取第一個非 0 的 PrevIntDate
 		sql += " LEFT JOIN \"CdCode\" DF ON DF.\"DefCode\" = 'AcSubBookCode' ";
 		sql += "                        AND DF.\"Code\" = NVL(LASTM.\"AcSubBookCode\", THISM.\"AcSubBookCode\") ";
 		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = F.\"CustNo\" ";
