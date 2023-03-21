@@ -656,13 +656,11 @@ public class L4320Batch extends TradeBuffer {
 			// 加碼值 = 目前合約加減碼-政府補貼利率差額
 			// 擬調利率 = 本次指標利率 + 加碼值
 			BigDecimal subsidyRateDiff = BigDecimal.ZERO;
-			if ("02".equals(iBaseRateCode)) {
-				// 政府補貼利率差額(郵局指標利率)
+			// 政府補貼利率差額(郵局指標利率)
+			if ("02".equals(iBaseRateCode) && !"N".equals(s.get("GovOfferFlag"))) {
 				subsidyRateDiff = getSubsidyRateDiff(s.get("GovOfferFlag"), presentEffectDate, titaVo);
-				if (!"N".equals(s.get("GovOfferFlag"))) {
-					warnMsg += ", 政府補貼利率差額:" + subsidyRateDiff;
-					tTempVo.putParam("SubsidyRateDiff", subsidyRateDiff);
-				}
+				warnMsg += ", 政府補貼利率差額:" + subsidyRateDiff;
+				tTempVo.putParam("SubsidyRateDiff", subsidyRateDiff);
 				rateIncr = rateIncr.subtract(subsidyRateDiff);
 			}
 			rateProp = iBaseRate.add(rateIncr);
@@ -842,9 +840,6 @@ public class L4320Batch extends TradeBuffer {
 
 	// 政府補貼利率差額
 	private BigDecimal getSubsidyRateDiff(String govOfferFlag, int presEffDate, TitaVo titaVo) throws LogicException {
-		if (!"N".equals(govOfferFlag)) {
-			return BigDecimal.ZERO;
-		}
 
 		String jsFieldName = "SubsidyRate" + govOfferFlag;
 		if (subsidyRateVo.get(jsFieldName) == null) {
@@ -858,13 +853,13 @@ public class L4320Batch extends TradeBuffer {
 			return BigDecimal.ZERO;
 		}
 
-		TempVo oldTempVo = new TempVo();
-		oldTempVo.getVo(tCdComm.getJsonFields());
-		if (oldTempVo.get(jsFieldName) == null) {
+		TempVo oldSubsidyRateVo = new TempVo();
+		oldSubsidyRateVo = oldSubsidyRateVo.getVo(tCdComm.getJsonFields());
+		if (oldSubsidyRateVo.get(jsFieldName) == null) {
 			return BigDecimal.ZERO;
 		}
 
-		BigDecimal subsidyRateOld = parse.stringToBigDecimal(oldTempVo.get(jsFieldName));
+		BigDecimal subsidyRateOld = parse.stringToBigDecimal(oldSubsidyRateVo.get(jsFieldName));
 
 		return subsidyRateNow.subtract(subsidyRateOld);
 	}

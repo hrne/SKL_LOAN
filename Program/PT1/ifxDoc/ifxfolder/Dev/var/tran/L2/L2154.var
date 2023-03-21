@@ -1371,7 +1371,7 @@ C(3,#UpdateCode,1,
     ,#LbRepayFreq,#LbUtilDeadline,#LbGracePeriod,#LbGuaranteeDate,#LbRecycleDeadline,#LbRepayBank,#LbPostCode,#LbRepayAcctNo
     ,#LbRelationName,#LbRelationId,#LbRelationBirthday,#IntroducerLb,#FireOfficerLb,#EstimateLb,#CreditOfficerLb,#BusinessOfficerLb
     ,#SupervisorLb,#InvestigateOfficerLb,#EstimateReviewLb,#CoorgnizerLb,#LbBreach)
-    C(3,#DepartmentCode,0,HIDE(#BreachFlag,#ProdBreachFlag,#Breach)SHOW(#LbBreach),SHOW(#BreachFlag,#ProdBreachFlag,#Breach)HIDE(#LbBreach))
+    C(3,#DepartmentCode,0,HIDE(#ProdBreachFlag,#Breach)SHOW(#LbBreach),SHOW(#ProdBreachFlag,#Breach)HIDE(#LbBreach))
    ,SHOW(#BaseRateCodeX,#LbProdRateX,#LbRateIncrX,#LbIndividualIncrX,#LbApproveRateX,#RateCodeX
    ,#LbFirstRateAdjFreq,#LbRateAdjFreq,#LbAcctFee,#LbHandlingFee,#LbCreditSysNo,#AmortizedCodeX,#LbApplAmt,#LbApplAmt,#LbLoanTermYyX
    ,#LbLoanTermMm,#LbLoanTermDd,#LbPayIntFreq,#LbRepayFreq,#LbUtilDeadline,#LbGracePeriod,#LbGuaranteeDate,#LbRecycleDeadline
@@ -2174,7 +2174,7 @@ HELP(#DepartmentCodeHelp)
 #DepartmentCodeX=X,10,L
 T(3,)
 T(H,#DepartmentCode,#DepartmentCodeHelp)
-C(3,#DepartmentCode,0,HIDE(#BreachFlag,#ProdBreachFlag,#Breach)SHOW(#LbBreach),SHOW(#BreachFlag,#ProdBreachFlag,#Breach)HIDE(#LbBreach))
+C(3,#DepartmentCode,0,HIDE(#ProdBreachFlag,#Breach)SHOW(#LbBreach),SHOW(#ProdBreachFlag,#Breach)HIDE(#LbBreach))
 
 !依[案件隸屬單位]:企金時顯示[企金人員],餘為[房貸專員]
 #checkDepartmentCode=X,1,S
@@ -3521,7 +3521,6 @@ SWITCH(#BreachFlag,Y,T(3,@BreachFlagX,是)
 #BreachFlag=X,1,I
 C(3,#Hide8Fg,0,CALL(#HideP8),$)
 C(3,#UpdateCode,1,$,s)
-C(3,#DepartmentCode,0,s,$)
 HELP(#YesNoHelp)
 @V(H,#YesNoHelp)
 

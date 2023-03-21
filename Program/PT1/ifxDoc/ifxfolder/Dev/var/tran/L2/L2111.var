@@ -1066,7 +1066,7 @@ BIND(#BTN7,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF7A;ntxbuf5=type<-1:Introdu
 C(3,#UpdateCode,1,$,s)
 
 #BUF7B=X,7,S
-T(2,#Introducer)
+!T(2,#Introducer)
 
 #BIND7B=X,1,S
 BIND(#BTN7,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF7B;ntxbuf5=type<-1:Introducer<-OOEmployeeNo:IntroducerX<-OOFullname})

@@ -344,14 +344,10 @@ public class L4040 extends TradeBuffer {
 //							5.OccRepayAcct			委繳戶帳號		X	14	40	扣款帳號
 						occursList.putParam("OccRepayAcct", FormatUtil.padX(result.get("F4"), 14));
 //							6.OccCustId				委繳戶統一編號	X	10	50	身分證字號
-						if (parse.stringToInteger(result.get("F17")) == 0) {
-							CustMain tCustMain = custMainService.custNoFirst(parse.stringToInteger(result.get("F2")),
-									parse.stringToInteger(result.get("F2")), titaVo);
-							if (tCustMain != null) {
-								occursList.putParam("OccCustId", FormatUtil.padX(tCustMain.getCustId(), 10));
-							} else {
-								occursList.putParam("OccCustId", FormatUtil.padX(result.get("F19"), 10));
-							}
+						CustMain tCustMain = custMainService.custNoFirst(parse.stringToInteger(result.get("F2")),
+								parse.stringToInteger(result.get("F2")), titaVo);
+						if (tCustMain != null) {
+							occursList.putParam("OccCustId", FormatUtil.padX(tCustMain.getCustId(), 10));
 						} else {
 							occursList.putParam("OccCustId", FormatUtil.padX(result.get("F19"), 10));
 						}

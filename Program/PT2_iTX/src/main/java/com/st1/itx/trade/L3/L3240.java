@@ -474,7 +474,7 @@ public class L3240 extends TradeBuffer {
 					"放款主檔 戶號 = " + iCustNo + "-" + tx.getFacmNo() + "-" + tx.getBormNo()); // 該筆資料待放行中
 		}
 
-		if (tLoanBorMain.getPrevPayIntDate() != tx.getIntEndDate()) {
+		if ("L3200".equals(tx.getTitaTxCd()) && tLoanBorMain.getPrevPayIntDate() != tx.getIntEndDate()) {
 			throw new LogicException(titaVo, "E0019", "放款主檔 戶號 = " + iCustNo + "-" + tx.getFacmNo() + "-"
 					+ tx.getBormNo() + " 應沖正繳息迄日=" + tLoanBorMain.getPrevPayIntDate()); // 輸入資料錯誤
 		}

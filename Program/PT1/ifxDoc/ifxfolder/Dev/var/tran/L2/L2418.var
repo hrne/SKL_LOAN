@@ -265,6 +265,7 @@ E(0,@FUNCIND,#FunCd)
 C(3,#FunCd,1,INVOKEJS(SHOW,p1_2,1),INVOKEJS(SHOW,p1_2,0))
 T(H,#FunCd,#FuncCodeHelp)
 C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSEY))
+CALL(#HIDEP1)
 
 #checkFunCd=X,1,S
 C(3,#CHAIN,1,C(3,#FunCd,1,S,$),S)
@@ -630,8 +631,8 @@ C(3,#HIDE1FG,0,CALL(#HIDEP1),$)
 ! IF({n}==1,$,C(3,#ApplNo{l},0,INVOKEJS(SHOW,grd1_{l},0),INVOKEJS(SHOW,grd1_{l},1)))
 IF({n}==1,$,C(3,#ApplNo{l},0,INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1)))
 IF({n}==1,$,C(3,#ApplNo{l},0,S,$))
-@
-IF({n}==1,V(2,0),$)
+!@
+!IF({n}==1,V(2,0),$)
 
 #CustId{n}=X,10,L
 

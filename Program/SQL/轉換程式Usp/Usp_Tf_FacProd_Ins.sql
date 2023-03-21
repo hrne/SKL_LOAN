@@ -114,9 +114,19 @@ BEGIN
              WHEN "TB$TBLP"."AILIRT" = '3' -- 定期機動
              THEN '3'
            ELSE '' END                    AS "RateCode"            -- 利率區分 VARCHAR2 1 0
-          ,CASE
-             WHEN NVL("TB$TBLP"."GOVIRT",' ') = 'Y'
-             THEN 'Y'
+          ,CASE -- 2023-03-21 Wei 修改 from 綺萍: 政府優惠補貼息相關參數
+             WHEN TRIM("TB$TBLP"."IN$COD") IN ('IA')
+             THEN '1'
+             WHEN TRIM("TB$TBLP"."IN$COD") IN ('IB')
+             THEN '2'
+             WHEN TRIM("TB$TBLP"."IN$COD") IN ('IC')
+             THEN '3'
+             WHEN TRIM("TB$TBLP"."IN$COD") IN ('ID','IE')
+             THEN '4'
+             WHEN TRIM("TB$TBLP"."IN$COD") IN ('IF','IG')
+             THEN '5'
+             WHEN TRIM("TB$TBLP"."IN$COD") IN ('IH','II')
+             THEN '6'
            ELSE 'N' END                   AS "GovOfferFlag"        -- 政府優惠房貸 VARCHAR2 1 0
           ,CASE
              WHEN TRIM(TO_SINGLE_BYTE("TB$TBLP"."IN$COD")) IN ('P','P1','P2','P3') THEN 'Y'

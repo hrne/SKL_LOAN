@@ -28,6 +28,7 @@ import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacCloseService;
 import com.st1.itx.util.common.GSeqCom;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -70,7 +71,7 @@ public class L2634ReportA extends MakeReport {
 	private String reportCode = "L2634";
 	private String reportItem = "抵押權塗銷同意書-整批列印";
 	private String security = "";
-//	private String pageSize ="A5";
+	private String pageSize = "A4";
 	private String pageOrientation = "P";
 	private int iCustNo = 0;
 	private int iCloseNo = 0;
@@ -119,7 +120,11 @@ public class L2634ReportA extends MakeReport {
 //		this.pageSize = "A5";
 //		this.NowTime = dDateUtil.getNowStringTime();
 
-		this.open(titaVo, reportDate, brno, reportCode, reportItem, security, "A4", pageOrientation);
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(reportCode)
+				.setRptItem(reportItem).setSecurity(security).setRptSize(pageSize).setPageOrientation(pageOrientation)
+				.build();
+		this.open(titaVo, reportVo);
+
 		int agreecnt = 0;
 		for (ClOtherRights t : lClOtherRights) {
 

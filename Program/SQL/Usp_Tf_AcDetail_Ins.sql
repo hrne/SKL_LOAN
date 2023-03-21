@@ -38,13 +38,13 @@ BEGIN
         EXECUTE IMMEDIATE 'ALTER TABLE "AcDetail" ENABLE PRIMARY KEY'; 
     END IF;
 
-    SELECT "StartMonth"
+    SELECT "StartDate"
     INTO "DateStart"
     FROM "TfByYear"
     WHERE "Seq" = "ExecSeq"
     ;
 
-    SELECT "EndMonth"
+    SELECT "EndDate"
     INTO "DateEnd"
     FROM "TfByYear"
     WHERE "Seq" = "ExecSeq"

@@ -27,15 +27,15 @@ public class L9704ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(int lastMonth, int thisMonth, TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(int lastYearMonth, int thisYearMonth, TitaVo titaVo) throws Exception {
 		this.info("L9704ServiceImpl.findAll ");
 
-		if (lastMonth == 0) {
+		if (lastYearMonth == 0) {
 			this.error("L9704ServiceImpl.findAll lastMonth = 0");
 			return null;
 		}
 
-		if (thisMonth == 0) {
+		if (thisYearMonth == 0) {
 			this.error("L9704ServiceImpl.findAll thisMonth = 0");
 			return null;
 		}
@@ -108,8 +108,8 @@ public class L9704ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("lastMonth", lastMonth);
-		query.setParameter("thisMonth", thisMonth);
+		query.setParameter("lastMonth", lastYearMonth);
+		query.setParameter("thisMonth", thisYearMonth);
 
 		return this.convertToMap(query);
 	}

@@ -386,7 +386,7 @@ public class L2153 extends TradeBuffer {
 			wkCustNo = tFacMain.getCustNo();
 			wkFacmNo = tFacMain.getFacmNo();
 		} else {
-			if (titaVo.isHcodeNormal()) {
+			if (titaVo.isHcodeNormal() || titaVo.isHcodeModify()) {
 				wkCustNo = tCustMain.getCustNo();
 				if (wkCustNo == 0) {
 					wkCustNo = gGSeqCom.getSeqNo(0, 0, "L2", "0001", 9999999, titaVo);

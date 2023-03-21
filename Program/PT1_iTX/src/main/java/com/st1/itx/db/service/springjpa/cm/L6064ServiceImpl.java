@@ -47,6 +47,7 @@ public class L6064ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("iCode    = " + iCode);
 		this.info("iCodeItem = "+ iCodeItem);
 		String sql = "	SELECT ";
+		sql += "    C.\"Item\" as CI , ";
 		sql += "	A.\"DefCode\" , ";
 		sql += "	A.\"Code\" , ";
 		sql += "	A.\"Item\" , ";
@@ -57,7 +58,10 @@ public class L6064ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    B.\"Fullname\" ";
 		sql += "	from \"CdCode\" A ";
 		sql += "    left join \"CdEmp\" B on A.\"LastUpdateEmpNo\" = B.\"EmployeeNo\" ";
-
+		sql += "    left join (select * from \"CdCode\" where \"DefCode\" = 'CodeType') C ";
+		sql += "              on A.\"DefCode\" = C.\"Code\" and C.\"DefCode\" = 'CodeType' ";
+		
+		
 		sql += "	WHERE ";
 		if(!"".equals(iDefType)) {
 			sql += " A.\"DefType\" = :iDefType ";

@@ -66,9 +66,9 @@ K(MODIFYBUTTON,查詢)
 [
 ["[L6064]                                 各類代碼檔查詢"],
 ["#FdDate","業務類別、代碼類別代號、代碼、代碼說明，需擇一輸入"],
-["#FdDefType+．業務類別",#DefType,#DefTypeX],
+["#FdDefType+業務類別",#DefType,#DefTypeX],
 !["#FdDefCode+．代碼類別代號",#DefCode,#CodeBTN],
-["#FdDefCode+．代碼類別代號",#DefCode,#CodeBTN,#DefItemX],
+["#FdDefCode+代碼類別代號",#DefCode,#CodeBTN,#DefItemX],
 !["#FdDefItem+．代碼類別名稱",#DefItem],
 ["#FdCode+代碼",#Code],
 ["#FdCodeItem+代碼說明",#CodeItem],
@@ -76,7 +76,6 @@ K(MODIFYBUTTON,查詢)
 !<include src="COM.icf::RPTFG.scr"/>
 !],
 ]
-
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
 !#BTN1=X,15,I,ui:button;value:新增代碼檔代碼;enable:1;tabbable:0;title:L6604 各類代碼檔維護
@@ -253,6 +252,9 @@ T(H,#OOType,#DefTypeH)
 #OOLastEmp=x,47,S
 
 
+! 代碼類別說明
+#OODDefItem=x,50,L
+
 ! 修改的按鈕
 #OOFunc2=A,1,S
 E(0,2)
@@ -305,6 +307,7 @@ TXFORM=L6064
 #OOEnable
 #OOLastUpdate
 #OOLastEmp
+#OODDefItem
 ^
 
 TXFORM=L6R20
@@ -333,10 +336,16 @@ TXFORM=L6R20
 !{width:50,search:false,formatter:'cust:bind-button:#OOBTN4',align:'center',canExport:false}
 
 #OODefCode=代碼檔代碼
-{width:150,hidden:true}
+{width:150,align:'left'}
 
-#OODefItem=代碼檔說明
-{width:300,hidden:true}
+#OODDefItem=代碼類別名稱
+{width:400,align:'left'}
+
+!#OODefCode=代碼檔代碼
+!{width:150,hidden:true}
+
+!#OODefItem=代碼檔說明
+!{width:300,hidden:true}
 
 #OOCode=代碼
 {width:150,align:'left'}
@@ -369,11 +378,17 @@ TXFORM=L6R20
 !#OOBTN4=刪除
 !{width:50,search:false,formatter:'cust:bind-button:#OOBTN4',align:'center',canExport:false}
 
-#OODefCode=代碼檔代號
+#OOCCode=代碼檔代碼
 {width:150,align:'left'}
 
-#OODefItem=代碼檔說明
-{width:300,hidden:true}
+#OODDefItem=代碼類別名稱
+{width:400,align:'left'}
+
+!#OODefCode=代碼檔代號
+!{width:150,align:'left'}
+
+!#OODefItem=代碼檔說明
+!{width:300,hidden:true}
 
 #OOCode=代碼
 {width:150,align:'left'}

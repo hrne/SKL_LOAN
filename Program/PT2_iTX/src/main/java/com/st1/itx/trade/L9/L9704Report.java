@@ -45,11 +45,11 @@ public class L9704Report extends MakeReport {
 	BigDecimal totalThisMonthOvduPrinBal = BigDecimal.ZERO;
 	BigDecimal totalThisMonthOvduIntBal = BigDecimal.ZERO;
 
-	public void exec(int lastMonth, int thisMonth, TitaVo titaVo) throws LogicException {
+	public void exec(int lastYearMonth, int thisYearMonth, TitaVo titaVo) throws LogicException {
 		List<Map<String, String>> listL9704 = null;
 
 		try {
-			listL9704 = l9704ServiceImpl.findAll(lastMonth, thisMonth, titaVo);
+			listL9704 = l9704ServiceImpl.findAll(lastYearMonth, thisYearMonth, titaVo);
 
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
@@ -57,7 +57,7 @@ public class L9704Report extends MakeReport {
 			this.info("L9704ServiceImpl.findAll error = " + errors.toString());
 		}
 
-		exportExcel(thisMonth, listL9704, titaVo);
+		exportExcel(thisYearMonth, listL9704, titaVo);
 	}
 
 	private void exportExcel(int thisMonth, List<Map<String, String>> listL9704, TitaVo titaVo) throws LogicException {
@@ -91,7 +91,7 @@ public class L9704Report extends MakeReport {
 		makeExcel.setValue(2, 15, "日　　期：" + this.showBcDate(today, 1));
 		makeExcel.setValue(3, 15, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
 				+ dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
-		makeExcel.setValue(4, 15, "單　　位：  元");
+
 		int printRow = 7; // 從這行開始印
 
 		if (listL9704 == null || listL9704.isEmpty()) {

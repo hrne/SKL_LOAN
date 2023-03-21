@@ -27,6 +27,7 @@ import com.st1.itx.db.service.ClOtherRightsService;
 import com.st1.itx.db.service.ClOtherRightsFacService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.data.DataLog;
+import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L2418")
@@ -52,6 +53,8 @@ public class L2418 extends TradeBuffer {
 	public Parse parse;
 	@Autowired
 	public DataLog dataLog;
+	@Autowired
+	DateUtil dDateUtil;
 
 	// 功能
 	private int iFunCd;
@@ -62,7 +65,7 @@ public class L2418 extends TradeBuffer {
 	// 擔保品編號
 	private int iClNo;
 	// 戶號
-	private int iCustNo = 0;
+//	private int iCustNo = 0;
 	// 他項權利序號
 	private String iClSeq;
 
@@ -212,12 +215,10 @@ public class L2418 extends TradeBuffer {
 					throw new LogicException("E0008", "擔保品他項權利檔" + e.getErrorMsg());
 				}
 				updateClOtherRightsFac(titaVo);
-
 			} else if (iFunCd == 5) {
 
 			} else {
 				throw new LogicException(titaVo, "E0010", "擔保品他項權利檔"); // 功能選擇錯誤
-
 			}
 		}
 
@@ -261,21 +262,13 @@ public class L2418 extends TradeBuffer {
 		// 資料庫原始值
 		Slice<ClOtherRightsFac> slClOtherRightsFac = sClOtherRightsFacService.findClNoSeq(iClCode1, iClCode2, iClNo,
 				iClSeq, this.index, this.limit, titaVo);
-//		Slice<ClOtherRightsFac> slClOtherRightsFac = sClOtherRightsFacService.findClNo(iClCode1, iClCode2, iClNo, 0,
-//				Integer.MAX_VALUE, titaVo);
 		List<ClOtherRightsFac> lClOtherRightsFac = slClOtherRightsFac == null ? null : slClOtherRightsFac.getContent();
-//		int j = 0;
 		if (lClOtherRightsFac != null && lClOtherRightsFac.size() != 0) {
 			lClOtherRightsFacS = lClOtherRightsFac.size();
 			this.info("L2418 lClOtherRightsFacS=" + lClOtherRightsFacS);
 			for (int i = 0; i < lClOtherRightsFacS; i++) {
 				ClOtherRightsFac ClOtherRightsFaceVO = lClOtherRightsFac.get(i);
-//				if (iClSeq.equals(ClOtherRightsFaceVO.getSeq())) {
-//				int Row = i + 1;
-//					int Row = j + 1;
-//					j = j + 1;
 				slClOtherRightsFacApplNo[i] = ClOtherRightsFaceVO.getApproveNo();// 核准編號
-//				}
 			}
 		}
 
@@ -292,11 +285,11 @@ public class L2418 extends TradeBuffer {
 		tClOtherRightsFacId.setClCode2(iClCode2);
 		tClOtherRightsFacId.setClNo(iClNo);
 		tClOtherRightsFacId.setSeq(iClSeq);
-		this.info("***iFunCd" + iFunCd + ",isEloan=" + isEloan);
+
 		// ELOAN上送一律先刪除本日以前同KEY值的關聯檔ClOtherRightsFac資料
 		if (isEloan) {
 			for (int i = 0; i < lClOtherRightsFacS; i++) {// 原資料庫筆數
-				int slApplNo = slClOtherRightsFacApplNo[i];// 原資料庫值
+				int slApplNo = slClOtherRightsFacApplNo[i];// 原資料庫-核准號碼
 				ClFac tClFac = sClFacService.findById(new ClFacId(iClCode1, iClCode2, iClNo, slApplNo), titaVo);
 				if (tClFac != null) {
 					iCustNo = tClFac.getCustNo();
@@ -305,28 +298,22 @@ public class L2418 extends TradeBuffer {
 					tClOtherRightsFacId.setFacmNo(iFacmNo);
 					tClOtherRightsFac.setClOtherRightsFacId(tClOtherRightsFacId);
 					tClOtherRightsFac = sClOtherRightsFacService.findById(tClOtherRightsFacId, titaVo);
-					if (tClOtherRightsFac != null && parse.stringToInteger(
-							parse.timeStampToStringDate(tClOtherRightsFac.getLastUpdate())) < titaVo.getEntDyI()) {
+					if (tClOtherRightsFac != null && parse
+							.stringToInteger(parse.timeStampToStringDate(tClOtherRightsFac.getLastUpdate())) < dDateUtil
+									.getNowIntegerForBC()) {
 						tClOtherRightsFac = sClOtherRightsFacService.holdById(tClOtherRightsFacId, titaVo);
-//						ClOtherRightsFac beforeClOtherRightsFac = (ClOtherRightsFac) dataLog
-//								.clone(tClOtherRightsFac);
 						try {
 							sClOtherRightsFacService.delete(tClOtherRightsFac, titaVo);
 						} catch (DBException e) {
 							throw new LogicException("E0008", "擔保品他項權利額度關聯檔" + e.getErrorMsg());
 						}
-						// 紀錄變更前變更後
-//						dataLog.setEnv(titaVo, beforeClOtherRightsFac, tClOtherRightsFac);
-//						dataLog.exec("刪除擔保品他項權利額度關聯檔-核准編號:" + slApplNo);
 					}
 				}
-
 			}
 		}
-		//
+		// 上送資料-新增或刪除
 		for (int i = 0; i < iClOtherRightsFacL; i++) {
-			int iApplNo = iClOtherRightsFacApplNo[i];// tita上送核准編號
-			this.info("***L2418**iApplNo=" + iApplNo);
+			int iApplNo = iClOtherRightsFacApplNo[i];// tita上送核准編號(ELAON一次只有一筆)
 			if (iApplNo > 0) {
 				ClFac tClFac = sClFacService.findById(new ClFacId(iClCode1, iClCode2, iClNo, iApplNo), titaVo);
 				if (tClFac != null) {
@@ -335,13 +322,11 @@ public class L2418 extends TradeBuffer {
 					tClOtherRightsFacId.setCustNo(iCustNo);
 					tClOtherRightsFacId.setFacmNo(iFacmNo);
 					tClOtherRightsFac.setClOtherRightsFacId(tClOtherRightsFacId);
-					this.info("***L2418**tClOtherRightsFacId=" + tClOtherRightsFacId);
 					tClOtherRightsFac = sClOtherRightsFacService.findById(tClOtherRightsFacId, titaVo);
 					if (tClOtherRightsFac == null) {// 無關聯檔一律新增
 						tClOtherRightsFac = new ClOtherRightsFac();
 						tClOtherRightsFac.setClOtherRightsFacId(tClOtherRightsFacId);
 						tClOtherRightsFac.setApproveNo(iApplNo);
-						this.info("***L2418**insert****iApplNo=" + iApplNo);
 						try {
 							sClOtherRightsFacService.insert(tClOtherRightsFac, titaVo);
 						} catch (DBException e) {
@@ -351,7 +336,6 @@ public class L2418 extends TradeBuffer {
 					if (tClOtherRightsFac != null && iFunCd == 4) {
 						tClOtherRightsFac = sClOtherRightsFacService.holdById(tClOtherRightsFacId, titaVo);
 						ClOtherRightsFac beforeClOtherRightsFac = (ClOtherRightsFac) dataLog.clone(tClOtherRightsFac);
-						this.info("***L2418**delete****iApplNo=" + iApplNo);
 						try {
 							sClOtherRightsFacService.delete(tClOtherRightsFac, titaVo);
 						} catch (DBException e) {
@@ -364,18 +348,19 @@ public class L2418 extends TradeBuffer {
 				}
 			}
 		}
+
 		if (iFunCd == 2 && !isEloan) {
-			for (int i = 0; i < lClOtherRightsFacS; i++) {
+			for (int i = 0; i < lClOtherRightsFacS; i++) {// 原資料庫筆數
 				int slApplNo = slClOtherRightsFacApplNo[i];// 原資料庫值
 				boolean findfg = false;
-				for (int j = 0; j < iClOtherRightsFacL; j++) {
+				for (int j = 0; j < iClOtherRightsFacL; j++) {// tita上送筆數
 					int iApplNo = iClOtherRightsFacApplNo[j];
 					if (slApplNo == iApplNo) {
 						findfg = true;
 						continue;
 					}
 				}
-				if (!findfg) {// 刪除
+				if (!findfg) {// 比對原核准編號是否存在tita上送之核准編號,不存在則代表刪除
 					ClFac tClFac = sClFacService.findById(new ClFacId(iClCode1, iClCode2, iClNo, slApplNo), titaVo);
 					if (tClFac != null) {
 						iCustNo = tClFac.getCustNo();
@@ -388,20 +373,20 @@ public class L2418 extends TradeBuffer {
 							tClOtherRightsFac = sClOtherRightsFacService.holdById(tClOtherRightsFacId, titaVo);
 							ClOtherRightsFac beforeClOtherRightsFac = (ClOtherRightsFac) dataLog
 									.clone(tClOtherRightsFac);
-							this.info("***L2418**delete**old**slApplNo=" + slApplNo);
 							try {
 								sClOtherRightsFacService.delete(tClOtherRightsFac, titaVo);
 							} catch (DBException e) {
 								throw new LogicException("E0008", "擔保品他項權利額度關聯檔" + e.getErrorMsg());
 							}
 							// 紀錄變更前變更後
+							titaVo.putParam("FUNCIND", 4);// 變更記號以便寫TxDataLog,做完須改回原值
 							dataLog.setEnv(titaVo, beforeClOtherRightsFac, tClOtherRightsFac);
 							dataLog.exec("刪除擔保品他項權利額度關聯檔-核准編號:" + slApplNo);
+							titaVo.putParam("FUNCIND", iFunCd);// TxDataLog:做完須改回原值
 						}
 					}
 					continue;
 				}
-
 			}
 		}
 	}

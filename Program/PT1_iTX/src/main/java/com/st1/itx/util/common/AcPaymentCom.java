@@ -552,8 +552,6 @@ public class AcPaymentCom extends TradeBuffer {
 
 		tBankRemit = bankRemitService.findById(tBankRemitId, titaVo);
 
-		this.info("tBankRemit ..." + tBankRemit.toString());
-
 		if (tBankRemit != null) {
 			// 報表代號(交易代號)
 			remitformVo.setReportCode(titaVo.getTxCode());

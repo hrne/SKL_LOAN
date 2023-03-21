@@ -348,8 +348,12 @@ T(H,#CaseCloseCode,#CaseCloseCodeHelp)
 ![入帳日期]
 #FdEntryDate=X,2,L
 
-#EntryDate=D,7,L
-E(0,#SYSDATE)
+#EntryDate=D,7,I
+C(4,#EntryDate,E(0,#SYSDATE),$)
+@
+V(7)
+V(2,0)
+A(DATE,0,#EntryDate)
 
 !結案試算L3R11
 #SendL3r11=X,1,S

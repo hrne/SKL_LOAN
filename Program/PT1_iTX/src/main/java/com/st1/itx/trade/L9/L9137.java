@@ -39,7 +39,13 @@ public class L9137 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L9137 ");
 
-		String reportCode = titaVo.getParam("inputShowType");
+		String reportCode = "";
+		
+		if ("L6101".equals(titaVo.getTxcd())) {
+			reportCode = "2";
+		} else {
+			reportCode = titaVo.getParam("inputShowType");
+		}
 
 		// 2：全部印
 		if ("2".equals(reportCode)) {
@@ -50,8 +56,8 @@ public class L9137 extends TradeBuffer {
 			L9137report.exec(titaVo, reportCode);
 		}
 
-		String  infoNotification= "L9137 放款餘額總表 已完成";
-		
+		String infoNotification = "L9137 放款餘額總表 已完成";
+
 		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
 				titaVo.getParam("TLRNO") + "L9137", infoNotification, titaVo);
 

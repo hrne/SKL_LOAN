@@ -83,6 +83,7 @@ public class L6064 extends TradeBuffer {
 					break;
 				}
 				OccursList occursList = new OccursList();
+				occursList.putParam("OODDefItem",t.get("CI"));
 				occursList.putParam("OODefCode",t.get("DefCode"));
 				occursList.putParam("OOCode",t.get("Code"));
 				occursList.putParam("OOItem",t.get("Item"));

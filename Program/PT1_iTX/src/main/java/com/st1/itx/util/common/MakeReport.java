@@ -1796,18 +1796,18 @@ public class MakeReport extends CommBuffer {
 	 *
 	 */
 	private void checkCdReport(TitaVo titaVo, String rptCode) throws LogicException {
-		rptCode = rptCode.length() > 5 ? rptCode.substring(0, 5) : rptCode;
-		this.info("checkCdReport.rptCode=" + rptCode);
-		CdReport tCdReport = cdReportService.findById(rptCode, titaVo);
-		if (tCdReport == null) {
-			throw new LogicException("EC0009", "未設定報表代號：" + rptCode + "，請至L6068報表代號對照檔設定此報表代號 ");
-		} else {
-			this.info("checkCdReport.getLetterFg=" + tCdReport.getLetterFg());
-			if ("N".equals(tCdReport.getLetterFg())) {
-				// EC0015檢查錯誤
-				throw new LogicException("EC0015", "交易：" + tCdReport.getFormNo() + "，書面寄送設定為否，需調整請至L6068報表設定檔。 ");
-			}
-		}
+//		rptCode = rptCode.length() > 5 ? rptCode.substring(0, 5) : rptCode;
+//		this.info("checkCdReport.rptCode=" + rptCode);
+//		CdReport tCdReport = cdReportService.findById(rptCode, titaVo);
+//		if (tCdReport == null) {
+//			throw new LogicException("E0009", "未設定報表代號：" + rptCode + "，請至L6068報表代號對照檔設定此報表代號 ");
+//		} else {
+//			this.info("checkCdReport.getLetterFg=" + tCdReport.getLetterFg());
+//			if ("N".equals(tCdReport.getLetterFg())) {
+//				// EC0015檢查錯誤
+//				throw new LogicException("E0015", "交易：" + tCdReport.getFormNo() + "，書面寄送設定為否，需調整請至L6068報表設定檔。 ");
+//			}
+//		}
 	}
 
 }

@@ -68,39 +68,40 @@ T(4,CHAIN$)
 #INIT=X,1,S
 CALL(#ALWAYS_HIGHLIGHT)
 
-!今天明天日期
+!今天日期(系統日)
 #Today=A,8,S
 D(6,2,#SYSDATE,0)
-#Tomorrow=A,8,S
-D(6,2,#SYSDATE,1)
 
-!上個月日期
-#LastMonthDay=A,8,S
-D(7,3,#SYSDATE,1,0)
+!前一個月日期
+#LastDay=A,8,S
+D(7,3,#Today,1,0)
 
-!上個月月份    
-#tLastMonth=A,2,S
-T(1,#LastMonthDay,5,2)
+!本月底營業日
+#MFBSDYDate=A,8,S
+D(6,2,#MFBSDY,0)
 
-!今天明天日期之年
-#TodayYear=A,3,S
+
+
+!當月年份    
+#ThisYear=A,3,S
 T(1,#Today,2,3)
-#TomorrowYear=A,3,S
-T(1,#Tomorrow,2,3)
-!今天明天日期之月份
-#TodayMonth=A,2,S
+!當月月份    
+#ThisMonth=A,2,S
 T(1,#Today,5,2)
-#TomorrowMonth=A,2,S
-T(1,#Tomorrow,5,2)
+
+!上月年份    
+#LastYear=A,3,S
+T(1,#LastDay,2,3)
+!上月月份    
+#LastMonth=A,2,S
+T(1,#LastDay,5,2)
 
 #DefaultYear=A,3,S
-C(3,#TodayYear,#TomorrowYear,E(0,#TodayYear),E(0,#TodayYear))
+C(3,#Today,#MFBSDYDate,E(0,#ThisYear),E(0,#LastYear))
 
 #DefaultMonth=A,2,S
-C(3,#TodayMonth,#TomorrowMonth,E(0,#tLastMonth),E(0,#TodayMonth))
+C(3,#Today,#MFBSDYDate,E(0,#ThisMonth),E(0,#LastMonth))
 
-#ThisMonthDate=D,8,S
-E(0,0)
 
 ! 資料年
 #InputYear=A,3,I
@@ -114,18 +115,17 @@ E(0,#DefaultMonth)
 @V(2,0)
 IF(#InputYear==#DefaultYear,V(5,0,#DefaultMonth),V(5,0,12))
 
-#ThisMonth=A,5,S
-E(0,@ThisMonthDate,#InputYear*100)
-E(0,@ThisMonthDate,#ThisMonthDate+#InputMonth)
-E(0,@ThisMonthDate,#ThisMonthDate*100)
-E(0,@ThisMonthDate,#ThisMonthDate+1)
-E(0,#ThisMonthDate/100)
+#ThisYearMonth=A,6,S
+E(0,(#InputYear+1911)*100+#InputMonth)
 
-#LastMonthDate=D,8,S
-D(7,3,#ThisMonthDate,1,0)
+#NowYMD=A,8,S
+E(0,#ThisYearMonth*100+1)
 
-#LastMonth=A,5,S
-T(1,#LastMonthDate,2,5)
+#LastYMD=A,8,S
+D(7,3,#NowYMD,1,0)
+
+#LastYearMonth=A,6,S
+E(0,#LastYMD/100)
 
 </sub>
 
@@ -148,15 +148,13 @@ T(3,[L9704] 催收款明細表)
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 
-!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
-
 </sub>
 
 
 !------ 上行電文 ------
 <sub type="TIM">
-#ThisMonth
-#LastMonth
+#ThisYearMonth
+#LastYearMonth
 </sub>
 
 
