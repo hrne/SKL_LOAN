@@ -248,17 +248,24 @@ public class L2418 extends TradeBuffer {
 	 */
 	public void checkApplNo(TitaVo titaVo) throws LogicException {
 
+		boolean datafg = false;
 		for (int i = 0; i < iClOtherRightsFacL; i++) {
 			int Row = i + 1;
 			iClOtherRightsFacApplNo[i] = parse.stringToInteger(titaVo.getParam("ApplNo" + Row + "")); // 核准編號
 			if (iClOtherRightsFacApplNo[i] != 0) {
 				int iApplNo = iClOtherRightsFacApplNo[i];
+				datafg =true;
 				ClFac tClFac = sClFacService.findById(new ClFacId(iClCode1, iClCode2, iClNo, iApplNo));
 				if (tClFac == null) {
 					throw new LogicException("E0015", "此核准編號與擔保品非關聯資料，核准編號:" + iApplNo); // 查無資料
 				}
 			}
 		}
+		//新增或修改時檢核
+		if (!datafg && (iFunCd == 1 || iFunCd == 2)) {
+			throw new LogicException("E0015", "核准編號至少需一筆有值"); 
+		}
+		
 		// 資料庫原始值
 		Slice<ClOtherRightsFac> slClOtherRightsFac = sClOtherRightsFacService.findClNoSeq(iClCode1, iClCode2, iClNo,
 				iClSeq, this.index, this.limit, titaVo);

@@ -115,6 +115,7 @@ R(1,L2R05)
 C(3,#CustNo,0,$,E(0,#CustNo))
 C(3,#ApplNo,0,$,E(0,#L2r05CustNo))
 T(2,@RmkCustNo,#TimCustNo)
+T(2,@MRKEY,#TimCustNo)
 <include src="COM.icf::CustRmk.rtn"/>
 
 

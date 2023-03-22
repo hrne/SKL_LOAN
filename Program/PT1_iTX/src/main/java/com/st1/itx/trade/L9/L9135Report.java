@@ -172,17 +172,16 @@ public class L9135Report extends MakeReport {
 	public void exportExcel(TitaVo titaVo, List<Map<String, String>> l9135Result, int iAcDate) throws LogicException {
 
 //		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), tradeNo, tradeName, "", "A4", "L");
-		String txcd = titaVo.getTxCode();
+		String txcd = "L9135";
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String reportItem = tradeName;
-		
+
 		String pageSize = "A4";
 		String pageOrientation = "L";
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
-				.setRptItem(reportItem).setRptSize(pageSize).setPageOrientation(pageOrientation)
-				.build();
+				.setRptItem(reportItem).setRptSize(pageSize).setPageOrientation(pageOrientation).build();
 		this.open(titaVo, reportVo);
 
 		// 記錄筆數
@@ -242,7 +241,7 @@ public class L9135Report extends MakeReport {
 
 		int date = iAcDate;
 		String brno = titaVo.getBrno();
-		String fileCode = titaVo.getTxcd();
+		String fileCode = "L9135";
 		String fileItem = "銀行存款媒體檔";
 		String fileName = "銀行存款媒體檔.txt";
 

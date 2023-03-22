@@ -122,8 +122,9 @@ R(1,L2R07)
 
 #TimCustNo=A,7,S
 C(3,#CustNo,0,$,E(0,#CustNo))
-C(3,#CaseNo,0,$,E(0,#L2r07CustNo))
+C(3,#CaseNo,0,$,E(0,#L2r10CustNo))
 T(2,@RmkCustNo,#TimCustNo)
+T(2,@MRKEY,#TimCustNo)
 <include src="COM.icf::CustRmk.rtn"/>
 #RPTFG=A,1,S
 
@@ -206,7 +207,6 @@ T(H,#OORemarkType,#RelationCode3Help)
 !修改
 #OOBUF2=X,228,S
 T(2,#FUNC2+#OOCaseNo+#OOCustNo+#OOReltId+#OORelName+#OOPosInd+#OORemarkType+#OORemark)
-
 #OOBTN2=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L2306; ntxbuf=#OOBUF2})
 

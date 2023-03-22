@@ -49,9 +49,13 @@ import com.st1.itx.db.service.LoanNotYetService;
 import com.st1.itx.db.service.ReltMainService;
 import com.st1.itx.db.service.TxDataLogService;
 import com.st1.itx.db.service.springjpa.cm.L1001ServiceImpl;
+import com.st1.itx.db.service.springjpa.cm.L2023ServiceImpl;
+import com.st1.itx.db.service.springjpa.cm.L5051ServiceImpl;
 import com.st1.itx.db.domain.CustDataCtrl;
+import com.st1.itx.db.domain.CustFin;
+import com.st1.itx.db.domain.CustFinId;
 import com.st1.itx.db.service.CustDataCtrlService;
-
+import com.st1.itx.db.service.CustFinService;
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
@@ -123,6 +127,9 @@ public class L1001 extends TradeBuffer {
 
 	@Autowired
 	private L1001ServiceImpl l1001ServiceImpl;
+	
+	@Autowired
+	private CustFinService custFinService;
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -421,7 +428,8 @@ public class L1001 extends TradeBuffer {
 		}
 
 		CustDataCtrl custDataCtrl = custDataCtrlService.findById(aCustMain.getCustNo(), titaVo);
-		if (custDataCtrl != null && custDataCtrl.getApplMark() == 1) {
+		//2023/03/21 盈倩說改成非3
+		if (custDataCtrl != null && custDataCtrl.getApplMark() != 3) {
 			custDataControl = true;
 		}
 
@@ -459,11 +467,12 @@ public class L1001 extends TradeBuffer {
 //		Slice<CustFin> stmpCustFin = sCustFinService.custUKeyEq(aCustMain.getCustUKey(), 0, Integer.MAX_VALUE, titaVo);
 //		tmpCustFin = stmpCustFin == null ? null : stmpCustFin.getContent();
 		if (!custDataControl && allowInquiry) {
-			Slice<FinReportDebt> slFinReportDebt = finReportDebtService.findCustUKey(aCustMain.getCustUKey(),
-					this.index, this.limit, titaVo);
-			List<FinReportDebt> lFinReportDebt = slFinReportDebt == null ? null : slFinReportDebt.getContent();
+//			Slice<FinReportDebt> slFinReportDebt = finReportDebtService.findCustUKey(aCustMain.getCustUKey(),
+//					this.index, this.limit, titaVo);
+			Slice<CustFin> sCustFin = custFinService.custUKeyEq(aCustMain.getCustUKey(), this.index, this.limit, titaVo);
+			List<CustFin> lCustFin = sCustFin == null ? null : sCustFin.getContent();
 
-			if (lFinReportDebt != null) {
+			if (lCustFin != null) {
 				CustFinBTNFg = 1;
 			}
 		}
