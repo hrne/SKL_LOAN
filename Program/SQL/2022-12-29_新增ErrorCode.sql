@@ -1,1 +1,0 @@
-Insert into "TxErrCode" ("ErrCode","ErrContent","CreateDate","CreateEmpNo","LastUpdate","LastUpdateEmpNo") values ('E9005','ICS上傳資料失敗',to_timestamp('2022-12-29 11:52:14.371000000','YYYY-MM-DD HH24:MI:SS.FF'),'001702',to_timestamp('2022-12-29 11:52:14.371000000','YYYY-MM-DD HH24:MI:SS.FF'),'001702');

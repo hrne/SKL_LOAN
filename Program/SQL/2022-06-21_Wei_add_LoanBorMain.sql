@@ -1,1 +1,0 @@
-alter table "LoanBorMain" add "GraceFlag" DECIMAL(1) DEFAULT 0 NOT NULL;

@@ -1,3 +1,0 @@
-
-ALTER TABLE "JcicMonthlyLoanData" MODIFY "SyndNo" NUMBER(6,0);
-COMMIT;

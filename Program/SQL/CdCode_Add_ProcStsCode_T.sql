@@ -1,1 +1,0 @@
-INSERT INTO "CdCode" ("DefCode","DefType","Code","Item","Enable","EffectFlag","MinCodeLength","MaxCodeLength") VALUES ('ProcStsCode','4','T','轉暫收','Y','0','0','0');

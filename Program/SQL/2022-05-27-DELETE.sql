@@ -1,3 +1,0 @@
-DELETE "TxAuthority" where "TranNo" = 'L2980';
-DELETE "TxTranCode" where "TranNo" = 'L2980';
-Insert into "TxTranCode" ("TranNo","TranItem","Desc","TypeFg","CancelFg","ModifyFg","MenuNo","SubMenuNo","MenuFg","Status","CreateDate","CreateEmpNo","LastUpdate","LastUpdateEmpNo","SubmitFg","CustDataCtrlFg","CustRmkFg") values ('L2880','個人房貸調整作業','個人房貸調整作業',2,0,0,'L2','9',1,0,to_timestamp('27-5月 -22 09.07.28.107000000 上午','DD-MON-RR HH.MI.SSXFF AM'),'001712',to_timestamp('27-5月 -22 09.38.51.658000000 上午','DD-MON-RR HH.MI.SSXFF AM'),'001712',0,0,0);

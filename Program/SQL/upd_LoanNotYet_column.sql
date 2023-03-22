@@ -1,1 +1,0 @@
-alter table "LoanNotYet" drop COLUMN "NotYetItem";

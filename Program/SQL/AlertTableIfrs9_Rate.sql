@@ -1,3 +1,0 @@
-
-ALTER TABLE "LoanIfrs9Dp" MODIFY "DerRate" NUMBER(8,6);
-COMMIT;

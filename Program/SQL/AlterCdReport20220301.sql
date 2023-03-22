@@ -1,9 +1,0 @@
-﻿ALTER TABLE "CdReport" ADD "LetterFg" varchar2(1);
-comment on column "CdReport"."LetterFg" is '提供書面寄送';
-ALTER TABLE "CdReport" ADD "MessageFg" varchar2(1);
-comment on column "CdReport"."MessageFg" is '提供簡訊寄送';
-ALTER TABLE "CdReport" ADD "EmailFg" varchar2(1);
-comment on column "CdReport"."EmailFg" is '提供電子郵件寄送';
-comment on column "CdReport"."Letter" is '書面寄送順序';
-comment on column "CdReport"."Message" is '簡訊寄送順序';
-comment on column "CdReport"."Email" is '電子郵件寄送順序';

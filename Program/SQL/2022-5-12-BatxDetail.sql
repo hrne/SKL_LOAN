@@ -1,1 +1,0 @@
-ALTER TABLE "BatxDetail" MODIFY "ProcNote" nvarchar2(2000);

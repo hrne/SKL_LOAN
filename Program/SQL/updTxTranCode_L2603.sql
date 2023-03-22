@@ -1,1 +1,0 @@
-UPDATE "TxTranCode"SET "TranItem"='法拍費用借支查詢' WHERE "TranNo" = 'L2603';

@@ -1,1 +1,0 @@
-ALTER TABLE "LoanCustRmk" ADD "RmkCode" VARCHAR2(3);

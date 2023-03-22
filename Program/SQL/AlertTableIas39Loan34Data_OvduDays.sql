@@ -1,3 +1,0 @@
-
-ALTER TABLE "Ias39Loan34Data" MODIFY "OvduDays" NUMBER(4,0);
-COMMIT;

@@ -1,2 +1,0 @@
-ALTER TABLE "FacMain" MODIFY "PreStarBuildingYM" DECIMAL(6);
-ALTER TABLE "FacMain" MODIFY "StarBuildingYM" DECIMAL(6);

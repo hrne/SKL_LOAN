@@ -1,2 +1,0 @@
-ALTER TABLE "CdReport" ADD "WatermarkFlag" NUMBER(1) DEFAULT 0 NOT NULL;
-COMMIT;

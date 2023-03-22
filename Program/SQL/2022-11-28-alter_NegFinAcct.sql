@@ -1,1 +1,0 @@
-ALTER TABLE "NegFinAcct" MODIFY "FinItem" NVARCHAR2(100);

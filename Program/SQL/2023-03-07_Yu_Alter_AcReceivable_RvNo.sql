@@ -1,2 +1,0 @@
-
-    ALTER TABLE "AcReceivable" MODIFY "RvNo" VARCHAR2(40);
