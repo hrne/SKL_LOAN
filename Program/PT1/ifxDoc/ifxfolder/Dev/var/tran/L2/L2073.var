@@ -298,6 +298,9 @@ TXFORM=L2073
 #OOCustName=戶名
 {width:300,align:'left'}
 
+#OOApplMark=申請記號
+{width:80,align:'center'}
+
 #OOEmpName=修改人員
 {width:120,align:'center'}
 

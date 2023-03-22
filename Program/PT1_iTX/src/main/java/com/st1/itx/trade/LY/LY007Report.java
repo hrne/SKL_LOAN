@@ -109,8 +109,6 @@ public class LY007Report extends MakeReport {
 		eptExcel(lY007List, titaVo);
 		
 		
-		makeExcel.close();
-		
 		return true;
 
 	}
@@ -159,7 +157,7 @@ public class LY007Report extends MakeReport {
 			// 無資料時處理
 			makeExcel.setValue(8, 1, "本日無資料", "L");
 		}
-
+		makeExcel.close();
 	}
 
 }

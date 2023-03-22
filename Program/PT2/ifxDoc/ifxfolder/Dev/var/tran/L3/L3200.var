@@ -643,7 +643,8 @@ C(4,#ApplNo,T(F,@FacmNo,1),T(F,@FacmNo,0))
 C(4,#ApplNo,$,s)
 C(3,#L492aRepayType,0,$,$)
 SHOW(#BTN1,#BTN8)HIDE(#BTN3,#BTN6,#BTN2,#BTN7)
-
+@
+C(3,#RepayType,2,V(2,0),$)
 #TmpFacmNoX=X,50,S
 
 #TmpFacmNoXX=X,60,L
@@ -684,6 +685,8 @@ C(3,#FacmNo,0,T(F,#BormNo,0),T(F,#BormNo,1))
 C(3,#FacmNo,0,S,$)
 C(3,#RepayType,9,S,$)
 SHOW(#BTN7)HIDE(#BTN3,#BTN6,#BTN2,#BTN1,#BTN8)
+@
+C(3,#RepayType,2,V(2,0),$)
 ! @C(3,#RepayType,2,V(2,0),$)
 
 #BUF7B=X,18,S

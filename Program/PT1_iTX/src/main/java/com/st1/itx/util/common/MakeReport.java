@@ -526,6 +526,7 @@ public class MakeReport extends CommBuffer {
 		CdReport tCdReport = cdReportService.findById(reportVo.getRptCode(), tmpTitaVo);
 		if (tCdReport == null) {
 			tTxFile.setSignCode("0");
+			throw new LogicException("EC000", "未設定報表代號對照檔，請從L6068入口交易新增報表代號");
 		} else {
 			tTxFile.setSignCode(String.valueOf(tCdReport.getSignCode()));
 			// 2021-1-5 增加判斷 SignCode == 1 才印

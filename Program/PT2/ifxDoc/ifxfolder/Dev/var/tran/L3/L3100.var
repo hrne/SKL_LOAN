@@ -238,9 +238,6 @@ IF(#FKEY==1,INVOKEJS(SHOW,p1,1)INVOKEJS(SHOW,p1,#P2SH,#P6E,1),$)
 IF(#FKEY==2,INVOKEJS(SHOW,p1,1)INVOKEJS(SHOW,p1,#P2SH,#P6E,1),$)
 C(3,#FKEY,2,T(H,@ACTFGX,#ACTFG,#ActFgHelp),$)
 
-#SPANDYH=D,7,S
-E(0,#DrawdownDate)
-ASGN(SPANDY$)
 
 <include src="COM.icf::TITLE-RUN.pre"/>
 </sub>
@@ -1040,9 +1037,6 @@ C(3,#IsRv,1,E(0,#DrawdownDate)ASGN(SPANDY$),E(0,0)ASGN(SPANDY$),$)
 ! C(3,#DrawdownCode,3,E(0,#DrawdownDate)ASGN(SPANDY$),E(0,0)ASGN(SPANDY$))
 !檢查是否為預撥 0.否 1.是 
 
-#checkDrawdownCode3H=D,7,S
-E(0,#DrawdownDate)
-ASGN(SPANDY$)
 
 #SendL2r06=X,1,S
 IF(#FKEY==0 || #FKEY==7,$,s)

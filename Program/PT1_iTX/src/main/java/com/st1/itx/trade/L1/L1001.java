@@ -466,7 +466,7 @@ public class L1001 extends TradeBuffer {
 		// 財報按鈕fg
 //		Slice<CustFin> stmpCustFin = sCustFinService.custUKeyEq(aCustMain.getCustUKey(), 0, Integer.MAX_VALUE, titaVo);
 //		tmpCustFin = stmpCustFin == null ? null : stmpCustFin.getContent();
-		if (!custDataControl && allowInquiry) {
+//		if (!custDataControl && allowInquiry) {
 //			Slice<FinReportDebt> slFinReportDebt = finReportDebtService.findCustUKey(aCustMain.getCustUKey(),
 //					this.index, this.limit, titaVo);
 			Slice<CustFin> sCustFin = custFinService.custUKeyEq(aCustMain.getCustUKey(), this.index, this.limit, titaVo);
@@ -475,7 +475,7 @@ public class L1001 extends TradeBuffer {
 			if (lCustFin != null) {
 				CustFinBTNFg = 1;
 			}
-		}
+//		}
 		// 放款按鈕fg
 		if (aCustMain.getCustNo() != 0) {
 			Slice<FacMain> stmpFacMain = sFacMainService.facmCustNoRange(aCustMain.getCustNo(), aCustMain.getCustNo(),
