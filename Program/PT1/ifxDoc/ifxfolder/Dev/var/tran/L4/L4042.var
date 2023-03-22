@@ -288,8 +288,12 @@ C(4,#OOTitaTxCd,S,$)
 T(1,#OOTitaTxCd,1,2)
 
 #OOProcessDate=D,7,O
-#OOProcessTime=A,6,O
+#OOProcessDateX=X,9,O
+C(3,#OOProcessDate,0,S,CALL2(#AdjustDate,#OOProcessDate,#OOProcessDateX))
+#OOProcessTime=X,8,O
 
+#OOProcess=X,20,O
+T(2,#OOProcessDateX+ +#OOProcessTime)
 #OOAuthMeth=X,1,O
 
 #OOHistory=X,1,O
@@ -449,6 +453,9 @@ TXFORM=L4042
 {width:100}
 #OOStampFinishDate=核印完成日期
 {width:100}
+#OOProcess=處理日期時間
+{width:100}
+
 #OOBTN_CONNECT=帳號
 {search:false,formatter:'cust:bind-button:帳號',align:'center',canExport:false,width:40}
 #OOBTN_HISTORY=歷程
@@ -488,6 +495,8 @@ TXFORM=L4042
 {width:100}
 #OOStampFinishDate=核印完成日期
 {width:100}
+#OOProcess=處理日期時間
+{width:100}
 #OOBTN_CONNECT=帳號
 {search:false,formatter:'cust:bind-button:帳號',align:'center',canExport:false,width:40}
 #OOBTN_HISTORY=歷程
@@ -526,6 +535,8 @@ TXFORM=L4042
 {width:100}
 #OOStampFinishDate=核印完成日期
 {width:100}
+#OOProcess=處理日期時間
+{width:100}
 #OOBTN_CONNECT=帳號
 {search:false,formatter:'cust:bind-button:帳號',align:'center',canExport:false,width:40}
 #OOBTN_HISTORY=歷程
@@ -563,6 +574,8 @@ TXFORM=L4042
 #OORetrDate=提回日期
 {width:100}
 #OOStampFinishDate=核印完成日期
+{width:100}
+#OOProcess=處理日期時間
 {width:100}
 #OOBTN_CONNECT=帳號
 {search:false,formatter:'cust:bind-button:帳號',align:'center',canExport:false,width:40}

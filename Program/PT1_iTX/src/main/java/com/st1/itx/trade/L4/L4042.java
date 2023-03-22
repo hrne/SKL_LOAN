@@ -21,7 +21,6 @@ import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.springjpa.cm.L4042ServiceImpl;
 /* DB容器 */
 
-
 @Service("L4042")
 @Scope("prototype")
 public class L4042 extends TradeBuffer {
@@ -68,7 +67,7 @@ public class L4042 extends TradeBuffer {
 			for (Map<String, String> result : resultList) {
 				OccursList occursList = new OccursList();
 				int authCreateDate = parse.stringToInteger(result.get("F8"));
-				this.info("authCreateDate 1=="+authCreateDate);
+				this.info("authCreateDate 1==" + authCreateDate);
 				int propDate = parse.stringToInteger(result.get("F9"));
 				int retrDate = parse.stringToInteger(result.get("F10"));
 				int stampFinishDate = parse.stringToInteger(result.get("F16"));
@@ -77,10 +76,10 @@ public class L4042 extends TradeBuffer {
 				String wkCreateFlag = result.get("F7");
 				int processdate = parse.stringToInteger(result.get("F21"));
 				String authMeth = result.get("F23");
-				
+
 				if (authCreateDate > 19110000) {
 					authCreateDate = authCreateDate - 19110000;
-					this.info("authCreateDate 2=="+authCreateDate);
+					this.info("authCreateDate 2==" + authCreateDate);
 				}
 				if (propDate > 19110000) {
 					propDate = propDate - 19110000;
@@ -107,12 +106,12 @@ public class L4042 extends TradeBuffer {
 				}
 
 				CdEmp tCdEmp = tCdEmpService.findById(empno, titaVo);
-				if(tCdEmp!=null) {
+				if (tCdEmp != null) {
 					empno = tCdEmp.getFullname();
 				} else {
-					empno="";
+					empno = "";
 				}
-				
+
 				occursList.putParam("OOCustNo", result.get("F0"));
 				occursList.putParam("OOFacmNo", result.get("F1"));
 				occursList.putParam("OOAuthType", result.get("F2"));
@@ -137,11 +136,17 @@ public class L4042 extends TradeBuffer {
 				occursList.putParam("OOButtenFlagA", result.get("F18"));
 				occursList.putParam("OOTitaTxCd", result.get("F19"));
 				occursList.putParam("OOProcessDate", processdate);
-				occursList.putParam("OOProcessTime", result.get("F22"));
+				String processTime = "";
+				if (result.get("F22").length() == 6) {
+					processTime = result.get("F22").substring(0, 2) + ":" + result.get("F22").substring(2, 4) + ":"
+							+ result.get("F22").substring(4, 6);
+				} else {
+					processTime = result.get("F22");
+				}
+				occursList.putParam("OOProcessTime", processTime);
 				occursList.putParam("OOAuthMeth", authMeth);
 				// 判斷是否有歷程
 				occursList.putParam("OOHistory", result.get("F24"));
-				
 
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);

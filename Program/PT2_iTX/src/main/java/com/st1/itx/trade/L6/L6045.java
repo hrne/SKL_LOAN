@@ -14,13 +14,16 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.TxInquiry;
+import com.st1.itx.db.domain.TxRecord;
 import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.TxInquiryService;
+import com.st1.itx.db.service.TxRecordService;
 import com.st1.itx.db.service.TxTranCodeService;
 
 @Service("L6045")
@@ -40,10 +43,13 @@ public class L6045 extends TradeBuffer {
 	public TxTranCodeService txTranCodeService;
 	@Autowired
 	public CdEmpService cdEmpService;
-
+	
 	@Autowired
 	CustMainService sCustMainService;
-
+	
+	@Autowired
+	SendRsp iSendRsp;
+	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6045 ");
@@ -55,78 +61,88 @@ public class L6045 extends TradeBuffer {
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 100; // 64 * 200 = 12,800
 
-		int iTxDAteS = Integer.parseInt(titaVo.getParam("TxDateS")) + 19110000;
-		int iTxDAteE = Integer.parseInt(titaVo.getParam("TxDateE")) + 19110000;
-
+		int iTxDAteS = Integer.parseInt(titaVo.getParam("TxDateS"))+19110000;
+		int iTxDAteE = Integer.parseInt(titaVo.getParam("TxDateE"))+19110000;
+		
+		
 		int iCustNoSt = Integer.parseInt(titaVo.getParam("CustNo"));
 		int iCustNoEd = 0;
-		if (iCustNoSt > 0) {
+		if(iCustNoSt>0) {
 			iCustNoEd = iCustNoSt;
 		} else {
 			iCustNoEd = 9999999;
 		}
 		Slice<TxInquiry> sTxInquiry = null;
+		
+		sTxInquiry = sTxInquiryService.findImportFg(iTxDAteS, iTxDAteE, "1",iCustNoSt,iCustNoEd, this.index, this.limit, titaVo);
 
-		sTxInquiry = sTxInquiryService.findImportFg(iTxDAteS, iTxDAteE, "1", iCustNoSt, iCustNoEd, this.index, this.limit, titaVo);
-
-		List<TxInquiry> iTxInquiry = sTxInquiry == null ? null : sTxInquiry.getContent();
+		List<TxInquiry> iTxInquiry = sTxInquiry== null ? null : sTxInquiry.getContent();
 
 		TempVo tTempVo = new TempVo();
 		TxTranCode tTxTranCode = null;
+		
+		// 主管授權
+		if (!titaVo.getHsupCode().equals("1")) {
+			iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
+		}
+		
 		if (iTxInquiry != null) {
-
+			
 			for (TxInquiry tTxInquiry : iTxInquiry) {
 				OccursList occursList = new OccursList();
 				String tranItem = "";
 				tTempVo = new TempVo();
 				tTempVo = tTempVo.getVo(tTxInquiry.getTranData());
 
-				if (tTempVo.get("TxReason") == null || tTempVo.get("TxReason").isEmpty()) {
+				if(tTempVo.get("TxReason")==null || tTempVo.get("TxReason").isEmpty()) {
 					continue;
 				}
-
+				
 				occursList.putParam("OOTranNo", tTempVo.get("TXCD"));
 				tTxTranCode = txTranCodeService.findById(tTempVo.get("TXCD"), titaVo);
-				if (tTxTranCode != null) {
+				if(tTxTranCode!=null) {
 					tranItem = tTxTranCode.getTranItem();
 				}
 				occursList.putParam("OOTranItem", tranItem);
-
+				
 				occursList.putParam("OOReason", tTempVo.get("TxReason"));
-				occursList.putParam("OOTlrNo", tTempVo.get("TLRNO"));
-
+				occursList.putParam("OOTlrNo", tTempVo.get("TLRNO"));	
+				
 				CdEmp tCdEmp = cdEmpService.findById(tTempVo.get("TLRNO"), titaVo);
-
-				if (tCdEmp != null) {
+				
+				if(tCdEmp!=null) {
 					occursList.putParam("OOTlrItem", tCdEmp.getFullname());
 				} else {
 					occursList.putParam("OOTlrItem", "");
 				}
-
+				
+				
 				String date = tTempVo.get("CALDY");
 				date = date.substring(0, 3) + "/" + date.substring(3, 5) + "/" + date.substring(5, 7);
-
+				
 				String time = tTempVo.get("CALTM");
-				time = time.substring(0, 2) + ":" + time.substring(2, 4) + ":" + time.substring(4, 6);
-
-				occursList.putParam("OOCaldy", date + " " + time);
-
+				time = time.substring(0, 2)+":"+time.substring(2, 4)+":"+time.substring(4, 6);
+				
+				occursList.putParam("OOCaldy", date+" "+time);
+				
 				// 放入戶號與戶名
 				int custNo = tTxInquiry.getCustNo();
 				occursList.putParam("OOCustNo", custNo);
-
+				
 				CustMain tCustMain = sCustMainService.custNoFirst(custNo, custNo, titaVo);
-
-				if (tCustMain != null) {
+				
+				if (tCustMain != null)
+				{
 					occursList.putParam("OOCustName", tCustMain.getCustName());
-				} else {
+				} else 
+				{
 					this.warn("CustNo " + custNo + " is not found in CustMain !?");
 				}
-
+				
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}
-
+			
 		} else {
 			throw new LogicException("E0001", "");
 		}
