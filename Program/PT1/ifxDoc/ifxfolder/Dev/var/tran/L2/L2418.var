@@ -60,7 +60,7 @@ INVOKEJS(SHOW,grd1_1,1)
 
 </sub>
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=1;screen.width=[150,900];printer.width=[15,30]">
+<sub type="DC" name="p1" layout="cols=1;screen.width=[200,850];printer.width=[15,30]">
 [
 ["[L2418]                                 擔保品他項權利登錄"],
 ["#FdFunCd+功能",#FunCdX],
@@ -195,6 +195,41 @@ T(2,@ApplNo{i},#L2r46ApplNo{i})
 ##end
 
 
+##loop {times:10,n:1}
+#L2r05B{n}=X,1,S
+IF(#FKEY==0 || #FKEY==7,$,s)
+C(3,#ApplNo{n},0,S,$)
+E(0,@RimFuncCode,5)
+E(0,@RimCustNo,0)
+E(0,@RimFacmNo,0)
+E(0,@RimApplNo,#ApplNo{n})
+E(0,@RimCaseNo,0)
+S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
+R(1,L2R05)
+
+#SendL2r02B{n}=X,1,S
+IF(#FKEY==0 || #FKEY==7,$,s)
+C(3,#ApplNo{n},0,S,$)
+E(0,@RimApplNo,#ApplNo{n})
+E(0,@RimFuncCode,5)
+T(2,@RimCustId,)
+S(L2R02,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimApplNo,#RimCustId)
+R(1,L2R02)
+
+#L2r07B{n}=X,1,S
+IF(#FKEY==0 || #FKEY==7,$,s)
+C(3,#ApplNo{n},0,S,$)
+T(2,@RimCustId,#L2r02CustId)
+E(0,@RimCustNo,0)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+C(3,#ApplNo{n},0,S,$)
+E(0,@CustNo{n},#L2r05CustNo)
+E(0,@FacmNo{n},#L2r05FacmNo)
+T(2,@CustName{n},#L2r07CustName)
+T(2,@CustNameS{n},#CustName{n})
+C(3,#L2r05CustNo,0,$,T(2,@CustFacmNo{n},#L2r05CustNo+-+#L2r05FacmNo))
+##end
 
 ! 依縣市別組地政下拉選單
 #RimL2r59A=X,1,S
@@ -241,6 +276,7 @@ T(2,@FdRightsNote,)
 T(2,@FdSecuredTotal,*)
 T(F,@CityX,0)
 T(F,@LandAdmX,0)
+T(2,@FdSecuredDate,*)
 
 
 #FdFunCd=X,2,L
@@ -305,6 +341,14 @@ T(2,@FdRecWord,)
 T(2,@FdRecNumber,)
 T(2,@FdRightsNote,)
 T(2,@FdSecuredTotal,)
+T(2,@FdSecuredDate,)
+
+
+!日曆日
+#CDATE=D,8,S
+T(4,CDATE$)
+#CDATEX=D,7,S
+T(1,#CDATE,2,7)
 
 
 !除功能為1新增時,其他隱藏重新交易按鈕
@@ -446,7 +490,7 @@ R(1,L2R46)
 T(2,@ClSeq,#L2r46Seq)
 C(3,#FunCd,1,K(LIGHT,#cntmsg,TXTRED,0,1),$)
 !C(3,#L2r46Cnt,1,T(2,@cntmsg,),T(B,@cntmsg,該擔保品項下，第+#L2r46Cnt+筆他項權利資料。))
-C(3,#FunCd,1,T(2,@cntmsg,),$)
+C(3,#FunCd,1,T(B,@cntmsg,該擔保品項下，第+#L2r46Cnt+筆他項權利資料。),$)
 C(3,#FunCd,1,S,$)
 T(2,@City,#L2r46City)
 C(4,#L2r46OtherCity,$,SHOW(#InCityX))
@@ -609,10 +653,13 @@ C(3,#Precision,0,E(0,#TwSecuredTotal),E(0,#UsSecuredTotal))
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 D(8)
-@A(DATE,0,#SecuredDate)
+@
+V(7)
+A(DATE,0,#SecuredDate)
+IF(#SecuredDate>#CDATEX,V(P,不可大於日曆日),$)
 
 !建物坐落地號
-#Location=x,80,I
+#Location=x,40,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 
@@ -628,11 +675,20 @@ C(3,#FunCd,5,s,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(3,#HIDE1FG,0,CALL(#HIDEP1),$)
-! IF({n}==1,$,C(3,#ApplNo{l},0,INVOKEJS(SHOW,grd1_{l},0),INVOKEJS(SHOW,grd1_{l},1)))
-IF({n}==1,$,C(3,#ApplNo{l},0,INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1)))
-IF({n}==1,$,C(3,#ApplNo{l},0,S,$))
-!@
-!IF({n}==1,V(2,0),$)
+INVOKEJS(SHOW,grd1_{n},1)
+! IF({n}==1,$,C(3,#ApplNo{l},0,INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1)))
+! IF({n}==1,$,C(3,#ApplNo{l},0,S,$))
+!IF(#FunCd==2 && {n}!=1,C(3,#ApplNo{l},0,INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1)),$)
+!IF(#FunCd==2 && {n}!=1 ,C(3,#ApplNo{l},0,S,$),$)
+IF(#FunCd==1 && {n}!=1,C(3,#ApplNo{l},0,INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1)),$)
+IF(#FunCd==1 && {n}!=1,C(3,#ApplNo{l},0,S,$),$)
+IF(#FunCd==2 && {n}==1,C(3,#ApplNo{n},0,INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1)),$)
+IF(#FunCd==2 && {n}!=1,IF(#ApplNo{n}==0 && #ApplNo{l}==0 ,INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1)),$)
+IF(#FunCd==2 && {n}!=1 ,IF(#ApplNo{n}==0 && #ApplNo{l}==0,S,$),$)
+@
+IF(#FunCd==1 && {n}==1,V(2,0),$)
+!IF({n}==1,$,C(3,#ApplNo{n},0,INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1)))
+C(3,#ApplNo{n},0,INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1))
 
 #CustId{n}=X,10,L
 
@@ -723,9 +779,9 @@ T(B,#CustName{n})
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 </sub>
 
-<sub type="DC" name="p2" layout="cols=2;screen.width=[10,1200];printer.width=[15,30];order=1;">
+<sub type="DC" name="p2" layout="cols=2;screen.width=[10,1050];printer.width=[15,30];order=1;">
 [
-["<font color=red>@關聯"],
+["<font color=red>@關聯  (核准號碼原值改為0代表刪除)"],
 ["#grid#,{id:1,expand:true,loop:10,row_height:1,s_cols:[70,120,250], p_cols:[5,15,20]}","","",
 ["核准號碼","戶號","戶名"],
 [[#ApplNo1],[#CustFacmNo1],[#CustNameS1]],

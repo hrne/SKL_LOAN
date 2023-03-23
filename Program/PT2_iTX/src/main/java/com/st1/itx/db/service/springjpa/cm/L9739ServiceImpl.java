@@ -65,7 +65,7 @@ public class L9739ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			  AND \"CdItem\" = '01'";
 		sql += "			  AND \"EffectDate\" <= :entdy ";
 		sql += "		) R ";
-		sql += "		WHERE R.\"NewSeq\" = 1 OR R.\"OldSeq\" = 1";//--用正序跟反序找最新和最舊(固定)利率
+		sql += "		WHERE R.\"NewSeq\" = 1 OR R.\"OldSeq\" = 1";// --用正序跟反序找最新和最舊(固定)利率
 		sql += "	) S ON S.\"EffectDate\" > 0";
 		sql += "	LEFT JOIN (";
 		sql += "		SELECT \"EffectDate\"";
@@ -103,7 +103,7 @@ public class L9739ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("l9739.findAll ");
 
 		this.info("tmpEffectDate = " + tmpEffectDate);
-
+		this.info("titaVo.getEntDy() = " + titaVo.getEntDy());
 		String sql = " ";
 		sql += "	SELECT L.\"CustNo\"";
 		sql += "		  ,L.\"FacmNo\"";
@@ -132,6 +132,7 @@ public class L9739ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "							   AND M.\"BormNo\" = L.\"BormNo\"";
 		sql += "	WHERE REGEXP_LIKE(L.\"ProdNo\",'I[A-I]')";
 		sql += "	  AND L.\"EffectDate\" <= :entdy ";
+		sql += "	  AND M.\"MaturityDate\" < :today ";
 		sql += "	  AND M.\"Status\" = 0 ";
 		sql += "	  AND LC.\"CustNo\" IS NOT NULL ";
 		sql += "	ORDER BY L.\"ProdNo\" ASC";
@@ -147,6 +148,8 @@ public class L9739ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		query = em.createNativeQuery(sql);
 		query.setParameter("entdy", tmpEffectDate);
+		query.setParameter("today", titaVo.getEntDy());
+
 		return this.convertToMap(query);
 	}
 }

@@ -127,7 +127,7 @@ public class L1001 extends TradeBuffer {
 
 	@Autowired
 	private L1001ServiceImpl l1001ServiceImpl;
-	
+
 	@Autowired
 	private CustFinService custFinService;
 
@@ -428,8 +428,8 @@ public class L1001 extends TradeBuffer {
 		}
 
 		CustDataCtrl custDataCtrl = custDataCtrlService.findById(aCustMain.getCustNo(), titaVo);
-		//2023/03/21 盈倩說改成非3
-		if (custDataCtrl != null && custDataCtrl.getApplMark() != 3) {
+
+		if (custDataCtrl != null && custDataCtrl.getApplMark() == 1) {
 			custDataControl = true;
 		}
 
@@ -454,7 +454,8 @@ public class L1001 extends TradeBuffer {
 		String cdate = aCustMain.getCreateDate() == null ? "" : aCustMain.getCreateDate().toString();
 		String udate = aCustMain.getLastUpdate() == null ? "" : aCustMain.getLastUpdate().toString();
 
-		List<String> txcds = Arrays.asList("L1103", "L1104", "L1105", "L1107", "L1108", "L1109", "L1110", "L1111","L2703");
+		List<String> txcds = Arrays.asList("L1103", "L1104", "L1105", "L1107", "L1108", "L1109", "L1110", "L1111",
+				"L2703");
 
 		TxDataLog txDataLog = txDataLogService.findByMrKeyFirst("CustUKey:" + aCustMain.getCustUKey(), txcds, titaVo);
 
@@ -469,12 +470,12 @@ public class L1001 extends TradeBuffer {
 //		if (!custDataControl && allowInquiry) {
 //			Slice<FinReportDebt> slFinReportDebt = finReportDebtService.findCustUKey(aCustMain.getCustUKey(),
 //					this.index, this.limit, titaVo);
-			Slice<CustFin> sCustFin = custFinService.custUKeyEq(aCustMain.getCustUKey(), this.index, this.limit, titaVo);
-			List<CustFin> lCustFin = sCustFin == null ? null : sCustFin.getContent();
+		Slice<CustFin> sCustFin = custFinService.custUKeyEq(aCustMain.getCustUKey(), this.index, this.limit, titaVo);
+		List<CustFin> lCustFin = sCustFin == null ? null : sCustFin.getContent();
 
-			if (lCustFin != null) {
-				CustFinBTNFg = 1;
-			}
+		if (lCustFin != null) {
+			CustFinBTNFg = 1;
+		}
 //		}
 		// 放款按鈕fg
 		if (aCustMain.getCustNo() != 0) {
@@ -640,8 +641,10 @@ public class L1001 extends TradeBuffer {
 		occursList.putParam("OOCustNo", aCustMain.getCustNo());
 		occursList.putParam("OOCustTypeCode", aCustMain.getCustTypeCode());
 		occursList.putParam("OOCustName", aCustMain.getCustName().replace("$n", "\n"));
-		if (custDataControl || !allowInquiry) {
-			occursList.putParam("OODataStatus", "X");
+		if (!custDataControl || !allowInquiry) {
+			if (custDataCtrl != null && custDataCtrl.getApplMark() != 3) {
+				occursList.putParam("OODataStatus", "X");
+			}
 		} else {
 			occursList.putParam("OODataStatus", aCustMain.getDataStatus());
 		}

@@ -3362,6 +3362,8 @@ TXFORM=L2R45
 #L2r46RightsNote=X,2,S
 #L2r46SecuredTotal=m,14.2,S
 #L2r46Cnt=X,3,S
+#L2r46SecuredDate=D,7,S
+#L2r46Location=X,40,S
 ##loop{times:10,n:1}
 #L2r46ApplNo{n}=A,7,S
 ##end
@@ -3381,6 +3383,8 @@ TXFORM=L2R46
 #L2r46RightsNote
 #L2r46SecuredTotal
 #L2r46Cnt
+#L2r46SecuredDate
+#L2r46Location
 ##loop{times:10,n:1}
 #L2r46ApplNo{n}
 ##end

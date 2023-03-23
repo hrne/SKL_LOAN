@@ -27,6 +27,7 @@ import com.st1.itx.util.common.LoanCalcRepayIntCom;
 import com.st1.itx.util.common.LoanCloseBreachCom;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.LoanSetRepayIntCom;
+import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.common.data.CalcRepayIntVo;
 import com.st1.itx.util.common.data.LoanCloseBreachVo;
@@ -63,6 +64,9 @@ public class L3922 extends TradeBuffer {
 	@Autowired
 	DateUtil dDateUtil;
 	@Autowired
+	MakeReport makeReport;
+
+	@Autowired
 	BaTxCom baTxCom;
 	@Autowired
 	LoanSetRepayIntCom loanSetRepayIntCom;
@@ -80,7 +84,7 @@ public class L3922 extends TradeBuffer {
 		loanSetRepayIntCom.setTxBuffer(this.txBuffer);
 		loanCloseBreachCom.setTxBuffer(this.txBuffer);
 		baTxCom.setTxBuffer(txBuffer);
-
+		makeReport.setTxBuffer(txBuffer);
 		// 取得輸入資料
 		int iCustNo = this.parse.stringToInteger(titaVo.getParam("TimCustNo"));
 		int iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
@@ -281,13 +285,22 @@ public class L3922 extends TradeBuffer {
 						wkFacmNo = v.getFacmNo();
 						FacMain tFacMain = facMainService.findById(new FacMainId(iCustNo, v.getFacmNo()), titaVo);
 						if (!BreachDescription.isEmpty()) {
-							BreachDescription = BreachDescription + "，";
+							BreachDescription = BreachDescription + "。";
 						}
-						BreachDescription = BreachDescription + "額度:" + tFacMain.getFacmNo();
+
+						BreachDescription = BreachDescription + "額度:" + tFacMain.getFacmNo() + "，";
+
+						int Prohibitperiod = 0;
+						if (tFacMain.getProhibitMonth() > 0 && tFacMain.getFirstDrawdownDate() > 0) {
+							dDateUtil.init();
+							dDateUtil.setDate_1(tFacMain.getFirstDrawdownDate());
+							dDateUtil.setMons(tFacMain.getProhibitMonth());
+							Prohibitperiod = dDateUtil.getCalenderDay(); // 綁約期限
+						}
 						if (tFacMain.getProhibitMonth() == 0) {
 							BreachDescription = BreachDescription + " 無";
 						} else {
-							BreachDescription = BreachDescription + tFacMain.getProhibitMonth() + "個月";
+							BreachDescription = BreachDescription + makeReport.showDate("" + Prohibitperiod);
 						}
 					}
 				}

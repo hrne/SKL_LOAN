@@ -675,7 +675,7 @@ E(0,#OTotal2)
 CALL2(#ADJUSTDOT,#Precision,#OCloseTotal,#OCloseTotalX))
 
 !清償說明
-#OBreachDescription=X,180,L
+#OBreachDescription=X,4.50,L
 
 ![轉催收本金]
 #OOvDuTrfPrincipal=+m,14.2,S
@@ -843,7 +843,7 @@ TXFORM=L3922
 ["@放款餘額",#OLoanBalX],
 ["@計息期間",#OIntStartDate,"@-",#OIntEndDate],
 ["@利率",#ORateX],
-[#<->#,"@建物標示備註",#OBuildingRemark],
+["@建物標示備註",#OBuildingRemark],["@限制清償期限",#OBreachDescription],
 ["@本金",#OPrincipalX],["@契變手續費",#OModifyFeeX],
 ["@利息",#OInterestX],["@帳管費用",#OAcctFeeX],
 ["@延遲息",#ODelayIntX],["@火險費用",#OFireFeeX,"未到期@","-",#OUnOpenfireFeeX],
@@ -855,7 +855,7 @@ TXFORM=L3922
 ["<font color=red>@小計",#OSumX],["<font color=red>@總計",#OTotalX],
 ["@"],["<font color=red>@清償違約金",#OCloseBreachAmtUnpaidX,"（領清償證明）"],
 ["@"],["<font color=red>@總計",#OCloseTotalX,"（領清償證明）"],
-[#<->#,"@限制清償期限",#OBreachDescription],
+
 ! ["<font color=red>@小計 [含清償違約金]",#OCloseSumX],["<font color=red>@總計 [含清償違約金]",#OCloseTotalX],
 ]
 </sub>
@@ -865,12 +865,12 @@ TXFORM=L3922
 [#<->#,"@借戶戶號",#OCustNo,"@-",#OFacmNo,"@-",#OBormNo,#OTimCustNoX],
 [#<->#,"@備註",#ORemark],
 [#<->#,"@幣別",#OCurrencyCode,#OTmpFacmNoXX],
+[#<->#,"@限制清償期限",#OBreachDescription],
 ["@轉催收本金",#OOvDuTrfPrincipalX],["@催收還款金額",#OOvDuRepayAmtX],
 ["@轉催收利息",#OOvDuTrfInterestX],["@已轉銷呆帳金額",#OBadDebtTrfAmtX],
 ["@火險費用",#OFireFeeX],["@催收火險費",#OCollFireFeeX],
 ["@法務費用",#OLawFeeX],["@催收法務費",#OCollLawFeeX],
 ["@催收餘額",#OOvDuBalX]
-[#<->#,"@限制清償期限",#OBreachDescription],
 ]
 </sub>
 
