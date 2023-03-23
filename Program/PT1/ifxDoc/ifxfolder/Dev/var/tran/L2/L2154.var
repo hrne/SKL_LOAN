@@ -1626,6 +1626,7 @@ X(#ProdRate)
 T(B,#LbProdRateX+#WkPercent)
 
 #WkApproveRate=X,1,S
+C(3,#UpdateCode,1,$,s)
 C(3,#BaseRateCode,99,$,
  C(5,#L2r01IncrFlag,Y,E(0,@ApproveRate,#BaseRate+#RateIncr)
                       ,E(0,@ApproveRate,#BaseRate+#IndividualIncr)))

@@ -122,12 +122,7 @@ public class LY007Report extends MakeReport {
 
 			makeExcel.setValue(7, 15, iYear + ".12.31", "C");
 			makeExcel.setValue(8, 15, formatAmt(totalEquity, 0), "C");
-			int rowCursor = 7; // 列指標
-			// 新增明細行數
-			if (lY007List.size() > 1) {
-				// 將表格往下移，移出空間
-				makeExcel.setShiftRow(7, lY007List.size());
-			}
+			int rowCursor = 7; // 列指標			
 
 			for (Map<String, String> r : lY007List) {
 				BigDecimal loanBal = getBigDecimal(r.get("LoanBal"));
@@ -136,7 +131,7 @@ public class LY007Report extends MakeReport {
 				if(rel.equals("N")) {
 					continue;
 				}
-				
+				makeExcel.setShiftRow(rowCursor, 1);
 				makeExcel.setValue(rowCursor, 1, r.get("Rel"));// 與本公司之關係
 				makeExcel.setValue(rowCursor, 2, r.get("CustNo"));// 交易對象代號
 				makeExcel.setValue(rowCursor, 3, r.get("CustName"));// 交易對象名稱

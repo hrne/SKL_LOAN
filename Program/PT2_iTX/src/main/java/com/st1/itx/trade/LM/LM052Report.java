@@ -61,7 +61,7 @@ public class LM052Report extends MakeReport {
 		} else {
 			lastYM = thisYM - 1;
 		}
-		
+
 		List<Map<String, String>> lM052List = null;
 
 		int reportDate = titaVo.getEntDyI() + 19110000;
@@ -78,11 +78,9 @@ public class LM052Report extends MakeReport {
 				.setRptItem(fileItem).build();
 		// 開啟報表
 		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
-		
-		
+
 //		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM052", "放款資產分類-會計部備呆計提", "LM052_放款資產分類-會計部備呆計提",
 //				"LM052_底稿_放款資產分類-會計部備呆計提.xlsx", "總表");
-
 
 		makeExcel.setValue(12, 9, iMonth + "月月報表數", "C");
 		makeExcel.setValue(14, 5, thisMonthEndDate, "C");
@@ -105,7 +103,6 @@ public class LM052Report extends MakeReport {
 				exportExcel2(lM052List, i);
 			}
 		}
-
 
 		makeExcel.close();
 
@@ -150,7 +147,7 @@ public class LM052Report extends MakeReport {
 						row = 7;
 						col = 6;
 					}
-					tempAmt = tLDVo.get("F1") == null ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F1"));
+					tempAmt = tLDVo.get("F1") == "" ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F1"));
 					this.info("row=" + row + ",col=" + col + ",tempAmt=" + tempAmt);
 
 					makeExcel.setValue(row, col, tempAmt, "#,##0");

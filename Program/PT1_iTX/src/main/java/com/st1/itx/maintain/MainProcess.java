@@ -556,7 +556,7 @@ public class MainProcess extends SysLogger {
 		}
 
 //		if (txCom.isTxTypeInq() && tTxTranCode != null && tTxTranCode.getCustDataCtrlFg() == 1 && this.titaVo.getReason().isEmpty()) {
-		if (txCom.isTxTypeInq() && tTxTranCode != null && tTxTranCode.getCustDataCtrlFg() == 1) {
+		if (tTxTranCode != null && tTxTranCode.getCustDataCtrlFg() == 1) {
 			CustDataCtrl tCustDataCtrl = null;
 			if (titaVo.getMrKey().length() >= 7 && parse.isNumeric(titaVo.getMrKey().substring(0, 7))) {
 				tCustDataCtrl = sCustDataCtrlService.findById(parse.stringToInteger(titaVo.getMrKey().substring(0, 7)));
@@ -667,6 +667,8 @@ public class MainProcess extends SysLogger {
 
 		if (this.titaVo.getActFgI() <= 1 && (this.titaVo.isHcodeNormal() || this.titaVo.isHcodeModify())) {
 
+		} else if (this.titaVo.getActFgI() == 3 && this.titaVo.isHcodeErase()) {
+			;
 		} else if (this.titaVo.isHcodeSendOut() && txFlow.getFlowMode() != 3) {
 			throw new LogicException("EC004", "本筆資料為非「待送出放行」狀態");
 		} else if (this.titaVo.isHcodeReject() && txFlow.getFlowMode() != 1) {

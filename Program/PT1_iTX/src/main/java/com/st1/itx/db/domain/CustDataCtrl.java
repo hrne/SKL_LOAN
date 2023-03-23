@@ -55,6 +55,11 @@ public class CustDataCtrl implements Serializable {
   @Column(name = "`CustName`", length = 100)
   private String custName;
 
+  // 申請後身份證字號/統一編號
+  /* 客戶申請後留存變更後ID by Mata 2023.3.23 */
+  @Column(name = "`XXCustId`", length = 10)
+  private String xXCustId;
+
   // 設定日期
   /* by eric 2022.3.31 */
   @Column(name = "`SetDate`")
@@ -213,6 +218,25 @@ public class CustDataCtrl implements Serializable {
   }
 
 /**
+	* 申請後身份證字號/統一編號<br>
+	* 客戶申請後留存變更後ID by Mata 2023.3.23
+	* @return String
+	*/
+  public String getXXCustId() {
+    return this.xXCustId == null ? "" : this.xXCustId;
+  }
+
+/**
+	* 申請後身份證字號/統一編號<br>
+	* 客戶申請後留存變更後ID by Mata 2023.3.23
+  *
+  * @param xXCustId 申請後身份證字號/統一編號
+	*/
+  public void setXXCustId(String xXCustId) {
+    this.xXCustId = xXCustId;
+  }
+
+/**
 	* 設定日期<br>
 	* by eric 2022.3.31
 	* @return java.sql.Timestamp
@@ -368,7 +392,7 @@ public class CustDataCtrl implements Serializable {
   @Override
   public String toString() {
     return "CustDataCtrl [custNo=" + custNo + ", custUKey=" + custUKey + ", applMark=" + applMark + ", reason=" + reason + ", custId=" + custId + ", custName=" + custName
-           + ", setDate=" + setDate + ", setEmpNo=" + setEmpNo + ", reSetDate=" + reSetDate + ", reSetEmpNo=" + reSetEmpNo + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
-           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", xXCustId=" + xXCustId + ", setDate=" + setDate + ", setEmpNo=" + setEmpNo + ", reSetDate=" + reSetDate + ", reSetEmpNo=" + reSetEmpNo + ", createDate=" + createDate
+           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

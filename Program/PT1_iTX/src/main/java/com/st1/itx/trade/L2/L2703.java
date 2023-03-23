@@ -182,11 +182,15 @@ public class L2703 extends TradeBuffer {
 				sb.setCharAt(i, 'Ｏ');
 			tCustMain.setCustName(sb.toString());
 
-			if (tCustDataCtrl.getCustId().startsWith("XX")) {
+			//需要在CustDataCtrl新增一個欄位 專門放XX ，與CustMain的UKey相同時候需檢查該欄位是否為XX開頭，
+			//原程式判斷不變，需要在變更CustMain的資料時一起放入CustDataCtrl的新欄位，只要該欄位有直CsutMain應以CustDataCtrl的新欄位資料為主如果是空的在新增
+			
+			
+			if (tCustDataCtrl.getXXCustId().startsWith("XX")) {
 				// 為 XX 開頭時，表示這筆是設定後又解除過
 				// 這時將 CustMain 和 CustDataCtrl 互相交換，不取新編號
 
-				tCustMain.setCustId(tCustDataCtrl.getCustId());
+				tCustMain.setCustId(tCustDataCtrl.getXXCustId());
 				tCustDataCtrl.setCustId(custId); // custId 是原本的 CustMain.CustId
 
 				updateCustMain(tCustMainBefore, tCustMain, "重新設定顧客控管", titaVo);
@@ -197,9 +201,13 @@ public class L2703 extends TradeBuffer {
 				String newSeq = parse.IntegerToString(gSeqCom.getSeqNo(0, 0, "L2", "2703", 99999999, titaVo), 8);
 				String newId = "XX" + newSeq;
 				tCustMain.setCustId(newId);
+				tCustDataCtrl.setXXCustId(newId);
 
 				// 寫回
 				tCustMain = updateCustMain(tCustMainBefore, tCustMain, "設定顧客控管", titaVo);
+				//新增當第一次寫入的時候也寫入該欄位，日後變換記號1跟3以此欄位拿出原先XX編碼
+				this.info("進入回寫CustMain");
+				tCustDataCtrl = updateCustDataCtrl(isNew,tCustDataCtrl, titaVo);
 			}
 
 			/* 存入DB */
