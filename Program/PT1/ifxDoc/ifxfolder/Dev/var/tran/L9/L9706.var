@@ -99,6 +99,7 @@ T(1,#DT1,5,2)
 #ACCTDATE=D,7,I
 T(2,#DT2)
 @V(7)A(DATE,0,#ACCTDATE)
+V(5,0,#DT2)
 
 !戶號
 #CUSTNO=A,7,I

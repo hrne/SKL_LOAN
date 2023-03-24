@@ -12,7 +12,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
 
@@ -22,46 +21,71 @@ public class L9723ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Autowired
 	private BaseEntityManager baseEntityManager;
 
-	@Autowired
-	private LoanBorMainRepository loanBorMainRepos;
-
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		// 創建程式碼後,檢查初始值
-		 org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
-	
-	@SuppressWarnings("unchecked")
-	// 今日轉出有JCIC日期
-	public List<Map<String, String>> FindData(TitaVo titaVo) throws Exception {
+
+	public List<Map<String, String>> findDataCount(TitaVo titaVo) throws Exception {
 		this.info("L9723FindData");
-		
-//		int iJcicDate = (Integer.valueOf(titaVo.getParam("ReportDate"))+19110000)/100;
-		int iJcicDate = ((Integer.valueOf(titaVo.getParam("ReportDateY"))+1911)*100)+Integer.valueOf(titaVo.getParam("ReportDateM"));
-		
-		this.info("iJcicDate     = " + iJcicDate);
+
+		int iYearMonth = ((Integer.valueOf(titaVo.getParam("ReportDateY")) + 1911) * 100)
+				+ Integer.valueOf(titaVo.getParam("ReportDateM"));
+
+		this.info("iYearMonth     = " + iYearMonth);
 
 		String sql = "select count(*) AS \"count\", ";
 		sql += "           \"YearMonth\" as \"YearMonth\" ";
 		sql += "            from (SELECT \"CustNo\", ";
 		sql += "             \"YearMonth\"  ";
 		sql += "              FROM \"MonthlyFacBal\" ";
-		sql += "              WHERE \"YearMonth\" = " + iJcicDate + " ";
+		sql += "              WHERE \"YearMonth\" = " + iYearMonth + " ";
 		sql += "                AND \"PrinBalance\" > 0 ";
 		sql += "           GROUP BY \"CustNo\",\"YearMonth\" ";
 		sql += "           )";
 		sql += "   GROUP BY \"YearMonth\" ";
 
-		this.info("sql=" + sql);
+		this.info("sql1=" + sql);
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-
 		Query query;
 		query = em.createNativeQuery(sql);
-
 		return this.convertToMap(query);
 
-		
+	}
+
+	public List<Map<String, String>> findData(TitaVo titaVo) throws Exception {
+		this.info("L9723FindData");
+
+		int iYearMonth = ((Integer.valueOf(titaVo.getParam("ReportDateY")) + 1911) * 100)
+				+ Integer.valueOf(titaVo.getParam("ReportDateM"));
+
+		this.info("iYearMonth     = " + iYearMonth);
+
+		String sql = "";
+		sql += "	SELECT M.\"CustNo\"";
+		sql += "          ,M.\"LoanBalance\"";
+		sql += "          ,NVL(CM.\"CurrRoad\",CM.\"RegRoad\") AS \"Address\"";
+		sql += "          ,CM.\"AMLGroup\"";
+		sql += "          ,CM.\"NationalityCode\"";
+		sql += "          ,CM.\"IndustryCode\"";
+		sql += "          ,CM.\"JobTitle\"";
+		sql += "	FROM (	SELECT \"CustNo\"";
+		sql += "            	  ,SUM(\"PrinBalance\") AS \"LoanBalance\"";
+		sql += "            FROM \"MonthlyFacBal\" ";
+		sql += "            WHERE \"YearMonth\" = " + iYearMonth + " ";
+		sql += "              AND \"PrinBalance\" > 0 ";
+		sql += "            GROUP BY \"CustNo\"";
+		sql += "          ) M";
+		sql += "    LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = M.\"CustNo\"";
+		sql += "	ORDER BY M.\"CustNo\" ";
+
+		this.info("sql2=" + sql);
+
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		Query query;
+		query = em.createNativeQuery(sql);
+		return this.convertToMap(query);
+
 	}
 
 }

@@ -44,9 +44,13 @@ C(3,#CHAIN,1,T(4,NTXBUF$),S)
 #DT=D,8,S
 D(7,3,#SYSDATE,1,0)
 
+#DTY=N,3,S
+T(1,#DT,2,3)
+
 #RocYear=A,3,I
 T(1,@RocYear,#DT,2,3)
-@V(5,0,999)
+@V(5,1,999)
+IF(#RocYear>#DTY,V(P,不可大於會計年),$)
 
 !#RocYear=A,3,I
 !T(1,#DT,001,003)

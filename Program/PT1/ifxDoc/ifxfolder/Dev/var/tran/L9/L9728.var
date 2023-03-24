@@ -74,12 +74,14 @@ C(3,#CustNoEnd,0,E(0,9999999))
 E(0,0)
 @
 A(DATE,1,#FindDateStart)
+V(5,0,#SYSCDATE)
 
 
 #FindDateEnd=D,7,I
 E(0,#SYSCDATE)
 @A(DATE,1,#FindDateEnd)
 V(5,#FindDateStart,#SYSCDATE)
+IF(#FindDateStart>#FindDateEnd,V(P,起始日不可大於結束日),$)
 
 </sub>
 

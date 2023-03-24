@@ -39,10 +39,15 @@ T(4,CHAIN$)
 ! 工作月必須小於等於系統會計日期所屬的工作月
 ! 工作月為合理月份
 ! 工作月
+
+#DT=N,5,S
+T(1,#SYSDATE,2,5)
+
 #inputWorkMonth=A,5,I
 C(3,#inputWorkMonth,0,T(1,@inputWorkMonth,#SYSDATE,2,5),$)
 @
 C(3,#inputWorkMonth,0,S,A(YM13,1,#inputWorkMonth))
+IF(#inputWorkMonth>#DT,V(P,工作月不得大於會計月),$)
 
 <include src="ROM.icf::L0Rim.dec"/>
 </sub>

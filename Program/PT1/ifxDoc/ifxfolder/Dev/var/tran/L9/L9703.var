@@ -241,24 +241,27 @@ T(H,#CustType,#CustTypeHelp)
 #AcDate=D,7,I
 E(0,#L4R32Date1)
 @A(DATE,0,#AcDate)
-V(7)
-
+@V(7)
+V(5,0,#DT2)
 
 #EntryDate=D,7,I
 E(0,#L4R32Date2)
 @A(DATE,0,#EntryDate)
-V(7)
-
+@V(7)
+V(5,0,#DT2)
 
 #PayIntDateSt=D,7,I
 E(0,#L4R32Date7)
 @A(DATE,0,#PayIntDateSt)
 @V(7)
+V(5,0,#DT2)
 
 #PayIntDateEd=D,7,I
 E(0,#L4R32Date7)
 @A(DATE,0,#PayIntDateEd)
 @V(7)
+V(5,0,#DT2)
+IF(#PayIntDateEd<#PayIntDateSt,V(P,起始日不可大於終止日),$)
 
 <include src="ROM.icf::L1R20.dec"/>
 <include src="ROM.icf::L4R32.dec"/>

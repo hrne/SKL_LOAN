@@ -136,14 +136,17 @@ E(0,@tmpTargetCat,#tmpTargetCat*2)
 T(2,@tmpGrdId,#tmpGrd+#tmpTargetCat)
 INVOKEJS(SHOW,#tmpGrdId,0)
 
-#DATE=D,8,S
-T(4,DATE$)
+
+#DT=N,5,S
+T(1,#SYSDATE,2,5)
 
 #FdYearMonth=X,1,L
 T(2,*)
 
 #YearMonth=A,5,I
-T(1,@YearMonth,#DATE,2,5)
+T(2,#DT)
+@V(7)
+V(5,0,#DT)
 
 #tmpTargetCat=X,1,S
 

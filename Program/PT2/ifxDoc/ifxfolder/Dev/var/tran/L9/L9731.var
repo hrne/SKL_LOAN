@@ -161,16 +161,47 @@ E(0,@tmpTargetCat,#tmpTargetCat*2)
 T(2,@tmpGrdId,#tmpGrd+#tmpTargetCat)
 INVOKEJS(SHOW,#tmpGrdId,0)
 
-#DATE=D,8,S
-T(4,DATE$)
+!今天日期(系統日)
+#Today=A,8,S
+D(6,2,#SYSDATE,0)
+
+!前一個月日期
+#LastDay=A,8,S
+D(7,3,#Today,1,0)
+
+!本月底營業日
+#MFBSDYDate=A,8,S
+D(6,2,#MFBSDY,0)
+
+!當月年份    
+#ThisYear=A,3,S
+T(1,#Today,2,3)
+!當月月份    
+#ThisMonth=A,2,S
+T(1,#Today,5,2)
+
+!上月年份    
+#LastYear=A,3,S
+T(1,#LastDay,2,3)
+!上月月份    
+#LastMonth=A,2,S
+T(1,#LastDay,5,2)
+
+#DefaultYear=A,3,S
+C(3,#Today,#MFBSDYDate,E(0,#ThisYear),E(0,#LastYear))
+
+#DefaultMonth=A,2,S
+C(3,#Today,#MFBSDYDate,E(0,#ThisMonth),E(0,#LastMonth))
 
 #InputYear=A,3,I
-T(1,@InputYear,#DATE,2,3)
-@V(5,0,999)
+E(0,#DefaultYear)
+@V(2,0)
+V(5,0,#DefaultYear)
 
 #InputMonth=A,2,I
-T(1,@InputMonth,#DATE,5,2)
-@V(5,1,12)
+E(0,#DefaultMonth)
+@V(2,0)
+IF(#InputYear==#DefaultYear,V(5,0,#DefaultMonth),V(5,0,12))
 
 #tmpTargetCat=X,1,S
 

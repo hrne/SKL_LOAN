@@ -115,15 +115,15 @@ public class LY007Report extends MakeReport {
 
 	private void eptExcel(List<Map<String, String>> lY007List, TitaVo titaVo) throws LogicException {
 
-		
+		this.info("eptExcel");
 		int iYear =Integer.valueOf(titaVo.getParam("RocYear"));
 
 		if (lY007List != null && !lY007List.isEmpty()) {
 
 			makeExcel.setValue(7, 15, iYear + ".12.31", "C");
 			makeExcel.setValue(8, 15, formatAmt(totalEquity, 0), "C");
-			int rowCursor = 7; // 列指標			
-
+			int rowCursor = 7; // 列指標	
+			this.info("有值");
 			for (Map<String, String> r : lY007List) {
 				BigDecimal loanBal = getBigDecimal(r.get("LoanBal"));
 				BigDecimal gPercent = this.computeDivide(loanBal, totalEquity, 4);
@@ -131,7 +131,8 @@ public class LY007Report extends MakeReport {
 				if(rel.equals("N")) {
 					continue;
 				}
-				makeExcel.setShiftRow(rowCursor, 1);
+				this.info("setShiftRow="+rowCursor);
+				makeExcel.setShiftRow(rowCursor+1, 1);
 				makeExcel.setValue(rowCursor, 1, r.get("Rel"));// 與本公司之關係
 				makeExcel.setValue(rowCursor, 2, r.get("CustNo"));// 交易對象代號
 				makeExcel.setValue(rowCursor, 3, r.get("CustName"));// 交易對象名稱
@@ -153,6 +154,7 @@ public class LY007Report extends MakeReport {
 			makeExcel.setValue(8, 1, "本日無資料", "L");
 		}
 		makeExcel.close();
+		this.info("eptExcel close");
 	}
 
 }

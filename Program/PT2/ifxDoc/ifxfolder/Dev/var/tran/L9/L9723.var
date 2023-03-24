@@ -68,14 +68,48 @@ D(7,3,#SYSDATE,1,0)
 !V(7)
 !A(DATE,0,#ReportDate)
 
+!今天日期(系統日)
+#Today=A,8,S
+D(6,2,#SYSDATE,0)
+
+!前一個月日期
+#LastDay=A,8,S
+D(7,3,#Today,1,0)
+
+!本月底營業日
+#MFBSDYDate=A,8,S
+D(6,2,#MFBSDY,0)
+
+!當月年份    
+#ThisYear=A,3,S
+T(1,#Today,2,3)
+!當月月份    
+#ThisMonth=A,2,S
+T(1,#Today,5,2)
+
+!上月年份    
+#LastYear=A,3,S
+T(1,#LastDay,2,3)
+!上月月份    
+#LastMonth=A,2,S
+T(1,#LastDay,5,2)
+
+#DefaultYear=A,3,S
+C(3,#Today,#MFBSDYDate,E(0,#ThisYear),E(0,#LastYear))
+
+#DefaultMonth=A,2,S
+C(3,#Today,#MFBSDYDate,E(0,#ThisMonth),E(0,#LastMonth))
+
 
 #ReportDateY=N,3,I
-T(1,@ReportDateY,#ReportDate,2,3)
-@V(5,0,999)
+E(0,#DefaultYear)
+@V(2,0)
+V(5,0,#DefaultYear)
 
 #ReportDateM=A,2,I
-T(1,@ReportDateM,#ReportDate,5,2)
-@V(5,1,12)
+E(0,#DefaultMonth)
+@V(2,0)
+IF(#ReportDateY==#DefaultYear,V(5,0,#DefaultMonth),V(5,0,12))
 
 #RPTFG=A,1,S
 E(0,0)

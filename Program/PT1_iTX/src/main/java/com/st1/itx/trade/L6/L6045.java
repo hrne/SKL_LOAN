@@ -19,11 +19,14 @@ import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.TxInquiry;
 import com.st1.itx.db.domain.TxRecord;
+import com.st1.itx.db.domain.TxTeller;
+import com.st1.itx.db.domain.TxTellerAuth;
 import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.TxInquiryService;
 import com.st1.itx.db.service.TxRecordService;
+import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.db.service.TxTranCodeService;
 
 @Service("L6045")
@@ -48,6 +51,9 @@ public class L6045 extends TradeBuffer {
 	CustMainService sCustMainService;
 	
 	@Autowired
+	public TxTellerService txTellerService;
+	
+	@Autowired
 	SendRsp iSendRsp;
 	
 	@Override
@@ -63,7 +69,12 @@ public class L6045 extends TradeBuffer {
 
 		int iTxDAteS = Integer.parseInt(titaVo.getParam("TxDateS"))+19110000;
 		int iTxDAteE = Integer.parseInt(titaVo.getParam("TxDateE"))+19110000;
+
+		String ixxCustNo = titaVo.getTlrNo();
+		TxTeller itxTell = null;
+		itxTell = txTellerService.findById(ixxCustNo, titaVo);
 		
+		this.info("itxTell   =" + itxTell.getAllowFg());
 		
 		int iCustNoSt = Integer.parseInt(titaVo.getParam("CustNo"));
 		int iCustNoEd = 0;
@@ -87,9 +98,10 @@ public class L6045 extends TradeBuffer {
 		}
 		
 		if (iTxInquiry != null) {
-			
+			OccursList occursList = new OccursList();
+			occursList.putParam("OOAllowFg",itxTell.getAllowFg());
 			for (TxInquiry tTxInquiry : iTxInquiry) {
-				OccursList occursList = new OccursList();
+				
 				String tranItem = "";
 				tTempVo = new TempVo();
 				tTempVo = tTempVo.getVo(tTxInquiry.getTranData());
@@ -138,6 +150,7 @@ public class L6045 extends TradeBuffer {
 				{
 					this.warn("CustNo " + custNo + " is not found in CustMain !?");
 				}
+		
 				
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);

@@ -530,7 +530,7 @@ public class MakeExcel extends CommBuffer {
 	 * @param sheetName 頁籤名稱
 	 * @throws LogicException LogicException
 	 */
-	private void open(TitaVo titaVo, ReportVo reportVo, String fileName, String sheetName) throws LogicException {
+	public void open(TitaVo titaVo, ReportVo reportVo, String fileName, String sheetName) throws LogicException {
 		this.titaVo = titaVo;
 		this.checkParameters(reportVo, fileName);
 
