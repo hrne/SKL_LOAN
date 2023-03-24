@@ -4099,7 +4099,6 @@ TXFORM=L3R03
 #L3r04CurrencyCode=X,3,S
 #L3r04ChequeAmt=m,14.2,S
 #L3r04BktwFlag=X,1,S
-#L3r04TsibFlag=X,1,S
 #L3r04MediaFlag=X,1,S
 #L3r04UsageCode=A,2,S
 #L3r04ServiceCenter=X,1,S
@@ -4133,7 +4132,6 @@ TXFORM=L3R04
 #L3r04CurrencyCode
 #L3r04ChequeAmt
 #L3r04BktwFlag
-#L3r04TsibFlag
 #L3r04MediaFlag
 #L3r04UsageCode
 #L3r04ServiceCenter

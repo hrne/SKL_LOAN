@@ -98,7 +98,6 @@ C(3,#ChequeFlag,1,INVOKEJS(SHOW,p1,12,12,0),$)
 [#<->#,"#FdChequeAmt+支票金額",#ChequeAmtX],
 [#<->#,"#FdBankCode+行庫代號",#BankCode,#BTN5,#BankItem],
 ["#FdBktwFlag+是否為台支",#BktwFlag,#BktwFlagX],
-! ["#FdTsibFlag+是否為台新",#TsibFlag,#TsibFlagX],
 ! ["#FdMediaFlag+入媒體檔",#MediaFlag,#MediaFlagX],
 ["#FdOutsideCode+本埠外埠",#OutsideCode,#OutsideCodeX],
 ["#FdUsageCode+支票用途",#UsageCode,#UsageCodeX],
@@ -409,8 +408,6 @@ T(3,@BankCode, )
 T(3,@BankItem, )
 T(3,@BktwFlag, )
 T(3,@BktwFlagX, )
-T(3,@TsibFlag, )
-T(3,@TsibFlagX, )
 T(3,@MediaFlag, )
 T(3,@MediaFlagX, )
 E(0,@OutsideCode,0)
@@ -434,7 +431,6 @@ T(3,@FdChequeDate, )
 T(3,@FdAreaCode, )
 T(3,@FdBankCode, )
 T(3,@FdBktwFlag, )
-T(3,@FdTsibFlag, )
 T(3,@FdMediaFlag, )
 T(3,@FdOutsideCode, )
 T(3,@FdUsageCode, )
@@ -450,7 +446,6 @@ T(3,@FdChequeDate,*)
 T(3,@FdAreaCode,*)
 T(3,@FdBankCode,*)
 T(3,@FdBktwFlag,*)
-T(3,@FdTsibFlag,*)
 T(3,@FdMediaFlag,*)
 T(3,@FdOutsideCode,*)
 T(3,@FdUsageCode,*)
@@ -466,14 +461,13 @@ T(F,@ChequeDate,1)
 T(F,@AreaCode,1)
 T(F,@BankCode,1)
 T(F,@BktwFlag,1)
-T(F,@TsibFlag,1)
 T(F,@MediaFlag,1)
 T(F,@OutsideCode,1)
 T(F,@UsageCode,1)
 T(F,@ServiceCenter,1)
 T(F,@TempSourceCode,1)
 HIDE(#EntryDate)
-SHOW(#AreaCode,#BktwFlag,#TsibFlag,#MediaFlag,#OutsideCode,#BankCode,#UsageCode,#ServiceCenter,#TempSourceCode)
+SHOW(#AreaCode,#BktwFlag,#MediaFlag,#OutsideCode,#BankCode,#UsageCode,#ServiceCenter,#TempSourceCode)
 C(3,#TempReasonCode,8,$,S)
 T(F,@ChequeName,0)
 T(F,@ChequeAcct,0)
@@ -482,12 +476,11 @@ T(F,@ChequeDate,0)
 T(F,@AreaCode,0)
 T(F,@BankCode,0)
 T(F,@BktwFlag,0)
-T(F,@TsibFlag,0)
 T(F,@MediaFlag,0)
 T(F,@OutsideCode,0)
 T(F,@ServiceCenter,0)
 T(F,@TempSourceCode,0)
-HIDE(#AreaCode,#BktwFlag,#TsibFlag,#MediaFlag,#OutsideCode,#BankCode,#UsageCode,#ServiceCenter,#TempSourceCode)
+HIDE(#AreaCode,#BktwFlag,#MediaFlag,#OutsideCode,#BankCode,#UsageCode,#ServiceCenter,#TempSourceCode)
 
 
 
@@ -716,7 +709,6 @@ E(0,@AreaCode,#L3r04AreaCode)
 T(2,@BankCode,#L3r04BankCode)
 T(2,@BankItem,#L3r04BankItem)
 T(2,@BktwFlag,#L3r04BktwFlag)
-T(2,@TsibFlag,#L3r04TsibFlag)
 T(2,@MediaFlag,#L3r04MediaFlag)
 E(0,@OutsideCode,#L3r04OutsideCode)
 E(0,@UsageCode,#L3r04UsageCode)
@@ -811,18 +803,6 @@ T(3,N)
 #BktwFlagX=X,2,L
 C(4,#BktwFlag,S,$)T(H,#BktwFlag,#YNHelp)
 
-![是否為台新]
-#FdTsibFlag=X,2,L
-C(3,#ChequeFlag,1,T(3,*),S)
-
-#TsibFlag=X,1,S
-C(3,#ChequeFlag,1,$,s)
-HELP(#YNHelp)
-T(3,N)
-@V(H,#YNHelp)
-
-#TsibFlagX=X,2,L
-C(4,#TsibFlag,S,$)T(H,#TsibFlag,#YNHelp)
 
 ![入媒體檔]
 #FdMediaFlag=X,2,L
@@ -836,7 +816,7 @@ T(3,Y)
 
 #MediaFlagX=X,2,L
 C(4,#MediaFlag,S,$)
-T(H,#TsibFlag,#YNHelp)
+T(H,#MediaFlag,#YNHelp)
 
 ![本埠外埠]
 #FdOutsideCode=X,2,L
@@ -1017,12 +997,12 @@ T(3,[L3210] 暫收款登錄)
 
 #TimCustNo#CustId#ApplNo#FacmNo#EntryDate#CurrencyCode#TimTempAmt#TempReasonCode
 #TempSourceCode#ChequeName#ChequeAcct#ChequeNo#ChequeDate#AreaCode
-#BankCode#BktwFlag#TsibFlag#MediaFlag#OutsideCode#UsageCode
+#BankCode#BktwFlag#MediaFlag#OutsideCode#UsageCode
 #ServiceCenter#CreditorId#CreditorBankCode
 <include src="RPDTL.icf::RPDTL.tim"/>
 #CustNo#CustNoX#CustIdX#ApplNoX#TempReasonCodeX
 #TwTempAmt#UsTempAmt#TempAmtX#TempSourceCodeX#AreaCodeX
-#ChequeAmtX#BankItem#BktwFlagX#TsibFlagX#MediaFlagX#OutsideCodeX
+#ChequeAmtX#BankItem#BktwFlagX#MediaFlagX#OutsideCodeX
 #UsageCodeX#ServiceCenterX
 #PrevIntDateX
 </sub>

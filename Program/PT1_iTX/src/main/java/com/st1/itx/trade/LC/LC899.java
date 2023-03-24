@@ -38,8 +38,7 @@ public class LC899 extends TradeBuffer {
 			if ("1".equals(runmode)) {
 
 				TradeBuffer x = (TradeBuffer) MySpring.getBean(prgm);
-				x.setLoggerFg("1",
-						"com.st1.itx.trade." + titaVo.getTxCode().substring(0, 2) + "." + titaVo.getTxCode());
+				x.setLoggerFg("1", "com.st1.itx.trade." + titaVo.getTxCode().substring(0, 2) + "." + titaVo.getTxCode());
 				x.setTxBuffer(this.txBuffer);
 				this.info(titaVo.toString());
 				this.info(txBuffer.getTxCom().toString());
@@ -51,6 +50,8 @@ public class LC899 extends TradeBuffer {
 				MySpring.newTask(prgm, this.txBuffer, titaVo);
 			} else if ("3".equals(runmode)) {
 				MySpring.newTask(prgm, this.txBuffer, titaVo, true);
+			} else if ("4".equals(runmode)) {
+				titaVo.setBatchJobId(prgm);
 			}
 		}
 		this.addList(this.totaVo);

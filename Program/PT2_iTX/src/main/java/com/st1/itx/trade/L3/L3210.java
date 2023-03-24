@@ -258,7 +258,7 @@ public class L3210 extends TradeBuffer {
 			tLoanCheque.setBankCode(titaVo.getParam("BankCode"));
 			tLoanCheque.setOutsideCode(titaVo.getParam("OutsideCode"));
 			tLoanCheque.setBktwFlag(titaVo.getParam("BktwFlag"));
-			tLoanCheque.setTsibFlag(titaVo.getParam("TsibFlag"));
+			// tLoanCheque.setTsibFlag(titaVo.getParam("TsibFlag"));
 			tLoanCheque.setMediaFlag(titaVo.getParam("MediaFlag"));
 			tLoanCheque.setUsageCode(titaVo.getParam("UsageCode"));
 			tLoanCheque.setServiceCenter(titaVo.getParam("ServiceCenter"));

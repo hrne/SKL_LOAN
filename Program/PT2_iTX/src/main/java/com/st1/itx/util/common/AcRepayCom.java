@@ -1321,6 +1321,11 @@ public class AcRepayCom extends TradeBuffer {
 		}
 		iTempVo.putParam("RvNo", ba.getRvNo()); // 銷帳編號
 		iTempVo.putParam("RvJsonFields", ba.getRvJsonFields()); // 銷帳JsonFields
+		if ("L3230".equals(titaVo.getTxcd())) {
+			iTempVo.putParam("TempReasonCode", this.parse.stringToInteger(titaVo.getParam("TempReasonCode")));
+			iTempVo.putParam("TempItemCode", titaVo.getParam("TempItemCode"));
+			iTempVo.putParam("RemoveNo", titaVo.getParam("RemoveNo").trim());
+		}
 		tLoanBorTx.setOtherFields(iTempVo.getJsonString());
 
 		return tLoanBorTx;

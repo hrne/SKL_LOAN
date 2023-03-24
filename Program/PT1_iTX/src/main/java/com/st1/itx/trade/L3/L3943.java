@@ -138,7 +138,7 @@ public class L3943 extends TradeBuffer {
 		this.totaVo.putParam("OCurrencyCode", tLoanCheque.getCurrencyCode());
 		this.totaVo.putParam("OChequeAmt", tLoanCheque.getChequeAmt());
 		this.totaVo.putParam("OBktwFlag", tLoanCheque.getBktwFlag());
-		this.totaVo.putParam("OTsibFlag", tLoanCheque.getTsibFlag());
+		// this.totaVo.putParam("OTsibFlag", tLoanCheque.getTsibFlag());
 		this.totaVo.putParam("OMediaFlag", tLoanCheque.getMediaFlag());
 		this.totaVo.putParam("OUsageCode", tLoanCheque.getUsageCode());
 		this.totaVo.putParam("OServiceCenter", tLoanCheque.getServiceCenter());

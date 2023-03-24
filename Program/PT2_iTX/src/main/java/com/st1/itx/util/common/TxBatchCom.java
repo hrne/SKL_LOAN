@@ -897,7 +897,7 @@ public class TxBatchCom extends TradeBuffer {
 		l3210TitaVo.putParam("AreaCode", "");
 		l3210TitaVo.putParam("BankCode", "");
 		l3210TitaVo.putParam("BktwFlag", "N");
-		l3210TitaVo.putParam("TsibFlag", "N");
+		// l3210TitaVo.putParam("TsibFlag", "N");
 		l3210TitaVo.putParam("MediaFlag", "N");
 		l3210TitaVo.putParam("OutsideCode", 1);
 		l3210TitaVo.putParam("UsageCode", "");
