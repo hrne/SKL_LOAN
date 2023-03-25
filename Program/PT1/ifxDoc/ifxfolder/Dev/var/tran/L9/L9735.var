@@ -56,17 +56,12 @@ E(0,0)
 E(0,5)
 <include src="COM.icf::CheckAuth.rtn"/>
 
-#DATE=D,8,S
-T(4,DATE$)
-
-#DT=D,7,S
-T(1,#DATE,2,7)
 
 !撥款日期
 #DrawdownDate=D,7,I
 @V(7)
 A(DATE,0,#DrawdownDate)
-IF(#DrawdownDate>#DT,V(P,不可大於會計日),$)
+
 
 </sub>
 

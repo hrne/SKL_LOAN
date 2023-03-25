@@ -147,7 +147,7 @@ public class LY007Report extends MakeReport {
 				makeExcel.setValue(rowCursor, 12, gPercent, "C");// 交易金額占業主權益比率%
 				makeExcel.setValue(rowCursor, 13, r.get("Supervisor"), "C");// 最後決定權人員
 				makeExcel.setValue(rowCursor, 14, "");// 備註
-
+				rowCursor++;
 			}
 		} else {
 			// 無資料時處理

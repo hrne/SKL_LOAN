@@ -73,11 +73,13 @@ public class AcLoanRenewCom extends TradeBuffer {
 // -------------------  C       300,000     FacmNo001    新額度004，原額度001
 // -------------------  C       100,000     FacmNo002    新額度004，原額度002
 		// 撥款時，收付欄來源金額最大者為主要額度
+		if (!"L3100".equals(titaVo.getTxcd())) {
+			return null;
+		}
 		int mainFacmNo = 0;
 		BigDecimal mainAmt = BigDecimal.ZERO;
 		for (AcDetail ac : this.txBuffer.getAcDetailList()) {
-			if ((ac.getAcctCode().equals("TRO") || ac.getAcctCode().equals("TRE")) && ac.getDbCr().equals("C")) { // 借新還舊
-																													// 撥款
+			if ((ac.getAcctCode().equals("TRO") || ac.getAcctCode().equals("TRE"))) { // 借新還舊																													// 撥款
 				if (ac.getTxAmt().compareTo(mainAmt) > 0) {
 					mainAmt = ac.getTxAmt();
 					mainFacmNo = ac.getFacmNo();
@@ -86,8 +88,7 @@ public class AcLoanRenewCom extends TradeBuffer {
 		}
 
 		for (AcDetail ac : this.txBuffer.getAcDetailList()) {
-			if ((ac.getAcctCode().equals("TRO") || ac.getAcctCode().equals("TRE")) && ac.getDbCr().equals("C")) { // 借新還舊
-																													// 撥款
+			if ((ac.getAcctCode().equals("TRO") || ac.getAcctCode().equals("TRE"))) { // 借新還舊																													// 撥款
 				iNewFacmNo = parse.stringToInteger(titaVo.getMrKey().substring(8, 11)); // 0123456-890-234
 				iNewBormNo = parse.stringToInteger(titaVo.getMrKey().substring(12, 15));
 				if (this.txBuffer.getTxCom().getBookAcHcode() == 0) // 帳務訂正記號 帳務訂正記號 AcHCode 0.正常 1.訂正 2.3.沖正
