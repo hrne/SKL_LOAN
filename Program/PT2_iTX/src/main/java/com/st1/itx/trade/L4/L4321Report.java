@@ -46,14 +46,14 @@ public class L4321Report extends MakeReport {
 	}
 
 	private int iAdjCode = 0;
-	String iTxKind = "";
+	private int iTxKind = 0;
 	private long sno;
 	private String fileNm = "";
 	private List<Map<String, String>> fnAllList = new ArrayList<>();
 
 	public long exec(TitaVo titaVo) throws LogicException {
 		this.iAdjCode = parse.stringToInteger(titaVo.get("AdjCode"));
-		this.iTxKind = titaVo.getParam("TxKind");
+		this.iTxKind =  parse.stringToInteger(titaVo.getParam("TxKind"));
 
 		this.fileNm = titaVo.getParam("FileNm");
 		this.info("L4321Report exec");
@@ -67,7 +67,33 @@ public class L4321Report extends MakeReport {
 //		defaultExcel 預設excel底稿檔
 //		defaultSheet 預設sheet,可指定 sheet index or sheet name
 		this.info("titaVo.getTxcd() = " + titaVo.getTxcd());
+		int excelNo = 0;
 		switch (this.iAdjCode) {
+		case 1:
+			if (this.iTxKind == 1) {
+				excelNo = 1;
+			} else {
+				excelNo = 3;
+			}
+			break;
+		case 2:
+			if (this.iTxKind == 1) {
+				excelNo = 2;
+			} else {
+				excelNo = 4;
+			}
+			break;
+		case 3:
+			if (this.iTxKind == 1) {
+				excelNo = 1;
+			} else {
+				excelNo = 3;
+			}
+			break;
+		default:
+			break;
+		}
+		switch (excelNo) {
 		case 1:
 			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, fileNm,
 					"L4321_LNW171E底稿(10909調息檔)定期機動.xlsx", "正常件"); // 無地區
@@ -178,7 +204,7 @@ public class L4321Report extends MakeReport {
 					case 19: // F19 首次調整日期
 					case 20: // F20 利率調整週期
 					case 21: // F21預定下次利率調整日
-						if (this.iTxKind == "1") {
+						if (this.iTxKind == 1) {
 							ii++;
 							makeExcel.setValue(row, ii, tLDVo.get(fdnm));
 						}

@@ -2,6 +2,8 @@ package com.st1.itx.trade.L3;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -227,15 +229,26 @@ public class L3220 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0015", "查詢費用 " + e.getMessage()); // 檢查錯誤
 		}
 		if (this.baTxList != null) {
-			// 重新計算作帳金額
+//			1.輸入額度:以該額度抵繳退還金額
+//			2.未輸入額度： 以非暫收指定額度優先,依退還金額按額度編號依序抵繳(額度依起帳日由大到小)
+			Collections.sort(this.baTxList, new Comparator<BaTxVo>() {
+				public int compare(BaTxVo c1, BaTxVo c2) {
+					if (c1.getDataKind() != c2.getDataKind()) {
+						return c1.getDataKind() - c2.getDataKind();
+					}
+					if (c1.getPayIntDate() != c2.getPayIntDate()) {
+						return c2.getPayIntDate() - c1.getPayIntDate();
+					}
+					if (c1.getFacmNo() != c2.getFacmNo()) {
+						return c1.getPayIntDate() - c2.getPayIntDate();
+					}
+					return 0;
+				}
+			});
 			for (BaTxVo ba : this.baTxList) {
 				ba.setAcctAmt(BigDecimal.ZERO);
 			}
 			for (BaTxVo ba : this.baTxList) {
-				// 排除其他額度暫收可抵繳(指定額度)
-				if (ba.getDataKind() == 5) {
-					continue;
-				}
 				if (iTempReasonCode == 1 && (ba.getAcctCode().equals("TAV") || ba.getAcctCode().equals("TLD"))
 						|| (iTempReasonCode == 2 && ba.getAcctCode().substring(0, 2).equals("T1"))
 						|| (iTempReasonCode == 3 && ba.getAcctCode().substring(0, 2).equals("T2"))

@@ -135,7 +135,7 @@ public class AcReceivableCom extends TradeBuffer {
 					wkRvFg = 0;
 				else
 					wkRvFg = 1;
-				if (ac.getAcctCode().equals("TRO")||ac.getAcctCode().equals("TRE")) {
+				if (ac.getAcctCode().equals("TRO") || ac.getAcctCode().equals("TRE")) {
 					if (wkRvFg == 0)
 						wkRvFg = 1;
 					else
@@ -482,6 +482,10 @@ public class AcReceivableCom extends TradeBuffer {
 			} else
 				throw new LogicException(titaVo, "E6003", "AcReceivable Notfound " + tAcReceivableId);
 		} else {
+			// 正常交易且已銷帳，重新起帳
+			if (AcHCode == 0 && tAcReceivable.getClsFlag() == 1) {
+				newAcReceivable(bizTbsdy);
+			}
 			// 更新資料
 			updAcReceivable(AcHCode, bizTbsdy);
 			// 同交易序號訂正後為已銷帳則刪除，否則更新

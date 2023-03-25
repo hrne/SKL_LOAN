@@ -2356,7 +2356,7 @@ T(3,[L3100] 撥款)
 K(LIGHT,#BormNo,TXTRED,0)
 
 #Entdy=X,8,S
-E(0,#DrawdownDate)
+C(3,#IsRv,1,E(0,#DrawdownDate),E(0,#EffectDate))
 
 #TxNo=X,18,S
 T(2,#KINBR+#TLRNO+#TXTNO)

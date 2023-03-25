@@ -369,16 +369,11 @@ T(3,)T(H,#CurrencyCode,#CurrencyCodeHelp)
 #CURNM=_,_,S
 T(2,#CurrencyCode)
 
-
-
-
 #WkHideAmt=X,1,S
 C(3,#Precision,0,SHOW(#TwTempAmt)
                  HIDE(#UsTempAmt)
                 ,HIDE(#TwTempAmt)
                  SHOW(#UsTempAmt))
-
-
 
 ![額度編號]
 !作業項目=9,10,25,29必須輸入,其他不可輸入
@@ -391,36 +386,34 @@ T(3,@RelationName,)
 #TimFacmNo=A,3,S
 C(4,#ApplNo,E(0,#FacmNo),E(0,#L2r05FacmNo))
 
-
 ![暫收款金額]
 !退還暫收款金額不可>該戶號目前暫收金額
 #FdTempAmt=X,2,L
 
 #TwTempAmt=m,14,I
-C(3,#L3r05TempAmt,0,S,$)
+C(3,#L3r05ExcessiveAll,0,S,$)
 C(3,#Precision,0,$,s)
 C(3,#TempItemCode,1,S,$)
 C(3,#TempItemCode,2,S,$)
 C(3,#TempItemCode,3,S,$)
 @
 V(2,0)
-V(5,0,#L3r05TempAmt)
+V(5,0,#L3r05ExcessiveAll)
 
 #UsTempAmt=m,14.2,I
-C(3,#L3r05TempAmt,0,S,$)
+C(3,#L3r05ExcessiveAll,0,S,$)
 C(3,#Precision,0,s,$)
 C(3,#TempItemCode,1,S,$)
 C(3,#TempItemCode,2,S,$)
 C(3,#TempItemCode,3,S,$)
 @
 V(2,0)
-V(5,0,#L3r05TempAmt)
+V(5,0,#L3r05ExcessiveAll)
 
 #TimTempAmt=m,14.2,S
 C(3,#Precision,0,E(0,#TwTempAmt),E(0,#UsTempAmt))
 C(3,#TimTempAmt,0,T(3,@FdChequeAcct,*)T(3,@FdChequeNo,*)
                  ,T(3,@FdChequeAcct, )T(3,@FdChequeNo, ))
-
 
 #FdExcessive=X,2,L
 
@@ -434,8 +427,6 @@ CALL2(#ADJUSTDOT,#Precision,#Excessive,#ExcessiveX)
 #ExcessiveAllX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#ExcessiveAll,#ExcessiveAllX)
 #ExcessiveXX=X,50,L
-
-
 
 #WKHIDECHQAMT=X,1,S
 

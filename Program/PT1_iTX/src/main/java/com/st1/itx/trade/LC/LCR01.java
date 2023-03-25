@@ -75,10 +75,13 @@ public class LCR01 extends TradeBuffer {
 				tita2.put("ORGTLR", tTxRecord.getTlrNo());
 				tita2.put("ORGTNO", tTxRecord.getTxSeq());
 				tita2.put("HCODE", "1");
-				// L3100訂正改為一段式(經辦直接訂正)
-				if ("L3100".equals(tita2.getTxcd()) && suprelease == 1) {
+				// 訂正改為一段式(經辦直接訂正)
+				if (suprelease == 1) {
 					tita2.put("RELCD", "1");
 					tita2.put("ACTFG", "0");
+				}
+				// 審核訂正改為審核經辦直接訂正
+				if (suprelease == 2) {
 				}
 				totaVo.setEcTitaVo(tita2);
 			} catch (Throwable e) {
@@ -108,15 +111,13 @@ public class LCR01 extends TradeBuffer {
 		if (tTxFlow.getFlowStep() > flowstep) {
 			switch (tTxFlow.getFlowStep()) {
 			case 2:
-				if ("L3100".equals(tTxFlow.getTranNo())) {
-					suprelease = 1;
-					break;
-				}
-				throw new LogicException(titaVo, "EC008", "交易已放行");
+				suprelease = 1;
+				break;
 			case 3:
 				throw new LogicException(titaVo, "EC008", "交易已審核");
 			case 4:
-				throw new LogicException(titaVo, "EC008", "交易已審核放");
+				suprelease = 2;
+				break;
 			default:
 				throw new LogicException(titaVo, "EC008", "交易已異動");
 			}

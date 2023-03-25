@@ -2082,8 +2082,8 @@ public class BaTxCom extends TradeBuffer {
 		baTxVo.setRepayType(0);
 		baTxVo.setCustNo(iCustNo);
 		baTxVo.setBormNo(0);
-		baTxVo.setRvNo(" ");
-		baTxVo.setAcctCode("TAV");
+		baTxVo.setRvNo("");
+		baTxVo.setAcctCode("");
 		baTxVo.setFacmNo(this.overRpFacmNo);
 		// 溢繳 = 可償還餘額xxBal為正值時
 		// 短繳 = 可償還餘額xxBal為負值時取正值
@@ -2669,6 +2669,7 @@ public class BaTxCom extends TradeBuffer {
 						}
 						baTxVo.setRepayType(0);
 						baTxVo.setDbCr("D");
+						baTxVo.setPayIntDate(rv.getOpenAcDate()); // 起帳日期
 					} else {
 						if (isFeeFacmNo(iRepayType, iFacmNo, rv.getFacmNo())) {
 							baTxVo.setPayIntDate(rv.getOpenAcDate()); // 應繳息日、應繳日

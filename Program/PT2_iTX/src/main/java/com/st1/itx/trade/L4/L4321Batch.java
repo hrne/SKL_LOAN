@@ -82,7 +82,6 @@ public class L4321Batch extends TradeBuffer {
 	private String iLableBX = "";
 	private int custType1 = 0;
 	private int custType2 = 0;
-	private int wkConfirmFlag = 0;
 	private Boolean flag = true;
 
 //	輸入畫面 戶別 CustType 1:個金;2:企金（含企金自然人）
@@ -122,29 +121,19 @@ public class L4321Batch extends TradeBuffer {
 		this.info("isActfgEntry ... " + titaVo.isActfgEntry());
 		this.info("isHcodeNormal ... " + titaVo.isHcodeNormal());
 
-		if (titaVo.isActfgEntry()) {
-			if (titaVo.isHcodeNormal()) {
+		// 正常交易
+		if (titaVo.isHcodeNormal()) {
+			if (titaVo.isActfgEntry()) {
 				this.iConfirmFlag = 1;
-				this.wkConfirmFlag = 0;
-
-			} else {
-				this.iConfirmFlag = 0;
-				this.wkConfirmFlag = 1;
 			}
-		} else
-		// 主管放行
-		{
-			if (titaVo.isHcodeNormal()) {
+			if (titaVo.isActfgSuprele()) {
 				this.iConfirmFlag = 2;
-				this.wkConfirmFlag = 1;
-			} else {
-				this.iConfirmFlag = 1;
-				this.wkConfirmFlag = 2;
 			}
+		} else {
+			this.iConfirmFlag = 0;
 		}
 
 		this.info("iConfirmFlag ... " + iConfirmFlag);
-		this.info("wkConfirmFlag ... " + wkConfirmFlag);
 
 		// 戶別 CustType 1:個金;2:企金（含企金自然人）=> 客戶檔 0:個金1:企金2:企金自然人
 		if (this.iCustType == 2) {
@@ -242,10 +231,9 @@ public class L4321Batch extends TradeBuffer {
 	private void processUpdate(TitaVo titaVo) throws LogicException {
 		this.info("processUpdate...");
 		List<BatxRateChange> lBatxRateChange = new ArrayList<BatxRateChange>();
-		Slice<BatxRateChange> sBatxRateChange = batxRateChangeService.findL4321Report(this.iAdjDate, this.iAdjDate,
-				custType1, custType2, iTxKind, iAdjCode, iAdjCode, this.wkConfirmFlag, this.index, this.limit, titaVo);
+		Slice<BatxRateChange> sBatxRateChange = batxRateChangeService.findL4931AEq(custType1, custType2, iTxKind,
+				iTxKind, iAdjCode, iAdjCode, this.iAdjDate, this.iAdjDate, this.index, this.limit, titaVo);
 		lBatxRateChange = sBatxRateChange == null ? null : sBatxRateChange.getContent();
-
 		if (lBatxRateChange != null && lBatxRateChange.size() != 0) {
 			for (BatxRateChange tBatxRateChange : lBatxRateChange) {
 				// 未輸入利率=>不處理
@@ -276,7 +264,6 @@ public class L4321Batch extends TradeBuffer {
 				}
 				// 經辦更新
 				if (titaVo.isActfgEntry()) {
-
 					// 確認檢核
 					if (titaVo.isHcodeNormal()) {
 						if (checkConfirm(tBatxRateChange, titaVo)) {
@@ -296,30 +283,6 @@ public class L4321Batch extends TradeBuffer {
 
 					// 處理階梯式利率
 					setStepRateChange(tBatxRateChange, titaVo);
-				}
-				// 主管放行
-				if (titaVo.isActfgSuprele()) {
-					CdBaseRate tCdBaseRate = new CdBaseRate();
-					CdBaseRateId tCdBaseRateId = new CdBaseRateId();
-
-					tCdBaseRateId.setBaseRateCode(tBatxRateChange.getBaseRateCode());
-					tCdBaseRateId.setCurrencyCode("TWD");
-					tCdBaseRateId.setEffectDate(tBatxRateChange.getCurtEffDate());
-
-					tCdBaseRate = cdBaseRateService.holdById(tCdBaseRateId, titaVo);
-					if (tCdBaseRate != null) {
-//						0:已放行  1:已生效不可刪除 2:未放行
-//						一般
-						if (titaVo.isHcodeNormal()) {
-							tCdBaseRate.setEffectFlag(1);
-						}
-//						訂正
-						else {
-							tCdBaseRate.setEffectFlag(0);
-						}
-					} else {
-						this.info("查無此指標利率檔...");
-					}
 				}
 
 				// 更新確認記號、放款利率變動檔生效日
@@ -473,10 +436,10 @@ public class L4321Batch extends TradeBuffer {
 		BigDecimal individualIncr = BigDecimal.ZERO;
 		if (!"99".equals(tBatxRateChange.getBaseRateCode())) {
 			if (tBatxRateChange.getIncrFlag().equals("Y")) {
-				rateIncr =  tBatxRateChange.getRateIncr();
+				rateIncr = tBatxRateChange.getRateIncr();
 			} else {
-				rateIncr =  tBatxRateChange.getContrRateIncr();
-				individualIncr =  tBatxRateChange.getRateIncr();
+				rateIncr = tBatxRateChange.getContrRateIncr();
+				individualIncr = tBatxRateChange.getRateIncr();
 			}
 		}
 		LoanRateChange tLoanRateChange = new LoanRateChange();
