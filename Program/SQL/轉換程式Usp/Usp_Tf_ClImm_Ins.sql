@@ -114,7 +114,7 @@ BEGIN
              THEN NVL(S4."LGTSAM",0) 
              WHEN S1."ClCode1" = 2 
              THEN NVL(S5."LGTSAM",0) 
-           ELSE 0 END             AS "SettingAmt"          -- 設定金額 DECIMAL 16 2 
+           ELSE 0 END                     AS "SettingAmt"          -- 設定金額 DECIMAL 16 2 
           ,NVL(S2."GDTRDT",0)             AS "ClaimDate"           -- 擔保債權確定日期 decimald 8  
           ,CASE WHEN NVL(S2."GDTPTY",0) <> 0 THEN TO_CHAR(S2."GDTPTY") ELSE '' END 
                                           AS "SettingSeq"          -- 設定順位(1~4) VARCHAR2 1  
@@ -145,11 +145,11 @@ BEGIN
                           AND S4."GDRNUM" = S1."GDRNUM" 
                           AND S4."LGTSEQ" = S1."LGTSEQ" 
                           AND S1."ClCode1" = 1 
-      LEFT JOIN "LA$LGTP" S5 ON S5."GDRID1" = S1."GDRID1" 
-                            AND S5."GDRID2" = S1."GDRID2" 
-                            AND S5."GDRNUM" = S1."GDRNUM" 
-                            AND S5."LGTSEQ" = S1."LGTSEQ" 
-                            AND S1."ClCode1" = 2 
+    LEFT JOIN "LA$LGTP" S5 ON S5."GDRID1" = S1."GDRID1" 
+                          AND S5."GDRID2" = S1."GDRID2" 
+                          AND S5."GDRNUM" = S1."GDRNUM" 
+                          AND S5."LGTSEQ" = S1."LGTSEQ" 
+                          AND S1."ClCode1" = 2 
     WHERE S1."ClCode1" >= 1 
       AND S1."ClCode1" <= 2 
     ; 

@@ -86,7 +86,7 @@ public class NightlyBatch extends ScheduledBase {
 
 			// 當日等於系統會計日期(一般營業日日批)
 			if (nowDy == tbsDyf) {
-				this.mustInfo("nightlyBatch 當日與系統會計日期相同,檢察官帳檔");
+				this.mustInfo("nightlyBatch 當日與系統會計日期相同,檢查關帳檔");
 				AcCloseId acCloseId = new AcCloseId();
 				acCloseId.setAcDate(tbsDyf);
 				acCloseId.setBranchNo("0000");

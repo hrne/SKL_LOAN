@@ -143,6 +143,7 @@ public class L8330 extends TradeBuffer {
 				} else {
 					sDelayYM = 1;
 				}
+				
 				// @@@SQL-Function要改为：custRcSubCourtEq
 				Slice<JcicZ451> sJcicZ451 = sJcicZ451Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
 				if (sJcicZ451 != null) {
@@ -184,7 +185,7 @@ public class L8330 extends TradeBuffer {
 							throw new LogicException("E0007", "延期繳款累計期數(月份)不得超過6期.");
 						}
 					} 
-					if(sMajorYM>12) { //延期繳款原因H
+					if(sMajorYM>11) { //延期繳款原因H
 						if ("A".equals(iTranKey)) {
 							throw new LogicException("E0005", "「延期繳款原因」為'J本人:為重大災害災民【限累計申請最多12期】.");
 						} else {

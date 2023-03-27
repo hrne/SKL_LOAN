@@ -89,12 +89,6 @@
 					<tasklet ref="LM016Batch" />
 				</step>
 			</flow>
-			<!-- Step: LM017 -->
-			<flow>
-				<step id="sLM017" parent="parentStep">
-					<tasklet ref="LM017" />
-				</step>
-			</flow>
 			<!-- Step: LM018 專案放款餘額及利息收入 -->
 			<flow>
 				<step id="sLM018" parent="parentStep">
@@ -165,12 +159,6 @@
 			<flow>
 				<step id="sLM033Batch" parent="parentStep">
 					<tasklet ref="LM033Batch" />
-				</step>
-			</flow>
-			<!-- Step: LM034 -->
-			<flow>
-				<step id="sLM034" parent="parentStep">
-					<tasklet ref="LM034" />
 				</step>
 			</flow>
 			<!-- Step: LM035 地區逾放比 -->

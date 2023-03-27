@@ -98,7 +98,7 @@ T(1,#LastDay,5,2)
 C(3,#Today,#MFBSDYDate,E(0,#ThisYear),E(0,#LastYear))
 
 #DefaultMonth=A,2,S
-C(3,#Today,#MFBSDYDate,E(0,#ThisMonth),E(0,#LastMonth))
+E(0,#ThisMonth)
 
 
 #ReportDateY=N,3,I
