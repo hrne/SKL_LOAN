@@ -37,6 +37,7 @@ import com.st1.itx.db.service.JcicZ451Service;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
+import com.st1.itx.util.date.DateUtil;
 
 @Service("L8330")
 @Scope("prototype")
@@ -60,6 +61,8 @@ public class L8330 extends TradeBuffer {
 	SendRsp iSendRsp;
 	@Autowired
 	DataLog iDataLog;
+	@Autowired
+	public DateUtil iDateUtil;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -81,8 +84,11 @@ public class L8330 extends TradeBuffer {
 		titaVo.putParam("CustNo", iCustNo);
 		this.info("CustNo   = " + iCustNo);
 
+		int iaDelayYM = DealMon(iDelayYM, 1);// 延期繳款年月後1月
+		int imDelayYM = DealMon(iDelayYM, -1);// 延期繳款年月前1月
 		int sCovDelayYM = 0;// 延期繳款累計期數(「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款')
 		int sDelayYM = 0;// 延期繳款累計期數(「延期繳款原因」為非'L')
+		int sMajorYM = 0;// 延期繳款原因J不能超過12個月
 
 		// JcicZ451
 		JcicZ451 iJcicZ451 = new JcicZ451();
@@ -143,8 +149,29 @@ public class L8330 extends TradeBuffer {
 					for (JcicZ451 xJcicZ451 : sJcicZ451) {
 						if (!"D".equals(xJcicZ451.getTranKey())
 								&& !titaVo.getParam("Ukey").equals(xJcicZ451.getUkey())) {
+							if (("D".equals(iDelayCode) && "D".equals(xJcicZ451.getDelayCode()))
+									&& (iaDelayYM == xJcicZ451.getDelayYM() || imDelayYM == xJcicZ451.getDelayYM())) {
+								if ("A".equals(iTranKey)) {
+									throw new LogicException("E0005", "延期繳款原因為'D繳稅'者，延期繳款年月不能連續兩期.");
+								} else {
+									throw new LogicException("E0007", "延期繳款原因為'D繳稅'者，延期繳款年月不能連續兩期.");
+								}
+							}
+							if (("E".equals(iDelayCode) && "E".equals(xJcicZ451.getDelayCode()))
+									&& (iaDelayYM == xJcicZ451.getDelayYM() || imDelayYM == xJcicZ451.getDelayYM())) {
+								if ("A".equals(iTranKey)) {
+									throw new LogicException("E0005", "延期繳款原因為'E繳付子女學費'者，延期繳款年月不能連續兩期.");
+								} else {
+									throw new LogicException("E0007", "延期繳款原因為'E繳付子女學費'者，延期繳款年月不能連續兩期.");
+								}
+							}
+						}
+						if (!"D".equals(xJcicZ451.getTranKey())
+								&& !titaVo.getParam("Ukey").equals(xJcicZ451.getUkey())) {
 							if ("L".equals(xJcicZ451.getDelayCode())) {
 								sCovDelayYM++;
+							} else if ("H".equals(xJcicZ451.getDelayCode())) {
+								sMajorYM++;
 							} else {
 								sDelayYM++;
 							}
@@ -157,6 +184,13 @@ public class L8330 extends TradeBuffer {
 							throw new LogicException("E0007", "延期繳款累計期數(月份)不得超過6期.");
 						}
 					} 
+					if(sMajorYM>12) { //延期繳款原因H
+						if ("A".equals(iTranKey)) {
+							throw new LogicException("E0005", "「延期繳款原因」為'J本人:為重大災害災民【限累計申請最多12期】.");
+						} else {
+							throw new LogicException("E0007", "「延期繳款原因」為'J本人:為重大災害災民【限累計申請最多12期】.");
+						}
+					}
 //					else if (sCovDelayYM > 6) {
 //						if ("A".equals(iTranKey)) {
 //							throw new LogicException("E0005", "「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】.");
@@ -310,5 +344,18 @@ public class L8330 extends TradeBuffer {
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+	private int DealMon(int txMonth, int iMonth) throws LogicException {
+		String txMonStr = String.valueOf(txMonth);
+		int txDate = Integer.valueOf(txMonStr + "10");
+		int retxdate = 0;
+		iDateUtil.init();
+		iDateUtil.setDate_1(txDate);
+		iDateUtil.setMons(iMonth);
+		retxdate = iDateUtil.getCalenderDay();
+		String retxdateStr = String.valueOf(retxdate);
+		String retxMonStr = retxdateStr.substring(0, retxdateStr.length() - 2);
+
+		return Integer.valueOf(retxMonStr);
 	}
 }

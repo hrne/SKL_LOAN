@@ -35,6 +35,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.parse.Parse;
 
 @Service("L8312")
 @Scope("prototype")
@@ -58,6 +59,8 @@ public class L8312 extends TradeBuffer {
 	public DataLog iDataLog;
 	@Autowired
 	public DateUtil iDateUtil;
+	@Autowired
+	public Parse parse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -69,16 +72,16 @@ public class L8312 extends TradeBuffer {
 		String iCustId = titaVo.getParam("CustId").trim();// 債務人IDN
 		String iSubmitKey = titaVo.getParam("SubmitKey").trim();// 報送單位代號
 		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate").trim());
-		int iDelayYM = Integer.valueOf(titaVo.getParam("DelayYM").trim())+191100;
+		int iDelayYM = Integer.valueOf(titaVo.getParam("DelayYM").trim()) + 191100;
 		String iDelayCode = titaVo.getParam("DelayCode").trim();
 		String iDelayDesc = titaVo.getParam("DelayDesc").trim();
 		String iKey = "";
-		
+
 		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
 		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 		titaVo.putParam("CustNo", iCustNo);
 		this.info("CustNo   = " + iCustNo);
-		
+
 		// JcicZ051, JcicZ046
 		JcicZ051 iJcicZ051 = new JcicZ051();
 		JcicZ051Id iJcicZ051Id = new JcicZ051Id();
@@ -93,6 +96,7 @@ public class L8312 extends TradeBuffer {
 		int imDelayYM = DealMon(iDelayYM, -1);// 延期繳款年月前1月
 		int sCovDelayYM = 0;// 延期繳款累計期數(「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款')
 		int sDelayYM = 0;// 延期繳款累計期數(「延期繳款原因」為非'L')
+		int sMajorYM = 0;// 延期繳款原因J不能超過12個月
 
 		// 檢核項目(D-25)
 		if (!"4".equals(iTranKey_Tmp)) {
@@ -100,7 +104,8 @@ public class L8312 extends TradeBuffer {
 			// 2.1 KEY值（CustId+SubmitKey+RcDate）不存在則予以剔退***
 			// 2.2 start 完整key值已報送結案則予以剔退
 			if ("A".equals(iTranKey)) {
-				Slice<JcicZ046> sJcicZ046 = sJcicZ046Service.hadZ046(iCustId, iRcDate + 19110000, iSubmitKey, 0, Integer.MAX_VALUE, titaVo);
+				Slice<JcicZ046> sJcicZ046 = sJcicZ046Service.hadZ046(iCustId, iRcDate + 19110000, iSubmitKey, 0,
+						Integer.MAX_VALUE, titaVo);
 				if (sJcicZ046 != null) {
 					int sTranKey = 0;
 					for (JcicZ046 xJcicZ046 : sJcicZ046) {
@@ -124,19 +129,46 @@ public class L8312 extends TradeBuffer {
 				} else {
 					sDelayYM = 1;
 				}
-				Slice<JcicZ051> sJcicZ051 = sJcicZ051Service.SubCustRcEq(iCustId, iRcDate + 19110000, iSubmitKey, 0, Integer.MAX_VALUE, titaVo);
+				Slice<JcicZ051> sJcicZ051 = sJcicZ051Service.SubCustRcEq(iCustId, iRcDate + 19110000, iSubmitKey, 0,
+						Integer.MAX_VALUE, titaVo);
+				int DJcone = 0;
 				if (sJcicZ051 != null) {
 					for (JcicZ051 xJcicZ051 : sJcicZ051) {
-						if (!"D".equals(xJcicZ051.getTranKey()) && !titaVo.getParam("Ukey").equals(xJcicZ051.getUkey())) {
-							if (("D".equals(iDelayCode) && "D".equals(xJcicZ051.getDelayCode())) && (iaDelayYM == xJcicZ051.getDelayYM() || imDelayYM == xJcicZ051.getDelayYM())) {
+						if ((!"L".equals(xJcicZ051.getDelayCode())) && (!"J".equals(xJcicZ051.getDelayCode()))) {
+							if (!"D".equals(xJcicZ051.getDelayCode())) {
+								DJcone++;
+								if (DJcone > 5) {
+									throw new LogicException("E0005", "延期繳款累計期數(月份)不得超過6期");
+								}
+							}
+						}
+					}
+				}
+
+				if (sJcicZ051 != null) {
+					for (JcicZ051 xJcicZ051 : sJcicZ051) {
+						if (!"D".equals(xJcicZ051.getTranKey())
+								&& !titaVo.getParam("Ukey").equals(xJcicZ051.getUkey())) {
+							if (("D".equals(iDelayCode) && "D".equals(xJcicZ051.getDelayCode()))
+									&& (iaDelayYM == xJcicZ051.getDelayYM() || imDelayYM == xJcicZ051.getDelayYM())) {
 								if ("A".equals(iTranKey)) {
 									throw new LogicException("E0005", "延期繳款原因為'D繳稅'者，延期繳款年月不能連續兩期.");
 								} else {
 									throw new LogicException("E0007", "延期繳款原因為'D繳稅'者，延期繳款年月不能連續兩期.");
 								}
 							}
+							if (("E".equals(iDelayCode) && "E".equals(xJcicZ051.getDelayCode()))
+									&& (iaDelayYM == xJcicZ051.getDelayYM() || imDelayYM == xJcicZ051.getDelayYM())) {
+								if ("A".equals(iTranKey)) {
+									throw new LogicException("E0005", "延期繳款原因為'E繳付子女學費'者，延期繳款年月不能連續兩期.");
+								} else {
+									throw new LogicException("E0007", "延期繳款原因為'E繳付子女學費'者，延期繳款年月不能連續兩期.");
+								}
+							}
 							if ("L".equals(xJcicZ051.getDelayCode())) {
 								sCovDelayYM++;
+							} else if ("J".equals(xJcicZ051.getDelayCode())) {
+								sMajorYM++;
 							} else {
 								sDelayYM++;
 							}
@@ -148,13 +180,21 @@ public class L8312 extends TradeBuffer {
 						} else {
 							throw new LogicException("E0007", "延期繳款累計期數(月份)不得超過6期.");
 						}
-					} else if (sCovDelayYM > 6) {
+					}
+					if(sMajorYM>12) { //延期繳款原因J
 						if ("A".equals(iTranKey)) {
-							throw new LogicException("E0005", "「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】.");
+							throw new LogicException("E0005", "「延期繳款原因」為'J本人:為重大災害災民【限累計申請最多12期】.");
 						} else {
-							throw new LogicException("E0007", "「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】.");
+							throw new LogicException("E0007", "「延期繳款原因」為'J本人:為重大災害災民【限累計申請最多12期】.");
 						}
 					}
+//					else if (sCovDelayYM > 6) {
+//						if ("A".equals(iTranKey)) {
+//							throw new LogicException("E0005", "「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】.");
+//						} else {
+//							throw new LogicException("E0007", "「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】.");
+//						}
+//					}
 				} // 4, 5, 7.2 end
 			}
 
@@ -197,10 +237,10 @@ public class L8312 extends TradeBuffer {
 			uJcicZ051.setDelayCode(iDelayCode);
 			uJcicZ051.setDelayDesc(iDelayDesc);
 			uJcicZ051.setOutJcicTxtDate(0);
-			
+
 			uJcicZ051.setActualFilingDate(0);
 			uJcicZ051.setActualFilingMark("");
-			
+
 			try {
 				sJcicZ051Service.update(uJcicZ051, titaVo);
 			} catch (DBException e) {
@@ -213,8 +253,8 @@ public class L8312 extends TradeBuffer {
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
 			iJcicZ051 = sJcicZ051Service.ukeyFirst(iKey, titaVo);
-			//JcicZ051 uJcicZ0512 = new JcicZ051();
-			//uJcicZ0512 = sJcicZ051Service.holdById(iJcicZ051.getJcicZ051Id(), titaVo);
+			// JcicZ051 uJcicZ0512 = new JcicZ051();
+			// uJcicZ0512 = sJcicZ051Service.holdById(iJcicZ051.getJcicZ051Id(), titaVo);
 			iJcicZ051 = sJcicZ051Service.findById(iJcicZ051Id);
 			if (iJcicZ051 == null) {
 				throw new LogicException("E0004", "刪除資料不存在");
@@ -224,22 +264,22 @@ public class L8312 extends TradeBuffer {
 			if (uJcicZ0512 == null) {
 				throw new LogicException("E0004", "刪除資料不存在");
 			}
-			//if (iJcicZ051 == null) {
-			//	throw new LogicException("E0008", "");
-			//}
+			// if (iJcicZ051 == null) {
+			// throw new LogicException("E0008", "");
+			// }
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
-			
+
 			JcicZ051 oldJcicZ0512 = (JcicZ051) iDataLog.clone(uJcicZ0512);
 			uJcicZ0512.setTranKey(iTranKey);
 			uJcicZ0512.setDelayCode(iDelayCode);
 			uJcicZ0512.setDelayDesc(iDelayDesc);
 			uJcicZ0512.setOutJcicTxtDate(0);
-			
+
 			Slice<JcicZ051Log> dJcicLogZ051 = null;
 			dJcicLogZ051 = sJcicZ051LogService.ukeyEq(iJcicZ051.getUkey(), 0, Integer.MAX_VALUE, titaVo);
-			if (dJcicLogZ051 == null|| "A".equals(iTranKey) ) {
+			if (dJcicLogZ051 == null || "A".equals(iTranKey)) {
 				// 尚未開始寫入log檔之資料，主檔資料可刪除
 				try {
 					sJcicZ051Service.delete(iJcicZ051, titaVo);
@@ -262,42 +302,42 @@ public class L8312 extends TradeBuffer {
 			iDataLog.setEnv(titaVo, oldJcicZ0512, uJcicZ0512);
 //			iDataLog.exec("L8312刪除", uJcicZ0512.getSubmitKey()+uJcicZ0512.getCustId()+uJcicZ0512.getRcDate()+(uJcicZ0512.getDelayYM()-191100));
 			iDataLog.exec("L8312刪除", uJcicZ0512.getUkey());
-			
+
 			break;
-			// 修改
-			case "7":
-				iKey = titaVo.getParam("Ukey");
-				iJcicZ051 = sJcicZ051Service.ukeyFirst(iKey, titaVo);
-				JcicZ051 uJcicZ0513 = new JcicZ051();
-				uJcicZ0513 = sJcicZ051Service.holdById(iJcicZ051.getJcicZ051Id(), titaVo);
-				if (uJcicZ0513 == null) {
-					throw new LogicException("E0007", "更生債權金額異動通知資料");
-				}
-				// 2022/7/6新增錯誤判斷
-				int JcicDate3 = iJcicZ051.getOutJcicTxtDate();
-				this.info("JcicDate    = " + JcicDate3);
-				if (JcicDate3 != 0) {
-					throw new LogicException("E0007", "無此修改資料");
-				}
+		// 修改
+		case "7":
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ051 = sJcicZ051Service.ukeyFirst(iKey, titaVo);
+			JcicZ051 uJcicZ0513 = new JcicZ051();
+			uJcicZ0513 = sJcicZ051Service.holdById(iJcicZ051.getJcicZ051Id(), titaVo);
+			if (uJcicZ0513 == null) {
+				throw new LogicException("E0007", "更生債權金額異動通知資料");
+			}
+			// 2022/7/6新增錯誤判斷
+			int JcicDate3 = iJcicZ051.getOutJcicTxtDate();
+			this.info("JcicDate    = " + JcicDate3);
+			if (JcicDate3 != 0) {
+				throw new LogicException("E0007", "無此修改資料");
+			}
 
-				JcicZ051 oldJcicZ0513 = (JcicZ051) iDataLog.clone(uJcicZ0513);
-				uJcicZ0513.setJcicZ051Id(iJcicZ051Id);
-				uJcicZ0513.setTranKey(iTranKey);
-				uJcicZ0513.setDelayCode(iDelayCode);
-				uJcicZ0513.setDelayDesc(iDelayDesc);
-				uJcicZ0513.setUkey(iKey);
+			JcicZ051 oldJcicZ0513 = (JcicZ051) iDataLog.clone(uJcicZ0513);
+			uJcicZ0513.setJcicZ051Id(iJcicZ051Id);
+			uJcicZ0513.setTranKey(iTranKey);
+			uJcicZ0513.setDelayCode(iDelayCode);
+			uJcicZ0513.setDelayDesc(iDelayDesc);
+			uJcicZ0513.setUkey(iKey);
 
-				try {
-					sJcicZ051Service.update(uJcicZ0513, titaVo);
-				} catch (DBException e) {
-					throw new LogicException("E0005", "更生債權金額異動通知資料");
-				}
+			try {
+				sJcicZ051Service.update(uJcicZ0513, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0005", "更生債權金額異動通知資料");
+			}
 
-				iDataLog.setEnv(titaVo, oldJcicZ0513, uJcicZ0513);
+			iDataLog.setEnv(titaVo, oldJcicZ0513, uJcicZ0513);
 //				iDataLog.exec("L8312修改", uJcicZ0513.getSubmitKey()+uJcicZ0513.getCustId()+uJcicZ0513.getRcDate()+(uJcicZ0513.getDelayYM()-191100));
-				iDataLog.exec("L8312修改", uJcicZ0513.getUkey());
-			default:
-				break;
+			iDataLog.exec("L8312修改", uJcicZ0513.getUkey());
+		default:
+			break;
 		}
 
 		this.addList(this.totaVo);

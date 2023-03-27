@@ -44,8 +44,8 @@ BEGIN
          , JOB_START_TIME            AS "LastUpdate"      -- 最後更新日期時間 DATE 
          , '999999'                  AS "LastUpdateEmpNo" -- 最後更新人員 VARCHAR2 6
     FROM "TfClOtherRightsMap" TFM
-    LEFT JOIN "FacMain" FAC ON APLP.LMSACN = TFM.LMSACN
-                           AND APLP.LMSAPN = TFM.LMSAPN
+    LEFT JOIN "FacMain" FAC ON FAC."CustNo" = TFM.LMSACN
+                           AND FAC."FacmNo" = TFM.LMSAPN
     WHERE FAC."ApplNo" IS NOT NULL
     ;
 
