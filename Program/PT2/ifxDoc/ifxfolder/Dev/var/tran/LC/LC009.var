@@ -224,12 +224,14 @@ T(2,#Sno+#CodeX+#ItemX+#Ymd)
 
 ! 2022-11-29 Wei 增加判斷 (QC:2233)
 ! 若經辦與主管皆已簽核,不顯示簽核按鈕
+! 2023-03-28 Wei 增加判斷 (QC:2233)
+! 若主管已簽核,不顯示簽核按鈕
 ! 簽核按鈕
 #BTN2=X,4,S
 C(3,#SignCode,1,BIND(grid,{cmd=CHAIN;ntxcd=LC109;text=簽核;ntxbuf=#BUF2}),BIND(grid,cancel))
 C(3,#SignCode,1,$,s)
-C(4,#TlrNo,s,$)
 C(4,#SupNo,s,BIND(grid,cancel))
+C(4,#TlrNo,s,$)
 
 </sub>
 

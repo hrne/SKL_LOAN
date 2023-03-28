@@ -74,7 +74,7 @@ public class L2074 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-		this.limit = 100; // 136 * 400 = 54400
+		this.limit = Integer.MAX_VALUE; // 136 * 400 = 54400
 
 		// tita
 		// 統編

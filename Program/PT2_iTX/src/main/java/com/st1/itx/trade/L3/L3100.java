@@ -413,10 +413,11 @@ public class L3100 extends TradeBuffer {
 			// 借新還舊(同額度)不檢查動支期限
 			this.info("RenewFlag" + titaVo.getParam("RenewFlag") + "," + titaVo.getParam("RpFacmNo1") + "="
 					+ titaVo.getParam("FacmNo"));
-			if ("2".equals(titaVo.getParam("RenewFlag")) && parse.stringToInteger(titaVo.getParam("RpFacmNo1")) == parse
-					.stringToInteger(titaVo.getParam("FacmNo"))) {
-				this.info("RenewFlag" + titaVo.getParam("RenewFlag") + "," + titaVo.getParam("RpFacmNo1") + "="
-						+ titaVo.getParam("FacmNo"));
+			if ("2".equals(titaVo.getParam("RenewFlag"))) {
+				if (parse.stringToInteger(titaVo.getParam("RpFacmNo1")) != parse
+						.stringToInteger(titaVo.getParam("FacmNo"))) {
+					throw new LogicException(titaVo, "E0015", "收付類別為借新還舊需輸入相同額度編號)"); // 檢查錯誤
+				}
 			} else {
 				// 檢查額度 預約撥款到期執行撥款交易不需更新額度主檔
 				if (wkAvailableAmt.compareTo(iDrawdownAmt) < 0) {
