@@ -36,17 +36,18 @@ BEGIN
          , TFM."ClCode2"             AS "ClCode2"         -- 擔保品代號2 DECIMAL 2
          , TFM."ClNo"                AS "ClNo"            -- 擔保品編號 DECIMAL 7
          , TFM."Seq"                 AS "Seq"             -- 他項權利登記次序 VARCHAR2 8
-         , FAC."ApplNo"              AS "ApproveNo"       -- 核准號碼 DECIMAL 7
-         , TFM.LMSACN                AS "CustNo"          -- 借款人戶號 DECIMAL 7
-         , TFM.LMSAPN                AS "FacmNo"          -- 額度編號 DECIMAL 3
+         , CF."ApproveNo"            AS "ApproveNo"       -- 核准號碼 DECIMAL 7
+         , CF."CustNo"               AS "CustNo"          -- 借款人戶號 DECIMAL 7
+         , CF."FacmNo"               AS "FacmNo"          -- 額度編號 DECIMAL 3
          , JOB_START_TIME            AS "CreateDate"      -- 建檔日期時間 DATE 
          , '999999'                  AS "CreateEmpNo"     -- 建檔人員 VARCHAR2 6
          , JOB_START_TIME            AS "LastUpdate"      -- 最後更新日期時間 DATE 
          , '999999'                  AS "LastUpdateEmpNo" -- 最後更新人員 VARCHAR2 6
     FROM "TfClOtherRightsMap" TFM
-    LEFT JOIN "FacMain" FAC ON FAC."CustNo" = TFM.LMSACN
-                           AND FAC."FacmNo" = TFM.LMSAPN
-    WHERE FAC."ApplNo" IS NOT NULL
+    LEFT JOIN "ClFac" CF ON CF."ClCode1" = TFM."ClCode1"
+                        AND CF."ClCode2" = TFM."ClCode2"
+                        AND CF."ClNo" = TFM."ClNo"
+    WHERE CF."ApproveNo" IS NOT NULL
     ;
 
     -- 記錄寫入筆數

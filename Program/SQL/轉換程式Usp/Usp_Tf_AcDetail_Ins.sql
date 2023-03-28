@@ -21,8 +21,8 @@ BEGIN
  
     DECLARE  
         "TbsDyF" DECIMAL(8); --西元帳務日 
-        "DateStart" DECIMAL(6) := 0 ; -- 資料擷取起日
-        "DateEnd"   DECIMAL(6) := 0 ; -- 資料擷取止日
+        "DateStart" DECIMAL(8) := 0 ; -- 資料擷取起日
+        "DateEnd"   DECIMAL(8) := 0 ; -- 資料擷取止日
     BEGIN 
  
     SELECT "TbsDy" + 19110000 
