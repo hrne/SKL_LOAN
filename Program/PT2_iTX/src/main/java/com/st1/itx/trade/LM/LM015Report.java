@@ -54,7 +54,7 @@ public class LM015Report extends MakeReport {
 		
 		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
 				.setRptCode("LM015").setRptItem("信用曝險分佈報表").setRptSize("A4")
-				.setSecurity(this.getSecurity()).setPageOrientation("P").build();
+				.setPageOrientation("P").build();
 
 		
 		this.open(titaVo, reportVo);
@@ -89,13 +89,13 @@ public class LM015Report extends MakeReport {
 
 			for (Map<String, String> tLDVo : lm015List) {
 				// 擔保放款or催收 區分
-				String f0 = tLDVo.get("F0") == null || tLDVo.get("F0").length() == 0 ? "" : tLDVo.get("F0");
+				String f0 = tLDVo.get("AcctCodeSeq") == null || tLDVo.get("AcctCodeSeq").length() == 0 ? "" : tLDVo.get("AcctCodeSeq");
 
 				// 區域
-				String f1 = tLDVo.get("F1") == null || tLDVo.get("F1").length() == 0 ? "" : tLDVo.get("F1");
+				String f1 = tLDVo.get("CityGroup") == null || tLDVo.get("CityGroup").length() == 0 ? "" : tLDVo.get("CityGroup");
 
 				// 擔保放款or催收 金額
-				BigDecimal f3 = tLDVo.get("F2") == null || tLDVo.get("F2").length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F2"));
+				BigDecimal f3 = tLDVo.get("LoanBal") == null || tLDVo.get("LoanBal").length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("LoanBal"));
 
 				// 相同為0=擔保放款 反之為1= 催收款
 				if (temptt0.equals(f0)) {
@@ -185,7 +185,6 @@ public class LM015Report extends MakeReport {
 			noData();
 		}
 		this.close();
-		//this.toPdf(sno);
 	}
 
 	// 無資料列印格式

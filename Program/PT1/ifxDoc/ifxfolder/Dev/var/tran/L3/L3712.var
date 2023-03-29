@@ -317,7 +317,7 @@ C(3,#BormNo,0,s,T(2,#L3r02CurrencyCode))
 E(0,0)T(H,#CurrencyCode,#CurrPrecisionHelp)
 
 #SendL3r06A=X,1,S
-E(0,@RimFuncCode,2)
+E(0,@RimFuncCode,3)
 E(0,@RimCustNo,#TimCustNo)
 E(0,@RimFacmNo,#FacmNo)
 E(0,@RimBormNo,0)

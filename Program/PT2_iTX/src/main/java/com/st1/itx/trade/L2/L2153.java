@@ -200,7 +200,7 @@ public class L2153 extends TradeBuffer {
 		if (titaVo.isActfgEntry() && titaVo.isHcodeErase()) {
 			EntryEraseRoutine();
 		}
-		// 放行及放行訂正
+		// 放行
 		if (titaVo.isActfgSuprele()) {
 			ReleaseRoutine();
 		}
@@ -208,9 +208,9 @@ public class L2153 extends TradeBuffer {
 		if ("02".equals(titaVo.getParam("RepayCode"))) {
 			bankAuthActCom.add("A", titaVo);
 		}
+		// 2段式放行或1段式
 		if (titaVo.isActfgRelease()) {
-//			bankAuthActCom.add("A",titaVo);
-			// 新還款帳號(含還款方式)刪除
+			// 還款方式變更記錄檔
 			if (!"02".equals(titaVo.getParam("RepayCode"))) {
 				txtitaVo = new TitaVo();
 				txtitaVo = (TitaVo) titaVo.clone();
@@ -327,10 +327,6 @@ public class L2153 extends TradeBuffer {
 				loanCom.setTxTemp(tTxTempId, tTxTemp, wkCustNo, wkFacmNo, 0, 0, titaVo);
 				tTempVo.clear();
 				tTempVo.putParam("ActFg", tFacMain.getActFg());
-				tTempVo.putParam("LastAcctDate", tFacMain.getLastAcctDate());
-				tTempVo.putParam("LastKinbr", tFacMain.getLastKinbr());
-				tTempVo.putParam("LastTlrNo", tFacMain.getLastTlrNo());
-				tTempVo.putParam("LastTxtNo", tFacMain.getLastTxtNo());
 				tTxTemp.setText(tTempVo.getJsonString());
 				try {
 					txTempService.insert(tTxTemp, titaVo);
@@ -339,22 +335,6 @@ public class L2153 extends TradeBuffer {
 				}
 				// 更新額度主檔
 				tFacMain.setActFg(titaVo.getActFgI());
-				tFacMain.setLastAcctDate(titaVo.getEntDyI());
-				tFacMain.setLastKinbr(titaVo.getKinbr());
-				tFacMain.setLastTlrNo(titaVo.getTlrNo());
-				tFacMain.setLastTxtNo(titaVo.getTxtNo());
-			}
-			// 放行訂正
-			if (titaVo.isHcodeErase()) {
-				// 放款交易訂正交易須由最後一筆交易開始訂正
-				loanCom.checkEraseFacmTxSeqNo(tFacMain, titaVo);
-				tTempVo = tTempVo.getVo(tx.getText());
-				tFacMain.setActFg(this.parse.stringToInteger(tTempVo.getParam("ActFg")));
-				tFacMain.setLastAcctDate(this.parse.stringToInteger(tTempVo.getParam("LastAcctDate")));
-				tFacMain.setLastKinbr(tTempVo.getParam("LastKinbr"));
-				tFacMain.setLastTlrNo(tTempVo.getParam("LastTlrNo"));
-				tFacMain.setLastTxtNo(tTempVo.getParam("LastTxtNo"));
-
 			}
 			try {
 				tFacMain = facMainService.update2(tFacMain, titaVo);

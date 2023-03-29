@@ -822,7 +822,7 @@ T(H,@CurrencyCodeX,#CurrencyCode,#CurrencyCodeHelp)
 T(H,@RateCodeX,#RateCode,#FacmRateCodeHelp)
 T(H,@AcctCodeX,#AcctCode,#FacmAcctCodeHelp)
 T(H,@AmortizedCodeX,#AmortizedCode,#FacmAmortizedCodeHelp)
-T(H,@FreqBaseX,#FreqBase,#FreqBase2Help)
+T(H,@FreqBaseX,#FreqBase,#FreqBaseHelp)
 T(H,@NotYetFlagX,#NotYetFlag,#YNHelp)
 T(H,@CompensateFlagX,#CompensateFlag,#YNHelp)
 T(H,@RepayCodeX,#RepayCode,#RepayCodeHelp)
@@ -2379,7 +2379,6 @@ E(2,@Sno,#PdfSnoF)
 ! 匯款單FileNo
 #PdfPrtF=A,1,S
 C(3,#Sno,0,E(0,0),E(0,1))
-
 
 ! 匯款單FileNo
 #DPdfSnoF=X,8,S

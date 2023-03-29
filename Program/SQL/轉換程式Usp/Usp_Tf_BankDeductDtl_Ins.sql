@@ -6,6 +6,7 @@ set define off;
 CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_BankDeductDtl_Ins" 
 ( 
     -- 參數 
+    "ExecSeq"      IN  INT,       --執行序號
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間 
     JOB_END_TIME   OUT TIMESTAMP, --程式結束時間 
     INS_CNT        OUT INT,       --新增資料筆數 
@@ -19,13 +20,28 @@ BEGIN
     JOB_START_TIME := SYSTIMESTAMP; 
  
     DECLARE 
-      "DateStart" DECIMAL(8) := 201901; 
+        "DateStart" DECIMAL(8) := 0 ; -- 資料擷取起日
+        "DateEnd"   DECIMAL(8) := 0 ; -- 資料擷取止日
     BEGIN 
  
     -- 刪除舊資料 
-    EXECUTE IMMEDIATE 'ALTER TABLE "BankDeductDtl" DISABLE PRIMARY KEY CASCADE'; 
-    EXECUTE IMMEDIATE 'TRUNCATE TABLE "BankDeductDtl" DROP STORAGE'; 
-    EXECUTE IMMEDIATE 'ALTER TABLE "BankDeductDtl" ENABLE PRIMARY KEY'; 
+    IF "ExecSeq" = 1 THEN
+      EXECUTE IMMEDIATE 'ALTER TABLE "BankDeductDtl" DISABLE PRIMARY KEY CASCADE'; 
+      EXECUTE IMMEDIATE 'TRUNCATE TABLE "BankDeductDtl" DROP STORAGE'; 
+      EXECUTE IMMEDIATE 'ALTER TABLE "BankDeductDtl" ENABLE PRIMARY KEY'; 
+    END IF;
+
+    SELECT "StartDate"
+    INTO "DateStart"
+    FROM "TfByYear"
+    WHERE "Seq" = "ExecSeq"
+    ;
+
+    SELECT "EndDate"
+    INTO "DateEnd"
+    FROM "TfByYear"
+    WHERE "Seq" = "ExecSeq"
+    ;
  
     -- 寫入資料 
     INSERT INTO "BankDeductDtl" (
@@ -87,7 +103,8 @@ BEGIN
                  ORDER BY "MediaSeq" desc 
              ) AS "Seq" 
       FROM "PostDeductMedia" 
-      WHERE TRUNC("MediaDate" / 100) >= "DateStart" 
+      WHERE "MediaDate" >= "DateStart" 
+        AND "MediaDate" <= "DateEnd" 
     ) 
     , PDM AS ( 
       SELECT "MediaDate" 
@@ -234,7 +251,8 @@ BEGIN
                  AND MBK."MBKTRX" = '1' -- 火險費 
             THEN 0 
           ELSE 1 END = 1 
-      AND TRUNC(MBK."TRXIDT" / 100) >= "DateStart" 
+      AND MBK."TRXIDT" >= "DateStart" 
+      AND MBK."TRXIDT" <= "DateEnd" 
     ; 
  
     -- 記錄寫入筆數 
@@ -454,7 +472,8 @@ BEGIN
                        AND td.TRXNMT = MBK.TRXNMT
     LEFT JOIN "As400EmpNoMapping" AEM ON AEM."As400TellerNo" = td.TRXMEM
     -- WHERE NVL(MBK.MBKCDE,' ') = 'Y' 
-    WHERE TRUNC(MBK."TRXIDT" / 100) >= "DateStart" 
+    WHERE MBK."TRXIDT" >= "DateStart" 
+      AND MBK."TRXIDT" <= "DateEnd" 
     ; 
  
     -- 記錄寫入筆數 

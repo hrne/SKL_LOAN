@@ -177,7 +177,7 @@ public class L2154 extends TradeBuffer {
 		if (titaVo.isActfgEntry() && titaVo.isHcodeErase()) {
 			EntryEraseRoutine();
 		}
-		// 放行及放行訂正
+		// 放行
 		if (titaVo.isActfgSuprele()) {
 			if (iFuncCode == 4 & titaVo.isHcodeErase()) { // 刪除
 				throw new LogicException(titaVo, "E0010", "刪除後不可訂正"); // 功能選擇錯誤
@@ -335,10 +335,6 @@ public class L2154 extends TradeBuffer {
 					loanCom.setTxTemp(tTxTempId, tTxTemp, wkCustNo, wkFacmNo, 0, 0, titaVo);
 					tTempVo.clear();
 					tTempVo.putParam("ActFg", tFacMain.getActFg());
-					tTempVo.putParam("LastAcctDate", tFacMain.getLastAcctDate());
-					tTempVo.putParam("LastKinbr", tFacMain.getLastKinbr());
-					tTempVo.putParam("LastTlrNo", tFacMain.getLastTlrNo());
-					tTempVo.putParam("LastTxtNo", tFacMain.getLastTxtNo());
 					tTxTemp.setText(tTempVo.getJsonString());
 					try {
 						txTempService.insert(tTxTemp, titaVo);
@@ -347,10 +343,6 @@ public class L2154 extends TradeBuffer {
 					}
 					// 更新額度主檔
 					tFacMain.setActFg(titaVo.getActFgI());
-					tFacMain.setLastAcctDate(titaVo.getEntDyI());
-					tFacMain.setLastKinbr(titaVo.getKinbr());
-					tFacMain.setLastTlrNo(titaVo.getTlrNo());
-					tFacMain.setLastTxtNo(titaVo.getTxtNo());
 					try {
 						tFacMain = facMainService.update(tFacMain, titaVo);
 					} catch (DBException e) {
@@ -389,31 +381,6 @@ public class L2154 extends TradeBuffer {
 					}
 					// 刪除階梯式利率
 					DeleteFacProdStepRateRoutine();
-					break;
-				}
-			}
-			// 放行訂正
-			if (titaVo.isHcodeErase()) {
-				// 放款交易訂正交易須由最後一筆交易開始訂正
-				loanCom.checkEraseFacmTxSeqNo(tFacMain, titaVo);
-				tTempVo = tTempVo.getVo(tx.getText());
-				switch (iFuncCode) {
-				case 2: // 修改
-					tFacMain.setActFg(this.parse.stringToInteger(tTempVo.getParam("ActFg")));
-					tFacMain.setLastAcctDate(this.parse.stringToInteger(tTempVo.getParam("LastAcctDate")));
-					tFacMain.setLastKinbr(tTempVo.getParam("LastKinbr"));
-					tFacMain.setLastTlrNo(tTempVo.getParam("LastTlrNo"));
-					tFacMain.setLastTxtNo(tTempVo.getParam("LastTxtNo"));
-					try {
-						tFacMain = facMainService.update(tFacMain, titaVo);
-					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0008",
-								"額度主檔 戶號 = " + wkCustNo + "額度編號 = " + wkFacmNo + e.getErrorMsg()); // 新增資料時，發生錯誤
-					}
-					break;
-				case 4: // 刪除
-					// 還原額度檔
-					RestoredDeletedFacMainRoutine();
 					break;
 				}
 			}
@@ -852,32 +819,39 @@ public class L2154 extends TradeBuffer {
 				&& titaVo.getParam("RepayBank").equals(titaVo.getParam("OldRepayBank"))
 				&& titaVo.getParam("PostCode").equals(titaVo.getParam("OldPostCode"))
 				&& titaVo.getParam("RepayAcctNo").equals(titaVo.getParam("OldAcctNo"))) {
-
 			return;
 		}
-		if (titaVo.isActfgSuprele()) {
+
+		txtitaVo = new TitaVo();
+		txtitaVo = (TitaVo) titaVo.clone();
+		txtitaVo.putParam("RepayCode", titaVo.getParam("OldRepayCode"));
+		txtitaVo.putParam("PostCode", titaVo.getParam("OldPostCode"));
+		txtitaVo.putParam("RepayAcctNo", titaVo.getParam("OldAcctNo"));
+		txtitaVo.putParam("RelationCode", titaVo.getParam("OldRelationCode"));
+		txtitaVo.putParam("RelationName", titaVo.getParam("OldRelationName"));
+		txtitaVo.putParam("RelationBirthday", titaVo.getParam("OldRelationBirthday"));
+		txtitaVo.putParam("RelationGender", titaVo.getParam("OldRelationGender"));
+		txtitaVo.putParam("RelationId", titaVo.getParam("OldRelationId"));
+		txtitaVo.putParam("RepayBank", titaVo.getParam("OldRepayBank"));
+		// 2段式放行或1段式
+		if (titaVo.isActfgRelease()) {
 			// 舊還款帳號(含還款方式)刪除
 			if ("02".equals(titaVo.getParam("OldRepayCode"))) {
-				txtitaVo = new TitaVo();
-				txtitaVo = (TitaVo) titaVo.clone();
-				txtitaVo.putParam("RepayCode", titaVo.getParam("OldRepayCode"));
-				txtitaVo.putParam("PostCode", titaVo.getParam("OldPostCode"));
-				txtitaVo.putParam("RepayAcctNo", titaVo.getParam("OldAcctNo"));
-				txtitaVo.putParam("RelationCode", titaVo.getParam("OldRelationCode"));
-				txtitaVo.putParam("RelationName", titaVo.getParam("OldRelationName"));
-				txtitaVo.putParam("RelationBirthday", titaVo.getParam("OldRelationBirthday"));
-				txtitaVo.putParam("RelationGender", titaVo.getParam("OldRelationGender"));
-				txtitaVo.putParam("RelationId", titaVo.getParam("OldRelationId"));
-				txtitaVo.putParam("RepayBank", titaVo.getParam("OldRepayBank"));
 				bankAuthActCom.del("A", txtitaVo);
 			}
-			// 新還款帳號(含還款方式)刪除
+			if ("02".equals(titaVo.getParam("RepayCode"))) {
+				bankAuthActCom.add("A", titaVo);
+			}
+			// 還款方式變更記錄檔
 			if (!"02".equals(titaVo.getParam("RepayCode"))) {
 				bankAuthActCom.addRepayActChangeLog(titaVo);
 			}
+		} else {
+			// 經辦登錄檢查
+			if ("02".equals(titaVo.getParam("RepayCode"))) {
+				bankAuthActCom.add("A", titaVo);
+			}
 		}
-		// 新還款帳號(含還款方式)
-		bankAuthActCom.add("A", titaVo);
 
 	}
 
@@ -888,7 +862,6 @@ public class L2154 extends TradeBuffer {
 		DeleteFacProdStepRateRoutine();
 		// 更新階梯式利率
 		FacProdStepRate tFacProdStepRate = new FacProdStepRate();
-
 
 		for (int i = 1; i <= 10; i++) {
 			if (this.parse.stringToDouble(titaVo.getParam("StepMonthE" + i)) > 0) {

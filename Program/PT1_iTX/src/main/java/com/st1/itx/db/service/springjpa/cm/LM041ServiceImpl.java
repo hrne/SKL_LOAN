@@ -51,7 +51,7 @@ public class LM041ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,ViableCusts.\"FacmNo\" ";
 		sql += "       ,ViableCusts.\"Status\" ";
 		sql += "       ,\"Fn_ParseEOL\"(C.\"CustName\",0) AS \"CustName\"";
-		sql += "       ,A.\"RvBal\" ";
+		sql += "       ,DECODE(ViableCusts.\"Status\",2,A2.\"RvBal\",A.\"RvBal\") AS \"RvBal\"";
 		sql += " FROM ( SELECT \"CityCode\" ";
 		sql += "              ,MAX(\"Status\") \"Status\" ";
 		sql += "              ,\"CustNo\" ";
@@ -68,9 +68,18 @@ public class LM041ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               AND \"DbCr\" = 'D' ";
 		sql += "               AND \"AcDate\" = :entdy ";
 		sql += "             ) A ON A.\"CustNo\" = ViableCusts.\"CustNo\" ";
+		sql += "                AND ViableCusts.\"Status\" = 6 ";
+		sql += " LEFT JOIN ( SELECT \"CustNo\" ";
+		sql += "                   ,\"AcBal\" AS  \"RvBal\" ";
+		sql += "             FROM \"AcReceivable\" ";
+		sql += "             WHERE \"AcctCode\" = 'TAV' ";
+		sql += "               AND \"OpenAcDate\" = :entdy ";
+		sql += "             ) A2 ON A2.\"CustNo\" = ViableCusts.\"CustNo\" ";
+		sql += "                 AND ViableCusts.\"Status\" = 2 ";
 		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = ViableCusts.\"CustNo\" ";
 		sql += " LEFT JOIN \"CdCity\" CT  ON CT.\"CityCode\" = ViableCusts.\"CityCode\" ";
 		sql += " WHERE NVL(A.\"RvBal\", 0) > 0 ";
+		sql += " 	OR NVL(A2.\"RvBal\", 0) > 0 ";
 		this.info("sql=" + sql);
 
 		Query query;

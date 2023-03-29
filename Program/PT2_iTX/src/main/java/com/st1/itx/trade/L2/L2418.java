@@ -336,7 +336,7 @@ public class L2418 extends TradeBuffer {
 			}
 		}
 
-		if (iFunCd == 2 ) {
+		if (iFunCd == 2 && !isEloan) {//ELOAN一次只上送一筆
 			for (int i = 0; i < lClOtherRightsFacS; i++) {// 原資料庫筆數
 				int slApplNo = slClOtherRightsFacApplNo[i];// 原資料庫值
 				boolean findfg = false;

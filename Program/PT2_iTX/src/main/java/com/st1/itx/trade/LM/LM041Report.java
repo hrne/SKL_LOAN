@@ -94,6 +94,11 @@ public class LM041Report extends MakeReport {
 					int col = i + 1;
 
 					switch (i) {
+					case 4:
+						String valueItem = "2".equals(value) ? "2：催收戶" : "6：呆帳戶";
+
+						makeExcel.setValue(row, col, valueItem);
+						break;
 					case 6:
 						BigDecimal bd = getBigDecimal(value);
 						total = total.add(bd);

@@ -817,7 +817,9 @@ public class BankAuthActCom extends TradeBuffer {
 		if (titaVo.getActFgI() == 1) {
 			return;
 		}
-		addRepayActChangeLog(status, titaVo);// 新增還款帳號變更(含還款方式)紀錄檔
+		if (titaVo.isHcodeNormal()) {
+			addRepayActChangeLog(status, titaVo);// 新增還款帳號變更(含還款方式)紀錄檔
+		}
 		if ("700".equals(iRepayBank)) {
 			if (this.isNewAct) {
 				tBankAuthAct = inserBankAuthAct("01", acctSeq, status, titaVo);
@@ -885,19 +887,32 @@ public class BankAuthActCom extends TradeBuffer {
 		// 同戶扣款帳號
 
 		tBankAuthAct = getRepayAcct(titaVo);
-
-		this.info("tBankAuthAct = " + tBankAuthAct);
-		// 同戶無該扣款帳號、未授權
-		this.info("status = " + status);
-		if (tBankAuthAct == null && "".equals(status.trim())) {
-			this.isDelLog = true;
-			if ("700".equals(iRepayBank)) {
-				deletePostAuthLog("1", "1", titaVo);
-				deletePostAuthLog("1", "2", titaVo);
-			} else {
-				deleteAchAuthLog("A", titaVo);
+		if ("L2154".equals(titaVo.getTxcd()) || "L2153".equals(titaVo.getTxcd())) {
+			if (titaVo.isActfgSuprele()) {
+				// 同戶無該扣款帳號、未授權
+				if (tBankAuthAct == null && "".equals(status.trim())) {
+					this.isDelLog = true;
+					if ("700".equals(iRepayBank)) {
+						deletePostAuthLog("1", "1", titaVo);
+						deletePostAuthLog("1", "2", titaVo);
+					} else {
+						deleteAchAuthLog("A", titaVo);
+					}
+				}
+			}
+		} else {
+			// 同戶無該扣款帳號、未授權
+			if (tBankAuthAct == null && "".equals(status.trim())) {
+				this.isDelLog = true;
+				if ("700".equals(iRepayBank)) {
+					deletePostAuthLog("1", "1", titaVo);
+					deletePostAuthLog("1", "2", titaVo);
+				} else {
+					deleteAchAuthLog("A", titaVo);
+				}
 			}
 		}
+
 		this.info("isDelLog = " + isDelLog);
 
 		addRepayActChangeLogDelete(titaVo);// 刪除還款帳號變更(含還款方式)紀錄檔
