@@ -102,25 +102,24 @@ public class LC001 extends TradeBuffer {
 					String daTranNo = lc001Vo.get("TranNo");
 
 					int supRelease = 0;
-					//L3100 由經辦執行訂正
-					if (daTranNo.equals("L3100")) {
+					//由經辦執行訂正
+					
 						if (iLevelFg == 1) {
 							supRelease = 1;
 						} else {
 							supRelease = 0;
 						}
-					} else {
-						// 兩段式以上的登錄交易==>主管已放行，不顯示<修正>按鈕
-						if (daFlowType > 1 && daEntdy < tbsdy) {
-							// 非一段式交易,不可訂正非本日交易
-							supRelease = 1;
-						} else if (daFlowType > 1 && daFlowStep == 1) {
-							if (daFlowStep != daFlowStep2 || (daFlowStep == 1 && daSubmitFg == 1 && daFlowMode != 3)) {
-								supRelease = 1; // 1的時候 按鈕不開
-							}
 
-						}
-					}
+					
+					// 	// 兩段式以上的登錄交易==>主管已放行，不顯示<修正>按鈕
+					// 	if (daFlowType > 1 && daEntdy < tbsdy) {
+					// 		// 非一段式交易,不可訂正非本日交易
+					// 		supRelease = 1;
+					// 	} else if (daFlowType > 1 && daFlowStep == 1) {
+					// 		if (daFlowStep != daFlowStep2 || (daFlowStep == 1 && daSubmitFg == 1 && daFlowMode != 3)) {
+					// 			supRelease = 1; // 1的時候 按鈕不開
+					// 		}
+					// 	}
 
 					OccursList occursList = new OccursList();
 					occursList.putParam("CalDate", daCalDate);

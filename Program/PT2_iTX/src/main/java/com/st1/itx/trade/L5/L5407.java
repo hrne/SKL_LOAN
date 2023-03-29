@@ -21,29 +21,30 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 
-@Component("L5407")
-@Scope("prototype")
-
 /**
  * 房貸協辦人員等級維護
  * 
  * @author Fegie
  * @version 1.0.0
  */
-
+@Component("L5407")
+@Scope("prototype")
 public class L5407 extends TradeBuffer {
-	/* 轉型共用工具 */
 
 	@Autowired
-	public PfCoOfficerService iPfCoOfficerService;
+	private PfCoOfficerService iPfCoOfficerService;
+
 	@Autowired
-	public PfCoOfficerLogService iPfCoOfficerLogService;
+	private PfCoOfficerLogService iPfCoOfficerLogService;
+
 	@Autowired
-	public CdEmpService iCdEmpService;
+	private CdEmpService iCdEmpService;
+
 	@Autowired
-	public DataLog iDataLog;
+	private DataLog iDataLog;
+
 	@Autowired
-	public DateUtil iDateUtil;
+	private DateUtil iDateUtil;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -69,7 +70,8 @@ public class L5407 extends TradeBuffer {
 		String iDistItem = titaVo.getParam("DistCodeX");
 		String iDeptItem = titaVo.getParam("DeptCodeX");
 
-		PfCoOfficer iPfCoOfficer, nPfCoOfficer = new PfCoOfficer();
+		PfCoOfficer iPfCoOfficer;
+		PfCoOfficer nPfCoOfficer = new PfCoOfficer();
 		PfCoOfficerId nPfCoOfficerId = new PfCoOfficerId();
 		switch (iFunctionCd) {
 		case "1": // 1跟3為類似的 新增 ，2是修改，4是刪除
@@ -83,11 +85,11 @@ public class L5407 extends TradeBuffer {
 				}
 			}
 			iPfCoOfficer = iPfCoOfficerService.findByEmpNoFirst(iEmpNo, titaVo);
-			if (iPfCoOfficer != null) {
-				if (iPfCoOfficer.getEffectiveDate() > Integer.valueOf(titaVo.getParam("EffectiveDate"))) {
-					throw new LogicException("E0005", "新增時發生錯誤，新生效日需大於舊生效日");
-				}
+			if (iPfCoOfficer != null
+					&& iPfCoOfficer.getEffectiveDate() > Integer.valueOf(titaVo.getParam("EffectiveDate"))) {
+				throw new LogicException("E0005", "新增時發生錯誤，新生效日需大於舊生效日");
 			}
+
 			// 全新資料
 			nPfCoOfficerId.setEmpNo(iEmpNo);
 			nPfCoOfficerId.setEffectiveDate(iEffectiveDate);
@@ -109,29 +111,54 @@ public class L5407 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException("E0005", "新增時發生錯誤，該生效日期已存在");
 			}
-			UpdateLog(titaVo);
+			updateLog(titaVo);
 			break;
 		case "2":
 			PfCoOfficerId oPfCoOfficerId = new PfCoOfficerId();
 			oPfCoOfficerId.setEffectiveDate(iEffectiveDate);
 			oPfCoOfficerId.setEmpNo(iEmpNo);
 			PfCoOfficer oPfCoOfficer = iPfCoOfficerService.holdById(oPfCoOfficerId, titaVo);
-			PfCoOfficer cPfCoOfficer = (PfCoOfficer) iDataLog.clone(oPfCoOfficer);
+			if (oPfCoOfficer == null) {
+				// 全新資料
+				nPfCoOfficerId.setEmpNo(iEmpNo);
+				nPfCoOfficerId.setEffectiveDate(iEffectiveDate);
+				nPfCoOfficer.setPfCoOfficerId(nPfCoOfficerId);
+				nPfCoOfficer.setEmpClass(iEmpClass);
+				nPfCoOfficer.setClassPass(iClassPass);
+				if (iIneffectiveDate != 19110000) {
+					nPfCoOfficer.setIneffectiveDate(iIneffectiveDate);
+				}
+				nPfCoOfficer.setAreaCode(iAreaCode);
+				nPfCoOfficer.setDistCode(iDistCode);
+				nPfCoOfficer.setDeptCode(iDeptCode);
+				nPfCoOfficer.setAreaItem(iAreaItem);
+				nPfCoOfficer.setDistItem(iDistItem);
+				nPfCoOfficer.setDeptItem(iDeptItem);
 
-			oPfCoOfficer.setClassPass(iClassPass);
-			if (iIneffectiveDate != 19110000) {
-				oPfCoOfficer.setIneffectiveDate(iIneffectiveDate);
+				try {
+					iPfCoOfficerService.insert(nPfCoOfficer, titaVo);
+				} catch (DBException e) {
+					throw new LogicException("E0005", "修改時發生錯誤，該生效日期已存在");
+				}
+				updateLog(titaVo);
+			} else {
+				PfCoOfficer cPfCoOfficer = (PfCoOfficer) iDataLog.clone(oPfCoOfficer);
+
+				oPfCoOfficer.setClassPass(iClassPass);
+				if (iIneffectiveDate != 19110000) {
+					oPfCoOfficer.setIneffectiveDate(iIneffectiveDate);
+				}
+				oPfCoOfficer.setEmpClass(iEmpClass);
+				try {
+					oPfCoOfficer = iPfCoOfficerService.update2(oPfCoOfficer, titaVo);
+				} catch (DBException e) {
+					throw new LogicException("E0005", "修改時發生錯誤");
+				}
+				// 紀錄變更前變更後
+				iDataLog.setEnv(titaVo, cPfCoOfficer, oPfCoOfficer);
+				iDataLog.exec();
+				updateLog(titaVo);
 			}
-			oPfCoOfficer.setEmpClass(iEmpClass);
-			try {
-				oPfCoOfficer = iPfCoOfficerService.update2(oPfCoOfficer, titaVo);
-			} catch (DBException e) {
-				throw new LogicException("E0005", "修改時發生錯誤");
-			}
-			// 紀錄變更前變更後
-			iDataLog.setEnv(titaVo, cPfCoOfficer, oPfCoOfficer);
-			iDataLog.exec();
-			UpdateLog(titaVo);
 			break;
 		case "3":
 			Slice<PfCoOfficer> x3PfCoOfficer = null;
@@ -144,11 +171,12 @@ public class L5407 extends TradeBuffer {
 				}
 			}
 			iPfCoOfficer = iPfCoOfficerService.findByEmpNoFirst(iEmpNo, titaVo);
-			if (iPfCoOfficer != null) {
-				if (iPfCoOfficer.getEffectiveDate() > Integer.valueOf(titaVo.getParam("EffectiveDate"))) {
-					throw new LogicException("E0005", "新增時發生錯誤，新生效日需大於舊生效日");
-				}
+
+			if (iPfCoOfficer != null
+					&& iPfCoOfficer.getEffectiveDate() > Integer.valueOf(titaVo.getParam("EffectiveDate"))) {
+				throw new LogicException("E0005", "新增時發生錯誤，新生效日需大於舊生效日");
 			}
+
 			// 全新資料
 			nPfCoOfficerId.setEmpNo(iEmpNo);
 			nPfCoOfficerId.setEffectiveDate(iEffectiveDate);
@@ -169,7 +197,7 @@ public class L5407 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException("E0005", "新增時發生錯誤，該生效日期已存在");
 			}
-			UpdateLog(titaVo);
+			updateLog(titaVo);
 			break;
 		case "4":
 			PfCoOfficerId iPfCoOfficerId = new PfCoOfficerId();
@@ -185,7 +213,7 @@ public class L5407 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException("E0005", "刪除時發生錯誤");
 			}
-			UpdateLog(titaVo);
+			updateLog(titaVo);
 
 			break;
 		default:
@@ -195,7 +223,7 @@ public class L5407 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private void UpdateLog(TitaVo titaVo) throws LogicException {
+	private void updateLog(TitaVo titaVo) throws LogicException {
 		this.totaVo.init(titaVo);
 		String iFunctionCd = titaVo.getParam("FunctionCd");
 		String iEmpNo = titaVo.getParam("EmpNo");

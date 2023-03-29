@@ -124,11 +124,19 @@ public class L2918ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		sql += " LEFT JOIN \"CdCode\" ccode2 ON ccode2.\"Code\" = clor.\"City\" ";
 		sql += "                         AND ccode2.\"DefCode\" = 'ClOtherRightsCityCd' ";
+		sql += " LEFT JOIN \"ClOtherRightsFac\" crf ON crf.\"ClCode1\" = clor.\"ClCode1\" ";//20230327增加條件
+		sql += "                                   AND crf.\"ClCode2\" = clor.\"ClCode2\" ";
+		sql += "                                   AND crf.\"ClNo\"    = clor.\"ClNo\" ";
+		sql += "                                   AND crf.\"Seq\"     = clor.\"Seq\" ";
+		
 		if (iCustNo > 0) {
 			sql += " WHERE ";
 			sql += " cf.\"CustNo\" = :custNo ";
 			sql += " AND cf.\"FacmNo\" >= :facmNoS ";
 			sql += " AND cf.\"FacmNo\" <= :facmNoE ";
+			sql += " AND crf.\"CustNo\" = :custNo ";
+			sql += " AND crf.\"FacmNo\" >= :facmNoS ";
+			sql += " AND crf.\"FacmNo\" <= :facmNoE ";
 		}
 
 		sql += " GROUP BY ";

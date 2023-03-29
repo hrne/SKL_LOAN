@@ -34,10 +34,10 @@ public class LM015ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("entdy == >" + entdy);
 		String sql = "SELECT \"F1\"";
 		sql += "              , \"F2\"";
-		sql += "              , ROUND(SUM(F3),0)";
+		sql += "              , SUM(F3)";
 		sql += "        FROM ( SELECT DECODE(M.\"AcctCode\", '990', 1, 0) AS F1";
 		sql += "                    , NVL(A.\"CityGroup\",'A') AS F2";
-		sql += "                    , NVL(MBV.\"BookValue\",M.\"LoanBalance\") AS F3";
+		sql += "                    , ROUND(NVL(MBV.\"BookValue\",M.\"LoanBalance\")) AS F3";
 		sql += "               FROM \"MonthlyLoanBal\" M";
 		sql += "               LEFT JOIN(SELECT \"CityGroup\"";
 		sql += "               		           ,\"CityCode\"";
