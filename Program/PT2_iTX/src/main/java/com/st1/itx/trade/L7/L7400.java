@@ -21,6 +21,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.SlipMedia2022;
 import com.st1.itx.db.domain.TxToDoDetailId;
 import com.st1.itx.db.service.AcDetailService;
@@ -118,6 +119,8 @@ public class L7400 extends TradeBuffer {
 
 		if (listSlipMedia2022 == null || listSlipMedia2022.isEmpty()) {
 			this.info("無資料");
+			// TxToDo回寫狀態
+			updateTxToDo(iAcDate, iBatchNo, iMediaSeq, titaVo);
 			throw new LogicException("E0001", "總帳傳票檔");
 		}
 

@@ -30,8 +30,8 @@ public class L9734ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 執行報表輸出(覆審報表)
 	 * 
 	 * @param titaVo
-	 * @param yearMonth 
-	 * @param conditionCode 
+	 * @param yearMonth
+	 * @param conditionCode
 	 * @return
 	 * @throws Exception
 	 */
@@ -45,26 +45,35 @@ public class L9734ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String iYearMonth = String.valueOf((iYear * 100) + iMonth);
 
 		String sql = " ";
-		this.info("L9734.findAll iYeariMonth=" + iYearMonth);
-		
-		Query query;
-		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-		query = em.createNativeQuery(sql);
-		
+		this.info("iYeariMonth=" + iYearMonth);
+		this.info("conditionCode=" + conditionCode);
+
+		String iYearMonthL5 = "";
+
+		// 此表根據樣張明細備註有取五個月前的撥款日
+		if (iMonth - 5 < 0) {
+			iYearMonthL5 = String.valueOf(((iYear - 1) * 100) + (12 + (iMonth - 5)));
+		} else {
+			iYearMonthL5 = String.valueOf((iYear * 100) + (iMonth - 5));
+		}
+
+		iYearMonth = String.valueOf((iYear * 100) + iMonth);
+
 		switch (conditionCode) {
-		
-		case 1://覆審案件資料表-個金3000萬以上
-		case 2://覆審案件資料表-企金3000萬以上
-			sql += "SELECT R.\"CustNo\" AS F0";
-			sql += "			,R.\"FacmNo\" AS F1";
-			sql += "			,\"Fn_ParseEOL\"(C.\"CustName\",0) AS F2";
-			sql += "			,R.\"ReChkYearMonth\" AS F3";
-			sql += "			,R.\"DrawdownDate\" AS F4";
-			sql += "			,R.\"LoanBal\" AS F5";
-			sql += "			,R2.\"tLoanBal\" AS F6";
-			sql += "			,NVL(RC.\"RenewCode\",' ') AS F7";
-			sql += "			,DECODE(R.\"ReCheckCode\",'2','*',' ') AS F8";
-			sql += "			,R.\"Evaluation\" AS F9";
+
+		case 1:// 覆審案件資料表-個金3000萬以上
+		case 2:// 覆審案件資料表-企金3000萬以上
+			sql += "SELECT R.\"CustNo\"";
+			sql += "			,R.\"FacmNo\"";
+			sql += "			,\"Fn_ParseEOL\"(C.\"CustName\",0) AS \"CustName\"";
+			sql += "			,R.\"ReChkYearMonth\"";
+			sql += "			,R.\"DrawdownDate\"";
+			sql += "			,R3.\"PrevPayIntDate\"";
+			sql += "			,R.\"LoanBal\"";
+			sql += "			,R2.\"tLoanBal\"";
+			sql += "			,NVL(RC.\"RenewCode\",' ') AS \"RenewCode\"";
+			sql += "			,DECODE(R.\"ReCheckCode\",'2','*',' ') AS \"ReCheckCode\"";
+			sql += "			,R.\"Evaluation\"";
 			sql += "	  FROM \"InnReCheck\" R";
 			sql += "	  LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = R.\"CustNo\"";
 			sql += "	  LEFT JOIN (SELECT \"CustNo\"";
@@ -82,25 +91,34 @@ public class L9734ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "				   AND \"LoanBal\" > 0 ";
 			sql += "				 GROUP BY \"CustNo\") R2";
 			sql += "	    ON R2.\"CustNo\" = R.\"CustNo\" ";
+			sql += "	  LEFT JOIN (SELECT \"CustNo\"";
+			sql += "					   ,\"FacmNo\" ";
+			sql += "					   ,MIN(\"PrevPayIntDate\") AS \"PrevPayIntDate\"";
+			sql += "				 FROM \"LoanBorMain\"";
+			sql += "	  			 WHERE \"LoanBal\" > 0 ";
+			sql += "				 GROUP BY \"CustNo\",\"FacmNo\") R3";
+			sql += "	    ON R3.\"CustNo\" = R.\"CustNo\" ";
+			sql += "	   AND R3.\"FacmNo\" = R.\"FacmNo\" ";
 			sql += "	  WHERE R.\"YearMonth\" = :yyyymm";
 			sql += "		AND R.\"ConditionCode\" = :cond ";
 			sql += "		AND R.\"LoanBal\" > 0 ";
 			sql += "	  ORDER BY R.\"CustNo\",R.\"FacmNo\"";
 			break;
 
-		case 3://覆審案件資料表-個金2000萬以上小於3000萬
-			sql += "SELECT R.\"CustNo\" AS F0";
-			sql += "			,R.\"FacmNo\" AS F1";
-			sql += "			,\"Fn_ParseEOL\"(C.\"CustName\",0) AS F2";
-			sql += "			,R.\"ReChkUnit\" AS F3";
-			sql += "			,E.\"CenterShortName\" AS F4";
-			sql += "			,R.\"ReChkYearMonth\" AS F5";
-			sql += "			,R.\"DrawdownDate\" AS F6";
-			sql += "			,R.\"LoanBal\" AS F7";
-			sql += "			,R2.\"tLoanBal\" AS F8";
-			sql += "			,NVL(RC.\"RenewCode\",' ') AS F9";
-			sql += "			,DECODE(R.\"ReCheckCode\",'2','*',' ') AS F10";
-			sql += "			,R.\"Evaluation\" AS F11";
+		case 3:// 覆審案件資料表-個金2000萬以上小於3000萬
+			sql += "SELECT R.\"CustNo\"";
+			sql += "			,R.\"FacmNo\"";
+			sql += "			,\"Fn_ParseEOL\"(C.\"CustName\",0) AS \"CustName\"";
+			sql += "			,R.\"ReChkUnit\"";
+			sql += "			,E.\"CenterShortName\"";
+			sql += "			,R.\"ReChkYearMonth\"";
+			sql += "			,R.\"DrawdownDate\"";
+			sql += "			,R3.\"PrevPayIntDate\"";
+			sql += "			,R.\"LoanBal\"";
+			sql += "			,R2.\"tLoanBal\"";
+			sql += "			,NVL(RC.\"RenewCode\",' ') AS \"RenewCode\"";
+			sql += "			,DECODE(R.\"ReCheckCode\",'2','*',' ') AS \"ReCheckCode\"";
+			sql += "			,R.\"Evaluation\"";
 			sql += "	  FROM \"InnReCheck\" R";
 			sql += "	  LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = R.\"CustNo\"";
 			sql += "	  LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = R.\"CustNo\"";
@@ -121,41 +139,35 @@ public class L9734ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "				   AND \"LoanBal\" > 0 ";
 			sql += "				 GROUP BY \"CustNo\") R2";
 			sql += "	    ON R2.\"CustNo\" = R.\"CustNo\" ";
+			sql += "	  LEFT JOIN (SELECT \"CustNo\"";
+			sql += "					   ,\"FacmNo\" ";
+			sql += "					   ,MIN(\"PrevPayIntDate\") AS \"PrevPayIntDate\"";
+			sql += "				 FROM \"LoanBorMain\"";
+			sql += "	  			 WHERE \"LoanBal\" > 0 ";
+			sql += "				 GROUP BY \"CustNo\",\"FacmNo\") R3";
+			sql += "	    ON R3.\"CustNo\" = R.\"CustNo\" ";
+			sql += "	   AND R3.\"FacmNo\" = R.\"FacmNo\" ";
 			sql += "	  WHERE R.\"YearMonth\" = :yyyymm";
 			sql += "		AND R.\"ConditionCode\" = :cond ";
 			sql += "		AND R.\"LoanBal\" > 0 ";
 			sql += "	  ORDER BY R.\"CustNo\", R.\"FacmNo\"";
 			break;
 
-		case 4://覆審案件資料表-個金100萬以上小於2000萬
+		case 4:// 覆審案件資料表-個金100萬以上小於2000萬
 
-			String iYearMonthL5 = "";
-
-			// 此表根據樣張明細備註有取五個月前的撥款日
-			if (iMonth - 5 < 0) {
-				iYearMonthL5 = String.valueOf(((iYear - 1) * 100) + (12 + (iMonth - 5)));
-			} else {
-				iYearMonthL5 = String.valueOf((iYear * 100) + (iMonth - 5));
-			}
-
-			 iYearMonth = String.valueOf((iYear * 100) + iMonth);
-
-			this.info("lM065.findAll");
-			this.info("iYearMonth=" + iYearMonth);
-			this.info("iYearMonthL5=" + iYearMonthL5);
-
-			sql += "SELECT DISTINCT(S1.\"CustNo\") AS F0";
-			sql += "			,S1.\"FacmNo\" AS F1";
-			sql += "			,S1.\"CustName\" AS F2";
-			sql += "			,S1.\"ReChkUnit\" AS F3";
-			sql += "			,S1.\"CenterShortName\" AS F4";
-			sql += "			,S1.\"ReChkYearMonth\" AS F5";
-			sql += "			,S1.\"DrawdownDate\" AS F6";
-			sql += "			,S1.\"LoanBal\" AS F7";
-			sql += "			,R2.\"tLoanBal\" AS F8";
-			sql += "			,NVL(RC.\"RenewCode\",' ') AS F9";
-			sql += "			,DECODE(S1.\"ReCheckCode\",'2','*',' ') AS F10";
-			sql += "			,S1.\"Evaluation\" AS F11";
+			sql += "SELECT DISTINCT(S1.\"CustNo\") AS \"CustNo\"";
+			sql += "			,S1.\"FacmNo\"";
+			sql += "			,S1.\"CustName\" ";
+			sql += "			,S1.\"ReChkUnit\" ";
+			sql += "			,S1.\"CenterShortName\" ";
+			sql += "			,S1.\"ReChkYearMonth\" ";
+			sql += "			,S1.\"DrawdownDate\" ";
+			sql += "			,R3.\"PrevPayIntDate\"";
+			sql += "			,S1.\"LoanBal\" ";
+			sql += "			,R2.\"tLoanBal\" ";
+			sql += "			,NVL(RC.\"RenewCode\",' ') AS \"RenewCode\"";
+			sql += "			,DECODE(S1.\"ReCheckCode\",'2','*',' ') AS \"ReCheckCode\"";
+			sql += "			,S1.\"Evaluation\" ";
 			sql += "	  FROM(SELECT DISTINCT(R.\"CustNo\")";
 			sql += "	  	   FROM \"InnReCheck\" R";
 			sql += "	  	   LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = R.\"CustNo\"";
@@ -204,26 +216,33 @@ public class L9734ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "				   AND \"LoanBal\" > 0 ";
 			sql += "				 GROUP BY \"CustNo\") R2";
 			sql += "	    ON R2.\"CustNo\" = S1.\"CustNo\" ";
+			sql += "	  LEFT JOIN (SELECT \"CustNo\"";
+			sql += "					   ,\"FacmNo\" ";
+			sql += "					   ,MIN(\"PrevPayIntDate\") AS \"PrevPayIntDate\"";
+			sql += "				 FROM \"LoanBorMain\"";
+			sql += "	  			 WHERE \"LoanBal\" > 0 ";
+			sql += "				 GROUP BY \"CustNo\",\"FacmNo\") R3";
+			sql += "	    ON R3.\"CustNo\" = S1.\"CustNo\" ";
+			sql += "	   AND R3.\"FacmNo\" = S1.\"FacmNo\" ";
 			sql += "	  ORDER BY S1.\"CustNo\", S1.\"FacmNo\"";
 
-			query.setParameter("l5yymm", iYearMonthL5);
-			
 			break;
 
-		case 5://覆審案件資料表-企金未達3000萬
-			sql += "	SELECT R.\"CustNo\" AS F0";
-			sql += "			,R.\"FacmNo\" AS F1";
-			sql += "			,\"Fn_ParseEOL\"(C.\"CustName\",0) AS F2";
-			sql += "			,R.\"ReChkUnit\" AS F3";
-			sql += "			,MOD(R.\"ReChkYearMonth\", 100) AS F4";
-			sql += "			,R.\"DrawdownDate\" AS F5";
-			sql += "			,R.\"LoanBal\" AS F6";
-			sql += "			,R2.\"tLoanBal\" AS F7";
-			sql += "			,NVL(RC.\"RenewCode\",' ') AS F8";
-			sql += "			,DECODE(R.\"ReCheckCode\",'2','*',' ') AS F9";
-			sql += "			,DECODE(R.\"ReChkYearMonth\",0,' ','V') AS F10";
-			sql += "			,R.\"ReChkYearMonth\" AS F11";
-			sql += "			,R.\"Evaluation\" AS F12";
+		case 5:// 覆審案件資料表-企金未達3000萬
+			sql += "	SELECT R.\"CustNo\" ";
+			sql += "			,R.\"FacmNo\" ";
+			sql += "			,\"Fn_ParseEOL\"(C.\"CustName\",0) AS \"CustName\"";
+			sql += "			,R.\"ReChkUnit\" ";
+			sql += "			,MOD(R.\"ReChkYearMonth\", 100) AS \"ReChkMonth\"";
+			sql += "			,R.\"DrawdownDate\" ";
+			sql += "			,R3.\"PrevPayIntDate\"";
+			sql += "			,R.\"LoanBal\" ";
+			sql += "			,R2.\"tLoanBal\" ";
+			sql += "			,NVL(RC.\"RenewCode\",' ') AS \"RenewCode\"";
+			sql += "			,DECODE(R.\"ReCheckCode\",'2','*',' ') AS \"ReCheckCode\"";
+			sql += "			,DECODE(R.\"ReChkYearMonth\",0,' ','V') AS \"ReChkYearMonthCode\"";
+			sql += "			,R.\"ReChkYearMonth\" ";
+			sql += "			,R.\"Evaluation\" ";
 			sql += "	  FROM \"InnReCheck\" R";
 			sql += "	  LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = R.\"CustNo\"";
 			sql += "	  LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = R.\"CustNo\"";
@@ -244,13 +263,21 @@ public class L9734ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "				   AND \"LoanBal\" > 0 ";
 			sql += "				 GROUP BY \"CustNo\") R2";
 			sql += "	    ON R2.\"CustNo\" = R.\"CustNo\" ";
+			sql += "	  LEFT JOIN (SELECT \"CustNo\"";
+			sql += "					   ,\"FacmNo\" ";
+			sql += "					   ,MIN(\"PrevPayIntDate\") AS \"PrevPayIntDate\"";
+			sql += "				 FROM \"LoanBorMain\"";
+			sql += "	  			 WHERE \"LoanBal\" > 0 ";
+			sql += "				 GROUP BY \"CustNo\",\"FacmNo\") R3";
+			sql += "	    ON R3.\"CustNo\" = R.\"CustNo\" ";
+			sql += "	   AND R3.\"FacmNo\" = R.\"FacmNo\" ";
 			sql += "	  WHERE R.\"YearMonth\" = :yyyymm";
 			sql += "		AND R.\"ConditionCode\" = :cond ";
 			sql += "		AND R.\"LoanBal\" > 0 ";
 			sql += "	  ORDER BY R.\"CustNo\", R.\"FacmNo\"";
 			break;
-			
-		case 6 ://土地貸款覆審表
+
+		case 6:// 土地貸款覆審表
 			sql += "WITH \"TEMP\" AS (SELECT \"CustNo\"";
 			sql += "							   ,\"FacmNo\"";
 			sql += "					  	   	   ,MAX(\"DrawdownDate\") AS \"DrawdownDate\"";
@@ -258,21 +285,22 @@ public class L9734ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "						WHERE \"YearMonth\" = :yyyymm ";
 			sql += "						GROUP BY \"CustNo\"";
 			sql += "								,\"FacmNo\")";
-			sql += "	 SELECT  R.\"CustNo\" AS F0";
-			sql += "			,R.\"FacmNo\" AS F1";
-			sql += "			,\"Fn_ParseEOL\"(C.\"CustName\",0) AS F2";
-			sql += "			,R.\"CustTypeItem\" AS F3";
-			sql += "			,R.\"UsageItem\" AS F4";
-			sql += "			,CI.\"CityItem\" AS F5";
-			sql += "			,MOD(R.\"ReChkYearMonth\",100) AS F6";
-			sql += "			,TEMP.\"DrawdownDate\" AS F7";
-			sql += "			,R.\"LoanBal\" AS F8";
-			sql += "			,R2.\"tLoanBal\" AS F9";
-			sql += "			,NVL(RC.\"RenewCode\",' ') AS F10";
-			sql += "			,DECODE(R.\"FollowMark\",'1','免','2','V','3','X',' ') AS F11";
-			sql += "			,R.\"ReChkUnit\" AS F12";
-			sql += "			,R.\"Evaluation\" AS F13";
-			sql += "			,R.\"Remark\" AS F14";
+			sql += "	 SELECT  R.\"CustNo\" ";
+			sql += "			,R.\"FacmNo\" ";
+			sql += "			,\"Fn_ParseEOL\"(C.\"CustName\",0) AS \"CustName\"";
+			sql += "			,R.\"CustTypeItem\" ";
+			sql += "			,R.\"UsageItem\" ";
+			sql += "			,CI.\"CityItem\" ";
+			sql += "			,MOD(R.\"ReChkYearMonth\",100) AS \"ReChkMonth\"";
+			sql += "			,TEMP.\"DrawdownDate\" ";
+			sql += "			,R3.\"PrevPayIntDate\"";
+			sql += "			,R.\"LoanBal\" ";
+			sql += "			,R2.\"tLoanBal\"";
+			sql += "			,NVL(RC.\"RenewCode\",' ') AS \"RenewCode\"";
+			sql += "			,DECODE(R.\"FollowMark\",'1','免','2','V','3','X',' ') AS \"FollowMark\"";
+			sql += "			,R.\"ReChkUnit\" ";
+			sql += "			,R.\"Evaluation\" ";
+			sql += "			,R.\"Remark\" ";
 			sql += "	  FROM \"InnReCheck\" R";
 			sql += "	  LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = R.\"CustNo\"";
 			sql += "	  LEFT JOIN \"FacMain\" FM ON FM.\"CustNo\" = R.\"CustNo\"";
@@ -304,6 +332,14 @@ public class L9734ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "				   AND \"LoanBal\" > 0 ";
 			sql += "				 GROUP BY \"CustNo\") R2";
 			sql += "	    ON R2.\"CustNo\" = R.\"CustNo\" ";
+			sql += "	  LEFT JOIN (SELECT \"CustNo\"";
+			sql += "					   ,\"FacmNo\" ";
+			sql += "					   ,MIN(\"PrevPayIntDate\") AS \"PrevPayIntDate\"";
+			sql += "				 FROM \"LoanBorMain\"";
+			sql += "	  			 WHERE \"LoanBal\" > 0 ";
+			sql += "				 GROUP BY \"CustNo\",\"FacmNo\") R3";
+			sql += "	    ON R3.\"CustNo\" = R.\"CustNo\" ";
+			sql += "	   AND R3.\"FacmNo\" = R.\"FacmNo\" ";
 			sql += "	  LEFT JOIN \"TEMP\" TEMP ON TEMP.\"CustNo\" = R.\"CustNo\"";
 			sql += "	  						 AND TEMP.\"FacmNo\" = R.\"FacmNo\"";
 			sql += "	  WHERE R.\"YearMonth\" = :yyyymm";
@@ -311,14 +347,20 @@ public class L9734ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "		AND R.\"LoanBal\" > 0 ";
 			sql += "	  ORDER BY R.\"CustNo\", R.\"FacmNo\"";
 			break;
-			
+
 		}
 
 		this.info("sql=" + sql);
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
 
-	
 		query.setParameter("yyyymm", iYearMonth);
 		query.setParameter("cond", conditionCode);
+		if (conditionCode == 4) {
+			this.info("iYearMonthL5=" + iYearMonthL5);
+			query.setParameter("l5yymm", iYearMonthL5);
+		}
 		return this.convertToMap(query);
 	}
 
@@ -328,8 +370,8 @@ public class L9734ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @param titaVo
 	 * @param yearMonth     西元年月
 	 * @param conditionCode 條件代碼
-	 * @return 
-	 * @throws Exception 
+	 * @return
+	 * @throws Exception
 	 * 
 	 */
 	public List<Map<String, String>> findList(TitaVo titaVo, int yearMonth, int conditionCode) throws Exception {

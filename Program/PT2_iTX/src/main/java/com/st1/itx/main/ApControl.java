@@ -467,7 +467,7 @@ public class ApControl extends SysLogger {
 		try {
 			/* String to JSON */
 
-			if (tita.indexOf("\"TLRNO\":\"E-LOAN\"") != -1 || tita.indexOf("\"TLRNO\":\"SKLWEB\"") == -1)
+			if (tita.indexOf("\"TLRNO\":\"E-LOAN\"") != -1 || tita.indexOf("\"TLRNO\":\"SKLWEB\"") != -1)
 				this.titaVo = this.eloanConver.exec(tita);
 			else {
 				this.titaVo = this.titaVo.getVo(tita.replaceAll("\\$n", "\n"));
