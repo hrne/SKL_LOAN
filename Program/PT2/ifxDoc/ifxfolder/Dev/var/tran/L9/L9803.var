@@ -61,7 +61,12 @@ E(0,5)
 
 #tmpLineCounter=N,3,S
 
-
+#Ap1Name=X,20,L
+T(2,逾期暨風險控管月報)
+#Ap2Name=X,20,L
+T(2,放款服務課月報)
+#Ap3Name=X,20,L
+T(2,放款推展課月報)
 
 #Ap1=X,16,I,ui:button;value:逾期暨風險控管月報;enable:1;tabbable:0
 #Ap2=X,16,I,ui:button;value:放款服務課月報;enable:1;tabbable:0
@@ -210,36 +215,23 @@ INVOKEJS(SHOW,p3,1)
 
 
 !區塊p1
-<sub type="DC" name="p1" layout="cols=3;screen.width=[147,850];printer.width=[20,80];order=1;">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[100,200];printer.width=[20,80];order=1;">
 [
-[],
-["#grid#,{id:4,expand:true,loop:0,row_height:1,s_cols:[150,100,120], p_cols:[16,8,8]}","","",
-[[#BtnAllShell1,"@全選"]],
-], 
-
-!["#grid#,{id:7,expand:true,loop:0,row_height:1}","","",
-![],[#RptBtn,#RptCode,#RptName]
-!],
-
-["#grid#,{id:1,expand:true,loop:50,row_height:1}","","",
-[],[#BtnShell1,#TradeCode1,#TradeName1]
+["逾期暨風險控管月報"],
+["#grid#,{id:1,expand:true,loop:50,row_height:1,s_cols:[50,50,200]}","","",
+[["全選",#BtnAllShell1],"報表代號","報表名稱"],
+[#BtnShell1,#TradeCode1,#TradeName1],
 ],
 ]
 </sub>
 
 !區塊p2
-<sub type="DC" name="p2" layout="cols=2;screen.width=[147,850];printer.width=[20,80];order=1;">
+<sub type="DC" name="p2" layout="cols=2;screen.width=[100,200];printer.width=[20,80];order=1;">
 [
-[],
-["#grid#,{id:5,expand:true,loop:0,row_height:1,s_cols:[150,100,120], p_cols:[16,8,8]}","","",
-[[#BtnAllShell2,"@全選"]],
-], 
-!["#grid#,{id:8,expand:true,loop:0,row_height:1}","","",
-![],["","報表代號","報表名稱"]
-!],
-
-["#grid#,{id:2,expand:true,loop:50,row_height:1}","","",
-[],[#BtnShell51,#TradeCode51,#TradeName51]
+["放款服務課月報"],
+["#grid#,{id:2,expand:true,loop:50,row_height:1,s_cols:[50,50,200]}","","",
+[["全選",#BtnAllShell2],"報表代號","報表名稱"],
+[#BtnShell51,#TradeCode51,#TradeName51],
 ],
 ]
 </sub>
@@ -247,15 +239,10 @@ INVOKEJS(SHOW,p3,1)
 !區塊p3
 <sub type="DC" name="p3" layout="cols=2;screen.width=[147,850];printer.width=[20,80];order=1;">
 [
-[],
-["#grid#,{id:6,expand:true,loop:0,row_height:1,s_cols:[150,100,120], p_cols:[16,8,8]}","","",
-[[#BtnAllShell3,"@全選"]],
-], 
-!["#grid#,{id:9,expand:true,loop:0,row_height:1}","","",
-![],["","報表代號","報表名稱"]
-!],
-["#grid#,{id:3,expand:true,loop:50,row_height:1}","","",
-[],[#BtnShell101,#TradeCode101,#TradeName101]
+["放款推展課月報"],
+["#grid#,{id:3,expand:true,loop:50,row_height:1,s_cols:[50,50,200]}","","",
+[["全選",#BtnAllShell3],"報表代號","報表名稱"],
+[#BtnShell101,#TradeCode101,#TradeName101],
 ],
 ]
 </sub>

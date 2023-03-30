@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
@@ -66,6 +67,7 @@ public class L9735ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , MLB.\"ProdNo\" ";
 		sql += "      , LBM.\"Status\" ";
 		sql += "      , LBM.\"DrawdownDate\" ";
+		sql += "      , CI.\"EvaNetWorth\" ";
 		sql += " FROM \"ConstructionCompany\" CC ";
 		sql += " LEFT JOIN \"MonthlyLoanBal\" MLB ON MLB.\"CustNo\" = CC.\"CustNo\" ";
 		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = MLB.\"CustNo\" ";
@@ -74,6 +76,12 @@ public class L9735ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"LoanBorMain\" LBM ON LBM.\"CustNo\" = MLB.\"CustNo\" ";
 		sql += "                            AND LBM.\"FacmNo\" = MLB.\"FacmNo\" ";
 		sql += "                            AND LBM.\"BormNo\" = MLB.\"BormNo\" ";
+		sql += "LEFT JOIN \"ClFac\" CF ON CF.\"CustNo\" = FM.\"CustNo\" ";
+		sql += "                    AND CF.\"FacmNo\" = FM.\"FacmNo\" ";
+		sql += "                    AND CF.\"MainFlag\" = 'Y' ";
+		sql += "LEFT JOIN \"ClImm\" CI ON CI.\"ClCode1\" = CF.\"ClCode1\" ";
+		sql += "                    AND CI.\"ClCode2\" = CF.\"ClCode2\" ";
+		sql += "                    AND CI.\"ClNo\" = CF.\"ClNo\" ";
 		sql += " WHERE MLB.\"YearMonth\" = :inputYearMonth ";
 		sql += "   AND MLB.\"LoanBalance\" > 0 ";
 		sql += "   AND NVL(CC.\"DeleteFlag\", ' ') != '*' ";
@@ -93,4 +101,47 @@ public class L9735ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
+	public List<Map<String, String>> getBankOnline(TitaVo titaVo) {
+
+		try {
+			this.info("1." + titaVo.getParam("DATABASE"));
+		} catch (LogicException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		String sql = "  ";
+		sql += " SELECT COUNT(*) AS \"Int\" FROM \"CdBank\"";
+
+		this.info("sql=" + sql);
+
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+
+		return this.convertToMap(query);
+	}
+
+	public List<Map<String, String>> getBankMonth(TitaVo titaVo) {
+
+		try {
+			titaVo.setDataBaseOnMon();
+			this.info("2." + titaVo.getParam("DATABASE"));
+		} catch (LogicException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		String sql = "  ";
+
+		sql += " SELECT COUNT(*) AS \"Int\" FROM \"CdBank\"";
+
+		this.info("sql=" + sql);
+
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+
+		return this.convertToMap(query);
+	}
 }

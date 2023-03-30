@@ -666,7 +666,7 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	}
 
 	public boolean isEloan() {
-		return "E-LOAN".equals(this.getTlrNo()) || "E-TEST".equals(this.getTlrNo());
+		return "E-LOAN".equals(this.getTlrNo()) || "E-TEST".equals(this.getTlrNo()) || "SKLWEB".equals(this.getTlrNo());
 	}
 
 	/**

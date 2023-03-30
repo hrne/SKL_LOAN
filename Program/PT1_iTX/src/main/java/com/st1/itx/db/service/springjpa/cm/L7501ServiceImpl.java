@@ -37,7 +37,7 @@ public class L7501ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , NVL(FAC.\"FacmNo\",0) AS \"FacmNo\"";
 		sql += "      , MIN(NVL(LBM.\"DrawdownDate\",0)) AS \"DrawdownDate\" ";
 		sql += "      , MAX(NVL(LBM.\"MaturityDate\",0)) AS \"MaturityDate\" ";
-		sql += "      , MAX(NVL(LBM.\"PrevPayIntDate\",0)) AS \"PrevIntDate\" ";
+		sql += "      , MIN(NVL(LBM.\"PrevPayIntDate\",0)) AS \"PrevIntDate\" ";
 		sql += "      , SUM(NVL(LBM.\"LoanBal\",0)) AS \"LoanBal\" ";
 		sql += "      , MAX(NVL(LBM.\"LastEntDy\",0)) AS \"LbsDy\" ";
 		sql += " FROM \"CustMain\" CM ";

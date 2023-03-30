@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L9;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -48,6 +49,13 @@ public class L9735Report extends MakeReport {
 		List<Map<String, String>> resultList = l9735ServiceImpl.getConstructionCompanyLoanData(inputDrawdownDate,
 				titaVo);
 
+		List<Map<String, String>> resultListOnline = l9735ServiceImpl.getBankOnline(titaVo);
+		this.info("resultListOnline = " + resultListOnline.get(0).get("Int"));
+
+		List<Map<String, String>> resultListMon = l9735ServiceImpl.getBankMonth(titaVo);
+
+		this.info("resultListMon = " + resultListMon.get(0).get("Int"));
+
 		// open excel
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
@@ -62,13 +70,14 @@ public class L9735Report extends MakeReport {
 
 		// 開啟報表
 		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
-		
+
 		makeExcel.setSheet(defaultSheet, titaVo.getParam("DrawdownDate"));
 
 		int row = 2;
 
 		if (resultList == null || resultList.isEmpty()) {
 			makeExcel.setValue(row, 1, "本日無資料", "R");
+
 			isFinished = false;
 		} else {
 			for (Map<String, String> result : resultList) {
@@ -86,6 +95,11 @@ public class L9735Report extends MakeReport {
 				makeExcel.setValue(row, 11, result.get("ProdNo"), "L");
 				makeExcel.setValue(row, 12, parse.stringToInteger(result.get("Status")));
 				makeExcel.setValue(row, 13, this.showBcDate(result.get("DrawdownDate"), 0), "C");
+				makeExcel.setValue(row, 14, parse.stringToBigDecimal(result.get("EvaNetWorth")), "#,###");
+				BigDecimal ltv = "0".equals(result.get("EvaNetWorth")) ? BigDecimal.ZERO
+						: parse.stringToBigDecimal(result.get("LineAmt")).divide(
+								parse.stringToBigDecimal(result.get("EvaNetWorth")), 2, BigDecimal.ROUND_HALF_UP);
+				makeExcel.setFormula(row, 15, ltv, "ROUND(F" + row + "/N" + row + ",2)", "0%");
 
 				row++;
 			}

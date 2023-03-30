@@ -66,6 +66,7 @@ public class L9736ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , MLB.\"ProdNo\" ";
 		sql += "      , LBM.\"Status\" ";
 		sql += "      , LBM.\"DrawdownDate\" ";
+		sql += "      , CI.\"EvaNetWorth\" ";
 		sql += " FROM  \"MonthlyLoanBal\" MLB ";
 		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = MLB.\"CustNo\" ";
 		sql += " LEFT JOIN \"FacMain\" FM ON FM.\"CustNo\" = MLB.\"CustNo\" ";
@@ -73,6 +74,12 @@ public class L9736ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"LoanBorMain\" LBM ON LBM.\"CustNo\" = MLB.\"CustNo\" ";
 		sql += "                            AND LBM.\"FacmNo\" = MLB.\"FacmNo\" ";
 		sql += "                            AND LBM.\"BormNo\" = MLB.\"BormNo\" ";
+		sql += "LEFT JOIN \"ClFac\" CF ON CF.\"CustNo\" = FM.\"CustNo\" ";
+		sql += "                    AND CF.\"FacmNo\" = FM.\"FacmNo\" ";
+		sql += "                    AND CF.\"MainFlag\" = 'Y' ";
+		sql += "LEFT JOIN \"ClImm\" CI ON CI.\"ClCode1\" = CF.\"ClCode1\" ";
+		sql += "                    AND CI.\"ClCode2\" = CF.\"ClCode2\" ";
+		sql += "                    AND CI.\"ClNo\" = CF.\"ClNo\" ";
 		sql += " WHERE MLB.\"YearMonth\" = :inputYearMonth ";
 		sql += "   AND MLB.\"LoanBalance\" > 0 ";
 		sql += "   AND LBM.\"DrawdownDate\" <= :inputDrawdownDate ";

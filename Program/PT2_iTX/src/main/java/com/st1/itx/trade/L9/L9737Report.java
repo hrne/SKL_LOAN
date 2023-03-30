@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L9;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -87,7 +88,11 @@ public class L9737Report extends MakeReport {
 				makeExcel.setValue(row, 11, result.get("ProdNo"), "L");
 				makeExcel.setValue(row, 12, parse.stringToInteger(result.get("Status")));
 				makeExcel.setValue(row, 13, this.showBcDate(result.get("DrawdownDate"), 0), "C");
-
+				makeExcel.setValue(row, 14, parse.stringToBigDecimal(result.get("EvaNetWorth")), "#,###");
+				BigDecimal ltv = "0".equals(result.get("EvaNetWorth")) ? BigDecimal.ZERO
+						: parse.stringToBigDecimal(result.get("LineAmt")).divide(
+								parse.stringToBigDecimal(result.get("EvaNetWorth")), 2, BigDecimal.ROUND_HALF_UP);
+				makeExcel.setFormula(row, 15, ltv, "ROUND(F" + row + "/N" + row + ",2)", "0%");
 				row++;
 			}
 		}

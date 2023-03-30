@@ -43,13 +43,10 @@ E(0,0)
 [
 ["[L9805]                                 半年報"],
 ["@會計日期",#ACCTDATE],
-["#grid#,{id:1,expand:true,loop:0,row_height:1,s_cols:[150,100,120], p_cols:[16,8,8]}","","",
-[[#BtnAllShell1,"@全選"]],
-], 
-["#grid#,{id:2,expand:true,loop:50,row_height:1}","","",
-[],[#BtnShell1,#TradeCode1,#TradeName1]
+["#grid#,{id:1,expand:true,loop:50,row_height:1,s_cols:[50,50,200]}","","",
+[["全選",#BtnAllShell1],"報表代號","報表名稱"],
+[#BtnShell1,#TradeCode1,#TradeName1],
 ],
-
 ]
 
 
@@ -146,7 +143,7 @@ E(0,@TradeCat{i},#OOGroupNo{i})
 
 !多餘行數的不顯示
 ##loop{times:50,i:1}
-IF(#TradeCat{i}==0,INVOKEJS(SHOW,grd2_{i},0),INVOKEJS(SHOW,grd2_{i},1))
+IF(#TradeCat{i}==0,INVOKEJS(SHOW,grd1_{i},0),INVOKEJS(SHOW,grd1_{i},1))
 ##end
 
 

@@ -44,6 +44,8 @@ public class L7501 extends TradeBuffer {
 
 		if (loanDataList == null || loanDataList.isEmpty()) {
 			this.info("L7501 result is empty.");
+			totaVo.putParam("CustNo", "");
+			totaVo.putParam("CustName", "");
 		} else {
 			occursCounts = loanDataList.size();
 			this.info("L7501 occursCounts = " + occursCounts);
@@ -54,7 +56,6 @@ public class L7501 extends TradeBuffer {
 				moveTota(loanData);
 			}
 		}
-		totaVo.putParam("OccursCounts", occursCounts);
 
 		this.addList(this.totaVo);
 		return this.sendList();
