@@ -37,7 +37,7 @@ public class LM015ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              , ROUND(SUM(\"LoanBal\"),0) AS \"LoanBal\"";
 		sql += "        FROM ( SELECT DECODE(M.\"AcctCode\", '990', 1, 0) AS \"AcctCodeSeq\"";
 		sql += "                    , NVL(A.\"CityGroup\",'A') AS \"CityGroup\"";
-		sql += "                    , ROUND(NVL(MBV.\"BookValue\",M.\"LoanBalance\")) AS \"LoanBal\"";
+		sql += "                    , NVL(MBV.\"BookValue\",M.\"LoanBalance\") AS \"LoanBal\"";
 		sql += "               FROM \"MonthlyLoanBal\" M";
 		sql += "               LEFT JOIN(SELECT \"CityGroup\"";
 		sql += "               		           ,\"CityCode\"";

@@ -88,7 +88,10 @@ public class Manufacture extends CommBuffer {
 
 			throw new LogicException(titaVo, "EC001", "輸出檔(TxFile)序號:" + fileno);
 		} else {
-
+			CdReport cdReport = cdReportService.findById(tTxFile.getFileCode().trim());
+			if (Objects.isNull(cdReport) && "1".equals(this.titaVo.get("checkCdReport")))
+				throw new LogicException(titaVo, "EW000", "未設定報表檔CdReport");
+			
 			int filetype = tTxFile.getFileType();
 
 			this.setFilename("txfile-" + fileno + "-" + titaVo.getKinbr() + titaVo.getTlrNo() + "-" + dateUtil.getNowStringBc() + "-" + dateUtil.getNowStringTime());
@@ -113,7 +116,7 @@ public class Manufacture extends CommBuffer {
 
 			this.setFilename(this.OutFolder + this.getFilename());
 			
-			CdReport cdReport = cdReportService.findById(tTxFile.getFileCode().trim());
+			
 			if (!Objects.isNull(cdReport) && cdReport.getApLogFlag() == 1) {
 				titaVo.putParam(ContentName.txCodeNM, cdReport.getFormName());
 				titaVo.putParam(ContentName.txCode, cdReport.getFormNo());

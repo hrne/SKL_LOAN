@@ -86,6 +86,8 @@ public class LM041Report extends MakeReport {
 		} else {
 			int row = 3;
 			BigDecimal total = BigDecimal.ZERO;
+			String statusCode = "";
+
 			for (Map<String, String> tLDVo : LMList) {
 
 				for (int i = 0; i <= 6; i++) {
@@ -95,14 +97,19 @@ public class LM041Report extends MakeReport {
 
 					switch (i) {
 					case 4:
-						String valueItem = "2".equals(value) ? "2：催收戶" : "6：呆帳戶";
 
-						makeExcel.setValue(row, col, valueItem);
+						statusCode = value;
+
+						makeExcel.setValue(row, col, "2".equals(value) ? "2：催收戶" : "6：呆帳戶");
+						
 						break;
 					case 6:
-						BigDecimal bd = getBigDecimal(value);
-						total = total.add(bd);
-						makeExcel.setValue(row, col, bd, "#,##0", "R");
+
+						if ("6".equals(statusCode)) {
+							BigDecimal bd = getBigDecimal(value);
+							total = total.add(bd);
+							makeExcel.setValue(row, col, bd, "#,##0", "R");
+						}
 						break;
 					default:
 						makeExcel.setValue(row, col, value);

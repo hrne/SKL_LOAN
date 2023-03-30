@@ -27,56 +27,56 @@ public class L2614ServiceImpl extends ASpringJpaParm implements InitializingBean
 	/* 轉換工具 */
 	@Autowired
 	public Parse parse;
-
+	
 	// *** 折返控制相關 ***
 	private int limit;
-
+	
 	// *** 折返控制相關 ***
 	private int cnt;
 
 	// *** 折返控制相關 ***
 	private int size;
-
+	
 	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
-
+	
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(int index, int limit, TitaVo titaVo) throws Exception {
-
+		
 		int iOverdueDate = parse.stringToInteger(titaVo.getParam("OverdueDate")) + 19110000;
-
+		
 		this.info("L2614ServiceImpl.findAll ");
-		String sql = "     SELECT ";
-		sql += "    ad.\"TitaTxtNo\"   AS \"TitaTxtNo\",  ";
-		sql += "    ad.\"SlipNo\"      AS \"SlipNo\",     ";
-		sql += "    ad.\"AcNoCode\"    AS \"AcNoCode\",   ";
-		sql += "    ad.\"AcSubCode\"   AS \"AcSubCode\",  ";
-		sql += "    ad.\"AcDtlCode\"   AS \"AcDtlCode\",  ";
-		sql += "    cc.\"AcNoItem\"    AS \"AcNoItem\",   ";
-		sql += "    CASE  WHEN ad.\"DbCr\" = 'D' THEN  ad.\"TxAmt\"    ";
-		sql += "          ELSE  0  END AS \"DTxAmt\",     ";
+		String sql =  "     SELECT "; 
+		sql += "    ad.\"TitaTxtNo\"   AS \"TitaTxtNo\",  "; 
+		sql += "    ad.\"SlipNo\"      AS \"SlipNo\",     "; 
+		sql += "    ad.\"AcNoCode\"    AS \"AcNoCode\",   "; 
+		sql += "    ad.\"AcSubCode\"   AS \"AcSubCode\",  "; 
+		sql += "    ad.\"AcDtlCode\"   AS \"AcDtlCode\",  "; 
+		sql += "    cc.\"AcNoItem\"    AS \"AcNoItem\",   "; 
+		sql += "    CASE  WHEN ad.\"DbCr\" = 'D' THEN  ad.\"TxAmt\"    "; 
+		sql += "          ELSE  0  END AS \"DTxAmt\",     "; 
 		sql += "    CASE  WHEN ad.\"DbCr\" = 'D' THEN 0   ";
-		sql += "          ELSE ad.\"TxAmt\" END AS \"CTxAmt\",";
-		sql += "    ad.\"CustNo\"      AS \"CustNo\",     ";
-		sql += "    cm.\"CustName\"    AS \"CustName\"    ";
-		sql += "    FROM ";
-		sql += "      \"ForeclosureFee\"   ff";
-		sql += "    LEFT JOIN \"AcDetail\"         ad ON ad.\"AcctCode\" = 'F24'";
-		sql += "                               AND ad.\"CustNo\" = ff.\"CustNo\"";
-		sql += "                               AND ad.\"RvNo\" = lpad(ff.\"RecordNo\", 7, '0')";
-		sql += "    LEFT JOIN \"CdAcCode\"         cc ON cc.\"AcNoCode\" = ad.\"AcNoCode\"";
-		sql += "                               AND cc.\"AcSubCode\" = ad.\"AcSubCode\"";
-		sql += "                               AND cc.\"AcDtlCode\" = ad.\"AcDtlCode\"";
-		sql += "    LEFT JOIN \"CustMain\"         cm ON cm.\"CustNo\" = ad.\"CustNo\"";
-		sql += "    WHERE";
-		sql += "    ff.\"OverdueDate\" >= :ioverduedate";
+		sql += "          ELSE ad.\"TxAmt\" END AS \"CTxAmt\","  ;
+		sql += "    ad.\"CustNo\"      AS \"CustNo\",     "; 
+		sql += "    cm.\"CustName\"    AS \"CustName\"    "; 
+		sql += "    FROM "; 
+		sql += "      \"ForeclosureFee\"   ff"; 
+		sql += "    LEFT JOIN \"AcDetail\"         ad ON ad.\"AcctCode\" = 'F24'"; 
+		sql += "                               AND ad.\"CustNo\" = ff.\"CustNo\""; 
+		sql += "                               AND ad.\"RvNo\" = ff.\"RecordNo\""; 
+		sql += "    LEFT JOIN \"CdAcCode\"         cc ON cc.\"AcNoCode\" = ad.\"AcNoCode\""; 
+		sql += "                               AND cc.\"AcSubCode\" = ad.\"AcSubCode\""; 
+		sql += "                               AND cc.\"AcDtlCode\" = ad.\"AcDtlCode\""; 
+		sql += "    LEFT JOIN \"CustMain\"         cm ON cm.\"CustNo\" = ad.\"CustNo\""; 
+		sql += "    WHERE" ; 
+		sql += "    ff.\"OverdueDate\" >= :ioverduedate"; 
 		sql += "    AND ff.\"OverdueDate\" <= :ioverduedate";
 		sql += "    AND ad.\"AcctCode\" is not null";
-		sql += "    ORDER BY";
-		sql += "    ad.\"TitaTxtNo\",";
+		sql += "    ORDER BY"; 
+		sql += "    ad.\"TitaTxtNo\","; 
 		sql += "    ad.\"SlipNo\"";
 
 		sql += " " + sqlRow;
@@ -112,5 +112,5 @@ public class L2614ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public int getSize() {
 		return cnt;
 	}
-
+	
 }

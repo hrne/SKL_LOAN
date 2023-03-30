@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.TxAttachment;
 import com.st1.itx.db.domain.TxFile;
@@ -171,7 +173,7 @@ public class AjaxController extends SysLogger {
 	}
 
 	@RequestMapping(value = "download/file/{tlrNo}/{sno}/{fileType}/{name}")
-	public void getFile(@PathVariable String tlrNo, @PathVariable String sno, @PathVariable String fileType, String name,HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public void getFile(@PathVariable String tlrNo, @PathVariable String sno, @PathVariable String fileType, String name, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ThreadVariable.setObject(ContentName.loggerFg, true);
 		this.mustInfo("getFile...");
 
@@ -212,6 +214,8 @@ public class AjaxController extends SysLogger {
 		titaVo.putParam("fileno", sno);
 		titaVo.putParam(ContentName.caldy, dateUtil.getNowStringRoc());
 		titaVo.putParam(ContentName.caltm, dateUtil.getNowStringTime());
+		if ("000_111".equals(name))
+			titaVo.putParam("checkCdReport", "1");
 
 		Manufacture manufacture = MySpring.getBean("manufacture", Manufacture.class);
 		manufacture.setTitaVo(titaVo);
@@ -219,6 +223,13 @@ public class AjaxController extends SysLogger {
 		try {
 			manufacture.exec();
 		} catch (Exception e) {
+			if (e instanceof LogicException && "EW000".equals(((LogicException) e).getErrorMsgId())) {
+				response.addHeader("Access-Control-Allow-Origin", "*");
+				response.setContentType("application/text");
+				IOUtils.copy(new ByteArrayInputStream("1".getBytes(StandardCharsets.UTF_8)), response.getOutputStream());
+				response.flushBuffer();
+				return;
+			}
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.error(errors.toString());

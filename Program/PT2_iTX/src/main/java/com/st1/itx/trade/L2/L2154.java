@@ -490,7 +490,7 @@ public class L2154 extends TradeBuffer {
 		tTempVo.putParam("FireOfficer", tFacMain.getFireOfficer());
 		tTempVo.putParam("Estimate", tFacMain.getEstimate());
 		tTempVo.putParam("CreditOfficer", tFacMain.getCreditOfficer());
-		tTempVo.putParam("LoanOfficer", tFacMain.getBusinessOfficer());
+		tTempVo.putParam("LoanOfficer", tFacMain.getLoanOfficer());
 		tTempVo.putParam("BusinessOfficer", tFacMain.getBusinessOfficer());
 		tTempVo.putParam("ApprovedLevel", tFacMain.getApprovedLevel());
 		tTempVo.putParam("Supervisor", tFacMain.getSupervisor());
@@ -573,7 +573,6 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setFireOfficer(titaVo.getParam("FireOfficer"));
 		tFacMain.setEstimate(titaVo.getParam("Estimate"));
 		tFacMain.setCreditOfficer(titaVo.getParam("CreditOfficer"));
-		tFacMain.setLoanOfficer(titaVo.getParam("BusinessOfficer"));
 		tFacMain.setBusinessOfficer(titaVo.getParam("BusinessOfficer"));
 		tFacMain.setApprovedLevel(titaVo.getParam("ApprovedLevel"));
 		tFacMain.setSupervisor(titaVo.getParam("Supervisor"));
@@ -672,7 +671,7 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setFireOfficer(tTempVo.getParam("FireOfficer"));
 		tFacMain.setEstimate(tTempVo.getParam("Estimate"));
 		tFacMain.setCreditOfficer(tTempVo.getParam("CreditOfficer"));
-		tFacMain.setLoanOfficer(tTempVo.getParam("BusinessOfficer"));
+		tFacMain.setLoanOfficer(tTempVo.getParam("LoanOfficer"));
 		tFacMain.setBusinessOfficer(tTempVo.getParam("BusinessOfficer"));
 		tFacMain.setApprovedLevel(tTempVo.getParam("ApprovedLevel"));
 		tFacMain.setSupervisor(tTempVo.getParam("Supervisor"));
@@ -782,7 +781,7 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setFireOfficer(tTempVo.getParam("FireOfficer"));
 		tFacMain.setEstimate(tTempVo.getParam("Estimate"));
 		tFacMain.setCreditOfficer(tTempVo.getParam("CreditOfficer"));
-		tFacMain.setLoanOfficer(tTempVo.getParam("BusinessOfficer"));
+		tFacMain.setLoanOfficer(tTempVo.getParam("LoanOfficer"));
 		tFacMain.setBusinessOfficer(tTempVo.getParam("BusinessOfficer"));
 		tFacMain.setApprovedLevel(tTempVo.getParam("ApprovedLevel"));
 		tFacMain.setSupervisor(tTempVo.getParam("Supervisor"));

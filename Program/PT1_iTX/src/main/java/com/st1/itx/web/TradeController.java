@@ -34,7 +34,7 @@ public class TradeController extends SysLogger {
 		TotaVoList totaLi = null;
 
 		try {
-			totaLi = (TotaVoList) new ObjectMapper().configure(Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true).readValue(apControl.callTrade(tita), TotaVoList.class).clone();
+			totaLi = (TotaVoList) new ObjectMapper().configure(Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true).readValue(apControl.callTrade(tita).substring(5), TotaVoList.class).clone();
 			apControl.clearV();
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
