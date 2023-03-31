@@ -27,7 +27,7 @@ public class L7501ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	public List<Map<String, String>> getLoanData(String custId, TitaVo titaVo) {
-		this.info("L7501ServiceImpl findAll ");
+		this.info("L7501ServiceImpl getLoanData ");
 
 		this.info("custId = " + custId);
 

@@ -68,7 +68,7 @@ public class L7501Controller extends TradeController {
 		}
 		titaVo.putParam("KINBR", "0000");
 		titaVo.putParam("TLRNO", tellerNo);
-		titaVo.putParam("TXTNO", 0);
+		titaVo.putParam("TXTNO", "00000000");
 		titaVo.putParam("ENTDY", d.getNowIntegerRoc());
 		titaVo.putParam("ORGKIN", "");
 		titaVo.putParam("ORGTLR", "");
@@ -105,11 +105,13 @@ public class L7501Controller extends TradeController {
 		titaVo.putParam("DELAY", "0");
 		titaVo.putParam("FMTCHK", " ");
 		titaVo.putParam("FROMMQ", "    ");
-		titaVo.putParam("FUNCIND", "0");
+		titaVo.putParam("FUNCIND", "5");
 		titaVo.putParam("LockNo", 0);
 		titaVo.putParam("LockCustNo", 0);
 		titaVo.putParam("AUTHNO", "      ");
 		titaVo.putParam("AGENT", "      ");
+		titaVo.putParam("TXCODE", "L7501");
+		titaVo.putParam("OrgEntdy", d.getNowIntegerRoc());
 		titaVo.putParam("CustId", custId);
 		String result = "";
 		try {

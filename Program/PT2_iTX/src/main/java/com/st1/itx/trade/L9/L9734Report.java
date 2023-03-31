@@ -1226,7 +1226,7 @@ public class L9734Report extends MakeReport {
 
 		this.info("yymm=" + iYearMonth);
 
-		String itemName = "土地覆審";
+		String itemName = "06-土地覆審";
 
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();

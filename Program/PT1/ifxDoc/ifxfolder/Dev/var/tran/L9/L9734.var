@@ -44,9 +44,11 @@ E(0,0)
 ["[L9734]                                 覆審報表產製"],
 ["#FdYearMonth+資料年月",#YearMonth],
 
-["#grid#,{id:1,expand:false,loop:6,row_height:1,s_cols:[150,50], p_cols:[8,8]}","","",
-[],["",#BtnShell1,#ReportName1],
+["#grid#,{id:1,expand:false,loop:6,row_height:1,s_cols:[50,50,50], p_cols:[8,8]}","","",
+["全選",#BtnAllShell1,"報表名稱"],
+["",#BtnShell1,#ReportName1],
 ],
+
 ]
 
 
@@ -84,57 +86,35 @@ T(1,#Report{i},5,25)
 ##end
 
 
-! Clearing the SELECT ALL button, for unselecting a single trade
-! 修改這裡的 loop times
-#FuncClearSelectAll=@,1,S
+!全選勾選功能 start..........
+
+#BtnAllShell1=X,1,I,ui:button;value:  ;enable:1;tabbable:0
+
+#ApAllBIND1=X,1,S
+BIND(#BtnAllShell1,click, {cmd=CALLSEND;DOCODE=ApAllBtnProc1})
+
+#ApAllBtnProc1=@,1,S
+C(5,#BtnAllShell1,V,T(3,@BtnAllShell1,  ),T(3,@BtnAllShell1,V))
 ##loop{times:6,i:1}
-C(5,#tmpTargetCat,{i},T(3,@BtnAllShell{i},　)T(3,@BtnAllShell0,　),$)
+!全勾選前，先排除沒有交易代號行數不勾選
+C(5,#BtnAllShell1,V,T(3,@BtnShell{i},V),T(3,@BtnShell{i},  ))
 ##end
 
+
+!全選勾選功能 end..........
+
 ##loop{times:6,i:1}
+!權限勾選按鈕
+#BtnShell{i}=X,1,I,ui:button;value:  ;enable:1;tabbable:0
 
-!---------- BUTTON VISUAL -----------
+#Ap1GBIND{i}=X,1,S
+BIND(#BtnShell{i},click, {cmd=CALLSEND;DOCODE=Ap1GBtnProc{i}})
 
-! BtnShell: Creates visual of button.
-#BtnShell{i}=X,2,I,ui:button;value:　;enable:1;tabbable:0
-
-!---------- BUTTON BINDER -----------
-
-! BtnBind: Bind button to its state machine processor.
-#BtnBind{i}=X,1,S
-BIND(#BtnShell{i},click,{cmd=CALLSEND;DOCODE=Btn{i}FSMP})
-
-!---------- BUTTON STATE MACHINE PROCESSOR -----------
-
-! BtnFSMP: Button Finite-State Machine Processor
-
-! What happens when Button is Clicked?
-! Button State, GoTo, State Visual
-
-! 1, 0, V, also makes its category's Select All go to state 0.
-! 0, 1, empty
-#Btn{i}FSMP=@,1,S
-C(5,#BtnShell{i},V,T(3,@BtnShell{i},　)T(1,@tmpTargetCat,#ReportCat{i},1,1)CALL(#FuncClearSelectAll),T(3,@BtnShell{i},V))
+#Ap1GBtnProc{i}=@,1,S
+C(5,#BtnShell{i},V,T(3,@BtnShell{i},  ),T(3,@BtnShell{i},V))
 
 ##end
 
-#tmpGrd=x,3,S
-T(3,grd)
-
-#tmpGrdId=x,4,S
-
-! Expand (show all in category)
-! Trade grid id = Category * 2
-#FuncExpandCat=@,1,S
-E(0,@tmpTargetCat,#tmpTargetCat*2)
-T(2,@tmpGrdId,#tmpGrd+#tmpTargetCat)
-INVOKEJS(SHOW,#tmpGrdId,1)
-
-! Fold (hide all in category)
-#FuncFoldCat=@,1,S
-E(0,@tmpTargetCat,#tmpTargetCat*2)
-T(2,@tmpGrdId,#tmpGrd+#tmpTargetCat)
-INVOKEJS(SHOW,#tmpGrdId,0)
 
 #FdYearMonth=X,1,L
 T(2,*)
@@ -169,32 +149,8 @@ E(0,#ThisYearMonth)
 V(5,0,#ThisYearMonth)
 
 
-
-
-#tmpTargetCat=X,1,S
-
-#tmpLineCounter=N,3,S
-
-! 總項目數 
-#TotalItem=N,3,S
+#TotalItem=A,1,S
 E(0,6)
-
-
-! Select All in a category
-
-! 修改這裡的 loop times
-#FuncSelectCat=@,1,S
-##loop{times:6,k:1}
-C(5,#ReportCat{k},#tmpTargetCat,T(3,@BtnShell{k},V),$)
-##end
-
-! Unselect All in a category
-
-! 修改這裡的 loop times
-#FuncUnselectCat=@,1,S
-##loop{times:6,i:1}
-C(5,#ReportCat{i},#tmpTargetCat,T(3,@BtnShell{i},　),$)
-##end
 
 
 </sub>

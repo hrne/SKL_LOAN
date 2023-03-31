@@ -36,7 +36,15 @@ public class L7501 extends TradeBuffer {
 		this.info("active L7501");
 		this.totaVo.init(titaVo);
 
-		String inputCustId = titaVo.getParam("CustId");
+		String inputCustId = titaVo.containsKey("CustId") ? titaVo.getParam("CustId") : "";
+
+		if (inputCustId.isEmpty()) {
+			throw new LogicException("E0001", "傳入參數之身分證字號不得為空白");
+		}
+		
+		if (inputCustId.length() < 10) {
+			throw new LogicException("E0001", "傳入參數之身分證字號必須為10碼長度");
+		}
 
 		this.info("L7501 inputCustId = " + inputCustId);
 
@@ -70,6 +78,6 @@ public class L7501 extends TradeBuffer {
 		occurslist.putParam("PrevIntDate", data.get("PrevIntDate"));
 		occurslist.putParam("LoanBal", data.get("LoanBal"));
 		occurslist.putParam("LbsDy", data.get("LbsDy"));
-		this.totaVo.addOccursList(occurslist);		
+		this.totaVo.addOccursList(occurslist);
 	}
 }
