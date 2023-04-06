@@ -2083,7 +2083,7 @@ public class BaTxCom extends TradeBuffer {
 		baTxVo.setCustNo(iCustNo);
 		baTxVo.setBormNo(0);
 		baTxVo.setRvNo("");
-		baTxVo.setAcctCode("");
+		baTxVo.setAcctCode("   ");
 		baTxVo.setFacmNo(this.overRpFacmNo);
 		// 溢繳 = 可償還餘額xxBal為正值時
 		// 短繳 = 可償還餘額xxBal為負值時取正值

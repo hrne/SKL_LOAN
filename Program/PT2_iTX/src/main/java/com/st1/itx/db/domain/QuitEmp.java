@@ -1,8 +1,6 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -27,7 +25,12 @@ import com.st1.itx.Exception.LogicException;
 public class QuitEmp implements Serializable {
 
 
-  // 員工編號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6544786653195336075L;
+
+// 員工編號
   /* 員工編號 */
   @Id
   @Column(name = "`EmpNo`", length = 10)

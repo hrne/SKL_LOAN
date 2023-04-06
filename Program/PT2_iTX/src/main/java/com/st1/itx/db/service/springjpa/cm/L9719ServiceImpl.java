@@ -27,7 +27,6 @@ public class L9719ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 		this.info("l9719.findAll ");
 
@@ -86,7 +85,7 @@ public class L9719ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      SELECT CASE WHEN NVL(MLB.\"AcctCode\",' ') = '990' THEN 'OV'";
 		sql += "                  ELSE 'LN' END ";
 		sql += "             AS \"AcctCode\"";
-		sql += "            ,ROUND(SUM(NVL(i.\"AccumDPAmortized\", 0))) AS \"AccumDPAmortized\"";
+		sql += "            ,SUM(ROUND(NVL(i.\"AccumDPAmortized\", 0))) AS \"AccumDPAmortized\"";
 		sql += "      FROM \"Ias39IntMethod\" i";
 		sql += "      LEFT JOIN \"MonthlyLoanBal\" MLB ON I.\"YearMonth\" = MLB.\"YearMonth\" ";
 		sql += "                                      AND I.\"CustNo\" = MLB.\"CustNo\" ";

@@ -1,5 +1,7 @@
 package com.st1.itx.util.common;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,8 +145,8 @@ public class LockControl extends CommBuffer {
 			}
 		} else {
 			if (LogFg) {
+				TxUnLock tTxUnLock = new TxUnLock();
 				try {
-					TxUnLock tTxUnLock = new TxUnLock();
 					tTxUnLock.setCustNo(tTxLock.getCustNo());
 					tTxUnLock.setLockNo(LockNo);
 					tTxUnLock.setTranNo(tTxLock.getTranNo());
@@ -160,9 +162,25 @@ public class LockControl extends CommBuffer {
 					this.titaVo.putParam(ContentName.dataBase, ContentName.onLine);
 					sTxUnLockService.insert(tTxUnLock, this.titaVo);
 				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0002", "戶號解除鎖定紀錄檔:" + e.getErrorMsg());
+					if (e.getErrorId() == 2)
+						try {
+							sTxUnLockService.update(tTxUnLock, this.titaVo);
+						} catch (DBException e2) {
+							throw new LogicException(titaVo, "E0002", "戶號解除鎖定紀錄檔:" + e2.getErrorMsg());
+						} catch (Exception e3) {
+							StringWriter errors = new StringWriter();
+							e3.printStackTrace(new PrintWriter(errors));
+							this.error(errors.toString());
+							throw new LogicException(titaVo, "EC000", e3.getMessage());
+						}
+				} catch (Exception e3) {
+					StringWriter errors = new StringWriter();
+					e3.printStackTrace(new PrintWriter(errors));
+					this.error(errors.toString());
+					throw new LogicException(titaVo, "EC000", e3.getMessage());
 				}
 			}
+
 			try {
 				sTxLockService.delete(tTxLock);
 			} catch (DBException e) {
@@ -175,7 +193,5 @@ public class LockControl extends CommBuffer {
 
 	@Override
 	public void exec() throws LogicException {
-		// TODO Auto-generated method stub
-
 	}
 }

@@ -29,7 +29,6 @@ import com.st1.itx.db.service.TxToDoMainService;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.CustMainService;
 
-import com.st1.itx.db.domain.CustTelNo;
 import com.st1.itx.db.service.CustTelNoService;
 
 import com.st1.itx.db.domain.CdBcm;
@@ -46,7 +45,6 @@ import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.CustNoticeCom;
-import com.st1.itx.util.common.MakeExcel;
 
 @Service("L8102")
 @Scope("prototype")

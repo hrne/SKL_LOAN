@@ -1,8 +1,6 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -11,8 +9,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.Id;
 import javax.persistence.Column;
-import com.st1.itx.util.StaticTool;
-import com.st1.itx.Exception.LogicException;
 
 /**
  * CdReport 報表代號對照檔<br>
@@ -27,7 +23,12 @@ import com.st1.itx.Exception.LogicException;
 public class CdReport implements Serializable {
 
 
-  // 報表代號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7306740372220493091L;
+
+// 報表代號
   @Id
   @Column(name = "`FormNo`", length = 10)
   private String formNo = " ";

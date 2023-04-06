@@ -15,7 +15,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.db.domain.CdBranch;
 import com.st1.itx.db.domain.CdBranchGroup;
 import com.st1.itx.db.service.CdBranchService;
-import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.CdBcm;
 import com.st1.itx.db.service.CdBcmService;
 import com.st1.itx.db.service.CdBranchGroupService;

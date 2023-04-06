@@ -17,8 +17,6 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 
 import com.st1.itx.db.domain.NegAppr01;
-import com.st1.itx.db.domain.NegFinShare;
-import com.st1.itx.db.domain.NegFinShareId;
 import com.st1.itx.db.domain.NegMain;
 import com.st1.itx.db.domain.NegMainId;
 import com.st1.itx.db.domain.NegTrans;

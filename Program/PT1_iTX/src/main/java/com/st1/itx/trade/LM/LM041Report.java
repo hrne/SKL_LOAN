@@ -105,11 +105,11 @@ public class LM041Report extends MakeReport {
 						break;
 					case 6:
 
+						BigDecimal bd = getBigDecimal(value);
 						if ("6".equals(statusCode)) {
-							BigDecimal bd = getBigDecimal(value);
 							total = total.add(bd);
-							makeExcel.setValue(row, col, bd, "#,##0", "R");
 						}
+						makeExcel.setValue(row, col, bd, "#,##0", "R");
 						break;
 					default:
 						makeExcel.setValue(row, col, value);

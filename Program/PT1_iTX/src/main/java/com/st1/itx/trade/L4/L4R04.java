@@ -13,7 +13,6 @@ import com.st1.itx.db.domain.BankRmtf;
 import com.st1.itx.db.domain.BankRmtfId;
 import com.st1.itx.db.domain.BatxDetail;
 import com.st1.itx.db.domain.BatxDetailId;
-import com.st1.itx.db.domain.BatxHeadId;
 import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.service.BankRmtfService;

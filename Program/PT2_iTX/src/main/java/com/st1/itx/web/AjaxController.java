@@ -173,7 +173,7 @@ public class AjaxController extends SysLogger {
 	}
 
 	@RequestMapping(value = "download/file/{tlrNo}/{sno}/{fileType}/{name}")
-	public void getFile(@PathVariable String tlrNo, @PathVariable String sno, @PathVariable String fileType, String name, HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public void getFile(@PathVariable String tlrNo, @PathVariable String sno, @PathVariable String fileType, @PathVariable String name, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ThreadVariable.setObject(ContentName.loggerFg, true);
 		this.mustInfo("getFile...");
 
@@ -214,8 +214,6 @@ public class AjaxController extends SysLogger {
 		titaVo.putParam("fileno", sno);
 		titaVo.putParam(ContentName.caldy, dateUtil.getNowStringRoc());
 		titaVo.putParam(ContentName.caltm, dateUtil.getNowStringTime());
-		this.mustInfo(name);
-		this.mustInfo(titaVo.toString());
 		if ("000_111".equals(name))
 			titaVo.putParam("checkCdReport", "1");
 		Manufacture manufacture = MySpring.getBean("manufacture", Manufacture.class);

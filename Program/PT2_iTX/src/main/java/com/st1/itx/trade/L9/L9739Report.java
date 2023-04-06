@@ -70,13 +70,12 @@ public class L9739Report extends MakeReport {
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String reportItem = txname;
 		String brno = titaVo.getBrno();
-		
+
 		String pageSize = "A4";
 		String pageOrientation = "P";
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
-				.setRptItem(reportItem).setRptSize(pageSize).setPageOrientation(pageOrientation)
-				.build();
+				.setRptItem(reportItem).setRptSize(pageSize).setPageOrientation(pageOrientation).build();
 		// 開啟報表
 		this.open(titaVo, reportVo);
 
@@ -175,8 +174,8 @@ public class L9739Report extends MakeReport {
 			int tmpCount = 0;
 			for (Map<String, String> r : listL9739Detail) {
 
-				//資料庫撈出來的資料(當前有效日期)
-				int tmpNowEffectDate = Integer.valueOf(r.get("EffectDate")) + -19110000;
+				// 資料庫撈出來的資料(當前有效日期)
+//				int tmpNowEffectDate = Integer.valueOf(r.get("EffectDate")) + -19110000;
 
 //				this.info("tmpRate = " + this.tmpProdNoMap.get(r.get("ProdNo").toString() + "Rate") + ",nowRate = "
 //						+ r.get("StoreRate").toString());
@@ -195,14 +194,16 @@ public class L9739Report extends MakeReport {
 			}
 
 			if (tmpCount == 0) {
-				this.print(1, 3, "本日無資料");
-			} else {
-				this.result = true;
+				this.print(1, 3, "無不符合項目");
 			}
+			
+			this.result = true;
 
 		} else {
 
 			this.print(1, 3, "本日無資料");
+			
+			this.result = false;
 
 		}
 

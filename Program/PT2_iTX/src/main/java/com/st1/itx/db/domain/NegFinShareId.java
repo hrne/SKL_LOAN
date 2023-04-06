@@ -2,12 +2,8 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import com.st1.itx.util.StaticTool;
-import com.st1.itx.Exception.LogicException;
 
 /**
  * NegFinShare 債務協商債權分攤檔<br>
@@ -20,7 +16,12 @@ import com.st1.itx.Exception.LogicException;
 public class NegFinShareId implements Serializable {
 
 
-  // 債務人戶號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -680311490336171655L;
+
+// 債務人戶號
   /* 保貸戶須建立客戶主檔 */
   @Column(name = "`CustNo`")
   private int custNo = 0;

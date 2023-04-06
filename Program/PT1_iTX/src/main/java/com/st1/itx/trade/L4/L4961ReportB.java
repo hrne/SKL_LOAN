@@ -15,7 +15,6 @@ import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.domain.CollList;
 import com.st1.itx.db.domain.CollListId;
-import com.st1.itx.db.domain.InsuRenew;
 import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CollListService;
 import com.st1.itx.db.service.InsuRenewService;

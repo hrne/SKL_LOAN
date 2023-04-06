@@ -75,6 +75,8 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       	  WHEN M.\"ClCode1\" IN (3) ";
 		sql += "       	  THEN 'D'";
 		sql += "       	  ELSE 'C' END  AS F22";
+		sql += "       ,M.\"DepartmentCode\" 	                  AS F23 ";
+		sql += "       ,M.\"EntCode\" 	                          AS F24 ";
 		sql += " FROM \"MonthlyLoanBal\" M ";
 		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = M.\"CustNo\" ";
 		sql += " LEFT JOIN \"LoanBorMain\" L ON L.\"CustNo\" = M.\"CustNo\" ";
@@ -150,16 +152,16 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	  FROM \"mainData\" M ";
 		sql += "	  LEFT JOIN \"allMonthMaxLoan\" M2 ON M2.\"CustNo\" = M.\"CustNo\"";
 		sql += "	  LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = M.\"CustNo\"";
-		sql += " 	  LEFT JOIN ( SELECT TO_CHAR(\"CusId\") AS \"RptId\" ";
-		sql += "             	  FROM \"RptRelationSelf\" ";
+		sql += " 	  LEFT JOIN ( SELECT TO_CHAR(\"CustId\") AS \"RptId\" ";
+		sql += "             	  FROM \"BankRelationSelf\" ";
 		sql += "             	  WHERE \"LAW005\" = '1' ";
 		sql += "             	  UNION ";
-		sql += "             	  SELECT TO_CHAR(\"RlbID\") AS \"RptId\" ";
-		sql += "             	  FROM \"RptRelationFamily\" ";
+		sql += "             	  SELECT TO_CHAR(\"RelationId\") AS \"RptId\" ";
+		sql += "             	  FROM \"BankRelationFamily\" ";
 		sql += "             	  WHERE \"LAW005\" = '1' ";
 		sql += "             	  UNION ";
-		sql += "             	  SELECT TO_CHAR(\"ComNo\") AS \"RptId\" ";
-		sql += "             	  FROM \"RptRelationCompany\" ";
+		sql += "             	  SELECT TO_CHAR(\"CompanyId\") AS \"RptId\" ";
+		sql += "             	  FROM \"BankRelationCompany\" ";
 		sql += "             	  WHERE \"LAW005\" = '1' ";
 		sql += "           	    ) R ON R.\"RptId\" = C.\"CustId\" ";
 		sql += "	  ORDER BY M.\"TotalLoanBal\" DESC";
@@ -176,7 +178,7 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	/**
-	 * 執行報表輸出(五類資產檢核表、放款額度明細表)
+	 * 執行報表輸出(五類資產檢核表)、(放款額度明細表)
 	 * 
 	 * @param titaVo
 	 * @param yearMonth
@@ -210,16 +212,6 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          WHEN M.\"ProdNo\" IN ('60','61','62') THEN '協' ";
 		sql += "          WHEN M.\"AcctCode\" = 990  THEN '催' ";
 		sql += "        ELSE ' ' END AS F13";
-//		sql += "       ,CASE ";
-//		sql += "          WHEN M.\"AcctCode\" = 990 AND M.\"PrinBalance\" = 1 THEN '5' ";
-//		sql += "          WHEN M.\"AcctCode\" = 990 AND M.\"ProdNo\" IN ('60','61','62') THEN '2' ";
-//		sql += "          WHEN M.\"OvduTerm\" >= 7 AND M.\"OvduTerm\" <= 12 THEN '2' ";
-//		sql += "          WHEN M.\"AcctCode\" = 990 AND M.\"ProdNo\" NOT IN ('60','61','62') THEN '3' ";
-//		sql += "          WHEN M.\"AcctCode\" = 990 AND M.\"OvduTerm\" >= 12 THEN '2' ";
-//		sql += "          WHEN M.\"AcctCode\" <> 990 AND M.\"ProdNo\" IN ('60','61','62') AND M.\"OvduTerm\" = 0 THEN '2' ";
-//		sql += "          WHEN M.\"AcctCode\" <> 990 AND M.\"OvduTerm\" >= 1 AND M.\"OvduTerm\" <= 6 THEN '2' ";
-//		sql += "          WHEN M.\"AcctCode\" = 990 AND M.\"OvduTerm\" >= 12 THEN '3' ";
-//		sql += "        ELSE '1' END AS F14";
 		sql += "       ,M.\"AssetClass\" AS F14";
 		sql += "       ,CASE  ";
 		sql += "       	  WHEN (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]'))";

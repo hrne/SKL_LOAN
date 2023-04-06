@@ -83,23 +83,22 @@ public class L5500Batch extends TradeBuffer {
 
 	@Autowired
 	private WebClient webClient;
-		
-	
+
 	/**
 	 * 三階放款明細統計（T9410051）
 	 */
 	@Autowired
 	private L9744Batch l9744Batch;
-	
+
 	/**
 	 * 放款專員明細統計（T9410052）
 	 */
 	@Autowired
 	private L9745Batch l9745Batch;
-	
+
 	/**
 	 * 介紹人換算業績報酬檢核表
-	 * */
+	 */
 	@Autowired
 	private L9746Batch l9746Batch;
 
@@ -116,8 +115,14 @@ public class L5500Batch extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5500Batch ");
 		this.totaVo.init(titaVo);
-
-		entday = Integer.valueOf(titaVo.getParam("ENTDY")) + 19110000;
+		if (titaVo.get("WorkDate") == null || titaVo.get("WorkDate").isEmpty()) {
+			if (titaVo.getEntDyI() > 0) {
+				titaVo.putParam("WorkDate", titaVo.getEntDyI());
+			} else {
+				titaVo.putParam("WorkDate", dateUtil.getNowIntegerRoc());
+			}
+		}
+		entday = Integer.valueOf(titaVo.getParam("WorkDate")) + 19110000;
 
 		CdWorkMonth cdWorkMonth = cdWorkMonthService.findDateFirst(entday, entday, titaVo);
 		if (cdWorkMonth == null) {
@@ -162,11 +167,11 @@ public class L5500Batch extends TradeBuffer {
 		l9744Batch.setTxBuffer(this.getTxBuffer());
 		l9745Batch.setTxBuffer(this.getTxBuffer());
 		l9746Batch.setTxBuffer(this.getTxBuffer());
-		
+
 		l9744Batch.run(titaVo);
 		l9745Batch.run(titaVo);
 		l9746Batch.run(titaVo);
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
@@ -491,17 +496,22 @@ public class L5500Batch extends TradeBuffer {
 					hlThreeLaqhcp.setTActNum(new BigDecimal(d.get("tUnitCnt")));
 					hlThreeLaqhcp.setTActAmt(new BigDecimal(d.get("tUnitAmt")));
 				}
-				if (hlThreeLaqhcp.getGoalAmt().compareTo(BigDecimal.ZERO) == 0 || hlThreeLaqhcp.getActAmt().compareTo(BigDecimal.ZERO) == 0) {
+				if (hlThreeLaqhcp.getGoalAmt().compareTo(BigDecimal.ZERO) == 0
+						|| hlThreeLaqhcp.getActAmt().compareTo(BigDecimal.ZERO) == 0) {
 					hlThreeLaqhcp.setActRate(BigDecimal.ZERO);
 				} else {
-					BigDecimal ma = hlThreeLaqhcp.getActAmt().divide(hlThreeLaqhcp.getGoalAmt(), 2, BigDecimal.ROUND_UP).multiply(new BigDecimal("100").setScale(2, BigDecimal.ROUND_UP));
+					BigDecimal ma = hlThreeLaqhcp.getActAmt().divide(hlThreeLaqhcp.getGoalAmt(), 2, BigDecimal.ROUND_UP)
+							.multiply(new BigDecimal("100").setScale(2, BigDecimal.ROUND_UP));
 
 					hlThreeLaqhcp.setActRate(ma);
 				}
-				if (hlThreeLaqhcp.getTGoalAmt().compareTo(BigDecimal.ZERO) == 0 || hlThreeLaqhcp.getTActAmt().compareTo(BigDecimal.ZERO) == 0) {
+				if (hlThreeLaqhcp.getTGoalAmt().compareTo(BigDecimal.ZERO) == 0
+						|| hlThreeLaqhcp.getTActAmt().compareTo(BigDecimal.ZERO) == 0) {
 					hlThreeLaqhcp.setTActRate(BigDecimal.ZERO);
 				} else {
-					BigDecimal ma = hlThreeLaqhcp.getTActAmt().divide(hlThreeLaqhcp.getTGoalAmt(), 2, BigDecimal.ROUND_UP).multiply(new BigDecimal("100").setScale(2, BigDecimal.ROUND_UP));
+					BigDecimal ma = hlThreeLaqhcp.getTActAmt()
+							.divide(hlThreeLaqhcp.getTGoalAmt(), 2, BigDecimal.ROUND_UP)
+							.multiply(new BigDecimal("100").setScale(2, BigDecimal.ROUND_UP));
 
 					hlThreeLaqhcp.setTActRate(ma);
 				}
@@ -558,7 +568,7 @@ public class L5500Batch extends TradeBuffer {
 		sql += "  where aa.\"WorkMonth\"=:workmonth and bb.\"AreaCode\" is not null ";
 		sql += "  group by bb.\"AreaCode\" ";
 		sql += ") c on c.\"AreaCode\"=a.\"AreaCode\" ";
-		sql +="order by a.\"AreaCode\" ";
+		sql += "order by a.\"AreaCode\" ";
 
 		Map<String, String> conds = new HashMap<String, String>();
 
@@ -704,8 +714,10 @@ public class L5500Batch extends TradeBuffer {
 				HlCusData hlCusData = new HlCusData();
 
 				hlCusData.setHlCusNo(Long.valueOf(d.get("CustNo").toString()));
-				hlCusData.setHlCusName(d.get("CustName").substring(0, d.get("CustName").length() > 50 ? 50 : d.get("CustName").length()));
-				this.info(parse.stringToStringDate(d.get("LastUpdate")) + "-" + parse.stringToInteger(parse.stringToStringDate(d.get("LastUpdate"))));
+				hlCusData.setHlCusName(d.get("CustName").substring(0,
+						d.get("CustName").length() > 50 ? 50 : d.get("CustName").length()));
+				this.info(parse.stringToStringDate(d.get("LastUpdate")) + "-"
+						+ parse.stringToInteger(parse.stringToStringDate(d.get("LastUpdate"))));
 
 				int processDate = parse.stringToInteger(parse.stringToStringDate(d.get("LastUpdate")));
 				if (processDate > 0) {

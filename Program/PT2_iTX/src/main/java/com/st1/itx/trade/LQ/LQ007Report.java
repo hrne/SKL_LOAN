@@ -19,8 +19,6 @@ import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-import net.sf.ehcache.pool.impl.BalancedAccessEvictor;
-
 @Component
 @Scope("prototype")
 

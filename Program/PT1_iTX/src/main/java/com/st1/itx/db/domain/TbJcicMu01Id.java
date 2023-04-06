@@ -2,12 +2,8 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import com.st1.itx.util.StaticTool;
-import com.st1.itx.Exception.LogicException;
 
 /**
  * TbJcicMu01 聯徵人員名冊<br>
@@ -20,7 +16,12 @@ import com.st1.itx.Exception.LogicException;
 public class TbJcicMu01Id implements Serializable {
 
 
-  // 總行代號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -5763635857238255959L;
+
+// 總行代號
   @Column(name = "`HeadOfficeCode`", length = 3)
   private String headOfficeCode = " ";
 

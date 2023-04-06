@@ -187,14 +187,14 @@ public class L5814p extends TradeBuffer {
 		int iCustNo = 0;
 		int iFacmNo = 0;
 		BigDecimal iLoanAmt = BigDecimal.ZERO; // 最初貸款金額為0者， 填補最初貸款金額
-		BigDecimal oLoanAmt = BigDecimal.ZERO; // 初貸金額
+//		BigDecimal oLoanAmt = BigDecimal.ZERO; // 初貸金額
 
 		for (int i = 3; i <= lastRowNum; i++) {
 
 			iYearMonth = 0;
 			iCustNo = 0;
 			iFacmNo = 0;			
-			oLoanAmt = BigDecimal.ONE; // 初值給1
+//			oLoanAmt = BigDecimal.ONE; // 初值給1
 			iLoanAmt = BigDecimal.ZERO;
 			OccursList occursList = new OccursList();
 
@@ -216,9 +216,9 @@ public class L5814p extends TradeBuffer {
 				if (!StringUtils.isEmpty(makeExcel.getValue(i, 19))) {
 					iFacmNo = new BigDecimal(makeExcel.getValue(i, 19).toString()).intValue();
 				}
-				if (!StringUtils.isEmpty(makeExcel.getValue(i, 28))) {
-					oLoanAmt = new BigDecimal(makeExcel.getValue(i, 28).toString());
-				}
+//				if (!StringUtils.isEmpty(makeExcel.getValue(i, 28))) {
+//					oLoanAmt = new BigDecimal(makeExcel.getValue(i, 28).toString());
+//				}
 				if (!StringUtils.isEmpty(makeExcel.getValue(i, 38))) {
 					iLoanAmt = new BigDecimal(makeExcel.getValue(i, 38).toString());
 				}				
@@ -226,13 +226,16 @@ public class L5814p extends TradeBuffer {
 				if (iYearMonth > 0 && iCustNo > 0 && iFacmNo > 0) {
 
 					// 第28欄=0才要使用第38欄更新YearlyHouseLoanInt.LoanAmt(若第38欄=0或null或空白,則該筆不更新)
-					this.info("oLoanAmt.compareTo(BigDecimal.ZERO)=" + oLoanAmt.compareTo(BigDecimal.ZERO));
+					// 20230331 調整為第38欄只要有值就更新,拿掉第28欄判斷條件
+//					this.info("oLoanAmt.compareTo(BigDecimal.ZERO)=" + oLoanAmt.compareTo(BigDecimal.ZERO));
 					this.info("iLoanAmt.compareTo(BigDecimal.ZERO)=" + iLoanAmt.compareTo(BigDecimal.ZERO));
 
-					if (oLoanAmt.compareTo(BigDecimal.ZERO) == 0 && iLoanAmt.compareTo(BigDecimal.ZERO) == 1) {
+//					if (oLoanAmt.compareTo(BigDecimal.ZERO) == 0 && iLoanAmt.compareTo(BigDecimal.ZERO) == 1) {
+					if (iLoanAmt.compareTo(BigDecimal.ZERO) == 1) {
 
 						this.info("塞入資料到第幾列開始 i=" + i);
-						this.info("YearMonth :" + iYearMonth + ",CustNo :" + iCustNo + ",FacmNo :" + iFacmNo + ",LoanAmt :" + iLoanAmt);
+						this.info("YearMonth :" + iYearMonth + ",CustNo :" + iCustNo + ",FacmNo :" + iFacmNo
+								+ ",LoanAmt :" + iLoanAmt);
 
 						occursList.putParam("YearMonth", iYearMonth);
 						occursList.putParam("CustNo", iCustNo);

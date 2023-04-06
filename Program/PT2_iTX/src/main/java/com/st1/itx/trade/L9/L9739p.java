@@ -77,9 +77,10 @@ public class L9739p extends TradeBuffer {
 
 		isFinish = l9739Report.exec(titaVo,iYearMonth,loanTypeCount);
 
-		if (isFinish) {
+		//因是找不符合資料，所以不符合才列出，反之。
+		if (!isFinish) {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), txcd + txName + " 已完成", titaVo);
+					titaVo.getParam("TLRNO"), txcd + txName + " 已完成 ", titaVo);
 		} else {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
 					titaVo.getParam("TLRNO"), txcd + txName + " 查無資料", titaVo);

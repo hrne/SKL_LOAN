@@ -452,6 +452,8 @@ public class L9731Report extends MakeReport {
 					case 20:// 初貸日
 					case 21:// 政策性_專案貸款
 					case 22:// 擔保品類別
+					case 23:// 案件隸屬單位
+					case 24:// 企金別
 						makeExcel.setValue(row, col, fieldValue, "C");
 						break;
 

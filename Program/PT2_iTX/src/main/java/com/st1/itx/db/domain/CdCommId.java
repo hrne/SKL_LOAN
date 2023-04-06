@@ -2,8 +2,6 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import com.st1.itx.util.StaticTool;
@@ -20,7 +18,12 @@ import com.st1.itx.Exception.LogicException;
 public class CdCommId implements Serializable {
 
 
-  // 代碼類別
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5065314289644705021L;
+
+// 代碼類別
   /* 01:政府補貼利率 */
   @Column(name = "`CdType`", length = 5)
   private String cdType = " ";

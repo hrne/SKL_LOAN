@@ -15,8 +15,6 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.BatxRateChange;
-import com.st1.itx.db.domain.CdBaseRate;
-import com.st1.itx.db.domain.CdBaseRateId;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanBorMainId;
 import com.st1.itx.db.domain.LoanRateChange;

@@ -2,7 +2,6 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -14,8 +13,6 @@ import javax.persistence.Column;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import com.st1.itx.util.StaticTool;
-import com.st1.itx.Exception.LogicException;
 
 /**
  * TxAmlRatingAppl Eloan評級案件申請留存檔<br>
@@ -30,7 +27,12 @@ import com.st1.itx.Exception.LogicException;
 public class TxAmlRatingAppl implements Serializable {
 
 
-  // 序號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -9016683136285059836L;
+
+// 序號
   @Id
   @Column(name = "`LogNo`")
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "`TxAmlRatingAppl_SEQ`")

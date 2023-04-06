@@ -24,7 +24,6 @@ import com.st1.itx.db.service.ClBuildingService;
 import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.YearlyHouseLoanIntService;
-import com.st1.itx.db.service.springjpa.cm.L5811ServiceImpl;
 import com.st1.itx.db.service.springjpa.cm.L5813ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.MakeExcel;

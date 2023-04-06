@@ -1,11 +1,8 @@
 package com.st1.itx.util.common;
 
 import java.math.BigDecimal;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.DBException;
@@ -15,7 +12,6 @@ import com.st1.itx.db.domain.CdInsurer;
 import com.st1.itx.db.domain.CdInsurerId;
 import com.st1.itx.db.domain.ClEva;
 import com.st1.itx.db.domain.ClEvaId;
-import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.ClImm;
 import com.st1.itx.db.domain.ClImmId;
 import com.st1.itx.db.domain.ClMain;

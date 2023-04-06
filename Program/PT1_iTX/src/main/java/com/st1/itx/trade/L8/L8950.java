@@ -8,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 /* 套件 */
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 /* 錯誤處理 */
@@ -16,9 +15,6 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.CdBank;
-import com.st1.itx.db.domain.CdEmp;
-import com.st1.itx.db.domain.TbJcicMu01;
 import com.st1.itx.db.service.CdBankService;
 import com.st1.itx.db.service.CdEmpService;
 /*DB服務*/
