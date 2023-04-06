@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class AcAcctCheck implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -2729378850837790320L;
-
-@EmbeddedId
+  @EmbeddedId
   private AcAcctCheckId acAcctCheckId;
 
   // 會計日期
@@ -109,6 +105,10 @@ public class AcAcctCheck implements Serializable {
   // 核心貸方金額
   @Column(name = "`CoreCrAmt`")
   private BigDecimal coreCrAmt = new BigDecimal("0");
+
+  // 業務檔已銷金額
+  @Column(name = "`MasterClsAmt`")
+  private BigDecimal masterClsAmt = new BigDecimal("0");
 
   // 建檔人員
   @Column(name = "`CreateEmpNo`", length = 6)
@@ -499,6 +499,25 @@ public class AcAcctCheck implements Serializable {
   }
 
 /**
+	* 業務檔已銷金額<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getMasterClsAmt() {
+    return this.masterClsAmt;
+  }
+
+/**
+	* 業務檔已銷金額<br>
+	* 
+  *
+  * @param masterClsAmt 業務檔已銷金額
+	*/
+  public void setMasterClsAmt(BigDecimal masterClsAmt) {
+    this.masterClsAmt = masterClsAmt;
+  }
+
+/**
 	* 建檔人員<br>
 	* 
 	* @return String
@@ -580,6 +599,7 @@ public class AcAcctCheck implements Serializable {
     return "AcAcctCheck [acAcctCheckId=" + acAcctCheckId + ", acctItem=" + acctItem
            + ", tdBal=" + tdBal + ", tdCnt=" + tdCnt + ", tdNewCnt=" + tdNewCnt + ", tdClsCnt=" + tdClsCnt + ", tdExtCnt=" + tdExtCnt + ", tdExtAmt=" + tdExtAmt
            + ", receivableBal=" + receivableBal + ", acctMasterBal=" + acctMasterBal + ", ydBal=" + ydBal + ", dbAmt=" + dbAmt + ", crAmt=" + crAmt + ", coreDbAmt=" + coreDbAmt
-           + ", coreCrAmt=" + coreCrAmt + ", createEmpNo=" + createEmpNo + ", createDate=" + createDate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", lastUpdate=" + lastUpdate + "]";
+           + ", coreCrAmt=" + coreCrAmt + ", masterClsAmt=" + masterClsAmt + ", createEmpNo=" + createEmpNo + ", createDate=" + createDate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", lastUpdate=" + lastUpdate
+           + "]";
   }
 }

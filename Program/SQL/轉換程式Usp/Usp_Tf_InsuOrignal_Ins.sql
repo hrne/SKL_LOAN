@@ -105,9 +105,12 @@ BEGIN
         AND FR1P."CHKPRO" = 1
     )
     , S AS (
-      SELECT CNM."ClCode1"                AS "ClCode1"         -- 擔保品-代號1 DECIMAL 1 0
-          , CNM."ClCode2"                AS "ClCode2"         -- 擔保品-代號2 DECIMAL 2 0
-          , CNM."ClNo"                   AS "ClNo"            -- 擔保品編號 DECIMAL 7 0
+      SELECT NVL(CNM."ClCode1", INSP.GDRID1)
+                                         AS "ClCode1"         -- 擔保品-代號1 DECIMAL 1 0
+          , NVL(CNM."ClCode2", INSP.GDRID2)
+                                         AS "ClCode2"         -- 擔保品-代號2 DECIMAL 2 0
+          , NVL(CNM."ClNo", INSP.GDRNUM)
+                                         AS "ClNo"            -- 擔保品編號 DECIMAL 7 0
           , TRIM(INSP."INSNUM")          AS "OrigInsuNo"      -- 原始保險單號碼 VARCHAR2 17 0
           , NVL(TRIM(FR1P."INSNUM"),' ') AS "EndoInsuNo"      -- 批單號碼 VARCHAR2 17 0
           , MAX(NVL(INSP."INSIID",' '))  AS "InsuCompany"     -- 保險公司 VARCHAR2 2 0
@@ -136,9 +139,10 @@ BEGIN
                             AND CNM."LgtSeq" = INSP."LGTSEQ"
       LEFT JOIN NOW_INSUNO ON NOW_INSUNO.INSNUM2 = TRIM(INSP."INSNUM")
       WHERE INSP."Seq" = 1
-        AND NVL(CNM."ClNo",0) > 0 -- 擔保品存在
-        AND NVL(INSP."INSIID",' ') != ' '
-        AND NVL(NOW_INSUNO.INSNUM2,' ') = ' '
+        -- 2023-04-06 Wei註解下面三個條件 from Lai
+        -- AND NVL(CNM."ClNo",0) > 0 -- 擔保品存在
+        -- AND NVL(INSP."INSIID",' ') != ' '
+        -- AND NVL(NOW_INSUNO.INSNUM2,' ') = ' '
       GROUP BY CNM."ClCode1"
             , CNM."ClCode2"
             , CNM."ClNo"

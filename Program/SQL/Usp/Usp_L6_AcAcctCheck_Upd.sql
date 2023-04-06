@@ -106,7 +106,13 @@ BEGIN
                    ELSE L1."LoanBal" 
                  END
                 )             AS "LoanBal"
-      FROM "FacMain" F1
+            , SUM(CASE 
+                   WHEN NVL(L2."BormNo",0) > 0 
+                   THEN L2."OvduAmt" - L2."OvduBal" 
+                   ELSE L1."DrawdownAmt" - L1."LoanBal" 
+                 END
+                )             AS "ClsAmt"
+     FROM "FacMain" F1
       LEFT JOIN "LoanBorMain" L1 ON L1."CustNo" = F1."CustNo"
                                 AND L1."FacmNo" = F1."FacmNo"
       LEFT JOIN "LoanOverdue" L2 ON L2."CustNo" = L1."CustNo"
@@ -169,6 +175,7 @@ BEGIN
           ,JOB_START_TIME                   AS "CreateDate"      -- 建檔日期 DATE 
           ,"EmpNo"                          AS "LastUpdateEmpNo" -- 最後維護人員 VARCHAR2 6
           ,JOB_START_TIME                   AS "LastUpdate"      -- 最後維護日期 DATE 
+          ,NVL(S3."ClsAmt",0)               AS "MasterClsAmt"    -- 業務檔已銷金額 DECIMAL 18 2
     FROM "AcctCodeData" S1
     LEFT JOIN "AR" S2 ON S2."AcctCode" = S1."AcctCode"
                      AND S2."AcSubBookCode" = S1."AcSubBookCode"
@@ -247,14 +254,19 @@ BEGIN
              ELSE ' ' END           AS "AcctCode"
            , '00A'                  AS "AcSubBookCode"
            , 'TWD'                  AS "CurrencyCode"
-           , SUM(S1."TotInsuPrem")  AS "InsuBal"
+           , SUM(CASE
+                WHEN S1."StatusCode" IN (0) and S1."AcDate" > 0 AND  S1."InsuYearMonth" >= trunc(SP."InsuSettleDate" / 100)
+                     THEN  S1."TotInsuPrem"
+                WHEN S1."StatusCode" IN (1,2) and S1."AcDate" = 0
+                     THEN  S1."TotInsuPrem"
+                ELSE 0  END)        AS "InsuBal"
+           , SUM(CASE
+                WHEN S1."AcDate" > 0 THEN  S1."TotInsuPrem"
+                ELSE 0  END)        AS "ClsAmt"
       FROM "InsuRenew" S1
       LEFT JOIN "SystemParas" SP ON SP."BusinessType" = 'LN'
       WHERE S1."RenewCode" = 2
         AND S1."TotInsuPrem" > 0
-        AND S1."RenewCode" = 2
-        AND (   (S1."StatusCode" IN (0) and S1."AcDate" > 0 AND  S1."InsuYearMonth" >= trunc(SP."InsuSettleDate" / 100)) -- 火險保費已解付新產日期
-             OR (S1."StatusCode" IN (1,2) and S1."AcDate" = 0 )) 
       GROUP BY CASE
                  WHEN S1."StatusCode" = 0 THEN 'TMI'
                  WHEN S1."StatusCode" = 1 THEN 'F09'
@@ -302,6 +314,7 @@ BEGIN
           ,JOB_START_TIME                   AS "CreateDate"      -- 建檔日期 DATE 
           ,"EmpNo"                          AS "LastUpdateEmpNo" -- 最後維護人員 VARCHAR2 6
           ,JOB_START_TIME                   AS "LastUpdate"      -- 最後維護日期 DATE 
+          ,NVL(S3."ClsAmt",0)               AS "MasterClsAmt"    -- 業務檔已銷金額 DECIMAL 18 2
     FROM "AcctCodeData" S1
     LEFT JOIN "AR" S2 ON S2."AcctCode" = S1."AcctCode"
                      AND S2."AcSubBookCode" = S1."AcSubBookCode"
@@ -377,9 +390,11 @@ BEGIN
              ELSE 'F07' END         AS "AcctCode"
            , '00A'                  AS "AcSubBookCode"
            , 'TWD'                  AS "CurrencyCode"
-           , SUM(S1."Fee")          AS "LawFeeBal"
+           , SUM(CASE WHEN  S1."CloseDate" = 0 THEN S1."Fee"
+                      ELSE 0 END )  AS "LawFeeBal"
+           , SUM(CASE WHEN  S1."CloseDate" > 0 THEN S1."Fee"
+                      ELSE 0 END )  AS "ClsAmt"
       FROM "ForeclosureFee" S1
-      WHERE S1."CloseDate" = 0
       GROUP BY CASE
                  WHEN S1."OverdueDate" > 0 THEN 'F24'
                ELSE 'F07' END
@@ -425,6 +440,7 @@ BEGIN
           ,JOB_START_TIME                   AS "CreateDate"      -- 建檔日期 DATE 
           ,"EmpNo"                          AS "LastUpdateEmpNo" -- 最後維護人員 VARCHAR2 6
           ,JOB_START_TIME                   AS "LastUpdate"      -- 最後維護日期 DATE 
+          ,NVL(S3."ClsAmt",0)               AS "MasterClsAmt"    -- 業務檔已銷金額 DECIMAL 18 2
     FROM "AcctCodeData" S1
     LEFT JOIN "AR" S2 ON S2."AcctCode" = S1."AcctCode"
                      AND S2."AcSubBookCode" = S1."AcSubBookCode"
@@ -497,6 +513,10 @@ BEGIN
            -- 將結案金額計入本日展期金額
            , SUM(0.00)                        AS "TdExtAmt"        -- 本日展期金額 DECIMAL 18 2
            , SUM("RvBal") AS "ReceivableBal"
+           , SUM(CASE
+                   WHEN S2."ClsFlag" = 1
+                   THEN S2."RvAmt" 
+                 ELSE 0 END)                  AS "ClsAmt"          -- 已銷金額 DECIMAL 18 2
       FROM "AcReceivable" S2
       WHERE S2."AcctFlag" = 0
         AND S2."AcctCode" IN ( 'F10' -- 帳管費
@@ -569,6 +589,7 @@ BEGIN
           ,JOB_START_TIME                   AS "CreateDate"      -- 建檔日期 DATE 
           ,"EmpNo"                          AS "LastUpdateEmpNo" -- 最後維護人員 VARCHAR2 6
           ,JOB_START_TIME                   AS "LastUpdate"      -- 最後維護日期 DATE 
+          ,NVL(S2."ClsAmt",0)               AS "MasterClsAmt"    -- 業務檔已銷金額 DECIMAL 18 2
     FROM "AcctCodeData" S1
     LEFT JOIN "AR" S2 ON S2."AcctCode" = S1."AcctCode"
                      AND S2."AcSubBookCode" = S1."AcSubBookCode"

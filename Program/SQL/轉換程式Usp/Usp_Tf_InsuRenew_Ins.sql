@@ -149,9 +149,12 @@ BEGIN
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
           ,0                              AS "InsuReceiptDate"
     FROM (
-      SELECT CNM."ClCode1"                  AS "ClCode1"             -- 擔保品-代號1 DECIMAL 1 0
-           , CNM."ClCode2"                  AS "ClCode2"             -- 擔保品-代號2 DECIMAL 2 0
-           , CNM."ClNo"                     AS "ClNo"                -- 擔保品編號 DECIMAL 7 0
+      SELECT NVL(CNM."ClCode1", FR1P.GDRID1)
+                                            AS "ClCode1"             -- 擔保品-代號1 DECIMAL 1 0
+           , NVL(CNM."ClCode2", FR1P.GDRID2)
+                                            AS "ClCode2"             -- 擔保品-代號2 DECIMAL 2 0
+           , NVL(CNM."ClNo", FR1P.GDRNUM)
+                                            AS "ClNo"                -- 擔保品編號 DECIMAL 7 0
            , FR1P."INSNUM"                  AS "PrevInsuNo"          -- 原保單號碼 VARCHAR2 17 0
            , FR1P."ADTYMT"                  AS "InsuYearMonth"       -- 火險到期年月 DECIMAL 6 0
            , FR1P."LMSACN"                  AS "CustNo"              -- 借款人戶號 DECIMAL 7 0
@@ -244,7 +247,8 @@ BEGIN
         AND NVL(TRIM(FR1P."INSNUM"),' ') <> ' '
         -- AND NVL(TRIM(FR1P."INSNUM2"),' ') <> ' '
         -- AND NVL(FR1P."CHKPRO",1) = 0 -- 若為1.不處理時,不轉入
-        AND NVL(CNM."ClNo",0) > 0
+        -- 2023-04-06 Wei註解下面一個條件 from Lai
+        -- AND NVL(CNM."ClNo",0) > 0
     ) S0
     ;
 

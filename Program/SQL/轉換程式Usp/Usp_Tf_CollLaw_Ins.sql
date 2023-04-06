@@ -62,10 +62,18 @@ BEGIN
           -- 2021-03-22 把換行符修改為%n
           ,TRANSLATE(TRIM(TO_SINGLE_BYTE(LAWP.other_record)),CHR(13)||CHR(10),'$n')
                                           AS "Memo"               -- 其他紀錄內容 VARCHAR2 500 0
-          ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 8 0
-          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
-          ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 8 0
-          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+          ,CASE
+             WHEN LAWP.entry_date IS NOT NULL
+             THEN LAWP.entry_date
+           ELSE JOB_START_TIME
+           END                            AS "CreateDate"          -- 建檔日期時間 DATE 8 0
+          ,NVL(LAWP.USERID,'999999')      AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+          ,CASE
+             WHEN LAWP.entry_date IS NOT NULL
+             THEN LAWP.entry_date
+           ELSE JOB_START_TIME
+           END                            AS "LastUpdate"          -- 最後更新日期時間 DATE 8 0
+          ,NVL(LAWP.USERID,'999999')      AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
     FROM REMIN_LAWPROCESS_INFO LAWP
     LEFT JOIN "ClFac" CF ON CF."CustNo" = LAWP.LMSACN
                         AND CF."FacmNo" = LAWP.LMSAPN

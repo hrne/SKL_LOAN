@@ -241,8 +241,8 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	 * gen bodyFld Asc
 	 */
 	public void getBodyLenAndAdd() {
-		if (!this.getTxCode().equals("XXR99"))
-			return;
+//		if (!this.getTxCode().equals("XXR99"))
+//			return;
 
 		int i = 1;
 		List<String> bodyNameList = new ArrayList<String>();
@@ -529,10 +529,10 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	 * @return isTxcdInq true
 	 */
 	public boolean isTxcdInq() {
-		return this.getTxcd().trim().substring(2, 3).equals("9") || this.getTxcd().trim().substring(2, 3).equals("R") || this.getTxcd().trim().substring(2, 3).equals("0")
-				|| this.getTxCode().trim().substring(2, 3).equals("0") || this.getTxCode().trim().substring(2, 3).equals("9") || this.getTxCode().trim().substring(2, 3).equals("R")
-				|| this.isFuncindInquire();
-	}
+        return this.getTxcd().trim().substring(2, 3).equals("9") || this.getTxcd().trim().substring(2, 3).equals("R") || this.getTxcd().trim().substring(2, 3).equals("0")
+                || this.getTxCode().trim().substring(2, 3).equals("0") || this.getTxCode().trim().substring(2, 3).equals("9") || this.getTxCode().trim().substring(2, 3).equals("R")
+                || this.isFuncindInquire();
+    }
 
 	/**
 	 * 

@@ -63,10 +63,18 @@ BEGIN
           ,0                              AS "MeetPlaceCode"       -- 面催地點選項 DECIMAL 1 0
           ,M.Presence_Addr                AS "MeetPlace"           -- 面催地點 NVARCHAR2 60 0
           ,M.Other_Record                 AS "Remark"              -- 其他記錄 NVARCHAR2 500 0
-          ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 8 0
-          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
-          ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 8 0
-          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+          ,CASE
+             WHEN M.entry_date IS NOT NULL
+             THEN M.entry_date
+           ELSE JOB_START_TIME
+           END                            AS "CreateDate"          -- 建檔日期時間 DATE 8 0
+          ,M.USERID                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+          ,CASE
+             WHEN M.entry_date IS NOT NULL
+             THEN M.entry_date
+           ELSE JOB_START_TIME
+           END                            AS "LastUpdate"          -- 最後更新日期時間 DATE 8 0
+          ,M.USERID                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
     FROM REMIN_REMINMEET_INFO M
     ;
 
