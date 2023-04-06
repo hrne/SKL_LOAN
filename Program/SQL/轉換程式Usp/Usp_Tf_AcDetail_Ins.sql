@@ -242,6 +242,7 @@ BEGIN
            , "AcNoCode"
            , "AcSubCode"
            , "AcDtlCode"
+           , '00A' AS "AcSubBookCode"
       FROM "TfActblMapping"
       UNION
       SELECT L.ACNACC
@@ -250,6 +251,21 @@ BEGIN
            , C."AcNoCode"
            , C."AcSubCode"
            , C."AcDtlCode"
+           -- 2023-04-06 Wei 增加 from Lai
+           -- AcDetail AcSubBookCode轉換
+           -- 依TB$LCDP.ACNAS區分
+           -- 傳統A轉1
+           -- 利變A轉201
+           -- 利變B轉B
+           -- 其他轉00A
+           , CASE
+               WHEN NVL(L.ACTFSC,' ') = '1'
+               THEN '1'
+               WHEN NVL(L.ACTFSC,' ') = 'A'
+               THEN '201'
+               WHEN NVL(L.ACTFSC,' ') = 'B'
+               THEN 'B'
+             ELSE '00A' AS "AcSubBookCode"
       FROM "TB$LCDP" L
       LEFT JOIN "CdAcCode" C ON C."AcNoCodeOld" = L."CORACC" 
                             AND C."AcSubCode" = NVL(L."CORACS",'     ') 
@@ -293,6 +309,7 @@ BEGIN
             ,NVL(S4."TRXAMT",FF."Fee") AS "TRXAMT" 
             ,FF."RecordNo" 
             ,S4."TRXIDT" 
+            ,S3."AcSubBookCode"
       FROM "LA$JLNP" S1 
       LEFT JOIN "LA$JLNP" S2 ON S2."TRXDAT" = S1."TRXDAT" 
                             AND S2."JLNOVN" = S1."JLNVNO" -- 串取訂正資料 
@@ -421,6 +438,8 @@ BEGIN
              WHEN NVL(S."AcBookFlag",0) = 1 -- 2022-09-23 Wei BugFix From 綺萍賴桑提供 
                   AND NVL(ACT."ACTFSC",' ') = 'A' -- 資金來源若有串到,且資料為A 則為利變帳冊 
              THEN '201' 
+             WHEN NVL(S."AcSubBookCode",' ') != ' ' -- 2023-04-06 Wei 增加 from Lai
+             THEN S."AcSubBookCode"
            ELSE '00A' END                 AS "AcSubBookCode"       -- 區隔帳冊 VARCHAR2 3 0 -- 2021-07-15 新增欄位,00A傳統帳冊、201利變帳冊 
           ,''                             AS "SumNo"               -- 彙總別 VARCHAR2 3 0 
           ,''                             AS "DscptCode"           -- 摘要代號 VARCHAR2 4 0 

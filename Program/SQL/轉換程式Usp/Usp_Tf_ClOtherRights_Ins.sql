@@ -45,60 +45,34 @@ BEGIN
       , "LastUpdate"      -- 最後更新日期時間 DATE 
       , "LastUpdateEmpNo" -- 最後更新人員 VARCHAR2 6
     )
-    WITH LGTSAM_DATA AS (
-        SELECT "GDRID1"
-             , "GDRID2"
-             , "GDRNUM"
-             , "LGTSAM"
-        FROM "LA$HGTP" -- 建物
-        WHERE "LGTSAM" != 0
-          AND "GDRID1" != 2
-        UNION ALL
-        SELECT "GDRID1"
-             , "GDRID2"
-             , "GDRNUM"
-             , "LGTSAM"
-        FROM "LA$LGTP" -- 土地
-        WHERE "LGTSAM" != 0
-          AND "GDRID1" != 1
-        UNION ALL
-        SELECT "GDRID1"
-             , "GDRID2"
-             , "GDRNUM"
-             , "CGT018"
-        FROM "LN$CGTP" -- 動產
-        WHERE "CGT018" != 0
-        UNION ALL
-        SELECT "GDRID1"
-             , "GDRID2"
-             , "GDRNUM"
-             , "BGTAMT"
-        FROM "LA$BGTP" -- 保證
-        WHERE "BGTAMT" != 0
-        UNION ALL
-        SELECT "GDRID1"
-             , "GDRID2"
-             , "GDRNUM"
-             , "SGDQTY"
-        FROM "LA$SGDP" -- 股票
-        WHERE "SGDQTY" != 0
-    )
-    , groupData AS (
+    WITH rawData AS (
         SELECT TFM."ClCode1"
              , TFM."ClCode2"
              , TFM."ClNo"
              , TFM."Seq"
-             , SUM(NVL(L.LGTSAM,0)) AS LGTSAM
+             , CASE 
+                 WHEN TFM."ClCode1" = 1 
+                 THEN NVL(S4."LGTSAM",0) 
+                 WHEN TFM."ClCode1" = 2 
+                 THEN NVL(S5."LGTSAM",0) 
+                 WHEN TFM."ClCode1" = 5
+                 THEN NVL(BG."BGTAMT",0) 
+               ELSE 0 END           AS LGTSAM
              , TFM.GDTRDT           AS GDTRDT
         FROM "TfClOtherRightsMap" TFM
-        LEFT JOIN LGTSAM_DATA L ON L.GDRID1 = TFM.GDRID1
-                               AND L.GDRID2 = TFM.GDRID2
-                               AND L.GDRNUM = TFM.GDRNUM
-        GROUP BY TFM."ClCode1"
-               , TFM."ClCode2"
-               , TFM."ClNo"
-               , TFM."Seq"
-               , TFM.GDTRDT
+        LEFT JOIN "ClNoMapping" CNM ON CNM."ClCode1" = TFM."ClCode1"
+                                   AND CNM."ClCode2" = TFM."ClCode2"
+                                   AND CNM."ClNo" = TFM."ClNo"
+        LEFT JOIN "LA$HGTP" S4 ON S4."GDRID1" = CNM."GDRID1" 
+                              AND S4."GDRID2" = CNM."GDRID2" 
+                              AND S4."GDRNUM" = CNM."GDRNUM" 
+                              AND S4."LGTSEQ" = CNM."LGTSEQ" 
+                              AND CNM."ClCode1" = 1 
+        LEFT JOIN "LA$LGTP" S5 ON S5."GDRID1" = CNM."GDRID1" 
+                              AND S5."GDRID2" = CNM."GDRID2" 
+                              AND S5."GDRNUM" = CNM."GDRNUM" 
+                              AND S5."LGTSEQ" = CNM."LGTSEQ" 
+                              AND CNM."ClCode1" = 2
     )
     SELECT "ClCode1"                 AS "ClCode1"         -- 擔保品代號1 DECIMAL 1
          , "ClCode2"                 AS "ClCode2"         -- 擔保品代號2 DECIMAL 2
@@ -124,7 +98,7 @@ BEGIN
          , '999999'                  AS "CreateEmpNo"     -- 建檔人員 VARCHAR2 6
          , JOB_START_TIME            AS "LastUpdate"      -- 最後更新日期時間 DATE 
          , '999999'                  AS "LastUpdateEmpNo" -- 最後更新人員 VARCHAR2 6
-    FROM groupData
+    FROM rawData
     ;
 
     -- 記錄寫入筆數
