@@ -104,8 +104,8 @@ BEGIN
       SELECT A."CustNo" 
            , A."FacmNo"
            , SUM( CASE WHEN A."TitaHCode" = '3'
-                           THEN 0 - A."Interest" - A."DelayInt" - A."BreachAmt"
-                       ELSE A."Interest" + A."DelayInt" + A."BreachAmt"
+                           THEN 0 - A."Interest" - A."DelayInt" -- - A."BreachAmt"
+                       ELSE A."Interest" + A."DelayInt"  -- + A."BreachAmt"
                   END ) AS "YearlyInt" -- 修改:累計實收利息
       FROM "LoanBorTx" A
       LEFT JOIN "FacMain" F ON F."CustNo" = A."CustNo"

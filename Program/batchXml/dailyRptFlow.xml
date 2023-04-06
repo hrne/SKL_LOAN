@@ -30,33 +30,23 @@
 				</step>
 			</flow>
 			<!-- L9744(原LD006) 三階放款明細統計 -->
-			<flow>
+			<!-- <flow>
 				<step id="sL9744Batch" parent="parentStep">
 					<tasklet ref="L9744Batch" />
 				</step>
-			</flow>
+			</flow> -->
 			<!-- L9745(原LD007) 放款專員明細統計 -->
-			<flow>
+			<!-- <flow>
 				<step id="sL9745Batch" parent="parentStep">
 					<tasklet ref="L9745Batch" />
 				</step>
-			</flow>
+			</flow> -->
 			<!-- L9746(原LD010) 介紹人換算業績報酬檢核表 -->
-			<flow>
+			<!-- <flow>
 				<step id="sL9746Batch" parent="parentStep">
 					<tasklet ref="L9746Batch" />
 				</step>
-			</flow>
-			<!-- <flow> <step id="sLD004Batch" parent="parentStep"> <tasklet ref="LD004Batch" 
-				/> </step> </flow> <flow> <step id="sLD005Batch" parent="parentStep"> <tasklet 
-				ref="LD005Batch" /> </step> </flow> <flow> <step id="sLD006Batch" parent="parentStep"> 
-				<tasklet ref="LD006Batch" /> </step> </flow> <flow> <step id="sLD007Batch" 
-				parent="parentStep"> <tasklet ref="LD007Batch" /> </step> </flow> <flow> 
-				<step id="sLD008Batch" parent="parentStep"> <tasklet ref="LD008Batch" /> 
-				</step> </flow> <flow> <step id="sLD009" parent="parentStep"> <tasklet ref="LD009" 
-				/> </step> </flow> <flow> <step id="sLD010Batch" parent="parentStep"> <tasklet 
-				ref="LD010Batch" /> </step> </flow> -->
-
+			</flow> -->
 			<!-- L9137 (原LD008) 放款餘額總表 -->
 			<flow>
 				<step id="sL9137Batch" parent="parentStep">

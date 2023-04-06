@@ -89,12 +89,6 @@
 					<tasklet ref="LM016Batch" />
 				</step>
 			</flow>
-			<!-- Step: LM018 專案放款餘額及利息收入 -->
-			<flow>
-				<step id="sLM018" parent="parentStep">
-					<tasklet ref="LM018" />
-				</step>
-			</flow>
 			<!-- Step: LM019 利息收入明細表 -->
 			<flow>
 				<step id="sLM019" parent="parentStep">
@@ -117,12 +111,6 @@
 			<flow>
 				<step id="sLM025" parent="parentStep">
 					<tasklet ref="LM025" />
-				</step>
-			</flow>
-			<!-- Step: LM027 轉銷呆帳備忘錄 -->
-			<flow>
-				<step id="sLM027" parent="parentStep">
-					<tasklet ref="LM027" />
 				</step>
 			</flow>
 			<!-- Step: LM028 預估現金流量 -->
@@ -311,46 +299,10 @@
 					<tasklet ref="LM060" />
 				</step>
 			</flow>
-			<!-- Step: LM061 逾清償期二年案件追蹤控管表_內部控管 -->
+			<!-- Step: L9734Batch 覆審報表產製(原LM062-LM067)  -->
 			<flow>
-				<step id="sLM061" parent="parentStep">
-					<tasklet ref="LM061" />
-				</step>
-			</flow>
-			<!-- Step: LM062 01-個金3000萬以上-10810 -->
-			<flow>
-				<step id="sLM062" parent="parentStep">
-					<tasklet ref="LM062" />
-				</step>
-			</flow>
-			<!-- Step: LM063 02-企金3000萬以上-10810 -->
-			<flow>
-				<step id="sLM063" parent="parentStep">
-					<tasklet ref="LM063" />
-				</step>
-			</flow>
-			<!-- Step: LM064 03-個金2000萬以上小於3000萬-10810 -->
-			<flow>
-				<step id="sLM064" parent="parentStep">
-					<tasklet ref="LM064" />
-				</step>
-			</flow>
-			<!-- Step: LM065 04-個金100萬以上小於2000萬-10810 -->
-			<flow>
-				<step id="sLM065" parent="parentStep">
-					<tasklet ref="LM065" />
-				</step>
-			</flow>
-			<!-- Step: LM066 05-企金未達3000萬-10810 -->
-			<flow>
-				<step id="sLM066" parent="parentStep">
-					<tasklet ref="LM066" />
-				</step>
-			</flow>
-			<!-- Step: LM067 06-土地追蹤-10810 -->
-			<flow>
-				<step id="sLM067" parent="parentStep">
-					<tasklet ref="LM067" />
+				<step id="sL9734Batch" parent="parentStep">
+					<tasklet ref="L9734Batch" />
 				</step>
 			</flow>
 			<!-- Batch: LM070Batch 介紹人加碼獎勵津貼明細 -->
@@ -445,8 +397,8 @@
 			</flow>
 			<!-- Step: LM086放款餘額明細表 -->
 			<flow>
-				<step id="sLM086" parent="parentStep">
-					<tasklet ref="LM086" />
+				<step id="sLM086Batch" parent="parentStep">
+					<tasklet ref="LM086Batch" />
 				</step>
 			</flow>
 
