@@ -112,18 +112,10 @@ T(3,1:新增;2:修改;4:刪除;5:查詢)
 #RimAreaCode=X,3,S
 #RimApproveNo=A,7,S
 
-! 調RIM取縣市代碼
-#RimL6r03City=X,1,S
-E(0,@RimFunCd,1)
-T(3,@RimCityCode,)
-T(3,@RimAreaCode,)
-RESET_RIM(#RimL6r03City,L6R03)
-S(L6R03,1,#RimFunCd,#RimCityCode,#RimAreaCode)
-R(1,L6R03)
 
 ! 縣市代碼的下拉選單
 #L6r03ResultCity=x,50000,S
-T(2,:自行輸入;+#L6r03Result)
+T(2,:自行輸入)
 
 ! 權利價值說明下拉選單
 #CDDEF001=x,50,S

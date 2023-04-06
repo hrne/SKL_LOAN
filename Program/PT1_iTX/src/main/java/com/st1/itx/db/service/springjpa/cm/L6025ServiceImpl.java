@@ -57,13 +57,11 @@ public class L6025ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "	SELECT ";
 		sql += "	cl.\"CityCode\" AS \"CityCode\" , ";
 		sql += "	cl.\"LandOfficeCode\" AS \"LandOfficeCode\" , ";
-		sql += "	NVL(MIN(cc.\"CityItem\"),MIN(cd2.\"Item\")) AS \"CityItem\" , ";
+		sql += "	MIN(cd2.\"Item\") AS \"CityItem\" , ";
 		sql += "	MIN(cl.\"LandOfficeItem\") AS \"LoanItem\" , ";
 		sql += "	MIN(cl.\"LastUpdate\") AS \"LastUpdate\", ";
 		sql += "	MIN(cl.\"LastUpdateEmpNo\") AS \"LastUpdateEmpNo\" ";
 		sql += "	from \"CdLand\" cl ";
-		sql += "	left join \"CdCity\" cc ON cc.\"CityCode\" = cl.\"CityCode\" ";
-		sql += "	left join \"CdCode\" cd ON cd.\"Code\" = cl.\"LandOfficeCode\"";
 		sql += "	left join \"CdCode\" cd2 ON cd2.\"DefCode\" = 'ClOtherRightsCityCd' ";
 		sql += "	and cd2.\"Code\" = cl.\"CityCode\"  ";
 

@@ -108,24 +108,14 @@ E(0,1)ASGN(AGAIN$)
 #RimCityCode=X,4,S
 #RimFunCd=A,1,S
 
-! 調RIM取縣市代碼
-#RimL6r49City=X,1,S
-E(0,@RimFunCd,1)
-T(2,@RimCityCode,)
-S(L6R49,1,#RimFunCd,#RimCityCode)
-R(1,L6R49)
-T(B,@L6r49ResultCity,#L6r49Result+;+#ClOtherRightsCityHelp)
-
-! 縣市代碼的下拉選單
-#L6r49ResultCity=X,50000,S
 
 #CityCode=X,4,I
 C(3,#FunCd,1,$,s)
-HELP(#L6r49ResultCity)
+HELP(#ClOtherRightsCityHelp)
 @T(3,@CityCodeX,)
-V(H,#L6r49ResultCity)
+V(H,#ClOtherRightsCityHelp)
 #CityCodeX=X,20,L
-T(H,#CityCode,#L6r49ResultCity)
+T(H,#CityCode,#ClOtherRightsCityHelp)
 
 #RimL6r50A=X,1,S
 C(3,#FunCd,1,S,$)
@@ -161,7 +151,6 @@ C(3,#FunCd,4,s,$)
 E(0,0)
 
 
-<include src="ROM.icf::L6R49.dec"/>
 <include src="ROM.icf::L6R50.dec"/>
 </sub>
 
@@ -203,7 +192,6 @@ TXFORM=L6205=
 
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
-<include src="ROM.icf::L6R49.tom"/>
 <include src="ROM.icf::L6R50.tom"/>
 </sub>
 

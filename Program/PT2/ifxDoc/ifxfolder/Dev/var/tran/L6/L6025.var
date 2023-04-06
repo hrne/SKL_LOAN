@@ -86,32 +86,16 @@ T(1,@CityCode,#NTXBUF,1,2),$)
 C(3,#CHAIN,1,T(4,NTXBUF5$),S)
 C(4,#NTXBUF5,E(0,@RPTFG2,1),E(0,@RPTFG2,2))
 
-<include src="ROM.icf::L6R49.dec"/>
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 
-!調RIM參數
-#RimCityCode=X,2,S
-#RimAreaCode=X,3,S
-#RimFunCd=A,1,S
-
-! 調RIM取縣市代碼
-#RimL6r49City=X,1,S
-E(0,@RimFunCd,1)
-T(2,@RimCityCode,)
-S(L6R49,1,#RimFunCd,#RimCityCode)
-R(1,L6R49)
-T(B,@L6r49ResultCity,#L6r49Result+;+#ClOtherRightsCityHelp)
-
-! 縣市代碼的下拉選單
-#L6r49ResultCity=X,50000,S
 
 #CityCode=X,4,I
-HELP(#L6r49ResultCity)
-@C(4,#CityCode,S,V(H,#L6r49ResultCity))
+HELP(#ClOtherRightsCityHelp)
+@C(4,#CityCode,S,V(H,#ClOtherRightsCityHelp))
 
 #CityCodeX=X,20,L
 C(4,#CityCode,S,$)
-T(H,#CityCode,#L6r49ResultCity)
+T(H,#CityCode,#ClOtherRightsCityHelp)
 
 #RPTFG=A,1,S
 E(0,0)
@@ -196,7 +180,6 @@ TXFORM=L6025
 #OOLastUpdate
 #OOLastEmp
 ^
-<include src="ROM.icf::L6R49.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
