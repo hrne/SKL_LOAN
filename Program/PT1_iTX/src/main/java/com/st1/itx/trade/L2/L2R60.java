@@ -56,7 +56,6 @@ public class L2R60 extends TradeBuffer {
 				}
 				s += t.getRecWord() + ":" + t.getRecWordItem().trim();
 			}
-
 			outs = s;
 		}
 

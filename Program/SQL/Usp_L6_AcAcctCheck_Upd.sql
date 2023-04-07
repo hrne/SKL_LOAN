@@ -267,6 +267,7 @@ BEGIN
       LEFT JOIN "SystemParas" SP ON SP."BusinessType" = 'LN'
       WHERE S1."RenewCode" = 2
         AND S1."TotInsuPrem" > 0
+        AND S1."StatusCode" IN (0,1,2) 
       GROUP BY CASE
                  WHEN S1."StatusCode" = 0 THEN 'TMI'
                  WHEN S1."StatusCode" = 1 THEN 'F09'

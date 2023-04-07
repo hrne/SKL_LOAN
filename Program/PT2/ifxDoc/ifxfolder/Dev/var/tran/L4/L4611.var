@@ -526,15 +526,21 @@ T(4,DATE$)
 ! 自保續保
 #RenewCodeX=_,_,L
 T(3,)T(H,#RenewCode,#SelfInsuCodeHelp2)
-IF(#RenewCode==1,SHOW(#InsuReceiptDateX),HIDE(#InsuReceiptDateX))
+!IF(#RenewCode==1,SHOW(#InsuReceiptDateX),HIDE(#InsuReceiptDateX))
+HIDE(#InsuReceiptDateX)
+IF(#RenewCode==2,s,$)
+IF(#FunctionCode==4 || #FunctionCode==5,s,$)
+SHOW(#InsuReceiptDateX)
 
 #InsuReceiptDateX=D,7,S
-!IF(#RenewCode==1,$,S)
-IF(#FunctionCode==1 ,T(1,#DATE,2,7),$)
-IF(#FunctionCode==2 && #InsuReceiptDate==0,T(1,#DATE,2,7),$)
-!C(2,#FunctionCode,s,$,$,s,s,s)
-!C(3,#RenewCode,1,C(4,#InsuReceiptDate,#DATE,T(2,#InsuReceiptDate)),s,S)
-C(3,#RenewCode,1,C(4,#InsuReceiptDateX,T(1,#DATE,2,7),T(2,#InsuReceiptDate)),s,S)
+IF(#RenewCode==1,T(1,#DATE,2,7),S)
+IF(#FunctionCode==2 && #InsuReceiptDate > 0,T(2,#InsuReceiptDate),T(1,#DATE,2,7))
+!!IF(#RenewCode==1,$,S)
+!IF(#FunctionCode==1 ,T(1,#DATE,2,7),$)
+!IF(#FunctionCode==2 ,T(1,#DATE,2,7),$)
+!!C(2,#FunctionCode,s,$,$,s,s,s)
+!!C(3,#RenewCode,1,C(4,#InsuReceiptDate,#DATE,T(2,#InsuReceiptDate)),s,S)
+!C(3,#RenewCode,1,C(4,#InsuReceiptDateX,T(1,#DATE,2,7),T(2,#InsuReceiptDate)),s,S)
 
 !總保費
 #TotalPrem=m,14,L
@@ -617,11 +623,16 @@ C(3,#FunctionCode,1,I,s)
 !修改後保件單日
 !#InsuReceiptDateX=X,16,I
 #InsuReceiptDateX=_,_,I
-C(3,#RenewCode,1,O,S)
-C(3,#FunctionCode,4,O,$)
-C(3,#FunctionCode,5,O,$)
-C(2,#FunctionCode,$,$,$,$,s,s)
-!C(3,#RenewCode,1,C(4,#InsuReceiptDate,T(2,#VIEW_SYSDATE),T(2,#InsuReceiptDate)),s,S)
+C(3,#FunctionCode,4,S,$)
+C(3,#FunctionCode,5,S,$)
+C(3,#RenewCode,1,$,S)
+@C(4,#InsuReceiptDateX,S,$)
+A(DATE,0,#InsuReceiptDateX)
+!C(3,#RenewCode,1,O,S)
+!C(3,#FunctionCode,4,O,$)
+!C(3,#FunctionCode,5,O,$)
+!C(2,#FunctionCode,$,$,$,$,s,s)
+!!C(3,#RenewCode,1,C(4,#InsuReceiptDate,T(2,#VIEW_SYSDATE),T(2,#InsuReceiptDate)),s,S)
 
 #Remark=X,50,I
 C(2,#FunctionCode,s,$,$,s,s,s)

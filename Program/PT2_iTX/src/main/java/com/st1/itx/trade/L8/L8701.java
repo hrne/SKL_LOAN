@@ -91,6 +91,7 @@ public class L8701 extends TradeBuffer {
 	private int bCount;
 	private String sign = "+";
 	private String memo;
+	private int iStartday;
 	private ArrayList<String> Data = new ArrayList<String>();
 
 	@Override
@@ -238,7 +239,7 @@ public class L8701 extends TradeBuffer {
 			
 			acctCode = "";
 			loanBal = BigDecimal.ZERO;
-
+			
 			// 找基準日前的每日餘額檔，找不到則依會計明細檔回朔餘額(資料轉換未轉每日餘額檔)
 			tDailyLoanBal = dailyLoanBalService.dataDateFirst(ln.getCustNo(), ln.getFacmNo(), ln.getBormNo(), Integer.parseInt(iDataDatef), titaVo);
 			if (tDailyLoanBal == null) {
@@ -289,7 +290,9 @@ public class L8701 extends TradeBuffer {
 		}
 
 		// 資料基準日 < AcDate <= 最近的一筆餘額檔日期(沒有則小於本日)
-		Slice<AcDetail> slAcDetail = acDetailService.bormNoAcDateRange(ln.getCustNo(), ln.getFacmNo(), ln.getBormNo(), 1, Integer.parseInt(iDataDatef) + 1, endDatef, 0, Integer.MAX_VALUE, titaVo);
+		// 2023/4/6:bormNoAcDateRange條件起日改為使用DrawdownDate,而不使用(基準日+1天)
+		iStartday = ln.getDrawdownDate() + 19110000;
+		Slice<AcDetail> slAcDetail = acDetailService.bormNoAcDateRange(ln.getCustNo(), ln.getFacmNo(), ln.getBormNo(), 1, iStartday, endDatef, 0, Integer.MAX_VALUE, titaVo);
 		if (slAcDetail == null) {
 			return;
 		}

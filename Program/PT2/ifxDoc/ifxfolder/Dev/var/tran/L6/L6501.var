@@ -6,7 +6,7 @@
 
 #TXCD
 T(3,L6501)
-
+AchDeductDD2
 </sub>
 
 <sub type="DC" name="BFHEAD">
@@ -20,23 +20,16 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=3;screen.width=[250,250,250,250];printer.width=[30,25,30,20];order=1;">
 [
 ["[L6501]                                 系統變數及系統值設定"],
-["#FdGraceDays+違約寬限天數（營業日）",#GraceDays],
-["#FdAchAuthOneTime+ACH授權提出一日一批",#AchAuthOneTime,#AchAuthOneTimeX],
+["#FdGraceDays+違約寬限天數（營業日）",#GraceDays],["#FdAchAuthOneTime+ACH授權提出一日一批",#AchAuthOneTime,#AchAuthOneTimeX],
 [#<->#,"#FdAchDeductFlag+ACH扣款方式",#AchDeductFlag,#AchDeductFlagX],
-["#FdDeductDD1+扣款特定日1",#AchDeductDD1],
-["#FdDeductDD2+扣款特定日2",#AchDeductDD2],
-["#FdDeductDD3+扣款特定日3",#AchDeductDD3],
-["#FdDeductDD4+扣款特定日4",#AchDeductDD4],
-["#FdDeductDD5+扣款特定日5",#AchDeductDD5],
-["#FdSecondDeductDays+特定日二扣營業日差",#AchSecondDeductDays],
+["#FdDeductDD1+扣款特定日1",#AchDeductDD1],["#FdDeductDD2+扣款特定日2",#AchDeductDD2],
+["#FdDeductDD3+扣款特定日3",#AchDeductDD3],["#FdDeductDD4+扣款特定日4",#AchDeductDD4],
+["#FdDeductDD5+扣款特定日5",#AchDeductDD5],["#FdSecondDeductDays+特定日二扣營業日差",#AchSecondDeductDays],
 [#<->#,"#FdDeductMethod+連續日扣款方式",#AchDeductMethod,#AchDeductMethodX],
 [#<->#,"#FdPostDeductFlag+POST扣款方式",#PostDeductFlag,#PostDeductFlagX],
-["#FdDeductDD6+扣款特定日1",#PostDeductDD1],
-["#FdDeductDD7+扣款特定日2",#PostDeductDD2],
-["#FdDeductDD8+扣款特定日3",#PostDeductDD3],
-["#FdDeductDD9+扣款特定日4",#PostDeductDD4],
-["#FdDeductDD10+扣款特定日5",#PostDeductDD5],
-["#FdSecondDeductDays2+特定日二扣營業日差",#PostSecondDeductDays],
+["#FdDeductDD6+扣款特定日1",#PostDeductDD1],["#FdDeductDD7+扣款特定日2",#PostDeductDD2],
+["#FdDeductDD8+扣款特定日3",#PostDeductDD3],["#FdDeductDD9+扣款特定日4",#PostDeductDD4],
+["#FdDeductDD10+扣款特定日5",#PostDeductDD5],["#FdSecondDeductDays2+特定日二扣營業日差",#PostSecondDeductDays],
 [#<->#,"#FdDeductMethod2+連續日扣款方式",#PostDeductMethod,#PostDeductMethodX],
 ["#FdLoanDeptCustNo+放款部收款專戶戶號",#LoanDeptCustNo],
 ["#FdNegDeptCustNo+前置協商收款專戶戶號",#NegDeptCustNo],
@@ -246,7 +239,8 @@ E(0,@AchDeductDD4,#L6R28AchDeductDD4)
 E(0,@AchDeductDD5,#L6R28AchDeductDD5)
 E(0,@AchSecondDeductDays,#L6R28AchSecondDeductDays)
 E(0,@AchDeductMethod,#L6R28AchDeductMethod)
-C(3,#AchDeductFlag,2,INVOKEJS(SHOW,p1,3,5,0),INVOKEJS(SHOW,p1,3,5,1))
+C(3,#AchDeductFlag,1,INVOKEJS(SHOW,p1,3,5,1),INVOKEJS(SHOW,p1,6,6,1))
+C(3,#AchDeductFlag,1,INVOKEJS(SHOW,p1,6,6,0),INVOKEJS(SHOW,p1,3,5,0))
 
 !POST
 E(0,@PostDeductFlag,#L6R28PostDeductFlag)
@@ -260,7 +254,8 @@ E(0,@PostDeductDD4,#L6R28PostDeductDD4)
 E(0,@PostDeductDD5,#L6R28PostDeductDD5)
 E(0,@PostSecondDeductDays,#L6R28PostSecondDeductDays)
 E(0,@PostDeductMethod,#L6R28PostDeductMethod)
-C(3,#PostDeductFlag,2,INVOKEJS(SHOW,p1,8,10,0),INVOKEJS(SHOW,p1,8,10,1))
+C(3,#PostDeductFlag,1,INVOKEJS(SHOW,p1,8,10,1),INVOKEJS(SHOW,p1,11,11,1))
+C(3,#PostDeductFlag,1,INVOKEJS(SHOW,p1,11,11,0),INVOKEJS(SHOW,p1,8,10,0))
 
 #DeductMethodTmp=X,60,L
 T(H,#AchDeductMethod,#DeductMethodHelp)
@@ -322,7 +317,8 @@ T(H,#AchAuthOneTime,#AchAuthOneTimeHelp)
 HELP(#SpcDateHelp)
 @T(3,@AchDeductFlagX,)
 V(H,#SpcDateHelp)
-C(3,#AchDeductFlag,2,INVOKEJS(SHOW,p1,3,5,0),INVOKEJS(SHOW,p1,3,5,1))
+C(3,#AchDeductFlag,1,INVOKEJS(SHOW,p1,3,5,1),INVOKEJS(SHOW,p1,6,6,1))
+C(3,#AchDeductFlag,1,INVOKEJS(SHOW,p1,6,6,0),INVOKEJS(SHOW,p1,3,5,0))
 
 #AchDeductFlagX=X,6,L
 T(H,#AchDeductFlag,#SpcDateHelp)
@@ -357,6 +353,7 @@ HELP(#DeductMethodHelp)
 @T(3,@AchDeductMethodX,)
 V(H,#DeductMethodHelp)
 
+
 #AchDeductMethodX=X,60,L
 T(H,#AchDeductMethod,#DeductMethodHelp)
 
@@ -365,7 +362,8 @@ T(H,#AchDeductMethod,#DeductMethodHelp)
 HELP(#SpcDateHelp)
 @T(3,@PostDeductFlagX,)
 V(H,#SpcDateHelp)
-C(3,#PostDeductFlag,2,INVOKEJS(SHOW,p1,8,10,0),INVOKEJS(SHOW,p1,8,10,1))
+C(3,#PostDeductFlag,1,INVOKEJS(SHOW,p1,8,10,1),INVOKEJS(SHOW,p1,11,11,1))
+C(3,#PostDeductFlag,1,INVOKEJS(SHOW,p1,11,11,0),INVOKEJS(SHOW,p1,8,10,0))
 
 #PostDeductFlagX=X,6,L
 T(H,#PostDeductFlag,#SpcDateHelp)

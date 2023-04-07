@@ -223,16 +223,17 @@ T(2,@CustNameS{n},#CustName{n})
 C(3,#L2r05CustNo,0,$,T(2,@CustFacmNo{n},#L2r05CustNo+-+#L2r05FacmNo))
 ##end
 
+
 ! 依縣市別組地政下拉選單
-#RimL2r59A=X,1,S
-C(3,#FunCd,1,S,$)
-T(2,@CityCode,#City)
-RESET_RIM(#RimL2r59A,L2R59)
-S(L2R59,1,#CityCode)
-R(1,L2R59)
-T(2,@LoanOfficeHelp,:自行輸入;+#L2r59Help1)
-C(4,#L2r59Help1,T(3,@LoanOfficeHelp,:自行輸入),$)
+#RimL6r49CityA=X,1,S
+E(0,@RimFunCd,2)
+T(2,@RimCityCode,#City)
+RESET_RIM(#RimL6r49CityA,L6R49)
+S(L6R49,1,#RimFunCd,#RimCityCode)
+R(1,L6R49)
+C(4,#L6r49Result,T(2,@LoanOfficeHelp,:自行輸入),T(2,@LoanOfficeHelp,:自行輸入;+#L6r49Result))
 T(H,@LandAdmX,#LandAdm,#LoanOfficeHelp)
+
 
 
 
@@ -504,8 +505,6 @@ T(2,@Location,#L2r46Location)
 T(2,@ApplNo{i},#L2r46ApplNo{i})
 ##end
 
-
-
 #CityCode=X,2,S
 !縣市
 #City=X,4,I
@@ -535,7 +534,6 @@ RESET_RIM(#RimL6r49CityB,L6R49)
 S(L6R49,1,#RimFunCd,#RimCityCode)
 R(1,L6R49)
 C(4,#L6r49Result,T(2,@LoanOfficeHelp,:自行輸入),T(2,@LoanOfficeHelp,:自行輸入;+#L6r49Result))
-
 
 #CHECKRIML6r49=X,1,S
 C(4,#City,$,S)
@@ -763,7 +761,6 @@ T(B,#CustName{n})
 <include src="ROM.icf::L2R40.dec"/>
 <include src="ROM.icf::L2R46.dec"/>
 <include src="ROM.icf::L2R48.dec"/>
-<include src="ROM.icf::L2R59.dec"/>
 <include src="ROM.icf::L2R60.dec"/>
 <include src="ROM.icf::L2R07.dec"/>
 <include src="ROM.icf::L6R49.dec"/>
@@ -849,7 +846,6 @@ TXFORM=L2418
 <include src="ROM.icf::L2R40.tom"/>
 <include src="ROM.icf::L2R46.tom"/>
 <include src="ROM.icf::L2R48.tom"/>
-<include src="ROM.icf::L2R59.tom"/>
 <include src="ROM.icf::L6R49.tom"/>
 <include src="ROM.icf::L2R60.tom"/>
 <include src="ROM.icf::L2R07.tom"/>

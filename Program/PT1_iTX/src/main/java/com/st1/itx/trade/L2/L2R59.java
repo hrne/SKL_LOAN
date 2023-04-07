@@ -1,4 +1,4 @@
-	package com.st1.itx.trade.L2;
+package com.st1.itx.trade.L2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,13 +49,13 @@ public class L2R59 extends TradeBuffer {
 		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 		if ("".equals(iCity)) {
 			try {
-				resultList = l2418ServiceImpl.findAll(this.index, this.limit, titaVo);
+				resultList = l2418ServiceImpl.findAll(0, Integer.MAX_VALUE, titaVo);
 			} catch (Exception e) {
 				this.info("Error ... " + e.getMessage());
 			}
 		} else {
 			try {
-				resultList = l2418ServiceImpl.findCityEq(this.index, this.limit, titaVo);
+				resultList = l2418ServiceImpl.findCityEq(0, Integer.MAX_VALUE, titaVo);
 			} catch (Exception e) {
 				this.info("Error ... " + e.getMessage());
 			}
