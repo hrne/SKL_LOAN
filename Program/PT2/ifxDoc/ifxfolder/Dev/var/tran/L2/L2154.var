@@ -1386,7 +1386,8 @@ C(3,#UpdateCode,1,
     ,#RepayBank,#RepayAcctNo,#PostCode,#RelationCode,#RelationName,#RelationId,#RelationBirthday,#RelationGender
     ,#Introducer,#District,#FireOfficer,#Estimate,#CreditOfficer,#BusinessOfficer,#Supervisor,#InvestigateOfficer
     ,#EstimateReview,#Coorgnizer,#Breach)
-    HIDE(#BTN11,#BTN12,#BTN13,#BTN14,#BTN16,#BTN17,#BTN19,#BTN20,#BTN21))
+    HIDE(#BTN11,#BTN12,#BTN13,#BTN14,#BTN16,#BTN17,#BTN19,#BTN20,#BTN21)
+    T(F,@BreachCode,0)T(F,@ProhibitMonth,0)T(F,@BreachGetCode,0)T(F,@BreachPercent,0)T(F,@BreachDecreaseMonth,0)T(F,@BreachDecrease,0)T(F,@BreachStartPercent,0))
 ##loop{times:10,i:1}
 C(3,#UpdateCode,1,
     SHOW(#StepMonthS{i},#StepMonthE{i},#StepRateType{i},#StepRateIncr{i})

@@ -168,9 +168,10 @@ public class L4960 extends TradeBuffer {
 				occursList.putParam("OOStatusCode", tInsuRenew.getStatusCode());
 				occursList.putParam("OOAcDate", tInsuRenew.getAcDate());
 				occursList.putParam("OOBtnFlag", btnShowFlag.get(tmp));
-				occursList.putParam("OOEthqInsuCovrg", tInsuRenew.getEthqInsuCovrg()); // 地震險保險金額
-				occursList.putParam("OOEthqInsuPrem", tInsuRenew.getEthqInsuPrem()); // 地震險保費
-				occursList.putParam("OORemark", tInsuRenew.getRemark()); // 備註
+				occursList.putParam("OOEthqInsuCovrg", tInsuRenew.getEthqInsuCovrg());	//地震險保險金額
+				occursList.putParam("OOEthqInsuPrem", tInsuRenew.getEthqInsuPrem());		//地震險保費
+				occursList.putParam("OORemark", tInsuRenew.getRemark());		//備註
+				occursList.putParam("OOInsuReceiptDate", tInsuRenew.getInsuReceiptDate());
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}

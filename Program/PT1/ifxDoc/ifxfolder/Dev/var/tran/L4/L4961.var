@@ -234,6 +234,8 @@ T(2,#OOAcDateYYY+/+#OOAcDateMM+/+#OOAcDateDD))
 
 #OORenewCode=A,1,O
 #OORenewCodeX=X,6,O
+
+#OOInsuReceiptDate=D,7,S
 !SWITCH(#OORenewCode,1,T(3,自保),2,T(3,續保))
 
 ! ["@年月選項",#SearchFlag,#SearchFlagX,"@@@年月",#InsuYearMonth,"@@@繳款方式",#RepayCode,#RepayCodeX,"@@@是否繳款",#SearchOption,#SearchOptionX],
@@ -268,6 +270,7 @@ TXFORM=L4961
 #OORepayCode
 #OOStatusCode
 #OOAcDate
+#OOInsuReceiptDate
 ^
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
@@ -304,7 +307,8 @@ TXFORM=L4961
 {width:85,align:'center'}
 #OOAcDateX=會計日期
 {width:85,align:'center'}
-
+#OOInsuReceiptDate=保單收件日
+{width:85,align:'center'}
 ^
 <include src="PRT.icf::INQ04.sel" map="i=L4961;cpi=15"/>
 #SearchFlag

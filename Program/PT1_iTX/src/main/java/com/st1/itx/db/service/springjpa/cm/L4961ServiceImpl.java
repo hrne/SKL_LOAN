@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.eum.ContentName;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L4961ServiceImpl")
@@ -77,10 +78,11 @@ public class L4961ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,i.\"RepayCode\"       as F7                              ";
 		sql += " ,i.\"StatusCode\"      as F8                              ";
 		sql += " ,i.\"AcDate\"          as F9                              ";
-		sql += " ,i.\"FireInsuCovrg\"   as F10                              ";
-		sql += " ,i.\"FireInsuPrem\"    as F11                              ";
-		sql += " ,i.\"EthqInsuCovrg\"   as F12                              ";
-		sql += " ,i.\"EthqInsuPrem\"    as F13                              ";
+		sql += " ,i.\"FireInsuCovrg\"   as F10                             ";
+		sql += " ,i.\"FireInsuPrem\"    as F11                             ";
+		sql += " ,i.\"EthqInsuCovrg\"   as F12                             ";
+		sql += " ,i.\"EthqInsuPrem\"    as F13                             ";
+		sql += " ,i.\"InsuReceiptDate\" as F14                             ";
 		sql += " from \"InsuRenew\" i                                      ";
 		sql += " left join \"CustMain\" c on c.\"CustNo\" = i.\"CustNo\"   ";
 		// 查詢方式: 1.火險到期年月 2.報表年月 3.未銷全部

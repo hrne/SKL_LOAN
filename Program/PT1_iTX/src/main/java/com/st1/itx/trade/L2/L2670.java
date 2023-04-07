@@ -78,11 +78,11 @@ public class L2670 extends TradeBuffer {
 		// 額度
 		int iFacmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
 		// 契變日期
-		int iContractChgDate = parse.stringToInteger(titaVo.getParam("ContractChgDate")) + 19110000;
+		int iContractChgDate = parse.stringToInteger(titaVo.getParam("ContractChgDate"));
 		parse.stringToInteger(titaVo.getParam("ContractChgNo"));
 		// 契變手續費
 		BigDecimal feeAmt = parse.stringToBigDecimal(titaVo.getParam("TimFeeAmt"));
-		String iRvNo = parse.IntegerToString(iContractChgDate, 8) + titaVo.getParam("ContractChgNo");
+		String iRvNo = parse.IntegerToString(iContractChgDate, 7) + titaVo.getParam("ContractChgNo");
 		String rvNo = "0000000000";
 		this.info("iRvNo = " + iRvNo);
 		// new table
@@ -96,7 +96,7 @@ public class L2670 extends TradeBuffer {
 		if (iFunCd == 1) {
 
 			// 取該契變日期戶號額度最大序號 +1為當前序號
-			tAcReceivable = acReceivableService.useL2670First("F29", iCustNo, iFacmNo, iContractChgDate);
+			tAcReceivable = acReceivableService.useL2670First("F29", iCustNo, iFacmNo, iContractChgDate + 19110000);
 			this.info("L2670 tAcReceivable =" + tAcReceivable);
 			if (tAcReceivable != null) {
 				iRvNo = parse.IntegerToString(parse.stringToInteger(tAcReceivable.getRvNo()) + 1, 9);
@@ -190,7 +190,8 @@ public class L2670 extends TradeBuffer {
 					acReceivableService.update2(tAcReceivable, titaVo);
 				} catch (DBException e) {
 					e.printStackTrace();
-					throw new LogicException(titaVo, "E6003", "AcReceivable.mnt delete " + tAcReceivable + e.getErrorMsg());
+					throw new LogicException(titaVo, "E6003",
+							"AcReceivable.mnt delete " + tAcReceivable + e.getErrorMsg());
 				}
 			} else {
 				PrintCode = 1;

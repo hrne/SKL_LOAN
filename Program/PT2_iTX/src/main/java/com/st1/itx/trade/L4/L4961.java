@@ -102,12 +102,15 @@ public class L4961 extends TradeBuffer {
 
 				int insuMonth = parse.stringToInteger(result.get("F0"));
 				int acDate = parse.stringToInteger(result.get("F9"));
-
+				int insDate = parse.stringToInteger(result.get("F14"));
 				if (insuMonth > 191100) {
 					insuMonth = insuMonth - 191100;
 				}
 				if (acDate > 19110000) {
 					acDate = acDate - 19110000;
+				}
+				if (insDate > 19110000) {
+					insDate = insDate - 19110000;
 				}
 
 				occursList.putParam("OOInsuYearMonth", insuMonth);
@@ -120,7 +123,8 @@ public class L4961 extends TradeBuffer {
 				occursList.putParam("OORepayCode", result.get("F7"));
 				occursList.putParam("OOStatusCode", result.get("F8"));
 				occursList.putParam("OOAcDate", acDate);
-
+				occursList.putParam("OOInsuReceiptDate", insDate);
+				
 				totalCnt = totalCnt.add(new BigDecimal(1));
 				totalAmt = totalAmt.add(parse.stringToBigDecimal(result.get("F6")));
 				/* 將每筆資料放入Tota的OcList */

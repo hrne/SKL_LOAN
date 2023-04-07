@@ -248,6 +248,8 @@ T(3,)T(H,#OOStatusCode,#StatusCodeHelp)
 !備註
 #OORemark=X,50,L
 
+#OOInsuReceiptDate=D,7,S
+
 #OOTotalPrem=m,14,S
 E(0,#OOFireInsuPrem+#OOEthqInsuPrem)
 
@@ -320,6 +322,7 @@ TXFORM=L4960
 #OOEthqInsuCovrg
 #OOEthqInsuPrem
 #OORemark
+#OOInsuReceiptDate
 ^
 <include src="ROM.icf::L4R02.tom"/>
 <include src="ROM.icf::L2R47.tom"/>
@@ -374,6 +377,9 @@ TXFORM=L4960
 #OOStatusCodeX=處理代碼
 {width:95,align:'center'}
 
+#OOInsuReceiptDate=保單收件日
+{width:85,align:'center'}
+
 #OORemark=備註
 {width:150}
 
@@ -425,6 +431,9 @@ TXFORM=L4960
 ! 轉催
 #OOStatusCodeX=處理代碼
 {width:95,align:'center'}
+
+#OOInsuReceiptDate=保單收件日
+{width:85,align:'center'}
 
 #OORemark=備註
 {width:150}
