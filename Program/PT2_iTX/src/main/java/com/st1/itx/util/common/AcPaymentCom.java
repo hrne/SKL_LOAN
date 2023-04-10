@@ -432,7 +432,7 @@ public class AcPaymentCom extends TradeBuffer {
 		// LN為撥款
 		// RT為退款
 		String batchNo = "";
-		if (drawdownCode == 1 || drawdownCode == 2) {
+		if (drawdownCode == 1 || drawdownCode == 2|| drawdownCode == 3) {
 			batchNo = "LN";
 		} else {
 			batchNo = "RT";
@@ -447,7 +447,7 @@ public class AcPaymentCom extends TradeBuffer {
 		} else {
 			batchNo += parse.IntegerToString(tAcClose.getClsNo() + 1, 2);
 		}
-		if (drawdownCode == 1 || drawdownCode == 5) {
+		if (drawdownCode == 1 || drawdownCode == 2|| drawdownCode == 5) {
 			batchNo += "  ";
 		} else {
 			batchNo += "00";

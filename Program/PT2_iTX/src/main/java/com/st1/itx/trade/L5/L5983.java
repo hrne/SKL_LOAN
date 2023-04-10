@@ -15,6 +15,8 @@ import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.ConstructionCompanyService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.data.DataLog;
+
 
 /**
  * L5983 建商名單維護
@@ -31,6 +33,9 @@ public class L5983 extends TradeBuffer {
 
 	@Autowired
 	CustMainService custMainService;
+
+	@Autowired
+	public DataLog dataLog;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -102,11 +107,12 @@ public class L5983 extends TradeBuffer {
 		} catch (Exception e) {
 			throw new LogicException("E0006", "建商名單檔");
 		}
-
 		if (constructionCompany == null) {
 			throw new LogicException("E0003", "建商名單檔");
 		}
 
+		ConstructionCompany beforeConstructionCompany = (ConstructionCompany)dataLog.clone(constructionCompany);
+		
 		// modify
 		constructionCompany.setDeleteFlag(titaVo.getParam("DeleteFlag"));
 
@@ -118,6 +124,9 @@ public class L5983 extends TradeBuffer {
 		} catch (DBException e) {
 			throw new LogicException("E0007", "建商名單檔");
 		}
+		dataLog.setEnv(titaVo, beforeConstructionCompany,constructionCompany);
+		dataLog.exec("修改建商名單檔");
+
 	}
 
 	/**
@@ -142,6 +151,7 @@ public class L5983 extends TradeBuffer {
 		if (constructionCompany == null) {
 			throw new LogicException("E0004", "建商名單檔");
 		}
+		ConstructionCompany beforeConstructionCompany = (ConstructionCompany)dataLog.clone(constructionCompany);
 
 		// delete
 		try {
@@ -149,5 +159,8 @@ public class L5983 extends TradeBuffer {
 		} catch (DBException e) {
 			throw new LogicException("E0008", "建商名單檔");
 		}
+		dataLog.setEnv(titaVo, beforeConstructionCompany,constructionCompany);
+		dataLog.exec("刪除建商名單檔");
+
 	}
 }

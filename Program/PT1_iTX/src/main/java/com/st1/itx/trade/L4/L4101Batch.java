@@ -400,7 +400,7 @@ public class L4101Batch extends TradeBuffer {
 		if (tAcClose == null) {
 			throw new LogicException(titaVo, "E0001", "無帳務資料"); // 查詢資料不存在
 		}
-		if (iItemCode == 1) {
+		if (iItemCode == 1 || iItemCode == 2) {
 			batchNo = "LN" + parse.IntegerToString(tAcClose.getClsNo() + 1, 2) + "  ";
 
 		} else {
