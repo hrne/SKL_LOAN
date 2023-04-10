@@ -80,7 +80,7 @@ public class L8701 extends TradeBuffer {
 	private CustMain tCustMain = new CustMain();
 	private FacMain tFacMain = new FacMain();
 	private DailyLoanBal tDailyLoanBal = new DailyLoanBal();
-	private String iDataDatef;
+	private int iDataDatef;
 	private int iDataDate;
 	private int iTbsdyf;
 	private int iTbsdy;
@@ -91,7 +91,6 @@ public class L8701 extends TradeBuffer {
 	private int bCount;
 	private String sign = "+";
 	private String memo;
-	private int iStartday;
 	private ArrayList<String> Data = new ArrayList<String>();
 
 	@Override
@@ -143,8 +142,8 @@ public class L8701 extends TradeBuffer {
 			}
 			if (iExcelline >= 4 && map.get("f2") != null) {
 				iCustId = (String) map.get("f2");// 統編 A123456789
-				iDataDatef = (String) map.get("f5");// 資料基準日 => 上傳csv資料E欄<索取日迄日>
-				iDataDate = Integer.parseInt(iDataDatef) - 19110000;
+				iDataDatef = Integer.parseInt((String) map.get("f5"));// 資料基準日 => 上傳csv資料E欄<索取日迄日>
+				iDataDate = iDataDatef - 19110000;
 				iBday = Integer.parseInt((String) map.get("f3"));//=> 上傳csv資料C欄<生日>
 				this.info("iDataDatef==" + iDataDatef);
 				getDataRoutine(titaVo);
@@ -241,7 +240,7 @@ public class L8701 extends TradeBuffer {
 			loanBal = BigDecimal.ZERO;
 			
 			// 找基準日前的每日餘額檔，找不到則依會計明細檔回朔餘額(資料轉換未轉每日餘額檔)
-			tDailyLoanBal = dailyLoanBalService.dataDateFirst(ln.getCustNo(), ln.getFacmNo(), ln.getBormNo(), Integer.parseInt(iDataDatef), titaVo);
+			tDailyLoanBal = dailyLoanBalService.dataDateFirst(ln.getCustNo(), ln.getFacmNo(), ln.getBormNo(), iDataDatef, titaVo);
 			if (tDailyLoanBal == null) {
 				acDetailRoutine(ln, titaVo);
 			} else {
@@ -271,11 +270,34 @@ public class L8701 extends TradeBuffer {
 		this.info("acDetailRoutine ..." + ln.getCustNo() + "-" + ln.getFacmNo() + "-" + ln.getBormNo());
 		BigDecimal wkLnBal = BigDecimal.ZERO;
 		BigDecimal wkOvBal = BigDecimal.ZERO;
-		int endDatef = 0;
 		// 最近的一筆餘額
 		tDailyLoanBal = dailyLoanBalService.dataDateFirst(ln.getCustNo(), ln.getFacmNo(), ln.getBormNo(), iTbsdyf, titaVo);
 		if (tDailyLoanBal == null) {
-			endDatef = iTbsdyf - 1; // 本日不算
+			// 撥款日~資料基準日
+			Slice<AcDetail> slAcDetail = acDetailService.bormNoAcDateRange(ln.getCustNo(), ln.getFacmNo(), ln.getBormNo(), 1, ln.getDrawdownDate()+19110000, iDataDatef, 0, Integer.MAX_VALUE, titaVo);
+			if (slAcDetail == null) {
+				return;
+			}
+			for (AcDetail ac : slAcDetail.getContent()) {
+				if (ac.getEntAc() > 0) {
+					if ("990".equals(ac.getAcctCode())) {
+						if ("D".equals(ac.getDbCr())) {
+							wkOvBal = wkOvBal.add(ac.getTxAmt());
+						} else {
+							wkOvBal = wkOvBal.subtract(ac.getTxAmt());
+						}
+					} else {
+						if ("D".equals(ac.getDbCr())) {
+							wkLnBal = wkLnBal.add(ac.getTxAmt());
+						} else {
+							wkLnBal = wkLnBal.subtract(ac.getTxAmt());
+						}
+						acctCode = ac.getAcctCode();
+					}
+					this.info("ac=" + ac.getAcctCode() + "-" + ac.getDbCr() + "-" + ac.getTxAmt() + ", OvBal=" + wkOvBal
+							+ ", LnBal=" + wkLnBal);
+				}
+			}
 		}
 
 		if (tDailyLoanBal != null) {
@@ -285,37 +307,34 @@ public class L8701 extends TradeBuffer {
 				wkLnBal = tDailyLoanBal.getLoanBalance();
 				acctCode = tDailyLoanBal.getAcctCode();
 			}
-			endDatef = tDailyLoanBal.getDataDate() + 19110000;
 			this.info("DailyLoanBal=" + tDailyLoanBal.getAcctCode() + ", OvBal=" + wkOvBal + ", LnBal=" + wkLnBal);
-		}
-
-		// 資料基準日 < AcDate <= 最近的一筆餘額檔日期(沒有則小於本日)
-		// 2023/4/6:bormNoAcDateRange條件起日改為使用DrawdownDate,而不使用(基準日+1天)
-		iStartday = ln.getDrawdownDate() + 19110000;
-		Slice<AcDetail> slAcDetail = acDetailService.bormNoAcDateRange(ln.getCustNo(), ln.getFacmNo(), ln.getBormNo(), 1, iStartday, endDatef, 0, Integer.MAX_VALUE, titaVo);
-		if (slAcDetail == null) {
-			return;
-		}
-		for (AcDetail ac : slAcDetail.getContent()) {
-			if (ac.getEntAc() > 0) {
-				if ("990".equals(ac.getAcctCode())) {
-					if ("D".equals(ac.getDbCr())) {
-						wkOvBal = wkOvBal.subtract(ac.getTxAmt());
+			// 資料基準日+1~每日餘額檔資料日期
+			Slice<AcDetail> slAcDetail = acDetailService.bormNoAcDateRange(ln.getCustNo(), ln.getFacmNo(), ln.getBormNo(), 1, iDataDatef + 1,  tDailyLoanBal.getDataDate() + 19110000, 0, Integer.MAX_VALUE, titaVo);
+			if (slAcDetail == null) {
+				return;
+			}
+			for (AcDetail ac : slAcDetail.getContent()) {
+				if (ac.getEntAc() > 0) {
+					if ("990".equals(ac.getAcctCode())) {
+						if ("D".equals(ac.getDbCr())) {
+							wkOvBal = wkOvBal.subtract(ac.getTxAmt());
+						} else {
+							wkOvBal = wkOvBal.add(ac.getTxAmt());
+						}
 					} else {
-						wkOvBal = wkOvBal.add(ac.getTxAmt());
+						if ("D".equals(ac.getDbCr())) {
+							wkLnBal = wkLnBal.subtract(ac.getTxAmt());
+						} else {
+							wkLnBal = wkLnBal.add(ac.getTxAmt());
+						}
+						acctCode = ac.getAcctCode();
 					}
-				} else {
-					if ("D".equals(ac.getDbCr())) {
-						wkLnBal = wkLnBal.subtract(ac.getTxAmt());
-					} else {
-						wkLnBal = wkLnBal.add(ac.getTxAmt());
-					}
-					acctCode = tDailyLoanBal.getAcctCode();
+					this.info("ac=" + ac.getAcctCode() + "-" + ac.getDbCr() + "-" + ac.getTxAmt() + ", OvBal=" + wkOvBal
+							+ ", LnBal=" + wkLnBal);
 				}
-				this.info("ac=" + ac.getAcctCode() + "-" + ac.getDbCr() + "-" + ac.getTxAmt() + ", OvBal=" + wkOvBal
-						+ ", LnBal=" + wkLnBal);
 			}
 		}
+
 		if (wkOvBal.compareTo(BigDecimal.ZERO) > 0) {
 			acctCode = "990";
 			loanBal = wkOvBal;
@@ -368,7 +387,7 @@ public class L8701 extends TradeBuffer {
 		// 授信帳號 50
 		strField += makeFile.fillStringR(parse.IntegerToString(ln.getCustNo(), 7) + parse.IntegerToString(ln.getFacmNo(), 3) + parse.IntegerToString(ln.getBormNo(), 3), 50);
 		strField += makeFile.fillStringR(oAcctItem, 20);// 放款科目20碼
-		strField += makeFile.fillStringR(iDataDatef, 8);// 資料基準日8碼
+		strField += makeFile.fillStringR(parse.IntegerToString(iDataDatef,8), 8);// 資料基準日8碼
 		int FirstDrawdownDate = 0; 
 		if(tFacMain.getFirstDrawdownDate()!=0) {
 			FirstDrawdownDate = tFacMain.getFirstDrawdownDate() + 19110000;
