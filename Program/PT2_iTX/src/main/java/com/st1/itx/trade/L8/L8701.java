@@ -273,7 +273,7 @@ public class L8701 extends TradeBuffer {
 		// 最近的一筆餘額
 		tDailyLoanBal = dailyLoanBalService.dataDateFirst(ln.getCustNo(), ln.getFacmNo(), ln.getBormNo(), iTbsdyf, titaVo);
 		if (tDailyLoanBal == null) {
-			// 撥款日~資料基準日
+			// 撥款日~資料基準日 
 			Slice<AcDetail> slAcDetail = acDetailService.bormNoAcDateRange(ln.getCustNo(), ln.getFacmNo(), ln.getBormNo(), 1, ln.getDrawdownDate()+19110000, iDataDatef, 0, Integer.MAX_VALUE, titaVo);
 			if (slAcDetail == null) {
 				return;

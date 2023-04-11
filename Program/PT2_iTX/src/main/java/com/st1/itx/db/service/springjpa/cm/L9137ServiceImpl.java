@@ -99,19 +99,33 @@ public class L9137ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                            ELSE 'N' END AS \"IsRelated\"";
 		sql += "                     FROM ( SELECT CM.\"CustNo\"";
 		sql += "                                  ,NVL(CM.\"EntCode\",'0') AS \"EntCode\"";
-		sql += "                                  ,SUM(TO_NUMBER(NVL(BRS.\"LAW001\",'0'))";
-		sql += "                                       + TO_NUMBER(NVL(BRS.\"LAW005\",'0'))";
-		sql += "                                       + TO_NUMBER(NVL(BRC.\"LAW001\",'0'))";
-		sql += "                                       + TO_NUMBER(NVL(BRC.\"LAW005\",'0'))";
-		sql += "                                       + TO_NUMBER(NVL(BRF.\"LAW001\",'0'))";
-		sql += "                                       + TO_NUMBER(NVL(BRF.\"LAW005\",'0'))";
-		sql += "                                      ) AS \"IsRelated\"";
-//		sql += "                                  ,COUNT(S.\"StaffId\") AS \"IsRelated\"";
+//		sql += "                                  ,SUM(TO_NUMBER(NVL(BRS.\"LAW001\",'0'))";
+//		sql += "                                       + TO_NUMBER(NVL(BRS.\"LAW005\",'0'))";
+//		sql += "                                       + TO_NUMBER(NVL(BRC.\"LAW001\",'0'))";
+//		sql += "                                       + TO_NUMBER(NVL(BRC.\"LAW005\",'0'))";
+//		sql += "                                       + TO_NUMBER(NVL(BRF.\"LAW001\",'0'))";
+//		sql += "                                       + TO_NUMBER(NVL(BRF.\"LAW005\",'0'))";
+//		sql += "                                      ) AS \"IsRelated\"";
+		sql += "                                  ,COUNT(REL.\"Id\") AS \"IsRelated\"";
 		sql += "                            FROM \"CustMain\" CM";
-		sql += "                            LEFT JOIN \"BankRelationSelf\" BRS ON BRS.\"CustId\" = CM.\"CustId\"";
-		sql += "                            LEFT JOIN \"BankRelationCompany\" BRC ON BRC.\"CompanyId\" = CM.\"CustId\"";
-		sql += "                            LEFT JOIN \"BankRelationFamily\" BRF ON BRF.\"RelationId\" = CM.\"CustId\"";
+//		sql += "                            LEFT JOIN \"BankRelationSelf\" BRS ON BRS.\"CustId\" = CM.\"CustId\"";
+//		sql += "                            LEFT JOIN \"BankRelationCompany\" BRC ON BRC.\"CompanyId\" = CM.\"CustId\"";
+//		sql += "                            LEFT JOIN \"BankRelationFamily\" BRF ON BRF.\"RelationId\" = CM.\"CustId\"";
 //		sql += "                            LEFT JOIN \"StakeholdersStaff\" S ON S.\"StaffId\" = CM.\"CustId\"";
+		sql += "                            LEFT JOIN (";
+		sql += "                            	SELECT \"EmpId\" AS \"Id\"";
+		sql += "                            	FROM \"LifeRelEmp\"";
+		sql += "                            	UNION ALL";
+		sql += "                            	SELECT DISTINCT";
+		sql += "                           			   CASE";
+		sql += "                            			 WHEN \"BusId\" <> '-' THEN \"BusId\"";
+		sql += "                            			 WHEN \"RelId\" <> '-' THEN \"RelId\"";
+		sql += "                            			 WHEN \"HeadId\" <> '-' THEN \"HeadId\"";
+		sql += "                            		   END AS \"Id\"";
+		sql += "                            	FROM \"LifeRelHead\"";
+		sql += "                            	WHERE \"RelWithCompany\" IN ('A','B')";
+		sql += "                            	  AND \"LoanBalance\" > 0";
+		sql += "                            ) REL ON REL.\"Id\" = CM.\"CustId\"";
 		sql += "                            WHERE CM.\"CustNo\" > 0";
 		sql += "                            GROUP BY CM.\"CustNo\",NVL(CM.\"EntCode\",'0')";
 		sql += "                          ) S0";
@@ -230,27 +244,8 @@ public class L9137ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ) ";
 		sql += " SELECT S.\"DetailSeq\" ";
 		sql += "       ,SUM(S.\"Counts\")      AS \"Counts\" ";
-		sql += "       ,SUM(S.\"LoanBalance\") AS \"Amt\" ";
-		
-		
+		sql += "       ,SUM(S.\"LoanBalance\") AS \"Amt\" ";		
 		sql += " FROM (  SELECT CASE ";
-////		sql += "                  WHEN D.\"AcctCode\" = '310' AND C.\"IsRelated\" = 'Y'          THEN 1";
-//		sql += "                  WHEN D.\"AcctCode\" = '310' AND C.\"EntCode\" IN ('1')         THEN 1"; // EntCode = 2
-//		// 為企金自然人,算在個人戶
-//		sql += "                  WHEN D.\"AcctCode\" = '310'                                    THEN 2";
-////		sql += "                  WHEN D.\"AcctCode\" = '320' AND C.\"IsRelated\" = 'Y'          THEN 3";
-//		sql += "                  WHEN D.\"AcctCode\" = '320' AND C.\"EntCode\" IN ('1')         THEN 3"; // EntCode = 2
-//		// 為企金自然人,算在個人戶
-//		sql += "                  WHEN D.\"AcctCode\" = '320'                                    THEN 4";
-////		sql += "                  WHEN D.\"AcctCode\" = '330' AND C.\"IsRelated\" = 'Y'          THEN 5";
-//		sql += "                  WHEN D.\"AcctCode\" = '330' AND C.\"EntCode\" IN ('1')         THEN 5"; // EntCode = 2
-//		// 為企金自然人,算在個人戶
-//		sql += "                  WHEN D.\"AcctCode\" = '330'                                    THEN 6";
-//		sql += "                  WHEN D.\"AcctCode\" = '990' AND D.\"FacAcctCode\" <> '340'     THEN 7";
-//		sql += "                  WHEN D.\"AcctCode\" = '340'                                    THEN 8";
-//		sql += "                  WHEN D.\"AcctCode\" = '990' AND D.\"FacAcctCode\" = '340'      THEN 9";
-//		sql += " 			   	ELSE 99 END AS \"DetailSeq\" ";
-		
 		sql += " 				   WHEN C.\"IsRelated\" = 'Y' ";
 		sql += "                     THEN CASE WHEN D.\"AcctCode\" = '310' AND C.\"EntCode\" IN ('1')         THEN 2 ";
 		sql += "                               WHEN D.\"AcctCode\" = '310'                                    THEN 3 ";
@@ -283,21 +278,35 @@ public class L9137ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                           ,CASE WHEN S0.\"IsRelated\" > 0 ";
 		sql += "                                 THEN 'Y' ";
 		sql += "                            ELSE 'N' END AS \"IsRelated\" ";
-		sql += "                     FROM ( SELECT CM.\"CustNo\" ";
-		sql += "                                  ,NVL(CM.\"EntCode\",'0') AS \"EntCode\" ";
-		sql += "                                  ,SUM(TO_NUMBER(NVL(BRS.\"LAW001\",'0'))";
-		sql += "                                       + TO_NUMBER(NVL(BRS.\"LAW005\",'0'))";
-		sql += "                                       + TO_NUMBER(NVL(BRC.\"LAW001\",'0'))";
-		sql += "                                       + TO_NUMBER(NVL(BRC.\"LAW005\",'0'))";
-		sql += "                                       + TO_NUMBER(NVL(BRF.\"LAW001\",'0'))";
-		sql += "                                       + TO_NUMBER(NVL(BRF.\"LAW005\",'0'))";
-		sql += "                                      ) AS \"IsRelated\"";
-//		sql += "                                  ,COUNT(S.\"StaffId\") AS \"IsRelated\"";
+		sql += "                     FROM ( SELECT CM.\"CustNo\"";
+		sql += "                                  ,NVL(CM.\"EntCode\",'0') AS \"EntCode\"";
+//		sql += "                                  ,SUM(TO_NUMBER(NVL(BRS.\"LAW001\",'0'))";
+//		sql += "                                       + TO_NUMBER(NVL(BRS.\"LAW005\",'0'))";
+//		sql += "                                       + TO_NUMBER(NVL(BRC.\"LAW001\",'0'))";
+//		sql += "                                       + TO_NUMBER(NVL(BRC.\"LAW005\",'0'))";
+//		sql += "                                       + TO_NUMBER(NVL(BRF.\"LAW001\",'0'))";
+//		sql += "                                       + TO_NUMBER(NVL(BRF.\"LAW005\",'0'))";
+//		sql += "                                      ) AS \"IsRelated\"";
+		sql += "                                  ,COUNT(REL.\"Id\") AS \"IsRelated\"";
 		sql += "                            FROM \"CustMain\" CM";
-		sql += "                            LEFT JOIN \"BankRelationSelf\" BRS ON BRS.\"CustId\" = CM.\"CustId\"";
-		sql += "                            LEFT JOIN \"BankRelationCompany\" BRC ON BRC.\"CompanyId\" = CM.\"CustId\"";
-		sql += "                            LEFT JOIN \"BankRelationFamily\" BRF ON BRF.\"RelationId\" = CM.\"CustId\"";
+//		sql += "                            LEFT JOIN \"BankRelationSelf\" BRS ON BRS.\"CustId\" = CM.\"CustId\"";
+//		sql += "                            LEFT JOIN \"BankRelationCompany\" BRC ON BRC.\"CompanyId\" = CM.\"CustId\"";
+//		sql += "                            LEFT JOIN \"BankRelationFamily\" BRF ON BRF.\"RelationId\" = CM.\"CustId\"";
 //		sql += "                            LEFT JOIN \"StakeholdersStaff\" S ON S.\"StaffId\" = CM.\"CustId\"";
+		sql += "                            LEFT JOIN (";
+		sql += "                            	SELECT \"EmpId\" AS \"Id\"";
+		sql += "                            	FROM \"LifeRelEmp\"";
+		sql += "                            	UNION ALL";
+		sql += "                            	SELECT DISTINCT";
+		sql += "                           			   CASE";
+		sql += "                            			 WHEN \"BusId\" <> '-' THEN \"BusId\"";
+		sql += "                            			 WHEN \"RelId\" <> '-' THEN \"RelId\"";
+		sql += "                            			 WHEN \"HeadId\" <> '-' THEN \"HeadId\"";
+		sql += "                            		   END AS \"Id\"";
+		sql += "                            	FROM \"LifeRelHead\"";
+		sql += "                            	WHERE \"RelWithCompany\" IN ('A','B')";
+		sql += "                            	  AND \"LoanBalance\" > 0";
+		sql += "                            ) REL ON REL.\"Id\" = CM.\"CustId\"";
 		sql += "                            WHERE CM.\"CustNo\" > 0 ";
 		sql += "                            GROUP BY CM.\"CustNo\",NVL(CM.\"EntCode\",'0')  ";
 		sql += "                          ) S0 ";

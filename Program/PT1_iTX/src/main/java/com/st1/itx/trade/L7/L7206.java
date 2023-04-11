@@ -82,7 +82,7 @@ public class L7206 extends TradeBuffer {
 
 		ArrayList<String> dataLineList = new ArrayList<>();
 
-		titaVo.setDataBaseOnMon();// 指定月報環境
+		// titaVo.setDataBaseOnMon();// 指定月報環境
 
 		// 上傳檔案
 		// 0:人壽利關人職員名單[LA$RLTP] ;csv xlsx xls
