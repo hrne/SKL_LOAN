@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
@@ -121,7 +122,7 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   ln3.*          															";
 		sql += "  ,cdr.\"Item\"					   AS \"RepayCodeX\"						";
 		sql += "  ,CASE WHEN ln3.\"TxDescCode\" = 'Fee' AND ln3.\"TitaTxCd\" = 'L3210' THEN '暫收銷'  ||  cdf.\"Item\" 	 ";
-		sql += "        WHEN ln3.\"TxDescCode\" = 'Fee' AND ln3.\"TitaTxCd\" = 'L3230' THEN '暫收銷'  ||  cdf.\"Item\" 	 ";
+		sql += "        WHEN ln3.\"TxDescCode\" = 'Fee' AND ln3.\"TitaTxCd\" = 'L3230' THEN '暫收退'  ||  cdf.\"Item\" 	 ";
 		sql += "        WHEN ln3.\"TxDescCode\" = 'Fee' THEN cdf.\"Item\"                                            ";
 		sql += "        ELSE NVL(cdt.\"Item\",ln3.\"Desc\")  	    	                                             ";
 		sql += "        END                     AS \"TxDescCodeX\"	                                                 ";

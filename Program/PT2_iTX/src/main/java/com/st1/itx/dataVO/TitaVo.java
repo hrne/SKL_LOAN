@@ -530,7 +530,7 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	 */
 	public boolean isTxcdInq() {
         return this.getTxcd().trim().substring(2, 3).equals("9") || this.getTxcd().trim().substring(2, 3).equals("R") || this.getTxcd().trim().substring(2, 3).equals("0")
-                || this.getTxCode().trim().substring(2, 3).equals("0") || this.getTxCode().trim().substring(2, 3).equals("9") || this.getTxCode().trim().substring(2, 3).equals("R")
+                || (this.getTxCode().trim().length() >= 4 && (this.getTxCode().trim().substring(2, 3).equals("0") || this.getTxCode().trim().substring(2, 3).equals("9") || this.getTxCode().trim().substring(2, 3).equals("R")))
                 || this.isFuncindInquire();
     }
 
