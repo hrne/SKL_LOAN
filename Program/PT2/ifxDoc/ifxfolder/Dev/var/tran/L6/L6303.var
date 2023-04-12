@@ -1,0 +1,275 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L6303)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+
+!--- 控制grd顯示欄位
+#CALLGRID=@,1,S
+##loop{times:6,n:1}
+IF(#CodeType{n}==0,INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1))
+##end
+C(3,#UpdateCode,1,$,s)
+INVOKEJS(SHOW,grd1_1,1)
+
+</sub>
+
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L6303]                                 政府優惠房屋貸款-補貼利率維護"],
+["#FdEffectDate+生效日期",#EffectDate],
+["#FdRemark+備註",#Remark],
+
+
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+! #BTN_SELECT_ALL=X,15,I,ui:button;value:查詢;enable:0;tabbable:0;title:LXXXX
+
+#FdEffectDate=X,2,L
+#FdRemark=X,2,L
+#FdCodeType=X,2,L
+#FdItem=X,2,L
+! #FdJsonFields=X,2,L
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L6033 政府優惠房屋貸款-補貼利率]進入),$)
+#AutoReFresh=A,1,S
+C(3,#CHAIN,1,$,S)
+E(0,1)
+ASGN(CAUTO$)
+
+![連動交易]
+#NTXBUF=X,138,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#CHAIN_FuncCode=X,1,S
+T(1,#NTXBUF,1,1)
+
+#CHAIN_EffectDate=D,7,S
+T(1,#NTXBUF,2,7)
+
+#CHAIN_Remark=X,100,S
+T(1,#NTXBUF,9,100)
+C(3,#CHAIN,1,T(2,@FuncCode,#CHAIN_FuncCode),)
+C(3,#CHAIN,1,T(2,@TranKey_Tmp,#CHAIN_FuncCode),)
+C(3,#CHAIN,1,T(2,@EffectDate,#CHAIN_EffectDate),)
+C(3,#CHAIN,1,T(2,@Remark,#CHAIN_Remark),)
+
+!---------- AP TEXT AREA Variables ----------
+!刪除隱藏重新交易按鈕
+#AGAIN=X,1,S
+C(3,#FuncCode,1,S,$)
+E(0,1)ASGN(AGAIN$)
+
+!FuncCode2
+#CDCODEFuncCode2=x,20,S                  
+T(3,CdCode.FuncCode2)                  
+#FuncCode2Help=x,100,S   
+
+! 新增進入
+#Deal_New=X,1,S
+C(5,#TranKey_Tmp,1,$,S)
+T(F,@EffectDate,1)T(F,@Remark,1)
+K(MODIFYBUTTON,新增)
+T(2,@FdEffectDate,*)
+
+
+! 異動進入
+#Deal_Update=X,1,S
+C(5,#TranKey_Tmp,2,$,S)
+T(F,@EffectDate,0)T(F,@Remark,1)
+K(MODIFYBUTTON,異動)
+
+! 查詢進入
+#Deal_Search=X,1,S
+C(5,#TranKey_Tmp,5,$,S)
+T(F,@EffectDate,0)T(F,@Remark,0)
+##loop {times:6,i:1}
+T(F,@CodeTypeNo{i},0)
+T(F,@CdItemNo{i},0)
+T(F,@JsonFieldsNo{i},0)
+##end
+T(2,@FdEffectDate, )
+K(NOBUTTON,CLOSEY)
+
+! 刪除進入
+#Deal_Delete=X,1,S
+C(5,#TranKey_Tmp,4,$,S)
+T(F,@EffectDate,0)T(F,@Remark,0)
+##loop {times:6,i:1}
+T(F,@CodeTypeNo{i},0)
+T(F,@CdItemNo{i},0)
+T(F,@JsonFieldsNo{i},0)
+##end
+K(MODIFYBUTTON,刪除)
+E(0,@FUNCIND,4)
+
+! 功能
+#FuncCode=A,1,S
+T(F,@FuncCode,0)
+C(3,#CHAIN,1,s,$)
+HELP(#FuncCode2Help)
+@V(H,#FuncCode2Help)
+
+#FuncCodeX=X,12,L
+T(H,#TranKey_Tmp,#FuncCode2Help)
+C(2,#TranKey_Tmp,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除))
+
+
+#TranKey_Tmp=X,1,S
+C(2,#CHAIN,$,s)
+
+
+
+! [調Rim相關]
+! 定義Rom欄位名稱、型態、長度
+<include src="ROM.icf::L6R51.dec"/>
+
+#RimEffectDate=D,7,S
+E(0,10101)
+
+#EffectDate=D,7,I
+C(5,#TranKey_Tmp,1,$,s)
+D(8)
+@V(7)A(DATE,0,#EffectDate)
+
+#RimL6r51B=X,1,S
+E(0,@RimEffectDate,#EffectDate)
+S(L6R51,1,#RimEffectDate,#TranKey_Tmp)
+R(1,L6R51)
+##loop {times:6,i:1}
+T(2,@CodeTypeNo{i},#L6r51CodeTypeNo{i})
+T(2,@CdItemNo{i},#L6r51CdItemNo{i})
+E(0,@JsonFieldsNo{i},#L6r51JsonFieldsNo{i})
+##end
+T(2,@Remark,#L6r51Remark)
+
+#Remark=X,100,I
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+ 
+!#RPTFG=A,1,S
+!E(0,0)
+
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L6R14Rim.dec"/>
+<include src="ROM.icf::L6R14.dec"/>
+
+
+</sub>
+
+!<sub type="DC" name="p2" layout="cols=2;screen.width=[250,1000];printer.width=[15,30];order=1;">
+<sub type="DC" name="p2" layout="cols=2;screen.width=[200,1000];printer.width=[45,70];order=1;">
+[
+["政府優惠房屋貸款"],
+["#grid#,{id:1,expand:false,loop:6,row_height:0,s_cols:[60,60,60], p_cols:[90,90,90]}","","",
+["代碼","項目中文","利率"],
+[#CodeTypeNo1,#CdItemNo1,#JsonFieldsNo1],
+],
+]
+!</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+!<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+
+
+
+#ProdGroup1=X,5,S
+T(3,1)
+#ProdGroup2=X,5,S
+T(3,2)
+#ProdGroup3=X,5,S
+T(3,3)
+#ProdGroup4=X,5,S
+T(3,4)
+#ProdGroup5=X,5,S
+T(3,5)
+#ProdGroup6=X,5,S
+T(3,6)
+
+
+
+! 修改這裡的 loop times
+##loop{times:6,i:1}
+
+#CodeTypeNo{i}=X,5,L
+! T(1,#ProdGroup{i},1,2)
+
+#CdItemNo{i}=X,50,L
+
+! T(H,@CdItemNo1,#CodeTypeNo{i},#GovOfferCodeHelp)
+
+! #JsonFieldsNo{i}=A,20,I
+#JsonFieldsNo{i}=n,5.4,I
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+! T(1,#ProdGroup{i},1,25)
+
+##end
+
+</sub>
+
+!---------- TXFORM = L6303 ----------
+<sub type="FORM" name="L6303">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L6303,$,S)
+
+!#SCRTIL=_,_,S
+!T(3,[L6303] 政府優惠房屋貸款-補貼利率維護)
+
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#TranKey_Tmp
+#FuncCode
+#EffectDate
+#Remark
+##loop{times:6,i:1}
+#CodeTypeNo{i}
+#JsonFieldsNo{i}
+##end
+
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L6303^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L6R14.tom"/>
+<include src="ROM.icf::L6R51.tom"/>
+
+
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::FM01.sel"/>
+<include src="PRT.icf::FMR01.sel"/>
+<include src="PRT.icf::FMH01.sel"/>
+<include src="PRT.icf::FMHR01.sel"/>
+</sub>
+

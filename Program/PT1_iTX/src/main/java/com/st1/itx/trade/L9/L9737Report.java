@@ -89,9 +89,10 @@ public class L9737Report extends MakeReport {
 				makeExcel.setValue(row, 12, parse.stringToInteger(result.get("Status")));
 				makeExcel.setValue(row, 13, this.showBcDate(result.get("DrawdownDate"), 0), "C");
 				makeExcel.setValue(row, 14, parse.stringToBigDecimal(result.get("EvaNetWorth")), "#,##0");
-				BigDecimal ltv = "0".equals(result.get("EvaNetWorth")) ||  "0".equals(result.get("LineAmt")) ? BigDecimal.ZERO
-						: parse.stringToBigDecimal(result.get("LineAmt")).divide(
-								parse.stringToBigDecimal(result.get("EvaNetWorth"))).setScale(2, BigDecimal.ROUND_HALF_UP);
+				BigDecimal ltv = BigDecimal.ZERO;
+//						"0".equals(result.get("EvaNetWorth")) ||  "0".equals(result.get("LineAmt")) ? BigDecimal.ZERO
+//						: parse.stringToBigDecimal(result.get("LineAmt")).divide(
+//								parse.stringToBigDecimal(result.get("EvaNetWorth"))).setScale(2, BigDecimal.ROUND_HALF_UP);
 				makeExcel.setFormula(row, 15, ltv, "ROUND(F" + row + "/N" + row + ",2)", "0%");
 				row++;
 			}

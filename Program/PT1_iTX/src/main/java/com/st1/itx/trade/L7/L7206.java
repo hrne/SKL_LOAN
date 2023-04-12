@@ -82,7 +82,7 @@ public class L7206 extends TradeBuffer {
 
 		ArrayList<String> dataLineList = new ArrayList<>();
 
-		// titaVo.setDataBaseOnMon();// 指定月報環境
+		titaVo.keepOrgDataBase();// 保留原本記號
 
 		// 上傳檔案
 		// 0:人壽利關人職員名單[LA$RLTP] ;csv xlsx xls
@@ -211,6 +211,23 @@ public class L7206 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
 
+			
+			titaVo.setDataBaseOnMon();// 指定月報環境
+			this.info("onMon");
+			
+			try {
+
+				if (delStakeholdersStaff != null) {
+					this.info("1.delete old data");
+					tStakeholdersStaffService.deleteAll(delStakeholdersStaff, titaVo);
+				}
+				this.info("2.insert new data");
+				tStakeholdersStaffService.insertAll(instakeholdersStaff, titaVo);
+
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+			}
+
 			// 1:人壽利關人負責人名單[T07];xlsx xls
 		} else if (iFunctionCode == 1) {
 
@@ -280,6 +297,22 @@ public class L7206 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
 
+			titaVo.setDataBaseOnMon();// 指定月報環境
+			this.info("onMon");
+			
+			try {
+
+				if (delLifeRelHead != null) {
+					this.info("1.delete old data");
+					tLifeRelHeadService.deleteAll(delLifeRelHead, titaVo);
+				}
+				this.info("2.insert new data");
+				tLifeRelHeadService.insertAll(inLifeRelHead, titaVo);
+
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+			}
+			
 			// 2:人壽負利關人職員名單[T07_2];xlsx xls
 		} else if (iFunctionCode == 2) {
 
@@ -310,6 +343,22 @@ public class L7206 extends TradeBuffer {
 			} // for
 
 			this.info("inLifeRelEmp =" + inLifeRelEmp.toString());
+			try {
+
+				if (delLifeRelEmp != null) {
+					this.info("1.delete old data");
+					tLifeRelEmpService.deleteAll(delLifeRelEmp, titaVo);
+				}
+				this.info("2.insert new data");
+				tLifeRelEmpService.insertAll(inLifeRelEmp, titaVo);
+
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+			}
+			
+			titaVo.setDataBaseOnMon();// 指定月報環境
+			this.info("onMon");
+			
 			try {
 
 				if (delLifeRelEmp != null) {
@@ -372,8 +421,28 @@ public class L7206 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
+			
+			
+			
+			titaVo.setDataBaseOnMon();// 指定月報環境
+			this.info("onMon");
 
+			try {
+
+				if (delFinHoldRel != null) {
+					this.info("1.delete old data");
+					tFinHoldRelService.deleteAll(delFinHoldRel, titaVo);
+				}
+				this.info("2.insert new data");
+				tFinHoldRelService.insertAll(inFinHoldRel, titaVo);
+
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+			}
+			
 		}
+
+		titaVo.setDataBaseOnOrg();// 還原原本的環境
 
 		this.totaVo.putParam("CountAll", CountAll);
 		this.totaVo.putParam("Count", CountS);
@@ -382,6 +451,24 @@ public class L7206 extends TradeBuffer {
 		return this.sendList();
 
 	}
+
+//	public void updateData(TitaVo titaVo,List insData,List delData) throws LogicException {
+//
+//		
+//		try {
+//
+//			if (delData != null) {
+//				this.info("1.delete old data");
+//				tFinHoldRelService.deleteAll(delData, titaVo);
+//			}
+//			this.info("2.insert new data");
+//			tFinHoldRelService.insertAll(insData, titaVo);
+//
+//		} catch (DBException e) {
+//			throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+//		}
+//		
+//	}
 
 	/**
 	 * 處理CSV檔案資料

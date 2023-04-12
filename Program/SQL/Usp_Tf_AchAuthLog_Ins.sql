@@ -92,7 +92,7 @@ BEGIN
           ,NVL(FACM."LMSPRL",'00')        AS "RelationCode"        -- 與借款人關係 VARCHAR2 2 
           ,CASE
              WHEN NVL(FACM."LMSPRL",'00') != '00'
-             THEN NVL(FACM."LMSPAN",u' ')
+             THEN TO_NCHAR(NVL(FACM."LMSPAN",' '))
            ELSE CM."CustName" 
            END                            AS "RelAcctName"         -- 第三人帳戶戶名 NVARCHAR2 100 
           ,CASE
@@ -225,10 +225,26 @@ BEGIN
            ELSE 0 END                     AS "RetrDate"            -- 提回日期 Decimald 8 
           ,0                              AS "DeleteDate"          -- 刪除日期 Decimald 8 
           ,NVL(FACM."LMSPRL",'00')        AS "RelationCode"        -- 與借款人關係 VARCHAR2 2 
-          ,NVL(FACM."LMSPAN",u' ')        AS "RelAcctName"         -- 第三人帳戶戶名 NVARCHAR2 100 
-          ,NVL(FACM."LMSPID",' ')         AS "RelationId"          -- 第三人身分證字號 VARCHAR2 10 0
-          ,0                              AS "RelAcctBirthday"     -- 第三人出生日期 Decimald 8 
-          ,''                             AS "RelAcctGender"       -- 第三人性別 VARCHAR2 1 
+          ,CASE
+             WHEN NVL(FACM."LMSPRL",'00') != '00'
+             THEN TO_NCHAR(NVL(FACM."LMSPAN",' '))
+           ELSE CM."CustName" 
+           END                            AS "RelAcctName"         -- 第三人帳戶戶名 NVARCHAR2 100 
+          ,CASE
+             WHEN NVL(FACM."LMSPRL",'00') != '00'
+             THEN NVL(FACM."LMSPID",' ')
+           ELSE CM."CustId" 
+           END                            AS "RelationId"          -- 第三人身分證字號 VARCHAR2 10 0
+          ,CASE
+             WHEN NVL(FACM."LMSPRL",'00') != '00'
+             THEN 0
+           ELSE CM."Birthday" 
+           END                            AS "RelAcctBirthday"     -- 第三人出生日期 Decimald 8 
+          ,CASE
+             WHEN NVL(FACM."LMSPRL",'00') != '00'
+             THEN '' 
+           ELSE CM."Sex" 
+           END                            AS "RelAcctGender"       -- 第三人性別 VARCHAR2 1 
           ,''                             AS "AmlRsp"              -- AML回應碼 VARCHAR2 1
           ,''                             AS "TitaTxCd"            -- 交易代號 VARCHAR2 5
           ,NVL(AEM1."EmpNo",'999999')     AS "CreateEmpNo"         -- 建立者櫃員編號 VARCHAR2 6 0
@@ -271,6 +287,7 @@ BEGIN
                                                     ELSE '000' END
                               AND AAL."RepayAcct" = LPAD(S1."LMSPCN",14,'0')
                               AND AAL."CreateFlag" = 'A'
+    LEFT JOIN "CustMain" CM ON CM."CustNo" = S1.LMSACN
     WHERE NVL(S1."ATHCOD",' ') = ' '
       AND NVL(AAL."CustNo",0) = 0 -- 不存在的才寫入
     ;
@@ -352,10 +369,26 @@ BEGIN
           ,0                              AS "RetrDate"            -- 提回日期 Decimald 8 
           ,0                              AS "DeleteDate"          -- 刪除日期 Decimald 8 
           ,NVL(FACM."LMSPRL",'00')        AS "RelationCode"        -- 與借款人關係 VARCHAR2 2 
-          ,NVL(FACM."LMSPAN",u' ')        AS "RelAcctName"         -- 第三人帳戶戶名 NVARCHAR2 100 
-          ,NVL(FACM."LMSPID",' ')         AS "RelationId"          -- 第三人身分證字號 VARCHAR2 10 0
-          ,0                              AS "RelAcctBirthday"     -- 第三人出生日期 Decimald 8 
-          ,''                             AS "RelAcctGender"       -- 第三人性別 VARCHAR2 1 
+          ,CASE
+             WHEN NVL(FACM."LMSPRL",'00') != '00'
+             THEN TO_NCHAR(NVL(FACM."LMSPAN",' '))
+           ELSE CM."CustName" 
+           END                            AS "RelAcctName"         -- 第三人帳戶戶名 NVARCHAR2 100 
+          ,CASE
+             WHEN NVL(FACM."LMSPRL",'00') != '00'
+             THEN NVL(FACM."LMSPID",' ')
+           ELSE CM."CustId" 
+           END                            AS "RelationId"          -- 第三人身分證字號 VARCHAR2 10 0
+          ,CASE
+             WHEN NVL(FACM."LMSPRL",'00') != '00'
+             THEN 0
+           ELSE CM."Birthday" 
+           END                            AS "RelAcctBirthday"     -- 第三人出生日期 Decimald 8 
+          ,CASE
+             WHEN NVL(FACM."LMSPRL",'00') != '00'
+             THEN '' 
+           ELSE CM."Sex" 
+           END                            AS "RelAcctGender"       -- 第三人性別 VARCHAR2 1 
           ,''                             AS "AmlRsp"              -- AML回應碼 VARCHAR2 1
           ,''                             AS "TitaTxCd"            -- 交易代號 VARCHAR2 5
           ,BAA."CreateEmpNo"              AS "CreateEmpNo"         -- 建立者櫃員編號 VARCHAR2 6 0
@@ -383,6 +416,7 @@ BEGIN
     ) FACM ON FACM."LMSACN" = BAA."CustNo"
           AND FACM."LMSPCN" = BAA."RepayAcct"
           AND FACM."SEQ" = 1
+    LEFT JOIN "CustMain" CM ON CM."CustNo" = BAA."CustNo"
     WHERE BAA."BAASeq" = 1 -- 只取一筆
     ;
 

@@ -265,7 +265,7 @@ BEGIN
                THEN '201'
                WHEN NVL(L.ACTFSC,' ') = 'B'
                THEN 'B'
-             ELSE '00A' AS "AcSubBookCode"
+             ELSE '00A' END AS "AcSubBookCode"
       FROM "TB$LCDP" L
       LEFT JOIN "CdAcCode" C ON C."AcNoCodeOld" = L."CORACC" 
                             AND C."AcSubCode" = NVL(L."CORACS",'     ') 
