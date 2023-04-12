@@ -209,6 +209,7 @@ T(2,@CustId,#L8r28CustId)
 T(2,@SubmitKey,#L8r28SubmitKey)
 T(2,@CaseStatus,#L8r28CaseStatus)
 E(0,@ClaimDate,#L8r28ClaimDate)
+E(0,@ClaimDate1,#L8r28ClaimDate)
 T(2,@CourtCode,#L8r28CourtCode)
 E(0,@Year,#L8r28Year)
 T(2,@CourtDiv,#L8r28CourtDiv)
@@ -309,17 +310,21 @@ T(H,#CaseStatus,#CaseStatus56Help)
 
 #Space1=X,1,S
 C(5,#CaseStatus,A,C(5,#TranKey_Tmp,5,s,C(5,#TranKey_Tmp,4,s,INVOKEJS(SHOW,p1,6,6,0)INVOKEJS(SHOW,p1,5,5,1)T(3,@Approve, )T(3,@ApproveX, )T(2,@FdApprove, )T(F,@Approve,0)T(F,@OutstandAmt,1)T(F,@SubAmt,0))),$)
-C(5,#CaseStatus,B,C(5,#TranKey_Tmp,5,s,C(5,#TranKey_Tmp,4,s,INVOKEJS(SHOW,p1,6,6,0)INVOKEJS(SHOW,p1,5,5,1)T(3,@Approve, )T(3,@ApproveX, )T(2,@FdApprove,*)T(F,@Approve,1)T(F,@OutstandAmt,0)T(F,@SubAmt,1))),$)
-C(5,#CaseStatus,C,C(5,#TranKey_Tmp,5,s,C(5,#TranKey_Tmp,4,s,INVOKEJS(SHOW,p1,6,6,0)INVOKEJS(SHOW,p1,5,5,1)T(3,@Approve, )T(3,@ApproveX, )T(2,@FdApprove,*)T(F,@Approve,1)T(F,@OutstandAmt,1)T(F,@SubAmt,1))),$)
+C(5,#CaseStatus,B,C(5,#TranKey_Tmp,5,s,C(5,#TranKey_Tmp,4,s,INVOKEJS(SHOW,p1,6,6,0)INVOKEJS(SHOW,p1,5,5,1)T(F,@Approve,1)T(H,@ApproveX,#Approve,#YesNoHelp)T(2,@FdApprove,*)T(F,@OutstandAmt,0)T(F,@SubAmt,1))),$)
+C(5,#CaseStatus,C,C(5,#TranKey_Tmp,5,s,C(5,#TranKey_Tmp,4,s,INVOKEJS(SHOW,p1,6,6,0)INVOKEJS(SHOW,p1,5,5,1)T(F,@Approve,1)T(H,@ApproveX,#Approve,#YesNoHelp)T(2,@FdApprove,*)T(F,@OutstandAmt,1)T(F,@SubAmt,1))),$)
 C(5,#CaseStatus,D,C(5,#TranKey_Tmp,5,s,C(5,#TranKey_Tmp,4,s,INVOKEJS(SHOW,p1,6,6,0)INVOKEJS(SHOW,p1,5,5,1)T(3,@Approve,N)T(H,@ApproveX,#Approve,#YesNoHelp)T(2,@FdApprove, )T(F,@Approve,0))),$)
 C(5,#CaseStatus,E,C(5,#TranKey_Tmp,5,s,C(5,#TranKey_Tmp,4,s,INVOKEJS(SHOW,p1,6,6,1)INVOKEJS(SHOW,p1,5,5,0)T(3,@Approve, )T(3,@ApproveX, )T(2,@FdApprove, )T(F,@Approve,0)T(F,@OutstandAmt,0)T(F,@SubAmt,0))),$)
 C(5,#CaseStatus,G,C(5,#TranKey_Tmp,5,s,C(5,#TranKey_Tmp,4,s,INVOKEJS(SHOW,p1,6,6,0)INVOKEJS(SHOW,p1,5,5,1)T(3,@Approve, )T(3,@ApproveX, )T(2,@FdApprove, )T(F,@Approve,0)T(F,@OutstandAmt,0)T(F,@SubAmt,0))),$)
-C(5,#CaseStatus,H,C(5,#TranKey_Tmp,5,s,C(5,#TranKey_Tmp,4,s,INVOKEJS(SHOW,p1,6,6,0)INVOKEJS(SHOW,p1,5,5,1)T(3,@Approve, )T(3,@ApproveX, )T(2,@FdApprove, )T(F,@Approve,0)T(F,@OutstandAmt,0)T(F,@SubAmt,0))),$)
-
+! C(5,#CaseStatus,H,C(5,#TranKey_Tmp,5,s,C(5,#TranKey_Tmp,4,s,INVOKEJS(SHOW,p1,6,6,0)INVOKEJS(SHOW,p1,5,5,1)T(3,@Approve, )T(3,@ApproveX, )T(2,@FdApprove, )T(F,@Approve,0)T(F,@OutstandAmt,0)T(F,@SubAmt,0))),$)
+IF(#CaseStatus=="H",C(5,#TranKey_Tmp,5,s,C(5,#TranKey_Tmp,4,s,INVOKEJS(SHOW,p1,6,6,0)INVOKEJS(SHOW,p1,5,5,1)T(3,@Approve, )T(3,@ApproveX, )T(2,@FdApprove, )T(F,@Approve,0)T(F,@OutstandAmt,0)T(F,@SubAmt,0))),$)
 
 
 #CDate=D,7,S
 T(1,#SYSCDATE,2,7)
+
+!日曆日
+#wkSYSCDATE=D,7,S
+E(0,#SYSCDATE)
 
 !裁定日期
 #ClaimDate=D,7,I
@@ -343,6 +348,7 @@ C(5,#CaseStatus,E,$,S)
 D(8)
 @V(7)A(DATE,0,#ClaimDate1)
 IF(#ClaimDate1 <= #CDate ,$,V(P,裁定日期應小於等於報送日期))
+
 !承審法院代碼
 #CourtCode=X,3,I
 C(5,#TranKey_Tmp,7,s,$)
@@ -385,19 +391,18 @@ C(5,#TranKey,D,s,$)
 
 !法院裁定免責確定 12 
 #Approve=X,1,I
-C(5,#CaseStatus,A,S,$)
-C(5,#CaseStatus,B,,$)
-C(5,#CaseStatus,C,,$)
+! C(5,#CaseStatus,A,S,$)
+C(5,#CaseStatus,B,$,$)
+C(5,#CaseStatus,C,$,$)
 C(5,#CaseStatus,D,s,$)
-C(5,#CaseStatus,E,S,$)
-C(5,#CaseStatus,F,S,$)
-C(5,#CaseStatus,G,S,$)
-C(5,#TranKey_Tmp,5,$,)
-C(5,#TranKey_Tmp,4,$,)
-C(5,#TranKey,D,T(2,@Approve,#L8r28Approve)T(2,@FdApprove, )T(F,@Approve,0),$)
+! C(5,#CaseStatus,E,S,$)
+! C(5,#CaseStatus,G,S,$)
+! C(5,#CaseStatus,H,S,$)
+IF(#CaseStatus == "A" ||#CaseStatus == "E" ||#CaseStatus == "G" ||#CaseStatus == "H" ,S,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(F,@Approve,0)T(2,@FdApprove, )T(F,@OutstandAmt,0)T(2,@FdOutstandAmt, )T(H,@ApproveX,#Approve,#YesNoHelp),$)
 C(5,#TranKey,D,s,$)
-
-
 HELP(#YesNoHelp)
 @T(3,@ApproveX,)
 V(H,#YesNoHelp)

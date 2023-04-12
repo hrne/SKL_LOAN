@@ -10,8 +10,6 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.CdCode;
-import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.domain.CdLand;
 import com.st1.itx.db.domain.CdLandId;
 import com.st1.itx.db.service.CdCodeService;
@@ -35,8 +33,6 @@ public class L6205 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CdLandService cdLandService;
-	@Autowired
-	public CdCodeService cdCodeService;
 	@Autowired
 	Parse parse;
 	@Autowired
@@ -125,8 +121,6 @@ public class L6205 extends TradeBuffer {
 			break;
 		}
 
-		insCdCode(iFunCd, "LandOfficeCode", iLandOfficeCode, titaVo);
-
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
@@ -142,80 +136,4 @@ public class L6205 extends TradeBuffer {
 
 	}
 
-	private void insCdCode(int mFuncCode, String mDefCode, String mLoanCode, TitaVo titaVo) throws LogicException {
-
-		// 檢查代碼檔是否已存在
-		CdCode fCdCode = new CdCode();
-		fCdCode = cdCodeService.findById(new CdCodeId(mDefCode, mLoanCode));
-		if (fCdCode != null && mFuncCode == 1) {
-			mFuncCode = 2;
-		}
-		this.info("L6205 mFuncCode : " + mFuncCode);
-
-		// 更新各類代碼檔
-		CdCode tCdCode = new CdCode();
-		CdCodeId tCdCodeId = new CdCodeId();
-
-		tCdCodeId.setDefCode(mDefCode);
-		tCdCodeId.setCode(mLoanCode);
-
-		switch (mFuncCode) {
-		case 1: // 新增
-			tCdCode.setCdCodeId(tCdCodeId);
-			tCdCode = moveCdCode(tCdCode, mFuncCode, "Y", titaVo);
-			try {
-				cdCodeService.insert(tCdCode, titaVo);
-				this.info("L6205 insCdCode : " + mFuncCode + mDefCode + mLoanCode);
-			} catch (DBException e) {
-				if (e.getErrorId() == 2) {
-					break; // 代碼檔新增資料已存在時離開
-				} else {
-					throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增資料時，發生錯誤
-				}
-			}
-			break;
-
-		case 2: // 修改
-			tCdCode = cdCodeService.holdById(tCdCodeId);
-			if (tCdCode == null) {
-				throw new LogicException(titaVo, "E0003", "代碼檔:" + mLoanCode); // 修改資料不存在
-			}
-			CdCode tCdCode2 = (CdCode) dataLog.clone(tCdCode); ////
-			try {
-				tCdCode = moveCdCode(tCdCode, mFuncCode, "Y", titaVo);
-				tCdCode = cdCodeService.update2(tCdCode, titaVo); ////
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
-			}
-			dataLog.setEnv(titaVo, tCdCode2, tCdCode); ////
-			dataLog.exec("修改各類代碼檔"); ////
-			break;
-
-		case 4: // 刪除時 Enable維護為"N"
-			tCdCode = cdCodeService.holdById(tCdCodeId);
-			if (tCdCode == null) {
-				throw new LogicException(titaVo, "E0003", "代碼檔:" + mLoanCode); // 修改資料不存在
-			}
-			CdCode tCdCode4 = (CdCode) dataLog.clone(tCdCode); ////
-			try {
-				tCdCode = moveCdCode(tCdCode, mFuncCode, "N", titaVo);
-				tCdCode = cdCodeService.update2(tCdCode, titaVo); ////
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
-			}
-			dataLog.setEnv(titaVo, tCdCode4, tCdCode); ////
-			dataLog.exec("刪除各類代碼檔"); ////
-			break;
-
-		}
-	}
-
-	private CdCode moveCdCode(CdCode mCdCode, int mFuncCode, String mEnable, TitaVo titaVo) throws LogicException {
-
-		mCdCode.setDefType(6);
-		mCdCode.setItem(iLandOfficeItem);
-		mCdCode.setEnable(mEnable);
-
-		return mCdCode;
-	}
 }

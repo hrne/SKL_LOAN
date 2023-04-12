@@ -70,16 +70,6 @@ T(2,@ClOtherRightsCityHelp,#HelpDesc2)
 #RimFunCd=A,1,S
 #RimSyndFeeCode=X,2,S
 
-! 調RIM取縣市代碼
-#RimL6r49City=X,1,S
-E(0,@RimFunCd,1)
-T(2,@RimCityCode,)
-S(L6R49,1,#RimFunCd,#RimCityCode)
-R(1,L6R49)
-T(B,@L6r49ResultCity,#L6r49Result+;+#ClOtherRightsCityHelp)
-
-! 縣市代碼的下拉選單
-#L6r49ResultCity=X,50000,S
 
 
 #CHAIN=A,1,S
@@ -124,17 +114,16 @@ E(0,1)ASGN(AGAIN$)
 
 #CityCode=X,4,I
 C(3,#FunCd,1,$,s)
-HELP(#L6r49ResultCity)
+HELP(#ClOtherRightsCityHelp)
 @
-V(H,#L6r49ResultCity)
-! C(4,#CityCode,S,V(H,#L6r49ResultCity))
+V(H,#ClOtherRightsCityHelp)
+! C(4,#CityCode,S,V(H,#ClOtherRightsCityHelp))
 
 #CityCodeX=X,20,L
 C(4,#CityCode,S,$)
-T(H,#CityCode,#L6r49ResultCity)
+T(H,#CityCode,#ClOtherRightsCityHelp)
 
 #LoanOfficeHelp=X,2000,S
-
 
 ! 依縣市別組地政下拉選單
 #RimL6r49LandOffice=X,1,S
@@ -144,8 +133,6 @@ RESET_RIM(#RimL6r49LandOffice,L6R49)
 S(L6R49,1,#RimFunCd,#RimCityCode)
 R(1,L6R49)
 T(2,@LoanOfficeHelp,#L6r49Result)
-
-
 
 #LandOfficeCode=X,2,I
 C(3,#FunCd,1,$,s)
@@ -182,7 +169,6 @@ E(0,0)
 
 
 <include src="ROM.icf::L6R49.dec"/>
-<include src="ROM.icf::L2R59.dec"/>
 <include src="ROM.icf::L6R47.dec"/>
 </sub>
 
@@ -224,7 +210,6 @@ TXFORM=L6203
 <include src="ROM.icf::L6R49.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
-<include src="ROM.icf::L2R59.tom"/>
 <include src="ROM.icf::L6R47.tom"/>
 </sub>
 

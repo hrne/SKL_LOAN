@@ -126,7 +126,9 @@ public class L8312 extends TradeBuffer {
 				// 7.2 第7欄「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】，則不受上述檢核5的限制.
 				if ("L".equals(iDelayCode)) {
 					sCovDelayYM = 1;
-				} else {
+				} else if ("J".equals(iDelayCode)) {
+					sMajorYM = 1;
+				}else {
 					sDelayYM = 1;
 				}
 				Slice<JcicZ051> sJcicZ051 = sJcicZ051Service.SubCustRcEq(iCustId, iRcDate + 19110000, iSubmitKey, 0,
@@ -188,13 +190,13 @@ public class L8312 extends TradeBuffer {
 							throw new LogicException("E0007", "「延期繳款原因」為'J本人:為重大災害災民【限累計申請最多12期】.");
 						}
 					}
-//					else if (sCovDelayYM > 6) {
+					else if (sCovDelayYM > 6) {
 //						if ("A".equals(iTranKey)) {
 //							throw new LogicException("E0005", "「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】.");
 //						} else {
 //							throw new LogicException("E0007", "「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】.");
 //						}
-//					}
+					}
 				} // 4, 5, 7.2 end
 			}
 

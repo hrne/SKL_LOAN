@@ -241,7 +241,7 @@ public class L8701 extends TradeBuffer {
 			
 			// 找基準日前的每日餘額檔，找不到則依會計明細檔回朔餘額(資料轉換未轉每日餘額檔)
 			tDailyLoanBal = dailyLoanBalService.dataDateFirst(ln.getCustNo(), ln.getFacmNo(), ln.getBormNo(), iDataDatef, titaVo);
-			if (tDailyLoanBal == null) {
+			if (tDailyLoanBal == null || (tDailyLoanBal != null && (tDailyLoanBal.getDataDate() + 19110000 < iDataDatef))) {
 				acDetailRoutine(ln, titaVo);
 			} else {
 				acctCode = tDailyLoanBal.getAcctCode();

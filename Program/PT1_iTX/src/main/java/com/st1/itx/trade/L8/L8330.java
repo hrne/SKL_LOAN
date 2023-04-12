@@ -130,16 +130,18 @@ public class L8330 extends TradeBuffer {
 				} // 2 end
 				
 				// 4 start 延期繳款累積期數(月份)不得超過6期
-				if (!"L".equals(iDelayCode)) {
-					Slice<JcicZ451> sJcicZ451 = sJcicZ451Service.otherEq(iSubmitKey, iCustId, iApplyDate+19110000, iCourtCode,iDelayYM, 0,  1, titaVo);
-					if(sJcicZ451 != null) {
-						throw new LogicException("E0002", "已有相同資料存在.");
-					}
-				}	
+//				if (!"L".equals(iDelayCode)) {
+//					Slice<JcicZ451> sJcicZ451 = sJcicZ451Service.otherEq(iSubmitKey, iCustId, iApplyDate+19110000, iCourtCode,iDelayYM, 0,  1, titaVo);
+//					if(sJcicZ451 != null) {
+//						throw new LogicException("E0002", "已有相同資料存在.");
+//					}
+//				}	
 				
 				// 6.2 start 「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】，則不受上述檢核4的限制.
 				if ("L".equals(iDelayCode)) {
 					sCovDelayYM = 1;
+				} else if ("H".equals(iDelayCode)) {
+					sMajorYM++;
 				} else {
 					sDelayYM = 1;
 				}
@@ -180,9 +182,9 @@ public class L8330 extends TradeBuffer {
 					}
 					if (sDelayYM > 6) {
 						if ("A".equals(iTranKey)) {
-							throw new LogicException("E0005", "延期繳款累計期數(月份)不得超過6期.");
+							throw new LogicException("E0005", "延期繳款"+iDelayCode+"累計期數(月份)不得超過6期.");
 						} else {
-							throw new LogicException("E0007", "延期繳款累計期數(月份)不得超過6期.");
+							throw new LogicException("E0007", "延期繳款"+iDelayCode+"累計期數(月份)不得超過6期.");
 						}
 					} 
 					if(sMajorYM>11) { //延期繳款原因H
@@ -192,13 +194,13 @@ public class L8330 extends TradeBuffer {
 							throw new LogicException("E0007", "「延期繳款原因」為'J本人:為重大災害災民【限累計申請最多12期】.");
 						}
 					}
-//					else if (sCovDelayYM > 6) {
+					else if (sCovDelayYM > 6) {
 //						if ("A".equals(iTranKey)) {
 //							throw new LogicException("E0005", "「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】.");
 //						} else {
 //							throw new LogicException("E0007", "「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】.");
 //						}
-//					}
+					}
 				} // 4, 6.2 end
 			}
 			// 3 「延期繳款年月」不得小於「調解申請日」--->(前端檢核)

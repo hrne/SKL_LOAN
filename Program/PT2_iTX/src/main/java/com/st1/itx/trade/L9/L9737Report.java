@@ -93,7 +93,11 @@ public class L9737Report extends MakeReport {
 //						"0".equals(result.get("EvaNetWorth")) ||  "0".equals(result.get("LineAmt")) ? BigDecimal.ZERO
 //						: parse.stringToBigDecimal(result.get("LineAmt")).divide(
 //								parse.stringToBigDecimal(result.get("EvaNetWorth"))).setScale(2, BigDecimal.ROUND_HALF_UP);
+				//設公式
 				makeExcel.setFormula(row, 15, ltv, "ROUND(F" + row + "/N" + row + ",2)", "0%");
+				
+				//重新計算
+				makeExcel.formulaCaculate(row, 15);
 				row++;
 			}
 		}

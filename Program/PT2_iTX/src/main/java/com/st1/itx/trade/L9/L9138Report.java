@@ -58,7 +58,7 @@ public class L9138Report extends MakeReport {
 
 		this.info("L9138Report.printHeader");
 
-		this.print(-1, 1, "程式ID  ：" + this.getParentTranCode());
+		this.print(-1, 1, "程式ID  ：" + this.getRptCode());
 		this.print(-2, 1, "報表代號：" + this.getRptCode());
 
 		this.print(-1, 150, "機密等級：" + this.getSecurity());

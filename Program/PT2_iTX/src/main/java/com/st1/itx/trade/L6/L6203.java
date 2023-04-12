@@ -2,8 +2,6 @@ package com.st1.itx.trade.L6;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -30,7 +28,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L6203 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6203.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -64,7 +61,7 @@ public class L6203 extends TradeBuffer {
 
 		// 檢查輸入資料
 		if (!(iFunCd >= 1 && iFunCd <= 4)) {
-			throw new LogicException(titaVo, "E0010", "L6607"); // 功能選擇錯誤
+			throw new LogicException(titaVo, "E0010", "L6203"); // 功能選擇錯誤
 		}
 
 		CdLandOfficeId cdLandOfficeId = new CdLandOfficeId();
