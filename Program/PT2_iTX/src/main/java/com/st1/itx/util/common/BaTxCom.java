@@ -765,7 +765,7 @@ public class BaTxCom extends TradeBuffer {
 			settleAcctAmt(6);
 		}
 
-// STEP 7 : 計算作帳金額 3.暫收抵繳
+// STEP 7 : 計算作帳金額 3.暫收抵繳(無還款則不抵繳)
 		settleTmpAcctAmt();
 
 // STEP 8 : 計算溢(C)短(D)繳 
@@ -1861,7 +1861,7 @@ public class BaTxCom extends TradeBuffer {
 
 	/* 計算作帳金額 */
 	private void settleAcctAmt(int repayPriority) {
-		this.info("settleAcctAmt repayPriority=" + repayPriority);
+		this.info("settleAcctAmt repayPriority=" + repayPriority + "overRpFacmNo" + this.overRpFacmNo);
 		// 短繳期金
 		if (repayPriority == 4) {
 			for (BaTxVo ba : this.baTxList) {
@@ -1901,26 +1901,26 @@ public class BaTxCom extends TradeBuffer {
 			}
 			if (this.isPayAllFee) {
 				// 全部回收費用
-				if (ba.getRepayPriority() == repayPriority && ba.getAcctAmt().equals(BigDecimal.ZERO)) { // 尚未作帳
+				if (ba.getRepayPriority() == repayPriority && ba.getAcctAmt().compareTo(BigDecimal.ZERO) == 0) { // 尚未作帳
 					ba.setAcctAmt(ba.getUnPaidAmt()); // AcctAmt = UnPaidAmt
 					this.xxBal = this.xxBal.subtract(ba.getAcctAmt());
 					this.txBal = this.txBal.subtract(ba.getAcctAmt());
 					this.repayTotal = this.repayTotal.add(ba.getUnPaidAmt());
 					this.shortFacmNo = ba.getFacmNo();// 短繳額度;
-					if (this.overRpFacmNo == 0) {
+					if (ba.getFacmNo() > 0) {
 						this.overRpFacmNo = ba.getFacmNo();// 溢短繳額度;
 					}
 				}
 			} else {
 				// 部分回收費用，可償還餘額比作帳金額大時回收
-				if (ba.getRepayPriority() == repayPriority && ba.getAcctAmt().equals(BigDecimal.ZERO) // 尚未作帳
+				if (ba.getRepayPriority() == repayPriority && ba.getAcctAmt().compareTo(BigDecimal.ZERO) == 0 // 尚未作帳
 						&& this.xxBal.compareTo(ba.getUnPaidAmt()) >= 0) { // this.xxBal >= UnPaidAmt
 					ba.setAcctAmt(ba.getUnPaidAmt()); // AcctAmt = UnPaidAmt
 					this.xxBal = this.xxBal.subtract(ba.getAcctAmt()); // this.xxBal = this.xxBal - AcctAmt
 					this.txBal = this.txBal.subtract(ba.getAcctAmt()); //
 					this.repayTotal = this.repayTotal.add(ba.getUnPaidAmt());
 					this.shortFacmNo = ba.getFacmNo();// 短繳額度;
-					if (this.overRpFacmNo == 0) {
+					if (ba.getFacmNo() > 0) {
 						this.overRpFacmNo = ba.getFacmNo();// 溢短繳額度;
 					}
 				}
@@ -2056,10 +2056,15 @@ public class BaTxCom extends TradeBuffer {
 
 	/* 計算暫收抵繳作帳金額 */
 	private void settleTmpAcctAmt() {
-		for (BaTxVo ba : this.baTxList) {
-			if (ba.getDataKind() == 3) {
-				ba.setAcctAmt(ba.getUnPaidAmt());
-				this.tempAmt = this.tempAmt.add(ba.getAcctAmt());
+		// 無還款則不抵繳
+		if (this.repayTotal.compareTo(BigDecimal.ZERO) == 0) {
+			this.xxBal = this.txBal;
+		} else {
+			for (BaTxVo ba : this.baTxList) {
+				if (ba.getDataKind() == 3) {
+					ba.setAcctAmt(ba.getUnPaidAmt());
+					this.tempAmt = this.tempAmt.add(ba.getAcctAmt());
+				}
 			}
 		}
 		this.info("tavAmt 可暫收抵繳金額= " + this.tavAmt + ", tempAmt暫收款金額" + this.tempAmt);
@@ -2083,7 +2088,7 @@ public class BaTxCom extends TradeBuffer {
 		baTxVo.setCustNo(iCustNo);
 		baTxVo.setBormNo(0);
 		baTxVo.setRvNo("");
-		baTxVo.setAcctCode("   ");
+		baTxVo.setAcctCode("");
 		baTxVo.setFacmNo(this.overRpFacmNo);
 		// 溢繳 = 可償還餘額xxBal為正值時
 		// 短繳 = 可償還餘額xxBal為負值時取正值
@@ -2250,40 +2255,35 @@ public class BaTxCom extends TradeBuffer {
 			}
 		}
 
+		int acSeq = 0;
 		// 交易金額、暫收借、暫收貸
-		// 存暫收
+		// 存暫收 => 無暫收借、交易金額加入暫收抵繳
 		if (!isRepayLoan) {
 			for (BaTxVo ba : this.baTxList) {
 				if (ba.getDataKind() == 4) {
+					acSeq++;
 					ba.setTxAmt(wkTxBal);
-					ba.setTempAmt(wkTempBal);
-					ba.setOverflow(wkTxBal.add(wkTempBal));
+					ba.setTempAmt(BigDecimal.ZERO);
+					ba.setOverflow(wkTxBal);
+					wkTempBal = wkTempBal.add(wkTxBal);
 					wkTxBal = BigDecimal.ZERO;
-					wkTempBal = BigDecimal.ZERO;
 				}
 			}
 		}
-		int acSeq = 0;
-		// 費用 => 還放款為依序抵繳、暫收款為抵繳費用金額
+		// 費用 => 依序抵繳
 		for (BaTxVo ba : this.baTxList) {
 			if (ba.getRepayType() >= 4 && ba.getAcAmt().compareTo(BigDecimal.ZERO) > 0) {
 				acSeq++;
 				ba.setAcSeq(acSeq);
-				// 還放款
-				if (isRepayLoan) {
-					if (wkTempBal.compareTo(ba.getAcAmt()) >= 0) {
-						ba.setTempAmt(ba.getAcAmt());
-						ba.setTxAmt(BigDecimal.ZERO);
-						wkTempBal = wkTempBal.subtract(ba.getTempAmt());
-					} else {
-						ba.setTempAmt(wkTempBal);
-						ba.setTxAmt(ba.getAcAmt().subtract(wkTempBal));
-						wkTempBal = BigDecimal.ZERO;
-						wkTxBal = wkTxBal.subtract(ba.getTxAmt());
-					}
-				} else {
+				if (wkTempBal.compareTo(ba.getAcAmt()) >= 0) {
 					ba.setTempAmt(ba.getAcAmt());
 					ba.setTxAmt(BigDecimal.ZERO);
+					wkTempBal = wkTempBal.subtract(ba.getTempAmt());
+				} else {
+					ba.setTempAmt(wkTempBal);
+					ba.setTxAmt(ba.getAcAmt().subtract(wkTempBal));
+					wkTempBal = BigDecimal.ZERO;
+					wkTxBal = wkTxBal.subtract(ba.getTxAmt());
 				}
 			}
 		}
@@ -2314,14 +2314,12 @@ public class BaTxCom extends TradeBuffer {
 			}
 		}
 		// 有作帳金額的最後一筆，計算溢繳
-		if (isRepayLoan) {
-			if (acSeq > 0) {
-				for (BaTxVo ba : this.baTxList) {
-					if (ba.getAcSeq() == acSeq) {
-						ba.setTempAmt(ba.getTempAmt().add(wkTempBal));
-						ba.setTxAmt(ba.getTxAmt().add(wkTxBal));
-						ba.setOverflow(ba.getTempAmt().add(ba.getTxAmt()).subtract(ba.getAcAmt()));
-					}
+		if (acSeq > 0) {
+			for (BaTxVo ba : this.baTxList) {
+				if (ba.getAcSeq() == acSeq) {
+					ba.setTempAmt(ba.getTempAmt().add(wkTempBal));
+					ba.setTxAmt(ba.getTxAmt().add(wkTxBal));
+					ba.setOverflow(ba.getTempAmt().add(ba.getTxAmt()).subtract(ba.getAcAmt()));
 				}
 			}
 		}

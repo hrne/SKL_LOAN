@@ -216,16 +216,15 @@ public class L4002 extends TradeBuffer {
 				}
 				if (tBatxDetail.getFileName().isEmpty()) {
 					tBatxDetail.setFileName(" ");
-				}				
+				}
 				if (tBatxDetail.getReconCode().isEmpty()) {
 					tBatxDetail.setReconCode(" ");
 				}
-
-				switch (tBatxDetail.getRepayCode()) {
-				case 1:
+				//
+				if ("RESV00".equals(tBatxDetail.getBatchNo())) {
 					grp1.setAcDate(tBatxDetail.getAcDate());
 					grp1.setBatchNo(tBatxDetail.getBatchNo());
-					grp1.setRepayCode(tBatxDetail.getRepayCode());
+					grp1.setRepayCode(0);
 					grp1.setReconCode(" ");
 					grp1.setFileName(" ");
 					grp1.setRankFlag(1);
@@ -244,61 +243,87 @@ public class L4002 extends TradeBuffer {
 					grp3.setFileName(" ");
 					grp3.setRankFlag(3);
 					labelRankFlag = 3;
-					break;
+				} else {
+					switch (tBatxDetail.getRepayCode()) {
+					case 1:
+						grp1.setAcDate(tBatxDetail.getAcDate());
+						grp1.setBatchNo(tBatxDetail.getBatchNo());
+						grp1.setRepayCode(tBatxDetail.getRepayCode());
+						grp1.setReconCode(" ");
+						grp1.setFileName(" ");
+						grp1.setRankFlag(1);
 
-				case 2:
-				case 3:
-					grp1.setAcDate(tBatxDetail.getAcDate());
-					grp1.setBatchNo(tBatxDetail.getBatchNo());
-					grp1.setRepayCode(tBatxDetail.getRepayCode());
-					grp1.setReconCode(" ");
-					grp1.setFileName(" ");
-					grp1.setRankFlag(1);
+						grp2.setAcDate(tBatxDetail.getAcDate());
+						grp2.setBatchNo(tBatxDetail.getBatchNo());
+						grp2.setRepayCode(tBatxDetail.getRepayCode());
+						grp2.setReconCode(" ");
+						grp2.setFileName(tBatxDetail.getFileName());
+						grp2.setRankFlag(2);
 
-					grp2.setAcDate(tBatxDetail.getAcDate());
-					grp2.setBatchNo(tBatxDetail.getBatchNo());
-					grp2.setRepayCode(tBatxDetail.getRepayCode());
-					grp2.setReconCode(tBatxDetail.getReconCode());
-					grp2.setFileName(" ");
-					grp2.setRankFlag(2);
+						grp3.setAcDate(tBatxDetail.getAcDate());
+						grp3.setBatchNo(tBatxDetail.getBatchNo());
+						grp3.setRepayCode(tBatxDetail.getRepayCode());
+						grp3.setReconCode(tBatxDetail.getReconCode());
+						grp3.setFileName(" ");
+						grp3.setRankFlag(3);
+						labelRankFlag = 3;
+						break;
 
-					grp3.setAcDate(tBatxDetail.getAcDate());
-					grp3.setBatchNo(tBatxDetail.getBatchNo());
-					grp3.setRepayCode(tBatxDetail.getRepayCode());
-					grp3.setReconCode(tBatxDetail.getReconCode());
-					grp3.setFileName(tBatxDetail.getFileName());
-					grp3.setRankFlag(3);
-					break;
+					case 2:
+					case 3:
+						grp1.setAcDate(tBatxDetail.getAcDate());
+						grp1.setBatchNo(tBatxDetail.getBatchNo());
+						grp1.setRepayCode(tBatxDetail.getRepayCode());
+						grp1.setReconCode(" ");
+						grp1.setFileName(" ");
+						grp1.setRankFlag(1);
 
-				case 4:
-					grp1.setAcDate(tBatxDetail.getAcDate());
-					grp1.setBatchNo(tBatxDetail.getBatchNo());
-					grp1.setRepayCode(tBatxDetail.getRepayCode());
-					grp1.setReconCode(" ");
-					grp1.setFileName(" ");
-					grp1.setRankFlag(1);
+						grp2.setAcDate(tBatxDetail.getAcDate());
+						grp2.setBatchNo(tBatxDetail.getBatchNo());
+						grp2.setRepayCode(tBatxDetail.getRepayCode());
+						grp2.setReconCode(tBatxDetail.getReconCode());
+						grp2.setFileName(" ");
+						grp2.setRankFlag(2);
 
-					grp2.setAcDate(tBatxDetail.getAcDate());
-					grp2.setBatchNo(tBatxDetail.getBatchNo());
-					grp2.setRepayCode(tBatxDetail.getRepayCode());
-					grp2.setReconCode(tBatxDetail.getReconCode());
-					grp2.setFileName(tBatxDetail.getFileName());
-					grp2.setRankFlag(2);
-					break;
-				default:
-					grp1.setAcDate(tBatxDetail.getAcDate());
-					grp1.setBatchNo(tBatxDetail.getBatchNo());
-					grp1.setRepayCode(0);
-					grp1.setReconCode(" ");
-					grp1.setFileName(" ");
-					grp1.setRankFlag(1);
-					grp2.setAcDate(tBatxDetail.getAcDate());
-					grp2.setBatchNo(tBatxDetail.getBatchNo());
-					grp2.setRepayCode(tBatxDetail.getRepayCode());
-					grp2.setReconCode(" ");
-					grp2.setFileName(" ");
-					grp2.setRankFlag(2);
-					break;
+						grp3.setAcDate(tBatxDetail.getAcDate());
+						grp3.setBatchNo(tBatxDetail.getBatchNo());
+						grp3.setRepayCode(tBatxDetail.getRepayCode());
+						grp3.setReconCode(tBatxDetail.getReconCode());
+						grp3.setFileName(tBatxDetail.getFileName());
+						grp3.setRankFlag(3);
+						break;
+
+					case 4:
+						grp1.setAcDate(tBatxDetail.getAcDate());
+						grp1.setBatchNo(tBatxDetail.getBatchNo());
+						grp1.setRepayCode(tBatxDetail.getRepayCode());
+						grp1.setReconCode(" ");
+						grp1.setFileName(" ");
+						grp1.setRankFlag(1);
+
+						grp2.setAcDate(tBatxDetail.getAcDate());
+						grp2.setBatchNo(tBatxDetail.getBatchNo());
+						grp2.setRepayCode(tBatxDetail.getRepayCode());
+						grp2.setReconCode(tBatxDetail.getReconCode());
+						grp2.setFileName(tBatxDetail.getFileName());
+						grp2.setRankFlag(2);
+						break;
+
+					default:
+						grp1.setAcDate(tBatxDetail.getAcDate());
+						grp1.setBatchNo(tBatxDetail.getBatchNo());
+						grp1.setRepayCode(0);
+						grp1.setReconCode(" ");
+						grp1.setFileName(" ");
+						grp1.setRankFlag(1);
+						grp2.setAcDate(tBatxDetail.getAcDate());
+						grp2.setBatchNo(tBatxDetail.getBatchNo());
+						grp2.setRepayCode(tBatxDetail.getRepayCode());
+						grp2.setReconCode(" ");
+						grp2.setFileName(" ");
+						grp2.setRankFlag(2);
+						break;
+					}
 				}
 				ooRpAmt = tBatxDetail.getRepayAmt();
 				this.info("L4002  - ooRpAmt : " + ooRpAmt);

@@ -42,6 +42,8 @@ import com.st1.itx.util.common.LoanAvailableAmt;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
+
+
 /**
  * L2R05 尋找額度檔資料 BY 1.CUSTNO + FACMNO or 2.APPLNO
  * 
@@ -456,8 +458,13 @@ public class L2R05 extends TradeBuffer {
 		this.totaVo.putParam("L2r05ProdBreachFlag", tFacMain.getProdBreachFlag());
 		this.totaVo.putParam("L2r05BreachCode", tFacMain.getBreachCode());
 		this.totaVo.putParam("L2r05BreachGetCode", tFacMain.getBreachGetCode());
-		this.totaVo.putParam("L2r05Breach", tFacMain.getBreachDescription());
 
+		this.totaVo.putParam("L2r05Breach", tFacMain.getBreachDescription());
+		if (tFacMain.getBreachDescription().isEmpty()) {
+			this.totaVo.putParam("L2r05Breach", getBreachDescription(tFacMain, titaVo));
+		} else {
+			this.totaVo.putParam("L2r05Breach", tFacMain.getBreachDescription());
+		}
 		this.totaVo.putParam("L2r05BreachFlag", tFacMain.getBreachFlag());
 		this.totaVo.putParam("L2r05ProhibitMonth", tFacMain.getProhibitMonth());
 		this.totaVo.putParam("L2r05BreachPercent", tFacMain.getBreachPercent());
@@ -503,7 +510,7 @@ public class L2R05 extends TradeBuffer {
 		this.totaVo.putParam("L2r05EsGcd", tFacMain.getEsGcd());
 		this.totaVo.putParam("L2r05EsGKind", tFacMain.getEsGKind());
 		this.totaVo.putParam("L2r05EsGcnl", tFacMain.getEsGcnl());
-		//購地貸款相關
+		// 購地貸款相關
 		if (tFacMain.getPreStarBuildingYM() > 0) {
 			this.totaVo.putParam("L2r05PreStarBuildingYM", tFacMain.getPreStarBuildingYM() - 191100);
 		} else {
@@ -513,8 +520,7 @@ public class L2R05 extends TradeBuffer {
 			this.totaVo.putParam("L2r05StarBuildingYM", tFacMain.getStarBuildingYM() - 191100);
 		} else {
 			this.totaVo.putParam("L2r05StarBuildingYM", tFacMain.getStarBuildingYM());
-		}		
-
+		}
 
 	}
 
@@ -712,8 +718,68 @@ public class L2R05 extends TradeBuffer {
 		this.totaVo.putParam("L2r05EsGcd", "");
 		this.totaVo.putParam("L2r05EsGKind", "");
 		this.totaVo.putParam("L2r05EsGcnl", "");
-		//購地貸款相關
+		// 購地貸款相關
 		this.totaVo.putParam("L2r05PreStarBuildingYM", 0);
 		this.totaVo.putParam("L2r05StarBuildingYM", 0);
 	}
+
+	// 清償違約說明
+	public String getBreachDescription(FacMain t, TitaVo titaVo) throws LogicException {
+		this.info("getBreachDescription  ");
+
+		String wkBreachDescription = "";
+		String wkBreachA = "";
+		String wkBreachB = "";
+		String wkBreachC = "";
+		String wkBreachD = "";
+		String wkBreachE = "";
+		String wkBreachF = "";
+
+		if (t != null) {
+			if ("Y".equals(t.getBreachFlag())) {
+				wkBreachA = "自借款日起算，於未滿 " + t.getProhibitMonth() + "個月期間提前清償者";
+				if (t.getBreachStartPercent() != 0) {
+					wkBreachB = "，還款金額達 " + t.getBreachStartPercent() + "% 以上時";
+				}
+				switch (t.getBreachCode()) {
+				case "001":
+					wkBreachC = "，按各次提前清償金額";
+					break;
+				case "002":
+					wkBreachC = "，按各次提前清償金額";
+					break;
+				case "003":
+					wkBreachC = "，每次還款按核准額度";
+					break;
+				case "004":
+					wkBreachC = "，每次還款依撥款金額";
+					break;
+				case "005":
+					wkBreachC = "，按各次提前清償金額";
+					break;
+				}
+				if (t.getBreachPercent().compareTo(BigDecimal.ZERO) > 0) {
+					wkBreachD = "，" + t.getBreachPercent() + "% 計付違約金";
+				}
+				if (t.getBreachDecreaseMonth() != 0) {
+					wkBreachE = "，但每" + t.getBreachDecreaseMonth() + "個月遞減違約金" + t.getBreachDecrease() + "%";
+				}
+				switch (t.getBreachGetCode()) {
+				case "1":
+					wkBreachF = "，即時收取";
+					break;
+
+				case "2":
+					wkBreachF = "，領清償證明時收取";
+					break;
+				}
+
+			}
+			wkBreachDescription = wkBreachA + wkBreachB + wkBreachC + wkBreachD + wkBreachE + wkBreachF;
+
+		}
+
+		return wkBreachDescription;
+	}
+
 }

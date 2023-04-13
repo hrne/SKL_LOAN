@@ -84,6 +84,8 @@ public class L4451 extends TradeBuffer {
 	public CdCodeService cdCodeService;
 	@Autowired
 	public BankAuthActService bankAuthActService;
+	@Autowired
+	public L4450Batch l4450Batch;
 
 	private TempVo tempVo = new TempVo();
 	private BigDecimal unpaidAmt = BigDecimal.ZERO;
@@ -155,8 +157,8 @@ public class L4451 extends TradeBuffer {
 		switch (iFunctionCode) {
 		case "1":
 			// 執行產檔
-			MySpring.newTask("L4450Batch", this.txBuffer, titaVo);
-			totaVo.putParam("OWarningMsg", "請查詢產檔資料(L4943銀行扣款檔資料查詢)");
+			l4450Batch.setTxBuffer(this.txBuffer);
+			l4450Batch.run(titaVo);
 
 			break;
 
@@ -292,7 +294,7 @@ public class L4451 extends TradeBuffer {
 
 		tBankAuthAct = bankAuthActService.findById(tBankAuthActId, titaVo);
 
-		if (tBankAuthAct != null)		{
+		if (tBankAuthAct != null) {
 			failFlag = tBankAuthAct.getStatus();
 			limitAmt = tBankAuthAct.getLimitAmt();
 		}

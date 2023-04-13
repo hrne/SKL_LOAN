@@ -382,7 +382,19 @@ public class L420ABatch extends TradeBuffer {
 			this.info("addL4211MapList iBatxList.size = 0 return ");
 			return;
 		}
+		
+		// 按AcSeq，小至大排序
+		Collections.sort(iBatxList, new Comparator<BaTxVo>() {
+			@Override
+			public int compare(BaTxVo c1, BaTxVo c2) {
+				if (c1.getAcSeq() != c2.getAcSeq()) {
+					return c1.getAcSeq() - c2.getAcSeq();
+				}
+				return 0;
+			}
+		});
 
+		
 		custName = " ";
 		CustMain tCustMain = custMainService.custNoFirst(tDetail.getCustNo(), tDetail.getCustNo(), titaVo);
 		if (tCustMain != null) {
@@ -425,6 +437,7 @@ public class L420ABatch extends TradeBuffer {
 	}
 
 	private void addL4211AcAmt(BatxDetail tDetail, TempVo iTempVo, BaTxVo baTxVo, TitaVo titaVo) throws LogicException {
+		this.info("addL4211AcAmt baTxVo = " + baTxVo.toString());
 		Map<String, String> da = new HashMap<>();
 		da.put("ReconCode", "" + tDetail.getReconCode());
 		da.put("BatchNo", "" + tDetail.getBatchNo());

@@ -110,9 +110,8 @@ public class L9735Report extends MakeReport {
 			}
 		}
 
-		long sno = makeExcel.close();
+		makeExcel.close();
 
-		makeExcel.toExcel(sno);
 
 		return isFinished;
 	}

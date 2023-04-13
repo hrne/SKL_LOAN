@@ -395,9 +395,13 @@ public class L3210 extends TradeBuffer {
 		// 貸方：暫收可抵繳
 		if (iTempAmt.compareTo(BigDecimal.ZERO) > 0) {
 			AcDetail acDetail = new AcDetail();
+			acDetail.setDbCr("C");
 			acDetail.setAcctCode("TAV");
+			acDetail.setSumNo("092"); // 暫收款
 			acDetail.setCustNo(iCustNo);
 			acDetail.setFacmNo(iFacmNo);
+			acDetail.setTxAmt(iTempAmt);
+			lAcDetail.add(acDetail);
 
 			// 新增放款交易內容檔
 			addLoanBorTxRoutine(acDetail);

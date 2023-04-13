@@ -183,7 +183,7 @@ public class L4450Batch extends TradeBuffer {
 		}
 		// 單筆
 		if ("L4451".equals(titaVo.getTxcd())) {
-			exec(titaVo);			
+			exec(titaVo);
 		}
 		return this.sendList();
 	}
@@ -362,16 +362,15 @@ public class L4450Batch extends TradeBuffer {
 				}
 			}
 
-			this.batchTransaction.commit();
 
 			if (checkFlag) {
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4943",
-						"01" + titaVo.getParam("CustNo") +"00000" +titaVo.getParam("EntryDate")
+						"01" + titaVo.getParam("CustNo") + "00000" + titaVo.getParam("EntryDate")
 								+ titaVo.getParam("EntryDate"),
 						checkMsg, titaVo);
 			} else {
 				checkMsg = "執行失敗，" + checkMsg;
-				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "", "", checkMsg, titaVo);
+				throw new LogicException(titaVo, "E0015", checkMsg);// 檢查錯誤
 			}
 		}
 
