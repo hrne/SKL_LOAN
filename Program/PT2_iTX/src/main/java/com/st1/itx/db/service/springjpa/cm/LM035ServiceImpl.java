@@ -40,13 +40,13 @@ public class LM035ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("yearMonthList = " + tmp);
 
 		String sql = "SELECT S1.\"YearMonth\"";
-		sql += "			,DECODE(S1.\"CityCode\", '85', '96', S1.\"CityCode\") AS \"CityCode\"";
+		sql += "			,S1.\"CityCode\" AS \"CityCode\"";
 		sql += "            ,S1.\"CityItem\" AS \"CityItem\"";
 		sql += "            ,ROUND((SUM(S1.\"LoanBal\") + SUM(S1.\"ColBal\") + SUM(S1.\"OvduBal\")), 2) AS \"LoanBal\"";
 		sql += "            ,ROUND(SUM(S1.\"OvduBal\"), 2) AS \"OvduBal\"";
 		sql += "            ,ROUND(SUM(S1.\"ColBal\"), 2) AS \"ColBal\"";
 		sql += "            ,CASE WHEN SUM(S1.\"LoanBal\") + SUM(S1.\"ColBal\") > 0";
-		sql += "                  THEN ROUND((SUM(S1.\"OvduBal\") + SUM(S1.\"ColBal\")) / (SUM(S1.\"LoanBal\") + SUM(S1.\"ColBal\")), 4)";
+		sql += "                  THEN ROUND((SUM(S1.\"OvduBal\") + SUM(S1.\"ColBal\")) / (SUM(S1.\"LoanBal\") + SUM(S1.\"OvduBal\") + SUM(S1.\"ColBal\")), 4)";
 		sql += "             ELSE 0 END AS \"Ratio\"";
 		sql += "      FROM (SELECT M.\"YearMonth\"";
 		sql += "				  ,F.\"CityCode\" AS \"CityCode\"";

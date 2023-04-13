@@ -91,15 +91,17 @@ C(4,#BatchResultCode,S,T(H,#BatchResultCode,#BatchResultCodeH))
 ! 輸入欄位
 ! [執行日期區間-起日]
 #InputStartDate=D,7,I
-E(0,#SYSCDATE)
+!E(0,#SYSCDATE)
+C(4,#InputStartDate,E(0,#SYSCDATE),$)
 @V(7)
-A(4,0,#InputStartDate)
+A(4,0,#SYSCDATE)
 V(5,0010101,#SYSCDATE)
 
 ! 輸入欄位
 ! [執行日期區間-迄日]
 #InputEndDate=D,7,I
-E(0,#SYSCDATE)
+!E(0,#SYSCDATE)
+C(4,#InputEndDate,E(0,#SYSCDATE),$)
 @V(7)
 A(4,0,#InputEndDate)
 V(5,#InputStartDate,#SYSCDATE)
@@ -131,7 +133,7 @@ E(0,0)
 #batch-row-status=X,50,S
 
 !#batch-row-txtno 該列傳送序號
-#batch-row-txtno=X,18,O
+#batch-row-txtno=X,14,O
 </sub>
 
 

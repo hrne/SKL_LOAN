@@ -28,6 +28,7 @@ import com.st1.itx.db.service.JcicZ056LogService;
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ056Service;
 
+
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
@@ -151,10 +152,10 @@ public class L8317 extends TradeBuffer {
 						if (flagCaseStatus == 0) {
 							if ("A".equals(iTranKey)) {
 								throw new LogicException("E0005",
-										"報送案件狀態「D:清算撤消免責確定」 前，需曾報送「A:清算程序開始」 或「C:清算程序開始同時終止」，且12欄「法院裁定免責確定」原填報為Y.");
+										"報送案件狀態「D:清算撤消免責確定」 前，需曾報送「A:清算程序開始」 或「C:清算程序開始同時終止」，且「法院裁定免責確定」原填報為Y.");
 							} else {
 								throw new LogicException("E0007",
-										"報送案件狀態「D:清算撤消免責確定」 前，需曾報送「A:清算程序開始」 或「C:清算程序開始同時終止」，且12欄「法院裁定免責確定」原填報為Y.");
+										"報送案件狀態「D:清算撤消免責確定」 前，需曾報送「A:清算程序開始」 或「C:清算程序開始同時終止」，且「法院裁定免責確定」原填報為Y.");
 							}
 						}
 					}

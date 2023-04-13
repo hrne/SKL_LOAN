@@ -141,7 +141,7 @@ public class L8330 extends TradeBuffer {
 				if ("L".equals(iDelayCode)) {
 					sCovDelayYM = 1;
 				} else if ("H".equals(iDelayCode)) {
-					sMajorYM++;
+					sMajorYM = 1;
 				} else {
 					sDelayYM = 1;
 				}
@@ -169,13 +169,14 @@ public class L8330 extends TradeBuffer {
 								}
 							}
 						}
+	
 						if (!"D".equals(xJcicZ451.getTranKey())
 								&& !titaVo.getParam("Ukey").equals(xJcicZ451.getUkey())) {
-							if ("L".equals(xJcicZ451.getDelayCode())) {
+							if ("L".equals(xJcicZ451.getDelayCode()) && iApplyDate==xJcicZ451.getApplyDate()) {
 								sCovDelayYM++;
-							} else if ("H".equals(xJcicZ451.getDelayCode())) {
+							} else if ("H".equals(xJcicZ451.getDelayCode())&& iApplyDate==xJcicZ451.getApplyDate()) {
 								sMajorYM++;
-							} else {
+							} else if(iApplyDate == xJcicZ451.getApplyDate()){
 								sDelayYM++;
 							}
 						}

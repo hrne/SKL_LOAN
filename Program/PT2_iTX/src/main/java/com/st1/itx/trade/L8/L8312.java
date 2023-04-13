@@ -167,11 +167,13 @@ public class L8312 extends TradeBuffer {
 									throw new LogicException("E0007", "延期繳款原因為'E繳付子女學費'者，延期繳款年月不能連續兩期.");
 								}
 							}
-							if ("L".equals(xJcicZ051.getDelayCode())) {
+
+							
+							if ("L".equals(xJcicZ051.getDelayCode()) && iRcDate == xJcicZ051.getRcDate()) {
 								sCovDelayYM++;
-							} else if ("J".equals(xJcicZ051.getDelayCode())) {
+							} else if ("J".equals(xJcicZ051.getDelayCode())  && iRcDate == xJcicZ051.getRcDate()) {
 								sMajorYM++;
-							} else {
+							} else if(iRcDate == xJcicZ051.getRcDate()){
 								sDelayYM++;
 							}
 						}
