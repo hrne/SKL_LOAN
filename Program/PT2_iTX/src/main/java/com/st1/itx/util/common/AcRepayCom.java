@@ -289,6 +289,8 @@ public class AcRepayCom extends TradeBuffer {
 				tx.setTxAmt(this.wkTxAmtRemaind);
 				tx.setTempAmt(BigDecimal.ZERO);
 				tx.setOverflow(tx.getTxAmt());
+				this.wkTempAmtRemaind = this.wkTempAmtRemaind.add(this.wkTxAmtRemaind);
+				this.wkTxAmtRemaind = BigDecimal.ZERO;
 				if (feeAmt.compareTo(BigDecimal.ZERO) > 0) {
 					AcDetail acDetail = new AcDetail();
 					acDetail.setDbCr("D");
@@ -299,8 +301,6 @@ public class AcRepayCom extends TradeBuffer {
 					acDetail.setBormNo(0);
 					acDetail.setSumNo("090"); // 暫收抵繳
 					this.lAcDetail.add(acDetail);
-					this.wkTempAmtRemaind = this.wkTempAmtRemaind.add(this.wkTxAmtRemaind);
-					this.wkTxAmtRemaind = BigDecimal.ZERO;
 					// 按AcAcDetail SumNo，大至小排序
 					Collections.sort(this.lAcDetail, new Comparator<AcDetail>() {
 						@Override
