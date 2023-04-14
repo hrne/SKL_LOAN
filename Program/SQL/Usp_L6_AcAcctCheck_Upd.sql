@@ -474,6 +474,7 @@ BEGIN
                              , 'TCK' -- 2023-01-30 Wei from Lai
                              , 'TAM' -- 2023-01-30 Wei from Lai
                              , 'TRO' -- 2023-01-30 Wei from Lai
+                             , 'TRE' -- 2023-01-30 Wei from Lai                             
                              , 'TLD' -- 2023-01-30 Wei from Lai
                              , 'TSL' -- 2023-01-30 Wei from Lai
                              , 'T10' -- 2023-01-30 Wei from Lai
@@ -528,6 +529,7 @@ BEGIN
                              , 'TCK' -- 2023-01-30 Wei from Lai
                              , 'TAM' -- 2023-01-30 Wei from Lai
                              , 'TRO' -- 2023-01-30 Wei from Lai
+                             , 'TRE' -- 2023-01-30 Wei from Lai                             
                              , 'TLD' -- 2023-01-30 Wei from Lai
                              , 'TSL' -- 2023-01-30 Wei from Lai
                              , 'T10' -- 2023-01-30 Wei from Lai
@@ -554,6 +556,7 @@ BEGIN
                           ,'TCK' -- 2023-01-30 Wei from Lai
                           ,'TAM' -- 2023-01-30 Wei from Lai
                           ,'TRO' -- 2023-01-30 Wei from Lai
+                          , 'TRE' -- 2023-01-30 Wei from Lai                             
                           ,'TLD' -- 2023-01-30 Wei from Lai
                           ,'TSL' -- 2023-01-30 Wei from Lai
                           ,'T10' -- 2023-01-30 Wei from Lai

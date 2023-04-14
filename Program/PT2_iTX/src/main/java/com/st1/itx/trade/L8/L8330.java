@@ -128,7 +128,7 @@ public class L8330 extends TradeBuffer {
 								"「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」未曾報送(447)前置調解金融機構無擔保債務協議資料.");
 					}
 				} // 2 end
-				
+
 				// 4 start 延期繳款累積期數(月份)不得超過6期
 //				if (!"L".equals(iDelayCode)) {
 //					Slice<JcicZ451> sJcicZ451 = sJcicZ451Service.otherEq(iSubmitKey, iCustId, iApplyDate+19110000, iCourtCode,iDelayYM, 0,  1, titaVo);
@@ -136,7 +136,7 @@ public class L8330 extends TradeBuffer {
 //						throw new LogicException("E0002", "已有相同資料存在.");
 //					}
 //				}	
-				
+
 				// 6.2 start 「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】，則不受上述檢核4的限制.
 				if ("L".equals(iDelayCode)) {
 					sCovDelayYM = 1;
@@ -145,7 +145,7 @@ public class L8330 extends TradeBuffer {
 				} else {
 					sDelayYM = 1;
 				}
-				
+
 				// @@@SQL-Function要改为：custRcSubCourtEq
 				Slice<JcicZ451> sJcicZ451 = sJcicZ451Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
 				if (sJcicZ451 != null) {
@@ -169,39 +169,65 @@ public class L8330 extends TradeBuffer {
 								}
 							}
 						}
-	
+
 						if (!"D".equals(xJcicZ451.getTranKey())
 								&& !titaVo.getParam("Ukey").equals(xJcicZ451.getUkey())) {
-							if ("L".equals(xJcicZ451.getDelayCode()) && iApplyDate==xJcicZ451.getApplyDate()) {
+							if ("L".equals(xJcicZ451.getDelayCode()) && iApplyDate == xJcicZ451.getApplyDate()) {
 								sCovDelayYM++;
-							} else if ("H".equals(xJcicZ451.getDelayCode())&& iApplyDate==xJcicZ451.getApplyDate()) {
+							} else if ("H".equals(xJcicZ451.getDelayCode()) && iApplyDate == xJcicZ451.getApplyDate()) {
 								sMajorYM++;
-							} else if(iApplyDate == xJcicZ451.getApplyDate()){
+							} else if (iApplyDate == xJcicZ451.getApplyDate()) {
 								sDelayYM++;
 							}
 						}
-					}
-					if (sDelayYM > 6) {
-						if ("A".equals(iTranKey)) {
-							throw new LogicException("E0005", "延期繳款"+iDelayCode+"累計期數(月份)不得超過6期.");
-						} else {
-							throw new LogicException("E0007", "延期繳款"+iDelayCode+"累計期數(月份)不得超過6期.");
+						if (sDelayYM > 6 && iApplyDate == xJcicZ451.getApplyDate()) {
+							if ("A".equals(iTranKey)) {
+								throw new LogicException("E0005", "延期繳款累計期數(月份)不得超過6期.");
+							} else {
+								throw new LogicException("E0007", "延期繳款累計期數(月份)不得超過6期.");
+							}
 						}
-					} 
-					if(sMajorYM>11) { //延期繳款原因H
-						if ("A".equals(iTranKey)) {
-							throw new LogicException("E0005", "「延期繳款原因」為'J本人:為重大災害災民【限累計申請最多12期】.");
-						} else {
-							throw new LogicException("E0007", "「延期繳款原因」為'J本人:為重大災害災民【限累計申請最多12期】.");
+						if ("H".equals(iDelayCode) && iApplyDate == xJcicZ451.getApplyDate()) {
+							if (sMajorYM > 11) { // 延期繳款原因H
+								if ("A".equals(iTranKey)) {
+									throw new LogicException("E0005", "「延期繳款原因」為'H:為重大災害災民【限累計申請最多12期】.");
+								} else {
+									throw new LogicException("E0007", "「延期繳款原因」為'H:為重大災害災民【限累計申請最多12期】.");
+								}
+							}
 						}
+						if ("L".equals(iDelayCode) && iApplyDate == xJcicZ451.getApplyDate()) {
+							if (sCovDelayYM > 6) {
+//							if ("A".equals(iTranKey)) {
+//								throw new LogicException("E0005", "「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】.");
+//							} else {
+//								throw new LogicException("E0007", "「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】.");
+//							}
+							}
+						}
+
 					}
-					else if (sCovDelayYM > 6) {
+//					if (sDelayYM > 6) {
+//						if ("A".equals(iTranKey)) {
+//							throw new LogicException("E0005", "延期繳款累計期數(月份)不得超過6期.");
+//						} else {
+//							throw new LogicException("E0007", "延期繳款累計期數(月份)不得超過6期.");
+//						}
+//					} 
+//					if(sMajorYM>11) { //延期繳款原因H
+//						if ("A".equals(iTranKey)) {
+//							throw new LogicException("E0005", "「延期繳款原因」為'J本人:為重大災害災民【限累計申請最多12期】.");
+//						} else {
+//							throw new LogicException("E0007", "「延期繳款原因」為'J本人:為重大災害災民【限累計申請最多12期】.");
+//						}
+//					}
+//					else if (sCovDelayYM > 6) {
 //						if ("A".equals(iTranKey)) {
 //							throw new LogicException("E0005", "「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】.");
 //						} else {
 //							throw new LogicException("E0007", "「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】.");
 //						}
-					}
+//					}
 				} // 4, 6.2 end
 			}
 			// 3 「延期繳款年月」不得小於「調解申請日」--->(前端檢核)
@@ -251,10 +277,10 @@ public class L8330 extends TradeBuffer {
 			uJcicZ451.setDelayCode(iDelayCode);
 			uJcicZ451.setTranKey(iTranKey);
 			uJcicZ451.setOutJcicTxtDate(0);
-			
+
 			uJcicZ451.setActualFilingDate(0);
 			uJcicZ451.setActualFilingMark("");
-			
+
 			try {
 				sJcicZ451Service.update(uJcicZ451, titaVo);
 			} catch (DBException e) {
@@ -285,7 +311,7 @@ public class L8330 extends TradeBuffer {
 
 			Slice<JcicZ451Log> dJcicLogZ451 = null;
 			dJcicLogZ451 = sJcicZ451LogService.ukeyEq(iJcicZ451.getUkey(), 0, Integer.MAX_VALUE, titaVo);
-			if (dJcicLogZ451 == null || "A".equals(iTranKey) ) {
+			if (dJcicLogZ451 == null || "A".equals(iTranKey)) {
 				// 尚未開始寫入log檔之資料，主檔資料可刪除
 				try {
 					sJcicZ451Service.delete(iJcicZ451, titaVo);
@@ -349,6 +375,7 @@ public class L8330 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
+
 	private int DealMon(int txMonth, int iMonth) throws LogicException {
 		String txMonStr = String.valueOf(txMonth);
 		int txDate = Integer.valueOf(txMonStr + "10");
