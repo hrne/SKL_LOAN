@@ -510,7 +510,7 @@ BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L492A; ntxbuf=#BUF4A;ntxbuf5=type<-1
 :RP_ACNO<-OOAcNo
 :RP_ACCTCODE<-OOAcctCode
 :RP_REPCAT<-OORepayType
-:TempSourceCode<-OORepayCode})
+:TempSourceCode<-OORepayCodeA})
 
 !backNext=true 當值帶回原本畫面將會自動往下執行
 #BTN4=X,16,I,ui:button;value:已入帳未還款查詢;enable:0;tabbable:1;backNext:true;title:L492A 已入帳未還款查詢

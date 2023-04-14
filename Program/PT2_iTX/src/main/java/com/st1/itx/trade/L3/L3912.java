@@ -83,6 +83,7 @@ public class L3912 extends TradeBuffer {
 
 		TempVo tTempVo = new TempVo();
 		tTempVo = tTempVo.getVo(tLoanBorTx.getOtherFields());
+
 		TempVo rvTempVo = new TempVo();
 		rvTempVo = tTempVo.getVo(tTempVo.getParam("RvJsonFields"));
 		if (tLoanBorTx.getTitaTxCd().equals("L3100")) {
@@ -110,7 +111,11 @@ public class L3912 extends TradeBuffer {
 		} else if (tLoanBorTx.getTitaTxCd().equals("L3210")) {
 			RPTFG = 13;
 		} else if (tLoanBorTx.getTitaTxCd().equals("L3220")) {
-			RPTFG = 14;
+			if (tTempVo.get("RemitBank") == null) {
+				RPTFG = 15;
+			} else {
+				RPTFG = 14;
+			}
 		} else if (tLoanBorTx.getTitaTxCd().equals("L3230")) {
 			RPTFG = 15;
 		} else if (tLoanBorTx.getBorxNo() == 1 && tLoanBorTx.getTitaTxCd().equals("L3101")) {
@@ -291,6 +296,8 @@ public class L3912 extends TradeBuffer {
 		this.totaVo.putParam("OSumFee", tTempVo.getParam("SumFee"));
 		this.totaVo.putParam("OIncomeFee", tTempVo.getParam("IncomeFee"));
 		this.totaVo.putParam("OPrepaidFee", tTempVo.getParam("PrepaidFee"));
+		this.totaVo.putParam("OAcctFee", tTempVo.getParam("AcctFee"));
+		this.totaVo.putParam("OHandlingFee", tTempVo.getParam("HandlingFee"));
 		this.totaVo.putParam("OLeadingBank", tTempVo.getParam("LeadingBank"));
 		this.totaVo.putParam("OSigningDate", tTempVo.getParam("SigningDate"));
 		this.totaVo.putParam("ODrawdownStartDate", tTempVo.getParam("DrawdownStartDate"));
@@ -319,6 +326,7 @@ public class L3912 extends TradeBuffer {
 		}
 		this.totaVo.putParam("OExcessive", tTempVo.getParam("Excessive"));
 		this.totaVo.putParam("OExcessiveX", ExcessiveX);
+		this.totaVo.putParam("OCreateEmpNo", tLoanBorTx.getCreateEmpNo());
 
 		this.addList(this.totaVo);
 		return this.sendList();

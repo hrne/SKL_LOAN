@@ -2,6 +2,8 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import com.st1.itx.util.StaticTool;
@@ -18,12 +20,7 @@ import com.st1.itx.Exception.LogicException;
 public class BankRmtfId implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 6128499153218781991L;
-
-// 會計日
+  // 資料會計日
   @Column(name = "`AcDate`")
   private int acDate = 0;
 
@@ -45,7 +42,7 @@ public class BankRmtfId implements Serializable {
   }
 
 /**
-	* 會計日<br>
+	* 資料會計日<br>
 	* 
 	* @return Integer
 	*/
@@ -54,10 +51,10 @@ public class BankRmtfId implements Serializable {
   }
 
 /**
-	* 會計日<br>
+	* 資料會計日<br>
 	* 
   *
-  * @param acDate 會計日
+  * @param acDate 資料會計日
   * @throws LogicException when Date Is Warn	*/
   public void setAcDate(int acDate) throws LogicException {
     this.acDate = StaticTool.rocToBc(acDate);

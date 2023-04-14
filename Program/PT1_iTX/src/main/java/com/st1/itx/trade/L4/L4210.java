@@ -23,7 +23,6 @@ import com.st1.itx.db.service.BatxHeadService;
 import com.st1.itx.db.service.BatxOthersService;
 import com.st1.itx.db.service.NegAppr02Service;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.common.AcPaymentCom;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
@@ -67,9 +66,6 @@ public class L4210 extends TradeBuffer {
 	/* 轉型共用工具 */
 	@Autowired
 	public Parse parse;
-
-	@Autowired
-	public AcPaymentCom acPaymentCom;
 
 	@Autowired
 	public BatxDetailService batxDetailService;
@@ -221,6 +217,9 @@ public class L4210 extends TradeBuffer {
 		tBatxDetail.setProcCode("00000");
 		tBatxDetail.setTitaTlrNo("");
 		tBatxDetail.setTitaTxtNo("");
+		tBatxDetail.setMediaDate(iAcDate);
+		tBatxDetail.setMediaKind(iBatchNo.substring(4, 6));
+		tBatxDetail.setMediaSeq(wkDetailSeq);
 		TempVo tempVo = new TempVo();
 		tempVo.putParam("Note", iNote);
 		tempVo.putParam("Remark", wkRemark);

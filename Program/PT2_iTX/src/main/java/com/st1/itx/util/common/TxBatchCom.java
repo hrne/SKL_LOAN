@@ -28,6 +28,8 @@ import com.st1.itx.db.domain.BatxDetail;
 import com.st1.itx.db.domain.BatxDetailId;
 import com.st1.itx.db.domain.BatxHead;
 import com.st1.itx.db.domain.BatxHeadId;
+import com.st1.itx.db.domain.BatxOthers;
+import com.st1.itx.db.domain.BatxOthersId;
 import com.st1.itx.db.domain.EmpDeductDtl;
 import com.st1.itx.db.domain.FacClose;
 import com.st1.itx.db.domain.LoanBook;
@@ -41,6 +43,7 @@ import com.st1.itx.db.service.BankDeductDtlService;
 import com.st1.itx.db.service.BankRmtfService;
 import com.st1.itx.db.service.BatxDetailService;
 import com.st1.itx.db.service.BatxHeadService;
+import com.st1.itx.db.service.BatxOthersService;
 import com.st1.itx.db.service.EmpDeductDtlService;
 import com.st1.itx.db.service.FacCloseService;
 import com.st1.itx.db.service.FacMainService;
@@ -142,9 +145,11 @@ import com.st1.itx.util.parse.Parse;
 /**
  * 整批入帳處理<BR>
  * 1.TxBatchCom.run 人工或批次入帳後，將交易結果更新整批入帳檔 call by ApControl<BR>
- * 1.1 隔日訂正不處理(隔日訂正，來源科目回沖至暫收可抵繳)<BR>
- * 1.2 更新BankDeductDtl銀扣檔會計日<BR>
- * 1.3 更新EmpDeductDtl員工扣薪款檔會計日<BR>
+ * 1.1 匯款轉帳入帳更新匯款轉帳檔BankRmtf會計日<BR>
+ * 1.2 銀行扣款入帳更新BankDeductDtl銀扣檔會計日<BR>
+ * 1.3 員工扣薪更新EmpDeductDtl員工扣薪款檔會計日<BR>
+ * 1.4 支票兌現入帳更新支票檔LoanCheque<BR>
+ * 
  * 2.TxBatchCom.txCheck 交易檢核 call by 整批檢核(L420ABatch、L420BBatch)<BR>
  * 3.TxBatchCom.txTita 組入帳交易電文call by 整批入帳(L420BBatch)、整批入帳轉暫收(L420C)<BR>
  * 3.1 正常交易，組交易電文 3.2 訂正交易，讀取TxRecord 交易記錄檔，組原電文
@@ -190,6 +195,8 @@ public class TxBatchCom extends TradeBuffer {
 	@Autowired
 	public LoanChequeService loanChequeService;
 	@Autowired
+	public BatxOthersService batxOthersService;
+	@Autowired
 	public TxRecordService txRecordService;
 	@Autowired
 	public TxErrCodeService txErrCodeService;
@@ -234,6 +241,8 @@ public class TxBatchCom extends TradeBuffer {
 	private BigDecimal shortCloseBreach = BigDecimal.ZERO;
 //  另收欠款= 6 未到期火險費用
 	private BigDecimal unOpenfireFee = BigDecimal.ZERO;
+//  當期未收火險費用
+	private BigDecimal unSettlefireFee = BigDecimal.ZERO;
 //	暫收可抵繳  
 	private BigDecimal tavAmt = BigDecimal.ZERO;
 //	暫收抵繳
@@ -335,6 +344,7 @@ public class TxBatchCom extends TradeBuffer {
 		this.repayFee = BigDecimal.ZERO;
 		this.unPayRepayTypeFee = BigDecimal.ZERO;
 		this.unOpenfireFee = BigDecimal.ZERO;
+		this.unSettlefireFee = BigDecimal.ZERO;
 		this.repayTotal = BigDecimal.ZERO;
 		this.amlRsp = 0;
 		this.repayFacmNo = 0;
@@ -897,7 +907,6 @@ public class TxBatchCom extends TradeBuffer {
 		l3210TitaVo.putParam("AreaCode", "");
 		l3210TitaVo.putParam("BankCode", "");
 		l3210TitaVo.putParam("BktwFlag", "N");
-		// l3210TitaVo.putParam("TsibFlag", "N");
 		l3210TitaVo.putParam("MediaFlag", "N");
 		l3210TitaVo.putParam("OutsideCode", 1);
 		l3210TitaVo.putParam("UsageCode", "");
@@ -1128,8 +1137,11 @@ public class TxBatchCom extends TradeBuffer {
 		if (tBatxDetail.getRepayCode() == 4) {
 			updLoanCheque(0, tBatxDetail, titaVo);
 		}
-		tempVo.putParam("ResvEntdy", titaVo.getOrgEntdyI()); // for 隔日沖正再做新交易時紀錄於LoanBorTx.OtherFiled
-		tempVo.putParam("ResvTxSeq", titaVo.getOrgTxSeq()); // 同上
+		// 其他還款來源
+		if (tBatxDetail.getRepayCode() >= 5 && tBatxDetail.getRepayCode() < 90) {
+			updBatxOthers(0, tBatxDetail, titaVo);
+		}
+
 		tBatxDetail.setProcNote(tempVo.getJsonString());
 
 		try {
@@ -1266,6 +1278,11 @@ public class TxBatchCom extends TradeBuffer {
 			if (tDetail.getRepayCode() == 4) {
 				updLoanCheque(acDate, tDetail, titaVo);
 			}
+			// 其他還款來源
+			if (tDetail.getRepayCode() >= 5 && tDetail.getRepayCode() < 90) {
+				updBatxOthers(acDate, tDetail, titaVo);
+			}
+
 		} else {
 			// 交易失敗
 			String errorMsg = this.txBuffer.getTxCom().getErrorMsg().length() > 100
@@ -1319,9 +1336,9 @@ public class TxBatchCom extends TradeBuffer {
 
 	}
 
-//	Update BankRmtf 交易結束更新匯款轉帳檔
+//	Update BankRmtf 更新匯款轉帳檔
 	private BatxDetail updBankRmtf(int acDate, BatxDetail tBatxDetail, TitaVo titaVo) throws LogicException {
-		this.info("updBankRm tf ...");
+		this.info("updBankRmtf ...");
 		BankRmtf tBankRmtf = null;
 		if (acDate == 0) {
 			tBankRmtf = bankRmtfService.findTxSeqFirst(titaVo.getOrgEntdyI() + 19110000, titaVo.getOrgTlr(),
@@ -1350,6 +1367,7 @@ public class TxBatchCom extends TradeBuffer {
 			}
 		}
 		tBankRmtf.setRepayType(parse.IntegerToString(tBatxDetail.getRepayType(), 2));
+		tBankRmtf.setTitaEntdy(acDate);
 		if (acDate == 0) {
 			tBankRmtf.setTitaTlrNo("");
 			tBankRmtf.setTitaTxtNo("");
@@ -1360,7 +1378,7 @@ public class TxBatchCom extends TradeBuffer {
 		try {
 			bankRmtfService.update(tBankRmtf, titaVo);
 		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0007", "TxBatchCom update BankDeductDtl " + e.getErrorMsg());
+			throw new LogicException(titaVo, "E0007", "TxBatchCom update BankRmtf " + e.getErrorMsg());
 		}
 		return tBatxDetail;
 	}
@@ -1543,6 +1561,46 @@ public class TxBatchCom extends TradeBuffer {
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007",
 					"戶號 = " + iCustNo + " 支票帳號 = " + iChequeAcct + " 支票號碼 = " + iChequeNo + " " + e.getErrorMsg()); // 更新資料時，發生錯誤
+		}
+		return tBatxDetail;
+	}
+
+//	Update BatxOthers 更新其他還款來源檔
+	private BatxDetail updBatxOthers(int acDate, BatxDetail tBatxDetail, TitaVo titaVo) throws LogicException {
+		this.info("updBatxOthers ...");
+		BatxOthersId tBatxOthersId = new BatxOthersId();
+		BatxOthers tBatxOthers = null;
+		if (acDate == 0) {
+			tBatxOthers = batxOthersService.findTxSeqFirst(titaVo.getOrgEntdyI() + 19110000, titaVo.getOrgTlr(),
+					titaVo.getOrgTno(), titaVo);
+			if (tBatxOthers == null) {
+				throw new LogicException("E0006", "TxBatchCom BatxOthers"); // E0006 鎖定資料時，發生錯誤
+			}
+			tBatxOthers = batxOthersService.holdById(tBatxOthers, titaVo);
+			tBatxDetail.setMediaDate(tBatxOthers.getAcDate());
+			tBatxDetail.setMediaKind(tBatxOthers.getBatchNo().substring(4, 6));
+			tBatxDetail.setMediaSeq(tBatxOthers.getDetailSeq());
+		} else {
+			tBatxOthersId.setAcDate(tBatxDetail.getMediaDate());
+			tBatxOthersId.setBatchNo("BATX" + tBatxDetail.getMediaKind()); // 上傳批號後兩碼
+			tBatxOthersId.setDetailSeq(tBatxDetail.getMediaSeq());
+			tBatxOthers = batxOthersService.holdById(tBatxOthersId, titaVo);
+			if (tBatxOthers == null) {
+				throw new LogicException("E0006", "TxBatchCom BatxOthers"); // E0006 鎖定資料時，發生錯誤
+			}
+		}
+		tBatxOthers.setTitaEntdy(acDate);
+		if (acDate == 0) {
+			tBatxOthers.setTitaTlrNo("");
+			tBatxOthers.setTitaTxtNo("");
+		} else {
+			tBatxOthers.setTitaTlrNo(titaVo.getTlrNo());
+			tBatxOthers.setTitaTxtNo(titaVo.getTxtNo());
+		}
+		try {
+			batxOthersService.update(tBatxOthers, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0007", "TxBatchCom update BatxOthers " + e.getErrorMsg());
 		}
 		return tBatxDetail;
 	}
@@ -1820,6 +1878,9 @@ public class TxBatchCom extends TradeBuffer {
 		}
 		if (this.fireFee.compareTo(BigDecimal.ZERO) > 0) {
 			this.checkMsg += " 火險費:" + df.format(this.fireFee) + "(" + this.fireFeeDate + ")";
+		}
+		if (this.unSettlefireFee.compareTo(BigDecimal.ZERO) > 0) {
+			this.checkMsg += " 未收當月火險費:" + df.format(this.unSettlefireFee);
 		}
 		if (this.modifyFee.compareTo(BigDecimal.ZERO) > 0) {
 			this.checkMsg += " 契變手續費:" + df.format(this.modifyFee);
@@ -2230,16 +2291,24 @@ public class TxBatchCom extends TradeBuffer {
 				if (baTxVo.getDataKind() == 5) {
 					this.otrTavAmt = this.otrTavAmt.add(baTxVo.getUnPaidAmt());
 				}
+				// 另收費用
 				if (baTxVo.getDataKind() == 6) {
 					// 未到期火險費用
 					if (baTxVo.getRepayType() == 5) {
 						this.unOpenfireFee = this.unOpenfireFee.add(baTxVo.getUnPaidAmt());
 					}
-					// 另收費用
 					if (baTxVo.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
 						this.unPayTotal = this.unPayTotal.add(baTxVo.getUnPaidAmt()); // 全部應繳
 						this.unPayFee = this.unPayFee.add(baTxVo.getFeeAmt());
 						this.repayFee = this.repayFee.add(baTxVo.getAcctAmt());
+					}
+				}
+				// 當期未收火險費用
+				if (this.repayType <= 2 || this.repayType >= 9) {
+					if (baTxVo.getDataKind() == 1 && baTxVo.getAcctAmt().compareTo(BigDecimal.ZERO) == 0) {
+						if (baTxVo.getRepayType() == 5) {
+							this.unSettlefireFee = this.unSettlefireFee.add(baTxVo.getUnPaidAmt());
+						}
 					}
 				}
 			}

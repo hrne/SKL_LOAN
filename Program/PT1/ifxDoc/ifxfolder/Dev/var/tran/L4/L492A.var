@@ -230,7 +230,8 @@ E(0,1)ASGN(LOOP$)
 #OOEntryDate=D,7,O
 
 #OORepayCode=A,2,O
-
+#OORepayCodeA=A,2,O
+C(3,#OORepayCode,11,E(0,1),E(0,#OORepayCode))
 ! 01	匯款轉帳
 ! 02	銀行扣款
 ! 03	員工扣款
@@ -387,6 +388,8 @@ TXFORM=L492A
 
 
 #OORepayCode=
+{width:1,hidden:true}
+#OORepayCodeA=
 {width:1,hidden:true}
 #OORepayType=
 {width:1,hidden:true}

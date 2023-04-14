@@ -8,8 +8,6 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -59,7 +57,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3220")
 @Scope("prototype")
 public class L3220 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L3220.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -131,20 +128,20 @@ public class L3220 extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		logger.info("active L3220 ");
-		logger.info("   isActfgEntry   = " + titaVo.isActfgEntry());
-		logger.info("   isActfgRelease = " + titaVo.isActfgRelease());
-		logger.info("   isHcodeNormal  = " + titaVo.isHcodeNormal());
-		logger.info("   isHcodeErase   = " + titaVo.isHcodeErase());
-		logger.info("   isHcodeModify  = " + titaVo.isHcodeModify());
-		logger.info("   EntdyI         = " + titaVo.getEntDyI());
-		logger.info("   Kinbr          = " + titaVo.getKinbr());
-		logger.info("   TlrNo          = " + titaVo.getTlrNo());
-		logger.info("   Tno            = " + titaVo.getTxtNo());
-		logger.info("   OrgEntdyI      = " + titaVo.getOrgEntdyI());
-		logger.info("   OrgKin         = " + titaVo.getOrgKin());
-		logger.info("   OrgTlr         = " + titaVo.getOrgTlr());
-		logger.info("   OrgTno         = " + titaVo.getOrgTno());
+		this.info("active L3220 ");
+		this.info("   isActfgEntry   = " + titaVo.isActfgEntry());
+		this.info("   isActfgRelease = " + titaVo.isActfgRelease());
+		this.info("   isHcodeNormal  = " + titaVo.isHcodeNormal());
+		this.info("   isHcodeErase   = " + titaVo.isHcodeErase());
+		this.info("   isHcodeModify  = " + titaVo.isHcodeModify());
+		this.info("   EntdyI         = " + titaVo.getEntDyI());
+		this.info("   Kinbr          = " + titaVo.getKinbr());
+		this.info("   TlrNo          = " + titaVo.getTlrNo());
+		this.info("   Tno            = " + titaVo.getTxtNo());
+		this.info("   OrgEntdyI      = " + titaVo.getOrgEntdyI());
+		this.info("   OrgKin         = " + titaVo.getOrgKin());
+		this.info("   OrgTlr         = " + titaVo.getOrgTlr());
+		this.info("   OrgTno         = " + titaVo.getOrgTno());
 
 		this.totaVo.init(titaVo);
 		loanCom.setTxBuffer(this.txBuffer);
@@ -220,9 +217,9 @@ public class L3220 extends TradeBuffer {
 	}
 
 	private void TempAcDetailRoutine() throws LogicException {
-		logger.info("TempAcDetailRoutine ... ");
-		logger.info("   iTempAmt  = " + iTempAmt);
-		logger.info("   wkTempBal = " + wkTempBal);
+		this.info("TempAcDetailRoutine ... ");
+		this.info("   iTempAmt  = " + iTempAmt);
+		this.info("   wkTempBal = " + wkTempBal);
 		try {
 			this.baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, iFacmNo, 0, 0, iTempAmt, titaVo);
 		} catch (LogicException e) {
@@ -285,13 +282,13 @@ public class L3220 extends TradeBuffer {
 		if (wkTempBal.compareTo(new BigDecimal(0)) > 0) {
 			throw new LogicException(titaVo, "E3060", "目前客戶之暫收款 = " + wkCustTempBal); // 退還金額大於目前客戶之暫收款
 		}
-		logger.info("TempAcDetailRoutine end ");
-		logger.info("   wkTempBal = " + wkTempBal);
+		this.info("TempAcDetailRoutine end ");
+		this.info("   wkTempBal = " + wkTempBal);
 
 	}
 
 	private void ChequeAmtNormalRoutine() throws LogicException {
-		logger.info("ChequeAmtNormalRoutine ... ");
+		this.info("ChequeAmtNormalRoutine ... ");
 
 		// 鎖定支票檔
 		LoanCheque tLoanCheque = loanChequeService.holdById(new LoanChequeId(iChequeAcct, iChequeNo));
@@ -339,7 +336,7 @@ public class L3220 extends TradeBuffer {
 	}
 
 	private void ChequeAmtEraseRoutine() throws LogicException {
-		logger.info("ChequeAmtEraseRoutine ... ");
+		this.info("ChequeAmtEraseRoutine ... ");
 
 		// 鎖定支票檔
 		LoanCheque tLoanCheque = loanChequeService.holdById(new LoanChequeId(iChequeAcct, iChequeNo));
@@ -362,8 +359,8 @@ public class L3220 extends TradeBuffer {
 	}
 
 	private void ChequeAcDetailRoutine() throws LogicException {
-		logger.info("ChequeAcDetailRoutine ... ");
-		logger.info("   isBookAcYes = " + this.txBuffer.getTxCom().isBookAcYes());
+		this.info("ChequeAcDetailRoutine ... ");
+		this.info("   isBookAcYes = " + this.txBuffer.getTxCom().isBookAcYes());
 
 		AcDetail acDetail;
 		if (this.txBuffer.getTxCom().isBookAcYes()) {
@@ -381,8 +378,8 @@ public class L3220 extends TradeBuffer {
 	}
 
 	private void AcDetailRoutine() throws LogicException {
-		logger.info("AcDetailRoutine ... ");
-		logger.info("   isBookAcYes = " + this.txBuffer.getTxCom().isBookAcYes());
+		this.info("AcDetailRoutine ... ");
+		this.info("   isBookAcYes = " + this.txBuffer.getTxCom().isBookAcYes());
 
 		if (this.txBuffer.getTxCom().isBookAcYes()) {
 			// 貸方 收付欄
@@ -394,7 +391,7 @@ public class L3220 extends TradeBuffer {
 
 	// 維護撥款匯款檔
 	private void AcPaymentRoutine() throws LogicException {
-		logger.info("AcPaymentRoutine ... ");
+		this.info("AcPaymentRoutine ... ");
 
 		if (titaVo.isActfgEntry()) {
 			acPaymentCom.remit(titaVo);
@@ -412,7 +409,7 @@ public class L3220 extends TradeBuffer {
 
 	// 新增放款交易內容檔
 	private void addLoanBorTxRoutine() throws LogicException {
-		logger.info("addLoanBorTxRoutine ... ");
+		this.info("addLoanBorTxRoutine ... ");
 // TempItemCode
 //		01	抽票
 //		02	退票
@@ -441,13 +438,13 @@ public class L3220 extends TradeBuffer {
 		// 3227 AML暫收款退還
 		// 3228 聯貸費攤提暫收款
 		switch (iTempItemCode) {
-		case 1:
+		case 1: // 抽票退還
 			tLoanBorTx.setTxDescCode("3222");
 			break;
-		case 2:
+		case 2: // 退票退還
 			tLoanBorTx.setTxDescCode("3223");
 			break;
-		case 3:
+		case 3: // 服務中心代收抽票退還
 			tLoanBorTx.setTxDescCode("3224");
 			break;
 		default:
@@ -477,11 +474,13 @@ public class L3220 extends TradeBuffer {
 		tTempVo.clear();
 		tTempVo.putParam("TempItemCode", iTempItemCode);
 		tTempVo.putParam("TempReasonCode", iTempReasonCode);
-		tTempVo.putParam("RemitBank", titaVo.getParam("RpRemitBank1") + titaVo.getParam("RpRemitBranch1"));
-		tTempVo.putParam("RemitAcctNo", titaVo.getParam("RpRemitAcctNo1"));
-		tTempVo.putParam("RemitCustName", titaVo.getParam("RpCustName1"));
-		tTempVo.putParam("RemitRemark", titaVo.getParam("RpRemark1"));
-		tTempVo.putParam("RemitAmt", titaVo.getParam("RpAmt1"));
+		if (iTempItemCode > 3) {
+			tTempVo.putParam("RemitBank", titaVo.getParam("RpRemitBank1") + titaVo.getParam("RpRemitBranch1"));
+			tTempVo.putParam("RemitAcctNo", titaVo.getParam("RpRemitAcctNo1"));
+			tTempVo.putParam("RemitCustName", titaVo.getParam("RpCustName1"));
+			tTempVo.putParam("RemitRemark", titaVo.getParam("RpRemark1"));
+			tTempVo.putParam("RemitAmt", titaVo.getParam("RpAmt1"));
+		}
 		// 新增摘要
 		tTempVo.putParam("Note", iNote);
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());

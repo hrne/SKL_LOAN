@@ -1532,10 +1532,12 @@ E(0,#UsAcctFee)
 C(3,#PRECISION,0,E(0,#TwAcctFee),E(0,#UsAcctFee))
 #RimAcctFee=m,14.2,S
 #RimAcctCode=X,3,S
+
 #MessageTxtA=X,30,L
 C(3,#TimAcctFee,0,S,$)
 
 #SendL3r16A=X,1,S
+C(3,#TimAcctFee,0,S,$)
 E(0,@RimCustNo,#TimCustNo)
 E(0,@RimFacmNo,#FacmNo)
 E(0,@RimAcctFee,#TimAcctFee)
@@ -1568,6 +1570,7 @@ C(3,#PRECISION,0,E(0,#TwHandlingFee),E(0,#UsHandlingFee))
 C(3,#TimHandlingFee,0,S,$)
 
 #SendL3r16B=X,1,S
+C(3,#TimHandlingFee,0,S,$)
 E(0,@RimCustNo,#TimCustNo)
 E(0,@RimFacmNo,#FacmNo)
 E(0,@RimAcctFee,#TimHandlingFee)

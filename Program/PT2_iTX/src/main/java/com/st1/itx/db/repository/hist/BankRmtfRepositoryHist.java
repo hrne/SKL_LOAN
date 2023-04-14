@@ -3,11 +3,14 @@ package com.st1.itx.db.repository.hist;
 
 import java.util.Optional;
 
+import java.math.BigDecimal;
+import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,10 +25,10 @@ import com.st1.itx.db.domain.BankRmtfId;
  */
 public interface BankRmtfRepositoryHist extends JpaRepository<BankRmtf, BankRmtfId> {
 
-  // AcDate = ,AND TitaTlrNo = ,AND TitaTxtNo =
-  public Optional<BankRmtf> findTopByAcDateIsAndTitaTlrNoIsAndTitaTxtNoIs(int acDate_0, String titaTlrNo_1, String titaTxtNo_2);
+  // TitaEntdy = ,AND TitaTlrNo = ,AND TitaTxtNo =
+  public Optional<BankRmtf> findTopByTitaEntdyIsAndTitaTlrNoIsAndTitaTxtNoIs(int titaEntdy_0, String titaTlrNo_1, String titaTxtNo_2);
 
-  // EntryDate >= ,AND AcDate<= 
+  // EntryDate >= ,AND AcDate <= 
   public Slice<BankRmtf> findAllByEntryDateGreaterThanEqualAndAcDateLessThanEqual(int entryDate_0, int acDate_1, Pageable pageable);
 
   // Hold

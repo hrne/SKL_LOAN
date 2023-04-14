@@ -286,6 +286,8 @@ T(3,[L3912] 交易內容)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+#OCreateEmpNo=X,6,S
 #ORPTFG=A,2,S
 
 ![借戶戶號]
@@ -977,6 +979,15 @@ T(2,@L3731Remark,#ORemark)
 #OAcctFeeX=X,22,S
 CALL2(#ADJUSTDOT,#Precision,#OAcctFee,#OAcctFeeX)
 T(2,@L3420AcctFeeX,#OAcctFeeX)
+C(3,#OAcctFee,0,IF(#OCreateEmpNo =="999999",$,T(2,@L3100AcctFeeX,#OAcctFeeX)),T(2,@L3100AcctFeeX,#OAcctFeeX))
+
+
+![手續費]
+#OHandlingFee=m,14.2,S
+#OHandlingFeeX=X,22,S
+C(3,#OHandlingFee,0,IF(#OCreateEmpNo =="999999",S,$),$)
+CALL2(#ADJUSTDOT,#Precision,#OHandlingFee,#OHandlingFeeX)
+T(2,@L3100HandlingFeeX,#OHandlingFeeX)
 
 
 ![契變手續費]
@@ -1006,7 +1017,6 @@ T(2,@L3420LawFeeX,#OLawFeeX)
 #OTrfBadAmt=m,14.2,S
 E(0,#OFireFee+#OLawFee+#ORepayAmt)
 CALL2(#ADJUSTDOT,#Precision,#OTrfBadAmt,#L3420TrfBadAmt)
-
 
 ![催收收回本金]
 #OOvduPaidPrin=m,14.2,S
@@ -1273,6 +1283,8 @@ T(3,[L3912] 交易內容查詢)
 ![撥款金額]
 #L3100DrawdowmAmtX=X,22,L
 
+#L3100AcctFeeX=X,22,L
+#L3100HandlingFeeX=X,22,L
 ![撥款日期]
 #L3100DrawdownDateX=X,9,L
 
@@ -2083,6 +2095,8 @@ TXFORM=L3912
 #OFitRate#OIncrFlag#ORateIncr#OIndividualIncr#ORemark#OAcctFee#OModifyFee#OFireFee#OLawFee
 #OOvduPaidPrin#OOvduPaidInt#OOvduPaidBreach#OOvduReduceInt#OOvduReduceBreach
 #OTempSourceCode#OTempItemCode#ODescription
+#OAcctFee
+#OHandlingFee
 #OLeadingFee#OManageFee#OCommitFee#OPartFee#OAgencyFee
 #OUnderwriteFee#OOtherFee#OSumFee#OIncomeFee#OPrepaidFee
 #OLeadingBank#OSigningDate#ODrawdownStartDate#ODrawdownEndDate
@@ -2095,6 +2109,7 @@ TXFORM=L3912
 #OSlipSumNoX
 #OExcessive
 #OExcessiveX
+#OCreateEmpNo
 ^
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 
@@ -2150,8 +2165,9 @@ TXFORM=L3912
 ["@匯款戶名",#L3100RemitCustName],
 ["@匯款附言",#L3100RemitRemark],
 ["@匯款金額",#ORemitAmtX],
-["@櫃員編號",#L3200TellerNo,#L3200TellerNoX],["@交易序號",#OTxtNoX],
-["@主管編號",#L3100SupperNo,#L3100SupperNoX],["@作業日期",#L3200TxDate,#L3200TxTimeX],
+["@帳管費",#L3100AcctFeeX],["@手續費",#L3100HandlingFeeX],
+["@櫃員編號",#L3100TellerNo,#L3100TellerNoX],["@交易序號",#OTxtNoX],
+["@主管編號",#L3100SupperNo,#L3100SupperNoX],["@作業日期",#L3100TxDate,#L3100TxTimeX],
 ]
 
 </sub>

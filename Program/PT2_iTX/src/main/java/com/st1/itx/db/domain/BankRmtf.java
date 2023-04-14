@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,15 +27,10 @@ import com.st1.itx.Exception.LogicException;
 public class BankRmtf implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -215822473601662893L;
-
-@EmbeddedId
+  @EmbeddedId
   private BankRmtfId bankRmtfId;
 
-  // 會計日
+  // 資料會計日
   @Column(name = "`AcDate`", insertable = false, updatable = false)
   private int acDate = 0;
 
@@ -106,11 +102,18 @@ public class BankRmtf implements Serializable {
   @Column(name = "`ReconCode`", length = 3)
   private String reconCode;
 
+  // 作帳日
+  /* 入帳後更新 */
+  @Column(name = "`TitaEntdy`")
+  private int titaEntdy = 0;
+
   // 經辦
+  /* 入帳後更新 */
   @Column(name = "`TitaTlrNo`", length = 6)
   private String titaTlrNo;
 
   // 交易序號
+  /* 入帳後更新 */
   @Column(name = "`TitaTxtNo`", length = 8)
   private String titaTxtNo;
 
@@ -142,7 +145,7 @@ public class BankRmtf implements Serializable {
   }
 
 /**
-	* 會計日<br>
+	* 資料會計日<br>
 	* 
 	* @return Integer
 	*/
@@ -151,10 +154,10 @@ public class BankRmtf implements Serializable {
   }
 
 /**
-	* 會計日<br>
+	* 資料會計日<br>
 	* 
   *
-  * @param acDate 會計日
+  * @param acDate 資料會計日
   * @throws LogicException when Date Is Warn	*/
   public void setAcDate(int acDate) throws LogicException {
     this.acDate = StaticTool.rocToBc(acDate);
@@ -501,8 +504,27 @@ TCK:支票
   }
 
 /**
+	* 作帳日<br>
+	* 入帳後更新
+	* @return Integer
+	*/
+  public int getTitaEntdy() {
+    return StaticTool.bcToRoc(this.titaEntdy);
+  }
+
+/**
+	* 作帳日<br>
+	* 入帳後更新
+  *
+  * @param titaEntdy 作帳日
+  * @throws LogicException when Date Is Warn	*/
+  public void setTitaEntdy(int titaEntdy) throws LogicException {
+    this.titaEntdy = StaticTool.rocToBc(titaEntdy);
+  }
+
+/**
 	* 經辦<br>
-	* 
+	* 入帳後更新
 	* @return String
 	*/
   public String getTitaTlrNo() {
@@ -511,7 +533,7 @@ TCK:支票
 
 /**
 	* 經辦<br>
-	* 
+	* 入帳後更新
   *
   * @param titaTlrNo 經辦
 	*/
@@ -521,7 +543,7 @@ TCK:支票
 
 /**
 	* 交易序號<br>
-	* 
+	* 入帳後更新
 	* @return String
 	*/
   public String getTitaTxtNo() {
@@ -530,7 +552,7 @@ TCK:支票
 
 /**
 	* 交易序號<br>
-	* 
+	* 入帳後更新
   *
   * @param titaTxtNo 交易序號
 	*/
@@ -619,7 +641,8 @@ TCK:支票
   public String toString() {
     return "BankRmtf [bankRmtfId=" + bankRmtfId + ", custNo=" + custNo + ", repayType=" + repayType + ", repayAmt=" + repayAmt
            + ", depAcctNo=" + depAcctNo + ", entryDate=" + entryDate + ", dscptCode=" + dscptCode + ", virtualAcctNo=" + virtualAcctNo + ", withdrawAmt=" + withdrawAmt + ", depositAmt=" + depositAmt
-           + ", balance=" + balance + ", remintBank=" + remintBank + ", traderInfo=" + traderInfo + ", amlRsp=" + amlRsp + ", reconCode=" + reconCode + ", titaTlrNo=" + titaTlrNo
-           + ", titaTxtNo=" + titaTxtNo + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", balance=" + balance + ", remintBank=" + remintBank + ", traderInfo=" + traderInfo + ", amlRsp=" + amlRsp + ", reconCode=" + reconCode + ", titaEntdy=" + titaEntdy
+           + ", titaTlrNo=" + titaTlrNo + ", titaTxtNo=" + titaTxtNo + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

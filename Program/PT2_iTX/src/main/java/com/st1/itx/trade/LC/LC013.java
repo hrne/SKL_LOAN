@@ -26,9 +26,11 @@ import com.st1.itx.db.domain.TxTellerAuth;
 import com.st1.itx.db.service.TxTellerAuthService;
 
 import com.st1.itx.util.common.CheckAuth;
+import com.st1.itx.util.parse.Parse;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 
 @Service("LC013")
@@ -56,6 +58,9 @@ public class LC013 extends TradeBuffer {
 	@Autowired
 	public CheckAuth checkAuth;
 
+	@Autowired
+	private Parse parse;
+
 	Map<String, String> authNos = new HashMap<String, String>();
 
 	@Override
@@ -70,9 +75,46 @@ public class LC013 extends TradeBuffer {
 		// 經辦權限
 		TlrAuth(titaVo.getTlrNo(), "", "", titaVo);
 
+		Slice<TxAgent> slTxAgent = null;
+		List<TxAgent> lTxAgent = null;
+
+		if ("1".equals(titaVo.get("ISLOGIN"))) {
+			slTxAgent = txAgentService.findByTlrNo(titaVo.getTlrNo(), index, limit, titaVo);
+			lTxAgent = slTxAgent == null ? null : slTxAgent.getContent();
+			if (lTxAgent != null) {
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
+				long time = new Date().getTime();
+				Date dates = new Date(time);
+				String times = sdf.format(dates);
+
+				for (TxAgent txAgent : lTxAgent) {
+
+					String sTdayY = times.substring(0, 4);
+					String sTdayMDHM = times.substring(4, 12);
+					String tTtDayY = parse.IntegerToString(parse.stringToInteger(sTdayY) - 1911, 3);
+					BigDecimal xTday = new BigDecimal(tTtDayY + sTdayMDHM);
+
+					String sSday = parse.IntegerToString(txAgent.getBeginDate(), 7);
+					String sTime = parse.IntegerToString(txAgent.getBeginTime(), 4);
+					BigDecimal xBeginDate = new BigDecimal(sSday.substring(0, 3) + sSday.substring(3, 7) + sTime);
+
+					String sEday = parse.IntegerToString(txAgent.getEndDate(), 7);
+					String sETime = parse.IntegerToString(txAgent.getEndTime(), 4);
+					BigDecimal xEndDate = new BigDecimal(sEday.substring(0, 3) + sEday.substring(3, 7) + sETime);
+					this.info("xTday   = " + xTday);
+					this.info("xBeginDate = " + xBeginDate);
+					this.info("xEndDate  = " + xEndDate);
+					if (xTday.compareTo(xBeginDate) > -1 && xTday.compareTo(xEndDate) < 1)
+						throw new LogicException("EC000", "被代理人不能登入:" + titaVo.getTlrNo());
+
+				}
+			}
+		}
+
 		// 代理權限
-		Slice<TxAgent> slTxAgent = txAgentService.findByAgentTlrNo(titaVo.getTlrNo(), 0, 1000);
-		List<TxAgent> lTxAgent = slTxAgent == null ? null : slTxAgent.getContent();
+		slTxAgent = txAgentService.findByAgentTlrNo(titaVo.getTlrNo(), 0, 1000);
+
+		lTxAgent = slTxAgent == null ? null : slTxAgent.getContent();
 
 		// 現在時間
 		SimpleDateFormat sdFormat = new SimpleDateFormat("HHmm");

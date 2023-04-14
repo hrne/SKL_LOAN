@@ -481,11 +481,6 @@ public class L3210 extends TradeBuffer {
 		tLoanBorTx.setDisplayflag("A"); // A:帳務
 		tLoanBorTx.setAcctCode(ac.getAcctCode()); // 業務科目
 
-		// 0: 債協暫收款 10: AML凍結／未確定
-		if (iTempReasonCode == 0 || iTempReasonCode == 10) {
-			tLoanBorTx.setTxAmt(ac.getTxAmt());
-		}
-
 		// 其他欄位
 		tTempVo.putParam("TempReasonCode", iTempReasonCode);
 
