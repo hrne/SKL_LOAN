@@ -49,7 +49,7 @@ E(0,0)
 ["#FdRvNo+銷帳編號",#RvNo],
 ["#FdAcDate+會計日期",#AcDate],
 ["#FdInqType+彙計方式",#InqType,#InqTypeX],
-[#FdInqTypeX2+#InqTypeX2,#InqData,#InqDataX],
+[#FdInqTypeX2+#InqTypeX2,#InqData,#InqDataX,#InqTypeX3,#InputTitaTxtNoStart,#InqTypeX4,#InputTitaTxtNoEnd],
 ["#FdDbCr+借貸別",#DbCr,#DbCrX],
 ]
 !---------- AP Button AREA ----------
@@ -102,10 +102,11 @@ T(3,0:全部;1:借;2:貸)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 T(2,@RimTxCode,#TXCD)
+E(0,@AcDate,#SYSDATE)
 
 
 
-#NTXBUF=X,46,S
+#NTXBUF=X,62,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
 
@@ -142,18 +143,25 @@ T(1,#NTXBUF,40,6)
 #CHAIN_DbCr=X,1,S
 T(1,#NTXBUF,46,1)
 
-C(3,#CHAIN,1,T(2,@AcBookCode,#CHAIN_AcBookCode),)
-C(3,#CHAIN,1,T(2,@AcSubBookCode,#CHAIN_AcSubBookCode),)
-C(3,#CHAIN,1,T(2,@BranchNo,#CHAIN_BranchNo),)
-C(3,#CHAIN,1,T(2,@CurrencyCode,#CHAIN_CurrencyCode),)
-C(3,#CHAIN,1,T(2,@AcNoCode,#CHAIN_AcNoCode),)
-C(3,#CHAIN,1,T(2,@AcSubCode,#CHAIN_AcSubCode),)
-C(3,#CHAIN,1,T(2,@AcDtlCode,#CHAIN_AcDtlCode),)
-C(3,#CHAIN,1,T(2,@AcDate,#CHAIN_AcDate),)
-C(3,#CHAIN,1,T(2,@InqType,#CHAIN_InqType),)
-C(3,#CHAIN,1,T(2,@InqData,#CHAIN_InqData),)
-C(3,#CHAIN,1,T(2,@DbCr,#CHAIN_DbCr),)
-E(0,@AcDate,#SYSDATE)
+#CHAIN_InputTitaTxtNoStart=A,8,S
+T(1,#NTXBUF,47,8)
+
+#CHAIN_InputTitaTxtNoEnd=A,8,S
+T(1,#NTXBUF,55,8)
+
+C(3,#CHAIN,1,T(2,@AcBookCode,#CHAIN_AcBookCode),$)
+C(3,#CHAIN,1,T(2,@AcSubBookCode,#CHAIN_AcSubBookCode),$)
+C(3,#CHAIN,1,T(2,@BranchNo,#CHAIN_BranchNo),$)
+C(3,#CHAIN,1,T(2,@CurrencyCode,#CHAIN_CurrencyCode),$)
+C(3,#CHAIN,1,T(2,@AcNoCode,#CHAIN_AcNoCode),$)
+C(3,#CHAIN,1,T(2,@AcSubCode,#CHAIN_AcSubCode),$)
+C(3,#CHAIN,1,T(2,@AcDtlCode,#CHAIN_AcDtlCode),$)
+C(3,#CHAIN,1,T(2,@AcDate,#CHAIN_AcDate),$)
+C(3,#CHAIN,1,T(2,@InqType,#CHAIN_InqType),$)
+C(3,#CHAIN,1,T(2,@InqData,#CHAIN_InqData),$)
+C(3,#CHAIN,1,T(2,@DbCr,#CHAIN_DbCr),$)
+C(3,#CHAIN,1,E(0,@InputTitaTxtNoStart,#CHAIN_InputTitaTxtNoStart),$)
+C(3,#CHAIN,1,E(0,@InputTitaTxtNoEnd,#CHAIN_InputTitaTxtNoEnd),$)
 
 
 #FdBranchNo=X,2,L
@@ -297,6 +305,18 @@ C(3,#InqType,1,V(H,#SumNoTypeHelp),V(7))
 #InqDataX=X,20,L
 C(3,#InqType,1,T(H,#InqData,#SumNoTypeHelp),S)
 
+
+
+#InqTypeX3=X,12,L
+C(3,#InqType,2,SHOW(#InqTypeX3),HIDE(#InqTypeX3))
+C(3,#InqType,2,T(2,交易序號),S)
+#InqTypeX4=X,1,L
+C(3,#InqType,2,SHOW(#InqTypeX4),HIDE(#InqTypeX4))
+T(2,~)
+#InputTitaTxtNoStart=A,8,L
+C(3,#InqType,2,SHOW(#InputTitaTxtNoStart),HIDE(#InputTitaTxtNoStart))
+#InputTitaTxtNoEnd=A,8,L
+C(3,#InqType,2,SHOW(#InputTitaTxtNoEnd),HIDE(#InputTitaTxtNoEnd))
 
 ![借貸別]
 #DbCr=A,1,I
@@ -461,6 +481,8 @@ T(2,#OOTitaTlrNo+ +#OOTlrItem)
 #InqType
 #InqData
 #DbCr
+#InputTitaTxtNoStart
+#InputTitaTxtNoEnd
 #END
 </sub>
 

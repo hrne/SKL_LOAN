@@ -57,6 +57,12 @@ public class L6905ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iAcDate = this.parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 
 		int iInqType = this.parse.stringToInteger(titaVo.getParam("InqType"));
+		int iInputTitaTxtNoStart = this.parse.stringToInteger(titaVo.getParam("InputTitaTxtNoStart"));
+		int iInputTitaTxtNoEnd = this.parse.stringToInteger(titaVo.getParam("InputTitaTxtNoEnd"));
+		if (iInputTitaTxtNoEnd == 0) {
+			iInputTitaTxtNoEnd = 99999999;
+		}
+
 		String iInqData = titaVo.getParam("InqData").trim();
 
 		String sql = "SELECT A.*,B.\"TranItem\",C.\"Fullname\" as TLRNAME,D.\"Fullname\" as SUPNAME,E.\"AcNoItem\" ";
@@ -67,7 +73,7 @@ public class L6905ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "LEFT JOIN \"CdAcCode\" E on E.\"AcNoCode\"=A.\"AcNoCode\" and E.\"AcSubCode\"=A.\"AcSubCode\" and E.\"AcDtlCode\"=a.\"AcDtlCode\" ";
 		// sql += "WHERE （A.\"DrawdownAmt\" > 0 OR D.\"AdjRange\" > 0) ";
 		sql += "WHERE A.\"AcDate\" = :AcDate ";
-		//sql += "  AND A.\"EntAc\" > 0 ";
+		// sql += " AND A.\"EntAc\" > 0 ";
 
 		if (!iBranchNo.isEmpty()) {
 			sql += "AND A.\"BranchNo\" = :BranchNo ";
@@ -99,26 +105,22 @@ public class L6905ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "AND A.\"DbCr\"='C' ";
 		}
 		if (iInqType == 0) {
-			sql += "ORDER BY A.\"AcNoCode\",A.\"AcSubCode\",A.\"AcDtlCode\" ";
 		} else if (iInqType == 1) {
 			sql += "AND \"SumNo\" = :SumNo ";
-			sql += "ORDER BY A.\"AcNoCode\",A.\"AcSubCode\",A.\"AcDtlCode\",A.\"SumNo\" ";
 		} else if (iInqType == 2) {
 			sql += "AND \"TitaTlrNo\" = :TitaTlrNo ";
-			sql += "ORDER BY A.\"AcNoCode\",A.\"AcSubCode\",A.\"AcDtlCode\",A.\"TitaTlrNo\" ";
+			sql += "AND \"TitaTxtNo\" >= :TitaTxtNoStart ";
+			sql += "AND \"TitaTxtNo\" <= :TitaTxtNoEnd ";
 		} else if (iInqType == 3) {
 			sql += "AND \"TitaBatchNo\" = :TitaBatchNo ";
-			sql += "ORDER BY A.\"AcNoCode\",A.\"AcSubCode\",A.\"AcDtlCode\",A.\"TitaBatchNo\" ";
 		} else if (iInqType == 4) {
 			sql += "AND \"DscptCode\" = :DscptCode ";
-			sql += "ORDER BY A.\"AcNoCode\",A.\"AcSubCode\",A.\"AcDtlCode\",A.\"DscptCode\" ";
 		} else if (iInqType == 5) {
 			sql += "AND \"SlipBatNo\" = :SlipBatNo ";
-			sql += "ORDER BY A.\"AcNoCode\",A.\"AcSubCode\",A.\"AcDtlCode\",A.\"SlipBatNo\" ";
 		} else if (iInqType == 6) {
 			sql += "AND \"TitaSecNo\" = :TitaSecNo ";
-			sql += "ORDER BY A.\"AcNoCode\",A.\"AcSubCode\",A.\"AcDtlCode\",A.\"TitaSecNo\" ";
 		}
+		sql += "ORDER BY A.\"SlipNo\" ASC  ";
 
 		sql += sqlRow;
 
@@ -136,7 +138,7 @@ public class L6905ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("ThisLimit", limit);
 
 		query.setParameter("AcDate", iAcDate);
-		
+
 		if (!iAcBookCode.isEmpty()) {
 			query.setParameter("AcBookCode", iAcBookCode);
 			this.info("L6905Service 1");
@@ -171,6 +173,8 @@ public class L6905ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("SumNo", FormatUtil.padX(iInqData, 3));
 		} else if (iInqType == 2) {
 			query.setParameter("TitaTlrNo", iInqData);
+			query.setParameter("TitaTxtNoStart", iInputTitaTxtNoStart);
+			query.setParameter("TitaTxtNoEnd", iInputTitaTxtNoEnd);
 		} else if (iInqType == 3) {
 			query.setParameter("TitaBatchNo", iInqData);
 		} else if (iInqType == 4) {
@@ -180,7 +184,7 @@ public class L6905ServiceImpl extends ASpringJpaParm implements InitializingBean
 		} else if (iInqType == 6) {
 			query.setParameter("TitaSecNo", FormatUtil.padX(iInqData, 2));
 		}
-		
+
 		this.info("L6905Service FindData=" + query);
 
 		// *** 折返控制相關 ***

@@ -22,13 +22,15 @@ T(3,L9742)
 
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=1;screen.width=[147,850];printer.width=[20,80];">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[150,350,150,350];printer.width=[20,60,20,60];order=1;">
 [
 ["[L9742]                                  L9742企金戶還本收據及繳息收據"],
-["會計日期",#inputAcDate],
-["傳票號碼",#inputSlipNoStart,"～",#inputSlipNoEnd,#BTN2],
-["交易序號",#inputTitaTxtNoStart,"～",#inputTitaTxtNoEnd],
-["作業選項",#inputOption,#inputOptionX]
+[#<->#,"會計日期",#inputAcDate],
+[#<->#,"經辦",#inputTitaTlrNo],
+[#<->#,"交易序號",#inputTitaTxtNoStart],
+[#<->#,"傳票號碼(起)",#inputSlipNoStart,#BTN2],
+[#<->#,"傳票號碼(迄)",#inputSlipNoEnd,#BTN3],
+[#<->#,"作業選項",#inputOption,#inputOptionX]
 ]
 
 !---------- AP Button AREA ----------
@@ -37,6 +39,7 @@ T(3,L9742)
 ![Buttom資料查詢]
 
 #BTN2=X,15,I,ui:button;value:會計明細;enable:1;tabbable:0
+#BTN3=X,15,I,ui:button;value:會計明細;enable:1;tabbable:0
 
 
 !會計明細按鈕
@@ -46,8 +49,7 @@ T(3,L9742)
 BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L6905; ntxbuf=#BUF2;ntxbuf5=type<-1:
 inputSlipNoStart<-OOSlipNo:
 inputSlipNoEnd<-OOSlipNo:
-inputTitaTxtNoStart<-OOTitaTxtNo:
-inputTitaTxtNoEnd<-OOTitaTxtNo})
+inputTitaTxtNoStart<-OOTitaTxtNo})
 
 !ENABLE(#BTN2)ENABLE(#BTN3)
 #Submit=A,1,S
@@ -70,6 +72,9 @@ T(4,CHAIN$)
 
 #TXCD2=X,5,S
 T(3,L9742)
+#sval=X,1,S
+E(0,@inputTitaTxtNoStart,00000000)
+E(0,@inputTitaTxtNoEnd,99999999)
 
 #inputAcDate=D,7,I
 E(0,#SYSDATE)
@@ -77,17 +82,48 @@ E(0,#SYSDATE)
 A(DATE,0,#inputAcDate)
 V(5,0,#SYSDATE)
 
-#inputSlipNoStart=A,6,I
-#inputSlipNoEnd=A,6,I
-C(5,#inputSlipNoStart,000000,E(0,999999),E(0,#inputSlipNoStart))
-@V(5,#inputSlipNoEnd,999999)
-V(2,0)
+#inputTitaTlrNo=X,6,I
+T(2,#TLRNO)
+@C(4,#inputTitaTlrNo,T(F,@inputTitaTxtNoStart,0),T(F,@inputTitaTxtNoStart,1))
+C(4,#inputTitaTlrNo,E(0,@inputTitaTxtNoStart,00000000)E(0,@inputTitaTxtNoEnd,99999999),$)
+
+
+
 
 #inputTitaTxtNoStart=A,8,I
-#inputTitaTxtNoEnd=A,8,I
-C(5,#inputTitaTxtNoStart,00000000,E(0,99999999),E(0,#inputTitaTxtNoStart))
-@V(5,#inputTitaTxtNoEnd,99999999)
+C(4,#inputTitaTlrNo,S,$)
+
+
+!會計明細按鈕
+#BUF2B=X,62,S
+T(2,000+   +0000+   +           +     +  +#inputAcDate+2+#inputTitaTlrNo+0+#inputTitaTxtNoStart+#inputTitaTxtNoEnd)
+C(4,#inputTitaTlrNo,$,s)
+T(2,000+   +0000+   +           +     +  +#inputAcDate+0+      +0+#inputTitaTxtNoStart+#inputTitaTxtNoEnd)
+
+#BIND2B=X,1,S
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L6905; ntxbuf=#BUF2B;ntxbuf5=type<-1:
+inputSlipNoStart<-OOSlipNo})
+
+!會計明細按鈕
+#BUF3B=X,62,S
+T(2,000+   +0000+   +           +     +  +#inputAcDate+2+#inputTitaTlrNo+0+#inputTitaTxtNoStart+#inputTitaTxtNoEnd)
+C(4,#inputTitaTlrNo,$,s)
+T(2,000+   +0000+   +           +     +  +#inputAcDate+0+      +0+#inputTitaTxtNoStart+#inputTitaTxtNoEnd)
+
+#BIND3B=X,1,S
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L6905; ntxbuf=#BUF3B;ntxbuf5=type<-1:
+inputSlipNoEnd<-OOSlipNo})
+
+#inputTitaTxtNoEnd=A,8,S
+
+
+
+#inputSlipNoStart=A,6,I
+#inputSlipNoEnd=A,6,I
+C(3,#inputSlipNoEnd,0,E(0,999999),$)
+@V(5,#inputSlipNoStart,999999)
 V(2,0)
+
 
 
 #inputOptionHelp=X,50,S

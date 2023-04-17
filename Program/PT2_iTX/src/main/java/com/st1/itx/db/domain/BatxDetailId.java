@@ -2,6 +2,8 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import com.st1.itx.util.StaticTool;
@@ -18,12 +20,8 @@ import com.st1.itx.Exception.LogicException;
 public class BatxDetailId implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 4164854825790661700L;
-
-// 會計日期
+  // 會計日期
+  /* 會計日 */
   @Column(name = "`AcDate`")
   private int acDate = 0;
 
@@ -48,7 +46,7 @@ public class BatxDetailId implements Serializable {
 
 /**
 	* 會計日期<br>
-	* 
+	* 會計日
 	* @return Integer
 	*/
   public int getAcDate() {
@@ -57,7 +55,7 @@ public class BatxDetailId implements Serializable {
 
 /**
 	* 會計日期<br>
-	* 
+	* 會計日
   *
   * @param acDate 會計日期
   * @throws LogicException when Date Is Warn	*/

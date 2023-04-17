@@ -567,6 +567,7 @@ public class L4200Batch extends TradeBuffer {
 				BigDecimal repayAmt = parse.stringToBigDecimal(tempOccursList.get("OccRepayAmt"));
 				String reconCode = "";
 				procStsCode = "0";
+				tempVo = new TempVo();
 				if (isNumeric(tempOccursList.get("OccVirAcctNo"))) {
 					switch (tempOccursList.get("OccVirAcctNo").substring(0, 5)) {
 					case "95101":
@@ -647,11 +648,25 @@ public class L4200Batch extends TradeBuffer {
 				// 預先作業 其他來源建檔 上營業日 戶號 金額 相同者
 				if ("00000".equals(errorCode)) {
 					List<String> procStsCodeList = Arrays.asList("5", "6", "7");
-					BatxDetail err103 = batxDetailService.findL4200BFirst(this.txBuffer.getTxCom().getLbsdyf(), "L4210",
+					BatxDetail err103BatxDetail = batxDetailService.findL4200BFirst(iEntryDate + 19110000, "L4210",
 							custNo, repayAmt, procStsCodeList, titaVo);
-					if (err103 != null) {
+					if (err103BatxDetail != null) {
 						errorCode = "00103";
-						procCodeX = "" + this.txBuffer.getTxCom().getLbsdy() + " " + err103.getBatchNo();
+						procStsCode = "1";
+						procCodeX = "" + err103BatxDetail.getAcDate() + "-" + err103BatxDetail.getBatchNo() + "-"
+								+ parse.IntegerToString(err103BatxDetail.getDetailSeq(), 6);
+						tempVo.putParam("RepayCode11Chain", procCodeX);
+						err103BatxDetail = batxDetailService.holdById(err103BatxDetail, titaVo);
+						TempVo err103TempVo = new TempVo();
+						err103TempVo = err103TempVo.getVo(err103BatxDetail.getProcNote());
+						err103TempVo.putParam("RepayCode11Chain",
+								"" + iAcDate + "-" + iBatchNo + "-" + parse.IntegerToString(i + 1, 6));
+						err103BatxDetail.setProcNote(err103TempVo.getJsonString());
+						try {
+							batxDetailService.update(err103BatxDetail, titaVo);
+						} catch (DBException e) {
+							throw new LogicException("E0008", "err103BatxDetail update Fail : " + e.getErrorMsg());
+						}
 					}
 				}
 
@@ -689,21 +704,23 @@ public class L4200Batch extends TradeBuffer {
 				tBatxDetail.setDisacctAmt(BigDecimal.ZERO);
 				tBatxDetail.setProcStsCode(procStsCode);
 				tBatxDetail.setProcCode(errorCode);
-				tempVo = new TempVo();
 				tempVo.putParam("VirtualAcctNo", tempOccursList.get("OccVirAcctNo"));
 				tempVo.putParam("DscptCode", tempOccursList.get("OccNoteCode"));
 				if ("00000".equals(errorCode)) {
 					tempVo.putParam("CheckMsg", "");
 					tempVo.putParam("Note", tempOccursList.get("OccRemark"));
 				} else {
-					tempVo.putParam("CheckMsg",
-							setProcCodeX(errorCode, procCodeX, titaVo) + ", " + tempOccursList.get("OccRemark"));
+					String errMsg = setProcCodeX(errorCode, procCodeX, titaVo) + ", " + tempOccursList.get("OccRemark");
+					if (!tempOccursList.get("OccTrader").trim().isEmpty()) {
+						errMsg += ", 交易人資料:" + tempOccursList.get("OccTrader").trim();
+					}
+					tempVo.putParam("CheckMsg", errMsg);
 				}
 
 				tBatxDetail.setTitaTlrNo("");
 				tBatxDetail.setTitaTxtNo("");
 				tBatxDetail.setMediaDate(iAcDate);
-				tBatxDetail.setMediaKind(iBatchNo.substring(4, 6));  // 批號後兩碼(匯款轉帳)
+				tBatxDetail.setMediaKind(iBatchNo.substring(4, 6)); // 批號後兩碼(匯款轉帳)
 				tBatxDetail.setMediaSeq(i + 1);
 
 //			D.寫VO入各個對應Table (BankRmtf皆寫入)

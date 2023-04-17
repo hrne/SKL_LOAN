@@ -80,7 +80,6 @@ public class L8312 extends TradeBuffer {
 		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
 		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 		titaVo.putParam("CustNo", iCustNo);
-		this.info("CustNo   = " + iCustNo);
 
 		// JcicZ051, JcicZ046
 		JcicZ051 iJcicZ051 = new JcicZ051();
@@ -184,7 +183,7 @@ public class L8312 extends TradeBuffer {
 								}
 							}
 							if ("J".equals(xJcicZ051.getDelayCode()) && iRcDate == xJcicZ051.getRcDate()) {
-								if (sMajorYM > 11) { // 延期繳款原因J
+								if (sMajorYM > 12) { // 延期繳款原因J
 									if ("A".equals(iTranKey)) {
 										throw new LogicException("E0005", "「延期繳款原因」為'J本人:為重大災害災民【限累計申請最多12期】.");
 									} else {

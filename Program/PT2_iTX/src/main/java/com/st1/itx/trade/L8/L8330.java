@@ -188,7 +188,7 @@ public class L8330 extends TradeBuffer {
 							}
 						}
 						if ("H".equals(iDelayCode) && iApplyDate == xJcicZ451.getApplyDate()) {
-							if (sMajorYM > 11) { // 延期繳款原因H
+							if (sMajorYM > 12) { // 延期繳款原因H
 								if ("A".equals(iTranKey)) {
 									throw new LogicException("E0005", "「延期繳款原因」為'H:為重大災害災民【限累計申請最多12期】.");
 								} else {

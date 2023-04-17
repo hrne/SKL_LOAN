@@ -1,5 +1,6 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.math.BigDecimal;
@@ -253,20 +254,20 @@ em = null;
   }
 
   @Override
-  public BatxDetail findL4200BFirst(int acDate_0, String fileName_1, int custNo_2, BigDecimal repayAmt_3, List<String> procStsCode_4, TitaVo... titaVo) {
+  public BatxDetail findL4200BFirst(int entryDate_0, String fileName_1, int custNo_2, BigDecimal repayAmt_3, List<String> procStsCode_4, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("findL4200BFirst " + dbName + " : " + "acDate_0 : " + acDate_0 + " fileName_1 : " +  fileName_1 + " custNo_2 : " +  custNo_2 + " repayAmt_3 : " +  repayAmt_3 + " procStsCode_4 : " +  procStsCode_4);
+    this.info("findL4200BFirst " + dbName + " : " + "entryDate_0 : " + entryDate_0 + " fileName_1 : " +  fileName_1 + " custNo_2 : " +  custNo_2 + " repayAmt_3 : " +  repayAmt_3 + " procStsCode_4 : " +  procStsCode_4);
     Optional<BatxDetail> batxDetailT = null;
     if (dbName.equals(ContentName.onDay))
-      batxDetailT = batxDetailReposDay.findTopByAcDateIsAndFileNameIsAndCustNoIsAndRepayAmtIsAndProcStsCodeInOrderByBatchNoDescDetailSeqDesc(acDate_0, fileName_1, custNo_2, repayAmt_3, procStsCode_4);
+      batxDetailT = batxDetailReposDay.findTopByEntryDateIsAndFileNameIsAndCustNoIsAndRepayAmtIsAndProcStsCodeInOrderByAcDateDescBatchNoDescDetailSeqDesc(entryDate_0, fileName_1, custNo_2, repayAmt_3, procStsCode_4);
     else if (dbName.equals(ContentName.onMon))
-      batxDetailT = batxDetailReposMon.findTopByAcDateIsAndFileNameIsAndCustNoIsAndRepayAmtIsAndProcStsCodeInOrderByBatchNoDescDetailSeqDesc(acDate_0, fileName_1, custNo_2, repayAmt_3, procStsCode_4);
+      batxDetailT = batxDetailReposMon.findTopByEntryDateIsAndFileNameIsAndCustNoIsAndRepayAmtIsAndProcStsCodeInOrderByAcDateDescBatchNoDescDetailSeqDesc(entryDate_0, fileName_1, custNo_2, repayAmt_3, procStsCode_4);
     else if (dbName.equals(ContentName.onHist))
-      batxDetailT = batxDetailReposHist.findTopByAcDateIsAndFileNameIsAndCustNoIsAndRepayAmtIsAndProcStsCodeInOrderByBatchNoDescDetailSeqDesc(acDate_0, fileName_1, custNo_2, repayAmt_3, procStsCode_4);
+      batxDetailT = batxDetailReposHist.findTopByEntryDateIsAndFileNameIsAndCustNoIsAndRepayAmtIsAndProcStsCodeInOrderByAcDateDescBatchNoDescDetailSeqDesc(entryDate_0, fileName_1, custNo_2, repayAmt_3, procStsCode_4);
     else 
-      batxDetailT = batxDetailRepos.findTopByAcDateIsAndFileNameIsAndCustNoIsAndRepayAmtIsAndProcStsCodeInOrderByBatchNoDescDetailSeqDesc(acDate_0, fileName_1, custNo_2, repayAmt_3, procStsCode_4);
+      batxDetailT = batxDetailRepos.findTopByEntryDateIsAndFileNameIsAndCustNoIsAndRepayAmtIsAndProcStsCodeInOrderByAcDateDescBatchNoDescDetailSeqDesc(entryDate_0, fileName_1, custNo_2, repayAmt_3, procStsCode_4);
 
     return batxDetailT.isPresent() ? batxDetailT.get() : null;
   }

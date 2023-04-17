@@ -10,6 +10,7 @@ import javax.persistence.LockModeType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,8 +40,8 @@ public interface BatxDetailRepositoryDay extends JpaRepository<BatxDetail, BatxD
   // AcDate = ,AND BatchNo = 
   public Slice<BatxDetail> findAllByAcDateIsAndBatchNoIsOrderByMediaDateAscMediaKindAscMediaSeqAsc(int acDate_0, String batchNo_1, Pageable pageable);
 
-  // AcDate = ,AND FileName = ,AND CustNo = ,AND RepayAmt = ,AND ProcStsCode ^i
-  public Optional<BatxDetail> findTopByAcDateIsAndFileNameIsAndCustNoIsAndRepayAmtIsAndProcStsCodeInOrderByBatchNoDescDetailSeqDesc(int acDate_0, String fileName_1, int custNo_2, BigDecimal repayAmt_3, List<String> procStsCode_4);
+  // EntryDate = ,AND FileName = ,AND CustNo = ,AND RepayAmt = ,AND ProcStsCode ^i
+  public Optional<BatxDetail> findTopByEntryDateIsAndFileNameIsAndCustNoIsAndRepayAmtIsAndProcStsCodeInOrderByAcDateDescBatchNoDescDetailSeqDesc(int entryDate_0, String fileName_1, int custNo_2, BigDecimal repayAmt_3, List<String> procStsCode_4);
 
   // AcDate = ,AND BatchNo = ,AND CustNo = ,AND ProcStsCode ^i
   public Slice<BatxDetail> findAllByAcDateIsAndBatchNoIsAndCustNoIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeDescDetailSeqAsc(int acDate_0, String batchNo_1, int custNo_2, List<String> procStsCode_3, Pageable pageable);

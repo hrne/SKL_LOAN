@@ -105,9 +105,9 @@ public interface BatxDetailService {
   public Slice<BatxDetail> findL4200AEq(int acDate_0, String batchNo_1, int index, int limit, TitaVo... titaVo);
 
   /**
-   * AcDate = ,AND FileName = ,AND CustNo = ,AND RepayAmt = ,AND ProcStsCode ^i
+   * EntryDate = ,AND FileName = ,AND CustNo = ,AND RepayAmt = ,AND ProcStsCode ^i
    *
-   * @param acDate_0 acDate_0
+   * @param entryDate_0 entryDate_0
    * @param fileName_1 fileName_1
    * @param custNo_2 custNo_2
    * @param repayAmt_3 repayAmt_3
@@ -115,7 +115,7 @@ public interface BatxDetailService {
    * @param titaVo Variable-Length Argument
    * @return Slice BatxDetail BatxDetail of List
    */
-  public BatxDetail findL4200BFirst(int acDate_0, String fileName_1, int custNo_2, BigDecimal repayAmt_3, List<String> procStsCode_4, TitaVo... titaVo);
+  public BatxDetail findL4200BFirst(int entryDate_0, String fileName_1, int custNo_2, BigDecimal repayAmt_3, List<String> procStsCode_4, TitaVo... titaVo);
 
   /**
    * AcDate = ,AND BatchNo = ,AND CustNo = ,AND ProcStsCode ^i

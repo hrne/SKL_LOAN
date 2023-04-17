@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,15 +27,11 @@ import com.st1.itx.Exception.LogicException;
 public class BatxDetail implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -5532489009951153305L;
-
-@EmbeddedId
+  @EmbeddedId
   private BatxDetailId batxDetailId;
 
   // 會計日期
+  /* 會計日 */
   @Column(name = "`AcDate`", insertable = false, updatable = false)
   private int acDate = 0;
 
@@ -122,7 +119,7 @@ public class BatxDetail implements Serializable {
   private String procNote;
 
   // 其他說明
-  /* jsonformat */
+  /* tita暫存 */
   @Column(name = "`OtherNote`", length = 2000)
   private String otherNote;
 
@@ -139,7 +136,7 @@ public class BatxDetail implements Serializable {
   private int mediaDate = 0;
 
   // 媒體別
-  /* 1:ACH新光(銀行扣款)2:ACH他行(銀行扣款)3:郵局(員工扣薪)4:15日(員工扣薪)5:非15日(員工扣薪)6.批號後兩碼(匯款轉帳) */
+  /* 1:ACH新光(銀行扣款)2:ACH他行(銀行扣款)3:郵局(員工扣薪)4:15日(員工扣薪)5:非15日(員工扣薪)6.上傳批號後兩碼(匯款轉帳、支票兌現、其他還款來源) */
   @Column(name = "`MediaKind`", length = 2)
   private String mediaKind;
 
@@ -176,7 +173,7 @@ public class BatxDetail implements Serializable {
 
 /**
 	* 會計日期<br>
-	* 
+	* 會計日
 	* @return Integer
 	*/
   public int getAcDate() {
@@ -185,7 +182,7 @@ public class BatxDetail implements Serializable {
 
 /**
 	* 會計日期<br>
-	* 
+	* 會計日
   *
   * @param acDate 會計日期
   * @throws LogicException when Date Is Warn	*/
@@ -711,7 +708,7 @@ D:刪除
 
 /**
 	* 其他說明<br>
-	* jsonformat
+	* tita暫存
 	* @return String
 	*/
   public String getOtherNote() {
@@ -720,7 +717,7 @@ D:刪除
 
 /**
 	* 其他說明<br>
-	* jsonformat
+	* tita暫存
   *
   * @param otherNote 其他說明
 	*/
@@ -792,7 +789,7 @@ D:刪除
 3:郵局(員工扣薪)
 4:15日(員工扣薪)
 5:非15日(員工扣薪)
-6.批號後兩碼(匯款轉帳)
+6.上傳批號後兩碼(匯款轉帳、支票兌現、其他還款來源)
 	* @return String
 	*/
   public String getMediaKind() {
@@ -806,7 +803,7 @@ D:刪除
 3:郵局(員工扣薪)
 4:15日(員工扣薪)
 5:非15日(員工扣薪)
-6.批號後兩碼(匯款轉帳)
+6.上傳批號後兩碼(匯款轉帳、支票兌現、其他還款來源)
   *
   * @param mediaKind 媒體別
 	*/
