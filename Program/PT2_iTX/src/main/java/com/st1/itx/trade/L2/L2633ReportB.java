@@ -24,6 +24,7 @@ import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.springjpa.cm.L2633ServiceImpl;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
@@ -169,7 +170,10 @@ public class L2633ReportB extends MakeReport {
 
 			this.info("Size =" + resultList.size());
 
-			this.open(titaVo, titaVo.getEntDyI(), brno, reportCode, reportItem, security, pageSize, pageOrientation);
+			ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(brno).setRptCode(reportCode)
+					.setRptItem(reportItem).setSecurity(security).setRptSize(pageSize)
+					.setPageOrientation(pageOrientation).build();
+			this.open(titaVo, reportVo);
 			this.setCharSpaces(0);
 			this.setFont(1, 10);
 			print(-4, 85, this.showRocDate(iApplDate, 0), "C"); // 日期
@@ -282,8 +286,12 @@ public class L2633ReportB extends MakeReport {
 
 		} else {
 			// 出空表
-			this.open(titaVo, titaVo.getEntDyI(), brno, reportCode, reportItem, security, pageSize, pageOrientation);
+			ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(brno).setRptCode(reportCode)
+					.setRptItem(reportItem).setSecurity(security).setRptSize(pageSize)
+					.setPageOrientation(pageOrientation).build();
+			this.open(titaVo, reportVo);
 			this.setCharSpaces(0);
+
 			this.setRptItem("清償日報表-限補領補發(無符合資料)");
 			print(2, 1, "本日無資料");
 			return;

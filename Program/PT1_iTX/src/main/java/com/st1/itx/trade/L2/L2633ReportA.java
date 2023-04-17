@@ -25,6 +25,7 @@ import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.springjpa.cm.L2633ServiceImpl;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
@@ -207,7 +208,10 @@ public class L2633ReportA extends MakeReport {
 
 			this.info("Size =" + resultList.size());
 
-			this.open(titaVo, titaVo.getEntDyI(), brno, reportCode, reportItem, security, pageSize, pageOrientation);
+			ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(brno).setRptCode(reportCode)
+					.setRptItem(reportItem).setSecurity(security).setRptSize(pageSize)
+					.setPageOrientation(pageOrientation).build();
+			this.open(titaVo, reportVo);
 			this.setCharSpaces(0);
 			this.setFont(1, 10);
 			print(-4, 85, this.showRocDate(iTranDate, 0), "C"); // 日期
@@ -300,7 +304,7 @@ public class L2633ReportA extends MakeReport {
 				} else {
 					print(0, 81, collectWayCode); // 領取方式
 				}
-				if ("20".equals(collectWayCode)) { //20.不能領時才顯示備註欄
+				if ("20".equals(collectWayCode)) { // 20.不能領時才顯示備註欄
 					print(0, 95, FormatUtil.padX("" + rmk, 20)); // 備註欄
 				}
 				print(0, 117, FormatUtil.padX("" + telNo1, 20)); // 連絡電話1
@@ -325,7 +329,11 @@ public class L2633ReportA extends MakeReport {
 
 		} else {
 			// 出空表
-			this.open(titaVo, titaVo.getEntDyI(), brno, reportCode, reportItem, security, pageSize, pageOrientation);
+
+			ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(brno).setRptCode(reportCode)
+					.setRptItem(reportItem).setSecurity(security).setRptSize(pageSize)
+					.setPageOrientation(pageOrientation).build();
+			this.open(titaVo, reportVo);
 			this.setCharSpaces(0);
 			this.setRptItem("清償日報表-一般結案(無符合資料)");
 			print(2, 1, "本日無資料");
