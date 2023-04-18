@@ -214,11 +214,14 @@ T(3,)T(H,#OORepayCode,#RepayCodeHelp)
 ! 處理代碼
 #OOStatusCode=A,1,O
 #OOStatusCodeX=X,8,O
+!T(3,0:正常;1:借支;2:催收;3:呆帳;4:結案)
 T(3,)T(H,#OOStatusCode,#StatusCodeHelp)
 SWITCH(#OOStatusCode,0,T(2,正常),
                      1,T(2,借支),
                      2,T(2,催收),
-                     3,T(2,呆帳))
+                     3,T(2,呆帳),
+                     4,T(2,結案)
+                     )
 
 ! 會計日期
 #OOAcDate=D,7,O

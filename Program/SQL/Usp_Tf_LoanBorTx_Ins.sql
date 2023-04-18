@@ -255,6 +255,7 @@ BEGIN
                               ,'F27' -- 聯貸管理費
                               ,'F29' -- 契變手續費
                               ,'F30' -- 呆帳戶法務費墊付
+                              ,'T10','T11','T12','T13' -- 2023-04-18 Wei 增加 from Lai
                               ) 
     ) 
     , JLSeq1 AS ( 
@@ -582,7 +583,7 @@ BEGIN
              THEN '3210'
              WHEN TR1.TRXTRN='3088'
              THEN '3214'
-             WHEN TR1.TRXTRN='3037' AND JL."AcctCode" = 'T11'
+             WHEN TR1.TRXTRN='3037' AND JL."AcctCode" IN ('T10','T11','T12','T13')
              THEN '3236' -- 2023-04-17 Wei 新增 from 賴桑:轉入債協暫收款
              WHEN TR1.TRXTRN='3037'
              THEN '3221'

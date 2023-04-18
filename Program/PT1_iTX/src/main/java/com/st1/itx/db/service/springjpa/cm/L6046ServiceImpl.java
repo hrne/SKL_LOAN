@@ -49,9 +49,10 @@ public class L6046ServiceImpl extends ASpringJpaParm implements InitializingBean
         sql += " left join \"CustDataCtrl\" B on A.\"CustUKey\" = B.\"CustUKey\" ";
         sql += " where  ";
         sql += "  A.\"CustNo\" is not null and";
-        sql += "  B.\"CustNo\" is not null and ";
-        sql += "  A.\"CustId\" is not null and ";
-        sql += "  B.\"CustId\" is not null ";
+        sql += "  B.\"CustNo\" is not null  ";
+//        sql += "  B.\"CustNo\" is not null and ";
+//        sql += "  A.\"CustId\" is not null and ";
+//        sql += "  B.\"CustId\" is not null ";
         
 		if (iCustNo != null ) {
 			sql += " AND  A.\"CustNo\" =  :iCustNo     ";

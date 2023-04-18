@@ -2022,7 +2022,8 @@ public class BaTxCom extends TradeBuffer {
 								wkUnpaidAmt = wkUnpaidAmt.add(ba.getUnpaidInt());
 							}
 						}
-						this.shortAmtLimit = this.shortAmtLimit.add(wkShortAmtLimit);
+						this.shortAmtLimit = wkShortAmtLimit;
+						this.info("getPayintDateAmt wkShortAmtLimit=" + wkShortAmtLimit + ", BaTxVo= " + ba.toString());
 					}
 				}
 			}

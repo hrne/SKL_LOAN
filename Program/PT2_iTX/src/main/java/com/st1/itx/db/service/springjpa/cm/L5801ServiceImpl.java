@@ -48,6 +48,21 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String sql = " ";
 
+		sql += " WITH RATEDATA AS (";
+		sql += "		SELECT \"EffectDate\"";
+		sql += "			 , Json_value(\"JsonFields\",'$.SubsidyRate1')  AS \"Rate1\"";
+		sql += "			 , Json_value(\"JsonFields\",'$.SubsidyRate2')  AS \"Rate2\"";
+		sql += "			 , Json_value(\"JsonFields\",'$.SubsidyRate3')  AS \"Rate3\"";
+		sql += "			 , Json_value(\"JsonFields\",'$.SubsidyRate4')  AS \"Rate4\"";
+		sql += "			 , Json_value(\"JsonFields\",'$.SubsidyRate5')  AS \"Rate5\"";
+		sql += "			 , Json_value(\"JsonFields\",'$.SubsidyRate6')  AS \"Rate6\"";
+		sql += "			 , ROW_NUMBER()OVER(ORDER BY \"EffectDate\" DESC) AS \"Seq\"";
+		sql += "		FROM \"CdComm\"";
+		sql += "		WHERE \"CdType\" = '01'";
+		sql += "		  AND \"CdItem\" = '01'";
+		sql += "		  AND TRUNC(\"EffectDate\" / 100 ) <= :thisMonth ";
+		sql += "		  AND \"Enable\" = 'Y' ";
+		sql += " )";
 		sql += " SELECT N.\"CustNo\"                                                     "; // -- F0 戶號
 		sql += "      , N.\"FacmNo\"                                                     "; // -- F1 額度
 		sql += "      , N.\"ProdNo\"                                                     "; // -- F2 商品代碼
@@ -64,6 +79,14 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , N.\"SellerName\"                                                 "; // -- F13 售屋者戶名
 		sql += "      , N.\"SellerId\"                                                   "; // -- F14 售屋者身份證字號及營利事業編號
 		sql += "      , N.\"Remark\"                                                     "; // -- F15 註記
+		sql += "      , CASE N.\"ProjectKind\" ";
+		sql += "             WHEN 1 THEN NVL(RA.\"Rate1\",0) " ;// 0.85";
+		sql += "             WHEN 2 THEN NVL(RA.\"Rate2\",0) " ;// 0.85";
+		sql += "             WHEN 3 THEN NVL(RA.\"Rate3\",0) " ;//0.425";
+		sql += "             WHEN 4 THEN NVL(RA.\"Rate4\",0) " ;//0.25";
+		sql += "             WHEN 5 THEN NVL(RA.\"Rate5\",0) " ;//0.125";
+		sql += "             ELSE        NVL(RA.\"Rate6\",0) " ;//0.7";
+		sql += "        END                           AS \"SubsidyRate\""; // -- F16 補貼利率"
 		sql += " FROM ( ";
 		sql += " SELECT T.\"CustNo\"                           AS \"CustNo\" ";
 		sql += "      , T.\"FacmNo\"                           AS \"FacmNo\" ";
@@ -152,6 +175,8 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          ON CU2.\"CustUKey\" = RM.\"ReltUKey\"";
 		sql += "   LEFT JOIN \"CdCity\" CI";
 		sql += "          ON CI.\"CityCode\" =  N.\"CityCode\"";
+		sql += "   LEFT JOIN RATEDATA RA";
+		sql += "          ON RA.\"Seq\" = 1";
 
 		sql += "   ORDER BY  N.\"ProjectKind\", N.\"ProdNo\", N.\"CustNo\", N.\"FacmNo\"";
 
@@ -187,6 +212,21 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		String sql = " ";
+		sql += " WITH RATEDATA AS (";
+		sql += "		SELECT \"EffectDate\"";
+		sql += "			 , Json_value(\"JsonFields\",'$.SubsidyRate1')  AS \"Rate1\"";
+		sql += "			 , Json_value(\"JsonFields\",'$.SubsidyRate2')  AS \"Rate2\"";
+		sql += "			 , Json_value(\"JsonFields\",'$.SubsidyRate3')  AS \"Rate3\"";
+		sql += "			 , Json_value(\"JsonFields\",'$.SubsidyRate4')  AS \"Rate4\"";
+		sql += "			 , Json_value(\"JsonFields\",'$.SubsidyRate5')  AS \"Rate5\"";
+		sql += "			 , Json_value(\"JsonFields\",'$.SubsidyRate6')  AS \"Rate6\"";
+		sql += "			 , ROW_NUMBER()OVER(ORDER BY \"EffectDate\" DESC) AS \"Seq\"";
+		sql += "		FROM \"CdComm\"";
+		sql += "		WHERE \"CdType\" = '01'";
+		sql += "		  AND \"CdItem\" = '01'";
+		sql += "		  AND TRUNC(\"EffectDate\" / 100 ) <= :thisMonth ";
+		sql += "		  AND \"Enable\" = 'Y' ";
+		sql += " )";
 		sql += " SELECT CASE WHEN N.\"Type\" = 2";
 		sql += "                  THEN '終止名冊'";
 		sql += "             ELSE      '結清名冊'";
@@ -208,6 +248,16 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        END     AS \"F9\"                                                         "; // -- F9 註記
 		sql += "      , N.\"LastMonthBal\"                                                "; // -- F10 上月貸款餘額"
 
+		sql += "      , CASE N.\"ProjectKind\" ";
+		sql += "             WHEN 1 THEN NVL(RA.\"Rate1\",0) " ;// 0.85";
+		sql += "             WHEN 2 THEN NVL(RA.\"Rate2\",0) " ;// 0.85";
+		sql += "             WHEN 3 THEN NVL(RA.\"Rate3\",0) " ;//0.425";
+		sql += "             WHEN 4 THEN NVL(RA.\"Rate4\",0) " ;//0.25";
+		sql += "             WHEN 5 THEN NVL(RA.\"Rate5\",0) " ;//0.125";
+		sql += "             ELSE        NVL(RA.\"Rate6\",0) " ;//0.7";
+		sql += "        END                           AS \"SubsidyRate\""; // -- F11 補貼利率"
+		
+		
 		sql += "      FROM (";
 		sql += "      SELECT T.\"CustNo\"                           AS \"CustNo\"";
 		sql += "           , T.\"FacmNo\"                           AS \"FacmNo\"";
@@ -278,6 +328,8 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   ) N";
 		sql += "   LEFT JOIN \"CustMain\" CU";
 		sql += "          ON CU.\"CustNo\" = N.\"CustNo\"";
+		sql += "   LEFT JOIN RATEDATA RA";
+		sql += "          ON RA.\"Seq\" = 1";
 		sql += "   WHERE N.\"LastMonthBal\"  > 0" ;// 排除上個月餘額已是0
 		sql += "   ORDER BY  N.\"ProjectKind\", N.\"ProdNo\", N.\"CustNo\", N.\"FacmNo\"";
 
@@ -343,7 +395,23 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                          + MOD(:thisMonth,100) - MOD(TRUNC(FA.\"FirstDrawdownDate\" / 100),100) ";
 		sql += "                      )  <= 240 )    ";// 排除本月超過屆滿20年
 		sql += " )";
-		
+
+		sql += " ,RATEDATA AS (";
+		sql += "		SELECT \"EffectDate\"";
+		sql += "			 , Json_value(\"JsonFields\",'$.SubsidyRate1')  AS \"Rate1\"";
+		sql += "			 , Json_value(\"JsonFields\",'$.SubsidyRate2')  AS \"Rate2\"";
+		sql += "			 , Json_value(\"JsonFields\",'$.SubsidyRate3')  AS \"Rate3\"";
+		sql += "			 , Json_value(\"JsonFields\",'$.SubsidyRate4')  AS \"Rate4\"";
+		sql += "			 , Json_value(\"JsonFields\",'$.SubsidyRate5')  AS \"Rate5\"";
+		sql += "			 , Json_value(\"JsonFields\",'$.SubsidyRate6')  AS \"Rate6\"";
+		sql += "			 , ROW_NUMBER()OVER(ORDER BY \"EffectDate\" DESC) AS \"Seq\"";
+		sql += "		FROM \"CdComm\"";
+		sql += "		WHERE \"CdType\" = '01'";
+		sql += "		  AND \"CdItem\" = '01'";
+		sql += "		  AND TRUNC(\"EffectDate\" / 100 ) <= :thisMonth ";
+		sql += "		  AND \"Enable\" = 'Y' ";
+		sql += " )";
+
 		sql += " SELECT N.\"ProjectKind\"                                                         "; // -- F0 專案融資種類
 		sql += "      , N.\"LastMonthBalCount\"                                                   "; // -- F1 A.上月貸款餘額(次數)
 		sql += "      , N.\"LastMonthBal\"                                                        "; // -- F2 A.上月貸款餘額
@@ -356,6 +424,7 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , N.\"ThisMonthBalCount\"                                                   "; // -- F9 D.本月貸款餘額(次數)
 		sql += "      , N.\"ThisMonthBal\"                                                        "; // -- F10 D.本月貸款餘額
 		sql += "      , ROUND(N.\"ThisMonthBal\" * N.\"SubsidyRate\" / 1200, 0)  AS \"F11\"       "; // -- F11 補貼息"
+		sql += "      , N.\"SubsidyRate\"                                                         "; // -- F12 補貼利率
 
 		sql += "      FROM (SELECT MAX(CASE T.\"ProdNo\"";
 		sql += "                            WHEN 'IA' THEN 1";
@@ -369,14 +438,14 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                       END)                           AS \"ProjectKind\"";
 
 		sql += "                 , MAX(CASE T.\"ProdNo\"";
-		sql += "                            WHEN 'IA' THEN 0.85";
-		sql += "                            WHEN 'IB' THEN 0.85";
-		sql += "                            WHEN 'IC' THEN 0.425";
-		sql += "                            WHEN 'ID' THEN 0.25";
-		sql += "                            WHEN 'IE' THEN 0.25";
-		sql += "                            WHEN 'IF' THEN 0.125";
-		sql += "                            WHEN 'IG' THEN 0.125";
-		sql += "                            ELSE           0.7";
+		sql += "                            WHEN 'IA' THEN NVL(RA.\"Rate1\",0) "  ;// 0.85";
+		sql += "                            WHEN 'IB' THEN NVL(RA.\"Rate2\",0) " ;// 0.85";
+		sql += "                            WHEN 'IC' THEN NVL(RA.\"Rate3\",0) " ;//0.425";
+		sql += "                            WHEN 'ID' THEN NVL(RA.\"Rate4\",0) " ;//0.25";
+		sql += "                            WHEN 'IE' THEN NVL(RA.\"Rate4\",0) " ;//0.25";
+		sql += "                            WHEN 'IF' THEN NVL(RA.\"Rate5\",0) " ;//0.125";
+		sql += "                            WHEN 'IG' THEN NVL(RA.\"Rate5\",0) " ;//0.125";
+		sql += "                            ELSE           NVL(RA.\"Rate6\",0) " ;//0.7";
 		sql += "                       END)                           AS \"SubsidyRate\"";
 
 		sql += "                 , SUM(CASE WHEN NVL(TP.\"DetailSeq\",0) > 1 THEN 0";
@@ -481,6 +550,8 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                    ON TP.\"CustNo\" = T.\"CustNo\"";
 		sql += "                   AND TP.\"FacmNo\" = T.\"FacmNo\"";
 		sql += "                   AND TP.\"BormNo\" = T.\"BormNo\"";
+		sql += "             LEFT JOIN RATEDATA RA";
+		sql += "                    ON RA.\"Seq\" = 1";
 		
 		sql += "             WHERE T.\"YearMonth\" = :thisMonth ";
 		sql += "               AND T.\"ProdNo\" >= 'IA'";
@@ -536,6 +607,21 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		String sql = " ";
+		sql += " WITH RATEDATA AS (";
+		sql += "		SELECT \"EffectDate\"";
+		sql += "			 , Json_value(\"JsonFields\",'$.SubsidyRate1')  AS \"Rate1\"";
+		sql += "			 , Json_value(\"JsonFields\",'$.SubsidyRate2')  AS \"Rate2\"";
+		sql += "			 , Json_value(\"JsonFields\",'$.SubsidyRate3')  AS \"Rate3\"";
+		sql += "			 , Json_value(\"JsonFields\",'$.SubsidyRate4')  AS \"Rate4\"";
+		sql += "			 , Json_value(\"JsonFields\",'$.SubsidyRate5')  AS \"Rate5\"";
+		sql += "			 , Json_value(\"JsonFields\",'$.SubsidyRate6')  AS \"Rate6\"";
+		sql += "			 , ROW_NUMBER()OVER(ORDER BY \"EffectDate\" DESC) AS \"Seq\"";
+		sql += "		FROM \"CdComm\"";
+		sql += "		WHERE \"CdType\" = '01'";
+		sql += "		  AND \"CdItem\" = '01'";
+		sql += "		  AND TRUNC(\"EffectDate\" / 100 ) <= :thisMonth ";
+		sql += "		  AND \"Enable\" = 'Y' ";
+		sql += " )";
 		sql += " SELECT N.\"CustNo\"                                                     "; // -- F0 戶號
 		sql += "      , N.\"FacmNo\"                                                     "; // -- F1 額度
 		sql += "      , N.\"ProdNo\"                                                     "; // -- F2 商品代碼
@@ -566,14 +652,14 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                       END)                           AS \"ProjectKind\"";
 
 		sql += "                 , MAX(CASE T.\"ProdNo\"";
-		sql += "                            WHEN 'IA' THEN 0.85";
-		sql += "                            WHEN 'IB' THEN 0.85";
-		sql += "                            WHEN 'IC' THEN 0.425";
-		sql += "                            WHEN 'ID' THEN 0.25";
-		sql += "                            WHEN 'IE' THEN 0.25";
-		sql += "                            WHEN 'IF' THEN 0.125";
-		sql += "                            WHEN 'IG' THEN 0.125";
-		sql += "                            ELSE           0.7";
+		sql += "                            WHEN 'IA' THEN NVL(RA.\"Rate1\",0) "  ;// 0.85";
+		sql += "                            WHEN 'IB' THEN NVL(RA.\"Rate1\",0) "  ;// 0.85";
+		sql += "                            WHEN 'IC' THEN NVL(RA.\"Rate1\",0) "  ;// 0.425";
+		sql += "                            WHEN 'ID' THEN NVL(RA.\"Rate1\",0) "  ;// 0.25";
+		sql += "                            WHEN 'IE' THEN NVL(RA.\"Rate1\",0) "  ;// 0.25";
+		sql += "                            WHEN 'IF' THEN NVL(RA.\"Rate1\",0) "  ;// 0.125";
+		sql += "                            WHEN 'IG' THEN NVL(RA.\"Rate1\",0) "  ;// 0.125";
+		sql += "                            ELSE           NVL(RA.\"Rate1\",0) "  ;// 0.7";
 		sql += "                       END)                           AS \"SubsidyRate\"";
 
 		sql += "                 , MAX(T.\"AcBookCode\")              AS \"AcBookCode\"";
@@ -634,6 +720,8 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             LEFT JOIN \"FacMain\" FA";
 		sql += "                    ON FA.\"CustNo\" = T.\"CustNo\"";
 		sql += "                   AND FA.\"FacmNo\" = T.\"FacmNo\"";
+		sql += "             LEFT JOIN RATEDATA RA";
+		sql += "                    ON RA.\"Seq\" = 1";
 
 		sql += "             WHERE T.\"YearMonth\" = :thisMonth ";
 		sql += "               AND T.\"ProdNo\" >= 'IA'";

@@ -822,15 +822,24 @@ public class L3200 extends TradeBuffer {
 				throw new LogicException(titaVo, "E3094", "到期繳息還本， 不可有短繳金額");
 			}
 			// 依 1.還本金額 2.還息金額
-			if (isRepayPrincipal) {
-				wkShortAmtLimit = wkPrincipal
+			// 最後一期本金、利息
+			int lastTermNo = loanCalcRepayIntCom.getPaidTerms();
+			BigDecimal lastPrincipal = BigDecimal.ZERO;
+			BigDecimal lastInterest = BigDecimal.ZERO;
+			for (CalcRepayIntVo c : lCalcRepayIntVo) {
+				if (c.getTermNo() == lastTermNo) {
+					lastPrincipal = lastPrincipal.add(c.getPrincipal());
+					lastInterest = lastInterest.add(c.getInterest());
+				}
+			}
+			if (lastPrincipal.compareTo(BigDecimal.ZERO) > 0) {
+				wkShortAmtLimit = lastPrincipal
 						.multiply(new BigDecimal(this.txBuffer.getSystemParas().getShortPrinPercent()))
 						.divide(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
 				if (this.txBuffer.getSystemParas().getShortPrinLimit() > 0 && wkShortAmtLimit
 						.compareTo(new BigDecimal(this.txBuffer.getSystemParas().getShortPrinLimit())) > 0) {
 					wkShortAmtLimit = new BigDecimal(this.txBuffer.getSystemParas().getShortPrinLimit());
 				}
-				wkTotalShortAmtLimit = wkTotalShortAmtLimit.add(wkShortAmtLimit);
 				if (wkShortAmtLimit.compareTo(wkUnpaidAmtRemaind) >= 0) {
 					wkUnpaidPrin = wkUnpaidPrin.add(wkUnpaidAmtRemaind);
 					wkUnpaidAmtRemaind = BigDecimal.ZERO;
@@ -839,10 +848,9 @@ public class L3200 extends TradeBuffer {
 					wkUnpaidAmtRemaind = wkUnpaidAmtRemaind.subtract(wkShortAmtLimit);
 				}
 			} else {
-				wkShortAmtLimit = wkInterest
+				wkShortAmtLimit = lastInterest
 						.multiply(new BigDecimal(this.txBuffer.getSystemParas().getShortIntPercent()))
 						.divide(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
-				wkTotalShortAmtLimit = wkTotalShortAmtLimit.add(wkShortAmtLimit);
 				if (wkShortAmtLimit.compareTo(wkUnpaidAmtRemaind) >= 0) {
 					wkUnpaidInt = wkUnpaidInt.add(wkUnpaidAmtRemaind);
 					wkUnpaidAmtRemaind = BigDecimal.ZERO;
@@ -851,6 +859,7 @@ public class L3200 extends TradeBuffer {
 					wkUnpaidAmtRemaind = wkUnpaidAmtRemaind.subtract(wkShortAmtLimit);
 				}
 			}
+			wkTotalShortAmtLimit = wkShortAmtLimit;
 		}
 		this.info("wkTotalShortAmtLimit= " + wkTotalShortAmtLimit + ", wkUnpaidPrin=" + wkUnpaidPrin + ", wkUnpaidInt="
 				+ wkUnpaidInt);

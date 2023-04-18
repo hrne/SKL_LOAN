@@ -58,6 +58,7 @@ public class L5801Report2 extends MakeReport {
 
 		fontStyleVo.setSize((short) 12); // 字體大小 : 12
 
+		
 		makeExcel.setValue(1, 1, "種類", fontStyleVo);
 		makeExcel.setValue(1, 2, "戶號額度", fontStyleVo);
 		makeExcel.setValue(1, 3, "商品代碼", fontStyleVo);
@@ -80,6 +81,7 @@ public class L5801Report2 extends MakeReport {
 		makeExcel.setWidth(9, 7);
 		makeExcel.setWidth(10, 25);
 
+		
 		int printRow = 2; // 從第三行開始印
 
 		if (listL5801 == null || listL5801.isEmpty()) {
@@ -107,6 +109,7 @@ public class L5801Report2 extends MakeReport {
 				// F4 專案融資種類
 				String ProjectKind = mapL5801.get("F4");
 				String Kind = "";
+				String Rate = mapL5801.get("F11");//補貼利率
 				switch (ProjectKind) {
 				case "1":
 					Kind = "一千二百億元青年優惠房屋貸款暨信用保證專案(不得轉貸、重購)";
@@ -115,19 +118,19 @@ public class L5801Report2 extends MakeReport {
 					Kind = "四千億元優惠購屋專案貸款(不得轉貸、重購)";
 					break;
 				case "3":
-					Kind = "續辦二千億元優惠購屋專案貸款(補貼 0.425%，不得轉貸、重購)";
+					Kind = "續辦二千億元優惠購屋專案貸款(補貼 " + Rate + "%，不得轉貸、重購)";
 					break;
 				case "4":
-					Kind = "續辦四千八百億元優惠購屋專案貸款(補貼 0.25%，不得轉貸、重購)";
+					Kind = "續辦四千八百億元優惠購屋專案貸款(補貼 " + Rate + "%，不得轉貸、重購)";
 					break;
 				case "5":
-					Kind = "續辦六千億元優惠購屋專案貸款(補貼 0.125%，不得轉貸、重購)";
+					Kind = "續辦六千億元優惠購屋專案貸款(補貼 " + Rate + "%，不得轉貸、重購)";
 					break;
 				case "6":
-					Kind = "增撥新台幣四千億元優惠購屋專案貸款(補貼 0.7%，不得重購)";
+					Kind = "增撥新台幣四千億元優惠購屋專案貸款(補貼 " + Rate + "%，不得重購)";
 					break;
 				}
-
+				
 				makeExcel.setValue(printRow, 4, Kind, fontStyleVo);
 
 				// F5 借款人戶名
@@ -135,7 +138,7 @@ public class L5801Report2 extends MakeReport {
 
 				makeExcel.setValue(printRow, 5, CustName, fontStyleVo);
 
-				// F6 借款人身份證字號
+				// F6 借款人身份證字號	
 				String CustId = mapL5801.get("F6");
 
 				makeExcel.setValue(printRow, 6, CustId, fontStyleVo);
@@ -160,10 +163,11 @@ public class L5801Report2 extends MakeReport {
 
 				makeExcel.setValue(printRow, 10, LastmonthBal, fontStyleVo);
 
+				
 				printRow++;
 			}
 			// 畫框線
-			makeExcel.setAddRengionBorder("A", 1, "I", printRow - 1, 1);
+			makeExcel.setAddRengionBorder("A", 1, "I", printRow-1, 1);
 
 		}
 

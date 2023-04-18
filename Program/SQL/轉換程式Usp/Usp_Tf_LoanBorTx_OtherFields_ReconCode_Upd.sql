@@ -78,12 +78,6 @@ BEGIN
     -- 記錄寫入筆數 
     INS_CNT := INS_CNT + sql%rowcount; 
 
-    UPDATE "LoanBorTx"
-    SET "TxDescCode" = '3210'
-    WHERE "TxDescCode" = '3211'
-      AND NVL(JSON_VALUE("OtherFields", '$.ReconCode'),' ') NOT IN ('A6','A7')
-
-
     -- 記錄程式結束時間 
     JOB_END_TIME := SYSTIMESTAMP; 
 

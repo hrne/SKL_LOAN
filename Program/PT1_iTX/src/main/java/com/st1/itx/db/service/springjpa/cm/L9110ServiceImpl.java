@@ -184,7 +184,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            , FAC.\"LineAmt\"          AS LineAmt "; // F19 核准額度
 		sql += "            , NVL(CLS.\"CustodyNo\",'無')        AS CustodyNo ";// F20 保管條號碼
 		sql += "            , CLI.\"EvaNetWorth\"      AS EvaNetWorth ";// F21 評估淨值
-		sql += "            , CLI.\"SettingAmt\"       AS SettingAmt ";// F22 設定金額
+		sql += "            , CLI2.\"SettingAmt\"       AS SettingAmt ";// F22 設定金額
 		sql += "       FROM \"ClFac\" CF";
 		sql += "       LEFT JOIN \"FacMain\" FAC ON FAC.\"ApplNo\" = CF.\"ApproveNo\"";
 		sql += "       LEFT JOIN \"CdCode\" CDC1 ON CDC1.\"DefCode\" = 'ClCode2' || CF.\"ClCode1\"";
@@ -212,7 +212,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                     AND CLMOV.\"ClNo\"    = CF.\"ClNo\"";
 		sql += "       LEFT JOIN \"CdCode\" CDC2 ON CDC2.\"DefCode\" = 'EvaCompanyCode'";
 		sql += "                                AND CDC2.\"Code\" = NVL(CLI.\"EvaCompanyCode\",' ')";
-		sql += "       LEFT JOIN (SELECT MAX(cli.\"ClaimDate\") AS \"ClaimDate\" ,\"ApproveNo\" AS \"ApplNo\" FROM \"ClFac\" cf2"
+		sql += "       LEFT JOIN (SELECT MAX(cli.\"ClaimDate\") AS \"ClaimDate\" ,\"ApproveNo\" AS \"ApplNo\" , SUM(cli.\"SettingAmt\") AS \"SettingAmt\" FROM \"ClFac\" cf2"
 				+ "		LEFT JOIN \"ClImm\" cli ON cli.\"ClCode1\" = cf2.\"ClCode1\" AND cli.\"ClCode2\" = cf2.\"ClCode2\" AND cli.\"ClNo\" = cf2.\"ClNo\"  "
 				+ "		WHERE cf2.\"ApproveNo\" = :applNo"
 				+ "		GROUP BY \"ApproveNo\") CLI2  ON CLI2.\"ApplNo\" =  CF.\"ApproveNo\" ";
@@ -326,7 +326,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-	public List<Map<String, String>> queryInsu(TitaVo titaVo, String applNo) throws Exception {
+	public List<Map<String, String>> queryInsu(TitaVo titaVo, String applNo ) throws Exception {
 
 		this.info("L9110ServiceImpl.queryInsu");
 
@@ -340,7 +340,10 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                           ORDER BY CF.\"ClCode1\" ";
 		sql += "                                  , CF.\"ClCode2\" ";
 		sql += "                                  , CF.\"ClNo\" ";
-		sql += "                                  , IR.\"InsuStartDate\" DESC ";
+		sql += "                                  , CASE WHEN FM.\"FirstDrawdownDate\" = 0 THEN  0  ";
+		sql += "                                   	 	 WHEN IR.\"InsuStartDate\" >= FM.\"FirstDrawdownDate\" AND  IR.\"InsuEndDate\" <= FM.\"FirstDrawdownDate\" THEN  0 ";
+		sql += "                                   	 	 ELSE 1 END ASC";
+		sql += "                                  , IR.\"InsuStartDate\" DESC";
 		sql += "                          )   AS SEQ "; // -- 序號
 		sql += "      , IR.\"NowInsuNo\"      AS NowInsuNo"; // -- 保單號碼
 		sql += "      , IR.\"FireInsuAmt\"    AS \"FireInsuAmt\""; // -- 火險金額
@@ -349,6 +352,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , IR.\"InsuCompany\"    AS InsuCompany"; // -- 保險公司
 		sql += "      , IR.\"EarthInsuAmt\"   AS \"EarthInsuAmt\""; // -- 地震險金額
 		sql += " FROM \"ClFac\" CF";
+		sql += " LEFT JOIN \"FacMain\" FM ON FM.\"ApplNo\" = :applNo";
 		sql += " LEFT JOIN ( SELECT IO.\"ClCode1\" ";
 		sql += "                  , IO.\"ClCode2\" ";
 		sql += "                  , IO.\"ClNo\" ";
@@ -380,7 +384,6 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           ) IR ON IR.\"ClCode1\" = CF.\"ClCode1\" ";
 		sql += "               AND IR.\"ClCode2\" = CF.\"ClCode2\" ";
 		sql += "               AND IR.\"ClNo\"    = CF.\"ClNo\" ";
-		sql += "               AND IR.\"InsuEndDate\"    >= :date ";
 		sql += " WHERE CF.\"ApproveNo\" = :applNo "; // 日期大於保險迄日
 		sql += "   AND NVL(IR.\"ClNo\",0) != 0 "; // 2022-04-25 智偉增加:有串到保險單資料才顯示
 		sql += " ) WHERE SEQ = 1  ";
@@ -391,9 +394,6 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("applNo", applNo);
-		int cDate = titaVo.getEntDyI() + 19110000;
-		query.setParameter("date", cDate);
-		this.info("cDate =" + cDate);
 
 		return this.convertToMap(query);
 	}
