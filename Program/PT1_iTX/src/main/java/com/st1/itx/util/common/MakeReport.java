@@ -522,6 +522,9 @@ public class MakeReport extends CommBuffer {
 
 		// 檢查是否需核核
 		CdReport tCdReport = cdReportService.findById(reportVo.getRptCode(), tmpTitaVo);
+		if(tCdReport == null && !reportVo.getRptCode().trim().isEmpty())
+			tCdReport = cdReportService.findById(reportVo.getRptCode().trim().substring(0, 5), tmpTitaVo);
+			
 		if (tCdReport == null) {
 			tTxFile.setSignCode("0");
 			if ("1".equals(tmpTitaVo.get("checkCdReport")))
