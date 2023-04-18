@@ -43,7 +43,7 @@ K(MODIFYBUTTON,查詢)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
 ["[L6042]                                 交易控制檔查詢"],
-["#FdTranNo+交易代碼",#TranNo],
+["#FdTranNo+交易代碼",#TranNo,"      (關鍵字)"],
 ]
 !["@顯示方式",
 !<include src="COM.icf::RPTFG.scr"/>

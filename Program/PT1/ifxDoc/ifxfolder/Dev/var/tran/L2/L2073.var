@@ -237,7 +237,13 @@ C(3,#OOHasHistory,1,BIND(grid,{cmd=CHAIN;ntxcd=L6933;text=歷程;ntxbuf=#OOBUFHi
 
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 
+#button=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L2074; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
+! C(5,#OOAllowFg,0,BIND(grid,cancel),BIND(grid,{cmd=CHAIN; ntxcd=L2074; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$))
+C(5,#OOAllowFg,0,$,K(MODIFYBUTTON,1,查詢對照表))
 
+
+#OOAllowFg=X,1,L
 
 </sub>
 
@@ -263,6 +269,7 @@ TXFORM=L2073
 #OOReason
 #OOApplMark
 #OOHasHistory
+#OOAllowFg
 ^
 <include src="ROM.icf::L1R09.tom"/>
 <include src="ROM.icf::L2R47.tom"/>

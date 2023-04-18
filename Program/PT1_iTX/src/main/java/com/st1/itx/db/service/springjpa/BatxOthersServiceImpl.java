@@ -376,6 +376,230 @@ em = null;
   }
 
   @Override
+  public Slice<BatxOthers> searchCustNoA(int acDate_0, int acDate_1, int custNo_2, String batchNo_3, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<BatxOthers> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("searchCustNoA " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " custNo_2 : " +  custNo_2 + " batchNo_3 : " +  batchNo_3);
+    if (dbName.equals(ContentName.onDay))
+      slice = batxOthersReposDay.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndBatchNoIs(acDate_0, acDate_1, custNo_2, batchNo_3, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = batxOthersReposMon.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndBatchNoIs(acDate_0, acDate_1, custNo_2, batchNo_3, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = batxOthersReposHist.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndBatchNoIs(acDate_0, acDate_1, custNo_2, batchNo_3, pageable);
+    else 
+      slice = batxOthersRepos.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndBatchNoIs(acDate_0, acDate_1, custNo_2, batchNo_3, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<BatxOthers> searchCustNoB(int acDate_0, int acDate_1, int custNo_2, String batchNo_3, int repayCode_4, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<BatxOthers> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("searchCustNoB " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " custNo_2 : " +  custNo_2 + " batchNo_3 : " +  batchNo_3 + " repayCode_4 : " +  repayCode_4);
+    if (dbName.equals(ContentName.onDay))
+      slice = batxOthersReposDay.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndBatchNoIsAndRepayCodeIs(acDate_0, acDate_1, custNo_2, batchNo_3, repayCode_4, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = batxOthersReposMon.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndBatchNoIsAndRepayCodeIs(acDate_0, acDate_1, custNo_2, batchNo_3, repayCode_4, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = batxOthersReposHist.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndBatchNoIsAndRepayCodeIs(acDate_0, acDate_1, custNo_2, batchNo_3, repayCode_4, pageable);
+    else 
+      slice = batxOthersRepos.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndBatchNoIsAndRepayCodeIs(acDate_0, acDate_1, custNo_2, batchNo_3, repayCode_4, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<BatxOthers> searchCustNoC(int acDate_0, int acDate_1, int custNo_2, String batchNo_3, String createEmpNo_4, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<BatxOthers> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("searchCustNoC " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " custNo_2 : " +  custNo_2 + " batchNo_3 : " +  batchNo_3 + " createEmpNo_4 : " +  createEmpNo_4);
+    if (dbName.equals(ContentName.onDay))
+      slice = batxOthersReposDay.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndBatchNoIsAndCreateEmpNoIs(acDate_0, acDate_1, custNo_2, batchNo_3, createEmpNo_4, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = batxOthersReposMon.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndBatchNoIsAndCreateEmpNoIs(acDate_0, acDate_1, custNo_2, batchNo_3, createEmpNo_4, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = batxOthersReposHist.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndBatchNoIsAndCreateEmpNoIs(acDate_0, acDate_1, custNo_2, batchNo_3, createEmpNo_4, pageable);
+    else 
+      slice = batxOthersRepos.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndBatchNoIsAndCreateEmpNoIs(acDate_0, acDate_1, custNo_2, batchNo_3, createEmpNo_4, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<BatxOthers> searchCustNoD(int acDate_0, int acDate_1, int custNo_2, String batchNo_3, int repayCode_4, String createEmpNo_5, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<BatxOthers> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("searchCustNoD " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " custNo_2 : " +  custNo_2 + " batchNo_3 : " +  batchNo_3 + " repayCode_4 : " +  repayCode_4 + " createEmpNo_5 : " +  createEmpNo_5);
+    if (dbName.equals(ContentName.onDay))
+      slice = batxOthersReposDay.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndBatchNoIsAndRepayCodeIsAndCreateEmpNoIs(acDate_0, acDate_1, custNo_2, batchNo_3, repayCode_4, createEmpNo_5, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = batxOthersReposMon.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndBatchNoIsAndRepayCodeIsAndCreateEmpNoIs(acDate_0, acDate_1, custNo_2, batchNo_3, repayCode_4, createEmpNo_5, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = batxOthersReposHist.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndBatchNoIsAndRepayCodeIsAndCreateEmpNoIs(acDate_0, acDate_1, custNo_2, batchNo_3, repayCode_4, createEmpNo_5, pageable);
+    else 
+      slice = batxOthersRepos.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndBatchNoIsAndRepayCodeIsAndCreateEmpNoIs(acDate_0, acDate_1, custNo_2, batchNo_3, repayCode_4, createEmpNo_5, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<BatxOthers> searchCustNoE(int acDate_0, int acDate_1, int custNo_2, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<BatxOthers> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("searchCustNoE " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " custNo_2 : " +  custNo_2);
+    if (dbName.equals(ContentName.onDay))
+      slice = batxOthersReposDay.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIs(acDate_0, acDate_1, custNo_2, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = batxOthersReposMon.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIs(acDate_0, acDate_1, custNo_2, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = batxOthersReposHist.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIs(acDate_0, acDate_1, custNo_2, pageable);
+    else 
+      slice = batxOthersRepos.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIs(acDate_0, acDate_1, custNo_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<BatxOthers> searchCustNoF(int acDate_0, int acDate_1, int custNo_2, int repayCode_3, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<BatxOthers> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("searchCustNoF " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " custNo_2 : " +  custNo_2 + " repayCode_3 : " +  repayCode_3);
+    if (dbName.equals(ContentName.onDay))
+      slice = batxOthersReposDay.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndRepayCodeIs(acDate_0, acDate_1, custNo_2, repayCode_3, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = batxOthersReposMon.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndRepayCodeIs(acDate_0, acDate_1, custNo_2, repayCode_3, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = batxOthersReposHist.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndRepayCodeIs(acDate_0, acDate_1, custNo_2, repayCode_3, pageable);
+    else 
+      slice = batxOthersRepos.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndRepayCodeIs(acDate_0, acDate_1, custNo_2, repayCode_3, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<BatxOthers> searchCustNoG(int acDate_0, int acDate_1, int custNo_2, String createEmpNo_3, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<BatxOthers> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("searchCustNoG " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " custNo_2 : " +  custNo_2 + " createEmpNo_3 : " +  createEmpNo_3);
+    if (dbName.equals(ContentName.onDay))
+      slice = batxOthersReposDay.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndCreateEmpNoIs(acDate_0, acDate_1, custNo_2, createEmpNo_3, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = batxOthersReposMon.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndCreateEmpNoIs(acDate_0, acDate_1, custNo_2, createEmpNo_3, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = batxOthersReposHist.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndCreateEmpNoIs(acDate_0, acDate_1, custNo_2, createEmpNo_3, pageable);
+    else 
+      slice = batxOthersRepos.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndCreateEmpNoIs(acDate_0, acDate_1, custNo_2, createEmpNo_3, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<BatxOthers> searchCustNoH(int acDate_0, int acDate_1, int custNo_2, int repayCode_3, String createEmpNo_4, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<BatxOthers> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("searchCustNoH " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " custNo_2 : " +  custNo_2 + " repayCode_3 : " +  repayCode_3 + " createEmpNo_4 : " +  createEmpNo_4);
+    if (dbName.equals(ContentName.onDay))
+      slice = batxOthersReposDay.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndRepayCodeIsAndCreateEmpNoIs(acDate_0, acDate_1, custNo_2, repayCode_3, createEmpNo_4, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = batxOthersReposMon.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndRepayCodeIsAndCreateEmpNoIs(acDate_0, acDate_1, custNo_2, repayCode_3, createEmpNo_4, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = batxOthersReposHist.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndRepayCodeIsAndCreateEmpNoIs(acDate_0, acDate_1, custNo_2, repayCode_3, createEmpNo_4, pageable);
+    else 
+      slice = batxOthersRepos.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndRepayCodeIsAndCreateEmpNoIs(acDate_0, acDate_1, custNo_2, repayCode_3, createEmpNo_4, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
   public BatxOthers holdById(BatxOthersId batxOthersId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

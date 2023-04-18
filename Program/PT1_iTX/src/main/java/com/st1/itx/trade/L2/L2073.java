@@ -20,12 +20,15 @@ import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustDataCtrl;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.TxDataLog;
+import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustDataCtrlService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.TxDataLogService;
+import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -64,6 +67,12 @@ public class L2073 extends TradeBuffer {
 	@Autowired
 	TxDataLogService sTxDataLogService;
 
+	@Autowired
+	public TxTellerService txTellerService;
+	
+	@Autowired
+	SendRsp iSendRsp;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2073 ");
@@ -81,7 +90,12 @@ public class L2073 extends TradeBuffer {
 		String iCustId = titaVo.getParam("CustId");
 		// 戶號
 		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
-
+		
+		String ixxCustNo = titaVo.getTlrNo();
+		TxTeller itxTell = null;
+		itxTell = txTellerService.findById(ixxCustNo, titaVo);
+		
+		
 		// 宣告
 		Timestamp ts;
 
@@ -126,13 +140,20 @@ public class L2073 extends TradeBuffer {
 			/* 手動折返 */
 			this.totaVo.setMsgEndToEnter();
 		}
-
+		
+		// 主管授權
+		if (!titaVo.getHsupCode().equals("1")) {
+//			iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
+		}
+		
 		for (CustDataCtrl tCustDataCtrl : lCustDataCtrl) {
 
 			String lastUpdate = "";
 
 			// new occurs
-			OccursList occurslist = new OccursList();
+			OccursList occurslist = new OccursList();		
+			occurslist.putParam("OOAllowFg",itxTell.getAllowFg());
+
 			// new table
 			tCustMain = new CustMain();
 			String custUKey = tCustDataCtrl.getCustUKey();

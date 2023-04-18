@@ -213,7 +213,7 @@ public class L3005 extends TradeBuffer {
 				BigDecimal totTxAmt = parse.stringToBigDecimal(result.get("TotTxAmt"));
 				BigDecimal wkOverShort = BigDecimal.ZERO;
 				String txMsg = "";
-				if (repayCodeX != null && !repayCodeX.isEmpty()) {
+				if ((!"L3100".equals(result.get("TitaTxCd"))) && repayCodeX != null && !repayCodeX.isEmpty()) {
 					txMsg += repayCodeX;
 					if ("1".equals(result.get("RepayCode"))) {
 						txMsg += result.get("ReconCode");

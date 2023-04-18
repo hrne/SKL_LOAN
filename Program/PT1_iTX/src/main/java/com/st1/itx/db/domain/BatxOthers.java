@@ -31,6 +31,7 @@ public class BatxOthers implements Serializable {
   private BatxOthersId batxOthersId;
 
   // 會計日期
+  /* 資料日期 */
   @Column(name = "`AcDate`", insertable = false, updatable = false)
   private int acDate = 0;
 
@@ -94,8 +95,7 @@ public class BatxOthers implements Serializable {
   @Column(name = "`Note`", length = 100)
   private String note;
 
-  // 作帳會計日
-  /* 繳款會計日 */
+  // 入帳會計日
   @Column(name = "`TitaEntdy`")
   private int titaEntdy = 0;
 
@@ -136,7 +136,7 @@ public class BatxOthers implements Serializable {
 
 /**
 	* 會計日期<br>
-	* 
+	* 資料日期
 	* @return Integer
 	*/
   public int getAcDate() {
@@ -145,7 +145,7 @@ public class BatxOthers implements Serializable {
 
 /**
 	* 會計日期<br>
-	* 
+	* 資料日期
   *
   * @param acDate 會計日期
   * @throws LogicException when Date Is Warn	*/
@@ -444,8 +444,8 @@ public class BatxOthers implements Serializable {
   }
 
 /**
-	* 作帳會計日<br>
-	* 繳款會計日
+	* 入帳會計日<br>
+	* 
 	* @return Integer
 	*/
   public int getTitaEntdy() {
@@ -453,10 +453,10 @@ public class BatxOthers implements Serializable {
   }
 
 /**
-	* 作帳會計日<br>
-	* 繳款會計日
+	* 入帳會計日<br>
+	* 
   *
-  * @param titaEntdy 作帳會計日
+  * @param titaEntdy 入帳會計日
   * @throws LogicException when Date Is Warn	*/
   public void setTitaEntdy(int titaEntdy) throws LogicException {
     this.titaEntdy = StaticTool.rocToBc(titaEntdy);

@@ -55,6 +55,30 @@ public interface BatxOthersRepositoryMon extends JpaRepository<BatxOthers, BatxO
   // TitaEntdy = ,AND TitaTlrNo = ,AND TitaTxtNo =
   public Optional<BatxOthers> findTopByTitaEntdyIsAndTitaTlrNoIsAndTitaTxtNoIs(int titaEntdy_0, String titaTlrNo_1, String titaTxtNo_2);
 
+  // AcDate >= ,AND AcDate <= ,AND CustNo = , AND BatchNo = 
+  public Slice<BatxOthers> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndBatchNoIs(int acDate_0, int acDate_1, int custNo_2, String batchNo_3, Pageable pageable);
+
+  // AcDate >= ,AND AcDate <= ,AND CustNo = , AND BatchNo = , AND RepayCode = 
+  public Slice<BatxOthers> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndBatchNoIsAndRepayCodeIs(int acDate_0, int acDate_1, int custNo_2, String batchNo_3, int repayCode_4, Pageable pageable);
+
+  // AcDate >= ,AND AcDate <= ,AND CustNo = , AND BatchNo = , AND CreateEmpNo = 
+  public Slice<BatxOthers> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndBatchNoIsAndCreateEmpNoIs(int acDate_0, int acDate_1, int custNo_2, String batchNo_3, String createEmpNo_4, Pageable pageable);
+
+  // AcDate >= ,AND AcDate <= ,AND CustNo = , AND BatchNo = , AND RepayCode = , AND CreateEmpNo = 
+  public Slice<BatxOthers> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndBatchNoIsAndRepayCodeIsAndCreateEmpNoIs(int acDate_0, int acDate_1, int custNo_2, String batchNo_3, int repayCode_4, String createEmpNo_5, Pageable pageable);
+
+  // AcDate >= ,AND AcDate <= ,AND CustNo = 
+  public Slice<BatxOthers> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIs(int acDate_0, int acDate_1, int custNo_2, Pageable pageable);
+
+  // AcDate >= ,AND AcDate <= ,AND CustNo = , AND RepayCode = 
+  public Slice<BatxOthers> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndRepayCodeIs(int acDate_0, int acDate_1, int custNo_2, int repayCode_3, Pageable pageable);
+
+  // AcDate >= ,AND AcDate <= ,AND CustNo = , AND CreateEmpNo = 
+  public Slice<BatxOthers> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndCreateEmpNoIs(int acDate_0, int acDate_1, int custNo_2, String createEmpNo_3, Pageable pageable);
+
+  // AcDate >= ,AND AcDate <= ,AND CustNo = , AND RepayCode = ,AND CreateEmpNo = 
+  public Slice<BatxOthers> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoIsAndRepayCodeIsAndCreateEmpNoIs(int acDate_0, int acDate_1, int custNo_2, int repayCode_3, String createEmpNo_4, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

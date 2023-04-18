@@ -30,7 +30,74 @@ BEGIN
              , LMSAPN
     )
     , HGData AS (
-      SELECT HG.*
+      SELECT HG.CUSBRH
+           , HG.GDRID1
+           , HG.GDRID2
+           , HG.GDRNUM
+           , HG.LGTSEQ
+           , HG.LGTCIF
+           , HG.LGTADR
+           , HG.HGTMHN
+           , HG.HGTMHS
+           , HG.HGTPSM
+           , HG.HGTCAM
+           , HG.LGTIID
+           , HG.LGTUNT
+           , HG.LGTIAM
+           , HG.LGTSAM
+           , HG.LGTSAT
+           , HG.GRTSTS
+           , HG.HGTSTR
+           , HG.HGTCDT
+           , HG.HGTFLR
+           , HG.HGTROF
+           , HG.SALNAM
+           , HG.SALID1
+           , HG.HGTCAP
+           , HG.HGTGUS
+           , HG.HGTAUS
+           , HG.HGTFOR
+           , HG.HGTCPE
+           , HG.HGTADS
+           , HG.HGTAD1
+           , HG.HGTAD2
+           , HG.HGTAD3
+           , HG.HGTGTD
+           , HG.BUYAMT
+           , HG.BUYDAT
+           , CASE
+               WHEN LPAD(HG.GDRID1,1,'0')
+                    || LPAD(HG.GDRID2,2,'0')
+                    || LPAD(HG.GDRNUM,7,'0')
+                    || LPAD(HG.LGTSEQ,2,'0')
+                    IN (
+                      '101170176301', -- 新北市三重區 06020-000
+                      '101102220301', -- 新北市板橋區 08215-000
+                      '101102072801', -- 新北市三重區 00354-000
+                      '101104701701', -- 屏東縣屏東市 04496-000
+                      '101102923202', -- 桃園市桃園區 00252-000
+                      '101102810401'  -- 台北市大同區 01087-000
+                    ) -- 新光做過唯一性處理,本支仍須處理的例外
+               THEN 0
+             ELSE HG.GDRNUM2 END AS GDRNUM2
+           , CASE
+               WHEN LPAD(HG.GDRID1,1,'0')
+                    || LPAD(HG.GDRID2,2,'0')
+                    || LPAD(HG.GDRNUM,7,'0')
+                    || LPAD(HG.LGTSEQ,2,'0')
+                    IN (
+                      '101170176301', -- 新北市三重區 06020-000
+                      '101102220301', -- 新北市板橋區 08215-000
+                      '101102072801', -- 新北市三重區 00354-000
+                      '101104701701', -- 屏東縣屏東市 04496-000
+                      '101102923202', -- 桃園市桃園區 00252-000
+                      '101102810401'  -- 台北市大同區 01087-000
+                    ) -- 新光做過唯一性處理,本支仍須處理的例外
+               THEN '0'
+             ELSE HG.GDRMRK END AS GDRMRK
+           , HG.HGTMHN2
+           , HG.HGTCIP
+           , HG.UPDATE_IDENT
       FROM "LA$HGTP" HG
       LEFT JOIN LA$APLP APLP ON APLP.GDRID1 = HG.GDRID1
                             AND APLP.GDRID2 = HG.GDRID2
@@ -38,7 +105,23 @@ BEGIN
       WHERE HG.LGTADR IS NOT NULL -- 地址非空,空白地址由下一段程式處理
         AND NVL(HG.HGTMHN,0) != 0 -- 主建號
         AND NVL(APLP.LMSACN,0) != 0 -- 已跟額度綁定
-        AND HG.GDRNUM2 = 0 -- 新光沒做過唯一性處理的,才由本支程式處理
+        AND CASE
+              WHEN HG.GDRNUM2 = 0 -- 新光沒做過唯一性處理的,才由本支程式處理
+              THEN 0
+              WHEN LPAD(HG.GDRID1,1,'0')
+                   || LPAD(HG.GDRID2,2,'0')
+                   || LPAD(HG.GDRNUM,7,'0')
+                   || LPAD(HG.LGTSEQ,2,'0')
+                   IN (
+                     '101170176301', -- 新北市三重區 06020-000
+                     '101102220301', -- 新北市板橋區 08215-000
+                     '101102072801', -- 新北市三重區 00354-000
+                     '101104701701', -- 屏東縣屏東市 04496-000
+                     '101102923202', -- 桃園市桃園區 00252-000
+                     '101102810401'  -- 台北市大同區 01087-000
+                   )
+              THEN 0 -- 新光做過唯一性處理,本支仍須處理的例外
+            ELSE 1 END = 0
     )
     , DistinctData AS (
       SELECT S5.CUSENT

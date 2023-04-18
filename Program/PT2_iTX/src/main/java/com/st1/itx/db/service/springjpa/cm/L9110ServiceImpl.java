@@ -332,25 +332,20 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		// -- L9110 法人Query(火險)
 		String sql = "";
-		sql += " SELECT * FROM ";
-		sql += " ( SELECT ROW_NUMBER() OVER (PARTITION BY CF.\"ApproveNo\"";
+		sql += " SELECT ROW_NUMBER() OVER (PARTITION BY CF.\"ApproveNo\"";
 		sql += "                                  , CF.\"ClCode1\" ";
 		sql += "                                  , CF.\"ClCode2\" ";
 		sql += "                                  , CF.\"ClNo\" ";
 		sql += "                           ORDER BY CF.\"ClCode1\" ";
 		sql += "                                  , CF.\"ClCode2\" ";
 		sql += "                                  , CF.\"ClNo\" ";
-		sql += "                                  , CASE WHEN FM.\"FirstDrawdownDate\" = 0 THEN  0  ";
-		sql += "                                   	 	 WHEN IR.\"InsuStartDate\" >= FM.\"FirstDrawdownDate\" AND  IR.\"InsuEndDate\" <= FM.\"FirstDrawdownDate\" THEN  0 ";
-		sql += "                                   	 	 ELSE 1 END ASC";
-		sql += "                                  , IR.\"InsuStartDate\" DESC";
 		sql += "                          )   AS SEQ "; // -- 序號
-		sql += "      , IR.\"NowInsuNo\"      AS NowInsuNo"; // -- 保單號碼
-		sql += "      , IR.\"FireInsuAmt\"    AS \"FireInsuAmt\""; // -- 火險金額
-		sql += "      , IR.\"InsuStartDate\"  AS InsuStartDate"; // -- 保險起日
-		sql += "      , IR.\"InsuEndDate\"    AS InsuEndDate"; // -- 保險迄日
-		sql += "      , IR.\"InsuCompany\"    AS InsuCompany"; // -- 保險公司
-		sql += "      , IR.\"EarthInsuAmt\"   AS \"EarthInsuAmt\""; // -- 地震險金額
+		sql += "      , IR.\"NowInsuNo\"      AS \"NowInsuNo\" "; // -- 保單號碼
+		sql += "      , IR.\"FireInsuAmt\"    AS \"FireInsuAmt\" "; // -- 火險金額
+		sql += "      , IR.\"InsuStartDate\"  AS \"InsuStartDate\" "; // -- 保險起日
+		sql += "      , IR.\"InsuEndDate\"    AS \"InsuEndDate\" "; // -- 保險迄日
+		sql += "      , IR.\"InsuCompany\"    AS \"InsuCompany\" "; // -- 保險公司
+		sql += "      , IR.\"EarthInsuAmt\"   AS \"EarthInsuAmt\" "; // -- 地震險金額
 		sql += " FROM \"ClFac\" CF";
 		sql += " LEFT JOIN \"FacMain\" FM ON FM.\"ApplNo\" = :applNo";
 		sql += " LEFT JOIN ( SELECT IO.\"ClCode1\" ";
@@ -360,33 +355,33 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                  , IO.\"OrigInsuNo\" AS \"NowInsuNo\" ";
 		sql += "                  , IO.\"FireInsuCovrg\" AS \"FireInsuAmt\" ";
 		sql += "                  , IO.\"EthqInsuCovrg\" AS \"EarthInsuAmt\" ";
-		sql += "                  , IO.\"InsuStartDate\"";
-		sql += "                  , IO.\"InsuEndDate\"";
-		sql += "                  , CDC1.\"Item\"                             AS \"InsuCompany\"";
+		sql += "                  , IO.\"InsuStartDate\" ";
+		sql += "                  , IO.\"InsuEndDate\" ";
+		sql += "                  , CDC1.\"Item\"                             AS \"InsuCompany\" ";
 		sql += "             FROM \"InsuOrignal\" IO ";
-		sql += "             LEFT JOIN \"CdCode\" CDC1 ON CDC1.\"DefCode\" = 'InsuCompany'"; // -- 共用代碼檔(保險公司)
-		sql += "                                      AND CDC1.\"Code\"    = IO.\"InsuCompany\"";
+		sql += "             LEFT JOIN \"CdCode\" CDC1 ON CDC1.\"DefCode\" = 'InsuCompany' "; // -- 共用代碼檔(保險公司)
+		sql += "                                      AND CDC1.\"Code\"    = IO.\"InsuCompany\" ";
 		sql += "             UNION ";
-		sql += "             SELECT IR.\"ClCode1\"";
-		sql += "                  , IR.\"ClCode2\"";
-		sql += "                  , IR.\"ClNo\"";
-		sql += "                  , IR.\"PrevInsuNo\"";
-		sql += "                  , IR.\"NowInsuNo\"";
+		sql += "             SELECT IR.\"ClCode1\" ";
+		sql += "                  , IR.\"ClCode2\" ";
+		sql += "                  , IR.\"ClNo\" ";
+		sql += "                  , IR.\"PrevInsuNo\" ";
+		sql += "                  , IR.\"NowInsuNo\" ";
 		sql += "                  , IR.\"FireInsuCovrg\" AS \"FireInsuAmt\" ";
 		sql += "                  , IR.\"EthqInsuCovrg\" AS \"EarthInsuAmt\" ";
-		sql += "                  , IR.\"InsuStartDate\"";
-		sql += "                  , IR.\"InsuEndDate\"";
-		sql += "                  , CDC1.\"Item\"                             AS \"InsuCompany\"";
+		sql += "                  , IR.\"InsuStartDate\" ";
+		sql += "                  , IR.\"InsuEndDate\" ";
+		sql += "                  , CDC1.\"Item\"                             AS \"InsuCompany\" ";
 		sql += "             FROM \"InsuRenew\" IR ";
-		sql += "             LEFT JOIN \"CdCode\" CDC1 ON CDC1.\"DefCode\" = 'InsuCompany'"; // -- 共用代碼檔(保險公司)
-		sql += "                                      AND CDC1.\"Code\"    = IR.\"InsuCompany\"";
+		sql += "             LEFT JOIN \"CdCode\" CDC1 ON CDC1.\"DefCode\" = 'InsuCompany' "; // -- 共用代碼檔(保險公司)
+		sql += "                                      AND CDC1.\"Code\"    = IR.\"InsuCompany\" ";
 		sql += "             WHERE NVL(IR.\"NowInsuNo\",' ') != ' ' ";
 		sql += "           ) IR ON IR.\"ClCode1\" = CF.\"ClCode1\" ";
 		sql += "               AND IR.\"ClCode2\" = CF.\"ClCode2\" ";
 		sql += "               AND IR.\"ClNo\"    = CF.\"ClNo\" ";
 		sql += " WHERE CF.\"ApproveNo\" = :applNo "; // 日期大於保險迄日
 		sql += "   AND NVL(IR.\"ClNo\",0) != 0 "; // 2022-04-25 智偉增加:有串到保險單資料才顯示
-		sql += " ) WHERE SEQ = 1  ";
+		sql += "   ORDER BY \"NowInsuNo\"  ASC ";
 
 		this.info("sql=" + sql);
 		Query query;

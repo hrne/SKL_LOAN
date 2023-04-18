@@ -21,6 +21,7 @@ public class BatxOthersId implements Serializable {
 
 
   // 會計日期
+  /* 資料日期 */
   @Column(name = "`AcDate`")
   private int acDate = 0;
 
@@ -44,7 +45,7 @@ public class BatxOthersId implements Serializable {
 
 /**
 	* 會計日期<br>
-	* 
+	* 資料日期
 	* @return Integer
 	*/
   public int getAcDate() {
@@ -53,7 +54,7 @@ public class BatxOthersId implements Serializable {
 
 /**
 	* 會計日期<br>
-	* 
+	* 資料日期
   *
   * @param acDate 會計日期
   * @throws LogicException when Date Is Warn	*/

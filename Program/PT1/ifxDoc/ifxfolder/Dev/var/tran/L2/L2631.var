@@ -57,6 +57,7 @@
 ["@利息",#InterestX],["@帳管費用",#AcctFeeX],
 ["@延遲息",#DelayIntX],["@火險費用",#FireFeeX],
 ["@違約金",#BreachAmtX],["@法務費用",#LawFeeX],
+[#<->#,"@清償違約金",#CloseBreachAmtX],
 ["@累短收",#ShortfallX,#ShortfallXX],["@累溢收",#ExcessiveX],
 ]
 !---------- AP Button AREA ----------   
@@ -520,6 +521,7 @@ E(0,@LawFee,#L3r11LawFee)
 E(0,@FireFee,#L3r11FireFee)
 E(0,@AcctFee,#L3r11AcctFee)
 E(0,@ModifyFee,#L3r11ModifyFee)
+E(0,@CloseBreachAmt,#L3r11CloseBreachAmt)
 T(2,@BdLocation,#L3r11BdLocation)
 T(2,@BdRmk,#L3r11BdRmk)
 T(2,@ClNoX,#L3r11ClNoX)
@@ -529,6 +531,7 @@ CALL2(#ADJUSTDOT,#Precision,#DelayInt,#DelayIntX)
 CALL2(#ADJUSTDOT,#Precision,#BreachAmt,#BreachAmtX)
 CALL2(#ADJUSTDOT,#Precision,#Excessive,#ExcessiveX)
 CALL2(#ADJUSTDOT,#Precision,#LawFee,#LawFeeX)
+CALL2(#ADJUSTDOT,#Precision,#CloseBreachAmt,#CloseBreachAmtX)
 CALL2(#ADJUSTDOT,#Precision,#FireFee,#FireFeeX)
 CALL2(#ADJUSTDOT,#Precision,#AcctFee,#AcctFeeX)
 CALL2(#ADJUSTDOT,#Precision,#ModifyFee,#ModifyFeeX)
@@ -728,6 +731,10 @@ E(0,@Excessive,#L3r11Excessive)
 #ExcessiveX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#Excessive,#ExcessiveX)
 
+#CloseBreachAmt=m,14.2,S
+E(0,@CloseBreachAmt,#L3r11CloseBreachAmt)
+#CloseBreachAmtX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#CloseBreachAmt,#CloseBreachAmtX)
 
 #LawFee=m,14.2,S
 E(0,@LawFee,#L3r11LawFee)
@@ -842,6 +849,14 @@ E(0,@CloseNo,#OCloseNo)
 K(LIGHT,#CloseNo,TXTRED,0,1)
 
 
+! 匯款單FileNo
+#PdfSnoF=X,8,S
+E(2,@SnoF,#PdfSnoF)
+#SnoF=A,8,S
+
+! 匯款單FileNo
+#PdfPrtF=A,1,S
+C(3,#SnoF,0,E(0,0),E(0,1))
 
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 
@@ -877,6 +892,32 @@ K(LIGHT,#CloseNo,TXTRED,0,1)
 #OOClNo
 #OOSeq
 #END
+#IntStartDate
+#IntEndDate
+#BdLocation
+#BdRmk
+#PrincipalX
+#InterestX
+#BreachAmtX
+#ExcessiveX
+#LawFeeX
+#FireFeeX
+#AcctFeeX
+#ShortfallX
+#DelayIntX
+#ModifyFeeX
+#Principal
+#Interest
+#DelayInt
+#BreachAmt
+#CloseBreachAmt
+#Excessive
+#LawFee
+#FireFee
+#AcctFee
+#ModifyFee
+#Shortfall
+#ShortCloseBreach
 </sub>
 
 
@@ -884,6 +925,7 @@ K(LIGHT,#CloseNo,TXTRED,0,1)
 <sub type="TOM">
 TXFORM=L2631
 #OCloseNo
+#PdfSnoF
 ^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="ROM.icf::L2R01.tom"/>
@@ -912,4 +954,6 @@ TXFORM=L2631
 <include src="PRT.icf::FMR01.sel"/>
 <include src="PRT.icf::FMH01.sel"/>
 <include src="PRT.icf::FMHR01.sel"/>
+#PdfPrtF=1,PDF,,,,,,,,,,,,,PdfSnoF;1,清償作業
+^
 </sub>

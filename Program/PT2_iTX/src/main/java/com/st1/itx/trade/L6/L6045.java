@@ -18,11 +18,14 @@ import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.TxInquiry;
+import com.st1.itx.db.domain.TxRecord;
 import com.st1.itx.db.domain.TxTeller;
+import com.st1.itx.db.domain.TxTellerAuth;
 import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.TxInquiryService;
+import com.st1.itx.db.service.TxRecordService;
 import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.db.service.TxTranCodeService;
 
@@ -71,8 +74,6 @@ public class L6045 extends TradeBuffer {
 		TxTeller itxTell = null;
 		itxTell = txTellerService.findById(ixxCustNo, titaVo);
 		
-		this.info("itxTell   =" + itxTell.getAllowFg());
-		
 		int iCustNoSt = Integer.parseInt(titaVo.getParam("CustNo"));
 		int iCustNoEd = 0;
 		if(iCustNoSt>0) {
@@ -85,9 +86,9 @@ public class L6045 extends TradeBuffer {
 		sTxInquiry = sTxInquiryService.findImportFg(iTxDAteS, iTxDAteE, "1",iCustNoSt,iCustNoEd, this.index, this.limit, titaVo);
 
 		List<TxInquiry> iTxInquiry = sTxInquiry== null ? null : sTxInquiry.getContent();
-
 		TempVo tTempVo = new TempVo();
 		TxTranCode tTxTranCode = null;
+		
 		
 		// 主管授權
 		if (!titaVo.getHsupCode().equals("1")) {
@@ -95,14 +96,15 @@ public class L6045 extends TradeBuffer {
 		}
 		
 		if (iTxInquiry != null) {
-			OccursList occursList = new OccursList();
-			occursList.putParam("OOAllowFg",itxTell.getAllowFg());
 			for (TxInquiry tTxInquiry : iTxInquiry) {
-				
+				this.info("tTxInquiry    =" + tTxInquiry);
+				OccursList occursList = new OccursList();
+				occursList.putParam("OOAllowFg",itxTell.getAllowFg());
+
 				String tranItem = "";
 				tTempVo = new TempVo();
 				tTempVo = tTempVo.getVo(tTxInquiry.getTranData());
-
+				this.info("tTempVo   =" + tTempVo);
 				if(tTempVo.get("TxReason")==null || tTempVo.get("TxReason").isEmpty()) {
 					continue;
 				}

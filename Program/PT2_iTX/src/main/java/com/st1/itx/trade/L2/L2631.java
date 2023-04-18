@@ -70,6 +70,8 @@ public class L2631 extends TradeBuffer {
 	public L2631ReportB l2631ReportB;
 	@Autowired
 	public L2631ReportC l2631ReportC;
+	@Autowired
+	public L2631ReportD l2631ReportD;
 
 	/* 日期工具 */
 	@Autowired
@@ -102,7 +104,7 @@ public class L2631 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2631 ");
 		this.totaVo.init(titaVo);
-
+		l2631ReportD.setTxBuffer(this.txBuffer);
 		// new PK
 		FacCloseId tFacCloseId = new FacCloseId();
 		// new table
@@ -222,15 +224,6 @@ public class L2631 extends TradeBuffer {
 				}
 			}
 		}
-		if ("Y".equals(titaVo.getParam("CollectFlag"))) {
-			l2631ReportA.exec(titaVo);
-			l2631ReportB.exec(titaVo);
-			l2631ReportC.exec(titaVo);
-
-			String checkMsg = "列印已完成。";
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-					titaVo.getTlrNo() + "L2631", checkMsg, titaVo);
-		}
 
 		this.info("tFacClose  = " + tFacClose);
 		try {
@@ -241,6 +234,23 @@ public class L2631 extends TradeBuffer {
 
 		this.totaVo.putParam("OCloseNo", wkcloseNo);
 
+		String parentTranCode = titaVo.getTxcd();
+
+		l2631ReportD.setParentTranCode(parentTranCode);
+
+//		boolean isFinished = l9110Report.exec(titaVo, this.totaVo);
+
+		l2631ReportD.exec(titaVo, this.totaVo);
+
+		if ("Y".equals(titaVo.getParam("CollectFlag"))) {
+			l2631ReportA.exec(titaVo);
+			l2631ReportB.exec(titaVo);
+			l2631ReportC.exec(titaVo);
+
+			String checkMsg = "列印已完成。";
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+					titaVo.getTlrNo() + "L2631", checkMsg, titaVo);
+		}
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

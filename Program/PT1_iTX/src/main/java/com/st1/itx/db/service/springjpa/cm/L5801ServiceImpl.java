@@ -653,13 +653,13 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		sql += "                 , MAX(CASE T.\"ProdNo\"";
 		sql += "                            WHEN 'IA' THEN NVL(RA.\"Rate1\",0) "  ;// 0.85";
-		sql += "                            WHEN 'IB' THEN NVL(RA.\"Rate1\",0) "  ;// 0.85";
-		sql += "                            WHEN 'IC' THEN NVL(RA.\"Rate1\",0) "  ;// 0.425";
-		sql += "                            WHEN 'ID' THEN NVL(RA.\"Rate1\",0) "  ;// 0.25";
-		sql += "                            WHEN 'IE' THEN NVL(RA.\"Rate1\",0) "  ;// 0.25";
-		sql += "                            WHEN 'IF' THEN NVL(RA.\"Rate1\",0) "  ;// 0.125";
-		sql += "                            WHEN 'IG' THEN NVL(RA.\"Rate1\",0) "  ;// 0.125";
-		sql += "                            ELSE           NVL(RA.\"Rate1\",0) "  ;// 0.7";
+		sql += "                            WHEN 'IB' THEN NVL(RA.\"Rate2\",0) "  ;// 0.85";
+		sql += "                            WHEN 'IC' THEN NVL(RA.\"Rate3\",0) "  ;// 0.425";
+		sql += "                            WHEN 'ID' THEN NVL(RA.\"Rate4\",0) "  ;// 0.25";
+		sql += "                            WHEN 'IE' THEN NVL(RA.\"Rate4\",0) "  ;// 0.25";
+		sql += "                            WHEN 'IF' THEN NVL(RA.\"Rate5\",0) "  ;// 0.125";
+		sql += "                            WHEN 'IG' THEN NVL(RA.\"Rate5\",0) "  ;// 0.125";
+		sql += "                            ELSE           NVL(RA.\"Rate6\",0) "  ;// 0.7";
 		sql += "                       END)                           AS \"SubsidyRate\"";
 
 		sql += "                 , MAX(T.\"AcBookCode\")              AS \"AcBookCode\"";

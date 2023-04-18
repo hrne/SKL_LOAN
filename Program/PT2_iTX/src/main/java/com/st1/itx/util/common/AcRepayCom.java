@@ -289,9 +289,9 @@ public class AcRepayCom extends TradeBuffer {
 				tx.setTxAmt(this.wkTxAmtRemaind);
 				tx.setTempAmt(BigDecimal.ZERO);
 				tx.setOverflow(tx.getTxAmt());
-				this.wkTempAmtRemaind = this.wkTempAmtRemaind.add(this.wkTxAmtRemaind);
-				this.wkTxAmtRemaind = BigDecimal.ZERO;
-				if (feeAmt.compareTo(BigDecimal.ZERO) > 0) {
+				if (feeAmt.compareTo(BigDecimal.ZERO) == 0) {
+					this.wkTempAmtRemaind = BigDecimal.ZERO;
+				} else {
 					AcDetail acDetail = new AcDetail();
 					acDetail.setDbCr("D");
 					acDetail.setAcctCode("TAV");
@@ -301,6 +301,7 @@ public class AcRepayCom extends TradeBuffer {
 					acDetail.setBormNo(0);
 					acDetail.setSumNo("090"); // 暫收抵繳
 					this.lAcDetail.add(acDetail);
+					this.wkTempAmtRemaind = this.wkTempAmtRemaind.add(this.wkTxAmtRemaind);
 					// 按AcAcDetail SumNo，大至小排序
 					Collections.sort(this.lAcDetail, new Comparator<AcDetail>() {
 						@Override
@@ -314,6 +315,7 @@ public class AcRepayCom extends TradeBuffer {
 						}
 					});
 				}
+				this.wkTxAmtRemaind = BigDecimal.ZERO;
 			}
 			this.lLoanBorTx.add(tx);
 		}
@@ -333,7 +335,7 @@ public class AcRepayCom extends TradeBuffer {
 		BigDecimal overflow = settleOverflow(tx, this.lAcDetail, titaVo);
 		tx.setTxAmt(tx.getTxAmt().add(this.wkTxAmtRemaind));
 		tx.setTempAmt(tx.getTempAmt().add(this.wkTempAmtRemaind));
-		tx.setOverflow(overflow);
+		tx.setOverflow(tx.getOverflow().add(overflow));
 
 		// step 6. 將本戶累溢收放入Json Field(Excessive)
 		this.lLoanBorTx = setExcessive(this.lLoanBorTx, iBaTxList, this.lAcDetail, titaVo);

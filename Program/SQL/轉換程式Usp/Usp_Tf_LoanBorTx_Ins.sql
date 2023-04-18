@@ -546,6 +546,8 @@ BEGIN
           /* 更新交易別代碼 */ 
           -- 2022-11-07 Wei 新增 from Lai 寫在LoanBorTx.xlsx 的 交易別 Sheet
           ,CASE 
+             WHEN TR1.TRXTRN='3037' AND JL."AcctCode" IN ('T10','T11','T12','T13')
+             THEN '3236' -- 2023-04-17 Wei 新增 from 賴桑:轉入債協暫收款
              WHEN CASE 
                     WHEN TR1."TRXCRC" IN ('1','3') 
                     THEN 0 - NVL(JL."JLNAMT",0) 
@@ -583,8 +585,6 @@ BEGIN
              THEN '3210'
              WHEN TR1.TRXTRN='3088'
              THEN '3214'
-             WHEN TR1.TRXTRN='3037' AND JL."AcctCode" IN ('T10','T11','T12','T13')
-             THEN '3236' -- 2023-04-17 Wei 新增 from 賴桑:轉入債協暫收款
              WHEN TR1.TRXTRN='3037'
              THEN '3221'
              WHEN TR1.TRXTRN='3083'

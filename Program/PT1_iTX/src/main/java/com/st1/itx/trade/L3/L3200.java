@@ -1681,7 +1681,7 @@ public class L3200 extends TradeBuffer {
 		if (iRepayType == 2) {
 			tLoanBorTx.setTxDescCode("3203");
 		} else {
-			if (isRepayPrincipal) {
+			if (wkPrincipal.compareTo(BigDecimal.ZERO) > 0) {
 				tLoanBorTx.setTxDescCode("3201");
 			} else {
 				tLoanBorTx.setTxDescCode("3202");

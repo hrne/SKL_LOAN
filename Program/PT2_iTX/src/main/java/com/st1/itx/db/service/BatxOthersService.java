@@ -167,6 +167,122 @@ public interface BatxOthersService {
   public BatxOthers findTxSeqFirst(int titaEntdy_0, String titaTlrNo_1, String titaTxtNo_2, TitaVo... titaVo);
 
   /**
+   * AcDate &gt;= ,AND AcDate &lt;= ,AND CustNo = , AND BatchNo = 
+   *
+   * @param acDate_0 acDate_0
+   * @param acDate_1 acDate_1
+   * @param custNo_2 custNo_2
+   * @param batchNo_3 batchNo_3
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice BatxOthers BatxOthers of List
+   */
+  public Slice<BatxOthers> searchCustNoA(int acDate_0, int acDate_1, int custNo_2, String batchNo_3, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * AcDate &gt;= ,AND AcDate &lt;= ,AND CustNo = , AND BatchNo = , AND RepayCode = 
+   *
+   * @param acDate_0 acDate_0
+   * @param acDate_1 acDate_1
+   * @param custNo_2 custNo_2
+   * @param batchNo_3 batchNo_3
+   * @param repayCode_4 repayCode_4
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice BatxOthers BatxOthers of List
+   */
+  public Slice<BatxOthers> searchCustNoB(int acDate_0, int acDate_1, int custNo_2, String batchNo_3, int repayCode_4, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * AcDate &gt;= ,AND AcDate &lt;= ,AND CustNo = , AND BatchNo = , AND CreateEmpNo = 
+   *
+   * @param acDate_0 acDate_0
+   * @param acDate_1 acDate_1
+   * @param custNo_2 custNo_2
+   * @param batchNo_3 batchNo_3
+   * @param createEmpNo_4 createEmpNo_4
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice BatxOthers BatxOthers of List
+   */
+  public Slice<BatxOthers> searchCustNoC(int acDate_0, int acDate_1, int custNo_2, String batchNo_3, String createEmpNo_4, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * AcDate &gt;= ,AND AcDate &lt;= ,AND CustNo = , AND BatchNo = , AND RepayCode = , AND CreateEmpNo = 
+   *
+   * @param acDate_0 acDate_0
+   * @param acDate_1 acDate_1
+   * @param custNo_2 custNo_2
+   * @param batchNo_3 batchNo_3
+   * @param repayCode_4 repayCode_4
+   * @param createEmpNo_5 createEmpNo_5
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice BatxOthers BatxOthers of List
+   */
+  public Slice<BatxOthers> searchCustNoD(int acDate_0, int acDate_1, int custNo_2, String batchNo_3, int repayCode_4, String createEmpNo_5, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * AcDate &gt;= ,AND AcDate &lt;= ,AND CustNo = 
+   *
+   * @param acDate_0 acDate_0
+   * @param acDate_1 acDate_1
+   * @param custNo_2 custNo_2
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice BatxOthers BatxOthers of List
+   */
+  public Slice<BatxOthers> searchCustNoE(int acDate_0, int acDate_1, int custNo_2, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * AcDate &gt;= ,AND AcDate &lt;= ,AND CustNo = , AND RepayCode = 
+   *
+   * @param acDate_0 acDate_0
+   * @param acDate_1 acDate_1
+   * @param custNo_2 custNo_2
+   * @param repayCode_3 repayCode_3
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice BatxOthers BatxOthers of List
+   */
+  public Slice<BatxOthers> searchCustNoF(int acDate_0, int acDate_1, int custNo_2, int repayCode_3, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * AcDate &gt;= ,AND AcDate &lt;= ,AND CustNo = , AND CreateEmpNo = 
+   *
+   * @param acDate_0 acDate_0
+   * @param acDate_1 acDate_1
+   * @param custNo_2 custNo_2
+   * @param createEmpNo_3 createEmpNo_3
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice BatxOthers BatxOthers of List
+   */
+  public Slice<BatxOthers> searchCustNoG(int acDate_0, int acDate_1, int custNo_2, String createEmpNo_3, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * AcDate &gt;= ,AND AcDate &lt;= ,AND CustNo = , AND RepayCode = ,AND CreateEmpNo = 
+   *
+   * @param acDate_0 acDate_0
+   * @param acDate_1 acDate_1
+   * @param custNo_2 custNo_2
+   * @param repayCode_3 repayCode_3
+   * @param createEmpNo_4 createEmpNo_4
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice BatxOthers BatxOthers of List
+   */
+  public Slice<BatxOthers> searchCustNoH(int acDate_0, int acDate_1, int custNo_2, int repayCode_3, String createEmpNo_4, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By BatxOthers
    * 
    * @param batxOthersId key

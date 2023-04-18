@@ -67,9 +67,12 @@ public class L6033 extends TradeBuffer {
 			
 		}else {
 			this.info("EffectDate  = 19110000");
+			
 			Slice<CdComm> iCdComm;
 			iCdComm = sCdCommService.findAll(this.index, this.limit, titaVo);
-			
+			if (iCdComm == null) {
+				throw new LogicException(titaVo, "E0001", "政府優惠房屋貸款-補貼利率"); // 查無資料
+			}
 			List<CdComm> lCdComm = iCdComm == null ? new ArrayList<CdComm>() : iCdComm.getContent();
 			this.info("getContent   = " +  iCdComm.getContent());
 			for(CdComm siCdComm : lCdComm) {
