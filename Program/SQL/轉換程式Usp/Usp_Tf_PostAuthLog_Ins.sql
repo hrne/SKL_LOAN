@@ -106,7 +106,7 @@ BEGIN
           ,CASE
              WHEN NVL(FACM."LMSPRL",'00') != '00'
              THEN 0
-           ELSE CM."Birthday" 
+           ELSE NVL(CM."Birthday",0)
            END                            AS "RelAcctBirthday"     -- 第三人出生日期 Decimald 8 
           ,CASE
              WHEN NVL(FACM."LMSPRL",'00') != '00'
@@ -265,7 +265,7 @@ BEGIN
           ,CASE
              WHEN NVL(FACM."LMSPRL",'00') != '00'
              THEN 0
-           ELSE CM."Birthday" 
+           ELSE NVL(CM."Birthday",0)
            END                            AS "RelAcctBirthday"     -- 第三人出生日期 Decimald 8 
           ,CASE
              WHEN NVL(FACM."LMSPRL",'00') != '00'

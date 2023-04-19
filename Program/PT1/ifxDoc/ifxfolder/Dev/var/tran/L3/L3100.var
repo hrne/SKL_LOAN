@@ -2454,6 +2454,9 @@ C(3,#DSnoF,0,E(0,0),E(0,1))
 #StepRateIncr{n}
 #StepRatePer{n}
 ##end
+#CustNoX
+#CustIdX
+#ApplNoX
 #RepayCodeX
 #RepayAcctNo
 #RepayBankX

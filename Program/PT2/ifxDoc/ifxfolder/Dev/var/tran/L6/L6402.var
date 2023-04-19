@@ -286,9 +286,9 @@ T(H,@CustDataCtrlFgX,#CustDataCtrlFg,#CustDataCtrlFgHelp)
 T(H,@CustRmkFgX,#CustRmkFg,#CustRmkFgHelp)
 T(H,@ApLogFlagX,#ApLogFlag,#ApLogFlagHelp)
 
+C(5,#TypeFg,1,T(2,@FdCancelFg, )T(F,@CancelFg,0)T(2,@FdModifyFg, )T(F,@ModifyFg,0))
 
-
-#TranItem=x,40,I
+#TranItem=x,100,I
 C(2,#FunCode,s,$,$,s,s,s)
 @V(7)
 
@@ -299,12 +299,17 @@ C(2,#FunCode,s,$,$,s,s,s)
 #TypeFg=A,1,L
 C(2,#FunCode,s,$,$,s,s,s)
 C(5,#Aptype3,0,E(0,1),C(5,#Aptype3,9,E(0,1),E(0,2)))
+
 HELP(#TypeHelp)
 @T(3,@TypeFgX,)
 V(H,#TypeHelp)
 
 #TypeFgX=X,8,L
 T(H,#TypeFg,#TypeHelp)
+
+
+! IF(#TypeFg==1,T(F,@CancelFg,0))
+! IF(#TypeFg==1,T(2,@FdCancelFg, )T(F,@CancelFg,0))
 
 !-------------------
 #Status=A,1,I

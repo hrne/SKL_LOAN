@@ -55,13 +55,20 @@ BEGIN
                                                 ,"TRXNMT" 
                                                 ,"TRXNM2" 
                                     ORDER BY CASE 
-                                                WHEN "TRXTRN" IN ('3066') THEN 1 
-                                                WHEN "TRXTRN" IN ('3025','3031','3041','3084','3086','3088') THEN 2 
-                                                WHEN "TRXTRN" = '3085' THEN 3 
-                                                WHEN "TRXTRN" = '3080' THEN 4 
-                                                WHEN "TRXTRN" = '3081' THEN 5 
-                                                WHEN "TRXTRN" IN ('3036','3082','3083') THEN 6 
-                                              ELSE 9 END 
+                                                WHEN "TRXTRN" = '3066' THEN 1 
+                                                WHEN "TRXTRN" = '3041' THEN 2 
+                                                WHEN "TRXTRN" = '3025' THEN 3
+                                                WHEN "TRXTRN" = '3084' THEN 4 
+                                                WHEN "TRXTRN" = '3031' THEN 5 
+                                                WHEN "TRXTRN" = '3086' THEN 6 
+                                                WHEN "TRXTRN" = '3088' THEN 7 
+                                                WHEN "TRXTRN" = '3085' THEN 8
+                                                WHEN "TRXTRN" = '3080' THEN 9 
+                                                WHEN "TRXTRN" = '3081' THEN 10 
+                                                WHEN "TRXTRN" = '3082' THEN 11
+                                                WHEN "TRXTRN" = '3083' THEN 12
+                                                WHEN "TRXTRN" = '3036' THEN 13
+                                              ELSE 14 END 
                                    ) AS "SEQ" 
           FROM "LA$TRXP" 
          ) S1 
