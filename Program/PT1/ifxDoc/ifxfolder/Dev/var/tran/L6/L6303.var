@@ -32,6 +32,7 @@ INVOKEJS(SHOW,grd1_1,1)
 [
 ["[L6303]                                 政府優惠房屋貸款-補貼利率維護"],
 ["#FdEffectDate+生效日期",#EffectDate],
+["#FdEnable+生效記號",#Enable,#EnableX],
 ["#FdRemark+備註",#Remark],
 
 
@@ -44,6 +45,7 @@ INVOKEJS(SHOW,grd1_1,1)
 #FdRemark=X,2,L
 #FdCodeType=X,2,L
 #FdItem=X,2,L
+#FdEnable=X,2,L
 ! #FdJsonFields=X,2,L
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -63,12 +65,11 @@ T(1,#NTXBUF,1,1)
 #CHAIN_EffectDate=D,7,S
 T(1,#NTXBUF,2,7)
 
-#CHAIN_Remark=X,100,S
-T(1,#NTXBUF,9,100)
-C(3,#CHAIN,1,T(2,@FuncCode,#CHAIN_FuncCode),)
-C(3,#CHAIN,1,T(2,@TranKey_Tmp,#CHAIN_FuncCode),)
-C(3,#CHAIN,1,T(2,@EffectDate,#CHAIN_EffectDate),)
-C(3,#CHAIN,1,T(2,@Remark,#CHAIN_Remark),)
+#chainval=X,1,S
+C(3,#CHAIN,1,T(2,@FuncCode,#CHAIN_FuncCode),$)
+C(3,#CHAIN,1,T(2,@TranKey_Tmp,#CHAIN_FuncCode),$)
+C(3,#CHAIN,1,T(2,@EffectDate,#CHAIN_EffectDate),$)
+
 
 !---------- AP TEXT AREA Variables ----------
 !刪除隱藏重新交易按鈕
@@ -84,7 +85,7 @@ T(3,CdCode.FuncCode2)
 ! 新增進入
 #Deal_New=X,1,S
 C(5,#TranKey_Tmp,1,$,S)
-T(F,@EffectDate,1)T(F,@Remark,1)
+T(F,@EffectDate,1)T(F,@Remark,1)T(F,@Enable,1)
 K(MODIFYBUTTON,新增)
 T(2,@FdEffectDate,*)
 
@@ -92,13 +93,13 @@ T(2,@FdEffectDate,*)
 ! 異動進入
 #Deal_Update=X,1,S
 C(5,#TranKey_Tmp,2,$,S)
-T(F,@EffectDate,0)T(F,@Remark,1)
+T(F,@EffectDate,0)T(F,@Remark,1)T(F,@Enable,1)
 K(MODIFYBUTTON,異動)
 
 ! 查詢進入
 #Deal_Search=X,1,S
 C(5,#TranKey_Tmp,5,$,S)
-T(F,@EffectDate,0)T(F,@Remark,0)
+T(F,@EffectDate,0)T(F,@Remark,0)T(F,@Enable,0)
 ##loop {times:6,i:1}
 T(F,@CodeTypeNo{i},0)
 T(F,@CdItemNo{i},0)
@@ -110,7 +111,7 @@ K(NOBUTTON,CLOSEY)
 ! 刪除進入
 #Deal_Delete=X,1,S
 C(5,#TranKey_Tmp,4,$,S)
-T(F,@EffectDate,0)T(F,@Remark,0)
+T(F,@EffectDate,0)T(F,@Remark,0)T(F,@Enable,0)
 ##loop {times:6,i:1}
 T(F,@CodeTypeNo{i},0)
 T(F,@CdItemNo{i},0)
@@ -158,11 +159,28 @@ T(2,@CdItemNo{i},#L6r51CdItemNo{i})
 E(0,@JsonFieldsNo{i},#L6r51JsonFieldsNo{i})
 ##end
 T(2,@Remark,#L6r51Remark)
+T(2,@Enable,#L6r51Enable)
+
+#EnableFgHelp=X,20,S
+T(3,Y:啟用;N:停用)
+
+#Enable=X,1,I
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+HELP(#EnableFgHelp)
+@V(H,#EnableFgHelp)
+
+! 啟用記號中文
+#EnableX=X,10,L
+T(H,#Enable,#EnableFgHelp)
 
 #Remark=X,100,I
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,5,s,$)
- 
+
+
+
+
 !#RPTFG=A,1,S
 !E(0,0)
 
@@ -245,6 +263,7 @@ T(3,1)ASGN(LOOP$)
 #TranKey_Tmp
 #FuncCode
 #EffectDate
+#Enable
 #Remark
 ##loop{times:6,i:1}
 #CodeTypeNo{i}

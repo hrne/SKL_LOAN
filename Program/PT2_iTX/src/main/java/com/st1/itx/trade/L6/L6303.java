@@ -60,7 +60,7 @@ public class L6303 extends TradeBuffer {
 
 		CdCommId tCdCommId = new CdCommId();
 		int iEffectDate = Integer.valueOf(titaVo.getParam("EffectDate").trim()) + 19110000;
-
+		String iEnable = titaVo.getParam("Enable").trim();
 		tCdCommId.setCdType("01");
 		tCdCommId.setCdItem("01");
 		tCdCommId.setEffectDate(iEffectDate);
@@ -75,6 +75,7 @@ public class L6303 extends TradeBuffer {
 			sCdComm = new CdComm();
 			sCdComm = setCdcommRoutine(sCdComm, titaVo);
 			sCdComm.setCdCommId(tCdCommId);
+			sCdComm.setEnable(iEnable);
 			try {
 				sCdCommService.insert(sCdComm, titaVo);
 			} catch (DBException e) {
@@ -96,6 +97,7 @@ public class L6303 extends TradeBuffer {
 			CdComm oldCdComm = (CdComm) iDataLog.clone(uCdComm);
 
 			sCdComm = setCdcommRoutine(uCdComm, titaVo);
+			sCdComm.setEnable(iEnable);
 			try {
 				sCdCommService.update(uCdComm, titaVo); ////
 			} catch (DBException e) {

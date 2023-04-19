@@ -92,6 +92,7 @@ public class L6R51 extends TradeBuffer {
 
 				totaVo.putParam("L6r51EffectDate", tCdComm.getEffectDate());
 				totaVo.putParam("L6r51Remark", tCdComm.getRemark());
+				totaVo.putParam("L6r51Enable",tCdComm.getEnable());
 			}
 
 			for (CdCode tCdCode : slCdCode.getContent()) {

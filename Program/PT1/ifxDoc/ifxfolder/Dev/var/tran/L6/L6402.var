@@ -286,7 +286,7 @@ T(H,@CustDataCtrlFgX,#CustDataCtrlFg,#CustDataCtrlFgHelp)
 T(H,@CustRmkFgX,#CustRmkFg,#CustRmkFgHelp)
 T(H,@ApLogFlagX,#ApLogFlag,#ApLogFlagHelp)
 
-C(5,#TypeFg,1,T(2,@FdCancelFg, )T(F,@CancelFg,0)T(2,@FdModifyFg, )T(F,@ModifyFg,0))
+C(5,#TypeFg,1,T(2,@FdCancelFg, )T(F,@CancelFg,0)T(2,@FdModifyFg, )T(F,@ModifyFg,0),$)
 
 #TranItem=x,100,I
 C(2,#FunCode,s,$,$,s,s,s)

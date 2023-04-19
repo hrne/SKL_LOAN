@@ -5175,6 +5175,9 @@ TXFORM=L4R03
 #L4r04Balance=m,14,S
 #L4r04RemintBank=A,7,S
 #L4r04TraderInfo=X,40,S
+#L4r04TitaEntdy=D,7,S
+#L4r04TitaTlrNo=X,6,S
+#L4r04TitaTxtNo=X,8,S
 </L4R04.dec>
 
 <L4R04.tom>
@@ -5188,6 +5191,9 @@ TXFORM=L4R04
 #L4r04Balance
 #L4r04RemintBank
 #L4r04TraderInfo
+#L4r04TitaEntdy
+#L4r04TitaTlrNo
+#L4r04TitaTxtNo
 ^
 </L4R04.tom>
 
@@ -5280,6 +5286,9 @@ TXFORM=L4R08
 #L4r09CustNm=c,100,S
 #L4r09RvNo=x,12,S
 #L4r09Note=U,60,S
+#L4r09TitaEntdy=D,7,S
+#L4r09TitaTlrNo=X,6,S
+#L4r09TitaTxtNo=X,8,S
 </L4R09.dec>
 
 <L4R09.tom>
@@ -5296,6 +5305,9 @@ TXFORM=L4R09
 #L4r09CustNm
 #L4r09RvNo
 #L4r09Note
+#L4r09TitaEntdy
+#L4r09TitaTlrNo
+#L4r09TitaTxtNo
 ^
 </L4R09.tom>
 
@@ -5869,6 +5881,34 @@ TXFORM=L4R34
 #L4r34TxAmt2
 ^
 </L4R34.tom>
+
+<L4R35.dec>
+#L4r35CustNo=A,7,S
+#L4r35RepayType=A,2,S
+#L4r35RepayAmt=m,14,S
+#L4r35AcctAmt=m,14,S
+#L4r35DisacctAmt=m,14,S
+#L4r35ProcStsCode=X,1,S
+#L4r35ProcCode=X,5,S
+#L4r35ProcDscptCode=X,300,S
+#L4r35TxSn=X,14,S
+#L4r35FacmNoA=A,3,S
+</L4R35.dec>
+
+<L4R35.tom>
+TXFORM=L4R35
+#L4r35CustNo
+#L4r35RepayType
+#L4r35RepayAmt
+#L4r35AcctAmt
+#L4r35DisacctAmt
+#L4r35ProcStsCode
+#L4r35ProcCode
+#L4r35ProcDscptCode
+#L4r35TxSn
+#L4r35FacmNoA
+^
+</L4R35.tom>
 
 <L5R01.dec>
 #L5r01CustId=X,10,S
@@ -10203,9 +10243,7 @@ TXFORM=L6R50
 <L6R51.dec>
 #L6r51EffectDate=D,7,S
 #L6r51Remark=X,60,S
-#L6r51CodeType=X,5,S
-#L6r51CdItem=X,5,S
-#L6r51JsonFields=X,300,S
+#L6r51Enable=X,1,S
 ##loop{times:6,i:1}
 #L6r51CodeTypeNo{i}=X,5,S
 #L6r51CdItemNo{i}=X,50,S
@@ -10217,9 +10255,7 @@ TXFORM=L6R50
 TXFORM=L6R51
 #L6r51EffectDate
 #L6r51Remark
-#L6r51CodeType
-#L6r51CdItem
-#L6r51JsonFields
+#L6r51Enable
 ##loop{times:6,i:1}
 #L6r51CodeTypeNo{i}
 #L6r51CdItemNo{i}

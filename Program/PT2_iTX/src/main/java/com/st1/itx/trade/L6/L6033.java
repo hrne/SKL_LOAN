@@ -57,12 +57,16 @@ public class L6033 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0001", "政府優惠房屋貸款-補貼利率"); // 查無資料
 			}
 			String iRemark;
-			   
+			String iEnable;
+			
 			OccursList occursList = new OccursList();
 			iRemark = sCdComm.getRemark();
-
+			iEnable = sCdComm.getEnable();
+			
 			occursList.putParam("OOEffectDate", sCdComm.getEffectDate());
 			occursList.putParam("OORemark", iRemark);
+			occursList.putParam("OOEnable", iEnable);
+			
 			this.totaVo.addOccursList(occursList);
 			
 		}else {
@@ -79,6 +83,7 @@ public class L6033 extends TradeBuffer {
 				OccursList occursList = new OccursList();
 				occursList.putParam("OOEffectDate", siCdComm.getEffectDate());
 				occursList.putParam("OORemark", siCdComm.getRemark());
+				occursList.putParam("OOEnable", siCdComm.getEnable());
 				this.totaVo.addOccursList(occursList);
 			}
 		}

@@ -75,6 +75,7 @@ C(2,#CHAIN,$,s)
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@EffectDate,1,7)
 T(1,@Remark,8,100)
+T(1,@Enable,108,1)
 
 #RPTFG=A,1,S
 E(0,0)
@@ -105,25 +106,27 @@ T(3,[L6033] 政府優惠房屋貸款-補貼利率)
 
 #OORemark=X,100,L
 
+#OOEnable=X,1,S
+
 
 
 ! 修改的按鈕
 #OOBUF_2=X,136,S
-T(2,2+#OOEffectDate+#OORemark)
+T(2,2+#OOEffectDate)
 
 #OOBTN_2=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L6303;text=修改;ntxbuf=#OOBUF_2}))
 
 ! 刪除的按鈕
 #OOBUF_4=X,136,S
-T(2,4+#OOEffectDate+#OORemark)
+T(2,4+#OOEffectDate)
 
 #OOBTN_4=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L6303;text=刪除;ntxbuf=#OOBUF_4}))
 
 ! 查詢的按鈕
 #OOBUF_5=X,136,S
-T(2,5+#OOEffectDate+#OORemark)
+T(2,5+#OOEffectDate)
 
 #OOBTN_5=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L6303;text=查詢;ntxbuf=#OOBUF_5})
@@ -143,6 +146,7 @@ BIND(grid,{cmd=CHAIN;ntxcd=L6303;text=查詢;ntxbuf=#OOBUF_5})
 TXFORM=L6033
 #OOEffectDate
 #OORemark
+#OOEnable
 ^
 
 <include src="COM.icf::TRCTL.tom"/>
@@ -178,6 +182,10 @@ TXFORM=L6033
 
 #OORemark=備註
 {width:300,align:'center'}
+
+!#OOEnable=記號
+!{width:300,align:'center'}
+
 
 ^
 

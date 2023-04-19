@@ -385,7 +385,7 @@ T(2,#OOCustNo+0000000)
 
 #OOBTN8=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L2018; ntxbuf=#OOBUF8})
-IF(#OOFacShareApplBTNFg==0,BIND(grid,cancel),$)
+IF(#OOFacShareApplBTNFg==1,BIND(grid,cancel),$)
 
 
 !關聯戶
@@ -404,7 +404,7 @@ T(2,2+#OOCustId+#OOCustNo+#OOCustName)
 C(2,#OOCustCrossBTNFg,BIND(grid,{ cmd=CHAIN; ntxcd=L1109; text=未設定; ntxbuf=#OOBUF12}),
 BIND(grid,{ cmd=CHAIN; ntxcd=L1109;text=已設定; ntxbuf=#OOBUF12}),
 BIND(grid,cancel))
-
+! IF(#OOCustCrossBTNFg==1,BIND(grid,cancel),$)
 !顧客電話
 #OOBUF14=X,18,S
 T(2,1+#OOCustId+0000000)
@@ -412,7 +412,7 @@ T(2,1+#OOCustId+0000000)
 #OOBTN14=X,1,S
 C(2,#OOCustTelNoBTNFg,BIND(grid,{ cmd=CHAIN; ntxcd=L1905; text=未設定; ntxbuf=#OOBUF14}),
 BIND(grid,{ cmd=CHAIN; ntxcd=L1905;text=已設定; ntxbuf=#OOBUF14}),
-BIND(grid,cancel))
+BIND(grid,cancel))OOBTN13
 
 !寬限控管
 #OOBUF15=X,7,S
