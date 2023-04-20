@@ -862,7 +862,7 @@ public class L3100 extends TradeBuffer {
 		}
 		if (titaVo.isHcodeErase()) {
 			// 註記放款交易內容檔
-			tLoanBorTx = loanBorTxService.custNoTxtNoFirst(iCustNo, iFacmNo, wkBormNo, titaVo.getOrgEntdyI(),
+			tLoanBorTx = loanBorTxService.custNoTxtNoFirst(iCustNo, iFacmNo, wkBormNo, titaVo.getOrgEntdyI() + 19110000,
 					titaVo.getOrgTlr(), titaVo.getOrgTno(), titaVo);
 			if (tLoanBorTx == null) {
 				throw new LogicException(titaVo, "E0006", "放款交易內容檔"); // 鎖定資料時，發生錯誤

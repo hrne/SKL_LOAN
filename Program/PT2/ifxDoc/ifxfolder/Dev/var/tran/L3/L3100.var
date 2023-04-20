@@ -238,6 +238,9 @@ IF(#FKEY==1,INVOKEJS(SHOW,p1,1)INVOKEJS(SHOW,p1,#P2SH,#P6E,1),$)
 IF(#FKEY==2,INVOKEJS(SHOW,p1,1)INVOKEJS(SHOW,p1,#P2SH,#P6E,1),$)
 C(3,#FKEY,2,T(H,@ACTFGX,#ACTFG,#ActFgHelp),$)
 
+#SPANDYH=D,7,S
+C(3,#FKEY,0,S,$)
+C(3,#IsRv,1,E(0,#DrawdownDate)ASGN(SPANDY$),E(0,0)ASGN(SPANDY$),$)
 
 <include src="COM.icf::TITLE-RUN.pre"/>
 </sub>
@@ -1026,7 +1029,7 @@ D(8)
 ! C(3,#DrawdownCode,3,IF(#DrawdownDate<=#wksysdate,V(P,預撥日期不可小於等於會計日),$),V(5,0010101,#SYSDATE))
 #TxtSysDate=x,20,L
 #EffectDateX=X,10,S
-CALL2(#AdjustDate,#EffectDate,#EffectDateX)
+CALL2(#AdjustDate,#DrawdownDate,#EffectDateX)
 #IsRv=A,1,S
 IF(#DrawdownDate>#EffectDate,E(0,1),E(0,0))
 C(3,#IsRv,1,T(2,@TxtSysDate,會計日期：+#EffectDateX),T(2,@TxtSysDate,))

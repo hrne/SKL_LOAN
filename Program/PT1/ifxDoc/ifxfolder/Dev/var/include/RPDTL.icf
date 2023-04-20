@@ -60,6 +60,7 @@
 
 ! [還款來源／撥款方式]
 #RPTYPZ=A,2,S
+#RPTYPZ2=A,2,S
 
 ! 應收付總金額
 #RPTOT=m,14,S
@@ -295,7 +296,8 @@ T(2,@RpAcCode1,#RP_ACNO)
 ,C(3,#FKEY,7
 ,E(0,@RpCode1,#RPTYPZ)
 E(0,@RpAmt1,#RPAMTZ)
-,s))
+,$))
+C(3,#RPTYPZ2,0,$,E(0,@RpFacmNo2,#RP_FACMNO))
 
 ! AML姓名
 #RP_AmlCheckName=x,100,S
@@ -662,7 +664,7 @@ C(3,#RpCode{i},90,C(1,#RpAmt{i},E(0,0),E(0,0),$),$)
 IF(#DF1=={i},INVOKEJS(SHOW,grd9_{i},1),
 IF(#GRD_SKFG{i}==1&&#RpAmt{z}>0&&#RPTOTF{z}>0,
      IF(#RPFG==1,E(0,@RpCode{i},90),$)
-     IF(#RPFG==2,E(0,@RpCode{i},90),$)
+     IF(#RPFG==2,IF(#DF2=={i},C(3,#RPTYPZ2,0,E(0,@RpCode{i},90),E(0,@RpCode{i},#RPTYPZ2)),E(0,@RpCode{i},90)),$)
      IF(#RPFG==3,E(0,@RpCode{i},93),$)
      IF(#RPFG==1||#RPFG==2||#RPFG==3||#RPFG==6||#RPFG==7,
         IF(#RPTOTF{z}>0,INVOKEJS(SHOW,grd9_{i},1)CALL(#COL_DIS_CALL{i}),INVOKEJS(SHOW,grd9_{i},0))
@@ -680,6 +682,7 @@ C(3,#RP_IND,1,IF(#RpCode{i}==90||#RpCode{i}==91||#RpCode{i}==95,$,CALL(#RPTOT_DI
 C(3,#RP_IND,1,IF(#RpCode{i}==90||#RpCode{i}==91||#RpCode{i}==95,$,$),$)
 CALL(#RPTOTBALX{i})
 IF(#RPFG==7,IF(#RPTOTF{z}>0,$,s),$)
+IF(#RpCode{i}<90,s,$)
 @
 IF(#RpAmt{i}>0,
   IF(#RPFG==1||#RPFG==2,

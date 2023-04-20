@@ -1122,8 +1122,11 @@ C(3,#CaseCloseCode,6,E(0,@RPFG,2),$)
 #TMPRPTYP=X,1,S
 ! IF(#CaseCloseCode==1 || #CaseCloseCode==2,E(0,@RPTYPZ,91),E(0,@RPTYPZ,#L492aRepayCode))
 C(3,#L492aRepayCode,0,E(0,@RPTYPZ,90),E(0,@RPTYPZ,#L492aRepayCode))
+C(3,#L492aRepayCode,0,
 IF(#CaseCloseCode==1,E(0,@RPTYPZ,95),$)
-IF(#CaseCloseCode==2,E(0,@RPTYPZ,91),$)
+IF(#CaseCloseCode==2,E(0,@RPTYPZ,91),$),
+IF(#CaseCloseCode==1,E(0,@RPTYPZ2,95),$)
+IF(#CaseCloseCode==2,E(0,@RPTYPZ2,91),$))
 
 !Principal,本金
 !Interest,利息

@@ -210,8 +210,7 @@ public class L4211Report extends MakeReport {
 				.ascString("DetailSeq").ascString("AcSeq").getList();
 
 		fnAllList3 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
-				.ascString("SortingForSubTotal").ascString("EntryDate").ascString("CustNo").ascString("DetailSeq")
-				.ascString("AcSeq").getList();
+				.ascString("EntryDate").ascString("CustNo").ascString("DetailSeq").ascString("AcSeq").getList();
 
 		makePdf(fnAllList1, fnAllList2, fnAllList3, false, titaVo);
 	}
@@ -261,8 +260,7 @@ public class L4211Report extends MakeReport {
 				.ascNumber("DetailSeq").ascString("AcSeq").getList();
 
 		fnAllList3 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
-				.ascString("SortingForSubTotal").ascString("EntryDate").ascString("CustNo").ascNumber("DetailSeq")
-				.ascString("AcSeq").getList();
+				.ascString("EntryDate").ascString("CustNo").ascNumber("DetailSeq").ascString("AcSeq").getList();
 
 		makePdf(fnAllList1, fnAllList2, fnAllList3, false, titaVo);
 	}
@@ -549,9 +547,9 @@ public class L4211Report extends MakeReport {
 
 			if (!scode.equals(tfnAllList.get("DetailSeq"))) { // 匯款序號不同 印匯款金額
 				this.print(0, c2, tfnAllList.get("DetailSeq"), "C");// 匯款序號
-			
+
 				if (!"L4211".equals(txCode)) {
-					this.print(0, c3, formatAmt(new BigDecimal(tfnAllList.get("RepayAmt")),0), "R");// 匯款金額
+					this.print(0, c3, formatAmt(new BigDecimal(tfnAllList.get("RepayAmt")), 0), "R");// 匯款金額
 				}
 
 				if ("L4211".equals(txCode)) {
@@ -564,12 +562,10 @@ public class L4211Report extends MakeReport {
 						this.print(0, c3, formatAmt(TxAmtMap.get(tmp), 0), "R");// 匯款金額
 					}
 				}
-				
 
 				scode = tfnAllList.get("DetailSeq");
 
 			}
-
 
 			this.print(0, c4, dfMakeferAmt, "R");// 作帳金額
 			String custNo = tfnAllList.get("CustNo");
@@ -909,7 +905,7 @@ public class L4211Report extends MakeReport {
 				this.print(0, c2, tfnAllList.get("DetailSeq"), "C");// 匯款序號
 
 				if (!"L4211".equals(txCode)) {
-					this.print(0, c3, formatAmt(new BigDecimal(tfnAllList.get("RepayAmt")),0), "R");// 匯款金額
+					this.print(0, c3, formatAmt(new BigDecimal(tfnAllList.get("RepayAmt")), 0), "R");// 匯款金額
 				}
 
 				if ("L4211".equals(txCode)) {
@@ -923,12 +919,10 @@ public class L4211Report extends MakeReport {
 					}
 
 				}
-				
 
 				scode = tfnAllList.get("DetailSeq");
 
 			}
-
 
 			this.print(0, c4, dfMakeferAmt, "R");// 作帳金額
 			String custNo = tfnAllList.get("CustNo");
@@ -1205,27 +1199,27 @@ public class L4211Report extends MakeReport {
 
 //						pageCnt = pageCnt + 2;
 //
-						totalsumTransferAmt = totalsumTransferAmt.add(allsumTransferAmt);
-						totalsumMakerferAmt = totalsumMakerferAmt.add(allsumMakeferAmt);
-						totalsumPrincipal = totalsumPrincipal.add(allsumPrincipal);
-						totalsumInterest = totalsumInterest.add(allsumInterest);
-						totalsumPayment = totalsumPayment.add(allsumPayment);
-						totalsumDamages = totalsumDamages.add(allsumDamages);
-						totalsumTemporaryLoan = totalsumTemporaryLoan.add(allsumTemporaryLoan);
-						totalsumCollection = totalsumCollection.add(allsumCollection);
-						totalsumShortPayment = totalsumShortPayment.add(allsumShortPayment);
-						totalsumOthers = totalsumOthers.add(allsumOthers);
+					totalsumTransferAmt = totalsumTransferAmt.add(allsumTransferAmt);
+					totalsumMakerferAmt = totalsumMakerferAmt.add(allsumMakeferAmt);
+					totalsumPrincipal = totalsumPrincipal.add(allsumPrincipal);
+					totalsumInterest = totalsumInterest.add(allsumInterest);
+					totalsumPayment = totalsumPayment.add(allsumPayment);
+					totalsumDamages = totalsumDamages.add(allsumDamages);
+					totalsumTemporaryLoan = totalsumTemporaryLoan.add(allsumTemporaryLoan);
+					totalsumCollection = totalsumCollection.add(allsumCollection);
+					totalsumShortPayment = totalsumShortPayment.add(allsumShortPayment);
+					totalsumOthers = totalsumOthers.add(allsumOthers);
 
-						allsumTransferAmt = BigDecimal.ZERO;
-						allsumMakeferAmt = BigDecimal.ZERO;
-						allsumPrincipal = BigDecimal.ZERO;
-						allsumInterest = BigDecimal.ZERO;
-						allsumPayment = BigDecimal.ZERO;
-						allsumDamages = BigDecimal.ZERO;
-						allsumTemporaryLoan = BigDecimal.ZERO;
-						allsumCollection = BigDecimal.ZERO;
-						allsumShortPayment = BigDecimal.ZERO;
-						allsumOthers = BigDecimal.ZERO;
+					allsumTransferAmt = BigDecimal.ZERO;
+					allsumMakeferAmt = BigDecimal.ZERO;
+					allsumPrincipal = BigDecimal.ZERO;
+					allsumInterest = BigDecimal.ZERO;
+					allsumPayment = BigDecimal.ZERO;
+					allsumDamages = BigDecimal.ZERO;
+					allsumTemporaryLoan = BigDecimal.ZERO;
+					allsumCollection = BigDecimal.ZERO;
+					allsumShortPayment = BigDecimal.ZERO;
+					allsumOthers = BigDecimal.ZERO;
 //					}
 
 				}
@@ -1265,7 +1259,7 @@ public class L4211Report extends MakeReport {
 			if (!scode.equals(tfnAllList.get("DetailSeq"))) { // 匯款序號不同 印匯款金額
 				this.print(0, c2, tfnAllList.get("DetailSeq"), "C");// 匯款序號
 				if (!"L4211".equals(txCode)) {
-					this.print(0, c3, formatAmt(new BigDecimal(tfnAllList.get("RepayAmt")),0), "R");// 匯款金額
+					this.print(0, c3, formatAmt(new BigDecimal(tfnAllList.get("RepayAmt")), 0), "R");// 匯款金額
 				}
 				if ("L4211".equals(txCode)) {
 					tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo").substring(0, 7)),
@@ -1277,13 +1271,9 @@ public class L4211Report extends MakeReport {
 					}
 				}
 
-				
-
 				scode = tfnAllList.get("DetailSeq");
 
 			}
-
-	
 
 			this.print(0, c4, dfMakeferAmt, "R");// 作帳金額
 			String custNo = tfnAllList.get("CustNo");

@@ -148,9 +148,6 @@ public class L4101 extends TradeBuffer {
 					lBankRemit.add(t);
 				}
 			}
-			if (lBankRemit.size() == 0) {
-				throw new LogicException(titaVo, "E0001", "查無資料");
-			}
 
 			if (unReleaseCnt > 0) {
 
@@ -163,31 +160,21 @@ public class L4101 extends TradeBuffer {
 			}
 
 //			[是否檢核未放行]為Y時 , 若有未放行資料，則提示訊息 不出媒體檔 顯示未放行清單
-			if ("Y".equals(titaVo.get("ReleaseCheck"))) {
-				if (unReleaseCnt > 0) {
-					this.totaA.setWarnMsg("有未放行資料不產生媒體檔");
-					this.addList(totaA);
-				} else {
-
-					// 執行交易
-					// 更新批號
+			if ("Y".equals(titaVo.get("ReleaseCheck")) && unReleaseCnt > 0) {
+				this.totaA.setWarnMsg("有未放行資料不產生媒體檔");
+				this.addList(totaA);
+			} else {
+				// 執行交易
+				// 更新批號
+				if (lBankRemit.size() > 0) {
 					newBatchNo = this.updBatchNo(batchNo, titaVo);
 					this.info("batchNo = " + batchNo);
 					this.info("titaVo = " + titaVo.toString());
 					MySpring.newTask("L4101Batch", this.txBuffer, titaVo);
-
 					this.totaWarnMsg.setWarnMsg("背景作業中,待處理完畢訊息通知");
+				} else {
+					throw new LogicException(titaVo, "E0001", "查無資料");
 				}
-			} else {
-
-				// 執行交易
-				// 更新批號
-				newBatchNo = this.updBatchNo(batchNo, titaVo);
-				this.info("batchNo = " + batchNo);
-				this.info("titaVo = " + titaVo.toString());
-				MySpring.newTask("L4101Batch", this.txBuffer, titaVo);
-
-				this.totaWarnMsg.setWarnMsg("背景作業中,待處理完畢訊息通知");
 			}
 			this.addList(this.totaWarnMsg);
 			totaVo.put("OBatchNo", newBatchNo);
