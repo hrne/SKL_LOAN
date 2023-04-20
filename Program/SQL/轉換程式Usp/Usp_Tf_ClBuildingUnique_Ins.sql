@@ -20,6 +20,13 @@ BEGIN
 
     -- -- 寫入資料 (舊擔保品編號檔)
     INSERT INTO "ClBuildingUnique"
+    WITH GDTP AS (
+      SELECT GDRID1
+           , GDRID2
+           , GDRNUM
+           , ESTVAL
+      FROM LA$GDTP
+    )
     SELECT CASE
              WHEN S1."GDRMRK" = 1 
              THEN 'Y'
@@ -67,6 +74,10 @@ BEGIN
                                       WHEN "LGTSAM" != 0
                                       THEN 0
                                     ELSE 1 END -- 2022-10-31 Wei 原本已設定金額大小反序，現在僅比較設定金額有值及無值 
+                                  , CASE
+                                      WHEN GDTP.ESTVAL != 0
+                                      THEN 0
+                                    ELSE 1 END -- 2023-04-20 Wei 鑑價總值有值優先
                                   , "LMSAPN" DESC -- 2022-03-10 Wei
                                   , "GDRID1"
                                   , "GDRID2"
@@ -77,7 +88,10 @@ BEGIN
                      , "GDRID2"
                      , "GDRNUM"
                      , "LGTSEQ"
-               FROM "TmpLA$HGTP"
+               FROM "TmpLA$HGTP" HGTP
+               LEFT JOIN GDTP ON GDTP.GDRID1 = HGTP.GDRID1
+                             AND GDTP.GDRID2 = HGTP.GDRID2
+                             AND GDTP.GDRNUM = HGTP.GDRNUM
               ) S4 ON S4."GroupNo" = S1."GroupNo"
                   AND S4."SecGroupNo" = S1."SecGroupNo"
                   AND S4."Seq" = 1

@@ -332,15 +332,8 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		// -- L9110 法人Query(火險)
 		String sql = "";
-		sql += " SELECT ROW_NUMBER() OVER (PARTITION BY CF.\"ApproveNo\"";
-		sql += "                                  , CF.\"ClCode1\" ";
-		sql += "                                  , CF.\"ClCode2\" ";
-		sql += "                                  , CF.\"ClNo\" ";
-		sql += "                           ORDER BY CF.\"ClCode1\" ";
-		sql += "                                  , CF.\"ClCode2\" ";
-		sql += "                                  , CF.\"ClNo\" ";
-		sql += "                          )   AS SEQ "; // -- 序號
-		sql += "      , IR.\"NowInsuNo\"      AS \"NowInsuNo\" "; // -- 保單號碼
+		sql += " SELECT   ";
+		sql += "        IR.\"NowInsuNo\"      AS \"NowInsuNo\" "; // -- 保單號碼
 		sql += "      , IR.\"FireInsuAmt\"    AS \"FireInsuAmt\" "; // -- 火險金額
 		sql += "      , IR.\"InsuStartDate\"  AS \"InsuStartDate\" "; // -- 保險起日
 		sql += "      , IR.\"InsuEndDate\"    AS \"InsuEndDate\" "; // -- 保險迄日

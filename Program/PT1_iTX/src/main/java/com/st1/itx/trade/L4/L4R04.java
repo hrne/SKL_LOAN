@@ -72,7 +72,7 @@ public class L4R04 extends TradeBuffer {
 			tBankRmtfId.setBatchNo(tDetail.getBatchNo());
 			tBankRmtfId.setDetailSeq(tDetail.getDetailSeq());
 		}
-		tBankRmtf = bankRmtfService.findById(tBankRmtfId);
+		tBankRmtf = bankRmtfService.findById(tBankRmtfId, titaVo);
 
 		if (tBankRmtf == null) {
 			throw new LogicException(titaVo, "E0001", " 查無資料");
@@ -91,6 +91,11 @@ public class L4R04 extends TradeBuffer {
 		this.totaVo.putParam("L4r04Balance", tBankRmtf.getBalance());
 		this.totaVo.putParam("L4r04RemintBank", tBankRmtf.getRemintBank());
 		this.totaVo.putParam("L4r04TraderInfo", tBankRmtf.getTraderInfo());
+		this.totaVo.putParam("L4r04TitaEntdy", tBankRmtf.getTitaEntdy());
+		this.totaVo.putParam("L4r04TitaTlrNo", tBankRmtf.getTitaTlrNo());
+		this.totaVo.putParam("L4r04TitaTxtNo", tBankRmtf.getTitaTxtNo().isEmpty() ? ""
+				: parse.IntegerToString(parse.stringToInteger(tBankRmtf.getTitaTxtNo()), 8));
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

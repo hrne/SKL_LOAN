@@ -279,13 +279,11 @@ public class L6403Batch extends TradeBuffer {
 //		this.info("L6403 > InserOnetAuthority = " + AuthNo + "/" + TranNo + "/" + CanFg + "/" + InqFg);
 		TxAuthority tTxAuthority = new TxAuthority();
 		int AuthFg = 0;
-		if ("V".equals(InqFg)) {
+		
+		if ("V".equals(InqFg)) 
 			AuthFg = 1;
-		} else if ("V".equals(CanFg)) {
+		if ("V".equals(CanFg)) 
 			AuthFg = 2;
-		} else {
-			AuthFg = 0;
-		}
 
 		TxTranCode txTranCode = sTxTranCodeService.findById(TranNo, titaVo);
 		if (txTranCode != null) {

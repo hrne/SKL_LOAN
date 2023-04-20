@@ -73,6 +73,10 @@ public class L4R09 extends TradeBuffer {
 			this.totaVo.putParam("L4r09CustNm", tBatxOthers.getCustNm());
 			this.totaVo.putParam("L4r09RvNo", tBatxOthers.getRvNo());
 			this.totaVo.putParam("L4r09Note", tBatxOthers.getNote());
+
+			this.totaVo.putParam("L4r09TitaEntdy", tBatxOthers.getTitaEntdy());
+			this.totaVo.putParam("L4r09TitaTlrNo", tBatxOthers.getTitaTlrNo());
+			this.totaVo.putParam("L4r09TitaTxtNo", tBatxOthers.getTitaTxtNo());
 		} else {
 			throw new LogicException(titaVo, "E0001", " 查無資料");
 		}

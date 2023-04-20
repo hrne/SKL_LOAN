@@ -288,7 +288,7 @@ public class L3230 extends TradeBuffer {
 		}
 		// 訂正放款交易內容檔by交易
 		if (titaVo.isHcodeErase()) {
-			//此段訂正點調原先程式,改為比照L3210訂正?? 2023/3/8修改,待確認
+			// 此段訂正點調原先程式,改為比照L3210訂正?? 2023/3/8修改,待確認
 			Slice<LoanBorTx> slLoanBortx = loanBorTxService.acDateTxtNoEq(titaVo.getOrgEntdyI() + 19110000,
 					titaVo.getOrgKin(), titaVo.getOrgTlr(), titaVo.getOrgTno(), 0, Integer.MAX_VALUE, titaVo);
 			this.lLoanBorTx = slLoanBortx == null ? null : slLoanBortx.getContent();
@@ -350,10 +350,8 @@ public class L3230 extends TradeBuffer {
 				ba.setAcctAmt(BigDecimal.ZERO); // 出帳金額
 				// 暫收款：可出帳餘額(不吻合帳戶別清零)、費用：未出帳餘額
 				ba.setAcAmt(BigDecimal.ZERO);
-				if ((ba.getDataKind() == 3 && iTempReasonCode == 1)
-						|| (iTempReasonCode == 1 && ba.getAcctCode().equals("TLD"))
+				if ((iTempReasonCode == 1 && ba.getDataKind() == 3)
 						|| (iTempReasonCode == 2 && ba.getAcctCode().substring(0, 2).equals("T1"))
-						|| (iTempReasonCode == 3 && ba.getAcctCode().substring(0, 2).equals("T2"))
 						|| (iTempReasonCode == 4 && ba.getAcctCode().equals("TAM"))) {
 					ba.setAcAmt(ba.getUnPaidAmt());
 				}
@@ -520,7 +518,7 @@ public class L3230 extends TradeBuffer {
 			acDetail.setCustNo(iRpCustNo);
 			acDetail.setSumNo("094");
 			acDetail.setTxAmt(iRpAmt);
-			//由債協專戶入一般債權TAV 
+			// 由債協專戶入一般債權TAV
 			if (iCustNo == this.txBuffer.getSystemParas().getNegDeptCustNo()
 					&& iRpCustNo != this.txBuffer.getSystemParas().getLoanDeptCustNo()) {
 				if (acNegCom.getAcctCode(iRpCustNo, titaVo).equals("TAV")) {
@@ -531,7 +529,7 @@ public class L3230 extends TradeBuffer {
 					acDetail.setAcctCode("TAV");
 					acDetail.setSumNo("092");
 					acDetail.setSlipNote("一般債權");
-					acDetail.setJsonFields(tempVo.getJsonString());//記錄實際借款人戶號對應之匯款人戶號
+					acDetail.setJsonFields(tempVo.getJsonString());// 記錄實際借款人戶號對應之匯款人戶號
 				}
 			}
 			lAcDetail.add(acDetail);

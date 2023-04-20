@@ -31,7 +31,6 @@ import com.st1.itx.db.service.springjpa.cm.L9110ServiceImpl;
 import com.st1.itx.util.common.AuthLogCom;
 import com.st1.itx.util.common.EmployeeCom;
 import com.st1.itx.util.common.MakeReport;
-import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -50,7 +49,7 @@ public class L9110Report extends MakeReport {
 	private String brno = "";
 	private String reportCode = "L9110";
 	private String reportItem = "首次撥款審核資料表";
-//	private String security = "機密";
+	private String security = "機密";
 	private String pageSize = "A4";
 	private String pageOrientation = "L";
 
@@ -847,12 +846,8 @@ public class L9110Report extends MakeReport {
 	public void makePdf(TitaVo titaVo, TotaVo totaVo) throws LogicException {
 		// 名稱固定為查詢的第一筆額度編號
 		String fileReportItem = reportItem.concat(titaVo.getParam("APPLNO1"));
-		
-		ReportVo reportVo = ReportVo.builder().setBrno(brno).setRptDate(reportDate)
-				.setRptCode(reportCode).setRptItem(fileReportItem).setRptSize(pageSize)
-				.setPageOrientation(pageOrientation).build();
-		this.open(titaVo, reportVo);
-//		this.open(titaVo, reportDate, brno, reportCode, fileReportItem, security, pageSize, pageOrientation);
+
+		this.open(titaVo, reportDate, brno, reportCode, fileReportItem, security, pageSize, pageOrientation);
 		this.setCharSpaces(0);
 
 		// 2022-06-17 Wei:應珮琪要求照AS400畫面增加欄位"列印條件選擇"
@@ -1141,7 +1136,7 @@ public class L9110Report extends MakeReport {
 		this.print(-2, 1, "報　表：" + this.getRptCode());
 
 		int rpad = 18;
-		this.print(-1, newBorder.length() - rpad, "機密等級：" + this.getSecurity());
+		this.print(-1, newBorder.length() - rpad, "機密等級：" + this.security);
 		this.print(-2, newBorder.length() - rpad, "日　　期：" + showBcDate(this.nowDate, 1));
 		this.print(-3, newBorder.length() - rpad, "時　　間：" + showTime(this.nowTime));
 		this.print(-4, newBorder.length() - rpad, "頁　　數：" + this.getNowPage());
@@ -1175,17 +1170,17 @@ public class L9110Report extends MakeReport {
 		 * --------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6-----
 		 * -----------123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345
 		 */
-		this.print(1, 5, " 序號　保單號碼　　　　　　　 火險金額        地震險金額      保險起日　 保險迄日　 保險公司");
+		this.print(1, 5, " 保單號碼　　　　　　　 火險金額        地震險金額      保險起日　 保險迄日　 保險公司");
 		this.print(1, 5,
 				"------------------------------------------------------------------------------------------------------------");
 		for (Map<String, String> mInsu : listInsuQuery) {
-			this.print(1, 8, mInsu.get("F0"), "R");
-			this.print(0, 12, mInsu.get("F1"));
-			this.print(0, 43, formatAmt(mInsu.get("FireInsuAmt"), 0), "R");
-			this.print(0, 61, formatAmt(mInsu.get("EarthInsuAmt"), 0), "R");
-			this.print(0, 67, this.showRocDate(mInsu.get("F3"), 1));
-			this.print(0, 78, this.showRocDate(mInsu.get("F4"), 1));
-			this.print(0, 89, mInsu.get("F5"));
+//			this.print(1, 8, mInsu.get("F0"), "R");
+			this.print(1, 6, mInsu.get("F0"));
+			this.print(0, 37, formatAmt(mInsu.get("FireInsuAmt"), 0), "R");
+			this.print(0, 55, formatAmt(mInsu.get("EarthInsuAmt"), 0), "R");
+			this.print(0, 61, this.showRocDate(mInsu.get("F2"), 1));
+			this.print(0, 72, this.showRocDate(mInsu.get("F3"), 1));
+			this.print(0, 83, mInsu.get("F4"));
 		}
 	}
 
@@ -1208,9 +1203,9 @@ public class L9110Report extends MakeReport {
 		 * ------123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345
 		 */
 		checkSpace(4);
-		print(1, 5, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　（坪）　　　  （仟）　　　 （仟）");
-		print(1, 5, "擔保品編號　　提供人　　　　　　　　　　　土地坐落　　　　　　　　　　　　　　　　　　　　　　　年度　　　擔保品別 　　　　面積 　　　　  核貸　　　　 設定");
-		print(1, 5, "－－－－－－　－－－－－－－－－－－－－　－－－－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－　－－－－－　－－－－－－　－－－－－－");
+		print(1, 5, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　（坪）　　　　（仟）　　　（仟）");
+		print(1, 5, "擔保品編號　　提供人　　　　　　　　　　　土地坐落　　　　　　　　　　　　　　　　　　　　　　擔保品別　　　　面積　　　　核貸　　　　設定　");
+		print(1, 5, "－－－－－－　－－－－－－－－－－－－－　－－－－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－　－－－－－　－－－－－－");
 
 		int clsize = 0;
 		clsize = listLandQuery.size();
@@ -1261,27 +1256,28 @@ public class L9110Report extends MakeReport {
 				this.warn(thisApplNo + "'s land " + mLand.get("F0") + " got a wrong F7 input, " + e);
 			}
 
-			this.print(0, 107, f7, "R"); // 年度 11/11會議決議刪除12/1會議加回來
-			this.print(0, 121, mLand.get("F17"), "R"); // 擔保品別
-			BigDecimal Area = new BigDecimal(mLand.get("F6")).multiply(ownerPartTotal);
-			this.print(0, 133, formatAmt(Area, 2), "R"); // 面積
+//			this.print(0, 107, f7, "R"); // 年度 11/11會議決議刪除12/1會議加回來,2023/4/17 QC2367再刪除
 //			this.print(0, 123, formatAmt(mLand.get("F8"), 0), "R"); // 前次移轉  11/11會議決議刪除
 //			this.print(0, 135, formatAmt(computeDivide(getBigDecimal(mLand.get("F9")), thousand, 0), 0), "R"); // 鑑定單價  11/11會議決議刪除
-			this.print(0, 147, formatAmt(loanAmt, 0), "R"); // 核貸
-			this.print(0, 161, formatAmt(settingAmt, 0), "R"); // 設定
+
+			this.print(0, 107, mLand.get("F17"), "R"); // 擔保品別
+			BigDecimal Area = new BigDecimal(mLand.get("F6")).multiply(ownerPartTotal);
+			this.print(0, 121, formatAmt(Area, 2), "R"); // 面積
+			this.print(0, 133, formatAmt(loanAmt, 0), "R"); // 核貸
+			this.print(0, 147, formatAmt(settingAmt, 0), "R"); // 設定
 			totalSettingAmt = totalSettingAmt.add(getBigDecimal(mLand.get("F10")));
 
 			totalArea = totalArea.add(Area);
 //			totalLastTransferred = totalLastTransferred.add(getBigDecimal(mLand.get("F8")));
 		}
 		checkSpace(2);
-		print(1, 5, "－－－－－－　－－－－－－－－－－－－－　－－－－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－　－－－－－　－－－－－－　－－－－－－");
+		print(1, 5, "－－－－－－　－－－－－－－－－－－－－　－－－－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－　－－－－－　－－－－－－");
 		print(1, 5, "土地合計：");
-		print(0, 133, formatAmt(totalArea, 2), "R"); // 合計-面積
+		print(0, 121, formatAmt(totalArea, 2), "R"); // 合計-面積
 //		print(0, 123, formatAmt(totalLastTransferred, 0), "R"); // 合計-前次移轉
 		// 2022-04-25 智偉:改為不顯示加總的設定金額
-		print(0, 147, formatAmt(loanAmttotal, 0), "R"); // 合計-設定
-		print(0, 161, formatAmt(settingAmttotal, 0), "R"); // 合計-設定
+		print(0, 133, formatAmt(loanAmttotal, 0), "R"); // 合計-核貸
+		print(0, 147, formatAmt(settingAmttotal, 0), "R"); // 合計-設定
 	}
 
 	/**

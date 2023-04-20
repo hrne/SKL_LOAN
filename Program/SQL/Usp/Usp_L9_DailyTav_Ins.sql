@@ -44,7 +44,8 @@ BEGIN
            , MAX("LastUpdate")      AS "LastUpdate"
            , MAX("LastUpdateEmpNo") AS "LastUpdateEmpNo"
       FROM "AcReceivable"
-      WHERE "AcctCode" IN ('TAV','TLD')
+      WHERE "AcctCode" IN ('TAV')
+      -- 2023-04-20 Wei 修改 from Lai : 暫收款不分TLD
       GROUP BY "AcctCode"
              , "CustNo"
              , "FacmNo"

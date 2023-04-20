@@ -36,7 +36,6 @@ public class L3R05 extends TradeBuffer {
 	Parse parse;
 
 	private ArrayList<BaTxVo> baTxList = new ArrayList<BaTxVo>();
-	private BigDecimal oExcessive = BigDecimal.ZERO;
 	private BigDecimal oExcessiveAll = BigDecimal.ZERO;
 
 	@Override
@@ -63,8 +62,7 @@ public class L3R05 extends TradeBuffer {
 		baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, iFacmNo, 0, iTempItemCode == 6 ? 96 : 0,
 				BigDecimal.ZERO, titaVo);
 
-		if (iTempReasonCode == 1 && iCustNo != this.txBuffer.getSystemParas().getLoanDeptCustNo()) {
-
+		if (iTempReasonCode == 1) {
 			wkTmpFacmNoX = baTxCom.getTmpFacmNoX();
 			wkTempAmt = baTxCom.getExcessive();
 			oExcessiveAll = baTxCom.getExcessive().add(baTxCom.getExcessiveOther());
@@ -76,9 +74,7 @@ public class L3R05 extends TradeBuffer {
 					ba.setAcctAmt(BigDecimal.ZERO);
 				}
 				for (BaTxVo ba : this.baTxList) {
-					if (iTempReasonCode == 1 && ba.getAcctCode().equals("TLD")
-							|| (iTempReasonCode == 2 && ba.getAcctCode().substring(0, 2).equals("T1"))
-							|| (iTempReasonCode == 3 && ba.getAcctCode().substring(0, 2).equals("T2"))
+					if ((iTempReasonCode == 2 && ba.getAcctCode().substring(0, 2).equals("T1"))
 							|| (iTempReasonCode == 4 && ba.getAcctCode().equals("TAM"))) {
 						wkTempAmt = wkTempAmt.add(ba.getUnPaidAmt());
 					}

@@ -45,7 +45,8 @@ K(MODIFYBUTTON,查詢)
 <sub type="DC" name="L4921" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
 [
 ["[L4921]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@其他還款來源建檔查詢"],
-[#<->#,"#FdAcDate+會計日期",#AcDate],
+[#<->#,"#FdAcDate+資料日期",#AcDateS,#AcDateE,"(會計日)"],
+[#<->#,"#FdCustNo+戶號",#CustNo],
 [#<->#,"#FdBatchNo+整批批號",#BatchNo,"空白:全部"],
 [#<->#,"#FdRepayCode+還款來源",#RepayCode,#RepayCodeX],
 [#<->#,"#FdCreateEmpNo+建檔經辦",#CreateEmpNo,"空白:全部"],
@@ -53,6 +54,7 @@ K(MODIFYBUTTON,查詢)
 
 #FdAcDate=X,2,L
 T(3,*)
+#FdCustNo=X,2,L
 #FdBatchNo=X,2,L
 #FdRepayCode=X,2,L
 T(3,*)
@@ -86,10 +88,18 @@ T(2,1)
 T(4,CHAIN$) 
 
 ! 會計日期
-#AcDate=D,7,I
+#AcDateS=D,7,I
 E(0,#SYSDATE)
 @
-V(7)A(DATE,0,#AcDate)
+V(7)A(DATE,0,#AcDateS)
+
+#AcDateE=D,7,I
+C(3,#AcDateE,0,E(0,#AcDateS),$)
+@
+V(7)A(DATE,0,#AcDateE)
+IF(#AcDateE<#AcDateS,V(P,不可小於會計起日),$))
+
+#CustNo=A,7,I
 
 ! 處理批號
 #BatchNo=X,6,I
@@ -196,27 +206,37 @@ T(3,)T(H,#OORepayType,#RepayTypeHelp)
 #OOCustNm=X,100,O
 ! 摘要
 #OORemark=X,60,O
-! 按鈕顯示註記 1顯示，0不顯示
-#OOBtnFlag=A,1,O
 
-#OProcStsCodeX=X,6,O
-T(3,)
-C(3,#OOBtnFlag,0,T(2,已入帳),$)
-C(3,#OOBtnFlag,2,T(2,已刪除),$)
-
+#OOTitaEntdy=D,7,L
+#OOTitaTlrNo=X,6,L
+#OOTitaTxtNo=A,8,L
+#OOChainAcDate=D,7,L
+#OOChainBatchNo=X,6,L
+#OOChainDetailSeq=A,6,L
+#OOChainFlag=X,1,L
+#OODeleteFlag=X,1,L
+#OOModifyFlag=X,1,L
 
 #OOBUF_EDIT=X,20,S
 T(2,2+#OOAcDate+#OOBatchNo+#OODetailSeq)
 #OOBUF_DELETE=X,20,S
 T(2,4+#OOAcDate+#OOBatchNo+#OODetailSeq)
+#OOBUF_Seatch=X,20,S
+T(2,5+#OOAcDate+#OOBatchNo+#OODetailSeq)
+#OOBUF_Remit=X,20,S
+T(2,5+#OOChainAcDate+#OOChainBatchNo+#OOChainDetailSeq)
 
 #OOBTN_Edit=A,2,O
-C(3,#OOBtnFlag,0,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L4210; ntxbuf=#OOBUF_EDIT}))
-C(3,#OOBtnFlag,2,BIND(grid,cancel),$)
-#OOBTN_Delete=A,2,O
-C(3,#OOBtnFlag,0,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L4210; ntxbuf=#OOBUF_DELETE}))
-C(3,#OOBtnFlag,2,BIND(grid,cancel),$)
+C(5,#OOModifyFlag,N,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L4210; ntxbuf=#OOBUF_EDIT}))
 
+#OOBTN_Delete=A,2,O
+C(5,#OODeleteFlag,N,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L4210; ntxbuf=#OOBUF_DELETE}))
+
+#OOBTN_Seatch=A,2,O
+BIND(grid,{ cmd=CHAIN; ntxcd=L4210; ntxbuf=#OOBUF_Seatch})
+#OOBTN_Remit=A,2,O
+BIND(grid,{ cmd=CHAIN; ntxcd=L4201; ntxbuf=#OOBUF_Remit})
+C(5,#OOChainFlag,N,BIND(grid,cancel),$)
 
 
 
@@ -225,7 +245,12 @@ C(3,#OOBtnFlag,2,BIND(grid,cancel),$)
 
 !------ 上行電文 TEXT ------
 <sub type="TIM">
-#AcDate#BatchNo#RepayCode#CreateEmpNo
+#AcDateS
+#AcDateE
+#CustNo
+#BatchNo
+#RepayCode
+#CreateEmpNo
 #END
 </sub>
 
@@ -246,7 +271,15 @@ TXFORM=L4921
 #OOCustNo
 #OOCustNm
 #OORemark
-#OOBtnFlag
+#OOTitaEntdy
+#OOTitaTlrNo
+#OOTitaTxtNo
+#OOChainAcDate
+#OOChainBatchNo
+#OOChainDetailSeq
+#OOChainFlag
+#OODeleteFlag
+#OOModifyFlag
 ^
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
@@ -267,24 +300,20 @@ TXFORM=L4921
 #RPTFG=0,QUERY.GRID
 #any={detail:true, header:'L4921.part',caption:'', width:1080, rowNum:20, rowList:[20,40,60]}
 
-#OOBTN_Edit=
-{search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false,width:65}
-#OOBTN_Delete=
-{search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false,width:65}
-#OOAcDate=會計日期
+#OOBTN_Edit=修改
+{search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false,width:40}
+#OOBTN_Delete=刪除
+{search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false,width:40}
+#OOBTN_Seatch=查詢
+{search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:40}
+#OOBTN_Remit=匯款
+{search:false,formatter:'cust:bind-button:匯款',align:'center',canExport:false,width:40}
+#OOAcDate=資料日期(會計日)
 {width:80,align:'center'}
 #OOBatchNo=批號
 {width:65,align:'center'}
 #OORepayCodeX=來源
 {width:130,align:'center'}
-#OOAcNo=會科
-{width:85,align:'center'}
-#OORepayId=來源統編
-{width:100,align:'center'}
-#OORepayName=來源戶名
-{width:85,align:'center'}
-#OORvNo=銷帳碼
-{width:100,align:'center'}
 #OORepayTypeX=還款類別
 {width:130,align:'center'}
 #OORepayAmt=金額
@@ -293,10 +322,14 @@ TXFORM=L4921
 {width:100,align:'center'}
 #OOCustNm=戶名
 {width:85,align:'center'}
-#OORemark=摘要
-{width:125,align:'center'}
-#OProcStsCodeX=狀態
-{width:125,align:'center'}
+#OOTitaEntdy=會計日期
+{width:80,align:'center'}
+#OOTitaTlrNo=經辦
+{width:85,align:'center'}
+#OOTitaTxtNo=交易序號
+{width:130,align:'center'}
+	
+
 
 ^
 <include src="PRT.icf::INQ04.sel" map="i=L4921;cpi=15"/>

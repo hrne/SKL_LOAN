@@ -96,12 +96,8 @@ BEGIN
          , TMP.LMSTOA                     AS "TavBal"              -- 暫收款餘額 DECIMAL 16 2 
          , TMP."LatestFlag"               AS "LatestFlag"          -- 最新記號 VARCHAR2 1   
          -- 2022-12-08 Wei 增加 from Lai
-         , CASE
-             WHEN TMP.LMSACN = 601776
-             THEN 'T10'
-             WHEN TMP.LMSACN = 610940
-             THEN 'TLD'
-           ELSE 'TAV' END                 AS "AcctCode"
+         -- 2023-04-20 Wei 修改 from Lai : 暫收款不排除610940,601776
+         , 'TAV'                          AS "AcctCode"
          , JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE   
          , '999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
          , JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE   

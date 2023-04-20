@@ -5843,6 +5843,7 @@ TXFORM=L4R32
 #L4R33TraderInfo=X,20,S
 #L4R33AmlRsp=X,1,S
 #L4R33ReconCode=X,3,S
+#L4R33TitaEntdy=D,7,S
 #L4R33TitaTlrNo=X,6,S
 #L4R33TitaTxtNo=X,8,S
 #L4R33CustName=X,100,S
@@ -5864,6 +5865,7 @@ TXFORM=L4R33
 #L4R33TraderInfo
 #L4R33AmlRsp
 #L4R33ReconCode
+#L4R33TitaEntdy
 #L4R33TitaTlrNo
 #L4R33TitaTxtNo
 #L4R33CustName

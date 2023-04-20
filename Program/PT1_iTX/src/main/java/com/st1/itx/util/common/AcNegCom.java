@@ -190,14 +190,14 @@ public class AcNegCom extends TradeBuffer {
 	 * @throws LogicException ...
 	 */
 	public String getAcctCode(int custNo, TitaVo titaVo) throws LogicException {
-// T10  債協暫收款－收款專戶                                601776戶號(前置協商收款專戶)                              
+// TAV  債協暫收款－收款專戶                                601776戶號(前置協商收款專戶)                              
 // T11  債協暫收款－抵繳款                                  案件種類 1:債協                  
 // T12  前調暫收款－抵繳款                                  案件種類 2:調解                  
 // T13  更生暫收款－抵繳款                                  案件種類 3:更生   4:清算                
 		NegMain tNegMain = new NegMain();
 		String acctCode = null;
 		if (custNo == this.txBuffer.getSystemParas().getNegDeptCustNo()) { // 專戶
-			acctCode = "T10";
+			acctCode = "TAV";
 		} else {
 			tNegMain = negMainService.custNoFirst(custNo, titaVo);
 			if (tNegMain == null) {
@@ -244,7 +244,7 @@ public class AcNegCom extends TradeBuffer {
 		int custNo = iCustNo;
 		int facmNo = 0;
 		if (custNo == this.txBuffer.getSystemParas().getNegDeptCustNo())
-			acctCode = "T10"; // 債協暫收款－收款專戶
+			acctCode = "TAV"; // 債協暫收款－收款專戶
 		else {
 			NegMain tNegMain = new NegMain();
 			tNegMain = negMainService.statusFirst("0", iCustNo, titaVo); // 0-正常
@@ -294,7 +294,7 @@ public class AcNegCom extends TradeBuffer {
 		NegMain tNegMain = new NegMain();
 		String acctCode = null;
 		if (custNo == this.txBuffer.getSystemParas().getNegDeptCustNo())
-			acctCode = "T10";
+			acctCode = "TAV";
 		else {
 			tNegMain = negMainService.custNoFirst(custNo, titaVo);
 			if (tNegMain == null)
@@ -349,7 +349,7 @@ public class AcNegCom extends TradeBuffer {
 	 * 
 	 * @param entryDate 入帳日
 	 * @param txAmt     金額
-	 * @param custNo    戶號
+	 * @param iCustNo    戶號
 	 * @param titaVo    TitaVo
 	 * @return TempVo
 	 * @throws LogicException LogicException

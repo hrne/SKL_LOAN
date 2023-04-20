@@ -86,6 +86,7 @@ public class L4R33 extends TradeBuffer {
 			this.totaVo.putParam("L4R33TraderInfo", tBankRmtf.getTraderInfo());
 			this.totaVo.putParam("L4R33AmlRsp", tBankRmtf.getAmlRsp());
 			this.totaVo.putParam("L4R33ReconCode", tBankRmtf.getReconCode());
+			this.totaVo.putParam("L4R33TitaEntdy", tBankRmtf.getTitaEntdy());
 			this.totaVo.putParam("L4R33TitaTlrNo", tBankRmtf.getTitaTlrNo());
 			this.totaVo.putParam("L4R33TitaTxtNo", tBankRmtf.getTitaTxtNo());
 			int iCustNo = tBankRmtf.getCustNo();

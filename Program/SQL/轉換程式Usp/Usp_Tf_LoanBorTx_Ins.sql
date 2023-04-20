@@ -547,6 +547,7 @@ BEGIN
                      ,'F27' -- 聯貸管理費
                      ,'F29' -- 契變手續費
                      ,'F30' -- 呆帳戶法務費墊付
+                     ,'T10','T11','T12','T13' -- 2023-04-18 Wei 增加 from Lai
                      )  
              THEN JL."AcctCode"
            ELSE TO_CHAR(TR1."ACTACT") END          AS "AcctCode" 

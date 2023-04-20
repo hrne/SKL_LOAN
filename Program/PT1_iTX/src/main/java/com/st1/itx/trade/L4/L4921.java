@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.BatxDetail;
@@ -69,47 +70,82 @@ public class L4921 extends TradeBuffer {
 
 		List<BatxOthers> lBatxOthers = new ArrayList<BatxOthers>();
 
-		int adAcDate1 = 0;
-		int adAcDate2 = 0;
-
-		if (parse.stringToInteger(titaVo.getParam("AcDate").trim()) == 0) {
-			adAcDate1 = 0;
-			adAcDate2 = 99991231;
-		} else {
-			adAcDate1 = parse.stringToInteger(titaVo.getParam("AcDate").trim()) + 19110000;
-			adAcDate2 = parse.stringToInteger(titaVo.getParam("AcDate").trim()) + 19110000;
-		}
+		int iAcDateS = parse.stringToInteger(titaVo.getParam("AcDateS")) + 19110000;
+		int iAcDateE = parse.stringToInteger(titaVo.getParam("AcDateE")) + 19110000;
+		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 
 		String strBatchNo = titaVo.getParam("BatchNo").trim();
 		int intRepayCode = parse.stringToInteger(titaVo.getParam("RepayCode").trim());
 		String strCreateEmpNo = titaVo.getParam("CreateEmpNo").trim();
-
-		if ("".equals(strCreateEmpNo) && "99".equals(titaVo.getParam("RepayCode")) && "".equals(strBatchNo)) {
-			sBatxOthers = batxOthersService.searchRuleE(adAcDate1, adAcDate2, this.index, this.limit, titaVo);
-			this.info("flag = E");
-		} else if ("".equals(strCreateEmpNo) && "99".equals(titaVo.getParam("RepayCode"))) {
-			sBatxOthers = batxOthersService.searchRuleA(adAcDate1, adAcDate2, strBatchNo, this.index, this.limit, titaVo);
-			this.info("flag = A");
-		} else if ("99".equals(titaVo.getParam("RepayCode")) && "".equals(strBatchNo)) {
-			sBatxOthers = batxOthersService.searchRuleG(adAcDate1, adAcDate2, strCreateEmpNo, this.index, this.limit, titaVo);
-			this.info("flag = G");
-		} else if ("".equals(strCreateEmpNo) && "".equals(strBatchNo)) {
-			sBatxOthers = batxOthersService.searchRuleF(adAcDate1, adAcDate2, intRepayCode, this.index, this.limit, titaVo);
-			this.info("flag = F");
-		} else if ("".equals(strCreateEmpNo)) {
-			sBatxOthers = batxOthersService.searchRuleB(adAcDate1, adAcDate2, strBatchNo, intRepayCode, this.index, this.limit, titaVo);
-			this.info("flag = B");
-		} else if ("99".equals(titaVo.getParam("RepayCode"))) {
-			sBatxOthers = batxOthersService.searchRuleC(adAcDate1, adAcDate2, strBatchNo, strCreateEmpNo, this.index, this.limit);
-			this.info("flag = C");
-		} else if ("".equals(strBatchNo)) {
-			sBatxOthers = batxOthersService.searchRuleH(adAcDate1, adAcDate2, intRepayCode, strCreateEmpNo, this.index, this.limit, titaVo);
-			this.info("flag = H");
+		if (iCustNo == 0) {
+			if ("".equals(strCreateEmpNo) && "99".equals(titaVo.getParam("RepayCode")) && "".equals(strBatchNo)) {
+				sBatxOthers = batxOthersService.searchRuleE(iAcDateS, iAcDateE, this.index, this.limit, titaVo);
+				this.info("flag = E");
+			} else if ("".equals(strCreateEmpNo) && "99".equals(titaVo.getParam("RepayCode"))) {
+				sBatxOthers = batxOthersService.searchRuleA(iAcDateS, iAcDateE, strBatchNo, this.index, this.limit,
+						titaVo);
+				this.info("flag = A");
+			} else if ("99".equals(titaVo.getParam("RepayCode")) && "".equals(strBatchNo)) {
+				sBatxOthers = batxOthersService.searchRuleG(iAcDateS, iAcDateE, strCreateEmpNo, this.index, this.limit,
+						titaVo);
+				this.info("flag = G");
+			} else if ("".equals(strCreateEmpNo) && "".equals(strBatchNo)) {
+				sBatxOthers = batxOthersService.searchRuleF(iAcDateS, iAcDateE, intRepayCode, this.index, this.limit,
+						titaVo);
+				this.info("flag = F");
+			} else if ("".equals(strCreateEmpNo)) {
+				sBatxOthers = batxOthersService.searchRuleB(iAcDateS, iAcDateE, strBatchNo, intRepayCode, this.index,
+						this.limit, titaVo);
+				this.info("flag = B");
+			} else if ("99".equals(titaVo.getParam("RepayCode"))) {
+				sBatxOthers = batxOthersService.searchRuleC(iAcDateS, iAcDateE, strBatchNo, strCreateEmpNo, this.index,
+						this.limit);
+				this.info("flag = C");
+			} else if ("".equals(strBatchNo)) {
+				sBatxOthers = batxOthersService.searchRuleH(iAcDateS, iAcDateE, intRepayCode, strCreateEmpNo,
+						this.index, this.limit, titaVo);
+				this.info("flag = H");
+			} else {
+				sBatxOthers = batxOthersService.searchRuleD(iAcDateS, iAcDateE, strBatchNo, intRepayCode,
+						strCreateEmpNo, this.index, this.limit, titaVo);
+				this.info("flag = D");
+			}
 		} else {
-			sBatxOthers = batxOthersService.searchRuleD(adAcDate1, adAcDate2, strBatchNo, intRepayCode, strCreateEmpNo, this.index, this.limit, titaVo);
-			this.info("flag = D");
-		}
+			if ("".equals(strCreateEmpNo) && "99".equals(titaVo.getParam("RepayCode")) && "".equals(strBatchNo)) {
+				sBatxOthers = batxOthersService.searchCustNoE(iAcDateS, iAcDateE, iCustNo, this.index, this.limit,
+						titaVo);
+				this.info("CustNoflag = E");
+			} else if ("".equals(strCreateEmpNo) && "99".equals(titaVo.getParam("RepayCode"))) {
+				sBatxOthers = batxOthersService.searchCustNoA(iAcDateS, iAcDateE, iCustNo, strBatchNo, this.index,
+						this.limit, titaVo);
+				this.info("CustNoflag = A");
+			} else if ("99".equals(titaVo.getParam("RepayCode")) && "".equals(strBatchNo)) {
+				sBatxOthers = batxOthersService.searchCustNoG(iAcDateS, iAcDateE, iCustNo, strCreateEmpNo, this.index,
+						this.limit, titaVo);
+				this.info("CustNoflag = G");
+			} else if ("".equals(strCreateEmpNo) && "".equals(strBatchNo)) {
+				sBatxOthers = batxOthersService.searchCustNoF(iAcDateS, iAcDateE, iCustNo, intRepayCode, this.index,
+						this.limit, titaVo);
+				this.info("CustNoflag = F");
+			} else if ("".equals(strCreateEmpNo)) {
+				sBatxOthers = batxOthersService.searchCustNoB(iAcDateS, iAcDateE, iCustNo, strBatchNo, intRepayCode,
+						this.index, this.limit, titaVo);
+				this.info("CustNoflag = B");
+			} else if ("99".equals(titaVo.getParam("RepayCode"))) {
+				sBatxOthers = batxOthersService.searchCustNoC(iAcDateS, iAcDateE, iCustNo, strBatchNo, strCreateEmpNo,
+						this.index, this.limit);
+				this.info("CustNoflag = C");
+			} else if ("".equals(strBatchNo)) {
+				sBatxOthers = batxOthersService.searchCustNoH(iAcDateS, iAcDateE, iCustNo, intRepayCode, strCreateEmpNo,
+						this.index, this.limit, titaVo);
+				this.info("CustNoflag = H");
+			} else {
+				sBatxOthers = batxOthersService.searchCustNoD(iAcDateS, iAcDateE, iCustNo, strBatchNo, intRepayCode,
+						strCreateEmpNo, this.index, this.limit, titaVo);
+				this.info("CustNoflag = D");
+			}
 
+		}
 		lBatxOthers = sBatxOthers == null ? null : sBatxOthers.getContent();
 		int i = 0;
 		if (lBatxOthers != null && lBatxOthers.size() != 0) {
@@ -120,7 +156,6 @@ public class L4921 extends TradeBuffer {
 
 				BatxDetail tBatxDetail = new BatxDetail();
 				BatxDetailId tBatxDetailId = new BatxDetailId();
-				int flag = 1;
 
 				tBatxDetailId.setAcDate(tBatxOthersVO.getAcDate());
 				tBatxDetailId.setBatchNo(tBatxOthersVO.getBatchNo());
@@ -130,13 +165,24 @@ public class L4921 extends TradeBuffer {
 				if (tBatxDetail == null) {
 					continue;
 				}
-				// 0已入帳 不顯示按紐
-				if ("5".equals(tBatxDetail.getProcStsCode()) || "6".equals(tBatxDetail.getProcStsCode()) || "7".equals(tBatxDetail.getProcStsCode())) {
-					flag = 0;
-				}
-				// 2已刪除 刪除控制不顯示兩按紐
-				if ("D".equals(tBatxDetail.getProcStsCode())) {
-					flag = 2;
+
+				// 大額增入帳:若整批入帳檔的大額手工增入帳與匯款轉帳連結序號有值則顯示<匯款>按鈕，連結L4201查詢
+				// RepayCode11Chain
+				TempVo tTempVo = new TempVo();
+				int chainAcDate = 0;
+				String chainBatchNo = "";
+				int chainDetailSeq = 0;
+				String chainFlag = "N";
+				if (tBatxOthersVO.getRepayCode() == 11) {
+					tTempVo = tTempVo.getVo(tBatxDetail.getProcNote());
+					if ((!"".equals(tTempVo.getParam("RepayCode11Chain")))) {
+						String[] thisColumn = tTempVo.getParam("RepayCode11Chain").split("-");
+						chainAcDate = parse.stringToInteger(thisColumn[0]) - 19110000;
+						chainBatchNo = thisColumn[1];
+						chainDetailSeq = parse.stringToInteger(thisColumn[2]);
+						this.info("RepayCode11Chain = " + tTempVo.getParam("RepayCode11Chain"));
+						chainFlag = "Y";
+					}
 				}
 
 				occursList.putParam("OOAcDate", tBatxOthersVO.getAcDate());
@@ -152,7 +198,29 @@ public class L4921 extends TradeBuffer {
 				occursList.putParam("OOCustNo", tBatxOthersVO.getCustNo());
 				occursList.putParam("OOCustNm", tBatxOthersVO.getCustNm());
 				occursList.putParam("OORemark", tBatxOthersVO.getNote());
-				occursList.putParam("OOBtnFlag", flag);
+				occursList.putParam("OOTitaEntdy", tBatxOthersVO.getTitaEntdy());
+				occursList.putParam("OOTitaTlrNo", tBatxOthersVO.getTitaTlrNo());
+				occursList.putParam("OOTitaTxtNo", tBatxOthersVO.getTitaTxtNo());
+				occursList.putParam("OOChainAcDate", chainAcDate);
+				occursList.putParam("OOChainBatchNo", chainBatchNo);
+				occursList.putParam("OOChainDetailSeq", chainDetailSeq);
+				occursList.putParam("OOChainFlag", chainFlag);
+				String modifyFg = "N";
+				String deleteFg = "N";
+
+				if (tBatxOthersVO.getTitaEntdy() == 0) {
+					if (tBatxOthersVO.getAcDate() == titaVo.getEntDyI()) {
+						// 可修改刪除
+						modifyFg = "Y";
+						deleteFg = "Y";
+					} else {
+						modifyFg = "N";
+						deleteFg = "Y";
+						// 可刪除
+					}
+				}
+				occursList.putParam("OOModifyFlag", modifyFg);
+				occursList.putParam("OODeleteFlag", deleteFg);
 				i++;
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);

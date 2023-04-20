@@ -18,7 +18,7 @@ E(0,0)
 <sub type="DC" name="L4201" layout="cols=3;screen.width=[130,370,130,370];printer.width=[20,80];order=1">
 [
 ["[L4201]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@匯款轉帳-明細維護"],
-[#<->#,"@會計日期",#AcDate],
+[#<->#,"@資料日期",#AcDate,"(會計日)"],
 ["@整批批號",#BatchNo],["@明細序號",#DetailSeq],
 [#<->#,"@戶號",#CustNo,#CustName],
 ["@還款類別",#RepayTypeX],["@還款金額",#RepayAmt],
@@ -29,9 +29,9 @@ E(0,0)
 ["@存摺帳號",#DepAcctNo],["@入帳日期",#EntryDate],
 ["@摘要",#DscptCode],["@虛擬帳號",#VirtualAcctNo],
 ["@提款",#WithdrawAmt],["@存款",#DepositAmt],
-[#<->#,"@匯款銀行代碼",#RemintBankX],
-[#<->#,"@交易人資料",#TraderInfo],
-[#<->#,"@還款類別",#RepayTypeA,#RepayTypeAX],
+["@匯款銀行代碼",#RemintBankX],["@會計日期",#TitaEntdy],
+["@交易人資料",#TraderInfo],["@經辦",#TitaTlrNo],
+["@還款類別",#RepayTypeA,#RepayTypeAX],["@交易序號",#TitaTxtNo],
 [#<->#,"@入帳戶號",#CustNoA,"-",#FacmNoA],
 ]
 #BTN_L3921=X,94,I,ui:button;value:回收試算;enable:1;tabbable:0;
@@ -135,11 +135,36 @@ IF(#FuncCode==1 || #FuncCode==2 || #FuncCode==3,E(0,1),E(0,0))
 #BatchNo=X,6,L
 !明細序號
 #DetailSeq=A,6,L
+
+
+#RimFunCode=A,1,S
+
+#RimL4r35A=X,1,S
+C(3,#FuncCode,5,$,s)
+E(0,@RimFunCode,#FuncCode)
+E(0,@RimAcDate,#AcDate)
+T(2,@RimBatchNo,#BatchNo)
+E(0,@RimDetailSeq,#DetailSeq)
+RESET_RIM(#RimL4r35A,L4R35)
+S(L4R35,1,#RimFunCode,#RimAcDate,#RimBatchNo,#RimDetailSeq)
+R(1,L4R35)
+E(0,@CustNo,#L4r35CustNo)
+E(0,@RepayType,#L4r35RepayType)
+E(0,@RepayAmt,#L4r35RepayAmt)
+E(0,@AcctAmt,#L4r35AcctAmt)
+E(0,@DisacctAmt,#L4r35DisacctAmt)
+T(2,@ProcStsCode,#L4r35ProcStsCode)
+T(2,@ProcStsCodeTemp,#L4r35ProcStsCode)
+T(2,@ProcCode,#L4r35ProcCode)
+T(2,@ProcDscptCode,#L4r35ProcDscptCode)
+T(2,@TxSn,#L4r35TxSn)
+E(0,@FacmNoA,#L4r35FacmNoA)
+
+
 !戶號
 #CustNo=A,7,L
 E(0,@RimEntryCode,2)
 
-<include src="ROM.icf::L4R02.dec"/>
 
 #RimCustId=X,10,S
 
@@ -160,14 +185,13 @@ T(2,@CustName,#L4r02CustName)
 !戶名
 #CustName=X,60,L
 
-<include src="ROM.icf::L4R04.dec"/>
 
 ! 會計日期
 #RimAcDate=D,7,S
 ! 整批批號
-#RimBatchNo=X,6,L
+#RimBatchNo=X,6,S
 !明細序號
-#RimDetailSeq=A,6,L
+#RimDetailSeq=A,6,S
 
 #RimL4r04=X,1,S
 E(0,@RimAcDate,#AcDate)
@@ -185,7 +209,9 @@ E(3,@DepositAmt,#L4r04DepositAmt)
 E(3,@Balance,#L4r04Balance)
 T(1,@RemintBank,#L4r04RemintBank,1,3)
 T(2,@TraderInfo,#L4r04TraderInfo)
-
+E(0,@TitaEntdy,#L4r04TitaEntdy)
+T(2,@TitaTlrNo,#L4r04TitaTlrNo)
+T(2,@TitaTxtNo,#L4r04TitaTxtNo)
 
 #RepayType=A,2,L
 !HELP(01:期款;
@@ -218,8 +244,9 @@ T(3,)T(H,#RepayType,#RepayTypeHelp)
 
 #ProcStsCode=X,1,I
 HELP(#ProcStsCodeHelp)
-IF(#RepayAmt < 0,T(F,@ProcStsCode,0),$)
+T(F,@ProcStsCode,0)
 C(3,#UpdateCode,1,$,s)
+IF(#RepayAmt < 0,T(F,@ProcStsCode,0),T(F,@ProcStsCode,1))
 IF(#RepayAmt >= 0,$,s)
 IF(#ProcStsCode == 4 || #ProcStsCode == 3 || #ProcStsCode == 2 || #ProcStsCode == 1 || #ProcStsCode == 0,$,s)
 @
@@ -299,6 +326,12 @@ BIND(#BTN_L3420,click, {cmd=CHAIN; ntxcd=L3420; ntxbuf=#BUF_L3420})
 
 #RemintBankX=X,16,L
 T(3,)T(H,#RemintBank,#BankCdHelp)
+!會計日
+#TitaEntdy=D,7,L
+!經辦
+#TitaTlrNo=X,6,L
+!交易序號
+#TitaTxtNo=X,8,L
 
 !交易人資料
 #TraderInfo=X,40,L
@@ -345,8 +378,10 @@ T(2,#CustNo)
 
 
 
+<include src="ROM.icf::L4R02.dec"/>
+<include src="ROM.icf::L4R35.dec"/>
+<include src="ROM.icf::L4R04.dec"/>
 </sub>
-
 !---------- 輸出共用變數宣告區 ----------
 <sub type="RTN" name="AFXMT">
 <include src="PRT.icf::PRTHEAD.rtn"/>
@@ -375,6 +410,7 @@ TXFORM=L4201
 ^
 <include src="ROM.icf::L4R02.tom"/>
 <include src="ROM.icf::L4R04.tom"/>
+<include src="ROM.icf::L4R35.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 
 </sub>

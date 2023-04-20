@@ -1,5 +1,6 @@
 package com.st1.itx.trade.BS;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
@@ -19,6 +21,7 @@ import com.st1.itx.db.domain.BankRmtf;
 import com.st1.itx.db.domain.DailyTav;
 import com.st1.itx.db.domain.DailyTavId;
 import com.st1.itx.db.domain.NegAppr02;
+import com.st1.itx.db.domain.NegAppr02Id;
 import com.st1.itx.db.domain.NegMain;
 import com.st1.itx.db.domain.NegTrans;
 import com.st1.itx.db.domain.NegTransId;
@@ -154,38 +157,6 @@ public class BST03 extends TradeBuffer {
 		return custNo;
 	}
 
-	private void dailyTav(String acctCode, BankRmtf t, TitaVo titaVo) throws LogicException {
-
-		DailyTavId tDailyTavId = new DailyTavId();
-		tDailyTavId.setAcDate(titaVo.getEntDyI());
-		tDailyTavId.setCustNo(t.getCustNo());
-		tDailyTavId.setFacmNo(0);
-		DailyTav tDailyTav = dailyTavService.holdById(tDailyTavId, titaVo); // hold by id
-		if (tDailyTav == null) {
-			tDailyTav = new DailyTav();
-			tDailyTav.setDailyTavId(tDailyTavId);
-			tDailyTav.setAcctCode(acctCode);
-			tDailyTav.setSelfUseFlag("N");
-			tDailyTav.setTavBal(t.getRepayAmt());
-			tDailyTav.setLatestFlag("Y");
-			try {
-				dailyTavService.insert(tDailyTav, titaVo); // insert
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E6003", "tDailyTav insert " + tDailyTavId + e.getErrorMsg());
-			}
-
-		} else {
-			tDailyTav.setTavBal(t.getRepayAmt().add(tDailyTav.getTavBal()));
-			try {
-				dailyTavService.update(tDailyTav, titaVo); //
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E6003", "tDailyTav insert " + tDailyTavId + e.getErrorMsg());
-			}
-
-		}
-
-	}
-
 	private void deleteAcReceivable(AcDetail ac, TitaVo titaVo) throws LogicException {
 		AcReceivableId tAcReceivableId = new AcReceivableId();
 		tAcReceivableId.setAcctCode(ac.getAcctCode());
@@ -262,14 +233,14 @@ public class BST03 extends TradeBuffer {
 	 * @throws LogicException ...
 	 */
 	public String getAcctCode(int custNo, TitaVo titaVo) throws LogicException {
-// T10  債協暫收款－收款專戶                                601776戶號(前置協商收款專戶)                              
+// TAV  債協暫收款－收款專戶                                601776戶號(前置協商收款專戶)                              
 // T11  債協暫收款－抵繳款                                  案件種類 1:債協                  
 // T12  前調暫收款－抵繳款                                  案件種類 2:調解                  
 // T13  更生暫收款－抵繳款                                  案件種類 3:更生   4:清算                
 		NegMain tNegMain = new NegMain();
 		String acctCode = null;
 		if (custNo == this.txBuffer.getSystemParas().getNegDeptCustNo()) // 專戶
-			acctCode = "T10";
+			acctCode = "TAV";
 		else {
 			tNegMain = negMainService.custNoFirst(custNo, titaVo);
 			if (tNegMain == null)

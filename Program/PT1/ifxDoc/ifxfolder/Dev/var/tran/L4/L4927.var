@@ -17,24 +17,24 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,100];">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[180,320,180,320];printer.width=[20,100];order=1">
 [
 ["[L4927]                                 匯款轉帳檔明細查詢"],
 !["#FdFuncCode+功能",#FuncCodeX],
-["#FdEntryDate+入帳日期  ",#EntryDate],
-["#FdCustNo+戶號",#CustNo,#CustName],
-["#FdReconCode+對帳類別",#ReconCode,#ReconCodeX],
-["#FdRepayAmt+還款金額",#RepayAmt],
-["#FdRemintBank+匯款銀行代碼",#RemintBank],
-["#FdDscptCode+摘要代碼",#DscptCode,#DscptCodeX],
-["#FdTraderInfo+交易人資料",#TraderInfo],
-["#FdRepayType+還款類別",#RepayType,#RepayTypeX],
-["#FdVirtualAcctNo+虛擬帳號",#VirtualAcctNo],
-["#FdAmlRsp+AML回應碼",#AmlRsp,#AmlRspX],
-["#FdDepAcctNo+存摺帳號",#DepAcctNo],
-["#FdAcDate+會計日",#AcDate],
-["#FdBatchNo+批號",#BatchNo],  
-["#FdDetailSeq+明細序號",#DetailSeq],
+[#<->#,"#FdEntryDate+入帳日期  ",#EntryDate],
+[#<->#,"#FdCustNo+戶號",#CustNo,#CustName],
+[#<->#,"#FdReconCode+對帳類別",#ReconCode,#ReconCodeX],
+[#<->#,"#FdRepayAmt+還款金額",#RepayAmt],
+[#<->#,"#FdRemintBank+匯款銀行代碼",#RemintBank],
+[#<->#,"#FdDscptCode+摘要代碼",#DscptCode,#DscptCodeX],
+[#<->#,"#FdTraderInfo+交易人資料",#TraderInfo],
+[#<->#,"#FdRepayType+還款類別",#RepayType,#RepayTypeX],
+[#<->#,"#FdVirtualAcctNo+虛擬帳號",#VirtualAcctNo],
+[#<->#,"#FdAmlRsp+AML回應碼",#AmlRsp,#AmlRspX],
+[#<->#,"#FdDepAcctNo+存摺帳號",#DepAcctNo],
+["#FdAcDate+資料日期(會計日)",#AcDate],["@會計日期",#TitaEntdy],
+["#FdBatchNo+批號",#BatchNo],["@經辦",#TitaTlrNo],
+["#FdDetailSeq+明細序號",#DetailSeq],["@交易序號",#TitaTxtNo],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -172,6 +172,7 @@ T(2,@RemintBank,#L4R33RemintBank)
 T(2,@TraderInfo,#L4R33TraderInfo)
 T(2,@AmlRsp,#L4R33AmlRsp)
 T(2,@ReconCode,#L4R33ReconCode)
+E(0,@TitaEntdy,#L4R33TitaEntdy)
 T(2,@TitaTlrNo,#L4R33TitaTlrNo)
 T(2,@TitaTxtNo,#L4R33TitaTxtNo)
 T(2,@CustName,#L4R33CustName)
@@ -229,6 +230,8 @@ T(H,#AmlRsp,#AmlRspHelp)
 #DepositAmt=m,14,L
 !結餘
 #Balance=m,14,L
+!會計日
+#TitaEntdy=D,7,L
 !經辦
 #TitaTlrNo=X,6,L
 !交易序號
@@ -287,6 +290,7 @@ T(3,[L4927]  匯款轉帳檔明細查詢)
 #TraderInfo
 #AmlRsp
 #ReconCode
+#TitaEntdy
 #TitaTlrNo
 #TitaTxtNo
 

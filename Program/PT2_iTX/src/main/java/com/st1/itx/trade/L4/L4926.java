@@ -70,7 +70,7 @@ public class L4926 extends TradeBuffer {
 			
 				int iAcDate = parse.stringToInteger(result.get("AcDate")) - 19110000;
 				int iEntryDate = parse.stringToInteger(result.get("EntryDate")) - 19110000;
-				occursList.putParam("OOAcDate",  iAcDate); // 會計日
+				occursList.putParam("OOAcDate",  iAcDate); // 資料日期(會計日)
 				occursList.putParam("OOBatchNo",  result.get("BatchNo")); // 批號
 				occursList.putParam("OODetailSeq",  result.get("DetailSeq")); // 明細序號
 				occursList.putParam("OOCustNo", result.get("CustNo")); // 戶號
@@ -81,6 +81,7 @@ public class L4926 extends TradeBuffer {
 				occursList.putParam("OORemintBank",  result.get("RemintBank")); // 匯款銀行代碼
 				occursList.putParam("OOTraderInfo", result.get("TraderInfo")); // 交易人資料
 				occursList.putParam("OOReconCode", result.get("ReconCode")); // 對帳類別
+				occursList.putParam("OOTitaEntdy", result.get("TitaEntdy")); // 會計日期
 				occursList.putParam("OOTitaTlrNo", result.get("TitaTlrNo")); // 經辦
 				occursList.putParam("OOTitaTxtNo", result.get("TitaTxtNo")); // 交易序號
 						 

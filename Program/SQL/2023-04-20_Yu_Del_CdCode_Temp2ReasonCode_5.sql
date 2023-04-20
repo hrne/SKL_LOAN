@@ -1,0 +1,1 @@
+DELETE FROM "CdCode" WHERE "DefCode" = 'Temp2ReasonCode' AND "Code" = 5;

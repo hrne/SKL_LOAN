@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.DBException;
@@ -126,8 +127,6 @@ public class L4210 extends TradeBuffer {
 		iNote = titaVo.getParam("Note");
 		if (iRepayCode == 11)
 			iReconCode = "P03";
-		else if (iRepayCode == 07)
-			iReconCode = "T10";
 		else if (iRepayCode == 05)
 			iReconCode = "OPL";
 		else if (iRepayCode == 06)
@@ -376,7 +375,9 @@ public class L4210 extends TradeBuffer {
 		if (tBatxOthers == null) {
 			throw new LogicException(titaVo, "E0001", "L4210 BatxOthers 無此資料");
 		}
-
+		if (tBatxOthers.getTitaEntdy() > 0) {
+			throw new LogicException(titaVo, "E0015", "已入帳"); // 檢查錯誤
+		}
 		try {
 			batxOthersService.delete(tBatxOthers, titaVo);
 		} catch (DBException e) {
@@ -385,12 +386,29 @@ public class L4210 extends TradeBuffer {
 
 		BatxDetail tBatxDetail = new BatxDetail();
 		BatxDetailId tBatxDetailId = new BatxDetailId();
-		tBatxDetailId.setAcDate(iAcDate);
-		tBatxDetailId.setBatchNo(iBatchNo);
-		tBatxDetailId.setDetailSeq(iDetailSeq);
+		// 資料日<>系統日
+		if (iAcDate == titaVo.getEntDyI() + 19110000) {
+			tBatxDetailId.setAcDate(iAcDate);
+			tBatxDetailId.setBatchNo(iBatchNo);
+			tBatxDetailId.setDetailSeq(iDetailSeq);
+		} else {
+			Slice<BatxDetail> slBatxDetail = batxDetailService.findL4002AEq(titaVo.getEntDyI() + 19110000, "RESV00", 0,
+					Integer.MAX_VALUE);
+			if (slBatxDetail == null) {
+				throw new LogicException(titaVo, "E0001", "L4210 BatxDetail 無此資料");
+			}
+			for (BatxDetail t : slBatxDetail.getContent()) {
 
+				if (t.getMediaDate() + 19110000 == iAcDate && iBatchNo.equals("BATX" + t.getMediaKind())
+						&& iDetailSeq == t.getMediaSeq()) {
+
+					tBatxDetailId.setAcDate(t.getAcDate());
+					tBatxDetailId.setBatchNo(t.getBatchNo());
+					tBatxDetailId.setDetailSeq(t.getDetailSeq());
+				}
+			}
+		}
 		tBatxDetail = batxDetailService.holdById(tBatxDetailId, titaVo);
-
 		if (tBatxDetail != null) {
 			try {
 				batxDetailService.delete(tBatxDetail, titaVo);

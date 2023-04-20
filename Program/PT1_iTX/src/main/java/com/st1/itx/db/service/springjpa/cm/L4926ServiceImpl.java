@@ -69,7 +69,7 @@ public class L4926ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String sql = "";
 		sql += " SELECT                         ";
-		sql += "   \"AcDate\"     	"; // 會計日
+		sql += "   \"AcDate\"     	"; // 資料日期(會計日)
 		sql += " , \"BatchNo\"    	"; // 批號
 		sql += " , \"DetailSeq\"  	"; // 明細序號
 		sql += " , \"CustNo\"     	"; // 戶號
@@ -80,6 +80,7 @@ public class L4926ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " , \"RemintBank\" 	"; // 匯款銀行代碼
 		sql += " , \"TraderInfo\" 	"; // 交易人資料
 		sql += " , \"ReconCode\"  	"; // 對帳類別
+		sql += " , \"TitaEntdy\"  	"; // 會計日期
 		sql += " , \"TitaTlrNo\"  	"; // 經辦
 		sql += " , \"TitaTxtNo\"  	"; // 交易序號
 

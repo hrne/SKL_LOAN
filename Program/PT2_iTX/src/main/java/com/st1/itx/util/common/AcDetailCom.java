@@ -23,7 +23,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
 /*
- * Call By 1.帳務類交易 Ex.L3200 回收登錄 2.傳票類交易 Ex.L6201 其他傳票輸入
+ * Call By 1.帳務類交易 Ex.L3100 撥款  2.傳票類交易(L6201 其他傳票輸入、L
  *
  * ========================== 交易程式帳務處理步驟 ==============================
  * 
@@ -260,8 +260,8 @@ public class AcDetailCom extends TradeBuffer {
 				tAcDetail.setSumNo(ac.getSumNo());// 彙總別
 				tAcDetail.setDscptCode(ac.getDscptCode()); // 摘要代號
 				tAcDetail.setSlipNote(ac.getSlipNote()); // 傳票摘要
-				tAcDetail.setTitaHCode(ac.getTitaHCode()); // 訂正別 
-				
+				tAcDetail.setTitaHCode(ac.getTitaHCode()); // 訂正別
+
 				/*----------- TITA值 -----------*/
 				tAcDetail.setBranchNo(titaVo.getAcbrNo()); // 記帳單位別
 				if (titaVo.getCurName().trim().isEmpty())
@@ -394,26 +394,17 @@ public class AcDetailCom extends TradeBuffer {
 		if (!ac.getAcctCode().equals(tCdAcCode.getAcctCode())) {
 			tTempVo.putParam("RvAcctCode", ac.getAcctCode());
 		}
-		
+
 		tAcDetail.setJsonFields(tTempVo.getJsonString());
 	}
 
 	/* 會計科子細目設定檔 */
 	private void findAcCode(AcDetail ac, TitaVo titaVo) throws LogicException {
 		// step 1. 轉換業務科目
-// 1. 轉換專戶
-		// TAV -> TLD 0610940戶號(TLD 放款部專戶)
-		// TAV -> T10 -> 0601776戶號(T10 前置協商收款專戶)
-		if ("TAV".equals(ac.getAcctCode()) && ac.getCustNo() == this.txBuffer.getSystemParas().getLoanDeptCustNo()) {
-			ac.setAcctCode("TLD");
-		}
-		if ("TAV".equals(ac.getAcctCode()) && ac.getCustNo() == this.txBuffer.getSystemParas().getNegDeptCustNo()) {
-			ac.setAcctCode("T10");
-		}
 
 		String acctCode = ac.getAcctCode();
 
-// 2. 轉換短繳期金
+// 1. 轉換短繳期金
 // 銷帳科目記號ReceivableFlag = 4-短繳期金 		               	         
 // Z10	短繳期金-短期擔保放款	  310	短期擔保放款
 // Z20	短繳期金-中期擔保放款	  320	中期擔保放款
@@ -429,7 +420,7 @@ public class AcDetailCom extends TradeBuffer {
 			}
 		}
 
-// 3. 轉換費用攤提
+// 2. 轉換費用攤提
 		// 企金費用攤提，未到期收入轉入TSL暫收款－費用攤提
 		// F12企金帳管費收入、 F27聯貸管理費收入
 		// 聯貸手續費:SL-費用代號(2)-流水號(3)-攤提年月(YYYMM)
@@ -443,14 +434,22 @@ public class AcDetailCom extends TradeBuffer {
 			}
 		}
 
-		// step 2. 額度編號檢核
-		if (acctCode.equals("TAV") && ac.getFacmNo() == 0)
-			throw new LogicException("E6001", "AcDetailCom 暫收可抵繳科目需有額度編號"); // E6001 分錄檢核有誤
-		if (acctCode.equals("TLD") && ac.getFacmNo() > 0)
-			throw new LogicException("E6001", "AcDetailCom 放款部專戶額度編號須為零"); // E6001 分錄檢核有誤
-		if (acctCode.equals("T10") && ac.getFacmNo() > 0)
-			throw new LogicException("E6001", "AcDetailCom 前置協商收款專戶額度編號須為零"); // E6001 分錄檢核有誤
-
+		// step 2. 暫收款額度編號檢核
+		if (acctCode.equals("TAV")) {
+			if (ac.getCustNo() == this.txBuffer.getSystemParas().getLoanDeptCustNo()) {
+				if (ac.getFacmNo() > 0) {
+					throw new LogicException("E6001", "AcDetailCom 放款部專戶額度編號須為零"); // E6001 分錄檢核有誤
+				}
+			} else if (ac.getCustNo() == this.txBuffer.getSystemParas().getNegDeptCustNo()) {
+				if (ac.getFacmNo() > 0) {
+					throw new LogicException("E6001", "AcDetailCom 前置協商收款專戶額度編號須為零"); // E6001 分錄檢核有誤
+				}
+			} else {
+				if (ac.getFacmNo() == 0) {
+					throw new LogicException("E6001", "AcDetailCom 暫收可抵繳科目需有額度編號"); // E6001 分錄檢核有誤
+				}
+			}
+		}
 		// step 3.Find CdAcCode
 		if (acctCode != null && acctCode.trim().length() > 0) {
 			tCdAcCode = cdAcCodeService.acCodeAcctFirst(acctCode, titaVo);
