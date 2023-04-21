@@ -69,10 +69,10 @@ public class L4721Report2 extends MakeReport {
 	String headerExcessive = "";
 	String headerDueAmt = "";
 
-	String fileName = "L4721.txt";
-
-	public void exec(TitaVo titaVo, TxBuffer txbuffer) throws LogicException {
+	public void exec(TitaVo titaVo, TxBuffer txbuffer, int txKind, String kindItem) throws LogicException {
 		this.info("L4721Report2 exec start");
+
+		int itxKind = parse.stringToInteger(titaVo.getParam("TxKind"));
 
 		this.titaVo = titaVo;
 		this.setTxBuffer(txbuffer);
@@ -80,8 +80,9 @@ public class L4721Report2 extends MakeReport {
 
 		List<String> file = getData(titaVo);
 
+		String fileName = "L4721-" + kindItem + ".txt";
 		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
-				titaVo.getTxCode() + "-L4721.txt", fileName, 2);
+				titaVo.getTxCode() + "-" + kindItem, fileName, 2);
 
 		for (String line : file) {
 			makeFile.put(line);
@@ -93,8 +94,14 @@ public class L4721Report2 extends MakeReport {
 
 		makeFile.toFile(sno);
 
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-				titaVo.getTlrNo() + "L4721", titaVo.getTxCode() + " 已產生L4721.txt", titaVo);
+		// itxKind畫面上的 0 全部，txKind是JAVA內設定的參數，因照迴圈跑到5為最後一項的時候在丟出訊息，否則會跑出五次
+		if (itxKind == 0 && txKind == 5) {
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+					titaVo.getTlrNo() + "L4721", titaVo.getTxCode() + " 已產生L4721.txt", titaVo);
+		} else if (itxKind == txKind) {
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+					titaVo.getTlrNo() + "L4721", titaVo.getTxCode() + " 已產生L4721.txt", titaVo);
+		}
 	}
 
 	private List<String> getData(TitaVo titaVo) throws LogicException {
@@ -103,10 +110,16 @@ public class L4721Report2 extends MakeReport {
 
 		List<String> result = new ArrayList<>();
 
-		int adjDate = Integer.parseInt(titaVo.getParam("AdjDate")) + 19110000;
+		int sAdjDate = Integer.parseInt(titaVo.getParam("sAdjDate")) + 19110000;
+		int eAdjDate = Integer.parseInt(titaVo.getParam("eAdjDate")) + 19110000;
 		int custType1 = 0;
 		int custType2 = 0;
 		int txKind = Integer.parseInt(titaVo.getParam("TxKind"));
+
+		int ieday = titaVo.getEntDyI() + 19110000;
+		dateUtil.setDate_1(ieday);
+		dateUtil.setMons(-6);
+		int isday = Integer.parseInt(String.valueOf(dateUtil.getCalenderDay()).substring(0, 6) + "01");
 
 //		輸入畫面 戶別 CustType 1:個金;2:企金（含企金自然人）
 //		客戶檔 0:個金1:企金2:企金自然人
@@ -121,8 +134,8 @@ public class L4721Report2 extends MakeReport {
 		Slice<BatxRateChange> sBatxRateChange = null;
 		List<BatxRateChange> lBatxRateChange = new ArrayList<BatxRateChange>();
 
-		sBatxRateChange = batxRateChangeService.findL4321Report(adjDate, adjDate, custType1, custType2, txKind, 0, 9, 2,
-				this.index, this.limit, titaVo);
+		sBatxRateChange = batxRateChangeService.findL4321Report(sAdjDate, eAdjDate, custType1, custType2, txKind, 0, 9,
+				2, this.index, this.limit, titaVo);
 
 		lBatxRateChange = sBatxRateChange == null ? null : sBatxRateChange.getContent();
 
@@ -147,7 +160,7 @@ public class L4721Report2 extends MakeReport {
 			List<Map<String, String>> listL4721Detail = new ArrayList<Map<String, String>>();
 
 			try {
-				listL4721Detail = l4721ServiceImpl.doDetail(custNo, titaVo);
+				listL4721Detail = l4721ServiceImpl.doDetail(custNo, isday, ieday, tBatxRateChange.getAdjDate(), titaVo);
 			} catch (Exception e) {
 				this.error("bankStatementServiceImpl doQuery = " + e.getMessage());
 				throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
@@ -234,7 +247,7 @@ public class L4721Report2 extends MakeReport {
 
 			String locationX = tmap.get("Location").toString();
 			String locationXX = "";
-			String s = "";
+
 			for (int i = 0; i < locationX.length(); i++) {
 				locationXX = toX(locationX.substring(i, i + 1), locationXX);
 			}

@@ -39,35 +39,53 @@ public class L9742Report extends MakeReport {
 
 	}
 
-	public Boolean exec(TitaVo titaVo,int option) throws LogicException {
+	public Boolean exec(TitaVo titaVo, int option) throws LogicException {
 		// 讀取VAR參數
 		this.setFontSize(16);
 		this.setCharSpaces(0);
 		List<Map<String, String>> listL9742 = null;
 		try {
-			listL9742 = l9742ServiceImpl.findAll(titaVo,option);
+			listL9742 = l9742ServiceImpl.findAll(titaVo, Integer.valueOf(titaVo.getParam("FunctionCode")), option);
 		} catch (Exception e) {
 			this.info("l9742ServiceImpl.findAll error = " + e.toString());
 			return false;
 		}
-		makeReport(titaVo, listL9742,option);
+		makeReport(titaVo, listL9742, option);
 
 		return true;
 	}
 
-	public void makeReport(TitaVo titaVo, List<Map<String, String>> listL9742,int option) throws LogicException {
+	public void makeReport(TitaVo titaVo, List<Map<String, String>> listL9742, int option) throws LogicException {
 
-		String formName = option==1 ? "支出收入傳票" : "還本繳息收據";
+		String formName = "";
+		switch (option) {
+		case 1:
+			formName = "(還本收據)";
+			break;
+		case 2:
+			formName = "(繳息收據)";
+			break;
+		case 3:
+			formName = "(手續費收據)";
+			break;
+		default:
+			break;
+
+		}
+
+		if (listL9742.size() == 0) {
+			formName = formName + " 本日無資料";
+		}
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-				.setRptCode("L9742").setRptItem("企金戶還本收據及繳息收據(" + formName + ")").setRptSize("A4")
-				.setPageOrientation("L").build();
+				.setRptCode("L9742").setRptItem("企金戶收據" + formName).setRptSize("A4").setPageOrientation("L").build();
 
 		this.open(titaVo, reportVo);
 
 		if (listL9742 != null && !listL9742.isEmpty()) {
 
 			Boolean firstPage = true;
+
 			for (Map<String, String> rowL9742 : listL9742) {
 
 				if (firstPage) {
@@ -80,6 +98,7 @@ public class L9742Report extends MakeReport {
 				 * F0 = 傳票號碼 F1 = 登錄交易序號 F2 = 科目代號 F3 = 業務科目名稱 F4 = 彙總別 F5 = 入帳日期 F6 = 戶號 F7 =
 				 * 額度編號 F8 = 撥款序號 F9 = 戶名/公司名稱 F10 = 記帳金額 F11 = 計息起日 F12 = 計息迄日
 				 */
+
 				String txtNo = rowL9742.get("F2").substring(0, 1);
 
 				this.info("EntryDate ... = " + rowL9742.get("F5"));
@@ -90,10 +109,19 @@ public class L9742Report extends MakeReport {
 				this.print(1, 2, "傳票號碼　.....　");
 				this.print(0, 26, padStart(rowL9742.get("F0").toString(), 6, "0"), "R");
 
-				if (option==1) {
+				switch (option) {
+				case 1:
 					this.print(0, 41, "還本收據");
-				} else {
+					break;
+				case 2:
 					this.print(0, 41, "繳息收據");
+					break;
+				case 3:
+					this.print(0, 41, "收入傳票");
+					break;
+				default:
+					break;
+
 				}
 
 				this.print(1, 2, "交易序號　.....　");
@@ -128,15 +156,14 @@ public class L9742Report extends MakeReport {
 				}
 
 				int repayCode = Integer.valueOf(rowL9742.get("RepayCode"));
-				
-			
-				if(repayCode==4) {
+
+				if (repayCode == 4) {
 					this.print(1, 3, "銀扣 　 電匯　　票據 Ｖ 其他");
-				}else if(repayCode==2) {
+				} else if (repayCode == 2) {
 					this.print(1, 3, "銀扣 Ｖ 電匯　　票據　　其他");
-				}else if(repayCode==1) {
+				} else if (repayCode == 1) {
 					this.print(1, 3, "銀扣 　 電匯 Ｖ 票據　　其他");
-				}else {
+				} else {
 					this.print(1, 3, "銀扣 　 電匯 　 票據　　其他 Ｖ");
 				}
 
@@ -149,25 +176,35 @@ public class L9742Report extends MakeReport {
 				this.print(0, 36, showDate(rowL9742.get("F5").toString(), 1), "C");
 				this.print(1, 1, "├──────────┼──────────────────┼─────────┤");
 				this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
-				if (!rowL9742.get("F16").equals("11") && !titaVo.getParam("inputOption").equals("1")) // 20210916 從現有樣張上推測
-																									// 還本收據不出此字樣
-				{
-					this.print(0, 50, "非支票");
-				}
+//				if (!rowL9742.get("F16").equals("11") && !titaVo.getParam("inputOption").equals("1")) 
+				// 20210916
+				// 從現有樣張上推測
+				// 還本收據不出此字樣
+//				{
+//					this.print(0, 50, "非支票");
+//				}
 				this.print(0, 58, "$");
 
-				BigDecimal f10 = new BigDecimal(rowL9742.get("F10").toString());
+				BigDecimal f10 = new BigDecimal(rowL9742.get("Amt").toString());
 				DecimalFormat df1 = new DecimalFormat("#,##0");
 				this.print(0, 73, df1.format(f10), "R");
 
 				this.print(1, 1, "│　　　　　　　　　　│　戶號：　　　　　　　　　　　　　　│　　　　　　　　　│");
 				this.print(0, 13, rowL9742.get("F15"), "C");
-				this.print(0, 34,
-						padStart(rowL9742.get("F6").toString(), 7, "0") + "-"
-								+ padStart(rowL9742.get("F7").toString(), 3, "0") + "-"
-								+ padStart(rowL9742.get("F8").toString(), 3, "0"));
 
-	
+				// 戶號額度撥款
+				String custFacmBorm = padStart(rowL9742.get("F6").toString(), 7, "0");
+
+				if (!"0".equals(rowL9742.get("F7").toString())) {
+					custFacmBorm = custFacmBorm + "-" + padStart(rowL9742.get("F7").toString(), 3, "0");
+				}
+
+				if (!"0".equals(rowL9742.get("F8").toString())) {
+					custFacmBorm = custFacmBorm + "-" + padStart(rowL9742.get("F8").toString(), 3, "0");
+				}
+
+				this.print(0, 34, custFacmBorm);
+
 				// 戶名固定做wrap
 
 				ArrayList<String> custNameWrap = longStringWrap(rowL9742.get("F9"), 20);
@@ -188,8 +225,8 @@ public class L9742Report extends MakeReport {
 				// 這裡可以考慮改成for迴圈
 
 				this.print(1, 1, "│　　　　　　　　　　│　計算期間：　　　　　　　　　　　　│　　　　　　　　　│");
-				this.print(0, 34,
-						showDate(rowL9742.get("F11").toString(), 1) + " - " + showDate(rowL9742.get("F12").toString(), 1));
+				this.print(0, 34, showDate(rowL9742.get("F11").toString(), 1) + " - "
+						+ showDate(rowL9742.get("F12").toString(), 1));
 				this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
 				this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
 				this.print(1, 1, "└──────────┴──────────────────┴─────────┘");

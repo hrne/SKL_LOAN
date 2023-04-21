@@ -30,14 +30,14 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> TempQuery(int custNo, TitaVo titaVo) throws Exception {
-		dateUtil.init();
+	public List<Map<String, String>> TempQuery(int custNo,int isday,int ieday, TitaVo titaVo) throws Exception {
 
 		this.info("BankStatementServiceImpl Temp");
-		int ieday = titaVo.getEntDyI() + 19110000;
-		dateUtil.setDate_1(ieday);
-		dateUtil.setMons(-6);
-		int isday = Integer.parseInt(String.valueOf(dateUtil.getCalenderDay()).substring(0, 6) + "01");
+//		dateUtil.init();
+//		int ieday = titaVo.getEntDyI() + 19110000;
+//		dateUtil.setDate_1(ieday);
+//		dateUtil.setMons(-6);
+//		int isday = Integer.parseInt(String.valueOf(dateUtil.getCalenderDay()).substring(0, 6) + "01");
 		this.info("custNo ... " + custNo);
 		this.info("isday ... " + isday);
 		this.info("ieday ... " + ieday);
@@ -68,14 +68,14 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-	public List<Map<String, String>> doQuery(int custNo, TitaVo titaVo) throws Exception {
-		dateUtil.init();
+	public List<Map<String, String>> doQuery(int custNo,int isday,int ieday,TitaVo titaVo) throws Exception {
 
 		this.info("BankStatementServiceImpl doQuery");
-		int ieday = titaVo.getEntDyI() + 19110000;
-		dateUtil.setDate_1(ieday);
-		dateUtil.setMons(-6);
-		int isday = Integer.parseInt(String.valueOf(dateUtil.getCalenderDay()).substring(0, 6) + "01");
+//		dateUtil.init();
+//		int ieday = titaVo.getEntDyI() + 19110000;
+//		dateUtil.setDate_1(ieday);
+//		dateUtil.setMons(-6);
+//		int isday = Integer.parseInt(String.valueOf(dateUtil.getCalenderDay()).substring(0, 6) + "01");
 		this.info("custNo ... " + custNo);
 		this.info("isday ... " + isday);
 		this.info("ieday ... " + ieday);
@@ -137,19 +137,19 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-	public List<Map<String, String>> doDetail(int custNo, TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> doDetail(int custNo,int isday,int ieday,int adjDate,TitaVo titaVo) throws Exception {
 		dateUtil.init();
 
 		this.info("BankStatementServiceImpl doDetail");
-		int adjDate = Integer.parseInt(titaVo.getParam("AdjDate")) + 19110000;
-		int ieday = titaVo.getEntDyI() + 19110000;
-		dateUtil.setDate_1(ieday);
-		dateUtil.setMons(-6);
-		int isday = Integer.parseInt(String.valueOf(dateUtil.getCalenderDay()).substring(0, 6) + "01");
+//		int adjDate = Integer.parseInt(titaVo.getParam("AdjDate")) + 19110000;
+//		int ieday = titaVo.getEntDyI() + 19110000;
+//		dateUtil.setDate_1(ieday);
+//		dateUtil.setMons(-6);
+//		int isday = Integer.parseInt(String.valueOf(dateUtil.getCalenderDay()).substring(0, 6) + "01");
 		this.info("custNo ... " + custNo);
 		this.info("isday ... " + isday);
 		this.info("ieday ... " + ieday);
-
+		this.info("adjDate ... " + adjDate);
 //		因抓取不到費用類，第一層group by 到額度(同額度同調整日、同源利率
 
 		String sql = " ";

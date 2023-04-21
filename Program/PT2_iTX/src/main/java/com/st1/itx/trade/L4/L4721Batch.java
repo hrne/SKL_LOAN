@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.trade.L4.L4721Report;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
@@ -32,11 +31,13 @@ public class L4721Batch extends TradeBuffer {
 	public DateUtil dateUtil;
 	@Autowired
 	public L4721Report l4721Report;
-
+	@Autowired
+	public L4721Report2 l4721Report2;
 //	寄送筆數
-	private int commitCnt = 200;
+//	private int commitCnt = 200;
 
-	private int iAdjDate = 0;
+//	private int isAdjDate = 0;
+//	private int ieAdjDate = 0;
 	private int iTxKind = 0;
 	private int iCustType = 0;
 	private String sendMsg = "";
@@ -49,18 +50,44 @@ public class L4721Batch extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4721Batch ");
 		this.totaVo.init(titaVo);
-		this.iAdjDate = parse.stringToInteger(titaVo.getParam("AdjDate")) + 19110000;
 		this.iTxKind = parse.stringToInteger(titaVo.getParam("TxKind"));
 		this.iCustType = parse.stringToInteger(titaVo.getParam("CustType"));
 		// 設定分頁、筆數
 		this.index = titaVo.getReturnIndex();
 		this.limit = Integer.MAX_VALUE;
 
-		try {
-			l4721Report.exec(titaVo, this.txBuffer);
-		} catch (LogicException e) {
-			sendMsg = e.getErrorMsg();
-			flag = false;
+		if (this.iTxKind == 0) {
+			for (int txkind = 1; txkind <= 5; txkind++) {
+
+				try {
+					l4721Report.exec(titaVo, this.txBuffer, txkind, kindItem(txkind));
+				} catch (LogicException e) {
+					sendMsg = e.getErrorMsg();
+					flag = false;
+				}
+
+				try {
+					l4721Report2.exec(titaVo, this.txBuffer, txkind, kindItem(txkind));
+				} catch (LogicException e) {
+					sendMsg = e.getErrorMsg();
+					flag = false;
+				}
+			}
+		} else {
+
+			try {
+				l4721Report.exec(titaVo, this.txBuffer, this.iTxKind, kindItem(this.iTxKind));
+			} catch (LogicException e) {
+				sendMsg = e.getErrorMsg();
+				flag = false;
+			}
+
+			try {
+				l4721Report2.exec(titaVo, this.txBuffer, this.iTxKind, kindItem(this.iTxKind));
+			} catch (LogicException e) {
+				sendMsg = e.getErrorMsg();
+				flag = false;
+			}
 		}
 
 		// 送出通知訊息
@@ -73,39 +100,51 @@ public class L4721Batch extends TradeBuffer {
 	private void sendMessage(TitaVo titaVo) throws LogicException {
 		if (flag) {
 			// 設定訊息
-			if (iTxKind <= 3) {
+
+			if (iTxKind >= 1 && iTxKind <= 3) {
 				if (this.iCustType == 1) {
-					sendMsg = "個金，" + sendMsg;
+					sendMsg = "個金" + sendMsg;
 				} else {
-					sendMsg = "企金，" + sendMsg;
+					sendMsg = "企金" + sendMsg;
 				}
 			}
 
-			switch (this.iTxKind) {
-			case 1:
-				sendMsg = sendMsg + "，定期機動利率變動資料";
-				break;
-			case 2:
-				sendMsg = sendMsg + "，指數型利率變動資料";
-				break;
-			case 3:
-				sendMsg = sendMsg + "，機動利率變動資料";
-				break;
-			case 4:
-				sendMsg = sendMsg + "，員工利率變動資料";
-				break;
-			case 5:
-				sendMsg = sendMsg + "，按商品別利率變動資料";
-				break;
-			default:
-				break;
-			}
+			sendMsg = sendMsg + "," + kindItem(this.iTxKind);
 
 			sendMsg = sendMsg + "，報表產出完畢。";
 
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getEmpNot() + "L4721", sendMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+					titaVo.getEmpNot() + "L4721", sendMsg, titaVo);
 		} else {
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4721", "", sendMsg, titaVo);
 		}
+	}
+
+	private String kindItem(int txKind) {
+
+		String kindItem = "";
+		switch (txKind) {
+		case 0:
+			sendMsg = "定期機動利率、指數型利率、機動利率、員工利率、按商品別利率變動利率";
+			break;
+		case 1:
+			kindItem = "定期機動利率變動資料";
+			break;
+		case 2:
+			kindItem = "指數型利率變動資料";
+			break;
+		case 3:
+			kindItem = "機動利率變動資料";
+			break;
+		case 4:
+			kindItem = "員工利率變動資料";
+			break;
+		case 5:
+			kindItem = "按商品別利率變動資料";
+			break;
+		default:
+			break;
+		}
+		return kindItem;
 	}
 }

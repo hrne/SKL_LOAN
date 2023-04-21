@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+
 /* 套件 */
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -368,17 +370,17 @@ public class L5701 extends TradeBuffer {
 			UpdInsertNegMain(NegMainId, InputNegMain, FunctionCode);
 			break;
 		case "11":
-			// 二階段新增
+			// 階段新增
 			// NegMain.setTwoStepCode("Y");
 			// 直接寫入新的NEGMAIN
 			// 檢查舊的是否已經結案
 			// 若未結案 新的NEGMAIN-Status為未生效
 			// 已結案則是正常
 			if (("N").equals(NegMainVO.getTwoStepCode())) {
-				throw new LogicException(titaVo, "E0015", "二階段註記為Ｎ，不可執行二階段新增");
+				throw new LogicException(titaVo, "E0015", "階段註記為Ｎ，不可執行階段新增");
 			}
 			if (("1").equals(NegMainVO.getCaseKindCode())) {
-				throw new LogicException(titaVo, "E0015", "案件種類為債協，不可執行二階段新增");
+				throw new LogicException(titaVo, "E0015", "案件種類為債協，不可執行階段新增");
 			}
 
 			IntCaseSeq = MaxIntCaseSeq(CustNo);
@@ -466,7 +468,7 @@ public class L5701 extends TradeBuffer {
 		String IsMainFin = titaVo.getParam("IsMainFin").trim(); // 最大債權 Y N
 		String TotalContrAmt = titaVo.getParam("TotalContrAmt").trim(); // (新壽)簽約總金額
 		String MainFinCode = titaVo.getParam("MainFinCode").trim(); // 最大債權機構
-		String TwoStepCode = titaVo.getParam("TwoStepCode").trim(); // 二階段註記
+		String TwoStepCode = titaVo.getParam("TwoStepCode").trim(); // 階段註記
 		String ChgCondDate = titaVo.getParam("ChgCondDate").trim(); // 申請變更還款條件日
 		String PayerCustNo = titaVo.getParam("PayerCustNo").trim(); // 付款人戶號
 		String CourtCode = titaVo.getParam("CourtCode").trim(); // 受理調解機構代號
@@ -496,7 +498,7 @@ public class L5701 extends TradeBuffer {
 		InputNegMain.setIsMainFin(IsMainFin);// 最大債權 Y N
 		InputNegMain.setTotalContrAmt(parse.stringToBigDecimal(TotalContrAmt));// (parse.stringToInteger(新壽)簽約總金額
 		InputNegMain.setMainFinCode(MainFinCode);// 最大債權機構
-		InputNegMain.setTwoStepCode(TwoStepCode);// 二階段註記
+		InputNegMain.setTwoStepCode(TwoStepCode);// 階段註記
 		InputNegMain.setPayerCustNo(parse.stringToInteger(PayerCustNo));// 付款人戶號
 		InputNegMain.setChgCondDate(parse.stringToInteger(ChgCondDate));// 申請變更還款條件日
 		InputNegMain.setCourtCode(CourtCode);// 受理調解機構代號
@@ -547,19 +549,22 @@ public class L5701 extends TradeBuffer {
 
 			if (InputNegMain.getDeferYMStart() > 0) {// 設定喘息期一併異動下次繳款日與還款結束日
 				if (sNegMsain.getDeferYMStart() != InputNegMain.getDeferYMStart() || sNegMsain.getDeferYMEnd() != InputNegMain.getDeferYMEnd()) {
-					int daystart = InputNegMain.getDeferYMStart() * 100 - 19110000 + 10;
-					int dayend = InputNegMain.getDeferYMEnd() * 100 - 19110000 + 10;
+					int iday1 = sNegMsain.getFirstDueDate() +19110000;
+					String unitday =  parse.IntegerToString(iday1,8).substring(6);//每個月幾號繳款->目前債協應該都是10號
+					int iunitday = parse.stringToInteger(unitday);
+					int daystart = InputNegMain.getDeferYMStart() * 100 - 19110000 + iunitday;
+					int dayend = InputNegMain.getDeferYMEnd() * 100 - 19110000 + iunitday;
 					int period = negCom.DiffMonth(1, daystart, dayend) + 1;
 					int odaystart = sNegMsain.getDeferYMStart();
 					int odayend = sNegMsain.getDeferYMEnd();
 					int operiod = 0;
 					if (odaystart > 0) {
-						odaystart = odaystart * 100 - 19110000 + 10;
-						odayend = odayend * 100 - 19110000 + 10;
+						odaystart = odaystart * 100 - 19110000 + iunitday;
+						odayend = odayend * 100 - 19110000 + iunitday;
 						operiod = negCom.DiffMonth(1, odaystart, odayend) + 1;
 					}
 					if (daystart <= sNegMsain.getPayIntDate()) {
-						throw new LogicException(titaVo, "E0015", "延期繳款年月區間設定有誤,繳款迄日=" + sNegMsain.getPayIntDate());
+						throw new LogicException(titaVo, "E0015", "輸入延期繳款年月時檢查延期繳款年月起月應大於繳息迄日=" + sNegMsain.getPayIntDate());
 					}
 
 					if (daystart <= odayend) {// 已設定-修改區間
@@ -613,7 +618,7 @@ public class L5701 extends TradeBuffer {
 				InputNegMain.setPayIntDate(InputNegMain.getChgCondDate());
 				InputNegMain.setChgCondDate(0);
 			}
-			if (("11").equals(FunctionCode)) {// 二階段新增時繳息迄日=首次繳款日前一個月
+			if (("11").equals(FunctionCode)) {// 階段新增時繳息迄日=首次繳款日前一個月
 				InputNegMain.setPayIntDate(negCom.getRepayDate(InputNegMain.getFirstDueDate(), -1, titaVo));
 			}
 
@@ -737,8 +742,12 @@ public class L5701 extends TradeBuffer {
 		for (int i = 0; i < NegFinShareL; i++) {
 			int Row = i + 1;
 			negFinShareContractAmt.add(parse.stringToBigDecimal(titaVo.getParam("NegFinShareContractAmt" + Row + "").trim())); // 簽約金額
+			String iNegFinShareDate = titaVo.getParam("NegFinShareCancelDate"+Row+"").trim();
+			this.info("NegFinShareCancelDate1    =" + iNegFinShareDate);
+			if(iNegFinShareDate.equals("0000000")) {
 			negFinShareAmtRatio.add((parse.stringToBigDecimal(titaVo.getParam("NegFinShareAmtRatio" + Row + "").trim()))); // 債權比例%
 			negFinShareDueAmt.add((parse.stringToBigDecimal(titaVo.getParam("NegFinShareDueAmt" + Row + "").trim()))); // 期款
+			}
 		}
 		
 		//01.債務協商債權分攤檔 累計 (簽約金額、債權比率、期款)

@@ -18,7 +18,7 @@ E(0,0)
 <sub type="DC" name="L4721" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
 [
 ["[L4721]                                 整批批次產出利率變動對帳單"],
-[#<->#,"#FdAdjDate+利率調整日",#AdjDate],
+[#<->#,"#FdAdjDate+利率調整日",#sAdjDate,"~",#eAdjDate],
 [#<->#,"#FdTxKind+利率種類",#TxKind,#TxKindX],
 [#<->#,"#FdCustType+個金/企金",#CustType,#CustTypeX]
 ]
@@ -36,14 +36,12 @@ T(3,*)
 #CDDEF01=x,26,S
 T(3,CdCode.EntCode2)
 
+
 #EntCodeHelp=x,1024,S 
 
 ![利率種類]
 #CDDEF02=x,50,S
 T(3,CdCode.TxKind)
-
-#BaseRateHelp=x,1024,S 
-
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
@@ -54,6 +52,10 @@ T(2,@EntCodeHelp,#HelpDesc1)
 T(2,@BaseRateHelp,#HelpDesc2)  
 ! T(B,@BaseRateHelp,#HelpDesc2+;98:員工利率;99:自訂利率)  
 
+
+#BaseRateHelp=x,1024,S 
+T(2,0:全部;+#BaseRateHelp)
+
 #CHAIN=A,1,S
 T(4,CHAIN$) 
 
@@ -61,9 +63,26 @@ T(4,CHAIN$)
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 ! T(1,@FunctionCode,#NTXBUF,1,1)
 
-#AdjDate=D,7,I
-E(0,#SYSDATE)
-@A(DATE,0,#AdjDate)V(7)
+!會計日期 必須輸入
+#DATE=D,8,S
+T(4,DATE$)
+
+#DT=D,7,S
+T(1,#DATE,2,7)
+
+#sAdjDate=D,7,I
+T(2,#DT)
+@V(7)A(4,0,#sAdjDate)
+IF(#sAdjDate > #DT,V(P,不可大於會計日),$)
+
+#eAdjDate=D,7,I
+T(2,#DT)
+@V(7)A(4,0,#eAdjDate)
+IF(#eAdjDate > #DT,V(P,不可大於會計日),$)
+IF(#eAdjDate < #sAdjDate,V(P,不可小於會計起日),$)
+
+
+
 
 #TxKind=A,1,I
 HELP(#BaseRateHelp)
@@ -107,8 +126,10 @@ T(3,)T(H,#CustType,#EntCodeHelp)
 
 !------ 上行電文 TEXT ------
 <sub type="TIM">
-#AdjDate
+#sAdjDate
+#eAdjDate
 #TxKind
+#TxKindX
 #CustType
 #END
 </sub>

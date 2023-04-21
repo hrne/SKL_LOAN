@@ -20,6 +20,8 @@ import com.st1.itx.db.service.springjpa.cm.L4721ServiceImpl;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
+import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -50,6 +52,9 @@ public class L4721Report extends MakeReport {
 	@Autowired
 	Parse parse;
 
+	@Autowired
+	DateUtil dateUtil;
+
 	String headerCustName = "";
 	String headerCustNo = "0";
 	String headerFacmNo = "0";
@@ -79,7 +84,7 @@ public class L4721Report extends MakeReport {
 
 		print(-4, 1, "客戶名稱：" + headerCustName, "L");
 		if (first) {
-			print(-4, 57, "戶　　號：" + headerCustNo , "L");
+			print(-4, 57, "戶　　號：" + headerCustNo, "L");
 		} else {
 			print(-4, 57, "戶　　號：" + headerCustNo + "-" + headerFacmNo, "L");
 		}
@@ -143,9 +148,11 @@ public class L4721Report extends MakeReport {
 	 * 
 	 * @param titaVo   TitaVo
 	 * @param txbuffer TxBuffer
+	 * @param txKind   利率種類
+	 * @param kindItem 利率種類名稱
 	 * @throws LogicException ...
 	 */
-	public void exec(TitaVo titaVo, TxBuffer txbuffer) throws LogicException {
+	public void exec(TitaVo titaVo, TxBuffer txbuffer, int txKind, String kindItem) throws LogicException {
 		this.info("L4721Report.printHeader");
 
 //		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
@@ -156,10 +163,10 @@ public class L4721Report extends MakeReport {
 		this.setTxBuffer(txbuffer);
 		baTxCom.setTxBuffer(txbuffer);
 
-		int adjDate = Integer.parseInt(titaVo.getParam("AdjDate")) + 19110000;
+		int sAdjDate = Integer.parseInt(titaVo.getParam("sAdjDate")) + 19110000;
+		int eAdjDate = Integer.parseInt(titaVo.getParam("eAdjDate")) + 19110000;
 		int custType1 = 0;
 		int custType2 = 0;
-		int txKind = Integer.parseInt(titaVo.getParam("TxKind"));
 
 //		輸入畫面 戶別 CustType 1:個金;2:企金（含企金自然人）
 //		客戶檔 0:個金1:企金2:企金自然人
@@ -174,8 +181,8 @@ public class L4721Report extends MakeReport {
 		Slice<BatxRateChange> sBatxRateChange = null;
 		List<BatxRateChange> lBatxRateChange = new ArrayList<BatxRateChange>();
 
-		sBatxRateChange = batxRateChangeService.findL4321Report(adjDate, adjDate, custType1, custType2, txKind, 0, 9, 2,
-				this.index, this.limit, titaVo);
+		sBatxRateChange = batxRateChangeService.findL4321Report(sAdjDate, eAdjDate, custType1, custType2, txKind, 0, 9,
+				2, this.index, this.limit, titaVo);
 
 		lBatxRateChange = sBatxRateChange == null ? null : sBatxRateChange.getContent();
 
@@ -183,9 +190,21 @@ public class L4721Report extends MakeReport {
 			throw new LogicException("E0001", "查無資料");
 		}
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4721", "放款本息對帳單暨繳息通知單", "密", "8.5,12", "P");
+		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
+				.setRptCode("L4721").setRptItem("放款本息對帳單暨繳息通知單(" + kindItem + ")").setSecurity("密")
+				.setRptSize("inch,8.5,12").setPageOrientation("P").build();
+
+		this.openForm(titaVo, reportVo);
+
+//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4721", "放款本息對帳單暨繳息通知單", "密", "8.5,12", "P");
 
 		Boolean Firstfg = false;
+
+		int ieday = titaVo.getEntDyI() + 19110000;
+		dateUtil.setDate_1(ieday);
+		dateUtil.setMons(-6);
+		int isday = Integer.parseInt(String.valueOf(dateUtil.getCalenderDay()).substring(0, 6) + "01");
+
 		for (BatxRateChange tBatxRateChange : lBatxRateChange) {
 
 			List<Map<String, String>> listL4721Temp = new ArrayList<Map<String, String>>();
@@ -199,24 +218,25 @@ public class L4721Report extends MakeReport {
 			if (custNo == tBatxRateChange.getCustNo()) {
 				continue;
 			}
-			
+
 			// 不同戶號額度相同跳過(也可能換戶號時額度相同)
-			if( custNo == tBatxRateChange.getCustNo() && facmNo == tBatxRateChange.getFacmNo()) {
+			if (custNo == tBatxRateChange.getCustNo() && facmNo == tBatxRateChange.getFacmNo()) {
 				continue;
 			}
-			
+
 			custNo = tBatxRateChange.getCustNo();
 			facmNo = tBatxRateChange.getFacmNo();
 
 			try {
-				listL4721Temp = l4721ServiceImpl.TempQuery(custNo, titaVo);
+
+				listL4721Temp = l4721ServiceImpl.TempQuery(custNo, isday, ieday, titaVo);
 			} catch (Exception e) {
 				this.error("bankStatementServiceImpl TempQuery = " + e.getMessage());
 				throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
 			}
 
 			try {
-				listL4721Head = l4721ServiceImpl.doQuery(custNo, titaVo);
+				listL4721Head = l4721ServiceImpl.doQuery(custNo, isday, ieday, titaVo);
 			} catch (Exception e) {
 				this.error("bankStatementServiceImpl doQuery = " + e.getMessage());
 				throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
@@ -289,13 +309,12 @@ public class L4721Report extends MakeReport {
 						parse.stringToInteger(mapL4721Head.get("TxEffectDate")));
 				this.newPage();
 			}
-			
-			
+
 			first = false;
 			List<Map<String, String>> listL4721Detail = new ArrayList<Map<String, String>>();
 
 			try {
-				listL4721Detail = l4721ServiceImpl.doDetail(custNo, titaVo);
+				listL4721Detail = l4721ServiceImpl.doDetail(custNo, isday, ieday, tBatxRateChange.getAdjDate(), titaVo);
 			} catch (Exception e) {
 				this.error("bankStatementServiceImpl doQuery = " + e.getMessage());
 				throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
@@ -318,7 +337,6 @@ public class L4721Report extends MakeReport {
 				int tempfacmno = parse.stringToInteger(listL4721Detail.get(0).get("FacmNo"));
 				int tempcustno = parse.stringToInteger(listL4721Detail.get(0).get("CustNo"));
 
-				
 				// 先更新表頭資料
 				setHead(listL4721Detail.get(0), tempcustno, tempfacmno,
 						parse.stringToInteger(listL4721Detail.get(0).get("TxEffectDate")));

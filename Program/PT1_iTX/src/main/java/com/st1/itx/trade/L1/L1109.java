@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L1;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdBcm;
 import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.domain.CustCross;
@@ -117,8 +119,76 @@ public class L1109 extends TradeBuffer {
 
 					}
 				}
-			}
+			} else {
+				int i = 1;
+				while (true) {
+					CustCross fCustCross = new CustCross();
+					CustCrossId fCustCrossId = new CustCrossId(); // findbyId
+					if (i == 21) {
+						break;
+					}
+					String iSubCompanyCode = titaVo.get("SubCompanyCode" + i).trim();
 
+					if (iSubCompanyCode.isEmpty()) {
+						break;
+					}
+
+					String iCrossUse = titaVo.get("CrossUse" + i);
+					if ("".equals(iCrossUse)) {
+						iCrossUse = "N";
+					}
+
+					fCustCrossId.setCustUKey(iCustUKey);
+					fCustCrossId.setSubCompanyCode(iSubCompanyCode);
+					fCustCross = iCustCrossService.holdById(fCustCrossId, titaVo);
+
+					CdCodeId cdCodeId = new CdCodeId();
+
+					cdCodeId.setDefCode("SubCompanyCode");
+					cdCodeId.setCode(iSubCompanyCode);
+
+					CdCode cdCode = iCdCodeService.findById(cdCodeId, titaVo);
+
+					String k = "";
+					if (cdCode != null) {
+						k = iSubCompanyCode + " " + cdCode.getItem() + " 交互運用";
+					} else {
+						k = iSubCompanyCode + " 交互運用";
+					}
+
+					if (fCustCross == null) {
+						// insert
+						fCustCross = new CustCross(); // init
+						fCustCross.setCustCrossId(fCustCrossId);
+						fCustCross.setCrossUse(iCrossUse);
+						try {
+							iCustCrossService.insert(fCustCross, titaVo);
+						} catch (DBException e) {
+							throw new LogicException("E0005", "新增時發生錯誤");
+						}
+						if ("Y".equals(iCrossUse)) {
+							iDataLog.setLog(k, "N", iCrossUse);
+							cnt++;
+						}
+					} else {
+						// update
+						if (!iCrossUse.equals(fCustCross.getCrossUse())) {
+							iDataLog.setLog(k, fCustCross.getCrossUse(), iCrossUse);
+							cnt++;
+						}
+
+						fCustCross.setCrossUse(iCrossUse);
+						try {
+							fCustCross = iCustCrossService.update2(fCustCross, titaVo);
+						} catch (DBException e) {
+							throw new LogicException("E0007", "更新時發生錯誤");
+						}
+
+					}
+
+					i++;
+				}
+			}
 		} else {
 			int i = 1;
 			while (true) {

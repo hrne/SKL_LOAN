@@ -46,18 +46,33 @@ public class L9742p extends TradeBuffer {
 		l9742Report.setParentTranCode(parentTranCode);
 
 		boolean isFinish = true;
-		int option =Integer.valueOf(titaVo.getParam("inputOption"));
-		if(option==0) {
-			 isFinish = l9742Report.exec(titaVo,1);
-			 isFinish = isFinish && l9742Report.exec(titaVo,2);
-		}else {
-			isFinish = l9742Report.exec(titaVo,option);
+
+		int functionCode = Integer.valueOf(titaVo.getParam("FunctionCode"));
+		int option = 0;
+
+		this.info("functionCode = " + functionCode);
+
+		// 先確認是手動輸入或整批
+		if (functionCode == 1) {
+			option = Integer.valueOf(titaVo.getParam("inputOption"));
+
+			this.info("option = " + option);
+
+			if (option == 0) {
+				isFinish = l9742Report.exec(titaVo, 1) && l9742Report.exec(titaVo, 2) && l9742Report.exec(titaVo, 3);
+			} else {
+				isFinish = l9742Report.exec(titaVo, option);
+			}
+		} else {
+			isFinish = l9742Report.exec(titaVo, 1) && l9742Report.exec(titaVo, 2) && l9742Report.exec(titaVo, 3);
 		}
 
 		if (isFinish) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), tranCode + tranName + "已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
+					titaVo.getParam("TLRNO"), tranCode + tranName + "已完成", titaVo);
 		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), tranCode + tranName + "查無資料", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
+					titaVo.getParam("TLRNO"), tranCode + tranName + "查無資料", titaVo);
 		}
 
 		this.addList(this.totaVo);

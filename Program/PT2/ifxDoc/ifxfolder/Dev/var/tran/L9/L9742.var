@@ -22,9 +22,10 @@ T(3,L9742)
 
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[150,350,150,350];printer.width=[20,60,20,60];order=1;">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[150,850];printer.width=[20,20];order=1;">
 [
-["[L9742]                                  L9742企金戶還本收據及繳息收據"],
+["[L9742]                              L9742企金戶還本收據及繳息收據"],
+[#<->#,"功能",#FunctionCode,#FunctionCodeX],
 [#<->#,"會計日期",#inputAcDate],
 [#<->#,"經辦",#inputTitaTlrNo],
 [#<->#,"交易序號",#inputTitaTxtNoStart],
@@ -49,7 +50,7 @@ T(3,L9742)
 BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L6905; ntxbuf=#BUF2;ntxbuf5=type<-1:
 inputSlipNoStart<-OOSlipNo:
 inputSlipNoEnd<-OOSlipNo:
-inputTitaTxtNoStart<-OOTitaTxtNo})
+inputTitaTxtNo<-OOTitaTxtNo})
 
 !ENABLE(#BTN2)ENABLE(#BTN3)
 #Submit=A,1,S
@@ -70,11 +71,18 @@ T(4,CHAIN$)
 
 !-----------------------------------------------------
 
-#TXCD2=X,5,S
-T(3,L9742)
-#sval=X,1,S
-E(0,@inputTitaTxtNoStart,00000000)
-E(0,@inputTitaTxtNoEnd,99999999)
+#FunctionCodeHelp=X,30,S
+T(3,1:手動輸入;2:整批列印)
+
+! 作業項目
+#FunctionCode=A,1,I
+HELP(#FunctionCodeHelp)
+@V(H,#FunctionCodeHelp)
+@C(3,#FunctionCode,1,INVOKEJS(SHOW,p1,3,7,1))
+@C(3,#FunctionCode,2,INVOKEJS(SHOW,p1,3,7,0))
+
+#FunctionCodeX=X,8,L
+T(H,#FunctionCode,#FunctionCodeHelp)
 
 #inputAcDate=D,7,I
 E(0,#SYSDATE)
@@ -83,15 +91,12 @@ A(DATE,0,#inputAcDate)
 V(5,0,#SYSDATE)
 
 #inputTitaTlrNo=X,6,I
-T(2,#TLRNO)
-@C(4,#inputTitaTlrNo,T(F,@inputTitaTxtNoStart,0),T(F,@inputTitaTxtNoStart,1))
-C(4,#inputTitaTlrNo,E(0,@inputTitaTxtNoStart,00000000)E(0,@inputTitaTxtNoEnd,99999999),$)
-
-
-
+!@C(4,#inputTitaTlrNo,T(F,@inputTitaTxtNo,0),T(F,@inputTitaTxtNo,1))
+!C(4,#inputTitaTlrNo,E(0,@inputTitaTxtNo,00000000)E(0,@inputTitaTxtNoEnd,99999999),$)
 
 #inputTitaTxtNoStart=A,8,I
-C(4,#inputTitaTlrNo,S,$)
+@V(5,00000000,99999999)
+!C(4,#inputTitaTlrNo,S,$)
 
 
 !會計明細按鈕
@@ -115,6 +120,7 @@ BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L6905; ntxbuf=#BUF3B;ntxbuf5=type<-1:
 inputSlipNoEnd<-OOSlipNo})
 
 #inputTitaTxtNoEnd=A,8,S
+E(0,0)
 
 
 
@@ -126,8 +132,8 @@ V(2,0)
 
 
 
-#inputOptionHelp=X,50,S
-T(3,0:全部;1:還本繳息收據;2:支出收入傳票)
+#inputOptionHelp=X,60,S
+T(3,0:全部;1:還本收據;2:繳息收據;3:手續費收據)
 
 ! 作業項目
 #inputOption=A,1,I
@@ -187,6 +193,7 @@ IF(#KINBR=="0009"||#KINBR=="0008",T(2,#KINBR+#TlrNoNO),T(2,#EMPNOS))
 #inputTitaTxtNoStart
 #inputTitaTxtNoEnd
 #inputOption
+#FunctionCode
 #END
 </sub>
 !------ 下行電文TOM ------
