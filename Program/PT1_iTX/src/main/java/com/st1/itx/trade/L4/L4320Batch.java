@@ -489,6 +489,7 @@ public class L4320Batch extends TradeBuffer {
 		int nextPayIntDate = StaticTool.bcToRoc(parse.stringToInteger(s.get("NextPayIntDate")));
 		// MaturityDate 到期日期
 		int maturityDate = StaticTool.bcToRoc(parse.stringToInteger(s.get("MaturityDate")));
+		String maturityDateX = "(" + maturityDate + ")";
 		// 利率調整週期
 		int rateAdjFreq = parse.stringToInteger(s.get("RateAdjFreq"));
 		b.setPreNextAdjFreq(rateAdjFreq);
@@ -534,11 +535,11 @@ public class L4320Batch extends TradeBuffer {
 				// 下次調整日月份>=到期日月份，則下次調整日為到期日
 				if (preNextAdjDate / 100 >= maturityDate / 100) {
 					if (preNextAdjDate > maturityDate) {
-						warnMsg += ", 下次利率調整日+ 調整周期 > 到期日";
+						warnMsg += ", 下次利率調整日+ 調整周期 > 到期日" + maturityDateX;
 					} else if (preNextAdjDate == maturityDate) {
-						warnMsg += ", 下次利率調整日+ 調整周期 = 到期日";
+						warnMsg += ", 下次利率調整日+ 調整周期 = 到期日" + maturityDateX;
 					} else {
-						warnMsg += ", 下次利率調整月份 + 調整周期 = 到期日月份"; // 不及通知客戶，故不調整
+						warnMsg += ", 下次利率調整月份 + 調整周期 = 到期日" + maturityDateX + "月份"; // 不及通知客戶，故不調整
 					}
 					preNextAdjDate = maturityDate;
 				} else if (preNextAdjDate % 100 > preDD) {
@@ -601,7 +602,7 @@ public class L4320Batch extends TradeBuffer {
 			} else if (effDateCurt == maturityDate) {
 				// 下次利率調整日為到期日者於整批利率調整時列入[檢核提醒件],不調整利率
 				adjCode = 9;
-				warnMsg += ", 下次利率調整日為到期日";
+				warnMsg += ", 下次利率調整日為到期日" + maturityDateX;
 			} else if ("Y".equals(incrFlag)) {
 				adjCode = 1; // 批次自動調整
 			} else if ("".equals(cityCode.trim()) || this.iCustType == 2) {

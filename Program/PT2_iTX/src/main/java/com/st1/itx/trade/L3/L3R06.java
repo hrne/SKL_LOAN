@@ -144,7 +144,10 @@ public class L3R06 extends TradeBuffer {
 			RepayAmtRoutine();
 			break;
 		case 3:
-			loadBorMainRoutine();
+			if (iCustNo != this.txBuffer.getSystemParas().getLoanDeptCustNo()
+					&& iCustNo != this.txBuffer.getSystemParas().getNegDeptCustNo()) {
+				loadBorMainRoutine();
+			}
 			EachFeeRoutine();
 			break;
 		default:
@@ -339,7 +342,7 @@ public class L3R06 extends TradeBuffer {
 					// 可回收期數 = 已到期期數 + 預收期數
 					wkPreRepayTermNo = wkPreRepayTermNo + this.txBuffer.getSystemParas().getPreRepayTerms();
 					// 輸入之回收期數不可 > [可回收期數-計算至上次繳息日之期數]
-					if (iRepayTerms > 0) {  
+					if (iRepayTerms > 0) {
 						if ((iRepayTerms + wkPrevTermNo) > wkPreRepayTermNo) {
 							this.info(" 戶號:" + iCustNo + "-" + ln.getFacmNo() + "-" + ln.getBormNo() + ",可預收迄日"
 									+ wkPreRepayDate + ",可回收期數= " + (wkPreRepayTermNo - wkPrevTermNo));
@@ -494,10 +497,6 @@ public class L3R06 extends TradeBuffer {
 		oExcessive = baTxCom.getExcessive();
 		oExcessiveAll = baTxCom.getExcessive().add(baTxCom.getExcessiveOther());
 
-		
-		
-		
-		
 		this.info("   oAcctFee        = " + oAcctFee);
 		this.info("   oFireFee        = " + oFireFee);
 		this.info("   oModifyFee      = " + oModifyFee);

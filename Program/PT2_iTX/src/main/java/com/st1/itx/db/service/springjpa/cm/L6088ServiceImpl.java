@@ -103,6 +103,13 @@ public class L6088ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (useAgStatusCode)
 			sql += " AND CE.\"AgCurInd\" = :AgStatusCode "; // 這裡 AgStatusCode 是 Y/N，條件是在職/非在職，應該是對應 AgCurInd (Y/N) 而非
 															// AgStatusCode (null/1)
+		if("N".equals(iAgStatusCode)) {
+			sql += " AND CE.\"AgStatusCode\" in ('2','3','5') ";
+		}else {
+			sql += " AND CE.\"AgStatusCode\" in ('1','0','4','9') ";
+		}	
+		
+		
 		sql += " ORDER BY CE.\"EmployeeNo\" ";
 		sql += " OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
 

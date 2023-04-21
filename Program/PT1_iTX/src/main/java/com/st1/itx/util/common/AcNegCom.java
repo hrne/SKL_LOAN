@@ -76,7 +76,7 @@ public class AcNegCom extends TradeBuffer {
 						|| ac.getAcctCode().equals("T13")) {
 					updateNegTrans(ac.getCustNo(), ac.getTxAmt(), titaVo);
 				}
-				if (ac.getAcctCode().equals("TAV") && "一般債權".equals(ac.getSlipNote())) {
+				if (ac.getAcctCode().equals("TAV") && "一般債權".equals(ac.getSlipNote())						) {
 					int custNo = this.parse.stringToInteger(titaVo.getParam("TimCustNo"));
 					if ("L3230".equals(titaVo.getTxcd())) {
 						custNo = ac.getCustNo();//20230315程式需再修改,使用JsonFields裡存的原戶號才抓的到債協戶號???RmCustNo

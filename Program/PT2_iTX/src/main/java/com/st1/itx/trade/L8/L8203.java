@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L8;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -186,23 +187,34 @@ public class L8203 extends TradeBuffer {
 		if (mMlaundryDetail.getFlEntdy() != 0) {// 經辦做過修改
 			flentdy = mMlaundryDetail.getFlEntdy() + 19110000;
 		}
-		if (titaVo.isActfgEntry() && flentdy != 0) {// 經辦
+		if (titaVo.isActfgEntry() && flentdy != 0) {// 經辦修改資料先刪除舊的紀錄
 			TxFlowId tTxFlowId = new TxFlowId();
 			tTxFlowId.setEntdy(flentdy);
 			tTxFlowId.setFlowNo(mMlaundryDetail.getFlowNo());
 			TxFlow tTxFlow = sTxFlowService.findById(tTxFlowId, titaVo);
 			if (tTxFlow != null) {
-				flowmode = tTxFlow.getFlowMode();// 1:待放行
+//				flowmode = tTxFlow.getFlowMode();// 1:待放行
+				try {
+					sTxFlowService.delete(tTxFlow, titaVo);
+
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時，發生錯誤
+				}
+				
 			}
 		}
 		
-		if (titaVo.isActfgEntry()) {// 經辦需檢核流程模式,若為待放行則只可修正,不可用修改以免產生新的TxFlow
+		if (titaVo.isActfgEntry()) {// 經辦修改資料更新流程控制號碼
 			if (titaVo.isHcodeNormal()) {// 修改
 				if (flowmode == 0) {// 非待放行
 					mMlaundryDetail.setFlEntdy(iAcDate);
 					mMlaundryDetail.setFlowNo(iFlowNo);
 				} else {
-					throw new LogicException(titaVo, "E0015", "主管未放行，只可修正"); // 檢查錯誤
+//					titaVo.putParam("ORGKIN", iFlowNo.substring(0,4));
+//					titaVo.putParam("ORGTLR", iFlowNo.substring(4,10));
+//					titaVo.putParam("ORGTNO", iFlowNo.substring(10,18));
+//					titaVo.putParam("OrgEntdy", mMlaundryDetail.getFlEntdy());
+					
 				}
 			}
 		}

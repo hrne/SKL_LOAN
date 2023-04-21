@@ -15,6 +15,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.db.domain.CdBranch;
 import com.st1.itx.db.domain.CdBranchGroup;
 import com.st1.itx.db.service.CdBranchService;
+import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.CdBcm;
 import com.st1.itx.db.service.CdBcmService;
 import com.st1.itx.db.service.CdBranchGroupService;
@@ -472,7 +473,7 @@ public class XXR99 extends TradeBuffer {
 		return s;
 	}
 
-	private String getAuthGroup(String branchNo, String levelFg) {
+	private String getAuthGroup(String branchNo, String levelFg) throws LogicException{
 		this.info("XXR99 getAuthGroup = " + branchNo + "/" + levelFg);
 		String s = "";
 
@@ -483,11 +484,15 @@ public class XXR99 extends TradeBuffer {
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = Integer.MAX_VALUE;
-
-		Slice<TxAuthGroup> slTxAuthGroup = sTxAuthGroupService.BranchAll(branchNo, Integer.valueOf(levelFg), this.index,
-				this.limit);
+		Slice<TxAuthGroup> slTxAuthGroup = null;
+		if (!branchNo.equals("") && (!levelFg.equals("") && !levelFg.equals("0"))) {
+			slTxAuthGroup = sTxAuthGroupService.BranchAll(branchNo, Integer.valueOf(levelFg), this.index, this.limit);
+			this.info("slTxAuthGroup   =" + slTxAuthGroup);
+			
+		} else {
+			slTxAuthGroup = sTxAuthGroupService.findAll(this.index, this.limit);
+		}
 		List<TxAuthGroup> lTxAuthGroup = slTxAuthGroup == null ? null : slTxAuthGroup.getContent();
-
 		if (lTxAuthGroup != null) {
 			for (TxAuthGroup tTxAuthGroup : lTxAuthGroup) {
 				if (!"".equals(s)) {
@@ -495,6 +500,8 @@ public class XXR99 extends TradeBuffer {
 				}
 				s += tTxAuthGroup.getAuthNo().trim() + ":" + tTxAuthGroup.getAuthItem().trim();
 			}
+		}else {
+			throw new LogicException("E0001", "查無資料");
 		}
 
 		this.info("XXR99 getAuthGroup = " + branchNo + "/" + s);

@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ import com.st1.itx.db.service.TxDataLogService;
 import com.st1.itx.db.service.TxTranCodeService;
 import com.st1.itx.Exception.LogicException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
@@ -115,6 +118,11 @@ public class L6934 extends TradeBuffer {
 					|| "已編BorTx流水號".equals(fld) || "最後更新日期時間".equals(fld) || "上次會計日".equals(fld) || "會計日期".equals(fld)
 					|| "上次交易行別".equals(fld) || "上次交易日".equals(fld)) {
 				continue;
+			}
+			if("L8203".equals(txDataLog.getTranNo())) {
+				if("流程控制序號".equals(fld) || "流程控制帳務日".equals(fld)) {
+					continue;
+				}
 			}
 
 			this.info(fld + " = " + oval + " to " + nval);

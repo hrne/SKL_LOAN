@@ -105,6 +105,9 @@ public class BaTxCom extends TradeBuffer {
 	// 未到期火險費用條件 0.全列已到期、1.續約保單起日 > 入帳月
 	private int isUnOpenfireFee = 0;
 
+	// isBanakDeductBatchRepay 是否為銀扣整批入帳
+	private boolean isBanakDeductBatchRepay = false;
+
 // isAcLoanInt 是否利息提存
 	private boolean isAcLoanInt = false;
 
@@ -509,8 +512,9 @@ public class BaTxCom extends TradeBuffer {
 			loadUnPaid(iPayIntDate, iCustNo, iFacmNo, iBormNo, 99, titaVo);
 		}
 
-		// 銀扣期款不回收費用
+		// 銀扣期款=>設定為銀扣整批入帳，不回收費用
 		if (iRepayCode == 2 && iRepayType == 1) {
+			this.isBanakDeductBatchRepay = true;
 			this.payFeeFlag = "N";
 			if (this.totalFee.compareTo(BigDecimal.ZERO) > 0) {
 				this.tempVo.putParam("UnPayFeeX", this.unPayFeeX);
@@ -1937,8 +1941,9 @@ public class BaTxCom extends TradeBuffer {
 		int payIntDate = 0;
 		BigDecimal payintDateAmt = BigDecimal.ZERO;
 		int repayIntDate = 0;
+		boolean isTermContinue = true; // 繼續下一期(銀扣整批入帳只收一期)
 		for (BaTxVo ba : this.baTxList) {
-			if (ba.getRepayPriority() == 5 && ba.getPayIntDate() > 0) {
+			if (ba.getRepayPriority() == 5 && ba.getPayIntDate() > 0 && isTermContinue) {
 				if (payIntDate != ba.getPayIntDate() || facmNo != ba.getFacmNo()) {
 					payIntDate = ba.getPayIntDate();
 					facmNo = ba.getFacmNo();
@@ -1948,6 +1953,10 @@ public class BaTxCom extends TradeBuffer {
 						settlePayintDateAmt(payIntDate, facmNo);
 						this.repayIntDateByFacmNoVo.putParam(parse.IntegerToString(facmNo, 3), payIntDate); // 額度還款應繳日
 						repayIntDate = payIntDate;
+						if (isBanakDeductBatchRepay) {
+							isTermContinue = false; // 銀扣整批入帳只收一期)
+						}
+						
 					} else {
 						for (BaTxVo b : this.baTxList) {
 							if (b.getRepayPriority() == 5 && b.getFacmNo() == facmNo

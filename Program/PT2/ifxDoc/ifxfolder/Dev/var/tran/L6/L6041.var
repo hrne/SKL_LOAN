@@ -43,6 +43,7 @@ E(0,40)ASGN(INQPRT$)
 ["#FdTlrNo+使用者代號",#TlrNo,#TlrItem],
 ["#FdGroupNo+課組別",#GroupNo,#GroupNoX],
 ["#FdLevelFg+權限等級",#LevelFg,#LevelFgX],
+["#FdAuthNo+權限編號",#AuthNo],
 ]
 !["@顯示方式",
 !<include src="COM.icf::RPTFG.scr"/>
@@ -84,6 +85,7 @@ C(3,#AdminFg,1,$,T(F,@BrNo,0))
 #FdTlrNo=X,2,L
 #FdGroupNo=X,2,L
 #FdLevelFg=X,2,L
+#FdAuthNo=X,2,L
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
@@ -178,6 +180,47 @@ V(H,#LevelHelp)
 #LevelFgX=X,10,L
 T(H,#LevelFg,#LevelHelp)
 
+!權限群組
+#H2=X,9,S
+T(3,AUTHGROUP)
+
+#GroupT=X,4,S
+T(3,GROP)
+T(2,@GroupT2,#GroupT+#BrNo)
+T(2,@AuthGroupT,#H2+#BrNo+#LevelFg)
+
+#X2=X,1,S
+C(3,#FunCode,2,$,S)
+RESET_RIM(#X2,XXR99)
+S(XXR99,01,#AuthGroupT)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@AuthGroupH,#HelpDesc1)
+##loop {times:40, i:1}
+T(H,@AuthNoX{i},#AuthNo{i},#AuthGroupH)
+##end
+
+#AuthGroupT=X,14,S
+T(2,#H2+#BrNo+#LevelFg)
+
+#AuthGroupH=x,1024,S
+
+#GroupT2=X,8,S
+T(2,#GroupT+#BrNo)
+#AuthGroupHelp=X,1024,S
+RESET_RIM(#AuthGroupHelp,XXR99)
+S(XXR99,01,#AuthGroupT)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@AuthGroupH,#HelpDesc1)
+
+#AuthNo=X,6,I
+HELP(#AuthGroupH,cols:3)
+C(4,#TlrNo,$,S)
+
+#AuthNoX=x,20,L
+C(4,#AuthNo,S,$)
+T(H,#AuthNo,#AuthGroupH)
 
 !<include src="COM.icf::RPTFG.dec"/>
 #RPTFG=A,1,S
@@ -255,6 +298,15 @@ T(2,L6401+CODE:+#OTlrNo)
 
 !BIND(grid,{cmd=CHAIN;ntxcd=L6933;text=歷程;ntxbuf=#OBUF6})
 C(5,#OHasHistory,"Y",BIND(grid,{cmd=CHAIN;ntxcd=L6933;text=歷程;ntxbuf=#OBUF6}),BIND(grid,cancel))    
+! 查詢的按鈕
+#OFunc7=A,1,S
+E(0,5)
+
+#OBUF7=X,65,S
+T(2,#OFunc7+#OTlrNo)
+
+#OBTN7=X,4,S
+BIND(grid,{cmd=CHAIN;ntxcd=L6404;text=查詢;ntxbuf=#OBUF7})
 
 ! 修改的按鈕
 #OFunc2=A,1,S
@@ -292,6 +344,7 @@ IF(#OOCHAIN==1,BIND(grid,cancel),$)
 #BrNo
 #GroupNo
 #LevelFg
+#AuthNo
 #END
 </sub>
 
@@ -347,6 +400,9 @@ TXFORM=L6R20
 
 #OBTN6=歷程
 {width:50,search:false,formatter:'cust:bind-button:#OBTN6',align:'center',canExport:false}
+
+#OBTN7=權限查詢
+{width:80,search:false,formatter:'cust:bind-button:#OBTN7',align:'center',canExport:false}
 
 #OTlrNo=使用者
 {width:70,align:'center'}

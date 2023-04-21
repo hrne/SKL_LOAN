@@ -328,9 +328,9 @@ public class L3210 extends TradeBuffer {
 					acDetail.setCustNo(parse.stringToInteger(tempVo.getParam("CustNo")));
 					acDetail.setFacmNo(parse.stringToInteger(tempVo.getParam("FacmNo")));
 					acDetail.setSumNo("092"); // 轉暫收款可抵繳
-					acDetail.setSlipNote("一般債權");
-					// acDetail.setJsonFields(tTempVo.getJsonString());
-
+					if (iCustNo != this.txBuffer.getSystemParas().getNegDeptCustNo()) {
+						acDetail.setSlipNote("一般債權");
+					}
 				} else {
 					acDetail.setSumNo("094"); // 轉債協暫收款
 				}
