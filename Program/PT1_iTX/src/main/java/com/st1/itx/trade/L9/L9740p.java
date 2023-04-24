@@ -39,6 +39,25 @@ public class L9740p extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active " + txCD + "p");
 		this.totaVo.init(titaVo);
+		
+		// 帳務日(西元)
+		int tbsdy = this.txBuffer.getTxCom().getTbsdyf();
+		// 月底日(西元)
+		int mfbsdy = this.txBuffer.getTxCom().getMfbsdyf();
+
+		// 年
+		int iYear = mfbsdy / 10000;
+		// 月
+		int iMonth = (mfbsdy / 100) % 100;
+
+
+		// 判斷帳務日與月底日是否同一天
+		if (tbsdy < mfbsdy) {
+			iYear = iMonth - 1 == 0 ? (iYear - 1) : iYear;
+			iMonth = iMonth - 1 == 0 ? 12 : iMonth - 1;
+		}
+		
+		
 
 		this.info(txCD + "p titaVo.getTxcd() = " + titaVo.getTxcd());
 		String parentTranCode = titaVo.getTxcd();
@@ -47,7 +66,7 @@ public class L9740p extends TradeBuffer {
 
 		boolean isFinish = false;
 
-		isFinish = l9740Report.exec(titaVo);
+		isFinish = l9740Report.exec(titaVo,iYear * 100 +iMonth);
 
 		if (isFinish) {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",

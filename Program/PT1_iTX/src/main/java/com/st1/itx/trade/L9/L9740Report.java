@@ -57,7 +57,7 @@ public class L9740Report extends MakeReport {
 //	private int reportDate = 0;
 	private String reportCode = "L9740";
 	private String reportItem = "公會無自用住宅放款檢核清單";
-//	private String security = "密";
+	private String security = "密";
 	private String pageSize = "A4";
 	private String pageOrientation = "P";
 
@@ -113,13 +113,14 @@ public class L9740Report extends MakeReport {
 	 * 執行報表輸出
 	 * 
 	 * @param titaVo
+	 * @param yearMonth 西元年月
 	 * @return
 	 * @throws LogicException
 	 *
 	 * 
 	 */
 
-	public boolean exec(TitaVo titaVo) throws LogicException {
+	public boolean exec(TitaVo titaVo,int yearMonth) throws LogicException {
 		this.info("L9740Report exec");
 
 //		int reportDate = titaVo.getEntDyI() + 19110000;
@@ -153,13 +154,13 @@ public class L9740Report extends MakeReport {
 		try {
 
 			// Q9309141 新撥款之戶號
-			listL9740Data1 = l9740ServiceImpl.findPage1(titaVo, drawDownDateA1, drawDownDateA2, acctCodeA, renewFlagA);
+			listL9740Data1 = l9740ServiceImpl.findPage1(titaVo, drawDownDateA1, drawDownDateA2, acctCodeA, renewFlagA,yearMonth);
 
 			// Q9309142 續期放款利率 最低、最高
-			listL9740Data2 = l9740ServiceImpl.findPage2(titaVo, drawDownDateB1, acctCodeB, statusB);
+			listL9740Data2 = l9740ServiceImpl.findPage2(titaVo, drawDownDateB1, acctCodeB, statusB,yearMonth);
 
 			// Q9309143 利率超過 X.XX% 之借戶
-			listL9740Data3 = l9740ServiceImpl.findPage3(titaVo, drawDownDateC1, acctCodeC, statusC, rateC);
+			listL9740Data3 = l9740ServiceImpl.findPage3(titaVo, drawDownDateC1, acctCodeC, statusC, rateC,yearMonth);
 
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();

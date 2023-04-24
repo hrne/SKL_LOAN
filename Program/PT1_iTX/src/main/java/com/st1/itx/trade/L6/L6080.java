@@ -31,6 +31,7 @@ import com.st1.itx.util.parse.Parse;
  */
 public class L6080 extends TradeBuffer {
 
+	
 	/* DB服務注入 */
 	@Autowired
 	L6041ServiceImpl iL6041ServiceImpl;

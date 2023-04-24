@@ -190,13 +190,13 @@ public class L4721Report extends MakeReport {
 			throw new LogicException("E0001", "查無資料");
 		}
 
-		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
-				.setRptCode("L4721").setRptItem("放款本息對帳單暨繳息通知單(" + kindItem + ")").setSecurity("密")
-				.setRptSize("inch,8.5,12").setPageOrientation("P").build();
+//		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
+//				.setRptCode("L4721").setRptItem("放款本息對帳單暨繳息通知單(" + kindItem + ")").setSecurity("密")
+//				.setRptSize("inch,8.5,12").setPageOrientation("P").build();
+//
+//		this.openForm(titaVo, reportVo);
 
-		this.openForm(titaVo, reportVo);
-
-//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4721", "放款本息對帳單暨繳息通知單", "密", "8.5,12", "P");
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4721", "放款本息對帳單暨繳息通知單(" + kindItem + ")", "密", "8.5,12", "P");
 
 		Boolean Firstfg = false;
 

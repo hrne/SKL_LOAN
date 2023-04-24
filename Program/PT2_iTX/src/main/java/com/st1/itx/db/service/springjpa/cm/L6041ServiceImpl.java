@@ -101,7 +101,6 @@ public class L6041ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 	
 	public List<Map<String, String>> findByTrolAll(String iTlro ,int index, int limit, TitaVo titaVo) throws LogicException {
-
 		this.info("L6041ServiceImpl findByTrolAll active");
 		
 		String sql = " ";

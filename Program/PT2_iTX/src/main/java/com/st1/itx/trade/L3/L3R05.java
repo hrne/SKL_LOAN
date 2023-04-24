@@ -62,7 +62,7 @@ public class L3R05 extends TradeBuffer {
 		baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, iFacmNo, 0, iTempItemCode == 6 ? 96 : 0,
 				BigDecimal.ZERO, titaVo);
 
-		if (iTempReasonCode == 1) {
+		if (iTempReasonCode == 1 || iCustNo == this.txBuffer.getSystemParas().getNegDeptCustNo()) {
 			wkTmpFacmNoX = baTxCom.getTmpFacmNoX();
 			wkTempAmt = baTxCom.getExcessive();
 			oExcessiveAll = baTxCom.getExcessive().add(baTxCom.getExcessiveOther());

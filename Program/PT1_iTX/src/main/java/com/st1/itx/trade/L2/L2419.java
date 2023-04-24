@@ -291,25 +291,38 @@ public class L2419 extends TradeBuffer {
 
 			// 擔保品代號1
 			String clCode1String = makeExcel.getValue(row, L2419Column.CL_CODE_1.getIndex()).toString();
-			clCode1String = clCode1String.substring(0, clCode1String.indexOf("_"));
-			this.info("clCode1String = " + clCode1String);
-			int clCode1 = (int) toNumeric(clCode1String);
-			if (clCode1 != 1 && clCode1 != 2) {
+			int clCode1 = 0;
+			if (clCode1String != null && !clCode1String.isEmpty()) {
+				clCode1String = clCode1String.substring(0, clCode1String.indexOf("_"));
+				this.info("clCode1String = " + clCode1String);
+				clCode1 = (int) toNumeric(clCode1String);
+				if (clCode1 != 1 && clCode1 != 2) {
 //				throwError("B ,行數:" + row, "擔保品代號1應為1或2", columnB);
+					setError(row, L2419Column.CL_CODE_1.getIndex());
+				}
+			} else {
+				// 此為必輸欄位
 				setError(row, L2419Column.CL_CODE_1.getIndex());
 			}
 
 			// 擔保品代號2
 			String columnC = makeExcel.getValue(row, L2419Column.CL_CODE_2.getIndex()).toString();
-			columnC = columnC.substring(0, columnC.indexOf("_"));
-			this.info("columnC = " + columnC);
-			String clCode2 = columnC;
-			if (clCode1 == 1) {
-				checkCode(titaVo, "ClCode21", "" + clCode2, "擔保品代號2", columnC, row, L2419Column.CL_CODE_2.getIndex());
-			} else if (clCode1 == 2) {
-				checkCode(titaVo, "ClCode22", "" + clCode2, "擔保品代號2", columnC, row, L2419Column.CL_CODE_2.getIndex());
+			if (columnC != null && !columnC.isEmpty()) {
+				columnC = columnC.substring(0, columnC.indexOf("_"));
+				this.info("columnC = " + columnC);
+				String clCode2 = columnC;
+				if (clCode1 == 1) {
+					checkCode(titaVo, "ClCode21", "" + clCode2, "擔保品代號2", columnC, row,
+							L2419Column.CL_CODE_2.getIndex());
+				} else if (clCode1 == 2) {
+					checkCode(titaVo, "ClCode22", "" + clCode2, "擔保品代號2", columnC, row,
+							L2419Column.CL_CODE_2.getIndex());
+				} else {
+					setError(row, L2419Column.CL_CODE_1.getIndex());
+				}
 			} else {
-				// unexpected ClCode1
+				// 此為必輸欄位
+				setError(row, L2419Column.CL_CODE_2.getIndex());
 			}
 
 			// 擔保品編號
@@ -330,7 +343,7 @@ public class L2419 extends TradeBuffer {
 
 			if (insertFlag.equals("N")) {
 				int applNo = Integer.parseInt(titaVo.getParam("ApplNo"));
-				
+
 				FacMain facMain = sFacMainService.facmApplNoFirst(applNo, titaVo);
 
 				String drawdownStatus = "N";
@@ -345,12 +358,17 @@ public class L2419 extends TradeBuffer {
 			}
 			// 擔保品類別代碼
 			String typeCode = makeExcel.getValue(row, L2419Column.CL_TYPE.getIndex()).toString();
-			typeCode = typeCode.substring(0, typeCode.indexOf("_"));
-			this.info("typeCode = " + typeCode);
-			if (clCode1 == 1) {
-				checkCode(titaVo, "ClTypeCode21", typeCode, "擔保品類別", typeCode, row, L2419Column.CL_TYPE.getIndex());
+			if (typeCode != null && !typeCode.isEmpty()) {
+				typeCode = typeCode.substring(0, typeCode.indexOf("_"));
+				this.info("typeCode = " + typeCode);
+				if (clCode1 == 1) {
+					checkCode(titaVo, "ClTypeCode21", typeCode, "擔保品類別", typeCode, row, L2419Column.CL_TYPE.getIndex());
+				} else {
+					checkCode(titaVo, "ClTypeCode22", typeCode, "擔保品類別", typeCode, row, L2419Column.CL_TYPE.getIndex());
+				}
 			} else {
-				checkCode(titaVo, "ClTypeCode22", typeCode, "擔保品類別", typeCode, row, L2419Column.CL_TYPE.getIndex());
+				// 此為必輸欄位
+				setError(row, L2419Column.CL_TYPE.getIndex());
 			}
 
 			if (clCode1 == 1) {
@@ -383,52 +401,64 @@ public class L2419 extends TradeBuffer {
 
 			// 郵遞區號
 			String zip3 = makeExcel.getValue(row, L2419Column.ZIP_3.getIndex()).toString();
-			this.info("zip3 = " + zip3);
-			String cityCode = getItem("zipcity=" + zip3);
+			String cityCode = "";
 			String areaCode = "";
+			if (zip3 != null && !zip3.isEmpty()) {
+				this.info("zip3 = " + zip3);
+				cityCode = getItem("zipcity=" + zip3);
+				areaCode = "";
 
-			if (cityCode.isEmpty()) {
-				CdArea cdArea = sCdAreaService.Zip3First(zip3, titaVo);
-				if (cdArea == null) {
-					// 郵遞區號無法找到鄉鎮市區代碼
-					setError(row, L2419Column.ZIP_3.getIndex());
-				} else {
-					CdCity cdCity = sCdCityService.findById(cdArea.getCityCode(), titaVo);
-					if (cdCity == null) {
-						// 郵遞區號無法找到縣市別代碼
+				if (cityCode.isEmpty()) {
+					CdArea cdArea = sCdAreaService.Zip3First(zip3, titaVo);
+					if (cdArea == null) {
+						// 郵遞區號無法找到鄉鎮市區代碼
 						setError(row, L2419Column.ZIP_3.getIndex());
+					} else {
+						CdCity cdCity = sCdCityService.findById(cdArea.getCityCode(), titaVo);
+						if (cdCity == null) {
+							// 郵遞區號無法找到縣市別代碼
+							setError(row, L2419Column.ZIP_3.getIndex());
+						}
+
+						items.put("zipcity=" + zip3, cdArea.getCityCode());
+						items.put("city=" + cdArea.getCityCode(), cdCity.getCityItem());
+						items.put("ziparea=" + zip3, cdArea.getAreaCode());
+						items.put("area=" + cdArea.getCityCode() + "-" + cdArea.getAreaCode(), cdArea.getAreaItem());
+
+						// 縣市
+						cityCode = cdArea.getCityCode();
+						// 鄉鎮市區
+						areaCode = cdArea.getAreaCode();
 					}
-
-					items.put("zipcity=" + zip3, cdArea.getCityCode());
-					items.put("city=" + cdArea.getCityCode(), cdCity.getCityItem());
-					items.put("ziparea=" + zip3, cdArea.getAreaCode());
-					items.put("area=" + cdArea.getCityCode() + "-" + cdArea.getAreaCode(), cdArea.getAreaItem());
-
+				} else {
 					// 縣市
-					cityCode = cdArea.getCityCode();
 					// 鄉鎮市區
-					areaCode = cdArea.getAreaCode();
+					areaCode = getItem("ziparea=" + zip3);
 				}
 			} else {
-				// 縣市
-				// 鄉鎮市區
-				areaCode = getItem("ziparea=" + zip3);
+				// 此為必輸欄位
+				setError(row, L2419Column.ZIP_3.getIndex());
 			}
 
 			// 段小段代碼
 			String irCode = makeExcel.getValue(row, L2419Column.IR_CODE.getIndex()).toString();
-			this.info("irCode = " + irCode);
-			irCode = leftPadZero(irCode, 4);
+			if (irCode != null && !irCode.isEmpty()) {
+				this.info("irCode = " + irCode);
+				irCode = leftPadZero(irCode, 4);
 
-			this.info("CdLandSection = " + cityCode + "-" + areaCode + "-" + irCode);
-			CdLandSectionId cdLandSectionId = new CdLandSectionId();
-			cdLandSectionId.setCityCode(cityCode);
-			cdLandSectionId.setAreaCode(areaCode);
-			cdLandSectionId.setIrCode(irCode);
+				this.info("CdLandSection = " + cityCode + "-" + areaCode + "-" + irCode);
+				CdLandSectionId cdLandSectionId = new CdLandSectionId();
+				cdLandSectionId.setCityCode(cityCode);
+				cdLandSectionId.setAreaCode(areaCode);
+				cdLandSectionId.setIrCode(irCode);
 
-			CdLandSection cdLandSection = sCdLandSectionService.findById(cdLandSectionId, titaVo);
-			if (cdLandSection == null) {
-				// 此地段4碼在地段代碼檔查無資料
+				CdLandSection cdLandSection = sCdLandSectionService.findById(cdLandSectionId, titaVo);
+				if (cdLandSection == null) {
+					// 此地段4碼在地段代碼檔查無資料
+					setError(row, L2419Column.IR_CODE.getIndex());
+				}
+			} else {
+				// 此為必輸欄位
 				setError(row, L2419Column.IR_CODE.getIndex());
 			}
 

@@ -486,9 +486,7 @@ public class XXR99 extends TradeBuffer {
 		this.limit = Integer.MAX_VALUE;
 		Slice<TxAuthGroup> slTxAuthGroup = null;
 		if (!branchNo.equals("") && (!levelFg.equals("") && !levelFg.equals("0"))) {
-			slTxAuthGroup = sTxAuthGroupService.BranchAll(branchNo, Integer.valueOf(levelFg), this.index, this.limit);
-			this.info("slTxAuthGroup   =" + slTxAuthGroup);
-			
+			slTxAuthGroup = sTxAuthGroupService.BranchAll(branchNo, Integer.valueOf(levelFg), this.index, this.limit);		
 		} else {
 			slTxAuthGroup = sTxAuthGroupService.findAll(this.index, this.limit);
 		}
@@ -503,7 +501,6 @@ public class XXR99 extends TradeBuffer {
 		}else {
 			throw new LogicException("E0001", "查無資料");
 		}
-
 		this.info("XXR99 getAuthGroup = " + branchNo + "/" + s);
 
 		return s;

@@ -35,11 +35,12 @@ public class L9740ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @param eDate     撥款迄日(西元)
 	 * @param acctCode  科目代號
 	 * @param renewFlag 是否借新還舊
+	 * @param yearMonth 西元年月
 	 * @return
 	 * @throws Exception
 	 */
-	public List<Map<String, String>> findPage1(TitaVo titaVo, int sDate, int eDate, String acctCode, String renewFlag)
-			throws Exception {
+	public List<Map<String, String>> findPage1(TitaVo titaVo, int sDate, int eDate, String acctCode, String renewFlag,
+			int yearMonth) throws Exception {
 		this.info("l9740.findPage1 ");
 
 		String sql = " ";
@@ -88,11 +89,12 @@ public class L9740ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @param date       撥款日(西元)
 	 * @param acctCode   科目代號
 	 * @param statusCode 戶況代號
+	 * @param yearMonth  西元年月
 	 * @return
 	 * @throws Exception
 	 */
-	public List<Map<String, String>> findPage2(TitaVo titaVo, int date, String acctCode, String statusCode)
-			throws Exception {
+	public List<Map<String, String>> findPage2(TitaVo titaVo, int date, String acctCode, String statusCode,
+			int yearMonth) throws Exception {
 		this.info("l9740.findPage2 ");
 
 		String sql = " ";
@@ -158,13 +160,13 @@ public class L9740ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @param acctCode   科目代號
 	 * @param statusCode 戶況代號
 	 * @param rate       利率
+	 * @param yearMonth  西元年月
 	 * @return
 	 * @throws Exception
 	 */
 	public List<Map<String, String>> findPage3(TitaVo titaVo, int date, String acctCode, String statusCode,
-			BigDecimal rate) throws Exception {
+			BigDecimal rate, int yearMonth) throws Exception {
 		this.info("l9740.findPage3 ");
-
 		String sql = " ";
 		sql += "	SELECT M.\"CustNo\"";
 		sql += "		  ,M.\"FacmNo\"";
@@ -172,11 +174,14 @@ public class L9740ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  ,MIN(M.\"DrawdownDate\" - 19110000) AS \"DrawdownDate\"";
 		sql += "		  ,SUM(M.\"DrawdownAmt\") AS \"DrawdownAmt\"";
 		sql += "		  ,MIN(L.\"FitRate\") AS \"StoreRate\"";
-		sql += "		  ,MIN(M.\"PrevPayIntDate\" - 19110000) AS \"PrevPayIntDate\"";
+//		sql += "		  ,MIN(M.\"PrevPayIntDate\" - 19110000) AS \"PrevPayIntDate\"";
+		sql += "		  ,MIN(DECODE(M.\"PrevPayIntDate\",0,0,M.\"PrevPayIntDate\" - 19110000)) AS \"PrevPayIntDate\"";
 		sql += "	FROM \"LoanBorMain\" M";
 		sql += "	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\"";
 		sql += "						   AND F.\"FacmNo\" = M.\"FacmNo\"";
-
+		sql += "	LEFT JOIN \"MonthlyFacBal\" MB ON MB.\"CustNo\" = F.\"CustNo\"";
+		sql += "						   		  AND MB.\"FacmNo\" = F.\"FacmNo\"";
+		sql += "						   		  AND MB.\"YearMonth\" = :yearmonth ";
 		sql += "	LEFT JOIN ( ";
 		sql += "		SELECT R1.\"CustNo\"";
 		sql += "			  ,R1.\"FacmNo\"";
@@ -222,7 +227,8 @@ public class L9740ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("date =" + date);
 		this.info("acctCode =" + acctCode);
 		this.info("status =" + statusCode);
-
+		this.info("yearMonth =" + yearMonth);
+		this.info("rate =" + rate);
 		this.info("sql3=" + sql);
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
@@ -232,6 +238,7 @@ public class L9740ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("endDate", date);
 		query.setParameter("rate", rate);
 		query.setParameter("acctCode", acctCode);
+		query.setParameter("yearmonth", yearMonth);
 		return this.convertToMap(query);
 	}
 

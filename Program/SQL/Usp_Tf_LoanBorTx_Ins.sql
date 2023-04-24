@@ -675,6 +675,7 @@ BEGIN
                    WHEN "TitaTxCd" = '3041' THEN 'L3420' 
                    WHEN "TitaTxCd" = '3046' THEN 'L3711' 
                    WHEN "TitaTxCd" = '3066' THEN 'L3200' 
+                   WHEN "TitaTxCd" = '3079' THEN 'L6201' -- 2023-04-24 Wei 新增 from Lai
                    WHEN "TitaTxCd" = '3080' THEN 'L3200' 
                    WHEN "TitaTxCd" = '3081' THEN 'L3200' 
                    WHEN "TitaTxCd" = '3082' THEN 'L3210' 

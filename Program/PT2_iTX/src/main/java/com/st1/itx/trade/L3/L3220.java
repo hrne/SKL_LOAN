@@ -247,6 +247,8 @@ public class L3220 extends TradeBuffer {
 			}
 			for (BaTxVo ba : this.baTxList) {
 				if (iTempReasonCode == 1 && (ba.getAcctCode().equals("TAV"))
+						|| (iTempReasonCode == 2 && ba.getAcctCode().equals("TAV")
+								&& iCustNo == this.txBuffer.getSystemParas().getNegDeptCustNo())
 						|| (iTempReasonCode == 2 && ba.getAcctCode().substring(0, 2).equals("T1"))
 						|| (iTempReasonCode == 4 && ba.getAcctCode().equals("TAM"))) {
 					if (ba.getUnPaidAmt().compareTo(new BigDecimal(0)) > 0

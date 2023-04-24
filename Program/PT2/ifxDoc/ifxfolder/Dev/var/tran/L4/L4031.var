@@ -39,7 +39,7 @@ E(0,0)
 <sub type="DC" name="L4031" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
 [
 ["[L4031]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@利率調整清單"],
-[#<->#,"#FdRateChangeDate+調整日期",#RateChangeDate],
+[#<->#,"#FdRateChangeDate+資料產製日期",#RateChangeDate],
 [#<->#,"#FdCustType+個金/企金",#CustType,#CustTypeX]
 ]
 

@@ -89,6 +89,7 @@ public class L6041 extends TradeBuffer {
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		 */
 		this.index = titaVo.getReturnIndex();
+		
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 500;

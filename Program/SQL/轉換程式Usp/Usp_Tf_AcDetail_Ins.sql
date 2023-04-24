@@ -471,10 +471,12 @@ BEGIN
              THEN ',"CaseCloseCode":"' || S."TRXTCT" || '"' -- 結案區分 
            ELSE '' END 
            || '}'                         AS "JsonFields"          -- jason格式紀錄欄 VARCHAR2 300 0 
-          ,TO_DATE(S."TRXIDT",'YYYYMMDD') AS "CreateDate"          -- 建檔日期時間 DATE 0 0 
-          , NVL(AEM1."EmpNo",'999999')    AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0 
-          ,TO_DATE(S."TRXIDT",'YYYYMMDD') AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0 
-          , NVL(AEM1."EmpNo",'999999')    AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0 
+          ,TO_DATE(NVL(S."TRXIDT",S."TRXDAT"),'YYYYMMDD')
+                                          AS "CreateDate"          -- 建檔日期時間 DATE 0 0 
+          ,NVL(AEM1."EmpNo",'999999')     AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0 
+          ,TO_DATE(NVL(S."TRXIDT",S."TRXDAT",'YYYYMMDD')
+                                          AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0 
+          ,NVL(AEM1."EmpNo",'999999')     AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0 
           ,S."BSTBTN"                     AS "SlipSumNo" 
           ,CASE  
              WHEN S."JLNCRC" IS NULL 
@@ -518,6 +520,7 @@ BEGIN
                    WHEN '3041' THEN 'L3420' 
                    WHEN '3046' THEN 'L3711' 
                    WHEN '3066' THEN 'L3200' 
+                   WHEN '3079' THEN 'L6201' -- 2023-04-24 Wei 新增 from Lai
                    WHEN '3080' THEN 'L3200' 
                    WHEN '3081' THEN 'L3200' 
                    WHEN '3082' THEN 'L3210' 

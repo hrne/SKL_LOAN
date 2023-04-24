@@ -2,6 +2,7 @@
 <sub type="SYS">
 </sub>
 
+
 <sub type="SYS" name="label">
 
 !#TXCD
@@ -306,7 +307,7 @@ E(0,5)
 T(2,#OFunc7+#OTlrNo)
 
 #OBTN7=X,4,S
-BIND(grid,{cmd=CHAIN;ntxcd=L6404;text=查詢;ntxbuf=#OBUF7})
+BIND(grid,{cmd=CHAIN;ntxcd=L6080;text=查詢;ntxbuf=#OBUF7})
 
 ! 修改的按鈕
 #OFunc2=A,1,S

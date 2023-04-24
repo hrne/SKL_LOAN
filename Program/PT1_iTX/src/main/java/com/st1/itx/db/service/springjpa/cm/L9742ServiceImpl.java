@@ -146,7 +146,7 @@ public class L9742ServiceImpl extends ASpringJpaParm implements InitializingBean
 		} else {
 			sql += "		    ,M.\"FacmNo\" ";
 			sql += "		    ,CASE WHEN CC.\"Count\" > 1 THEN '0' ";
-			sql += "		  		  ELSE M.\"BormNo\" END ";
+			sql += "		  		  ELSE M.\"BormNo\" END AS \"BormNo\"";
 		}
 		sql += "		  ,SUM(M.\"Amt\") AS \"Amt\"";
 		sql += "		  ,M.\"CustName\"";

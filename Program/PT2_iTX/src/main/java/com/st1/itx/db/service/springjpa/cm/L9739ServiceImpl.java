@@ -43,7 +43,7 @@ public class L9739ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	SELECT P.\"ProdNo\"";
 		sql += "		  ,P.\"ProdName\"";
 		sql += "		  ,P.\"ProdIncr\"";
-		sql += "		  ,NVL(S.\"EffectDate\",0) AS \"EffectDate\"";
+		sql += "		  ,NVL(P.\"StartDate\",0) AS \"EffectDate\"";
 		sql += "		  ,NVL(S.\"JsonFields\",'0') AS \"JsonFields\"";
 		sql += "		  ,NVL(S.\"lJsonFields\",'0') AS \"lJsonFields\"";
 		sql += "		  ,ROW_NUMBER()OVER(ORDER BY P.\"ProdNo\" ASC) as \"Seq\"";

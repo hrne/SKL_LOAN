@@ -351,6 +351,8 @@ public class L3230 extends TradeBuffer {
 				// 暫收款：可出帳餘額(不吻合帳戶別清零)、費用：未出帳餘額
 				ba.setAcAmt(BigDecimal.ZERO);
 				if ((iTempReasonCode == 1 && ba.getDataKind() == 3)
+						|| (iTempReasonCode == 2 && ba.getAcctCode().equals("TAV")
+								&& iCustNo == this.txBuffer.getSystemParas().getNegDeptCustNo())
 						|| (iTempReasonCode == 2 && ba.getAcctCode().substring(0, 2).equals("T1"))
 						|| (iTempReasonCode == 4 && ba.getAcctCode().equals("TAM"))) {
 					ba.setAcAmt(ba.getUnPaidAmt());
