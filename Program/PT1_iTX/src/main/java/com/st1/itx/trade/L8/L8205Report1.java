@@ -15,6 +15,7 @@ import com.st1.itx.db.service.springjpa.cm.L8205ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
+import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Component
@@ -44,7 +45,7 @@ public class L8205Report1 extends MakeReport {
 		this.print(-4, this.getMidXAxis(), "新光人壽保險股份有限公司", "C");
 		this.print(-4, 80, "報表等級：機密");
 		this.print(-5, 3, "報  表：" + this.getRptCode());
-		this.print(-5, this.getMidXAxis(), "疑似洗錢樣態3合理性報表", "C");
+		this.print(-5, this.getMidXAxis(), "疑似洗錢樣態合理性報表", "C");
 		String bcDate = dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(6, 8)
 				+ "/" + dDateUtil.getNowStringBc().substring(2, 4);
 		this.print(-5, 80, "日　　期：" + bcDate);
@@ -59,7 +60,8 @@ public class L8205Report1 extends MakeReport {
 	// 自訂表尾
 	@Override
 	public void printFooter() {
-		print(-66, this.getMidXAxis(), "　經辦:　　　　　　　　　　　　　　經理:　　　　　　　　　　　　　　協理:　　　　　　　　　　　　　　", "C");
+//		print(-65, this.getMidXAxis(), "　        　　　　　　　　　　　　　　督導主管:　　　　　　　　　　　　         　　　　　　　　　　　　　　", "C");
+//		print(-66, this.getMidXAxis(), "　經辦:　　　　　　　　　　　　　　經理:　　　　　　　　　　　　　　協理:　　　　　　　　　　　　　　", "C");
 	}
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
@@ -93,7 +95,7 @@ public class L8205Report1 extends MakeReport {
 		int icount = 0;
 
 		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getKinbr()).setRptDate(titaVo.getEntDyI())
-				.setSecurity("機密").setRptCode("L8205").setRptItem("疑似洗錢樣態3合理性報表").setPageOrientation("P")
+				.setSecurity("機密").setRptCode("L8205").setRptItem("疑似洗錢樣態合理性報表").setPageOrientation("P")
 				.setUseDefault(true).build();
 
 		this.open(titaVo, reportVo, "A4直式底稿.pdf");
@@ -105,8 +107,17 @@ public class L8205Report1 extends MakeReport {
 			DecimalFormat df1 = new DecimalFormat("#,##0");
 
 			for (Map<String, String> tL8205Vo : listL8205) {
-				// 樣態
-				print(1, 4, tL8205Vo.get("F0"));
+				// 樣態 :原樣態1改為樣態4,樣態2改為樣態5,樣態3改為樣態27
+				String type = tL8205Vo.get("F0");
+				String typex = "";
+				if("1".equals(type)) {
+					typex = " 4";
+				}else if("2".equals(type)){
+					typex = " 5";
+				}else {
+					typex = "27";
+				}
+				print(1, 3, typex);
 
 				// 入帳日
 				print(0, 6, tL8205Vo.get("F1") == "0" || tL8205Vo.get("F1") == null || tL8205Vo.get("F1").length() == 0
@@ -198,6 +209,8 @@ public class L8205Report1 extends MakeReport {
 		}
 
 		this.print(-64, this.getMidXAxis(), "===== 報　表　結　束 =====", "C");
+		print(-65, this.getMidXAxis(), "　        　　　　　　　　　　　　　　督導主管:　　　  　　　　　　　　         　　　　　　　　　　　　　　", "C");
+		print(-67, this.getMidXAxis(), "　經辦:　　　　　　　　　　　　　　經理:　　　　　　　　　　　　　　協理:　　　　　　　　　　　　　　", "C");
 
 		long sno = this.close();
 		this.toPdf(sno);
@@ -206,8 +219,8 @@ public class L8205Report1 extends MakeReport {
 
 	public void makeExcel(TitaVo titaVo) throws LogicException {
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L8205", "疑似洗錢樣態3合理性報表",
-				"L8205" + "_" + "疑似洗錢樣態3合理性報表");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L8205", "疑似洗錢樣態合理性報表",
+				"L8205" + "_" + "疑似洗錢樣態合理性報表");
 		printExcelHeader();
 
 		int rowCursor = 2;
@@ -215,8 +228,17 @@ public class L8205Report1 extends MakeReport {
 		if (listL8205 != null && listL8205.size() > 0) {
 
 			for (Map<String, String> tL8205Vo : listL8205) {
-
-				makeExcel.setValue(rowCursor, 1, tL8205Vo.get("F0"));
+				// 樣態 :原樣態1改為樣態4,樣態2改為樣態5,樣態3改為樣態27
+				String type = tL8205Vo.get("F0");
+				String typex = "";
+				if("1".equals(type)) {
+					typex = " 4";
+				}else if("2".equals(type)){
+					typex = " 5";
+				}else {
+					typex = "27";
+				}
+				makeExcel.setValue(rowCursor, 1, typex);
 
 				makeExcel
 						.setValue(rowCursor, 2,

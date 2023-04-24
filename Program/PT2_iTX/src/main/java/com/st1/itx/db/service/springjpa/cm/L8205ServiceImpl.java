@@ -61,7 +61,8 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		sql += "left join \"CdBranchGroup\" CD ON CD.\"BranchNo\" = T.\"BrNo\"	\n";
 //		sql += "and CD.\"GroupNo\" = T.\"GroupNo\"								\n";
 		sql += "left join \"CdEmp\" E ON M.\"CreateEmpNo\" = E.\"EmployeeNo\"	\n";
-		sql += "where M.\"EntryDate\" >= :entryStart and M.\"EntryDate\" <= :entrydEnd  and M.\"Factor\"='3'   \n";
+//		sql += "where M.\"EntryDate\" >= :entryStart and M.\"EntryDate\" <= :entrydEnd  and M.\"Factor\"='3'   \n";
+		sql += "where M.\"EntryDate\" >= :entryStart and M.\"EntryDate\" <= :entrydEnd    \n"; // 2023/4/24三種樣態合理性報表合併
 		sql += "order by M.\"EntryDate\" , M.\"CustNo\" ";
 
 		this.info("sql=" + sql);

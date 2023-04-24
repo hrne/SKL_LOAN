@@ -163,45 +163,48 @@ public class L5801Report3 extends MakeReport {
 				makeExcel.setValue(printRow, 1, Kind, fontStyleVo);
 
 				// F1 上月貸款餘額(次數)
-				makeExcel.setValue(printRow, 2, mapL5801.get("F1"), fontStyleVo);
+				String LastMonthCnt = mapL5801.get("F1");
+				makeExcel.setValue(printRow, 2, getBigDecimal(LastMonthCnt), fontStyleVo);
 				
 				// F2 上月貸款餘額
 				String LastMonthBal = mapL5801.get("F2");
-				makeExcel.setValue(printRow, 3, LastMonthBal, fontStyleVo);
+				makeExcel.setValue(printRow, 3, getBigDecimal(LastMonthBal), fontStyleVo);
 
 				// F3 本月貸出數(次數)
-				makeExcel.setValue(printRow, 4, mapL5801.get("F3"), fontStyleVo);
+				String ThisMonthOpenCnt = mapL5801.get("F3");
+				makeExcel.setValue(printRow, 4, getBigDecimal(ThisMonthOpenCnt), fontStyleVo);
 				
 				// F4 本月貸出數
 				String OpenAmount = mapL5801.get("F4");
-				makeExcel.setValue(printRow, 5, OpenAmount, fontStyleVo);
+				makeExcel.setValue(printRow, 5, getBigDecimal(OpenAmount), fontStyleVo);
 
 				// F5 本月收回數(次數)
-				makeExcel.setValue(printRow, 6, mapL5801.get("F5"), fontStyleVo);
+				String ThisMonthCloseCnt = mapL5801.get("F5");
+				makeExcel.setValue(printRow, 6, getBigDecimal(ThisMonthCloseCnt), fontStyleVo);
 
 				// F6 本月收回數
 				String CloseAmount = mapL5801.get("F6");
-				makeExcel.setValue(printRow, 7, CloseAmount, fontStyleVo);
+				makeExcel.setValue(printRow, 7, getBigDecimal(CloseAmount), fontStyleVo);
 
 				// F7 屆期不再申撥補貼息(次數)
-				makeExcel.setValue(printRow, 8, mapL5801.get("F7"), fontStyleVo);
+				String MaturityCnt = mapL5801.get("F7");
+				makeExcel.setValue(printRow, 8, getBigDecimal(MaturityCnt), fontStyleVo);
 				
 				// F8 屆期不再申撥補貼息
 				String MaturityAmount = mapL5801.get("F8");
-				makeExcel.setValue(printRow, 9, MaturityAmount, fontStyleVo);
+				makeExcel.setValue(printRow, 9, getBigDecimal(MaturityAmount), fontStyleVo);
 
-				// F9 本月貸款餘額
-				makeExcel.setValue(printRow, 10, mapL5801.get("F9"), fontStyleVo);
+				// F9 本月貸款餘額(次數)
+				String ThisMonthCnt = mapL5801.get("F9");
+				makeExcel.setValue(printRow, 10, getBigDecimal(ThisMonthCnt), fontStyleVo);
 				
 				// F10 本月貸款餘額
 				String ThisMonthBal = mapL5801.get("F10");
-
-				makeExcel.setValue(printRow, 11, ThisMonthBal, fontStyleVo);
+				makeExcel.setValue(printRow, 11, getBigDecimal(ThisMonthBal), fontStyleVo);
 				
 				// F1 補貼息
 				String Money = mapL5801.get("F11");
-
-				makeExcel.setValue(printRow, 12, Money, fontStyleVo);
+				makeExcel.setValue(printRow, 12, getBigDecimal(Money), fontStyleVo);
 				
 				printRow++;
 			}

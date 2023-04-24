@@ -449,7 +449,10 @@ BEGIN
           ,'0000'                         AS "TitaKinbr"           -- 登錄單位別 VARCHAR2 4 0 
           ,NVL(AEM1."EmpNo",'999999')     AS "TitaTlrNo"           -- 登錄經辦 VARCHAR2 6 0 
           ,LPAD(S."TRXNMT",8,'0')         AS "TitaTxtNo"           -- 登錄交易序號 DECIMAL 8 0 
-          ,S."TRXTRN"                     AS "TitaTxCd"            -- 交易代號 VARCHAR2 5 0 
+          ,CASE
+             WHEN S."AGLVBN" >= 90
+             THEN 'L618D'
+           ELSE S."TRXTRN" END            AS "TitaTxCd"            -- 交易代號 VARCHAR2 5 0 
           ,''                             AS "TitaSecNo"           -- 業務類別 VARCHAR2 2 0 
           ,''                             AS "TitaBatchNo"         -- 整批批號 VARCHAR2 6 0 
           ,''                             AS "TitaBatchSeq"        -- 整批明細序號 VARCHAR2 6 0 
@@ -655,7 +658,7 @@ BEGIN
           ,'0000'                         AS "TitaKinbr"           -- 登錄單位別 VARCHAR2 4 0 
           ,'999999'                       AS "TitaTlrNo"           -- 登錄經辦 VARCHAR2 6 0 
           ,0                              AS "TitaTxtNo"           -- 登錄交易序號 DECIMAL 8 0 
-          ,''                             AS "TitaTxCd"            -- 交易代號 VARCHAR2 5 0 
+          ,'L618D'                        AS "TitaTxCd"            -- 交易代號 VARCHAR2 5 0 
           ,''                             AS "TitaSecNo"           -- 業務類別 VARCHAR2 2 0 
           ,''                             AS "TitaBatchNo"         -- 整批批號 VARCHAR2 6 0 
           ,''                             AS "TitaBatchSeq"        -- 整批明細序號 VARCHAR2 6 0 

@@ -1422,4 +1422,27 @@ public class MakeExcel extends CommBuffer {
 //			}
 //		}
 	}
+
+	public void setNoBackgroundByRow(int row) throws LogicException {
+		if (this.openedSheet == null) {
+			throw new LogicException(titaVo, "E0013", "(MakeExcel) openedSheet is null");
+		}
+
+		Row tempRow = this.openedSheet.getRow(row - 1);
+
+		if (defaultColumnStyle == null) {
+			defaultColumnStyle = this.openedWorkbook.createCellStyle();
+			defaultColumnStyle.setFillForegroundColor(IndexedColors.AUTOMATIC.getIndex());
+			defaultColumnStyle.setFillPattern(FillPatternType.NO_FILL);
+		}
+
+		if (tempRow != null) {
+			for (Cell tempCell : tempRow) {
+				if (tempCell != null) {
+					tempCell.setCellStyle(defaultColumnStyle);
+				}
+			}
+		}
+
+	}
 }

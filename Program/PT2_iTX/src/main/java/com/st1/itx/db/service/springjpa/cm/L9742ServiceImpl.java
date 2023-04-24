@@ -88,7 +88,7 @@ public class L9742ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " 		LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = TX.\"CustNo\" ";
 		sql += " 		LEFT JOIN \"AcDetail\" ACD ON ACD.\"AcDate\" = TX.\"AcDate\" ";
 		sql += "                           		  AND ACD.\"TitaTxtNo\" = TO_NUMBER(TX.\"TitaTxtNo\") ";
-		sql += "                           		  AND ACD.\"TitaTxCd\" = TX.\"TitaTxCd\" ";
+//		sql += "                           		  AND ACD.\"TitaTxCd\" = TX.\"TitaTxCd\" ";
 		sql += "                           		  AND ACD.\"TitaTlrNo\" = TX.\"TitaTlrNo\" ";
 		sql += " 		LEFT JOIN \"CdAcCode\" CDAC ON CDAC.\"AcNoCode\" = ACD.\"AcNoCode\" ";
 		sql += "                            	   AND CDAC.\"AcSubCode\" = ACD.\"AcSubCode\" ";
@@ -148,10 +148,10 @@ public class L9742ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "		    ,CASE WHEN CC.\"Count\" > 1 THEN '0' ";
 			sql += "		  		  ELSE M.\"BormNo\" END AS \"BormNo\"";
 		}
-		sql += "		  ,SUM(M.\"Amt\") AS \"Amt\"";
 		sql += "		  ,M.\"CustName\"";
-		sql += "		  ,M.\"IntStartDate\"";
-		sql += "		  ,M.\"IntEndDate\"";
+		sql += "		  ,SUM(M.\"Amt\") AS \"Amt\"";
+		sql += "		  ,MIN(M.\"IntStartDate\") AS \"IntStartDate\"";
+		sql += "		  ,MAXM.\"IntEndDate\") AS \"IntEndDate\"";
 		sql += "		  ,M.\"Fullname\"";
 		sql += "		  ,M.\"AcDate\"";
 		sql += "		  ,M.\"AcSubCode\"";
@@ -173,8 +173,6 @@ public class L9742ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "		  		  ELSE M.\"BormNo\" END ";
 		}
 		sql += "		    ,M.\"CustName\"";
-		sql += "		    ,M.\"IntStartDate\"";
-		sql += "		    ,M.\"IntEndDate\"";
 		sql += "		    ,M.\"Fullname\"";
 		sql += "		    ,M.\"AcDate\"";
 		sql += "		    ,M.\"AcSubCode\"";

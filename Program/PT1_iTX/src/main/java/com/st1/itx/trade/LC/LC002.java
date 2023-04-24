@@ -29,7 +29,7 @@ import com.st1.itx.db.service.springjpa.cm.LC002ServiceImpl;
 @Scope("prototype")
 /**
  * 修正查詢
- * 
+ *
  * @author eric chang
  * @version 1.0.0
  */
@@ -101,7 +101,7 @@ public class LC002 extends TradeBuffer {
 
 				}
 			} else
-				throw new LogicException(titaVo, "E0001", "訂正資料");
+				throw new LogicException(titaVo, "E0001", "修正資料");
 
 			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 			if (dList != null && dList.size() >= this.limit) {

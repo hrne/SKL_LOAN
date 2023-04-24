@@ -172,7 +172,7 @@ public class L5801Report extends MakeReport {
 				// F10 優惠貸款金額
 				String DrawdownAmt = mapL5801.get("F10");
 
-				makeExcel.setValue(printRow, 10, DrawdownAmt, fontStyleVo);
+				makeExcel.setValue(printRow, 10, getBigDecimal(DrawdownAmt), fontStyleVo);
 
 				// F11 撥款日期
 				String FirstDrawdownDate = mapL5801.get("F11");

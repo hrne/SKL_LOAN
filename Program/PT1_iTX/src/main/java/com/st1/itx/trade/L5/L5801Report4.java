@@ -149,32 +149,32 @@ public class L5801Report4 extends MakeReport {
 				// F7 A.上月貸款餘額
 				String LastMonthBal = mapL5801.get("F6");
 
-				makeExcel.setValue(printRow, 6, LastMonthBal, fontStyleVo);
+				makeExcel.setValue(printRow, 6, getBigDecimal(LastMonthBal), fontStyleVo);
 
 				// F8 B.本月貸出數
 				String OpenAmount = mapL5801.get("F7");
 
-				makeExcel.setValue(printRow, 7, OpenAmount, fontStyleVo);
+				makeExcel.setValue(printRow, 7, getBigDecimal(OpenAmount), fontStyleVo);
 
 				// F9 C1.本月收回數
 				String CloseAmount = mapL5801.get("F8");
 
-				makeExcel.setValue(printRow, 8, CloseAmount, fontStyleVo);
+				makeExcel.setValue(printRow, 8, getBigDecimal(CloseAmount), fontStyleVo);
 
 				// F10 C2.屆期不再申撥補貼息
 				String MaturityAmount = mapL5801.get("F9");
 
-				makeExcel.setValue(printRow, 9, MaturityAmount, fontStyleVo);
+				makeExcel.setValue(printRow, 9, getBigDecimal(MaturityAmount), fontStyleVo);
 
 				// F11 D.本月貸款餘額
 				String ThisMonthBal = mapL5801.get("F10");
 				
-				makeExcel.setValue(printRow, 10, ThisMonthBal, fontStyleVo);
+				makeExcel.setValue(printRow, 10, getBigDecimal(ThisMonthBal), fontStyleVo);
 				
 				// F5 補貼息
 				String Money = mapL5801.get("F11");
 
-				makeExcel.setValue(printRow, 11, Money, fontStyleVo);
+				makeExcel.setValue(printRow, 11, getBigDecimal(Money), fontStyleVo);
 				printRow++;
 			}
 			// 畫框線

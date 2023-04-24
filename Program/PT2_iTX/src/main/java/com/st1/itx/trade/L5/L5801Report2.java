@@ -146,7 +146,7 @@ public class L5801Report2 extends MakeReport {
 				// F7 原核撥優惠貸款金額
 				String DrawdownAmt = mapL5801.get("F7");
 
-				makeExcel.setValue(printRow, 7, DrawdownAmt, fontStyleVo);
+				makeExcel.setValue(printRow, 7, getBigDecimal(DrawdownAmt), fontStyleVo);
 
 				// F8 銷戶/終止補貼日期
 				String CloseDate = mapL5801.get("F8");
@@ -161,7 +161,7 @@ public class L5801Report2 extends MakeReport {
 				// F10 上個月貸款餘額
 				String LastmonthBal = mapL5801.get("F10");
 
-				makeExcel.setValue(printRow, 10, LastmonthBal, fontStyleVo);
+				makeExcel.setValue(printRow, 10, getBigDecimal(LastmonthBal), fontStyleVo);
 
 				
 				printRow++;

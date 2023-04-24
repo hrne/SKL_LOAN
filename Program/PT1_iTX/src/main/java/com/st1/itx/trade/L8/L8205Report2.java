@@ -15,13 +15,14 @@ import com.st1.itx.db.service.springjpa.cm.L8205ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
+import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Component
 @Scope("prototype")
 
 public class L8205Report2 extends MakeReport {
-
+	//2023/4/24三個樣態合併到Report1,故Report2不需執行
 	@Autowired
 	L8205ServiceImpl l8205ServiceImpl;
 
@@ -105,7 +106,7 @@ public class L8205Report2 extends MakeReport {
 
 			for (Map<String, String> tL8205Vo : listL8205) {
 				// 樣態
-				print(1, 4, tL8205Vo.get("F0"));
+				print(1, 3, tL8205Vo.get("F0"));
 
 				// 入帳日
 				print(0, 6, tL8205Vo.get("F1") == "0" || tL8205Vo.get("F1") == null || tL8205Vo.get("F1").length() == 0

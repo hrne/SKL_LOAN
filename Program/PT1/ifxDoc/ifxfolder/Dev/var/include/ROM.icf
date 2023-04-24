@@ -8709,6 +8709,7 @@ TXFORM=L8R49
 #L8R50ManagerDate=D,7,S
 #L8R50ManagerCheckDate=D,7,S
 #L8R50CustName=x,50,S
+#L8R50EditEmpNo=X,6,S
 </L8R50.dec>
 
 <L8R50.tom>
@@ -8725,6 +8726,7 @@ TXFORM=L8R50
 #L8R50ManagerDate
 #L8R50ManagerCheckDate
 #L8R50CustName
+#L8R50EditEmpNo
 
 ^
 </L8R50.tom>

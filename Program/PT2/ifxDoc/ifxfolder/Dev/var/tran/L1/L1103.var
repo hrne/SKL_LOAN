@@ -546,12 +546,13 @@ C(3,#IdSTAT,4,T(2,@FdPassportnoBef,*),T(2,@FdPassportnoBef, ))
 T(H,#TypeCodeBef,#TypeCodeHelp)
 
 #TypeCodeAft=A,1,I
-C(2,#TypeCodeBef,s,$,$,$,$)
+C(5,#TypeCodeBef,0,T(F,@TypeCodeAft,0),T(F,@TypeCodeAft,1))
+IF(#TypeCodeBef==0,C(2,#TypeCodeBef,s,$,$,$,$),$)
 HELP(#TypeCodeHelp)
 @
 C(3,#TypeCodeBef,#TypeCodeAft,s,$)
 C(2,#TypeCodeBef,V(1,0),V(1,0,1),V(1,0,1,2,3,4),V(1,0,1,2,3,4),V(1,0,1,2,3,4))
-!V(H,#TypeCodeHelp)
+V(H,#TypeCodeHelp)
 
 #TypeCodeXAft=x,20,L
 T(H,#TypeCodeAft,#TypeCodeHelp)

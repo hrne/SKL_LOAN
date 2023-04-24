@@ -148,88 +148,101 @@ public class L2419 extends TradeBuffer {
 		String evaCompany = titaVo.getParam("EvaCompany");
 		// 鑑價日期
 		int evaDate = Integer.parseInt(titaVo.getParam("EvaDate")) + 19110000;
-		// 批號
-		String groupNo = getGroupNo(applNo, titaVo);
-
-		Slice<ClBatch> slClBatch = sClBatchService.findGroupNo(groupNo, 0, Integer.MAX_VALUE, titaVo);
-		if (slClBatch != null && !slClBatch.isEmpty()) {
-			// 此批號已存在,通知錯誤
-			throw new LogicException("E0005", "批號已存在,擔保品整批匯入檔(ClBatch),批號(" + groupNo + ")");
-		}
-
-		int lastRowNum = makeExcel.getSheetLastRowNum();
-
-		this.info("lastRowNum=" + lastRowNum);
-
-		ClBatch tClBatch;
-		ClBatchId tClBatchId;
-
-		int row = 3;
-		for (; row <= lastRowNum + 1; row++) {
-			this.info("row = " + row);
-
-			// 編號
-			String columnA = makeExcel.getValue(row, L2419Column.NO.getIndex()).toString(); // NO
-			int no = (int) toNumeric(columnA);
-
-			if (no == 0) {
-				setError(row, L2419Column.NO.getIndex());
-				break;
-			}
-
-			// 擔保品代號1
-			String columnB = makeExcel.getValue(row, L2419Column.CL_CODE_1.getIndex()).toString();
-			columnB = columnB.substring(0, columnB.indexOf("_"));
-			this.info("columnB = " + columnB);
-			int clCode1 = Integer.parseInt(columnB);
-
-			// 擔保品代號2
-			String columnC = makeExcel.getValue(row, L2419Column.CL_CODE_2.getIndex()).toString();
-			columnC = columnC.substring(0, columnC.indexOf("_"));
-			this.info("columnC = " + columnC);
-			int clCode2 = Integer.parseInt(columnC);
-
-			// 擔保品序號
-			int clNo = this.getClNo(clCode1, clCode2, titaVo);
-
-			makeExcel.setValueInt(row, L2419Column.CL_NO.getIndex(), clNo);
-
-			tClBatchId = new ClBatchId();
-			tClBatchId.setGroupNo(groupNo);
-			tClBatchId.setSeq(no);
-
-			tClBatch = new ClBatch();
-			tClBatch.setClBatchId(tClBatchId);
-			tClBatch.setApplNo(applNo);
-			tClBatch.setEvaCompany(evaCompany);
-			tClBatch.setEvaDate(evaDate);
-			tClBatch.setClCode1(clCode1);
-			tClBatch.setClCode2(clCode2);
-			tClBatch.setClNo(clNo);
-			tClBatch.setInsertStatus(0);
-
-			try {
-				sClBatchService.insert(tClBatch, titaVo);
-			} catch (DBException e) {
-				throw new LogicException("E0005", "擔保品整批匯入檔(ClBatch),上傳檔編號(" + no + ")");
-			}
-		}
-
-		makeExcel.lockColumn(3, row - 1, L2419Column.NO.getIndex(), L2419Column.CL_NO.getIndex(), 142); // 142:最後一個欄位Index
-
-		makeExcel.protectSheet(groupNo);
-
-		String newFileItem = "擔保品明細表回饋檔_" + groupNo + ".xlsx";
-		String fileName = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
-				+ File.separatorChar + newFileItem;
-		makeExcel.saveExcel(fileName);
-		toTxFile(titaVo, fileName, newFileItem);
 
 		String msg = "";
-
+		
 		if (noError) {
+			// 批號
+			String groupNo = getGroupNo(applNo, titaVo);
+
+			Slice<ClBatch> slClBatch = sClBatchService.findGroupNo(groupNo, 0, Integer.MAX_VALUE, titaVo);
+			if (slClBatch != null && !slClBatch.isEmpty()) {
+				// 此批號已存在,通知錯誤
+				throw new LogicException("E0005", "批號已存在,擔保品整批匯入檔(ClBatch),批號(" + groupNo + ")");
+			}
+
+			int lastRowNum = makeExcel.getSheetLastRowNum();
+
+			this.info("lastRowNum=" + lastRowNum);
+
+			ClBatch tClBatch;
+			ClBatchId tClBatchId;
+
+			int row = 3;
+			for (; row <= lastRowNum + 1; row++) {
+				this.info("row = " + row);
+
+				// 編號
+				String columnA = makeExcel.getValue(row, L2419Column.NO.getIndex()).toString(); // NO
+				int no = (int) toNumeric(columnA);
+
+				if (no == 0) {
+					setError(row, L2419Column.NO.getIndex());
+					break;
+				}
+
+				// 擔保品代號1
+				String columnB = makeExcel.getValue(row, L2419Column.CL_CODE_1.getIndex()).toString();
+				if (columnB == null || columnB.isEmpty()) {
+					continue;
+				}
+				columnB = columnB.substring(0, columnB.indexOf("_"));
+				this.info("columnB = " + columnB);
+				int clCode1 = Integer.parseInt(columnB);
+				if (clCode1 != 1 || clCode1 != 2) {
+					continue;
+				}
+
+				// 擔保品代號2
+				String columnC = makeExcel.getValue(row, L2419Column.CL_CODE_2.getIndex()).toString();
+				if (columnC == null || columnC.isEmpty()) {
+					continue;
+				}
+				columnC = columnC.substring(0, columnC.indexOf("_"));
+				this.info("columnC = " + columnC);
+				int clCode2 = Integer.parseInt(columnC);
+
+				// 擔保品序號
+				int clNo = this.getClNo(clCode1, clCode2, titaVo);
+
+				makeExcel.setValueInt(row, L2419Column.CL_NO.getIndex(), clNo);
+
+				tClBatchId = new ClBatchId();
+				tClBatchId.setGroupNo(groupNo);
+				tClBatchId.setSeq(no);
+
+				tClBatch = new ClBatch();
+				tClBatch.setClBatchId(tClBatchId);
+				tClBatch.setApplNo(applNo);
+				tClBatch.setEvaCompany(evaCompany);
+				tClBatch.setEvaDate(evaDate);
+				tClBatch.setClCode1(clCode1);
+				tClBatch.setClCode2(clCode2);
+				tClBatch.setClNo(clNo);
+				tClBatch.setInsertStatus(0);
+
+				try {
+					sClBatchService.insert(tClBatch, titaVo);
+				} catch (DBException e) {
+					throw new LogicException("E0005", "擔保品整批匯入檔(ClBatch),上傳檔編號(" + no + ")");
+				}
+			}
+
+			makeExcel.lockColumn(3, row - 1, L2419Column.NO.getIndex(), L2419Column.CL_NO.getIndex(), 142); // 142:最後一個欄位Index
+
+			makeExcel.protectSheet(groupNo);
+			String newFileItem = "擔保品明細表回饋檔_" + groupNo + ".xlsx";
+			String fileName = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
+					+ File.separatorChar + newFileItem;
+			makeExcel.saveExcel(fileName);
+			toTxFile(titaVo, fileName, newFileItem);
 			msg = "擔保品整批匯入，資料已檢核通過，請至【報表及製檔】下傳回饋檔";
 		} else {
+			String newFileItem = "擔保品明細表回饋檔_error.xlsx";
+			String fileName = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
+					+ File.separatorChar + newFileItem;
+			makeExcel.saveExcel(fileName);
+			toTxFile(titaVo, fileName, newFileItem);
 			msg = "擔保品整批匯入，資料檢核不通過，請至【報表及製檔】下傳回饋檔，修正紅底欄位資料";
 		}
 
@@ -273,21 +286,31 @@ public class L2419 extends TradeBuffer {
 
 		lastOwnerList = new ArrayList<>();
 
+		int lastNo = 0;
+
 		for (int i = 0; i <= lastRowNum; i++) {
 
 			int row = 3 + i;
 
 			this.info("row = " + row);
 
+			makeExcel.setNoBackgroundByRow(row);
+
 			// 編號
 			String columnA = makeExcel.getValue(row, L2419Column.NO.getIndex()).toString(); // NO
 			int no = (int) toNumeric(columnA);
 			this.info("columnA = " + columnA);
 
-			if (no == 0) {
-				setError(row, L2419Column.NO.getIndex());
+			// 是否寫入資料庫
+			String insertFlag = makeExcel.getValue(row, L2419Column.INSERT_FLAG.getIndex()).toString();
+
+			if (no == 0 && insertFlag != null && !insertFlag.isEmpty()) {
+				no = lastNo + 1;
+				makeExcel.setValueInt(row, L2419Column.NO.getIndex(), no);
+			} else if (no == 0) {
 				break;
 			}
+			lastNo = no;
 
 			// 擔保品代號1
 			String clCode1String = makeExcel.getValue(row, L2419Column.CL_CODE_1.getIndex()).toString();
@@ -317,8 +340,6 @@ public class L2419 extends TradeBuffer {
 				} else if (clCode1 == 2) {
 					checkCode(titaVo, "ClCode22", "" + clCode2, "擔保品代號2", columnC, row,
 							L2419Column.CL_CODE_2.getIndex());
-				} else {
-					setError(row, L2419Column.CL_CODE_1.getIndex());
 				}
 			} else {
 				// 此為必輸欄位
@@ -336,7 +357,6 @@ public class L2419 extends TradeBuffer {
 			}
 
 			// 是否寫入資料庫
-			String insertFlag = makeExcel.getValue(row, L2419Column.INSERT_FLAG.getIndex()).toString();
 			if ((insertFlag == null || insertFlag.isEmpty()) || !(insertFlag.equals("Y") || insertFlag.equals("N"))) {
 				setError(row, L2419Column.INSERT_FLAG.getIndex());
 			}
@@ -353,9 +373,11 @@ public class L2419 extends TradeBuffer {
 				}
 
 				if (drawdownStatus.equals("Y")) {
+					// 已經撥款 insertFlag不能改為N
 					setError(row, L2419Column.INSERT_FLAG.getIndex());
 				}
 			}
+
 			// 擔保品類別代碼
 			String typeCode = makeExcel.getValue(row, L2419Column.CL_TYPE.getIndex()).toString();
 			if (typeCode != null && !typeCode.isEmpty()) {
@@ -363,7 +385,7 @@ public class L2419 extends TradeBuffer {
 				this.info("typeCode = " + typeCode);
 				if (clCode1 == 1) {
 					checkCode(titaVo, "ClTypeCode21", typeCode, "擔保品類別", typeCode, row, L2419Column.CL_TYPE.getIndex());
-				} else {
+				} else if (clCode1 == 2) {
 					checkCode(titaVo, "ClTypeCode22", typeCode, "擔保品類別", typeCode, row, L2419Column.CL_TYPE.getIndex());
 				}
 			} else {

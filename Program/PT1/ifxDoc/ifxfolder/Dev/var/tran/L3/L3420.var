@@ -1117,16 +1117,22 @@ C(3,#CaseCloseCode,2,E(0,@RPFG,2),$)
 C(3,#CaseCloseCode,4,E(0,@RPFG,2),$)
 C(3,#CaseCloseCode,5,E(0,@RPFG,2),$)
 C(3,#CaseCloseCode,6,E(0,@RPFG,2),$)
+
+
+! 額度
+#TmpFacmNo=X,1,S
+C(3,#L492aRepayType,0,E(0,@RP_FACMNO,#L3r11RpFacmNo),E(0,@RP_FACMNO,#L492aFacmNo))
+
 !改
 !還款來源,1:匯款轉帳 91:借新還舊
 #TMPRPTYP=X,1,S
 ! IF(#CaseCloseCode==1 || #CaseCloseCode==2,E(0,@RPTYPZ,91),E(0,@RPTYPZ,#L492aRepayCode))
 C(3,#L492aRepayCode,0,E(0,@RPTYPZ,90),E(0,@RPTYPZ,#L492aRepayCode))
 C(3,#L492aRepayCode,0,
-IF(#CaseCloseCode==1,E(0,@RPTYPZ,95),$)
-IF(#CaseCloseCode==2,E(0,@RPTYPZ,91),$),
-IF(#CaseCloseCode==1,E(0,@RPTYPZ2,95),$)
-IF(#CaseCloseCode==2,E(0,@RPTYPZ2,91),$))
+IF(#CaseCloseCode==1,E(0,@RPTYPZ,95)E(0,@RP_FACMNO,#FacmNo),$)
+IF(#CaseCloseCode==2,E(0,@RPTYPZ,91)E(0,@RP_FACMNO,#FacmNo),$),
+IF(#CaseCloseCode==1,E(0,@RPTYPZ2,95)E(0,@RP_FACMNO2,#FacmNo),$)
+IF(#CaseCloseCode==2,E(0,@RPTYPZ2,91)E(0,@RP_FACMNO2,#FacmNo),$))
 
 !Principal,本金
 !Interest,利息
@@ -1184,10 +1190,6 @@ E(0,@RP_REPCAT,3)
 
 #TmpCustNo=X,1,S
 E(0,@RP_CUSTNO,#CustNo)
-
-! 額度
-#TmpFacmNo=X,1,S
-C(3,#L492aRepayType,0,E(0,@RP_FACMNO,#L3r11RpFacmNo),E(0,@RP_FACMNO,#L492aFacmNo))
 
 
 !類別   摘要

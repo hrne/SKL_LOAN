@@ -131,8 +131,11 @@ T(3,[L8926] 疑似洗錢交易合理性明細查詢)
 #OFactor=N,2,L
 #OFactor1=A,1,L
 E(0,#OFactor)
+!#OFactorX=X,6,L
+!T(2,樣態+#OFactor1)
 #OFactorX=X,6,L
-T(2,樣態+#OFactor1)
+T(H,#OFactor,#FactorHelp)
+
 #OTotalAmt=m,14,L
 #OTotalCnt=N,4,L
 #ORational=X,1,L
@@ -201,6 +204,9 @@ X(#OOTotalAmt1)
 
 !交易樣態(TOTA)
 #OOFactor=N,2,L
+#OOFactorX=X,6,L
+T(H,#OOFactor,#FactorHelp)
+
 
 !統計期間起日
 #OOStartEntryDate=D,7,L
@@ -282,7 +288,7 @@ TXFORM=L8926
 #OOCreateDate=產製日期
 {width:80,align:'center'}
 
-#OOFactor=交易樣態
+#OOFactorX=交易樣態
 {width:70,align:'center'}
 
 #OOEntryDate=入帳日期
