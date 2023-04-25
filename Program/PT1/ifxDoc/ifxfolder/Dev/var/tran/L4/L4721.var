@@ -113,6 +113,11 @@ T(3,)T(H,#CustType,#EntCodeHelp)
 ! #CHAINXMT=X,1,S
 ! C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 
+
+#RPTFG=A,1,S
+E(0,0)
+
+
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -122,6 +127,23 @@ T(3,)T(H,#CustType,#EntCodeHelp)
 
 !------------ TXFORM = L4721 -----------
 <sub type="FORM" name="L4721">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L4721,$,S)
+
+#SCRTIL=_,_,S
+
+T(3,[L4721] 整批批次產出利率變動對帳單)
+
+! 筆數(TOTA)
+#CntPaper=N,16,L
+
+! 筆數(TOTA)
+#CntEmail=N,16,L
+
+! 筆數(TOTA)
+#CntMsg=N,16,L
+
 </sub>
 
 !------ 上行電文 TEXT ------
@@ -136,14 +158,19 @@ T(3,)T(H,#CustType,#EntCodeHelp)
 
 !------ 下行電文TOM ------
 <sub type="TOM">
-<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L4721
 ^
-<include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="COM.icf::TRCTL.tom"/>
 </sub>
+
+
 
 
 !---------- 單據輸出組合 ----------
 <sub type="SELECT">
 <include src="PRT.icf::UPD01.sel"/>
+
 </sub>
+
+

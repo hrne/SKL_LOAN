@@ -184,6 +184,8 @@ T(3,1)ASGN(LOOP$)
 
 !交易樣態(TOTA)
 #OOFactor=N,2,L
+#OOFactorX=X,6,L
+T(H,#OOFactor,#FactorHelp)
 
 !入帳日期(TOTA)
 #OOAcDate=D,7,L
@@ -371,7 +373,7 @@ TXFORM=L8922
 #OOBTNL8923=訪談
 {width:50,search:false,formatter:'cust:bind-button:#OOBTNL8923',align:'center',canExport:false}
 
-#OOFactor=交易樣態
+#OOFactorX=交易樣態
 {width:70,align:'center'}
 
 #OOAcDate=入帳日期

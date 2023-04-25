@@ -26,7 +26,7 @@ import com.st1.itx.util.http.WebClient;
 public class L4721 extends TradeBuffer {
 
 	@Autowired
-	public L4721ServiceImpl l4721ServiceImpl;
+	public L4721Batch sL4721Batch;
 
 	@Autowired
 	public WebClient webClient;
@@ -40,8 +40,11 @@ public class L4721 extends TradeBuffer {
 
 //		還本繳息對帳單.pdf
 		// 執行交易
-		webClient.sendPost(dateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "", "", titaVo.getParam("TLRNO"), "批次作業啟動請稍等", titaVo);
+		webClient.sendPost(dateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "", "",
+				titaVo.getParam("TLRNO"), "批次作業啟動請稍等", titaVo);
 		MySpring.newTask("L4721Batch", this.txBuffer, titaVo);
+		
+//		sL4721Batch.run(titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

@@ -150,7 +150,7 @@ public class L2419 extends TradeBuffer {
 		int evaDate = Integer.parseInt(titaVo.getParam("EvaDate")) + 19110000;
 
 		String msg = "";
-		
+
 		if (noError) {
 			// 批號
 			String groupNo = getGroupNo(applNo, titaVo);
@@ -188,7 +188,7 @@ public class L2419 extends TradeBuffer {
 				columnB = columnB.substring(0, columnB.indexOf("_"));
 				this.info("columnB = " + columnB);
 				int clCode1 = Integer.parseInt(columnB);
-				if (clCode1 != 1 || clCode1 != 2) {
+				if (clCode1 != 1 && clCode1 != 2) {
 					continue;
 				}
 

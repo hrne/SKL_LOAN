@@ -2,7 +2,7 @@ package com.st1.itx.trade.L4;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +16,9 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.buffer.TxBuffer;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.BatxRateChange;
+import com.st1.itx.db.domain.CustNotice;
 import com.st1.itx.db.service.BatxRateChangeService;
+import com.st1.itx.db.service.CustNoticeService;
 import com.st1.itx.db.service.springjpa.cm.L4721ServiceImpl;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.MakeFile;
@@ -69,7 +71,10 @@ public class L4721Report2 extends MakeReport {
 	String headerExcessive = "";
 	String headerDueAmt = "";
 
-	public void exec(TitaVo titaVo, TxBuffer txbuffer, int txKind, String kindItem) throws LogicException {
+
+
+	public void exec(TitaVo titaVo, TxBuffer txbuffer, int txKind, String kindItem)
+			throws LogicException {
 		this.info("L4721Report2 exec start");
 
 		int itxKind = parse.stringToInteger(titaVo.getParam("TxKind"));
@@ -94,6 +99,7 @@ public class L4721Report2 extends MakeReport {
 
 		makeFile.toFile(sno);
 
+
 		// itxKind畫面上的 0 全部，txKind是JAVA內設定的參數，因照迴圈跑到5為最後一項的時候在丟出訊息，否則會跑出五次
 		if (itxKind == 0 && txKind == 5) {
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
@@ -102,6 +108,7 @@ public class L4721Report2 extends MakeReport {
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
 					titaVo.getTlrNo() + "L4721", titaVo.getTxCode() + " 已產生L4721.txt", titaVo);
 		}
+
 	}
 
 	private List<String> getData(TitaVo titaVo, int txkind) throws LogicException {
@@ -140,6 +147,8 @@ public class L4721Report2 extends MakeReport {
 
 		lBatxRateChange = sBatxRateChange == null ? null : sBatxRateChange.getContent();
 
+		this.info("lBatxRateChange.size()=" + lBatxRateChange.size());
+
 		if (lBatxRateChange == null || lBatxRateChange.size() == 0) {
 			return result;
 		}
@@ -158,10 +167,14 @@ public class L4721Report2 extends MakeReport {
 			custNo = tBatxRateChange.getCustNo();
 			facmNo = tBatxRateChange.getFacmNo();
 
+			this.info("custNo =" + custNo);
+			this.info("facmNo =" + facmNo);
+
+
 			List<Map<String, String>> listL4721Detail = new ArrayList<Map<String, String>>();
 
 			try {
-				listL4721Detail = l4721ServiceImpl.doDetail(custNo, isday, ieday, tBatxRateChange.getAdjDate(), titaVo);
+				listL4721Detail = l4721ServiceImpl.doDetail(custNo, isday, ieday, tBatxRateChange.getAdjDate() + 19110000, titaVo);
 			} catch (Exception e) {
 				this.error("bankStatementServiceImpl doQuery = " + e.getMessage());
 				throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");

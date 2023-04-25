@@ -327,7 +327,7 @@ public class L4321Batch extends TradeBuffer {
 		}
 		if (tBatxRateChange.getAdjustedRate().compareTo(tBatxRateChange.getPresentRate()) != 0
 				&& tLoanBorMain.getPrevPayIntDate() > tBatxRateChange.getCurtEffDate()) {
-			checkMsg += "上次繳息日大於利率生效日 ";
+			checkMsg += "上次繳息日大於利率生效日";
 			isCheckError = true;
 		}
 
@@ -378,7 +378,8 @@ public class L4321Batch extends TradeBuffer {
 		}
 		if (isCheckError) {
 			this.checkErrorCnt++;
-			tBatxRateChange.setAdjCode(8);
+			tBatxRateChange.setAdjCode(8); // 8.確認失敗件
+			tBatxRateChange.setRateKeyInCode(0); // 0:未調整
 			tTempVo.putParam("CheckMsg", checkMsg);
 			tBatxRateChange.setJsonFields(tTempVo.getJsonString());
 			try {

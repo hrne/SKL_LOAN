@@ -255,6 +255,16 @@ public class L4040 extends TradeBuffer {
 						} catch (DBException e) {
 							throw new LogicException(titaVo, "E0007", "L4041 PostAuthLog update " + e.getErrorMsg());
 						}
+						this.info("updDetailStatus...0");
+//						2.回寫狀態
+						TxToDoDetailId tTxToDoDetailId = new TxToDoDetailId();
+						tTxToDoDetailId.setCustNo(tAchAuthLog.getCustNo());
+						tTxToDoDetailId.setFacmNo(tAchAuthLog.getFacmNo());
+						tTxToDoDetailId.setBormNo(0);
+						tTxToDoDetailId.setDtlValue(FormatUtil.pad9(tAchAuthLog.getRepayAcct(), 14));
+						tTxToDoDetailId.setItemCode("ACHP00");
+
+						txToDoCom.updDetailStatus(0, tTxToDoDetailId, titaVo);
 					}
 				}
 			} else {

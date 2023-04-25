@@ -164,6 +164,8 @@ public class L3922 extends TradeBuffer {
 		if (lLoanBorMain == null || lLoanBorMain.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "放款主檔"); // 查詢資料不存在
 		}
+		
+		Boolean isCalcu = false;
 		for (LoanBorMain ln : lLoanBorMain) {
 			// 戶況 0: 正常戶1:展期2: 催收戶3: 結案戶4: 逾期戶5: 催收結案戶6: 呆帳戶7: 部分轉呆戶8: 債權轉讓戶9: 呆帳結案戶
 			switch (iCaseCloseCode) { // 結案區分
@@ -172,22 +174,15 @@ public class L3922 extends TradeBuffer {
 			case 2: // 2:借新還舊
 			case 3: // 3:轉催收
 				if (!(ln.getStatus() == 0 || ln.getStatus() == 4)) {
-					if (iBormNo == 0) {
-						continue;
-					} else {
-						throw new LogicException(titaVo, "E3068", "戶況 = " + ln.getStatus()); // 該筆放款戶況非正常戶及逾期戶
-					}
+					continue;
 				}
+				isCalcu = true;
 				break;
 			case 4: // 4:催收戶本人清償
 			case 5: // 5:催收戶保證人代償
 			case 6: // 6:催收戶強制執行
 				if (ln.getStatus() != 2 && ln.getStatus() != 7) {
-					if (iBormNo == 0) {
-						continue;
-					} else {
-						throw new LogicException(titaVo, "E3069", "戶況 = " + ln.getStatus()); // 該筆放款戶況非催收戶
-					}
+					continue;
 				} else {
 					// 查詢催收呆帳檔
 					tLoanOverdue = loanOverdueService.findById(
@@ -199,15 +194,13 @@ public class L3922 extends TradeBuffer {
 					wkOvduPaidPrin = tLoanOverdue.getOvduPrinAmt().subtract(tLoanOverdue.getOvduPrinBal()); // 催收還款本金
 					wkOvduPaidInt = tLoanOverdue.getOvduIntAmt().subtract(tLoanOverdue.getOvduIntBal()); // 催收還款利息
 				}
+				isCalcu = true;
 			case 7: // 7:轉列呆帳
 			case 8: // 8:催收部分轉呆
 				if (ln.getStatus() != 2 && ln.getStatus() != 7) {
-					if (iBormNo == 0) {
-						continue;
-					} else {
-						throw new LogicException(titaVo, "E3069", "戶況 = " + ln.getStatus()); // 該筆放款戶況非催收戶
-					}
+					continue;
 				}
+				isCalcu = true;
 				break;
 			default:
 				throw new LogicException(titaVo, "E0010", "結案區分 = " + iCaseCloseCode); // 功能選擇錯誤
@@ -257,6 +250,13 @@ public class L3922 extends TradeBuffer {
 					// 將每筆資料放入Tota的OcList
 					this.totaVo.addOccursList(occursList);
 				}
+			}
+		}
+		if (!isCalcu) {
+			if (iCaseCloseCode < 4) {
+				throw new LogicException(titaVo, "E3068", ""); // 該筆放款戶況非正常戶及逾期戶
+			} else {
+				throw new LogicException(titaVo, "E3069", ""); // 該筆放款戶況非催收戶
 			}
 		}
 

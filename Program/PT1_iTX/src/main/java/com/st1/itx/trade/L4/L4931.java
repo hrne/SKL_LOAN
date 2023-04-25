@@ -124,7 +124,7 @@ public class L4931 extends TradeBuffer {
 
 				String procNote = "";
 				if (tempVo.get("CheckMsg") != null) {
-					procNote += tempVo.get("CheckMsg");
+					procNote += tempVo.get("CheckMsg") + " ";
 				}
 				if (tempVo.get("WarnMsg") != null) {
 					procNote += tempVo.get("WarnMsg");

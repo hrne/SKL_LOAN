@@ -1,6 +1,8 @@
 package com.st1.itx.trade.L4;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -56,11 +58,13 @@ public class L4721Batch extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 		this.limit = Integer.MAX_VALUE;
 
+		Map<String, String> countCustNotice = new HashMap<String, String>();
+
 		if (this.iTxKind == 0) {
 			for (int txkind = 1; txkind <= 5; txkind++) {
 
 				try {
-					l4721Report.exec(titaVo, this.txBuffer, txkind, kindItem(txkind));
+					countCustNotice = l4721Report.exec(titaVo, this.txBuffer, txkind, kindItem(txkind));
 				} catch (LogicException e) {
 					sendMsg = e.getErrorMsg();
 					flag = false;
@@ -76,7 +80,7 @@ public class L4721Batch extends TradeBuffer {
 		} else {
 
 			try {
-				l4721Report.exec(titaVo, this.txBuffer, this.iTxKind, kindItem(this.iTxKind));
+				countCustNotice = l4721Report.exec(titaVo, this.txBuffer, this.iTxKind, kindItem(this.iTxKind));
 			} catch (LogicException e) {
 				sendMsg = e.getErrorMsg();
 				flag = false;
@@ -89,6 +93,17 @@ public class L4721Batch extends TradeBuffer {
 				flag = false;
 			}
 		}
+
+//		this.totaVo.putParam("CntPaper", countCustNotice.get("CntPaper"));
+//		this.totaVo.putParam("CntEmail", countCustNotice.get("CntEmail"));
+//		this.totaVo.putParam("CntMsg", countCustNotice.get("CntMsg"));
+
+//		this.info("CntPaper=" + countCustNotice.get("CntPaper"));
+//		this.info("CntEmail=" +  countCustNotice.get("CntEmail"));
+//		this.info("CntMsg=" +  countCustNotice.get("CntMsg"));
+		String msg = "書面通知筆數：" + countCustNotice.get("CntPaper") + "筆,電子郵件通知筆數：" + countCustNotice.get("CntEmail")
+				+ "筆,簡訊通知筆數：" + countCustNotice.get("CntMsg") + "筆。";
+		webClient.sendPost(dateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "", "", titaVo.getParam("TLRNO"), msg, titaVo);
 
 		// 送出通知訊息
 		sendMessage(titaVo);

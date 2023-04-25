@@ -153,11 +153,11 @@ public class L4455Report extends MakeReport {
 			break;
 		}
 
-		if ("999".equals(irepaybank)) {
+		// if ("999".equals(irepaybank)) {
 			this.print(-3, this.getMidXAxis(), "銀行扣款總傳票明細表" + feeItem, "C");
-		} else {
-			this.print(-3, this.getMidXAxis(), "ACH 扣款總傳票明細表" + feeItem, "C");
-		}
+		// } else {
+			// this.print(-3, this.getMidXAxis(), "ACH 扣款總傳票明細表" + feeItem, "C");
+		// }
 
 		this.print(-3, 203, "時　間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
 				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");

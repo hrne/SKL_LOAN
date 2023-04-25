@@ -15,7 +15,9 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.buffer.TxBuffer;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.BatxRateChange;
+import com.st1.itx.db.domain.CustNotice;
 import com.st1.itx.db.service.BatxRateChangeService;
+import com.st1.itx.db.service.CustNoticeService;
 import com.st1.itx.db.service.springjpa.cm.L4721ServiceImpl;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.CustNoticeCom;
@@ -50,6 +52,9 @@ public class L4721Report extends MakeReport {
 	CustNoticeCom custNoticeCom;
 
 	@Autowired
+	public CustNoticeService custNoticeService;
+
+	@Autowired
 	Parse parse;
 
 	@Autowired
@@ -65,6 +70,10 @@ public class L4721Report extends MakeReport {
 	String headerExcessive = "";
 	String headerDueAmt = "";
 	int cnt = 0;
+
+	int cPaper = 0;
+	int cEmail = 0;
+	int cMsg = 0;
 
 	private HashMap<Integer, tmpFacm> sameMap = new HashMap<>();
 	private Boolean first = true;
@@ -111,34 +120,34 @@ public class L4721Report extends MakeReport {
 		// (x,y)
 		// (5,425)┌┐(590,425)
 		// (5,545)└┘(590,545)
-		drawLine(5, 425, 590, 425);
-		drawLine(5, 425, 5, 545);
-		drawLine(590, 425, 590, 545);
-		drawLine(5, 545, 590, 545);
+		drawLine(5, 430, 590, 430);
+		drawLine(5, 430, 5, 550);
+		drawLine(590, 430, 590, 550);
+		drawLine(5, 550, 590, 550);
 
 		this.setFontSize(12);
-		print(-33, 3, "＊利率調整後次月份應繳金額為＄　　　　　　　　元，如因部分還本、利率調整或契約內容");
-		print(-33, 44, headerDueAmt, "R");
-		print(-34, 3, "　變更，致使應繳金額有所變動時再另行通知。");
-		print(-35, 3, "＊本公司各項放款利率公佈於全省各營業處所。");
-		print(-36, 3, "＊本單之貸款餘額計算至列印日期為止。");
-		print(-37, 3, "＊每月應繳金額以最新列印日期之通知單為準。");
-		print(-38, 3, "＊本單據僅供對帳使用，不做任何證明用途。");
-		print(-39, 3, "＊為了維護您的權益，請立即詳閱本帳單，並核對所列金額與日期是否與您的紀錄相符，");
-		print(-40, 3, "　如有任何意見或發現不符，請立即電洽本公司 TEL: 02-23895858 轉 放款服務課");
+		print(-32, 3, "＊利率調整後次月份應繳金額為＄　　　　　　　　元，如因部分還本、利率調整或契約內容");
+		print(-32, 44, headerDueAmt, "R");
+		print(-33, 3, "　變更，致使應繳金額有所變動時再另行通知。");
+		print(-34, 3, "＊本公司各項放款利率公佈於全省各營業處所。");
+		print(-35, 3, "＊本單之貸款餘額計算至列印日期為止。");
+		print(-36, 3, "＊每月應繳金額以最新列印日期之通知單為準。");
+		print(-37, 3, "＊本單據僅供對帳使用，不做任何證明用途。");
+		print(-38, 3, "＊為了維護您的權益，請立即詳閱本帳單，並核對所列金額與日期是否與您的紀錄相符，");
+		print(-39, 3, "　如有任何意見或發現不符，請立即電洽本公司 TEL: 02-23895858 轉 放款服務課");
 
 		// (x,y)
 		// (5,550)┌┐(590,550)
 		// (5,615)└┘(590,615)
-		drawLine(5, 550, 590, 550);
-		drawLine(5, 550, 5, 615);
-		drawLine(590, 550, 590, 615);
-		drawLine(5, 615, 590, 615);
+		drawLine(5, 555, 590, 555);
+		drawLine(5, 555, 5, 620);
+		drawLine(590, 550, 590, 620);
+		drawLine(5, 620, 590, 620);
 
-		print(-42, 3, "銀行匯款");
-		print(-43, 3, "戶名：新光人壽保險股份有限公司");
-		print(-44, 3, "解款行：新光銀行城內分行　新光銀行城內分行代號：1030116");
-		print(-45, 3, "期款專用帳號：9510200" + headerCustNo + "　　還本專用帳號：9510300" + headerCustNo);
+		print(-41, 3, "銀行匯款");
+		print(-42, 3, "戶名：新光人壽保險股份有限公司");
+		print(-43, 3, "解款行：新光銀行城內分行　新光銀行城內分行代號：1030116");
+		print(-44, 3, "期款專用帳號：9510200" + headerCustNo + "　　還本專用帳號：9510300" + headerCustNo);
 
 		this.setFontSize(10);
 	}
@@ -152,7 +161,8 @@ public class L4721Report extends MakeReport {
 	 * @param kindItem 利率種類名稱
 	 * @throws LogicException ...
 	 */
-	public void exec(TitaVo titaVo, TxBuffer txbuffer, int txKind, String kindItem) throws LogicException {
+	public Map<String, String> exec(TitaVo titaVo, TxBuffer txbuffer, int txKind, String kindItem)
+			throws LogicException {
 		this.info("L4721Report.printHeader");
 
 //		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
@@ -196,7 +206,8 @@ public class L4721Report extends MakeReport {
 //
 //		this.openForm(titaVo, reportVo);
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4721", "放款本息對帳單暨繳息通知單(" + kindItem + ")", "密", "8.5,12", "P");
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4721", "放款本息對帳單暨繳息通知單(" + kindItem + ")", "密",
+				"8.5,12", "P");
 
 		Boolean Firstfg = false;
 
@@ -226,6 +237,41 @@ public class L4721Report extends MakeReport {
 
 			custNo = tBatxRateChange.getCustNo();
 			facmNo = tBatxRateChange.getFacmNo();
+
+			this.info("custNo =" + custNo);
+			this.info("facmNo =" + facmNo);
+
+			List<CustNotice> checkNoticeTypeCount = new ArrayList<CustNotice>();
+			Slice<CustNotice> sCustNotice = null;
+
+			try {
+				sCustNotice = custNoticeService.findCustNoFormNo(custNo, "L4721", 0, Integer.MAX_VALUE, titaVo);
+
+				checkNoticeTypeCount = sCustNotice == null ? null : sCustNotice.getContent();
+
+			} catch (Exception e) {
+				this.error("custNoticeService findCustNoFormNo = " + e.getMessage());
+				throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
+			}
+			if (checkNoticeTypeCount != null) {
+				this.info("checkNoticeTypeCount.size =" + checkNoticeTypeCount.size());
+
+				for (CustNotice r : checkNoticeTypeCount) {
+
+					if ("Y".equals(r.getPaperNotice())) {
+						cPaper = cPaper + 1;
+					}
+
+					if ("Y".equals(r.getMsgNotice())) {
+						cMsg = cMsg + 1;
+					}
+
+					if ("Y".equals(r.getEmailNotice())) {
+						cEmail = cEmail + 1;
+					}
+
+				}
+			}
 
 			try {
 
@@ -314,7 +360,8 @@ public class L4721Report extends MakeReport {
 			List<Map<String, String>> listL4721Detail = new ArrayList<Map<String, String>>();
 
 			try {
-				listL4721Detail = l4721ServiceImpl.doDetail(custNo, isday, ieday, tBatxRateChange.getAdjDate(), titaVo);
+				listL4721Detail = l4721ServiceImpl.doDetail(custNo, isday, ieday,
+						tBatxRateChange.getAdjDate() + 19110000, titaVo);
 			} catch (Exception e) {
 				this.error("bankStatementServiceImpl doQuery = " + e.getMessage());
 				throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
@@ -423,8 +470,22 @@ public class L4721Report extends MakeReport {
 				} // for
 			} // if
 		} // for
+
 		long sno = this.close();
 		this.toPdf(sno);
+
+		Map<String, String> countCustNotice = new HashMap<String, String>();
+
+		countCustNotice.put("CntPaper", cPaper + "");
+		countCustNotice.put("CntMsg", cMsg + "");
+		countCustNotice.put("CntEmail", cEmail + "");
+
+		this.info("cPaper=" + cPaper);
+		this.info("cMsg=" + cMsg);
+		this.info("cEmail=" + cEmail);
+
+		return countCustNotice;
+
 	}
 
 	private void setHead(Map<String, String> headerBankStatement, int custNo, int facmNo, int effectDate)
