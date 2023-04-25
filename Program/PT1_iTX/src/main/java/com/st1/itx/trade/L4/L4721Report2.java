@@ -78,7 +78,7 @@ public class L4721Report2 extends MakeReport {
 		this.setTxBuffer(txbuffer);
 		baTxCom.setTxBuffer(txbuffer);
 
-		List<String> file = getData(titaVo);
+		List<String> file = getData(titaVo, txKind);
 
 		String fileName = "L4721-" + kindItem + ".txt";
 		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
@@ -104,7 +104,7 @@ public class L4721Report2 extends MakeReport {
 		}
 	}
 
-	private List<String> getData(TitaVo titaVo) throws LogicException {
+	private List<String> getData(TitaVo titaVo, int txkind) throws LogicException {
 
 		this.info("L4721Report2 getData start");
 
@@ -114,7 +114,8 @@ public class L4721Report2 extends MakeReport {
 		int eAdjDate = Integer.parseInt(titaVo.getParam("eAdjDate")) + 19110000;
 		int custType1 = 0;
 		int custType2 = 0;
-		int txKind = Integer.parseInt(titaVo.getParam("TxKind"));
+		int txKind = Integer.parseInt(titaVo.getParam("TxKind")) == 0 ? txkind
+				: Integer.parseInt(titaVo.getParam("TxKind"));
 
 		int ieday = titaVo.getEntDyI() + 19110000;
 		dateUtil.setDate_1(ieday);

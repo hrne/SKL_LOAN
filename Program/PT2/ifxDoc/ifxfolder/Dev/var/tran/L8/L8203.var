@@ -39,6 +39,7 @@ E(0,0)
 ["#FdFactor+交易樣態",#Factor,#FactorX],
 ["#FdTotalAmt+累積金額",#TotalAmt],
 ["#FdTotalCnt+累積筆數",#TotalCnt],
+["#FdEditEmpNo+經辦",#EditEmpNo,#EditEmpNoX],
 ["#FdRational+合理性",#Rational,#RationalX],
 ["#FdEmpNoDesc+經辦合理性說明",#EmpNoDesc],
 ["#FdManagerCheck+主管覆核",#ManagerCheck,#ManagerCheckX],
@@ -62,7 +63,7 @@ E(0,0)
 #FdManagerCheck=X,2,L
 #FdManagerDesc=X,2,L
 #FdManagerDate=X,2,L
-
+#FdEditEmpNo=X,2,L
 !---------- AP TEXT AREA Variables ----------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 
@@ -80,6 +81,7 @@ T(3,CdCode.Factor)
 !主管1 經辦3
 #Level=A,1,S
 T(4,LEVEL$)
+
 
 #mkg=X,1,S
 INVOKEJS(SHOW,p1,11,11,0)
@@ -278,6 +280,20 @@ E(0,@ManagerCheckDate,#L8R50ManagerCheckDate)
 T(2,@CustName,#L8R50CustName)
 T(H,#RationalX,#Rational,#YesNoHelp)
 T(H,#ManagerCheckX,#ManagerCheck,#AgreeHelp)
+T(2,@EditEmpNo,#L8R50EditEmpNo)
+
+#RcvL2r08A=X,1,S
+T(2,@RimEmployeeNo,#EditEmpNo)
+T(2,@RimTxCode1,#TXCD)
+T(3,@RimErrorSkip,Y)
+RESET_RIM(#RcvL2r08A,L2R08)
+S(L2R08,1,#RimTxCode1,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+T(2,@EditEmpNoX,#L2r08FullName)
+
+#RimEmployeeNo=X,6,S
+#RimTxCode1=X,5,S
+#RimErrorSkip=X,1,S
 
 !視調到的資料隱藏相關欄位
 #WKTFDates=A,1,S
@@ -306,6 +322,10 @@ IF(#FuncCode==2 || #FuncCode==4 || #FuncCode==5,s,$)
 !C(3,#FuncCode,4,s)
 !@V(2,0)
 
+!經辦
+#EditEmpNo=X,6,L
+#EditEmpNoX=X,50,L
+
 !合理性
 #Rational=X,1,I
 C(3,#FuncCode,4,s)
@@ -317,6 +337,8 @@ V(H,#YesNoHelp)
 
 #RationalX=X,2,L
 T(H,#Rational,#YesNoHelp)
+
+
 
 !經辦合理性說明
 !#EmpNoDesc=X,2.50,I
@@ -336,6 +358,7 @@ R(1,L8R60)
 E(0,@RepaySource,#L8R60RepaySource)
 T(2,@RepayBank,#L8R60RepayBank)
 T(2,@Description,#L8R60Description)
+
 
 #RepaySource=A,2,L
 #RepayBank=X,20,L
@@ -432,6 +455,8 @@ E(0,0)
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L8R50.dec"/>
 <include src="ROM.icf::L8R60.dec"/>
+<include src="ROM.icf::L2R08.dec"/>
+
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -493,6 +518,7 @@ TXFORM=L8203^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="ROM.icf::L8R50.tom"/>
 <include src="ROM.icf::L8R60.tom"/>
+<include src="ROM.icf::L2R08.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 

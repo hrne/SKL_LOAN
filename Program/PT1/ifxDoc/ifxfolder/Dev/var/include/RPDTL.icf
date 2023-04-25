@@ -676,7 +676,7 @@ IF(#GRD_SKFG{i}==1&&#RpAmt{z}>0&&#RPTOTF{z}>0,
                IF(#RPFG==6,E(0,@RpCode{i},01),$)
                INVOKEJS(SHOW,grd9_{i},1),
                IF(#RPFG==1||#RPFG==2,C(3,#RpCode{i},0,INVOKEJS(SHOW,grd9_{i},0),INVOKEJS(SHOW,grd9_{i},1)),INVOKEJS(SHOW,grd9_{i},0)))
-     IF(#DF2=={i}&&#RPTOTF{z}>0,$,C(3,#RPFG,2,$,s))))
+     IF(#DF2=={i}&&#RPTOTF{z}>0,$,IF(#RPFG==1||#RPFG==2,$,s))))
 IF(#RPFG==4||#RPFG==5||#RPFG==8,s,$)
 C(3,#RP_IND,1,IF(#RpCode{i}==90||#RpCode{i}==91||#RpCode{i}==95,$,$),$)
 C(3,#RP_IND,1,IF(#RpCode{i}==90||#RpCode{i}==91||#RpCode{i}==95,$,CALL(#RPTOT_DIS{i},6)),$)

@@ -551,11 +551,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           END                         AS F40繳息週期 ";
 		sql += "      , FAC.\"RateCode\" || \"Fn_GetCdCode\"('FacmRateCode',FAC.\"RateCode\") ";
 		sql += "                                       AS F41利率區分 ";
-		sql += "      , CASE ";
-		sql += "          WHEN FAC.\"ProdBreachFlag\" = 'Y' ";
-		sql += "          THEN TO_NCHAR(\"Fn_GetCdCode\"('BreachCode',FAC.\"BreachCode\")) ";
-		sql += "        ELSE FAC.\"BreachDescription\" ";
-		sql += "        END                            AS F42違約適用方式 ";
+		sql += "      , TO_NCHAR(\"Fn_GetCdCode\"('BreachCode',FAC.\"BreachCode\")) AS F42違約適用方式 ";
 		sql += "      , NVL(\"Fn_ParseEOL\"(GROUPCM.\"CustName\", 0),'無')           AS F43團體戶名 "; // 法人不出
 		sql += "      , FAC.\"PieceCode\" ";
 		sql += "　　　　　　　　　　　　　　             AS F44計件代碼 ";
@@ -583,16 +579,8 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , NVL(LBM.\"LoanBal\",0)         AS F55本戶目前總額 ";
 		sql += "      , \"Fn_GetCdCode\"('RuleCode',FAC.\"RuleCode\") ";
 		sql += "                                       AS F56規定管制代碼 ";
-		sql += "      , CASE ";
-		sql += "          WHEN FAC.\"ProdBreachFlag\" = 'Y' ";
-		sql += "          THEN TO_CHAR(\"Fn_GetCdCode\"('BreachGetCode',FAC.\"BreachGetCode\")) ";
-		sql += "        ELSE '' ";
-		sql += "        END                            AS F57違約金收取方式 ";
-		sql += "      , CASE ";
-		sql += "          WHEN FAC.\"ProdBreachFlag\" = 'Y' ";
-		sql += "          THEN FAC.\"BreachCode\" ";
-		sql += "        ELSE '' ";
-		sql += "        END                            AS F58違約適用方式 ";
+		sql += "      , TO_CHAR(\"Fn_GetCdCode\"('BreachGetCode',FAC.\"BreachGetCode\"))  AS F57違約金收取方式 ";
+		sql += "      , FAC.\"BreachCode\"     		   AS F58違約適用方式 ";
 		sql += "      , PROD.\"ProdName\"       	   AS F59商品名稱 ";
 		sql += "      , FAC.\"BaseRateCode\"       	   AS F60指標利率代碼 ";
 		sql += "      , FAC.\"LastBormNo\"       	   AS F61最後撥款序號 ";

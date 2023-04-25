@@ -120,6 +120,10 @@ public class L8203 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0003", titaVo.getParam("CustNo")); // 修改資料不存在
 			}
 			MlaundryDetail tMlaundryDetail2 = (MlaundryDetail) dataLog.clone(tMlaundryDetail); ////
+			String sEmpNo = titaVo.getParam("EMPNOT");// 備份原始值
+			if (iLevel == 1) {//主管不當最後異動人員
+				titaVo.putParam("EMPNOT", tMlaundryDetail.getLastUpdateEmpNo());// 蓋掉櫃員
+			}
 
 			moveMlaundryDetail(tMlaundryDetail, tMlaundryDetailId, iFuncCode, iFEntryDate, iFactor, iCustNo,
 					iManagerCheck, iFManagerDate, titaVo);
@@ -134,6 +138,7 @@ public class L8203 extends TradeBuffer {
 			} else {
 				dataLog.exec("經辦修改合理性");
 			}
+			titaVo.putParam("EMPNOT",sEmpNo);//還原備份
 
 			break;
 		case 4: // 刪除

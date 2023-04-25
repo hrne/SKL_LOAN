@@ -21,10 +21,12 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdBranchGroup;
 import com.st1.itx.db.domain.CdReport;
 import com.st1.itx.db.service.CdBranchGroupService;
+import com.st1.itx.db.service.CdBranchService;
 import com.st1.itx.db.service.CdReportService;
 import com.st1.itx.db.service.springjpa.cm.L9739ServiceImpl;
 import com.st1.itx.db.service.springjpa.cm.L9741ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.SortMapListCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
@@ -142,11 +144,11 @@ public class L9R99 extends TradeBuffer {
 		this.info("listL9739Title =" + listL9739.size());
 
 		// 政府補貼利率前期
-		BigDecimal lastRate = BigDecimal.ZERO;
+//		BigDecimal lastRate = BigDecimal.ZERO;
 		// 政府補貼利率當期
-		BigDecimal thisRate = BigDecimal.ZERO;
+//		BigDecimal thisRate = BigDecimal.ZERO;
 		// 前期-當期
-		BigDecimal diffRate = BigDecimal.ZERO;
+//		BigDecimal diffRate = BigDecimal.ZERO;
 		// 郵局利率
 		BigDecimal basePostRate = BigDecimal.ZERO;
 		// 商品加碼
@@ -154,8 +156,8 @@ public class L9R99 extends TradeBuffer {
 		// 使用利率
 		BigDecimal rate = BigDecimal.ZERO;
 
-		JSONObject thisJS;
-		JSONObject lastJS;
+//		JSONObject thisJS;
+//		JSONObject lastJS;
 
 		for (int i = 0; i < listL9739.size(); i++) {
 			int t = i + 1;
@@ -163,30 +165,30 @@ public class L9R99 extends TradeBuffer {
 			this.totaVo.putParam("OOProdNo" + t, listL9739.get(i).get("ProdNo"));
 			this.totaVo.putParam("OOProdName" + t, listL9739.get(i).get("ProdName"));
 			this.totaVo.putParam("OOEffectDate" + t, Integer.valueOf(listL9739.get(i).get("EffectDate")) - 19110000);
-
-			int seq = Integer.valueOf(listL9739.get(i).get("Seq"));
-
-			switch (seq) {
-			// ID、IE同一組利率
-			case 4:
-			case 5:
-				seq = 4;
-				break;
-			// IF、IG同一組利率
-			case 6:
-			case 7:
-				seq = 5;
-				break;
-			// IH、II同一組利率
-			case 8:
-			case 9:
-				seq = 6;
-				break;
-			default:
-				break;
-			}
-
-			this.info("seq =" + seq);
+//
+//			int seq = Integer.valueOf(listL9739.get(i).get("Seq"));
+//
+//			switch (seq) {
+//			// ID、IE同一組利率
+//			case 4:
+//			case 5:
+//				seq = 4;
+//				break;
+//			// IF、IG同一組利率
+//			case 6:
+//			case 7:
+//				seq = 5;
+//				break;
+//			// IH、II同一組利率
+//			case 8:
+//			case 9:
+//				seq = 6;
+//				break;
+//			default:
+//				break;
+//			}
+//
+//			this.info("seq =" + seq);
 
 			prodIncrRate = new BigDecimal(listL9739.get(i).get("ProdIncr").toString());
 			basePostRate = new BigDecimal(listL9739.get(i).get("BaseRate").toString());
@@ -194,30 +196,35 @@ public class L9R99 extends TradeBuffer {
 			this.info("prodIncrRate =" + prodIncrRate);
 			this.info("basePostRate =" + basePostRate);
 
-			if (!"0".equals(listL9739.get(i).get("JsonFields").toString())) {
-				this.info("listL9739.get(i).get(\"JsonFields\").toString() ="
-						+ listL9739.get(i).get("JsonFields").toString());
-				thisJS = new JSONObject(listL9739.get(i).get("JsonFields").toString());
-				thisRate = new BigDecimal(thisJS.get("SubsidyRate" + seq).toString());
-			}
+//			if (!"0".equals(listL9739.get(i).get("JsonFields").toString())) {
+//				this.info("listL9739.get(i).get(\"JsonFields\").toString() ="
+//						+ listL9739.get(i).get("JsonFields").toString());
+//				thisJS = new JSONObject(listL9739.get(i).get("JsonFields").toString());
+//				thisRate = new BigDecimal(thisJS.get("SubsidyRate" + seq).toString());
+//			}
+//
+//			if (!"0".equals(listL9739.get(i).get("lJsonFields").toString())) {
+//
+//				this.info("listL9739.get(i).get(\"lJsonFields\").toString() ="
+//						+ listL9739.get(i).get("lJsonFields").toString());
+//				lastJS = new JSONObject(listL9739.get(i).get("lJsonFields").toString());
+//				lastRate = new BigDecimal(lastJS.get("SubsidyRate" + seq).toString());
+//			}
 
-			if (!"0".equals(listL9739.get(i).get("lJsonFields").toString())) {
+//			this.info("thisRate =" + thisRate);
+//			this.info("lastRate =" + lastRate);
 
-				this.info("listL9739.get(i).get(\"lJsonFields\").toString() ="
-						+ listL9739.get(i).get("lJsonFields").toString());
-				lastJS = new JSONObject(listL9739.get(i).get("lJsonFields").toString());
-				lastRate = new BigDecimal(lastJS.get("SubsidyRate" + seq).toString());
-			}
+//			diffRate = lastRate.subtract(thisRate);
 
-			this.info("thisRate =" + thisRate);
-			this.info("lastRate =" + lastRate);
+//			this.info("diffRate =" + diffRate);
+			//XX政府優惠利率：郵局儲蓄利率+(初始生效利率與最新生效利率差)+商品加碼利率
+//			rate = basePostRate.add(prodIncrRate).add(diffRate).setScale(3, RoundingMode.HALF_DOWN);
 
-			diffRate = lastRate.subtract(thisRate);
+			//政府優惠利率：郵局儲蓄利率+(初始生效利率與最新生效利率差)+商品加碼利率
+			rate = basePostRate.add(prodIncrRate).setScale(3, RoundingMode.HALF_DOWN);
 
-			this.info("diffRate =" + diffRate);
-
-			rate = basePostRate.add(prodIncrRate).add(diffRate).setScale(3, RoundingMode.HALF_DOWN);
-
+			
+			
 			this.totaVo.putParam("OOFitRate" + t, rate);
 
 		}
@@ -277,7 +284,7 @@ public class L9R99 extends TradeBuffer {
 			this.totaVo.putParam("OOGroupNo" + i, i);
 		}
 		this.totaVo.putParam("OOGroupNoAllSize", lCdBranchGroup.size());
-
+		
 		String ld = "LD%";
 		String lh = "LH%";
 		String lm = "LM%";
@@ -293,39 +300,36 @@ public class L9R99 extends TradeBuffer {
 		String g3 = "3";
 
 		if ("L9801".equals(tranCode)) {
-			findReport(titaVo, g2, 1);
-			fullColumn(this.no);
+
 		}
 		if ("L9802".equals(tranCode)) {
-			findReport(titaVo, g3, 3);
-			fullColumn(this.no);
+
 		}
 		if ("L9803".equals(tranCode)) {
 			// 1 放款管理課
-			findReport(titaVo, g1, 2);
+			findReport(titaVo, g1, lm);
 			fullColumn(this.no);
 
 			// 2放款服務課
-			findReport(titaVo, g2, 2);
+			findReport(titaVo, g2, lm);
 			fullColumn(this.no);
 
 			// 3放款審查課
-			findReport(titaVo, g3, 2);
+
+			findReport(titaVo, g3, lm);
+			findReport(titaVo, g3, lp);
+
 			fullColumn(this.no);
 
 		}
 		if ("L9804".equals(tranCode)) {
-			findReport(titaVo, g3, 4);
-			findReport(titaVo, g2, 4);
-			fullColumn(this.no);
+
 		}
 		if ("L9805".equals(tranCode)) {
-			findReport(titaVo, g1, 5);
-			fullColumn(this.no);
+
 		}
 		if ("L9806".equals(tranCode)) {
-			findReport(titaVo, g1, 6);
-			fullColumn(this.no);
+
 		}
 
 		this.totaVo.putParam("OOTotalRptSize", this.no);
@@ -352,18 +356,12 @@ public class L9R99 extends TradeBuffer {
 		}
 
 	}
-	/**
-	 * 查詢報表清單
-	 *  @param titaVo
-	 *  @param groupNo 課組別
-	 *  @param cycle 報表週期
-	 **/
-	private void findReport(TitaVo titaVo, String groupNo, int cycle) throws LogicException {
+
+	private void findReport(TitaVo titaVo, String groupNo, String rptCodeLike) throws LogicException {
 		int sTradeSub = 0;
 		Slice<CdReport> slCdReport;
 		// 1 放款服務課
-
-		slCdReport = sCdReportService.findRptCycleGrp(cycle, groupNo, this.index, Integer.MAX_VALUE, titaVo);
+		slCdReport = sCdReportService.findRptGroupNo(groupNo, rptCodeLike, this.index, Integer.MAX_VALUE, titaVo);
 		List<CdReport> lCdReport = slCdReport == null ? null : slCdReport.getContent();
 
 		// 查無資料

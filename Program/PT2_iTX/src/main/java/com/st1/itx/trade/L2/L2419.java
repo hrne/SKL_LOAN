@@ -177,7 +177,6 @@ public class L2419 extends TradeBuffer {
 				int no = (int) toNumeric(columnA);
 
 				if (no == 0) {
-					setError(row, L2419Column.NO.getIndex());
 					break;
 				}
 

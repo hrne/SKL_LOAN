@@ -292,7 +292,7 @@ public class L3721 extends TradeBuffer {
 
 			// 刪除整批利率調整檔(未確認)
 			DeleteBatxRateChangeRoutine();
-			
+
 			// 更新放款主檔
 			updLoanBorMainRoutine();
 
@@ -336,25 +336,25 @@ public class L3721 extends TradeBuffer {
 	private void CheckBatxRateChangeRoutine() throws LogicException {
 		this.info("CheckBatxRateChangeRoutine ... ");
 
-		BatxRateChange tBatxRateChange = batxRateChangeService
-				.findById(new BatxRateChangeId(titaVo.getEntDyI() + 19110000, iCustNo, iFacmNo, wkBormNo), titaVo);
+		BatxRateChange tBatxRateChange = batxRateChangeService.adjDateDescFirst(iCustNo, iFacmNo, wkBormNo, titaVo);
 		if (tBatxRateChange != null && tBatxRateChange.getConfirmFlag() == 1) {
 			throw new LogicException(titaVo, "E0007", "整批利率調整確認未放行"); // 更新資料時，發生錯誤
 
 		}
 	}
+
 	// 刪除整批利率調整檔(未確認)(//，放行後刪除整批利率調整檔， 撥款序號
 	private void DeleteBatxRateChangeRoutine() throws LogicException {
 		this.info("ReleaseBatxRateRoutine ... ");
 
-		BatxRateChange tBatxRateChange = batxRateChangeService
-				.holdById(new BatxRateChangeId(titaVo.getEntDyI() + 19110000, iCustNo, iFacmNo, wkBormNo), titaVo);
+		BatxRateChange tBatxRateChange = batxRateChangeService.adjDateDescFirst(iCustNo, iFacmNo, wkBormNo, titaVo);
 		if (tBatxRateChange != null && tBatxRateChange.getConfirmFlag() == 0) {
 			if (titaVo.isActfgEntry()) {
 				this.totaVo.setWarnMsg(
 						"利率已變動,，放行後刪除整批利率調整檔， 撥款序號 =" + wkBormNo + " 生效日 = " + tBatxRateChange.getCurtEffDate());
 				this.addList(this.totaVo);
 			} else {
+				batxRateChangeService.holdById(tBatxRateChange, titaVo);
 				try {
 					batxRateChangeService.delete(tBatxRateChange, titaVo);
 				} catch (DBException f) {

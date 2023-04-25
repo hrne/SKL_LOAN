@@ -932,19 +932,40 @@ T(3,[L3721] 借戶利率變更)
 !------ 上行電文 TEXT ------
 <sub type="TIM">
 
-#TimCustNo#FacmNo#BormNo#RateCode2#EffectDate2
-#ProdNo2#ProdNo2X#ProdRate2
-#BaseRateCode2#BaseRate2#IncrFlag2#FitRate2#RateIncr2
-#Remark#NextRateAdjDate2
-#CustNo#CustId#ApplNo
-#ProdNo1
-#BaseRateCode1
+#TimCustNo
+#ProdRate2
+#BaseRate2#IncrFlag2
 #BaseRate1
 #RateIncr1
 #IncrFlag1
-#DeleteFg
 #CheckChangFg
-#ChangFg
+#END
+#FdActFg#ACTFGX
+#FdCustNo#CustNo#CustNoX
+#FdCustId#CustId#CustIdX
+#FdApplNo#ApplNo#ApplNoX
+#FdFacmNo#FacmNo
+#FdBormNo#BormNo
+#FdNextRateAdjDate1#NextRateAdjDate1
+#FdEffectDate1#EffectDate1
+#FdRateCode1#RateCode1X
+#FdProdNo1#ProdNo1#ProdNo1X
+#FdBaseRateCode1#BaseRateCode1#BaseRateCode1X
+#FdBaseRate1#BaseRate1X
+#FdFitRate1#FitRate1X
+#FdRateIncr1#RateIncr1X
+#FdIndividualIncr1#IndividualIncr1X
+#DeleteFg#DeleteFgX
+#FdEffectDate2#EffectDate2
+#FdRateCode2#RateCode2#RateCode2X
+#FdProdNo2#ProdNo2#ProdNo2X
+#FdBaseRateCode2#BaseRateCode2#BaseRateCode2X
+#FdBaseRate2#BaseRate2X
+#ChangFg#ChangFgX
+#FdRateIncr2#RateIncr2
+#FdFitRate2#FitRate2
+#FdRemark#Remark
+#FdNextRateAdjDate2#NextRateAdjDate2
 </sub>
 
 
