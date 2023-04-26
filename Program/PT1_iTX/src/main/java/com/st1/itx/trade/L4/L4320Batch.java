@@ -11,8 +11,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
@@ -23,6 +23,8 @@ import com.st1.itx.db.domain.BatxRateChangeId;
 import com.st1.itx.db.domain.CdBaseRate;
 import com.st1.itx.db.domain.CdBaseRateId;
 import com.st1.itx.db.domain.CdComm;
+import com.st1.itx.db.domain.CdCommId;
+import com.st1.itx.db.domain.FacProd;
 import com.st1.itx.db.domain.LoanRateChange;
 import com.st1.itx.db.service.BatxBaseRateChangeService;
 import com.st1.itx.db.service.BatxRateChangeService;
@@ -206,7 +208,8 @@ public class L4320Batch extends TradeBuffer {
 			}
 		}
 
-		// 指標利率檔生效記號
+
+		// 更新指標利率檔生效記號
 		if (!iBaseRateCode.trim().isEmpty()) {
 			CdBaseRate tCdBaseRate = new CdBaseRate();
 			CdBaseRateId tCdBaseRateId = new CdBaseRateId();
@@ -224,6 +227,12 @@ public class L4320Batch extends TradeBuffer {
 				}
 			}
 		}
+		
+		// 更新補貼息利率檔生效記號及商品檔加碼利率
+		if ("02".equals(iBaseRateCode) && iCustType == 0) {
+			updateSubsidyRate(titaVo);
+		}
+
 		// 產出清單
 		if (flag && titaVo.isHcodeNormal() && this.processCnt > 0) {
 			this.info("產出清單");
@@ -840,14 +849,84 @@ public class L4320Batch extends TradeBuffer {
 	}
 
 	// 政府補貼利率差額
+	private void updateSubsidyRate(TitaVo titaVo) throws LogicException {
+		this.info("updateSubsidyRate...");
+		// 本次指標利率變動日有變動補貼利率，才處理
+		CdComm tCdCommn = cdCommService.findById(new CdCommId("01", "01", iEffectDate + 19110000), titaVo);
+		if (tCdCommn == null) {
+			return;
+		}
+		// 須為未啟用狀態
+		if (titaVo.isHcodeNormal()) {
+			if ("Y".equals(tCdCommn.getEnable())) {
+				throw new LogicException("E0015", "政府補貼利率檔須為未啟用"); // 檢查錯誤
+			}
+			tCdCommn.setEnable("Y");
+		} else {
+			if ("N".equals(tCdCommn.getEnable())) {
+				throw new LogicException("E0015", "政府補貼利率檔須為已啟用"); // 檢查錯誤
+			}
+			tCdCommn.setEnable("N");
+		}
+		try {
+			cdCommService.update(tCdCommn, titaVo);
+		} catch (DBException e) {
+			throw new LogicException("E0007", "CdCommn update error : " + e.getErrorMsg());
+		}
+
+		// 需抓到前次補貼利率變動日資料，才處理
+		CdComm tCdCommnPre = cdCommService.CdTypeDescFirst("01", "01", 0, iEffectDate - 1 + 19110000, titaVo);
+		if (tCdCommnPre == null) {
+			return;
+		}
+
+		//
+		Slice<FacProd> slFacProd = facProdService.findAll(0, Integer.MAX_VALUE, titaVo);
+		List<FacProd> lFacProd = new ArrayList<FacProd>();
+
+		// 計算本次與前次的補貼息差額
+		TempVo nowVo = new TempVo();
+		nowVo = nowVo.getVo(tCdCommn.getJsonFields());
+		TempVo preVo = new TempVo();
+		preVo = preVo.getVo(tCdCommnPre.getJsonFields());
+		for (int i = 1; i <= 10; i++) {
+			String nameId = "SubsidyRate" + i;
+			if (nowVo.get(nameId) != null && preVo.get(nameId) != null) {
+				BigDecimal rateDiff = parse.stringToBigDecimal(nowVo.get(nameId))
+						.subtract(parse.stringToBigDecimal(preVo.get(nameId)));
+				if (titaVo.isHcodeErase()) {
+					rateDiff = BigDecimal.ZERO.subtract(rateDiff);
+				}
+				for (FacProd p : slFacProd.getContent()) {
+					if (("" + i).equals(p.getGovOfferFlag())) {
+						BigDecimal prodIncr = p.getProdIncr();
+						p.setProdIncr(prodIncr.subtract(rateDiff));
+						lFacProd.add(p);
+						this.info("RateDiff=" + rateDiff + ", ProdIncr=" + prodIncr + ", " + p.toString());
+					}
+				}
+			}
+		}
+
+		if (lFacProd.size() > 0) {
+			try {
+				facProdService.updateAll(lFacProd, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "FacProd update error : " + e.getErrorMsg());
+			}
+		}
+
+	}
+
+	// 政府補貼利率差額
 	private BigDecimal getSubsidyRateDiff(String govOfferFlag, int presEffDate, TitaVo titaVo) throws LogicException {
 
-		String jsFieldName = "SubsidyRate" + govOfferFlag;
-		if (subsidyRateVo.get(jsFieldName) == null) {
+		String nameId = "SubsidyRate" + govOfferFlag;
+		if (subsidyRateVo.get(nameId) == null) {
 			return BigDecimal.ZERO;
 		}
 
-		BigDecimal subsidyRateNow = parse.stringToBigDecimal(subsidyRateVo.get(jsFieldName));
+		BigDecimal subsidyRateNow = parse.stringToBigDecimal(subsidyRateVo.get(nameId));
 
 		CdComm tCdComm = cdCommService.CdTypeDescFirst("01", "01", 0, presEffDate + 19110000, titaVo);
 		if (tCdComm == null) {
@@ -856,11 +935,11 @@ public class L4320Batch extends TradeBuffer {
 
 		TempVo oldSubsidyRateVo = new TempVo();
 		oldSubsidyRateVo = oldSubsidyRateVo.getVo(tCdComm.getJsonFields());
-		if (oldSubsidyRateVo.get(jsFieldName) == null) {
+		if (oldSubsidyRateVo.get(nameId) == null) {
 			return BigDecimal.ZERO;
 		}
 
-		BigDecimal subsidyRateOld = parse.stringToBigDecimal(oldSubsidyRateVo.get(jsFieldName));
+		BigDecimal subsidyRateOld = parse.stringToBigDecimal(oldSubsidyRateVo.get(nameId));
 
 		return subsidyRateNow.subtract(subsidyRateOld);
 	}

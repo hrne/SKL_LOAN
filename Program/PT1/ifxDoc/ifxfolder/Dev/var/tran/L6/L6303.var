@@ -161,17 +161,18 @@ E(0,@JsonFieldsNo{i},#L6r51JsonFieldsNo{i})
 T(2,@Remark,#L6r51Remark)
 T(2,@Enable,#L6r51Enable)
 
-#EnableFgHelp=X,20,S
-T(3,Y:啟用;N:停用)
+#EnableFgHelp=X,100,S
+T(3,Y:已生效[不可修改、刪除];N:未生效[未執行整批利率變更])
 
-#Enable=X,1,I
+#Enable=X,1,L
+C(5,#TranKey_Tmp,1,T(2,N),$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 HELP(#EnableFgHelp)
 @V(H,#EnableFgHelp)
 
 ! 啟用記號中文
-#EnableX=X,10,L
+#EnableX=X,100,L
 T(H,#Enable,#EnableFgHelp)
 
 #Remark=X,100,I

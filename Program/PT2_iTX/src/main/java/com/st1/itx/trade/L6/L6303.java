@@ -149,7 +149,7 @@ public class L6303 extends TradeBuffer {
 		t.setRemark(titaVo.getParam("Remark"));
 
 		tTempVo.clear();
-		tTempVo.putParam("SubsidyEffectDate" , Integer.valueOf(titaVo.getParam("EffectDate").trim()) + 19110000);
+//		tTempVo.putParam("SubsidyEffectDate" , Integer.valueOf(titaVo.getParam("EffectDate").trim()) + 19110000);
 		for (int i = 1; i <= 10; i++) {
 			if (titaVo.get("CodeTypeNo" + i) == null || "".equals(titaVo.get("CodeTypeNo" + i).trim())) {
 				continue;
