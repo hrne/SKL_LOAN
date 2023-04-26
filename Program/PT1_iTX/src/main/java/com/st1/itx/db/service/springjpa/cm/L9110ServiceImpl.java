@@ -374,6 +374,9 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               AND IR.\"ClNo\"    = CF.\"ClNo\" ";
 		sql += " WHERE CF.\"ApproveNo\" = :applNo "; // 日期大於保險迄日
 		sql += "   AND NVL(IR.\"ClNo\",0) != 0 "; // 2022-04-25 智偉增加:有串到保險單資料才顯示
+		sql += "   AND CASE WHEN FM.\"FirstDrawdownDate\" = 0 THEN 1 ";
+		sql += "   	        WHEN IR.\"InsuEndDate\" > FM.\"FirstDrawdownDate\"  THEN 1 ";
+		sql += "   	        ELSE 0  END  = 1 ";
 		sql += "   ORDER BY \"NowInsuNo\"  ASC ";
 
 		this.info("sql=" + sql);

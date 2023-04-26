@@ -151,7 +151,7 @@ public class L9742ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  ,M.\"CustName\"";
 		sql += "		  ,SUM(M.\"Amt\") AS \"Amt\"";
 		sql += "		  ,MIN(M.\"IntStartDate\") AS \"IntStartDate\"";
-		sql += "		  ,MAXM.\"IntEndDate\") AS \"IntEndDate\"";
+		sql += "		  ,MAX(M.\"IntEndDate\") AS \"IntEndDate\"";
 		sql += "		  ,M.\"Fullname\"";
 		sql += "		  ,M.\"AcDate\"";
 		sql += "		  ,M.\"AcSubCode\"";

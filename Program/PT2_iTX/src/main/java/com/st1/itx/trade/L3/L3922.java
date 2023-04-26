@@ -164,7 +164,7 @@ public class L3922 extends TradeBuffer {
 		if (lLoanBorMain == null || lLoanBorMain.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "放款主檔"); // 查詢資料不存在
 		}
-		
+
 		Boolean isCalcu = false;
 		for (LoanBorMain ln : lLoanBorMain) {
 			// 戶況 0: 正常戶1:展期2: 催收戶3: 結案戶4: 逾期戶5: 催收結案戶6: 呆帳戶7: 部分轉呆戶8: 債權轉讓戶9: 呆帳結案戶
@@ -277,7 +277,7 @@ public class L3922 extends TradeBuffer {
 		// 清償違約金
 		if (oListCloseBreach != null && oListCloseBreach.size() > 0) {
 			for (LoanCloseBreachVo v : oListCloseBreach) {
-				if (v.getCloseBreachAmt().compareTo(BigDecimal.ZERO) > 0) {
+//				if (v.getCloseBreachAmt().compareTo(BigDecimal.ZERO) > 0) {
 					oCloseBreachAmt = oCloseBreachAmt.add(v.getCloseBreachAmt());
 					oCloseBreachAmtPaid = oCloseBreachAmtPaid.add(v.getCloseBreachAmtPaid());
 					oCloseBreachAmtUnpaid = oCloseBreachAmtUnpaid.add(v.getCloseBreachAmtUnpaid());
@@ -303,7 +303,7 @@ public class L3922 extends TradeBuffer {
 							BreachDescription = BreachDescription + makeReport.showDate("" + Prohibitperiod);
 						}
 					}
-				}
+//				}
 			}
 		}
 
