@@ -308,8 +308,7 @@ HELP(Y:不發送; :發送)
 C(3,#IsCheck,0,$,C(5,#CanMsg,0,C(4,#Msg{i},V(P,此客戶尚未設定簡訊電話，故不可設定為發送),$),$))
 C(4,#Msg{i},$,IF(#Msg{i} == #CheckY,$,V(P,限輸入Y或空白)))
 
-#Err{i}=x,200,S
-T(B,#NoticeX{i}+，不可申請全部不寄送)
+
 
 ! 不發送記號-EMail
 #EMail{i}=X,1,I
@@ -326,6 +325,10 @@ C(5,#Paper{i},Y,E(0,@ChkB{i},#ChkB{i}+1),$)
 C(5,#Msg{i},Y,E(0,@ChkB{i},#ChkB{i}+1),$)
 C(5,#EMail{i},Y,E(0,@ChkB{i},#ChkB{i}+1),$)
 C(3,#ChkA{i},#ChkB{i},V(P,#Err{i}),$)
+
+
+#Err{i}=x,200,S
+T(B,#NoticeX{i}+，不可申請全部不寄送)
 
 ##end
 

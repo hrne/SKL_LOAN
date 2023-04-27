@@ -7,7 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.st1.itx.Exception.DBException;
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.AcClose;
+import com.st1.itx.db.domain.AcCloseId;
 import com.st1.itx.db.domain.BankRemit;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.CustMainService;
@@ -85,9 +89,7 @@ public class L4101OldVo extends FileVo {
 		int seq = 0;
 		// 組明細
 		for (BankRemit t : lBankRemit) {
-			if (t.getDrawdownCode() == 2 || t.getDrawdownCode() == 4 || t.getDrawdownCode() == 11) {
-				continue;
-			}
+			
 			String wkCustId = "";
 			String wkCustNm = "";
 			CustMain tCustMain = custMainService.custNoFirst(t.getCustNo(), t.getCustNo(), titaVo);

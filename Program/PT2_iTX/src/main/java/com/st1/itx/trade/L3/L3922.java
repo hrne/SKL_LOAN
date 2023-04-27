@@ -278,31 +278,32 @@ public class L3922 extends TradeBuffer {
 		if (oListCloseBreach != null && oListCloseBreach.size() > 0) {
 			for (LoanCloseBreachVo v : oListCloseBreach) {
 //				if (v.getCloseBreachAmt().compareTo(BigDecimal.ZERO) > 0) {
-					oCloseBreachAmt = oCloseBreachAmt.add(v.getCloseBreachAmt());
-					oCloseBreachAmtPaid = oCloseBreachAmtPaid.add(v.getCloseBreachAmtPaid());
-					oCloseBreachAmtUnpaid = oCloseBreachAmtUnpaid.add(v.getCloseBreachAmtUnpaid());
-					if (wkFacmNo != v.getFacmNo()) {
-						wkFacmNo = v.getFacmNo();
-						FacMain tFacMain = facMainService.findById(new FacMainId(iCustNo, v.getFacmNo()), titaVo);
-						if (!BreachDescription.isEmpty()) {
-							BreachDescription = BreachDescription + "。";
-						}
-
-						BreachDescription = BreachDescription + "額度:" + tFacMain.getFacmNo() + "，";
-
-						int Prohibitperiod = 0;
-						if (tFacMain.getProhibitMonth() > 0 && tFacMain.getFirstDrawdownDate() > 0) {
-							dDateUtil.init();
-							dDateUtil.setDate_1(tFacMain.getFirstDrawdownDate());
-							dDateUtil.setMons(tFacMain.getProhibitMonth());
-							Prohibitperiod = dDateUtil.getCalenderDay(); // 綁約期限
-						}
-						if (tFacMain.getProhibitMonth() == 0) {
-							BreachDescription = BreachDescription + " 無";
-						} else {
-							BreachDescription = BreachDescription + makeReport.showDate("" + Prohibitperiod);
-						}
+				oCloseBreachAmt = oCloseBreachAmt.add(v.getCloseBreachAmt());
+				oCloseBreachAmtPaid = oCloseBreachAmtPaid.add(v.getCloseBreachAmtPaid());
+				oCloseBreachAmtUnpaid = oCloseBreachAmtUnpaid.add(v.getCloseBreachAmtUnpaid());
+				if (wkFacmNo != v.getFacmNo()) {
+					wkFacmNo = v.getFacmNo();
+					FacMain tFacMain = facMainService.findById(new FacMainId(iCustNo, v.getFacmNo()), titaVo);
+					if (!BreachDescription.isEmpty()) {
+						BreachDescription = BreachDescription + "。";
 					}
+
+					BreachDescription = BreachDescription + "額度:" + parse.IntegerToString(tFacMain.getFacmNo(), 3)
+							+ "，";
+
+					int Prohibitperiod = 0;
+					if (tFacMain.getProhibitMonth() > 0 && tFacMain.getFirstDrawdownDate() > 0) {
+						dDateUtil.init();
+						dDateUtil.setDate_1(tFacMain.getFirstDrawdownDate());
+						dDateUtil.setMons(tFacMain.getProhibitMonth());
+						Prohibitperiod = dDateUtil.getCalenderDay(); // 綁約期限
+					}
+					if (tFacMain.getProhibitMonth() == 0) {
+						BreachDescription = BreachDescription + " 無";
+					} else {
+						BreachDescription = BreachDescription + makeReport.showDate("" + Prohibitperiod);
+					}
+				}
 //				}
 			}
 		}

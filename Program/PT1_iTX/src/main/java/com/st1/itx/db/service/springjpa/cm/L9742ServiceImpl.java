@@ -72,7 +72,7 @@ public class L9742ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      		 , \"Fn_ParseEOL\"(CM.\"CustName\", 0) AS \"CustName\" "; // 戶名
 		sql += "      		 , CASE WHEN :inputOption = 1 "; // 還本收據
 		sql += "             	    THEN TX.\"Principal\" ";
-		sql += "             		WHEN :inputOption = 2 "; // 繳息收據
+		sql += "             		WHEN :inputOption = 2 AND ACD.\"AcNoCode\" LIKE '40241%'";// 繳息收據
 		sql += "             		THEN TX.\"Interest\" ";
 		sql += "             		WHEN :inputOption = 3 AND ACD.\"AcNoCode\" LIKE '409030%'"; // 手續費收據
 		sql += "             		THEN TX.\"FeeAmt\" ";
@@ -117,7 +117,7 @@ public class L9742ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   		  AND ACD.\"SlipNo\" <= :inputSlipNoEnd "; // 傳票號碼-止
 		sql += "      	  AND  CASE WHEN :inputOption = 1 "; // 還本收據
 		sql += "             	    THEN TX.\"Principal\" ";
-		sql += "             		WHEN :inputOption = 2 "; // 繳息收據
+		sql += "             		WHEN :inputOption = 2 AND ACD.\"AcNoCode\" LIKE '40241%'";// 繳息收據
 		sql += "             		THEN TX.\"Interest\" ";
 		sql += "             		WHEN :inputOption = 3 AND ACD.\"AcNoCode\" LIKE '409030%'"; // 手續費收據
 		sql += "             		THEN TX.\"FeeAmt\" ";

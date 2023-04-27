@@ -250,9 +250,9 @@ C(3,#IsRv,1,E(0,#DrawdownDate)ASGN(SPANDY$),E(0,0)ASGN(SPANDY$),$)
 [
 ["[L3100]                                 撥款"],
 [#<->#,"#FdACTFG+登放記號",#ACTFGX],
-[#<->#,"#FdCustNo+借戶戶號",#CustNo,"@@@",#BTN1,#CustNoX],
-[#<->#,"#FdCustId+統一編號",#CustId,"@",#BTN2,#CustIdX],
-[#<->#,"#FdApplNo+核准編號",#ApplNo,"@@@",#BTN3,#ApplNoX],
+[#<->#,"#FdCustNo+借戶戶號",#CustNo,"@@@",#BTN1,#CustName],
+[#<->#,"#FdCustId+統一編號",#CustId,"@",#BTN2],
+[#<->#,"#FdApplNo+核准編號",#ApplNo,"@@@",#BTN3],
 ["#FdFacmNo+額度編號",#FacmNo,"@@@@@@@",#BTN4],
 ["#FdBormNo+撥款序號",#BormNo],
 [#<->#,"@",#BTNHIDEP4,"@",#BTNHIDEP6,"@",#BTNHIDEP2,"@",#BTNHIDEP3,"@",#BTNHIDEP5,"@",#BTNEXPAND],
@@ -519,7 +519,7 @@ T(2,@FdSyndNo, )
 T(3,00000019999999000)
 
 #BIND1A=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:CustNo<-OOCustNo:FacmNo<-OOFacmNo:CustNoX<-OOCustName})
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:CustNo<-OOCustNo:FacmNo<-OOFacmNo:CustName<-OOCustName})
 
 ![借戶戶號]
 !借戶戶號, 統一編號或核准編號擇一輸入
@@ -531,25 +531,25 @@ C(3,#HIDE2FG,1,CALL(#HIDEP2),$)
 C(3,#FKEY,0,$,s)
 SHOW(#BTN1)HIDE(#BTN2,#BTN3)
 T(2,@FdApplNo, )
+@HIDE(#BTN1)
+
 
 #CustNo2=A,7,S
 C(4,#CustNo,S,$)
 E(0,#CustNo)
 T(2,@CustNo,#CustNo2)
 
-#WKBTN1=X,1,S
-C(4,#CustNo,HIDE(#BTN1),SHOW(#BTN1))
 
 #BUF1B=X,18,S
 C(4,#CustNo,T(3,00000019999999000),T(2,#CustNo+#CustNo+000))
-! T(2,#CustNo+#CustNo+000)
+
 
 #BIND1B=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:CustNo<-OOCustNo:FacmNo<-OOFacmNo:CustNoX<-OOCustName})
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:CustNo<-OOCustNo:FacmNo<-OOFacmNo:CustName<-OOCustName})
 
 #WKIDNO=X,10,S
+T(3,@CustName,)
 
-T(3,#CustNoX,)
 #SendL2r07A=X,1,S
 IF(#FKEY==0||#FKEY==7,$,s)
 C(4,#CustNo,S,$)
@@ -558,8 +558,10 @@ E(0,@RimCustNo,#CustNo)
 RESET_RIM(#SendL2r07A,L2R07)
 S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
 R(1,L2R07)
+T(2,@CustId,)
+T(2,@ApplNo,)
 
-#CustNoX=x,2.50,L
+#CustName=x,2.50,L
 IF(#FKEY==0||#FKEY==7,$,s)
 C(4,#CustNo,S,$)
 T(2,#L2r07CustName)
@@ -567,26 +569,25 @@ T(2,#L2r07CustName)
 #BUF2A=X,100,S
 
 #BIND2A=X,1,S
-BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<-OOCustId:CustIdX<-OOCustName})
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<-OOCustId:CustNo<-OOCustNo:CustName<-OOCustName})
 
 ![統一編號]
 #FdCustId=X,2,L
 
 #CustId=X,10,I
 CALL(#CLOSEALL)
-C(4,#CustNo,$,S)
 C(3,#FKEY,0,$,s)
 SHOW(#BTN2)HIDE(#BTN1,#BTN3)
 T(2,@FdApplNo, )
 @C(4,#CustId,S,$)
 V(7)
-T(3,#CustIdX,)
+T(3,#CustName,)
 
 #BUF2B=X,100,S
 T(2,0000000+#CustId)
 
 #BIND2B=X,1,S
-BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustId<-OOCustId:CustIdX<-OOCustName})
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustId<-OOCustId:CustNo<-OOCustNo:CustName<-OOCustName})
 
 #CheckCustId=X,1,S
 C(4,#CustId,S,$)
@@ -603,20 +604,16 @@ E(0,@RimCustNo,#CustNo)
 RESET_RIM(#SendL2r07B,L2R07)
 S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
 R(1,L2R07)
-T(2,@CustIdX,#L2r07CustName)
+T(2,@CustName,#L2r07CustName)
+T(2,@CustNo,#L2r07CustNo)
+T(2,@ApplNo,)
 
-#CustIdX=x,2.50,L
-C(4,#CustId,S,$)
-
-#WkCustNo=A,7,S
-IF(#FKEY==0 || #FKEY==7,$,s)
-C(4,#CustId,E(0,#CustNo),E(0,#L2r07CustNo))
 
 #BUF3A=X,18,S
 T(3,000000199999990)
 
 #BIND3A=X,1,S
-BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3A;ntxbuf5=type<-1:ApplNo<-OOApplNo:FacmNo<-OOFacmNo:ApplNoX<-OOCustName})
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3A;ntxbuf5=type<-1:ApplNo<-OOApplNo:CustId<-"":CustNo<-OOCustNo:FacmNo<-OOFacmNo:CustName<-OOCustName})
 
 ![核准編號]
 #FdApplNo=X,2,L
@@ -627,12 +624,11 @@ T(2,#WkStar)
 
 #ApplNo=X,7,I
 CALL(#CLOSEALL)
-C(4,#CustNo,$,S)
-C(4,#CustId,$,S)
 C(3,#FKEY,0,$,s)
 SHOW(#BTN3)HIDE(#BTN2,#BTN1)
-@C(4,#ApplNo,V(P,需擇一輸入),$)
-T(3,#ApplNoX,)
+@
+C(3,#CustNo,0,C(4,#ApplNo,V(P,需擇一輸入),T(3,#CustName,)),$)
+
 
 #ApplNo2=A,7,S
 C(4,#ApplNo,S,$)
@@ -648,7 +644,7 @@ C(4,#ApplNo,T(3,000000199999990),T(2,#ApplNo+99999990))
 ! T(2,#ApplNo+99999990)
 
 #BIND3B=X,1,S
-BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3B;ntxbuf5=type<-1:ApplNo<-OOApplNo:FacmNo<-OOFacmNo:ApplNoX<-OOCustName})
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3B;ntxbuf5=type<-1:ApplNo<-OOApplNo:CustId<-"":CustNo<-OOCustNo:FacmNo<-OOFacmNo:CustName<-OOCustName})
 
 !用核准號碼(ApplNo)調L2R05
 #SendL2r05A=X,1,S
@@ -662,21 +658,19 @@ E(0,@RimCaseNo,0)
 RESET_RIM(#SendL2r05A,L2R05)
 S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
 R(1,L2R05)
-T(2,@FacmNo,#L2r05FacmNo)
+E(0,@FacmNo,#L2r05FacmNo)
+T(2,@CustNo,#L2r05CustNo)
+T(2,@CustId,)
 
 #SendL2r07C=X,1,S
 IF(#FKEY==0||#FKEY==7,$,s)
-C(4,#CustNo,$,S)
-C(4,#CustId,$,S)
+C(4,#ApplNo,S,$)
 T(2,@RimCustId,#L2r05CustId)
 E(0,@RimCustNo,#CustNo)
 RESET_RIM(#SendL2r07C,L2R07)
 S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
 R(1,L2R07)
-T(2,@ApplNoX,#L2r07CustName)
-
-#ApplNoX=x,2.50,L
-C(4,#ApplNo,S,$)
+T(2,@CustName,#L2r07CustName)
 
 #SendL6r28=X,1,S
 IF(#FKEY==0 || #FKEY==7,$,s)
@@ -688,18 +682,14 @@ R(1,L6R28)
 
 #TimCustNo=A,7,S
 E(0,0)
-C(4,#CustNo,$,E(0,#CustNo))
-C(4,#CustId,$,E(0,#L2r07CustNo))
-C(4,#ApplNo,$,E(0,#L2r05CustNo))
+E(0,#CustNo)
 T(2,@LockCustNo,#TimCustNo)
 T(2,@RmkCustNo,#TimCustNo)
 <include src="COM.icf::LockControl.rtn"/>
 <include src="COM.icf::CustRmk.rtn"/>
 
 #TimCustNoX=x,100,S
-C(4,#CustNo,$,T(2,#CustNoX))
-C(4,#CustId,$,T(2,#CustIdX))
-C(4,#ApplNo,$,T(2,#ApplNoX))
+T(2,#CustName)
 
 #WkCaseNo=A,7,S
 
@@ -2410,74 +2400,72 @@ C(3,#DSnoF,0,E(0,0),E(0,1))
 !------ 上行電文 TEXT ------
 <sub type="TIM">
 
-#TimCustNo#FacmNo#BormNo#RateIncr
-#ApproveRate#RateCode#RateAdjFreq#DrawdownCode
-#CurrencyCode#TimDrawdownAmt#DrawdownDate#LoanTermYy#LoanTermMm#LoanTermDd
-#MaturityDate#IntCalcCode#AmortizedCode#FreqBase#PayIntFreq#RepayFreq
-#GracePeriod#GraceDate#SpecificDd#SpecificDate#FirstDueDate#FirstAdjRateDate
-#NextIntDate#NextRepayDate#TotalPeriod#TimAcctFee#TimHandlingFee#TimFinalBal
-#NotYetFlag#PieceCode#PieceCodeSecond#TimPieceCodeSecondAmt#UsageCode#RenewFlag#SyndNo#CompensateFlag
-#RelationCode#RelationBirthday#RelationGender
+#TimCustNo
+#RateCode
+#TimDrawdownAmt#LoanTermYy#LoanTermMm#LoanTermDd
+#IntCalcCode
+#SpecificDate
+#NextIntDate#NextRepayDate#TimAcctFee#TimHandlingFee#TimFinalBal
+#PieceCodeSecond#TimPieceCodeSecondAmt#UsageCode
+#RelationCode#RelationGender
 #TxBormNo
+#TwPieceCodeSecondAmt#UsPieceCodeSecondAmt
 #IsRv
 #END
-#TxtSysDate
+#ACTFGX
+#CustNo#CustId#ApplNo#CustName
+#FacmNo#BormNo
 #AcctCodeX
-#DrawdownCodeX
-#TwDrawdownAmt
-#UsDrawdownAmt
-#DrawdownAmtX
+#DrawdownCode#DrawdownCodeX
+#CurrencyCode
+#TwDrawdownAmt#UsDrawdownAmt#DrawdownAmtX
+#DrawdownDate#TxtSysDate
+#MaturityDate
 #IntCalcCodeX
-#AmortizedCodeX
-#FreqBaseX
-#PayIntFreqX
-#RepayFreqX
-#GraceDateX
-#LbAcctFee
-#MessageTxtA
-#MessageTxtB
-#NotYetFlag
-#NotYetFlagX
-#RenewFlagX
-#PieceCodeX
+#AmortizedCode#AmortizedCodeX
+#TotalPeriod
+#FreqBase#FreqBaseX
+#PayIntFreq#PayIntFreqX
+#RepayFreq#RepayFreqX
+#GracePeriod
+#GraceDate#GraceDateX
+#SpecificDd
+#FirstDueDate
+#TwAcctFee#UsAcctFee#LbAcctFee#MessageTxtA
+#TwHandlingFee#UsHandlingFee#MessageTxtB
+#TwFinalBal#UsFinalBal
+#NotYetFlag#NotYetFlagX
+#RenewFlag#RenewFlagX
+#PieceCode#PieceCodeX
 #UsageCodeX
-#CompensateFlagX
-#ProdNo
-#ProdName
-#BaseRateCode
-#BaseRateCodeX
-#BaseRate
-#ProdRate
+#SyndNo
+#CompensateFlag#CompensateFlagX
+#ProdNo#ProdName
+#BaseRateCode#BaseRateCodeX
+#BaseRate#ProdRate#RateIncr
+#ApproveRate
 #RateCodeX
+#RateAdjFreq
+#FirstAdjRateDate
 ##loop{times:10,n:1}
-#StepMonths{n}
-#StepMonthE{n}
-#StepRateType{n}
-#StepRateTypeX{n}
-#StepRateIncr{n}
-#StepRatePer{n}
+#StepMonths{n}#StepMonthE{n}#StepRateType{n}#StepRateTypeX{n}#StepRateIncr{n}#StepRatePer{n}
 ##end
-#CustNoX
-#CustIdX
-#ApplNoX
 #RepayCodeX
 #RepayAcctNo
 #RepayBankX
-#PostCode
-#PostCodeX
+#PostCode#PostCodeX
 #RelationCodeX
 #RelationName
 #RelationId
+#RelationBirthday
 #RelationGenderX
-#RpRemitIdKindX
-#RpRemitGenderX
+#RPTITLEtt
+#RpRemitIdKind#RpRemitIdKindX
+#RpRemitId
+#RpRemitGender#RpRemitGenderX
+#RpRemitBirthday
+#RemitIdKind#RemitId#RemitGender#RemitBirthday
 <include src="RPDTL.icf::RPDTL.tim"/>
-#CustNo#CustId#ApplNo#TwDrawdownAmt#UsDrawdownAmt
-#TwAcctFee#UsAcctFee#TwFinalBal#UsFinalBal
-#TwHandlingFee#UsHandlingFee
-#TwPieceCodeSecondAmt#UsPieceCodeSecondAmt
-#RpRemitIdKind#RpRemitId#RpRemitGender#RpRemitBirthday
-#RPTITLEtt#RemitIdKind#RemitId#RemitGender#RemitBirthday
 </sub>
 
 

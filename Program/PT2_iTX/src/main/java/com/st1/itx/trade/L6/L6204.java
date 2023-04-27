@@ -12,9 +12,12 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.db.domain.TxErrCode;
+import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.TxErrCodeService;
+import com.st1.itx.db.service.TxTranCodeService;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.menu.MenuBuilder;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L6204")
@@ -76,7 +79,7 @@ public class L6204 extends TradeBuffer {
 
 					tTxErrCode = MoveToDb(iErrCode, tTxErrCode, titaVo);
 					sTxErrCodeService.update2(tTxErrCode, titaVo);
-					int iCustNo = Integer.valueOf(tTxErrCode.getLastUpdateEmpNo());
+					String iCustNo = tTxErrCode.getLastUpdateEmpNo();
 					this.info("iCustNo   = " + iCustNo);
 					titaVo.putParam("CustNo", iCustNo);
 					dataLog.setEnv(titaVo, tTxErrCode2, tTxErrCode); ////
@@ -89,7 +92,7 @@ public class L6204 extends TradeBuffer {
 					this.info("tTxErrCode2   = " + tTxErrCode2);
 					tTxErrCode = MoveToDb(iErrCode, tTxErrCode, titaVo);
 					sTxErrCodeService.delete(tTxErrCode, titaVo);
-					int iCustNo = Integer.valueOf(tTxErrCode.getLastUpdateEmpNo());
+					String iCustNo = tTxErrCode.getLastUpdateEmpNo();
 					this.info("iCustNo   = " + iCustNo);
 					titaVo.putParam("CustNo", iCustNo);
 					dataLog.setEnv(titaVo, tTxErrCode2, tTxErrCode);
