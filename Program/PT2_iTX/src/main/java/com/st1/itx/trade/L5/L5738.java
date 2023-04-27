@@ -17,7 +17,7 @@ import com.st1.itx.util.MySpring;
  * @author ST1-ChihWei
  * @version 1.0.0
  */
-@Service("L5735")
+@Service("L5738")
 @Scope("prototype")
 public class L5738 extends TradeBuffer {
 

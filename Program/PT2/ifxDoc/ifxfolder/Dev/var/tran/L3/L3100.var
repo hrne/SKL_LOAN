@@ -1371,6 +1371,7 @@ E(0,1090100+#SpecificDd)
 
 !記算虛擬基準日與到期日差
 #VirtualDiff=A,8,S
+C(3,#AmortizedCode,2,S,$)
 D(7,1,#VirtualSpecificDate,#wkmadate,0)
 T(1,@VirtualDiffYY,#VirtualDiff,001,004)
 T(1,@VirtualDiffMM,#VirtualDiff,005,002)

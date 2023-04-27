@@ -106,7 +106,24 @@ BEGIN
              WHEN S3."GTRCDE" = 0 THEN '2' 
              WHEN S3."GTRCDE" = 1 THEN '1' 
            ELSE '1' END                   AS "SettingStat"         -- 設定狀態 VARCHAR2 1 
-          ,'0'                            AS "ClStat"              -- 擔保品狀態 VARCHAR2 1 
+          -- ClStat 擔保品狀態
+          -- 0:正常
+          -- 1:塗銷
+          -- 2:處分
+          -- 3:抵押權確定
+          ,CASE
+             WHEN S1."ClCode1" = 1 -- 房地擔保品
+                  AND S4.GRTSTS = 0 -- 塗銷 2023-04-27 Wei 新增 from SKL IT 佳怡 email SKL-會議記錄-首撥表相關-20230426
+             THEN '1' 
+             WHEN S1."ClCode1" = 1 -- 房地擔保品
+             THEN '0' 
+             WHEN S1."ClCode1" = 2 -- 土地擔保品
+                  AND S5.GRTSTS = 0 -- 塗銷 2023-04-27 Wei 新增 from SKL IT 佳怡 email SKL-會議記錄-首撥表相關-20230426
+             THEN '1' 
+             WHEN S1."ClCode1" = 2 -- 房地擔保品
+             THEN '0' 
+           ELSE 'XX' -- 不合理的值
+           END                            AS "ClStat"              -- 擔保品狀態 VARCHAR2 1 
           ,CASE WHEN NVL(S2."GDTSDT",0) > 0 THEN S2."GDTSDT" ELSE 0 END 
                                           AS "SettingDate"         -- 設定日期 decimald 8  
           ,CASE 

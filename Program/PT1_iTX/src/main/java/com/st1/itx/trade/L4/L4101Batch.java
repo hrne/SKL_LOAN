@@ -155,27 +155,12 @@ public class L4101Batch extends TradeBuffer {
 				Integer.MAX_VALUE, titaVo);
 
 		for (BankRemit t : slBankRemit.getContent()) {
-			// 作業項目為1.撥款時把退款篩選掉
-			if (iItemCode == 1) {
-				if (t.getDrawdownCode() == 2 || t.getDrawdownCode() == 3 || t.getDrawdownCode() == 4
-						|| t.getDrawdownCode() == 5 || t.getDrawdownCode() == 11) {
-					continue;
+			// 依作業項目篩選資料
+			if ((iItemCode == 1 && t.getDrawdownCode() == 1) || (iItemCode == 2 && t.getDrawdownCode() == 2)
+					|| (iItemCode == 3 && t.getDrawdownCode() == 5)) {
+				if (t.getActFg() != 1) {
+					lBankRemit.add(t);
 				}
-			}
-			if (iItemCode == 2) {
-				if (t.getDrawdownCode() == 1 || t.getDrawdownCode() == 3 || t.getDrawdownCode() == 4
-						|| t.getDrawdownCode() == 5 || t.getDrawdownCode() == 11) {
-					continue;
-				}
-			}
-			// 作業項目為3.退款時把撥款篩選掉
-			if (iItemCode == 3) {
-				if (t.getDrawdownCode() == 1 || t.getDrawdownCode() == 2 || t.getDrawdownCode() == 3) {
-					continue;
-				}
-			}
-			if (t.getActFg() != 1) {
-				lBankRemit.add(t);
 			}
 		}
 
@@ -235,32 +220,22 @@ public class L4101Batch extends TradeBuffer {
 		}
 		lBankRemit = slBankRemit == null ? null : new ArrayList<BankRemit>(slBankRemit.getContent());
 		for (BankRemit t : lBankRemit) {
-			// 作業項目為1.撥款時把退款篩選掉
-			if (iItemCode == 1) {
-				if (t.getDrawdownCode() == 2 || t.getDrawdownCode() == 4 || t.getDrawdownCode() == 5
-						|| t.getDrawdownCode() == 11) {
-					continue;
-				}
+			// 作業項目為1.撥款(核心匯款)
+			if (iItemCode == 1 && t.getDrawdownCode() == 1) {
 				// 核心匯款
 				lBankRemit4.add(t);
+				lBankRemit2.add(t);
 			}
-			if (iItemCode == 2) {
-				if (t.getDrawdownCode() == 1 || t.getDrawdownCode() == 4 || t.getDrawdownCode() == 5
-						|| t.getDrawdownCode() == 11) {
-					continue;
-				}
+			// 作業項目為2.撥款(整批匯款)
+			if (iItemCode == 2 && t.getDrawdownCode() == 2) {
 				// 整批匯款
 				lBankRemit3.add(t);
-
+				lBankRemit2.add(t);
 			}
-
-			// 作業項目為2.退款時把撥款篩選掉
-			if (iItemCode == 3) {
-				if (t.getDrawdownCode() == 1 || t.getDrawdownCode() == 2 || t.getDrawdownCode() == 3) {
-					continue;
-				}
+			// 作業項目為3.退款(核心匯款)
+			if (iItemCode == 3 && t.getDrawdownCode() == 5) {
+				lBankRemit2.add(t);
 			}
-			lBankRemit2.add(t);
 		}
 
 		totaVo.put("PdfSnoM", "");
@@ -274,14 +249,7 @@ public class L4101Batch extends TradeBuffer {
 			procBankRemitMediaOld(lBankRemit3, reportItem, titaVo);
 		}
 
-//		if (batchNo.length() > 2) {
-//			String reportItem = "-撥款匯款媒體檔(整批匯款)";
-//			if ("LN".equals(batchNo.substring(0, 2))) {
-//				procBankRemitMediaOld(lBankRemit2, reportItem, titaVo);
-//			}
-//		}
 //			step2產出撥款傳票
-//		totaA.init(titaVo);
 		doRptA(titaVo);
 
 //			step3產出整批匯款單

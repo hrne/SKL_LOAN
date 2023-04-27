@@ -65,36 +65,8 @@ BEGIN
            , HG.HGTGTD
            , HG.BUYAMT
            , HG.BUYDAT
-           , CASE
-               WHEN LPAD(HG.GDRID1,1,'0')
-                    || LPAD(HG.GDRID2,2,'0')
-                    || LPAD(HG.GDRNUM,7,'0')
-                    || LPAD(HG.LGTSEQ,2,'0')
-                    IN (
-                      '101170176301', -- 新北市三重區 06020-000
-                      '101102220301', -- 新北市板橋區 08215-000
-                      '101102072801', -- 新北市三重區 00354-000
-                      '101104701701', -- 屏東縣屏東市 04496-000
-                      '101102923202', -- 桃園市桃園區 00252-000
-                      '101102810401'  -- 台北市大同區 01087-000
-                    ) -- 新光做過唯一性處理,本支仍須處理的例外
-               THEN 0
-             ELSE HG.GDRNUM2 END AS GDRNUM2
-           , CASE
-               WHEN LPAD(HG.GDRID1,1,'0')
-                    || LPAD(HG.GDRID2,2,'0')
-                    || LPAD(HG.GDRNUM,7,'0')
-                    || LPAD(HG.LGTSEQ,2,'0')
-                    IN (
-                      '101170176301', -- 新北市三重區 06020-000
-                      '101102220301', -- 新北市板橋區 08215-000
-                      '101102072801', -- 新北市三重區 00354-000
-                      '101104701701', -- 屏東縣屏東市 04496-000
-                      '101102923202', -- 桃園市桃園區 00252-000
-                      '101102810401'  -- 台北市大同區 01087-000
-                    ) -- 新光做過唯一性處理,本支仍須處理的例外
-               THEN '0'
-             ELSE HG.GDRMRK END AS GDRMRK
+           , '0' AS GDRNUM2 -- 2023-04-27 Wei 修改 from SKL 佳怡 email SKL-會議記錄-首撥表相關-20230426 與文齡經理確認過先前討論唯一性轉換原則已經完全不需要額外判斷這2個欄位
+           , '0' AS GDRMRK -- 2023-04-27 Wei 修改 from SKL 佳怡 email SKL-會議記錄-首撥表相關-20230426 與文齡經理確認過先前討論唯一性轉換原則已經完全不需要額外判斷這2個欄位
            , HG.HGTMHN2
            , HG.HGTCIP
            , HG.UPDATE_IDENT
@@ -105,30 +77,60 @@ BEGIN
       WHERE HG.LGTADR IS NOT NULL -- 地址非空,空白地址由下一段程式處理
         AND NVL(HG.HGTMHN,0) != 0 -- 主建號
         AND NVL(APLP.LMSACN,0) != 0 -- 已跟額度綁定
-        AND CASE
-              WHEN HG.GDRNUM2 = 0 -- 新光沒做過唯一性處理的,才由本支程式處理
-              THEN 0
-              WHEN LPAD(HG.GDRID1,1,'0')
-                   || LPAD(HG.GDRID2,2,'0')
-                   || LPAD(HG.GDRNUM,7,'0')
-                   || LPAD(HG.LGTSEQ,2,'0')
-                   IN (
-                     '101170176301', -- 新北市三重區 06020-000
-                     '101102220301', -- 新北市板橋區 08215-000
-                     '101102072801', -- 新北市三重區 00354-000
-                     '101104701701', -- 屏東縣屏東市 04496-000
-                     '101102923202', -- 桃園市桃園區 00252-000
-                     '101102810401'  -- 台北市大同區 01087-000
-                   )
-              THEN 0 -- 新光做過唯一性處理,本支仍須處理的例外
-            ELSE 1 END = 0
     )
     , DistinctData AS (
       SELECT S5.CUSENT
             ,S3.LMSACN
             ,S3.LMSAPN
             ,NVL(S4."LoanBalTotal",0) AS "LoanBalTotal"
-            ,S2.*
+            ,S2.CUSBRH
+           , S2.GDRID1
+           , S2.GDRID2
+           , S2.GDRNUM
+           , S2.LGTSEQ
+           , S2.LGTCIF
+           , S2.LGTADR
+           , S2.HGTMHN
+           , S2.HGTMHS
+           , S2.HGTPSM
+           , S2.HGTCAM
+           , S2.LGTIID
+           , S2.LGTUNT
+           , S2.LGTIAM
+           , S2.LGTSAM
+           , S2.LGTSAT
+           , S2.GRTSTS
+           , S2.HGTSTR
+           , S2.HGTCDT
+           , S2.HGTFLR
+           , S2.HGTROF
+           , S2.SALNAM
+           , S2.SALID1
+           , S2.HGTCAP
+           , S2.HGTGUS
+           , S2.HGTAUS
+           , S2.HGTFOR
+           , S2.HGTCPE
+           , S2.HGTADS
+           , S2.HGTAD1
+           , S2.HGTAD2
+           , S2.HGTAD3
+           , S2.HGTGTD
+           , S2.BUYAMT
+           , S2.BUYDAT
+           , S2.GDRNUM2
+           , S2.GDRMRK
+           , S2.HGTMHN2
+           , S2.HGTCIP
+           , S2.UPDATE_IDENT
+            -- 2023-04-27 Wei 增加 from SKL 佳怡 email SKL-會議記錄-首撥表相關-20230426
+           , CASE 
+               WHEN S2.GRTSTS = 0 -- 已塗銷的不做唯一性直接轉入
+               THEN LPAD(S2.GDRID1,1,'0') ||
+                    LPAD(S2.GDRID2,2,'0') ||
+                    LPAD(S2.GDRNUM,7,'0') ||
+                    LPAD(S2.LGTSEQ,2,'0')
+             ELSE '0' END AS "ProcessUniqueFlag" -- 是否經過唯一性處理記號 0:要經過;else:不經過
       FROM HGData S2
       LEFT JOIN LA$APLP S3 ON S3.GDRID1 = S2.GDRID1
                           AND S3.GDRID2 = S2.GDRID2
@@ -139,12 +141,58 @@ BEGIN
       WHERE NVL(S3.LMSACN,0) != 0
         AND S2.GDRID1 = 1
     )
-    SELECT DENSE_RANK() OVER (ORDER BY S1."LMSACN"
-                                      ,S1."HGTAD1"
-                                      ,S1."HGTAD2"
-                                    ) AS "GroupNo"
+    SELECT DENSE_RANK() 
+           OVER (
+            ORDER BY S1.LMSACN
+                   , S1.HGTAD1
+                   , S1.HGTAD2
+                   , S1."ProcessUniqueFlag" -- 2023-04-27 Wei 修改 from SKL 佳怡 email SKL-會議記錄-首撥表相關-20230426
+           ) AS "GroupNo"
           ,0 AS "SecGroupNo"
-          ,S1.*
+          ,S1.CUSENT
+          ,S1.LMSACN
+          ,S1.LMSAPN
+          ,S1."LoanBalTotal"
+          ,S1.CUSBRH
+          ,S1.GDRID1
+          ,S1.GDRID2
+          ,S1.GDRNUM
+          ,S1.LGTSEQ
+          ,S1.LGTCIF
+          ,S1.LGTADR
+          ,S1.HGTMHN
+          ,S1.HGTMHS
+          ,S1.HGTPSM
+          ,S1.HGTCAM
+          ,S1.LGTIID
+          ,S1.LGTUNT
+          ,S1.LGTIAM
+          ,S1.LGTSAM
+          ,S1.LGTSAT
+          ,S1.GRTSTS
+          ,S1.HGTSTR
+          ,S1.HGTCDT
+          ,S1.HGTFLR
+          ,S1.HGTROF
+          ,S1.SALNAM
+          ,S1.SALID1
+          ,S1.HGTCAP
+          ,S1.HGTGUS
+          ,S1.HGTAUS
+          ,S1.HGTFOR
+          ,S1.HGTCPE
+          ,S1.HGTADS
+          ,S1.HGTAD1
+          ,S1.HGTAD2
+          ,S1.HGTAD3
+          ,S1.HGTGTD
+          ,S1.BUYAMT
+          ,S1.BUYDAT
+          ,S1.GDRNUM2
+          ,S1.GDRMRK
+          ,S1.HGTMHN2
+          ,S1.HGTCIP
+          ,S1.UPDATE_IDENT
     FROM DistinctData S1
     ;
 
@@ -163,6 +211,10 @@ BEGIN
            DENSE_RANK() OVER (ORDER BY S1."LMSACN" -- 戶號
                                       ,S1."HGTAD1"
                                       ,S1."HGTAD2"
+                                      ,S1.GDRID1
+                                      ,S1.GDRID2
+                                      ,S1.GDRNUM
+                                      ,S1.LGTSEQ
                                     ) AS "GroupNo"
          , 0 AS "SecGroupNo"
          , S1.*
@@ -189,126 +241,13 @@ BEGIN
            WHERE NVL(S3.LMSACN,0) != 0
              AND S1.GDRID1 = 1
              AND NVL(S1.LGTADR,' ') = ' '
-             AND S1.GDRNUM2 = 0 -- 新光沒做過唯一性處理的,才由本支程式處理
          ) S1
         , "GetGroupNoMax" M
     ;
 
     -- 記錄寫入筆數
     INS_CNT := INS_CNT + sql%rowcount;
-
-    /* 更新組別號碼 已預設過GDRNUM2 未被列入唯一性處理者 */
-    INSERT INTO "TmpLA$HGTP"
-    SELECT s6."MaxGroupNo" 
-          + DENSE_RANK() OVER (ORDER BY S1.GDRNUM2
-                              ) AS "GroupNo"
-          ,0 AS "SecGroupNo"
-          ,NVL(S5.CUSENT,0) AS CUSENT
-          ,NVL(S3.LMSACN,0) AS LMSACN
-          ,NVL(S3.LMSAPN,0) AS LMSAPN
-          ,NVL(S4."LoanBalTotal",0) AS "LoanBalTotal"
-          ,S1.*
-    FROM "LA$HGTP" S1 -- 組員
-    LEFT JOIN "TmpLA$HGTP" S2 ON S2.GDRID1 = S1.GDRID1
-                             AND S2.GDRID2 = S1.GDRID2
-                             AND S2.GDRNUM = S1.GDRNUM
-                             AND S2.LGTSEQ = S1.LGTSEQ
-    LEFT JOIN LA$APLP S3 ON S3.GDRID1 = S1.GDRID1
-                        AND S3.GDRID2 = S1.GDRID2
-                        AND S3.GDRNUM = S1.GDRNUM
-    LEFT JOIN (SELECT LMSACN
-                     ,LMSAPN
-                     ,SUM(LMSLBL) AS "LoanBalTotal"
-               FROM LA$LMSP
-               WHERE LMSLBL != 0
-               GROUP BY LMSACN
-                       ,LMSAPN
-              ) S4 ON S4.LMSACN = S3.LMSACN
-                  AND S4.LMSAPN = S3.LMSAPN
-    LEFT JOIN CU$CUSP S5 on S5.LMSACN = S3.LMSACN
-    ,(SELECT MAX("GroupNo") AS "MaxGroupNo"
-      FROM "TmpLA$HGTP"
-     ) S6
-    WHERE S1.GDRNUM2 > 0 -- 新光做過唯一性處理的直接寫入
-      AND S1.GDRID1 = 1 -- 只取房地
-      AND S2.GDRID1 IS NULL -- 未被寫入唯一性處理工作檔
-    ;
-
-    -- 記錄寫入筆數
-    INS_CNT := INS_CNT + sql%rowcount;
-
-    /* 更新組別號碼 已預設過GDRNUM2,GDRMRK判斷唯一性 */
-    MERGE INTO "TmpLA$HGTP" T1
-    USING (SELECT S2."GroupNo"
-                 ,S2."SecGroupNo"
-                 ,S1.LMSACN
-                 ,S1.LMSAPN
-                 ,S1.GDRID1
-                 ,S1.GDRID2
-                 ,S1.GDRNUM
-                 ,S1.LGTSEQ
-                 ,ROW_NUMBER() OVER (PARTITION BY S1.GDRID1
-                                                 ,S1.GDRID2
-                                                 ,S1.GDRNUM
-                                                 ,S1.LGTSEQ
-                                     ORDER BY S2.LGTCIF
-                                             ,S2.GDRID1
-                                             ,S2.GDRID2
-                                             ,S2.GDRNUM
-                                             ,S2.LGTSEQ) AS SEQ
-           FROM "TmpLA$HGTP" S1 -- 組員
-           LEFT JOIN "TmpLA$HGTP" S2 ON S2.GDRNUM2 = S1.GDRNUM2
-                                    AND S2.GDRMRK = 1 -- 組長
-                                    AND S2.LGTCIF = S1.LGTCIF
---                                    AND NVL(S2.HGTCIP,0) = NVL(S1.HGTCIP,0)
-           WHERE S1.GDRNUM2 > 0 -- 新光做過唯一性處理的直接寫入
-             AND S1.GDRMRK = 0
-          ) SC1
-    ON (    SC1."LMSACN"  = T1."LMSACN"
-        AND SC1."LMSAPN"  = T1."LMSAPN"
-        AND SC1."GDRID1"  = T1."GDRID1"
-        AND SC1."GDRID2"  = T1."GDRID2"
-        AND SC1."GDRNUM"  = T1."GDRNUM"
-        AND SC1."LGTSEQ"  = T1."LGTSEQ"
-        AND SC1."SEQ"     = 1
-    )
-    WHEN MATCHED THEN UPDATE SET
-        T1."GroupNo"    = SC1."GroupNo"
-       ,T1."SecGroupNo" = SC1."SecGroupNo"
-    ;
-
-    /* 更新組別號碼 將同組但擔保品提供人不同的資料更新上去 */
-    MERGE INTO "TmpLA$HGTP" T1
-    USING (SELECT DISTINCT
-                  S2."GroupNo"
-                 ,S2."SecGroupNo"
-                 ,S1.LMSACN
-                 ,S1.LMSAPN
-                 ,S1.GDRID1
-                 ,S1.GDRID2
-                 ,S1.GDRNUM
-                 ,S1.LGTSEQ
-           FROM "TmpLA$HGTP" S1 -- 組員
-           LEFT JOIN "TmpLA$HGTP" S2 ON S2.GDRNUM2 = S1.GDRNUM2
-                                    AND S2.GDRMRK = 1 -- 組長
---                                    AND NVL(S2.HGTCIP,0) = NVL(S1.HGTCIP,0)
-           WHERE S1.GDRNUM2 > 0 -- 有被設定過唯一性
-             AND S1.GDRMRK = 0
-             AND S1."GroupNo" IS NULL
-             AND S1."SecGroupNo" IS NULL
-          ) SC1
-    ON (    SC1."LMSACN"  = T1."LMSACN"
-        AND SC1."LMSAPN"  = T1."LMSAPN"
-        AND SC1."GDRID1"  = T1."GDRID1"
-        AND SC1."GDRID2"  = T1."GDRID2"
-        AND SC1."GDRNUM"  = T1."GDRNUM"
-        AND SC1."LGTSEQ"  = T1."LGTSEQ"
-    )
-    WHEN MATCHED THEN UPDATE SET
-        T1."GroupNo"    = SC1."GroupNo"
-       ,T1."SecGroupNo" = SC1."SecGroupNo"
-    ;
-
+    
     /* 更新組別子號 */
     MERGE INTO "TmpLA$HGTP" T1
     USING (SELECT S1."GroupNo"

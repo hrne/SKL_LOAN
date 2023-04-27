@@ -46,6 +46,8 @@ BEGIN
           ,S1."ClCode2"                   AS "ClCode2"             -- 擔保品代號2 DECIMAL 2 
           ,S1."ClNo"                      AS "ClNo"                -- 擔保品編號 DECIMAL 7 
           ,CASE
+             WHEN NVL(CM3."CustUKey",' ') != ' '
+             THEN NVL(CM3."CustUKey",' ')
              WHEN S1."ClCode1" = 1 AND NVL(CM."CustUKey",' ') != ' '
              THEN CM."CustUKey"
              WHEN S1."ClCode1" = 2 AND NVL(CM2."CustUKey",' ') != ' '
@@ -129,6 +131,8 @@ BEGIN
                            AND NVL(CUSP."LMSACN",0) > 0
     LEFT JOIN "CustMain" CM2 ON CM2."CustNo" = CUSP2."LMSACN" -- 土地擔保品提供人戶號
                             AND NVL(CUSP2."LMSACN",0) > 0
+    LEFT JOIN "CustMain" CM3 ON CM3."CustNo" = APLP."LMSACN" -- 借戶戶號
+                            AND NVL(APLP."LMSACN",0) > 0
     LEFT JOIN "CdCity" CITY ON NVL(HGTP."HGTAD1",' ') <> ' ' -- 建物擔保品地區別
                            AND CITY."CityItem" = NVL(HGTP."HGTAD1",' ')
     LEFT JOIN "CdArea" AREA ON AREA."CityCode" = CITY."CityCode" -- 建物擔保品鄉鎮區

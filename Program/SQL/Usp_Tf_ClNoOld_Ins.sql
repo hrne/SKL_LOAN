@@ -24,21 +24,7 @@ BEGIN
           ,S1."GDRID2"      AS "GDRID2"      -- 舊擔保品代號2 decimal(2, 0) default 0 not null, 
           ,S1."GDRNUM"      AS "GDRNUM"      -- 舊擔保品編號 decimal(7, 0) default 0 not null, 
           ,S1."LGTSEQ"      AS "LGTSEQ"      -- 舊擔保品序號 decimal(2, 0) default 0 not null, 
-          ,CASE
-             WHEN LPAD(S1.GDRID1,1,'0')
-                  || LPAD(S1.GDRID2,2,'0')
-                  || LPAD(S1.GDRNUM,7,'0')
-                  || LPAD(S1.LGTSEQ,2,'0')
-                  IN (
-                    '101170176301', -- 新北市三重區 06020-000
-                    '101102220301', -- 新北市板橋區 08215-000
-                    '101102072801', -- 新北市三重區 00354-000
-                    '101104701701', -- 屏東縣屏東市 04496-000
-                    '101102923202', -- 桃園市桃園區 00252-000
-                    '101102810401'  -- 台北市大同區 01087-000
-                  ) -- 新光做過唯一性處理,本支仍須處理的例外
-             THEN 0
-           ELSE S1."GDRNUM2" END AS "GDRNUM2"     -- 舊群組編號 decimal(10, 0) default 0 not null 
+          ,0                AS "GDRNUM2"     -- 舊群組編號 decimal(10, 0) default 0 not null 
           ,ROW_NUMBER() OVER (PARTITION BY S1."GDRID1",S1."GDRID2",S1."GDRNUM" 
                               ORDER BY S1."CIF_SEQ" 
                                      , S1."LGTCIF" 
@@ -86,29 +72,8 @@ BEGIN
                   THEN 1 -- 多筆擔保品且為主要擔保品時，轉入 
                   WHEN S2."TfFg" IS NOT NULL 
                   THEN 0 -- 多筆擔保品但非為主要擔保品時，不轉入 
-                  WHEN S1."GDRNUM2" = 0  
-                       AND NVL(S1."LGTADR",' ') <> ' ' 
-                  THEN 1 -- 單筆擔保品且群組號碼為0時，轉入 
-                  WHEN TO_CHAR(S1."GDRID1") || TO_CHAR(S1."GDRID2") || TO_CHAR(S1."GDRNUM") = TO_CHAR(S1."GDRNUM2")  
-                       AND S1."GDRMRK" = '1' 
-                       AND NVL(S1."LGTADR",' ') <> ' ' 
-                  THEN 1 -- 單筆擔保品且擔保品號碼等同群組號碼 且 擔保品註記為1 且 地址不為NULL 時，轉入 
-                  WHEN LPAD(S1.GDRID1,1,'0')
-                       || LPAD(S1.GDRID2,2,'0')
-                       || LPAD(S1.GDRNUM,7,'0')
-                       || LPAD(S1.LGTSEQ,2,'0') 
-                       IN ('101170176301', -- 新北市三重區 06020-000
-                           '101102220301', -- 新北市板橋區 08215-000
-                           '101102072801', -- 新北市三重區 00354-000
-                           '101104701701', -- 屏東縣屏東市 04496-000
-                           '101102923202', -- 桃園市桃園區 00252-000
-                           '101102810401'  -- 台北市大同區 01087-000
-                          )
-                  THEN 1 -- 2023-03-20 Wei 修改 from 新壽-金靜 email 2023年3月20日 下午3:59 回覆確認補轉資料
                 ELSE 0 END  -- 其餘皆不轉 
                 = 1 
-            -- AND NVL(CU."CUSCIF",0) > 0 -- 擔保品提供人必須在客戶主檔有建資料 
-            -- AND NVL(CM."CustId",' ') <> ' ' -- 且該筆擔保品提供人資料有轉至新系統的客戶主檔 
             AND S1."GDRID1" = '1' -- 只撈建物 
           UNION 
           /* 土地 */ 

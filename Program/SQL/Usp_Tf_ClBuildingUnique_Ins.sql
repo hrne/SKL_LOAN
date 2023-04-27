@@ -28,26 +28,9 @@ BEGIN
       FROM LA$GDTP
     )
     SELECT CASE
-             WHEN S1."GDRMRK" = 1 
-             THEN 'Y'
-             WHEN S1."GDRNUM2" > 0 
-             THEN ' '
              WHEN S1."GDRNUM" = S4."GDRNUM" 
                   AND S1."LGTSEQ" = S4."LGTSEQ" 
              THEN 'Y' -- 2022-03-10 Wei
-             WHEN LPAD(S1.GDRID1,1,'0')
-                  || LPAD(S1.GDRID2,2,'0')
-                  || LPAD(S1.GDRNUM,7,'0')
-                  || LPAD(S1.LGTSEQ,2,'0')
-                  IN (
-                    '101170176301', -- 新北市三重區 06020-000
-                    '101102220301', -- 新北市板橋區 08215-000
-                    '101102072801', -- 新北市三重區 00354-000
-                    '101104701701', -- 屏東縣屏東市 04496-000
-                    '101102923202', -- 桃園市桃園區 00252-000
-                    '101102810401'  -- 台北市大同區 01087-000
-                  ) -- 新光做過唯一性處理,本支仍須處理的例外
-             THEN 'Y'
            ELSE ' ' END AS "TfFg"
           ,S1."GroupNo"
           ,S1."SecGroupNo"
@@ -185,99 +168,6 @@ BEGIN
     )
     WHEN MATCHED THEN UPDATE SET
     T1."SecGroupNo" = SC1."MinSecGroupNo"
-    ;
-
-    -- 更新ClBuildingUnique 同組內皆無Y者 透過GDRNUM2 去更新組號
-    MERGE INTO "ClBuildingUnique" T1
-    USING (SELECT S4."GroupNo"
-                 ,S4."SecGroupNo"
-                 ,S1."GDRID1"
-                 ,S1."GDRID2"
-                 ,S1."GDRNUM"
-                 ,S1."LGTSEQ"
-                 ,ROW_NUMBER() OVER (PARTITION BY S1."GDRID1"
-                                                 ,S1."GDRID2"
-                                                 ,S1."GDRNUM"
-                                                 ,S1."LGTSEQ"
-                                     ORDER BY S4."GroupNo"
-                                             ,S4."SecGroupNo"
-                                    ) AS "Seq"
-           FROM (SELECT "GroupNo"
-                       ,"SecGroupNo"
-                 FROM "ClBuildingUnique"
-                 GROUP BY "GroupNo"
-                         ,"SecGroupNo"
-                 HAVING SUM(CASE WHEN "TfFg" = 'Y' THEN 1 ELSE 0 END) = 0
-                ) S0 -- 整組內皆無Y者的組別號碼
-           -- 整組內皆無Y者的明細
-           LEFT JOIN "ClBuildingUnique" S1 ON S1."GroupNo"    = S0."GroupNo"
-                                          AND S1."SecGroupNo" = S0."SecGroupNo"
-           -- 串工作檔取GDRNUM2
-           LEFT JOIN "TmpLA$HGTP" S2 ON S2."GDRID1" = S1."GDRID1"
-                                    AND S2."GDRID2" = S1."GDRID2"
-                                    AND S2."GDRNUM" = S1."GDRNUM"
-                                    AND S2."LGTSEQ" = S1."LGTSEQ"
-           -- 串工作檔取GDRNUM2 主要的那筆
-           LEFT JOIN "TmpLA$HGTP" S3 ON S3."GDRNUM2" = S2."GDRNUM2"
-                                    AND S3."GDRMRK" = 1
-           -- 串工作檔取主要那筆且有被轉入的最新群組號碼
-           LEFT JOIN "ClBuildingUnique" S4 ON S4."GDRID1" = S3."GDRID1"
-                                          AND S4."GDRID2" = S3."GDRID2"
-                                          AND S4."GDRNUM" = S3."GDRNUM"
-                                          AND S4."LGTSEQ" = S3."LGTSEQ"
-                                          AND S4."TfFg" = 'Y'
-           WHERE S2."GDRNUM2" > 0
-         ) SC1
-    ON (    SC1."GDRID1"  = T1."GDRID1"
-        AND SC1."GDRID2"  = T1."GDRID2"
-        AND SC1."GDRNUM"  = T1."GDRNUM"
-        AND SC1."LGTSEQ"  = T1."LGTSEQ"
-        AND SC1."Seq"     = 1
-    )
-    WHEN MATCHED THEN UPDATE SET
-     T1."GroupNo" = SC1."GroupNo"
-    ,T1."SecGroupNo" = SC1."SecGroupNo"
-    ;
-
-    -- 更新ClBuildingUnique 同組內皆無Y者 第二次 因為有GDRNUM2皆已有組別號碼 所以第二次更新的不會有沒組別號碼的 僅取同大群組內有Y的
-    MERGE INTO "ClBuildingUnique" T1
-    USING (SELECT S4."GroupNo"
-                 ,S4."SecGroupNo"
-                 ,S1."GDRID1"
-                 ,S1."GDRID2"
-                 ,S1."GDRNUM"
-                 ,S1."LGTSEQ"
-                 ,ROW_NUMBER() OVER (PARTITION BY S1."GDRID1"
-                                                 ,S1."GDRID2"
-                                                 ,S1."GDRNUM"
-                                                 ,S1."LGTSEQ"
-                                     ORDER BY S4."GroupNo"
-                                             ,S4."SecGroupNo"
-                                    ) AS "Seq"
-           FROM (SELECT "GroupNo"
-                       ,"SecGroupNo"
-                 FROM "ClBuildingUnique"
-                 GROUP BY "GroupNo"
-                         ,"SecGroupNo"
-                 HAVING SUM(CASE WHEN "TfFg" = 'Y' THEN 1 ELSE 0 END) = 0
-                ) S0 -- 整組內皆無Y者的組別號碼
-           -- 整組內皆無Y者的明細
-           LEFT JOIN "ClBuildingUnique" S1 ON S1."GroupNo"    = S0."GroupNo"
-                                          AND S1."SecGroupNo" = S0."SecGroupNo"
-           -- 串工作檔取主要那筆且有被轉入的最新群組號碼
-           LEFT JOIN "ClBuildingUnique" S4 ON S4."GroupNo" = S0."GroupNo"
-                                          AND S4."TfFg" = 'Y'
-           WHERE S4."GroupNo" > 0
-         ) SC1
-    ON (    SC1."GDRID1"  = T1."GDRID1"
-        AND SC1."GDRID2"  = T1."GDRID2"
-        AND SC1."GDRNUM"  = T1."GDRNUM"
-        AND SC1."LGTSEQ"  = T1."LGTSEQ"
-        AND SC1."Seq"     = 1
-    )
-    WHEN MATCHED THEN UPDATE SET
-     T1."GroupNo" = SC1."GroupNo"
-    ,T1."SecGroupNo" = SC1."SecGroupNo"
     ;
 
     -- 記錄程式結束時間
