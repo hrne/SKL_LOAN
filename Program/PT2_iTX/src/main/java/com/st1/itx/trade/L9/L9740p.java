@@ -58,7 +58,7 @@ public class L9740p extends TradeBuffer {
 		int drawDownDateC1 = Integer.valueOf(titaVo.getParam("DrawDownDateC1")) + 19110000;
 
 		int year = drawDownDateC1 / 10000;
-		int month = year % 100;
+		int month = drawDownDateC1 / 100 % 100;
 		int day = drawDownDateC1 % 100;
 
 		switch (month) {

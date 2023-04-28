@@ -60,7 +60,7 @@ public class L9742ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String sql = "";
 		sql += "	WITH \"MainData\" AS (";
-		sql += " 		SELECT ACD.\"SlipNo\" "; // 傳票號碼
+		sql += " 		SELECT DISTINCT ACD.\"SlipNo\" "; // 傳票號碼
 		sql += "      		 , ACD.\"TitaTxtNo\" "; // 交易序號
 		sql += "      		 , ACD.\"AcNoCode\" "; // 會計科目代碼
 		sql += "      		 , CDAC.\"AcNoItem\" "; // 會計科目名稱

@@ -168,20 +168,20 @@ public class L9740ServiceImpl extends ASpringJpaParm implements InitializingBean
 			BigDecimal rate, int yearMonth) throws Exception {
 		this.info("l9740.findPage3 ");
 		String sql = " ";
-		sql += "	SELECT M.\"CustNo\"";
-		sql += "		  ,M.\"FacmNo\"";
+		sql += "	SELECT MB.\"CustNo\"";
+		sql += "		  ,MB.\"FacmNo\"";
 //		sql += "		  ,MIN(M.\"BormNo\") AS \"BormNo\"";
 		sql += "		  ,MIN(M.\"DrawdownDate\" - 19110000) AS \"DrawdownDate\"";
 		sql += "		  ,SUM(M.\"DrawdownAmt\") AS \"DrawdownAmt\"";
 		sql += "		  ,MIN(L.\"FitRate\") AS \"StoreRate\"";
 //		sql += "		  ,MIN(M.\"PrevPayIntDate\" - 19110000) AS \"PrevPayIntDate\"";
-		sql += "		  ,MIN(DECODE(M.\"PrevPayIntDate\",0,0,M.\"PrevPayIntDate\" - 19110000)) AS \"PrevPayIntDate\"";
-		sql += "	FROM \"LoanBorMain\" M";
-		sql += "	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\"";
-		sql += "						   AND F.\"FacmNo\" = M.\"FacmNo\"";
-		sql += "	LEFT JOIN \"MonthlyFacBal\" MB ON MB.\"CustNo\" = F.\"CustNo\"";
-		sql += "						   		  AND MB.\"FacmNo\" = F.\"FacmNo\"";
-		sql += "						   		  AND MB.\"YearMonth\" = :yearmonth ";
+		sql += "		  ,MIN(DECODE(MB.\"PrevIntDate\",0,0,MB.\"PrevIntDate\" - 19110000)) AS \"PrevPayIntDate\"";
+		sql += "	FROM \"MonthlyFacBal\" MB";
+		sql += "	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = MB.\"CustNo\"";
+		sql += "						   AND F.\"FacmNo\" = MB.\"FacmNo\"";
+		sql += "	LEFT JOIN \"LoanBorMain\" M ON M.\"CustNo\" = F.\"CustNo\"";
+		sql += "						   	   AND M.\"FacmNo\" = F.\"FacmNo\"";
+		sql += "						   	   AND M.\"BormNo\" = F.\"LastBormNo\" ";
 		sql += "	LEFT JOIN ( ";
 		sql += "		SELECT R1.\"CustNo\"";
 		sql += "			  ,R1.\"FacmNo\"";
@@ -205,8 +205,10 @@ public class L9740ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	) L  ON L.\"CustNo\" = M.\"CustNo\"";
 		sql += "	    AND L.\"FacmNo\" = M.\"FacmNo\"";
 		sql += "	    AND L.\"BormNo\" = M.\"BormNo\"";
-
 		sql += "	WHERE M.\"DrawdownDate\" <= :endDate";
+		sql += "	  AND MB.\"PrevIntDate\" <= :endDate ";
+		sql += "	  AND MB.\"PrevIntDate\" > 0 ";
+		sql += "	  AND MB.\"YearMonth\" = :yearmonth ";
 		sql += "	  AND L.\"FitRate\" > :rate ";
 		sql += "	  AND F.\"AcctCode\" = :acctCode ";
 
@@ -218,8 +220,8 @@ public class L9740ServiceImpl extends ASpringJpaParm implements InitializingBean
 		} else {
 			sql += "	  AND M.\"Status\" IN (0,2)";
 		}
-		sql += "	GROUP BY M.\"CustNo\"";
-		sql += "			,M.\"FacmNo\"";
+		sql += "	GROUP BY MB.\"CustNo\"";
+		sql += "			,MB.\"FacmNo\"";
 		sql += "	ORDER BY \"CustNo\" ASC";
 		sql += "			,\"FacmNo\" ASC";
 //		sql += "			,\"BormNo\" ASC";

@@ -83,52 +83,141 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 			wkBormNoStart = iBormNo;
 			wkBormNoEnd = iBormNo;
 		}
-
+		// 1.有撥款序號 => 撥款序號交易的最後一筆
+		// 2.有暫收可抵繳 => 該戶有暫收可抵繳的最後一筆
+		// 3.債協交易 => 該戶債協交易的最後一筆
+		// 4.期票交易 => 不顯示<訂正>按紐
+		// 5.利率變更(有撥款序號) => 不顯示<訂正>按紐
+		// 6.轉換的撥款、內容變更(有撥款序號) => 不顯示<訂正>按紐
+		// 7.其他 => 不顯示<訂正>按紐
 		String sql = "";
-		sql += "   WITH LASTTX AS ( 														";
-		sql += "   SELECT																	";
-		sql += "      \"CustNo\"				AS	\"CustNo\"								";
-		sql += "     ,\"AcDate\"	            AS	\"AcDate\"								";
-		sql += "     ,\"TitaKinBr\"	        AS	\"TitaKinBr\"								";
-		sql += "     ,\"TitaTlrNo\"	        AS	\"TitaTlrNo\"								";
-		sql += "     ,\"TitaTxtNo\"		    AS	\"TitaTxtNo\"								";
-		sql += "  FROM																		";
-		sql += "   (SELECT																	";
-		sql += "      \"CustNo\"		    AS	\"CustNo\"					    			";
-		sql += "     ,\"AcDate\"	        AS	\"AcDate\"						    		";
-		sql += "     ,\"TitaKinBr\"	        AS	\"TitaKinBr\"								";
-		sql += "     ,\"TitaTlrNo\"	        AS	\"TitaTlrNo\"								";
-		sql += "     ,\"TitaTxtNo\"		    AS	\"TitaTxtNo\"								";
-		sql += " 	 ,ROW_NUMBER() OVER (Partition By \"CustNo\"             				";
-		sql += "       ,CASE WHEN \"AcctCode\" IN ('T11','T12','T13','T21','T22','T23') THEN 1  "; // 債協科目分開控管
-		sql += "             WHEN NVL(JSON_VALUE(\"OtherFields\", '$.ReconCode'),' ')  IN ('A6') THEN 1 "; // 債協入帳分開控管
-		sql += "             WHEN NVL(JSON_VALUE(\"OtherFields\", '$.TempReasonCode'),' ')  IN ('3','6','03','06') THEN 2 "; // 期票入帳分開控管
-		sql += "             ELSE 0 END";
-		sql += " 	   ORDER BY \"AcDate\" Desc 											";
-		sql += "               ,\"TitaCalDy\" Desc	                    					";
-		sql += "               ,\"TitaCalTm\"	Desc                    					";
-		sql += "               ,\"TitaTxtNo\" Desc             	    						";
-		sql += "               ,\"AcSeq\"     Desc )  AS \"RowNumber\"  					";
-		sql += "    FROM																	";
-		sql += "      \"LoanBorTx\"															";
-		sql += "    WHERE \"CustNo\" = :CustNo                               				";
-		sql += "      AND \"TitaTxCd\" IN ('L3200','L3210','L3220','L3230','L3410','L3420','L3410','L3440','L3711','L3712', 'L618B','L618C')							";
-		sql += "      AND \"TitaHCode\" = '0'											 	";
-		sql += "  ) 																		";
-		sql += "  	WHERE \"RowNumber\"	= 1													";
-		sql += "  	)																	 	";
+		sql += " WITH TX1 AS (                ";
+		sql += "  SELECT                 ";
+		sql += "    l.\"CustNo\"		                      ";
+		sql += "   ,l.\"AcDate\"	                       ";
+		sql += "   ,l.\"TitaKinBr\"	       							                ";
+		sql += "   ,l.\"TitaTlrNo\"	        					                ";
+		sql += "   ,l.\"TitaTxtNo\"                ";
+		sql += "   ,MIN(CASE WHEN la.\"BorxNo\" is null THEN 0 ELSE 1 end) AS \"LastFg\"                ";
+		sql += "  FROM \"LoanBorTx\" l                ";
+		sql += "  LEFT JOIN                ";
+		sql += "   (                 ";
+		sql += "   SELECT                 ";
+		sql += "   \"CustNo\"                ";
+		sql += "  ,\"FacmNo\"                ";
+		sql += "  ,\"BormNo\"                ";
+		sql += "  ,MAX(\"BorxNo\") AS \"BorxNo\"                ";
+		sql += "  FROM \"LoanBorTx\"                ";
+		sql += "  WHERE \"CustNo\" = :CustNo                 ";
+		sql += "   AND  \"FacmNo\" > 0                ";
+		sql += "   AND  \"BormNo\" > 0                ";
+		sql += "   AND  \"TitaHCode\" = '0'                ";
+		sql += "   AND  CASE WHEN \"TitaTxCd\" in ('L3721') THEN 5                 ";
+		sql += "             WHEN \"CreateEmpNo\" in ('999999') AND \"TitaTxCd\" in ('L3100','L3701') THEN 6                ";
+		sql += "             ELSE 1                ";
+		sql += "        END = 1                ";
+		sql += "  GROUP BY  \"CustNo\"                ";
+		sql += "           ,\"FacmNo\"                ";
+		sql += "           ,\"BormNo\"                ";
+		sql += "  ) la on  la.\"CustNo\" = l.\"CustNo\"                ";
+		sql += "      AND  la.\"FacmNo\" = l.\"FacmNo\"                ";
+		sql += "      AND  la.\"BormNo\" = l.\"BormNo\"                ";
+		sql += "      AND  la.\"BorxNo\" = l.\"BorxNo\"                ";
+		sql += "  WHERE l.\"CustNo\" = :CustNo                ";
+		sql += "   AND  l.\"FacmNo\" > 0                ";
+		sql += "   AND  l.\"BormNo\" > 0                ";
+		sql += "   AND  CASE WHEN \"TitaTxCd\" in ('L3721') THEN 5                 ";
+		sql += "             WHEN \"CreateEmpNo\" in ('999999') AND \"TitaTxCd\" in ('L3100','L3701') THEN 6                ";
+		sql += "             ELSE 1                ";
+		sql += "        END = 1                ";
+		sql += "  GROUP BY                 ";
+		sql += "    l.\"CustNo\"		                    ";
+		sql += "   ,l.\"AcDate\"	                        ";
+		sql += "   ,l.\"TitaKinBr\"	      						                ";
+		sql += "   ,l.\"TitaTlrNo\"	       			                ";
+		sql += "   ,l.\"TitaTxtNo\"	                ";
+		sql += ")                ";
+		sql += ", LASTTX AS (              ";
+		sql += "   SELECT              ";
+		sql += "    l.\"CustNo\"              ";
+		sql += "   ,l.\"AcDate\"	                      ";
+		sql += "   ,l.\"TitaKinBr\"	      						              ";
+		sql += "   ,l.\"TitaTlrNo\"	       			              ";
+		sql += "   ,l.\"TitaTxtNo\"              ";
+		sql += "   ,L.\"TitaTxCd\"              ";
+		sql += "   ,L.\"TxKind\"              ";
+		sql += "   ,l.\"TxBorm\"              ";
+		sql += "   ,l.\"TmpAmt\"              ";
+		sql += "   ,ROW_NUMBER() OVER (Partition By l.\"CustNo\"              ";
+		sql += "                                   ,l.\"TxKind\"                                           ";
+		sql += "    	                   	   ORDER BY l.\"AcDate\" Desc 							               ";
+		sql += "		                               ,l.\"TitaCalDy\" Desc	                       ";
+		sql += "	                                 ,l.\"TitaCalTm\"	Desc                             ";
+		sql += "	                                 ,l.\"AcSeq\"	Asc              ";
+		sql += "	                    ) AS \"ROWNUMBER\"                              ";
+		sql += "   ,l.\"AcSeq\"               ";
+		sql += "  FROM (              ";
+		sql += "        SELECT              ";
+		sql += "         \"CustNo\"              ";
+		sql += "        ,\"AcDate\"	                      ";
+		sql += "        ,\"TitaKinBr\"	      						              ";
+		sql += "        ,\"TitaTlrNo\"	       			              ";
+		sql += "        ,\"TitaTxtNo\"              ";
+		sql += "        ,MAX(\"TitaTxCd\") AS \"TitaTxCd\"              ";
+		sql += "        ,MAX(\"TitaCalDy\") AS \"TitaCalDy\"              ";
+		sql += "        ,MAX(\"TitaCalTm\") AS \"TitaCalTm\"              ";
+		sql += "        ,SUM(\"TempAmt\" + \"Overflow\") AS \"TmpAmt\"              ";
+		sql += "        ,MIN(CASE WHEN \"CreateEmpNo\" in ('999999') AND \"TitaTxCd\" in ('L3100','L3701') THEN 6               ";
+		sql += "                  WHEN \"TitaTxCd\" in ('L3721') THEN 5               ";
+		sql += "                  WHEN \"CreateEmpNo\" in ('999999') AND \"TitaTxCd\" in ('L3100','L3701') THEN 6              ";
+		sql += "       		        WHEN \"AcctCode\" IN ('TCK','RCK','BCK') THEN 4                ";
+		sql += "       		        WHEN NVL(JSON_VALUE(\"OtherFields\", '$.TempReasonCode'),' ')  IN ('3','6','03','06') THEN 4              ";
+		sql += "                  WHEN \"AcctCode\" IN ('T11','T12','T13') THEN 3               ";
+		sql += "       		        WHEN NVL(JSON_VALUE(\"OtherFields\", '$.ReconCode'),' ')  IN ('A6','A7') THEN 3               ";
+		sql += "                  WHEN \"AcctCode\" IN ('TAV') THEN 2               ";
+		sql += "                  WHEN (\"TempAmt\" + \"Overflow\") <> 0 THEN 2               ";
+		sql += "                  WHEN \"BormNo\" > 0 THEN 1                 ";
+		sql += "     		          ELSE 7              ";
+		sql += "       	  	  END)                        AS \"TxKind\"               ";
+		sql += "        ,MAX(CASE WHEN \"BormNo\" > 0 THEN 1              ";
+		sql += "             ELSE 0              ";
+		sql += "   	    END)                           AS \"TxBorm\"               ";
+		sql += "       ,MAX(\"AcSeq\")                   AS \"AcSeq\"               ";
+		sql += "       FROM \"LoanBorTx\"              ";
+		sql += "       WHERE \"CustNo\" = :CustNo              ";
+		sql += "         AND  \"TitaHCode\" = '0'              ";
+		sql += "       GROUP BY \"CustNo\"              ";
+		sql += "               ,\"AcDate\"	                      ";
+		sql += "               ,\"TitaKinBr\"	      						              ";
+		sql += "               ,\"TitaTlrNo\"	       			              ";
+		sql += "               ,\"TitaTxtNo\"              ";
+		sql += "        ) l              ";
+		sql += "    LEFT JOIN TX1 ON l.\"TxBorm\" > 0              ";
+		sql += "                 AND TX1.\"CustNo\" = l.\"CustNo\"              ";
+		sql += "                 AND TX1.\"AcDate\"	= l.\"AcDate\"                      ";
+		sql += "                 AND TX1.\"TitaKinBr\" = l.\"TitaKinBr\"	      						              ";
+		sql += "                 AND TX1.\"TitaTlrNo\" = l.\"TitaTlrNo\"	       			              ";
+		sql += "                 AND TX1.\"TitaTxtNo\" = l.\"TitaTxtNo\"              ";
+		sql += "                 AND TX1.\"LastFg\" = 1              ";
+		sql += "    WHERE l.\"TxKind\" IN (1,2,3)              ";
+		sql += "      AND CASE WHEN l.\"TxBorm\" = 0 THEN 1               ";
+		sql += "               WHEN NVL(TX1.\"LastFg\",0) = 1 THEN 1               ";
+		sql += "               ELSE 0              ";
+		sql += "          END = 1                ";
+		sql += ") ";
 		sql += "  SELECT																	";
 		sql += "   ln3.*          															";
 		sql += "  ,cdr.\"Item\"					   AS \"RepayCodeX\"						";
 		sql += "  ,CASE WHEN ln3.\"TxDescCode\" = 'Fee' AND ln3.\"TitaTxCd\" = 'L3210' THEN '暫收銷'  ||  cdf.\"Item\" 	 ";
-		sql += "        WHEN ln3.\"TxDescCode\" = 'Fee' AND ln3.\"TitaTxCd\" = 'L3220' THEN '暫收退'  ||  cdf.\"Item\" 	 ";
 		sql += "        WHEN ln3.\"TxDescCode\" = 'Fee' AND ln3.\"TitaTxCd\" = 'L3230' THEN '暫收退'  ||  cdf.\"Item\" 	 ";
 		sql += "        WHEN ln3.\"TxDescCode\" = 'Fee' THEN cdf.\"Item\"                                            ";
 		sql += "        ELSE NVL(cdt.\"Item\",ln3.\"Desc\")  	    	                                             ";
 		sql += "        END                     AS \"TxDescCodeX\"	                                                 ";
 		sql += "  ,ln2.\"TotTxAmt\"												  			";
-		sql += "  ,NVL(JSON_VALUE(ln3.\"OtherFields\", '$.ReconCode'), rm.\"ReconCode\")  AS  \"ReconCode\" ";
-		sql += "  ,CASE WHEN NVL(la.\"AcDate\", 0) > 0 THEN 'Y' ELSE ' ' END	    AS  \"HCodeFlag\" ";
+		sql += "  ,NVL(JSON_VALUE(ln3.\"OtherFields\", '$.ReconCode'), ' ')         AS  \"ReconCode\" ";
+		sql += "  ,CASE WHEN NVL(la.\"AcDate\", 0) > 0 THEN 'Y' ";
+		sql += "        ELSE NVL(JSON_VALUE(ln3.\"OtherFields\", '$.HCodeFlag'), ' ')       ";
+		sql += "        END                     AS  \"HCodeFlag\" ";
 		sql += "  FROM																		";
 		sql += "  ( SELECT																	";
 		sql += "      ln.\"CustNo\"				AS	\"CustNo\"								";
@@ -147,7 +236,6 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		} else {
 			sql += "      AND ln.\"AcDate\" BETWEEN :AcDateS AND :DateEnd 					";
 		}
-		sql += "      AND ln.\"Displayflag\" IN ('Y','I','A','F')							";
 		if (iTitaHCode == 0) {
 			sql += "      AND ln.\"TitaHCode\" = '0'										";
 		}
@@ -159,14 +247,6 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  AND  ln2.\"TitaKinBr\" = ln3.\"TitaKinBr\"   								 ";
 		sql += "  AND  ln2.\"TitaTlrNo\" = ln3.\"TitaTlrNo\"   								 ";
 		sql += "  AND  ln2.\"TitaTxtNo\" = ln3.\"TitaTxtNo\"   								 ";
-		sql += " left join \"BankRmtf\" rm  											     ";
-		sql += "   ON  rm.\"CustNo\" = ln3.\"CustNo\"   									 ";
-		sql += "  AND  rm.\"AcDate\" = ln3.\"AcDate\"   									 ";
-		sql += "  AND  rm.\"TitaTlrNo\" = ln3.\"TitaTlrNo\"   								 ";
-		sql += "  AND  rm.\"TitaTxtNo\" = ln3.\"TitaTxtNo\"   								 ";
-		sql += "  AND  rm.\"TitaTxtNo\" = ln3.\"TitaTxtNo\"   								 ";
-		sql += "  AND  ln3.\"RepayCode\" =  1         										 ";
-		sql += "  AND  NVL(JSON_VALUE(ln3.\"OtherFields\", '$.ReconCode'), ' ') = ' '        ";
 		sql += " left  join \"CdCode\" cdr  													 ";
 		sql += "   on  cdr.\"DefCode\" = 'BatchRepayCode'   									     ";
 		sql += "  AND  cdr.\"Code\"    = ln3.\"RepayCode\" 									 ";
@@ -183,7 +263,7 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  and ln3.\"TitaKinBr\"	 = la.\"TitaKinBr\"									 ";
 		sql += "  and ln3.\"TitaTlrNo\"	 = la.\"TitaTlrNo\"									 ";
 		sql += "  and ln3.\"TitaTxtNo\"	 = la.\"TitaTxtNo\"									 ";
-
+		sql += "  and la.ROWNUMBER = 1								                      	 ";
 		sql += " WHERE 											 							 ";
 		if (iTitaTxtNo.isEmpty()) {
 			sql += " ln3.\"FacmNo\" >= :FacmNoS											 	 ";
@@ -203,8 +283,6 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         ,ln2.\"TitaCalTm\"	ASC                    							 ";
 		sql += "         ,ln3.\"TitaTxtNo\" ASC             	    						 ";
 		sql += "         ,ln3.\"AcSeq\"     ASC                     						 ";
-		sql += "         ,ln3.\"CreateDate\" ASC                    						 ";
-		sql += "         ,ln3.\"Displayflag\" ASC                  							 ";
 		sql += " " + sqlRow;
 
 		this.info("sql=" + sql);
@@ -260,48 +338,8 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		return this.convertToMap(query);
 	}
+
 	public int getSize() {
 		return cnt;
 	}
-	
-	public List<Map<String, String>> custNoLastLoanBorTx(int iCustNo, TitaVo titaVo) throws Exception {
-		String sql = "";
-		sql += "  SELECT																	";
-		sql += "  tx.*                                    						    	   	";
-		sql += "  FROM																		";
-		sql += "   (SELECT																	";
-		sql += "     \"LoanBorTx\".* 					    			                    ";
-		sql += " 	 ,ROW_NUMBER() OVER (Partition By \"CustNo\"             				";
-		sql += "       ,CASE WHEN \"AcctCode\" IN ('T11','T12','T13','T21','T22','T23') THEN 1  "; // 債協科目分開控管
-		sql += "             WHEN NVL(JSON_VALUE(\"OtherFields\", '$.ReconCode'),' ')  IN ('A6','A7') THEN 1 "; // 債協入帳分開控管
-		sql += "             WHEN NVL(JSON_VALUE(\"OtherFields\", '$.TempReasonCode'),' ')  IN ('3','6','03','06') THEN 2 "; // 期票入帳分開控管
-		sql += "             ELSE 0 END";
-		sql += " 	   ORDER BY \"AcDate\" Desc 											";
-		sql += "               ,\"TitaCalDy\" Desc	                    					";
-		sql += "               ,\"TitaCalTm\"	Desc                    					";
-		sql += "               ,\"TitaTxtNo\" Desc             	    						";
-		sql += "               ,\"AcSeq\"     Desc )  AS \"RowNumber\"  					";
-		sql += "    FROM																	";
-		sql += "      \"LoanBorTx\"															";
-		sql += "    WHERE \"CustNo\" = :CustNo                               				";
-		sql += "      AND \"TitaTxCd\" IN ('L3200','L3210','L3220','L3230','L3410','L3420','L3410','L3440','L3711','L3712', 'L618B','L618C')							";
-		sql += "      AND \"TitaHCode\" = '0'											 	";
-		sql += "  ) tx																		";
-		sql += "  WHERE \"RowNumber\"	= 1													";
-		this.info("sql=" + sql);
-		Query query;
-		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-		query = em.createNativeQuery(sql);
-
-		this.info("sql=" + sql);
-		query.setParameter("CustNo", iCustNo);
-		query.setFirstResult(0);
-		query.setMaxResults(this.limit);
-		List<Object> result = query.getResultList();
-		size = result.size();
-		this.info("Total size ..." + size);
-
-		return this.convertToMap(query);
-	}
-
 }

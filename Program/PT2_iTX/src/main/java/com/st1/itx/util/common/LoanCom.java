@@ -1145,42 +1145,15 @@ public class LoanCom extends TradeBuffer {
 
 	/**
 	 * 檢查到同戶帳務交易需由最近一筆交易開始訂正
+	 * 改以檢核暫收款餘額是否足夠(AcReceivableCom)
 	 * 
 	 * @param iCustNo 戶號
 	 * @param titaVo  TitaVo
 	 * @throws LogicException LogicException
 	 */
 	public void checkEraseCustNoTxSeqNo(int iCustNo, TitaVo titaVo) throws LogicException {
-		this.info("checkEraseCustNoTxSeqNo ... ");
-		if (iCustNo == this.txBuffer.getSystemParas().getLoanDeptCustNo()
-				|| iCustNo == this.txBuffer.getSystemParas().getNegDeptCustNo()) {
-			return;
-		}
+		// 改以檢核暫收款餘額是否足夠(AcReceivableCom)
 
-		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
-
-		try {
-			resultList = l3005ServiceImpl.custNoLastLoanBorTx(iCustNo, titaVo);
-		} catch (Exception e) {
-			this.info("Error ... " + e.getMessage());
-		}
-
-		String orgTxSeq = "";
-		int acDate = 0;
-		boolean isCustNoLastTx = false;
-		if (resultList != null && resultList.size() != 0) {
-			this.info("Size =" + resultList.size());
-			for (Map<String, String> result : resultList) {
-				orgTxSeq = result.get("TitaKinBr") + result.get("TitaTlrNo") + result.get("TitaTxtNo");
-				acDate = parse.stringToInteger(result.get("AcDate")) - 19110000;
-				if (acDate == titaVo.getOrgEntdyI() && orgTxSeq.equals(titaVo.getOrgTxSeq())) {
-					isCustNoLastTx = true;
-				}
-			}
-		}
-		if (!isCustNoLastTx) {
-			throw new LogicException(titaVo, "E3088", "同戶帳務最近一筆交易序號 = " + acDate + "-" + orgTxSeq); // 放款交易訂正須由最後一筆交易開始訂正
-		}
 	}
 
 	/**

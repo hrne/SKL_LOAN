@@ -435,9 +435,10 @@ E(0,@RimType,2)
 RESET_RIM(#RimL4r03A,L4R03)
 S(L4R03,1,#RimType,#RimCustNo)
 R(1,L4R03)
-T(2,@CustIdTemp,#L4r03CustId)
+T(2,@CustIdTemp2,#L4r03CustId)
 
 !找尋主檔OR客戶主檔記號
+!1=客戶主檔 2=授權記錄檔
 #Type=9,1,S
 E(0,#L4r03Type)
 
@@ -468,6 +469,7 @@ RESET_RIM(#RimL4r03B,L4R03)
 S(L4R03,1,#RimType,#RimCustNo)
 R(1,L4R03)
 T(2,@CustName,#L4r03CustName)
+T(2,@CustIdTemp,#L4r03CustId)
 
 ! 戶名
 #CustName=x,100,L
@@ -503,16 +505,6 @@ E(0,700)
 C(3,#FuncCode,1,$,s)
 @V(2,0)
 
-<include src="ROM.icf::L4R03Rim.dec"/>
-<include src="ROM.icf::L4R01.dec"/>
-<include src="ROM.icf::L4R03.dec"/>
-<include src="ROM.icf::L4R21.dec"/>
-<include src="ROM.icf::L4R22.dec"/>
-<include src="ROM.icf::L4R23.dec"/>
-<include src="ROM.icf::L4R24.dec"/>
-<include src="ROM.icf::L4R30.dec"/>
-<include src="ROM.icf::L6R17Rim.dec"/>
-<include src="ROM.icf::L6R17.dec"/>
 
 #RimL4r01=X,1,S
 C(3,#FuncCode,1,$,s)
@@ -592,8 +584,8 @@ R(1,L4R03)
 T(2,@RelAcctName,#L4r03CustName)
 T(2,@RelationId,#L4r03CustId)
 E(0,@RelAcctBirthday,#L4r03Birthday)
-T(2,@RelAcctGenderP,#L4r03Gender)
-T(H,@RelAcctGenderX,#RelAcctGenderP,#SexHelp)
+T(2,@RelAcctGender,#L4r03Gender)
+T(H,@RelAcctGenderX,#RelAcctGender,#SexHelp)
 
 #SetValue2=A,1,S
 IF(#FuncCode==4 || #FuncCode==5,s,$)
@@ -646,13 +638,11 @@ IF(#AuthApplCodeTemp==#AuthApplCode,E(0,@checkFlag,0),E(0,@checkFlag,1))
 IF(#AuthApplCodeTemp==#AuthApplCode,V(P,請變更狀態),$)
 C(3,#checkFlag,1,T(F,@CustId,0)T(F,@RelationCode,0),C(3,#PostSuccessFg,1,$,T(F,@CustId,1)T(F,@RelationCode,1)))
 
-
 ! 若已授權，下方欄位不可修改
 ! 每筆扣款限額
 #LimitAmt=m,8,I
 IF(#FuncCode==4 || #FuncCode==5,s,$)
 IF(#AcctCheckFlag==0 || #AcctCheckFlag==8,$,s)
-
 
 #RelationCode=A,2,I
 IF(#FuncCode==4 || #FuncCode==5,s,$)
@@ -671,9 +661,9 @@ C(3,#RelationCode,0,
 T(2,@RelAcctName,#L4r03CustName)
 T(2,@RelationId,#L4r03CustId)
 E(0,@RelAcctBirthday,#L4r03Birthday)
-T(2,@RelAcctGenderP,#L4r03Gender)
-T(H,@RelAcctGenderX,#RelAcctGenderP,#SexHelp)
-,T(2,@CustId,)
+T(2,@RelAcctGender,#L4r03Gender)
+T(H,@RelAcctGenderX,#RelAcctGender,#SexHelp),
+T(2,@CustId,)
 T(2,@RelAcctName,)
 T(2,@RelationId,)
 E(0,@RelAcctBirthday,0)
@@ -683,7 +673,7 @@ T(2,@RelAcctGenderX,)
 
 #RelationCodeX=X,4,L
 T(H,#RelationCode,#RelationCodeHelp)
-IF(#RelationCode==00,T(2,@CustId,#CustIdTemp),$)
+! IF(#RelationCode==00,T(2,@CustId,#CustIdTemp),$)
 IF(#RelationCode==00,s,$)
 IF(#RelationCode==99
 ,T(2,@RelAcctGender,)
@@ -691,8 +681,6 @@ T(2,@RelAcctGenderX,)
 ,IF(#RelationCode==01||#RelationCode==03||#RelationCode==05||#RelationCode==07||#RelationCode==08||#RelationCode==11
 ,T(2,@RelAcctGender,1)T(H,@RelAcctGenderX,#RelAcctGender,#SexHelp)
 ,T(2,@RelAcctGender,2)T(H,@RelAcctGenderX,#RelAcctGender,#SexHelp)))
-
-
 
 ! 扣款人ＩＤ
 #CustIdTemp=X,10,S
@@ -707,20 +695,22 @@ A(ID_UNINO,0,#CustId)
 E(0,@CustCodeFg,1)
 C(3,#CustCodeFg,1,CALL(#wkCustCode),$)
 C(5,#RelationCode,#OldRelationCode,s,$)
-! IF(#RelationCode==00,$,T(2,@RelationId,#CustId))
-T(2,@RelationId,#CustId)
-C(3,#RelationCode,0,$,s)
-C(3,#Type,1,IF(#CustId==#CustIdTemp,$,V(P,非本人ID)),IF(#CustId==#CustIdTemp,$,V(P,非授權檔ID))))
+C(3,#RelationCode,0,T(2,@RelationId,#CustIdTemp),T(2,@RelationId,#CustId))
+! C(3,#Type,1,IF(#CustId==#CustIdTemp,$,V(P,非本人ID)),$)
+! C(3,#Type,1,IF(#CustId==#CustIdTemp,$,V(P,非本人ID)),IF(#CustId==#CustIdTemp,$,V(P,非授權檔ID)))
 
-! 本人且與護皓不同id時檢查ID不應存在客戶檔
+! 本人且與戶號不同id時檢查ID不應存在客戶檔
 #RimL2r07CheckId=X,1,S
+IF(#FuncCode==4 || #FuncCode==5,s,$)
 C(3,#RelationCode,0,$,s)
 C(5,#CustId,#CustIdTemp,s,$)
+C(5,#CustId,#L4R30CustId,s,$)
 T(2,@RimTxCode,#TXCD)
 T(2,@RimCustId,#CustId)
 E(0,@RimCustNo,0)
 S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
 R(1,L2R07)
+C(5,#CustId,#L2r07CustId,ALERT(非本人ID，且不存在於客戶主檔),$)
 
 ! IF(#CustId==#CustIdTemp,s,$)
 ! C(5,#CustId,#CustIdTemp,$,V(P,與主檔設定ID不合))
@@ -754,10 +744,6 @@ T(F,@RelAcctGender,1))
 !E(0,@RelAcctBirthday,#L4r03Birthday)
 !T(2,@RelAcctGenderP,#L4r03Gender)
 
-#RelAcctGenderP=X,1,S
-C(3,#RelationCode,0,$,s)
-T(H,@RelAcctGenderX,#RelAcctGenderP,#SexHelp)
-
 ! 帳戶戶名
 #RelAcctName=x,100,I
 IF(#FuncCode==4 || #FuncCode==5,s,$)
@@ -769,10 +755,10 @@ C(3,#RelationCode,0,s,$)
 ! 身分證字號
 #RelationId=X,10,I
 IF(#FuncCode==4 || #FuncCode==5,s,$)
-C(3,#AcctCheckFlag,0,$,s)
+IF(#AcctCheckFlag==0 || #AcctCheckFlag==8,$,s)
 ! 11/5 非本人時自動帶扣款人ID
 C(3,#RelationCode,0,s,$)
-IF(#RelationCode==00,$,T(2,@RelationId,#CustId))
+! IF(#RelationCode==00,$,T(2,@RelationId,#CustId))
 @V(7)A(ID_UNINO,0,#RelationId)
 
 #CustIdLen=m,2,S
@@ -808,18 +794,17 @@ SHOW(#RelAcctGender),
 HIDE(#RelAcctGender)
 ))
 
-! 性別(非本人&個人戶才需輸入)
+! 性別(個人戶才需輸入)
 #RelAcctGender=X,1,I
 IF(#FuncCode==4 || #FuncCode==5,s,$)
 C(3,#PostSuccessFg,1,s,$)
 ! C(3,#AcctCheckFlag,0,$,s)
-C(3,#RelationCode,0,s,$)
 IF(#CustIdLen==10,$,S)
+C(3,#RelationCode,0,s,$)
 HELP(#SexHelp)
 @V(H,#SexHelp)
 #RelAcctGenderX=X,2,L
-C(3,#RelationCode,0,C(4,#RelAcctGenderP,T(2,),T(H,#RelAcctGenderP,#SexHelp)),C(4,#RelAcctGender,T(2,),T(H,#RelAcctGender,#SexHelp)))
-
+T(H,#RelAcctGender,#SexHelp)
 
 !用戶編碼
 #wkCustCode=@,1,S
@@ -844,6 +829,17 @@ T(2,@CustCode,#RepayAcctSeq+#CustId+#PostDepCode+#CustNo)
 #StampCancelDate=D,7,L
 
 
+<include src="ROM.icf::L4R03Rim.dec"/>
+<include src="ROM.icf::L4R01.dec"/>
+<include src="ROM.icf::L4R03.dec"/>
+<include src="ROM.icf::L4R21.dec"/>
+<include src="ROM.icf::L4R22.dec"/>
+<include src="ROM.icf::L4R23.dec"/>
+<include src="ROM.icf::L4R24.dec"/>
+<include src="ROM.icf::L4R30.dec"/>
+<include src="ROM.icf::L2R07.dec"/>
+<include src="ROM.icf::L6R17Rim.dec"/>
+<include src="ROM.icf::L6R17.dec"/>
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -899,6 +895,7 @@ TXFORM=L4412
 <include src="ROM.icf::L4R21.tom"/>
 <include src="ROM.icf::L4R22.tom"/>
 <include src="ROM.icf::L4R23.tom"/>
+<include src="ROM.icf::L2R07.tom"/>
 <include src="ROM.icf::L4R24.tom"/>
 <include src="ROM.icf::L4R30.tom"/>
 <include src="ROM.icf::L6R17.tom"/>

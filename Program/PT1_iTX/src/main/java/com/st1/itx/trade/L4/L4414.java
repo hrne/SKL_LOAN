@@ -161,11 +161,11 @@ public class L4414 extends TradeBuffer {
 //					filePath1 = "D:\\temp\\TestingInPut\\AHP21P_授回.txt";
 				String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
 						+ File.separatorChar + filename;
-
+				
 				achCnt = achCnt + 1;
-
+				
 				ArrayList<String> dataLineList = new ArrayList<>();
-
+				
 				// 編碼參數，設定為UTF-8 || big5
 				try {
 					dataLineList = fileCom.intputTxt(filePath1, "UTF-8");
@@ -174,14 +174,14 @@ public class L4414 extends TradeBuffer {
 				}
 
 				AchAuthFileVo achAuthFileVo = new AchAuthFileVo();
-
+				
 				// 使用資料容器內定義的方法切資料
 				achAuthFileVo.setValueFromFile(dataLineList);
 				AchStampFinishDate = Integer.parseInt(dataLineList.get(0).substring(9, 17)) + 19110000;
 				this.info("AchStampFinishDate==" + AchStampFinishDate);
-
+				
 				setAchAuthLog(achAuthFileVo, titaVo);
-
+				
 			} else if (filename.substring(0, 1).indexOf("P") >= 0) {
 				int postsize = 0;
 //					POST
@@ -189,33 +189,33 @@ public class L4414 extends TradeBuffer {
 //					filePath1 = "D:\\temp\\TestingInPut\\PO$P21P_846授權回.txt";
 				String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
 						+ File.separatorChar + filename;
-
+				
 				postCnt = postCnt + 1;
-
+				
 				ArrayList<String> dataLineList = new ArrayList<>();
-
+				
 				// 編碼參數，設定為UTF-8 || big5
 				try {
 					dataLineList = fileCom.intputTxt(filePath1, "UTF-8");
 				} catch (IOException e) {
 					throw new LogicException("E0014", "L4414(" + filePath1 + ") : " + e.getMessage());
 				}
-
+				
 				PostAuthFileVo postAuthFileVo = new PostAuthFileVo();
 				// 使用資料容器內定義的方法切資料
 				postAuthFileVo.setValueFromFile(dataLineList);
-
+				
 				postsize = dataLineList.size() - 1;
 				if (!dataLineList.get(postsize).substring(26, 34).toString().isEmpty()) {
 					PostCreateDate = Integer.parseInt(dataLineList.get(postsize).substring(26, 34));
 				}
-
+				
 				setPostAuthLog(postAuthFileVo, titaVo);
 			} else {
 				throw new LogicException("E0014", filename + " 此檔案不符本交易處理範圍");
 			}
 		}
-
+		
 		// 編碼參數，設定為UTF-8 || big5
 		// 取當前日期時間
 		this.nowDate = makeReport.dDateUtil.getNowStringRoc();
@@ -359,7 +359,7 @@ public class L4414 extends TradeBuffer {
 				fPropDate = parse.stringToInteger(tempOccursList.get("PropDate"));
 				fAuthStatus = tempOccursList.get("AuthStatus");
 				fCreateFlag = tempOccursList.get("CreateFlag");
-				fBankCode = tempOccursList.get("BankCode");
+				fBankCode = tempOccursList.get("RepayBank");
 				fPostDepCode = tempOccursList.get("PostDepCode");
 				fOrgCode = tempOccursList.get("OccOrgCode");
 				fAuthApplCode = tempOccursList.get("AuthApplCode");

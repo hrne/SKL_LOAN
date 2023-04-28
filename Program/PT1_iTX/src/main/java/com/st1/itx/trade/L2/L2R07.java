@@ -101,6 +101,8 @@ public class L2R07 extends TradeBuffer {
 			if (tCustMain != null) {
 				throw new LogicException(titaVo, "E0015", "扣款人ID已存在客戶主檔"); // 檢查錯誤
 			} else {
+				this.totaVo.putParam("L2r07CustId", iCustId);
+				this.addList(this.totaVo);
 				return this.sendList();
 			}
 		}
