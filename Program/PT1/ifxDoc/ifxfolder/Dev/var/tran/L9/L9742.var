@@ -17,12 +17,22 @@ T(3,L9742)
 <include src="COM.icf::BFHEAD2.dec"/>
 
 
+
+! 功能 (2: 修改)
+#FuncCode=A,1,S
+E(0,2)
+K(MODIFYBUTTON,確定)
+
+#FUNCIND=_,_,S
+E(0,#FuncCode)
+
+
 </sub>
 
 
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[150,850];printer.width=[20,20];order=1;">
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
 ["[L9742]                              L9742企金戶還本收據及繳息收據"],
 [#<->#,"功能",#FunctionCode,#FunctionCodeX],
@@ -37,22 +47,8 @@ T(3,L9742)
 !---------- AP Button AREA ----------
 
  
+
 ![Buttom資料查詢]
-
-#BTN2=X,15,I,ui:button;value:會計明細;enable:1;tabbable:0
-#BTN3=X,15,I,ui:button;value:會計明細;enable:1;tabbable:0
-
-
-!會計明細按鈕
-#BUF2=X,6,S
-#BIND2=X,1,S
-!BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L6903; ntxbuf=#BUF2;ntxbuf5=type<-1:
-BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L6905; ntxbuf=#BUF2;ntxbuf5=type<-1:
-inputSlipNoStart<-OOSlipNo:
-inputSlipNoEnd<-OOSlipNo:
-inputTitaTxtNo<-OOTitaTxtNo})
-
-!ENABLE(#BTN2)ENABLE(#BTN3)
 #Submit=A,1,S
 K(MODIFYBUTTON,查詢)
 
@@ -60,14 +56,6 @@ K(MODIFYBUTTON,查詢)
 !---------- AP TEXT AREA Variables ----------
 #CHAIN=A,1,S
 T(4,CHAIN$)
-
-! #NTXBUF=X,3,S
-! C(3,#CHAIN,1,T(4,NTXBUF$),S)
-! T(1,@FUNCD,#NTXBUF,1,1)
-! T(1,@TLR,#NTXBUF,2,2)
-! T(2,@FKEY,7)
-
-!ALERT(#BTN2)
 
 !-----------------------------------------------------
 
@@ -95,15 +83,19 @@ V(5,0,#SYSDATE)
 !C(4,#inputTitaTlrNo,E(0,@inputTitaTxtNo,00000000)E(0,@inputTitaTxtNoEnd,99999999),$)
 
 #inputTitaTxtNoStart=A,8,I
+V(7)
 @V(5,00000000,99999999)
-!C(4,#inputTitaTlrNo,S,$)
 
+#BTN2=X,15,I,ui:button;value:會計明細;enable:1;tabbable:0
+#BTN3=X,15,I,ui:button;value:會計明細;enable:1;tabbable:0
 
 !會計明細按鈕
 #BUF2B=X,62,S
-T(2,000+   +0000+   +           +     +  +#inputAcDate+2+#inputTitaTlrNo+0+#inputTitaTxtNoStart+#inputTitaTxtNoEnd)
-C(4,#inputTitaTlrNo,$,s)
-T(2,000+   +0000+   +           +     +  +#inputAcDate+0+      +0+#inputTitaTxtNoStart+#inputTitaTxtNoEnd)
+T(2,000+   +0000+   +           +     +  +#inputAcDate+2+#inputTitaTlrNo+0+#inputTitaTxtNoStart+99999999)
+C(4,#inputTitaTlrNo,C(4,#inputTitaTxtNoStart,$,s),s)
+T(2,000+   +0000+   +           +     +  +#inputAcDate+0+      +0+00000000+99999999)
+
+
 
 #BIND2B=X,1,S
 BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L6905; ntxbuf=#BUF2B;ntxbuf5=type<-1:
@@ -118,6 +110,7 @@ T(2,000+   +0000+   +           +     +  +#inputAcDate+0+      +0+#inputTitaTxtN
 #BIND3B=X,1,S
 BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L6905; ntxbuf=#BUF3B;ntxbuf5=type<-1:
 inputSlipNoEnd<-OOSlipNo})
+
 
 #inputTitaTxtNoEnd=A,8,S
 E(0,0)
@@ -199,7 +192,6 @@ IF(#KINBR=="0009"||#KINBR=="0008",T(2,#KINBR+#TlrNoNO),T(2,#EMPNOS))
 !------ 下行電文TOM ------
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
-<include src="HELPRIM.icf::HELPRIM.tom"/>
 
 TXFORM=L9742
 ^

@@ -16,6 +16,8 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdCity;
 import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.CdCodeId;
+import com.st1.itx.db.domain.CdLand;
+import com.st1.itx.db.domain.CdLandId;
 import com.st1.itx.db.domain.CdLandOffice;
 import com.st1.itx.db.domain.CdLandOfficeId;
 import com.st1.itx.db.domain.ClFac;
@@ -27,6 +29,7 @@ import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.service.CdCityService;
 import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdLandOfficeService;
+import com.st1.itx.db.service.CdLandService;
 import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.ClOtherRightsService;
 import com.st1.itx.db.service.FacCloseService;
@@ -61,6 +64,8 @@ public class L2075 extends TradeBuffer {
 	public CdCodeService cdCodeService;
 	@Autowired
 	public CdCityService cdCityService;
+	@Autowired
+	public CdLandService cdLandService;
 	@Autowired
 	public CdLandOfficeService cdLandOfficeService;
 	@Autowired
@@ -283,10 +288,10 @@ public class L2075 extends TradeBuffer {
 		occursList.putParam("OOCity", wkCityItem);
 		// 找地政所名稱
 		if ("".equals(tClOtherRights.getOtherLandAdm())) {
-			CdCode tCdCode = cdCodeService.findById(new CdCodeId("LandOfficeCode", tClOtherRights.getLandAdm()),
+			CdLand tCdLand = cdLandService.findById(new CdLandId(tClOtherRights.getCity(), tClOtherRights.getLandAdm()),
 					titaVo);
-			if (tCdCode != null) {
-				wkLandOfficeItem = tCdCode.getItem();
+			if (tCdLand != null) {
+				wkLandOfficeItem = tCdLand.getLandOfficeItem();
 			}
 		} else {
 			wkLandOfficeItem = tClOtherRights.getOtherLandAdm();

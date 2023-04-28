@@ -580,10 +580,10 @@ public class L4414 extends TradeBuffer {
 			occursList.putParam("OOCustNoB", fCustNo);
 			occursList.putParam("OOCustNameB", loanCom.getCustNameByNo(fCustNo));
 			occursList.putParam("OOFacmNoB", fFacmNo);
-			if (bankX(fBankCode, titaVo).length() > 8) {
-				occursList.putParam("OORepayBankXB", bankX(fBankCode, titaVo).substring(0, 8));
+			if (bankX(fRepayBank, titaVo).length() > 8) {
+				occursList.putParam("OORepayBankXB", bankX(fRepayBank, titaVo).substring(0, 8));
 			} else {
-				occursList.putParam("OORepayBankXB", bankX(fBankCode, titaVo));
+				occursList.putParam("OORepayBankXB", bankX(fRepayBank, titaVo));
 			}
 			occursList.putParam("OORepayAcctB", fRepayAcct);
 			occursList.putParam("OOAuthStatusB", fAuthStatus);

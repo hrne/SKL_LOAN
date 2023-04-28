@@ -115,7 +115,7 @@ public class L2918ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "LEFT JOIN \"ClFac\"    cf ON clor.\"ClCode1\" = cf.\"ClCode1\" ";
 		sql += "                         AND clor.\"ClCode2\" = cf.\"ClCode2\" ";
 		sql += "                         AND clor.\"ClNo\" = cf.\"ClNo\" ";
-		sql += " LEFT JOIN \"CdLand\" cl ON cl.\"CityCode\" = clor.\"LandAdm\" ";
+		sql += " LEFT JOIN \"CdLand\" cl ON cl.\"CityCode\" = clor.\"City\" ";
 		sql += "                             AND cl.\"LandOfficeCode\" = clor.\"LandAdm\" ";
 		sql += " LEFT JOIN \"CdLandOffice\" clo ON clo.\"LandOfficeCode\" = clor.\"LandAdm\" ";
 		sql += "                                      AND clo.\"RecWord\" = clor.\"RecWord\" ";

@@ -3742,15 +3742,7 @@ TXFORM=L2R58
 ^
 </L2R58.tom>
 
-<L2R59.dec>
-#L2r59Help1=X,2000,S
-</L2R59.dec>
 
-<L2R59.tom>
-TXFORM=L2R59
-#L2r59Help1
-^
-</L2R59.tom>
 
 <L2R60.dec>
 #L2r60Help1=X,2000,S
