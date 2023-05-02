@@ -105,11 +105,13 @@ public class L6041ServiceImpl extends ASpringJpaParm implements InitializingBean
 		
 		String sql = " ";
 		sql += " select  ";
-		sql += " \"TlrNo\", ";
-		sql += " \"AuthNo\", ";
-		sql += " \"LastUpdate\", ";
-		sql += " \"LastUpdateEmpNo\" ";
-		sql += " from \"TxTellerAuth\" ";
+		sql += " A.\"TlrNo\" , ";
+		sql += " A.\"AuthNo\", ";
+		sql += " B.\"AuthItem\" , ";
+		sql += " A.\"LastUpdate\" , ";
+		sql += " A.\"LastUpdateEmpNo\" ";
+		sql += " from \"TxTellerAuth\" A ";
+		sql += " left join \"TxAuthGroup\" B on a.\"AuthNo\" = b.\"AuthNo\" ";
 		
 		if (!iTlro.equals("")) {
 		sql += " where \"TlrNo\" = :TlrNo ";

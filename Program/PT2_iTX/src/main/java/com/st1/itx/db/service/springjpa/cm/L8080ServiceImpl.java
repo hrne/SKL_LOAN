@@ -43,7 +43,8 @@ public class L8080ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iTypeCode = parse.stringToInteger(titaVo.getParam("TypeCode"));
 		String custId = titaVo.getParam("CustId").trim();
 		int custNo = parse.stringToInteger(titaVo.getParam("CustNo"));
-
+		this.info("***L8080*iBrNo="+iBrNo+",iStatus="+iStatus+",iAcDate1="+iAcDate1+",iAcDate2"+iAcDate2+",iTypeCode="+iTypeCode);
+		
 		String sql = "";
 		sql += " select t.\"LogNo\" ";
 		sql += "      , t.\"Entdy\" ";
@@ -63,40 +64,40 @@ public class L8080ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (iTypeCode != 9) {
 			switch (iTypeCode) {
 			case 0:
-				sql += " case ";
-				sql += "   when SUBSTR(\"CaseNo\",0,2) in ('LN','RT') ";
-				sql += "   then 1 ";
-				sql += "   when \"CaseNo\" = 'L3110' ";
-				sql += "   then 1 ";
-				sql += " else 0 end > 0 ";
+				sql += " and case ";
+				sql += "       when SUBSTR(\"CaseNo\",0,2) in ('LN','RT') ";
+				sql += "       then 1 ";
+				sql += "       when \"CaseNo\" = 'L3110' ";
+				sql += "       then 1 ";
+				sql += "     else 0 end > 0 ";
 //				L3110
 //				LNnnnn
 				break;
 			case 1:
-				sql += " case ";
-				sql += "   when (\"CaseNo\") = 'AUTH' ";
-				sql += "   then 1 ";
-				sql += " else 0 end > 0 ";
+				sql += " and case ";
+				sql += "       when (\"CaseNo\") = 'AUTH' ";
+				sql += "       then 1 ";
+				sql += "     else 0 end > 0 ";
 //				AUTH
 				break;
 			case 2:
-				sql += " case ";
-				sql += " when (\"CaseNo\") = 'DEDUCT' ";
-				sql += " THEN 1 ";
-				sql += " ELSE 0 END > 0 ";
+				sql += " and case ";
+				sql += "       when (\"CaseNo\") = 'DEDUCT' ";
+				sql += "       THEN 1 ";
+				sql += "     ELSE 0 END > 0 ";
 //				DEDUCT
 				break;
 			case 3:
-				sql += " case ";
-				sql += "   when SUBSTR(\"CaseNo\",0,4) = 'BATX' ";
-				sql += "   then 1 ";
-				sql += " else 0 end > 0 ";
+				sql += " and case ";
+				sql += "       when SUBSTR(\"CaseNo\",0,4) = 'BATX' ";
+				sql += "       then 1 ";
+				sql += "     else 0 end > 0 ";
 //				BATXnn
 				break;
 			}
 		}
 		if (!"9".equals(iStatus)) {
-			sql += " and \"ConfirmStatus\" = " + iStatus;
+			sql += " and \"ConfirmStatus\" = :iStatus" ;
 		}
 		if (custId != null && !custId.isEmpty()) {
 			sql += " and \"CustId\" = :custId ";

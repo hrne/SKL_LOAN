@@ -16,8 +16,12 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.CustTelNo;
 import com.st1.itx.db.domain.InsuRenew;
 import com.st1.itx.db.domain.InsuRenewMediaTemp;
+import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.CustTelNoService;
 import com.st1.itx.db.service.InsuRenewMediaTempService;
 import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -55,6 +59,12 @@ public class L4602p extends TradeBuffer {
 
 	@Autowired
 	InsuRenewMediaTempService insuRenewMediaTempService;
+
+	@Autowired
+	CustMainService sCustMainService;
+
+	@Autowired
+	CustTelNoService sCustTelNoService;
 
 	@Autowired
 	L4600Batch l4600Batch;
@@ -143,6 +153,20 @@ public class L4602p extends TradeBuffer {
 				tL4602.put("OOPrevInsuNo", t.getPrevInsuNo());
 				tL4602.put("OOCustNo", t.getCustNo());
 				tL4602.put("OOFacmNo", t.getFacmNo());
+
+				CustMain cm = new CustMain();
+				cm = sCustMainService.custNoFirst(t.getCustNo(), t.getCustNo(), titaVo);
+
+				CustTelNo ct = new CustTelNo();
+
+				this.info("cm.getCustUKey() = " + cm.getCustUKey());
+				ct = sCustTelNoService.custUKeyFirst(cm.getCustUKey(), "02", titaVo);
+
+				String tel = ct == null ? "" : ct.getTelArea() + "-" + ct.getTelNo();
+
+				this.info("cm.tel() = " + tel);
+				tL4602.put("OOTelNo", tel);
+
 				tL4602.put("OORepayCodeX", t.getRepayCode());
 				tL4602.put("OOCustName", tInsuRenewMediaTemp.getLoanCustName());
 				tL4602.put("OONewInsuStartDate", t.getInsuStartDate());
@@ -153,6 +177,7 @@ public class L4602p extends TradeBuffer {
 				tL4602.put("OOEthqFee", t.getEthqInsuPrem());
 				tL4602.put("OOTotlFee", t.getTotInsuPrem());
 				tL4602.put("OONoticeWay", tInsuRenewMediaTemp.getNoticeFlag());
+				tL4602.put("OOStatusCode", t.getStatusCode());
 
 				// 報表明細資料
 				listL4602.add(tL4602);
@@ -172,7 +197,7 @@ public class L4602p extends TradeBuffer {
 		}
 
 		this.info("lInsuRenewMediaTemp.size() =" + lInsuRenewMediaTemp.size());
-		
+
 		if (lInsuRenewMediaTemp.size() > 0) {
 			try {
 				insuRenewMediaTempService.insertAll(lInsuRenewMediaTemp, titaVo);
@@ -180,13 +205,13 @@ public class L4602p extends TradeBuffer {
 				throw new LogicException("E0005", "InsuRenew : " + e.getErrorMsg());
 			}
 		}
-		
+
 		this.info("lInsuRenewMediaTemp.size()2 =" + lInsuRenewMediaTemp.size());
 //		// 把明細資料容器裝到檔案資料容器內
 		insuRenewFileVo.setOccursList(tmpList);
 
 		this.info("lInsuRenewMediaTemp.size()3 =" + lInsuRenewMediaTemp.size());
-		
+
 		l4602Report2.exec(titaVo, insuRenewFileVo);
 
 //		// 轉換資料格式

@@ -283,8 +283,8 @@ public class AcReceivableCom extends TradeBuffer {
 						throw new LogicException(titaVo, "E6003",
 								"AcReceivable.mnt update2 " + tAcReceivableId + e.getErrorMsg());
 					}
-					// [契變手續費紀錄]變更前變更後
-					if ("F29".equals(rv.getAcctCode())) {
+					// [契變手續費紀錄][帳管費]變更前變更後
+					if ("F29".equals(rv.getAcctCode()) || "F10".equals(rv.getAcctCode())) {
 						dataLog.setEnv(titaVo, beforeAcReceivable, tAcReceivable);
 						dataLog.exec();
 					}

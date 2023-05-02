@@ -43,6 +43,9 @@ public class L4600ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          , IR.\"InsuEndDate\"         AS \"InsuEndDate\"   "; // -- 保險迄日
 		sql += "          , IR.\"FireInsuCovrg\"       AS \"FireInsuCovrg\" "; // -- 火險保額
 		sql += "          , IR.\"EthqInsuCovrg\"       AS \"EthqInsuCovrg\" "; // -- 地震險保額
+		sql += "          , IR.\"ClCode1\"          AS \"ClCode1\"    "; // -- 押品別1
+		sql += "          , IR.\"ClCode2\"          AS \"ClCode2\"    "; // -- 押品別2
+		sql += "          , IR.\"ClNo\"          AS \"ClNo\"    "; // -- 押品號碼
 		sql += "          , \"Fn_GetAdviseFireInsuCovrg\"(IR.\"ClCode1\",IR.\"ClCode2\",IR.\"ClNo\",1) ";
 		sql += "                                     AS \"TotalArea\" "; // -- 總坪數
 		sql += "          , \"Fn_GetAdviseFireInsuCovrg\"(IR.\"ClCode1\",IR.\"ClCode2\",IR.\"ClNo\",2)  ";
@@ -87,6 +90,9 @@ public class L4600ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                   AND \"EthqInsuCovrg\" > 0 ";
 		sql += "              THEN '有地震險無火險' ";
 		sql += "            ELSE NULL END AS \"Remark\" "; // -- 備註
+		sql += "          , \"ClCode1\"   "; // -- 押品別1
+		sql += "          , \"ClCode2\"       "; // -- 押品別2
+		sql += "          , \"ClNo\"      "; // -- 押品號碼
 		sql += "     FROM \"Data\" ";
 		sql += " ) ";
 		sql += " SELECT \"InsuYearMonth\" "; // -- 到期年月
@@ -101,6 +107,9 @@ public class L4600ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , \"TotalArea\"     "; // -- 總坪數
 		sql += "      , \"AdviseFireInsuCovrg\" "; // -- 建議火險保額
 		sql += "      , \"Remark\" "; // -- 備註
+		sql += "      , \"ClCode1\""; // -- 押品別1
+		sql += "      , \"ClCode2\""; // -- 押品別2
+		sql += "      , \"ClNo\""; // -- 押品號碼
 		sql += " FROM \"Condition\" ";
 		sql += " WHERE NVL(\"Remark\",' ') != ' ' ";
 		;

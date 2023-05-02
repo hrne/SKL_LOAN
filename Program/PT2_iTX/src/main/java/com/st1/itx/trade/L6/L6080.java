@@ -67,12 +67,12 @@ public class L6080 extends TradeBuffer {
 			for (Map<String, String> t : sL6041ServiceImpl) {
 				OccursList occursList = new OccursList();
 				occursList.putParam("OTlrNo", t.get("F0"));
-				occursList.putParam("OAuthNo", t.get("F1"));
+				occursList.putParam("OAuthNo", t.get("F1")+"  "+t.get("F2"));
 
-				String DateTime = this.parse.stringToStringDateTime(t.get("F2"));
+				String DateTime = this.parse.stringToStringDateTime(t.get("F3"));
 				occursList.putParam("OLastUpdate", DateTime);
 
-				String iEmpNo = t.get("F3");
+				String iEmpNo = t.get("F4");
 				if (!iEmpNo.isEmpty() || iEmpNo.length() > 0) {
 					CdEmp tCdEmp = cdEmpService.findById(iEmpNo, titaVo);
 					if (tCdEmp != null) {

@@ -64,7 +64,7 @@ public class L8202Batch extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8202Batch ");
 		this.totaVo.init(titaVo);
-		iEntryDateE = parse.stringToInteger(titaVo.getParam("EntryDateE")); // 樣態一~三入帳日期迄日相同
+		iEntryDateE = parse.stringToInteger(titaVo.getParam("EntryDateE")); // 樣態一~三入帳日期迄日相同,2023/5月修改樣態中文名稱:樣態1=>樣態4,樣態2=>樣態5,樣態3=>樣態27
 		// 刪除未寫疑似洗錢樣態檢核明細檔的疑似洗錢交易合理性明細檔
 		try {
 			deleteDetail(titaVo);
@@ -184,7 +184,7 @@ public class L8202Batch extends TradeBuffer {
 		MlaundryChkDtl c = new MlaundryChkDtl();
 		MlaundryChkDtlId cId = new MlaundryChkDtlId();
 
-//		運算全戶餘額及其他輸出欄位 樣態1
+//		運算全戶餘額及其他輸出欄位 樣態1 =>2023/5月:中文名稱改為樣態4
 		if (fnAllList1 != null && fnAllList1.size() != 0) {
 			for (Map<String, String> s : fnAllList1) {
 				this.info("fnAllList=" + s);
@@ -224,7 +224,7 @@ public class L8202Batch extends TradeBuffer {
 		} catch (Exception e) {
 			throw new LogicException("E0015", ", " + e.getMessage());
 		}
-		if (fnAllList2 != null && fnAllList2.size() != 0) {
+		if (fnAllList2 != null && fnAllList2.size() != 0) {//樣態2 =>2023/5月:中文名稱改為樣態5
 			for (Map<String, String> s : fnAllList2) {
 				this.info("fnAllList=" + s);
 				// F0 入帳日期
@@ -263,7 +263,7 @@ public class L8202Batch extends TradeBuffer {
 		} catch (Exception e) {
 			throw new LogicException("E0015", ", " + e.getMessage());
 		}
-		// 樣態3
+		// 樣態3 =>2023/5月:中文名稱改為樣態27
 		if (fnAllList3 != null && fnAllList3.size() != 0) {
 			for (Map<String, String> s : fnAllList3) {
 				this.info("fnAllList=" + s);
@@ -316,7 +316,7 @@ public class L8202Batch extends TradeBuffer {
 		MlaundryDetail d = new MlaundryDetail();
 		MlaundryDetailId dId = new MlaundryDetailId();
 
-//		運算全戶餘額及其他輸出欄位
+//		運算全戶餘額及其他輸出欄位 ,2023/5月修改樣態中文名稱:樣態1=>樣態4,樣態2=>樣態5,樣態3=>樣態27
 		if (fnAllList1 != null && fnAllList1.size() != 0) {
 			for (Map<String, String> s : fnAllList1) {
 				this.info("fnAllList1=" + s);
@@ -354,7 +354,7 @@ public class L8202Batch extends TradeBuffer {
 
 		}
 
-		if (fnAllList2 != null && fnAllList2.size() != 0) {
+		if (fnAllList2 != null && fnAllList2.size() != 0) {//2023/5月修改樣態中文名稱:樣態1=>樣態4,樣態2=>樣態5,樣態3=>樣態27
 			for (Map<String, String> s : fnAllList2) {
 				this.info("fnAllList2=" + s);
 				// F0 戶號
@@ -392,7 +392,7 @@ public class L8202Batch extends TradeBuffer {
 
 		}
 
-		if (fnAllList3 != null && fnAllList3.size() != 0) {
+		if (fnAllList3 != null && fnAllList3.size() != 0) {//2023/5月修改樣態中文名稱:樣態1=>樣態4,樣態2=>樣態5,樣態3=>樣態27
 			for (Map<String, String> s : fnAllList3) {
 				this.info("fnAllList3=" + s);
 				// F0 戶號

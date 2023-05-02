@@ -110,7 +110,7 @@ T(3,1)ASGN(LOOP$)
 #OTlrNo=X,6,L
 
 
-#OAuthNo=X,8,L
+#OAuthNo=X,20,L
 
 #OLastUpdate=X,18,L
 
@@ -154,7 +154,7 @@ TXFORM=L6080
 {width:70,align:'center'}
 
 #OAuthNo=權限編號
-{width:70,align:'center'}
+{width:150,align:'center'}
 
 #OLastUpdate=最後修改日期
 {width:150,align:'center'}

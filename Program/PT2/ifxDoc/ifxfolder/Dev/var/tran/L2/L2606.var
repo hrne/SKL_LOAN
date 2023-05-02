@@ -215,6 +215,9 @@ E(0,@RimCaseNo,0)
 S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
 R(1,L2R05)
 
+#MRKEY=_,_,S
+T(2,#TimCustNo+-+#FacmNo)
+
 #RvNo=X,15,L
 
 #RimAcctCode=X,3,S

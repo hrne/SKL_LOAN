@@ -1,6 +1,5 @@
 package com.st1.itx.trade.L2;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,7 +79,7 @@ public class L2R59 extends TradeBuffer {
 					this.totaVo.putParam("L2r59TxtNo", tAcReceivable.getTitaTxtNo());// 交易序號
 				} else {
 					this.totaVo.putParam("L2r59AcDate", 0);// 會計日
-					this.totaVo.putParam("L2r59TlrNo", 0);// 經辦
+					this.totaVo.putParam("L2r59TlrNo", "");// 經辦
 					this.totaVo.putParam("L2r59TxtNo", 0);// 交易序號
 				}
 				this.totaVo.putParam("L2r59CreateDate", DbDateToRocDate(tAcReceivable.getCreateDate().toString())); // 作業日期
