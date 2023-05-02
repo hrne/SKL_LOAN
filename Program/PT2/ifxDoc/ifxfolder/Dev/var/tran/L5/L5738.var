@@ -44,11 +44,22 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=1;screen.width=[140,850];printer.width=[20,20];">
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,750];printer.width=[20,20];">
 [
-["[L5738]                                公會無自用住宅放款檢核清單                                                             "],
-["@撥款日期",#DrawdownDate," (含)之前"],
-["@","（本功能請於月底環境執行。產生報表為 ＂L9740_公會無自用住宅放款檢核清單.xlsx＂）"],
+["[L5738]                                 公會無自用住宅利率報送"],
+["","@@@@@新撥款之借戶"],
+["@撥款期間",#DrawDownDateA1,"～",#DrawDownDateA2],
+["@業務科目",#AcctCodeA,#AcctCodeAX],
+["@是否排除借新還舊",#RenewFlagA,#RenewFlagAX],
+["","@@@@@續期放款利率 最低、最高"],
+["@撥款日期前(含)",#DrawDownDateB1],
+["@業務科目",#AcctCodeB,#AcctCodeBX],
+["@戶況",#StatusB,#StatusBX],
+["","@@@@@利率超過之借戶"],
+["@撥款日期前(含)",#DrawDownDateC1],
+["@業務科目",#AcctCodeC,#AcctCodeCX],
+["@戶況",#StatusC,#StatusCX],
+["@檢核利率",#RateC,"@％"],
 ]
 !---------- AP TEXT AREA Variables ----------
 
@@ -56,14 +67,165 @@ E(0,0)
 E(0,5)
 <include src="COM.icf::CheckAuth.rtn"/>
 
+! 取得系統會計日期
+#DT1=D,8,S
+T(4,DATE$)
+
+#DT2=D,7,S
+T(1,#DT1,2,7)
 
 
-!撥款日期
-#DrawdownDate=D,7,I
+
+
+
+![----------------------------]第一張報表欄位-開始----------------------------]]
+
+!撥款期間-起日
+#DrawDownDateA1=D,7,I
+T(2,#DT2)
 @V(7)
-A(DATE,0,#DrawdownDate)
+V(5,0,#DT2)
+A(DATE,0,#DrawDownDateA1)
+
+!撥款期間-迄日
+#DrawDownDateA2=D,7,I
+T(2,#DT2)
+@V(7)
+V(5,#DrawDownDateA1,#DT2)
+A(DATE,0,#DrawDownDateA2)
 
 
+! Help
+
+#AcctCodeAHelp=X,100,S
+T(3,
+310:短期擔保放款;
+320:中期擔保放款;
+330:長期擔保放款;
+340:長期擔保放款-無自用住宅放款)
+
+
+#AcctCodeA=A,3,I
+T(3,340)
+HELP(#AcctCodeAHelp)
+@V(H,#AcctCodeAHelp)
+
+#AcctCodeAX=X,40,L
+T(H,#AcctCodeA,#AcctCodeAHelp)
+
+#RenewFlagAHelp=X,20,S
+T(3,Y:是;N:否)
+
+#RenewFlagA=X,1,I
+T(3,Y)
+HELP(#RenewFlagAHelp)
+@V(H,#RenewFlagAHelp)
+
+#RenewFlagAX=X,18,L
+T(H,#RenewFlagA,#RenewFlagAHelp)
+
+
+!#CheckHide=X,1,S
+!IF(#AcctCodeA == 3 ,
+!INVOKEJS(SHOW,L5738,5,5,0),
+!NVOKEJS(SHOW,L5738,5,5,1))
+
+!#AcctCodeA=A,1,I
+!HELP(#AcctCodeAHelp)
+!@V(H,#AcctCodeAHelp)
+![----------------------------]第一張報表欄位-結束----------------------------]]
+
+
+![----------------------------]第二張報表欄位-開始----------------------------]]
+
+!撥款日期前
+#DrawDownDateB1=D,7,I
+T(2,#DT2)
+@V(7)
+V(5,0,#DT2)
+A(DATE,0,#DrawDownDateB1)
+
+#AcctCodeBHelp=X,100,S
+T(3,
+310:短期擔保放款;
+320:中期擔保放款;
+330:長期擔保放款;
+340:長期擔保放款-無自用住宅放款)
+
+#AcctCodeB=A,3,I
+T(3,340)
+HELP(#AcctCodeBHelp)
+@V(H,#AcctCodeBHelp)
+
+#AcctCodeBX=X,40,L
+T(H,#AcctCodeB,#AcctCodeBHelp)
+
+#StatusBHelp=X,40,S
+T(3,0:正常戶;1:催收戶; :全部[正常+催收])
+
+#StatusB=X,1,I
+HELP(#StatusBHelp)
+@V(H,#StatusBHelp)
+
+#StatusBX=X,18,L
+T(H,#StatusB,#StatusBHelp)
+![----------------------------]第二張報表欄位-結束----------------------------]]
+
+
+![----------------------------]第三張報表欄位-開始----------------------------]]
+
+!撥款日期前
+#DrawDownDateC1=D,7,I
+T(2,#DT2)
+@V(7)
+V(5,0,#DT2)
+A(DATE,0,#DrawDownDateC1)
+
+#AcctCodeCHelp=X,100,S
+T(3,
+310:短期擔保放款;
+320:中期擔保放款;
+330:長期擔保放款;
+340:長期擔保放款-無自用住宅放款)
+
+#AcctCodeC=A,3,I
+T(3,340)
+HELP(#AcctCodeCHelp)
+@V(H,#AcctCodeCHelp)
+
+#AcctCodeCX=X,40,L
+T(H,#AcctCodeC,#AcctCodeCHelp)
+
+#StatusCHelp=X,40,S
+T(3,0:正常戶;1:催收戶; :全部[正常+催收])
+
+#StatusC=X,1,I
+HELP(#StatusBHelp)
+@V(H,#StatusBHelp)
+
+#StatusCX=X,18,L
+T(H,#StatusC,#StatusCHelp)
+
+
+#RateC=n,2.2,I
+@V(5,0.00,99.99)
+
+![----------------------------]第三張報表欄位-結束----------------------------]
+ 
+
+
+
+
+!CustTypeCode 客戶別
+#CDDEF0001=x,20,S
+T(3,CdCode.CustTypeCode)
+#CODEF0002=x,20,S
+T(3,CdCode.IdKind)
+
+!#CustTypeCodeHelpRim=X,1,S
+!RESET_RIM(#CustTypeCodeHelpRim,XXR99)
+!S(XXR99,01,#CDDEF0001,#CODEF0002)
+!R(1,XXR99)
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -78,7 +240,11 @@ A(DATE,0,#DrawdownDate)
 !C(5,#TXFORM,L5738,$,S)
 
 #SCRTIL=_,_,S
-T(3,[L5738]            X800)
+T(3,[L5738]            公會無自用住宅利率報送)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 
 #LOOP=X,1,S
 T(3,1)ASGN(LOOP$)
@@ -88,7 +254,18 @@ T(3,1)ASGN(LOOP$)
 
 !------ 上行電文 ------
 <sub type="TIM">
-#DrawdownDate
+#DrawDownDateA1
+#DrawDownDateA2
+#AcctCodeA
+#AcctCodeAX
+#RenewFlagA
+#DrawDownDateB1
+#AcctCodeB
+#StatusB
+#DrawDownDateC1
+#AcctCodeC
+#StatusC
+#RateC
 </sub>
 
 
@@ -101,7 +278,12 @@ TXFORM=L5738
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
 </sub>
-
+!--------- OUTPUT畫面 --------
+<sub type="PART" name="L5738" layout="cols=3;screen.width=[250,250,100,250];printer.width=[20,20,20,20];order=1">
+[
+["[L5738]                                    公會無自用住宅利率報送                                                             "],
+]
+</sub>
 
 
 !---------- 單據輸出組合 ----------

@@ -15,13 +15,18 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.MlaundryChkDtl;
 import com.st1.itx.db.domain.MlaundryDetail;
 import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.MlaundryChkDtlService;
 import com.st1.itx.db.service.MlaundryDetailService;
 import com.st1.itx.db.service.CdCodeService;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
+import com.st1.itx.db.service.CdEmpService;
+
 
 /**
  * Tita AcDateStart=9,7 AcDateEnd=9,7 END=X,1
@@ -47,6 +52,8 @@ public class L8926 extends TradeBuffer {
 	public CustMainService sCustMainService;
 	@Autowired
 	CdCodeService sCdCodeService;
+	@Autowired
+	public CdEmpService cdEmpService;
 	@Autowired
 	Parse parse;
 
@@ -93,6 +100,17 @@ public class L8926 extends TradeBuffer {
 		totaVo.putParam("OManagerCheckDate", tMlaundryDetail.getManagerCheckDate());
 		totaVo.putParam("OManagerDate", tMlaundryDetail.getManagerDate());
 		totaVo.putParam("OManagerDesc", tMlaundryDetail.getManagerDesc() != null ? tMlaundryDetail.getManagerDesc().replace("$n", "\n") : "");
+		String iEmployeeNo = tMlaundryDetail.getCreateEmpNo();//建檔經辦
+		totaVo.putParam("OLastUpdateEmpNo", iEmployeeNo);
+		if (!iEmployeeNo.isEmpty()) {
+			// 查詢員工資料檔
+			CdEmp tCdEmp = cdEmpService.findById(iEmployeeNo, titaVo);
+			if (tCdEmp != null) {
+				totaVo.putParam("OLastUpdateEmpNoX", tCdEmp.getFullname());
+			} else {
+				totaVo.putParam("OLastUpdateEmpNoX", "");
+			}
+		}		
 		
 		// 查詢疑似洗錢樣態檢核明細檔
 		Slice<MlaundryChkDtl> slMlaundryChkDtl;

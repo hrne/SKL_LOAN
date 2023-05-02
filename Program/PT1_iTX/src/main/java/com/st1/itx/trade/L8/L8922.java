@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -160,7 +161,7 @@ public class L8922 extends TradeBuffer {
 				occursList.putParam("OORational", tMlaundryDetail.getRational()); // 合理性記號
 				occursList.putParam("OOEmpNoDesc", tMlaundryDetail.getEmpNoDesc().replace("$n", "\n")); // 經辦合理性說明
 				occursList.putParam("OOManagerDesc", tMlaundryDetail.getManagerDesc().replace("$n", "\n")); // 主管覆核說明
-				occursList.putParam("OOEmpNo", tMlaundryDetail.getLastUpdateEmpNo()); // 經辦
+				occursList.putParam("OOEmpNo", tMlaundryDetail.getCreateEmpNo()); // 建檔經辦
 				occursList.putParam("OOManagerCheck", tMlaundryDetail.getManagerCheck()); // 主管覆核
 				if (tMlaundryDetail.getManagerDate() == 0) {
 					occursList.putParam("OOManagerDate", ""); // 主管同意日期
@@ -274,7 +275,7 @@ public class L8922 extends TradeBuffer {
 					occursList.putParam("OORational", result.get("Rational")); // 合理性記號
 					occursList.putParam("OOEmpNoDesc", result.get("EmpNoDesc").replace("$n", "\n")); // 經辦合理性說明
 					occursList.putParam("OOManagerDesc", result.get("ManagerDesc").replace("$n", "\n")); // 主管覆核說明
-					occursList.putParam("OOEmpNo", result.get("LastUpdateEmpNo")); // 經辦
+					occursList.putParam("OOEmpNo", result.get("CreateEmpNo")); // 建檔經辦
 					occursList.putParam("OOManagerCheck", result.get("ManagerCheck")); // 主管覆核
 
 					int iManagerDate = parse.stringToInteger(result.get("ManagerDate"));

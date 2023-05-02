@@ -89,7 +89,7 @@ public class L4101OldVo extends FileVo {
 		int seq = 0;
 		// 組明細
 		for (BankRemit t : lBankRemit) {
-			
+
 			String wkCustId = "";
 			String wkCustNm = "";
 			CustMain tCustMain = custMainService.custNoFirst(t.getCustNo(), t.getCustNo(), titaVo);
@@ -110,14 +110,14 @@ public class L4101OldVo extends FileVo {
 			// 明細資料的單筆資料的欄位組合
 			String thisLine = "" + FormatUtil.pad9("" + seq, 4) // 序號
 					+ FormatUtil.pad9(t.getRemitAcctNo(), 14) // 帳號
-					+ FormatUtil.pad9("" + t.getRemitAmt(), 13) // 金額
+					+ FormatUtil.pad9("" + t.getRemitAmt(), 11) + FormatUtil.pad9("" + 0, 2) // 金額(小數位)
 					+ FormatUtil.pad9("" + t.getRemitBank(), 3)// 解付單位代號3
 					+ FormatUtil.pad9("" + t.getRemitBranch(), 4)// 解付單位代號4
 					+ FormatUtil.padX(t.getCustName(), 59)// 代償專戶
 					+ "新光人壽保險股份有限公司─放款服務課"// 新光人壽保險股份有限公司─放款服務課
 					+ FormatUtil.padX("", 59)// space
 					+ "00174"// 00174
-					+ t.getAcDate() + 19110000// 匯款日期
+					+ (Integer.valueOf(t.getAcDate()) + 19110000)// 匯款日期
 					+ t.getBatchNo().substring(4, 6);// 批號
 
 			result.add(thisLine);

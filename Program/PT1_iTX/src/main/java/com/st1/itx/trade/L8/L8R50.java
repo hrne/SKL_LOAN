@@ -122,7 +122,7 @@ public class L8R50 extends TradeBuffer {
 		this.totaVo.putParam("L8R50ManagerDate", mMlaundryDetail.getManagerDate()); // 主管同意日期
 		this.totaVo.putParam("L8R50ManagerCheckDate", mMlaundryDetail.getManagerCheckDate()); // 主管覆核日期
 		this.totaVo.putParam("L8R50ManagerCheck", mMlaundryDetail.getManagerCheck()); // 主管覆核
-		this.totaVo.putParam("L8R50EditEmpNo", mMlaundryDetail.getLastUpdateEmpNo());//經辦
+		this.totaVo.putParam("L8R50EditEmpNo", mMlaundryDetail.getCreateEmpNo());//建檔經辦
 		//logger.info("L8r50 ManagerDate=" + mMlaundryDetail.getManagerDate());
 		this.totaVo.putParam("L8R50CustName", mCustName); // 戶名
 		//logger.info("L8r50 mCustName=" + mCustName);

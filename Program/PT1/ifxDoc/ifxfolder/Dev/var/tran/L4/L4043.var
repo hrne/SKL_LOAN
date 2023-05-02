@@ -105,7 +105,7 @@ CALL(#HelpProc)
 T(2,@SearchFlagHelp,#HelpDesc1)
 T(2,@PostDepCodeHelp,#HelpDesc2)
 T(2,@AuthCodeHelp,#HelpDesc3)
-T(2,@AuthStatusCodeHelp,#HelpDesc4)
+T(2,@AuthStatusCodeHelp, :未授權;+#HelpDesc4)
 T(2,@AuthErrorCodeHelp,#HelpDesc5)
 T(2,@AuthApplCodeHelp,#HelpDesc6)
 

@@ -70,7 +70,8 @@ public class L8922ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ",C.\"CustName\" 						AS \"CustName\"					\n"; // 戶名
 		sql += ",M.\"TotalAmt\" 						AS \"TotalAmt\"					\n"; // 累積金額
 		sql += ",M.\"TotalCnt\" 						AS \"TotalCnt\"					\n"; // 次數
-		sql += ",E.\"Fullname\" 		        		AS \"Fullname\"					\n"; // 經辦
+//		sql += ",E.\"Fullname\" 		        		AS \"Fullname\"					\n"; // 經辦
+		sql += ",M.\"CreateEmpNo\" 		        		AS \"CreateEmpNo\"				\n"; // 經辦
 		sql += ",M.\"Rational\" 						AS \"Rational\"					\n"; // 合理性
 		sql += ",to_char(M.\"LastUpdate\", 'yyyymmdd') 	AS \"LastUpdate\"				\n"; // 異動時間
 		sql += ",M.\"EmpNoDesc\" 						AS \"EmpNoDesc\"				\n"; // 經辦說明

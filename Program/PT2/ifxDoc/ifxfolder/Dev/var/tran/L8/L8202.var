@@ -22,16 +22,16 @@ E(0,0)
 [
 ["[L8202]                                 疑似洗錢樣態資料產生"],
 ["#FdEntryDate+入帳日期",#EntryDateS],
-["@洗錢樣態一","銀扣/匯款轉帳/支票兌現(不含專戶)"],
+["@洗錢樣態4","銀扣/匯款轉帳/支票兌現(不含專戶)"],
 ["#FdFactorDays+統計期間天數",#FactorDays],
 ["#FdFactorRange+統計期間",#EntryDateSL,"~",#EntryDateE],
 ["#FdFactor1TotLimit+金額合計超過",#Factor1TotLimit],
-["@洗錢樣態二","銀扣/匯款轉帳/支票兌現(不含專戶)"],
+["@洗錢樣態5","銀扣/匯款轉帳/支票兌現(不含專戶)"],
 ["#FdFactorDays2+統計期間天數",#FactorDays2],
 ["#FdFactorRange+統計期間",#EntryDateSL2,"~",#EntryDateE2],
 ["#FdFactor2Count+次數",#Factor2Count],
 ["#FdFactor2AmtStart+單筆金額起迄",#Factor2AmtStart,"~",#Factor2AmtEnd],
-["@洗錢樣態三","匯款摘要0087ＡＴ存入或0001現金存入"],
+["@洗錢樣態27","匯款摘要0087ＡＴ存入或0001現金存入"],
 ["#FdFactorDays3+統計期間天數",#FactorDays3],
 ["#FdFactorRange+統計期間",#EntryDateSL3,"~",#EntryDateE3],
 ["#FdFactor3TotLimit+金額合計超過",#Factor3TotLimit],
@@ -139,13 +139,13 @@ D(6,2,#EntryDateSL38,1)
 #EntryDateSL3=D,7,L
 E(0,#EntryDateSL38-19110000)
 
-!統計期間天數-樣態一
+!統計期間天數-樣態一 =>2023/4/30改為樣態4
 #FactorDays=A,3,S
 
 ! 樣態一-金額合計超過
 #Factor1TotLimit=m,14,S
 
-!統計期間天數-樣態二
+!統計期間天數-樣態二 =>2023/4/30改為樣態5
 #FactorDays2=A,3,S
 
 ! 樣態二-次數
@@ -156,7 +156,7 @@ E(0,#EntryDateSL38-19110000)
 
 #Factor2AmtEnd=m,14,S
 
-!統計期間天數-樣態三
+!統計期間天數-樣態三 =>2023/4/30改為樣態27
 #FactorDays3=A,3,S
 ! 樣態三-金額合計超過
 #Factor3TotLimit=m,14,S

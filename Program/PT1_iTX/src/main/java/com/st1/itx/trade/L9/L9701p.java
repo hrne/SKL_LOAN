@@ -86,6 +86,7 @@ public class L9701p extends TradeBuffer {
 					iCNfg = custNotice.getEmailNotice();
 				}
 				if (iCNfg.equals("Y")) {
+					
 					l9701Report.setParentTranCode(parentTranCode);
 					l9701Report2.setParentTranCode(parentTranCode);
 					l9701Report3.setParentTranCode(parentTranCode);

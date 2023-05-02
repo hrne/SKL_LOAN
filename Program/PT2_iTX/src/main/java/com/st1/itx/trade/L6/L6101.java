@@ -656,7 +656,7 @@ public class L6101 extends TradeBuffer {
 			this.info("02=exec L9130、L9131、L9132、L9132A、L9132B、L9132C");
 
 			l9130Report.exec(titaVo);
-			l9130Report2022.exec(titaVo);
+			//l9130Report2022.exec(titaVo);//2023/5/2點掉,文齡經理:支票使用舊格式媒體檔
 			l9131Report.exec(titaVo);
 			l9131Report.close();
 			l9132Report.exec(titaVo);

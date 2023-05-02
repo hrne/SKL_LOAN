@@ -52,7 +52,7 @@ RESET_RIM(#HelpRim,XXR99)
 S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03)
 R(1,XXR99)
 CALL(#HelpProc)
-T(2,@AuthStatusHelp,#HelpDesc1)
+T(2,@AuthStatusHelp, :未授權;+#HelpDesc1)
 T(2,@StampCodeHelp,#HelpDesc2)
 T(2,@AuthErrorCodeHelp,#HelpDesc3)
 

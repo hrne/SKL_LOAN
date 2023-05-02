@@ -42,7 +42,7 @@ E(0,0)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
-["[L6080]                                 權限群組查詢                                                            "],
+["[L6080]                                 使用者權限群組查詢                                                            "],
 ["#FdTlrNo+使用者代號",#TlrNo],
 ]
 !---------- AP Button AREA ----------
@@ -52,7 +52,7 @@ K(MODIFYBUTTON,查詢)
 
 !---------- AP TEXT AREA Variables ----------
 #FdTlrNo=X,2,L
-T(3,*)
+T(3,)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -97,7 +97,7 @@ C(4,#TlrNo,$,V(8,6,6))
 <sub type="FORM" name="L6080">
 
 #SCRTIL=_,_,S
-T(3,[L6080] 權限群組查詢)
+T(3,[L6080] 使用者權限群組查詢)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 
@@ -140,7 +140,7 @@ TXFORM=L6080
 !--------- OUTPUT畫面 --------
 <sub type="PART" name="L6080" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
-["[L6080]                                 權限群組查詢                                                                            "],
+["[L6080]                                 使用者權限群組查詢                                                                            "],
 ]
 </sub>
 

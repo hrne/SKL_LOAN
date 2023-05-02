@@ -108,7 +108,9 @@ public class L6905ServiceImpl extends ASpringJpaParm implements InitializingBean
 		} else if (iInqType == 1) {
 			sql += "AND \"SumNo\" = :SumNo ";
 		} else if (iInqType == 2) {
-			sql += "AND \"TitaTlrNo\" = :TitaTlrNo ";
+			if (iInqData.length() != 0) {
+				sql += "AND \"TitaTlrNo\" = :TitaTlrNo ";
+			}
 			sql += "AND \"TitaTxtNo\" >= :TitaTxtNoStart ";
 			sql += "AND \"TitaTxtNo\" <= :TitaTxtNoEnd ";
 		} else if (iInqType == 3) {
@@ -172,7 +174,9 @@ public class L6905ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (iInqType == 1) {
 			query.setParameter("SumNo", FormatUtil.padX(iInqData, 3));
 		} else if (iInqType == 2) {
-			query.setParameter("TitaTlrNo", iInqData);
+			if (iInqData.length() != 0) {
+				query.setParameter("TitaTlrNo", iInqData);
+			}
 			query.setParameter("TitaTxtNoStart", iInputTitaTxtNoStart);
 			query.setParameter("TitaTxtNoEnd", iInputTitaTxtNoEnd);
 		} else if (iInqType == 3) {

@@ -67,12 +67,12 @@
 !    L2R56 : 商品建檔時組出清償說明
 !    L2R57 : 依企金使用記號組出商品下拉式選單
 !    L2R58 : 依鍵值查詢銷帳檔資料
-!    L2R59 : 
-!    L2R60 : 
+!    L2R59 : 查詢會計銷帳檔
+!    L2R60 : 依縣市別地政組收件字下拉選單
 !    L2R61 : 跳號
-!    L2R62 : 
-!    L2R63 : 
-!    L2R64 : 
+!    L2R62 : 客戶警訊共同模組
+!    L2R63 : L2880抓取應處理明細檔擬調利率
+!    L2R64 : 抓取保證人明細戶況及繳息迄日
 !    L2R65 : 查核准號碼是否已撥款
 !    L3R30 : 帳戶備忘錄資料
 !    L1R01 : 尋找客戶檔資料
@@ -3742,6 +3742,31 @@ TXFORM=L2R58
 ^
 </L2R58.tom>
 
+<L2R59.dec>
+#L2r59OpenAcDate=D,7,S
+#L2r59AcctFee=m,14.2,S
+#L2r59SlipNote=X,60,S
+#L2r59CurCode=X,3,S
+#L2r59AcDate=D,7,S
+#L2r59TlrNo=X,6,S
+#L2r59TxtNo=X,8,S
+#L2r59CreateDate=D,7,S
+#L2r59CreateTime=X,8,S
+</L2R59.dec>
+
+<L2R59.tom>
+TXFORM=L2R59
+#L2r59OpenAcDate
+#L2r59AcctFee
+#L2r59SlipNote
+#L2r59CurCode
+#L2r59AcDate
+#L2r59TlrNo
+#L2r59TxtNo
+#L2r59CreateDate
+#L2r59CreateTime
+^
+</L2R59.tom>
 
 
 <L2R60.dec>

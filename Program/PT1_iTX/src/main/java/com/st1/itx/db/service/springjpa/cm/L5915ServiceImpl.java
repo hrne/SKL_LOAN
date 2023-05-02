@@ -80,21 +80,17 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// SKL User 李珮君 要求跟AS400產一樣的檔案
 		// 協辦人員業績件數的檔案要產出不只有協辦人員業績件數的檔案
 		String sql = " ";
-		sql += " WITH workMonthData AS ( ";
-		sql += "     SELECT \"EndDate\" ";
-		sql += "     FROM \"CdWorkMonth\" ";
-		sql += "     WHERE ( \"Year\" * 100 + \"Month\" ) = :inputWorkMonth ";
-		sql += " ) ";
-		sql += " , rawData AS ( ";
+		sql += " WITH rawData AS ( ";
 		sql += "     SELECT L.\"CustNo\" ";
 		sql += "          , L.\"FacmNo\" ";
 		sql += "          , SUM(L.\"DrawdownAmt\") AS \"UtilBal\" ";
-		sql += "     FROM \"LoanBorMain\" L ";
-		sql += "     LEFT JOIN workMonthData D ON D.\"EndDate\" >= L.\"DrawdownDate\" ";
-		sql += "     WHERE NVL(D.\"EndDate\",0) > 0 ";
+		sql += "     FROM \"PfItDetail\" L ";
+		sql += "     WHERE L.\"RepayType\" = 0 ";
+		sql += "       AND L.\"WorkMonth\" = :inputWorkMonth ";
 		sql += "     GROUP BY L.\"CustNo\" ";
 		sql += "            , L.\"FacmNo\" ";
 		sql += " ) ";
+		sql += "SELECT * FROM ( ";	
 		sql += " SELECT 5                       AS \"RewardType\" "; // 獎金類別
 		sql += "      , PR.\"PieceCode\"        AS \"PieceCode\" "; // 計件代碼
 		sql += "      , 0                       AS \"DrawdownAmt\" "; // 撥款金額
@@ -103,6 +99,7 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , PR.\"CustNo\"           AS \"CustNo\" "; // 戶號
 		sql += "      , CM.\"CustName\"         AS \"CustName\" "; // 戶名
 		sql += "      , PR.\"FacmNo\"           AS \"FacmNo\" "; // 額度號碼
+		sql += "      , PR.\"BormNo\"           AS \"BormNo\" "; // 撥款序號
 		sql += "      , CM.\"CustId\"           AS \"CustId\" "; // 統一編號
 		sql += "      , rd.\"UtilBal\"          AS \"UtilBal\" "; // 已用額度
 		sql += "      , PR.\"CoorgnizerBonus\"  AS \"Bonus\" "; // 車馬費發放額
@@ -130,6 +127,7 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , PR.\"CustNo\"           AS \"CustNo\" "; // 戶號
 		sql += "      , CM.\"CustName\"         AS \"CustName\" "; // 戶名
 		sql += "      , PR.\"FacmNo\"           AS \"FacmNo\" "; // 額度號碼
+		sql += "      , PR.\"BormNo\"           AS \"BormNo\" "; // 撥款序號
 		sql += "      , CM.\"CustId\"           AS \"CustId\" "; // 統一編號
 		sql += "      , rd.\"UtilBal\"          AS \"UtilBal\" "; // 已用額度
 		sql += "      , PR.\"IntroducerBonus\"  AS \"Bonus\" "; // 車馬費發放額
@@ -152,10 +150,13 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"CdBcm\" B3 ON B3.\"UnitCode\" = PI.\"UnitCode\" "; // 部室
 		sql += " WHERE PR.\"IntroducerBonusDate\" > 0 ";
 		sql += "   AND PR.\"WorkMonth\" = :inputWorkMonth ";
-		sql += " ORDER BY \"EmpNo\" ";
+		sql += ") ";	
+		sql += " ORDER BY SUBSTR(\"EmpNo\",1,1) ";
+		sql += "        , CASE WHEN SUBSTR(\"EmpNo\",2,1) BETWEEN '0' AND '9' THEN 'B' ELSE 'A' END "; //數字排後面
+		sql += "        , SUBSTR(\"EmpNo\",3,4) " ;
 		sql += "        , \"CustNo\" ";
-		sql += "        , \"DrawdownAmt\" ";
 		sql += "        , \"FacmNo\" ";
+		sql += "        , \"BormNo\" ";
 		this.info("sql=" + sql);
 
 		Query query;
@@ -174,6 +175,7 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// SKL User 李珮君 要求跟AS400產一樣的檔案
 		// 協辦人員業績金額的檔案要產出不只有協辦人員業績金額的檔案
 		String sql = " ";
+		sql += "SELECT * FROM ( ";	
 		sql += " SELECT PD.\"CustNo\"            AS \"CustNo\" "; // -- F0 戶號
 		sql += "      , PD.\"FacmNo\"            AS \"FacmNo\" "; // -- F1 額度
 		sql += "      , SUM(PD.\"DrawdownAmt\")  AS \"DrawdownAmt\" "; // -- F2 撥款金額
@@ -204,11 +206,14 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        , NVL(PCO.\"DeptItem\", ' ') ";
 		sql += "        , NVL(PCO.\"DistItem\", ' ') ";
 		sql += "        , NVL(PCO.\"AreaItem\", ' ') ";
+		sql += ") ";	
 		sql += " ORDER BY CASE ";
 		sql += "            WHEN \"EmpNo\" = ' ' ";
 		sql += "            THEN 1 ";
 		sql += "          ELSE 0 END ";
-		sql += "        , \"EmpNo\" ";
+		sql += "        , SUBSTR(\"EmpNo\",1,1) ";
+		sql += "        , CASE WHEN SUBSTR(\"EmpNo\",2,1) BETWEEN '0' AND '9' THEN 'B' ELSE 'A' END "; //數字排後面
+		sql += "        , SUBSTR(\"EmpNo\",3,4) " ;
 		sql += "        , \"CustNo\" ";
 		sql += "        , \"FacmNo\" ";
 		this.info("sql=" + sql);

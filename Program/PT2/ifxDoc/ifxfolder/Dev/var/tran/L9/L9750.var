@@ -1,0 +1,134 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+![一段式/二段式/三段式]
+!#RELCD=_,_,S
+!E(0,2)
+
+!#ACTFG=_,_,S
+!C(2,#FKEY,E(0,1),$)
+
+#TXCD
+T(3,L9750)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[200,800];printer.width=[20,40];">
+[
+["[L9750]                                 會計師查核"],
+["#FdType+@報表",#Type,#TypeX],
+["#FdDataDate+#DateItem",#DateStart,"~",#DateEnd],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!#BUF1=X,42,S
+
+#FdType=X,2,L
+T(3,*)
+#FdDataDate=X,2,L
+T(3,*)
+
+#TypeHelp=x,200,S
+T(3,1:撥款案件;2:展期案件;3:契變案件;4:清償案件)
+
+!---------- AP TEXT AREA Variables ----------
+#FUNCIND=_,_,S
+E(0,5)
+<include src="COM.icf::CheckAuth.rtn"/>
+
+!日曆日
+#CDATE=D,8,S
+T(4,CDATE$)
+
+#CDATEX=D,7,S
+T(1,#CDATE,2,7)
+INVOKEJS(SHOW,p1,2,2,0)
+
+!本營業日
+#DATE=D,8,S
+T(4,DATE$)
+
+
+#Type=A,1,I
+HELP(#TypeHelp)
+@T(3,@TypeX,)
+V(H,#TypeHelp)
+C(3,#Type,0,INVOKEJS(SHOW,p1,2,2,0)INVOKEJS(SHOW,p1,3,5,1)T(2,@FdDataDate,),INVOKEJS(SHOW,p1,2,2,1)INVOKEJS(SHOW,p1,3,5,0)T(2,@FdDataDate,*))
+
+#TypeX=X,40,L
+T(H,#Type,#TypeHelp)
+
+#DateItem=X,12,L
+C(2,#Type,$,T(2,撥款日期區間),T(2,撥款日期區間),T(2,會計日期區間),T(2,入帳日期區間))
+
+
+#DateStart=D,7,I
+C(3,#DateStart,0,T(1,#DATE,2,7),$)
+D(8)
+@
+V(7)
+A(DATE,0,#DateStart)
+C(4,#DateStart,S,V(5,0010101,#DATE))
+
+#DateEnd=D,7,I
+E(0,#DateStart)
+D(8)
+@
+V(7)
+A(DATE,0,#DateEnd)
+V(5,#DateStart,#DATE)
+
+
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM= L9750 ----------
+<sub type="FORM" name="L9750">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L9750,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L9750] 會計師查核)
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#Type
+#DateStart
+#DateEnd
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+
+TXFORM=L9750
+
+^
+
+<include src="COM.icf::TRCTL.tom"/>
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

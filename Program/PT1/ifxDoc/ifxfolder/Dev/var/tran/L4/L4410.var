@@ -116,7 +116,7 @@ T(2,@RelationCodeHelp,#HelpDesc2)
 T(2,@BankCdHelp,#HelpDesc3)
 T(2,@FuncCodeHelp,#HelpDesc4)
 T(2,@CreateFlagHelp,#HelpDesc5)
-T(2,@AuthStatusHelp,#HelpDesc6)
+T(2,@AuthStatusHelp, :未授權;+#HelpDesc6)
 T(2,@AmlRspHelp,#HelpDesc7)
 
 

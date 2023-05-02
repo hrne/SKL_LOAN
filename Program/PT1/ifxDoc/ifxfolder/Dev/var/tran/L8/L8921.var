@@ -214,6 +214,10 @@ X(#OOTotalAmt1)
 !交易樣態(TOTA)
 #OOFactor=N,2,L
 
+#OOFactorX=X,6,L
+T(H,#OOFactor,#FactorHelp)
+
+
 !統計期間起日
 #OOStartEntryDate=D,7,L
 
@@ -271,7 +275,7 @@ TXFORM=L8921
 #OOCreateDate=產製日期
 {width:80,align:'center'}
 
-#OOFactor=交易樣態
+#OOFactorX=交易樣態
 {width:70,align:'center'}
 
 #OOEntryDate=入帳日期

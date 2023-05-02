@@ -94,8 +94,9 @@ public class L6064ServiceImpl extends ASpringJpaParm implements InitializingBean
 //			sql += " A.\"CodeItem\" = :iCodeItem ";
 			sql += " A.\"Item\" Like :iCodeItem ";
 		}
-			
-		
+		sql += " ORDER BY  CASE WHEN A.\"DefCode\" = 'CodeType' THEN A.\"Code\" ELSE A.\"DefCode\" END ";
+		sql += "         , CASE WHEN A.\"DefCode\" = 'CodeType' THEN ' ' ELSE  A.\"Code\" END ";
+
 		sql += sqlRow;
 
 		this.info("sql=" + sql);
@@ -110,16 +111,16 @@ public class L6064ServiceImpl extends ASpringJpaParm implements InitializingBean
 		
 		
 		if (!"".equals(iDefType)) {
-		query.setParameter("iDefType", iDefType);
+		query.setParameter("iDefType" , iDefType);
 		}
 		if (!"".equals(iDefCode)) {
-		query.setParameter("iDefCode", "%" + iDefCode + "%");
+		query.setParameter("iDefCode" , "%" + iDefCode + "%");
 		}
 		if (!"".equals(iCode)) {
-		query.setParameter("iCode", "%" + iCode+ "%");
+		query.setParameter("iCode" , "%" + iCode+ "%");
 		}
 		if (!"".equals(iCodeItem)) {
-		query.setParameter("iCodeItem", "%" + iCodeItem+ "%");
+		query.setParameter("iCodeItem" , "%" + iCodeItem+ "%");
 		}
 		this.info("L6064Service FindData=" + query);
 		// *** 折返控制相關 ***

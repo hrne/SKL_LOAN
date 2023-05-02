@@ -389,6 +389,7 @@ T(1,@ApplNo,#NTXBUF,2,7)
 T(1,@ClCode1,#NTXBUF,9,1)
 T(1,@ClCode2,#NTXBUF,11,2)
 T(1,@ClNo,#NTXBUF,14,7)
+T(1,@CustNo,#NTXBUF,21,7)
 
 
 #Init=X,1,S
@@ -1717,7 +1718,7 @@ A(4,0,#DispDate)
 IF(#FunCd==4,s,$)
 IF(#PageFg==5,$,CALL(#Show5))
 HELP(#MtgReasonCodeHelp)
-@V(H,#MtgReasonCodeHelp)
+@C(4,#MtgReasonCode,$,V(H,#MtgReasonCodeHelp))
 IF(#MtgReasonCode=="",T(3,@FdReceivedNo, ),T(3,@FdReceivedNo,*))
 IF(#MtgReasonCode=="",T(3,@FdCancelNo, ),T(3,@FdCancelNo,*))
 
@@ -1971,8 +1972,6 @@ T(3,[L2411] 不動產擔保品資料登錄)
 
 #OClNo=A,7,S
 IF(#FunCd==1 || #FunCd==3,E(0,@ClNo,#OClNo),S)
-
-
 
 #BUF1=X,11,S
 T(2,1+#ClCode1+#ClCode2+#ClNo)

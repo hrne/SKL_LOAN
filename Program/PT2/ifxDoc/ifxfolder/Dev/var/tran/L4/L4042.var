@@ -104,9 +104,9 @@ R(1,XXR99)
 CALL(#HelpProc)
 T(2,@BankCdHelp,#HelpDesc1)
 T(2,@SearchFlagHelp,#HelpDesc2)
-T(2,@AuthStatusCodeHelp,#HelpDesc3)
+T(2,@AuthStatusCodeHelp, :未授權;+#HelpDesc3)
 T(2,@AuthCodeHelp,#HelpDesc4)
-T(2,@AuthStatusHelp,#HelpDesc5)
+T(2,@AuthStatusHelp, :未授權;+#HelpDesc5)
 
 #LABELDATEHelp=x,50,S
 T(3,1:*    建檔日期;2:*    提出日期;3:*    提回日期)

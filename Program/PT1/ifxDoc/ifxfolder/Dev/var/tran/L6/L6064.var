@@ -246,7 +246,7 @@ T(H,#OOType,#DefTypeH)
 ! 啟用記號(TOTA)
 #OOEnable=X,1,L
 
-!最後修改人員&日期
+!最後修改人員&日期CHAIN
 #OOLastUpdate=x,20,S
 
 #OOLastEmp=x,47,S
@@ -263,13 +263,16 @@ E(0,2)
 T(2,#OOFunc2+#OODefCode+#OOCode)
 
 #OOBTN2=X,4,S
-BIND(grid,cancel)
+!BIND(grid,cancel)
 ! CHAIN 1 時必為隱藏
-C(3,#CHAIN,1,s,$)
+!C(3,#CHAIN,1,s,$)
+!C(5,#CHAIN,1,BIND(grid,cancel),s)
 ! DefCode為CodeType時，須為Admin才可修改
 ! DefCode為其他時，皆可修改
-C(5,#OODefCode,CodeType,C(3,#IsAdmin,1,$,s),$) 
-BIND(grid,{cmd=CHAIN;ntxcd=L6604;text=修改;ntxbuf=#OOBUF2})
+!C(5,#OODefCode,CodeType,C(3,#IsAdmin,1,$,s),$) 
+! C(5,#OODefCode,CodeType,C(3,#IsAdmin,1,BIND(grid,{cmd=CHAIN;ntxcd=L6604;text=修改;ntxbuf=#OOBUF2}),s),$) 
+C(5,#OODefCode,CodeType,C(3,#IsAdmin,1,BIND(grid,{cmd=CHAIN;ntxcd=L6604;text=修改;ntxbuf=#OOBUF2}),BIND(grid,cancel)),BIND(grid,{cmd=CHAIN;ntxcd=L6604;text=修改;ntxbuf=#OOBUF2})) 
+!BIND(grid,{cmd=CHAIN;ntxcd=L6604;text=修改;ntxbuf=#OOBUF2})
 
 ! 刪除的按鈕
 #OOFunc4=A,1,S
