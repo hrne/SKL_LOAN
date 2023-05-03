@@ -7,15 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.domain.AcClose;
-import com.st1.itx.db.domain.AcCloseId;
 import com.st1.itx.db.domain.BankRemit;
-import com.st1.itx.db.domain.CustMain;
-import com.st1.itx.db.service.CustMainService;
-import com.st1.itx.util.format.FormatUtil;
+import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -30,9 +25,10 @@ public class L4101OldVo extends FileVo {
 	/**
 	 * 
 	 */
+
 	private static final long serialVersionUID = -4183615389357447145L;
 	@Autowired
-	public CustMainService custMainService;
+	public MakeReport makeReport;
 	// 設定首筆筆數
 	private final int headerCounts = 1;
 	// 設定尾筆筆數
@@ -90,12 +86,6 @@ public class L4101OldVo extends FileVo {
 		// 組明細
 		for (BankRemit t : lBankRemit) {
 
-			String wkCustId = "";
-			String wkCustNm = "";
-			CustMain tCustMain = custMainService.custNoFirst(t.getCustNo(), t.getCustNo(), titaVo);
-			if (tCustMain != null) {
-				wkCustId = tCustMain.getCustId();
-			}
 			seq = seq + 1;
 ////		DataSeq		序號			4	0	4
 ////		AcctNo		帳號			X	14	4	18
@@ -107,19 +97,41 @@ public class L4101OldVo extends FileVo {
 ////		ColumnC		00174		X	5	191	196
 ////		RemitDate	匯款日期		X	8	196	204
 ////		BatchNo		批號			X	2	204	206
-			// 明細資料的單筆資料的欄位組合
-			String thisLine = "" + FormatUtil.pad9("" + seq, 4) // 序號
-					+ FormatUtil.pad9(t.getRemitAcctNo(), 14) // 帳號
-					+ FormatUtil.pad9("" + t.getRemitAmt(), 11) + FormatUtil.pad9("" + 0, 2) // 金額(小數位)
-					+ FormatUtil.pad9("" + t.getRemitBank(), 3)// 解付單位代號3
-					+ FormatUtil.pad9("" + t.getRemitBranch(), 4)// 解付單位代號4
-					+ FormatUtil.padX(t.getCustName(), 59)// 代償專戶
-					+ "新光人壽保險股份有限公司─放款服務課"// 新光人壽保險股份有限公司─放款服務課
-					+ FormatUtil.padX("", 59)// space
-					+ "00174"// 00174
-					+ (Integer.valueOf(t.getAcDate()) + 19110000)// 匯款日期
-					+ t.getBatchNo().substring(4, 6)// 批號
-			 		+ "  ";
+
+//			20230503請IT提供正確的layout
+//			序號(4)
+//			帳號(14)
+//			金額(13)(AS400只放前面11位後面兩位補0)
+//			行庫代號(7) 
+//			收款人姓名(60 J) => 29個全形字
+//			匯款人姓名(40 J) => 19個全形字
+//			附言(40 J) => 19個全形字
+//			空白(15)
+//			單位代號(5)
+//			匯款日期(8)
+//			批號(2)
+//			空白(2)
+
+			String thisLine = "";
+			try {
+				thisLine += makeReport.fillUpWord("" + seq, 4, "0", "L");// 序號
+				thisLine += makeReport.fillUpWord("" + t.getRemitAcctNo(), 14, "0", "L");// 帳號
+				thisLine += makeReport.fillUpWord("" + t.getRemitAmt(), 11, "0", "L") + "00";// 金額
+				thisLine += makeReport.fillUpWord("" + t.getRemitBank(), 3, "0", "L");// 解付單位代號3
+				thisLine += makeReport.fillUpWord("" + t.getRemitBranch(), 4, "0", "L");// 解付單位代號4
+				String name = t.getCustName().replace("o", "Ｏ");
+				thisLine += makeReport.fillUpWord("" + name, 58, "　", "R") + "  ";// 代償專戶(29全形+2半形)
+				thisLine += makeReport.fillUpWord("新光人壽保險股份有限公司─放款服務課", 38, " ", "R") + "  ";// 代償專戶
+				thisLine += "　　　　　　　　　　　　　　　　　　　" + "  ";// 附言(19全形+2半形)
+				thisLine += "               ";// 空白(15個半形空白)
+				thisLine += "00174";// 單位代號
+				thisLine += (Integer.valueOf(1110503) + 19110000);// 匯款日期
+				thisLine += "01  ";// 批號
+			} catch (LogicException e) {
+		
+				e.printStackTrace();
+			}
+
 			result.add(thisLine);
 		}
 

@@ -432,7 +432,8 @@ public class MakeReport extends CommBuffer {
 	private void init() {
 		// 使新舊方法可同時使用
 		if (this.reportVo == null) {
-			this.reportVo = ReportVo.builder().setBrno(this.brno).setRptDate(this.date).setRptCode(this.rptCode).setRptItem(this.rptItem).setRptSize(this.rptSize).setSecurity(this.rptSecurity)
+			this.reportVo = ReportVo.builder().setBrno(this.brno).setRptDate(this.date).setRptCode(this.rptCode)
+					.setRptItem(this.rptItem).setRptSize(this.rptSize).setSecurity(this.rptSecurity)
 					.setPageOrientation(this.pageOrientation).setUseDefault(this.useDefault).build();
 		} else {
 			this.brno = this.reportVo.getBrno();
@@ -473,7 +474,8 @@ public class MakeReport extends CommBuffer {
 	private void init9() {
 		// 使新舊方法可同時使用
 		if (this.reportVo == null) {
-			this.reportVo = ReportVo.builder().setBrno(this.brno).setRptDate(this.date).setRptCode(this.rptCode).setRptItem(this.rptItem).setRptSize(this.rptSize).setSecurity(this.rptSecurity)
+			this.reportVo = ReportVo.builder().setBrno(this.brno).setRptDate(this.date).setRptCode(this.rptCode)
+					.setRptItem(this.rptItem).setRptSize(this.rptSize).setSecurity(this.rptSecurity)
 					.setPageOrientation(this.pageOrientation).setUseDefault(this.useDefault).build();
 		} else {
 			this.brno = this.reportVo.getBrno();
@@ -522,9 +524,6 @@ public class MakeReport extends CommBuffer {
 
 		// 檢查是否需核核
 		CdReport tCdReport = cdReportService.findById(reportVo.getRptCode(), tmpTitaVo);
-		if(tCdReport == null && !reportVo.getRptCode().trim().isEmpty())
-			tCdReport = cdReportService.findById(reportVo.getRptCode().trim().substring(0, 5), tmpTitaVo);
-			
 		if (tCdReport == null) {
 			tTxFile.setSignCode("0");
 			if ("1".equals(tmpTitaVo.get("checkCdReport")))
@@ -653,7 +652,8 @@ public class MakeReport extends CommBuffer {
 			this.reportVo.setRptSize("A4"); // 若未設定紙張大小，預設為A4
 		}
 
-		if (this.reportVo.getPageOrientation() == null || this.reportVo.getPageOrientation().isEmpty() || !this.reportVo.getPageOrientation().equals("P")) {
+		if (this.reportVo.getPageOrientation() == null || this.reportVo.getPageOrientation().isEmpty()
+				|| !this.reportVo.getPageOrientation().equals("P")) {
 			this.reportVo.setPageOrientation("L"); // 若未設定紙張方向 或者 不為P:直印，則預設為L:橫印
 		}
 
@@ -671,7 +671,8 @@ public class MakeReport extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	@Deprecated
-	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String security) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String security)
+			throws LogicException {
 
 		this.titaVo = titaVo;
 
@@ -741,7 +742,8 @@ public class MakeReport extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	@Deprecated
-	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String security, String defaultPdf) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String security,
+			String defaultPdf) throws LogicException {
 		this.titaVo = titaVo;
 
 		this.checkParm(date, brno, rptCode, rptItem);
@@ -784,7 +786,8 @@ public class MakeReport extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	@Deprecated
-	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security, String pageSize, String pageOrientation) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security,
+			String pageSize, String pageOrientation) throws LogicException {
 
 		this.titaVo = titaVo;
 
@@ -836,7 +839,8 @@ public class MakeReport extends CommBuffer {
 
 		this.reportVo.setPageOrientation(this.reportVo.getPageOrientation().toUpperCase());
 
-		if (this.reportVo.getPageOrientation() == null || this.reportVo.getPageOrientation().isEmpty() || !this.reportVo.getPageOrientation().equals("P")) {
+		if (this.reportVo.getPageOrientation() == null || this.reportVo.getPageOrientation().isEmpty()
+				|| !this.reportVo.getPageOrientation().equals("P")) {
 			this.reportVo.setPageOrientation("L"); // 若未設定紙張方向 或者 不為P:直印，則預設為L:橫印
 		}
 
@@ -859,7 +863,8 @@ public class MakeReport extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	@Deprecated
-	public void openForm(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String pageSize, String pageOrientation) throws LogicException {
+	public void openForm(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String pageSize,
+			String pageOrientation) throws LogicException {
 
 		formMode = true;
 
@@ -1208,10 +1213,12 @@ public class MakeReport extends CommBuffer {
 		List<HashMap<String, Object>> orgMap = new ArrayList<HashMap<String, Object>>();
 
 		try {
-			orgMap = new ObjectMapper().readValue(tTxFile.getFileData(), new TypeReference<List<Map<String, Object>>>() {
-			});
+			orgMap = new ObjectMapper().readValue(tTxFile.getFileData(),
+					new TypeReference<List<Map<String, Object>>>() {
+					});
 		} catch (IOException e) {
-			throw new LogicException("EC009", "(MakeReport)輸出檔(TxFile)序號:" + tTxFile.getFileNo() + ",資料格式 " + e.getMessage());
+			throw new LogicException("EC009",
+					"(MakeReport)輸出檔(TxFile)序號:" + tTxFile.getFileNo() + ",資料格式 " + e.getMessage());
 		}
 
 		orgMap.addAll(listMap);
@@ -1675,10 +1682,20 @@ public class MakeReport extends CommBuffer {
 	 * @param word     要補滿的符號或文字(單字佳)
 	 * @param pos      向左補齊(L)/向右補齊(R) 如果文字字數大於上限位數 自動截斷
 	 * @return str 處理後文字
+	 * @throws LogicException 
 	 *
 	 */
 
-	public String fillUpWord(String text, int allCount, String word, String pos) {
+	public String fillUpWord(String text, int allCount, String word, String pos) throws LogicException {
+
+		if ("R".equals(pos) || "L".equals(pos)) {
+		} else {
+			throw new LogicException("EC004", "參數輸入有誤，fillUpWord的pos參數請輸入R(右邊)或L(左邊)");
+		}
+
+		if (word.length() != 1) {
+			throw new LogicException("EC004", "參數輸入有誤，fillUpWord的word參數請輸入一個字");
+		}
 
 		int[] num = new int[text.length()];
 
@@ -1696,6 +1713,17 @@ public class MakeReport extends CommBuffer {
 				num[i] = 1;
 			}
 
+		}
+
+		int tmpWordLen = 0;
+
+		// 中文字數為2，非中文為1
+		if (word.matches("[\\u4E00-\\u9FA5]+")) {
+			tmpWordLen = 2;
+		} else if (word.matches("[\\u0391-\\uFFE5]+")) {
+			tmpWordLen = 2;
+		} else {
+			tmpWordLen = 1;
 		}
 
 		// 計算用
@@ -1720,14 +1748,34 @@ public class MakeReport extends CommBuffer {
 		int emptyCount = 0;
 		emptyCount = allCount - tmpHaveCount;
 
+		int remainder = 0;
+		// 如果word為全形，須把空自數的部分除2，餘數不計
+		if (tmpWordLen == 2) {
+			// 餘數
+			remainder = emptyCount % tmpWordLen;
+
+			emptyCount = emptyCount / tmpWordLen;
+		}
+
 		// 重新組合
 		for (int i = 0; i < emptyCount; i++) {
+
 			if (pos == "L") {
 				lstr += word;
 			} else {
 				str += word;
 			}
 		}
+
+		// 處理全形餘數補空白
+		for (int i = 0; i < remainder; i++) {
+			if (pos == "L") {
+				lstr += " ";
+			} else {
+				str += " ";
+			}
+		}
+
 		if (pos == "L") {
 			str = lstr + text;
 		}

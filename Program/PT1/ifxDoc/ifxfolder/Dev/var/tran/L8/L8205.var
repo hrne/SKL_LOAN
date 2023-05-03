@@ -47,7 +47,7 @@ T(3, )
 #FdCustNo=X,2,L
 
 #TypeHelp=x,200,S
-T(3,1:疑似洗錢樣態合理性報表;2:疑似洗錢樣態27延遲交易確認報表;3:疑似洗錢樣態4、5延遲交易確認報表;4:疑似洗錢訪談交易登記表)
+T(3,1:疑似洗錢樣態合理性報表;2:疑似洗錢樣態延遲交易確認報表;3:疑似洗錢訪談交易登記表)
 
 !---------- AP TEXT AREA Variables ----------
 #CHAIN=A,1,S
@@ -83,21 +83,21 @@ T(4,DATE$)
 HELP(#TypeHelp)
 @T(3,@TypeX,)
 V(H,#TypeHelp)
-C(3,#Type,4,INVOKEJS(SHOW,p1,2,2,0)INVOKEJS(SHOW,p1,3,5,1)T(2,@FdRecordDate,),INVOKEJS(SHOW,p1,2,2,1)INVOKEJS(SHOW,p1,3,5,0)T(2,@FdRecordDate,*))
+C(3,#Type,3,INVOKEJS(SHOW,p1,2,2,0)INVOKEJS(SHOW,p1,3,5,1)T(2,@FdRecordDate,),INVOKEJS(SHOW,p1,2,2,1)INVOKEJS(SHOW,p1,3,5,0)T(2,@FdRecordDate,*))
 !C(3,#Type,5,INVOKEJS(SHOW,p1,2,2,0)INVOKEJS(SHOW,p1,3,5,1)T(2,@FdRecordDate,),INVOKEJS(SHOW,p1,2,2,1)INVOKEJS(SHOW,p1,3,5,0)T(2,@FdRecordDate,*))
 
 #TypeX=X,40,L
 T(H,#Type,#TypeHelp)
 
 #DateItem=X,8,L
-C(3,#Type,4,T(2,訪談日期),T(2,入帳日期))
+C(3,#Type,3,T(2,訪談日期),T(2,入帳日期))
 !C(3,#Type,5,T(2,訪談日期),T(2,入帳日期))
 
 
 
 
 #DateStart=D,7,I
-C(3,#Type,4,S,$)
+C(3,#Type,3,S,$)
 !C(3,#Type,5,S,$)
 T(1,#DATE,2,7)
 D(8)
@@ -117,13 +117,13 @@ V(5,#DateStart,#CDATEX)
 
 #ActualRepayDate=D,7,I
 !C(3,#Type,5,$,S)
-C(3,#Type,4,$,S)
+C(3,#Type,3,$,S)
 @A(DATE,1,#ActualRepayDate)
 !V(7)
 
 #RepayDate=D,7,I
 !C(3,#Type,5,$,S)
-C(3,#Type,4,$,S)
+C(3,#Type,3,$,S)
 @A(DATE,1,#RepayDate)
 C(4,#ActualRepayDate,$,s)
 C(4,#RepayDate,$,s)
@@ -131,7 +131,7 @@ V(P,至少需輸入一個日期)
 
 #CustNo=A,7,I
 !C(3,#Type,5,$,S)
-C(3,#Type,4,$,S)
+C(3,#Type,3,$,S)
 
 
 #MRKEY=_,_,S

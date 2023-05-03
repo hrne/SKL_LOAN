@@ -119,6 +119,7 @@ public class L4041 extends TradeBuffer {
 
 		totaVo.put("PdfSno846", "0");
 		totaVo.put("PdfSno53N", "0");
+		totaVo.put("PdfSno", "0" );
 
 		int nPropDate = dateUtil.getNowIntegerForBC();
 

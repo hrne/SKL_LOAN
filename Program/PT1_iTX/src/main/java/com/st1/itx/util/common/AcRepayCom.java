@@ -288,7 +288,9 @@ public class AcRepayCom extends TradeBuffer {
 				updBorTxAcDetail(tx, this.lAcDetail, titaVo); // 更新放款明細檔及帳務明細檔關聯欄
 				tx.setTxAmt(this.wkTxAmtRemaind);
 				tx.setTempAmt(BigDecimal.ZERO);
-				tx.setOverflow(tx.getTxAmt());
+				if ("TAV".equals(tx.getAcctCode())) {
+					tx.setOverflow(tx.getTxAmt());
+				}
 				if (feeAmt.compareTo(BigDecimal.ZERO) == 0) {
 					this.wkTempAmtRemaind = BigDecimal.ZERO;
 				} else {

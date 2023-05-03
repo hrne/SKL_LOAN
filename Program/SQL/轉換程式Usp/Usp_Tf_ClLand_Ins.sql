@@ -325,12 +325,6 @@ BEGIN
                                AND LG."GDRNUM" = M."GDRNUM" 
          WHERE B0."ClCode1" = '1' -- 撈建物 
            AND NVL(LG."LGTNM1",0) != 0 
-           AND CASE 
-                 WHEN B0."ClCode1" = 5 
-                 THEN 1 
-                 WHEN B0."ClNo" = M."GDRNUM" 
-                 THEN 1 
-               ELSE 0 END = 1 
     ) 
     SELECT S1."ClCode1"                   AS "ClCode1"             -- 擔保品代號1 DECIMAL 1  
           ,S1."ClCode2"                   AS "ClCode2"             -- 擔保品代號2 DECIMAL 2  

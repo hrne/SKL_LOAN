@@ -127,13 +127,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("findL492AEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " acDate_1 : " +  acDate_1 + " procStsCode_2 : " +  procStsCode_2);
     if (dbName.equals(ContentName.onDay))
-      slice = batxDetailReposDay.findAllByCustNoIsAndAcDateIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeAsc(custNo_0, acDate_1, procStsCode_2, pageable);
+      slice = batxDetailReposDay.findAllByCustNoIsAndAcDateIsAndProcStsCodeInOrderByEntryDateAscCustNoAscFacmNoAscRepayCodeAsc(custNo_0, acDate_1, procStsCode_2, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = batxDetailReposMon.findAllByCustNoIsAndAcDateIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeAsc(custNo_0, acDate_1, procStsCode_2, pageable);
+      slice = batxDetailReposMon.findAllByCustNoIsAndAcDateIsAndProcStsCodeInOrderByEntryDateAscCustNoAscFacmNoAscRepayCodeAsc(custNo_0, acDate_1, procStsCode_2, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = batxDetailReposHist.findAllByCustNoIsAndAcDateIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeAsc(custNo_0, acDate_1, procStsCode_2, pageable);
+      slice = batxDetailReposHist.findAllByCustNoIsAndAcDateIsAndProcStsCodeInOrderByEntryDateAscCustNoAscFacmNoAscRepayCodeAsc(custNo_0, acDate_1, procStsCode_2, pageable);
     else 
-      slice = batxDetailRepos.findAllByCustNoIsAndAcDateIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeAsc(custNo_0, acDate_1, procStsCode_2, pageable);
+      slice = batxDetailRepos.findAllByCustNoIsAndAcDateIsAndProcStsCodeInOrderByEntryDateAscCustNoAscFacmNoAscRepayCodeAsc(custNo_0, acDate_1, procStsCode_2, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

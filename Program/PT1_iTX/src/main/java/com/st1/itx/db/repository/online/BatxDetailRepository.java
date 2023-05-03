@@ -26,7 +26,7 @@ import com.st1.itx.db.domain.BatxDetailId;
 public interface BatxDetailRepository extends JpaRepository<BatxDetail, BatxDetailId> {
 
   // CustNo = ,AND AcDate = ,AND ProcStsCode ^i
-  public Slice<BatxDetail> findAllByCustNoIsAndAcDateIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeAsc(int custNo_0, int acDate_1, List<String> procStsCode_2, Pageable pageable);
+  public Slice<BatxDetail> findAllByCustNoIsAndAcDateIsAndProcStsCodeInOrderByEntryDateAscCustNoAscFacmNoAscRepayCodeAsc(int custNo_0, int acDate_1, List<String> procStsCode_2, Pageable pageable);
 
   // AcDate = ,AND BatchNo = 
   public Slice<BatxDetail> findAllByAcDateIsAndBatchNoIsOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(int acDate_0, String batchNo_1, Pageable pageable);

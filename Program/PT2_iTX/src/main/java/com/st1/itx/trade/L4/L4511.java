@@ -258,12 +258,30 @@ public class L4511 extends TradeBuffer {
 				OccursList occursList = new OccursList();
 				occursList.putParam("OccYearMonthA",
 						setFormatMonth(parse.stringToInteger(titaVo.getCalDy()) + 19110000));
-				occursList.putParam("OccUnit", FormatUtil.padX(centerCodeAcc, 6));
-//				occursList.putParam("OccUnit", "10H400");
+//				occursList.putParam("OccUnit", FormatUtil.padX(centerCodeAcc, 6));
+				occursList.putParam("OccUnit", "10H400");
 				if (flag == 1) {
 					occursList.putParam("OccUnknowA", "0000000001");
 				} else {
-					occursList.putParam("OccUnknowA", "0000000002");
+//					occursList.putParam("OccUnknowA", "0000000002");
+					String tEmpCudtId = tEmpDeductMedia.getCustId();
+					CdEmp cDemp = cdEmpService.findAgentIdFirst(tEmpCudtId, titaVo);
+					if(cDemp!=null) {
+						String cDComm = cDemp.getCommLineType();
+						if(cDComm == null) {
+							cDComm = " ";
+						}
+						occursList.putParam("OccUnknowA", "000000000"+cDComm);
+						String cCommL = cDemp.getCommLineCode();
+						if(cCommL == null) {
+							cCommL = "  ";
+						}
+						occursList.putParam("OccLineCode", cCommL);
+					}else {
+						occursList.putParam("OccUnknowA", "000000000"+" ");
+						occursList.putParam("OccLineCode", "  ");
+					}
+					
 				}
 				occursList.putParam("OccCustId", FormatUtil.padX(tEmpDeductMedia.getCustId(), 10));
 
