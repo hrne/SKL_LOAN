@@ -132,11 +132,11 @@ public class L4601Report2 extends MakeReport {
 			line += ",";
 			line += m.get("ClCode1") + "-" + m.get("ClCode2") + "-" + m.get("ClNo");
 			line += ",";
-			line += iInsuRenewMediaTemp == null ? " " : iInsuRenewMediaTemp.getSeq();
+			line += iInsuRenewMediaTemp.getSeq().isEmpty()? " " : iInsuRenewMediaTemp.getSeq();
 			line += ",";
 			line += m.get("PrevInsuNo");
 			line += ",";
-			line +=  iInsuRenewMediaTemp == null ? " " :iInsuRenewMediaTemp.getInsuCustName();
+			line +=  iInsuRenewMediaTemp.getInsuCustName().isEmpty()? " " :iInsuRenewMediaTemp.getInsuCustName();
 			line += ",";
 			line += m.get("InsuStartDate");
 			line += ",";

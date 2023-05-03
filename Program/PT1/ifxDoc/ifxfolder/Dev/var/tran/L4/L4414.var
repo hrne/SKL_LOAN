@@ -54,7 +54,7 @@ R(1,XXR99)
 CALL(#HelpProc)
 T(2,@AuthStatusHelp, :未授權;+#HelpDesc1)
 T(2,@StampCodeHelp,#HelpDesc2)
-T(2,@AuthErrorCodeHelp,#HelpDesc3)
+T(2,@AuthErrorCodeHelp,  :  未授權;+#HelpDesc3)
 
 ![一般數值 multiple:true 可上船多個檔案]
 #BUTTON_FLD=X,1,O,ui:button;value:瀏覽;enable:1;tabbable:1;file:true;multiple:true;fieldName:#FILENA;width:600

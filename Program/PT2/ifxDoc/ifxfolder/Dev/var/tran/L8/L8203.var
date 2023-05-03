@@ -84,7 +84,7 @@ T(4,LEVEL$)
 
 
 #mkg=X,1,S
-INVOKEJS(SHOW,p1,11,11,0)
+INVOKEJS(SHOW,p1,12,12,0)
 
 !AP
 #CDCODEAp=x,20,S                  
@@ -282,6 +282,10 @@ T(H,#RationalX,#Rational,#YesNoHelp)
 T(H,#ManagerCheckX,#ManagerCheck,#AgreeHelp)
 T(2,@EditEmpNo,#L8R50EditEmpNo)
 
+#OL8R50ManagerDate=D,7,S
+E(0,#L8R50ManagerDate)
+
+
 #RcvL2r08A=X,1,S
 T(2,@RimEmployeeNo,#EditEmpNo)
 T(2,@RimTxCode1,#TXCD)
@@ -297,13 +301,13 @@ T(2,@EditEmpNoX,#L2r08FullName)
 
 !視調到的資料隱藏相關欄位
 #WKTFDates=A,1,S
-INVOKEJS(SHOW,p1,10,11,0)
-C(5,#ManagerCheck,"Y",INVOKEJS(SHOW,p1,10,10,1)INVOKEJS(SHOW,p1,11,11,0),$)
-C(5,#ManagerCheck,"N",INVOKEJS(SHOW,p1,10,10,0)INVOKEJS(SHOW,p1,11,11,1),$)
+INVOKEJS(SHOW,p1,11,12,0)
+C(5,#ManagerCheck,"Y",INVOKEJS(SHOW,p1,11,11,1)INVOKEJS(SHOW,p1,12,12,0),$)
+C(5,#ManagerCheck,"N",INVOKEJS(SHOW,p1,11,11,0)INVOKEJS(SHOW,p1,12,12,1),$)
 
 #mkg2=X,1,S
 !IF(#L8R50ManagerDate>0,INVOKEJS(SHOW,p1,11,11,0),$)
-IF(#L8R50ManagerDate!=0 && #L8R50ManagerCheckDate!=0,INVOKEJS(SHOW,p1,11,11,1),$)
+IF(#L8R50ManagerDate!=0 && #L8R50ManagerCheckDate!=0,INVOKEJS(SHOW,p1,12,12,1),$)
 !戶名
 #CustName=X,50,L
 
@@ -401,11 +405,10 @@ C(5,#ManagerCheck,"Y",T(3,@WKSTAR4,*),T(3,@WKSTAR4, ))
 IF(#FuncCode==5,T(2,@FdManagerDesc,),T(2,@FdManagerDesc,#WKSTAR3))
 T(H,@ManagerCheckX,#ManagerCheck,#AgreeHelp)
 T(4,@CDATE,CDATE$)
-C(5,#ManagerCheck,"Y",E(0,@ManagerDate,#CDATE)INVOKEJS(SHOW,p1,10,10,1)INVOKEJS(SHOW,p1,11,11,0),E(0,@ManagerDate,0))
+C(5,#ManagerCheck,"Y",C(3,#OL8R50ManagerDate,0,E(0,@ManagerDate,#CDATE),E(0,@ManagerDate,#OL8R50ManagerDate))INVOKEJS(SHOW,p1,11,11,1),C(3,#OL8R50ManagerDate,0,E(0,@ManagerDate,0),E(0,@ManagerDate,#OL8R50ManagerDate)))
 !C(5,#ManagerCheck,"N",E(0,@ManagerCheckDate,#CDATE)INVOKEJS(SHOW,p1,10,10,0)INVOKEJS(SHOW,p1,11,11,1),E(0,@ManagerCheckDate,0))
-C(5,#ManagerCheck,"N",E(0,@ManagerCheckDate,#CDATE)INVOKEJS(SHOW,p1,10,10,0)INVOKEJS(SHOW,p1,11,11,1),E(0,@ManagerCheckDate,#CDATE))
+C(5,#ManagerCheck,"N",E(0,@ManagerCheckDate,#CDATE)INVOKEJS(SHOW,p1,11,11,0)INVOKEJS(SHOW,p1,12,12,1),E(0,@ManagerCheckDate,#CDATE))
 T(2,@MRKEY,#AcDate+-+#Factor+-+#CustNo)
-
 #ManagerDateCopy=D,7,S
 
 #WKSTAR3=X,2,S
@@ -508,8 +511,15 @@ T(6A,#Entdy+#TxNo)
 #ManagerDate
 #ManagerCheckDate
 #Level
-#EditEmpNo
 #END
+#FuncCodeX
+#CustName
+#FactorX
+#EditEmpNo
+#EditEmpNoX
+#RationalX
+#ManagerCheckX
+#OL8R50ManagerDate
 </sub>
 
 

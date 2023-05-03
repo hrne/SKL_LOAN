@@ -22,7 +22,7 @@ import com.st1.itx.util.parse.Parse;
 @Scope("prototype")
 
 public class L8205Report4 extends MakeReport {
-	//原樣態1改為樣態4,樣態2改為樣態5,樣態3改為樣態27
+	//2023/5/2三個樣態合併到Report3,故Report4不需執行
 
 	@Autowired
 	L8205ServiceImpl l8205ServiceImpl;

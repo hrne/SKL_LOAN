@@ -118,8 +118,8 @@ public class L4101OldVo extends FileVo {
 					+ FormatUtil.padX("", 59)// space
 					+ "00174"// 00174
 					+ (Integer.valueOf(t.getAcDate()) + 19110000)// 匯款日期
-					+ t.getBatchNo().substring(4, 6);// 批號
-
+					+ t.getBatchNo().substring(4, 6)// 批號
+			 		+ "  ";
 			result.add(thisLine);
 		}
 

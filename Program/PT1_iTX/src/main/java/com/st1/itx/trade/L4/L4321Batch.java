@@ -147,7 +147,7 @@ public class L4321Batch extends TradeBuffer {
 		// 產出確認清單
 		if (titaVo.isActfgEntry() && titaVo.isHcodeNormal()) {
 			this.batchTransaction.commit();
-			l4321Report.exec(titaVo);
+			l4321Report.exec(1, titaVo);
 		}
 	}
 

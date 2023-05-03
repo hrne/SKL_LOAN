@@ -82,7 +82,7 @@ R(1,XXR99)
 CALL(#HelpProc) 
 T(2,@PostDepCodeHelp,#HelpDesc1) 
 T(2,@AuthCodeHelp,#HelpDesc2) 
-T(2,@AuthErrorCodeHelp,#HelpDesc3) 
+T(2,@AuthErrorCodeHelp,  :  未授權;+#HelpDesc3) 
 
 #AuthCodeHelp2=x,1024,S
 T(2,0:全部;+#HelpDesc2)

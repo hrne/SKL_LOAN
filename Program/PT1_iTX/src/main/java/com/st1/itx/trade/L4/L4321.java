@@ -13,9 +13,11 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.BatxDetail;
 import com.st1.itx.db.service.springjpa.cm.L4321ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
+import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L4321")
@@ -31,6 +33,8 @@ public class L4321 extends TradeBuffer {
 	@Autowired
 	public Parse parse;
 	@Autowired
+	public L4321Report l4321Report;
+	@Autowired
 	public L4321ServiceImpl L4321ServiceImpl;
 
 	private int iTxKind = 0;
@@ -42,6 +46,16 @@ public class L4321 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4321 ");
 		this.totaVo.init(titaVo);
+		// 重產報表
+		if ("LC899".equals(titaVo.getTxCode())) {
+			String[] strAr = titaVo.getParam("Parm").split(",");
+			this.iTxKind = parse.stringToInteger(strAr[0]);
+			this.iCustType = parse.stringToInteger(strAr[1]);
+			this.iAdjCode = parse.stringToInteger(strAr[2]);
+			putFileNm(titaVo);
+			l4321Report.exec(2, titaVo);
+			return null;
+		}
 		this.iTxKind = parse.stringToInteger(titaVo.getParam("TxKind"));
 		this.iCustType = parse.stringToInteger(titaVo.getParam("CustType"));
 		this.iAdjCode = parse.stringToInteger(titaVo.get("AdjCode"));
@@ -84,6 +98,13 @@ public class L4321 extends TradeBuffer {
 //		filename 輸出檔案名稱(不含副檔名,預設為.xlsx)
 //		defaultExcel 預設excel底稿檔
 //		defaultSheet 預設sheet,可指定 sheet index or sheet name
+		// 執行交易
+		MySpring.newTask("L4321Batch", this.txBuffer, titaVo);
+		this.addList(this.totaVo);
+		return this.sendList();
+	}
+
+	private void putFileNm(TitaVo titaVo) throws LogicException {
 		String fileNm1 = "";
 		if (this.iCustType == 1) {
 			fileNm1 = "個金";
@@ -118,7 +139,10 @@ public class L4321 extends TradeBuffer {
 			fileNm += fileNm1 + "-按地區別調整";
 			break;
 		case 3:
-			fileNm += fileNm1 + "-人工調整";
+			fileNm += fileNm1 + "-人工調整_按合約";
+			break;
+		case 4:
+			fileNm += fileNm1 + "-人工調整_按地區別";
 			break;
 		default:
 			break;
@@ -129,10 +153,5 @@ public class L4321 extends TradeBuffer {
 		titaVo.putParam("iCode", "L4321");
 		titaVo.putParam("iItem", fileNm);
 
-		// 執行交易
-		MySpring.newTask("L4321Batch", this.txBuffer, titaVo);
-
-		this.addList(this.totaVo);
-		return this.sendList();
 	}
 }

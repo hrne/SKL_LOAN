@@ -79,7 +79,7 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	public List<Map<String, String>> L8205Rpt2(TitaVo titaVo) throws Exception {
-
+		//l8205Report2改為不執行,併入L8205Rpt1一起出表
 		this.info("L8205Rpt2");
 		String iEntryDateStart = titaVo.getParam("DateStart");
 		String iEntryDateEnd = titaVo.getParam("DateEnd");
@@ -150,7 +150,8 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		sql += "left join \"CdBranchGroup\" CD ON CD.\"BranchNo\" = T.\"BrNo\"	\n";
 //		sql += "and CD.\"GroupNo\" = T.\"GroupNo\"								\n";
 		sql += "left join \"CdEmp\" E ON M.\"CreateEmpNo\" = E.\"EmployeeNo\"	\n";
-		sql += "where M.\"EntryDate\" >= :entryStart and M.\"EntryDate\" <= :entrydEnd  and M.\"Factor\"='3'   \n";
+//		sql += "where M.\"EntryDate\" >= :entryStart and M.\"EntryDate\" <= :entrydEnd  and M.\"Factor\"='3'   \n";
+		sql += "where M.\"EntryDate\" >= :entryStart and M.\"EntryDate\" <= :entrydEnd   \n";// 2023/5/2三種樣態延遲報表合併
 //		sql += "and NVL(M.\"ManagerCheck\", 'N') != 'Y'      \n     ";
 		sql += "order by M.\"EntryDate\" , M.\"CustNo\" ";
 
@@ -167,6 +168,7 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	public List<Map<String, String>> L8205Rpt4(TitaVo titaVo) throws Exception {
+		//l8205Report4改為不執行,併入L8205Rpt3一起出表
 
 		this.info("L8205Rpt4");
 		String iEntryDateStart = titaVo.getParam("DateStart");

@@ -223,6 +223,11 @@ public class L8203 extends TradeBuffer {
 				}
 			}
 		}
+
+		int oManagerDate = mMlaundryDetail.getManagerDate();
+		if (mMlaundryDetail.getManagerDate() > 0) {// 主管已同意過則備份主管同意日,不可覆蓋主管同意日
+			oManagerDate = oManagerDate + 19110000;
+		}
 		
 		if (Integer.valueOf(titaVo.getParam("ManagerCheckDate")) != 0) {//主管覆核日期
 			iManagerCheckDate = Integer.valueOf(titaVo.getParam("ManagerCheckDate")) + 19110000;
@@ -230,9 +235,11 @@ public class L8203 extends TradeBuffer {
 //		this.info("ManagerCheckDate=" + iManagerCheckDate);
 
 		if (titaVo.isActfgSuprele()) {// 主管放行檢查欄位:整批放行需更新主管覆核欄位=Y及日期
-			if ( selectTotal > 0) {//整批放行
+			if (selectTotal > 0) {// 整批放行
 				iManagerCheck = "Y";
-				iFManagerDate = iToday;
+				if (oManagerDate == 0) {// 主管未同意過則覆蓋主管同意日
+					iFManagerDate = iToday;
+				}
 				iManagerCheckDate = iToday;
 			}
 		}
@@ -253,9 +260,9 @@ public class L8203 extends TradeBuffer {
 		mMlaundryDetail.setEmpNoDesc(titaVo.getParam("EmpNoDesc"));
 		mMlaundryDetail.setManagerDesc(titaVo.getParam("ManagerDesc"));
 
-		mMlaundryDetail
-				.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-		mMlaundryDetail.setLastUpdateEmpNo(titaVo.getTlrNo());
+//		mMlaundryDetail
+//				.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+//		mMlaundryDetail.setLastUpdateEmpNo(titaVo.getTlrNo());
 //		this.info("getTlrNo==" + titaVo.getTlrNo());
 	}
 

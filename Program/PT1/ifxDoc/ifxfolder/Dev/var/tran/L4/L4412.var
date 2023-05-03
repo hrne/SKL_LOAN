@@ -155,7 +155,7 @@ T(2,@FuncCodeHelp,#HelpDesc3)
 T(2,@PostDepCodeHelp,#HelpDesc4)
 T(2,@AuthCodeHelp,#HelpDesc5)
 T(2,@StampCodeHelp,#HelpDesc6)
-T(2,@AuthErrorCodeHelp,#HelpDesc7)
+T(2,@AuthErrorCodeHelp,  :  未授權;+#HelpDesc7)
 T(2,@AmlRspHelp,#HelpDesc8)
 
 #RimRepayAcct=A,14,S

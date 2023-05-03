@@ -51,7 +51,7 @@ public class L4321Report extends MakeReport {
 	private String fileNm = "";
 	private List<Map<String, String>> fnAllList = new ArrayList<>();
 
-	public long exec(TitaVo titaVo) throws LogicException {
+	public long exec(int confirmFlag, TitaVo titaVo) throws LogicException {
 		this.iAdjCode = parse.stringToInteger(titaVo.get("AdjCode"));
 		this.iTxKind =  parse.stringToInteger(titaVo.getParam("TxKind"));
 
@@ -114,7 +114,7 @@ public class L4321Report extends MakeReport {
 			break;
 		}
 		try {
-			fnAllList = L4321ServiceImpl.findAll(1, titaVo);
+			fnAllList = L4321ServiceImpl.findAll(confirmFlag, titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
