@@ -47,7 +47,7 @@ K(MODIFYBUTTON,查詢)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+<sub type="DC" name="p1" layout="cols=1;screen.width=[250,800];printer.width=[20,20];">
 [
 ["[L6067]                                 保證人關係代碼查詢"],
 ["#FdGuaRelCode+保證人關係代碼",#GuaRelCode],

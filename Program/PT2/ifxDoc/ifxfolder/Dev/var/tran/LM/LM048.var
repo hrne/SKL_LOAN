@@ -15,15 +15,6 @@ T(3,LM048)
 
 <sub type="DC" name="BFHEAD">
 <include src="COM.icf::BFHEAD2.dec"/>
-!起始交易記號  0:起始交易,1:非起始交易
-#ORGFG=_,_,S
-E(0,0)
-
-#BUF2=X,11,S
-T(2,1+          )
-
-#ORGFG=_,_,S
-E(0,0)
 
 
 </sub>
@@ -31,12 +22,27 @@ E(0,0)
 
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=1;screen.width=[130,850];printer.width=[20,20];">
+<sub type="DC" name="p1" layout="cols=1;screen.width=[140,860];printer.width=[20,80];">
 [
 ["[LM048]                                 LM048 企業放款風險承擔限額控管表"],
 ["@資料年月",#DataYear,"@年",#DataMonth,"@月"],
 ["@企業放款餘額限額",#EntLoanBalLimit,"@元"],
 ]
+
+
+!---------- AP TEXT AREA Variables ----------
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L9803月報]進入),$)
+
+! #NTXBUF=X,3,S
+! C(3,#CHAIN,1,T(4,NTXBUF$),S)
+! T(1,@FUNCD,#NTXBUF,1,1)
+! T(1,@TLR,#NTXBUF,2,2)
+! T(2,@FKEY,7)
+
+
+!-----------------------------------------------------
 
 #TXCD2=X,5,S
 T(3,LM048)
@@ -62,7 +68,6 @@ E(0,#DataYear*100)
 E(0,#YearMonth+#DataMonth)
 
 #EntLoanBalLimit=m,14,I
-@V(2,0)
 @V(5,0,9999999999999)
 
 </sub>
@@ -71,6 +76,24 @@ E(0,#YearMonth+#DataMonth)
 !---------- 輸出共用變數宣告區 ----------
 <sub type="RTN" name="AFXMT">
 <include src="PRT.icf::PRTHEAD.rtn"/>
+
+#PRTSC_RFG=X,1,S
+C(3,#HCODE,1,S,$)
+C(5,#TXFORM,LM048,$,S)
+C(3,#FKEY,2,E(0,0),E(0,1))
+
+</sub>
+
+
+!---------- TXFORM = C5100 ----------
+<sub type="FORM" name="LM048">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,C5100,$,S)
+
+#SCRTIL=_,_,S
+T(3,[LM048] LM048 企業放款風險承擔限額控管表)
+
 </sub>
 
 !---------- TXFORM = LM048 ----------
@@ -81,6 +104,10 @@ C(5,#TXFORM,LM048,$,S)
 
 #SCRTIL=_,_,S
 T(3,[LM048] LM048 企業放款風險承擔限額控管表)
+
+
+#OEMPNOS=X,6,S
+IF(#KINBR=="0009"||#KINBR=="0008",T(2,#KINBR+#TlrNoNO),T(2,#EMPNOS))
 
 </sub>
 
@@ -95,8 +122,10 @@ T(3,[LM048] LM048 企業放款風險承擔限額控管表)
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
+
 TXFORM=LM048
 ^
+
 </sub>
 
 !--------- OUTPUT畫面 --------
@@ -105,6 +134,7 @@ TXFORM=LM048
 ["[LM048]                                 企業放款風險承擔限額控管表                                                                            "],
 ]
 </sub>
+
 
 !---------- 單據輸出組合 ----------
 <sub type="SELECT">

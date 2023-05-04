@@ -391,10 +391,10 @@ TXFORM=L4931
 
 </sub>
 
-<sub type="PART" prompt='{{#SCRTIL}} world' name="L4931" layout="cols=1;screen.width=[870];order=1;">
+<sub type="PART" prompt='{{#SCRTIL}} world' name="L4931" layout="cols=1;screen.width=[1000];order=1;">
 [
 ["[L4931]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@個別利率調整作業"],
-["調整記號:  1.批次自動調整@@@@@2.按地區別調整@@@@@3.人工調整(按合約)@@@@@4.人工調整(按地區別)@@@@@8.確認失敗件@@@@@9.檢核提醒件@@@@@"],
+["調整記號:  1.批次自動調整@@@@@2.按地區別調整@@@@@3.人工調整_按合約@@@@@4.人工調整_按地區別@@@@@8.確認失敗件@@@@@9.到期日提醒件@@@@@"],
 ]
 </sub>
 
@@ -415,6 +415,47 @@ TXFORM=L4931
 #batch-print=6,L4931.PFNX,NA,,,,,,1169:827
 ^
 #batch-print=7,L4931.PFNX,NA,,,,,,1169:827
+^
+#batch-print=8,L4931.PFNX,NA,,,,,,1169:827
+^
+
+#RPTFG=8,QUERY.GRID,L4931
+#any={detail:true, header:'L4931.part', caption:'', rowNum:20, rowList:[20,40,60],ifxDisplay:0,
+}
+#OOBTN_L3932=
+{search:false,formatter:'cust:bind-button:利率',align:'center',canExport:false,width:65}
+#OOCityItem=地區別
+{width:70,align:'center'}
+#OOAreaItem=鄉鎮區
+{width:70,align:'center'}
+#OOCustNumber=戶號
+{width:115,align:'center'}
+#OOCustName=戶名
+{width:70,align:'left'}
+#OOTotalLoanBal=全戶餘額
+{width:120}
+#OODrawdownAmt=撥款金額
+{width:120}
+#OOLoanBal=放款餘額
+{width:120}
+#OOPresEffDate=目前生效日
+{width:90,align:'right'}
+#OOCurtEffDate=本次生效日
+{width:90,align:'right'}
+#OOPrevIntDate=繳息迄日
+{width:80,align:'right'}
+#OOCustCodeX=客戶別
+{width:60}
+#OOProdNo=商品代碼
+{width:80}
+#OOPresentRate=目前利率
+{width:80,align:'right'}
+#OOContrRateIncr=合約加碼利率
+{width:100,align:'right'}
+#OOAdjCode=調整記號
+{width:70,align:'center'}
+#OOProcNote=檢核訊息
+{width:240}
 ^
 
 #RPTFG=7,QUERY.GRID,L4931

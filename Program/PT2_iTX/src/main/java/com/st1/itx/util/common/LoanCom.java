@@ -305,7 +305,6 @@ public class LoanCom extends TradeBuffer {
 		if (titaVo.isHcodeModify()) {
 			tLoanBorTx2.setTitaEmpNoS(titaVo.getParam("EraseSupNo"));
 		}
-		tLoanBorTx2.setLoanBal(iLoanBal);
 		try {
 			loanBorTxService.insert(tLoanBorTx2, titaVo);
 		} catch (DBException e) {

@@ -64,7 +64,7 @@ public class LM078Report extends MakeReport {
 
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
-		String txcd = "LD010";
+		String txcd = "LM078";
 		String fileItem = "B044「借款戶向金融機構申請並經錄案」之不動產抵押貸款案件辦理情形";
 		String fileName = "LM078_B044「借款戶向金融機構申請並經錄案」之不動產抵押貸款案件辦理情形" + showRocDate(entdy, 0).substring(0, 7);
 		String defaultExcel = "LM078_底稿_B044「借款戶向金融機構申請並經錄案」之不動產抵押貸款案件辦理情形.xlsx";

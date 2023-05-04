@@ -1,0 +1,126 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+#TXCD=_,_,S
+T(3,LM070)
+
+</sub>
+<sub type="PREDC" name="PreDC">
+<include src="COM.icf::TITLE-RUN.pre"/>
+</sub>
+
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+
+
+</sub>
+
+
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20,20,20];order=1;">
+[
+["[LM070]                         LM070介紹人加碼獎勵津貼明細 "],
+["#FdWorkMonth+工作月",#WorkMonth],
+]
+!["工作年月",#inputYear,"/",#inputMonth],
+
+!---------- AP TEXT AREA Variables ----------
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L9803月報]進入),$)
+
+#FdWorkMonth=X,2,L
+T(3,*)
+
+!#NTXBUF=X,3,S
+!C(3,#CHAIN,1,T(4,NTXBUF$),S)
+!T(1,@FUNCD,#NTXBUF,1,1)
+!T(1,@TLR,#NTXBUF,2,2)
+!T(2,@FKEY,7)
+
+
+!-----------------------------------------------------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+! 工作月
+#WorkMonth=A,5,I
+C(3,#WorkMonth,0,T(1,@WorkMonth,#SYSDATE,2,5),$)
+@
+C(3,#WorkMonth,0,S,A(YM13,1,#WorkMonth))
+
+
+#inputYear=A,3,S
+T(1,#WorkMonth,1,3)
+
+#inputMonth=A,2,S
+T(1,#WorkMonth,4,2)
+!@V(5,1,13)
+
+</sub>
+
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+
+#PRTSC_RFG=X,1,S
+C(3,#HCODE,1,S,$)
+C(5,#TXFORM,LM070,$,S)
+C(3,#FKEY,2,E(0,0),E(0,1))
+
+</sub>
+
+
+!---------- TXFORM = C5100 ----------
+<sub type="FORM" name="LM070">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,LM070,$,S)
+
+#SCRTIL=_,_,S
+T(3,[LM070] LM070介紹人加碼獎勵津貼明細)
+
+</sub>
+
+!---------- TXFORM = LM070 ----------
+<sub type="FORM" name="LM070">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,LM070,$,S)
+
+#SCRTIL=_,_,S
+T(3,[LM070] LM070介紹人加碼獎勵津貼明細)
+
+
+#OEMPNOS=X,6,S
+IF(#KINBR=="0009"||#KINBR=="0008",T(2,#KINBR+#TlrNoNO),T(2,#EMPNOS))
+
+</sub>
+
+
+!------ 上行電文TIM：BASIC LABEL + AP TEXT AREA + AP TEXT ------
+<sub type="TIM">
+#inputYear
+#inputMonth
+#END
+</sub>
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+
+TXFORM=LM070
+^
+
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>
+

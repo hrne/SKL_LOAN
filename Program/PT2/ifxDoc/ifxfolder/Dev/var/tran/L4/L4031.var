@@ -160,6 +160,8 @@ C(3,#OOIgnCnt,0,T(2, ),X(#OOIgnCnt))
 ! 已總數確認
 #OOCheckFlag=A,1,O
 
+#OORptFg=X,1,O
+
 ! 總數 
 #OOBUF_TOTAL=X,50,S
 SWITCH(#OORank,
@@ -211,7 +213,6 @@ SWITCH(#OOCheckFlag,1,BIND(grid,{ cmd=CHAIN;ntxcd=LC009; text=#OOText_Exec; ntxb
 T(2,)
 C(2,#OOStatus,T(2,未確認),T(2,確認未放行),T(2,已確認放行))
 
-#OORptFg=X,1,O
 
 #OONeedConCnt=m,4,S
 #OONeedConCntX=X,5,O

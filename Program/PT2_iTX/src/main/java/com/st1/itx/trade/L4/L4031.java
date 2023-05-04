@@ -181,8 +181,8 @@ public class L4031 extends TradeBuffer {
 //                                      1.已調整           6(有地區別，可選擇<取消調整>)   
 //                                      2.待輸入           6(有地區別，可選擇<取消調整>)   
 //                                      9:檢核有誤         7(有地區別，可選擇<按擬調利率調整><按目前利率調整><輸入利率調整><按合約利率調整>)  
-//                  8.確認失敗件                1.已調整 		       5(目前&調後)   
-//              	9.檢核提醒件                0.未調整 		       5(目前&調後)   
+//                  8.確認失敗件                1.已調整 		       8(目前)   
+//              	9.到期日提醒件             0.未調整 		       8(目前)   
 // 2.指數型利率調整
 // 4.員工利率調整 
 // 5.按商品別調整  
@@ -269,13 +269,13 @@ public class L4031 extends TradeBuffer {
 				break;
 			case 8:
 				lableBX = "確認失敗件";
-				rptFg = 5;
+				rptFg = 8;
 				checkFlag = 9;
 				status = 9;
 				break;
 			case 9:
-				lableBX = "檢核提醒件";
-				rptFg = 5;
+				lableBX = "到期日提醒件";
+				rptFg = 8;
 				checkFlag = 9;
 				status = 9;
 				break;

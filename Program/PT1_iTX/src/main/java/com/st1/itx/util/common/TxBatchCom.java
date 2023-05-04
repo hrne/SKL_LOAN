@@ -36,6 +36,7 @@ import com.st1.itx.db.domain.LoanBook;
 import com.st1.itx.db.domain.LoanCheque;
 import com.st1.itx.db.domain.LoanChequeId;
 import com.st1.itx.db.domain.LoanCustRmk;
+import com.st1.itx.db.domain.NegMain;
 import com.st1.itx.db.domain.TxErrCode;
 import com.st1.itx.db.domain.TxRecord;
 import com.st1.itx.db.domain.TxRecordId;
@@ -50,6 +51,7 @@ import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBookService;
 import com.st1.itx.db.service.LoanChequeService;
 import com.st1.itx.db.service.LoanCustRmkService;
+import com.st1.itx.db.service.NegMainService;
 import com.st1.itx.db.service.TxErrCodeService;
 import com.st1.itx.db.service.TxRecordService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -202,6 +204,8 @@ public class TxBatchCom extends TradeBuffer {
 	public TxErrCodeService txErrCodeService;
 	@Autowired
 	public LoanCustRmkService loanCustRmkService;
+	@Autowired
+	public NegMainService negMainService;
 
 	private ArrayList<BaTxVo> baTxList;
 
@@ -509,9 +513,21 @@ public class TxBatchCom extends TradeBuffer {
 			}
 		}
 
+		// ------------- 設定 AML 檢核結果 ----------------------
 		// AML 檢核 0-正常 1-錯誤
 		if (this.amlRsp > 0) {
 			this.procStsCode = "3"; // 3.檢核錯誤
+		}
+
+		// --------------- 執行債一般債權客戶檢核 ------------------
+		// 匯款轉帳若為一般債權客戶,整批檢核訊息提示債協的案件種類且需人工入帳,A6與A7的還款類別為債協匯入款,其他的依原預設還款類別
+		// USER需以L3210自行輸入暫收原因或以整批入帳之維護交易維護
+		if ("0".equals(this.procStsCode) && tDetail.getRepayCode() == 1 && this.repayType != 11) {
+			NegMain tNegMain = negMainService.statusFirst("0", tDetail.getCustNo(), titaVo); // 0-正常
+			if (tNegMain != null && "N".equals(tNegMain.getIsMainFin())) {
+				this.checkMsg += loanCom.getCdCodeX("CaseKindCode", tNegMain.getCaseKindCode(), titaVo) + this.checkMsg;
+				this.procStsCode = "2"; // 2.人工處理
+			}
 		}
 
 		// ------------- 將檢核結果存入整批入帳明細檔(還款類別、處理說明、處理狀態) -----------

@@ -80,22 +80,26 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("LP005ServiceImpl queryAmt inputWorkMonth = " + inputWorkMonth);
 
 		String sql = " ";
-		sql += " SELECT PD.\"CustNo\"            AS CustNo      "; // -- F0 戶號
-		sql += "      , PD.\"FacmNo\"            AS FacmNo      "; // -- F1 額度
-		sql += "      , PD.\"ComputeCoBonusAmt\" AS DrawdownAmt "; // -- F2 撥款金額
-		sql += "      , PD.\"PieceCode\"         AS PieceCode   "; // -- F3 計件代碼
-		sql += "      , PD.\"Coorgnizer\"        AS Coorgnizer  "; // -- F4 員工代號
-		sql += "      , \"Fn_GetEmpName\"(PD.\"Coorgnizer\",0) ";
+		sql += " SELECT PR.\"CustNo\"            AS CustNo      "; // -- F0 戶號
+		sql += "      , PR.\"FacmNo\"            AS FacmNo      "; // -- F1 額度
+		sql += "      , PI.\"DrawdownAmt\"       AS DrawdownAmt "; // -- F2 撥款金額
+		sql += "      , PR.\"PieceCode\"         AS PieceCode   "; // -- F3 計件代碼
+		sql += "      , PR.\"Coorgnizer\"        AS Coorgnizer  "; // -- F4 員工代號
+		sql += "      , \"Fn_GetEmpName\"(PR.\"Coorgnizer\",0) ";
 		sql += "                                 AS EmpName     "; // -- F5 員工姓名
 		sql += "      , PCO.\"DeptItem\"         AS Dept        "; // -- F6 部室
 		sql += "      , PCO.\"DistItem\"         AS Dist        "; // -- F7 區部
 		sql += "      , PCO.\"AreaItem\"         AS Area        "; // -- F8 單位
-		sql += " FROM \"PfDetail\" PD ";
-		sql += " LEFT JOIN \"PfCoOfficer\" PCO ON PCO.\"EmpNo\" = PD.\"Coorgnizer\" ";
+		sql += " FROM \"PfReward\" PR ";
+		sql += " LEFT JOIN \"PfItDetail\" PI ON PI.\"CustNo\" = PR.\"CustNo\" ";
+		sql += "                            AND PI.\"FacmNo\" = PR.\"FacmNo\" ";
+		sql += "                            AND PI.\"BormNo\" = PR.\"BormNo\" ";
+		sql += "                            AND PI.\"RepayType\" = 0 ";
+		sql += " LEFT JOIN \"PfCoOfficer\" PCO ON PCO.\"EmpNo\" = PR.\"Coorgnizer\" ";
 		sql += "                              AND TRUNC(PCO.\"EffectiveDate\" / 100) <= :inputWorkMonth ";
 		sql += "                              AND TRUNC(PCO.\"IneffectiveDate\" / 100) >= :inputWorkMonth ";
-		sql += " WHERE PD.\"ComputeCoBonusAmt\" > 0 ";
-		sql += "   AND PD.\"WorkMonth\" = :inputWorkMonth ";
+		sql += " WHERE PR.\"RepayType\" = 0 ";
+		sql += "   AND PR.\"WorkMonth\" = :inputWorkMonth ";
 		this.info("sql=" + sql);
 
 		Query query;

@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
@@ -117,9 +118,9 @@ public class L4601Report2 extends MakeReport {
 
 		for (Map<String, String> m : list) {
 
-			InsuRenewMediaTemp iInsuRenewMediaTemp = new InsuRenewMediaTemp();
-			iInsuRenewMediaTemp = insuRenewMediaTempService.fireInsuFirst(m.get("InsuYearMonth"), m.get("ClCode1"),
-					m.get("ClCode2"), m.get("ClNo"), m.get("PrevInsuNo"), titaVo);
+			InsuRenewMediaTemp sInsuRenewMediaTemp = insuRenewMediaTempService.fireInsuFirst(m.get("InsuYearMonth"),
+					m.get("ClCode1"), this.fillUpWord(m.get("ClCode2"), 2, "0", "L"), this.fillUpWord(m.get("ClNo"), 7, "0", "L"),
+					m.get("PrevInsuNo"), titaVo);
 
 			String line = "";
 			line += m.get("InsuYearMonth");
@@ -132,11 +133,11 @@ public class L4601Report2 extends MakeReport {
 			line += ",";
 			line += m.get("ClCode1") + "-" + m.get("ClCode2") + "-" + m.get("ClNo");
 			line += ",";
-			line += iInsuRenewMediaTemp.getSeq().isEmpty()? " " : iInsuRenewMediaTemp.getSeq();
+			line += sInsuRenewMediaTemp == null ? " " : sInsuRenewMediaTemp.getSeq();
 			line += ",";
 			line += m.get("PrevInsuNo");
 			line += ",";
-			line +=  iInsuRenewMediaTemp.getInsuCustName().isEmpty()? " " :iInsuRenewMediaTemp.getInsuCustName();
+			line += sInsuRenewMediaTemp == null ? " " : sInsuRenewMediaTemp.getInsuCustName();
 			line += ",";
 			line += m.get("InsuStartDate");
 			line += ",";

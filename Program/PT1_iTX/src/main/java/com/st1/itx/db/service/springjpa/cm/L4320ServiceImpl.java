@@ -34,8 +34,8 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		;
 	}
 
-	public List<Map<String, String>> findAll(int iAdjCode, TitaVo titaVo) throws Exception {
-		// iAdjCode 0: 一般、 4:定期機動指標利率變動調整合約利率
+	public List<Map<String, String>> findAll(int iExecCode, TitaVo titaVo) throws Exception {
+		// iExecCode 0: 一般、 9.定期機動檢核件
 		int iTxKind = Integer.parseInt(titaVo.getParam("TxKind"));
 		int iEffectMonth = Integer.parseInt(titaVo.getParam("EffectMonth"));
 		int iEffectDate = Integer.parseInt(titaVo.getParam("EffectDate"));
@@ -253,7 +253,7 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "       and r.\"BaseRateCode\" = " + iBaseRateCode;
 			sql += "       and r.\"RateCode\" = '3'                  ";
 			// 0: 一般、9:定期機動檢核件
-			if (iAdjCode == 0) {
+			if (iExecCode == 0) {
 				sql += "       and b.\"NextAdjRateDate\" >= " + iEffectDateS;
 				sql += "       and b.\"NextAdjRateDate\" <= " + iEffectDateE;
 			} else {

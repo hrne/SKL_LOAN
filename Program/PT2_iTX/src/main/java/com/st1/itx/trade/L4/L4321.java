@@ -46,12 +46,19 @@ public class L4321 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4321 ");
 		this.totaVo.init(titaVo);
+		this.info("titaVo.getTxcd()=" + titaVo.getTxcd() + ", titaVo.getTxCode()=" + titaVo.getTxCode());
 		// 重產報表
 		if ("LC899".equals(titaVo.getTxCode())) {
+			this.info("LC899 exec l4321Report");
 			String[] strAr = titaVo.getParam("Parm").split(",");
 			this.iTxKind = parse.stringToInteger(strAr[0]);
 			this.iCustType = parse.stringToInteger(strAr[1]);
 			this.iAdjCode = parse.stringToInteger(strAr[2]);
+			
+			titaVo.putParam("TxKind", strAr[0]);
+			titaVo.putParam("CustType", strAr[1]);
+			titaVo.putParam("AdjCode", strAr[2]);
+			titaVo.putParam("AdjDate", strAr[3]);
 			putFileNm(titaVo);
 			l4321Report.exec(2, titaVo);
 			return null;
@@ -99,6 +106,7 @@ public class L4321 extends TradeBuffer {
 //		defaultExcel 預設excel底稿檔
 //		defaultSheet 預設sheet,可指定 sheet index or sheet name
 		// 執行交易
+		putFileNm(titaVo);
 		MySpring.newTask("L4321Batch", this.txBuffer, titaVo);
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -130,7 +138,6 @@ public class L4321 extends TradeBuffer {
 		default:
 			break;
 		}
-		this.info("titaVo.getTxcd() = " + titaVo.getTxcd());
 		switch (this.iAdjCode) {
 		case 1:
 			fileNm += fileNm1 + "-批次自動調整";

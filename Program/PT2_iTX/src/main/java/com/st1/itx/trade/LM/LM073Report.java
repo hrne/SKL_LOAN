@@ -65,7 +65,7 @@ public class LM073Report extends MakeReport {
 		String txcd = "LM073";
 		String fileItem = "央行報送明細資料";
 		String fileName = "LM073央行報送明細資料" + showRocDate(entdy, 0).substring(0, 7);
-		String defaultExcel = "LM073央行報送明細資料.xlsx";
+		String defaultExcel = "LM073_底稿_央行報送明細資料.xlsx";
 		String defaultSheet = "明細";
 
 		this.info("reportVo open");

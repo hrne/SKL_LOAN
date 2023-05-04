@@ -90,24 +90,31 @@ public class L4321Report extends MakeReport {
 				excelNo = 3;
 			}
 			break;
+		case 4:
+			if (this.iTxKind == 1) {
+				excelNo = 2;
+			} else {
+				excelNo = 4;
+			}
+			break;
 		default:
 			break;
 		}
 		switch (excelNo) {
 		case 1:
-			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, fileNm,
+			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4321", fileNm, fileNm,
 					"L4321_LNW171E底稿(10909調息檔)定期機動.xlsx", "正常件"); // 無地區
 			break;
 		case 2:
-			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, fileNm,
+			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4321", fileNm, fileNm,
 					"L4321_LNW171E底稿(10909調息檔)定期機動-地區別調整.xlsx", "正常件");
 			break;
 		case 3:
-			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, fileNm,
+			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4321", fileNm, fileNm,
 					"L4321_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
 			break;
 		case 4:
-			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, fileNm,
+			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4321", fileNm, fileNm,
 					"L4321_LNW171E底稿(10909調息檔)機動-地區別調整.xlsx", "正常件");
 			break;
 		default:

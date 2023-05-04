@@ -80,54 +80,54 @@ public class L4931ServiceImpl extends ASpringJpaParm implements InitializingBean
 			custCode1 = 1;
 			custCode2 = 2;
 		}
-		if ("9".equals(iAdjCode) || "A".equals(iAdjCode)) {
+		if ("A".equals(iAdjCode)) {
 			adjCode = "";
 		}
 
 		this.info("today = " + today);
 
 		String sql = " ";
-		sql += " select                              ";  
+		sql += " select                              ";
 		sql += "   b.\"AdjDate\"                     "; // F0
 		sql += " , b.\"CustNo\"                      "; // F1
 		sql += " , b.\"FacmNo\"                      "; // F2
-		sql += " , b.\"BormNo\"                      "; // F3  
-		sql += " , b.\"TxKind\"                      "; // F4  
-		sql += " , b.\"DrawdownAmt\"                 "; // F5  
-		sql += " , b.\"CityCode\"                    "; // F6  
-		sql += " , b.\"AreaCode\"                    "; // F7  
-		sql += " , b.\"IncrFlag\"                    "; // F8  
-		sql += " , b.\"AdjCode\"                     "; // F9  
-		sql += " , b.\"RateKeyInCode\"               "; // F10 
-		sql += " , b.\"ConfirmFlag\"                 "; // F11 
-		sql += " , b.\"TotBalance\"                  "; // F12 
-		sql += " , b.\"LoanBalance\"                 "; // F13 
-		sql += " , b.\"PresEffDate\"                 "; // F14 
-		sql += " , b.\"CurtEffDate\"                 "; // F15 
-		sql += " , b.\"PreNextAdjDate\"              "; // F16 
-		sql += " , b.\"PreNextAdjFreq\"              "; // F17 
-		sql += " , b.\"PrevIntDate\"                 "; // F18 
-		sql += " , b.\"CustCode\"                    "; // F19 
-		sql += " , b.\"ProdNo\"                      "; // F20		
-		sql += " , b.\"RateIncr\"                    "; // F21 
-		sql += " , b.\"ContractRate\"                "; // F22 
-		sql += " , b.\"PresentRate\"                 "; // F23 
-		sql += " , b.\"ProposalRate\"                "; // F24 
-		sql += " , b.\"AdjustedRate\"                "; // F25 
-		sql += " , b.\"ContrBaseRate\"               "; // F26 
-		sql += " , b.\"ContrRateIncr\"               "; // F27 
-		sql += " , b.\"IndividualIncr\"              "; // F28 
-		sql += " , b.\"BaseRateCode\"                "; // F29 
-		sql += " , b.\"RateCode\"                    "; // F30 
-		sql += " , b.\"CurrBaseRate\"                "; // F31 
-		sql += " , b.\"TxEffectDate\"                "; // F32 
-		sql += " , b.\"TxRateAdjFreq\"               "; // F33 
-		sql += " , b.\"JsonFields\"                  "; // F34 
-		sql += " , cm.\"CustName\"                   "; // F35 
-		sql += " , cc.\"CityItem\"                   "; // F36 
-		sql += " , ca.\"AreaItem\"                   "; // F37 
-		sql += " , b.\"OvduTerm\"                    "; // F38 
-    	sql += " from \"BatxRateChange\" b                                      ";
+		sql += " , b.\"BormNo\"                      "; // F3
+		sql += " , b.\"TxKind\"                      "; // F4
+		sql += " , b.\"DrawdownAmt\"                 "; // F5
+		sql += " , b.\"CityCode\"                    "; // F6
+		sql += " , b.\"AreaCode\"                    "; // F7
+		sql += " , b.\"IncrFlag\"                    "; // F8
+		sql += " , b.\"AdjCode\"                     "; // F9
+		sql += " , b.\"RateKeyInCode\"               "; // F10
+		sql += " , b.\"ConfirmFlag\"                 "; // F11
+		sql += " , b.\"TotBalance\"                  "; // F12
+		sql += " , b.\"LoanBalance\"                 "; // F13
+		sql += " , b.\"PresEffDate\"                 "; // F14
+		sql += " , b.\"CurtEffDate\"                 "; // F15
+		sql += " , b.\"PreNextAdjDate\"              "; // F16
+		sql += " , b.\"PreNextAdjFreq\"              "; // F17
+		sql += " , b.\"PrevIntDate\"                 "; // F18
+		sql += " , b.\"CustCode\"                    "; // F19
+		sql += " , b.\"ProdNo\"                      "; // F20
+		sql += " , b.\"RateIncr\"                    "; // F21
+		sql += " , b.\"ContractRate\"                "; // F22
+		sql += " , b.\"PresentRate\"                 "; // F23
+		sql += " , b.\"ProposalRate\"                "; // F24
+		sql += " , b.\"AdjustedRate\"                "; // F25
+		sql += " , b.\"ContrBaseRate\"               "; // F26
+		sql += " , b.\"ContrRateIncr\"               "; // F27
+		sql += " , b.\"IndividualIncr\"              "; // F28
+		sql += " , b.\"BaseRateCode\"                "; // F29
+		sql += " , b.\"RateCode\"                    "; // F30
+		sql += " , b.\"CurrBaseRate\"                "; // F31
+		sql += " , b.\"TxEffectDate\"                "; // F32
+		sql += " , b.\"TxRateAdjFreq\"               "; // F33
+		sql += " , b.\"JsonFields\"                  "; // F34
+		sql += " , cm.\"CustName\"                   "; // F35
+		sql += " , cc.\"CityItem\"                   "; // F36
+		sql += " , ca.\"AreaItem\"                   "; // F37
+		sql += " , b.\"OvduTerm\"                    "; // F38
+		sql += " from \"BatxRateChange\" b                                      ";
 		sql += " left join \"CustMain\" cm on cm.\"CustNo\" = b.\"CustNo\"      ";
 		sql += " left join \"CdCity\" cc  on cc.\"CityCode\" = b.\"CityCode\"   ";
 		sql += " left join \"CdArea\" ca  on ca.\"CityCode\" = b.\"CityCode\"   ";

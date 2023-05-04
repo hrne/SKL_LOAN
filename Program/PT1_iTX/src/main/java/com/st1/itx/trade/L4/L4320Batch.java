@@ -208,7 +208,6 @@ public class L4320Batch extends TradeBuffer {
 			}
 		}
 
-
 		// 更新指標利率檔生效記號
 		if (!iBaseRateCode.trim().isEmpty()) {
 			CdBaseRate tCdBaseRate = new CdBaseRate();
@@ -227,7 +226,7 @@ public class L4320Batch extends TradeBuffer {
 				}
 			}
 		}
-		
+
 		// 更新補貼息利率檔生效記號及商品檔加碼利率
 		if ("02".equals(iBaseRateCode) && iCustType == 0) {
 			updateSubsidyRate(titaVo);
@@ -301,13 +300,13 @@ public class L4320Batch extends TradeBuffer {
 		}
 	}
 
-	private void execute(int iAdjCode, TitaVo titaVo) throws LogicException {
+	private void execute(int iExecCode, TitaVo titaVo) throws LogicException {
 
 //      抓取資料
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 
 		try {
-			fnAllList = l4320BatchServiceImpl.findAll(iAdjCode, titaVo);
+			fnAllList = l4320BatchServiceImpl.findAll(iExecCode, titaVo);
 		} catch (Exception e) {
 			throw new LogicException("E0015", ", " + e.getMessage()); // 檢查錯誤
 		}
@@ -362,7 +361,7 @@ public class L4320Batch extends TradeBuffer {
 					}
 				}
 				/* 設定各項值 */
-				seBatxRateChange(iAdjCode, b, s, titaVo);
+				seBatxRateChange(iExecCode, b, s, titaVo);
 
 				// commit per commitCnt
 				this.processCnt++;
@@ -393,9 +392,9 @@ public class L4320Batch extends TradeBuffer {
 	}
 
 	/* 設定各項值 */
-	private void seBatxRateChange(int iAdjCode, BatxRateChange b, Map<String, String> s, TitaVo titaVo)
+	private void seBatxRateChange(int iExecCode, BatxRateChange b, Map<String, String> s, TitaVo titaVo)
 			throws LogicException {
-		this.info("seBatxRateChange ... iAdjCode=" + iAdjCode);
+		this.info("seBatxRateChange ... iExecCode=" + iExecCode);
 		TempVo tTempVo = new TempVo();
 		// 作業項目
 		b.setTxKind(iTxKind);
@@ -484,16 +483,6 @@ public class L4320Batch extends TradeBuffer {
 		// 目前生效日 = 借戶利率檔生效日
 		b.setPresEffDate(presentEffectDate);
 
-		// 合約利率=生效之指標利率+目前之合約加減碼； 自訂利率 =>0
-		BigDecimal contrBaseRate = BigDecimal.ZERO;
-		BigDecimal contractRate = BigDecimal.ZERO;
-		if (!"99".equals(baseRateCode)) {
-			contrBaseRate = iBaseRate;
-			contractRate = contrBaseRate.add(rateIncr);
-		}
-		b.setContrBaseRate(contrBaseRate);
-		b.setContractRate(contractRate);
-
 		// NextPayIntDate 下次繳息日,下次應繳日
 		int nextPayIntDate = StaticTool.bcToRoc(parse.stringToInteger(s.get("NextPayIntDate")));
 		// MaturityDate 到期日期
@@ -505,12 +494,27 @@ public class L4320Batch extends TradeBuffer {
 		// 主檔下次利率調整日期
 		int nextAdjRateDate = StaticTool.bcToRoc(parse.stringToInteger(s.get("NextAdjRateDate")));
 
+		// 合約利率=生效之指標利率+目前之合約加減碼； 自訂利率 =>0
+		BigDecimal contrBaseRate = BigDecimal.ZERO;
+		BigDecimal contractRate = BigDecimal.ZERO;
+		if (!"99".equals(baseRateCode)) {
+			contrBaseRate = iBaseRate;
+			if (iExecCode == 9) {
+				CdBaseRate tCdBaseRate = cdBaseRateService.baseRateCodeDescFirst("TWD", iBaseRateCode, 0,
+						nextAdjRateDate + 19110000);
+				contrBaseRate = tCdBaseRate.getBaseRate();
+			}
+			contractRate = contrBaseRate.add(rateIncr);
+		}
+		b.setContrBaseRate(contrBaseRate);
+		b.setContractRate(contractRate);
+
 		// 預定下次利率調整日期
 		// 1). 下次調整日月份>=到期日月份，則下次調整日為到期日
 		// 2). 首次利率調整日為月底日取首次利率調整日/本次利率調整日/首撥日/到期日的最大DD的相對日為下次利率調整日
 		int preNextAdjDate = 0;
 		if (iTxKind == 1) {
-			if (iAdjCode == 9 || nextAdjRateDate == maturityDate) {
+			if (nextAdjRateDate == maturityDate) {
 				preNextAdjDate = nextAdjRateDate;
 			} else {
 				// 預定下次利率調整日 = 主檔下次利率調整日期 + 利率調整週期
@@ -559,7 +563,7 @@ public class L4320Batch extends TradeBuffer {
 		b.setPreNextAdjDate(preNextAdjDate);
 
 		// 本次指標利率
-		b.setCurrBaseRate(iBaseRate);
+		b.setCurrBaseRate(contrBaseRate);
 
 		// 調整記號 1.批次自動調整 2.按地區別自動調整 3.人工調整(未調整) 4.批次自動調整(提醒建) 9.上次繳息日大於利率生效日
 		int adjCode = 0;
@@ -596,22 +600,26 @@ public class L4320Batch extends TradeBuffer {
 			// 利率按合約 N && 有地區別， 本次利率 = 目前利率 + 地區別加減碼，依地區別利率上、下限調整，不可超過合約加碼利率
 			// 利率按合約 N && 無地區別， 本次利率 = 本次指標利率 +借戶利率檔個人加碼利率
 			if ("Y".equals(incrFlag)) {
-				rateProp = iBaseRate.add(rateIncr);
+				rateProp = contrBaseRate.add(rateIncr);
 			} else {
-				rateProp = iBaseRate.add(individualIncr);
+				rateProp = contrBaseRate.add(individualIncr);
 			}
 
-			// 定期機動檢核提醒件
-			if (iAdjCode == 9) {
-				// 下次利率調整日小於調整月份列入[檢核提醒件]
-				adjCode = 9;
+			// 定期機動檢核件
+			if (iExecCode == 9) {
+				// 下次利率調整日小於調整月份列入[人工調整]
+				if ("Y".equals(incrFlag)) {
+					adjCode = 3;
+				} else {
+					adjCode = 4;
+				}
 				if (nextAdjRateDate < wkLastMonthDateS && nextAdjRateDate < maturityDate) {
 					warnMsg += ", 下次利率調整日小於調整月份";
 				}
-			} else if (effDateCurt == maturityDate) {
-				// 下次利率調整日為到期日者於整批利率調整時列入[檢核提醒件],不調整利率
+			} else if (effDateCurt / 100  == maturityDate / 100) {
+				// 下次利率調整日為到期日月份者於整批利率調整時列入[到期日提醒件],不調整利率
 				adjCode = 9;
-				warnMsg += ", 下次利率調整日為到期日" + maturityDateX;
+				warnMsg += ", 下次利率調整日為到期日" + maturityDateX + "月份";
 			} else if ("Y".equals(incrFlag)) {
 				adjCode = 1; // 批次自動調整
 			} else if ("".equals(cityCode.trim()) || this.iCustType == 2) {
@@ -673,7 +681,7 @@ public class L4320Batch extends TradeBuffer {
 				tTempVo.putParam("SubsidyRateDiff", subsidyRateDiff);
 				rateIncr = rateIncr.subtract(subsidyRateDiff);
 			}
-			rateProp = iBaseRate.add(rateIncr);
+			rateProp = contrBaseRate.add(rateIncr);
 			// 1.自動調整
 			adjCode = 1;
 			break;
