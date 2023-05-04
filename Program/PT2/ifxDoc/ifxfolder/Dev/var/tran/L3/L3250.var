@@ -58,9 +58,7 @@ HIDE(#what)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,1000];printer.width=[20,150];">
 [
 ["[L3250]                                 暫收款退還沖正（轉換前資料）"],
-["#FdCustNo+借戶戶號",#CustNo,"@@@",#BTN1,#CustNoX],
-["#FdCustId+統一編號",#CustId,"@@@",#BTN2,#CustIdX],
-["#FdApplNo+核准編號",#ApplNo,"@@@",#BTN3,#ApplNoX],
+["#FdCustNo+借戶戶號",#CustNo,"@@@",#CustNoX],
 ["#FdTempReasonCode+暫收帳戶",#TempReasonCodeX],
 ["#FdAcctCode+作業項目",#AcctCodeX],
 ["#FdFacmNo+額度編號",#FacmNo],
@@ -76,16 +74,14 @@ HIDE(#what)
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
-#BTN1=X,15,I,ui:button;value:額度資料查詢;enable:1;tabbable:0;title: L2015 額度明細資料查詢
-#BTN2=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0;title: L1001 顧客明細資料查詢;
-#BTN3=X,15,I,ui:button;value:核准號碼查詢;enable:0;tabbable:0;title: L2016 核准號碼明細資料查詢;
+! #BTN1=X,15,I,ui:button;value:額度資料查詢;enable:1;tabbable:0;title: L2015 額度明細資料查詢
 ! #BTN6=X,15,I,ui:button;value:撥款明細查詢;enable:1;tabbable:0;title: L3002 撥款明細資料查詢
 
 #SetSysPar=X,1,S
 E(0,1)ASGN(AGAIN$)
 
 #BUF1=X,42,S
-HIDE(#BTN1,#BTN2,#BTN3,#what)
+HIDE(#what)
 !---------- AP TEXT AREA Variables ----------
 ! Help
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
@@ -136,6 +132,7 @@ T(3,Y:是;N:否)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
+! IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L3005交易明細資料查詢]進入),$)
 T(2,@RimTxCode,#TXCD)
 E(0,@RimFKey,#FKEY)
 HIDE(#UsTempAmt)
@@ -182,23 +179,15 @@ T(2,@TellerNo,#L3r19TellerNo)
 T(2,@TxtNo,#L3r19TxtNo)
 
 
-#InitFd=X,1,S
-
-#BUF1A=X,30,S
-T(3,00000019999999000)
-
-#BIND1A=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:CustNo<-OOCustNo:CustNoX<-OOCustName})
-
 ![借戶戶號]
 !借戶戶號, 統一編號或核准編號擇一輸入
 #FdCustNo=X,2,L
 
-#CustNo=X,7,I
-SHOW(#BTN1)HIDE(#BTN2,#BTN3)
-CALL(#InitValue)
-@
-HIDE(#BTN1)
+#CustNo=X,7,L
+! SHOW(#BTN1)HIDE(#BTN2,#BTN3)
+! CALL(#InitValue)
+! @
+! HIDE(#BTN1)
 
 #CustNo2=A,7,S
 C(4,#CustNo,S,$)
@@ -218,108 +207,13 @@ T(2,@CustNoX,#L2r07CustName)
 #CustNoX=X,100,L
 C(4,#CustNo,S,$)
 
-#BUF2A=X,100,S
-
-#BIND2A=X,1,S
-BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<-OOCustId:CustIdX<-OOCustName})
-
-![統一編號]
-#FdCustId=X,2,L
-
-#CustId=X,10,I
-T(3,@FdApplNo, )
-C(3,#CHAIN,1,s,$)
-C(4,#CustNo,$,s)
-SHOW(#BTN2)HIDE(#BTN1,#BTN3)
-CALL(#InitValue)
-@
-T(3,#CustIdX,)
-A(ID_UNINO,0,#CustId)
-HIDE(#BTN2)
-
-#BUF2B=X,100,S
-T(2,0000000+#CustId)
-
-#BIND2B=X,1,S
-BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustId<-OOCustId:CustIdX<-OOCustName})
-
-#CheckCustId=X,1,S
-C(4,#CustId,S,$)
-A(ID_UNINO,0,#CustId)
-
-#SendL2r07B=X,1,S
-C(4,#CustId,S,$)
-T(2,@RimCustId,#CustId)
-E(0,@RimCustNo,0)
-RESET_RIM(#SendL2r07B,L2R07)
-S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
-R(1,L2R07)
-T(2,@CustIdX,#L2r07CustName)
-
-#CustIdX=X,100,L
-C(4,#CustId,S,$)
-
 #WkStartDate=D,7,S
 E(0,#SYSDATE)
 
-#BUF3A=X,45,S
-T(2,0000001999999900000000000000          0000000)
-
-#BIND3A=X,1,S
-BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3A;ntxbuf5=type<-1:ApplNo<-OOApplNo:ApplNoX<-OOCustName})
-
-![核准編號]
-#FdApplNo=X,2,L
-C(3,#CHAIN,1,S,$)
-C(4,#CustNo,$,S)
-C(4,#CustId,$,S)
-T(3,*)
-
-#ApplNo=X,7,I
-C(3,#CHAIN,1,s,$)
-C(4,#CustNo,$,S)
-C(4,#CustId,$,S)
-SHOW(#BTN3)HIDE(#BTN1,#BTN2)
-CALL(#InitValue)
-@C(4,#ApplNo,V(P,需擇一輸入),$)
-HIDE(#BTN3)
-
-#ApplNo2=A,7,S
-C(4,#ApplNo,S,$)
-E(0,#ApplNo)
-T(2,@ApplNo,#ApplNo2)
-T(3,#ApplNoX,)
-
-!用核准號碼(ApplNo)調L2R05
-#SendL2r05A=X,1,S
-C(4,#ApplNo,S,$)
-E(0,@RimFuncCode,5)
-E(0,@RimCustNo,0)
-E(0,@RimFacmNo,0)
-E(0,@RimApplNo,#ApplNo)
-E(0,@RimCaseNo,0)
-RESET_RIM(#SendL2r05A,L2R05)
-S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
-R(1,L2R05)
-E(0,@FacmNo,#L2r05FacmNo)
-
-#SendL2r07C=X,1,S
-C(3,#CustNo,0,$,S)C(4,#CustId,$,S)
-T(2,@RimCustId,#L2r05CustId)
-E(0,@RimCustNo,#CustNo)
-RESET_RIM(#SendL2r07C,L2R07)
-S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
-R(1,L2R07)
-T(2,@ApplNoX,#L2r07CustName)
-
-#ApplNoX=X,100,L
-C(4,#ApplNo,S,$)
 
 #TimCustNo=A,7,S
 E(0,0)
 C(4,#CustNo,$,E(0,#CustNo))
-C(4,#CustId,$,E(0,#L2r07CustNo))
-C(4,#ApplNo,$,E(0,#L2r05CustNo))
 T(2,@LockCustNo,#TimCustNo)
 T(2,@RmkCustNo,#TimCustNo)
 ! <include src="COM.icf::LockControl.rtn"/>
@@ -337,37 +231,8 @@ T(3,)T(H,#TempReasonCode,#Temp2ReasonCodeHelp)
 ![作業項目]
 #FdAcctCode=X,2,L
 
-! #BUF8=X,100,S
-! T(2,#TXCD+#TimCustNo)
-
-
-! #BIND8=X,1,S
-! BIND(#BTN8,click, {cmd=CHAIN; ntxcd=L3914; ntxbuf=#BUF8;ntxbuf5=type<-1:
-! CustNo<-OCustNo:
-! AcctCode<-OOAcctCode:
-! AcctCodeX<-OOAcctItem:
-! FacmNoR<-OOFacmNo:
-! FacmNo<-OOFacmNo:
-! RvNo<-OORvNo:
-! EntryDate<-OOEntryDate:
-! AcDate<-OOAcDate:
-! OrgEntdy<-OOAcDate:
-! TwTempAmt<-OOTxAmt:
-! UsTempAmt<-OOTxAmt:
-! TellerNo<-OOTellerNo:
-! ORGTLR<-OOTellerNo:
-! TxtNo<-OOTxtNo:
-! ORGTNO<-OOTxtNo:
-! Description<-OODesc})
-
-
-! #BTN8=X,30,I,ui:button;value:暫收款退還／銷帳資料查詢;enable:1;tabbable:1;backNext:true;title: L3914 暫收款退還／銷帳資料查詢
-
 
 #AcctCode=X,3,S
-! C(4,#AcctCode,V(P,請點選[暫收款退還／銷帳資料查詢]),$)
-! HELP(#AcctCodeHelp,cols:2)
-! @V(H,#AcctCodeHelp)
 
 #AcctCodeX=X,20,L
 T(3,)T(H,#AcctCode,#AcctCodeHelp)
@@ -377,13 +242,9 @@ T(3,)T(H,#AcctCode,#AcctCodeHelp)
 #FdFacmNo=X,2,L
 
 !由L3914帶入的值若為0則必須輸入
-!#FacmNo=A,3,L
 #FacmNoR=A,3,S
 #FacmNo=A,3,L
-! T(2,@FacmNo,#FacmNoR)
-! C(3,#FacmNo,0,T(F,@FacmNo,1),T(F,@FacmNo,0))
-! C(3,#FacmNo,0,$,s)
-! @V(2,0)
+
 
 #MRKEY=_,_,S
 C(3,#FacmNo,0,T(2,#TimCustNo),T(2,#TimCustNo+-+#FacmNo))
@@ -461,13 +322,9 @@ E(0,@OrgEntdy,#AcDate)
 ! <include src="RPDTL.icf::RPCOL.dec"/>
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L2Rim.dec"/>
-<include src="ROM.icf::L2R05.dec"/>
 <include src="ROM.icf::L2R07.dec"/>
 <include src="ROM.icf::L3Rim.dec"/>
-<include src="ROM.icf::L3R02.dec"/>
-<include src="ROM.icf::L3R05.dec"/>
 <include src="ROM.icf::L3R19.dec"/>
-<include src="ROM.icf::L2R08.dec"/>
 </sub>
 !--------- 收付欄 -----------------------
 ! <sub type="DC" name="RPDTL" layout="cols=1;screen.width=[1000];printer.width=[20,80];">
@@ -498,8 +355,7 @@ T(3,[L3250] 暫收款退還沖正（轉換前資料）)
 </sub>
 !------ 上行電文 TEXT ------
 <sub type="TIM">
-
-#TimCustNo#CustId#ApplNo#FacmNo
+#TimCustNo#FacmNo
 #TempReasonCode#AcctCode
 #CurrencyCode
 #TimTempAmt
@@ -522,11 +378,7 @@ TXFORM=L3250^
 
 <include src="COM.icf::TRCTL.tom"/>
 <include src="COM.icf::LockControl.tom"/>
-<include src="ROM.icf::L2R05.tom"/>
 <include src="ROM.icf::L2R07.tom"/>
-<include src="ROM.icf::L2R08.tom"/>
-<include src="ROM.icf::L3R02.tom"/>
-<include src="ROM.icf::L3R05.tom"/>
 <include src="ROM.icf::L3R19.tom"/>
 <include src="PRT.icf::FM101.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>

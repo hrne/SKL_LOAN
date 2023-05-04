@@ -19,7 +19,26 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "ClNoMap" ENABLE PRIMARY KEY';
 
     -- 寫入資料 (擔保品編號新舊對照檔))
-    INSERT INTO "ClNoMap"
+    INSERT INTO "ClNoMap" (
+      "GdrId1"
+      ,"GdrId2"
+      ,"GdrNum"
+      ,"LgtSeq"
+      ,"MainGdrId1"
+      ,"MainGdrId2"
+      ,"MainGdrNum"
+      ,"MainLgtSeq"
+      ,"ClCode1"
+      ,"ClCode2"
+      ,"ClNo"
+      ,"TfStatus"
+      ,"OriCustNo"
+      ,"OriFacmNo"
+      ,"CreateDate"
+      ,"CreateEmpNo"
+      ,"LastUpdate"
+      ,"LastUpdateEmpNo"
+    )
     WITH cData AS (
       SELECT "GroupNo"
            , "SecGroupNo"
@@ -72,6 +91,8 @@ BEGIN
              WHEN S0."HGTMHN" = 0
              THEN 6 -- 6 '未轉入,資料不完整(主建號)'
            ELSE 0 END AS "TfStatus" -- 0 未轉入 其他原因
+          ,APLP.LMSACN                    AS "OriCustNo" -- 原擔保品綁定戶號
+          ,APLP.LMSAPN                    AS "OriFacmNo" -- 原擔保品綁定額度號碼
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
@@ -108,13 +129,35 @@ BEGIN
                               AND S3."LGTSEQ" = S1."MainLGTSEQ"
     LEFT JOIN cData ON cData."GroupNo" = S1."GroupNo"
                    AND cData."SecGroupNo" = S1."SecGroupNo"
+    LEFT JOIN LA$APLP APLP ON APLP.GDRID1 = S0.GDRID1
+                          AND APLP.GDRID2 = S0.GDRID2
+                          AND APLP.GDRNUM = S0.GDRNUM
     WHERE S0."GDRID1" = 1 -- 只抓擔保品代號1 = 1 房地 的擔保品
     ;
 
     -- 記錄寫入筆數
     INS_CNT := INS_CNT + sql%rowcount;
 
-    INSERT INTO "ClNoMap"
+    INSERT INTO "ClNoMap" (
+      "GdrId1"
+      ,"GdrId2"
+      ,"GdrNum"
+      ,"LgtSeq"
+      ,"MainGdrId1"
+      ,"MainGdrId2"
+      ,"MainGdrNum"
+      ,"MainLgtSeq"
+      ,"ClCode1"
+      ,"ClCode2"
+      ,"ClNo"
+      ,"TfStatus"
+      ,"OriCustNo"
+      ,"OriFacmNo"
+      ,"CreateDate"
+      ,"CreateEmpNo"
+      ,"LastUpdate"
+      ,"LastUpdateEmpNo"
+    )
     SELECT S0."GDRID1"                           AS "GdrId1"
           ,S0."GDRID2"                           AS "GdrId2"
           ,S0."GDRNUM"                           AS "GdrNum"
@@ -155,6 +198,8 @@ BEGIN
              WHEN S0."LGTNM1" = 0
              THEN 7 -- 7 '未轉入,資料不完整(地號)'
            ELSE 0 END AS "TfStatus" -- 0 未轉入
+          ,APLP.LMSACN                    AS "OriCustNo" -- 原擔保品綁定戶號
+          ,APLP.LMSAPN                    AS "OriFacmNo" -- 原擔保品綁定額度號碼
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
@@ -189,13 +234,35 @@ BEGIN
                               AND S3."GDRID2" = S1."MainGDRID2"
                               AND S3."GDRNUM" = S1."MainGDRNUM"
                               AND S3."LGTSEQ" = S1."MainLGTSEQ"
+    LEFT JOIN LA$APLP APLP ON APLP.GDRID1 = S0.GDRID1
+                          AND APLP.GDRID2 = S0.GDRID2
+                          AND APLP.GDRNUM = S0.GDRNUM
     WHERE S0."GDRID1" = 2 -- 只抓擔保品代號1 = 2 土地 的擔保品
     ;
 
     -- 記錄寫入筆數
     INS_CNT := INS_CNT + sql%rowcount;
 
-    INSERT INTO "ClNoMap"
+    INSERT INTO "ClNoMap" (
+      "GdrId1"
+      ,"GdrId2"
+      ,"GdrNum"
+      ,"LgtSeq"
+      ,"MainGdrId1"
+      ,"MainGdrId2"
+      ,"MainGdrNum"
+      ,"MainLgtSeq"
+      ,"ClCode1"
+      ,"ClCode2"
+      ,"ClNo"
+      ,"TfStatus"
+      ,"OriCustNo"
+      ,"OriFacmNo"
+      ,"CreateDate"
+      ,"CreateEmpNo"
+      ,"LastUpdate"
+      ,"LastUpdateEmpNo"
+    )
     SELECT S0."GDRID1"                           AS "GdrId1"
           ,S0."GDRID2"                           AS "GdrId2"
           ,S0."GDRNUM"                           AS "GdrNum"
@@ -220,6 +287,8 @@ BEGIN
              WHEN S2."ClNo" IS NOT NULL 
              THEN 3 -- 3 單筆擔保品直接轉入
            ELSE 0 END AS "TfStatus" -- 0 未轉入
+          ,APLP.LMSACN                    AS "OriCustNo" -- 原擔保品綁定戶號
+          ,APLP.LMSAPN                    AS "OriFacmNo" -- 原擔保品綁定額度號碼
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
@@ -229,13 +298,35 @@ BEGIN
     LEFT JOIN "ClNoMapping" S2 ON S2."GDRID1" = S0."GDRID1"
                               AND S2."GDRID2" = S0."GDRID2"
                               AND S2."GDRNUM" = S0."GDRNUM"
+    LEFT JOIN LA$APLP APLP ON APLP.GDRID1 = S0.GDRID1
+                          AND APLP.GDRID2 = S0.GDRID2
+                          AND APLP.GDRNUM = S0.GDRNUM
     WHERE S0."GDRID1" = 9 -- 只抓擔保品代號1 = 9 動產 的擔保品
     ;
 
     -- 記錄寫入筆數
     INS_CNT := INS_CNT + sql%rowcount;
 
-    INSERT INTO "ClNoMap"
+    INSERT INTO "ClNoMap" (
+      "GdrId1"
+      ,"GdrId2"
+      ,"GdrNum"
+      ,"LgtSeq"
+      ,"MainGdrId1"
+      ,"MainGdrId2"
+      ,"MainGdrNum"
+      ,"MainLgtSeq"
+      ,"ClCode1"
+      ,"ClCode2"
+      ,"ClNo"
+      ,"TfStatus"
+      ,"OriCustNo"
+      ,"OriFacmNo"
+      ,"CreateDate"
+      ,"CreateEmpNo"
+      ,"LastUpdate"
+      ,"LastUpdateEmpNo"
+    )
     SELECT S0."GDRID1"                           AS "GdrId1"
           ,S0."GDRID2"                           AS "GdrId2"
           ,S0."GDRNUM"                           AS "GdrNum"
@@ -260,6 +351,8 @@ BEGIN
              WHEN S2."ClNo" IS NOT NULL 
              THEN 3 -- 3 單筆擔保品直接轉入
            ELSE 0 END AS "TfStatus" -- 0 未轉入
+          ,APLP.LMSACN                    AS "OriCustNo" -- 原擔保品綁定戶號
+          ,APLP.LMSAPN                    AS "OriFacmNo" -- 原擔保品綁定額度號碼
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
@@ -269,13 +362,35 @@ BEGIN
     LEFT JOIN "ClNoMapping" S2 ON S2."GDRID1" = S0."GDRID1"
                               AND S2."GDRID2" = S0."GDRID2"
                               AND S2."GDRNUM" = S0."GDRNUM"
+    LEFT JOIN LA$APLP APLP ON APLP.GDRID1 = S0.GDRID1
+                          AND APLP.GDRID2 = S0.GDRID2
+                          AND APLP.GDRNUM = S0.GDRNUM
     WHERE S0."GDRID1" IN (3,4) -- 只抓擔保品代號1 = 3 or 4 股票 的擔保品
     ;
 
     -- 記錄寫入筆數
     INS_CNT := INS_CNT + sql%rowcount;
 
-    INSERT INTO "ClNoMap"
+    INSERT INTO "ClNoMap" (
+      "GdrId1"
+      ,"GdrId2"
+      ,"GdrNum"
+      ,"LgtSeq"
+      ,"MainGdrId1"
+      ,"MainGdrId2"
+      ,"MainGdrNum"
+      ,"MainLgtSeq"
+      ,"ClCode1"
+      ,"ClCode2"
+      ,"ClNo"
+      ,"TfStatus"
+      ,"OriCustNo"
+      ,"OriFacmNo"
+      ,"CreateDate"
+      ,"CreateEmpNo"
+      ,"LastUpdate"
+      ,"LastUpdateEmpNo"
+    )
     SELECT S0."GDRID1"                           AS "GdrId1"
           ,S0."GDRID2"                           AS "GdrId2"
           ,S0."GDRNUM"                           AS "GdrNum"
@@ -300,6 +415,8 @@ BEGIN
              WHEN S2."ClNo" IS NOT NULL 
              THEN 3 -- 3 單筆擔保品直接轉入
            ELSE 0 END AS "TfStatus" -- 0 未轉入
+          ,APLP.LMSACN                    AS "OriCustNo" -- 原擔保品綁定戶號
+          ,APLP.LMSAPN                    AS "OriFacmNo" -- 原擔保品綁定額度號碼
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
@@ -309,6 +426,9 @@ BEGIN
     LEFT JOIN "ClNoMapping" S2 ON S2."GDRID1" = S0."GDRID1"
                               AND S2."GDRID2" = S0."GDRID2"
                               AND S2."GDRNUM" = S0."GDRNUM"
+    LEFT JOIN LA$APLP APLP ON APLP.GDRID1 = S0.GDRID1
+                          AND APLP.GDRID2 = S0.GDRID2
+                          AND APLP.GDRNUM = S0.GDRNUM
     WHERE S0."GDRID1" = 5-- 只抓擔保品代號1 = 5 其他 的擔保品
     ;
 

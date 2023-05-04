@@ -150,6 +150,9 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   ,l.\"TmpAmt\"              ";
 		sql += "   ,ROW_NUMBER() OVER (Partition By l.\"CustNo\"              ";
 		sql += "                                   ,CASE WHEN l.\"TxKind\" = 1 AND l.\"TmpAmt\" > 0 THEN 2 ELSE l.\"TxKind\" END ";
+		sql += "                                   ,CASE WHEN l.\"TxKind\" = 1 AND l.\"TmpAmt\" = 0 THEN l.\"AcDate\" ELSE 0 END ";
+		sql += "                                   ,CASE WHEN l.\"TxKind\" = 1 AND l.\"TmpAmt\" = 0 THEN l.\"TitaTlrNo\" ELSE ' ' END ";
+		sql += "                                   ,CASE WHEN l.\"TxKind\" = 1 AND l.\"TmpAmt\" = 0 THEN l.\"TitaTxtNo\" ELSE ' ' END ";
 		sql += "    	                   	   ORDER BY l.\"AcDate\" Desc 							               ";
 		sql += "		                               ,l.\"TitaCalDy\" Desc	                       ";
 		sql += "	                                   ,l.\"TitaCalTm\"	Desc                             ";
@@ -212,6 +215,7 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  ,CASE WHEN ln3.\"TxDescCode\" = 'Fee' AND ln3.\"TitaTxCd\" = 'L3210' THEN '暫收銷'  ||  cdf.\"Item\" 	 ";
 		sql += "        WHEN ln3.\"TxDescCode\" = 'Fee' AND ln3.\"TitaTxCd\" = 'L3230' THEN '暫收退'  ||  cdf.\"Item\" 	 ";
 		sql += "        WHEN ln3.\"TxDescCode\" = 'Fee' THEN cdf.\"Item\"                                            ";
+		sql += "        WHEN ln3.\"AcctCode\" = 'TAV' THEN REPLACE(NVL(cdt.\"Item\",ln3.\"Desc\"),'債協','一般債權') 	 ";
 		sql += "        ELSE NVL(cdt.\"Item\",ln3.\"Desc\")  	    	                                             ";
 		sql += "        END                     AS \"TxDescCodeX\"	                                                 ";
 		sql += "  ,ln2.\"TotTxAmt\"												  			";

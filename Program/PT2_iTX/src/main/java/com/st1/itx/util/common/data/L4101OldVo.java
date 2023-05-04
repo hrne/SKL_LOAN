@@ -125,7 +125,7 @@ public class L4101OldVo extends FileVo {
 				thisLine += "　　　　　　　　　　　　　　　　　　　" + "  ";// 附言(19全形+2半形)
 				thisLine += "               ";// 空白(15個半形空白)
 				thisLine += "00174";// 單位代號
-				thisLine += (Integer.valueOf(1110503) + 19110000);// 匯款日期
+				thisLine += (Integer.valueOf(t.getAcDate()) + 19110000);// 匯款日期
 				thisLine += "01  ";// 批號
 			} catch (LogicException e) {
 		

@@ -158,33 +158,6 @@ public class L3250 extends TradeBuffer {
 		if (wkFacmNo == 0) {
 			wkFacmNo = baTxCom.getOverRpFacmNo();
 		}
-		// 溢收金額
-		for (BaTxVo ba : this.baTxList) {
-			if (ba.getDataKind() == 3 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
-				BigDecimal acctAmt = BigDecimal.ZERO;
-				if (wkOverAmt.compareTo(ba.getAcctAmt()) > 0) {
-					acctAmt = ba.getAcctAmt();
-					wkOverAmt = wkOverAmt.subtract(ba.getAcctAmt());
-				} else {
-					acctAmt = wkOverAmt;
-					wkOverAmt = BigDecimal.ZERO;
-				}
-				if (acctAmt.compareTo(BigDecimal.ZERO) > 0) {
-					AcDetail acDetail = new AcDetail();
-					acDetail.setDbCr("D");
-					acDetail.setAcctCode(ba.getAcctCode());
-					acDetail.setSumNo("090");
-					acDetail.setTxAmt(acctAmt);
-					acDetail.setCustNo(ba.getCustNo());
-					acDetail.setFacmNo(ba.getFacmNo());
-					acDetail.setBormNo(ba.getBormNo());
-					acDetail.setRvNo(ba.getRvNo());
-					acDetail.setReceivableFlag(ba.getReceivableFlag());
-					this.lAcDetail.add(acDetail);
-					this.info("settleTempAmt ba " + acDetail.toString());
-				}
-			}
-		}
 		titaVo.putParam("RpCode1", wkRepayCode);
 		titaVo.putParam("RpAmt1", wkTxAmt);
 		titaVo.putParam("RpCustNo1", iCustNo);
@@ -196,136 +169,15 @@ public class L3250 extends TradeBuffer {
 				titaVo.getOrgKin() + titaVo.getOrgTlr() + titaVo.getOrgTno(), 0, Integer.MAX_VALUE, titaVo); // findByTxseq
 		if (slAcList != null) {
 			for (AcDetail ac : slAcList.getContent()) {
-				if ("D".equals(ac.getDbCr())) {
-					acDetail = new AcDetail();
-					acDetail.setDbCr("C");
-					acDetail.setAcctCode(ac.getAcctCode());
-					acDetail.setCustNo(iCustNo);
-					acDetail.setFacmNo(0);
-					acDetail.setTxAmt(ac.getTxAmt());
-					String sumNo = "";
-					String rvNo = "";
-					if ("P03".equals(ac.getAcctCode()) || "C01".equals(ac.getAcctCode())
-							|| "P01".equals(ac.getAcctCode())) {
-						if ("P03".equals(ac.getAcctCode())) {
-							sumNo = "101";
-						} else {
-							sumNo = "102";
-						}
-						if ("C01".equals(ac.getAcctCode())) {
-							rvNo = "0010060" + titaVo.getOrgEntdyI();
-						}
-					}
-					if ("TAV".equals(ac.getAcctCode())) {
-						sumNo = "090";
-						acDetail.setFacmNo(wkFacmNo);
-					}
-					acDetail.setSumNo(sumNo);
-					acDetail.setRvNo(rvNo);
-					lAcDetail.add(acDetail);
+				if ("C".equals(ac.getDbCr())) {
+					addAcDetail(ac);
 				}
 			}
-		}
-
-		if (slAcList != null) {
 			for (AcDetail ac : slAcList.getContent()) {
 				if ("D".equals(ac.getDbCr())) {
-					if ("P03".equals(ac.getAcctCode()) || "C01".equals(ac.getAcctCode())
-							|| "P01".equals(ac.getAcctCode()) || "TEM".equals(ac.getAcctCode())
-							|| "TCK".equals(ac.getAcctCode())) {
-						String sumNo = "";
-						sumNo = "10" + wkRepayCode;
-						String rvNo = "";
-						if ("C01".equals(ac.getAcctCode())) {
-							rvNo = "0010060" + titaVo.getOrgEntdyI();
-						}
-						acDetail = new AcDetail();
-						acDetail.setDbCr("C");
-						acDetail.setAcctCode(ac.getAcctCode());
-						acDetail.setSumNo(sumNo);
-						acDetail.setTxAmt(ac.getTxAmt());
-						acDetail.setCustNo(iCustNo);
-						acDetail.setFacmNo(0);
-						lAcDetail.add(acDetail);
-						acDetail.setRvNo(rvNo);
-						lAcDetail.add(acDetail);
-					}
+					addAcDetail(ac);
 				}
 			}
-		}
-
-		// 暫收款銷帳(費用科目)
-		if (!iAcctCode.isEmpty()) {
-			acDetail = new AcDetail();
-			acDetail.setDbCr("D");
-			acDetail.setAcctCode(iAcctCode);
-			acDetail.setTxAmt(iTempAmt);
-			acDetail.setCustNo(iCustNo);
-			acDetail.setFacmNo(iFacmNo);
-			acDetail.setRvNo(iRvNo);
-			switch (iAcctCode) {
-			case "TMI": // TMI 暫收款－火險保費
-			case "F25": // F25 催收款項－火險費用
-				checkInsuRenew(acDetail, titaVo);
-				break;
-			case "F07": // F07 暫付法務費
-			case "F24": // F24 催收款項－法務費用
-				acDetail.setReceivableFlag(2);
-				checkForeclosureFee(acDetail, titaVo);
-				break;
-			case "F10": // 10.沖帳管費/手續費
-			case "F12": // 12.聯貸件
-			case "F27": // 27.聯貸管理費
-			case "F29": // 29.貸後契變手續費
-			case "F30": // 30.沖呆帳戶法務費墊付
-				acDetail.setReceivableFlag(3);
-				lAcDetail.add(acDetail);
-				break;
-			default:
-				lAcDetail.add(acDetail);
-				// F08 收回呆帳及過期帳
-				if ("F08".equals(iAcctCode)) {
-					UpdLoanOverDueEraseRoutine();
-				}
-			}
-		} else {
-			AcDetail acDetail = new AcDetail();
-			acDetail.setDbCr("C");
-			acDetail.setAcctCode("TAV");
-			acDetail.setTxAmt(iTempAmt);
-			acDetail.setCustNo(iCustNo);
-			acDetail.setFacmNo(wkFacmNo);
-			acDetail.setBormNo(0);
-			acDetail.setSumNo("092"); // 暫收轉帳
-			this.lAcDetail.add(acDetail);
-		}
-
-		BigDecimal wkOverflow = BigDecimal.ZERO;
-
-		// 借貸差
-		for (AcDetail ac : this.lAcDetail) {
-			if ("D".equals(ac.getDbCr())) {
-				wkOverflow = wkOverflow.add(ac.getTxAmt());
-			} else {
-				wkOverflow = wkOverflow.subtract((ac.getTxAmt()));
-			}
-		}
-
-		if (wkOverflow.compareTo(BigDecimal.ZERO) != 0) {
-			AcDetail acDetail = new AcDetail();
-			if (wkOverflow.compareTo(BigDecimal.ZERO) > 0) {
-				acDetail.setDbCr("C");
-				acDetail.setTxAmt(wkOverflow);
-			} else {
-				acDetail.setDbCr("D");
-				acDetail.setTxAmt(BigDecimal.ZERO.subtract(wkOverflow));
-			}
-			acDetail.setAcctCode("TAV");
-			acDetail.setCustNo(iCustNo);
-			acDetail.setFacmNo(wkFacmNo);
-			acDetail.setBormNo(0);
-			acDetail.setSumNo("092"); // 暫收轉帳
-			this.lAcDetail.add(acDetail);
 		}
 
 		// 產生會計分錄
@@ -341,6 +193,58 @@ public class L3250 extends TradeBuffer {
 		if (titaVo.isHcodeErase()) {
 			throw new LogicException(titaVo, "E0010", "本交易不可訂正"); // 功能選擇錯誤
 		}
+	}
+
+	private void addAcDetail(AcDetail ac) throws LogicException {
+		acDetail = new AcDetail();
+		if ("D".equals(ac.getDbCr())) {
+			acDetail.setDbCr("C");
+		} else {
+			acDetail.setDbCr("D");
+		}
+		acDetail.setAcctCode(ac.getAcctCode());
+		acDetail.setCustNo(iCustNo);
+		acDetail.setFacmNo(0);
+		acDetail.setTxAmt(ac.getTxAmt());
+		String sumNo = "";
+		String rvNo = "";
+		if ("P03".equals(ac.getAcctCode()) || "C01".equals(ac.getAcctCode()) || "P01".equals(ac.getAcctCode())) {
+			if ("P03".equals(ac.getAcctCode())) {
+				sumNo = "101";
+			} else {
+				sumNo = "102";
+			}
+			if ("C01".equals(ac.getAcctCode())) {
+				rvNo = "0010060" + titaVo.getOrgEntdyI();
+			}
+		}
+		if ("TAV".equals(ac.getAcctCode())) {
+			sumNo = "090";
+			acDetail.setFacmNo(wkFacmNo);
+		}
+		acDetail.setSumNo(sumNo);
+		acDetail.setRvNo(rvNo);
+		switch (ac.getAcctCode()) {
+		case "TMI": // TMI 暫收款－火險保費
+		case "F25": // F25 催收款項－火險費用
+			checkInsuRenew(acDetail, titaVo);
+			break;
+		case "F07": // F07 暫付法務費
+		case "F24": // F24 催收款項－法務費用
+			acDetail.setReceivableFlag(2);
+			checkForeclosureFee(acDetail, titaVo);
+			break;
+		case "F10": // 10.沖帳管費/手續費
+		case "F12": // 12.聯貸件
+		case "F27": // 27.聯貸管理費
+		case "F29": // 29.貸後契變手續費
+		case "F30": // 30.沖呆帳戶法務費墊付
+			acDetail.setReceivableFlag(3);
+			break;
+		case "F08": // 30.沖呆帳戶法務費墊付
+			UpdLoanOverDueEraseRoutine();
+		}
+		lAcDetail.add(acDetail);
 	}
 
 	// 沖正處理

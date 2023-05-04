@@ -1156,7 +1156,7 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	}
 
 	public boolean isFuncindInquire() {
-		return this.get(ContentName.funcind) != null && this.get(ContentName.funcind).trim().equals("5");
+		return this.get(ContentName.funcind) != null && (this.get(ContentName.funcind).trim().equals("0") || this.get(ContentName.funcind).trim().equals("5"));
 	}
 
 	/**

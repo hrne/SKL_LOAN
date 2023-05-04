@@ -72,7 +72,7 @@ BEGIN
                   THEN 1 -- 多筆擔保品且為主要擔保品時，轉入 
                   WHEN S2."TfFg" IS NOT NULL 
                   THEN 0 -- 多筆擔保品但非為主要擔保品時，不轉入 
-                ELSE 0 END  -- 其餘皆不轉 
+                ELSE 1 END  -- 其餘皆轉 
                 = 1 
             AND S1."GDRID1" = '1' -- 只撈建物 
           UNION 

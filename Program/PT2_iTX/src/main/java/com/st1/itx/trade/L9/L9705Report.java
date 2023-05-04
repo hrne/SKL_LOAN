@@ -395,7 +395,6 @@ public class L9705Report extends MakeReport {
 			return;
 		}
 
-
 		// 帳管費 + 契變手續費(只有第一期需扣)
 		acctFee = c + 1 == 1 ? dBaTxCom.getAcctFee().add(dBaTxCom.getModifyFee()) : BigDecimal.ZERO;
 
@@ -481,6 +480,9 @@ public class L9705Report extends MakeReport {
 		BigDecimal BreachAmt = BigDecimal.ZERO;
 		BigDecimal UnPaidAmt = BigDecimal.ZERO;
 		BigDecimal LoanBal = BigDecimal.ZERO;
+		BigDecimal tmpTotalBreachAmt = BigDecimal.ZERO;
+		BigDecimal tmpLastBreachAmt = BigDecimal.ZERO;
+		String tDate = "";
 		int tmpCount = 0;
 
 		for (BaTxVo baTxVo : listBaTxVo) {
@@ -508,7 +510,7 @@ public class L9705Report extends MakeReport {
 			// 未還本金餘額
 			LoanBal = baTxVo.getLoanBalPaid();
 
-			//只有第一期要加溢短繳
+			// 只有第一期要加溢短繳
 			if (tmpCount > 1) {
 				UnPaidAmt = BreachAmt.add(Principal).add(Interest).add(acctFee);
 			} else {
@@ -547,6 +549,18 @@ public class L9705Report extends MakeReport {
 			printCm(1, y, tempDate.substring(0, 3) + "/" + tempDate.substring(3, 5) + "/" + tempDate.substring(5, 7));
 			// 違約金
 			printCm(4.5, y, df1.format(BreachAmt), "R");
+
+			// 都沒有違約金的時候 不需要印
+			tmpTotalBreachAmt = tmpTotalBreachAmt.add(BreachAmt);
+
+			// 上一筆大於這一筆且這一筆為0 就要重新紀錄日期
+			if (tmpLastBreachAmt.compareTo(BreachAmt) == 1 && BreachAmt.compareTo(BigDecimal.ZERO) == 0) {
+				tDate = tempDate;
+			}
+
+			// 判斷完在記錄上一筆
+			tmpLastBreachAmt = BreachAmt;
+
 			// 本金
 			printCm(7, y, df1.format(Principal), "R");
 			// 利息
@@ -571,9 +585,13 @@ public class L9705Report extends MakeReport {
 			this.printCm(1, y, "　　重要資訊有異動時，敬請洽詢公司服務人員或客戶服務部（０８００—０３１１１５）辦理變更。");
 		}
 
-		y = top + yy + (++l) * h;
 		printCm(1, y, "＊＊舊繳息通知單作廢（以最新製發日期為準）。");
 
+		if (tmpTotalBreachAmt.compareTo(BigDecimal.ZERO) != 0) {
+			y = top + yy + (++l) * h;
+			printCm(1, y, "＊＊註：違約金暫計到" + this.showRocDate(tDate, 0) + "，若提前或延後繳款，請電話查詢　該違約金額。");
+
+		}
 		// 滯繳通知單
 //					this.print(1, 8,
 //							"＊＊註：違約金暫計到" + transRocChinese(titaVo.getParam("EntryDate")) + "，若提前或延後繳款，請電話查詢　該違約金額");

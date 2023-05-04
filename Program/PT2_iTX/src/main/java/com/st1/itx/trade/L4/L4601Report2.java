@@ -72,7 +72,7 @@ public class L4601Report2 extends MakeReport {
 
 	String fileName = "LN5811P.csv";
 
-	private static final String fileHeader = "到期年月,戶號,額度,姓名,押品,序號,保單號碼,提供人,保險起日,保險迄日,火險保額,地震險保額,坪數(含建築物、公設等),建議火險保額 (e-loan),備註, 險種註記";
+	private static final String fileHeader = "到期年月,戶號,額度,姓名,押品,押品序號,保單號碼,提供人,保險起日,保險迄日,火險保額,地震險保額,坪數(含建築物、公設等),建議火險保額 (e-loan),備註, 險種註記";
 
 	public void exec(TitaVo titaVo) throws LogicException {
 

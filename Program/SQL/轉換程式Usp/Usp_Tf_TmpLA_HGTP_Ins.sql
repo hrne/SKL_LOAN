@@ -71,12 +71,6 @@ BEGIN
            , HG.HGTCIP
            , HG.UPDATE_IDENT
       FROM "LA$HGTP" HG
-      LEFT JOIN LA$APLP APLP ON APLP.GDRID1 = HG.GDRID1
-                            AND APLP.GDRID2 = HG.GDRID2
-                            AND APLP.GDRNUM = HG.GDRNUM
-      WHERE HG.LGTADR IS NOT NULL -- 地址非空,空白地址由下一段程式處理
-        AND NVL(HG.HGTMHN,0) != 0 -- 主建號
-        AND NVL(APLP.LMSACN,0) != 0 -- 已跟額度綁定
     )
     , DistinctData AS (
       SELECT S5.CUSENT
@@ -130,6 +124,21 @@ BEGIN
                     LPAD(S2.GDRID2,2,'0') ||
                     LPAD(S2.GDRNUM,7,'0') ||
                     LPAD(S2.LGTSEQ,2,'0')
+               WHEN NVL(S2.LGTADR,' ') = ' ' -- 地址為空 2023-05-04 Wei 增加: 新壽每筆資料都很重要 地址為空要照轉
+               THEN LPAD(S2.GDRID1,1,'0') ||
+                    LPAD(S2.GDRID2,2,'0') ||
+                    LPAD(S2.GDRNUM,7,'0') ||
+                    LPAD(S2.LGTSEQ,2,'0')
+               WHEN NVL(S2.HGTMHN,0) = 0 -- 建號為0 2023-05-04 Wei 增加: 新壽每筆資料都很重要 建號為0要照轉
+               THEN LPAD(S2.GDRID1,1,'0') ||
+                    LPAD(S2.GDRID2,2,'0') ||
+                    LPAD(S2.GDRNUM,7,'0') ||
+                    LPAD(S2.LGTSEQ,2,'0')
+               WHEN NVL(S3.LMSACN,0) = 0 -- 戶號為0 2023-05-04 Wei 增加: 新壽每筆資料都很重要 戶號為0要照轉
+               THEN LPAD(S2.GDRID1,1,'0') ||
+                    LPAD(S2.GDRID2,2,'0') ||
+                    LPAD(S2.GDRNUM,7,'0') ||
+                    LPAD(S2.LGTSEQ,2,'0')
              ELSE '0' END AS "ProcessUniqueFlag" -- 是否經過唯一性處理記號 0:要經過;else:不經過
       FROM HGData S2
       LEFT JOIN LA$APLP S3 ON S3.GDRID1 = S2.GDRID1
@@ -138,14 +147,13 @@ BEGIN
       LEFT JOIN LBL S4 ON S4.LMSACN = S3.LMSACN
                       AND S4.LMSAPN = S3.LMSAPN
       LEFT JOIN CU$CUSP S5 on S5.LMSACN = S3.LMSACN
-      WHERE NVL(S3.LMSACN,0) != 0
-        AND S2.GDRID1 = 1
+      WHERE S2.GDRID1 = 1
     )
     SELECT DENSE_RANK() 
            OVER (
-            ORDER BY S1.LMSACN
-                   , S1.HGTAD1
-                   , S1.HGTAD2
+            ORDER BY NVL(S1.LMSACN,0)
+                   , NVL(S1.HGTAD1,' ')
+                   , NVL(S1.HGTAD2,' ')
                    , S1."ProcessUniqueFlag" -- 2023-04-27 Wei 修改 from SKL 佳怡 email SKL-會議記錄-首撥表相關-20230426
            ) AS "GroupNo"
           ,0 AS "SecGroupNo"
@@ -198,60 +206,15 @@ BEGIN
 
     -- 記錄寫入筆數
     INS_CNT := INS_CNT + sql%rowcount;
-
-    -- 寫入資料
-    -- 2021-10-06 智偉增加此段
-    -- 理由: 新壽原本就有要求地址為Null的資料照轉
-    INSERT INTO "TmpLA$HGTP"
-    WITH "GetGroupNoMax" AS (
-      SELECT MAX("GroupNo") AS "Value"
-      FROM "TmpLA$HGTP"
-    )
-    SELECT M."Value" +
-           DENSE_RANK() OVER (ORDER BY S1."LMSACN" -- 戶號
-                                      ,S1."HGTAD1"
-                                      ,S1."HGTAD2"
-                                      ,S1.GDRID1
-                                      ,S1.GDRID2
-                                      ,S1.GDRNUM
-                                      ,S1.LGTSEQ
-                                    ) AS "GroupNo"
-         , 0 AS "SecGroupNo"
-         , S1.*
-    FROM ( SELECT DISTINCT
-                  S5.CUSENT
-                 ,S3.LMSACN
-                 ,S3.LMSAPN
-                 ,NVL(S4."LoanBalTotal",0) AS "LoanBalTotal"
-                 ,S1.*
-           FROM "LA$HGTP" S1
-           LEFT JOIN LA$APLP S3 ON S3.GDRID1 = S1.GDRID1
-                               AND S3.GDRID2 = S1.GDRID2
-                               AND S3.GDRNUM = S1.GDRNUM
-           LEFT JOIN (SELECT LMSACN
-                            ,LMSAPN
-                            ,SUM(LMSLBL) AS "LoanBalTotal"
-                      FROM LA$LMSP
-                      WHERE LMSLBL != 0
-                      GROUP BY LMSACN
-                              ,LMSAPN
-                     ) S4 ON S4.LMSACN = S3.LMSACN
-                         AND S4.LMSAPN = S3.LMSAPN
-           LEFT JOIN CU$CUSP S5 on S5.LMSACN = S3.LMSACN
-           WHERE NVL(S3.LMSACN,0) != 0
-             AND S1.GDRID1 = 1
-             AND NVL(S1.LGTADR,' ') = ' '
-         ) S1
-        , "GetGroupNoMax" M
-    ;
-
-    -- 記錄寫入筆數
-    INS_CNT := INS_CNT + sql%rowcount;
     
     /* 更新組別子號 */
     MERGE INTO "TmpLA$HGTP" T1
     USING (SELECT S1."GroupNo"
-                 ,dense_rank() over (partition by S1."GroupNo" order by S1.hgtmhn)  AS "SecGroupNo"
+                 ,DENSE_RANK()
+                  OVER (
+                    PARTITION BY S1."GroupNo"
+                    ORDER BY NVL(S1.hgtmhn,0)
+                  )  AS "SecGroupNo"
                  ,S1.LMSACN
                  ,S1.LMSAPN
                  ,S1.GDRID1

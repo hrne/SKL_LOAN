@@ -196,7 +196,7 @@ public class L4602Report extends MakeReport {
 		width.add(12);
 		colName.add("戶名");
 		width.add(30);
-		colName.add("連絡電話");
+		colName.add("聯絡電話");
 		width.add(30);
 		colName.add("保險起日");
 		width.add(15);

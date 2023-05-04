@@ -41,36 +41,36 @@ BEGIN
           ,S1."GDRNUM"
           ,S1."LGTSEQ"
     FROM "TmpLA$HGTP" S1
-    LEFT JOIN (SELECT  "GroupNo"
-                     , "SecGroupNo"
+    LEFT JOIN (SELECT  HGTP."GroupNo"
+                     , HGTP."SecGroupNo"
                      , ROW_NUMBER ()
                        OVER (
-                           PARTITION BY "GroupNo"
-                                      , "SecGroupNo"
-                           ORDER BY "LMSACN" -- 2022-03-10 Wei
+                           PARTITION BY HGTP."GroupNo"
+                                      , HGTP."SecGroupNo"
+                           ORDER BY HGTP."LMSACN" -- 2022-03-10 Wei
                                   , CASE
-                                      WHEN "LoanBalTotal" != 0
+                                      WHEN HGTP."LoanBalTotal" != 0
                                       THEN 0
                                     ELSE 1 END -- 2022-06-13 Wei 未結案者優先
-                                  , "GRTSTS" DESC -- 2022-05-06 Wei 有設定擔保者優先
+                                  , HGTP."GRTSTS" DESC -- 2022-05-06 Wei 有設定擔保者優先
                                   , CASE
-                                      WHEN "LGTSAM" != 0
+                                      WHEN HGTP."LGTSAM" != 0
                                       THEN 0
                                     ELSE 1 END -- 2022-10-31 Wei 原本已設定金額大小反序，現在僅比較設定金額有值及無值 
                                   , CASE
                                       WHEN GDTP.ESTVAL != 0
                                       THEN 0
                                     ELSE 1 END -- 2023-04-20 Wei 鑑價總值有值優先
-                                  , "LMSAPN" DESC -- 2022-03-10 Wei
-                                  , "GDRID1"
-                                  , "GDRID2"
-                                  , "GDRNUM" DESC -- 2022-03-10 Wei
-                                  , "LGTSEQ"
+                                  , HGTP."LMSAPN" DESC -- 2022-03-10 Wei
+                                  , HGTP."GDRID1"
+                                  , HGTP."GDRID2"
+                                  , HGTP."GDRNUM" DESC -- 2022-03-10 Wei
+                                  , HGTP."LGTSEQ"
                        ) AS "Seq"
-                     , "GDRID1"
-                     , "GDRID2"
-                     , "GDRNUM"
-                     , "LGTSEQ"
+                     , HGTP."GDRID1"
+                     , HGTP."GDRID2"
+                     , HGTP."GDRNUM"
+                     , HGTP."LGTSEQ"
                FROM "TmpLA$HGTP" HGTP
                LEFT JOIN GDTP ON GDTP.GDRID1 = HGTP.GDRID1
                              AND GDTP.GDRID2 = HGTP.GDRID2
