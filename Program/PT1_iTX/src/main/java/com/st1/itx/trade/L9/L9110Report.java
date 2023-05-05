@@ -165,6 +165,7 @@ public class L9110Report extends MakeReport {
 		List<Map<String, String>> listClQuery = null;
 		List<Map<String, String>> listLandQuery = null;
 		List<Map<String, String>> listBuildingQuery = null;
+		List<Map<String, String>> listBuildingLandQuery = null;
 		List<Map<String, String>> listInsuQuery = null;
 		List<Map<String, String>> listStockQuery = null;
 
@@ -182,6 +183,7 @@ public class L9110Report extends MakeReport {
 			listClQuery = l9110ServiceImpl.queryCl(titaVo, thisApplNo);
 			listLandQuery = l9110ServiceImpl.queryLand(titaVo, thisApplNo);
 			listBuildingQuery = l9110ServiceImpl.queryBuilding(titaVo, thisApplNo);
+			listBuildingLandQuery = l9110ServiceImpl.queryBuildingLand(titaVo, thisApplNo);
 			listInsuQuery = l9110ServiceImpl.queryInsu(titaVo, thisApplNo);
 			listStockQuery = l9110ServiceImpl.queryStock(titaVo, thisApplNo);
 
@@ -396,15 +398,21 @@ public class L9110Report extends MakeReport {
 					this.print(0, 69, "他項存續期限 . " + this.showRocDate(tL9110Cl.get("F4"), 1));
 					this.print(0, 135, "評估淨值 .....");
 					this.print(0, 165, formatAmt(tL9110Cl.get("F21"), 0), "R");
+//
+//					if (listLandQuery != null && !listLandQuery.isEmpty()) {
+//						// 列印土地明細
+//						printLandDetail(listLandQuery, clCode1.equals("1") ? "0" : tL9110Cl.get("F19"));
+//					}
+//
+//					if (listBuildingQuery != null && !listBuildingQuery.isEmpty()) {
+//						// 列印建物明細
+//						printBuildingDetail(listBuildingQuery, clCode1.equals("2") ? "0" : tL9110Cl.get("F19"));
+//					}
 
-					if (listLandQuery != null && !listLandQuery.isEmpty()) {
-						// 列印土地明細
-						printLandDetail(listLandQuery, clCode1.equals("1") ? "0" : tL9110Cl.get("F19"));
-					}
-
-					if (listBuildingQuery != null && !listBuildingQuery.isEmpty()) {
+					// NEW
+					if (listBuildingLandQuery != null && !listBuildingLandQuery.isEmpty()) {
 						// 列印建物明細
-						printBuildingDetail(listBuildingQuery, clCode1.equals("2") ? "0" : tL9110Cl.get("F19"));
+						printBuildingLandDetail(listBuildingLandQuery, clCode1.equals("2") ? "0" : tL9110Cl.get("F19"));
 					}
 
 					break;
@@ -511,6 +519,8 @@ public class L9110Report extends MakeReport {
 		List<Map<String, String>> listClQuery = null;
 		List<Map<String, String>> listLandQuery = null;
 		List<Map<String, String>> listBuildingQuery = null;
+		List<Map<String, String>> listBuildingLandQuery = null;
+
 		List<Map<String, String>> listInsuQuery = null;
 		List<Map<String, String>> listStockQuery = null;
 
@@ -528,6 +538,8 @@ public class L9110Report extends MakeReport {
 			listClQuery = l9110ServiceImpl.queryCl(titaVo, thisApplNo);
 			listLandQuery = l9110ServiceImpl.queryLand(titaVo, thisApplNo);
 			listBuildingQuery = l9110ServiceImpl.queryBuilding(titaVo, thisApplNo);
+			listBuildingLandQuery = l9110ServiceImpl.queryBuildingLand(titaVo, thisApplNo);
+
 			listInsuQuery = l9110ServiceImpl.queryInsu(titaVo, thisApplNo);
 			listStockQuery = l9110ServiceImpl.queryStock(titaVo, thisApplNo);
 
@@ -752,14 +764,19 @@ public class L9110Report extends MakeReport {
 					this.print(0, 135, "評估淨值 .....");
 					this.print(0, 165, formatAmt(tL9110Cl.get("F21"), 0), "R");
 
-					if (listLandQuery != null && !listLandQuery.isEmpty()) {
-						// 列印土地明細
-						printLandDetail(listLandQuery, clCode1.equals("1") ? "0" : tL9110Cl.get("F19"));
-					}
-
-					if (listBuildingQuery != null && !listBuildingQuery.isEmpty()) {
+//					if (listLandQuery != null && !listLandQuery.isEmpty()) {
+//						// 列印土地明細
+//						printLandDetail(listLandQuery, clCode1.equals("1") ? "0" : tL9110Cl.get("F19"));
+//					}
+//
+//					if (listBuildingQuery != null && !listBuildingQuery.isEmpty()) {
+//						// 列印建物明細
+//						printBuildingDetail(listBuildingQuery, clCode1.equals("2") ? "0" : tL9110Cl.get("F19"));
+//					}
+					// NEW
+					if (listBuildingLandQuery != null && !listBuildingLandQuery.isEmpty()) {
 						// 列印建物明細
-						printBuildingDetail(listBuildingQuery, clCode1.equals("2") ? "0" : tL9110Cl.get("F19"));
+						printBuildingLandDetail(listBuildingLandQuery, clCode1.equals("2") ? "0" : tL9110Cl.get("F19"));
 					}
 					break;
 				case "3": // 股票
@@ -1027,6 +1044,98 @@ public class L9110Report extends MakeReport {
 
 		// 2022-04-25 智偉:改為不顯示加總的設定金額
 //		print(0, 141, formatAmt(computeDivide(totalSettingAmt, thousand, 0), 0), "R");
+	}
+
+	/**
+	 * 列印新建物土地明細(自然人、法人共用)
+	 *
+	 * @param listBuildingQuery 建物明細查詢結果
+	 * @throws LogicException
+	 */
+	private void printBuildingLandDetail(List<Map<String, String>> listBuildingQuery, String lineAmt)
+			throws LogicException {
+		// TODO:建物
+
+		/**
+		 * ---------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6-----
+		 * ------123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345
+		 */
+		checkSpace(5);
+		print(1, 3, "主建物　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　公設　　　（坪）　　（坪）　　（坪）　　（坪）　　（仟）　（仟）　（坪）　　（仟）　（仟）擔保品");
+		print(1, 3, "建　號　　　提供人／門牌號碼／土地坐落　　　　　　　擔保品別　　　建號　　　主建物　附屬建物　　公設　　　車位　　　核貸　　設定　土地面積　　核貸　　設定　編號");
+		print(1, 3, "－－－－－　－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－　－－－－　－－－－　－－－－　－－－－　－－－　－－－　－－－－　－－－　－－－　－－－－　");
+
+		BigDecimal totalFloorArea = BigDecimal.ZERO;
+		BigDecimal totalBdSubArea = BigDecimal.ZERO;
+		BigDecimal totalPublicArea = BigDecimal.ZERO;
+		BigDecimal totalLandArea = BigDecimal.ZERO;
+		BigDecimal totalCarArea = BigDecimal.ZERO;
+
+		BigDecimal totalSettingAmt = BigDecimal.ZERO;
+		BigDecimal totalLandSettingAmt = BigDecimal.ZERO;
+
+		BigDecimal thousand = getBigDecimal("1000");
+
+		int clsize = 0;
+		int i = 0;
+		clsize = listBuildingQuery.size();
+		// 核貸總金額餘額
+		loanAmttotal = computeDivide(parse.stringToBigDecimal(lineAmt), thousand, 0);
+		BigDecimal loanAmtBal = loanAmttotal;
+		for (Map<String, String> mBuilding : listBuildingQuery) {
+
+			checkSpace(2);
+			BigDecimal loanAmt = BigDecimal.ZERO;
+
+			i++;
+
+			if (clsize - i != 0) {
+				loanAmt = computeDivide(loanAmttotal, new BigDecimal(clsize), 0);
+				loanAmtBal = loanAmtBal.subtract(loanAmt);
+			} else {
+				loanAmt = loanAmtBal;
+			}
+
+			this.print(1, 3, mBuilding.get("F1")); // 主建物建號
+			this.print(0, 15, mBuilding.get("F2")); // 提供人
+			this.print(0, 54, mBuilding.get("F4")); // 擔保品別
+			this.print(0, 66, mBuilding.get("F5")); // 公設建號
+			this.print(0, 85, formatAmt(mBuilding.get("F6"), 2), "R"); // 主建物面積
+			totalFloorArea = totalFloorArea.add(getBigDecimal(mBuilding.get("F6")));
+			this.print(0, 95, formatAmt(mBuilding.get("F7"), 2), "R"); // 附屬建物面積
+			totalBdSubArea = totalBdSubArea.add(getBigDecimal(mBuilding.get("F7")));
+			this.print(0, 105, formatAmt(mBuilding.get("F8"), 2), "R"); // 公設面積
+			totalPublicArea = totalPublicArea.add(getBigDecimal(mBuilding.get("F8")));
+			this.print(0, 115, formatAmt(mBuilding.get("F9"), 2), "R"); // 車位面積
+			totalCarArea = totalCarArea.add(getBigDecimal(mBuilding.get("F9")));
+			this.print(0, 123, formatAmt(loanAmt, 0), "R"); // 核貸
+			this.print(0, 131, formatAmt(computeDivide(getBigDecimal(mBuilding.get("F10")), thousand, 0), 0), "R");// 設定金額
+			totalSettingAmt = totalSettingAmt.add(getBigDecimal(mBuilding.get("F10")));
+			this.print(0, 141, formatAmt(mBuilding.get("F11"), 2), "R"); // 土地面積
+			totalLandArea = totalLandArea.add(getBigDecimal(mBuilding.get("F11")));
+			this.print(0, 149, formatAmt(loanAmt, 0), "R"); // 土地核貸
+			this.print(0, 157, formatAmt(computeDivide(getBigDecimal(mBuilding.get("F12")), thousand, 0), 0), "R");// 土地設定金額
+			totalLandSettingAmt = totalLandSettingAmt.add(getBigDecimal(mBuilding.get("F12")));
+			this.print(0, 159, mBuilding.get("F13") + "-" + mBuilding.get("F14")); // 擔保品編號
+
+			this.print(1, 15, mBuilding.get("F3")); // 門牌號碼／土地坐落
+			this.print(0, 159, mBuilding.get("F15")); // 擔保品編號
+
+		}
+
+		checkSpace(2);
+		print(1, 3, "－－－－－　－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－　－－－－　－－－－　－－－－　－－－－　－－－　－－－　－－－－　－－－　－－－　－－－－　");
+		print(1, 3, " 　　合計：");
+		print(0, 85, formatAmt(totalFloorArea, 2), "R");
+		print(0, 95, formatAmt(totalBdSubArea, 2), "R");
+		print(0, 105, formatAmt(totalPublicArea, 2), "R");
+		print(0, 115, formatAmt(totalCarArea, 2), "R");
+		print(0, 123, formatAmt(loanAmttotal, 0), "R");
+		print(0, 131, formatAmt(computeDivide(totalSettingAmt, thousand, 0), 0), "R");
+		print(0, 141, formatAmt(totalLandArea, 2), "R");
+		print(0, 149, formatAmt(loanAmttotal, 0), "R");
+		print(0, 157, formatAmt(computeDivide(totalSettingAmt, thousand, 0), 0), "R");
+
 	}
 
 	/**

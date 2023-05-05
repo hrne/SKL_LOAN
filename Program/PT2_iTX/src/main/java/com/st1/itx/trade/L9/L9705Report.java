@@ -584,7 +584,7 @@ public class L9705Report extends MakeReport {
 			y = top + yy + (++l) * h;
 			this.printCm(1, y, "　　重要資訊有異動時，敬請洽詢公司服務人員或客戶服務部（０８００—０３１１１５）辦理變更。");
 		}
-
+		y = top + yy + (++l) * h;
 		printCm(1, y, "＊＊舊繳息通知單作廢（以最新製發日期為準）。");
 
 		if (tmpTotalBreachAmt.compareTo(BigDecimal.ZERO) != 0) {

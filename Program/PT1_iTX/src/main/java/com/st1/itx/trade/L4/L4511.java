@@ -16,6 +16,7 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.EmpDeductDtl;
 import com.st1.itx.db.domain.EmpDeductDtlId;
 import com.st1.itx.db.domain.EmpDeductMedia;
@@ -23,6 +24,7 @@ import com.st1.itx.db.domain.EmpDeductMediaId;
 import com.st1.itx.db.domain.TxToDoDetailId;
 import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdEmpService;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.EmpDeductDtlService;
 import com.st1.itx.db.service.EmpDeductMediaService;
 import com.st1.itx.db.service.EmpDeductScheduleService;
@@ -61,6 +63,10 @@ public class L4511 extends TradeBuffer {
 
 	@Autowired
 	public CdEmpService cdEmpService;
+	
+	@Autowired
+	public CustMainService cdCustMainService;
+
 
 	@Autowired
 	public EmpDeductScheduleService empDeductScheduleService;
@@ -262,17 +268,29 @@ public class L4511 extends TradeBuffer {
 				occursList.putParam("OccUnit", "10H400");
 				if (flag == 1) {
 					occursList.putParam("OccUnknowA", "0000000001");
+					occursList.putParam("OccLineCode", "");
 				} else {
 //					occursList.putParam("OccUnknowA", "0000000002");
 					String tEmpCudtId = tEmpDeductMedia.getCustId();
-					CdEmp cDemp = cdEmpService.findAgentIdFirst(tEmpCudtId, titaVo);
+//					CdEmp cDemp = cdEmpService.findAgentIdFirst(tEmpCudtId, titaVo);
+					int tEmpCudtNo = tEmpDeductMedia.getCustNo();
+					CustMain cDMain = cdCustMainService.custNoFirst(tEmpCudtNo, tEmpCudtNo, titaVo);
+					String tEmpNo = cDMain.getEmpNo();
+					Slice<CdEmp> cDemp = cdEmpService.findEmployeeNo(tEmpNo, tEmpNo,0,Integer.MAX_VALUE, titaVo);
+					String cDComm = " ";
 					if(cDemp!=null) {
-						String cDComm = cDemp.getCommLineType();
+						for(CdEmp t :cDemp) {
+							cDComm = t.getCommLineType();
+						}
 						if(cDComm == null) {
 							cDComm = " ";
 						}
 						occursList.putParam("OccUnknowA", "000000000"+cDComm);
-						String cCommL = cDemp.getCommLineCode();
+						String cCommL = " ";
+						for(CdEmp t :cDemp) {
+							cCommL = t.getCommLineCode();
+						}
+						
 						if(cCommL == null) {
 							cCommL = "  ";
 						}

@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L9;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,7 @@ public class L9711Report2 extends MakeReport {
 
 	@Autowired
 	public CustMainService custMainService;
-	
+
 	@Autowired
 	L9711Report4 l9711report4;
 
@@ -72,7 +73,8 @@ public class L9711Report2 extends MakeReport {
 
 	}
 
-	public long exec(TitaVo titaVo, TxBuffer txbuffer, List<Map<String, String>> L9711List,String nTxCd) throws LogicException {
+	public long exec(TitaVo titaVo, TxBuffer txbuffer, List<Map<String, String>> L9711List, String nTxCd)
+			throws LogicException {
 
 		this.info("L9711Report2 exec");
 		ENTDY = String.valueOf(Integer.parseInt(titaVo.getParam("ENTDY").toString()));
@@ -87,8 +89,7 @@ public class L9711Report2 extends MakeReport {
 		String pageOrientation = "P";
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(nTxCd)
-				.setRptItem(reportItem).setRptSize(pageSize).setPageOrientation(pageOrientation)
-				.build();
+				.setRptItem(reportItem).setRptSize(pageSize).setPageOrientation(pageOrientation).build();
 		this.openForm(titaVo, reportVo);
 
 		if (L9711List.size() > 0) {
@@ -140,8 +141,8 @@ public class L9711Report2 extends MakeReport {
 		}
 
 		long sno = this.close();
-		
-		l9711report4.exec(titaVo,L9711List);
+
+		l9711report4.exec(titaVo, L9711List);
 
 		return sno;
 	}
@@ -208,7 +209,7 @@ public class L9711Report2 extends MakeReport {
 
 		setFont(1, 14);
 
-		 printCm(10, 19, " ", "C");
+		printCm(10, 19, " ", "C");
 
 		setFont(1, 11);
 
@@ -266,6 +267,10 @@ public class L9711Report2 extends MakeReport {
 
 		int tmpCount = 0;
 
+		BigDecimal tmpTotalBreachAmt = BigDecimal.ZERO;
+		BigDecimal tmpLastBreachAmt = BigDecimal.ZERO;
+		String tDate = "";
+
 		for (BaTxVo baTxVo : listBaTxVo) {
 			tmpCount++;
 			if (tmpCount == 7) {
@@ -320,6 +325,18 @@ public class L9711Report2 extends MakeReport {
 			printCm(1, y, tempDate.substring(0, 3) + "/" + tempDate.substring(3, 5) + "/" + tempDate.substring(5, 7));
 			// 違約金
 			printCm(4.5, y, String.format("%,d", BreachAmt), "R");
+
+			// 都沒有違約金的時候 不需要印
+			tmpTotalBreachAmt = tmpTotalBreachAmt.add(new BigDecimal(BreachAmt));
+
+			// 上一筆大於這一筆且這一筆為0 就要重新紀錄日期
+			if (tmpLastBreachAmt.compareTo(new BigDecimal(BreachAmt)) == 1
+					&& new BigDecimal(BreachAmt).compareTo(BigDecimal.ZERO) == 0) {
+				tDate = tempDate;
+			}
+
+			// 判斷完在記錄上一筆
+			tmpLastBreachAmt = new BigDecimal(BreachAmt);
 			// 本金
 			printCm(7, y, String.format("%,d", Principal), "R");
 			// 利息
@@ -354,6 +371,13 @@ public class L9711Report2 extends MakeReport {
 		} else if ("L9711".equals(txcdW)) {
 
 			printCm(1, y, "＊＊舊繳息通知單作廢（以最新製發日期為準）。");
+
+			if (tmpTotalBreachAmt.compareTo(BigDecimal.ZERO) != 0) {
+				y = top + yy + (++l) * h;
+				printCm(1, y, "＊＊註：違約金暫計到" + this.showRocDate(tDate, 0) + "，若提前或延後繳款，請電話查詢　該違約金額。");
+
+			}
+
 			y = top + yy + (++l) * h;
 			printCm(1, y, "＊＊貴戶所借款項如業已屆期，本公司雖經收取利息及違約金但並無同意延期清償之意 , 貴戶仍需依約履行");
 			if (tL9711Vo.get("F8").equals("0")) {
