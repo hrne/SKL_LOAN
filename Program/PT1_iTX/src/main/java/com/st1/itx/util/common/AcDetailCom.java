@@ -382,7 +382,6 @@ public class AcDetailCom extends TradeBuffer {
 //			    L3420 結案登錄-不可欠繳		
 		if (titaVo.getTxcd().equals("L3410") || titaVo.getTxcd().equals("L3420")) {
 			tTempVo.putParam("CaseCloseCode", titaVo.getParam("CaseCloseCode"));
-			tTempVo.putParam("RenewCode", titaVo.getParam("RenewCode"));
 		}
 
 		// 2. StampTaxFreeAmt 免印花稅金額

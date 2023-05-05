@@ -529,10 +529,11 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	 * @return isTxcdInq true
 	 */
 	public boolean isTxcdInq() {
-        return this.getTxcd().trim().substring(2, 3).equals("9") || this.getTxcd().trim().substring(2, 3).equals("R") || this.getTxcd().trim().substring(2, 3).equals("0")
-                || (this.getTxCode().trim().length() >= 4 && (this.getTxCode().trim().substring(2, 3).equals("0") || this.getTxCode().trim().substring(2, 3).equals("9") || this.getTxCode().trim().substring(2, 3).equals("R")))
-                || this.isFuncindInquire();
-    }
+		return this.getTxcd().trim().substring(2, 3).equals("9") || this.getTxcd().trim().substring(2, 3).equals("R") || this.getTxcd().trim().substring(2, 3).equals("0")
+				|| (this.getTxCode().trim().length() >= 4
+						&& (this.getTxCode().trim().substring(2, 3).equals("0") || this.getTxCode().trim().substring(2, 3).equals("9") || this.getTxCode().trim().substring(2, 3).equals("R")))
+				|| this.isFuncindInquire();
+	}
 
 	/**
 	 * 
@@ -1156,7 +1157,7 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	}
 
 	public boolean isFuncindInquire() {
-		return this.get(ContentName.funcind) != null && (this.get(ContentName.funcind).trim().equals("0") || this.get(ContentName.funcind).trim().equals("5"));
+		return this.get(ContentName.funcind) != null && this.get(ContentName.funcind).trim().equals("5");
 	}
 
 	/**
@@ -1438,7 +1439,7 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	public String getReason() {
 		return this.get(ContentName.reason) == null ? "" : this.get(ContentName.reason).trim();
 	}
-	
+
 	public String getSpanDy() {
 		return Objects.isNull(this.get(ContentName.spanDy)) ? "0" : this.get(ContentName.spanDy).trim();
 	}
@@ -1446,7 +1447,7 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	public boolean isSpanDy() {
 		return Integer.parseInt(this.getSpanDy()) != 0;
 	}
-	
+
 	/**
 	 * 是否為敏感性資料交易
 	 * 

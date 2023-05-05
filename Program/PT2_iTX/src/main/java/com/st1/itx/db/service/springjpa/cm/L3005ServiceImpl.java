@@ -213,7 +213,7 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   ln3.*          															";
 		sql += "  ,cdr.\"Item\"					   AS \"RepayCodeX\"						";
 		sql += "  ,CASE WHEN ln3.\"TxDescCode\" = 'Fee' AND ln3.\"TitaTxCd\" = 'L3210' THEN '暫收銷'  ||  cdf.\"Item\" 	 ";
-		sql += "        WHEN ln3.\"TxDescCode\" = 'Fee' AND ln3.\"TitaTxCd\" = 'L3230' THEN '暫收退'  ||  cdf.\"Item\" 	 ";
+		sql += "        WHEN ln3.\"TxDescCode\" = 'Fee' AND ln3.\"TitaTxCd\" IN ('L3230','L3250') THEN '暫收退'  ||  cdf.\"Item\" 	 ";
 		sql += "        WHEN ln3.\"TxDescCode\" = 'Fee' THEN cdf.\"Item\"                                            ";
 		sql += "        WHEN ln3.\"AcctCode\" = 'TAV' THEN REPLACE(NVL(cdt.\"Item\",ln3.\"Desc\"),'債協','一般債權') 	 ";
 		sql += "        ELSE NVL(cdt.\"Item\",ln3.\"Desc\")  	    	                                             ";

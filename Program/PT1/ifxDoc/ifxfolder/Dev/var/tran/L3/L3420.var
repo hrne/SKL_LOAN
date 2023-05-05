@@ -70,7 +70,7 @@ C(5,#FacmBormNo{n},000-000,INVOKEJS(SHOW,grd1_{n},0),C(4,#FacmBormNo{n},INVOKEJS
 ["#FdBreachAmt+違約金",#BreachAmtX],["#FdLawFee1+法務費",#LawFee1X],
 ["#FdShortfall+累短收",#ShortfallX,#ShortfallXX],["#FdCloseBreachAmt+清償違約金",#CloseBreachAmtX],
 [#<->#,"#FdExcessive+累溢收",#ExcessiveX],
-["#FdNewApplNo+核准號碼",#NewApplNo,"@@@",#BTN6],["@@@@@展期記號",#RenewCode,#RenewCodeX],
+! ["#FdNewApplNo+核准號碼",#NewApplNo,"@@@",#BTN6],["@@@@@展期記號",#RenewCode,#RenewCodeX],
 [#<->#,"#FdReduceAmt+減免金額",#TwReduceAmt,#UsReduceAmt],
 ["#FdAdvanceCloseCode+提前清償原因",#AdvanceCloseCode,#AdvanceCloseCodeX],["@","@"],
 !部分轉呆
@@ -90,8 +90,6 @@ C(5,#FacmBormNo{n},000-000,INVOKEJS(SHOW,grd1_{n},0),C(4,#FacmBormNo{n},INVOKEJS
 #BTN3=X,15,I,ui:button;value:核准號碼查詢;enable:1;tabbable:0;title: L2016 核准號碼明細資料查詢;
 ! #BTN4=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
 ! #BTN5=X,15,I,ui:button;value:已入帳未還款查詢;enable:1;tabbable:1;title:L492A 已入帳未還款查詢
-! #BTN6=X,15,I,ui:button;value:核准號碼查詢;enable:1;tabbable:0;title: L2016 核准號碼明細資料查詢;
-#BTN6=X,15,I,ui:button;value:放款資料查詢;enable:1;tabbable:0;title: L3001 放款明細資料查詢;
 #BTN7=X,15,I,ui:button;value:撥款資料查詢;enable:1;tabbable:0;title: L3002 撥款明細資料查詢
 
 #BUF1=X,42,S
@@ -127,22 +125,15 @@ T(3,CdCode.AdvanceCloseCode)
 
 #AdvanceCloseCodeHelp=x,1024,S
 
-!展期記號
-#CDDEF05=x,26,S
-T(3,CdCode.RenewCode)
-
-#RenewCodeHelp=x,1024,S
-
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04)
 R(1,XXR99)
 CALL(#HelpProc) 
 T(2,@CurrencyCodeHelp,#HelpDesc1)
 T(2,@CurrPrecisionHelp,#HelpDesc2)
 T(2,@CaseCloseCodeHelp,#HelpDesc3)
 T(2,@AdvanceCloseCodeHelp,#HelpDesc4)
-T(2,@RenewCodeHelp,#HelpDesc5)
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
@@ -152,13 +143,12 @@ E(0,@RimFKey,#FKEY)
 
 #WKINIT=X,1,S
 INVOKEJS(SHOW,p1,1)
-INVOKEJS(SHOW,p1,18,24,0)
+INVOKEJS(SHOW,p1,17,23,0)
 INVOKEJS(SHOW,p2,0)
 
 #InitValue=@,1,S
 T(F,@FacmNo,1)
 T(F,@BormNo,1)
-T(3,@FdNewApplNo,*)
 T(3,@FdCaseCloseCode,*)
 T(3,@FdEntryDate,*)
 ! E(0,@FacmNo,0)
@@ -175,9 +165,9 @@ HIDE(#UsReduceAmt,#UsTrfBadAmt,#UsTrfOvDuAmt)
 ! HIDE(#EntryDate,#UsReduceAmt,#UsTrfBadAmt)
 SHOW(#AdvanceCloseCode)
 INVOKEJS(SHOW,p1,5,5,1)
-INVOKEJS(SHOW,p1,15,16,1)
-INVOKEJS(SHOW,p1,8,17,1)
-INVOKEJS(SHOW,p1,18,24,0)
+INVOKEJS(SHOW,p1,15,15,1)
+INVOKEJS(SHOW,p1,8,16,1)
+INVOKEJS(SHOW,p1,17,23,0)
 
 
 #Flag=A,1,L
@@ -374,17 +364,14 @@ C(2,#CaseCloseCode,SHOW(#BTN7),HIDE(#BTN7),HIDE(#BTN7),HIDE(#BTN7),SHOW(#BTN7),S
 #WKHIDE1=X,1,S
 E(0,@EntryDate,0)
 HIDE(#EntryDate)
-IF(#CaseCloseCode>=7,INVOKEJS(SHOW,p1,8,17,0)
-                     INVOKEJS(SHOW,p1,18,24,1)
+IF(#CaseCloseCode>=7,INVOKEJS(SHOW,p1,8,16,0)
+                     INVOKEJS(SHOW,p1,17,23,1)
                     ,$)
 IF(#CaseCloseCode>=7,S,$)                      
 INVOKEJS(SHOW,p1,5,5,1)
-INVOKEJS(SHOW,p1,8,17,1) 
-INVOKEJS(SHOW,p1,15,15,0)
-INVOKEJS(SHOW,p1,18,24,0)
-C(3,#CaseCloseCode,1,INVOKEJS(SHOW,p1,15,15,1),$)
-C(3,#CaseCloseCode,2,INVOKEJS(SHOW,p1,15,15,1),$)
-C(3,#CaseCloseCode,3,INVOKEJS(SHOW,p1,17,17,0),$)
+INVOKEJS(SHOW,p1,8,16,1) 
+INVOKEJS(SHOW,p1,17,23,0)
+C(3,#CaseCloseCode,3,INVOKEJS(SHOW,p1,16,16,0),$)
 
 
 !還款來源 00:全部;
@@ -753,68 +740,6 @@ C(3,#CaseCloseCode,7,E(0,0),E(0,#L3r11Excessive))
 #ExcessiveX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#Excessive,#ExcessiveX)
 
-#BUF6A=X,34,S
-T(2,0000000+#TimCustNo+          +0000000+000)
-
-#BIND6A=X,1,S
-BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L3001; ntxbuf=#BUF6A;ntxbuf5=type<-1:NewApplNo<-OOApplNo:NewFacmNo<-OOFacmNo})
-
-![核准號碼]
-!結案區分非展期，核准號碼不可輸入
-#FdNewApplNo=X,2,L
-T(3,*)
-!結案區分為2借新還舊時自動塞入原核准號碼
-#NewApplNo=A,7,I
-C(2,#CaseCloseCode,S,$,E(0,#TimApplNo),S,S,S,S,S,S)
-C(3,#CaseCloseCode,2,s,$)
-@V(2,0)
-C(3,#CaseCloseCode,1,IF(#NewApplNo==#TimApplNo,V(P,不可為同額度之核准號碼),$),$)
-
-! V(2,#TimApplNo)
-
-! #BUF6B=X,18,S
-! T(2,#TimCustNo)
-
-! #BIND6B=X,1,S
-! BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L3001; ntxbuf=#BUF6B;ntxbuf5=type<-1:NewApplNo<-OOApplNo:NewFacmNo<-OOFacmNo})
-
-!用新核准號碼(NewApplNo)調L2R05
-#SendL2r05C=X,1,S
-C(3,#NewApplNo,0,S,$)
-E(0,@RimFuncCode,5)
-E(0,@RimCustNo,#TimCustNo)
-E(0,@RimFacmNo,#FacmNo)
-E(0,@RimApplNo,0)
-E(0,@RimCaseNo,0)
-RESET_RIM(#SendL2r05C,L2R05)
-S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo,#NewApplNo)
-R(1,L2R05)
-
-#NewFacmNo=A,3,S
-C(3,#NewApplNo,0,S,$)
-E(0,#L2r05FacmNo)
-
-#ChecknewApplNo=X,1,S
-C(3,#NewApplNo,0,S,$)
-E(0,@RimFuncCode,5)
-T(2,@RimProdNo,#L2r05ProdNo)
-RESET_RIM(#ChecknewApplNo,L2R01)
-S(L2R01,1,#RimFuncCode,#RimTxCode,#RimProdNo)
-R(1,L2R01)
-
-
-!檢查此核准號碼商品是否為協議商品
-#RenewFacProdNoFg=A,1,S
-C(2,#CaseCloseCode,S,$,$,S,S,S,S,S,S,S)
-C(5,#L2r01AgreementFg,Y,E(0,1),E(0,0))
-! IF(#L2r05ProdNo=="60"||#L2r05ProdNo=="61"||#L2r05ProdNo=="62"||#L2r05ProdNo=="63",E(0,1),E(0,0))
-!help 1:一般,2協議
-#RenewCode=A,1,L
-C(2,#CaseCloseCode,S,$,$,S,S,S,S,S,S,S)
-C(3,#RenewFacProdNoFg,1,E(0,2),E(0,1))
-
-#RenewCodeX=X,10,L
-T(3,)T(H,#RenewCode,#RenewCodeHelp)
 
 #WkReduceAmt=m,14.2,S
 C(3,#CaseCloseCode,7,S,E(0,#Interest+#DelayInt+#BreachAmt))
@@ -825,7 +750,7 @@ C(3,#CaseCloseCode,7,S,E(0,#Interest+#DelayInt+#BreachAmt))
 !b.已轉催收之款項不可減免，未轉催收之利息及違約金為&1,減免金額需<=後者
 !c.轉催收及轉列呆帳，減免金額不可輸入
 #FdReduceAmt=X,2,L
-C(3,#WkReduceAmt,0,INVOKEJS(SHOW,p1,16,16,0),INVOKEJS(SHOW,p1,16,16,1))
+C(3,#WkReduceAmt,0,INVOKEJS(SHOW,p1,15,15,0),INVOKEJS(SHOW,p1,15,15,1))
 
 #TwReduceAmt=m,14,I
 C(3,#Precision,0,$,S)
@@ -1266,8 +1191,8 @@ T(3,[L3420] 結案登錄-不可欠繳)
 !------ 上行電文 TEXT ------
 <sub type="TIM">
 
-#TimCustNo#FacmNo#BormNo#CaseCloseCode#RenewCode#EntryDate
-#NewApplNo#NewFacmNo#TimReduceAmt#AdvanceCloseCode
+#TimCustNo#FacmNo#BormNo#CaseCloseCode#EntryDate
+#NewFacmNo#TimReduceAmt#AdvanceCloseCode
 #TimTrfBadAmt#TotalRepayAmt#RealRepayAmt#RqspFlag
 #AcctFee1#ModifyFee1#FireFee1#LawFee1#ShortfallInt#ShortfallPrin#ShortCloseBreach#CloseBreachAmt
 #FireFg#CollFireFg#LawFg#CollLawFg#TimTrfOvDuAmt
@@ -1301,7 +1226,6 @@ T(3,[L3420] 結案登錄-不可欠繳)
 #ShortfallXX
 #CloseBreachAmtX
 #ExcessiveX
-#RenewCodeX
 #AdvanceCloseCodeX
 #OvDuTrfPrincipalX
 #OvDuRepayAmtX

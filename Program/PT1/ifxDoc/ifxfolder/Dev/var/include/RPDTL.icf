@@ -684,6 +684,7 @@ C(3,#RP_IND,1,IF(#RpCode{i}==90||#RpCode{i}==91||#RpCode{i}==95,$,$),$)
 IF(#RPFG==7,IF(#RPTOTF{z}>0,$,s),$)
 IF(#RpCode{i}<90,s,$)
 @
+IF(#DF1=={i},V(2,0),$)
 IF(#RpAmt{i}>0,
   IF(#RPFG==1||#RPFG==2,
     IF(#RpCode{i}==90,C(3,#RpFacmNo{i},0,V(P,需有額度號碼，請先點選[未銷帳查詢]),$),$)

@@ -114,9 +114,6 @@ public class L3420 extends TradeBuffer {
 	private int iBormNo;
 	private int iEntryDate;
 	private int iCaseCloseCode;
-	private int iNewApplNo;
-	private int iNewFacmNo;
-	private int iRenewCode;
 	private String iAdvanceCloseCode;
 	private int iRpCode; // 還款來源
 	private BigDecimal iTxAmt;
@@ -249,9 +246,7 @@ public class L3420 extends TradeBuffer {
 		if (titaVo.get("Description") != null) {
 			iNote = titaVo.getParam("Description");// 新增摘要-董事會通過核定日期訊息
 		}
-		iNewApplNo = this.parse.stringToInteger(titaVo.getParam("NewApplNo"));
-		iNewFacmNo = this.parse.stringToInteger(titaVo.getParam("NewFacmNo"));
-		iRenewCode = this.parse.stringToInteger(titaVo.getParam("RenewCode"));
+
 		iAdvanceCloseCode = titaVo.getParam("AdvanceCloseCode");
 		iReduceAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimReduceAmt"));
 		iTrfBadAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimTrfBadAmt"));
@@ -317,11 +312,6 @@ public class L3420 extends TradeBuffer {
 		// 檢查到同戶帳務交易需由最近一筆交易開始訂正
 		if (titaVo.isHcodeErase()) {
 			loanCom.checkEraseCustNoTxSeqNo(iCustNo, titaVo);
-		}
-
-		// 展期處理
-		if (iCaseCloseCode == 1) {
-			facRenew(titaVo);
 		}
 
 		// 按清償違約金、違約金、 延滯息、利息順序減免
@@ -396,7 +386,8 @@ public class L3420 extends TradeBuffer {
 				if (iRqspFlag.equals("Y")) {
 					String iSupvReasonCode = "0007";
 					if (!titaVo.getHsupCode().equals("1")) {
-						if (iReduceAmt.compareTo(new BigDecimal(this.txBuffer.getSystemParas().getReduceAmtLimit3())) > 0) {
+						if (iReduceAmt
+								.compareTo(new BigDecimal(this.txBuffer.getSystemParas().getReduceAmtLimit3())) > 0) {
 							iSupvReasonCode = "0027";
 						} else if (iReduceAmt
 								.compareTo(new BigDecimal(this.txBuffer.getSystemParas().getReduceAmtLimit2())) > 0) {
@@ -408,7 +399,7 @@ public class L3420 extends TradeBuffer {
 					}
 				}
 			}
-			
+
 			switch (iCaseCloseCode) { // 結案區分
 			case 0: // 0:正常結案
 				wkBorMainStatus = 3; // 3:結案戶
@@ -1372,9 +1363,6 @@ public class L3420 extends TradeBuffer {
 		tTempVo.putParam("Note", iNote);
 		tTempVo.putParam("AdvanceCloseCode", iAdvanceCloseCode);
 		tTempVo.putParam("PaidTerms", wkPaidTerms);
-		tTempVo.putParam("NewApplNo", iNewApplNo);
-		tTempVo.putParam("NewFacmNo", iNewFacmNo);
-		tTempVo.putParam("RenewCode", iRenewCode);
 
 		// 減免金額
 		if (wkReduceAmt.compareTo(BigDecimal.ZERO) > 0) {
@@ -1646,47 +1634,6 @@ public class L3420 extends TradeBuffer {
 				facCloseService.update(tFacClose, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", "清償作業檔 Key = " + iCustNo + wkCloseNo); // 新增資料時，發生錯誤 }
-			}
-		}
-	}
-
-	// 展期處理
-	private void facRenew(TitaVo titaVo) throws LogicException {
-		tOldFacMain = new FacMain();
-		tNewFacMain = new FacMain();
-		renewCnt = 0;
-		oldFacmNo = 0;
-//		取舊額度的展期次數+1擺進新額度的展期次數
-//		舊額度擺進新額度的舊額度編號
-		if (titaVo.isHcodeNormal()) {
-			tOldFacMain = facMainService.findById(new FacMainId(iCustNo, iFacmNo), titaVo);
-			if (tOldFacMain != null) {
-				renewCnt = tOldFacMain.getRenewCnt() + 1;
-				oldFacmNo = iFacmNo;
-			}
-			tNewFacMain = facMainService.holdById(new FacMainId(iCustNo, iNewFacmNo), titaVo);
-			if (tNewFacMain != null) {
-				tNewFacMain.setRenewCnt(renewCnt);
-				tNewFacMain.setOldFacmNo(oldFacmNo);
-				try {
-					facMainService.update(tNewFacMain, titaVo);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0007", "額度主檔 " + e.getErrorMsg()); // 更新資料時，發生錯誤
-				}
-
-			}
-//			復原
-		} else {
-			tNewFacMain = facMainService.holdById(new FacMainId(iCustNo, iNewFacmNo), titaVo);
-			if (tNewFacMain != null) {
-				tNewFacMain.setRenewCnt(0);
-				tNewFacMain.setOldFacmNo(0);
-				try {
-					facMainService.update(tNewFacMain, titaVo);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0007", "額度主檔 " + e.getErrorMsg()); // 更新資料時，發生錯誤
-				}
-
 			}
 		}
 	}

@@ -18,6 +18,9 @@ import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcLoanRenew;
 import com.st1.itx.db.domain.AcLoanRenewId;
 import com.st1.itx.db.domain.AcReceivable;
+import com.st1.itx.db.domain.FacMain;
+import com.st1.itx.db.domain.FacMainId;
+import com.st1.itx.db.domain.FacProd;
 import com.st1.itx.db.service.AcLoanRenewService;
 import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.FacMainService;
@@ -72,29 +75,29 @@ public class AcLoanRenewCom extends TradeBuffer {
 // 借新還舊  L3100  撥貸  004-001
 // -------------------  C       300,000     FacmNo001    新額度004，原額度001
 // -------------------  C       100,000     FacmNo002    新額度004，原額度002
-		// 撥款時，收付欄來源金額最大者為主要額度
+		// 撥款時，收付欄來源額度最小者為主要額度
 		if (!"L3100".equals(titaVo.getTxcd())) {
 			return null;
 		}
-		int mainFacmNo = 0;
-		BigDecimal mainAmt = BigDecimal.ZERO;
+		int mainFacmNo = 999;
 		for (AcDetail ac : this.txBuffer.getAcDetailList()) {
-			if ((ac.getAcctCode().equals("TRO") || ac.getAcctCode().equals("TRE"))) { // 借新還舊																													// 撥款
-				if (ac.getTxAmt().compareTo(mainAmt) > 0) {
-					mainAmt = ac.getTxAmt();
+			if ((ac.getAcctCode().equals("TRO") || ac.getAcctCode().equals("TRE"))) { // 借新還舊 // 撥款
+				if (ac.getFacmNo() < mainFacmNo) {
 					mainFacmNo = ac.getFacmNo();
 				}
 			}
 		}
 
 		for (AcDetail ac : this.txBuffer.getAcDetailList()) {
-			if ((ac.getAcctCode().equals("TRO") || ac.getAcctCode().equals("TRE"))) { // 借新還舊																													// 撥款
+			if ((ac.getAcctCode().equals("TRO") || ac.getAcctCode().equals("TRE"))) { // 借新還舊 // 撥款
 				iNewFacmNo = parse.stringToInteger(titaVo.getMrKey().substring(8, 11)); // 0123456-890-234
 				iNewBormNo = parse.stringToInteger(titaVo.getMrKey().substring(12, 15));
-				if (this.txBuffer.getTxCom().getBookAcHcode() == 0) // 帳務訂正記號 帳務訂正記號 AcHCode 0.正常 1.訂正 2.3.沖正
+				if (this.txBuffer.getTxCom().getBookAcHcode() == 0) {
+					// 帳務訂正記號 帳務訂正記號 AcHCode 0.正常 1.訂正 2.3.沖正
 					procInsert(ac, mainFacmNo, titaVo);
-				else
+				} else {
 					procDelete(ac, titaVo);
+				}
 			}
 		}
 		return null;
@@ -112,7 +115,7 @@ public class AcLoanRenewCom extends TradeBuffer {
 				int iNegNo = 0;
 				tTempVo = new TempVo();
 				tTempVo = tTempVo.getVo(lAcLoanRenew.getOtherFields());
-				if ("2".equals(lAcLoanRenew.getRenewCode()) && !"".equals(tTempVo.getParam("NegNo"))) {
+				if (!"".equals(tTempVo.getParam("NegNo"))) {
 					iNegNo = parse.stringToInteger(tTempVo.getParam("NegNo"));
 				}
 				if (tNegNo < iNegNo) {
@@ -148,13 +151,22 @@ public class AcLoanRenewCom extends TradeBuffer {
 				tAcLoanRenewId.setOldBormNo(parse.stringToInteger(acRv.getRvNo().substring(0, 3)));
 				tAcLoanRenew = new AcLoanRenew();
 				tAcLoanRenew.setAcLoanRenewId(tAcLoanRenewId);
-				tAcLoanRenew.setRenewCode(tTempVo.get("RenewCode"));
-				if ("2".equals(tTempVo.get("RenewCode"))) {// 協議件需寫協議編號
-					tTempVo = new TempVo();
-					tTempVo.putParam("NegNo", tNegNo);
-					tAcLoanRenew.setOtherFields(tTempVo.getJsonString());
+				// 暫收款－借新還舊
+				if ("TRO".equals(acRv.getAcctCode())) {
+					tAcLoanRenew.setRenewCode("2");
+				} else {
+					tAcLoanRenew.setRenewCode("1");
 				}
 
+				FacMain tFacMain = facMainService.findById(new FacMainId(acRv.getCustNo(), iNewFacmNo), titaVo);
+				if (tFacMain != null) {
+					FacProd tFacProd = facProdService.findById(tFacMain.getProdNo(), titaVo);
+					if (tFacProd != null && "Y".equals(tFacProd.getAgreementFg())) {// 協議件需寫協議編號
+						tTempVo = new TempVo();
+						tTempVo.putParam("NegNo", tNegNo);
+						tAcLoanRenew.setOtherFields(tTempVo.getJsonString());
+					}
+				}
 				tAcLoanRenew.setAcDate(ac.getAcDate());
 				if (ac.getFacmNo() == mainFacmNo) {
 					tAcLoanRenew.setMainFlag(mainFlag);

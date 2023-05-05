@@ -243,9 +243,9 @@ public class AcNegCom extends TradeBuffer {
 		String acctCode = "TAV"; // 暫收可抵繳
 		int custNo = iCustNo;
 		int facmNo = 0;
-		if (custNo == this.txBuffer.getSystemParas().getNegDeptCustNo())
+		if (custNo == this.txBuffer.getSystemParas().getNegDeptCustNo()) {
 			acctCode = "TAV"; // 債協暫收款－收款專戶
-		else {
+		} else {
 			NegMain tNegMain = new NegMain();
 			tNegMain = negMainService.statusFirst("0", iCustNo, titaVo); // 0-正常
 			if (tNegMain != null && tNegMain.getPayerCustNo() > 0) {
@@ -358,8 +358,8 @@ public class AcNegCom extends TradeBuffer {
 			throws LogicException {
 		this.info("NegAppr02 entryDate=" + entryDate + ", txAmt=" + txAmt);
 		List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
-		// NegAppr02一般債權撥付資料檔，提兌日 = 入帳日，金額相同，會計日=0，檢核成功 ,抓第一筆符合條件之資料
-		Slice<NegAppr02> slNegAppr02 = negAppr02Service.bringUpDateEq(entryDate + 19110000, 0, Integer.MAX_VALUE,
+		// NegAppr02一般債權撥付資料檔，提兌日 <= 入帳日 且 會計日=0，若金額相同或加總相同，檢核成功
+		Slice<NegAppr02> slNegAppr02 = negAppr02Service.bringUpDate2(entryDate + 19110000, 0, 0, Integer.MAX_VALUE,
 				titaVo);
 		if (slNegAppr02 == null) {
 			return lAcDetail;

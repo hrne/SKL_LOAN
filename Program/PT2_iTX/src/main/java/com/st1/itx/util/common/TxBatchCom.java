@@ -434,10 +434,37 @@ public class TxBatchCom extends TradeBuffer {
 		initialProcNote(tDetail, tempVo.getVo(tDetail.getProcNote()), titaVo);
 		this.otherTempVo = new TempVo();
 
-		// 入帳日期檢核
+		// --------------- 入帳日期檢核 ---------------
 		if (tDetail.getEntryDate() > this.txBuffer.getTxBizDate().getTbsDy()) {
 			this.checkMsg += "入帳日" + tDetail.getEntryDate() + " 大於會計日" + this.txBuffer.getTxBizDate().getTbsDy();
 			this.procStsCode = "3"; // 3.檢核錯誤
+		}
+
+		// ---- 執行債一般債權匯入款A7 債權撥付檔檢核 ------------------
+		// 如有MATCH到一般債權撥付檔,則顯示一般債權客戶戶號,若沒有,則顯示[不符一般債權撥付檔]
+		if ("A7".equals(tDetail.getReconCode())) {
+			List<AcDetail> lAcDetail = acNegCom.getNegAppr02CustNo(tDetail.getEntryDate(), tDetail.getRepayAmt(),
+					tDetail.getCustNo(), titaVo);
+			if (lAcDetail == null || lAcDetail.size() == 0) {
+				this.checkMsg += " 不符一般債權撥付檔";
+				this.procStsCode = "3"; // 3.檢核錯誤
+			} else {
+				String custNoX = "";
+				for (AcDetail ac : lAcDetail) {
+					custNoX += " " + ac.getCustNo();
+				}
+				this.checkMsg += " 一般債權客戶戶號:" + custNoX;
+			}
+		}
+
+		// --------------- 執行債協匯入款戶號檢核 ------------------
+		if ("0".equals(this.procStsCode) && this.repayType == 11) {
+			if (acNegCom.isNegCustNo(tDetail.getCustNo(), titaVo)) {
+				this.procStsCode = "4"; // 4.檢核正常
+			} else {
+				this.checkMsg += " 非債協戶或債協戶非正常戶";
+				this.procStsCode = "3"; // 3.檢核錯誤
+			}
 		}
 
 		// --------------- 執行 AML 交易檢核(匯款轉帳及支票兌現) ------------------
@@ -1336,17 +1363,6 @@ public class TxBatchCom extends TradeBuffer {
 				batxHeadService.update(tBatxHead, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", "update BatxHead " + tBatxHead + e.getErrorMsg());
-			}
-
-			// 啟動背景作業－整批入帳完成(非整批入帳)
-			if ("BATX".equals(tBatxHead.getBatchNo().substring(0, 4)) && tBatxHead.getUnfinishCnt() == 0
-					&& "0".equals(tBatxHead.getBatxStsCode())) {
-				TitaVo l420BTita = new TitaVo();
-				l420BTita = (TitaVo) titaVo.clone();
-				l420BTita.putParam("FunctionCode", "3");// 處理代碼 3.檢核
-				l420BTita.putParam("AcDate", tBatxHead.getAcDate()); // 會計日期
-				l420BTita.putParam("BatchNo", tBatxHead.getBatchNo());// 批號
-				MySpring.newTask("L420BBatch", this.txBuffer, l420BTita);
 			}
 		}
 

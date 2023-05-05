@@ -81,7 +81,9 @@ public class LC002 extends TradeBuffer {
 					occursList.putParam("TlrNo", dVo.get("TlrX"));
 					occursList.putParam("FlowType", dVo.get("FlowType"));
 					occursList.putParam("FlowStep", dVo.get("FlowStep"));
-					occursList.putParam("RejectReason", Objects.isNull(dVo.get("RejectReason")) || dVo.get("RejectReason").isEmpty() ? "" : "退回原因 : " + dVo.get("RejectReason"));
+					occursList.putParam("RejectReason",
+							Objects.isNull(dVo.get("RejectReason")) || dVo.get("RejectReason").isEmpty() ? ""
+									: "退回原因 : " + dVo.get("RejectReason"));
 
 					int supRelease = 0;
 					int flowType = dVo.get("FlowType").isEmpty() ? 0 : Integer.valueOf(dVo.get("FlowType"));
@@ -90,7 +92,7 @@ public class LC002 extends TradeBuffer {
 					int submitFg = dVo.get("SubmitFg").isEmpty() ? 0 : Integer.valueOf(dVo.get("SubmitFg"));
 					int flowMode = dVo.get("FlowMode").isEmpty() ? 0 : Integer.valueOf(dVo.get("FlowMode"));
 					if (flowType > 1 && flowStep == 1) {
-						if (flowStep != flowStep2 || (flowStep == 1 && submitFg == 1 && flowMode != 3)) {
+						if (flowStep != flowStep2) {
 							supRelease = 1; // 1的時候 按鈕不開
 						}
 					}
@@ -138,7 +140,8 @@ public class LC002 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 500;
 
-		Slice<TxRecord> slTxRecord = txRecordService.findByLC002(iEntday, iBrNo, "S", 1, 0, 1, iTlrNo + "%", iTranNo + "%", this.index, this.limit);
+		Slice<TxRecord> slTxRecord = txRecordService.findByLC002(iEntday, iBrNo, "S", 1, 0, 1, iTlrNo + "%",
+				iTranNo + "%", this.index, this.limit);
 		List<TxRecord> lTxRecord = slTxRecord == null ? null : slTxRecord.getContent();
 
 		if (lTxRecord == null) {
@@ -152,7 +155,8 @@ public class LC002 extends TradeBuffer {
 					tTxFlowId.setEntdy(tTxRecord.getEntdy());
 					tTxFlowId.setFlowNo(tTxRecord.getFlowNo());
 					TxFlow tTxFlow = txFlowService.findById(tTxFlowId);
-					if (tTxRecord.getFlowStep() != tTxFlow.getFlowStep() || (tTxRecord.getFlowStep() == 1 && tTxFlow.getSubmitFg() == 1 && tTxFlow.getFlowMode() != 3)) {
+					if (tTxRecord.getFlowStep() != tTxFlow.getFlowStep() || (tTxRecord.getFlowStep() == 1
+							&& tTxFlow.getSubmitFg() == 1 && tTxFlow.getFlowMode() != 3)) {
 						supRelease = 1; // 1的時候 按鈕不開
 					}
 				}
