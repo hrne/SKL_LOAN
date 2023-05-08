@@ -599,56 +599,59 @@ public class L4320Batch extends TradeBuffer {
 			// 利率按合約 Y ， 本次利率 = 本次指標利率 + 目前合約加減碼
 			// 利率按合約 N && 有地區別， 本次利率 = 目前利率 + 地區別加減碼，依地區別利率上、下限調整，不可超過合約加碼利率
 			// 利率按合約 N && 無地區別， 本次利率 = 本次指標利率 +借戶利率檔個人加碼利率
+			String warnCity = "";
+			boolean isCityRate = false;
 			if ("Y".equals(incrFlag)) {
 				rateProp = contrBaseRate.add(rateIncr);
 			} else {
-				rateProp = contrBaseRate.add(individualIncr);
+				if ("".equals(cityCode.trim()) || this.iCustType == 2) {
+					rateProp = contrBaseRate.add(individualIncr);
+				} else {
+					isCityRate = true;
+					tTempVo.putParam("CityRateIncr", cityRateIncr);
+					tTempVo.putParam("CityRateCeiling", cityRateCeiling);
+					tTempVo.putParam("CityRateFloor", cityRateFloor);
+					// 本次利率 = 目前利率 + 地區別加減碼
+					rateProp = presentRate.add(cityRateIncr);
+
+					// 依地區別利率上、下限調整
+					if (rateProp.compareTo(cityRateCeiling) > 0) {
+						rateProp = cityRateCeiling;
+						warnCity = ", 高於地區上限，依地區上限利率調整";
+					}
+					if (rateProp.compareTo(cityRateFloor) < 0) {
+						rateProp = cityRateFloor;
+						warnCity = ", 低於地區下限，依地區下限利率調整";
+					}
+					if (rateIncr.compareTo(BigDecimal.ZERO) > 0 && contractRate.compareTo(rateProp) < 0) {
+						rateProp = contractRate;
+						warnCity = ", 高於合約利率，依合約利率調整";
+					}
+					warnCity += ", 地區別加減碼設定值:" + cityRateIncr;
+				}
 			}
 
-			// 定期機動檢核件
-			if (iExecCode == 9) {
-				// 下次利率調整日小於調整月份列入[人工調整]
-				if ("Y".equals(incrFlag)) {
-					adjCode = 3;
-				} else {
-					adjCode = 4;
-				}
-				if (nextAdjRateDate < wkLastMonthDateS && nextAdjRateDate < maturityDate) {
-					warnMsg += ", 下次利率調整日小於調整月份";
-				}
-			} else if (effDateCurt / 100  == maturityDate / 100) {
+			if (effDateCurt / 100 >= maturityDate / 100) {
 				// 下次利率調整日為到期日月份者於整批利率調整時列入[到期日提醒件],不調整利率
 				adjCode = 9;
 				warnMsg += ", 下次利率調整日為到期日" + maturityDateX + "月份";
+			} else if (iExecCode == 9) {
+				// 下次利率調整日小於調整月份列入[人工調整]
+				warnMsg += ", 下次利率調整日小於調整月份";
+				if (isCityRate) {
+					adjCode = 4;
+				} else {
+					adjCode = 3;
+				}
 			} else if ("Y".equals(incrFlag)) {
 				adjCode = 1; // 批次自動調整
-			} else if ("".equals(cityCode.trim()) || this.iCustType == 2) {
-				adjCode = 3; // 人工調整(按合約)
-			} else {
+			} else if (isCityRate) {
 				adjCode = 2; // 按地區別調整
-				tTempVo.putParam("CityRateIncr", cityRateIncr);
-				tTempVo.putParam("CityRateCeiling", cityRateCeiling);
-				tTempVo.putParam("CityRateFloor", cityRateFloor);
-				// 本次利率 = 目前利率 + 地區別加減碼
-				rateProp = presentRate.add(cityRateIncr);
-				String warn = "";
-				// 依地區別利率上、下限調整
-				if (rateProp.compareTo(cityRateCeiling) > 0) {
-					rateProp = cityRateCeiling;
-					warn = ", 高於地區上限，依地區上限利率調整";
-				}
-				if (rateProp.compareTo(cityRateFloor) < 0) {
-					rateProp = cityRateFloor;
-					warn = ", 低於地區下限，依地區下限利率調整";
-				}
-				if (rateIncr.compareTo(BigDecimal.ZERO) > 0 && contractRate.compareTo(rateProp) < 0) {
-					rateProp = contractRate;
-					warn = ", 高於合約利率，依合約利率調整";
-				}
-				warn += ", 地區別加減碼設定值:" + cityRateIncr;
-				warnMsg += warn;
+			} else {
+				adjCode = 3; // 人工調整(按合約)
 			}
 
+			warnMsg += warnCity;
 			// 逾一期 => 下次繳息日,下次應繳日 < 上次月初日
 			if (adjCode == 2 && b.getOvduTerm() >= 1) {
 				adjCode = 4; // 人工調整(按地區別)

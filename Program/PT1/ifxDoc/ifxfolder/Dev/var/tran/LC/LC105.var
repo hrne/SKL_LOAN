@@ -1,0 +1,164 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+! <include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+! #ORGFG=_,_,S
+! E(0,1)
+
+#button=x,100,S
+K(MODIFYBUTTON,刪除)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,800];printer.width=[20,20];">
+[
+["[LC105]                                 上傳附件查詢"],
+["#FdTranNo+交易代號",#TranNo],
+["#FdCustNo+戶@@@@號",#CustNo,"-",#FacmNo,"-",#BormNo],
+["#FdMrKey+參考編號",#MrKey],
+["#FdNote+說@@@@明",#Note],
+]
+
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+
+#FdTranNo=X,2,L
+#FdCustNo=X,2,L
+#FdMrKey=X,2,L
+#FdDesc=X,2,L
+#FdNote=X,2,L
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，LC014請從入口交易進入),$)
+
+! 刪除進入
+#Deal_Delete=X,1,S
+C(5,#TranKey_Tmp,4,$,S)
+K(MODIFYBUTTON,刪除)
+E(0,@FUNCIND,4)
+
+![連動交易]
+#NTXBUF=X,700,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@TranKey_Tmp,#NTXBUF,1,1)
+T(1,@TranNo,#NTXBUF,2,5)
+T(1,@CustNo,#NTXBUF,7,7)
+T(1,@FacmNo,#NTXBUF,14,3)
+T(1,@BormNo,#NTXBUF,17,3)
+T(1,@MrKey,#NTXBUF,20,100)
+T(1,@Note,#NTXBUF,120,100)
+T(1,@FileNo,#NTXBUF,220,8)
+
+
+![刪除]
+#TranKey_Tmp=X,1,S
+
+!交易代號
+#TranNo=X,5,L
+
+!戶號
+#CustNo=A,7,L
+
+#FacmNo=A,3,L
+
+#BormNo=A,3,L
+
+#MrKey=x,100,L
+
+#Note=x,100,L
+
+
+#MRKEY=_,_,S
+C(3,#CustNo,0,S,T(2,#CustNo+-+#FacmNo+-+#BormNo))
+
+#FileNo=X,100,L
+
+#RPTFG=A,1,S
+
+!刪除隱藏重新交易按鈕
+#AGAIN=X,1,S
+E(0,1)
+ASGN(AGAIN$)
+
+
+!#CHAINXMT=X,1,S
+!C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+
+</sub>
+
+!---------- TXFORM = LC105 ----------
+<sub type="FORM" name="LC105">
+
+#SCRTIL=_,_,S
+T(3,[LC105] 上傳附件查詢)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+#OFileNo=A,8,S
+
+!附件類別
+#OTypeItem=x,50,S
+
+!備註
+#ODesc=x,100,S
+
+!上傳日期
+#OCreateDate=X,20,S
+
+!上傳人員
+#OCreateEmp=x,20,S
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#TranKey_Tmp
+#TranNo
+#CustNo
+#FacmNo
+#BormNo
+#MrKey
+#FileNo
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="PRT.icf::FM101.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+!--------- OUTPUT畫面 --------
+!---------- 單據輸出組合 ----------
+!<sub type="PART" name="LC105" layout="cols=1;screen.width=[150,800];printer.width=[20,20];">
+
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+
+</sub>

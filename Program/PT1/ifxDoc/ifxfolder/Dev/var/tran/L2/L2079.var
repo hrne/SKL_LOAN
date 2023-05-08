@@ -195,7 +195,7 @@ T(3,1)ASGN(LOOP$)
 #OONewFacmNo=A,3,L
 #OONewBormNo=A,3,L
 #OORenewCode=X,1,L
-#OORenewCodeX=x,4,L
+#OORenewCodeX=x,8,L
 T(H,#OORenewCode,#RenewCodeHelp)
 #OOMainFlag=X,1,L
 #OOAcDate=D,7,L
@@ -255,8 +255,8 @@ TXFORM=L2079
 {width:100,align:'center'}
 #OONewBormNo=新撥款序號
 {width:100,align:'center'}
-#OORenewCodeX=展期記號
-{width:90,align:'center'}
+#OORenewCodeX=展期／借新還舊
+{width:130,align:'center'}
 #OOMainFlag=主要記號
 {width:90,align:'center'}
 #OOAcDate=會計日期

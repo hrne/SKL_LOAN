@@ -48,14 +48,15 @@ public class L5915Batch extends TradeBuffer {
 
 		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", (isFinish ? "LC009" : "L5915"),
 				titaVo.getTlrNo(), TRAN_CODE + TRAN_NAME + (isFinish ? "已完成" : "查無資料"), titaVo);
+		String mm = titaVo.getParam("Ym").substring(3, 5);
+		if ("03".equals(mm) || "06".equals(mm) || "09".equals(mm) || "13".equals(mm)) {
+			lP005Report.setTxBuffer(this.getTxBuffer());
+			lP005Report.setParentTranCode("L5915");
+			lP005Report.exec(titaVo);
 
-		lP005Report.setTxBuffer(this.getTxBuffer());
-		lP005Report.setParentTranCode("L5915");
-		lP005Report.exec(titaVo);
-
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
-				"LP005房貸協辦人員考核核算底稿已完成", titaVo);
-
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+					"LP005房貸協辦人員考核核算底稿已完成", titaVo);
+		}
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

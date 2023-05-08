@@ -45,7 +45,10 @@ BEGIN
         , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
     )
     SELECT "MlaundryRecord_SEQ".nextval   AS "LogNo"
-          ,IV."IVWDAT"                    AS "RecordDate"          -- 訪談日期 Decimald 8 0
+          ,CASE IV."IVWDAT"
+             WHEN 39290925 -- 2023-05-08 Wei from SKL金靜 mail 回覆:疑似洗錢訪談有問題的那筆資料,就按您建議的值轉入
+             THEN 20180925
+           ELSE IV."IVWDAT"               AS "RecordDate"          -- 訪談日期 Decimald 8 0
           ,IV."LMSACN"                    AS "CustNo"              -- 戶號 Decimal 7 0
           ,0                              AS "FacmNo"              -- 額度編號 Decimal 3 0
           ,0                              AS "BormNo"              -- 撥款序號 Decimal 3 0

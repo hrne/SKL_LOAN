@@ -83,11 +83,15 @@ public class L4320RServiceImpl extends ASpringJpaParm implements InitializingBea
 				+ " LEFT JOIN \"CdCode\"   CD ON CD.\"DefCode\" = 'BaseRate0' "
 				+ "                          AND CD.\"Code\" = BR.\"BaseRateCode\" "
 				+ " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\"   = BR.\"CustNo\" "
-				+ " LEFT JOIN \"FacProd\"  FP ON FP.\"ProdNo\"   = BR.\"ProdNo\" " + " WHERE BR.\"AdjDate\" = "
-				+ iAdjDate + "   AND BR.\"TxKind\" = " + txKind + "   AND BR.\"CustCode\" >= " + custType1
-				+ "   AND BR.\"CustCode\" <= " + custType2 + "   AND BR.\"AdjCode\" = " + adjCode
-				+ "   AND BR.\"RateKeyInCode\" = " + rateKeyInCode + "   AND BR.\"TitaTlrNo\" = " + titaTlrNo
-				+ "   AND BR.\"TitaTxtNo\" = " + titaTxtNo;
+				+ " LEFT JOIN \"FacProd\"  FP ON FP.\"ProdNo\"   = BR.\"ProdNo\" " // 商品檔
+				+ " WHERE BR.\"AdjDate\" = " + iAdjDate // AdjDate
+				+ "   AND BR.\"TxKind\" = " + txKind // TxKind
+				+ "   AND BR.\"CustCode\" >= " + custType1 // CustCode
+				+ "   AND BR.\"CustCode\" <= " + custType2 // CustCode
+				+ "   AND BR.\"AdjCode\" = " + adjCode // AdjCode
+				+ "   AND BR.\"RateKeyInCode\" = " + rateKeyInCode // RateKeyInCode
+				+ "   AND BR.\"TitaTlrNo\" = '" + titaTlrNo + "'" // TitaTlrNo
+				+ "   AND BR.\"TitaTxtNo\" = '" + titaTxtNo + "'"; // TitaTxtNo
 		this.info("sql=" + sql);
 
 		Query query;

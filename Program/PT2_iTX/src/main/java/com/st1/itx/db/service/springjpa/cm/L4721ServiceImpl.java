@@ -1,6 +1,5 @@
 package com.st1.itx.db.service.springjpa.cm;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -71,12 +70,6 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   ,NVL(c.\"EntCode\", ' ')                      as \"EntCode\" "; // 企金別 共用代碼檔 0:個金 1:企金 2:企金自然人
 		sql += "   ,NVL(cm.\"CityCode\", ' ')                    as \"CityCode\""; // 擔保品地區別
 		sql += "   ,NVL(cm.\"AreaCode\", ' ')                    as \"AreaCode\" "; // 擔保品鄉鎮別
-//		sql += "   ,NVL(\"Fn_GetCdCityIntRateCeiling\"(NVL(cm.\"CityCode\", ' '), r2.\"EffectDate\" ), 0) ";
-//		sql += "                                                 as \"CityRateCeiling\" "; // 地區別利率上限
-//		sql += "   ,NVL(\"Fn_GetCdCityIntRateFloor\"(NVL(cm.\"CityCode\", ' '), r2.\"EffectDate\" ), 0) ";
-//		sql += "                                                 as \"CityRateFloor\" "; // 地區別利率下限
-//		sql += "   ,NVL(\"Fn_GetCdCityIntRateIncr\"(NVL(cm.\"CityCode\", ' '), r2.\"EffectDate\",  :inputEffectDateE ), 0) ";
-//		sql += "                                                 as \"CityRateIncr\" "; // 地區別利率加減碼
 		sql += "   ,b.\"NextPayIntDate\"                         as \"NextPayIntDate\" "; // 下次繳息日,下次應繳日
 		sql += "   ,b.\"DrawdownDate\"                           as \"DrawdownDate\" "; // 撥款日期
 		sql += "   ,b.\"MaturityDate\"                           as \"MaturityDate\" "; // 到期日期
@@ -180,8 +173,6 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " left join \"FacCaseAppl\" a on  a.\"ApplNo\" = f.\"ApplNo\"  ";
 		}
 		sql += " where b.\"Status\" = 0                                        ";
-		sql += "   and b.\"MaturityDate\" >= " + sDate;
-		sql += "   and b.\"MaturityDate\" <= " + eDate;
 		sql += "   and c.\"EntCode\" >= " + iEntCode1;
 		sql += "   and c.\"EntCode\" <= " + iEntCode2;
 		// 1.定期機動調整
@@ -214,8 +205,8 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 商品代碼
 		if (iTxKind == 5) {
 			sql += "   and p.\"ProdNo\" in ( " + prodNos + " ) ";
-			sql += "   and r.\"EffectDate\"  <= " + sDate;
-			sql += "   and r.\"EffectDate\"  >= " + eDate;
+			sql += "   and r.\"EffectDate\"  >= " + sDate;
+			sql += "   and r.\"EffectDate\"  <= " + eDate;
 		}
 
 		this.info("sql=" + sql);

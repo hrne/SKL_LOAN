@@ -1,0 +1,126 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+
+#button=x,100,S
+K(MODIFYBUTTON,設定)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,800];printer.width=[20,20];">
+[
+["[LC115]                                 套印預設印表機設定"],
+["#FdStanIp+工作站IP",#StanIp],
+["#FdFileCode+報表代碼",#FileCode],
+["#FdFileItem+報表說明",#FileItem],
+["#FdServerIp+列印伺服器IP",#ServerIp],
+["#FdPrinter+預設印表機",#Printer],
+]
+!---------- AP Button AREA ----------
+
+! 必輸欄位
+
+
+!---------- AP TEXT AREA Variables ----------
+#FdStanIp=X,2,L
+
+#FdFileCode=X,2,L
+
+#FdFileItem=X,2,L
+
+#FdServerIp=X,2,L
+T(3,*)
+
+#FdPrinter=X,2,L
+T(3,*)
+
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#NTXBUF=x,1000,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@StanIp,#NTXBUF,1,15)
+T(1,@FileCode,#NTXBUF,16,40)
+T(1,@FileItem,#NTXBUF,56,80)
+T(1,@ServerIp,#NTXBUF,136,15)
+T(1,@Printer,#NTXBUF,151,80)
+
+!自動更新原交易
+#AutoReFresh=A,1,S
+C(3,#CHAIN,1,$,S)
+E(0,1)
+ASGN(CAUTO$)
+
+!不可重新交易
+#AGAIN=X,1,S
+E(0,1)ASGN(AGAIN$)
+
+#StanIp=X,15,L
+
+#FileCode=x,40,L
+
+#MRKEY=_,_,S
+T(2,#StanIp+-+#FileCode)
+
+#FileItem=x,80,L
+
+#ServerIp=X,15,I
+
+#printerList=x,500,S
+C(4,#ServerIp,S,$)
+K(PLIST,#ServerIp)
+
+#Printer=x,100,I
+C(4,#ServerIp,S,$)
+HELP(#printerList)
+@
+V(7)
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = LC115 ----------
+<sub type="FORM" name="LC115">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,LC115,$,S)
+
+#SCRTIL=_,_,S
+T(3,[LC115] 套印預設印表機設定)
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#StanIp
+#FileCode
+#ServerIp
+#Printer
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+
+TXFORM=LC115
+^
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

@@ -48,26 +48,27 @@ BEGIN
                        , CNM."ClCode2"
                        , CNM."ClNo"
             ORDER BY NVL(GDTP."GDTIDT",0)
-                   , CNM.GDRID1
-                   , CNM.GDRID2
-                   , CNM.GDRNUM
+                   , CNM."GdrId1"
+                   , CNM."GdrId2"
+                   , CNM."GdrNum"
+                   , CNM."LgtSeq"
            )                           AS "EvaNo" -- 鑑估序號 DECIMAL 2  
          , NVL(GDTP."GDTIDT",0)        AS "EvaDate" -- 鑑價日期 DecimalD 8  
          , NVL(GDTP."ETTVAL",0)        AS "EvaAmt" -- 評估總價 DECIMAL 16 2 必須輸入
-         , NVL(S2."ESTVAL",0)          AS "EvaNetWorth" -- 評估淨值 DECIMAL 16 2 可不輸入
-         , NVL(S2."RSTVAL",0)          AS "RentEvaValue" -- 出租評估淨值 DECIMAL 16 2 可不輸入
+         , NVL(GDTP."ESTVAL",0)        AS "EvaNetWorth" -- 評估淨值 DECIMAL 16 2 可不輸入
+         , NVL(GDTP."RSTVAL",0)        AS "RentEvaValue" -- 出租評估淨值 DECIMAL 16 2 可不輸入
          , CASE 
              WHEN CNM."ClCode1" = 1 
-             THEN S4."LGTIID" 
+             THEN HGTP."LGTIID" 
              WHEN CNM."ClCode1" = 2 
-             THEN S5."LGTIID" 
+             THEN LGTP."LGTIID" 
            ELSE '' END                 AS "EvaCompanyId" -- 估價公司代碼 VARCHAR2 2  
          , "Fn_GetCdCode"('EvaCompanyCode'
              ,CASE 
                 WHEN CNM."ClCode1" = 1 
-                THEN S4."LGTIID" 
+                THEN HGTP."LGTIID" 
                 WHEN CNM."ClCode1" = 2 
-                THEN S5."LGTIID" 
+                THEN LGTP."LGTIID" 
               ELSE '' END )           AS "EvaCompanyName" -- 估價公司名稱 NVARCHAR2 100  
          , APLP."CUSEM6"              AS "EvaEmpno" -- 估價人員 VARCHAR2 6  
          -- 舊資料轉入時，重評原因以計件代碼判斷後轉入

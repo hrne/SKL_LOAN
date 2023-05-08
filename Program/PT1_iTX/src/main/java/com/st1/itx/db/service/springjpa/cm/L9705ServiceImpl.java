@@ -155,10 +155,11 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 			dayFg = "1";
 			break;
 		case "2": // 應繳日變更
-		case "3": // 利率變動
 		case "4": // 部份還款
 			sql += "    AND M.\"CustNo\" > 0 ";
 			sql += "    AND LBT.\"CustNo\" IS NOT NULL";
+		case "3": // 利率變動
+			sql += "    AND M.\"CustNo\" > 0 ";
 //			sql += "    AND BATX.\"RepayType\" = '02' ";
 			dayFg = "1";
 			break;
