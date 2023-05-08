@@ -467,6 +467,17 @@ public class TxBatchCom extends TradeBuffer {
 			}
 		}
 
+		// --------------- 執行債一般債權客戶檢核 ------------------
+		// 匯款轉帳若為一般債權客戶,整批檢核訊息提示債協的案件種類且需人工入帳,A6與A7的還款類別為債協匯入款,其他的依原預設還款類別
+		// USER需以L3210自行輸入暫收原因或以整批入帳之維護交易維護
+		if ("0".equals(this.procStsCode) && tDetail.getRepayCode() == 1 && this.repayType != 11) {
+			NegMain tNegMain = negMainService.statusFirst("0", tDetail.getCustNo(), titaVo); // 0-正常
+			if (tNegMain != null && "N".equals(tNegMain.getIsMainFin())) {
+				this.checkMsg += loanCom.getCdCodeX("CaseKindCode", tNegMain.getCaseKindCode(), titaVo) + "案件";
+				this.procStsCode = "2"; // 2.人工處理
+			}
+		}
+
 		// --------------- 執行 AML 交易檢核(匯款轉帳及支票兌現) ------------------
 		// 檢核狀態 0.非可疑名單/已完成名單確認 1.需審查/確認 2.為凍結名單/未確定名單
 		// 如為 1,2，需再讀取AmlLog檔的最新確認狀態
@@ -546,16 +557,6 @@ public class TxBatchCom extends TradeBuffer {
 			this.procStsCode = "3"; // 3.檢核錯誤
 		}
 
-		// --------------- 執行債一般債權客戶檢核 ------------------
-		// 匯款轉帳若為一般債權客戶,整批檢核訊息提示債協的案件種類且需人工入帳,A6與A7的還款類別為債協匯入款,其他的依原預設還款類別
-		// USER需以L3210自行輸入暫收原因或以整批入帳之維護交易維護
-		if ("0".equals(this.procStsCode) && tDetail.getRepayCode() == 1 && this.repayType != 11) {
-			NegMain tNegMain = negMainService.statusFirst("0", tDetail.getCustNo(), titaVo); // 0-正常
-			if (tNegMain != null && "N".equals(tNegMain.getIsMainFin())) {
-				this.checkMsg += loanCom.getCdCodeX("CaseKindCode", tNegMain.getCaseKindCode(), titaVo) + this.checkMsg;
-				this.procStsCode = "2"; // 2.人工處理
-			}
-		}
 
 		// ------------- 將檢核結果存入整批入帳明細檔(還款類別、處理說明、處理狀態) -----------
 		// 檢核正常

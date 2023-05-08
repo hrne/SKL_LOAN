@@ -20,8 +20,13 @@ E(0,0)
 ["[L4721]                                 整批批次產出利率變動對帳單"],
 [#<->#,"#FdAdjDate+利率調整日",#sAdjDate,"~",#eAdjDate],
 [#<->#,"#FdTxKind+利率種類",#TxKind,#TxKindX],
-[#<->#,"#FdCustType+個金/企金",#CustType,#CustTypeX]
+[#<->#,"#FdCustType+個金/企金",#CustType,#CustTypeX],
+["#grid#,{id:1,expand:true,loop:50,row_height:1,s_cols:[50,200]}","#FdProdNo+商品代碼",
+["代碼","商品名稱"],
+[#ProdNo1,#ProdNoX1],
+],
 ]
+
 
 #FdAdjDate=X,2,L
 T(3,*)
@@ -29,8 +34,16 @@ T(3,*)
 T(3,*)
 #FdCustType=X,2,L
 T(3,*)
+#FdProdNo=X,2,L
+T(3,*)
 ! Help
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+!預設進入畫面不會有商品別，需選擇全部或按商品
+INVOKEJS(SHOW,L4721,4,4,0)
+##loop{times:50,i:1}
+C(4,#ProdNoX{i},INVOKEJS(SHOW,grd1_{i},0),INVOKEJS(SHOW,grd1_{i},1))
+##end
 
 ![戶別]
 #CDDEF01=x,26,S
@@ -42,6 +55,7 @@ T(3,CdCode.EntCode2)
 ![利率種類]
 #CDDEF02=x,50,S
 T(3,CdCode.TxKind)
+
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
@@ -81,21 +95,15 @@ T(2,#DT)
 IF(#eAdjDate > #DT,V(P,不可大於會計日),$)
 IF(#eAdjDate < #sAdjDate,V(P,不可小於會計起日),$)
 
-
-
-
 #TxKind=A,1,I
 HELP(#BaseRateHelp)
 @V(H,#BaseRateHelp)
+IF(#TxKind==0 || #TxKind==5,INVOKEJS(SHOW,L4721,4,4,1),INVOKEJS(SHOW,L4721,4,4,0))
+IF(#TxKind==0 || #TxKind==5,INVOKEJS(SHOW,grd1_0,1),INVOKEJS(SHOW,grd1_0,0))
+
 
 #TxKindX=X,16,L
 T(3,)T(H,#TxKind,#BaseRateHelp)
-!SWITCH(#TxKind
-!,01,T(2,保單分紅利率)
-!,02,T(2,郵政儲金利率)
-!,98,T(2,員工利率)
-!,99,T(2,自訂利率)
-!,T(2,))
 
 ! 戶別
 #CustType=A,1,I
@@ -107,16 +115,33 @@ HELP(#EntCodeHelp)
 
 #CustTypeX=X,30,L
 T(3,)T(H,#CustType,#EntCodeHelp)
-!SWITCH(#CustType,1,T(3,個金),2,T(3,企金（含企金自然人）),T(3,))
-
-
-! #CHAINXMT=X,1,S
-! C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
-
 
 #RPTFG=A,1,S
 E(0,0)
 
+
+#RimFuncCode=A,1,S
+#RimTxCode=X,5,S
+#RimProdNo=X,5,S
+
+##loop{times:50,i:1}
+
+#ProdNoX{i}=X,20,L
+
+#ProdNo{i}=X,5,I
+@C(4,#ProdNo{i},INVOKEJS(SHOW,grd1_{i},0),INVOKEJS(SHOW,grd1_{i},1))
+C(4,#ProdNo{i},s,$)
+T(2,@RimProdNo,#ProdNo{i})
+E(0,@RimFuncCode,5)
+T(2,@RimTxCode,#TXCD)
+S(L2R01,1,#RimFuncCode,#RimTxCode,#RimProdNo)
+R(1,L2R01)
+T(2,@ProdNoX{i},#L2r01ProdName)
+T(2,@ProdNo{i},#L2r01ProdNo)
+##end
+
+
+<include src="ROM.icf::L2R01.dec"/>
 
 </sub>
 
@@ -153,6 +178,11 @@ T(3,[L4721] 整批批次產出利率變動對帳單)
 #TxKind
 #TxKindX
 #CustType
+
+##loop{times:50,i:1}
+#ProdNo{i}
+##end
+
 #END
 </sub>
 
@@ -162,6 +192,7 @@ T(3,[L4721] 整批批次產出利率變動對帳單)
 TXFORM=L4721
 ^
 <include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L2R01.tom"/>
 </sub>
 
 

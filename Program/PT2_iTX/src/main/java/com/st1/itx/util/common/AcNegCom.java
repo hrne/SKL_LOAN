@@ -386,7 +386,6 @@ public class AcNegCom extends TradeBuffer {
 				acDetail.setDbCr("C");
 				acDetail.setSumNo("092"); // 092 :轉客戶暫收可抵繳
 				acDetail.setAcctCode("TAV");
-				acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
 				acDetail.setTxAmt(tNegAppr02.getTxAmt());
 				acDetail.setCustNo(custNo);// 實際借款人戶號
 				acDetail.setFacmNo(facmNo);

@@ -151,9 +151,11 @@ BEGIN
     )
     SELECT DENSE_RANK() 
            OVER (
-            ORDER BY NVL(S1.LMSACN,0)
-                   , NVL(S1.HGTAD1,' ')
-                   , NVL(S1.HGTAD2,' ')
+            ORDER BY NVL(S1.LMSACN,0) -- 戶號
+                   , NVL(S1.HGTAD1,' ') -- 縣市別
+                   , NVL(S1.HGTAD2,' ') -- 鄉鎮市區
+                   , NVL(S1.LGTADR,' ') -- 門牌號碼
+                   , NVL(S1.LGTSEQ,' ') -- 序號
                    , S1."ProcessUniqueFlag" -- 2023-04-27 Wei 修改 from SKL 佳怡 email SKL-會議記錄-首撥表相關-20230426
            ) AS "GroupNo"
           ,0 AS "SecGroupNo"
@@ -213,7 +215,10 @@ BEGIN
                  ,DENSE_RANK()
                   OVER (
                     PARTITION BY S1."GroupNo"
-                    ORDER BY NVL(S1.hgtmhn,0)
+                    ORDER BY NVL(S1.LGTADR,' ') -- 2023-05-08 Wei 增加 from SKL佳怡 2023-05-05 mail 增加唯一性判斷條件-門牌號碼
+                           , NVL(S1.hgtmhn,0)
+                           , NVL(S1.LGTSEQ,' ') -- 2023-05-08 Wei 增加 from SKL佳怡 2023-05-05 mail 增加唯一性判斷條件-序號
+                           , NVL(S1.LGTCIF,' ') -- 2023-05-08 Wei 增加 from SKL佳怡 2023-05-05 mail 增加唯一性判斷條件-擔保品提供人
                   )  AS "SecGroupNo"
                  ,S1.LMSACN
                  ,S1.LMSAPN

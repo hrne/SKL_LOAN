@@ -176,10 +176,9 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                  WHEN \"CreateEmpNo\" in ('999999') AND \"TitaTxCd\" in ('L3100','L3701') THEN 6              ";
 		sql += "       		        WHEN \"AcctCode\" IN ('TCK','RCK','BCK') THEN 4                ";
 		sql += "       		        WHEN NVL(JSON_VALUE(\"OtherFields\", '$.TempReasonCode'),' ')  IN ('3','6','03','06') THEN 4              ";
-		sql += "                  WHEN \"AcctCode\" IN ('T11','T12','T13') THEN 3               ";
-		sql += "       		        WHEN NVL(JSON_VALUE(\"OtherFields\", '$.ReconCode'),' ')  IN ('A6','A7') THEN 3               ";
 		sql += "                  WHEN \"AcctCode\" IN ('TAV') THEN 2               ";
 		sql += "                  WHEN (\"TempAmt\" + \"Overflow\") <> 0 THEN 2               ";
+		sql += "                  WHEN \"AcctCode\" IN ('T11','T12','T13') THEN 3               ";
 		sql += "                  WHEN \"BormNo\" > 0 THEN 1                 ";
 		sql += "     		          ELSE 7              ";
 		sql += "       	  	  END)                        AS \"TxKind\"               ";

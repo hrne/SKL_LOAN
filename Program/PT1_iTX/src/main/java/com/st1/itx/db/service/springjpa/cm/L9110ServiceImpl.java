@@ -196,6 +196,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,S1.\"LandOwnerPart\" AS F27土地持份比例    ";
 		sql += " ,S1.\"LandOwnerTotal\" AS F28土地持份總比例    ";
 		sql += " ,S1.\"LandClItem\" AS F29土地擔保品別  ";
+		sql += " ,S1.\"BdLandItem\" AS F30類別  ";
 		sql += " FROM ";
 		sql += "     (( ";
 		sql += "         SELECT ";
@@ -238,7 +239,8 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             0 AS \"LandSettingAmt\",  ";
 		sql += "             0 AS \"LandOwnerPart\" ,  ";
 		sql += "             0 AS \"LandOwnerTotal\",  ";
-		sql += "             ' ' AS \"LandClItem\"   ";
+		sql += "             ' ' AS \"LandClItem\",   ";
+		sql += "             '1' AS \"BdLandItem\"   ";
 		sql += "         FROM ";
 		sql += "             \"ClFac\"        cf ";
 		sql += "             LEFT JOIN \"ClBuilding\"   l ON l.\"ClCode1\" = cf.\"ClCode1\" ";
@@ -352,7 +354,8 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             cli.\"SettingAmt\"        AS \"LandSettingAmt\", ";
 		sql += "             nvl(lo.\"OwnerPart\", 0) AS \"LandOwnerPart\" , ";
 		sql += "             nvl(lo.\"OwnerTotal\", 0) AS \"LandOwnerTotal\", ";
-		sql += "             TO_CHAR(cdc1.\"Item\" )            AS \"LandClItem\"   ";
+		sql += "             TO_CHAR(cdc1.\"Item\" )            AS \"LandClItem\",   ";
+		sql += "             '2' AS \"BdLandItem\"   ";
 		sql += "         FROM ";
 		sql += "             \"ClFac\"           cf ";
 		sql += "             LEFT JOIN \"ClLand\"          l ON l.\"ClCode1\" = cf.\"ClCode1\" ";

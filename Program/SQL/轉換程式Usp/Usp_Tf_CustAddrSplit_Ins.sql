@@ -330,8 +330,12 @@ BEGIN
     ,C1."RegAreaCode"  = C2."AreaCode"   -- 鄉鎮市區代碼 VARCHAR2 3  
     ,C1."RegRoad"      = CASE 
                            WHEN C2."SplitFg" = 'Y' 
-                           THEN C2."SplitRoad"  -- 路名 NVARCHAR2 40  
-                         ELSE C1."RegRoad" END 
+                           THEN C2."SplitRoad"  -- 路名 NVARCHAR2 40
+                           WHEN NVL(C2."CityCode",' ') <> ' ' AND NVL(C2."AreaCode",' ') <> ' ' 
+                           THEN SUBSTR(C1."RegRoad",3+LENGTH(C1."AreaItem")+1) 
+                           WHEN NVL(C2."CityCode",' ') <> ' ' 
+                           THEN SUBSTR(C1."RegRoad",4) 
+                         ELSE C1."RegRoad" END  
     ,C1."RegSection"   = CASE 
                            WHEN C2."SplitFg" = 'Y' 
                            THEN C2."Section"    -- 段 VARCHAR2 5  
@@ -674,6 +678,10 @@ BEGIN
     ,C1."CurrRoad"      = CASE 
                             WHEN C2."SplitFg" = 'Y' 
                             THEN C2."SplitRoad"  -- 路名 NVARCHAR2 40  
+                            WHEN NVL(C2."CityCode",' ') <> ' ' AND NVL(C2."AreaCode",' ') <> ' ' 
+                            THEN SUBSTR(C1."CurrRoad",3+LENGTH(C1."AreaItem")+1) 
+                            WHEN NVL(C2."CityCode",' ') <> ' ' 
+                            THEN SUBSTR(C1."CurrRoad",4) 
                           ELSE C1."CurrRoad" END 
     ,C1."CurrSection"   = CASE 
                             WHEN C2."SplitFg" = 'Y' 

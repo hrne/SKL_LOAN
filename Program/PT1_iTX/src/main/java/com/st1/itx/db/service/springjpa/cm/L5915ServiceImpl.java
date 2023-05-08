@@ -149,6 +149,7 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"CdBcm\" B2 ON B2.\"UnitCode\" = PI.\"DistCode\" "; // 部室
 		sql += " LEFT JOIN \"CdBcm\" B3 ON B3.\"UnitCode\" = PI.\"UnitCode\" "; // 部室
 		sql += " WHERE PR.\"IntroducerBonusDate\" > 0 ";
+		sql += "   AND PR.\"RepayType\" = 0 ";
 		sql += "   AND PR.\"WorkMonth\" = :inputWorkMonth ";
 		sql += ") ";	
 		sql += " ORDER BY SUBSTR(\"EmpNo\",1,1) ";
@@ -176,13 +177,13 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 協辦人員業績金額的檔案要產出不只有協辦人員業績金額的檔案
 		String sql = " ";
 		sql += "SELECT * FROM ( ";	
-		sql += " SELECT PD.\"CustNo\"            AS \"CustNo\" "; // -- F0 戶號
-		sql += "      , PD.\"FacmNo\"            AS \"FacmNo\" "; // -- F1 額度
-		sql += "      , SUM(PD.\"DrawdownAmt\")  AS \"DrawdownAmt\" "; // -- F2 撥款金額
-		sql += "      , PD.\"PieceCode\"         AS \"PieceCode\" "; // -- F3 計件代碼
-		sql += "      , NVL(PD.\"Coorgnizer\",' ') ";
+		sql += " SELECT PR.\"CustNo\"            AS \"CustNo\" "; // -- F0 戶號
+		sql += "      , PR.\"FacmNo\"            AS \"FacmNo\" "; // -- F1 額度
+		sql += "      , SUM(PI.\"DrawdownAmt\")  AS \"DrawdownAmt\" "; // -- F2 撥款金額
+		sql += "      , PR.\"PieceCode\"         AS \"PieceCode\" "; // -- F3 計件代碼
+		sql += "      , NVL(PR.\"Coorgnizer\",' ') ";
 		sql += "                                 AS \"EmpNo\"  "; // -- F4 員工代號
-		sql += "      , \"Fn_GetEmpName\"(PD.\"Coorgnizer\",0) ";
+		sql += "      , \"Fn_GetEmpName\"(PR.\"Coorgnizer\",0) ";
 		sql += "                                 AS \"EmpName\"     "; // -- F5 員工姓名
 		sql += "      , NVL(PCO.\"DeptItem\", ' ') ";
 		sql += "                                 AS \"Dept\"        "; // -- F6 部室
@@ -190,19 +191,23 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                 AS \"Dist\"        "; // -- F7 區部
 		sql += "      , NVL(PCO.\"AreaItem\", ' ') ";
 		sql += "                                 AS \"Unit\"        "; // -- F8 單位
-		sql += " FROM \"PfDetail\" PD ";
-		sql += " LEFT JOIN \"PfCoOfficer\" PCO ON PCO.\"EmpNo\" = PD.\"Coorgnizer\" ";
+		sql += " FROM \"PfReward\" PR ";
+		sql += " LEFT JOIN \"PfItDetail\" PI ON PI.\"CustNo\" = PR.\"CustNo\" ";
+		sql += "                            AND PI.\"FacmNo\" = PR.\"FacmNo\" ";
+		sql += "                            AND PI.\"BormNo\" = PR.\"BormNo\" ";
+		sql += "                            AND PI.\"RepayType\" = 0 ";
+		sql += " LEFT JOIN \"PfCoOfficer\" PCO ON PCO.\"EmpNo\" = PR.\"Coorgnizer\" ";
 		sql += "                              AND TRUNC(PCO.\"EffectiveDate\" / 100) <= :inputWorkMonth ";
 		sql += "                              AND TRUNC(PCO.\"IneffectiveDate\" / 100) >= :inputWorkMonth ";
-		sql += " WHERE PD.\"PieceCode\" IN ('1','2','A','B','8','9') ";
-		sql += "   AND PD.\"ProdCode\" NOT IN ('TB') ";
-		sql += "   AND PD.\"DrawdownAmt\" > 0 ";
-		sql += "   AND PD.\"WorkMonth\" = :inputWorkMonth ";
-		sql += " GROUP BY PD.\"CustNo\" ";
-		sql += "        , PD.\"FacmNo\" ";
-		sql += "        , PD.\"PieceCode\" ";
-		sql += "        , NVL(PD.\"Coorgnizer\",' ')  ";
-		sql += "        , \"Fn_GetEmpName\"(PD.\"Coorgnizer\",0) ";
+		sql += " WHERE PR.\"PieceCode\" IN ('1','2','A','B','8','9') ";
+		sql += "   AND PR.\"ProdCode\" NOT IN ('TB') ";
+		sql += "   AND PR.\"RepayType\" = 0 ";
+		sql += "   AND PR.\"WorkMonth\" = :inputWorkMonth ";
+		sql += " GROUP BY PR.\"CustNo\" ";
+		sql += "        , PR.\"FacmNo\" ";
+		sql += "        , PR.\"PieceCode\" ";
+		sql += "        , NVL(PR.\"Coorgnizer\",' ')  ";
+		sql += "        , \"Fn_GetEmpName\"(PR.\"Coorgnizer\",0) ";
 		sql += "        , NVL(PCO.\"DeptItem\", ' ') ";
 		sql += "        , NVL(PCO.\"DistItem\", ' ') ";
 		sql += "        , NVL(PCO.\"AreaItem\", ' ') ";

@@ -2,27 +2,23 @@ package com.st1.itx.trade.L4;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.buffer.TxBuffer;
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.domain.BatxRateChange;
-import com.st1.itx.db.domain.CustNotice;
 import com.st1.itx.db.service.BatxRateChangeService;
-import com.st1.itx.db.service.CustNoticeService;
 import com.st1.itx.db.service.springjpa.cm.L4721ServiceImpl;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.http.WebClient;
@@ -71,9 +67,17 @@ public class L4721Report2 extends MakeReport {
 	String headerExcessive = "";
 	String headerDueAmt = "";
 
-
-
-	public void exec(TitaVo titaVo, TxBuffer txbuffer, int txKind, String kindItem)
+	/**
+	 * 資料明細
+	 * 
+	 * @param titaVo
+	 * @param txbuffer
+	 * @param data     主要資料來源
+	 * @param txKind   利率種類代碼
+	 * @param kindItem 利率代碼中文名稱
+	 * @throws LogicException
+	 */
+	public void exec(TitaVo titaVo, TxBuffer txbuffer, List<Map<String, String>> data, int txKind, String kindItem)
 			throws LogicException {
 		this.info("L4721Report2 exec start");
 
@@ -83,11 +87,17 @@ public class L4721Report2 extends MakeReport {
 		this.setTxBuffer(txbuffer);
 		baTxCom.setTxBuffer(txbuffer);
 
-		List<String> file = getData(titaVo, txKind);
+		List<String> file = getData(titaVo, data, txKind);
 
-		String fileName = "L4721-" + kindItem + ".txt";
-		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
-				titaVo.getTxCode() + "-" + kindItem, fileName, 2);
+		String fileName = "L4721-" + kindItem;
+
+//		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
+//				titaVo.getTxCode() + "-" + kindItem, fileName, 2);
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getBrno())
+				.setRptCode(titaVo.getTxCode()).setRptItem(fileName).build();
+
+		makeFile.open(titaVo, reportVo, fileName + ".txt", 2);
 
 		for (String line : file) {
 			makeFile.put(line);
@@ -98,7 +108,6 @@ public class L4721Report2 extends MakeReport {
 		this.info("sno : " + sno);
 
 		makeFile.toFile(sno);
-
 
 		// itxKind畫面上的 0 全部，txKind是JAVA內設定的參數，因照迴圈跑到5為最後一項的時候在丟出訊息，否則會跑出五次
 		if (itxKind == 0 && txKind == 5) {
@@ -111,70 +120,53 @@ public class L4721Report2 extends MakeReport {
 
 	}
 
-	private List<String> getData(TitaVo titaVo, int txkind) throws LogicException {
-
-		this.info("L4721Report2 getData start");
+	/**
+	 * 資料明細
+	 * 
+	 * @param titaVo
+	 * @param lBatxRateChange 利率變動檔資料源
+	 * @param txkind          利率種類代碼
+	 */
+	private List<String> getData(TitaVo titaVo, List<Map<String, String>> data, int txkind) throws LogicException {
 
 		List<String> result = new ArrayList<>();
-
-		int sAdjDate = Integer.parseInt(titaVo.getParam("sAdjDate")) + 19110000;
-		int eAdjDate = Integer.parseInt(titaVo.getParam("eAdjDate")) + 19110000;
-		int custType1 = 0;
-		int custType2 = 0;
-		int txKind = Integer.parseInt(titaVo.getParam("TxKind")) == 0 ? txkind
-				: Integer.parseInt(titaVo.getParam("TxKind"));
 
 		int ieday = titaVo.getEntDyI() + 19110000;
 		dateUtil.setDate_1(ieday);
 		dateUtil.setMons(-6);
 		int isday = Integer.parseInt(String.valueOf(dateUtil.getCalenderDay()).substring(0, 6) + "01");
 
-//		輸入畫面 戶別 CustType 1:個金;2:企金（含企金自然人）
-//		客戶檔 0:個金1:企金2:企金自然人
-		if (Integer.parseInt(titaVo.getParam("CustType")) == 2) {
-			custType1 = 1;
-			custType2 = 2;
-		}
-
 		int custNo = 0;
 		int facmNo = 0;
 
-		Slice<BatxRateChange> sBatxRateChange = null;
-		List<BatxRateChange> lBatxRateChange = new ArrayList<BatxRateChange>();
+		for (Map<String, String> r : data) {
 
-		sBatxRateChange = batxRateChangeService.findL4321Report(sAdjDate, eAdjDate, custType1, custType2, txKind, 0, 9,
-				2, this.index, this.limit, titaVo);
+			int iEffectDate = parse.stringToInteger(r.get("EffectDate"));
+			int iCustNo = parse.stringToInteger(r.get("EffectDate"));
+			int iFacmNo = parse.stringToInteger(r.get("EffectDate"));
+			int iPresEffDate = parse.stringToInteger(r.get("PresEffDate"));
 
-		lBatxRateChange = sBatxRateChange == null ? null : sBatxRateChange.getContent();
-
-		this.info("lBatxRateChange.size()=" + lBatxRateChange.size());
-
-		if (lBatxRateChange == null || lBatxRateChange.size() == 0) {
-			return result;
-		}
-
-		for (BatxRateChange tBatxRateChange : lBatxRateChange) {
-
-//			// 放款利率變動檔生效日，利率未變動為零
-			if (tBatxRateChange.getTxEffectDate() == 0) {
+			if (iEffectDate == 0) {
+//				if (tBatxRateChange.getTxEffectDate() == 0) {
 				continue;
 			}
-			// 戶號不同
-			if (custNo == tBatxRateChange.getCustNo() && facmNo == tBatxRateChange.getFacmNo()) {
+			// 相同戶號跳過
+			if (custNo == iCustNo) {
 				continue;
 			}
 
-			custNo = tBatxRateChange.getCustNo();
-			facmNo = tBatxRateChange.getFacmNo();
+			// 不同戶號額度相同跳過(也可能換戶號時額度相同)
+			if (custNo == iCustNo && facmNo == iFacmNo) {
+				continue;
+			}
 
-			this.info("custNo =" + custNo);
-			this.info("facmNo =" + facmNo);
-
+			custNo = iCustNo;
+			facmNo = iFacmNo;
 
 			List<Map<String, String>> listL4721Detail = new ArrayList<Map<String, String>>();
 
 			try {
-				listL4721Detail = l4721ServiceImpl.doDetail(custNo, isday, ieday, tBatxRateChange.getAdjDate() + 19110000, titaVo);
+				listL4721Detail = l4721ServiceImpl.doDetail(custNo, isday, ieday, iPresEffDate, titaVo);
 			} catch (Exception e) {
 				this.error("bankStatementServiceImpl doQuery = " + e.getMessage());
 				throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");

@@ -1081,19 +1081,47 @@ public class L9110Report extends MakeReport {
 		clsize = listBuildingQuery.size();
 		// 核貸總金額餘額
 		loanAmttotal = computeDivide(parse.stringToBigDecimal(lineAmt), thousand, 0);
-		BigDecimal loanAmtBal = loanAmttotal;
+		BigDecimal bdAmtBal = loanAmttotal;
+		BigDecimal landAmtBal = loanAmttotal;
+		int bdCnt = 0;
+		int lastbdCnt = 0;
+		int landCnt = 0;
+		int lastlandCnt = 0;
+		for (Map<String, String> mBuilding : listBuildingQuery) {
+			if ("1".equals(mBuilding.get("F30"))) {
+				bdCnt++;
+			}
+			if ("2".equals(mBuilding.get("F30"))) {
+				landCnt++;
+			}
+		}
 		for (Map<String, String> mBuilding : listBuildingQuery) {
 
 			checkSpace(2);
-			BigDecimal loanAmt = BigDecimal.ZERO;
+			BigDecimal bdloanAmt = BigDecimal.ZERO;
+			BigDecimal landloanAmt = BigDecimal.ZERO;
 
 			i++;
 
-			if (clsize - i != 0) {
-				loanAmt = computeDivide(loanAmttotal, new BigDecimal(clsize), 0);
-				loanAmtBal = loanAmtBal.subtract(loanAmt);
-			} else {
-				loanAmt = loanAmtBal;
+			//計算分配建物設定金額
+			if ("1".equals(mBuilding.get("F30"))) {
+				lastbdCnt++;
+				if (bdCnt - lastbdCnt != 0) {
+					bdloanAmt = computeDivide(loanAmttotal, new BigDecimal(bdCnt), 0);
+					bdAmtBal = bdAmtBal.subtract(bdloanAmt);
+				}else {
+					bdloanAmt = bdAmtBal;
+				}
+			}
+			//計算分配土地設定金額
+			if ("2".equals(mBuilding.get("F30"))) {
+				lastlandCnt++;
+				if (landCnt - lastlandCnt != 0) {
+					landloanAmt = computeDivide(loanAmttotal, new BigDecimal(landCnt), 0);
+					landAmtBal = landAmtBal.subtract(landloanAmt);
+				}else {
+					landloanAmt = landAmtBal;
+				}
 			}
 
 			this.print(1, 3, mBuilding.get("F1")); // 主建物建號
@@ -1108,12 +1136,12 @@ public class L9110Report extends MakeReport {
 			totalPublicArea = totalPublicArea.add(getBigDecimal(mBuilding.get("F8")));
 			this.print(0, 115, formatAmt(mBuilding.get("F9"), 2), "R"); // 車位面積
 			totalCarArea = totalCarArea.add(getBigDecimal(mBuilding.get("F9")));
-			this.print(0, 123, formatAmt(loanAmt, 0), "R"); // 核貸
+			this.print(0, 123, formatAmt(bdloanAmt, 0), "R"); // 核貸
 			this.print(0, 131, formatAmt(computeDivide(getBigDecimal(mBuilding.get("F10")), thousand, 0), 0), "R");// 設定金額
 			totalSettingAmt = totalSettingAmt.add(getBigDecimal(mBuilding.get("F10")));
 			this.print(0, 141, formatAmt(mBuilding.get("F11"), 2), "R"); // 土地面積
 			totalLandArea = totalLandArea.add(getBigDecimal(mBuilding.get("F11")));
-			this.print(0, 149, formatAmt(loanAmt, 0), "R"); // 土地核貸
+			this.print(0, 149, formatAmt(landloanAmt, 0), "R"); // 土地核貸
 			this.print(0, 157, formatAmt(computeDivide(getBigDecimal(mBuilding.get("F12")), thousand, 0), 0), "R");// 土地設定金額
 			totalLandSettingAmt = totalLandSettingAmt.add(getBigDecimal(mBuilding.get("F12")));
 			this.print(0, 159, mBuilding.get("F13") + "-" + mBuilding.get("F14")); // 擔保品編號
@@ -1134,7 +1162,7 @@ public class L9110Report extends MakeReport {
 		print(0, 131, formatAmt(computeDivide(totalSettingAmt, thousand, 0), 0), "R");
 		print(0, 141, formatAmt(totalLandArea, 2), "R");
 		print(0, 149, formatAmt(loanAmttotal, 0), "R");
-		print(0, 157, formatAmt(computeDivide(totalSettingAmt, thousand, 0), 0), "R");
+		print(0, 157, formatAmt(computeDivide(totalLandSettingAmt, thousand, 0), 0), "R");
 
 	}
 

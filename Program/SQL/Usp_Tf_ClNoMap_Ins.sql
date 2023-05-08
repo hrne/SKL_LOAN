@@ -91,8 +91,8 @@ BEGIN
              WHEN S0."HGTMHN" = 0
              THEN 6 -- 6 '未轉入,資料不完整(主建號)'
            ELSE 0 END AS "TfStatus" -- 0 未轉入 其他原因
-          ,APLP.LMSACN                    AS "OriCustNo" -- 原擔保品綁定戶號
-          ,APLP.LMSAPN                    AS "OriFacmNo" -- 原擔保品綁定額度號碼
+          ,NVL(APLP.LMSACN,0)             AS "OriCustNo" -- 原擔保品綁定戶號
+          ,NVL(APLP.LMSAPN,0)             AS "OriFacmNo" -- 原擔保品綁定額度號碼
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
@@ -198,8 +198,8 @@ BEGIN
              WHEN S0."LGTNM1" = 0
              THEN 7 -- 7 '未轉入,資料不完整(地號)'
            ELSE 0 END AS "TfStatus" -- 0 未轉入
-          ,APLP.LMSACN                    AS "OriCustNo" -- 原擔保品綁定戶號
-          ,APLP.LMSAPN                    AS "OriFacmNo" -- 原擔保品綁定額度號碼
+          ,NVL(APLP.LMSACN,0)             AS "OriCustNo" -- 原擔保品綁定戶號
+          ,NVL(APLP.LMSAPN,0)             AS "OriFacmNo" -- 原擔保品綁定額度號碼
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
@@ -287,8 +287,8 @@ BEGIN
              WHEN S2."ClNo" IS NOT NULL 
              THEN 3 -- 3 單筆擔保品直接轉入
            ELSE 0 END AS "TfStatus" -- 0 未轉入
-          ,APLP.LMSACN                    AS "OriCustNo" -- 原擔保品綁定戶號
-          ,APLP.LMSAPN                    AS "OriFacmNo" -- 原擔保品綁定額度號碼
+          ,NVL(APLP.LMSACN,0)             AS "OriCustNo" -- 原擔保品綁定戶號
+          ,NVL(APLP.LMSAPN,0)             AS "OriFacmNo" -- 原擔保品綁定額度號碼
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
@@ -327,6 +327,23 @@ BEGIN
       ,"LastUpdate"
       ,"LastUpdateEmpNo"
     )
+    WITH APLP AS (
+      SELECT LMSACN
+           , LMSAPN
+           , GDRID1
+           , GDRID2
+           , GDRNUM
+           , ROW_NUMBER()
+             OVER (
+              PARTITION BY GDRID1
+                         , GDRID2
+                         , GDRNUM
+              ORDER BY LMSACN
+                     , LMSAPN
+             ) AS "Seq"
+      FROM LA$APLP
+      WHERE GDRID1 IN (3,4)
+    )
     SELECT S0."GDRID1"                           AS "GdrId1"
           ,S0."GDRID2"                           AS "GdrId2"
           ,S0."GDRNUM"                           AS "GdrNum"
@@ -351,8 +368,8 @@ BEGIN
              WHEN S2."ClNo" IS NOT NULL 
              THEN 3 -- 3 單筆擔保品直接轉入
            ELSE 0 END AS "TfStatus" -- 0 未轉入
-          ,APLP.LMSACN                    AS "OriCustNo" -- 原擔保品綁定戶號
-          ,APLP.LMSAPN                    AS "OriFacmNo" -- 原擔保品綁定額度號碼
+          ,NVL(APLP.LMSACN,0)             AS "OriCustNo" -- 原擔保品綁定戶號
+          ,NVL(APLP.LMSAPN,0)             AS "OriFacmNo" -- 原擔保品綁定額度號碼
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
@@ -362,9 +379,10 @@ BEGIN
     LEFT JOIN "ClNoMapping" S2 ON S2."GDRID1" = S0."GDRID1"
                               AND S2."GDRID2" = S0."GDRID2"
                               AND S2."GDRNUM" = S0."GDRNUM"
-    LEFT JOIN LA$APLP APLP ON APLP.GDRID1 = S0.GDRID1
-                          AND APLP.GDRID2 = S0.GDRID2
-                          AND APLP.GDRNUM = S0.GDRNUM
+    LEFT JOIN APLP ON APLP.GDRID1 = S0.GDRID1
+                  AND APLP.GDRID2 = S0.GDRID2
+                  AND APLP.GDRNUM = S0.GDRNUM
+                  AND APLP."Seq" = 1
     WHERE S0."GDRID1" IN (3,4) -- 只抓擔保品代號1 = 3 or 4 股票 的擔保品
     ;
 
@@ -415,8 +433,8 @@ BEGIN
              WHEN S2."ClNo" IS NOT NULL 
              THEN 3 -- 3 單筆擔保品直接轉入
            ELSE 0 END AS "TfStatus" -- 0 未轉入
-          ,APLP.LMSACN                    AS "OriCustNo" -- 原擔保品綁定戶號
-          ,APLP.LMSAPN                    AS "OriFacmNo" -- 原擔保品綁定額度號碼
+          ,NVL(APLP.LMSACN,0)             AS "OriCustNo" -- 原擔保品綁定戶號
+          ,NVL(APLP.LMSAPN,0)             AS "OriFacmNo" -- 原擔保品綁定額度號碼
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  

@@ -43,9 +43,6 @@ public class L4721Report extends MakeReport {
 	public L4721ServiceImpl l4721ServiceImpl;
 
 	@Autowired
-	public BatxRateChangeService batxRateChangeService;
-
-	@Autowired
 	public BaTxCom baTxCom;
 
 	@Autowired
@@ -77,6 +74,10 @@ public class L4721Report extends MakeReport {
 
 	private HashMap<Integer, tmpFacm> sameMap = new HashMap<>();
 	private Boolean first = true;
+
+	// 存戶號額度，通知用
+	public Map<String, String> mTmpCustFacm = new HashMap<>();
+	public List<Map<String, String>> lTmpCustFacm = new ArrayList<Map<String, String>>();
 
 	@Override
 	public void printHeader() {
@@ -157,11 +158,12 @@ public class L4721Report extends MakeReport {
 	 * 
 	 * @param titaVo   TitaVo
 	 * @param txbuffer TxBuffer
-	 * @param txKind   利率種類
+	 * @param data     主要資料來源
 	 * @param kindItem 利率種類名稱
+	 * @return 
 	 * @throws LogicException ...
 	 */
-	public Map<String, String> exec(TitaVo titaVo, TxBuffer txbuffer, int txKind, String kindItem)
+	public Map<String, String> exec(TitaVo titaVo, TxBuffer txbuffer, List<Map<String, String>> data, String kindItem)
 			throws LogicException {
 		this.info("L4721Report.printHeader");
 
@@ -173,32 +175,8 @@ public class L4721Report extends MakeReport {
 		this.setTxBuffer(txbuffer);
 		baTxCom.setTxBuffer(txbuffer);
 
-		int sAdjDate = Integer.parseInt(titaVo.getParam("sAdjDate")) + 19110000;
-		int eAdjDate = Integer.parseInt(titaVo.getParam("eAdjDate")) + 19110000;
-		int custType1 = 0;
-		int custType2 = 0;
-
-//		輸入畫面 戶別 CustType 1:個金;2:企金（含企金自然人）
-//		客戶檔 0:個金1:企金2:企金自然人
-		if (Integer.parseInt(titaVo.getParam("CustType")) == 2) {
-			custType1 = 1;
-			custType2 = 2;
-		}
-
 		int custNo = 0;
 		int facmNo = 0;
-
-		Slice<BatxRateChange> sBatxRateChange = null;
-		List<BatxRateChange> lBatxRateChange = new ArrayList<BatxRateChange>();
-
-		sBatxRateChange = batxRateChangeService.findL4321Report(sAdjDate, eAdjDate, custType1, custType2, txKind, 0, 9,
-				2, this.index, this.limit, titaVo);
-
-		lBatxRateChange = sBatxRateChange == null ? null : sBatxRateChange.getContent();
-
-		if (lBatxRateChange == null || lBatxRateChange.size() == 0) {
-			throw new LogicException("E0001", "查無資料");
-		}
 
 //		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
 //				.setRptCode("L4721").setRptItem("放款本息對帳單暨繳息通知單(" + kindItem + ")").setSecurity("密")
@@ -216,62 +194,40 @@ public class L4721Report extends MakeReport {
 		dateUtil.setMons(-6);
 		int isday = Integer.parseInt(String.valueOf(dateUtil.getCalenderDay()).substring(0, 6) + "01");
 
-		for (BatxRateChange tBatxRateChange : lBatxRateChange) {
+		lTmpCustFacm = new ArrayList<Map<String, String>>();
+
+//		for (BatxRateChange tBatxRateChange : lBatxRateChange) {
+		for (Map<String, String> r : data) {
 
 			List<Map<String, String>> listL4721Temp = new ArrayList<Map<String, String>>();
 			List<Map<String, String>> listL4721Head = new ArrayList<Map<String, String>>();
 
 //			// 放款利率變動檔生效日，利率未變動為零
-			if (tBatxRateChange.getTxEffectDate() == 0) {
+
+			int iEffectDate = parse.stringToInteger(r.get("EffectDate"));
+			int iCustNo = parse.stringToInteger(r.get("EffectDate"));
+			int iFacmNo = parse.stringToInteger(r.get("EffectDate"));
+			int iPresEffDate = parse.stringToInteger(r.get("PresEffDate"));
+
+			if (iEffectDate == 0) {
+//				if (tBatxRateChange.getTxEffectDate() == 0) {
 				continue;
 			}
 			// 相同戶號跳過
-			if (custNo == tBatxRateChange.getCustNo()) {
+			if (custNo == iCustNo) {
 				continue;
 			}
 
 			// 不同戶號額度相同跳過(也可能換戶號時額度相同)
-			if (custNo == tBatxRateChange.getCustNo() && facmNo == tBatxRateChange.getFacmNo()) {
+			if (custNo == iCustNo && facmNo == iFacmNo) {
 				continue;
 			}
 
-			custNo = tBatxRateChange.getCustNo();
-			facmNo = tBatxRateChange.getFacmNo();
+			custNo = iCustNo;
+			facmNo = iFacmNo;
 
 			this.info("custNo =" + custNo);
 			this.info("facmNo =" + facmNo);
-
-			List<CustNotice> checkNoticeTypeCount = new ArrayList<CustNotice>();
-			Slice<CustNotice> sCustNotice = null;
-
-			try {
-				sCustNotice = custNoticeService.findCustNoFormNo(custNo, "L4721", 0, Integer.MAX_VALUE, titaVo);
-
-				checkNoticeTypeCount = sCustNotice == null ? null : sCustNotice.getContent();
-
-			} catch (Exception e) {
-				this.error("custNoticeService findCustNoFormNo = " + e.getMessage());
-				throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
-			}
-			if (checkNoticeTypeCount != null) {
-				this.info("checkNoticeTypeCount.size =" + checkNoticeTypeCount.size());
-
-				for (CustNotice r : checkNoticeTypeCount) {
-
-					if ("Y".equals(r.getPaperNotice())) {
-						cPaper = cPaper + 1;
-					}
-
-					if ("Y".equals(r.getMsgNotice())) {
-						cMsg = cMsg + 1;
-					}
-
-					if ("Y".equals(r.getEmailNotice())) {
-						cEmail = cEmail + 1;
-					}
-
-				}
-			}
 
 			try {
 
@@ -294,7 +250,6 @@ public class L4721Report extends MakeReport {
 				continue;
 
 			// 印出有 暫收款額度000的資料 下方帶出利率變動額度
-
 			Boolean HeadFlag = false;
 			if (listL4721Temp != null && !listL4721Temp.isEmpty() && listL4721Head != null
 					&& !listL4721Head.isEmpty()) {
@@ -345,6 +300,14 @@ public class L4721Report extends MakeReport {
 						// 現在利率
 						String newRate = formatAmt(Head.get("AdjustedRate"), 2) + "%";
 						print(0, 55, newRate, "R");
+
+						mTmpCustFacm = new HashMap<>();
+						mTmpCustFacm.put("CustNo", String.valueOf(custNo));
+						mTmpCustFacm.put("FacmNo", FormatUtil.pad9("" + Head.get("FacmNo"), 3));
+						mTmpCustFacm.put("rateChangeDate", rateChangeDate);
+						mTmpCustFacm.put("originRate", originRate);
+						mTmpCustFacm.put("newRate", newRate);
+						lTmpCustFacm.add(mTmpCustFacm);
 					}
 				}
 
@@ -360,8 +323,7 @@ public class L4721Report extends MakeReport {
 			List<Map<String, String>> listL4721Detail = new ArrayList<Map<String, String>>();
 
 			try {
-				listL4721Detail = l4721ServiceImpl.doDetail(custNo, isday, ieday,
-						tBatxRateChange.getAdjDate() + 19110000, titaVo);
+				listL4721Detail = l4721ServiceImpl.doDetail(custNo, isday, ieday, iPresEffDate, titaVo);
 			} catch (Exception e) {
 				this.error("bankStatementServiceImpl doQuery = " + e.getMessage());
 				throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
