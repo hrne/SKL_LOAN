@@ -2,6 +2,7 @@ package com.st1.itx.trade.LC;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -16,6 +17,7 @@ import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.TxAttachment;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.TxAttachmentService;
+import com.st1.itx.db.service.springjpa.cm.L6064ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
@@ -34,6 +36,9 @@ public class LC014 extends TradeBuffer {
 	@Autowired
 	public CdEmpService cdEmpService;
 
+	@Autowired
+	public L6064ServiceImpl l6064ServiceImpls;
+
 	/* 轉型共用工具 */
 	@Autowired
 	public Parse parse;
@@ -45,8 +50,9 @@ public class LC014 extends TradeBuffer {
 
 		String iTranNo = titaVo.getParam("TranNo");
 		String iMrKey = titaVo.getParam("MrKey");
-
-		Slice<TxAttachment> slTxAttachment = txAttachmentService.findByTran(iTranNo, iMrKey, 0, Integer.MAX_VALUE, titaVo);
+		String itranl = titaVo.getEmpNot(); // 櫃員 編號
+		Slice<TxAttachment> slTxAttachment = txAttachmentService.findByTran(iTranNo, iMrKey, 0, Integer.MAX_VALUE,
+				titaVo);
 		List<TxAttachment> lTxAttachment = slTxAttachment == null ? null : slTxAttachment.getContent();
 
 		if (lTxAttachment == null || lTxAttachment.size() == 0) {
@@ -59,15 +65,38 @@ public class LC014 extends TradeBuffer {
 			occursList.putParam("OTypeItem", txAttachment.getTypeItem());
 			occursList.putParam("ODesc", txAttachment.getDesc());
 			occursList.putParam("OCreateDate", parse.stringToStringDateTime(txAttachment.getCreateDate().toString()));
+
 			String empNo = txAttachment.getCreateEmpNo();
 
 			CdEmp cdEmp = cdEmpService.findById(empNo, titaVo);
 
 			if (cdEmp != null) {
-				empNo += cdEmp.getFullname();
+				empNo = empNo + ' ' + cdEmp.getFullname();
 			}
 
 			occursList.putParam("OCreateEmp", empNo);
+			String iCreate = txAttachment.getCreateEmpNo();
+			// 新增刪除記號 判斷L6064是否有Code有紀錄該交易有的畫判斷是否為建立人查詢顯示，如果是本人才會顯示刪除按紐
+			// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
+			this.limit = Integer.MAX_VALUE; // 217 * 200 = 43400
+			this.info("iTranNo   = " + iTranNo);
+			this.info("iCreate   = " + iCreate);
+			List<Map<String, String>> L6064DateList = null;
+			try {
+				L6064DateList = l6064ServiceImpls.findAll("", "UplowDelBtn", iTranNo, "", this.index, this.limit,
+						titaVo);
+			} catch (Exception e) {
+				throw new LogicException(titaVo, "E0001", "SQL ERROR");
+			}
+			if (L6064DateList.size() != 0) {
+				if (itranl.equals(iCreate)) {
+					occursList.putParam("OCtrlCode", 1);
+				} else {
+					occursList.putParam("OCtrlCode", 0);
+				}
+			} else {
+				occursList.putParam("OCtrlCode", 0);
+			}
 
 			this.totaVo.addOccursList(occursList);
 		}

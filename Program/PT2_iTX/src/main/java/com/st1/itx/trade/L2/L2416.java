@@ -73,7 +73,6 @@ public class L2416 extends TradeBuffer {
 	@Autowired
 	public DataLog dataLog;
 
-	//
 	private int iFunCd;
 	private int iClCode1;
 	private int iClCode2;
@@ -98,6 +97,13 @@ public class L2416 extends TradeBuffer {
 		if (titaVo.isEloan() || "ELTEST".equals(titaVo.getTlrNo())) {
 			this.isEloan = true;
 		}
+		this.info("TEST = " + titaVo.get("OOClCode1"));
+		if (titaVo.get("OOClCode1") != null) {
+			titaVo.putParam("ClCode1", titaVo.get("OOClCode1"));
+			titaVo.putParam("ClCode2", titaVo.get("OOClCode2"));
+			titaVo.putParam("ClNo", titaVo.get("OOClNo"));
+			titaVo.putParam("LandSeq", titaVo.get("OOClLandSeq"));
+		}
 
 		iFunCd = parse.stringToInteger(titaVo.getParam("FunCd"));
 		iClCode1 = parse.stringToInteger(titaVo.getParam("ClCode1"));
@@ -107,7 +113,6 @@ public class L2416 extends TradeBuffer {
 		if (iClCode1 == 2 && iLandSeq > 0) {
 			throw new LogicException("E0019", "土地擔保品土地序號應為0"); // 輸入資料錯誤
 		}
-
 		if (iClCode1 == 1 && iLandSeq == 0 && iFunCd != 1) {
 			throw new LogicException("E0019", "房地擔保品土地序號應大於0"); // 輸入資料錯誤
 		}
@@ -202,7 +207,8 @@ public class L2416 extends TradeBuffer {
 					InsertClLandReason(titaVo);
 
 					dataLog.setEnv(titaVo, beforeClLand, tClLand);
-					dataLog.exec("不動產土地修改原因: " + parse.stringToInteger(titaVo.getParam("Reason1")) + " " + titaVo.getParam("ReasonX1"));
+					dataLog.exec("不動產土地修改原因: " + parse.stringToInteger(titaVo.getParam("Reason1")) + " "
+							+ titaVo.getParam("ReasonX1"));
 				}
 				// FunCD=4 刪除
 			} else if (iFunCd == 4) {
@@ -210,7 +216,7 @@ public class L2416 extends TradeBuffer {
 				if (tClLand != null) {
 					try {
 						sClLandService.delete(tClLand, titaVo);
-						;
+
 					} catch (DBException e) {
 						throw new LogicException("E0008", "擔保品土地所有權人檔");
 					}
@@ -257,7 +263,8 @@ public class L2416 extends TradeBuffer {
 					InsertClLandReason(titaVo);
 
 					dataLog.setEnv(titaVo, beforeClLand, tClLand);
-					dataLog.exec("不動產土地修改原因: " + parse.stringToInteger(titaVo.getParam("Reason1")) + " " + titaVo.getParam("ReasonX1"));
+					dataLog.exec("不動產土地修改原因: " + parse.stringToInteger(titaVo.getParam("Reason1")) + " "
+							+ titaVo.getParam("ReasonX1"));
 				}
 				// FunCD=4 刪除
 			} else if (iFunCd == 4) {
@@ -323,8 +330,9 @@ public class L2416 extends TradeBuffer {
 			tClLand.setLandZoningCode(titaVo.getParam("LandZoningCode"));
 			tClLand.setLandUsageType(titaVo.getParam("LandUsageType"));
 			tClLand.setPostedLandValue(parse.stringToBigDecimal(titaVo.getParam("PostedLandValue")));
-			tClLand.setPostedLandValueYearMonth(
-					parse.stringToInteger(parse.IntegerToString(parse.stringToInteger(titaVo.getParam("PostedLandValueYear")) + 1911, 4) + (titaVo.getParam("PostedLandValueMonth"))));
+			tClLand.setPostedLandValueYearMonth(parse.stringToInteger(
+					parse.IntegerToString(parse.stringToInteger(titaVo.getParam("PostedLandValueYear")) + 1911, 4)
+							+ (titaVo.getParam("PostedLandValueMonth"))));
 			tClLand.setTransferedYear(parse.stringToInteger(titaVo.getParam("TransferedYear")) + 1911);
 			tClLand.setLastTransferedAmt(parse.stringToBigDecimal(titaVo.getParam("LastTransferedAmt")));
 			tClLand.setEvaUnitPrice(parse.stringToBigDecimal(titaVo.getParam("EvaUnitPrice")));
@@ -393,7 +401,8 @@ public class L2416 extends TradeBuffer {
 
 	// delete 土地所有權人檔
 	private void deleteClLandOwner(TitaVo titaVo) throws LogicException {
-		Slice<ClLandOwner> slClLandOwner = sClLandOwnerService.LandSeqEq(iClCode1, iClCode2, iClNo, iLandSeq, 0, Integer.MAX_VALUE);
+		Slice<ClLandOwner> slClLandOwner = sClLandOwnerService.LandSeqEq(iClCode1, iClCode2, iClNo, iLandSeq, 0,
+				Integer.MAX_VALUE);
 		lClLandOwner = slClLandOwner == null ? null : slClLandOwner.getContent();
 
 		if (lClLandOwner != null && lClLandOwner.size() > 0) {

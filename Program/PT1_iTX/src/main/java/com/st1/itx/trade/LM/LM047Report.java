@@ -41,7 +41,7 @@ public class LM047Report extends MakeReport {
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "LM047";
-		String fileItem = "介紹人換算業績報酬檢核表";
+		String fileItem = "放款分期協議案件明細";
 		String fileName = "LM047_放款分期協議案件明細_內部控管";
 		String defaultExcel = "LM047放款分期協議案件明細_內部控管.xlsx";
 		String defaultSheet = "協議控管表";

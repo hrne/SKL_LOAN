@@ -1192,7 +1192,7 @@ T(3,[L3420] 結案登錄-不可欠繳)
 <sub type="TIM">
 
 #TimCustNo#FacmNo#BormNo#CaseCloseCode#EntryDate
-#NewFacmNo#TimReduceAmt#AdvanceCloseCode
+#TimReduceAmt#AdvanceCloseCode
 #TimTrfBadAmt#TotalRepayAmt#RealRepayAmt#RqspFlag
 #AcctFee1#ModifyFee1#FireFee1#LawFee1#ShortfallInt#ShortfallPrin#ShortCloseBreach#CloseBreachAmt
 #FireFg#CollFireFg#LawFg#CollLawFg#TimTrfOvDuAmt

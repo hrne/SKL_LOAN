@@ -61,13 +61,10 @@ public class LC105 extends TradeBuffer {
 				titaVo);
 		List<TxAttachment> lTxAttachment = slTxAttachment == null ? null : slTxAttachment.getContent();
 
-		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp").trim();
-
 		if (lTxAttachment == null || lTxAttachment.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "附件資料"); // 查無資料
 		}
 		TxAttachment uTxAttachment = new TxAttachment();
-		if ("4".equals(iTranKey_Tmp)) {
 			uTxAttachment = txAttachmentService.holdById(iFileNo, titaVo);
 			if (uTxAttachment == null) {
 				throw new LogicException("E0004", "");
@@ -79,8 +76,6 @@ public class LC105 extends TradeBuffer {
 			}
 			iDataLog.setEnv(titaVo, uTxAttachment, uTxAttachment);
 			iDataLog.exec("LC105刪除");
-
-		}
 
 		this.addList(this.totaVo);
 		return this.sendList();

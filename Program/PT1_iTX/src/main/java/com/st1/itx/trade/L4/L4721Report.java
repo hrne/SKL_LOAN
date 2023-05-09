@@ -205,8 +205,8 @@ public class L4721Report extends MakeReport {
 //			// 放款利率變動檔生效日，利率未變動為零
 
 			int iEffectDate = parse.stringToInteger(r.get("EffectDate"));
-			int iCustNo = parse.stringToInteger(r.get("EffectDate"));
-			int iFacmNo = parse.stringToInteger(r.get("EffectDate"));
+			int iCustNo = parse.stringToInteger(r.get("CustNo"));
+			int iFacmNo = parse.stringToInteger(r.get("FacmNo"));
 			int iPresEffDate = parse.stringToInteger(r.get("PresEffDate"));
 
 			if (iEffectDate == 0) {

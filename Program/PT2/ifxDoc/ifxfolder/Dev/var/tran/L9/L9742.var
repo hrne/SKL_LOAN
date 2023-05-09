@@ -187,6 +187,7 @@ IF(#KINBR=="0009"||#KINBR=="0008",T(2,#KINBR+#TlrNoNO),T(2,#EMPNOS))
 #inputTitaTxtNoEnd
 #inputOption
 #FunctionCode
+#inputTitaTlrNo
 #END
 </sub>
 !------ 下行電文TOM ------

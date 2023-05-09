@@ -42,6 +42,8 @@ public class L9742ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int inputTitaTxtNoStart = parse.stringToInteger(titaVo.getParam("inputTitaTxtNoStart"));
 		int inputTitaTxtNoEnd = parse.stringToInteger(titaVo.getParam("inputTitaTxtNoEnd"));
 
+		String tlrNo = titaVo.getParam("inputTitaTlrNo").trim();
+
 		// 整批
 		if (functionCode == 2) {
 			inputSlipNoStart = 0;
@@ -97,15 +99,18 @@ public class L9742ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " 		WHERE TX.\"TitaHCode\" = 0 "; // 訂正別為0:正常
 		sql += "   		  AND CM.\"EntCode\" IN (1, 2) "; // 企金別為1:企金、2:企金自然人
 		sql += "   		  AND TX.\"AcDate\" = :inputAcDate "; // 會計日期
+		if (tlrNo.length() > 0) {
+			sql += "   		  AND TX.\"TitaTxtNo\" = :inputTitaTxtNo "; // 會計日期
+		}
 
 		// functionCode 1=手動輸入、2=整批
 		if (functionCode == 1) {
 			// 當交易序號為0表示找範圍 0~99999999
-			if (inputSlipNoStart == 0) {
+			if (inputTitaTxtNoStart == 0) {
 				sql += "   		  AND ACD.\"TitaTxtNo\" >= :inputTitaTxtNoStart "; // 交易序號-起
 				sql += "   		  AND ACD.\"TitaTxtNo\" <= 99999999 "; // 交易序號-止
 			} else {
-				//交易序號大於0 ，只找畫面輸入的值
+				// 交易序號大於0 ，只找畫面輸入的值
 				sql += "   		  AND ACD.\"TitaTxtNo\" = :inputTitaTxtNoStart "; // 交易序號
 			}
 		} else {
@@ -113,6 +118,7 @@ public class L9742ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "   		  AND ACD.\"TitaTxtNo\" <= :inputTitaTxtNoEnd "; // 交易序號-止
 			sql += "      	  AND \"RepayCode\" = 2 "; // 付款方式 2=銀行扣款
 		}
+
 		sql += "   		  AND ACD.\"SlipNo\" >= :inputSlipNoStart "; // 傳票號碼-起
 		sql += "   		  AND ACD.\"SlipNo\" <= :inputSlipNoEnd "; // 傳票號碼-止
 		sql += "      	  AND  CASE WHEN :inputOption = 1 "; // 還本收據
@@ -179,7 +185,6 @@ public class L9742ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		    ,M.\"SlipBatNo\"";
 		sql += "		    ,M.\"RepayCode\"";
 
-
 		this.info("sql=" + sql);
 
 		Query query;
@@ -188,6 +193,10 @@ public class L9742ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 
 		query.setParameter("inputAcDate", acdate);
+
+		if (tlrNo.length() > 0) {
+			query.setParameter("inputTitaTxtNo", tlrNo);
+		}
 
 		// functionCode 1=手動輸入、2=整批
 		if (functionCode == 1) {

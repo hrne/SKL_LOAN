@@ -141,6 +141,8 @@ T(3,1)ASGN(LOOP$)
 !上傳人員
 #OCreateEmp=x,20,S
 
+!控制刪除按紐FG
+#OCtrlCode=A,1,S
 
 #OOBufA=X,8,S
 T(2,#OFileNo)
@@ -155,7 +157,7 @@ BIND(grid,{cmd=viewPdf;sno=#OOBufA})
 T(2,4+#TranNo+#CustNo+#FacmNo+#BormNo+#MrKey+#Note+#OFileNo)
 #OOBtnB=X,500,S
 BIND(grid,{ cmd=CHAIN; ntxcd=LC105; text=刪除; ntxbuf=#OOBTNB})
-
+IF(#OCtrlCode==0,BIND(grid,cancel),$)
 
 
 </sub>
@@ -184,6 +186,7 @@ TXFORM=LC014
 #OCreateDate
 #OCreateEmp
 #OFileNo
+#OCtrlCode
 ^
 </sub>
 

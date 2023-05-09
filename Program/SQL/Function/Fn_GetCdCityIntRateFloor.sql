@@ -26,7 +26,7 @@ BEGIN
                     ORDER BY "EffectYYMM" DESC
                  )                  AS "Seq"
           FROM "CdCityRate" CCR
-          WHERE CCR."EffectYYMM" >= TRUNC("InputDate" / 100)
+          WHERE CCR."EffectYYMM" <= TRUNC("InputDate" / 100)
             AND CCR."CityCode" = "InputCityCode"
      )
      SELECT NVL("IntRateFloor",0)

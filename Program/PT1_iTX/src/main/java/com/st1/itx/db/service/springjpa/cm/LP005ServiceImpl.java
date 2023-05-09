@@ -133,64 +133,62 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , PCO.\"EmpNo\"            AS Coorgnizer  "; // -- F3 員工代號
 		sql += "      , PCO.\"EmpClass\"         AS EmpClass    "; // -- F4 考核前職級
 		sql += "      , PR.count1                AS count1      "; // -- F5 件數1
-		sql += "      , PD.amt1                  AS amt1        "; // -- F6 金額1
+		sql += "      , PR.amt1                  AS amt1        "; // -- F6 金額1
 		sql += "      , PR.count2                AS count2      "; // -- F7 件數2
-		sql += "      , PD.amt2                  AS amt2        "; // -- F8 金額2
+		sql += "      , PR.amt2                  AS amt2        "; // -- F8 金額2
 		sql += "      , PR.count3                AS count3      "; // -- F9 件數3
-		sql += "      , PD.amt3                  AS amt3        "; // -- F10 金額3
+		sql += "      , PR.amt3                  AS amt3        "; // -- F10 金額3
 		sql += "      , PR.count4                AS count4      "; // -- F11 件數4
-		sql += "      , PD.amt4                  AS amt4        "; // -- F12 金額4
+		sql += "      , PR.amt4                  AS amt4        "; // -- F12 金額4
 		sql += "      , PR.countTotal            AS countTotal  "; // -- F13 件數合計
-		sql += "      , PD.amtTotal              AS amtTotal    "; // -- F14 金額合計
+		sql += "      , PR.amtTotal              AS amtTotal    "; // -- F14 金額合計
 		sql += " FROM \"PfCoOfficer\" PCO ";
-		sql += " LEFT JOIN ( SELECT \"Coorgnizer\"    AS Coorgnizer "; // -- 介紹人
+		sql += " LEFT JOIN ( SELECT PR.\"Coorgnizer\"    AS Coorgnizer "; // -- 介紹人
 		sql += "                  , SUM(CASE ";
-		sql += "                          WHEN \"WorkMonth\" = :inputWorkMonth1 ";
+		sql += "                          WHEN PR.\"WorkMonth\" = :inputWorkMonth1 ";
 		sql += "                          THEN 1 ";
 		sql += "                        ELSE 0 END) AS count1     "; // -- 件數1
 		sql += "                  , SUM(CASE  ";
-		sql += "                          WHEN \"WorkMonth\" = :inputWorkMonth2 ";
+		sql += "                          WHEN PR.\"WorkMonth\" = :inputWorkMonth2 ";
 		sql += "                          THEN 1 ";
 		sql += "                        ELSE 0 END) AS count2     "; // -- 件數2
 		sql += "                  , SUM(CASE  ";
-		sql += "                          WHEN \"WorkMonth\" = :inputWorkMonth3 ";
+		sql += "                          WHEN PR.\"WorkMonth\" = :inputWorkMonth3 ";
 		sql += "                          THEN 1 ";
 		sql += "                        ELSE 0 END) AS count3     "; // -- 件數3
 		sql += "                  , SUM(CASE  ";
-		sql += "                          WHEN \"WorkMonth\" = :inputWorkMonth4 ";
+		sql += "                          WHEN PR.\"WorkMonth\" = :inputWorkMonth4 ";
 		sql += "                          THEN 1 ";
 		sql += "                        ELSE 0 END) AS count4     "; // -- 件數4
 		sql += "                  , SUM(1)          AS countTotal "; // -- 件數合計
-		sql += "             FROM \"PfReward\" ";
-		sql += "             WHERE \"CoorgnizerBonus\" > 0 ";
-		sql += "               AND \"WorkSeason\" = :inputWorkSeason ";
-		sql += "             GROUP BY \"Coorgnizer\" ";
-		sql += "           ) PR ON PR.Coorgnizer = PCO.\"EmpNo\" ";
-		sql += " LEFT JOIN ( SELECT \"Coorgnizer\"             AS Coorgnizer  "; // -- 介紹人
 		sql += "                  , SUM(CASE ";
-		sql += "                          WHEN \"WorkMonth\" = :inputWorkMonth1 ";
-		sql += "                          THEN \"ComputeCoBonusAmt\" ";
+		sql += "                          WHEN PR.\"WorkMonth\" = :inputWorkMonth1 ";
+		sql += "                          THEN PI.\"DrawdownAmt\" ";
 		sql += "                        ELSE 0 END )         AS amt1 "; // -- 金額1
 		sql += "                  , SUM(CASE ";
-		sql += "                          WHEN \"WorkMonth\" = :inputWorkMonth2 ";
-		sql += "                          THEN \"ComputeCoBonusAmt\" ";
+		sql += "                          WHEN PR.\"WorkMonth\" = :inputWorkMonth2 ";
+		sql += "                          THEN PI.\"DrawdownAmt\" ";
 		sql += "                        ELSE 0 END )         AS amt2 "; // -- 金額2
 		sql += "                  , SUM(CASE ";
-		sql += "                          WHEN \"WorkMonth\" = :inputWorkMonth3 ";
-		sql += "                          THEN \"ComputeCoBonusAmt\" ";
+		sql += "                          WHEN PR.\"WorkMonth\" = :inputWorkMonth3 ";
+		sql += "                          THEN PI.\"DrawdownAmt\" ";
 		sql += "                        ELSE 0 END )         AS amt3 "; // -- 金額3
 		sql += "                  , SUM(CASE ";
-		sql += "                          WHEN \"WorkMonth\" = :inputWorkMonth4 ";
-		sql += "                          THEN \"ComputeCoBonusAmt\" ";
+		sql += "                          WHEN PR.\"WorkMonth\" = :inputWorkMonth4 ";
+		sql += "                          THEN PI.\"DrawdownAmt\" ";
 		sql += "                        ELSE 0 END )         AS amt4 "; // -- 金額4
-		sql += "                  , SUM(\"ComputeCoBonusAmt\") AS amtTotal "; // -- 金額合計
-		sql += "             FROM \"PfDetail\"  ";
-		sql += "             WHERE \"ComputeCoBonusAmt\" > 0 ";
-		sql += "               AND \"WorkSeason\" = :inputWorkSeason ";
-		sql += "             GROUP BY \"Coorgnizer\" ";
-		sql += "           ) PD ON PD.Coorgnizer = PCO.\"EmpNo\" ";
+		sql += "                  , SUM(PI.\"DrawdownAmt\")  AS amtTotal "; // -- 金額合計
+		sql += "             FROM \"PfReward\" PR ";
+		sql += "             LEFT JOIN \"PfItDetail\" PI ON PI.\"CustNo\" = PR.\"CustNo\" ";
+		sql += "                                        AND PI.\"FacmNo\" = PR.\"FacmNo\" ";
+		sql += "                                        AND PI.\"BormNo\" = PR.\"BormNo\" ";
+		sql += "                                        AND PI.\"RepayType\" = 0 ";
+		sql += "             WHERE PR.\"CoorgnizerBonus\" > 0 ";
+		sql += "               AND PR.\"WorkSeason\" = :inputWorkSeason ";
+		sql += "             GROUP BY PR.\"Coorgnizer\" ";
+		sql += "           ) PR ON PR.Coorgnizer = PCO.\"EmpNo\" ";
 		sql += " WHERE PCO.\"DeptCode\" = :inputDeptCode ";
-		sql += "   AND TRUNC(PCO.\"EffectiveDate\" / 100) <= :inputWorkMonth1 ";
+		sql += "   AND TRUNC(PCO.\"EffectiveDate\" / 100) <= :inputWorkMonth4 ";
 		sql += "   AND TRUNC(PCO.\"IneffectiveDate\" / 100) >= :inputWorkMonth1 ";
 		sql += " ORDER BY Dist ";
 		sql += "        , Area ";

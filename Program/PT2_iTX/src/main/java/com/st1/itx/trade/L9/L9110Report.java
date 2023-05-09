@@ -1054,7 +1054,7 @@ public class L9110Report extends MakeReport {
 	 */
 	private void printBuildingLandDetail(List<Map<String, String>> listBuildingQuery, String lineAmt)
 			throws LogicException {
-		// TODO:建物
+		// TODO:newbdland
 
 		/**
 		 * ---------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6-----
@@ -1088,38 +1088,47 @@ public class L9110Report extends MakeReport {
 		int landCnt = 0;
 		int lastlandCnt = 0;
 		for (Map<String, String> mBuilding : listBuildingQuery) {
-			if ("1".equals(mBuilding.get("F30"))) {
+			if ("1".equals(mBuilding.get("F30")) && "1".equals(mBuilding.get("F0"))) {
 				bdCnt++;
 			}
 			if ("2".equals(mBuilding.get("F30"))) {
 				landCnt++;
 			}
 		}
+		int oldpage = this.getNowPage();
 		for (Map<String, String> mBuilding : listBuildingQuery) {
 
 			checkSpace(2);
+
+			if (this.getNowPage() != oldpage) {
+				oldpage = this.getNowPage();
+				print(1, 3, "主建物　　　提供人　　　　　　　　　　　　　　　　　　　　　　　　公設　　　（坪）　　（坪）　　（坪）　　（坪）　　（仟）　（仟）　（坪）　　（仟）　（仟）擔保品");
+				print(1, 3, "建　號　　　門牌號碼／土地坐落　　　　　　　　　　　擔保品別　　　建號　　　主建物　附屬建物　　公設　　　車位　　　核貸　　設定　土地面積　　核貸　　設定　編號");
+				print(1, 3, "－－－－－　－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－　－－－－　－－－－　－－－－　－－－－　－－－　－－－　－－－－　－－－　－－－　－－－－　");
+
+			}
 			BigDecimal bdloanAmt = BigDecimal.ZERO;
 			BigDecimal landloanAmt = BigDecimal.ZERO;
 
 			i++;
 
-			//計算分配建物設定金額
-			if ("1".equals(mBuilding.get("F30"))) {
+			// 計算分配建物設定金額
+			if ("1".equals(mBuilding.get("F30")) && "1".equals(mBuilding.get("F0"))) {
 				lastbdCnt++;
 				if (bdCnt - lastbdCnt != 0) {
 					bdloanAmt = computeDivide(loanAmttotal, new BigDecimal(bdCnt), 0);
 					bdAmtBal = bdAmtBal.subtract(bdloanAmt);
-				}else {
+				} else {
 					bdloanAmt = bdAmtBal;
 				}
 			}
-			//計算分配土地設定金額
+			// 計算分配土地設定金額
 			if ("2".equals(mBuilding.get("F30"))) {
 				lastlandCnt++;
 				if (landCnt - lastlandCnt != 0) {
 					landloanAmt = computeDivide(loanAmttotal, new BigDecimal(landCnt), 0);
 					landAmtBal = landAmtBal.subtract(landloanAmt);
-				}else {
+				} else {
 					landloanAmt = landAmtBal;
 				}
 			}
@@ -1128,22 +1137,38 @@ public class L9110Report extends MakeReport {
 			this.print(0, 15, mBuilding.get("F2")); // 提供人
 			this.print(0, 54, mBuilding.get("F4")); // 擔保品別
 			this.print(0, 66, mBuilding.get("F5")); // 公設建號
-			this.print(0, 85, formatAmt(mBuilding.get("F6"), 2), "R"); // 主建物面積
-			totalFloorArea = totalFloorArea.add(getBigDecimal(mBuilding.get("F6")));
-			this.print(0, 95, formatAmt(mBuilding.get("F7"), 2), "R"); // 附屬建物面積
-			totalBdSubArea = totalBdSubArea.add(getBigDecimal(mBuilding.get("F7")));
-			this.print(0, 105, formatAmt(mBuilding.get("F8"), 2), "R"); // 公設面積
-			totalPublicArea = totalPublicArea.add(getBigDecimal(mBuilding.get("F8")));
-			this.print(0, 115, formatAmt(mBuilding.get("F9"), 2), "R"); // 車位面積
-			totalCarArea = totalCarArea.add(getBigDecimal(mBuilding.get("F9")));
-			this.print(0, 123, formatAmt(bdloanAmt, 0), "R"); // 核貸
-			this.print(0, 131, formatAmt(computeDivide(getBigDecimal(mBuilding.get("F10")), thousand, 0), 0), "R");// 設定金額
-			totalSettingAmt = totalSettingAmt.add(getBigDecimal(mBuilding.get("F10")));
-			this.print(0, 141, formatAmt(mBuilding.get("F11"), 2), "R"); // 土地面積
-			totalLandArea = totalLandArea.add(getBigDecimal(mBuilding.get("F11")));
-			this.print(0, 149, formatAmt(landloanAmt, 0), "R"); // 土地核貸
-			this.print(0, 157, formatAmt(computeDivide(getBigDecimal(mBuilding.get("F12")), thousand, 0), 0), "R");// 土地設定金額
-			totalLandSettingAmt = totalLandSettingAmt.add(getBigDecimal(mBuilding.get("F12")));
+			this.print(0, 85, mBuilding.get("F6").trim().isEmpty() ? " " : formatAmt(mBuilding.get("F6"), 2), "R"); // 主建物面積
+			if (!mBuilding.get("F6").trim().isEmpty()) {
+				totalFloorArea = totalFloorArea.add(getBigDecimal(mBuilding.get("F6")));
+			}
+			this.print(0, 95, mBuilding.get("F7").trim().isEmpty() ? " " : formatAmt(mBuilding.get("F7"), 2), "R"); // 附屬建物面積
+			if (!mBuilding.get("F7").trim().isEmpty()) {
+				totalBdSubArea = totalBdSubArea.add(getBigDecimal(mBuilding.get("F7")));
+			}
+			this.print(0, 105, mBuilding.get("F8").trim().isEmpty() ? " " : formatAmt(mBuilding.get("F8"), 2), "R"); // 公設面積
+			if (!mBuilding.get("F8").trim().isEmpty()) {
+				totalPublicArea = totalPublicArea.add(getBigDecimal(mBuilding.get("F8")));
+			}
+			this.print(0, 115, mBuilding.get("F9").trim().isEmpty() ? " " : formatAmt(mBuilding.get("F9"), 2), "R"); // 車位面積
+			if (!mBuilding.get("F9").trim().isEmpty()) {
+				totalCarArea = totalCarArea.add(getBigDecimal(mBuilding.get("F9")));
+			}
+			this.print(0, 123, "2".equals(mBuilding.get("F30")) ? " " : formatAmt(bdloanAmt, 0), "R"); // 核貸
+			this.print(0, 131, mBuilding.get("F10").trim().isEmpty() ? " "
+					: formatAmt(computeDivide(getBigDecimal(mBuilding.get("F10")), thousand, 0), 0), "R");// 設定金額
+			if (!mBuilding.get("F10").trim().isEmpty()) {
+				totalSettingAmt = totalSettingAmt.add(getBigDecimal(mBuilding.get("F10")));
+			}
+			this.print(0, 141, mBuilding.get("F11").trim().isEmpty() ? " " : formatAmt(mBuilding.get("F11"), 2), "R"); // 土地面積
+			if (!mBuilding.get("F11").trim().isEmpty()) {
+				totalLandArea = totalLandArea.add(getBigDecimal(mBuilding.get("F11")));
+			}
+			this.print(0, 149, "1".equals(mBuilding.get("F30")) ? " " : formatAmt(landloanAmt, 0), "R"); // 土地核貸
+			this.print(0, 157, mBuilding.get("F12").trim().isEmpty() ? " "
+					: formatAmt(computeDivide(getBigDecimal(mBuilding.get("F12")), thousand, 0), 0), "R");// 土地設定金額
+			if (!mBuilding.get("F12").trim().isEmpty()) {
+				totalLandSettingAmt = totalLandSettingAmt.add(getBigDecimal(mBuilding.get("F12")));
+			}
 			this.print(0, 159, mBuilding.get("F13") + "-" + mBuilding.get("F14")); // 擔保品編號
 
 			this.print(1, 15, mBuilding.get("F3")); // 門牌號碼／土地坐落

@@ -139,7 +139,8 @@ public class AcLoanRenewCom extends TradeBuffer {
 			tTempVo = new TempVo();
 			tTempVo = tTempVo.getVo(acRv.getJsonFields());
 			// 1:展期(新額度) 2:借新還舊(同額度)
-			if ("1".equals(tTempVo.get("CaseCloseCode")) || "2".equals(tTempVo.get("CaseCloseCode"))) {
+			if (("1".equals(tTempVo.get("CaseCloseCode")) && "TRE".equals(ac.getAcctCode()))
+					|| ("2".equals(tTempVo.get("CaseCloseCode")) && "TRO".equals(ac.getAcctCode()))) {
 				if (acRv.getLastAcDate() != ac.getAcDate()) {
 					continue;
 				}
@@ -152,7 +153,7 @@ public class AcLoanRenewCom extends TradeBuffer {
 				tAcLoanRenew = new AcLoanRenew();
 				tAcLoanRenew.setAcLoanRenewId(tAcLoanRenewId);
 				// 暫收款－借新還舊
-				if ("TRO".equals(acRv.getAcctCode())) {
+				if ("2".equals(tTempVo.get("CaseCloseCode"))) {
 					tAcLoanRenew.setRenewCode("2");
 				} else {
 					tAcLoanRenew.setRenewCode("1");

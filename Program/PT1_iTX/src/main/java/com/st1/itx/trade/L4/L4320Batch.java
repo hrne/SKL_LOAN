@@ -535,7 +535,7 @@ public class L4320Batch extends TradeBuffer {
 				// 首次利率調整日為月底日取首次利率調整日/本次利率調整日/首撥日/到期日的最大DD
 				int maxDD;
 				if (firstAdjRateDate % 100 == dateUtil.getMonLimit()) {
-					maxDD = Math.max(firstAdjRateDate % 100, nextAdjRateDate);
+					maxDD = Math.max(firstAdjRateDate % 100, nextAdjRateDate % 100);
 					int firstDrawdownDate = StaticTool.bcToRoc(parse.stringToInteger(s.get("FirstDrawdownDate")));
 					maxDD = Math.max(maxDD, firstDrawdownDate % 100);
 					maxDD = Math.max(maxDD, maturityDate % 100);
@@ -556,7 +556,7 @@ public class L4320Batch extends TradeBuffer {
 					}
 					preNextAdjDate = maturityDate;
 				} else if (preNextAdjDate % 100 > preDD) {
-					warnMsg += ", 下次利率調整日>相對日";
+					warnMsg += ", 下次利率調整日(" + preNextAdjDate % 100 + ")>相對日(" + preDD + ")";
 				}
 			}
 		}
