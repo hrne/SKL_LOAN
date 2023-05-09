@@ -103,10 +103,9 @@ public class L4721Batch extends TradeBuffer {
 		}
 
 		if (this.prodNos.length() == 0) {
-			this.prodNos = "''";
-			throw new LogicException(titaVo, "E0001", "無輸入商品資料");
-		} else {
+			this.prodNos = "";
 
+		} else {
 			this.prodNos = this.prodNos.substring(0, this.prodNos.length() - 1);
 		}
 		this.info("this.prodNos=" + this.prodNos);
@@ -169,7 +168,6 @@ public class L4721Batch extends TradeBuffer {
 	 * @throws LogicException
 	 */
 	private List<Map<String, String>> mainDataBatxRateChange(TitaVo titaVo, int txkind) throws LogicException {
-
 
 //		List<BatxRateChange> lBatxRateChange = new ArrayList<BatxRateChange>();
 //

@@ -116,6 +116,8 @@ public class L7205p extends TradeBuffer {
 		this.info("filename=" + filename);
 
 		ArrayList<String> dataLineList = new ArrayList<>();
+		
+		titaVo.keepOrgDataBase();// 保留原本記號
 
 //       編碼參數，設定為UTF-8 || big5
 		try {
@@ -129,7 +131,6 @@ public class L7205p extends TradeBuffer {
 
 		}
 
-		titaVo.setDataBaseOnMon();// 指定月報環境
 
 		String extension[] = filename.split("\\.");
 		this.info("file extension=" + extension[extension.length - 1]);
@@ -195,8 +196,25 @@ public class L7205p extends TradeBuffer {
 
 					throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 				}
+				
+				titaVo.setDataBaseOnMon();// 指定月報環境
+				
+				try {
+					tMothlyFacBalService.update(tMonthlyFacBal, titaVo);
+
+				} catch (DBException e) {
+
+					throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+				}
+				
 				CountS++; // 成功筆數+1
 			}
+			
+			
+			titaVo.setDataBaseOnOrg();// 還原原本的環境
+			
+			
+			titaVo.keepOrgDataBase();// 保留原本記號
 			// 維護Ifrs9FacData
 			Ifrs9FacDataId ifrs9FacDataId = new Ifrs9FacDataId();
 			ifrs9FacDataId.setCustNo(custno);
@@ -249,8 +267,24 @@ public class L7205p extends TradeBuffer {
 						throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 					}
 				}
+				
+				titaVo.setDataBaseOnMon();// 指定月報環境
+				
+
+				for (LoanIfrs9Ap t : lLoanIfrs9Ap) {
+					t.setAssetClass(parse.stringToInteger(assetclass));
+					try {
+						tLoanIfrs9ApService.update(t, titaVo);
+					} catch (DBException e) {
+						throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+					}
+				}
+				
+				
 			}
 		} // for
+		
+		titaVo.setDataBaseOnOrg();// 還原原本的環境
 
 //		this.totaVo.putParam("CountAll", CountAll);
 //		this.totaVo.putParam("CountS", CountS);

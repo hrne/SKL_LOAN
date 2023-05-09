@@ -78,7 +78,7 @@ public class L2066 extends TradeBuffer {
 		}
 		// 查無資料
 		if (lAcReceivable == null) {
-			throw new LogicException(titaVo, "E2028", "此戶號額度帳管費資料"); // 查無資料
+			throw new LogicException(titaVo, "E2003", "此戶號額度無帳管費資料"); // 查無資料
 		}
 
 		this.totaVo.putParam("OCustNo", iCustNo);

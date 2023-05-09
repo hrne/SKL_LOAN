@@ -3,11 +3,14 @@ package com.st1.itx.db.repository.hist;
 
 import java.util.Optional;
 
+import java.math.BigDecimal;
+import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -124,8 +127,8 @@ public interface AcDetailRepositoryHist extends JpaRepository<AcDetail, AcDetail
   // AcBookCode = ,AND AcSubBookCode % ,AND BranchNo = ,AND CurrencyCode = ,AND AcNoCode = ,AND AcSubCode =  ,AND AcDate >= ,AND AcDate <= 
   public Slice<AcDetail> findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcNoCodeIsAndAcSubCodeIsAndAcDateGreaterThanEqualAndAcDateLessThanEqualOrderByAcDateAsc(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, String acNoCode_4, String acSubCode_5, int acDate_6, int acDate_7, Pageable pageable);
 
-  // AcctCode = ,AND CustNo = ,AND RvNo = ,AND AcDate =
-  public Optional<AcDetail> findTopByAcctCodeIsAndCustNoIsAndRvNoIsAndAcDateIs(String acctCode_0, int custNo_1, String rvNo_2, int acDate_3);
+  // AcctCode = ,AND CustNo = ,AND RvNo = ,AND AcDate = ,AND DbCr = ,AND TitaHCode = 
+  public Optional<AcDetail> findTopByAcctCodeIsAndCustNoIsAndRvNoIsAndAcDateIsAndDbCrIsAndTitaHCodeIs(String acctCode_0, int custNo_1, String rvNo_2, int acDate_3, String dbCr_4, String titaHCode_5);
 
   // AcDate = ,AND RelTxseq = 
   public Slice<AcDetail> findAllByAcDateIsAndRelTxseqIsOrderByAcSeqAsc(int acDate_0, String relTxseq_1, Pageable pageable);

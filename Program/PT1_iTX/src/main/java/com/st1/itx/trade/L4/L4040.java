@@ -335,8 +335,7 @@ public class L4040 extends TradeBuffer {
 							BankNo7 = tCdCode.getContent().get(0).getCode();
 							BankNo3 = BankNo7.substring(0, 3);
 						} else {
-							throw new LogicException("E0015",
-									"error RepayBank Code:" + result.get("F3") + ",請先新增代碼:BankNo");
+							throw new LogicException("E0015", "找不到提回行代號(BankNo):" + result.get("F3") + ",請先至L6064新增代碼");
 						}
 
 						this.info("BankNo3==" + BankNo3);

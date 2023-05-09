@@ -204,7 +204,9 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 5.按商品別調整
 		// 商品代碼
 		if (iTxKind == 5) {
-			sql += "   and p.\"ProdNo\" in ( " + prodNos + " ) ";
+			if (prodNos.length() > 0) {
+				sql += "   and p.\"ProdNo\" in ( " + prodNos + " ) ";
+			}
 			sql += "   and r.\"EffectDate\"  >= " + sDate;
 			sql += "   and r.\"EffectDate\"  <= " + eDate;
 		}

@@ -112,6 +112,9 @@ public class LogAspect extends SysLogger {
 			event = 9;
 			titaVo.putParam(ContentName.txCodeNM, "登出");
 		}
+		
+		if (event == -1 && titaVo.isTxcdInq())
+			event = 4;
 
 		if (event == -1)
 			return;

@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -1063,20 +1066,20 @@ em = null;
   }
 
   @Override
-  public AcDetail findL4701First(String acctCode_0, int custNo_1, String rvNo_2, int acDate_3, TitaVo... titaVo) {
+  public AcDetail findL4701First(String acctCode_0, int custNo_1, String rvNo_2, int acDate_3, String dbCr_4, String titaHCode_5, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("findL4701First " + dbName + " : " + "acctCode_0 : " + acctCode_0 + " custNo_1 : " +  custNo_1 + " rvNo_2 : " +  rvNo_2 + " acDate_3 : " +  acDate_3);
+    this.info("findL4701First " + dbName + " : " + "acctCode_0 : " + acctCode_0 + " custNo_1 : " +  custNo_1 + " rvNo_2 : " +  rvNo_2 + " acDate_3 : " +  acDate_3 + " dbCr_4 : " +  dbCr_4 + " titaHCode_5 : " +  titaHCode_5);
     Optional<AcDetail> acDetailT = null;
     if (dbName.equals(ContentName.onDay))
-      acDetailT = acDetailReposDay.findTopByAcctCodeIsAndCustNoIsAndRvNoIsAndAcDateIs(acctCode_0, custNo_1, rvNo_2, acDate_3);
+      acDetailT = acDetailReposDay.findTopByAcctCodeIsAndCustNoIsAndRvNoIsAndAcDateIsAndDbCrIsAndTitaHCodeIs(acctCode_0, custNo_1, rvNo_2, acDate_3, dbCr_4, titaHCode_5);
     else if (dbName.equals(ContentName.onMon))
-      acDetailT = acDetailReposMon.findTopByAcctCodeIsAndCustNoIsAndRvNoIsAndAcDateIs(acctCode_0, custNo_1, rvNo_2, acDate_3);
+      acDetailT = acDetailReposMon.findTopByAcctCodeIsAndCustNoIsAndRvNoIsAndAcDateIsAndDbCrIsAndTitaHCodeIs(acctCode_0, custNo_1, rvNo_2, acDate_3, dbCr_4, titaHCode_5);
     else if (dbName.equals(ContentName.onHist))
-      acDetailT = acDetailReposHist.findTopByAcctCodeIsAndCustNoIsAndRvNoIsAndAcDateIs(acctCode_0, custNo_1, rvNo_2, acDate_3);
+      acDetailT = acDetailReposHist.findTopByAcctCodeIsAndCustNoIsAndRvNoIsAndAcDateIsAndDbCrIsAndTitaHCodeIs(acctCode_0, custNo_1, rvNo_2, acDate_3, dbCr_4, titaHCode_5);
     else 
-      acDetailT = acDetailRepos.findTopByAcctCodeIsAndCustNoIsAndRvNoIsAndAcDateIs(acctCode_0, custNo_1, rvNo_2, acDate_3);
+      acDetailT = acDetailRepos.findTopByAcctCodeIsAndCustNoIsAndRvNoIsAndAcDateIsAndDbCrIsAndTitaHCodeIs(acctCode_0, custNo_1, rvNo_2, acDate_3, dbCr_4, titaHCode_5);
 
     return acDetailT.isPresent() ? acDetailT.get() : null;
   }

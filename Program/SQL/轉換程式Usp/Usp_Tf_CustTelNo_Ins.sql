@@ -93,7 +93,26 @@ BEGIN
           -- LNM56ZP火險未繳簡訊通知檔 
           -- CUSTL1+CUSTL2+CUSTL3+CUSTL4
           SELECT TRIM("CUSID1")     AS "CUSTID"
+          -- 2023-05-09 Wei 增加判斷 09開頭,十碼長就轉入簡訊
                , CASE
+                    WHEN SUBSTR("CUSTL1",0,2) = '09' 
+                         AND LENGTH(TRANSLATE("CUSTL1",'0123456789-','0123456789')) = 10
+                    THEN TRANSLATE("CUSTL1",'0123456789-','0123456789')
+                    WHEN SUBSTR("CUSTL2",0,2) = '09' 
+                         AND LENGTH(TRANSLATE("CUSTL2",'0123456789-','0123456789')) = 10
+                    THEN TRANSLATE("CUSTL2",'0123456789-','0123456789')
+                    WHEN SUBSTR("CUSTL3",0,2) = '09' 
+                         AND LENGTH(TRANSLATE("CUSTL3",'0123456789-','0123456789')) = 10
+                    THEN TRANSLATE("CUSTL3",'0123456789-','0123456789')
+                    WHEN SUBSTR("CUSTL4",0,2) = '09' 
+                         AND LENGTH(TRANSLATE("CUSTL4",'0123456789-','0123456789')) = 10
+                    THEN TRANSLATE("CUSTL4",'0123456789-','0123456789')
+                    WHEN SUBSTR("CUSBBC",0,2) = '09' 
+                         AND LENGTH(TRANSLATE("CUSBBC",'0123456789-','0123456789')) = 10
+                    THEN TRANSLATE("CUSBBC",'0123456789-','0123456789')
+                    WHEN SUBSTR("CUSFX1",0,2) = '09' 
+                         AND LENGTH(TRANSLATE("CUSFX1",'0123456789-','0123456789')) = 10
+                    THEN TRANSLATE("CUSFX1",'0123456789-','0123456789')
                     WHEN REGEXP_LIKE(TRIM("CUSTL1"),'^09\d{8}$')
                     THEN TRIM("CUSTL1")
                     WHEN REGEXP_LIKE(TRIM("CUSTL2"),'^09\d{8}$')
@@ -238,14 +257,6 @@ BEGIN
                  ELSE '' END
      WHERE SUBSTR("CUSTEL",0,2) = '09'
        AND "TelTypeCode" != '05' -- 05:簡訊
-     ;
-
-     UPDATE "TempCustTelNo"
-     SET "TelNo" = CASE
-                     WHEN LENGTH(TRANSLATE("CUSTEL",'0123456789-','0123456789')) > 10
-                     THEN SUBSTR(TRANSLATE("CUSTEL",'0123456789-','0123456789'),0,10)
-                   ELSE TRANSLATE("CUSTEL",'0123456789-','0123456789') END
-     WHERE "TelTypeCode" = '05' -- 05:簡訊
      ;
 
      /* -數量大於3 */
@@ -410,48 +421,6 @@ BEGIN
 
     -- 記錄寫入筆數
     INS_CNT := INS_CNT + sql%rowcount;
-
-    -- 2023-04-13 Wei 增加 from SKL佳怡 : 照目前轉手機邏輯轉為簡訊
-    -- 寫入資料
-    INSERT INTO "CustTelNo" (
-        "TelNoUKey"           -- 電話識別碼 VARCHAR2 32 
-      , "CustUKey"            -- 客戶識別碼 VARCHAR2 32 
-      , "TelTypeCode"         -- 電話種類 VARCHAR2 2 
-      , "TelArea"             -- 電話區碼 VARCHAR2 5 
-      , "TelNo"               -- 電話號碼 VARCHAR2 10
-      , "TelExt"              -- 分機號碼 VARCHAR2 6 
-      , "TelChgRsnCode"       -- 異動原因 VARCHAR2 2 
-      , "RelationCode"        -- 與借款人關係 VARCHAR2 2 
-      , "LiaisonName"         -- 聯絡人姓名 NVARCHAR2 100 
-      , "Rmk"                 -- 備註 NVARCHAR2 40 
-      , "StopReason"          -- 停用原因 NVARCHAR2 40 
-      , "Enable"              -- 啟用記號 VARCHAR2 1 
-      , "CreateDate"          -- 建檔日期時間 DATE  
-      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
-      , "LastUpdate"          -- 最後更新日期時間 DATE  
-      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
-    )
-    SELECT SYS_GUID()                     AS "TelNoUKey"           -- 電話識別碼 VARCHAR2 32 
-         , CT."CustUKey"                  AS "CustUKey"            -- 客戶識別碼 VARCHAR2 32 
-         , '05'                           AS "TelTypeCode"         -- 電話種類 VARCHAR2 2 
-         , CT."TelArea"                   AS "TelArea"             -- 電話區碼 VARCHAR2 5 
-         , CT."TelNo"                     AS "TelNo"               -- 電話號碼 VARCHAR2 10
-         , CT."TelExt"                    AS "TelExt"              -- 分機號碼 VARCHAR2 6 
-         , CT."TelChgRsnCode"             AS "TelChgRsnCode"       -- 異動原因 VARCHAR2 2 
-         , CT."RelationCode"              AS "RelationCode"        -- 與借款人關係 VARCHAR2 2 
-         , CT."LiaisonName"               AS "LiaisonName"         -- 聯絡人姓名 NVARCHAR2 100 
-         , CT."Rmk"                       AS "Rmk"                 -- 備註 NVARCHAR2 40 
-         , CT."StopReason"                AS "StopReason"          -- 停用原因 NVARCHAR2 40 
-         , CT."Enable"                    AS "Enable"              -- 啟用記號 VARCHAR2 1 
-         , CT."CreateDate"                AS "CreateDate"          -- 建檔日期時間 DATE  
-         , CT."CreateEmpNo"               AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
-         , CT."LastUpdate"                AS "LastUpdate"          -- 最後更新日期時間 DATE  
-         , CT."LastUpdateEmpNo"           AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
-    FROM "CustTelNo" CT
-    WHERE CT."TelTypeCode" = '03'
-    ;
-
-
 
     -- 記錄程式結束時間
     JOB_END_TIME := SYSTIMESTAMP;

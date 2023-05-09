@@ -104,6 +104,7 @@ public class L3250 extends TradeBuffer {
 	private BigDecimal wkOverAmt = BigDecimal.ZERO;
 	private BigDecimal wkTxAmt = BigDecimal.ZERO;
 	private BigDecimal wkTempAmt = BigDecimal.ZERO;
+	private BigDecimal wkFeeAmt = BigDecimal.ZERO;
 	private int wkRepayCode = 0;
 	private String wkReconCode = "";
 	private int wkFacmNo = 0;
@@ -220,7 +221,6 @@ public class L3250 extends TradeBuffer {
 		}
 		if ("TAV".equals(ac.getAcctCode())) {
 			sumNo = "090";
-			acDetail.setFacmNo(wkFacmNo);
 		}
 		acDetail.setSumNo(sumNo);
 		acDetail.setRvNo(rvNo);
@@ -243,6 +243,12 @@ public class L3250 extends TradeBuffer {
 			break;
 		case "F08": // 30.沖呆帳戶法務費墊付
 			UpdLoanOverDueEraseRoutine();
+			if (ac.getFacmNo() > 0) {
+				wkFacmNo = ac.getFacmNo();
+			}
+		}
+		if ("TAV".equals(ac.getAcctCode())) {
+			acDetail.setFacmNo(wkFacmNo);
 		}
 		lAcDetail.add(acDetail);
 	}
@@ -288,7 +294,7 @@ public class L3250 extends TradeBuffer {
 						&& tInsuRenew.getTitaTxtNo().equals(titaVo.getOrgTno())) {
 					this.info("this.InsuRenew=".toString());
 					ac.setTxAmt(tInsuRenew.getTotInsuPrem());
-					wkTempAmt = wkTempAmt.add(tInsuRenew.getTotInsuPrem());
+					wkFeeAmt = wkFeeAmt.add(tInsuRenew.getTotInsuPrem());
 					switch (tInsuRenew.getStatusCode()) {
 					case 0:
 						ac.setReceivableFlag(3);
@@ -317,8 +323,8 @@ public class L3250 extends TradeBuffer {
 				}
 			}
 		}
-		if (wkTempAmt.compareTo(iTempAmt) != 0) {
-			throw new LogicException(titaVo, "E0015", "火險費用不符" + wkTempAmt); // 檢查錯誤
+		if (wkFeeAmt.compareTo(iTempAmt) != 0) {
+			throw new LogicException(titaVo, "E0015", "火險費用不符" + wkFeeAmt); // 檢查錯誤
 		}
 	}
 
@@ -344,7 +350,7 @@ public class L3250 extends TradeBuffer {
 				if (tForeclosureFee.getCloseDate() == closeDate
 						&& tForeclosureFee.getFee().compareTo(BigDecimal.ZERO) > 0) {
 					ac.setTxAmt(tForeclosureFee.getFee()); // 記帳金額
-					wkTempAmt = wkTempAmt.add(tForeclosureFee.getFee());
+					wkFeeAmt = wkFeeAmt.add(tForeclosureFee.getFee());
 					ac.setCustNo(tForeclosureFee.getCustNo());
 					ac.setFacmNo(tForeclosureFee.getFacmNo());
 					// 紀錄號碼 7 int轉string左補0
@@ -353,8 +359,8 @@ public class L3250 extends TradeBuffer {
 				}
 			}
 		}
-		if (wkTempAmt.compareTo(iTempAmt) != 0) {
-			throw new LogicException(titaVo, "E0015", "法拍費用不符" + wkTempAmt); // 檢查錯誤
+		if (wkFeeAmt.compareTo(iTempAmt) != 0) {
+			throw new LogicException(titaVo, "E0015", "法拍費用不符" + wkFeeAmt); // 檢查錯誤
 		}
 	}
 

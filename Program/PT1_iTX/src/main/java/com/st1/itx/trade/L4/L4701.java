@@ -82,10 +82,9 @@ public class L4701 extends TradeBuffer {
 		this.info("active L4701 ");
 		this.totaVo.init(titaVo);
 
-//		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
-		this.index = titaVo.getReturnIndex();
-//		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = 500;
+		// tita
+		int iAcDate = parse.stringToInteger(titaVo.getParam("EntryDate"));
+		int iAcDateF = parse.stringToInteger(titaVo.getParam("EntryDate")) + 19110000;
 
 		Slice<LoanCheque> sLoanCheque = null;
 
@@ -97,7 +96,7 @@ public class L4701 extends TradeBuffer {
 
 		ArrayList<OccursList> tmp = new ArrayList<>();
 
-		sLoanCheque = loanChequeService.receiveDateRange(this.getTxBuffer().getTxCom().getTbsdyf(), this.getTxBuffer().getTxCom().getTbsdyf(), lStatus, this.index, this.limit);
+		sLoanCheque = loanChequeService.receiveDateRange(iAcDateF, iAcDateF, lStatus, 0, Integer.MAX_VALUE, titaVo);
 
 		lLoanCheque = sLoanCheque == null ? null : sLoanCheque.getContent();
 
@@ -129,27 +128,27 @@ public class L4701 extends TradeBuffer {
 			for (LoanCheque tLoanCheque : lLoanCheque) {
 				OccursList occursList = new OccursList();
 				AcDetail tAcDetail = new AcDetail();
-				int entryDate = 0;
 				int slipNo = 0;
-				tAcDetail = acDetailService.findL4701First("RCK", tLoanCheque.getCustNo(),
-						FormatUtil.pad9("" + tLoanCheque.getChequeAcct(), 9) + " " + FormatUtil.pad9("" + tLoanCheque.getChequeNo(), 7), this.getTxBuffer().getTxCom().getTbsdyf(), titaVo);
+				tAcDetail = acDetailService
+						.findL4701First("RCK", tLoanCheque.getCustNo(),
+								FormatUtil.pad9("" + tLoanCheque.getChequeAcct(), 9) + " "
+										+ FormatUtil.pad9("" + tLoanCheque.getChequeNo(), 7),
+								iAcDateF, "D", "0", titaVo);
 				if (tAcDetail != null) {
 					slipNo = tAcDetail.getSlipNo();
-					entryDate = tAcDetail.getAcDate();
 				}
-				this.info("entryDate = " + entryDate);
 				occursList.putParam("ChequeNo", FormatUtil.pad9("" + tLoanCheque.getChequeNo(), 7));
 				occursList.putParam("ChequeDate", FormatUtil.pad9("" + tLoanCheque.getChequeDate(), 7));
 				occursList.putParam("BankCode", FormatUtil.padX("" + tLoanCheque.getBankCode(), 7));
 				occursList.putParam("ChequeAcct", FormatUtil.padX("" + tLoanCheque.getChequeAcct(), 9));
 				occursList.putParam("ChequeAmt", FormatUtil.pad9("" + tLoanCheque.getChequeAmt(), 7));
-				occursList.putParam("MediaDate", FormatUtil.pad9("" + this.getTxBuffer().getTxCom().getTbsdy(), 7));
-				occursList.putParam("Teller", FormatUtil.padX(this.getTxBuffer().getTxCom().getRelTlr(), 8));
+				occursList.putParam("MediaDate", FormatUtil.pad9("" + titaVo.getCalDy(), 7));
+				occursList.putParam("Teller", FormatUtil.padX(titaVo.getTlrNo(), 8));
 				occursList.putParam("UnitCode", "10H400");
 				occursList.putParam("SrcCode", "1");
 				occursList.putParam("SrcUnit", "10H400");
 				occursList.putParam("RecipeNo", FormatUtil.padX("" + slipNo, 5));
-				occursList.putParam("EntryDate", FormatUtil.pad9("" + entryDate, 7));
+				occursList.putParam("EntryDate", FormatUtil.pad9("" + tLoanCheque.getReceiveDate(), 7));
 				occursList.putParam("CustNo", FormatUtil.pad9("" + tLoanCheque.getCustNo(), 7));
 
 				tmp.add(occursList);
@@ -162,7 +161,8 @@ public class L4701 extends TradeBuffer {
 
 //			String path = "D:\\temp\\pdcm.csv";
 
-			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-票據媒體檔", "pdcm.csv", 2);
+			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
+					titaVo.getTxCode() + "-票據媒體檔", "pdcm.csv", 2);
 
 			for (String line : file) {
 				makeFile.put(line);
@@ -181,7 +181,8 @@ public class L4701 extends TradeBuffer {
 
 			String checkMsg = "票據明細表已完成。 ";
 
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L4701", checkMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+					titaVo.getTlrNo() + "L4701", checkMsg, titaVo);
 		}
 
 		this.addList(this.totaVo);

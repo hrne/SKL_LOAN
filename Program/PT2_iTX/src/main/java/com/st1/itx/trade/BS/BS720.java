@@ -90,6 +90,12 @@ public class BS720 extends TradeBuffer {
 		this.info("BS720 YearMonth=" + iYearMonth + ", YearMonthLast=" + iYearMonthLast);
 
 		// 利息法帳面資料檔更新
+		titaVo.keepOrgDataBase();// 保留原本記號
+		
+		procUpload(iYearMonth, titaVo);
+		
+		titaVo.setDataBaseOnMon();// 指定月報環境
+		
 		procUpload(iYearMonth, titaVo);
 
 		this.batchTransaction.commit();

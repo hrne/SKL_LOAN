@@ -35,6 +35,7 @@ import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
 /*
@@ -347,6 +348,8 @@ public class L3210 extends TradeBuffer {
 			acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
 			acDetail.setTxAmt(iTempAmt);
 			acDetail.setCustNo(iCustNo);
+			acDetail.setRvNo(FormatUtil.pad9(String.valueOf(iChequeAcct), 9) + " "
+					+ FormatUtil.pad9(String.valueOf(iChequeNo), 7));
 			lAcDetail.add(acDetail);
 			addLoanBorTxRoutine(acDetail);
 			break;

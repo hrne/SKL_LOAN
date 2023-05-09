@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.AcDetail;
@@ -617,16 +619,18 @@ public interface AcDetailService {
   public Slice<AcDetail> acdtlAcDateRange2(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, String acNoCode_4, String acSubCode_5, int acDate_6, int acDate_7, int index, int limit, TitaVo... titaVo);
 
   /**
-   * AcctCode = ,AND CustNo = ,AND RvNo = ,AND AcDate =
+   * AcctCode = ,AND CustNo = ,AND RvNo = ,AND AcDate = ,AND DbCr = ,AND TitaHCode = 
    *
    * @param acctCode_0 acctCode_0
    * @param custNo_1 custNo_1
    * @param rvNo_2 rvNo_2
    * @param acDate_3 acDate_3
+   * @param dbCr_4 dbCr_4
+   * @param titaHCode_5 titaHCode_5
    * @param titaVo Variable-Length Argument
    * @return Slice AcDetail AcDetail of List
    */
-  public AcDetail findL4701First(String acctCode_0, int custNo_1, String rvNo_2, int acDate_3, TitaVo... titaVo);
+  public AcDetail findL4701First(String acctCode_0, int custNo_1, String rvNo_2, int acDate_3, String dbCr_4, String titaHCode_5, TitaVo... titaVo);
 
   /**
    * AcDate = ,AND RelTxseq = 

@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class AcDetail implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -6670873208160939522L;
-
-@EmbeddedId
+  @EmbeddedId
   private AcDetailId acDetailId;
 
   // 登放日期
@@ -106,7 +102,7 @@ public class AcDetail implements Serializable {
   private int bormNo = 0;
 
   // 銷帳編號
-  /* 銷帳科目記號=1時，由會計銷帳檔處理公用程式自動編號；其他由業務自行編號 */
+  /* 銷帳科目記號=8核心銷帳碼科目時為銷帳碼 */
   @Column(name = "`RvNo`", length = 30)
   private String rvNo;
 
@@ -141,10 +137,12 @@ public class AcDetail implements Serializable {
   private String sumNo;
 
   // 摘要代號
+  /* 未用 */
   @Column(name = "`DscptCode`", length = 4)
   private String dscptCode;
 
   // 傳票摘要
+  /* L6201其他傳票輸入、L618D 提存入帳 */
   @Column(name = "`SlipNote`", length = 80)
   private String slipNote;
 
@@ -553,7 +551,7 @@ C:貸
 
 /**
 	* 銷帳編號<br>
-	* 銷帳科目記號=1時，由會計銷帳檔處理公用程式自動編號；其他由業務自行編號
+	* 銷帳科目記號=8核心銷帳碼科目時為銷帳碼
 	* @return String
 	*/
   public String getRvNo() {
@@ -562,7 +560,7 @@ C:貸
 
 /**
 	* 銷帳編號<br>
-	* 銷帳科目記號=1時，由會計銷帳檔處理公用程式自動編號；其他由業務自行編號
+	* 銷帳科目記號=8核心銷帳碼科目時為銷帳碼
   *
   * @param rvNo 銷帳編號
 	*/
@@ -762,7 +760,7 @@ C:貸
 
 /**
 	* 摘要代號<br>
-	* 
+	* 未用
 	* @return String
 	*/
   public String getDscptCode() {
@@ -771,7 +769,7 @@ C:貸
 
 /**
 	* 摘要代號<br>
-	* 
+	* 未用
   *
   * @param dscptCode 摘要代號
 	*/
@@ -781,7 +779,7 @@ C:貸
 
 /**
 	* 傳票摘要<br>
-	* 
+	* L6201其他傳票輸入、L618D 提存入帳
 	* @return String
 	*/
   public String getSlipNote() {
@@ -790,7 +788,7 @@ C:貸
 
 /**
 	* 傳票摘要<br>
-	* 
+	* L6201其他傳票輸入、L618D 提存入帳
   *
   * @param slipNote 傳票摘要
 	*/

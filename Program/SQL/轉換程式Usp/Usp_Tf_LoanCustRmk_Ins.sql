@@ -35,6 +35,27 @@ BEGIN
       , "LastUpdate" -- 最後更新日期時間 DATE  
       , "LastUpdateEmpNo" -- 最後更新人員 VARCHAR2 6 
     )
+    WITH lastData AS (
+      SELECT LMSACN
+           , TRXDAT
+           , MAX(DOCSEQ) AS "MaxDOCSEQ"
+      FROM DAT_LNDOCP
+      WHERE TRXDAT IN (
+        20150309
+        , 20011026
+        , 20160317
+        , 20140506
+        , 20121003
+        , 20210616
+        , 20170913
+        , 20141113
+        , 20111012
+        , 20090930
+        , 20041130
+      )
+      GROUP BY LMSACN
+             , TRXDAT
+    )
     SELECT S1."LMSACN"                    AS "CustNo"              -- 借款人戶號 DECIMAL 7 
          , CASE S1."TRXDAT"
              WHEN 50150309 THEN 20150309
