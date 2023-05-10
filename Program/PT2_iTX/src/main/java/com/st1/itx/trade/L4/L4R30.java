@@ -64,7 +64,7 @@ public class L4R30 extends TradeBuffer {
 				if (tPostAuthLogHistory.getProcessTime() == 0) {
 					this.totaVo.putParam("L4R30CalTime", "");
 				} else {
-					ProcessTime = "" + tPostAuthLogHistory.getProcessTime();
+					ProcessTime = parse.IntegerToString(tPostAuthLogHistory.getProcessTime(), 6);
 					ProcessTime = ProcessTime.substring(0, 2) + ":" + ProcessTime.substring(2, 4) + ":"
 							+ ProcessTime.substring(4, 6);
 					this.totaVo.putParam("L4R30CalTime", ProcessTime);
@@ -113,7 +113,7 @@ public class L4R30 extends TradeBuffer {
 				if (tPostAuthLog.getProcessTime() == 0) {
 					this.totaVo.putParam("L4R30CalTime", "");
 				} else {
-					ProcessTime = "" + tPostAuthLog.getProcessTime();
+					ProcessTime = parse.IntegerToString(tPostAuthLog.getProcessTime(), 6);
 					ProcessTime = ProcessTime.substring(0, 2) + ":" + ProcessTime.substring(2, 4) + ":"
 							+ ProcessTime.substring(4, 6);
 					this.totaVo.putParam("L4R30CalTime", ProcessTime);

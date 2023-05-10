@@ -1,0 +1,50 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+#TXCD
+T(3,LC000)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+</sub>
+
+<sub type="DC" name="p1" layout="cols=2;screen.width=[120,250,120,400];printer.width=[15,30,15,45];order=1;">
+[
+["快捷鍵說明"],
+[#<->#,"KEY UP","Focus 向上移動"],
+[#<->#,"KEY Down","Focus 向下移動"],
+[#<->#,"KEY Enter","Focus 向下移動"],
+[#<->#,"KEY TAB","Focus 向下移動"],
+[#<->#,""],
+[#<->#,"KEY ESC","離開交易"],
+[#<->#,"KEY F2","隱藏／顯示代碼"],
+[#<->#,"KEY F4","登出"],
+[#<->#,"KEY F6","相同交易上次輸入內容"],
+[#<->#,"KEY F10","送出交易"],
+]
+
+#INIT=x,1,S
+K(NOBUTTON,CLOSE)
+
+</sub>
+
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+</sub>
+
+!------ 上行電文TIM：BASIC LABEL + AP TEXT AREA + AP TEXT ------
+<sub type="TIM">
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+</sub>

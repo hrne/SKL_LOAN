@@ -54,6 +54,7 @@ public class L9742p extends TradeBuffer {
 
 		// 先確認是手動輸入或整批
 		if (functionCode == 1) {
+			//1.還本 2.利息 3.手續費
 			option = Integer.valueOf(titaVo.getParam("inputOption"));
 
 			this.info("option = " + option);
@@ -64,6 +65,7 @@ public class L9742p extends TradeBuffer {
 				isFinish = l9742Report.exec(titaVo, option);
 			}
 		} else {
+			//1.還本 2.利息 3.手續費
 			isFinish = l9742Report.exec(titaVo, 1) && l9742Report.exec(titaVo, 2) && l9742Report.exec(titaVo, 3);
 		}
 

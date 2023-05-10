@@ -38,7 +38,8 @@ E(0,#FuncCode)
 [#<->#,"功能",#FunctionCode,#FunctionCodeX],
 [#<->#,"會計日期",#inputAcDate],
 [#<->#,"經辦",#inputTitaTlrNo],
-[#<->#,"交易序號",#inputTitaTxtNoStart],
+[#<->#,"交易序號(起)",#inputTitaTxtNoStart],
+[#<->#,"交易序號(迄)",#inputTitaTxtNoEnd],
 [#<->#,"傳票號碼(起)",#inputSlipNoStart,#BTN2],
 [#<->#,"傳票號碼(迄)",#inputSlipNoEnd,#BTN3],
 [#<->#,"作業選項",#inputOption,#inputOptionX]
@@ -86,6 +87,12 @@ V(5,0,#SYSDATE)
 V(7)
 @V(5,00000000,99999999)
 
+#inputTitaTxtNoEnd=A,8,I
+E(0,0)
+C(3,#inputTitaTxtNoEnd,0,E(0,99999999),$)
+@V(5,#inputTitaTxtNoStart,99999999)
+V(2,0)
+
 #BTN2=X,15,I,ui:button;value:會計明細;enable:1;tabbable:0
 #BTN3=X,15,I,ui:button;value:會計明細;enable:1;tabbable:0
 
@@ -112,8 +119,7 @@ BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L6905; ntxbuf=#BUF3B;ntxbuf5=type<-1:
 inputSlipNoEnd<-OOSlipNo})
 
 
-#inputTitaTxtNoEnd=A,8,S
-E(0,0)
+
 
 
 

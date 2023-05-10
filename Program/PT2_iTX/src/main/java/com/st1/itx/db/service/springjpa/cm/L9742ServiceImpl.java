@@ -72,7 +72,7 @@ public class L9742ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      		 , LPAD(TX.\"FacmNo\", 3, '0') AS \"FacmNo\" "; // 額度
 		sql += "      		 , LPAD(TX.\"BormNo\", 3, '0') AS \"BormNo\" "; // 撥款編號
 		sql += "      		 , \"Fn_ParseEOL\"(CM.\"CustName\", 0) AS \"CustName\" "; // 戶名
-		sql += "      		 , CASE WHEN :inputOption = 1 "; // 還本收據
+		sql += "      		 , CASE WHEN :inputOption = 1 AND ACD.\"AcctCode\" IN ('310','320','330','340')"; // 還本收據
 		sql += "             	    THEN TX.\"Principal\" ";
 		sql += "             		WHEN :inputOption = 2 AND ACD.\"AcNoCode\" LIKE '40241%'";// 繳息收據
 		sql += "             		THEN TX.\"Interest\" ";
@@ -103,26 +103,17 @@ public class L9742ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "   		  AND TX.\"TitaTxtNo\" = :inputTitaTxtNo "; // 會計日期
 		}
 
+		sql += "   		  AND ACD.\"TitaTxtNo\" >= :inputTitaTxtNoStart "; // 交易序號-起
+		sql += "   		  AND ACD.\"TitaTxtNo\" <= inputTitaTxtNoEnd "; // 交易序號-止
 		// functionCode 1=手動輸入、2=整批
-		if (functionCode == 1) {
-			// 當交易序號為0表示找範圍 0~99999999
-			if (inputTitaTxtNoStart == 0) {
-				sql += "   		  AND ACD.\"TitaTxtNo\" >= :inputTitaTxtNoStart "; // 交易序號-起
-				sql += "   		  AND ACD.\"TitaTxtNo\" <= 99999999 "; // 交易序號-止
-			} else {
-				// 交易序號大於0 ，只找畫面輸入的值
-				sql += "   		  AND ACD.\"TitaTxtNo\" = :inputTitaTxtNoStart "; // 交易序號
-			}
-		} else {
-			sql += "   		  AND ACD.\"TitaTxtNo\" >= :inputTitaTxtNoStart "; // 交易序號-起
-			sql += "   		  AND ACD.\"TitaTxtNo\" <= :inputTitaTxtNoEnd "; // 交易序號-止
+		if (functionCode == 2) {
 			sql += "      	  AND \"RepayCode\" = 2 "; // 付款方式 2=銀行扣款
 		}
 
 		sql += "   		  AND ACD.\"SlipNo\" >= :inputSlipNoStart "; // 傳票號碼-起
 		sql += "   		  AND ACD.\"SlipNo\" <= :inputSlipNoEnd "; // 傳票號碼-止
-		sql += "      	  AND  CASE WHEN :inputOption = 1 "; // 還本收據
-		sql += "             	    THEN TX.\"Principal\" ";
+		sql += "      	  AND CASE WHEN :inputOption = 1 AND ACD.\"AcctCode\" IN ('310','320','330','340')"; // 還本收據
+		sql += "             	   THEN TX.\"Principal\" ";
 		sql += "             		WHEN :inputOption = 2 AND ACD.\"AcNoCode\" LIKE '40241%'";// 繳息收據
 		sql += "             		THEN TX.\"Interest\" ";
 		sql += "             		WHEN :inputOption = 3 AND ACD.\"AcNoCode\" LIKE '409030%'"; // 手續費收據
@@ -198,13 +189,9 @@ public class L9742ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("inputTitaTxtNo", tlrNo);
 		}
 
-		// functionCode 1=手動輸入、2=整批
-		if (functionCode == 1) {
-			query.setParameter("inputTitaTxtNoStart", inputTitaTxtNoStart);
-		} else {
-			query.setParameter("inputTitaTxtNoStart", inputTitaTxtNoStart);
-			query.setParameter("inputTitaTxtNoEnd", inputTitaTxtNoEnd);
-		}
+
+		query.setParameter("inputTitaTxtNoStart", inputTitaTxtNoStart);
+		query.setParameter("inputTitaTxtNoEnd", inputTitaTxtNoEnd);
 
 		query.setParameter("inputSlipNoStart", inputSlipNoStart);
 		query.setParameter("inputSlipNoEnd", inputSlipNoEnd);

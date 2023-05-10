@@ -99,7 +99,7 @@ public class L9742Report extends MakeReport {
 				 * 額度編號 F8 = 撥款序號 F9 = 戶名/公司名稱 F10 = 記帳金額 F11 = 計息起日 F12 = 計息迄日
 				 */
 
-				String txtNo = rowL9742.get("F2").substring(0, 1);
+//				String txtNo = rowL9742.get("F2").substring(0, 1);
 
 				this.info("EntryDate ... = " + rowL9742.get("F5"));
 				this.info("IntStartDate ... = " + rowL9742.get("F11"));
@@ -140,11 +140,11 @@ public class L9742Report extends MakeReport {
 				// xiangwei 20211027
 
 				String acChineseName = rowL9742.get("F3");
-				String prefix = "1".equals(txtNo) ? "擔保放款－" : "利息收入－";
+//				String prefix = "1".equals(txtNo) ? "擔保放款－" : "利息收入－";
 
-				if (!acChineseName.contains(prefix)) {
-					acChineseName = prefix + acChineseName;
-				}
+//				if (!acChineseName.contains(prefix)) {
+//					acChineseName = acChineseName;
+//				}
 
 				// wrap
 				// 九個中文字寬
@@ -223,8 +223,13 @@ public class L9742Report extends MakeReport {
 				}
 				// 先輸出到最大三十字，如果將來有更長的戶名需要輸出，
 				// 這裡可以考慮改成for迴圈
-
-				this.print(1, 1, "│　　　　　　　　　　│　計算期間：　　　　　　　　　　　　│　　　　　　　　　│");
+				
+				// 手續費不需要計算期間
+				if (option == 3) {
+					this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
+				} else {
+					this.print(1, 1, "│　　　　　　　　　　│　計算期間：　　　　　　　　　　　　│　　　　　　　　　│");
+				}
 				this.print(0, 34, showDate(rowL9742.get("F11").toString(), 1) + " - "
 						+ showDate(rowL9742.get("F12").toString(), 1));
 				this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
@@ -263,7 +268,12 @@ public class L9742Report extends MakeReport {
 			this.print(1, 1, "│　　　　　　　　　　│　戶名：　　　　　　　　　　　　　　│　　　　　　　　　│");
 			this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
 			this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
-			this.print(1, 1, "│　　　　　　　　　　│　計算期間：　　　　　　　　　　　　│　　　　　　　　　│");
+			// 手續費不需要計算期間
+			if (option == 3) {
+				this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
+			} else {
+				this.print(1, 1, "│　　　　　　　　　　│　計算期間：　　　　　　　　　　　　│　　　　　　　　　│");
+			}
 			this.print(0, 43, "-");
 			this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
 			this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
@@ -274,7 +284,7 @@ public class L9742Report extends MakeReport {
 		}
 
 		this.close();
-		// this.toPdf(sno);
+
 
 	}
 

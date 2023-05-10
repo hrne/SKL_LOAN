@@ -93,7 +93,7 @@ A(YM,1,#DataMonth)
 <sub type="FORM" name="L7300">
 
 #SCRTIL=_,_,S
-T(3,[L7300] 表外放款承諾資料產出)
+T(3,[L7300] ICS資產資料傳輸)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 
