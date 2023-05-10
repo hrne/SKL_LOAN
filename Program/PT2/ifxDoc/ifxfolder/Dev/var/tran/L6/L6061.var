@@ -108,6 +108,7 @@ C(4,#AcNoCode,s,$)
 
 
 #SendL6R23=X,1,S
+C(4,#AcNoCode,s,$)
 E(0,@RimFuncCode,5)
 T(2,@RimAcNoCode,#AcNoCode)
 T(2,@RimAcSubCode,#AcSubCode)
@@ -118,6 +119,9 @@ R(1,L6R23)
 
 #AcNoItem=x,80,L
 T(2,#L6R23AcNoItem)
+
+
+
 
 #BUF1=X,16,S
 !C(4,#AcNoCode,HIDE(#BTN1),SHOW(#BTN1))

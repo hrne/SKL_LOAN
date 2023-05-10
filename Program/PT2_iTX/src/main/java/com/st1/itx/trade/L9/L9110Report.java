@@ -776,7 +776,7 @@ public class L9110Report extends MakeReport {
 					// NEW
 					if (listBuildingLandQuery != null && !listBuildingLandQuery.isEmpty()) {
 						// 列印建物明細
-						printBuildingLandDetail(listBuildingLandQuery, clCode1.equals("2") ? "0" : tL9110Cl.get("F19"));
+						printBuildingLandDetail(listBuildingLandQuery, tL9110Cl.get("F19"));
 					}
 					break;
 				case "3": // 股票
@@ -1109,7 +1109,7 @@ public class L9110Report extends MakeReport {
 			}
 			BigDecimal bdloanAmt = BigDecimal.ZERO;
 			BigDecimal landloanAmt = BigDecimal.ZERO;
-
+			String clItem = "";
 			i++;
 
 			// 計算分配建物設定金額
@@ -1133,10 +1133,13 @@ public class L9110Report extends MakeReport {
 					landloanAmt = landAmtBal;
 				}
 			}
+			if ("1".equals(mBuilding.get("F0")) || "1".equals(mBuilding.get("F29"))) {
+				clItem = mBuilding.get("F4");
+			}
 
 			this.print(1, 5, mBuilding.get("F1")); // 主建物建號
 			this.print(0, 17, mBuilding.get("F2")); // 提供人
-			this.print(0, 56, mBuilding.get("F4")); // 擔保品別
+			this.print(0, 56, clItem); // 擔保品別
 			this.print(0, 68, mBuilding.get("F5")); // 公設建號
 			this.print(0, 87, mBuilding.get("F6").trim().isEmpty() ? " " : formatAmt(mBuilding.get("F6"), 2), "R"); // 主建物面積
 			if (!mBuilding.get("F6").trim().isEmpty()) {
@@ -1159,7 +1162,7 @@ public class L9110Report extends MakeReport {
 					"R"); // 核貸
 			this.print(0, 143, mBuilding.get("F10").trim().isEmpty() ? " "
 					: formatAmt(computeDivide(getBigDecimal(mBuilding.get("F10")), thousand, 0), 0), "R");// 設定金額
-			if ("1".equals(mBuilding.get("F29")) && !mBuilding.get("F10").trim().isEmpty()) {
+			if (("1".equals(mBuilding.get("F0")) && !mBuilding.get("F10").trim().isEmpty())) {
 				totalSettingAmt = totalSettingAmt.add(getBigDecimal(mBuilding.get("F10")));
 			}
 			this.print(0, 145, mBuilding.get("F12") + "-" + mBuilding.get("F13") + "-" + mBuilding.get("F14")); // 擔保品編號

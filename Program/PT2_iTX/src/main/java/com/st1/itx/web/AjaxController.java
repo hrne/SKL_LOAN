@@ -175,6 +175,7 @@ public class AjaxController extends SysLogger {
 	@RequestMapping(value = "download/file/{tlrNo}/{sno}/{fileType}/{name}")
 	public void getFile(@PathVariable String tlrNo, @PathVariable String sno, @PathVariable String fileType, @PathVariable String name, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ThreadVariable.setObject(ContentName.loggerFg, true);
+		ThreadVariable.setObject(ContentName.empnot, tlrNo);
 		this.mustInfo("getFile...");
 
 		fileType = fileType == null ? "" : fileType.trim();

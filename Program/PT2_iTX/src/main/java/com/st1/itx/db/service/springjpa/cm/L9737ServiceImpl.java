@@ -75,11 +75,11 @@ public class L9737ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   LEFT JOIN \"ClEva\" CE_early ON CE_early.\"ClCode1\" = CF.\"ClCode1\" ";
 		sql += "                               AND CE_early.\"ClCode2\" = CF.\"ClCode2\" ";
 		sql += "                               AND CE_early.\"ClNo\" = CF.\"ClNo\" ";
-		sql += "                               AND CE_early.\"EvaDate\" <= CAS.\"ApplNo\" ";
+		sql += "                               AND CE_early.\"EvaDate\" <= CAS.\"ApproveDate\" ";
 		sql += "   LEFT JOIN \"ClEva\" CE_later ON CE_later.\"ClCode1\" = CF.\"ClCode1\" ";
 		sql += "                               AND CE_later.\"ClCode2\" = CF.\"ClCode2\" ";
 		sql += "                               AND CE_later.\"ClNo\" = CF.\"ClNo\" ";
-		sql += "                               AND CE_later.\"EvaDate\" > CAS.\"ApplNo\" ";
+		sql += "                               AND CE_later.\"EvaDate\" > CAS.\"ApproveDate\" ";
 		sql += "                               AND NVL(CE_early.\"EvaDate\",0) = 0 "; // 若第1段串不到,才串第2段
 		sql += " ) ";
 		sql += " , \"CFSum\" AS ( ";

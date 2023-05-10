@@ -179,8 +179,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (iTxKind == 1) {
 			sql += "       and b.\"RateCode\" = '3' ";
 			sql += "       and r.\"RateCode\" = '3'  ";
-			sql += "       and b.\"NextAdjRateDate\" >= " + sDate;
-			sql += "       and b.\"NextAdjRateDate\" <= " + eDate;
+
 		}
 		// 2.指數型利率調整
 		if (iTxKind == 2) {

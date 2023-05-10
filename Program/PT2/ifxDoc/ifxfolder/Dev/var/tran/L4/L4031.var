@@ -88,6 +88,11 @@ E(0,@RateChangeDate,#SYSDATE)
 @A(DATE,0,#RateChangeDate)
 IF(#RateChangeDate==0,V(P,調整日期不可為0),$)
 
+!會計日
+#NowAcDate=D,7,L
+E(0,@NowAcDate,#SYSDATE)
+
+
 ! #AdjMonth=A,5,I
 ! T(1,#RateChangeDate,1,5)
 
@@ -195,8 +200,10 @@ IF(#OOCheckFlag==1,T(2,已確認報表),IF(#OOCheckFlag==0,T(2,確認),IF(#OOChe
 
 #OOBuff_L4321=X,42,O
 T(2,#RateChangeDate+#OOLableA+#CustType+#OOLableB_AdjCode+#OOLableB_KeyinCode+#OOLableBX)
-#OOBuff_LC009=X,15,O
-T(2,#TLRNO+L4321)
+!#OOBuff_LC009=X,15,O
+!T(2,#TLRNO+L4321)
+#OOBuff_LC009=X,81,O
+T(2,      +L4321+               +                                        +#RateChangeDate+#NowAcDate)
 
 #OOBuff_L4325=X,10,O
 T(2,#RateChangeDate+#OOLableA+#CustType)

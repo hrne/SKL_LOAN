@@ -93,38 +93,38 @@ BEGIN
           -- LNM56ZP火險未繳簡訊通知檔 
           -- CUSTL1+CUSTL2+CUSTL3+CUSTL4
           SELECT TRIM("CUSID1")     AS "CUSTID"
-          -- 2023-05-09 Wei 增加判斷 09開頭,十碼長就轉入簡訊
                , CASE
+                    WHEN REGEXP_LIKE(TRIM(TRANSLATE("CUSTL1",'0123456789- ','0123456789')),'^09\d{8}$')
+                    THEN TRIM(TRANSLATE("CUSTL1",'0123456789- ','0123456789'))
+                    WHEN REGEXP_LIKE(TRIM(TRANSLATE("CUSTL2",'0123456789- ','0123456789')),'^09\d{8}$')
+                    THEN TRIM(TRANSLATE("CUSTL2",'0123456789- ','0123456789'))
+                    WHEN REGEXP_LIKE(TRIM(TRANSLATE("CUSTL3",'0123456789- ','0123456789')),'^09\d{8}$')
+                    THEN TRIM(TRANSLATE("CUSTL3",'0123456789- ','0123456789'))
+                    WHEN REGEXP_LIKE(TRIM(TRANSLATE("CUSTL4",'0123456789- ','0123456789')),'^09\d{8}$')
+                    THEN TRIM(TRANSLATE("CUSTL4",'0123456789- ','0123456789'))
+                    WHEN REGEXP_LIKE(TRIM(TRANSLATE("CUSBBC",'0123456789- ','0123456789')),'^09\d{8}$')
+                    THEN TRIM(TRANSLATE("CUSBBC",'0123456789- ','0123456789'))
+                    WHEN REGEXP_LIKE(TRIM(TRANSLATE("CUSFX1",'0123456789- ','0123456789')),'^09\d{8}$')
+                    THEN TRIM(TRANSLATE("CUSFX1",'0123456789- ','0123456789'))
+                    -- 2023-05-09 Wei 因為新壽要遮罩又要看到資料 特別增加以下判斷 09開頭,十碼長就轉入簡訊
                     WHEN SUBSTR("CUSTL1",0,2) = '09' 
-                         AND LENGTH(TRANSLATE("CUSTL1",'0123456789-','0123456789')) = 10
-                    THEN TRANSLATE("CUSTL1",'0123456789-','0123456789')
+                         AND LENGTH(TRANSLATE("CUSTL1",'0123456789- ','0123456789')) = 10
+                    THEN TRANSLATE("CUSTL1",'0123456789- ','0123456789')
                     WHEN SUBSTR("CUSTL2",0,2) = '09' 
-                         AND LENGTH(TRANSLATE("CUSTL2",'0123456789-','0123456789')) = 10
-                    THEN TRANSLATE("CUSTL2",'0123456789-','0123456789')
+                         AND LENGTH(TRANSLATE("CUSTL2",'0123456789- ','0123456789')) = 10
+                    THEN TRANSLATE("CUSTL2",'0123456789- ','0123456789')
                     WHEN SUBSTR("CUSTL3",0,2) = '09' 
-                         AND LENGTH(TRANSLATE("CUSTL3",'0123456789-','0123456789')) = 10
-                    THEN TRANSLATE("CUSTL3",'0123456789-','0123456789')
+                         AND LENGTH(TRANSLATE("CUSTL3",'0123456789- ','0123456789')) = 10
+                    THEN TRANSLATE("CUSTL3",'0123456789- ','0123456789')
                     WHEN SUBSTR("CUSTL4",0,2) = '09' 
-                         AND LENGTH(TRANSLATE("CUSTL4",'0123456789-','0123456789')) = 10
-                    THEN TRANSLATE("CUSTL4",'0123456789-','0123456789')
+                         AND LENGTH(TRANSLATE("CUSTL4",'0123456789- ','0123456789')) = 10
+                    THEN TRANSLATE("CUSTL4",'0123456789- ','0123456789')
                     WHEN SUBSTR("CUSBBC",0,2) = '09' 
-                         AND LENGTH(TRANSLATE("CUSBBC",'0123456789-','0123456789')) = 10
-                    THEN TRANSLATE("CUSBBC",'0123456789-','0123456789')
+                         AND LENGTH(TRANSLATE("CUSBBC",'0123456789- ','0123456789')) = 10
+                    THEN TRANSLATE("CUSBBC",'0123456789- ','0123456789')
                     WHEN SUBSTR("CUSFX1",0,2) = '09' 
-                         AND LENGTH(TRANSLATE("CUSFX1",'0123456789-','0123456789')) = 10
-                    THEN TRANSLATE("CUSFX1",'0123456789-','0123456789')
-                    WHEN REGEXP_LIKE(TRIM("CUSTL1"),'^09\d{8}$')
-                    THEN TRIM("CUSTL1")
-                    WHEN REGEXP_LIKE(TRIM("CUSTL2"),'^09\d{8}$')
-                    THEN TRIM("CUSTL2")
-                    WHEN REGEXP_LIKE(TRIM("CUSTL3"),'^09\d{8}$')
-                    THEN TRIM("CUSTL3")
-                    WHEN REGEXP_LIKE(TRIM("CUSTL4"),'^09\d{8}$')
-                    THEN TRIM("CUSTL4")
-                    WHEN REGEXP_LIKE(TRIM("CUSBBC"),'^09\d{8}$')
-                    THEN TRIM("CUSBBC")
-                    WHEN REGEXP_LIKE(TRIM("CUSFX1"),'^09\d{8}$')
-                    THEN TRIM("CUSFX1")
+                         AND LENGTH(TRANSLATE("CUSFX1",'0123456789- ','0123456789')) = 10
+                    THEN TRANSLATE("CUSFX1",'0123456789- ','0123456789')
                  ELSE 'X'
                  END                AS "CUSTEL"
                , '05'               AS "TelTypeCode" -- 05:簡訊
@@ -371,6 +371,14 @@ BEGIN
        AND "CUSTEL" = '77069880213'
      ;
 
+     /* 05:簡訊 總長度=10 直接放入TelNo */
+     UPDATE "TempCustTelNo"
+     SET "TelNo" = TRIM(TRANSLATE("CUSTEL",'0123456789- ','0123456789'))
+     WHERE "TelTypeCode" = '05'
+       AND LENGTH(TRIM(TRANSLATE("CUSTEL",'0123456789- ','0123456789'))) = 10
+       AND NVL("TelNo",' ') = ' '
+     ;
+
     -- 刪除舊資料
     EXECUTE IMMEDIATE 'ALTER TABLE "CustTelNo" DISABLE PRIMARY KEY CASCADE';
     EXECUTE IMMEDIATE 'TRUNCATE TABLE "CustTelNo" DROP STORAGE';
@@ -395,18 +403,29 @@ BEGIN
       , "LastUpdate"          -- 最後更新日期時間 DATE  
       , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
     )
+    -- 2023-05-10 Wei 新增 相同電話種類相同號碼只取一筆寫入
+    WITH TC AS (
+      SELECT DISTINCT
+             "CUSTID"
+           , "TelTypeCode"
+           , "TelArea"
+           , "TelNo"
+           , "TelExt"
+           , "CUSTNA4"
+      FROM "TempCustTelNo"
+    )
     SELECT SYS_GUID()                     AS "TelNoUKey"           -- 電話識別碼 VARCHAR2 32 
          , CM."CustUKey"                  AS "CustUKey"            -- 客戶識別碼 VARCHAR2 32 
-         , S1."TelTypeCode"               AS "TelTypeCode"         -- 電話種類 VARCHAR2 2 
-         , S1."TelArea"                   AS "TelArea"             -- 電話區碼 VARCHAR2 5 
-         , S1."TelNo"                     AS "TelNo"               -- 電話號碼 VARCHAR2 10
-         , S1."TelExt"                    AS "TelExt"              -- 分機號碼 VARCHAR2 6 
+         , TC."TelTypeCode"               AS "TelTypeCode"         -- 電話種類 VARCHAR2 2 
+         , TC."TelArea"                   AS "TelArea"             -- 電話區碼 VARCHAR2 5 
+         , TC."TelNo"                     AS "TelNo"               -- 電話號碼 VARCHAR2 10
+         , TC."TelExt"                    AS "TelExt"              -- 分機號碼 VARCHAR2 6 
          , '01'                           AS "TelChgRsnCode"       -- 異動原因 VARCHAR2 2 
          , CASE
-             WHEN TRIM(S1."CUSTNA4") = TRIM(CM."CustName")
+             WHEN TRIM(TC."CUSTNA4") = TRIM(CM."CustName")
              THEN '00'
            ELSE '99' END                  AS "RelationCode"        -- 與借款人關係 VARCHAR2 2 
-         , S1."CUSTNA4"                   AS "LiaisonName"         -- 聯絡人姓名 NVARCHAR2 100 
+         , TC."CUSTNA4"                   AS "LiaisonName"         -- 聯絡人姓名 NVARCHAR2 100 
          , u''                            AS "Rmk"                 -- 備註 NVARCHAR2 40 
          , u''                            AS "StopReason"          -- 停用原因 NVARCHAR2 40 
          , 'Y'                            AS "Enable"              -- 啟用記號 VARCHAR2 1 
@@ -415,8 +434,8 @@ BEGIN
          , JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
          , '999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
     FROM "CustMain" CM
-    LEFT JOIN "TempCustTelNo" S1 ON S1."CUSTID" = CM."CustId"
-    WHERE NVL(S1."TelNo",' ') <> ' '
+    LEFT JOIN TC ON TC."CUSTID" = CM."CustId"
+    WHERE NVL(TC."TelNo",' ') <> ' '
     ;
 
     -- 記錄寫入筆數

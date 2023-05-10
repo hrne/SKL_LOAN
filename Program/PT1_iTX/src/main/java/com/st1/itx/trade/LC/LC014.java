@@ -51,8 +51,7 @@ public class LC014 extends TradeBuffer {
 		String iTranNo = titaVo.getParam("TranNo");
 		String iMrKey = titaVo.getParam("MrKey");
 		String itranl = titaVo.getEmpNot(); // 櫃員 編號
-		Slice<TxAttachment> slTxAttachment = txAttachmentService.findByTran(iTranNo, iMrKey, 0, Integer.MAX_VALUE,
-				titaVo);
+		Slice<TxAttachment> slTxAttachment = txAttachmentService.findByTran(iTranNo, iMrKey, 0, Integer.MAX_VALUE,titaVo);
 		List<TxAttachment> lTxAttachment = slTxAttachment == null ? null : slTxAttachment.getContent();
 
 		if (lTxAttachment == null || lTxAttachment.size() == 0) {
@@ -76,14 +75,16 @@ public class LC014 extends TradeBuffer {
 
 			occursList.putParam("OCreateEmp", empNo);
 			String iCreate = txAttachment.getCreateEmpNo();
+			
 			// 新增刪除記號 判斷L6064是否有Code有紀錄該交易有的畫判斷是否為建立人查詢顯示，如果是本人才會顯示刪除按紐
 			// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
+			
 			this.limit = Integer.MAX_VALUE; // 217 * 200 = 43400
 			this.info("iTranNo   = " + iTranNo);
 			this.info("iCreate   = " + iCreate);
 			List<Map<String, String>> L6064DateList = null;
 			try {
-				L6064DateList = l6064ServiceImpls.findAll("", "UplowDelBtn", iTranNo, "", this.index, this.limit,
+				L6064DateList = l6064ServiceImpls.findAll("", "UploadDelBtn", iTranNo, "", this.index, this.limit,
 						titaVo);
 			} catch (Exception e) {
 				throw new LogicException(titaVo, "E0001", "SQL ERROR");

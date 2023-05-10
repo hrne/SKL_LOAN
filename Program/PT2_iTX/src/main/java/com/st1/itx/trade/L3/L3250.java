@@ -197,6 +197,7 @@ public class L3250 extends TradeBuffer {
 	}
 
 	private void addAcDetail(AcDetail ac) throws LogicException {
+		boolean isRvFee = false;
 		acDetail = new AcDetail();
 		if ("D".equals(ac.getDbCr())) {
 			acDetail.setDbCr("C");
@@ -228,11 +229,13 @@ public class L3250 extends TradeBuffer {
 		case "TMI": // TMI 暫收款－火險保費
 		case "F25": // F25 催收款項－火險費用
 			checkInsuRenew(acDetail, titaVo);
+			isRvFee = true;
 			break;
 		case "F07": // F07 暫付法務費
 		case "F24": // F24 催收款項－法務費用
 			acDetail.setReceivableFlag(2);
 			checkForeclosureFee(acDetail, titaVo);
+			isRvFee = true;
 			break;
 		case "F10": // 10.沖帳管費/手續費
 		case "F12": // 12.聯貸件
@@ -250,7 +253,9 @@ public class L3250 extends TradeBuffer {
 		if ("TAV".equals(ac.getAcctCode())) {
 			acDetail.setFacmNo(wkFacmNo);
 		}
-		lAcDetail.add(acDetail);
+		if (!isRvFee) {
+			lAcDetail.add(acDetail);
+		}
 	}
 
 	// 沖正處理

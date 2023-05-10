@@ -150,7 +150,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,S1.\"BdNo\" AS \"F1建號\"   ";
 		sql += " ,S1.\"Owner\" AS \"F2擔保品提供人\"    ";
 		sql += " ,S1.\"Location\" AS \"F3門牌坐落\"   ";
-		sql += " ,S1.\"BdClItem\" AS \"F4擔保品別\"    ";
+		sql += " ,S1.\"ClItem\" AS \"F4擔保品別\"    ";
 		sql += " ,S1.\"BdPublicDdNo\" AS \"F5公社建號\"    ";
 		sql += " ,CASE WHEN ROW_NUMBER() OVER( ";
 		sql += "                 PARTITION BY S1.\"ClCode1\", S1.\"ClCode2\", S1.\"ClNo\" ";
@@ -229,7 +229,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             lpad(l.\"ClCode2\", 2, '0') AS \"ClCode2\",   ";
 		sql += "             lpad(l.\"ClNo\", 7, '0') AS \"ClNo\",   ";
 		sql += "             0 AS \"LandSeq\",   ";
-		sql += "             TO_CHAR(cdc1.\"Item\")        AS \"BdClItem\",   ";
+		sql += "             TO_CHAR(cdc1.\"Item\")        AS \"ClItem\",   ";
 		sql += "             ' ' AS \"LandCityItem\" ,  ";
 		sql += "             ' ' AS \"LandAreaItem\",  ";
 		sql += "             ' ' AS \"LandIrItem\" ,  ";
@@ -353,7 +353,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             TO_CHAR(lpad(cf.\"ClCode2\", 2, '0')) AS \"ClCode2\",   ";
 		sql += "             TO_CHAR(lpad(cf.\"ClNo\", 7, '0')) AS \"ClNo\",   ";
 		sql += "             l.\"LandSeq\" AS \"LandSeq\",   ";
-		sql += "             ' ' AS \"BdClItem\",   ";
+		sql += "             TO_CHAR(cdc1.\"Item\")        AS \"ClItem\",   ";
 		sql += "             TO_CHAR(city.\"CityItem\")         AS \"LandCityItem\",   ";
 		sql += "             TO_CHAR(area.\"AreaItem\")         AS \"LandAreaItem\", ";
 		sql += "             TO_CHAR(cdls.\"IrItem\")           AS \"LandIrItem\" , ";

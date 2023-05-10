@@ -53,7 +53,7 @@ public class LM083ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   FROM \"ClFac\" CF ";
 		sql += "   LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = CF.\"CustNo\" ";
 		sql += "                            AND FAC.\"FacmNo\" = CF.\"FacmNo\" ";
-		sql += "   LEFT JOIN \"FacCaseAppl\" CAS ON CAS.\"ApplNo\" = CF.\"ApplNo\" ";	
+		sql += "   LEFT JOIN \"FacCaseAppl\" CAS ON CAS.\"ApplNo\" = CF.\"ApproveNo\" ";	
 		sql += "   LEFT JOIN \"ClEva\" CE_early ON CE_early.\"ClCode1\" = CF.\"ClCode1\" ";
 		sql += "                               AND CE_early.\"ClCode2\" = CF.\"ClCode2\" ";
 		sql += "                               AND CE_early.\"ClNo\" = CF.\"ClNo\" ";
