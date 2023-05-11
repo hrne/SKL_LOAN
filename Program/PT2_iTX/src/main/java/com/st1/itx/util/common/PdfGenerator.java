@@ -782,7 +782,7 @@ public class PdfGenerator extends CommBuffer {
 			empNm = tCdEmp.getFullname();
 		}
 
-		this.info("PdfGenerator setWatermark empNm = " + empNm);
+		// this.info("PdfGenerator setWatermark empNm = " + empNm);
 
 		watermark.append(empNm).append(" ");
 
@@ -799,9 +799,9 @@ public class PdfGenerator extends CommBuffer {
 		widthMax = document.getPageSize().getWidth();
 		heightMax = document.getPageSize().getHeight();
 
-		this.info("paperorientaton =" + paperorientaton);
-		this.info("widthMax =" + widthMax);
-		this.info("heightMax =" + heightMax);
+		// this.info("paperorientaton =" + paperorientaton);
+		// this.info("widthMax =" + widthMax);
+		// this.info("heightMax =" + heightMax);
 
 		for (float w = 0; w < widthMax + 150f; w += 150f) {
 			for (float h = 0; h < heightMax + 80f; h += 80f) {

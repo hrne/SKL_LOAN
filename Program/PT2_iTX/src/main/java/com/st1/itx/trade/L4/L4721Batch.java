@@ -20,7 +20,6 @@ import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.springjpa.cm.L4721ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.CustNoticeCom;
-import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.TxToDoCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
@@ -56,9 +55,6 @@ public class L4721Batch extends TradeBuffer {
 
 	@Autowired
 	private CustMainService custMainService;
-
-	@Autowired
-	private MakeReport makeReport;
 
 	@Autowired
 	public L4721Report l4721Report;
@@ -114,15 +110,17 @@ public class L4721Batch extends TradeBuffer {
 
 		// 利率種類0 全部(1~5)
 		if (this.iTxKind == 0) {
+			String[] tmpKindItem = this.kindItem.split("、");
 			for (int txkind = 1; txkind <= 5; txkind++) {
 
 				try {
-					l4721Report.exec(titaVo, this.txBuffer, mainDataBatxRateChange(titaVo, txkind), this.kindItem);
+					l4721Report.exec(titaVo, this.txBuffer, mainDataBatxRateChange(titaVo, txkind),
+							tmpKindItem[txkind - 1]);
 
 					dealMessageData(titaVo, l4721Report.lTmpCustFacm);
 
 					l4721Report2.exec(titaVo, this.txBuffer, mainDataBatxRateChange(titaVo, txkind), txkind,
-							this.kindItem);
+							tmpKindItem[txkind - 1]);
 				} catch (LogicException e) {
 					sendMsg = e.getErrorMsg();
 					flag = false;
@@ -280,7 +278,7 @@ public class L4721Batch extends TradeBuffer {
 		tTxToDoDetail.setStatus(0);
 		tTxToDoDetail.setProcessNote(txToDoCom.getProcessNoteForText(noticePhoneNo,
 				"親愛的客戶您好，新光人壽通知您，房貸額度 " + tmpCustFacm.get("FacmNo") + " 自"
-						+ makeReport.showRocDate(parse.stringToInteger(tmpCustFacm.get("rateChangeDate"))) + "起利率由"
+						+ tmpCustFacm.get("rateChangeDate") + "起利率由"
 						+ parse.stringToInteger(tmpCustFacm.get("originRate")) + "% 調整為"
 						+ parse.stringToInteger(tmpCustFacm.get("newRate")) + "%，敬請留意帳戶餘額以利扣款。",
 				this.getTxBuffer().getMgBizDate().getTbsDy()));

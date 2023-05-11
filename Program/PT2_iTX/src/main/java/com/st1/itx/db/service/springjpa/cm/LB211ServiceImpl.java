@@ -83,7 +83,7 @@ public class LB211ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                               AND LB.\"FacmNo\" = substr(M.\"AcctNo\",8,3)";
 		sql += "                               AND LB.\"BormNo\" = substr(M.\"AcctNo\",12,3)";
 		sql += "   WHERE ( M.\"DataYMD\" Between :acdateStart  AND :acdateEnd  )";
-		sql += "   ORDER BY M.\"BankItem\", M.\"BranchItem\", M.\"AcctNo\", M.\"AcDate\", M.\"TranCode\", M.\"LoanBal\" DESC ";
+		sql += "   ORDER BY M.\"BankItem\", M.\"BranchItem\", M.\"AcctNo\", M.\"AcDate\", M.\"TranCode\", M.\"LoanBal\" ASC ";
 
 		this.info("sql=" + sql);
 

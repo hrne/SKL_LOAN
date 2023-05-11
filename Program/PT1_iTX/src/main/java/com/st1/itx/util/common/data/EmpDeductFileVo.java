@@ -155,7 +155,9 @@ public class EmpDeductFileVo extends FileVo {
 			String thisLine = "" + occursList.get("OccYearMonthA") + occursList.get("OccUnit") + occursList.get("OccUnknowA") + occursList.get("OccCustId") + occursList.get("OccUnknowB")
 					+ occursList.get("OccUnknowC") + occursList.get("OccRepayAmt") + occursList.get("OccUnknowD") + occursList.get("OccUnknowE") + occursList.get("OccEntryDate")
 					+ occursList.get("OccYearMonthB") + occursList.get("OccProcessType") + occursList.get("OccRepayCode") + occursList.get("OccCustNo") + occursList.get("OccAcctCode")
-					+ occursList.get("OccUnknowF") + occursList.get("OccLineCode");
+					+ occursList.get("OccUnknowF") 
+//					+ occursList.get("OccLineCode")
+					;
 			result.add(thisLine);
 		}
 

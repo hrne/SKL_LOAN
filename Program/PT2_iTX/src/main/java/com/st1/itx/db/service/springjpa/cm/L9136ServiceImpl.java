@@ -32,23 +32,20 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// org.junit.Assert.assertNotNull(sPfItDetailService);
 	}
 
-
-
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 		this.info("L9136 ServiceImpl findAll");
 
 		int acDateStart = 0;
 		int acDateEnd = 0;
 		if ("L9136".equals(titaVo.getTxcd().toString())) {
-			acDateStart =  this.parse.stringToInteger(titaVo.getParam("sAcDate")) + 19110000;
+			acDateStart = this.parse.stringToInteger(titaVo.getParam("sAcDate")) + 19110000;
 			acDateEnd = this.parse.stringToInteger(titaVo.getParam("eAcDate")) + 19110000;
 		} else {
 			acDateStart = this.parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 			acDateEnd = this.parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 		}
 
-
-		String sql = " "; 
+		String sql = " ";
 		sql += "	SELECT T.\"TxDate\" AS \"AcDate\"";
 		sql += "		  ,T.\"TxSeq\" AS \"TxSeq\"";
 		sql += "		  ,T.\"CustNo\" AS \"CustNo\"";
@@ -72,21 +69,22 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	LEFT JOIN \"ClFac\" Cl ON Cl.\"CustNo\" = T.\"CustNo\"";
 		sql += "						  AND Cl.\"FacmNo\" = T.\"FacmNo\"";
 		sql += "						  AND Cl.\"MainFlag\" = 'Y'";
+		sql += "	LEFT JOIN \"TxRecord\" TR ON TR.\"TxNo\" = T.\"TxSeq\"";
+		sql += "						     AND TR.\"Entdy\" BETWEEN :sAcDate AND :eAcDate ";
+//		sql += "						     AND TRIM(TR.\"MrKey\") = T.\"MrKey\"";
 		sql += "	LEFT JOIN \"CdCode\" CC ON CC.\"DefCode\" = 'ClCode2' || Cl.\"ClCode1\"";
 		sql += "						   AND CC.\"Code\" = LPAD(Cl.\"ClCode2\",2,0)";
-		sql += "	LEFT JOIN \"CdEmp\" CE ON CE.\"EmployeeNo\" = T.\"TlrNo\"";
-		sql += "	LEFT JOIN \"TxRecord\" TR ON TR.\"TxNo\" = T.\"TxSeq\"";
-		sql += "						     AND TRIM(TR.\"MrKey\") = T.\"MrKey\"";
-		sql += "	LEFT JOIN \"CdEmp\" CE2 ON CE2.\"EmployeeNo\" = TR.\"SupNo\"";
+		sql += "	LEFT JOIN \"CdEmp\" CE ON CE.\"EmployeeNo\" = JSON_VALUE(TR.\"TranData\",'$.EMPNOT')";
+		sql += "	LEFT JOIN \"CdEmp\" CE2 ON CE2.\"EmployeeNo\" = JSON_VALUE(TR.\"TranData\",'$.EMPNOS')";
 		sql += "	LEFT JOIN \"TxTranCode\" TC ON TC.\"TranNo\" = T.\"TranNo\"";
 		sql += "	WHERE T.\"TxDate\" BETWEEN :sAcDate AND :eAcDate";
 		sql += "	  AND JSON_QUERY(T.\"Content\",'$[*].f' WITH WRAPPER) IS NOT NULL";
 		sql += "	  AND T.\"TlrNo\" <> 'E-LOAN'";
 		sql += "	  AND T.\"CustNo\" > 0";
+		sql += "	  AND T.\"TranNo\" <> 'L5702' ";
 		sql += "	ORDER BY T.\"TxDate\" ASC";
 		sql += "			,T.\"TlrNo\" ASC";
 		sql += "			,T.\"TxSeq\" ASC";
-
 
 		this.info("L9136ServiceImpl sql=" + sql);
 
@@ -104,13 +102,13 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int acDateStart = 0;
 		int acDateEnd = 0;
 		if ("L9136".equals(titaVo.getTxcd().toString())) {
-			acDateStart =  this.parse.stringToInteger(titaVo.getParam("sAcDate")) + 19110000;
+			acDateStart = this.parse.stringToInteger(titaVo.getParam("sAcDate")) + 19110000;
 			acDateEnd = this.parse.stringToInteger(titaVo.getParam("eAcDate")) + 19110000;
 		} else {
 			acDateStart = this.parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 			acDateEnd = this.parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 		}
-		String sql = " "; 
+		String sql = " ";
 		sql += "	WITH \"tmpData\" AS (";
 		sql += "		SELECT T.\"Entdy\" AS \"TxDate\"";
 		sql += "			  ,T.\"TxSeq\"";
@@ -241,11 +239,10 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("eAcDate", acDateEnd);
 		return this.convertToMap(query);
 	}
-	
-	
-	public List<Map<String, String>> findSupNo(TitaVo titaVo,String TxNo) throws Exception {
-	
-		String sql = " "; 
+
+	public List<Map<String, String>> findSupNo(TitaVo titaVo, String TxNo) throws Exception {
+
+		String sql = " ";
 		sql += " WITH \"count\" AS (";
 		sql += " 	SELECT \"TxSeq\" AS \"TxSeq\" ";
 		sql += "          ,COUNT(\"TxSeq\") AS \"Count\"";
@@ -276,16 +273,13 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " FROM \"con3\" C";
 		sql += " LEFT JOIN \"CdEmp\" CE ON CE.\"EmployeeNo\" = C.\"EmpNo\"";
 
-
 		this.info("L9136ServiceImpl sql=" + sql);
 
-		
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("TxNo", TxNo);
 		return this.convertToMap(query);
 	}
-
 
 }

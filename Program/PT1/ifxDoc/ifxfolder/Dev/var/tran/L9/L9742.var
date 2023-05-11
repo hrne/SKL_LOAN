@@ -98,9 +98,7 @@ V(2,0)
 
 !會計明細按鈕
 #BUF2B=X,62,S
-T(2,000+   +0000+   +           +     +  +#inputAcDate+2+#inputTitaTlrNo+0+#inputTitaTxtNoStart+99999999)
-C(4,#inputTitaTlrNo,C(4,#inputTitaTxtNoStart,$,s),s)
-T(2,000+   +0000+   +           +     +  +#inputAcDate+0+      +0+00000000+99999999)
+T(2,000+   +0000+   +           +     +  +#inputAcDate+2+#inputTitaTlrNo+0+#inputTitaTxtNoStart++#inputTitaTxtNoEnd)
 
 
 

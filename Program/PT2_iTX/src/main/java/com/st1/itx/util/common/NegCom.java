@@ -783,9 +783,9 @@ public class NegCom extends CommBuffer {
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 		}
-		dataLog.setEnv(titaVo, tNegTransOrg, tNegTransUpd);
-		dataLog.exec("修改債務協商交易檔:" + tNegTrans.getCustNo() + "-" + tNegTrans.getAcDate() + "-" + tNegTrans.getTitaTlrNo()
-				+ "-" + tNegTrans.getTitaTxtNo());
+//		dataLog.setEnv(titaVo, tNegTransOrg, tNegTransUpd);
+//		dataLog.exec("修改債務協商交易檔:" + tNegTrans.getCustNo() + "-" + tNegTrans.getAcDate() + "-" + tNegTrans.getTitaTlrNo()
+//				+ "-" + tNegTrans.getTitaTxtNo());
 
 		tNegMainUpd = sNegMainService.holdById(tNegMain, titaVo);
 		NegMain tNegMainOrg = (NegMain) dataLog.clone(tNegMainUpd);// 資料異動前
@@ -812,8 +812,8 @@ public class NegCom extends CommBuffer {
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 		}
-		dataLog.setEnv(titaVo, tNegMainOrg, tNegMainUpd);
-		dataLog.exec("修改債務協商案件主檔:" + tNegMainUpd.getCustNo() + "-" + tNegMainUpd.getCaseSeq());
+//		dataLog.setEnv(titaVo, tNegMainOrg, tNegMainUpd);
+//		dataLog.exec("修改債務協商案件主檔:" + tNegMainUpd.getCustNo() + "-" + tNegMainUpd.getCaseSeq());
 
 		// Insert Temp
 		insertTxTemp(titaVo, tNegMainOrg, tNegTransOrg);
@@ -1597,8 +1597,8 @@ public class NegCom extends CommBuffer {
 
 	public void updateDbReverse(TempVo tTempVo, NegMain tNegMain, NegTrans tNegTrans, TitaVo titaVo)
 			throws LogicException {
-		NegMain beforeNegMain = (NegMain) dataLog.clone(tNegMain);
-		NegTrans beforeNegTrans = (NegTrans) dataLog.clone(tNegTrans);
+//		NegMain beforeNegMain = (NegMain) dataLog.clone(tNegMain);
+//		NegTrans beforeNegTrans = (NegTrans) dataLog.clone(tNegTrans);
 
 		tNegMain.setCaseKindCode(tTempVo.get("CaseKindCode"));// 案件種類
 		tNegMain.setStatus(tTempVo.get("Status"));// 戶況
@@ -1638,8 +1638,8 @@ public class NegCom extends CommBuffer {
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007", "債務協商案件主檔");// 更新資料時，發生錯誤
 		}
-		dataLog.setEnv(titaVo, beforeNegMain, tNegMain);
-		dataLog.exec("修改債務協商案件主檔:" + tNegMain.getCustNo() + "-" + tNegMain.getCaseSeq());
+//		dataLog.setEnv(titaVo, beforeNegMain, tNegMain);
+//		dataLog.exec("修改債務協商案件主檔:" + tNegMain.getCustNo() + "-" + tNegMain.getCaseSeq());
 
 		tNegTrans.setCustNo(parse.stringToInteger(tTempVo.get("TranCustNo")));// 戶號
 		tNegTrans.setCaseSeq(parse.stringToInteger(tTempVo.get("TranCaseSeq")));// 案件序號
@@ -1683,9 +1683,9 @@ public class NegCom extends CommBuffer {
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007", "債務協商交易檔");// E0007 更新資料時，發生錯誤
 		}
-		dataLog.setEnv(titaVo, beforeNegTrans, tNegTrans);
-		dataLog.exec("修改債務協商交易檔:" + tNegTrans.getCustNo() + "-" + tNegTrans.getAcDate() + "-" + tNegTrans.getTitaTlrNo()
-				+ "-" + tNegTrans.getTitaTxtNo());
+//		dataLog.setEnv(titaVo, beforeNegTrans, tNegTrans);
+//		dataLog.exec("修改債務協商交易檔:" + tNegTrans.getCustNo() + "-" + tNegTrans.getAcDate() + "-" + tNegTrans.getTitaTlrNo()
+//				+ "-" + tNegTrans.getTitaTxtNo());
 
 	}
 

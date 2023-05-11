@@ -122,9 +122,6 @@ public class L9735ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "LEFT JOIN \"ClFac\" CF ON CF.\"CustNo\" = FM.\"CustNo\" ";
 		sql += "                    AND CF.\"FacmNo\" = FM.\"FacmNo\" ";
 		sql += "                    AND CF.\"MainFlag\" = 'Y' ";
-		sql += "LEFT JOIN \"ClImm\" CI ON CI.\"ClCode1\" = CF.\"ClCode1\" ";
-		sql += "                    AND CI.\"ClCode2\" = CF.\"ClCode2\" ";
-		sql += "                    AND CI.\"ClNo\" = CF.\"ClNo\" ";
 		sql += "LEFT JOIN \"CFSum\" CS ON CS.\"CustNo\" = FM.\"CustNo\" ";
 		sql += "                    AND CS.\"FacmNo\" = FM.\"FacmNo\" ";
 		sql += " WHERE MLB.\"YearMonth\" = :inputYearMonth ";

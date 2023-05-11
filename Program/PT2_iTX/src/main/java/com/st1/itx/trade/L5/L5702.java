@@ -17,6 +17,7 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
+import com.st1.itx.db.domain.CdCl;
 import com.st1.itx.db.domain.NegAppr02;
 import com.st1.itx.db.domain.NegMain;
 import com.st1.itx.db.domain.NegMainId;
@@ -160,7 +161,7 @@ public class L5702 extends TradeBuffer {
 //				updateNegAppr02(tNegTransId, titaVo);// 維護NegAppr02,2022-3-22取消L5712暫收解入功能
 
 			} else {
-				NegTrans bNegTrans = (NegTrans) dataLog.clone(tNegTrans); ////
+//				NegTrans bNegTrans = (NegTrans) dataLog.clone(tNegTrans); ////
 
 				if (tNegTrans.getTxStatus() == 0) {
 					tNegTrans.setTxStatus(1); // 交易狀態0:未入帳;1:待處理;2:已入帳
@@ -176,8 +177,8 @@ public class L5702 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", e.getErrorMsg());// E0007 更新資料時，發生錯誤
 				}
-				dataLog.setEnv(titaVo, bNegTrans, tNegTrans); ////
-				dataLog.exec("修改債務協商交易檔"); ////
+//				dataLog.setEnv(titaVo, bNegTrans, tNegTrans); ////
+//				dataLog.exec("修改債務協商交易檔"); ////
 
 			}
 		} else { // 訂正

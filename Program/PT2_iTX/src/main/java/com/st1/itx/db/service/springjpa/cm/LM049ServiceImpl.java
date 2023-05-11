@@ -30,7 +30,45 @@ public class LM049ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		this.info("lM049.findAll ");
 
-		String sql = " ";
+		String sql = "";
+		sql += " WITH CF AS ( ";
+		sql += "   SELECT CF.\"CustNo\" AS \"CustNo\" ";
+		sql += "        , CF.\"FacmNo\" AS \"FacmNo\" ";
+		sql += "        , ROW_NUMBER() ";
+		sql += "          OVER ( ";
+		sql += "            PARTITION BY CF.\"CustNo\" ";
+		sql += "                       , CF.\"FacmNo\" ";
+		sql += "                       , CF.\"ClCode1\" ";
+		sql += "                       , CF.\"ClCode2\" ";
+		sql += "                       , CF.\"ClNo\" ";
+		sql += "            ORDER BY NVL(CE_early.\"EvaDate\",0) DESC "; // 第1段. 最接近該額度核准日期，且擔保品鑑價日小於等於核准日期的那筆資料
+		sql += "                   , NVL(CE_later.\"EvaDate\",0) "; // 第2段. 若第1段抓不到資料，才是改為抓鑑價日期最接近核准日期的那筆評估淨值
+		sql += "          )                               AS \"Seq\" ";
+		sql += "        , NVL(CE_early.\"EvaNetWorth\",NVL(CE_later.\"EvaNetWorth\",0)) ";
+		sql += "                                          AS \"EvaNetWorth\" ";
+		sql += "   FROM \"ClFac\" CF ";
+		sql += "   LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = CF.\"CustNo\" ";
+		sql += "                            AND FAC.\"FacmNo\" = CF.\"FacmNo\" ";
+		sql += "   LEFT JOIN \"FacCaseAppl\" CAS ON CAS.\"ApplNo\" = CF.\"ApproveNo\" ";
+		sql += "   LEFT JOIN \"ClEva\" CE_early ON CE_early.\"ClCode1\" = CF.\"ClCode1\" ";
+		sql += "                               AND CE_early.\"ClCode2\" = CF.\"ClCode2\" ";
+		sql += "                               AND CE_early.\"ClNo\" = CF.\"ClNo\" ";
+		sql += "                               AND CE_early.\"EvaDate\" <= CAS.\"ApproveDate\" ";
+		sql += "   LEFT JOIN \"ClEva\" CE_later ON CE_later.\"ClCode1\" = CF.\"ClCode1\" ";
+		sql += "                               AND CE_later.\"ClCode2\" = CF.\"ClCode2\" ";
+		sql += "                               AND CE_later.\"ClNo\" = CF.\"ClNo\" ";
+		sql += "                               AND CE_later.\"EvaDate\" > CAS.\"ApproveDate\" ";
+		sql += "                               AND NVL(CE_early.\"EvaDate\",0) = 0 "; // 若第1段串不到,才串第2段
+		sql += " ) ";
+		sql += " , \"CFSum\" AS ( ";
+		sql += "   SELECT \"CustNo\" ";
+		sql += "        , \"FacmNo\" ";
+		sql += "        , SUM(NVL(\"EvaNetWorth\",0)) AS \"EvaNetWorth\" ";
+		sql += "   FROM CF ";
+		sql += "   WHERE \"Seq\" = 1 "; // 每個擔保品只取一筆
+		sql += "   GROUP BY \"CustNo\" ";
+		sql += "          , \"FacmNo\" ";
+		sql += " )";
 		sql += " SELECT S0.\"CusType\" "; // F0
 		sql += "      , S0.\"CusSCD\" "; // F1
 		sql += "      , S0.\"CusscdName\" "; // F2
@@ -123,7 +161,7 @@ public class LM049ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        , CASE ";
 		sql += "            WHEN CLM.\"ClCode1\" IN (1,2) "; // -- 不動產
 		sql += "            THEN CASE "; // -- 鑑價金額以評估淨值優先，其次取鑑估總值
-		sql += "                   WHEN NVL(IMM.\"EvaNetWorth\",0) > 0 THEN NVL(IMM.\"EvaNetWorth\",0)  ";
+		sql += "                   WHEN NVL(CS.\"EvaNetWorth\",0) > 0 THEN NVL(CS.\"EvaNetWorth\",0)  ";
 		sql += "                 ELSE NVL(CLM.\"EvaAmt\",0) END ";
 		sql += "            WHEN CLM.\"ClCode1\" IN (3,4)  ";// -- 股票
 		sql += "            THEN CS.\"SettingBalance\" * CS.\"YdClosingPrice\" ";
@@ -154,9 +192,8 @@ public class LM049ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   LEFT JOIN \"ClMain\" CLM ON CLM.\"ClCode1\" = CF.\"ClCode1\" ";
 		sql += "                         AND CLM.\"ClCode2\" = CF.\"ClCode2\" ";
 		sql += "                         AND CLM.\"ClNo\" = CF.\"ClNo\" ";
-		sql += "   LEFT JOIN \"ClImm\" IMM ON IMM.\"ClCode1\" = CF.\"ClCode1\" ";
-		sql += "                        AND IMM.\"ClCode2\" = CF.\"ClCode2\" ";
-		sql += "                        AND IMM.\"ClNo\" = CF.\"ClNo\" ";
+		sql += "   LEFT JOIN \"CFSum\" CS ON CS.\"CustNo\" = FAC.\"CustNo\" ";
+		sql += "                         AND CS.\"FacmNo\" = FAC.\"FacmNo\" ";
 		sql += "   LEFT JOIN \"ClStock\" CS ON CS.\"ClCode1\" = CF.\"ClCode1\" ";
 		sql += "                           AND CS.\"ClCode2\" = CF.\"ClCode2\" ";
 		sql += "                           AND CS.\"ClNo\" = CF.\"ClNo\" ";

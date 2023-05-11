@@ -700,8 +700,8 @@ public class NegReportCom extends CommBuffer {
 								// E0007 更新資料時，發生錯誤
 								throw new LogicException(titaVo, "E0007", "一般債權撥付資料檔");
 							}
-							dataLog.setEnv(titaVo, beforeNegAppr02, tNegAppr02);
-							dataLog.exec("修改一般債權撥付資料檔");
+//							dataLog.setEnv(titaVo, beforeNegAppr02, tNegAppr02);
+//							dataLog.exec("修改一般債權撥付資料檔");
 
 						} else {
 							try {
@@ -947,8 +947,8 @@ public class NegReportCom extends CommBuffer {
 					} catch (DBException e) {
 
 					}
-					dataLog.setEnv(titaVo, beforeNegAppr, tNegAppr);// 資料異動後-2
-					dataLog.exec("修改撥付日期設定:"+tNegAppr.getYyyyMm()+"-"+tNegAppr.getKindCode());// 資料異動後-3
+//					dataLog.setEnv(titaVo, beforeNegAppr, tNegAppr);// 資料異動後-2
+//					dataLog.exec("修改撥付日期設定:"+tNegAppr.getYyyyMm()+"-"+tNegAppr.getKindCode());// 資料異動後-3
 				}
 			}
 		} else {
@@ -1129,8 +1129,8 @@ public class NegReportCom extends CommBuffer {
 									// E0007 更新資料時，發生錯誤
 									throw new LogicException(titaVo, "E0007", "最大債權撥付資料檔");
 								}
-								dataLog.setEnv(titaVo, beforeNegAppr01, tNegAppr01);// 資料異動後-2
-								dataLog.exec("修改最大債權撥付資料檔:"+tNegAppr01.getCustNo()+"-"+tNegAppr01.getAcDate()+"-"+tNegAppr01.getFinCode());
+//								dataLog.setEnv(titaVo, beforeNegAppr01, tNegAppr01);// 資料異動後-2
+//								dataLog.exec("修改最大債權撥付資料檔:"+tNegAppr01.getCustNo()+"-"+tNegAppr01.getAcDate()+"-"+tNegAppr01.getFinCode());
 							}
 
 						} else {
@@ -1172,8 +1172,8 @@ public class NegReportCom extends CommBuffer {
 								// E0007 更新資料時，發生錯誤
 								throw new LogicException(titaVo, "E0007", "債務協商交易檔");
 							}
-							dataLog.setEnv(titaVo, beforeNegTrans, tNegTrans);// 資料異動後-2
-							dataLog.exec("修改債務協商交易檔:"+tNegTrans.getCustNo()+"-"+tNegTrans.getAcDate()+"-"+tNegTrans.getTitaTlrNo()+"-"+tNegTrans.getTitaTxtNo());
+//							dataLog.setEnv(titaVo, beforeNegTrans, tNegTrans);// 資料異動後-2
+//							dataLog.exec("修改債務協商交易檔:"+tNegTrans.getCustNo()+"-"+tNegTrans.getAcDate()+"-"+tNegTrans.getTitaTlrNo()+"-"+tNegTrans.getTitaTxtNo());
 
 						}
 					} else {
