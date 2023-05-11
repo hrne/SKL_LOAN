@@ -30,7 +30,7 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	/* 轉換工具 */
 	@Autowired
-	public Parse parse;
+	private Parse parse;
 
 	// *** 折返控制相關 ***
 	private int limit;
@@ -343,7 +343,25 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-	public int getSize() {
-		return cnt;
+	@SuppressWarnings("unchecked")
+	public List<Map<String, String>> checkIsArchive(TitaVo titaVo) throws Exception {
+
+		int iCustNo = this.parse.stringToInteger(titaVo.getParam("TimCustNo"));
+		
+		String sql = "";
+		sql += " SELECT TA.\"CustNo\" ";
+		sql += " FROM \"TxArchiveTableLog\" TA ";
+		sql += " WHERE TA.\"CustNo\" = :inputCustNo ";
+		sql += "   AND TA.\"DataFrom\" = 'ONLINE' ";
+		sql += "   AND TA.\"Type\" = '5YTX' ";
+		
+		this.info("sql=" + sql);
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+
+		query.setParameter("inputCustNo", iCustNo);
+
+		return this.convertToMap(query);
 	}
 }

@@ -129,8 +129,7 @@ public class L9136Report extends MakeReport {
 		this.dataSource = 1;
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-				.setRptCode(tradeNo).setRptItem(tradeName).setRptSize("A4").setPageOrientation("L")
-				.build();
+				.setRptCode(tradeNo).setRptItem(tradeName).setRptSize("A4").setPageOrientation("L").build();
 
 		this.open(titaVo, reportVo);
 
@@ -142,23 +141,31 @@ public class L9136Report extends MakeReport {
 			for (Map<String, String> r : l9136List) {
 				count++;
 
-				String[] tmpUpdateItem = r.get("Item").replaceAll("\\[\"", "").replaceAll("\"\\]", "")
-						.replaceAll("\"\\,\"", "@").split("@");
+				//移除前後中括號
+				//移除換行符
+				String[] tmpUpdateItem = r.get("Item").replaceAll("\\[", "").replaceAll("\\]", "")
+						.replaceAll("\\\\n", "").replaceAll("\\,", "@").split("@");
 
-				String[] tmpOldContent = r.get("Old").replaceAll("\\[\"", "").replaceAll("\"\\]", "")
-						.replaceAll("\"\\,\"", "@").split("@");
+				String[] tmpOldContent = r.get("Old").replaceAll("\\[", "").replaceAll("\\]", "")
+						.replaceAll("\\\\n", "").replaceAll("\\,", "@").split("@");
 
-				String[] tmpNewContent = r.get("New").replaceAll("\\[\"", "").replaceAll("\"\\]", "")
-						.replaceAll("\"\\,\"", "@").split("@");
-
+				String[] tmpNewContent = r.get("New").replaceAll("\\[", "").replaceAll("\\]", "")
+						.replaceAll("\\\\n", "").replaceAll("\\,", "@").split("@");
 				// 要排除的字段
 				String[] word = { "最後更新日期時間", "最後更新人員", "建檔日期時間", "交易進行記號", "上次櫃員編號", "上次交易序號", "已編BorTx流水號", "上次會計日",
-						"會計日期", "上次交易行別", "上次交易日", "經辦合理性說明" };
+						"會計日期", "上次交易行別", "上次交易日", "經辦合理性說明", "流程控制帳務日", "流程控制序號" };
 
 				List<String> tmpWord = new ArrayList<String>(Arrays.asList(word));
 				List<String> tmp1 = new ArrayList<String>(Arrays.asList(tmpUpdateItem));
 				List<String> tmp2 = new ArrayList<String>(Arrays.asList(tmpOldContent));
 				List<String> tmp3 = new ArrayList<String>(Arrays.asList(tmpNewContent));
+
+//				this.info("btmp1.size()=" + tmp1.size());
+//				this.info("btmp1 = " + tmp1.toString());
+//				this.info("btmp2.size()=" + tmp2.size());
+//				this.info("btmp2 = " + tmp2.toString());
+//				this.info("btmp3.size()=" + tmp3.size());
+//				this.info("btmp3 = " + tmp3.toString());
 
 				// 避免有空白
 				if (tmp1.size() == 0 || tmp2.size() == 0 || tmp3.size() == 0) {
@@ -168,21 +175,16 @@ public class L9136Report extends MakeReport {
 				for (int i = 0; i < tmp1.size(); i++) {
 					for (int j = 0; j < tmpWord.size(); j++) {
 						// 排除不需要的顯示的字串
-						if (tmp1.get(i).toString().indexOf(tmpWord.get(j).toString()) == 0) {
-							tmp1.set(i, "");
-							tmp2.set(i, "");
-							tmp3.set(i, "");
+						// 因顯示出來的字串有包含雙引號所以把雙引號移除
+						if (tmp1.get(i).toString().replace("\"", "").indexOf(tmpWord.get(j).toString()) == 0) {
+							tmp1.set(i, " ");
+							tmp2.set(i, " ");
+							tmp3.set(i, " ");
 						}
 					}
 				}
 
-				this.info("tmp1.size()=" + tmp1.size());
-				this.info("tmp1 = " + tmp1.toString());
-				this.info("tmp2.size()=" + tmp2.size());
-				this.info("tmp2 = " + tmp2.toString());
-				this.info("tmp3.size()=" + tmp3.size());
-				this.info("tmp3 = " + tmp3.toString());
-
+	
 				if (tmp1.size() == tmp2.size() && tmp1.size() == tmp3.size() && tmp2.size() == tmp3.size()) {
 				} else {
 					continue;
@@ -193,7 +195,8 @@ public class L9136Report extends MakeReport {
 					// 排除空值的資料
 					if (tmp1.get(i).length() != 0) {
 
-						report(r, tmp1.get(i), tmp2.get(i), tmp3.get(i), this.dataSource);
+						report(r, tmp1.get(i).replace("\"", ""), tmp2.get(i).replace("\"", ""),
+								tmp3.get(i).replace("\"", ""), this.dataSource);
 					}
 
 					// 超過40行 換新頁
@@ -224,7 +227,8 @@ public class L9136Report extends MakeReport {
 				if ("1".equals(r.get("Seq"))) {
 					count++;
 
-					report(r, r.get("Item"), r.get("Old"), r.get("New"), this.dataSource);
+					report(r, r.get("Item").replace("\"", ""), r.get("Old").replace("\"", ""),
+							r.get("New").replace("\"", ""), this.dataSource);
 
 					// 超過40行 換新頁
 					if (this.NowRow >= 40) {
@@ -325,35 +329,46 @@ public class L9136Report extends MakeReport {
 
 		// 戶號-額度-撥款
 		if (!"0".equals(r.get("CustNo"))) {
-			this.print(0, 31, r.get("CustNo"), "R");
-
-			if (!"0".equals(r.get("FacmNo"))) {
-				this.print(0, 31, "-", "L");
-				this.print(0, 36, fillUpWord(r.get("FacmNo"), 3, "0", "L"), "R");
-
-				if (!"0".equals(r.get("BormNo"))) {
-					this.print(0, 36, "-", "L");
-					this.print(0, 41, fillUpWord(r.get("BormNo"), 3, "0", "L"), "R");
-				}
-			}
+			this.print(0, 31, fillUpWord(r.get("CustNo"), 7, "0", "L"), "R");
+		} else {
+			this.print(0, 31, "0000000", "R");
+		}
+		
+		if (!"0".equals(r.get("FacmNo"))) {
+			this.print(0, 31, "-", "L");
+			this.print(0, 36, fillUpWord(r.get("FacmNo"), 3, "0", "L"), "R");
+		} else {
+			this.print(0, 31, "-", "L");
+			this.print(0, 36, "000", "R");
+		}
+		
+		if (!"0".equals(r.get("BormNo"))) {
+			this.print(0, 36, "-", "L");
+			this.print(0, 41, fillUpWord(r.get("BormNo"), 3, "0", "L"), "R");
+		} else {
+			this.print(0, 36, "-", "L");
+			this.print(0, 41, "000", "R");
 		}
 
 		// 戶名
 		this.print(0, 43, r.get("CustName").length() > 5 ? r.get("CustName").substring(0, 6) : r.get("CustName"));
 
 		// 判斷屬於"資料變更"
-		if (dataSource == 1) {
+		if (dataSource == 1)
+
+		{
 			// "資料變更"的 放入交易別
 			// 1.有核准號碼、押品別、押品號碼
 			// 2.有L56XX 法催紀錄、L57XX 債務協商
 			if (r.get("ApproveNo").trim().length() != 0) {
 
 				// 核准號碼
-				this.print(0, 56, r.get("ApproveNo"));
+				this.print(0, 56, r.get("ApproveNo") == null ? " " : r.get("ApproveNo"));
 				// 押品別
-				this.print(0, 66, r.get("ClCode1") + "  " + r.get("ClCode2") + "  " + r.get("ClName"));
+				this.print(0, 66, r.get("ClCode1") == null ? " "
+						: r.get("ClCode1") + "  " + r.get("ClCode2") + "  " + r.get("ClName"));
 				// 押品號碼
-				this.print(0, 86, r.get("ClNo"));
+				this.print(0, 86, r.get("ClNo") == null ? " " : r.get("ApproveNo"));
 
 			} else if ("L56".equals(r.get("TranNo").substring(0, 3)) || "L57".equals(r.get("TranNo").substring(0, 3))) {
 
@@ -380,9 +395,10 @@ public class L9136Report extends MakeReport {
 			this.print(0, 97, tmpUpdateItem.length() == 0 ? " " : fillUpWord(tmpUpdateItem, 32, " ", "R"));
 		}
 
-
 		// 更改前內容
-		this.print(0, 122, tmpOldContent.length() == 0 ? " " : fillUpWord(tmpOldContent, 22, " ", "R"));
+		this.print(0, 122, tmpOldContent.length() == 0 ? " " :
+
+				fillUpWord(tmpOldContent, 22, " ", "R"));
 
 		// 更改後內容
 		String afContent = tmpNewContent.trim();
@@ -404,6 +420,5 @@ public class L9136Report extends MakeReport {
 		this.print(0, 186, supNoName);
 
 	}
-
 
 }

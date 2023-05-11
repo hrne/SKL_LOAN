@@ -32,12 +32,12 @@ E(0,40)ASGN(INQPRT$)
 #ORGFG=_,_,S
 E(0,0)
 
-#BufLD006=X,3,S
+#BufL9744=X,3,S
 T(3,111)
 
 #Button=x,100,S
-T(2,{cmd=CHAIN; ntxcd=LD006; ntxbuf=#BufLD006})ASGN(BTN_NEW1$)
-K(MODIFYBUTTON,1,LD006 三階放款明細統計檔)
+T(2,{cmd=CHAIN; ntxcd=L9744; ntxbuf=#BufL9744})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,L9744 三階放款明細統計檔)
 
 </sub>
 !--使用資料庫 PfItDetail

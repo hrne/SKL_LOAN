@@ -37,12 +37,12 @@ E(0,0)
 ! T(2,{cmd=CHAIN; ntxcd=L5502; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
 ! K(MODIFYBUTTON,1,新增)
 
-#BufLD007=X,3,S
+#BufL9745=X,3,S
 T(3,111)
 
 #Button=x,100,S
-T(2,{cmd=CHAIN; ntxcd=LD007; ntxbuf=#BufLD007})ASGN(BTN_NEW1$)
-K(MODIFYBUTTON,1,LD007 放款專員明細統計)
+T(2,{cmd=CHAIN; ntxcd=L9745; ntxbuf=#BufL9745})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,L9745 房貸專員明細統計)
 
 </sub>
 

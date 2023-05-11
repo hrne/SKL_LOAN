@@ -292,6 +292,8 @@ public class L3005 extends TradeBuffer {
 			}
 		} else {
 
+			checkIsArchive(titaVo);
+
 			if (iAcDate == 0) {
 				throw new LogicException(titaVo, "E0001", "入帳日期  " + iEntryDate + " 後無交易資料"); // 查詢資料不存在
 			} else {
@@ -307,5 +309,33 @@ public class L3005 extends TradeBuffer {
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+
+	/**
+	 * 
+	 * PJ201800012_會議記錄_20230509-L6972搬運資料衍生問題<BR>
+	 * 2.與USER確認L6972判斷條件<BR>
+	 * 2.1.已搬移的客戶記錄在[歷史封存表紀錄檔TxArchiveTableLog]，在[L3005交易明細查詢]查[放
+	 * 款交易明細檔LoanBorTx]查無資料時，應檢查該戶後是否存在於[歷史封存表紀錄檔
+	 * TxArchiveTableLog]，若是，應顯示提示訊息”交易明細已搬運至歷史環境”
+	 * 
+	 * @param titaVo titaVo
+	 * @throws LogicException LogicException
+	 */
+	private void checkIsArchive(TitaVo titaVo) throws LogicException {
+		/**
+		 * 
+		 */
+		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
+
+		try {
+			resultList = l3005ServiceImpl.checkIsArchive(titaVo);
+		} catch (Exception e) {
+			this.info("Error ... " + e.getMessage());
+		}
+
+		if (resultList != null && !resultList.isEmpty()) {
+			throw new LogicException(titaVo, "E0001", "交易明細已搬運至歷史環境"); // 查詢資料不存在
+		}
 	}
 }

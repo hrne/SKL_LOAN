@@ -374,7 +374,7 @@ public class L9711Report2 extends MakeReport {
 
 			if (tmpTotalBreachAmt.compareTo(BigDecimal.ZERO) != 0) {
 				y = top + yy + (++l) * h;
-				printCm(1, y, "＊＊註：違約金暫計到" + this.showRocDate(tDate, 0) + "，若提前或延後繳款，請電話查詢　該違約金額。");
+				printCm(1, y, "＊＊註：違約金暫計到" + this.showRocDate(tDate, 0) + "，若提前或延後繳款，請電話查詢　該違約金金額。");
 
 			}
 

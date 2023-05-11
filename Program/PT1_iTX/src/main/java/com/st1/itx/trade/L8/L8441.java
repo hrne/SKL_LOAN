@@ -32,17 +32,7 @@ import com.st1.itx.util.http.WebClient;
  */
 public class L8441 extends TradeBuffer {
 
-//	@Override
-//	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-//		this.info("active L8441 ");
-//		this.totaVo.init(titaVo);
-//
-//		MySpring.newTask("L8441Batch", this.txBuffer, titaVo);
-//		
-//		this.addList(this.totaVo);
-//		return this.sendList();
-//	}
-
+	/* DB服務注入 */
 	@Autowired
 	public Parse parse;
 
@@ -54,7 +44,7 @@ public class L8441 extends TradeBuffer {
 
 	@Autowired
 	public WebClient webClient;
-	
+
 	@Autowired
 	public JcicReFileService sJcicReFileService;
 
@@ -65,84 +55,143 @@ public class L8441 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8441Batch");
 		this.totaVo.init(titaVo);
-		this.info("titaVo   = " + titaVo);
+		
 		String iSubmitkey = "";
 		int sTotal = 0;
 		int sCorrect = 0;
 		int sMistakeCount = 0;
-		int sJcicDate = 0;	
-		
+		int sJcicDate = 0;
+
 //		吃檔
 //		String filePath1 = "D:\\temp\\test\\火險\\Test\\Return\\1)R-10904LNM01P.txt";
 		String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
 				+ File.separatorChar + titaVo.getParam("FILENA").trim();
 		ArrayList<String> dataLineList1 = new ArrayList<>();
 
-//		if (filePath1 != null) {
-//			String checkMsg = "聯真回寫筆數已上傳。";
-//			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L8442",
-//					titaVo.getTlrNo(), checkMsg, titaVo);
-//		}
-		
 		try {
 			dataLineList1 = fileCom.intputTxt(filePath1, "big5");
 		} catch (IOException e) {
 			this.info("L8441Batch(" + filePath1 + ") : " + e.getMessage());
 		}
-		this.info("dataLineList1    = " + dataLineList1);
+		String ixxx = "";
+		
 		for (String filename : dataLineList1) {
-			if (filename.contains("畫面編號:")) {
-			int Xx =	filename.length();
-			this.info("XX    = "  + Xx); // 050 28
-			}
 			if (filename.contains("畫面編號:")) {
 				iSubmitkey = filename.substring(7, 10).trim();
 			}
+			// 新增搜尋錯誤筆數時要找到對應的筆數
+			String fCount = "";
+			String pCount = "";
+			if (filename.contains("----------------- 第")) {
+				pCount = filename.substring(19, 29).trim();
+				if (pCount.length() < 6) {
+					for (int x = pCount.length(); x < 5; x++) {
+						fCount += "0";
+					}
+					ixxx = fCount + pCount;
+				}
+			}
+
 			if (filename.contains("本次檢核共檢視過")) {
-//				int iTotal = parse.stringToInteger(filename.substring(8, 17).trim());
 				String ixTotal = filename.substring(8, 18).trim();
-				String ixTotal2 ="";
-				for(int i=0; i < ixTotal.length(); i++) {
-					if(ixTotal.charAt(i)>=48 && ixTotal.charAt(i)<=57) {
+				String ixTotal2 = "";
+				for (int i = 0; i < ixTotal.length(); i++) {
+					if (ixTotal.charAt(i) >= 48 && ixTotal.charAt(i) <= 57) {
 						ixTotal2 += ixTotal.charAt(i);
 					}
-				}	
-				sTotal = parse.stringToInteger(ixTotal2);
+				}
 				
-//				int iCorrect = parse.stringToInteger(filename.substring(25, 35).trim());
+				sTotal = parse.stringToInteger(ixTotal2);
 				String ixCorrect = filename.substring(26, 36).trim();
-				String ixCorrect2 ="";
-				for(int i=0; i < ixCorrect.length(); i++) {
-					if(ixCorrect.charAt(i)>=48 && ixCorrect.charAt(i)<=57) {
+				String ixCorrect2 = "";
+				for (int i = 0; i < ixCorrect.length(); i++) {
+					if (ixCorrect.charAt(i) >= 48 && ixCorrect.charAt(i) <= 57) {
 						ixCorrect2 += ixCorrect.charAt(i);
 					}
-				}	
+				}
 				sCorrect = parse.stringToInteger(ixCorrect2);
-				
+
 //				int iMistakeCount = parse.stringToInteger(filename.substring(39, 49).trim());
 				String ixMistakeCount = filename.substring(40, 50).trim();
-				String ixMistakeCount2 ="";
-				for(int i=0; i < ixMistakeCount.length(); i++) {
-					if(ixMistakeCount.charAt(i)>=48 && ixMistakeCount.charAt(i)<=57) {
+				String ixMistakeCount2 = "";
+				for (int i = 0; i < ixMistakeCount.length(); i++) {
+					if (ixMistakeCount.charAt(i) >= 48 && ixMistakeCount.charAt(i) <= 57) {
 						ixMistakeCount2 += ixMistakeCount.charAt(i);
 					}
-				}	
-				sMistakeCount = parse.stringToInteger(ixMistakeCount2);;
-				
-				this.info("sMistakeCount    =  " + sMistakeCount);
-				
-			} 
+				}
+				sMistakeCount = parse.stringToInteger(ixMistakeCount2);
+
+			}
 			if (filename.contains("報送日期:")) {
 				int iJcicDate = parse.stringToInteger(filename.substring(6, 13).trim());
 				sJcicDate = iJcicDate;
 			}
 		}
-		this.info("iSubmitkey   = " + iSubmitkey);
-		this.info("sJcicDate    = " + sJcicDate);
-		this.info("sTotal       = " + sTotal);
-		this.info("sCorrect     = " + sCorrect);
-		this.info("sMistakeCount  = " + sMistakeCount);
 		
+		//找出錯誤筆數 後面需要排除
+		boolean open = false;
+		for (String filename2 : dataLineList1) {
+
+			// fCount + pCount;
+			if (filename2.contains("[第" + ixxx + "筆資料]")) {
+				open = true;
+			}
+			if (filename2.trim().length() == 0 && open) {
+				open = false;
+			}
+
+			if (open) {
+				String sSubkey = "";
+				String sTraCdoe = "";
+				String sSubUnit = "";
+				String sDebtor = "";
+				String sAppDate = "";
+				int i = 0;
+				i++;
+				for (int j = 0; j < i; j++) {
+					// 資料別
+					if (filename2.contains("資料別")) {
+						sSubkey = getVal(filename2);
+					}
+
+					// 交易代碼
+					if (filename2.contains("交易代碼)")) {
+						sTraCdoe = getVal(filename2);
+					}
+
+					// 報送單位代號
+					if (filename2.contains("報送單位代號")) {
+						sSubUnit = getVal(filename2);
+					}
+					
+					// 債務人ID
+					if (filename2.contains("債務人")) {
+						sDebtor = getVal(filename2);
+					}
+					
+					// 協商日期
+					if (filename2.contains("協商請求日") || filename2.contains("裁定日期") || filename2.contains("調解申請日")
+							|| filename2.contains("原前置協商申請日")) {
+						sAppDate = getVal(filename2);
+					}
+				}
+				
+				//差update欄位
+				
+				String table ="";
+				int tablea  =  parse.stringToInteger(iSubmitkey);
+				if(tablea < 100 ) {
+					table = "JcicZ0"+iSubmitkey;
+				}
+				if(tablea > 100 ) {
+					table = "JcicZ"+iSubmitkey;
+				}
+
+				this.info("table  " +table);			
+	
+			}
+		}
+
 		JcicReFileId iJcicReFileid = new JcicReFileId();
 		JcicReFile iJcicReFile = new JcicReFile();
 		JcicReFile chJcicReFile = new JcicReFile();
@@ -152,6 +201,10 @@ public class L8441 extends TradeBuffer {
 		if (chJcicReFile != null) {
 			throw new LogicException("E0002", "已有相同資料");
 		}
+		if(iSubmitkey.trim().equals("")) {
+			throw new LogicException("E0005", "聯徵上傳檔案");
+		}
+		
 		iJcicReFile.setJcicReFileId(iJcicReFileid);
 		iJcicReFile.setSubmitKey(iSubmitkey);
 		iJcicReFile.setJcicDate(sJcicDate);
@@ -160,24 +213,49 @@ public class L8441 extends TradeBuffer {
 		iJcicReFile.setMistakeCount(sMistakeCount);
 		iJcicReFile.setNoBackFileCount(0);
 		iJcicReFile.setNoBackFileDate(0);
+		
+		
 		try {
 			sJcicReFileService.insert(iJcicReFile, titaVo);
 		} catch (DBException e) {
 			throw new LogicException("E0005", "聯徵上傳檔案");
 		}
-		
+
 		this.totaVo.putParam("Submitkey", iSubmitkey);
 		this.totaVo.putParam("JcicDate", sJcicDate);
 		this.totaVo.putParam("ReportTotal", sTotal);
 		this.totaVo.putParam("CorrectCount", sCorrect);
 		this.totaVo.putParam("MistakeCount", sMistakeCount);
-		this.info("sMistakeCount    =  " + sMistakeCount);
-		
+
 		String checkMsg = "聯真回寫筆數已上傳。";
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L8442",
-				titaVo.getTlrNo(), checkMsg, titaVo);
-		
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L8942", titaVo.getTlrNo(),
+				checkMsg, titaVo);
+
 		this.addList(this.totaVo);
 		return this.sendList();
+
 	}
+
+	public String getVal(String text) {
+		
+		int length = text.trim().length();
+		
+		boolean open = false;
+		
+		String rText = "";
+		for(int i = 0 ;i<length;i++) {
+			String uText = text.substring(i,i+1);
+			
+			if(open) {
+				
+				rText = rText + uText;
+			}
+			if("=".equals(uText)) {
+				open = true;
+			}
+		}
+		
+		return rText;
+	}
+
 }
