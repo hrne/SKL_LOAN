@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -143,13 +146,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("insuEndDateRange " + dbName + " : " + "insuEndDate_0 : " + insuEndDate_0 + " insuEndDate_1 : " +  insuEndDate_1);
     if (dbName.equals(ContentName.onDay))
-      slice = insuOrignalReposDay.findAllByInsuEndDateGreaterThanEqualAndInsuEndDateLessThanEqualOrderByOrigInsuNoAscEndoInsuNoAsc(insuEndDate_0, insuEndDate_1, pageable);
+      slice = insuOrignalReposDay.findAllByInsuEndDateGreaterThanEqualAndInsuEndDateLessThanEqualOrderByOrigInsuNoAscEndoInsuNoAscClNoDesc(insuEndDate_0, insuEndDate_1, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = insuOrignalReposMon.findAllByInsuEndDateGreaterThanEqualAndInsuEndDateLessThanEqualOrderByOrigInsuNoAscEndoInsuNoAsc(insuEndDate_0, insuEndDate_1, pageable);
+      slice = insuOrignalReposMon.findAllByInsuEndDateGreaterThanEqualAndInsuEndDateLessThanEqualOrderByOrigInsuNoAscEndoInsuNoAscClNoDesc(insuEndDate_0, insuEndDate_1, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = insuOrignalReposHist.findAllByInsuEndDateGreaterThanEqualAndInsuEndDateLessThanEqualOrderByOrigInsuNoAscEndoInsuNoAsc(insuEndDate_0, insuEndDate_1, pageable);
+      slice = insuOrignalReposHist.findAllByInsuEndDateGreaterThanEqualAndInsuEndDateLessThanEqualOrderByOrigInsuNoAscEndoInsuNoAscClNoDesc(insuEndDate_0, insuEndDate_1, pageable);
     else 
-      slice = insuOrignalRepos.findAllByInsuEndDateGreaterThanEqualAndInsuEndDateLessThanEqualOrderByOrigInsuNoAscEndoInsuNoAsc(insuEndDate_0, insuEndDate_1, pageable);
+      slice = insuOrignalRepos.findAllByInsuEndDateGreaterThanEqualAndInsuEndDateLessThanEqualOrderByOrigInsuNoAscEndoInsuNoAscClNoDesc(insuEndDate_0, insuEndDate_1, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

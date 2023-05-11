@@ -37,7 +37,7 @@
 			<tasklet ref="L9DailyTavIns" />
 			<next on="COMPLETED" to="insertAmlCustList" />
 			<end on="FAILED" />
-		</step>InsertAmlCustList
+		</step>
 		<!-- InsertAmlCustList -->
 		<step id="insertAmlCustList" parent="parentStep">
 			<tasklet ref="InsertAmlCustList" />
@@ -63,8 +63,13 @@
 		<step id="startBS996" parent="parentStep" next="startDailyRptFlow">
 			<tasklet ref="StartBS996" />
 		</step>
-		<step id="startDailyRptFlow" parent="parentStep" next="eodFinal">
+		<step id="startDailyRptFlow" parent="parentStep" next="l6972DailyBatch">
 			<job ref="dailyRptFlow" job-launcher="jobLauncher" />
+		</step>
+		<step id="l6972DailyBatch" parent="parentStep">
+			<tasklet ref="L6972DailyBatch" />
+			<next on="COMPLETED" to="eodFinal" />
+			<end on="FAILED" />
 		</step>
 		<!-- 每日批次結束，判斷是否需要執行月批 -->
 		<step id="eodFinal" parent="parentStep">

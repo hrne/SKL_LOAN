@@ -923,8 +923,8 @@ public class L3200 extends TradeBuffer {
 		BigDecimal wkRepayLoan = wkTotalPrincipal.add(wkTotalInterest).add(wkTotalDelayInt).add(wkTotalBreachAmt);
 		this.info("calcRepayInt ..." + checkMsg + " 累計償還本利:" + wkRepayLoan);
 
-		wkIntStartDate = 9991231;
-		wkIntEndDate = 0;
+		wkIntStartDate = ln.getPrevPayIntDate();
+		wkIntEndDate = iRepayType == 1 ? ln.getNextPayIntDate() : iEntryDate;
 		wkLoanBal = ln.getLoanBal();
 		wkDueDate = ln.getNextPayIntDate();
 		wkPrevTermNo = 0;

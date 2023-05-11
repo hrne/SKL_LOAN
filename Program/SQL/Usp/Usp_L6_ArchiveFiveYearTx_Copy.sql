@@ -7,28 +7,40 @@ BEGIN
         v_archiveType     CHAR(4)        := '5YTX';
 
         -- 搬運目標資料 Query
-        v_query           VARCHAR2(2500) := 'SELECT LBT."CustNo"
+        v_query           VARCHAR2(2500) := '
+                                            WITH LBM AS (
+                                                -- 在放款主檔(LoanBorMain)放款餘額皆為0
+                                                SELECT "CustNo"
+                                                     , SUM("LoanBal") AS "SumLoanBal"
+                                                FROM "LoanBorMain"
+                                                GROUP BY "CustNo"
+                                            )
+                                            , FC AS (
+                                                SELECT FC."CustNo"
+                                                     , FC."FacmNo"
+                                                     , FC."CloseDate"
+                                                     , FC."ReceiveFg"
+                                                     , FC."ReceiveDate"
+                                                     , FC."CollectFlag"
+                                                     , ROW_NUMBER() OVER (
+                                                        PARTITION BY FC."CustNo"
+                                                                   , FC."FacmNo"
+                                                        ORDER BY NVL(FC."CloseDate",0) DESC -- 清償作業檔(FacClose)的最後一筆結清日期
+                                                       ) "Seq"
+                                                FROM LBM
+                                                LEFT JOIN "FacClose" FC ON FC."CustNo" = LBM."CustNo"
+                                                WHERE LBM."SumLoanBal" = 0 -- 在放款主檔(LoanBorMain)放款餘額皆為0
+                                                  AND FC."CloseDate" >= 19110101 -- 確保有結清日期
+                                            )
+                                            SELECT LBT."CustNo"
                                                   ,LBT."FacmNo"
                                                   ,LBT."BormNo"
                                             FROM "LoanBorTx" LBT
-                                            LEFT JOIN (SELECT "CustNo"
-                                                            , "FacmNo"
-                                                            , "CloseDate"
-                                                            , "ReceiveFg"
-                                                            , "ReceiveDate"
-                                                            , "CollectFlag"
-                                                            , ROW_NUMBER() OVER ( PARTITION BY "CustNo", "FacmNo"
-                                                                                  ORDER BY "CloseNo" DESC ) "Seq"
-                                                       FROM "FacClose"
-                                                      ) FC ON FC."Seq" = 1 -- 抓 CloseNo 最大者
-                                                          AND FC."CustNo" = LBT."CustNo"
-                                                          AND FC."FacmNo" = LBT."FacmNo"
+                                            LEFT JOIN FC ON FC."Seq" = 1 -- 清償作業檔(FacClose)的最後一筆結清日期
+                                                        AND FC."CustNo" = LBT."CustNo"
+                                                        AND FC."FacmNo" = LBT."FacmNo"
                                             LEFT JOIN "TxBizDate" TBD ON TBD."DateCode" = ''ONLINE''
-                                            WHERE FC."CloseDate" >= 19110101 -- 確保有結清日期
-                                              AND FC."ReceiveFg" != 0 -- 確保已領取
-                                              AND FC."ReceiveDate" >= 19110101 -- 確保有領取日期
-                                              AND FC."CollectFlag" = ''Y'' -- 確保要領取清償證明
-                                              AND TRUNC(MONTHS_BETWEEN(TO_DATE(TO_CHAR(TBD."TbsDyf"), ''YYYYMMDD''), TO_DATE(TO_CHAR(FC."ReceiveDate"), ''YYYYMMDD''))) >= 5 * 12 -- 領取滿五年
+                                            WHERE NVL(FC."CloseDate",0) >= 19110101 -- 確保有結清日期
                                               AND TRUNC(MONTHS_BETWEEN(TO_DATE(TO_CHAR(TBD."TbsDyf"), ''YYYYMMDD''), TO_DATE(TO_CHAR(FC."CloseDate"), ''YYYYMMDD''))) >= 5 * 12 -- 結清滿五年';
         TYPE t_dataRecord IS RECORD
                              (

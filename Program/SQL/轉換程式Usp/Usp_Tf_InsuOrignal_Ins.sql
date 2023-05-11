@@ -67,6 +67,9 @@ BEGIN
            , ROW_NUMBER()
              OVER (
               PARTITION BY INSP."INSNUM"
+                         , CNM."ClCode1"
+                         , CNM."ClCode2"
+                         , CNM."ClNo"
               ORDER BY INSP."INSSDT"
                      , INSP."GDRID1"
                      , INSP."GDRID2"
@@ -74,6 +77,10 @@ BEGIN
                      , INSP."LGTSEQ"
              ) AS "Seq" 
       FROM "LA$INSP" INSP
+      LEFT JOIN "ClNoMap" CNM ON CNM."GdrId1" = INSP."GDRID1"
+                             AND CNM."GdrId2" = INSP."GDRID2"
+                             AND CNM."GdrNum" = INSP."GDRNUM"
+                             AND CNM."LgtSeq" = INSP."LGTSEQ"
     )
     , FR1P AS (
       SELECT FR1P."GDRID1"
@@ -173,10 +180,9 @@ BEGIN
              THEN '12'
              WHEN S."OrigInsuNo" LIKE '%FNP%' -- 住宅地震基本保險
              THEN '13'
-             WHEN TRUNC(MONTHS_BETWEEN(
-                    TO_DATE(S."InsuEndDate",'YYYYMMDD')
-                    , TO_DATE(S."InsuStartDate",'YYYYMMDD')
-                  )) < 12
+             WHEN TRUNC(MONTHS_BETWEEN(TO_DATE(DECODE(S."InsuEndDate",0,19110101,S."InsuEndDate"),'YYYYMMDD')
+                                      ,TO_DATE(DECODE(S."InsuStartDate",0,19110101,S."InsuStartDate"),'YYYYMMDD')
+                                      )) < 12
              THEN '09' -- 短期保單
              WHEN S."FireInsuCovrg" > 0 -- 火災險保險金額
                   AND S."EthqInsuCovrg" > 0 -- 地震險保險金額
