@@ -182,7 +182,8 @@ public class L2412 extends TradeBuffer {
 
 				this.info("新增時取號");
 
-				String clCode = StringUtils.leftPad(String.valueOf(iClCode1), 2, "0") + StringUtils.leftPad(String.valueOf(iClCode2), 2, "0");
+				String clCode = StringUtils.leftPad(String.valueOf(iClCode1), 2, "0")
+						+ StringUtils.leftPad(String.valueOf(iClCode2), 2, "0");
 
 				iClNo = gGSeqCom.getSeqNo(0, 0, "L2", clCode, 9999999, titaVo);
 
@@ -382,7 +383,8 @@ public class L2412 extends TradeBuffer {
 		String clTypeCode = titaVo.getParam("ClTypeCode");
 
 		if ("300".equals(clTypeCode) || "350".equals(clTypeCode)) {
-			Slice<ClMovables> sClMovables = sClMovablesService.findUnique1(titaVo.getParam("ProductBrand"), titaVo.getParam("ProductSpec"), titaVo.getParam("OwnerId"), 0, Integer.MAX_VALUE);
+			Slice<ClMovables> sClMovables = sClMovablesService.findUnique1(titaVo.getParam("ProductBrand"),
+					titaVo.getParam("ProductSpec"), titaVo.getParam("OwnerId"), 0, Integer.MAX_VALUE);
 			List<ClMovables> lClMovables = sClMovables == null ? null : sClMovables.getContent();
 			if (lClMovables != null) {
 				for (ClMovables clMovables : lClMovables) {
@@ -395,7 +397,8 @@ public class L2412 extends TradeBuffer {
 				}
 			}
 		} else if ("320".equals(clTypeCode) || "330".equals(clTypeCode)) {
-			Slice<ClMovables> sClMovables = sClMovablesService.findUnique2(titaVo.getParam("ProductBrand"), 0, Integer.MAX_VALUE);
+			Slice<ClMovables> sClMovables = sClMovablesService.findUnique2(titaVo.getParam("ProductBrand"), 0,
+					Integer.MAX_VALUE);
 			List<ClMovables> lClMovables = sClMovables == null ? null : sClMovables.getContent();
 			if (lClMovables != null) {
 				for (ClMovables clMovables : lClMovables) {
@@ -409,7 +412,8 @@ public class L2412 extends TradeBuffer {
 			}
 
 		} else if ("310".equals(clTypeCode)) {
-			Slice<ClMovables> sClMovables = sClMovablesService.findUnique3(titaVo.getParam("LicenseNo"), 0, Integer.MAX_VALUE);
+			Slice<ClMovables> sClMovables = sClMovablesService.findUnique3(titaVo.getParam("LicenseNo"), 0,
+					Integer.MAX_VALUE);
 			List<ClMovables> lClMovables = sClMovables == null ? null : sClMovables.getContent();
 			if (lClMovables != null) {
 				for (ClMovables clMovables : lClMovables) {
@@ -423,7 +427,8 @@ public class L2412 extends TradeBuffer {
 			}
 
 		} else if ("340".equals(clTypeCode)) {
-			Slice<ClMovables> sClMovables = sClMovablesService.findUnique4(titaVo.getParam("EngineSN"), 0, Integer.MAX_VALUE);
+			Slice<ClMovables> sClMovables = sClMovablesService.findUnique4(titaVo.getParam("EngineSN"), 0,
+					Integer.MAX_VALUE);
 			List<ClMovables> lClMovables = sClMovables == null ? null : sClMovables.getContent();
 			if (lClMovables != null) {
 				for (ClMovables clMovables : lClMovables) {
@@ -477,7 +482,8 @@ public class L2412 extends TradeBuffer {
 			shareTotal = parse.stringToBigDecimal(titaVo.getParam("SettingAmt"));
 		}
 
-		if ("1".equals(titaVo.getParam("ClStat")) || "2".equals(titaVo.getParam("SettingStat"))) {
+		if ("1".equals(titaVo.getParam("ClStat")) || "2".equals(titaVo.getParam("SettingStat"))
+				|| "0".equals(titaVo.getParam("ClStatus"))) {
 			tClMain.setShareTotal(BigDecimal.ZERO);
 		} else {
 			tClMain.setShareTotal(shareTotal);

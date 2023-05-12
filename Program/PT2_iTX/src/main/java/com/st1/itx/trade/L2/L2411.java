@@ -555,9 +555,9 @@ public class L2411 extends TradeBuffer {
 								} catch (DBException e) {
 									throw new LogicException("E0007", "擔保品所有權人與授信戶關係檔" + e.getErrorMsg());
 								}
-							} 
-						} 
-					} 
+							}
+						}
+					}
 
 					if (this.isEloan) { // eloan 檢核不同核准號碼要新增額度關聯 2022.3.10
 						ClFacId clFacId = new ClFacId();
@@ -801,14 +801,12 @@ public class L2411 extends TradeBuffer {
 		if (parse.stringToBigDecimal(titaVo.getParam("SettingAmt")).compareTo(shareTotal) < 0) {
 			shareTotal = parse.stringToBigDecimal(titaVo.getParam("SettingAmt"));
 		}
-		if ("1".equals(titaVo.getParam("ClStat")) || "2".equals(titaVo.getParam("SettingStat"))) {
+		if ("1".equals(titaVo.getParam("ClStat")) || "2".equals(titaVo.getParam("SettingStat"))
+				|| "0".equals(titaVo.getParam("ClStatus"))) {
 			tClMain.setShareTotal(BigDecimal.ZERO);
 		} else {
 			tClMain.setShareTotal(shareTotal);
 		}
-
-		this.info("L2411 shareTotal = " + shareTotal.toString());
-		tClMain.setShareTotal(shareTotal);
 	}
 
 	private void setClImm(TitaVo titaVo) throws LogicException {

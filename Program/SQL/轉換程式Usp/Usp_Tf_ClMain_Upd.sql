@@ -53,6 +53,7 @@ BEGIN
                         THEN ROUND(NVL(CF."LineAmt",0) / NVL(CLM."EvaAmt",0),8) 
                       ELSE 1 END                     AS "LoanToValue" 
                     , NVL(IMM."SettingAmt",0)        AS "SettingAmt" 
+                    , CLM."ClStatus"                 AS "ClStatus"
                FROM "ClMain" CLM 
                LEFT JOIN "ClImm" IMM ON IMM."ClCode1" = CLM."ClCode1" 
                                    AND IMM."ClCode2" = CLM."ClCode2" 
@@ -68,7 +69,10 @@ BEGIN
                -- 2021-08-10 智偉 新增 可分配金額 轉入邏輯 
                -- 步驟1: 評估淨值有值時取評估淨值，無值時取鑑估總值，乘上貸放成數 (四捨五入至個位數) 
                -- 步驟2: 將步驟1算出的結果與設定金額相比，較低者則為可分配金額 
-               , CASE 
+               , CASE
+                   -- 2023-05-12 Wei from W.Y.Lai : ClMain.Status=0未抵押時，ShareTotal轉換時放0
+                   WHEN "ClStatus" = 0
+                   THEN 0
                    WHEN "SettingStat" = 2 -- 擔保品塗銷/解除設定時，可分配金額設為0 
                    THEN 0 
                    WHEN "LineAmt" = 0 -- 額度金額為0 無法計算貸放成數 

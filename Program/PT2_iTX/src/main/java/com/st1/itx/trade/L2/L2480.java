@@ -180,7 +180,8 @@ public class L2480 extends TradeBuffer {
 			tClMain.setEvaDate(parse.stringToInteger(titaVo.getParam("EvaDate")));
 			tClMain.setEvaAmt(parse.stringToBigDecimal(titaVo.getParam("EvaAmt")));
 
-			if ("1".equals(tClImm.getClStat()) || "2".equals(tClImm.getSettingStat())) {
+			if ("1".equals(tClImm.getClStat()) || "2".equals(tClImm.getSettingStat())
+					|| "0".equals(tClMain.getClStatus())) {
 				tClMain.setShareTotal(BigDecimal.ZERO);
 			} else {
 				tClMain.setShareTotal(shareTotal);
@@ -195,7 +196,7 @@ public class L2480 extends TradeBuffer {
 			if (shareTotal.subtract(oldShareTotal).compareTo(BigDecimal.ZERO) < 0) {
 				this.totaVo.init(titaVo);
 				this.totaVo.setWarnMsg("可分配金額不足，新評估總價*貸放成數 = " + shareTotal + "，" + "原可分配金額=" + oldShareTotal);
-				
+
 			}
 			// 紀錄變更前變更後
 			dataLog.setEnv(titaVo, beforeClMain, tClMain);
@@ -277,7 +278,8 @@ public class L2480 extends TradeBuffer {
 				tClMain.setEvaAmt(parse.stringToBigDecimal(titaVo.getParam("EvaAmt")));
 				tClMain.setShareTotal(shareTotal);
 
-				if ("1".equals(tClImm.getClStat()) || "2".equals(tClImm.getSettingStat())) {
+				if ("1".equals(tClImm.getClStat()) || "2".equals(tClImm.getSettingStat())
+						|| "0".equals(tClMain.getClStatus())) {
 					tClMain.setShareTotal(BigDecimal.ZERO);
 				} else {
 					tClMain.setShareTotal(shareTotal);
@@ -312,7 +314,7 @@ public class L2480 extends TradeBuffer {
 				if (shareTotal.subtract(oldShareTotal).compareTo(BigDecimal.ZERO) < 0) {
 					this.totaVo.init(titaVo);
 					this.totaVo.setWarnMsg("可分配金額不足，新評估總價*貸放成數 = " + shareTotal + "，" + "原可分配金額=" + oldShareTotal);
-					
+
 				}
 				// 紀錄變更前變更後
 				dataLog.setEnv(titaVo, beforeClImm, tClImm);
@@ -353,7 +355,8 @@ public class L2480 extends TradeBuffer {
 				tClMain.setEvaAmt(parse.stringToBigDecimal(titaVo.getParam("EvaAmt")));
 				tClMain.setShareTotal(shareTotal);
 
-				if ("1".equals(tClImm.getClStat()) || "2".equals(tClImm.getSettingStat())) {
+				if ("1".equals(tClImm.getClStat()) || "2".equals(tClImm.getSettingStat())
+						|| "0".equals(tClMain.getClStatus())) {
 					tClMain.setShareTotal(BigDecimal.ZERO);
 				} else {
 					tClMain.setShareTotal(shareTotal);
@@ -401,7 +404,7 @@ public class L2480 extends TradeBuffer {
 				if (t == null) {
 					throw new LogicException("E0001", "該擔保品編號不存在擔保品不動產檔 =" + iClCode1 + -+iClCode2 + -+iClNo);
 				}
-				if ("1".equals(t.getClStat()) || "2".equals(t.getSettingStat())) {
+				if ("1".equals(t.getClStat()) || "2".equals(t.getSettingStat()) || "0".equals(tClMain.getClStatus())) {
 					tClMain.setShareTotal(BigDecimal.ZERO);
 				} else {
 					tClMain.setShareTotal(shareTotal);

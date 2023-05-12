@@ -2,6 +2,7 @@ package com.st1.itx.trade.L9;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -10,9 +11,11 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9711ServiceImpl;
 import com.st1.itx.util.common.BaTxCom;
+import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.parse.Parse;
@@ -24,7 +27,7 @@ public class L9711Report extends MakeReport {
 
 	@Autowired
 	L9711ServiceImpl l9711ServiceImpl;
-	
+
 	@Autowired
 	L9711Report3 l9711report3;
 
@@ -34,6 +37,10 @@ public class L9711Report extends MakeReport {
 	@Autowired
 	Parse parse;
 
+	@Autowired
+	private CustNoticeCom custNoticeCom;
+
+	private boolean isLetterNoticeFlag = true;
 	// 起始欄位 位置
 	int startPos = 4;
 
@@ -71,9 +78,11 @@ public class L9711Report extends MakeReport {
 		this.print(-4, centerPos, "到期起訖日...　" + showRocDate(titaVo.get("ACCTDATE_ST"), 1) + " -  "
 				+ showRocDate(titaVo.get("ACCTDATE_ED"), 1), "C");
 //		this.print(-4, centerPos, "（　需列印到期通知單之清單　　）", "C");
-
+		if (!isLetterNoticeFlag) {
+			this.print(-3, centerPos, "(已申請不列印書面通知書客戶)", "C");
+		}
 		// 右排
-		this.print(-1, leftPos, "機密案件："+this.getSecurity(), "L");
+		this.print(-1, leftPos, "機密案件：" + this.getSecurity(), "L");
 		this.print(-2, leftPos, "日　　期：" + tim + "/" + dDateUtil.getNowStringBc().substring(6) + "/"
 				+ dDateUtil.getNowStringBc().substring(2, 4), "L");
 		this.print(-3, leftPos, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
@@ -124,37 +133,69 @@ public class L9711Report extends MakeReport {
 		String txcd = titaVo.getTxcd();
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
-		String reportItem = "放款到期明細表";		
+		String reportItem = "放款到期明細表";
 		String pageSize = "A4";
 		String pageOrientation = "P";
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
-				.setRptItem(reportItem).setRptSize(pageSize).setPageOrientation(pageOrientation)
-				.build();
+				.setRptItem(reportItem).setRptSize(pageSize).setPageOrientation(pageOrientation).build();
 		this.open(titaVo, reportVo);
 
+		
+		// 書面列印通知書客戶
+		List<Map<String, String>> isLetterList = new ArrayList<Map<String, String>>();
+		// 書面不列印通知書客戶
+		List<Map<String, String>> isNotLetterList = new ArrayList<Map<String, String>>();
+		
 		if (l9711List.size() > 0) {
 
-			// 計算筆數
-			int count = 0;
 
-			for (Map<String, String> tL9711Vo : l9711List) {
+			// 先找初以申請不列印書面通知書之客戶
+			for (Map<String, String> r : l9711List) {
 
-				count++;
+				int custNo = parse.stringToInteger(r.get("F4"));
+				int facmNo = parse.stringToInteger(r.get("F5"));
 
-				printData(tL9711Vo);
+				TempVo tempVo = new TempVo();
+				tempVo = custNoticeCom.getCustNotice("L9711", custNo, facmNo, titaVo);
 
-				// 每到 60 筆，換一頁
-				if (count >= 60) {
-
-					this.info("換一頁：" + count + "筆");
-
-					count = 0;
-
-					newPage();
-
+				if ("Y".equals(tempVo.getParam("isLetter"))) {
+					isLetterList.add(r);
+				} else {
+					isNotLetterList.add(r);
 				}
 
+			}
+			
+			
+			// 計算筆數
+			int count = 0;
+			
+			// 書面列印通知書客戶
+			for (Map<String, String> tL9711Vo : isLetterList) {
+				count++;
+				printData(tL9711Vo);
+				// 每到 60 筆，換一頁
+				if (count >= 60) {
+//					this.info("換一頁：" + count + "筆");
+					count = 0;
+					newPage();
+				}
+			}
+			
+			// 書面不列印通知書客戶
+			isLetterNoticeFlag = false;
+			newPage();
+			count = 0;
+			for (Map<String, String> tL9711Vo : isNotLetterList) {
+				count++;
+				printData(tL9711Vo);
+				// 每到 60 筆，換一頁
+				if (count >= 60) {
+//					this.info("換一頁：" + count + "筆");
+					count = 0;
+					newPage();
+				}
 			}
 
 		} else {
@@ -162,16 +203,14 @@ public class L9711Report extends MakeReport {
 			this.print(1, startPos, "本日無資料");
 
 		}
-		
+
 		long sno = this.close();
 
 		this.toPdf(sno);
-		
-		l9711report3.exec(titaVo,l9711List);
+
+		l9711report3.exec(titaVo, isLetterList);
 
 		return l9711List;
-		
-		
 
 	}
 

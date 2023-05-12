@@ -20,7 +20,7 @@ K(MODIFYBUTTON,刪除)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,800];printer.width=[20,20];">
 [
-["[LC105]                                 上傳附件查詢"],
+["[LC105]                                 上傳附件刪除"],
 ["#FdTranNo+交易代號",#TranNo],
 ["#FdCustNo+戶@@@@號",#CustNo,"-",#FacmNo,"-",#BormNo],
 ["#FdMrKey+參考編號",#MrKey],

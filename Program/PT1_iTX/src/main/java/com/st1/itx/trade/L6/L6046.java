@@ -26,6 +26,7 @@ import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.TxDataLogService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -63,6 +64,9 @@ public class L6046 extends TradeBuffer {
 
 	@Autowired
 	TxDataLogService sTxDataLogService;
+	
+	@Autowired
+	SendRsp iSendRsp;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -91,6 +95,11 @@ public class L6046 extends TradeBuffer {
 		List<CustDataCtrl> lCustDataCtrl = new ArrayList<CustDataCtrl>();
 		Slice<CustDataCtrl> slCustDataCtrl = null;
 
+		// 主管授權
+		if (!titaVo.getHsupCode().equals("1")) {
+			iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
+		}
+		
 		String wkCustUKey = "";
 		// 統編有輸入 先查結清戶檔的原統編是否存在,在查客戶主檔統編
 		if (!iCustId.isEmpty()) {

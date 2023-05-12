@@ -13,9 +13,11 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.buffer.TxBuffer;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9703ServiceImpl;
 import com.st1.itx.util.common.BaTxCom;
+import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.common.data.ReportVo;
@@ -45,6 +47,9 @@ public class L9703Report1 extends MakeReport {
 	@Autowired
 	Parse parse;
 
+	@Autowired
+	private CustNoticeCom custNoticeCom;
+
 	/**
 	 * 表頭種類<BR>
 	 * 1=逾期期數<BR>
@@ -70,6 +75,16 @@ public class L9703Report1 extends MakeReport {
 	private String unpaidDaySt;
 	private String unpaidDayEd;
 
+	private BigDecimal totalOfLoanBal = BigDecimal.ZERO; // 本金餘額加總
+	private BigDecimal totalOfUnpaidPriInt = BigDecimal.ZERO; // 未收本息加總
+	private BigDecimal totalOfBreachAmtAndDelayInt = BigDecimal.ZERO; // 違約金加總
+	private BigDecimal totalOfOverflow = BigDecimal.ZERO; // 溢短繳加總
+	private BigDecimal totalOfTotal = BigDecimal.ZERO; // 合計加總
+
+	private int counts = 0;// 筆數計算
+
+	private boolean isLetterNoticeFlag = true;
+
 	@Override
 	public void printHeader() {
 
@@ -77,7 +92,7 @@ public class L9703Report1 extends MakeReport {
 
 		this.setFontSize(8);
 
-		this.print(-1, 150, "機密等級："+this.getSecurity());
+		this.print(-1, 150, "機密等級：" + this.getSecurity());
 
 		this.print(-2, 3, "程式ID：" + this.getParentTranCode());
 		this.print(-2, 80, "新光人壽保險股份有限公司", "C");
@@ -86,6 +101,9 @@ public class L9703Report1 extends MakeReport {
 		this.print(-3, 3, "報　表：" + this.getRptCode());
 		this.print(-3, 80, "滯繳客戶明細表", "C");
 		this.print(-3, 150, "　　　：" + this.showBcDate(PayIntDateEd, 0));
+		if (!isLetterNoticeFlag) {
+			this.print(-4, 80, "(已申請不列印書面通知書客戶)", "C");
+		}
 		this.print(-4, 150, "入帳日：" + this.showBcDate(bcEntryDate, 0));
 
 		if (rptFlag == 1) {
@@ -120,11 +138,8 @@ public class L9703Report1 extends MakeReport {
 
 		String tran = titaVo.getTxCode().isEmpty() ? "L9703" : titaVo.getTxCode();
 
-//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), tran, "滯繳客戶明細表", "密", "A4", "");
-
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-				.setRptCode(tran).setRptItem("滯繳客戶明細表").setRptSize("A4").setPageOrientation("")
-				.build();
+				.setRptCode(tran).setRptItem("滯繳客戶明細表").setRptSize("A4").setPageOrientation("").build();
 
 		this.open(titaVo, reportVo);
 
@@ -133,8 +148,6 @@ public class L9703Report1 extends MakeReport {
 		// 最近應繳日
 		PayIntDateSt = String.valueOf(Integer.parseInt(titaVo.getParam("PayIntDateSt")) + 19110000);
 		PayIntDateEd = String.valueOf(Integer.parseInt(titaVo.getParam("PayIntDateEd")) + 19110000);
-
-		int entryDate = Integer.parseInt(titaVo.getParam("EntryDate"));
 
 		rptFlag = Integer.parseInt(titaVo.getParam("UnpaidCond"));
 
@@ -157,21 +170,79 @@ public class L9703Report1 extends MakeReport {
 			this.error("L9703ServiceImpl.findAll error = " + errors.toString());
 		}
 
-		int counts = 0;// 筆數計算
-
-		BigDecimal totalOfLoanBal = BigDecimal.ZERO; // 本金餘額加總
-		BigDecimal totalOfUnpaidPriInt = BigDecimal.ZERO; // 未收本息加總
-		BigDecimal totalOfBreachAmtAndDelayInt = BigDecimal.ZERO; // 違約金加總
-		BigDecimal totalOfOverflow = BigDecimal.ZERO; // 溢短繳加總
-		BigDecimal totalOfTotal = BigDecimal.ZERO; // 合計加總
-
 		if (listL9703 == null || listL9703.size() == 0) {
 			this.setRptItem("滯繳客戶明細表(無符合資料)");
 			this.print(1, 1, "*******    查無資料   ******");
 			long sno = this.close();
 			return sno;
+		}
+
+		// 有申請書面列印通知書客戶
+		List<Map<String, String>> isLetterList = new ArrayList<Map<String, String>>();
+		// 有申請書面不列印通知書客戶
+		List<Map<String, String>> isNotLetterList = new ArrayList<Map<String, String>>();
+
+		// 先找初以申請不列印書面通知書之客戶
+		for (Map<String, String> tL9703 : listL9703) {
+
+			int custNo = parse.stringToInteger(tL9703.get("F2"));
+			int facmNo = parse.stringToInteger(tL9703.get("F3"));
+
+			TempVo tempVo = new TempVo();
+			tempVo = custNoticeCom.getCustNotice("L9703", custNo, facmNo, titaVo);
+
+			if ("Y".equals(tempVo.getParam("isLetter"))) {
+				isLetterList.add(tL9703);
+			} else {
+				isNotLetterList.add(tL9703);
+			}
 
 		}
+
+		// 有列印書面通知資料
+		printData(titaVo, txbuffer, isLetterList);
+
+		isLetterNoticeFlag = false;
+		newPage();
+		// 不列印書面通知資料
+		printData(titaVo, txbuffer, isNotLetterList);
+
+		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
+		print(1, 5, "合　　計　　　　　筆");
+		print(0, 13, FormatUtil.pad9(String.valueOf(counts), 7));
+
+		// 本金餘額總計
+		print(0, 57, formatAmt(totalOfLoanBal, 0), "R");
+
+		// 未收本息總計
+		print(0, 103, formatAmt(totalOfUnpaidPriInt, 0), "R");
+
+		// 違約金總計
+		print(0, 115, formatAmt(totalOfBreachAmtAndDelayInt, 0), "R");
+
+		// 溢短繳總計
+		print(0, 128, formatAmt(totalOfOverflow, 0), "R");
+
+		// 合計總計
+		print(0, 140, formatAmt(totalOfTotal, 0), "R");
+		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
+
+		long sno = this.close();
+		return sno;
+	}
+
+	private void printData(TitaVo titaVo, TxBuffer txbuffer, List<Map<String, String>> listL9703)
+			throws NumberFormatException, LogicException {
+
+		int entryDate = Integer.parseInt(titaVo.getParam("EntryDate"));
+
+		BigDecimal tLoanBal = BigDecimal.ZERO; // 本金餘額加總
+		BigDecimal tUnpaidPriInt = BigDecimal.ZERO; // 未收本息加總
+		BigDecimal tBreachAmtAndDelayInt = BigDecimal.ZERO; // 違約金加總
+		BigDecimal tOverflow = BigDecimal.ZERO; // 溢短繳加總
+		BigDecimal tTotal = BigDecimal.ZERO; // 合計加總
+
+		int tCounts = 0;// 筆數計算
 
 		for (Map<String, String> tL9703 : listL9703) {
 			List<BaTxVo> listBaTxVo = new ArrayList<>();
@@ -341,33 +412,33 @@ public class L9703Report1 extends MakeReport {
 				this.print(0, 143, "電話..... *");
 			}
 
+			// 合計用
 			counts++;
+			// 小計用
+			tCounts++;
 
 		} // for
 
 		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
-		print(1, 5, "合　　計　　　　　筆");
-		print(0, 13, FormatUtil.pad9(String.valueOf(counts), 7));
+		print(1, 5, "小　　計　　　　　筆");
+		print(0, 13, FormatUtil.pad9(String.valueOf(tCounts), 7));
 
 		// 本金餘額總計
-		print(0, 57, formatAmt(totalOfLoanBal, 0), "R");
+		print(0, 57, formatAmt(tLoanBal, 0), "R");
 
 		// 未收本息總計
-		print(0, 103, formatAmt(totalOfUnpaidPriInt, 0), "R");
+		print(0, 103, formatAmt(tUnpaidPriInt, 0), "R");
 
 		// 違約金總計
-		print(0, 115, formatAmt(totalOfBreachAmtAndDelayInt, 0), "R");
+		print(0, 115, formatAmt(tBreachAmtAndDelayInt, 0), "R");
 
 		// 溢短繳總計
-		print(0, 128, formatAmt(totalOfOverflow, 0), "R");
+		print(0, 128, formatAmt(tOverflow, 0), "R");
 
 		// 合計總計
-		print(0, 140, formatAmt(totalOfTotal, 0), "R");
+		print(0, 140, formatAmt(tTotal, 0), "R");
 		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 
-		long sno = this.close();
-		return sno;
 	}
-
 
 }

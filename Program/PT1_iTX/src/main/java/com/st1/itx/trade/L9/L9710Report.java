@@ -10,12 +10,15 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9710ServiceImpl;
+import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.parse.Parse;
 
 @Component("L9710Report")
 @Scope("prototype")
@@ -31,6 +34,12 @@ public class L9710Report extends MakeReport {
 	@Autowired
 	DateUtil dateUtil;
 
+	@Autowired
+	private CustNoticeCom custNoticeCom;
+
+	@Autowired
+	Parse parse;
+
 	String f0 = "";
 	String f1 = "";
 	int ptfg = 0;
@@ -42,13 +51,15 @@ public class L9710Report extends MakeReport {
 	// 計算當前列數
 	int tempCount = 0;
 
+	private boolean isLetterNoticeFlag = true;
+
 	// 橫式規格
 	@Override
 	public void printHeader() {
 
 		this.setFontSize(10);
 		this.setCharSpaces(0);
-		this.print(-1, 146, "機密等級："+this.getSecurity());
+		this.print(-1, 146, "機密等級：" + this.getSecurity());
 		this.print(-2, 3, "　程式ID：" + this.getParentTranCode());
 		this.print(-2, 80, "新光人壽保險股份有限公司", "C");
 		this.print(-3, 3, "　報　表：" + this.getRptCode());
@@ -59,6 +70,11 @@ public class L9710Report extends MakeReport {
 		this.print(-3, 80, "寬限到期明細表", "C");
 		this.print(-3, 146, "時　  間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
 				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6));
+
+		if (!isLetterNoticeFlag) {
+			this.print(-4, 80, "(已申請不列印書面通知書客戶)", "C");
+		}
+
 		this.print(-4, 146, "頁　  次：");
 		this.print(0, 160, Integer.toString(this.getNowPage()), "R");
 		this.print(-5, 80,
@@ -110,8 +126,7 @@ public class L9710Report extends MakeReport {
 		String reportName = "寬限到期明細表";
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-				.setRptCode(txcd).setRptItem(reportName).setRptSize("A4").setPageOrientation("L")
-				.build();
+				.setRptCode(txcd).setRptItem(reportName).setRptSize("A4").setPageOrientation("L").build();
 
 		this.open(titaVo, reportVo);
 
@@ -124,9 +139,31 @@ public class L9710Report extends MakeReport {
 
 		if (l9710List != null && l9710List.size() != 0) {
 
-			// 輸出Excel
+			// 有申請書面列印通知書客戶
+			List<Map<String, String>> isLetterList = new ArrayList<Map<String, String>>();
+			// 有申請書面不列印通知書客戶
+			List<Map<String, String>> isNotLetterList = new ArrayList<Map<String, String>>();
 
-			for (Map<String, String> tL9710Vo : l9710List) {
+			// 先找初以申請不列印書面通知書之客戶
+			for (Map<String, String> r : l9710List) {
+
+				int custNo = parse.stringToInteger(r.get("CustNo"));
+				int facmNo = parse.stringToInteger(r.get("FacmNo"));
+
+				TempVo tempVo = new TempVo();
+				tempVo = custNoticeCom.getCustNotice("L9710", custNo, facmNo, titaVo);
+
+				if ("Y".equals(tempVo.getParam("isLetter"))) {
+					isLetterList.add(r);
+				} else {
+					isNotLetterList.add(r);
+				}
+
+			}
+
+			// 輸出Excel
+			// 有列印書面通知客戶
+			for (Map<String, String> tL9710Vo : isLetterList) {
 
 				count++;
 
@@ -156,7 +193,33 @@ public class L9710Report extends MakeReport {
 				report(tL9710Vo);
 			}
 
-			if (this.getNowPage() > 0 && count == l9710List.size()) {
+			if (this.getNowPage() > 0 && count == isLetterList.size()) {
+				ptfg = 9;
+				reportTot(tempCity);
+			}
+
+			isLetterNoticeFlag = false;
+			newPage();
+
+			// 記錄筆數
+			count = 0;
+			// 不列印書面通知客戶
+			for (Map<String, String> tL9710Vo : isNotLetterList) {
+
+				count++;
+
+				// 超過40行 換新頁
+				if (this.NowRow >= 40) {
+					this.newPage();
+
+				}
+
+				f1 = tL9710Vo.get("CityCode");
+
+				report(tL9710Vo);
+			}
+
+			if (this.getNowPage() > 0 && count == isNotLetterList.size()) {
 				ptfg = 9;
 				reportTot(tempCity);
 			}
