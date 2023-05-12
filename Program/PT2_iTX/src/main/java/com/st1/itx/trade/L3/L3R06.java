@@ -387,10 +387,9 @@ public class L3R06 extends TradeBuffer {
 				}
 				oShortFacmNo = ln.getFacmNo();
 
-				int wkIntStartDate = 99991231;
-				int wkIntEndDate = 0;
+				int wkIntStartDate = ln.getPrevPayIntDate();
+				int wkIntEndDate = iRepayType == 1 ? loanCalcRepayIntCom.getPrevPaidIntDate() : 0;
 				for (CalcRepayIntVo c : lCalcRepayIntVo) {
-
 					wkIntStartDate = c.getStartDate() < wkIntStartDate ? c.getStartDate() : wkIntStartDate;
 					wkIntEndDate = c.getEndDate() > wkIntEndDate ? c.getEndDate() : wkIntEndDate;
 				}

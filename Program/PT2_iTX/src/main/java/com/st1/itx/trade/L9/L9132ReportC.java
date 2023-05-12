@@ -81,8 +81,8 @@ public class L9132ReportC extends MakeReport {
 	private void printDetailHeader() {
 		print(1, 1, "傳票批號：　" + this.batchNo);
 		print(1, 1, "");
-		print(1, 1, "交易序號　          傳票號碼  會計科目／名稱　　　　　　　　　　　　　　　　　　　　 區隔帳冊 　　　　　　  借方金額　　　　　　貸方金額　　戶號　　 戶名　　　經辦    ");
-		print(1, 1, "－－－－－－－－－  －－－－  －－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－－　－－－－－－－－－　－－－－　－－－　 －－－－  ");
+		print(1, 1, "交易序號　          傳票號碼  會計科目／名稱　　　　　　　　　　　　　　　　　　　　 區隔帳冊 　　　　　  借方金額　　　　　貸方金額　　戶號額度　　  戶名　　　經辦    ");
+		print(1, 1, "－－－－－－－－－  －－－－  －－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－　 －－－　 －－－－  ");
 //		print(1, 1, "交易序號　傳票號碼　會計科目／名稱　　　　　　　　　　　　　　　　　　　　　　　　區隔帳冊　　　　　　　借方金額　　　　　　　貸方金額　　戶號　　戶名　　　經辦");
 //		print(1, 1, "－－－－　－－－－　－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－－－－－－　－－－－－－－－－－　－－－－　－－－－　－－－－");
 		// -------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
@@ -102,10 +102,9 @@ public class L9132ReportC extends MakeReport {
 		this.nowDate = dDateUtil.getNowStringRoc();
 		this.nowTime = dDateUtil.getNowStringTime();
 
-		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate)
-				.setBrno(brno).setRptCode(reportCode).setRptItem(reportItem)
-				.setRptSize(pageSize).setPageOrientation(pageOrientation).build();
-		
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(reportCode)
+				.setRptItem(reportItem).setRptSize(pageSize).setPageOrientation(pageOrientation).build();
+
 		this.open(titaVo, reportVo);
 
 		setCharSpaces(0);
@@ -147,6 +146,7 @@ public class L9132ReportC extends MakeReport {
 				BigDecimal dbAmt = getBigDecimal(result.get("DbAmt"));
 				BigDecimal crAmt = getBigDecimal(result.get("CrAmt"));
 				String custNo = result.get("CustNo") == null ? "" : result.get("CustNo");
+				String facmNo = result.get("FacmNo") == null ? "" : result.get("FacmNo");
 				String custName = result.get("CustName") == null ? "" : result.get("CustName");
 				String empName = result.get("EmpName") == null ? "" : result.get("EmpName");
 
@@ -154,11 +154,11 @@ public class L9132ReportC extends MakeReport {
 				print(0, 29, slipNo, "R");
 				print(0, 31, acNo);
 				print(0, 85, acSubBookItem);
-				print(0, 117, formatAmt(dbAmt, 0), "R");
-				print(0, 137, formatAmt(crAmt, 0), "R");
-				print(0, 147, custNo, "R");
-				print(0, 149, custName);
-				print(0, 159, empName);
+				print(0, 115, formatAmt(dbAmt, 0), "R");
+				print(0, 133, formatAmt(crAmt, 0), "R");
+				print(0, 143, custNo + " " + facmNo, "R");
+				print(0, 150, custName);
+				print(0, 160, empName);
 
 				// 加總
 				tlrCnt = tlrCnt.add(BigDecimal.ONE);
@@ -176,20 +176,22 @@ public class L9132ReportC extends MakeReport {
 		printTlrTotal();
 		// 印總計
 //		print(1, 1, "－－－－　－－－－　－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－－－－－－　－－－－－－－－－－　－－－－　－－－－　－－－－");
-		print(1, 1, "－－－－－－－－－  －－－－  －－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－－　－－－－－－－－－　－－－－　－－－　 －－－－  ");
+//		print(1, 1, "－－－－－－－－－  －－－－  －－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－－　－－－－－－－－－　－－－－　－－－　 －－－－  ");
+		print(1, 1, "－－－－－－－－－  －－－－  －－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－　 －－－　 －－－－  ");
 		print(1, 1, "　合　　　　　計：　　　　　　　　　筆");
 		print(0, 37, formatAmt(cnt, 0), "R");
-		print(0, 117, formatAmt(dbAmtTotal, 0), "R");
-		print(0, 135, formatAmt(crAmtTotal, 0), "R");
+		print(0, 115, formatAmt(dbAmtTotal, 0), "R");
+		print(0, 133, formatAmt(crAmtTotal, 0), "R");
 	}
 
 	private void printTlrTotal() {
 //		print(1, 1, "－－－－　－－－－　－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－－－－－－　－－－－－－－－－－　－－－－　－－－－　－－－－");
-		print(1, 1, "－－－－－－－－－  －－－－  －－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－－　－－－－－－－－－　－－－－　－－－　 －－－－  ");
+//		print(1, 1, "－－－－－－－－－  －－－－  －－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－－　－－－－－－－－－　－－－－　－－－　 －－－－  ");
+		print(1, 1, "－－－－－－－－－  －－－－  －－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－　 －－－　 －－－－  ");
 		print(1, 1, "　小　　　　　計：　　　　　　　　　筆");
 		print(0, 32, formatAmt(tlrCnt, 0), "R");
-		print(0, 117, formatAmt(tlrDbAmt, 0), "R");
-		print(0, 137, formatAmt(tlrCrAmt, 0), "R");
+		print(0, 115, formatAmt(tlrDbAmt, 0), "R");
+		print(0, 133, formatAmt(tlrCrAmt, 0), "R");
 
 		// 小計清零
 		tlrCnt = BigDecimal.ZERO;

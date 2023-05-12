@@ -1,7 +1,8 @@
 package com.st1.itx.trade.L3;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -18,12 +19,14 @@ import com.st1.itx.db.domain.CdBankId;
 import com.st1.itx.db.domain.CdBankOld;
 import com.st1.itx.db.domain.CdBankOldId;
 import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.LoanBorTx;
 import com.st1.itx.db.domain.LoanCheque;
 import com.st1.itx.db.domain.LoanChequeId;
 import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.CdBankOldService;
 import com.st1.itx.db.service.CdBankService;
 import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.LoanChequeService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
@@ -55,6 +58,8 @@ public class L3943 extends TradeBuffer {
 	@Autowired
 	public AcReceivableService acReceivableService;
 	@Autowired
+	public LoanBorTxService loanBorTxService;
+	@Autowired
 	public CdBankOldService cdBankOldService;
 
 	@Autowired
@@ -63,6 +68,7 @@ public class L3943 extends TradeBuffer {
 	DateUtil dDateUtil;
 
 	private OccursList occursList;
+	private HashMap<Integer, BigDecimal> facTxAmt = new HashMap<>();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -138,7 +144,6 @@ public class L3943 extends TradeBuffer {
 		this.totaVo.putParam("OCurrencyCode", tLoanCheque.getCurrencyCode());
 		this.totaVo.putParam("OChequeAmt", tLoanCheque.getChequeAmt());
 		this.totaVo.putParam("OBktwFlag", tLoanCheque.getBktwFlag());
-		// this.totaVo.putParam("OTsibFlag", tLoanCheque.getTsibFlag());
 		this.totaVo.putParam("OMediaFlag", tLoanCheque.getMediaFlag());
 		this.totaVo.putParam("OUsageCode", tLoanCheque.getUsageCode());
 		this.totaVo.putParam("OServiceCenter", tLoanCheque.getServiceCenter());
@@ -163,17 +168,17 @@ public class L3943 extends TradeBuffer {
 			this.totaVo.putParam("ORelNo",
 					tLoanCheque.getKinbr() + tLoanCheque.getTellerNo() + FormatUtil.pad9(tLoanCheque.getTxtNo(), 8));
 		}
+		this.totaVo.putParam("ORPTFG", 0);
 
 //		 查詢會計銷帳檔
 		wkRvNo = FormatUtil.pad9(String.valueOf(tLoanCheque.getChequeAcct()), 9) + " "
 				+ FormatUtil.pad9(String.valueOf(tLoanCheque.getChequeNo()), 7);
 		Slice<AcReceivable> slAcReceivable = acReceivableService.acrvRvNoEq("TCK", tLoanCheque.getCustNo(), wkRvNo, 0,
 				Integer.MAX_VALUE, titaVo);
-		List<AcReceivable> lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
 
-		if (lAcReceivable != null && lAcReceivable.size() > 0) {
-			for (AcReceivable tAcReceivable : lAcReceivable) {
-//				if (iFacmNo == 0 || iFacmNo == tAcReceivable.getFacmNo()) {
+		if (slAcReceivable != null) {
+			for (AcReceivable tAcReceivable : slAcReceivable.getContent()) {
+//				if (iFacmNo == 0 || iFacmNo == slAcReceivable.getFacmNo()) {
 				occursList = new OccursList();
 				occursList.putParam("OOFacmNo", tAcReceivable.getFacmNo());
 				occursList.putParam("OORvAmt", tAcReceivable.getRvAmt());
@@ -181,6 +186,32 @@ public class L3943 extends TradeBuffer {
 //				}
 				// 將每筆資料放入Tota的OcList
 				this.totaVo.addOccursList(occursList);
+			}
+		} else {
+			Slice<LoanBorTx> slLoanBorTx = loanBorTxService.acDateTxtNoEq(tLoanCheque.getAcDate() + 19110000, "0000",
+					tLoanCheque.getTellerNo(), tLoanCheque.getTxtNo(), 0, Integer.MAX_VALUE, titaVo);
+			if (slLoanBorTx != null) {
+				for (LoanBorTx tLoanBorTx : slLoanBorTx.getContent()) {
+					if (tLoanBorTx.getTxAmt().compareTo(BigDecimal.ZERO) > 0) {
+						if (facTxAmt.get(tLoanBorTx.getFacmNo()) == null) {
+							facTxAmt.put(tLoanBorTx.getFacmNo(), tLoanBorTx.getTxAmt());
+						} else {
+							facTxAmt.put(tLoanBorTx.getFacmNo(),
+									facTxAmt.get(tLoanBorTx.getFacmNo()).add(tLoanBorTx.getTxAmt()));
+						}
+					}
+				}
+				for (Integer facmNo : facTxAmt.keySet()) {
+					occursList = new OccursList();
+					occursList.putParam("OOFacmNo", facmNo);
+					occursList.putParam("OORvAmt", facTxAmt.get(facmNo));
+					occursList.putParam("OORvBal", 0);
+					// 將每筆資料放入Tota的OcList
+					this.totaVo.addOccursList(occursList);
+				}
+			} else {
+				// 不顯示明細
+				this.totaVo.putParam("ORPTFG", 1);
 			}
 		}
 

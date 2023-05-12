@@ -70,9 +70,9 @@ public class L6101Excel extends MakeReport {
 		
 		printExcelHeader();
 		
-		int Caldy = parse.stringToInteger(titaVo.getCalDy())+19110000;
+//		int Caldy = parse.stringToInteger(titaVo.getCalDy())+19110000;//20230511改用findEntdyImportFg且日期使用會計日
 		
-		Slice<TxInquiry> sTxInquiry = sTxInquiryService.findImportFg(Caldy,Caldy, "1",0,9999999, 0,Integer.MAX_VALUE, titaVo);
+		Slice<TxInquiry> sTxInquiry = sTxInquiryService.findEntdyImportFg(reportDate,reportDate, "1",0,9999999, 0,Integer.MAX_VALUE, titaVo);
 
 		List<TxInquiry> iTxInquiry = sTxInquiry == null ? null : sTxInquiry.getContent();
 

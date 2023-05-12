@@ -302,6 +302,8 @@ T(3,)T(H,#OServiceCenter,#ServiceCenterHelp)
 ![交易序號]
 #ORelNo=X,18,L
 
+#ORPTFG=A,1,S
+E(0,@RPTFG,#ORPTFG)
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 #LOOP=X,1,S
 T(3,1)ASGN(LOOP$)
@@ -343,6 +345,7 @@ TXFORM=L3943
 #OCurrencyCode#OChequeAmt
 #OBktwFlag#OMediaFlag#OUsageCode#OServiceCenter
 #OCreditorId#OCreditorBankItem
+#ORPTFG
 #ORelNo
 #OOFacmNo
 #OORvAmt
@@ -387,7 +390,9 @@ TXFORM=L3943
 <sub type="SELECT">
 
 
-
+#RPTFG=1,QUERY.GRID,L3943
+#any={detail:false, header:'L3943.PART', caption:' ', width:1600, rowNum:30, rowList:[10,20,40]}
+^
 #RPTFG=0,QUERY.GRID,L3943
 #any={detail:true, header:'L3943.PART', caption:'', width:1010, rowNum:20, rowList:[20,40,60]}
 
@@ -401,21 +406,5 @@ TXFORM=L3943
 #OORvBalX=未銷餘額
 {width:170}
 
-^
-<include src="PRT.icf::INQ01.sel" map="i=L3943"/>
-
-#OCustNo#OCustNoX
-#OChequeName
-#OChequeAcct#OReceiveDate
-#OChequeNo#OAcDate
-#OChequeDate#OEntryDate
-#OChequeAmtX#OOutsideCodeX
-#OBankItem#OAreaCodeX
-#OBranchItem#OBktwFlagX
-#OStatusCodeX
-#OUsageCodeX#OMediaFlagX
-#OServiceCenterX#OCreditorId
-#OCreditorBankItem
-#ORelNo
 ^
 </sub>

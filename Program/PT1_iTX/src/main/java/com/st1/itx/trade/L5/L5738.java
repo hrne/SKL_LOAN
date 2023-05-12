@@ -12,16 +12,16 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
 
 /**
- * L9740 
+ * L5738
  * 
- * @author ST1-ChihWei
+ * @author 
  * @version 1.0.0
  */
 @Service("L5738")
 @Scope("prototype")
 public class L5738 extends TradeBuffer {
 
-	String txcd = "L9740";
+	String txcd = "L5738";
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {

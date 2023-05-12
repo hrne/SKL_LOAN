@@ -90,11 +90,6 @@ public class L6045 extends TradeBuffer {
 		TxTranCode tTxTranCode = null;
 		
 		
-		// 主管授權
-		if (!titaVo.getHsupCode().equals("1")) {
-			iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
-		}
-		
 		if (iTxInquiry != null) {
 			for (TxInquiry tTxInquiry : iTxInquiry) {
 				this.info("tTxInquiry    =" + tTxInquiry);

@@ -100,11 +100,11 @@ public class L9742ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   		  AND CM.\"EntCode\" IN (1, 2) "; // 企金別為1:企金、2:企金自然人
 		sql += "   		  AND TX.\"AcDate\" = :inputAcDate "; // 會計日期
 		if (tlrNo.length() > 0) {
-			sql += "   		  AND TX.\"TitaTxtNo\" = :inputTitaTxtNo "; // 會計日期
+			sql += "   		  AND TX.\"TitaTlrNo\" = :inputTitaTlrNo "; // 經辦
 		}
 
 		sql += "   		  AND ACD.\"TitaTxtNo\" >= :inputTitaTxtNoStart "; // 交易序號-起
-		sql += "   		  AND ACD.\"TitaTxtNo\" <= inputTitaTxtNoEnd "; // 交易序號-止
+		sql += "   		  AND ACD.\"TitaTxtNo\" <= :inputTitaTxtNoEnd "; // 交易序號-止
 		// functionCode 1=手動輸入、2=整批
 		if (functionCode == 2) {
 			sql += "      	  AND \"RepayCode\" = 2 "; // 付款方式 2=銀行扣款
@@ -186,13 +186,12 @@ public class L9742ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("inputAcDate", acdate);
 
 		if (tlrNo.length() > 0) {
-			query.setParameter("inputTitaTxtNo", tlrNo);
+			query.setParameter("inputTitaTlrNo", tlrNo);
 		}
 
 
 		query.setParameter("inputTitaTxtNoStart", inputTitaTxtNoStart);
 		query.setParameter("inputTitaTxtNoEnd", inputTitaTxtNoEnd);
-
 		query.setParameter("inputSlipNoStart", inputSlipNoStart);
 		query.setParameter("inputSlipNoEnd", inputSlipNoEnd);
 		query.setParameter("inputOption", option);

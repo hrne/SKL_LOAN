@@ -128,7 +128,7 @@ public class L9132Report extends MakeReport {
 		print(1, 1, "會計科目：");
 		print(0, 13, acNoCode);
 		print(0, 26, acNoItem);
-		print(1, 1, "子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　區隔帳冊　　　　　　戶號　　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
+		print(1, 1, "子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　區隔帳冊　　　　　戶號額度　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
 		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－－－－－　－－－－－－－－－－－－　－－－－－－");
 
 	}
@@ -186,8 +186,7 @@ public class L9132Report extends MakeReport {
 //		this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(reportCode)
-				.setRptItem(reportItem).setRptSize(pageSize).setPageOrientation(pageOrientation)
-				.build();
+				.setRptItem(reportItem).setRptSize(pageSize).setPageOrientation(pageOrientation).build();
 
 		this.open(titaVo, reportVo);
 
@@ -224,7 +223,7 @@ public class L9132Report extends MakeReport {
 					acNoCode = r.get("AcNoCode");
 					// 子目
 					acSubCode = r.get("AcSubCode");
-					
+
 					acctCode = r.get("AcctCode");
 					// 科目中文
 					acNoItem = "10121100000".equals(acNoCode) ? r.get("AcNoItem").substring(0, 12) : r.get("AcNoItem");
@@ -245,12 +244,12 @@ public class L9132Report extends MakeReport {
 					this.info("AcSubCode=" + acSubCode + " === " + r.get("AcSubCode") + " : " + i);
 					this.info("AcctCode=" + acctCode + " === " + r.get("AcctCode") + " : " + i);
 					// 子目：不同子目時畫子目小計 並換頁
-					if ((!r.get("AcSubCode").equals(acSubCode) && i > 2) ||
-							(!r.get("AcctCode").equals(acctCode) && i > 2)) {
+					if ((!r.get("AcSubCode").equals(acSubCode) && i > 2)
+							|| (!r.get("AcctCode").equals(acctCode) && i > 2)) {
 						acSubCodeCalculate();
 
 						acSubCode = r.get("AcSubCode");
-						
+
 						acctCode = r.get("AcctCode");
 
 						acNoItem = "10121100000".equals(acNoCode) ? r.get("AcNoItem").substring(0, 12)
@@ -259,12 +258,12 @@ public class L9132Report extends MakeReport {
 						this.newPage();
 
 						batchTitle();
-					} 
+					}
 				}
 
 				// 子目
 				String acSubCode = r.get("AcSubCode");
-		
+
 				// 傳票號碼
 				String slipNo = "0".equals(r.get("SlipNo")) ? " " : r.get("SlipNo");
 
@@ -272,8 +271,9 @@ public class L9132Report extends MakeReport {
 //				String acSubBookCode = r.get("AcSubBookCode");
 				String acSubBookItem = r.get("AcSubBookItem");
 
-				// 戶號
+				// 戶號額度
 				String custNo = r.get("CustNo");
+				String facmNo = r.get("FacmNo");
 
 				// 借貸方金額
 				BigDecimal dbAmt = "0".equals(r.get("DbAmt")) ? BigDecimal.ZERO : new BigDecimal(r.get("DbAmt"));
@@ -300,7 +300,7 @@ public class L9132Report extends MakeReport {
 				// 區隔帳冊
 				print(0, 67, acSubBookItem, "C");
 				// 戶號
-				print(0, 82, custNo);
+				print(0, 82, custNo + " " + facmNo);
 				// 貸方金額
 				print(0, 118, formatAmt(dbAmt, 0), "R");
 				// 貸方金額
@@ -358,8 +358,7 @@ public class L9132Report extends MakeReport {
 //		this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(reportCode)
-				.setRptItem(reportItem).setRptSize(pageSize).setPageOrientation(pageOrientation)
-				.build();
+				.setRptItem(reportItem).setRptSize(pageSize).setPageOrientation(pageOrientation).build();
 
 		this.open(titaVo, reportVo);
 
@@ -379,7 +378,8 @@ public class L9132Report extends MakeReport {
 			// 本日無資料
 			print(1, 1, "傳票批號：");
 			print(1, 1, "會計科目：");
-			print(1, 1, "子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　區隔帳冊　　　　　　戶號　　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
+//			print(1, 1, "子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　區隔帳冊　　　　　　戶號　　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
+			print(1, 1, "子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　區隔帳冊　　　　　戶號額度　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
 			print(1, 1, "－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－－－－－　－－－－－－－－－－－－　－－－－－－");
 			print(1, 1, "本日無資料");
 
@@ -485,7 +485,8 @@ public class L9132Report extends MakeReport {
 				print(1, 1, "會計科目：");
 				print(0, 13, acNoCode);
 				print(0, 26, acNoItem);
-				print(1, 1, "子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　區隔帳冊　　　　　　戶號　　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
+//				print(1, 1, "子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　區隔帳冊　　　　　　戶號　　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
+				print(1, 1, "子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　區隔帳冊　　　　　戶號額度　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
 				print(1, 1, "－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－－－－－　－－－－－－－－－－－－　－－－－－－");
 
 				for (Iterator<Entry<AcSubCodeVo, L9132RptDataVo>> detailIt = acSubCodeMap.entrySet()
@@ -518,8 +519,10 @@ public class L9132Report extends MakeReport {
 							print(1, 1, "會計科目：");
 							print(0, 13, acNoCode);
 							print(0, 26, acNoItem);
+//							print(1, 1,
+//									"子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　區隔帳冊　　　　　　戶號　　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
 							print(1, 1,
-									"子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　區隔帳冊　　　　　　戶號　　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
+									"子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　區隔帳冊　　　　　戶號額度　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
 							print(1, 1,
 									"－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－－－－－　－－－－－－－－－－－－　－－－－－－");
 						}
@@ -585,7 +588,8 @@ public class L9132Report extends MakeReport {
 						print(1, 1, "會計科目：");
 						print(0, 13, acNoCode);
 						print(0, 26, acNoItem);
-						print(1, 1, "子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　區隔帳冊　　　　　　戶號　　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
+//						print(1, 1, "子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　區隔帳冊　　　　　　戶號　　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
+						print(1, 1, "子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　區隔帳冊　　　　　戶號額度　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
 						print(1, 1, "－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－－－－－　－－－－－－－－－－－－　－－－－－－");
 					}
 				}

@@ -178,7 +178,7 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  ,DECODE(R.\"Seq\", 2,CE2.\"Fullname\",CE.\"Fullname\") AS \"Name\"";
 		sql += "		  ,DECODE(R.\"Seq\", 2,CE.\"Fullname\",CE2.\"Fullname\") AS \"SupNoName\"";
 		sql += "		  ,R.\"TranNo\" AS \"TranNo\"";
-		sql += "		  ,TC.\"TranItem\" AS \"TranItem\"";
+		sql += "		  ,TC.\"TranItem\" || ' ' || NVL(JSON_VALUE(T.\"TranData\",'$.LabelBX'),'')AS \"TranItem\"";
 		sql += "		  ,R.\"Seq\" AS \"Seq\"";
 		sql += "	FROM (";
 		sql += "		SELECT T.\"Entdy\" AS \"TxDate\"";

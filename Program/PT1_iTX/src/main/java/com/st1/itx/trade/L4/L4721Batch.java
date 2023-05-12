@@ -279,8 +279,8 @@ public class L4721Batch extends TradeBuffer {
 		tTxToDoDetail.setProcessNote(txToDoCom.getProcessNoteForText(noticePhoneNo,
 				"親愛的客戶您好，新光人壽通知您，房貸額度 " + tmpCustFacm.get("FacmNo") + " 自"
 						+ tmpCustFacm.get("rateChangeDate") + "起利率由"
-						+ parse.stringToInteger(tmpCustFacm.get("originRate")) + "% 調整為"
-						+ parse.stringToInteger(tmpCustFacm.get("newRate")) + "%，敬請留意帳戶餘額以利扣款。",
+						+ tmpCustFacm.get("originRate") + " 調整為"
+						+ tmpCustFacm.get("newRate") + "，敬請留意帳戶餘額以利扣款。",
 				this.getTxBuffer().getMgBizDate().getTbsDy()));
 
 		txToDoCom.addDetail(true, flag, tTxToDoDetail, titaVo);

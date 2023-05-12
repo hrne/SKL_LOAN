@@ -924,7 +924,7 @@ public class L3200 extends TradeBuffer {
 		this.info("calcRepayInt ..." + checkMsg + " 累計償還本利:" + wkRepayLoan);
 
 		wkIntStartDate = ln.getPrevPayIntDate();
-		wkIntEndDate = iRepayType == 1 ? ln.getNextPayIntDate() : iEntryDate;
+		wkIntEndDate = 0;
 		wkLoanBal = ln.getLoanBal();
 		wkDueDate = ln.getNextPayIntDate();
 		wkPrevTermNo = 0;
@@ -1066,7 +1066,9 @@ public class L3200 extends TradeBuffer {
 
 		// 有計息
 		isCalcRepayInt = true;
-
+		if (iRepayType == 1) {
+			wkIntEndDate = loanCalcRepayIntCom.getPrevPaidIntDate();
+		}
 	}
 
 	// 訂正
