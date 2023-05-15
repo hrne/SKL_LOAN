@@ -108,7 +108,7 @@ inputSlipNoStart<-OOSlipNo})
 
 !會計明細按鈕
 #BUF3B=X,62,S
-T(2,000+   +0000+   +           +     +  +#inputAcDate+2+#inputTitaTlrNo+0+#inputTitaTxtNoStart+#inputTitaTxtNoEnd)
+T(2,000+   +0000+   +           +     +  +#inputAcDate+2+#inputTitaTlrNo+0+#inputTitaTxtNoStart+999999)
 C(4,#inputTitaTlrNo,$,s)
 T(2,000+   +0000+   +           +     +  +#inputAcDate+0+      +0+#inputTitaTxtNoStart+#inputTitaTxtNoEnd)
 

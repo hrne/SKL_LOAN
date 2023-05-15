@@ -971,7 +971,7 @@ public class L3100 extends TradeBuffer {
 		tLoanBorMain.setTotalPeriod(this.parse.stringToInteger(titaVo.getParam("TotalPeriod")));
 		tLoanBorMain.setRepaidPeriod(0);
 		tLoanBorMain.setPaidTerms(0);
-		tLoanBorMain.setPrevPayIntDate(0);
+		tLoanBorMain.setPrevPayIntDate(this.parse.stringToInteger(titaVo.getParam("DrawdownDate")));
 		tLoanBorMain.setPrevRepaidDate(0);
 		tLoanBorMain.setNextPayIntDate(this.parse.stringToInteger(titaVo.getParam("FirstDueDate")));
 		tLoanBorMain.setNextRepayDate(this.parse.stringToInteger(titaVo.getParam("NextRepayDate")));

@@ -95,7 +95,7 @@ public class L6310 extends TradeBuffer {
 
 				tTxHoliday.setCountry(titaVo.getParam("Country"));
 				tTxHoliday.setHoliday(this.parse.stringToInteger(titaVo.getParam("Holiday" + i)));
-				tTxHoliday.setTypeCode(this.parse.stringToInteger(titaVo.getParam("TypeCode" + i)));
+				tTxHoliday.setTypeCode(titaVo.getParam("TypeCode" + i));
 				tTxHoliday.setCreateDate(parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime()));
 				tTxHoliday.setCreateEmpNo(titaVo.getTlrNo());
 				tTxHoliday.setLastUpdate(parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime()));
@@ -136,7 +136,7 @@ public class L6310 extends TradeBuffer {
 				try {
 					tTxHoliday.setCountry(titaVo.getParam("Country"));
 					tTxHoliday.setHoliday(this.parse.stringToInteger(titaVo.getParam("Holiday" + i)));
-					tTxHoliday.setTypeCode(this.parse.stringToInteger(titaVo.getParam("TypeCode" + i)));
+					tTxHoliday.setTypeCode(titaVo.getParam("TypeCode" + i));
 					tTxHoliday.setLastUpdate(parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime()));
 					tTxHoliday.setLastUpdateEmpNo(titaVo.getTlrNo());
 

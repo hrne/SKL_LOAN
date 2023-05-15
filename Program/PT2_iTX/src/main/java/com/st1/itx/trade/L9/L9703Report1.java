@@ -243,201 +243,206 @@ public class L9703Report1 extends MakeReport {
 		BigDecimal tTotal = BigDecimal.ZERO; // 合計加總
 
 		int tCounts = 0;// 筆數計算
+		if (listL9703.size() > 0) {
 
-		for (Map<String, String> tL9703 : listL9703) {
-			List<BaTxVo> listBaTxVo = new ArrayList<>();
+			for (Map<String, String> tL9703 : listL9703) {
+				List<BaTxVo> listBaTxVo = new ArrayList<>();
 
-			int custNo = parse.stringToInteger(tL9703.get("F2"));
-			int facmNo = parse.stringToInteger(tL9703.get("F3"));
+				int custNo = parse.stringToInteger(tL9703.get("F2"));
+				int facmNo = parse.stringToInteger(tL9703.get("F3"));
 
-			this.info("L9703Report1 tL9703.custNo = " + custNo);
-			this.info("L9703Report1 tL9703.facmNo = " + facmNo);
+				this.info("L9703Report1 tL9703.custNo = " + custNo);
+				this.info("L9703Report1 tL9703.facmNo = " + facmNo);
 
-			baTxCom.setTxBuffer(txbuffer);
-			this.info("titaVo.getTxcd()=" + titaVo.getTxcd());
-			try {
-				if ("L4703".equals(titaVo.getTxcd())) {
-					listBaTxVo = baTxCom.settingPayintDate(entryDate, titaVo.getEntDyI(), custNo, facmNo, 0, 1,
-							BigDecimal.ZERO, titaVo);
+				baTxCom.setTxBuffer(txbuffer);
+				this.info("titaVo.getTxcd()=" + titaVo.getTxcd());
+				try {
+					if ("L4703".equals(titaVo.getTxcd())) {
+						listBaTxVo = baTxCom.settingPayintDate(entryDate, titaVo.getEntDyI(), custNo, facmNo, 0, 1,
+								BigDecimal.ZERO, titaVo);
+					} else {
+						listBaTxVo = baTxCom.settingUnPaid(entryDate, custNo, facmNo, 0, 1, BigDecimal.ZERO, titaVo);
+
+					}
+
+				} catch (LogicException e) {
+					this.error("baTxCom settingUnPaid ErrorMsg :" + e.getMessage());
+				}
+
+				BigDecimal unpaidPriInt = BigDecimal.ZERO; // 未收本息
+				BigDecimal breachAmtAndDelayInt = BigDecimal.ZERO; // 違約金(報表最終產出的違約金包含違約金及延遲息)
+				BigDecimal overflow = BigDecimal.ZERO; // 溢短繳
+				BigDecimal intRate = BigDecimal.ZERO; // 利率
+				BigDecimal total; // 合計
+
+				// 未收本息 = 本金+利息 baTxVo.Principal + baTxVo.Interest
+				// 違約金 有 但要扣成 0 baTxVo.BreachAmt
+				// 溢短繳 baTxVo.UnPaidAmt
+				for (BaTxVo baTxVo : listBaTxVo) {
+
+					int dataKind = baTxVo.getDataKind();
+					int repayType = baTxVo.getRepayType();
+
+					if (dataKind == 2 && repayType == 1) {
+						unpaidPriInt = unpaidPriInt.add(baTxVo.getPrincipal()); // 未收本
+						unpaidPriInt = unpaidPriInt.add(baTxVo.getInterest()); // 未收息
+						breachAmtAndDelayInt = breachAmtAndDelayInt.add(baTxVo.getBreachAmt()); // 違約金
+
+						intRate = baTxVo.getIntRate();
+					}
+
+					// 溢短繳 = 溢繳 - 短繳
+
+					// 溢繳 dataKind = 3.暫收抵繳
+					if (dataKind == 3) {
+						overflow = overflow.add(baTxVo.getUnPaidAmt());
+					}
+
+					// 短繳
+					// dataKind = 1.應收費用+未收費用+短繳期金
+					// repayType = 01 期款
+					if (dataKind == 1 && repayType == 1) {
+						overflow = overflow.subtract(baTxVo.getUnPaidAmt());
+					}
+				}
+				total = unpaidPriInt.add(breachAmtAndDelayInt).subtract(overflow); // 合計
+
+				totalOfUnpaidPriInt = totalOfUnpaidPriInt.add(unpaidPriInt); // 未收本息加總計算
+				totalOfBreachAmtAndDelayInt = totalOfBreachAmtAndDelayInt.add(breachAmtAndDelayInt); // 違約金加總計算
+				totalOfOverflow = totalOfOverflow.add(overflow); // 溢短繳加總計算
+				totalOfTotal = totalOfTotal.add(total); // 合計加總計算
+
+				// 地區別
+				this.print(1, 1, tL9703.get("F0"));
+
+				// 催收人員
+				this.print(0, 8, tL9703.get("F1"));
+
+				// 戶號
+				String tmpCustNo = tL9703.get("F2");
+				String tmpFacmNo = tL9703.get("F3");
+				this.print(0, 15, FormatUtil.pad9(tmpCustNo, 7) + "-" + FormatUtil.pad9(tmpFacmNo, 3));
+
+				// 報表長度僅能容納5個中文字
+				// 戶名
+				String custName = tL9703.get("F4");
+				if (custName.length() > 5) {
+					custName = custName.substring(0, 5);
+				}
+				this.print(0, 27, custName);
+
+				// 初貸日
+				String drawdownDate = tL9703.get("F5");
+				if (drawdownDate == null || "0".equals(drawdownDate) || drawdownDate.isEmpty()) {
+					this.print(0, 36, "");
 				} else {
-					listBaTxVo = baTxCom.settingUnPaid(entryDate, custNo, facmNo, 0, 1, BigDecimal.ZERO, titaVo);
-
+					this.print(0, 36, this.showRocDate(drawdownDate, 1));
 				}
 
-			} catch (LogicException e) {
-				this.error("baTxCom settingUnPaid ErrorMsg :" + e.getMessage());
-			}
+				// 本金餘額
+				BigDecimal loanBal = tL9703.get("F6") == null ? BigDecimal.ZERO : new BigDecimal(tL9703.get("F6"));
+				this.print(0, 57, formatAmt(loanBal, 0), "R");
+				totalOfLoanBal = totalOfLoanBal.add(loanBal); // 本金餘額加總計算
 
-			BigDecimal unpaidPriInt = BigDecimal.ZERO; // 未收本息
-			BigDecimal breachAmtAndDelayInt = BigDecimal.ZERO; // 違約金(報表最終產出的違約金包含違約金及延遲息)
-			BigDecimal overflow = BigDecimal.ZERO; // 溢短繳
-			BigDecimal intRate = BigDecimal.ZERO; // 利率
-			BigDecimal total; // 合計
+				// 利率
+				this.print(0, 64, formatAmt(intRate, 4), "R");
 
-			// 未收本息 = 本金+利息 baTxVo.Principal + baTxVo.Interest
-			// 違約金 有 但要扣成 0 baTxVo.BreachAmt
-			// 溢短繳 baTxVo.UnPaidAmt
-			for (BaTxVo baTxVo : listBaTxVo) {
-
-				int dataKind = baTxVo.getDataKind();
-				int repayType = baTxVo.getRepayType();
-
-				if (dataKind == 2 && repayType == 1) {
-					unpaidPriInt = unpaidPriInt.add(baTxVo.getPrincipal()); // 未收本
-					unpaidPriInt = unpaidPriInt.add(baTxVo.getInterest()); // 未收息
-					breachAmtAndDelayInt = breachAmtAndDelayInt.add(baTxVo.getBreachAmt()); // 違約金
-
-					intRate = baTxVo.getIntRate();
+				// 繳息迄日
+				String interestEndDate = tL9703.get("F7");
+				if (interestEndDate == null || "0".equals(interestEndDate) || interestEndDate.isEmpty()) {
+					this.print(0, 65, "");
+				} else {
+					this.print(0, 65, this.showRocDate(interestEndDate, 1));
 				}
 
-				// 溢短繳 = 溢繳 - 短繳
-
-				// 溢繳 dataKind = 3.暫收抵繳
-				if (dataKind == 3) {
-					overflow = overflow.add(baTxVo.getUnPaidAmt());
+				// 最近應繳日
+				String lastRepaidDate = tL9703.get("F8");
+				if (lastRepaidDate == null || "0".equals(lastRepaidDate) || lastRepaidDate.isEmpty()) {
+					this.print(0, 75, "");
+				} else {
+					this.print(0, 75, this.showRocDate(lastRepaidDate, 1));
 				}
-
-				// 短繳
-				// dataKind = 1.應收費用+未收費用+短繳期金
-				// repayType = 01 期款
-				if (dataKind == 1 && repayType == 1) {
-					overflow = overflow.subtract(baTxVo.getUnPaidAmt());
-				}
-			}
-			total = unpaidPriInt.add(breachAmtAndDelayInt).subtract(overflow); // 合計
-
-			totalOfUnpaidPriInt = totalOfUnpaidPriInt.add(unpaidPriInt); // 未收本息加總計算
-			totalOfBreachAmtAndDelayInt = totalOfBreachAmtAndDelayInt.add(breachAmtAndDelayInt); // 違約金加總計算
-			totalOfOverflow = totalOfOverflow.add(overflow); // 溢短繳加總計算
-			totalOfTotal = totalOfTotal.add(total); // 合計加總計算
-
-			// 地區別
-			this.print(1, 1, tL9703.get("F0"));
-
-			// 催收人員
-			this.print(0, 8, tL9703.get("F1"));
-
-			// 戶號
-			String tmpCustNo = tL9703.get("F2");
-			String tmpFacmNo = tL9703.get("F3");
-			this.print(0, 15, FormatUtil.pad9(tmpCustNo, 7) + "-" + FormatUtil.pad9(tmpFacmNo, 3));
-
-			// 報表長度僅能容納5個中文字
-			// 戶名
-			String custName = tL9703.get("F4");
-			if (custName.length() > 5) {
-				custName = custName.substring(0, 5);
-			}
-			this.print(0, 27, custName);
-
-			// 初貸日
-			String drawdownDate = tL9703.get("F5");
-			if (drawdownDate == null || "0".equals(drawdownDate) || drawdownDate.isEmpty()) {
-				this.print(0, 36, "");
-			} else {
-				this.print(0, 36, this.showRocDate(drawdownDate, 1));
-			}
-
-			// 本金餘額
-			BigDecimal loanBal = tL9703.get("F6") == null ? BigDecimal.ZERO : new BigDecimal(tL9703.get("F6"));
-			this.print(0, 57, formatAmt(loanBal, 0), "R");
-			totalOfLoanBal = totalOfLoanBal.add(loanBal); // 本金餘額加總計算
-
-			// 利率
-			this.print(0, 64, formatAmt(intRate, 4), "R");
-
-			// 繳息迄日
-			String interestEndDate = tL9703.get("F7");
-			if (interestEndDate == null || "0".equals(interestEndDate) || interestEndDate.isEmpty()) {
-				this.print(0, 65, "");
-			} else {
-				this.print(0, 65, this.showRocDate(interestEndDate, 1));
-			}
-
-			// 最近應繳日
-			String lastRepaidDate = tL9703.get("F8");
-			if (lastRepaidDate == null || "0".equals(lastRepaidDate) || lastRepaidDate.isEmpty()) {
-				this.print(0, 75, "");
-			} else {
-				this.print(0, 75, this.showRocDate(lastRepaidDate, 1));
-			}
 
 //			int days = getCashDay(parse.stringToInteger(lastRepaidDate), parse.stringToInteger(tL9703.get("F9")));
 
-			int days = parse.stringToInteger(tL9703.get("OvduDays"));
+				int days = parse.stringToInteger(tL9703.get("OvduDays"));
 
-			// 日數
-			this.print(0, 89, "" + days, "R");
+				// 日數
+				this.print(0, 89, "" + days, "R");
 
-			// 未收本息
-			this.print(0, 103, formatAmt(unpaidPriInt, 0), "R");
+				// 未收本息
+				this.print(0, 103, formatAmt(unpaidPriInt, 0), "R");
 
-			// 違約金
-			this.print(0, 115, formatAmt(breachAmtAndDelayInt, 0), "R");
+				// 違約金
+				this.print(0, 115, formatAmt(breachAmtAndDelayInt, 0), "R");
 
-			// 溢短繳
-			this.print(0, 128, formatAmt(overflow, 0), "R");
+				// 溢短繳
+				this.print(0, 128, formatAmt(overflow, 0), "R");
 
-			// 合計
-			this.print(0, 140, formatAmt(total, 0), "R");
+				// 合計
+				this.print(0, 140, formatAmt(total, 0), "R");
 
-			// 聯絡人
-			String cName = tL9703.get("F10");
-			if (cName != null && !cName.isEmpty()) {
-				if (cName.length() > 5) {
-					cName = cName.substring(0, 5);
+				// 聯絡人
+				String cName = tL9703.get("F10");
+				if (cName != null && !cName.isEmpty()) {
+					if (cName.length() > 5) {
+						cName = cName.substring(0, 5);
+					}
+					this.print(0, 142, cName);
 				}
-				this.print(0, 142, cName);
-			}
 
-			// 電話
+				// 電話
 //			this.print(0, 149, tL9703.get("F11"));
 
-			// 繳款方式
-			this.print(0, 159, tL9703.get("F13"));
+				// 繳款方式
+				this.print(0, 159, tL9703.get("F13"));
 
-			String cellPhone = tL9703.get("F12");
+				String cellPhone = tL9703.get("F12");
 
-			if (cellPhone != null && !cellPhone.isEmpty()) {
-				this.print(1, 15, "手機號碼..... " + cellPhone);
-			} else {
-				this.print(1, 15, "手機號碼..... *");
-			}
+				if (cellPhone != null && !cellPhone.isEmpty()) {
+					this.print(1, 15, "手機號碼..... " + cellPhone);
+				} else {
+					this.print(1, 15, "手機號碼..... *");
+				}
 
-			String phoneNumber = tL9703.get("F11");
+				String phoneNumber = tL9703.get("F11");
 
-			if (phoneNumber != null && !phoneNumber.isEmpty()) {
-				this.print(0, 143, "電話..... " + phoneNumber);
-			} else {
-				this.print(0, 143, "電話..... *");
-			}
+				if (phoneNumber != null && !phoneNumber.isEmpty()) {
+					this.print(0, 143, "電話..... " + phoneNumber);
+				} else {
+					this.print(0, 143, "電話..... *");
+				}
 
-			// 合計用
-			counts++;
-			// 小計用
-			tCounts++;
+				// 合計用
+				counts++;
+				// 小計用
+				tCounts++;
 
-		} // for
+			} // for
 
-		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
-		print(1, 5, "小　　計　　　　　筆");
-		print(0, 13, FormatUtil.pad9(String.valueOf(tCounts), 7));
+			print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
+			print(1, 5, "小　　計　　　　　筆");
+			print(0, 13, FormatUtil.pad9(String.valueOf(tCounts), 7));
 
-		// 本金餘額總計
-		print(0, 57, formatAmt(tLoanBal, 0), "R");
+			// 本金餘額總計
+			print(0, 57, formatAmt(tLoanBal, 0), "R");
 
-		// 未收本息總計
-		print(0, 103, formatAmt(tUnpaidPriInt, 0), "R");
+			// 未收本息總計
+			print(0, 103, formatAmt(tUnpaidPriInt, 0), "R");
 
-		// 違約金總計
-		print(0, 115, formatAmt(tBreachAmtAndDelayInt, 0), "R");
+			// 違約金總計
+			print(0, 115, formatAmt(tBreachAmtAndDelayInt, 0), "R");
 
-		// 溢短繳總計
-		print(0, 128, formatAmt(tOverflow, 0), "R");
+			// 溢短繳總計
+			print(0, 128, formatAmt(tOverflow, 0), "R");
 
-		// 合計總計
-		print(0, 140, formatAmt(tTotal, 0), "R");
-		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
+			// 合計總計
+			print(0, 140, formatAmt(tTotal, 0), "R");
+			print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
+
+		} else {
+			this.print(1, 1, "本日無資料");
+		}
 
 	}
 

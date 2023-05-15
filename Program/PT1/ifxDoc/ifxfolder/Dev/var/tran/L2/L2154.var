@@ -1150,7 +1150,25 @@ E(0,@StepRateIncrLb{n},#L2r05StepRateIncr{n})
 T(3,@StepRatePer{n},%)
 ##end
 
+#SendL2r11A=X,1,S
+IF(#FKEY==0 || #FKEY==7,$,s)
+E(0,@RimApplNo,#L2r05ApplNo)
+S(L2R11,1,#RimTxCode,#RimApplNo)
+R(1,L2R11)
+##loop{times:20,n:1}
+T(2,@ClKey{n},#L2r11ClKey{n})
+E(0,@ClApplNo{n},#L2r11ApplNo{n})
+E(0,@ClClTypeCode{n},#L2r11ClTypeCode{n})
+T(2,@ClMainFlag{n},#L2r11MainFlag{n})
+E(0,@EvaAmt{n},#L2r11EvaAmt{n})
+T(2,@ClBdLocation{n},#L2r11BdLocation{n})
+##end
 
+#SendL2r53A=X,1,S
+T(2,@RimCustNo,#CustNo)
+T(2,@RimRepayBank,#RepayBank)
+S(L2R53,1,#RimCustNo,#RimRepayBank)
+R(1,L2R53)
 
 ! 檢查該帳號是否授權 郵局檢查
 ! 4R22
@@ -1201,12 +1219,13 @@ S(L2R09,1,#RimTxCode,#RimBankCode)
 R(1,L2R09)
 T(2,@RepayBankX,#L2r09BankItem)
 
-#SendL2r01=X,1,S
-C(3,#UpdateCode,1,RESET_RIM(#SendL2r01,L2R01),$)
+#SendL2r01B=X,1,S
+IF(#FKEY==0 || #FKEY==7,$,s)
 E(0,@RimFuncCode,5)
-T(2,@RimProdNo,#L2r05ProdNo)
+T(2,@RimProdNo,#ProdNo)
 S(L2R01,1,#RimFuncCode,#RimTxCode,#RimProdNo)
 R(1,L2R01)
+T(2,@ProdNoX,#L2r01ProdName)
 
 #RcvL2r01A=X,1,S
 C(3,#FuncCode,2,$,S)
@@ -1564,9 +1583,10 @@ C(3,#UpdateCode,1,$,s)
 V(7)C(5,#ProdNo,#L2r05ProdNo,$,C(3,#L2r05UtilAmt,0,$,V(P,尚有放款餘額，不可變更商品代碼)))
 
 #SendL2r01A=X,1,S
-C(3,#UpdateCode,1,RESET_RIM(#SendL2r01A,L2R01),$)
+C(5,#RimProdNo,#ProdNo,s,$)
 E(0,@RimFuncCode,5)
 T(2,@RimProdNo,#ProdNo)
+RESET_RIM(#SendL2r01A,L2R01)
 S(L2R01,1,#RimFuncCode,#RimTxCode,#RimProdNo)
 R(1,L2R01)
 
@@ -1594,6 +1614,7 @@ T(2,@RimCurrencyCode,#L2r05CurrencyCode)
 T(2,@RimBaseRateCode,#BaseRateCode)
 E(0,@RimEffectDate,#EffectDate)
 E(0,@RimEffectTime,0)
+C(3,#BaseRateCode,#L2r05BaseRateCode,s,$)
 C(3,#UpdateCode,1,RESET_RIM(#SendL2r06B,L2R06),$)
 S(L2R06,1,#RimTxCode,#RimCurrencyCode,#RimBaseRateCode,#RimEffectDate,#RimEffectTime)
 R(1,L2R06)
@@ -2701,36 +2722,36 @@ T(H,@RelationGenderX,#RelationGender,#SexHelp)
 #OldRelationBirthday=D,7,S
 #OldRelationGender=X,1,S
 
-#SendL2r44=X,1,S
-IF(#FKEY==0 || #FKEY==7,$,s)
-C(3,#RepayCode,2,$,S)
-T(2,@RimCustNo,#CustNo)
-E(0,@RimFacmNo,#FacmNo)
-E(0,@RimFunCode,#FuncCode)
-RESET_RIM(#SendL2r44,L2R44)
-S(L2R44,1,#RimCustNo,#RimFacmNo,#RimFunCode)
-R(1,L2R44)
+! #SendL2r44=X,1,S
+! IF(#FKEY==0 || #FKEY==7,$,s)
+! C(3,#RepayCode,2,$,S)
+! T(2,@RimCustNo,#CustNo)
+! E(0,@RimFacmNo,#FacmNo)
+! E(0,@RimFunCode,#FuncCode)
+! RESET_RIM(#SendL2r44,L2R44)
+! S(L2R44,1,#RimCustNo,#RimFacmNo,#RimFunCode)
+! R(1,L2R44)
 
-#CHECKL2R44=X,1,S
-IF(#FKEY==0 || #FKEY==7,$,s)
-T(2,@RepayBank,#L2r44RepayBank)
-T(2,@OldRepayBank,#L2r44RepayBank)
-E(0,@RepayAcctNo,#L2r44RepayAcctNo)
-E(0,@OldAcctNo,#L2r44RepayAcctNo)
-T(2,@PostCode,#L2r44PostCode)
-T(2,@OldPostCode,#L2r44PostCode)
-!T(2,@AchAuthCode,#L2r44AchAuthCode)
-T(2,@RelationCode,#L2r44RelationCode)
-T(2,@OldRelationCode,#L2r44RelationCode)
-T(2,@RelationName,#L2r44RelationName)
-T(2,@OldRelationName,#L2r44RelationName)
-T(2,@RelationId,#L2r44RelationId)
-T(2,@OldRelationId,#L2r44RelationId)
-E(0,@RelationBirthday,#L2r44RelationBirthday)
-E(0,@OldRelationBirthday,#L2r44RelationBirthday)
-T(2,@RelationGender,#L2r44RelationGender)
-T(2,@OldRelationGender,#L2r44RelationGender)
-T(2,@MainStatus,#L2r44MainStatus)
+! #CHECKL2R44=X,1,S
+! IF(#FKEY==0 || #FKEY==7,$,s)
+! T(2,@RepayBank,#L2r44RepayBank)
+! T(2,@OldRepayBank,#L2r44RepayBank)
+! E(0,@RepayAcctNo,#L2r44RepayAcctNo)
+! E(0,@OldAcctNo,#L2r44RepayAcctNo)
+! T(2,@PostCode,#L2r44PostCode)
+! T(2,@OldPostCode,#L2r44PostCode)
+! !T(2,@AchAuthCode,#L2r44AchAuthCode)
+! T(2,@RelationCode,#L2r44RelationCode)
+! T(2,@OldRelationCode,#L2r44RelationCode)
+! T(2,@RelationName,#L2r44RelationName)
+! T(2,@OldRelationName,#L2r44RelationName)
+! T(2,@RelationId,#L2r44RelationId)
+! T(2,@OldRelationId,#L2r44RelationId)
+! E(0,@RelationBirthday,#L2r44RelationBirthday)
+! E(0,@OldRelationBirthday,#L2r44RelationBirthday)
+! T(2,@RelationGender,#L2r44RelationGender)
+! T(2,@OldRelationGender,#L2r44RelationGender)
+! T(2,@MainStatus,#L2r44MainStatus)
 
 ![繳款方式]
 !修改時自動顯示可修改,其他自動顯示不必須輸入
@@ -2796,13 +2817,7 @@ V(2,0)
 C(3,#UpdateCode,1,C(5,#RepayBank,700,T(3,@FdPostCode,*),T(3,@FdPostCode, )),$)
 
 #RimRepayBank=X,3,S
-#SendL2r53=X,1,S
-C(3,#RepayCode,2,$,S)
-T(2,@RimCustNo,#CustNo)
-T(2,@RimRepayBank,#RepayBank)
-RESET_RIM(#SendL2r53,L2R53)
-S(L2R53,1,#RimCustNo,#RimRepayBank)
-R(1,L2R53)
+
 
 #LbRepayBank=X,3,L
 C(3,#RepayCode,2,$,S)
@@ -2882,6 +2897,7 @@ T(H,#PostCode,#PostCodeHelp)
 ! 檢查該帳號是否授權 郵局檢查
 ! 4R22
 #SendL4R22A=X,1,S
+IF(#RimCustNo==#CustNo&&#RimAcctNo==#RepayAcctNo&&#RimBankNo==#RepayBank,s,$)
 C(3,#RepayCode,02,$,S)
 E(0,@RimCustNo,#CustNo)
 E(0,@RimAcctNo,#RepayAcctNo)
@@ -3113,7 +3129,7 @@ BIND(#BTN12,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF12B;ntxbuf5=type<-1:FireO
 #SendL2r08B=X,1,S
 C(4,#FireOfficer,S,$)
 T(2,@RimEmployeeNo,#FireOfficer)
-IF(#L2r05FireOfficer==#FireOfficer,T(3,@RimErrorSkip,Y),T(3,@RimErrorSkip,))
+IF(#L2r05FireOfficer==#FireOfficer,s,T(3,@RimErrorSkip,))
 C(3,#UpdateCode,1,RESET_RIM(#SendL2r08B,L2R08),$)
 S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
 R(1,L2R08)
@@ -3145,7 +3161,7 @@ BIND(#BTN13,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF13B;ntxbuf5=type<-1:Estim
 #SendL2r08C=X,1,S
 C(4,#Estimate,S,$)
 T(2,@RimEmployeeNo,#Estimate)
-IF(#L2r05Estimate==#Estimate,T(3,@RimErrorSkip,Y),T(3,@RimErrorSkip,))
+IF(#L2r05Estimate==#Estimate,s,T(3,@RimErrorSkip,))
 C(3,#UpdateCode,1,RESET_RIM(#SendL2r08C,L2R08),$)
 S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
 R(1,L2R08)
@@ -3178,7 +3194,7 @@ BIND(#BTN14,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF14B;ntxbuf5=type<-1:Credi
 #SendL2r08D=X,1,S
 C(4,#CreditOfficer,S,$)
 T(2,@RimEmployeeNo,#CreditOfficer)
-IF(#L2r05CreditOfficer==#CreditOfficer,T(3,@RimErrorSkip,Y),T(3,@RimErrorSkip,))
+IF(#L2r05CreditOfficer==#CreditOfficer,s,T(3,@RimErrorSkip,))
 C(3,#UpdateCode,1,RESET_RIM(#SendL2r08D,L2R08),$)
 S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
 R(1,L2R08)
@@ -3211,7 +3227,7 @@ BIND(#BTN16,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF16B;ntxbuf5=type<-1:Busin
 #SendL2r08F=X,1,S
 C(4,#BusinessOfficer,S,$)
 T(2,@RimEmployeeNo,#BusinessOfficer)
-IF(#L2r05BusinessOfficer==#BusinessOfficer,T(3,@RimErrorSkip,Y),T(3,@RimErrorSkip,))
+IF(#L2r05BusinessOfficer==#BusinessOfficer,s,T(3,@RimErrorSkip,))
 C(3,#UpdateCode,1,RESET_RIM(#SendL2r08F,L2R08),$)
 S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
 R(1,L2R08)
@@ -3261,7 +3277,7 @@ BIND(#BTN17,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF17B;ntxbuf5=type<-1:Super
 #SendL2r08G=X,1,S
 C(4,#Supervisor,S,$)
 T(2,@RimEmployeeNo,#Supervisor)
-IF(#L2r05Supervisor==#Supervisor,T(3,@RimErrorSkip,Y),T(3,@RimErrorSkip,))
+IF(#L2r05Supervisor==#Supervisor,s,T(3,@RimErrorSkip,))
 C(3,#UpdateCode,1,RESET_RIM(#SendL2r08G,L2R08),$)
 S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
 R(1,L2R08)
@@ -3292,7 +3308,7 @@ BIND(#BTN19,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF19B;ntxbuf5=type<-1:Inves
 #SendL2r08H=X,1,S
 C(4,#InvestigateOfficer,S,$)
 T(2,@RimEmployeeNo,#InvestigateOfficer)
-IF(#L2r05InvestigateOfficer==#InvestigateOfficer,T(3,@RimErrorSkip,Y),T(3,@RimErrorSkip,))
+IF(#L2r05InvestigateOfficer==#InvestigateOfficer,s,T(3,@RimErrorSkip,))
 C(3,#UpdateCode,1,RESET_RIM(#SendL2r08H,L2R08),$)
 S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
 R(1,L2R08)
@@ -3323,7 +3339,7 @@ BIND(#BTN20,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF20B;ntxbuf5=type<-1:Estim
 #SendL2r08I=X,1,S
 C(4,#EstimateReview,S,$)
 T(2,@RimEmployeeNo,#EstimateReview)
-IF(#L2r05EstimateReview==#EstimateReview,T(3,@RimErrorSkip,Y),T(3,@RimErrorSkip,))
+IF(#L2r05EstimateReview==#EstimateReview,s,T(3,@RimErrorSkip,))
 C(3,#UpdateCode,1,RESET_RIM(#SendL2r08I,L2R08),$)
 S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
 R(1,L2R08)
@@ -3355,7 +3371,7 @@ BIND(#BTN21,click, {cmd=CHAIN; ntxcd=L5022; ntxbuf=#BUF21B;ntxbuf5=type<-1:Coorg
 C(4,#Coorgnizer,S,$)
 T(2,@RimEmployeeNo,#Coorgnizer)
 E(0,@RimFunCd,#FuncCode)
-IF(#L2r05Coorgnizer==#Coorgnizer,E(0,@RimFunCd,5),E(0,@RimFunCd,#FuncCode))
+IF(#L2r05Coorgnizer==#Coorgnizer,s,E(0,@RimFunCd,#FuncCode))
 C(3,#UpdateCode,1,RESET_RIM(#SendL2r13J,L2R13),$)
 S(L2R13,1,#RimFunCd,#RimEmployeeNo)
 R(1,L2R13)
@@ -3633,7 +3649,7 @@ C(5,#BreachFlag,#L2r05BreachFlag
 ,C(5,#BreachPercent,#L2r05BreachPercent
 ,C(5,#BreachDecreaseMonth,#L2r05BreachDecreaseMonth
 ,C(5,#BreachDecrease,#L2r05BreachDecrease
-,C(5,#BreachStartPercent,#L2r05BreachStartPercent,S,$),$),$),$),$),$),$),$)
+,C(5,#BreachStartPercent,#L2r05BreachStartPercent,s,$),$),$),$),$),$),$),$)
 RESET_RIM(#RcvL2r56B,L2R56)
 S(L2R56,1,#BreachFlag,#BreachCode,#ProhibitMonth,#BreachGetCode,#BreachPercent,#BreachDecreaseMonth,#BreachDecrease,#BreachStartPercent)
 R(1,L2R56)
@@ -3786,19 +3802,19 @@ C(3,#Hide8Fg,0,CALL(#HideP8),$)
 #INVK8=X,1,S
 C(3,#Hide9Fg,0,CALL(#HideP9),$)
 
-#SendL2r11=X,1,S
-C(3,#UpdateCode,1,RESET_RIM(#SendL2r11,L2R11),$)
-E(0,@RimApplNo,#L2r05ApplNo)
-S(L2R11,1,#RimTxCode,#RimApplNo)
-R(1,L2R11)
-##loop{times:20,n:1}
-T(2,@ClKey{n},#L2r11ClKey{n})
-E(0,@ClApplNo{n},#L2r11ApplNo{n})
-E(0,@ClClTypeCode{n},#L2r11ClTypeCode{n})
-T(2,@ClMainFlag{n},#L2r11MainFlag{n})
-E(0,@EvaAmt{n},#L2r11EvaAmt{n})
-T(2,@ClBdLocation{n},#L2r11BdLocation{n})
-##end
+! #SendL2r11=X,1,S
+! C(3,#UpdateCode,1,RESET_RIM(#SendL2r11,L2R11),$)
+! E(0,@RimApplNo,#L2r05ApplNo)
+! S(L2R11,1,#RimTxCode,#RimApplNo)
+! R(1,L2R11)
+! ##loop{times:20,n:1}
+! T(2,@ClKey{n},#L2r11ClKey{n})
+! E(0,@ClApplNo{n},#L2r11ApplNo{n})
+! E(0,@ClClTypeCode{n},#L2r11ClTypeCode{n})
+! T(2,@ClMainFlag{n},#L2r11MainFlag{n})
+! E(0,@EvaAmt{n},#L2r11EvaAmt{n})
+! T(2,@ClBdLocation{n},#L2r11BdLocation{n})
+! ##end
 
 ##loop{times:20,n:1}
 

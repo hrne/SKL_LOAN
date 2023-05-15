@@ -227,6 +227,12 @@
 					<tasklet ref="LM047" />
 				</step>
 			</flow>
+				<!-- Step: LM048 企業放款風險承擔限額控管表 -->
+			<flow>
+				<step id="sLM048Batch" parent="parentStep">
+					<tasklet ref="LM048Batch" />
+				</step>
+			</flow>
 			<!-- Step: LM049 放款金控法第44條利害關係人放款餘額表_限額控管 -->
 			<flow>
 				<step id="sLM049" parent="parentStep">

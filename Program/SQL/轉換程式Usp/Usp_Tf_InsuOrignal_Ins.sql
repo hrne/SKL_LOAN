@@ -150,9 +150,9 @@ BEGIN
         -- AND NVL(CNM."ClNo",0) > 0 -- 擔保品存在
         -- AND NVL(INSP."INSIID",' ') != ' '
         -- AND NVL(NOW_INSUNO.INSNUM2,' ') = ' '
-      GROUP BY CNM."ClCode1"
-            , CNM."ClCode2"
-            , CNM."ClNo"
+      GROUP BY NVL(CNM."ClCode1", INSP.GDRID1)
+            , NVL(CNM."ClCode2", INSP.GDRID2)
+            , NVL(CNM."ClNo", INSP.GDRNUM)
             , TRIM(INSP."INSNUM")
             , NVL(TRIM(FR1P."INSNUM"),' ')
     )

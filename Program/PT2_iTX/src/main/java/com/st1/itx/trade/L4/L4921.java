@@ -154,18 +154,6 @@ public class L4921 extends TradeBuffer {
 			for (BatxOthers tBatxOthersVO : lBatxOthers) {
 				OccursList occursList = new OccursList();
 
-				BatxDetail tBatxDetail = new BatxDetail();
-				BatxDetailId tBatxDetailId = new BatxDetailId();
-
-				tBatxDetailId.setAcDate(tBatxOthersVO.getAcDate());
-				tBatxDetailId.setBatchNo(tBatxOthersVO.getBatchNo());
-				tBatxDetailId.setDetailSeq(tBatxOthersVO.getDetailSeq());
-
-				tBatxDetail = batxDetailService.findById(tBatxDetailId, titaVo);
-				if (tBatxDetail == null) {
-					continue;
-				}
-
 				// 大額增入帳:若整批入帳檔的大額手工增入帳與匯款轉帳連結序號有值則顯示<匯款>按鈕，連結L4201查詢
 				// RepayCode11Chain
 				TempVo tTempVo = new TempVo();
@@ -174,14 +162,22 @@ public class L4921 extends TradeBuffer {
 				int chainDetailSeq = 0;
 				String chainFlag = "N";
 				if (tBatxOthersVO.getRepayCode() == 11) {
-					tTempVo = tTempVo.getVo(tBatxDetail.getProcNote());
-					if ((!"".equals(tTempVo.getParam("RepayCode11Chain")))) {
-						String[] thisColumn = tTempVo.getParam("RepayCode11Chain").split("-");
-						chainAcDate = parse.stringToInteger(thisColumn[0]) - 19110000;
-						chainBatchNo = thisColumn[1];
-						chainDetailSeq = parse.stringToInteger(thisColumn[2]);
-						this.info("RepayCode11Chain = " + tTempVo.getParam("RepayCode11Chain"));
-						chainFlag = "Y";
+					BatxDetail tBatxDetail = new BatxDetail();
+					BatxDetailId tBatxDetailId = new BatxDetailId();
+					tBatxDetailId.setAcDate(tBatxOthersVO.getAcDate());
+					tBatxDetailId.setBatchNo(tBatxOthersVO.getBatchNo());
+					tBatxDetailId.setDetailSeq(tBatxOthersVO.getDetailSeq());
+					tBatxDetail = batxDetailService.findById(tBatxDetailId, titaVo);
+					if (tBatxDetail != null) {
+						tTempVo = tTempVo.getVo(tBatxDetail.getProcNote());
+						if ((!"".equals(tTempVo.getParam("RepayCode11Chain")))) {
+							String[] thisColumn = tTempVo.getParam("RepayCode11Chain").split("-");
+							chainAcDate = parse.stringToInteger(thisColumn[0]) - 19110000;
+							chainBatchNo = thisColumn[1];
+							chainDetailSeq = parse.stringToInteger(thisColumn[2]);
+							this.info("RepayCode11Chain = " + tTempVo.getParam("RepayCode11Chain"));
+							chainFlag = "Y";
+						}
 					}
 				}
 

@@ -141,14 +141,12 @@ public class L9711Report extends MakeReport {
 				.setRptItem(reportItem).setRptSize(pageSize).setPageOrientation(pageOrientation).build();
 		this.open(titaVo, reportVo);
 
-		
 		// 書面列印通知書客戶
 		List<Map<String, String>> isLetterList = new ArrayList<Map<String, String>>();
 		// 書面不列印通知書客戶
 		List<Map<String, String>> isNotLetterList = new ArrayList<Map<String, String>>();
-		
-		if (l9711List.size() > 0) {
 
+		if (l9711List.size() > 0) {
 
 			// 先找初以申請不列印書面通知書之客戶
 			for (Map<String, String> r : l9711List) {
@@ -166,11 +164,15 @@ public class L9711Report extends MakeReport {
 				}
 
 			}
-			
-			
-			// 計算筆數
-			int count = 0;
-			
+		} else {
+
+			this.print(1, startPos, "本日無資料");
+
+		}
+
+		// 計算筆數
+		int count = 0;
+		if (isLetterList.size() > 0) {
 			// 書面列印通知書客戶
 			for (Map<String, String> tL9711Vo : isLetterList) {
 				count++;
@@ -182,11 +184,16 @@ public class L9711Report extends MakeReport {
 					newPage();
 				}
 			}
-			
+
+		} else {
+			this.print(1, startPos, "本日無資料");
+		}
+
+		isLetterNoticeFlag = false;
+		newPage();
+		count = 0;
+		if (isNotLetterList.size() > 0) {
 			// 書面不列印通知書客戶
-			isLetterNoticeFlag = false;
-			newPage();
-			count = 0;
 			for (Map<String, String> tL9711Vo : isNotLetterList) {
 				count++;
 				printData(tL9711Vo);
@@ -197,13 +204,9 @@ public class L9711Report extends MakeReport {
 					newPage();
 				}
 			}
-
 		} else {
-
 			this.print(1, startPos, "本日無資料");
-
 		}
-
 		long sno = this.close();
 
 		this.toPdf(sno);

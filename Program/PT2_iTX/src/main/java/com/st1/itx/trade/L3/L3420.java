@@ -1589,6 +1589,8 @@ public class L3420 extends TradeBuffer {
 			tFacClose.setFacmNo(iFacmNo);
 			tFacClose.setApplDate(0);// 申請日期自動寫入時為0
 			tFacClose.setFunCode("0");
+			tFacClose.setCollectFlag("N"); // 5/12郁宏:一律不領,經辦會進交易維護
+			tFacClose.setCollectWayCode("02");// 5/12郁宏:一律不領,經辦會進交易維護
 			tFacClose.setCloseDate(iEntryDate);
 			tFacClose.setEntryDate(iEntryDate);
 			tFacClose.setCloseReasonCode(iAdvanceCloseCode);

@@ -35,27 +35,6 @@ BEGIN
       , "LastUpdate" -- 最後更新日期時間 DATE  
       , "LastUpdateEmpNo" -- 最後更新人員 VARCHAR2 6 
     )
-    WITH lastData AS (
-      SELECT LMSACN
-           , TRXDAT
-           , MAX(DOCSEQ) AS "MaxDOCSEQ"
-      FROM DAT_LNDOCP
-      WHERE TRXDAT IN (
-        20150309
-        , 20011026
-        , 20160317
-        , 20140506
-        , 20121003
-        , 20210616
-        , 20170913
-        , 20141113
-        , 20111012
-        , 20090930
-        , 20041130
-      )
-      GROUP BY LMSACN
-             , TRXDAT
-    )
     SELECT S1."LMSACN"                    AS "CustNo"              -- 借款人戶號 DECIMAL 7 
          , CASE S1."TRXDAT"
              WHEN 50150309 THEN 20150309
@@ -70,7 +49,24 @@ BEGIN
              WHEN 28990930 THEN 20090930
              WHEN 25191130 THEN 20041130
            ELSE S1."TRXDAT" END           AS "AcDate"              -- 會計日期 DECIMALD 8
-         , S1."DOCSEQ"                    AS "RmkNo"               -- 備忘錄序號 DECIMAL 3 
+         , ROW_NUMBER()
+           OVER (
+            PARTITION BY S1.LMSACN
+                       , CASE S1."TRXDAT"
+                           WHEN 50150309 THEN 20150309
+                           WHEN 39121026 THEN 20011026
+                           WHEN 30160317 THEN 20160317
+                           WHEN 30140506 THEN 20140506
+                           WHEN 30121003 THEN 20121003
+                           WHEN 30110616 THEN 20210616
+                           WHEN 29710913 THEN 20170913
+                           WHEN 29411113 THEN 20141113
+                           WHEN 29111012 THEN 20111012
+                           WHEN 28990930 THEN 20090930
+                           WHEN 25191130 THEN 20041130
+                         ELSE S1."TRXDAT" END
+            ORDER BY S1.DOCSEQ 
+           )                              AS "RmkNo"               -- 備忘錄序號 DECIMAL 3 
          , ''                             AS "RmkCode"             -- 備忘錄代碼 VARCHAR2 3
          , S1."DOCTXT"                    AS "RmkDesc"             -- 備忘錄說明 NVARCHAR2 120 
          , CASE

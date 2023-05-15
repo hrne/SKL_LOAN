@@ -152,7 +152,7 @@ T(3,1)ASGN(LOOP$)
 #OOHoliday=D,7,S
 
 ! 假日型態(TOTA)
-#OOTypeCode=N,1,S
+#OOTypeCode=X,1,S
 
 ! 最後修改時間(TOTA)
 #OOLastUpdate=X,18,L

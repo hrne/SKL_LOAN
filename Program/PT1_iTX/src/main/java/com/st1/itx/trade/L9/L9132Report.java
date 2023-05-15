@@ -300,7 +300,7 @@ public class L9132Report extends MakeReport {
 				// 區隔帳冊
 				print(0, 67, acSubBookItem, "C");
 				// 戶號
-				print(0, 82, custNo + " " + facmNo);
+				print(0, 79, custNo + " " + facmNo);
 				// 貸方金額
 				print(0, 118, formatAmt(dbAmt, 0), "R");
 				// 貸方金額

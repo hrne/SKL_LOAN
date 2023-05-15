@@ -14,9 +14,9 @@ import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
 
 /**
- * LM048 企業放款風險承擔限額控管表
  * 
- * @author Chih Wei Huang
+ * 
+ * @author ChihWei
  * @version 1.0.0
  */
 @Service("LM048p")
@@ -32,21 +32,26 @@ public class LM048p extends TradeBuffer {
 	@Autowired
 	DateUtil dDateUtil;
 
+	String txcd = "LM048";
+	String txName = "企業放款風險承擔限額控管表";
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("active LM048p ");
+		this.info("active" + txcd + "p");
 		this.totaVo.init(titaVo);
 
-		this.info("LM048p titaVo.getTxcd() = " + titaVo.getTxcd());
+		this.info(txcd + "p titaVo.getTxcd() = " + titaVo.getTxcd());
 		String parentTranCode = titaVo.getTxcd();
 
 		lM048Report.setParentTranCode(parentTranCode);
 
 		lM048Report.exec(titaVo);
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "LM049企業放款風險承擔限額控管表", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+				txcd + txName + "已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
+
 }

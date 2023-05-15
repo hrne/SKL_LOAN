@@ -135,14 +135,11 @@ public class L9710Report extends MakeReport {
 		// 記錄筆數
 		int count = 0;
 
-		String tempCity = "";
-
+		// 有申請書面列印通知書客戶
+		List<Map<String, String>> isLetterList = new ArrayList<Map<String, String>>();
+		// 有申請書面不列印通知書客戶
+		List<Map<String, String>> isNotLetterList = new ArrayList<Map<String, String>>();
 		if (l9710List != null && l9710List.size() != 0) {
-
-			// 有申請書面列印通知書客戶
-			List<Map<String, String>> isLetterList = new ArrayList<Map<String, String>>();
-			// 有申請書面不列印通知書客戶
-			List<Map<String, String>> isNotLetterList = new ArrayList<Map<String, String>>();
 
 			// 先找初以申請不列印書面通知書之客戶
 			for (Map<String, String> r : l9710List) {
@@ -160,7 +157,9 @@ public class L9710Report extends MakeReport {
 				}
 
 			}
-
+		}
+		if (isLetterList.size() > 0) {
+			String tempCity = "";
 			// 輸出Excel
 			// 有列印書面通知客戶
 			for (Map<String, String> tL9710Vo : isLetterList) {
@@ -198,11 +197,19 @@ public class L9710Report extends MakeReport {
 				reportTot(tempCity);
 			}
 
-			isLetterNoticeFlag = false;
-			newPage();
+		} else {
+			this.print(1, 1, "本日無資料");
+		}
 
-			// 記錄筆數
-			count = 0;
+		isLetterNoticeFlag = false;
+		newPage();
+
+		// 記錄筆數
+		count = 0;
+		cnt = 0;
+		amt = 0;
+		if (isNotLetterList.size() > 0) {
+			String tempCity = "";
 			// 不列印書面通知客戶
 			for (Map<String, String> tL9710Vo : isNotLetterList) {
 

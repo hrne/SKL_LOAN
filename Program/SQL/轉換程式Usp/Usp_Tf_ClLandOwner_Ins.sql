@@ -45,7 +45,8 @@ BEGIN
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
-    FROM (SELECT S0."ClCode1"
+    FROM (SELECT DISTINCT
+                 S0."ClCode1"
                 ,S0."ClCode2"
                 ,S0."ClNo"
                 ,S0."LandSeq"
@@ -57,19 +58,21 @@ BEGIN
           LEFT JOIN "LA$LGTP" S2 ON S2."GDRID1" = S1."GDRID1"
                                 AND S2."GDRID2" = S1."GDRID2"
                                 AND S2."GDRNUM" = S1."GDRNUM"
-                                AND LPAD(REPLACE(TRIM(S2."LGTNM1"),'-',''),4,'0') = S0."LandNo1"
-                                AND LPAD(REPLACE(TRIM(S2."LGTNM2"),'-',''),4,'0') = S0."LandNo2"
-          WHERE NVL(S2."LGTCIF",0) > 0
-          GROUP BY  S0."ClCode1"
-                   ,S0."ClCode2"
-                   ,S0."ClNo"
-                   ,S0."LandSeq"
-                   ,NVL(S2."LGTCIF",0)
+                                AND CASE
+                                      WHEN S0."ClCode1" = 1 -- 若為房地擔保品 只抓原擔保品的擔保品提供人
+                                           AND S2."LGTSEQ" = S1."LGTSEQ"
+                                      THEN 1
+                                      WHEN S0."ClCode1" = 2 -- 若為土地擔保品 抓原擔保品中相同地號的所有擔保品提供人
+                                           AND LPAD(REPLACE(TRIM(S2.LGTNM1),'-',''),4,'0') = S0."LandNo1"
+                                           AND LPAD(REPLACE(TRIM(S2.LGTNM2),'-',''),4,'0') = S0."LandNo2"
+                                      THEN 1
+                                    ELSE 0 END = 1
+          WHERE NVL(S2."LGTCIF",0) != 0
          ) LG
     LEFT JOIN "CU$CUSP" CU ON CU."CUSCIF" = LG."LGTCIF"
     LEFT JOIN "CustMain" CM ON TRIM(CM."CustId") = TRIM(CU."CUSID1")
     WHERE NVL(CU."CUSCIF",0) > 0
-      AND NVL(CM."CustId",' ') <> ' ' 
+      AND NVL(CM."CustId",' ') != ' ' 
     ;
     -- 記錄寫入筆數
     INS_CNT := INS_CNT + sql%rowcount;

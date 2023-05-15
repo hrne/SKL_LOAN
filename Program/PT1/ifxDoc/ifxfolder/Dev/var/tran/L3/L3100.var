@@ -27,9 +27,6 @@ E(0,1)
 #CRDB=_,_,S
 E(0,1)
 
-
-
-
 </sub>
 
 <sub type="DC" name="BFHEAD">
@@ -233,7 +230,7 @@ T(3,1:登錄;2:放行)
 !#FKEY 0:登錄,1:更正,2:放行,3:審核/在途登錄,5:更正重登,6:在途設定,7修改,9檢視journal!
 #INVKALL=X,1,S
 K(MODIFYBUTTON,登錄)
-IF(#FKEY==0 || #FKEY==7,INVOKEJS(SHOW,p1,1)INVOKEJS(SHOW,p1,#P2SH,#P6E,0),HIDE(#BTN1,#BTN2,#BTN3,#BTN4))
+IF(#FKEY==0 || #FKEY==7,INVOKEJS(SHOW,p1,1)INVOKEJS(SHOW,p1,#P2SH,#P6E,0),HIDE(#BTN2,#BTN3,#BTN4))
 IF(#FKEY==1,INVOKEJS(SHOW,p1,1)INVOKEJS(SHOW,p1,#P2SH,#P6E,1),$)
 IF(#FKEY==2,INVOKEJS(SHOW,p1,1)INVOKEJS(SHOW,p1,#P2SH,#P6E,1),$)
 C(3,#FKEY,2,T(H,@ACTFGX,#ACTFG,#ActFgHelp),$)
@@ -250,7 +247,7 @@ C(3,#IsRv,1,E(0,#DrawdownDate)ASGN(SPANDY$),E(0,0)ASGN(SPANDY$),$)
 [
 ["[L3100]                                 撥款"],
 [#<->#,"#FdACTFG+登放記號",#ACTFGX],
-[#<->#,"#FdCustNo+借戶戶號",#CustNo,"@@@",#BTN1,#CustName],
+[#<->#,"#FdCustNo+借戶戶號",#CustNo,"@@@",#CustName],
 [#<->#,"#FdCustId+統一編號",#CustId,"@",#BTN2],
 [#<->#,"#FdApplNo+核准編號",#ApplNo,"@@@",#BTN3],
 ["#FdFacmNo+額度編號",#FacmNo,"@@@@@@@",#BTN4],
@@ -259,7 +256,7 @@ C(3,#IsRv,1,E(0,#DrawdownDate)ASGN(SPANDY$),E(0,0)ASGN(SPANDY$),$)
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
-#BTN1=X,15,I,ui:button;value:額度資料明細;enable:1;tabbable:0;title:L2015 額度明細資料查詢;
+! #BTN1=X,15,I,ui:button;value:額度資料明細;enable:1;tabbable:0;title:L2015 額度明細資料查詢;
 #BTN2=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0;title: L1001 顧客明細資料查詢;
 #BTN3=X,15,I,ui:button;value:核准號碼明細;enable:1;tabbable:0;title:L2016 核准號碼明細資料查詢;
 #BTN4=X,15,I,ui:button;value:放款資料查詢;enable:1;tabbable:0;title:L3001 放款明細資料查詢
@@ -275,7 +272,7 @@ C(3,#IsRv,1,E(0,#DrawdownDate)ASGN(SPANDY$),E(0,0)ASGN(SPANDY$),$)
 
 #WKHIDE=X,1,S
 HIDE(#Wait,#Wait2,#Wait3)
-IF(#FKEY==0 || #FKEY==7,SHOW(#BTN1)HIDE(#BTN2,#BTN3,#BTN4),$)
+IF(#FKEY==0 || #FKEY==7,HIDE(#BTN2,#BTN3,#BTN4),$)
 !---------- AP TEXT AREA Variables ----------
 ! Help
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
@@ -515,12 +512,6 @@ T(2,@FdPieceCode,#WkStar)
 T(2,@FdUsageCode, )
 T(2,@FdSyndNo, )
 
-#BUF1A=X,18,S
-T(3,00000019999999000)
-
-#BIND1A=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:CustNo<-OOCustNo:FacmNo<-OOFacmNo:CustName<-OOCustName})
-
 ![借戶戶號]
 !借戶戶號, 統一編號或核准編號擇一輸入
 #FdCustNo=X,2,L
@@ -529,9 +520,9 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:CustNo<
 CALL(#CLOSEALL)
 C(3,#HIDE2FG,1,CALL(#HIDEP2),$)
 C(3,#FKEY,0,$,s)
-SHOW(#BTN1)HIDE(#BTN2,#BTN3)
+HIDE(#BTN2,#BTN3)
 T(2,@FdApplNo, )
-@HIDE(#BTN1)
+@
 
 
 #CustNo2=A,7,S
@@ -539,13 +530,6 @@ C(4,#CustNo,S,$)
 E(0,#CustNo)
 T(2,@CustNo,#CustNo2)
 
-
-#BUF1B=X,18,S
-C(4,#CustNo,T(3,00000019999999000),T(2,#CustNo+#CustNo+000))
-
-
-#BIND1B=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:CustNo<-OOCustNo:FacmNo<-OOFacmNo:CustName<-OOCustName})
 
 #WKIDNO=X,10,S
 T(3,@CustName,)
@@ -577,7 +561,7 @@ BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<
 #CustId=X,10,I
 CALL(#CLOSEALL)
 C(3,#FKEY,0,$,s)
-SHOW(#BTN2)HIDE(#BTN1,#BTN3)
+SHOW(#BTN2)HIDE(#BTN3)
 T(2,@FdApplNo, )
 @C(4,#CustId,S,$)
 V(7)
@@ -600,14 +584,13 @@ C(4,#CustId,HIDE(#BTN2),SHOW(#BTN2))
 IF(#FKEY==0||#FKEY==7,$,s)
 C(4,#CustId,S,$)
 T(2,@RimCustId,#CustId)
-E(0,@RimCustNo,#CustNo)
+E(0,@RimCustNo,0)
 RESET_RIM(#SendL2r07B,L2R07)
 S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
 R(1,L2R07)
 T(2,@CustName,#L2r07CustName)
 T(2,@CustNo,#L2r07CustNo)
 T(2,@ApplNo,)
-
 
 #BUF3A=X,18,S
 T(3,000000199999990)
@@ -625,7 +608,7 @@ T(2,#WkStar)
 #ApplNo=X,7,I
 CALL(#CLOSEALL)
 C(3,#FKEY,0,$,s)
-SHOW(#BTN3)HIDE(#BTN2,#BTN1)
+SHOW(#BTN3)HIDE(#BTN2)
 @
 C(3,#CustNo,0,C(4,#ApplNo,V(P,需擇一輸入),T(3,#CustName,)),$)
 
@@ -651,7 +634,7 @@ BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3B;ntxbuf5=type<-1:ApplNo<
 IF(#FKEY==0 || #FKEY==7,$,s)
 C(4,#ApplNo,S,$)
 E(0,@RimFuncCode,5)
-E(0,@RimCustNo,#CustNo)
+E(0,@RimCustNo,0)
 E(0,@RimFacmNo,0)
 E(0,@RimApplNo,#ApplNo)
 E(0,@RimCaseNo,0)
@@ -695,8 +678,8 @@ T(2,#CustName)
 
 #WkFacmNo=A,3,S
 
-#BUF4A=X,34,S
-T(2,#WkCaseNo+#CustNo+#CustId+#ApplNo+#WkFacmNo)
+#BUF4A=X,39,S
+T(2,#WkCaseNo+#CustNo+#CustId+#ApplNo+#WkFacmNo+L3100)
 
 #BIND4A=X,1,S
 BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L3001; ntxbuf=#BUF4A;ntxbuf5=type<-1:FacmNo<-OOFacmNo})

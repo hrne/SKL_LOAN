@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -34,7 +32,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2632 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2632.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -99,7 +96,6 @@ public class L2632 extends TradeBuffer {
 			tFacClose.setCloseReasonCode(titaVo.getParam("CloseReasonCode"));
 			tFacClose.setCloseAmt(parse.stringToBigDecimal(titaVo.getParam("TimCloseAmt")));
 			tFacClose.setCollectWayCode(titaVo.getParam("CollectWayCode"));
-			tFacClose.setReceiveDate(parse.stringToInteger(titaVo.getParam("ReceiveDate")));
 			tFacClose.setAgreeNo(titaVo.getParam("AgreeNo"));
 			tFacClose.setDocNo(parse.stringToInteger(titaVo.getParam("DocNo")));
 			tFacClose.setClsNo(titaVo.getParam("ClsNo"));
@@ -122,7 +118,7 @@ public class L2632 extends TradeBuffer {
 		} else if (iFunCd == 4) {
 
 			FacClose tFacClose4 = sFacCloseService.holdById(FacCloseId);
-			logger.info(" L2632 tFacClose4" + tFacClose4);
+			this.info(" L2632 tFacClose4" + tFacClose4);
 			if (tFacClose4 == null) {
 				throw new LogicException(titaVo, "E0004", "戶號= " + iCustNo + " 清償序號 =" + iCloseNo); // 刪除資料不存在
 			}

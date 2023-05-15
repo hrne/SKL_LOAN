@@ -79,13 +79,14 @@ T(4,CHAIN$)
 T(2,@RimTxCode,#TXCD) 
 E(0,@RimFKey,#FKEY)
 
-#NTXBUF=X,34,S
+#NTXBUF=X,39,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 C(4,#NTXBUF,E(0,@CHAIN,0),$)
 C(4,#NTXBUF,S,$)
 C(3,#CHAIN,1,T(1,@ChainCustNo,#NTXBUF,8,7),$)
 C(3,#CHAIN,1,T(1,@ChainApplNo,#NTXBUF,25,7),$)
 C(3,#CHAIN,1,T(1,@ChainCaseNo,#NTXBUF,1,7),$)
+C(3,#CHAIN,1,T(1,@ChainTranNo,#NTXBUF,35,5),$)
 
 #ChainCustNo=A,7,S
 
@@ -93,6 +94,7 @@ C(3,#CHAIN,1,T(1,@ChainCaseNo,#NTXBUF,1,7),$)
 
 #ChainCaseNo=A,7,S
 
+#ChainTranNo=X,5,S
 
 
 
@@ -343,6 +345,7 @@ C(3,#FacmNo,0,T(2,#TimCustNo),T(2,#TimCustNo+-+#FacmNo))
 #RPTFG2=A,1,S
 C(3,#RPTFG,0,$,S)
 C(4,#NTXBUF5,T(3,1),T(3,2))
+C(4,#ChainTranNo,$,C(5,#ChainTranNo,L3100,E(0,3),$))
 
 
 #CHAINXMT=X,1,S
@@ -735,6 +738,58 @@ TXFORM=L3001
 
 #OOTavAmt14=暫收可抵繳
 {width:100}
+
+#OOTamAmtX=
+{width:100}
+
+
+
+^
+
+#RPTFG2=3,QUERY.GRID,L3001
+#any={detail:true, header:'L3001.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
+
+#OOBTN1=額度
+{width:40,search:false,formatter:'cust:bind-button:額度;L2154 額度資料維護',align:'center',canExport:false}
+
+#OOBTN2=撥款
+{width:40,search:false,formatter:'cust:bind-button:撥款;L3002 撥款明細資料查詢',align:'center',canExport:false}
+
+#OOBTN9=利率
+{width:40,search:false,formatter:'cust:bind-button:利率;L3932 借戶利率查詢',align:'center',canExport:false}
+
+#OOCaseNo=案件編號
+{width:80,align:'center'}
+
+#OOFacmNo=額度 
+{width:55,align:'center'}
+
+#OOApplNo=核准號碼 
+{width:80,align:'center'}
+
+#OODeadline=動支期限</br>循環止日 
+{width:90,align:'center'}
+
+#OOCurrencyCode=幣別 
+{width:55,align:'center'}
+
+#OOLineAmt14=核准額度
+{width:100,sum:true}
+
+#OOUtilAmt14=目前餘額
+{width:100,sum:true}
+
+#OOUtilBal14=已動用</br>額度餘額
+{width:100,sum:true}
+
+#OOAvailable14=可用額度
+{width:100,sum:true}
+
+#OOTavAmt14=暫收可抵繳
+{width:100}
+
+#OOBTN11=額度</br>擔保品
+{width:100,search:false,formatter:'cust:bind-button:;L2017 額度與擔保品關聯查詢',align:'center',canExport:false}
 
 #OOTamAmtX=
 {width:100}

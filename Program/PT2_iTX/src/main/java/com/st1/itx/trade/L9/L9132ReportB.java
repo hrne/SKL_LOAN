@@ -140,7 +140,7 @@ public class L9132ReportB extends MakeReport {
 				print(0, 85, acSubBookItem);
 				print(0, 115, formatAmt(dbAmt, 0), "R");
 				print(0, 133, formatAmt(crAmt, 0), "R");
-				print(0, 143, custNo + " " + facmNo, "R");
+				print(0, 135, custNo + " " + facmNo, "L");
 				print(0, 150, custName);
 				print(0, 160, empName);
 

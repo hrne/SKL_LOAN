@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -50,7 +49,7 @@ public class LM048Report extends MakeReport {
 	private BigDecimal entLoanBal = BigDecimal.ZERO;
 	private BigDecimal abLoanBal = BigDecimal.ZERO;
 
-	private final BigDecimal thousand = getBigDecimal("1000");
+	private BigDecimal thousand = BigDecimal.ZERO;
 
 	private void classifyData(List<Map<String, String>> listLM048) {
 
@@ -149,6 +148,9 @@ public class LM048Report extends MakeReport {
 	}
 
 	public void exec(TitaVo titaVo) throws LogicException {
+
+		thousand = new BigDecimal("1000");
+
 		List<Map<String, String>> listLM048 = null;
 		List<Map<String, String>> listLoanBalQuery = null;
 
@@ -216,7 +218,7 @@ public class LM048Report extends MakeReport {
 				.setRptItem(fileItem).build();
 		// 開啟報表
 		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
-		
+
 //		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM048", "企業放款風險承擔限額控管表", "LM048企業放款風險承擔限額控管表",
 //				"LM048_底稿_企業放款風險承擔限額控管表.xlsx", "明細總表108.04");
 

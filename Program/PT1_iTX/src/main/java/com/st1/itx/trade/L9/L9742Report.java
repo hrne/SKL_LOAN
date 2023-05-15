@@ -227,11 +227,14 @@ public class L9742Report extends MakeReport {
 				// 手續費不需要計算期間
 				if (option == 3) {
 					this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
+					this.print(0, 34, showDate(rowL9742.get("F11").toString(), 1) + " - "
+							+ showDate(rowL9742.get("F12").toString(), 1));
+
 				} else {
 					this.print(1, 1, "│　　　　　　　　　　│　計算期間：　　　　　　　　　　　　│　　　　　　　　　│");
+					this.print(0, 34, showDate(rowL9742.get("F11").toString(), 1) + " - "
+							+ showDate(rowL9742.get("F12").toString(), 1));
 				}
-				this.print(0, 34, showDate(rowL9742.get("F11").toString(), 1) + " - "
-						+ showDate(rowL9742.get("F12").toString(), 1));
 				this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
 				this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
 				this.print(1, 1, "└──────────┴──────────────────┴─────────┘");
