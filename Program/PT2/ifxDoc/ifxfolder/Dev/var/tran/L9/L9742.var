@@ -80,14 +80,17 @@ A(DATE,0,#inputAcDate)
 V(5,0,#SYSDATE)
 
 #inputTitaTlrNo=X,6,I
+C(5,#FunctionCode,1,$,s)
 !@C(4,#inputTitaTlrNo,T(F,@inputTitaTxtNo,0),T(F,@inputTitaTxtNo,1))
 !C(4,#inputTitaTlrNo,E(0,@inputTitaTxtNo,00000000)E(0,@inputTitaTxtNoEnd,99999999),$)
 
 #inputTitaTxtNoStart=A,8,I
+C(5,#FunctionCode,1,$,s)
 V(7)
 @V(5,00000000,99999999)
 
 #inputTitaTxtNoEnd=A,8,I
+C(5,#FunctionCode,1,$,s)
 E(0,0)
 C(3,#inputTitaTxtNoEnd,0,E(0,99999999),$)
 @V(5,#inputTitaTxtNoStart,99999999)
@@ -122,7 +125,10 @@ inputSlipNoEnd<-OOSlipNo})
 
 
 #inputSlipNoStart=A,6,I
+C(5,#FunctionCode,1,$,s)
+
 #inputSlipNoEnd=A,6,I
+C(5,#FunctionCode,1,$,s)
 C(3,#inputSlipNoEnd,0,E(0,999999),$)
 @V(5,#inputSlipNoStart,999999)
 V(2,0)

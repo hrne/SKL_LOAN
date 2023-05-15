@@ -110,7 +110,7 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-	public List<Map<String, String>> queryDept(int pfYear, int pfSeason, String inputDeptCode, TitaVo titaVo) {
+	public List<Map<String, String>> queryDept(int pfYear, int pfSeason, String inputDeptCode,int effectiveDateS,int effectiveDateE, TitaVo titaVo) {
 
 		int inputWorkMonth1 = pfYear * 100 + (1 + (3 * (pfSeason - 1)));
 		int inputWorkMonth2 = pfYear * 100 + (2 + (3 * (pfSeason - 1)));
@@ -118,12 +118,15 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int inputWorkMonth4 = pfSeason == 4 ? pfYear * 100 + 13 : 0;
 		int inputWorkSeason = pfYear * 10 + pfSeason;
 
+		
 		this.info("LP005ServiceImpl queryDept inputWorkMonth1 = " + inputWorkMonth1);
 		this.info("LP005ServiceImpl queryDept inputWorkMonth2 = " + inputWorkMonth2);
 		this.info("LP005ServiceImpl queryDept inputWorkMonth3 = " + inputWorkMonth3);
 		this.info("LP005ServiceImpl queryDept inputWorkMonth4 = " + inputWorkMonth4);
 		this.info("LP005ServiceImpl queryDept inputWorkSeason = " + inputWorkSeason);
 		this.info("LP005ServiceImpl queryDept inputDeptCode = " + inputDeptCode);
+		this.info("LP005ServiceImpl queryDept effectiveDateS = " + effectiveDateS);
+		this.info("LP005ServiceImpl queryDept effectiveDateE = " + effectiveDateE);
 
 		String sql = " ";
 		sql += " SELECT PCO.\"DistItem\"         AS Dist        "; // -- F0 區部
@@ -188,8 +191,8 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             GROUP BY PR.\"Coorgnizer\" ";
 		sql += "           ) PR ON PR.Coorgnizer = PCO.\"EmpNo\" ";
 		sql += " WHERE PCO.\"DeptCode\" = :inputDeptCode ";
-		sql += "   AND TRUNC(PCO.\"EffectiveDate\" / 100) <= :inputWorkMonth4 ";
-		sql += "   AND TRUNC(PCO.\"IneffectiveDate\" / 100) >= :inputWorkMonth1 ";
+		sql += "   AND PCO.\"EffectiveDate\"  <= :effectiveDateE ";
+		sql += "   AND PCO.\"IneffectiveDate\" >= :effectiveDateS ";
 		sql += " ORDER BY Dist ";
 		sql += "        , Area ";
 		sql += "        , Coorgnizer ";
@@ -204,6 +207,8 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("inputWorkMonth4", inputWorkMonth4);
 		query.setParameter("inputWorkSeason", inputWorkSeason);
 		query.setParameter("inputDeptCode", inputDeptCode);
+		query.setParameter("effectiveDateS", effectiveDateS);
+		query.setParameter("effectiveDateE", effectiveDateE);
 
 		return this.convertToMap(query);
 	}

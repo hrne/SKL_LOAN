@@ -180,7 +180,7 @@ public class LC999 extends TradeBuffer {
 				tTxHolidayId.setCountry("TW");
 				tTxHolidayId.setHoliday(Integer.valueOf(y + m + d));
 				tTxHoliday.setTxHolidayId(tTxHolidayId);
-				tTxHoliday.setTypeCode("1");
+				tTxHoliday.setTypeCode(1);
 				try {
 					sTxHolidayService.insert(tTxHoliday);
 				} catch (DBException e) {

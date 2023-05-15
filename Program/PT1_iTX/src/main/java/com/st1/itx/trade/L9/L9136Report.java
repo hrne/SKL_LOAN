@@ -141,8 +141,8 @@ public class L9136Report extends MakeReport {
 			for (Map<String, String> r : l9136List) {
 				count++;
 
-				//移除前後中括號
-				//移除換行符
+				// 移除前後中括號
+				// 移除換行符
 				String[] tmpUpdateItem = r.get("Item").replaceAll("\\[", "").replaceAll("\\]", "")
 						.replaceAll("\\\\n", "").replaceAll("\\,", "@").split("@");
 
@@ -160,13 +160,12 @@ public class L9136Report extends MakeReport {
 				List<String> tmp2 = new ArrayList<String>(Arrays.asList(tmpOldContent));
 				List<String> tmp3 = new ArrayList<String>(Arrays.asList(tmpNewContent));
 
-//				this.info("btmp1.size()=" + tmp1.size());
-//				this.info("btmp1 = " + tmp1.toString());
-//				this.info("btmp2.size()=" + tmp2.size());
-//				this.info("btmp2 = " + tmp2.toString());
-//				this.info("btmp3.size()=" + tmp3.size());
-//				this.info("btmp3 = " + tmp3.toString());
-
+				this.info("btmp1 = " + tmp1.toString());
+				this.info("btmp2 = " + tmp2.toString());
+				this.info("btmp3 = " + tmp3.toString());
+				this.info("btmp1.size()=" + tmp1.size());
+				this.info("btmp2.size()=" + tmp2.size());
+				this.info("btmp3.size()=" + tmp3.size());
 				// 避免有空白
 				if (tmp1.size() == 0 || tmp2.size() == 0 || tmp3.size() == 0) {
 					continue;
@@ -177,14 +176,17 @@ public class L9136Report extends MakeReport {
 						// 排除不需要的顯示的字串
 						// 因顯示出來的字串有包含雙引號所以把雙引號移除
 						if (tmp1.get(i).toString().replace("\"", "").indexOf(tmpWord.get(j).toString()) == 0) {
-							tmp1.set(i, " ");
-							tmp2.set(i, " ");
-							tmp3.set(i, " ");
+							tmp1.set(i, "");
+							tmp2.set(i, "");
+							tmp3.set(i, "");
 						}
 					}
 				}
 
-	
+				this.info("atmp1.size()=" + tmp1.size());
+				this.info("atmp2.size()=" + tmp2.size());
+				this.info("atmp3.size()=" + tmp3.size());
+
 				if (tmp1.size() == tmp2.size() && tmp1.size() == tmp3.size() && tmp2.size() == tmp3.size()) {
 				} else {
 					continue;
@@ -195,8 +197,16 @@ public class L9136Report extends MakeReport {
 					// 排除空值的資料
 					if (tmp1.get(i).length() != 0) {
 
-						report(r, tmp1.get(i).replace("\"", ""), tmp2.get(i).replace("\"", ""),
-								tmp3.get(i).replace("\"", ""), this.dataSource);
+						String item = tmp1.get(i).replace("\"", "");
+						String oldContent = tmp2.get(i).replace("\"", "");
+						String newContent = tmp3.get(i).replace("\"", "");
+
+						if (item.trim().length() == 0 && oldContent.trim().length() == 0
+								&& newContent.trim().length() == 0) {
+							continue;
+						}
+
+						report(r, item, oldContent, newContent, this.dataSource);
 					}
 
 					// 超過40行 換新頁
@@ -333,7 +343,7 @@ public class L9136Report extends MakeReport {
 		} else {
 			this.print(0, 31, "0000000", "R");
 		}
-		
+
 		if (!"0".equals(r.get("FacmNo"))) {
 			this.print(0, 31, "-", "L");
 			this.print(0, 36, fillUpWord(r.get("FacmNo"), 3, "0", "L"), "R");
@@ -341,7 +351,7 @@ public class L9136Report extends MakeReport {
 			this.print(0, 31, "-", "L");
 			this.print(0, 36, "000", "R");
 		}
-		
+
 		if (!"0".equals(r.get("BormNo"))) {
 			this.print(0, 36, "-", "L");
 			this.print(0, 41, fillUpWord(r.get("BormNo"), 3, "0", "L"), "R");

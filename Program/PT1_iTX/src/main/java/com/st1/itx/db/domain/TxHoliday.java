@@ -40,8 +40,8 @@ public class TxHoliday implements Serializable {
 
   // 假日型態
   /* 1一般例假日 2.特殊狀況假日 */
-  @Column(name = "`TypeCode`", length = 1)
-  private String typeCode;
+  @Column(name = "`TypeCode`")
+  private int typeCode = 0;
 
   // 建檔日期時間
   @CreatedDate
@@ -111,10 +111,10 @@ public class TxHoliday implements Serializable {
 /**
 	* 假日型態<br>
 	* 1一般例假日 2.特殊狀況假日
-	* @return String
+	* @return Integer
 	*/
-  public String getTypeCode() {
-    return this.typeCode == null ? "" : this.typeCode;
+  public int getTypeCode() {
+    return this.typeCode;
   }
 
 /**
@@ -123,7 +123,7 @@ public class TxHoliday implements Serializable {
   *
   * @param typeCode 假日型態
 	*/
-  public void setTypeCode(String typeCode) {
+  public void setTypeCode(int typeCode) {
     this.typeCode = typeCode;
   }
 

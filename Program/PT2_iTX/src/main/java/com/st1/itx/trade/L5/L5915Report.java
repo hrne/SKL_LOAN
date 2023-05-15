@@ -44,7 +44,8 @@ public class L5915Report extends MakeReport {
 
 		this.info("workMonth = " + workMonth);
 
-		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getKinbr()).setRptDate(titaVo.getEntDyI()).setRptCode(REPORT_CODE).setRptItem(REPORT_ITEM).build();
+		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getKinbr()).setRptDate(titaVo.getEntDyI())
+				.setRptCode(REPORT_CODE).setRptItem(REPORT_ITEM+titaVo.getParam("Ym")).build();
 
 		makeExcel.open(titaVo, reportVo, FILE_NAME + "_" + workMonth, DEFAULT_EXCEL, "件數");
 

@@ -60,6 +60,10 @@ public class L9133 extends TradeBuffer {
 		// 交易櫃員
 		empNo = titaVo.getTlrNo();
 
+		String parentTranCode = titaVo.getTxcd();
+
+		l9133Report.setParentTranCode(parentTranCode);
+
 		// 執行預存程式更新會計業務檢核檔
 		sAcAcctCheckService.Usp_L6_AcAcctCheck_Upd(iAcDate, empNo, titaVo);
 

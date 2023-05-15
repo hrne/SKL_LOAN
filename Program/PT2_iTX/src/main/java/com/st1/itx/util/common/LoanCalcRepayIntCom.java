@@ -223,6 +223,14 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			}
 		}
 
+		// 本金餘額為零
+		if (iPrincipal.compareTo(BigDecimal.ZERO) == 0) {
+			for (int i = 0; i <= wkCalcVoCount; i++) {
+				zeroAmtRoutine(i, titaVo);
+			}
+
+		}
+		
 		// 移除計算金額=0
 		int wkRemoveCnt = 0;
 		for (int i = wkCalcVoCount; i >= 0; i--) {
@@ -350,7 +358,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		oInterest = BigDecimal.ZERO;
 		oDelayInt = BigDecimal.ZERO;
 		oExtraAmt = BigDecimal.ZERO;
-		oRepaidPeriod = 0;		
+		oRepaidPeriod = 0;
 		oPaidTerms = 0;
 		oDueAmt = iDueAmt;
 		oCalcCount = 0;
@@ -2375,6 +2383,54 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		this.info("      oDelayInt       = " + oDelayInt);
 		this.info("      oBreachAmt      = " + oBreachAmt);
 		this.info("totalAmtRoutine end ");
+	}
+
+	private void zeroAmtRoutine(int wkIndex, TitaVo titaVo) throws LogicException {
+		this.info("zeroAmtRoutine ... ");
+		this.info("   wkIndex    = " + wkIndex);
+		this.info("   iSyndFlag  = " + iSyndFlag);
+		this.info("   iNonePrincipalFlag = " + iNonePrincipalFlag);
+		this.info("   oPrincipal = " + oPrincipal);
+
+		vCalcRepayIntVo = lCalcRepayIntVo.get(wkIndex);
+		switch (iSyndFlag) {
+		case "Y":
+			oPrevPaidIntDate = vCalcRepayIntVo.getEndDate(); // 上次收息日
+			break;
+		case "N":
+			if (vCalcRepayIntVo.getDuraFlag() == 1
+					|| (vCalcRepayIntVo.getDuraFlag() != 1 && vCalcRepayIntVo.getExtraRepayFlag() == 0)) {
+				oPrevPaidIntDate = vCalcRepayIntVo.getEndDate(); // 上次收息日
+			}
+			break;
+		}
+		oRateIncr = vCalcRepayIntVo.getRateIncr(); // 加碼利率
+		oIndividualIncr = vCalcRepayIntVo.getIndividualIncr(); // 個別加碼利率
+		if (iCaseCloseFlag.equals("Y") && wkIndex == wkCalcVoCount
+				&& vCalcRepayIntVo.getPrincipal().compareTo(BigDecimal.ZERO) > 0) {
+			oRepaidPeriod += 1;
+			oPrevRepaidDate = vCalcRepayIntVo.getEndDate();
+		} else {
+			if (vCalcRepayIntVo.getPrincipal().compareTo(BigDecimal.ZERO) > 0 && vCalcRepayIntVo.getDuraFlag() == 1) {
+				oRepaidPeriod += 1;
+				oPrevRepaidDate = vCalcRepayIntVo.getEndDate();
+			}
+		}
+		oStoreRate = vCalcRepayIntVo.getStoreRate();
+		if (iNonePrincipalFlag == 0) {
+			oPrincipal = oPrincipal.add(vCalcRepayIntVo.getPrincipal());
+			oLoanBal = oLoanBal.subtract(vCalcRepayIntVo.getPrincipal());
+		}
+		oInterest = oInterest.add(vCalcRepayIntVo.getInterest());
+		oDelayInt = oDelayInt.add(vCalcRepayIntVo.getDelayInt());
+		oBreachAmt = oBreachAmt.add(vCalcRepayIntVo.getBreachAmt());
+
+		this.info("      oPrevPaidIntDate= " + oPrevPaidIntDate);
+		this.info("      oPrincipal      = " + oPrincipal);
+		this.info("      oInterest       = " + oInterest);
+		this.info("      oDelayInt       = " + oDelayInt);
+		this.info("      oBreachAmt      = " + oBreachAmt);
+		this.info("zeroAmtRoutine end ");
 	}
 
 	// 計算下次收息日 167800 CALINT-OOIDATE-RTN.

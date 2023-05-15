@@ -68,6 +68,7 @@ public class L6907 extends TradeBuffer {
 		List<Map<String, String>> L6907List = null;
 
 		try {
+//			L6907List = l6907ServiceImpl.FindAll(titaVo, this.index, Integer.MAX_VALUE);
 			L6907List = l6907ServiceImpl.FindAll(titaVo, this.index, this.limit);
 		} catch (Exception e) {
 			// E5004 讀取DB時發生問題
@@ -199,6 +200,14 @@ public class L6907 extends TradeBuffer {
 
 		}
 
+
+		// 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可
+		if (L6907List != null && L6907List.size() >= this.limit) {
+			titaVo.setReturnIndex(this.setIndexNext());
+			/* 手動折返 */
+			this.totaVo.setMsgEndToEnter();
+		}
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

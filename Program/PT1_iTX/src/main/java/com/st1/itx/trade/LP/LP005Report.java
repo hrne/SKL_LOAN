@@ -13,11 +13,13 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.CdWorkMonth;
+import com.st1.itx.db.domain.CdWorkMonthId;
 import com.st1.itx.db.service.CdWorkMonthService;
 import com.st1.itx.db.service.springjpa.cm.LP005ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
+import com.st1.itx.util.parse.Parse;
 
 @Component
 @Scope("prototype")
@@ -32,47 +34,56 @@ public class LP005Report extends MakeReport {
 	@Autowired
 	MakeExcel makeExcel;
 
+	@Autowired
+	private Parse parse;
+	private int effectiveDateS = 0;
+	private int effectiveDateE = 0;
+
 	public void exec(TitaVo titaVo) throws LogicException {
 		this.info("LP005Report exec ...");
 
 		// 系統會計日期
-		int iEntdy = titaVo.getEntDyI() + 19110000;
+		int workMonth = parse.stringToInteger(titaVo.getParam("Ym")) + 191100;
 
-		CdWorkMonth tCdWorkMonth = sCdWorkMonthService.findDateFirst(iEntdy, iEntdy, titaVo);
+		// CdWorkMonth tCdWorkMonth = sCdWorkMonthService.findDateFirst(iEntdy, iEntdy,
+		// titaVo);
 
-		if (tCdWorkMonth == null) {
-			return;
-		}
+//		if (tCdWorkMonth == null) {
+//			return;
+//		}
 
 		// 業績年度
-		int pfYear = tCdWorkMonth.getYear();
+		int pfYear = workMonth / 100;
 
 		// 業績月份
-		int pfMonth = tCdWorkMonth.getMonth();
-
-		// 若為工作月月底日,取當工作月,若非月底日,取上個工作月
-		if (iEntdy != tCdWorkMonth.getEndDate()) {
-			if (pfMonth == 1) {
-				pfYear = pfYear - 1;
-				pfMonth = 13;
-			} else {
-				pfMonth = pfMonth - 1;
-			}
-		}
+		int pfMonth = workMonth % 100;
 
 		int pfSeason = 0;
+		int pfMonths = 0;
 
 		// 判斷季度
 		if (pfMonth < 4) {
 			pfSeason = 1;
+			pfMonths = 1;
 		} else if (pfMonth < 7) {
 			pfSeason = 2;
+			pfMonths = 4;
 		} else if (pfMonth < 10) {
 			pfSeason = 3;
+			pfMonths = 7;
 		} else {
 			pfSeason = 4;
+			pfMonths = 10;
 		}
 
+		CdWorkMonth tCdWorkMonth = sCdWorkMonthService.findById(new CdWorkMonthId(pfYear, pfMonths), titaVo);
+		if (tCdWorkMonth != null) {
+			effectiveDateS = tCdWorkMonth.getStartDate() + 19110000;
+		}
+		tCdWorkMonth = sCdWorkMonthService.findById(new CdWorkMonthId(pfYear, pfMonth), titaVo);
+		if (tCdWorkMonth != null) {
+			effectiveDateE = tCdWorkMonth.getEndDate() + 19110000;
+		}
 		this.info("pfYear = " + pfYear);
 		this.info("pfMonth = " + pfMonth);
 		this.info("pfSeason = " + pfSeason);
@@ -88,12 +99,12 @@ public class LP005Report extends MakeReport {
 		this.info("exportExcel ... ");
 
 		int maxOfLoops = 3;
-		
+
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "LP005";
-		String fileItem = "協辦考核核算底稿";		
-		String defaultSheet = "1月件數";	
+		String fileItem = "協辦考核核算底稿";
+		String defaultSheet = "1月件數";
 
 		if (pfSeason == 4) {
 			maxOfLoops = 4;
@@ -107,7 +118,7 @@ public class LP005Report extends MakeReport {
 //			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP005", "協辦考核核算底稿",
 //					"LP005_" + (pfYear - 1911) + "Q" + pfSeason + "協辦考核核算底稿", "LP005_底稿_協辦考核核算_第四季特別版.xlsx", "1月件數");
 		} else {
-			
+
 			String fileName = "LP005_" + (pfYear - 1911) + "Q" + pfSeason + "協辦考核核算底稿";
 			String defaultExcel = "LP005_底稿_協辦考核核算.xlsx";
 			ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
@@ -261,7 +272,8 @@ public class LP005Report extends MakeReport {
 
 		makeExcel.setValue(1, 1, title);
 
-		List<Map<String, String>> listDept = lp005ServiceImpl.queryDept(pfYear, pfSeason, deptCode, titaVo);
+		List<Map<String, String>> listDept = lp005ServiceImpl.queryDept(pfYear, pfSeason, deptCode, effectiveDateS,
+				effectiveDateE, titaVo);
 
 		if (listDept == null || listDept.isEmpty()) {
 			return listEmpClass;

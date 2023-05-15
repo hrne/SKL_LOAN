@@ -171,7 +171,37 @@ public class L3250 extends TradeBuffer {
 		if (slAcList != null) {
 			for (AcDetail ac : slAcList.getContent()) {
 				if ("C".equals(ac.getDbCr())) {
-					addAcDetail(ac);
+					if ("TAV".equals(ac.getAcctCode())) {
+						wkOverAmt = ac.getTxAmt();
+						for (BaTxVo ba : this.baTxList) {
+							if (ba.getDataKind() == 3 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
+								BigDecimal acctAmt = BigDecimal.ZERO;
+								if (wkOverAmt.compareTo(ba.getAcctAmt()) > 0) {
+									acctAmt = ba.getAcctAmt();
+									wkOverAmt = wkOverAmt.subtract(ba.getAcctAmt());
+								} else {
+									acctAmt = wkOverAmt;
+									wkOverAmt = BigDecimal.ZERO;
+								}
+								if (acctAmt.compareTo(BigDecimal.ZERO) > 0) {
+									AcDetail acDetail = new AcDetail();
+									acDetail.setDbCr("D");
+									acDetail.setAcctCode(ba.getAcctCode());
+									acDetail.setSumNo("090");
+									acDetail.setTxAmt(acctAmt);
+									acDetail.setCustNo(ba.getCustNo());
+									acDetail.setFacmNo(ba.getFacmNo());
+									acDetail.setBormNo(ba.getBormNo());
+									acDetail.setRvNo(ba.getRvNo());
+									acDetail.setReceivableFlag(ba.getReceivableFlag());
+									this.lAcDetail.add(acDetail);
+									this.info("settleTempAmt ba " + acDetail.toString());
+								}
+							}
+						}
+					} else {
+						addAcDetail(ac);
+					}
 				}
 			}
 			for (AcDetail ac : slAcList.getContent()) {

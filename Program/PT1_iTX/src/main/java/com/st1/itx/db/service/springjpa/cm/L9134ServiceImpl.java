@@ -150,6 +150,8 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> doQueryL9134_3(TitaVo titaVo) {
 
 		String sql = " ";
+		sql += "SELECT * ";
+		sql += "FROM ( ";
 		sql += "     SELECT C.\"AcNoItem\" ";
 		sql += "          , AC.\"AcNoCode\"";
 		sql += "          , AC.\"AcSubCode\"";
@@ -168,13 +170,36 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                            AND CC.\"Code\" = AC.\"AcSubBookCode\" ";
 		sql += "     LEFT JOIN \"CollList\" CO ON CO.\"CustNo\" = AC.\"CustNo\" ";
 		sql += "                              AND CO.\"FacmNo\" = AC.\"FacmNo\" ";
-		sql += "    where  AC.\"AcctCode\" in ('T10','T11','T12','T13','TAM','TAV','TCK','TEM','THC','TLD','TMI','TRO','TSL') ";
-		sql += "       AND AC.\"RvBal\" > 0 ";
-		sql += "     ORDER BY AC.\"AcNoCode\" ASC ";
-		sql += "            , AC.\"AcSubCode\" ASC ";
-		sql += "            , AC.\"AcDtlCode\" ASC ";
-		sql += "            , AC.\"CustNo\" ASC ";
-		sql += "            , AC.\"FacmNo\" ASC ";
+		sql += "     where  AC.\"AcctCode\" in ('T10','T11','T12','T13','TAM','TAV','TCK','TEM','THC','TLD','TRO','TSL') ";
+		sql += "       AND AC.\"RvBal\" > 0 ";		
+		sql += "     UNION ALL ";
+		sql += "     SELECT C.\"AcNoItem\"";
+		sql += "          , C.\"AcNoCode\"";
+		sql += "          , C.\"AcSubCode\"";
+		sql += "          , C.\"AcDtlCode\"";
+		sql += "          , S1.\"CustNo\"";
+		sql += "          , S1.\"FacmNo\"";
+		sql += "          , S1.\"InsuStartDate\" AS \"OpenAcDate\"";
+		sql += "          , S1.\"AcDate\"        AS \"LastTxDate\"";
+		sql += "          , S1.\"TotInsuPrem\"   AS \"AcBal\"";
+		sql += "          , S1.\"TotInsuPrem\"   AS \"RvBal\"";
+		sql += "          , CC.\"Item\"";
+		sql += "          , ' '                  AS \"RenewCode\"";
+		sql += "     FROM \"InsuRenew\" S1 ";
+		sql += "     LEFT JOIN \"SystemParas\" SP ON SP.\"BusinessType\" = 'LN' ";
+		sql += "     LEFT JOIN \"CdAcCode\" C ON C.\"AcctCode\" = 'TMI' ";
+		sql += "     LEFT JOIN \"CdCode\" CC ON CC.\"DefCode\" = 'AcSubBookCode' ";
+		sql += "                            AND CC.\"Code\" = '00A' ";
+		sql += "    where  S1.\"RenewCode\" = 2";
+		sql += "       AND S1.\"StatusCode\" = 0 ";		
+		sql += "       AND S1.\"AcDate\" > 0 ";		
+		sql += "       AND S1.\"InsuYearMonth\"  >= trunc(SP.\"InsuSettleDate\" / 100) ";		
+		sql += "    ) ";		
+		sql += "     ORDER BY \"AcNoCode\" ASC ";
+		sql += "            , \"AcSubCode\" ASC ";
+		sql += "            , \"AcDtlCode\" ASC ";
+		sql += "            , \"CustNo\" ASC ";
+		sql += "            , \"FacmNo\" ASC ";
 
 		this.info("doQueryL9134C sql=" + sql);
 		Query query;

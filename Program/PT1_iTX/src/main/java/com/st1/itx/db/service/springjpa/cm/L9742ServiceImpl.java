@@ -175,6 +175,7 @@ public class L9742ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		    ,M.\"AcSubCode\"";
 		sql += "		    ,M.\"SlipBatNo\"";
 		sql += "		    ,M.\"RepayCode\"";
+		sql += "	ORDER BY M.\"SlipNo\" ASC";
 
 		this.info("sql=" + sql);
 
