@@ -216,7 +216,13 @@ BEGIN
       FROM DUAL
       ;
     END LOOP;
+
     INS_CNT := INS_CNT + sql%rowcount;
+
+    -- 迴圈已完成,清零    
+    i_CustNo := 0;
+    i_FacmNo := 0;
+    i_BormNo := 0;
 
 --   同撥款只有一筆日期最大著為最新
     MERGE INTO "DailyLoanBal" M
@@ -315,12 +321,33 @@ BEGIN
    EXCEPTION
      WHEN OTHERS
      THEN 
-     UPDATE "DailyLoanBalTemp"
-     SET "ErrorMsg" = SUBSTR(DBMS_UTILITY.FORMAT_ERROR_BACKTRACE(), 1, 200)
-     WHERE "CustNo" = i_CustNo
-       AND "FacmNo" = i_FacmNo
-       AND "BormNo" = i_BormNo
-     ;
+     -- 若戶號不為零,則為迴圈內之錯誤,紀錄是哪一筆錯誤
+     IF i_CustNo != 0
+     THEN 
+       UPDATE "DailyLoanBalTemp"
+       SET "ErrorMsg" = SUBSTR(DBMS_UTILITY.FORMAT_ERROR_BACKTRACE(), 1, 200)
+       WHERE "CustNo" = i_CustNo
+         AND "FacmNo" = i_FacmNo
+         AND "BormNo" = i_BormNo
+       ;
+     END IF;
+     "Usp_L9_UspErrorLog_Ins"(
+         'Usp_L9_DailyLoanBal_Upd' -- UspName 預存程序名稱
+       , SQLCODE -- Sql Error Code (固定值)
+       , CASE
+           WHEN i_CustNo != 0
+           THEN '戶號'
+                || LPAD(i_CustNo,7,'0')
+                || '-'
+                || LPAD(i_FacmNo,3,'0')
+                || '-'
+                || LPAD(i_BormNo,3,'0')
+                || ','
+         ELSE '' END
+         || SQLERRM -- Sql Error Message (固定值)
+       , dbms_utility.format_error_backtrace -- Sql Error Trace (固定值)
+       , EmpNo -- 發動預存程序的員工編號
+     );
      COMMIT;
      RAISE;
   END;

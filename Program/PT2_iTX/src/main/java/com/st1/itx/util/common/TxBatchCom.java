@@ -1136,6 +1136,7 @@ public class TxBatchCom extends TradeBuffer {
 			tBatxHead.setBatxTotAmt(tBatxHead.getBatxTotAmt().add(repayAmt));
 			tBatxHead.setBatxTotCnt(tBatxHead.getBatxTotCnt() + 1);
 			tBatxHead.setUnfinishCnt(tBatxHead.getUnfinishCnt() + 1);
+			tBatxHead.setBatxExeCode("3");
 		}
 		try {
 			batxHeadService.update(tBatxHead, titaVo);

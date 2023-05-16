@@ -3639,9 +3639,9 @@ C(5,#BreachFlag,N,S,$)
 C(3,#UpdateCode,1,$,s)
 @V(5,0,100)
 
-
 #RcvL2r56B=X,1,S
 C(3,#UpdateCode,1,$,S)
+C(5,#BreachFlag,N,S,$)
 C(5,#BreachFlag,#L2r05BreachFlag
 ,C(5,#BreachCode,#L2r05BreachCode
 ,C(5,#ProhibitMonth,#L2r05ProhibitMonth

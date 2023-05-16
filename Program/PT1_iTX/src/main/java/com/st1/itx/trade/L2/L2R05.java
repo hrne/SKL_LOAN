@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Formatter;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -41,8 +42,6 @@ import com.st1.itx.util.common.AuthLogCom;
 import com.st1.itx.util.common.LoanAvailableAmt;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
-
-
 
 /**
  * L2R05 尋找額度檔資料 BY 1.CUSTNO + FACMNO or 2.APPLNO
@@ -456,7 +455,8 @@ public class L2R05 extends TradeBuffer {
 		this.totaVo.putParam("L2r05AdvanceCloseCode", tFacMain.getAdvanceCloseCode());
 
 		this.totaVo.putParam("L2r05ProdBreachFlag", tFacMain.getProdBreachFlag());
-		this.totaVo.putParam("L2r05BreachCode", tFacMain.getBreachCode());
+		this.totaVo.putParam("L2r05BreachCode",
+				FormatUtil.pad9(tFacMain.getBreachCode() == null ? "0" : tFacMain.getBreachCode(), 3));
 		this.totaVo.putParam("L2r05BreachGetCode", tFacMain.getBreachGetCode());
 
 		this.totaVo.putParam("L2r05Breach", tFacMain.getBreachDescription());

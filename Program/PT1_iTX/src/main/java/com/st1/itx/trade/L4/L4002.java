@@ -101,8 +101,8 @@ public class L4002 extends TradeBuffer {
 
 						setL4002Tota(tBatxHead, titaVo);
 					} else {
-						this.info("continue... ，procExeCode = " + procExeCode + "， BatxHead狀態 != 0~3 ，狀態 = "
-								+ tBatxHead.getBatxExeCode());
+//						this.info(tBatxHead.getBatchNo() + " continue... ，procExeCode = " + procExeCode
+//								+ "， BatxHead狀態 != 0~3 ，狀態 = " + tBatxHead.getBatxExeCode());
 						continue;
 					}
 				} else {
@@ -326,11 +326,11 @@ public class L4002 extends TradeBuffer {
 					}
 				}
 				ooRpAmt = tBatxDetail.getRepayAmt();
-				this.info("L4002  - ooRpAmt : " + ooRpAmt);
+				// this.info("L4002 - ooRpAmt : " + ooRpAmt);
 
-				this.info("L4002  - grp1 : " + grp1.toString());
-				this.info("L4002  - grp2 : " + grp2.toString());
-				this.info("L4002  - grp3 : " + grp3.toString());
+				// this.info("L4002 - grp1 : " + grp1.toString());
+				// this.info("L4002 - grp2 : " + grp2.toString());
+				// this.info("L4002 - grp3 : " + grp3.toString());
 
 // ProcStsCode 處理狀態 0.未檢核 1.不處理 2.人工處理 3.檢核錯誤 4.檢核正常 5.人工入帳 6.批次入帳 7.批次入帳後人工
 				// grp1 總筆數合計
@@ -588,9 +588,9 @@ public class L4002 extends TradeBuffer {
 
 			for (tmpBatx tempL4002Vo : tempList) {
 
-				this.info("!!!! L4002 OOFileName :" + tempL4002Vo.getFileName());
+				// this.info("!!!! L4002 OOFileName :" + tempL4002Vo.getFileName());
 
-				this.info("!!!! L4002 tempL4002Vo :" + tempL4002Vo.toString());
+				// this.info("!!!! L4002 tempL4002Vo :" + tempL4002Vo.toString());
 
 				OccursList occursList = new OccursList();
 				occursList.putParam("OOBatchNo", tempL4002Vo.getBatchNo());

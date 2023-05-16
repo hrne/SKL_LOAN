@@ -556,7 +556,7 @@ public class L4320Batch extends TradeBuffer {
 					}
 					preNextAdjDate = maturityDate;
 				} else if (preNextAdjDate % 100 > preDD) {
-					warnMsg += ", 下次利率調整日(" + preNextAdjDate % 100 + ")>相對日(" + preDD + ")";
+					warnMsg += ", 下次利率調整日(" + preNextAdjDate % 100 + ")>首調日(" + firstAdjRateDate % 100 + ")";
 				}
 			}
 		}

@@ -1,0 +1,147 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+#KeyInq=X,1,S
+K(MODIFYBUTTON,查詢)
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L6973)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,322)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,10)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+#BUF0=X,20,S
+T(2,1+0000000000000000000)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+! 權限檢查
+<include src="COM.icf::BFHEAD2.dec"/>
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[300,900];printer.width=[20,20];">
+[
+["[L6973]                                 資料庫批次錯誤查詢"],
+[""],
+]
+
+!---------- AP Button AREA ----------
+
+!---------- AP TEXT AREA Variables ----------
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#RPTFG=A,1,S
+E(0,0)
+
+#XMT=X,1,S
+XMT()
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L6973 ----------
+<sub type="FORM" name="L6973">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L6973,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L6973] 資料庫批次錯誤查詢)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+#LogUkey=x,32,L
+#LogDate=A,8,L
+#LogTime=A,6,L
+#UspName=x,100,L
+#ErrorMessage=x,100,L
+#ErrorBackTrace=x,100,L
+#ExecEmpNo=x,6,L
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L6973
+#LogUkey
+#LogDate
+#LogTime
+#UspName
+#ErrorMessage
+#ErrorBackTrace
+#ExecEmpNo
+^
+<include src="COM.icf::TRCTL.tom"/>
+</sub>
+
+<sub type="PART" name="L6973" layout="cols=1;screen.width=[130,870];printer.width=[15,30]">
+[
+["[L6973]                                 資料庫批次錯誤查詢"],
+[""],
+]
+</sub>
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+#RPTFG=0,QUERY.GRID,L6973
+#any={detail:true, header:'L6973.part', caption:'', width:1100, rowNum:20, rowList:[20,40,60]}
+
+#LogUkey
+
+#LogDate=記錄日期
+{width:80,align:'left'}
+#LogTime=記錄時間
+{width:80,align:'left'}
+#UspName=程式名稱
+{width:250,align:'left'}
+#ErrorMessage=錯誤訊息
+{width:300,align:'left'}
+#ErrorBackTrace=錯誤追蹤
+{width:500,align:'left'}
+#ExecEmpNo=啟動人員員編
+{width:100,align:'left'}
+^
+
+</sub>

@@ -671,16 +671,11 @@ S(L1R09,1,#RimFunCd,#RimCustId,#RimCustNo)
 R(1,L1R09)
 T(2,@OwnerName,#L1r09CustName)
 
-
-
-
-
 ! [所有權人姓名]
 #OwnerName=x,2.50,I
 IF(#FunCd==4,s,$)
 C(4,#L1r09CustName,$,s)
 @V(7)
-
 
 #OwnerCHECK=X,1,S
 C(4,#CustId,s,$)

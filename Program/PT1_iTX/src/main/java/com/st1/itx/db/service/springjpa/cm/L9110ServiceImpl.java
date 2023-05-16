@@ -217,9 +217,9 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             CASE ";
 		sql += "                 WHEN cf.\"ClCode1\" = 1 ";
 		sql += "              AND cf.\"ClCode2\" = 5           THEN ";
-		sql += "             nvl(l.\"FloorArea\", 0) ";
+		sql += "             nvl(l.\"ParkingArea\", 0) ";
 		sql += "                 ELSE ";
-		sql += "                     0 END AS \"BdParkingArea\",   ";
+		sql += "                     nvl(cbpk.\"ParkingArea\", 0) END AS \"BdParkingArea\",   ";
 		sql += "             l.\"EvaUnitPrice\"   AS \"BdEvaunitprice\",   ";
 		sql += "             cli.\"SettingAmt\"   AS \"SettingAmt\",   ";
 		sql += "             TO_CHAR(nvl(substr(l.\"SellerName\", 0, 6), '無')) AS \"BdSellerName\",  ";

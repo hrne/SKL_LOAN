@@ -13,6 +13,9 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.CustNotice;
+import com.st1.itx.db.domain.CustNoticeId;
+import com.st1.itx.db.service.CustNoticeService;
 import com.st1.itx.db.service.springjpa.cm.L9711ServiceImpl;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.CustNoticeCom;
@@ -39,6 +42,9 @@ public class L9711Report extends MakeReport {
 
 	@Autowired
 	private CustNoticeCom custNoticeCom;
+	
+	@Autowired
+	private CustNoticeService sCustNoticeService;
 
 	private boolean isLetterNoticeFlag = true;
 	// 起始欄位 位置
@@ -154,13 +160,30 @@ public class L9711Report extends MakeReport {
 				int custNo = parse.stringToInteger(r.get("F4"));
 				int facmNo = parse.stringToInteger(r.get("F5"));
 
-				TempVo tempVo = new TempVo();
-				tempVo = custNoticeCom.getCustNotice("L9711", custNo, facmNo, titaVo);
+				CustNotice lCustNotice = new CustNotice();
+				CustNoticeId lCustNoticeId = new CustNoticeId();
 
-				if ("Y".equals(tempVo.getParam("isLetter"))) {
+				lCustNoticeId.setCustNo(custNo);
+				lCustNoticeId.setFacmNo(facmNo);
+				lCustNoticeId.setFormNo("L9710");
+
+				lCustNotice = sCustNoticeService.findById(lCustNoticeId, titaVo);
+
+//				TempVo tempVo = new TempVo();
+//				tempVo = sCustNoticeService....getCustNotice("L9703", custNo, facmNo, titaVo);
+
+//				if ("Y".equals(tempVo.getParam("isLetter"))) {
+				// custNotice 空的 表示 沒有申請列印 或 有值但是 paper為N 也是沒有申請列印
+				if (lCustNotice == null) {
 					isLetterList.add(r);
 				} else {
-					isNotLetterList.add(r);
+					if ("Y".equals(lCustNotice.getPaperNotice())) {
+						isLetterList.add(r);
+					}
+
+					if ("N".equals(lCustNotice.getPaperNotice())) {
+						isNotLetterList.add(r);
+					}
 				}
 
 			}

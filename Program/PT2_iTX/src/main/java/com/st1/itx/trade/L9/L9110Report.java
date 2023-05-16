@@ -412,7 +412,7 @@ public class L9110Report extends MakeReport {
 					// NEW
 					if (listBuildingLandQuery != null && !listBuildingLandQuery.isEmpty()) {
 						// 列印建物明細
-						printBuildingLandDetail(listBuildingLandQuery, clCode1.equals("2") ? "0" : tL9110Cl.get("F19"));
+						printBuildingLandDetail(listBuildingLandQuery, tL9110Cl.get("F19"));
 					}
 
 					break;
@@ -877,6 +877,7 @@ public class L9110Report extends MakeReport {
 			this.info("thisApplNo = " + thisApplNo);
 
 			BigDecimal loanBal = BigDecimal.ZERO;
+			int firstDrawdownDate = 0;
 
 			if (thisApplNo != null && !(thisApplNo.isEmpty()) && Integer.parseInt(thisApplNo) > 0) {
 
@@ -895,6 +896,7 @@ public class L9110Report extends MakeReport {
 						this.warn("L9110Report thisApplNo(" + thisApplNo + ")  is not found in FacCaseAppl. ");
 					}
 				} else {
+					firstDrawdownDate = tFacMain.getFirstDrawdownDate();
 					loanBal = tFacMain.getUtilBal();
 					tCustMain = sCustMainService.custNoFirst(tFacMain.getCustNo(), tFacMain.getCustNo(), titaVo);
 				}
@@ -919,10 +921,10 @@ public class L9110Report extends MakeReport {
 
 				// 2022-06-17 Wei:應珮琪要求照AS400畫面增加欄位"列印條件選擇"
 				// 1:未撥款;2:已撥款;3:全部
-				if (choice == 1 && loanBal.compareTo(BigDecimal.ZERO) != 0) {
+				if (choice == 1 && firstDrawdownDate > 0) {
 					// 要篩選未撥款,但此筆撥款餘額!=0,跳過
 					continue;
-				} else if (choice == 2 && loanBal.compareTo(BigDecimal.ZERO) == 0) {
+				} else if (choice == 2 && firstDrawdownDate == 0) {
 					// 要篩選已撥款,但此筆撥款餘額=0,跳過
 					continue;
 				}

@@ -13,11 +13,12 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.buffer.TxBuffer;
-import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.CustNotice;
+import com.st1.itx.db.domain.CustNoticeId;
+import com.st1.itx.db.service.CustNoticeService;
 import com.st1.itx.db.service.springjpa.cm.L9703ServiceImpl;
 import com.st1.itx.util.common.BaTxCom;
-import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.common.data.ReportVo;
@@ -47,8 +48,9 @@ public class L9703Report1 extends MakeReport {
 	@Autowired
 	Parse parse;
 
+
 	@Autowired
-	private CustNoticeCom custNoticeCom;
+	private CustNoticeService sCustNoticeService;
 
 	/**
 	 * 表頭種類<BR>
@@ -188,13 +190,30 @@ public class L9703Report1 extends MakeReport {
 			int custNo = parse.stringToInteger(tL9703.get("F2"));
 			int facmNo = parse.stringToInteger(tL9703.get("F3"));
 
-			TempVo tempVo = new TempVo();
-			tempVo = custNoticeCom.getCustNotice("L9703", custNo, facmNo, titaVo);
+			CustNotice lCustNotice = new CustNotice();
+			CustNoticeId lCustNoticeId = new CustNoticeId();
 
-			if ("Y".equals(tempVo.getParam("isLetter"))) {
+			lCustNoticeId.setCustNo(custNo);
+			lCustNoticeId.setFacmNo(facmNo);
+			lCustNoticeId.setFormNo("L9703");
+
+			lCustNotice = sCustNoticeService.findById(lCustNoticeId, titaVo);
+
+//			TempVo tempVo = new TempVo();
+//			tempVo = sCustNoticeService....getCustNotice("L9703", custNo, facmNo, titaVo);
+
+//			if ("Y".equals(tempVo.getParam("isLetter"))) {
+			// custNotice 空的 表示 沒有申請列印 或 有值但是 paper為N 也是沒有申請列印
+			if (lCustNotice == null) {
 				isLetterList.add(tL9703);
 			} else {
-				isNotLetterList.add(tL9703);
+				if ("Y".equals(lCustNotice.getPaperNotice())) {
+					isLetterList.add(tL9703);
+				}
+
+				if ("N".equals(lCustNotice.getPaperNotice())) {
+					isNotLetterList.add(tL9703);
+				}
 			}
 
 		}
@@ -350,7 +369,7 @@ public class L9703Report1 extends MakeReport {
 				this.print(0, 57, formatAmt(loanBal, 0), "R");
 				totalOfLoanBal = totalOfLoanBal.add(loanBal); // 本金餘額加總計算
 				tLoanBal = tLoanBal.add(loanBal); // 本金餘額小總計算
-				
+
 				// 利率
 				this.print(0, 64, formatAmt(intRate, 4), "R");
 
