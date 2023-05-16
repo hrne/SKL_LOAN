@@ -98,7 +98,7 @@ public class L2306 extends TradeBuffer {
 				tReltMain.setReltCode(titaVo.getParam("PosInd"));
 				tReltMain.setRemarkType(titaVo.getParam("RemarkType"));
 				tReltMain.setReltmark(titaVo.getParam("Remark"));
-				tReltMain.setApplDate(parse.stringToInteger(titaVo.getEntDy()));
+				tReltMain.setApplDate(dateUtil.getNowIntegerForBC());
 				/* 存入DB */
 
 				if ("02".equals(titaVo.getParam("PosInd"))) { // 判斷同一戶號案件編號只能有一個配偶
@@ -155,7 +155,7 @@ public class L2306 extends TradeBuffer {
 				tReltMain.setReltCode(titaVo.getParam("PosInd"));
 				tReltMain.setRemarkType(titaVo.getParam("RemarkType"));
 				tReltMain.setReltmark(titaVo.getParam("Remark"));
-				tReltMain.setApplDate(parse.stringToInteger(titaVo.getEntDy()));
+				tReltMain.setApplDate(dateUtil.getNowIntegerForBC());
 
 				if ("02".equals(titaVo.getParam("PosInd"))) { // 判斷同一戶號案件編號只能有一個配偶
 					Slice<ReltMain> slReltMain = sReltMainService.findByBoth(iCaseNo, iCustNo, index, limit, titaVo);

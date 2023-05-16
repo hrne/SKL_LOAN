@@ -18,7 +18,7 @@ BEGIN
     EXECUTE IMMEDIATE 'TRUNCATE TABLE "ClLandOwner" DROP STORAGE';
     EXECUTE IMMEDIATE 'ALTER TABLE "ClLandOwner" ENABLE PRIMARY KEY';
 
-    -- 寫入資料
+    -- 寫入資料 - 純土地
     INSERT INTO "ClLandOwner" (
         "ClCode1"             -- 擔保品代號1 DECIMAL 1 
       , "ClCode2"             -- 擔保品代號2 DECIMAL 2 
@@ -58,16 +58,59 @@ BEGIN
           LEFT JOIN "LA$LGTP" S2 ON S2."GDRID1" = S1."GDRID1"
                                 AND S2."GDRID2" = S1."GDRID2"
                                 AND S2."GDRNUM" = S1."GDRNUM"
-                                AND CASE
-                                      WHEN S0."ClCode1" = 1 -- 若為房地擔保品 只抓原擔保品的擔保品提供人
-                                           AND S2."LGTSEQ" = S1."LGTSEQ"
-                                      THEN 1
-                                      WHEN S0."ClCode1" = 2 -- 若為土地擔保品 抓原擔保品中相同地號的所有擔保品提供人
-                                           AND LPAD(REPLACE(TRIM(S2.LGTNM1),'-',''),4,'0') = S0."LandNo1"
-                                           AND LPAD(REPLACE(TRIM(S2.LGTNM2),'-',''),4,'0') = S0."LandNo2"
-                                      THEN 1
-                                    ELSE 0 END = 1
+                                AND LPAD(REPLACE(TRIM(S2.LGTNM1),'-',''),4,'0') = S0."LandNo1"
+                                AND LPAD(REPLACE(TRIM(S2.LGTNM2),'-',''),4,'0') = S0."LandNo2"
           WHERE NVL(S2."LGTCIF",0) != 0
+            AND S0."ClCode1" = 2 -- 純土地
+         ) LG
+    LEFT JOIN "CU$CUSP" CU ON CU."CUSCIF" = LG."LGTCIF"
+    LEFT JOIN "CustMain" CM ON TRIM(CM."CustId") = TRIM(CU."CUSID1")
+    WHERE NVL(CU."CUSCIF",0) > 0
+      AND NVL(CM."CustId",' ') != ' ' 
+    ;
+    -- 記錄寫入筆數
+    INS_CNT := INS_CNT + sql%rowcount;
+
+    -- 寫入資料 - 房地
+    INSERT INTO "ClLandOwner" (
+        "ClCode1"             -- 擔保品代號1 DECIMAL 1 
+      , "ClCode2"             -- 擔保品代號2 DECIMAL 2 
+      , "ClNo"                -- 擔保品編號 DECIMAL 7 
+      , "LandSeq"             -- 土地序號 DECIMAL 3
+      , "OwnerCustUKey"       -- 所有權人客戶識別碼 VARCHAR2 32 
+      , "OwnerRelCode"        -- 與授信戶關係 VARCHAR2 2
+      , "OwnerPart"           -- 持分比率(分子) DECIMAL 10 
+      , "OwnerTotal"          -- 持分比率(分母) DECIMAL 10 
+      , "CreateDate"          -- 建檔日期時間 DATE  
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+      , "LastUpdate"          -- 最後更新日期時間 DATE  
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+    )
+    SELECT LG."ClCode1"                   AS "ClCode1"             -- 擔保品代號1 DECIMAL 1 
+          ,LG."ClCode2"                   AS "ClCode2"             -- 擔保品代號2 DECIMAL 2 
+          ,LG."ClNo"                      AS "ClNo"                -- 擔保品編號 DECIMAL 7 
+          ,LG."LandSeq"                   AS "LandSeq"             -- 土地序號 DECIMAL 3
+          ,CM."CustUKey"                  AS "OwnerCustUKey"       -- 所有權人客戶識別碼 VARCHAR2 32 
+          ,''                             AS "OwnerRelCode"        -- 與授信戶關係 VARCHAR2 2
+          ,1                              AS "OwnerPart"           -- 持分比率(分子) DECIMAL 10 
+          ,1                              AS "OwnerTotal"          -- 持分比率(分母) DECIMAL 10 
+          ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
+          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+          ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
+          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+    FROM (SELECT DISTINCT
+                 TBLM."ClCode1"
+                ,TBLM."ClCode2"
+                ,TBLM."ClNo"
+                ,TBLM."LandSeq"
+                ,NVL(S2."LGTCIF",0) AS "LGTCIF"
+          FROM "TfBuildingLandMapping" TBLM
+          LEFT JOIN "LA$LGTP" S2 ON S2."GDRID1" = TBLM."GDRID1"
+                                AND S2."GDRID2" = TBLM."GDRID2"
+                                AND S2."GDRNUM" = TBLM."GDRNUM"
+                                AND S2."LGTSEQ" = TBLM."LGTSEQ"
+          WHERE NVL(S2."LGTCIF",0) != 0
+            AND TBLM."ClCode1" = 1 -- 若為房地擔保品 只抓與建物提供人相同的資料
          ) LG
     LEFT JOIN "CU$CUSP" CU ON CU."CUSCIF" = LG."LGTCIF"
     LEFT JOIN "CustMain" CM ON TRIM(CM."CustId") = TRIM(CU."CUSID1")

@@ -1176,7 +1176,7 @@ R(1,L2R53)
 C(3,#L2r05RepayCode,02,$,S)
 E(0,@RimCustNo,#CustNo)
 E(0,@RimAcctNo,#L2r05RepayAcctNo)
-E(0,@RimBankNo,#L2r05RepayBank)
+T(2,@RimBankNo,#L2r05RepayBank)
 C(5,#RepayBank,700,T(2,@RimPostDepCode,#L2r05PostCode),$)
 S(L4R22,1,#RimCustNo,#RimAcctNo,#RimBankNo,#RimPostDepCode)
 R(1,L4R22)
@@ -2865,8 +2865,8 @@ C(3,#RepayCode,2,$,S)
 
 #RimFindCode=A,1,S
 #RimPostDepCode=X,1,S
-#RimAcctNo=X,14,S
-#RimBankNo=A,3,S
+#RimAcctNo=A,14,S
+#RimBankNo=X,3,S
 
 #AcctCheckFlag=A,1,S
 #BeforeAcctCheckFlag=A,1,S
@@ -2901,7 +2901,7 @@ IF(#RimCustNo==#CustNo&&#RimAcctNo==#RepayAcctNo&&#RimBankNo==#RepayBank,s,$)
 C(3,#RepayCode,02,$,S)
 E(0,@RimCustNo,#CustNo)
 E(0,@RimAcctNo,#RepayAcctNo)
-E(0,@RimBankNo,#RepayBank)
+T(2,@RimBankNo,#RepayBank)
 C(5,#RepayBank,700,T(2,@RimPostDepCode,#PostCode),$)
 RESET_RIM(#SendL4R22A,L4R22)
 S(L4R22,1,#RimCustNo,#RimAcctNo,#RimBankNo,#RimPostDepCode)

@@ -37,7 +37,7 @@ public class L9133Report extends MakeReport {
 	SortMapListCom sortMapListCom;
 
 	private String reportCode = "L9133";
-	private String reportItem = "會計與主檔餘額檢核表";
+	private String reportItem = "L9133-會計與主檔餘額檢核表";
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
 		this.info("L9133Report exec ...");

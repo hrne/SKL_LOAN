@@ -414,11 +414,15 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                            	 AND l1.\"ClCode2\" = cf.\"ClCode2\" ";
 		sql += "                                            	 AND l1.\"ClNo\" 		= cf.\"ClNo\"  ";
 		sql += " LEFT JOIN (SELECT MIN(cf.\"ApproveNo\") AS \"ApplNo\",SUM(cf.\"Area\") AS \"Area\" ";
-		sql += " FROM (SELECT DISTINCT cf.\"ApproveNo\",cll.\"CityCode\" ,cll.\"AreaCode\",cll.\"IrCode\",cll.\"LandNo1\",cll.\"LandNo2\" ,cll.\"Area\" ";
+		sql += " FROM (SELECT DISTINCT cf.\"ApproveNo\",cll.\"CityCode\" ,cll.\"AreaCode\",cll.\"IrCode\",cll.\"LandNo1\",cll.\"LandNo2\" ,cll.\"Area\",clo.\"OwnerCustUKey\" ";
 		sql += " FROM \"ClFac\" cf  ";
 		sql += " LEFT JOIN \"ClLand\" cll   ON cll.\"ClCode1\" = cf.\"ClCode1\" ";
 		sql += "                         AND cll.\"ClCode2\" = cf.\"ClCode2\" ";
-		sql += "                         AND cll.\"ClNo\" = cf.\"ClNo\")  cf ";
+		sql += "                         AND cll.\"ClNo\" = cf.\"ClNo\"  ";
+		sql += " LEFT JOIN \"ClLandOwner\" clo ON clo.\"ClCode1\" = cll.\"ClCode1\" ";
+		sql += "                         AND clo.\"ClCode2\" = cll.\"ClCode2\" ";
+		sql += "                         AND clo.\"ClNo\" = cll.\"ClNo\"  ";
+		sql += "                         AND clo.\"LandSeq\" = cll.\"LandSeq\")  cf ";
 		sql += " WHERE cf.\"ApproveNo\" = :applNo) b ON b.\"ApplNo\" = cf.\"ApproveNo\" ";
 		sql += "         WHERE ";
 		sql += "             cf.\"ApproveNo\" = :applNo ";

@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.JobMain;
@@ -129,6 +131,42 @@ public interface JobMainService {
    * @throws DBException exception
    */
   public void deleteAll(List<JobMain> jobMain, TitaVo... titaVo) throws DBException;
+
+  /**
+   * Stored Procedure<br>
+   * (日終批次)更新TxHoliday
+   * @param  EmpNo String
+   * @param titaVo Variable-Length Argument
+   *
+   */
+  public void Usp_Tx_TxHoliday_Ins(String EmpNo, TitaVo... titaVo);
+
+  /**
+   * Stored Procedure<br>
+   * (日終批次)更新員工檔
+   * @param  EmpNo String
+   * @param titaVo Variable-Length Argument
+   *
+   */
+  public void Usp_L6_CdEmp_Ins(String EmpNo, TitaVo... titaVo);
+
+  /**
+   * Stored Procedure<br>
+   * (日終批次)更新組織檔
+   * @param  EmpNo String
+   * @param titaVo Variable-Length Argument
+   *
+   */
+  public void Usp_L6_CdBcm_Ins(String EmpNo, TitaVo... titaVo);
+
+  /**
+   * Stored Procedure<br>
+   * (日終批次)更新離職員工檔
+   * @param  InputEmpNo String
+   * @param titaVo Variable-Length Argument
+   *
+   */
+  public void Usp_L6_QuitEmp_Ins(String InputEmpNo, TitaVo... titaVo);
 
   /**
    * Stored Procedure<br>
@@ -634,15 +672,6 @@ public interface JobMainService {
    *
    */
   public void Usp_L9_MonthlyLM052Ovdu_Ins(int TYYMM, String EmpNo, TitaVo... titaVo);
-
-  /**
-   * Stored Procedure<br>
-   * (日終批次)更新TxHoliday
-   * @param  EmpNo String
-   * @param titaVo Variable-Length Argument
-   *
-   */
-  public void Usp_Tx_TxHoliday_Ins(String EmpNo, TitaVo... titaVo);
 
   /**
    * Stored Procedure<br>

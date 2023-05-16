@@ -57,9 +57,9 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  ,NVL(Cl.\"ClCode2\",JSON_VALUE(TR.\"TranData\",'$.ClCode2')) AS \"ClCode2\"";
 		sql += "		  ,CC.\"Item\" AS \"ClName\"";
 		sql += "		  ,NVL(Cl.\"ClNo\",JSON_VALUE(TR.\"TranData\",'$.ClNo')) AS \"ClNo\"";
-		sql += "		  ,JSON_QUERY(T.\"Content\",'$[*].f' WITH WRAPPER) AS \"Item\"";
-		sql += "		  ,JSON_QUERY(T.\"Content\",'$[*].o' WITH WRAPPER) AS \"Old\"";
-		sql += "		  ,JSON_QUERY(T.\"Content\",'$[*].n' WITH WRAPPER) AS \"New\"";
+		sql += "		  ,CASE WHEN T.\"Reason\" LIKE '%刪除%' THEN '[\"刪除\"]' ELSE JSON_QUERY(T.\"Content\",'$[*].f' WITH WRAPPER) END AS \"Item\"";
+		sql += "		  ,CASE WHEN T.\"Reason\" LIKE '%刪除%' THEN '[\"刪除\"]' ELSE JSON_QUERY(T.\"Content\",'$[*].o' WITH WRAPPER) END AS \"Old\"";
+		sql += "		  ,CASE WHEN T.\"Reason\" LIKE '%刪除%' THEN '[\"刪除\"]' ELSE JSON_QUERY(T.\"Content\",'$[*].n' WITH WRAPPER) END AS \"New\"";
 		sql += "		  ,CE.\"Fullname\" AS \"Name\"";
 		sql += "		  ,CE2.\"Fullname\" AS \"SupNoName\"";
 		sql += "		  ,T.\"TranNo\" AS \"TranNo\"";

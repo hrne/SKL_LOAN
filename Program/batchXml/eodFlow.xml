@@ -11,6 +11,21 @@
 		<!-- Usp_Tx_TxHoliday_Ins -->
 		<step id="txTxHolidayUpd" parent="parentStep">
 			<tasklet ref="TxTxHolidayUpd" />
+			<next on="COMPLETED" to="l6CdEmpIns" />
+			<end on="FAILED" />
+		</step>
+		<step id="l6CdEmpIns" parent="parentStep">
+			<tasklet ref="L6CdEmpIns" />
+			<next on="COMPLETED" to="l6CdBcmIns" />
+			<end on="FAILED" />
+		</step>
+		<step id="l6CdBcmIns" parent="parentStep">
+			<tasklet ref="L6CdBcmIns" />
+			<next on="COMPLETED" to="l6QuitEmpIns" />
+			<end on="FAILED" />
+		</step>
+		<step id="l6QuitEmpIns" parent="parentStep">
+			<tasklet ref="L6QuitEmpIns" />
 			<next on="COMPLETED" to="l2CustDataCtrlIns" />
 			<end on="FAILED" />
 		</step>

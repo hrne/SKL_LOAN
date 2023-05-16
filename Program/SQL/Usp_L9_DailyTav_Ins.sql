@@ -44,8 +44,7 @@ BEGIN
            , MAX("LastUpdate")      AS "LastUpdate"
            , MAX("LastUpdateEmpNo") AS "LastUpdateEmpNo"
       FROM "AcReceivable"
-      WHERE "AcctCode" IN ('TAV')
-      -- 2023-04-20 Wei 修改 from Lai : 暫收款不分TLD
+      WHERE "AcctCode" IN ('TAV','TCK','TAM','TSL','T11')
       GROUP BY "AcctCode"
              , "CustNo"
              , "FacmNo"
@@ -61,10 +60,10 @@ BEGIN
            ELSE 'N' END           AS "SelfUseFlag"
          , AR."TavBal"            AS "TavBal"
          , 'Y'                    AS "LatestFlag"
-         , AR."LastUpdate"        AS "CreateDate"
-         , AR."LastUpdateEmpNo"   AS "CreateEmpNo"
-         , AR."LastUpdate"        AS "LastUpdate"
-         , AR."LastUpdateEmpNo"   AS "LastUpdateEmpNo"
+         , NVL(AR."LastUpdate",JOB_START_TIME)   AS "CreateDate"
+         , NVL(AR."LastUpdateEmpNo",EmpNo)       AS "CreateEmpNo"
+         , NVL(AR."LastUpdate",JOB_START_TIME)   AS "LastUpdate"
+         , NVL(AR."LastUpdateEmpNo",EmpNo)       AS "LastUpdateEmpNo"
     FROM AR
     LEFT JOIN "DailyTav" DT ON DT."CustNo" = AR."CustNo"
                            AND DT."FacmNo" = AR."FacmNo"
@@ -72,6 +71,7 @@ BEGIN
                            AND DT."LatestFlag" = 'Y'
     LEFT JOIN "LoanFacTmp" LFT ON LFT."CustNo" = AR."CustNo"
                               AND LFT."FacmNo" = AR."FacmNo"
+                              AND AR."AcctCode" IN ('TAV')                              
     WHERE NVL(DT."TavBal",0) != AR."TavBal"
     ;
 

@@ -273,7 +273,8 @@ public class L9703Report1 extends MakeReport {
 				BigDecimal breachAmtAndDelayInt = BigDecimal.ZERO; // 違約金(報表最終產出的違約金包含違約金及延遲息)
 				BigDecimal overflow = BigDecimal.ZERO; // 溢短繳
 				BigDecimal intRate = BigDecimal.ZERO; // 利率
-				BigDecimal total; // 合計
+				BigDecimal total = BigDecimal.ZERO;
+				; // 合計
 
 				// 未收本息 = 本金+利息 baTxVo.Principal + baTxVo.Interest
 				// 違約金 有 但要扣成 0 baTxVo.BreachAmt
@@ -312,6 +313,11 @@ public class L9703Report1 extends MakeReport {
 				totalOfOverflow = totalOfOverflow.add(overflow); // 溢短繳加總計算
 				totalOfTotal = totalOfTotal.add(total); // 合計加總計算
 
+				tUnpaidPriInt = tUnpaidPriInt.add(unpaidPriInt); // 未收本息小計計算
+				tBreachAmtAndDelayInt = tBreachAmtAndDelayInt.add(breachAmtAndDelayInt); // 違約金小計計算
+				tOverflow = tOverflow.add(overflow); // 溢短繳小計計算
+				tTotal = tTotal.add(total); // 合計小計計算
+
 				// 地區別
 				this.print(1, 1, tL9703.get("F0"));
 
@@ -343,7 +349,8 @@ public class L9703Report1 extends MakeReport {
 				BigDecimal loanBal = tL9703.get("F6") == null ? BigDecimal.ZERO : new BigDecimal(tL9703.get("F6"));
 				this.print(0, 57, formatAmt(loanBal, 0), "R");
 				totalOfLoanBal = totalOfLoanBal.add(loanBal); // 本金餘額加總計算
-
+				tLoanBal = tLoanBal.add(loanBal); // 本金餘額小總計算
+				
 				// 利率
 				this.print(0, 64, formatAmt(intRate, 4), "R");
 

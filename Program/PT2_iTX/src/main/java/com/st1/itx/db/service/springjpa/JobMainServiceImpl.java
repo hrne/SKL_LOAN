@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -382,6 +385,70 @@ em = null;
       jobMainRepos.deleteAll(jobMain);
       jobMainRepos.flush();
     }
+  }
+
+  @Override
+  public void Usp_Tx_TxHoliday_Ins(String EmpNo, TitaVo... titaVo) {
+    String dbName = "";
+    
+    if (titaVo.length != 0)
+    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    if (dbName.equals(ContentName.onDay))
+      jobMainReposDay.uspTxTxholidayIns(EmpNo);
+    else if (dbName.equals(ContentName.onMon))
+      jobMainReposMon.uspTxTxholidayIns(EmpNo);
+    else if (dbName.equals(ContentName.onHist))
+      jobMainReposHist.uspTxTxholidayIns(EmpNo);
+   else
+      jobMainRepos.uspTxTxholidayIns(EmpNo);
+  }
+
+  @Override
+  public void Usp_L6_CdEmp_Ins(String EmpNo, TitaVo... titaVo) {
+    String dbName = "";
+    
+    if (titaVo.length != 0)
+    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    if (dbName.equals(ContentName.onDay))
+      jobMainReposDay.uspL6CdempIns(EmpNo);
+    else if (dbName.equals(ContentName.onMon))
+      jobMainReposMon.uspL6CdempIns(EmpNo);
+    else if (dbName.equals(ContentName.onHist))
+      jobMainReposHist.uspL6CdempIns(EmpNo);
+   else
+      jobMainRepos.uspL6CdempIns(EmpNo);
+  }
+
+  @Override
+  public void Usp_L6_CdBcm_Ins(String EmpNo, TitaVo... titaVo) {
+    String dbName = "";
+    
+    if (titaVo.length != 0)
+    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    if (dbName.equals(ContentName.onDay))
+      jobMainReposDay.uspL6CdbcmIns(EmpNo);
+    else if (dbName.equals(ContentName.onMon))
+      jobMainReposMon.uspL6CdbcmIns(EmpNo);
+    else if (dbName.equals(ContentName.onHist))
+      jobMainReposHist.uspL6CdbcmIns(EmpNo);
+   else
+      jobMainRepos.uspL6CdbcmIns(EmpNo);
+  }
+
+  @Override
+  public void Usp_L6_QuitEmp_Ins(String InputEmpNo, TitaVo... titaVo) {
+    String dbName = "";
+    
+    if (titaVo.length != 0)
+    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    if (dbName.equals(ContentName.onDay))
+      jobMainReposDay.uspL6QuitempIns(InputEmpNo);
+    else if (dbName.equals(ContentName.onMon))
+      jobMainReposMon.uspL6QuitempIns(InputEmpNo);
+    else if (dbName.equals(ContentName.onHist))
+      jobMainReposHist.uspL6QuitempIns(InputEmpNo);
+   else
+      jobMainRepos.uspL6QuitempIns(InputEmpNo);
   }
 
   @Override
@@ -1166,22 +1233,6 @@ em = null;
       jobMainReposHist.uspL9Monthlylm052ovduIns(TYYMM, EmpNo);
    else
       jobMainRepos.uspL9Monthlylm052ovduIns(TYYMM, EmpNo);
-  }
-
-  @Override
-  public void Usp_Tx_TxHoliday_Ins(String EmpNo, TitaVo... titaVo) {
-    String dbName = "";
-    
-    if (titaVo.length != 0)
-    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    if (dbName.equals(ContentName.onDay))
-      jobMainReposDay.uspTxTxholidayIns(EmpNo);
-    else if (dbName.equals(ContentName.onMon))
-      jobMainReposMon.uspTxTxholidayIns(EmpNo);
-    else if (dbName.equals(ContentName.onHist))
-      jobMainReposHist.uspTxTxholidayIns(EmpNo);
-   else
-      jobMainRepos.uspTxTxholidayIns(EmpNo);
   }
 
   @Override

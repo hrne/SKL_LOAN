@@ -55,6 +55,8 @@
 		<IText-Asian-Ver>5.2.0</IText-Asian-Ver>
 		<Bouncy-Castle-Provider-Ver>1.61</Bouncy-Castle-Provider-Ver>
 		<Apache-HttpClient-Ver>4.5.12</Apache-HttpClient-Ver>
+		<Apache-FTP-Ver>1.2.0</Apache-FTP-Ver>
+		<Apache-Mina-Ver>2.2.1</Apache-Mina-Ver>
 
 		<Querydsl-JPA-Support-Ver>4.2.1</Querydsl-JPA-Support-Ver>
 
@@ -82,6 +84,18 @@
     		<groupId>commons-net</groupId>
     		<artifactId>commons-net</artifactId>
     		<version>${Commons-Net-Ver}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.ftpserver</groupId>
+			<artifactId>ftpserver-core</artifactId>
+			<version>${Apache-FTP-Ver}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.ftpserver</groupId>
+			<artifactId>ftplet-api</artifactId>
+			<version>${Apache-FTP-Ver}</version>
 		</dependency>
 
 		<!-- Mail -->

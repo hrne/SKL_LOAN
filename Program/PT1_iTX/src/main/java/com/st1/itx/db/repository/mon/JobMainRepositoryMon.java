@@ -3,6 +3,8 @@ package com.st1.itx.db.repository.mon;
 
 import java.util.Optional;
 
+import java.math.BigDecimal;
+import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
@@ -30,6 +32,22 @@ public interface JobMainRepositoryMon extends JpaRepository<JobMain, JobMainId> 
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)
   public Optional<JobMain> findByJobMainId(JobMainId jobMainId);
+
+  // (日終批次)更新TxHoliday
+  @Procedure(value = "\"Usp_Tx_TxHoliday_Ins\"")
+  public void uspTxTxholidayIns(String EmpNo);
+
+  // (日終批次)更新員工檔
+  @Procedure(value = "\"Usp_L6_CdEmp_Ins\"")
+  public void uspL6CdempIns(String EmpNo);
+
+  // (日終批次)更新組織檔
+  @Procedure(value = "\"Usp_L6_CdBcm_Ins\"")
+  public void uspL6CdbcmIns(String EmpNo);
+
+  // (日終批次)更新離職員工檔
+  @Procedure(value = "\"Usp_L6_QuitEmp_Ins\"")
+  public void uspL6QuitempIns(String InputEmpNo);
 
   // (日終批次)維護 CustDataCtrl 結清戶個資控管檔
   @Procedure(value = "\"Usp_L2_CustDataCtrl_Ins\"")
@@ -226,10 +244,6 @@ public interface JobMainRepositoryMon extends JpaRepository<JobMain, JobMainId> 
   // (月底日日終批次)維護 MonthlyLM052Ovdu
   @Procedure(value = "\"Usp_L9_MonthlyLM052Ovdu_Ins\"")
   public void uspL9Monthlylm052ovduIns(int TYYMM, String EmpNo);
-
-  // (日終批次)更新TxHoliday
-  @Procedure(value = "\"Usp_Tx_TxHoliday_Ins\"")
-  public void uspTxTxholidayIns(String EmpNo);
 
   // 執行L5811產生國稅局申報檢核檔時
   @Procedure(value = "\"Usp_L9_YearlyHouseLoanIntCheck_Upd\"")

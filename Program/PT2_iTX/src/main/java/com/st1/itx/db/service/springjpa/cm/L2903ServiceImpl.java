@@ -30,14 +30,23 @@ public class L2903ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> findAll(int CustNo, int index, int limit, TitaVo titaVo) throws Exception {
 		this.info("L2903ServiceImpl.findAll ");
 		String sql = "";
-		sql += "     SELECT Min(\"CaseNo\") AS F1";
-		sql += "	           ,\"CustNo\"       ";
-		sql += "               ,\"ReltUKey\"     ";
-		sql += "               ,\"FinalFg\"      ";
-		sql += "     FROM \"ReltMain\"           ";
-		sql += "     WHERE \"CustNo\" = :custno  ";
-		sql += "       AND \"FinalFg\" = 'Y'     ";
-		sql += "     GROUP BY \"CustNo\", \"ReltUKey\", \"FinalFg\"";
+		sql += "     SELECT  rm.\"ReltUKey\" 			AS F0 , ";
+		sql += " 			 MIN(cm.\"CustNo\") 		AS F1 ";
+		sql += "     FROM \"ReltMain\"     rm      ";
+		sql += " LEFT JOIN \"CustMain\"   cm ON cm.\"CustUKey\" = rm.\"ReltUKey\" ";
+		sql += "     WHERE rm.\"CustNo\" = :custno  ";
+		sql += "       AND rm.\"FinalFg\" = 'Y'     ";
+		sql += "  GROUP BY rm.\"ReltUKey\" ";
+		sql += " UNION (SELECT cm2.\"CustUKey\" 	AS F0 , ";
+		sql += " 			   cm2.\"CustNo\" 		AS F1 ";
+		sql += " FROM \"ReltMain\" rm ";
+		sql += " LEFT JOIN \"CustMain\" cm ON cm.\"CustNo\" = :custno ";
+		sql += " LEFT JOIN \"CustMain\" cm2 ON cm2.\"CustNo\" = rm.\"CustNo\" ";
+		sql += " WHERE rm.\"ReltUKey\" = cm.\"CustUKey\"  ";
+		sql += "    AND cm2.\"CustUKey\" IS NOT NULL  ";
+		sql += " GROUP BY cm2.\"CustUKey\" ,cm2.\"CustNo\" ) ";
+	
+		sql += " ORDER BY F1 ";
 
 		this.info("sql=" + sql);
 		Query query;

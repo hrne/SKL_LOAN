@@ -303,7 +303,62 @@ BEGIN
  
     -- 記錄寫入筆數 
     INS_CNT := INS_CNT + sql%rowcount; 
- 
+
+    EXECUTE IMMEDIATE 'TRUNCATE TABLE "TfBuildingLandMapping" DROP STORAGE';
+
+    INSERT INTO "TfBuildingLandMapping" (
+     "ClCode1",
+     "ClCode2",
+     "ClNo",
+     "LandSeq",
+     GDRID1,
+     GDRID2,
+     GDRNUM,
+     LGTSEQ
+    )
+    WITH S1 AS ( 
+         SELECT DISTINCT 
+                B0."ClCode1" 
+              , B0."ClCode2" 
+              , B0."ClNo" 
+              , M."GDRID1" 
+              , M."GDRID2" 
+              , M."GDRNUM" 
+         FROM "ClBuilding" B0  
+         LEFT JOIN "ClNoMapping" M ON M."ClCode1" = B0."ClCode1" 
+                                  AND M."ClCode2" = B0."ClCode2" 
+                                  AND M."ClNo"    = B0."ClNo" 
+         LEFT JOIN "LA$LGTP" LG ON LG."GDRID1" = M."GDRID1" 
+                               AND LG."GDRID2" = M."GDRID2" 
+                               AND LG."GDRNUM" = M."GDRNUM" 
+         WHERE B0."ClCode1" = '1' -- 撈建物 
+           AND NVL(LG."LGTNM1",0) != 0 
+    ) 
+    SELECT S1."ClCode1"                   AS "ClCode1"             -- 擔保品代號1 DECIMAL 1  
+         , S1."ClCode2"                   AS "ClCode2"             -- 擔保品代號2 DECIMAL 2  
+         , S1."ClNo"                      AS "ClNo"                -- 擔保品編號 DECIMAL 7  
+         , ROW_NUMBER() 
+           OVER (
+             PARTITION BY S1."ClCode1" 
+                        , S1."ClCode2" 
+                        , S1."ClNo" 
+             ORDER BY S2."GDRID1" 
+                    , S2."GDRID2" 
+                    , S2."GDRNUM" 
+                    , S2."LGTSEQ"
+           )                              AS "LandSeq"             -- 土地序號 DECIMAL 3 
+         , S2.GDRID1
+         , S2.GDRID2
+         , S2.GDRNUM
+         , S2.LGTSEQ
+    FROM S1 
+    LEFT JOIN "LA$LGTP" S2 ON S2."GDRID1" = S1."GDRID1" 
+                          AND S2."GDRID2" = S1."GDRID2" 
+                          AND S2."GDRNUM" = S1."GDRNUM" 
+                          -- AND S2."LGTSEQ" = S1."LGTSEQ" 
+    WHERE NVL(S2."GDRNUM",0) > 0  
+    ; 
+
     -- 從建物檔將建物的土地資料寫入土地檔寫入資料 
     INSERT INTO "ClLand"  (
          "ClCode1"             -- 擔保品代號1 DECIMAL 1  
@@ -335,38 +390,10 @@ BEGIN
        , "LastUpdate"          -- 最後更新日期時間 DATE   
        , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6  
     )
-    WITH S1 AS ( 
-         SELECT DISTINCT 
-                B0."ClCode1" 
-              , B0."ClCode2" 
-              , B0."ClNo" 
-              , M."GDRID1" 
-              , M."GDRID2" 
-              , M."GDRNUM" 
-         FROM "ClBuilding" B0  
-         LEFT JOIN "ClNoMapping" M ON M."ClCode1" = B0."ClCode1" 
-                                  AND M."ClCode2" = B0."ClCode2" 
-                                  AND M."ClNo"    = B0."ClNo" 
-         LEFT JOIN "LA$LGTP" LG ON LG."GDRID1" = M."GDRID1" 
-                               AND LG."GDRID2" = M."GDRID2" 
-                               AND LG."GDRNUM" = M."GDRNUM" 
-         WHERE B0."ClCode1" = '1' -- 撈建物 
-           AND NVL(LG."LGTNM1",0) != 0 
-    ) 
     SELECT S1."ClCode1"                   AS "ClCode1"             -- 擔保品代號1 DECIMAL 1  
           ,S1."ClCode2"                   AS "ClCode2"             -- 擔保品代號2 DECIMAL 2  
           ,S1."ClNo"                      AS "ClNo"                -- 擔保品編號 DECIMAL 7  
-          ,CASE 
-             WHEN S1."ClCode1" = 1 THEN ROW_NUMBER() OVER (PARTITION BY S1."ClCode1" 
-                                                                       ,S1."ClCode2" 
-                                                                       ,S1."ClNo" 
-                                                           ORDER BY S2."GDRID1" 
-                                                                   ,S2."GDRID2" 
-                                                                   ,S2."GDRNUM" 
-                                                                   ,S2."LGTSEQ" 
-                                                                   ,S2."LGTNM1" 
-                                                                   ,S2."LGTNM2") 
-           ELSE 0 END                     AS "LandSeq"             -- 土地序號 DECIMAL 3 
+          ,S1."LandSeq"                   AS "LandSeq"             -- 土地序號 DECIMAL 3 
           ,NVL(C1."CityCode",' ')         AS "CityCode"            -- 縣市 VARCHAR2 2  
           ,NVL(C1."AreaCode",' ')         AS "AreaCode"            -- 鄉鎮市區 VARCHAR2 3  
           ,NVL(LS."IrCode",' ')           AS "IrCode"              -- 段小段代碼 VARCHAR2 5  
@@ -495,11 +522,11 @@ BEGIN
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE   
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6  
-    FROM S1 
+    FROM "TfBuildingLandMapping" S1 
     LEFT JOIN "LA$LGTP" S2 ON S2."GDRID1" = S1."GDRID1" 
                           AND S2."GDRID2" = S1."GDRID2" 
                           AND S2."GDRNUM" = S1."GDRNUM" 
-                          -- AND S2."LGTSEQ" = S1."LGTSEQ" 
+                          AND S2."LGTSEQ" = S1."LGTSEQ" 
     LEFT JOIN ( SELECT CITY."CityCode" 
                       ,CITY."CityItem" 
                       ,AREA."AreaCode" 

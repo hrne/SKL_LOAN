@@ -115,8 +115,8 @@ public class L2903 extends TradeBuffer {
 				}
 
 				for (Map<String, String> result : resultList) {
-					if (!temp.contains(result.get("F2"))) {
-						temp.add(result.get("F2"));
+					if (!temp.contains(result.get("F0"))) {
+						temp.add(result.get("F0"));
 					}
 				}
 			} // for
@@ -196,8 +196,8 @@ public class L2903 extends TradeBuffer {
 			}
 
 			for (Map<String, String> result : resultList) {
-				if (!temp.contains(result.get("F2"))) {
-					temp.add(result.get("F2"));
+				if (!temp.contains(result.get("F0"))) {
+					temp.add(result.get("F0"));
 				}
 			}
 
@@ -256,7 +256,6 @@ public class L2903 extends TradeBuffer {
 					/* 將每筆資料放入Tota的OcList */
 					this.totaVo.addOccursList(occurslist);
 				} // for
-
 			} // for
 		} // else
 

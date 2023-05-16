@@ -26,7 +26,7 @@ public class L9133Report2 extends CommBuffer {
 	private MakeExcel makeExcel;
 
 	private String reportCode = "L9133";
-	private String reportItem = "會計與主檔餘額檢核明細表";
+	private String reportItem = "L9133-會計與主檔餘額檢核明細表";
 
 	public void exec(TitaVo titaVo) throws LogicException {
 		this.info("L9133Report2 exec ...");
