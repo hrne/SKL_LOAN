@@ -44,7 +44,7 @@ BEGIN
            , MAX("LastUpdate")      AS "LastUpdate"
            , MAX("LastUpdateEmpNo") AS "LastUpdateEmpNo"
       FROM "AcReceivable"
-      WHERE "AcctCode" IN ('TAV','TCK','TAM','TSL','T11')
+      WHERE "AcctCode" IN ('TAV','TCK','TAM','TSL','T11','T12','T13')
       GROUP BY "AcctCode"
              , "CustNo"
              , "FacmNo"
