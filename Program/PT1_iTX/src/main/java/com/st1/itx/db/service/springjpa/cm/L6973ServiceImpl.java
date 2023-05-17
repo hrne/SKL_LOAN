@@ -1,0 +1,57 @@
+package com.st1.itx.db.service.springjpa.cm;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
+
+import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.service.springjpa.ASpringJpaParm;
+import com.st1.itx.db.transaction.BaseEntityManager;
+
+@Service("L6973ServiceImpl")
+@Repository
+public class L6973ServiceImpl extends ASpringJpaParm implements InitializingBean {
+
+	@Autowired
+	private BaseEntityManager baseEntityManager;
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+	}
+
+	public List<Map<String, String>> doQuery(int index, int limit, TitaVo titaVo) throws Exception {
+		this.info("L6973ServiceImpl.doQuery index:" + index + ",limit:" + limit);
+
+		// *** 折返控制相關 ***
+		this.index = index;
+		// *** 折返控制相關 ***
+		this.limit = limit;
+
+		String sql = "";
+		sql += " SELECT \"LogUkey\" ";
+		sql += "      , \"LogDate\" ";
+		sql += "      , LPAD(\"LogTime\",6,'0') AS \"LogTime\" ";
+		sql += "      , \"UspName\" ";
+		sql += "      , \"ErrorMessage\" ";
+		sql += "      , \"ErrorBackTrace\" ";
+		sql += "      , \"ExecEmpNo\" ";
+		sql += " FROM \"UspErrorLog\" ";
+		sql += " ORDER BY \"LogDate\" DESC ";
+		sql += "        , LPAD(\"LogTime\",6,'0') DESC ";
+		this.info("sql = " + sql);
+
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+
+		Query query = em.createNativeQuery(sql);
+
+		return switchback(query);
+	}
+
+}

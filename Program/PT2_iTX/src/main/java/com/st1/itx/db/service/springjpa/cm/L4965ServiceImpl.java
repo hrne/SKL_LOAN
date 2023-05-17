@@ -240,6 +240,7 @@ public class L4965ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sqlL4965 += "        ,ROW_NUMBER() Over (Partition By o.\"ClCode1\", o.\"ClCode2\", o.\"ClNo\", o.\"OrigInsuNo\", o.\"EndoInsuNo\" ";
 		sqlL4965 += "                             order By c.\"ApproveNo\" ASC)";
 		sqlL4965 += "                             as   \"RowNo\"";
+		sqlL4965 += "        ,0                     as \"InsuYearMonth\"  ";
 		sqlL4965 += "        from \"InsuOrignal\" o";
 		sqlL4965 += "        left join \"ClFac\" c on c.\"ClCode1\" = o.\"ClCode1\"";
 		sqlL4965 += "                   and c.\"ClCode2\" = o.\"ClCode2\"";
@@ -264,10 +265,11 @@ public class L4965ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sqlL4965 += "        ,o.\"InsuStartDate\"      as \"InsuStartDate\"";
 		sqlL4965 += "        ,o.\"InsuEndDate\"        as \"InsuEndDate\"  ";
 		sqlL4965 += "        ,o.\"InsuTypeCode\"       as  \"InsuTypeCode\" ";
-		sqlL4965 += "        ,o.\"PrevInsuNo\"        as \"PrevInsuNo\"  ";
+		sqlL4965 += "        ,o.\"PrevInsuNo\"         as \"PrevInsuNo\"  ";
 		sqlL4965 += "        ,ROW_NUMBER() Over (Partition By o.\"ClCode1\", o.\"ClCode2\", o.\"ClNo\", o.\"PrevInsuNo\", o.\"EndoInsuNo\"";
 		sqlL4965 += "                             order By c.\"ApproveNo\" ASC)";
 		sqlL4965 += "                             as   \"RowNo\"";
+		sqlL4965 += "        ,o.\"InsuYearMonth\"      as \"InsuYearMonth\"  ";
 		sqlL4965 += "        from \"InsuRenew\" o ";
 		sqlL4965 += "        left join \"ClFac\" c on c.\"ClCode1\" = o.\"ClCode1\"";
 		sqlL4965 += "                   and c.\"ClCode2\" = o.\"ClCode2\"";

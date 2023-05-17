@@ -96,7 +96,7 @@ public class L4041Report extends MakeReport {
 
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4041", "授權資料明細表", "", "A4", "P");
 
-		this.print(-9, 3, "　　戶號　　　　　　　　　　　　扣款人ID　　　　扣款帳號　　 　授權方式　授權類別　異動人員　　異動日期");
+		this.print(-9, 3, "　戶號　　戶名　　　　　　　　　扣款人ID　存款別　扣款帳號　　 　授權方式　授權類別　異動人員　異動日期");
 		this.print(-10, 3, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 
 		for (Map<String, String> result : ListResult) {
@@ -112,15 +112,15 @@ public class L4041Report extends MakeReport {
 				print(0, 31, result.get("F7"), "L");
 
 				// 郵局存款別+扣款帳號
-				print(0, 43, result.get("F3") + " " + result.get("F4"));
+				print(0, 45, result.get("F3") + " " + result.get("F4"));
 
 				// 授權方式
 				if ("1".equals(result.get("F1"))) {
-					print(0, 62, "紙本申請");
+					print(0, 64, "紙本申請");
 				} else if ("2".equals(result.get("F1"))) {
-					print(0, 62, "紙本終止");
+					print(0, 64, "紙本終止");
 				} else {
-					print(0, 62, "紙本");
+					print(0, 64, "紙本");
 				}
 
 				// 授權類別
@@ -131,7 +131,7 @@ public class L4041Report extends MakeReport {
 				} else {
 					iAuthCode = "";
 				}
-				print(0, 70, iAuthCode);
+				print(0, 74, iAuthCode);
 
 				// 異動人員
 				String iEmp = titaVo.getTlrNo();
@@ -139,7 +139,7 @@ public class L4041Report extends MakeReport {
 				if (tCdEmp != null) {
 					iEmp = tCdEmp.getFullname();
 				}
-				print(0, 80, iEmp);
+				print(0, 82, iEmp);
 				// 異動日期
 				print(0, 90, "" + this.showRocDate(titaVo.getCalDy(), 1));
 
@@ -170,8 +170,9 @@ public class L4041Report extends MakeReport {
 		if (this.NowRow >= 60) {
 
 			newPage();
-			this.print(-9, 3, "戶號 扣款人ID 　郵局存款別　　扣款帳號　　　　　授權方式　　　　授權類別　建檔人員　　　建檔日期");
-			this.print(-10, 3, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
+			this.print(-9, 3, "　戶號　　戶名　　　　　　　　　扣款人ID　存款別　扣款帳號　　 　授權方式　授權類別　異動人員　異動日期");
+			this.print(-10, 3, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
+
 		}
 
 	}

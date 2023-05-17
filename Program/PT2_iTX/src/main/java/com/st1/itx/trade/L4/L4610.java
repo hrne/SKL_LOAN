@@ -129,6 +129,7 @@ public class L4610 extends TradeBuffer {
 					tInsuRenewId.setClNo(clNo);
 					tInsuRenewId.setPrevInsuNo(tOldInsuRenew.getPrevInsuNo());
 					tInsuRenewId.setEndoInsuNo(endoInsuNo);
+					tInsuRenewId.setInsuYearMonth(tOldInsuRenew.getInsuYearMonth());
 					tNewInsuRenew.setInsuRenewId(tInsuRenewId);
 					tNewInsuRenew.setCustNo(tOldInsuRenew.getCustNo());
 					tNewInsuRenew.setFacmNo(tOldInsuRenew.getFacmNo());

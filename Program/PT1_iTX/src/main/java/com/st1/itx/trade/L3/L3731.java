@@ -309,7 +309,7 @@ public class L3731 extends TradeBuffer {
 		}
 
 		datalog.setEnv(titaVo, beforeLoanBorMain, tLoanBorMain);
-		datalog.exec();
+		datalog.exec("修改放款主檔");
 	}
 
 	// 還原撥款主檔
@@ -355,7 +355,7 @@ public class L3731 extends TradeBuffer {
 					"催收呆帳檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo + " 撥款序號 = " + wkBormNo + " 催收序號 = " + wkOvduNo); // 更新資料時，發生錯誤
 		}
 		datalog.setEnv(titaVo, beforeLoanOverdue, tLoanOverdue);
-		datalog.exec();
+		datalog.exec("修改催收呆帳檔");
 	}
 
 	// 還原催收檔

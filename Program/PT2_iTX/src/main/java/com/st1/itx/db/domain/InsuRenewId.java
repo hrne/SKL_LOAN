@@ -2,8 +2,12 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * InsuRenew 火險單續保檔<br>
@@ -16,12 +20,7 @@ import javax.persistence.Embeddable;
 public class InsuRenewId implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -2552902055569082702L;
-
-// 擔保品-代號1
+  // 擔保品-代號1
   @Column(name = "`ClCode1`")
   private int clCode1 = 0;
 
@@ -42,15 +41,21 @@ public class InsuRenewId implements Serializable {
   @Column(name = "`EndoInsuNo`", length = 17)
   private String endoInsuNo = " ";
 
+  // 火險單年月
+  /* 原火險到期年月 */
+  @Column(name = "`InsuYearMonth`")
+  private int insuYearMonth = 0;
+
   public InsuRenewId() {
   }
 
-  public InsuRenewId(int clCode1, int clCode2, int clNo, String prevInsuNo, String endoInsuNo) {
+  public InsuRenewId(int clCode1, int clCode2, int clNo, String prevInsuNo, String endoInsuNo, int insuYearMonth) {
     this.clCode1 = clCode1;
     this.clCode2 = clCode2;
     this.clNo = clNo;
     this.prevInsuNo = prevInsuNo;
     this.endoInsuNo = endoInsuNo;
+    this.insuYearMonth = insuYearMonth;
   }
 
 /**
@@ -148,10 +153,29 @@ public class InsuRenewId implements Serializable {
     this.endoInsuNo = endoInsuNo;
   }
 
+/**
+	* 火險單年月<br>
+	* 原火險到期年月
+	* @return Integer
+	*/
+  public int getInsuYearMonth() {
+    return this.insuYearMonth;
+  }
+
+/**
+	* 火險單年月<br>
+	* 原火險到期年月
+  *
+  * @param insuYearMonth 火險單年月
+	*/
+  public void setInsuYearMonth(int insuYearMonth) {
+    this.insuYearMonth = insuYearMonth;
+  }
+
 
   @Override
   public int hashCode() {
-    return Objects.hash(clCode1, clCode2, clNo, prevInsuNo, endoInsuNo);
+    return Objects.hash(clCode1, clCode2, clNo, prevInsuNo, endoInsuNo, insuYearMonth);
   }
 
   @Override
@@ -161,11 +185,11 @@ public class InsuRenewId implements Serializable {
     if(obj == null || getClass() != obj.getClass())
       return false;
     InsuRenewId insuRenewId = (InsuRenewId) obj;
-    return clCode1 == insuRenewId.clCode1 && clCode2 == insuRenewId.clCode2 && clNo == insuRenewId.clNo && prevInsuNo.equals(insuRenewId.prevInsuNo) && endoInsuNo.equals(insuRenewId.endoInsuNo);
+    return clCode1 == insuRenewId.clCode1 && clCode2 == insuRenewId.clCode2 && clNo == insuRenewId.clNo && prevInsuNo.equals(insuRenewId.prevInsuNo) && endoInsuNo.equals(insuRenewId.endoInsuNo) && insuYearMonth == insuRenewId.insuYearMonth;
   }
 
   @Override
   public String toString() {
-    return "InsuRenewId [clCode1=" + clCode1 + ", clCode2=" + clCode2 + ", clNo=" + clNo + ", prevInsuNo=" + prevInsuNo + ", endoInsuNo=" + endoInsuNo + "]";
+    return "InsuRenewId [clCode1=" + clCode1 + ", clCode2=" + clCode2 + ", clNo=" + clNo + ", prevInsuNo=" + prevInsuNo + ", endoInsuNo=" + endoInsuNo + ", insuYearMonth=" + insuYearMonth + "]";
   }
 }

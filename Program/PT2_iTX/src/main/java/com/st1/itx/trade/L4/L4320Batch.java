@@ -555,7 +555,7 @@ public class L4320Batch extends TradeBuffer {
 						warnMsg += ", 下次利率調整月份 + 調整周期 = 到期日" + maturityDateX + "月份"; // 不及通知客戶，故不調整
 					}
 					preNextAdjDate = maturityDate;
-				} else if (preNextAdjDate % 100 > preDD) {
+				} else if (preNextAdjDate % 100 > firstAdjRateDate % 100) {
 					warnMsg += ", 下次利率調整日(" + preNextAdjDate % 100 + ")>首調日(" + firstAdjRateDate % 100 + ")";
 				}
 			}

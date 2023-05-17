@@ -43,6 +43,7 @@ public class L4R18 extends TradeBuffer {
 		int iClNo = parse.stringToInteger(titaVo.getParam("RimClNo"));
 		String iPrevInsuNo = titaVo.getParam("RimPrevInsuNo");
 		String iEndoInsuNo = titaVo.getParam("RimEndoInsuNo");
+		int iInsuYearMonth = parse.stringToInteger(titaVo.getParam("RimInsuYearMonth"));
 		
 
 		if ("".equals(iEndoInsuNo)) {
@@ -63,6 +64,7 @@ public class L4R18 extends TradeBuffer {
 		tInsuRenewId.setClNo(iClNo);
 		tInsuRenewId.setPrevInsuNo(iPrevInsuNo);
 		tInsuRenewId.setEndoInsuNo(iEndoInsuNo);
+		tInsuRenewId.setInsuYearMonth(iInsuYearMonth);
 
 		tInsuRenew = insuRenewService.findById(tInsuRenewId, titaVo);
 

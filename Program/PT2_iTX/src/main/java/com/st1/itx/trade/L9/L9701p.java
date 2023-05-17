@@ -71,53 +71,60 @@ public class L9701p extends TradeBuffer {
 
 		String formNo = "L9701";
 		CdReport tCdReport = new CdReport();
+		Slice<CustNotice> fFormNo = null;
 		tCdReport = sCdReportService.findById(formNo, titaVo);
 		int iCustNo = parse.stringToInteger(titaVo.get("CustNo"));
 		String Fg = tCdReport.getLetterFg();
+		//L6068如果不寄送就略過
 		if ("Y".equals(Fg)) {
-			String iCNfg = "";
-			String parentTranCode = titaVo.getTxcd();
-			Slice<CustNotice> tCustNotice = null;
-			tCustNotice = sCustNoticeService.findCustNo(iCustNo, 0, Integer.MAX_VALUE, titaVo);
 
-			List<CustNotice> lCustNotice = tCustNotice == null ? null : tCustNotice.getContent();
-			if (lCustNotice != null && lCustNotice.size() > 0) {
-				for (CustNotice custNotice : lCustNotice) {
-					iCNfg = custNotice.getEmailNotice();
-				}
-				if (iCNfg.equals("Y")) {
-					
-					l9701Report.setParentTranCode(parentTranCode);
-					l9701Report2.setParentTranCode(parentTranCode);
-					l9701Report3.setParentTranCode(parentTranCode);
+			fFormNo  = sCustNoticeService.findCustNoFormNo(iCustNo, formNo, 0, Integer.MAX_VALUE, titaVo);
+			
+			if( fFormNo != null ) {
+//			String iCNfg = "";
+					String parentTranCode = titaVo.getTxcd();
+//			Slice<CustNotice> tCustNotice = null;
+//			tCustNotice = sCustNoticeService.findCustNo(iCustNo, 0, Integer.MAX_VALUE, titaVo);
 
-					// 讀取VAR參數
-					String iReportType = titaVo.getParam("ReportType").trim();
+//			List<CustNotice> lCustNotice = tCustNotice == null ? null : tCustNotice.getContent();
+//					if (lCustNotice != null && lCustNotice.size() > 0) {
+//				for (CustNotice custNotice : lCustNotice) {
+//					iCNfg = custNotice.getEmailNotice();
+//				}
+//				if (iCNfg.equals("Y")) {
+						l9701Report.setParentTranCode(parentTranCode);
+						l9701Report2.setParentTranCode(parentTranCode);
+						l9701Report3.setParentTranCode(parentTranCode);
 
-					List<BaTxVo> listBaTxVo = new ArrayList<>();
+						// 讀取VAR參數
+						String iReportType = titaVo.getParam("ReportType").trim();
 
-					if (iReportType.equals("1") || iReportType.equals("9")) {
-						l9701Report.exec(titaVo, listBaTxVo);
+						List<BaTxVo> listBaTxVo = new ArrayList<>();
+
+						if (iReportType.equals("1") || iReportType.equals("9")) {
+							l9701Report.exec(titaVo, listBaTxVo);
+						}
+
+						if (iReportType.equals("2") || iReportType.equals("9")) {
+							l9701Report2.exec(titaVo, listBaTxVo);
+						}
+
+						if (iReportType.equals("3") || iReportType.equals("9")) {
+							l9701Report3.exec(titaVo);
+						}
+						if (!iReportType.equals("3")) {
+							listBaTxVo = runBaTxCom(titaVo);
+						}
+
+						String nowBc = dDateUtil.getNowStringBc();
+						String tlrNo = titaVo.getTlrNo();
+
+						webClient.sendPost(nowBc, "1800", tlrNo, "Y", "LC009", tlrNo + "L9701", "L9701客戶往來交易明細表已完成",
+								titaVo);
 					}
+//				}
 
-					if (iReportType.equals("2") || iReportType.equals("9")) {
-						l9701Report2.exec(titaVo, listBaTxVo);
-					}
-
-					if (iReportType.equals("3") || iReportType.equals("9")) {
-						l9701Report3.exec(titaVo);
-					}
-					if (!iReportType.equals("3")) {
-						listBaTxVo = runBaTxCom(titaVo);
-					}
-
-					String nowBc = dDateUtil.getNowStringBc();
-					String tlrNo = titaVo.getTlrNo();
-
-					webClient.sendPost(nowBc, "1800", tlrNo, "Y", "LC009", tlrNo + "L9701", "L9701客戶往來交易明細表已完成",
-							titaVo);
-				}
-			}
+//			}
 		}
 		this.addList(this.totaVo);
 		return this.sendList();

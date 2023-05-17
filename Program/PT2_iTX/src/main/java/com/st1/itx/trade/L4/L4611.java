@@ -140,6 +140,7 @@ public class L4611 extends TradeBuffer {
 		tInsuRenewId.setClNo(clNo);
 		tInsuRenewId.setPrevInsuNo(prevInsuNo);
 		tInsuRenewId.setEndoInsuNo(endoInsuNo);
+		tInsuRenewId.setInsuYearMonth(insuYearMonth);
 		this.info("tInsuRenewId = " + tInsuRenewId);
 		tInsuRenew = insuRenewService.holdById(tInsuRenewId, titaVo);
 		if ("1".equals(iFunctionCode)) {

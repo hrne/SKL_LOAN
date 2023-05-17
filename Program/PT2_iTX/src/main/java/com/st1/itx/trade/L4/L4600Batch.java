@@ -302,8 +302,8 @@ public class L4600Batch extends TradeBuffer {
 			}
 
 //				排除自保件
-			InsuRenew nInsuRenew = insuRenewService.findById(
-					new InsuRenewId(t.getClCode1(), t.getClCode2(), t.getClNo(), t.getNowInsuNo(), " "), titaVo);
+			InsuRenew nInsuRenew = insuRenewService.findById(new InsuRenewId(t.getClCode1(), t.getClCode2(),
+					t.getClNo(), t.getNowInsuNo(), " ", iInsuEndMonth + 191100), titaVo);
 
 			if (nInsuRenew != null) {
 				this.info("排除自保件 ... " + t.getNowInsuNo());
@@ -324,7 +324,7 @@ public class L4600Batch extends TradeBuffer {
 			tInsuRenew.setPrevInsuNo(t.getNowInsuNo());
 			tInsuRenew.setEndoInsuNo(" ");
 			tInsuRenew.setInsuRenewId(
-					new InsuRenewId(t.getClCode1(), t.getClCode2(), t.getClNo(), t.getNowInsuNo(), " "));
+					new InsuRenewId(t.getClCode1(), t.getClCode2(), t.getClNo(), t.getNowInsuNo(), " ", iInsuEndMonth + 191100));
 			tInsuRenew.setNowInsuNo("");
 			tInsuRenew.setOrigInsuNo(t.getOrigInsuNo());
 			tInsuRenew.setInsuYearMonth(iInsuEndMonth);

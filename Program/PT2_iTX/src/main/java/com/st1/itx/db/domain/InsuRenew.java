@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class InsuRenew implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 7769068378577847277L;
-
-@EmbeddedId
+  @EmbeddedId
   private InsuRenewId insuRenewId;
 
   // 擔保品-代號1
@@ -57,7 +53,7 @@ public class InsuRenew implements Serializable {
 
   // 火險單年月
   /* 原火險到期年月 */
-  @Column(name = "`InsuYearMonth`")
+  @Column(name = "`InsuYearMonth`", insertable = false, updatable = false)
   private int insuYearMonth = 0;
 
   // 借款人戶號
@@ -903,7 +899,7 @@ null:待通知
 
   @Override
   public String toString() {
-    return "InsuRenew [insuRenewId=" + insuRenewId + ", insuYearMonth=" + insuYearMonth
+    return "InsuRenew [insuRenewId=" + insuRenewId
            + ", custNo=" + custNo + ", facmNo=" + facmNo + ", nowInsuNo=" + nowInsuNo + ", origInsuNo=" + origInsuNo + ", renewCode=" + renewCode + ", insuCompany=" + insuCompany
            + ", insuTypeCode=" + insuTypeCode + ", repayCode=" + repayCode + ", fireInsuCovrg=" + fireInsuCovrg + ", ethqInsuCovrg=" + ethqInsuCovrg + ", fireInsuPrem=" + fireInsuPrem + ", ethqInsuPrem=" + ethqInsuPrem
            + ", insuStartDate=" + insuStartDate + ", insuEndDate=" + insuEndDate + ", totInsuPrem=" + totInsuPrem + ", acDate=" + acDate + ", titaTlrNo=" + titaTlrNo + ", titaTxtNo=" + titaTxtNo

@@ -210,6 +210,7 @@ HIDE(#NewFacmNo)
 #RimClNo=A,7,S
 #RimPrevInsuNo=x,16,S
 #RimEndoInsuNo=x,16,S
+#RimInsuYearMonth=A,5,S
 
 ! 塞值調rim，無值提error
 #RimL4r18=X,1,S
@@ -220,7 +221,7 @@ T(1,@RimClNo,#NTXBUF,5,7)
 T(1,@RimPrevInsuNo,#NTXBUF,12,16)
 T(1,@RimEndoInsuNo,#NTXBUF,28,16)
 RESET_RIM(#RimL4r18,L4R18)
-S(L4R18,1,#RimClCode1,#RimClCode2,#RimClNo,#RimPrevInsuNo,#RimEndoInsuNo)
+S(L4R18,1,#RimClCode1,#RimClCode2,#RimClNo,#RimPrevInsuNo,#RimEndoInsuNo,#RimInsuYearMonth)
 R(1,L4R18)
 
 ! 自保且新保單號碼不為空時，保單號碼&日期須調整

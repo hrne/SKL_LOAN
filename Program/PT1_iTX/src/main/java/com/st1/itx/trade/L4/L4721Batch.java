@@ -288,6 +288,7 @@ public class L4721Batch extends TradeBuffer {
 		tTxToDoDetail.setCustNo(parse.stringToInteger(tmpCustFacm.get("CustNo")));
 		tTxToDoDetail.setFacmNo(parse.stringToInteger(tmpCustFacm.get("FacmNo")));
 		tTxToDoDetail.setBormNo(0);
+		tTxToDoDetail.setExcuteTxcd("L4721");
 		tTxToDoDetail.setDtlValue("<利率調整通知>");
 		tTxToDoDetail.setItemCode("MAIL00");
 		tTxToDoDetail.setStatus(0);

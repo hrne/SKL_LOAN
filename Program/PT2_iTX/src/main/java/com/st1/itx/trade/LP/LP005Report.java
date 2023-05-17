@@ -280,11 +280,11 @@ public class LP005Report extends MakeReport {
 		}
 
 		int rowCursor = 4;
-		int rowCursorTotal = 5;
+//		int rowCursorTotal = 5;
 
 		if (listDept.size() > 1) {
 			makeExcel.setShiftRow(rowCursor + 1, listDept.size() - 1);
-			rowCursorTotal += listDept.size() - 1;
+//			rowCursorTotal += listDept.size() - 1;
 		}
 
 		for (Map<String, String> m : listDept) {
@@ -375,18 +375,77 @@ public class LP005Report extends MakeReport {
 			rowCursor++;
 		}
 
-		// 公式重新計算
-		for (int j = 0; j < 2; j++) {
-			for (int k = 6; k <= 15; k++) {
-				makeExcel.formulaCaculate(rowCursorTotal, k);
-			}
-			rowCursorTotal++;
+		// 設公式
+		makeExcel.setFormula(rowCursor, 6, BigDecimal.ZERO, "SUM(F4:F" + rowCursor + ")", "0");
+		makeExcel.setFormula(rowCursor, 7, BigDecimal.ZERO, "SUM(G4:G" + rowCursor + ")", "0");
+		makeExcel.setFormula(rowCursor, 8, BigDecimal.ZERO, "SUM(H4:H" + rowCursor + ")", "0");
+		makeExcel.setFormula(rowCursor, 9, BigDecimal.ZERO, "SUM(I4:I" + rowCursor + ")", "0");
+		makeExcel.setFormula(rowCursor, 10, BigDecimal.ZERO, "SUM(J4:J" + rowCursor + ")", "0");
+		makeExcel.setFormula(rowCursor, 11, BigDecimal.ZERO, "SUM(K4:K" + rowCursor + ")", "0");
+		if (pfSeason == 4) {
+			makeExcel.setFormula(rowCursor, 12, BigDecimal.ZERO, "SUM(L4:L" + rowCursor + ")", "0");
+			makeExcel.setFormula(rowCursor, 13, BigDecimal.ZERO, "SUM(M4:M" + rowCursor + ")", "0");
 		}
-		for (int j = 0; j < 3; j++) {
-			for (int k = 6; k <= 14; k += 2) {
-				makeExcel.formulaCaculate(rowCursorTotal, k);
-			}
-			rowCursorTotal++;
+
+		// 公式重整
+		makeExcel.formulaCaculate(rowCursor, 6);
+		makeExcel.formulaCaculate(rowCursor, 7);
+		makeExcel.formulaCaculate(rowCursor, 8);
+		makeExcel.formulaCaculate(rowCursor, 9);
+		makeExcel.formulaCaculate(rowCursor, 10);
+		makeExcel.formulaCaculate(rowCursor, 11);
+		makeExcel.formulaCaculate(rowCursor, 12);
+		makeExcel.formulaCaculate(rowCursor, 13);
+		if (pfSeason == 4) {
+			makeExcel.formulaCaculate(rowCursor, 14);
+			makeExcel.formulaCaculate(rowCursor, 15);
+		}
+
+		rowCursor++;
+
+		// 設公式
+		makeExcel.setFormula(rowCursor, 6, BigDecimal.ZERO, "SUBTOTAL(3,C4:C" + (rowCursor - 1) + ")", "0");
+		makeExcel.setFormula(rowCursor, 8, BigDecimal.ZERO, "SUBTOTAL(3,C4:C" + (rowCursor - 1) + ")", "0");
+		makeExcel.setFormula(rowCursor, 10, BigDecimal.ZERO, "SUBTOTAL(3,C4:C" + (rowCursor - 1) + ")", "0");
+		if (pfSeason == 4) {
+			makeExcel.setFormula(rowCursor, 12, BigDecimal.ZERO, "SUBTOTAL(3,C4:C" + (rowCursor - 1) + ")", "0");
+		}
+
+		// 公式重整
+		makeExcel.formulaCaculate(rowCursor, 6);
+		makeExcel.formulaCaculate(rowCursor, 8);
+		makeExcel.formulaCaculate(rowCursor, 10);
+		makeExcel.formulaCaculate(rowCursor, 12);
+		if (pfSeason == 4) {
+			makeExcel.formulaCaculate(rowCursor, 14);
+		}
+
+		rowCursor++;
+		// 設公式
+		makeExcel.setFormula(rowCursor, 6, BigDecimal.ZERO, "COUNTIF(F4:F" + (rowCursor - 1) + ",\"<>0\")", "0");
+		makeExcel.setFormula(rowCursor, 8, BigDecimal.ZERO, "COUNTIF(H4:H" + (rowCursor - 1) + ",\"<>0\")", "0");
+		makeExcel.setFormula(rowCursor, 10, BigDecimal.ZERO, "COUNTIF(J4:J" + (rowCursor - 1) + ",\"<>0\")", "0");
+		if (pfSeason == 4) {
+			makeExcel.setFormula(rowCursor, 12, BigDecimal.ZERO, "COUNTIF(L4:L" + (rowCursor - 1) + ",\"<>0\")", "0");
+		}
+
+		// 公式重整
+		makeExcel.formulaCaculate(rowCursor, 6);
+		makeExcel.formulaCaculate(rowCursor, 8);
+		makeExcel.formulaCaculate(rowCursor, 10);
+		makeExcel.formulaCaculate(rowCursor, 12);
+		if (pfSeason == 4) {
+			makeExcel.formulaCaculate(rowCursor, 14);
+		}
+
+		rowCursor++;
+
+		makeExcel.formulaCaculate(rowCursor, 6);
+		makeExcel.formulaCaculate(rowCursor, 8);
+		makeExcel.formulaCaculate(rowCursor, 10);
+		makeExcel.formulaCaculate(rowCursor, 12);
+		if (pfSeason == 4) {
+			makeExcel.formulaCaculate(rowCursor, 14);
 		}
 
 		return listEmpClass;
