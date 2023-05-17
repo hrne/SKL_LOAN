@@ -811,7 +811,7 @@ public class TxToDoCom extends TradeBuffer {
 			settingValue = "AMLM  ;-;Y;-;-;-;L8082;L8082;L8101;Y;AML定審中、低風險處理";
 			break;
 		case "L7400": // 總帳傳票資料傳輸
-			settingValue = "L7400 ;-;I;-;-;-;L698B;L698B;L7400;Y;總帳傳票資料傳輸";//由L698A調整為L698B無戶號戶名
+			settingValue = "L7400 ;-;I;Y;Y;-;L698B;L698B;L7400;Y;總帳傳票資料傳輸";//由L698A調整為L698B無戶號戶名
 			break;
 //		case "AMLL":
 //			settingValue = "AMLL  ;-;Y;-;-;-;L8083;L8083;L8101;Y;AML定審低風險處理";

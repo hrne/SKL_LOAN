@@ -77,8 +77,7 @@ public class L4721Report2 extends MakeReport {
 	 * @param kindItem 利率代碼中文名稱
 	 * @throws LogicException
 	 */
-	public void exec(TitaVo titaVo, TxBuffer txbuffer, List<Map<String, String>> data, int txKind, String kindItem)
-			throws LogicException {
+	public void exec(TitaVo titaVo, TxBuffer txbuffer, List<Map<String, String>> data) throws LogicException {
 		this.info("L4721Report2 exec start");
 
 		int itxKind = parse.stringToInteger(titaVo.getParam("TxKind"));
@@ -87,9 +86,9 @@ public class L4721Report2 extends MakeReport {
 		this.setTxBuffer(txbuffer);
 		baTxCom.setTxBuffer(txbuffer);
 
-		List<String> file = getData(titaVo, data, txKind);
+		List<String> file = getData(titaVo, data);
 
-		String fileName = "L4721-" + kindItem;
+		String fileName = "L4721";
 
 //		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
 //				titaVo.getTxCode() + "-" + kindItem, fileName, 2);
@@ -109,14 +108,9 @@ public class L4721Report2 extends MakeReport {
 
 		makeFile.toFile(sno);
 
-		// itxKind畫面上的 0 全部，txKind是JAVA內設定的參數，因照迴圈跑到5為最後一項的時候在丟出訊息，否則會跑出五次
-		if (itxKind == 0 && txKind == 5) {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-					titaVo.getTlrNo() + "L4721", titaVo.getTxCode() + " 已產生L4721.txt", titaVo);
-		} else if (itxKind == txKind) {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-					titaVo.getTlrNo() + "L4721", titaVo.getTxCode() + " 已產生L4721.txt", titaVo);
-		}
+
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+				titaVo.getTlrNo() + "L4721", titaVo.getTxCode() + " 已產生L4721.txt", titaVo);
 
 	}
 
@@ -125,9 +119,8 @@ public class L4721Report2 extends MakeReport {
 	 * 
 	 * @param titaVo
 	 * @param lBatxRateChange 利率變動檔資料源
-	 * @param txkind          利率種類代碼
 	 */
-	private List<String> getData(TitaVo titaVo, List<Map<String, String>> data, int txkind) throws LogicException {
+	private List<String> getData(TitaVo titaVo, List<Map<String, String>> data) throws LogicException {
 
 		List<String> result = new ArrayList<>();
 
@@ -142,8 +135,8 @@ public class L4721Report2 extends MakeReport {
 		for (Map<String, String> r : data) {
 
 			int iEffectDate = parse.stringToInteger(r.get("EffectDate"));
-			int iCustNo = parse.stringToInteger(r.get("EffectDate"));
-			int iFacmNo = parse.stringToInteger(r.get("EffectDate"));
+			int iCustNo = parse.stringToInteger(r.get("CustNo"));
+			int iFacmNo = parse.stringToInteger(r.get("FacmNo"));
 			int iPresEffDate = parse.stringToInteger(r.get("PresEffDate"));
 
 			if (iEffectDate == 0) {
@@ -166,9 +159,9 @@ public class L4721Report2 extends MakeReport {
 			List<Map<String, String>> listL4721Detail = new ArrayList<Map<String, String>>();
 
 			try {
-				listL4721Detail = l4721ServiceImpl.doDetail(custNo, isday, ieday, iPresEffDate, titaVo);
+				listL4721Detail = l4721ServiceImpl.doDetail(custNo, isday, ieday, titaVo);
 			} catch (Exception e) {
-				this.error("bankStatementServiceImpl doQuery = " + e.getMessage());
+				this.error("l4721ServiceImpl doDetail = " + e.getMessage());
 				throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
 			}
 

@@ -56,6 +56,7 @@ public class L9703p extends TradeBuffer {
 		this.info("L9703p titaVo.getTxcd() = " + titaVo.getTxcd());
 		String formNo = "L9703";
 		CdReport tCdReport = new CdReport();
+		Slice<CustNotice> fFormNo = null;
 		tCdReport = sCdReportService.findById(formNo, titaVo);
 
 		int iCustNo = parse.stringToInteger(titaVo.get("CustNo"));
@@ -63,45 +64,53 @@ public class L9703p extends TradeBuffer {
 
 		String Fg = tCdReport.getLetterFg();
 		if ("Y".equals(Fg)) {
-//			String iCNfg = "";
-//			String parentTranCode = titaVo.getTxcd();
-			Slice<CustNotice> tCustNotice = null;
-			Slice<CustNotice> iCustNotice = null;
-			if (iFacmNo == 0) {
-				tCustNotice = sCustNoticeService.findCustNo(iCustNo, 0, Integer.MAX_VALUE, titaVo);
-			} else {
-				iCustNotice = sCustNoticeService.facmNoEq(iCustNo, iFacmNo, iFacmNo, 0, Integer.MAX_VALUE, titaVo);
+			String iFg = "";
+			fFormNo = sCustNoticeService.findCustNoFormNo(iCustNo, formNo, 0, Integer.MAX_VALUE, titaVo);
+			int iFormcount = fFormNo.getSize();
+			this.info("iFormcount   = " + iFormcount);
+			if (iFormcount == 1) {
+				for (CustNotice custNotice : fFormNo) {
+					iFg = custNotice.getPaperNotice();
+				}
 			}
-			this.info("tCustNotice   = " + tCustNotice);
-			this.info("iCustNotice   = " + iCustNotice);
-			
-			
-			//額度0
-			List<CustNotice> lCustNotice = tCustNotice == null ? null : tCustNotice.getContent();
-			if (lCustNotice != null && lCustNotice.size() > 0) {
-				String tran = titaVo.getTxCode().isEmpty() ? "L9703" : titaVo.getTxCode();
-				String parentTranCode = titaVo.getTxcd();
-				l9703report.setParentTranCode(parentTranCode);
-				l9703report.exec(titaVo, this.getTxBuffer());
-				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-						titaVo.getParam("TLRNO") + tran, tran + " 滯繳客戶明細表 已完成", titaVo);
+			this.info("iFg     = " + iFg);
+			if (iFormcount != 1 || (iFormcount == 1 && iFg.equals("Y"))) {
+				Slice<CustNotice> tCustNotice = null;
+				Slice<CustNotice> iCustNotice = null;
+				if (iFacmNo == 0) {
+					tCustNotice = sCustNoticeService.findCustNo(iCustNo, 0, Integer.MAX_VALUE, titaVo);
+				} else {
+					iCustNotice = sCustNoticeService.facmNoEq(iCustNo, iFacmNo, iFacmNo, 0, Integer.MAX_VALUE, titaVo);
+				}
+				this.info("tCustNotice   = " + tCustNotice);
+				this.info("iCustNotice   = " + iCustNotice);
+
+				// 額度0
+				List<CustNotice> lCustNotice = tCustNotice == null ? null : tCustNotice.getContent();
+				if (lCustNotice != null && lCustNotice.size() > 0) {
+					String tran = titaVo.getTxCode().isEmpty() ? "L9703" : titaVo.getTxCode();
+					String parentTranCode = titaVo.getTxcd();
+					l9703report.setParentTranCode(parentTranCode);
+					l9703report.exec(titaVo, this.getTxBuffer());
+					webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
+							titaVo.getParam("TLRNO") + tran, tran + " 滯繳客戶明細表 已完成", titaVo);
+				}
+
+				// 有額度判別是否要產出
+				List<CustNotice> oCustNotice = iCustNotice == null ? null : iCustNotice.getContent();
+				String pFg = "";
+				for (CustNotice t : oCustNotice) {
+					pFg = t.getPaperNotice();
+				}
+				if (iFacmNo != 0 && oCustNotice != null && pFg.equals("Y")) {
+					String tran = titaVo.getTxCode().isEmpty() ? "L9703" : titaVo.getTxCode();
+					String parentTranCode = titaVo.getTxcd();
+					l9703report.setParentTranCode(parentTranCode);
+					l9703report.exec(titaVo, this.getTxBuffer());
+					webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
+							titaVo.getParam("TLRNO") + tran, tran + " 滯繳客戶明細表 已完成", titaVo);
+				}
 			}
-			
-			//有額度判別是否要產出
-			List<CustNotice> oCustNotice = iCustNotice == null ? null : iCustNotice.getContent();
-			String pFg = "";
-			for(CustNotice t : oCustNotice) {
-				pFg = t.getPaperNotice();
-			}
-			if(iFacmNo != 0 && oCustNotice != null && pFg.equals("Y")) {
-				String tran = titaVo.getTxCode().isEmpty() ? "L9703" : titaVo.getTxCode();
-				String parentTranCode = titaVo.getTxcd();
-				l9703report.setParentTranCode(parentTranCode);
-				l9703report.exec(titaVo, this.getTxBuffer());
-				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-						titaVo.getParam("TLRNO") + tran, tran + " 滯繳客戶明細表 已完成", titaVo);
-			}
-			
 		}
 		this.addList(this.totaVo);
 		return this.sendList();

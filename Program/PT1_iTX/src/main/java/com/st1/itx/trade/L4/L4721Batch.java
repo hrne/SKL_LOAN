@@ -3,6 +3,7 @@ package com.st1.itx.trade.L4;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,8 +20,10 @@ import com.st1.itx.db.service.BatxRateChangeService;
 import com.st1.itx.db.service.springjpa.cm.L4721ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.CustNoticeCom;
+import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.TxToDoCom;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
@@ -58,6 +61,8 @@ public class L4721Batch extends TradeBuffer {
 	public L4721Report2 l4721Report2;
 	@Autowired
 	public L4721ServiceImpl sL4721ServiceImpl;
+	@Autowired
+	private MakeReport makeReport;
 
 	private int isAdjDate = 0;
 	private int ieAdjDate = 0;
@@ -66,11 +71,15 @@ public class L4721Batch extends TradeBuffer {
 	private String kindItem = "";
 	private String prodNos = "";
 
+	private List<Map<String, String>> letterCustList = new ArrayList<Map<String, String>>();
+
 //	輸入畫面 戶別 CustType 1:個金;2:企金（含企金自然人）
 //	客戶檔 0:個金1:企金2:企金自然人
 	private int iCustType = 0;
 	private String sendMsg = "";
 	private Boolean flag = true;
+	private int custNoLast = 0;
+	private int facmNoLast = 0;
 
 	int CntPaper = 0;
 	int CntEmail = 0;
@@ -103,40 +112,44 @@ public class L4721Batch extends TradeBuffer {
 		this.info("this.prodNos=" + this.prodNos);
 
 		this.kindItem = this.iTxKind == 0 ? "定期機動利率、指數型利率、機動利率、員工利率、按商品別利率變動利率" : titaVo.getParam("TxKindX");
+		String[] tmpKindItem = this.kindItem.split("、");
 
-		// 利率種類0 全部(1~5)
-		if (this.iTxKind == 0) {
-			String[] tmpKindItem = this.kindItem.split("、");
-			for (int txkind = 1; txkind <= 5; txkind++) {
-
+		for (int txkind = 1; txkind <= 5; txkind++) {
+			if (this.iTxKind == 0 || txkind == this.iTxKind) {
+				List<Map<String, String>> custList = new ArrayList<Map<String, String>>();
 				try {
-					l4721Report.exec(titaVo, this.txBuffer, mainDataBatxRateChange(titaVo, txkind),
-							tmpKindItem[txkind - 1]);
 
-					dealMessageData(titaVo, l4721Report.lTmpCustFacm);
+					custList = sL4721ServiceImpl.findAll(txkind, this.iCustType, this.isAdjDate, this.ieAdjDate,
+							this.prodNos, titaVo);
 
-					l4721Report2.exec(titaVo, this.txBuffer, mainDataBatxRateChange(titaVo, txkind), txkind,
-							tmpKindItem[txkind - 1]);
-				} catch (LogicException e) {
-					sendMsg = e.getErrorMsg();
-					flag = false;
+				} catch (Exception e) {
+
+					StringWriter errors = new StringWriter();
+					e.printStackTrace(new PrintWriter(errors));
+					this.info("L4721ServiceImpl error = " + errors.toString());
+
 				}
 
+				if (custList != null) {
+					for (Map<String, String> data : custList) {
+						try {
+							l4721Report.exec(titaVo, this.txBuffer, parse.stringToInteger(data.get("CustNo")),
+									tmpKindItem[txkind - 1]);
+
+							dealHeadData(titaVo, data);
+
+						} catch (LogicException e) {
+							sendMsg = e.getErrorMsg();
+							flag = false;
+						}
+
+					} // for
+				} // if
 			}
-		} else {
+		}
 
-			try {
-				l4721Report.exec(titaVo, this.txBuffer, mainDataBatxRateChange(titaVo, this.iTxKind), this.kindItem);
-
-				dealMessageData(titaVo, l4721Report.lTmpCustFacm);
-
-				l4721Report2.exec(titaVo, this.txBuffer, mainDataBatxRateChange(titaVo, this.iTxKind), this.iTxKind,
-						this.kindItem);
-			} catch (LogicException e) {
-				sendMsg = e.getErrorMsg();
-				flag = false;
-			}
-
+		if (CntPaper > 0) {
+			l4721Report2.exec(titaVo, this.txBuffer, letterCustList);
 		}
 
 		String msg = "";
@@ -152,43 +165,6 @@ public class L4721Batch extends TradeBuffer {
 
 		this.addList(this.totaVo);
 		return this.sendList();
-	}
-
-	/**
-	 * 主要資料來源
-	 * 
-	 * @param titaVo
-	 * @param txkind 利率種類
-	 * @throws LogicException
-	 */
-	private List<Map<String, String>> mainDataBatxRateChange(TitaVo titaVo, int txkind) throws LogicException {
-
-//		List<BatxRateChange> lBatxRateChange = new ArrayList<BatxRateChange>();
-//
-//		Slice<BatxRateChange> sBatxRateChange = batxRateChangeService.findL4321Report(this.isAdjDate, this.ieAdjDate,
-//				custType1, custType2, this.iTxKind, 0, 9, 2, this.index, this.limit, titaVo);
-//
-//		lBatxRateChange = sBatxRateChange == null ? null : sBatxRateChange.getContent();
-		List<Map<String, String>> data = new ArrayList<Map<String, String>>();
-		try {
-
-			data = sL4721ServiceImpl.findAll(txkind, this.iCustType, this.isAdjDate, this.ieAdjDate, this.prodNos,
-					titaVo);
-
-		} catch (Exception e) {
-
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.info("L9711ServiceImpl.LoanBorTx error = " + errors.toString());
-			return null;
-
-		}
-
-		if (data == null) {
-			throw new LogicException(titaVo, "E0001", "查無資料");
-		}
-
-		return data;
 	}
 
 	/**
@@ -216,39 +192,94 @@ public class L4721Batch extends TradeBuffer {
 	}
 
 	/**
-	 * 處理簡訊資料
+	 * 
 	 */
-	private void dealMessageData(TitaVo titaVo, List<Map<String, String>> tmpCustFacm) throws LogicException {
+	private void dealHeadData(TitaVo titaVo, Map<String, String> iData) throws LogicException {
 
-		for (Map<String, String> t : tmpCustFacm) {
+		int ieday = titaVo.getEntDyI() + 19110000;
+		dateUtil.setDate_1(ieday);
+		dateUtil.setMons(-6);
+		// 起日為會計日前六個月的一日
+		int isday = Integer.parseInt(String.valueOf(dateUtil.getCalenderDay()).substring(0, 6) + "01");
 
-			TempVo tempVo = new TempVo();
-			tempVo = custNoticeCom.getCustNotice("L4721", parse.stringToInteger(t.get("CustNo")),
-					parse.stringToInteger(t.get("FacmNo")), titaVo);
+		int iCustNo = parse.stringToInteger(iData.get("CustNo"));
+		int iFacmNo = parse.stringToInteger(iData.get("FacmNo"));
 
-			int noticeFlag = parse.stringToInteger(tempVo.getParam("NoticeFlag"));
-			String noticePhoneNo = tempVo.getParam("MessagePhoneNo");
-			String noticeEmail = tempVo.getParam("EmailAddress");
-			String noticeAddress = tempVo.getParam("LetterAddress");
+		if (iCustNo == custNoLast && iFacmNo == facmNoLast) {
+			return;
+		}
+		Map<String, String> mTmpCustFacm = new HashMap<>();
+		List<Map<String, String>> lTmpCustFacm = new ArrayList<Map<String, String>>();
 
-			this.info("noticeFlag : " + noticeFlag);
-			this.info("noticePhoneNo : " + noticePhoneNo);
-			this.info("noticeEmail : " + noticeEmail);
-			this.info("noticeAddress : " + noticeAddress);
+		List<Map<String, String>> listL4721Head = new ArrayList<Map<String, String>>();
 
-			if ("Y".equals(tempVo.getParam("isLetter"))) {
-				CntPaper = CntPaper + 1;
-			}
-			if ("Y".equals(tempVo.getParam("isMessage"))) {
-				CntMsg = CntMsg + 1;
-				setTextFileVO(t, noticePhoneNo, titaVo);
-			}
-			if ("Y".equals(tempVo.getParam("isEmail"))) {
-				CntEmail = CntEmail + 1;
-				setMailMFileVO(t, noticeEmail, titaVo);
+		try {
+			listL4721Head = sL4721ServiceImpl.doQuery(iCustNo, isday, ieday, titaVo);
+		} catch (Exception e) {
+			this.error("bankStatementServiceImpl doQuery = " + e.getMessage());
+			throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
+		}
+
+		if (listL4721Head != null && !listL4721Head.isEmpty()) {
+
+			for (Map<String, String> data : listL4721Head) {
+				if ("Y".equals(data.get("Flag")) && parse.stringToInteger(data.get("TxEffectDate")) != 0) {
+
+					String rateChangeDate = makeReport.showRocDate(data.get("TxEffectDate"), 0);
+
+					// 原利率
+					String originRate = makeReport.formatAmt(data.get("PresentRate"), 2) + "%";
+					// 現在利率
+					String newRate = makeReport.formatAmt(data.get("AdjustedRate"), 2) + "%";
+
+					mTmpCustFacm = new HashMap<>();
+					mTmpCustFacm.put("CustNo", FormatUtil.pad9("" + iCustNo, 7));
+					mTmpCustFacm.put("FacmNo", FormatUtil.pad9("" + data.get("FacmNo"), 3));
+					mTmpCustFacm.put("rateChangeDate", rateChangeDate);
+					mTmpCustFacm.put("originRate", originRate);
+					mTmpCustFacm.put("newRate", newRate);
+					lTmpCustFacm.add(mTmpCustFacm);
+				}
 			}
 
 		}
+
+		TempVo tempVo = new TempVo();
+		tempVo = custNoticeCom.getCustNotice("L4721", iCustNo, 0, titaVo);
+
+		int noticeFlag = parse.stringToInteger(tempVo.getParam("NoticeFlag"));
+		String noticePhoneNo = tempVo.getParam("MessagePhoneNo");
+		String noticeEmail = tempVo.getParam("EmailAddress");
+		String noticeAddress = tempVo.getParam("LetterAddress");
+
+		this.info("noticeFlag : " + noticeFlag);
+		this.info("noticePhoneNo : " + noticePhoneNo);
+		this.info("noticeEmail : " + noticeEmail);
+		this.info("noticeAddress : " + noticeAddress);
+
+		if ("Y".equals(tempVo.getParam("isLetter"))) {
+			if (iCustNo != custNoLast) {
+				CntPaper = CntPaper + 1;
+				letterCustList.add(iData);
+			}
+		}
+		if ("Y".equals(tempVo.getParam("isEmail"))) {
+			if (iCustNo != custNoLast) {
+				CntEmail = CntEmail + 1;
+				setMailMFileVO(iData, noticeEmail, titaVo);
+			}
+		}
+
+		if ("Y".equals(tempVo.getParam("isMessage"))) {
+			for (Map<String, String> t : lTmpCustFacm) {
+				CntMsg = CntMsg + 1;
+				setTextFileVO(t, noticePhoneNo, titaVo);
+			}
+
+		}
+
+		custNoLast = iCustNo;
+		facmNoLast = iFacmNo;
 	}
 
 	/**
@@ -258,6 +289,7 @@ public class L4721Batch extends TradeBuffer {
 			throws LogicException {
 
 		txToDoCom.setTxBuffer(this.getTxBuffer());
+
 		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 		tTxToDoDetail.setCustNo(parse.stringToInteger(tmpCustFacm.get("CustNo")));
 		tTxToDoDetail.setFacmNo(parse.stringToInteger(tmpCustFacm.get("FacmNo")));
@@ -272,6 +304,7 @@ public class L4721Batch extends TradeBuffer {
 				this.getTxBuffer().getMgBizDate().getTbsDy()));
 
 		txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo);
+
 	}
 
 	private void setMailMFileVO(Map<String, String> tmpCustFacm, String noticeEmail, TitaVo titaVo)
@@ -281,12 +314,11 @@ public class L4721Batch extends TradeBuffer {
 
 		String dataLines = "";
 
-		dataLines = "親愛的客戶您好，新光人壽通知您，房貸額度 " + tmpCustFacm.get("FacmNo") + " 自" + tmpCustFacm.get("rateChangeDate")
-				+ "起利率由" + tmpCustFacm.get("originRate") + " 調整為" + tmpCustFacm.get("newRate") + "，敬請留意帳戶餘額以利扣款。";
+		dataLines = "親愛的客戶您好，新光人壽通知您，房貸利率調整，敬請留意帳戶餘額以利扣款。";
 
 		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 		tTxToDoDetail.setCustNo(parse.stringToInteger(tmpCustFacm.get("CustNo")));
-		tTxToDoDetail.setFacmNo(parse.stringToInteger(tmpCustFacm.get("FacmNo")));
+		tTxToDoDetail.setFacmNo(0);
 		tTxToDoDetail.setBormNo(0);
 		tTxToDoDetail.setExcuteTxcd("L4721");
 		tTxToDoDetail.setDtlValue("<利率調整通知>");

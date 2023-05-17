@@ -378,7 +378,7 @@ public class L9136Report extends MakeReport {
 				this.print(0, 66, r.get("ClCode1") == null ? " "
 						: r.get("ClCode1") + "  " + r.get("ClCode2") + "  " + r.get("ClName"));
 				// 押品號碼
-				this.print(0, 86, r.get("ClNo") == null ? " " : r.get("ApproveNo"));
+				this.print(0, 86, r.get("ClNo") == null ? " " : r.get("ClNo"));
 
 			} else if ("L56".equals(r.get("TranNo").substring(0, 3)) || "L57".equals(r.get("TranNo").substring(0, 3))) {
 
