@@ -19,18 +19,25 @@ import com.st1.itx.db.domain.TxControl;
 //import com.st1.itx.db.domain.PfRewardMediaId;
 import com.st1.itx.db.service.PfRewardMediaService;
 import com.st1.itx.db.service.PfRewardService;
+import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.TxControlService;
 import com.st1.itx.db.domain.FacProd;
 import com.st1.itx.db.domain.PfDetail;
 import com.st1.itx.db.domain.PfReward;
+import com.st1.itx.db.domain.LoanBorMain;
+import com.st1.itx.db.domain.LoanBorMainId;
 import com.st1.itx.db.service.FacProdService;
 import com.st1.itx.db.service.PfDetailService;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CdWorkMonth;
+import com.st1.itx.db.domain.CdWorkMonthId;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CdWorkMonthService;
 import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.FacMain;
+import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.FacMainService;
 
 @Service("L5R37")
 @Scope("prototype")
@@ -43,13 +50,17 @@ import com.st1.itx.db.service.CustMainService;
 public class L5R37 extends TradeBuffer {
 
 	@Autowired
-	public PfRewardService pfRewardService;
+	public LoanBorMainService loanBorMainService;
 
 	@Autowired
 	public PfRewardMediaService pfRewardMediaService;
+	@Autowired
+	public PfRewardService pfRewardService;
 
 	@Autowired
 	public FacProdService facProdService;
+	@Autowired
+	public FacMainService facMainService;
 
 	@Autowired
 	public CdEmpService cdEmpService;
@@ -74,7 +85,18 @@ public class L5R37 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		String iFunCode = titaVo.get("FunCode").trim();
-//		int iBonusDate = Integer.valueOf(titaVo.get("BonusDate").trim());		
+		int iWorkMonth = parse.stringToInteger(titaVo.get("WorkMonth").trim());
+		// 工作季(西曆)
+		int workSeason = 0;
+		if (iWorkMonth % 100 <= 3)
+			workSeason = (iWorkMonth / 100) + 1;
+		else if (iWorkMonth % 100 <= 6)
+			workSeason = (iWorkMonth / 100) + 2;
+		else if (iWorkMonth % 100 <= 9)
+			workSeason = (iWorkMonth / 100) + 3;
+		else
+			workSeason = (iWorkMonth / 100) + 4;
+		// int iBonusDate = Integer.valueOf(titaVo.get("BonusDate").trim());
 
 //		PfRewardMediaId pfRewardMediaId = new PfRewardMediaId();
 
@@ -84,105 +106,102 @@ public class L5R37 extends TradeBuffer {
 //		PfRewardMedia pfRewardMedia = pfRewardMediaService.findById(pfRewardMediaId, titaVo);
 
 		if ("1".equals(iFunCode)) {
-			boolean found = true;
 			int custNo = Integer.valueOf(titaVo.getParam("CustNo").trim());
 			int facmNo = Integer.valueOf(titaVo.getParam("FacmNo").trim());
 			int bormNo = Integer.valueOf(titaVo.getParam("BormNo").trim());
 			int bonusType = Integer.valueOf(titaVo.getParam("BonusType").trim());
+
+			PfRewardMedia pfRewardMedia = pfRewardMediaService.findDupFirst(custNo, facmNo, bormNo, bonusType,
+					iWorkMonth + 191100, titaVo);
+			if (pfRewardMedia != null) {
+				throw new LogicException("E0002", "獎金資料");
+			}
+			String prodCode = "";
+			String pieceCode = "";
+			String employeeNo = "";
+			int perfDate = 0;
 			Slice<PfReward> slPfReward = pfRewardService.findBormNoEq(custNo, facmNo, bormNo, 0, Integer.MAX_VALUE,
 					titaVo);
-			if (slPfReward == null ) {
-				throw new LogicException(titaVo, "E0001", "業績資料");
-			}
-			for (PfReward pfReward : slPfReward.getContent()) {
-				if (pfReward.getRepayType() != 0 ) {
-					continue;
-				}
-
-				if ((bonusType == 1 || bonusType == 7) && "".equals(pfReward.getIntroducer())) {
-					throw new LogicException(titaVo, "E0001", "無介紹人資料");
-				}
-				if (bonusType == 5 && "".equals(pfReward.getCoorgnizer())) {
-					throw new LogicException(titaVo, "E0001", "無協辦人員資料");
-				}
-
-				this.totaVo.putParam("BonusNo", 0);
-				CdWorkMonth cdWorkMonth = cdWorkMonthService.findDateFirst(pfReward.getPerfDate() + 19110000,
-						pfReward.getPerfDate() + 19110000, titaVo);
-				if (cdWorkMonth == null) {
-					throw new LogicException("E0001", "放款業績工作月對照檔");
-				}
-				this.totaVo.putParam("BonusDate", cdWorkMonth.getBonusDate());
-				this.totaVo.putParam("BonusType", bonusType);
-				this.totaVo.putParam("PerfDate", pfReward.getPerfDate());
-				this.totaVo.putParam("CustNo", pfReward.getCustNo());
-
-				CustMain custMain = custMainService.custNoFirst(pfReward.getCustNo(), pfReward.getCustNo(), titaVo);
-				if (custMain == null) {
-					throw new LogicException("E0001", "客戶資料");
-				}
-
-				this.totaVo.putParam("CustName", custMain.getCustName());
-				this.totaVo.putParam("FacmNo", pfReward.getFacmNo());
-				this.totaVo.putParam("BormNo", pfReward.getBormNo());
-				String employeeNo = "";
-				if (bonusType == 1 || bonusType == 7) {
-					employeeNo = pfReward.getIntroducer();
-				} else {
-					employeeNo = pfReward.getCoorgnizer();
-				}
-				this.totaVo.putParam("EmployeeNo", employeeNo);
-				CdEmp cdEmp = cdEmpService.findById(employeeNo, titaVo);
-				if (cdEmp == null) {
-					this.totaVo.putParam("EmployeeName", employeeNo);
-				} else {
-					this.totaVo.putParam("EmployeeName", cdEmp.getFullname());
-				}
-				this.totaVo.putParam("Bonus", 0);
-				this.totaVo.putParam("AdjustBonus", 0);
-				this.totaVo.putParam("AdjustBonusDate", 0);
-				this.totaVo.putParam("ProdCode", pfReward.getProdCode());
-
-				FacProd facProd = facProdService.findById(pfReward.getProdCode(), titaVo);
-				if (facProd == null) {
-					this.totaVo.putParam("ProdName", pfReward.getProdCode());
-				} else {
-					this.totaVo.putParam("ProdName", facProd.getProdName());
-				}
-
-				this.totaVo.putParam("PieceCode", pfReward.getPieceCode());
-				this.totaVo.putParam("WorkMonth", pfReward.getWorkMonth() - 191100);
-				this.totaVo.putParam("WorkSeason", pfReward.getWorkSeason() - 19110);
-				this.totaVo.putParam("Remark", "");
-				this.totaVo.putParam("MediaFg", 0);
-				this.totaVo.putParam("MediaDate", 0);
-				this.totaVo.putParam("ManualFg", 1);
-				this.totaVo.putParam("LastUpdate", "");
-				this.totaVo.putParam("LastEmpName", "");
-
-				PfRewardMedia pfRewardMedia = pfRewardMediaService.findDupFirst(pfReward.getCustNo(),
-						pfReward.getFacmNo(), pfReward.getBormNo(), bonusType, titaVo);
-				if (pfRewardMedia != null) {
-					String s = "";
-					if (bonusType == 1) {
-						s = "介紹人";
-					} else if (bonusType == 1) {
-						s = "介紹人";
-					} else {
-						s = "介紹人加碼";
+			for (PfReward tPfReward : slPfReward.getContent()) {
+				if (tPfReward.getRepayType() == 0) {
+					if ((bonusType == 1 || bonusType == 7)) {
+						employeeNo = tPfReward.getIntroducer();
 					}
-//					TotaVo msgTotaVo = new TotaVo();
-//					
-//					msgTotaVo.setWarnMsg("業績 "+pfDetail.getCustNo()+"-"+pfDetail.getFacmNo()+"-"+pfDetail.getBormNo()+" 已有"+s+"獎金資料，請確認");
-//					this.addList(msgTotaVo);
-					throw new LogicException("E0002", "獎金資料");
+					if (bonusType == 5) {
+						employeeNo = tPfReward.getCoorgnizer();
+					}
+					prodCode = tPfReward.getProdCode();
+					pieceCode = tPfReward.getPieceCode();
+					perfDate = tPfReward.getPerfDate();
 				}
-				found = true;
-				break;
 			}
-			if (!found) {
-				throw new LogicException(titaVo, "E0001", "業績資料");
+			if (prodCode.isEmpty()) {
+				LoanBorMain tLoanBorMain = loanBorMainService.findById(new LoanBorMainId(custNo, facmNo, bormNo),
+						titaVo);
+				if (tLoanBorMain == null) {
+					throw new LogicException(titaVo, "E0001", "撥款資料");
+				}
+				FacMain tFacMain = facMainService.findById(new FacMainId(custNo, facmNo), titaVo);
+				if (tFacMain == null) {
+					throw new LogicException(titaVo, "E0001", "額度資料");
+				}
+				if (bonusType == 1 || bonusType == 7) {
+					employeeNo = tFacMain.getIntroducer();
+				} else {
+					employeeNo = tFacMain.getCoorgnizer();
+				}
+				prodCode = tFacMain.getProdNo();
+				pieceCode = tLoanBorMain.getPieceCode();
+				perfDate = tLoanBorMain.getDrawdownDate();
 			}
+
+			this.totaVo.putParam("PerfDate", perfDate);
+			this.totaVo.putParam("BonusNo", 0);
+			CdWorkMonth cdWorkMonth = cdWorkMonthService
+					.findById(new CdWorkMonthId(iWorkMonth / 100 + 1911, iWorkMonth % 100), titaVo);
+			if (cdWorkMonth == null) {
+				throw new LogicException("E0001", "放款業績工作月對照檔");
+			}
+			this.totaVo.putParam("BonusDate", cdWorkMonth.getBonusDate());
+			this.totaVo.putParam("BonusType", bonusType);
+			this.totaVo.putParam("CustNo", custNo);
+
+			CustMain custMain = custMainService.custNoFirst(custNo, custNo, titaVo);
+			if (custMain == null) {
+				throw new LogicException("E0001", "客戶資料");
+			}
+
+			this.totaVo.putParam("CustName", custMain.getCustName());
+			this.totaVo.putParam("FacmNo", facmNo);
+			this.totaVo.putParam("BormNo", bormNo);
+			this.totaVo.putParam("EmployeeNo", employeeNo);
+			CdEmp cdEmp = cdEmpService.findById(employeeNo, titaVo);
+			if (cdEmp == null) {
+				this.totaVo.putParam("EmployeeName", employeeNo);
+			} else {
+				this.totaVo.putParam("EmployeeName", cdEmp.getFullname());
+			}
+			this.totaVo.putParam("Bonus", 0);
+			this.totaVo.putParam("AdjustBonus", 0);
+			this.totaVo.putParam("AdjustBonusDate", 0);
+			this.totaVo.putParam("ProdCode", prodCode);
+
+			FacProd facProd = facProdService.findById(prodCode, titaVo);
+			if (facProd == null) {
+				this.totaVo.putParam("ProdName", prodCode);
+			} else {
+				this.totaVo.putParam("ProdName", facProd.getProdName());
+			}
+
+			this.totaVo.putParam("PieceCode", pieceCode);
+			this.totaVo.putParam("WorkMonth", iWorkMonth);
+			this.totaVo.putParam("WorkSeason", workSeason);
+			this.totaVo.putParam("Remark", "");
+			this.totaVo.putParam("MediaFg", 0);
+			this.totaVo.putParam("MediaDate", 0);
+			this.totaVo.putParam("ManualFg", 1);
+			this.totaVo.putParam("LastUpdate", "");
+			this.totaVo.putParam("LastEmpName", "");
 		} else {
 			long iBonusNo = Long.valueOf(titaVo.get("BonusNo").trim());
 
@@ -191,10 +210,6 @@ public class L5R37 extends TradeBuffer {
 			if (pfRewardMedia == null) {
 				throw new LogicException("E0001", "");
 			} else {
-
-//					if (pfRewardMedia.getMediaFg() == 1 && ("2".equals(iFunCode) || "4".equals(iFunCode))) {
-//						throw new LogicException("EC008", "已產製媒體檔，不可修改或刪除");
-//					}
 				if ("2".equals(iFunCode) || "4".equals(iFunCode)) {
 					String controlCode = "";
 					if (pfRewardMedia.getBonusType() == 7) {

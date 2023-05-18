@@ -56,7 +56,8 @@ BEGIN
             WHERE LBM."SumLoanBal" = 0 -- 在放款主檔(LoanBorMain)放款餘額皆為0
               AND FC."CloseDate" >= 19110101 -- 確保有結清日期
         )
-        SELECT LBT."CustNo"
+        SELECT DISTINCT
+               LBT."CustNo"
               ,LBT."FacmNo"
               ,LBT."BormNo"
         FROM "LoanBorTx" LBT
@@ -68,7 +69,8 @@ BEGIN
           AND TRUNC(MONTHS_BETWEEN(TO_DATE(TO_CHAR(TBD."TbsDyf"), 'YYYYMMDD'), TO_DATE(TO_CHAR(FC."CloseDate"), 'YYYYMMDD'))) >= 5 * 12 -- 結清滿五年
         ;
         
-        SELECT COUNT(*) INTO (v_tempCount) FROM "TxArchivedTemp";
+        SELECT COUNT(*) INTO v_tempCount FROM "TxArchivedTemp";
+        
         -- 檢查筆數
         IF v_archiveTables.COUNT = 0
         THEN
@@ -125,6 +127,7 @@ BEGIN
                         ELSE
                             DBMS_OUTPUT.PUT_LINE('搬運失敗!');
                         end if;
+                        COMMIT;
                     end loop;
             end loop;
 

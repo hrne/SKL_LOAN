@@ -14,7 +14,9 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.db.domain.CdLoanNotYet;
 import com.st1.itx.db.domain.PfRewardMedia;
+import com.st1.itx.db.domain.PfRewardMediaId;
 import com.st1.itx.db.domain.TxControl;
 import com.st1.itx.db.service.PfRewardMediaService;
 import com.st1.itx.db.service.TxControlService;
@@ -37,7 +39,7 @@ public class L5503 extends TradeBuffer {
 
 	@Autowired
 	public TxControlService txControlService;
-
+	
 	@Autowired
 	public DataLog dataLog;
 
@@ -50,20 +52,20 @@ public class L5503 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		int workmonth = Integer.valueOf(titaVo.getParam("WorkMonth")) + 191100;
-
+		
 		String controlCode = "L5511." + workmonth + ".2";
 		TxControl txControl = txControlService.findById(controlCode, titaVo);
 		if (txControl != null) {
 			throw new LogicException(titaVo, "E0010", "已產生媒體檔");
 		}
-
+		
 		String iFunCode = titaVo.get("FunCode").trim();
 		if ("1".equals(iFunCode)) {
 			int custNo = Integer.valueOf(titaVo.getParam("CustNo"));
 			int facmNo = Integer.valueOf(titaVo.getParam("FacmNo"));
 			int bormNo = Integer.valueOf(titaVo.getParam("BormNo"));
 			int bonusType = Integer.valueOf(titaVo.getParam("BonusType"));
-			PfRewardMedia pfRewardMedia = pfRewardMediaService.findDupFirst(custNo, facmNo, bormNo, bonusType, titaVo);
+			PfRewardMedia pfRewardMedia = pfRewardMediaService.findDupFirst(custNo, facmNo, bormNo, bonusType,workmonth, titaVo);
 			if (pfRewardMedia != null) {
 				String s = "";
 				if (bonusType == 1) {

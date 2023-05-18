@@ -14,7 +14,9 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.db.domain.CdLoanNotYet;
 import com.st1.itx.db.domain.PfRewardMedia;
+import com.st1.itx.db.domain.PfRewardMediaId;
 import com.st1.itx.db.domain.TxControl;
 import com.st1.itx.db.service.PfRewardMediaService;
 import com.st1.itx.db.service.TxControlService;
@@ -37,7 +39,7 @@ public class L5504 extends TradeBuffer {
 
 	@Autowired
 	public TxControlService txControlService;
-
+	
 	@Autowired
 	public DataLog dataLog;
 
@@ -63,7 +65,7 @@ public class L5504 extends TradeBuffer {
 			int facmNo = Integer.valueOf(titaVo.getParam("FacmNo"));
 			int bormNo = Integer.valueOf(titaVo.getParam("BormNo"));
 			int bonusType = Integer.valueOf(titaVo.getParam("BonusType"));
-			PfRewardMedia pfRewardMedia = pfRewardMediaService.findDupFirst(custNo, facmNo, bormNo, bonusType, titaVo);
+			PfRewardMedia pfRewardMedia = pfRewardMediaService.findDupFirst(custNo, facmNo, bormNo, bonusType,workmonth, titaVo);
 			if (pfRewardMedia != null) {
 
 				throw new LogicException("E0002", "介紹人加碼獎金資料");

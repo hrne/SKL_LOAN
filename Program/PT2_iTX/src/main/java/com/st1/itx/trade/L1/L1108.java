@@ -416,8 +416,10 @@ public class L1108 extends TradeBuffer {
 							throw new LogicException("E0007", tCustNotice.getFormNo() + "不可申請全部不寄送");
 						}
 					} else {
-						if ("N".equals(VarPaper) && "N".equals(VarMsg) && "N".equals(VarEMail)) {
-							throw new LogicException("E0007", tCustNotice.getFormNo() + "不可申請全部不寄送");
+						if (cdReport2.getSendCode() == 1) {
+							if ("N".equals(VarPaper) && "N".equals(VarMsg) && "N".equals(VarEMail)) {
+								throw new LogicException("E0007", tCustNotice.getFormNo() + "不可申請全部不寄送");
+							}
 						}
 					}
 				}

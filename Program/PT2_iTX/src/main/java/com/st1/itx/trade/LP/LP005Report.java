@@ -105,13 +105,14 @@ public class LP005Report extends MakeReport {
 		String txcd = "LP005";
 		String fileItem = "協辦考核核算底稿";
 		String defaultSheet = "1月件數";
-
+		// ReportVo reportVo =
+		String seasonItem = (pfYear - 1911) + "Q" + pfSeason;
 		if (pfSeason == 4) {
 			maxOfLoops = 4;
-			String fileName = "LP005_" + (pfYear - 1911) + "Q" + pfSeason + "協辦考核核算底稿";
+			String fileName = "LP005_" + seasonItem + "協辦考核核算底稿";
 			String defaultExcel = "LP005_底稿_協辦考核核算_第四季特別版.xlsx";
 			ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
-					.setRptItem(fileItem).build();
+					.setRptItem(fileItem + seasonItem).build();
 			// 開啟報表
 			this.info("reportVo open");
 			makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
@@ -119,10 +120,10 @@ public class LP005Report extends MakeReport {
 //					"LP005_" + (pfYear - 1911) + "Q" + pfSeason + "協辦考核核算底稿", "LP005_底稿_協辦考核核算_第四季特別版.xlsx", "1月件數");
 		} else {
 
-			String fileName = "LP005_" + (pfYear - 1911) + "Q" + pfSeason + "協辦考核核算底稿";
+			String fileName = "LP005_" + seasonItem + "協辦考核核算底稿";
 			String defaultExcel = "LP005_底稿_協辦考核核算.xlsx";
 			ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
-					.setRptItem(fileItem).build();
+					.setRptItem(fileItem + seasonItem).build();
 			// 開啟報表
 			this.info("reportVo open");
 			makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);

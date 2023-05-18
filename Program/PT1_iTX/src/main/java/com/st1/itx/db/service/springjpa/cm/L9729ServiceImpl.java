@@ -20,63 +20,70 @@ import com.st1.itx.util.parse.Parse;
 @Service
 @Repository
 public class L9729ServiceImpl extends ASpringJpaParm implements InitializingBean {
-
+	
 	public enum WorkType {
 		FiveYearsTX("1", "5YTX", "已結清並領取清償證明五年之交易明細");
-
+		
 		private String helpNo;
 		private String code;
 		private String desc;
-
-		public String getHelpNo() {
+		
+		public String getHelpNo()
+		{
 			return helpNo;
 		}
-
-		public String getCode() {
+		
+		public String getCode()
+		{
 			return code;
 		}
-
-		public String getDesc() {
+		
+		public String getDesc()
+		{
 			return desc;
 		}
-
-		WorkType(String _helpNo, String _code, String _desc) {
+		
+		WorkType(String _helpNo, String _code, String _desc)
+		{
 			this.helpNo = _helpNo;
 			this.code = _code;
 			this.desc = _desc;
 		}
-
-		public static WorkType getWorkTypeByHelp(String helpCode) throws LogicException {
+		
+		public static WorkType getWorkTypeByHelp(String helpCode) throws LogicException
+		{
 			// also used by L6971
 			// 設定 workType
-			for (WorkType w : WorkType.values()) {
-				if (w.getHelpNo().equals(helpCode)) {
+			for (WorkType w : WorkType.values())
+			{
+				if (w.getHelpNo().equals(helpCode))
+				{
 					return w;
 				}
 			}
-
+			
 			throw new LogicException("E0019", "L9729 不支援此明細種類: " + helpCode);
 		}
 	}
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
-
+	
 	@Autowired
 	Parse parse;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
-
+	
 	public List<Map<String, String>> findAll(String inputType, TitaVo titaVo) throws LogicException {
-		this.info("L9729ServiceImpl.findAll");
-
+		this.info("L9729ServiceImpl.findAll"); 
+		
 		int inputDate = parse.stringToInteger(titaVo.get("InputDate")) + 19110000;
-
+		
 		this.info("inputDate = " + inputDate);
 		this.info("inputType = " + inputType);
-
+		
 		String sql = "";
 		sql += " SELECT \"TableName\" ";
 		sql += "      , \"BatchNo\" ";
@@ -96,6 +103,7 @@ public class L9729ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        , \"FacmNo\" ASC ";
 		sql += "        , \"BormNo\" ASC ";
 
+
 		this.info("sql=" + sql);
 
 		Query query;
@@ -103,7 +111,7 @@ public class L9729ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setParameter("inputDate", inputDate);
 		query.setParameter("inputType", inputType);
-
+		
 		return this.convertToMap(query);
 	}
 

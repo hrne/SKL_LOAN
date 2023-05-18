@@ -35,6 +35,9 @@ BEGIN
     -- 2.TitaTlrNo經辦只轉了4碼,與LoanBorTx不同
     -- 3.RvNo銷帳碼=T05
 
+    -- 2023-05-18 Wei 修改轉換程式 from Linda
+    -- BatxOthers已經有放RvNo,請把重複放在Note的改放空白
+
     -- 寫入資料
     -- 法院扣薪
     INSERT INTO "BatxOthers" (
@@ -84,7 +87,7 @@ BEGIN
           ,0                              AS "FacmNo"              -- 額度號碼 DECIMAL 3 0
           ,CTS."CUSNAE"                   AS "CustNm"              -- 借款人戶名 NVARCHAR2 100 0
           ,CTS."T05"                      AS "RvNo"                -- 銷帳碼 VARCHAR2 12 0
-          ,CTS."T05"                      AS "Note"                -- 摘要 NVARCHAR2 60 0
+          ,''                             AS "Note"                -- 摘要 NVARCHAR2 60 0
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 0 
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 0 
@@ -156,7 +159,7 @@ BEGIN
           ,0                              AS "FacmNo"              -- 額度號碼 DECIMAL 3 0
           ,KCP."CUSNAJ"                   AS "CustNm"              -- 借款人戶名 NVARCHAR2 100 0
           ,KCP."KCPPLY"                   AS "RvNo"                -- 銷帳碼 VARCHAR2 12 0
-          ,KCP."KCPPLY"                   AS "Note"                -- 摘要 NVARCHAR2 60 0
+          ,''                             AS "Note"                -- 摘要 NVARCHAR2 60 0
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 0 
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 0 

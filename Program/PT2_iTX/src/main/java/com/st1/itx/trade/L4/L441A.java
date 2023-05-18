@@ -113,7 +113,8 @@ public class L441A extends TradeBuffer {
 			t1PostAuthLog.setCustId(tPostAuthLog.getCustId());
 			t1PostAuthLog.setRepayAcctSeq(tPostAuthLog.getRepayAcctSeq());
 			t1PostAuthLog.setPropDate(dateUtil.getNowIntegerForBC());
-			t1PostAuthLog.setProcessDate(tPostAuthLog.getProcessDate());
+			t1PostAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
+			t1PostAuthLog.setProcessTime(dateUtil.getNowIntegerTime());
 			t1PostAuthLog.setAuthErrorCode(""); // 再次授權
 			t1PostAuthLog.setRelationCode(tPostAuthLog.getRelationCode());
 			t1PostAuthLog.setRelAcctName(tPostAuthLog.getRelAcctName());
@@ -152,7 +153,8 @@ public class L441A extends TradeBuffer {
 			t2PostAuthLog.setFacmNo(tPostAuthLog.getFacmNo());
 			t2PostAuthLog.setCustId(tPostAuthLog.getCustId());
 			t2PostAuthLog.setRepayAcctSeq(tPostAuthLog.getRepayAcctSeq());
-			t2PostAuthLog.setProcessDate(tPostAuthLog.getProcessDate());
+			t2PostAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
+			t2PostAuthLog.setProcessTime(dateUtil.getNowIntegerTime());
 			t2PostAuthLog.setPropDate(dateUtil.getNowIntegerForBC());
 			t2PostAuthLog.setAuthErrorCode(" ");
 			t2PostAuthLog.setRelationCode(tPostAuthLog.getRelationCode());

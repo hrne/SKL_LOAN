@@ -201,7 +201,7 @@ public class L6971 extends TradeBuffer {
 			if (recordList != null && !recordList.isEmpty()) {
 				for (TxArchiveTableLog record : recordList) {
 					// deletedRecords 和 TxArchiveTableLog.Records 不符時 rollback
-					if (record.getResult() != deletedRecords) {
+					if (record.getRecords() != deletedRecords) {
 						this.error(
 								"L6971.setIsDeletedToTrue: different count between deleted records and TxArchiveTableLog.Records! rollback");
 						throw new LogicException("E0007", "實際刪除資料數與 TxArchiveTableLog 紀錄的數量不符");

@@ -266,7 +266,6 @@ public class L9110Report extends MakeReport {
 			printCustTel(listCustTelNoQuery);
 
 			// 2
-			this.print(1, 1, " ");
 
 			String relateCustName = "資料未建立";
 
@@ -275,7 +274,6 @@ public class L9110Report extends MakeReport {
 			this.print(1, 1, "二、關聯戶戶名： " + relateCustName);
 
 			// 3
-			this.print(1, 1, " ");
 			if (listGuaQuery == null || listGuaQuery.isEmpty()) {
 				this.print(1, 1, "三、保證人資料： 資料未建立");
 			} else {
@@ -284,7 +282,6 @@ public class L9110Report extends MakeReport {
 			}
 
 			// 4
-			this.print(1, 1, " ");
 			this.print(1, 1, "四、核准資料：");
 			this.print(1, 5, "鍵檔日期 ..... " + this.showRocDate(tL9110.get("F16"), 1));
 			this.print(0, 35, "核准額度 ..... "); // amount is R-pined at 49
@@ -367,7 +364,6 @@ public class L9110Report extends MakeReport {
 			}
 
 			if (tL9110Cl != null) {
-				this.print(1, 1, " ");
 				this.print(1, 1, "五、擔保品資料： " + tL9110Cl.get("F0"));
 
 				String clCode1 = "";
@@ -461,12 +457,10 @@ public class L9110Report extends MakeReport {
 					break;
 				}
 			} else {
-				this.print(1, 1, " ");
 				this.print(1, 1, "五、擔保品資料： 資料未建立");
 			}
 
 			// 6
-			this.print(1, 1, " ");
 			if (listInsuQuery != null && !listInsuQuery.isEmpty()) {
 				this.print(1, 1, "六、保險資料：");
 				// 列印保險資料
@@ -476,11 +470,9 @@ public class L9110Report extends MakeReport {
 			}
 
 			// 7
-			this.print(1, 1, " ");
 			this.print(1, 1, "七、本戶號目前總餘額： " + formatAmt(tL9110.get("F55"), 0) + "　元");
 
 			// 8
-			this.print(1, 1, " ");
 			if (listCoborrowerQuery == null || listCoborrowerQuery.isEmpty()) {
 				this.print(1, 1, "八、共同借款人資料： 資料未建立");
 			} else {
@@ -489,7 +481,6 @@ public class L9110Report extends MakeReport {
 			}
 
 			// 9
-			this.print(1, 1, " ");
 			if (listShareQuotaQuery == null || listShareQuotaQuery.isEmpty()) {
 				this.print(1, 1, "九、合併額度控管資料： 資料未建立");
 			} else {
@@ -605,19 +596,19 @@ public class L9110Report extends MakeReport {
 			this.print(1, 5, "性別 ......... " + tL9110.get("F4"));
 			this.print(0, 50, "出生年月日 ... " + this.showRocDate(tL9110.get("F11"), 1));
 			this.print(0, 99, "客戶別 ....... " + tL9110.get("F8"));
-			this.print(1, 5, "員工代號 ..... " + tL9110.get("F9"));
+			this.print(0, 138, "員工代號 ..... " + tL9110.get("F9"));
 			CdEmp tCdEmp = sCdEmpService.findById(tL9110.get("F9"), titaVo);
 			if (tCdEmp != null) {
 				if (employeeCom.isDay15Employee(tCdEmp, titaVo)) {
-					this.print(0, 50, "15 日薪 ...... " + "十五日薪");
+					this.print(1, 5, "15 日薪 ...... " + "十五日薪");
 				} else {
-					this.print(0, 50, "15 日薪 ...... " + "非十五日薪");
+					this.print(1, 5, "15 日薪 ...... " + "非十五日薪");
 				}
 			} else {
-				this.print(0, 50, "15 日薪 ...... " + tL9110.get("F10"));
+				this.print(1, 5, "15 日薪 ...... " + tL9110.get("F10"));
 			}
-			this.print(0, 99, "配偶姓名 ..... " + isNullorEmpty(tL9110.get("F5"), titaVo));
-			this.print(0, 138, "配偶統一編號 . " + isNullorEmpty(tL9110.get("F6"), titaVo));
+			this.print(0, 50, "配偶姓名 ..... " + isNullorEmpty(tL9110.get("F5"), titaVo));
+			this.print(0, 99, "配偶統一編號 . " + isNullorEmpty(tL9110.get("F6"), titaVo));
 			this.print(1, 5, "戶籍地址 ..... " + tL9110.get("F12"));
 			this.print(0, 99, "郵遞區號 ..... " + tL9110.get("F13"));
 			this.print(1, 5, "通訊地址 ..... " + tL9110.get("F14"));
@@ -630,7 +621,6 @@ public class L9110Report extends MakeReport {
 			printCustTel(listCustTelNoQuery);
 
 			// 2
-			this.print(1, 1, " ");
 			if (listGuaQuery == null || listGuaQuery.isEmpty()) {
 				this.print(1, 1, "二、保證人資料： 資料未建立");
 			} else {
@@ -639,7 +629,6 @@ public class L9110Report extends MakeReport {
 			}
 
 			// 3
-			this.print(1, 1, " ");
 			this.print(1, 1, "三、核准資料：");
 			this.print(1, 5, "鍵檔日期 ..... " + this.showRocDate(tL9110.get("F16"), 1));
 			this.print(0, 35, "核准額度 ..... "); // amount is R-pined at 49// 核貸總金額
@@ -735,7 +724,6 @@ public class L9110Report extends MakeReport {
 			// TODO:擔保品
 			// 4
 			if (tL9110Cl != null) {
-				this.print(1, 1, " ");
 				this.print(1, 1, "四、擔保品資料： " + tL9110Cl.get("F0"));
 
 				String clCode1 = "";
@@ -821,7 +809,6 @@ public class L9110Report extends MakeReport {
 					break;
 				}
 			} else {
-				this.print(1, 1, " ");
 				this.print(1, 1, "四、擔保品資料：　資料未建立");
 			}
 
@@ -835,11 +822,9 @@ public class L9110Report extends MakeReport {
 			}
 
 			// 6
-			this.print(1, 1, " ");
 			this.print(1, 1, "六、本戶號目前總餘額： " + formatAmt(tL9110.get("F55"), 0) + "　元");
 
 			// 7
-			this.print(1, 1, " ");
 			if (listCoborrowerQuery == null || listCoborrowerQuery.isEmpty()) {
 				this.print(1, 1, "七、共同借款人資料： 資料未建立");
 			} else {
@@ -848,7 +833,6 @@ public class L9110Report extends MakeReport {
 			}
 
 			// 8
-			this.print(1, 1, " ");
 			if (listShareQuotaQuery == null || listShareQuotaQuery.isEmpty()) {
 				this.print(1, 1, "八、合併額度控管資料： 資料未建立");
 			} else {
@@ -1063,9 +1047,9 @@ public class L9110Report extends MakeReport {
 		 * ------123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345
 		 */
 		checkSpace(5);
-		print(1, 5, "　主建物　　提供人　　　　　　　　　　　　　　　　　　　　　　　　公設　　　（坪）　　（坪）　　（坪）　　（坪）　　（坪）　　（仟）　（仟）");
-		print(1, 5, "　建　號　　門牌號碼／土地坐落　　　　　　　　　　　擔保品別　　　建號　　　主建物　附屬建物　　公設　　　車位　　土地面積　　核貸　　設定　擔保品編號");
-		print(1, 5, "－－－－－　－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－　－－－－　－－－－　－－－－　－－－－　－－－－　－－－　－－－　－－－－－－　");
+		print(1, 5, "主建物建號　提供人　　　　　　　　　　　　　　　　　　　　　　　　公設　　　（坪）　　（坪）　　（坪）　　（坪）　　（坪）　　（仟）　（仟）");
+		print(1, 5, "擔保品編號　門牌號碼／土地坐落　　　　　　　　　　　擔保品別　　　建號　　　主建物　附屬建物　　公設　　　車位　　土地面積　　核貸　　設定　");
+		print(1, 5, "－－－－－　－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－　－－－－　－－－－　－－－－　－－－－　－－－－　－－－　－－－　");
 
 		BigDecimal totalFloorArea = BigDecimal.ZERO;
 		BigDecimal totalBdSubArea = BigDecimal.ZERO;
@@ -1104,9 +1088,9 @@ public class L9110Report extends MakeReport {
 
 			if (this.getNowPage() != oldpage) {
 				oldpage = this.getNowPage();
-				print(1, 5, "　主建物　　提供人　　　　　　　　　　　　　　　　　　　　　　　　公設　　　（坪）　　（坪）　　（坪）　　（坪）　　（坪）　　（仟）　（仟）");
-				print(1, 5, "　建　號　　門牌號碼／土地坐落　　　　　　　　　　　擔保品別　　　建號　　　主建物　附屬建物　　公設　　　車位　　土地面積　　核貸　　設定　擔保品編號");
-				print(1, 5, "－－－－－　－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－　－－－－　－－－－　－－－－　－－－－　－－－－　－－－　－－－　－－－－－－　");
+				print(1, 5, "主建物建號　提供人　　　　　　　　　　　　　　　　　　　　　　　　公設　　　（坪）　　（坪）　　（坪）　　（坪）　　（坪）　　（仟）　（仟）");
+				print(1, 5, "擔保品編號　門牌號碼／土地坐落　　　　　　　　　　　擔保品別　　　建號　　　主建物　附屬建物　　公設　　　車位　　土地面積　　核貸　　設定　");
+				print(1, 5, "－－－－－　－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－　－－－－　－－－－　－－－－　－－－－　－－－－　－－－　－－－　");
 
 			}
 			BigDecimal bdloanAmt = BigDecimal.ZERO;
@@ -1140,7 +1124,12 @@ public class L9110Report extends MakeReport {
 			}
 
 			this.print(1, 5, mBuilding.get("F1")); // 主建物建號
-			this.print(0, 17, mBuilding.get("F2")); // 提供人
+
+			if ("1".equals(mBuilding.get("F0")) || "1".equals(mBuilding.get("F29"))) {
+				this.print(0, 17, mBuilding.get("F2")); // 提供人
+			} else {
+				this.print(0, 56, mBuilding.get("F2")); // 提供人
+			}
 			this.print(0, 56, clItem); // 擔保品別
 			this.print(0, 68, mBuilding.get("F5")); // 公設建號
 			this.print(0, 87, mBuilding.get("F6").trim().isEmpty() ? " " : formatAmt(mBuilding.get("F6"), 2), "R"); // 主建物面積
@@ -1160,21 +1149,31 @@ public class L9110Report extends MakeReport {
 				totalCarArea = totalCarArea.add(getBigDecimal(mBuilding.get("F9")));
 			}
 			this.print(0, 127, mBuilding.get("F11").trim().isEmpty() ? " " : formatAmt(mBuilding.get("F11"), 2), "R"); // 土地面積
-			this.print(0, 135, "1".equals(mBuilding.get("F29")) ? formatAmt(bdloanAmt, 0) : formatAmt(landloanAmt, 0),
-					"R"); // 核貸
-			this.print(0, 143, mBuilding.get("F10").trim().isEmpty() ? " "
-					: formatAmt(computeDivide(getBigDecimal(mBuilding.get("F10")), thousand, 0), 0), "R");// 設定金額
+			if ("1".equals(mBuilding.get("F0"))) {
+				this.print(0, 135,
+						"1".equals(mBuilding.get("F29")) ? formatAmt(bdloanAmt, 0) : formatAmt(landloanAmt, 0), "R"); // 核貸
+			}
+			if ("1".equals(mBuilding.get("F0"))) {
+				this.print(0, 143, mBuilding.get("F10").trim().isEmpty() ? " "
+						: formatAmt(computeDivide(getBigDecimal(mBuilding.get("F10")), thousand, 0), 0), "R");// 設定金額
+			}
 			if (("1".equals(mBuilding.get("F0")) && !mBuilding.get("F10").trim().isEmpty())) {
 				totalSettingAmt = totalSettingAmt.add(getBigDecimal(mBuilding.get("F10")));
 			}
-			this.print(0, 145, mBuilding.get("F12") + "-" + mBuilding.get("F13") + "-" + mBuilding.get("F14")); // 擔保品編號
-
-			this.print(1, 17, mBuilding.get("F3")); // 門牌號碼／土地坐落
+			this.print(1, 1, " ");
+			if ("1".equals(mBuilding.get("F29")) || "1".equals(mBuilding.get("F0"))) {
+				this.print(0, 5, mBuilding.get("F12") + "-" + mBuilding.get("F13") + "-" + mBuilding.get("F14")); // 擔保品編號
+			}
+			if ("1".equals(mBuilding.get("F0")) || "1".equals(mBuilding.get("F29"))) {
+				this.print(0, 17, mBuilding.get("F3")); // 門牌號碼
+			} else {
+				this.print(0, 56, mBuilding.get("F3")); // 土地坐落
+			}
 
 		}
 
 		checkSpace(2);
-		print(1, 5, "－－－－－　－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－　－－－－　－－－－　－－－－　－－－－　－－－－　－－－　－－－　－－－－－－　");
+		print(1, 5, "－－－－－　－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－　－－－－　－－－－　－－－－　－－－－　－－－－　－－－　－－－　");
 		print(1, 5, " 　　合計：");
 		print(0, 87, formatAmt(totalFloorArea, 2), "R");
 		print(0, 97, formatAmt(totalBdSubArea, 2), "R");
@@ -1228,12 +1227,22 @@ public class L9110Report extends MakeReport {
 			this.print(1, 5, "交互運用 ..... ");
 
 			int i = 0;
+			int j = 0;
+			String displaySubCompany = "";
 			for (Map<String, String> queryCrossUse : listCrossUseQuery) {
-				String subCompany = queryCrossUse.get("F0");
-
-				this.print(i, 20, subCompany);
-				i = 1; // 第一次為0, 第二次以後印新的一行
+				if (!displaySubCompany.isEmpty()) {
+					displaySubCompany += "、";
+				}
+				if (j == 4) {
+					this.print(i, 20, displaySubCompany);
+					displaySubCompany = "";
+					i = 1;
+					j = 0;
+				}
+				displaySubCompany += queryCrossUse.get("F0");
+				j++;
 			}
+			this.print(i, 20, displaySubCompany);
 		}
 	}
 
@@ -1246,20 +1255,33 @@ public class L9110Report extends MakeReport {
 		this.info("printCustTel");
 
 		checkSpace(3);
-		this.print(1, 3, "　電話種類　區碼　　　電話號碼　　　分機　與借款人關係　聯絡人姓名");
-		this.print(1, 3, "　－－－－　－－　－－－－－－－－　－－　－－－－－－　－－－－－");
+//		this.print(1, 3, "　電話種類　區碼　　　電話號碼　　　分機　與借款人關係　聯絡人姓名");
+//		this.print(1, 3, "　－－－－　－－　－－－－－－－－　－－　－－－－－－　－－－－－");
 
 		if (listCustTelNoQuery == null || listCustTelNoQuery.isEmpty()) {
 			this.print(1, 5, "資料未建立");
 		} else {
+			String telText = "";
+			int i = 0;
+			int j = 0;
 			for (Map<String, String> queryCustTel : listCustTelNoQuery) {
-				this.print(1, 5, queryCustTel.get("F0")); // 電話種類
-				this.print(0, 15, queryCustTel.get("F1")); // 電話區碼
-				this.print(0, 21, queryCustTel.get("F2")); // 電話號碼
-				this.print(0, 39, queryCustTel.get("F3")); // 分機號碼
-				this.print(0, 45, queryCustTel.get("F4")); // 與借款人關係
-				this.print(0, 59, queryCustTel.get("F5")); // 聯絡人姓名
+				String telType = queryCustTel.get("F0").trim();
+				String telArea = queryCustTel.get("F1").trim();
+				String telNo = queryCustTel.get("F2").trim();
+				String telExt = queryCustTel.get("F3").trim();
+				if (j == 4) {
+					this.print(1, 5, telText);
+					telText = "";
+					j = 0;
+					i = 1;
+				}
+				telText += telType + " ... " + telArea + " " + telNo + " " + telExt + "　"; // 電話種類
+//				this.print(0, 45, queryCustTel.get("F4")); // 與借款人關係 	qc2446不需要
+//				this.print(0, 59, queryCustTel.get("F5")); // 聯絡人姓名	qc2446不需要
+				j++;
+
 			}
+			this.print(i, 5, telText);
 		}
 	}
 

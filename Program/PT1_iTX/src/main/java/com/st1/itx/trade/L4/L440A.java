@@ -90,10 +90,10 @@ public class L440A extends TradeBuffer {
 		CheckAmlVo checkAmlVo = new CheckAmlVo();
 		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 
-// // 1.新增授權 2.再次授權 3.取消授權
-//		createFlag1 新增->更新
-//		createFlag2 再次->新增
-//		createFlag3 取消->新增一筆取消
+		// 1.新增授權 2.再次授權 3.取消授權
+		// createFlag1 新增->更新
+		// createFlag2 再次->新增
+		// createFlag3 取消->新增一筆取消
 		switch (createFlag) {
 		case 1:
 			tAchAuthLog.setPropDate(dateUtil.getNowIntegerForBC());
@@ -119,6 +119,7 @@ public class L440A extends TradeBuffer {
 			t1AchAuthLog.setAchAuthLogId(tAchAuthLogId);
 			t1AchAuthLog.setFacmNo(tAchAuthLog.getFacmNo());
 			t1AchAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
+			t1AchAuthLog.setProcessTime(dateUtil.getNowIntegerTime());
 			t1AchAuthLog.setPropDate(dateUtil.getNowIntegerForBC());
 			t1AchAuthLog.setAuthMeth(tAchAuthLog.getAuthMeth());
 			t1AchAuthLog.setLimitAmt(tAchAuthLog.getLimitAmt());
@@ -157,6 +158,7 @@ public class L440A extends TradeBuffer {
 			t2AchAuthLog.setAchAuthLogId(tAchAuthLogId);
 			t2AchAuthLog.setFacmNo(tAchAuthLog.getFacmNo());
 			t2AchAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
+			t2AchAuthLog.setProcessTime(dateUtil.getNowIntegerTime());
 			t2AchAuthLog.setPropDate(dateUtil.getNowIntegerForBC());
 			t2AchAuthLog.setAuthMeth(tAchAuthLog.getAuthMeth());
 			t2AchAuthLog.setLimitAmt(tAchAuthLog.getLimitAmt());

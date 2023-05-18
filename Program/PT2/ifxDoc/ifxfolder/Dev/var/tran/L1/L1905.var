@@ -1,0 +1,487 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L1905)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,315)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+#BTNADDBUF=X,18,S
+T(2,1+          +0000000)
+
+
+#BtnAddA=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L1105; ntxbuf=#BTNADDBUF; ntxbuf5=type})
+ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,新增)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L1905]                                 顧客聯絡電話查詢"],
+["#FdMain+查詢條件","@(統一編號、戶號，需擇一輸入)"],
+["#FdCustId+．統一編號",#CustId,#BTN1,#CustIdName],
+["#FdCustNo+．戶號",#CustNo,#BTN2,#CustNoName],
+]
+#FdMain=X,2,L
+T(3,*)
+#FdCustId=X,2,L
+#FdCustNo=X,2,L
+
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+#BTN1=X,15,I,ui:button;value:顧客資料查詢;enable:0;tabbable:0
+
+#BUF1=X,42,S
+ENABLE(#BTN1)
+
+#BIND1=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1;ntxbuf5=type<-1:CustId<-OOCustId:CustIdName<-OOCustName:CustNo<-:CustNoName<-})
+#BTN2=X,15,I,ui:button;value:顧客資料查詢;enable:0;tabbable:0
+
+#BUF2=X,42,S
+ENABLE(#BTN2)
+
+#BIND2=X,1,S
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2;ntxbuf5=type<-1:CustNo<-OOCustNo:CustNoName<-OOCustName:CustId<-:CustIdName<-})
+
+
+#Submit=A,1,S
+K(MODIFYBUTTON,查詢)
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+!EnableFg
+#CDDEF0001=x,20,S
+T(3,CdCode.EnableFg)
+
+#EnableFgHelp=x,1024,S
+
+!TelTypeCode
+#CDDEF0002=x,20,S
+T(3,CdCode.TelTypeCode)
+
+#TelTypeCodeHelp=x,1024,S
+
+!RelationCode
+#CDDEF0003=x,20,S
+T(3,CdCode.RelationCode)
+
+#RelationCodeHelp=x,1024,S
+
+! TelChgRsnCode
+#CODEF0004=x,20,S
+T(3,CdCode.TelChgRsnCode)
+
+#TelChgRsnCodeHelp=x,1024,S
+
+!當錯誤時會清空戶名
+#ClearSpace=X,20,S
+
+#EnableFgHelpRim=X,1,S
+RESET_RIM(#EnableFgHelpRim,XXR99)
+S(XXR99,01,#CDDEF0001,#CDDEF0002,#CDDEF0003,#CODEF0004)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@EnableFgHelp,#HelpDesc1)
+T(2,@TelTypeCodeHelp,#HelpDesc2)
+T(2,@RelationCodeHelp,#HelpDesc3)
+T(2,@TelChgRsnCodeHelp,#HelpDesc4)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+! 20200413 新增By Jacky
+#ChainSearchTXBUF=X,18,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(2,@BTNADDBUF,#ChainSearchTXBUF)
+T(1,#CustId,#ChainSearchTXBUF,2,10)
+T(1,#CustNo,#ChainSearchTXBUF,12,7)
+
+#NTXBUF5=X,10,S
+C(3,#CHAIN,1,T(4,NTXBUF5$),S)
+
+#RPTFG2=A,1,S
+C(4,#NTXBUF5,T(3,1),T(3,2))
+
+!統一編號
+#CustId=X,10,I
+C(3,#CHAIN,1,s,$)
+! INVOKEJS(SHOW,p1,1,2,1)
+@
+T(2,#CustIdName,)
+A(ID_UNINO,0,#CustId)
+! C(4,#CustId,T(3,@CustIdName,)INVOKEJS(SHOW,p1,1,1,0),INVOKEJS(SHOW,p1,2,2,0))
+C(4,#CustId,$,T(2,@BTNADDBUF,1+#CustId+0000000))
+
+
+
+! 調Rim相關 開始
+! 定義Rom欄位名稱、型態、長度
+<include src="ROM.icf::L1R01.dec"/>
+
+! 宣告Rim欲傳送的欄位1
+! 欄位名稱即為後端在titaVo get值時的KEY
+! 要注意欄為型態跟長度
+#RimCustId=X,10,S
+
+! 宣告Rim欲傳送的欄位2
+#RimCustNo=A,7,S
+
+#RimFunCd=A,1,S
+E(0,5)
+! Rim L1R01.java
+! RESET_RIM() 用意參考var function
+! S() 為送出資料
+! 參數1為此Rim的交易代號
+! 參數2為將收到的值切成幾筆
+! 參數3及其後皆為tita欄位
+! R() 為收到的電文轉入欄位
+! 參數1，為 0 時，不顯示；為 1 時，顯示。
+! 參數2，交易代號，在本交易的電文區要寫TXFROM
+#RimL1r01A=X,1,S
+C(4,#CustId,S,$)
+T(2,@RimCustId,#CustId)
+E(0,@RimCustNo,0)
+RESET_RIM(#RimL1r01A,L1R01)
+S(L1R01,1,#RimCustId,#RimCustNo,#RimFunCd)
+R(1,L1R01)
+
+#checkL1r01A=X,1,S
+C(4,#CustId,S,$)
+T(2,@CustIdName,#L1r01CustName)
+! 調Rim相關 結束
+
+!戶名
+#CustIdName=X,100,L
+C(4,#CustId,S,s)
+!戶號
+#CustNo=A,7,I
+C(4,#CustId,$,S)
+! C(3,#CHAIN,1,s,$)
+@
+T(2,#CustNoName,)
+C(4,#CustId,C(3,#CustNo,0,V(P,需擇一輸入查詢條件),$),S)
+C(3,#CustNo,0,$,T(2,@BTNADDBUF,1+          +#CustNo))
+
+
+#RimL1r01B=X,1,S
+C(3,#CustNo,0,S,$)
+T(2,@RimCustId,)
+E(0,@RimCustNo,#CustNo)
+RESET_RIM(#RimL1r01B,L1R01)
+S(L1R01,1,#RimCustId,#RimCustNo,#RimFunCd)
+R(1,L1R01)
+
+#checkL1r01B=X,1,S
+C(3,#CustNo,0,S,$)
+T(2,@CustNoName,#L1r01CustName)
+
+!戶名
+#CustNoName=X,100,L
+C(3,#CustNo,0,S,s)
+!身分證找戶號
+<include src="ROM.icf::L2R47.dec"/>
+#Rim2R47CustId=X,10,S
+
+#RimL2R47=X,1,S
+T(2,@Rim2R47CustId,#CustId)
+RESET_RIM(#RimL2R47,L2R47)
+C(4,#CustId,s,$)
+S(L2R47,1,#Rim2R47CustId)
+R(1,L2R47)
+
+#MRKEY=_,_,S
+C(4,#CustId,T(2,#CustNo),T(2,#L2R47CustNo))
+
+#RPTFG=A,1,S
+
+
+#RETURN=A,1,S
+E(0,0)
+
+![折返KEY]
+#RTNTXT=X,9,S
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,1)XMT(),$)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L1905 ----------
+<sub type="FORM" name="L1905">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L1905,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L1905] 顧客聯絡電話)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+
+
+#OCustId=X,10,L
+T(2,#L1r01CustId)
+
+#OCustName=X,100,L
+T(2,#L1r01CustName)
+
+#OCustNo=X,7,L
+T(2,#L1r01CustNo)
+
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+!電話種類
+#OOTelTypeCode=A,2,L
+#OOTEL_LB=X,8,L
+T(H,#OOTelTypeCode,#TelTypeCodeHelp)
+
+!電話號碼
+#OOTelArea=X,5,S
+#OOTelNo=X,10,S
+#OOTelExt=X,5,S
+#DASH1=X,1,L
+C(4,#OOTelArea,T(3,),T(3,-))
+#DASH2=X,1,L
+C(4,#OOTelExt,T(3,),T(3,-))
+#OOTEL_PHONE=X,22,L
+IF(#OOTelTypeCode == 03 || #OOTelTypeCode == 05,T(2,#OOTelNo),T(B,#OOTelArea+#DASH1+#OOTelNo+#DASH2+#OOTelExt))
+IF(#OOTelTypeCode == 09,T(B,#OOTelArea+#OOTelNo+#OOTelExt),s)
+! IF(#OOTelTypeCode == 03 || #OOTelTypeCode == 05,T(2,#OOMobile),$)
+! IF(#OOTelTypeCode == 03 || #OOTelTypeCode == 05,s,$)
+! C(4,#OOTelArea,$,T(2,@OOTEL_PHONE,#OOTelArea))
+! C(4,#OOTelArea,$,C(4,#OOTelNo,$,T(2,@OOTEL_PHONE,#OOTEL_PHONE+#DASH)))
+! C(4,#OOTelNo,$,T(2,@OOTEL_PHONE,#OOTEL_PHONE+#OOTelNo))
+! C(4,#OOTelNo,$,C(4,#OOTelExt,$,T(2,@OOTEL_PHONE,#OOTEL_PHONE+#DASH)))
+! C(4,#OOTelExt,$,T(2,@OOTEL_PHONE,#OOTEL_PHONE+#OOTelExt))
+! C(4,#OOTelArea,C(4,#OOTelNo,C(4,#OOTelExt,$,T(B,#OOTelExt)),T(B,#OOTelNo)),T(B,#OOTelArea))
+! T(B,#OOTelArea+#DASH+#OOTelNo+#DASH+#OOTelExt)
+
+!與借款人關係
+#OORelationCode=X,2,L
+#OORelationItem=X,4,L
+C(4,#OORelationCode,S,$)
+T(H,#OORelationCode,#RelationCodeHelp)
+!聯絡人姓名
+#OOLiaisonName=c,100,L
+
+! 最後修改時間
+#OOLastUpdate=X,30,O
+
+!異動人員
+#OOLastUpdateEmpNo=X,6,L
+
+! 異動人員全名
+#OOLastUpdateEmpNoName=X,40,L
+
+! 組合
+#OOCombined=X,48,L
+T(2,#OOLastUpdateEmpNo+  +#OOLastUpdateEmpNoName)
+
+!啟用記號
+#OOEnable=X,1,L
+#OOEnableX=X,4,L
+C(4,#OOEnable,S,$)
+T(H,#OOEnable,#EnableFgHelp)
+
+!異動原因
+#OOTelChgRsnCode=X,2,L
+#OOTelChgRsnItem=X,8,L
+IF(#OOTelChgRsnCode == "00",$,T(H,#OOTelChgRsnCode,#TelChgRsnCodeHelp))
+
+!備註
+#OORmk=c,40,L
+
+!停用原因
+#OOStopReason=x,40,L
+
+! 電話識別碼
+#OOTelNoUKey=x,32,S
+
+#FUNCD=X,1,S
+T(3,2)
+
+!修改
+#OOBUF1=X,50,S
+C(3,#CustNo,0,$,T(2,2+          +#CustNo+#OOTelNoUKey))
+C(4,#CustId,$,T(2,2+#CustId+0000000+#OOTelNoUKey))
+
+
+#OOBTN1=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L1105; ntxbuf=#OOBUF1})
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#CustId
+#CustNo
+#RETURN
+#END
+#RTNTXT
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+! 調Rim相關 開始
+<include src="ROM.icf::L1R01.tom"/>
+<include src="ROM.icf::L2R47.tom"/>
+! 調Rim相關 結束
+
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L1905
+#OOTelTypeCode
+#OOTelArea
+#OOTelNo
+#OOTelExt
+#OORelationCode
+#OOLiaisonName
+#OOLastUpdate
+#OOLastUpdateEmpNo
+#OOLastUpdateEmpNoName
+#OOEnable
+#OOTelChgRsnCode
+#OORmk
+#OOStopReason
+#OOTelNoUKey
+^
+
+</sub>
+
+!--------- OUTPUT畫面 --------
+<sub type="PART" name="O1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L1905]                                 顧客聯絡電話查詢                                                                                                                "],
+! ["@統一編號",#OCustId,"-",#OCustName],
+]
+</sub>
+
+<sub type="SELECT">
+#RPTFG2=1,QUERY.GRID,L1905
+#any={detail:true, header:'O1.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOBTN1=修改
+{width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
+
+#OOTEL_LB=電話種類
+{width:80,align:'center'}
+
+#OOTEL_PHONE=電話號碼
+{width:150,align:'left'}
+
+#OORelationItem=與顧客關係
+{width:150,align:'center'}
+
+#OOLiaisonName=聯絡人姓名
+{width:100,align:'left'}
+
+
+#OOEnableX=啟用記號
+{width:90,align:'center'}
+
+#OOTelChgRsnItem=異動原因
+{width:90,align:'center'}
+
+#OORmk=備註
+{width:200,align:'left'}
+
+#OOStopReason=停用原因
+{width:200,align:'left'}
+
+#OOCombined=異動人員
+{width:100,align:'left'}
+
+#OOLastUpdate=異動日期時間
+{width:140,align:'center'}
+
+^
+
+#RPTFG2=2,QUERY.GRID,L1905
+#any={detail:true, header:'O1.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOTEL_LB=電話種類
+{width:80,align:'center'}
+
+#OOTEL_PHONE=電話號碼
+{width:150,align:'left'}
+
+#OORelationItem=與顧客關係
+{width:150,align:'center'}
+
+#OOLiaisonName=聯絡人姓名
+{width:100,align:'left'}
+
+
+#OOEnableX=啟用記號
+{width:90,align:'center'}
+
+#OOTelChgRsnItem=異動原因
+{width:90,align:'center'}
+
+#OORmk=備註
+{width:200,align:'left'}
+
+#OOStopReason=停用原因
+{width:200,align:'left'}
+
+#OOCombined=異動人員
+{width:100,align:'left'}
+
+#OOLastUpdate=異動日期時間
+{width:140,align:'center'}
+
+#OOTelArea=
+{width:10,hidden:true}
+#OOTelNo=
+{width:10,hidden:true}
+#OOTelExt=
+{width:10,hidden:true}
+^
+<include src="PRT.icf::INQ01.sel" map="i=L1905;cpi=15"/>
+#OCustId#OCustName
+%
+#OOTEL_LB#OOTEL_PHONE#OORelationItem#OOLiaisonName#OOCombined#OOEnableX#OOTelChgRsnItem#OORmk#OOStopReason#
+@^
+</sub>

@@ -27,6 +27,9 @@ E(0,1)ASGN(LOOPHEIGHT$)
 #INQPRT=n,2,S
 E(0,40)ASGN(INQPRT$)
 
+! #AGAIN=X,1,S
+! E(0,1)ASGN(AGAIN$)
+
 </sub>
 
 <sub type="DC" name="BFHEAD">
@@ -50,7 +53,7 @@ E(0,0)
 ["#R8+@本金餘額",#PrinBalance,"元以上"],
 ["#R9+@會計日",#AcDate],
 ["#R10+@入帳日",#EntryDate],
-["#R11+@最近繳款日",#PayIntDateSt,"~",#PayIntDateEd"],
+["#R11+@最近繳款日",#PayIntDateSt,"~",#PayIntDateEd],
 ["#FdMsg+@注意事項",#Msg],
 ]
 !---------- AP Button AREA ----------
@@ -88,6 +91,8 @@ IF(#UnpaidCond==1,T(3,@R4,*),T(3,@R4, ))
 IF(#UnpaidCond==1,INVOKEJS(SHOW,#R4,1),INVOKEJS(SHOW,#R4,0))
 IF(#UnpaidCond==2,T(3,@R5,*),T(3,@R5, ))
 IF(#UnpaidCond==2,INVOKEJS(SHOW,#R5,1),INVOKEJS(SHOW,#R5,0))
+
+
 
 
 
@@ -250,6 +255,7 @@ E(0,#L4R32Date2)
 @V(7)
 V(5,0,#DT2)
 
+
 #PayIntDateSt=D,7,I
 E(0,#L4R32Date7)
 @A(DATE,0,#PayIntDateSt)
@@ -263,6 +269,7 @@ E(0,#L4R32Date7)
 V(5,0,#DT2)
 IF(#PayIntDateEd<#PayIntDateSt,V(P,起始日不可大於終止日),$)
 
+
 <include src="ROM.icf::L1R20.dec"/>
 <include src="ROM.icf::L4R32.dec"/>
 
@@ -271,6 +278,9 @@ T(3,L9703A)
 
 #RimFlag=A,1,S
 
+#notPrintLetter=X,1,S
+#nLetter=X,1,S
+
 #L1R20Rim2=X,1,S
 C(3,#CustNo,0,S,$)
 RESET_RIM(#L1R20Rim2,L1R20)
@@ -278,10 +288,17 @@ E(0,@RimFlag,0)
 S(L1R20,01,#CustNo,#FacmNo,#FormNo,#RimFlag)
 R(1,L1R20)
 T(2,@Msg,#L1R20Msg)
+T(2,@nLetter,#notPrintLetter)
+E(0,1)
+ASGN(AGAIN$)
 
 #ShowMsg=A,1,S
 C(3,#CustNo,0,E(0,0),C(4,#Msg,E(0,0),E(0,1)))
+C(5,#nLetter,Y,K(NOBUTTON,CLOSE),K(NOBUTTON,SHOW))
 INVOKEJS(SHOW,p1,11,11,#ShowMsg)
+
+C(5,#notPrintLetter,Y,ALERT(此戶號額度不通知書面寄送),$)
+
 
 </sub>
 
@@ -331,11 +348,15 @@ T(3,[L9703] 滯繳客戶明細表)
 !------ 下行電文TOM ------
 <sub type="TOM">
 ! 調Rim相關 開始
+
+
 <include src="ROM.icf::L1R01.tom"/>
 <include src="ROM.icf::L1R20.tom"/>
 <include src="ROM.icf::L4R32.tom"/>
 ! 調Rim相關 結束
-TXFORM=L9703^
+TXFORM=L9703
+#NLetter
+^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
