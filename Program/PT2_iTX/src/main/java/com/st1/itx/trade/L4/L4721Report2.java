@@ -77,10 +77,11 @@ public class L4721Report2 extends MakeReport {
 	 * @param kindItem 利率代碼中文名稱
 	 * @throws LogicException
 	 */
-	public void exec(TitaVo titaVo, TxBuffer txbuffer, List<Map<String, String>> data) throws LogicException {
+	public void exec(TitaVo titaVo, TxBuffer txbuffer, List<Map<String, String>> data, String kindItem)
+			throws LogicException {
 		this.info("L4721Report2 exec start");
 
-		int itxKind = parse.stringToInteger(titaVo.getParam("TxKind"));
+//		int itxKind = parse.stringToInteger(titaVo.getParam("TxKind"));
 
 		this.titaVo = titaVo;
 		this.setTxBuffer(txbuffer);
@@ -88,7 +89,7 @@ public class L4721Report2 extends MakeReport {
 
 		List<String> file = getData(titaVo, data);
 
-		String fileName = "L4721";
+		String fileName = "L4721-" + kindItem;
 
 //		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
 //				titaVo.getTxCode() + "-" + kindItem, fileName, 2);
@@ -107,7 +108,6 @@ public class L4721Report2 extends MakeReport {
 		this.info("sno : " + sno);
 
 		makeFile.toFile(sno);
-
 
 		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
 				titaVo.getTlrNo() + "L4721", titaVo.getTxCode() + " 已產生L4721.txt", titaVo);
@@ -134,15 +134,9 @@ public class L4721Report2 extends MakeReport {
 
 		for (Map<String, String> r : data) {
 
-			int iEffectDate = parse.stringToInteger(r.get("EffectDate"));
 			int iCustNo = parse.stringToInteger(r.get("CustNo"));
 			int iFacmNo = parse.stringToInteger(r.get("FacmNo"));
-			int iPresEffDate = parse.stringToInteger(r.get("PresEffDate"));
 
-			if (iEffectDate == 0) {
-//				if (tBatxRateChange.getTxEffectDate() == 0) {
-				continue;
-			}
 			// 相同戶號跳過
 			if (custNo == iCustNo) {
 				continue;
@@ -178,7 +172,6 @@ public class L4721Report2 extends MakeReport {
 				}
 
 				int tempfacmno = parse.stringToInteger(listL4721Detail.get(0).get("FacmNo"));
-//				int tempcustno = parse.stringToInteger(listL4721Detail.get(0).get("CustNo"));
 				int times = 0;
 				for (Map<String, String> mapL4721Detail : listL4721Detail) {
 

@@ -494,6 +494,11 @@ public class L2419Batch extends TradeBuffer {
 				isExistInClMain = true;
 			}
 
+			// 2023/05/18新增判斷:取得CustUKey記錄在ClMain
+			String custUKey = findCustUKey(titaVo);
+			
+			clMain.setCustUKey(custUKey);
+			
 			// 擔保品類別代碼
 			clMain.setClTypeCode(clTypeCode);
 			// 地區別
@@ -842,6 +847,14 @@ public class L2419Batch extends TradeBuffer {
 
 		this.batchTransaction.commit();
 		return null;
+	}
+
+	private String findCustUKey(TitaVo titaVo) {
+		CustMain custMain = sCustMainService.custNoFirst(custNo, custNo, titaVo);
+		if (custMain != null && custMain.getCustUKey() != null) {
+			return custMain.getCustUKey();
+		}
+		return "";
 	}
 
 	private void deleteData(int clCode1, int clCode2, int clNo, ClBatch tClBatch, String insuNo, TitaVo titaVo)

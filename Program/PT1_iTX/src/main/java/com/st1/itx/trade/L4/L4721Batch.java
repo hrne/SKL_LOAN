@@ -15,8 +15,10 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.BatxRateChangeService;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.springjpa.cm.L4721ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.CustNoticeCom;
@@ -50,7 +52,10 @@ public class L4721Batch extends TradeBuffer {
 	private CustNoticeCom custNoticeCom;
 
 	@Autowired
-	public BatxRateChangeService batxRateChangeService;
+	private BatxRateChangeService batxRateChangeService;
+
+	@Autowired
+	private CustMainService custMainService;
 
 	@Autowired
 	private TxToDoCom txToDoCom;
@@ -80,7 +85,7 @@ public class L4721Batch extends TradeBuffer {
 	private Boolean flag = true;
 	private int custNoLast = 0;
 	private int facmNoLast = 0;
-
+	private long sno = 0;
 	int CntPaper = 0;
 	int CntEmail = 0;
 	int CntMsg = 0;
@@ -133,9 +138,11 @@ public class L4721Batch extends TradeBuffer {
 				if (custList != null) {
 					for (Map<String, String> data : custList) {
 						try {
-							l4721Report.exec(titaVo, this.txBuffer, parse.stringToInteger(data.get("CustNo")),
-									tmpKindItem[txkind - 1]);
+							this.sno = l4721Report.exec(titaVo, this.txBuffer,
+									parse.stringToInteger(data.get("CustNo")), tmpKindItem[txkind - 1]);
 
+							this.info("CustNo =" + data.get("CustNo"));
+							this.info("sno =" + this.sno);
 							dealHeadData(titaVo, data);
 
 						} catch (LogicException e) {
@@ -145,12 +152,12 @@ public class L4721Batch extends TradeBuffer {
 
 					} // for
 				} // if
-			}
-		}
 
-		if (CntPaper > 0) {
-			l4721Report2.exec(titaVo, this.txBuffer, letterCustList);
-		}
+			} // if
+			if (CntPaper > 0) {
+				l4721Report2.exec(titaVo, this.txBuffer, letterCustList, tmpKindItem[txkind - 1]);
+			}
+		} // for
 
 		String msg = "";
 
@@ -258,12 +265,17 @@ public class L4721Batch extends TradeBuffer {
 		this.info("noticeAddress : " + noticeAddress);
 
 		if ("Y".equals(tempVo.getParam("isLetter"))) {
+			this.info("isLetterCust : " + iCustNo);
+			this.info("isLetterLastCust : " + custNoLast);
 			if (iCustNo != custNoLast) {
 				CntPaper = CntPaper + 1;
 				letterCustList.add(iData);
 			}
 		}
 		if ("Y".equals(tempVo.getParam("isEmail"))) {
+			this.info("isEmailCust : " + iCustNo);
+			this.info("isEmailLastCust : " + custNoLast);
+
 			if (iCustNo != custNoLast) {
 				CntEmail = CntEmail + 1;
 				setMailMFileVO(iData, noticeEmail, titaVo);
@@ -271,6 +283,9 @@ public class L4721Batch extends TradeBuffer {
 		}
 
 		if ("Y".equals(tempVo.getParam("isMessage"))) {
+			this.info("isMessageCust : " + iCustNo);
+			this.info("isMessageLastCust : " + custNoLast);
+			this.info("lTmpCustFacm : " + lTmpCustFacm.toString());
 			for (Map<String, String> t : lTmpCustFacm) {
 				CntMsg = CntMsg + 1;
 				setTextFileVO(t, noticePhoneNo, titaVo);
@@ -312,7 +327,18 @@ public class L4721Batch extends TradeBuffer {
 
 		txToDoCom.setTxBuffer(this.getTxBuffer());
 
-		String dataLines = "";
+		CustMain tCustMain = new CustMain();
+		tCustMain = custMainService.custNoFirst(parse.stringToInteger(tmpCustFacm.get("CustNo")),
+				parse.stringToInteger(tmpCustFacm.get("FacmNo")), titaVo);
+
+		String dataLines = "<" + noticeEmail + ">";
+
+		// L4711>String[] processNotes = tTxToDoDetail.getProcessNote().split(",");
+		// L4711>String email = processNotes[2];
+		// L4711>long pdfno = Long.parseLong(processNotes[3]);
+		// 若未來有修改此段落時,請一併修改L4711
+		dataLines += "\"H1\",\"" + tCustMain.getCustId() + "\"," + noticeEmail + "," + this.sno
+				+ ",\"親愛的客戶您好，新光人壽通知您，房貸利率調整，敬請留意帳戶餘額以利扣款。\",\"" + this.getTxBuffer().getMgBizDate().getTbsDy() + "\"";
 
 		dataLines = "親愛的客戶您好，新光人壽通知您，房貸利率調整，敬請留意帳戶餘額以利扣款。";
 
@@ -326,7 +352,7 @@ public class L4721Batch extends TradeBuffer {
 		tTxToDoDetail.setStatus(0);
 		tTxToDoDetail.setProcessNote(dataLines);
 
-		txToDoCom.addDetail(false, 9, tTxToDoDetail, titaVo);
+		txToDoCom.addDetail(true, 9, tTxToDoDetail, titaVo);
 	}
 
 }

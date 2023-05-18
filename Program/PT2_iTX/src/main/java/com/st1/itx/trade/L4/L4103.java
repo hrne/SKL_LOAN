@@ -57,10 +57,8 @@ public class L4103 extends TradeBuffer {
 		Slice<AcDetail> slAcDetail = acDetailService.acdtlTitaBatchNo(titaVo.getAcbrNo(), titaVo.getCurName(), acDate,
 				batchNo, 0, Integer.MAX_VALUE, titaVo);
 		lAcDetail = slAcDetail == null ? null : new ArrayList<AcDetail>(slAcDetail.getContent());
-		
 
-
-		if (lAcDetail == null && lAcDetail.size() == 0) {
+		if (lAcDetail == null || lAcDetail.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "查無資料");
 		}
 

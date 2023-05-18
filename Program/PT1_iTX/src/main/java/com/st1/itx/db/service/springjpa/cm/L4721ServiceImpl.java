@@ -32,6 +32,8 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	public List<Map<String, String>> findAll(int itxkind, int iCustType, int sDate, int eDate, String prodNos,
 			TitaVo titaVo) throws Exception {
+		this.info("L4721ServiceImpl findAll");
+
 //		// iExecCode 0: 一般、 9.定期機動檢核件
 		int iTxKind = itxkind;
 //		輸入畫面 戶別 CustType 1:個金;2:企金（含企金自然人）
@@ -139,7 +141,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	public List<Map<String, String>> TempQuery(int custNo, int isday, int ieday, TitaVo titaVo) throws Exception {
 
-		this.info("BankStatementServiceImpl Temp");
+		this.info("L4721ServiceImpl Temp");
 
 		this.info("custNo ... " + custNo);
 		this.info("isday ... " + isday);
@@ -173,7 +175,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	public List<Map<String, String>> doQuery(int custNo, int sDate, int eDate, TitaVo titaVo) throws Exception {
 
-		this.info("BankStatementServiceImpl doQuery");
+		this.info("L4721ServiceImpl doQuery");
 
 		this.info("custNo ... " + custNo);
 
@@ -254,14 +256,14 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-	public List<Map<String, String>> doDetail(int custNo, int isday, int ieday, TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> doDetail(int custNo, int sDate, int eDate, TitaVo titaVo) throws Exception {
 		dateUtil.init();
 
-		this.info("BankStatementServiceImpl doDetail");
+		this.info("L4721ServiceImpl doDetail");
 
 		this.info("custNo ... " + custNo);
-		this.info("isday ... " + isday);
-		this.info("ieday ... " + ieday);
+		this.info("isday ... " + sDate);
+		this.info("ieday ... " + eDate);
 //		因抓取不到費用類，第一層group by 到額度(同額度同調整日、同源利率
 
 		String sql = " ";
@@ -280,9 +282,9 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,X.\"Interest\"                                        "; // F6:繳息金額
 		sql += "       ,X.\"BreachAmt\" + \"DelayInt\"                       AS \"BreachAmt\"  "; // F7:違約金+延滯息
 		sql += "       ,X.\"FEE1\" + X.\"FEE2\" + X.\"FEE3\" + X.\"FEE4\"    AS \"OtherFee\"   "; // F8:火險費或其他費用
-		sql += "       ,CASE WHEN BR.\"TxEffectDate\" = 0 THEN 0 WHEN BR.\"TxEffectDate\" IS NOT NULL THEN BR.\"TxEffectDate\" - 19110000 ELSE 0 END AS \"TxEffectDate\"";
-		sql += "       ,NVL(BR.\"PresentRate\",0)                            AS \"PresentRate\"";
-		sql += "       ,NVL(BR.\"AdjustedRate\",0)                           AS \"AdjustedRate\"";
+		sql += "       ,NVL(r.\"EffectDate\",0) AS  \"TxEffectDate\" ";// 利率生效日
+		sql += "       ,NVL(r2.\"FitRate\",0) AS \"PresentRate\" ";
+		sql += "       ,NVL(r.\"FitRate\",0) AS \"AdjustedRate\" ";
 		sql += "       ,X.\"AcDate\"                      ";
 		sql += "       ,X.\"RepayCode\"                   ";
 		sql += "       ,NVL(CB.\"BdLocation\", ' ')      AS \"Location\"      "; // 押品地址
@@ -319,8 +321,8 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              +	NVL(JSON_VALUE(T.\"OtherFields\",  '$.FireFee'),0)                    ";
 		sql += "              +	NVL(JSON_VALUE(T.\"OtherFields\",  '$.LawFee'),0) > 0                 ";
 		sql += "                or T.\"TitaTxCd\" = 'L3210' )                                         ";
-		sql += "         AND  T.\"EntryDate\" >= " + isday; // tbsdy六個月前的月初日
-		sql += "         AND  T.\"EntryDate\" <= " + ieday; // tbsdy
+		sql += "         AND  T.\"EntryDate\" >= " + sDate; // tbsdy六個月前的月初日
+		sql += "         AND  T.\"EntryDate\" <= " + eDate; // tbsdy
 		sql += "       GROUP BY  t.\"FacmNo\", t.\"EntryDate\", t.\"AcDate\", CASE WHEN t.\"IntStartDate\" = 0 AND t.\"IntEndDate\" = 0 THEN 'Y' ELSE 'N' END                      ";
 		sql += "      ) X                                                                             ";
 		sql += " LEFT JOIN \"CdCode\" CD ON CD.\"DefCode\" = 'RepayCode'                              ";
@@ -337,6 +339,35 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               AND \"Status\" != 3                                           ";
 		sql += "        GROUP BY   \"CustNo\",\"FacmNo\") LB ON LB.\"CustNo\" = X.\"CustNo\"                         ";
 		sql += "                                            AND LB.\"FacmNo\" =  X.\"FacmNo\"                        ";
+		sql += " LEFT JOIN (                                             ";
+		sql += "           select                                       ";
+		sql += "            \"CustNo\"                              ";
+		sql += "           ,\"FacmNo\"                              ";
+		sql += "           ,\"BormNo\"                              ";
+		sql += "           ,\"FitRate\"                              ";
+		sql += "           ,\"EffectDate\"                           ";
+		sql += "           ,row_number() over (partition by \"CustNo\", \"FacmNo\", \"BormNo\" order by \"EffectDate\" Desc) as \"seq\" ";
+		sql += "           from \"LoanRateChange\"                           ";
+		sql += "  		   where \"EffectDate\" >=" + sDate;
+		sql += "   			 and \"EffectDate\" <=" + eDate;
+		sql += "        ) r            on  r.\"CustNo\" = X.\"CustNo\"        ";
+		sql += "                       and r.\"FacmNo\" = X.\"FacmNo\"        ";
+		sql += "                       and r.\"seq\" = 1                          ";
+		sql += " LEFT JOIN (                                             ";
+		sql += "           select                                       ";
+		sql += "            \"CustNo\"                              ";
+		sql += "           ,\"FacmNo\"                              ";
+		sql += "           ,\"BormNo\"                              ";
+		sql += "           ,\"FitRate\"                              ";
+		sql += "           ,\"EffectDate\"                           ";
+		sql += "           ,row_number() over (partition by \"CustNo\", \"FacmNo\", \"BormNo\" order by \"EffectDate\" Desc) as \"seq\" ";
+		sql += "           from \"LoanRateChange\" rb                          ";
+		sql += "  		   where \"EffectDate\" >=" + sDate;
+		sql += "   			 and \"EffectDate\" <=" + eDate;
+		sql += "        ) r2            on  r2.\"CustNo\" = r.\"CustNo\"        ";
+		sql += "                       and  r2.\"FacmNo\" = r.\"FacmNo\"        ";
+		sql += "                       and  r2.\"BormNo\" = r.\"BormNo\"        ";
+		sql += "                       and  r2.\"seq\" = 2                          ";
 		sql += " LEFT JOIN \"ClFac\" F ON F.\"CustNo\"   =  LB.\"CustNo\"                              ";
 		sql += "                      AND F.\"FacmNo\"   =  LB.\"FacmNo\"                              ";
 		sql += "                      AND F.\"MainFlag\" = 'Y'                                        ";
