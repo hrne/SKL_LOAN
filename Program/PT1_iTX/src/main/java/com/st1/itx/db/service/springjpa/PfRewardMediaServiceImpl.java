@@ -176,13 +176,13 @@ em = null;
     this.info("findDupFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " bormNo_2 : " +  bormNo_2 + " bonusType_3 : " +  bonusType_3 + " workMonth_4 : " +  workMonth_4);
     Optional<PfRewardMedia> pfRewardMediaT = null;
     if (dbName.equals(ContentName.onDay))
-      pfRewardMediaT = pfRewardMediaReposDay.findTopByCustNoIsAndFacmNoIsAndBormNoIsAndBonusTypeIsWorkMonthIs(custNo_0, facmNo_1, bormNo_2, bonusType_3, workMonth_4);
+      pfRewardMediaT = pfRewardMediaReposDay.findTopByCustNoIsAndFacmNoIsAndBormNoIsAndBonusTypeIsAndWorkMonthIs(custNo_0, facmNo_1, bormNo_2, bonusType_3, workMonth_4);
     else if (dbName.equals(ContentName.onMon))
-      pfRewardMediaT = pfRewardMediaReposMon.findTopByCustNoIsAndFacmNoIsAndBormNoIsAndBonusTypeIsWorkMonthIs(custNo_0, facmNo_1, bormNo_2, bonusType_3, workMonth_4);
+      pfRewardMediaT = pfRewardMediaReposMon.findTopByCustNoIsAndFacmNoIsAndBormNoIsAndBonusTypeIsAndWorkMonthIs(custNo_0, facmNo_1, bormNo_2, bonusType_3, workMonth_4);
     else if (dbName.equals(ContentName.onHist))
-      pfRewardMediaT = pfRewardMediaReposHist.findTopByCustNoIsAndFacmNoIsAndBormNoIsAndBonusTypeIsWorkMonthIs(custNo_0, facmNo_1, bormNo_2, bonusType_3, workMonth_4);
+      pfRewardMediaT = pfRewardMediaReposHist.findTopByCustNoIsAndFacmNoIsAndBormNoIsAndBonusTypeIsAndWorkMonthIs(custNo_0, facmNo_1, bormNo_2, bonusType_3, workMonth_4);
     else 
-      pfRewardMediaT = pfRewardMediaRepos.findTopByCustNoIsAndFacmNoIsAndBormNoIsAndBonusTypeIsWorkMonthIs(custNo_0, facmNo_1, bormNo_2, bonusType_3, workMonth_4);
+      pfRewardMediaT = pfRewardMediaRepos.findTopByCustNoIsAndFacmNoIsAndBormNoIsAndBonusTypeIsAndWorkMonthIs(custNo_0, facmNo_1, bormNo_2, bonusType_3, workMonth_4);
 
     return pfRewardMediaT.isPresent() ? pfRewardMediaT.get() : null;
   }

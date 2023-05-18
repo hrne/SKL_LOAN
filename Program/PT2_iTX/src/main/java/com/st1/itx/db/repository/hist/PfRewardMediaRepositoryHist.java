@@ -30,8 +30,8 @@ public interface PfRewardMediaRepositoryHist extends JpaRepository<PfRewardMedia
   // CustNo = ,AND FacmNo =
   public Slice<PfRewardMedia> findAllByCustNoIsAndFacmNoIsOrderByPerfDateAsc(int custNo_0, int facmNo_1, Pageable pageable);
 
-  // CustNo = ,AND FacmNo = ,AND BormNo = ,AND BonusType = ,WorkMonth =
-  public Optional<PfRewardMedia> findTopByCustNoIsAndFacmNoIsAndBormNoIsAndBonusTypeIsWorkMonthIs(int custNo_0, int facmNo_1, int bormNo_2, int bonusType_3, int workMonth_4);
+  // CustNo = ,AND FacmNo = ,AND BormNo = ,AND BonusType = ,AND WorkMonth =
+  public Optional<PfRewardMedia> findTopByCustNoIsAndFacmNoIsAndBormNoIsAndBonusTypeIsAndWorkMonthIs(int custNo_0, int facmNo_1, int bormNo_2, int bonusType_3, int workMonth_4);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

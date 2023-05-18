@@ -62,7 +62,7 @@ public interface PfRewardMediaService {
   public Slice<PfRewardMedia> findFacmNo(int custNo_0, int facmNo_1, int index, int limit, TitaVo... titaVo);
 
   /**
-   * CustNo = ,AND FacmNo = ,AND BormNo = ,AND BonusType = ,WorkMonth =
+   * CustNo = ,AND FacmNo = ,AND BormNo = ,AND BonusType = ,AND WorkMonth =
    *
    * @param custNo_0 custNo_0
    * @param facmNo_1 facmNo_1
