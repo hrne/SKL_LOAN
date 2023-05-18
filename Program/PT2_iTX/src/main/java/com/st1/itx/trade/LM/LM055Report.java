@@ -45,7 +45,7 @@ public class LM055Report extends MakeReport {
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
-	 * @throws LogicException 
+	 * @throws LogicException
 	 * 
 	 */
 	public void exec(TitaVo titaVo, int yearMonth) throws LogicException {
@@ -101,6 +101,12 @@ public class LM055Report extends MakeReport {
 		BigDecimal amount = BigDecimal.ZERO;
 
 		for (Map<String, String> r : listData) {
+
+			// 會null是因為MonthlyFacBal的AssetClass沒有更新到處於null狀態，需上傳L7205(五類資產分類上傳轉檔作業)
+			if (r.get("F2") == null) {
+				continue;
+			}
+
 			type = r.get("F0");
 			kind = Integer.valueOf(r.get("F1"));
 			amount = new BigDecimal(r.get("F2"));
@@ -136,7 +142,5 @@ public class LM055Report extends MakeReport {
 		}
 
 	}
-
-	
 
 }

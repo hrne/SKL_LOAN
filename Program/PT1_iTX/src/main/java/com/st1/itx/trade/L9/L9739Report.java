@@ -144,13 +144,19 @@ public class L9739Report extends MakeReport {
 
 		this.setFont(1, 12);
 		this.print(1, 1, " ");
+
 		// 標題
+		this.print(1, 14, "基本利率代碼");
+		this.print(0, 28, "商品名稱");
+		this.print(0, 46, "生效日期");
+		this.print(0, 60, "利率");
 
 		if (listL9739Title.size() > 0) {
 			for (Map<String, String> t : listL9739Title) {
 				String text = t.get("ProdNo") + "     " + fillUpWord(t.get("ProdName"), 22, " ", "R")
-						+ this.showRocDate(t.get("EffectDate"), 1) + "     "
-						+ fillUpWord(t.get("FitRate"), 5, "0", "R");
+						+ fillUpWord("0".equals(t.get("EffectDate")) ? " " : this.showRocDate(t.get("EffectDate"), 1),
+								9, " ", "R")
+						+ "     " + fillUpWord(t.get("FitRate"), 5, "0", "R");
 				this.print(1, this.getMidXAxis(), text, "C");
 			}
 		} else {
@@ -196,13 +202,13 @@ public class L9739Report extends MakeReport {
 			if (tmpCount == 0) {
 				this.print(1, 3, "無不符合項目");
 			}
-			
+
 			this.result = true;
 
 		} else {
 
 			this.print(1, 3, "本日無資料");
-			
+
 			this.result = false;
 
 		}

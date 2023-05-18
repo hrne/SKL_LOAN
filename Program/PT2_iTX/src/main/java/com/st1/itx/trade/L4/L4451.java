@@ -25,7 +25,6 @@ import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.PostAuthLogService;
 import com.st1.itx.db.service.PostDeductMediaService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.AuthLogCom;
 import com.st1.itx.util.common.TxAmlCom;
 import com.st1.itx.util.common.data.CheckAmlVo;

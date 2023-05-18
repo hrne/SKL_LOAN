@@ -112,6 +112,7 @@ public class ContentName {
 	public static final String parent = "parent";
 	public static final String jobId = "jobId";
 	public static final String batchDate = "batchDate";
+	public static final String batchType = "batchType";
 	public static final String monOrDay = "MD";
 
 	public static final String jobMode = "jobMode";

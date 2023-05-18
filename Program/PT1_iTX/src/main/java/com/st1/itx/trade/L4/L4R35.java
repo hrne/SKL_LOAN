@@ -13,7 +13,6 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.BatxDetail;
 import com.st1.itx.db.domain.BatxDetailId;
 import com.st1.itx.db.service.BatxDetailService;
-import com.st1.itx.db.service.CdAcCodeService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 

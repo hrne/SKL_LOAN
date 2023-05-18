@@ -543,17 +543,17 @@ public class ApControl extends SysLogger {
 			for (String job : jobIds) {
 				JobParameters params = new JobParametersBuilder().addDate(ContentName.batchDate, new Date()).addString(ContentName.jobId, job).addString(ContentName.tlrno, this.titaVo.getTlrNo())
 						.addString("excuteMode", "0").addString(ContentName.dataBase, this.titaVo.getDataBase()).addString(ContentName.parent, this.titaVo.getTxcd())
-						.addString(ContentName.loggerFg, ThreadVariable.isLogger() + "").addString("txSeq", this.titaVo.getJobTxSeq()).toJobParameters();
+						.addString(ContentName.loggerFg, ThreadVariable.isLogger() + "").addString("txSeq", this.titaVo.getJobTxSeq()).addString(ContentName.batchType, this.titaVo.get(ContentName.batchType)).toJobParameters();
 				MySpring.jobLaunch(job, params);
 			}
 		} else {
 			JobParameters params = new JobParametersBuilder().addDate(ContentName.batchDate, new Date()).addString(ContentName.jobId, jobId).addString(ContentName.tlrno, this.titaVo.getTlrNo())
 					.addString("excuteMode", "0").addString(ContentName.dataBase, this.titaVo.getDataBase()).addString(ContentName.parent, this.titaVo.getTxcd())
-					.addString(ContentName.loggerFg, ThreadVariable.isLogger() + "").addString("txSeq", this.titaVo.getJobTxSeq()).toJobParameters();
+					.addString(ContentName.loggerFg, ThreadVariable.isLogger() + "").addString("txSeq", this.titaVo.getJobTxSeq()).addString(ContentName.batchType, this.titaVo.get(ContentName.batchType)).toJobParameters();
 			MySpring.jobLaunch(jobId, params);
 		}
 	}
-
+	
 	public void clearV() {
 		jsonConvert = null;
 		eloanConver = null;

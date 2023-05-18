@@ -2,8 +2,6 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import com.st1.itx.util.StaticTool;
@@ -20,7 +18,12 @@ import com.st1.itx.Exception.LogicException;
 public class TxHolidayId implements Serializable {
 
 
-  // 地區別
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2626677544458293458L;
+
+// 地區別
   @Column(name = "`Country`", length = 2)
   private String country = " ";
 

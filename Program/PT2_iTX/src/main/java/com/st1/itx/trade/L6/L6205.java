@@ -12,7 +12,6 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdLand;
 import com.st1.itx.db.domain.CdLandId;
-import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdLandService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;

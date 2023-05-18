@@ -19,6 +19,8 @@ import com.st1.itx.db.service.JobMainService;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.BatchBase;
 import com.st1.itx.util.MySpring;
+import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 
 /**
  * 每日資料庫複製<BR>
@@ -49,6 +51,10 @@ public class DailyCopy extends BatchBase implements Tasklet, InitializingBean {
 	JobMainService sJobMainService;
 	@Autowired
 	AcCloseService sAcCloseService;
+	@Autowired
+	public WebClient webClient;
+	@Autowired
+	public DateUtil dateUtil;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -117,6 +123,8 @@ public class DailyCopy extends BatchBase implements Tasklet, InitializingBean {
 			throw new LogicException(titaVo, "E0007", "更新關帳狀態(09:放款)"); // 更新資料時，發生錯誤
 		}
 		this.info("DailyCopy exit.");
+		
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "", "", "夜間批次執行完畢", titaVo);
 	}
 
 	private void doCopy(TitaVo tempTitaVo) throws LogicException {

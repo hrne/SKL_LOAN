@@ -129,6 +129,7 @@ E(0,0)
 #ProdNoX{i}=X,20,L
 
 #ProdNo{i}=X,5,I
+IF(#TxKind==0,$,IF(#TxKind==5,$,s))
 @C(4,#ProdNo{i},INVOKEJS(SHOW,grd1_{i},0),INVOKEJS(SHOW,grd1_{i},1))
 C(4,#ProdNo{i},s,$)
 T(2,@RimProdNo,#ProdNo{i})

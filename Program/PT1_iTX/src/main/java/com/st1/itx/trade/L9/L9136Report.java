@@ -160,12 +160,12 @@ public class L9136Report extends MakeReport {
 				List<String> tmp2 = new ArrayList<String>(Arrays.asList(tmpOldContent));
 				List<String> tmp3 = new ArrayList<String>(Arrays.asList(tmpNewContent));
 
-				this.info("btmp1 = " + tmp1.toString());
-				this.info("btmp2 = " + tmp2.toString());
-				this.info("btmp3 = " + tmp3.toString());
-				this.info("btmp1.size()=" + tmp1.size());
-				this.info("btmp2.size()=" + tmp2.size());
-				this.info("btmp3.size()=" + tmp3.size());
+//				this.info("btmp1 = " + tmp1.toString());
+//				this.info("btmp2 = " + tmp2.toString());
+//				this.info("btmp3 = " + tmp3.toString());
+//				this.info("btmp1.size()=" + tmp1.size());
+//				this.info("btmp2.size()=" + tmp2.size());
+//				this.info("btmp3.size()=" + tmp3.size());
 				// 避免有空白
 				if (tmp1.size() == 0 || tmp2.size() == 0 || tmp3.size() == 0) {
 					continue;
@@ -176,6 +176,17 @@ public class L9136Report extends MakeReport {
 						// 排除不需要的顯示的字串
 						// 因顯示出來的字串有包含雙引號所以把雙引號移除
 						if (tmp1.get(i).toString().replace("\"", "").indexOf(tmpWord.get(j).toString()) == 0) {
+
+							String item = tmp1.get(i).replace("\"", "");
+							String oldContent = tmp2.get(i).replace("\"", "");
+							String newContent = tmp3.get(i).replace("\"", "");
+
+							// 全空白排除
+							if (item.trim().length() == 0 && oldContent.trim().length() == 0
+									&& newContent.trim().length() == 0) {
+								continue;
+							}
+
 							tmp1.set(i, "");
 							tmp2.set(i, "");
 							tmp3.set(i, "");
@@ -183,37 +194,39 @@ public class L9136Report extends MakeReport {
 					}
 				}
 
-				this.info("atmp1.size()=" + tmp1.size());
-				this.info("atmp2.size()=" + tmp2.size());
-				this.info("atmp3.size()=" + tmp3.size());
+//				this.info("atmp1.size()=" + tmp1.size());
+//				this.info("atmp2.size()=" + tmp2.size());
+//				this.info("atmp3.size()=" + tmp3.size());
 
 				if (tmp1.size() == tmp2.size() && tmp1.size() == tmp3.size() && tmp2.size() == tmp3.size()) {
 				} else {
 					continue;
 				}
 
+				int k = 0;
+
 				for (int i = 0; i < tmp1.size(); i++) {
 
 					// 排除空值的資料
 					if (tmp1.get(i).length() != 0) {
 
-						String item = tmp1.get(i).replace("\"", "");
-						String oldContent = tmp2.get(i).replace("\"", "");
-						String newContent = tmp3.get(i).replace("\"", "");
-
-						if (item.trim().length() == 0 && oldContent.trim().length() == 0
-								&& newContent.trim().length() == 0) {
-							continue;
-						}
+						String item = tmp1.get(i);
+						String oldContent = tmp2.get(i);
+						String newContent = tmp3.get(i);
 
 						report(r, item, oldContent, newContent, this.dataSource);
 					}
+
+					k++;
 
 					// 超過40行 換新頁
 					if (this.NowRow >= 40) {
 
 						this.print(2, this.getMidXAxis(), this.nextPageText, "C");
-						this.newPage();
+						
+						if (k != tmp1.size()) {
+							this.newPage();
+						}
 
 					}
 

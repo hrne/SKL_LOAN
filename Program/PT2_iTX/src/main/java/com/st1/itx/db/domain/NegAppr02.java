@@ -2,7 +2,6 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -27,7 +26,12 @@ import com.st1.itx.Exception.LogicException;
 public class NegAppr02 implements Serializable {
 
 
-  @EmbeddedId
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -439792206497594600L;
+
+@EmbeddedId
   private NegAppr02Id negAppr02Id;
 
   // 提兌日

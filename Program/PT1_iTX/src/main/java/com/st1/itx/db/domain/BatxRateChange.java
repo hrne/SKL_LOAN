@@ -2,7 +2,6 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -27,7 +26,12 @@ import com.st1.itx.Exception.LogicException;
 public class BatxRateChange implements Serializable {
 
 
-  @EmbeddedId
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1055386299672988675L;
+
+@EmbeddedId
   private BatxRateChangeId batxRateChangeId;
 
   // 調整日期

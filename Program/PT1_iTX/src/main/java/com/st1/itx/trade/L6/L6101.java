@@ -18,6 +18,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcClose;
 import com.st1.itx.db.domain.AcCloseId;
+import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcMain;
 import com.st1.itx.db.domain.AcMainId;
 import com.st1.itx.db.domain.AcReceivable;
@@ -30,6 +31,7 @@ import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.domain.TxToDoDetailId;
 import com.st1.itx.db.domain.TxToDoMain;
 import com.st1.itx.db.service.AcCloseService;
+import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.AcMainService;
 import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.BankRemitService;
@@ -100,6 +102,9 @@ public class L6101 extends TradeBuffer {
 	AcReceivableService sAcReceivableService;
 
 	@Autowired
+	private AcDetailService sAcDetailService;
+
+	@Autowired
 	AcMainService sAcMainService;
 	@Autowired
 	SlipMedia2022Service slipMedia2022Service;
@@ -161,10 +166,13 @@ public class L6101 extends TradeBuffer {
 	@Autowired
 	TxToDoCom txToDoCom;
 
+	private int iAcDate = 0;
+	private int iAcDateF = 0;
 	private int iClsFg = 0;
 	private int iMsgCode = 0;
 	private int iClsNo = 0;
 	private int iCoreSeqNo = 0;
+	private String iBatNo = "";
 
 	private String iSecNo = "";
 
@@ -174,12 +182,14 @@ public class L6101 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		// 取得輸入資料
+		iAcDate = this.txBuffer.getTxCom().getTbsdy();
+		iAcDateF = this.txBuffer.getTxCom().getTbsdyf();
 		iSecNo = titaVo.getParam("SecNo");
+		iBatNo = titaVo.getParam("BatNo");
 		iClsFg = this.parse.stringToInteger(titaVo.getParam("ClsFg"));
 		iCoreSeqNo = this.parse.stringToInteger(titaVo.getParam("CoreSeqNo"));
 		iMsgCode = 0;
 		iClsNo = 0;
-
 		this.info("SecNo = " + iSecNo);
 		this.info("ClsFg = " + iClsFg);
 		this.info("CoreSeqNo = " + iCoreSeqNo);
@@ -217,8 +227,8 @@ public class L6101 extends TradeBuffer {
 		case "09": // 09-放款
 			// MsgCode=01 撥款匯款作業未完成
 			String batchNo = "LN" + titaVo.getParam("BatNo") + "  ";
-			Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(this.txBuffer.getTxCom().getTbsdyf(), batchNo,
-					00, 99, 0, 0, 0, Integer.MAX_VALUE, titaVo);
+			Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(iAcDateF, batchNo, 00, 99, 0, 0, 0,
+					Integer.MAX_VALUE, titaVo);
 			if (slBankRemit != null) {
 				cMsgCode = cMsgCode + 1;
 				OccursList occursList = new OccursList();
@@ -228,8 +238,7 @@ public class L6101 extends TradeBuffer {
 			}
 			slBankRemit = null;
 			batchNo = "RT" + titaVo.getParam("BatNo") + "  ";
-			slBankRemit = bankRemitService.findL4901B(this.txBuffer.getTxCom().getTbsdyf(), batchNo, 00, 99, 0, 0, 0,
-					Integer.MAX_VALUE, titaVo);
+			slBankRemit = bankRemitService.findL4901B(iAcDateF, batchNo, 00, 99, 0, 0, 0, Integer.MAX_VALUE, titaVo);
 			if (slBankRemit != null) {
 				cMsgCode = cMsgCode + 1;
 				OccursList occursList = new OccursList();
@@ -313,7 +322,7 @@ public class L6101 extends TradeBuffer {
 		AcClose tAcClose = new AcClose();
 		AcCloseId tAcCloseId = new AcCloseId();
 
-		tAcCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
+		tAcCloseId.setAcDate(iAcDate);
 		tAcCloseId.setBranchNo(titaVo.getAcbrNo());
 		tAcCloseId.setSecNo(fSecNo); // 業務類別: 01-撥款匯款 02-支票繳款 09-放款
 
@@ -370,9 +379,8 @@ public class L6101 extends TradeBuffer {
 	// 讀取整批入帳總數檔
 	private int findBatxHead(int fBatxTotCnt, TitaVo titaVo) throws LogicException {
 		int errocount = 0;
-		int acDate = this.txBuffer.getTxBizDate().getTbsDyf();
 		Slice<BatxHead> slBatxHead;
-		slBatxHead = sBatxHeadService.acDateRange(acDate, acDate, this.index, Integer.MAX_VALUE);
+		slBatxHead = sBatxHeadService.acDateRange(iAcDateF, iAcDateF, this.index, Integer.MAX_VALUE);
 		List<BatxHead> lBatxHead = slBatxHead == null ? null : slBatxHead.getContent();
 
 		if (lBatxHead == null || lBatxHead.size() == 0) {
@@ -405,8 +413,7 @@ public class L6101 extends TradeBuffer {
 	private int findTxFlow(String fSecNo, int fTxFlowCnt, TitaVo titaVo) throws LogicException {
 
 		Slice<TxFlow> slTxFlow;
-		slTxFlow = sTxFlowService.findBySecNo(this.txBuffer.getTxCom().getTbsdy() + 19110000, fSecNo, this.index,
-				Integer.MAX_VALUE);
+		slTxFlow = sTxFlowService.findBySecNo(iAcDateF, fSecNo, this.index, Integer.MAX_VALUE);
 		List<TxFlow> lTxFlow = slTxFlow == null ? null : slTxFlow.getContent();
 
 		if (lTxFlow == null || lTxFlow.size() == 0) {
@@ -461,7 +468,7 @@ public class L6101 extends TradeBuffer {
 		List<Map<String, String>> L6901List = null;
 
 		try {
-			L6901List = l6101ServiceImpl.findAcMainAll(this.txBuffer.getTxCom().getTbsdyf(), titaVo);
+			L6901List = l6101ServiceImpl.findAcMainAll(iAcDateF, titaVo);
 		} catch (Exception e) {
 			// E5004 讀取DB時發生問題
 			throw new LogicException(titaVo, "E0001", "SQL ERROR");
@@ -513,7 +520,7 @@ public class L6101 extends TradeBuffer {
 		AcClose tAcClose = new AcClose();
 		AcCloseId tAcCloseId = new AcCloseId();
 
-		tAcCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
+		tAcCloseId.setAcDate(iAcDate);
 		tAcCloseId.setBranchNo(titaVo.getAcbrNo());
 		tAcCloseId.setSecNo(uSecNo); // 業務類別: 1-撥款匯款 2-支票繳款 3-債協 9-放款
 
@@ -572,7 +579,7 @@ public class L6101 extends TradeBuffer {
 		AcClose tAcClose = new AcClose();
 		AcCloseId tAcCloseId = new AcCloseId();
 
-		tAcCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
+		tAcCloseId.setAcDate(iAcDate);
 		tAcCloseId.setBranchNo(titaVo.getAcbrNo());
 		tAcCloseId.setSecNo(fSecNo); // 業務類別: 1-撥款匯款 2-支票繳款 3-債協 9-放款
 
@@ -596,7 +603,7 @@ public class L6101 extends TradeBuffer {
 		AcClose tAcClose = new AcClose();
 		AcCloseId tAcCloseId = new AcCloseId();
 
-		tAcCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
+		tAcCloseId.setAcDate(iAcDate);
 		tAcCloseId.setBranchNo(titaVo.getAcbrNo());
 		tAcCloseId.setSecNo("09"); // 業務類別: 09-放款
 
@@ -626,7 +633,7 @@ public class L6101 extends TradeBuffer {
 		}
 
 		// 啟動L9130核心傳票媒體檔產生作業
-		titaVo.putParam("AcDate", this.txBuffer.getTxCom().getTbsdy()); // 會計日期
+		titaVo.putParam("AcDate", iAcDate); // 會計日期
 		if ("02".equals(uSecNo)) {
 			titaVo.putParam("BatchNo", 11); // 傳票批號 , 02:支票繳款時固定為11
 		} else {
@@ -656,7 +663,7 @@ public class L6101 extends TradeBuffer {
 			this.info("02=exec L9130、L9131、L9132、L9132A、L9132B、L9132C");
 
 			l9130Report.exec(titaVo);
-			//l9130Report2022.exec(titaVo);//2023/5/2點掉,文齡經理:支票使用舊格式媒體檔
+			// l9130Report2022.exec(titaVo);//2023/5/2點掉,文齡經理:支票使用舊格式媒體檔
 			l9131Report.exec(titaVo);
 			l9131Report.close();
 			l9132Report.exec(titaVo);
@@ -673,11 +680,10 @@ public class L6101 extends TradeBuffer {
 
 	// 寫入應處理清單-業績工作月結算啟動通知(工作月結束，放款關帳)
 	private void txToDoPFCL(TitaVo titaVo) throws LogicException {
-		int acDateF = this.txBuffer.getTxBizDate().getTbsDyf();
 		// 工作月(西曆)
-		CdWorkMonth tCdWorkMonth = sCdWorkMonthService.findDateFirst(acDateF, acDateF);
+		CdWorkMonth tCdWorkMonth = sCdWorkMonthService.findDateFirst(iAcDateF, iAcDateF, titaVo);
 		if (tCdWorkMonth == null) {
-			throw new LogicException(titaVo, "E0001", "CdWorkMonth 放款業績工作月對照檔，業績日期=" + acDateF); // 查詢資料不存在
+			throw new LogicException(titaVo, "E0001", "CdWorkMonth 放款業績工作月對照檔，業績日期=" + iAcDateF); // 查詢資料不存在
 		}
 		// 終止日期 >= 本營業日 && 終止日期 < 下營業日
 
@@ -708,32 +714,31 @@ public class L6101 extends TradeBuffer {
 		AcClose tAcClose = new AcClose();
 		AcCloseId tAcCloseId = new AcCloseId();
 
-		tAcCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
+		tAcCloseId.setAcDate(iAcDate);
 		tAcCloseId.setBranchNo(titaVo.getAcbrNo());
-		tAcCloseId.setSecNo(iSecNo); // 業務類別: 1-撥款匯款 2-支票繳款 3-債協 9-放款
+		tAcCloseId.setSecNo(iSecNo); // 業務類別: 2-支票繳款 9-放款
 
 		tAcClose = sAcCloseService.findById(tAcCloseId);
 
 		if (tAcClose == null) {
 			throw new LogicException(titaVo, "E0015", "會計業務關帳控制檔 業務類別:" + iSecNo); // 檢查錯誤
 		}
-		// 開帳及關帳取消時檢查
-		if (iClsFg == 0 || iClsFg == 2) {
-			// 檢查上傳媒體檔是否已完成
-			CheckSlipMedia2022(iClsFg, tAcClose, titaVo);
-		}
-		this.info("iClsFg = " + iClsFg);
-		// 關帳
-		if (iClsFg == 1) {
-			this.info("iClsFg = 1");
-			txToDoL7400(titaVo);
-		}
-		// 關帳取消
-		if (iClsFg == 2) {
-			this.info("iClsFg = 2");
-			txToDoL7400Delete(tAcClose, titaVo);
-		}
 
+		// L7400 總帳傳票資料傳輸(只有放款，支票使用人工上傳)相關處理
+		if ("09".equals(iSecNo)) {
+			// 開帳及關帳取消時檢查資料傳輸是否已完成
+			if (iClsFg == 0 || iClsFg == 2) {
+				CheckSlipMedia2022(iClsFg, tAcClose, titaVo);
+			}
+			// 關帳時，寫入應處理清單(L7400)
+			if (iClsFg == 1) {
+				txToDoL7400(titaVo);
+			}
+			// 關帳取消時，刪除應處理清單(L7400)
+			if (iClsFg == 2) {
+				txToDoL7400Delete(tAcClose, titaVo);
+			}
+		}
 		// 更新會計業務關帳控制檔
 		if (iMsgCode == 0) {
 			iClsNo = updAcClose(iSecNo, iClsFg, iClsNo, titaVo);
@@ -791,37 +796,6 @@ public class L6101 extends TradeBuffer {
 		}
 	}
 
-	// 1:總帳傳票檔傳送作業 L7400
-	private void mediaSlip(TitaVo titaVo) throws LogicException {
-
-		AcClose tAcClose = new AcClose();
-		AcCloseId tAcCloseId = new AcCloseId();
-
-		tAcCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
-		tAcCloseId.setBranchNo(titaVo.getAcbrNo());
-		tAcCloseId.setSecNo(iSecNo); // 業務類別: 1-撥款匯款 2-支票繳款 3-債協 9-放款
-
-		tAcClose = sAcCloseService.findById(tAcCloseId);
-
-		if (tAcClose == null) {
-			throw new LogicException(titaVo, "E0015", "會計業務關帳控制檔 業務類別:" + iSecNo); // 檢查錯誤
-		}
-		// 需檢查已關帳才可執行上傳作業
-		if (tAcClose.getClsFg() != 1) {
-			throw new LogicException(titaVo, "E0010", "需為關帳狀態 批號:" + tAcClose.getClsNo()); // 功能選擇錯誤
-		}
-
-		titaVo.putParam("AcDate", this.txBuffer.getTxCom().getTbsdy()); // 會計日期
-		if ("02".equals(iSecNo)) {
-			titaVo.putParam("BatchNo", 11); // 傳票批號 , 02:支票繳款時固定為11
-		} else {
-			titaVo.putParam("BatchNo", tAcClose.getClsNo()); // 傳票批號 , 09:放款時為業務關帳之次數
-		}
-		titaVo.putParam("MediaSeq", tAcClose.getCoreSeqNo()); // 核心傳票
-		// 執行交易
-		MySpring.newTask("L7400", this.txBuffer, titaVo);
-	}
-
 	// 開帳檢查上傳媒體檔不可有"未完成"
 	// 取消關帳檢查上傳媒體檔不可"已完成"
 	private void CheckSlipMedia2022(int iClsFg, AcClose tAcClose, TitaVo titaVo) throws LogicException {
@@ -847,9 +821,14 @@ public class L6101 extends TradeBuffer {
 
 	}
 
-	// 寫入應處理清單-
+	// 寫入應處理清單(該批號有帳務才寫)
 	private void txToDoL7400(TitaVo titaVo) throws LogicException {
 		this.info("txToDoL7400 ...");
+		Slice<AcDetail> slAcDetail = sAcDetailService.findSlipBatNo(iAcDateF, parse.stringToInteger(iBatNo), 0, 1,
+				titaVo);
+        if (slAcDetail == null) {
+        	return;
+        }
 		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 		TempVo tTempVo = new TempVo();
 		tTxToDoDetail.setItemCode("L7400");

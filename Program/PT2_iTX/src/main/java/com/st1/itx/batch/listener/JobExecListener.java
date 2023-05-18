@@ -124,7 +124,7 @@ public class JobExecListener extends SysLogger implements JobExecutionListener {
 				boolean status = true;
 				Collection<StepExecution> stepEli = jobExecution.getStepExecutions();
 				for (StepExecution se : stepEli)
-					status = !se.getExitStatus().getExitCode().equals("COMPLETED") ? !status : status;
+					status = se.getExitStatus().getExitCode().equals("FAILED") ? false : status;
 
 				jobMain = jobMainService.holdById(jobMainId);
 				jobMain.setEndTime(time);

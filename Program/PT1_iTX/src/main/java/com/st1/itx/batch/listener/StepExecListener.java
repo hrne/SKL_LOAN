@@ -108,6 +108,7 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 		titaVo.putParam(ContentName.empnot, stepExecution.getJobParameters().getString(ContentName.tlrno, "BAT001"));
 
 		String txSeq = stepExecution.getJobExecution().getJobParameters().getString(ContentName.txSeq);
+		String batchType = stepExecution.getJobExecution().getJobParameters().getString(ContentName.batchType);
 		txSeq = Objects.isNull(txSeq) || txSeq.trim().isEmpty() ? stepExecution.getJobExecution().getExecutionContext().getString(ContentName.txSeq, "") : txSeq;
 
 		if (Objects.isNull(txSeq) || txSeq.trim().isEmpty()) {
@@ -130,6 +131,7 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 				jobDetail = new JobDetail();
 
 				jobDetail.setJobDetailId(jobDetailId);
+				jobDetail.setBatchType(batchType);
 				jobDetail.setStepStartTime(time);
 				jobDetailService.insert(jobDetail, titaVo);
 				this.info("jobDetail insert. " + jobDetail.toString());

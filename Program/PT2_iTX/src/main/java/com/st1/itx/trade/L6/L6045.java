@@ -18,14 +18,11 @@ import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.TxInquiry;
-import com.st1.itx.db.domain.TxRecord;
 import com.st1.itx.db.domain.TxTeller;
-import com.st1.itx.db.domain.TxTellerAuth;
 import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.TxInquiryService;
-import com.st1.itx.db.service.TxRecordService;
 import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.db.service.TxTranCodeService;
 
