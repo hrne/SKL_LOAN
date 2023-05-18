@@ -1,0 +1,125 @@
+CREATE OR REPLACE PROCEDURE "Usp_Cp_LoanBorTx_Ins"
+(
+"EmpNo" IN VARCHAR2
+)
+AS
+BEGIN
+  IF USER = 'ITXADMIN' THEN
+    RETURN;
+  END IF;
+
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE "LoanBorTx" DROP STORAGE';
+
+  INSERT INTO "LoanBorTx" (
+    "CustNo",
+    "FacmNo",
+    "BormNo",
+    "BorxNo",
+    "TitaCalDy",
+    "TitaCalTm",
+    "TitaKinBr",
+    "TitaTlrNo",
+    "TitaTxtNo",
+    "AcSeq",
+    "TitaTxCd",
+    "TitaCrDb",
+    "TitaHCode",
+    "TitaCurCd",
+    "TitaEmpNoS",
+    "RepayCode",
+    "TxDescCode",
+    "Desc",
+    "AcDate",
+    "CorrectSeq",
+    "Displayflag",
+    "EntryDate",
+    "DueDate",
+    "AcctCode",
+    "TxAmt",
+    "LoanBal",
+    "IntStartDate",
+    "IntEndDate",
+    "PaidTerms",
+    "Rate",
+    "Principal",
+    "Interest",
+    "DelayInt",
+    "BreachAmt",
+    "CloseBreachAmt",
+    "FeeAmt",
+    "TempAmt",
+    "ExtraRepay",
+    "UnpaidInterest",
+    "UnpaidPrincipal",
+    "UnpaidCloseBreach",
+    "Shortfall",
+    "Overflow",
+    "SlipSumNo",
+    "OtherFields",
+    "CreateDate",
+    "CreateEmpNo",
+    "LastUpdate",
+    "LastUpdateEmpNo"
+)
+  SELECT
+    "CustNo",
+    "FacmNo",
+    "BormNo",
+    "BorxNo",
+    "TitaCalDy",
+    "TitaCalTm",
+    "TitaKinBr",
+    "TitaTlrNo",
+    "TitaTxtNo",
+    "AcSeq",
+    "TitaTxCd",
+    "TitaCrDb",
+    "TitaHCode",
+    "TitaCurCd",
+    "TitaEmpNoS",
+    "RepayCode",
+    "TxDescCode",
+    "Desc",
+    "AcDate",
+    "CorrectSeq",
+    "Displayflag",
+    "EntryDate",
+    "DueDate",
+    "AcctCode",
+    "TxAmt",
+    "LoanBal",
+    "IntStartDate",
+    "IntEndDate",
+    "PaidTerms",
+    "Rate",
+    "Principal",
+    "Interest",
+    "DelayInt",
+    "BreachAmt",
+    "CloseBreachAmt",
+    "FeeAmt",
+    "TempAmt",
+    "ExtraRepay",
+    "UnpaidInterest",
+    "UnpaidPrincipal",
+    "UnpaidCloseBreach",
+    "Shortfall",
+    "Overflow",
+    "SlipSumNo",
+    "OtherFields",
+    "CreateDate",
+    "CreateEmpNo",
+    "LastUpdate",
+    "LastUpdateEmpNo"
+  FROM ITXADMIN."LoanBorTx";
+
+  Exception 
+  WHEN OTHERS THEN
+  "Usp_L9_UspErrorLog_Ins"(
+    'Usp_Cp_LoanBorTx_Ins',
+    SQLCODE,
+    SQLERRM,
+    dbms_utility.format_error_backtrace,
+    "EmpNo"
+  );
+END;

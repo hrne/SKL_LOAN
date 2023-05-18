@@ -1,0 +1,125 @@
+CREATE OR REPLACE PROCEDURE "Usp_Cp_Ias34Dp_Ins"
+(
+"EmpNo" IN VARCHAR2
+)
+AS
+BEGIN
+  IF USER = 'ITXADMIN' THEN
+    RETURN;
+  END IF;
+
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE "Ias34Dp" DROP STORAGE';
+
+  INSERT INTO "Ias34Dp" (
+    "DataYM",
+    "CustNo",
+    "CustId",
+    "FacmNo",
+    "BormNo",
+    "AcCode",
+    "Status",
+    "FirstDrawdownDate",
+    "DrawdownDate",
+    "MaturityDate",
+    "LineAmt",
+    "DrawdownAmt",
+    "LoanBal",
+    "IntAmt",
+    "Fee",
+    "OvduDays",
+    "OvduDate",
+    "BadDebtDate",
+    "BadDebtAmt",
+    "DerDate",
+    "DerRate",
+    "DerLoanBal",
+    "DerIntAmt",
+    "DerFee",
+    "DerY1Amt",
+    "DerY2Amt",
+    "DerY3Amt",
+    "DerY4Amt",
+    "DerY5Amt",
+    "DerY1Int",
+    "DerY2Int",
+    "DerY3Int",
+    "DerY4Int",
+    "DerY5Int",
+    "DerY1Fee",
+    "DerY2Fee",
+    "DerY3Fee",
+    "DerY4Fee",
+    "DerY5Fee",
+    "IndustryCode",
+    "ClTypeJCIC",
+    "Zip3",
+    "ProdCode",
+    "CustKind",
+    "Ifrs9ProdCode",
+    "CreateDate",
+    "CreateEmpNo",
+    "LastUpdate",
+    "LastUpdateEmpNo"
+)
+  SELECT
+    "DataYM",
+    "CustNo",
+    "CustId",
+    "FacmNo",
+    "BormNo",
+    "AcCode",
+    "Status",
+    "FirstDrawdownDate",
+    "DrawdownDate",
+    "MaturityDate",
+    "LineAmt",
+    "DrawdownAmt",
+    "LoanBal",
+    "IntAmt",
+    "Fee",
+    "OvduDays",
+    "OvduDate",
+    "BadDebtDate",
+    "BadDebtAmt",
+    "DerDate",
+    "DerRate",
+    "DerLoanBal",
+    "DerIntAmt",
+    "DerFee",
+    "DerY1Amt",
+    "DerY2Amt",
+    "DerY3Amt",
+    "DerY4Amt",
+    "DerY5Amt",
+    "DerY1Int",
+    "DerY2Int",
+    "DerY3Int",
+    "DerY4Int",
+    "DerY5Int",
+    "DerY1Fee",
+    "DerY2Fee",
+    "DerY3Fee",
+    "DerY4Fee",
+    "DerY5Fee",
+    "IndustryCode",
+    "ClTypeJCIC",
+    "Zip3",
+    "ProdCode",
+    "CustKind",
+    "Ifrs9ProdCode",
+    "CreateDate",
+    "CreateEmpNo",
+    "LastUpdate",
+    "LastUpdateEmpNo"
+  FROM ITXADMIN."Ias34Dp";
+
+  Exception 
+  WHEN OTHERS THEN
+  "Usp_L9_UspErrorLog_Ins"(
+    'Usp_Cp_Ias34Dp_Ins',
+    SQLCODE,
+    SQLERRM,
+    dbms_utility.format_error_backtrace,
+    "EmpNo"
+  );
+END;

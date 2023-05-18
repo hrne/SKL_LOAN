@@ -1,0 +1,75 @@
+CREATE OR REPLACE PROCEDURE "Usp_Cp_JcicB091_Ins"
+(
+"EmpNo" IN VARCHAR2
+)
+AS
+BEGIN
+  IF USER = 'ITXADMIN' THEN
+    RETURN;
+  END IF;
+
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE "JcicB091" DROP STORAGE';
+
+  INSERT INTO "JcicB091" (
+    "DataYM",
+    "DataType",
+    "BankItem",
+    "BranchItem",
+    "Filler4",
+    "ClActNo",
+    "ClTypeJCIC",
+    "OwnerId",
+    "EvaAmt",
+    "EvaDate",
+    "LoanLimitAmt",
+    "SettingDate",
+    "CompanyId",
+    "CompanyCountry",
+    "StockCode",
+    "Currency",
+    "PledgeEndYM",
+    "DispPrice",
+    "Filler19",
+    "JcicDataYM",
+    "CreateDate",
+    "CreateEmpNo",
+    "LastUpdate",
+    "LastUpdateEmpNo"
+)
+  SELECT
+    "DataYM",
+    "DataType",
+    "BankItem",
+    "BranchItem",
+    "Filler4",
+    "ClActNo",
+    "ClTypeJCIC",
+    "OwnerId",
+    "EvaAmt",
+    "EvaDate",
+    "LoanLimitAmt",
+    "SettingDate",
+    "CompanyId",
+    "CompanyCountry",
+    "StockCode",
+    "Currency",
+    "PledgeEndYM",
+    "DispPrice",
+    "Filler19",
+    "JcicDataYM",
+    "CreateDate",
+    "CreateEmpNo",
+    "LastUpdate",
+    "LastUpdateEmpNo"
+  FROM ITXADMIN."JcicB091";
+
+  Exception 
+  WHEN OTHERS THEN
+  "Usp_L9_UspErrorLog_Ins"(
+    'Usp_Cp_JcicB091_Ins',
+    SQLCODE,
+    SQLERRM,
+    dbms_utility.format_error_backtrace,
+    "EmpNo"
+  );
+END;
