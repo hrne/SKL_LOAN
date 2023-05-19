@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -782,13 +785,13 @@ em = null;
     this.info("findEndoInsuNoFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " prevInsuNo_2 : " +  prevInsuNo_2 + " endoInsuNo_3 : " +  endoInsuNo_3);
     Optional<InsuRenew> insuRenewT = null;
     if (dbName.equals(ContentName.onDay))
-      insuRenewT = insuRenewReposDay.findTopByCustNoIsAndFacmNoIsAndPrevInsuNoIsAndEndoInsuNoIsOrderByEndoInsuNoDesc(custNo_0, facmNo_1, prevInsuNo_2, endoInsuNo_3);
+      insuRenewT = insuRenewReposDay.findTopByCustNoIsAndFacmNoIsAndPrevInsuNoIsAndEndoInsuNoIsOrderByInsuYearMonthDesc(custNo_0, facmNo_1, prevInsuNo_2, endoInsuNo_3);
     else if (dbName.equals(ContentName.onMon))
-      insuRenewT = insuRenewReposMon.findTopByCustNoIsAndFacmNoIsAndPrevInsuNoIsAndEndoInsuNoIsOrderByEndoInsuNoDesc(custNo_0, facmNo_1, prevInsuNo_2, endoInsuNo_3);
+      insuRenewT = insuRenewReposMon.findTopByCustNoIsAndFacmNoIsAndPrevInsuNoIsAndEndoInsuNoIsOrderByInsuYearMonthDesc(custNo_0, facmNo_1, prevInsuNo_2, endoInsuNo_3);
     else if (dbName.equals(ContentName.onHist))
-      insuRenewT = insuRenewReposHist.findTopByCustNoIsAndFacmNoIsAndPrevInsuNoIsAndEndoInsuNoIsOrderByEndoInsuNoDesc(custNo_0, facmNo_1, prevInsuNo_2, endoInsuNo_3);
+      insuRenewT = insuRenewReposHist.findTopByCustNoIsAndFacmNoIsAndPrevInsuNoIsAndEndoInsuNoIsOrderByInsuYearMonthDesc(custNo_0, facmNo_1, prevInsuNo_2, endoInsuNo_3);
     else 
-      insuRenewT = insuRenewRepos.findTopByCustNoIsAndFacmNoIsAndPrevInsuNoIsAndEndoInsuNoIsOrderByEndoInsuNoDesc(custNo_0, facmNo_1, prevInsuNo_2, endoInsuNo_3);
+      insuRenewT = insuRenewRepos.findTopByCustNoIsAndFacmNoIsAndPrevInsuNoIsAndEndoInsuNoIsOrderByInsuYearMonthDesc(custNo_0, facmNo_1, prevInsuNo_2, endoInsuNo_3);
 
     return insuRenewT.isPresent() ? insuRenewT.get() : null;
   }

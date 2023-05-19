@@ -97,6 +97,12 @@
 			<artifactId>ftplet-api</artifactId>
 			<version>${Apache-FTP-Ver}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.mina</groupId>
+			<artifactId>mina-core</artifactId>
+			<version>${Apache-Mina-Ver}</version>
+		</dependency>
 
 		<!-- Mail -->
 		<dependency>

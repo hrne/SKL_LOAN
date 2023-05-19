@@ -138,6 +138,9 @@ T(3,L9711)
 
 #RimFlag=A,1,S
 
+#notPrintLetter=X,1,S
+#nLetter=X,1,S
+
 #L1R20Rim2=X,1,S
 C(3,#CustNo,0,S,$)
 RESET_RIM(#L1R20Rim2,L1R20)
@@ -145,9 +148,11 @@ E(0,@RimFlag,0)
 S(L1R20,01,#CustNo,#FacmNo,#FormNo,#RimFlag)
 R(1,L1R20)
 T(2,@Msg,#L1R20Msg)
+T(2,@nLetter,#notPrintLetter)
 
 #ShowMsg=A,1,S
 C(3,#CustNo,0,E(0,0),C(4,#Msg,E(0,0),E(0,1)))
+C(5,#nLetter,Y,K(NOBUTTON,CLOSEY),K(NOBUTTON,SHOWY))
 INVOKEJS(SHOW,p1,3,3,#ShowMsg)
 
 </sub>

@@ -89,13 +89,13 @@ public class L5R37 extends TradeBuffer {
 		// 工作季(西曆)
 		int workSeason = 0;
 		if (iWorkMonth % 100 <= 3)
-			workSeason = (iWorkMonth / 100) + 1;
+			workSeason = (iWorkMonth / 100)*10 + 1;
 		else if (iWorkMonth % 100 <= 6)
-			workSeason = (iWorkMonth / 100) + 2;
+			workSeason = (iWorkMonth / 100)*10 + 2;
 		else if (iWorkMonth % 100 <= 9)
-			workSeason = (iWorkMonth / 100) + 3;
+			workSeason = (iWorkMonth / 100)*10 + 3;
 		else
-			workSeason = (iWorkMonth / 100) + 4;
+			workSeason = (iWorkMonth / 100)*10 + 4;
 		// int iBonusDate = Integer.valueOf(titaVo.get("BonusDate").trim());
 
 //		PfRewardMediaId pfRewardMediaId = new PfRewardMediaId();
@@ -206,7 +206,6 @@ public class L5R37 extends TradeBuffer {
 			this.totaVo.putParam("LastEmpName", "");
 		} else {
 			long iBonusNo = Long.valueOf(titaVo.get("BonusNo").trim());
-			this.info("***iBonusNo=" + iBonusNo);
 			PfRewardMedia pfRewardMedia = pfRewardMediaService.findById(iBonusNo, titaVo);
 
 			if (pfRewardMedia == null) {
