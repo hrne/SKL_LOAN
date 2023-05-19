@@ -54,6 +54,22 @@ public class L2917ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> findAll(int index, int limit, TitaVo titaVo) throws Exception {
 
 		int iCustNo = this.parse.stringToInteger(titaVo.getParam("CustNo"));
+		int iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
+		int iClCode1 = this.parse.stringToInteger(titaVo.getParam("ClCode1"));
+		int iClCode2 = this.parse.stringToInteger(titaVo.getParam("ClCode2"));
+		int iClNo = this.parse.stringToInteger(titaVo.getParam("ClNo"));
+		int facmNoS = 0;
+		int facmNoE = 999;
+		if (iFacmNo > 0) {
+			facmNoS = iFacmNo;
+			facmNoE = iFacmNo;
+		}
+		int clNoS = 0;
+		int clNoE = 9999999;
+		if (iClNo > 0) {
+			clNoS = iClNo;
+			clNoE = iClNo;
+		}
 
 		String sql = " ";
 		sql += " select ";
@@ -79,7 +95,16 @@ public class L2917ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                         AND clb.\"ClCode2\" = cf.\"ClCode2\" ";
 		sql += "                          AND clb.\"ClNo\" = cf.\"ClNo\" ";
 		sql += " where ";
-		sql += " cf.\"CustNo\" = :custNo ";
+		if (iCustNo > 0) {
+			sql += " cf.\"CustNo\" = :custNo ";
+			sql += " cf.\"FacmNo\" >= :facmNoS ";
+			sql += " AND  cf.\"FacmNo\" <= :facmNoE ";
+		} else {
+			sql += " cf.\"ClCode1\" = :clCode1 ";
+			sql += " AND cf.\"ClCode2\" = :clCode2 ";
+			sql += " AND cf.\"ClNo\" >= :clNoS ";
+			sql += " AND  cf.\"ClNo\" <= :clNoE ";
+		}
 		sql += "             AND cll.\"ClCode1\" is not null ";
 		sql += "             AND clb.\"ClCode1\" is not null ";
 		sql += " GROUP BY cll.\"ClCode1\",cll.\"ClCode2\",cll.\"ClNo\",cll.\"LandSeq\" ";
@@ -97,7 +122,16 @@ public class L2917ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("custNo", iCustNo);
+		if (iCustNo > 0) {
+			query.setParameter("custNo", iCustNo);
+			query.setParameter("facmNoS", facmNoS);
+			query.setParameter("facmNoE", facmNoE);
+		} else {
+			query.setParameter("clCode1", iClCode1);
+			query.setParameter("clCode2", iClCode2);
+			query.setParameter("clNoS", clNoS);
+			query.setParameter("clNoE", clNoE);
+		}
 		this.info("iCustNo = " + iCustNo);
 
 		query.setParameter("ThisIndex", index);

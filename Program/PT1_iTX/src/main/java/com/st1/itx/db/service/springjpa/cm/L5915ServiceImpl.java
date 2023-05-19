@@ -119,6 +119,7 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " SELECT 5                       AS \"RewardType\" "; // 獎金類別
 		sql += "      , PR.\"PieceCode\"        AS \"PieceCode\" "; // 計件代碼
 		sql += "      , 0                       AS \"DrawdownAmt\" "; // 撥款金額
+		sql += "      , PR.\"BonusDate\"        AS \"BonusDate\" "; // 車馬費發放日期
 		sql += "      , PR.\"CustNo\"           AS \"CustNo\" "; // 戶號
 		sql += "      , CM.\"CustName\"         AS \"CustName\" "; // 戶名
 		sql += "      , PR.\"FacmNo\"           AS \"FacmNo\" "; // 額度號碼
@@ -145,6 +146,7 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " SELECT 1                       AS \"RewardType\" "; // 獎金類別
 		sql += "      , PR.\"PieceCode\"        AS \"PieceCode\" "; // 計件代碼
 		sql += "      , PI.\"DrawdownAmt\"      AS \"DrawdownAmt\" "; // 撥款金額
+		sql += "      , PR.\"BonusDate\"        AS \"BonusDate\" "; // 車馬費發放日期
 		sql += "      , PR.\"CustNo\"           AS \"CustNo\" "; // 戶號
 		sql += "      , CM.\"CustName\"         AS \"CustName\" "; // 戶名
 		sql += "      , PR.\"FacmNo\"           AS \"FacmNo\" "; // 額度號碼

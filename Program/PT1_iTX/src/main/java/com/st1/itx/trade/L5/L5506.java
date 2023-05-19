@@ -3,6 +3,8 @@ package com.st1.itx.trade.L5;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -80,7 +82,7 @@ public class L5506 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0003", "");
 			} else {
 				PfIntranetAdjust pfIntranetAdjust2 = (PfIntranetAdjust) dataLog.clone(pfIntranetAdjust);
-
+				
 				pfIntranetAdjust.setSumAmt(BigDecimal.ZERO);
 				pfIntranetAdjust.setSumCnt(BigDecimal.ZERO);
 
@@ -108,10 +110,11 @@ public class L5506 extends TradeBuffer {
 		int iBormNo = Integer.valueOf(titaVo.getParam("BormNo").trim());
 
 		int iPerfDate = Integer.valueOf(titaVo.getParam("PerfDate").trim());
-		int iWorkMonth = Integer.valueOf(titaVo.getParam("WorkMonth").trim());
-		int iWorkSeason = Integer.valueOf(titaVo.getParam("WorkSeason").trim());
+		int iWorkMonth = Integer.valueOf(titaVo.getParam("WorkMonth").trim()) + 191100;
+		int iWorkSeason = Integer.valueOf(titaVo.getParam("WorkSeason").trim()) + 1911;
 		BigDecimal iPerfCnt = new BigDecimal(titaVo.getParam("PerfCnt").trim());
 		BigDecimal iPerfAmt = new BigDecimal(titaVo.getParam("PerfAmt").trim());
+
 
 		pfIntranetAdjust.setCustNo(iCustNo);
 		pfIntranetAdjust.setFacmNo(iFacmNo);
@@ -134,12 +137,12 @@ public class L5506 extends TradeBuffer {
 
 		if ("-".equals(titaVo.getParam("SumAmtSign").trim())) {
 			iSumAmt = iSumAmt.multiply(bigNeg);
-		}
-
+		} 
+		
 		if ("-".equals(titaVo.getParam("SumCntSign").trim())) {
 			iSumCnt = iSumCnt.multiply(bigNeg);
-		}
-
+		} 
+		
 		pfIntranetAdjust.setSumAmt(iSumAmt);
 		pfIntranetAdjust.setSumCnt(iSumCnt);
 

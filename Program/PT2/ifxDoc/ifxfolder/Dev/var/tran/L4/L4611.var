@@ -210,7 +210,9 @@ HIDE(#NewFacmNo)
 #RimClNo=A,7,S
 #RimPrevInsuNo=x,16,S
 #RimEndoInsuNo=x,16,S
+#RimInsuReceiptDate=D,7,S
 #RimInsuYearMonth=A,5,S
+
 
 ! 塞值調rim，無值提error
 #RimL4r18=X,1,S
@@ -220,6 +222,7 @@ T(1,@RimClCode2,#NTXBUF,3,2)
 T(1,@RimClNo,#NTXBUF,5,7)
 T(1,@RimPrevInsuNo,#NTXBUF,12,16)
 T(1,@RimEndoInsuNo,#NTXBUF,28,16)
+T(1,@RimInsuYearMonth,#NTXBUF,45,5)
 RESET_RIM(#RimL4r18,L4R18)
 S(L4R18,1,#RimClCode1,#RimClCode2,#RimClNo,#RimPrevInsuNo,#RimEndoInsuNo,#RimInsuYearMonth)
 R(1,L4R18)
@@ -431,7 +434,7 @@ E(0,@RimClCode2,#ClCode2)
 E(0,@RimClNo,#ClNo)
 T(2,@RimPrevInsuNo,#PrevInsuNo)
 T(2,@RimEndoInsuNo,#EndoInsuNo)
-T(2,@RimInsuReceiptDate,#InsuReceiptDate)
+E(0,@RimInsuReceiptDate,#InsuReceiptDate)
 
 RESET_RIM(#RimL4r26,L4R26)
 S(L4R26,1,#RimClCode1,#RimClCode2,#RimClNo,#RimPrevInsuNo,#RimEndoInsuNo,#RimInsuReceiptDate)
@@ -618,8 +621,7 @@ T(H,#CommericalFlag,#CommericalFlagHelp)
 
 !原本保件單日
 #InsuReceiptDate=D,7,L
-C(3,#FunctionCode,1,I,s)
-@V(7)
+
 
 !修改後保件單日
 !#InsuReceiptDateX=X,16,I
@@ -633,7 +635,7 @@ A(DATE,0,#InsuReceiptDateX)
 !C(3,#FunctionCode,4,O,$)
 !C(3,#FunctionCode,5,O,$)
 !C(2,#FunctionCode,$,$,$,$,s,s)
-!!C(3,#RenewCode,1,C(4,#InsuReceiptDate,T(2,#VIEW_SYSDATE),T(2,#InsuReceiptDate)),s,S)
+!C(3,#RenewCode,1,C(4,#InsuReceiptDate,T(2,#VIEW_SYSDATE),T(2,#InsuReceiptDate)),s,S)
 
 #Remark=X,50,I
 C(2,#FunctionCode,s,$,$,s,s,s)

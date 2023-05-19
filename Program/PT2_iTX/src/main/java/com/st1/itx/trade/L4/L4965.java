@@ -68,7 +68,7 @@ public class L4965 extends TradeBuffer {
 //		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 //		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = 100;  // 266*100 = 26600
+		this.limit = 100; // 266*100 = 26600
 
 		List<String[]> dataL4965 = l4965ServiceImpl.findData(this.index, this.limit, titaVo);
 
@@ -111,11 +111,12 @@ public class L4965 extends TradeBuffer {
 			String OrigInsuNo = data[7];
 			String EndoInsuNo = data[8];
 			String PrevInsuNo = "";
-			int insuYearMonth =  parse.stringToInteger(data[18]);
+			int insuYearMonth = parse.stringToInteger(data[18]);
 			if (data[16] != null) {
 				PrevInsuNo = data[16];
 				occursList.putParam("OOPrevInsuNo", data[16]);
 			}
+			occursList.putParam("OOInsuYearMonth", insuYearMonth > 0 ? insuYearMonth - 191100 : 0);
 
 			// 新保
 			InsuOrignal tInsuOrignal = new InsuOrignal();

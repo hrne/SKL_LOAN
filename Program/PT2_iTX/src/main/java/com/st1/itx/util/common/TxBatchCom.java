@@ -55,6 +55,7 @@ import com.st1.itx.db.service.NegMainService;
 import com.st1.itx.db.service.TxErrCodeService;
 import com.st1.itx.db.service.TxRecordService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -439,6 +440,33 @@ public class TxBatchCom extends TradeBuffer {
 			this.procStsCode = "3"; // 3.檢核錯誤
 		}
 
+		// --------------- 執行 AML 交易檢核(匯款轉帳及支票兌現) ------------------
+		// 檢核狀態 0.非可疑名單/已完成名單確認 1.需審查/確認 2.為凍結名單/未確定名單
+		// 如為 1,2，需再讀取AmlLog檔的最新確認狀態
+		// 匯款轉帳： 1.借款人 2.交易人
+		// 支票兌現： 1.借款人 2.發票人
+		if ("0".equals(this.procStsCode)) {
+			if (tDetail.getRepayCode() == 1 || tDetail.getRepayCode() == 4) {
+				if ("1".equals(this.tTempVo.getParam("AmlRsp1")) || "1".equals(this.tTempVo.getParam("AmlRsp2"))
+						|| "2".equals(this.tTempVo.getParam("AmlRsp1")) || "2".equals(this.tTempVo.getParam("AmlRsp2"))) {
+					txAmlCom.setTxBuffer(this.getTxBuffer());
+					this.tTempVo = txAmlCom.batxCheck(this.tTempVo, tDetail, titaVo);
+					if ("2".equals(this.tTempVo.getParam("AmlRsp1")) || "2".equals(this.tTempVo.getParam("AmlRsp2"))) {
+						this.checkMsg += " AML姓名檢核：為凍結名單/未確定名單 ";
+						this.amlRsp = 2;
+					} else if ("1".equals(this.tTempVo.getParam("AmlRsp1")) || "1".equals(this.tTempVo.getParam("AmlRsp2"))) {
+						this.checkMsg += " AML姓名檢核：需審查/確認 ";
+						this.amlRsp = 1;
+					}
+				}
+			}
+		}
+		// ------------- 設定 AML 檢核結果 ----------------------
+		// AML 檢核 0-正常 1-錯誤
+		if (this.amlRsp > 0) {
+			this.procStsCode = "3"; // 3.檢核錯誤
+		}
+
 		// ---- 執行債一般債權匯入款A7 債權撥付檔檢核 ------------------
 		// 如有MATCH到一般債權撥付檔,則顯示一般債權客戶戶號,若沒有,則顯示[不符一般債權撥付檔]
 		if ("A7".equals(tDetail.getReconCode())) {
@@ -474,28 +502,6 @@ public class TxBatchCom extends TradeBuffer {
 			if (tNegMain != null && "N".equals(tNegMain.getIsMainFin())) {
 				this.checkMsg += loanCom.getCdCodeX("CaseKindCode", tNegMain.getCaseKindCode(), titaVo) + "案件";
 				this.procStsCode = "2"; // 2.人工處理
-			}
-		}
-
-		// --------------- 執行 AML 交易檢核(匯款轉帳及支票兌現) ------------------
-		// 檢核狀態 0.非可疑名單/已完成名單確認 1.需審查/確認 2.為凍結名單/未確定名單
-		// 如為 1,2，需再讀取AmlLog檔的最新確認狀態
-		// 匯款轉帳： 1.借款人 2.交易人
-		// 支票兌現： 1.借款人 2.發票人
-		if ("0".equals(this.procStsCode)) {
-			if (tDetail.getRepayCode() == 1 || tDetail.getRepayCode() == 4) {
-				if ("1".equals(this.tTempVo.get("AmlRsp1")) || "1".equals(this.tTempVo.get("AmlRsp2"))
-						|| "2".equals(this.tTempVo.get("AmlRsp1")) || "2".equals(this.tTempVo.get("AmlRsp2"))) {
-					txAmlCom.setTxBuffer(this.getTxBuffer());
-					this.tTempVo = txAmlCom.batxCheck(this.tTempVo, tDetail, titaVo);
-					if ("2".equals(this.tTempVo.get("AmlRsp1")) || "2".equals(this.tTempVo.get("AmlRsp2"))) {
-						this.checkMsg += " AML姓名檢核：為凍結名單/未確定名單 ";
-						this.amlRsp = 2;
-					} else if ("1".equals(this.tTempVo.get("AmlRsp1")) || "1".equals(this.tTempVo.get("AmlRsp2"))) {
-						this.checkMsg += " AML姓名檢核：需審查/確認 ";
-						this.amlRsp = 1;
-					}
-				}
 			}
 		}
 		this.info("TxBatchCom txCheck " + this.procStsCode + "," + this.repayType);
@@ -548,12 +554,6 @@ public class TxBatchCom extends TradeBuffer {
 			if ("0".equals(this.procStsCode)) {
 				settingprocStsCode(tDetail, titaVo);
 			}
-		}
-
-		// ------------- 設定 AML 檢核結果 ----------------------
-		// AML 檢核 0-正常 1-錯誤
-		if (this.amlRsp > 0) {
-			this.procStsCode = "3"; // 3.檢核錯誤
 		}
 
 
@@ -902,9 +902,9 @@ public class TxBatchCom extends TradeBuffer {
 
 //      09 其他  同戶合併 轉暫收        
 //      AmlRsp1 0.非可疑名單/已完成名單確認 1.需審查/確認 2.為凍結名單/未確定名單	
-		if ("2".equals(this.tTempVo.get("AmlRsp1")) || "2".equals(this.tTempVo.get("AmlRsp2")))
+		if ("2".equals(this.tTempVo.getParam("AmlRsp1")) || "2".equals(this.tTempVo.getParam("AmlRsp2")))
 			iReasonCode = 10;
-		else if ("1".equals(this.tTempVo.get("AmlRsp1")) || "1".equals(this.tTempVo.get("AmlRsp2")))
+		else if ("1".equals(this.tTempVo.getParam("AmlRsp1")) || "1".equals(this.tTempVo.getParam("AmlRsp2")))
 			throw new LogicException(l3210TitaVo, "E0022", ""); // E0022 該筆資料需進行AML審查/確認
 		else if (tBatxDetail.getRepayCode() == 4)
 			iReasonCode = 8;

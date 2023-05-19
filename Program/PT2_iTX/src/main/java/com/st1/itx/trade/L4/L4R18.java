@@ -44,7 +44,6 @@ public class L4R18 extends TradeBuffer {
 		String iPrevInsuNo = titaVo.getParam("RimPrevInsuNo");
 		String iEndoInsuNo = titaVo.getParam("RimEndoInsuNo");
 		int iInsuYearMonth = parse.stringToInteger(titaVo.getParam("RimInsuYearMonth"));
-		
 
 		if ("".equals(iEndoInsuNo)) {
 			iEndoInsuNo = " ";
@@ -64,7 +63,7 @@ public class L4R18 extends TradeBuffer {
 		tInsuRenewId.setClNo(iClNo);
 		tInsuRenewId.setPrevInsuNo(iPrevInsuNo);
 		tInsuRenewId.setEndoInsuNo(iEndoInsuNo);
-		tInsuRenewId.setInsuYearMonth(iInsuYearMonth);
+		tInsuRenewId.setInsuYearMonth(iInsuYearMonth + 191100);
 
 		tInsuRenew = insuRenewService.findById(tInsuRenewId, titaVo);
 
@@ -99,8 +98,8 @@ public class L4R18 extends TradeBuffer {
 			this.totaVo.putParam("L4r18InsuTypeCode", tInsuRenew.getInsuTypeCode());
 			this.totaVo.putParam("L4r18CommericalFlag", tInsuRenew.getCommericalFlag());
 			this.totaVo.putParam("L4r18Remark", tInsuRenew.getRemark());
-			String iInsuReceiptDate = parse.IntegerToString(tInsuRenew.getInsuReceiptDate(),7);
-			if(("0000000").equals(iInsuReceiptDate)) {
+			String iInsuReceiptDate = parse.IntegerToString(tInsuRenew.getInsuReceiptDate(), 7);
+			if (("0000000").equals(iInsuReceiptDate)) {
 				iInsuReceiptDate = " ";
 			}
 			this.totaVo.putParam("L4r18InsuReceiptDate", iInsuReceiptDate);
@@ -131,7 +130,7 @@ public class L4R18 extends TradeBuffer {
 			this.totaVo.putParam("L4r18CommericalFlag", "");
 			this.totaVo.putParam("L4r18Remark", "");
 			this.totaVo.putParam("L4r18InsuReceiptDate", "");
-			this.totaVo.putParam("L4r18InsuReceiptDateX","");
+			this.totaVo.putParam("L4r18InsuReceiptDateX", "");
 		}
 
 		this.addList(this.totaVo);

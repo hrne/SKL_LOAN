@@ -17,7 +17,6 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.TxToDoDetail;
-import com.st1.itx.db.service.BatxRateChangeService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.springjpa.cm.L4721ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -51,8 +50,6 @@ public class L4721Batch extends TradeBuffer {
 	@Autowired
 	private CustNoticeCom custNoticeCom;
 
-	@Autowired
-	private BatxRateChangeService batxRateChangeService;
 
 	@Autowired
 	private CustMainService custMainService;
@@ -329,7 +326,7 @@ public class L4721Batch extends TradeBuffer {
 
 		CustMain tCustMain = new CustMain();
 		tCustMain = custMainService.custNoFirst(parse.stringToInteger(tmpCustFacm.get("CustNo")),
-				parse.stringToInteger(tmpCustFacm.get("FacmNo")), titaVo);
+				parse.stringToInteger(tmpCustFacm.get("CustNo")), titaVo);
 
 		String dataLines = "<" + noticeEmail + ">";
 

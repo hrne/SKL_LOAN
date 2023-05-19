@@ -167,7 +167,8 @@ R(1,L2R47)
 #MRKEY=_,_,S
 C(4,#CustId,C(3,#CustNo,0,S,T(2,#CustNo)),T(2,#L2R47CustNo)) 
 
-
+#date=D,7,S
+E(0,#SYSDATE)
 ! 系統參數-查詢
 #RPTFG=A,1,S
 E(0,0)
@@ -260,14 +261,14 @@ T(3,自保)
 ! 1:on 0:off
 #OOBtnFlag=A,1,S
 
-#OOBUFB_M=x,50,S
-T(2,2+#OOClCode1+#OOClCode2+#OOClNo+#OOPrevInsuNo+#OOEndoInsuNo+#OOSelfInsuCode)
-#OOBUFA_2=x,50,S
-T(2,6+#OOClCode1+#OOClCode2+#OOClNo+#OOPrevInsuNo+#OOEndoInsuNo+#OOSelfInsuCode)
-#OOBUFA_1=x,50,S
-T(2,1+#OOClCode1+#OOClCode2+#OOClNo+#OOPrevInsuNo+#OOEndoInsuNo+#OOSelfInsuCode)
-#OOBUFA_renew=x,50,S
-T(2,6+#OOClCode1+#OOClCode2+#OOClNo+#OOPrevInsuNo+#OOEndoInsuNo+#OOSelfInsuCode)
+#OOBUFB_M=x,55,S
+T(2,2+#OOClCode1+#OOClCode2+#OOClNo+#OOPrevInsuNo+#OOEndoInsuNo+#OOSelfInsuCode+#OOInsuYearMonth)
+#OOBUFA_2=x,55,S
+T(2,6+#OOClCode1+#OOClCode2+#OOClNo+#OOPrevInsuNo+#OOEndoInsuNo+#OOSelfInsuCode+#OOInsuYearMonth)
+#OOBUFA_1=x,55,S
+T(2,1+#OOClCode1+#OOClCode2+#OOClNo+#OOPrevInsuNo+#OOEndoInsuNo+#OOSelfInsuCode+#OOInsuYearMonth)
+#OOBUFA_renew=x,55,S
+T(2,6+#OOClCode1+#OOClCode2+#OOClNo+#OOPrevInsuNo+#OOEndoInsuNo+#OOSelfInsuCode+#OOInsuYearMonth)
 
 ! [維護]
 #OOBTNB=A,2,O
@@ -275,11 +276,12 @@ C(3,#OOSelfInsuCode,0,BIND(grid,cancel),
 BIND(grid,{ cmd=CHAIN; ntxcd=L4611; ntxbuf=#OOBUFB_M}))
 
 #OOBTNA=A,2,O
+IF(#OOInsuEndDate<#date,BIND(grid,cancel),$)
+IF(#OOInsuEndDate<#date,s,$)
 C(3,#OOBtnFlag,1,$,BIND(grid,cancel))
 C(3,#OOBtnFlag,1,$,s)
 C(4,#OOEndoInsuNo,$,BIND(grid,cancel))
 C(4,#OOEndoInsuNo,$,s)
-
 SWITCH(#OOSelfInsuCode,
 1,
 BIND(grid,cancel),

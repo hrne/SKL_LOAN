@@ -87,13 +87,11 @@ T(1,#DATE,2,7)
 #sAdjDate=D,7,I
 T(2,#DT)
 @V(7)A(4,0,#sAdjDate)
-IF(#sAdjDate > #DT,V(P,不可大於會計日),$)
 
 #eAdjDate=D,7,I
 T(2,#DT)
 @V(7)A(4,0,#eAdjDate)
-IF(#eAdjDate > #DT,V(P,不可大於會計日),$)
-IF(#eAdjDate < #sAdjDate,V(P,不可小於會計起日),$)
+IF(#eAdjDate < #sAdjDate,V(P,不可小於利率調整起日),$)
 
 #TxKind=A,1,I
 HELP(#BaseRateHelp)

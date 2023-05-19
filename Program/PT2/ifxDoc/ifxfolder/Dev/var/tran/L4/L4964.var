@@ -1,0 +1,485 @@
+﻿\----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L4964)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,189)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+#BTNADDBUF=X,50,S
+T(2,1+0+00+0000000+                +                +0+      )
+
+
+#BtnAddA=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L4611; ntxbuf=#BTNADDBUF; ntxbuf5=type})
+ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,新增續保)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L4964" layout="cols=1;screen.width=[150,1080];printer.width=[20,20];">
+[
+["[L4964]                                 擔保品保險單資料查詢"],
+["#FdClCode1+擔保品代號１",#ClCode1,#ClCode1X],
+["#FdClCode2+擔保品代號２",#ClCode2,#ClCode2X],
+["#FdClNo+擔保品號碼",#ClNo],
+["#FdState+期間",#State,#StateX],
+]
+
+#FdClCode1=X,2,L
+T(3,*)
+#FdClCode2=X,2,L
+T(3,*)
+#FdClNo=X,2,L
+T(3,*)
+#FdState=X,2,L
+T(3,*)
+
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+#BUF1=X,42,S
+!---------- AP TEXT AREA Variables ----------
+
+!Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+![代號2]
+#CDDEF01=x,26,S
+T(3,CdCode.ClCode21)
+
+#ClCode21Help=x,1024,S
+
+![代號2]
+#CDDEF02=x,26,S
+T(3,CdCode.ClCode22)
+
+#ClCode22Help=x,1024,S
+
+![保險公司]
+#CDDEF03=x,26,S
+T(3,CdCode.InsuCompany)
+
+#InsuCompanyHelp=x,1024,S
+
+![保險類別]
+#CDDEF04=x,26,S
+T(3,CdCode.InsuTypeCode)
+
+#InsuTypeCodeHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@ClCode21Help,#HelpDesc1)
+T(2,@ClCode22Help,#HelpDesc2)
+T(2,@InsuCompanyHelp,#HelpDesc3)
+T(2,@InsuTypeCodeHelp,#HelpDesc4)
+
+#SelfInsuCodeHelp=x,30,S
+T(3,0:自保;1:自保;2:自保)
+#SelfInsuCodeHelp2=x,30,S
+T(3,0:新保;1:自保;2:續保)
+
+#ClCode1Help=x,1024,S
+T(3,1:房地;2:土地)
+
+#StateHelp=x,1024,S
+T(3,0:近三個月;9:全部)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#NTXBUF=X,20,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@ClCode1,#NTXBUF,1,1)
+T(1,@ClCode2,#NTXBUF,2,2)
+T(1,@ClNo,#NTXBUF,4,7)
+T(1,@CustNo,#NTXBUF,11,7)
+T(1,@FacmNo,#NTXBUF,18,3)
+E(0,@State,9)
+
+
+!擔保品代號１
+#ClCode1=A,1,I
+C(3,#CHAIN,0,$,s)
+C(2,#ClCode1,E(0,1),)
+HELP(#ClCode1Help)
+@C(2,#ClCode1,E(0,1),)
+V(H,#ClCode1Help)
+!HELP(1:房地;2:土地)
+!@C(2,#ClCode1,E(0,1),)
+!V(1,1,2)
+
+#ClCode1X=X,18,L
+T(3,)T(H,#ClCode1,#ClCode1Help)
+!SWITCH(#ClCode1,
+!        1,T(3,房地),
+!        2,T(3,土地),)
+
+
+!擔保品代號２  
+#ClCode2Help=x,1024,S
+IF (#ClCode1==1,T(2,#ClCode21Help),T(2,#ClCode22Help))
+
+#ClCode2=A,2,I
+C(3,#CHAIN,0,$,s)     
+HELP(#ClCode2Help)
+@V(H,#ClCode2Help)
+!IF (#ClCode1==1,HELP(01: 房地-住宅;02: 房地-辦公;03: 房地-商場;04: 房地-廠房;
+!     05: 房地-停車位;99: 房地-其他,cols:3),
+!IF (#ClCode1==2,HELP(01: 土地-住宅區;02: 土地-商業區;03: 土地-工業區;09: 土地-其他分區;
+!     10: 土地-甲種建地;11: 土地-乙種建地;12: 土地-丙種建地;13: 土地-丁種建地;
+!     19: 土地-其他用地,cols:3),))
+!@IF (#ClCode1==1,V(1,01,02,03,04,05,99),
+! IF (#ClCode1==2,V(1,01,02,03,09,10,11,12,13,19),))
+
+#ClCode2X=X,20,L   
+T(3,)T(H,#ClCode2,#ClCode2Help)
+!IF (#ClCode1==1,SWITCH(#ClCode2,
+!        01,T(3,房地-住宅),
+!        02,T(3,房地-辦公),
+!        03,T(3,房地-商場),
+!        04,T(3,房地-廠房),
+!        05,T(3,房地-停車位),
+!        99,T(3,房地-其他),),
+!IF (#ClCode1==2,SWITCH(#ClCode2,
+!        01,T(3,土地-住宅區),
+!        02,T(3,土地-商業區),
+!        03,T(3,土地-工業區),
+!        09,T(3,土地-其他分區),
+!        10,T(3,土地-甲種建地),
+!        11,T(3,土地-乙種建地),
+!        12,T(3,土地-丙種建地),
+!        13,T(3,土地-丁種建地),
+!        19,T(3,土地-其他用地),),))
+
+
+!擔保品號碼
+#ClNo=A,7,I
+C(3,#CHAIN,0,$,s)
+@V(2,0)
+
+
+! 戶號
+#CustNo=A,7,S
+
+! 額度
+#FacmNo=A,3,S
+
+#State=A,1,I
+C(3,#CHAIN,1,s,$)
+HELP(#StateHelp)
+@
+V(H,#StateHelp)
+
+#StateX=X,15,L
+T(H,#State,#StateHelp)
+
+#RPTFG=A,1,S
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L4964 ----------
+<sub type="FORM" name="L4964">
+#SCRTIL=_,_,S
+T(3,[L4964] 不動產保險單資料)
+
+
+
+! #BUF1=X,20,S
+! T(2,#ClCode1+#ClCode2+#ClNo)
+
+! #buttonA=x,100,S
+! T(2,{ cmd=CHAIN; ntxcd=4610; ntxbuf=#BUF1})ASGN(BTN_NEW1$)
+! K(MODIFYBUTTON,1,新保單)
+
+!新保單 4610
+
+
+
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+#OOSelfInsuCode=A,1,L
+!原保險單號碼
+#OOPrevInsuNo=x,16,L
+!批單號碼
+#OOEndoInsuNo=x,16,L
+!建物門牌 ClBuilding.BdLocation
+#OOBdLocation=X,60,L
+!保險單號碼
+#OONowInsuNo=X,16,L
+!保險公司
+#OOInsuCompany=A,2,L
+#OOInsuCompanyX=X,20,L
+T(3,)T(H,#OOInsuCompany,#InsuCompanyHelp)
+!T(A,#OOInsuCompany,L2DEF,ISUCOMPANYDEF,ISUCOM,ISUCOMX)
+!保險起日
+#OOInsuStartDate=D,7,L
+!保險迄日
+#OOInsuEndDate=D,7,L
+!保險類別
+#OOInsuTypeCode=A,2,L
+#OOInsuTypeCodeX=X,20,L
+T(3,)T(H,#OOInsuTypeCode,#InsuTypeCodeHelp)
+!T(A,#OOInsuTypeCode,L2DEF,ISUTYPEDEF,ISUTYPE,ISUTYPEX)
+!火災險保險金額
+#OOFireInsuCovrg=m,14,L
+!地震險保險金額
+#OOEthqInsuCovrg=m,14,L
+!火災險保費
+#OOFireInsuPrem=m,14,L
+!地震險保費
+#OOEthqInsuPrem=m,14,L
+
+#OOInsuYearMonth=A,5,S
+
+! 1:on 0:off
+#OOBtnFlag=A,1,S
+
+
+! 按鈕傳值不會補零，需先轉型態
+#OOFireInsuCovrgX=X,18,L
+X(#OOFireInsuCovrg)
+#OOEthqInsuCovrgX=X,18,L
+X(#OOEthqInsuCovrg)
+#OOFireInsuPremX=X,18,L
+X(#OOFireInsuPrem)
+#OOEthqInsuPremX=X,18,L
+X(#OOEthqInsuPrem)
+
+! InsuRenew.RenewCode 判斷自保/續保
+! InsuRenew.PrevInsuNo 空白則為新保
+#OOSelfInsuCodeX=X,4,L
+T(3,)T(H,#OOSelfInsuCode,#SelfInsuCodeHelp)
+!SWITCH(#OOSelfInsuCode,
+!1,T(2,自保),
+!2,T(2,續保),
+!0,T(2,新保),
+!T(2,))
+#OOSelfInsuCodeX2=X,4,L
+T(3,)T(H,#OOSelfInsuCode,#SelfInsuCodeHelp2)
+
+! 7 3 1 2 7 2 14 14
+! 新保:1 、 自保:2 、 維護:3 
+#OOBUFA_2=x,50,S
+T(2,6+#ClCode1+#ClCode2+#ClNo+#OOPrevInsuNo+#OOEndoInsuNo+#OOSelfInsuCode)
+#OOBUFA_1=x,50,S
+T(2,1+#ClCode1+#ClCode2+#ClNo+#OOPrevInsuNo+#OOEndoInsuNo+#OOSelfInsuCode)
+#OOBUFA_renew=x,50,S
+T(2,6+#ClCode1+#ClCode2+#ClNo+#OOPrevInsuNo+#OOEndoInsuNo+#OOSelfInsuCode)
+ 
+#OOBUFB_C=x,200,S
+T(2,2+#ClCode1+#ClCode2+#ClNo+#OOPrevInsuNo+#OOEndoInsuNo)
+
+#OOBUFB_M=x,50,S
+T(2,2+#ClCode1+#ClCode2+#ClNo+#OOPrevInsuNo+#OOEndoInsuNo+#OOSelfInsuCode+#OOInsuYearMonth)
+ 
+! 210303 修改為全都為自保，若狀態為自保僅能維護
+! 維護能修改狀態
+#OOBtnAText=X,4,L
+T(3,)T(H,#OOSelfInsuCode,#SelfInsuCodeHelp)
+!SWITCH(#OOSelfInsuCode,
+!1,T(2,續保),
+!2,T(2,自保),
+!0,T(2,續保),
+!T(2,))
+
+! BIND(grid,cancel),
+! 1,
+! BIND(grid,{ cmd=CHAIN; ntxcd=L4610; text=#OOSelfInsuCodeX; ntxbuf=#OOBUFA_2}),
+! 2,
+! BIND(grid,{ cmd=CHAIN; ntxcd=L4611; text=#OOSelfInsuCodeX; ntxbuf=#OOBUFA_renew}),
+! 0,
+! BIND(grid,{ cmd=CHAIN; ntxcd=L4610; text=#OOSelfInsuCodeX; ntxbuf=#OOBUFA_1}),
+! 批單號碼有時
+! 新保時不顯示自保按鈕
+#OOBTNA=A,2,O
+C(4,#OOEndoInsuNo,$,BIND(grid,cancel))
+C(4,#OOEndoInsuNo,$,s)
+C(3,#OOSelfInsuCode,0,BIND(grid,cancel),$)
+C(3,#OOSelfInsuCode,0,s,$)
+C(3,#OOBtnFlag,1,$,BIND(grid,cancel))
+C(3,#OOBtnFlag,1,$,s)
+SWITCH(#OOSelfInsuCode,
+1,
+BIND(grid,cancel),
+2,
+BIND(grid,{ cmd=CHAIN; ntxcd=L4611; text=#OOBtnAText; ntxbuf=#OOBUFA_2}),
+0,
+BIND(grid,{ cmd=CHAIN; ntxcd=L4611; text=#OOBtnAText; ntxbuf=#OOBUFA_renew}),
+BIND(grid,cancel))
+
+! [維護]
+! T(3,0:新保;1:自保;2:續保)
+#OOBTNB=A,2,O
+! C(3,#OOBtnFlag,1,$,BIND(grid,cancel))
+! C(3,#OOBtnFlag,1,$,s)
+C(3,#OOSelfInsuCode,0,
+BIND(grid,{ cmd=CHAIN; ntxcd=L4610; ntxbuf=#OOBUFB_C}),
+BIND(grid,{ cmd=CHAIN; ntxcd=L4611; ntxbuf=#OOBUFB_M}))
+
+#OOBUF_DELETE_C=x,200,S
+T(2,4+#ClCode1+#ClCode2+#ClNo+#OOPrevInsuNo+#OOEndoInsuNo)
+
+#OOBUF_DELETE_M=x,50,S
+T(2,4+#ClCode1+#ClCode2+#ClNo+#OOPrevInsuNo+#OOEndoInsuNo+#OOSelfInsuCode+#OOInsuYearMonth)
+
+#DeleteX=X,5,S
+C(3,#OOSelfInsuCode,0,T(3,L4610),T(3,L4611))
+
+
+! [刪除]
+#OOBTN_DELETE=A,2,O
+C(3,#OOBtnFlag,1,$,BIND(grid,cancel))
+C(3,#OOBtnFlag,1,$,s)
+C(3,#OOSelfInsuCode,0,
+BIND(grid,{ cmd=CHAIN; ntxcd=L4610; ntxbuf=#OOBUF_DELETE_C}),
+BIND(grid,{ cmd=CHAIN; ntxcd=L4611; ntxbuf=#OOBUF_DELETE_M})
+)
+
+
+#OOBUF_C=x,200,S
+T(2,5+#ClCode1+#ClCode2+#ClNo+#OOPrevInsuNo+#OOEndoInsuNo)
+	
+#OOBUF_M=x,50,S
+T(2,5+#ClCode1+#ClCode2+#ClNo+#OOPrevInsuNo+#OOEndoInsuNo+#OOSelfInsuCode+#OOInsuYearMonth)
+	
+! [查詢]
+#OOBTNC=A,2,O
+C(3,#OOSelfInsuCode,0,
+BIND(grid,{ cmd=CHAIN; ntxcd=L4610; ntxbuf=#OOBUF_C}),
+BIND(grid,{ cmd=CHAIN; ntxcd=L4611; ntxbuf=#OOBUF_M})
+)
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#ClCode1
+#ClCode2
+#ClNo
+#CustNo
+#FacmNo
+#State
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L4964
+#OOSelfInsuCode
+#OOPrevInsuNo
+#OOEndoInsuNo
+#OOBdLocation
+#OONowInsuNo
+#OOInsuCompany
+#OOInsuStartDate
+#OOInsuEndDate
+#OOInsuTypeCode
+#OOFireInsuCovrg
+#OOEthqInsuCovrg
+#OOFireInsuPrem
+#OOEthqInsuPrem
+#OOInsuYearMonth
+#OOBtnFlag
+^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+<sub type="PART" prompt='{{#SCRTIL}} world' name="L4964" layout="cols=1;screen.width=[200,1000];order=1;">
+[
+["[L4964]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@擔保品保險單資料查詢"],
+[""],
+]
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+#RPTFG=0,QUERY.GRID
+#any={detail:true, header:'L4964.part',caption:'', rowNum:20, rowList:[20,40,60]}
+
+#OOBTNA=
+{width:35,search:false,formatter:'cust:bind-button:#OOSelfInsuCodeX ',align:'center',canExport:false}
+
+#OOBTNB=
+{width:35,search:false,formatter:'cust:bind-button:修改 ',align:'center',canExport:false}
+
+#OOBTN_DELETE=
+{width:35,search:false,formatter:'cust:bind-button:刪除 ',align:'center',canExport:false}
+
+#OOBTNC=
+{width:35,search:false,formatter:'cust:bind-button:查詢 ',align:'center',canExport:false}
+
+#OOPrevInsuNo=原保險單號碼
+{width:125}
+#OONowInsuNo=保險單號碼
+{width:105}
+#OOEndoInsuNo=批單號碼
+{width:95}
+#OOSelfInsuCodeX2=續保自保
+{width:85,align:'center'}
+#OOBdLocation=建物門牌
+{width:85}
+#OOInsuCompanyX=保險公司
+{width:85}
+#OOInsuStartDate=保險起日
+{width:85}
+#OOInsuEndDate=保險迄日
+{width:85}
+#OOInsuTypeCodeX=保險類別
+{width:85}
+#OOFireInsuCovrg=火災險保險金額
+{width:145}
+#OOFireInsuPrem=火災險保費
+{width:105}
+#OOEthqInsuCovrg=地震險保險金額
+{width:145}
+#OOEthqInsuPrem=地震險保費
+{width:105}
+^
+</sub>

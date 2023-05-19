@@ -4,24 +4,31 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 
-import com.st1.itx.db.domain.PfDetail;
-import com.st1.itx.db.service.PfDetailService;
+import com.st1.itx.db.domain.PfItDetail;
+import com.st1.itx.db.service.PfItDetailService;
 import com.st1.itx.db.domain.CdBcm;
 import com.st1.itx.db.service.CdBcmService;
 import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.PfBsDetail;
 import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.PfBsDetailService;
 import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.domain.CdWorkMonth;
 import com.st1.itx.db.service.CdEmpService;
+import com.st1.itx.db.service.CdWorkMonthService;
 import com.st1.itx.db.domain.PfIntranetAdjust;
 import com.st1.itx.db.service.PfIntranetAdjustService;
 
@@ -34,12 +41,19 @@ import com.st1.itx.db.service.PfIntranetAdjustService;
  * @version 1.0.0
  */
 public class L5R45 extends TradeBuffer {
+	private static final Object iWorkSeason = null;
 
 	@Autowired
-	public PfDetailService pfDetailService;
+	CdWorkMonthService cdWorkMonthService;
 
 	@Autowired
-	public CdBcmService CdBcmService;
+	public PfItDetailService pfItDetailService;
+
+	@Autowired
+	public PfBsDetailService pfBsDetailService;
+
+	@Autowired
+	public CdBcmService cdBcmService;
 
 	@Autowired
 	public CustMainService custMainService;
@@ -64,17 +78,43 @@ public class L5R45 extends TradeBuffer {
 			int iFacmNo = Integer.valueOf(titaVo.getParam("FacmNo").trim());
 			int iBormNo = Integer.valueOf(titaVo.getParam("BormNo").trim());
 
-			Slice<PfDetail> slPfDetail = pfDetailService.FindByBormNo(iCustNo, iFacmNo, iBormNo, 0, Integer.MAX_VALUE, titaVo);
-			List<PfDetail> lPfDetail = slPfDetail == null ? null : slPfDetail.getContent();
-			if (lPfDetail != null && lPfDetail.size() > 0) {
-				for (PfDetail pfDetail : lPfDetail) {
+			CdWorkMonth tCdWorkMonth = cdWorkMonthService.findDateFirst(titaVo.getEntDyI() + 19110000,
+					titaVo.getEntDyI() + 19110000, titaVo);
+			if (tCdWorkMonth == null) {
+				throw new LogicException(titaVo, "E0001", "CdWorkMonth 放款業績工作月檔，業績日期=" + titaVo.getEntDyI()); // 查詢資料不存在
+			}
+
+			int iWorkMonthF = tCdWorkMonth.getYear() * 100 + tCdWorkMonth.getMonth();
+			int iWorkMonth = iWorkMonthF - 191100;
+			PfIntranetAdjust pfIntranetAdjust = pfIntranetAdjustService.findByBormFirst(iCustNo, iFacmNo, iBormNo,
+					iWorkMonthF, titaVo);
+
+			if (pfIntranetAdjust != null) {
+				throw new LogicException("E0002", "業績資料");
+			}
+			// 工作季(西曆)
+			int iWorkSeason = 0;
+			if (iWorkMonth % 100 <= 3)
+				iWorkSeason = (iWorkMonth / 100) + 1;
+			else if (iWorkMonth % 100 <= 6)
+				iWorkSeason = (iWorkMonth / 100) + 2;
+			else if (iWorkMonth % 100 <= 9)
+				iWorkSeason = (iWorkMonth / 100) + 3;
+			else
+				iWorkSeason = (iWorkMonth / 100) + 4;
+
+			Slice<PfItDetail> slPfItDetail = pfItDetailService.findBormNoEq(iCustNo, iFacmNo, iBormNo, 0,
+					Integer.MAX_VALUE, titaVo);
+			List<PfItDetail> lPfItDetail = slPfItDetail == null ? null : slPfItDetail.getContent();
+			if (lPfItDetail != null && lPfItDetail.size() > 0) {
+				for (PfItDetail PfItDetail : lPfItDetail) {
 					// 撥款件
-					if (pfDetail.getRepayType() == 0) {
+					if (PfItDetail.getRepayType() == 0) {
 						found = true;
 
-						this.totaVo.putParam("CustNo", pfDetail.getCustNo());
-						this.totaVo.putParam("FacmNo", pfDetail.getFacmNo());
-						this.totaVo.putParam("BormNo", pfDetail.getBormNo());
+						this.totaVo.putParam("CustNo", iCustNo);
+						this.totaVo.putParam("FacmNo", iFacmNo);
+						this.totaVo.putParam("BormNo", iBormNo);
 
 						CustMain custMain = custMainService.custNoFirst(iCustNo, iCustNo, titaVo);
 
@@ -84,12 +124,12 @@ public class L5R45 extends TradeBuffer {
 
 						this.totaVo.putParam("CustName", custMain.getCustName());
 
-						this.totaVo.putParam("LogNo", pfDetail.getLogNo());
+						this.totaVo.putParam("LogNo", PfItDetail.getLogNo());
 
-						this.totaVo.putParam("Introducer", pfDetail.getIntroducer());
+						this.totaVo.putParam("Introducer", PfItDetail.getIntroducer());
 
-						if (!"".equals(pfDetail.getIntroducer().trim())) {
-							CdEmp cdEmp = cdEmpService.findById(pfDetail.getIntroducer(), titaVo);
+						if (!"".equals(PfItDetail.getIntroducer().trim())) {
+							CdEmp cdEmp = cdEmpService.findById(PfItDetail.getIntroducer(), titaVo);
 
 							if (cdEmp == null) {
 								this.totaVo.putParam("IntroducerName", "");
@@ -100,27 +140,24 @@ public class L5R45 extends TradeBuffer {
 							this.totaVo.putParam("IntroducerName", "");
 						}
 
-						this.totaVo.putParam("BsOfficer", pfDetail.getBsOfficer());
-
-						if (!"".equals(pfDetail.getBsOfficer().trim())) {
-							CdEmp cdEmp = cdEmpService.findById(pfDetail.getBsOfficer(), titaVo);
-
-							if (cdEmp == null) {
-								this.totaVo.putParam("BsOfficerName", "");
-							} else {
+						this.totaVo.putParam("BsOfficer", "");
+						this.totaVo.putParam("BsOfficerName", "");
+						PfBsDetail tPfBsDetail = pfBsDetailService.findBormNoLatestFirst(iCustNo, iFacmNo, iBormNo,
+								titaVo);
+						if (tPfBsDetail != null && !"".equals(tPfBsDetail.getBsOfficer().trim())) {
+							this.totaVo.putParam("BsOfficer", tPfBsDetail.getBsOfficer());
+							CdEmp cdEmp = cdEmpService.findById(tPfBsDetail.getBsOfficer(), titaVo);
+							if (cdEmp != null) {
 								this.totaVo.putParam("BsOfficerName", cdEmp.getFullname());
 							}
-						} else {
-							this.totaVo.putParam("BsOfficerName", "");
 						}
+						this.totaVo.putParam("PerfAmt", PfItDetail.getPerfAmt());
 
-						this.totaVo.putParam("PerfAmt", pfDetail.getItPerfAmt());
+						this.totaVo.putParam("PerfCnt", PfItDetail.getPerfCnt());
 
-						this.totaVo.putParam("PerfCnt", pfDetail.getItPerfCnt());
+						this.totaVo.putParam("UnitCode", PfItDetail.getUnitCode());
 
-						this.totaVo.putParam("UnitCode", pfDetail.getUnitCode());
-
-						CdBcm cdBcm = CdBcmService.findById(pfDetail.getUnitCode().trim(), titaVo);
+						CdBcm cdBcm = cdBcmService.findById(PfItDetail.getUnitCode().trim(), titaVo);
 
 						if (cdBcm != null) {
 							this.totaVo.putParam("UnitItem", cdBcm.getUnitItem());
@@ -128,9 +165,9 @@ public class L5R45 extends TradeBuffer {
 							this.totaVo.putParam("UnitItem", "");
 						}
 
-						this.totaVo.putParam("DistCode", pfDetail.getDistCode());
+						this.totaVo.putParam("DistCode", PfItDetail.getDistCode());
 
-						cdBcm = CdBcmService.distCodeFirst(pfDetail.getDistCode(), titaVo);
+						cdBcm = cdBcmService.distCodeFirst(PfItDetail.getDistCode(), titaVo);
 
 						if (cdBcm != null) {
 							this.totaVo.putParam("DistItem", cdBcm.getDistItem());
@@ -138,9 +175,9 @@ public class L5R45 extends TradeBuffer {
 							this.totaVo.putParam("DistItem", "");
 						}
 
-						this.totaVo.putParam("DeptCode", pfDetail.getDeptCode());
+						this.totaVo.putParam("DeptCode", PfItDetail.getDeptCode());
 
-						cdBcm = CdBcmService.deptCodeFirst(pfDetail.getDeptCode(), titaVo);
+						cdBcm = cdBcmService.deptCodeFirst(PfItDetail.getDeptCode(), titaVo);
 
 						if (cdBcm != null) {
 							this.totaVo.putParam("DeptItem", cdBcm.getDeptItem());
@@ -148,9 +185,9 @@ public class L5R45 extends TradeBuffer {
 							this.totaVo.putParam("DeptItem", "");
 						}
 
-						this.totaVo.putParam("PerfDate", pfDetail.getPerfDate());
-						this.totaVo.putParam("WorkMonth", pfDetail.getWorkMonth());
-						this.totaVo.putParam("WorkSeason", pfDetail.getWorkSeason());
+						this.totaVo.putParam("PerfDate", PfItDetail.getPerfDate());
+						this.totaVo.putParam("WorkMonth", iWorkMonth);
+						this.totaVo.putParam("WorkSeason", iWorkSeason);
 
 						this.totaVo.putParam("UnitType", 0);
 						this.totaVo.putParam("SumAmtSign", " ");
@@ -163,12 +200,6 @@ public class L5R45 extends TradeBuffer {
 
 			if (!found) {
 				throw new LogicException("E0001", "業績資料");
-			}
-
-			PfIntranetAdjust pfIntranetAdjust = pfIntranetAdjustService.findByBormFirst(iCustNo, iFacmNo, iBormNo, titaVo);
-
-			if (pfIntranetAdjust != null) {
-				throw new LogicException("E0002", "業績資料");
 			}
 
 		} else {
@@ -184,7 +215,8 @@ public class L5R45 extends TradeBuffer {
 			this.totaVo.putParam("FacmNo", pfIntranetAdjust.getFacmNo());
 			this.totaVo.putParam("BormNo", pfIntranetAdjust.getBormNo());
 
-			CustMain custMain = custMainService.custNoFirst(pfIntranetAdjust.getCustNo(), pfIntranetAdjust.getCustNo(), titaVo);
+			CustMain custMain = custMainService.custNoFirst(pfIntranetAdjust.getCustNo(), pfIntranetAdjust.getCustNo(),
+					titaVo);
 
 			if (custMain == null) {
 				throw new LogicException("E0001", "客戶主檔");
@@ -227,7 +259,7 @@ public class L5R45 extends TradeBuffer {
 
 			this.totaVo.putParam("UnitCode", pfIntranetAdjust.getUnitCode());
 
-			CdBcm cdBcm = CdBcmService.findById(pfIntranetAdjust.getUnitCode().trim(), titaVo);
+			CdBcm cdBcm = cdBcmService.findById(pfIntranetAdjust.getUnitCode().trim(), titaVo);
 
 			if (cdBcm != null) {
 				this.totaVo.putParam("UnitItem", cdBcm.getUnitItem());
@@ -237,7 +269,7 @@ public class L5R45 extends TradeBuffer {
 
 			this.totaVo.putParam("DistCode", pfIntranetAdjust.getDistCode());
 
-			cdBcm = CdBcmService.distCodeFirst(pfIntranetAdjust.getDistCode(), titaVo);
+			cdBcm = cdBcmService.distCodeFirst(pfIntranetAdjust.getDistCode(), titaVo);
 
 			if (cdBcm != null) {
 				this.totaVo.putParam("DistItem", cdBcm.getDistItem());
@@ -247,7 +279,7 @@ public class L5R45 extends TradeBuffer {
 
 			this.totaVo.putParam("DeptCode", pfIntranetAdjust.getDeptCode());
 
-			cdBcm = CdBcmService.deptCodeFirst(pfIntranetAdjust.getDeptCode(), titaVo);
+			cdBcm = cdBcmService.deptCodeFirst(pfIntranetAdjust.getDeptCode(), titaVo);
 
 			if (cdBcm != null) {
 				this.totaVo.putParam("DeptItem", cdBcm.getDeptItem());
@@ -256,8 +288,8 @@ public class L5R45 extends TradeBuffer {
 			}
 
 			this.totaVo.putParam("PerfDate", pfIntranetAdjust.getPerfDate());
-			this.totaVo.putParam("WorkMonth", pfIntranetAdjust.getWorkMonth());
-			this.totaVo.putParam("WorkSeason", pfIntranetAdjust.getWorkSeason());
+			this.totaVo.putParam("WorkMonth", pfIntranetAdjust.getWorkMonth() - 191100);
+			this.totaVo.putParam("WorkSeason", pfIntranetAdjust.getWorkSeason() - 1911);
 
 			this.totaVo.putParam("UnitType", pfIntranetAdjust.getUnitType());
 

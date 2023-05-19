@@ -70,10 +70,6 @@ public class L2917 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 100; // 122 * 400 = 48800
 
-		// tita
-		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
-		this.info("iCustNo = " + iCustNo);
-
 		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 
 		try {
@@ -98,6 +94,8 @@ public class L2917 extends TradeBuffer {
 				landLocation = result.get("F5");
 				moveOccursList(titaVo);
 			}
+		} else {
+			throw new LogicException("E2003", "無擔保品關聯資料");// 查無資料
 		}
 		if (resultList != null && resultList.size() >= this.limit) {
 			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */

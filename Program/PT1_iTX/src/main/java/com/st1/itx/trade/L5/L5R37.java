@@ -122,17 +122,19 @@ public class L5R37 extends TradeBuffer {
 			int perfDate = 0;
 			Slice<PfReward> slPfReward = pfRewardService.findBormNoEq(custNo, facmNo, bormNo, 0, Integer.MAX_VALUE,
 					titaVo);
-			for (PfReward tPfReward : slPfReward.getContent()) {
-				if (tPfReward.getRepayType() == 0) {
-					if ((bonusType == 1 || bonusType == 7)) {
-						employeeNo = tPfReward.getIntroducer();
+			if (slPfReward != null) {
+				for (PfReward tPfReward : slPfReward.getContent()) {
+					if (tPfReward.getRepayType() == 0) {
+						if ((bonusType == 1 || bonusType == 7)) {
+							employeeNo = tPfReward.getIntroducer();
+						}
+						if (bonusType == 5) {
+							employeeNo = tPfReward.getCoorgnizer();
+						}
+						prodCode = tPfReward.getProdCode();
+						pieceCode = tPfReward.getPieceCode();
+						perfDate = tPfReward.getPerfDate();
 					}
-					if (bonusType == 5) {
-						employeeNo = tPfReward.getCoorgnizer();
-					}
-					prodCode = tPfReward.getProdCode();
-					pieceCode = tPfReward.getPieceCode();
-					perfDate = tPfReward.getPerfDate();
 				}
 			}
 			if (prodCode.isEmpty()) {
@@ -204,7 +206,7 @@ public class L5R37 extends TradeBuffer {
 			this.totaVo.putParam("LastEmpName", "");
 		} else {
 			long iBonusNo = Long.valueOf(titaVo.get("BonusNo").trim());
-
+			this.info("***iBonusNo=" + iBonusNo);
 			PfRewardMedia pfRewardMedia = pfRewardMediaService.findById(iBonusNo, titaVo);
 
 			if (pfRewardMedia == null) {
