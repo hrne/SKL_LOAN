@@ -95,7 +95,7 @@ public class L5735Report extends MakeReport {
 				makeExcel.setValue(row, 12, parse.stringToInteger(result.get("Status")));
 				makeExcel.setValue(row, 13, this.showBcDate(result.get("DrawdownDate"), 0), "C");
 				makeExcel.setValue(row, 14, parse.stringToBigDecimal(result.get("EvaNetWorth")), "#,##0");
-				makeExcel.setValue(row, 15, parse.stringToBigDecimal(result.get("LoanRatio")), "0.00%");
+				makeExcel.setValue(row, 15, parse.stringToBigDecimal(result.get("LoanRatio")), "0%");
 				
 //												"0".equals(result.get("EvaNetWorth")) ||  "0".equals(result.get("LineAmt")) ? BigDecimal.ZERO
 //						: parse.stringToBigDecimal(result.get("LineAmt")).divide(

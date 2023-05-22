@@ -261,7 +261,7 @@ public class L4041ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " , \"FacmNo\"           as F6   ";
 		sql += " from \"PostAuthLog\"  a                     ";
 		sql += " where                             			";
-		sql += "   		 a.\"MediaCode\" ='Y' 				";
+		sql += "   		 a.\"PostMediaCode\" ='Y' 				";
 		sql += "   and a.\"ProcessDate\" = :processDate  	";
 		// propDate有值,
 
@@ -310,7 +310,7 @@ public class L4041ServiceImpl extends ASpringJpaParm implements InitializingBean
 		processDate = iProcessDate;
 
 		this.info("processDate = " + processDate);
-		return findAll(titaVo);
+		return checkIsMedia(titaVo);
 	}
 
 	public int getSize() {

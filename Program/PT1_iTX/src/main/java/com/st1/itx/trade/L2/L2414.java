@@ -415,7 +415,8 @@ public class L2414 extends TradeBuffer {
 			dataLog.setEnv(titaVo, beforeClOther, tClOther);
 			dataLog.exec("修改擔保品其他檔資料");
 
-			if (iApplNo > 0 && this.isEloan) { // eloan 檢核不同核准號碼要新增額度關聯 2022.3.10
+//			if (iApplNo > 0 && this.isEloan) { // eloan 檢核不同核准號碼要新增額度關聯 2022.3.10
+			if (iApplNo > 0) { // 20230522 Yu須更新與授信戶關係
 				List<HashMap<String, String>> ownerMap = new ArrayList<HashMap<String, String>>();
 				String iOwnerId = titaVo.getParam("OwnerId");
 
@@ -437,6 +438,9 @@ public class L2414 extends TradeBuffer {
 				ClFac clFac = sClFacService.findById(clFacId, titaVo);
 				if (clFac == null) {
 					clFacCom.insertClFac(titaVo, iClCode1, iClCode2, iClNo, iApplNo, ownerMap);
+				} else {
+					clFacCom.updateClOwnerRelation(titaVo, iApplNo, ownerMap);
+					clFacCom.changeClFac(iApplNo, titaVo);
 				}
 
 			} // if

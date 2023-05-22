@@ -83,16 +83,21 @@ BEGIN
     FROM "LA$LDGP" S1 
     LEFT JOIN "TB$LCDP" S2 ON S2."ACNACC" = S1."ACNACC" 
                           AND NVL(S2."ACNACS",' ') = NVL(S1."ACNACS",' ') 
-                          AND NVL(S2."ACNASS",' ') = NVL(S1."ACNASS",' ') 
+                          AND NVL(S2."ACNASS",' ') = NVL(S1."ACNASS",' ')                                                 
     LEFT JOIN "CdAcCode" S3 ON S3."AcNoCodeOld" = S2."CORACC" 
                            AND S3."AcSubCode" = NVL(S2."CORACS",'     ') 
                            AND S3."AcDtlCode" = CASE 
-                                                  WHEN S2."CORACC" IN ('40903300','20232020','20232182','20232180','20232181','40907400') 
-                                                       AND NVL(S2."CORACS",'     ') = '     ' 
-                                                  THEN '01' 
-                                                ELSE '  ' END  
-    WHERE S1."TRXDAT" >= 20190101 
-      AND NVL(S2."CORACC",' ') <> ' ' -- 有串到新會科才寫入 
+                                                WHEN L."CORACC" IN ('40903300' -- 放款帳管費 2022-06-30 Wei From Lai Email: 
+                                                                   ,'20232020' -- 2022-09-08 Wei FROM yoko line 
+                                                                   ,'20232182' -- 2022-09-08 Wei fix bug 
+                                                                   ,'20232180' -- 2022-09-08 Wei fix bug 
+                                                                   ,'20232181' -- 2022-09-08 Wei fix bug 
+                                                                   ,'40907400'  -- 2022-09-08 Wei fix bug 
+                                                                   )
+                                                     AND NVL(L."CORACS",'     ') = '     ' 
+                                                THEN '01' 
+                                              ELSE '  ' END
+    WHERE NVL(S2."CORACC",' ') <> ' ' -- 有串到新會科才寫入 
       AND NVL(S3."AcctCode",' ') <> ' ' 
     GROUP BY S1."TRXDAT" 
             ,S3."AcctCode" 

@@ -26,9 +26,6 @@ public class L5022ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	// *** 折返控制相關 ***
-	private int index;
-
-	// *** 折返控制相關 ***
 	private int limit;
 
 	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
@@ -64,7 +61,6 @@ public class L5022ServiceImpl extends ASpringJpaParm implements InitializingBean
 	/**
 	 * 
 	 * @param cDate  ...
-	 * @param empNo  ...
 	 * @param index  ...
 	 * @param limit  ...
 	 * @param titaVo titaVo
@@ -76,19 +72,18 @@ public class L5022ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-		String sql = "select * from (select a.* , " + "case when a.\"EffectiveDate\" > '" + cDate + "' then '3'" + " when a.\"IneffectiveDate\" < '" + cDate
+		String sql = "select * from (select case when nvl(c.\"logcount\",0)> 0 then 1 else 0 end as \"LogCount\" , a.* ," 
+				+ "case when a.\"EffectiveDate\" > '" + cDate + "' then '3'" + " when a.\"IneffectiveDate\" < '" + cDate
 				+ "' and a.\"IneffectiveDate\" !='0' then '2'" + " when (a.\"EffectiveDate\" <= '" + cDate + "' and a.\"IneffectiveDate\" = '0') or (a.\"IneffectiveDate\" > '" + cDate
 				+ "' and a.\"EffectiveDate\" <= '" + cDate + "')then '1' " + " else '9' end \"StatusFg\","
 				+ " b.\"Fullname\" from \"PfCoOfficer\" a left join \"CdEmp\" b on b.\"EmployeeNo\" = a.\"EmpNo\" ";
+		sql +=  " Left join (select \"EmpNo\" ,sum(1) as \"logcount\" from \"PfCoOfficerLog\"  group by \"EmpNo\" ) C on c.\"EmpNo\" = a.\"EmpNo\" ";
 		if (!empNo.trim().isEmpty()) {
 			sql += " where a.\"EmpNo\" = '" + empNo + "' ";
 		}
 		sql += "order by a.\"EmpNo\" ASC , \"EffectiveDate\" DESC) ";
-
 		sql += sqlRow;
 		this.info("sql = " + sql);
-		// *** 折返控制相關 ***
-		this.index = index;
 		// *** 折返控制相關 ***
 		this.limit = limit;
 		query = em.createNativeQuery(sql);

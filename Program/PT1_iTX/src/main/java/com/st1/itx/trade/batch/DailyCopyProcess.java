@@ -37,8 +37,7 @@ public class DailyCopyProcess extends TradeBuffer {
 		this.info("DailyCopyProcess tbsdyf = " + tbsdyf);
 		this.info("DailyCopyProcess tlrNo = " + tlrNo);
 		this.info("DailyCopyProcess targetEnv = " + targetEnv);
-
-
+	
 		// 關閉全部ForeignKey
 		this.info("DailyCopyProcess 關閉全部ForeignKey ...");
 		sJobMainService.Usp_Cp_ForeignKeyControl_Upd(tbsdyf, tlrNo, 0, titaVo);
@@ -50,9 +49,6 @@ public class DailyCopyProcess extends TradeBuffer {
 
 		this.info("DailyCopyProcess Usp_Cp_CdAcCode_Ins ...");
 		sJobMainService.Usp_Cp_CdAcCode_Ins(tlrNo, titaVo);
-
-		this.info("DailyCopyProcess Usp_Cp_CdAoDept_Ins ...");
-		sJobMainService.Usp_Cp_CdAoDept_Ins(tlrNo, titaVo);
 
 		this.info("DailyCopyProcess Usp_Cp_CdAppraisalCompany_Ins ...");
 		sJobMainService.Usp_Cp_CdAppraisalCompany_Ins(tlrNo, titaVo);

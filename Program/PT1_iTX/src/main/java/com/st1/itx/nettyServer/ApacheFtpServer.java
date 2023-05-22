@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import java.io.*;
 import java.util.HashMap;
@@ -34,7 +35,7 @@ public class ApacheFtpServer {
     @Value("${itx_Config}")
     private String itxResource;
 
-//    @PostConstruct
+    @PostConstruct
     public void initFtp() throws IOException {
         FtpServerFactory serverFactory = new FtpServerFactory();
         ListenerFactory listenerFactory = new ListenerFactory();

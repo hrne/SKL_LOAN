@@ -13,10 +13,14 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.ClBuilding;
+import com.st1.itx.db.domain.ClBuildingOwner;
 import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.ClFacId;
 import com.st1.itx.db.domain.ClImm;
 import com.st1.itx.db.domain.ClImmId;
+import com.st1.itx.db.domain.ClLand;
+import com.st1.itx.db.domain.ClLandOwner;
 import com.st1.itx.db.domain.ClMain;
 import com.st1.itx.db.domain.ClMainId;
 import com.st1.itx.db.domain.ClMovables;
@@ -27,15 +31,21 @@ import com.st1.itx.db.domain.ClOwnerRelation;
 import com.st1.itx.db.domain.ClOwnerRelationId;
 import com.st1.itx.db.domain.ClStock;
 import com.st1.itx.db.domain.ClStockId;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.FacCaseAppl;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacShareAppl;
+import com.st1.itx.db.service.ClBuildingOwnerService;
+import com.st1.itx.db.service.ClBuildingService;
 import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.ClImmService;
+import com.st1.itx.db.service.ClLandOwnerService;
+import com.st1.itx.db.service.ClLandService;
 import com.st1.itx.db.service.ClMainService;
 import com.st1.itx.db.service.ClMovablesService;
 import com.st1.itx.db.service.ClOtherService;
 import com.st1.itx.db.service.ClStockService;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacCaseApplService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.FacShareApplService;
@@ -77,6 +87,16 @@ public class ClFacCom extends TradeBuffer {
 	public FacCaseApplService sFacCaseApplService;
 	@Autowired
 	public ClOwnerRelationService sClOwnerRelationService;
+	@Autowired
+	public ClBuildingService sClBuildingService;
+	@Autowired
+	public ClBuildingOwnerService sClBuildingOwnerService;
+	@Autowired
+	public ClLandService sClLandService;
+	@Autowired
+	public ClLandOwnerService sClLandOwnerService;
+	@Autowired
+	public CustMainService sCustMainService;
 
 	@Autowired
 	public DataLog dataLog;
@@ -85,6 +105,136 @@ public class ClFacCom extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	/**
+	 * 擔保品編號唯一性檢核<BR>
+	 * 1.唯一性規則<BR>
+	 * .1) 房地擔保品： 建物門牌+建物所有權人(有一個有權人相同即視為相同)<BR>
+	 * .2) 土地擔保品： 土地座落+土地所有權人(有一個有權人相同即視為相同)<BR>
+	 * 2.同借戶擔保品才作唯一性關聯，不同借戶擔保品編號不同<BR>
+	 * 3.擔保品狀態為正常才作唯一性關聯；其餘狀態(塗銷、處分、抵押權確定)擔保品編號不同<BR>
+	 * 
+	 * @param iCustUkey 借戶客戶識別碼
+	 * @param iClCode1  擔保品代號1
+	 * @param iClCode2  擔保品代號2
+	 * @param titaVo    TitaVo
+	 * @return 擔保品編號
+	 * @throws LogicException ...
+	 */
+	public int unifyClNoCheck(String iCustUkey, int iClCode1, int iClCode2, TitaVo titaVo) throws LogicException {
+		int clNo = 0;
+		// 擔保品編號唯一性規則
+		if (iClCode1 == 1) {
+			clNo = getBuildingClNo(iCustUkey, iClCode1, iClCode2, titaVo);
+		} else {
+			clNo = getLandClNo(iCustUkey, iClCode1, iClCode2, titaVo);
+		}
+		return clNo;
+
+	}
+
+	// 房地擔保品編號
+	private int getBuildingClNo(String iCustUkey, int iClCode1, int iClCode2, TitaVo titaVo) throws LogicException {
+		int clNo = 0;
+		Slice<ClBuilding> slClBuilding = sClBuildingService.findBdLocationEq(titaVo.getParam("CityCode").trim(),
+				titaVo.getParam("AreaCode").trim(), titaVo.getParam("IrCode").trim(), titaVo.getParam("BdNo1").trim(),
+				titaVo.getParam("BdNo2").trim(), 0, Integer.MAX_VALUE, titaVo);
+		if (slClBuilding != null) {
+			for (ClBuilding cl : slClBuilding.getContent()) {
+				if (cl.getClCode1() == iClCode1 && cl.getClCode2() == iClCode2) {
+					ClMain tClMain = sClMainService.findById(new ClMainId(iClCode1, iClCode2, cl.getClNo()), titaVo);
+					if (iCustUkey.equals(tClMain.getCustUKey())) {
+						ClImm tClImm = sClImmService.findById(new ClImmId(iClCode1, iClCode2, cl.getClNo()), titaVo);
+						if ("0".equals(tClImm.getClStat())) {
+							if (checkBuildingOwner(iClCode1, iClCode2, cl.getClNo(), titaVo)) {
+								clNo = cl.getClNo();
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+		return clNo;
+	}
+
+	// 判斷建物所有權人是否相同
+	private boolean checkBuildingOwner(int iClCode1, int iClCode2, int clNo, TitaVo titaVo) throws LogicException {
+// 有一個有權人相同即視為相同
+		boolean isSameOwner = false;
+		Slice<ClBuildingOwner> slClBuildingOwner = sClBuildingOwnerService.clNoEq(iClCode1, iClCode2, clNo, this.index,
+				this.limit, titaVo);
+		if (slClBuildingOwner.getContent() != null) {
+			for (ClBuildingOwner o : slClBuildingOwner.getContent()) {
+				if (isSameOwner) {
+					break;
+				}
+				for (int i = 1; i <= 10; i++) {
+					if (titaVo.getParam("OwnerId" + i) == null || titaVo.getParam("OwnerId" + i).trim().isEmpty()) {
+						break;
+					}
+					CustMain custMain = sCustMainService.findById(o.getOwnerCustUKey(), titaVo);
+					if (custMain != null && custMain.getCustId().equals(titaVo.getParam("OwnerId" + i))) {
+						isSameOwner = true;
+					}
+				}
+			}
+		}
+		return isSameOwner;
+	}
+
+	// 土地擔保品編號
+	private int getLandClNo(String iCustUkey, int iClCode1, int iClCode2, TitaVo titaVo) throws LogicException {
+		int clNo = 0;
+		Slice<ClLand> slClLand = sClLandService.findLandLocationEq(titaVo.getParam("CityCodeB").trim(),
+				titaVo.getParam("AreaCodeB").trim(), titaVo.getParam("IrCodeB").trim(),
+				titaVo.getParam("LandNo1").trim(), titaVo.getParam("LandNo2").trim(), 0, Integer.MAX_VALUE, titaVo);
+		List<ClLand> lClLand = slClLand == null ? null : slClLand.getContent();
+		if (lClLand != null) {
+			for (ClLand cl : lClLand) {
+				if (cl.getClCode1() == iClCode1 && cl.getClCode2() == iClCode2) {
+					ClMain tClMain = sClMainService.findById(new ClMainId(iClCode1, iClCode2, cl.getClNo()), titaVo);
+					if (iCustUkey.equals(tClMain.getCustUKey())) {
+						ClImm tClImm = sClImmService.findById(new ClImmId(iClCode1, iClCode2, cl.getClNo()), titaVo);
+						if ("0".equals(tClImm.getClStat())) {
+							if (checkLandOwner(iClCode1, iClCode2, cl.getClNo(), titaVo)) {
+								clNo = cl.getClNo();
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+		return clNo;
+	}
+
+	// 判斷土地所有權人是否相同
+	private boolean checkLandOwner(int iClCode1, int iClCode2, int clNo, TitaVo titaVo) throws LogicException {
+// 有一個有權人相同即視為相同
+		boolean isSameOwner = false;
+		Slice<ClLandOwner> slClLandOwner = sClLandOwnerService.LandSeqEq(iClCode1, iClCode2, clNo, 000, 0,
+				Integer.MAX_VALUE, titaVo);
+		if (slClLandOwner != null) {
+			for (ClLandOwner o : slClLandOwner.getContent()) {
+				if (isSameOwner) {
+					break;
+				}
+				for (int i = 1; i <= 10; i++) {
+					// 若該筆無資料就離開迴圈
+					if (titaVo.getParam("OwnerId" + i) == null || titaVo.getParam("OwnerId" + i).trim().isEmpty()) {
+						break;
+					}
+					CustMain custMain = sCustMainService.findById(o.getOwnerCustUKey(), titaVo);
+					if (custMain != null && custMain.getCustId().equals(titaVo.getParam("OwnerId" + i))) {
+						isSameOwner = true;
+						break;
+					}
+				}
+			}
+		}
+		return isSameOwner;
 	}
 
 	/**
@@ -220,7 +370,7 @@ public class ClFacCom extends TradeBuffer {
 	}
 
 	// 擔保品提供人與授信戶關係
-	private void updateClOwnerRelation(TitaVo titaVo, int iApplNo, List<HashMap<String, String>> ownerMap)
+	public void updateClOwnerRelation(TitaVo titaVo, int iApplNo, List<HashMap<String, String>> ownerMap)
 			throws LogicException {
 		FacMain facMain = sFacMainService.facmApplNoFirst(iApplNo, titaVo);
 		if (facMain == null) {

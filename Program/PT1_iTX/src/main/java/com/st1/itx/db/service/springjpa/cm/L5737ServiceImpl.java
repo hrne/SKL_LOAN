@@ -63,24 +63,18 @@ public class L5737ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                       , CF.\"ClCode1\" ";
 		sql += "                       , CF.\"ClCode2\" ";
 		sql += "                       , CF.\"ClNo\" ";
-		sql += "            ORDER BY NVL(CE_early.\"EvaDate\",0) DESC "; // 第1段. 最接近該額度核准日期，且擔保品鑑價日小於等於核准日期的那筆資料
-        sql += "                   , NVL(CE_later.\"EvaDate\",0) "; // 第2段. 若第1段抓不到資料，才是改為抓鑑價日期最接近核准日期的那筆評估淨值
+		// 20230522 佳怡說明：擔保品改成鑑價日最接近核准日期的評估
+		sql += "            ORDER BY ABS(NVL(CAS.\"ApproveDate\",0) - NVL(CE.\"EvaDate\",19110101) ) ASC ";
 		sql += "          )                               AS \"Seq\" ";
-		sql += "        , NVL(CE_early.\"EvaNetWorth\",NVL(CE_later.\"EvaNetWorth\",0)) ";
-		sql += "                                          AS \"EvaNetWorth\" ";
+		sql += "        , NVL(CE.\"EvaNetWorth\",0) AS \"EvaNetWorth\" ";
 		sql += "   FROM \"ClFac\" CF ";
 		sql += "   LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = CF.\"CustNo\" ";
 		sql += "                            AND FAC.\"FacmNo\" = CF.\"FacmNo\" ";
-		sql += "   LEFT JOIN \"FacCaseAppl\" CAS ON CAS.\"ApplNo\" = CF.\"ApproveNo\" ";	
-		sql += "   LEFT JOIN \"ClEva\" CE_early ON CE_early.\"ClCode1\" = CF.\"ClCode1\" ";
-		sql += "                               AND CE_early.\"ClCode2\" = CF.\"ClCode2\" ";
-		sql += "                               AND CE_early.\"ClNo\" = CF.\"ClNo\" ";
-		sql += "                               AND CE_early.\"EvaDate\" <= CAS.\"ApproveDate\" ";
-		sql += "   LEFT JOIN \"ClEva\" CE_later ON CE_later.\"ClCode1\" = CF.\"ClCode1\" ";
-		sql += "                               AND CE_later.\"ClCode2\" = CF.\"ClCode2\" ";
-		sql += "                               AND CE_later.\"ClNo\" = CF.\"ClNo\" ";
-		sql += "                               AND CE_later.\"EvaDate\" > CAS.\"ApproveDate\" ";
-		sql += "                               AND NVL(CE_early.\"EvaDate\",0) = 0 "; // 若第1段串不到,才串第2段
+		sql += "   LEFT JOIN \"FacCaseAppl\" CAS ON CAS.\"ApplNo\" = CF.\"ApproveNo\" ";
+		sql += "   LEFT JOIN \"ClEva\" CE ON CE.\"ClCode1\" = CF.\"ClCode1\" ";
+		sql += "                         AND CE.\"ClCode2\" = CF.\"ClCode2\" ";
+		sql += "                         AND CE.\"ClNo\" = CF.\"ClNo\" ";
+		sql += "   WHERE NVL(CAS.\"ApproveDate\",0) > 0 ";
 		sql += " ) ";
 		sql += " , \"CFSum\" AS ( ";
 		sql += "   SELECT \"CustNo\" ";
@@ -108,7 +102,7 @@ public class L5737ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , CASE ";
 		sql += "          WHEN NVL(CS.\"EvaNetWorth\", 0) = 0";
 		sql += "          THEN 0 ";
-		sql += "        ELSE TRUNC(FM.\"LineAmt\" / CS.\"EvaNetWorth\", 4)";
+		sql += "        ELSE ROUND(FM.\"LineAmt\" / CS.\"EvaNetWorth\", 0)";
 		sql += "        END                        AS \"LoanRatio\" "; // 貸款成數
 		sql += " FROM  \"MonthlyLoanBal\" MLB ";
 		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = MLB.\"CustNo\" ";

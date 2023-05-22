@@ -123,9 +123,7 @@ BEGIN
                                                        AND NVL(S2."CORACS",'     ') = '     ' 
                                                   THEN '01' 
                                                 ELSE '  ' END 
-    WHERE S1."TRXDAT" >= 20190101 
---      AND S1."TRXDAT" <= "TbsDyF" 
-      AND NVL(S2."CORACC",' ') <> ' ' -- 有串到新會科才寫入 
+    WHERE NVL(S2."CORACC",' ') <> ' ' -- 有串到新會科才寫入 
       AND NVL(S3."AcNoCode",' ') <> ' ' -- 2021-07-15 新增判斷 有串到最新的11碼會科才寫入 
     GROUP BY CASE 
                WHEN NVL(S2."ACTFSC",' ') = 'A' 
