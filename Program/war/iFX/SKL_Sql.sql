@@ -618,6 +618,13 @@ CREATE TABLE itxadmin."FTP_USER" (
 
 ALTER TABLE itxadmin."FTP_USER"
 ADD  CONSTRAINT "FTP_USER_PK" PRIMARY KEY ("USERID");
+
+insert all
+into "FTP_USER" (userid, userpassword, homedirectory, enableflag, writepermission, idletime, uploadrate, downloadrate, maxloginnumber, maxloginperip)
+  values ('admin', '1qaz2wsx', 'C:\SKL\iTX_Log\', 'Y','Y',3000, 48000000, 48000000, 20, 2)
+into "FTP_USER" (userid, userpassword, homedirectory, enableflag, writepermission, idletime, uploadrate, downloadrate, maxloginnumber, maxloginperip)
+  values ('itx', '1qaz2wsx', 'C:\SKL\iTX_Log\', 'Y','Y',3000, 48000000, 48000000, 20, 2)
+select * from dual;
 --------------------------------------------------------------------------------------------------------------------------------
 --SpringBatch
 --1、批量實例表
