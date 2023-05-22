@@ -113,12 +113,10 @@ public class L6880 extends TradeBuffer {
 				proc(titaVo, "BATCH", iEntday);
 				// 往前跳開批次日期需過總帳(測試時)，連線日期 -> 批次日期
 				if (parse.stringToInteger(iEntday) > this.txBuffer.getTxBizDate().getTbsDy()) {
-					Slice<AcMain> slAcMain = acMainService.acmainAcDateEq(this.txBuffer.getTxBizDate().getTbsDyf(),
-							this.index, Integer.MAX_VALUE);
+					Slice<AcMain> slAcMain = acMainService.acmainAcDateEq(this.txBuffer.getTxBizDate().getTbsDyf(), this.index, Integer.MAX_VALUE);
 					List<AcMain> lAcMain = slAcMain == null ? null : slAcMain.getContent();
 					if (lAcMain != null) {
-						acMainCom.changeDate(this.txBuffer.getTxBizDate().getTbsDy(), parse.stringToInteger(iEntday),
-								lAcMain, titaVo);
+						acMainCom.changeDate(this.txBuffer.getTxBizDate().getTbsDy(), parse.stringToInteger(iEntday), lAcMain, titaVo);
 					}
 				}
 			} else {
@@ -263,12 +261,10 @@ public class L6880 extends TradeBuffer {
 
 		for (TxTeller te : txTellerLi)
 			if (te.getTlrNo().trim().equals(titaVo.getTlrNo().trim())) {
-				TxRecord txRecord = txRecordService.findEntdyFirst(this.getTxBuffer().getTxBizDate().getTbsDyf(),
-						titaVo.getTlrNo(), "00");
+				TxRecord txRecord = txRecordService.findEntdyFirst(this.getTxBuffer().getTxBizDate().getTbsDyf(), te.getTlrNo(), "00");
 				te.setTxtNo(Objects.isNull(txRecord) ? 1 : parse.stringToInteger(txRecord.getTxSeq()) + 1);
 			} else {
-				TxRecord txRecord = txRecordService.findEntdyFirst(this.getTxBuffer().getTxBizDate().getTbsDyf(),
-						titaVo.getTlrNo(), "00");
+				TxRecord txRecord = txRecordService.findEntdyFirst(this.getTxBuffer().getTxBizDate().getTbsDyf(), te.getTlrNo(), "00");
 				te.setTxtNo(Objects.isNull(txRecord) ? 0 : parse.stringToInteger(txRecord.getTxSeq()));
 			}
 		try {

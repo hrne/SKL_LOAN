@@ -20,6 +20,7 @@ import com.st1.itx.db.domain.PostAuthLogId;
 import com.st1.itx.db.domain.TxToDoDetailId;
 import com.st1.itx.db.service.BankAuthActService;
 import com.st1.itx.db.service.PostAuthLogService;
+import com.st1.itx.db.service.TxControlService;
 import com.st1.itx.db.service.springjpa.cm.L4041ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.FileCom;
@@ -47,33 +48,27 @@ public class L4041 extends TradeBuffer {
 
 	@Autowired
 	public DateUtil dateUtil;
-
 	/* 轉型共用工具 */
 	@Autowired
 	public Parse parse;
-
-	@Autowired
-	public FileCom fileCom;
-
 	@Autowired
 	public L4041ServiceImpl l4041ServiceImpl;
-
 	@Autowired
 	public PostAuthLogService postAuthLogService;
-
-	@Autowired
-	public MakeFile makeFile;
-
 	@Autowired
 	public TxToDoCom txToDoCom;
-
 	@Autowired
 	public BankAuthActService bankAuthActService;
 	@Autowired
+	public TxControlService txControlService;
+	@Autowired
 	SortMapListCom sortMapListCom;
-
 	@Autowired
 	L4041Report l4041Report;
+	@Autowired
+	public MakeFile makeFile;
+	@Autowired
+	public FileCom fileCom;
 
 	private int authCreateDate = 0;
 	private int processDate = 0;
@@ -100,7 +95,6 @@ public class L4041 extends TradeBuffer {
 		int iAuthApplCode = parse.stringToInteger(titaVo.getParam("AuthApplCode"));
 		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 		int iPropDate = parse.stringToInteger(titaVo.getParam("PropDate"));
-
 		this.info("iPropDate : " + iPropDate);
 
 		if (iPropDate != 0) {
@@ -119,7 +113,7 @@ public class L4041 extends TradeBuffer {
 
 		totaVo.put("PdfSno846", "0");
 		totaVo.put("PdfSno53N", "0");
-		totaVo.put("PdfSno", "0" );
+		totaVo.put("PdfSno", "0");
 
 		int nPropDate = dateUtil.getNowIntegerForBC();
 
@@ -135,8 +129,8 @@ public class L4041 extends TradeBuffer {
 			txtitaVo.putParam("FunctionCode", "3");
 			try {
 				// *** 折返控制相關 ***
-				resultList = l4041ServiceImpl.findAll(dateUtil.getNowIntegerForBC() + 19110000, this.index,
-						Integer.MAX_VALUE, txtitaVo);
+				resultList = l4041ServiceImpl.checkIsMedia(dateUtil.getNowIntegerForBC(), 0, Integer.MAX_VALUE,
+						txtitaVo);
 			} catch (Exception e) {
 				this.error("l4920ServiceImpl findByCondition " + e.getMessage());
 				throw new LogicException("E0013", e.getMessage());
@@ -145,13 +139,12 @@ public class L4041 extends TradeBuffer {
 			if (resultList != null && resultList.size() != 0) {
 				throw new LogicException(titaVo, "E0010", "不可一日多批"); // 功能選擇錯誤
 			}
-
 		}
 
 		resultList = new ArrayList<Map<String, String>>();
 		try {
 			// *** 折返控制相關 ***
-			resultList = l4041ServiceImpl.findAll(nPropDate, this.index, this.limit, titaVo);
+			resultList = l4041ServiceImpl.findAll(this.index, this.limit, titaVo);
 		} catch (Exception e) {
 			this.error("l4041ServiceImpl findByCondition " + e.getMessage());
 			throw new LogicException("E0013", e.getMessage());
@@ -509,20 +502,26 @@ public class L4041 extends TradeBuffer {
 
 						PostAuthLog newPostAuthLog = postAuthLogService.holdById(tPostAuthLogId, titaVo);
 
-						newPostAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
-						newPostAuthLog.setProcessTime(dateUtil.getNowIntegerTime());
 						if (result.get("F1").equals("1")) {
+							newPostAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
+							newPostAuthLog.setProcessTime(dateUtil.getNowIntegerTime());
 							newPostAuthLog.setPropDate(0);
+							newPostAuthLog.setPostMediaCode("");
+							newPostAuthLog.setFileSeq(0);
+							try {
+								postAuthLogService.update(newPostAuthLog, titaVo);
+							} catch (DBException e) {
+								throw new LogicException(titaVo, "E0007",
+										"L4041 PostAuthLog update " + e.getErrorMsg());
+							}
+						} else {
+							try {
+								postAuthLogService.delete(newPostAuthLog, titaVo);
+							} catch (DBException e) {
+								throw new LogicException(titaVo, "E0007",
+										"L4041 PostAuthLog update " + e.getErrorMsg());
+							}
 						}
-						newPostAuthLog.setPostMediaCode("");
-						newPostAuthLog.setFileSeq(0);
-
-						try {
-							postAuthLogService.update(newPostAuthLog, titaVo);
-						} catch (DBException e) {
-							throw new LogicException(titaVo, "E0007", "L4041 PostAuthLog update " + e.getErrorMsg());
-						}
-
 						TxToDoDetailId tTxToDoDetailId = new TxToDoDetailId();
 						tTxToDoDetailId.setCustNo(newPostAuthLog.getCustNo());
 						tTxToDoDetailId.setFacmNo(newPostAuthLog.getFacmNo());
@@ -530,7 +529,8 @@ public class L4041 extends TradeBuffer {
 						tTxToDoDetailId.setDtlValue(FormatUtil.pad9(newPostAuthLog.getRepayAcct(), 14));
 						tTxToDoDetailId.setItemCode("ACHP00");
 
-						txToDoCom.updDetailStatus(0, tTxToDoDetailId, titaVo);
+						txToDoCom.updDetailStatus(result.get("F1").equals("1") ? 0 : 3, tTxToDoDetailId, titaVo);
+
 					}
 					if (cnt == 0) {
 						throw new LogicException(titaVo, "CE001", "查無資料");

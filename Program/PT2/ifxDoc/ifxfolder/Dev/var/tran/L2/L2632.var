@@ -38,6 +38,7 @@ E(0,0)
 ["#FdTelNo3+連絡電話３",#TelNo3],
 ["#FdCloseReasonCode+清償原因",#CloseReasonCode,#CloseReasonCodeX],
 ["#FdCollectWayCode+領取地點",#CollectWayCode,#CollectWayCodeX],
+["#FdReceiveDate+領取日期",#ReceiveDate],
 [#<->#,"#FdPostAddress+郵寄地址",#PostAddress],
 [#<->#,"#FdRmk+備註欄",#Rmk],
 [#<->#,"#FdAgreeNo+塗銷同意書編號",#AgreeNo],
@@ -150,6 +151,7 @@ T(H,@CloseIndX,#CloseInd,#CloseIndHelp)
 T(2,@CollectFlag,#L2r36CollectFlag)
 E(0,@TwCloseAmt,#L2r36CloseAmt)
 E(0,@CollectWayCode,#L2r36CollectWayCode)
+E(0,@ReceiveDate,#L2r36ReceiveDate)
 T(2,@PostAddress,#L2r36PostAddress)
 T(2,@Rmk,#L2r36Rmk)
 T(2,@AgreeNo,#L2r36AgreeNo)
@@ -225,6 +227,7 @@ T(F,@CustNo,0)
 T(F,@FacmNo,0)
 T(F,@CloseNo,0)
 T(F,@CollectWayCode,1)
+T(F,@ReceiveDate,1)
 T(F,@CreateDate,1)
 
 #WKTEXTOFF=X,1,S
@@ -233,6 +236,7 @@ HIDE(#CloseReasonCode,#CollectWayCode)
 T(F,@CustNo,0)
 T(F,@FacmNo,0)
 T(F,@CollectWayCode,0)
+T(F,@ReceiveDate,0)
 T(F,@AgreeNo,0)
 T(F,@DocNo,0)
 T(F,@ClsNo,0)
@@ -393,6 +397,15 @@ C(5,#CollectFlag,"N",V(1,01,20),C(5,#CollectFlag,"Y",V(2,01,20),V(H,#CollectWayC
 #CollectWayCodeX=X,50,L
 T(H,#CollectWayCode,#CollectWayCodeHelp)
 
+!領取日期
+#FdReceiveDate=X,2,L
+
+#ReceiveDate=D,7,I
+C(2,#FunCode,S,S,$,S,s,s,S)
+C(5,#CollectFlag,"Y",$,S)
+@V(7)A(DATE,0,#ReceiveDate)
+
+
 ![郵寄地址]
 #FdPostAddress=X,2,L
 #PostAddress=x,200,I,maxWidth:50
@@ -471,6 +484,7 @@ T(3,[L2632] 清償作業維護)
 #CloseReasonCode
 #TimCloseAmt
 #CollectWayCode
+#ReceiveDate
 #PostAddress
 #AgreeNo
 #DocNo

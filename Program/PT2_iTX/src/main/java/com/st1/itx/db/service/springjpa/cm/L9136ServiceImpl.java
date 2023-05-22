@@ -57,7 +57,7 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  ,NVL(Cl.\"ClCode2\",JSON_VALUE(TR.\"TranData\",'$.ClCode2')) AS \"ClCode2\"";
 		sql += "		  ,CC.\"Item\" AS \"ClName\"";
 		sql += "		  ,NVL(Cl.\"ClNo\",JSON_VALUE(TR.\"TranData\",'$.ClNo')) AS \"ClNo\"";
-		sql += "		  ,CASE WHEN T.\"Reason\" LIKE '%刪除%' THEN  T.\"Reason\" ELSE JSON_QUERY(T.\"Content\",'$[*].f' WITH WRAPPER) END AS \"Item\"";
+		sql += "		  ,CASE WHEN T.\"Reason\" LIKE '%刪除%' THEN  '[\"' || TO_CHAR(T.\"Reason\") || '\"]' ELSE JSON_QUERY(T.\"Content\",'$[*].f' WITH WRAPPER) END AS \"Item\"";
 		sql += "		  ,CASE WHEN T.\"Reason\" LIKE '%刪除%' THEN '[\"\"]' ELSE JSON_QUERY(T.\"Content\",'$[*].o' WITH WRAPPER) END AS \"Old\"";
 		sql += "		  ,CASE WHEN T.\"Reason\" LIKE '%刪除%' THEN '[\"\"]' ELSE JSON_QUERY(T.\"Content\",'$[*].n' WITH WRAPPER) END AS \"New\"";
 		sql += "		  ,CE.\"Fullname\" AS \"Name\"";

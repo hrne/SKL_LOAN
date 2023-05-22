@@ -122,17 +122,21 @@ E(0,1)ASGN(AGAIN$)
 
 !顯示框線
 #WKTF=X,1,S
-C(3,#FunctionCd,2,T(F,@EmpNo,0)T(F,@UnitCode,0)T(F,@DistCode,0)T(F,@DeptCode,0)T(F,@EffectiveDate,1)C(3,#StatusFg,1,T(F,@IneffectiveDate,1)T(F,@EmpClass,0)T(F,@ClassPass,0),T(F,@IneffectiveDate,1)T(F,@EmpClass,1)T(F,@ClassPass,1)),$)
+C(3,#FunctionCd,2,T(F,@EmpNo,0)T(F,@UnitCode,1)T(F,@DistCode,1)T(F,@DeptCode,1)T(F,@EffectiveDate,0)C(3,#StatusFg,1,T(F,@IneffectiveDate,1)T(F,@EmpClass,0)T(F,@ClassPass,0),T(F,@IneffectiveDate,1)T(F,@EmpClass,1)T(F,@ClassPass,1)),$)
 #WKTF1=X,1,S
 C(3,#FunctionCd,4,T(F,@EmpNo,0)T(F,@UnitCode,0)T(F,@DistCode,0)T(F,@DeptCode,0)T(F,@EffectiveDate,0)T(F,@IneffectiveDate,0)T(F,@EmpClass,0)T(F,@ClassPass,0),$)
+
+#WKTF2=X,1,S
+C(3,#FunctionCd,3,T(F,@EmpNo,0)T(F,@UnitCode,1)T(F,@DistCode,1)T(F,@DeptCode,1)T(F,@EffectiveDate,1),$)
+
+
 ! 停效說明隱藏，修改時若與原本不同才開啟
 ! INVOKEJS(SHOW,L5407,8,8,0)
-
-
 ! 員工代號
 #EmpNo=X,6,I
-C(2,#FunctionCd,S,$,s,$,s)
-@T(3,@Fullname,)
+C(2,#FunctionCd,S,$,s,s,s)
+@
+T(3,@Fullname,)
 T(3,@UnitCode,)
 T(3,@DistCode,)
 T(3,@DeptCode,)
@@ -156,7 +160,7 @@ T(2,@DistCode,#L5r07DistCode)
 T(2,@DistCodeX,#L5r07DistCodeX)
 T(2,@DeptCode,#L5r07DeptCode)
 T(2,@DeptCodeX,#L5r07DeptCodeX)
-C(4,#Fullname,T(F,@UnitCode,1)T(F,@DistCode,1)T(F,@DeptCode,1),T(F,@UnitCode,0)T(F,@DistCode,0)T(F,@DeptCode,0))
+!C(4,#Fullname,T(F,@UnitCode,1)T(F,@DistCode,1)T(F,@DeptCode,1),T(F,@UnitCode,0)T(F,@DistCode,0)T(F,@DeptCode,0))
 
 <include src="ROM.icf::L5R40.dec"/>
 #RimL5r40=X,1,S
@@ -169,8 +173,10 @@ C(4,#Fullname,T(F,@UnitCode,1)T(F,@DistCode,1)T(F,@DeptCode,1),T(F,@UnitCode,0)T
 
 ! 單位代號
 #UnitCode=X,6,I
-C(2,#FunctionCd,s,$,s,$,s)
-C(4,#Fullname,$,s)
+C(2,#FunctionCd,s,$,$,$,s)
+C(3,#FunctionCd,2,C(3,#StatusFg,1,s,$),$)
+!C(2,#FunctionCd,s,$,s,$,s)
+!C(2,#FunctionCd,s,$,s,s,s)
 @C(4,#UnitCode,s,$)
 T(2,@RimChoose,1)
 T(2,@RimAreaCode,#UnitCode)
@@ -187,8 +193,9 @@ T(2,@DistCodeX,#L5R40DistItem)
 
 ! 區部代號
 #DistCode=X,6,I
-C(2,#FunctionCd,s,$,s,$,s)
-C(4,#Fullname,$,s)
+C(2,#FunctionCd,s,$,$,$,s)
+C(3,#FunctionCd,2,C(3,#StatusFg,1,s,$),$)
+!C(2,#FunctionCd,s,$,s,$,s)
 @C(4,#DistCode,s,$)
 T(2,@RimChoose,2)
 T(2,@RimDistCode,#DistCode)
@@ -203,8 +210,9 @@ T(2,@DistCodeX,#L5R40DistItem)
 
 ! 部室代號
 #DeptCode=X,6,I
-C(2,#FunctionCd,s,$,s,$,s)
-C(4,#Fullname,$,s)
+C(2,#FunctionCd,s,$,$,$,s)
+C(3,#FunctionCd,2,C(3,#StatusFg,1,s,$),$)
+!C(2,#FunctionCd,s,$,s,$,s)
 @C(4,#DeptCode,s,$)
 T(2,@RimChoose,3)
 T(2,@RimDeptCode,#DeptCode)
@@ -222,7 +230,8 @@ T(4,#SYSCDATE)
 
 ! 生效日期 
 #EffectiveDate=D,7,I
-C(2,#FunctionCd,s,$,$,$,s)
+! C(2,#FunctionCd,s,$,$,$,s)
+C(2,#FunctionCd,s,$,s,$,s)
 C(3,#FunctionCd,1,T(1,#SYSTIMETMP,2,7),$)
 D(8)
 @A(DATE,0,#EffectiveDate)

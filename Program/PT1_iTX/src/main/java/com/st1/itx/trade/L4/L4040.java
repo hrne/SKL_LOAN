@@ -152,8 +152,8 @@ public class L4040 extends TradeBuffer {
 		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 
 		switch (iFunctionCode) {
-		case 1:
-		case 2:
+		case 1: // 篩選資浪
+		case 2: // 產出媒體檔
 			this.info("case1!!");
 //			不可一日多批時,篩選資料檢查本日是否以產出媒體檔
 			if (iFunctionCode == 1 && "Y".equals(this.getTxBuffer().getSystemParas().getAchAuthOneTime())) {
@@ -162,7 +162,8 @@ public class L4040 extends TradeBuffer {
 				txtitaVo.putParam("FunctionCode", "1");
 				try {
 					// *** 折返控制相關 ***
-					resultList = l4040ServiceImpl.findAll(nPropDate, this.index, Integer.MAX_VALUE, txtitaVo);
+					resultList = l4040ServiceImpl.checkIsMedia(nPropDate, this.index, Integer.MAX_VALUE,
+							txtitaVo);
 				} catch (Exception e) {
 					this.error("l4040ServiceImpl findByCondition " + e.getMessage());
 					throw new LogicException("E0013", e.getMessage());
@@ -176,7 +177,7 @@ public class L4040 extends TradeBuffer {
 		resultList = new ArrayList<Map<String, String>>();
 		try {
 			// *** 折返控制相關 ***
-			resultList = l4040ServiceImpl.findAll(0, this.index, this.limit, titaVo);
+			resultList = l4040ServiceImpl.findAll(this.index, this.limit, titaVo);
 		} catch (Exception e) {
 			this.error("l4040ServiceImpl findByCondition " + e.getMessage());
 			throw new LogicException("E0013", e.getMessage());
@@ -242,18 +243,25 @@ public class L4040 extends TradeBuffer {
 
 						AchAuthLog tAchAuthLog = achAuthLogService.holdById(tAchAuthLogId, titaVo);
 
-						tAchAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
-						tAchAuthLog.setProcessTime(dateUtil.getNowIntegerTime());
 						if ("A".equals(result.get("F5"))) {
+							tAchAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
+							tAchAuthLog.setProcessTime(dateUtil.getNowIntegerTime());
 							tAchAuthLog.setPropDate(0);
-						}
-						tAchAuthLog.setBatchNo("");
-						tAchAuthLog.setMediaCode("");
-
-						try {
-							achAuthLogService.update(tAchAuthLog, titaVo);
-						} catch (DBException e) {
-							throw new LogicException(titaVo, "E0007", "L4041 PostAuthLog update " + e.getErrorMsg());
+							tAchAuthLog.setBatchNo("");
+							tAchAuthLog.setMediaCode("");
+							try {
+								achAuthLogService.update(tAchAuthLog, titaVo);
+							} catch (DBException e) {
+								throw new LogicException(titaVo, "E0007",
+										"L4041 PostAuthLog update " + e.getErrorMsg());
+							}
+						} else {
+							try {
+								achAuthLogService.delete(tAchAuthLog, titaVo);
+							} catch (DBException e) {
+								throw new LogicException(titaVo, "E0007",
+										"L4041 PostAuthLog update " + e.getErrorMsg());
+							}
 						}
 						this.info("updDetailStatus...0");
 //						2.回寫狀態
@@ -264,7 +272,7 @@ public class L4040 extends TradeBuffer {
 						tTxToDoDetailId.setDtlValue(FormatUtil.pad9(tAchAuthLog.getRepayAcct(), 14));
 						tTxToDoDetailId.setItemCode("ACHP00");
 
-						txToDoCom.updDetailStatus(0, tTxToDoDetailId, titaVo);
+						txToDoCom.updDetailStatus("A".equals(result.get("F5")) ? 0 : 3, tTxToDoDetailId, titaVo);
 					}
 				}
 			} else {

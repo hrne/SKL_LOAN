@@ -96,7 +96,9 @@ public class L2632 extends TradeBuffer {
 			tFacClose.setCloseReasonCode(titaVo.getParam("CloseReasonCode"));
 			tFacClose.setCloseAmt(parse.stringToBigDecimal(titaVo.getParam("TimCloseAmt")));
 			tFacClose.setCollectWayCode(titaVo.getParam("CollectWayCode"));
+			tFacClose.setPostAddress(titaVo.getParam("PostAddress"));
 			tFacClose.setAgreeNo(titaVo.getParam("AgreeNo"));
+			tFacClose.setReceiveDate(parse.stringToInteger(titaVo.getParam("ReceiveDate")));
 			tFacClose.setDocNo(parse.stringToInteger(titaVo.getParam("DocNo")));
 			tFacClose.setClsNo(titaVo.getParam("ClsNo"));
 			tFacClose.setTelNo1(titaVo.getParam("TelNo1"));
@@ -131,7 +133,6 @@ public class L2632 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0008", e.getErrorMsg());
 			}
 			if (iItemCode == 2) {
-
 				// 銷帳
 				AcReceivable acReceivable = new AcReceivable();
 				List<AcReceivable> acReceivableList = new ArrayList<AcReceivable>();
@@ -144,11 +145,7 @@ public class L2632 extends TradeBuffer {
 				acReceivableList.add(acReceivable);
 				acReceivableCom.setTxBuffer(this.getTxBuffer());
 				acReceivableCom.mnt(2, acReceivableList, titaVo); // 0-起帳 1-銷帳 2-起帳刪除
-
 			}
-
-		} else if (iFunCd == 5) {
-
 		}
 
 		this.addList(this.totaVo);

@@ -97,7 +97,7 @@ public class L2917ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " where ";
 		if (iCustNo > 0) {
 			sql += " cf.\"CustNo\" = :custNo ";
-			sql += " cf.\"FacmNo\" >= :facmNoS ";
+			sql += " AND  cf.\"FacmNo\" >= :facmNoS ";
 			sql += " AND  cf.\"FacmNo\" <= :facmNoE ";
 		} else {
 			sql += " cf.\"ClCode1\" = :clCode1 ";

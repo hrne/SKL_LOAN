@@ -157,6 +157,10 @@ C(3,#CHAIN,1,T(1,#NTXBUF,15,3),$)
 C(3,#CHAIN,1,s,$)
 IF(#CustId != "" && #CustNo1 == 0 && #CustNo2 == 0,$,IF(#CustNo1 == #CustNo2 && #CustNo1 == 0,S,IF(#CustNo1 == #CustNo2,$,S)))
 
+#MRKEY=_,_,S
+C(4,#CustId,$,E(0,#L2r07CustNo))
+C(4,#CustId,$,s)
+IF(#CustNo1>0,C(3,#CustNo1,#CustNo2,E(0,#CustNo1),S),S)
 
 
 #FdRptFg=X,2,L

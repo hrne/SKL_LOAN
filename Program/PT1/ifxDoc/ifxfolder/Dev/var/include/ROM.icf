@@ -3120,8 +3120,8 @@ TXFORM=L2R35
 #L2r36CloseAmt=+m,14.2,S
 #L2r36CollectFlag=X,1,S
 #L2r36CollectWayCode=X,2,S
-#L2r36PostAddress=x,200,S
 #L2r36ReceiveDate=D,7,S
+#L2r36PostAddress=x,200,S
 #L2r36AgreeNo=X,10,S
 #L2r36DocNo=A,7,S
 #L2r36ClsNo=X,18,S
@@ -3147,8 +3147,8 @@ TXFORM=L2R36
 #L2r36CloseAmt
 #L2r36CollectFlag
 #L2r36CollectWayCode
-#L2r36PostAddress
 #L2r36ReceiveDate
+#L2r36PostAddress
 #L2r36AgreeNo
 #L2r36DocNo
 #L2r36ClsNo

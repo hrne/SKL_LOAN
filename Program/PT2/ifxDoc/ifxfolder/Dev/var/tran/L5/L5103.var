@@ -680,6 +680,7 @@ C(3,#OPTA{i},0,S,T(H,#OPTA{i},#ApplicationCodeHelp))
 C(3,#ApplObj,4,$,S)
 IF(#ApplCode==1&&#ACTFG==1,$,s)
 C(3,#OPTA{i},0,S,$)
+IF(#ApplCode==1&&#ACTFG==1,E(0,0),$) 
 @V(2,0)
 
 #COPTA{i}=X,1,S
@@ -737,6 +738,7 @@ C(3,#OPTB{i},0,S,T(H,#OPTB{i},#SettingCodeHelp))
 C(3,#ApplObj,4,$,S)
 IF(#ApplCode==1&&#ACTFG==1,$,s)
 C(3,#OPTB{i},0,S,$)
+IF(#ApplCode==1&&#ACTFG==1,E(0,0),$) 
 @V(2,0)
 
 #COPTB{i}=X,1,S
@@ -794,6 +796,7 @@ C(3,#OPTC{i},0,S,T(H,#OPTC{i},#GuaranteedCodeHelp))
 C(3,#ApplObj,4,$,S)
 IF(#ApplCode==1&&#ACTFG==1,$,s)
 C(3,#OPTC{i},0,S,$)
+IF(#ApplCode==1&&#ACTFG==1,E(0,0),$) 
 @V(2,0)
 
 #COPTC{i}=X,1,S

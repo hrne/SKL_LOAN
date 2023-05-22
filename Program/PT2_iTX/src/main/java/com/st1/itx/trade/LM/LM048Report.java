@@ -666,15 +666,15 @@ public class LM048Report extends MakeReport {
 		}
 
 		// 合併儲存格
-		if (mergeRowRange1 != null && !mergeRowRange1.isEmpty()) {
-			mergeColumns(mergeRowRange1, 1);
-		}
-		if (mergeRowRange2 != null && !mergeRowRange2.isEmpty()) {
-			mergeColumns(mergeRowRange2, 2);
-		}
-		if (mergeRowRange3 != null && !mergeRowRange3.isEmpty()) {
-			mergeColumns(mergeRowRange3, 3);
-		}
+//		if (mergeRowRange1 != null && !mergeRowRange1.isEmpty()) {
+//			mergeColumns(mergeRowRange1, 1);
+//		}
+//		if (mergeRowRange2 != null && !mergeRowRange2.isEmpty()) {
+//			mergeColumns(mergeRowRange2, 2);
+//		}
+//		if (mergeRowRange3 != null && !mergeRowRange3.isEmpty()) {
+//			mergeColumns(mergeRowRange3, 3);
+//		}
 		// 印評等產業合計
 		// 評等產業合計-核貸金額
 		makeExcel.setValue(rowCursor, 5, formatThousand(lineAmtTotal), "#,##0");
