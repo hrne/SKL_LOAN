@@ -80,6 +80,7 @@ public class L2R36 extends TradeBuffer {
 		this.totaVo.putParam("L2r36CloseAmt", tFacClose.getCloseAmt());
 		this.totaVo.putParam("L2r36CollectFlag", tFacClose.getCollectFlag());
 		this.totaVo.putParam("L2r36CollectWayCode", tFacClose.getCollectWayCode());
+		this.totaVo.putParam("L2r36ReceiveDate", tFacClose.getReceiveDate());
 		this.totaVo.putParam("L2r36PostAddress", tFacClose.getPostAddress());
 		this.totaVo.putParam("L2r36ReceiveDate", tFacClose.getReceiveDate());
 		this.totaVo.putParam("L2r36AgreeNo", tFacClose.getAgreeNo());

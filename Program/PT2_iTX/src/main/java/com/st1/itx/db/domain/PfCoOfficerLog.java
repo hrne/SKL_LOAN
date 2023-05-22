@@ -1,14 +1,19 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
-import javax.persistence.EmbeddedId;
+import javax.persistence.Id;
 import javax.persistence.Column;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import com.st1.itx.util.StaticTool;
 import com.st1.itx.Exception.LogicException;
 
@@ -24,400 +29,458 @@ import com.st1.itx.Exception.LogicException;
 @Table(name = "`PfCoOfficerLog`")
 public class PfCoOfficerLog implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 5773113124003052651L;
 
-	@EmbeddedId
-	private PfCoOfficerLogId pfCoOfficerLogId;
+  // 序號
+  @Id
+  @Column(name = "`LogNo`")
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "`PfCoOfficerLog_SEQ`")
+  @SequenceGenerator(name = "`PfCoOfficerLog_SEQ`", sequenceName = "`PfCoOfficerLog_SEQ`", allocationSize = 1)
+  private Long logNo = 0L;
 
-	// 員工代號
-	@Column(name = "`EmpNo`", length = 6, insertable = false, updatable = false)
-	private String empNo;
+  // 員工代號
+  @Column(name = "`EmpNo`", length = 6)
+  private String empNo;
 
-	// 生效日期
-	@Column(name = "`EffectiveDate`", insertable = false, updatable = false)
-	private int effectiveDate = 0;
+  // 生效日期
+  @Column(name = "`EffectiveDate`")
+  private int effectiveDate = 0;
 
-	// 停效日期
-	@Column(name = "`IneffectiveDate`")
-	private int ineffectiveDate = 0;
+  // 停效日期
+  @Column(name = "`IneffectiveDate`")
+  private int ineffectiveDate = 0;
 
-	// 單位代號
-	@Column(name = "`AreaCode`", length = 6)
-	private String areaCode;
+  // 單位代號
+  @Column(name = "`AreaCode`", length = 6)
+  private String areaCode;
 
-	// 區部代號
-	@Column(name = "`DistCode`", length = 6)
-	private String distCode;
+  // 區部代號
+  @Column(name = "`DistCode`", length = 6)
+  private String distCode;
 
-	// 部室代號
-	@Column(name = "`DeptCode`", length = 6)
-	private String deptCode;
+  // 部室代號
+  @Column(name = "`DeptCode`", length = 6)
+  private String deptCode;
 
-	// 單位中文
-	@Column(name = "`AreaItem`", length = 20)
-	private String areaItem;
+  // 單位中文
+  @Column(name = "`AreaItem`", length = 20)
+  private String areaItem;
 
-	// 區部中文
-	@Column(name = "`DistItem`", length = 20)
-	private String distItem;
+  // 區部中文
+  @Column(name = "`DistItem`", length = 20)
+  private String distItem;
 
-	// 部室中文
-	@Column(name = "`DeptItem`", length = 20)
-	private String deptItem;
+  // 部室中文
+  @Column(name = "`DeptItem`", length = 20)
+  private String deptItem;
 
-	// 協辦等級
-	@Column(name = "`EmpClass`", length = 1)
-	private String empClass;
+  // 協辦等級
+  @Column(name = "`EmpClass`", length = 1)
+  private String empClass;
 
-	// 初階授信通過
-	@Column(name = "`ClassPass`", length = 1)
-	private String classPass;
+  // 初階授信通過
+  @Column(name = "`ClassPass`", length = 1)
+  private String classPass;
 
-	// 序號
-	/* 流水號用 */
-	@Column(name = "`SerialNo`", insertable = false, updatable = false)
-	private int serialNo = 0;
+  // 更新經辦
+  @Column(name = "`UpdateTlrNo`", length = 6)
+  private String updateTlrNo;
 
-	// 建檔日期時間
-	@CreatedDate
-	@Column(name = "`CreateDate`")
-	private java.sql.Timestamp createDate;
+  // 更新日期時間
+  @Column(name = "`UpdateDate`")
+  private java.sql.Timestamp updateDate;
 
-	// 建檔人員
-	@Column(name = "`CreateEmpNo`", length = 6)
-	private String createEmpNo;
+  // 功能
+  /* 1.新增 2.修改 4.刪除 */
+  @Column(name = "`FunctionCode`")
+  private int functionCode = 0;
 
-	// 最後更新日期時間
-	@LastModifiedDate
-	@Column(name = "`LastUpdate`")
-	private java.sql.Timestamp lastUpdate;
+  // 建檔日期時間
+  @CreatedDate
+  @Column(name = "`CreateDate`")
+  private java.sql.Timestamp createDate;
 
-	// 最後更新人員
-	@Column(name = "`LastUpdateEmpNo`", length = 6)
-	private String lastUpdateEmpNo;
+  // 建檔人員
+  @Column(name = "`CreateEmpNo`", length = 6)
+  private String createEmpNo;
 
-	public PfCoOfficerLogId getPfCoOfficerLogId() {
-		return this.pfCoOfficerLogId;
-	}
+  // 最後更新日期時間
+  @LastModifiedDate
+  @Column(name = "`LastUpdate`")
+  private java.sql.Timestamp lastUpdate;
 
-	public void setPfCoOfficerLogId(PfCoOfficerLogId pfCoOfficerLogId) {
-		this.pfCoOfficerLogId = pfCoOfficerLogId;
-	}
+  // 最後更新人員
+  @Column(name = "`LastUpdateEmpNo`", length = 6)
+  private String lastUpdateEmpNo;
 
-	/**
-	 * 員工代號<br>
-	 * 
-	 * @return String
-	 */
-	public String getEmpNo() {
-		return this.empNo == null ? "" : this.empNo;
-	}
 
-	/**
-	 * 員工代號<br>
-	 * 
-	 *
-	 * @param empNo 員工代號
-	 */
-	public void setEmpNo(String empNo) {
-		this.empNo = empNo;
-	}
+/**
+	* 序號<br>
+	* 
+	* @return Long
+	*/
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  public Long getLogNo() {
+    return this.logNo;
+  }
 
-	/**
-	 * 生效日期<br>
-	 * 
-	 * @return Integer
-	 */
-	public int getEffectiveDate() {
-		return StaticTool.bcToRoc(this.effectiveDate);
-	}
+/**
+	* 序號<br>
+	* 
+  *
+  * @param logNo 序號
+	*/
+  public void setLogNo(Long logNo) {
+    this.logNo = logNo;
+  }
 
-	/**
-	 * 生效日期<br>
-	 * 
-	 *
-	 * @param effectiveDate 生效日期
-	 * @throws LogicException when Date Is Warn
-	 */
-	public void setEffectiveDate(int effectiveDate) throws LogicException {
-		this.effectiveDate = StaticTool.rocToBc(effectiveDate);
-	}
+/**
+	* 員工代號<br>
+	* 
+	* @return String
+	*/
+  public String getEmpNo() {
+    return this.empNo == null ? "" : this.empNo;
+  }
 
-	/**
-	 * 停效日期<br>
-	 * 
-	 * @return Integer
-	 */
-	public int getIneffectiveDate() {
-		return StaticTool.bcToRoc(this.ineffectiveDate);
-	}
+/**
+	* 員工代號<br>
+	* 
+  *
+  * @param empNo 員工代號
+	*/
+  public void setEmpNo(String empNo) {
+    this.empNo = empNo;
+  }
 
-	/**
-	 * 停效日期<br>
-	 * 
-	 *
-	 * @param ineffectiveDate 停效日期
-	 * @throws LogicException when Date Is Warn
-	 */
-	public void setIneffectiveDate(int ineffectiveDate) throws LogicException {
-		this.ineffectiveDate = StaticTool.rocToBc(ineffectiveDate);
-	}
+/**
+	* 生效日期<br>
+	* 
+	* @return Integer
+	*/
+  public int getEffectiveDate() {
+    return StaticTool.bcToRoc(this.effectiveDate);
+  }
 
-	/**
-	 * 單位代號<br>
-	 * 
-	 * @return String
-	 */
-	public String getAreaCode() {
-		return this.areaCode == null ? "" : this.areaCode;
-	}
+/**
+	* 生效日期<br>
+	* 
+  *
+  * @param effectiveDate 生效日期
+  * @throws LogicException when Date Is Warn	*/
+  public void setEffectiveDate(int effectiveDate) throws LogicException {
+    this.effectiveDate = StaticTool.rocToBc(effectiveDate);
+  }
 
-	/**
-	 * 單位代號<br>
-	 * 
-	 *
-	 * @param areaCode 單位代號
-	 */
-	public void setAreaCode(String areaCode) {
-		this.areaCode = areaCode;
-	}
+/**
+	* 停效日期<br>
+	* 
+	* @return Integer
+	*/
+  public int getIneffectiveDate() {
+    return StaticTool.bcToRoc(this.ineffectiveDate);
+  }
 
-	/**
-	 * 區部代號<br>
-	 * 
-	 * @return String
-	 */
-	public String getDistCode() {
-		return this.distCode == null ? "" : this.distCode;
-	}
+/**
+	* 停效日期<br>
+	* 
+  *
+  * @param ineffectiveDate 停效日期
+  * @throws LogicException when Date Is Warn	*/
+  public void setIneffectiveDate(int ineffectiveDate) throws LogicException {
+    this.ineffectiveDate = StaticTool.rocToBc(ineffectiveDate);
+  }
 
-	/**
-	 * 區部代號<br>
-	 * 
-	 *
-	 * @param distCode 區部代號
-	 */
-	public void setDistCode(String distCode) {
-		this.distCode = distCode;
-	}
+/**
+	* 單位代號<br>
+	* 
+	* @return String
+	*/
+  public String getAreaCode() {
+    return this.areaCode == null ? "" : this.areaCode;
+  }
 
-	/**
-	 * 部室代號<br>
-	 * 
-	 * @return String
-	 */
-	public String getDeptCode() {
-		return this.deptCode == null ? "" : this.deptCode;
-	}
+/**
+	* 單位代號<br>
+	* 
+  *
+  * @param areaCode 單位代號
+	*/
+  public void setAreaCode(String areaCode) {
+    this.areaCode = areaCode;
+  }
 
-	/**
-	 * 部室代號<br>
-	 * 
-	 *
-	 * @param deptCode 部室代號
-	 */
-	public void setDeptCode(String deptCode) {
-		this.deptCode = deptCode;
-	}
+/**
+	* 區部代號<br>
+	* 
+	* @return String
+	*/
+  public String getDistCode() {
+    return this.distCode == null ? "" : this.distCode;
+  }
 
-	/**
-	 * 單位中文<br>
-	 * 
-	 * @return String
-	 */
-	public String getAreaItem() {
-		return this.areaItem == null ? "" : this.areaItem;
-	}
+/**
+	* 區部代號<br>
+	* 
+  *
+  * @param distCode 區部代號
+	*/
+  public void setDistCode(String distCode) {
+    this.distCode = distCode;
+  }
 
-	/**
-	 * 單位中文<br>
-	 * 
-	 *
-	 * @param areaItem 單位中文
-	 */
-	public void setAreaItem(String areaItem) {
-		this.areaItem = areaItem;
-	}
+/**
+	* 部室代號<br>
+	* 
+	* @return String
+	*/
+  public String getDeptCode() {
+    return this.deptCode == null ? "" : this.deptCode;
+  }
 
-	/**
-	 * 區部中文<br>
-	 * 
-	 * @return String
-	 */
-	public String getDistItem() {
-		return this.distItem == null ? "" : this.distItem;
-	}
+/**
+	* 部室代號<br>
+	* 
+  *
+  * @param deptCode 部室代號
+	*/
+  public void setDeptCode(String deptCode) {
+    this.deptCode = deptCode;
+  }
 
-	/**
-	 * 區部中文<br>
-	 * 
-	 *
-	 * @param distItem 區部中文
-	 */
-	public void setDistItem(String distItem) {
-		this.distItem = distItem;
-	}
+/**
+	* 單位中文<br>
+	* 
+	* @return String
+	*/
+  public String getAreaItem() {
+    return this.areaItem == null ? "" : this.areaItem;
+  }
 
-	/**
-	 * 部室中文<br>
-	 * 
-	 * @return String
-	 */
-	public String getDeptItem() {
-		return this.deptItem == null ? "" : this.deptItem;
-	}
+/**
+	* 單位中文<br>
+	* 
+  *
+  * @param areaItem 單位中文
+	*/
+  public void setAreaItem(String areaItem) {
+    this.areaItem = areaItem;
+  }
 
-	/**
-	 * 部室中文<br>
-	 * 
-	 *
-	 * @param deptItem 部室中文
-	 */
-	public void setDeptItem(String deptItem) {
-		this.deptItem = deptItem;
-	}
+/**
+	* 區部中文<br>
+	* 
+	* @return String
+	*/
+  public String getDistItem() {
+    return this.distItem == null ? "" : this.distItem;
+  }
 
-	/**
-	 * 協辦等級<br>
-	 * 
-	 * @return String
-	 */
-	public String getEmpClass() {
-		return this.empClass == null ? "" : this.empClass;
-	}
+/**
+	* 區部中文<br>
+	* 
+  *
+  * @param distItem 區部中文
+	*/
+  public void setDistItem(String distItem) {
+    this.distItem = distItem;
+  }
 
-	/**
-	 * 協辦等級<br>
-	 * 
-	 *
-	 * @param empClass 協辦等級
-	 */
-	public void setEmpClass(String empClass) {
-		this.empClass = empClass;
-	}
+/**
+	* 部室中文<br>
+	* 
+	* @return String
+	*/
+  public String getDeptItem() {
+    return this.deptItem == null ? "" : this.deptItem;
+  }
 
-	/**
-	 * 初階授信通過<br>
-	 * 
-	 * @return String
-	 */
-	public String getClassPass() {
-		return this.classPass == null ? "" : this.classPass;
-	}
+/**
+	* 部室中文<br>
+	* 
+  *
+  * @param deptItem 部室中文
+	*/
+  public void setDeptItem(String deptItem) {
+    this.deptItem = deptItem;
+  }
 
-	/**
-	 * 初階授信通過<br>
-	 * 
-	 *
-	 * @param classPass 初階授信通過
-	 */
-	public void setClassPass(String classPass) {
-		this.classPass = classPass;
-	}
+/**
+	* 協辦等級<br>
+	* 
+	* @return String
+	*/
+  public String getEmpClass() {
+    return this.empClass == null ? "" : this.empClass;
+  }
 
-	/**
-	 * 序號<br>
-	 * 流水號用
-	 * 
-	 * @return Integer
-	 */
-	public int getSerialNo() {
-		return this.serialNo;
-	}
+/**
+	* 協辦等級<br>
+	* 
+  *
+  * @param empClass 協辦等級
+	*/
+  public void setEmpClass(String empClass) {
+    this.empClass = empClass;
+  }
 
-	/**
-	 * 序號<br>
-	 * 流水號用
-	 *
-	 * @param serialNo 序號
-	 */
-	public void setSerialNo(int serialNo) {
-		this.serialNo = serialNo;
-	}
+/**
+	* 初階授信通過<br>
+	* 
+	* @return String
+	*/
+  public String getClassPass() {
+    return this.classPass == null ? "" : this.classPass;
+  }
 
-	/**
-	 * 建檔日期時間<br>
-	 * 
-	 * @return java.sql.Timestamp
-	 */
-	public java.sql.Timestamp getCreateDate() {
-		return this.createDate;
-	}
+/**
+	* 初階授信通過<br>
+	* 
+  *
+  * @param classPass 初階授信通過
+	*/
+  public void setClassPass(String classPass) {
+    this.classPass = classPass;
+  }
 
-	/**
-	 * 建檔日期時間<br>
-	 * 
-	 *
-	 * @param createDate 建檔日期時間
-	 */
-	public void setCreateDate(java.sql.Timestamp createDate) {
-		this.createDate = createDate;
-	}
+/**
+	* 更新經辦<br>
+	* 
+	* @return String
+	*/
+  public String getUpdateTlrNo() {
+    return this.updateTlrNo == null ? "" : this.updateTlrNo;
+  }
 
-	/**
-	 * 建檔人員<br>
-	 * 
-	 * @return String
-	 */
-	public String getCreateEmpNo() {
-		return this.createEmpNo == null ? "" : this.createEmpNo;
-	}
+/**
+	* 更新經辦<br>
+	* 
+  *
+  * @param updateTlrNo 更新經辦
+	*/
+  public void setUpdateTlrNo(String updateTlrNo) {
+    this.updateTlrNo = updateTlrNo;
+  }
 
-	/**
-	 * 建檔人員<br>
-	 * 
-	 *
-	 * @param createEmpNo 建檔人員
-	 */
-	public void setCreateEmpNo(String createEmpNo) {
-		this.createEmpNo = createEmpNo;
-	}
+/**
+	* 更新日期時間<br>
+	* 
+	* @return java.sql.Timestamp
+	*/
+  public java.sql.Timestamp getUpdateDate() {
+    return this.updateDate;
+  }
 
-	/**
-	 * 最後更新日期時間<br>
-	 * 
-	 * @return java.sql.Timestamp
-	 */
-	public java.sql.Timestamp getLastUpdate() {
-		return this.lastUpdate;
-	}
+/**
+	* 更新日期時間<br>
+	* 
+  *
+  * @param updateDate 更新日期時間
+	*/
+  public void setUpdateDate(java.sql.Timestamp updateDate) {
+    this.updateDate = updateDate;
+  }
 
-	/**
-	 * 最後更新日期時間<br>
-	 * 
-	 *
-	 * @param lastUpdate 最後更新日期時間
-	 */
-	public void setLastUpdate(java.sql.Timestamp lastUpdate) {
-		this.lastUpdate = lastUpdate;
-	}
+/**
+	* 功能<br>
+	* 1.新增 2.修改 4.刪除
+	* @return Integer
+	*/
+  public int getFunctionCode() {
+    return this.functionCode;
+  }
 
-	/**
-	 * 最後更新人員<br>
-	 * 
-	 * @return String
-	 */
-	public String getLastUpdateEmpNo() {
-		return this.lastUpdateEmpNo == null ? "" : this.lastUpdateEmpNo;
-	}
+/**
+	* 功能<br>
+	* 1.新增 2.修改 4.刪除
+  *
+  * @param functionCode 功能
+	*/
+  public void setFunctionCode(int functionCode) {
+    this.functionCode = functionCode;
+  }
 
-	/**
-	 * 最後更新人員<br>
-	 * 
-	 *
-	 * @param lastUpdateEmpNo 最後更新人員
-	 */
-	public void setLastUpdateEmpNo(String lastUpdateEmpNo) {
-		this.lastUpdateEmpNo = lastUpdateEmpNo;
-	}
+/**
+	* 建檔日期時間<br>
+	* 
+	* @return java.sql.Timestamp
+	*/
+  public java.sql.Timestamp getCreateDate() {
+    return this.createDate;
+  }
 
-	@Override
-	public String toString() {
-		return "PfCoOfficerLog [pfCoOfficerLogId=" + pfCoOfficerLogId + ", ineffectiveDate=" + ineffectiveDate + ", areaCode=" + areaCode + ", distCode=" + distCode + ", deptCode=" + deptCode
-				+ ", areaItem=" + areaItem + ", distItem=" + distItem + ", deptItem=" + deptItem + ", empClass=" + empClass + ", classPass=" + classPass + ", createDate=" + createDate
-				+ ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
-	}
+/**
+	* 建檔日期時間<br>
+	* 
+  *
+  * @param createDate 建檔日期時間
+	*/
+  public void setCreateDate(java.sql.Timestamp createDate) {
+    this.createDate = createDate;
+  }
+
+/**
+	* 建檔人員<br>
+	* 
+	* @return String
+	*/
+  public String getCreateEmpNo() {
+    return this.createEmpNo == null ? "" : this.createEmpNo;
+  }
+
+/**
+	* 建檔人員<br>
+	* 
+  *
+  * @param createEmpNo 建檔人員
+	*/
+  public void setCreateEmpNo(String createEmpNo) {
+    this.createEmpNo = createEmpNo;
+  }
+
+/**
+	* 最後更新日期時間<br>
+	* 
+	* @return java.sql.Timestamp
+	*/
+  public java.sql.Timestamp getLastUpdate() {
+    return this.lastUpdate;
+  }
+
+/**
+	* 最後更新日期時間<br>
+	* 
+  *
+  * @param lastUpdate 最後更新日期時間
+	*/
+  public void setLastUpdate(java.sql.Timestamp lastUpdate) {
+    this.lastUpdate = lastUpdate;
+  }
+
+/**
+	* 最後更新人員<br>
+	* 
+	* @return String
+	*/
+  public String getLastUpdateEmpNo() {
+    return this.lastUpdateEmpNo == null ? "" : this.lastUpdateEmpNo;
+  }
+
+/**
+	* 最後更新人員<br>
+	* 
+  *
+  * @param lastUpdateEmpNo 最後更新人員
+	*/
+  public void setLastUpdateEmpNo(String lastUpdateEmpNo) {
+    this.lastUpdateEmpNo = lastUpdateEmpNo;
+  }
+
+
+  @Override
+  public String toString() {
+    return "PfCoOfficerLog [logNo=" + logNo + ", empNo=" + empNo + ", effectiveDate=" + effectiveDate + ", ineffectiveDate=" + ineffectiveDate + ", areaCode=" + areaCode + ", distCode=" + distCode
+           + ", deptCode=" + deptCode + ", areaItem=" + areaItem + ", distItem=" + distItem + ", deptItem=" + deptItem + ", empClass=" + empClass + ", classPass=" + classPass
+           + ", updateTlrNo=" + updateTlrNo + ", updateDate=" + updateDate + ", functionCode=" + functionCode + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+  }
 }

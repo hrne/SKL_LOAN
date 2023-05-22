@@ -44,7 +44,7 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 	// *** 折返控制相關 ***
 	private int size;
 
-	private int propDate;
+	private int processDate;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -173,24 +173,18 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// iCreateFlag 1.新增授權 2.再次授權 3.取消授權
 		this.info("iFunctionCode = " + iFunctionCode);
 		switch (iFunctionCode) {
-		case 1:
+		case 1: // 篩選資料
 			if (iCustNo > 0) {
 				sql += "   and a.\"CustNo\" = " + iCustNo;
 			}
-
-			this.info("propDate = " + propDate);
-			if (propDate != 0) {
-				sql += "   and a.\"MediaCode\" ='Y' ";
-				sql += "   and a.\"PropDate\" =  " + propDate;
-			} else {
-				sql += "   and a.\"MediaCode\" " + searchMediaCode;
-				if (iPropDate > 0) {
-					sql += "   and a.\"PropDate\" >= " + iPropDate;
-				}
-				if (iPropDate == 0 && iCustNo == 0) {
-					sql += "   and a.\"PropDate\" = 0 ";
-				}
+			sql += "   and a.\"MediaCode\" " + searchMediaCode;
+			if (iPropDate > 0) {
+				sql += "   and a.\"PropDate\" >= " + iPropDate;
 			}
+			if (iPropDate == 0 && iCustNo == 0) {
+				sql += "   and a.\"PropDate\" = 0 ";
+			}
+
 			if (iCreateFlag == 3) {
 				sql += "   and a.\"CreateFlag\" = 'A'";
 			}
@@ -211,7 +205,7 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 		case 3:
 			sql += "   and a.\"MediaCode\" " + searchMediaCode;
 			if (iDataCreateDate > 0) {
-				sql += "   and a.\"PropDate\" =" + iDataCreateDate;
+				sql += "   and a.\"ProcessDate\" =" + iDataCreateDate;
 			}
 			if (iRepayBank == 1) {
 				sql += "   and a.\"RepayBank\" = '103'";
@@ -229,7 +223,6 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		 篩選               -> 輸入條件
 //		 產出媒體       -> 提出日+狀態s
 //		 重製媒體碼   -> 提出日+狀態+媒體碼
-
 		this.info("sql=" + sql);
 		Query query;
 
@@ -255,13 +248,72 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(result);
 	}
 
-	public List<Map<String, String>> findAll(int nPropDate, int index, int limit, TitaVo titaVo) throws Exception {
+	@SuppressWarnings("unchecked")
+	public List<Map<String, String>> checkIsMedia(TitaVo titaVo) throws Exception {
+
+		this.info("L4040.checkIsMedia");
+
+		String sql = "";
+
+		sql += " select                                ";
+		sql += "    a.\"AuthCreateDate\"               ";
+		sql += "  , a.\"CustNo\"                       ";
+		sql += "  , a.\"RepayBank\"                    ";
+		sql += "  , a.\"RepayAcct\"                    ";
+		sql += "  , a.\"CreateFlag\"                   ";
+		sql += "  , a.\"FacmNo\"                       ";
+		sql += "  , a.\"ProcessDate\"                  ";
+		sql += " from \"AchAuthLog\"  a                     ";
+		sql += " where                             			";
+		sql += "   		 a.\"MediaCode\" ='Y' 				";
+		sql += "   and a.\"ProcessDate\" = :processDate  	";
+		// propDate有值,
+
+//		 篩選               -> 輸入條件
+//		 產出媒體       -> 提出日+狀態s
+//		 重製媒體碼   -> 提出日+狀態+媒體碼
+
+		this.info("sql=" + sql);
+		Query query;
+
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
+		query = em.createNativeQuery(sql);
+		query.setParameter("processDate", processDate);
+
+		cnt = query.getResultList().size();
+		this.info("Total cnt ..." + cnt);
+
+		// *** 折返控制相關 ***
+		// 設定從第幾筆開始抓,需在createNativeQuery後設定
+		query.setFirstResult(this.index * this.limit);
+
+		// *** 折返控制相關 ***
+		// 設定每次撈幾筆,需在createNativeQuery後設定
+		query.setMaxResults(this.limit);
+
+		List<Object> result = query.getResultList();
+
+		size = result.size();
+		this.info("Total size ..." + size);
+
+		return this.convertToMap(result);
+	}
+
+	public List<Map<String, String>> findAll(int index, int limit, TitaVo titaVo) throws Exception {
 		this.index = index;
 		this.limit = limit;
 
-		propDate = nPropDate;
-
 		return findAll(titaVo);
+	}
+
+	public List<Map<String, String>> checkIsMedia(int iProcessDate, int index, int limit, TitaVo titaVo)
+			throws Exception {
+		this.index = index;
+		this.limit = limit;
+
+		processDate = iProcessDate;
+		this.info("processDate = " + processDate);
+		return checkIsMedia(titaVo);
 	}
 
 	public int getSize() {

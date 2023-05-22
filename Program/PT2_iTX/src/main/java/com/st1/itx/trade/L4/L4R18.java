@@ -37,7 +37,6 @@ public class L4R18 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 //		L4611維護、刪除調rim
-
 		int iClCode1 = parse.stringToInteger(titaVo.getParam("RimClCode1"));
 		int iClCode2 = parse.stringToInteger(titaVo.getParam("RimClCode2"));
 		int iClNo = parse.stringToInteger(titaVo.getParam("RimClNo"));

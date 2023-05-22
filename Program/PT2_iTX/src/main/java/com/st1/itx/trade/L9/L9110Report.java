@@ -348,18 +348,18 @@ public class L9110Report extends MakeReport {
 					if ("002".equals(tL9110.get("F58"))) {
 
 						this.print(1, 5, "違約適用方式 . " + textA + tL9110.get("F62") + textB);
-						this.print(1, 5, "綁約期限 ..... " + tL9110.get("F48") + " 個月");
+						this.print(0, 69, "綁約期限 ..... " + tL9110.get("F48") + " 個月");
 					} else {
 						String BreachDecreaseYY = formatAmt(
 								computeDivide(getBigDecimal(tL9110.get("F62")), new BigDecimal(12), 0), 0);
 						this.print(1, 5, "違約適用方式 . " + textA + BreachDecreaseYY + textB);
-						this.print(1, 5, "綁約期限 ..... " + tL9110.get("F48") + " 個月");
+						this.print(0, 69, "綁約期限 ..... " + tL9110.get("F48") + " 個月");
 					}
 
 				} else {
 					this.print(1, 5, "違約適用方式 . " + isNullorEmpty(tL9110.get("F42"), titaVo));
-					this.print(1, 5, "綁約期限 ..... " + tL9110.get("F48") + " 個月");
-					this.print(0, 35, "違約分段月數 . " + tL9110.get("F62") + " 個月");
+					this.print(0, 35, "綁約期限 ..... " + tL9110.get("F48") + " 個月");
+					this.print(0, 69, "違約分段月數 . " + tL9110.get("F62") + " 個月");
 				}
 			}
 
@@ -706,18 +706,18 @@ public class L9110Report extends MakeReport {
 					if ("002".equals(tL9110.get("F58"))) {
 
 						this.print(1, 5, "違約適用方式 . " + textA + tL9110.get("F62") + "個" + textB);
-						this.print(1, 5, "綁約期限 ..... " + tL9110.get("F48") + " 個月");
+						this.print(0, 69, "綁約期限 ..... " + tL9110.get("F48") + " 個月");
 					} else {
 						String BreachDecreaseYY = formatAmt(
 								computeDivide(getBigDecimal(tL9110.get("F62")), new BigDecimal(12), 0), 0);
 						this.print(1, 5, "違約適用方式 . " + textA + BreachDecreaseYY + textB);
-						this.print(1, 5, "綁約期限 ..... " + tL9110.get("F48") + " 個月");
+						this.print(0, 69, "綁約期限 ..... " + tL9110.get("F48") + " 個月");
 					}
 
 				} else {
 					this.print(1, 5, "違約適用方式 . " + isNullorEmpty(tL9110.get("F42"), titaVo));
-					this.print(1, 5, "綁約期限 ..... " + tL9110.get("F48") + " 個月");
-					this.print(0, 35, "違約分段月數 . " + tL9110.get("F62") + " 個月");
+					this.print(0, 35, "綁約期限 ..... " + tL9110.get("F48") + " 個月");
+					this.print(0, 69, "違約分段月數 . " + tL9110.get("F62") + " 個月");
 				}
 			}
 
@@ -1047,9 +1047,9 @@ public class L9110Report extends MakeReport {
 		 * ------123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345
 		 */
 		checkSpace(5);
-		print(1, 5, "主建物建號　提供人　　　　　　　　　　　　　　　　　　　　　　　　公設　　　（坪）　　（坪）　　（坪）　　（坪）　　（坪）　　（仟）　（仟）");
-		print(1, 5, "擔保品編號　門牌號碼／土地坐落　　　　　　　　　　　擔保品別　　　建號　　　主建物　附屬建物　　公設　　　車位　　土地面積　　核貸　　設定　");
-		print(1, 5, "－－－－－　－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－　－－－－　－－－－　－－－－　－－－－　－－－－　－－－　－－－　");
+		print(1, 5, "主建物建號　　提供人　　　　　　　　　　　　　　　　　　擔保品別　　　公設　　　（坪）　　（坪）　　（坪）　　（坪）　　（坪）　　（仟）　（仟）");
+		print(1, 5, "擔保品編號　　門牌號碼　　　　　　　　　　　　　　　　　土地坐落　　　建號　　　主建物　附屬建物　　公設　　　車位　　土地面積　　核貸　　設定　");
+		print(1, 5, "－－－－－－　－－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－　－－－－　－－－－　－－－－　－－－－　－－－－　－－－　－－－　");
 
 		BigDecimal totalFloorArea = BigDecimal.ZERO;
 		BigDecimal totalBdSubArea = BigDecimal.ZERO;
@@ -1088,10 +1088,9 @@ public class L9110Report extends MakeReport {
 
 			if (this.getNowPage() != oldpage) {
 				oldpage = this.getNowPage();
-				print(1, 5, "主建物建號　提供人　　　　　　　　　　　　　　　　　　　　　　　　公設　　　（坪）　　（坪）　　（坪）　　（坪）　　（坪）　　（仟）　（仟）");
-				print(1, 5, "擔保品編號　門牌號碼／土地坐落　　　　　　　　　　　擔保品別　　　建號　　　主建物　附屬建物　　公設　　　車位　　土地面積　　核貸　　設定　");
-				print(1, 5, "－－－－－　－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－　－－－－　－－－－　－－－－　－－－－　－－－－　－－－　－－－　");
-
+				print(1, 5, "主建物建號　　提供人　　　　　　　　　　　　　　　　　　擔保品別　　　公設　　　（坪）　　（坪）　　（坪）　　（坪）　　（坪）　　（仟）　（仟）");
+				print(1, 5, "擔保品編號　　門牌號碼　　　　　　　　　　　　　　　　　土地坐落　　　建號　　　主建物　附屬建物　　公設　　　車位　　土地面積　　核貸　　設定　");
+				print(1, 5, "－－－－－－　－－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－　－－－－　－－－－　－－－－　－－－－　－－－－　－－－　－－－　");
 			}
 			BigDecimal bdloanAmt = BigDecimal.ZERO;
 			BigDecimal landloanAmt = BigDecimal.ZERO;
@@ -1126,35 +1125,35 @@ public class L9110Report extends MakeReport {
 			this.print(1, 5, mBuilding.get("F1")); // 主建物建號
 
 			if ("1".equals(mBuilding.get("F0")) || "1".equals(mBuilding.get("F29"))) {
-				this.print(0, 17, mBuilding.get("F2")); // 提供人
+				this.print(0, 19, mBuilding.get("F2")); // 提供人
 			} else {
-				this.print(0, 56, mBuilding.get("F2")); // 提供人
+				this.print(0, 60, mBuilding.get("F2")); // 提供人
 			}
-			this.print(0, 56, clItem); // 擔保品別
-			this.print(0, 68, mBuilding.get("F5")); // 公設建號
-			this.print(0, 87, mBuilding.get("F6").trim().isEmpty() ? " " : formatAmt(mBuilding.get("F6"), 2), "R"); // 主建物面積
+			this.print(0, 60, clItem); // 擔保品別
+			this.print(0, 72, mBuilding.get("F5")); // 公設建號
+			this.print(0, 91, mBuilding.get("F6").trim().isEmpty() ? " " : formatAmt(mBuilding.get("F6"), 2), "R"); // 主建物面積
 			if (!mBuilding.get("F6").trim().isEmpty()) {
 				totalFloorArea = totalFloorArea.add(getBigDecimal(mBuilding.get("F6")));
 			}
-			this.print(0, 97, mBuilding.get("F7").trim().isEmpty() ? " " : formatAmt(mBuilding.get("F7"), 2), "R"); // 附屬建物面積
+			this.print(0, 101, mBuilding.get("F7").trim().isEmpty() ? " " : formatAmt(mBuilding.get("F7"), 2), "R"); // 附屬建物面積
 			if (!mBuilding.get("F7").trim().isEmpty()) {
 				totalBdSubArea = totalBdSubArea.add(getBigDecimal(mBuilding.get("F7")));
 			}
-			this.print(0, 107, mBuilding.get("F8").trim().isEmpty() ? " " : formatAmt(mBuilding.get("F8"), 2), "R"); // 公設面積
+			this.print(0, 111, mBuilding.get("F8").trim().isEmpty() ? " " : formatAmt(mBuilding.get("F8"), 2), "R"); // 公設面積
 			if (!mBuilding.get("F8").trim().isEmpty()) {
 				totalPublicArea = totalPublicArea.add(getBigDecimal(mBuilding.get("F8")));
 			}
-			this.print(0, 117, mBuilding.get("F9").trim().isEmpty() ? " " : formatAmt(mBuilding.get("F9"), 2), "R"); // 車位面積
+			this.print(0, 121, mBuilding.get("F9").trim().isEmpty() ? " " : formatAmt(mBuilding.get("F9"), 2), "R"); // 車位面積
 			if (!mBuilding.get("F9").trim().isEmpty()) {
 				totalCarArea = totalCarArea.add(getBigDecimal(mBuilding.get("F9")));
 			}
-			this.print(0, 127, mBuilding.get("F11").trim().isEmpty() ? " " : formatAmt(mBuilding.get("F11"), 2), "R"); // 土地面積
+			this.print(0, 131, mBuilding.get("F11").trim().isEmpty() ? " " : formatAmt(mBuilding.get("F11"), 2), "R"); // 土地面積
 			if ("1".equals(mBuilding.get("F0"))) {
-				this.print(0, 135,
+				this.print(0, 139,
 						"1".equals(mBuilding.get("F29")) ? formatAmt(bdloanAmt, 0) : formatAmt(landloanAmt, 0), "R"); // 核貸
 			}
 			if ("1".equals(mBuilding.get("F0"))) {
-				this.print(0, 143, mBuilding.get("F10").trim().isEmpty() ? " "
+				this.print(0, 147, mBuilding.get("F10").trim().isEmpty() ? " "
 						: formatAmt(computeDivide(getBigDecimal(mBuilding.get("F10")), thousand, 0), 0), "R");// 設定金額
 			}
 			if (("1".equals(mBuilding.get("F0")) && !mBuilding.get("F10").trim().isEmpty())) {
@@ -1165,23 +1164,23 @@ public class L9110Report extends MakeReport {
 				this.print(0, 5, mBuilding.get("F12") + "-" + mBuilding.get("F13") + "-" + mBuilding.get("F14")); // 擔保品編號
 			}
 			if ("1".equals(mBuilding.get("F0")) || "1".equals(mBuilding.get("F29"))) {
-				this.print(0, 17, mBuilding.get("F3")); // 門牌號碼
+				this.print(0, 19, mBuilding.get("F3")); // 門牌號碼
 			} else {
-				this.print(0, 56, mBuilding.get("F3")); // 土地坐落
+				this.print(0, 60, mBuilding.get("F3")); // 土地坐落
 			}
 
 		}
 
 		checkSpace(2);
-		print(1, 5, "－－－－－　－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－　－－－－　－－－－　－－－－　－－－－　－－－－　－－－　－－－　");
+		print(1, 5, "－－－－－－　－－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－　－－－－　－－－－　－－－－　－－－－　－－－－　－－－　－－－　");
 		print(1, 5, " 　　合計：");
-		print(0, 87, formatAmt(totalFloorArea, 2), "R");
-		print(0, 97, formatAmt(totalBdSubArea, 2), "R");
-		print(0, 107, formatAmt(totalPublicArea, 2), "R");
-		print(0, 117, formatAmt(totalCarArea, 2), "R");
-		print(0, 127, formatAmt(totalLandArea, 2), "R");
-		print(0, 135, formatAmt(loanAmttotal, 0), "R");
-		print(0, 143, formatAmt(computeDivide(totalSettingAmt, thousand, 0), 0), "R");
+		print(0, 91, formatAmt(totalFloorArea, 2), "R");
+		print(0, 101, formatAmt(totalBdSubArea, 2), "R");
+		print(0, 111, formatAmt(totalPublicArea, 2), "R");
+		print(0, 121, formatAmt(totalCarArea, 2), "R");
+		print(0, 131, formatAmt(totalLandArea, 2), "R");
+		print(0, 139, formatAmt(loanAmttotal, 0), "R");
+		print(0, 147, formatAmt(computeDivide(totalSettingAmt, thousand, 0), 0), "R");
 
 	}
 
@@ -1229,11 +1228,13 @@ public class L9110Report extends MakeReport {
 			int i = 0;
 			int j = 0;
 			String displaySubCompany = "";
+			String displaySubCompanyX = "";
 			for (Map<String, String> queryCrossUse : listCrossUseQuery) {
 				if (!displaySubCompany.isEmpty()) {
 					displaySubCompany += "、";
 				}
-				if (j == 4) {
+				displaySubCompanyX = displaySubCompany + queryCrossUse.get("F0");
+				if (displaySubCompanyX.length() > 65) {
 					this.print(i, 20, displaySubCompany);
 					displaySubCompany = "";
 					i = 1;
@@ -1259,18 +1260,26 @@ public class L9110Report extends MakeReport {
 //		this.print(1, 3, "　－－－－　－－　－－－－－－－－　－－　－－－－－－　－－－－－");
 
 		if (listCustTelNoQuery == null || listCustTelNoQuery.isEmpty()) {
-			this.print(1, 5, "資料未建立");
+			this.print(1, 5, "電話資料未建立");
 		} else {
+			this.print(1, 5, "");
 			String telText = "";
+			String telTextX = "";
 			int i = 0;
 			int j = 0;
 			for (Map<String, String> queryCustTel : listCustTelNoQuery) {
 				String telType = queryCustTel.get("F0").trim();
 				String telArea = queryCustTel.get("F1").trim();
+				// 區碼加-
+				if (!telArea.isEmpty()) {
+					telArea += "-";
+				}
 				String telNo = queryCustTel.get("F2").trim();
 				String telExt = queryCustTel.get("F3").trim();
-				if (j == 4) {
-					this.print(1, 5, telText);
+				telTextX = telText + telType + " ... " + telArea + " " + telNo + " " + telExt;
+
+				if (telTextX.length() > 130) {
+					this.print(i, 5, telText);
 					telText = "";
 					j = 0;
 					i = 1;
@@ -1281,6 +1290,7 @@ public class L9110Report extends MakeReport {
 				j++;
 
 			}
+
 			this.print(i, 5, telText);
 		}
 	}

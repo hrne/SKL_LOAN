@@ -3,22 +3,20 @@ package com.st1.itx.trade.L1;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
-import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CustNotice;
 import com.st1.itx.db.domain.CustNoticeId;
-import com.st1.itx.db.domain.TxTeller;
+import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.service.CdReportService;
 import com.st1.itx.db.service.CustNoticeService;
+import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
@@ -33,6 +31,9 @@ import com.st1.itx.util.parse.Parse;
 public class L1R20 extends TradeBuffer {
 	@Autowired
 	public CustNoticeService custNoticeService;
+
+	@Autowired
+	public FacMainService facMainService;
 
 	@Autowired
 	public CdReportService cdReportService;
@@ -99,13 +100,19 @@ public class L1R20 extends TradeBuffer {
 
 			rs = chkNotice(custNotice, flag);
 		} else {
-			Slice<CustNotice> slCustNotice = custNoticeService.findCustNoFormNo(custNo, formNo, 0, Integer.MAX_VALUE,
-					titaVo);
-			List<CustNotice> lCustNotice = slCustNotice == null ? null : slCustNotice.getContent();
-			if (lCustNotice != null && lCustNotice.size() > 0) {
-				for (CustNotice custNotice : lCustNotice) {
-					rs += chkNotice(custNotice, flag);
-				}
+			// 排除一戶多額度中，有一額度沒有申請列印(表示需列印)，會被列為皆不列印之情況
+			Slice<FacMain> sFacMainService = facMainService.facmCustNoRange(custNo, custNo, 0, 999, 0,
+					Integer.MAX_VALUE, titaVo);
+			List<FacMain> lFacMain = sFacMainService == null ? null : sFacMainService.getContent();
+			if (lFacMain != null && lFacMain.size() > 0) {
+				CustNoticeId custNoticeid = new CustNoticeId();
+				custNoticeid.setCustNo(custNo);
+				custNoticeid.setFacmNo(facmNo);
+				custNoticeid.setFormNo(formNo);
+				CustNotice custNotice = custNoticeService.findById(custNoticeid, titaVo);
+
+				rs += chkNotice(custNotice, flag);
+
 			}
 		}
 
