@@ -184,10 +184,14 @@ public class L9136Report extends MakeReport {
 							item = tmp1.get(i).replace("\"", "");
 							oldContent = tmp2.get(i).replace("\"", "");
 							newContent = tmp3.get(i).replace("\"", "");
-
 							// 全空白排除
 							if (item.trim().length() == 0 && oldContent.trim().length() == 0
 									&& newContent.trim().length() == 0) {
+								continue;
+							}
+
+							//完全空白或null
+							if (item.trim().isEmpty() || item.trim().equals("null")) {
 								continue;
 							}
 

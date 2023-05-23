@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.util.date.DateUtil;
 
 @Service
 @Repository
@@ -21,6 +22,8 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
+	@Autowired
+	DateUtil dateUtil;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -678,7 +681,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                      AND CDC1.\"Code\"    = IR.\"InsuCompany\" ";
 		sql += " WHERE CF.\"ApproveNo\" = :applNo "; // 日期大於保險迄日
 		sql += "   AND NVL(IR.\"ClNo\",0) != 0 "; // 2022-04-25 智偉增加:有串到保險單資料才顯示
-		sql += "   AND CASE WHEN FM.\"FirstDrawdownDate\" = 0 THEN 1 ";
+		sql += "   AND CASE WHEN FM.\"FirstDrawdownDate\" = 0  AND IR.\"InsuEndDate\" > :date THEN 1 ";
 		sql += "   	        WHEN IR.\"InsuEndDate\" > FM.\"FirstDrawdownDate\"  THEN 1 ";
 		sql += "   	        ELSE 0  END  = 1 ";
 		sql += "   ORDER BY \"NowInsuNo\"  ASC ";
@@ -689,6 +692,8 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("applNo", applNo);
+		query.setParameter("date", dateUtil.getNowIntegerForBC());
+		this.info("date =" + titaVo.getEntdd());
 
 		return this.convertToMap(query);
 	}

@@ -107,11 +107,7 @@ public class L4211Report2 extends MakeReport {
 		this.print(-3, 3, "報  表 ：" + "L4211B");
 		this.print(-3, 83, "匯款轉帳失敗表 ----(									)", "C");
 
-		if (ReconCode.equals("P03")) {
-			this.print(-3, 90, "A7");
-		} else {
-			this.print(-3, 90, ReconCode);// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
-		}
+		this.print(-3, 90, ReconCode);// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
 
 		this.print(-3, 165, "時    間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
 				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
@@ -140,12 +136,12 @@ public class L4211Report2 extends MakeReport {
 	public void exec(TitaVo titaVo) throws LogicException {
 
 		long sno = 0;
-		
+
 		txCode = "L4211";
 		reportName = "匯款轉帳失敗表";
 
 		this.info("exec   =" + titaVo.toString());
-	
+
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 		try {
 			fnAllList = l4211BRServiceImpl.findAll(titaVo);
@@ -281,7 +277,7 @@ public class L4211Report2 extends MakeReport {
 
 			} // for
 
-			sno =this.close();
+			sno = this.close();
 			this.toPdf(sno);
 		} else {
 			throw new LogicException("E2003", "查無資料"); // 查無資料

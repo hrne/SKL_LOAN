@@ -43,6 +43,7 @@ BEGIN
       , "CreateEmpNo" -- 建檔人員 VARCHAR2 6 
       , "LastUpdate" -- 最後更新日期時間 DATE  
       , "LastUpdateEmpNo" -- 最後更新人員 VARCHAR2 6 
+      , "ApplEmpName" -- NVACHAR2(30) 2023-05-23 Wei 新增 from Linda or舊資料轉檔用,直接轉AS400的檔案借閱人名字,不需要再MAPPING在職檔那些找員編
     )
     SELECT "LN$DOCP"."LMSACN"             AS "CustNo"              -- 借款人戶號 DECIMAL 7 0
           ,"LN$DOCP"."LMSAPN"             AS "FacmNo"              -- 額度號碼 DECIMAL 3 0
@@ -58,8 +59,7 @@ BEGIN
              WHEN "LN$DOCP"."DOCBDT" != 0
              THEN '2'
            ELSE '1' END                   AS "ApplCode"            -- 申請或歸還 VARCHAR2 1 0
-          ,NVL(T."CUSEMP","CdEmp"."EmployeeNo")
-                                          AS "ApplEmpNo"           -- 借閱人 VARCHAR2 6 0
+          ,''                             AS "ApplEmpNo"           -- 借閱人 VARCHAR2 6 0
           ,''                             AS "KeeperEmpNo"         -- 管理人 VARCHAR2 6 0
           ,CASE LPAD("LN$DOCP"."DOCPUR",2,'0')
              WHEN '01'
@@ -88,17 +88,14 @@ BEGIN
           ,0                              AS "TitaEntDy"           -- 登錄日期 DecimalD 8 0
           ,''                             AS "TitaTlrNo"           -- 登錄經辦 VARCHAR2 6 0
           ,0                              AS "TitaTxtNo"           -- 登錄交易序號 DECIMAL 8 0
-          ,'{"DOCEMN":"'
-           || TRIM("LN$DOCP"."DOCEMN")
-           ||'"}'                         AS "JsonFields"          -- JsonFields
+          ,''                             AS "JsonFields"          -- JsonFields
           ,''                             AS "FacmNoMemo"          -- 額度備註 NVARCHAR2 20
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,TRIM("LN$DOCP"."DOCEMN")       AS "ApplEmpName" -- NVACHAR2(30) 2023-05-23 Wei 新增 from Linda or舊資料轉檔用,直接轉AS400的檔案借閱人名字,不需要再MAPPING在職檔那些找員編
     FROM "LN$DOCP"
-    LEFT JOIN "CdEmp" ON TRIM("CdEmp"."Fullname") = TRIM("LN$DOCP"."DOCEMN")
-    LEFT JOIN LN$DTYP T on TRIM(TO_SINGLE_BYTE(T.EMPNAM)) = TRIM("LN$DOCP".DOCEMN)
     ;
 
     -- 記錄寫入筆數

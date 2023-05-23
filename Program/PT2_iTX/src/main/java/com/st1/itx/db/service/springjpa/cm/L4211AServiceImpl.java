@@ -43,9 +43,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 //		reportNo = Integer.valueOf(titaVo.get("ReportNo"));
 		
 		inputReconCode = String.valueOf(titaVo.get("ReconCode")).trim();
-		if (inputReconCode.equals("A7")) {
-			inputReconCode = "P03";
-		}
+
 		inputAcDate = (Integer.valueOf(titaVo.get("AcDate")) + 19110000);
 
 		this.info("L4211AServiceImpl.printNo = " + printNo);

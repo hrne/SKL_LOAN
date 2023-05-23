@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class BankRemit implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -363471675307099233L;
-
-@EmbeddedId
+  @EmbeddedId
   private BankRemitId bankRemitId;
 
   // 會計日期
@@ -57,7 +53,7 @@ public class BankRemit implements Serializable {
   private String batchNo;
 
   // 撥款方式
-  /* CdCode.DrawdownCode201:撥款(整批匯款)02:撥款(單筆匯款)04:退款台新(存款憑條)05:退款他行(整批匯款)11:退款新光(存款憑條) */
+  /* CdCode.DrawdownCode201:撥款(核心匯款)02:撥款(整批匯款)03:撥款(單筆匯款)04:退款台新(存款憑條)05:退款他行(核心匯款)11:退款新光(存款憑條) */
   @Column(name = "`DrawdownCode`")
   private int drawdownCode = 0;
 
@@ -137,6 +133,11 @@ public class BankRemit implements Serializable {
   /* CdCode.PayCodeI:建檔O:確認C:建檔取消A:已開票D:支票到期B:退件S:請款單位擋匯T:網銀擋匯W:匯款途中F:匯款失敗H:支票兌領/匯款成功R:退匯/退回情況改變成作廢L:支票掛失V:支票作廢J:空白票遺失Z:逾一年未兌領Y:逾二年未兌領P:繳款成功X:付款沖回Q:AML相似名單確認中U:禁止交易(AML) */
   @Column(name = "`PayCode`", length = 1)
   private String payCode;
+
+  // 核心匯款記號
+  /* 0.非核心匯款1.核心匯款(1500萬(不含)以下) */
+  @Column(name = "`CoreRemitFlag`")
+  private int coreRemitFlag = 0;
 
   // 建檔日期時間
   @CreatedDate
@@ -263,10 +264,11 @@ public class BankRemit implements Serializable {
 /**
 	* 撥款方式<br>
 	* CdCode.DrawdownCode2
-01:撥款(整批匯款)
-02:撥款(單筆匯款)
+01:撥款(核心匯款)
+02:撥款(整批匯款)
+03:撥款(單筆匯款)
 04:退款台新(存款憑條)
-05:退款他行(整批匯款)
+05:退款他行(核心匯款)
 11:退款新光(存款憑條)
 	* @return Integer
 	*/
@@ -277,10 +279,11 @@ public class BankRemit implements Serializable {
 /**
 	* 撥款方式<br>
 	* CdCode.DrawdownCode2
-01:撥款(整批匯款)
-02:撥款(單筆匯款)
+01:撥款(核心匯款)
+02:撥款(整批匯款)
+03:撥款(單筆匯款)
 04:退款台新(存款憑條)
-05:退款他行(整批匯款)
+05:退款他行(核心匯款)
 11:退款新光(存款憑條)
   *
   * @param drawdownCode 撥款方式
@@ -694,6 +697,27 @@ U:禁止交易(AML)
   }
 
 /**
+	* 核心匯款記號<br>
+	* 0.非核心匯款
+1.核心匯款(1500萬(不含)以下)
+	* @return Integer
+	*/
+  public int getCoreRemitFlag() {
+    return this.coreRemitFlag;
+  }
+
+/**
+	* 核心匯款記號<br>
+	* 0.非核心匯款
+1.核心匯款(1500萬(不含)以下)
+  *
+  * @param coreRemitFlag 核心匯款記號
+	*/
+  public void setCoreRemitFlag(int coreRemitFlag) {
+    this.coreRemitFlag = coreRemitFlag;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -776,6 +800,6 @@ U:禁止交易(AML)
            + ", statusCode=" + statusCode + ", remitBank=" + remitBank + ", remitBranch=" + remitBranch + ", remitAcctNo=" + remitAcctNo + ", custNo=" + custNo + ", facmNo=" + facmNo
            + ", bormNo=" + bormNo + ", custName=" + custName + ", custId=" + custId + ", custBirthday=" + custBirthday + ", custGender=" + custGender + ", remark=" + remark
            + ", currencyCode=" + currencyCode + ", remitAmt=" + remitAmt + ", amlRsp=" + amlRsp + ", actFg=" + actFg + ", modifyContent=" + modifyContent + ", payCode=" + payCode
-           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", coreRemitFlag=" + coreRemitFlag + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

@@ -14,7 +14,6 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.ClBuilding;
 import com.st1.itx.db.domain.ClBuildingId;
-import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.ClNoMap;
 import com.st1.itx.db.service.ClBuildingService;
 import com.st1.itx.db.service.ClFacService;
@@ -30,21 +29,21 @@ public class L2040 extends TradeBuffer {
 
 	/* DB服務注入 */
 	@Autowired
-	public ClNoMapService sClNoMapService;
+	ClNoMapService sClNoMapService;
 
 	@Autowired
-	public ClFacService sClFacService;
+	ClFacService sClFacService;
 
 	@Autowired
-	public ClBuildingService sClBuildingService;
+	ClBuildingService sClBuildingService;
 
 	/* 日期工具 */
 	@Autowired
-	public DateUtil dateUtil;
+	DateUtil dateUtil;
 
 	/* 轉換工具 */
 	@Autowired
-	public Parse parse;
+	Parse parse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -66,9 +65,7 @@ public class L2040 extends TradeBuffer {
 		int iClSeq = parse.stringToInteger(titaVo.getParam("ClSeq"));
 
 		List<ClNoMap> lClNoMap = new ArrayList<ClNoMap>();
-		List<ClFac> lClFac = new ArrayList<ClFac>();
 		Slice<ClNoMap> sClNoMap = null;
-		Slice<ClFac> slClFac = null;
 		if (iFunCd == 1) { // 原擔保品 查新的
 			if (iClSeq == 0) { // 查全部
 				sClNoMap = sClNoMapService.findGdrNum(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
@@ -101,16 +98,12 @@ public class L2040 extends TradeBuffer {
 				int tClCode2 = tClNoMap.getClCode2();
 				int tClNo = tClNoMap.getClNo();
 
-				slClFac = sClFacService.clNoEq(tClCode1, tClCode2, tClNo, this.index, this.limit, titaVo);
-				lClFac = slClFac == null ? null : new ArrayList<ClFac>(slClFac.getContent());
+				// 2023-05-23 Wei from QC:2426 要能查到舊擔保品綁在哪個額度
+				int oriCustNo = tClNoMap.getOriCustNo();
+				int oriFacmNo = tClNoMap.getOriFacmNo();
 
-				if (lClFac != null) {
-					occurslist.putParam("OOCustNo", lClFac.get(0).getCustNo());
-					occurslist.putParam("OOFacmNo", lClFac.get(0).getFacmNo());
-				} else {
-					occurslist.putParam("OOCustNo", "");
-					occurslist.putParam("OOFacmNo", "");
-				}
+				occurslist.putParam("OOCustNo", oriCustNo);
+				occurslist.putParam("OOFacmNo", oriFacmNo);
 
 				if (tClCode1 == 1) {
 					ClBuildingId clBuildingId = new ClBuildingId();
@@ -121,7 +114,8 @@ public class L2040 extends TradeBuffer {
 					tClBuilding = sClBuildingService.findById(clBuildingId, titaVo);
 
 					if (tClBuilding != null) {
-						occurslist.putParam("OOAddress", tClBuilding.getBdLocation() + "，建號" + tClBuilding.getBdNo1() + "-" + tClBuilding.getBdNo2());
+						occurslist.putParam("OOAddress", tClBuilding.getBdLocation() + "，建號" + tClBuilding.getBdNo1()
+								+ "-" + tClBuilding.getBdNo2());
 					} else {
 						occurslist.putParam("OOAddress", "");
 					}

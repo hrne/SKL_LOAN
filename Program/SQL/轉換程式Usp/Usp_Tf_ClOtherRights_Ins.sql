@@ -73,6 +73,10 @@ BEGIN
                               AND S5."GDRNUM" = CNM."GDRNUM" 
                               AND S5."LGTSEQ" = CNM."LGTSEQ" 
                               AND CNM."ClCode1" = 2
+        LEFT JOIN "LA$BGTP" BG ON BG."GDRID1" = CNM."GDRID1"
+                              AND BG."GDRID2" = CNM."GDRID2"
+                              AND BG."GDRNUM" = CNM."GDRNUM"
+                              AND CNM."ClCode1" = 5
     )
     SELECT "ClCode1"                 AS "ClCode1"         -- 擔保品代號1 DECIMAL 1
          , "ClCode2"                 AS "ClCode2"         -- 擔保品代號2 DECIMAL 2

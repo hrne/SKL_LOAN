@@ -60,24 +60,8 @@ public class L4211Batch extends TradeBuffer {
 		String functionCode = titaVo.get("FunctionCode");
 
 		this.info("functionCodeXXXX = " + functionCode);
-		if ("0".equals(functionCode)) {
-			// 全部
-
-			try {
-//				printNo
-//				1 匯款總傳票明細表
-//				2入帳後檢核明細表
-//				3 人工處理明細表
-				l4211Report.exec(titaVo, 1);
-				l4211Report.exec(titaVo, 2);
-				l4211Report.exec(titaVo, 3);
-				
-			} catch (LogicException e) {
-				sendMsg = e.getErrorMsg();
-				flag = false;
-			}
-
-		} else if ("1".equals(functionCode)) {
+		
+		if ("1".equals(functionCode)) {
 			// 產生匯款總傳票明細表
 			// 入帳後檢核明細表
 			String reportNo = titaVo.get("ReportNo");

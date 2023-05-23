@@ -100,6 +100,7 @@ public class L3220 extends TradeBuffer {
 	private BigDecimal wkCustTempBal;
 	private BigDecimal wkChequeAmt;
 	private String wkAcctCode;
+	private int wkBorxNo;
 	private List<AcDetail> lAcDetail;
 	private ArrayList<BaTxVo> baTxList = new ArrayList<BaTxVo>();
 	private List<LoanBorTx> lLoanBorTx = new ArrayList<LoanBorTx>();
@@ -188,7 +189,7 @@ public class L3220 extends TradeBuffer {
 		if (iTempAmt.compareTo(new BigDecimal(0)) > 0) { // 暫收款
 			if (titaVo.isHcodeNormal()) {
 				txAmlCom.setTxBuffer(this.txBuffer);
-				txAmlCom.remitOut(titaVo);
+				txAmlCom.remitOut(wkBorxNo, titaVo);
 			}
 			// 維護撥款匯款檔
 			AcPaymentRoutine();
@@ -427,7 +428,7 @@ public class L3220 extends TradeBuffer {
 
 		tLoanBorTx = new LoanBorTx();
 		tLoanBorTxId = new LoanBorTxId();
-		loanCom.setFacmBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, titaVo);
+		wkBorxNo = loanCom.setFacmBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, titaVo);
 		tLoanBorTx.setEntryDate(titaVo.getEntDyI());
 		tLoanBorTx.setTxAmt(BigDecimal.ZERO.subtract(iTempAmt));
 		// 3221 暫收款退還

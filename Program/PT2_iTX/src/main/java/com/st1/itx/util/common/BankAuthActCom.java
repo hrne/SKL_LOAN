@@ -18,13 +18,13 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AchAuthLog;
 import com.st1.itx.db.domain.AchAuthLogHistory;
-import com.st1.itx.db.domain.PostAuthLog;
-import com.st1.itx.db.domain.PostAuthLogHistory;
 import com.st1.itx.db.domain.AchAuthLogId;
 import com.st1.itx.db.domain.BankAuthAct;
 import com.st1.itx.db.domain.BankAuthActId;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
+import com.st1.itx.db.domain.PostAuthLog;
+import com.st1.itx.db.domain.PostAuthLogHistory;
 import com.st1.itx.db.domain.PostAuthLogId;
 import com.st1.itx.db.domain.RepayActChangeLog;
 import com.st1.itx.db.domain.TxToDoDetail;
@@ -598,6 +598,12 @@ public class BankAuthActCom extends TradeBuffer {
 		tPostAuthLogId.setPostDepCode(titaVo.getParam("PostDepCode"));
 		tPostAuthLogId.setRepayAcct(titaVo.getParam("RepayAcct"));
 		tPostAuthLogId.setAuthCode(authCode);
+		String authCodeX = "";
+		if ("1".equals(authCode)) {
+			authCodeX = "期款";
+		} else {
+			authCodeX = "火險";
+		}
 		PostAuthLog tPostAuthLog = postAuthLogService.holdById(tPostAuthLogId, titaVo);
 		if (tPostAuthLog == null) {
 			throw new LogicException("E0015", "此筆授權資料檔找不到"); // 檢查錯誤
@@ -609,7 +615,7 @@ public class BankAuthActCom extends TradeBuffer {
 		if ("Y".equals(tPostAuthLog.getPostMediaCode())) {
 			throw new LogicException("E0015", "已提出授權，不可變動"); // 檢查錯誤
 		}
-
+		PostAuthLog beforePostAuthLog = (PostAuthLog) datalog.clone(tPostAuthLog);
 		tPostAuthLog.setCustId(iCustId);
 		tPostAuthLog.setLimitAmt(iLimitAmt);
 		tPostAuthLog.setRelationCode(iRelationCode);
@@ -617,12 +623,14 @@ public class BankAuthActCom extends TradeBuffer {
 		tPostAuthLog.setRelationId(iRelationId);
 		tPostAuthLog.setRelAcctBirthday(parse.stringToInteger(iRelAcctBirthday));
 		tPostAuthLog.setRelAcctGender(iRelAcctGender);
-
 		try {
-			postAuthLogService.update(tPostAuthLog, titaVo);
+			tPostAuthLog = postAuthLogService.update2(tPostAuthLog, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 		}
+
+		datalog.setEnv(titaVo, beforePostAuthLog, tPostAuthLog);
+		datalog.exec("修改郵局授權檔-" + authCodeX);
 	}
 
 	private void updateAch(TitaVo titaVo) throws LogicException {
@@ -646,19 +654,21 @@ public class BankAuthActCom extends TradeBuffer {
 		if ("Y".equals(tAchAuthLog.getMediaCode())) {
 			throw new LogicException("E0015", "已提出授權，不可變動"); // 檢查錯誤
 		}
-
+		AchAuthLog beforeAchAuthLog = (AchAuthLog) datalog.clone(tAchAuthLog);
 		tAchAuthLog.setLimitAmt(iLimitAmt);
 		tAchAuthLog.setRelationCode(iRelationCode);
 		tAchAuthLog.setRelAcctName(iRelAcctName);
 		tAchAuthLog.setRelationId(iRelationId);
 		tAchAuthLog.setRelAcctBirthday(parse.stringToInteger(iRelAcctBirthday));
 		tAchAuthLog.setRelAcctGender(iRelAcctGender);
-
 		try {
-			achAuthLogService.update(tAchAuthLog, titaVo);
+			tAchAuthLog = achAuthLogService.update2(tAchAuthLog, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007", "AchAuthLog:" + e.getErrorMsg());
 		}
+
+		datalog.setEnv(titaVo, beforeAchAuthLog, tAchAuthLog);
+		datalog.exec("修改ACH授權檔");
 	}
 
 	/**
@@ -938,7 +948,6 @@ public class BankAuthActCom extends TradeBuffer {
 					&& tFacMain.getUtilAmt().compareTo(BigDecimal.ZERO) > 0) {
 				throw new LogicException(titaVo, "E0015", "額度(" + t.getFacmNo() + ")使用中，不允許刪除"); // 檢查錯誤
 			}
-
 		}
 		this.isNewLog = true;
 		if ("700".equals(iRepayBank)) {
@@ -1063,6 +1072,15 @@ public class BankAuthActCom extends TradeBuffer {
 		}
 	}
 
+	/**
+	 * 刪除郵局授權檔
+	 * 
+	 * @param authApplCode 申請代號，狀態碼1:申請 2:終止 3:郵局終止 4:誤終止 9:暫停授權(DeleteDate &gt;
+	 *                     0時，顯示用)
+	 * @param authCode     1:期款 2:火險
+	 * @param titaVo       TitaVo ..
+	 * @throws LogicException
+	 */
 	private void deletePostAuthLog(String authApplCode, String authCode, TitaVo titaVo) throws LogicException {
 		this.info("deletePostAuthLog ... ");
 		PostAuthLog tPostAuthLog = postAuthLogService.repayAcctFirst(iCustNo, iPostDepCode, iRepayAcct, authCode,
@@ -1078,8 +1096,18 @@ public class BankAuthActCom extends TradeBuffer {
 		if (!authApplCode.equals(tPostAuthLog.getAuthApplCode())) {
 			throw new LogicException("E0015", "最後一筆授權資料記號不符" + authApplCode + "/" + tPostAuthLog.getAuthApplCode()); // 檢查錯誤
 		}
+
+		String authCodeX = "";
+		if ("1".equals(authCode)) {
+			authCodeX = "期款";
+		} else {
+			authCodeX = "火險";
+		}
 		postAuthLogService.holdById(tPostAuthLog, titaVo);
 		try {
+
+			datalog.setEnv(titaVo, tPostAuthLog, tPostAuthLog);
+			datalog.exec("刪除郵局授權檔-" + authCodeX);
 			postAuthLogService.delete(tPostAuthLog, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0006", e.getErrorMsg());
@@ -1103,6 +1131,8 @@ public class BankAuthActCom extends TradeBuffer {
 		}
 		achAuthLogService.holdById(tAchAuthLog, titaVo);
 		try {
+			datalog.setEnv(titaVo, tAchAuthLog, tAchAuthLog);
+			datalog.exec("刪除ACH授權檔");
 			achAuthLogService.delete(tAchAuthLog, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0006", e.getErrorMsg());

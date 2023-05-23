@@ -308,6 +308,9 @@ public class AcPaymentCom extends TradeBuffer {
 			tBankRemit.setBatchNo(batchNo);
 			tBankRemit.setStatusCode(0); // 正常
 			tBankRemit.setActFg(titaVo.getActFgI());
+			if ("L3220".equals(titaVo.getTxcd())) {
+				tBankRemit.setAmlRsp("0");
+			}
 			isInsert = true;
 		}
 
@@ -373,7 +376,7 @@ public class AcPaymentCom extends TradeBuffer {
 		}
 
 		// 放行更新AML回應碼
-		if (titaVo.isHcodeNormal() && titaVo.isActfgRelease()) {
+		if (titaVo.isHcodeNormal() && titaVo.isActfgSuprele()) {
 			// AML@交易序號：前兩碼03+會計日期+交易序號
 			String transactionId = "03" + "-" + (tBankRemit.getAcDate() + 19110000) + "-";
 			if (titaVo.isActfgSuprele()) {

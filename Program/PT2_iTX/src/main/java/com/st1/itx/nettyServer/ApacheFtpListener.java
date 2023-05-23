@@ -17,14 +17,17 @@ public class ApacheFtpListener implements ServletContextListener {
 
     //容器關閉時調用方法stop ftpServer
     public void contextDestroyed(ServletContextEvent sce) {
-        apacheFtpServer.stop();
+        /*
+    	apacheFtpServer.stop();
         sce.getServletContext().removeAttribute(SERVER_NAME);
         logger.info("Apache Ftp server is stoped!");
+        */
     }
 
     //容器初始化調用方法start ftpServer
     public void contextInitialized(ServletContextEvent sce) {
-        apacheFtpServer = (ApacheFtpServer) MySpring.getBean("apacheFtpServer");
+        /*
+    	apacheFtpServer = (ApacheFtpServer) MySpring.getBean("apacheFtpServer");
 
         sce.getServletContext().setAttribute(SERVER_NAME, apacheFtpServer);
         try {
@@ -34,6 +37,7 @@ public class ApacheFtpListener implements ServletContextListener {
             e.printStackTrace();
             throw new RuntimeException("Apache Ftp server start failed!", e);
         }
+        */
     }
 
 }

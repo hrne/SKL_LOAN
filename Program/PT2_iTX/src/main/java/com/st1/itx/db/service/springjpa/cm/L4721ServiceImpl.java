@@ -78,8 +78,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           ,\"RateCode\"                           ";
 		sql += "           ,row_number() over (partition by \"CustNo\", \"FacmNo\", \"BormNo\" order by \"EffectDate\" Desc) as \"seq\" ";
 		sql += "           from \"LoanRateChange\" rb                          ";
-		sql += "  		   where \"EffectDate\" >=" + sDate;
-		sql += "   			 and \"EffectDate\" <=" + eDate;
+		sql += "  		   where \"EffectDate\" <=" + eDate;
 		sql += "        ) r2            on  r2.\"CustNo\" = r.\"CustNo\"        ";
 		sql += "                       and  r2.\"FacmNo\" = r.\"FacmNo\"        ";
 		sql += "                       and  r2.\"BormNo\" = r.\"BormNo\"        ";
@@ -239,8 +238,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           ,\"EffectDate\"                           ";
 		sql += "           ,row_number() over (partition by \"CustNo\", \"FacmNo\", \"BormNo\" order by \"EffectDate\" Desc) as \"seq\" ";
 		sql += "           from \"LoanRateChange\" rb                          ";
-		sql += "  		   where \"EffectDate\" >=" + sDate;
-		sql += "   			 and \"EffectDate\" <=" + eDate;
+		sql += "  		   where \"EffectDate\" <=" + eDate;
 		sql += "        ) r2            on  r2.\"CustNo\" = r.\"CustNo\"        ";
 		sql += "                       and  r2.\"FacmNo\" = r.\"FacmNo\"        ";
 		sql += "                       and  r2.\"BormNo\" = r.\"BormNo\"        ";
@@ -362,8 +360,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           ,\"EffectDate\"                           ";
 		sql += "           ,row_number() over (partition by \"CustNo\", \"FacmNo\", \"BormNo\" order by \"EffectDate\" Desc) as \"seq\" ";
 		sql += "           from \"LoanRateChange\" rb                          ";
-		sql += "  		   where \"EffectDate\" >=" + sDate;
-		sql += "   			 and \"EffectDate\" <=" + eDate;
+		sql += "  		   where \"EffectDate\" <=" + eDate;
 		sql += "        ) r2            on  r2.\"CustNo\" = r.\"CustNo\"        ";
 		sql += "                       and  r2.\"FacmNo\" = r.\"FacmNo\"        ";
 		sql += "                       and  r2.\"BormNo\" = r.\"BormNo\"        ";

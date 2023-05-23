@@ -308,8 +308,10 @@ public class L4211Report extends MakeReport {
 		this.info("txCode=" + txCode);
 		this.info("reportName" + reportName);
 
+		String reconCode = titaVo.get("ReconCode");
+
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getBrno())
-				.setRptCode(txCode).setRptItem(reportName).setRptSize("A4").setPageOrientation("L").build();
+				.setRptCode(txCode).setRptItem(reportName + reconCode).setRptSize("A4").setPageOrientation("L").build();
 
 //		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txCode, reportName, "", "A4", "L");
 
@@ -453,11 +455,8 @@ public class L4211Report extends MakeReport {
 
 				// 頁面設置配置
 				String A17 = tfnAllList.get("ReconCode");
-				if (A17.equals("P03")) {
-					this.print(-3, this.getMidXAxis() + 11, "A7", "C");
-				} else {
-					this.print(-3, this.getMidXAxis() + 11, A17, "C");// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
-				}
+
+				this.print(-3, this.getMidXAxis() + 11, A17, "C");// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
 				this.print(-5, 15, tfnAllList.get("BatchNo"));// 批次號碼(表頭)
 				this.print(-8, 0, "");
 
@@ -517,12 +516,8 @@ public class L4211Report extends MakeReport {
 					this.print(pageIndex - pageCnt - 2, this.getMidXAxis(), "=====續下頁=====", "C");
 					pageCnt = 0;
 					newPage();
-					if (tfnAllList.get("ReconCode").equals("P03")) {
-						this.print(-3, this.getMidXAxis() + 11, "A7", "C");
-					} else {
-						this.print(-3, this.getMidXAxis() + 11, tfnAllList.get("ReconCode"), "C");// 存摺代號(表頭)A1~A7
-																									// (P03銀行存款－新光匯款轉帳)
-					}
+					this.print(-3, this.getMidXAxis() + 11, tfnAllList.get("ReconCode"), "C");// 存摺代號(表頭)A1~A7
+																								// (P03銀行存款－新光匯款轉帳)
 					this.print(-5, 15, tfnAllList.get("BatchNo"));// 批次號碼(表頭)
 					this.print(-8, 0, "");
 
@@ -810,11 +805,8 @@ public class L4211Report extends MakeReport {
 				// 頁面設置配置
 
 				String A17 = tfnAllList.get("ReconCode");
-				if (A17.equals("P03")) {
-					this.print(-3, this.getMidXAxis() + 18, "A7", "C");
-				} else {
-					this.print(-3, this.getMidXAxis() + 18, A17, "C");// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
-				}
+
+				this.print(-3, this.getMidXAxis() + 18, A17, "C");// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
 				this.print(-5, 15, tfnAllList.get("BatchNo"));// 批次號碼(表頭)
 				this.print(-8, 0, "");
 
@@ -874,12 +866,9 @@ public class L4211Report extends MakeReport {
 					this.print(pageIndex - pageCnt - 2, this.getMidXAxis(), "=====續下頁=====", "C");
 					pageCnt = 0;
 					newPage();
-					if (tfnAllList.get("ReconCode").equals("P03")) {
-						this.print(-3, this.getMidXAxis() + 18, "A7", "C");
-					} else {
-						this.print(-3, this.getMidXAxis() + 18, tfnAllList.get("ReconCode"), "C");// 存摺代號(表頭)A1~A7
-																									// (P03銀行存款－新光匯款轉帳)
-					}
+
+					this.print(-3, this.getMidXAxis() + 18, tfnAllList.get("ReconCode"), "C");// 存摺代號(表頭)A1~A7
+																								// (P03銀行存款－新光匯款轉帳)
 					this.print(-5, 15, tfnAllList.get("BatchNo"));// 批次號碼(表頭)
 					this.print(-8, 0, "");
 				}
@@ -1165,11 +1154,7 @@ public class L4211Report extends MakeReport {
 				// 頁面設置配置
 
 				String A17 = tfnAllList.get("ReconCode");
-				if (A17.equals("P03")) {
-					this.print(-3, this.getMidXAxis() + 16, "A7", "C");
-				} else {
-					this.print(-3, this.getMidXAxis() + 16, A17, "C");// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
-				}
+				this.print(-3, this.getMidXAxis() + 16, A17, "C");// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
 				this.print(-5, 15, tfnAllList.get("BatchNo"));// 批次號碼(表頭)
 				this.print(-8, 0, "");
 
@@ -1229,12 +1214,9 @@ public class L4211Report extends MakeReport {
 					this.print(pageIndex - pageCnt - 2, this.getMidXAxis(), "=====續下頁=====", "C");
 					pageCnt = 0;
 					newPage();
-					if (tfnAllList.get("ReconCode").equals("P03")) {
-						this.print(-3, this.getMidXAxis() + 16, "A7", "C");
-					} else {
-						this.print(-3, this.getMidXAxis() + 16, tfnAllList.get("ReconCode"), "C");// 存摺代號(表頭)A1~A7
-																									// (P03銀行存款－新光匯款轉帳)
-					}
+
+					this.print(-3, this.getMidXAxis() + 16, tfnAllList.get("ReconCode"), "C");// 存摺代號(表頭)A1~A7
+																								// (P03銀行存款－新光匯款轉帳)
 					this.print(-5, 15, tfnAllList.get("BatchNo"));// 批次號碼(表頭)
 					this.print(-8, 0, "");
 				}

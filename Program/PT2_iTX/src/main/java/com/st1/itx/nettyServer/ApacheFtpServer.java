@@ -32,13 +32,13 @@ public class ApacheFtpServer {
 
     protected FtpServer server;
     
-    @Value("${iTXftpPort}")
+//    @Value("${iTXftpPort}")
     private String ftpPort;
 
-    @Value("${itx_Config}")
+//    @Value("${iTXConfig}")
     private String itxResource;
 
-    @PostConstruct
+//    @PostConstruct
     public void initFtp() throws IOException {
         FtpServerFactory serverFactory = new FtpServerFactory();
         ListenerFactory listenerFactory = new ListenerFactory();

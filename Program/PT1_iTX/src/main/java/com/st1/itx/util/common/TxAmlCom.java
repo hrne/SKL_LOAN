@@ -38,7 +38,7 @@ import com.st1.itx.util.parse.Parse;
 //        2.檢核或確認通過，主管才能放行或駁回
 //        3.確認未過，需訂正
 //        4.檢核或確認通過但主管駁回，可修正後，重跑流程
-//      B.remitOut 撥款匯款 (暫收款退還、預約撥款到期 ) Call by 1.L3220 暫收款退還 2.L3100 預約撥款到期
+//      B.remitOut 撥款匯款 (暫收款退還 ) Call by L3220 暫收款退還 
 //        1.經辦交易送AML檢核
 //        2.檢核或確認通過，交易成功
 // 
@@ -150,8 +150,6 @@ public class TxAmlCom extends TradeBuffer {
 				// AML@交易序號：前兩碼03+會計日期+交易序號
 				checkAmlVo.setTransactionId("03" + "-" + (titaVo.getEntDyI() + 19110000) + "-" + titaVo.getOrgTxSeq());
 				remitRp(checkAmlVo, titaVo);
-			} else if ("L3110".equals(titaVo.getTxcd())) {
-				remitL3110(checkAmlVo, titaVo);
 			} else {
 			}
 		}
@@ -182,14 +180,22 @@ public class TxAmlCom extends TradeBuffer {
 	/**
 	 * 撥款匯款 Call By L3220 暫收款退還
 	 * 
+	 * @param borxNo 交易內容檔序號
 	 * @param titaVo TitaVo
 	 * @throws LogicException Exception
 	 */
-	public void remitOut(TitaVo titaVo) throws LogicException {
+	/**
+	 * 
+	 * @param borxNo
+	 * @param titaVo
+	 * @throws LogicException
+	 */
+	public void remitOut(int borxNo, TitaVo titaVo) throws LogicException {
 		this.info("TxAmlCom.remit .....");
 		CheckAmlVo checkAmlVo = new CheckAmlVo();
-		// AML@交易序號：前兩碼03+會計日期+交易序號
-		checkAmlVo.setTransactionId("03" + "-" + (titaVo.getEntDyI() + 19110000) + "-" + titaVo.getTxSeq());
+		// AML@交易序號：前兩碼03+會計日期+MRKey(戶號+額度)+交易內容檔序號
+		checkAmlVo.setTransactionId("03" + "-" + (titaVo.getEntDyI() + 19110000) + "-" + titaVo.getMrKey() + "-"
+				+ parse.IntegerToString(borxNo, 3));
 		remitRp(checkAmlVo, titaVo);
 	}
 
@@ -239,6 +245,7 @@ public class TxAmlCom extends TradeBuffer {
 						else
 							checkAmlVo.setBirthEstDt("0" + titaVo.getParam("RemitBirthday")); // 出生日期
 					}
+					checkAmlVo.setRefNo(parse.IntegerToString(custNo, 7)); // 相關編號
 					checkAmlVo.setAcctNo(titaVo.getMrKey()); // 放款案號：戶號-額度-撥款
 					checkAmlVo.setCaseNo(titaVo.getBacthNo()); // 案號：整批批號(ex.LNnnnn)
 					// AML檢核
@@ -248,39 +255,6 @@ public class TxAmlCom extends TradeBuffer {
 				}
 			}
 		}
-		return checkAmlVo;
-	}
-
-	/*---------- 預約撥款 ----------*/
-	private CheckAmlVo remitL3110(CheckAmlVo checkAmlVo, TitaVo titaVo) throws LogicException {
-		this.info("TxAmlCom.remitL3110 .....");
-// 處理同remitRp
-		// AML@交易序號：前兩碼03+會計日期+交易序號
-		checkAmlVo.setTransactionId("03" + "-" + (titaVo.getEntDyI() + 19110000) + "-" + titaVo.getOrgTxSeq());
-		// 保單角色： 4.借款人/7.轉帳委託人(BY 匯款帳號)
-		custNo = parse.stringToInteger(titaVo.getMrKey().substring(0, 7));
-		tCustMain = custMainService.custNoFirst(custNo, custNo, titaVo);
-		if (titaVo.getParam("CompensateAcct").equals(tCustMain.getCustName())) {
-			checkAmlVo.setRoleId("4");
-			custMainMove(tCustMain, checkAmlVo, titaVo);
-		} else {
-			checkAmlVo.setRoleId("7");
-			checkAmlVo.setName(titaVo.getParam("CompensateAcct"));// 姓名：戶名
-			checkAmlVo.setIdentityCd(titaVo.getParam("RemitIdKind")); // 身份別 1:自然人 2:法人
-			checkAmlVo.setCustKey(titaVo.getParam("RemitId")); // 身份證ID/居留證號碼
-			checkAmlVo.setSex(titaVo.getParam("RemitGender")); // 性別
-			if (parse.stringToInteger(titaVo.getParam("RemitBirthday")) == 0)
-				checkAmlVo.setBirthEstDt(""); // 出生日期
-			else
-				checkAmlVo.setBirthEstDt("0" + titaVo.getParam("RemitBirthday")); // 出生日期
-		}
-		checkAmlVo.setAcctNo(titaVo.getMrKey()); // 放款案號：戶號-額度-撥款
-		checkAmlVo.setCaseNo("L3110"); // 案號：L3110
-		// AML檢核
-		checkAmlVo = amlLogCheck(checkAmlVo, titaVo);
-		// AML檢核回應訊息
-		amlCheckRsp(checkAmlVo, titaVo);
-
 		return checkAmlVo;
 	}
 
@@ -313,6 +287,7 @@ public class TxAmlCom extends TradeBuffer {
 		// AML@交易序號 ：03+戶號(7)+扣款銀行(3)+扣款帳號(14)
 		checkAmlVo.setTransactionId("03-" + parse.IntegerToString(tAchAuthLog.getCustNo(), 7) + "-"
 				+ tAchAuthLog.getRepayBank() + "-" + tAchAuthLog.getRepayAcct() + "-" + titaVo.getCalDy());
+		checkAmlVo.setRefNo(parse.IntegerToString(tAchAuthLog.getCustNo(), 7)); // 相關編號
 		checkAmlVo.setAcctNo(tAchAuthLog.getCustNo() + "-" + tAchAuthLog.getFacmNo()); // 放款案號：戶號-額度
 		checkAmlVo.setCaseNo("AUTH"); // 案號：AUTH
 		// 保單角色： 4.借款人/7.轉帳委託人
@@ -381,6 +356,7 @@ public class TxAmlCom extends TradeBuffer {
 				+ tPostAuthLog.getPostDepCode() + "-" + tPostAuthLog.getRepayAcct() + "-" + titaVo.getCalDy());
 		checkAmlVo.setUnit("10HC00"); // 查詢單位：10HC00
 		checkAmlVo.setAcceptanceUnit(""); // 代辦單位：space
+		checkAmlVo.setRefNo(parse.IntegerToString(tPostAuthLog.getCustNo(), 7)); // 相關編號
 		checkAmlVo.setAcctNo(tPostAuthLog.getCustNo() + "-" + tPostAuthLog.getFacmNo()); // 放款案號：戶號-額度
 		checkAmlVo.setCaseNo("AUTH"); // 案號：AUTH
 		// 保單角色： 4.借款人/7.轉帳委託人
@@ -447,6 +423,7 @@ public class TxAmlCom extends TradeBuffer {
 		// AML@交易序號： 03+戶號(7)+扣款銀行(3)+郵局帳戶別(1)+扣款帳號(14)
 		checkAmlVo.setTransactionId("03" + tBankDeductDtl.getCustNo() + tBankDeductDtl.getRepayBank()
 				+ tBankDeductDtl.getPostCode() + tBankDeductDtl.getRepayAcctNo());
+		checkAmlVo.setRefNo(parse.IntegerToString(tBankDeductDtl.getCustNo(), 7)); // 相關編號
 		checkAmlVo.setAcctNo(tBankDeductDtl.getCustNo() + "-" + tBankDeductDtl.getFacmNo()); // 放款案號：戶號-額度
 		checkAmlVo.setCaseNo("DEDUCT"); // 案號：DEDUCT
 		// 保單角色： 4.借款人/7.轉帳委託人

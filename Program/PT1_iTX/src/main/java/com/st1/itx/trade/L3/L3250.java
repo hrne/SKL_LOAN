@@ -34,6 +34,7 @@ import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
 /*
@@ -348,7 +349,11 @@ public class L3250 extends TradeBuffer {
 					}
 					ac.setCustNo(tInsuRenew.getCustNo());// 戶號+額度
 					ac.setFacmNo(tInsuRenew.getFacmNo());
-					ac.setRvNo(tInsuRenew.getPrevInsuNo()); // 銷帳編號
+					if (tInsuRenew.getEndoInsuNo().trim().isEmpty()) {
+						ac.setRvNo(tInsuRenew.getPrevInsuNo()); // 銷帳編號
+					} else {
+						ac.setRvNo(FormatUtil.padX(tInsuRenew.getPrevInsuNo(), 17) + tInsuRenew.getEndoInsuNo()); // 銷帳編號(17)+批單號碼(n)
+					}
 					TempVo tTempVo = new TempVo();
 					tTempVo.clear();
 					tTempVo.putParam("OpenAcDate", tInsuRenew.getInsuStartDate());

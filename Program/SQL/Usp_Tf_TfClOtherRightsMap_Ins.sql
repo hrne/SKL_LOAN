@@ -49,8 +49,8 @@ BEGIN
         LEFT JOIN LA$APLP A ON A.GDRID1 = G.GDRID1
                            AND A.GDRID2 = G.GDRID2
                            AND A.GDRNUM = G.GDRNUM
-        WHERE CNM."ClCode1" != 0
-          AND CNM."TfStatus" IN ('1','3')
+        WHERE CNM."ClCode1" IN (1,2)
+          AND CNM."TfStatus" IN ('1','2','3')
           AND NVL(A.LMSACN,0) != 0
           AND NVL(A.LMSAPN,0) != 0
     )

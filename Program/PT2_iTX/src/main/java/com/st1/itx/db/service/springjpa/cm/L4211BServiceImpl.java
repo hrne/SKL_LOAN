@@ -42,9 +42,7 @@ public class L4211BServiceImpl extends ASpringJpaParm implements InitializingBea
 
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 		inputReconCode = String.valueOf(titaVo.get("ReconCode")).trim();
-		if (inputReconCode.equals("A7")) {
-			inputReconCode = "P03";
-		}
+
 		iENTDY = Integer.valueOf(titaVo.get("EntryDate")) + 19110000;
 
 		this.info("ReconCode     = " + inputReconCode);
@@ -78,6 +76,7 @@ public class L4211BServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "                       AND BATX.\"CustNo\" <> 0 ";
 		sql += " WHERE BATX.\"RepayCode\" = '01' ";
 		sql += "  AND BATX.\"EntryDate\" = :iENTDY ";
+		sql += "  AND BATX.\"ProcStsCode\" = '1' ";
 		sql += " AND CASE";
 		sql += "       WHEN NVL(TRIM( :inputReconCode ),' ') != ' ' ";// 輸入空白時查全部
 		sql += "       THEN :inputReconCode";
