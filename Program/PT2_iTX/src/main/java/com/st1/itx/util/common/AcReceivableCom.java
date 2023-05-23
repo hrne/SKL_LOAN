@@ -696,7 +696,7 @@ public class AcReceivableCom extends TradeBuffer {
 				throw new LogicException(titaVo, "E6003",
 						"銷帳金額與總保費不符 " + ac.getTxAmt() + "/" + tInsuRenew.getTotInsuPrem());
 			}
-			if (AcHCode == 0) {
+			if (tAcReceivable.getClsFlag() == 1) {
 				tInsuRenew.setAcDate(bizTbsdy); // 1-已銷
 				tInsuRenew.setTitaTlrNo(titaVo.getTlrNo());
 				tInsuRenew.setTitaTxtNo(titaVo.getTxtNo());

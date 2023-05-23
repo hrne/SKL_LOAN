@@ -171,15 +171,19 @@ public class L9136Report extends MakeReport {
 					continue;
 				}
 
+				String item = "";
+				String oldContent = "";
+				String newContent = "";
+
 				for (int i = 0; i < tmp1.size(); i++) {
 					for (int j = 0; j < tmpWord.size(); j++) {
 						// 排除不需要的顯示的字串
 						// 因顯示出來的字串有包含雙引號所以把雙引號移除
 						if (tmp1.get(i).toString().replace("\"", "").indexOf(tmpWord.get(j).toString()) == 0) {
 
-							String item = tmp1.get(i).replace("\"", "");
-							String oldContent = tmp2.get(i).replace("\"", "");
-							String newContent = tmp3.get(i).replace("\"", "");
+							item = tmp1.get(i).replace("\"", "");
+							oldContent = tmp2.get(i).replace("\"", "");
+							newContent = tmp3.get(i).replace("\"", "");
 
 							// 全空白排除
 							if (item.trim().length() == 0 && oldContent.trim().length() == 0
@@ -210,9 +214,9 @@ public class L9136Report extends MakeReport {
 					// 排除空值的資料
 					if (tmp1.get(i).length() != 0) {
 
-						String item = tmp1.get(i);
-						String oldContent = tmp2.get(i);
-						String newContent = tmp3.get(i);
+						item = tmp1.get(i).replace("\"", "");
+						oldContent = tmp2.get(i).replace("\"", "");
+						newContent = tmp3.get(i).replace("\"", "");
 
 						report(r, item, oldContent, newContent, this.dataSource);
 					}
@@ -222,9 +226,8 @@ public class L9136Report extends MakeReport {
 					// 超過40行 換新頁
 					if (this.NowRow >= 40) {
 
-						this.print(2, this.getMidXAxis(), this.nextPageText, "C");
-						
 						if (k != tmp1.size()) {
+							this.print(2, this.getMidXAxis(), this.nextPageText, "C");
 							this.newPage();
 						}
 
