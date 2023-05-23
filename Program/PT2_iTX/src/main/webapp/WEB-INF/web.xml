@@ -15,8 +15,7 @@
 	<!-- set new logbackConfig -->
 	<listener>
 		<listener-class>com.st1.itx.config.SetLogBackConfig</listener-class>
-	</listener> 
-   
+	</listener>    
     
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>

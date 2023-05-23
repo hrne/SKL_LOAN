@@ -2,8 +2,6 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import com.st1.itx.util.StaticTool;
@@ -20,7 +18,12 @@ import com.st1.itx.Exception.LogicException;
 public class PfCoOfficerId implements Serializable {
 
 
-  // 員工代號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3111757480554158020L;
+
+// 員工代號
   @Column(name = "`EmpNo`", length = 6)
   private String empNo = " ";
 

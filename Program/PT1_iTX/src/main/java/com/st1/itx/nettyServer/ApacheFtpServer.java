@@ -31,6 +31,9 @@ public class ApacheFtpServer {
     private DataSource dataSource;
 
     protected FtpServer server;
+    
+    @Value("${iTXftpPort}")
+    private String ftpPort;
 
     @Value("${itx_Config}")
     private String itxResource;
@@ -40,7 +43,7 @@ public class ApacheFtpServer {
         FtpServerFactory serverFactory = new FtpServerFactory();
         ListenerFactory listenerFactory = new ListenerFactory();
 
-        listenerFactory.setPort(3131);
+        listenerFactory.setPort(Integer.parseInt(ftpPort));
 
         DataConnectionConfigurationFactory dataConnectionConfFactory = new DataConnectionConfigurationFactory();
         dataConnectionConfFactory.setPassivePorts("10000-10500");

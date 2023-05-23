@@ -2,7 +2,6 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -30,7 +29,12 @@ import com.st1.itx.Exception.LogicException;
 public class PfIntranetAdjust implements Serializable {
 
 
-  // 序號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4642824795348552655L;
+
+// 序號
   @Id
   @Column(name = "`LogNo`")
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "`PfIntranetAdjust_SEQ`")

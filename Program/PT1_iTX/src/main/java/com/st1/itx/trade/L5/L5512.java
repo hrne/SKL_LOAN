@@ -2,8 +2,6 @@ package com.st1.itx.trade.L5;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -15,17 +13,10 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdWorkMonth;
 import com.st1.itx.db.domain.CdWorkMonthId;
 import com.st1.itx.db.domain.TxControl;
-import com.st1.itx.db.service.CdBonusService;
-import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CdWorkMonthService;
-import com.st1.itx.db.service.PfItDetailService;
-import com.st1.itx.db.service.PfRewardService;
 import com.st1.itx.db.service.TxControlService;
-import com.st1.itx.db.service.springjpa.cm.L5051ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
-import com.st1.itx.util.common.MakeFile;
-import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.parse.Parse;
 /**
  * Tita<br>
