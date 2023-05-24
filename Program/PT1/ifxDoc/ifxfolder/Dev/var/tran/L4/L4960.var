@@ -278,6 +278,8 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L4611; ntxbuf=#OOBUFB_M}))
 #OOBTNA=A,2,O
 IF(#OOInsuEndDate<#date,BIND(grid,cancel),$)
 IF(#OOInsuEndDate<#date,s,$)
+C(3,#OOStatusCode,1,BIND(grid,cancel),$)
+C(3,#OOStatusCode,1,s,$)
 C(3,#OOBtnFlag,1,$,BIND(grid,cancel))
 C(3,#OOBtnFlag,1,$,s)
 C(4,#OOEndoInsuNo,$,BIND(grid,cancel))

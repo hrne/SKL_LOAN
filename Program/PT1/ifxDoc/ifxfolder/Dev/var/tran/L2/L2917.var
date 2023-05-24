@@ -108,6 +108,11 @@ T(4,CHAIN$)
 
 #NTXBUF=X,200,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@CustNo,#NTXBUF,1,7)
+T(1,@FacmNo,#NTXBUF,8,3)
+T(1,@ClCode1,#NTXBUF,11,1)
+T(1,@ClCode2,#NTXBUF,12,2)
+T(1,@ClNo,#NTXBUF,14,7)
 
 
 
@@ -177,6 +182,8 @@ IF(#CustNo > 0,S,$)
 C(3,#ClCode1,0,S,$)
 
 
+#CheinXmt=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 
 
 #RPTFG=A,1,S

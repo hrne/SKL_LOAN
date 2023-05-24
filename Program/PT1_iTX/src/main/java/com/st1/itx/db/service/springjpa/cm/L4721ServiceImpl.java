@@ -63,6 +63,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           ,\"EffectDate\"                           ";
 		sql += "           ,\"RateCode\"                           ";
 		sql += "           ,\"ProdNo\"                           ";
+		sql += "           ,\"BaseRateCode\"                           ";
 		sql += "           ,row_number() over (partition by \"CustNo\", \"FacmNo\", \"BormNo\" order by \"EffectDate\" Desc) as \"seq\" ";
 		sql += "           from \"LoanRateChange\"                           ";
 		sql += "  		   where \"EffectDate\" >=" + sDate;

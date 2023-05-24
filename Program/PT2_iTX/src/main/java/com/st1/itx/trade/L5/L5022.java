@@ -14,7 +14,6 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdEmp;
-import com.st1.itx.db.domain.PfCoOfficer;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.PfCoOfficerService;
 import com.st1.itx.db.service.springjpa.cm.L5022ServiceImpl;
@@ -46,14 +45,13 @@ public class L5022 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 		String iEmpNo = titaVo.getParam("EmpNo");
 		int cDate = Integer.valueOf(titaVo.getEntDy()) + 19110000;
-		int iEffectiveDateS = Integer.valueOf(titaVo.getParam("EffectiveDateS")) + 19110000;
+		Integer.valueOf(titaVo.getParam("EffectiveDateS"));
 		int iEffectiveDateE = Integer.valueOf(titaVo.getParam("EffectiveDateE")) + 19110000;
 		String iStatusFg = titaVo.getParam("StatusFlag");
 
 		this.info("cDate=" + cDate);
 		List<Map<String, String>> iL5022SqlReturn = new ArrayList<Map<String, String>>();
-		Slice<PfCoOfficer> sPfCoOfficer = null;
-		CdEmp iCdEmp = new CdEmp();
+		new CdEmp();
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		 */
@@ -80,29 +78,63 @@ public class L5022 extends TradeBuffer {
 		String rEmpNo = "";
 		String rStatusFg = "";
 		int reCount = 0;
+		String iCent ="";
+		int iQuitDate =0;
+		CdEmp iCd = iCdEmpService.findById(iEmpNo, titaVo);
+		if(iCd != null) {
+			iCent = iCd.getCenterCode();
+			iQuitDate = iCd.getQuitDate();
+		}else {
+			iCent = "";
+			iQuitDate = 0;
+		}
+		this.info("單位       =  " + iCent);
+		this.info("離職日期 =  " + iQuitDate);
+		
 		for (Map<String, String> r5022SqlReturn : iL5022SqlReturn) {
 			OccursList occursList = new OccursList();
+			String r5022EmpNo = r5022SqlReturn.get("EmpNo");
 
+			//6.如果該員工已離職但還是在有效日期區間內和單位代號與員工檔不同，該資料後面需要加上星號(*)
+
+			
 			if (!iStatusFg.trim().isEmpty()) { // 有輸入狀態
 				occursList.putParam("OOEmpNo", r5022SqlReturn.get("EmpNo"));
+				int iIneffectiveDate = Integer.valueOf(r5022SqlReturn.get("IneffectiveDate"));
+				int iEffectiveDate =  Integer.valueOf(r5022SqlReturn.get("EffectiveDate"));
+
 				if (r5022SqlReturn.get("EffectiveDate").equals("") || r5022SqlReturn.get("EffectiveDate").equals("0")) {
 					occursList.putParam("OOEffectiveDate", "");
 				} else {
-					occursList.putParam("OOEffectiveDate", Integer.valueOf(r5022SqlReturn.get("EffectiveDate")) - 19110000);
+					occursList.putParam("OOEffectiveDate", iEffectiveDate - 19110000);
 				}
 				occursList.putParam("OOEmpClass", r5022SqlReturn.get("EmpClass"));
 				occursList.putParam("OOClassPass", r5022SqlReturn.get("ClassPass"));
-				occursList.putParam("OOFullname", r5022SqlReturn.get("Fullname"));
-				occursList.putParam("OOUnitCode", r5022SqlReturn.get("AreaCode"));
+				if(iIneffectiveDate < iQuitDate && iQuitDate < iEffectiveDate ) {
+//					離職日期在有效期間內需在名字後加上*
+					occursList.putParam("OOFullname", r5022SqlReturn.get("Fullname")+"*");
+				}else {
+					occursList.putParam("OOFullname", r5022SqlReturn.get("Fullname"));
+					
+				}
+				String ixAreaCode =  r5022SqlReturn.get("AreaCode");
+				this.info("iCent      = " + iCent);
+				this.info("ixAreaCode = " + ixAreaCode);
+				if(!iCent.equals(ixAreaCode)) {
+					occursList.putParam("OOUnitCode",ixAreaCode + "*" );
+				}else {
+					occursList.putParam("OOUnitCode",ixAreaCode);
+				}
 				occursList.putParam("OODistCode", r5022SqlReturn.get("DistCode"));
 				occursList.putParam("OODeptCode", r5022SqlReturn.get("DeptCode"));
 				occursList.putParam("OOUnitCodeX", r5022SqlReturn.get("AreaItem"));
 				occursList.putParam("OODistCodeX", r5022SqlReturn.get("DistItem"));
 				occursList.putParam("OODeptCodeX", r5022SqlReturn.get("DeptItem"));
-				if (r5022SqlReturn.get("IneffectiveDate").equals("") || r5022SqlReturn.get("IneffectiveDate").equals("0")) {
+				if (r5022SqlReturn.get("IneffectiveDate").equals("29101231") || r5022SqlReturn.get("IneffectiveDate").equals("0")) {
 					occursList.putParam("OOIneffectiveDate", "");
 				} else {
-					occursList.putParam("OOIneffectiveDate", Integer.valueOf(r5022SqlReturn.get("IneffectiveDate")) - 19110000);
+
+					occursList.putParam("OOIneffectiveDate", iIneffectiveDate - 19110000);
 				}
 				rStatusFg = r5022SqlReturn.get("StatusFg");
 				if (rStatusFg.equals("1")) { // 若狀態為1:已生效，第一筆之後的狀態須改為已停用
@@ -164,6 +196,7 @@ public class L5022 extends TradeBuffer {
 					}
 				}
 				occursList.putParam("OOStatusFg", rStatusFg);
+				occursList.putParam("OOLogCount", r5022SqlReturn.get("LogCount"));
 			}
 
 			reCount++;

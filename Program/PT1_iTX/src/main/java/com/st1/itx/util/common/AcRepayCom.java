@@ -343,15 +343,18 @@ public class AcRepayCom extends TradeBuffer {
 		this.lLoanBorTx = setExcessive(this.lLoanBorTx, iBaTxList, this.lAcDetail, titaVo);
 
 		// step 7. 暫收轉額度計算並出帳
-		this.lAcDetail = tempAmtTransfer(this.lLoanBorTx, this.lAcDetail, titaVo);
-
+		if (!"L3220".equals(titaVo.getTxcd())) {
+			this.lAcDetail = tempAmtTransfer(this.lLoanBorTx, this.lAcDetail, titaVo);
+		}
 		// step 8. 設定交易內容檔序號(borxNo)、入帳順序(AcSeq)
 		int lxAcseq = 0;
 		for (LoanBorTx lx : this.lLoanBorTx) {
 			lxAcseq++;
 			lx.setAcSeq(lxAcseq);
-			if (lx.getBormNo() == 0) {
-				setFacmBorxNo(lx, titaVo);
+			if (!"L3220".equals(titaVo.getTxcd())) {
+				if (lx.getBormNo() == 0) {
+					setFacmBorxNo(lx, titaVo);
+				}
 			}
 			this.info(lx.toString());
 		}

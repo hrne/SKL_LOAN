@@ -682,9 +682,9 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WHERE CF.\"ApproveNo\" = :applNo "; // 日期大於保險迄日
 		sql += "   AND NVL(IR.\"ClNo\",0) != 0 "; // 2022-04-25 智偉增加:有串到保險單資料才顯示
 		sql += "   AND CASE WHEN FM.\"FirstDrawdownDate\" = 0  AND IR.\"InsuEndDate\" > :date THEN 1 ";
-		sql += "   	        WHEN IR.\"InsuEndDate\" > FM.\"FirstDrawdownDate\"  THEN 1 ";
+		sql += "   	        WHEN FM.\"FirstDrawdownDate\" > 0 AND IR.\"InsuEndDate\" > FM.\"FirstDrawdownDate\"  THEN 1 ";
 		sql += "   	        ELSE 0  END  = 1 ";
-		sql += "   ORDER BY \"NowInsuNo\"  ASC ";
+		sql += "   ORDER BY \"InsuEndDate\"  DESC ";
 
 		this.info("sql=" + sql);
 		Query query;
@@ -693,7 +693,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setParameter("applNo", applNo);
 		query.setParameter("date", dateUtil.getNowIntegerForBC());
-		this.info("date =" + titaVo.getEntdd());
+		this.info("date =" + dateUtil.getNowIntegerForBC());
 
 		return this.convertToMap(query);
 	}

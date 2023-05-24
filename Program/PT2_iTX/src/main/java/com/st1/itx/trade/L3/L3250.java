@@ -111,7 +111,7 @@ public class L3250 extends TradeBuffer {
 	private int wkFacmNo = 0;
 
 	// work area
-	private AcDetail acDetail;
+//	private AcDetail acDetail;
 	private List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 	private ArrayList<BaTxVo> baTxList = new ArrayList<BaTxVo>();
 	private TempVo tTempVo = new TempVo();
@@ -229,7 +229,7 @@ public class L3250 extends TradeBuffer {
 
 	private void addAcDetail(AcDetail ac) throws LogicException {
 		boolean isRvFee = false;
-		acDetail = new AcDetail();
+		AcDetail acDetail = new AcDetail();
 		if ("D".equals(ac.getDbCr())) {
 			acDetail.setDbCr("C");
 		} else {
@@ -325,10 +325,10 @@ public class L3250 extends TradeBuffer {
 		Slice<InsuRenew> slInsuRenew = insuRenewService.findCustEq(iCustNo, 0, Integer.MAX_VALUE, titaVo);
 		if (slInsuRenew != null) {
 			for (InsuRenew tInsuRenew : slInsuRenew.getContent()) {
-				this.info("InsuRenew=".toString());
+				this.info("InsuRenew=" + tInsuRenew.toString());
 				if (tInsuRenew.getAcDate() == titaVo.getOrgEntdyI()
 						&& tInsuRenew.getTitaTxtNo().equals(titaVo.getOrgTno())) {
-					this.info("this.InsuRenew=".toString());
+					this.info("this.InsuRenew=" + tInsuRenew.toString());
 					ac.setTxAmt(tInsuRenew.getTotInsuPrem());
 					wkFeeAmt = wkFeeAmt.add(tInsuRenew.getTotInsuPrem());
 					switch (tInsuRenew.getStatusCode()) {
@@ -359,7 +359,7 @@ public class L3250 extends TradeBuffer {
 					tTempVo.putParam("OpenAcDate", tInsuRenew.getInsuStartDate());
 					tTempVo.putParam("InsuYearMonth", tInsuRenew.getInsuYearMonth());
 					ac.setJsonFields(tTempVo.getJsonString());
-					lAcDetail.add(acDetail);
+					lAcDetail.add(ac);
 				}
 			}
 		}
@@ -395,7 +395,7 @@ public class L3250 extends TradeBuffer {
 					ac.setFacmNo(tForeclosureFee.getFacmNo());
 					// 紀錄號碼 7 int轉string左補0
 					ac.setRvNo(parse.IntegerToString(tForeclosureFee.getRecordNo(), 7)); // 銷帳編號
-					lAcDetail.add(acDetail);
+					lAcDetail.add(ac);
 				}
 			}
 		}

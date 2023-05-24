@@ -682,14 +682,14 @@ public class AcReceivableCom extends TradeBuffer {
 		String endoInsuNo = " ";
 		if (wkRvNo.length() > 17) {
 			prevInsuNo = wkRvNo.substring(0, 17).trim();
-			endoInsuNo = wkRvNo.substring(17, wkRvNo.length() - 1);
+			endoInsuNo = wkRvNo.substring(17, wkRvNo.length());
 		}
 		InsuRenew tInsuRenew = new InsuRenew();
 		tInsuRenew = insuRenewService.findEndoInsuNoFirst(ac.getCustNo(), ac.getFacmNo(), prevInsuNo, endoInsuNo,
 				titaVo);
 		if (tInsuRenew == null)
 			throw new LogicException(titaVo, "E6003", "AcReceivableCom updInsuRenew notfound " + ac.getCustNo() + "-"
-					+ ac.getFacmNo() + "," + ac.getRvNo());
+					+ ac.getFacmNo() + "," + prevInsuNo + "," + endoInsuNo);
 		else {
 			tInsuRenew = insuRenewService.holdById(tInsuRenew, titaVo);
 			if (tInsuRenew.getTotInsuPrem().compareTo(ac.getTxAmt()) != 0) {
