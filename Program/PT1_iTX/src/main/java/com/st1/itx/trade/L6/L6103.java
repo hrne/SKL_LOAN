@@ -1,6 +1,11 @@
 package com.st1.itx.trade.L6;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Locale;
+
+import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -13,6 +18,9 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
+
+import oracle.jdbc.datasource.OracleDataSource;
+
 import com.st1.itx.db.domain.TxBizDate;
 import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.TxBizDateService;
@@ -41,12 +49,30 @@ public class L6103 extends TradeBuffer {
 	@Autowired
 	public DataLog dataLog;
 
+	@Autowired
+	private DataSource dataSourceDay;
+
+	@Autowired
+	private DataSource dataSourceMon;
+
+	@Autowired
+	private DataSource dataSourceHist;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6103 ");
 		this.totaVo.init(titaVo);
 
 		this.info("L6103 SupCode : " + titaVo.getHsupCode());
+		try {
+			this.info(dataSourceDay.getConnection().getMetaData().getUserName().toLowerCase(Locale.TAIWAN).indexOf("day") == -1 ? "no Day DataBase Connect" : "Day DataBase is Connect");
+			this.info(dataSourceMon.getConnection().getMetaData().getUserName().toLowerCase(Locale.TAIWAN).indexOf("mon") == -1 ? "no Mon DataBase Connect" : "Mon DataBase is Connect");
+			this.info(dataSourceHist.getConnection().getMetaData().getUserName().toLowerCase(Locale.TAIWAN).indexOf("hist") == -1 ? "no Hist DataBase Connect" : "Hist DataBase is Connect");
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error(errors.toString());
+		}
 		// 交易需主管核可
 //		if (!titaVo.getHsupCode().equals("1")) {
 //			sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");

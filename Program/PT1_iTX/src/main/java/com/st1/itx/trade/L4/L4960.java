@@ -103,7 +103,9 @@ public class L4960 extends TradeBuffer {
 //			InsuYearMonth > InsuStartDate > InsuEndDate  DESC
 			lInsuRenew.sort((c1, c2) -> {
 				int result = 0;
-				if (c1.getInsuYearMonth() - c2.getInsuYearMonth() != 0) {
+				if (c1.getRenewCode() - c2.getRenewCode() != 0) {
+					result = c2.getRenewCode() - c1.getRenewCode();
+				} else if (c1.getInsuYearMonth() - c2.getInsuYearMonth() != 0) {
 					result = c2.getInsuYearMonth() - c1.getInsuYearMonth();
 				} else if (c1.getInsuStartDate() - c2.getInsuStartDate() != 0) {
 					result = c2.getInsuStartDate() - c1.getInsuStartDate();
@@ -168,9 +170,9 @@ public class L4960 extends TradeBuffer {
 				occursList.putParam("OOStatusCode", tInsuRenew.getStatusCode());
 				occursList.putParam("OOAcDate", tInsuRenew.getAcDate());
 				occursList.putParam("OOBtnFlag", btnShowFlag.get(tmp));
-				occursList.putParam("OOEthqInsuCovrg", tInsuRenew.getEthqInsuCovrg());	//地震險保險金額
-				occursList.putParam("OOEthqInsuPrem", tInsuRenew.getEthqInsuPrem());		//地震險保費
-				occursList.putParam("OORemark", tInsuRenew.getRemark());		//備註
+				occursList.putParam("OOEthqInsuCovrg", tInsuRenew.getEthqInsuCovrg()); // 地震險保險金額
+				occursList.putParam("OOEthqInsuPrem", tInsuRenew.getEthqInsuPrem()); // 地震險保費
+				occursList.putParam("OORemark", tInsuRenew.getRemark()); // 備註
 				occursList.putParam("OOInsuReceiptDate", tInsuRenew.getInsuReceiptDate());
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);

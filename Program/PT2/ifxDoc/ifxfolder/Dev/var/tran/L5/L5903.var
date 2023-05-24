@@ -218,15 +218,16 @@ T(H,#OOUsageCode,#UsageCodeHelp)
 T(2,#OOKeeperEmpNo+ +#OOKeeperEmpName)
 ! 借閱人
 #OApplEmpNoX=x,27,O
-T(2,#OOApplEmpNo+ +#OOApplEmpName)
+IF(#OOApplEmpNo=="",T(2,#OOApplEmpName),T(2,#OOApplEmpNo+ +#OOApplEmpName))
+!T(2,#OOApplEmpNo+ +#OOApplEmpName)
 ! 歸還人
 #OReturnEmpNoX=x,27,O
  T(2,#OOReturnEmpNo+ +#OOReturnEmpName)
 
-#OOBUF_RETURN=X,280,S
+#OOBUF_RETURN=X,300,S
 T(2,#OOCustNo+#OOFacmNo+#OOApplSeq+#OOCustName+#OOKeeperEmpNo
    +#OOApplEmpNo+#OOApplDate+#OOReturnDate+#OOReturnEmpNo
-   +#OOUsageCode+#OORemark+2+#OOCopyCode+#OOApplObj+#OOFacmNoMemo)
+   +#OOUsageCode+#OORemark+2+#OOCopyCode+#OOApplObj+#OOFacmNoMemo+#OOApplEmpName)
 
 #OOBTN_RETURN=A,2,O
 IF(#OOReturnDate>0,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L5103; ntxbuf=#OOBUF_RETURN}))
@@ -322,13 +323,13 @@ TXFORM=L5903
 {width:85,align:'center'}
 ! 戶名
 #OOCustName=戶名
-{width:95,align:'center'}
+{width:95,align:'left'}
 ! 管理人
 #OKeeperEmpNoX=管理人
-{width:100,align:'center'}
+{width:120,align:'left'}
 ! 借閱人
 #OApplEmpNoX=借閱人
-{width:100,align:'center'}
+{width:120,align:'left'}
 ! 借閱日期
 #OOApplDate=借閱日期
 {width:85,align:'center'}
@@ -337,7 +338,7 @@ TXFORM=L5903
 {width:85,align:'center'}
 ! 歸還人
 #OReturnEmpNoX=歸還人
-{width:100,align:'center'}
+{width:120,align:'left'}
 ! 用途
 #OOUsageCodeX=用途
 {width:65,align:'center'}

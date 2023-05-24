@@ -260,7 +260,7 @@ public class L4721Report2 extends MakeReport {
 
 			int effectDate = parse.stringToInteger(tmap.get("TxEffectDate"));
 			if (effectDate != 0) {
-				baTxCom.getDueAmt(effectDate, parse.stringToInteger(tmap.get("CustNo")),
+				baTxCom.getDueAmt(titaVo.getEntDyI(), parse.stringToInteger(tmap.get("CustNo")),
 						parse.stringToInteger(tmap.get("FacmNo")), 0, titaVo);
 				headerDueAmt = "" + (baTxCom.getPrincipal().add(baTxCom.getInterest()));
 				headerExcessive = "" + baTxCom.getExcessive().subtract(baTxCom.getShortfall());
@@ -305,7 +305,7 @@ public class L4721Report2 extends MakeReport {
 		String endDate = tmap.get("IntEndDate");
 		String tstartDate = "00000000";
 		String tendDate = "00000000";
-		// 組成yyymmdd-yyymmdd
+		// 組成yyymmdd-yyymmddㄨ
 		if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
 
 //			if (!"".equals(showRocDate(startDate, 3))) {

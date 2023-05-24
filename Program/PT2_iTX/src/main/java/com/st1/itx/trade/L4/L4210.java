@@ -159,7 +159,7 @@ public class L4210 extends TradeBuffer {
 		// 第一筆從1開始
 		int wkDetailSeq = 1;
 
-		BatxOthers seqBatxOthers = batxOthersService.detSeqFirst(iAcDate, iBatchNo);
+		BatxOthers seqBatxOthers = batxOthersService.detSeqFirst(iAcDate, iBatchNo,titaVo);
 
 		// 第二筆後+1續編
 		if (seqBatxOthers != null) {

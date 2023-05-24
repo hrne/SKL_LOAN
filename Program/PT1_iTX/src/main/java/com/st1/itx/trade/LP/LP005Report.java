@@ -376,6 +376,8 @@ public class LP005Report extends MakeReport {
 			rowCursor++;
 		}
 
+		int refreshFormulaRow = rowCursor;
+
 		// 設公式
 		makeExcel.setFormula(rowCursor, 6, BigDecimal.ZERO, "SUM(F4:F" + rowCursor + ")", "0");
 		makeExcel.setFormula(rowCursor, 7, BigDecimal.ZERO, "SUM(G4:G" + rowCursor + ")", "0");
@@ -388,20 +390,6 @@ public class LP005Report extends MakeReport {
 			makeExcel.setFormula(rowCursor, 13, BigDecimal.ZERO, "SUM(M4:M" + rowCursor + ")", "0");
 		}
 
-		// 公式重整
-		makeExcel.formulaCaculate(rowCursor, 6);
-		makeExcel.formulaCaculate(rowCursor, 7);
-		makeExcel.formulaCaculate(rowCursor, 8);
-		makeExcel.formulaCaculate(rowCursor, 9);
-		makeExcel.formulaCaculate(rowCursor, 10);
-		makeExcel.formulaCaculate(rowCursor, 11);
-		makeExcel.formulaCaculate(rowCursor, 12);
-		makeExcel.formulaCaculate(rowCursor, 13);
-		if (pfSeason == 4) {
-			makeExcel.formulaCaculate(rowCursor, 14);
-			makeExcel.formulaCaculate(rowCursor, 15);
-		}
-
 		rowCursor++;
 
 		// 設公式
@@ -410,15 +398,6 @@ public class LP005Report extends MakeReport {
 		makeExcel.setFormula(rowCursor, 10, BigDecimal.ZERO, "SUBTOTAL(3,C4:C" + (rowCursor - 1) + ")", "0");
 		if (pfSeason == 4) {
 			makeExcel.setFormula(rowCursor, 12, BigDecimal.ZERO, "SUBTOTAL(3,C4:C" + (rowCursor - 1) + ")", "0");
-		}
-
-		// 公式重整
-		makeExcel.formulaCaculate(rowCursor, 6);
-		makeExcel.formulaCaculate(rowCursor, 8);
-		makeExcel.formulaCaculate(rowCursor, 10);
-		makeExcel.formulaCaculate(rowCursor, 12);
-		if (pfSeason == 4) {
-			makeExcel.formulaCaculate(rowCursor, 14);
 		}
 
 		rowCursor++;
@@ -431,22 +410,49 @@ public class LP005Report extends MakeReport {
 		}
 
 		// 公式重整
-		makeExcel.formulaCaculate(rowCursor, 6);
-		makeExcel.formulaCaculate(rowCursor, 8);
-		makeExcel.formulaCaculate(rowCursor, 10);
-		makeExcel.formulaCaculate(rowCursor, 12);
+		makeExcel.formulaCaculate(refreshFormulaRow, 6);
+		makeExcel.formulaCaculate(refreshFormulaRow, 7);
+		makeExcel.formulaCaculate(refreshFormulaRow, 8);
+		makeExcel.formulaCaculate(refreshFormulaRow, 9);
+		makeExcel.formulaCaculate(refreshFormulaRow, 10);
+		makeExcel.formulaCaculate(refreshFormulaRow, 11);
+		makeExcel.formulaCaculate(refreshFormulaRow, 12);
+		makeExcel.formulaCaculate(refreshFormulaRow, 13);
 		if (pfSeason == 4) {
-			makeExcel.formulaCaculate(rowCursor, 14);
+			makeExcel.formulaCaculate(refreshFormulaRow, 14);
+			makeExcel.formulaCaculate(refreshFormulaRow, 15);
+		}
+
+		refreshFormulaRow++;
+
+		// 公式重整
+		makeExcel.formulaCaculate(refreshFormulaRow, 6);
+		makeExcel.formulaCaculate(refreshFormulaRow, 8);
+		makeExcel.formulaCaculate(refreshFormulaRow, 10);
+		makeExcel.formulaCaculate(refreshFormulaRow, 12);
+		if (pfSeason == 4) {
+			makeExcel.formulaCaculate(refreshFormulaRow, 14);
+		}
+
+		refreshFormulaRow++;
+
+		// 公式重整
+		makeExcel.formulaCaculate(refreshFormulaRow, 6);
+		makeExcel.formulaCaculate(refreshFormulaRow, 8);
+		makeExcel.formulaCaculate(refreshFormulaRow, 10);
+		makeExcel.formulaCaculate(refreshFormulaRow, 12);
+		if (pfSeason == 4) {
+			makeExcel.formulaCaculate(refreshFormulaRow, 14);
 		}
 
 		rowCursor++;
 
-		makeExcel.formulaCaculate(rowCursor, 6);
-		makeExcel.formulaCaculate(rowCursor, 8);
-		makeExcel.formulaCaculate(rowCursor, 10);
-		makeExcel.formulaCaculate(rowCursor, 12);
+		makeExcel.formulaCaculate(refreshFormulaRow, 6);
+		makeExcel.formulaCaculate(refreshFormulaRow, 8);
+		makeExcel.formulaCaculate(refreshFormulaRow, 10);
+		makeExcel.formulaCaculate(refreshFormulaRow, 12);
 		if (pfSeason == 4) {
-			makeExcel.formulaCaculate(rowCursor, 14);
+			makeExcel.formulaCaculate(refreshFormulaRow, 14);
 		}
 
 		return listEmpClass;

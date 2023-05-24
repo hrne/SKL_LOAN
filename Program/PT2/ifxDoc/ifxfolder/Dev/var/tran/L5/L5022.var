@@ -39,10 +39,6 @@ T(2,{ cmd=CHAIN; ntxcd=L5407; ntxbuf=1})ASGN(BTN_NEW1$)
 K(MODIFYBUTTON,1,新增)
 !K(MODIFYBUTTON,查詢)
 
-! #buttonA=x,100,S
-! T(2,{ cmd=CHAIN; ntxcd=L5914; ntxbuf=1})ASGN(BTN_NEW1$)
-! K(MODIFYBUTTON,查詢)
-
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
@@ -103,12 +99,13 @@ C(3,#CHAIN,0,$,s)
 ! #NewEmpNo=X,7,S
 ! T(2,1+#EmpNo)
 @V(NL)
-C(4,#EmpNo,$,K(MODIFYBUTTON,2,L5914測試按鈕))
+C(4,#EmpNo,$,K(MODIFYBUTTON,2,L5914歷程按鈕))
+
 
 #Button2=x,100,S
 T(2,{cmd=CHAIN; ntxcd=L5914; ntxbuf=#EmpNo; ntxbuf5=type})
 ASGN(BTN_NEW2$)
-K(MODIFYBUTTON,2,L5914測試按鈕)
+! K(MODIFYBUTTON,2,L5914歷程按鈕)
 
 
 #StatusFlag=X,1,I
@@ -168,7 +165,7 @@ E(0,1)ASGN(LOOP$)
 ! 員工姓名
 #OOFullname=X,8,O
 ! 單位代號
-#OOUnitCode=X,6,O
+#OOUnitCode=X,7,O
 ! 單位中文
 #OOUnitCodeX=x,20,O
 ! 區部代號
@@ -273,7 +270,7 @@ TXFORM=L5022
 #OOFullname=員工姓名
 {width:85}
 #OOUnitCode=單位代號
-{width:85,align:'center'}
+{width:95,align:'center'}
 #OOUnitCodeX=單位中文
 {width:95}
 #OODistCode=區部代號

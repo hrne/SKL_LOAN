@@ -164,7 +164,7 @@ HIDE(#BTND,#BTNA,#BTNB)
 
 
 ! 新增按鈕會帶入1 ??? 防呆
-#NTXBUF=X,280,S
+#NTXBUF=X,300,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@ApplCode,#NTXBUF,248,1)
 C(3,#ApplCode,0,s,$)
@@ -182,6 +182,7 @@ T(1,@Remark,#NTXBUF,148,100)
 T(1,@CopyCode,#NTXBUF,249,1)
 T(1,@ApplObj,#NTXBUF,250,1)
 T(1,@FacmNoMemo,#NTXBUF,251,20)
+T(1,@ApplEmpNoX,#NTXBUF,271,20)
 INVOKEJS(SHOW,p1,02,02,1)
 
 

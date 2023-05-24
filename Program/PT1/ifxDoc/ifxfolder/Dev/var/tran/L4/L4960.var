@@ -282,8 +282,6 @@ C(3,#OOStatusCode,1,BIND(grid,cancel),$)
 C(3,#OOStatusCode,1,s,$)
 C(3,#OOBtnFlag,1,$,BIND(grid,cancel))
 C(3,#OOBtnFlag,1,$,s)
-C(4,#OOEndoInsuNo,$,BIND(grid,cancel))
-C(4,#OOEndoInsuNo,$,s)
 SWITCH(#OOSelfInsuCode,
 1,
 BIND(grid,cancel),

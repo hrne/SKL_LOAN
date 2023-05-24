@@ -39,7 +39,6 @@ import com.st1.itx.db.service.LoanOverdueService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcRepayCom;
 import com.st1.itx.util.common.BaTxCom;
-import com.st1.itx.util.common.LoanAvailableAmt;
 import com.st1.itx.util.common.LoanCalcRepayIntCom;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.LoanSetRepayIntCom;
@@ -103,8 +102,6 @@ public class L3420 extends TradeBuffer {
 	private LoanCalcRepayIntCom loanCalcRepayIntCom;
 	@Autowired
 	private PfDetailCom pfDetailCom;
-	@Autowired
-	private LoanAvailableAmt loanAvailableAmt;
 	@Autowired
 	DateUtil dDateUtil;
 
@@ -1555,11 +1552,7 @@ public class L3420 extends TradeBuffer {
 		if (iCaseCloseCode != 0 && iCaseCloseCode != 4 && iCaseCloseCode != 5 && iCaseCloseCode != 6) {
 			return;
 		}
-
-		// 結清時判斷該戶號額度下主要擔保品的其他額度是否已全部結清
-		if (isAllClose) {
-			isAllClose = loanAvailableAmt.isAllCloseClFac(iCustNo, iFacmNo, titaVo);
-		}
+		// 檢查額度放款餘額
 		if (isAllClose) {
 			if (titaVo.isHcodeNormal()) {
 				FacCloseNormal();

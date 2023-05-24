@@ -325,6 +325,7 @@ public class AcRepayCom extends TradeBuffer {
 		// step 4. 費用出帳
 		if (feeAmt.compareTo(BigDecimal.ZERO) > 0) {
 			if ("L3230".equals(titaVo.getTxcd())) {
+				this.wkTempAmtRemaind = feeAmt;
 				settleFee(titaVo.getParam("Description"), titaVo);
 			}
 			if ("L3210".equals(titaVo.getTxcd())) {
@@ -408,6 +409,7 @@ public class AcRepayCom extends TradeBuffer {
 		if (this.baTxList == null) {
 			return BigDecimal.ZERO;
 		}
+		this.info("settleFee , this.wkTxAmtRemaind=" + this.wkTxAmtRemaind + ", this.wkTempAmtRemaind=" + this.wkTempAmtRemaind);
 		BigDecimal totalFee = BigDecimal.ZERO;
 		// 還放款為依序抵繳、暫收款為抵繳費用金額
 		for (BaTxVo ba : this.baTxList) {

@@ -10,34 +10,33 @@ import javax.servlet.annotation.WebListener;
 
 @WebListener
 public class ApacheFtpListener implements ServletContextListener {
-    private final Logger logger = LoggerFactory.getLogger(ApacheFtpListener.class);
-    private final String SERVER_NAME = "FTP-SERVER";
+	private final Logger logger = LoggerFactory.getLogger(ApacheFtpListener.class);
+	private final String SERVER_NAME = "FTP-SERVER";
 
-    private ApacheFtpServer apacheFtpServer;
+	private ApacheFtpServer apacheFtpServer;
 
-    //容器關閉時調用方法stop ftpServer
-    public void contextDestroyed(ServletContextEvent sce) {
-        /*
-    	apacheFtpServer.stop();
-        sce.getServletContext().removeAttribute(SERVER_NAME);
-        logger.info("Apache Ftp server is stoped!");
-        */
-    }
+	// 容器關閉時調用方法stop ftpServer
+	public void contextDestroyed(ServletContextEvent sce) {
 
-    //容器初始化調用方法start ftpServer
-    public void contextInitialized(ServletContextEvent sce) {
-        /*
-    	apacheFtpServer = (ApacheFtpServer) MySpring.getBean("apacheFtpServer");
+		apacheFtpServer.stop();
+		sce.getServletContext().removeAttribute(SERVER_NAME);
+		logger.info("Apache Ftp server is stoped!");
 
-        sce.getServletContext().setAttribute(SERVER_NAME, apacheFtpServer);
-        try {
-            apacheFtpServer.start();
-            logger.info("Apache Ftp server is started!");
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Apache Ftp server start failed!", e);
-        }
-        */
-    }
+	}
+
+	// 容器初始化調用方法start ftpServer
+	public void contextInitialized(ServletContextEvent sce) {
+		apacheFtpServer = (ApacheFtpServer) MySpring.getBean("apacheFtpServer");
+
+		sce.getServletContext().setAttribute(SERVER_NAME, apacheFtpServer);
+		try {
+			apacheFtpServer.start();
+			logger.info("Apache Ftp server is started!");
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException("Apache Ftp server start failed!", e);
+		}
+
+	}
 
 }

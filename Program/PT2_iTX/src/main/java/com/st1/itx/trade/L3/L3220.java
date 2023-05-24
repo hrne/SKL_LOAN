@@ -185,15 +185,6 @@ public class L3220 extends TradeBuffer {
 			ChequeAcDetailRoutine();
 		}
 
-		// AML交易檢核
-		if (iTempAmt.compareTo(new BigDecimal(0)) > 0) { // 暫收款
-			if (titaVo.isHcodeNormal()) {
-				txAmlCom.setTxBuffer(this.txBuffer);
-				txAmlCom.remitOut(wkBorxNo, titaVo);
-			}
-			// 維護撥款匯款檔
-			AcPaymentRoutine();
-		}
 		// 貸方
 		if (titaVo.isHcodeNormal()) {
 			// 帳務處理
@@ -206,8 +197,17 @@ public class L3220 extends TradeBuffer {
 			loanCom.checkEraseCustNoTxSeqNo(iCustNo, titaVo);// 檢查到同戶帳務交易需由最近一筆交易開始訂正
 			loanCom.setFacmBorTxHcodeByTx(iCustNo, titaVo);// 訂正放款交易內容檔by交易
 		}
+		// AML交易檢核
+		if (iTempAmt.compareTo(new BigDecimal(0)) > 0 && titaVo.isHcodeNormal()) {
+			txAmlCom.setTxBuffer(this.txBuffer);
+			txAmlCom.remitOut(wkBorxNo, titaVo);
+		}
+		// 維護撥款匯款檔
+		if (iTempAmt.compareTo(new BigDecimal(0)) > 0) { // 暫收款
+			AcPaymentRoutine();
+		}
 
-		// 暫收款交易新增帳務及更新放款交易內容檔
+		// 新增帳務及更新放款交易內容檔
 		if (titaVo.isHcodeNormal()) {
 			acRepayCom.settleTempRun(this.lLoanBorTx, this.baTxList, this.lAcDetail, titaVo);
 		}
@@ -429,6 +429,7 @@ public class L3220 extends TradeBuffer {
 		tLoanBorTx = new LoanBorTx();
 		tLoanBorTxId = new LoanBorTxId();
 		wkBorxNo = loanCom.setFacmBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, titaVo);
+		this.info("wkBorxNo=" + wkBorxNo);
 		tLoanBorTx.setEntryDate(titaVo.getEntDyI());
 		tLoanBorTx.setTxAmt(BigDecimal.ZERO.subtract(iTempAmt));
 		// 3221 暫收款退還

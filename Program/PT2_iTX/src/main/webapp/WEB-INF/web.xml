@@ -21,11 +21,9 @@
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
 	
-	<!-- 
 	<listener>
         <listener-class>com.st1.itx.nettyServer.ApacheFtpListener</listener-class>
     </listener>
-     -->
     
 
 	<!-- - Servlet that dispatches request to registered handlers (Controller implementations). -->

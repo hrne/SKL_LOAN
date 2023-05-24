@@ -8,16 +8,21 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.buffer.TxBuffer;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.BatxRateChange;
+import com.st1.itx.db.domain.CustNotice;
+import com.st1.itx.db.service.BatxRateChangeService;
 import com.st1.itx.db.service.CustNoticeService;
 import com.st1.itx.db.service.springjpa.cm.L4721ServiceImpl;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
@@ -419,7 +424,7 @@ public class L4721Report extends MakeReport {
 		headerDueAmt = "";
 		headerExcessive = "";
 		if (effectDate != 0) {
-			baTxCom.getDueAmt(effectDate, custNo, facmNo, 0, titaVo);
+			baTxCom.getDueAmt(titaVo.getEntDyI(), custNo, facmNo, 0, titaVo);
 			headerDueAmt = "" + (baTxCom.getPrincipal().add(baTxCom.getInterest()));
 			headerExcessive = "" + baTxCom.getExcessive().subtract(baTxCom.getShortfall());
 		} else {

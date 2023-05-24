@@ -458,6 +458,17 @@ public class L6101 extends TradeBuffer {
 				fAcReceivableCnt++;
 			}
 		}
+		slAcReceivable = sAcReceivableService.acctCodeEq(0, "TRE", 0, 9999999, 0, Integer.MAX_VALUE, titaVo);
+		if (slAcReceivable != null) {
+			for (AcReceivable tAcReceivable : slAcReceivable.getContent()) {
+				OccursList occursList = new OccursList();
+				occursList.putParam("OOMsgCode", "錯誤");
+				occursList.putParam("OOMessage", "暫收款－展期，戶號：" + parse.IntegerToString(tAcReceivable.getCustNo(), 7)
+						+ "，有未銷餘額=" + tAcReceivable.getRvBal());
+				this.totaVo.addOccursList(occursList);
+				fAcReceivableCnt++;
+			}
+		}
 
 		this.info("L6101 findAcReceivable fUnProcessCnt : " + fAcReceivableCnt);
 		return fAcReceivableCnt;
@@ -808,13 +819,14 @@ public class L6101 extends TradeBuffer {
 				if (!t.getLatestFlag().equals("Y")) {
 					continue;
 				}
+				String msg = ", 傳票批號=" + t.getBatchNo() + ", 上傳序號=" + tAcClose.getClsNo();
 				// 開帳檢查上傳媒體檔不可有"未完成"
 				if (iClsFg == 0 && t.getTransferFlag().equals("N")) {
-					throw new LogicException(titaVo, "E0015", "上傳未完成 不可執行開帳作業 業務類別:" + iSecNo); // 檢查錯誤
+					throw new LogicException(titaVo, "E0015", "上傳未完成 不可執行開帳作業" + msg); // 檢查錯誤
 				}
 				// 取消關帳檢查上傳媒體檔不可"已完成"
 				if (iClsFg == 2 && t.getTransferFlag().equals("Y")) {
-					throw new LogicException(titaVo, "E0015", "上傳已完成 不可執行取消關帳作業 業務類別:" + iSecNo); // 檢查錯誤
+					throw new LogicException(titaVo, "E0015", "上傳已完成 不可執行取消關帳作業" + msg); // 檢查錯誤
 				}
 			}
 		}
@@ -826,9 +838,9 @@ public class L6101 extends TradeBuffer {
 		this.info("txToDoL7400 ...");
 		Slice<AcDetail> slAcDetail = sAcDetailService.findSlipBatNo(iAcDateF, parse.stringToInteger(iBatNo), 0, 1,
 				titaVo);
-        if (slAcDetail == null) {
-        	return;
-        }
+		if (slAcDetail == null) {
+			return;
+		}
 		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 		TempVo tTempVo = new TempVo();
 		tTxToDoDetail.setItemCode("L7400");

@@ -77,7 +77,7 @@ public class L5903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ,i.\"ApplSeq\"                                    ";
 		sql += "        ,c.\"CustName\"                                   ";
 		sql += "        ,NVL(e1.\"Fullname\",i.\"KeeperEmpNo\")    AS F4  ";
-		sql += "        ,NVL(e2.\"Fullname\",i.\"ApplEmpNo\")      AS F5  ";
+		sql += "        ,NVL(e2.\"Fullname\",i.\"ApplEmpName\")    AS F5  ";
 		sql += "        ,i.\"ApplDate\"                                   ";
 		sql += "        ,i.\"ReturnDate\"                                 ";
 		sql += "        ,NVL(e3.\"Fullname\",i.\"ReturnEmpNo\")    AS F8  ";

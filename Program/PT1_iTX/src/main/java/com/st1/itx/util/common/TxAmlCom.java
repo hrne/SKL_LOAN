@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.w3c.dom.Document;
 
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
@@ -194,8 +195,8 @@ public class TxAmlCom extends TradeBuffer {
 		this.info("TxAmlCom.remit .....");
 		CheckAmlVo checkAmlVo = new CheckAmlVo();
 		// AML@交易序號：前兩碼03+會計日期+MRKey(戶號+額度)+交易內容檔序號
-		checkAmlVo.setTransactionId("03" + "-" + (titaVo.getEntDyI() + 19110000) + "-" + titaVo.getMrKey() + "-"
-				+ parse.IntegerToString(borxNo, 3));
+		checkAmlVo.setTransactionId("03" + "-" + (titaVo.getEntDyI() + 19110000) + "-" + titaVo.getMrKey().trim() + "-"
+				+ parse.IntegerToString(borxNo, 4));
 		remitRp(checkAmlVo, titaVo);
 	}
 
@@ -752,9 +753,15 @@ public class TxAmlCom extends TradeBuffer {
 				+ checkAmlVo.getTransactionId());
 		TxAmlLog tTxAmlLog = txAmlLogService.findByTransactionIdFirst(titaVo.getEntDyI() + 19110000,
 				checkAmlVo.getTransactionId(), titaVo);
+		String orgName = "";
+		if (tTxAmlLog != null) {
+			Document doc = checkAml.convertStringToXml(tTxAmlLog.getMsgRg());
+			orgName = checkAml.getXmlValue(doc, "Name");
+		}
+
 		// AML紀錄檔存在，檢核狀態 = 1.需審查/確認 => AML姓名再檢核
 		if (tTxAmlLog != null) {
-			if ("1".equals(tTxAmlLog.getConfirmStatus())) {
+			if ("1".equals(tTxAmlLog.getConfirmStatus()) || !orgName.equals(checkAmlVo.getName())) {
 				checkAmlVo.setLogNo(tTxAmlLog.getLogNo()); // LogNo
 				checkAmlVo.setEntdy(titaVo.getEntDyI()); // 帳務日
 				checkAmlVo.setBrNo(titaVo.getKinbr()); // 單位
