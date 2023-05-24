@@ -15,9 +15,43 @@ CREATE TABLE itxadmin."FTP_USER" (
 ALTER TABLE itxadmin."FTP_USER"
 ADD  CONSTRAINT "FTP_USER_PK" PRIMARY KEY ("USERID");
 
+
+--Dev
 insert all
 into "FTP_USER" (userid, userpassword, homedirectory, enableflag, writepermission, idletime, uploadrate, downloadrate, maxloginnumber, maxloginperip)
-  values ('admin', '1qaz2wsx', 'C:\SKL\iTX_Log\', 'Y','Y',3000, 48000000, 48000000, 20, 2)
+  values ('admin', '1qaz2wsx', '/home/weblogic/Dev/itxDoc/itxWrite/upload/FTP/', 'Y','Y',3000, 48000000, 48000000, 20, 2)
 into "FTP_USER" (userid, userpassword, homedirectory, enableflag, writepermission, idletime, uploadrate, downloadrate, maxloginnumber, maxloginperip)
-  values ('itx', '1qaz2wsx', 'C:\SKL\iTX_Log\', 'Y','Y',3000, 48000000, 48000000, 20, 2)
+  values ('itx', '1qaz2wsx', '/home/weblogic/Dev/itxDoc/itxWrite/upload/FTP/', 'Y','Y',3000, 48000000, 48000000, 20, 2)
+select * from dual;
+
+--Uat
+insert all
+into "FTP_USER" (userid, userpassword, homedirectory, enableflag, writepermission, idletime, uploadrate, downloadrate, maxloginnumber, maxloginperip)
+  values ('admin', '1qaz2wsx', '/home/weblogic/Uat/itxDoc/itxWrite/upload/FTP/', 'Y','Y',3000, 48000000, 48000000, 20, 2)
+into "FTP_USER" (userid, userpassword, homedirectory, enableflag, writepermission, idletime, uploadrate, downloadrate, maxloginnumber, maxloginperip)
+  values ('itx', '1qaz2wsx', '/home/weblogic/Uat/itxDoc/itxWrite/upload/FTP/', 'Y','Y',3000, 48000000, 48000000, 20, 2)
+select * from dual;
+
+--Sit
+insert all
+into "FTP_USER" (userid, userpassword, homedirectory, enableflag, writepermission, idletime, uploadrate, downloadrate, maxloginnumber, maxloginperip)
+  values ('admin', '1qaz2wsx', '/home/weblogic/Sit/itxDoc/itxWrite/upload/FTP/', 'Y','Y',3000, 48000000, 48000000, 20, 2)
+into "FTP_USER" (userid, userpassword, homedirectory, enableflag, writepermission, idletime, uploadrate, downloadrate, maxloginnumber, maxloginperip)
+  values ('itx', '1qaz2wsx', '/home/weblogic/Sit/itxDoc/itxWrite/upload/FTP/', 'Y','Y',3000, 48000000, 48000000, 20, 2)
+select * from dual;
+
+--pt1
+insert all
+into "FTP_USER" (userid, userpassword, homedirectory, enableflag, writepermission, idletime, uploadrate, downloadrate, maxloginnumber, maxloginperip)
+  values ('admin', '1qaz2wsx', '/home/weblogic/pt1/itxDoc/itxWrite/upload/FTP/', 'Y','Y',3000, 48000000, 48000000, 20, 2)
+into "FTP_USER" (userid, userpassword, homedirectory, enableflag, writepermission, idletime, uploadrate, downloadrate, maxloginnumber, maxloginperip)
+  values ('itx', '1qaz2wsx', '/home/weblogic/pt1/itxDoc/itxWrite/upload/FTP/', 'Y','Y',3000, 48000000, 48000000, 20, 2)
+select * from dual;
+
+--pt2
+insert all
+into "FTP_USER" (userid, userpassword, homedirectory, enableflag, writepermission, idletime, uploadrate, downloadrate, maxloginnumber, maxloginperip)
+  values ('admin', '1qaz2wsx', '/home/weblogic/pt2/itxDoc/itxWrite/upload/FTP/', 'Y','Y',3000, 48000000, 48000000, 20, 2)
+into "FTP_USER" (userid, userpassword, homedirectory, enableflag, writepermission, idletime, uploadrate, downloadrate, maxloginnumber, maxloginperip)
+  values ('itx', '1qaz2wsx', '/home/weblogic/pt2/itxDoc/itxWrite/upload/FTP/', 'Y','Y',3000, 48000000, 48000000, 20, 2)
 select * from dual;
