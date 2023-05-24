@@ -1,5 +1,5 @@
 --FTP_USER
-CREATE TABLE itxadmin."FTP_USER" (      
+CREATE TABLE "FTP_USER" (      
    userid VARCHAR2(64) NOT NULL,       
    userpassword VARCHAR2(64),      
    homedirectory VARCHAR2(128) NOT NULL,             
