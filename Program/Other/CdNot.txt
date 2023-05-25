@@ -1,9 +1,0 @@
-comment on table "CdLoanNotYet" is '未齊件代碼檔';
-comment on column "CdLoanNotYet"."NotYetCode" is '未齊件代碼';
-comment on column "CdLoanNotYet"."NotYetItem" is '未齊件說明';
-comment on column "CdLoanNotYet"."YetDays" is '齊件日期計算日';
-comment on column "CdLoanNotYet"."Enable" is '啟用記號';
-comment on column "CdLoanNotYet"."CreateDate" is '建檔日期時間';
-comment on column "CdLoanNotYet"."CreateEmpNo" is '建檔人員';
-comment on column "CdLoanNotYet"."LastUpdate" is '最後更新日期時間';
-comment on column "CdLoanNotYet"."LastUpdateEmpNo" is '最後更新人員';
