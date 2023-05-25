@@ -52,12 +52,17 @@ public class LY002Report extends MakeReport {
 	public boolean exec(TitaVo titaVo) throws LogicException {
 		this.info("LY002.exportExcel active");
 
+		int reportVer = Integer.valueOf(titaVo.getParam("ReportCode"));
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = titaVo.getTxCode();
 		String fileItem = "非RBC_表14-1_會計部年度檢查報表";
 		String fileName = "LY002-非RBC_表14-1_會計部年度檢查報表";
-		String defaultExcel = "LY002_底稿_非RBC_表14-1_會計部年度檢查報表.xlsx";
+
+		// 1 舊版報表，2新版報表
+		String defaultExcel = reportVer == 1 ? "LY002_底稿_非RBC_表14-1_會計部年度檢查報表(舊).xlsx"
+				: "LY002_底稿_A141重要放款餘額明細表(新).xlsx";
+
 		String defaultSheet = "表14-1";
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
@@ -87,12 +92,15 @@ public class LY002Report extends MakeReport {
 
 			makeExcel.setShiftRow(row, lY002List.size() + 4);
 
-			eptExcel(lY002List);
-
 			// 科目
 			lY002List = lY002ServiceImpl.findAll(titaVo, endOfYearMonth, "Y");
 
-			eptExcel(lY002List);
+			// 1為舊版報表格式，2新版報表格式
+			if (reportVer == 1) {
+				oldExcel(lY002List);
+			} else {
+				eptExcel(lY002List);
+			}
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -245,7 +253,7 @@ public class LY002Report extends MakeReport {
 	 * 
 	 * @param lDList
 	 */
-	private void exportExcel(List<Map<String, String>> lDList) throws LogicException {
+	private void oldExcel(List<Map<String, String>> lDList) throws LogicException {
 
 		int row = 6;
 

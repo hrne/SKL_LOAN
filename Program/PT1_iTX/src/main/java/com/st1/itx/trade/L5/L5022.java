@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
@@ -78,25 +77,25 @@ public class L5022 extends TradeBuffer {
 		String rEmpNo = "";
 		String rStatusFg = "";
 		int reCount = 0;
-		String iCent ="";
-		int iQuitDate =0;
-		CdEmp iCd = iCdEmpService.findById(iEmpNo, titaVo);
-		if(iCd != null) {
-			iCent = iCd.getCenterCode();
-			iQuitDate = iCd.getQuitDate();
-		}else {
-			iCent = "";
-			iQuitDate = 0;
-		}
-		this.info("單位       =  " + iCent);
-		this.info("離職日期 =  " + iQuitDate);
+		
 		
 		for (Map<String, String> r5022SqlReturn : iL5022SqlReturn) {
 			OccursList occursList = new OccursList();
-			String r5022EmpNo = r5022SqlReturn.get("EmpNo");
+//			String r5022EmpNo = r5022SqlReturn.get("EmpNo");
 
 			//6.如果該員工已離職但還是在有效日期區間內和單位代號與員工檔不同，該資料後面需要加上星號(*)
-
+			String iCent ="";
+			int iQuitDate =0;
+			CdEmp iCd = iCdEmpService.findById(r5022SqlReturn.get("EmpNo"), titaVo);
+			if(iCd != null) {
+				iCent = iCd.getCenterCode();
+				iQuitDate = iCd.getQuitDate();
+			}else {
+				iCent = "";
+				iQuitDate = 0;
+			}
+			this.info("單位       =  " + iCent);
+			this.info("離職日期 =  " + iQuitDate);
 			
 			if (!iStatusFg.trim().isEmpty()) { // 有輸入狀態
 				occursList.putParam("OOEmpNo", r5022SqlReturn.get("EmpNo"));
@@ -112,19 +111,20 @@ public class L5022 extends TradeBuffer {
 				occursList.putParam("OOClassPass", r5022SqlReturn.get("ClassPass"));
 				if(iIneffectiveDate < iQuitDate && iQuitDate < iEffectiveDate ) {
 //					離職日期在有效期間內需在名字後加上*
-					occursList.putParam("OOFullname", r5022SqlReturn.get("Fullname")+"*");
+					occursList.putParam("OOStart1", "*");
 				}else {
-					occursList.putParam("OOFullname", r5022SqlReturn.get("Fullname"));
-					
+					occursList.putParam("OOStart1", "");
 				}
+				occursList.putParam("OOFullname", r5022SqlReturn.get("Fullname"));
 				String ixAreaCode =  r5022SqlReturn.get("AreaCode");
 				this.info("iCent      = " + iCent);
 				this.info("ixAreaCode = " + ixAreaCode);
 				if(!iCent.equals(ixAreaCode)) {
-					occursList.putParam("OOUnitCode",ixAreaCode + "*" );
+					occursList.putParam("OOStart2", "*");
 				}else {
-					occursList.putParam("OOUnitCode",ixAreaCode);
+					occursList.putParam("OOStart2", "");
 				}
+				occursList.putParam("OOUnitCode",ixAreaCode);
 				occursList.putParam("OODistCode", r5022SqlReturn.get("DistCode"));
 				occursList.putParam("OODeptCode", r5022SqlReturn.get("DeptCode"));
 				occursList.putParam("OOUnitCodeX", r5022SqlReturn.get("AreaItem"));

@@ -193,6 +193,10 @@ T(H,#OOEmpClass,#ClassTypeHelp)
 #OOStatusFgX=X,10,S
 T(H,#OOStatusFg,#EffectiveStatusHelp)
 ! 1+6+8+3(6+16)+7+1+1=90
+!星號註記
+#OOStart1=X,1,S
+#OOStart2=X,1,S
+
 #OOBUF_EDIT=X,41,S
 T(2,2+#OOEmpNo+#OOEffectiveDate+#OOStatusFg)
 #OOBUF_COPY=X,34,S
@@ -238,7 +242,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L5914; ntxbuf=#OOBUF_SEARCH})
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L5022
-#OOEmpNo#OOFullname#OOUnitCode#OOUnitCodeX#OODistCode#OODistCodeX#OODeptCode#OODeptCodeX#OOEffectiveDate#OOIneffectiveDate#OOEmpClass#OOClassPass#OOStatusFg
+#OOEmpNo#OOFullname#OOUnitCode#OOUnitCodeX#OODistCode#OODistCodeX#OODeptCode#OODeptCodeX#OOEffectiveDate#OOIneffectiveDate#OOEmpClass#OOClassPass#OOStatusFg#OOStart1#OOStart2
 ^
 </sub>
 
@@ -265,10 +269,19 @@ TXFORM=L5022
 #OOBTN_SEARCH=歷程
 {search:false,formatter:'cust:bind-button:歷程',align:'center',canExport:false,width:40}
 
+!星號註記
+#OOStart1=
+{width:15,align:'center'}
+
 #OOEmpNo=員工代號
 {width:80,align:'center'}
 #OOFullname=員工姓名
 {width:85}
+
+!星號註記
+#OOStart2=
+{width:15,align:'center'}
+
 #OOUnitCode=單位代號
 {width:95,align:'center'}
 #OOUnitCodeX=單位中文
@@ -295,10 +308,18 @@ TXFORM=L5022
 #RPTFG=1,QUERY.GRID,L5022
 #any={detail:true, header:'L5022.part', caption:'', width:1080, rowNum:20, rowList:[20,40,60]}
 
+
+!星號註記
+#OOStart1=
+{width:15,align:'center'}
 #OOEmpNo=員工代號
 {width:80,align:'center'}
 #OOFullname=員工姓名
 {width:85}
+
+!星號註記
+#OOStart2=
+{width:15,align:'center'}
 #OOUnitCode=單位代號
 {width:85,align:'center'}
 #OOUnitCodeX=單位中文

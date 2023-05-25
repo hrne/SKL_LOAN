@@ -26,6 +26,7 @@ T(3,LY002)
 [
 ["[LY002]                                  LY002非RBC_表14-1_會計部年度檢查報表"],
 ["@年度",#RocYear],
+["@報表項目",#ReportCode,#ReportCodeX], 
 ]
 
 !---------- AP TEXT AREA Variables ----------
@@ -39,6 +40,15 @@ C(3,#CHAIN,1,T(4,NTXBUF$),S)
 !T(1,@TLR,#NTXBUF,2,2)
 T(2,@FKEY,7)
 
+#ReportHelp=X,100,S
+T(3,1:表14-1_會計部年度檢查報表[舊];2:A141重要放款餘額明細表[新])
+
+
+#ReportCode=X,1,I
+HELP(#ReportHelp)
+
+#ReportCodeX=X,30,L
+T(H,#ReportCode,#ReportHelp)
 
 !-----------------------------------------------------
 
@@ -98,6 +108,7 @@ IF(#KINBR=="0009"||#KINBR=="0008",T(2,#KINBR+#TlrNoNO),T(2,#EMPNOS))
 !------ 上行電文TIM：BASIC LABEL + AP TEXT AREA + AP TEXT ------
 <sub type="TIM">
 #RocYear
+#ReportCode
 #END
 </sub>
 !------ 下行電文TOM ------

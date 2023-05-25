@@ -149,8 +149,8 @@ public class L4961 extends TradeBuffer {
 
 			if (resultList.size() == this.limit && hasNext()) {
 				titaVo.setReturnIndex(this.setIndexNext());
-				/* 手動折返 */
-				this.totaVo.setMsgEndToEnter();
+				/* 自動折返 */
+				this.totaVo.setMsgEndToAuto();
 			}
 		} else {
 //			throw new LogicException(titaVo, "E0001", "查無資料");

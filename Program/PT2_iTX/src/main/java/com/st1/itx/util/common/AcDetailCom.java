@@ -282,7 +282,7 @@ public class AcDetailCom extends TradeBuffer {
 				settingjsonfields(ac, titaVo);
 
 				/*----------- 自動設定 -----------*/
-				tAcDetailId.setRelDy(titaVo.getEntDyI()); // 登放日期
+				tAcDetailId.setRelDy(this.txBuffer.getTxCom().getReldy()); // 登放日期
 				tAcDetailId.setRelTxseq(this.txBuffer.getTxCom().getRelNo()); // 登放序號
 
 				// 分錄序號，由AcEnterComt重編

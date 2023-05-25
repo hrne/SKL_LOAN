@@ -62,54 +62,67 @@ public class L6103 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6103 ");
 		this.totaVo.init(titaVo);
-
-		this.info("L6103 SupCode : " + titaVo.getHsupCode());
-		try {
-			this.info(dataSourceDay.getConnection().getMetaData().getUserName().toLowerCase(Locale.TAIWAN).indexOf("day") == -1 ? "no Day DataBase Connect" : "Day DataBase is Connect");
-			this.info(dataSourceMon.getConnection().getMetaData().getUserName().toLowerCase(Locale.TAIWAN).indexOf("mon") == -1 ? "no Mon DataBase Connect" : "Mon DataBase is Connect");
-			this.info(dataSourceHist.getConnection().getMetaData().getUserName().toLowerCase(Locale.TAIWAN).indexOf("hist") == -1 ? "no Hist DataBase Connect" : "Hist DataBase is Connect");
-		} catch (Exception e) {
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.error(errors.toString());
-		}
-		// 交易需主管核可
-//		if (!titaVo.getHsupCode().equals("1")) {
-//			sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
-//		} else {
-		toDo(titaVo);
-//		}
-
-		this.addList(this.totaVo);
-		return this.sendList();
-	}
-
-	private void toDo(TitaVo titaVo) throws LogicException {
 		int iFUNCD = Integer.parseInt(titaVo.get("FUNCD").trim());
 
 		TxTeller tTxTeller = txTellerService.holdById(titaVo.getTlrNo());
-
 		if (tTxTeller == null) {
 			throw new LogicException(titaVo, "E0003", "使用者:" + titaVo.getTlrNo());
 		}
-
-		/* 使用DB記號 0.onLine 1.onDay 2.onMon 3.onHist */
-		if (iFUNCD == 0)
+		int result = 0;
+		switch (iFUNCD) {
+		case 0:
 			titaVo.setDataBaseOnLine();
-		else if (iFUNCD == 1) {
-			throw new LogicException("EC001", "日報環境未開放!");
-//			titaVo.setDataBaseOnDay();
-		} else if (iFUNCD == 2)
-			titaVo.setDataBaseOnMon();
-		else if (iFUNCD == 3) {
-			throw new LogicException("EC001", "歷史資料環境尚未開放!");
-//			titaVo.setDataBaseOnHist();
+			break;
+
+		case 1:
+			try {
+				result = dataSourceDay.getConnection().getMetaData().getUserName().toLowerCase(Locale.TAIWAN)
+						.indexOf("day");
+			} catch (Exception e) {
+				StringWriter errors = new StringWriter();
+				e.printStackTrace(new PrintWriter(errors));
+				this.error(errors.toString());
+			}
+			if (result == -1) {
+				throw new LogicException("EC001", "日報環境未開放!");
+			}
+			break;
+
+		case 2:
+			try {
+				result = dataSourceMon.getConnection().getMetaData().getUserName().toLowerCase(Locale.TAIWAN)
+						.indexOf("mon");
+			} catch (Exception e) {
+				StringWriter errors = new StringWriter();
+				e.printStackTrace(new PrintWriter(errors));
+				this.error(errors.toString());
+			}
+			if (result == -1) {
+				throw new LogicException("EC001", "月報環境未開放!");
+			}
+			break;
+
+		case 3:
+			try {
+				result = dataSourceHist.getConnection().getMetaData().getUserName().toLowerCase(Locale.TAIWAN)
+						.indexOf("hist");
+			} catch (Exception e) {
+				StringWriter errors = new StringWriter();
+				e.printStackTrace(new PrintWriter(errors));
+				this.error(errors.toString());
+			}
+			if (result == -1) {
+				throw new LogicException("EC001", "歷史資料環境尚未開放!");
+			}
+			break;
 		}
+
 		TxBizDate txBizDate = txBizDateService.findById("ONLINE", titaVo);
 
-		if (txBizDate == null)
+		if (txBizDate == null) {
 			throw new LogicException("EC001", titaVo.getDataBase() + "TxBizDate");
-
+		}
+		
 		TxTeller tTxTeller2 = (TxTeller) dataLog.clone(tTxTeller); // 異動前資料
 		tTxTeller.setReportDb(iFUNCD);
 		tTxTeller.setEntdy(txBizDate.getTbsDy());
@@ -123,6 +136,7 @@ public class L6103 extends TradeBuffer {
 		}
 		dataLog.setEnv(titaVo, tTxTeller2, tTxTeller); ////
 		dataLog.exec("報表查詢作業申請"); ////
-
+		this.addList(this.totaVo);
+		return this.sendList();
 	}
 }

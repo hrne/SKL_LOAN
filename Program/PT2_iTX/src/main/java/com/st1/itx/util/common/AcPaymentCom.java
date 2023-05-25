@@ -254,7 +254,7 @@ public class AcPaymentCom extends TradeBuffer {
 	 * @throws LogicException LogicException
 	 */
 	public void remit(TitaVo titaVo) throws LogicException {
-		acDate = titaVo.getEntDyI();
+		acDate = this.txBuffer.getTxCom().getReldy();
 		titaTlrNo = this.txBuffer.getTxCom().getRelTlr();
 		titaTxtNo = String.format("%08d", this.txBuffer.getTxCom().getRelTno());
 

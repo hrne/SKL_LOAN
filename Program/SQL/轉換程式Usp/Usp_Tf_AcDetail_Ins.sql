@@ -477,7 +477,7 @@ BEGIN
           ,TO_DATE(NVL(S."TRXIDT",S."TRXDAT"),'YYYYMMDD')
                                           AS "CreateDate"          -- 建檔日期時間 DATE 0 0 
           ,NVL(AEM1."EmpNo",'999999')     AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0 
-          ,TO_DATE(NVL(S."TRXIDT",S."TRXDAT",'YYYYMMDD')
+          ,TO_DATE(NVL(S."TRXIDT",S."TRXDAT"),'YYYYMMDD')
                                           AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0 
           ,NVL(AEM1."EmpNo",'999999')     AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0 
           ,S."BSTBTN"                     AS "SlipSumNo" 

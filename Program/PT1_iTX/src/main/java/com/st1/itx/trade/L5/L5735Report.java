@@ -76,7 +76,7 @@ public class L5735Report extends MakeReport {
 
 		if (resultList == null || resultList.isEmpty()) {
 			makeExcel.setValue(row, 1, "本日無資料", "R");
-
+		
 			isFinished = false;
 		} else {
 			for (Map<String, String> result : resultList) {
@@ -95,15 +95,16 @@ public class L5735Report extends MakeReport {
 				makeExcel.setValue(row, 12, parse.stringToInteger(result.get("Status")));
 				makeExcel.setValue(row, 13, this.showBcDate(result.get("DrawdownDate"), 0), "C");
 				makeExcel.setValue(row, 14, parse.stringToBigDecimal(result.get("EvaNetWorth")), "#,##0");
+				this.info("LoanRatio = " + parse.stringToBigDecimal(result.get("LoanRatio")));
 				makeExcel.setValue(row, 15, parse.stringToBigDecimal(result.get("LoanRatio")), "0%");
-				
+
 //												"0".equals(result.get("EvaNetWorth")) ||  "0".equals(result.get("LineAmt")) ? BigDecimal.ZERO
 //						: parse.stringToBigDecimal(result.get("LineAmt")).divide(
 //								parse.stringToBigDecimal(result.get("EvaNetWorth"))).setScale(2, BigDecimal.ROUND_HALF_UP);
-				//設公式
+				// 設公式
 //				makeExcel.setFormula(row, 15, ltv, "ROUND(F" + row + "/N" + row + ",2)", "0%");
-				
-				//重新計算
+
+				// 重新計算
 //				makeExcel.formulaCaculate(row, 15);
 
 				row++;
@@ -111,7 +112,6 @@ public class L5735Report extends MakeReport {
 		}
 
 		makeExcel.close();
-
 
 		return isFinished;
 	}

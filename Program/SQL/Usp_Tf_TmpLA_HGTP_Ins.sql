@@ -158,7 +158,7 @@ BEGIN
                    , NVL(S1.LGTCIF,' ') -- 2023-05-08 Wei 增加 from SKL佳怡 2023-05-05 mail 增加唯一性判斷條件-擔保品提供人
                    , NVL(S1.HGTMHS,' ') -- 2023-05-10 Wei 增加 from SKL佳怡 2023-05-09 會議 增加唯一性判斷條件-主建物(坪)
                    , NVL(S1.HGTPSM,' ') -- 2023-05-10 Wei 增加 from SKL佳怡 2023-05-09 會議 增加唯一性判斷條件-公設(坪)
-                   , NVL(S1.HGTCAS,' ') -- 2023-05-10 Wei 增加 from SKL佳怡 2023-05-09 會議 增加唯一性判斷條件-車位(坪)
+                   , NVL(S1.HGTCAM,' ') -- 2023-05-10 Wei 增加 from SKL佳怡 2023-05-09 會議 增加唯一性判斷條件-車位(坪)
                    , NVL(S1.HGTADS,' ') -- 2023-05-10 Wei 增加 from SKL佳怡 2023-05-09 會議 增加唯一性判斷條件-附屬建物(坪)
                    , S1."ProcessUniqueFlag" -- 2023-04-27 Wei 修改 from SKL 佳怡 email SKL-會議記錄-首撥表相關-20230426
            ) AS "GroupNo"
