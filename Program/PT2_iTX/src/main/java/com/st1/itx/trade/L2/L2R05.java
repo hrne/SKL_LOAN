@@ -110,6 +110,7 @@ public class L2R05 extends TradeBuffer {
 	private Slice<FacProdStepRate> slFacProdStepRate;
 	private DecimalFormat df = new DecimalFormat("##,###,###,###,##0");
 	private int FirstAdjRateDate = 0;
+	private BigDecimal FirstLoanBorRate = BigDecimal.ZERO;
 	private TempVo tempVo = new TempVo();
 
 	private String wkRepayBank = "";
@@ -227,8 +228,8 @@ public class L2R05 extends TradeBuffer {
 		}
 
 		this.info("tempVo =" + tempVo);
-
-		if (tFacMain.getActFg() == 1 && iFKey == 0) {
+		// 非查詢功能時檢查是否已放行
+		if (iFuncCode != 5 && tFacMain.getActFg() == 1 && iFKey == 0) {
 			throw new LogicException(titaVo, "E0021",
 					"額度檔 戶號 = " + tFacMain.getCustNo() + " 額度編號 =  " + tFacMain.getFacmNo()); // 該筆資料待放行中
 		}
@@ -329,6 +330,7 @@ public class L2R05 extends TradeBuffer {
 			LoanBorMain tLoanBorMain = loanBorMainService.findById(new LoanBorMainId(iCustNo, iFacmNo, 1), titaVo);
 			if (tLoanBorMain != null) {
 				FirstAdjRateDate = tLoanBorMain.getNextAdjRateDate();
+				FirstLoanBorRate = tLoanBorMain.getApproveRate();
 			}
 
 		}
@@ -398,6 +400,8 @@ public class L2R05 extends TradeBuffer {
 		this.totaVo.putParam("L2r05RateCode", tFacMain.getRateCode());
 		this.totaVo.putParam("L2r05FirstRateAdjFreq", tFacMain.getFirstRateAdjFreq());
 		this.totaVo.putParam("L2r05FirstAdjRateDate", FirstAdjRateDate);
+		this.totaVo.putParam("L2r05FirstLoanBorRate", FirstLoanBorRate);
+		
 
 		this.totaVo.putParam("L2r05RateAdjFreq", tFacMain.getRateAdjFreq());
 		this.totaVo.putParam("L2r05CurrencyCode", tFacMain.getCurrencyCode());

@@ -112,8 +112,8 @@ public class LQ007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	      when MOD(int.\"YearMonth\",100) IN (7,8,9) then trunc(int.\"YearMonth\" /100) * 100 + 9 ";
 		sql += "	      when MOD(int.\"YearMonth\",100) IN (10,11,12) then trunc(int.\"YearMonth\" /100) * 100 + 12 ";
 		sql += "	   end AS \"VisibleMonth\"";
-		sql += "       ,SUM(bal.\"BalSum\") \"BalSum\" "; // --餘額
-		sql += "       ,SUM(int.\"IntSum\") \"IntSum\" "; // --利收
+		sql += "       ,SUM(nvl(bal.\"BalSum\",0)) \"BalSum\" "; // --餘額
+		sql += "       ,SUM(nvl(int.\"IntSum\",0)) \"IntSum\" "; // --利收
 		sql += " FROM (SELECT spn.\"ProdNoShow\" ";
 		sql += "                  ,trunc(ad.\"RelDy\" / 100) AS \"YearMonth\" ";
 		sql += "                  ,SUM(DECODE(ad.\"DbCr\", 'C', ad.\"TxAmt\", -ad.\"TxAmt\")) \"IntSum\" ";

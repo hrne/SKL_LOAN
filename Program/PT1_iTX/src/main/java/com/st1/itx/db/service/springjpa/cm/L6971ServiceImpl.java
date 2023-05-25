@@ -32,8 +32,13 @@ public class L6971ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(WorkType workType, TitaVo titaVo) throws LogicException {
+	public List<Map<String, String>> findAll(WorkType workType, int index, int limit, TitaVo titaVo) throws Exception {
 		this.info("L6971ServiceImpl.findAll");
+
+		// *** 折返控制相關 ***
+		this.index = index;
+		// *** 折返控制相關 ***
+		this.limit = limit;
 
 		int inputDate = parse.stringToInteger(titaVo.get("InputDate")) + 19110000;
 
@@ -84,8 +89,10 @@ public class L6971ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// Joining table corresponding to workType
 		switch (workType) {
 		case FiveYearsTX:
-			sql += " LEFT JOIN (SELECT COUNT(*) \"Count\"" + "               ,\"CustNo\" " + "               ,\"FacmNo\" " + "               ,\"BormNo\" " + "         FROM \"LoanBorTx\" "
-					+ "         GROUP BY \"CustNo\" " + "                 ,\"FacmNo\" " + "                 ,\"BormNo\" " + "        ) LBTX ON LBTX.\"CustNo\" = TATL.\"CustNo\" ";
+			sql += " LEFT JOIN (SELECT COUNT(*) \"Count\"" + "               ,\"CustNo\" "
+					+ "               ,\"FacmNo\" " + "               ,\"BormNo\" " + "         FROM \"LoanBorTx\" "
+					+ "         GROUP BY \"CustNo\" " + "                 ,\"FacmNo\" "
+					+ "                 ,\"BormNo\" " + "        ) LBTX ON LBTX.\"CustNo\" = TATL.\"CustNo\" ";
 			sql += "                 AND LBTX.\"FacmNo\" = TATL.\"FacmNo\" ";
 			sql += "                 AND LBTX.\"BormNo\" = TATL.\"BormNo\" ";
 			break;
@@ -114,7 +121,7 @@ public class L6971ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
-		return this.convertToMap(query);
+		return switchback(query);
 	}
 
 }

@@ -1786,6 +1786,7 @@ TXFORM=L2R04
 #L2r05LoanTermMm=A,2,S
 #L2r05LoanTermDd=A,3,S
 #L2r05FirstDrawdownDate=D,7,S
+#L2r05FirstLoanBorRate=+n,2.4,S
 #L2r05MaturityDate=D,7,S
 #L2r05IntCalcCode=X,1,S
 #L2r05AmortizedCode=A,1,S
@@ -1915,6 +1916,7 @@ TXFORM=L2R05
 #L2r05LoanTermMm
 #L2r05LoanTermDd
 #L2r05FirstDrawdownDate
+#L2r05FirstLoanBorRate
 #L2r05MaturityDate
 #L2r05IntCalcCode
 #L2r05AmortizedCode
@@ -9097,6 +9099,7 @@ TXFORM=L6R02
 #L6R04Enable=X,1,S
 #L6R04MinCodeLength=A,1,S
 #L6R04MaxCodeLength=A,1,S
+#L6R04IsNumeric=X,1,S
 </L6R04.dec>
 
 <L6R04.tom>
@@ -9108,6 +9111,7 @@ TXFORM=L6R04
 #L6R04Enable
 #L6R04MinCodeLength
 #L6R04MaxCodeLength
+#L6R04IsNumeric
 ^
 </L6R04.tom>
 

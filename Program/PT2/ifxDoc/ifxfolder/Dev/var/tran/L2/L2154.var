@@ -1376,7 +1376,7 @@ T(2,@CoorgnizerX,#L2r13FullName)
 #WKSHOWLB=X,1,S
 C(3,#UpdateCode,1,
     SHOW(#BaseRateCodeX,#LbProdRateX,#RateIncr,#RateIncrX,#IndividualIncr,#IndividualIncrX
-    ,#LbApproveRateX,#RateCode,#RateCodeX,#FirstRateAdjFreq,#FirstRateAdjFreqX,#RateAdjFreq,#RateAdjFreqX,#TwAcctFee,#TwHandlingFee
+    ,#RateCode,#RateCodeX,#FirstRateAdjFreq,#FirstRateAdjFreqX,#RateAdjFreq,#RateAdjFreqX,#TwAcctFee,#TwHandlingFee
     ,#CreditSysNo,#AmortizedCode,#AmortizedCodeX,#TwApplAmt,#LoanTermYy,#LoanTermMm,#LoanTermDd,#FreqBase,#PayIntFreq
     ,#PayIntFreqX,#RepayFreq,#RepayFreqX,#UtilDeadline,#UtilDeadlineX,#GracePeriod,#GracePeriodX,#GuaranteeDate
     ,#GuaranteeDateX,#RepayCode,#RepayCodeX,#RepayBank,#RepayBankX,#RepayAcctNo,#PostCode,#PostCodeX,#RelationCode
@@ -1519,8 +1519,8 @@ T(2,@FdIntCalcCode,#WkStar)
 
 #ShowP2=X,1,S
 C(3,#UpdateCode,1,
-    SHOW(#BaseRateCodeX,#LbProdRateX,#RateIncr,#RateIncrX,#LbApproveRateX,#RateCode,#RateCodeX,#FirstRateAdjFreq,#FirstRateAdjFreqX,#RateAdjFreq,#RateAdjFreqX,#TwAcctFee,#CreditSysNo)
-    HIDE(#LbRateIncrX,#LbFirstRateAdjFreq,#LbRateAdjFreq,#UsAcctFee,#LbAcctFee,#UsHandlingFee,#LbHandlingFee,#LbCreditSysNo)
+    SHOW(#BaseRateCodeX,#LbProdRateX,#RateIncr,#RateIncrX,#RateCode,#RateCodeX,#FirstRateAdjFreq,#FirstRateAdjFreqX,#RateAdjFreq,#RateAdjFreqX,#TwAcctFee,#CreditSysNo)
+    HIDE(#LbRateIncrX,#LbFirstRateAdjFreq,#LbRateAdjFreq,#LbApproveRateX,#UsAcctFee,#LbAcctFee,#UsHandlingFee,#LbHandlingFee,#LbCreditSysNo)
    ,SHOW(#BaseRateCodeX,#LbProdRateX,#LbRateIncrX,#LbIndividualIncrX,#LbApproveRateX,#RateCodeX,#LbFirstRateAdjFreq,#LbRateAdjFreq,#LbAcctFee,#LbCreditSysNo)
     HIDE(#RateIncr,#RateIncrX,#IndividualIncr,#IndividualIncrX,#ApproveRate,#ApproveRateX,#RateCode,#FirstRateAdjFreq,#FirstRateAdjFreqX,#RateAdjFreq,#RateAdjFreqX,#TwAcctFee,#UsAcctFee,#CreditSysNo))
 C(3,#UpdateCode,1,$,s)
@@ -1534,19 +1534,19 @@ C(5,#L2r01IncrFlag,Y,T(F,@RateIncr,1)T(F,@IndividualIncr,0)
 !                     ,T(F,@RateIncr,0)T(F,@IndividualIncr,1)
 !                      HIDE(#RateIncr,#RateIncrX,#LbIndividualIncrX)
 !                      SHOW(#LbRateIncrX,#IndividualIncr,#IndividualIncrX))
-C(3,#BaseRateCode,99,$,
- C(5,#L2r01IncrFlag,Y,E(0,@ApproveRate,#BaseRate+#RateIncr)
-                     ,E(0,@ApproveRate,#BaseRate+#IndividualIncr)))                      
+! C(3,#BaseRateCode,99,$,
+!  C(5,#L2r01IncrFlag,Y,E(0,@ApproveRate,#BaseRate+#RateIncr)
+!                      ,E(0,@ApproveRate,#BaseRate+#IndividualIncr)))                      
 ! C(3,#L2r01RateCode,9,SHOW(#RateCode),HIDE(#RateCode))
 IF(#FuncCode==2 && #L2r01RateCode==9,$
-                                  ,SHOW(#RateCodeX)) 
-C(3,#BaseRateCode,99,SHOW(#LbRateIncrX,#ApproveRate,#ApproveRateX)
-                     HIDE(#RateIncr,#RateIncrX,#LbApproveRateX)
-                     T(3,@ApproveRateX,%)
-                    ,SHOW(#LbApproveRateX)
-                     HIDE(#ApproveRate,#ApproveRateX)
-                     T(3,@ApproveRateX, ))                                                                            
-CALL(#HideFirstRateAdjFreq) 
+                                  ,SHOW(#RateCodeX))
+SHOW(#ApproveRate,#ApproveRateX)
+T(3,@ApproveRateX,%)
+C(3,#BaseRateCode,99,SHOW(#LbRateIncrX)HIDE(#RateIncr,#RateIncrX,#LbApproveRateX),$)
+!                     ,HIDE(#LbApproveRateX)
+!                      SHOW(#ApproveRate,#ApproveRateX)
+!                      T(3,@ApproveRateX,%))                                                                            
+CALL(#HideFirstRateAdjFreq)
 
 #InitP2=X,1,S
 T(H,@BaseRateCodeX,#BaseRateCode,#BaseRateHelp)
@@ -1589,9 +1589,10 @@ T(2,@RimProdNo,#ProdNo)
 RESET_RIM(#SendL2r01A,L2R01)
 S(L2R01,1,#RimFuncCode,#RimTxCode,#RimProdNo)
 R(1,L2R01)
+T(2,@ProdNoX,#L2r01ProdName)
+E(0,@BaseRateCode,#L2r01BaseRateCode)
 
 #ProdNoX=X,60,L
-T(2,#L2r01ProdName)
 
 ![指標利率代碼]
 !修改時自動顯示可修改,其他自動顯示不必須輸入
@@ -1599,14 +1600,14 @@ T(2,#L2r01ProdName)
 
 #BaseRateCode=A,2,L
 
-
 #BaseRateCodeX=X,30,L
 T(H,#BaseRateCode,#BaseRateHelp)
-C(3,#UpdateCode,1,$,s)
-C(3,#BaseRateCode,99,SHOW(#ApproveRate,#ApproveRateX)HIDE(#LbApproveRateX)
-                    ,HIDE(#ApproveRate,#ApproveRateX)SHOW(#LbApproveRateX))
+C(3,#UpdateCode,1,SHOW(#ApproveRate,#ApproveRateX)HIDE(#LbApproveRateX),s)
+! C(3,#BaseRateCode,99,SHOW(#ApproveRate,#ApproveRateX)HIDE(#LbApproveRateX)
+!                     ,HIDE(#ApproveRate,#ApproveRateX)SHOW(#LbApproveRateX))
 
 #SendL2r06B=X,1,S
+C(3,#FuncCode,4,S,$)
 C(3,#FuncCode,5,S,$)
 C(3,#L2r05BaseRateCode,#L2r01BaseRateCode,E(0,@BaseRateCode,#L2r05BaseRateCode),$)
 C(3,#L2r05BaseRateCode,#L2r01BaseRateCode,s,$)
@@ -1624,9 +1625,10 @@ E(0,@BaseRate,#L2r06Rate)
 #FdBaseRate=X,2,L
 
 !8/17 配合少玄開放可修正
-#BaseRate=n,2.4,I
-C(3,#FuncCode,5,s,$)
-C(3,#FuncCode,4,s,$)
+!2023/5/25不可修改僅顯示 依據核准利率-加碼或個別加碼
+#BaseRate=n,2.4,L
+! C(3,#FuncCode,5,s,$)
+! C(3,#FuncCode,4,s,$)
 ! E(0,#L2r06Rate)
 !#Wk_BaseRate=X,8,S
 !X(#BaseRate)
@@ -1699,8 +1701,9 @@ T(B,#LbIndividualIncrX+#WkPercent)
 C(3,#Hide1Fg,0,CALL(#HideP1),$)
 C(3,#UpdateCode,1,$,s)
 C(3,#BaseRateCode,99,$,C(5,#L2r01IncrFlag,Y,E(0,#BaseRate+#RateIncr),E(0,#BaseRate+#IndividualIncr)))
-C(3,#BaseRateCode,99,$,s)
+C(3,#BaseRateCode,99,$,$)
 @V(2,0)
+C(3,#BaseRateCode,99,$,C(5,#L2r01IncrFlag,Y,E(0,@BaseRate,#ApproveRate-#RateIncr),E(0,@BaseRate,#ApproveRate-#IndividualIncr)))
 
 #LbApproveRateX=X,12,L
 X(#ApproveRate)

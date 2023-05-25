@@ -47,13 +47,13 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String sql = "　";
 
-		sql += " select   ";
+		sql += " select  distinct ";
 		sql += "    r.\"CustNo\"                                 as \"CustNo\"  "; // 戶號
-		sql += "   ,r.\"FacmNo\"                                 as \"FacmNo\"  "; // 額度
-		sql += "   ,r.\"BormNo\"                                 as \"BormNo\"  "; // 撥款
-		sql += "   ,r.\"EffectDate\"                             as \"TxEffectDate\"  "; // 利率生效日
-		sql += "   ,r.\"FitRate\"			                     as \"AdjustedRate\" "; // 適用利率
-		sql += "   ,r2.\"FitRate\"                 				 as \"PresentRate\" ";// 前次利率
+//		sql += "   ,r.\"FacmNo\"                                 as \"FacmNo\"  "; // 額度
+//		sql += "   ,r.\"BormNo\"                                 as \"BormNo\"  "; // 撥款
+//		sql += "   ,r.\"EffectDate\"                             as \"TxEffectDate\"  "; // 利率生效日
+//		sql += "   ,r.\"FitRate\"			                     as \"AdjustedRate\" "; // 適用利率
+//		sql += "   ,r2.\"FitRate\"                 				 as \"PresentRate\" ";// 前次利率
 		sql += " from (                                             ";
 		sql += "           select                                       ";
 		sql += "            \"CustNo\"                              ";
@@ -126,10 +126,10 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 			}
 		}
 
-		sql += " order by r.\"CustNo\" ";
-		sql += " 		 ,r.\"FacmNo\" ";
-		sql += " 		 ,r.\"BormNo\" ";
-		sql += " 		 ,r.\"EffectDate\" DESC";
+		sql += " order by r.\"CustNo\" ASC";
+//		sql += " 		 ,r.\"FacmNo\" ";
+//		sql += " 		 ,r.\"BormNo\" ";
+//		sql += " 		 ,r.\"EffectDate\" DESC";
 
 		this.info("sql=" + sql);
 

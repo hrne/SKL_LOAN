@@ -124,6 +124,12 @@ public class L2040 extends TradeBuffer {
 					occurslist.putParam("OOAddress", "");
 				} // else
 
+				// 2023-05-25 Wei 增加 for 連動L2943 from SKL-佳怡:新系統要可以查舊系統建物明細
+				occurslist.putParam("OOGdrid1", tClNoMap.getGdrId1());
+				occurslist.putParam("OOGdrid2", tClNoMap.getGdrId2());
+				occurslist.putParam("OOGdrnum", tClNoMap.getGdrNum());
+				occurslist.putParam("OOLgtseq", tClNoMap.getLgtSeq());
+				
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occurslist);
 			}

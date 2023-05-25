@@ -32,9 +32,9 @@ public class L7501ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("custId = " + custId);
 
 		String sql = "";
-		sql += " SELECT CM.\"CustNo\" ";
+		sql += " SELECT LPAD(CM.\"CustNo\",7,'0') AS \"CustNo\" ";
 		sql += "      , CM.\"CustName\" ";
-		sql += "      , NVL(FAC.\"FacmNo\",0) AS \"FacmNo\"";
+		sql += "      , LPAD(NVL(FAC.\"FacmNo\",0),3,'0') AS \"FacmNo\"";
 		sql += "      , MIN(NVL(LBM.\"DrawdownDate\",0)) AS \"DrawdownDate\" ";
 		sql += "      , MAX(NVL(LBM.\"MaturityDate\",0)) AS \"MaturityDate\" ";
 		sql += "      , MIN(NVL(LBM.\"PrevPayIntDate\",0)) AS \"PrevIntDate\" ";
@@ -51,9 +51,9 @@ public class L7501ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   AND NVL(CM.\"CuscCd\",0) = 1 ";
 		sql += "   AND NVL(LBM.\"Status\",9) = 0 ";
 		sql += "   AND CM.\"CustId\" = :inputCustId ";
-		sql += " GROUP BY CM.\"CustNo\" ";
+		sql += " GROUP BY LPAD(CM.\"CustNo\",7,'0') ";
 		sql += "        , CM.\"CustName\" ";
-		sql += "        , FAC.\"FacmNo\" ";
+		sql += "        , LPAD(NVL(FAC.\"FacmNo\",0),3,'0') ";
 		sql += " ORDER BY \"FacmNo\" ";
 
 		this.info("sql=" + sql);

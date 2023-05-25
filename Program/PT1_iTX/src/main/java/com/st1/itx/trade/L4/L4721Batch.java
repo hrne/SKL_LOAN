@@ -134,6 +134,13 @@ public class L4721Batch extends TradeBuffer {
 
 				if (custList != null) {
 					for (Map<String, String> data : custList) {
+						
+						try {
+							Thread.sleep(50);
+						} catch (InterruptedException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
 						try {
 							this.sno = l4721Report.exec(titaVo, this.txBuffer,
 									parse.stringToInteger(data.get("CustNo")), tmpKindItem[txkind - 1]);

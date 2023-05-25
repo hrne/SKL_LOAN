@@ -55,7 +55,8 @@ public class L6064ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	A.\"Enable\" , ";
 		sql += "	A.\"LastUpdate\" , ";
 		sql += "    A.\"LastUpdateEmpNo\" ,";
-		sql += "    B.\"Fullname\" ";
+		sql += "    B.\"Fullname\" , ";
+		sql += "    A.\"IsNumeric\" ";
 		sql += "	from \"CdCode\" A ";
 		sql += "    left join \"CdEmp\" B on A.\"LastUpdateEmpNo\" = B.\"EmployeeNo\" ";
 		sql += "    left join (select * from \"CdCode\" where \"DefCode\" = 'CodeType') C ";

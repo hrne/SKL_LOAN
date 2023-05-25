@@ -85,11 +85,7 @@ BEGIN
                  THEN S2."LGTSSG" 
                  WHEN NVL(S2."LGTSSG",' ') != ' ' 
                  THEN S2."LGTSSG" || '小段' 
-                ELSE '' END  || 
-                '，地號'  
-                || LPAD(REPLACE(TRIM(S2."LGTNM1"),'-',''),4,'0') 
-                || '-' 
-                || LPAD(REPLACE(TRIM(S2."LGTNM2"),'-',''),4,'0') 
+                ELSE '' END 
                )                          AS "LandLocation"        -- 土地座落 NVARCHAR2 150  
           ,S2."LGTORY"                    AS "LandCode"            -- 地目 VARCHAR2 2  
           ,NVL(S2."LGTSQM",0)             AS "Area"                -- 面積 DECIMAL 9 2 
@@ -413,11 +409,7 @@ BEGIN
                  THEN S2."LGTSSG" 
                  WHEN NVL(S2."LGTSSG",' ') != ' ' 
                  THEN S2."LGTSSG" || '小段' 
-                ELSE '' END  || 
-                '，地號'  
-                || LPAD(REPLACE(TRIM(S2."LGTNM1"),'-',''),4,'0') 
-                || '-' 
-                || LPAD(REPLACE(TRIM(S2."LGTNM2"),'-',''),4,'0') 
+                ELSE '' END
                 )                         AS "LandLocation"        -- 土地座落 NVARCHAR2 150  
           ,S2."LGTORY"                    AS "LandCode"            -- 地目 VARCHAR2 2  
           ,NVL(S2."LGTSQM",0)             AS "Area"                -- 面積 DECIMAL 9 2 

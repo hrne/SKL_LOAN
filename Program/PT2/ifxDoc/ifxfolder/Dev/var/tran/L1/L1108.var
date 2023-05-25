@@ -320,15 +320,15 @@ HELP(Y:不發送; :發送)
 C(3,#IsCheck,0,$,C(5,#CanEmail,0,C(4,#EMail{i},V(P,此客戶尚未設定信箱，故不可設定為發送),$),$))
 C(4,#EMail{i},$,IF(#EMail{i} == #CheckY,$,V(P,限輸入Y或空白)))
 C(5,#SendCode{i},1,$,s)
-E(0,@ChkB{i},0)
-C(5,#Paper{i},Y,E(0,@ChkB{i},#ChkB{i}+1),$)
-C(5,#Msg{i},Y,E(0,@ChkB{i},#ChkB{i}+1),$)
-C(5,#EMail{i},Y,E(0,@ChkB{i},#ChkB{i}+1),$)
-C(3,#ChkA{i},#ChkB{i},V(P,#Err{i}),$)
+!E(0,@ChkB{i},0)
+!C(5,#Paper{i},Y,E(0,@ChkB{i},#ChkB{i}+1),$)
+!C(5,#Msg{i},Y,E(0,@ChkB{i},#ChkB{i}+1),$)
+!C(5,#EMail{i},Y,E(0,@ChkB{i},#ChkB{i}+1),$)
+!C(3,#ChkA{i},#ChkB{i},V(P,#Err{i}),$)
 
 
-#Err{i}=x,200,S
-T(B,#NoticeX{i}+，不可申請全部不寄送)
+!#Err{i}=x,200,S
+!T(B,#NoticeX{i}+，不可申請全部不寄送)
 
 ##end
 

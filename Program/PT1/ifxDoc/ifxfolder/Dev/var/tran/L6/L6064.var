@@ -255,6 +255,7 @@ T(H,#OOType,#DefTypeH)
 ! 代碼類別說明
 #OODDefItem=x,50,L
 
+
 ! 修改的按鈕
 #OOFunc2=A,1,S
 E(0,2)
@@ -283,6 +284,7 @@ T(2,#OOFunc4+#OODefCode+#OOCode)
 
 #OOBTN4=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L6604;text=刪除;ntxbuf=#OOBUF4})
+
 
 </sub>
 

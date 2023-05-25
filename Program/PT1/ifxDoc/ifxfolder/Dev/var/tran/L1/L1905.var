@@ -27,6 +27,12 @@ E(0,1)ASGN(LOOPHEIGHT$)
 #INQPRT=n,2,S
 E(0,40)ASGN(INQPRT$)
 
+#BTNADDBUF=X,18,S
+! T(2,1+          +0000000)
+T(2,1+)
+
+
+
 </sub>
 
 <sub type="DC" name="BFHEAD">
@@ -34,15 +40,6 @@ E(0,40)ASGN(INQPRT$)
 !起始交易記號  0:起始交易,1:非起始交易
 #ORGFG=_,_,S
 E(0,0)
-
-#BTNADDBUF=X,18,S
-T(2,1+          +0000000)
-
-
-#BtnAddA=x,100,S
-T(2,{cmd=CHAIN; ntxcd=L1105; ntxbuf=#BTNADDBUF; ntxbuf5=type})
-ASGN(BTN_NEW1$)
-K(MODIFYBUTTON,1,新增)
 
 </sub>
 
@@ -189,11 +186,18 @@ C(4,#CustId,S,s)
 #CustNo=A,7,I
 C(4,#CustId,$,S)
 ! C(3,#CHAIN,1,s,$)
+
+
 @
 T(2,#CustNoName,)
 C(4,#CustId,C(3,#CustNo,0,V(P,需擇一輸入查詢條件),$),S)
 C(3,#CustNo,0,$,T(2,@BTNADDBUF,1+          +#CustNo))
+C(5,#CustId,C(5,#CustNo,0,$,K(MODIFYBUTTON,1,新增)),$)
 
+#BtnAddB=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L1105; ntxbuf=#BTNADDBUF; ntxbuf5=type})
+ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,新增)
 
 #RimL1r01B=X,1,S
 C(3,#CustNo,0,S,$)
@@ -210,6 +214,7 @@ T(2,@CustNoName,#L1r01CustName)
 !戶名
 #CustNoName=X,100,L
 C(3,#CustNo,0,S,s)
+
 !身分證找戶號
 <include src="ROM.icf::L2R47.dec"/>
 #Rim2R47CustId=X,10,S
@@ -220,6 +225,11 @@ RESET_RIM(#RimL2R47,L2R47)
 C(4,#CustId,s,$)
 S(L2R47,1,#Rim2R47CustId)
 R(1,L2R47)
+
+#TimCustNo=A,7,S
+E(0,#CustNo)
+T(2,@RmkCustNo,#TimCustNo)
+<include src="COM.icf::CustRmk.rtn"/>
 
 #MRKEY=_,_,S
 C(4,#CustId,T(2,#CustNo),T(2,#L2R47CustNo))
@@ -252,6 +262,12 @@ C(3,#CHAIN,1,E(0,@CHAIN,1)XMT(),$)
 
 #SCRTIL=_,_,S
 T(3,[L1905] 顧客聯絡電話)
+
+#BtnAddA=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L1105; ntxbuf=#BTNADDBUF; ntxbuf5=type})
+ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,新增)
+
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
@@ -295,6 +311,9 @@ IF(#OOTelTypeCode == 09,T(B,#OOTelArea+#OOTelNo+#OOTelExt),s)
 ! C(4,#OOTelExt,$,T(2,@OOTEL_PHONE,#OOTEL_PHONE+#OOTelExt))
 ! C(4,#OOTelArea,C(4,#OOTelNo,C(4,#OOTelExt,$,T(B,#OOTelExt)),T(B,#OOTelNo)),T(B,#OOTelArea))
 ! T(B,#OOTelArea+#DASH+#OOTelNo+#DASH+#OOTelExt)
+
+#TelTypeCode=A,2,S
+E(0,#OOTelTypeCode)
 
 !與借款人關係
 #OORelationCode=X,2,L
@@ -349,6 +368,13 @@ C(4,#CustId,$,T(2,2+#CustId+0000000+#OOTelNoUKey))
 #OOBTN1=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L1105; ntxbuf=#OOBUF1})
 
+#button=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L1105; ntxbuf=#BTNADDBUF; ntxbuf5=type})
+! C(5,#OOAllowFg,0,BIND(grid,cancel),BIND(grid,{cmd=CHAIN; ntxcd=L2074; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$))
+!C(5,#CustId, ,$,C(5,#CustNo,0,$,K(MODIFYBUTTON,1,新增)))
+
+
+
 </sub>
 
 
@@ -357,6 +383,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L1105; ntxbuf=#OOBUF1})
 #CustId
 #CustNo
 #RETURN
+#TelTypeCode
 #END
 #RTNTXT
 </sub>
@@ -372,6 +399,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L1105; ntxbuf=#OOBUF1})
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L1905
+#TelTypeCode
 #OOTelTypeCode
 #OOTelArea
 #OOTelNo

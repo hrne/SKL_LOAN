@@ -1,6 +1,8 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -9,6 +11,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Column;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * CdCode 共用代碼檔<br>
@@ -22,315 +26,353 @@ import javax.persistence.Column;
 @Table(name = "`CdCode`")
 public class CdCode implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -3129556042640092177L;
 
-	@EmbeddedId
-	private CdCodeId cdCodeId;
+  @EmbeddedId
+  private CdCodeId cdCodeId;
 
-	// 代碼檔代號
-	@Column(name = "`DefCode`", length = 20, insertable = false, updatable = false)
-	private String defCode;
+  // 代碼檔代號
+  @Column(name = "`DefCode`", length = 20, insertable = false, updatable = false)
+  private String defCode;
 
-	// 代碼檔業務類別
-	/* 01:顧客管理作業02:業務作業03:帳務作業04:批次作業05:管理性作業06:共同作業07:介接外部系統08:遵循法令作業09:報表作業 */
-	@Column(name = "`DefType`")
-	private int defType = 0;
+  // 代碼檔業務類別
+  /* 01:顧客管理作業02:業務作業03:帳務作業04:批次作業05:管理性作業06:共同作業07:介接外部系統08:遵循法令作業09:報表作業 */
+  @Column(name = "`DefType`")
+  private int defType = 0;
 
-	// 代碼
-	@Column(name = "`Code`", length = 20, insertable = false, updatable = false)
-	private String code;
+  // 代碼
+  @Column(name = "`Code`", length = 20, insertable = false, updatable = false)
+  private String code;
 
-	// 代碼說明
-	@Column(name = "`Item`", length = 50)
-	private String item;
+  // 代碼說明
+  @Column(name = "`Item`", length = 50)
+  private String item;
 
-	// 啟用記號
-	/* Y:啟用N:未啟用 */
-	@Column(name = "`Enable`", length = 1)
-	private String enable;
+  // 啟用記號
+  /* Y:啟用N:未啟用 */
+  @Column(name = "`Enable`", length = 1)
+  private String enable;
 
-	// 狀態
-	/* 0:已放行1:未放行因應L6301放行新增記號 */
-	@Column(name = "`EffectFlag`")
-	private int effectFlag = 0;
+  // 狀態
+  /* 0:已放行1:未放行因應L6301放行新增記號 */
+  @Column(name = "`EffectFlag`")
+  private int effectFlag = 0;
 
-	// 代碼最小長度
-	/* 因應QC1297單，新增設置代碼長度 */
-	@Column(name = "`MinCodeLength`")
-	private int minCodeLength = 0;
+  // 代碼最小長度
+  /* 因應QC1297單，新增設置代碼長度 */
+  @Column(name = "`MinCodeLength`")
+  private int minCodeLength = 0;
 
-	// 代碼最大長度
-	/* 因應QC1297單，新增設置代碼長度 */
-	@Column(name = "`MaxCodeLength`")
-	private int maxCodeLength = 0;
+  // 代碼最大長度
+  /* 因應QC1297單，新增設置代碼長度 */
+  @Column(name = "`MaxCodeLength`")
+  private int maxCodeLength = 0;
 
-	// 建檔日期時間
-	@CreatedDate
-	@Column(name = "`CreateDate`")
-	private java.sql.Timestamp createDate;
+  // 是否為數字
+  /* Y:限數字 */
+  @Column(name = "`IsNumeric`", length = 1)
+  private String isNumeric;
 
-	// 建檔人員
-	@Column(name = "`CreateEmpNo`", length = 6)
-	private String createEmpNo;
+  // 建檔日期時間
+  @CreatedDate
+  @Column(name = "`CreateDate`")
+  private java.sql.Timestamp createDate;
 
-	// 最後更新日期時間
-	@LastModifiedDate
-	@Column(name = "`LastUpdate`")
-	private java.sql.Timestamp lastUpdate;
+  // 建檔人員
+  @Column(name = "`CreateEmpNo`", length = 6)
+  private String createEmpNo;
 
-	// 最後更新人員
-	@Column(name = "`LastUpdateEmpNo`", length = 6)
-	private String lastUpdateEmpNo;
+  // 最後更新日期時間
+  @LastModifiedDate
+  @Column(name = "`LastUpdate`")
+  private java.sql.Timestamp lastUpdate;
 
-	public CdCodeId getCdCodeId() {
-		return this.cdCodeId;
-	}
+  // 最後更新人員
+  @Column(name = "`LastUpdateEmpNo`", length = 6)
+  private String lastUpdateEmpNo;
 
-	public void setCdCodeId(CdCodeId cdCodeId) {
-		this.cdCodeId = cdCodeId;
-	}
 
-	/**
-	 * 代碼檔代號<br>
-	 * 
-	 * @return String
-	 */
-	public String getDefCode() {
-		return this.defCode == null ? "" : this.defCode;
-	}
+  public CdCodeId getCdCodeId() {
+    return this.cdCodeId;
+  }
 
-	/**
-	 * 代碼檔代號<br>
-	 * 
-	 *
-	 * @param defCode 代碼檔代號
-	 */
-	public void setDefCode(String defCode) {
-		this.defCode = defCode;
-	}
+  public void setCdCodeId(CdCodeId cdCodeId) {
+    this.cdCodeId = cdCodeId;
+  }
 
-	/**
-	 * 代碼檔業務類別<br>
-	 * 01:顧客管理作業 02:業務作業 03:帳務作業 04:批次作業 05:管理性作業 06:共同作業 07:介接外部系統 08:遵循法令作業
-	 * 09:報表作業
-	 * 
-	 * @return Integer
-	 */
-	public int getDefType() {
-		return this.defType;
-	}
+/**
+	* 代碼檔代號<br>
+	* 
+	* @return String
+	*/
+  public String getDefCode() {
+    return this.defCode == null ? "" : this.defCode;
+  }
 
-	/**
-	 * 代碼檔業務類別<br>
-	 * 01:顧客管理作業 02:業務作業 03:帳務作業 04:批次作業 05:管理性作業 06:共同作業 07:介接外部系統 08:遵循法令作業
-	 * 09:報表作業
-	 *
-	 * @param defType 代碼檔業務類別
-	 */
-	public void setDefType(int defType) {
-		this.defType = defType;
-	}
+/**
+	* 代碼檔代號<br>
+	* 
+  *
+  * @param defCode 代碼檔代號
+	*/
+  public void setDefCode(String defCode) {
+    this.defCode = defCode;
+  }
 
-	/**
-	 * 代碼<br>
-	 * 
-	 * @return String
-	 */
-	public String getCode() {
-		return this.code == null ? "" : this.code;
-	}
+/**
+	* 代碼檔業務類別<br>
+	* 01:顧客管理作業
+02:業務作業
+03:帳務作業
+04:批次作業
+05:管理性作業
+06:共同作業
+07:介接外部系統
+08:遵循法令作業
+09:報表作業
+	* @return Integer
+	*/
+  public int getDefType() {
+    return this.defType;
+  }
 
-	/**
-	 * 代碼<br>
-	 * 
-	 *
-	 * @param code 代碼
-	 */
-	public void setCode(String code) {
-		this.code = code;
-	}
+/**
+	* 代碼檔業務類別<br>
+	* 01:顧客管理作業
+02:業務作業
+03:帳務作業
+04:批次作業
+05:管理性作業
+06:共同作業
+07:介接外部系統
+08:遵循法令作業
+09:報表作業
+  *
+  * @param defType 代碼檔業務類別
+	*/
+  public void setDefType(int defType) {
+    this.defType = defType;
+  }
 
-	/**
-	 * 代碼說明<br>
-	 * 
-	 * @return String
-	 */
-	public String getItem() {
-		return this.item == null ? "" : this.item;
-	}
+/**
+	* 代碼<br>
+	* 
+	* @return String
+	*/
+  public String getCode() {
+    return this.code == null ? "" : this.code;
+  }
 
-	/**
-	 * 代碼說明<br>
-	 * 
-	 *
-	 * @param item 代碼說明
-	 */
-	public void setItem(String item) {
-		this.item = item;
-	}
+/**
+	* 代碼<br>
+	* 
+  *
+  * @param code 代碼
+	*/
+  public void setCode(String code) {
+    this.code = code;
+  }
 
-	/**
-	 * 啟用記號<br>
-	 * Y:啟用 N:未啟用
-	 * 
-	 * @return String
-	 */
-	public String getEnable() {
-		return this.enable == null ? "" : this.enable;
-	}
+/**
+	* 代碼說明<br>
+	* 
+	* @return String
+	*/
+  public String getItem() {
+    return this.item == null ? "" : this.item;
+  }
 
-	/**
-	 * 啟用記號<br>
-	 * Y:啟用 N:未啟用
-	 *
-	 * @param enable 啟用記號
-	 */
-	public void setEnable(String enable) {
-		this.enable = enable;
-	}
+/**
+	* 代碼說明<br>
+	* 
+  *
+  * @param item 代碼說明
+	*/
+  public void setItem(String item) {
+    this.item = item;
+  }
 
-	/**
-	 * 狀態<br>
-	 * 0:已放行 1:未放行 因應L6301放行新增記號
-	 * 
-	 * @return Integer
-	 */
-	public int getEffectFlag() {
-		return this.effectFlag;
-	}
+/**
+	* 啟用記號<br>
+	* Y:啟用
+N:未啟用
+	* @return String
+	*/
+  public String getEnable() {
+    return this.enable == null ? "" : this.enable;
+  }
 
-	/**
-	 * 狀態<br>
-	 * 0:已放行 1:未放行 因應L6301放行新增記號
-	 *
-	 * @param effectFlag 狀態
-	 */
-	public void setEffectFlag(int effectFlag) {
-		this.effectFlag = effectFlag;
-	}
+/**
+	* 啟用記號<br>
+	* Y:啟用
+N:未啟用
+  *
+  * @param enable 啟用記號
+	*/
+  public void setEnable(String enable) {
+    this.enable = enable;
+  }
 
-	/**
-	 * 代碼最小長度<br>
-	 * 因應QC1297單，新增設置代碼長度
-	 * 
-	 * @return Integer
-	 */
-	public int getMinCodeLength() {
-		return this.minCodeLength;
-	}
+/**
+	* 狀態<br>
+	* 0:已放行
+1:未放行
+因應L6301放行新增記號
+	* @return Integer
+	*/
+  public int getEffectFlag() {
+    return this.effectFlag;
+  }
 
-	/**
-	 * 代碼最小長度<br>
-	 * 因應QC1297單，新增設置代碼長度
-	 *
-	 * @param minCodeLength 代碼最小長度
-	 */
-	public void setMinCodeLength(int minCodeLength) {
-		this.minCodeLength = minCodeLength;
-	}
+/**
+	* 狀態<br>
+	* 0:已放行
+1:未放行
+因應L6301放行新增記號
+  *
+  * @param effectFlag 狀態
+	*/
+  public void setEffectFlag(int effectFlag) {
+    this.effectFlag = effectFlag;
+  }
 
-	/**
-	 * 代碼最大長度<br>
-	 * 因應QC1297單，新增設置代碼長度
-	 * 
-	 * @return Integer
-	 */
-	public int getMaxCodeLength() {
-		return this.maxCodeLength;
-	}
+/**
+	* 代碼最小長度<br>
+	* 因應QC1297單，新增設置代碼長度
+	* @return Integer
+	*/
+  public int getMinCodeLength() {
+    return this.minCodeLength;
+  }
 
-	/**
-	 * 代碼最大長度<br>
-	 * 因應QC1297單，新增設置代碼長度
-	 *
-	 * @param maxCodeLength 代碼最大長度
-	 */
-	public void setMaxCodeLength(int maxCodeLength) {
-		this.maxCodeLength = maxCodeLength;
-	}
+/**
+	* 代碼最小長度<br>
+	* 因應QC1297單，新增設置代碼長度
+  *
+  * @param minCodeLength 代碼最小長度
+	*/
+  public void setMinCodeLength(int minCodeLength) {
+    this.minCodeLength = minCodeLength;
+  }
 
-	/**
-	 * 建檔日期時間<br>
-	 * 
-	 * @return java.sql.Timestamp
-	 */
-	public java.sql.Timestamp getCreateDate() {
-		return this.createDate;
-	}
+/**
+	* 代碼最大長度<br>
+	* 因應QC1297單，新增設置代碼長度
+	* @return Integer
+	*/
+  public int getMaxCodeLength() {
+    return this.maxCodeLength;
+  }
 
-	/**
-	 * 建檔日期時間<br>
-	 * 
-	 *
-	 * @param createDate 建檔日期時間
-	 */
-	public void setCreateDate(java.sql.Timestamp createDate) {
-		this.createDate = createDate;
-	}
+/**
+	* 代碼最大長度<br>
+	* 因應QC1297單，新增設置代碼長度
+  *
+  * @param maxCodeLength 代碼最大長度
+	*/
+  public void setMaxCodeLength(int maxCodeLength) {
+    this.maxCodeLength = maxCodeLength;
+  }
 
-	/**
-	 * 建檔人員<br>
-	 * 
-	 * @return String
-	 */
-	public String getCreateEmpNo() {
-		return this.createEmpNo == null ? "" : this.createEmpNo;
-	}
+/**
+	* 是否為數字<br>
+	* Y:限數字
+	* @return String
+	*/
+  public String getIsNumeric() {
+    return this.isNumeric == null ? "" : this.isNumeric;
+  }
 
-	/**
-	 * 建檔人員<br>
-	 * 
-	 *
-	 * @param createEmpNo 建檔人員
-	 */
-	public void setCreateEmpNo(String createEmpNo) {
-		this.createEmpNo = createEmpNo;
-	}
+/**
+	* 是否為數字<br>
+	* Y:限數字
+  *
+  * @param isNumeric 是否為數字
+	*/
+  public void setIsNumeric(String isNumeric) {
+    this.isNumeric = isNumeric;
+  }
 
-	/**
-	 * 最後更新日期時間<br>
-	 * 
-	 * @return java.sql.Timestamp
-	 */
-	public java.sql.Timestamp getLastUpdate() {
-		return this.lastUpdate;
-	}
+/**
+	* 建檔日期時間<br>
+	* 
+	* @return java.sql.Timestamp
+	*/
+  public java.sql.Timestamp getCreateDate() {
+    return this.createDate;
+  }
 
-	/**
-	 * 最後更新日期時間<br>
-	 * 
-	 *
-	 * @param lastUpdate 最後更新日期時間
-	 */
-	public void setLastUpdate(java.sql.Timestamp lastUpdate) {
-		this.lastUpdate = lastUpdate;
-	}
+/**
+	* 建檔日期時間<br>
+	* 
+  *
+  * @param createDate 建檔日期時間
+	*/
+  public void setCreateDate(java.sql.Timestamp createDate) {
+    this.createDate = createDate;
+  }
 
-	/**
-	 * 最後更新人員<br>
-	 * 
-	 * @return String
-	 */
-	public String getLastUpdateEmpNo() {
-		return this.lastUpdateEmpNo == null ? "" : this.lastUpdateEmpNo;
-	}
+/**
+	* 建檔人員<br>
+	* 
+	* @return String
+	*/
+  public String getCreateEmpNo() {
+    return this.createEmpNo == null ? "" : this.createEmpNo;
+  }
 
-	/**
-	 * 最後更新人員<br>
-	 * 
-	 *
-	 * @param lastUpdateEmpNo 最後更新人員
-	 */
-	public void setLastUpdateEmpNo(String lastUpdateEmpNo) {
-		this.lastUpdateEmpNo = lastUpdateEmpNo;
-	}
+/**
+	* 建檔人員<br>
+	* 
+  *
+  * @param createEmpNo 建檔人員
+	*/
+  public void setCreateEmpNo(String createEmpNo) {
+    this.createEmpNo = createEmpNo;
+  }
 
-	@Override
-	public String toString() {
-		return "CdCode [cdCodeId=" + cdCodeId + ", defType=" + defType + ", item=" + item + ", enable=" + enable + ", effectFlag=" + effectFlag + ", minCodeLength=" + minCodeLength
-				+ ", maxCodeLength=" + maxCodeLength + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
-	}
+/**
+	* 最後更新日期時間<br>
+	* 
+	* @return java.sql.Timestamp
+	*/
+  public java.sql.Timestamp getLastUpdate() {
+    return this.lastUpdate;
+  }
+
+/**
+	* 最後更新日期時間<br>
+	* 
+  *
+  * @param lastUpdate 最後更新日期時間
+	*/
+  public void setLastUpdate(java.sql.Timestamp lastUpdate) {
+    this.lastUpdate = lastUpdate;
+  }
+
+/**
+	* 最後更新人員<br>
+	* 
+	* @return String
+	*/
+  public String getLastUpdateEmpNo() {
+    return this.lastUpdateEmpNo == null ? "" : this.lastUpdateEmpNo;
+  }
+
+/**
+	* 最後更新人員<br>
+	* 
+  *
+  * @param lastUpdateEmpNo 最後更新人員
+	*/
+  public void setLastUpdateEmpNo(String lastUpdateEmpNo) {
+    this.lastUpdateEmpNo = lastUpdateEmpNo;
+  }
+
+
+  @Override
+  public String toString() {
+    return "CdCode [cdCodeId=" + cdCodeId + ", defType=" + defType + ", item=" + item + ", enable=" + enable + ", effectFlag=" + effectFlag
+           + ", minCodeLength=" + minCodeLength + ", maxCodeLength=" + maxCodeLength + ", isNumeric=" + isNumeric + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+  }
 }

@@ -47,7 +47,7 @@ E(0,0)
 ["#FdCurrencyCode+幣別",#CurrencyCode],
 ["#FdAccountType+科子細目",#AcNoCode,"-",#AcSubCode,"-",#AcDtlCode,"@",#BTN1,#AcNoItem],
 ["#FdCustNo+戶號",#CustNo,"-",#FacmNo,"@@",#TmpFacmNoXX],
-["#FdAcctCode+業務科目",#AcctCode,#AcctCodeX],
+["#FdAcctCode+銷帳科目",#AcctCode,#AcctCodeX],
 ["#FdClsFlag+銷帳記號",#ClsFlag,#ClsFlagX],
 ]
 !---------- AP Button AREA ----------
@@ -77,6 +77,7 @@ R(1,XXR99)
 CALL(#HelpProc)
 T(2,#AcBookCodeHelp,#HelpDesc1)
 T(2,#AcctCodeHelp,#HelpDesc2)
+T(HELP,@AcctCodeHelp,#AcctCodeHelp,-,310;320;330;340;990)
 T(2,#AcSubBookCodeHelp,#HelpDesc3)
 
 !銷帳記號
@@ -218,14 +219,14 @@ C(3,#CustNo,0,S,$)
 C(3,#FacmNo,0,T(2,#CustNo),T(2,#CustNo+-+#FacmNo)) 
 
 #FdAcctCode=X,2,L
-! 業務科目
+! 銷帳科目
 #AcctCode=X,3,I
 C(3,#CHAIN,1,s,$)
 C(4,#AcNoCode,$,S)
 HELP(#AcctCodeHelp,cols:2)
 @T(3,@AcctCodeX,)
 C(3,#CustNo,0,$,s)
-C(4,#AcctCode,V(P,科子細目、戶號、業務科目請擇一輸入),$)
+C(4,#AcctCode,V(P,科子細目、戶號、銷帳科目請擇一輸入),$)
 
 #AcctCodeX=X,20,L
 T(H,#AcctCode,#AcctCodeHelp)
@@ -320,7 +321,7 @@ T(3,1)ASGN(LOOP$)
 #OOCustNoX=X,11,L
 T(2,#OOCustNo+-+#OOFacmNo)
 
-! 業務科目
+! 銷帳科目
 #OOAcctCode=X,3,L
 #OOAcctItem=x,40,L
 
@@ -456,7 +457,7 @@ TXFORM=L6907
 #OOGetFeeTxt=未收
 {width:40,align:'center'}
 
-#OOAcctCodeX=業務科目
+#OOAcctCodeX=銷帳科目
 {width:200,align:'left'}
 
 #OORvNo=銷帳編號
@@ -501,7 +502,7 @@ TXFORM=L6907
 #OOGetFeeTxt=未收
 {width:40,align:'center'}
 
-#OOAcctCodeX=業務科目
+#OOAcctCodeX=銷帳科目
 {width:200,align:'left'}
 
 #OORvNo=銷帳編號

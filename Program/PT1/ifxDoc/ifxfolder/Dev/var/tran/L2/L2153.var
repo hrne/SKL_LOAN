@@ -1081,8 +1081,8 @@ T(3,@StepX{n},-)
 #FdBaseRateCode=X,2,L
 
 #BaseRateCode=A,2,L
-C(3,#BaseRateCode,99,SHOW(#ApproveRate)HIDE(#RateIncr)T(F,@RateIncr,0)T(3,@RateIncrX, )
-                    ,HIDE(#ApproveRate)SHOW(#RateIncr)T(F,@RateIncr,1)T(3,@RateIncrX,%))
+C(3,#BaseRateCode,99,HIDE(#RateIncr)T(F,@RateIncr,0)T(3,@RateIncrX, )
+                    ,SHOW(#RateIncr)T(F,@RateIncr,1)T(3,@RateIncrX,%))
 
 #BaseRateCodeX=X,30,L
 T(H,#BaseRateCode,#BaseRate0Help)
@@ -1098,12 +1098,12 @@ E(0,@RimEffectTime,0)
 ! RESET_RIM(#SendL2r06,L2R06)
 S(L2R06,1,#RimTxCode,#RimCurrencyCode,#RimBaseRateCode,#RimEffectDate,#RimEffectTime)
 R(1,L2R06)
+E(0,@BaseRate,#L2r06Rate)
 
 ![指標利率]
 #FdBaseRate=X,2,L
 
 #BaseRate=n,2.4,S
-E(0,#L2r06Rate)
 
 #BaseRateX=X,12,L
 X(#BaseRate)
@@ -1116,13 +1116,11 @@ T(B,#BaseRateX+#WkPercent)
 #ProdRate=n,2.4,S
 E(0,#BaseRate+#L2r01ProdIncr)
 C(3,#BaseRateCode,99,S,$)
-E(0,@ApproveRate,#BaseRate+#L2r01ProdIncr)
+C(3,#ApproveRate,0,E(0,@ApproveRate,#ProdRate),$)
 
 #ProdRateX=X,12,L
 X(#ProdRate)
 T(B,#ProdRateX+#WkPercent)
-X(@ApproveRateX,#ApproveRate)
-C(3,#BaseRateCode,99,T(3,@ApproveRateX,%),T(B,@ApproveRateX,#ApproveRateX+#WkPercent))
 
 ![利率加減碼]
 !必須輸入
@@ -1134,10 +1132,6 @@ C(3,#Hide2Flag,0,CALL(#HideP2),$)
 C(3,#BaseRateCode,99,S,$)
 C(3,#RateIncr,0,E(0,#L2r01ProdIncr),$)
 
-#bri=+n,2.4,S
-C(3,#BaseRateCode,99,S,$)
-E(0,#BaseRate+#RateIncr)
-@V(5,#L2r01LowLimitRate,99)
 
 #RateIncrX=X,12,L
 C(3,#BaseRateCode,99,$,s)
@@ -1152,20 +1146,27 @@ T(B,@RateIncrX,#RateIncrX+#WkPercent)
 
 #ApproveRate=n,2.4,I
 C(3,#Hide2Flag,0,CALL(#HideP2),$)
-C(3,#BaseRateCode,99,$,E(0,#BaseRate+#RateIncr))
-C(3,#BaseRateCode,99,$,s)
+C(3,#BaseRateCode,99,$,C(3,#ApproveRate,0,E(0,#BaseRate+#RateIncr),$))
+C(3,#BaseRateCode,99,$,$)
 @V(2,0)
+C(3,#BaseRateCode,99,$,E(0,@BaseRate,#ApproveRate-#RateIncr))
 
-#ApproveRateX=X,12,L
+#BaseRateX=_,_,L
 C(3,#BaseRateCode,99,s,$)
-X(@ApproveRateX,#ApproveRate)
-T(B,@ApproveRateX,#ApproveRateX+#WkPercent)
+X(#BaseRate)
+T(B,#BaseRateX+#WkPercent)
+
+#ProdLowLimitRate=X,7,S
+X(#L2r01LowLimitRate)
+
+#checkMsg=X,60,S
+T(B,核准利率低於商品設定利率下限+#ProdLowLimitRate+%)
+
+#bri=+n,2.4,S
+@
+IF(#ApproveRate<#L2r01LowLimitRate,V(P,#checkMsg),$)
 
 
-#bri99=+n,2.4,S
-C(3,#BaseRateCode,99,$,S)
-E(0,#ApproveRate)
-@V(5,#L2r01LowLimitRate,99)
 
 ![利率區分]
 !商品不限制時,才須輸入,否則自動顯示不必輸入
@@ -2487,7 +2488,7 @@ T(2,@Breach,#L2r56Breach)
 C(3,#Hide7Flag,0,CALL(#HideP7),$)
 ! IF(#ProdBreachFlag=="Y"||#ProdBreachFlag=="",T(F,@Breach,0),T(F,@Breach,1))
 IF(#BreachFlag=="N",S,$)
-IF(#ProdBreachFlag=="Y",T(2,@Breach,#L2r01Breach),$)
+! IF(#ProdBreachFlag=="Y",T(2,@Breach,#L2r01Breach),$)
 C(5,#ProdBreachFlag,Y,s,$)
 C(4,#ProdBreachFlag,s,$)
 
@@ -2670,7 +2671,7 @@ C(3,#ExpandFlag,0,CALL(#Expand),$)
 ["#FdBaseRate+指標利率",#BaseRateX],
 ["#FdProdRate+商品利率",#ProdRateX],
 ["#FdRateIncr+加碼利率",#RateIncr,#RateIncrX],
-["#FdApproveRate+核准利率",#ApproveRate,#ApproveRateX],
+["#FdApproveRate+核准利率",#ApproveRate,"%"],
 ["#FdRateCode+利率區分",#RateCode,#RateCodeX],
 ["#FdFirstRateAdjFreq+首次利率調整週期",#FirstRateAdjFreq,#LbFirstRateAdjFreq,#FirstRateAdjFreqX],
 ["#FdRateAdjFreq+利率調整週期",#RateAdjFreq,#LbRateAdjFreq,#RateAdjFreqX],

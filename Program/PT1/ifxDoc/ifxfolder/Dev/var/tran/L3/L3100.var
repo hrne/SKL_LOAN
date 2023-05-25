@@ -819,6 +819,17 @@ S(L2R01,1,#RimFuncCode,#RimTxCode,#RimProdNo)
 R(1,L2R01)
 T(2,@ProdName,#L2r01ProdName)
 
+!個金定期機動需特別處理可調整核准利率
+!1需特別處理 0不可輸入核准額度
+#checkwk=A,1,S
+IF(#FKEY==0 || #FKEY==7,$,s)
+C(3,#L2r05DepartmentCode,0,$,S)
+C(3,#L2r05RateCode,3,$,S)
+E(0,1)
+
+#WkShowApproveRate=X,1,S
+C(3,#checkwk,0,$,S)
+T(F,@ApproveRate,0)
 
 #EffectDate=D,7,S
 E(0,#SYSDATE)
@@ -1023,16 +1034,23 @@ E(0,@RimEffectTime,0)
 RESET_RIM(#SendL2r06,L2R06)
 S(L2R06,1,#RimTxCode,#RimCurrencyCode,#RimBaseRateCode,#RimEffectDate,#RimEffectTime)
 R(1,L2R06)
-E(0,@BaseRate,#L2r06Rate)
-E(0,@ProdRate,#BaseRate+#L2r01ProdIncr)
-E(0,@ApproveRate,#BaseRate+#RateIncr)
+E(0,@ProdRate,#L2r06Rate+#L2r01ProdIncr)
 C(3,#BaseRateCode,99,E(0,@ApproveRate,#L2r05ApproveRate),$)
+C(3,#BaseRateCode,99,s,$)
+C(3,#checkwk,0,
+ E(0,@BaseRate,#L2r06Rate)
+ E(0,@ApproveRate,#BaseRate+#RateIncr)
+ ,
+ C(3,#L2r05FirstDrawdownDate,0,E(0,@ApproveRate,#L2r05ApproveRate),E(0,@ApproveRate,#L2r05FirstLoanBorRate))
+ E(0,@BaseRate,#ApproveRate-#RateIncr)
+)
+
 
 #WKFADJDATE=D,8,S
 D(7,2,#DrawdownDate,#FirstRateAdjFreq,0)
 C(3,#RateCode,3,T(F,@FirstAdjRateDate,1),T(F,@FirstAdjRateDate,0))
 C(3,#RateCode,3,$,s)
-C(3,#L2r05FirstAdjRateDate,0,T(F,@FirstAdjRateDate,1)E(0,@FirstAdjRateDate,#WKFADJDATE),T(F,@FirstAdjRateDate,0)E(0,@FirstAdjRateDate,#L2r05FirstAdjRateDate))
+C(3,#L2r05FirstAdjRateDate,0,E(0,@FirstAdjRateDate,#WKFADJDATE),E(0,@FirstAdjRateDate,#L2r05FirstAdjRateDate))
 ![貸款期間]
 !必須輸入
 #FdLoanTerm=X,2,L
@@ -1120,7 +1138,7 @@ T(H,#AmortizedCode,#FacmAmortizedCodeHelp)
 
 !2021/8/30 額度資料改為不可修改純顯示
 #FreqBase=A,1,L
-C(3,#AmortizedCode,2,HIDE(#SpecificDd),C(3,#FreqBase,2,SHOW(#SpecificDd)T(2,@FdSpecificDd,*),HIDE(#SpecificDd))))
+C(3,#AmortizedCode,2,HIDE(#SpecificDd),C(3,#FreqBase,2,SHOW(#SpecificDd)T(2,@FdSpecificDd,*),HIDE(#SpecificDd)))
 ! HELP(#FreqBaseHelp)
 !到期取息者,週期基準固定為月不必輸入
 ! C(3,#AmortizedCode,2,E(0,2),$)
@@ -1765,7 +1783,6 @@ C(3,#BaseRateCode,0,S,$)T(H,#BaseRateCode,#BaseRateCodeHelp)
 #FdBaseRate=X,2,L
 
 #BaseRate=n,2.4,L
-E(0,#L2r06Rate)
 ! E(0,@ApproveRate,#BaseRate+#RateIncr)
 
 ! #WkBaseRate=X,7,S
@@ -1791,7 +1808,6 @@ P(L,#WKRATE2)
 #FdProdRate=X,2,L
 
 #ProdRate=n,2.4,L
-E(0,#BaseRate+#L2r01ProdIncr)
 
 ! #WkProdRate=X,7,S
 ! X(#ProdRate)
@@ -1822,17 +1838,19 @@ C(3,#HIDE2FG,0,CALL(#HIDEP2),$)
 !依核准額度自動顯示不必輸入 L2R05
 #FdApproveRate=X,2,L
 
-#ApproveRate=n,2.4,L
-E(0,#BaseRate+#RateIncr)
-C(3,#BaseRateCode,99,E(0,#L2r05ApproveRate),$)
+#ApproveRate=n,2.4,I
+C(3,#checkwk,1,$,s)
+@V(2,0)
+C(3,#BaseRateCode,99,$,E(0,@BaseRate,#ApproveRate-#RateIncr))
 
-#WkApproveRate=X,7,S
-X(#ApproveRate)
-P(R,#WkApproveRate)
 
-#ApproveRateX=X,10,L
-T(2,#WkApproveRate+#WkPercent)
-P(L,#ApproveRateX)
+! #WkApproveRate=X,7,S
+! X(#ApproveRate)
+! P(R,#WkApproveRate)
+
+! #ApproveRateX=X,10,L
+! T(2,#WkApproveRate+#WkPercent)
+! P(L,#ApproveRateX)
 
 ![利率區分]
 !依核准額度自動顯示不必輸入 L2R05

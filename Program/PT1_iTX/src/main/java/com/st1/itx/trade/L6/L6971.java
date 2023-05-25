@@ -55,6 +55,14 @@ public class L6971 extends TradeBuffer {
 		this.info("active L6971 ");
 		this.totaVo.init(titaVo);
 
+		/*
+		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
+		 */
+		this.index = titaVo.getReturnIndex();
+
+		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
+		this.limit = 100; // 29 * 500 = 14500
+
 		if (!ContentName.onLine.equals(titaVo.getDataBase())) {
 			throw new LogicException("E0008", "L6971 只允許在連線環境執行!!");
 		}
@@ -81,7 +89,7 @@ public class L6971 extends TradeBuffer {
 		List<Map<String, String>> l6971Query = null;
 
 		try {
-			l6971Query = l6971ServiceImpl.findAll(workType, titaVo);
+			l6971Query = l6971ServiceImpl.findAll(workType, index, limit, titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -153,7 +161,9 @@ public class L6971 extends TradeBuffer {
 				0, Integer.MAX_VALUE, titaVo);
 
 		TitaVo titaVoHistory = (TitaVo) titaVo.clone();
-		titaVoHistory.setDataBaseOnHist();
+//		titaVoHistory.setDataBaseOnHist();
+		// 2023-05-25 Wei for DEV測試用
+		titaVoHistory.setDataBaseOnDay();
 
 		Slice<LoanBorTx> sLoanBorTxHistory = loanBorTxService.borxBormNoEq(custNo, facmNo, bormNo, 0, Integer.MAX_VALUE,
 				0, Integer.MAX_VALUE, titaVoHistory);

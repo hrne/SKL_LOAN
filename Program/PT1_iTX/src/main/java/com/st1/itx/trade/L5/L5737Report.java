@@ -89,7 +89,7 @@ public class L5737Report extends MakeReport {
 				makeExcel.setValue(row, 13, this.showBcDate(result.get("DrawdownDate"), 0), "C");
 				makeExcel.setValue(row, 14, parse.stringToBigDecimal(result.get("EvaNetWorth")), "#,##0");
 				this.info("LoanRatio = " + parse.stringToBigDecimal(result.get("LoanRatio")));
-				makeExcel.setValue(row, 15, parse.stringToBigDecimal(result.get("LoanRatio")), "0%");
+				makeExcel.setValue(row, 15, parse.stringToBigDecimal(result.get("LoanRatio")) + "%");
 				row++;
 			}
 		}

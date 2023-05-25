@@ -12,6 +12,8 @@ import com.st1.itx.db.service.TxArchiveTableService;
 import com.st1.itx.db.service.springjpa.cm.L9729ServiceImpl.WorkType;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -30,8 +32,15 @@ public class L6972p extends TradeBuffer {
 	@Autowired
 	TxArchiveTableService txArchiveTableService;
 
+	@Autowired
+	WebClient webClient;
+	
+	@Autowired
+	DateUtil dateUtil;
+	
 	WorkType workType;
 
+	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6972 ");
@@ -67,6 +76,8 @@ public class L6972p extends TradeBuffer {
 
 		this.info("L6972 exit.");
 
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "L9729", "", "L6972搬運資料已完成,連動至L9729產生報表", titaVo);
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
