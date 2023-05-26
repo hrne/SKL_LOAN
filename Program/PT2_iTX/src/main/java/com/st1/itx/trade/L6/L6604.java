@@ -83,7 +83,6 @@ public class L6604 extends TradeBuffer {
 
 		CdCode tCdCode = sCdCodeService.holdById(tCdCodeId);
 
-		
 		switch (iFunCode) {
 		case 1: // 新增
 			if (tCdCode != null) {
@@ -92,18 +91,18 @@ public class L6604 extends TradeBuffer {
 			tCdCode = new CdCode();
 			tCdCode.setCdCodeId(tCdCodeId);
 			tCdCode = moveCdDef(tCdCode, iDefType, titaVo);
-			
-			String str = titaVo.getParam("Item").trim();
-	        boolean isNumeric =  str.matches("[+-]?\\d*(\\.\\d+)?");
+
+			String str = titaVo.getParam("Code").trim();
+			boolean isNumeric = str.matches("[+-]?\\d*(\\.\\d+)?");
 
 			String iIsNumeric = tCdCode.getIsNumeric();
 
-	        if("Y".equals(iIsNumeric)) {
-	        	if(!isNumeric) {
-	        		throw new LogicException(titaVo, "E0001", "新增資料有誤，該代碼檔代號限輸入數字");
-	        	}
-	        }
-	        
+			if ("Y".equals(iIsNumeric)) {
+				if (!isNumeric) {
+					throw new LogicException(titaVo, "E0005", "新增資料有誤，該代碼檔代號限輸入數字");
+				}
+			}
+
 			try {
 				sCdCodeService.insert(tCdCode, titaVo);
 			} catch (DBException e) {
@@ -119,12 +118,12 @@ public class L6604 extends TradeBuffer {
 			if (tCdCode == null) {
 				throw new LogicException(titaVo, "E0003", iDefCode + "-" + iCode); // 修改資料不存在
 			}
-			
+
 			// 代碼檔修改[業務類別]時,其下代碼一併修改
 			if (iDefCode.equals("CodeType")) {
 				this.info("Synchronize CodeType");
 				iChkFg = updDefType(iCode, iDefType, iChkFg, titaVo);
-			} 
+			}
 
 			CdCode tCdCode2 = (CdCode) dataLog.clone(tCdCode);
 			try {
@@ -141,6 +140,15 @@ public class L6604 extends TradeBuffer {
 			if (tCdCode == null) {
 				throw new LogicException(titaVo, "E0004", iDefCode + "-" + iCode); // 刪除資料不存在
 			}
+			String ixDefCode = titaVo.getParam("DefCode");
+			if (ixDefCode.equals("CodeType")) {
+				Slice<CdCode> icCdCode = sCdCodeService.defCodeEq("CodeType", titaVo.getParam("DefCode"), 0,
+						Integer.MAX_VALUE, titaVo);
+				List<CdCode> isCdCode = icCdCode == null ? null : icCdCode.getContent();
+				if (isCdCode != null) {
+					throw new LogicException(titaVo, "E0008", "請先刪除代碼檔代號" + titaVo.getParam("Code") + "資料"); // 刪除資料不存在
+				}
+			}
 			try {
 				sCdCodeService.delete(tCdCode);
 			} catch (DBException e) {
@@ -149,7 +157,7 @@ public class L6604 extends TradeBuffer {
 			dataLog.setEnv(titaVo, tCdCode, tCdCode); ////
 			dataLog.exec("刪除各類代碼檔"); ////
 			break;
-			
+
 		}
 
 		this.addList(this.totaVo);
@@ -165,29 +173,31 @@ public class L6604 extends TradeBuffer {
 		tCdCode.setEnable(titaVo.getParam("Enable"));
 		tCdCode.setMinCodeLength(Integer.parseInt(titaVo.getParam("MinCodeLength")));
 		tCdCode.setMaxCodeLength(Integer.parseInt(titaVo.getParam("MaxCodeLength")));
-		
-		Slice<CdCode> icCdCode = sCdCodeService.defCodeEq("CodeType",titaVo.getParam("DefCode"), 0, Integer.MAX_VALUE, titaVo);
+
+		Slice<CdCode> icCdCode = sCdCodeService.defCodeEq("CodeType", titaVo.getParam("DefCode"), 0, Integer.MAX_VALUE,
+				titaVo);
 		List<CdCode> isCdCode = icCdCode == null ? null : icCdCode.getContent();
-		for(CdCode iCdCode : isCdCode) {
+		for (CdCode iCdCode : isCdCode) {
 			String ix = iCdCode.getIsNumeric();
-			if(ix!=null) {
-				tCdCode.setIsNumeric(ix);				
-			}else {
-				tCdCode.setIsNumeric(titaVo.getParam("IsNumeric"));		
+			if (ix != null) {
+				tCdCode.setIsNumeric(ix);
+			} else {
+				tCdCode.setIsNumeric(titaVo.getParam("IsNumeric"));
 			}
 		}
 
 		CdCode cdCode = new CdCode();
-		if(("CodeType").equals(titaVo.getParam("DefCode"))) {
-			Slice<CdCode>cCdCode = sCdCodeService.defCodeEq(titaVo.getParam("Code"),"%", 0, Integer.MAX_VALUE, titaVo);
+		if (("CodeType").equals(titaVo.getParam("DefCode"))) {
+			Slice<CdCode> cCdCode = sCdCodeService.defCodeEq(titaVo.getParam("Code"), "%", 0, Integer.MAX_VALUE,
+					titaVo);
 			List<CdCode> sCdCode = cCdCode == null ? null : cCdCode.getContent();
 
-				for(CdCode iCdCode : sCdCode) {
-					
-					if(sCdCode!=null) {
+			if (sCdCode != null) {
+				for (CdCode iCdCode : sCdCode) {
+
 					cdCode = new CdCode();
-					this.info("iCdCode=="+iCdCode.getDefCode()+",code=="+iCdCode.getCode());
-					cdCode = sCdCodeService.holdById(new CdCodeId(iCdCode.getDefCode(),iCdCode.getCode()), titaVo);
+					this.info("iCdCode==" + iCdCode.getDefCode() + ",code==" + iCdCode.getCode());
+					cdCode = sCdCodeService.holdById(new CdCodeId(iCdCode.getDefCode(), iCdCode.getCode()), titaVo);
 					cdCode.setMinCodeLength(Integer.parseInt(titaVo.getParam("MinCodeLength")));
 					cdCode.setMaxCodeLength(Integer.parseInt(titaVo.getParam("MaxCodeLength")));
 					try {
@@ -197,9 +207,9 @@ public class L6604 extends TradeBuffer {
 					}
 				}
 			}
-			
+
 		}
-		
+
 		return tCdCode;
 	}
 
@@ -211,27 +221,27 @@ public class L6604 extends TradeBuffer {
 		List<CdCode> lCdCode = slCdCode == null ? null : slCdCode.getContent();
 
 		String iIsNumeric = titaVo.getParam("IsNumeric");
-		String str = titaVo.getParam("Item").trim();
+		String str = titaVo.getParam("Code").trim();
 //		this.info
-        boolean isNumeric =  str.matches("[+-]?\\d*(\\.\\d+)?");
-        if("Y".equals(iIsNumeric)) {
-        	if(!isNumeric) {
-        		throw new LogicException(titaVo, "E0001", "新增資料有誤，該代碼檔代號限輸入數字");
-        	}
-        }
-		
+		boolean isNumeric = str.matches("[+-]?\\d*(\\.\\d+)?");
+		if ("Y".equals(iIsNumeric)) {
+			if (!isNumeric) {
+				throw new LogicException(titaVo, "E0005", "新增資料有誤，該代碼檔代號限輸入數字");
+			}
+		}
+
 		if (lCdCode == null || lCdCode.size() == 0) {
 			this.info("L6604 updDefType notfound : " + uChkFg);
 			uChkFg = 0;
 			return uChkFg;
 		}
-		
-		this.info("uDefType=="+uDefType+",lCdCode Type=="+lCdCode.get(0).getDefType());
-		if(uDefType == lCdCode.get(0).getDefType()) {
+
+		this.info("uDefType==" + uDefType + ",lCdCode Type==" + lCdCode.get(0).getDefType());
+		if (uDefType == lCdCode.get(0).getDefType()) {
 			uChkFg = 0;
 			return uChkFg;
 		}
-		
+
 		// 如有找到資料
 		for (CdCode tCdCode : lCdCode) {
 			CdCode uCdCode = new CdCode();
@@ -242,7 +252,8 @@ public class L6604 extends TradeBuffer {
 					uCdCode.setDefType(uDefType);
 					sCdCodeService.update(uCdCode);
 				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0007", tCdCode.getDefCode() + "-" + tCdCode.getCode() + ":" + e.getErrorMsg()); // 更新資料時，發生錯誤
+					throw new LogicException(titaVo, "E0007",
+							tCdCode.getDefCode() + "-" + tCdCode.getCode() + ":" + e.getErrorMsg()); // 更新資料時，發生錯誤
 				}
 			} else {
 				throw new LogicException(titaVo, "E0003", tCdCode.getDefCode() + "-" + tCdCode.getCode()); // 修改資料不存在

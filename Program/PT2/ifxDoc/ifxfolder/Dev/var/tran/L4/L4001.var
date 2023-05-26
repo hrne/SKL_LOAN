@@ -81,7 +81,7 @@ T(2,@StatusCodeHelp,#HelpDesc2)
 #CHAIN=A,1,S
 T(4,CHAIN$) 
 
-#NTXBUF=X,12,S
+#NTXBUF=X,14,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@AcDateFrom,#NTXBUF,1,7)
 T(1,@AcDateTo,#NTXBUF,8,7)

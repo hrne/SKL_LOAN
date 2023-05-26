@@ -3,6 +3,8 @@ package com.st1.itx.trade.L5;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -109,7 +111,7 @@ public class L5506 extends TradeBuffer {
 
 		int iPerfDate = Integer.valueOf(titaVo.getParam("PerfDate").trim());
 		int iWorkMonth = Integer.valueOf(titaVo.getParam("WorkMonth").trim()) + 191100;
-		int iWorkSeason = Integer.valueOf(titaVo.getParam("WorkSeason").trim()) + 1911;
+		int iWorkSeason = Integer.valueOf(titaVo.getParam("WorkSeason").trim()) + 19110;
 		BigDecimal iPerfCnt = new BigDecimal(titaVo.getParam("PerfCnt").trim());
 		BigDecimal iPerfAmt = new BigDecimal(titaVo.getParam("PerfAmt").trim());
 

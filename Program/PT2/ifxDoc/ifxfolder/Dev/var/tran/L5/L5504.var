@@ -301,7 +301,7 @@ T(3,@FdAdjustBonus2,調整發放獎金)
 HIDE(#BtnL3002)
 !HIDE(#BtnCdEmp)
 !C(3,#ManualFg,1,$,HIDE(#BtnL2001))
-
+T(F,@WorkMonth,0)
 
 #Frame4=X,3,S
 C(3,#FunCode,4,$,C(3,#FunCode,5,$,S))

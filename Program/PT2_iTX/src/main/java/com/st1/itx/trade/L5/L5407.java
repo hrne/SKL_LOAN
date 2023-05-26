@@ -13,6 +13,7 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.PfCoOfficer;
 import com.st1.itx.db.domain.PfCoOfficerId;
 import com.st1.itx.db.domain.PfCoOfficerLog;
+import com.st1.itx.db.domain.PfCoOfficerLogId;
 import com.st1.itx.db.service.PfCoOfficerLogService;
 import com.st1.itx.db.service.PfCoOfficerService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -163,8 +164,9 @@ public class L5407 extends TradeBuffer {
 						if (t.getIneffectiveDate() == 9991231) {
 							throw new LogicException("E0015", "該生效日" + t.getEffectiveDate() + "需設定停效日期");// 檢查錯誤
 						} 
-						else if(iEffectiveDate < t.getIneffectiveDate() && iIneffectiveDate <= t.getIneffectiveDate()){
-							throw new LogicException("E0015","該生效日" + iEffectiveDate + "已超過原停效日" + t.getIneffectiveDate());// 檢查錯誤
+						else if(iEffectiveDate > t.getIneffectiveDate() && iIneffectiveDate <= t.getIneffectiveDate()){
+							throw new LogicException("E0015","該生效日" + iEffectiveDate + "已超過原生效日" + t.getIneffectiveDate()
+							 + "且該停效日"+iIneffectiveDate +"等於或小於原停效日" + t.getEffectiveDate());// 檢查錯誤
 						}
 					}
 				}
@@ -178,7 +180,7 @@ public class L5407 extends TradeBuffer {
 		Slice<PfCoOfficerLog> slPfCoOfficerLog = pfCoOfficerLogService.findEmpNoEq(iEmpNo, 0, Integer.MAX_VALUE,
 				titaVo);
 
-		if (slPfCoOfficerLog == null) {
+		if (slPfCoOfficerLog == null && iFunctionCode != 1 ) {
 			PfCoOfficer oPf = pfCoOfficerService.effectiveDateFirst(iEmpNo, 0, 99991231, titaVo);
 			if (oPf != null) {
 				PfCoOfficerLog tPfCoOfficerLog = new PfCoOfficerLog();
