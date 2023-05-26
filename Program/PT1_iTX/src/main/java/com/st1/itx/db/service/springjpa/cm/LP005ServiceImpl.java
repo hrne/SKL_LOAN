@@ -270,19 +270,19 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN ( SELECT \"EmployeeNo\"                "; // -
 		sql += "                  , SUM(CASE ";
 		sql += "                          WHEN \"WorkMonth\" = :inputWorkMonth1 ";
-		sql += "                          THEN CNT ";
+		sql += "                          THEN 1 ";
 		sql += "                        ELSE 0 END) AS count1     "; // -- 件數1
 		sql += "                  , SUM(CASE  ";
 		sql += "                          WHEN \"WorkMonth\" = :inputWorkMonth2 ";
-		sql += "                          THEN CNT ";
+		sql += "                          THEN 1 ";
 		sql += "                        ELSE 0 END) AS count2     "; // -- 件數2
 		sql += "                  , SUM(CASE  ";
 		sql += "                          WHEN \"WorkMonth\" = :inputWorkMonth3 ";
-		sql += "                          THEN CNT ";
+		sql += "                          THEN 1 ";
 		sql += "                        ELSE 0 END) AS count3     "; // -- 件數3
 		sql += "                  , SUM(CASE  ";
 		sql += "                          WHEN \"WorkMonth\" = :inputWorkMonth4 ";
-		sql += "                          THEN CNT ";
+		sql += "                          THEN 1 ";
 		sql += "                        ELSE 0 END) AS count4     "; // -- 件數4
 		sql += "                  , SUM(1)          AS countTotal "; // -- 件數合計
 		sql += "                  , SUM(CASE ";

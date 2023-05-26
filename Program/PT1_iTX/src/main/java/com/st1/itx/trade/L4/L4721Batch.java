@@ -50,7 +50,6 @@ public class L4721Batch extends TradeBuffer {
 	@Autowired
 	private CustNoticeCom custNoticeCom;
 
-
 	@Autowired
 	private CustMainService custMainService;
 
@@ -86,6 +85,7 @@ public class L4721Batch extends TradeBuffer {
 	int CntPaper = 0;
 	int CntEmail = 0;
 	int CntMsg = 0;
+	int commitCnt = 200;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -133,14 +133,10 @@ public class L4721Batch extends TradeBuffer {
 				}
 
 				if (custList != null) {
+
+					int cntTrans = 0;
 					for (Map<String, String> data : custList) {
-						
-						try {
-							Thread.sleep(50);
-						} catch (InterruptedException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
+
 						try {
 							this.sno = l4721Report.exec(titaVo, this.txBuffer,
 									parse.stringToInteger(data.get("CustNo")), tmpKindItem[txkind - 1]);
@@ -148,6 +144,13 @@ public class L4721Batch extends TradeBuffer {
 							this.info("CustNo =" + data.get("CustNo"));
 							this.info("sno =" + this.sno);
 							dealHeadData(titaVo, data);
+
+							cntTrans++;
+
+							if (cntTrans > this.commitCnt) {
+								cntTrans = 0;
+								this.batchTransaction.commit();
+							}
 
 						} catch (LogicException e) {
 							sendMsg = e.getErrorMsg();

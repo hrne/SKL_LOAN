@@ -30,6 +30,7 @@ import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.data.BankRemitFileVo;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 import com.st1.itx.util.report.RemitForm;
 
@@ -103,6 +104,8 @@ public class L4102 extends TradeBuffer {
 
 	@Autowired
 	LoanCom loanCom;
+	@Autowired
+	public WebClient webClient;
 
 	@Value("${iTXOutFolder}")
 	private String outFolder = "";
@@ -114,38 +117,36 @@ public class L4102 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4102 ");
 		this.totaVo.init(titaVo);
-		acDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
+		acDate = parse.stringToInteger(titaVo.getParam("AcDate"));
 		batchNo = titaVo.getParam("BatchNo");
 		int iItemCode = parse.stringToInteger(titaVo.getParam("ItemCode")); // 1.撥款 2.退款
 		List<BankRemit> lBankRemit = new ArrayList<BankRemit>();
 		List<BankRemit> unReleaselBankRemit = new ArrayList<BankRemit>();
-		Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(acDate, batchNo, 00, 99, 0, 0, 0, Integer.MAX_VALUE,
-				titaVo);
+		Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(acDate + 19110000, batchNo, 00, 99, 0, 0, 0,
+				Integer.MAX_VALUE, titaVo);
 		if (slBankRemit == null) {
 			throw new LogicException(titaVo, "E0001", "查無資料");
 		}
 
 		int unReleaseCnt = 0;
 		for (BankRemit t : slBankRemit.getContent()) {
+			boolean isFind = false;
 			// 作業項目為1.撥款時把退款篩選掉
-			if (iItemCode == 1) {
-				if (t.getDrawdownCode() == 4 || t.getDrawdownCode() == 5 || t.getDrawdownCode() == 11) {
-					continue;
-				}
+			if (iItemCode == 1 && (t.getDrawdownCode() == 1 || t.getDrawdownCode() == 2 || t.getDrawdownCode() == 3)) {
+				isFind = true;
 			}
 
 			// 作業項目為2.退款時把撥款篩選掉
-			if (iItemCode == 2) {
-				if (t.getDrawdownCode() == 1 || t.getDrawdownCode() == 2) {
-					continue;
-				}
+			if (iItemCode == 2 && t.getDrawdownCode() == 5) {
+				isFind = true;
 			}
-
-			if (t.getActFg() == 1) {
-				unReleaseCnt++;
-				unReleaselBankRemit.add(t);
-			} else {
-				lBankRemit.add(t);
+			if (isFind) {
+				if (t.getActFg() == 1) {
+					unReleaseCnt++;
+					unReleaselBankRemit.add(t);
+				} else {
+					lBankRemit.add(t);
+				}
 			}
 		}
 
@@ -157,21 +158,26 @@ public class L4102 extends TradeBuffer {
 			for (BankRemit t : unReleaselBankRemit) {
 				setTota(t, titaVo);
 			}
-
 			this.addList(totaB);
 		}
 
-		if (lBankRemit.size() == 0) {
+		if (unReleaseCnt == 0 && lBankRemit.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "查無資料");
 		}
+		if (lBankRemit.size() > 0) {
+			// 執行交易
+			titaVo.setBatchNo(batchNo);
+			this.info("batchNo = " + batchNo);
+			this.info("titaVo = " + titaVo.toString());
+			MySpring.newTask("L4102Batch", this.txBuffer, titaVo);
 
-		// 執行交易
-		titaVo.setBatchNo(batchNo);
-		this.info("batchNo = " + batchNo);
-		this.info("titaVo = " + titaVo.toString());
-		MySpring.newTask("L4102Batch", this.txBuffer, titaVo);
+			this.totaVo.setWarnMsg("背景作業中,待處理完畢訊息通知");
+		} else {
+			String checkMsg = "撥款匯款無已放行資料。   批號 = " + batchNo;
 
-		this.totaVo.setWarnMsg("背景作業中,待處理完畢訊息通知");
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4102",
+					"" + acDate + iItemCode + batchNo, checkMsg, titaVo);
+		}
 
 		this.addList(this.totaVo);
 		return this.sendList();

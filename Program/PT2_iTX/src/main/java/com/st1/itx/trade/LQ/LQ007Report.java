@@ -20,7 +20,6 @@ import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-
 @Component
 @Scope("prototype")
 
@@ -135,27 +134,33 @@ public class LQ007Report extends MakeReport {
 			int tmpYM = 0;
 			for (Integer y : ymList) {
 
+				int tmpYear = y / 100;
+				int tmpMonth = y % 100;
+
+				if (tmpMonth <= 3) {
+					y = tmpYear * 100 + 3;
+				} else if (tmpMonth <= 6) {
+					y = tmpYear * 100 + 6;
+				} else if (tmpMonth <= 9) {
+					y = tmpYear * 100 + 9;
+				} else {
+					y = tmpYear * 100 + 12;
+				}
+
+				// 排除非當年度的3 6 9月份
+				if (y != (tmpYear * 100 + 12) && endY > tmpYear) {
+					continue;
+				}
+
 				for (Map<String, String> r : LQ007List) {
 					int visibleMonth = parse.stringToInteger(r.get("VisibleMonth"));
 					String prodNo = "";
 					BigDecimal balSum = BigDecimal.ZERO;
 					BigDecimal intSum = BigDecimal.ZERO;
 
-					int tmpYear = y / 100;
-					int tmpMonth = y % 100;
-
-					if (tmpMonth <= 3) {
-						y = tmpYear * 100 + 3;
-					} else if (tmpMonth <= 6) {
-						y = tmpYear * 100 + 6;
-					} else if (tmpMonth <= 9) {
-						y = tmpYear * 100 + 9;
-					} else {
-						y = tmpYear * 100 + 12;
-					}
-
+			
 					// 排除非當年度的3 6 9月份
-					if (y != (tmpYear * 100 + 12) && endY > tmpYear) {
+					if (visibleMonth != (tmpYear * 100 + 12) && endY > tmpYear) {
 						continue;
 					}
 

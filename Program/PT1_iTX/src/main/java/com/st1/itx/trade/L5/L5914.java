@@ -42,7 +42,8 @@ public class L5914 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		String iEmpNo = titaVo.getParam("EmpNo");
-		Slice<PfCoOfficerLog> iPfCoOfficerLog = iPfCoOfficerLogService.findEmpNoEq(iEmpNo, 0, Integer.MAX_VALUE, titaVo);
+		Slice<PfCoOfficerLog> iPfCoOfficerLog = iPfCoOfficerLogService.findEmpNoEq(iEmpNo, 0, Integer.MAX_VALUE,
+				titaVo);
 
 		if (iPfCoOfficerLog == null) {
 			throw new LogicException(titaVo, "E0001", "查無資料");
@@ -50,8 +51,8 @@ public class L5914 extends TradeBuffer {
 
 		for (PfCoOfficerLog rPfCoOfficerLog : iPfCoOfficerLog) {
 			OccursList occursList = new OccursList();
-			occursList.putParam("OOEmpNo" , rPfCoOfficerLog.getEmpNo());
-			occursList.putParam("OOEffectiveDate" , rPfCoOfficerLog.getEffectiveDate());
+			occursList.putParam("OOEmpNo", rPfCoOfficerLog.getEmpNo());
+			occursList.putParam("OOEffectiveDate", rPfCoOfficerLog.getEffectiveDate());
 			occursList.putParam("OOIneffectiveDate", rPfCoOfficerLog.getIneffectiveDate());
 			occursList.putParam("OOAreaCode", rPfCoOfficerLog.getAreaCode());
 			occursList.putParam("OODistCode", rPfCoOfficerLog.getDistCode());
@@ -65,19 +66,28 @@ public class L5914 extends TradeBuffer {
 			occursList.putParam("OOFunctionCode", rPfCoOfficerLog.getFunctionCode());
 			occursList.putParam("OOEmpClass", rPfCoOfficerLog.getEmpClass());
 			occursList.putParam("OOClassPass", rPfCoOfficerLog.getClassPass());
-			String taU = rPfCoOfficerLog.getUpdateDate().toString();
-			String uaDate = StringUtils
-					.leftPad(String.valueOf(Integer.valueOf(taU.substring(0, 10).replace("-", "")) - 19110000), 7, '0');
-			uaDate = uaDate.substring(0, 3) + "/" + uaDate.substring(3, 5) + "/" + uaDate.substring(5);
-			occursList.putParam("OOLastUpdate", uaDate);
-			String rEmpNo = rPfCoOfficerLog.getUpdateTlrNo();
-			CdEmp iCdEmp = iCdEmpService.findById(rEmpNo, titaVo);
-			if (iCdEmp == null) {
-				occursList.putParam("OOLastUpdateEmpNo", rEmpNo);
+			// 會有空白null的錯誤需要改
+			if (rPfCoOfficerLog.getUpdateDate() != null) {
+				String taU = rPfCoOfficerLog.getUpdateDate().toString();
+				String uaDate = StringUtils.leftPad(
+						String.valueOf(Integer.valueOf(taU.substring(0, 10).replace("-", "")) - 19110000), 7, '0');
+				uaDate = uaDate.substring(0, 3) + "/" + uaDate.substring(3, 5) + "/" + uaDate.substring(5);
+				occursList.putParam("OOLastUpdate", uaDate);
 			} else {
-				occursList.putParam("OOLastUpdateEmpNo", rEmpNo + " " + iCdEmp.getFullname());
+				occursList.putParam("OOLastUpdate", "");
 			}
-			occursList.putParam("OOFunctionCode" , rPfCoOfficerLog.getFunctionCode());
+			if (rPfCoOfficerLog.getUpdateTlrNo() != null) {
+				String rEmpNo = rPfCoOfficerLog.getUpdateTlrNo();
+				CdEmp iCdEmp = iCdEmpService.findById(rEmpNo, titaVo);
+				if (iCdEmp == null) {
+					occursList.putParam("OOLastUpdateEmpNo", rEmpNo);
+				} else {
+					occursList.putParam("OOLastUpdateEmpNo", rEmpNo + " " + iCdEmp.getFullname());
+				}
+			} else {
+				occursList.putParam("OOLastUpdateEmpNo", "");
+			}
+			occursList.putParam("OOFunctionCode", rPfCoOfficerLog.getFunctionCode());
 
 			this.totaVo.addOccursList(occursList);
 		}

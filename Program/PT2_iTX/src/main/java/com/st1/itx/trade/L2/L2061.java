@@ -101,11 +101,12 @@ public class L2061 extends TradeBuffer {
 			occursList.putParam("OOContractChgDate", tmpAcReceivable.getOpenAcDate());
 			occursList.putParam("OOCustNo", tmpAcReceivable.getCustNo());
 			occursList.putParam("OOFacmNo", tmpAcReceivable.getFacmNo());
-			occursList.putParam("OOContractChgNo", tmpAcReceivable.getRvNo().substring(8));
+			occursList.putParam("OOContractChgNo",
+					tmpAcReceivable.getRvNo().length() >= 10 ? tmpAcReceivable.getRvNo().substring(8)
+							: tmpAcReceivable.getRvNo().substring(7));
 			occursList.putParam("OOContractChgCode", contractChgCode);
 			occursList.putParam("OOCurrencyCode", tmpAcReceivable.getCurrencyCode());
 			occursList.putParam("OOFeeAmt", tmpAcReceivable.getRvAmt());
-
 			occursList.putParam("OOIsBankDeduct", "N");
 			FacMain tFacMain = facMainService.findById(new FacMainId(iCustNo, iFacmNo), titaVo);
 			if (tFacMain != null) {
@@ -113,6 +114,7 @@ public class L2061 extends TradeBuffer {
 					occursList.putParam("OOIsBankDeduct", "Y");
 				}
 			}
+			occursList.putParam("OORvNo", tmpAcReceivable.getRvNo());
 
 			this.info("occursList L2061" + occursList);
 			this.totaVo.addOccursList(occursList);

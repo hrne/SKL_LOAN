@@ -3167,6 +3167,8 @@ TXFORM=L2R36
 
 
 <L2R37.dec>
+#L2r37ContractChgDate=D,7,S
+#L2r37ContractChgNo=A,2,S
 #L2r37ContractChgCode=A,2,S
 #L2r37CurrencyCode=X,3,S
 #L2r37FeeAmt=m,14.2,S
@@ -3179,6 +3181,8 @@ TXFORM=L2R36
 
 <L2R37.tom>
 TXFORM=L2R37
+#L2r37ContractChgDate
+#L2r37ContractChgNo
 #L2r37ContractChgCode
 #L2r37CurrencyCode
 #L2r37FeeAmt

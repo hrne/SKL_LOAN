@@ -218,22 +218,23 @@ E(0,#OOFeeAmt)
 !P(R,#OOFeeAmtX)
 X(#OOFeeAmt1)
 
+#OORvNo=X,10,S
 
 !修改
 #OOBUF2=X,30,S
-T(2,#FUNC2+#OOCustNo+#OOFacmNo+#OOContractChgDate+#OOContractChgNo+#OOContractChgCode)
+T(2,#FUNC2+#OOCustNo+#OOFacmNo+#OORvNo)
 #OOBTN2=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L2670; ntxbuf=#OOBUF2})
 
 !刪除
 #OOBUF4=X,30,S
-T(2,#FUNC4+#OOCustNo+#OOFacmNo+#OOContractChgDate+#OOContractChgNo+#OOContractChgCode)
+T(2,#FUNC4+#OOCustNo+#OOFacmNo+#OORvNo)
 #OOBTN4=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L2670; ntxbuf=#OOBUF4})
 
 !查詢
 #OOBUF5=X,30,S
-T(2,#FUNC5+#OOCustNo+#OOFacmNo+#OOContractChgDate+#OOContractChgNo+#OOContractChgCode)
+T(2,#FUNC5+#OOCustNo+#OOFacmNo+#OORvNo)
 #OOBTN5=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L2670; ntxbuf=#OOBUF5})
 
@@ -254,6 +255,7 @@ E(0,#SYSNDATE)
 
 !Y/N
 #OOIsBankDeduct=X,1,S
+
 !銀扣
 #OOBUF6=X,70,S
 T(2,01+#OOCustNo+00000+#CSYSDATE+9991231+00000000000000+00000000000000+00000000000000)
@@ -285,6 +287,7 @@ TXFORM=L2061
 #OOCurrencyCode
 #OOFeeAmt
 #OOIsBankDeduct
+#OORvNo
 ^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="ROM.icf::L1R01.tom"/>

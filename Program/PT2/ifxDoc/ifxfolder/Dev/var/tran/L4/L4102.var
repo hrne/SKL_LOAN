@@ -82,11 +82,13 @@ T(4,CHAIN$)
 
 #NTXBUF=X,17,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
-T(1,@BatchNo,#NTXBUF,1,6)
+T(1,@AcDate,#NTXBUF,1,7)
+T(1,@ItemCode,#NTXBUF,8,1)
+T(1,@BatchNo,#NTXBUF,9,6)
 
 ! 會計日期
 #AcDate=D,7,I
-E(0,#SYSDATE)
+C(3,#AcDate,0,E(0,#SYSDATE),$)
 @V(7)A(DATE,0,#AcDate)
 
 ![經辦編號]
@@ -105,8 +107,7 @@ T(H,#ItemCode,#ItemCodeHelp)
 
 ![整批批號]
 #BatchNo=X,6,I
-C(3,#ItemCode,1,T(3,LN0100),$)
-C(3,#ItemCode,2,T(3,RT0100),$)
+C(3,#ItemCode,1,T(3,LN0100),C(3,#ItemCode,2,T(3,RT0100),$))
 @V(7)
 
 
@@ -115,6 +116,7 @@ T(2,Y)
 
 
 #RPTFG=A,1,S
+
 
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 </sub>

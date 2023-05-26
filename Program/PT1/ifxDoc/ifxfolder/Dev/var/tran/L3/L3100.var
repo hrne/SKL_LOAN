@@ -1034,16 +1034,17 @@ E(0,@RimEffectTime,0)
 RESET_RIM(#SendL2r06,L2R06)
 S(L2R06,1,#RimTxCode,#RimCurrencyCode,#RimBaseRateCode,#RimEffectDate,#RimEffectTime)
 R(1,L2R06)
-E(0,@ProdRate,#L2r06Rate+#L2r01ProdIncr)
+IF(#FKEY==0,E(0,@ProdRate,#L2r06Rate+#L2r01ProdIncr)
 C(3,#BaseRateCode,99,E(0,@ApproveRate,#L2r05ApproveRate),$)
-C(3,#BaseRateCode,99,s,$)
-C(3,#checkwk,0,
+C(3,#BaseRateCode,99,$,C(3,#checkwk,0,
  E(0,@BaseRate,#L2r06Rate)
  E(0,@ApproveRate,#BaseRate+#RateIncr)
  ,
  C(3,#L2r05FirstDrawdownDate,0,E(0,@ApproveRate,#L2r05ApproveRate),E(0,@ApproveRate,#L2r05FirstLoanBorRate))
  E(0,@BaseRate,#ApproveRate-#RateIncr)
-)
+)),$)
+
+
 
 
 #WKFADJDATE=D,8,S

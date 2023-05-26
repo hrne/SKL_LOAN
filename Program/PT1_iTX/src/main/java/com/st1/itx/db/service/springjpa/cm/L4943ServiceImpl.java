@@ -91,6 +91,16 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "     ) postLimit on postLimit.\"CustNo\" = BDD.\"CustNo\" ";
 
 		}
+		if (functionCode == 8) {
+			sql += " left join (                                              ";
+			sql += "     select                                               ";
+			sql += "      \"CustNo\"                                          ";
+			sql += "     from \"FacClose\"                               ";
+			sql += "     where \"CloseDate\" = 0                           ";
+			sql += "       and \"EntryDate\" >= :entDy";
+			sql += "     group by \"CustNo\"                                  ";
+			sql += "     ) facclose on facclose.\"CustNo\" = BDD.\"CustNo\" ";
+		}
 		if (functionCode == 10) {
 			sql += " left join (                                              ";
 			sql += "     select                                               ";
@@ -178,6 +188,9 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 		case 6: // 媒體檔總金額
 			sql += "   and BDD.\"MediaCode\" = 'Y' ";
 			break;
+		case 8: // 戶號已設定清償
+			sql += "   and NVL(facclose.\"CustNo\",0) > 0 ";
+			break;
 		case 9: // 整批
 			break;
 		case 10: // 溢短收
@@ -219,6 +232,8 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("singleLimitAmt", singleLimitAmt);
 		} else if (functionCode == 3) {
 			query.setParameter("lowLimitAmt", lowLimitAmt);
+		} else if (functionCode == 8) {
+			query.setParameter("entDy", titaVo.getEntDyI() + 19110000);
 		}
 
 		return this.convertToMap(query); // 此段為彙總,不需要做折返
@@ -299,7 +314,16 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "       and \"EntryDate\" <= :entryDateTo";
 			sql += "     group by \"CustNo\"                                  ";
 			sql += "     ) postLimit on postLimit.\"CustNo\" = BDD.\"CustNo\" ";
-
+		}
+		if (functionCode == 8) {
+			sql += " left join (                                              ";
+			sql += "     select                                               ";
+			sql += "      \"CustNo\"                                          ";
+			sql += "     from \"FacClose\"                               ";
+			sql += "     where \"CloseDate\" = 0                           ";
+			sql += "       and \"EntryDate\" >= :entDy";
+			sql += "     group by \"CustNo\"                                  ";
+			sql += "     ) facclose on facclose.\"CustNo\" = BDD.\"CustNo\" ";
 		}
 		if (functionCode == 10 || functionCode == 11) {
 			sql += " left join (                                              ";
@@ -392,6 +416,9 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 		case 6: // 媒體檔總金額
 			sql += "   and BDD.\"MediaCode\" = 'Y' ";
 			break;
+		case 8: // 戶號已設定清償
+			sql += "   and NVL(facclose.\"CustNo\",0) > 0 ";
+			break;
 		case 9: // 整批
 			break;
 		case 10: // 溢短收
@@ -427,11 +454,14 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("singleLimitAmt", singleLimitAmt);
 		} else if (functionCode == 3) {
 			query.setParameter("lowLimitAmt", lowLimitAmt);
+		} else if (functionCode == 8) {
+			query.setParameter("entDy", titaVo.getEntDyI() + 19110000);
 		}
 
 		return switchback(query);
 	}
 
+	// 7:已到期未至應繳日
 	public List<Map<String, String>> doQuery7(int inputIndex, int inputLimit, TitaVo titaVo) throws Exception {
 
 		int entryDate = Integer.parseInt(titaVo.getParam("EntryDate")) + 19110000;

@@ -1442,6 +1442,10 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	public String getSpanDy() {
 		return Objects.isNull(this.get(ContentName.spanDy)) ? "0" : this.get(ContentName.spanDy).trim();
 	}
+	
+	public int getSpanDyI() {
+        return Objects.isNull(this.get(ContentName.spanDy)) ? Integer.parseInt("0") : Integer.parseInt(this.get(ContentName.spanDy).trim());
+    }
 
 	public boolean isSpanDy() {
 		return Integer.parseInt(this.getSpanDy()) != 0;

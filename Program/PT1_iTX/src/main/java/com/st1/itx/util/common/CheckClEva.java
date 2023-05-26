@@ -1,6 +1,7 @@
 package com.st1.itx.util.common;
 
 import java.math.BigDecimal;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -16,7 +17,6 @@ import com.st1.itx.db.domain.ClImm;
 import com.st1.itx.db.domain.ClImmId;
 import com.st1.itx.db.domain.ClMain;
 import com.st1.itx.db.domain.ClMainId;
-import com.st1.itx.db.domain.FacCaseAppl;
 import com.st1.itx.db.service.CdInsurerService;
 import com.st1.itx.db.service.ClEvaService;
 import com.st1.itx.db.service.ClFacService;
@@ -25,6 +25,7 @@ import com.st1.itx.db.service.ClMainService;
 import com.st1.itx.db.service.FacCaseApplService;
 import com.st1.itx.tradeService.CommBuffer;
 import com.st1.itx.util.data.DataLog;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Component("checkClEva")
@@ -70,43 +71,35 @@ public class CheckClEva extends CommBuffer {
 
 		int iClCode1 = parse.stringToInteger(titaVo.getParam("ClCode1"));
 		int iClCode2 = parse.stringToInteger(titaVo.getParam("ClCode2"));
-		int iApplNo = parse.stringToInteger(titaVo.getParam("ApplNo"));
-
-		FacCaseAppl tFacCaseAppl = facCaseApplService.findById(iApplNo, titaVo);
-
-		if (tFacCaseAppl == null) {
-			throw new LogicException(titaVo, "E2003", "案件申請檔"); // 查無資料
+		String creditCode = titaVo.get("CreditCode");
+		if (!creditCode.isEmpty()) {
+			creditCode = FormatUtil.pad9(creditCode, 2);
 		}
 
-		String PieceCode = tFacCaseAppl.getPieceCode();
 		int EvaReason = 0;
 		String EvaReasonX = "";
-		switch (PieceCode) {
-		case "1":
-		case "2":
-		case "A":
-		case "B":
-		case "F":
-		case "G":
+		switch (creditCode) {
+		case "01":
+		case "02":
+		case "03":
 			EvaReason = 1;
 			EvaReasonX = "新貸件";
 			break;
-
-		case "5":
-		case "E":
+		case "06":
 			EvaReason = 2;
 			EvaReasonX = "展期件";
 			break;
-
-		case "4":
-		case "D":
+		case "05":
 			EvaReason = 3;
 			EvaReasonX = "增貸件";
 			break;
-
-		case "6":
+		case "04":
 			EvaReason = 4;
 			EvaReasonX = "動支件";
+			break;
+		case "12":
+			EvaReason = 12;
+			EvaReasonX = "貸前授變";
 			break;
 		default:
 			break;
@@ -119,7 +112,6 @@ public class CheckClEva extends CommBuffer {
 
 		if (tClEva != null) { // 新增時，若存在則抓最新的序號+1
 			newEvaNo += tClEva.getEvaNo();
-
 		} else { // 新增一筆00原始的資料
 			setOriginalClEva(titaVo, iClNo);
 		}

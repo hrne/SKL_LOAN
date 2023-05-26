@@ -194,6 +194,9 @@ INVOKEJS(SHOW,L4943_5,1),$)
 C(3,#FunctionCode,7,
 INVOKEJS(SHOW,L4943_3,1)
 INVOKEJS(SHOW,L4943_10,1),$)
+C(3,#FunctionCode,8,
+INVOKEJS(SHOW,L4943_3,1)
+INVOKEJS(SHOW,L4943_5,1),$)
 C(3,#FunctionCode,9,
 INVOKEJS(SHOW,L4943_3,1)
 INVOKEJS(SHOW,L4943_4,1)
@@ -236,7 +239,7 @@ T(2,)
 ! 銀行別
 #BankCode=A,3,I
 C(3,#CHAIN,1,s,$)
-IF(#FunctionCode==4 || #FunctionCode==5 || #FunctionCode==6 || #FunctionCode==7 || #FunctionCode==9 || #FunctionCode==10|| #FunctionCode==11,$,s)
+IF(#FunctionCode==4 || #FunctionCode==5 || #FunctionCode==6 || #FunctionCode==7 || #FunctionCode==8 || #FunctionCode==9 || #FunctionCode==10 || #FunctionCode==11,$,s)
 HELP(#BankDeductCdHelp,cols:4)
 @V(H,#BankDeductCdHelp)
 

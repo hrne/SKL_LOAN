@@ -110,11 +110,8 @@ public class L2670Report extends MakeReport {
 		int iCustNo = Integer.valueOf(titaVo.getParam("CustNo"));
 		// 額度
 		int iFacmNo = Integer.valueOf(titaVo.getParam("FacmNo"));
-		// 契變日期
-		int iContractChgDate = Integer.valueOf(titaVo.getParam("ContractChgDate")) + 19110000;
-		Integer.valueOf(titaVo.getParam("ContractChgNo"));
-
-		String iRvNo = parse.IntegerToString(iContractChgDate, 8) + titaVo.getParam("ContractChgNo");
+		// 銷帳編號
+		String iRvNo = titaVo.getParam("RvNo");
 
 		Point a = new Point(30, 60);
 		Point b = new Point(550, 60);

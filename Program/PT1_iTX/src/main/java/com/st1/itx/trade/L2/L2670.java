@@ -82,8 +82,7 @@ public class L2670 extends TradeBuffer {
 		parse.stringToInteger(titaVo.getParam("ContractChgNo"));
 		// 契變手續費
 		BigDecimal feeAmt = parse.stringToBigDecimal(titaVo.getParam("TimFeeAmt"));
-		String iRvNo = parse.IntegerToString(iContractChgDate, 7) + titaVo.getParam("ContractChgNo");
-		String rvNo = "0000000000";
+		String iRvNo = titaVo.getParam("RvNo");
 		this.info("iRvNo = " + iRvNo);
 		// new table
 		AcReceivable tAcReceivable = new AcReceivable();
@@ -94,22 +93,16 @@ public class L2670 extends TradeBuffer {
 
 		// 新增
 		if (iFunCd == 1) {
-
 			// 取該契變日期戶號額度最大序號 +1為當前序號
 			tAcReceivable = acReceivableService.useL2670First("F29", iCustNo, iFacmNo, iContractChgDate + 19110000);
-			this.info("L2670 tAcReceivable =" + tAcReceivable);
 			if (tAcReceivable != null) {
 				iRvNo = parse.IntegerToString(parse.stringToInteger(tAcReceivable.getRvNo()) + 1, 9);
 			} else {
 				iRvNo = parse.IntegerToString(iContractChgDate * 100 + 1, 9);
 			}
 			tAcReceivable = new AcReceivable();
-
-			this.info("rvNo = " + rvNo);
-
 			tAcReceivable.setReceivableFlag(3); // 銷帳科目記號 -> 2-核心出帳 3-未收費用 4-短繳期金 5-另收欠款
 			tAcReceivable.setAcctCode("F29"); // 業務科目
-
 			tAcReceivable.setRvAmt(feeAmt); // 契變手續費
 			tAcReceivable.setCustNo(iCustNo); // 戶號
 			tAcReceivable.setFacmNo(iFacmNo); // 額度
@@ -132,7 +125,6 @@ public class L2670 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0010", "該筆已銷帳"); // E0010功能選擇錯誤
 
 //			變更理由由acReceivableCom寫入
-
 			acReceivableList = new ArrayList<AcReceivable>();
 			tAcReceivable = new AcReceivable();
 
@@ -215,7 +207,7 @@ public class L2670 extends TradeBuffer {
 		this.info("createDate = " + createDate);
 		this.info("createTime = " + createTime);
 
-		this.totaVo.putParam("OContractChgNo", rvNo.substring(8));
+		this.totaVo.putParam("OContractChgNo", iRvNo.length() >= 10 ? iRvNo.substring(8) : iRvNo.substring(7));
 		if (tmpAcReceivable.getClsFlag() == 1) {
 			this.totaVo.putParam("OAcDate", tmpAcReceivable.getLastAcDate());
 			this.totaVo.putParam("OTitaTxtNo", tmpAcReceivable.getTitaTxtNo());

@@ -138,7 +138,13 @@ C(3,#EditMode,1,T(3,*),S)
 C(3,#EditMode,1,T(3,*),S)
 
 #FdIsNumeric=x,2,L
-T(3,*)
+C(3,#EditMode,1,T(3,*),S)
+
+#FdMinCodeLength=x,2,L
+C(3,#EditMode,1,T(3,*),S)
+
+#FdMaxCodeLength=x,2,L
+C(3,#EditMode,1,T(3,*),S)
 
 !顯示框線
 #ShowFrame=A,1,S
@@ -149,7 +155,10 @@ C(5,#FdDefItem,*,T(F,@DefItem,1),T(F,@DefItem,0))
 C(5,#FdCode,*,T(F,@Code,1),T(F,@Code,0))
 C(5,#FdItem,*,T(F,@Item,1),T(F,@Item,0))
 C(5,#FdEnable,*,T(F,@Enable,1),T(F,@Enable,0))
-C(5,#FdIsNumeric,*,T(F,@DefItem,1),T(F,@DefItem,0))
+C(5,#FdIsNumeric,*,T(F,@IsNumeric,1),T(F,@IsNumeric,0))
+C(5,#FdMinCodeLength,*,T(F,@MinCodeLength,1),T(F,@MinCodeLength,0))
+C(5,#FdMaxCodeLength,*,T(F,@MaxCodeLength,1),T(F,@MaxCodeLength,0))
+
 
 !調RIM確認執行櫃員是否有管理權限
 #TlrNo=X,6,S
@@ -224,6 +233,7 @@ T(2,@Enable,#L6R04Enable)
 T(2,@DefType,#L6R04DefType)
 T(2,@IsNumeric,#L6R04IsNumeric)
 T(H,@EnableX,#Enable,#EnableH)
+T(H,@IsNumericX,#IsNumeric,#EnableH)
 #SetCodeLength=X,1,S
 C(5,#DefCode,CodeType,$,s)
 E(0,@MinCodeLength,#L6R04MinCodeLength)
@@ -238,10 +248,12 @@ C(2,#FunCode,s,$,$,$,s,s)
 
 !代碼長度
 #MinCodeLength=A,1,I
+C(5,#FunCode,4,s,$)
 C(5,#DefCode,CodeType,$,s)
 @V(2,0)
 
 #MaxCodeLength=A,1,I
+C(5,#FunCode,4,s,$)
 C(5,#DefCode,CodeType,$,s)
 @V(2,0)V(5,#MinCodeLength,9)
 
@@ -267,9 +279,10 @@ T(H,#Enable,#EnableH)
 
 !限用數字記號
 #IsNumeric=X,1,I
+C(5,#FunCode,4,s,$)
 C(5,#DefCode,CodeType,$,s)
 HELP(#EnableH)
-@T(3,@EnableX,)
+@T(3,@IsNumericX,)
 V(3,Y,N,y,n)
 
 #IsNumericX=X,10,L

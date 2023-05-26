@@ -129,6 +129,7 @@ T(H,#OOEmpClass,#ClassTypeHelp)
 
 !功能
 #OOFunctionCode=X,20,L
+C(3,#OOFunctionCode,0,T(3,))
 C(3,#OOFunctionCode,1,T(3,新增))
 C(3,#OOFunctionCode,2,T(3,修改))
 C(3,#OOFunctionCode,3,T(3,複製))

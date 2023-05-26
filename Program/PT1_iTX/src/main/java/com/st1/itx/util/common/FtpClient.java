@@ -53,7 +53,13 @@ public class FtpClient extends CommBuffer {
 	 * @param password 登入密碼
 	 */
 	public void setConnection(String ip, String username, String password) {
-		setConnection(ip, 21, username, password);
+		int port = 21;
+		if (ip.indexOf(":") > -1) {
+			String[] s = ip.split(":");
+			ip = s[0];
+			port = Integer.parseInt(s[1]);
+		}
+		setConnection(ip, port, username, password);
 	}
 
 	/**
@@ -175,7 +181,13 @@ public class FtpClient extends CommBuffer {
 	 * @param remoteSubdirectory 指定傳送到遠端時，要放在對方的哪個子目錄。留空則不移動至子目錄。
 	 */
 	public void sendFile(String ip, String username, String password, String fileLocation, String remoteSubdirectory) {
-		sendFile(ip, 21, username, password, fileLocation, remoteSubdirectory);
+		int port = 21;
+		if (ip.indexOf(":") > -1) {
+			String[] s = ip.split(":");
+			ip = s[0];
+			port = Integer.parseInt(s[1]);
+		}
+		sendFile(ip, port, username, password, fileLocation, remoteSubdirectory);
 	}
 
 	/**
@@ -189,7 +201,8 @@ public class FtpClient extends CommBuffer {
 	 * @param fileLocation       完整的檔案位置
 	 * @param remoteSubdirectory 指定傳送到遠端時，要放在對方的哪個子目錄。留空則不移動至子目錄。
 	 */
-	public void sendFile(String ip, int port, String username, String password, String fileLocation, String remoteSubdirectory) {
+	public void sendFile(String ip, int port, String username, String password, String fileLocation,
+			String remoteSubdirectory) {
 		this.setConnection(ip, port, username, password);
 		this.sendFile(fileLocation, remoteSubdirectory);
 		this.closeConnection();
@@ -205,7 +218,13 @@ public class FtpClient extends CommBuffer {
 	 * @param fileLocation 完整的檔案位置
 	 */
 	public void sendFile(String ip, String username, String password, String fileLocation) {
-		sendFile(ip, 21, username, password, fileLocation, "");
+		int port = 21;
+		if (ip.indexOf(":") > -1) {
+			String[] s = ip.split(":");
+			ip = s[0];
+			port = Integer.parseInt(s[1]);
+		}
+		sendFile(ip, port, username, password, fileLocation, "");
 	}
 
 	/**

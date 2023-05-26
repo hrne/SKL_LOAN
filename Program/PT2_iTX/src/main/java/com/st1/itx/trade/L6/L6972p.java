@@ -25,22 +25,21 @@ import com.st1.itx.util.parse.Parse;
 @Service("L6972p")
 @Scope("prototype")
 public class L6972p extends TradeBuffer {
-	
+
 	@Autowired
 	Parse parse;
-	
+
 	@Autowired
 	TxArchiveTableService txArchiveTableService;
 
 	@Autowired
 	WebClient webClient;
-	
+
 	@Autowired
 	DateUtil dateUtil;
-	
+
 	WorkType workType;
 
-	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6972 ");
@@ -55,19 +54,19 @@ public class L6972p extends TradeBuffer {
 		int custNo = parse.stringToInteger(titaVo.getParam("InputCustNo"));
 		int facmNo = parse.stringToInteger(titaVo.getParam("InputFacmNo"));
 		int bormNo = parse.stringToInteger(titaVo.getParam("InputBormNo"));
-		
-		
+
 		// pass the exceptions of USPs to upper levels
 		switch (workType) {
 		case FiveYearsTX:
 			if (inputRoute == 0) // online to history
 			{
 				this.info("L6972 execute ArchiveFiveYearTx");
-				txArchiveTableService.Usp_L6_ArchiveFiveYearTx_Copy(titaVo.getEntDyI() + 19110000, titaVo.getTlrNo(), titaVo);
-			} else
-			{
+				txArchiveTableService.Usp_L6_ArchiveFiveYearTx_Copy(titaVo.getEntDyI() + 19110000, titaVo.getTlrNo(),
+						titaVo);
+			} else {
 				this.info("L6972 execute UnarchiveFiveYearTx: " + custNo + "-" + facmNo + "-" + bormNo);
-				txArchiveTableService.Usp_L6_UnarchiveFiveYearTx_Copy(custNo, facmNo, bormNo, titaVo.getEntDyI() + 19110000, titaVo.getTlrNo(), titaVo);
+				txArchiveTableService.Usp_L6_UnarchiveFiveYearTx_Copy(custNo, facmNo, bormNo,
+						titaVo.getEntDyI() + 19110000, titaVo.getTlrNo(), titaVo);
 			}
 			break;
 		default:
@@ -76,8 +75,9 @@ public class L6972p extends TradeBuffer {
 
 		this.info("L6972 exit.");
 
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "L9729", "", "L6972搬運資料已完成,連動至L9729產生報表", titaVo);
-		
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", titaVo.getTlrNo(),
+				"L6972搬運資料已完成,連動至L9729產生報表", titaVo);
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

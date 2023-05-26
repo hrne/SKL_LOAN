@@ -45,11 +45,10 @@ public class L5737Report extends MakeReport {
 		// 取得輸入值
 		int inputDrawdownDate = parse.stringToInteger(titaVo.getParam("DrawdownDate"));
 
-		List<Map<String, String>> resultList = l5737ServiceImpl.getOverdueCustomerLoanData(inputDrawdownDate,
-				titaVo);
+		List<Map<String, String>> resultList = l5737ServiceImpl.getOverdueCustomerLoanData(inputDrawdownDate, titaVo);
 
 		// open excel
-		
+
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = this.txCD;
@@ -89,7 +88,7 @@ public class L5737Report extends MakeReport {
 				makeExcel.setValue(row, 13, this.showBcDate(result.get("DrawdownDate"), 0), "C");
 				makeExcel.setValue(row, 14, parse.stringToBigDecimal(result.get("EvaNetWorth")), "#,##0");
 				this.info("LoanRatio = " + parse.stringToBigDecimal(result.get("LoanRatio")));
-				makeExcel.setValue(row, 15, parse.stringToBigDecimal(result.get("LoanRatio")) + "%");
+				makeExcel.setValue(row, 15, parse.stringToBigDecimal(result.get("LoanRatio")), "0%");
 				row++;
 			}
 		}

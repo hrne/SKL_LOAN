@@ -200,14 +200,14 @@ public class L4721Report extends MakeReport {
 		try {
 			listL4721Temp = l4721ServiceImpl.TempQuery(iCustNo, isday, ieday, titaVo);
 		} catch (Exception e) {
-			this.error("bankStatementServiceImpl TempQuery = " + e.getMessage());
+			this.error("l4721ServiceImpl TempQuery = " + e.getMessage());
 			throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
 		}
 
 		try {
 			listL4721Head = l4721ServiceImpl.doQuery(iCustNo, isday, ieday, titaVo);
 		} catch (Exception e) {
-			this.error("bankStatementServiceImpl doQuery = " + e.getMessage());
+			this.error("l4721ServiceImpl doQuery = " + e.getMessage());
 			throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
 		}
 
@@ -286,7 +286,7 @@ public class L4721Report extends MakeReport {
 		try {
 			listL4721Detail = l4721ServiceImpl.doDetail(iCustNo, isday, ieday, titaVo);
 		} catch (Exception e) {
-			this.error("bankStatementServiceImpl doQuery = " + e.getMessage());
+			this.error("l4721ServiceImpl doDetail = " + e.getMessage());
 			throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
 		}
 
@@ -395,16 +395,6 @@ public class L4721Report extends MakeReport {
 
 		long sno = this.close();
 		this.toPdf(sno);
-
-		Map<String, String> countCustNotice = new HashMap<String, String>();
-
-		countCustNotice.put("CntPaper", cPaper + "");
-		countCustNotice.put("CntMsg", cMsg + "");
-		countCustNotice.put("CntEmail", cEmail + "");
-
-		this.info("cPaper=" + cPaper);
-		this.info("cMsg=" + cMsg);
-		this.info("cEmail=" + cEmail);
 
 		return sno;
 

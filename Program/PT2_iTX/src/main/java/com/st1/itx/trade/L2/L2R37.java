@@ -47,19 +47,16 @@ public class L2R37 extends TradeBuffer {
 		// tita參數
 		// 功能
 		int iFunCd = parse.stringToInteger(titaVo.getParam("RimFunCd"));
-		// 契變日期
-		int iContractChgDate = parse.stringToInteger(titaVo.getParam("RimContractChgDate")) + 19110000;
 		// 戶號
 		int iCustNo = parse.stringToInteger(titaVo.getParam("RimCustNo"));
 		// 額度
 		int iFacmNo = parse.stringToInteger(titaVo.getParam("RimFacmNo"));
-		parse.stringToInteger(titaVo.getParam("RimContractChgNo"));
-
-		String iRvNo = iContractChgDate + titaVo.getParam("RimContractChgNo");
+		String iRvNo = titaVo.getParam("RimRvNo");
 
 		this.info("iRvNo = " + iRvNo);
 
-		AcReceivable tAcReceivable = acReceivableService.findById(new AcReceivableId("F29", iCustNo, iFacmNo, iRvNo), titaVo);
+		AcReceivable tAcReceivable = acReceivableService.findById(new AcReceivableId("F29", iCustNo, iFacmNo, iRvNo),
+				titaVo);
 
 		if (tAcReceivable == null) {
 			switch (iFunCd) {
@@ -87,12 +84,22 @@ public class L2R37 extends TradeBuffer {
 		TempVo tTempVo = new TempVo();
 		tTempVo = tTempVo.getVo(tAcReceivable.getJsonFields());
 
-		int CreateDate = parse.stringToInteger((String.valueOf(
-				tAcReceivable.getCreateDate().toString().substring(0, 4) + tAcReceivable.getCreateDate().toString().substring(5, 7) + tAcReceivable.getCreateDate().toString().substring(8, 10))))
-				- 19110000;
+		int CreateDate = parse.stringToInteger((String.valueOf(tAcReceivable.getCreateDate().toString().substring(0, 4)
+				+ tAcReceivable.getCreateDate().toString().substring(5, 7)
+				+ tAcReceivable.getCreateDate().toString().substring(8, 10)))) - 19110000;
 
 		String CreateTime = tAcReceivable.getCreateDate().toString().substring(11, 19);
+		String wkRvNo = tAcReceivable.getRvNo();
+		int wkSeq = 0;
+		if (wkRvNo.length() >= 10) {
+			wkSeq = parse.stringToInteger(wkRvNo.substring(8));
+		} else {
+			wkSeq = parse.stringToInteger(wkRvNo.substring(7));
+		}
+		this.info("wkSeq = " + wkSeq);
 
+		this.totaVo.putParam("L2r37ContractChgDate", tAcReceivable.getOpenAcDate()); // 契變日期
+		this.totaVo.putParam("L2r37ContractChgNo", wkSeq); // 契變序號
 		this.totaVo.putParam("L2r37ContractChgCode", tTempVo.get("ContractChgCode")); // 契變項目代碼
 		this.totaVo.putParam("L2r37CurrencyCode", tAcReceivable.getCurrencyCode()); // 幣別
 		this.totaVo.putParam("L2r37FeeAmt", tAcReceivable.getRvAmt()); // 契變手續費

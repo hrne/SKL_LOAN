@@ -65,7 +65,8 @@ public class L2062 extends TradeBuffer {
 		// new ArrayList
 		List<AcReceivable> lAcReceivable = new ArrayList<AcReceivable>();
 
-		Slice<AcReceivable> slAcReceivable = acReceivableService.useL2062Eq("F29", iCustNo, iFacmNo, iFacmNo, ClsFlagSt, ClsFlagEd, this.index, this.limit, titaVo);
+		Slice<AcReceivable> slAcReceivable = acReceivableService.useL2062Eq("F29", iCustNo, iFacmNo, iFacmNo, ClsFlagSt,
+				ClsFlagEd, this.index, this.limit, titaVo);
 
 		lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
 
@@ -100,12 +101,15 @@ public class L2062 extends TradeBuffer {
 			occursList.putParam("OOCustNo", tmpAcReceivable.getCustNo());
 			occursList.putParam("OOFacmNo", tmpAcReceivable.getFacmNo());
 			occursList.putParam("OOContractChgDate", tmpAcReceivable.getOpenAcDate());
-			occursList.putParam("OOContractChgNo", tmpAcReceivable.getRvNo().substring(8));
+			occursList.putParam("OOContractChgNo",
+					tmpAcReceivable.getRvNo().length() >= 10 ? tmpAcReceivable.getRvNo().substring(8)
+							: tmpAcReceivable.getRvNo().substring(7));
 			occursList.putParam("OOContractChgCode", contractChgCode);
 			occursList.putParam("OOCurrencyCode", tmpAcReceivable.getCurrencyCode());
 			occursList.putParam("OOFeeAmt", tmpAcReceivable.getRvAmt());
 			occursList.putParam("OOEntryFG", entryfg);
 			occursList.putParam("OOPrintCode", tTempVo.getParam("PrintCode"));
+			occursList.putParam("OORvNo", tmpAcReceivable.getRvNo());
 			this.info("occursList L2062" + occursList);
 			this.totaVo.addOccursList(occursList);
 		}

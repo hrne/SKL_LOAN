@@ -40,15 +40,6 @@ C(3,#CHAIN,1,T(4,NTXBUF$),S)
 !T(1,@TLR,#NTXBUF,2,2)
 T(2,@FKEY,7)
 
-#ReportHelp=X,100,S
-T(3,1:表14-1_會計部年度檢查報表[舊];2:A141重要放款餘額明細表[新])
-
-
-#ReportCode=X,1,I
-HELP(#ReportHelp)
-
-#ReportCodeX=X,30,L
-T(H,#ReportCode,#ReportHelp)
 
 !-----------------------------------------------------
 
@@ -65,6 +56,17 @@ IF(#RocYear>#DTY,V(P,不可大於會計年),$)
 
 !#RocYear=A,3,I
 !T(1,#DT,001,003)
+
+
+#ReportHelp=X,100,S
+T(3,1:表14-1_會計部年度檢查報表[舊];2:A141重要放款餘額明細表[新])
+
+
+#ReportCode=X,1,I
+HELP(#ReportHelp)
+
+#ReportCodeX=X,30,L
+T(H,#ReportCode,#ReportHelp)
 
 </sub>
 

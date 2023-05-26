@@ -209,9 +209,10 @@ P(R,#OOFeeAmtX)
 
 #OOPrintCode=X,1,L
 
+#OORvNo=X,10,S
 !修改
 #OOBUF2=X,30,S
-T(2,#FUNC2+#OOCustNo+#OOFacmNo+#OOContractChgDate+#OOContractChgNo+#OOContractChgCode)
+T(2,#FUNC2+#OOCustNo+#OOFacmNo+#OORvNo)
 
 #OOBTN2=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L2670; ntxbuf=#OOBUF2})
@@ -219,7 +220,7 @@ IF(#OOEntryFG=="Y",BIND(grid,cancel),$)
 
 !查詢
 #OOBUF5=X,30,S
-T(2,#FUNC5+#OOCustNo+#OOFacmNo+#OOContractChgDate+#OOContractChgNo+#OOContractChgCode)
+T(2,#FUNC5+#OOCustNo+#OOFacmNo+#OORvNo)
 
 #OOBTN5=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L2670; ntxbuf=#OOBUF5})
@@ -230,8 +231,8 @@ T(3,@OOBTN7,列印)
 C(3,#OOPrintCode,1,T(3,@OOBTN7,補列印),$)
 
 #OOBUF7=X,30,S
-C(3,#OOPrintCode,1,T(2,#FUNC8+#OOCustNo+#OOFacmNo+#OOContractChgDate+#OOContractChgNo+#OOContractChgCode),
-                   T(2,#FUNC7+#OOCustNo+#OOFacmNo+#OOContractChgDate+#OOContractChgNo+#OOContractChgCode))
+C(3,#OOPrintCode,1,T(2,#FUNC8+#OOCustNo+#OOFacmNo+#OORvNo),
+                   T(2,#FUNC7+#OOCustNo+#OOFacmNo+#OORvNo))
 
 
 #OOBTN7=X,10,S
@@ -264,6 +265,7 @@ TXFORM=L2062
 #OOFeeAmt
 #OOEntryFG
 #OOPrintCode
+#OORvNo
 ^
 <include src="ROM.icf::L1R01.tom"/>
 <include src="COM.icf::TRCTL.tom"/>

@@ -120,32 +120,28 @@ public class L4101 extends TradeBuffer {
 
 			int unReleaseCnt = 0;
 			for (BankRemit t : slBankRemit.getContent()) {
-				// 1.撥款(核心匯款)，2.撥款(整批匯款)，3.退款(核心匯款)。
-				// 作業項目為1.2撥款時把退款篩選掉
-				if (iItemCode == 1) {
-					if (t.getDrawdownCode() == 2 || t.getDrawdownCode() == 3 || t.getDrawdownCode() == 4
-							|| t.getDrawdownCode() == 5 || t.getDrawdownCode() == 11) {
-						continue;
-					}
+				// 01:撥款(核心匯款) 02:撥款(整批匯款) 05:退款他行(核心匯款)
+				// 作業項目為1.2撥款時抓撥款
+				boolean isFind = false;
+				// 作業項目為1.撥款核心時只抓01撥款(核心匯款)
+				if (iItemCode == 1 && t.getDrawdownCode() == 1) {
+					isFind = true;
 				}
-				if (iItemCode == 2) {
-					if (t.getDrawdownCode() == 1 || t.getDrawdownCode() == 3 || t.getDrawdownCode() == 4
-							|| t.getDrawdownCode() == 5 || t.getDrawdownCode() == 11) {
-						continue;
-					}
+				// 作業項目為2.撥款整批時只抓02:撥款(整批匯款)
+				if (iItemCode == 2 && t.getDrawdownCode() == 2) {
+					isFind = true;
 				}
-				// 作業項目為3.退款時把撥款篩選掉
-				if (iItemCode == 3) {
-					if (t.getDrawdownCode() == 1 || t.getDrawdownCode() == 2 || t.getDrawdownCode() == 3) {
-						continue;
-					}
+				// 作業項目為3.退款時只抓05:退款他行(核心匯款)
+				if (iItemCode == 3 && t.getDrawdownCode() == 5) {
+					isFind = true;
 				}
-
-				if (t.getActFg() == 1) {
-					unReleaseCnt++;
-					unReleaselBankRemit.add(t);
-				} else {
-					lBankRemit.add(t);
+				if (isFind) {
+					if (t.getActFg() == 1) {
+						unReleaseCnt++;
+						unReleaselBankRemit.add(t);
+					} else {
+						lBankRemit.add(t);
+					}
 				}
 			}
 

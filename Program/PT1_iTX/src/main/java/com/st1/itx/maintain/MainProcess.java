@@ -312,7 +312,10 @@ public class MainProcess extends SysLogger {
 		txCom.setFlowNo(no);
 
 		/* 暫時添加 */
-		txCom.setReldy(entday);
+		if (this.titaVo.isSpanDy())
+            txCom.setReldy(this.titaVo.getSpanDyI());
+        else
+            txCom.setReldy(entday);
 
 		txCom.setRelNo(no);
 		txCom.setRelKin(no.substring(0, 4));
