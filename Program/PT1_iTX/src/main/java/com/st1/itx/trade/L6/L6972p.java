@@ -12,6 +12,7 @@ import com.st1.itx.db.service.TxArchiveTableService;
 import com.st1.itx.db.service.springjpa.cm.L9729ServiceImpl.WorkType;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.MySpring;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
@@ -76,7 +77,12 @@ public class L6972p extends TradeBuffer {
 		this.info("L6972 exit.");
 
 		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", titaVo.getTlrNo(),
-				"L6972搬運資料已完成,連動至L9729產生報表", titaVo);
+				"L6972搬運資料已完成", titaVo);
+		
+		titaVo.putParam("InputType", 1);
+		titaVo.putParam("InputDate", titaVo.getEntDyI());
+
+		MySpring.newTask("L9729p", this.txBuffer, titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

@@ -105,9 +105,12 @@ public class L1108 extends TradeBuffer {
 				if (titaVo.getParam("FormNo" + i).equals("")) {
 					continue;
 				}
-				String VarPaper = "N";
-				String VarMsg = "N";
-				String VarEMail = "N";
+//				String VarPaper = "N";
+//				String VarMsg = "N";
+//				String VarEMail = "N";
+				String VarPaper = "";
+				String VarMsg = "";
+				String VarEMail = "";
 				String uKey = custMain.getCustUKey();
 
 				Slice<CustTelNo> tCustTelNo = sCustTelNoService.findCustUKey(uKey, 0, Integer.MAX_VALUE, titaVo);
@@ -115,25 +118,11 @@ public class L1108 extends TradeBuffer {
 				// 有UKEY 但是要從L1905的資料裡面抓出對應編號
 
 				boolean ixy = titaVo.getParam("Msg" + i).trim().isEmpty();
-
-				// 05簡訊
-//				if (tCustTelNo != null) {
-//					CustTelNo sCustTelNo = new CustTelNo();
-//					sCustTelNo = sCustTelNoService.custUKeyFirst(custMain.getCustUKey(), "05", titaVo);
-//					if (sCustTelNo == null && !ixy) {
-//						throw new LogicException("E0005", "電話種類簡訊不存在，不發送簡訊限輸入'Y'");
-//					}
-//				}
-//				// CustMain Email
-//				boolean ixyz = titaVo.getParam("EMail" + i).trim().isEmpty();
-//				String sEmail = custMain.getEmail().trim();
-//				if ("".equals(sEmail) && ixyz) {
-//					throw new LogicException("E0005", "電子信箱不存在，不發送Email限輸入'Y'");
-//				}
 				Slice<CustTelNo> tCustTelNo1 = sCustTelNoService.findCustUKey(uKey, 0, Integer.MAX_VALUE, titaVo);
 				CdReport cdReport3 = sCdReportService.findById(titaVo.getParam("FormNo" + i), titaVo);
 				String icdEFg = cdReport3.getEmailFg();
 				String iMsgFg = cdReport3.getMessageFg();
+				String iLetFg = cdReport3.getLetterFg();
 				// CustUkey 接電話跟客戶主檔 要去判斷有無對應的該編號(05) 然後去看是否有簡訊
 				// 有UKEY 但是要從L1905的資料裡面抓出對應編號
 				// 看抓到的MSG以及其他的是否有符合
@@ -193,6 +182,7 @@ public class L1108 extends TradeBuffer {
 				iFormNo = titaVo.getParam("FormNo" + i);
 
 				if (!iFormNo.equals("")) {
+
 					if ("".equals(titaVo.getParam("Paper" + i))) {
 						VarPaper = "Y";
 					}
@@ -203,6 +193,28 @@ public class L1108 extends TradeBuffer {
 						VarEMail = "Y";
 					}
 
+					// 如果在頁面上輸入Y(不寄送)才需要修改DB的值為不寄送
+					if ("Y".equals(titaVo.getParam("Paper" + i))) {
+						VarPaper = "N";
+					}
+					if ("Y".equals(titaVo.getParam("Msg" + i))) {
+						VarMsg = "N";
+					}
+					if ("Y".equals(titaVo.getParam("EMail" + i))) {
+						VarEMail = "N";
+					}
+
+					// 如果頁面上已經是空白且CdReport是N不寄送 頁面上雖然是空白 但預設應該要為Y 2023/5/26 佳怡
+					if (iLetFg.equals("N") && "Y".equals(titaVo.getParam("Paper" + i))) {
+						VarPaper = "Y";
+					}
+					if (iMsgFg.equals("N") && "Y".equals(titaVo.getParam("Msg" + i))) {
+						VarMsg = "Y";
+					}
+					if (icdEFg.equals("N") && "Y".equals(titaVo.getParam("EMail" + i))) {
+						VarEMail = "Y";
+					}
+					
 					int ApplyDt = iParse.stringToInteger(titaVo.getParam("ApplyDt"));
 
 					CustNotice tCustNotice = new CustNotice();
@@ -222,7 +234,14 @@ public class L1108 extends TradeBuffer {
 
 					CdReport cdReport = sCdReportService.findById(tCustNotice.getFormNo(), titaVo);
 					if (cdReport.getSendCode() == 1) {
-						if ("N".equals(VarPaper) && "N".equals(VarMsg) && "N".equals(VarEMail)) {
+//						if ("N".equals(VarPaper) && "N".equals(VarMsg) && "N".equals(VarEMail)) {
+						this.info("Paper   ="   + titaVo.getParam("Paper" + i));
+						this.info("Msg     ="  + titaVo.getParam("Msg" + i));
+						this.info("EMail   ="  + titaVo.getParam("EMail" + i));
+
+						if ( "Y".equals(titaVo.getParam("Paper" + i)) 
+									&& "Y".equals(titaVo.getParam("Msg" + i)) 
+										&& "Y".equals(titaVo.getParam("EMail" + i))) {
 							throw new LogicException("E0007", tCustNotice.getFormNo() + "不可申請全部不寄送");
 						}
 					}
@@ -239,16 +258,20 @@ public class L1108 extends TradeBuffer {
 					continue;
 				}
 
-				String VarPaper = "N";
-				String VarMsg = "N";
-				String VarEMail = "N";
+//				String VarPaper = "N";
+//				String VarMsg = "N";
+//				String VarEMail = "N";
 
+				String VarPaper = "";
+				String VarMsg = "";
+				String VarEMail = "";
 				String uKey = custMain.getCustUKey();
 
 				Slice<CustTelNo> tCustTelNo = sCustTelNoService.findCustUKey(uKey, 0, Integer.MAX_VALUE, titaVo);
 				CdReport cdReport3 = sCdReportService.findById(titaVo.getParam("FormNo" + i), titaVo);
 				String icdEFg = cdReport3.getEmailFg();
 				String iMsgFg = cdReport3.getMessageFg();
+				String iLetFg = cdReport3.getLetterFg();
 				// CustUkey 接電話跟客戶主檔 要去判斷有無對應的該編號(05) 然後去看是否有簡訊
 				// 有UKEY 但是要從L1905的資料裡面抓出對應編號
 				// 看抓到的MSG以及其他的是否有符合
@@ -309,13 +332,44 @@ public class L1108 extends TradeBuffer {
 				iFormNo = titaVo.getParam("FormNo" + i);
 
 				// 這邊的邏輯因為前端 VAR 是設定「不通知申請」，所以Paper{i}, Msg{i}, EMail{i}為 Y 時對應DB的 N
-				if (titaVo.getParam("Paper" + i).trim().isEmpty()) {
+//				if (titaVo.getParam("Paper" + i).trim().isEmpty()) {
+//					VarPaper = "Y";
+//				}
+//				if (titaVo.getParam("Msg" + i).trim().isEmpty()) {
+//					VarMsg = "Y";
+//				}
+//				if (titaVo.getParam("EMail" + i).trim().isEmpty()) {
+//					VarEMail = "Y";
+//				}
+				if ("".equals(titaVo.getParam("Paper" + i))) {
 					VarPaper = "Y";
 				}
-				if (titaVo.getParam("Msg" + i).trim().isEmpty()) {
+				if ("".equals(titaVo.getParam("Msg" + i))) {
 					VarMsg = "Y";
 				}
-				if (titaVo.getParam("EMail" + i).trim().isEmpty()) {
+				if ("".equals(titaVo.getParam("EMail" + i))) {
+					VarEMail = "Y";
+				}
+
+				// 如果在頁面上輸入Y(不寄送)才需要修改DB的值為不寄送
+				if ("Y".equals(titaVo.getParam("Paper" + i))) {
+					VarPaper = "N";
+				}
+				if ("Y".equals(titaVo.getParam("Msg" + i))) {
+					VarMsg = "N";
+				}
+				if ("Y".equals(titaVo.getParam("EMail" + i))) {
+					VarEMail = "N";
+				}
+
+				// 如果頁面上已經是空白且CdReport是N不寄送 頁面上雖然是空白 但預設應該要為Y 2023/5/26 佳怡
+				if (iLetFg.equals("N") && "Y".equals(titaVo.getParam("Paper" + i))) {
+					VarPaper = "Y";
+				}
+				if (iMsgFg.equals("N") && "Y".equals(titaVo.getParam("Msg" + i))) {
+					VarMsg = "Y";
+				}
+				if (icdEFg.equals("N") && "Y".equals(titaVo.getParam("EMail" + i))) {
 					VarEMail = "Y";
 				}
 
@@ -351,13 +405,17 @@ public class L1108 extends TradeBuffer {
 						throw new LogicException("E0005", "客戶通知設定檔");
 					}
 
-					if ("N".equals(VarPaper) || "N".equals(VarMsg) || "N".equals(VarPaper)) {
-						log = true;
-						oCustNotice = (CustNotice) iDataLog.clone(tCustNotice);
-						oCustNotice.setPaperNotice("Y");
-						oCustNotice.setMsgNotice("Y");
-						oCustNotice.setEmailNotice("Y");
-					}
+//					if ("N".equals(VarPaper) || "N".equals(VarMsg) || "N".equals(VarPaper)) {
+//						log = true;
+//						oCustNotice = (CustNotice) iDataLog.clone(tCustNotice);
+//						oCustNotice.setPaperNotice("Y");
+//						oCustNotice.setMsgNotice("Y");
+//						oCustNotice.setEmailNotice("Y");
+//					}
+					oCustNotice = (CustNotice) iDataLog.clone(tCustNotice);
+					oCustNotice.setPaperNotice(VarPaper);
+					oCustNotice.setMsgNotice(VarMsg);
+					oCustNotice.setEmailNotice(VarEMail);
 
 				} else {
 					// 變更前
@@ -393,8 +451,11 @@ public class L1108 extends TradeBuffer {
 						cdReport.setLetterFg(VarPaper);// 書面'
 
 						if (cdReport.getSendCode() == 1) {
-							if ("N".equals(tCustNotice.getPaperNotice()) && "N".equals(tCustNotice.getMsgNotice())
-									&& "N".equals(tCustNotice.getEmailNotice())) {
+//							if ("N".equals(tCustNotice.getPaperNotice()) && "N".equals(tCustNotice.getMsgNotice())
+//									&& "N".equals(tCustNotice.getEmailNotice())) {
+							if ( "Y".equals(titaVo.getParam("Paper" + i)) 
+									&& "Y".equals(titaVo.getParam("Msg" + i)) 
+										&& "Y".equals(titaVo.getParam("EMail" + i))) {
 								throw new LogicException("E0007", tCustNotice.getFormNo() + "不可申請全部不寄送");
 							}
 						}
@@ -412,12 +473,21 @@ public class L1108 extends TradeBuffer {
 
 				if (cdReport2 != null && tCustNotice != null) {
 					if (cdReport2.getSendCode() == 1) {
-						if ("N".equals(VarPaper) && "N".equals(VarMsg) && "N".equals(VarEMail)) {
+//						if ("N".equals(VarPaper) && "N".equals(VarMsg) && "N".equals(VarEMail)) {
+						if ( "Y".equals(titaVo.getParam("Paper" + i)) 
+								&& "Y".equals(titaVo.getParam("Msg" + i)) 
+									&& "Y".equals(titaVo.getParam("EMail" + i))) {
 							throw new LogicException("E0007", tCustNotice.getFormNo() + "不可申請全部不寄送");
 						}
 					} else {
 						if (cdReport2.getSendCode() == 1) {
-							if ("N".equals(VarPaper) && "N".equals(VarMsg) && "N".equals(VarEMail)) {
+//							if ("N".equals(VarPaper) && "N".equals(VarMsg) && "N".equals(VarEMail)) {
+//							if ((iLetFg.equals("N") && "Y".equals(titaVo.getParam("Paper" + i))) 
+//									&& (iMsgFg.equals("N") && "Y".equals(titaVo.getParam("Msg" + i))) 
+//										&& ("Y".equals(titaVo.getParam("EMail" + i)))) {
+							if ( "Y".equals(titaVo.getParam("Paper" + i)) 
+									&& "Y".equals(titaVo.getParam("Msg" + i)) 
+										&& "Y".equals(titaVo.getParam("EMail" + i))) {
 								throw new LogicException("E0007", tCustNotice.getFormNo() + "不可申請全部不寄送");
 							}
 						}

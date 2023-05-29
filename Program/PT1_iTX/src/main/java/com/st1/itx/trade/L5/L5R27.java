@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L5;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,13 +10,17 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdBcm;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.PfBsDetail;
 import com.st1.itx.db.domain.PfItDetail;
+import com.st1.itx.db.domain.FacMain;
+import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.PfItDetailAdjust;
 import com.st1.itx.db.domain.TxControl;
 import com.st1.itx.db.service.CdEmpService;
+import com.st1.itx.db.service.CdBcmService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.PfBsDetailService;
 import com.st1.itx.db.service.PfItDetailService;
@@ -45,6 +50,9 @@ public class L5R27 extends TradeBuffer {
 
 	@Autowired
 	public CdEmpService sCdEmpService;
+
+	@Autowired
+	public CdBcmService sCdBcmService;
 
 	@Autowired
 	public FacMainService sFacMainService;
@@ -121,7 +129,19 @@ public class L5R27 extends TradeBuffer {
 		totaVo.putParam("L5r27DistManagerName", DistManagerName);
 
 		totaVo.putParam("L5r27UtilBal", pfItDetail.getDrawdownAmt());
-
+		//部室
+		totaVo.putParam("L5r27DeptCode", pfItDetail.getDeptCode());
+		String deptCodeX = FindCdBcm(pfItDetail.getDeptCode(), titaVo);
+		totaVo.putParam("L5r27DeptCodeX", deptCodeX);
+		//區部
+		totaVo.putParam("L5r27DistCode", pfItDetail.getDistCode());
+		String distCodeX = FindCdBcm(pfItDetail.getDistCode(), titaVo);
+		totaVo.putParam("L5r27DistCodeX", distCodeX);
+		//單位
+		totaVo.putParam("L5r27UnitCode", pfItDetail.getUnitCode());
+		String unitCodeX = FindCdBcm(pfItDetail.getUnitCode(), titaVo);
+		totaVo.putParam("L5r27UnitCodeX", unitCodeX);
+		
 		PfItDetailAdjust pfItDetailAdjust = pfItDetailAdjustService.findCustFacmBormFirst(pfItDetail.getCustNo(),
 				pfItDetail.getFacmNo(), pfItDetail.getBormNo(), titaVo);
 
@@ -154,6 +174,17 @@ public class L5R27 extends TradeBuffer {
 			}
 		}
 		return EmpName;
+	}
+
+	public String FindCdBcm(String cdBcmUnitCode, TitaVo titaVo) {
+		String codeName = "";
+		if (cdBcmUnitCode != null && cdBcmUnitCode.length() != 0) {
+			CdBcm tCdBcm = sCdBcmService.findById(cdBcmUnitCode, titaVo);
+			if (tCdBcm != null) {
+				codeName = tCdBcm.getUnitItem();
+			}
+		}
+		return codeName;
 	}
 
 }

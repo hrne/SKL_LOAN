@@ -103,14 +103,13 @@ public class LQ007Report extends MakeReport {
 					vYMonth = y * 100 + 12;
 				}
 
-				ymList.add(vYMonth);
-
 				if (endY > y) {
 					if (tmpYMonth / 100 != vYMonth / 100) {
 						tmpCol = tmpCol + 2;
 						tmpYMonth = vYMonth;
 						ymTitle = (vYMonth - 191100) / 100 + "年";
 						makeExcel.setValue(3, tmpCol, ymTitle, "C");
+						ymList.add(vYMonth);
 					}
 				} else {
 					if (tmpYMonth != vYMonth) {
@@ -118,6 +117,7 @@ public class LQ007Report extends MakeReport {
 						tmpYMonth = vYMonth;
 						ymTitle = (vYMonth - 191100) / 100 + "年" + (vYMonth - 191100) % 100 + "月";
 						makeExcel.setValue(3, tmpCol, ymTitle, "C");
+						ymList.add(vYMonth);
 					}
 				}
 
@@ -127,6 +127,8 @@ public class LQ007Report extends MakeReport {
 
 			}
 		}
+
+		this.info("ymList = " + ymList.toString());
 
 		if (LQ007List != null && !LQ007List.isEmpty()) {
 			int colBal = 0;
@@ -147,6 +149,8 @@ public class LQ007Report extends MakeReport {
 					y = tmpYear * 100 + 12;
 				}
 
+				//
+
 				// 排除非當年度的3 6 9月份
 				if (y != (tmpYear * 100 + 12) && endY > tmpYear) {
 					continue;
@@ -158,7 +162,6 @@ public class LQ007Report extends MakeReport {
 					BigDecimal balSum = BigDecimal.ZERO;
 					BigDecimal intSum = BigDecimal.ZERO;
 
-			
 					// 排除非當年度的3 6 9月份
 					if (visibleMonth != (tmpYear * 100 + 12) && endY > tmpYear) {
 						continue;

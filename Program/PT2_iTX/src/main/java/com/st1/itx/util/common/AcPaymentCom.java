@@ -226,7 +226,7 @@ public class AcPaymentCom extends TradeBuffer {
 			acDetail.setAcctCode("OPR");
 			break;
 		case "211":
-			acDetail.setAcctCode("P03");
+			acDetail.setAcctCode("P02");
 			break;
 		default:
 			break;

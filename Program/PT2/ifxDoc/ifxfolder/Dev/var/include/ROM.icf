@@ -6732,6 +6732,12 @@ TXFORM=L5R26
 #L5r27UnitManagerName=X,50,S
 #L5r27DistManager=X,6,S
 #L5r27DistManagerName=X,50,S
+#L5r27DeptCode=X,6,S
+#L5r27DeptCodeX=X,40,S
+#L5r27DistCode=X,6,S
+#L5r27DistCodeX=X,40,S
+#L5r27UnitCode=X,6,S
+#L5r27UnitCodeX=X,40,S
 </L5R27.dec>
 
 <L5R27.tom>
@@ -6756,6 +6762,12 @@ TXFORM=L5R27
 #L5r27UnitManagerName
 #L5r27DistManager
 #L5r27DistManagerName
+#L5r27DeptCode
+#L5r27DeptCodeX
+#L5r27DistCode
+#L5r27DistCodeX
+#L5r27UnitCode
+#L5r27UnitCodeX
 ^
 </L5R27.tom>
 

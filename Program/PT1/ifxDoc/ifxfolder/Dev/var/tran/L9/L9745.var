@@ -70,14 +70,14 @@ T(1,#SYSDATE,2,5)
 C(3,#workMonthStart,0,T(1,@workMonthStart,#SYSDATE,2,5),$)
 @
 C(3,#workMonthStart,0,S,A(YM13,1,#workMonthStart))
-IF(#workMonthStart>#DT,V(P,工作月不得大於會計月),$)
+!IF(#workMonthStart>#DT,V(P,工作月不得大於會計月),$)
 
 #workMonthEnd=A,5,I
 C(3,#workMonthStart,0,S,C(3,#workMonthEnd,0,E(0,#workMonthStart),$))
 @
 A(YM13,1,#workMonthEnd)
 IF(#workMonthEnd<#workMonthStart,V(P,工作月訖起不得小於工作月起),$)
-IF(#workMonthEnd>#DT,V(P,工作月不得大於會計月),$)
+!IF(#workMonthEnd>#DT,V(P,工作月不得大於會計月),$)
 
 ! 業績日期
 #drawdownDateStart=D,7,I

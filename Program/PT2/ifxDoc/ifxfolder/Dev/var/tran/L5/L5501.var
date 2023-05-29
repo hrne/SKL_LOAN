@@ -37,6 +37,9 @@ E(0,0)
 ["#<->#,#FdIntroducer+介紹人",#Introducer,#BTNA,#IntroducerName],
 ["#<->#,#FdUnitManager+處經理",#UnitManager,#BTNB,#UnitManagerName],
 ["#<->#,#FdDistManager+區經理",#DistManager,#BTNC,#DistManagerName],
+["#<->#,#FdDeptCode+部室",#DeptCode,#DeptCodeBTN,#DeptCodeX],
+["#<->#,#FdDistCode+區部",#DistCode,#DistCodeBTN,#DistCodeX],
+["#<->#,#FdUnitCode+單位",#UnitCode,#UnitCodeBTN,#UnitCodeX],
 ["#<->#,#FdBsOfficer+房貸專員",#BsOfficer,#BsOfficerName],
 ["#<->#,#FdUtilBal+已用額度",#UtilBal],
 ["#<->#,#FdTitle+調整後（額度）","@"],
@@ -91,6 +94,9 @@ C(3,#FunCode,2,T(3,*),T(3, ))
 C(3,#FunCode,2,T(3,*),T(3, ))
 #FdUnitManager=X,2,L
 #FdDistManager=X,2,L
+#FdDeptCode=X,2,L
+#FdDistCode=X,2,L
+#FdUnitCode=X,2,L
 #FdOption=X,2,L
 C(3,#FunCode,2,T(3,*),T(3, ))
 
@@ -151,6 +157,9 @@ T(F,@Introducer,0)
 T(F,@UnitManager,0)
 T(F,@DistManager,0)
 T(F,@Option,0)
+T(F,@DeptCode,0)
+T(F,@DistCode,0)
+T(F,@UnitCode,0)
 
 #RimL5r27=X,1,S
 C(3,#CHAIN,1,$,S)
@@ -177,6 +186,14 @@ T(2,@UnitManager,#L5r27UnitManager)
 T(2,@UnitManagerName,#L5r27UnitManagerName)
 T(2,@DistManager,#L5r27DistManager)
 T(2,@DistManagerName,#L5r27DistManagerName)
+T(2,@DeptCode,#L5r27DeptCode)
+T(2,@DeptCodeX,#L5r27DeptCodeX)
+T(2,@DistCode,#L5r27DistCode)
+T(2,@DistCodeX,#L5r27DistCodeX)
+T(2,@UnitCode,#L5r27UnitCode)
+T(2,@UnitCodeX,#L5r27UnitCodeX)
+
+
 
 ! 借款人戶號
 #CustNo=A,7,L
@@ -224,6 +241,12 @@ E(0,@AdjPerfReward,#L5r27AdjPerfReward)
 E(0,@AdjPerfAmt,#L5r27AdjPerfAmt)
 T(2,@AdjCntingCode,#L5r27AdjCntingCode)
 T(2,@AdjRange,#L5r27AdjRange)
+T(2,@DeptCode,#L5r27DeptCode)
+T(2,@DeptCodeX,#L5r27DeptCodeX)
+T(2,@DistCode,#L5r27DistCode)
+T(2,@DistCodeX,#L5r27DistCodeX)
+T(2,@UnitCode,#L5r27UnitCode)
+T(2,@UnitCodeX,#L5r27UnitCodeX)
 
 #OptionX=x,18,L
 SWITCH(#Option,
@@ -234,7 +257,7 @@ SWITCH(#Option,
 #InitApplCode=A,1,S
 IF(#FunCode != 2 || #Option == 2,E(0,1),S)
 #checkApplcode=X,1,S
-C(3,#InitApplCode,1,HIDE(#BTNA,#BTNB,#BTNC),SHOW(#BTNA,#BTNB,#BTNC))
+C(3,#InitApplCode,1,HIDE(#BTNA,#BTNB,#BTNC,#DeptCodeBTN,#DistCodeBTN,#UnitCodeBTN),SHOW(#BTNA,#BTNB,#BTNC,#DeptCodeBTN,#DistCodeBTN,#UnitCodeBTN))
 
 
 #Tf2=x,1,S
@@ -248,6 +271,9 @@ T(F,@AdjRange,0)
 T(F,@Introducer,1)
 T(F,@UnitManager,1)
 T(F,@DistManager,1)
+T(F,@DeptCode,1)
+T(F,@DistCode,1)
+T(F,@UnitCode,1)
 
 #Tf3=x,1,S
 C(3,#FunCode,2,$,S)
@@ -260,6 +286,9 @@ T(F,@AdjPerfReward,1)
 T(F,@AdjPerfAmt,1)
 T(F,@AdjCntingCode,1)
 T(F,@AdjRange,1)
+T(F,@DeptCode,0)
+T(F,@DistCode,0)
+T(F,@UnitCode,0)
 
 
 <include src="ROM.icf::L2R08.dec"/>
@@ -349,6 +378,46 @@ R(1,L2R08)
 T(2,@DistManagerName,#L2r08FullName)
 
 #DistManagerName=X,50,L
+
+! 部室代號
+#DeptCodeBTN=X,1,I,ui:button;value:單位代號查詢;enable:1;tabbable:0
+#DeptCodeBUF=X,6,S
+#DeptCodeBIND=X,1,S
+BIND(#DeptCodeBTN,click, {cmd=CHAIN; ntxcd=L6086; ntxbuf=#DeptCodeBUF;ntxbuf5=type<-1:DeptCode<-OODeptCode:DeptCodeX<-OODeptItem})
+
+#DeptCode=X,6,I
+IF(#FunCode != 2,s,$)
+IF(#Option == 2,s,$)
+
+! 部室名稱
+#DeptCodeX=x,40,L
+
+! 區部代號
+#DistCodeBTN=X,1,I,ui:button;value:單位代號查詢;enable:1;tabbable:0
+#DistCodeBUF=X,6,S
+#DistCodeBIND=X,1,S
+BIND(#DistCodeBTN,click, {cmd=CHAIN; ntxcd=L6086; ntxbuf=#DistCodeBUF;ntxbuf5=type<-1:DistCode<-OODistCode:DistCodeX<-OODistItem})
+
+#DistCode=X,6,I
+IF(#FunCode != 2,s,$)
+IF(#Option == 2,s,$)
+
+! 區部名稱
+#DistCodeX=x,40,L
+
+! 單位代號
+#UnitCodeBTN=X,1,I,ui:button;value:單位代號查詢;enable:1;tabbable:0
+#UnitCodeBUF=X,6,S
+#UnitCodeBIND=X,1,S
+BIND(#UnitCodeBTN,click, {cmd=CHAIN; ntxcd=L6086; ntxbuf=#UnitCodeBUF;ntxbuf5=type<-1:UnitCode<-OOUnitCode:UnitCodeX<-OOUnitItem})
+
+#UnitCode=X,6,I
+IF(#FunCode != 2,s,$)
+IF(#Option == 2,s,$)
+
+! 單位名稱
+#UnitCodeX=x,40,L
+
 
 
 !<include src="ROM.icf::L5R28.dec"/>
@@ -448,6 +517,9 @@ V(1,1,2)
 #Introducer
 #UnitManager
 #DistManager
+#DeptCode
+#DistCode
+#UnitCode
 </sub>
 
 !------ 下行電文TOM ------

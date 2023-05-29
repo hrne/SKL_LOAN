@@ -122,6 +122,7 @@ public class L5407 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException("E0005", "修改時發生錯誤");
 			}
+		
 			break;
 
 		case 4:
@@ -180,7 +181,8 @@ public class L5407 extends TradeBuffer {
 		Slice<PfCoOfficerLog> slPfCoOfficerLog = pfCoOfficerLogService.findEmpNoEq(iEmpNo, 0, Integer.MAX_VALUE,
 				titaVo);
 
-		if (slPfCoOfficerLog == null && iFunctionCode != 1 ) {
+		if (slPfCoOfficerLog == null && iFunctionCode == 1 ) {
+//		if (slPfCoOfficerLog == null ) {
 			PfCoOfficer oPf = pfCoOfficerService.effectiveDateFirst(iEmpNo, 0, 99991231, titaVo);
 			if (oPf != null) {
 				PfCoOfficerLog tPfCoOfficerLog = new PfCoOfficerLog();

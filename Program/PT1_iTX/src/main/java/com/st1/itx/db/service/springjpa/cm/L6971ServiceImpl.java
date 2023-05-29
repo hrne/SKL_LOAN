@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.service.springjpa.cm.L9729ServiceImpl.WorkType;
@@ -66,8 +65,7 @@ public class L6971ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                 ORDER BY \"ExecuteDate\" DESC ";
 		sql += "                                         ,\"BatchNo\"     DESC) AS \"Seq\" ";
 		sql += "       FROM \"TxArchiveTableLog\" ";
-		sql += "       WHERE \"DataFrom\" = 'ONLINE' ";
-		sql += "         AND \"DataTo\" = 'HISTORY' "; // 本程式只處理 ONLINE to HISTORY
+		sql += "       WHERE \"IsDeleted\" = 0 ";
 		sql += "         AND \"Records\"   > 0 "; // 此筆明細有操作資料
 
 		// Condition by WorkType

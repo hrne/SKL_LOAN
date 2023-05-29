@@ -9,7 +9,7 @@ import org.apache.ftpserver.listener.Listener;
 import org.apache.ftpserver.listener.ListenerFactory;
 import org.apache.ftpserver.usermanager.ClearTextPasswordEncryptor;
 import org.apache.ftpserver.usermanager.DbUserManagerFactory;
-
+import org.apache.tomcat.jdbc.pool.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-
-
 import javax.annotation.PostConstruct;
-import javax.sql.DataSource;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -89,16 +85,16 @@ public class ApacheFtpServer {
         DbUserManagerFactory dbUserManagerFactory = new DbUserManagerFactory();
         dbUserManagerFactory.setDataSource(dataSource);
         dbUserManagerFactory.setAdminName("admin");
-        dbUserManagerFactory.setSqlUserAdmin("SELECT userid FROM FTP_USER WHERE userid='{userid}' AND userid='admin'");
-        dbUserManagerFactory.setSqlUserInsert("INSERT INTO FTP_USER (userid, userpassword, homedirectory, " +
-                "enableflag, writepermission, idletime, uploadrate, downloadrate) VALUES " +
+        dbUserManagerFactory.setSqlUserAdmin("SELECT \"UserId\" FROM \"TxFtpUser\" WHERE \"UserId\"='{userid}' AND \"UserId\"='admin'");
+        dbUserManagerFactory.setSqlUserInsert("INSERT INTO \"TxFtpUser\" (\"UserId\", \"UserPassword\", \"HomeDirectory\", " +
+                "\"EnableFlag\", \"WritePermission\", \"IdleTime\", \"UploadRate\", \"DownloadRate\") VALUES " +
                 "('{userid}', '{userpassword}', '{homedirectory}', {enableflag}, " +
                 "{writepermission}, {idletime}, uploadrate}, {downloadrate})");
-        dbUserManagerFactory.setSqlUserDelete("DELETE FROM FTP_USER WHERE userid = '{userid}'");
-        dbUserManagerFactory.setSqlUserUpdate("UPDATE FTP_USER SET userpassword='{userpassword}',homedirectory='{homedirectory}',enableflag={enableflag},writepermission={writepermission},idletime={idletime},uploadrate={uploadrate},downloadrate={downloadrate},maxloginnumber={maxloginnumber}, maxloginperip={maxloginperip} WHERE userid='{userid}'");
-        dbUserManagerFactory.setSqlUserSelect("SELECT * FROM FTP_USER WHERE userid = '{userid}'");
-        dbUserManagerFactory.setSqlUserSelectAll("SELECT userid FROM FTP_USER ORDER BY userid");
-        dbUserManagerFactory.setSqlUserAuthenticate("SELECT userid, userpassword FROM FTP_USER WHERE userid='{userid}'");
+        dbUserManagerFactory.setSqlUserDelete("DELETE FROM \"TxFtpUser\" WHERE \"UserId\" = '{userid}'");
+        dbUserManagerFactory.setSqlUserUpdate("UPDATE \"TxFtpUser\" SET \"UserPassword\"='{userpassword}',\"HomeDirectory\"='{homedirectory}',\"EnableFlag\"={enableflag},\"WritePermission\"={writepermission},\"IdleTime\"={idletime},\"UploadRate\"={uploadrate},\"DownloadRate\"={downloadrate},\"MaxloginNumber\"={maxloginnumber}, \"MaxloginPerIp\"={maxloginperip} WHERE \"UserId\"='{userid}'");
+        dbUserManagerFactory.setSqlUserSelect("SELECT * FROM \"TxFtpUser\" WHERE \"UserId\" = '{userid}'");
+        dbUserManagerFactory.setSqlUserSelectAll("SELECT \"UserId\" FROM \"TxFtpUser\" ORDER BY \"UserId\"");
+        dbUserManagerFactory.setSqlUserAuthenticate("SELECT \"UserId\", \"UserPassword\" FROM \"TxFtpUser\" WHERE \"UserId\"='{userid}'");
         dbUserManagerFactory.setPasswordEncryptor(new ClearTextPasswordEncryptor());
         serverFactory.setUserManager(dbUserManagerFactory.createUserManager());
 

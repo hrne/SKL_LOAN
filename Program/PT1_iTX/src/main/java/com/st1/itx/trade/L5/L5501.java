@@ -15,9 +15,12 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
+import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.domain.PfIntranetAdjust;
 import com.st1.itx.db.domain.PfItDetail;
 import com.st1.itx.db.domain.PfItDetailAdjust;
 import com.st1.itx.db.domain.TxControl;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.PfItDetailService;
 import com.st1.itx.db.service.TxControlService;
 import com.st1.itx.db.service.PfItDetailAdjustService;
@@ -80,6 +83,9 @@ public class L5501 extends TradeBuffer {
 			pfItDetail.setIntroducer(titaVo.getParam("Introducer").trim());
 			pfItDetail.setUnitManager(titaVo.getParam("UnitManager").trim());
 			pfItDetail.setDistManager(titaVo.getParam("DistManager").trim());
+			pfItDetail.setDeptCode(titaVo.getParam("DeptCode").trim());
+			pfItDetail.setDistCode(titaVo.getParam("DistCode").trim());
+			pfItDetail.setUnitCode(titaVo.getParam("UnitCode").trim());
 			try {
 				pfItDetail = pfItDetailService.update(pfItDetail, titaVo);
 			} catch (DBException e) {
