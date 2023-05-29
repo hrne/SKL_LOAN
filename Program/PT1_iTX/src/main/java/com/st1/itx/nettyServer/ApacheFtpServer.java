@@ -9,7 +9,6 @@ import org.apache.ftpserver.listener.Listener;
 import org.apache.ftpserver.listener.ListenerFactory;
 import org.apache.ftpserver.usermanager.ClearTextPasswordEncryptor;
 import org.apache.ftpserver.usermanager.DbUserManagerFactory;
-import org.apache.tomcat.jdbc.pool.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +17,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import javax.sql.DataSource;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
