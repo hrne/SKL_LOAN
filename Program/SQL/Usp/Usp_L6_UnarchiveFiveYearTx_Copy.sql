@@ -3,8 +3,8 @@ CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L6_UnarchiveFiveYearTx_Copy"(
 ) IS
 BEGIN
     DECLARE
-        v_archiveType CHAR(4) := '5YTX';
-        v_tableName   CHAR(9) := 'LoanBorTx';
+        v_archiveType VARCHAR2(4) := '5YTX';
+        v_tableName   VARCHAR2(9) := 'LoanBorTx';
         v_result      NUMBER(1);
         v_nextBatchNo NUMBER(3);
     BEGIN

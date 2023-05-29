@@ -2,8 +2,12 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * TxArchiveTableLog 歷史封存表紀錄檔<br>
@@ -16,12 +20,7 @@ import javax.persistence.Embeddable;
 public class TxArchiveTableLogId implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 5050163324965259963L;
-
-// 分類
+  // 分類
   /* 5YTX:已結清並領取清償證明五年之交易明細 */
   @Column(name = "`Type`", length = 4)
   private String type = " ";

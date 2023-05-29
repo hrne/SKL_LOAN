@@ -957,7 +957,6 @@ TXFORM=L3916
 ["#FdRemitBranch+匯款分行",#RemitBranch],
 ["#FdRemitAcctNo+匯款帳號",#RemitAcctNo],
 ["#FdCompensateAcct+匯款戶名",#CompensateAcct],
-[#<->#,"#FdRemark+附言",#Remark],
 ["#FdPaymentBank+解付單位代號",#PaymentBank],
 [#<->#,"@","@"],
 [#<->#,"<font color=red>@繳款資料區","@"],
@@ -977,6 +976,7 @@ TXFORM=L3916
 ["#FdNplProcSitu+催收處理情形",#NplProcSitu],
 ["#FdBadDebtAmt+轉呆帳金額",#BadDebtAmtX],
 ["#FdBadDebtBal+呆帳餘額",#BadDebtBalX],
+[#<->#,"#FdRemark+備註",#Remark],
 ]
 </sub>
 

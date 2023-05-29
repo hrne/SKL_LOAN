@@ -1,6 +1,8 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -12,6 +14,8 @@ import javax.persistence.Column;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * TxArchiveTableLog 歷史封存表紀錄檔<br>
@@ -26,12 +30,7 @@ import javax.persistence.GenerationType;
 public class TxArchiveTableLog implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 4841737582056659640L;
-
-// 序號
+  // 序號
   @Id
   @Column(name = "`LogNo`")
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "`TxArchiveTableLog_SEQ`")

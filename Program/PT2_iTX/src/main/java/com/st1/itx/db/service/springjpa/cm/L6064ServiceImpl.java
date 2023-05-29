@@ -42,10 +42,7 @@ public class L6064ServiceImpl extends ASpringJpaParm implements InitializingBean
 	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
 	
 	public List<Map<String, String>> findAll(String iDefType, String iDefCode,String iCode,String iCodeItem,int index, int limit, TitaVo titaVo) throws Exception {
-		this.info("iDefType = " + iDefType);
-		this.info("iDefCode = " + iDefCode);
-		this.info("iCode    = " + iCode);
-		this.info("iCodeItem = "+ iCodeItem);
+
 		String sql = "	SELECT ";
 		sql += "    C.\"Item\" as CI , ";
 		sql += "	A.\"DefCode\" , ";

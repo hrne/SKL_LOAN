@@ -85,23 +85,33 @@ public class L9729ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("inputType = " + inputType);
 		
 		String sql = "";
-		sql += " SELECT \"TableName\" ";
-		sql += "      , \"BatchNo\" ";
-		sql += "      , \"CustNo\" ";
-		sql += "      , \"FacmNo\" ";
-		sql += "      , \"BormNo\" ";
-		sql += "      , DECODE(\"Result\", 1, '成功', '失敗') \"Result\" ";
-		sql += "      , \"Description\" ";
-		sql += "      , \"DataFrom\" ";
-		sql += "      , \"DataTo\" ";
-		sql += " FROM \"TxArchiveTableLog\" ";
-		sql += " WHERE \"ExecuteDate\" = :inputDate ";
-		sql += "   AND \"Type\" = :inputType ";
-		sql += " ORDER BY \"BatchNo\" DESC ";
-		sql += "        , \"TableName\" ASC ";
-		sql += "        , \"CustNo\" ASC ";
-		sql += "        , \"FacmNo\" ASC ";
-		sql += "        , \"BormNo\" ASC ";
+		// 2023-05-18 Wei 增加判斷 from SKL 琦欣
+		// 只產最後一批
+		sql += " WITH rawData AS ( ";
+		sql += "   SELECT MAX(\"BatchNo\") AS \"MaxBatchNo\" ";
+		sql += "   FROM \"TxArchiveTableLog\" ";
+		sql += "   WHERE \"ExecuteDate\" = :inputDate ";
+		sql += "     AND \"Type\" = :inputType ";
+		sql += " )  ";
+		sql += " SELECT T.\"TableName\" ";
+		sql += "      , T.\"BatchNo\" ";
+		sql += "      , T.\"CustNo\" ";
+		sql += "      , T.\"FacmNo\" ";
+		sql += "      , T.\"BormNo\" ";
+		sql += "      , DECODE(T.\"Result\", 1, '成功', '失敗') \"Result\" ";
+		sql += "      , T.\"Description\" ";
+		sql += "      , T.\"DataFrom\" ";
+		sql += "      , T.\"DataTo\" ";
+		sql += " FROM rawData R ";
+		sql += " LEFT JOIN \"TxArchiveTableLog\" T ON T.\"BatchNo\" = R.\"MaxBatchNo\" ";
+		sql += "                                  AND T.\"ExecuteDate\" = :inputDate ";
+		sql += "                                  AND T.\"Type\" = :inputType ";
+		sql += " WHERE NVL(T.\"BatchNo\",0) != 0 ";
+		sql += " ORDER BY T.\"BatchNo\" DESC ";
+		sql += "        , T.\"TableName\" ASC ";
+		sql += "        , T.\"CustNo\" ASC ";
+		sql += "        , T.\"FacmNo\" ASC ";
+		sql += "        , T.\"BormNo\" ASC ";
 
 
 		this.info("sql=" + sql);

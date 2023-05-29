@@ -48,7 +48,6 @@ public class L5022 extends TradeBuffer {
 		int iEffectiveDateE = Integer.valueOf(titaVo.getParam("EffectiveDateE")) + 19110000;
 		String iStatusFg = titaVo.getParam("StatusFlag");
 
-		this.info("cDate=" + cDate);
 		List<Map<String, String>> iL5022SqlReturn = new ArrayList<Map<String, String>>();
 		new CdEmp();
 		/*

@@ -95,7 +95,7 @@ public class L6064 extends TradeBuffer {
 				this.totaVo.addOccursList(occursList);
 			}
 		}
-		this.info("L6064DateList.size = " + L6064DateList.size() + "/" + idx);
+
 		
 		if (L6064DateList != null && idx < L6064DateList.size()) {
 			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */

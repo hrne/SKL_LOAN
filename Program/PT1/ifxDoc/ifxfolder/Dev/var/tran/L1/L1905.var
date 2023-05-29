@@ -283,6 +283,8 @@ T(2,#L1r01CustName)
 #OCustNo=X,7,L
 T(2,#L1r01CustNo)
 
+#OOCustNo=X,7,S
+
 #LOOP=X,1,S
 T(3,1)ASGN(LOOP$)
 
@@ -353,6 +355,8 @@ IF(#OOTelChgRsnCode == "00",$,T(H,#OOTelChgRsnCode,#TelChgRsnCodeHelp))
 !停用原因
 #OOStopReason=x,40,L
 
+
+
 ! 電話識別碼
 #OOTelNoUKey=x,32,S
 
@@ -373,6 +377,17 @@ T(2,{cmd=CHAIN; ntxcd=L1105; ntxbuf=#BTNADDBUF; ntxbuf5=type})
 ! C(5,#OOAllowFg,0,BIND(grid,cancel),BIND(grid,{cmd=CHAIN; ntxcd=L2074; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$))
 !C(5,#CustId, ,$,C(5,#CustNo,0,$,K(MODIFYBUTTON,1,新增)))
 
+!用於判定是否有歷程，Y/N
+! #OOHasHistory=X,1,S
+
+#18sp=X,18,S
+
+#OOBUF5=X,61,S
+T(2,0010101+9991231+L1105+#18sp+#OOCustNo+000+000)
+
+#OOBTN5=X,1,S
+! C(5,#OOHasHistory,"Y",BIND(grid,{ cmd=CHAIN; ntxcd=L6932;text=歷程 ;ntxbuf=#OOBUF5}),BIND(grid,cancel))
+BIND(grid,{ cmd=CHAIN; ntxcd=L6932;text=歷程 ;ntxbuf=#OOBUF5})
 
 
 </sub>
@@ -414,6 +429,7 @@ TXFORM=L1905
 #OORmk
 #OOStopReason
 #OOTelNoUKey
+#OOCustNo
 ^
 
 </sub>
@@ -432,6 +448,9 @@ TXFORM=L1905
 
 #OOBTN1=修改
 {width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
+
+#OOBTN5=歷程
+{width:50,search:false,formatter:'cust:bind-button:歷程',align:'center',canExport:false}
 
 #OOTEL_LB=電話種類
 {width:80,align:'center'}

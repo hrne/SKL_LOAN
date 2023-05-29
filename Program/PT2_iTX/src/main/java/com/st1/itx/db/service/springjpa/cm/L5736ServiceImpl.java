@@ -101,7 +101,7 @@ public class L5736ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , CASE ";
 		sql += "          WHEN NVL(CS.\"EvaNetWorth\", 0) = 0";
 		sql += "          THEN 0 ";
-		sql += "        ELSE ROUND(FM.\"LineAmt\" / CS.\"EvaNetWorth\", 2) * 100 ";
+		sql += "        ELSE ROUND(FM.\"LineAmt\" / CS.\"EvaNetWorth\", 2) ";
 		sql += "        END                        AS \"LoanRatio\" "; // 貸款成數
 		sql += " FROM  \"MonthlyLoanBal\" MLB ";
 		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = MLB.\"CustNo\" ";

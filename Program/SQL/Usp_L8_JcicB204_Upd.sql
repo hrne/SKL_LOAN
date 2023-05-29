@@ -68,7 +68,7 @@ BEGIN
       AND  NVL(Tx."TitaTxCd", ' ')    IN ('L3410', 'L3420') -- 結案
       AND  NVL(JSON_VALUE(Tx."OtherFields", '$.CaseCloseCode'),' ') IN ('0', '4', '5', '6')   -- 結案區分: 正常, 催收戶本人清償, 催收戶保證人代償,催收戶強制執行
       AND  NVL(M."CustNo",0)           =    0  -- 展期不申報
-      --AND  NVL(F."AdvanceCloseCode",0) <> 0
+      AND  NVL(F."AdvanceCloseCode",0) <>   0  -- 提前清償原因
       AND  NVL(F."UtilAmt",0)          =    0  -- 20230512佳怡:調整與AS400相同,額度餘額=0才申報 
     GROUP BY Tx."AcDate"
            , Tx."CustNo"

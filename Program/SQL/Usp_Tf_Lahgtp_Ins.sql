@@ -109,7 +109,7 @@ BEGIN
          , Gdrmrk         AS "Gdrmrk" -- '註記';
          , Hgtmhn2        AS "Hgtmhn2" -- '主建物建號2';
          , Hgtcip         AS "Hgtcip" -- '獨立產權註記';
-         , UpdateIdent    AS "UpdateIdent" -- 'Field update / access identifier';
+         , Update_Ident   AS "UpdateIdent" -- 'Field update / access identifier';
          , JOB_START_TIME AS "CreateDate" -- 建檔日期時間 DATE 
          , '999999'       AS "CreateEmpNo" -- 建檔人員 VARCHAR2 6
          , JOB_START_TIME AS "LastUpdate" -- 最後更新日期時間 DATE 

@@ -66,6 +66,7 @@ public class L5914 extends TradeBuffer {
 			occursList.putParam("OOFunctionCode", rPfCoOfficerLog.getFunctionCode());
 			occursList.putParam("OOEmpClass", rPfCoOfficerLog.getEmpClass());
 			occursList.putParam("OOClassPass", rPfCoOfficerLog.getClassPass());
+			
 			// 會有空白null的錯誤需要改
 			if (rPfCoOfficerLog.getUpdateDate() != null) {
 				String taU = rPfCoOfficerLog.getUpdateDate().toString();
@@ -76,6 +77,7 @@ public class L5914 extends TradeBuffer {
 			} else {
 				occursList.putParam("OOLastUpdate", "");
 			}
+			
 			if (rPfCoOfficerLog.getUpdateTlrNo() != null) {
 				String rEmpNo = rPfCoOfficerLog.getUpdateTlrNo();
 				CdEmp iCdEmp = iCdEmpService.findById(rEmpNo, titaVo);

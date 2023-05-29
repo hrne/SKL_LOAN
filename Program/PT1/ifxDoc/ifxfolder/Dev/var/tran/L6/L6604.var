@@ -18,6 +18,7 @@ E(0,0)
 </sub>
 
 
+
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,60];">
 [

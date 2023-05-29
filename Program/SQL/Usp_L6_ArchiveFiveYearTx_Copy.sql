@@ -41,14 +41,9 @@ BEGIN
         )
         , FC AS (
             SELECT FC."CustNo"
-                 , FC."FacmNo"
                  , FC."CloseDate"
-                 , FC."ReceiveFg"
-                 , FC."ReceiveDate"
-                 , FC."CollectFlag"
                  , ROW_NUMBER() OVER (
                     PARTITION BY FC."CustNo"
-                               , FC."FacmNo"
                     ORDER BY NVL(FC."CloseDate",0) DESC -- 清償作業檔(FacClose)的最後一筆結清日期
                    ) "Seq"
             FROM LBM
@@ -60,12 +55,12 @@ BEGIN
                LBT."CustNo"
               ,LBT."FacmNo"
               ,LBT."BormNo"
-        FROM "LoanBorTx" LBT
-        LEFT JOIN FC ON FC."Seq" = 1 -- 清償作業檔(FacClose)的最後一筆結清日期
-                    AND FC."CustNo" = LBT."CustNo"
-                    AND FC."FacmNo" = LBT."FacmNo"
+        FROM FC
+        LEFT JOIN "LoanBorTx" LBT ON LBT."CustNo" = FC."CustNo"
         LEFT JOIN "TxBizDate" TBD ON TBD."DateCode" = 'ONLINE'
-        WHERE NVL(FC."CloseDate",0) >= 19110101 -- 確保有結清日期
+        WHERE FC."Seq" = 1
+          AND NVL(FC."CloseDate",0) >= 19110101 -- 確保有結清日期
+          AND NVL(LBT."CustNo",0) != 0 -- 確保有串到交易明細
           AND TRUNC(MONTHS_BETWEEN(TO_DATE(TO_CHAR(TBD."TbsDyf"), 'YYYYMMDD'), TO_DATE(TO_CHAR(FC."CloseDate"), 'YYYYMMDD'))) >= 5 * 12 -- 結清滿五年
         ;
         

@@ -18,8 +18,8 @@ BEGIN
         v_cursor             SYS_REFCURSOR;
         v_schemaNameSource   VARCHAR2(14);
         v_schemaNameTarget   VARCHAR2(14);
-        v_schemaNameHistory  CHAR(14)  := 'C##ITXADMINDAY';
-        v_schemaNameOnline   CHAR(11)  := 'C##ITXADMIN';
+        v_schemaNameHistory  VARCHAR2(14)  := 'ITXADMINDAYD';
+        v_schemaNameOnline   VARCHAR2(14)  := 'ITXADMIND';
         v_targetColCount     NUMBER(3) := 0;
         TYPE t_tabColumnRecord IS RECORD
                                   (
@@ -134,12 +134,12 @@ BEGIN
         --
 
         -- 先檢查權限
-
         SELECT TO_NUMBER(COUNT(1))
         INTO v_targetColCount
         FROM ALL_TAB_COLUMNS
         WHERE OWNER = DBMS_ASSERT.SCHEMA_NAME(v_schemaNameTarget)
-          AND TABLE_NAME = DBMS_ASSERT.SIMPLE_SQL_NAME(v_tableName);
+          AND TABLE_NAME = DBMS_ASSERT.SIMPLE_SQL_NAME(v_tableName)
+        ;
 
         IF v_targetColCount = 0
         THEN
@@ -147,8 +147,8 @@ BEGIN
             DBMS_OUTPUT.PUT_LINE('v_tableName=' || v_tableName);
             DBMS_OUTPUT.PUT_LINE('v_targetColCount=' || v_targetColCount);
             DBMS_OUTPUT.PUT_LINE(DBMS_ASSERT.ENQUOTE_LITERAL(v_tableName) ||
-                                 ' 在 HISTORY.ALL_TAB_COLS 讀取不到欄位! 是不是 SELECT 權限尚未 GRANT ?');
-            INSERT_LOG(0, 'HISTORY.ALL_TAB_COLS 讀取不到欄位，可能為權限問題', 0);
+                                 ' 在 HISTORY('||v_schemaNameTarget||').ALL_TAB_COLS 讀取不到('||v_tableName||')欄位! 是不是 SELECT 權限尚未 GRANT ?');
+            INSERT_LOG(0, 'HISTORY('||v_schemaNameTarget||').ALL_TAB_COLS 讀取不到('||v_tableName||')欄位，可能為權限問題', 0);
             RETURN 0;
         end if;
 

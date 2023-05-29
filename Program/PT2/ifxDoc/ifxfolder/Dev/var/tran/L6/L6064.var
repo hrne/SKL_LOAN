@@ -337,8 +337,8 @@ TXFORM=L6R20
 #OOBTN2=修改
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
 
-!#OOBTN4=刪除
-!{width:50,search:false,formatter:'cust:bind-button:#OOBTN4',align:'center',canExport:false}
+#OOBTN4=刪除
+{width:50,search:false,formatter:'cust:bind-button:#OOBTN4',align:'center',canExport:false}
 
 #OODefCode=代碼檔代碼
 {width:150,align:'left'}
@@ -380,8 +380,8 @@ TXFORM=L6R20
 #OOBTN2=修改
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
 
-!#OOBTN4=刪除
-!{width:50,search:false,formatter:'cust:bind-button:#OOBTN4',align:'center',canExport:false}
+#OOBTN4=刪除
+{width:50,search:false,formatter:'cust:bind-button:#OOBTN4',align:'center',canExport:false}
 
 #OOCCode=代碼檔代碼
 {width:150,align:'left'}

@@ -79,7 +79,6 @@ public class L9745ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                        AND F.\"FacmNo\" = B.\"FacmNo\" ";
 		sql += " WHERE B.\"DrawdownAmt\" > 0 ";
 		sql += "   AND B.\"PerfAmt\" > 0 ";
-		sql += "   AND B.\"PerfDate\" <= :entDy ";
 		if (useWorkMonth) {
 			sql += "   AND B.\"WorkMonth\" BETWEEN :workMonthStart AND :workMonthEnd";
 		} else {
@@ -125,8 +124,6 @@ public class L9745ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (useBsOfficer) {
 			query.setParameter("bsOfficer", bsOfficer);
 		}
-
-		query.setParameter("entDy", entDy);
 		
 		return this.convertToMap(query);
 	}

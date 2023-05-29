@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -130,6 +133,34 @@ em = null;
       slice = txArchiveTableLogReposHist.findAllByTypeIsAndTableNameIsAndExecuteDateIsAndDataFromIsAndDataToIsAndBatchNoIsAndCustNoIsAndFacmNoIsAndBormNoIs(type_0, tableName_1, executeDate_2, dataFrom_3, dataTo_4, batchNo_5, custNo_6, facmNo_7, bormNo_8, pageable);
     else 
       slice = txArchiveTableLogRepos.findAllByTypeIsAndTableNameIsAndExecuteDateIsAndDataFromIsAndDataToIsAndBatchNoIsAndCustNoIsAndFacmNoIsAndBormNoIs(type_0, tableName_1, executeDate_2, dataFrom_3, dataTo_4, batchNo_5, custNo_6, facmNo_7, bormNo_8, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<TxArchiveTableLog> findL6971(String type_0, String tableName_1, int executeDate_2, int batchNo_3, int custNo_4, int facmNo_5, int bormNo_6, int isDeleted_7, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<TxArchiveTableLog> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findL6971 " + dbName + " : " + "type_0 : " + type_0 + " tableName_1 : " +  tableName_1 + " executeDate_2 : " +  executeDate_2 + " batchNo_3 : " +  batchNo_3 + " custNo_4 : " +  custNo_4 + " facmNo_5 : " +  facmNo_5 + " bormNo_6 : " +  bormNo_6 + " isDeleted_7 : " +  isDeleted_7);
+    if (dbName.equals(ContentName.onDay))
+      slice = txArchiveTableLogReposDay.findAllByTypeIsAndTableNameIsAndExecuteDateIsAndBatchNoIsAndCustNoIsAndFacmNoIsAndBormNoIsAndIsDeletedIs(type_0, tableName_1, executeDate_2, batchNo_3, custNo_4, facmNo_5, bormNo_6, isDeleted_7, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = txArchiveTableLogReposMon.findAllByTypeIsAndTableNameIsAndExecuteDateIsAndBatchNoIsAndCustNoIsAndFacmNoIsAndBormNoIsAndIsDeletedIs(type_0, tableName_1, executeDate_2, batchNo_3, custNo_4, facmNo_5, bormNo_6, isDeleted_7, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = txArchiveTableLogReposHist.findAllByTypeIsAndTableNameIsAndExecuteDateIsAndBatchNoIsAndCustNoIsAndFacmNoIsAndBormNoIsAndIsDeletedIs(type_0, tableName_1, executeDate_2, batchNo_3, custNo_4, facmNo_5, bormNo_6, isDeleted_7, pageable);
+    else 
+      slice = txArchiveTableLogRepos.findAllByTypeIsAndTableNameIsAndExecuteDateIsAndBatchNoIsAndCustNoIsAndFacmNoIsAndBormNoIsAndIsDeletedIs(type_0, tableName_1, executeDate_2, batchNo_3, custNo_4, facmNo_5, bormNo_6, isDeleted_7, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

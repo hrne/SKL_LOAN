@@ -55,6 +55,7 @@ import com.st1.itx.db.service.NegMainService;
 import com.st1.itx.db.service.TxErrCodeService;
 import com.st1.itx.db.service.TxRecordService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -447,13 +448,15 @@ public class TxBatchCom extends TradeBuffer {
 		if ("0".equals(this.procStsCode)) {
 			if (tDetail.getRepayCode() == 1 || tDetail.getRepayCode() == 4) {
 				if ("1".equals(this.tTempVo.getParam("AmlRsp1")) || "1".equals(this.tTempVo.getParam("AmlRsp2"))
-						|| "2".equals(this.tTempVo.getParam("AmlRsp1")) || "2".equals(this.tTempVo.getParam("AmlRsp2"))) {
+						|| "2".equals(this.tTempVo.getParam("AmlRsp1"))
+						|| "2".equals(this.tTempVo.getParam("AmlRsp2"))) {
 					txAmlCom.setTxBuffer(this.getTxBuffer());
 					this.tTempVo = txAmlCom.batxCheck(this.tTempVo, tDetail, titaVo);
 					if ("2".equals(this.tTempVo.getParam("AmlRsp1")) || "2".equals(this.tTempVo.getParam("AmlRsp2"))) {
 						this.checkMsg += " AML姓名檢核：為凍結名單/未確定名單 ";
 						this.amlRsp = 2;
-					} else if ("1".equals(this.tTempVo.getParam("AmlRsp1")) || "1".equals(this.tTempVo.getParam("AmlRsp2"))) {
+					} else if ("1".equals(this.tTempVo.getParam("AmlRsp1"))
+							|| "1".equals(this.tTempVo.getParam("AmlRsp2"))) {
 						this.checkMsg += " AML姓名檢核：需審查/確認 ";
 						this.amlRsp = 1;
 					}
@@ -554,7 +557,6 @@ public class TxBatchCom extends TradeBuffer {
 				settingprocStsCode(tDetail, titaVo);
 			}
 		}
-
 
 		// ------------- 將檢核結果存入整批入帳明細檔(還款類別、處理說明、處理狀態) -----------
 		// 檢核正常
@@ -1066,15 +1068,21 @@ public class TxBatchCom extends TradeBuffer {
 		l3420TitaVo.putParam("RqspFlag", ""); // 減免金額超過限額，Y.需主管核可
 		l3420TitaVo.putParam("ShortPrinPercent", "0"); // 短收本金比率
 		l3420TitaVo.putParam("ShortIntPercent", "0"); // 短收利息比率
-		// 提前清償原因
-		if ("".equals(this.tTempVo.getParam("CloseReasonCode"))) {
-			if (tBatxDetail.getRepayCode() == 2) {
-				l3420TitaVo.putParam("AdvanceCloseCode", "13"); // 13-銀扣到期
+		// 提前清償原因 
+		// CloseFg 1.正常結案因 2.提前結案
+		// 提前結案且無清償原因時，提前清償原因為 13-銀扣到期或02-自行還清
+		if ("2".equals(this.tTempVo.getParam("CloseFg"))) {
+			if ("".equals(this.tTempVo.getParam("CloseReasonCode"))) {
+				if (tBatxDetail.getRepayCode() == 2) {
+					l3420TitaVo.putParam("AdvanceCloseCode", "13"); // 13-銀扣到期
+				} else {
+					l3420TitaVo.putParam("AdvanceCloseCode", "02"); // 02-自行還清
+				}
 			} else {
-				l3420TitaVo.putParam("AdvanceCloseCode", "00"); // 00-無
+				l3420TitaVo.putParam("AdvanceCloseCode", this.tTempVo.getParam("CloseReasonCode"));
 			}
 		} else {
-			l3420TitaVo.putParam("AdvanceCloseCode", this.tTempVo.getParam("CloseReasonCode"));
+			l3420TitaVo.putParam("AdvanceCloseCode", "00"); // 00-無
 		}
 		// 清償違約金
 		if ("".equals(this.tTempVo.getParam("CloseBreachAmt"))) {

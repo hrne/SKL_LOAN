@@ -27,6 +27,9 @@ public class LY002p extends TradeBuffer {
 	LY002Report lY002Report;
 
 	@Autowired
+	LY002Report2 lY002Report2;
+
+	@Autowired
 	DateUtil dDateUtil;
 
 	@Autowired
@@ -40,13 +43,22 @@ public class LY002p extends TradeBuffer {
 		this.info("LY002p titaVo.getTxcd() = " + titaVo.getTxcd());
 		String parentTranCode = titaVo.getTxcd();
 
+		// 1 舊版報表，2新版報表
+		// 報表項目
+		int reportVer = Integer.valueOf(titaVo.getParam("ReportCode"));
+
 		lY002Report.setParentTranCode(parentTranCode);
 
-		boolean isFinish = lY002Report.exec(titaVo);
+		String noticeText = reportVer == 1 ? "LY002 非RBC_表14-1_會計部年度檢查報表" : "LY002 A141重要放款餘額明細表";
+
+		boolean isFinish = reportVer == 1 ? lY002Report.exec(titaVo) : lY002Report2.exec(titaVo);
+
 		if (isFinish) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "LY002 非RBC_表14-1_會計部年度檢查報表已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
+					titaVo.getParam("TLRNO"), noticeText + "已完成", titaVo);
 		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "LY002 非RBC_表14-1_會計部年度檢查報表查無資料", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
+					titaVo.getParam("TLRNO"), noticeText + "查無資料", titaVo);
 		}
 
 		this.addList(this.totaVo);

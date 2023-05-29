@@ -78,6 +78,7 @@ public class L5407 extends TradeBuffer {
 		PfCoOfficerId tPfCoOfficerId;
 		// 1跟3為類似的 新增 ，2是修改，4是刪除
 		switch (iFunctionCode) {
+		
 		case 1:
 		case 3:
 			checkEffectiveDate(titaVo);
@@ -182,7 +183,6 @@ public class L5407 extends TradeBuffer {
 				titaVo);
 
 		if (slPfCoOfficerLog == null && iFunctionCode == 1 ) {
-//		if (slPfCoOfficerLog == null ) {
 			PfCoOfficer oPf = pfCoOfficerService.effectiveDateFirst(iEmpNo, 0, 99991231, titaVo);
 			if (oPf != null) {
 				PfCoOfficerLog tPfCoOfficerLog = new PfCoOfficerLog();

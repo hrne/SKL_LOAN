@@ -11,6 +11,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.BankRemit;
 import com.st1.itx.db.domain.CdBank;
 import com.st1.itx.db.domain.CdBankId;
 import com.st1.itx.db.domain.FacMain;
@@ -21,6 +22,7 @@ import com.st1.itx.db.domain.LoanBorMainId;
 import com.st1.itx.db.domain.LoanOverdue;
 import com.st1.itx.db.domain.LoanOverdueId;
 import com.st1.itx.db.domain.LoanRateChange;
+import com.st1.itx.db.service.BankRemitService;
 import com.st1.itx.db.service.CdBankService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.FacProdService;
@@ -57,6 +59,8 @@ public class L3916 extends TradeBuffer {
 	public CdBankService cdBankService;
 	@Autowired
 	public LoanRateChangeService loanRateChangeService;
+	@Autowired
+	public BankRemitService bankRemitService;
 	@Autowired
 	public AuthLogCom authLogCom;
 	@Autowired
@@ -196,16 +200,29 @@ public class L3916 extends TradeBuffer {
 		this.totaVo.putParam("DrawdownAmt", tLoanBorMain.getDrawdownAmt());
 		this.totaVo.putParam("LoanBal", tLoanBorMain.getLoanBal());
 
-		CdBank tCdBank1 = cdBankService.findById(new CdBankId(tLoanBorMain.getRemitBank(), tLoanBorMain.getRemitBranch()), titaVo);
-		this.totaVo.putParam("RemitBank", tLoanBorMain.getRemitBank());
-		this.totaVo.putParam("RemitBranch", tLoanBorMain.getRemitBranch());
-		if (tCdBank1 != null) {
-			this.totaVo.putParam("RemitBank", tLoanBorMain.getRemitBank() + " " + tCdBank1.getBankItem());
-			this.totaVo.putParam("RemitBranch", tLoanBorMain.getRemitBranch() + " " + tCdBank1.getBranchItem());
+		// 改抓BankRemit
+		this.totaVo.putParam("RemitBank", "");
+		this.totaVo.putParam("RemitBranch", "");
+		this.totaVo.putParam("RemitAcctNo", "");
+		this.totaVo.putParam("PaymentBank", "");
+		this.totaVo.putParam("CompensateAcct", "");
+		BankRemit tBankRemit = bankRemitService.findL4104BFirst(tLoanBorMain.getCustNo(), tLoanBorMain.getFacmNo(),
+				tLoanBorMain.getBormNo(), parse.stringToInteger(tLoanBorMain.getDrawdownCode()), titaVo);
+		if (tBankRemit != null) {
+			CdBank tCdBank1 = cdBankService
+					.findById(new CdBankId(tBankRemit.getRemitBank(), tBankRemit.getRemitBranch()), titaVo);
+			this.totaVo.putParam("RemitBank", tBankRemit.getRemitBank());
+			this.totaVo.putParam("RemitBranch", tBankRemit.getRemitBranch());
+			if (tCdBank1 != null) {
+				this.totaVo.putParam("RemitBank", tBankRemit.getRemitBank() + " " + tCdBank1.getBankItem());
+				this.totaVo.putParam("RemitBranch", tBankRemit.getRemitBranch() + " " + tCdBank1.getBranchItem());
+			}
+			this.totaVo.putParam("RemitAcctNo", tBankRemit.getRemitAcctNo());
+			this.totaVo.putParam("PaymentBank",
+					FormatUtil.pad9(tBankRemit.getRemitBank(), 3) + FormatUtil.pad9(tBankRemit.getRemitBranch(), 4));
+			this.totaVo.putParam("CompensateAcct", tBankRemit.getCustName());// 收款戶名
 		}
-		this.totaVo.putParam("RemitAcctNo", tLoanBorMain.getRemitAcctNo());
-		this.totaVo.putParam("PaymentBank", tLoanBorMain.getPaymentBank());
-		this.totaVo.putParam("CompensateAcct", tLoanBorMain.getCompensateAcct());
+		this.totaVo.putParam("Remark", tLoanBorMain.getRemark());
 		this.totaVo.putParam("DrawdownDate", tLoanBorMain.getDrawdownDate());
 		this.totaVo.putParam("DrawdownCode", tLoanBorMain.getDrawdownCode());
 		this.totaVo.putParam("MaturityDate", tLoanBorMain.getMaturityDate());
@@ -248,7 +265,6 @@ public class L3916 extends TradeBuffer {
 		this.totaVo.putParam("NplProcSitu", wkOvduSituaction);
 		this.totaVo.putParam("BadDebtAmt", wkBadDebtAmt);
 		this.totaVo.putParam("BadDebtBal", wkBadDebtBal);
-		this.totaVo.putParam("Remark", tLoanBorMain.getRemark());
 		this.totaVo.putParam("RelationCode", tLoanBorMain.getRelationCode());
 		this.totaVo.putParam("RelationName", tLoanBorMain.getRelationName());
 		this.totaVo.putParam("RelationId", tLoanBorMain.getRelationId());

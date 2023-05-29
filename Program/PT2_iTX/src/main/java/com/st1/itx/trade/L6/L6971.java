@@ -61,7 +61,7 @@ public class L6971 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-		this.limit = 100; // 29 * 500 = 14500
+		this.limit = 1000; // 29 * 500 = 14500
 
 		if (!ContentName.onLine.equals(titaVo.getDataBase())) {
 			throw new LogicException("E0008", "L6971 只允許在連線環境執行!!");
@@ -106,6 +106,12 @@ public class L6971 extends TradeBuffer {
 				occursList.putParam("OOFacmNo", l6971Vo.get("FacmNo"));
 				occursList.putParam("OOBormNo", l6971Vo.get("BormNo"));
 				this.totaVo.addOccursList(occursList);
+			}
+
+			if (l6971ServiceImpl.hasNext()) {
+				titaVo.setReturnIndex(this.setIndexNext());
+				/* 手動折返 */
+				this.totaVo.setMsgEndToEnter();
 			}
 		} else {
 			// 查無資料
@@ -204,10 +210,8 @@ public class L6971 extends TradeBuffer {
 		this.info("L6971.setIsDeletedToTrue deleteAll successful. Set isDeleted to 1.");
 
 		try {
-
-			Slice<TxArchiveTableLog> recordList = txArchiveTableLogService.findLogs(type, tableName, execDate, "ONLINE",
-					"HISTORY", batchNo, custNo, facmNo, bormNo, 0, Integer.MAX_VALUE, titaVo);
-
+			Slice<TxArchiveTableLog> recordList = txArchiveTableLogService.findL6971(type, tableName, execDate, batchNo,
+					custNo, facmNo, bormNo, 0, 0, Integer.MAX_VALUE, titaVo);
 			if (recordList != null && !recordList.isEmpty()) {
 				for (TxArchiveTableLog record : recordList) {
 					// deletedRecords 和 TxArchiveTableLog.Records 不符時 rollback
@@ -222,6 +226,10 @@ public class L6971 extends TradeBuffer {
 					record.setLastUpdateEmpNo(titaVo.getTlrNo());
 					txArchiveTableLogService.update(record, titaVo);
 				}
+			} else {
+				this.error(
+						"L6971.setIsDeletedToTrue: different count between deleted records and TxArchiveTableLog.Records! rollback");
+				throw new LogicException("E0007", "實際刪除資料數與 TxArchiveTableLog 紀錄的數量不符");
 			}
 		} catch (Exception e) {
 			this.error("L6971.setIsDeletedToTrue failed to update IsDeleted.");

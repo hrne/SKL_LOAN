@@ -272,6 +272,7 @@ public class L3731 extends TradeBuffer {
 	private void AddTxTempBormRoutine() throws LogicException {
 		this.info("AddTxTempBormRoutine ... ");
 		tTempVo.putParam("Status", tLoanBorMain.getStatus());
+		tTempVo.putParam("Remark", tLoanBorMain.getRemark());
 		tTempVo.putParam("LastEntDy", tLoanBorMain.getLastEntDy());
 		tTempVo.putParam("LastKinbr", tLoanBorMain.getLastKinbr());
 		tTempVo.putParam("LastTlrNo", tLoanBorMain.getLastTlrNo());
@@ -296,6 +297,7 @@ public class L3731 extends TradeBuffer {
 		} else {
 			tLoanBorMain.setStatus(9); // 9: 呆帳結案戶
 		}
+		tLoanBorMain.setRemark(titaVo.get("Remark"));
 		tLoanBorMain.setLastBorxNo(wkBorxNo);
 		tLoanBorMain.setLastEntDy(titaVo.getEntDyI());
 		tLoanBorMain.setLastKinbr(titaVo.getKinbr());
@@ -331,6 +333,7 @@ public class L3731 extends TradeBuffer {
 		tLoanBorMain.setLastBorxNo(wkNewBorxNo);
 
 		tLoanBorMain.setStatus(this.parse.stringToInteger(tTempVo.get("Status")));
+		tLoanBorMain.setRemark(tTempVo.get("Remark"));
 		tLoanBorMain.setLastEntDy(this.parse.stringToInteger(tTempVo.get("LastEntDy")));
 		tLoanBorMain.setLastKinbr(tTempVo.get("LastKinbr"));
 		tLoanBorMain.setLastTlrNo(tTempVo.get("LastTlrNo"));

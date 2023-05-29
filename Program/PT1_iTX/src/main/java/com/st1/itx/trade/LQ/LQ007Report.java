@@ -109,7 +109,9 @@ public class LQ007Report extends MakeReport {
 						tmpYMonth = vYMonth;
 						ymTitle = (vYMonth - 191100) / 100 + "年";
 						makeExcel.setValue(3, tmpCol, ymTitle, "C");
-						ymList.add(vYMonth);
+						if (vYMonth % 100 == 12) {
+							ymList.add(vYMonth);
+						}
 					}
 				} else {
 					if (tmpYMonth != vYMonth) {

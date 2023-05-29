@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.TxArchiveTableLog;
@@ -52,6 +54,24 @@ public interface TxArchiveTableLogService {
    * @return Slice TxArchiveTableLog TxArchiveTableLog of List
    */
   public Slice<TxArchiveTableLog> findLogs(String type_0, String tableName_1, int executeDate_2, String dataFrom_3, String dataTo_4, int batchNo_5, int custNo_6, int facmNo_7, int bormNo_8, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * Type = ,AND TableName = ,AND ExecuteDate = ,AND BatchNo = ,AND CustNo = ,AND FacmNo = ,AND BormNo = ,AND IsDeleted = 
+   *
+   * @param type_0 type_0
+   * @param tableName_1 tableName_1
+   * @param executeDate_2 executeDate_2
+   * @param batchNo_3 batchNo_3
+   * @param custNo_4 custNo_4
+   * @param facmNo_5 facmNo_5
+   * @param bormNo_6 bormNo_6
+   * @param isDeleted_7 isDeleted_7
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice TxArchiveTableLog TxArchiveTableLog of List
+   */
+  public Slice<TxArchiveTableLog> findL6971(String type_0, String tableName_1, int executeDate_2, int batchNo_3, int custNo_4, int facmNo_5, int bormNo_6, int isDeleted_7, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By TxArchiveTableLog
