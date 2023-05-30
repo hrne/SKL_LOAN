@@ -140,6 +140,10 @@ T(4,CHAIN$)
 T(2,@RimTxCode,#TXCD)
 E(0,@RimFKey,#FKEY)
 
+#NTXBUF=X,18,S
+C(3,#CHAIN,1,$,S)
+T(4,NTXBUF$)
+T(1,@CustNo,#NTXBUF,1,7)
 
 #WKINIT=X,1,S
 INVOKEJS(SHOW,p1,1)

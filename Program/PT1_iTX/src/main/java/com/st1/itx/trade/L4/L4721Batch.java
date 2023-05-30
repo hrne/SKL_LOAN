@@ -85,7 +85,7 @@ public class L4721Batch extends TradeBuffer {
 	int CntPaper = 0;
 	int CntEmail = 0;
 	int CntMsg = 0;
-	int commitCnt = 200;
+	int commitCnt = 50;
 	String noticeEmail = "";
 
 	@Override
@@ -142,25 +142,26 @@ public class L4721Batch extends TradeBuffer {
 						this.sno = 0;
 
 						try {
-
-							if (dealHeadData(titaVo, data).equals("isEmail")) {
+							String isNotice = dealHeadData(titaVo, data);
+							this.info("isNotice = " + isNotice);
+							if ("isEmail".equals(isNotice)) {
 
 								this.sno = l4721Report.exec(titaVo, this.txBuffer,
 										parse.stringToInteger(data.get("CustNo")), tmpKindItem[txkind - 1]);
 								this.info("CustNo =" + data.get("CustNo"));
 								this.info("sno =" + this.sno);
 
+								cntTrans++;
+
+								if (cntTrans > this.commitCnt) {
+									cntTrans = 0;
+									this.batchTransaction.commit();
+								}
+
 							}
 
 							if (this.sno > 0) {
 								setMailMFileVO(data, this.noticeEmail, titaVo);
-							}
-
-							cntTrans++;
-
-							if (cntTrans > this.commitCnt) {
-								cntTrans = 0;
-								this.batchTransaction.commit();
 							}
 
 						} catch (LogicException e) {
@@ -290,7 +291,7 @@ public class L4721Batch extends TradeBuffer {
 				CntPaper = CntPaper + 1;
 				letterCustList.add(iData);
 			}
-			isNotice = "isLetter";
+//			isNotice = "isLetter";
 
 		}
 		if ("Y".equals(tempVo.getParam("isEmail"))) {
@@ -315,7 +316,7 @@ public class L4721Batch extends TradeBuffer {
 				setTextFileVO(t, noticePhoneNo, titaVo);
 			}
 
-			isNotice = "isMessage";
+//			isNotice = "";
 		}
 
 		custNoLast = iCustNo;

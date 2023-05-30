@@ -186,10 +186,18 @@ BEGIN
              || LPAD(FR1P.LGTSEQ,2,'0')     AS "EndoInsuNo"
            , FR1P.CHKPRO
       FROM "LN$FR1P" FR1P
-      LEFT JOIN "ClNoMap" CNM ON CNM."GdrId1" = FR1P."GDRID1"
-                             AND CNM."GdrId2" = FR1P."GDRID2"
-                             AND CNM."GdrNum" = FR1P."GDRNUM"
-                             AND CNM."LgtSeq" = FR1P."LGTSEQ"
+      LEFT JOIN "TfFR1P" TF ON TF.CUSBRH = FR1P.CUSBRH
+                           AND TF.ADTYMT = FR1P.ADTYMT
+                           AND TF.GDRID1 = FR1P.GDRID1
+                           AND TF.GDRID2 = FR1P.GDRID2
+                           AND TF.GDRNUM = FR1P.GDRNUM
+                           AND TF.LGTSEQ = FR1P.LGTSEQ
+                           AND TF.INSNUM = FR1P.INSNUM
+      -- 2023-05-30 Wei 補正資料 from Sharepoint\19\資料轉換\火險到期單筆檔_串不到建物明細檔
+      LEFT JOIN "ClNoMap" CNM ON CNM."GdrId1" = NVL(TF.N_GDRID1,FR1P."GDRID1")
+                             AND CNM."GdrId2" = NVL(TF.N_GDRID2,FR1P."GDRID2")
+                             AND CNM."GdrNum" = NVL(TF.N_GDRNUM,FR1P."GDRNUM")
+                             AND CNM."LgtSeq" = NVL(TF.N_LGTSEQ,FR1P."LGTSEQ")
       LEFT JOIN txData TX ON TX."TRXDAT" = FR1P."TRXDAT"
                          AND TX."TRXNMT" = FR1P."TRXNMT"
                          AND TX."TRXAMT" = FR1P."INSTOT"

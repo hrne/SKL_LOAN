@@ -1275,7 +1275,6 @@ R(1,L2R06)
 !參數rim
 
 #RcvL2r08A=X,1,S
-C(3,#UpdateCode,1,$,S)
 C(4,#Introducer,S,$)
 T(2,@RimEmployeeNo,#Introducer)
 T(3,@RimErrorSkip,Y)
@@ -1287,7 +1286,6 @@ T(2,@IntroducerX,#L2r08FullName)
 ! T(2,@DistrictX,#L2r08CenterCode1Name)
 
 #RcvL2r08B=X,1,S  
-C(3,#UpdateCode,1,$,S)
 C(4,#FireOfficer,S,$)
 T(2,@RimEmployeeNo,#FireOfficer)
 T(3,@RimErrorSkip,Y)
@@ -1297,7 +1295,6 @@ R(1,L2R08)
 T(2,@FireOfficerX,#L2r08FullName)
 
 #RcvL2r08C=X,1,S	
-C(3,#UpdateCode,1,$,S)
 C(4,#Estimate,S,$)
 T(2,@RimEmployeeNo,#Estimate)
 T(3,@RimErrorSkip,Y)
@@ -1307,7 +1304,6 @@ R(1,L2R08)
 T(2,@EstimateX,#L2r08FullName)
 
 #RcvL2r08D=X,1,S	
-C(3,#UpdateCode,1,$,S)
 C(4,#CreditOfficer,S,$)
 T(2,@RimEmployeeNo,#CreditOfficer)
 T(3,@RimErrorSkip,Y)
@@ -1318,7 +1314,6 @@ T(2,@CreditOfficerX,#L2r08FullName)
 
 
 #RcvL2r08F=X,1,S
-C(3,#UpdateCode,1,$,S)	
 C(4,#BusinessOfficer,S,$)
 T(2,@RimEmployeeNo,#BusinessOfficer)
 T(3,@RimErrorSkip,Y)
@@ -1328,7 +1323,6 @@ R(1,L2R08)
 T(2,@BusinessOfficerX,#L2r08FullName)
 
 #RcvL2r08G=X,1,S
-C(3,#UpdateCode,1,$,S)	
 C(4,#Supervisor,S,$)
 T(2,@RimEmployeeNo,#Supervisor)
 T(3,@RimErrorSkip,Y)
@@ -1338,7 +1332,6 @@ R(1,L2R08)
 T(2,@SupervisorX,#L2r08FullName)
 
 #RcvL2r08H=X,1,S
-C(3,#UpdateCode,1,$,S)	
 C(4,#InvestigateOfficer,S,$)
 T(2,@RimEmployeeNo,#InvestigateOfficer)
 T(3,@RimErrorSkip,Y)
@@ -1348,7 +1341,6 @@ R(1,L2R08)
 T(2,@InvestigateOfficerX,#L2r08FullName)
 
 #RcvL2r08I=X,1,S	
-C(3,#UpdateCode,1,$,S)
 C(4,#EstimateReview,S,$)
 T(2,@RimEmployeeNo,#EstimateReview)
 T(3,@RimErrorSkip,Y)
@@ -1358,7 +1350,6 @@ R(1,L2R08)
 T(2,@EstimateReviewX,#L2r08FullName)
 
 #RcvL2r13J=X,1,S	
-C(3,#UpdateCode,1,$,S)
 C(4,#Coorgnizer,S,$)
 T(2,@RimEmployeeNo,#Coorgnizer)
 E(0,@RimFunCd,5)

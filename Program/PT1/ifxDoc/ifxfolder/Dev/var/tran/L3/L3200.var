@@ -273,7 +273,7 @@ T(1,@EntryDate,#NTXBUF,19,7)
 T(1,@TwExtraRepay,#NTXBUF,26,16)
 T(1,@UsExtraRepay,#NTXBUF,26,16)
 T(1,@IncludeIntFlag,#NTXBUF,42,1)
-T(1,@RepayTerms,#NTXBUF,43,3),$)
+T(1,@RepayTerms,#NTXBUF,43,3)
 
 #ChainCustNo=A,7,S
 

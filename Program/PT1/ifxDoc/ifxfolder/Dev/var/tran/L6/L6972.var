@@ -115,12 +115,12 @@ T(3,撥款序號)
 ! 額度輸入
 #InputFacmNo=A,3,I
 ! InputRoute 為 0 時，代入 0 以防意外結果
-@C(3,#InputRoute,1,V(5,1,999),E(0,0))
+@C(3,#InputRoute,1,V(5,0,999),E(0,0))
 
 ! 撥款輸入
 ! InputRoute 為 0 時，代入 0 以防意外結果
 #InputBormNo=A,3,I
-@C(3,#InputRoute,1,V(5,1,999),E(0,0))
+@C(3,#InputRoute,1,V(5,0,999),E(0,0))
 
 ! 連動交易傳入參數:
 ! 執行種類

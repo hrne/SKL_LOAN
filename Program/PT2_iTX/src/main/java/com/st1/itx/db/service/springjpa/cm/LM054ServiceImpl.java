@@ -102,7 +102,7 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "		  ,L.\"MaturityDate\" AS F9";
 			sql += "		  ,M.\"StoreRate\" / 100 AS F10";
 			sql += "		  ,M.\"LoanBalance\" AS F11";
-			sql += "		  ,M.\"IntAmtAcc\" AS F12";
+			sql += "		  ,acInt.\"Interest\" AS F12";
 			sql += "		  ,'1' AS F13";
 			sql += "		  ,NVL(CM.\"EvaAmt\",0) AS F14";
 			sql += "		  ,NVL(F.\"LineAmt\",0) AS F15";
@@ -174,12 +174,28 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "				FROM \"CollTel\" ) CT";
 			sql += "	ON CT.\"CustNo\" = M2.\"CustNo\" AND CT.\"FacmNo\" = M2.\"FacmNo\"";
 			sql += "									  AND CT.\"SEQ\" = 1 ";
+			sql += "	LEFT JOIN (SELECT \"CustNo\"        "; 
+			sql += "       				 ,\"FacmNo\"   "; 
+			sql += "       				 ,\"BormNo\"     "; 
+			sql += "       				 ,SUM(\"Interest\") AS \"Interest\" "; 
+			sql += " 			   FROM \"AcLoanInt\" ";
+			sql += " 			   WHERE \"YearMonth\"    = :inputYearMonth ";
+			sql += "			   GROUP BY \"CustNo\" ";
+			sql += "         			   ,\"FacmNo\" ";
+			sql += "         		 	   ,\"BormNo\" ) acInt ";
+			sql += "	 ON acInt.\"CustNo\" = M.\"CustNo\"";
+			sql += "	AND acInt.\"FacmNo\" = M.\"FacmNo\"";
+			sql += "	AND acInt.\"BormNo\" = M.\"BormNo\"";	
 			sql += "	WHERE M.\"YearMonth\" = :yymm";
 			sql += "	  AND M.\"LoanBalance\" > 0 ";
 			sql += "	  AND R.\"CustNo\" IS NOT NULL";	
 			sql += "	ORDER BY M2.\"CustNo\"";
 			sql += "			,M2.\"FacmNo\"";
 			sql += "			,L.\"BormNo\"";
+			
+			
+	
+		
 		} else {
 
 			sql += "	SELECT :eymd  AS F0";
@@ -230,9 +246,21 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "			  WHEN M.\"ClCode1\" IN (1,2) THEN 'C'";
 			sql += "			ELSE '99' END ) AS \"ClNo\"";
 			sql += "		  ,SUM(M.\"LoanBalance\") AS \"LoanBalance\"";
-			sql += "		  ,SUM(M.\"IntAmtAcc\") AS \"IntAmtAcc\"";
+			sql += "		  ,SUM(acInt.\"Interest\") AS \"IntAmtAcc\"";
 			sql += "		  ,SUM(NVL(F.\"LineAmt\",0)) AS \"LineAmt\"";
 			sql += "	FROM \"MonthlyLoanBal\" M";
+			sql += "	LEFT JOIN (SELECT \"CustNo\"        "; 
+			sql += "       				 ,\"FacmNo\"   "; 
+			sql += "       				 ,\"BormNo\"     "; 
+			sql += "       				 ,SUM(\"Interest\") AS \"Interest\" "; 
+			sql += " 			   FROM \"AcLoanInt\" ";
+			sql += " 			   WHERE \"YearMonth\"    = :inputYearMonth ";
+			sql += "			   GROUP BY \"CustNo\" ";
+			sql += "         			   ,\"FacmNo\" ";
+			sql += "         		 	   ,\"BormNo\" ) acInt ";
+			sql += "	 ON acInt.\"CustNo\" = M.\"CustNo\"";
+			sql += "	AND acInt.\"FacmNo\" = M.\"FacmNo\"";
+			sql += "	AND acInt.\"BormNo\" = M.\"BormNo\"";	
 			sql += "	LEFT JOIN ( ";
 			sql += "		SELECT DISTINCT \"CustNo\"";
 			sql += "			  ,\"FacmNo\"";

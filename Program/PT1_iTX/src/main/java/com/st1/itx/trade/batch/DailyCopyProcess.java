@@ -250,9 +250,6 @@ public class DailyCopyProcess extends TradeBuffer {
 
 			this.info("DailyCopyProcess Usp_Cp_LoanSynd_Ins ...");
 			sJobMainService.Usp_Cp_LoanSynd_Ins(tlrNo, titaVo);
-
-			this.info("DailyCopyProcess Usp_Cp_LoanSyndItem_Ins ...");
-			sJobMainService.Usp_Cp_LoanSyndItem_Ins(tlrNo, titaVo);
 			this.batchTransaction.commit();
 
 			// 複製資料-其他

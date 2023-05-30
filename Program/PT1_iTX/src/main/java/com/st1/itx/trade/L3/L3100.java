@@ -948,8 +948,13 @@ public class L3100 extends TradeBuffer {
 		tLoanBorMain.setLastBorxNo(wkBorxNo);
 		tLoanBorMain.setLastOvduNo(0);
 		tLoanBorMain.setStatus(0);
-		tLoanBorMain.setRateIncr(this.parse.stringToBigDecimal(titaVo.getParam("RateIncr")));
-		tLoanBorMain.setIndividualIncr(new BigDecimal(0));
+		if (tFacProd.getIncrFlag().equals("Y")) {
+			tLoanBorMain.setRateIncr(this.parse.stringToBigDecimal(titaVo.getParam("RateIncr")));
+			tLoanBorMain.setIndividualIncr(new BigDecimal(0));
+		} else {
+			tLoanBorMain.setRateIncr(this.parse.stringToBigDecimal(titaVo.getParam("RateIncr")));
+			tLoanBorMain.setIndividualIncr(this.parse.stringToBigDecimal(titaVo.getParam("RateIncr")));
+		}
 		tLoanBorMain.setApproveRate(this.parse.stringToBigDecimal(titaVo.getParam("ApproveRate")));
 		tLoanBorMain.setStoreRate(this.parse.stringToBigDecimal(titaVo.getParam("ApproveRate")));
 		tLoanBorMain.setRateCode(titaVo.getParam("RateCode"));

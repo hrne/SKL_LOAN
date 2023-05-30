@@ -53,7 +53,7 @@ public class L6604 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6604 ");
 		this.totaVo.init(titaVo);
-
+		
 		// 取得輸入資料
 		int iFunCode = this.parse.stringToInteger(titaVo.getParam("FunCode"));
 		String iDefCode = titaVo.getParam("DefCode");
@@ -85,7 +85,7 @@ public class L6604 extends TradeBuffer {
 		CdCodeId tCdCodeId = new CdCodeId(iDefCode, iCode);
 
 		CdCode tCdCode = sCdCodeService.holdById(tCdCodeId);
-
+		this.info("iFunCode    = " + iFunCode);
 		switch (iFunCode) {
 		case 1: // 新增
 			if (tCdCode != null) {
@@ -106,6 +106,7 @@ public class L6604 extends TradeBuffer {
 				}
 			}
 
+			tCdCode.setIsNumeric(titaVo.getParam("IsNumeric"));
 			try {
 				sCdCodeService.insert(tCdCode, titaVo);
 			} catch (DBException e) {
@@ -131,6 +132,7 @@ public class L6604 extends TradeBuffer {
 			CdCode tCdCode2 = (CdCode) dataLog.clone(tCdCode);
 			try {
 				tCdCode = moveCdDef(tCdCode, iDefType, titaVo);
+				tCdCode.setIsNumeric(titaVo.getParam("IsNumeric"));
 				tCdCode = sCdCodeService.update2(tCdCode, titaVo); ////
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", iDefCode + "-" + iCode + ":" + e.getErrorMsg()); // 更新資料時，發生錯誤
@@ -144,9 +146,9 @@ public class L6604 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0004", iDefCode + "-" + iCode); // 刪除資料不存在
 			}
 			String ixDefCode = titaVo.getParam("DefCode");
+			String ixt = "%";
 			if (ixDefCode.equals("CodeType")) {
-				Slice<CdCode> icCdCode = sCdCodeService.defCodeEq("CodeType", titaVo.getParam("DefCode"), 0,
-						Integer.MAX_VALUE, titaVo);
+				Slice<CdCode> icCdCode = sCdCodeService.defCodeEq(titaVo.getParam("Code"),ixt , 0,Integer.MAX_VALUE, titaVo);
 				List<CdCode> isCdCode = icCdCode == null ? null : icCdCode.getContent();
 				if (isCdCode != null) {
 					throw new LogicException(titaVo, "E0008", "請先刪除代碼檔代號" + titaVo.getParam("Code") + "資料"); // 刪除資料不存在
@@ -181,28 +183,32 @@ public class L6604 extends TradeBuffer {
 				titaVo);
 		List<CdCode> isCdCode = icCdCode == null ? null : icCdCode.getContent();
 		for (CdCode iCdCode : isCdCode) {
+
 			String ix = iCdCode.getIsNumeric();
-			if (ix != null) {
-				tCdCode.setIsNumeric(ix);
-			} else {
+			this.info("ix    = " + ix );
+			if (ix == null) {
 				tCdCode.setIsNumeric(titaVo.getParam("IsNumeric"));
+			} else {
+				tCdCode.setIsNumeric(ix);
 			}
 		}
 
 		CdCode cdCode = new CdCode();
+		this.info("DefCode    = " + titaVo.getParam("DefCode") );
 		if (("CodeType").equals(titaVo.getParam("DefCode"))) {
 			Slice<CdCode> cCdCode = sCdCodeService.defCodeEq(titaVo.getParam("Code"), "%", 0, Integer.MAX_VALUE,
 					titaVo);
 			List<CdCode> sCdCode = cCdCode == null ? null : cCdCode.getContent();
-
+			this.info("titaVoget   = " + titaVo.getParam("IsNumeric"));
 			if (sCdCode != null) {
 				for (CdCode iCdCode : sCdCode) {
 
 					cdCode = new CdCode();
-					this.info("iCdCode==" + iCdCode.getDefCode() + ",code==" + iCdCode.getCode());
+					this.info("iCdCode==" + iCdCode.getDefCode() + ",code==" + iCdCode.getCode()+ ",IsNumeric==" +titaVo.getParam("IsNumeric"));
 					cdCode = sCdCodeService.holdById(new CdCodeId(iCdCode.getDefCode(), iCdCode.getCode()), titaVo);
 					cdCode.setMinCodeLength(Integer.parseInt(titaVo.getParam("MinCodeLength")));
 					cdCode.setMaxCodeLength(Integer.parseInt(titaVo.getParam("MaxCodeLength")));
+					cdCode.setIsNumeric(titaVo.getParam("IsNumeric"));
 					try {
 						sCdCodeService.update2(cdCode, titaVo);
 					} catch (DBException e) {
@@ -223,16 +229,6 @@ public class L6604 extends TradeBuffer {
 		slCdCode = sCdCodeService.defCodeEq(uCode, "%", this.index, Integer.MAX_VALUE);
 		List<CdCode> lCdCode = slCdCode == null ? null : slCdCode.getContent();
 
-		String iIsNumeric = titaVo.getParam("IsNumeric");
-		String str = titaVo.getParam("Code").trim();
-//		this.info
-		boolean isNumeric = str.matches("[+-]?\\d*(\\.\\d+)?");
-		if ("Y".equals(iIsNumeric)) {
-			if (!isNumeric) {
-				throw new LogicException(titaVo, "E0005", "新增資料有誤，該代碼檔代號限輸入數字");
-			}
-		}
-
 		if (lCdCode == null || lCdCode.size() == 0) {
 			this.info("L6604 updDefType notfound : " + uChkFg);
 			uChkFg = 0;
@@ -249,10 +245,11 @@ public class L6604 extends TradeBuffer {
 		for (CdCode tCdCode : lCdCode) {
 			CdCode uCdCode = new CdCode();
 			uCdCode = sCdCodeService.holdById(new CdCodeId(tCdCode.getDefCode(), tCdCode.getCode()));
-
+			this.info("IsNumeric   = " + titaVo.getParam("IsNumeric"));
 			if (uCdCode != null) {
 				try {
 					uCdCode.setDefType(uDefType);
+					uCdCode.setIsNumeric(titaVo.getParam("IsNumeric"));
 					sCdCodeService.update(uCdCode);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007",

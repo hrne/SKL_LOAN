@@ -502,6 +502,10 @@ TXFORM=L5051
 #OODistManagerName=區經理姓名
 {width:100,align:'left'}
 
+!工作月
+#OOWorkMonth=工作月
+{width:60,align:'center'}
+
 !三階換算業績
 #OOPerfEqAmt=三階換算業績
 {width:100,align:'right'}
@@ -601,6 +605,10 @@ TXFORM=L5051
 !員工姓名(區經理姓名(介紹人))
 #OODistManagerName=區經理姓名
 {width:100,align:'left'}
+
+!工作月
+#OOWorkMonth=工作月
+{width:60,align:'center'}
 
 !三階換算業績
 #OOPerfEqAmt=三階換算業績

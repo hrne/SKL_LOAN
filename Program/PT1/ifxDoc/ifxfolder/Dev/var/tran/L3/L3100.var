@@ -472,7 +472,6 @@ T(2,@FdBormNo, )
 T(2,@FdProdNo, )
 T(2,@FdBaseRateCode, )
 T(2,@FdBaseRate, )
-T(2,@FdProdRate, )
 T(2,@FdRateIncr, )
 T(2,@FdApproveRate, )
 T(2,@FdRateCode, )
@@ -1034,8 +1033,7 @@ E(0,@RimEffectTime,0)
 RESET_RIM(#SendL2r06,L2R06)
 S(L2R06,1,#RimTxCode,#RimCurrencyCode,#RimBaseRateCode,#RimEffectDate,#RimEffectTime)
 R(1,L2R06)
-IF(#FKEY==0,E(0,@ProdRate,#L2r06Rate+#L2r01ProdIncr)
-C(3,#BaseRateCode,99,E(0,@ApproveRate,#L2r05ApproveRate),$)
+IF(#FKEY==0,C(3,#BaseRateCode,99,E(0,@ApproveRate,#L2r05ApproveRate),$)
 C(3,#BaseRateCode,99,$,C(3,#checkwk,0,
  E(0,@BaseRate,#L2r06Rate)
  E(0,@ApproveRate,#BaseRate+#RateIncr)
@@ -2282,10 +2280,10 @@ C(3,#EXPANDFG,0,CALL(#EXPAND),$)
 [#<->#,"#FdProdNo+商品代碼",#ProdNo,#ProdName],
 ["#FdBaseRateCode+指標利率代碼",#BaseRateCode,#BaseRateCodeX],
 ["#FdBaseRate+指標利率",#BaseRate,"@%"],
-["#FdProdRate+商品利率",#ProdRate,"@%"],
+! ["#FdProdRate+商品利率",#ProdRate,"@%"],
 ["#FdRateIncr+利率加減碼",#RateIncr,"@%"],
 ["#FdApproveRate+核准利率",#ApproveRate,"@%"],
-["#FdRateCode+利率區分",#RateCodeX],
+[#<->#,"#FdRateCode+利率區分",#RateCodeX],
 ["#FdRateAdjFreq+利率調整週期",#RateAdjFreq,"@個月"],
 ["#FdFirstAdjRateDate+首次利率調整日期",#FirstAdjRateDate,#Wait2],
 ]

@@ -118,12 +118,13 @@ public class L5407 extends TradeBuffer {
 				tPfCoOfficer.setIneffectiveDate(iIneffectiveDate);
 			}
 			tPfCoOfficer.setEmpClass(iEmpClass);
+			
 			try {
 				tPfCoOfficer = pfCoOfficerService.update2(tPfCoOfficer, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", "修改時發生錯誤");
 			}
-		
+			updateLog(tPfCoOfficer, titaVo);
 			break;
 
 		case 4:
@@ -145,7 +146,7 @@ public class L5407 extends TradeBuffer {
 		default:
 			break;
 		}
-		updateLog(tPfCoOfficer, titaVo);
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

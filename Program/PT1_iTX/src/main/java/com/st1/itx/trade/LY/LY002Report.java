@@ -213,7 +213,7 @@ public class LY002Report extends MakeReport {
 			makeExcel.setValue(row, 1, custNo + facmNo + bormNo, "L");
 
 			// 合併另外做處理
-			checkMergeRegionValue(custNo, facmNo, clNo, tempEvaAmt, tempLineAmt);
+//			checkMergeRegionValue(custNo, facmNo, clNo, tempEvaAmt, tempLineAmt);
 
 			// 對照用
 //			makeExcel.setValue(row, 25, custNo, "C");
@@ -222,6 +222,10 @@ public class LY002Report extends MakeReport {
 //			makeExcel.setValue(row, 28, tempEvaAmt, "C");
 //			makeExcel.setValue(row, 29, tempLineAmt, "C");
 
+			makeExcel.setValue(row, 17, tempEvaAmt, "#,##0");
+			
+			makeExcel.setValue(row, 18, tempLineAmt, "#,##0");
+			
 			// F17 幣別
 			makeExcel.setValue(row, 19, tLDVo.get("F17"), "C");
 
@@ -254,68 +258,68 @@ public class LY002Report extends MakeReport {
 		// 要給擔保品判斷列數
 //		this.row = this.row;
 
-		this.info("mergeEva=" + mergeEva.toString());
-
-		this.info("mergeLine=" + mergeLine.toString());
-
-		int sRow = 7;
-		int eRow = 0;
-		this.info("eva-----");
-		// Test2
-//		for (int i = 0, length = mergeEva.size(); i < length; i++) {
-
-		Iterator<Map<String, Object>> iter = mergeEva.iterator();
-
-		Map<String, Object> itData = null;
-
-		while (iter.hasNext()) {
-
-			itData = iter.next();
-
-			tempEvaAmt = new BigDecimal(itData.get("eva").toString());
-
-			eRow = sRow + Integer.valueOf(itData.get("count").toString()) - 1;
-
-			if (sRow == eRow) {
-
-				makeExcel.setValue(sRow, 17, tempEvaAmt, "#,##0");
-
-			} else {
-
-				makeExcel.setMergedRegionValue(sRow, eRow, 17, 17, tempEvaAmt, "#,##0");
-
-			}
-
-			sRow = eRow + 1;
-
-		}
-
-		sRow = 7;
-		eRow = 0;
-
-		iter = mergeLine.iterator();
-
-		while (iter.hasNext()) {
-
-			itData = iter.next();
-
-			tempLineAmt = new BigDecimal(itData.get("line").toString());
-
-			eRow = sRow + Integer.valueOf(itData.get("count").toString()) - 1;
-
-			if (sRow == eRow) {
-
-				makeExcel.setValue(sRow, 18, tempLineAmt, "#,##0");
-
-			} else {
-
-				makeExcel.setMergedRegionValue(sRow, eRow, 18, 18, tempLineAmt, "#,##0");
-
-			}
-
-			sRow = eRow + 1;
-
-		}
+//		this.info("mergeEva=" + mergeEva.toString());
+//
+//		this.info("mergeLine=" + mergeLine.toString());
+//
+//		int sRow = 7;
+//		int eRow = 0;
+//		this.info("eva-----");
+//		// Test2
+////		for (int i = 0, length = mergeEva.size(); i < length; i++) {
+//
+//		Iterator<Map<String, Object>> iter = mergeEva.iterator();
+//
+//		Map<String, Object> itData = null;
+//
+//		while (iter.hasNext()) {
+//
+//			itData = iter.next();
+//
+//			tempEvaAmt = new BigDecimal(itData.get("eva").toString());
+//
+//			eRow = sRow + Integer.valueOf(itData.get("count").toString()) - 1;
+//
+//			if (sRow == eRow) {
+//
+//				makeExcel.setValue(sRow, 17, tempEvaAmt, "#,##0");
+//
+//			} else {
+//
+//				makeExcel.setMergedRegionValue(sRow, eRow, 17, 17, tempEvaAmt, "#,##0");
+//
+//			}
+//
+//			sRow = eRow + 1;
+//
+//		}
+//
+//		sRow = 7;
+//		eRow = 0;
+//
+//		iter = mergeLine.iterator();
+//
+//		while (iter.hasNext()) {
+//
+//			itData = iter.next();
+//
+//			tempLineAmt = new BigDecimal(itData.get("line").toString());
+//
+//			eRow = sRow + Integer.valueOf(itData.get("count").toString()) - 1;
+//
+//			if (sRow == eRow) {
+//
+//				makeExcel.setValue(sRow, 18, tempLineAmt, "#,##0");
+//
+//			} else {
+//
+//				makeExcel.setMergedRegionValue(sRow, eRow, 18, 18, tempLineAmt, "#,##0");
+//
+//			}
+//
+//			sRow = eRow + 1;
+//
+//		}
 
 	}
 

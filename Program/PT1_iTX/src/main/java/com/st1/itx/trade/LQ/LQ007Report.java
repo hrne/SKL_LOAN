@@ -102,17 +102,22 @@ public class LQ007Report extends MakeReport {
 				} else {
 					vYMonth = y * 100 + 12;
 				}
-
+				this.info("endY:y =" + endY + ":" + y);
+				this.info("tmpYMonth =" + tmpYMonth);
+				this.info("vYMonth =" + vYMonth);
 				if (endY > y) {
 					if (tmpYMonth / 100 != vYMonth / 100) {
 						tmpCol = tmpCol + 2;
 						tmpYMonth = vYMonth;
 						ymTitle = (vYMonth - 191100) / 100 + "年";
+
+						makeExcel.setValue(3, tmpCol, ymTitle, "C");
+					} else {
 						if (m == 12) {
 							ymList.add(vYMonth);
 						}
-						makeExcel.setValue(3, tmpCol, ymTitle, "C");
 					}
+
 				} else {
 					if (tmpYMonth != vYMonth) {
 						tmpCol = tmpCol + 2;

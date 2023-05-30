@@ -78,6 +78,17 @@ BEGIN
              THEN '07'
              WHEN '08'
              THEN '08'
+           -- 2023-05-30 Wei 增加 from Linda 檔案借閱的用途,
+           -- 400原先有A:部分塗銷、X:領還暫不領、0:補發、9:查核
+           -- 項目續編(09:查核,10:補發,11:部分塗銷,12:領還暫不領)
+             WHEN '0A'
+             THEN '11'
+             WHEN '0X'
+             THEN '12'
+             WHEN '00'
+             THEN '10'
+             WHEN '09'
+             THEN '09'
            ELSE '08' END                  AS "UsageCode"           -- 用途 VARCHAR2 2 0
           ,''                             AS "CopyCode"            -- 正本/影本 VARCHAR2 1 0
           ,"LN$DOCP"."DOCLDT"             AS "ApplDate"            -- 借閱日期 DecimalD 8 0

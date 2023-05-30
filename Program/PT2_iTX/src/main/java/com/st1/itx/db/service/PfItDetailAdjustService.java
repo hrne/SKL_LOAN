@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.PfItDetailAdjust;
@@ -44,6 +46,18 @@ public interface PfItDetailAdjustService {
    * @return Slice PfItDetailAdjust PfItDetailAdjust of List
    */
   public PfItDetailAdjust findCustFacmBormFirst(int custNo_0, int facmNo_1, int bormNo_2, TitaVo... titaVo);
+
+  /**
+   * CustNo = ,AND FacmNo = ,AND BormNo = ,AND WorkMonth =
+   *
+   * @param custNo_0 custNo_0
+   * @param facmNo_1 facmNo_1
+   * @param bormNo_2 bormNo_2
+   * @param workMonth_3 workMonth_3
+   * @param titaVo Variable-Length Argument
+   * @return Slice PfItDetailAdjust PfItDetailAdjust of List
+   */
+  public PfItDetailAdjust findWorkMonthFirst(int custNo_0, int facmNo_1, int bormNo_2, int workMonth_3, TitaVo... titaVo);
 
   /**
    * hold By PfItDetailAdjust

@@ -110,11 +110,11 @@ public class LCR03 extends TradeBuffer {
 				tita2.put("ORGEMPNM", cdEmp.getFullname().trim());
 
 				this.info("txtranCode == " + tTxTranCode.getSubmitFg());
-				if (1 == tTxTranCode.getSubmitFg()) {
+				if (1 == tTxTranCode.getSubmitFg() || 2 == tTxTranCode.getSubmitFg())
 					tita2.put("HCODE", "8");
-				} else {
+				else
 					tita2.put("HCODE", "0");
-				}
+
 				totaVo.setEcTitaVo(tita2);
 			} catch (Throwable e) {
 				throw new LogicException(titaVo, "EC002", "電文資料格式有誤");

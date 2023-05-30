@@ -63,10 +63,67 @@ BEGIN
              || LPAD(INSP.LGTSEQ,2,'0')
                 AS "EndoInsuNo"
       FROM "LA$INSP" INSP
-      LEFT JOIN "ClNoMap" CNM ON CNM."GdrId1" = INSP."GDRID1"
-                             AND CNM."GdrId2" = INSP."GDRID2"
-                             AND CNM."GdrNum" = INSP."GDRNUM"
-                             AND CNM."LgtSeq" = INSP."LGTSEQ"
+      -- 2023-05-30 Wei 補正資料 from Sharepoint\19\資料轉換\不動產押品建物火險檔-擔保品號碼為0
+      LEFT JOIN "ClNoMap" CNM ON CNM."GdrId1" = CASE
+                                                  WHEN INSP."GDRID1" = 0
+                                                       AND INSP."GDRID2" = 0
+                                                       AND INSP."GDRNUM" = 0
+                                                       AND INSP."LGTSEQ" = 0
+                                                  THEN CASE
+                                                         WHEN INSNUM = '130094FEP0182908'
+                                                         THEN 1
+                                                         WHEN INSNUM = '130094FEP0134611'
+                                                         THEN 1
+                                                         WHEN INSNUM = '130095FEP0233806'
+                                                         THEN 1
+                                                       ELSE 0 END
+                                                ELSE INSP."GDRID1"
+                                                END
+                             AND CNM."GdrId2" = CASE
+                                                  WHEN INSP."GDRID1" = 0
+                                                       AND INSP."GDRID2" = 0
+                                                       AND INSP."GDRNUM" = 0
+                                                       AND INSP."LGTSEQ" = 0
+                                                  THEN CASE
+                                                         WHEN INSNUM = '130094FEP0182908'
+                                                         THEN 1
+                                                         WHEN INSNUM = '130094FEP0134611'
+                                                         THEN 1
+                                                         WHEN INSNUM = '130095FEP0233806'
+                                                         THEN 1
+                                                       ELSE 0 END
+                                                ELSE INSP."GDRID2"
+                                                END
+                             AND CNM."GdrNum" = CASE
+                                                  WHEN INSP."GDRID1" = 0
+                                                       AND INSP."GDRID2" = 0
+                                                       AND INSP."GDRNUM" = 0
+                                                       AND INSP."LGTSEQ" = 0
+                                                  THEN CASE
+                                                         WHEN INSNUM = '130094FEP0182908'
+                                                         THEN 44930
+                                                         WHEN INSNUM = '130094FEP0134611'
+                                                         THEN 53354
+                                                         WHEN INSNUM = '130095FEP0233806'
+                                                         THEN 44930
+                                                       ELSE 0 END
+                                                ELSE INSP."GDRNUM"
+                                                END
+                             AND CNM."LgtSeq" = CASE
+                                                  WHEN INSP."GDRID1" = 0
+                                                       AND INSP."GDRID2" = 0
+                                                       AND INSP."GDRNUM" = 0
+                                                       AND INSP."LGTSEQ" = 0
+                                                  THEN CASE
+                                                         WHEN INSNUM = '130094FEP0182908'
+                                                         THEN 1
+                                                         WHEN INSNUM = '130094FEP0134611'
+                                                         THEN 1
+                                                         WHEN INSNUM = '130095FEP0233806'
+                                                         THEN 1
+                                                       ELSE 0 END
+                                                ELSE INSP."LGTSEQ"
+                                                END
     )
     , S AS (
       SELECT NVL(INSP."ClCode1",0)       AS "ClCode1"         -- 擔保品-代號1 DECIMAL 1 0

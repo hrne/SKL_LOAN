@@ -3,18 +3,28 @@ package com.st1.itx.util.http;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriUtils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.util.filter.FilterUtils;
 import com.st1.itx.util.format.FormatUtil;
@@ -109,6 +119,87 @@ public class WebClient extends SysLogger {
 			this.error(errors.toString());
 		}
 		return responseString;
+	}
+	
+	/**
+	 * @param brNo     Brno
+	 * @param tickNo   訊息編號 (編號一致後蓋前) 刪除模式依據此序號刪除
+	 * @param stopTime 顯示停止時間 西元 8 + 4 時間
+	 * @param msg      訊息內容
+	 * @param mode     false : insert and replace mode true : delete mode
+	 * @param titaVo   titaVo
+	 */
+	public void sendTicker(String brNo, String tickNo, String stopTime, String msg, boolean mode, TitaVo titaVo) {
+		this.info("sendTicker...");
+		this.info("tickNo : [" + tickNo + "] Msg : [" + msg + "]");
+
+		if ((Objects.isNull(msg) || Objects.isNull(tickNo) || Objects.isNull(titaVo)) && !mode) {
+			this.info("One Of Params Is Null..");
+			return;
+		}
+
+		if (Objects.isNull(tickNo) && mode) {
+			this.info("tickNo Is Null..");
+			return;
+		}
+
+		String url;
+		if (System.getProperty("ifx_LocalAddr") == null)
+			url = "http://192.168.10.8:7003/iFX/mvc/hnd/tickers/add";
+		else
+			url = System.getProperty("ifx_LocalAddr") + "/mvc/hnd/tickers/add";
+
+//        url = UriUtils.encodePath(url, "UTF-8");
+
+		CloseableHttpClient httpclient = HttpClients.createDefault();
+		HttpPost httpPost = new HttpPost(url);// 创建httpPost
+		httpPost.setHeader("Accept", "application/json");
+		httpPost.setHeader("Content-Type", "application/json");
+		String charSet = "UTF-8";
+
+		Map<String, String> m = new HashMap<>();
+		m.put("brNo", brNo);
+		m.put("tickNo", tickNo);
+		m.put("msg", msg);
+		m.put("stopTime", stopTime);
+		m.put("mode", mode ? "1" : "0");
+
+		try {
+			StringEntity entity = new StringEntity(new ObjectMapper().writeValueAsString(m), charSet);
+			httpPost.setEntity(entity);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error(errors.toString());
+		}
+
+		CloseableHttpResponse response = null;
+		try {
+			response = httpclient.execute(httpPost);
+			StatusLine status = response.getStatusLine();
+			int state = status.getStatusCode();
+			if (state == HttpStatus.SC_OK) {
+				HttpEntity responseEntity = response.getEntity();
+				String jsonString = EntityUtils.toString(responseEntity);
+			} else {
+				this.error("返回" + state + "(" + url + ")");
+			}
+		} catch (Exception e) {
+
+		} finally {
+			if (response != null) {
+				try {
+					response.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			try {
+				httpclient.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 }

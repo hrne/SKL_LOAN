@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -13,6 +14,8 @@ import javax.persistence.Column;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * PfItDetailAdjust 介紹人業績調整檔<br>
@@ -27,12 +30,7 @@ import javax.persistence.GenerationType;
 public class PfItDetailAdjust implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -4568209505456388685L;
-
-// 序號
+  // 序號
   @Id
   @Column(name = "`LogNo`")
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "`PfItDetailAdjust_SEQ`")
@@ -60,7 +58,7 @@ public class PfItDetailAdjust implements Serializable {
   private int workSeason = 0;
 
   // 調整記號
-  /* 0:無調整1:調整本月   2:調整本月及季累計 */
+  /* 1:同工作月調整   2:跨工作月調整 */
   @Column(name = "`AdjRange`")
   private int adjRange = 0;
 
@@ -217,9 +215,8 @@ public class PfItDetailAdjust implements Serializable {
 
 /**
 	* 調整記號<br>
-	* 0:無調整
-1:調整本月   
-2:調整本月及季累計
+	* 1:同工作月調整   
+2:跨工作月調整
 	* @return Integer
 	*/
   public int getAdjRange() {
@@ -228,9 +225,8 @@ public class PfItDetailAdjust implements Serializable {
 
 /**
 	* 調整記號<br>
-	* 0:無調整
-1:調整本月   
-2:調整本月及季累計
+	* 1:同工作月調整   
+2:跨工作月調整
   *
   * @param adjRange 調整記號
 	*/

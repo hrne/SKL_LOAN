@@ -58,7 +58,7 @@ public class LY004Report2 extends MakeReport {
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "LY004";
-		String fileItem = "非RBC_表14-4_會計部年度檢查報表";
+		String fileItem = "A144逾期放款及其他應收款項逾期債權轉銷表";
 		String fileName = "LY004-A144逾期放款及其他應收款項逾期債權轉銷表";
 		String defaultExcel = "LY004_底稿_A144逾期放款及其他應收款項逾期債權轉銷表.xlsx";
 		String defaultSheet = "A144逾期放款及其他應收款項逾期債權轉銷表";

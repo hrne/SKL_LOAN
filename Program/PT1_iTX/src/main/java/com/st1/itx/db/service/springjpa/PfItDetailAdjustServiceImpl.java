@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -117,13 +120,32 @@ em = null;
     this.info("findCustFacmBormFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " bormNo_2 : " +  bormNo_2);
     Optional<PfItDetailAdjust> pfItDetailAdjustT = null;
     if (dbName.equals(ContentName.onDay))
-      pfItDetailAdjustT = pfItDetailAdjustReposDay.findTopByCustNoIsAndFacmNoIsAndBormNoIs(custNo_0, facmNo_1, bormNo_2);
+      pfItDetailAdjustT = pfItDetailAdjustReposDay.findTopByCustNoIsAndFacmNoIsAndBormNoIsOrderByWorkMonthAsc(custNo_0, facmNo_1, bormNo_2);
     else if (dbName.equals(ContentName.onMon))
-      pfItDetailAdjustT = pfItDetailAdjustReposMon.findTopByCustNoIsAndFacmNoIsAndBormNoIs(custNo_0, facmNo_1, bormNo_2);
+      pfItDetailAdjustT = pfItDetailAdjustReposMon.findTopByCustNoIsAndFacmNoIsAndBormNoIsOrderByWorkMonthAsc(custNo_0, facmNo_1, bormNo_2);
     else if (dbName.equals(ContentName.onHist))
-      pfItDetailAdjustT = pfItDetailAdjustReposHist.findTopByCustNoIsAndFacmNoIsAndBormNoIs(custNo_0, facmNo_1, bormNo_2);
+      pfItDetailAdjustT = pfItDetailAdjustReposHist.findTopByCustNoIsAndFacmNoIsAndBormNoIsOrderByWorkMonthAsc(custNo_0, facmNo_1, bormNo_2);
     else 
-      pfItDetailAdjustT = pfItDetailAdjustRepos.findTopByCustNoIsAndFacmNoIsAndBormNoIs(custNo_0, facmNo_1, bormNo_2);
+      pfItDetailAdjustT = pfItDetailAdjustRepos.findTopByCustNoIsAndFacmNoIsAndBormNoIsOrderByWorkMonthAsc(custNo_0, facmNo_1, bormNo_2);
+
+    return pfItDetailAdjustT.isPresent() ? pfItDetailAdjustT.get() : null;
+  }
+
+  @Override
+  public PfItDetailAdjust findWorkMonthFirst(int custNo_0, int facmNo_1, int bormNo_2, int workMonth_3, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("findWorkMonthFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " bormNo_2 : " +  bormNo_2 + " workMonth_3 : " +  workMonth_3);
+    Optional<PfItDetailAdjust> pfItDetailAdjustT = null;
+    if (dbName.equals(ContentName.onDay))
+      pfItDetailAdjustT = pfItDetailAdjustReposDay.findTopByCustNoIsAndFacmNoIsAndBormNoIsAndWorkMonthIs(custNo_0, facmNo_1, bormNo_2, workMonth_3);
+    else if (dbName.equals(ContentName.onMon))
+      pfItDetailAdjustT = pfItDetailAdjustReposMon.findTopByCustNoIsAndFacmNoIsAndBormNoIsAndWorkMonthIs(custNo_0, facmNo_1, bormNo_2, workMonth_3);
+    else if (dbName.equals(ContentName.onHist))
+      pfItDetailAdjustT = pfItDetailAdjustReposHist.findTopByCustNoIsAndFacmNoIsAndBormNoIsAndWorkMonthIs(custNo_0, facmNo_1, bormNo_2, workMonth_3);
+    else 
+      pfItDetailAdjustT = pfItDetailAdjustRepos.findTopByCustNoIsAndFacmNoIsAndBormNoIsAndWorkMonthIs(custNo_0, facmNo_1, bormNo_2, workMonth_3);
 
     return pfItDetailAdjustT.isPresent() ? pfItDetailAdjustT.get() : null;
   }

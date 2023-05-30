@@ -17,7 +17,7 @@ import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
 
-@Component
+@Component("LY003Report")
 @Scope("prototype")
 
 public class LY003Report extends MakeReport {

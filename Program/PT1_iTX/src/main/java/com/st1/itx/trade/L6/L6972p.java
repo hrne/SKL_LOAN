@@ -59,8 +59,7 @@ public class L6972p extends TradeBuffer {
 		// pass the exceptions of USPs to upper levels
 		switch (workType) {
 		case FiveYearsTX:
-			if (inputRoute == 0) // online to history
-			{
+			if (inputRoute == 0) { // online to history
 				this.info("L6972 execute ArchiveFiveYearTx");
 				txArchiveTableService.Usp_L6_ArchiveFiveYearTx_Copy(titaVo.getEntDyI() + 19110000, titaVo.getTlrNo(),
 						titaVo);
@@ -78,7 +77,7 @@ public class L6972p extends TradeBuffer {
 
 		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", titaVo.getTlrNo(),
 				"L6972搬運資料已完成", titaVo);
-		
+
 		titaVo.putParam("InputType", 1);
 		titaVo.putParam("InputDate", titaVo.getEntDyI());
 
