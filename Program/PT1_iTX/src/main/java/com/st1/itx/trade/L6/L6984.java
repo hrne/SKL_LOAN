@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L6;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,17 +14,22 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.BankRemit;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.FacCaseAppl;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanBorMainId;
+import com.st1.itx.db.domain.TxRecord;
+import com.st1.itx.db.domain.TxRecordId;
 import com.st1.itx.db.domain.TxToDoDetail;
+import com.st1.itx.db.service.BankRemitService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacCaseApplService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBorMainService;
+import com.st1.itx.db.service.TxRecordService;
 import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
@@ -63,6 +69,10 @@ public class L6984 extends TradeBuffer {
 	public FacMainService sFacMainService;
 	@Autowired
 	public FacCaseApplService facCaseApplService;
+	@Autowired
+	public TxRecordService txRecordService;
+	@Autowired
+	public BankRemitService bankRemitService;
 
 	private int selectCode = 0;
 	private int custNo = 0;
@@ -159,9 +169,11 @@ public class L6984 extends TradeBuffer {
 				// 取戶名
 				tCustMain = sCustMainService.custNoFirst(tTxToDoDetail.getCustNo(), tTxToDoDetail.getCustNo(), titaVo);
 				// 預約日期,幣別,撥款金額
-				tLoanBorMain = sLoanBorMainService.findById(new LoanBorMainId(tTxToDoDetail.getCustNo(), tTxToDoDetail.getFacmNo(), tTxToDoDetail.getBormNo()), titaVo);
+				tLoanBorMain = sLoanBorMainService.findById(new LoanBorMainId(tTxToDoDetail.getCustNo(),
+						tTxToDoDetail.getFacmNo(), tTxToDoDetail.getBormNo()), titaVo);
 				// 案件編號,核准號碼
-				tFacMain = sFacMainService.findById(new FacMainId(tTxToDoDetail.getCustNo(), tTxToDoDetail.getFacmNo()), titaVo);
+				tFacMain = sFacMainService.findById(new FacMainId(tTxToDoDetail.getCustNo(), tTxToDoDetail.getFacmNo()),
+						titaVo);
 				if (tFacMain != null) {
 
 					tFacCaseAppl = facCaseApplService.findById(tFacMain.getApplNo(), titaVo);
@@ -169,6 +181,35 @@ public class L6984 extends TradeBuffer {
 						syndNo = tFacCaseAppl.getSyndNo();
 					}
 				}
+
+				// 訂正交易，讀取TxRecord 交易記錄檔，組原電文
+				TxRecordId tTxRecordId = new TxRecordId();
+				TitaVo txTitaVo = new TitaVo();
+				tTxRecordId.setEntdy(tLoanBorMain.getLastEntDy());
+				tTxRecordId.setTxNo(
+						tLoanBorMain.getLastKinbr() + tLoanBorMain.getLastTlrNo() + tLoanBorMain.getLastTxtNo());
+				TxRecord tTxRecord = txRecordService.findById(tTxRecordId, titaVo);
+				String remitId = "";
+				String remitBirthday = "";
+				String remitGender = "";
+				if (tTxRecord != null) {
+					try {
+						txTitaVo = txTitaVo.getVo(tTxRecord.getTranData());
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					if (txTitaVo.get("RemitId") != null) {
+						remitId = txTitaVo.get("RemitId");
+					}
+					if (txTitaVo.get("RemitBirthday") != null) {
+						remitBirthday = txTitaVo.get("RemitBirthday");
+					}
+					if (txTitaVo.get("RemitGender") != null) {
+						remitGender = txTitaVo.get("RemitGender");
+					}
+				}
+
 				tTempVo = tTempVo.getVo(tTxToDoDetail.getProcessNote());
 
 				occursList.putParam("OODrawdownDate", tLoanBorMain.getDrawdownDate()); // 預約日期
@@ -179,7 +220,8 @@ public class L6984 extends TradeBuffer {
 				occursList.putParam("OOCurrencyCode", tLoanBorMain.getCurrencyCode()); // 幣別
 				occursList.putParam("OODrawdownAmt", tLoanBorMain.getDrawdownAmt()); // 撥款金額
 				if (tTxToDoDetail.getStatus() == 2) {// 已處理顯示登放序號
-					occursList.putParam("OORelNo", tTxToDoDetail.getTitaKinbr() + tTxToDoDetail.getTitaTlrNo() + parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8)); // 登放序號
+					occursList.putParam("OORelNo", tTxToDoDetail.getTitaKinbr() + tTxToDoDetail.getTitaTlrNo()
+							+ parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8)); // 登放序號
 				} else {
 					occursList.putParam("OORelNo", ""); // 登放序號
 				}
@@ -232,10 +274,20 @@ public class L6984 extends TradeBuffer {
 
 				occursList.putParam("RpCode1", 01);
 				occursList.putParam("RpAmt1", tLoanBorMain.getDrawdownAmt());
-				occursList.putParam("RpRemitBank1", tLoanBorMain.getRemitBank());
-				occursList.putParam("RpRemitBranch1", tLoanBorMain.getRemitBranch());
-				occursList.putParam("RpRemitAcctNo1", tLoanBorMain.getRemitAcctNo());
-				occursList.putParam("RpCustName1", tCustMain.getCustName());
+				BankRemit tBankRemit = bankRemitService.findL4104BFirst(tLoanBorMain.getCustNo(),
+						tLoanBorMain.getFacmNo(), tLoanBorMain.getBormNo(),
+						parse.stringToInteger(tLoanBorMain.getDrawdownCode()), titaVo);
+				if (tBankRemit != null) {
+					occursList.putParam("RpRemitBank1", tBankRemit.getRemitBank());
+					occursList.putParam("RpRemitBranch1", tBankRemit.getRemitBranch());
+					occursList.putParam("RpRemitAcctNo1", tBankRemit.getRemitAcctNo());
+					occursList.putParam("RpCustName1", tBankRemit.getCustName());
+				} else {
+					occursList.putParam("RpRemitBank1", "");
+					occursList.putParam("RpRemitBranch1", "");
+					occursList.putParam("RpRemitAcctNo1", "");
+					occursList.putParam("RpCustName1", "");
+				}
 				occursList.putParam("RpRemark1", tLoanBorMain.getRemark());
 
 				occursList.putParam("RpFlag", 2);
@@ -252,6 +304,9 @@ public class L6984 extends TradeBuffer {
 				occursList.putParam("TITFCD", 1);
 				occursList.putParam("RpRvno1", "");
 				occursList.putParam("OORvBormNo", tTempVo.get("BormNo"));
+				occursList.putParam("RemitId", remitId);
+				occursList.putParam("RemitBirthday", remitBirthday);
+				occursList.putParam("RemitGender", remitGender);
 
 				cnt++;
 				this.totaVo.addOccursList(occursList);

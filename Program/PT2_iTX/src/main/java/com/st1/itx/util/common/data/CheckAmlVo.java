@@ -42,7 +42,7 @@ public class CheckAmlVo extends LinkedHashMap<String, String> {
 	/**
 	 * M 來源系統ID,預設值 Loan
 	 */
-	private String SrcSystemID = "BPM";
+	private String SrcSystemID = "LOAN";
 
 	/**
 	 * M 交易名稱

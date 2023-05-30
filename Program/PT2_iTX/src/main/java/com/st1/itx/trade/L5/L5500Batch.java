@@ -234,12 +234,14 @@ public class L5500Batch extends TradeBuffer {
 		sql += "and a.\"RepayType\"=0 ";
 		sql += "and a.\"PieceCode\" in ('1','2','3','4','8','A','F','G') ";
 		sql += "and a.\"DrawdownAmt\">0 ";
+		sql += "and a.\"PerfDate\" <= :entDy ";
 		sql += "and f.\"Introducer\" is not null ";
 
 		Map<String, String> conds = new HashMap<String, String>();
 
 		conds.put("workmonth1", workmonthX);
 		conds.put("workmonth2", workmonthX);
+		conds.put("entDy", "" + entday);
 
 		String custNo = "";
 		String facmNo = "";
@@ -414,37 +416,37 @@ public class L5500Batch extends TradeBuffer {
 		sql += "left join (";
 		sql += "  select \"DeptCode\",sum(\"PerfCnt\") as \"DeptCnt\",sum(\"PerfAmt\") as \"DeptAmt\"";
 		sql += "    from \"PfItDetail\" ";
-		sql += "   where \"WorkMonth\"=:workmonth2 and \"DrawdownAmt\">0";
+		sql += "   where \"WorkMonth\"=:workmonth2 and \"DrawdownAmt\">0 and \"PerfDate\" <= :entDy";
 		sql += "   group by \"DeptCode\" ";
 		sql += ") b on b.\"DeptCode\"=a.\"DeptCode\" ";
 		sql += "left join (";
 		sql += "  select \"DistCode\",sum(\"PerfCnt\") as \"DistCnt\",sum(\"PerfAmt\") as \"DistAmt\"";
 		sql += "    from \"PfItDetail\" ";
-		sql += "   where \"WorkMonth\"=:workmonth2 and \"DrawdownAmt\">0";
+		sql += "   where \"WorkMonth\"=:workmonth2 and \"DrawdownAmt\">0 and \"PerfDate\" <= :entDy";
 		sql += "   group by \"DistCode\" ";
 		sql += ") c on c.\"DistCode\"=a.\"DistCode\" ";
 		sql += "left join (";
 		sql += "  select \"UnitCode\",sum(\"PerfCnt\") as \"UnitCnt\",sum(\"PerfAmt\") as \"UnitAmt\"";
 		sql += "    from \"PfItDetail\" ";
-		sql += "   where \"WorkMonth\"=:workmonth2 and \"DrawdownAmt\">0";
+		sql += "   where \"WorkMonth\"=:workmonth2 and \"DrawdownAmt\">0 and \"PerfDate\" <= :entDy";
 		sql += "   group by \"UnitCode\" ";
 		sql += ") d on d.\"UnitCode\"=a.\"UnitCode\" ";
 		sql += "left join (";
 		sql += "  select \"DeptCode\",sum(\"PerfCnt\") as \"DeptCnt\",sum(\"PerfAmt\") as \"DeptAmt\"";
 		sql += "    from \"PfItDetail\" ";
-		sql += "   where \"WorkMonth\">=:workmonth1 and \"WorkMonth\"<=:workmonth2 and \"DrawdownAmt\">0";
+		sql += "   where \"WorkMonth\">=:workmonth1 and \"WorkMonth\"<=:workmonth2 and \"DrawdownAmt\">0 and \"PerfDate\" <= :entDy";
 		sql += "   group by \"DeptCode\" ";
 		sql += ") bb on bb.\"DeptCode\"=a.\"DeptCode\" ";
 		sql += "left join (";
 		sql += "  select \"DistCode\",sum(\"PerfCnt\") as \"DistCnt\",sum(\"PerfAmt\") as \"DistAmt\"";
 		sql += "    from \"PfItDetail\" ";
-		sql += "   where \"WorkMonth\">=:workmonth1 and \"WorkMonth\"<=:workmonth2 and \"DrawdownAmt\">0";
+		sql += "   where \"WorkMonth\">=:workmonth1 and \"WorkMonth\"<=:workmonth2 and \"DrawdownAmt\">0 and \"PerfDate\" <= :entDy";
 		sql += "   group by \"DistCode\" ";
 		sql += ") cc on cc.\"DistCode\"=a.\"DistCode\" ";
 		sql += "left join (";
 		sql += "  select \"UnitCode\",sum(\"PerfCnt\") as \"UnitCnt\",sum(\"PerfAmt\") as \"UnitAmt\"";
 		sql += "    from \"PfItDetail\" ";
-		sql += "   where \"WorkMonth\">=:workmonth1 and \"WorkMonth\"<=:workmonth2 and \"DrawdownAmt\">0";
+		sql += "   where \"WorkMonth\">=:workmonth1 and \"WorkMonth\"<=:workmonth2 and \"DrawdownAmt\">0 and \"PerfDate\" <= :entDy";
 		sql += "   group by \"UnitCode\" ";
 		sql += ") dd on dd.\"UnitCode\"=a.\"UnitCode\" ";
 
@@ -452,6 +454,7 @@ public class L5500Batch extends TradeBuffer {
 
 		conds.put("workmonth1", bworkmonthX);
 		conds.put("workmonth2", workmonthX);
+		conds.put("entDy", "" + entday);
 
 		List<Map<String, String>> data = l5500ServiceImpl.findData(index, limit, sql, conds, titaVo);
 		lHlThreeLaqhcp = new ArrayList<HlThreeLaqhcp>();
@@ -557,7 +560,7 @@ public class L5500Batch extends TradeBuffer {
 		sql += "  from \"PfBsDetail\" aa ";
 		sql += "  left join \"PfBsOfficer\" bb on bb.\"WorkMonth\"=:lworkmonth and bb.\"EmpNo\"=aa.\"BsOfficer\" ";
 		sql += "  left join \"PfBsDetailAdjust\" cc on cc.\"CustNo\"=aa.\"CustNo\" and cc.\"FacmNo\"=aa.\"FacmNo\" and cc.\"BormNo\"=aa.\"BormNo\" ";
-		sql += "  where aa.\"WorkMonth\"=:lworkmonth and bb.\"AreaCode\" is not null ";
+		sql += "  where aa.\"WorkMonth\"=:lworkmonth and bb.\"AreaCode\" is not null and aa.\"PerfDate\" <= :entDy";
 		sql += "  group by bb.\"AreaCode\"";
 		sql += ") b on b.\"AreaCode\"=a.\"AreaCode\" ";
 		sql += "left join (";
@@ -565,7 +568,7 @@ public class L5500Batch extends TradeBuffer {
 		sql += "  from \"PfBsDetail\" aa ";
 		sql += "  left join \"PfBsOfficer\" bb on bb.\"WorkMonth\"=:workmonth and bb.\"EmpNo\"=aa.\"BsOfficer\" ";
 		sql += "  left join \"PfBsDetailAdjust\" cc on cc.\"CustNo\"=aa.\"CustNo\" and cc.\"FacmNo\"=aa.\"FacmNo\" and cc.\"BormNo\"=aa.\"BormNo\" ";
-		sql += "  where aa.\"WorkMonth\"=:workmonth and bb.\"AreaCode\" is not null ";
+		sql += "  where aa.\"WorkMonth\"=:workmonth and bb.\"AreaCode\" is not null and aa.\"PerfDate\" <= :entDy";
 		sql += "  group by bb.\"AreaCode\" ";
 		sql += ") c on c.\"AreaCode\"=a.\"AreaCode\" ";
 		sql += "order by a.\"AreaCode\" ";
@@ -574,6 +577,7 @@ public class L5500Batch extends TradeBuffer {
 
 		conds.put("lworkmonth", lworkmonthX);
 		conds.put("workmonth", workmonthX);
+		conds.put("entDy", "" + entday);
 
 		List<Map<String, String>> data = l5500ServiceImpl.findData(index, limit, sql, conds, titaVo);
 		lHlAreaLnYg6Pt = new ArrayList<HlAreaLnYg6Pt>();
@@ -638,7 +642,7 @@ public class L5500Batch extends TradeBuffer {
 		sql += "        ,NVL(bb.\"AdjPerfAmt\",aa.\"PerfAmt\") as \"PerfAmt\"";
 		sql += "    from \"PfBsDetail\" aa ";
 		sql += "    left join \"PfBsDetailAdjust\" bb on bb.\"CustNo\"=aa.\"CustNo\" and bb.\"FacmNo\"=aa.\"FacmNo\" and bb.\"BormNo\"=aa.\"BormNo\" ";
-		sql += "    where aa.\"WorkMonth\"=:workmonth and aa.\"RepayType\"=0 and aa.\"BsOfficer\" is not null ";
+		sql += "    where aa.\"WorkMonth\"=:workmonth and aa.\"RepayType\"=0 and aa.\"BsOfficer\" is not null and aa.\"PerfDate\" <= :entDy";
 		sql += "  ) group by \"BsOfficer\" ";
 		sql += ") b on b.\"BsOfficer\" = a.\"EmpNo\" ";
 		sql += "where a.\"WorkMonth\"=:workmonth ";
@@ -647,6 +651,7 @@ public class L5500Batch extends TradeBuffer {
 		Map<String, String> conds = new HashMap<String, String>();
 
 		conds.put("workmonth", workmonthX);
+		conds.put("entDy", "" + entday);
 
 		List<Map<String, String>> data = l5500ServiceImpl.findData(index, limit, sql, conds, titaVo);
 		lHlEmpLnYg5Pt = new ArrayList<HlEmpLnYg5Pt>();

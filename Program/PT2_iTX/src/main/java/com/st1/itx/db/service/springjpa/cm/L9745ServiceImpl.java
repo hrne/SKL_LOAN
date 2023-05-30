@@ -50,7 +50,7 @@ public class L9745ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,B.\"FacmNo\" \"FacmNo\" ";
 		sql += "       ,B.\"BormNo\" \"BormNo\" ";
 		sql += "       ,B.\"DrawdownDate\" \"DrawdownDate\" ";
-		sql += "       ,F.\"ProdNo\" \"ProdNo\" ";
+		sql += "       ,B.\"ProdCode\" \"ProdCode\" ";
 		sql += "       ,B.\"PieceCode\" \"PieceCode\" ";
 		sql += "       ,B.\"DrawdownAmt\" \"DrawdownAmt\" ";
 		sql += "       ,B.\"WorkMonth\" \"WorkMonth\" ";
@@ -75,10 +75,9 @@ public class L9745ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"CdBcm\" B1 ON B1.\"UnitCode\" = I.\"DeptCode\" ";
 		sql += " LEFT JOIN \"CdBcm\" B2 ON B2.\"UnitCode\" = I.\"DistCode\" ";
 		sql += " LEFT JOIN \"CdBcm\" B3 ON B3.\"UnitCode\" = I.\"UnitCode\" ";
-		sql += " LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = B.\"CustNo\" ";
-		sql += "                        AND F.\"FacmNo\" = B.\"FacmNo\" ";
 		sql += " WHERE B.\"DrawdownAmt\" > 0 ";
 		sql += "   AND B.\"PerfAmt\" > 0 ";
+		sql += "   AND B.\"PerfDate\" <= :entDy ";
 		if (useWorkMonth) {
 			sql += "   AND B.\"WorkMonth\" BETWEEN :workMonthStart AND :workMonthEnd";
 		} else {
@@ -124,7 +123,9 @@ public class L9745ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (useBsOfficer) {
 			query.setParameter("bsOfficer", bsOfficer);
 		}
-		
+
+		query.setParameter("entDy", entDy);
+			
 		return this.convertToMap(query);
 	}
 

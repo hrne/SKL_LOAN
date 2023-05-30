@@ -1003,22 +1003,13 @@ public class L3100 extends TradeBuffer {
 		tLoanBorMain.setLastKinbr(titaVo.getKinbr());
 		tLoanBorMain.setLastTlrNo(titaVo.getTlrNo());
 		tLoanBorMain.setLastTxtNo(titaVo.getTxtNo());
-		tLoanBorMain.setRemitBank("");
-		tLoanBorMain.setRemitBranch("");
-		tLoanBorMain.setRemitAcctNo(new BigDecimal(0));
 		tLoanBorMain.setCompensateAcct("");
 		for (int i = 1; i <= 5; i++) {
 			if (titaVo.getSecNo().equals("01") && titaVo.get("RpCode" + i) != null) {
 				if (parse.stringToInteger(titaVo.getParam("RpCode" + i)) > 0
 						&& parse.stringToInteger(titaVo.getParam("RpCode" + i)) < 90) {
-					tLoanBorMain.setRemitBank(titaVo.getParam("RpRemitBank" + i));
-					tLoanBorMain.setRemitBranch(titaVo.getParam("RpRemitBranch" + i));
-					tLoanBorMain.setRemitAcctNo(parse.stringToBigDecimal(titaVo.getParam("RpRemitAcctNo" + i)));
 					tLoanBorMain.setCompensateAcct(titaVo.getParam("RpCustName" + i));
 					tLoanBorMain.setRemark(titaVo.getParam("RpRemark" + i));
-					int paymentBank = parse.stringToInteger(titaVo.getParam("RpRemitBank" + i)) * 10000;
-					int paymentBranch = parse.stringToInteger(titaVo.getParam("RpRemitBranch" + i));
-					tLoanBorMain.setPaymentBank(parse.IntegerToString(paymentBank + paymentBranch, 7));
 				}
 			}
 		}

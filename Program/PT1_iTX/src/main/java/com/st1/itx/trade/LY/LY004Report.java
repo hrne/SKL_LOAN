@@ -63,8 +63,6 @@ public class LY004Report extends MakeReport {
 		String defaultExcel = "LY004_底稿_非RBC_表14-4_會計部年度檢查報表.xlsx";
 		String defaultSheet = "表14-4";
 
-		this.info("reportVo open");
-
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
 				.setRptItem(fileItem).build();
 		// 開啟報表

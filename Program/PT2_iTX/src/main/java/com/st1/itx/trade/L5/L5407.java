@@ -178,11 +178,11 @@ public class L5407 extends TradeBuffer {
 
 	private void insertOrgLog(TitaVo titaVo) throws LogicException {
 		this.totaVo.init(titaVo);
-
-		Slice<PfCoOfficerLog> slPfCoOfficerLog = pfCoOfficerLogService.findEmpNoEq(iEmpNo, 0, Integer.MAX_VALUE,
-				titaVo);
-
-		if (slPfCoOfficerLog == null && iFunctionCode == 1 ) {
+		this.info("insertOrgLogiEmpNo    = " + iEmpNo);
+//		Slice<PfCoOfficerLog> slPfCoOfficerLog = pfCoOfficerLogService.findEmpNoEq(iEmpNo, 0, Integer.MAX_VALUE,
+//				titaVo);
+//
+//		if (slPfCoOfficerLog == null && iFunctionCode == 1 ) {
 			PfCoOfficer oPf = pfCoOfficerService.effectiveDateFirst(iEmpNo, 0, 99991231, titaVo);
 			if (oPf != null) {
 				PfCoOfficerLog tPfCoOfficerLog = new PfCoOfficerLog();
@@ -210,7 +210,7 @@ public class L5407 extends TradeBuffer {
 			}
 		}
 
-	}
+//	}
 
 	private void updateLog(PfCoOfficer oPf, TitaVo titaVo) throws LogicException {
 		this.totaVo.init(titaVo);

@@ -9,6 +9,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 
 import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -25,6 +26,8 @@ import com.st1.itx.util.parse.Parse;
 @Scope("prototype")
 
 public class EmployeeCom extends TradeBuffer {
+	@Autowired
+	CdEmpService cdEmpService;
 
 	@Autowired
 	DateUtil dDateUtil;
@@ -36,6 +39,7 @@ public class EmployeeCom extends TradeBuffer {
 		this.info("BankRelationCom ... " + titaVo);
 		return null;
 	}
+
 	/**
 	 * 是否為15日薪員工
 	 * 
@@ -92,7 +96,7 @@ public class EmployeeCom extends TradeBuffer {
 
 		return isSalary;
 	}
-	
+
 	/**
 	 * 是否為15日薪非業績人員
 	 * 
@@ -143,4 +147,31 @@ public class EmployeeCom extends TradeBuffer {
 		return isGAInsDepartent;
 	}
 
+	/**
+	 * 取得介紹人的區經理<BR>
+	 * 區經理 : CdEmp(員工資料檔)的AgLevel(業務人員職等)第一碼為'H'為區經理<BR>
+	 * 介紹人本身為區經理,否則依序找上層主管直到找到區經理 <BR>
+	 * 
+	 * @param introducerCdEmp
+	 * @param titaVo
+	 * @return 區經理員編
+	 * @throws LogicException
+	 */
+	public String getDistManager(CdEmp introducerCdEmp, TitaVo titaVo) throws LogicException {
+		if (introducerCdEmp.getAgLevel().length() >= 1 && "H".equals(introducerCdEmp.getAgLevel().substring(0, 1))) {
+			return introducerCdEmp.getEmployeeNo();
+		}
+		String directorId = introducerCdEmp.getDirectorId();
+		for (int i = 0; i <= 3; i++) {
+			CdEmp tCdEmp = cdEmpService.findAgentCodeFirst(directorId, titaVo);
+			if (tCdEmp == null) {
+				break;
+			}
+			if (tCdEmp.getAgLevel().length() >= 1 && "H".equals(tCdEmp.getAgLevel().substring(0, 1))) {
+				return tCdEmp.getEmployeeNo();
+			}
+			directorId = tCdEmp.getDirectorId();
+		}
+		return null;
+	}
 }

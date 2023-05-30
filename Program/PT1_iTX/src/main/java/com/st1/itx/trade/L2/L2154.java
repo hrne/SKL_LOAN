@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L2;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -519,8 +520,14 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setCreditSysNo(this.parse.stringToInteger(titaVo.getParam("CreditSysNo")));
 		tFacMain.setProdNo(titaVo.getParam("ProdNo"));
 		tFacMain.setBaseRateCode(titaVo.getParam("BaseRateCode"));
-		tFacMain.setRateIncr(this.parse.stringToBigDecimal(titaVo.getParam("RateIncr")));
-		tFacMain.setIndividualIncr(this.parse.stringToBigDecimal(titaVo.getParam("IndividualIncr")));
+
+		if ("N".equals(tFacProd.getIncrFlag())) {
+			tFacMain.setRateIncr(this.parse.stringToBigDecimal(titaVo.getParam("RateIncr")));
+			tFacMain.setIndividualIncr(this.parse.stringToBigDecimal(titaVo.getParam("RateIncr")));
+		} else {
+			tFacMain.setRateIncr(this.parse.stringToBigDecimal(titaVo.getParam("RateIncr")));
+			tFacMain.setIndividualIncr(new BigDecimal("0"));
+		}
 		tFacMain.setApproveRate(this.parse.stringToBigDecimal(titaVo.getParam("ApproveRate")));
 		tFacMain.setRateCode(titaVo.getParam("RateCode"));
 		tFacMain.setFirstRateAdjFreq(this.parse.stringToInteger(titaVo.getParam("FirstRateAdjFreq")));
@@ -617,6 +624,7 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setCreditSysNo(this.parse.stringToInteger(tTempVo.getParam("CreditSysNo")));
 		tFacMain.setProdNo(tTempVo.getParam("ProdNo"));
 		tFacMain.setBaseRateCode(tTempVo.getParam("BaseRateCode"));
+
 		tFacMain.setRateIncr(this.parse.stringToBigDecimal(tTempVo.getParam("RateIncr")));
 		tFacMain.setIndividualIncr(this.parse.stringToBigDecimal(tTempVo.getParam("IndividualIncr")));
 		tFacMain.setApproveRate(this.parse.stringToBigDecimal(tTempVo.getParam("ApproveRate")));

@@ -17,6 +17,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.AcClose;
 import com.st1.itx.db.domain.AcCloseId;
 import com.st1.itx.db.domain.AcDetail;
+import com.st1.itx.db.domain.BankRemit;
 import com.st1.itx.db.domain.CdAcCode;
 import com.st1.itx.db.domain.CdBank;
 import com.st1.itx.db.domain.CdBankId;
@@ -28,6 +29,7 @@ import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanBorMainId;
 import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.AcCloseService;
+import com.st1.itx.db.service.BankRemitService;
 import com.st1.itx.db.service.CdAcCodeService;
 import com.st1.itx.db.service.CdBankService;
 import com.st1.itx.db.service.CdCodeService;
@@ -59,6 +61,8 @@ public class L3100Report extends MakeReport {
 	FacMainService facMainService;
 	@Autowired
 	CdEmpService cdEmpService;
+	@Autowired
+	BankRemitService bankRemitService;
 
 	@Autowired
 	LoanCom loanCom;
@@ -286,9 +290,12 @@ public class L3100Report extends MakeReport {
 					parse.stringToInteger(titaVo.getParam("FacmNo")), parse.stringToInteger(titaVo.getParam("BormNo"))),
 					titaVo);
 			if (tLoanBorMain != null) {
+				BankRemit tBankRemit = bankRemitService.findL4104BFirst(tLoanBorMain.getCustNo(),
+						tLoanBorMain.getFacmNo(), tLoanBorMain.getBormNo(),
+						parse.stringToInteger(tLoanBorMain.getDrawdownCode()), titaVo);
 				acDate = tLoanBorMain.getDrawdownDate() + 19110000;
-				wkBankCode = tLoanBorMain.getRemitBank();
-				wkBranchCode = tLoanBorMain.getRemitBranch();
+				wkBankCode = tBankRemit.getRemitBank();
+				wkBranchCode = tBankRemit.getRemitBranch();
 				CdBank t = cdBankService.findById(new CdBankId(wkBankCode, wkBranchCode), titaVo);
 				if (t != null) {
 					wkBankItem = t.getBankItem();
@@ -300,9 +307,10 @@ public class L3100Report extends MakeReport {
 
 				payNm = tLoanBorMain.getCompensateAcct(); // 收款戶名
 				remark = tLoanBorMain.getRemark();// 附言
-				remitAcctNo = tLoanBorMain.getRemitAcctNo().toString();// 匯款帳號
+				remitAcctNo = tBankRemit.getRemitAcctNo().toString();// 匯款帳號
 				remitBankt = wkBankItem + "　" + wkBranchItem;// 匯款銀行
-				paymentBank = tLoanBorMain.getPaymentBank();// 解付單位代號
+				paymentBank = FormatUtil.pad9(tBankRemit.getRemitBank(), 3)
+						+ FormatUtil.pad9(tBankRemit.getRemitBranch(), 4);// 解付單位代號
 			}
 			print(-4, 2,
 					"借款人戶號　:" + parse.IntegerToString(headAcDetail.getCustNo(), 7) + "-"

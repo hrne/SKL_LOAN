@@ -111,7 +111,9 @@ public class L6971 extends TradeBuffer {
 			if (l6971ServiceImpl.hasNext()) {
 				titaVo.setReturnIndex(this.setIndexNext());
 				/* 手動折返 */
-				this.totaVo.setMsgEndToEnter();
+//				totaVo.setMsgEndToEnter();
+				/* 自動折返 */
+				totaVo.setMsgEndToAuto();
 			}
 		} else {
 			// 查無資料

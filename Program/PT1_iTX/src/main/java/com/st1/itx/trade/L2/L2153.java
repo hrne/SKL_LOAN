@@ -491,7 +491,7 @@ public class L2153 extends TradeBuffer {
 			}
 		}
 		if ("N".equals(tFacProd.getIncrFlag())) {
-			tFacMain.setRateIncr(new BigDecimal("0"));
+			tFacMain.setRateIncr(this.parse.stringToBigDecimal(titaVo.getParam("RateIncr")));
 			tFacMain.setIndividualIncr(this.parse.stringToBigDecimal(titaVo.getParam("RateIncr")));
 		} else {
 			tFacMain.setRateIncr(this.parse.stringToBigDecimal(titaVo.getParam("RateIncr")));

@@ -57,9 +57,9 @@ public class LY002Report2 extends MakeReport {
 		String fileName = "LY002-A141重要放款餘額明細表";
 
 		// 1 舊版報表，2新版報表
-		String defaultExcel = "LY002_底稿_A141重要放款餘額明細表(新).xlsx";
+		String defaultExcel = "LY002_底稿_A141重要放款餘額明細表.xlsx";
 
-		String defaultSheet = "表14-1";
+		String defaultSheet = "A141重要放款餘額明細表";
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
 				.setRptItem(fileItem).build();

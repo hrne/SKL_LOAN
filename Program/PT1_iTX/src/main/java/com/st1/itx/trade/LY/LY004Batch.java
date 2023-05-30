@@ -25,6 +25,9 @@ public class LY004Batch extends BatchBase implements Tasklet, InitializingBean {
 	@Autowired
 	LY004Report lY004Report;
 
+	@Autowired
+	LY004Report2 lY004Report2;
+	
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
@@ -38,7 +41,7 @@ public class LY004Batch extends BatchBase implements Tasklet, InitializingBean {
 	@Override
 	public void run() throws LogicException {
 		this.info("active LY004Batch ");
-
+		
 		int entdyf = titaVo.getEntDyI() + 19110000;
 
 		int iYear = entdyf / 10000;
@@ -49,9 +52,10 @@ public class LY004Batch extends BatchBase implements Tasklet, InitializingBean {
 			iYear = iYear - 1;
 		}
 
+
 		// 年月: 年初~本月 YYY / MM
 		titaVo.putParam("RocYear", iYear);
-
-		lY004Report.exec(titaVo);
+		
+		lY004Report2.exec(titaVo);
 	}
 }

@@ -28,6 +28,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.FtpClient;
 import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.SmsCom;
 import com.st1.itx.util.common.TxToDoCom;
 import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
@@ -72,6 +73,9 @@ public class L4710 extends TradeBuffer {
 
 	@Autowired
 	FtpClient ftpClient;
+
+	@Autowired
+	SmsCom smsCom;
 
 	@Value("${iTXOutFolder}")
 	private String outFolder = "";
@@ -142,13 +146,27 @@ public class L4710 extends TradeBuffer {
 		long sno = makeFile.close();
 
 		this.info("sno : " + sno);
-		boolean result = sendToFTP(sno, titaVo);
+//		boolean result = sendToFTP(sno, titaVo);
 
-		if (!result)
-			return;
+//		if (!result)
+//			return;
 
 		for (TxToDoDetail tTxToDoDetail : lTxToDoDetail) {
-//			2.回寫狀態
+			// 2023-05-29 Wei 改用API傳送 from SKL 琦欣
+			String proccessNote = tTxToDoDetail.getProcessNote();
+			String[] data = proccessNote.split(",");
+
+			if (data.length >= 4) {
+				String mobile = data[2];
+				String msg = data[3];
+				this.info("L4710 sendSms test mobile = " + mobile);
+				this.info("L4710 sendSms test msg = " + msg);
+				if (titaVo.getTlrNo().equals("001702")) {
+					smsCom.sendSms(titaVo, mobile, msg);
+				}
+			}
+
+			// 2.回寫狀態
 			TxToDoDetailId tTxToDoDetailId = new TxToDoDetailId();
 			tTxToDoDetailId.setCustNo(tTxToDoDetail.getCustNo());
 			tTxToDoDetailId.setFacmNo(tTxToDoDetail.getFacmNo());

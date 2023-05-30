@@ -49,7 +49,7 @@ public class L5500ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-
+		
 //		this.info("JcicServiceImpl this.index=[" + this.index + "],this.limit=[" + this.limit + "]");
 //		query.setParameter("ThisIndex", index);
 //		query.setParameter("ThisLimit", limit);
@@ -71,7 +71,7 @@ public class L5500ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		query.setMaxResults(this.limit);
 
 		return this.convertToMap(query);
-
+	
 	}
 
 	public List<String[]> FindData(int index, int limit, String sql, Map<String, String> queryKey, TitaVo titaVo) throws LogicException {

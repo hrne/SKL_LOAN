@@ -1304,14 +1304,15 @@ public class PfDetailCom extends TradeBuffer {
 			}
 		}
 		// 介紹人是否為15日薪(Y/Null)，單位代號(介紹人)
+		CdEmp introducerCdEmp = null;
 		if (!"".equals(pf.getIntroducer())) {
-			CdEmp tCdEmp = cdEmpService.findById(pf.getIntroducer(), titaVo);
-			if (tCdEmp != null) {
-				if (employeeCom.isDay15Salary(tCdEmp, titaVo)) {
+			introducerCdEmp = cdEmpService.findById(pf.getIntroducer(), titaVo);
+			if (introducerCdEmp != null) {
+				if (employeeCom.isDay15Salary(introducerCdEmp, titaVo)) {
 					pf.setIsIntroducerDay15("Y");
 				}
 				if ("".equals(pf.getUnitCode())) {
-					pf.setUnitCode(tCdEmp.getCenterCode());
+					pf.setUnitCode(introducerCdEmp.getCenterCode());
 				}
 			}
 		}
@@ -1406,19 +1407,13 @@ public class PfDetailCom extends TradeBuffer {
 			pf.setUnitManager(tCdBcm.getUnitManager()); // 處經理代號(介紹人)
 			pf.setDeptManager(tCdBcm.getDeptManager()); // 部經理代號(介紹人)
 			pf.setDistManager(tCdBcm.getDistManager()); // 區經理代號(介紹人)
-			// 區經理 : CdEmp(員工資料檔)的AgLevel(業務人員職等)第一碼為'H'為區經理
-			// 介紹人本身為區經理,否則依序找上層主管直到找到區經理
-			String employeeNo = pf.getIntroducer();
-			for (int i = 0; i <= 4; i++) {
-				CdEmp tCdEmp = cdEmpService.findById(employeeNo, titaVo);
-				if (tCdEmp == null) {
-					break;
+			// 區經理 : CdEmp(員工資料檔)的AgLevel(業務人員職等)第一碼為'H'為區經理 
+			// 介紹人本身為區經理,否則依序找上層主管直到找到區經理 
+			if (introducerCdEmp != null) {
+				String deptManage = employeeCom.getDistManager(introducerCdEmp, titaVo);
+				if (deptManage != null) {
+					pf.setDistManager(deptManage); // 區經理代號(介紹人)
 				}
-				if (tCdEmp.getAgLevel().length() >= 1 && "H".equals(tCdEmp.getAgLevel().substring(0, 1))) {
-					pf.setDistManager(employeeNo);
-					break;
-				}
-				employeeNo = tCdEmp.getDirectorId();
 			}
 		}
 

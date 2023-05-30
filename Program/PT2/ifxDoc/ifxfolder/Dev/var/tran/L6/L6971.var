@@ -167,7 +167,7 @@ TXFORM=L6971
 #batch-print=8,L6971.PFNX,NA,,,,,,1169:827
 ^
 #RPTFG=9,QUERY.GRID,L6971
-#any={detail:true, header:'L6971.part', caption:'', width:1005, rowNum:100, rowList:[100,500,1000],
+#any={detail:true, header:'L6971.part', caption:'', width:1005, rowNum:100, rowList:[100,500,1000,10000,100000],
 ifxBatch:{
 	name:'確認刪除明細',
 	type:'5',

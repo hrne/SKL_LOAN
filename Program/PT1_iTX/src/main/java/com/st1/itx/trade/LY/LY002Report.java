@@ -58,7 +58,7 @@ public class LY002Report extends MakeReport {
 		String fileItem = "非RBC_表14-1_會計部年度檢查報表";
 		String fileName = "LY002-非RBC_表14-1_會計部年度檢查報表";
 
-		String defaultExcel = "LY002_底稿_非RBC_表14-1_會計部年度檢查報表(舊).xlsx";
+		String defaultExcel = "LY002_底稿_非RBC_表14-1_會計部年度檢查報表.xlsx";
 
 		String defaultSheet = "表14-1";
 

@@ -897,13 +897,11 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:CustNo<
 #WkInit=X,1,S
 IF(#FKEY==0 || #FKEY==7,$,s)
 T(2,@RateIncrX,#WkPercent2)
-T(2,@IndividualIncrX,#WkPercent2)
 T(2,@FirstRateAdjFreqX,#WkMonthX)
 T(2,@RateAdjFreqX,#WkMonthX)
 T(3,@UtilDeadlineX, 前)
 T(3,@GracePeriodX, 個月)
 T(3,@RecycleDeadlineX, 前)
-! K(LIGHT,#FdBaseRateCode,TXTRED,-1)
 K(LIGHT,#FdApproveRate,TXTRED,-1)
 K(LIGHT,#FdRateAdjFreq,TXTRED,-1)
 K(LIGHT,#FdExtraRepayCode,TXTRED,-1)
@@ -918,7 +916,6 @@ K(LIGHT,#FdPayIntFreq,TXTRED,-1)
 K(LIGHT,#FdCustTypeCode,TXTRED,-1)
 K(LIGHT,#FdApplAmt,TXTRED,-1)
 C(3,#FuncCode,2,$,S)
-! K(LIGHT,#FdBaseRateCode,TXTRED,0)
 K(LIGHT,#FdApproveRate,TXTRED,0)
 K(LIGHT,#FdRateAdjFreq,TXTRED,0)
 K(LIGHT,#FdExtraRepayCode,TXTRED,0)
@@ -1026,7 +1023,6 @@ T(2,@ProdNo,#L2r05ProdNo)
 E(0,@ApplNo,#L2r05ApplNo)
 T(2,@BaseRateCode,#L2r05BaseRateCode)
 E(0,@RateIncr,#L2r05RateIncr)
-E(0,@IndividualIncr,#L2r05IndividualIncr)
 E(0,@ApproveRate,#L2r05ApproveRate)
 E(0,@RateCode,#L2r05RateCode)
 E(0,@FirstRateAdjFreq,#L2r05FirstRateAdjFreq)
@@ -1080,7 +1076,6 @@ T(2,@Estimate,#L2r05Estimate)
 T(2,@EstimateLb,#L2r05Estimate)
 T(2,@CreditOfficer,#L2r05CreditOfficer)
 T(2,@CreditOfficerLb,#L2r05CreditOfficer)
-! T(2,@LoanOfficer,#L2r05LoanOfficer)
 T(2,@BusinessOfficer,#L2r05BusinessOfficer)
 T(2,@BusinessOfficerLb,#L2r05BusinessOfficer)
 T(2,@ApprovedLevel,#L2r05ApprovedLevel)
@@ -1138,7 +1133,6 @@ E(0,@StarBuildingYM,#L2r05StarBuildingYM)
 E(0,@LbPreStarBuildingYM,#L2r05PreStarBuildingYM)
 E(0,@LbStarBuildingYM,#L2r05StarBuildingYM)
 E(0,@BaseRate,#L2r05BaseRate)
-! C(3,#FuncCode,5,E(0,@BaseRate,#L2r05BaseRate),$)
 ##loop{times:10,n:1}
 E(0,@StepMonthS{n},#L2r05StepRateMonths{n})
 E(0,@StepMonthE{n},#L2r05StepRateMonthE{n})
@@ -1375,7 +1369,7 @@ T(2,@CoorgnizerX,#L2r13FullName)
 
 #WKSHOWLB=X,1,S
 C(3,#UpdateCode,1,
-    SHOW(#BaseRateCodeX,#LbProdRateX,#RateIncr,#RateIncrX,#IndividualIncr,#IndividualIncrX
+    SHOW(#BaseRateCodeX,#LbProdRateX,#RateIncr,#RateIncrX
     ,#RateCode,#RateCodeX,#FirstRateAdjFreq,#FirstRateAdjFreqX,#RateAdjFreq,#RateAdjFreqX,#TwAcctFee,#TwHandlingFee
     ,#CreditSysNo,#AmortizedCode,#AmortizedCodeX,#TwApplAmt,#LoanTermYy,#LoanTermMm,#LoanTermDd,#FreqBase,#PayIntFreq
     ,#PayIntFreqX,#RepayFreq,#RepayFreqX,#UtilDeadline,#UtilDeadlineX,#GracePeriod,#GracePeriodX,#GuaranteeDate
@@ -1385,20 +1379,20 @@ C(3,#UpdateCode,1,
     ,#CreditOfficerX,#BusinessOfficer,#BusinessOfficerX,#Supervisor,#SupervisorX,#InvestigateOfficer,#InvestigateOfficerX
     ,#EstimateReview,#EstimateReviewX,#Coorgnizer,#CoorgnizerX)
     SHOW(#BTN11,#BTN12,#BTN13,#BTN14,#BTN16,#BTN17,#BTN19,#BTN20,#BTN21)
-    HIDE(#LbRateIncrX,#LbIndividualIncrX,#LbFirstRateAdjFreq,#LbRateAdjFreq,#UsAcctFee,#LbAcctFee,#UsHandlingFee,#LbHandlingFee
+    HIDE(#LbRateIncrX,#LbFirstRateAdjFreq,#LbRateAdjFreq,#UsAcctFee,#LbAcctFee,#UsHandlingFee,#LbHandlingFee
     ,#LbCreditSysNo,#LbApplAmt,#UsApplAmt,#LbApplAmt,#LbLoanTermYyX,#LbLoanTermMm,#LbLoanTermDd,#LbPayIntFreq
     ,#LbRepayFreq,#LbUtilDeadline,#LbGracePeriod,#LbGuaranteeDate,#LbRecycleDeadline,#LbRepayBank,#LbPostCode,#LbRepayAcctNo
     ,#LbRelationName,#LbRelationId,#LbRelationBirthday,#IntroducerLb,#FireOfficerLb,#EstimateLb,#CreditOfficerLb,#BusinessOfficerLb
     ,#SupervisorLb,#InvestigateOfficerLb,#EstimateReviewLb,#CoorgnizerLb,#LbBreach)
     C(3,#DepartmentCode,0,HIDE(#ProdBreachFlag,#Breach)SHOW(#LbBreach),SHOW(#ProdBreachFlag,#Breach)HIDE(#LbBreach))
-   ,SHOW(#BaseRateCodeX,#LbProdRateX,#LbRateIncrX,#LbIndividualIncrX,#LbApproveRateX,#RateCodeX
+   ,SHOW(#BaseRateCodeX,#LbProdRateX,#LbRateIncrX,#LbApproveRateX,#RateCodeX
    ,#LbFirstRateAdjFreq,#LbRateAdjFreq,#LbAcctFee,#LbHandlingFee,#LbCreditSysNo,#AmortizedCodeX,#LbApplAmt,#LbApplAmt,#LbLoanTermYyX
    ,#LbLoanTermMm,#LbLoanTermDd,#LbPayIntFreq,#LbRepayFreq,#LbUtilDeadline,#LbGracePeriod,#LbGuaranteeDate,#LbRecycleDeadline
    ,#RepayCodeX,#RepayBankX,#LbRepayAcctNo,#PostCodeX,#RelationCodeX,#LbRelationName,#LbRelationId,#LbRelationBirthday
    ,#RelationGenderX,#IntroducerX,#District,#DistrictX,#FireOfficerX,#EstimateX,#CreditOfficerX,#BusinessOfficerX,#SupervisorX
    ,#InvestigateOfficerX,#EstimateReviewX,#CoorgnizerX,#IntroducerLb,#FireOfficerLb,#EstimateLb,#CreditOfficerLb
    ,#BusinessOfficerLb,#SupervisorLb,#InvestigateOfficerLb,#EstimateReviewLb,#CoorgnizerLb,#LbBreach)
-    HIDE(#RateIncr,#RateIncrX,#IndividualIncr,#IndividualIncrX,#ApproveRate,#ApproveRateX,#RateCode
+    HIDE(#RateIncr,#RateIncrX,#ApproveRate,#ApproveRateX,#RateCode
     ,#FirstRateAdjFreq,#FirstRateAdjFreqX,#RateAdjFreq,#RateAdjFreqX,#TwAcctFee,#UsAcctFee,#TwHandlingFee,#UsHandlingFee
     ,#CreditSysNo,#AmortizedCode,#TwApplAmt,#UsApplAmt,#LoanTermYy,#LoanTermMm,#LoanTermDd,#FreqBase,#PayIntFreq,#PayIntFreqX
     ,#RepayFreq,#RepayFreqX,#UtilDeadline,#UtilDeadlineX,#GracePeriod,#GracePeriodX,#GuaranteeDate,#GuaranteeDateX,#RepayCode
@@ -1508,11 +1502,8 @@ BIND(#BTNExpand,click, {cmd=CALLSEND;DOCODE=Expand})
 #FDP2=X,1,S
 IF(#FKEY==0 || #FKEY==7,$,s)
 T(2,@FdProdNo,#WkStar)
-! T(2,@FdBaseRateCode,#WkStar)
 T(2,@FdBaseRate, )
 T(2,@FdProdRate, )
-! T(2,@FdRateIncr,#WkStar)
-T(2,@FdIndividualIncr, )
 T(2,@FdApproveRate, )
 T(2,@FdRateCode,#WkStar)
 T(2,@FdIntCalcCode,#WkStar)
@@ -1521,44 +1512,27 @@ T(2,@FdIntCalcCode,#WkStar)
 C(3,#UpdateCode,1,
     SHOW(#BaseRateCodeX,#LbProdRateX,#RateIncr,#RateIncrX,#RateCode,#RateCodeX,#FirstRateAdjFreq,#FirstRateAdjFreqX,#RateAdjFreq,#RateAdjFreqX,#TwAcctFee,#CreditSysNo)
     HIDE(#LbRateIncrX,#LbFirstRateAdjFreq,#LbRateAdjFreq,#LbApproveRateX,#UsAcctFee,#LbAcctFee,#UsHandlingFee,#LbHandlingFee,#LbCreditSysNo)
-   ,SHOW(#BaseRateCodeX,#LbProdRateX,#LbRateIncrX,#LbIndividualIncrX,#LbApproveRateX,#RateCodeX,#LbFirstRateAdjFreq,#LbRateAdjFreq,#LbAcctFee,#LbCreditSysNo)
-    HIDE(#RateIncr,#RateIncrX,#IndividualIncr,#IndividualIncrX,#ApproveRate,#ApproveRateX,#RateCode,#FirstRateAdjFreq,#FirstRateAdjFreqX,#RateAdjFreq,#RateAdjFreqX,#TwAcctFee,#UsAcctFee,#CreditSysNo))
+   ,SHOW(#BaseRateCodeX,#LbProdRateX,#LbRateIncrX,#LbApproveRateX,#RateCodeX,#LbFirstRateAdjFreq,#LbRateAdjFreq,#LbAcctFee,#LbCreditSysNo)
+    HIDE(#RateIncr,#RateIncrX,#ApproveRate,#ApproveRateX,#RateCode,#FirstRateAdjFreq,#FirstRateAdjFreqX,#RateAdjFreq,#RateAdjFreqX,#TwAcctFee,#UsAcctFee,#CreditSysNo))
 C(3,#UpdateCode,1,$,s)
-C(5,#L2r01IncrFlag,Y,T(F,@RateIncr,1)T(F,@IndividualIncr,0)
-                     SHOW(#RateIncr,#RateIncrX,#LbIndividualIncrX)
-                     HIDE(#LbRateIncrX,#IndividualIncr,#IndividualIncrX)
+C(5,#L2r01IncrFlag,Y,SHOW(#RateIncr,#RateIncrX)
+                     HIDE(#LbRateIncrX)
                     ,$)
-! C(5,#L2r01IncrFlag,Y,T(F,@RateIncr,1)T(F,@IndividualIncr,0)
-!                      SHOW(#RateIncr,#RateIncrX,#LbIndividualIncrX)
-!                      HIDE(#LbRateIncrX,#IndividualIncr,#IndividualIncrX)
-!                     ,T(F,@RateIncr,0)T(F,@IndividualIncr,1)
-!                      HIDE(#RateIncr,#RateIncrX,#LbIndividualIncrX)
-!                      SHOW(#LbRateIncrX,#IndividualIncr,#IndividualIncrX))
-! C(3,#BaseRateCode,99,$,
-!  C(5,#L2r01IncrFlag,Y,E(0,@ApproveRate,#BaseRate+#RateIncr)
-!                      ,E(0,@ApproveRate,#BaseRate+#IndividualIncr)))                      
-! C(3,#L2r01RateCode,9,SHOW(#RateCode),HIDE(#RateCode))
 IF(#FuncCode==2 && #L2r01RateCode==9,$
                                   ,SHOW(#RateCodeX))
 SHOW(#ApproveRate,#ApproveRateX)
 T(3,@ApproveRateX,%)
-C(3,#BaseRateCode,99,SHOW(#LbRateIncrX)HIDE(#RateIncr,#RateIncrX,#LbApproveRateX),$)
-!                     ,HIDE(#LbApproveRateX)
-!                      SHOW(#ApproveRate,#ApproveRateX)
-!                      T(3,@ApproveRateX,%))                                                                            
+C(3,#BaseRateCode,99,SHOW(#LbRateIncrX)HIDE(#RateIncr,#RateIncrX,#LbApproveRateX),$)                                                        
 CALL(#HideFirstRateAdjFreq)
 
 #InitP2=X,1,S
 T(H,@BaseRateCodeX,#BaseRateCode,#BaseRateHelp)
-! T(A,@BaseRateCodeX,#BaseRateCode,L2DEF,FacmBaseRateCodeDef,FacmBaseRateCode,FacmBaseRateCodeX)
 T(H,@RateCodeX,#RateCode,#FacmRateCodeHelp)
-! T(A,@RateCodeX,#RateCode,L2DEF,FacmRateCodeDef,FacmRateCode,FacmRateCodeX)
 X(@LbBaseRateX,#BaseRate)T(B,@LbBaseRateX,#LbBaseRateX+#WkPercent)
 E(0,@ProdRate,#BaseRate+#L2r01ProdIncr)
 X(@LbProdRateX,#ProdRate)T(B,@LbProdRateX,#LbProdRateX+#WkPercent)
 X(@LbRateIncrX,#RateIncr)T(B,@LbRateIncrX,#LbRateIncrX+#WkPercent)
 X(@LbApproveRateX,#ApproveRate)T(B,@LbApproveRateX,#LbApproveRateX+#WkPercent)
-X(@LbIndividualIncrX,#IndividualIncr)T(B,@LbIndividualIncrX,#LbIndividualIncrX+#WkPercent)
 X(@LbFirstRateAdjFreq,#FirstRateAdjFreq)
 T(B,@LbFirstRateAdjFreq,#LbFirstRateAdjFreq+#WkMonthX)
 C(3,#RateCode,3,$,T(3,@LbFirstRateAdjFreq,無))
@@ -1603,8 +1577,6 @@ E(0,@BaseRateCode,#L2r01BaseRateCode)
 #BaseRateCodeX=X,30,L
 T(H,#BaseRateCode,#BaseRateHelp)
 C(3,#UpdateCode,1,SHOW(#ApproveRate,#ApproveRateX)HIDE(#LbApproveRateX),s)
-! C(3,#BaseRateCode,99,SHOW(#ApproveRate,#ApproveRateX)HIDE(#LbApproveRateX)
-!                     ,HIDE(#ApproveRate,#ApproveRateX)SHOW(#LbApproveRateX))
 
 #SendL2r06B=X,1,S
 C(3,#FuncCode,4,S,$)
@@ -1627,12 +1599,6 @@ E(0,@BaseRate,#L2r06Rate)
 !8/17 配合少玄開放可修正
 !2023/5/25不可修改僅顯示 依據核准利率-加碼或個別加碼
 #BaseRate=n,2.4,L
-! C(3,#FuncCode,5,s,$)
-! C(3,#FuncCode,4,s,$)
-! E(0,#L2r06Rate)
-!#Wk_BaseRate=X,8,S
-!X(#BaseRate)
-!P(R,#Wk_BaseRate)
 
 #LbBaseRateX=X,12,L
 X(#BaseRate)
@@ -1651,9 +1617,7 @@ T(B,#LbProdRateX+#WkPercent)
 
 #WkApproveRate=X,1,S
 C(3,#UpdateCode,1,$,s)
-C(3,#BaseRateCode,99,$,
- C(5,#L2r01IncrFlag,Y,E(0,@ApproveRate,#BaseRate+#RateIncr)
-                      ,E(0,@ApproveRate,#BaseRate+#IndividualIncr)))
+C(3,#BaseRateCode,99,$,E(0,@ApproveRate,#BaseRate+#RateIncr))
 X(@LbApproveRateX,#ApproveRate)
 T(B,@LbApproveRateX,#LbApproveRateX+#WkPercent)
 
@@ -1680,16 +1644,8 @@ T(B,#LbRateIncrX+#WkPercent)
 !利率加減碼與個別加減碼,只能擇一輸入
 #FdIndividualIncr=X,2,L
 
-#IndividualIncr=+n,2.4,I
-C(3,#Hide1Fg,0,CALL(#HideP1),$)
-C(3,#UpdateCode,1,$,s)
-C(3,#BaseRateCode,99,S,$)
-C(5,#L2r01IncrFlag,Y,S,$)
-
-#LbIndividualIncrX=X,12,L
-X(#IndividualIncr)
-T(B,#LbIndividualIncrX+#WkPercent)
-
+#IndividualIncr=+n,2.4,S
+#LbIndividualIncrX=X,12,S
 #IndividualIncrX=X,3,L
 
 ![核准利率]
@@ -1700,10 +1656,10 @@ T(B,#LbIndividualIncrX+#WkPercent)
 #ApproveRate=n,2.4,I
 C(3,#Hide1Fg,0,CALL(#HideP1),$)
 C(3,#UpdateCode,1,$,s)
-C(3,#BaseRateCode,99,$,C(5,#L2r01IncrFlag,Y,E(0,#BaseRate+#RateIncr),E(0,#BaseRate+#IndividualIncr)))
+C(3,#BaseRateCode,99,$,E(0,#BaseRate+#RateIncr))
 C(3,#BaseRateCode,99,$,$)
 @V(2,0)
-C(3,#BaseRateCode,99,$,C(5,#L2r01IncrFlag,Y,E(0,@BaseRate,#ApproveRate-#RateIncr),E(0,@BaseRate,#ApproveRate-#IndividualIncr)))
+C(3,#BaseRateCode,99,$,E(0,@BaseRate,#ApproveRate-#RateIncr))
 
 #LbApproveRateX=X,12,L
 X(#ApproveRate)
@@ -1786,9 +1742,7 @@ T(2,@FdGracePeriod, )
 T(2,@FdAcctFee, )
 T(2,@FdHandlingFee, )
 T(2,@FdGuaranteeDate,#WkStar)
-! T(2,@PayIntFreqX,#WkUnitX)
 T(F,@PayIntFreqX,0)
-! T(2,@RepayFreqX,#WkUnitX)
 T(F,@RepayFreqX,0)
 C(3,#L2r01AmortizedCode,9,$,T(3,@FdAmortizedCode, ))
 C(3,#L2r01AmortizedCode,9,$,T(3,@FdFreqBase, ))
@@ -1812,15 +1766,10 @@ CALL(#HideRepayFreq)
 #InitP3=X,1,S
 T(H,@CurrencyCodeX,#CurrencyCode,#CurrencyHelp)
 T(H,@AcctCodeX,#AcctCode,#FacmAcctCodeHelp)
-! T(A,@AcctCodeX,#AcctCode,L2DEF,FacmAcctCodeDef,FacmAcctCode,FacmAcctCodeX)
 T(H,@AmortizedCodeX,#AmortizedCode,#AmortizedCodeHelp)
-! T(A,@AmortizedCodeX,#AmortizedCode,L2DEF,AmortizedCodeDef,AmortizedCode,AmortizedCodeX)
 T(H,@FreqBaseX,#FreqBase,#FreqBaseHelp)
-! T(A,@FreqBaseX,#FreqBase,L2DEF,FreqBaseDef,FreqBase,FreqBaseX)
 T(H,@PayIntFreqX,#FreqBase,#FreqBase2Help)
-! T(A,@PayIntFreqX,#FreqBase,L2DEF,FreqBaseDef,FreqBase,FreqBaseX)
 T(H,@RepayFreqX,#FreqBase,#FreqBase2Help)
-! T(A,@RepayFreqX,#FreqBase,L2DEF,FreqBaseDef,FreqBase,FreqBaseX)
 X(@LbRepayFreq,#RepayFreq)
 T(B,@LbRepayFreq,#LbRepayFreq+#RepayFreqX)
 C(3,#RepayFreq,0,T(3,@LbRepayFreq,無)) 
@@ -1898,7 +1847,6 @@ C(3,#AcctCode,#L2r05AcctCode,$,C(3,#L2r05UtilAmt,0,$,V(P,尚有放款餘額，�
 
 #AcctCodeX=X,20,L
 T(H,#AcctCode,#FacmAcctCodeHelp)
-! T(A,#AcctCode,L2DEF,FacmAcctCodeDef,FacmAcctCode,FacmAcctCodeX)
 
 ![貸款期間]
 !修改時自動顯示可修改,其他自動顯示不必須輸入
@@ -1992,22 +1940,6 @@ T(H,#AmortizedCode,#AmortizedCodeHelp)
 
 
 
-!契約終止代碼
-! #FdCancelCode=X,2,L
-! C(3,#AmortizedCode,5,T(3,*),T(3,))
-! C(3,#UpdateCode,1,T(3,*),T(3,))
-
-! #CancelCode=A,1,I
-! C(3,#AmortizedCode,5,SHOW(#CancelCode),HIDE(#CancelCode))
-! C(3,#AmortizedCode,5,$,S)
-! C(3,#UpdateCode,1,SHOW(#CancelCode),HIDE(#CancelCode))
-! C(3,#UpdateCode,1,$,s)
-! HELP(#CancelCodeHelp)
-! @V(H,#CancelCodeHelp)
-
-! #CancelCodeX=X,30,L
-! C(3,#AmortizedCode,5,$,S)
-! T(H,#CancelCode,#CancelCodeHelp)
 
 ![週期基準]
 !1:日 2:月 3:週
@@ -2298,7 +2230,6 @@ SHOW(#StepRateType{n})
 T(F,@StepMonthS{n},1)
 T(F,@StepRateType{n},1)
 T(F,@StepRateIncr{n},1)
-! IF(#StepMonthS{n}==0,HIDE(#StepMonthS{n},#StepMonthE{n},#StepRateType{n},#StepRateTypeX{n},#StepRateIncr{n},#StepRatePer{n}),$)
 ##end
 
 
@@ -2306,7 +2237,6 @@ T(F,@StepRateIncr{n},1)
 ##loop{times:10,n:1}
 T(3,@StepRateTypeX{n}, )
 T(H,@StepRateTypeX{n},#StepRateType{n},#RateTypeHelp)
-! T(H,@StepRateCodeX{n},#StepRateCode{n},#FacmRateCodeHelp)
 ##end
 
 
@@ -2338,7 +2268,6 @@ C(3,#StepMonthE1,0,S,$)
 C(3,#Hide3Fg,0,CALL(#HideP3),$)
 C(3,#BaseRateCode,99,E(0,1),$)
 HELP(#RateTypeHelp)
-! HELP(1:機動;3:定期機動)
 @
 C(3,#BaseRateCode,99,V(1,1),V(1,1,2))
 
@@ -2367,8 +2296,7 @@ T(F,@StepRateIncr{n},1)
 #TEXT_OFF_P9{n}=X,1,S
 C(3,#UpdateCode,1,$,S)
 IF(#StepMonthS{n} > 0,SHOW(#StepMonthS{n},#StepMonthE{n},#StepRateType{n},#StepRateTypeX{n},#StepRateIncr{n},#StepRatePer{n}),$)
-! T(F,@StepMonthS{n},0)
-! T(F,@StepRateIncr{n},0)
+
 
 #test{n}=X,20,S
 T(B,僅可輸入0，空白及+#Month{m})
@@ -2413,7 +2341,6 @@ C(3,#BaseRateCode,99,V(1,1),V(1,1,2))
 #StepRateTypeX{n}=X,10,L
 C(4,#StepRateType{n},S,$)
 T(H,#StepRateType{n},#RateTypeHelp)
-! T(H,#StepRateCode{n},#FacmRateCodeHelp)
 
 #StepRateIncr{n}=+n,2.4,I
 C(3,#UpdateCode,1,$,s)
@@ -2524,12 +2451,9 @@ C(3,#Hide4Fg,0,CALL(#HideP4),$)
 HELP(#CustTypeCodeHelp)
 @V(H,#CustTypeCodeHelp)
 C(3,#CustTypeCode,1,E(0,@RuleCode,00)T(F,@RuleCode,0)T(3,@FdRuleCode,),T(F,@RuleCode,1)T(3,@FdRuleCode,*))
-!HELP(L2DEF,CustTypeCodeDef,CustTypeCode,CustTypeCodeX,cols:3)
-!@V(E,0,L2DEF,CustTypeCodeDef)
 
 #CustTypeCodeX=X,20,L
 T(H,#CustTypeCode,#CustTypeCodeHelp)
-!T(A,#CustTypeCode,L2DEF,CustTypeCodeDef,CustTypeCode,CustTypeCodeX)
 
 ![規定管制代碼]
 #FdRuleCode=X,2,L
@@ -2579,7 +2503,6 @@ C(3,#Hide4Fg,0,CALL(#HideP4),$)
 D(8)
 @V(7)A(DATE,0,#RecycleDeadline)
 IF(#RecycleDeadline<=#L2r02ApproveDate,V(P,#RecycMsg),$)
-! V(6,010101,#L2r02ApproveDate)
 
 #LbRecycleDeadline=D,7,L
 
@@ -2680,8 +2603,6 @@ P(L,#LbCreditScore)
 !---- P5 扣款帳號
 #INVK5=X,1,S
 C(3,#Hide5Fg,0,CALL(#HideP5),$)
-!HIDE(#BTN3)
-
 
 #FDP5=X,1,S
 T(2,@FdRepayCode,#WkStar)
@@ -2693,9 +2614,6 @@ T(3,@FdRelationName, )
 T(3,@FdRelationId, )
 T(3,@FdRelationBirthday, )
 T(3,@FdRelationGender, )
-!T(2,@FdAchAuthCode, )
-! T(2,@FdAchBank, )
-! T(2,@FdAchAuthNo, )
 
 #ShowP5=X,1,S
 C(3,#UpdateCode,1,
@@ -2706,9 +2624,7 @@ C(3,#UpdateCode,1,
 
 #InitP5=X,1,S
 T(H,@PostCodeX,#PostCode,#PostCodeHelp)
-!T(H,@AchAuthCodeX,#AchAuthCode,#AchAuthCodeHelp)
 T(H,@RelationCodeX,#RelationCode,#RelationCodeHelp)
-!T(A,@RELACCTERRX,#RELACCTERR,L3DEF,ACCTERRDEF,ACCTERR,ACCTERRX)
 T(H,@RelationGenderX,#RelationGender,#SexHelp)
 
 
@@ -2725,36 +2641,6 @@ T(H,@RelationGenderX,#RelationGender,#SexHelp)
 #OldRelationBirthday=D,7,S
 #OldRelationGender=X,1,S
 
-! #SendL2r44=X,1,S
-! IF(#FKEY==0 || #FKEY==7,$,s)
-! C(3,#RepayCode,2,$,S)
-! T(2,@RimCustNo,#CustNo)
-! E(0,@RimFacmNo,#FacmNo)
-! E(0,@RimFunCode,#FuncCode)
-! RESET_RIM(#SendL2r44,L2R44)
-! S(L2R44,1,#RimCustNo,#RimFacmNo,#RimFunCode)
-! R(1,L2R44)
-
-! #CHECKL2R44=X,1,S
-! IF(#FKEY==0 || #FKEY==7,$,s)
-! T(2,@RepayBank,#L2r44RepayBank)
-! T(2,@OldRepayBank,#L2r44RepayBank)
-! E(0,@RepayAcctNo,#L2r44RepayAcctNo)
-! E(0,@OldAcctNo,#L2r44RepayAcctNo)
-! T(2,@PostCode,#L2r44PostCode)
-! T(2,@OldPostCode,#L2r44PostCode)
-! !T(2,@AchAuthCode,#L2r44AchAuthCode)
-! T(2,@RelationCode,#L2r44RelationCode)
-! T(2,@OldRelationCode,#L2r44RelationCode)
-! T(2,@RelationName,#L2r44RelationName)
-! T(2,@OldRelationName,#L2r44RelationName)
-! T(2,@RelationId,#L2r44RelationId)
-! T(2,@OldRelationId,#L2r44RelationId)
-! E(0,@RelationBirthday,#L2r44RelationBirthday)
-! E(0,@OldRelationBirthday,#L2r44RelationBirthday)
-! T(2,@RelationGender,#L2r44RelationGender)
-! T(2,@OldRelationGender,#L2r44RelationGender)
-! T(2,@MainStatus,#L2r44MainStatus)
 
 ![繳款方式]
 !修改時自動顯示可修改,其他自動顯示不必須輸入
@@ -2766,7 +2652,6 @@ C(3,#Hide5Fg,0,CALL(#HideP5),$)
 HELP(#RepayCodeHelp)
 @
 V(H,#RepayCodeHelp)
-!@V(2,0)V(E,0,L3DEF,RepayCodeDef)
 
 #RepayCodeX=X,16,L
 T(H,#RepayCode,#RepayCodeHelp)
@@ -2825,13 +2710,6 @@ C(3,#UpdateCode,1,C(5,#RepayBank,700,T(3,@FdPostCode,*),T(3,@FdPostCode, )),$)
 #LbRepayBank=X,3,L
 C(3,#RepayCode,2,$,S)
 
-! #SendL2r09=X,1,S
-! C(3,#RepayCode,2,$,S)
-! C(4,#RepayBank,S,$)
-! T(2,@RimBankCode,#RepayBank)
-! RESET_RIM(#SendL2r09,L2R09)
-! S(L2R09,1,#RimTxCode,#RimBankCode)
-! R(1,L2R09)
 
 #RepayBankX=X,20,L
 C(3,#RepayCode,2,$,S)
@@ -2919,11 +2797,6 @@ T(2,@RelationName,#L4r22RelAcctName)
 T(2,@RelationId,#L4r22RelationId)
 E(0,@RelationBirthday,#L4r22RelAcctBirthday)
 T(2,@RelationGender,#L4r22RelAcctGender),$)
-! T(2,@RelationCode,)
-! T(2,@RelationName,)
-! T(2,@RelationId,)
-! E(0,@RelationBirthday,0)
-! E(0,@RelationGender,0))
 
 #CheckFlag=A,1,S
 E(0,0)
@@ -3005,7 +2878,6 @@ C(3,#UpdateCode,1,$,s)
 C(3,#RelationCode,0,s,$)
 C(3,#Hide5Fg,0,CALL(#HideP5),$)
 D(8)
-! @V(7)A(DATE,0,#RelationBirthday)
 
 #LbRelationBirthday=D,7,L
 
@@ -3022,7 +2894,6 @@ HELP(#SexHelp)
 
 #RelationGenderX=X,2,L
 C(3,#RepayCode,2,$,s)
-!C(3,#RelationCode,0,s,$)
 T(H,#RelationGender,#SexHelp)
 
 #what=X,1,I
@@ -3042,7 +2913,6 @@ T(2,@FdDistrict, )
 T(2,@FdFireOfficer, )
 T(2,@FdEstimate, )
 T(2,@FdCreditOfficer,#WkStar)
-! T(2,@FdLoanOfficer, )
 T(2,@FdBusinessOfficer, )
 T(2,@FdSupervisor, )
 T(2,@FdInvestigateOfficer, )
@@ -3663,13 +3533,11 @@ T(2,@LbBreach,#L2r56Breach)
 C(3,#Hide8Fg,0,CALL(#HideP8),$)
 C(3,#UpdateCode,1,$,s)
 IF(#BreachFlag=="N",S,$)
-! IF(#ProdBreachFlag=="Y",T(2,@Breach,#L2r05Breach),$)
 C(5,#ProdBreachFlag,Y,s,$)
 C(4,#ProdBreachFlag,s,$)
 
 #LbBreach=X,4.50,L
 
-! #Breach2=x,130,L
 
 #SHOW_Breach=X,1,S
 INVOKEJS(SHOW,p1,#P7S1,#P7E,0)
@@ -3805,20 +3673,6 @@ C(3,#Hide8Fg,0,CALL(#HideP8),$)
 #INVK8=X,1,S
 C(3,#Hide9Fg,0,CALL(#HideP9),$)
 
-! #SendL2r11=X,1,S
-! C(3,#UpdateCode,1,RESET_RIM(#SendL2r11,L2R11),$)
-! E(0,@RimApplNo,#L2r05ApplNo)
-! S(L2R11,1,#RimTxCode,#RimApplNo)
-! R(1,L2R11)
-! ##loop{times:20,n:1}
-! T(2,@ClKey{n},#L2r11ClKey{n})
-! E(0,@ClApplNo{n},#L2r11ApplNo{n})
-! E(0,@ClClTypeCode{n},#L2r11ClTypeCode{n})
-! T(2,@ClMainFlag{n},#L2r11MainFlag{n})
-! E(0,@EvaAmt{n},#L2r11EvaAmt{n})
-! T(2,@ClBdLocation{n},#L2r11BdLocation{n})
-! ##end
-
 ##loop{times:20,n:1}
 
 #ClKey{n}=X,12,L
@@ -3841,7 +3695,6 @@ P(R,#EvaAmtX{n})
 #ClBdLocation{n}=X,2.50,L
 
 #HIDECLSTEP{n}=X,1,S
-! C(3,{n},1,S,$)
 C(4,#ClKey{n},HIDE(#ClKey{n},#ClApplNo{n},#ClClTypeCodeX{n},#ClMainFlag{n},#EvaAmtX{n},#ClBdLocation{n}),
               SHOW(#ClKey{n},#ClApplNo{n},#ClClTypeCodeX{n},#ClMainFlag{n},#EvaAmtX{n},#ClBdLocation{n}))
 C(4,#ClKey{n},INVOKEJS(SHOW,grd5_{n},0),
@@ -3897,9 +3750,9 @@ C(3,#CheckCode,0,$,S)
 [#<->#,"#FdProdNo+商品代碼",#ProdNo,#BTN2,#ProdNoX],
 ["#FdBaseRateCode+指標利率代碼",#BaseRateCode,#BaseRateCodeX],
 ["#FdBaseRate+指標利率",#BaseRate,#BaseRateX,#LbBaseRateX],
-["#FdProdRate+商品利率",#LbProdRateX],
+! ["#FdProdRate+商品利率",#LbProdRateX],
 ["#FdRateIncr+加碼利率",#RateIncr,#LbRateIncrX,#RateIncrX],
-["#FdIndividualIncr+個別加碼利率",#IndividualIncr,#LbIndividualIncrX,#IndividualIncrX],
+! ["#FdIndividualIncr+個別加碼利率",#IndividualIncr,#LbIndividualIncrX,#IndividualIncrX],
 ["#FdApproveRate+核准利率",#ApproveRate,#LbApproveRateX,#ApproveRateX],
 ["#FdRateCode+利率區分",#RateCode,#RateCodeX],
 ["#FdFirstRateAdjFreq+首次利率調整週期",#FirstRateAdjFreq,#LbFirstRateAdjFreq,#FirstRateAdjFreqX],

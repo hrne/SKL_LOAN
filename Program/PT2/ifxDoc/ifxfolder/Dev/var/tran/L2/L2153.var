@@ -2669,10 +2669,10 @@ C(3,#ExpandFlag,0,CALL(#Expand),$)
 [#<->#,"#FdProdNo+商品代碼",#ProdNo,#ProdNoX],
 ["#FdBaseRateCode+指標利率代碼",#BaseRateCode,#BaseRateCodeX],
 ["#FdBaseRate+指標利率",#BaseRateX],
-["#FdProdRate+商品利率",#ProdRateX],
+! ["#FdProdRate+商品利率",#ProdRateX],
 ["#FdRateIncr+加碼利率",#RateIncr,#RateIncrX],
 ["#FdApproveRate+核准利率",#ApproveRate,"%"],
-["#FdRateCode+利率區分",#RateCode,#RateCodeX],
+[#<->#,"#FdRateCode+利率區分",#RateCode,#RateCodeX],
 ["#FdFirstRateAdjFreq+首次利率調整週期",#FirstRateAdjFreq,#LbFirstRateAdjFreq,#FirstRateAdjFreqX],
 ["#FdRateAdjFreq+利率調整週期",#RateAdjFreq,#LbRateAdjFreq,#RateAdjFreqX],
 ]

@@ -46,38 +46,31 @@ public class L9744ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// check titaVo for input values
 
 		String sql = "";
-		sql += " SELECT B0.\"UnitItem\" AS \"BsDeptItem\" "; // 部室中文(房貸專員)
-		sql += "       ,E0.\"Fullname\" AS \"BsName\" "; // 房貸專員姓名
-		sql += "       ,\"Fn_ParseEOL\"(C.\"CustName\", 0) AS \"CustName\" "; // 戶名
-		sql += "       ,I.\"CustNo\""; // 戶號
-		sql += "       ,I.\"FacmNo\""; // 額度號碼
-		sql += "       ,I.\"BormNo\""; // 撥款序號
-		sql += "       ,I.\"DrawdownDate\""; // 撥款日
-		sql += "       ,I.\"ProdCode\""; // 商品代碼
-		sql += "       ,I.\"PieceCode\""; // 計件代碼
-		sql += "       ,I.\"CntingCode\""; // 是否計件
-		sql += "       ,I.\"DrawdownAmt\""; // 撥款金額
-		sql += "       ,NVL(I.\"DeptCode\", ' ') AS \"DeptCode\""; // 部室代號(介紹人)
-		sql += "       ,NVL(I.\"DistCode\", ' ') AS \"DistCode\""; // 區部代號(介紹人)
-		sql += "       ,NVL(I.\"UnitCode\", ' ') AS \"UnitCode\""; // 單位代號(介紹人)
-		sql += "       ,NVL(B2.\"UnitItem\", ' ') AS \"ItDeptItem\""; // 部室中文(介紹人)
-		sql += "       ,NVL(B3.\"UnitItem\", ' ') AS \"ItDistItem\""; // 區部中文(介紹人)
-		sql += "       ,NVL(B1.\"UnitItem\", ' ') AS \"ItUnitIem\""; // 單位中文(介紹人)
-		sql += "       ,NVL(I.\"Introducer\", ' ') AS \"Introducer\""; // 員工代號(介紹人)
-		sql += "       ,NVL(E1.\"Fullname\", ' ') AS \"ItName\""; // 介紹人姓名
-		sql += "       ,NVL(E2.\"Fullname\", ' ') AS \"ItUnitManager\""; // 處經理姓名(介紹人)
-		sql += "       ,NVL(E3.\"Fullname\", ' ') AS \"ItDistManager\""; // 區經理姓名(介紹人)
-		sql += "       ,NVL(PIDA.\"AdjPerfEqAmt\", I.\"PerfEqAmt\") AS \"PerfEqAmt\" "; // 換算業績 -- 20211201 依eric指示
+		sql += " SELECT B0.\"UnitItem\" AS \"BsDeptItem\" "; // F0 部室中文(房貸專員)
+		sql += "       ,E0.\"Fullname\" AS \"BsName\" "; // F1 房貸專員姓名
+		sql += "       ,\"Fn_ParseEOL\"(C.\"CustName\", 0) AS \"CustName\" "; // F2 戶名
+		sql += "       ,I.\"CustNo\""; // F3 戶號
+		sql += "       ,I.\"FacmNo\""; // F4 額度號碼
+		sql += "       ,I.\"BormNo\""; // F5 撥款序號
+		sql += "       ,I.\"DrawdownDate\""; // F6 撥款日
+		sql += "       ,I.\"ProdCode\""; // F7 商品代碼
+		sql += "       ,I.\"PieceCode\""; // F8 計件代碼
+		sql += "       ,I.\"CntingCode\""; // F9 是否計件
+		sql += "       ,I.\"DrawdownAmt\""; // F10 撥款金額
+		sql += "       ,NVL(I.\"DeptCode\", ' ') AS \"DeptCode\""; // F11 部室代號(介紹人)
+		sql += "       ,NVL(I.\"DistCode\", ' ') AS \"DistCode\""; // F12 區部代號(介紹人)
+		sql += "       ,NVL(I.\"UnitCode\", ' ') AS \"UnitCode\""; // F13 單位代號(介紹人)
+		sql += "       ,NVL(B2.\"UnitItem\", ' ') AS \"ItDeptItem\""; // F14 部室中文(介紹人)
+		sql += "       ,NVL(B3.\"UnitItem\", ' ') AS \"ItDistItem\""; // F15 區部中文(介紹人)
+		sql += "       ,NVL(B1.\"UnitItem\", ' ') AS \"ItUnitIem\""; // F16 單位中文(介紹人)
+		sql += "       ,NVL(I.\"Introducer\", ' ') AS \"Introducer\""; // F17 員工代號(介紹人)
+		sql += "       ,NVL(E1.\"Fullname\", ' ') AS \"ItName\""; // F18 介紹人姓名
+		sql += "       ,NVL(E2.\"Fullname\", ' ') AS \"ItUnitManager\""; // F19 處經理姓名(介紹人)
+		sql += "       ,NVL(E3.\"Fullname\", ' ') AS \"ItDistManager\""; // F20 區經理姓名(介紹人)
+		sql += "       ,NVL(PIDA.\"AdjPerfEqAmt\", I.\"PerfEqAmt\") AS \"PerfEqAmt\" "; // F21 換算業績 -- 20211201 依eric指示
 																						// 此三金額修改為撥款層而非額度層總計
-		sql += "       ,NVL(PIDA.\"AdjPerfReward\", I.\"PerfReward\") AS \"PerfReward\" "; // 業務報酬 -- 參考L5051
-		sql += "       ,NVL(PIDA.\"AdjPerfAmt\", I.\"PerfAmt\") AS \"PerfAmt\" "; // 業績金額
-		sql += "       ,NVL(e1.\"AgLevel\", '')  AS \"AgLevel0\""; // 介紹人職等
-		sql += "       ,NVL(e4.\"Fullname\", '') AS \"ManagerName1\""; // 介紹人主管姓名1
-		sql += "       ,NVL(e4.\"AgLevel\", '')  AS \"AgLevel1\""; // 介紹人主管職等1
-		sql += "       ,NVL(e5.\"Fullname\", '') AS \"ManagerName2\""; // 介紹人主管姓名2
-		sql += "       ,NVL(e5.\"AgLevel\", '')  AS \"AgLevel2\""; // 介紹人主管職等2
-		sql += "       ,NVL(e6.\"Fullname\", '') AS \"ManagerName3\""; // 介紹人主管姓名3
-		sql += "       ,NVL(e6.\"AgLevel\", '')  AS \"AgLevel3\""; // 介紹人主管職等3
+		sql += "       ,NVL(PIDA.\"AdjPerfReward\", I.\"PerfReward\") AS \"PerfReward\" "; // F22 業務報酬 -- 參考L5051
+		sql += "       ,NVL(PIDA.\"AdjPerfAmt\", I.\"PerfAmt\") AS \"PerfAmt\" "; // F23 業績金額
 		sql += " FROM \"PfItDetail\" I";
 		sql += " LEFT JOIN \"PfBsDetail\" B ON B.\"PerfDate\"    = I.\"PerfDate\""; // 取房貸專員
 		sql += "                           AND B.\"CustNo\"      = I.\"CustNo\"";
@@ -91,9 +84,6 @@ public class L9744ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"CdEmp\" E1 ON E1.\"EmployeeNo\" = I.\"Introducer\""; // 取介紹人姓名
 		sql += " LEFT JOIN \"CdEmp\" E2 ON E2.\"EmployeeNo\" = I.\"UnitManager\""; // 取處經理姓名(介紹人)
 		sql += " LEFT JOIN \"CdEmp\" E3 ON E3.\"EmployeeNo\" = I.\"DistManager\""; // 取區經理姓名(介紹人)
-		sql += " left join \"CdEmp\" e4 on e4.\"AgentCode\"=e1.\"DirectorId\" ";
-		sql += " left join \"CdEmp\" e5 on e5.\"AgentCode\"=e4.\"DirectorId\" ";
-		sql += " left join \"CdEmp\" e6 on e6.\"AgentCode\"=e5.\"DirectorId\" ";
 		sql += " LEFT JOIN \"CdBcm\" B0 ON B0.\"UnitCode\" = B.\"DeptCode\" "; // 取部室中文(房貸專員)
 		sql += " LEFT JOIN \"CdBcm\" B1 ON B1.\"UnitCode\" = I.\"UnitCode\""; // 取單位中文(介紹人)
 		sql += " LEFT JOIN \"CdBcm\" B2 ON B2.\"UnitCode\" = I.\"DeptCode\""; // 取部室中文(介紹人)
@@ -104,8 +94,8 @@ public class L9744ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                    AND PIDA.\"WorkMonth\" = I.\"WorkMonth\"  ";
 		sql += "                                    AND PIDA.\"AdjRange\" IN (1,2) ";
 		sql += " WHERE I.\"DrawdownAmt\" > 0 ";
-		sql += "   AND I.\"Introducer\" IS NOT NULL ";
 		sql += "   AND I.\"PerfDate\" <= :entDy ";
+		sql += "   AND I.\"Introducer\" IS NOT NULL ";
 		sql += "   AND ABS(NVL(PIDA.\"AdjPerfEqAmt\", I.\"PerfEqAmt\")) ";
 		sql += "       + ABS(NVL(PIDA.\"AdjPerfReward\", I.\"PerfReward\")) ";
 		sql += "       + ABS(NVL(PIDA.\"AdjPerfAmt\", I.\"PerfAmt\")) > 0 ";
@@ -154,7 +144,7 @@ public class L9744ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (useIntroducer) {
 			query.setParameter("introducer", introducer);
 		}
-
+		
 		query.setParameter("entDy", entDy);
 
 		return this.convertToMap(query);

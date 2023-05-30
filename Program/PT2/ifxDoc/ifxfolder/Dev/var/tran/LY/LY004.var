@@ -26,6 +26,7 @@ T(3,LY004)
 [
 ["[LY004]                                  LY004非RBC_表14-4_會計部年度檢查報表"],
 ["@年度",#RocYear],
+["@報表項目",#ReportCode,#ReportCodeX], 
 ]
 
 !---------- AP TEXT AREA Variables ----------
@@ -55,6 +56,16 @@ IF(#RocYear>#DTY,V(P,不可大於會計年),$)
 
 !#RocYear=A,3,I
 !T(1,#DT,001,003)
+
+#ReportHelp=X,100,S
+T(3,1:表14-4_會計部年度檢查報表[舊];2:A144逾期放款及其他應收款項逾期債權轉銷表[新])
+
+
+#ReportCode=X,1,I
+HELP(#ReportHelp)
+
+#ReportCodeX=X,50,L
+T(H,#ReportCode,#ReportHelp)
 
 </sub>
 
@@ -98,6 +109,7 @@ IF(#KINBR=="0009"||#KINBR=="0008",T(2,#KINBR+#TlrNoNO),T(2,#EMPNOS))
 !------ 上行電文TIM：BASIC LABEL + AP TEXT AREA + AP TEXT ------
 <sub type="TIM">
 #RocYear
+#ReportCode
 #END
 </sub>
 !------ 下行電文TOM ------

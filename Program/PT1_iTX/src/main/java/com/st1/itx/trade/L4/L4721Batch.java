@@ -86,6 +86,7 @@ public class L4721Batch extends TradeBuffer {
 	int CntEmail = 0;
 	int CntMsg = 0;
 	int commitCnt = 200;
+	String noticeEmail = "";
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -137,13 +138,23 @@ public class L4721Batch extends TradeBuffer {
 					int cntTrans = 0;
 					for (Map<String, String> data : custList) {
 
-						try {
-							this.sno = l4721Report.exec(titaVo, this.txBuffer,
-									parse.stringToInteger(data.get("CustNo")), tmpKindItem[txkind - 1]);
+						// 序號初始化
+						this.sno = 0;
 
-							this.info("CustNo =" + data.get("CustNo"));
-							this.info("sno =" + this.sno);
-							dealHeadData(titaVo, data);
+						try {
+
+							if (dealHeadData(titaVo, data).equals("isEmail")) {
+
+								this.sno = l4721Report.exec(titaVo, this.txBuffer,
+										parse.stringToInteger(data.get("CustNo")), tmpKindItem[txkind - 1]);
+								this.info("CustNo =" + data.get("CustNo"));
+								this.info("sno =" + this.sno);
+
+							}
+
+							if (this.sno > 0) {
+								setMailMFileVO(data, this.noticeEmail, titaVo);
+							}
 
 							cntTrans++;
 
@@ -208,8 +219,9 @@ public class L4721Batch extends TradeBuffer {
 	/**
 	 * 
 	 */
-	private void dealHeadData(TitaVo titaVo, Map<String, String> iData) throws LogicException {
+	private String dealHeadData(TitaVo titaVo, Map<String, String> iData) throws LogicException {
 
+		String isNotice = "";
 		int ieday = titaVo.getEntDyI() + 19110000;
 		dateUtil.setDate_1(ieday);
 		dateUtil.setMons(-6);
@@ -220,7 +232,7 @@ public class L4721Batch extends TradeBuffer {
 		int iFacmNo = parse.stringToInteger(iData.get("FacmNo"));
 
 		if (iCustNo == custNoLast && iFacmNo == facmNoLast) {
-			return;
+			return null;
 		}
 		Map<String, String> mTmpCustFacm = new HashMap<>();
 		List<Map<String, String>> lTmpCustFacm = new ArrayList<Map<String, String>>();
@@ -263,12 +275,12 @@ public class L4721Batch extends TradeBuffer {
 
 		int noticeFlag = parse.stringToInteger(tempVo.getParam("NoticeFlag"));
 		String noticePhoneNo = tempVo.getParam("MessagePhoneNo");
-		String noticeEmail = tempVo.getParam("EmailAddress");
+		this.noticeEmail = tempVo.getParam("EmailAddress");
 		String noticeAddress = tempVo.getParam("LetterAddress");
 
 		this.info("noticeFlag : " + noticeFlag);
 		this.info("noticePhoneNo : " + noticePhoneNo);
-		this.info("noticeEmail : " + noticeEmail);
+		this.info("noticeEmail : " + this.noticeEmail);
 		this.info("noticeAddress : " + noticeAddress);
 
 		if ("Y".equals(tempVo.getParam("isLetter"))) {
@@ -278,6 +290,8 @@ public class L4721Batch extends TradeBuffer {
 				CntPaper = CntPaper + 1;
 				letterCustList.add(iData);
 			}
+			isNotice = "isLetter";
+
 		}
 		if ("Y".equals(tempVo.getParam("isEmail"))) {
 			this.info("isEmailCust : " + iCustNo);
@@ -285,8 +299,11 @@ public class L4721Batch extends TradeBuffer {
 
 			if (iCustNo != custNoLast) {
 				CntEmail = CntEmail + 1;
-				setMailMFileVO(iData, noticeEmail, titaVo);
+				// 處理Mail => 是否Email寄送=>產檔=>寄送
+//				setMailMFileVO(iData, noticeEmail, titaVo);
 			}
+
+			isNotice = "isEmail";
 		}
 
 		if ("Y".equals(tempVo.getParam("isMessage"))) {
@@ -298,10 +315,13 @@ public class L4721Batch extends TradeBuffer {
 				setTextFileVO(t, noticePhoneNo, titaVo);
 			}
 
+			isNotice = "isMessage";
 		}
 
 		custNoLast = iCustNo;
 		facmNoLast = iFacmNo;
+
+		return isNotice;
 	}
 
 	/**

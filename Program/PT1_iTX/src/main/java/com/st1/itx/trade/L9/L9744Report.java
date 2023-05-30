@@ -102,21 +102,8 @@ public class L9744Report extends MakeReport {
 					case 17: // 員工代號
 						makeExcel.setValue(row, col, tmpValue);
 						break;
-					case 20: // U欄:區經理 by eric 2022.5.20
-						String manager = "";
-						if (!tLDVo.get("AgLevel0").isEmpty() && "H".equals(tLDVo.get("AgLevel0").substring(0, 1))) {
-							manager = tLDVo.get("ItName");
-						} else if (!tLDVo.get("AgLevel1").isEmpty()
-								&& "H".equals(tLDVo.get("AgLevel1").substring(0, 1))) {
-							manager = tLDVo.get("ManagerName1");
-						} else if (!tLDVo.get("AgLevel2").isEmpty()
-								&& "H".equals(tLDVo.get("AgLevel2").substring(0, 1))) {
-							manager = tLDVo.get("ManagerName2");
-						} else if (!tLDVo.get("AgLevel3").isEmpty()
-								&& "H".equals(tLDVo.get("AgLevel3").substring(0, 1))) {
-							manager = tLDVo.get("ManagerName3");
-						}
-						makeExcel.setValue(row, col, manager);
+					case 20: // U欄:區經理 
+						makeExcel.setValue(row, col, tmpValue);
 						break;
 					case 21: // V欄:換算業績
 					case 22: // W欄:業務報酬
