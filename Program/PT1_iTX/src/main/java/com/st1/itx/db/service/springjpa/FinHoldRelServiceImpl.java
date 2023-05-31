@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -353,6 +356,22 @@ em = null;
       finHoldRelRepos.deleteAll(finHoldRel);
       finHoldRelRepos.flush();
     }
+  }
+
+  @Override
+  public void Usp_L7_FinHoldRel_Upd(String empNo, TitaVo... titaVo) {
+    String dbName = "";
+    
+    if (titaVo.length != 0)
+    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    if (dbName.equals(ContentName.onDay))
+      finHoldRelReposDay.uspL7FinholdrelUpd(empNo);
+    else if (dbName.equals(ContentName.onMon))
+      finHoldRelReposMon.uspL7FinholdrelUpd(empNo);
+    else if (dbName.equals(ContentName.onHist))
+      finHoldRelReposHist.uspL7FinholdrelUpd(empNo);
+   else
+      finHoldRelRepos.uspL7FinholdrelUpd(empNo);
   }
 
 }

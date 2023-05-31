@@ -320,8 +320,9 @@ E(0,#OOTelTypeCode)
 !與借款人關係
 #OORelationCode=X,2,L
 #OORelationItem=X,4,L
+C(5,#OORelationCode,00,,T(H,#OORelationCode,#RelationCodeHelp))
 C(4,#OORelationCode,S,$)
-T(H,#OORelationCode,#RelationCodeHelp)
+! T(H,#OORelationCode,#RelationCodeHelp)
 !聯絡人姓名
 #OOLiaisonName=c,100,L
 

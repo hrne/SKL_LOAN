@@ -118,6 +118,8 @@ public class L4721Batch extends TradeBuffer {
 		String[] tmpKindItem = this.kindItem.split("、");
 
 		for (int txkind = 1; txkind <= 5; txkind++) {
+			CntPaper = 0;
+
 			if (this.iTxKind == 0 || txkind == this.iTxKind) {
 				List<Map<String, String>> custList = new ArrayList<Map<String, String>>();
 				try {
@@ -142,26 +144,45 @@ public class L4721Batch extends TradeBuffer {
 						this.sno = 0;
 
 						try {
-							String isNotice = dealHeadData(titaVo, data);
-							this.info("isNotice = " + isNotice);
-							if ("isEmail".equals(isNotice)) {
 
-								this.sno = l4721Report.exec(titaVo, this.txBuffer,
-										parse.stringToInteger(data.get("CustNo")), tmpKindItem[txkind - 1]);
-								this.info("CustNo =" + data.get("CustNo"));
-								this.info("sno =" + this.sno);
+							int custNoTmp = parse.stringToInteger(data.get("CustNo"));
+							int facmNoTmp = parse.stringToInteger(data.get("FacmNo"));
 
-								cntTrans++;
+							TempVo tempVo = new TempVo();
+							tempVo = custNoticeCom.getCustNotice("L4721", custNoTmp, 0, titaVo);
 
-								if (cntTrans > this.commitCnt) {
-									cntTrans = 0;
-									this.batchTransaction.commit();
+							// 先判斷是否為email，才產表
+							if ("Y".equals(tempVo.getParam("isEmail"))) {
+								this.info("isEmailCust : " + custNoTmp);
+								this.info("isEmailLastCust : " + custNoLast);
+								
+
+								if (custNoTmp != custNoLast) {
+									CntEmail = CntEmail + 1;
+
+									this.sno = l4721Report.exec(titaVo, this.txBuffer, custNoTmp,
+											tmpKindItem[txkind - 1]);
+									this.info("CustNo =" + custNoTmp);
+									this.info("sno =" + this.sno);
+
+									cntTrans++;
+
+									if (cntTrans > this.commitCnt) {
+										cntTrans = 0;
+										this.batchTransaction.commit();
+									}
+
 								}
 
-							}
-
-							if (this.sno > 0) {
-								setMailMFileVO(data, this.noticeEmail, titaVo);
+								
+								if (this.sno > 0) {
+									setMailMFileVO(data, this.noticeEmail, titaVo);
+								}
+								
+								custNoLast = custNoTmp;
+								facmNoLast = facmNoTmp;
+							} else {
+								dealHeadData(titaVo, data);
 							}
 
 						} catch (LogicException e) {
@@ -173,6 +194,8 @@ public class L4721Batch extends TradeBuffer {
 				} // if
 
 			} // if
+
+			this.info("CntPaper = " + CntPaper);
 			if (CntPaper > 0) {
 				l4721Report2.exec(titaVo, this.txBuffer, letterCustList, tmpKindItem[txkind - 1]);
 			}
@@ -220,9 +243,8 @@ public class L4721Batch extends TradeBuffer {
 	/**
 	 * 
 	 */
-	private String dealHeadData(TitaVo titaVo, Map<String, String> iData) throws LogicException {
+	private void dealHeadData(TitaVo titaVo, Map<String, String> iData) throws LogicException {
 
-		String isNotice = "";
 		int ieday = titaVo.getEntDyI() + 19110000;
 		dateUtil.setDate_1(ieday);
 		dateUtil.setMons(-6);
@@ -233,7 +255,7 @@ public class L4721Batch extends TradeBuffer {
 		int iFacmNo = parse.stringToInteger(iData.get("FacmNo"));
 
 		if (iCustNo == custNoLast && iFacmNo == facmNoLast) {
-			return null;
+			return;
 		}
 		Map<String, String> mTmpCustFacm = new HashMap<>();
 		List<Map<String, String>> lTmpCustFacm = new ArrayList<Map<String, String>>();
@@ -294,18 +316,18 @@ public class L4721Batch extends TradeBuffer {
 //			isNotice = "isLetter";
 
 		}
-		if ("Y".equals(tempVo.getParam("isEmail"))) {
-			this.info("isEmailCust : " + iCustNo);
-			this.info("isEmailLastCust : " + custNoLast);
+//		if ("Y".equals(tempVo.getParam("isEmail"))) {
+//			this.info("isEmailCust : " + iCustNo);
+//			this.info("isEmailLastCust : " + custNoLast);
 
-			if (iCustNo != custNoLast) {
-				CntEmail = CntEmail + 1;
+//			if (iCustNo != custNoLast) {
+//				CntEmail = CntEmail + 1;
 				// 處理Mail => 是否Email寄送=>產檔=>寄送
 //				setMailMFileVO(iData, noticeEmail, titaVo);
-			}
+//			}
 
-			isNotice = "isEmail";
-		}
+//			isNotice = "isEmail";
+//		}
 
 		if ("Y".equals(tempVo.getParam("isMessage"))) {
 			this.info("isMessageCust : " + iCustNo);
@@ -322,7 +344,7 @@ public class L4721Batch extends TradeBuffer {
 		custNoLast = iCustNo;
 		facmNoLast = iFacmNo;
 
-		return isNotice;
+//		return isNotice;
 	}
 
 	/**

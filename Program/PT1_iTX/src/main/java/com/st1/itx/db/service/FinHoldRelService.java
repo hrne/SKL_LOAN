@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.FinHoldRel;
@@ -117,5 +119,14 @@ public interface FinHoldRelService {
    * @throws DBException exception
    */
   public void deleteAll(List<FinHoldRel> finHoldRel, TitaVo... titaVo) throws DBException;
+
+  /**
+   * Stored Procedure<br>
+   * 
+   * @param  empNo String
+   * @param titaVo Variable-Length Argument
+   *
+   */
+  public void Usp_L7_FinHoldRel_Upd(String empNo, TitaVo... titaVo);
 
 }

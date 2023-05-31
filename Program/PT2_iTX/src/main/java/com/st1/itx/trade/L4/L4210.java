@@ -159,7 +159,7 @@ public class L4210 extends TradeBuffer {
 		// 第一筆從1開始
 		int wkDetailSeq = 1;
 
-		BatxOthers seqBatxOthers = batxOthersService.detSeqFirst(iAcDate, iBatchNo,titaVo);
+		BatxOthers seqBatxOthers = batxOthersService.detSeqFirst(iAcDate, iBatchNo, titaVo);
 
 		// 第二筆後+1續編
 		if (seqBatxOthers != null) {
@@ -196,7 +196,7 @@ public class L4210 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0005", "L4210 BatxOthers insert " + e.getErrorMsg());
 		}
 		// head
-		updateBatxHead(iRepayAmt, titaVo);
+		updateBatxHead(iAcDate, iBatchNo, iRepayAmt, titaVo);
 		// Detail
 		tBatxDetailId.setAcDate(iAcDate);
 		tBatxDetailId.setBatchNo(iBatchNo);
@@ -235,11 +235,11 @@ public class L4210 extends TradeBuffer {
 		}
 	}
 
-	private void updateBatxHead(BigDecimal txAmt, TitaVo titaVo) throws LogicException {
+	private void updateBatxHead(int acDate, String batchNo, BigDecimal txAmt, TitaVo titaVo) throws LogicException {
 		BatxHead tBatxHead = new BatxHead();
 		BatxHeadId tBatxHeadId = new BatxHeadId();
-		tBatxHeadId.setAcDate(iAcDate);
-		tBatxHeadId.setBatchNo(iBatchNo);
+		tBatxHeadId.setAcDate(acDate);
+		tBatxHeadId.setBatchNo(batchNo);
 		Boolean isInsert = false;
 		tBatxHead = batxHeadService.holdById(tBatxHeadId, titaVo);
 		if (tBatxHead == null) {
@@ -250,11 +250,17 @@ public class L4210 extends TradeBuffer {
 		tBatxHead.setBatxTotAmt(tBatxHead.getBatxTotAmt().add(txAmt));
 		if (txAmt.compareTo(BigDecimal.ZERO) < 0) {
 			tBatxHead.setBatxTotCnt(tBatxHead.getBatxTotCnt() - 1);
+			tBatxHead.setUnfinishCnt(tBatxHead.getUnfinishCnt() - 1);
 		} else {
 			tBatxHead.setBatxTotCnt(tBatxHead.getBatxTotCnt() + 1);
+			tBatxHead.setUnfinishCnt(tBatxHead.getUnfinishCnt() + 1);
 		}
 		if (tBatxHead.getBatxTotCnt() > 0) {
-			tBatxHead.setBatxExeCode("0");
+			if (tBatxHead.getUnfinishCnt() == 0) {
+				tBatxHead.setBatxExeCode("4");
+			} else {
+				tBatxHead.setBatxExeCode("0");
+			}
 		} else {
 			tBatxHead.setBatxExeCode("8");
 		}
@@ -301,8 +307,8 @@ public class L4210 extends TradeBuffer {
 		}
 
 		//
-		updateBatxHead(BigDecimal.ZERO.subtract(tBatxDetail.getRepayAmt()), titaVo);
-		updateBatxHead(iRepayAmt, titaVo);
+		updateBatxHead(iAcDate, iBatchNo, BigDecimal.ZERO.subtract(tBatxDetail.getRepayAmt()), titaVo);
+		updateBatxHead(iAcDate, iBatchNo, iRepayAmt, titaVo);
 		//
 		tBatxDetail.setRepayCode(iRepayCode);
 		tBatxDetail.setCustNo(iCustNo);
@@ -420,6 +426,7 @@ public class L4210 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "L4210 BatxDetail 無此資料");
 		}
 
-		updateBatxHead(BigDecimal.ZERO.subtract(tBatxDetail.getRepayAmt()), titaVo);
+		updateBatxHead(tBatxDetail.getAcDate(), tBatxDetail.getBatchNo(),
+				BigDecimal.ZERO.subtract(tBatxDetail.getRepayAmt()), titaVo);
 	}
 }

@@ -190,7 +190,7 @@ public class L9136Report extends MakeReport {
 								continue;
 							}
 
-							//完全空白或null
+							// 完全空白或null
 							if (item.trim().isEmpty() || item.trim().equals("null")) {
 								continue;
 							}
@@ -355,7 +355,7 @@ public class L9136Report extends MakeReport {
 		// 主管卡使用日
 		this.print(1, 1, showRocDate(r.get("AcDate"), 1) + "-");
 		// 交易序號(8碼)
-		this.print(0, 21, fillUpWord(txNo, 7, "0", "L"), "R");
+		this.print(0, 21, txNo, "R");
 
 		// 戶號-額度-撥款
 		if (!"0".equals(r.get("CustNo"))) {
@@ -393,7 +393,7 @@ public class L9136Report extends MakeReport {
 			if (r.get("ApproveNo").trim().length() != 0) {
 
 				// 核准號碼
-				this.print(0, 56, r.get("ApproveNo") == null ? " " : r.get("ApproveNo"));
+				this.print(0, 56, r.get("ApproveNo") == null ? " " : fillUpWord(r.get("ApproveNo"), 7, "0", "L"));
 				// 押品別
 				this.print(0, 66, r.get("ClCode1") == null ? " "
 						: r.get("ClCode1") + "  " + r.get("ClCode2") + "  " + r.get("ClName"));
@@ -408,7 +408,7 @@ public class L9136Report extends MakeReport {
 
 		} else {
 			// 核准號碼
-			this.print(0, 56, r.get("ApproveNo"));
+			this.print(0, 56, fillUpWord(r.get("ApproveNo"), 7, "0", "L"));
 			// 押品別
 			this.print(0, 66, r.get("ClCode1") + "  " + r.get("ClCode2") + "  " + r.get("ClName"));
 			// 押品號碼
@@ -418,6 +418,8 @@ public class L9136Report extends MakeReport {
 		// 變更項目/交易別
 		if (dataSource == 1) {
 			tmpUpdateItem = tmpUpdateItem.trim();
+			tmpUpdateItem = r.get("TranNo") + " " + tmpUpdateItem;
+
 			this.print(0, 97, tmpUpdateItem.length() == 0 ? " " : fillUpWord(tmpUpdateItem, 20, ".", "R"));
 
 		} else {

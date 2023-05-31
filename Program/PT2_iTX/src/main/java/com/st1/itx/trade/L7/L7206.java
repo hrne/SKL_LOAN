@@ -114,6 +114,12 @@ public class L7206 extends TradeBuffer {
 		this.info("file fileName=" + tmpName);
 		this.info("file fileExt=" + fileExt);
 
+		// 月底營業日
+		// 20220101
+		// 10 17
+		int acDate = parse.stringToInteger(tmpName.substring(tmpName.length() - 8, tmpName.length()));
+		
+		this.info("acDate=" + acDate);
 		// 判斷選擇上傳的項目與實際上傳的檔案名稱要相符(避免上傳錯檔案，欄位不符會報錯)
 		if ("T07_2".equals(tmpName.substring(0, 5))
 				&& tmpName.contains("T07_2_") && "T07_2".equals(iFunctionName
@@ -211,10 +217,9 @@ public class L7206 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
 
-			
 			titaVo.setDataBaseOnMon();// 指定月報環境
 			this.info("onMon");
-			
+
 			try {
 
 				if (delStakeholdersStaff != null) {
@@ -263,6 +268,7 @@ public class L7206 extends TradeBuffer {
 				sLifeRelHeadId.setBusId(iBusId);
 
 				LifeRelHead sLifeRelHead = new LifeRelHead();
+				sLifeRelHead.setAcDate(acDate);
 				sLifeRelHead.setLifeRelHeadId(sLifeRelHeadId);
 				sLifeRelHead.setRelWithCompany(iRelWithCompany);
 				sLifeRelHead.setHeadName(maskData(iHeadName));
@@ -299,7 +305,7 @@ public class L7206 extends TradeBuffer {
 
 			titaVo.setDataBaseOnMon();// 指定月報環境
 			this.info("onMon");
-			
+
 			try {
 
 				if (delLifeRelHead != null) {
@@ -312,7 +318,7 @@ public class L7206 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
-			
+
 			// 2:人壽負利關人職員名單[T07_2];xlsx xls
 		} else if (iFunctionCode == 2) {
 
@@ -332,6 +338,7 @@ public class L7206 extends TradeBuffer {
 				BigDecimal iLoanBalance = new BigDecimal(tempOccursList.get("LoanBalance"));
 
 				LifeRelEmp sLifeRelEmp = new LifeRelEmp();
+				sLifeRelEmp.setAcDate(acDate);
 				sLifeRelEmp.setEmpId(iEmpId);
 				sLifeRelEmp.setEmpName(maskData(iEmpName));
 				sLifeRelEmp.setLoanBalance(iLoanBalance);
@@ -355,10 +362,10 @@ public class L7206 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
-			
+
 			titaVo.setDataBaseOnMon();// 指定月報環境
 			this.info("onMon");
-			
+
 			try {
 
 				if (delLifeRelEmp != null) {
@@ -394,6 +401,7 @@ public class L7206 extends TradeBuffer {
 				BigDecimal iLoanBalance = new BigDecimal(tempOccursList.get("LoanBalance"));
 
 				FinHoldRel sFinHoldRel = new FinHoldRel();
+				sFinHoldRel.setAcDate(acDate);
 				sFinHoldRel.setCompanyName(maskData(iCompanyName));
 				sFinHoldRel.setId(iId);
 				sFinHoldRel.setName(maskData(iName));
@@ -421,9 +429,7 @@ public class L7206 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
-			
-			
-			
+
 			titaVo.setDataBaseOnMon();// 指定月報環境
 			this.info("onMon");
 
@@ -439,7 +445,7 @@ public class L7206 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
-			
+
 		}
 
 		titaVo.setDataBaseOnOrg();// 還原原本的環境

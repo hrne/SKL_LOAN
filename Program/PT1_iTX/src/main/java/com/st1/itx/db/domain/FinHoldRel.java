@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -10,6 +11,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.Id;
 import javax.persistence.Column;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * FinHoldRel 金控利關人名單檔 T044
@@ -25,15 +28,14 @@ import javax.persistence.Column;
 public class FinHoldRel implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -7026933704041501368L;
-
-// 身分證/統一編號
+  // 身分證/統一編號
   @Id
   @Column(name = "`Id`", length = 10)
   private String id = " ";
+
+  // 會計日期
+  @Column(name = "`AcDate`")
+  private int acDate = 0;
 
   // 所在公司
   @Column(name = "`CompanyName`", length = 100)
@@ -92,6 +94,25 @@ public class FinHoldRel implements Serializable {
 	*/
   public void setId(String id) {
     this.id = id;
+  }
+
+/**
+	* 會計日期<br>
+	* 
+	* @return Integer
+	*/
+  public int getAcDate() {
+    return StaticTool.bcToRoc(this.acDate);
+  }
+
+/**
+	* 會計日期<br>
+	* 
+  *
+  * @param acDate 會計日期
+  * @throws LogicException when Date Is Warn	*/
+  public void setAcDate(int acDate) throws LogicException {
+    this.acDate = StaticTool.rocToBc(acDate);
   }
 
 /**
@@ -288,7 +309,7 @@ J：其他
 
   @Override
   public String toString() {
-    return "FinHoldRel [id=" + id + ", companyName=" + companyName + ", name=" + name + ", busTitle=" + busTitle + ", lineAmt=" + lineAmt + ", loanBalance=" + loanBalance
-           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "FinHoldRel [id=" + id + ", acDate=" + acDate + ", companyName=" + companyName + ", name=" + name + ", busTitle=" + busTitle + ", lineAmt=" + lineAmt
+           + ", loanBalance=" + loanBalance + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

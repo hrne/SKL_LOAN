@@ -111,6 +111,9 @@ public class L6101 extends TradeBuffer {
 
 	@Autowired
 	L6101ServiceImpl l6101ServiceImpl;
+	
+//	@Autowired
+//	private WebClient webClient;
 
 	@Autowired
 	DateUtil dDateUtil;
@@ -196,6 +199,11 @@ public class L6101 extends TradeBuffer {
 
 		// 1:業務關帳作業
 		acClose(titaVo);
+		
+//		if (iClsFg == 1)
+//			webClient.sendTicker("0000", "00001", "209912312300", "系統已關帳", false, titaVo);
+//		else
+//			webClient.sendTicker("0000", "00001", "209912312300", "系統已關帳", true, titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -390,7 +398,8 @@ public class L6101 extends TradeBuffer {
 			for (BatxHead tBatxHead : lBatxHead) {
 
 				// 4.入帳完成 8.已刪除
-				if (tBatxHead.getBatxExeCode().equals("4") || tBatxHead.getBatxExeCode().equals("8")) {
+				if (tBatxHead.getBatxExeCode().equals("4") || tBatxHead.getBatxExeCode().equals("8")
+						|| tBatxHead.getUnfinishCnt() == 0) {
 					continue;
 				}
 				errocount = 1;

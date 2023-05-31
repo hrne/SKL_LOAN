@@ -490,10 +490,6 @@ public class DailyCopyProcess extends TradeBuffer {
 			sJobMainService.Usp_Cp_Guarantor_Ins(tlrNo, titaVo);
 			this.batchTransaction.commit();
 
-			this.info("DailyCopyProcess Usp_Cp_GuildBuilders_Ins ...");
-			sJobMainService.Usp_Cp_GuildBuilders_Ins(tlrNo, titaVo);
-			this.batchTransaction.commit();
-
 			this.info("DailyCopyProcess Usp_Cp_HlAreaData_Ins ...");
 			sJobMainService.Usp_Cp_HlAreaData_Ins(tlrNo, titaVo);
 

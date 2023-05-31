@@ -125,7 +125,11 @@ public class L1905 extends TradeBuffer {
 				occursList.putParam("OOTelExt", tCustTelNo.getTelExt());
 //				occursList.putParam("OOMobile", tCustTelNo.getMobile()); 因改電話格式廢除
 				occursList.putParam("OORelationCode", tCustTelNo.getRelationCode());
-				occursList.putParam("OOLiaisonName", liaisonName);
+				if(tCustTelNo.getRelationCode().equals("00")) {
+					occursList.putParam("OOLiaisonName", "");
+				}else {					
+					occursList.putParam("OOLiaisonName", liaisonName);
+				}
 				if (iCdEmp == null) {
 					occursList.putParam("OOLastUpdateEmpNoName", "");
 				} else {

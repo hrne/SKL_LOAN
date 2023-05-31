@@ -296,7 +296,7 @@ T(H,@OORepayType,#RepayTypeHelp)
 #OOLastEmp=x,20,S
 
 #OOBufA=X,21,S
-T(2,2+#OOLogNo)
+T(2,2+#OOLogNo+#OORepayType)
 
 #OOBtnA=A,2,O
 !C(5,#OOAdjRange,0,BIND(grid,{ cmd=CHAIN; ntxcd=L5501; text=修改; ntxbuf=#OOBufA}),
@@ -304,8 +304,8 @@ T(2,2+#OOLogNo)
 BIND(grid,{ cmd=CHAIN; ntxcd=L5501; text=修改; ntxbuf=#OOBufA})
 C(3,#OOCanModify,1,$,BIND(grid,cancel))
 
-#OOBufB=X,9,S
-T(2,2+#OOLogNo)
+#OOBufB=X,10,S
+T(2,2+#OOLogNo+#OORepayType)
 
 #OOBtnB=A,2,O
 BIND(grid,{ cmd=CHAIN; ntxcd=L5505; ntxbuf=#OOBufB})

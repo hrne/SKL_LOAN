@@ -17,7 +17,7 @@ public class SmsVo extends LinkedHashMap<String, String> {
 	/**
 	 * M 來源系統ID,預設值 Loan
 	 */
-	private String srcSystemID = "BPM"; // 待申請通過後改為LOAN
+	private String srcSystemID = "LOAN"; // 待申請通過後改為LOAN
 
 	/**
 	 * M 交易名稱

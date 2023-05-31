@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -10,6 +11,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Column;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * LifeRelHead 人壽利關人負責人檔T07、TA07
@@ -25,13 +28,12 @@ import javax.persistence.Column;
 public class LifeRelHead implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -240005218157062533L;
-
-@EmbeddedId
+  @EmbeddedId
   private LifeRelHeadId lifeRelHeadId;
+
+  // 會計日期
+  @Column(name = "`AcDate`")
+  private int acDate = 0;
 
   // 與本公司關之關係
   /* 代碼說明：A：保險業負責人(依據保險業負責人應居被資格條件準則)B：辦理授信之值元C：主要股東(係指具有本公司已發行股份總數10%以上或前十大持股比率或有指派董監事之股東)D：本公司對其有控制與從屬關係之公司(請依公司法第369-1~369-3條、第369-9條、及第369-11條及關係企業合併營業報告書關係企業合併財務報表及關係報告書編製準則第六條之規定)E：本公司放款金額超過一億元以上之對象F：同一關係企業G：內勤職員Z：其他 */
@@ -65,7 +67,7 @@ public class LifeRelHead implements Serializable {
   private String relKinShip;
 
   // 關係人親屬稱謂
-  @Column(name = "`RelTitle`", length = 10)
+  @Column(name = "`RelTitle`", length = 15)
   private String relTitle;
 
   // 事業負責人身分證/統一編號
@@ -81,11 +83,11 @@ public class LifeRelHead implements Serializable {
   private int shareHoldingRatio = 0;
 
   // 事業擔任職務
-  /* 暫不以代號列入：A：董事長B：副董事長C：董事D：監事E：總經理F：副總經理G：協理H：經理I：副理J：其他 */
   @Column(name = "`BusTitle`", length = 50)
   private String busTitle;
 
   // 核貸金額
+  /* 暫不以代號列入：A：董事長B：副董事長C：董事D：監事E：總經理F：副總經理G：協理H：經理I：副理J：其他 */
   @Column(name = "`LineAmt`")
   private BigDecimal lineAmt = new BigDecimal("0");
 
@@ -118,6 +120,25 @@ public class LifeRelHead implements Serializable {
 
   public void setLifeRelHeadId(LifeRelHeadId lifeRelHeadId) {
     this.lifeRelHeadId = lifeRelHeadId;
+  }
+
+/**
+	* 會計日期<br>
+	* 
+	* @return Integer
+	*/
+  public int getAcDate() {
+    return StaticTool.bcToRoc(this.acDate);
+  }
+
+/**
+	* 會計日期<br>
+	* 
+  *
+  * @param acDate 會計日期
+  * @throws LogicException when Date Is Warn	*/
+  public void setAcDate(int acDate) throws LogicException {
+    this.acDate = StaticTool.rocToBc(acDate);
   }
 
 /**
@@ -371,17 +392,7 @@ NULL：本人
 
 /**
 	* 事業擔任職務<br>
-	* 暫不以代號列入：
-A：董事長
-B：副董事長
-C：董事
-D：監事
-E：總經理
-F：副總經理
-G：協理
-H：經理
-I：副理
-J：其他
+	* 
 	* @return String
 	*/
   public String getBusTitle() {
@@ -390,17 +401,7 @@ J：其他
 
 /**
 	* 事業擔任職務<br>
-	* 暫不以代號列入：
-A：董事長
-B：副董事長
-C：董事
-D：監事
-E：總經理
-F：副總經理
-G：協理
-H：經理
-I：副理
-J：其他
+	* 
   *
   * @param busTitle 事業擔任職務
 	*/
@@ -410,7 +411,17 @@ J：其他
 
 /**
 	* 核貸金額<br>
-	* 
+	* 暫不以代號列入：
+A：董事長
+B：副董事長
+C：董事
+D：監事
+E：總經理
+F：副總經理
+G：協理
+H：經理
+I：副理
+J：其他
 	* @return BigDecimal
 	*/
   public BigDecimal getLineAmt() {
@@ -419,7 +430,17 @@ J：其他
 
 /**
 	* 核貸金額<br>
-	* 
+	* 暫不以代號列入：
+A：董事長
+B：副董事長
+C：董事
+D：監事
+E：總經理
+F：副總經理
+G：協理
+H：經理
+I：副理
+J：其他
   *
   * @param lineAmt 核貸金額
 	*/
@@ -525,9 +546,9 @@ J：其他
 
   @Override
   public String toString() {
-    return "LifeRelHead [lifeRelHeadId=" + lifeRelHeadId + ", relWithCompany=" + relWithCompany + ", headName=" + headName + ", headTitle=" + headTitle + ", relName=" + relName
-           + ", relKinShip=" + relKinShip + ", relTitle=" + relTitle + ", busName=" + busName + ", shareHoldingRatio=" + shareHoldingRatio + ", busTitle=" + busTitle
-           + ", lineAmt=" + lineAmt + ", loanBalance=" + loanBalance + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
-           + "]";
+    return "LifeRelHead [lifeRelHeadId=" + lifeRelHeadId + ", acDate=" + acDate + ", relWithCompany=" + relWithCompany + ", headName=" + headName + ", headTitle=" + headTitle
+           + ", relName=" + relName + ", relKinShip=" + relKinShip + ", relTitle=" + relTitle + ", busName=" + busName + ", shareHoldingRatio=" + shareHoldingRatio
+           + ", busTitle=" + busTitle + ", lineAmt=" + lineAmt + ", loanBalance=" + loanBalance + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

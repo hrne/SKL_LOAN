@@ -179,7 +179,7 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "       				 ,\"BormNo\"     "; 
 			sql += "       				 ,SUM(\"Interest\") AS \"Interest\" "; 
 			sql += " 			   FROM \"AcLoanInt\" ";
-			sql += " 			   WHERE \"YearMonth\"    = :inputYearMonth ";
+			sql += " 			   WHERE \"YearMonth\"    = :yymm ";
 			sql += "			   GROUP BY \"CustNo\" ";
 			sql += "         			   ,\"FacmNo\" ";
 			sql += "         		 	   ,\"BormNo\" ) acInt ";
@@ -254,7 +254,7 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "       				 ,\"BormNo\"     "; 
 			sql += "       				 ,SUM(\"Interest\") AS \"Interest\" "; 
 			sql += " 			   FROM \"AcLoanInt\" ";
-			sql += " 			   WHERE \"YearMonth\"    = :inputYearMonth ";
+			sql += " 			   WHERE \"YearMonth\"    = :yymm ";
 			sql += "			   GROUP BY \"CustNo\" ";
 			sql += "         			   ,\"FacmNo\" ";
 			sql += "         		 	   ,\"BormNo\" ) acInt ";

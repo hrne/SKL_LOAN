@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -10,6 +11,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.Id;
 import javax.persistence.Column;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * LifeRelEmp 人壽利關人職員檔 T07_2
@@ -25,15 +28,14 @@ import javax.persistence.Column;
 public class LifeRelEmp implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -1824311485350561629L;
-
-// 職員身分證/統一編號
+  // 職員身分證/統一編號
   @Id
   @Column(name = "`EmpId`", length = 10)
   private String empId = " ";
+
+  // 會計日期
+  @Column(name = "`AcDate`")
+  private int acDate = 0;
 
   // 職員名稱
   @Column(name = "`EmpName`", length = 100)
@@ -79,6 +81,25 @@ public class LifeRelEmp implements Serializable {
 	*/
   public void setEmpId(String empId) {
     this.empId = empId;
+  }
+
+/**
+	* 會計日期<br>
+	* 
+	* @return Integer
+	*/
+  public int getAcDate() {
+    return StaticTool.bcToRoc(this.acDate);
+  }
+
+/**
+	* 會計日期<br>
+	* 
+  *
+  * @param acDate 會計日期
+  * @throws LogicException when Date Is Warn	*/
+  public void setAcDate(int acDate) throws LogicException {
+    this.acDate = StaticTool.rocToBc(acDate);
   }
 
 /**
@@ -198,7 +219,7 @@ public class LifeRelEmp implements Serializable {
 
   @Override
   public String toString() {
-    return "LifeRelEmp [empId=" + empId + ", empName=" + empName + ", loanBalance=" + loanBalance + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "LifeRelEmp [empId=" + empId + ", acDate=" + acDate + ", empName=" + empName + ", loanBalance=" + loanBalance + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
+           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }
