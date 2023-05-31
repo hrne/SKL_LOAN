@@ -356,6 +356,7 @@ public class L4101Batch extends TradeBuffer {
 		Path fullPath = Paths.get(outFolder, fileName);
 
 		ftpClient.sendFile(systemParas.getLoanMediaFtpUrl(), auth[0], auth[1], fullPath.toString(), "outbound");
+
 	}
 
 	private String getBatchNo(int iItemCode, TitaVo titaVo) throws LogicException {

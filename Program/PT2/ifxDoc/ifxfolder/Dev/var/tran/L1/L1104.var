@@ -48,6 +48,7 @@ E(0,40)ASGN(INQPRT$)
 #ORGFG=_,_,S
 E(0,0)
 
+
 </sub>
 
 
@@ -88,7 +89,10 @@ E(0,0)
 ["#FdStation+站別",#StationBef,#StationBefX],[#StationInd,#StationAft,#StationAftX],
 ["#FdIncomeOfYearly+年收入",#IncomeofyearlyBef,"仟元"],[#IncomeofyearlyInd,#IncomeofyearlyAft,"仟元"],
 ["#FdIncomeDataDate+年收入資料年月",#IncomeDataDateBef],[#IncomeDataDateInd,#IncomeDataDateAft],
+["#FdReasonFg+原因註記",#Reason,#ReasonX]
 ]
+
+
 !["@是否為授信限制對象",#IsLimitX],[#IsLimitXInd,#IsLimitXAft],
 !["@是否為利害關係人",#IsRelatedX],[#IsRelatedXInd,#IsRelatedXAft],
 !["@是否為準利害關係人",#IsLnrelNearX],[#IsLnrelNearXInd,#IsLnrelNearXAft],
@@ -145,6 +149,10 @@ T(1,@CustId,#NTXBUF,2,8)
 #TypeCodeHelp=x,100,S
 T(3,0:借戶;1:保證人;2:擔保品提供人;3:交易關係人;4:借戶關係人／關係企業)
 
+
+#ReasonHelp=X,500,S
+T(3,1:客戶申請;2:資料修正;)
+
 !Fd
 
 #FdCustId=X,2,L
@@ -152,6 +160,11 @@ T(3,0:借戶;1:保證人;2:擔保品提供人;3:交易關係人;4:借戶關係�
 T(3, )
 #FdTypeCode=X,2,L
 T(3,*)
+
+
+
+#FdReasonFg=X,2,L
+T(3, )
 
 !CustTypeCode 客戶別
 #CDDEF01=x,20,S
@@ -1342,6 +1355,14 @@ A(YM,0,#IncomeDataDateAft)
 IF(#IncomeDataDateAft==#IncomeDataDateBef,T(3,),T(3,X))
 IF(#IncomeDataDateAft>#YearMonthOfToday,V(P,年收入資料年月不可大於日曆日年月),$)
 
+#Reason=X,1,I
+HELP(1:客戶申請;2:資料修正)
+@
+IF(#FdReasonFg=="",V(7),$)
+IF(#Reason!=1,IF(#Reason!=2,V(P,請輸入1或2),$),$)
+#ReasonX=X,100,L
+T(H,#Reason,#ReasonHelp)
+
 
 !串IND IF空白跳ERROR
 
@@ -1502,6 +1523,7 @@ T(3,[L1104] 顧客基本資料變更-法人)
 #BusinessOfficerAft
 #StationInd
 #StationAft
+#Reason
 #END
 </sub>
 

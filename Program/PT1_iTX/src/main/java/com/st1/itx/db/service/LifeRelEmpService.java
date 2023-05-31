@@ -37,6 +37,17 @@ public interface LifeRelEmpService {
   public Slice<LifeRelEmp> findAll(int index, int limit, TitaVo... titaVo);
 
   /**
+   * AcDate = 
+   *
+   * @param acDate_0 acDate_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice LifeRelEmp LifeRelEmp of List
+   */
+  public Slice<LifeRelEmp> findAcDate(int acDate_0, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By LifeRelEmp
    * 
    * @param empId key

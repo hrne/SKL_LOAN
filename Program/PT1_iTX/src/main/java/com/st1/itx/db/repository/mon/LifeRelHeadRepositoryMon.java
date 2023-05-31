@@ -25,6 +25,9 @@ import com.st1.itx.db.domain.LifeRelHeadId;
  */
 public interface LifeRelHeadRepositoryMon extends JpaRepository<LifeRelHead, LifeRelHeadId> {
 
+  // AcDate = 
+  public Slice<LifeRelHead> findAllByAcDateIs(int acDate_0, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

@@ -142,20 +142,17 @@ public class L4721Batch extends TradeBuffer {
 
 						// 序號初始化
 						this.sno = 0;
+						int custNoTmp = parse.stringToInteger(data.get("CustNo"));
 
 						try {
-
-							int custNoTmp = parse.stringToInteger(data.get("CustNo"));
-							int facmNoTmp = parse.stringToInteger(data.get("FacmNo"));
 
 							TempVo tempVo = new TempVo();
 							tempVo = custNoticeCom.getCustNotice("L4721", custNoTmp, 0, titaVo);
 
-							// 先判斷是否為email，才產表
+							// 先判斷是否為email，才產表，最後才設定寄信
 							if ("Y".equals(tempVo.getParam("isEmail"))) {
 								this.info("isEmailCust : " + custNoTmp);
 								this.info("isEmailLastCust : " + custNoLast);
-								
 
 								if (custNoTmp != custNoLast) {
 									CntEmail = CntEmail + 1;
@@ -174,21 +171,29 @@ public class L4721Batch extends TradeBuffer {
 
 								}
 
-								
 								if (this.sno > 0) {
 									setMailMFileVO(data, this.noticeEmail, titaVo);
 								}
-								
-								custNoLast = custNoTmp;
-								facmNoLast = facmNoTmp;
-							} else {
-								dealHeadData(titaVo, data);
+
+								// 書面通知
+							} else if ("Y".equals(tempVo.getParam("isLetter"))) {
+								if (custNoTmp != custNoLast) {
+									CntPaper = CntPaper + 1;
+									letterCustList.add(data);
+								}
+
+								// 簡訊通知
+							} else if ("Y".equals(tempVo.getParam("isMessage"))) {
+								dealMessageData(titaVo, data);
 							}
 
 						} catch (LogicException e) {
 							sendMsg = e.getErrorMsg();
 							flag = false;
 						}
+
+						custNoLast = custNoTmp;
+				
 
 					} // for
 				} // if
@@ -241,9 +246,9 @@ public class L4721Batch extends TradeBuffer {
 	}
 
 	/**
-	 * 
+	 * 簡訊通知 資料處理
 	 */
-	private void dealHeadData(TitaVo titaVo, Map<String, String> iData) throws LogicException {
+	private void dealMessageData(TitaVo titaVo, Map<String, String> iData) throws LogicException {
 
 		int ieday = titaVo.getEntDyI() + 19110000;
 		dateUtil.setDate_1(ieday);
@@ -296,49 +301,15 @@ public class L4721Batch extends TradeBuffer {
 		TempVo tempVo = new TempVo();
 		tempVo = custNoticeCom.getCustNotice("L4721", iCustNo, 0, titaVo);
 
-		int noticeFlag = parse.stringToInteger(tempVo.getParam("NoticeFlag"));
 		String noticePhoneNo = tempVo.getParam("MessagePhoneNo");
 		this.noticeEmail = tempVo.getParam("EmailAddress");
-		String noticeAddress = tempVo.getParam("LetterAddress");
 
-		this.info("noticeFlag : " + noticeFlag);
-		this.info("noticePhoneNo : " + noticePhoneNo);
-		this.info("noticeEmail : " + this.noticeEmail);
-		this.info("noticeAddress : " + noticeAddress);
-
-		if ("Y".equals(tempVo.getParam("isLetter"))) {
-			this.info("isLetterCust : " + iCustNo);
-			this.info("isLetterLastCust : " + custNoLast);
-			if (iCustNo != custNoLast) {
-				CntPaper = CntPaper + 1;
-				letterCustList.add(iData);
-			}
-//			isNotice = "isLetter";
-
-		}
-//		if ("Y".equals(tempVo.getParam("isEmail"))) {
-//			this.info("isEmailCust : " + iCustNo);
-//			this.info("isEmailLastCust : " + custNoLast);
-
-//			if (iCustNo != custNoLast) {
-//				CntEmail = CntEmail + 1;
-				// 處理Mail => 是否Email寄送=>產檔=>寄送
-//				setMailMFileVO(iData, noticeEmail, titaVo);
-//			}
-
-//			isNotice = "isEmail";
-//		}
-
-		if ("Y".equals(tempVo.getParam("isMessage"))) {
-			this.info("isMessageCust : " + iCustNo);
-			this.info("isMessageLastCust : " + custNoLast);
-			this.info("lTmpCustFacm : " + lTmpCustFacm.toString());
-			for (Map<String, String> t : lTmpCustFacm) {
-				CntMsg = CntMsg + 1;
-				setTextFileVO(t, noticePhoneNo, titaVo);
-			}
-
-//			isNotice = "";
+		this.info("isMessageCust : " + iCustNo);
+		this.info("isMessageLastCust : " + custNoLast);
+		this.info("lTmpCustFacm : " + lTmpCustFacm.toString());
+		for (Map<String, String> t : lTmpCustFacm) {
+			CntMsg = CntMsg + 1;
+			setTextFileVO(t, noticePhoneNo, titaVo);
 		}
 
 		custNoLast = iCustNo;
@@ -372,6 +343,7 @@ public class L4721Batch extends TradeBuffer {
 
 	}
 
+	// EMAIL通知設定
 	private void setMailMFileVO(Map<String, String> tmpCustFacm, String noticeEmail, TitaVo titaVo)
 			throws LogicException {
 

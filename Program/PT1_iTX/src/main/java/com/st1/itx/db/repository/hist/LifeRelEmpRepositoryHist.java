@@ -24,6 +24,9 @@ import com.st1.itx.db.domain.LifeRelEmp;
  */
 public interface LifeRelEmpRepositoryHist extends JpaRepository<LifeRelEmp, String> {
 
+  // AcDate = 
+  public Slice<LifeRelEmp> findAllByAcDateIs(int acDate_0, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

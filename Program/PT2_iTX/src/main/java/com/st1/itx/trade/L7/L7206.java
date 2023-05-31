@@ -118,7 +118,7 @@ public class L7206 extends TradeBuffer {
 		// 20220101
 		// 10 17
 		int acDate = parse.stringToInteger(tmpName.substring(tmpName.length() - 8, tmpName.length()));
-		
+
 		this.info("acDate=" + acDate);
 		// 判斷選擇上傳的項目與實際上傳的檔案名稱要相符(避免上傳錯檔案，欄位不符會報錯)
 		if ("T07_2".equals(tmpName.substring(0, 5))
@@ -240,11 +240,11 @@ public class L7206 extends TradeBuffer {
 
 			List<LifeRelHead> delLifeRelHead = new ArrayList<LifeRelHead>();
 
-			Slice<LifeRelHead> tLifeRelHead = tLifeRelHeadService.findAll(0, Integer.MAX_VALUE, titaVo);
+			Slice<LifeRelHead> tLifeRelHead = tLifeRelHeadService.findAcDate(acDate, 0, Integer.MAX_VALUE, titaVo);
 
 			delLifeRelHead = tLifeRelHead == null ? null : tLifeRelHead.getContent();
 			this.info("delLifeRelHead = " + delLifeRelHead);
-
+			int cntTrans = 0;
 			for (OccursList tempOccursList : occursList) {
 
 				String iRelWithCompany = tempOccursList.get("RelWithCompany").toString();
@@ -285,7 +285,12 @@ public class L7206 extends TradeBuffer {
 				inLifeRelHead.add(sLifeRelHead);
 
 				CountS++; // 成功筆數+1
+				cntTrans++;
 
+				if (cntTrans > 500) {
+					cntTrans = 0;
+					this.batchTransaction.commit();
+				}
 			} // for
 
 			this.info("inLifeRelHead =" + inLifeRelHead.toString());
@@ -319,14 +324,14 @@ public class L7206 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
 
-			// 2:人壽負利關人職員名單[T07_2];xlsx xls
+			// 2:人壽利關人職員名單[T07_2];xlsx xls
 		} else if (iFunctionCode == 2) {
 
 			List<LifeRelEmp> inLifeRelEmp = new ArrayList<LifeRelEmp>();
 
 			List<LifeRelEmp> delLifeRelEmp = new ArrayList<LifeRelEmp>();
 
-			Slice<LifeRelEmp> tLifeRelEmp = tLifeRelEmpService.findAll(0, Integer.MAX_VALUE, titaVo);
+			Slice<LifeRelEmp> tLifeRelEmp = tLifeRelEmpService.findAcDate(acDate, 0, Integer.MAX_VALUE, titaVo);
 
 			delLifeRelEmp = tLifeRelEmp == null ? null : tLifeRelEmp.getContent();
 			this.info("delLifeRelEmp = " + delLifeRelEmp);
@@ -386,7 +391,7 @@ public class L7206 extends TradeBuffer {
 
 			List<FinHoldRel> delFinHoldRel = new ArrayList<FinHoldRel>();
 
-			Slice<FinHoldRel> tFinHoldRel = tFinHoldRelService.findAll(0, Integer.MAX_VALUE, titaVo);
+			Slice<FinHoldRel> tFinHoldRel = tFinHoldRelService.findAcDate(acDate, 0, Integer.MAX_VALUE, titaVo);
 
 			delFinHoldRel = tFinHoldRel == null ? null : tFinHoldRel.getContent();
 			this.info("delFinHoldRel = " + delFinHoldRel);

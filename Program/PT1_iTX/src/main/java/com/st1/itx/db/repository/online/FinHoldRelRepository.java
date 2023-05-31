@@ -24,6 +24,9 @@ import com.st1.itx.db.domain.FinHoldRel;
  */
 public interface FinHoldRelRepository extends JpaRepository<FinHoldRel, String> {
 
+  // AcDate = 
+  public Slice<FinHoldRel> findAllByAcDateIs(int acDate_0, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

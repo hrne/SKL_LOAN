@@ -205,7 +205,7 @@ public class BS020 extends TradeBuffer {
 			if (listBaTxVo != null && listBaTxVo.size() != 0) {
 				for (BaTxVo ba : listBaTxVo) {
 					// 累溢收 > 費用
-					if (ba.getDataKind() == 1 && ba.getRepayType() >= 4
+					if (ba.getDataKind() == 1 && ba.getRepayType() >= 4  && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0
 							&& baTxCom.getExcessive().compareTo(ba.getUnPaidAmt()) >= 0) {
 						isRecvPay = true;
 					}

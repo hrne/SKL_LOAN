@@ -102,6 +102,7 @@ E(0,0)
 ["#FdIntroducer+介紹人",#IntroducerBef,#IntroducerBefX],[#IntroducerInd,#IntroducerAft,#BtnCdEmp2,#IntroducerAftX],
 ["#FdBusinessOfficer+房貸專員",#BusinessOfficerBef,#BusinessOfficerBefX],[#BusinessOfficerInd,#BusinessOfficerAft,#BtnCdEmp3,#BusinessOfficerAftX],
 ["#FdStation+站別",#StationBef,#StationBefX],[#StationInd,#StationAft,#StationAftX],
+["#FdReasonFg+原因註記",#Reason,#ReasonX]
 ]
 !["#FdIsLimit+是否為授信限制對象",#IsLimitX],[#IsLimitXInd,#IsLimitXAft],
 !["#FdIsRelated+是否為利害關係人",#IsRelatedX],[#IsRelatedXInd,#IsRelatedXAft],
@@ -151,10 +152,16 @@ HIDE(#BtnCdEmp)
 #FdTypeCode=X,2,L
 T(3,*)
 
+#FdReasonFg=X,2,L
+T(3, )
+
 ! Help
 
 #TypeCodeHelp=x,100,S
 T(3,0:借戶;1:保證人;2:擔保品提供人;3:交易關係人;4:借戶關係人／關係企業)
+
+#ReasonHelp=X,500,S
+T(3,1:客戶申請;2:資料修正;)
 
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 !Sex 性別
@@ -1672,6 +1679,13 @@ T(H,#StationAft,#StationHelp)
 #StationInd=X,1,L
 C(5,#StationAft,#StationBef,T(3,),T(3,X))
 
+#Reason=X,1,I
+HELP(1:客戶申請;2:資料修正)
+@
+IF(#FdReasonFg=="",V(7),$)
+IF(#Reason!=1,IF(#Reason!=2,V(P,請輸入1或2),$),$)
+#ReasonX=X,100,L
+T(H,#Reason,#ReasonHelp)
 
 
 </sub>
@@ -1872,6 +1886,7 @@ T(3,[L1103] 顧客基本資料變更-自然人)
 #BusinessOfficerAft
 #StationInd
 #StationAft
+#Reason
 #END
 
 </sub>

@@ -32,6 +32,7 @@ import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.AcMainCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
+import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L6880")
@@ -66,6 +67,8 @@ public class L6880 extends TradeBuffer {
 
 	@Autowired
 	private AcCloseService sAcCloseService;
+	@Autowired
+	private WebClient webClient;
 
 	@Autowired
 	private AcMainCom acMainCom;
@@ -113,12 +116,10 @@ public class L6880 extends TradeBuffer {
 				proc(titaVo, "BATCH", iEntday);
 				// 往前跳開批次日期需過總帳(測試時)，連線日期 -> 批次日期
 				if (parse.stringToInteger(iEntday) > this.txBuffer.getTxBizDate().getTbsDy()) {
-					Slice<AcMain> slAcMain = acMainService.acmainAcDateEq(this.txBuffer.getTxBizDate().getTbsDyf(),
-							this.index, Integer.MAX_VALUE);
+					Slice<AcMain> slAcMain = acMainService.acmainAcDateEq(this.txBuffer.getTxBizDate().getTbsDyf(), this.index, Integer.MAX_VALUE);
 					List<AcMain> lAcMain = slAcMain == null ? null : slAcMain.getContent();
 					if (lAcMain != null) {
-						acMainCom.changeDate(this.txBuffer.getTxBizDate().getTbsDy(), parse.stringToInteger(iEntday),
-								lAcMain, titaVo);
+						acMainCom.changeDate(this.txBuffer.getTxBizDate().getTbsDy(), parse.stringToInteger(iEntday), lAcMain, titaVo);
 					}
 				}
 			} else {
@@ -156,6 +157,14 @@ public class L6880 extends TradeBuffer {
 			this.insertAcClose(titaVo);
 
 		}
+		// brNo –固定0000
+		// tickNo – 訊息編號 (編號一致後蓋前)
+		// stopTime – 顯示停止時間 西元 8 + 4 時間
+		// msg – 訊息內容
+		// mode – false : insert and replace mode ; true : delete mode titaVo – titaVo
+		String brtime = dDateUtil.getNowStringBc() + (this.txBuffer.getTxCom().getTxTime()/100 + 1);//1分鐘
+		webClient.sendTicker("0000", "00001", brtime, "系統已換日", false, titaVo);
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

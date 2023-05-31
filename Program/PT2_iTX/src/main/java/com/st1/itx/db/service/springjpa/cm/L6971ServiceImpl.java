@@ -39,9 +39,6 @@ public class L6971ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// *** 折返控制相關 ***
 		this.limit = limit;
 
-		int inputDate = parse.stringToInteger(titaVo.get("InputDate")) + 19110000;
-
-		this.info("inputDate = " + inputDate);
 		this.info("inputType = " + workType.getCode());
 
 		String sql = "";

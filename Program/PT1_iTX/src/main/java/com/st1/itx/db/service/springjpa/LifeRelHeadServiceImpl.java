@@ -114,6 +114,34 @@ em = null;
   }
 
   @Override
+  public Slice<LifeRelHead> findAcDate(int acDate_0, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<LifeRelHead> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findAcDate " + dbName + " : " + "acDate_0 : " + acDate_0);
+    if (dbName.equals(ContentName.onDay))
+      slice = lifeRelHeadReposDay.findAllByAcDateIs(acDate_0, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = lifeRelHeadReposMon.findAllByAcDateIs(acDate_0, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = lifeRelHeadReposHist.findAllByAcDateIs(acDate_0, pageable);
+    else 
+      slice = lifeRelHeadRepos.findAllByAcDateIs(acDate_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
   public LifeRelHead holdById(LifeRelHeadId lifeRelHeadId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

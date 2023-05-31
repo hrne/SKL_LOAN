@@ -38,6 +38,17 @@ public interface LifeRelHeadService {
   public Slice<LifeRelHead> findAll(int index, int limit, TitaVo... titaVo);
 
   /**
+   * AcDate = 
+   *
+   * @param acDate_0 acDate_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice LifeRelHead LifeRelHead of List
+   */
+  public Slice<LifeRelHead> findAcDate(int acDate_0, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By LifeRelHead
    * 
    * @param lifeRelHeadId key

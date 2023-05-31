@@ -9,14 +9,17 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
+import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcClose;
 import com.st1.itx.db.domain.AcCloseId;
+import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.BankRemit;
 import com.st1.itx.db.service.AcCloseService;
+import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.BankRemitService;
 import com.st1.itx.db.service.CdBankService;
 import com.st1.itx.db.service.CdEmpService;
@@ -64,9 +67,11 @@ public class L4101 extends TradeBuffer {
 	public TotaVo totaB; // 未放行清單
 	@Autowired
 	public TotaVo totaWarnMsg; // 未放行清單
-
+	
 	@Autowired
 	public BankRemitService bankRemitService;
+	@Autowired
+	public AcDetailService acDetailService;
 	@Autowired
 	public AcCloseService acCloseService;
 
@@ -174,13 +179,15 @@ public class L4101 extends TradeBuffer {
 			}
 			this.addList(this.totaWarnMsg);
 			totaVo.put("OBatchNo", newBatchNo);
+			titaVo.put("BatchNo", newBatchNo);
+			titaVo.put("MRKEY", newBatchNo);
 			this.info("totaB = " + totaB.toString());
 
 		}
 
 		// 訂正
 		if (titaVo.isHcodeErase()) {
-//			EntryEraseRoutine();
+			EntryEraseRoutine(titaVo);
 		}
 
 		this.addList(this.totaVo);
@@ -253,5 +260,45 @@ public class L4101 extends TradeBuffer {
 	private String dbDateToRocTime(String dbDate) {
 
 		return dbDate.substring(11, 19);
+	}
+
+	private void EntryEraseRoutine(TitaVo titaVo) throws LogicException {
+		this.info("EntryEraseRoutine ");
+		batchNo = titaVo.getParam("BatchNo");
+		String wkBatchNo = batchNo.substring(0, 4) + "  ";
+		iAcDate = parse.stringToInteger(titaVo.getParam("AcDate"));
+		this.info("new old BatchNo = " + batchNo + " " + wkBatchNo);
+		Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(iAcDate + 19110000, batchNo, 00, 99, 0, 0, 0,
+				Integer.MAX_VALUE, titaVo);
+		List<BankRemit> lBankRemit = slBankRemit.getContent();
+		List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
+		for (BankRemit tBankRemit : lBankRemit) {
+			tBankRemit.setBatchNo(wkBatchNo);
+			
+			Slice<AcDetail> slAcDetail = acDetailService.acdtlRelTxseqEq(iAcDate + 19110000,
+					titaVo.getKinbr() + tBankRemit.getTitaTlrNo() + tBankRemit.getTitaTxtNo(), 0, Integer.MAX_VALUE,
+					titaVo);
+			if (slAcDetail != null) {
+				for (AcDetail tAcDetail : slAcDetail.getContent()) {
+					if (tAcDetail.getEntAc() == 1) {
+						tAcDetail.setTitaBatchNo(wkBatchNo);
+						lAcDetail.add(tAcDetail);
+					}
+				}
+			}
+		}
+		if (lAcDetail.size() > 0) {
+			try {
+				acDetailService.updateAll(lAcDetail, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", "AcDetail " + e.getErrorMsg()); // 更新資料時，發生錯誤
+			}
+		}
+		try {
+			bankRemitService.updateAll(lBankRemit, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0007", "BankRemit " + e.getErrorMsg()); // 更新資料時，發生錯誤
+		}
+
 	}
 }

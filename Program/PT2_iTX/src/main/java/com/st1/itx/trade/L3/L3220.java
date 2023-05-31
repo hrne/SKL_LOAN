@@ -107,6 +107,7 @@ public class L3220 extends TradeBuffer {
 	private LoanBorTx tLoanBorTx;
 	private LoanBorTxId tLoanBorTxId;
 	private TempVo tTempVo = new TempVo();
+	private LoanCheque tLoanCheque;
 
 	// initialize variable
 	@PostConstruct
@@ -182,7 +183,7 @@ public class L3220 extends TradeBuffer {
 				ChequeAmtEraseRoutine();
 			}
 			// 帳務處理
-			ChequeAcDetailRoutine();
+			ChequeAcDetailRoutine(tLoanCheque);
 		}
 
 		// 貸方
@@ -293,7 +294,7 @@ public class L3220 extends TradeBuffer {
 		this.info("ChequeAmtNormalRoutine ... ");
 
 		// 鎖定支票檔
-		LoanCheque tLoanCheque = loanChequeService.holdById(new LoanChequeId(iChequeAcct, iChequeNo));
+		 tLoanCheque = loanChequeService.holdById(new LoanChequeId(iChequeAcct, iChequeNo));
 		if (tLoanCheque == null) {
 			throw new LogicException(titaVo, "E0006", "支票檔 支票帳號 = " + iChequeAcct + " 支票號碼 =  " + iChequeNo); // 鎖定資料時，發生錯誤
 		}
@@ -341,7 +342,7 @@ public class L3220 extends TradeBuffer {
 		this.info("ChequeAmtEraseRoutine ... ");
 
 		// 鎖定支票檔
-		LoanCheque tLoanCheque = loanChequeService.holdById(new LoanChequeId(iChequeAcct, iChequeNo));
+		 tLoanCheque = loanChequeService.holdById(new LoanChequeId(iChequeAcct, iChequeNo));
 		if (tLoanCheque == null) {
 			throw new LogicException(titaVo, "E0006", "支票檔 支票帳號 = " + iChequeAcct + " 支票號碼 =  " + iChequeNo); // 鎖定資料時，發生錯誤
 		}
@@ -360,12 +361,13 @@ public class L3220 extends TradeBuffer {
 		}
 	}
 
-	private void ChequeAcDetailRoutine() throws LogicException {
+	private void ChequeAcDetailRoutine(LoanCheque t) throws LogicException {
 		this.info("ChequeAcDetailRoutine ... ");
 		this.info("   isBookAcYes = " + this.txBuffer.getTxCom().isBookAcYes());
 
 		AcDetail acDetail;
 		if (this.txBuffer.getTxCom().isBookAcYes()) {
+			TempVo tempVo = new TempVo();
 			// 貸：應收票據－支票(RCK)
 			acDetail = new AcDetail();
 			acDetail.setDbCr("C");
@@ -375,6 +377,12 @@ public class L3220 extends TradeBuffer {
 			acDetail.setTxAmt(wkChequeAmt);
 			acDetail.setCustNo(iCustNo);
 			acDetail.setSlipNote(iNote);
+			tempVo.putParam("RemitBank",
+					t.getBankCode().length() > 3 ? t.getBankCode().substring(0, 3) : t.getBankCode());
+			tempVo.putParam("RemitBranch",
+					t.getBankCode().length() > 3 ? t.getBankCode().substring(3, t.getBankCode().length()) : "    ");
+			tempVo.putParam("RemitAcctNo", parse.IntegerToString(t.getChequeAcct(), 9));
+			acDetail.setJsonFields(tempVo.getJsonString());
 			lAcDetail.add(acDetail);
 		}
 	}

@@ -2,6 +2,8 @@ package com.st1.itx.trade.L6;
 
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ import com.st1.itx.db.service.TxBizDateService;
 import com.st1.itx.db.service.TxToDoMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 
 @Service("L6870")
 @Scope("prototype")
@@ -37,6 +40,8 @@ public class L6870 extends TradeBuffer {
 	private TxBizDateService sTxBizDateService;
 	@Autowired
 	private DateUtil dDateUtil;
+	@Autowired
+	private WebClient webClient;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -110,6 +115,14 @@ public class L6870 extends TradeBuffer {
 			// EOD : End Of Day
 			titaVo.setBatchJobId("eodFlow");
 		}
+
+		// brNo –固定0000
+		// tickNo – 訊息編號 (編號一致後蓋前)
+		// stopTime – 顯示停止時間 西元 8 + 4 時間
+		// msg – 訊息內容
+		// mode – false : insert and replace mode ; true : delete mode titaVo – titaVo
+		webClient.sendTicker("0000", "00001", "209912312300", "夜間批次執行中", false, titaVo);
+
 		this.info("L6870 end.");
 
 		this.addList(this.totaVo);

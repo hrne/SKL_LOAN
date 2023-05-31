@@ -307,19 +307,12 @@ public class LQ007Report extends MakeReport {
 						}
 
 						// 在資料庫沒有查詢到的年月 且 僅抓12月份 且 當年度以前
-					} else if (y == (tmpYear * 100 + 12) && endY < tmpYear) {
+					} else if (endY < tmpYear) {
 
 						this.info("tmpYM = " + tmpYM);
 						this.info("y = " + y);
-						if (tmpYM == y) {
-							continue;
-						}
 
-						tmpYM = y;
-
-						prodNo = "";
 						balSum = BigDecimal.ZERO;
-						intSum = BigDecimal.ZERO;
 
 						// 餘額
 						colBal = colBal + 2;
@@ -327,37 +320,17 @@ public class LQ007Report extends MakeReport {
 						colInt = colInt + 2;
 
 						makeExcel.setValue(5, colBal, formatAmt(balSum, 3, 8));
-						makeExcel.setValue(5, colInt, formatAmt(intSum, 3, 8));
-
+						makeExcel.setValue(5, colInt, formatAmt(balSum, 3, 8));
 						makeExcel.setValue(6, colBal, formatAmt(balSum, 3, 8));
-						intTotal = intTotal.add(intSum);
-
 						makeExcel.setValue(7, colBal, formatAmt(balSum, 3, 8));
-						intTotal = intTotal.add(intSum);
-
 						makeExcel.setValue(8, colBal, formatAmt(balSum, 3, 8));
-						intTotal = intTotal.add(intSum);
-
-						iaiiBalTotal = iaiiBalTotal.add(balSum);
-						makeExcel.setValue(9, colBal, formatAmt(iaiiBalTotal, 3, 8));
-						intTotal = intTotal.add(intSum);
-
-						iaiiBalTotal = iaiiBalTotal.add(balSum);
-						makeExcel.setValue(10, colBal, formatAmt(iaiiBalTotal, 3, 8));
-						intTotal = intTotal.add(intSum);
-
-						iaiiBalTotal = iaiiBalTotal.add(balSum);
-						makeExcel.setValue(11, colBal, formatAmt(iaiiBalTotal, 3, 8));
-						intTotal = intTotal.add(intSum);
-
+						makeExcel.setValue(9, colBal, formatAmt(balSum, 3, 8));
+						makeExcel.setValue(10, colBal, formatAmt(balSum, 3, 8));
+						makeExcel.setValue(11, colBal, formatAmt(balSum, 3, 8));
 						makeExcel.setValue(12, colBal, formatAmt(balSum, 3, 8));
-						intTotal = intTotal.add(intSum);
-						makeExcel.setValue(6, colInt, formatAmt(intTotal, 3, 8));
-
-						balTotal = balTotal.add(balSum);
-						intTotal = intTotal.add(intSum);
-						makeExcel.setValue(13, colBal, formatAmt(balTotal, 3, 8));
-						makeExcel.setValue(13, colInt, formatAmt(intTotal, 3, 8));
+						makeExcel.setValue(6, colInt, formatAmt(balSum, 3, 8));
+						makeExcel.setValue(13, colBal, formatAmt(balSum, 3, 8));
+						makeExcel.setValue(13, colInt, formatAmt(balSum, 3, 8));
 
 					}
 

@@ -37,6 +37,17 @@ public interface FinHoldRelService {
   public Slice<FinHoldRel> findAll(int index, int limit, TitaVo... titaVo);
 
   /**
+   * AcDate = 
+   *
+   * @param acDate_0 acDate_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice FinHoldRel FinHoldRel of List
+   */
+  public Slice<FinHoldRel> findAcDate(int acDate_0, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By FinHoldRel
    * 
    * @param id key

@@ -42,6 +42,7 @@ K(MODIFYBUTTON,查詢)
 [
 ["[L6971] 已封存且待刪除明細結果查詢 "],
 ["@搬運種類",#InputType,#InputTypeX],
+["@顯示明細",#ShowDetail,"@Y:顯示明細,人工勾選逐筆刪除","@N:不顯示明細,直接整批刪除"]
 ]
 
 !---------- AP Button AREA ----------
@@ -62,7 +63,11 @@ T(4,CHAIN$)
 #InputTypeHelp=X,40,S
 T(3,1:已結清並領取清償證明五年之交易明細)
 
+#ShowDetailHelp=X,40,S
+T(3,Y:是;N:否)
+
 #InputType=A,1,I
+E(0,1)
 HELP(#InputTypeHelp)
 @T(3,@InputTypeX,)
 V(H,#InputTypeHelp)
@@ -70,9 +75,15 @@ V(H,#InputTypeHelp)
 #InputTypeX=X,40,L
 T(H,#InputType,#InputTypeHelp)
 
+#ShowDetail=x,1,I
+T(2,Y)
+HELP(#ShowDetailHelp)
+@V(H,#ShowDetailHelp)
+
 ! RPTFG
 #RPTFG=A,1,S
 E(0,0)
+IF(#ShowDetail=="N",E(0,1),$)
 
 
 ! iCompensateFlag
@@ -139,6 +150,7 @@ T(6A,#OOExecDate+#OOBatchNo+#OOCustNo+#OOFacmNo+#OOBormNo+#InputType)
 !------ 上行電文TIM：BASIC LABEL + AP TEXT AREA + AP TEXT ------
 <sub type="TIM">
 #InputType
+#ShowDetail
 #END
 </sub>
 
@@ -163,10 +175,20 @@ TXFORM=L6971
 [""],
 ]
 </sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="PART" name="L6971N" layout="cols=1;screen.width=[100,900];printer.width=[20,20];">
+[
+["[L6971] 已封存且待刪除明細結果查詢 "],
+["","不顯示明細,直接整批刪除,背景作業中"],
+]
+</sub>
+
 <sub type="SELECT">
 #batch-print=8,L6971.PFNX,NA,,,,,,1169:827
 ^
-#RPTFG=9,QUERY.GRID,L6971
+
+#RPTFG=0,QUERY.GRID,L6971
 #any={detail:true, header:'L6971.part', caption:'', width:1005, rowNum:100, rowList:[100,500,1000,10000,100000],
 ifxBatch:{
 	name:'確認刪除明細',
@@ -196,6 +218,12 @@ ifxBatch:{
 #OOBormNo=撥款編號
 {width:100,align:'center'}
 ^
+
+
+#RPTFG=1,QUERY.GRID,L6971
+#any={detail:false, header:'L6971N.part', caption:'', width:1005, rowNum:100, rowList:[100,500,1000,10000,100000],}
+^
+
 </sub>
 
 

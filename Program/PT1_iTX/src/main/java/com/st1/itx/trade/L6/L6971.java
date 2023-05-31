@@ -24,6 +24,7 @@ import com.st1.itx.db.service.springjpa.cm.L6971ServiceImpl;
 import com.st1.itx.db.service.springjpa.cm.L9729ServiceImpl.WorkType;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.MySpring;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -69,18 +70,30 @@ public class L6971 extends TradeBuffer {
 
 		workType = WorkType.getWorkTypeByHelp(titaVo.getParam("InputType"));
 
+		String showDetail = titaVo.getParam("ShowDetail");
+
 		// 如果OOCustNo有值, 表示是要進行刪除
 		// 如果沒有值, 表示是查詢
 		if (titaVo.containsKey("OOCustNo")) {
 			doExecution(titaVo);
 		} else {
-			doInquiry(titaVo);
+			if (showDetail == null || showDetail.equals("Y")) { // 預設為查詢
+				doInquiry(titaVo);
+			} else {
+				doBatch(titaVo);
+			}
 		}
 
 		this.info("L6971 exit.");
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+
+	private void doBatch(TitaVo titaVo) throws LogicException {
+		this.info("L6971 doBatch ... ");
+
+		MySpring.newTask("L6971p", this.txBuffer, titaVo);
 	}
 
 	private void doInquiry(TitaVo titaVo) throws LogicException {

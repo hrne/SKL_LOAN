@@ -303,11 +303,21 @@ public class L1104 extends TradeBuffer {
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007", "客戶主檔" + e.getErrorMsg()); // 新增資料時，發生錯誤
 		}
-
+		String iResFg = titaVo.getParam("Reason");
+//		HELP(1:客戶申請;2:資料修正)
+		String iRes = "";
+		if(iResFg.equals("1")) {
+			iRes="客戶申請";
+		}
+		if(iResFg.equals("2")) {
+			iRes="資料修正";
+		}
+		
 		// 紀錄變更前變更後
 		iDataLog.setEnv(titaVo, BefCustMain, tCustMain);
 		iDataLog.exec("修改顧客資料/"
-		   +BefCustMain.getCustName()
+		   +BefCustMain.getCustName() +"  "
+		   +"原因註記/"+iRes
 //		   +BefCustMain.getEName()
 //		   +BefCustMain.getBirthday()+BefCustMain.getSex()
 //		   +BefCustMain.getCustTypeCode()+BefCustMain.getEmpNo()

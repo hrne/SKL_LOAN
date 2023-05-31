@@ -32,6 +32,7 @@ import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.AcMainCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
+import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L6880")
@@ -66,6 +67,8 @@ public class L6880 extends TradeBuffer {
 
 	@Autowired
 	private AcCloseService sAcCloseService;
+	@Autowired
+	private WebClient webClient;
 
 	@Autowired
 	private AcMainCom acMainCom;
@@ -154,6 +157,14 @@ public class L6880 extends TradeBuffer {
 			this.insertAcClose(titaVo);
 
 		}
+		// brNo –固定0000
+		// tickNo – 訊息編號 (編號一致後蓋前)
+		// stopTime – 顯示停止時間 西元 8 + 4 時間
+		// msg – 訊息內容
+		// mode – false : insert and replace mode ; true : delete mode titaVo – titaVo
+		String brtime = dDateUtil.getNowStringBc() + (this.txBuffer.getTxCom().getTxTime()/100 + 1);//1分鐘
+		webClient.sendTicker("0000", "00001", brtime, "系統已換日", false, titaVo);
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

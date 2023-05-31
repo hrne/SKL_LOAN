@@ -760,8 +760,8 @@ public class TxBatchCom extends TradeBuffer {
 
 		// 收付欄
 		int ii = 1;
+		txTitaVo.putParam("RpFlag", "1"); // 1:應收
 		if (tDetail.getRepayAmt().compareTo(BigDecimal.ZERO) > 0) {
-			txTitaVo.putParam("RpFlag", "1"); // 1:應收
 			txTitaVo.putParam("RpType1", tDetail.getRepayType());
 			txTitaVo.putParam("RpCode1", tDetail.getRepayCode());
 			txTitaVo.putParam("RpCodeX1",

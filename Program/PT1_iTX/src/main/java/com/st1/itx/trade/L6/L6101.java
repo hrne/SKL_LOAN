@@ -61,6 +61,7 @@ import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.TxToDoCom;
 //import com.st1.itx.util.MySpring;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -112,8 +113,8 @@ public class L6101 extends TradeBuffer {
 	@Autowired
 	L6101ServiceImpl l6101ServiceImpl;
 	
-//	@Autowired
-//	private WebClient webClient;
+	@Autowired
+	private WebClient webClient;
 
 	@Autowired
 	DateUtil dDateUtil;
@@ -200,10 +201,19 @@ public class L6101 extends TradeBuffer {
 		// 1:業務關帳作業
 		acClose(titaVo);
 		
-//		if (iClsFg == 1)
-//			webClient.sendTicker("0000", "00001", "209912312300", "系統已關帳", false, titaVo);
-//		else
-//			webClient.sendTicker("0000", "00001", "209912312300", "系統已關帳", true, titaVo);
+
+		//brNo –固定0000 
+		//tickNo – 訊息編號 (編號一致後蓋前)  
+		//stopTime – 顯示停止時間 西元 8 + 4 時間 
+		//msg – 訊息內容 
+		//mode – false : insert and replace mode ; true : delete mode titaVo – titaVo
+		if (iMsgCode == 0 && "09".equals(iSecNo)) {
+			if (iClsFg == 1) {
+				webClient.sendTicker("0000", "00001", "209912312300", "放款業務已關帳", false, titaVo);
+			} else {
+				webClient.sendTicker("0000", "00001", "209912312300", "放款業務已關帳", true, titaVo);
+			}
+		}
 
 		this.addList(this.totaVo);
 		return this.sendList();

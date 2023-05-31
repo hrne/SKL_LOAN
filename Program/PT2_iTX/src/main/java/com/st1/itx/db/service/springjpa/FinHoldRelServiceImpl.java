@@ -113,6 +113,34 @@ em = null;
   }
 
   @Override
+  public Slice<FinHoldRel> findAcDate(int acDate_0, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<FinHoldRel> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findAcDate " + dbName + " : " + "acDate_0 : " + acDate_0);
+    if (dbName.equals(ContentName.onDay))
+      slice = finHoldRelReposDay.findAllByAcDateIs(acDate_0, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = finHoldRelReposMon.findAllByAcDateIs(acDate_0, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = finHoldRelReposHist.findAllByAcDateIs(acDate_0, pageable);
+    else 
+      slice = finHoldRelRepos.findAllByAcDateIs(acDate_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
   public FinHoldRel holdById(String id, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

@@ -124,7 +124,12 @@ public class DailyCopy extends BatchBase implements Tasklet, InitializingBean {
 		}
 		this.info("DailyCopy exit.");
 		
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "", "", "夜間批次執行完畢", titaVo);
+		// brNo –固定0000
+		// tickNo – 訊息編號 (編號一致後蓋前)
+		// stopTime – 顯示停止時間 西元 8 + 4 時間
+		// msg – 訊息內容
+		// mode – false : insert and replace mode ; true : delete mode titaVo – titaVo
+		webClient.sendTicker("0000", "00001", "209912312300", "夜間批次執行完畢", false, titaVo);
 	}
 
 	private void doCopy(TitaVo tempTitaVo) throws LogicException {

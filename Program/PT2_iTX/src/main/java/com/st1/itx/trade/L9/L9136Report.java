@@ -408,7 +408,7 @@ public class L9136Report extends MakeReport {
 
 		} else {
 			// 核准號碼
-			this.print(0, 56, fillUpWord(r.get("ApproveNo"), 7, "0", "L"));
+			this.print(0, 56, r.get("ApproveNo") == null ? " " : fillUpWord(r.get("ApproveNo"), 7, "0", "L"));
 			// 押品別
 			this.print(0, 66, r.get("ClCode1") + "  " + r.get("ClCode2") + "  " + r.get("ClName"));
 			// 押品號碼
