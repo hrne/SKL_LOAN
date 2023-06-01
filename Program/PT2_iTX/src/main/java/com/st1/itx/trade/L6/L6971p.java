@@ -86,6 +86,8 @@ public class L6971p extends TradeBuffer {
 				int bormNo = parse.stringToInteger(l6971Vo.get("BormNo"));
 				doExecution5YTX(execDate, batchNo, custNo, facmNo, bormNo, titaVo);
 				count++;
+				this.info("L6971 commit");
+				this.batchTransaction.commit();
 			}
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", titaVo.getTlrNo(),
 					"L6971 整批刪除，共"+count+"筆，已完成", titaVo);

@@ -111,8 +111,8 @@ T(2,@BankDeductCdHelp,#HelpDesc1)
 T(B,@RepayTypeHelp,#HelpDesc2+;99:全部)
 T(B,@AmlRspHelp,#HelpDesc3)
 
-#FunctionHelp=x,160,S
-T(3,01:戶號;02:上限金額;03:下限金額;04:檢核不正常;05:扣款金額為0;06:媒體檔總金額;07:已到期未至應繳日;08:戶號已設定清償;09:整批;10:入帳後溢短收;11:入帳後有費用未收)
+#FunctionHelp=x,1024,S
+T(3,01:戶號;02:上限金額;03:下限金額;04:檢核不正常;05:扣款金額為0;06:媒體檔總金額;07:已到期未至應繳日;08:戶號已設定清償;09:整批;10:入帳後溢短收;11:入帳後有費用未收;12:暫收抵繳額度檢核)
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
@@ -209,6 +209,9 @@ C(3,#FunctionCode,11,
 INVOKEJS(SHOW,L4943_3,1)
 INVOKEJS(SHOW,L4943_4,1)
 INVOKEJS(SHOW,L4943_5,1),$)
+C(3,#FunctionCode,12,
+INVOKEJS(SHOW,L4943_3,1)
+INVOKEJS(SHOW,L4943_5,1),$)
 
 ! 戶號
 #CustNo=A,7,I
@@ -239,7 +242,7 @@ T(2,)
 ! 銀行別
 #BankCode=A,3,I
 C(3,#CHAIN,1,s,$)
-IF(#FunctionCode==4 || #FunctionCode==5 || #FunctionCode==6 || #FunctionCode==7 || #FunctionCode==8 || #FunctionCode==9 || #FunctionCode==10 || #FunctionCode==11,$,s)
+IF(#FunctionCode==4 || #FunctionCode==5 || #FunctionCode==6 || #FunctionCode==7 || #FunctionCode==8 || #FunctionCode==9 || #FunctionCode==10 || #FunctionCode==11|| #FunctionCode==12,$,s)
 HELP(#BankDeductCdHelp,cols:4)
 @V(H,#BankDeductCdHelp)
 
@@ -530,29 +533,29 @@ TXFORM=L4943
 #OOBTN_C=查詢
 {search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:35}
 #OOEntryDate=入帳日期
-{width:95}
+{width:70}
 #OOCustNo=戶號　
-{width:95}
+{width:50}
 #OOFacmNo=額度
-{width:95}
+{width:40}
 #OOPrevIntDate=繳息迄日
-{width:95}
+{width:70}
 #OOPayIntDate=應繳日
-{width:95}
+{width:70}
 #OORepayTypeX=還款類別
-{width:95}
+{width:70}
 #OOUnpaidAmt=應扣金額
-{width:95,sum:true}
+{width:90,sum:true}
 #OOTempAmt=暫收抵繳金額
-{width:125,sum:true}
+{width:100,sum:true}
 #OORepayAmt=扣款金額
-{width:95,sum:true}
-#OOMediaCode=媒體碼
-{width:80}
-#OOAcDateX=會計日期
-{width:95}
+{width:90,sum:true}
 #OOProcNote=檢核／扣款結果
 {width:150}
+#OOMediaCode=媒體碼
+{width:60}
+#OOAcDateX=會計日期
+{width:70}
 #OOProcStsCodeX=
 {width:150}
 ^
@@ -572,29 +575,29 @@ TXFORM=L4943
 #OOBTN_C=查詢
 {search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:35}
 #OOEntryDate=入帳日期
-{width:95}
+{width:70}
 #OOCustNo=戶號　
-{width:95}
+{width:50}
 #OOFacmNo=額度
-{width:95}
+{width:50}
 #OOPrevIntDate=繳息迄日
-{width:95}
+{width:70}
 #OOPayIntDate=應繳日
-{width:95}
+{width:70}
 #OORepayTypeX=還款類別
-{width:95}
+{width:70}
 #OORepayAmt=扣款金額
-{width:95,sum:true}
+{width:90,sum:true}
 #OOTempAmt=暫收抵繳金額
-{width:125,sum:true}
+{width:120,sum:true}
 #OOOverShort=溢短收
-{width:95,sum:true}
-#OOMediaCode=媒體碼
-{width:80}
-#OOAcDateX=會計日期
-{width:95}
+{width:90,sum:true}
 #OOProcNote=檢核／扣款結果
 {width:150}
+#OOMediaCode=媒體碼
+{width:50}
+#OOAcDateX=會計日期
+{width:70}
 #OOProcStsCodeX=
 {width:150}
 ^
@@ -603,17 +606,17 @@ TXFORM=L4943
 #any={detail:true, header:'L4943_7.part', caption:'', rowNum:20, rowList:[20,40,60]}
 
 #OOCustNo=戶號　
-{width:95}
+{width:50}
 #OOFacmNo=額度
-{width:95}
+{width:40}
 #OOPrevIntDate=到期日
-{width:95}
+{width:70}
 #OOPayIntDate=應繳日
-{width:95}
+{width:70}
 #OOUnpaidAmt=放款餘額
-{width:95,sum:true}
+{width:90,sum:true}
 #OOProcNote=檢核／扣款結果
-{width:300}
+{width:150}
 #OOProcStsCodeX=
 {width:150}
 ^

@@ -156,15 +156,20 @@ public class L4721Report extends MakeReport {
 	/**
 	 * titaVo需有利率種類TxKind及利率調整日期AdjDate
 	 * 
-	 * @param titaVo   TitaVo
-	 * @param txbuffer TxBuffer
-	 * @param iCustNo  有利率變動的戶號
-	 * @param data     主要資料來源
-	 * @param kindItem 利率種類名稱
+	 * @param titaVo     TitaVo
+	 * @param txbuffer   TxBuffer
+	 * @param iCustNo    有利率變動的戶號
+	 * @param data       主要資料來源
+	 * @param kindItem   利率種類名稱
+	 * @param sAdjDate   利率調整起日
+	 * @param eAdjDate   利率調整止日
+	 * @param sEntryDate 入帳起日(六個月前月初)
+	 * @param eEntryDate 入帳止日
 	 * @return
 	 * @throws LogicException ...
 	 */
-	public Long exec(TitaVo titaVo, TxBuffer txbuffer, int iCustNo, String kindItem) throws LogicException {
+	public Long exec(TitaVo titaVo, TxBuffer txbuffer, int iCustNo, String kindItem, int sAdjDate, int eAdjDate,
+			int sEntryDate, int eEntryDate) throws LogicException {
 		this.info("L4721Report.printHeader");
 
 //		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
@@ -185,12 +190,6 @@ public class L4721Report extends MakeReport {
 				"8.5,12", "P");
 
 		Boolean Firstfg = false;
-		// 止日為會計日
-		int ieday = titaVo.getEntDyI() + 19110000;
-		dateUtil.setDate_1(ieday);
-		dateUtil.setMons(-6);
-		// 起日為會計日前六個月的一日
-		int isday = Integer.parseInt(String.valueOf(dateUtil.getCalenderDay()).substring(0, 6) + "01");
 
 		lTmpCustFacm = new ArrayList<Map<String, String>>();
 
@@ -198,14 +197,14 @@ public class L4721Report extends MakeReport {
 		List<Map<String, String>> listL4721Head = new ArrayList<Map<String, String>>();
 
 		try {
-			listL4721Temp = l4721ServiceImpl.TempQuery(iCustNo, isday, ieday, titaVo);
+			listL4721Temp = l4721ServiceImpl.TempQuery(iCustNo, sEntryDate, eEntryDate, titaVo);
 		} catch (Exception e) {
 			this.error("l4721ServiceImpl TempQuery = " + e.getMessage());
 			throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
 		}
 
 		try {
-			listL4721Head = l4721ServiceImpl.doQuery(iCustNo, isday, ieday, titaVo);
+			listL4721Head = l4721ServiceImpl.doQuery(iCustNo, sAdjDate, eAdjDate, titaVo);
 		} catch (Exception e) {
 			this.error("l4721ServiceImpl doQuery = " + e.getMessage());
 			throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
@@ -284,7 +283,7 @@ public class L4721Report extends MakeReport {
 		List<Map<String, String>> listL4721Detail = new ArrayList<Map<String, String>>();
 
 		try {
-			listL4721Detail = l4721ServiceImpl.doDetail(iCustNo, isday, ieday, titaVo);
+			listL4721Detail = l4721ServiceImpl.doDetail(iCustNo, sAdjDate, eAdjDate, sEntryDate, eEntryDate, titaVo);
 		} catch (Exception e) {
 			this.error("l4721ServiceImpl doDetail = " + e.getMessage());
 			throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");

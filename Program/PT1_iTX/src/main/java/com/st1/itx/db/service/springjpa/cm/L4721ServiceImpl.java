@@ -30,7 +30,19 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(int itxkind, int iCustType, int sDate, int eDate, String prodNos,
+	/**
+	 * @param itxkind   利率種類
+	 * @param iCustType 客戶別
+	 * @param sAdjDate  利率調整起日
+	 * @param eAdjDate  利率調整止日
+	 * @param prodNos   商品利率代碼
+	 * @param titaVo
+	 * @return
+	 * @throws Exception
+	 * 
+	 * 
+	 */
+	public List<Map<String, String>> findAll(int itxkind, int iCustType, int sAdjDate, int eAdjDate, String prodNos,
 			TitaVo titaVo) throws Exception {
 		this.info("L4721ServiceImpl findAll");
 
@@ -66,8 +78,8 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           ,\"BaseRateCode\"                           ";
 		sql += "           ,row_number() over (partition by \"CustNo\", \"FacmNo\", \"BormNo\" order by \"EffectDate\" Desc) as \"seq\" ";
 		sql += "           from \"LoanRateChange\"                           ";
-		sql += "  		   where \"EffectDate\" >=" + sDate;
-		sql += "   			 and \"EffectDate\" <=" + eDate;
+		sql += "  		   where \"EffectDate\" >=" + sAdjDate;
+		sql += "   			 and \"EffectDate\" <=" + eAdjDate;
 		sql += "        ) r ";
 		sql += " left join(                                             ";
 		sql += "           select                                       ";
@@ -79,7 +91,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           ,\"RateCode\"                           ";
 		sql += "           ,row_number() over (partition by \"CustNo\", \"FacmNo\", \"BormNo\" order by \"EffectDate\" Desc) as \"seq\" ";
 		sql += "           from \"LoanRateChange\" rb                          ";
-		sql += "  		   where \"EffectDate\" <=" + eDate;
+		sql += "  		   where \"EffectDate\" <=" + eAdjDate;
 		sql += "        ) r2            on  r2.\"CustNo\" = r.\"CustNo\"        ";
 		sql += "                       and  r2.\"FacmNo\" = r.\"FacmNo\"        ";
 		sql += "                       and  r2.\"BormNo\" = r.\"BormNo\"        ";
@@ -127,9 +139,6 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		sql += " order by r.\"CustNo\" ASC";
-//		sql += " 		 ,r.\"FacmNo\" ";
-//		sql += " 		 ,r.\"BormNo\" ";
-//		sql += " 		 ,r.\"EffectDate\" DESC";
 
 		this.info("sql=" + sql);
 
@@ -139,13 +148,24 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-	public List<Map<String, String>> TempQuery(int custNo, int isday, int ieday, TitaVo titaVo) throws Exception {
+	/**
+	 * @param custNo     戶號
+	 * @param sEntryDate 入帳起日(六個月前月初)
+	 * @param eEntryDate 入帳止日
+	 * @param titaVo
+	 * @return
+	 * @throws Exception
+	 * 
+	 * 
+	 */
+	public List<Map<String, String>> TempQuery(int custNo, int sEntryDate, int eEntryDate, TitaVo titaVo)
+			throws Exception {
 
 		this.info("L4721ServiceImpl Temp");
 
 		this.info("custNo ... " + custNo);
-		this.info("isday ... " + isday);
-		this.info("ieday ... " + ieday);
+		this.info("sEntryDate ... " + sEntryDate);
+		this.info("eEntryDate ... " + eEntryDate);
 
 //		尋找該戶號是否有暫收款(回傳入帳日，金額，還款類別)
 
@@ -161,8 +181,8 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    lb.\"CustNo\" = " + custNo;
 		sql += "    AND lb.\"FacmNo\" = 0";
 		sql += "    AND lb.\"BormNo\" = 0";
-		sql += "    AND lb.\"EntryDate\" >= " + isday;
-		sql += "    AND lb.\"EntryDate\" <= " + ieday;
+		sql += "    AND lb.\"EntryDate\" >= " + sEntryDate;
+		sql += "    AND lb.\"EntryDate\" <= " + eEntryDate;
 
 		this.info("sql=" + sql);
 		Query query;
@@ -173,7 +193,17 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-	public List<Map<String, String>> doQuery(int custNo, int sDate, int eDate, TitaVo titaVo) throws Exception {
+	/**
+	 * @param custNo   戶號
+	 * @param sAdjDate 利率調整起日
+	 * @param eAdjDate 利率調整止日
+	 * @param titaVo
+	 * @return
+	 * @throws Exception
+	 * 
+	 * 
+	 */
+	public List<Map<String, String>> doQuery(int custNo, int sAdjDate, int eAdjDate, TitaVo titaVo) throws Exception {
 
 		this.info("L4721ServiceImpl doQuery");
 
@@ -225,8 +255,8 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           ,\"EffectDate\"                           ";
 		sql += "           ,row_number() over (partition by \"CustNo\", \"FacmNo\", \"BormNo\" order by \"EffectDate\" Desc) as \"seq\" ";
 		sql += "           from \"LoanRateChange\"                           ";
-		sql += "  		   where \"EffectDate\" >=" + sDate;
-		sql += "   			 and \"EffectDate\" <=" + eDate;
+		sql += "  		   where \"EffectDate\" >=" + sAdjDate;
+		sql += "   			 and \"EffectDate\" <=" + eAdjDate;
 		sql += "        ) r            on  r.\"CustNo\" = B.\"CustNo\"        ";
 		sql += "                       and r.\"FacmNo\" = B.\"FacmNo\"        ";
 		sql += "                       and r.\"seq\" = 1                          ";
@@ -239,7 +269,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           ,\"EffectDate\"                           ";
 		sql += "           ,row_number() over (partition by \"CustNo\", \"FacmNo\", \"BormNo\" order by \"EffectDate\" Desc) as \"seq\" ";
 		sql += "           from \"LoanRateChange\" rb                          ";
-		sql += "  		   where \"EffectDate\" <=" + eDate;
+		sql += "  		   where \"EffectDate\" <=" + eAdjDate;
 		sql += "        ) r2            on  r2.\"CustNo\" = r.\"CustNo\"        ";
 		sql += "                       and  r2.\"FacmNo\" = r.\"FacmNo\"        ";
 		sql += "                       and  r2.\"BormNo\" = r.\"BormNo\"        ";
@@ -255,14 +285,26 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-	public List<Map<String, String>> doDetail(int custNo, int sDate, int eDate, TitaVo titaVo) throws Exception {
+	/**
+	 * @param custNo     戶號
+	 * @param sAdjDate   利率調整起日
+	 * @param eAdjDate   利率調整止日
+	 * @param sEntryDate 入帳起日(六個月前月初)
+	 * @param eEntryDate 入帳止日
+	 * @param titaVo
+	 * @return
+	 * @throws Exception
+	 * 
+	 * 
+	 */
+	public List<Map<String, String>> doDetail(int custNo, int sAdjDate, int eAdjDate, int sEntryDate, int eEntryDate,
+			TitaVo titaVo) throws Exception {
 		dateUtil.init();
 
 		this.info("L4721ServiceImpl doDetail");
 
 		this.info("custNo ... " + custNo);
-		this.info("isday ... " + sDate);
-		this.info("ieday ... " + eDate);
+
 //		因抓取不到費用類，第一層group by 到額度(同額度同調整日、同源利率
 
 		String sql = " ";
@@ -320,8 +362,8 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              +	NVL(JSON_VALUE(T.\"OtherFields\",  '$.FireFee'),0)                    ";
 		sql += "              +	NVL(JSON_VALUE(T.\"OtherFields\",  '$.LawFee'),0) > 0                 ";
 		sql += "                or T.\"TitaTxCd\" = 'L3210' )                                         ";
-		sql += "         AND  T.\"EntryDate\" >= " + sDate; // tbsdy六個月前的月初日
-		sql += "         AND  T.\"EntryDate\" <= " + eDate; // tbsdy
+		sql += "         AND  T.\"EntryDate\" >= " + sEntryDate; // tbsdy六個月前的月初日
+		sql += "         AND  T.\"EntryDate\" <= " + eEntryDate; // tbsdy
 		sql += "       GROUP BY  t.\"FacmNo\", t.\"EntryDate\", t.\"AcDate\", CASE WHEN t.\"IntStartDate\" = 0 AND t.\"IntEndDate\" = 0 THEN 'Y' ELSE 'N' END                      ";
 		sql += "      ) X                                                                             ";
 		sql += " LEFT JOIN \"CdCode\" CD ON CD.\"DefCode\" = 'RepayCode'                              ";
@@ -347,8 +389,8 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           ,\"EffectDate\"                           ";
 		sql += "           ,row_number() over (partition by \"CustNo\", \"FacmNo\", \"BormNo\" order by \"EffectDate\" Desc) as \"seq\" ";
 		sql += "           from \"LoanRateChange\"                           ";
-		sql += "  		   where \"EffectDate\" >=" + sDate;
-		sql += "   			 and \"EffectDate\" <=" + eDate;
+		sql += "  		   where \"EffectDate\" >=" + sAdjDate;
+		sql += "   			 and \"EffectDate\" <=" + eAdjDate;
 		sql += "        ) r            on  r.\"CustNo\" = X.\"CustNo\"        ";
 		sql += "                       and r.\"FacmNo\" = X.\"FacmNo\"        ";
 		sql += "                       and r.\"seq\" = 1                          ";
@@ -361,7 +403,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           ,\"EffectDate\"                           ";
 		sql += "           ,row_number() over (partition by \"CustNo\", \"FacmNo\", \"BormNo\" order by \"EffectDate\" Desc) as \"seq\" ";
 		sql += "           from \"LoanRateChange\" rb                          ";
-		sql += "  		   where \"EffectDate\" <=" + eDate;
+		sql += "  		   where \"EffectDate\" <=" + eAdjDate;
 		sql += "        ) r2            on  r2.\"CustNo\" = r.\"CustNo\"        ";
 		sql += "                       and  r2.\"FacmNo\" = r.\"FacmNo\"        ";
 		sql += "                       and  r2.\"BormNo\" = r.\"BormNo\"        ";

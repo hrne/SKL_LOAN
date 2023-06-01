@@ -67,7 +67,6 @@ T(1,#CustId,#NTXBUF,2,10)
 T(1,#CustNo,#NTXBUF,12,7)
 C(3,#FunCd,2,$,S)
 T(1,#TelNoUKey,#NTXBUF,19,32)
-
 #Chk=X,1,S
 !C(4,#CustId,C(3,#CustNo,0,V(P,請先指定統一編號或戶號),$),$)
 !C(4,#CustId,INVOKEJS(SHOW,p1,3,3,0),$)
@@ -208,6 +207,16 @@ ASGN(AGAIN$)
 #Space=X,1,L
 T(2, )
 
+! 異動原因
+#TelChgRsnCode=A,2,L
+T(3,01)
+!C(3,#TelChgRsnCode,0,E(0,1),$)
+HELP(#TelChgRsnCodeHelp)
+@V(H,#TelChgRsnCodeHelp)
+! 異動原因中文
+#TelChgRsnItem=X,40,L
+T(H,#TelChgRsnCode,#TelChgRsnCodeHelp)
+
 !戶號
 #CustNo=A,7,L
 C(3,#CHAIN,1,s,$)
@@ -248,6 +257,8 @@ C(4,#CustId,$,T(2,@CustNameB,#L1r09CustName))
 C(4,#CustId,T(2,@CustId,#L1r09CustId),$)
 ! 電話種類
 #TelTypeCode=A,2,I
+
+
 HELP(#TelTypeCodeHelp)
 C(3,#L1r05TelTypeCode,9,INVOKEJS(SHOW,p1,6,6,1)INVOKEJS(SHOW,p1,5,5,0),INVOKEJS(SHOW,p1,6,6,0)INVOKEJS(SHOW,p1,5,5,1))
 @V(H,#TelTypeCodeHelp)
@@ -274,17 +285,11 @@ IF(#TelTypeCode == 3 || #TelTypeCode == 5 || #TelTypeCode == 9,S,$)
 #TelOther=X,20,I
 IF(#TelTypeCode == 9,$,S)
 @IF(#TelTypeCode == 9,V(9),S)
-! 異動原因
-#TelChgRsnCode=A,2,I
-C(3,#TelChgRsnCode,0,E(0,1),$)
-HELP(#TelChgRsnCodeHelp)
-@V(H,#TelChgRsnCodeHelp)
-! 異動原因中文
-#TelChgRsnItem=X,40,L
-T(H,#TelChgRsnCode,#TelChgRsnCodeHelp)
+
 
 ! 與借款人關係
 #RelationCode=X,2,I
+T(3,00)
 HELP(#RelationCodeHelp)
 @
 !IF(#RelationCode == "00" || #RelationCode == "",INVOKEJS(SHOW,p1,9,9,0)T(2,@FdLiaisonNam, ),INVOKEJS(SHOW,p1,9,9,1)T(2,@FdLiaisonNam,*))

@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L4;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -65,7 +66,7 @@ public class L4022 extends TradeBuffer {
 		// 如有找到資料
 		ArrayList<Integer> iWorkMonthList = new ArrayList<>();
 		for (CdCityRate tCdCityRate : slCdCityRate.getContent()) {
-
+			this.info(" tCdCityRate.getEffectYYMM() = " + tCdCityRate.getEffectYYMM());
 			if (iWorkMonthList.contains(tCdCityRate.getEffectYYMM())) {
 				continue;
 			} else {
@@ -74,6 +75,9 @@ public class L4022 extends TradeBuffer {
 				iWorkMonthList.add(0, tCdCityRate.getEffectYYMM());
 			}
 		}
+		this.info(" iWorkMonthList .getEffectYYMM() before= " + iWorkMonthList);
+		Collections.sort(iWorkMonthList,Collections.reverseOrder());
+		this.info(" iWorkMonthList .getEffectYYMM() after = " + iWorkMonthList);
 		for (int reWorkMonth : iWorkMonthList) {
 			OccursList occursList = new OccursList();
 			occursList.putParam("OOWorkMonth", reWorkMonth - 191100);

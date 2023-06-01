@@ -65,8 +65,12 @@ public class L4721Batch extends TradeBuffer {
 	@Autowired
 	private MakeReport makeReport;
 
+	// 利率調整日
 	private int isAdjDate = 0;
 	private int ieAdjDate = 0;
+	// 入帳日期
+	private int sEntryDate = 0;
+	private int eEntryDate = 0;
 	// 利率種類
 	private int iTxKind = 0;
 	private String kindItem = "";
@@ -95,24 +99,30 @@ public class L4721Batch extends TradeBuffer {
 		// 設定分頁、筆數
 		this.index = titaVo.getReturnIndex();
 		this.limit = Integer.MAX_VALUE;
-		this.iTxKind = parse.stringToInteger(titaVo.getParam("TxKind"));
-		this.iCustType = parse.stringToInteger(titaVo.getParam("CustType"));
-		this.isAdjDate = Integer.parseInt(titaVo.getParam("sAdjDate")) + 19110000;
-		this.ieAdjDate = Integer.parseInt(titaVo.getParam("eAdjDate")) + 19110000;
+		iTxKind = parse.stringToInteger(titaVo.getParam("TxKind"));
+		iCustType = parse.stringToInteger(titaVo.getParam("CustType"));
+
+		isAdjDate = Integer.parseInt(titaVo.getParam("sAdjDate")) + 19110000;
+		ieAdjDate = Integer.parseInt(titaVo.getParam("eAdjDate")) + 19110000;
+		eEntryDate = titaVo.getEntDyI() + 19110000;
+
+		dateUtil.setDate_1(eEntryDate);
+		dateUtil.setMons(-6);
+		sEntryDate = Integer.parseInt(String.valueOf(dateUtil.getCalenderDay()).substring(0, 6) + "01");
 
 		for (int i = 1; i <= 50; i++) {
 			if (titaVo.getParam("ProdNo" + i).length() != 0) {
-				this.prodNos = this.prodNos + "'" + titaVo.getParam("ProdNo" + i) + "',";
+				prodNos = prodNos + "'" + titaVo.getParam("ProdNo" + i) + "',";
 			}
 		}
 
-		if (this.prodNos.length() == 0) {
-			this.prodNos = "";
+		if (prodNos.length() == 0) {
+			prodNos = "";
 
 		} else {
-			this.prodNos = this.prodNos.substring(0, this.prodNos.length() - 1);
+			prodNos = prodNos.substring(0, prodNos.length() - 1);
 		}
-		this.info("this.prodNos=" + this.prodNos);
+		this.info("this.prodNos=" + prodNos);
 
 		this.kindItem = this.iTxKind == 0 ? "定期機動利率、指數型利率、機動利率、員工利率、按商品別利率變動利率" : titaVo.getParam("TxKindX");
 		String[] tmpKindItem = this.kindItem.split("、");
@@ -124,8 +134,7 @@ public class L4721Batch extends TradeBuffer {
 				List<Map<String, String>> custList = new ArrayList<Map<String, String>>();
 				try {
 
-					custList = sL4721ServiceImpl.findAll(txkind, this.iCustType, this.isAdjDate, this.ieAdjDate,
-							this.prodNos, titaVo);
+					custList = sL4721ServiceImpl.findAll(txkind, iCustType, isAdjDate, ieAdjDate, prodNos, titaVo);
 
 				} catch (Exception e) {
 
@@ -158,7 +167,7 @@ public class L4721Batch extends TradeBuffer {
 									CntEmail = CntEmail + 1;
 
 									this.sno = l4721Report.exec(titaVo, this.txBuffer, custNoTmp,
-											tmpKindItem[txkind - 1]);
+											tmpKindItem[txkind - 1], isAdjDate, ieAdjDate, sEntryDate, eEntryDate);
 									this.info("CustNo =" + custNoTmp);
 									this.info("sno =" + this.sno);
 
@@ -193,16 +202,16 @@ public class L4721Batch extends TradeBuffer {
 						}
 
 						custNoLast = custNoTmp;
-				
 
 					} // for
 				} // if
 
 			} // if
 
-			this.info("CntPaper = " + CntPaper);
+		
 			if (CntPaper > 0) {
-				l4721Report2.exec(titaVo, this.txBuffer, letterCustList, tmpKindItem[txkind - 1]);
+				l4721Report2.exec(titaVo, this.txBuffer, letterCustList, tmpKindItem[txkind - 1], isAdjDate, ieAdjDate,
+						sEntryDate, eEntryDate);
 			}
 		} // for
 
@@ -250,12 +259,6 @@ public class L4721Batch extends TradeBuffer {
 	 */
 	private void dealMessageData(TitaVo titaVo, Map<String, String> iData) throws LogicException {
 
-		int ieday = titaVo.getEntDyI() + 19110000;
-		dateUtil.setDate_1(ieday);
-		dateUtil.setMons(-6);
-		// 起日為會計日前六個月的一日
-		int isday = Integer.parseInt(String.valueOf(dateUtil.getCalenderDay()).substring(0, 6) + "01");
-
 		int iCustNo = parse.stringToInteger(iData.get("CustNo"));
 		int iFacmNo = parse.stringToInteger(iData.get("FacmNo"));
 
@@ -268,7 +271,7 @@ public class L4721Batch extends TradeBuffer {
 		List<Map<String, String>> listL4721Head = new ArrayList<Map<String, String>>();
 
 		try {
-			listL4721Head = sL4721ServiceImpl.doQuery(iCustNo, isday, ieday, titaVo);
+			listL4721Head = sL4721ServiceImpl.doQuery(iCustNo, isAdjDate, ieAdjDate, titaVo);
 		} catch (Exception e) {
 			this.error("bankStatementServiceImpl doQuery = " + e.getMessage());
 			throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");

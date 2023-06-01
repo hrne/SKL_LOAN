@@ -29,24 +29,13 @@
 					<tasklet ref="L9743Batch" />
 				</step>
 			</flow>
-			<!-- L9744(原LD006) 三階放款明細統計 -->
-			<!-- <flow>
-				<step id="sL9744Batch" parent="parentStep">
-					<tasklet ref="L9744Batch" />
-				</step>
-			</flow> -->
-			<!-- L9745(原LD007) 放款專員明細統計 -->
-			<!-- <flow>
-				<step id="sL9745Batch" parent="parentStep">
-					<tasklet ref="L9745Batch" />
-				</step>
-			</flow> -->
+
 			<!-- L9746(原LD010) 介紹人換算業績報酬檢核表 -->
-			<!-- <flow>
+			<flow>
 				<step id="sL9746Batch" parent="parentStep">
 					<tasklet ref="L9746Batch" />
 				</step>
-			</flow> -->
+			</flow>
 			<!-- L9137 (原LD008) 放款餘額總表 -->
 			<flow>
 				<step id="sL9137Batch" parent="parentStep">

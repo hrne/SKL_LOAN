@@ -13,8 +13,9 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.buffer.TxBuffer;
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.service.BatxRateChangeService;
+import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.service.springjpa.cm.L4721ServiceImpl;
+import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.MakeReport;
@@ -31,7 +32,7 @@ import com.st1.itx.util.parse.Parse;
  */
 @Component
 @Scope("prototype")
-public class L4721Report2 extends MakeReport {
+public class L4721Report2 extends TradeBuffer {
 
 	@Value("${iTXOutFolder}")
 	private String outFolder = "";
@@ -46,13 +47,13 @@ public class L4721Report2 extends MakeReport {
 	MakeFile makeFile;
 
 	@Autowired
+	MakeReport makeReport;
+
+	@Autowired
 	Parse parse;
 
 	@Autowired
 	public L4721ServiceImpl l4721ServiceImpl;
-
-	@Autowired
-	public BatxRateChangeService batxRateChangeService;
 
 	@Autowired
 	public BaTxCom baTxCom;
@@ -72,22 +73,27 @@ public class L4721Report2 extends MakeReport {
 	 * 
 	 * @param titaVo
 	 * @param txbuffer
-	 * @param data     主要資料來源
-	 * @param txKind   利率種類代碼
-	 * @param kindItem 利率代碼中文名稱
+	 * @param data       主要資料來源
+	 * @param txKind     利率種類代碼
+	 * @param kindItem   利率代碼中文名稱
+	 * @param sAdjDate   利率調整起日
+	 * @param eAdjDate   利率調整止日
+	 * @param sEntryDate 入帳起日(六個月前月初)
+	 * @param eEntryDate 入帳止日
 	 * @throws LogicException
 	 */
-	public void exec(TitaVo titaVo, TxBuffer txbuffer, List<Map<String, String>> data, String kindItem)
-			throws LogicException {
+	public void exec(TitaVo titaVo, TxBuffer txbuffer, List<Map<String, String>> data, String kindItem, int sAdjDate,
+			int eAdjDate, int sEntryDate, int eEntryDate) throws LogicException {
 		this.info("L4721Report2 exec start");
 
-//		int itxKind = parse.stringToInteger(titaVo.getParam("TxKind"));
-
-		this.titaVo = titaVo;
+	
 		this.setTxBuffer(txbuffer);
 		baTxCom.setTxBuffer(txbuffer);
 
-		List<String> file = getData(titaVo, data);
+		this.info("data.list = " + data.toString());
+		this.info("data.size = " + data.size());
+
+		List<String> file = getData(sAdjDate, eAdjDate, sEntryDate, eEntryDate, data, titaVo);
 
 		String fileName = "L4721-" + kindItem;
 
@@ -116,24 +122,31 @@ public class L4721Report2 extends MakeReport {
 
 	/**
 	 * 資料明細
-	 * 
+	 *
+	 * @param sAdjDate   利率調整起日
+	 * @param eAdjDate   利率調整止日
+	 * @param sEntryDate 入帳起日(六個月前月初)
+	 * @param eEntryDate 入帳止日
+	 * @param data       利率變動檔資料源
 	 * @param titaVo
-	 * @param lBatxRateChange 利率變動檔資料源
+	 * 
 	 */
-	private List<String> getData(TitaVo titaVo, List<Map<String, String>> data) throws LogicException {
+	private List<String> getData(int sAdjDate, int eAdjDate, int sEntryDate, int eEntryDate,
+			List<Map<String, String>> data, TitaVo titaVo) throws LogicException {
 
 		List<String> result = new ArrayList<>();
-
-		int ieday = titaVo.getEntDyI() + 19110000;
-		dateUtil.setDate_1(ieday);
-		dateUtil.setMons(-6);
-		int isday = Integer.parseInt(String.valueOf(dateUtil.getCalenderDay()).substring(0, 6) + "01");
 
 		int custNo = 0;
 		int facmNo = 0;
 
+		int cntTrans = 0;
+		
 		for (Map<String, String> r : data) {
 
+			cntTrans++;
+
+		
+			
 			int iCustNo = parse.stringToInteger(r.get("CustNo"));
 			int iFacmNo = parse.stringToInteger(r.get("FacmNo"));
 
@@ -153,7 +166,7 @@ public class L4721Report2 extends MakeReport {
 			List<Map<String, String>> listL4721Detail = new ArrayList<Map<String, String>>();
 
 			try {
-				listL4721Detail = l4721ServiceImpl.doDetail(custNo, isday, ieday, titaVo);
+				listL4721Detail = l4721ServiceImpl.doDetail(custNo, sAdjDate, eAdjDate, sEntryDate, eEntryDate, titaVo);
 			} catch (Exception e) {
 				this.error("l4721ServiceImpl doDetail = " + e.getMessage());
 				throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
@@ -173,6 +186,7 @@ public class L4721Report2 extends MakeReport {
 
 				int tempfacmno = parse.stringToInteger(listL4721Detail.get(0).get("FacmNo"));
 				int times = 0;
+
 				for (Map<String, String> mapL4721Detail : listL4721Detail) {
 
 					// 相同戶號不同額度的輸出
@@ -180,9 +194,9 @@ public class L4721Report2 extends MakeReport {
 					if (tempfacmno == parse.stringToInteger(mapL4721Detail.get("FacmNo"))) { // 相同額度
 						// 該額度第一次進要印0102
 						if (times == 0) {
-							result = sameFacmno(mapL4721Detail, result, true);
+							result = sameFacmno(mapL4721Detail, result, true, titaVo);
 						} else {
-							result = sameFacmno(mapL4721Detail, result, false);
+							result = sameFacmno(mapL4721Detail, result, false, titaVo);
 						}
 						times++;
 					} else { // 不同額度 印04並且切到下一個額度循環
@@ -200,9 +214,9 @@ public class L4721Report2 extends MakeReport {
 							line = "";
 							line += "45";
 							line += " 額度 " + FormatUtil.pad9(mapL4721Detail.get("FacmNo"), 3) + "     " + "利率自"
-									+ showRocDate(mapL4721Detail.get("TxEffectDate"), 0) + "起，　由"
-									+ formatAmt(mapL4721Detail.get("PresentRate"), 2) + "%" + "調整為"
-									+ formatAmt(mapL4721Detail.get("AdjustedRate"), 2) + "。";
+									+ makeReport.showRocDate(mapL4721Detail.get("TxEffectDate"), 0) + "起，　由"
+									+ makeReport.formatAmt(mapL4721Detail.get("PresentRate"), 2) + "%" + "調整為"
+									+ makeReport.formatAmt(mapL4721Detail.get("AdjustedRate"), 2) + "。";
 							result.add(line);
 						}
 
@@ -216,18 +230,25 @@ public class L4721Report2 extends MakeReport {
 								+ FormatUtil.pad9(mapL4721Detail.get("CustNo"), 7);
 						result.add(line);
 						tempfacmno = parse.stringToInteger(mapL4721Detail.get("FacmNo"));
-						result = sameFacmno(mapL4721Detail, result, true);
+						result = sameFacmno(mapL4721Detail, result, true, titaVo);
 						// 換額度要重新算次數
 						times = 0;
 					} // else
 
 				} // for
 			} // for
+			
+			if (cntTrans > 200) {
+				cntTrans = 0;
+				this.batchTransaction.commit();
+			}
+			
 		} // for
 		return result;
 	}
 
-	private List<String> sameFacmno(Map<String, String> tmap, List<String> result, Boolean same) throws LogicException {
+	private List<String> sameFacmno(Map<String, String> tmap, List<String> result, Boolean same, TitaVo titaVo)
+			throws LogicException {
 
 		String line = "";
 
@@ -305,22 +326,14 @@ public class L4721Report2 extends MakeReport {
 		String endDate = tmap.get("IntEndDate");
 		String tstartDate = "00000000";
 		String tendDate = "00000000";
-		// 組成yyymmdd-yyymmddㄨ
+		// 組成yyymmdd-yyymmdd
 		if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
 
-//			if (!"".equals(showRocDate(startDate, 3))) {
-//				tstartDate = showRocDate(startDate, 3);
-//			}
-//
-//			if (!"".equals(showRocDate(endDate, 3))) {
-//				tendDate = showRocDate(endDate, 3);
-//			}
-
-			if (!"".equals(showRocDate(startDate, 3))) {
+			if (!"".equals(makeReport.showRocDate(startDate, 3))) {
 				tstartDate = FormatUtil.pad9(startDate, 8);
 			}
 
-			if (!"".equals(showRocDate(endDate, 3))) {
+			if (!"".equals(makeReport.showRocDate(endDate, 3))) {
 				tendDate = FormatUtil.pad9(endDate, 8);
 			}
 			dateRange = tstartDate + "-" + tendDate;
@@ -429,5 +442,11 @@ public class L4721Report2 extends MakeReport {
 		}
 		String pattern = "%" + length + "s";
 		return String.format(pattern, str).replace(' ', padChar);
+	}
+
+	@Override
+	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

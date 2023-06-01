@@ -270,7 +270,7 @@ public class LW003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = " ";
 		sql += "  WITH \"Data1\" AS (";
 		sql += "	SELECT IM.\"WorkMonth\"";
-		sql += "	      ,SUM(R.\"IntroducerAddBonus\")) AS \"IntroAddBonus\"";
+		sql += "	      ,SUM(R.\"IntroducerAddBonus\") AS \"IntroAddBonus\"";
 		sql += "	FROM( SELECT I.* ";
 		sql += "	            ,ROW_NUMBER() OVER(";
 		sql += "		  		 PARTITION BY I.\"CustNo\", I.\"FacmNo\"";

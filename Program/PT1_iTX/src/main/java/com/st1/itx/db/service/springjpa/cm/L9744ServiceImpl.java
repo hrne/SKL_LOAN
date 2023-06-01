@@ -67,7 +67,7 @@ public class L9744ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,NVL(E1.\"Fullname\", ' ') AS \"ItName\""; // F18 介紹人姓名
 		sql += "       ,NVL(E2.\"Fullname\", ' ') AS \"ItUnitManager\""; // F19 處經理姓名(介紹人)
 		sql += "       ,NVL(E3.\"Fullname\", ' ') AS \"ItDistManager\""; // F20 區經理姓名(介紹人)
-		sql += "       ,I.\"PerfEqAmt\") AS \"PerfEqAmt\" "; // F21 換算業績 -- 20211201 此三金額修改為撥款層而非額度層總計
+		sql += "       ,I.\"PerfEqAmt\" "; // F21 換算業績 -- 20211201 此三金額修改為撥款層而非額度層總計
 		sql += "       ,I.\"PerfReward\" "; // F22 業務報酬 -- 參考L5051
 		sql += "       ,I.\"PerfAmt\" "; // F23 業績金額
 		sql += " FROM \"PfItDetail\" I";

@@ -162,7 +162,7 @@ BEGIN
                    , NVL(S1.HGTAD1,' ') -- 縣市別
                    , NVL(S1.HGTAD2,' ') -- 鄉鎮市區
                    , NVL(S1.LGTADR,' ') -- 2023-05-08 Wei 增加 from SKL佳怡 2023-05-05 mail 增加唯一性判斷條件-門牌號碼
-                   , NVL(S1.LGTCIF,' ') -- 2023-05-08 Wei 增加 from SKL佳怡 2023-05-05 mail 增加唯一性判斷條件-擔保品提供人
+                   , NVL(S1.LGTCIF,0) -- 2023-05-08 Wei 增加 from SKL佳怡 2023-05-05 mail 增加唯一性判斷條件-擔保品提供人
                   --  , NVL(S1.HGTMHS,' ') -- 2023-05-10 Wei 增加 from SKL佳怡 2023-05-09 會議 增加唯一性判斷條件-主建物(坪)
                   --  , NVL(S1.HGTPSM,' ') -- 2023-05-10 Wei 增加 from SKL佳怡 2023-05-09 會議 增加唯一性判斷條件-公設(坪)
                   --  , NVL(S1.HGTCAM,' ') -- 2023-05-10 Wei 增加 from SKL佳怡 2023-05-09 會議 增加唯一性判斷條件-車位(坪)

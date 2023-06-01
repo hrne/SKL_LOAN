@@ -113,7 +113,7 @@ T(F,@ResrvStndrd,1)
 T(F,@PosbleBorPsn,1)
 T(F,@PosbleBorAmt,1)
 T(F,@AlrdyBorAmt,1)
-T(F,@StockHoldersEqt,1),
+T(F,@StockHoldersEqt,1)
 T(F,@AvailableFunds,1),
 2,
 T(F,@AcDate,0)
@@ -121,7 +121,7 @@ T(F,@ResrvStndrd,1)
 T(F,@PosbleBorPsn,1)
 T(F,@PosbleBorAmt,1)
 T(F,@AlrdyBorAmt,1)
-T(F,@StockHoldersEqt,1),
+T(F,@StockHoldersEqt,1)
 T(F,@AvailableFunds,1),
 4,
 T(F,@AcDate,0)
@@ -129,8 +129,8 @@ T(F,@ResrvStndrd,0)
 T(F,@PosbleBorPsn,0)
 T(F,@PosbleBorAmt,0)
 T(F,@AlrdyBorAmt,0)
-T(F,@StockHoldersEqt,0))
-T(F,@AvailableFunds,0),
+T(F,@StockHoldersEqt,0)
+T(F,@AvailableFunds,0))
 
 #RimFuncCode=A,1,S
 #RimAcDate=D,7,S
