@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -7022,6 +7025,22 @@ em = null;
       jobMainReposHist.uspCpYearlyhouseloanintcheckIns(EmpNo);
    else
       jobMainRepos.uspCpYearlyhouseloanintcheckIns(EmpNo);
+  }
+
+  @Override
+  public void Usp_L9_DailyBackup_Copy(int Tbsdyf,String EmpNo, TitaVo... titaVo) {
+    String dbName = "";
+    
+    if (titaVo.length != 0)
+    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    if (dbName.equals(ContentName.onDay))
+      jobMainReposDay.uspL9DailybackupCopy(Tbsdyf,EmpNo);
+    else if (dbName.equals(ContentName.onMon))
+      jobMainReposMon.uspL9DailybackupCopy(Tbsdyf,EmpNo);
+    else if (dbName.equals(ContentName.onHist))
+      jobMainReposHist.uspL9DailybackupCopy(Tbsdyf,EmpNo);
+   else
+      jobMainRepos.uspL9DailybackupCopy(Tbsdyf,EmpNo);
   }
 
 }

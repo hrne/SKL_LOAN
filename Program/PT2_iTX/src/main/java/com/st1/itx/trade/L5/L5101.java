@@ -36,7 +36,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L5101 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L5101.class);
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -72,6 +71,7 @@ public class L5101 extends TradeBuffer {
 				iInnFundApl.setPosbleBorPsn(parse.stringToBigDecimal(titaVo.getParam("PosbleBorPsn")));
 				iInnFundApl.setPosbleBorAmt(parse.stringToBigDecimal(titaVo.getParam("PosbleBorAmt")));
 				iInnFundApl.setStockHoldersEqt(parse.stringToBigDecimal(titaVo.getParam("StockHoldersEqt")));
+				iInnFundApl.setAvailableFunds(parse.stringToBigDecimal(titaVo.getParam("AvailableFunds")));
 				try {
 					innFundAplService.insert(iInnFundApl, titaVo);
 				} catch (DBException e) {
@@ -89,6 +89,7 @@ public class L5101 extends TradeBuffer {
 				iInnFundApl.setPosbleBorPsn(parse.stringToBigDecimal(titaVo.getParam("PosbleBorPsn")));
 				iInnFundApl.setPosbleBorAmt(parse.stringToBigDecimal(titaVo.getParam("PosbleBorAmt")));
 				iInnFundApl.setStockHoldersEqt(parse.stringToBigDecimal(titaVo.getParam("StockHoldersEqt")));
+				iInnFundApl.setAvailableFunds(parse.stringToBigDecimal(titaVo.getParam("AvailableFunds")));
 				try {
 					innFundAplService.update(iInnFundApl, titaVo);
 				} catch (DBException e) {

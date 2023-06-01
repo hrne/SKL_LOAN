@@ -199,67 +199,14 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// SKL User 李珮君 要求跟AS400產一樣的檔案
 		// 協辦人員業績金額的檔案要產出不只有協辦人員業績金額的檔案
 		String sql = " ";
-		sql += " WITH UTILBAL AS ( ";
-		sql += "  SELECT PR.\"CustNo\" ";
-		sql += "       , PR.\"FacmNo\" ";
-		sql += "       , PR.\"EmployeeNo\" ";
-		sql += "       , PR.\"PieceCode\"  "; 
-		sql += "       , PR.\"ProdCode\"  "; 
-		sql += "       , SUM(NVL(PI.\"DrawdownAmt\",0)) AS \"UtilBal\" ";
-		sql += "  FROM ";
-		sql += "  ( SELECT \"CustNo\" ";
-		sql += "          , \"FacmNo\" ";
-		sql += "          , \"BormNo\" ";
-		sql += "          , \"EmployeeNo\" ";
-		sql += "          , \"PieceCode\"  "; 
-		sql += "          , \"ProdCode\"  "; 
-		sql += "    FROM ( SELECT \"CustNo\" ";
-		sql += "                 , \"FacmNo\" ";
-		sql += "                 , \"BormNo\" ";
-		sql += "                 , \"EmployeeNo\" ";
-		sql += "                 , \"PieceCode\"  "; 
-		sql += "                 , \"ProdCode\"  "; 
-		sql += "           FROM \"PfRewardMedia\" a ";
-		sql += "           WHERE \"WorkMonth\" = :inputWorkMonth ";
-		sql += "             AND \"BonusType\" in (5) "; // 協辦
-		sql += "             AND (\"AdjustBonus\" > 0  OR \"ManualFg\" = 1) ";
-		sql += "           UNION ALL";
-		sql += "           SELECT \"CustNo\" ";
-		sql += "                 , \"FacmNo\" ";
-		sql += "                 , \"BormNo\" ";
-		sql += "                 , \"Coorgnizer\" AS \"EmployeeNo\" ";
-		sql += "                 , \"PieceCode\"  "; 
-		sql += "                 , \"ProdCode\"  "; 
-		sql += "           FROM \"PfReward\" ";
-		sql += "           WHERE \"WorkMonth\" = :inputWorkMonth ";
-		sql += "         )  ";
-		sql += "    GROUP BY \"CustNo\" ";
-		sql += "           , \"FacmNo\" ";
-		sql += "           , \"BormNo\" ";
-		sql += "           , \"EmployeeNo\" ";
-		sql += "           , \"PieceCode\"  "; 
-		sql += "           , \"ProdCode\"  "; 
-		sql += "  ) PR ";
-		sql += "  LEFT JOIN \"PfItDetail\" PI ON PI.\"CustNo\" = PR.\"CustNo\" ";
-		sql += "                             AND PI.\"FacmNo\" = PR.\"FacmNo\" ";
-		sql += "                             AND PI.\"BormNo\" = PR.\"BormNo\" ";
-		sql += "                             AND PI.\"RepayType\" = 0 ";
-		sql += "  WHERE PR.\"PieceCode\" IN ('1','2','A','B','8','9') ";
-		sql += "    AND PR.\"ProdCode\" NOT IN ('TB') ";
-		sql += "  GROUP BY PR.\"CustNo\" ";
-		sql += "         , PR.\"FacmNo\" ";
-		sql += "         , PR.\"EmployeeNo\" ";
-		sql += "         , PR.\"PieceCode\"  "; 
-		sql += "         , PR.\"ProdCode\"  "; 
-		sql += " ) ";
-		sql += "SELECT * FROM ( ";
-		sql += " SELECT PR.\"CustNo\"            AS \"CustNo\" "; // -- F0 戶號
-		sql += "      , PR.\"FacmNo\"            AS \"FacmNo\" "; // -- F1 額度
-		sql += "      , PR.\"UtilBal\"           AS \"DrawdownAmt\" "; // -- F2 撥款金額
-		sql += "      , PR.\"PieceCode\"         AS \"PieceCode\" "; // -- F3 計件代碼
-		sql += "      , NVL(PR.\"EmployeeNo\",' ') ";
+		sql += "SELECT * FROM ( ";	
+		sql += " SELECT PI.\"CustNo\"            AS \"CustNo\" "; // -- F0 戶號
+		sql += "      , PI.\"FacmNo\"            AS \"FacmNo\" "; // -- F1 額度
+		sql += "      , SUM(PI.\"DrawdownAmt\")  AS \"DrawdownAmt\" "; // -- F2 撥款金額
+		sql += "      , PI.\"PieceCode\"         AS \"PieceCode\" "; // -- F3 計件代碼
+		sql += "      , NVL(PR.\"Coorgnizer\",' ') ";
 		sql += "                                 AS \"EmpNo\"  "; // -- F4 員工代號
-		sql += "      , \"Fn_GetEmpName\"(PR.\"EmployeeNo\",0) ";
+		sql += "      , \"Fn_GetEmpName\"(PR.\"Coorgnizer\",0) ";
 		sql += "                                 AS \"EmpName\"     "; // -- F5 員工姓名
 		sql += "      , NVL(PCO.\"DeptItem\", ' ') ";
 		sql += "                                 AS \"Dept\"        "; // -- F6 部室
@@ -267,17 +214,33 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                 AS \"Dist\"        "; // -- F7 區部
 		sql += "      , NVL(PCO.\"AreaItem\", ' ') ";
 		sql += "                                 AS \"Unit\"        "; // -- F8 單位
-		sql += " FROM UTILBAL PR ";
-		sql += " LEFT JOIN \"PfCoOfficer\" PCO ON PCO.\"EmpNo\" = PR.\"EmployeeNo\" ";
-		sql += "                              AND PCO.\"EffectiveDate\" = \"Fn_GetPfCoOfficeEffectiveDate\"(PR.\"EmployeeNo\",:inputWorkMonth) ";
-		sql += ") ";
+		sql += " FROM \"PfItDetail\" PI ";
+		sql += " LEFT JOIN \"PfReward\" PR ON PR.\"CustNo\" = PI.\"CustNo\" ";
+		sql += "                            AND PR.\"FacmNo\" = PI.\"FacmNo\" ";
+		sql += "                            AND PR.\"BormNo\" = PI.\"BormNo\" ";
+		sql += "                            AND PR.\"RepayType\" = 0 ";
+		sql += " LEFT JOIN \"PfCoOfficer\" PCO ON PCO.\"EmpNo\" = PR.\"Coorgnizer\" ";
+		sql += "                              AND PCO.\"EffectiveDate\" = \"Fn_GetPfCoOfficeEffectiveDate\"(PR.\"Coorgnizer\",:inputWorkMonth) ";
+		sql += " WHERE PI.\"PieceCode\" IN ('1','2','A','B','8','9') ";
+		sql += "   AND PI.\"ProdCode\" NOT IN ('TB') ";
+		sql += "   AND PI.\"RepayType\" = 0 ";
+		sql += "   AND PI.\"WorkMonth\" = :inputWorkMonth ";
+		sql += " GROUP BY PI.\"CustNo\" ";
+		sql += "        , PI.\"FacmNo\" ";
+		sql += "        , PI.\"PieceCode\" ";
+		sql += "        , NVL(PR.\"Coorgnizer\",' ')  ";
+		sql += "        , \"Fn_GetEmpName\"(PR.\"Coorgnizer\",0) ";
+		sql += "        , NVL(PCO.\"DeptItem\", ' ') ";
+		sql += "        , NVL(PCO.\"DistItem\", ' ') ";
+		sql += "        , NVL(PCO.\"AreaItem\", ' ') ";
+		sql += ") ";	
 		sql += " ORDER BY CASE ";
 		sql += "            WHEN \"EmpNo\" = ' ' ";
 		sql += "            THEN 1 ";
 		sql += "          ELSE 0 END ";
 		sql += "        , SUBSTR(\"EmpNo\",1,1) ";
-		sql += "        , CASE WHEN SUBSTR(\"EmpNo\",2,1) BETWEEN '0' AND '9' THEN 'B' ELSE 'A' END "; // 數字排後面
-		sql += "        , SUBSTR(\"EmpNo\",3,4) ";
+		sql += "        , CASE WHEN SUBSTR(\"EmpNo\",2,1) BETWEEN '0' AND '9' THEN 'B' ELSE 'A' END "; //數字排後面
+		sql += "        , SUBSTR(\"EmpNo\",3,4) " ;
 		sql += "        , \"CustNo\" ";
 		sql += "        , \"FacmNo\" ";
 		this.info("sql=" + sql);

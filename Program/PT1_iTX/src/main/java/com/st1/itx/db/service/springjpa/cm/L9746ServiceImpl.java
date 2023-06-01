@@ -98,23 +98,16 @@ public class L9746ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , CustName               AS F4 "; // -- 戶名
 		sql += "      , DrawdownAmt            AS F5 "; // -- 撥款金額
 		sql += "      , PieceCode              AS F6 "; // -- 計件代碼
-		sql += "      , NVL(PIDA.\"AdjCntingCode\", CntingCode) ";
-		sql += "                               AS F7 "; // -- 是否計件
+		sql += "      , CntingCode             AS F7 "; // -- 是否計件
 		sql += "      , DeptItem               AS F8 "; // -- 部室
 		sql += "      , DistItem               AS F9 "; // -- 區部
 		sql += "      , UnitItem               AS F10 "; // -- 單位
 		sql += "      , ProdCode               AS F11 "; // -- 商品代碼
-		sql += "      , NVL(PIDA.\"AdjPerfEqAmt\", PerfEqAmt) ";
-		sql += "                               AS F12 "; // -- 三階換算業績
-		sql += "      , NVL(PIDA.\"AdjPerfReward\", PerfReward) ";
-		sql += "                               AS F13 "; // -- 三階業務報酬
+		sql += "      , PerfEqAmt              AS F12 "; // -- 三階換算業績
+		sql += "      , PerfReward             AS F13 "; // -- 三階業務報酬
 		sql += "      , AgType1                AS F14 "; // -- 制度別
 		sql += "      , AgLevelSys             AS F15 "; // -- 業務制度別
 		sql += " FROM S1 ";
-		sql += " LEFT JOIN \"PfItDetailAdjust\" PIDA ON PIDA.\"CustNo\" = S1.CustNo ";
-		sql += "                                    AND PIDA.\"FacmNo\" = S1.FacmNo ";
-		sql += "                                    AND PIDA.\"WorkMonth\" = :inputWorkMonth ";
-		sql += "                                    AND PIDA.\"AdjRange\" IN (1,2) ";
 		sql += " ORDER BY F0 ";
 		sql += "        , F3 ";
 

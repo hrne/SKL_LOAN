@@ -67,10 +67,10 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,NVL(E1.\"Fullname\", ' ') AS \"ItName\""; // 介紹人姓名
 		sql += "       ,NVL(E2.\"Fullname\", ' ') AS \"ItUnitManager\""; // 處經理姓名(介紹人)
 		sql += "       ,NVL(E3.\"Fullname\", ' ') AS \"ItDistManager\""; // 區經理姓名(介紹人)
-		sql += "       ,NVL(PIDA.\"AdjPerfEqAmt\", I.\"PerfEqAmt\") AS \"PerfEqAmt\" "; // 換算業績 -- 20211201 依eric指示
+		sql += "       ,I.\"PerfEqAmt\" "; // 換算業績 -- 20211201 依eric指示
 																						// 此三金額修改為撥款層而非額度層總計
-		sql += "       ,NVL(PIDA.\"AdjPerfReward\", I.\"PerfReward\") AS \"PerfReward\" "; // 業務報酬 -- 參考L5051
-		sql += "       ,NVL(PIDA.\"AdjPerfAmt\", I.\"PerfAmt\") AS \"PerfAmt\" "; // 業績金額
+		sql += "       ,I.\"PerfReward\" "; // 業務報酬 -- 參考L5051
+		sql += "       ,I.\"PerfAmt\" "; // 業績金額
 		sql += "       ,NVL(e1.\"AgLevel\", '')  AS \"AgLevel0\""; // 介紹人職等
 		sql += "       ,NVL(e4.\"Fullname\", '') AS \"ManagerName1\""; // 介紹人主管姓名1
 		sql += "       ,NVL(e4.\"AgLevel\", '')  AS \"AgLevel1\""; // 介紹人主管職等1
@@ -98,11 +98,6 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"CdBcm\" B1 ON B1.\"UnitCode\" = I.\"UnitCode\""; // 取單位中文(介紹人)
 		sql += " LEFT JOIN \"CdBcm\" B2 ON B2.\"UnitCode\" = I.\"DeptCode\""; // 取部室中文(介紹人)
 		sql += " LEFT JOIN \"CdBcm\" B3 ON B3.\"UnitCode\" = I.\"DistCode\""; // 取區部中文(介紹人)
-		sql += " LEFT JOIN \"PfItDetailAdjust\" PIDA ON PIDA.\"CustNo\"    = I.\"CustNo\"     ";
-		sql += "                                    AND PIDA.\"FacmNo\"    = I.\"FacmNo\"     ";
-		sql += "                                    AND PIDA.\"BormNo\"    = I.\"BormNo\"     ";
-		sql += "                                    AND PIDA.\"WorkMonth\" = I.\"WorkMonth\"  ";
-		sql += "                                    AND PIDA.\"AdjRange\" IN (1,2) ";
 		sql += " WHERE I.\"DrawdownAmt\" > 0 ";
 		sql += "   AND I.\"Introducer\" IS NOT NULL ";
 		sql += "   AND I.\"PerfDate\" <= :entDy ";

@@ -111,6 +111,8 @@ public class ReportCom extends CommBuffer {
 					tradeName = cdReportService.FormNoFirst(tradeCode, titaVo).getFormName();
 				}
 
+				tradeCode = tradeCode.length() == 5 ? tradeCode : tradeCode.substring(0, 5);
+				
 				if (needInput(tradeCode)) {
 					// send notice through website
 					this.info("ReportCom: adding NeedInputJob " + tradeCode + "(" + txcd + ")");

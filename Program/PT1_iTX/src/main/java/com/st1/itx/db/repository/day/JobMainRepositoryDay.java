@@ -3,6 +3,8 @@ package com.st1.itx.db.repository.day;
 
 import java.util.Optional;
 
+import java.math.BigDecimal;
+import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
@@ -1690,6 +1692,10 @@ public interface JobMainRepositoryDay extends JpaRepository<JobMain, JobMainId> 
   // (每日複製)
   @Procedure(value = "\"Usp_Cp_YearlyHouseLoanIntCheck_Ins\"")
   public void uspCpYearlyhouseloanintcheckIns(String EmpNo);
+
+  // 每日複製
+  @Procedure(value = "\"Usp_L9_DailyBackup_Copy\"")
+  public void uspL9DailybackupCopy(int Tbsdyf,String EmpNo);
 
 }
 

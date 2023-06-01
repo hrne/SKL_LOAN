@@ -33,7 +33,7 @@ E(0,0)
 ["#<->#,#FdFunCode+功能選項",#FunCodeX],
 ["#<->#,#FdCustNo+借款人戶號",#CustNo,"-",#FacmNo,"-",#BormNo],
 ["#<->#,#FdCustNm+戶名",#CustNm],
-["#<->#,#FdOption+修改項目",#Option,#OptionX],
+["#<->#,#FdOption+調整項目",#Option,#OptionX],
 ["#<->#,#FdIntroducer+介紹人",#Introducer,#BTNA,#IntroducerName],
 ["#<->#,#FdUnitManager+處經理",#UnitManager,#BTNB,#UnitManagerName],
 ["#<->#,#FdDistManager+區經理",#DistManager,#BTNC,#DistManagerName],
@@ -47,7 +47,7 @@ E(0,0)
 ["#<->#,#FdPerfReward+業務報酬",#AdjPerfReward],
 ["#<->#,#FdPerfAmt+業績金額",#AdjPerfAmt],
 ["#<->#,#FdCntingCode+是否計件",#AdjCntingCode],
-[#FdAdjRange+調整範圍",#AdjRange,"@(1:調整本月@2:調整本月及季累計)"],
+[#FdAdjRange+調整範圍",#AdjRange,"@(1:同工作月調整@2:跨工作月調整)"],
 [#FdWorkMonth+工作月",#WorkMonth],
 ]
 ![#<->#,"#FdPerfDate+業績日期",#PerfDate],
@@ -72,6 +72,7 @@ IF(#CHAIN==0,V(P,本交易為連動交易，請由L5051連動進入),$)
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@FunCode,#NTXBUF,1,1)
 T(1,@LogNo,#NTXBUF,2,8)
+T(1,@RepayType,#NTXBUF,10,1)
 
 #FdWorkMonth=X,2,L
 #FdTitle=X,2,L
@@ -145,6 +146,8 @@ C(3,#FunCode,5,K(NOBUTTON,CLOSEY),$)
 
 #LogNo=A,8,S
 #AdjLogNo=A,8,S
+#RepayType=X,1,S
+
 
 #Tf=x,1,S
 C(3,#FunCode,4,$,S)
@@ -160,6 +163,12 @@ T(F,@Option,0)
 T(F,@DeptCode,0)
 T(F,@DistCode,0)
 T(F,@UnitCode,0)
+
+#Tf5=x,1,S
+IF(#RepayType != 0 ,$,S )
+T(F,@Option,0)
+T(F,@AdjRange,0)
+
 
 #RimL5r27=X,1,S
 C(3,#CHAIN,1,$,S)
@@ -202,8 +211,6 @@ T(2,@UnitCodeX,#L5r27UnitCodeX)
 ! 撥款序號
 #BormNo=A,3,L
 
-!工作月
-#WorkMonth=X,5,L
 
 #MRKEY=_,_,S
 T(2,#CustNo+-+#FacmNo+-+#BormNo)
@@ -221,7 +228,7 @@ T(2,#CustNo+-+#FacmNo+-+#BormNo)
 
 
 
-!修改項目
+!修改項目 ,RepayType = 0或4才可修改1.人員異動
 #OptionHelp=X,50,S
 T(3,1:人員異動 ;2:業績調整 )
 #Option=A,1,I
@@ -229,6 +236,7 @@ HELP(#OptionHelp)
 E(0,2)
 IF(#FunCode != 2,s,$)
 IF(#FunCode == 2 ,$,S)
+IF(#RepayType == 0 || #RepayType ==4,$,s)
 @V(3,1,2)
 T(2,@Introducer,#L5r27Introducer)
 T(2,@IntroducerName,#L5r27IntroducerName)
@@ -274,6 +282,7 @@ T(F,@DistManager,1)
 T(F,@DeptCode,1)
 T(F,@DistCode,1)
 T(F,@UnitCode,1)
+T(F,@WorkMonth,0)
 
 #Tf3=x,1,S
 C(3,#FunCode,2,$,S)
@@ -285,10 +294,10 @@ T(F,@AdjPerfEqAmt,1)
 T(F,@AdjPerfReward,1)
 T(F,@AdjPerfAmt,1)
 T(F,@AdjCntingCode,1)
-T(F,@AdjRange,1)
 T(F,@DeptCode,0)
 T(F,@DistCode,0)
 T(F,@UnitCode,0)
+T(F,@AdjRange,1)
 
 
 <include src="ROM.icf::L2R08.dec"/>
@@ -483,12 +492,37 @@ HELP(#CntingCodeH)
 @
 V(H,#CntingCodeH)
 
-#AdjRange=A,1,I
+#Tf4=x,1,S
+T(F,@WorkMonth,0)
+C(3,#FunCode,2,$,S)
+C(3,#Option,2,$,S)
+C(3,#AdjRange,2,$,S)
+T(F,@WorkMonth,1)
+
+!新增時AdjRange =2 ,其他為1
+#AdjRange=A,1,L
 C(3,#FunCode,4,s,$)
 IF(#Option == 1,s,$)
+IF(#FunCode==1,E(0,2),E(0,1))
+!@
+!V(1,1,2)
+
+
+
+#MESSAGE=X,20,S
+T(2,需大於原工作月+#L5r27WorkMonth)
+!工作月
+#WorkMonth=X,5,I
+C(3,#FunCode,4,s,$)
+IF(#Option == 1,s,$)
+IF(#AdjRange == 1,s,$)
 @
-V(1,1,2)
+A(YM13,1,#WorkMonth)
+IF(#AdjRange == 1,s,$)
+IF(#WorkMonth > #L5r27WorkMonth,$,V(P,#MESSAGE))
+
 </sub>
+
 
 !---------- 輸出共用變數宣告區 ----------
 <sub type="RTN" name="AFXMT">

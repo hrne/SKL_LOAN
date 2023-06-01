@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
@@ -85,21 +86,23 @@ public class L5051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "A.\"PerfAmt\",";
 		sql += "A.\"RepayType\",";
 		sql += "A.\"WorkMonth\" - 191100 as \"WorkMonth\", ";
-		sql += "NVL(D.\"AdjRange\",9) AS \"AdjRange\", ";
-//		sql += "NVL(H.LOGCNT,0) AS LOGCNT, ";
+		sql += "CASE WHEN A.\"RepayType\" = 4 THEN 2 ELSE NVL(D.\"AdjRange\",9) END AS \"AdjRange\", ";
 		sql += "D.\"AdjPerfEqAmt\", ";
 		sql += "D.\"AdjPerfReward\", ";
 		sql += "D.\"AdjPerfAmt\", ";
 		sql += "D.\"AdjCntingCode\", ";
 		sql += "NVL(G.\"Code\",'') AS \"MediaFg\", ";
 		sql += "NVL(G.\"CreateDate\",'') AS \"MediaDate\", ";
-		sql += "NVL(D.\"LastUpdate\",A.\"LastUpdate\") AS \"LastUpdate\", ";
-		sql += "NVL(D.\"LastUpdateEmpNo\",A.\"LastUpdateEmpNo\") AS \"LastUpdateEmpNo\", ";
+		sql += "A.\"LastUpdate\", ";
+		sql += "A.\"LastUpdateEmpNo\", ";
+		sql += "CASE WHEN A.\"RepayType\" = 4 THEN 'Y'";		
+		sql += "     WHEN A.\"LastUpdate\" = A.\"CreateDate\" THEN 'N' ";		
+		sql += "     ELSE 'Y' END AS \"HasHistory\", ";		
 		sql += "NVL(F6.\"Fullname\",F5.\"Fullname\") AS \"LastUpdateEmpName\" ";
 		sql += "FROM \"PfItDetail\" A ";
 		sql += "LEFT JOIN \"PfBsDetail\" B ON B.\"CustNo\"=A.\"CustNo\" AND B.\"FacmNo\"=A.\"FacmNo\" AND B.\"BormNo\"=A.\"BormNo\" AND B.\"PerfDate\"=A.\"PerfDate\" AND B.\"RepayType\"=A.\"RepayType\" AND B.\"PieceCode\"=A.\"PieceCode\" AND B.\"DrawdownAmt\">0 ";
 		sql += "LEFT JOIN \"CustMain\" C ON C.\"CustNo\"=A.\"CustNo\" ";
-		sql += "LEFT JOIN \"PfItDetailAdjust\" D ON D.\"CustNo\"=A.\"CustNo\" AND D.\"FacmNo\"=A.\"FacmNo\" AND D.\"BormNo\"=A.\"BormNo\" ";
+		sql += "LEFT JOIN \"PfItDetailAdjust\" D ON D.\"CustNo\"=A.\"CustNo\" AND D.\"FacmNo\"=A.\"FacmNo\" AND D.\"BormNo\"=A.\"BormNo\" AND A.\"RepayType\"=0 ";
 		sql += "LEFT JOIN \"CdBcm\" E1 ON E1.\"UnitCode\"=B.\"DeptCode\" ";
 		sql += "LEFT JOIN \"CdBcm\" E2 ON E2.\"UnitCode\"=A.\"DeptCode\" ";
 		sql += "LEFT JOIN \"CdBcm\" E3 ON E3.\"UnitCode\"=A.\"DistCode\" ";
@@ -111,10 +114,7 @@ public class L5051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "LEFT JOIN \"CdEmp\" F5 ON F5.\"EmployeeNo\"=A.\"LastUpdateEmpNo\" ";
 		sql += "LEFT JOIN \"CdEmp\" F6 ON F6.\"EmployeeNo\"=D.\"LastUpdateEmpNo\" ";
 		sql += "LEFT JOIN \"TxControl\" G ON G.\"Code\"= CONCAT(CONCAT('L5510.',A.\"WorkMonth\"),'.2') ";
-//		sql += "LEFT JOIN (SELECT \"CustNo\",\"FacmNo\",\"BormNo\",COUNT(*) AS LOGCNT FROM \"TxDataLog\" WHERE \"TranNo\"='L5501' OR \"TranNo\"='L5505' GROUP BY \"CustNo\",\"FacmNo\",\"BormNo\") H ON H.\"CustNo\"=A.\"CustNo\" AND H.\"FacmNo\"=A.\"FacmNo\" AND H.\"BormNo\"=A.\"BormNo\" ";
-		//sql += "WHERE （A.\"DrawdownAmt\" > 0 OR D.\"AdjRange\" > 0) ";
-		sql += "WHERE A.\"DrawdownAmt\" > 0 ";
-		sql += "AND A.\"RepayType\" = 0 ";
+		sql += "WHERE A.\"RepayType\" >= 0 ";
 		if (WorkMonthFm > 0) {
 			sql += "AND A.\"WorkMonth\" BETWEEN :WorkMonthFm AND :WorkMonthTo ";
 		} else {
@@ -136,11 +136,6 @@ public class L5051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		sql += "ORDER BY A.\"Introducer\",A.\"CustNo\",A.\"FacmNo\",A.\"BormNo\" ";
-//		if ("Y".equals(SumByFacm)) {
-//			sql += "ORDER BY A.\"Introducer\",A.\"CustNo\",A.\"FacmNo\",A.\"BormNo\" ";
-//		} else {
-//			sql += "ORDER BY A.\"PerfDate\",A.\"CustNo\",A.\"FacmNo\",A.\"BormNo\" ";
-//		}
 
 		sql += sqlRow;
 
@@ -150,11 +145,8 @@ public class L5051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.index = index;
 		// *** 折返控制相關 ***
 		this.limit = limit;
-//		this.info("L5051ServiceImpl sql=[" + sql + "]");
-//		this.info("L5051ServiceImpl this.index=[" + this.index + "],this.limit=[" + this.limit + "]");
 
 		Query query;
-//			query = em.createNativeQuery(sql,L5051Vo.class);//進SQL 所以不要用.class (要用.class 就要使用HQL)
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("ThisIndex", index);

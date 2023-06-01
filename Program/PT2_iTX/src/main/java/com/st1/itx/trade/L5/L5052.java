@@ -62,15 +62,6 @@ public class L5052 extends TradeBuffer {
 
 		String SumByFacm = titaVo.getParam("SumByFacm").trim();
 
-//		String L5052Sql = "";
-//		List<Map<String,String>> L5052VoList = null;
-//		try {
-//			L5052Sql = l5052ServiceImpl.FindL5052(FunctionCd, PerfDateFm, PerfDateTo, CustNo, FacmNo);
-//		} catch (Exception e) {
-//			// E5003 組建SQL語法發生問題
-//			this.info("L5051 ErrorForSql=" + e);
-//			throw new LogicException(titaVo, "E5003", "");
-//		}
 		/* 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值 */
 		this.index = titaVo.getReturnIndex();
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
@@ -103,28 +94,20 @@ public class L5052 extends TradeBuffer {
 		BigDecimal PerfCnt = new BigDecimal("0");
 		BigDecimal PerfAmt = new BigDecimal("0");
 		BigDecimal DrawdownAmt = new BigDecimal("0");
-		int cnt = 0;
 		Boolean first = true;
 
 		Map<String, String> dd = new HashMap<String, String>();
 
 		for (Map<String, String> d : L5052List) {
-			Long adjLogNo = Long.valueOf(d.get("AdjLogNo").toString());
-			Long adjWorkMonth = Long.valueOf(d.get("AdjWorkMonth").toString());
 
 			BigDecimal cntPerfCnt = BigDecimal.ZERO;
 			BigDecimal cntPerfAmt = BigDecimal.ZERO;
-
-			if (adjLogNo > 0 && adjWorkMonth > 0) {
-				cntPerfCnt = new BigDecimal(d.get("AdjPerfCnt"));
-				cntPerfAmt = new BigDecimal(d.get("AdjPerfAmt"));
-			} else {
-				cntPerfCnt = new BigDecimal(d.get("PerfCnt"));
-				cntPerfAmt = new BigDecimal(d.get("PerfAmt"));
-			}
+			cntPerfCnt = new BigDecimal(d.get("PerfCnt"));
+			cntPerfAmt = new BigDecimal(d.get("PerfAmt"));
 
 			if ("Y".equals(SumByFacm)) {
-				if (first || !BsOfficer.equals(d.get("BsOfficer").trim()) || !CustNo.equals(d.get("CustNo").trim()) || !FacmNo.equals(d.get("FacmNo").trim())) {
+				if (first || !BsOfficer.equals(d.get("BsOfficer").trim()) || !CustNo.equals(d.get("CustNo").trim())
+						|| !FacmNo.equals(d.get("FacmNo").trim())) {
 					if (!first) {
 						putTota(dd, WorkMonth, PerfCnt, PerfAmt, DrawdownAmt, 1, SumByFacm, titaVo);
 					}
@@ -133,18 +116,13 @@ public class L5052 extends TradeBuffer {
 					PerfCnt = new BigDecimal("0");
 					PerfAmt = new BigDecimal("0");
 					DrawdownAmt = new BigDecimal("0");
-					cnt = 0;
 					first = false;
 				}
 
-//				PerfCnt = PerfCnt.add(new BigDecimal(d.get("PerfCnt")));
-//				PerfAmt = PerfAmt.add(new BigDecimal(d.get("PerfAmt")));
 				PerfCnt = PerfCnt.add(cntPerfCnt);
 				PerfAmt = PerfAmt.add(cntPerfAmt);
 
 				DrawdownAmt = DrawdownAmt.add(new BigDecimal(d.get("DrawdownAmt")));
-
-				cnt++;
 
 				BsOfficer = d.get("BsOfficer").trim();
 				CustNo = d.get("CustNo").trim();
@@ -153,7 +131,8 @@ public class L5052 extends TradeBuffer {
 					WorkMonth = "";
 				}
 			} else {
-				putTota(d, d.get("WorkMonth"), cntPerfCnt, cntPerfAmt, new BigDecimal(d.get("DrawdownAmt")), 0, SumByFacm, titaVo);
+				putTota(d, d.get("WorkMonth"), cntPerfCnt, cntPerfAmt, new BigDecimal(d.get("DrawdownAmt")), 0,
+						SumByFacm, titaVo);
 			}
 
 			dd.clear();
@@ -179,7 +158,8 @@ public class L5052 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private void putTota(Map<String, String> d, String WorkMonth, BigDecimal PerfCnt, BigDecimal PerfAmt, BigDecimal DrawdownAmt, int canModify, String SumByFacm, TitaVo titaVo) {
+	private void putTota(Map<String, String> d, String WorkMonth, BigDecimal PerfCnt, BigDecimal PerfAmt,
+			BigDecimal DrawdownAmt, int canModify, String SumByFacm, TitaVo titaVo) {
 		OccursList occursList = new OccursList();
 
 		occursList.putParam("OOLogNo", d.get("LogNo"));
@@ -188,20 +168,12 @@ public class L5052 extends TradeBuffer {
 		occursList.putParam("OOBsOfficer", d.get("BsOfficer"));// 員工代號(房貸專員)
 
 		int AdjFg = 0;
-		int LogFg = 0;
+		if ("N".equals(SumByFacm) && "1".equals( d.get("AdjFg"))) {
+			AdjFg = 1;
+		}
+		int CanModify = 0;
 		if ("N".equals(SumByFacm)) {
-			Long AdjLogNo = Long.valueOf(d.get("AdjLogNo").toString());
-
-			if (AdjLogNo > 0) {
-				LogFg = 1;
-				int AdjWorkMonth = Integer.valueOf(d.get("AdjWorkMonth").toString());
-				if (AdjWorkMonth > 0) {
-					AdjFg = 1;
-				} else {
-					AdjFg = 0;
-				}
-			}
-
+			CanModify = 1;
 		}
 
 		occursList.putParam("OOAdjFg", AdjFg);
@@ -220,31 +192,18 @@ public class L5052 extends TradeBuffer {
 		occursList.putParam("OODrawdownAmt", DrawdownAmt);// 撥款金額
 		occursList.putParam("OOWorkMonth", WorkMonth);// 工作月
 
-//			occursList.putParam("OODeptCode", d.get("DeptCode"));// 部室代號
-//			occursList.putParam("OODistCode", d.get("DistCode"));// 區部代號
-//			occursList.putParam("OOUnitCode", d.get("UnitCode"));// 單位代號
 		occursList.putParam("OOItDeptName", d.get("ItDeptName"));// 部室中文
 		occursList.putParam("OOItDistName", d.get("ItDistName"));// 區部中文
 		occursList.putParam("OOItUnitName", d.get("ItUnitName"));// 單位中文
 		occursList.putParam("OOIntroducer", d.get("Introducer"));// 員工代號(介紹人)
 		occursList.putParam("OOIntroducerName", d.get("IntroducerName"));// 員工姓名(介紹人)
 
-		occursList.putParam("OOCanModify", 1);
+		occursList.putParam("OOCanModify", CanModify);
 		occursList.putParam("OORepayType", d.get("RepayType"));
-		occursList.putParam("OOLog", LogFg);
 
 		occursList.putParam("OOLastUpdate", parse.stringToStringDateTime(d.get("LastUpdate")));
 		occursList.putParam("OOLastEmp", d.get("LastUpdateEmpNo") + " " + d.get("LastUpdateEmpName"));
-
-		// 歷程按鈕顯示與否
-		// 邏輯同 L6933
-
-		Slice<TxDataLog> slTxDataLog = sTxDataLogService.findByTranNo("L5502", FormatUtil.pad9(d.get("CustNo"), 7) + "-" + FormatUtil.pad9(d.get("FacmNo"), 3) + "-" + d.get("WorkMonth").trim(), 0, 1,
-				titaVo);
-
-		List<TxDataLog> lTxDataLog = slTxDataLog != null ? slTxDataLog.getContent() : null;
-
-		occursList.putParam("OOHasHistory", lTxDataLog != null && !lTxDataLog.isEmpty() ? "Y" : "N");
+		occursList.putParam("OOHasHistory", d.get("HasHistory"));
 
 		this.totaVo.addOccursList(occursList);
 

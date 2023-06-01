@@ -3,11 +3,14 @@ package com.st1.itx.db.repository.mon;
 
 import java.util.Optional;
 
+import java.math.BigDecimal;
+import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +32,7 @@ public interface CdCityRateRepositoryMon extends JpaRepository<CdCityRate, CdCit
   public Slice<CdCityRate> findAllByEffectYYMMIsOrderByCityCodeAsc(int effectYYMM_0, Pageable pageable);
 
   // EffectYYMM >= ,AND EffectYYMM <=
-  public Slice<CdCityRate> findAllByEffectYYMMGreaterThanEqualAndEffectYYMMLessThanEqualOrderByCityCodeAscEffectYYMMDesc(int effectYYMM_0, int effectYYMM_1, Pageable pageable);
+  public Slice<CdCityRate> findAllByEffectYYMMGreaterThanEqualAndEffectYYMMLessThanEqualOrderByEffectYYMMDesc(int effectYYMM_0, int effectYYMM_1, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

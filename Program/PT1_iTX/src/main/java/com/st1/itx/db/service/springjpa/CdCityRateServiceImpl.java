@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -180,13 +183,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("findEffectDateRange " + dbName + " : " + "effectYYMM_0 : " + effectYYMM_0 + " effectYYMM_1 : " +  effectYYMM_1);
     if (dbName.equals(ContentName.onDay))
-      slice = cdCityRateReposDay.findAllByEffectYYMMGreaterThanEqualAndEffectYYMMLessThanEqualOrderByCityCodeAscEffectYYMMDesc(effectYYMM_0, effectYYMM_1, pageable);
+      slice = cdCityRateReposDay.findAllByEffectYYMMGreaterThanEqualAndEffectYYMMLessThanEqualOrderByEffectYYMMDesc(effectYYMM_0, effectYYMM_1, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = cdCityRateReposMon.findAllByEffectYYMMGreaterThanEqualAndEffectYYMMLessThanEqualOrderByCityCodeAscEffectYYMMDesc(effectYYMM_0, effectYYMM_1, pageable);
+      slice = cdCityRateReposMon.findAllByEffectYYMMGreaterThanEqualAndEffectYYMMLessThanEqualOrderByEffectYYMMDesc(effectYYMM_0, effectYYMM_1, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = cdCityRateReposHist.findAllByEffectYYMMGreaterThanEqualAndEffectYYMMLessThanEqualOrderByCityCodeAscEffectYYMMDesc(effectYYMM_0, effectYYMM_1, pageable);
+      slice = cdCityRateReposHist.findAllByEffectYYMMGreaterThanEqualAndEffectYYMMLessThanEqualOrderByEffectYYMMDesc(effectYYMM_0, effectYYMM_1, pageable);
     else 
-      slice = cdCityRateRepos.findAllByEffectYYMMGreaterThanEqualAndEffectYYMMLessThanEqualOrderByCityCodeAscEffectYYMMDesc(effectYYMM_0, effectYYMM_1, pageable);
+      slice = cdCityRateRepos.findAllByEffectYYMMGreaterThanEqualAndEffectYYMMLessThanEqualOrderByEffectYYMMDesc(effectYYMM_0, effectYYMM_1, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

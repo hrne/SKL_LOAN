@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L5;
 
 import java.util.ArrayList;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -8,17 +9,15 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.db.domain.PfItDetail;
-import com.st1.itx.db.domain.PfItDetailAdjust;
-import com.st1.itx.db.service.PfItDetailService;
-import com.st1.itx.db.domain.PfBsDetail;
-import com.st1.itx.db.service.PfBsDetailService;
-import com.st1.itx.db.service.PfItDetailAdjustService;
-import com.st1.itx.db.domain.CustMain;
-import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.PfBsDetail;
+import com.st1.itx.db.domain.PfItDetail;
 import com.st1.itx.db.service.CdEmpService;
+import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.PfBsDetailService;
+import com.st1.itx.db.service.PfItDetailService;
+import com.st1.itx.tradeService.TradeBuffer;
 
 @Service("L5R46")
 @Scope("prototype")
@@ -38,9 +37,6 @@ public class L5R46 extends TradeBuffer {
 
 	@Autowired
 	public PfItDetailService pfItDetailService;
-
-	@Autowired
-	public PfItDetailAdjustService pfItDetailAdjustService;
 
 	@Autowired
 	public PfBsDetailService pfBsDetailService;
@@ -84,8 +80,9 @@ public class L5R46 extends TradeBuffer {
 				this.totaVo.putParam("IntroducerName", "");
 			}
 
-			PfBsDetail pfBsDetail = pfBsDetailService.findByTxFirst(pfItDetail.getCustNo(), pfItDetail.getFacmNo(), pfItDetail.getBormNo(), pfItDetail.getPerfDate() + 19110000,
-					pfItDetail.getRepayType(), pfItDetail.getPieceCode(), titaVo);
+			PfBsDetail pfBsDetail = pfBsDetailService.findByTxFirst(pfItDetail.getCustNo(), pfItDetail.getFacmNo(),
+					pfItDetail.getBormNo(), pfItDetail.getPerfDate() + 19110000, pfItDetail.getRepayType(),
+					pfItDetail.getPieceCode(), titaVo);
 			if (pfBsDetail == null) {
 				this.totaVo.putParam("BsOfficer", "");
 				this.totaVo.putParam("BsOfficerName", "");
@@ -104,12 +101,6 @@ public class L5R46 extends TradeBuffer {
 				}
 			}
 
-			PfItDetailAdjust pfItDetailAdjust = pfItDetailAdjustService.findCustFacmBormFirst(pfItDetail.getCustNo(), pfItDetail.getFacmNo(), pfItDetail.getBormNo(), titaVo);
-			if (pfItDetailAdjust != null && pfItDetailAdjust.getWorkMonth() > 0) {
-				this.totaVo.putParam("PerfAmt", pfItDetailAdjust.getAdjPerfAmt());
-			} else {
-				this.totaVo.putParam("PerfAmt", pfItDetail.getPerfAmt());
-			}
 			this.totaVo.putParam("PieceCode", pfItDetail.getPieceCode());
 		}
 

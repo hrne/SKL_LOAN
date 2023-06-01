@@ -44,10 +44,11 @@ public class LM013Batch extends BatchBase implements Tasklet, InitializingBean {
 
 		// 核貸總值分界: 一億(參照樣張)
 		titaVo.putParam("inputAmount", 100000000);
-
-		// i = 有五種表
-		for (int i = 0; i <= 4; i++) {
-			lM013Report.exec(titaVo, i);
-		}
+		// 0總表,1非關係自然人,2非關係法人,3關係自然人,4關係法人
+		lM013Report.exec(titaVo, "LM013", "金檢報表", 0);
+		lM013Report.exec(titaVo, "LM013", "非關係自然人", 1);
+		lM013Report.exec(titaVo, "LM013", "關係自然人", 2);
+		lM013Report.exec(titaVo, "LM013", "非關係法人", 3);
+		lM013Report.exec(titaVo, "LM013", "關係法人", 4);
 	}
 }

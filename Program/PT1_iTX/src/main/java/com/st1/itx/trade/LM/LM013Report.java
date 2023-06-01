@@ -96,7 +96,7 @@ public class LM013Report extends MakeReport {
 		print(-3, 3, "程式ID：" + this.getParentTranCode());
 		print(-4, 3, "報  表：" + this.getRptCode());
 
-		print(-1, 192, "機密等級："+this.getSecurity());
+		print(-1, 192, "機密等級：" + this.getSecurity());
 		print(-2, 192, "日  期：" + this.showBcDate(dDateUtil.getNowStringBc(), 1));
 		print(-3, 192, "時  間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
 				+ dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
@@ -127,7 +127,7 @@ public class LM013Report extends MakeReport {
 
 	}
 
-	public Boolean exec(TitaVo titaVo, int type) throws LogicException {
+	public Boolean exec(TitaVo titaVo, String tranCode,String tranName, int type) throws LogicException {
 
 		marginAmount = getBigDecimal(titaVo.getParam("inputAmount"));
 		validDate = showRocDate(titaVo.getParam("inputDate"), 1);
@@ -182,7 +182,7 @@ public class LM013Report extends MakeReport {
 //				"金檢報表(放款種類表)" + listsArray[type].getReportKind(), "密", "A4", "L");
 
 		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
-				.setRptCode("LM013").setRptItem("金檢報表(放款種類表)" + listsArray[type].getReportKind()).setRptSize("A4")
+				.setRptCode(tranCode).setRptItem(tranName).setRptSize("A4")
 				.setSecurity(this.getSecurity()).setPageOrientation("L").build();
 
 		this.open(titaVo, reportVo);

@@ -2,8 +2,12 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * CdCityRate 地區利率檔<br>
@@ -16,12 +20,7 @@ import javax.persistence.Embeddable;
 public class CdCityRateId implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1434686701557958827L;
-
-// 生效年月
+  // 生效年月
   /* 西元年月 */
   @Column(name = "`EffectYYMM`")
   private int effectYYMM = 0;

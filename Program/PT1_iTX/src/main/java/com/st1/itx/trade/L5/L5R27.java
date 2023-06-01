@@ -1,6 +1,5 @@
 package com.st1.itx.trade.L5;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,18 +14,14 @@ import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.PfBsDetail;
 import com.st1.itx.db.domain.PfItDetail;
-import com.st1.itx.db.domain.FacMain;
-import com.st1.itx.db.domain.FacMainId;
-import com.st1.itx.db.domain.PfItDetailAdjust;
 import com.st1.itx.db.domain.TxControl;
-import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CdBcmService;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.PfBsDetailService;
 import com.st1.itx.db.service.PfItDetailService;
 import com.st1.itx.db.service.TxControlService;
-import com.st1.itx.db.service.FacMainService;
-import com.st1.itx.db.service.PfItDetailAdjustService;
 import com.st1.itx.tradeService.TradeBuffer;
 
 @Service("L5R27")
@@ -58,9 +53,6 @@ public class L5R27 extends TradeBuffer {
 	public FacMainService sFacMainService;
 
 	@Autowired
-	public PfItDetailAdjustService pfItDetailAdjustService;
-	
-	@Autowired
 	public TxControlService txControlService;
 
 	@Override
@@ -72,7 +64,6 @@ public class L5R27 extends TradeBuffer {
 		int funCode = Integer.valueOf(titaVo.getParam("FunCode"));
 		long logNo = Long.valueOf(titaVo.getParam("LogNo"));
 
-		
 		PfItDetail pfItDetail = sPfItDetailService.findById(logNo, titaVo);
 
 		if (pfItDetail == null) {
@@ -86,12 +77,6 @@ public class L5R27 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "客戶資料");
 		}
 		CustNm = CustMainVo.getCustName();
-
-		String controlCode = "L5510." + pfItDetail.getWorkMonth() + ".2";
-		TxControl txControl = txControlService.findById(controlCode, titaVo);
-		if (txControl != null) {
-			throw new LogicException(titaVo, "E0010", "已產生媒體檔");
-		}
 
 		totaVo.putParam("L5r27CustNo", pfItDetail.getCustNo());
 		totaVo.putParam("L5r27FacmNo", pfItDetail.getFacmNo());
@@ -119,47 +104,34 @@ public class L5R27 extends TradeBuffer {
 		String IntroducerName = FindEmpName(pfItDetail.getIntroducer(), titaVo);
 
 		totaVo.putParam("L5r27IntroducerName", IntroducerName);
-		//處經理
+		// 處經理
 		totaVo.putParam("L5r27UnitManager", pfItDetail.getUnitManager());
 		String UnitManagerName = FindEmpName(pfItDetail.getUnitManager(), titaVo);
 		totaVo.putParam("L5r27UnitManagerName", UnitManagerName);
-		//區經理
+		// 區經理
 		totaVo.putParam("L5r27DistManager", pfItDetail.getDistManager());
 		String DistManagerName = FindEmpName(pfItDetail.getDistManager(), titaVo);
 		totaVo.putParam("L5r27DistManagerName", DistManagerName);
 
 		totaVo.putParam("L5r27UtilBal", pfItDetail.getDrawdownAmt());
-		//部室
+		// 部室
 		totaVo.putParam("L5r27DeptCode", pfItDetail.getDeptCode());
 		String deptCodeX = FindCdBcm(pfItDetail.getDeptCode(), titaVo);
 		totaVo.putParam("L5r27DeptCodeX", deptCodeX);
-		//區部
+		// 區部
 		totaVo.putParam("L5r27DistCode", pfItDetail.getDistCode());
 		String distCodeX = FindCdBcm(pfItDetail.getDistCode(), titaVo);
 		totaVo.putParam("L5r27DistCodeX", distCodeX);
-		//單位
+		// 單位
 		totaVo.putParam("L5r27UnitCode", pfItDetail.getUnitCode());
 		String unitCodeX = FindCdBcm(pfItDetail.getUnitCode(), titaVo);
 		totaVo.putParam("L5r27UnitCodeX", unitCodeX);
-		
-		PfItDetailAdjust pfItDetailAdjust = pfItDetailAdjustService.findCustFacmBormFirst(pfItDetail.getCustNo(),
-				pfItDetail.getFacmNo(), pfItDetail.getBormNo(), titaVo);
-
-		if (pfItDetailAdjust == null || pfItDetailAdjust.getAdjRange() == 0) {
-			totaVo.putParam("L5r27AdjPerfEqAmt", pfItDetail.getPerfEqAmt());
-			totaVo.putParam("L5r27AdjPerfReward", pfItDetail.getPerfReward());
-			totaVo.putParam("L5r27AdjPerfAmt", pfItDetail.getPerfAmt());
-			totaVo.putParam("L5r27AdjCntingCode", pfItDetail.getCntingCode());
-			totaVo.putParam("L5r27AdjRange", 0);
-			totaVo.putParam("L5r27AdjLogNo", 0);
-		} else {
-			totaVo.putParam("L5r27AdjPerfEqAmt", pfItDetailAdjust.getAdjPerfEqAmt());
-			totaVo.putParam("L5r27AdjPerfReward", pfItDetailAdjust.getAdjPerfReward());
-			totaVo.putParam("L5r27AdjPerfAmt", pfItDetailAdjust.getAdjPerfAmt());
-			totaVo.putParam("L5r27AdjCntingCode", pfItDetailAdjust.getAdjCntingCode());
-			totaVo.putParam("L5r27AdjRange", pfItDetailAdjust.getAdjRange());
-			totaVo.putParam("L5r27AdjLogNo", pfItDetailAdjust.getLogNo());
-		}
+		totaVo.putParam("L5r27AdjPerfEqAmt", pfItDetail.getPerfEqAmt());
+		totaVo.putParam("L5r27AdjPerfReward", pfItDetail.getPerfReward());
+		totaVo.putParam("L5r27AdjPerfAmt", pfItDetail.getPerfAmt());
+		totaVo.putParam("L5r27AdjCntingCode", pfItDetail.getCntingCode());
+		totaVo.putParam("L5r27AdjRange", 0);
+		totaVo.putParam("L5r27AdjLogNo", 0);
 
 		this.addList(this.totaVo);
 		return this.sendList();

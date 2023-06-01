@@ -295,21 +295,29 @@ T(H,@OORepayType,#RepayTypeHelp)
 
 #OOLastEmp=x,20,S
 
+!BtnA業績
 #OOBufA=X,21,S
-T(2,2+#OOLogNo+#OORepayType)
+IF(#OOCanModify == 1,T(2,2+#OOLogNo+#OORepayType),T(2,1+#OOLogNo+#OORepayType))
+
+#BTNMSGA=X,4,S
+IF(#OOCanModify == 1,T(2,修改),T(2,新增))
 
 #OOBtnA=A,2,O
-!C(5,#OOAdjRange,0,BIND(grid,{ cmd=CHAIN; ntxcd=L5501; text=修改; ntxbuf=#OOBufA}),
-!BIND(grid,{ cmd=CHAIN; ntxcd=L5501; text=有修改; ntxbuf=#OOBufA}))
-BIND(grid,{ cmd=CHAIN; ntxcd=L5501; text=修改; ntxbuf=#OOBufA})
-C(3,#OOCanModify,1,$,BIND(grid,cancel))
+!!C(5,#OOAdjRange,0,BIND(grid,{ cmd=CHAIN; ntxcd=L5501; text=修改; ntxbuf=#OOBufA}),
+!!BIND(grid,{ cmd=CHAIN; ntxcd=L5501; text=有修改; ntxbuf=#OOBufA}))
+BIND(grid,{ cmd=CHAIN; ntxcd=L5501; text=#BTNMSGA; ntxbuf=#OOBufA})
+!C(3,#OOCanModify,1,$,BIND(grid,cancel))
+IF(#OOCanModify == 1 || #OOCanModify ==2,$,BIND(grid,cancel))
 
+!計件代碼
 #OOBufB=X,10,S
 T(2,2+#OOLogNo+#OORepayType)
 
 #OOBtnB=A,2,O
-BIND(grid,{ cmd=CHAIN; ntxcd=L5505; ntxbuf=#OOBufB})
-C(3,#OOCanModify,1,$,BIND(grid,cancel))
+BIND(grid,{ cmd=CHAIN; ntxcd=L5505; text=修改; ntxbuf=#OOBufB})
+!C(3,#OORepayType,0,$,BIND(grid,cancel))
+!C(3,#OOCanModify,1,$,BIND(grid,cancel))
+IF(#OORepayType == 0 && #OOCanModify==1,$,BIND(grid,cancel))
 
 #OOBufC=X,21,S
 T(2,4+#OOLogNo)
@@ -317,8 +325,10 @@ T(2,4+#OOLogNo)
 #OOBtnC=A,2,O
 C(5,#OOAdjRange,0,BIND(grid,cancel),
 BIND(grid,{ cmd=CHAIN; ntxcd=L5501; text=刪除; ntxbuf=#OOBufC}))
-C(5,#OOAdjRange,9,BIND(grid,cancel),$)
-C(3,#OOCanModify,1,$,BIND(grid,cancel))
+!C(5,#OOAdjRange,9,BIND(grid,cancel),$)
+!C(3,#OOCanModify,1,$,BIND(grid,cancel))
+IF(#OOAdjRange != 9 && #OOCanModify == 1,$,BIND(grid,cancel))
+
 
 #OOMrKey=X,20,S
 T(2,#OOCustNo+-+#OOFacmNo+-+#OOBormNo)

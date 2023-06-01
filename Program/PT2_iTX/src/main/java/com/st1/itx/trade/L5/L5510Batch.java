@@ -21,22 +21,20 @@ import com.st1.itx.db.domain.CdWorkMonthId;
 import com.st1.itx.db.domain.PfInsCheck;
 import com.st1.itx.db.domain.PfItDetail;
 import com.st1.itx.db.domain.TxControl;
-import com.st1.itx.db.service.TxControlService;
-import com.st1.itx.db.service.PfItDetailService;
-import com.st1.itx.db.service.PfItDetailAdjustService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CdWorkMonthService;
+import com.st1.itx.db.service.PfItDetailService;
+import com.st1.itx.db.service.TxControlService;
 import com.st1.itx.db.service.springjpa.cm.L5510ServiceImpl;
-
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.common.PfCheckInsuranceCom;
+import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeFile;
+import com.st1.itx.util.common.PfCheckInsuranceCom;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
-import com.st1.itx.util.common.MakeExcel;
 
 /**
  * 產生換算業績、業務報酬發放檔 call by L5510
@@ -53,8 +51,6 @@ public class L5510Batch extends TradeBuffer {
 	public TxControlService txControlService;
 	@Autowired
 	public PfItDetailService pfItDetailService;
-	@Autowired
-	public PfItDetailAdjustService pfItDetailAdjustService;
 	@Autowired
 	CdWorkMonthService cdWorkMonthService;
 	@Autowired

@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.JobMain;
@@ -3936,5 +3938,15 @@ public interface JobMainService {
    *
    */
   public void Usp_Cp_YearlyHouseLoanIntCheck_Ins(String EmpNo, TitaVo... titaVo);
+
+  /**
+   * Stored Procedure<br>
+   * 每日複製
+   * @param  Tbsdyf int
+   * @param  EmpNo String
+   * @param titaVo Variable-Length Argument
+   *
+   */
+  public void Usp_L9_DailyBackup_Copy(int Tbsdyf,String EmpNo, TitaVo... titaVo);
 
 }

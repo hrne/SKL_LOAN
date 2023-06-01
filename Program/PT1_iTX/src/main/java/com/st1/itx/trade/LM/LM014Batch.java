@@ -38,14 +38,14 @@ public class LM014Batch extends BatchBase implements Tasklet, InitializingBean {
 	@Override
 	public void run() throws LogicException {
 		this.info("active LM014Batch ");
-		
+
 		// 選項: 0 全部
 //		titaVo.putParam("inputType", 0);
 
-		lM014Report.exec(titaVo,"0","平均利率月報表（全部）");
-		lM014Report.exec(titaVo,"1","平均利率月報表（科目別）");
-		lM014Report.exec(titaVo,"2","平均利率月報表（種類別）");
-		lM014Report.exec(titaVo,"3","平均利率月報表（關係人）");
-		lM014Report.exec(titaVo,"4","平均利率月報表（種類別+關係人）");
+//		lM014Report.exec(titaVo,"0","平均利率月報表（全部）");
+		lM014Report.exec(titaVo, "1", "LM014-1", "平均利率月報表（科目別）");
+		lM014Report.exec(titaVo, "2", "LM014-2", "平均利率月報表（種類別）");
+		lM014Report.exec(titaVo, "3", "LM014-3", "平均利率月報表（關係人）");
+		lM014Report.exec(titaVo, "4", "LM014-4", "平均利率月報表（種類別+關係人）");
 	}
 }

@@ -28,14 +28,6 @@ public class LW003ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	/**
-	 * 查詢工作月
-	 * 
-	 * @param titaVo
-	 * @param tbsdy  帳務日
-	 * 
-	 */
-
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findWorkMonth(TitaVo titaVo, int tbsdy) throws Exception {
 
@@ -60,13 +52,6 @@ public class LW003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query.getResultList());
 	}
 
-	/**
-	 * 個金總業績
-	 * 
-	 * @param titaVo
-	 * @param wkYear  工作年
-	 * @param wkMonth 工作月
-	 */
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll1(TitaVo titaVo, int wkYear, int wkMonth) throws Exception {
 
@@ -98,13 +83,6 @@ public class LW003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query.getResultList());
 	}
 
-	/**
-	 * 區部
-	 * 
-	 * @param titaVo
-	 * @param wkYear  工作年
-	 * @param wkMonth 工作月
-	 */
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll2(TitaVo titaVo, int wkYear, int wkMonth) throws Exception {
 
@@ -194,13 +172,6 @@ public class LW003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query.getResultList());
 	}
 
-	/**
-	 * 通訊處
-	 * 
-	 * @param titaVo
-	 * @param wkYear  工作年
-	 * @param wkMonth 工作月
-	 */
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll3(TitaVo titaVo, int wkYear, int wkMonth) throws Exception {
 
@@ -289,13 +260,6 @@ public class LW003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query.getResultList());
 	}
 
-	/**
-	 * 介紹人個人獎金
-	 * 
-	 * @param titaVo
-	 * @param wkYear  工作年
-	 * @param wkMonth 工作月
-	 */
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll4(TitaVo titaVo, int wkYear, int wkMonth) throws Exception {
 
@@ -306,7 +270,7 @@ public class LW003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = " ";
 		sql += "  WITH \"Data1\" AS (";
 		sql += "	SELECT IM.\"WorkMonth\"";
-		sql += "	      ,SUM(NVL(PDA.\"AdjPerfAmt\",R.\"IntroducerAddBonus\")) AS \"IntroAddBonus\"";
+		sql += "	      ,SUM(R.\"IntroducerAddBonus\")) AS \"IntroAddBonus\"";
 		sql += "	FROM( SELECT I.* ";
 		sql += "	            ,ROW_NUMBER() OVER(";
 		sql += "		  		 PARTITION BY I.\"CustNo\", I.\"FacmNo\"";
@@ -328,9 +292,6 @@ public class LW003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "						,\"Introducer\"";
 		sql += "	          ) R ON R.\"CustNo\" = IM.\"CustNo\" AND R.\"FacmNo\" = IM.\"FacmNo\"";
 		sql += "				 								  AND R.\"Introducer\" = IM.\"Introducer\"";
-		sql += "	LEFT JOIN \"PfItDetailAdjust\" PDA ON PDA.\"CustNo\" = IM.\"CustNo\"";
-		sql += "	                        	      AND PDA.\"FacmNo\" = IM.\"FacmNo\"";
-		sql += "	                                  AND PDA.\"WorkMonth\" = IM.\"WorkMonth\"";
 		sql += "	WHERE  IM.\"SEQ\" =  1";
 		sql += "	GROUP BY IM.\"WorkMonth\")";
 		sql += " ";
@@ -358,14 +319,6 @@ public class LW003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query.getResultList());
 	}
 
-	/**
-	 * 專銷制單位
-	 * 
-	 * @param titaVo
-	 * @param wkYear  工作年
-	 * @param wkMonth 工作月
-	 * 
-	 */
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll5(TitaVo titaVo, int wkYear, int wkMonth) throws Exception {
 

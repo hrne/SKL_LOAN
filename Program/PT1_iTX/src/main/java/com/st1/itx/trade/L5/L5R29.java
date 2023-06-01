@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L5;
 
 import java.util.ArrayList;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -12,11 +13,9 @@ import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.PfBsDetail;
 import com.st1.itx.db.domain.PfItDetail;
-import com.st1.itx.db.domain.PfBsDetailAdjust;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.PfBsDetailService;
-import com.st1.itx.db.service.PfBsDetailAdjustService;
 import com.st1.itx.db.service.PfItDetailService;
 import com.st1.itx.tradeService.TradeBuffer;
 
@@ -40,9 +39,6 @@ public class L5R29 extends TradeBuffer {
 
 	@Autowired
 	public CdEmpService sCdEmpService;
-
-	@Autowired
-	public PfBsDetailAdjustService pfBsDetailAdjustService;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -73,7 +69,8 @@ public class L5R29 extends TradeBuffer {
 		totaVo.putParam("L5r29BsOfficer", pfBsDetail.getBsOfficer());
 		totaVo.putParam("L5r29BsOfficerName", FindEmpName(pfBsDetail.getBsOfficer(), titaVo));
 
-		PfItDetail pfItDetail = pfItDetailService.findByTxFirst(pfBsDetail.getCustNo(), pfBsDetail.getFacmNo(), pfBsDetail.getBormNo(), pfBsDetail.getPerfDate() + 19110000, pfBsDetail.getRepayType(),
+		PfItDetail pfItDetail = pfItDetailService.findByTxFirst(pfBsDetail.getCustNo(), pfBsDetail.getFacmNo(),
+				pfBsDetail.getBormNo(), pfBsDetail.getPerfDate() + 19110000, pfBsDetail.getRepayType(),
 				pfBsDetail.getPieceCode(), titaVo);
 		if (pfItDetail != null) {
 			totaVo.putParam("L5r29Introducer", pfItDetail.getIntroducer());
@@ -85,18 +82,6 @@ public class L5R29 extends TradeBuffer {
 
 		totaVo.putParam("L5r29PerfCnt", pfBsDetail.getPerfCnt());
 		totaVo.putParam("L5r29PerfAmt", pfBsDetail.getPerfAmt());
-
-		PfBsDetailAdjust pfBsDetailAdjust = pfBsDetailAdjustService.findCustBormFirst(pfBsDetail.getCustNo(), pfBsDetail.getFacmNo(), pfBsDetail.getBormNo(), titaVo);
-
-		if (pfBsDetailAdjust == null) {
-			totaVo.putParam("L5r29AdjLogNo", 0);
-		} else {
-			if (pfBsDetailAdjust.getWorkMonth() > 0) {
-				this.totaVo.putParam("L5r29PerfCnt", pfBsDetailAdjust.getAdjPerfCnt());
-				this.totaVo.putParam("L5r29PerfAmt", pfBsDetailAdjust.getAdjPerfAmt());
-			}
-			totaVo.putParam("L5r29AdjLogNo", pfBsDetailAdjust.getLogNo());
-		}
 
 		this.addList(this.totaVo);
 		return this.sendList();

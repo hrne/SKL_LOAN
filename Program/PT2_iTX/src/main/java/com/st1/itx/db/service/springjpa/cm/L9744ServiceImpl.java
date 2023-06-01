@@ -67,10 +67,9 @@ public class L9744ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,NVL(E1.\"Fullname\", ' ') AS \"ItName\""; // F18 介紹人姓名
 		sql += "       ,NVL(E2.\"Fullname\", ' ') AS \"ItUnitManager\""; // F19 處經理姓名(介紹人)
 		sql += "       ,NVL(E3.\"Fullname\", ' ') AS \"ItDistManager\""; // F20 區經理姓名(介紹人)
-		sql += "       ,NVL(PIDA.\"AdjPerfEqAmt\", I.\"PerfEqAmt\") AS \"PerfEqAmt\" "; // F21 換算業績 -- 20211201 依eric指示
-																						// 此三金額修改為撥款層而非額度層總計
-		sql += "       ,NVL(PIDA.\"AdjPerfReward\", I.\"PerfReward\") AS \"PerfReward\" "; // F22 業務報酬 -- 參考L5051
-		sql += "       ,NVL(PIDA.\"AdjPerfAmt\", I.\"PerfAmt\") AS \"PerfAmt\" "; // F23 業績金額
+		sql += "       ,I.\"PerfEqAmt\") AS \"PerfEqAmt\" "; // F21 換算業績 -- 20211201 此三金額修改為撥款層而非額度層總計
+		sql += "       ,I.\"PerfReward\" "; // F22 業務報酬 -- 參考L5051
+		sql += "       ,I.\"PerfAmt\" "; // F23 業績金額
 		sql += " FROM \"PfItDetail\" I";
 		sql += " LEFT JOIN \"PfBsDetail\" B ON B.\"PerfDate\"    = I.\"PerfDate\""; // 取房貸專員
 		sql += "                           AND B.\"CustNo\"      = I.\"CustNo\"";
@@ -88,11 +87,6 @@ public class L9744ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"CdBcm\" B1 ON B1.\"UnitCode\" = I.\"UnitCode\""; // 取單位中文(介紹人)
 		sql += " LEFT JOIN \"CdBcm\" B2 ON B2.\"UnitCode\" = I.\"DeptCode\""; // 取部室中文(介紹人)
 		sql += " LEFT JOIN \"CdBcm\" B3 ON B3.\"UnitCode\" = I.\"DistCode\""; // 取區部中文(介紹人)
-		sql += " LEFT JOIN \"PfItDetailAdjust\" PIDA ON PIDA.\"CustNo\"    = I.\"CustNo\"     ";
-		sql += "                                    AND PIDA.\"FacmNo\"    = I.\"FacmNo\"     ";
-		sql += "                                    AND PIDA.\"BormNo\"    = I.\"BormNo\"     ";
-		sql += "                                    AND PIDA.\"WorkMonth\" = I.\"WorkMonth\"  ";
-		sql += "                                    AND PIDA.\"AdjRange\" IN (1,2) ";
 		sql += " WHERE I.\"DrawdownAmt\" > 0 ";
 		sql += "   AND I.\"PerfDate\" <= :entDy ";
 		sql += "   AND I.\"Introducer\" IS NOT NULL ";

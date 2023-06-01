@@ -88,7 +88,7 @@ public class LM014Report extends MakeReport {
 		this.setMaxRows(50);
 	}
 
-	public Boolean exec(TitaVo titaVo,String subReportCode,String reportName) throws LogicException {
+	public Boolean exec(TitaVo titaVo,String subReportCode,String tradeCode,String reportName) throws LogicException {
 
 		this.setCharSpaces(0);
 
@@ -157,7 +157,7 @@ public class LM014Report extends MakeReport {
 				
 //				this.title = qo.reportType.value;
 				ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
-						.setRptCode("LM014").setRptItem(reportName).setRptSize("A4")
+						.setRptCode(tradeCode).setRptItem(reportName).setRptSize("A4")
 						.setSecurity("").setPageOrientation("L").build();
 
 				

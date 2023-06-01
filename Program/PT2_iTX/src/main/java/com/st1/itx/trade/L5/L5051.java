@@ -16,6 +16,8 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.TxControl;
+import com.st1.itx.db.service.TxControlService;
 import com.st1.itx.db.service.springjpa.cm.L5051ServiceImpl;
 import com.st1.itx.db.service.springjpa.cm.L6932ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -120,19 +122,10 @@ public class L5051 extends TradeBuffer {
 				}
 
 				DrawdownAmt = DrawdownAmt.add(new BigDecimal(d.get("DrawdownAmt")));
-
-				if ("0".equals(d.get("AdjRange")) || "9".equals(d.get("AdjRange"))) {
-					PerfEqAmt = PerfEqAmt.add(new BigDecimal(d.get("PerfEqAmt")));
-					PerfReward = PerfReward.add(new BigDecimal(d.get("PerfReward")));
-					PerfAmt = PerfAmt.add(new BigDecimal(d.get("PerfAmt")));
-				} else {
-					PerfEqAmt = PerfEqAmt.add(new BigDecimal(d.get("AdjPerfEqAmt")));
-					PerfReward = PerfReward.add(new BigDecimal(d.get("AdjPerfReward")));
-					PerfAmt = PerfAmt.add(new BigDecimal(d.get("AdjPerfAmt")));
-				}
-
+				PerfEqAmt = PerfEqAmt.add(new BigDecimal(d.get("PerfEqAmt")));
+				PerfReward = PerfReward.add(new BigDecimal(d.get("PerfReward")));
+				PerfAmt = PerfAmt.add(new BigDecimal(d.get("PerfAmt")));
 				cnt++;
-
 				Introducer = d.get("Introducer").trim();
 				CustNo = d.get("CustNo").trim();
 				FacmNo = d.get("FacmNo").trim();
@@ -140,18 +133,16 @@ public class L5051 extends TradeBuffer {
 					WorkMonth = "";
 				}
 			} else {
-				if ("0".equals(d.get("AdjRange")) || "9".equals(d.get("AdjRange"))) {
-					PerfEqAmt = new BigDecimal(d.get("PerfEqAmt"));
-					PerfReward = new BigDecimal(d.get("PerfReward"));
-					PerfAmt = new BigDecimal(d.get("PerfAmt"));
-				} else {
-					PerfEqAmt = new BigDecimal(d.get("AdjPerfEqAmt"));
-					PerfReward = new BigDecimal(d.get("AdjPerfReward"));
-					PerfAmt = new BigDecimal(d.get("AdjPerfAmt"));
-				}
+				PerfEqAmt = new BigDecimal(d.get("PerfEqAmt"));
+				PerfReward = new BigDecimal(d.get("PerfReward"));
+				PerfAmt = new BigDecimal(d.get("PerfAmt"));
 				int canmodify = 0;
 				if (d.get("MediaFg") == null || "".equals(d.get("MediaFg"))) {
 					canmodify = 1;
+				} else {
+					if ("0".equals(d.get("RepayType"))) {
+						canmodify = 2;
+					}					
 				}
 				putTota(d, d.get("WorkMonth"), new BigDecimal(d.get("DrawdownAmt")), PerfEqAmt, PerfReward, PerfAmt, 1,
 						canmodify, SumByFacm, titaVo);
@@ -208,59 +199,18 @@ public class L5051 extends TradeBuffer {
 		occursList.putParam("OOIntroducerName", d.get("IntroducerName"));// 員工姓名(介紹人)
 		occursList.putParam("OOUnitManagerName", d.get("UnitManagerName"));// 員工姓名(處經理姓名(介紹人))
 		occursList.putParam("OODistManagerName", d.get("DistManagerName"));// 員工姓名(區經理姓名(介紹人))
-
 		occursList.putParam("OOPerfEqAmt", PerfEqAmt);// 三階換算業績
 		occursList.putParam("OOPerfReward", PerfReward);// 三階業務報酬
 		occursList.putParam("OOPerfAmt", PerfAmt);// 三階業績金額
 		occursList.putParam("OOCntingCode", d.get("CntingCode"));// 是否計件
-
-//		if ("Y".equals(SumByFacm) && ("1".equals(d.get("AdjRange")) || "2".equals(d.get("AdjRange")))) {
-//			occursList.putParam("OOPerfEqAmt", new BigDecimal(d.get("AdjPerfEqAmt")));// 三階換算業績
-//			occursList.putParam("OOPerfReward", new BigDecimal(d.get("AdjPerfReward")));// 三階業務報酬
-//			occursList.putParam("OOPerfAmt", new BigDecimal(d.get("AdjPerfAmt")));// 三階業績金額
-//			occursList.putParam("OOCntingCode", d.get("adjCntingCode"));// 是否計件
-//		} else {
-//			occursList.putParam("OOPerfEqAmt", PerfEqAmt);// 三階換算業績
-//			occursList.putParam("OOPerfReward", PerfReward);// 三階業務報酬
-//			occursList.putParam("OOPerfAmt", PerfAmt);// 三階業績金額
-//			occursList.putParam("OOCntingCode", d.get("CntingCode"));// 是否計件
-//		}
 		occursList.putParam("OOAdjRange", d.get("AdjRange"));
 		occursList.putParam("OOCanModify", canModify);
 		occursList.putParam("OORepayType", d.get("RepayType"));
 		occursList.putParam("OOWorkMonth", WorkMonth);
-
-//		occursList.putParam("OOLog", d.get("LOGCNT"));
-
 		occursList.putParam("OOMediaDate", parse.stringToStringDate(d.get("MediaDate")));
 		occursList.putParam("OOLastUpdate", parse.stringToStringDateTime(d.get("LastUpdate")));
 		occursList.putParam("OOLastEmp", d.get("LastUpdateEmpNo") + " " + d.get("LastUpdateEmpName"));
-
-		// L6932 用的參數
-		titaVo.putParam("ST_DT", "0010101");
-		titaVo.putParam("ED_DT", "9991231");
-		titaVo.putParam("SX_DT", "0");
-		titaVo.putParam("EX_DT", "0");
-		titaVo.putParam("TRN_CODE", "L5501");
-		titaVo.putParam("TRN_CODE2", "");
-		titaVo.putParam("CUST_NO", d.get("CustNo"));
-		titaVo.putParam("FACM_NO", d.get("FacmNo"));
-		titaVo.putParam("BORM_SEQ", "000");
-		titaVo.putParam("TxtNo", "");
-		titaVo.putParam("MrKey", "");
-
-		List<Map<String, String>> l6932Vo;
-
-		try {
-			l6932Vo = l6932ServiceImpl.FindData(titaVo, this.index, 1);
-		} catch (Exception e) {
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.error("L6932ServiceImpl.findAll error = " + errors.toString());
-			throw new LogicException("E0013", "L6932ServiceImpl");
-		}
-
-		occursList.putParam("OOHasHistory", l6932Vo != null && !l6932Vo.isEmpty() ? "Y" : "N");
+		occursList.putParam("OOHasHistory",d.get("HasHistory"));
 
 		this.totaVo.addOccursList(occursList);
 	}

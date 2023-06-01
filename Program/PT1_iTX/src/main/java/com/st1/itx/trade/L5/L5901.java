@@ -33,7 +33,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L5901 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L5901.class);
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -84,6 +83,7 @@ public class L5901 extends TradeBuffer {
 				occursList.putParam("OOPosbleBorAmt", tInnFundApl.getPosbleBorAmt());
 				occursList.putParam("OOAlrdyBorAmt", tInnFundApl.getAlrdyBorAmt());
 				occursList.putParam("OOStockHoldersEqt", tInnFundApl.getStockHoldersEqt());
+				occursList.putParam("OOAvailableFunds", tInnFundApl.getAvailableFunds());
 
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
