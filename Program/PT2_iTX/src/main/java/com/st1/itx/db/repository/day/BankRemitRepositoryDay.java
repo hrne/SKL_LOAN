@@ -41,7 +41,10 @@ public interface BankRemitRepositoryDay extends JpaRepository<BankRemit, BankRem
   public Optional<BankRemit> findTopByTitaTlrNoIsAndTitaTxtNoIsAndDrawdownCodeIsOrderByAcDateDesc(String titaTlrNo_0, String titaTxtNo_1, int drawdownCode_2);
 
   // CustNo = ,AND FacmNo = ,AND BormNo = ,AND DrawdownCode =
-  public Optional<BankRemit> findTopByCustNoIsAndFacmNoIsAndBormNoIsAndDrawdownCodeIsOrderByAcDateDesc(int custNo_0, int facmNo_1, int bormNo_2, int drawdownCode_3);
+  public Optional<BankRemit> findTopByCustNoIsAndFacmNoIsAndBormNoIsAndDrawdownCodeIsOrderByAcDateDescCreateDateDesc(int custNo_0, int facmNo_1, int bormNo_2, int drawdownCode_3);
+
+  // CustNo = ,AND FacmNo = ,AND BormNo = 
+  public Optional<BankRemit> findTopByCustNoIsAndFacmNoIsAndBormNoIsOrderByAcDateDescCreateDateDesc(int custNo_0, int facmNo_1, int bormNo_2);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

@@ -118,13 +118,13 @@ public class L5407 extends TradeBuffer {
 				tPfCoOfficer.setIneffectiveDate(iIneffectiveDate);
 			}
 			tPfCoOfficer.setEmpClass(iEmpClass);
-			
+			updateLog(tPfCoOfficer, titaVo);
 			try {
 				tPfCoOfficer = pfCoOfficerService.update2(tPfCoOfficer, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", "修改時發生錯誤");
 			}
-			updateLog(tPfCoOfficer, titaVo);
+			
 			break;
 
 		case 4:
@@ -180,10 +180,10 @@ public class L5407 extends TradeBuffer {
 	private void insertOrgLog(TitaVo titaVo) throws LogicException {
 		this.totaVo.init(titaVo);
 		this.info("insertOrgLogiEmpNo    = " + iEmpNo);
-//		Slice<PfCoOfficerLog> slPfCoOfficerLog = pfCoOfficerLogService.findEmpNoEq(iEmpNo, 0, Integer.MAX_VALUE,
-//				titaVo);
-//
-//		if (slPfCoOfficerLog == null && iFunctionCode == 1 ) {
+		Slice<PfCoOfficerLog> slPfCoOfficerLog = pfCoOfficerLogService.findEmpNoEq(iEmpNo, 0, Integer.MAX_VALUE,
+				titaVo);
+
+		if (slPfCoOfficerLog == null && iFunctionCode == 1 ) {
 			PfCoOfficer oPf = pfCoOfficerService.effectiveDateFirst(iEmpNo, 0, 99991231, titaVo);
 			if (oPf != null) {
 				PfCoOfficerLog tPfCoOfficerLog = new PfCoOfficerLog();
@@ -211,7 +211,7 @@ public class L5407 extends TradeBuffer {
 			}
 		}
 
-//	}
+	}
 
 	private void updateLog(PfCoOfficer oPf, TitaVo titaVo) throws LogicException {
 		this.totaVo.init(titaVo);

@@ -83,13 +83,14 @@ public class ScheduledProcess extends SysLogger {
 				Slice<JobMain> jobMainSi = jobMainService.findAllByTxSeq(txs.getTxSeq(), 0, Integer.MAX_VALUE);
 				boolean isFinish = true;
 				boolean isBroken = false;
+				boolean isEodFlow = false;
 				if (jobMainSi != null) {
 					for (JobMain jm : jobMainSi.getContent()) {
 						isFinish = !jm.getStatus().equals("S") ? false : isFinish;
 						isBroken = jm.getStatus().equals("F") ? true : isBroken;
 
-						if (isBroken)
-							break;
+						if ("eodFlow".equals(jm.getJobCode()) && isBroken)
+							isEodFlow = true;
 					}
 
 					try {
@@ -114,8 +115,12 @@ public class ScheduledProcess extends SysLogger {
 							else
 								webClient.sendPost(dateUtil.getNowStringBc(), "2300", txs.getTlrNo(), "Y", "LC009", txs.getTlrNo(), txs.getTxCode() + " 執行成功", new TitaVo());
 						}
-						if (isBroken)
-							webClient.sendPost(dateUtil.getNowStringBc(), "2300", txs.getTlrNo(), "Y", "L6970", txs.getTxSeq(), txs.getTxCode() + " 執行失敗, 請至L6970查看", new TitaVo());
+						if (isBroken) {
+							if (isEodFlow)
+								webClient.sendTicker("0000", "00001", "209912312300", "夜間批次執行中斷", false, new TitaVo());
+							else
+								webClient.sendPost(dateUtil.getNowStringBc(), "2300", txs.getTlrNo(), "Y", "L6970", txs.getTxSeq(), txs.getTxCode() + " 執行失敗, 請至L6970查看", new TitaVo());
+						}
 					}
 				}
 			}

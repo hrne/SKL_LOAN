@@ -90,9 +90,9 @@ public class L9744ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WHERE I.\"DrawdownAmt\" > 0 ";
 		sql += "   AND I.\"PerfDate\" <= :entDy ";
 		sql += "   AND I.\"Introducer\" IS NOT NULL ";
-		sql += "   AND ABS(NVL(PIDA.\"AdjPerfEqAmt\", I.\"PerfEqAmt\")) ";
-		sql += "       + ABS(NVL(PIDA.\"AdjPerfReward\", I.\"PerfReward\")) ";
-		sql += "       + ABS(NVL(PIDA.\"AdjPerfAmt\", I.\"PerfAmt\")) > 0 ";
+		sql += "   AND ABS(I.\"PerfEqAmt\") ";
+		sql += "       + ABS(I.\"PerfReward\") ";
+		sql += "       + ABS(I.\"PerfAmt\") > 0 ";
 		if (useWorkMonth) {
 			sql += "   AND I.\"WorkMonth\" BETWEEN :workMonthStart AND :workMonthEnd";
 		} else {

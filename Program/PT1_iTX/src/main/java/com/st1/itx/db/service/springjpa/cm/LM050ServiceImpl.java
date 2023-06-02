@@ -55,10 +55,14 @@ public class LM050ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 		this.info("lM050.Totalequity yyqq=" + yyqq);
 		String sql = " ";
-		sql += " SELECT V.\"Totalequity\" ";
-		sql += "      , V.\"YearMonth\" ";
-		sql += " FROM \"CdVarValue\" V ";
-		sql += " WHERE V.\"YearMonth\" = :lyyqq ";
+		sql += "     SELECT \"StockHoldersEqt\" AS \"Totalequity\"";
+		sql += "           ,TRUNC(\"AcDate\" / 100 ) AS \"YearMonth\"";
+		sql += "     FROM \"InnFundApl\" ";
+		sql += "     WHERE \"AcDate\" = (";
+		sql += "     	SELECT MAX(\"AcDate\") ";
+		sql += "     	FROM \"InnFundApl\" ";
+		sql += "     	WHERE TRUNC(\"AcDate\" / 100) = :lyyqq";
+		sql += "     )";
 		this.info("sql=" + sql);
 
 		Query query;

@@ -120,7 +120,7 @@ public class WebClient extends SysLogger {
 		}
 		return responseString;
 	}
-	
+
 	/**
 	 * @param brNo     Brno
 	 * @param tickNo   訊息編號 (編號一致後蓋前) 刪除模式依據此序號刪除
@@ -185,21 +185,26 @@ public class WebClient extends SysLogger {
 				this.error("返回" + state + "(" + url + ")");
 			}
 		} catch (Exception e) {
-
+			StringWriter errors = new StringWriter();
+            e.printStackTrace(new PrintWriter(errors));
+            this.error(errors.toString());
 		} finally {
 			if (response != null) {
 				try {
 					response.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					StringWriter errors = new StringWriter();
+                    e.printStackTrace(new PrintWriter(errors));
+                    this.error(errors.toString());
 				}
 			}
 			try {
 				httpclient.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				StringWriter errors = new StringWriter();
+                e.printStackTrace(new PrintWriter(errors));
+                this.error(errors.toString());
 			}
 		}
 	}
-
 }

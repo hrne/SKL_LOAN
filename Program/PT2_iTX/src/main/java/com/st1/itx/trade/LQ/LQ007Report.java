@@ -141,43 +141,21 @@ public class LQ007Report extends MakeReport {
 			int colBal = 0;
 			int colInt = 1;
 			int tmpYM = 0;
+
+			boolean isEmpty = true;
+			// 清單上只會有 3 6 9 12月份
 			for (Integer y : ymList) {
 
-				int tmpYear = y / 100;
-				int tmpMonth = y % 100;
+				isEmpty = true;
 
-				if (tmpMonth <= 3) {
-					y = tmpYear * 100 + 3;
-				} else if (tmpMonth <= 6) {
-					y = tmpYear * 100 + 6;
-				} else if (tmpMonth <= 9) {
-					y = tmpYear * 100 + 9;
-				} else {
-					y = tmpYear * 100 + 12;
-				}
-
-				//
-
-				// 排除非當年度的3 6 9月份
-				if (y != (tmpYear * 100 + 12) && endY > tmpYear) {
-					continue;
-				}
-
+				// 查詢結果上只會有 3 6 9 12月份
 				for (Map<String, String> r : LQ007List) {
+
 					int visibleMonth = parse.stringToInteger(r.get("VisibleMonth"));
 					String prodNo = "";
 					BigDecimal balSum = BigDecimal.ZERO;
 					BigDecimal intSum = BigDecimal.ZERO;
-
-					// 排除非當年度的3 6 9月份
-					if (visibleMonth != (tmpYear * 100 + 12) && endY > tmpYear) {
-						continue;
-					}
-
-					// 1.清單與查詢年月相同 且 當年度(當年度的3 6 9 12月)
-					// 2.清單與查詢年月相同 且 僅抓12月份 且 當年度以前
-					if ((y == visibleMonth && endY == tmpYear)
-							|| (y == visibleMonth && y == (tmpYear * 100 + 12) && endY > tmpYear)) {
+					if (y == visibleMonth) {
 
 						prodNo = r.get("ProdNoShow");
 						balSum = getBigDecimal(r.get("BalSum"));
@@ -306,11 +284,13 @@ public class LQ007Report extends MakeReport {
 
 						}
 
-						// 在資料庫沒有查詢到的年月 且 僅抓12月份 且 當年度以前
-					} else if (endY < tmpYear) {
+						// 清單上有、查詢沒有則跑進一次
+					} else if (isEmpty) {
 
 						this.info("tmpYM = " + tmpYM);
 						this.info("y = " + y);
+
+						isEmpty = false;
 
 						balSum = BigDecimal.ZERO;
 

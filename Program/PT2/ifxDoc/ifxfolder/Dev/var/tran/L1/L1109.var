@@ -126,7 +126,6 @@ HIDE(#CrossUse{n})
 
 !統一編號
 #CustId=X,10,I
- 
 T(1,#CHAIN_CustId,1,10)
 C(5,#FunCd,2,s,$)
 !當錯誤時會清空戶名
@@ -145,22 +144,11 @@ T(2,#SubCompanyFgX,#Space)
 ! C(4,#CustId,INVOKEJS(SHOW,p1,2,2,0),INVOKEJS(SHOW,p1,3,3,0))
 ! C(4,#CustId,$,A(ID_UNINO,0,#CustId))
 
-! 戶號
-#CustNo=A,7,I
-!T(1,#CHAIN_CustNo,12,7)
-T(1,#CHAIN_CustNo,1,7)
 
-!C(3,#CHAIN,1,INVOKEJS(SHOW,p1,3,3,0),$)
-!C(3,#CHAIN,1,s,$)
-!C(4,#CustNo,INVOKEJS(SHOW,p1,3,3,1),S)
-@
-C(4,#CustId,$,s)
-C(3,#CustNo,0,V(P,統一編號與戶號須擇一輸入),s)
 
 <include src="ROM.icf::L1R06.dec"/>
 #RimCustId=X,10,S
 #RimCustNo=A,7,S
-
 
 #YNdef=X,1,S
 T(3,N)
@@ -168,25 +156,50 @@ T(3,N)
 #RimL1r06=X,1,S
 T(2,@RimCustId,#CustId)
 E(0,@RimCustNo,#CustNo)
+T(2,@)
 RESET_RIM(#RimL1r06,L1R06)
 S(L1R06,1,#RimCustId,#RimCustNo)
 R(1,L1R06)
 T(2,@CustName,#L1r06CustName)
-T(1,@CustName1,#L1r06CustName,1,50)
+T(1,@CustName1,#L1r06CustName,1,60)
 T(1,@CustName2,#L1r06CustName,51,50)
+
 ##loop{times:20,n:1}
 C(4,#L1r06SubCompanyCode{n},$,SHOW(#SubCompanyCode{n})T(2,@SubCompanyCode{n},#L1r06SubCompanyCode{n}))
 C(4,#L1r06SubCompanyItem{n},$,SHOW(#SubCompanyItem{n})T(2,@SubCompanyItem{n},#L1r06SubCompanyItem{n}))
 C(4,#L1r06CrossUse{n},$,SHOW(#CrossUse{n})T(2,@CrossUse{n},#L1r06CrossUse{n}))
 C(5,#L1r06CrossUse{n},Y,T(3,@YNdef,Y),$)
 ##end
+
+#AFG=A,1,S
+
+! 戶號
+#CustNo=A,7,I
+!C(5,#AFG,0,s,$)
+T(1,#CHAIN_CustNo,1,7)
+C(3,#AFG,0,s,$)
+@
+C(4,#CustId,C(3,#CustNo,0,V(P,統一編號與戶號須擇一輸入),$),s)
+!C(3,#CustNo,0,V(P,統一編號與戶號須擇一輸入),$)
+
+
+
 !戶名
 #CustName=c,100,S
+E(0,@AFG,1)
 T(1,#CHAIN_CustName,1,100)
 #CustName1=c,50,L
 #CustName2=c,50,L
 
+#RimL2R47=X,1,S
+T(2,@Rim2R47CustId,#CustId)
+RESET_RIM(#RimL2R47,L2R47)
+C(4,#CustId,s,$)
+S(L2R47,1,#Rim2R47CustId)
+R(1,L2R47)
 
+#MRKEY=_,_,S
+C(4,#CustId,T(2,#CustNo),T(2,#L2R47CustNo))
 
 ##loop{times:20,n:1}
 #Show{n}=S,1,S
@@ -210,7 +223,6 @@ C(5,#SubCompanyFg,Y,INVOKEJS(SHOW,p2,1),INVOKEJS(SHOW,p2,0))
 
 #SubCompanyFgX=X,60,L
 T(H,#SubCompanyFg,#SubCompanyFgHelp)
-
 
 ! Grid區塊
 ##loop{times:20,n:1}
@@ -239,15 +251,13 @@ V(P,至少勾選一筆同意)
 <include src="ROM.icf::L2R47.dec"/>
 #Rim2R47CustId=X,10,S
 
-#RimL2R47=X,1,S
-T(2,@Rim2R47CustId,#CustId)
-RESET_RIM(#RimL2R47,L2R47)
-C(4,#CustId,s,$)
-S(L2R47,1,#Rim2R47CustId)
-R(1,L2R47)
+#TimCustNo=A,7,S
+C(3,#CustNo,0,$,E(0,#CustNo))
+C(3,#CustId,0,$,E(0,#CustId))
+T(2,@RmkCustNo,#TimCustNo)
+T(2,@MRKEY,#TimCustNo)
+<include src="COM.icf::CustRmk.rtn"/>
 
-#MRKEY=_,_,S
-C(4,#CustId,T(2,#CustNo),T(2,#L2R47CustNo))
 
 #RPTFG=A,1,S
 

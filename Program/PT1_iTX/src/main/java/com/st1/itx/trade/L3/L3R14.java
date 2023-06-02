@@ -195,12 +195,9 @@ public class L3R14 extends TradeBuffer {
 
 		// 實撥金額 = 撥款金額 + 掛帳利息 - 利息金額
 		oRealPayAmt = oDuePayAmt.add(oOpenInterest).subtract(oInterest);
-		BankRemit tBankRemit = bankRemitService.findL4104BFirst(t2LoanBorMain.getCustNo(), t2LoanBorMain.getFacmNo(),
-				t2LoanBorMain.getBormNo(), parse.stringToInteger(t2LoanBorMain.getDrawdownCode()), titaVo);
+		BankRemit tBankRemit = bankRemitService.findBormNoFirst(t2LoanBorMain.getCustNo(), t2LoanBorMain.getFacmNo(),
+				t2LoanBorMain.getBormNo(), titaVo);
 
-		if (tBankRemit != null) {
-
-		}
 		// 取利息,掛帳利息給小數點
 		String dfoInterest = df.format(oInterest);
 		String dfoOpenInterest = df.format(oOpenInterest);
@@ -239,7 +236,7 @@ public class L3R14 extends TradeBuffer {
 		} else {
 			this.totaVo.putParam("L3r14RemitBank", ""); // 匯款銀行
 			this.totaVo.putParam("L3r14RemitBranch", ""); // 匯款分行
-			this.totaVo.putParam("L3r14RemitAcctNo", ""); // 匯款帳號
+			this.totaVo.putParam("L3r14RemitAcctNo", 0); // 匯款帳號
 			this.totaVo.putParam("L3r14RemitBankItem", ""); // 匯款銀行匯款分行中文
 		}
 		this.totaVo.putParam("L3r14CompensateAcct", t2LoanBorMain.getCompensateAcct()); // 戶名

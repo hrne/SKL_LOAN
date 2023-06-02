@@ -80,9 +80,9 @@ public class L5905ServiceImpl extends ASpringJpaParm implements InitializingBean
 			iFTraceYearMonthE = iTraceYearMonthE + 191100;
 		}
 		String iReChkMonth = titaVo.getParam("ReChkMonth");//覆審月份
-		if (iInqFg == 4) {//未完成:追蹤年月未到期,尚須追蹤
-			iFTraceYearMonthS = parse.stringToInteger(titaVo.getCalDy().substring(0,5))+191100;
-			iFTraceYearMonthE = 999999;
+		if (iInqFg == 4) {
+			iFTraceYearMonthS = 191101;
+			iFTraceYearMonthE = parse.stringToInteger(titaVo.getCalDy().substring(0,5))+191100;
 		}
 		this.info("L5905 iFYearMonth : " + iFYearMonth + "-" + iFYearMonthS + "-" + iFYearMonthE);
 		this.info("L5905 iFTraceYearMonthS = " + iFTraceYearMonthS + "-" + iFTraceYearMonthE );
@@ -106,7 +106,6 @@ public class L5905ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,I.\"ReChkUnit\" 						AS \"ReChkUnit\"				\n"; // 應覆審單位
 		sql += " ,I.\"Remark\" 							AS \"Remark\"					\n"; // 備註
 		sql += " ,I.\"TraceMonth\" 						AS \"TraceMonth\"				\n"; // 追蹤年月
-		sql += " ,I.\"SpecifyFg\" 						AS \"SpecifyFg\"				\n"; // 指定複審記號
 
 		sql += " FROM \"InnReCheck\" I													\n";
 		sql += " LEFT JOIN \"CustMain\" C ON  C.\"CustNo\" = I.\"CustNo\"				\n";
@@ -119,7 +118,7 @@ public class L5905ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		if (iInqFg==1) {
 			sql += " AND  I.\"YearMonth\" = :iFYearMonth       \n";
-			sql += " AND  I.\"ConditionCode\" = :iConditionCode       \n";
+			sql += " AND  I.\"ConditionCode\" = iConditionCode       \n";
 		}
 		if (iInqFg == 2) {
 			sql += " AND ( I.\"YearMonth\" >= :iFYearMonthS    AND   \n";

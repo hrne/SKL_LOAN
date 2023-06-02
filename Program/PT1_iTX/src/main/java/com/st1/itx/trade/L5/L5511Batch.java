@@ -100,6 +100,13 @@ public class L5511Batch extends TradeBuffer {
 
 		String iFunCode = titaVo.getParam("FunCode").trim();// 使用功能
 		iWorkMonth = parse.stringToInteger(titaVo.getParam("WorkMonth")) + 191100;
+		CdWorkMonth tCdWorkMonth = cdWorkMonthService.findById(new CdWorkMonthId(iWorkMonth / 100, iWorkMonth % 100));
+
+		if (tCdWorkMonth == null) {
+			throw new LogicException(titaVo, "E0001", "CdWorkMonth 放款業績工作月對照檔，工作年月=" + iWorkMonth); // 查詢資料不存在
+		} else if (tCdWorkMonth.getBonusDate() == 0) {
+			throw new LogicException(titaVo, "E0015", "CdWorkMonth 放款業績工作月對照檔，工作年月=" + iWorkMonth + "，獎金發放日期未設定"); // 查詢資料不存在
+		}
 
 		if ("1".equals(iFunCode)) {
 			toCheck(titaVo);
@@ -363,7 +370,6 @@ public class L5511Batch extends TradeBuffer {
 				pfRewardMedia.setFacmNo(pfReward.getFacmNo());
 				pfRewardMedia.setBormNo(pfReward.getBormNo());
 
-				pfRewardMedia.setEmployeeNo(pfReward.getIntroducer());
 				pfRewardMedia.setAdjustBonusDate(0);
 				pfRewardMedia.setWorkMonth(pfReward.getWorkMonth());
 				pfRewardMedia.setWorkSeason(pfReward.getWorkSeason());
@@ -399,6 +405,7 @@ public class L5511Batch extends TradeBuffer {
 					cnt++;
 
 					pfRewardMedia.setBonusType(1);
+					pfRewardMedia.setEmployeeNo(pfReward.getIntroducer());
 					pfRewardMedia.setBonus(pfReward.getIntroducerBonus());
 					pfRewardMedia.setAdjustBonus(pfReward.getIntroducerBonus());
 
@@ -417,6 +424,7 @@ public class L5511Batch extends TradeBuffer {
 					cnt++;
 
 					pfRewardMedia.setBonusType(5);
+					pfRewardMedia.setEmployeeNo(pfReward.getCoorgnizer());
 					pfRewardMedia.setBonus(pfReward.getCoorgnizerBonus());
 					pfRewardMedia.setAdjustBonus(pfReward.getCoorgnizerBonus());
 

@@ -203,11 +203,11 @@ public class L3916 extends TradeBuffer {
 		// 改抓BankRemit
 		this.totaVo.putParam("RemitBank", "");
 		this.totaVo.putParam("RemitBranch", "");
-		this.totaVo.putParam("RemitAcctNo", "");
+		this.totaVo.putParam("RemitAcctNo", 0);
 		this.totaVo.putParam("PaymentBank", "");
 		this.totaVo.putParam("CompensateAcct", "");
-		BankRemit tBankRemit = bankRemitService.findL4104BFirst(tLoanBorMain.getCustNo(), tLoanBorMain.getFacmNo(),
-				tLoanBorMain.getBormNo(), parse.stringToInteger(tLoanBorMain.getDrawdownCode()), titaVo);
+		BankRemit tBankRemit = bankRemitService.findBormNoFirst(tLoanBorMain.getCustNo(), tLoanBorMain.getFacmNo(),
+				tLoanBorMain.getBormNo(), titaVo);
 		if (tBankRemit != null) {
 			CdBank tCdBank1 = cdBankService
 					.findById(new CdBankId(tBankRemit.getRemitBank(), tBankRemit.getRemitBranch()), titaVo);
@@ -218,8 +218,7 @@ public class L3916 extends TradeBuffer {
 				this.totaVo.putParam("RemitBranch", tBankRemit.getRemitBranch() + " " + tCdBank1.getBranchItem());
 			}
 			this.totaVo.putParam("RemitAcctNo", tBankRemit.getRemitAcctNo());
-			this.totaVo.putParam("PaymentBank",
-					FormatUtil.pad9(tBankRemit.getRemitBank(), 3) + FormatUtil.pad9(tBankRemit.getRemitBranch(), 4));
+			this.totaVo.putParam("PaymentBank", tBankRemit.getRemitBank() + tBankRemit.getRemitBranch());
 			this.totaVo.putParam("CompensateAcct", tBankRemit.getCustName());// 收款戶名
 		}
 		this.totaVo.putParam("Remark", tLoanBorMain.getRemark());

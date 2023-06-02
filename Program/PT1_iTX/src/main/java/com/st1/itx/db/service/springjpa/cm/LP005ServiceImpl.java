@@ -75,25 +75,23 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	public List<Map<String, String>> queryAmt(int inputWorkMonth, TitaVo titaVo) {
-
+		//有協辦獎金戶號下全部額度
 		this.info("LP005ServiceImpl queryAmt inputWorkMonth = " + inputWorkMonth);
 
 		String sql = " ";
 		sql += " WITH UTILBAL AS ( ";
-		sql += "  SELECT PR.\"CustNo\" ";
-		sql += "       , PR.\"FacmNo\" ";
+		sql += "  SELECT PI.\"CustNo\" ";
+		sql += "       , PI.\"FacmNo\" ";
 		sql += "       , PR.\"EmployeeNo\" ";
 		sql += "       , PR.\"PieceCode\"  ";
 		sql += "       , PR.\"ProdCode\"  ";
 		sql += "       , SUM(NVL(PI.\"DrawdownAmt\",0)) AS \"UtilBal\" ";
 		sql += "  FROM ";
 		sql += "  ( SELECT \"CustNo\" ";
-		sql += "          , \"FacmNo\" ";
 		sql += "          , \"EmployeeNo\" ";
 		sql += "          , \"PieceCode\"  ";
 		sql += "          , \"ProdCode\"  ";
 		sql += "    FROM ( SELECT \"CustNo\" ";
-		sql += "                 , \"FacmNo\" ";
 		sql += "                 , \"EmployeeNo\" ";
 		sql += "                 , \"PieceCode\"  ";
 		sql += "                 , \"ProdCode\"  ";
@@ -103,19 +101,18 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             AND \"AdjustBonus\" > 0 ";
 		sql += "         )  ";
 		sql += "    GROUP BY \"CustNo\" ";
-		sql += "           , \"FacmNo\" ";
 		sql += "           , \"EmployeeNo\" ";
 		sql += "           , \"PieceCode\"  ";
 		sql += "           , \"ProdCode\"  ";
 		sql += "  ) PR ";
 		sql += "  LEFT JOIN \"PfItDetail\" PI ON PI.\"CustNo\" = PR.\"CustNo\" ";
-		sql += "                             AND PI.\"FacmNo\" = PR.\"FacmNo\" ";
 		sql += "                             AND PI.\"RepayType\" = 0 ";
 		sql += "                             AND PI.\"WorkMonth\" = :inputWorkMonth ";
 		sql += "  WHERE PR.\"PieceCode\" IN ('1','2','A','B','8','9') ";
 		sql += "    AND PR.\"ProdCode\" NOT IN ('TB') ";
-		sql += "  GROUP BY PR.\"CustNo\" ";
-		sql += "         , PR.\"FacmNo\" ";
+		sql += "    AND NVL(PI.\"CustNo\",0) > 0 ";
+		sql += "  GROUP BY PI.\"CustNo\" ";
+		sql += "         , PI.\"FacmNo\" ";
 		sql += "         , PR.\"EmployeeNo\" ";
 		sql += "         , PR.\"PieceCode\"  ";
 		sql += "         , PR.\"ProdCode\"  ";

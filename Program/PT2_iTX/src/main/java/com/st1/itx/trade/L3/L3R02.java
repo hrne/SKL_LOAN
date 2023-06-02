@@ -23,7 +23,6 @@ import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanRateChangeService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -235,14 +234,21 @@ public class L3R02 extends TradeBuffer {
 		this.totaVo.putParam("L3r02LastKinbr", tLoanBorMain.getLastKinbr());
 		this.totaVo.putParam("L3r02LastTlrNo", tLoanBorMain.getLastTlrNo());
 		this.totaVo.putParam("L3r02LastTxtNo", tLoanBorMain.getLastTxtNo());
-		BankRemit tBankRemit = bankRemitService.findL4104BFirst(tLoanBorMain.getCustNo(), tLoanBorMain.getFacmNo(),
-				tLoanBorMain.getBormNo(), parse.stringToInteger(tLoanBorMain.getDrawdownCode()), titaVo);
-		this.totaVo.putParam("L3r02RemitBank", tBankRemit.getRemitBank());
-		this.totaVo.putParam("L3r02RemitBranch", tBankRemit.getRemitBranch());
-		this.totaVo.putParam("L3r02RemitAcctNo", tBankRemit.getRemitAcctNo());
+		BankRemit tBankRemit = bankRemitService.findBormNoFirst(tLoanBorMain.getCustNo(), tLoanBorMain.getFacmNo(),
+				tLoanBorMain.getBormNo(), titaVo);
+
+		if (tBankRemit != null) {
+			this.totaVo.putParam("L3r02RemitBank", tBankRemit.getRemitBank());
+			this.totaVo.putParam("L3r02RemitBranch", tBankRemit.getRemitBranch());
+			this.totaVo.putParam("L3r02RemitAcctNo", tBankRemit.getRemitAcctNo());
+			this.totaVo.putParam("L3r02PaymentBank", tBankRemit.getRemitBank() + tBankRemit.getRemitBranch());
+		} else {
+			this.totaVo.putParam("L3r02RemitBank", "");
+			this.totaVo.putParam("L3r02RemitBranch", "");
+			this.totaVo.putParam("L3r02RemitAcctNo", 0);
+			this.totaVo.putParam("L3r02PaymentBank", "");
+		}
 		this.totaVo.putParam("L3r02CompensateAcct", tLoanBorMain.getCompensateAcct());
-		this.totaVo.putParam("L3r02PaymentBank",
-				FormatUtil.pad9(tBankRemit.getRemitBank(), 3) + FormatUtil.pad9(tBankRemit.getRemitBranch(), 4));
 		this.totaVo.putParam("L3r02Remark", tLoanBorMain.getRemark());
 		this.totaVo.putParam("L3r02AcDate", tLoanBorMain.getAcDate());
 		this.totaVo.putParam("L3r02NextAcDate", tLoanBorMain.getNextAcDate());

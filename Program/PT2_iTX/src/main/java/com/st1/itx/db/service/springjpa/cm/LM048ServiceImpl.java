@@ -57,7 +57,16 @@ public class LM048ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                    AS CustPercentage "; // -- F11 單一授信對象核貸金額占淨值比例
 		sql += " FROM \"CustMain\" CM ";
 		sql += " LEFT JOIN \"CdIndustry\" CDI ON CDI.\"IndustryCode\" = CM.\"IndustryCode\" ";
-		sql += " LEFT JOIN \"CdVarValue\" CDV ON CDV.\"YearMonth\" = :inputYearMonth ";
+		sql += " LEFT JOIN ( ";
+		sql += "     SELECT \"StockHoldersEqt\" AS \"Totalequity\"";
+		sql += "           ,TRUNC(\"AcDate\" /100 ) AS \"YearMonth\"";
+		sql += "     FROM \"InnFundApl\" ";
+		sql += "     WHERE \"AcDate\" = (";
+		sql += "     	SELECT MAX(\"AcDate\") ";
+		sql += "     	FROM \"InnFundApl\" ";
+		sql += "     	WHERE TRUNC(\"AcDate\" / 100) = :inputYearMonth";
+		sql += "     )";
+		sql += " )  CDV ON CDV.\"YearMonth\" = :inputYearMonth ";
 		sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = CM.\"CustNo\" ";
 		sql += " LEFT JOIN ( SELECT \"CustNo\" ";
 		sql += "                  , \"FacmNo\" ";
@@ -104,7 +113,16 @@ public class LM048ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             FROM \"ReltMain\" RM ";
 		sql += "             LEFT JOIN \"CustMain\" CRM ON CRM.\"CustNo\" = RM.\"CustNo\" ";
 		sql += "             LEFT JOIN \"CustMain\" CRD ON CRD.\"CustUKey\" = RM.\"ReltUKey\" ";
-		sql += "             LEFT JOIN \"CdVarValue\" CDV ON CDV.\"YearMonth\" = :inputYearMonth ";
+		sql += "			 LEFT JOIN ( ";
+		sql += "			     SELECT \"StockHoldersEqt\" AS \"Totalequity\"";
+		sql += "			           ,TRUNC(\"AcDate\" /100 ) AS \"YearMonth\"";
+		sql += "			     FROM \"InnFundApl\" ";
+		sql += "			     WHERE \"AcDate\" = (";
+		sql += "			     	SELECT MAX(\"AcDate\") ";
+		sql += "			     	FROM \"InnFundApl\" ";
+		sql += "			     	WHERE TRUNC(\"AcDate\" / 100) = :inputYearMonth";
+		sql += "			     )";
+		sql += "			 )  CDV ON CDV.\"YearMonth\" = :inputYearMonth ";
 		sql += "             LEFT JOIN ( SELECT CM.\"CustId\" ";
 		sql += "                               , SUM(FAC.\"LineAmt\") AS \"LineAmt\" ";
 		sql += "                         FROM \"FacMain\" FAC  ";

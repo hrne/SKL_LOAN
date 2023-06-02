@@ -252,13 +252,32 @@ em = null;
     this.info("findL4104BFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " bormNo_2 : " +  bormNo_2 + " drawdownCode_3 : " +  drawdownCode_3);
     Optional<BankRemit> bankRemitT = null;
     if (dbName.equals(ContentName.onDay))
-      bankRemitT = bankRemitReposDay.findTopByCustNoIsAndFacmNoIsAndBormNoIsAndDrawdownCodeIsOrderByAcDateDesc(custNo_0, facmNo_1, bormNo_2, drawdownCode_3);
+      bankRemitT = bankRemitReposDay.findTopByCustNoIsAndFacmNoIsAndBormNoIsAndDrawdownCodeIsOrderByAcDateDescCreateDateDesc(custNo_0, facmNo_1, bormNo_2, drawdownCode_3);
     else if (dbName.equals(ContentName.onMon))
-      bankRemitT = bankRemitReposMon.findTopByCustNoIsAndFacmNoIsAndBormNoIsAndDrawdownCodeIsOrderByAcDateDesc(custNo_0, facmNo_1, bormNo_2, drawdownCode_3);
+      bankRemitT = bankRemitReposMon.findTopByCustNoIsAndFacmNoIsAndBormNoIsAndDrawdownCodeIsOrderByAcDateDescCreateDateDesc(custNo_0, facmNo_1, bormNo_2, drawdownCode_3);
     else if (dbName.equals(ContentName.onHist))
-      bankRemitT = bankRemitReposHist.findTopByCustNoIsAndFacmNoIsAndBormNoIsAndDrawdownCodeIsOrderByAcDateDesc(custNo_0, facmNo_1, bormNo_2, drawdownCode_3);
+      bankRemitT = bankRemitReposHist.findTopByCustNoIsAndFacmNoIsAndBormNoIsAndDrawdownCodeIsOrderByAcDateDescCreateDateDesc(custNo_0, facmNo_1, bormNo_2, drawdownCode_3);
     else 
-      bankRemitT = bankRemitRepos.findTopByCustNoIsAndFacmNoIsAndBormNoIsAndDrawdownCodeIsOrderByAcDateDesc(custNo_0, facmNo_1, bormNo_2, drawdownCode_3);
+      bankRemitT = bankRemitRepos.findTopByCustNoIsAndFacmNoIsAndBormNoIsAndDrawdownCodeIsOrderByAcDateDescCreateDateDesc(custNo_0, facmNo_1, bormNo_2, drawdownCode_3);
+
+    return bankRemitT.isPresent() ? bankRemitT.get() : null;
+  }
+
+  @Override
+  public BankRemit findBormNoFirst(int custNo_0, int facmNo_1, int bormNo_2, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("findBormNoFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " bormNo_2 : " +  bormNo_2);
+    Optional<BankRemit> bankRemitT = null;
+    if (dbName.equals(ContentName.onDay))
+      bankRemitT = bankRemitReposDay.findTopByCustNoIsAndFacmNoIsAndBormNoIsOrderByAcDateDescCreateDateDesc(custNo_0, facmNo_1, bormNo_2);
+    else if (dbName.equals(ContentName.onMon))
+      bankRemitT = bankRemitReposMon.findTopByCustNoIsAndFacmNoIsAndBormNoIsOrderByAcDateDescCreateDateDesc(custNo_0, facmNo_1, bormNo_2);
+    else if (dbName.equals(ContentName.onHist))
+      bankRemitT = bankRemitReposHist.findTopByCustNoIsAndFacmNoIsAndBormNoIsOrderByAcDateDescCreateDateDesc(custNo_0, facmNo_1, bormNo_2);
+    else 
+      bankRemitT = bankRemitRepos.findTopByCustNoIsAndFacmNoIsAndBormNoIsOrderByAcDateDescCreateDateDesc(custNo_0, facmNo_1, bormNo_2);
 
     return bankRemitT.isPresent() ? bankRemitT.get() : null;
   }

@@ -274,9 +274,8 @@ public class L6984 extends TradeBuffer {
 
 				occursList.putParam("RpCode1", 01);
 				occursList.putParam("RpAmt1", tLoanBorMain.getDrawdownAmt());
-				BankRemit tBankRemit = bankRemitService.findL4104BFirst(tLoanBorMain.getCustNo(),
-						tLoanBorMain.getFacmNo(), tLoanBorMain.getBormNo(),
-						parse.stringToInteger(tLoanBorMain.getDrawdownCode()), titaVo);
+				BankRemit tBankRemit = bankRemitService.findBormNoFirst(tLoanBorMain.getCustNo(),
+						tLoanBorMain.getFacmNo(), tLoanBorMain.getBormNo(), titaVo);
 				if (tBankRemit != null) {
 					occursList.putParam("RpRemitBank1", tBankRemit.getRemitBank());
 					occursList.putParam("RpRemitBranch1", tBankRemit.getRemitBranch());
@@ -285,7 +284,7 @@ public class L6984 extends TradeBuffer {
 				} else {
 					occursList.putParam("RpRemitBank1", "");
 					occursList.putParam("RpRemitBranch1", "");
-					occursList.putParam("RpRemitAcctNo1", "");
+					occursList.putParam("RpRemitAcctNo1", 0);
 					occursList.putParam("RpCustName1", "");
 				}
 				occursList.putParam("RpRemark1", tLoanBorMain.getRemark());

@@ -91,6 +91,21 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "     ) postLimit on postLimit.\"CustNo\" = BDD.\"CustNo\" ";
 
 		}
+		if (functionCode == 3) {
+			sql += " left join (                                              ";
+			sql += "     select                                               ";
+			sql += "      \"CustNo\"                                          ";
+			sql += "     ,\"FacmNo\"                                          ";
+			sql += "     ,SUM(\"RvBal\") as \"RvBal\"                         ";
+			sql += "     from \"AcReceivable\"                                ";
+			sql += "     where \"ReceivableFlag\" = 4                         ";
+			sql += "       and substr(\"AcctCode\",1,1) = 'I'                 ";
+			sql += "       and \"ClsFlag\" = 0                                ";
+			sql += "     group by \"CustNo\"                                  ";
+			sql += "             ,\"FacmNo\"                                  ";
+			sql += "     ) shortLimit on shortLimit.\"CustNo\" = BDD.\"CustNo\" ";
+			sql += "                 and shortLimit.\"FacmNo\" = BDD.\"FacmNo\" ";
+		}
 		if (functionCode == 8) {
 			sql += " left join (                                              ";
 			sql += "     select                                               ";
@@ -128,7 +143,52 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "          and BATX.\"TitaTlrNo\" = BDD.\"TitaTlrNo\"        ";
 			sql += "          and BATX.\"TitaTxtNo\" = BDD.\"TitaTxtNo\"        ";
 		}
-
+		if (functionCode == 12) {
+			sql += " left join  ";
+			sql += "   (  SELECT             ";
+			sql += "       \"CustNo\"        ";
+			sql += "      FROM               ";
+			sql += "      (                  ";
+			sql += "       SELECT             ";
+			sql += "        TMP.\"CustNo\" ";
+			sql += "       ,TMP.\"RepayBank\" ";
+			sql += "       ,TMP.\"TempAmt\" ";
+			sql += "       ,TAV.\"RvBal\" ";
+			sql += "       FROM ";
+			sql += "       ( ";
+			sql += "        select  ";
+			sql += "         b.\"CustNo\" ";
+			sql += "        ,b.\"RepayBank\" ";
+			sql += "        ,SUM(b.\"TempAmt\") AS \"TempAmt\" ";
+			sql += "        from \"BankDeductDtl\" b ";
+			sql += "        where b.\"TempAmt\" > 0 ";
+			sql += "        group by b.\"CustNo\" ";
+			sql += "                ,b.\"RepayBank\" ";
+			sql += "        order by b.\"CustNo\" ";
+			sql += "       ) TMP ";
+			sql += "       left join ";
+			sql += "        (select  ";
+			sql += "          b.\"CustNo\" ";
+			sql += "         ,a.\"RepayBank\" ";
+			sql += "         ,SUM(b.\"RvBal\") AS \"RvBal\" ";
+			sql += "         from \"AcReceivable\" b ";
+			sql += "         left join \"FacMain\" f on  f.\"CustNo\" = b.\"CustNo\" ";
+			sql += "                              and  f.\"FacmNo\" = b.\"FacmNo\" ";
+			sql += "                              and  f.\"RepayCode\" = 2 ";
+			sql += "        left join \"BankAuthAct\" a on  a.\"CustNo\" = f.\"CustNo\" ";
+			sql += "                                  and  a.\"FacmNo\" = f.\"FacmNo\" ";
+			sql += "                                  and  a.\"AuthType\" in ('00','01') ";
+			sql += "         where b.\"AcctCode\" = 'TAV'    ";
+			sql += "          and	b.\"RvBal\" > 0	                ";
+			sql += "          and nvl(a.\"RepayBank\",' ') <> ' ' ";
+			sql += "        group by b.\"CustNo\" ";
+			sql += "                 ,a.\"RepayBank\" ";
+			sql += "       ) TAV on TAV.\"CustNo\" = TMP.\"CustNo\" ";
+			sql += "            and TAV.\"RepayBank\" = TMP.\"RepayBank\" ";
+			sql += "       where  TMP.\"TempAmt\" > nvl(TAV.\"RvBal\",0) ";
+			sql += "      ) group by \"CustNo\" ";
+			sql += "   )  T on T.\"CustNo\" = BDD.\"CustNo\"     ";
+		}
 		sql += " where BDD.\"EntryDate\" >= :entryDateFm";
 		sql += "   and BDD.\"EntryDate\" <= :entryDateTo";
 
@@ -172,8 +232,10 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "   and (postLimit.\"RepayAmt\" >= :postLimitAmt";
 			sql += "        and BDD.\"RepayAmt\" >= :singleLimitAmt" + " )      ";
 			break;
-		case 3: // 下限金額-
-			sql += "   and BDD.\"RepayAmt\" <= :lowLimitAmt";
+		case 3: // 下限金額-短繳金額
+			sql += "   and nvl(shortLimit.\"RvBal\",0) between 1 and :lowLimitAmt";
+			sql += "   and BDD.\"AcDate\" = 0                     ";
+			sql += "   and BDD.\"RepayType\" = 1                  ";
 			break;
 		case 4: // 檢核不正常
 			sql += "   and case when BDD.\"AmlRsp\" in ('1','2') then 1 ";
@@ -200,6 +262,9 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 		case 11: // 入帳後有費用未收(銀扣期款不收費用)
 			sql += "   and BDD.\"RepayType\" = 1";
 			sql += "   and NVL(JSON_VALUE(BATX.\"ProcNote\", '$.UnPayFeeX'),' ') <> ' ' ";
+			break;
+		case 12: // 暫收抵用額度檢核
+			sql += "   and NVL(T.\"CustNo\",0) > 0 ";
 			break;
 		}
 
@@ -315,6 +380,21 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "     group by \"CustNo\"                                  ";
 			sql += "     ) postLimit on postLimit.\"CustNo\" = BDD.\"CustNo\" ";
 		}
+		if (functionCode == 3) {
+			sql += " left join (                                              ";
+			sql += "     select                                               ";
+			sql += "      \"CustNo\"                                          ";
+			sql += "     ,\"FacmNo\"                                          ";
+			sql += "     ,SUM(\"RvBal\") as \"RvBal\"                         ";
+			sql += "     from \"AcReceivable\"                                ";
+			sql += "     where \"ReceivableFlag\" = 4                         ";
+			sql += "       and substr(\"AcctCode\",1,1) = 'I'                 ";
+			sql += "       and \"ClsFlag\" = 0";
+			sql += "     group by \"CustNo\"                                  ";
+			sql += "             ,\"FacmNo\"                                  ";
+			sql += "     ) shortLimit on shortLimit.\"CustNo\" = BDD.\"CustNo\" ";
+			sql += "                 and shortLimit.\"FacmNo\" = BDD.\"FacmNo\" ";
+		}
 		if (functionCode == 8) {
 			sql += " left join (                                              ";
 			sql += "     select                                               ";
@@ -355,6 +435,52 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " left join  \"BatxDetail\"  BATX on BATX.\"AcDate\" = BDD.\"AcDate\"              ";
 			sql += "          and BATX.\"TitaTlrNo\" = BDD.\"TitaTlrNo\"        ";
 			sql += "          and BATX.\"TitaTxtNo\" = BDD.\"TitaTxtNo\"        ";
+		}
+		if (functionCode == 12) {
+			sql += " left join  ";
+			sql += "   (  SELECT             ";
+			sql += "       \"CustNo\"        ";
+			sql += "      FROM               ";
+			sql += "      (                  ";
+			sql += "       SELECT             ";
+			sql += "        TMP.\"CustNo\" ";
+			sql += "       ,TMP.\"RepayBank\" ";
+			sql += "       ,TMP.\"TempAmt\" ";
+			sql += "       ,TAV.\"RvBal\" ";
+			sql += "       FROM ";
+			sql += "       ( ";
+			sql += "        select  ";
+			sql += "         b.\"CustNo\" ";
+			sql += "        ,b.\"RepayBank\" ";
+			sql += "        ,SUM(b.\"TempAmt\") AS \"TempAmt\" ";
+			sql += "        from \"BankDeductDtl\" b ";
+			sql += "        where b.\"TempAmt\" > 0 ";
+			sql += "        group by b.\"CustNo\" ";
+			sql += "                ,b.\"RepayBank\" ";
+			sql += "        order by b.\"CustNo\" ";
+			sql += "       ) TMP ";
+			sql += "       left join ";
+			sql += "        (select  ";
+			sql += "          b.\"CustNo\" ";
+			sql += "         ,a.\"RepayBank\" ";
+			sql += "         ,SUM(b.\"RvBal\") AS \"RvBal\" ";
+			sql += "         from \"AcReceivable\" b ";
+			sql += "         left join \"FacMain\" f on  f.\"CustNo\" = b.\"CustNo\" ";
+			sql += "                              and  f.\"FacmNo\" = b.\"FacmNo\" ";
+			sql += "                              and  f.\"RepayCode\" = 2 ";
+			sql += "        left join \"BankAuthAct\" a on  a.\"CustNo\" = f.\"CustNo\" ";
+			sql += "                                  and  a.\"FacmNo\" = f.\"FacmNo\" ";
+			sql += "                                  and  a.\"AuthType\" in ('00','01') ";
+			sql += "         where b.\"AcctCode\" = 'TAV'    ";
+			sql += "          and	b.\"RvBal\" > 0	                ";
+			sql += "          and nvl(a.\"RepayBank\",' ') <> ' ' ";
+			sql += "        group by b.\"CustNo\" ";
+			sql += "                 ,a.\"RepayBank\" ";
+			sql += "       ) TAV on TAV.\"CustNo\" = TMP.\"CustNo\" ";
+			sql += "            and TAV.\"RepayBank\" = TMP.\"RepayBank\" ";
+			sql += "       where  TMP.\"TempAmt\" > nvl(TAV.\"RvBal\",0) ";
+			sql += "      ) group by \"CustNo\" ";
+			sql += "   )  T on T.\"CustNo\" = BDD.\"CustNo\"     ";
 		}
 
 		sql += " where BDD.\"EntryDate\" >= :entryDateFm";
@@ -400,8 +526,10 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "   and (postLimit.\"RepayAmt\" >= :postLimitAmt";
 			sql += "        and BDD.\"RepayAmt\" >= :singleLimitAmt" + " )      ";
 			break;
-		case 3: // 下限金額-
-			sql += "   and BDD.\"RepayAmt\" <= :lowLimitAmt";
+		case 3: // 下限金額-短繳金額
+			sql += "   and nvl(shortLimit.\"RvBal\",0) between 1 and :lowLimitAmt";
+			sql += "   and BDD.\"AcDate\" = 0                     ";
+			sql += "   and BDD.\"RepayType\" = 1                  ";
 			break;
 		case 4: // 檢核不正常
 			sql += "   and case when BDD.\"AmlRsp\" in ('1','2') then 1 ";
@@ -428,6 +556,9 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 		case 11: // 入帳後有費用未收(銀扣期款不收費用)
 			sql += "   and BDD.\"RepayType\" = 1";
 			sql += "   and NVL(JSON_VALUE(BATX.\"ProcNote\", '$.UnPayFeeX'),' ') <> ' ' ";
+			break;
+		case 12: // 暫收抵用額度檢核
+			sql += "   and NVL(T.\"CustNo\",0) > 0 ";
 			break;
 		}
 

@@ -115,6 +115,17 @@ public interface BankRemitService {
   public BankRemit findL4104BFirst(int custNo_0, int facmNo_1, int bormNo_2, int drawdownCode_3, TitaVo... titaVo);
 
   /**
+   * CustNo = ,AND FacmNo = ,AND BormNo = 
+   *
+   * @param custNo_0 custNo_0
+   * @param facmNo_1 facmNo_1
+   * @param bormNo_2 bormNo_2
+   * @param titaVo Variable-Length Argument
+   * @return Slice BankRemit BankRemit of List
+   */
+  public BankRemit findBormNoFirst(int custNo_0, int facmNo_1, int bormNo_2, TitaVo... titaVo);
+
+  /**
    * hold By BankRemit
    * 
    * @param bankRemitId key

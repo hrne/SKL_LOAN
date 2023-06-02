@@ -860,6 +860,16 @@ public class L6101 extends TradeBuffer {
 		if (slAcDetail == null) {
 			return;
 		}
+		boolean isL7400 = false;
+		for (AcDetail ac : slAcDetail.getContent()) {
+			if (ac.getEntAc() > 0) {
+				isL7400 = true;
+				break;
+			}
+		}
+		if (!isL7400) {
+			return;
+		}
 		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 		TempVo tTempVo = new TempVo();
 		tTxToDoDetail.setItemCode("L7400");

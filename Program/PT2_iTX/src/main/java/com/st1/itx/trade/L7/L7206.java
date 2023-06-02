@@ -287,13 +287,51 @@ public class L7206 extends TradeBuffer {
 				CountS++; // 成功筆數+1
 				cntTrans++;
 
-				if (cntTrans > 500) {
+				// 每1000筆，新增一次
+				if (cntTrans > 1000) {
+
+					titaVo.setDataBaseOnLine();// 指定連線報環境
+					this.info("onLine");
+
+					try {
+
+						if (delLifeRelHead != null) {
+							this.info("1.delete old data");
+							tLifeRelHeadService.deleteAll(delLifeRelHead, titaVo);
+						}
+						this.info("2.insert new data");
+						tLifeRelHeadService.insertAll(inLifeRelHead, titaVo);
+
+					} catch (DBException e) {
+						throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+					}
+
+					titaVo.setDataBaseOnMon();// 指定月報環境
+					this.info("onMon");
+
+					try {
+
+						if (delLifeRelHead != null) {
+							this.info("1.delete old data");
+							tLifeRelHeadService.deleteAll(delLifeRelHead, titaVo);
+						}
+						this.info("2.insert new data");
+						tLifeRelHeadService.insertAll(inLifeRelHead, titaVo);
+
+					} catch (DBException e) {
+						throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+					}
+
 					cntTrans = 0;
+					inLifeRelHead = new ArrayList<LifeRelHead>();
+
 					this.batchTransaction.commit();
 				}
 			} // for
 
-			this.info("inLifeRelHead =" + inLifeRelHead.toString());
+			
+			titaVo.setDataBaseOnLine();// 指定連線報環境
+			this.info("onLine");
 
 			try {
 
@@ -323,6 +361,37 @@ public class L7206 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
+			
+//			this.info("inLifeRelHead =" + inLifeRelHead.toString());
+//
+//			try {
+//
+//				if (delLifeRelHead != null) {
+//					this.info("1.delete old data");
+//					tLifeRelHeadService.deleteAll(delLifeRelHead, titaVo);
+//				}
+//				this.info("2.insert new data");
+//				tLifeRelHeadService.insertAll(inLifeRelHead, titaVo);
+//
+//			} catch (DBException e) {
+//				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+//			}
+//
+//			titaVo.setDataBaseOnMon();// 指定月報環境
+//			this.info("onMon");
+//
+//			try {
+//
+//				if (delLifeRelHead != null) {
+//					this.info("1.delete old data");
+//					tLifeRelHeadService.deleteAll(delLifeRelHead, titaVo);
+//				}
+//				this.info("2.insert new data");
+//				tLifeRelHeadService.insertAll(inLifeRelHead, titaVo);
+//
+//			} catch (DBException e) {
+//				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+//			}
 
 			// 2:人壽利關人職員名單[T07_2];xlsx xls
 		} else if (iFunctionCode == 2) {

@@ -290,19 +290,20 @@ public class L3100Report extends MakeReport {
 					parse.stringToInteger(titaVo.getParam("FacmNo")), parse.stringToInteger(titaVo.getParam("BormNo"))),
 					titaVo);
 			if (tLoanBorMain != null) {
-				BankRemit tBankRemit = bankRemitService.findL4104BFirst(tLoanBorMain.getCustNo(),
-						tLoanBorMain.getFacmNo(), tLoanBorMain.getBormNo(),
-						parse.stringToInteger(tLoanBorMain.getDrawdownCode()), titaVo);
+				BankRemit tBankRemit = bankRemitService.findBormNoFirst(tLoanBorMain.getCustNo(),
+						tLoanBorMain.getFacmNo(), tLoanBorMain.getBormNo(), titaVo);
 				acDate = tLoanBorMain.getDrawdownDate() + 19110000;
-				wkBankCode = tBankRemit.getRemitBank();
-				wkBranchCode = tBankRemit.getRemitBranch();
-				CdBank t = cdBankService.findById(new CdBankId(wkBankCode, wkBranchCode), titaVo);
-				if (t != null) {
-					wkBankItem = t.getBankItem();
-					wkBranchItem = t.getBranchItem();
-				} else {
-					wkBankItem = wkBankCode;
-					wkBranchItem = wkBranchCode;
+				if (tBankRemit != null) {
+					wkBankCode = tBankRemit.getRemitBank();
+					wkBranchCode = tBankRemit.getRemitBranch();
+					CdBank t = cdBankService.findById(new CdBankId(wkBankCode, wkBranchCode), titaVo);
+					if (t != null) {
+						wkBankItem = t.getBankItem();
+						wkBranchItem = t.getBranchItem();
+					} else {
+						wkBankItem = wkBankCode;
+						wkBranchItem = wkBranchCode;
+					}
 				}
 
 				payNm = tLoanBorMain.getCompensateAcct(); // 收款戶名

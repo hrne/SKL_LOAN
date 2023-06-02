@@ -283,7 +283,8 @@ public class L4721Report extends MakeReport {
 		List<Map<String, String>> listL4721Detail = new ArrayList<Map<String, String>>();
 
 		try {
-			listL4721Detail = l4721ServiceImpl.doDetail(iCustNo, sAdjDate, eAdjDate, sEntryDate, eEntryDate, titaVo);
+			listL4721Detail = l4721ServiceImpl.doDetail(String.valueOf(iCustNo), sAdjDate, eAdjDate, sEntryDate,
+					eEntryDate, 1, titaVo);
 		} catch (Exception e) {
 			this.error("l4721ServiceImpl doDetail = " + e.getMessage());
 			throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
