@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.service.CdVarValueService;
 
 import com.st1.itx.db.service.springjpa.cm.LY006ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
@@ -23,9 +22,6 @@ import com.st1.itx.util.parse.Parse;
 @Component
 @Scope("prototype")
 public class LY006Report extends MakeReport {
-
-	@Autowired
-	CdVarValueService sCdVarValueService;
 
 	@Autowired
 	LY006ServiceImpl lY006ServiceImpl;

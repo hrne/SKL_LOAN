@@ -31,7 +31,7 @@
 
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[180,420,150,400];printer.width=[20,60,20,60];order=1;">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[200,500,200,500];printer.width=[20,60,20,60];order=1;">
 [
 ["[L2631]                                 清償作業"],
 [#<->#,"#FdCustNo+借戶戶號",#CustNo,"@@@",#BTN1,#BTN3,#CustName],
@@ -44,21 +44,23 @@
 [#<->#,"#FdFacmNo+額度編號",#FacmNo,#BTN8],
 [#<->#,"@",#BTN5,"@",#BTN7,"@",#BTN6,"@",#BTN12,"@",#BTN13,"@",#BTN14],
 [#<->#,"#FdCollectFlag+是否領取清償證明",#CollectFlag,#CollectFlagX],
+[#<->#,"#FdBdLocation+門牌號碼",#BdLocation],
+[#<->#,"#FdBdRmk+建物標示備註",#BdRmk],
+[#<->#,"#FdProhibitperiod+限制期限",#Prohibitperiod,#ProhibitMonthMsg],
+["#FdIntDate+計息期間",#IntStartDate,"-",#IntEndDate],["@@@@@@擔保品編號",#ClNoX],
+["@@@@@@本金",#PrincipalX],["@@@@@@契變手續費",#ModifyFeeX],
+["@@@@@@利息",#InterestX],["@@@@@@帳管費用",#AcctFeeX],
+["@@@@@@延遲息",#DelayIntX],["@@@@@@火險費用",#FireFeeX],
+["@@@@@@違約金",#BreachAmtX],["@@@@@@法務費用",#LawFeeX],
+[#<->#,"@@@@@@清償違約金",#CloseBreachAmtX],
+[#<->#,"@@@@@@累短收",#ShortfallX,#ShortfallXX],
+[#<->#,"@@@@@@累溢收",#ExcessiveX],
 [#<->#,"#FdCloseAmt+清償金額",#CloseAmt],
 ["#FdTelNo1+連絡電話１",#TelNo1,#BTN9],["#FdTelNo2+連絡電話２",#TelNo2,#BTN10],
 ["#FdTelNo3+連絡電話３",#TelNo3,#BTN11],["#FdCloseReasonCode+清償原因",#CloseReasonCode,#CloseReasonCodeX],
 [#<->#,"#FdCollectWayCode+領取地點",#CollectWayCode,#CollectWayCodeX],
 [#<->#,"#FdPostAddress+郵寄地址",#PostAddress],
 [#<->#,"#FdRmk1+備註欄",#Rmk1],
-[#<->#,"#FdBdLocation+門牌號碼",#BdLocation],
-["#FdBdRmk+建物標示備註",#BdRmk],["#FdClNo+擔保品編號",#ClNoX],
-[#<->#,"#FdIntDate+計息期間",#IntStartDate,"-",#IntEndDate],
-["@本金",#PrincipalX],["@契變手續費",#ModifyFeeX],
-["@利息",#InterestX],["@帳管費用",#AcctFeeX],
-["@延遲息",#DelayIntX],["@火險費用",#FireFeeX],
-["@違約金",#BreachAmtX],["@法務費用",#LawFeeX],
-[#<->#,"@清償違約金",#CloseBreachAmtX],
-["@累短收",#ShortfallX,#ShortfallXX],["@累溢收",#ExcessiveX],
 ]
 !---------- AP Button AREA ----------   
 ![Buttom資料查詢]
@@ -142,7 +144,7 @@ T(3,CdCode.CaseCloseCode)
 T(3,CdCode.CollectWayCode)
 
 #CollectWayCodeHelp=x,1024,S
-
+#CollectWayCodeHelpY=x,1024,S
 #CDDEF0004=x,30,S
 T(3,CdCode.Status)
 
@@ -156,6 +158,8 @@ CALL(#HelpProc)
 T(2,@AdvanceCloseCodeHelp,#HelpDesc1)
 T(2,@CloseIndHelp,#HelpDesc2)
 T(2,@CollectWayCodeHelp,#HelpDesc3)
+T(HELP,@CollectWayCodeHelp,#CollectWayCodeHelp,+,01;02;07;13;21;25;26;27;28;29)
+T(HELP,@CollectWayCodeHelpY,#CollectWayCodeHelp,+,02;07;13;21;25;26;27;28;29)
 T(2,@StatusHelp,#HelpDesc4)
 
 #FunCodHelp=x,100,S
@@ -197,6 +201,9 @@ T(1,@TranDate,#NTXBUF,12,7)
 T(1,@FacmNo,#NTXBUF,19,3)
 T(1,@oldFacmNo,#NTXBUF,19,3)
 
+#SetSysPar=X,1,S
+C(3,#CHAIN,1,S,$)
+E(0,0)ASGN(AGAIN$)
 
 #CHAIN_FUNCODE=A,1,S
 #oldFacmNo=A,3,S
@@ -212,7 +219,7 @@ T(F,#CloseInd,0)
 #init=X,1,S
 INVOKEJS(SHOW,p2,0)
 INVOKEJS(SHOW,p1,9,9,0)
-INVOKEJS(SHOW,p1,15,15,0)
+INVOKEJS(SHOW,p1,26,26,0)
 K(MODIFYBUTTON,登錄)
 T(2,@RimTxCode,#TXCD)
 E(0,@RimFKey,#FKEY)
@@ -488,10 +495,12 @@ HELP(#YNHelp)
 @
 C(4,#CollectFlag,T(3,@CollectFlagX,),$)
 V(H,#YNHelp)
-C(5,#CollectFlag,"N",T(3,@CollectWayCode,01),T(3,@CollectWayCode,))
+C(5,#CollectFlag,"N",T(3,@CollectWayCode,01),$)
 
 #CollectFlagX=x,2,L
 T(H,#CollectFlag,#YNHelp)
+T(H,@CollectWayCodeX,#CollectWayCode,#CollectWayCodeHelp)
+C(5,#CollectFlag,"N",T(F,@CollectWayCode,0),T(F,@CollectWayCode,1))
 
 #RimEntryDate=D,7,S
 #RimCaseCloseCode=A,1,S
@@ -529,7 +538,11 @@ E(0,@AcctFee,#L3r11AcctFee)
 E(0,@ModifyFee,#L3r11ModifyFee)
 E(0,@CloseBreachAmt,#L3r11CloseBreachAmt)
 T(2,@BdLocation,#L3r11BdLocation)
+T(2,@ClLocation,#L3r11BdLocation)
+T(2,@CurrAddress,#L3r11CurrAddres)
 T(2,@BdRmk,#L3r11BdRmk)
+E(0,@Prohibitperiod,#L3r11Prohibitperiod)
+T(2,@ProhibitMonthMsg,#L3r11ProhibitMonthMsg)
 T(2,@ClNoX,#L3r11ClNoX)
 CALL2(#ADJUSTDOT,#Precision,#Principal,#PrincipalX)
 CALL2(#ADJUSTDOT,#Precision,#Interest,#InterestX)
@@ -619,12 +632,16 @@ T(3,)T(H,#CloseReasonCode,#AdvanceCloseCodeHelp)
 
 !領取地點
 #CollectWayCode=X,2,I
-HELP(#CollectWayCodeHelp,cols:5)
+C(5,#CollectFlag,"N",T(3,@CollectWayCode,01),$)
+C(5,#CollectFlag,"N",s,$)
+HELP(#CollectWayCodeHelpY,cols:5)
 @
 C(4,#CollectWayCode,T(3,@CollectWayCodeX,),$)
-V(H,#CollectWayCodeHelp)
+V(H,#CollectWayCodeHelpY)
 C(5,#CollectFlag,"Y",V(2,01,20),V(1,01,20))
-IF(#CollectWayCode==21||#CollectWayCode==26||#CollectWayCode==27,INVOKEJS(SHOW,p1,15,15,1),INVOKEJS(SHOW,p1,15,15,0))
+IF(#CollectWayCode==21||#CollectWayCode==26||#CollectWayCode==27,INVOKEJS(SHOW,p1,26,26,1),INVOKEJS(SHOW,p1,26,26,0))
+IF(#CollectWayCode==26,T(2,@PostAddress,#ClLocation),$)
+IF(#CollectWayCode==27,T(2,@PostAddress,#CurrAddress),$)
 
 #CollectWayCodeX=x,12,L
 T(3,)
@@ -644,12 +661,17 @@ IF(#CollectWayCode==21||#CollectWayCode==26||#CollectWayCode==27,$,S)
 
 !門牌號碼
 #FdBdLocation=X,2,L
-#BdLocation=X,100,L
+#BdLocation=x,100,L
+#ClLocation=x,200,S
+#CurrAddress=x,200,S
 
 !建物標示備註
 #FdBdRmk=X,2,L
 #BdRmk=X,100,L
 
+#FdProhibitperiod=X,2,L
+#Prohibitperiod=D,7,L
+#ProhibitMonthMsg=x,30,L
 !擔保品編號
 #FdClNo=X,2,L
 #ClNoX=X,15,L
@@ -924,6 +946,8 @@ C(3,#SnoF,0,E(0,0),E(0,1))
 #ModifyFee
 #Shortfall
 #ShortCloseBreach
+#Prohibitperiod
+#ProhibitMonthMsg
 </sub>
 
 

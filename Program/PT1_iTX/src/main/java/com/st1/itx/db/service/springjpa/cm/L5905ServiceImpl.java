@@ -118,7 +118,7 @@ public class L5905ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		if (iInqFg==1) {
 			sql += " AND  I.\"YearMonth\" = :iFYearMonth       \n";
-			sql += " AND  I.\"ConditionCode\" = iConditionCode       \n";
+			sql += " AND  I.\"ConditionCode\" = :iConditionCode       \n";
 		}
 		if (iInqFg == 2) {
 			sql += " AND ( I.\"YearMonth\" >= :iFYearMonthS    AND   \n";

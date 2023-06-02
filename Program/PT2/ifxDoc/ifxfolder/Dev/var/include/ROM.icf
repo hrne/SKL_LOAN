@@ -4413,8 +4413,11 @@ TXFORM=L3R10
 #L3r11ClCode2=A,2,S
 #L3r11ClNo=A,7,S
 #L3r11ClNoX=X,15,S
-#L3r11BdLocation=X,200,S
+#L3r11BdLocation=x,200,S
+#L3r11CurrAddres=x,200,S
 #L3r11BdRmk=X,100,S
+#L3r11Prohibitperiod=D,7,S
+#L3r11ProhibitMonthMsg=X,30,S
 ##loop{times:50,n:1}
 #L3r11FacmNo{n}=A,3,S
 #L3r11BormNo{n}=A,3,S
@@ -4457,7 +4460,10 @@ TXFORM=L3R11
 #L3r11ClNo
 #L3r11ClNoX
 #L3r11BdLocation
+#L3r11CurrAddres
 #L3r11BdRmk
+#L3r11Prohibitperiod
+#L3r11ProhibitMonthMsg
 ##loop{times:50,n:1}
 #L3r11FacmNo{n}
 #L3r11BormNo{n}

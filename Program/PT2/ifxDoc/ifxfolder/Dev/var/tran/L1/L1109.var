@@ -175,14 +175,10 @@ C(5,#L1r06CrossUse{n},Y,T(3,@YNdef,Y),$)
 
 ! 戶號
 #CustNo=A,7,I
-!C(5,#AFG,0,s,$)
 T(1,#CHAIN_CustNo,1,7)
 C(3,#AFG,0,s,$)
 @
 C(4,#CustId,C(3,#CustNo,0,V(P,統一編號與戶號須擇一輸入),$),s)
-!C(3,#CustNo,0,V(P,統一編號與戶號須擇一輸入),$)
-
-
 
 !戶名
 #CustName=c,100,S

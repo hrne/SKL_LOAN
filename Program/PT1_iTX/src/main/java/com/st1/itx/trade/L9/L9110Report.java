@@ -267,6 +267,7 @@ public class L9110Report extends MakeReport {
 
 			// 2
 
+			this.print(1, 1, " ");
 			String relateCustName = "資料未建立";
 
 			// TODO:關聯戶???
@@ -274,6 +275,7 @@ public class L9110Report extends MakeReport {
 			this.print(1, 1, "二、關聯戶戶名： " + relateCustName);
 
 			// 3
+			this.print(1, 1, " ");
 			if (listGuaQuery == null || listGuaQuery.isEmpty()) {
 				this.print(1, 1, "三、保證人資料： 資料未建立");
 			} else {
@@ -282,6 +284,7 @@ public class L9110Report extends MakeReport {
 			}
 
 			// 4
+			this.print(1, 1, " ");
 			this.print(1, 1, "四、核准資料：");
 			this.print(1, 5, "鍵檔日期 ..... " + this.showRocDate(tL9110.get("F16"), 1));
 			this.print(0, 35, "核准額度 ..... "); // amount is R-pined at 49
@@ -364,6 +367,7 @@ public class L9110Report extends MakeReport {
 			}
 
 			if (tL9110Cl != null) {
+				this.print(1, 1, " ");
 				this.print(1, 1, "五、擔保品資料： " + tL9110Cl.get("F0"));
 
 				String clCode1 = "";
@@ -457,10 +461,12 @@ public class L9110Report extends MakeReport {
 					break;
 				}
 			} else {
+				this.print(1, 1, " ");
 				this.print(1, 1, "五、擔保品資料： 資料未建立");
 			}
 
 			// 6
+			this.print(1, 1, " ");
 			if (listInsuQuery != null && !listInsuQuery.isEmpty()) {
 				this.print(1, 1, "六、保險資料：");
 				// 列印保險資料
@@ -470,9 +476,11 @@ public class L9110Report extends MakeReport {
 			}
 
 			// 7
+			this.print(1, 1, " ");
 			this.print(1, 1, "七、本戶號目前總餘額： " + formatAmt(tL9110.get("F55"), 0) + "　元");
 
 			// 8
+			this.print(1, 1, " ");
 			if (listCoborrowerQuery == null || listCoborrowerQuery.isEmpty()) {
 				this.print(1, 1, "八、共同借款人資料： 資料未建立");
 			} else {
@@ -481,6 +489,7 @@ public class L9110Report extends MakeReport {
 			}
 
 			// 9
+			this.print(1, 1, " ");
 			if (listShareQuotaQuery == null || listShareQuotaQuery.isEmpty()) {
 				this.print(1, 1, "九、合併額度控管資料： 資料未建立");
 			} else {
@@ -621,6 +630,7 @@ public class L9110Report extends MakeReport {
 			printCustTel(listCustTelNoQuery);
 
 			// 2
+			this.print(1, 1, " ");
 			if (listGuaQuery == null || listGuaQuery.isEmpty()) {
 				this.print(1, 1, "二、保證人資料： 資料未建立");
 			} else {
@@ -629,6 +639,7 @@ public class L9110Report extends MakeReport {
 			}
 
 			// 3
+			this.print(1, 1, " ");
 			this.print(1, 1, "三、核准資料：");
 			this.print(1, 5, "鍵檔日期 ..... " + this.showRocDate(tL9110.get("F16"), 1));
 			this.print(0, 35, "核准額度 ..... "); // amount is R-pined at 49// 核貸總金額
@@ -724,6 +735,7 @@ public class L9110Report extends MakeReport {
 			// TODO:擔保品
 			// 4
 			if (tL9110Cl != null) {
+				this.print(1, 1, " ");
 				this.print(1, 1, "四、擔保品資料： " + tL9110Cl.get("F0"));
 
 				String clCode1 = "";
@@ -809,10 +821,12 @@ public class L9110Report extends MakeReport {
 					break;
 				}
 			} else {
+				this.print(1, 1, " ");
 				this.print(1, 1, "四、擔保品資料：　資料未建立");
 			}
 
 			// 5
+			this.print(1, 1, " ");
 			if (listInsuQuery == null || listInsuQuery.isEmpty()) {
 				this.print(1, 1, "五、保險資料： 資料未建立");
 			} else {
@@ -822,9 +836,11 @@ public class L9110Report extends MakeReport {
 			}
 
 			// 6
+			this.print(1, 1, " ");
 			this.print(1, 1, "六、本戶號目前總餘額： " + formatAmt(tL9110.get("F55"), 0) + "　元");
 
 			// 7
+			this.print(1, 1, " ");
 			if (listCoborrowerQuery == null || listCoborrowerQuery.isEmpty()) {
 				this.print(1, 1, "七、共同借款人資料： 資料未建立");
 			} else {
@@ -833,6 +849,7 @@ public class L9110Report extends MakeReport {
 			}
 
 			// 8
+			this.print(1, 1, " ");
 			if (listShareQuotaQuery == null || listShareQuotaQuery.isEmpty()) {
 				this.print(1, 1, "八、合併額度控管資料： 資料未建立");
 			} else {

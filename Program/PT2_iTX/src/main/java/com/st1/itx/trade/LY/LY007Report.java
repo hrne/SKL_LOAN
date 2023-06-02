@@ -3,17 +3,19 @@ package com.st1.itx.trade.LY;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.domain.CdVarValue;
-import com.st1.itx.db.service.CdVarValueService;
+import com.st1.itx.db.domain.InnFundApl;
+import com.st1.itx.db.service.InnFundAplService;
 import com.st1.itx.db.service.springjpa.cm.LY007ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
@@ -28,7 +30,7 @@ public class LY007Report extends MakeReport {
 	LY007ServiceImpl lY007ServiceImpl;
 
 	@Autowired
-	CdVarValueService sCdVarValueService;
+	InnFundAplService sInnFundAplService;
 
 	@Autowired
 	Parse parse;
@@ -44,16 +46,24 @@ public class LY007Report extends MakeReport {
 		this.info("LY007Report exec");
 
 		int inputYearMonth = (Integer.valueOf(titaVo.getParam("RocYear")) + 1911) * 100 + 12;
+	
+		// 西元月底日
+		int mfbsdy = this.txBuffer.getTxCom().getMfbsdyf();
 
-		CdVarValue tCdVarValue = sCdVarValueService.findYearMonthFirst(inputYearMonth, titaVo);
+		List<InnFundApl> lInnFundApl = new ArrayList<InnFundApl>();
+		// 先取得淨值
+		Slice<InnFundApl> slInnFundApl = sInnFundAplService.acDateYearEq(mfbsdy, mfbsdy, 0, Integer.MAX_VALUE, titaVo);
 
-		if (tCdVarValue != null) {
-			int equityDataMonth = tCdVarValue.getYearMonth() - 191100;
-			totalEquity = tCdVarValue.getTotalequity();
+		lInnFundApl = slInnFundApl == null ? null : slInnFundApl.getContent();
+
+		if (lInnFundApl != null) {
+
+			int equityDataMonth = (lInnFundApl.get(0).getAcDate() / 100) - 191100;
+			totalEquity = lInnFundApl.get(0).getStockHoldersEqt();
 			equityDataMonthOutput = String.valueOf(equityDataMonth);
-			equityDataMonthOutput = equityDataMonthOutput.substring(0, 3) + "." + equityDataMonthOutput.substring(3);
+			equityDataMonthOutput = equityDataMonthOutput.substring(0, 3) + "." + equityDataMonthOutput.substring(3)
+					+ ".31";
 		}
-
 		this.info("equityDataMonthOutput = " + equityDataMonthOutput);
 
 		

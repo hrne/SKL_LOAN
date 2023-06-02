@@ -210,7 +210,7 @@ public class L4211Report extends MakeReport {
 				.ascString("DetailSeq").ascString("AcSeq").getList();
 
 		fnAllList3 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
-				.ascString("EntryDate").ascString("CustNo").ascString("DetailSeq").ascString("AcSeq").getList();
+				.ascString("SortingForSubTotal").ascString("EntryDate").ascString("CustNo").ascString("DetailSeq").ascString("AcSeq").getList();
 
 		makePdf(fnAllList1, fnAllList2, fnAllList3, false, titaVo);
 	}
@@ -260,7 +260,7 @@ public class L4211Report extends MakeReport {
 				.ascNumber("DetailSeq").ascString("AcSeq").getList();
 
 		fnAllList3 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
-				.ascString("EntryDate").ascString("CustNo").ascNumber("DetailSeq").ascString("AcSeq").getList();
+				.ascString("SortingForSubTotal").ascString("EntryDate").ascString("CustNo").ascNumber("DetailSeq").ascString("AcSeq").getList();
 
 		makePdf(fnAllList1, fnAllList2, fnAllList3, false, titaVo);
 	}

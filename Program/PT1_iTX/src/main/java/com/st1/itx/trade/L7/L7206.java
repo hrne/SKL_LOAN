@@ -325,7 +325,6 @@ public class L7206 extends TradeBuffer {
 					cntTrans = 0;
 					inLifeRelHead = new ArrayList<LifeRelHead>();
 
-					this.batchTransaction.commit();
 				}
 			} // for
 

@@ -17,7 +17,7 @@ import com.st1.itx.tradeService.BatchBase;
 @Service("L9MonthlyLM032Upd")
 @Scope("step")
 /**
- * (月底日日終批次)維護MonthlyLM028月報工作檔
+ * (月底日日終批次)維護MonthlyLM032月報工作檔
  * 
  * @author Chih Wei
  * @version 1.0.0
@@ -29,12 +29,11 @@ public class L9MonthlyLM032Upd extends BatchBase implements Tasklet, Initializin
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		this.titaVo.putParam(ContentName.empnot, "BAT001");
+		this.titaVo.putParam(ContentName.empnot, "999999");
 	}
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// // logger = LoggerFactory.getLogger(L9MonthlyLM032Upd.class);
 
 		// 第二個參數
 		// D=日批

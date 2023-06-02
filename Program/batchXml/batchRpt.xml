@@ -13,18 +13,6 @@
 		</step>
 	</job>
 
-	<job id="jLD008" parent="parentJob"
-		xmlns="http://www.springframework.org/schema/batch">
-		<step id="sLD008" parent="parentStep">
-			<tasklet ref="LD008" />
-		</step>
-	</job>
-	<job id="jLD009" parent="parentJob"
-		xmlns="http://www.springframework.org/schema/batch">
-		<step id="sLD009" parent="parentStep">
-			<tasklet ref="LD009" />
-		</step>
-	</job>
 
 	<!-- 週報 -->
 	<job id="jLW003" parent="parentJob"

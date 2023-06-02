@@ -29,7 +29,7 @@ public class L9MonthlyLM052OvduIns extends BatchBase implements Tasklet, Initial
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		this.titaVo.putParam(ContentName.empnot, "BAT001");
+		this.titaVo.putParam(ContentName.empnot, "999999");
 	}
 
 	@Override

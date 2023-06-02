@@ -9,16 +9,18 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.domain.CdVarValue;
-import com.st1.itx.db.service.CdVarValueService;
+import com.st1.itx.db.domain.InnFundApl;
+import com.st1.itx.db.service.InnFundAplService;
 import com.st1.itx.db.service.springjpa.cm.LM048ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
+import com.st1.itx.util.parse.Parse;
 
 @Component
 @Scope("prototype")
@@ -28,10 +30,13 @@ public class LM048Report extends MakeReport {
 	LM048ServiceImpl lM048ServiceImpl;
 
 	@Autowired
-	CdVarValueService cdVarValueService;
+	InnFundAplService sInnFundAplService;
 
 	@Autowired
 	MakeExcel makeExcel;
+
+	@Autowired
+	Parse parse;
 
 	private List<Map<String, String>> listA = null;
 	private List<Map<String, String>> listB = null;
@@ -158,14 +163,29 @@ public class LM048Report extends MakeReport {
 
 		String entLoanBalLimit = titaVo.getParam("EntLoanBalLimit");
 
-		// 先取得淨值
-		CdVarValue tCdVarValue = cdVarValueService.findYearMonthFirst(inputYearMonth, titaVo);
+		// 西元月底日
+		int mfbsdy = this.txBuffer.getTxCom().getMfbsdyf();
 
-		if (tCdVarValue != null) {
-			this.info("淨值年月=" + tCdVarValue.getYearMonth());
-			this.info("淨值=" + tCdVarValue.getTotalequity());
-			netValueDataDate = tCdVarValue.getYearMonth();
-			netValue = tCdVarValue.getTotalequity();
+		List<InnFundApl> lInnFundApl = new ArrayList<InnFundApl>();
+		// 先取得淨值
+		Slice<InnFundApl> slInnFundApl = sInnFundAplService.acDateYearEq(mfbsdy, mfbsdy, 0, Integer.MAX_VALUE, titaVo);
+
+		lInnFundApl = slInnFundApl == null ? null : slInnFundApl.getContent();
+
+//		CdVarValue tCdVarValue = cdVarValueService.findYearMonthFirst(inputYearMonth, titaVo);
+//
+//		if (tCdVarValue != null) {
+//			this.info("淨值年月=" + tCdVarValue.getYearMonth());
+//			this.info("淨值=" + tCdVarValue.getTotalequity());
+//			netValueDataDate = tCdVarValue.getYearMonth();
+//			netValue = tCdVarValue.getTotalequity();
+//		}
+		if (lInnFundApl != null) {
+
+			this.info("淨值日期=" + lInnFundApl.get(0).getAcDate());
+			this.info("淨值=" + lInnFundApl.get(0).getStockHoldersEqt());
+			netValueDataDate = lInnFundApl.get(0).getAcDate() / 100;
+			netValue = lInnFundApl.get(0).getStockHoldersEqt();
 		}
 
 		try {

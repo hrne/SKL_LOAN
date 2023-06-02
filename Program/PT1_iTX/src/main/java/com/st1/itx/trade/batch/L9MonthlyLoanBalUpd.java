@@ -29,7 +29,7 @@ public class L9MonthlyLoanBalUpd extends BatchBase implements Tasklet, Initializ
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		this.titaVo.putParam(ContentName.empnot, "BAT001");
+		this.titaVo.putParam(ContentName.empnot, "999999");
 	}
 
 	@Override

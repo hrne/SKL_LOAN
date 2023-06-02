@@ -164,6 +164,10 @@ public class L2631ReportD extends MakeReport {
 		String iBdLocation = titaVo.getParam("BdLocation");
 		// 建物標示備註
 		String iBdRmk = titaVo.getParam("BdRmk");
+		// 限制期間
+		String iProhibitperiod = titaVo.getParam("Prohibitperiod");
+		// 限制清償期限
+		String iProhibitMonthMsg = titaVo.getParam("ProhibitMonthMsg");
 		// 本金
 		BigDecimal iPrincipal = parse.stringToBigDecimal(titaVo.getParam("Principal"));
 		// 利息
@@ -249,9 +253,11 @@ public class L2631ReportD extends MakeReport {
 
 		print(1, 2, "本金 ......... "); // 本金PrincipalX
 		print(0, 32, formatAmt(iPrincipal, 0), "R");
+		print(0, 45, iProhibitMonthMsg); // 限制清償期限
 
 		print(1, 2, "利息 ......... "); // 利息InterestX
 		print(0, 32, formatAmt(iInterest, 0), "R");
+		print(0, 45, "限制期間　 ... " + this.showDate(iProhibitperiod)); // 限制期間
 
 		print(1, 2, "延遲息 ....... "); // 延遲息DelayIntX
 		print(0, 32, formatAmt(iDelayInt, 0), "R");

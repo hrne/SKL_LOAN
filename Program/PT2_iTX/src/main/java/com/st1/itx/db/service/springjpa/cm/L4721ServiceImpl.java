@@ -286,25 +286,24 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	/**
-	 * @param custNoAll  所有書面通知戶號清單
+	 * @param custNo     戶號
 	 * @param sAdjDate   利率調整起日
 	 * @param eAdjDate   利率調整止日
 	 * @param sEntryDate 入帳起日(六個月前月初)
 	 * @param eEntryDate 入帳止日
-	 * @param reportType 報表類型(1:EMAIL通知、2書面通知)
 	 * @param titaVo
 	 * @return
 	 * @throws Exception
 	 * 
 	 * 
 	 */
-	public List<Map<String, String>> doDetail(String custNoAll, int sAdjDate, int eAdjDate, int sEntryDate,
-			int eEntryDate, int reportType, TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> doDetail(int custNo, int sAdjDate, int eAdjDate, int sEntryDate, int eEntryDate,
+			TitaVo titaVo) throws Exception {
 		dateUtil.init();
 
 		this.info("L4721ServiceImpl doDetail");
 
-		this.info("custNo ... " + custNoAll);
+		this.info("custNo ... " + custNo);
 
 //		因抓取不到費用類，第一層group by 到額度(同額度同調整日、同源利率
 
@@ -354,13 +353,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                ELSE";
 		sql += "                    'N' END AS \"Flag\"";
 		sql += "        FROM \"LoanBorTx\" T                                             ";
-		if (reportType == 1) {
-			sql += "        WHERE T.\"CustNo\" = " + custNoAll;
-
-		} else {
-			sql += "        WHERE T.\"CustNo\"  IN (" + custNoAll + ")";
-
-		}
+		sql += "        WHERE T.\"CustNo\" = " + custNo;
 		sql += "         AND  T.\"FacmNo\" != 0 ";
 		sql += "         AND  T.\"TitaHCode\" = 0                                          ";
 		sql += "         AND (T.\"Principal\" + T.\"ExtraRepay\" + T.\"Interest\" + T.\"BreachAmt\" + T.\"CloseBreachAmt\"";
@@ -383,11 +376,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                    ,MIN(\"NextPayIntDate\") AS \"NextPayIntDate\"";
 		sql += "                    ,MAX(\"SpecificDd\") AS \"SpecificDd\"";
 		sql += "        FROM  \"LoanBorMain\"";
-		if (reportType == 1) {
-			sql += "        WHERE  \"CustNo\" = " + custNoAll;
-		} else {
-			sql += "        WHERE  \"CustNo\" IN ( " + custNoAll + ")";
-		}
+		sql += "        WHERE  \"CustNo\" = " + custNo;
 		sql += "               AND \"Status\" != 3                                           ";
 		sql += "        GROUP BY   \"CustNo\",\"FacmNo\") LB ON LB.\"CustNo\" = X.\"CustNo\"                         ";
 		sql += "                                            AND LB.\"FacmNo\" =  X.\"FacmNo\"                        ";
@@ -426,7 +415,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                            AND CB.\"ClCode2\" =  F.\"ClCode2\"                       ";
 		sql += "                            AND CB.\"ClNo\"    =  F.\"ClNo\"                          ";
 		sql += " WHERE LB.\"SpecificDd\" IS NOT NULL";
-		sql += " ORDER BY  X.\"CustNo\",X.\"FacmNo\",X.\"EntryDate\"                                                             ";
+		sql += " ORDER BY X.\"FacmNo\",X.\"EntryDate\"                                                             ";
 
 		this.info("sql=" + sql);
 		Query query;

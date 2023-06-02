@@ -71,8 +71,7 @@ public class L5407 extends TradeBuffer {
 		String iDistItem = titaVo.getParam("DistCodeX");
 		String iDeptItem = titaVo.getParam("DeptCodeX");
 
-		// 資料庫協辦人員等級檔的第一筆資料寫入協辦人員等級歷程檔
-		insertOrgLog(titaVo);
+
 
 		PfCoOfficer tPfCoOfficer = null;
 		PfCoOfficerId tPfCoOfficerId;
@@ -81,6 +80,10 @@ public class L5407 extends TradeBuffer {
 		
 		case 1:
 		case 3:
+			if(iFunctionCode == 1) {
+			// 資料庫協辦人員等級檔的第一筆資料寫入協辦人員等級歷程檔
+			insertOrgLog(titaVo);
+			}
 			checkEffectiveDate(titaVo);
 
 			// 全新資料
@@ -180,10 +183,9 @@ public class L5407 extends TradeBuffer {
 	private void insertOrgLog(TitaVo titaVo) throws LogicException {
 		this.totaVo.init(titaVo);
 		this.info("insertOrgLogiEmpNo    = " + iEmpNo);
-		Slice<PfCoOfficerLog> slPfCoOfficerLog = pfCoOfficerLogService.findEmpNoEq(iEmpNo, 0, Integer.MAX_VALUE,
-				titaVo);
-
-		if (slPfCoOfficerLog == null && iFunctionCode == 1 ) {
+//		Slice<PfCoOfficerLog> slPfCoOfficerLog = pfCoOfficerLogService.findEmpNoEq(iEmpNo, 0, Integer.MAX_VALUE,
+//				titaVo);
+//		if (slPfCoOfficerLog == null && iFunctionCode == 1 ) {
 			PfCoOfficer oPf = pfCoOfficerService.effectiveDateFirst(iEmpNo, 0, 99991231, titaVo);
 			if (oPf != null) {
 				PfCoOfficerLog tPfCoOfficerLog = new PfCoOfficerLog();
@@ -211,10 +213,11 @@ public class L5407 extends TradeBuffer {
 			}
 		}
 
-	}
+//	}
 
 	private void updateLog(PfCoOfficer oPf, TitaVo titaVo) throws LogicException {
 		this.totaVo.init(titaVo);
+		this.info("updateLog Start");
 
 		PfCoOfficerLog tPfCoOfficerLog = new PfCoOfficerLog();
 		

@@ -124,7 +124,8 @@ public class L6987 extends TradeBuffer {
 				if (tmpForeclosureFee.getCloseDate() == 0) {
 					int recordNo = tmpForeclosureFee.getRecordNo();
 					String wkAcctCode = "";
-					int wkLoanStatus = facStatusCom.getLoanStatus(tmpForeclosureFee.getCustNo(), tmpForeclosureFee.getFacmNo(), this.txBuffer.getTxBizDate().getTbsDy(), titaVo);
+					int wkLoanStatus = facStatusCom.getLoanStatus(tmpForeclosureFee.getCustNo(),
+							tmpForeclosureFee.getFacmNo(), this.txBuffer.getTxBizDate().getTbsDy(), titaVo);
 					// 非呆帳戶、呆帳結案戶或債權轉讓戶 跳掉
 					if (!(wkLoanStatus == 8 || wkLoanStatus == 9 || wkLoanStatus == 6)) {
 						continue;
@@ -134,9 +135,11 @@ public class L6987 extends TradeBuffer {
 
 					CustMain tCustMain = new CustMain();
 
-					wkAcctCode = settingUnPaid(tmpForeclosureFee, baTxList, parse.IntegerToString(tmpForeclosureFee.getRecordNo(), 7), titaVo);
+					wkAcctCode = settingUnPaid(tmpForeclosureFee, baTxList,
+							parse.IntegerToString(tmpForeclosureFee.getRecordNo(), 7), titaVo);
 					// 取戶名
-					tCustMain = sCustMainService.custNoFirst(tmpForeclosureFee.getCustNo(), tmpForeclosureFee.getCustNo(), titaVo);
+					tCustMain = sCustMainService.custNoFirst(tmpForeclosureFee.getCustNo(),
+							tmpForeclosureFee.getCustNo(), titaVo);
 
 					occursList.putParam("OOProcStatus", 0);
 					occursList.putParam("OOCustNo", tmpForeclosureFee.getCustNo());
@@ -209,9 +212,11 @@ public class L6987 extends TradeBuffer {
 					CustMain tCustMain = new CustMain();
 
 					// 取戶名
-					tCustMain = sCustMainService.custNoFirst(tTxToDoDetail.getCustNo(), tTxToDoDetail.getCustNo(), titaVo);
+					tCustMain = sCustMainService.custNoFirst(tTxToDoDetail.getCustNo(), tTxToDoDetail.getCustNo(),
+							titaVo);
 
-					tForeclosureFee = sForeclosureFeeService.findById(parse.stringToInteger(tTxToDoDetail.getDtlValue()), titaVo);
+					tForeclosureFee = sForeclosureFeeService
+							.findById(parse.stringToInteger(tTxToDoDetail.getDtlValue()), titaVo);
 
 					tTempVo = tTempVo.getVo(tTxToDoDetail.getProcessNote());
 
@@ -224,7 +229,8 @@ public class L6987 extends TradeBuffer {
 					occursList.putParam("OOFeeCode", tForeclosureFee.getFeeCode()); // 科目名稱代號
 					occursList.putParam("OOTitaCrDb", 1); // 借貸
 					occursList.putParam("OOAcDate", tForeclosureFee.getReceiveDate()); // 收件日
-					occursList.putParam("OORelNo", tTxToDoDetail.getTitaEntdy() + tTxToDoDetail.getTitaKinbr() + tTxToDoDetail.getTitaTlrNo() + parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8));
+					occursList.putParam("OORelNo", tTxToDoDetail.getTitaEntdy() + tTxToDoDetail.getTitaKinbr()
+							+ tTxToDoDetail.getTitaTlrNo() + parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8));
 					occursList.putParam("OOItemCode", tTxToDoDetail.getItemCode());
 					occursList.putParam("OOBormNo", tTxToDoDetail.getBormNo());
 					occursList.putParam("OODtlValue", tTxToDoDetail.getDtlValue());
@@ -238,7 +244,8 @@ public class L6987 extends TradeBuffer {
 			}
 		}
 		if (cnt == 0) {
-			throw new LogicException(titaVo, "E0001", "法拍費用檔"); // 查詢資料不存在
+//			throw new LogicException(titaVo, "E0001", "法拍費用檔"); // 查詢資料不存在
+			throw new LogicException(titaVo, "E0001", "無可墊付資料"); // 查詢資料不存在
 		}
 
 		if (custNo > 0) {
@@ -295,14 +302,16 @@ public class L6987 extends TradeBuffer {
 		return result;
 	}
 
-	private String settingUnPaid(ForeclosureFee f, ArrayList<BaTxVo> baTxList, String rvNo, TitaVo titaVo) throws LogicException {
+	private String settingUnPaid(ForeclosureFee f, ArrayList<BaTxVo> baTxList, String rvNo, TitaVo titaVo)
+			throws LogicException {
 		String wkAcctCode = "";
 		if (baTxList == null || baTxList.size() == 0) {
 			return wkAcctCode;
 		}
 		// 找銷帳檔acctCode
 		for (BaTxVo ba : baTxList) {
-			if (ba.getRepayType() == 7 && ba.getFacmNo() == f.getFacmNo() && ba.getRvNo().equals(parse.IntegerToString(f.getRecordNo(), 7))) {
+			if (ba.getRepayType() == 7 && ba.getFacmNo() == f.getFacmNo()
+					&& ba.getRvNo().equals(parse.IntegerToString(f.getRecordNo(), 7))) {
 				wkAcctCode = ba.getAcctCode();
 				break;
 			}

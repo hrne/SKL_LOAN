@@ -285,7 +285,7 @@ public class LQ007Report extends MakeReport {
 						}
 
 						// 清單上有、查詢沒有則跑進一次
-					} else if (isEmpty) {
+					} else if (isEmpty && (y % 100) == 12) {
 
 						this.info("tmpYM = " + tmpYM);
 						this.info("y = " + y);

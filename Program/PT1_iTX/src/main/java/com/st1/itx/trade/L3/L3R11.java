@@ -20,6 +20,7 @@ import com.st1.itx.db.domain.ClImm;
 import com.st1.itx.db.domain.ClImmId;
 import com.st1.itx.db.domain.ClLand;
 import com.st1.itx.db.domain.ClLandId;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.FacClose;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
@@ -30,18 +31,20 @@ import com.st1.itx.db.service.ClBuildingService;
 import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.ClImmService;
 import com.st1.itx.db.service.ClLandService;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacCloseService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanOverdueService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BaTxCom;
-import com.st1.itx.util.common.LoanAvailableAmt;
+import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.LoanCalcRepayIntCom;
 import com.st1.itx.util.common.LoanCloseBreachCom;
 import com.st1.itx.util.common.LoanSetRepayIntCom;
 import com.st1.itx.util.common.data.CalcRepayIntVo;
 import com.st1.itx.util.common.data.LoanCloseBreachVo;
+import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -70,20 +73,25 @@ public class L3R11 extends TradeBuffer {
 	@Autowired
 	private FacMainService facMainService;
 	@Autowired
+	private CustMainService custMainService;
+	@Autowired
 	private ClFacService clFacService;
 
 	@Autowired
 	private Parse parse;
 	@Autowired
+	private DateUtil dDateUtil;
+	@Autowired
 	private BaTxCom baTxCom;
+	@Autowired
+	private CustNoticeCom custNoticeCom;
+
 	@Autowired
 	private LoanSetRepayIntCom loanSetRepayIntCom;
 	@Autowired
 	private LoanCalcRepayIntCom loanCalcRepayIntCom;
 	@Autowired
 	private LoanCloseBreachCom loanCloseBreachCom;
-	@Autowired
-	private LoanAvailableAmt loanAvailableAmt;
 
 	private List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
 	private ArrayList<CalcRepayIntVo> lCalcRepayIntVo;
@@ -388,6 +396,7 @@ public class L3R11 extends TradeBuffer {
 		if (custNoIntStartDate == 99991231) {
 			custNoIntStartDate = 0;
 		}
+
 		this.totaVo.putParam("L3r11CloseAmt", oCloseAmt);
 		this.totaVo.putParam("L3r11CloseReasonCode", wkCloseReasonCode);
 		this.totaVo.putParam("L3r11RpFacmNo", oRpFacmNo);
@@ -403,8 +412,44 @@ public class L3R11 extends TradeBuffer {
 			} else {
 				tFacMain = facMainService.findById(new FacMainId(iCustNo, iFacmNo), titaVo);
 			}
+			// 抓通訊地址
+			String WkCurrAddres = "";
+			this.totaVo.putParam("L3r11CurrAddres", WkCurrAddres); // 通訊地址
+			CustMain tCustMain = custMainService.custNoFirst(iCustNo, iCustNo, titaVo);
+			if (tCustMain != null) {
+
+				WkCurrAddres = custNoticeCom.getCurrAddress(tCustMain, titaVo);
+				this.info("CurrAddres" + WkCurrAddres);
+			}
+			this.totaVo.putParam("L3r11CurrAddres", WkCurrAddres); // 通訊地址
+			int Prohibitperiod = 0;
+			String prohibitMonthMsg = ""; // 限制清償年限訊息
 			if (tFacMain != null) {
 				wkApplNo = tFacMain.getApplNo();
+
+				if (tFacMain.getProhibitMonth() > 0 && tFacMain.getFirstDrawdownDate() > 0) {
+					dDateUtil.init();
+					dDateUtil.setDate_1(tFacMain.getFirstDrawdownDate());
+					dDateUtil.setMons(tFacMain.getProhibitMonth()); // 限制清償年限
+					Prohibitperiod = dDateUtil.getCalenderDay(); // 綁約期限
+				}
+				if (tFacMain.getProhibitMonth() > 0) {
+					int[] Yymm = { 0, 0 };
+					Yymm = judgeYYMM(tFacMain.getProhibitMonth());
+
+					int yy = Yymm[0];
+					String yyMsg = "";
+					int mm = Yymm[1];
+					String mmMsg = "";
+					if (yy > 0) {
+						yyMsg = yy + " 年 ";
+					}
+					if (mm > 0) {
+						mmMsg = mm + " 個月 ";
+					}
+					prohibitMonthMsg = "限制清償期限為 " + yyMsg + mmMsg;
+				}
+
 			}
 			Slice<ClFac> slClFac = clFacService.approveNoEq(wkApplNo, 0, Integer.MAX_VALUE, titaVo);
 			int clCode1 = 0;
@@ -429,8 +474,7 @@ public class L3R11 extends TradeBuffer {
 				ClBuilding tClBuilding = new ClBuilding();
 				tClBuilding = clBuildingService.findById(clBuildingId, titaVo);
 				if (tClBuilding != null) {
-					bdLocation = tClBuilding.getBdLocation() + "，建號" + tClBuilding.getBdNo1() + "-"
-							+ tClBuilding.getBdNo2();
+					bdLocation = tClBuilding.getBdLocation();
 				}
 			} else if (clCode1 == 2) {
 				ClLandId clLandId = new ClLandId();
@@ -457,6 +501,9 @@ public class L3R11 extends TradeBuffer {
 					clCode1 + "-" + parse.IntegerToString(clCode2, 2) + "-" + parse.IntegerToString(clNo, 7)); // 擔保品編號
 			this.totaVo.putParam("L3r11BdLocation", bdLocation); // 門牌號碼
 			this.totaVo.putParam("L3r11BdRmk", bdRmk); // 建物標示備註
+			this.totaVo.putParam("L3r11Prohibitperiod", Prohibitperiod); // 禁領清償日期
+			this.totaVo.putParam("L3r11ProhibitMonthMsg", prohibitMonthMsg); // 限制清償期限
+			
 		}
 
 		for (OccursList t : lOccursList) {
@@ -478,13 +525,10 @@ public class L3R11 extends TradeBuffer {
 				for (LoanBorMain ln : lLoanBorMain) {
 					if (ln.getBormNo() != iBormNo && (ln.getStatus() == 0 || ln.getStatus() == 4)) {
 						isAllClose = false;
-						return;
+						break;
 					}
 				}
 			}
-			// 結清時判斷該戶號額度下主要擔保品的其他額度是否已全部結清
-			isAllClose = loanAvailableAmt.isAllCloseClFac(iCustNo, iFacmNo, titaVo);
-			
 			// 清償作業檔
 			if (isAllClose) {
 				boolean isFindFacClose = false;
@@ -492,7 +536,6 @@ public class L3R11 extends TradeBuffer {
 						titaVo);
 				if (facCloseList != null) {
 					for (FacClose tFacClose : facCloseList.getContent()) {
-
 						if (tFacClose.getFacmNo() == iFacmNo && tFacClose.getEntryDate() == iEntryDate) {
 							wkCloseReasonCode = tFacClose.getCloseReasonCode();
 							wkCollectFlag = tFacClose.getCollectFlag();
@@ -506,5 +549,25 @@ public class L3R11 extends TradeBuffer {
 				}
 			}
 		}
+	}
+
+	public int[] judgeYYMM(int prohibitMonth) throws LogicException {
+		int YY = 0;
+		int MM = prohibitMonth;
+
+		int[] result = new int[2];
+
+		for (int i = 0; MM >= 12; i++) {
+			this.info("i =" + i);
+			this.info("YY MM Bef=" + YY + " " + MM);
+			MM = MM - 12;
+			YY = i;
+			this.info("YY MM Aft=" + YY + " " + MM);
+		}
+
+		result[0] = YY;
+		result[1] = MM;
+
+		return result;
 	}
 }

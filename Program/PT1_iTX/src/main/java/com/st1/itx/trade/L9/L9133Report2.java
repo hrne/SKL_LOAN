@@ -42,7 +42,7 @@ public class L9133Report2 extends CommBuffer {
 		List<Map<String, String>> resultList = l9133ServiceImpl.findDiffDetail(reportDate, titaVo);
 
 		if (resultList == null || resultList.isEmpty()) {
-			this.error("L9133Report2 lAcAcctCheckDetail IS NULL.");
+			//this.error("L9133Report2 lAcAcctCheckDetail IS NULL.");
 		} else {
 			int rowCursor = 2;
 			for (Map<String, String> result : resultList) {

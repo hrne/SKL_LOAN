@@ -78,8 +78,6 @@ public class L4721Batch extends TradeBuffer {
 
 	private List<Map<String, String>> letterCustList = new ArrayList<Map<String, String>>();
 
-	private List<Integer> iLetterCustList = new ArrayList<Integer>();
-
 //	輸入畫面 戶別 CustType 1:個金;2:企金（含企金自然人）
 //	客戶檔 0:個金1:企金2:企金自然人
 	private int iCustType = 0;
@@ -190,8 +188,7 @@ public class L4721Batch extends TradeBuffer {
 							} else if ("Y".equals(tempVo.getParam("isLetter"))) {
 								if (custNoTmp != custNoLast) {
 									CntPaper = CntPaper + 1;
-//									letterCustList.add(data);
-									iLetterCustList.add(custNoTmp);
+									letterCustList.add(data);
 								}
 
 								// 簡訊通知
@@ -211,8 +208,9 @@ public class L4721Batch extends TradeBuffer {
 
 			} // if
 
+		
 			if (CntPaper > 0) {
-				l4721Report2.exec(titaVo, this.txBuffer, iLetterCustList, tmpKindItem[txkind - 1], isAdjDate, ieAdjDate,
+				l4721Report2.exec(titaVo, this.txBuffer, letterCustList, tmpKindItem[txkind - 1], isAdjDate, ieAdjDate,
 						sEntryDate, eEntryDate);
 			}
 		} // for

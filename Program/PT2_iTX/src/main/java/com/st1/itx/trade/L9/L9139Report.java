@@ -124,6 +124,7 @@ public class L9139Report extends MakeReport {
 				} // for
 				row++;
 			} // for
+			makeExcel.setValue(1, 2, startDate);
 //			makeExcel.setFormula(row, 10, total, "SUBTOTAL(9,J2:J" + (row - 1) + ")", "#,##0");
 
 		} else {

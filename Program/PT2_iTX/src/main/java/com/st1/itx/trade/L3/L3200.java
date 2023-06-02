@@ -205,6 +205,7 @@ public class L3200 extends TradeBuffer {
 	private int wkPrevTermNo = 0;
 	private int wkNewTotalPeriod = 0;
 	private int wkPrePaidTerms = 0;
+	private BigDecimal wkIntStartRate = BigDecimal.ZERO; // 計息起日利率
 	private BigDecimal wkLoanBal = BigDecimal.ZERO;
 	private BigDecimal wkTotalExtraRepay = BigDecimal.ZERO;
 	private BigDecimal wkTotalPrincipal = BigDecimal.ZERO;
@@ -250,7 +251,6 @@ public class L3200 extends TradeBuffer {
 	private boolean isFirstBorm = true;
 	private boolean isCalcRepayInt = false;
 	private boolean isSettleUnpaid = false;
-	private boolean isRepayPrincipal = false; // 回收本金
 	private TempVo tTempVo = new TempVo();
 
 	@Override
@@ -919,7 +919,6 @@ public class L3200 extends TradeBuffer {
 	private void calcRepayInt(LoanBorMain ln) throws LogicException {
 		checkMsg = " 戶號:" + iCustNo + "-" + ln.getFacmNo() + "-" + ln.getBormNo();
 		isCalcRepayInt = false;
-		isRepayPrincipal = false; // 回收本金
 		BigDecimal wkRepayLoan = wkTotalPrincipal.add(wkTotalInterest).add(wkTotalDelayInt).add(wkTotalBreachAmt);
 		this.info("calcRepayInt ..." + checkMsg + " 累計償還本利:" + wkRepayLoan);
 
@@ -1058,11 +1057,6 @@ public class L3200 extends TradeBuffer {
 		wkDelayInt = loanCalcRepayIntCom.getDelayInt();
 		wkBreachAmt = loanCalcRepayIntCom.getBreachAmt();
 		wkExtraRepay = loanCalcRepayIntCom.getExtraAmt();
-
-		// 回收本金
-		if (wkPrincipal.compareTo(BigDecimal.ZERO) > 0) {
-			isRepayPrincipal = true;
-		}
 
 		// 有計息
 		isCalcRepayInt = true;
@@ -1452,7 +1446,8 @@ public class L3200 extends TradeBuffer {
 			tLoanBorMain.setStatus(3);
 		}
 		if (isCalcRepayInt) {
-			// 部分償還重算期金
+			tLoanBorMain.setStoreRate(loanCalcRepayIntCom.getStoreRate());
+			// 部分償還重算期金，以最後一段利率計算
 			if (wkRepaykindCode == 1) {
 				if ("3".equals(tLoanBorMain.getAmortizedCode()) || "4".equals(tLoanBorMain.getAmortizedCode())) {
 					int wkGracePeriod = loanCom.getGracePeriod(tLoanBorMain.getAmortizedCode(),
@@ -1483,7 +1478,6 @@ public class L3200 extends TradeBuffer {
 					}
 				}
 			} else {
-				tLoanBorMain.setStoreRate(loanCalcRepayIntCom.getStoreRate());
 				tLoanBorMain.setRepaidPeriod(tLoanBorMain.getRepaidPeriod() + loanCalcRepayIntCom.getRepaidPeriod());
 				tLoanBorMain.setPaidTerms(loanCalcRepayIntCom.getPaidTerms());
 				tLoanBorMain.setPrevPayIntDate(loanCalcRepayIntCom.getPrevPaidIntDate());
@@ -1618,6 +1612,7 @@ public class L3200 extends TradeBuffer {
 
 		for (CalcRepayIntVo c : lCalcRepayIntVo) {
 			wkIntSeq++;
+			wkIntStartRate = c.getStartDate() < wkIntStartDate ? c.getStoreRate() : wkIntStartRate; // 計息起日利率
 			wkIntStartDate = c.getStartDate() < wkIntStartDate ? c.getStartDate() : wkIntStartDate;
 			wkIntEndDate = c.getEndDate() > wkIntEndDate ? c.getEndDate() : wkIntEndDate;
 			wkLoanBal = wkLoanBal.subtract(c.getPrincipal());
@@ -1695,7 +1690,7 @@ public class L3200 extends TradeBuffer {
 		tLoanBorTx.setAcctCode(tFacMain.getAcctCode());
 		tLoanBorTx.setDueDate(wkDueDate);
 		tLoanBorTx.setLoanBal(tLoanBorMain.getLoanBal());
-		tLoanBorTx.setRate(tLoanBorMain.getStoreRate());
+		tLoanBorTx.setRate(wkIntStartRate);
 		tLoanBorTx.setIntStartDate(wkIntStartDate);
 		tLoanBorTx.setIntEndDate(wkIntEndDate);
 		tLoanBorTx.setPaidTerms(wkPaidTerms);

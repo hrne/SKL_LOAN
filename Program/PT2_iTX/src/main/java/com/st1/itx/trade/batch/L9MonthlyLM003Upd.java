@@ -29,12 +29,11 @@ public class L9MonthlyLM003Upd extends BatchBase implements Tasklet, Initializin
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		this.titaVo.putParam(ContentName.empnot, "BAT001");
+		this.titaVo.putParam(ContentName.empnot, "999999");
 	}
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// // logger = LoggerFactory.getLogger(L9MonthlyLM003Upd.class);
 
 		// 第二個參數
 		// D=日批

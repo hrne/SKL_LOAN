@@ -40,7 +40,7 @@ public class StartBS996 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		this.titaVo.putParam(ContentName.empnot, "BAT001");
+		this.titaVo.putParam(ContentName.empnot, "999999");
 	}
 
 	@Override
@@ -61,8 +61,8 @@ public class StartBS996 extends BatchBase implements Tasklet, InitializingBean {
 		try {
 			titaVo.init();
 			titaVo.putParam(ContentName.kinbr, "0000");
-			titaVo.putParam(ContentName.tlrno, "BAT001");
-			titaVo.putParam(ContentName.empnot, "BAT001");
+			titaVo.putParam(ContentName.tlrno, "999999");
+			titaVo.putParam(ContentName.empnot, "999999");
 
 			TxBuffer txBuffer = MySpring.getBean("txBuffer", TxBuffer.class);
 			txBuffer.init(titaVo);

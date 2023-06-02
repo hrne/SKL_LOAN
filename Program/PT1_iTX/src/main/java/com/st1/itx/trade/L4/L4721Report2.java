@@ -73,7 +73,7 @@ public class L4721Report2 extends TradeBuffer {
 	 * 
 	 * @param titaVo
 	 * @param txbuffer
-	 * @param data       主要資料來源(書面通知的戶號清單)
+	 * @param data       主要資料來源
 	 * @param txKind     利率種類代碼
 	 * @param kindItem   利率代碼中文名稱
 	 * @param sAdjDate   利率調整起日
@@ -82,10 +82,11 @@ public class L4721Report2 extends TradeBuffer {
 	 * @param eEntryDate 入帳止日
 	 * @throws LogicException
 	 */
-	public void exec(TitaVo titaVo, TxBuffer txbuffer, List<Integer> data, String kindItem, int sAdjDate, int eAdjDate,
-			int sEntryDate, int eEntryDate) throws LogicException {
+	public void exec(TitaVo titaVo, TxBuffer txbuffer, List<Map<String, String>> data, String kindItem, int sAdjDate,
+			int eAdjDate, int sEntryDate, int eEntryDate) throws LogicException {
 		this.info("L4721Report2 exec start");
 
+	
 		this.setTxBuffer(txbuffer);
 		baTxCom.setTxBuffer(txbuffer);
 
@@ -130,8 +131,8 @@ public class L4721Report2 extends TradeBuffer {
 	 * @param titaVo
 	 * 
 	 */
-	private List<String> getData(int sAdjDate, int eAdjDate, int sEntryDate, int eEntryDate, List<Integer> data,
-			TitaVo titaVo) throws LogicException {
+	private List<String> getData(int sAdjDate, int eAdjDate, int sEntryDate, int eEntryDate,
+			List<Map<String, String>> data, TitaVo titaVo) throws LogicException {
 
 		List<String> result = new ArrayList<>();
 
@@ -139,128 +140,110 @@ public class L4721Report2 extends TradeBuffer {
 		int facmNo = 0;
 
 		int cntTrans = 0;
+		
+		for (Map<String, String> r : data) {
 
-		String custNoAll = "";
-		for (int r : data) {
-			custNoAll = custNoAll + r + ",";
-		}
-		custNoAll = custNoAll.substring(0, custNoAll.length() - 1);
-//		
-//		for (Map<String, String> r : data) {
-//
-//			
-//
-//		
-//			
-//			int iCustNo = parse.stringToInteger(r.get("CustNo"));
-//			int iFacmNo = parse.stringToInteger(r.get("FacmNo"));
-//
-//			// 相同戶號跳過
-//			if (custNo == iCustNo) {
-//				continue;
-//			}
-//
-//			// 不同戶號額度相同跳過(也可能換戶號時額度相同)
-//			if (custNo == iCustNo && facmNo == iFacmNo) {
-//				continue;
-//			}
-//
-//			custNo = iCustNo;
-//			facmNo = iFacmNo;
+			cntTrans++;
 
-		List<Map<String, String>> listL4721Detail = new ArrayList<Map<String, String>>();
+		
+			
+			int iCustNo = parse.stringToInteger(r.get("CustNo"));
+			int iFacmNo = parse.stringToInteger(r.get("FacmNo"));
 
-		try {
-			listL4721Detail = l4721ServiceImpl.doDetail(custNoAll, sAdjDate, eAdjDate, sEntryDate, eEntryDate, 2,
-					titaVo);
-		} catch (Exception e) {
-			this.error("l4721ServiceImpl doDetail = " + e.getMessage());
-			throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
-		}
-
-		if (listL4721Detail != null && !listL4721Detail.isEmpty()) {
-
-			String line = "";
-
-			int tempdate = parse.stringToInteger(listL4721Detail.get(0).get("SpecificDd"));
-			for (Map<String, String> mapL4721Detail : listL4721Detail) {
-				if (tempdate != parse.stringToInteger(mapL4721Detail.get("SpecificDd"))) {
-//							sameFlg = true;
-					break;
-				}
+			// 相同戶號跳過
+			if (custNo == iCustNo) {
+				continue;
 			}
-			int tempcustno = 0;
-			int tempfacmno = 0;
-			int times = 0;
-			for (Map<String, String> mapL4721Detail : listL4721Detail) {
 
-				int iCustNo = parse.stringToInteger(mapL4721Detail.get("CustNo"));
-				int iFacmNo = parse.stringToInteger(mapL4721Detail.get("FacmNo"));
-//
-//				// 相同戶號跳過
-//				if (custNo == iCustNo) {
-//					continue;
-//				}
-//
-				// 不同戶號額度相同跳過(也可能換戶號時額度相同)
-				if (tempcustno == iCustNo && tempfacmno == iFacmNo) {
-					continue;
+			// 不同戶號額度相同跳過(也可能換戶號時額度相同)
+			if (custNo == iCustNo && facmNo == iFacmNo) {
+				continue;
+			}
+
+			custNo = iCustNo;
+			facmNo = iFacmNo;
+
+			List<Map<String, String>> listL4721Detail = new ArrayList<Map<String, String>>();
+
+			try {
+				listL4721Detail = l4721ServiceImpl.doDetail(custNo, sAdjDate, eAdjDate, sEntryDate, eEntryDate, titaVo);
+			} catch (Exception e) {
+				this.error("l4721ServiceImpl doDetail = " + e.getMessage());
+				throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
+			}
+
+			if (listL4721Detail != null && !listL4721Detail.isEmpty()) {
+
+				String line = "";
+
+				int tempdate = parse.stringToInteger(listL4721Detail.get(0).get("SpecificDd"));
+				for (Map<String, String> mapL4721Detail : listL4721Detail) {
+					if (tempdate != parse.stringToInteger(mapL4721Detail.get("SpecificDd"))) {
+//							sameFlg = true;
+						break;
+					}
 				}
-//
 
-				// 相同戶號不同額度的輸出
+				int tempfacmno = parse.stringToInteger(listL4721Detail.get(0).get("FacmNo"));
+				int times = 0;
 
-				if (tempfacmno == parse.stringToInteger(mapL4721Detail.get("FacmNo"))) { // 相同額度
-					// 該額度第一次進要印0102
-					if (times == 0) {
-						result = sameFacmno(mapL4721Detail, result, true, titaVo);
-					} else {
-						result = sameFacmno(mapL4721Detail, result, false, titaVo);
-					}
-					times++;
-				} else { // 不同額度 印04並且切到下一個額度循環
-					// 04
+				for (Map<String, String> mapL4721Detail : listL4721Detail) {
 
-					line = "";
-					line += "04";
-					result.add(line);
+					// 相同戶號不同額度的輸出
 
-					// 45
-					// 45 額度 003 利率自 109 年 09 月 01 日起， 由 1.68% 調整為 1.41% 。
-					BigDecimal presentRate = parse.stringToBigDecimal(mapL4721Detail.get("PresentRate"));
-					BigDecimal adjustedRate = parse.stringToBigDecimal(mapL4721Detail.get("AdjustedRate"));
-					if (presentRate.compareTo(adjustedRate) != 0) {
+					if (tempfacmno == parse.stringToInteger(mapL4721Detail.get("FacmNo"))) { // 相同額度
+						// 該額度第一次進要印0102
+						if (times == 0) {
+							result = sameFacmno(mapL4721Detail, result, true, titaVo);
+						} else {
+							result = sameFacmno(mapL4721Detail, result, false, titaVo);
+						}
+						times++;
+					} else { // 不同額度 印04並且切到下一個額度循環
+						// 04
+
 						line = "";
-						line += "45";
-						line += " 額度 " + FormatUtil.pad9(mapL4721Detail.get("FacmNo"), 3) + "     " + "利率自"
-								+ makeReport.showRocDate(mapL4721Detail.get("TxEffectDate"), 0) + "起，　由"
-								+ makeReport.formatAmt(mapL4721Detail.get("PresentRate"), 2) + "%" + "調整為"
-								+ makeReport.formatAmt(mapL4721Detail.get("AdjustedRate"), 2) + "。";
+						line += "04";
 						result.add(line);
-					}
 
-					// 05
+						// 45
+						// 45 額度 003 利率自 109 年 09 月 01 日起， 由 1.68% 調整為 1.41% 。
+						BigDecimal presentRate = parse.stringToBigDecimal(mapL4721Detail.get("PresentRate"));
+						BigDecimal adjustedRate = parse.stringToBigDecimal(mapL4721Detail.get("AdjustedRate"));
+						if (presentRate.compareTo(adjustedRate) != 0) {
+							line = "";
+							line += "45";
+							line += " 額度 " + FormatUtil.pad9(mapL4721Detail.get("FacmNo"), 3) + "     " + "利率自"
+									+ makeReport.showRocDate(mapL4721Detail.get("TxEffectDate"), 0) + "起，　由"
+									+ makeReport.formatAmt(mapL4721Detail.get("PresentRate"), 2) + "%" + "調整為"
+									+ makeReport.formatAmt(mapL4721Detail.get("AdjustedRate"), 2) + "。";
+							result.add(line);
+						}
 
-					// 0500036341+9510200000174395103000001743
-					line = "";
-					line += "05";
-					line += FormatUtil.pad9(headerDueAmt, 8) + "+" + "9510200"
-							+ FormatUtil.pad9(mapL4721Detail.get("CustNo"), 7) + "9510300"
-							+ FormatUtil.pad9(mapL4721Detail.get("CustNo"), 7);
-					result.add(line);
-					tempfacmno = parse.stringToInteger(mapL4721Detail.get("FacmNo"));
-					result = sameFacmno(mapL4721Detail, result, true, titaVo);
-					// 換額度要重新算次數
-					times = 0;
-				} // else
+						// 05
 
-				tempcustno = iCustNo;
-				tempfacmno = iFacmNo;
+						// 0500036341+9510200000174395103000001743
+						line = "";
+						line += "05";
+						line += FormatUtil.pad9(headerDueAmt, 8) + "+" + "9510200"
+								+ FormatUtil.pad9(mapL4721Detail.get("CustNo"), 7) + "9510300"
+								+ FormatUtil.pad9(mapL4721Detail.get("CustNo"), 7);
+						result.add(line);
+						tempfacmno = parse.stringToInteger(mapL4721Detail.get("FacmNo"));
+						result = sameFacmno(mapL4721Detail, result, true, titaVo);
+						// 換額度要重新算次數
+						times = 0;
+					} // else
 
+				} // for
 			} // for
-		} // if
-
-//		} // for
+			
+			if (cntTrans > 200) {
+				cntTrans = 0;
+				this.batchTransaction.commit();
+			}
+			
+		} // for
 		return result;
 	}
 

@@ -29,12 +29,11 @@ public class L5InnReCheckUpd extends BatchBase implements Tasklet, InitializingB
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		this.titaVo.putParam(ContentName.empnot, "BAT001");
+		this.titaVo.putParam(ContentName.empnot, "999999");
 	}
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// // logger = LoggerFactory.getLogger(L5InnReCheckUpd.class);
 
 		// 第二個參數
 		// D=日批

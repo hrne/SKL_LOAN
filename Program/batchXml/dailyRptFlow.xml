@@ -31,11 +31,11 @@
 			</flow>
 
 			<!-- L9746(原LD010) 介紹人換算業績報酬檢核表 -->
-			<flow>
+			<!-- <flow>
 				<step id="sL9746Batch" parent="parentStep">
 					<tasklet ref="L9746Batch" />
 				</step>
-			</flow>
+			</flow> -->
 			<!-- L9137 (原LD008) 放款餘額總表 -->
 			<flow>
 				<step id="sL9137Batch" parent="parentStep">
