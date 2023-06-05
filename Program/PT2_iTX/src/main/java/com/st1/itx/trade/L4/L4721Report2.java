@@ -139,13 +139,10 @@ public class L4721Report2 extends TradeBuffer {
 		int custNo = 0;
 		int facmNo = 0;
 
-		int cntTrans = 0;
 		
 		for (Map<String, String> r : data) {
 
-			cntTrans++;
 
-		
 			
 			int iCustNo = parse.stringToInteger(r.get("CustNo"));
 			int iFacmNo = parse.stringToInteger(r.get("FacmNo"));
@@ -238,10 +235,7 @@ public class L4721Report2 extends TradeBuffer {
 				} // for
 			} // for
 			
-			if (cntTrans > 200) {
-				cntTrans = 0;
-				this.batchTransaction.commit();
-			}
+	
 			
 		} // for
 		return result;

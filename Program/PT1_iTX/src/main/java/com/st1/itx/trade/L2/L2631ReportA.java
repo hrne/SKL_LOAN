@@ -11,6 +11,7 @@ import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
@@ -74,7 +75,8 @@ public class L2631ReportA extends MakeReport {
 	// 自訂表尾
 	@Override
 	public void printFooter() {
-		this.print(-15, 25, " ");
+		this.setFontSize(8);
+		this.print(-83, 2, "SKL-B#DBB94!5");
 
 //		this.print(-15, 25, "放款部部章：　　　　　　　　　　　　　　　　　　　經辦：" + this.titaVo.getTlrNo());
 	}
@@ -85,7 +87,11 @@ public class L2631ReportA extends MakeReport {
 
 		int iCustNo = parse.stringToInteger(titaVo.getParam("TimCustNo"));
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), reportCode, reportItem, "", pageSize, pageOrientation);
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
+				.setRptCode(reportCode).setRptItem(reportItem).setSecurity(security).setRptSize(pageSize)
+				.setPageOrientation(pageOrientation).build();
+		this.open(titaVo, reportVo);
+//		.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), reportCode, reportItem, "", pageSize, pageOrientation);
 		this.setFont(1);
 
 		this.setFontSize(12);
@@ -114,8 +120,8 @@ public class L2631ReportA extends MakeReport {
 		this.print(1, 8, "四、火險單正本：　　　　　　　 份。");
 		this.print(1, 1, "");
 		this.print(1, 1, "");
-		this.print(1, 8, "●上列文件一經簽領，嗣後　貴貸戶若需以原押品向本公司再申請撥款，");
-		this.print(1, 8, "須重新辦理設定手續。");
+		this.print(1, 8, "●上列文件領取後，貴貸戶須至地政事務所辦理塗銷，解除抵押設定。");
+		this.print(1, 8, "　如以原押品向本公司再申請撥款，須重新辦理設定手續。");
 		this.print(1, 1, "");
 		this.print(1, 1, "");
 		this.print(1, 44, "無　　誤　　此　　致", "C");
@@ -131,11 +137,11 @@ public class L2631ReportA extends MakeReport {
 		this.print(1, 1, "");
 		this.print(1, 8, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 		this.print(1, 1, "");
+		this.print(1, 8, "※請將此張簽收回條簽章後寄回，謝謝！");
+		this.print(1, 1, "");
 		this.print(1, 8, "地 址：台北市松山區南京東路五段１２５號１３樓　　　　　　 放款服務課");
 		this.print(1, 1, "");
 		this.print(1, 8, "備 註：　　　　　　　　　　　　　　　　　　　　製表人：　" + tlrNoX);
-		this.print(1, 1, "");
-		this.print(1, 8, "※請將此張簽收回條簽章後寄回，謝謝！");
 
 //		for (int i = 1; i <= 400; i++) {
 //			if ((i % 10) == 0) {

@@ -338,15 +338,15 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               and NVL(rv2.\"InsuYearMonth\",0) = TRUNC( :iAchSpecificDdFrom / 100 ) ";
 		sql += "               and TRUNC( b.\"NextPayIntDate\" / 100 ) > NVL(rv2.\"InsuYearMonth\",0) ";
 		sql += "          then 1 ";
-		// 郵局-費用:應繳日範圍費用檔有撈到就進
+		// 郵局-費用: 二扣應繳日範圍有費用或短繳就進
 		sql += "          when nvl(rv.\"ReceivableFlag\" ,0) > 0 ";
 		sql += "               and nvl(ba.\"RepayBank\", 'null') = '700' ";
 		sql += "               and b.\"SpecificDd\" = :iPostSecondSpecificDay ";
 		sql += "          then 1 ";
-		// ACH-費用: 應繳日範圍費用檔有撈到就進
+		// ACH-費用: 二扣應繳日範圍有費用或短繳就進
 		sql += "          when nvl(rv.\"ReceivableFlag\" ,0) > 0 ";
 		sql += "               and nvl(ba.\"RepayBank\", 'null') not in ('null','700') ";
-		sql += "               and b.\"SpecificDd\" IN :iAchSpecificDays ";
+		sql += "               and b.\"SpecificDd\" IN :iAchSecondSpecificDays ";
 		sql += "          then 1 ";
 		// 追加逾期期數
 		sql += "          when b.\"NextPayIntDate\" >= :iDeductDateStart ";

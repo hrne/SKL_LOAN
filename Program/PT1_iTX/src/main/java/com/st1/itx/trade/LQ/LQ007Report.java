@@ -102,9 +102,9 @@ public class LQ007Report extends MakeReport {
 				} else {
 					vYMonth = y * 100 + 12;
 				}
-				this.info("endY:y =" + endY + ":" + y);
-				this.info("tmpYMonth =" + tmpYMonth);
-				this.info("vYMonth =" + vYMonth);
+//				this.info("endY:y =" + endY + ":" + y);
+//				this.info("tmpYMonth =" + tmpYMonth);
+//				this.info("vYMonth =" + vYMonth);
 				if (endY > y) {
 					if (tmpYMonth / 100 != vYMonth / 100) {
 						tmpCol = tmpCol + 2;
@@ -142,11 +142,32 @@ public class LQ007Report extends MakeReport {
 			int colInt = 1;
 			int tmpYM = 0;
 
-			boolean isEmpty = true;
 			// 清單上只會有 3 6 9 12月份
 			for (Integer y : ymList) {
 
-				isEmpty = true;
+				this.info("tmpYM = " + tmpYM);
+				this.info("y = " + y);
+
+				BigDecimal tmpBalSum = BigDecimal.ZERO;
+
+				// 餘額
+				colBal = colBal + 2;
+				// 利收
+				colInt = colInt + 2;
+
+				// 無論查詢有無資料，一律先放零
+				makeExcel.setValue(5, colBal, formatAmt(tmpBalSum, 3, 8));
+				makeExcel.setValue(5, colInt, formatAmt(tmpBalSum, 3, 8));
+				makeExcel.setValue(6, colBal, formatAmt(tmpBalSum, 3, 8));
+				makeExcel.setValue(7, colBal, formatAmt(tmpBalSum, 3, 8));
+				makeExcel.setValue(8, colBal, formatAmt(tmpBalSum, 3, 8));
+				makeExcel.setValue(9, colBal, formatAmt(tmpBalSum, 3, 8));
+				makeExcel.setValue(10, colBal, formatAmt(tmpBalSum, 3, 8));
+				makeExcel.setValue(11, colBal, formatAmt(tmpBalSum, 3, 8));
+				makeExcel.setValue(12, colBal, formatAmt(tmpBalSum, 3, 8));
+				makeExcel.setValue(6, colInt, formatAmt(tmpBalSum, 3, 8));
+				makeExcel.setValue(13, colBal, formatAmt(tmpBalSum, 3, 8));
+				makeExcel.setValue(13, colInt, formatAmt(tmpBalSum, 3, 8));
 
 				// 查詢結果上只會有 3 6 9 12月份
 				for (Map<String, String> r : LQ007List) {
@@ -155,6 +176,14 @@ public class LQ007Report extends MakeReport {
 					String prodNo = "";
 					BigDecimal balSum = BigDecimal.ZERO;
 					BigDecimal intSum = BigDecimal.ZERO;
+					int tmpYear = visibleMonth % 100;
+					int tmpMonth = visibleMonth / 100;
+
+					// 小於當年度年份 且 不是12月份(369月份) 跳過
+					if (endY > tmpYear && tmpMonth != 12) {
+						continue;
+					}
+
 					if (y == visibleMonth) {
 
 						prodNo = r.get("ProdNoShow");
@@ -163,10 +192,10 @@ public class LQ007Report extends MakeReport {
 
 						// AA=>首次購物貸款
 						if ("AA".equals(prodNo)) {
-							// 餘額
-							colBal = colBal + 2;
-							// 利收
-							colInt = colInt + 2;
+//							// 餘額
+//							colBal = colBal + 2;
+//							// 利收
+//							colInt = colInt + 2;
 
 							makeExcel.setValue(5, colBal, formatAmt(balSum, 3, 8));
 							makeExcel.setValue(5, colInt, formatAmt(intSum, 3, 8));
@@ -283,34 +312,6 @@ public class LQ007Report extends MakeReport {
 							intTotal = BigDecimal.ZERO;
 
 						}
-
-						// 清單上有、查詢沒有則跑進一次
-					} else if (isEmpty && (y % 100) == 12) {
-
-						this.info("tmpYM = " + tmpYM);
-						this.info("y = " + y);
-
-						isEmpty = false;
-
-						balSum = BigDecimal.ZERO;
-
-						// 餘額
-						colBal = colBal + 2;
-						// 利收
-						colInt = colInt + 2;
-
-						makeExcel.setValue(5, colBal, formatAmt(balSum, 3, 8));
-						makeExcel.setValue(5, colInt, formatAmt(balSum, 3, 8));
-						makeExcel.setValue(6, colBal, formatAmt(balSum, 3, 8));
-						makeExcel.setValue(7, colBal, formatAmt(balSum, 3, 8));
-						makeExcel.setValue(8, colBal, formatAmt(balSum, 3, 8));
-						makeExcel.setValue(9, colBal, formatAmt(balSum, 3, 8));
-						makeExcel.setValue(10, colBal, formatAmt(balSum, 3, 8));
-						makeExcel.setValue(11, colBal, formatAmt(balSum, 3, 8));
-						makeExcel.setValue(12, colBal, formatAmt(balSum, 3, 8));
-						makeExcel.setValue(6, colInt, formatAmt(balSum, 3, 8));
-						makeExcel.setValue(13, colBal, formatAmt(balSum, 3, 8));
-						makeExcel.setValue(13, colInt, formatAmt(balSum, 3, 8));
 
 					}
 

@@ -122,7 +122,9 @@ public class L4101OldVo extends FileVo {
 				String name = t.getCustName().replace("o", "Ｏ");
 				thisLine += makeReport.fillUpWord("" + name, 58, "　", "R") + "  ";// 代償專戶(29全形+2半形)
 				thisLine += makeReport.fillUpWord("新光人壽保險股份有限公司─放款服務課", 38, " ", "R") + "  ";// 代償專戶
-				thisLine += "　　　　　　　　　　　　　　　　　　　" + "  ";// 附言(19全形+2半形)
+//				thisLine += "　　　　　　　　　　　　　　　　　　　" + "  ";// 附言(19全形+2半形)
+				String remark = t.getRemark().replace("o", "Ｏ");
+				thisLine += makeReport.fillUpWord("" + remark, 19, "　", "R") + "  ";// 附言(19全形+2半形)
 				thisLine += "               ";// 空白(15個半形空白)
 				thisLine += "00174";// 單位代號
 				thisLine += (Integer.valueOf(t.getAcDate()) + 19110000);// 匯款日期

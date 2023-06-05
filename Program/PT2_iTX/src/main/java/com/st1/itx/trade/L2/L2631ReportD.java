@@ -15,6 +15,11 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.ClBuilding;
+import com.st1.itx.db.domain.ClBuildingId;
+import com.st1.itx.db.domain.ClFac;
+import com.st1.itx.db.domain.ClLand;
+import com.st1.itx.db.domain.ClLandId;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
@@ -23,6 +28,9 @@ import com.st1.itx.db.domain.Guarantor;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanCheque;
 import com.st1.itx.db.service.CdCodeService;
+import com.st1.itx.db.service.ClBuildingService;
+import com.st1.itx.db.service.ClFacService;
+import com.st1.itx.db.service.ClLandService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.FacProdService;
@@ -45,6 +53,13 @@ public class L2631ReportD extends MakeReport {
 	CdCodeService cdCodeService;
 	@Autowired
 	CustMainService custMainService;
+	@Autowired
+	ClFacService clFacService;
+	@Autowired
+	ClLandService clLandService;
+	@Autowired
+	ClBuildingService clBuildingService;
+
 	@Autowired
 	FacMainService facMainService;
 	@Autowired
@@ -92,7 +107,7 @@ public class L2631ReportD extends MakeReport {
 		this.info("L2631ReportD.printHeader");
 
 		this.print(1, 42, "清償作業", "C");
-//		this.print(0, 76, "機密等級：" + this.security, "R");
+		this.print(-1, 76, "機密等級：" + this.security, "R");
 		this.print(-4, 6, "", "L");
 
 		// 明細起始列(自訂亦必須)
@@ -106,7 +121,8 @@ public class L2631ReportD extends MakeReport {
 	// 自訂表尾
 	@Override
 	public void printFooter() {
-		this.print(-15, 25, " ");
+		this.setFontSize(8);
+		this.print(-83, 2, "SKL-B#DBB94!5");
 	}
 
 	public Boolean exec(TitaVo titaVo, TotaVo totaVo) throws LogicException {
@@ -346,10 +362,11 @@ public class L2631ReportD extends MakeReport {
 		// 被保人 最高保證金額 目前保證總額 金額 戶況 繳息迄日
 		// L2R64
 
+		print(1, 1, "　被保人ID　　　最高保證金額　　目前保證總額　　戶名　　　　　　　　戶況　　繳息迄日");
+		print(1, 1,
+				"===================================================================================================");
 		BigDecimal GuaAmt = BigDecimal.ZERO;
 		if (slGuarantor != null) {
-
-			print(1, 1, "　被保人ID　　　最高保證金額　　目前保證總額　　戶名　　　　　　　　戶況　　繳息迄日");
 			for (Guarantor tGuarantor : slGuarantor.getContent()) {
 				// new occurs
 				OccursList occurslist = new OccursList();
@@ -405,7 +422,36 @@ public class L2631ReportD extends MakeReport {
 				print(0, 65, status, "C");// 戶況
 				print(0, 75, test[1] == 0 ? "無" : this.showDate("" + test[1]), "C");// 繳息迄日
 			}
+		} else {
+			print(1, 1, "無資料");
 		}
+
+		print(1, 1, " ");
+		print(1, 1, "額度資料區");
+		print(1, 1, "　額度編號　　　核准額度　　門牌號碼");
+		print(1, 1,
+				"===================================================================================================");
+		if (iFacmNo == 0) {
+
+			List<FacMain> lFacMain = new ArrayList<FacMain>();
+			Slice<FacMain> slFacMain = facMainService.CustNoAll(iCustNo, 0, Integer.MAX_VALUE, titaVo);
+			if (slFacMain == null) {
+				print(1, 1, "無資料");
+			} else {
+				for (FacMain t : slFacMain.getContent()) {
+					setTotaA(t, titaVo);
+				}
+			}
+
+		} else {
+			tFacMain = facMainService.findById(new FacMainId(iCustNo, iFacmNo), titaVo);
+			if (tFacMain != null) {
+				setTotaA(tFacMain, titaVo);
+			} else {
+				print(1, 1, "無資料");
+			}
+		}
+
 //		for (int i = 1; i <= 400; i++) {
 //			if ((i % 10) == 0) {
 //				this.print(-2, i, "" + (i / 10));
@@ -517,5 +563,45 @@ public class L2631ReportD extends MakeReport {
 		result[1] = loandate;
 
 		return result;
+	}
+
+	// totaA 額度資料
+	private void setTotaA(FacMain tFacMain, TitaVo titaVo) throws LogicException {
+
+		// 額度 核准額度 門牌號碼
+		int cfFacmNo = tFacMain.getFacmNo();
+		BigDecimal cfLineAmt = tFacMain.getLineAmt();
+		String cfLocation = "";
+
+		// 門牌號碼、土地建號
+
+		// ClFac擔保品與額度關聯檔
+
+		ClFac tClFac = clFacService.mainClNoFirst(tFacMain.getCustNo(), tFacMain.getFacmNo(), "Y", titaVo);
+
+		if (tClFac != null) {
+			// 房地
+			if (tClFac.getClCode1() == 1) {
+				// ClBuilding 擔保品建物檔
+				ClBuilding tClBuilding = clBuildingService
+						.findById(new ClBuildingId(tClFac.getClCode1(), tClFac.getClCode2(), tClFac.getClNo()), titaVo);
+				if (tClBuilding != null) {
+					cfLocation = tClBuilding.getBdLocation();
+				}
+			}
+			if (tClFac.getClCode1() == 2) {
+				// ClBuilding 擔保品建物檔
+				ClLand tClLand = clLandService
+						.findById(new ClLandId(tClFac.getClCode1(), tClFac.getClCode2(), tClFac.getClNo(), 0), titaVo);
+				if (tClLand != null) {
+					cfLocation = tClLand.getLandLocation();
+				}
+			}
+
+		}
+		print(1, 1, "　　　　　　           ");
+		print(0, 5, parse.IntegerToString(cfFacmNo, 3));// 額度編號
+		print(0, 23, formatAmt(cfLineAmt, 0), "R");// 核准額度
+		print(0, 29, cfLocation);// 門牌號碼
 	}
 }

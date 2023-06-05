@@ -13,13 +13,16 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.CdAcCode;
 import com.st1.itx.db.domain.CdAcCodeId;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.AcCloseService;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.CdAcCodeService;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.SlipMediaService;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
@@ -40,6 +43,8 @@ public class L4101ReportA extends MakeReport {
 	AcCloseService acCloseService;
 	@Autowired
 	CdAcCodeService cdAcCodeService;
+	@Autowired
+	CustMainService custMainService;
 
 	@Autowired
 	public Parse parse;
@@ -113,24 +118,43 @@ public class L4101ReportA extends MakeReport {
 		 * ---------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
 		 * 1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 		 */
-		print(2, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
-		print(1, 1, "　日期　　科子細目名稱　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　借方金額　　　　　　貸方金額　");
-		print(1, 1, "－－－－　－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－－－－－－　－－－－－－－－－　");
 
+		if (!"00".equals(titaVo.getBacthNo().substring(4, titaVo.getBacthNo().length()))) {
+			print(2, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
+			print(1, 1, "　日期　　科子細目名稱　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　借方金額　　　　　　貸方金額　");
+			print(1, 1, "－－－－　－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－－－－－－　－－－－－－－－－　");
+
+		} else {
+			print(2, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
+			print(1, 1, "　交易序號　傳票號碼　科子目名稱　　　　　　　　　　　　　　　　　　　　　　　　　　　　　借方金額　　　　貸方金額　資金來源　　戶號　　戶名　　　　　　　　　　　");
+			print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
+
+		}
 	}
 
 	// 自訂表尾
 	@Override
 	public void printFooter() {
-		this.print(-41, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
-		this.print(-42, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
-		this.print(-43, 1, "　　　　　　　　　　放 款 部　　　協理：　　　　　　　　經理：　　　　　　　　襄理：　　　　　　　　　　　　　　製表人：　　　　　　　　　　　　　　　　　");
-		this.print(-47, 1, "　　　　　　　　　　財 務 部　　　協理：　　　　　　　　經理：　　　　　　　　襄理：　　　　　　　　　　　　　　製表人：　　　　　　　　　　　　　　　　　");
-//		this.print(-44, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
+
+		if (!"00".equals(titaVo.getBacthNo().substring(4, titaVo.getBacthNo().length()))) {
+			this.print(-41, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
+			this.print(-42, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
+			this.print(-43, 1, "　　　　　　　　　　放 款 部　　　協理：　　　　　　　　經理：　　　　　　　　襄理：　　　　　　　　　　　　　　製表人：　　　　　　　　　　　　　　　　　");
+			this.print(-47, 1, "　　　　　　　　　　財 務 部　　　協理：　　　　　　　　經理：　　　　　　　　襄理：　　　　　　　　　　　　　　製表人：　　　　　　　　　　　　　　　　　");
+//			this.print(-44, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
+
+		} else {
+			this.print(-41, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
+			this.print(-42, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
+			this.print(-43, 1, "　　總經理：　　　　　　　資深副總：　　　　　　　資深協理：　　　　　　　放款部　協理：　　　　　　　經理：　　　　　　　覆核：　　　　　　　製表人：　　　　　　　　");
+			this.print(-47, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　財務部　協理：　　　　　　　經理：　　　　　　　　　　　　　　　　　製表人：　　　　　　　　");
+//			this.print(-44, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
+
+		}
 	}
 
-	public void exec(TitaVo titaVo) throws LogicException {
-		this.info("L4101ReportA exec ...");
+	public void execA(TitaVo titaVo) throws LogicException {
+		this.info("L4101ReportA execA ...");
 
 		// 設定字體1:標楷體 字體大小12
 		this.setFont(1, 12);
@@ -203,6 +227,104 @@ public class L4101ReportA extends MakeReport {
 		print(0, 101, "　　　　　　　　共　" + cnt + "　戶　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
 		print(0, 145, formatAmt(sumDbAmt, 0), "R");// 借方金額加總
 		print(0, 165, formatAmt(sumCrAmt, 0), "R");// 貸方金額加總
+
+	}
+
+	public void execB(TitaVo titaVo) throws LogicException {
+		this.info("L4101ReportA execB ...");
+
+		// 設定字體1:標楷體 字體大小12
+		this.setFont(1, 12);
+
+		this.reportDate = Integer.valueOf(titaVo.getParam("AcDate")) + 19110000;
+
+		this.brno = titaVo.getBrno();
+
+		this.nowDate = dDateUtil.getNowStringRoc();
+		this.nowTime = dDateUtil.getNowStringTime();
+
+		reportItem = "撥款A4傳票總表";
+		acDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
+		batchNo = titaVo.getBacthNo();
+		if (batchNo.length() > 2)
+			if ("RT".equals(batchNo.substring(0, 2))) {
+				reportItem = "退款A4傳票總表";
+			}
+		reportCode = titaVo.getTxcd();
+		reportCode = reportCode + "-A";
+
+		// 分錄
+		List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
+		this.info("L4101ReportA BatchNo = " + batchNo);
+		Slice<AcDetail> slAcDetail = acDetailService.acdtlTitaBatchNo(titaVo.getAcbrNo(), titaVo.getCurName(), acDate,
+				batchNo, 0, Integer.MAX_VALUE, titaVo);
+
+		lAcDetail = slAcDetail == null ? null : new ArrayList<AcDetail>(slAcDetail.getContent());
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(reportCode)
+				.setRptItem(reportItem + "-" + batchNo).setSecurity(security).setRptSize(pageSize)
+				.setPageOrientation(pageOrientation).build();
+		this.open(titaVo, reportVo);
+
+		if (lAcDetail == null || lAcDetail.isEmpty()) {
+			// 出空表
+			this.setCharSpaces(0);
+			print(1, 1, "本日無資料");
+			return;
+		}
+
+		this.setCharSpaces(0);
+
+		for (AcDetail tAcDetail : lAcDetail) {
+
+			this.info("tAcDetail EntAc = " + tAcDetail.getEntAc());
+			if (tAcDetail.getEntAc() == 0) {
+				continue;
+			}
+
+			String acNoCode = tAcDetail.getAcNoCode();
+			String acSubCode = tAcDetail.getAcSubCode();
+			String acDtlCode = "  ";
+			String acNoItemX = "";
+			CdAcCode tCdAcCode = cdAcCodeService.findById(new CdAcCodeId(acNoCode, acSubCode, acDtlCode), titaVo);
+			if (tCdAcCode != null) {
+				acNoItemX = tCdAcCode.getAcNoItem();
+			}
+			TempVo tTempVo = new TempVo();
+			tTempVo = tTempVo.getVo(tAcDetail.getJsonFields());
+
+			this.info("tTempVo = " + tTempVo);
+
+			CustMain c = custMainService.custNoFirst(tAcDetail.getCustNo(), tAcDetail.getCustNo(), titaVo);
+
+			// 明細資料第一行
+			print(1, 4, parse.IntegerToString(tAcDetail.getTitaTxtNo(), 8)); // 交易序號
+			print(0, 14, parse.IntegerToString(tAcDetail.getSlipNo(), 6)); // 傳票號碼
+
+			print(0, 23, acNoCode + " " + acNoItemX); // 科子細目
+			if ("D".equals(tAcDetail.getDbCr())) {
+				print(0, 100, formatAmt(tAcDetail.getTxAmt(), 0), "R");// 借方金額
+				sumDbAmt = sumDbAmt.add(tAcDetail.getTxAmt());
+			}
+			if ("C".equals(tAcDetail.getDbCr())) {
+				print(0, 116, formatAmt(tAcDetail.getTxAmt(), 0), "R");// 貸方金額
+				sumCrAmt = sumCrAmt.add(tAcDetail.getTxAmt());
+			}
+			String acSubBookCodeXX = tAcDetail.getAcSubBookCode();
+			if (this.txBuffer.getSystemParas().getAcSubBookCode().equals(tAcDetail.getAcSubBookCode())) {
+				acSubBookCodeXX = "";
+			}
+			print(0, 118, acSubBookCodeXX);// 資金來源
+			print(0, 128, "" + FormatUtil.pad9("" + tAcDetail.getCustNo(), 7));// 戶號
+			if (c != null) {
+				print(0, 137, FormatUtil.padX("" + c.getCustName(), 20));// 戶名
+			}
+		}
+
+		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
+		print(1, 1, "　　　　　　　　總　計　　　　　　           ");
+		print(0, 100, formatAmt(sumDbAmt, 0), "R");// 借方金額加總
+		print(0, 116, formatAmt(sumCrAmt, 0), "R");// 貸方金額加總
 
 	}
 

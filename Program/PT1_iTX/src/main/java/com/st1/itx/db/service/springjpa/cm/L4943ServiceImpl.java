@@ -91,21 +91,6 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "     ) postLimit on postLimit.\"CustNo\" = BDD.\"CustNo\" ";
 
 		}
-		if (functionCode == 3) {
-			sql += " left join (                                              ";
-			sql += "     select                                               ";
-			sql += "      \"CustNo\"                                          ";
-			sql += "     ,\"FacmNo\"                                          ";
-			sql += "     ,SUM(\"RvBal\") as \"RvBal\"                         ";
-			sql += "     from \"AcReceivable\"                                ";
-			sql += "     where \"ReceivableFlag\" = 4                         ";
-			sql += "       and substr(\"AcctCode\",1,1) = 'I'                 ";
-			sql += "       and \"ClsFlag\" = 0                                ";
-			sql += "     group by \"CustNo\"                                  ";
-			sql += "             ,\"FacmNo\"                                  ";
-			sql += "     ) shortLimit on shortLimit.\"CustNo\" = BDD.\"CustNo\" ";
-			sql += "                 and shortLimit.\"FacmNo\" = BDD.\"FacmNo\" ";
-		}
 		if (functionCode == 8) {
 			sql += " left join (                                              ";
 			sql += "     select                                               ";
@@ -233,10 +218,9 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "        and BDD.\"RepayAmt\" >= :singleLimitAmt" + " )      ";
 			break;
 		case 3: // 下限金額-短繳金額
-			sql += "   and nvl(shortLimit.\"RvBal\",0) = BDD.\"UnpaidAmt\" ";
-			sql += "   and nvl(shortLimit.\"RvBal\",0) between 1 and :lowLimitAmt";
-			sql += "   and BDD.\"AcDate\" = 0                     ";
 			sql += "   and BDD.\"RepayType\" = 1                  ";
+			sql += "   and BDD.\"IntStartDate\" = 0               "; // 短繳
+			sql += "   and BDD.\"RepayAmt\" between 1 and :lowLimitAmt";
 			break;
 		case 4: // 檢核不正常
 			sql += "   and case when BDD.\"AmlRsp\" in ('1','2') then 1 ";
@@ -381,21 +365,6 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "     group by \"CustNo\"                                  ";
 			sql += "     ) postLimit on postLimit.\"CustNo\" = BDD.\"CustNo\" ";
 		}
-		if (functionCode == 3) {
-			sql += " left join (                                              ";
-			sql += "     select                                               ";
-			sql += "      \"CustNo\"                                          ";
-			sql += "     ,\"FacmNo\"                                          ";
-			sql += "     ,SUM(\"RvBal\") as \"RvBal\"                         ";
-			sql += "     from \"AcReceivable\"                                ";
-			sql += "     where \"ReceivableFlag\" = 4                         ";
-			sql += "       and substr(\"AcctCode\",1,1) = 'I'                 ";
-			sql += "       and \"ClsFlag\" = 0";
-			sql += "     group by \"CustNo\"                                  ";
-			sql += "             ,\"FacmNo\"                                  ";
-			sql += "     ) shortLimit on shortLimit.\"CustNo\" = BDD.\"CustNo\" ";
-			sql += "                 and shortLimit.\"FacmNo\" = BDD.\"FacmNo\" ";
-		}
 		if (functionCode == 8) {
 			sql += " left join (                                              ";
 			sql += "     select                                               ";
@@ -528,9 +497,9 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "        and BDD.\"RepayAmt\" >= :singleLimitAmt" + " )      ";
 			break;
 		case 3: // 下限金額-短繳金額
-			sql += "   and nvl(shortLimit.\"RvBal\",0) between 1 and :lowLimitAmt";
-			sql += "   and BDD.\"AcDate\" = 0                     ";
 			sql += "   and BDD.\"RepayType\" = 1                  ";
+			sql += "   and BDD.\"IntStartDate\" = 0               "; // 短繳
+			sql += "   and BDD.\"RepayAmt\" between 1 and :lowLimitAmt";
 			break;
 		case 4: // 檢核不正常
 			sql += "   and case when BDD.\"AmlRsp\" in ('1','2') then 1 ";

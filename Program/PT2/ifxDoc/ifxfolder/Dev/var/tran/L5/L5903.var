@@ -205,8 +205,10 @@ T(2,)
 T(H,#OOUsageCode,#UsageCodeHelp)
 
 ! 正本/影本
-#OOCopyCode=A,1,O
+#OOCopyCode=X,1,O
 #OOCopyCodeX=X,10,O
+T(2,)
+C(4,#OOCopyCode,S,$)
 T(H,#OOCopyCode,#CopyCodeHelp)
 
 ! 備註
@@ -240,6 +242,20 @@ T(2,#OOCustNo+#OOFacmNo+#OOApplSeq+#OOCustName+#OOKeeperEmpNo
 
 #OOBTN_RETURN=A,2,O
 IF(#OOReturnDate>0 || #OOCopyCode ==2,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L5103; ntxbuf=#OOBUF_RETURN}))
+
+!管理人修改按鈕是否顯示
+#OOEnable=X,1,S
+
+#tempFG=X,1,S
+IF(#OOReturnDate>0,T(2,2),T(2,1))
+
+#OOBUF_UPDATE=X,300,S
+T(2,#OOCustNo+#OOFacmNo+#OOApplSeq+#OOCustName+#OOKeeperEmpNo
+   +#OOApplEmpNo+#OOApplDate+#OOReturnDate+#OOReturnEmpNo
+   +#OOUsageCode+#OORemark+#tempFG+#OOCopyCode+#OOApplObj+#OOFacmNoMemo+#OOApplEmpName)
+
+#OOBTN_UPDATE=X,1,S
+C(5,#OOEnable,Y,BIND(grid,{ cmd=CHAIN; ntxcd=L5108; ntxbuf=#OOBUF_UPDATE}),BIND(grid,cancel))
 
 #LC014Mrkey=x,100,S
 T(2,#OOCustNo+-+#OOFacmNo+-+#OOApplSeq)
@@ -295,6 +311,7 @@ TXFORM=L5903
 #OOReturnEmpNo
 #OOHasAttachment
 #OOFacmNoMemo
+#OOEnable
 ^
 </sub>
 
@@ -336,6 +353,9 @@ TXFORM=L5903
 ! 管理人
 #OKeeperEmpNoX=管理人
 {width:120,align:'left'}
+#OOBTN_UPDATE=管理人修改
+{search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false,width:85}
+
 ! 借閱人
 #OApplEmpNoX=借閱人
 {width:120,align:'left'}

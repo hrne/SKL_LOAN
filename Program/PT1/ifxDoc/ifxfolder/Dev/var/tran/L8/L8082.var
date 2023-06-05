@@ -34,15 +34,15 @@ K(MODIFYBUTTON,查詢)
 
 
 #ProcessTypeHelp=X,500,S
-T(3,2:郵寄放款本息攤還表暨息通知單;3:簡訊通知;9:全部)
+T(3,2:郵寄放款本息攤還表暨繳息通知單;3:簡訊通知;9:全部)
 
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
-["[L8082]                                 AML定審中、低風險資料查詢"],
-["#FdReviewType+評　　級",#ReviewType,#ReviewTypeX],
+["[L8082]                                 AML定審中風險資料查詢"],
+! ["#FdReviewType+評　　級",#ReviewType,#ReviewTypeX],
 ["#FdProcessType+通知類別",#ProcessType,#ProcessTypeX],
 ["#FdStatus+狀　　態",#Status,#StatusX],
 ["#FdAcDate+定審日期",#AcDate1,'~',#AcDate2],
@@ -130,8 +130,9 @@ T(2,@AMLIsStatusHelp,#HelpDesc1)
 T(2,#KINBR)
 
 !評級
-#ReviewType=X,1,I
+#ReviewType=X,1,L
 C(3,#CHAIN,1,s,$)
+T(3,M)
 HELP(#AMLReviewTypeHelp,cols:1)
 @
 V(H,#AMLReviewTypeHelp)
@@ -294,7 +295,7 @@ T(3,L8100)
 #batch-row-status=X,30,S
 
 !#batch-row-txtno 該列傳送序號
-#batch-row-txtno=X,18,O
+#batch-row-txtno=X,14,O
 
 
 !! ------- end of batch variables   -------------
@@ -333,7 +334,7 @@ TXFORM=L8082
 !--------- OUTPUT畫面 --------
 <sub type="PART" name="L8082" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
-["[L8082]                                 AML定審中、低風險資料查詢"],
+["[L8082]                                 AML定審中風險資料查詢"],
 ]
 </sub>
 
@@ -343,7 +344,7 @@ TXFORM=L8082
 ^
 
 #RPTFG=0,QUERY.GRID,L8082
-#any={caption:'[L8082]AML定審中、低風險資料查詢／單筆更新狀態點選[更新狀態]按鈕;整批更新狀態先勾選後再按[整批通知]按鈕(點各欄右方可排序)',width:1200,shrinkToFit:'false',rowList:[100,400,800,1600],rowNum:20,
+#any={caption:'[L8082]AML定審中風險資料查詢／單筆更新狀態點選[更新狀態]按鈕;整批更新狀態先勾選後再按[整批通知]按鈕(點各欄右方可排序)',width:1200,shrinkToFit:'false',rowList:[100,400,800,1600],rowNum:20,
 ifxBatch:{
 	name:'整批通知',
 	type:'5',

@@ -24,6 +24,8 @@ T(3,L5103)
 !起始交易記號  0:起始交易,1:非起始交易
 #ORGFG=_,_,S
 E(0,0)
+
+
 </sub>
 
 !=====================================================================
@@ -31,14 +33,16 @@ E(0,0)
 !=====================================================================
 <sub type="PREDC" name="PreDC">
 
+
 #ActFgHelp=x,20,S
 T(3,1:登錄;2:放行;3:審核)
 C(3,#FKEY,2,T(H,@ACTFGX,#ACTFG,#ActFgHelp),$)
 
 #Hiddent=X,1,S
 C(3,#ACTFG,2,$,s)
-HIDE(#BTNA,#BTNB,#BTNC,#BTND)
+HIDE(#BTND)
 
+<include src="COM.icf::TITLE-RUN.pre"/>
 </sub> 
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="L5103" layout="cols=3;screen.width=[130,370,130,370];printer.width=[20,80];order=1">
@@ -47,10 +51,10 @@ HIDE(#BTNA,#BTNB,#BTNC,#BTND)
 ["#FdACTFGX+登放記號",#ACTFGX],["#FdApplCodeX+申請或歸還",#ApplCodeX],
 [#<->#,"#FdCustNo+借款人戶號",#CustNo,"-",#FacmNo,#BTND,#CustName],
 [#<->#,"#FdFacmNoMemo+同押品額度",#FacmNoMemo],
-["#FdApplSeq+申請序號",#ApplSeq],["#FdApplEmpNo+借閱人",#ApplEmpNo,#BTNA,#ApplEmpNoX],
+["#FdApplSeq+申請序號",#ApplSeq],["#FdApplEmpNo+借閱人",#ApplEmpNo,#ApplEmpNoX],
 ["#FdUsageCode+用途",#UsageCode,#UsageCodeX],["#FdCopyCode+正本+/+影本",#CopyCode,#CopyCodeX],
-["#FdApplDate+借閱日期",#ApplDate],["#FdKeeperEmpNo+管理人",#KeeperEmpNo,#BTNB,#KeeperEmpNoX],
-["#FdReturnDate+歸還日期",#ReturnDate],["#FdReturnEmpNo+歸檔人",#ReturnEmpNo,#BTNC,#ReturnEmpNoX],
+["#FdApplDate+借閱日期",#ApplDate],["#FdKeeperEmpNo+管理人",#KeeperEmpNo,#KeeperEmpNoX],
+["#FdReturnDate+歸還日期",#ReturnDate],["#FdReturnEmpNo+歸還人",#ReturnEmpNo,#ReturnEmpNoX],
 [#<->#,"#FdRemark+備註",#Remark],
 [#<->#,"#FdApplObj+借閱項目",#ApplObj,#ApplObjX],
 ![#<->#,#LABLEA,#BTN_GRDA,#BTN_GRDB,#BTN_GRDC],
@@ -82,19 +86,19 @@ T(3,*)
 #FdApplCodeX=X,2,L
 T(3,*)
 #FdApplEmpNo=X,2,L
-T(3,*)
+!T(3,*)
 #FdCopyCode=X,2,L
 T(3,*)
 #FdKeeperEmpNo=X,2,L
 T(3,*)
 #FdReturnEmpNo=X,2,L
-T(3,*)
+!T(3,*)
 
 !---------- AP TEXT AREA Variables ----------
 
-#BTNA=X,4,I,ui:button;value:使用者查詢;enable:1;tabbable:0
-#BTNB=X,4,I,ui:button;value:使用者查詢;enable:1;tabbable:0
-#BTNC=X,4,I,ui:button;value:使用者查詢;enable:1;tabbable:0
+!#BTNA=X,4,I,ui:button;value:使用者查詢;enable:1;tabbable:0
+!#BTNB=X,4,I,ui:button;value:使用者查詢;enable:1;tabbable:0
+!#BTNC=X,4,I,ui:button;value:使用者查詢;enable:1;tabbable:0
 #BTND=X,4,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0
 !#BTN_GRDA=X,1,I,ui:button;value:申請資料;enable:1;tabbable:0
 !#BTN_GRDB=X,1,I,ui:button;value:設定資料;enable:1;tabbable:0
@@ -140,10 +144,15 @@ T(3,CdCode.SettingCode)
 T(3,CdCode.GuaranteedCode)
 #GuaranteedCodeHelp=x,1024,S
 
+!9檔案借閱管理人
+#InnDocKeeperRimName=x,20,S
+T(3,CdCode.InnDocKeeper)
+#InnDocKeeperHelp=x,1024,S
+
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#ApplCodeRimName,#ApplObjRimName,#UsageCodeXRimName,#CopyCodeRimName,#ApplicationRimName,#SettingRimName,#GuaranteedRimName)
+S(XXR99,01,#ApplCodeRimName,#ApplObjRimName,#UsageCodeXRimName,#CopyCodeRimName,#ApplicationRimName,#SettingRimName,#GuaranteedRimName,#InnDocKeeperRimName)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@ApplCodeHelp,#HelpDesc1) 
@@ -153,6 +162,7 @@ T(2,@CopyCodeHelp,#HelpDesc4)
 T(2,@ApplicationCodeHelp,#HelpDesc5)
 T(2,@SettingCodeHelp,#HelpDesc6)
 T(2,@GuaranteedCodeHelp,#HelpDesc7)
+T(2,@InnDocKeeperHelp,#HelpDesc8)
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
@@ -160,7 +170,7 @@ IF(#CHAIN==1,$,IF(#FKEY == 3 || #FKEY == 7,$,V(P,此為連動交易，請從交�
 
 #InitApplCode=A,1,S
 IF(#FKEY == 3 ,E(0,1),S)
-HIDE(#BTND,#BTNA,#BTNB)
+HIDE(#BTND)
 
 
 ! 新增按鈕會帶入1 ??? 防呆
@@ -240,6 +250,8 @@ C(2,#ACTFG,$,K(MODIFYBUTTON,登錄),K(MODIFYBUTTON,放行),K(MODIFYBUTTON,審核
 C(3,#ACTFG,1,S,$)
 E(0,1)ASGN(AGAIN$)             
 
+
+
 #BUFD=A,7,S
 E(0,0)
 #BINDD=X,1,S
@@ -266,7 +278,7 @@ INVOKEJS(SHOW,L5103_7,0)
 T(F,@CustNo,1)
 T(F,@FacmNo,1)
 T(F,@ApplSeq,1)
-T(F,@ApplEmpNo,1)
+T(F,@ApplEmpNo,0)
 T(F,@UsageCode,1)
 T(F,@CopyCode,1)
 T(F,@KeeperEmpNo,1)
@@ -288,7 +300,6 @@ T(F,@Remark,0)
 T(F,@ApplObj,0)
 T(F,@FacmNoMemo,0)
 T(F,@ApplDate,0)
-HIDE(#BTNB)
 ##loop {times:25,i:1}
 T(F,@OPTA{i},0)
 T(F,@AMTA{i},0)
@@ -298,7 +309,7 @@ T(F,@OPTC{i},0)
 T(F,@AMTC{i},0)
 ##end
 HIDE(#UsageCode,#CopyCode,#ApplObj)
-HIDE(#BTNA,#BTND)
+HIDE(#BTND)
 ,$)
 T(H,#ApplCode,#ApplCodeHelp)
 IF(#InitApplCode == 1,
@@ -322,6 +333,7 @@ T(F,@OPTC{i},0)
 T(F,@AMTC{i},0)
 ##end
 ,$)
+
 
 
 ! 借款人戶號
@@ -354,6 +366,7 @@ C(3,#ApplCode,1,$,s)
 !@
 !C(3,#FacmNo,0,T(F,@FacmNoMemo,1),T(F,@FacmNoMemo,0))
 !@C(1,#FacmNo,s,V(P,額度不可為0),s)
+
 
 ! 借款人戶名---調RIM
 #CustName=X,100,L
@@ -398,26 +411,26 @@ K(MODIFYBUTTON,1,LC104 上傳附件)
 !T(2,{cmd=CHAIN; ntxcd=LC014; ntxbuf=#BufLC014})ASGN(BTN_NEW2$)
 !K(MODIFYBUTTON,2,LC014 上傳附件查詢)
 
-#BUFA=X,74,S
-!T(2,#ApplEmpNo)
-T(2,0000       0)
+!#BUFA=X,74,S
+!!T(2,#ApplEmpNo)
+!T(2,0000       0)
 
-#BINDA=X,1,S
-BIND(#BTNA,click, {cmd=CHAIN; ntxcd=L6041; ntxbuf=#BUFA;ntxbuf5=type<-1:
-L5103ConfirmBrNo<-OBrNo:
-ApplEmpNo<-OTlrNo:
-ApplEmpNoX<-OTlrItem:
-L5103ConfirmGroupNo<-OGroupNo})
-IF(#InitApplCode == 1,BIND(grid,cancel),$)
+!#BINDA=X,1,S
+!BIND(#BTNA,click, {cmd=CHAIN; ntxcd=L6041; ntxbuf=#BUFA;ntxbuf5=type<-1:
+!L5103ConfirmBrNo<-OBrNo:
+!ApplEmpNo<-OTlrNo:
+!ApplEmpNoX<-OTlrItem:
+!L5103ConfirmGroupNo<-OGroupNo})
+!IF(#InitApplCode == 1,BIND(grid,cancel),$)
 
 ! 借閱人
-#ApplEmpNo=X,6,I
+#ApplEmpNo=X,6,L
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,1,$,s)
 C(3,#ApplCode,2,s,$)
 T(4,TLRNO$)
-@T(3,@ApplEmpNoX,)
-V(7)
+!@T(3,@ApplEmpNoX,)
+!V(7)
 
 #RimEmployeeNo=X,6,S
 #RimTxCode=X,6,S
@@ -451,7 +464,7 @@ HELP(#UsageCodeXHelp)
 V(H,#UsageCodeXHelp)
 V(NL)
 
-#UsageCodeX=X,4,L
+#UsageCodeX=X,16,L
 T(H,#UsageCode,#UsageCodeXHelp)
 
 
@@ -493,28 +506,31 @@ IF(#ApplDate>#TODAY,V(P,借閱日期不可大於本日),$)
 #SetTmpApplDate=A,1,S
 E(0,@TmpApplDate,#ApplDate)
 
-#BUFB=X,74,S
-!T(2,#KeeperEmpNo)
-T(2,0000       0)
+!#BUFB=X,74,S
+!!T(2,#KeeperEmpNo)
+!T(2,0000       0)
 
 !<瀏覽-員工號碼>
-#BINDB=X,1,S
-BIND(#BTNB,click, {cmd=CHAIN; ntxcd=L6041; ntxbuf=#BUFB;ntxbuf5=type<-1:
-L5103ConfirmBrNo<-OBrNo:
-KeeperEmpNo<-OTlrNo:
-KeeperEmpNoX<-OTlrItem:
-L5103ConfirmGroupNo<-OGroupNo})
-IF(#InitApplCode == 1,BIND(grid,cancel),$)
+!#BINDB=X,1,S
+!BIND(#BTNB,click, {cmd=CHAIN; ntxcd=L6041; ntxbuf=#BUFB;ntxbuf5=type<-1:
+!L5103ConfirmBrNo<-OBrNo:
+!KeeperEmpNo<-OTlrNo:
+!KeeperEmpNoX<-OTlrItem:
+!L5103ConfirmGroupNo<-OGroupNo})
+!IF(#InitApplCode == 1,BIND(grid,cancel),$)
 
 ! 管理人
 #KeeperEmpNo=X,6,I
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,1,$,s)
 C(3,#ApplCode,2,s,$)
-!C(4,#L5103ConfirmBrNo,$,C(4,#L5103ConfirmGroupNo,$,s))
-!V(P,請點選[瀏覽]取得員工編號)
+HELP(#InnDocKeeperHelp)
 @T(3,@KeeperEmpNoX,)
-V(7)
+V(H,#InnDocKeeperHelp)
+
+! 員工姓名---調RIM
+#KeeperEmpNoX=X,8,L
+T(H,#KeeperEmpNo,#InnDocKeeperHelp)
 
 #SendL2r08C=X,1,S
 C(4,#KeeperEmpNo,S,$)
@@ -522,14 +538,16 @@ T(2,@RimEmployeeNo,#KeeperEmpNo)
 RESET_RIM(#SendL2r08C,L2R08)
 S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
 R(1,L2R08)
-T(2,@KeeperEmpNoX,#L2r08FullName)
 C(4,#KeeperEmpNo,s,$)
 T(2,@L5103ConfirmGroupNo,#L2r08GroupNo)
 T(2,@L5103ConfirmBrNo,#L2r08Brno)
+IF(#KeeperEmpNoX == "",T(2,@KeeperEmpNoX,#L2r08FullName),$)
+
 
 ! 員工姓名---調RIM
-#KeeperEmpNoX=X,8,L
-C(3,#ApplCode,1,$,s)
+!#KeeperEmpNoX=X,8,L
+!C(3,#ApplCode,1,$,s)
+
 
 #AlertMsg1=x,32,S
 T(2,歸還日期不可小於借閱日期+#TmpApplDate)
@@ -546,27 +564,28 @@ IF(#TmpReturnDate>#TODAY,V(P,歸還日期不可大於本日),$)
 
 
 
-#BUFC=X,74,S
-!T(2,#KeeperEmpNo)
-T(2,0000       0)
+!#BUFC=X,74,S
+!!T(2,#KeeperEmpNo)
+!T(2,0000       0)
 
-#BINDC=X,1,S
-BIND(#BTNC,click, {cmd=CHAIN; ntxcd=L6041; ntxbuf=#BUFC;ntxbuf5=type<-1:
-L5103ConfirmBrNo<-OBrNo:
-ReturnEmpNo<-OTlrNo:
-ReturnEmpNoX<-OTlrItem:
-L5103ConfirmGroupNo<-OGroupNo})
+!#BINDC=X,1,S
+!BIND(#BTNC,click, {cmd=CHAIN; ntxcd=L6041; ntxbuf=#BUFC;ntxbuf5=type<-1:
+!L5103ConfirmBrNo<-OBrNo:
+!ReturnEmpNo<-OTlrNo:
+!ReturnEmpNoX<-OTlrItem:
+!L5103ConfirmGroupNo<-OGroupNo})
 
 
 
 ! 歸還人
-#ReturnEmpNo=X,6,I
+#ReturnEmpNo=X,6,L
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,2,$,s)
-!C(4,#L5103ConfirmBrNo,$,C(4,#L5103ConfirmGroupNo,$,s))
-!V(P,請點選[瀏覽]取得員工編號)
-@T(3,@ReturnEmpNoX,)
-V(7)
+T(4,TLRNO$)
+!!C(4,#L5103ConfirmBrNo,$,C(4,#L5103ConfirmGroupNo,$,s))
+!!V(P,請點選[瀏覽]取得員工編號)
+!@T(3,@ReturnEmpNoX,)
+!V(7)
 
 #CheckC=A,1,S
 !C(4,#L5103ConfirmBrNo,s,C(4,#L5103ConfirmGroupNo,s,$))
@@ -683,7 +702,7 @@ C(3,#OPTA{i},0,S,T(H,#OPTA{i},#ApplicationCodeHelp))
 C(3,#ApplObj,4,$,S)
 IF(#ApplCode==1&&#ACTFG==1,$,s)
 C(3,#OPTA{i},0,S,$)
-IF(#ApplCode==1&&#ACTFG==1,E(0,0),$) 
+IF(#ApplCode==1 && #ACTFG==1 && #FKEY != 7 ,E(0,0),$) 
 @V(2,0)
 
 #COPTA{i}=X,1,S
@@ -741,7 +760,7 @@ C(3,#OPTB{i},0,S,T(H,#OPTB{i},#SettingCodeHelp))
 C(3,#ApplObj,4,$,S)
 IF(#ApplCode==1&&#ACTFG==1,$,s)
 C(3,#OPTB{i},0,S,$)
-IF(#ApplCode==1&&#ACTFG==1,E(0,0),$) 
+IF(#ApplCode==1 && #ACTFG==1 && #FKEY != 7 ,E(0,0),$) 
 @V(2,0)
 
 #COPTB{i}=X,1,S
@@ -799,7 +818,7 @@ C(3,#OPTC{i},0,S,T(H,#OPTC{i},#GuaranteedCodeHelp))
 C(3,#ApplObj,4,$,S)
 IF(#ApplCode==1&&#ACTFG==1,$,s)
 C(3,#OPTC{i},0,S,$)
-IF(#ApplCode==1&&#ACTFG==1,E(0,0),$) 
+IF(#ApplCode==1 && #ACTFG==1 && #FKEY != 7 ,E(0,0),$) 
 @V(2,0)
 
 #COPTC{i}=X,1,S

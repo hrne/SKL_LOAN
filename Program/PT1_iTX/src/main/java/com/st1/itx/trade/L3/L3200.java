@@ -1609,10 +1609,9 @@ public class L3200 extends TradeBuffer {
 
 		int wkIntSeq = 0;
 		List<LoanIntDetail> lLoanIntDetail = new ArrayList<LoanIntDetail>();
-
 		for (CalcRepayIntVo c : lCalcRepayIntVo) {
 			wkIntSeq++;
-			wkIntStartRate = c.getStartDate() < wkIntStartDate ? c.getStoreRate() : wkIntStartRate; // 計息起日利率
+			wkIntStartRate = wkIntSeq == 1 ? c.getStoreRate() : wkIntStartRate; // 計息起日利率
 			wkIntStartDate = c.getStartDate() < wkIntStartDate ? c.getStartDate() : wkIntStartDate;
 			wkIntEndDate = c.getEndDate() > wkIntEndDate ? c.getEndDate() : wkIntEndDate;
 			wkLoanBal = wkLoanBal.subtract(c.getPrincipal());

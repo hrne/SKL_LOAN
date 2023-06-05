@@ -121,6 +121,13 @@ public class StringCut {
 		}
 		return sb.toString();
 	}
+	
+	public static String idMask(String value) {
+        if (value == null || value.trim().isEmpty() || value.trim().length() < 4)
+            return "";
+
+        return value.substring(0, value.length() - 4) + "****";
+    }
 
 	/**
 	 * replace LineUp

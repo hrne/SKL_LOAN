@@ -12,10 +12,12 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.dataVO.TxCom;
+import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.FacClose;
 import com.st1.itx.db.domain.InnDocRecord;
 import com.st1.itx.db.domain.InnDocRecordId;
 import com.st1.itx.db.domain.TxTeller;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.FacCloseService;
 import com.st1.itx.db.service.InnDocRecordService;
 import com.st1.itx.db.service.TxTellerService;
@@ -47,6 +49,8 @@ public class L5103 extends TradeBuffer {
 
 	@Autowired
 	public TxTellerService txTellerService;
+	@Autowired
+	public CdCodeService sCdCodeDefService;
 
 	private InnDocRecord tInnDocRecord = new InnDocRecord();
 	private InnDocRecordId tInnDocRecordId = new InnDocRecordId();
@@ -79,6 +83,18 @@ public class L5103 extends TradeBuffer {
 
 			TxTeller t1txTeller = txTellerService.findById(sApplEmpNo, titaVo);
 			TxTeller t2txTeller = txTellerService.findById(sKeeperEmpNo, titaVo);
+			//若管理人員編非空白,則檢查管理人員編需存在且非停用CdCode.InnDocKeeper
+			if (!"".equals(sKeeperEmpNo)) {
+				CdCode tCdCode = sCdCodeDefService.getItemFirst(5, "InnDocKeeper", sKeeperEmpNo,
+						titaVo);
+				if (tCdCode == null) {
+					throw new LogicException(titaVo, "E0015", "該檔案借閱管理人不存在，需請放款部服務課變更");
+				}
+				if("N".equals(tCdCode.getEnable())) {
+					throw new LogicException(titaVo, "E0015", "該檔案借閱管理人已停用，需請放款部服務課變更");
+				}
+			}
+			
 
 //			若保管與借閱同單位改為2段式交易
 			if (t1txTeller != null && t2txTeller != null) {

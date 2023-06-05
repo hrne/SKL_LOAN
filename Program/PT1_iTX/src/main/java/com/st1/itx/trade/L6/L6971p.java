@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
+import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
@@ -60,6 +61,8 @@ public class L6971p extends TradeBuffer {
 
 	WorkType workType;
 
+	private List<TxArchiveTableLog> listTxArchiveTableLog = new ArrayList<>();
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6971p ");
@@ -79,6 +82,10 @@ public class L6971p extends TradeBuffer {
 		int count = 0;
 		if (l6971Query != null && !l6971Query.isEmpty()) {
 			for (Map<String, String> l6971Vo : l6971Query) {
+				if (count % 1000 == 0) {
+					// 2023-06-05 Wei 每1000筆更新一次
+					updateAllTxArchiveTableLog(titaVo);
+				}
 				int execDate = parse.stringToInteger(l6971Vo.get("ExecuteDate"));
 				int batchNo = parse.stringToInteger(l6971Vo.get("BatchNo"));
 				int custNo = parse.stringToInteger(l6971Vo.get("CustNo"));
@@ -86,20 +93,11 @@ public class L6971p extends TradeBuffer {
 				int bormNo = parse.stringToInteger(l6971Vo.get("BormNo"));
 				doExecution5YTX(execDate, batchNo, custNo, facmNo, bormNo, titaVo);
 				count++;
-				this.info("L6971 doExecution5YTX commit");
-				this.batchTransaction.commit();
-				setIsDeletedToTrue("5YTX", "LoanBorTx", execDate, batchNo, custNo, facmNo, bormNo, titaVo);
-			}
-			for (Map<String, String> l6971Vo : l6971Query) {
-				int execDate = parse.stringToInteger(l6971Vo.get("ExecuteDate"));
-				int batchNo = parse.stringToInteger(l6971Vo.get("BatchNo"));
-				int custNo = parse.stringToInteger(l6971Vo.get("CustNo"));
-				int facmNo = parse.stringToInteger(l6971Vo.get("FacmNo"));
-				int bormNo = parse.stringToInteger(l6971Vo.get("BormNo"));
-				setIsDeletedToTrue("5YTX", "LoanBorTx", execDate, batchNo, custNo, facmNo, bormNo, titaVo);
-				this.info("L6971 setIsDeletedToTrue commit");
+				this.info("L6971 commit");
 				this.batchTransaction.commit();
 			}
+			// 2023-06-05 Wei 最後一次更新
+			updateAllTxArchiveTableLog(titaVo);
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", titaVo.getTlrNo(),
 					"L6971 整批刪除，共" + count + "筆，已完成", titaVo);
 		} else {
@@ -118,25 +116,23 @@ public class L6971p extends TradeBuffer {
 		this.info("FacmNo: " + facmNo);
 		this.info("BormNo: " + bormNo);
 
-		if (isHistoryAndOnlineSameCount5YTX(custNo, facmNo, bormNo, titaVo)) {
-			doDelete5YTX(custNo, facmNo, bormNo, titaVo);
+		Slice<LoanBorTx> sLoanBorTxOnline = loanBorTxService.borxBormNoEq(custNo, facmNo, bormNo, 0, Integer.MAX_VALUE,
+				0, Integer.MAX_VALUE, titaVo);
+		List<LoanBorTx> lLoanBorTx = sLoanBorTxOnline.getContent();
+
+		int size = sLoanBorTxOnline.getNumberOfElements();
+
+		if (isHistoryAndOnlineSameCount5YTX(custNo, facmNo, bormNo, size, titaVo)) {
+			doDelete5YTX(lLoanBorTx, titaVo);
+			setIsDeletedToTrue("5YTX", "LoanBorTx", execDate, batchNo, custNo, facmNo, bormNo, titaVo);
 		} else {
 			this.error("DATA has different count in ONLINE and HISTORY!");
-			throw new LogicException("E0008", "此 PK 在歷史環境與連線環境資料筆數不同");
-
+			throwException("E0008", "此 PK 在歷史環境與連線環境資料筆數不同", titaVo);
 		}
 	}
 
-	private void doDelete5YTX(int custNo, int facmNo, int bormNo, TitaVo titaVo) throws LogicException {
-
-		//
+	private void doDelete5YTX(List<LoanBorTx> lLoanBorTx, TitaVo titaVo) throws LogicException {
 		// 刪除確認可刪除的明細 for 5YTX
-		//
-
-		Slice<LoanBorTx> sLoanBorTx = loanBorTxService.borxBormNoEq(custNo, facmNo, bormNo, 0, Integer.MAX_VALUE, 0,
-				Integer.MAX_VALUE, titaVo);
-		List<LoanBorTx> lLoanBorTx = sLoanBorTx.getContent();
-
 		try {
 			loanBorTxService.deleteAll(lLoanBorTx, titaVo);
 		} catch (Exception e) {
@@ -144,63 +140,74 @@ public class L6971p extends TradeBuffer {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.error(errors.toString());
-			throw new LogicException("E0008", "從 LoanBorTx 刪除時失敗");
+			throwException("E0008", "從 LoanBorTx 刪除時失敗", titaVo);
 		}
 	}
 
-	private Boolean isHistoryAndOnlineSameCount5YTX(int custNo, int facmNo, int bormNo, TitaVo titaVo) {
-
-		//
-		// 檢查此明細 key 在 history 及 online 是否資料數量相符 for 5YTX
-		// 應該可以 generalize?
-		//
-
-		Slice<LoanBorTx> sLoanBorTxOnline = loanBorTxService.borxBormNoEq(custNo, facmNo, bormNo, 0, Integer.MAX_VALUE,
-				0, Integer.MAX_VALUE, titaVo);
-
+	private Boolean isHistoryAndOnlineSameCount5YTX(int custNo, int facmNo, int bormNo, int size, TitaVo titaVo) {
 		TitaVo titaVoHistory = (TitaVo) titaVo.clone();
 //		titaVoHistory.setDataBaseOnHist();
 		// 2023-05-25 Wei for DEV測試用
 		titaVoHistory.setDataBaseOnDay();
-
 		Slice<LoanBorTx> sLoanBorTxHistory = loanBorTxService.borxBormNoEq(custNo, facmNo, bormNo, 0, Integer.MAX_VALUE,
 				0, Integer.MAX_VALUE, titaVoHistory);
-
-		return sLoanBorTxOnline.getNumberOfElements() == sLoanBorTxHistory.getNumberOfElements();
+		return size == sLoanBorTxHistory.getNumberOfElements();
 	}
 
 	private void setIsDeletedToTrue(String type, String tableName, int execDate, int batchNo, int custNo, int facmNo,
 			int bormNo, TitaVo titaVo) throws LogicException {
-
-		//
 		// 完成刪除後，在 TxArchiveTableLog 將對應的資料 IsDeleted 設為 1
-		// 並且更新該筆資料內容
-		//
-
+		// 並且更新該筆資料內容 2023-06-05 Wei 改為存list,全部刪除完以後一次更新
 		this.info("L6971.setIsDeletedToTrue deleteAll successful. Set isDeleted to 1.");
 
 		try {
-			Slice<TxArchiveTableLog> recordList = txArchiveTableLogService.findL6971(type, tableName, execDate, batchNo,
+			Slice<TxArchiveTableLog> slice = txArchiveTableLogService.findL6971(type, tableName, execDate, batchNo,
 					custNo, facmNo, bormNo, 0, 0, Integer.MAX_VALUE, titaVo);
-			if (recordList != null && !recordList.isEmpty()) {
-				for (TxArchiveTableLog record : recordList) {
+			List<TxArchiveTableLog> list = slice.getContent();
+			if (!list.isEmpty()) {
+				for (TxArchiveTableLog record : list) {
 					record.setIsDeleted(1);
 					record.setDescription("此次封存明細已從連線環境刪除");
 					record.setLastUpdate(new Timestamp(System.currentTimeMillis()));
 					record.setLastUpdateEmpNo(titaVo.getTlrNo());
-					txArchiveTableLogService.update(record, titaVo);
 				}
+				listTxArchiveTableLog.addAll(list);
 			} else {
 				this.error(
 						"L6971.setIsDeletedToTrue: different count between deleted records and TxArchiveTableLog.Records! rollback");
-				throw new LogicException("E0007", "實際刪除資料數與 TxArchiveTableLog 紀錄的數量不符");
+				throwException("E0007", "實際刪除資料數與 TxArchiveTableLog 紀錄的數量不符", titaVo);
 			}
 		} catch (Exception e) {
 			this.error("L6971.setIsDeletedToTrue failed to update IsDeleted.");
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.error(errors.toString());
+			throwException("E0007", "更新 TxArchiveTableLog.IsDeleted 失敗", titaVo);
+		}
+	}
+
+	private void updateAllTxArchiveTableLog(TitaVo titaVo) throws LogicException {
+		if (listTxArchiveTableLog.isEmpty()) {
+			// 不得為空
+			this.info("updateAllTxArchiveTableLog listTxArchiveTableLog為空,不更新.");
+			return;
+		}
+		try {
+			txArchiveTableLogService.updateAll(listTxArchiveTableLog, titaVo);
+		} catch (DBException e) {
+			this.error("L6971.updateAllTxArchiveTableLog failed to update IsDeleted.");
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error(errors.toString());
 			throw new LogicException("E0007", "更新 TxArchiveTableLog.IsDeleted 失敗");
 		}
+		// 更新完清空
+		listTxArchiveTableLog = new ArrayList<>();
+	}
+
+	private void throwException(String errorCode, String errorMsg, TitaVo titaVo) throws LogicException {
+		// 2023-06-05 Error前需先更新一次
+		updateAllTxArchiveTableLog(titaVo);
+		throw new LogicException(errorCode, errorMsg);
 	}
 }

@@ -925,6 +925,7 @@ T(H,#AcctCode,#FacmAcctCodeHelp)
 
 #DrawdownCode=A,1,I
 C(3,#HIDE4FG,0,CALL(#HIDEP4),$)
+C(3,#FKEY,7,s,$)
 ! C(3,#FKEY,7,C(3,#FKEY7DrawdownCode,3,s,$),$)
 HELP(#DrawdownCodeHelp)
 C(3,#FKEY,0,E(0,1),$)
@@ -1005,6 +1006,7 @@ E(0,#TimDrawdownAmt)
 ! 預約撥款上送欄位
 
 #DrawdownDate=D,7,I
+C(3,#FKEY,7,s,$)
 ! C(3,#DrawdownDate,0,C(3,#DrawdownCode,3,E(0,#NBSDY),E(0,#SYSDATE)),$)
 E(0,#SYSDATE)
 D(8)

@@ -70,7 +70,11 @@ public class L6971 extends TradeBuffer {
 
 		workType = WorkType.getWorkTypeByHelp(titaVo.getParam("InputType"));
 
-		String showDetail = titaVo.getParam("ShowDetail");
+		String showDetail = null;
+
+		if (titaVo.containsKey("ShowDetail")) {
+			showDetail = titaVo.getParam("ShowDetail");
+		}
 
 		// 如果OOCustNo有值, 表示是要進行刪除
 		// 如果沒有值, 表示是查詢
@@ -92,7 +96,6 @@ public class L6971 extends TradeBuffer {
 
 	private void doBatch(TitaVo titaVo) throws LogicException {
 		this.info("L6971 doBatch ... ");
-
 		MySpring.newTask("L6971p", this.txBuffer, titaVo);
 	}
 

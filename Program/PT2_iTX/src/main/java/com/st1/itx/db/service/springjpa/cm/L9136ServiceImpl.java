@@ -167,7 +167,7 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  ,T.\"FacmNo\" AS \"FacmNo\"";
 		sql += "		  ,T.\"BormNo\" AS \"BormNo\"";
 		sql += "		  ,SUBSTR(cm.\"CustName\",0,5) AS \"CustName\"";
-		sql += "		  ,NVL(TO_CHAR(Cl.\"ApproveNo\"),TO_CHAR(NVL(JSON_VALUE(R.\"TranData\",'$.ApplNo')),'       ')) AS \"ApproveNo\"";
+		sql += "		  ,NVL(TO_CHAR(Cl.\"ApproveNo\"),TO_CHAR(NVL(JSON_VALUE(R.\"TranData\",'$.ApplNo'),'       '))) AS \"ApproveNo\"";
 		sql += "		  ,NVL(TO_CHAR(Cl.\"ClCode1\"),JSON_VALUE(R.\"TranData\",'$.ClCode1')) AS \"ClCode1\"";
 		sql += "		  ,NVL(TO_CHAR(Cl.\"ClCode2\"),JSON_VALUE(R.\"TranData\",'$.ClCode2')) AS \"ClCode2\"";
 		sql += "		  ,CC.\"Item\" AS \"ClName\"";

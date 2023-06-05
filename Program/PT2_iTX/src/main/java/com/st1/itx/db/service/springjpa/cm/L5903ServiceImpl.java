@@ -60,10 +60,10 @@ public class L5903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (iApplDateTo == 19110000) {//無輸入起訖日時
 			iApplDateTo = 99991231;
 		}
+		String iteller = titaVo.getParam("TLRNO");
 		
 		String iUsageCode = titaVo.getParam("UsageCode");
 		String iApplCode = titaVo.getParam("ApplCode");
-
 //		T(3,01:未還;02:已還;09:全部)
 
 		this.info("L5903.findAll iCustNo=" + iCustNo);
@@ -86,15 +86,19 @@ public class L5903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ,i.\"Remark\"                                     ";
 		sql += "        ,i.\"ApplObj\"                                    ";
 		sql += "        ,i.\"KeeperEmpNo\"                                ";
-		sql += "        ,i.\"ApplEmpNo\"                                ";
+		sql += "        ,i.\"ApplEmpNo\"                                  ";
 		sql += "        ,i.\"ReturnEmpNo\"                                ";
-		sql += "        ,i.\"TitaActFg\"                                ";
-		sql += "        ,i.\"FacmNoMemo\"                                ";
+		sql += "        ,i.\"TitaActFg\"                                  ";
+		sql += "        ,i.\"FacmNoMemo\"                                 ";
+		sql += "        ,case when nvl(cc.\"Enable\",' ') = 'Y' then 'Y'  ";
+		sql += "              else 'N'  end                        AS F18 ";
 		sql += " from \"InnDocRecord\" i                                  ";
 		sql += " left join \"CustMain\" c on c.\"CustNo\" = i.\"CustNo\"  ";
 		sql += " left join \"CdEmp\" e1 on e1.\"EmployeeNo\" = i.\"KeeperEmpNo\"  ";
 		sql += " left join \"CdEmp\" e2 on e2.\"EmployeeNo\" = i.\"ApplEmpNo\"  ";
 		sql += " left join \"CdEmp\" e3 on e3.\"EmployeeNo\" = i.\"ReturnEmpNo\"  ";
+		sql += " left join \"CdCode\" cc on cc.\"DefCode\"   = 'InnDocKeeper'  ";
+		sql += "                        and cc.\"Code\"      =  :iteller "  ;
 
 //		if ("01".equals(iApplCode)) {
 //			sql += " left join (                                              ";
@@ -139,12 +143,13 @@ public class L5903ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		}
 
-		sql += "order by i.\"CustNo\",i.\"FacmNo\" ,i.\"ApplSeq\"";
+		sql += " order by i.\"CustNo\",i.\"FacmNo\" ,i.\"ApplSeq\"";
 		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
+		query.setParameter("iteller", iteller);
 
 		cnt = query.getResultList().size();
 		this.info("Total cnt ..." + cnt);

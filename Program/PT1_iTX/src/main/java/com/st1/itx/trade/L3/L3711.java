@@ -464,10 +464,12 @@ public class L3711 extends TradeBuffer {
 		this.info("AddLoanIntDetailRoutine ... ");
 
 		int wkIntSeq = 0;
+		wkIntStartDate = 9991231;
+		wkIntEndDate = 0;
 
 		for (CalcRepayIntVo c : lCalcRepayIntVo) {
 			wkIntSeq++;
-			wkIntStartRate = c.getStartDate() < wkIntStartDate ? c.getStoreRate() : wkIntStartRate; // 計息起日利率
+			wkIntStartRate = wkIntSeq == 1 ? c.getStoreRate() : wkIntStartRate; // 計息起日利率
 			wkIntStartDate = c.getStartDate() < wkIntStartDate ? c.getStartDate() : wkIntStartDate;
 			wkIntEndDate = c.getEndDate() > wkIntEndDate ? c.getEndDate() : wkIntEndDate;
 			wkLoanBal = wkLoanBal.subtract(c.getPrincipal());

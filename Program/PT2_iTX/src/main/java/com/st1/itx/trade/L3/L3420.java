@@ -1262,7 +1262,7 @@ public class L3420 extends TradeBuffer {
 
 		for (CalcRepayIntVo c : lCalcRepayIntVo) {
 			wkIntSeq++;
-			wkIntStartRate = c.getStartDate() < wkIntStartDate ? c.getStoreRate() : wkIntStartRate; // 計息起日利率
+			wkIntStartRate = wkIntSeq == 1 ? c.getStoreRate() : wkIntStartRate; // 計息起日利率
 			wkIntStartDate = c.getStartDate() < wkIntStartDate ? c.getStartDate() : wkIntStartDate;
 			wkIntEndDate = c.getEndDate() > wkIntEndDate ? c.getEndDate() : wkIntEndDate;
 			tLoanIntDetailId = new LoanIntDetailId();

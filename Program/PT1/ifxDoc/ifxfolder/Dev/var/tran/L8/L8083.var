@@ -42,8 +42,8 @@ K(MODIFYBUTTON,查詢)
 !T(3,1:定審名單產出;11:案件轉派中;12:案件轉派退回;13:案件轉派覆核完成;2:電訪未完成;21:定審問卷暫存;22:定審問卷經辦完成;23:定審問卷主管覆核完成;24:定審問卷督導主管覆核完成[需進行四、五關覆核];25:定審問卷法遵經辦完成;3:電訪完成;31:定審問卷主管退回;32:定審問卷督導主管退回;33:定審問卷法遵經辦退回;4:定審問卷法遵主管退回;4:無須電訪;5:中低風險需定審;6:非一般壽險需定審;98:不須定審;99:完成定審)
 
 #ProcessTypeHelp=X,500,S
-!T(3,1:郵寄定期審查客戶基本資料更新表;2:郵寄放款本息攤還表暨息通知單;3:簡訊通知;9:全部)
-T(3,2:郵寄放款本息攤還表暨息通知單;3:簡訊通知;9:全部)
+!T(3,1:郵寄定期審查客戶基本資料更新表;2:郵寄放款本息攤還表暨繳息通知單;3:簡訊通知;9:全部)
+T(3,2:郵寄放款本息攤還表暨繳息通知單;3:簡訊通知;9:全部)
 
 #ProcessTypeH=x,100,S
 T(3,1:郵寄通知;2:郵寄通知;3:簡訊通知)
@@ -267,7 +267,7 @@ T(2,#oDataDt+#oCustKey+#oRRSeq+#oReviewType+#oUnit+#oIsStatus)
 
 #oBUF2b=x,1000,S
 T(6A,#DataDt+#CustKey+#ProcessDate+#ProcessTlrNo+#ProcessNote+#LogFlag+#BatchNo+#ReviewTypeX))
-	
+
 #oBtnText=X,8,S
 C(2,#oProcessType,T(3,處理),T(3,郵寄通知),T(3,郵寄通知),T(3,簡訊通知))
 
@@ -308,7 +308,7 @@ T(3,L8100)
 #batch-row-status=X,30,S
 
 !#batch-row-txtno 該列傳送序號
-#batch-row-txtno=X,18,O
+#batch-row-txtno=X,14,O
 
 
 !! ------- end of batch variables   -------------

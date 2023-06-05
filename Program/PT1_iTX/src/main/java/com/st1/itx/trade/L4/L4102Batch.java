@@ -94,6 +94,7 @@ public class L4102Batch extends TradeBuffer {
 	private String outFolder = "";
 
 	int acDate = 0;
+	String wkBatchNo = "";
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -101,8 +102,8 @@ public class L4102Batch extends TradeBuffer {
 
 		acDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 		int iItemCode = parse.stringToInteger(titaVo.getParam("ItemCode")); // 1.撥款 2.退款
-		String wkbatchNo = titaVo.getBacthNo();
-		this.info("L4102 Batch batchNo = " + wkbatchNo);
+		wkBatchNo = titaVo.getBacthNo();
+		this.info("L4102 Batch batchNo = " + wkBatchNo);
 
 		totaVo.put("PdfSnoM", "");
 		totaVo.put("PdfSnoF", "");
@@ -112,30 +113,12 @@ public class L4102Batch extends TradeBuffer {
 //		傳票明細表
 		doRptC(titaVo);
 
-		String checkMsg = "報表已製作完成。   批號 = " + wkbatchNo;
+		String checkMsg = "報表已製作完成。   批號 = " + wkBatchNo;
 
 		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
 				titaVo.getTlrNo() + "L4102", checkMsg, titaVo);
 
 		return this.sendList();
-	}
-
-	private String getBatchNo(int iItemCode, TitaVo titaVo) throws LogicException {
-		String batchNo = "";
-		AcCloseId tAcCloseId = new AcCloseId();
-		tAcCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
-		tAcCloseId.setBranchNo(titaVo.getAcbrNo());
-		tAcCloseId.setSecNo("09"); // 業務類別: 01-撥款匯款 02-支票繳款 09-放款
-		AcClose tAcClose = acCloseService.findById(tAcCloseId, titaVo);
-		if (tAcClose == null) {
-			throw new LogicException(titaVo, "E0001", "無帳務資料"); // 查詢資料不存在
-		}
-		if (iItemCode == 1) {
-			batchNo = "LN" + parse.IntegerToString(tAcClose.getClsNo() + 1, 2) + "  ";
-		} else {
-			batchNo = "RT" + parse.IntegerToString(tAcClose.getClsNo() + 1, 2) + "  ";
-		}
-		return batchNo;
 	}
 
 	public void doRptA(TitaVo titaVo) throws LogicException {
@@ -146,7 +129,12 @@ public class L4102Batch extends TradeBuffer {
 		l4101ReportA.setParentTranCode(parentTranCode);
 
 		// 撈資料組報表
-		l4101ReportA.exec(titaVo);
+		this.info("wkBatchNo = " + (wkBatchNo.substring(4, wkBatchNo.length())));
+		if (!"00".equals(wkBatchNo.substring(4, wkBatchNo.length()))) {
+			l4101ReportA.execA(titaVo);
+		} else {
+			l4101ReportA.execB(titaVo); // A4傳票總表
+		}
 
 		// 寫產檔記錄到TxReport
 		long rptNo = l4101ReportA.close();
