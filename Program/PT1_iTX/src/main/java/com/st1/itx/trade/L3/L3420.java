@@ -151,8 +151,6 @@ public class L3420 extends TradeBuffer {
 	private int wkFacmNoEnd = 999;
 	private int wkBormNoStart = 1;
 	private int wkBormNoEnd = 900;
-	private int renewCnt = 0;
-	private int oldFacmNo = 0;
 	private int wkTotaCount = 0;
 	private int wkIntStartDate = 9991231;
 	private int wkIntEndDate = 0;
@@ -162,6 +160,7 @@ public class L3420 extends TradeBuffer {
 	private int wkCloseNo = 0;
 	private String wkFacCloseInsertFg = "";
 
+	private BigDecimal wkIntStartRate = BigDecimal.ZERO; // 計息起日利率
 	private BigDecimal wkAfterLoanBal = BigDecimal.ZERO;
 	private BigDecimal wkPrincipal = BigDecimal.ZERO;
 	private BigDecimal wkInterest = BigDecimal.ZERO;
@@ -192,8 +191,6 @@ public class L3420 extends TradeBuffer {
 	private DecimalFormat df = new DecimalFormat("##,###,###,###,##0");
 	private TempVo tTempVo = new TempVo();
 	private FacMain tFacMain;
-	private FacMain tOldFacMain;
-	private FacMain tNewFacMain;
 	private LoanBorMain tLoanBorMain;
 	private LoanBorTx tLoanBorTx;
 	private LoanBorTxId tLoanBorTxId;
@@ -1265,6 +1262,7 @@ public class L3420 extends TradeBuffer {
 
 		for (CalcRepayIntVo c : lCalcRepayIntVo) {
 			wkIntSeq++;
+			wkIntStartRate = c.getStartDate() < wkIntStartDate ? c.getStoreRate() : wkIntStartRate; // 計息起日利率
 			wkIntStartDate = c.getStartDate() < wkIntStartDate ? c.getStartDate() : wkIntStartDate;
 			wkIntEndDate = c.getEndDate() > wkIntEndDate ? c.getEndDate() : wkIntEndDate;
 			tLoanIntDetailId = new LoanIntDetailId();
@@ -1330,7 +1328,7 @@ public class L3420 extends TradeBuffer {
 		tLoanBorTx.setEntryDate(iEntryDate);
 		tLoanBorTx.setDueDate(wkDueDate);
 		tLoanBorTx.setLoanBal(BigDecimal.ZERO);
-		tLoanBorTx.setRate(tLoanBorMain.getStoreRate());
+		tLoanBorTx.setRate(wkIntStartRate);
 		tLoanBorTx.setIntStartDate(wkIntStartDate);
 		tLoanBorTx.setIntEndDate(wkIntEndDate);
 		tLoanBorTx.setPaidTerms(0);

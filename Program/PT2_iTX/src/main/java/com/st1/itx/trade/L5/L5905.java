@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.service.springjpa.cm.L5905ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
+import com.st1.itx.util.format.FormatUtil;
 
 /**
  * Tita InqFg=9,1 YearMonth=9,5 ConditionCode=9,2 YearMonthS=9,5 YearMonthE=9,5
@@ -110,7 +111,9 @@ public class L5905 extends TradeBuffer {
 					occursList.putParam("OODrawdownDate", itempdate - 19110000);
 				}
 
-				occursList.putParam("OOLoanBal", parse.stringToInteger(result.get("LoanBal")));
+//				occursList.putParam("OOLoanBal", parse.stringToInteger(result.get("LoanBal")));
+				occursList.putParam("OOLoanBal", result.get("LoanBal"));
+				
 				occursList.putParam("OOEvaluation", parse.stringToInteger(result.get("Evaluation")));
 				occursList.putParam("OOCustTypeItem", result.get("CustTypeItem"));
 				occursList.putParam("OOUsageItem", result.get("UsageItem"));

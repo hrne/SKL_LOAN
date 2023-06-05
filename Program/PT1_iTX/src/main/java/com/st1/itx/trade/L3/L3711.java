@@ -130,6 +130,7 @@ public class L3711 extends TradeBuffer {
 	private int wkOldNextRepayDate;
 	private int wkNewSpecificDate;
 	private int wkLoanPrevIntDate;
+	private BigDecimal wkIntStartRate = BigDecimal.ZERO; // 計息起日利率
 	private BigDecimal wkInterest = BigDecimal.ZERO;
 	private BigDecimal wkLoanBal = BigDecimal.ZERO;
 	private BigDecimal wkDueAmt = BigDecimal.ZERO;
@@ -466,6 +467,7 @@ public class L3711 extends TradeBuffer {
 
 		for (CalcRepayIntVo c : lCalcRepayIntVo) {
 			wkIntSeq++;
+			wkIntStartRate = c.getStartDate() < wkIntStartDate ? c.getStoreRate() : wkIntStartRate; // 計息起日利率
 			wkIntStartDate = c.getStartDate() < wkIntStartDate ? c.getStartDate() : wkIntStartDate;
 			wkIntEndDate = c.getEndDate() > wkIntEndDate ? c.getEndDate() : wkIntEndDate;
 			wkLoanBal = wkLoanBal.subtract(c.getPrincipal());
@@ -527,7 +529,7 @@ public class L3711 extends TradeBuffer {
 		tLoanBorTx.setEntryDate(iEntryDate);
 		tLoanBorTx.setAcctCode(tFacMain.getAcctCode());
 		tLoanBorTx.setLoanBal(tLoanBorMain.getLoanBal());
-		tLoanBorTx.setRate(tLoanBorMain.getStoreRate());
+		tLoanBorTx.setRate(wkIntStartRate);
 		tLoanBorTx.setIntStartDate(wkIntStartDate);
 		tLoanBorTx.setIntEndDate(wkIntEndDate);
 		tLoanBorTx.setInterest(wkInterest);

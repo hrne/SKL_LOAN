@@ -80,12 +80,12 @@ public class L5407 extends TradeBuffer {
 		
 		case 1:
 		case 3:
-			if(iFunctionCode == 1) {
+
+			checkEffectiveDate(titaVo);
+//			if(iFunctionCode == 1) {
 			// 資料庫協辦人員等級檔的第一筆資料寫入協辦人員等級歷程檔
 			insertOrgLog(titaVo);
-			}
-			checkEffectiveDate(titaVo);
-
+//			}
 			// 全新資料
 			tPfCoOfficerId = new PfCoOfficerId();
 			tPfCoOfficer = new PfCoOfficer();

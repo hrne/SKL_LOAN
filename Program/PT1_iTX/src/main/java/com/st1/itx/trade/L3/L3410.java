@@ -131,8 +131,7 @@ public class L3410 extends TradeBuffer {
 	private int wkIntEndDate = 0;
 	private int wkPaidTerms = 0;
 	private int wkDueDate = 0;
-	private int renewCnt = 0;
-	private int oldFacmNo = 0;
+	private BigDecimal wkIntStartRate = BigDecimal.ZERO; // 計息起日利率
 	private BigDecimal wkPrincipal = BigDecimal.ZERO;
 	private BigDecimal wkInterest = BigDecimal.ZERO;
 	private BigDecimal wkDelayInt = BigDecimal.ZERO;
@@ -159,8 +158,6 @@ public class L3410 extends TradeBuffer {
 	private BigDecimal wkRolloverAmt = BigDecimal.ZERO;
 	private TempVo tTempVo = new TempVo();
 	private FacMain tFacMain;
-	private FacMain tOldFacMain;
-	private FacMain tNewFacMain;
 	private LoanBorMain tLoanBorMain;
 	private LoanBorTx tLoanBorTx;
 	private LoanBorTxId tLoanBorTxId;
@@ -233,15 +230,10 @@ public class L3410 extends TradeBuffer {
 
 		// Check Input
 		checkInputRoutine();
-		
+
 		// 檢查到同戶帳務交易需由最近一筆交易開始訂正
 		if (titaVo.isHcodeErase()) {
 			loanCom.checkEraseCustNoTxSeqNo(iCustNo, titaVo);
-		}
-
-		// 展期處理
-		if (iCaseCloseCode == 1) {
-			FacRenew(titaVo);
 		}
 
 		// 按違約金、 延滯息、利息順序減免
@@ -626,6 +618,7 @@ public class L3410 extends TradeBuffer {
 
 		for (CalcRepayIntVo c : lCalcRepayIntVo) {
 			wkIntSeq++;
+			wkIntStartRate = c.getStartDate() < wkIntStartDate ? c.getStoreRate() : wkIntStartRate; // 計息起日利率
 			wkIntStartDate = c.getStartDate() < wkIntStartDate ? c.getStartDate() : wkIntStartDate;
 			wkIntEndDate = c.getEndDate() > wkIntEndDate ? c.getEndDate() : wkIntEndDate;
 			wkLoanBal = wkLoanBal.subtract(c.getPrincipal());
@@ -689,7 +682,7 @@ public class L3410 extends TradeBuffer {
 		tLoanBorTx.setDueDate(wkDueDate);
 		// 交易金額
 		tLoanBorTx.setLoanBal(tLoanBorMain.getLoanBal());
-		tLoanBorTx.setRate(tLoanBorMain.getStoreRate());
+		tLoanBorTx.setRate(wkIntStartRate);
 		tLoanBorTx.setIntStartDate(wkIntStartDate);
 		tLoanBorTx.setIntEndDate(wkIntEndDate);
 		tLoanBorTx.setPaidTerms(0);
@@ -732,8 +725,8 @@ public class L3410 extends TradeBuffer {
 			tTempVo.putParam("ShortCloseBreach", wkShortCloseBreach);
 		}
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
-		
-		this.lLoanBorTx.add(tLoanBorTx); 
+
+		this.lLoanBorTx.add(tLoanBorTx);
 
 	}
 
@@ -749,7 +742,7 @@ public class L3410 extends TradeBuffer {
 		if (baTxCom.getExcessive().compareTo(wkTotalRcv) < 0) {
 			throw new LogicException(titaVo, "E3071", "暫收金額=" + baTxCom.getExcessive() + ",應收金額 = " + wkTotalRcv); // 金額不足
 		}
-		
+
 	}
 
 	// 貸方：短繳
@@ -782,44 +775,4 @@ public class L3410 extends TradeBuffer {
 				+ ", wkShortCloseBreach=" + wkShortCloseBreach);
 	}
 
-	// 展期處理
-	private void FacRenew(TitaVo titaVo) throws LogicException {
-		tOldFacMain = new FacMain();
-		tNewFacMain = new FacMain();
-		renewCnt = 0;
-		oldFacmNo = 0;
-//		取舊額度的展期次數+1擺進新額度的展期次數
-//		舊額度擺進新額度的舊額度編號
-		if (titaVo.isHcodeNormal()) {
-			tOldFacMain = facMainService.findById(new FacMainId(iCustNo, iFacmNo), titaVo);
-			if (tOldFacMain != null) {
-				renewCnt = tOldFacMain.getRenewCnt() + 1;
-				oldFacmNo = iFacmNo;
-			}
-			tNewFacMain = facMainService.holdById(new FacMainId(iCustNo, iNewFacmNo), titaVo);
-			if (tNewFacMain != null) {
-				tNewFacMain.setRenewCnt(renewCnt);
-				tNewFacMain.setOldFacmNo(oldFacmNo);
-				try {
-					facMainService.update(tNewFacMain, titaVo);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0007", "額度主檔 " + e.getErrorMsg()); // 更新資料時，發生錯誤
-				}
-
-			}
-		} else {
-//			復原
-			tNewFacMain = facMainService.holdById(new FacMainId(iCustNo, iNewFacmNo), titaVo);
-			if (tNewFacMain != null) {
-				tNewFacMain.setRenewCnt(0);
-				tNewFacMain.setOldFacmNo(0);
-				try {
-					facMainService.update(tNewFacMain, titaVo);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0007", "額度主檔 " + e.getErrorMsg()); // 更新資料時，發生錯誤
-				}
-
-			}
-		}
-	}
 }

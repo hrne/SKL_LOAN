@@ -143,6 +143,7 @@ public class L3440 extends TradeBuffer {
 	private int wkIntEndDate = 0;
 	private int wkRepaidPeriod = 0;
 	private int wkPaidTerms = 0;
+	private BigDecimal wkIntStartRate = BigDecimal.ZERO; // 計息起日利率
 	private BigDecimal wkLoanBal = BigDecimal.ZERO;
 	private BigDecimal wkBeforeLoanBal = BigDecimal.ZERO;
 	private BigDecimal wkPrincipal = BigDecimal.ZERO;
@@ -655,6 +656,7 @@ public class L3440 extends TradeBuffer {
 
 		for (CalcRepayIntVo c : lCalcRepayIntVo) {
 			wkIntSeq++;
+			wkIntStartRate = c.getStartDate() < wkIntStartDate ? c.getStoreRate() : wkIntStartRate; // 計息起日利率
 			wkIntStartDate = c.getStartDate() < wkIntStartDate ? c.getStartDate() : wkIntStartDate;
 			wkIntEndDate = c.getEndDate() > wkIntEndDate ? c.getEndDate() : wkIntEndDate;
 			wkLoanBal = wkLoanBal.subtract(c.getPrincipal());
@@ -717,7 +719,7 @@ public class L3440 extends TradeBuffer {
 		tLoanBorTx.setEntryDate(iEntryDate);
 		tLoanBorTx.setDueDate(wkDueDate);
 		tLoanBorTx.setLoanBal(tLoanBorMain.getLoanBal());
-		tLoanBorTx.setRate(tLoanBorMain.getStoreRate());
+		tLoanBorTx.setRate(wkIntStartRate);
 		tLoanBorTx.setIntStartDate(wkIntStartDate);
 		tLoanBorTx.setIntEndDate(wkIntEndDate);
 		tLoanBorTx.setPaidTerms(wkPaidTerms);
@@ -755,7 +757,7 @@ public class L3440 extends TradeBuffer {
 		tTempVo.putParam("PaidTerms", wkPaidTerms);
 		tTempVo.putParam("PaidTerms", wkPaidTerms);
 		tTempVo.putParam("OvDuRepaid", od.getOvduAmt().subtract(parse.stringToBigDecimal(tTempVo.get("OvduBal"))));// 催收還款金額
-		
+
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 
 		this.lLoanBorTx.add(tLoanBorTx);
@@ -800,7 +802,6 @@ public class L3440 extends TradeBuffer {
 		this.info("wkShortfallInterest=" + wkShortfallInterest + ", wkShortfallPrincipal=" + wkShortfallPrincipal
 				+ ", wkShortCloseBreach=" + wkShortCloseBreach);
 	}
-
 
 	// 更新催收呆帳檔
 	private void UpdLoanOvduRoutine() throws LogicException {

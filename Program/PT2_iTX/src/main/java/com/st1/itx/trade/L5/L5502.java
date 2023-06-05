@@ -67,14 +67,14 @@ public class L5502 extends TradeBuffer {
 
 	private void updateAdj(TitaVo titaVo) throws LogicException {
 		PfBsDetail pfBsDetail2 = (PfBsDetail) dataLog.clone(pfBsDetail);
-		if (pfBsDetail.getRepayType() == 0 && pfBsDetail.getLastUpdate().equals(pfBsDetail.getCreateDate())) {
-			pfBsDetail.setAdjPerfAmt(pfBsDetail.getPerfAmt());
-			pfBsDetail.setAdjPerfCnt(pfBsDetail.getPerfCnt());
-		}
-		BigDecimal iAdjPerfAmt = new BigDecimal(titaVo.getParam("PerfAmt").trim());
-		BigDecimal iAdjPerfCnt = new BigDecimal(titaVo.getParam("PerfCnt").trim());
-		pfBsDetail.setAdjPerfAmt(iAdjPerfAmt);
-		pfBsDetail.setAdjPerfCnt(iAdjPerfCnt);
+		BigDecimal orgAdjPerfAmt = pfBsDetail.getPerfAmt().add(pfBsDetail.getAdjPerfAmt());
+		BigDecimal orgAdjPerfCnt = pfBsDetail.getPerfCnt().add(pfBsDetail.getAdjPerfCnt());
+		BigDecimal iPerfAmt = new BigDecimal(titaVo.getParam("PerfAmt").trim());
+		BigDecimal iPerfCnt = new BigDecimal(titaVo.getParam("PerfCnt").trim());
+		pfBsDetail.setPerfAmt(iPerfAmt);
+		pfBsDetail.setPerfCnt(iPerfCnt);
+		pfBsDetail.setAdjPerfAmt(orgAdjPerfAmt.subtract(iPerfAmt));
+		pfBsDetail.setAdjPerfCnt(orgAdjPerfCnt.subtract(iPerfCnt));
 		try {
 			pfBsDetail = pfBsDetailService.update2(pfBsDetail, titaVo);
 			dataLog.setEnv(titaVo, pfBsDetail2, pfBsDetail);
@@ -87,16 +87,18 @@ public class L5502 extends TradeBuffer {
 
 	private void deleteAdj(TitaVo titaVo) throws LogicException {
 		PfBsDetail pfBsDetail2 = (PfBsDetail) dataLog.clone(pfBsDetail);
-		if (pfBsDetail.getRepayType() == 0) {
-			pfBsDetail.setPerfAmt(pfBsDetail.getAdjPerfAmt());
-			pfBsDetail.setPerfCnt(pfBsDetail.getAdjPerfCnt());
-			try {
-				pfBsDetail = pfBsDetailService.update2(pfBsDetail, titaVo);
-				dataLog.setEnv(titaVo, pfBsDetail2, pfBsDetail);
-				dataLog.exec("刪除房貸專員業績調整金額、件數");
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0008", e.getErrorMsg());
-			}
+		BigDecimal orgAdjPerfAmt = pfBsDetail.getPerfAmt().add(pfBsDetail.getAdjPerfAmt());
+		BigDecimal orgAdjPerfCnt = pfBsDetail.getPerfCnt().add(pfBsDetail.getAdjPerfCnt());
+		pfBsDetail.setAdjPerfAmt(orgAdjPerfAmt);
+		pfBsDetail.setAdjPerfCnt(orgAdjPerfCnt);
+		pfBsDetail.setAdjPerfAmt(BigDecimal.ZERO);
+		pfBsDetail.setAdjPerfCnt(BigDecimal.ZERO);
+		try {
+			pfBsDetail = pfBsDetailService.update2(pfBsDetail, titaVo);
+			dataLog.setEnv(titaVo, pfBsDetail2, pfBsDetail);
+			dataLog.exec("刪除房貸專員業績調整金額、件數");
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0008", e.getErrorMsg());
 		}
 	}
 }

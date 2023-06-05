@@ -103,7 +103,7 @@ public class LY002ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "		  ,L.\"MaturityDate\" AS F9";
 			sql += "		  ,M.\"StoreRate\" / 100 AS F10";
 			sql += "		  ,M.\"LoanBalance\" AS F11";
-			sql += "		  ,acInt.\"Interest\" AS F12";
+			sql += "		  ,NVL(acInt.\"Interest\",0) AS F12";
 			sql += "		  ,'1' AS F13";
 			sql += "		  ,NVL(CM.\"EvaAmt\",0) AS F14";
 			sql += "		  ,NVL(F.\"LineAmt\",0) AS F15";
@@ -258,7 +258,7 @@ public class LY002ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "			  WHEN M.\"ClCode1\" IN (1,2) THEN 'C'";
 			sql += "			ELSE '99' END ) AS \"ClNo\"";
 			sql += "		  ,SUM(M.\"LoanBalance\") AS \"LoanBalance\"";
-			sql += "		  ,SUM(acInt.\"Interest\") AS \"IntAmtAcc\"";
+			sql += "		  ,SUM(NVL(acInt.\"Interest\",0)) AS \"IntAmtAcc\"";
 			sql += "		  ,SUM(NVL(F.\"LineAmt\",0)) AS \"LineAmt\"";
 			sql += "	FROM \"MonthlyLoanBal\" M";
 			sql += "	LEFT JOIN (SELECT \"CustNo\"        "; 

@@ -80,9 +80,8 @@ public class L5052ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "F2.\"Fullname\" AS \"IntroducerName\",";
 		sql += "A.\"AdjPerfCnt\",";
 		sql += "A.\"AdjPerfAmt\", ";
-		sql += "CASE WHEN A.\"LastUpdate\" =  A.\"CreateDate\" THEN 0 ";		
-		sql += "     WHEN A.\"AdjPerfCnt\" <> A.\"PerfCnt\" THEN 1 ";		
-		sql += "     WHEN A.\"AdjPerfAmt\" <> A.\"PerfAmt\" THEN 1 ";		
+		sql += "CASE WHEN A.\"AdjPerfCnt\" <> 0 THEN 1 ";		
+		sql += "     WHEN A.\"AdjPerfAmt\" <> 0 THEN 1 ";		
 		sql += "     ELSE 0 END AS \"AdjFg\", ";				
 		sql += "A.\"LastUpdate\", ";
 		sql += "A.\"LastUpdateEmpNo\", ";

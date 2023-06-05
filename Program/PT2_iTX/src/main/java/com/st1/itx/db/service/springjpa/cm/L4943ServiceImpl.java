@@ -233,6 +233,7 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "        and BDD.\"RepayAmt\" >= :singleLimitAmt" + " )      ";
 			break;
 		case 3: // 下限金額-短繳金額
+			sql += "   and nvl(shortLimit.\"RvBal\",0) = BDD.\"UnpaidAmt\" ";
 			sql += "   and nvl(shortLimit.\"RvBal\",0) between 1 and :lowLimitAmt";
 			sql += "   and BDD.\"AcDate\" = 0                     ";
 			sql += "   and BDD.\"RepayType\" = 1                  ";

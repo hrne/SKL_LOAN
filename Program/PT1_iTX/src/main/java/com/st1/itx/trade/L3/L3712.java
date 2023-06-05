@@ -14,6 +14,8 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.AcDetail;
+import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.LoanBorMain;
@@ -29,6 +31,8 @@ import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.LoanIntDetailService;
 import com.st1.itx.db.service.TxTempService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.AcDetailCom;
+import com.st1.itx.util.common.AcReceivableCom;
 import com.st1.itx.util.common.AcRepayCom;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.LoanCalcRepayIntCom;
@@ -39,6 +43,7 @@ import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.common.data.CalcRepayIntVo;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
 /*
@@ -96,7 +101,7 @@ public class L3712 extends TradeBuffer {
 	LoanCalcRepayIntCom loanCalcRepayIntCom;
 	@Autowired
 	AcRepayCom acRepayCom;
-	
+
 	private TitaVo titaVo;
 	private int iCustNo;
 	private int iFacmNo;
@@ -118,6 +123,7 @@ public class L3712 extends TradeBuffer {
 	private int wkOldPrevRepaidDate;
 
 	private int wkNewSpecificDate;
+	private BigDecimal wkIntStartRate = BigDecimal.ZERO; // 計息起日利率
 	private BigDecimal wkInterest;
 	private BigDecimal wkUnpaidInt;
 	private BigDecimal wkLoanBal;
@@ -169,7 +175,7 @@ public class L3712 extends TradeBuffer {
 		// 帳務處理
 		acRepayCom.setTxBuffer(this.txBuffer);
 		acRepayCom.settleLoanRun(this.lLoanBorTx, this.baTxList, titaVo);
-		
+
 		// end
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -269,7 +275,6 @@ public class L3712 extends TradeBuffer {
 			throw new LogicException(titaVo, "E3076", ""); // 查無可變更應繳日的資料
 		}
 	}
-
 
 	// 訂正
 	private void SpecificEraseRoutine() throws LogicException {
@@ -425,6 +430,7 @@ public class L3712 extends TradeBuffer {
 
 		for (CalcRepayIntVo c : lCalcRepayIntVo) {
 			wkIntSeq++;
+			wkIntStartRate = c.getStartDate() < wkIntStartDate ? c.getStoreRate() : wkIntStartRate; // 計息起日利率
 			wkIntStartDate = c.getStartDate() < wkIntStartDate ? c.getStartDate() : wkIntStartDate;
 			wkIntEndDate = c.getEndDate() > wkIntEndDate ? c.getEndDate() : wkIntEndDate;
 			wkLoanBal = wkLoanBal.subtract(c.getPrincipal());
@@ -485,7 +491,7 @@ public class L3712 extends TradeBuffer {
 		tLoanBorTx.setEntryDate(wkTbsDy);
 		tLoanBorTx.setAcctCode(tFacMain.getAcctCode());
 		tLoanBorTx.setLoanBal(wkLoanBal);
-		tLoanBorTx.setRate(tLoanBorMain.getStoreRate());
+		tLoanBorTx.setRate(wkIntStartRate);
 		tLoanBorTx.setIntStartDate(wkIntStartDate);
 		tLoanBorTx.setIntEndDate(wkIntEndDate);
 		tLoanBorTx.setInterest(wkInterest);
@@ -500,7 +506,7 @@ public class L3712 extends TradeBuffer {
 		tTempVo.putParam("OldSpecificDd", wkOldSpecificDd); // 原指定應繳日
 		tTempVo.putParam("NewSpecificDd", tLoanBorMain.getSpecificDd()); // 新指定應繳日
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
-		this.lLoanBorTx.add(tLoanBorTx); 
+		this.lLoanBorTx.add(tLoanBorTx);
 	}
 
 	// 還原撥款主檔

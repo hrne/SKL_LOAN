@@ -68,7 +68,7 @@ public class L6971p extends TradeBuffer {
 		List<Map<String, String>> l6971Query = null;
 
 		workType = WorkType.getWorkTypeByHelp(titaVo.getParam("InputType"));
-		
+
 		try {
 			l6971Query = l6971ServiceImpl.findAll(workType, 0, Integer.MAX_VALUE, titaVo);
 		} catch (Exception e) {
@@ -86,11 +86,22 @@ public class L6971p extends TradeBuffer {
 				int bormNo = parse.stringToInteger(l6971Vo.get("BormNo"));
 				doExecution5YTX(execDate, batchNo, custNo, facmNo, bormNo, titaVo);
 				count++;
-				this.info("L6971 commit");
+				this.info("L6971 doExecution5YTX commit");
+				this.batchTransaction.commit();
+				setIsDeletedToTrue("5YTX", "LoanBorTx", execDate, batchNo, custNo, facmNo, bormNo, titaVo);
+			}
+			for (Map<String, String> l6971Vo : l6971Query) {
+				int execDate = parse.stringToInteger(l6971Vo.get("ExecuteDate"));
+				int batchNo = parse.stringToInteger(l6971Vo.get("BatchNo"));
+				int custNo = parse.stringToInteger(l6971Vo.get("CustNo"));
+				int facmNo = parse.stringToInteger(l6971Vo.get("FacmNo"));
+				int bormNo = parse.stringToInteger(l6971Vo.get("BormNo"));
+				setIsDeletedToTrue("5YTX", "LoanBorTx", execDate, batchNo, custNo, facmNo, bormNo, titaVo);
+				this.info("L6971 setIsDeletedToTrue commit");
 				this.batchTransaction.commit();
 			}
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", titaVo.getTlrNo(),
-					"L6971 整批刪除，共"+count+"筆，已完成", titaVo);
+					"L6971 整批刪除，共" + count + "筆，已完成", titaVo);
 		} else {
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", titaVo.getTlrNo(),
 					"L6971 整批刪除，查無資料", titaVo);
@@ -108,8 +119,7 @@ public class L6971p extends TradeBuffer {
 		this.info("BormNo: " + bormNo);
 
 		if (isHistoryAndOnlineSameCount5YTX(custNo, facmNo, bormNo, titaVo)) {
-			int deletedRecords = doDelete5YTX(custNo, facmNo, bormNo, titaVo);
-			setIsDeletedToTrue(deletedRecords, "5YTX", "LoanBorTx", execDate, batchNo, custNo, facmNo, bormNo, titaVo);
+			doDelete5YTX(custNo, facmNo, bormNo, titaVo);
 		} else {
 			this.error("DATA has different count in ONLINE and HISTORY!");
 			throw new LogicException("E0008", "此 PK 在歷史環境與連線環境資料筆數不同");
@@ -117,7 +127,7 @@ public class L6971p extends TradeBuffer {
 		}
 	}
 
-	private int doDelete5YTX(int custNo, int facmNo, int bormNo, TitaVo titaVo) throws LogicException {
+	private void doDelete5YTX(int custNo, int facmNo, int bormNo, TitaVo titaVo) throws LogicException {
 
 		//
 		// 刪除確認可刪除的明細 for 5YTX
@@ -129,7 +139,6 @@ public class L6971p extends TradeBuffer {
 
 		try {
 			loanBorTxService.deleteAll(lLoanBorTx, titaVo);
-			return lLoanBorTx.size();
 		} catch (Exception e) {
 			this.error("L6971.doDelete5YTX failed to delete.");
 			StringWriter errors = new StringWriter();
@@ -160,8 +169,8 @@ public class L6971p extends TradeBuffer {
 		return sLoanBorTxOnline.getNumberOfElements() == sLoanBorTxHistory.getNumberOfElements();
 	}
 
-	private void setIsDeletedToTrue(int deletedRecords, String type, String tableName, int execDate, int batchNo,
-			int custNo, int facmNo, int bormNo, TitaVo titaVo) throws LogicException {
+	private void setIsDeletedToTrue(String type, String tableName, int execDate, int batchNo, int custNo, int facmNo,
+			int bormNo, TitaVo titaVo) throws LogicException {
 
 		//
 		// 完成刪除後，在 TxArchiveTableLog 將對應的資料 IsDeleted 設為 1
@@ -175,12 +184,6 @@ public class L6971p extends TradeBuffer {
 					custNo, facmNo, bormNo, 0, 0, Integer.MAX_VALUE, titaVo);
 			if (recordList != null && !recordList.isEmpty()) {
 				for (TxArchiveTableLog record : recordList) {
-					// deletedRecords 和 TxArchiveTableLog.Records 不符時 rollback
-					if (record.getRecords() != deletedRecords) {
-						this.error(
-								"L6971.setIsDeletedToTrue: different count between deleted records and TxArchiveTableLog.Records! rollback");
-						throw new LogicException("E0007", "實際刪除資料數與 TxArchiveTableLog 紀錄的數量不符");
-					}
 					record.setIsDeleted(1);
 					record.setDescription("此次封存明細已從連線環境刪除");
 					record.setLastUpdate(new Timestamp(System.currentTimeMillis()));

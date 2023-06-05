@@ -130,23 +130,11 @@ public class L4102 extends TradeBuffer {
 
 		int unReleaseCnt = 0;
 		for (BankRemit t : slBankRemit.getContent()) {
-			boolean isFind = false;
-			// 作業項目為1.撥款時把退款篩選掉
-			if (iItemCode == 1 && (t.getDrawdownCode() == 1 || t.getDrawdownCode() == 2 || t.getDrawdownCode() == 3)) {
-				isFind = true;
-			}
-
-			// 作業項目為2.退款時把撥款篩選掉
-			if (iItemCode == 2 && t.getDrawdownCode() == 5) {
-				isFind = true;
-			}
-			if (isFind) {
-				if (t.getActFg() == 1) {
-					unReleaseCnt++;
-					unReleaselBankRemit.add(t);
-				} else {
-					lBankRemit.add(t);
-				}
+			if (t.getActFg() == 1) {
+				unReleaseCnt++;
+				unReleaselBankRemit.add(t);
+			} else {
+				lBankRemit.add(t);
 			}
 		}
 
@@ -173,7 +161,7 @@ public class L4102 extends TradeBuffer {
 
 			this.totaVo.setWarnMsg("背景作業中,待處理完畢訊息通知");
 		} else {
-			String checkMsg = "撥款匯款無已放行資料。   批號 = " + batchNo;
+			String checkMsg = "撥款無已放行資料。   批號 = " + batchNo;
 
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4102",
 					"" + acDate + iItemCode + batchNo, checkMsg, titaVo);

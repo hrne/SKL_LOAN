@@ -94,7 +94,6 @@ public class L4102Batch extends TradeBuffer {
 	private String outFolder = "";
 
 	int acDate = 0;
-	String batchNo = "";
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -102,9 +101,8 @@ public class L4102Batch extends TradeBuffer {
 
 		acDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 		int iItemCode = parse.stringToInteger(titaVo.getParam("ItemCode")); // 1.撥款 2.退款
-		batchNo = this.getBatchNo(iItemCode, titaVo);
 		String wkbatchNo = titaVo.getBacthNo();
-		this.info("L4102 Batch batchNo = " + batchNo);
+		this.info("L4102 Batch batchNo = " + wkbatchNo);
 
 		totaVo.put("PdfSnoM", "");
 		totaVo.put("PdfSnoF", "");
@@ -114,9 +112,10 @@ public class L4102Batch extends TradeBuffer {
 //		傳票明細表
 		doRptC(titaVo);
 
-		String checkMsg = "撥款匯款產檔已完成。   批號 = " + wkbatchNo;
+		String checkMsg = "報表已製作完成。   批號 = " + wkbatchNo;
 
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L4102", checkMsg, titaVo);
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+				titaVo.getTlrNo() + "L4102", checkMsg, titaVo);
 
 		return this.sendList();
 	}

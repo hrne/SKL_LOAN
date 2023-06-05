@@ -96,19 +96,22 @@ public class L5903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " left join \"CdEmp\" e2 on e2.\"EmployeeNo\" = i.\"ApplEmpNo\"  ";
 		sql += " left join \"CdEmp\" e3 on e3.\"EmployeeNo\" = i.\"ReturnEmpNo\"  ";
 
-		if ("01".equals(iApplCode)) {
-			sql += " left join (                                              ";
-			sql += "     select                                               ";
-			sql += "      \"CustNo\"                                          ";
-			sql += "     ,\"FacmNo\"                                          ";
-			sql += "     ,\"ApplDate\"                                        ";
-			sql += "     ,\"ApplSeq\"                                         ";
-			sql += "     from \"InnDocRecord\"                                ";
-			sql += "     where \"ApplCode\" = 2                               ";
-			sql += " ) i2  on i2.\"CustNo\"  = i.\"CustNo\"                   ";
-			sql += "      and i2.\"FacmNo\"  = i.\"FacmNo\"                   ";
-			sql += "      and i2.\"ApplSeq\" = i.\"ApplSeq\"                  ";
-		}
+//		if ("01".equals(iApplCode)) {
+//			sql += " left join (                                              ";
+//			sql += "     select                                               ";
+//			sql += "      \"CustNo\"                                          ";
+//			sql += "     ,\"FacmNo\"                                          ";
+//			sql += "     ,\"ApplDate\"                                        ";
+//			sql += "     ,\"ApplSeq\"                                         ";
+//			sql += "     from \"InnDocRecord\"                                ";
+//			sql += "     where                                                ";
+//			sql += "           case when \"ApplCode\" = '2'  then 1           "; //已歸還
+//			sql += "                when \"CopyCode\" = '2'  then 1           "; //影本不需歸還
+//			sql += "           else 0 end = 1                                 ";
+//			sql += " ) i2  on i2.\"CustNo\"  = i.\"CustNo\"                   ";
+//			sql += "      and i2.\"FacmNo\"  = i.\"FacmNo\"                   ";
+//			sql += "      and i2.\"ApplSeq\" = i.\"ApplSeq\"                  ";
+//		}
 
 		sql += " where i.\"ApplDate\" >= " + iApplDateFrom;
 		sql += "   and i.\"ApplDate\" <= " + iApplDateTo;
@@ -122,10 +125,18 @@ public class L5903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		if (!"09".equals(iApplCode)) {
-			sql += "   and i.\"ApplCode\" = " + iApplCode;
-			if ("01".equals(iApplCode)) {
-				sql += " and NVL(i2.\"CustNo\",0) = 0                             ";
+			if ("01".equals(iApplCode)) {//01:未還
+				sql += "   and case when i.\"ApplCode\" = '2' then 0"  ;//已歸還
+				sql += "            when i.\"CopyCode\" = '2' then 0"  ;//影本
+				sql += "       else 1 end = 1"  ;
+				//				sql += " and NVL(i2.\"CustNo\",0) = 0                             ";
 			}
+			if ("02".equals(iApplCode)) {//01:已還
+				sql += "   and case when i.\"ApplCode\" = '2' then 1"  ;
+				sql += "            when i.\"CopyCode\" = '2' then 1"  ;
+				sql += "       else 0 end = 1"  ;
+			}
+
 		}
 
 		sql += "order by i.\"CustNo\",i.\"FacmNo\" ,i.\"ApplSeq\"";

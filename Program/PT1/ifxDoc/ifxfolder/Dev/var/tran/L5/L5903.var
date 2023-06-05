@@ -67,12 +67,19 @@ T(3,*)
 T(3,CdCode.UsageCodeX)
 #UsageCodeHelp=x,1024,S
 
+!正本/影本
+#CopyCodeRimName=x,20,S
+T(3,CdCode.CopyCode)
+#CopyCodeHelp=x,1024,S
+
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#UsageCodeXRimName)
+S(XXR99,01,#UsageCodeXRimName,#CopyCodeRimName)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@UsageCodeHelp,00:全部;+#HelpDesc1)
+T(2,@CopyCodeHelp,#HelpDesc2)
 
 !狀態
 #ApplHelp=X,50,S
@@ -193,12 +200,14 @@ C(3,#OOReturnDate,0,S,E(0,#OOReturnDate))
 #OOReturnEmpName=x,20,O
 ! 用途
 #OOUsageCode=X,2,O
-#OOUsageCodeX=X,4,O
+#OOUsageCodeX=X,10,O
 T(2,)
 T(H,#OOUsageCode,#UsageCodeHelp)
 
 ! 正本/影本
 #OOCopyCode=A,1,O
+#OOCopyCodeX=X,10,O
+T(H,#OOCopyCode,#CopyCodeHelp)
 
 ! 備註
 #OORemark=X,100,O
@@ -230,7 +239,7 @@ T(2,#OOCustNo+#OOFacmNo+#OOApplSeq+#OOCustName+#OOKeeperEmpNo
    +#OOUsageCode+#OORemark+2+#OOCopyCode+#OOApplObj+#OOFacmNoMemo+#OOApplEmpName)
 
 #OOBTN_RETURN=A,2,O
-IF(#OOReturnDate>0,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L5103; ntxbuf=#OOBUF_RETURN}))
+IF(#OOReturnDate>0 || #OOCopyCode ==2,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L5103; ntxbuf=#OOBUF_RETURN}))
 
 #LC014Mrkey=x,100,S
 T(2,#OOCustNo+-+#OOFacmNo+-+#OOApplSeq)
@@ -339,9 +348,12 @@ TXFORM=L5903
 ! 歸還人
 #OReturnEmpNoX=歸還人
 {width:120,align:'left'}
+! 正本/影本
+#OOCopyCodeX=正本/影本
+{width:85,align:'center'}
 ! 用途
 #OOUsageCodeX=用途
-{width:65,align:'center'}
+{width:75,align:'center'}
 ! 備註
 #OORemark=備註
 {width:200,align:'left'}
