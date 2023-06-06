@@ -176,8 +176,11 @@ public class LQ007Report extends MakeReport {
 					String prodNo = "";
 					BigDecimal balSum = BigDecimal.ZERO;
 					BigDecimal intSum = BigDecimal.ZERO;
-					int tmpYear = visibleMonth % 100;
-					int tmpMonth = visibleMonth / 100;
+					int tmpYear = visibleMonth / 100;
+					int tmpMonth = visibleMonth % 100;
+					this.info("endY = " + endY);
+					this.info("tmpYear = " + tmpYear);
+					this.info("tmpMonth = " + tmpMonth);
 
 					// 小於當年度年份 且 不是12月份(369月份) 跳過
 					if (endY > tmpYear && tmpMonth != 12) {

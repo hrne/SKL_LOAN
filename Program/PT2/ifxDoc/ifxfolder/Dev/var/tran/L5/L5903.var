@@ -144,7 +144,7 @@ HELP(#UsageCodeHelp)
 @T(3,@UsageCodeX,)
 V(H,#UsageCodeHelp)
 
-#UsageCodeX=X,4,L
+#UsageCodeX=X,16,L
 T(H,#UsageCode,#UsageCodeHelp)
 
 ! 狀態

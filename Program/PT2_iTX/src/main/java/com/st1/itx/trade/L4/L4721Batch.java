@@ -90,7 +90,6 @@ public class L4721Batch extends TradeBuffer {
 	int CntEmail = 0;
 	int CntMsg = 0;
 	int commitCnt = 50;
-	String noticeEmail = "";
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -181,7 +180,10 @@ public class L4721Batch extends TradeBuffer {
 								}
 
 								if (this.sno > 0) {
-									setMailMFileVO(data, this.noticeEmail, titaVo);
+
+									String noticeEmail = tempVo.getParam("EmailAddress");
+
+									setMailMFileVO(data, noticeEmail, titaVo);
 								}
 
 								// 書面通知
@@ -193,7 +195,7 @@ public class L4721Batch extends TradeBuffer {
 
 								// 簡訊通知
 							} else if ("Y".equals(tempVo.getParam("isMessage"))) {
-								dealMessageData(titaVo, data);
+								setTextFileVO(titaVo, data);
 							}
 
 						} catch (LogicException e) {
@@ -257,9 +259,9 @@ public class L4721Batch extends TradeBuffer {
 	}
 
 	/**
-	 * 簡訊通知 資料處理
+	 * 簡訊通知
 	 */
-	private void dealMessageData(TitaVo titaVo, Map<String, String> iData) throws LogicException {
+	private void setTextFileVO(TitaVo titaVo, Map<String, String> iData) throws LogicException {
 
 		int iCustNo = parse.stringToInteger(iData.get("CustNo"));
 		int iFacmNo = parse.stringToInteger(iData.get("FacmNo"));
@@ -307,44 +309,35 @@ public class L4721Batch extends TradeBuffer {
 		tempVo = custNoticeCom.getCustNotice("L4721", iCustNo, 0, titaVo);
 
 		String noticePhoneNo = tempVo.getParam("MessagePhoneNo");
-		this.noticeEmail = tempVo.getParam("EmailAddress");
 
 		this.info("isMessageCust : " + iCustNo);
 		this.info("isMessageLastCust : " + custNoLast);
 		this.info("lTmpCustFacm : " + lTmpCustFacm.toString());
 		for (Map<String, String> t : lTmpCustFacm) {
 			CntMsg = CntMsg + 1;
-			setTextFileVO(t, noticePhoneNo, titaVo);
+
+			// 設定簡訊
+			txToDoCom.setTxBuffer(this.getTxBuffer());
+
+			TxToDoDetail tTxToDoDetail = new TxToDoDetail();
+			tTxToDoDetail.setCustNo(parse.stringToInteger(t.get("CustNo")));
+			tTxToDoDetail.setFacmNo(parse.stringToInteger(t.get("FacmNo")));
+			tTxToDoDetail.setBormNo(0);
+			tTxToDoDetail.setExcuteTxcd("L4721");
+			tTxToDoDetail.setDtlValue("<利率調整通知>");
+			tTxToDoDetail.setItemCode("TEXT00");
+			tTxToDoDetail.setStatus(0);
+			tTxToDoDetail.setProcessNote(txToDoCom.getProcessNoteForText(noticePhoneNo,
+					"親愛的客戶您好，新光人壽通知您，房貸額度 " + t.get("FacmNo") + " 自" + t.get("rateChangeDate") + "起利率由"
+							+ t.get("originRate") + " 調整為" + t.get("newRate") + "，敬請留意帳戶餘額以利扣款。",
+					this.getTxBuffer().getMgBizDate().getTbsDy()));
+
+			txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo);
+
 		}
 
 		custNoLast = iCustNo;
 		facmNoLast = iFacmNo;
-
-//		return isNotice;
-	}
-
-	/**
-	 * 設定簡訊訊息
-	 */
-	private void setTextFileVO(Map<String, String> tmpCustFacm, String noticePhoneNo, TitaVo titaVo)
-			throws LogicException {
-
-		txToDoCom.setTxBuffer(this.getTxBuffer());
-
-		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
-		tTxToDoDetail.setCustNo(parse.stringToInteger(tmpCustFacm.get("CustNo")));
-		tTxToDoDetail.setFacmNo(parse.stringToInteger(tmpCustFacm.get("FacmNo")));
-		tTxToDoDetail.setBormNo(0);
-		tTxToDoDetail.setExcuteTxcd("L4721");
-		tTxToDoDetail.setDtlValue("<利率調整通知>");
-		tTxToDoDetail.setItemCode("TEXT00");
-		tTxToDoDetail.setStatus(0);
-		tTxToDoDetail.setProcessNote(txToDoCom.getProcessNoteForText(noticePhoneNo,
-				"親愛的客戶您好，新光人壽通知您，房貸額度 " + tmpCustFacm.get("FacmNo") + " 自" + tmpCustFacm.get("rateChangeDate") + "起利率由"
-						+ tmpCustFacm.get("originRate") + " 調整為" + tmpCustFacm.get("newRate") + "，敬請留意帳戶餘額以利扣款。",
-				this.getTxBuffer().getMgBizDate().getTbsDy()));
-
-		txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo);
 
 	}
 
