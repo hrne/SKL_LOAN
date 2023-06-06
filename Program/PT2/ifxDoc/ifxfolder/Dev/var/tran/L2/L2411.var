@@ -1317,7 +1317,8 @@ V(9)
 ! [土地座落]
 #LandLocation=x,150,L
 IF(#FunCd==4,s,T(B,#CityItemB+#AreaItemB+#IrItemB))
-T(B,#LandLocation+，+地號+#LandNo1+-+#LandNo2)
+T(B,#LandLocation)
+! T(B,#LandLocation+，+地號+#LandNo1+-+#LandNo2)
 
 
 !-------------

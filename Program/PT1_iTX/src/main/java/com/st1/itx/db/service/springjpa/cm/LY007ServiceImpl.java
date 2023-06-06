@@ -79,6 +79,7 @@ public class LY007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                    ,\"BusTitle\" ";
 		sql += "              FROM \"LifeRelHead\" ";
 		sql += "              WHERE \"LoanBalance\" > 0 ";
+		sql += "                AND TRUNC(\"AcDate\" / 100 ) = :inputYearMonth ";
 		sql += "              UNION ";
 		sql += "              SELECT \"EmpName\" AS \"CustName\" ";
 		sql += "                    ,to_char(\"EmpId\") AS \"RptId\" ";
@@ -89,6 +90,7 @@ public class LY007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                    ,NULL AS \"RelTitle\" ";
 		sql += "                    ,NULL AS \"BusTitle\" ";
 		sql += "              FROM \"LifeRelEmp\" ";
+		sql += "              WHERE TRUNC(\"AcDate\" / 100 ) = :inputYearMonth ";
 		sql += "              ) s1 ON s1.\"RptId\" = cm.\"CustId\" ";
 		sql += "          LEFT JOIN \"ClBuilding\" s3 ON s3.\"ClCode1\" = s0.\"ClCode1\" ";
 		sql += "                                     AND s3.\"ClCode2\" = s0.\"ClCode2\" ";

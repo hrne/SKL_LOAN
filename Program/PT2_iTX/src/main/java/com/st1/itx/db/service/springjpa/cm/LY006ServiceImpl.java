@@ -34,17 +34,17 @@ public class LY006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " \"HeadId\", ";
 		sql += " \"HeadName\", ";
 		sql += " CASE ";
-		sql += " WHEN \"HeadTitle\"='董事長' THEN 'A' ";
-		sql += " WHEN \"HeadTitle\"='副董事長' THEN 'B' ";
-		sql += " WHEN \"HeadTitle\" LIKE'%董事' THEN 'C' ";
-		sql += " WHEN \"HeadTitle\"='監事' THEN 'D' ";
-		sql += " WHEN \"HeadTitle\"='總經理' THEN 'E' ";
-		sql += " WHEN \"HeadTitle\"='副總經理' THEN 'F' ";
-		sql += " WHEN \"HeadTitle\" LIKE '%協理' THEN 'G' ";
-		sql += " WHEN \"HeadTitle\"='經理' THEN 'H' ";
-		sql += " WHEN \"HeadTitle\"='副理' THEN 'I' ";
-		sql += " WHEN \"HeadTitle\" is NULL THEN ' ' ";
-		sql += " ELSE 'J' ";
+		sql += "   WHEN \"HeadTitle\"='董事長' THEN 'A' ";
+		sql += "   WHEN \"HeadTitle\"='副董事長' THEN 'B' ";
+		sql += "   WHEN \"HeadTitle\" LIKE'%董事' THEN 'C' ";
+		sql += "   WHEN \"HeadTitle\"='監事' THEN 'D' ";
+		sql += "   WHEN \"HeadTitle\"='總經理' THEN 'E' ";
+		sql += "   WHEN \"HeadTitle\"='副總經理' THEN 'F' ";
+		sql += "   WHEN \"HeadTitle\" LIKE '%協理' THEN 'G' ";
+		sql += "   WHEN \"HeadTitle\"='經理' THEN 'H' ";
+		sql += "   WHEN \"HeadTitle\"='副理' THEN 'I' ";
+		sql += "   WHEN \"HeadTitle\" is NULL THEN ' ' ";
+		sql += "   ELSE 'J' ";
 		sql += " END AS\"HeadTitle\", ";
 		sql += " \"RelId\", ";
 		sql += " \"RelName\", ";
@@ -69,15 +69,16 @@ public class LY006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " \"LineAmt\", ";
 		sql += " \"LoanBalance\" ";
 		sql += " from \"LifeRelHead\" ";
-		sql += "order by (case ";
-		sql += "when\"RelWithCompany\"='C' then 0\r\n"; 
-		sql += "when \"RelWithCompany\"='D' then 1\r\n" ; 
-		sql += "when \"RelWithCompany\"='F' then 2\r\n" ;
-		sql += "else 6 \r\n" ; 
-		sql += "end\r\n" ; 
-		sql += "),\"RelWithCompany\" asc";
-		sql += ",\"HeadId\" asc";
-		sql += ",\"BusId\" asc";
+		sql += " WHERE TRUNC(\"AcDate\" / 100 ) = :inputYearMonth ";
+		sql += " order by (case ";
+		sql += "			when\"RelWithCompany\"='C' then 0 "; 
+		sql += "			when \"RelWithCompany\"='D' then 1 " ; 
+		sql += "			when \"RelWithCompany\"='F' then 2 " ;
+		sql += "			else 6 " ; 
+		sql += "			end )" ; 
+		sql += " 		,\"RelWithCompany\" asc";
+		sql += "		,\"HeadId\" asc";
+		sql += "		,\"BusId\" asc";
 		
 		
 
@@ -86,7 +87,7 @@ public class LY006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-//		query.setParameter("inputYearMonth", inputYearMonth);
+		query.setParameter("inputYearMonth", inputYearMonth);
 		return this.convertToMap(query);
 	}
 

@@ -223,7 +223,7 @@ public class L4101ReportC extends MakeReport {
 			this.info("tTempVo = " + tTempVo);
 			wkName = tTempVo.getParam("CustName");
 			wkBankCode = tTempVo.getParam("RemitBank");
-			wkBranchCode = tTempVo.getParam("RemitBranch");
+			wkBranchCode = tTempVo.getParam("RemitBranch").isEmpty() ? "    " : tTempVo.getParam("RemitBranch");
 			wkAcctNo = tTempVo.getParam("RemitAcctNo");
 			CustMain c = custMainService.custNoFirst(tAcDetail.getCustNo(), tAcDetail.getCustNo(), titaVo);
 			CdBank t = cdBankService.findById(new CdBankId(wkBankCode, wkBranchCode), titaVo);

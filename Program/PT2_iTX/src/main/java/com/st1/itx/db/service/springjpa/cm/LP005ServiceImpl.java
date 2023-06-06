@@ -83,7 +83,7 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  SELECT PI.\"CustNo\" ";
 		sql += "       , PI.\"FacmNo\" ";
 		sql += "       , PR.\"EmployeeNo\" ";
-		sql += "       , PR.\"PieceCode\"  ";
+		sql += "       , PI.\"PieceCode\"  ";
 		sql += "       , PR.\"ProdCode\"  ";
 		sql += "       , SUM(NVL(PI.\"DrawdownAmt\",0)) AS \"UtilBal\" ";
 		sql += "  FROM ";
@@ -114,7 +114,7 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  GROUP BY PI.\"CustNo\" ";
 		sql += "         , PI.\"FacmNo\" ";
 		sql += "         , PR.\"EmployeeNo\" ";
-		sql += "         , PR.\"PieceCode\"  ";
+		sql += "         , PI.\"PieceCode\"  ";
 		sql += "         , PR.\"ProdCode\"  ";
 		sql += " ) ";
 		sql += " SELECT PR.\"CustNo\"            AS CustNo      "; // -- F0 戶號

@@ -121,7 +121,8 @@ public class L5407 extends TradeBuffer {
 				tPfCoOfficer.setIneffectiveDate(iIneffectiveDate);
 			}
 			tPfCoOfficer.setEmpClass(iEmpClass);
-			updateLog(tPfCoOfficer, titaVo);
+//			updateLog(tPfCoOfficer, titaVo);
+			updateLog(titaVo);
 			try {
 				tPfCoOfficer = pfCoOfficerService.update2(tPfCoOfficer, titaVo);
 			} catch (DBException e) {
@@ -215,7 +216,8 @@ public class L5407 extends TradeBuffer {
 
 //	}
 
-	private void updateLog(PfCoOfficer oPf, TitaVo titaVo) throws LogicException {
+//	private void updateLog(PfCoOfficer oPf, TitaVo titaVo) throws LogicException {
+	private void updateLog(TitaVo titaVo) throws LogicException {
 		this.totaVo.init(titaVo);
 		this.info("updateLog Start");
 

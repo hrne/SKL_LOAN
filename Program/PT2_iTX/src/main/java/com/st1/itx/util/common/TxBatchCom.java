@@ -1689,11 +1689,11 @@ public class TxBatchCom extends TradeBuffer {
 					this.procStsCode = "2"; // 2.人工處理
 					break;
 				}
-				// 無償還本利
+				// 無償還本利，銀扣除外
 				// 處理狀態:2.人工處理
 				// 處理說明:<不足利息>,<不足期款> 999999 期金:999999 未繳費用:999999
 				// 還款應繳日期=0
-				if (this.repayIntDate == 0) {
+				if (this.repayIntDate == 0 && tBatxDetail.getRepayCode() != 2) {
 					if (this.principal.compareTo(BigDecimal.ZERO) > 0) {
 						this.checkMsg += " 不足期款  差額:" + df.format(this.shortAmt);
 					} else {
@@ -2262,7 +2262,7 @@ public class TxBatchCom extends TradeBuffer {
 						this.unPayFee = this.unPayFee.add(baTxVo.getUnPaidAmt());
 						this.repayFee = this.repayFee.add(baTxVo.getAcctAmt());
 					}
-					if (this.unPayLoan.compareTo(BigDecimal.ZERO) > 0 && baTxVo.getRepayType() <= 3) {
+					if (baTxVo.getRepayType() <= 3) {
 						this.unPayLoan = this.unPayLoan.add(baTxVo.getUnPaidAmt());
 						this.repayLoan = this.repayLoan.add(baTxVo.getAcctAmt());
 						this.shortfallInt = this.shortfallInt.add(baTxVo.getInterest()); // 短繳利息

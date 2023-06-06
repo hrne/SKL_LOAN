@@ -55,7 +55,7 @@ public class L5735ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "  ";
 
 		sql += " WITH CF AS ( ";
-		sql += "   SELECT CF.\"CustNo\" AS \"CustNo\" ";
+		sql += "   SELECT DISTINCT CF.\"CustNo\" AS \"CustNo\" ";
 		sql += "        , CF.\"FacmNo\" AS \"FacmNo\" ";
 		sql += "        , ROW_NUMBER() ";
 		sql += "          OVER ( ";

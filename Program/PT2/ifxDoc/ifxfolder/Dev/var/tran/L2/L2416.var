@@ -438,6 +438,7 @@ E(0,@IrCode,#L2r28IrCode)
 E(0,@LandNo1,#L2r28LandNo1)
 E(0,@LandNo2,#L2r28LandNo2)
 T(2,@LandLocation,#L2r28LandLocation)
+T(2,@LandLocationX,#L2r28LandLocation)
 E(0,@LandCode,#L2r28LandCode)
 E(0,@Area,#L2r28Area)
 E(0,@LandZoningCode,#L2r28LandZoningCode)
@@ -611,7 +612,10 @@ IF(#FunCd==4,s,$)
 ! [土地座落]
 #LandLocation=x,100,L
 IF(#FunCd==4,s,T(B,#CityItem+#AreaItem+#IrItem))
-T(B,#LandLocation+，+地號+#LandNo1+-+#LandNo2)
+T(B,#LandLocation)
+#LandLocationX=x,100,L
+IF(#FunCd==4,s,T(B,#CityItem+#AreaItem+#IrItem))
+T(B,#LandLocationX+，+地號+#LandNo1+-+#LandNo2)
 
 #FdLD_1=X,2,L
 
@@ -925,7 +929,7 @@ E(0,1)
                          #AreaCode,#AreaItem,"（鄉／鎮／市／區）</BR>",
                          #IrCode,#IrItem,"（地段）</BR>",
                          "地號",#LandNo1,"－",#LandNo2,"</BR>"],
-[#<->#,"#FdLD_2",#LandLocation],
+[#<->#,"#FdLD_2",#LandLocationX],
 ]
 
 #t2=X,1,S

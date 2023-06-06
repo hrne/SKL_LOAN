@@ -700,7 +700,8 @@ public class AcRepayCom extends TradeBuffer {
 		// 彙總傳票批號
 		if (tx.getRepayCode() >= 1 && tx.getRepayCode() <= 4) {
 			if (titaVo.get("BATCHNO") != null && titaVo.get("BATCHNO").trim().length() == 6
-					&& "BATX".equals(titaVo.get("BATCHNO").substring(0, 4))) {
+					&& "BATX".equals(titaVo.get("BATCHNO").substring(0, 4)) 
+				&& titaVo.getTxtNo().substring(0, 2).equals(titaVo.get("BATCHNO").substring(4, 6))) {
 				tx.setSlipSumNo(parse.stringToInteger(titaVo.get("BATCHNO").substring(4, 6)));
 			}
 		}

@@ -362,7 +362,6 @@ public class L4450Batch extends TradeBuffer {
 				}
 			}
 
-
 			if (checkFlag) {
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4943",
 						"01" + titaVo.getParam("CustNo") + "00000" + titaVo.getParam("EntryDate")
@@ -433,7 +432,7 @@ public class L4450Batch extends TradeBuffer {
 							break;
 						}
 					}
-					// 當期期款已繳但有短繳
+					// 當期期款已繳但有短繳(非預繳)
 					if (tBaTxVo.getDataKind() == 1) {
 						if (baTxCom.getPrevPayIntDate() <= entryDate) {
 							tBaTxVo.setDataKind(2);
@@ -780,7 +779,9 @@ public class L4450Batch extends TradeBuffer {
 			if (!"0".equals(failFlag)) {
 				tTempVo.putParam("Auth", failFlag);
 			} else {
-
+				if (relationCode.get(tmp2) == null || relationCode.get(tmp2).trim().isEmpty()) {
+					tTempVo.putParam("Auth", 1);
+				}
 			}
 //			Deduct 兩個只會發生一個
 //			繳款金額=0(抵繳)

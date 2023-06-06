@@ -206,13 +206,15 @@ public class L4721Batch extends TradeBuffer {
 					} // for
 				} // if
 
+				if (CntPaper > 0) {
+					this.batchTransaction.commit();
+					l4721Report2.setBatchTransaction(this.batchTransaction);
+					l4721Report2.exec(titaVo, this.txBuffer, letterCustList, tmpKindItem[txkind - 1], isAdjDate,
+							ieAdjDate, sEntryDate, eEntryDate);
+
+				}
 			} // if
 
-		
-			if (CntPaper > 0) {
-				l4721Report2.exec(titaVo, this.txBuffer, letterCustList, tmpKindItem[txkind - 1], isAdjDate, ieAdjDate,
-						sEntryDate, eEntryDate);
-			}
 		} // for
 
 		String msg = "";

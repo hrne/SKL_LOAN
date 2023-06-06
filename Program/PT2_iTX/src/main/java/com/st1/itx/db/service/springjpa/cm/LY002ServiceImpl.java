@@ -159,14 +159,17 @@ public class LY002ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "			SELECT DISTINCT \"HeadId\" AS \"Id\"";
 			sql += "			      ,\"HeadName\" AS \"Name\"";
 			sql += "			FROM \"LifeRelHead\"";
+			sql += "			WHERE TRUNC(\"AcDate\" / 100 ) = :yymm ";
 			sql += "			UNION ALL";
 			sql += "			SELECT DISTINCT \"RelId\" AS \"Id\"";
 			sql += "			      ,\"RelName\" AS \"Name\"";
 			sql += "			FROM \"LifeRelHead\"";
+			sql += "			WHERE TRUNC(\"AcDate\" / 100 ) = :yymm ";
 			sql += "			UNION ALL";
 			sql += "			SELECT DISTINCT \"BusId\" AS \"Id\"";
 			sql += "			      ,\"BusName\" AS \"Name\"";
-			sql += "			FROM \"LifeRelHead\"";			
+			sql += "			FROM \"LifeRelHead\"";	
+			sql += "			WHERE TRUNC(\"AcDate\" / 100 ) = :yymm ";
 			sql += "		) WHERE \"Id\" <> '-' ";
 			sql += " 	) H ON H.\"Id\" = C.\"CustId\"";
 			sql += "	LEFT JOIN \"LoanBorMain\" L ON L.\"CustNo\" = M.\"CustNo\"";

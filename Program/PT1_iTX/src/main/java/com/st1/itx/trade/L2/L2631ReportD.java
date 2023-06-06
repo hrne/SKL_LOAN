@@ -273,7 +273,11 @@ public class L2631ReportD extends MakeReport {
 
 		print(1, 2, "利息 ......... "); // 利息InterestX
 		print(0, 32, formatAmt(iInterest, 0), "R");
-		print(0, 45, "限制期間　 ... " + this.showDate(iProhibitperiod)); // 限制期間
+		if (parse.stringToInteger(iProhibitperiod) == 0) {
+			print(0, 45, "無"); // 限制期間
+		} else {
+			print(0, 45, this.showDate(iProhibitperiod)); // 限制期間
+		}
 
 		print(1, 2, "延遲息 ....... "); // 延遲息DelayIntX
 		print(0, 32, formatAmt(iDelayInt, 0), "R");
