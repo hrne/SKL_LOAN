@@ -360,15 +360,17 @@ public class L2631ReportD extends MakeReport {
 		print(1, 2, "總計 ......... "); // 總計total
 		print(0, 32, formatAmt(total, 0), "R");
 		print(0, 45, "備註欄 ....... " + iRmk1); // 備註欄iRmk1
-		print(1, 1, "　　　　　　           ");
 
 		// 備註
 		// 被保人 最高保證金額 目前保證總額 金額 戶況 繳息迄日
 		// L2R64
 
-		print(1, 1, "　被保人ID　　　最高保證金額　　目前保證總額　　戶名　　　　　　　　戶況　　繳息迄日");
-		print(1, 1,
-				"===================================================================================================");
+		print(1, 1, "　　　　　　           ");
+		print(1, 1, "　　　　　　           ");
+		print(1, 1, "　　　　　　           ");
+		print(1, 1, "　　　　　　           ");
+		print(1, 1, "　被保人ID　　　最高保證金額　　目前保證總額　　戶名　　　　　　　戶況　　　繳息迄日");
+		print(1, 2, "================================================================================");
 		BigDecimal GuaAmt = BigDecimal.ZERO;
 		if (slGuarantor != null) {
 			for (Guarantor tGuarantor : slGuarantor.getContent()) {
@@ -431,10 +433,11 @@ public class L2631ReportD extends MakeReport {
 		}
 
 		print(1, 1, " ");
+		print(1, 1, " ");
+		print(1, 1, " ");
 		print(1, 1, "額度資料區");
 		print(1, 1, "　額度編號　　　核准額度　　門牌號碼");
-		print(1, 1,
-				"===================================================================================================");
+		print(1, 2, "================================================================================");
 		if (iFacmNo == 0) {
 
 			List<FacMain> lFacMain = new ArrayList<FacMain>();

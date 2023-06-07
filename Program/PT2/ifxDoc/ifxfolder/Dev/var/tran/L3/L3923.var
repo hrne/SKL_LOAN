@@ -576,7 +576,7 @@ CALL2(#ADJUSTDOT,#Precision,#OExcessive,#OExcessiveX)
 CALL2(#ADJUSTDOT,#PRECISION,#OTempTax,#OTempTaxX)
 
 #OSum=+m,14.2,L
-E(0,#OInterest+#ODelayInt+#OShortfall+#OTempTax-#OExcessive)
+E(0,#OInterest+#ODelayInt+#OBreachAmt+#OShortfall+#OTempTax-#OExcessive)
 
 #OSumX=X,22,L
 CALL2(#ADJUSTDOT,#PRECISION,#OSum,#OSumX)

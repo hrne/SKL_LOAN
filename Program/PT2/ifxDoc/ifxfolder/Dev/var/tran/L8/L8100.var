@@ -1,0 +1,495 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+
+!#RoleIdH=x,500,S
+!T(3,3:受益人/受款人;4:借款人;5:保證人;6:法人實質受益人;7:轉帳委託人;9:發票人)
+
+!#IdentityCdH=X,100,S
+!T(3,1:自然人;2:法人)
+
+!#SexH=X,50,S
+!T(3,M:男性;F:女性)
+
+!#FunCodeH=X,100,S
+!T(3,1:姓名檢核;2:更新狀態;3:人工確認;5:查詢)
+
+!#ConfirmStatusH=X,100,L
+!T(3,0:非可疑/已確認名單;1:需審查確認;2:為凍結/未確認名單)
+
+!#ConfirmCodeH=X,100,L
+!T(3,1:確認正常;2:確認可疑;3:確認未確定)
+
+</sub>
+
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[250,750];printer.width=[40,60];">
+[
+["[L8100]                                 AML 姓名檢核"],
+["#FdFunCode+功能",#FunCodeX],
+["#FdLogNo+檢核序號",#LogNo],
+["#FdTransactionId+ＡＭＬ交易序號",#TransactionId1,#TransactionId2,"@(空白表系統自動編號)"],
+["#FdUnit+查詢單位",#Unit],
+["#FdAcceptanceUnit+代辦單位",#AcceptanceUnit],
+["#FdRoleId+保單角色",#RoleId,#RoleIdX],
+["#FdAcctNo+放款案號",#AcctNo],
+["#FdCaseNo+案號",#CaseNo],
+["#FdName+姓名",#Name],
+["#FdEnglishName+英文姓名",#EnglishName],
+["#FdCustKey+身份證／居留證號碼",#CustKey],
+["#FdIdentityCd+身份別",#IdentityCd,#IdentityCdX],
+["#FdNationalCd+國籍／註冊地（登記地）國籍",#NationalCd],
+["#FdBirthNationCd+營業地國籍／居住地國籍",#BirthNationCd],
+["#FdSex+性別",#Sex,#SexX],
+["#FdBirthEstDt+個人出生日",#BirthEstDt],
+["#FdNotifyEmail+ＥＭＡＩＬ",#NotifyEmail,"@(可多組，以分號做區隔)"],
+["#FdQueryId+查詢者ＩＤ",#QueryId],
+["#FdSourceId+查詢來源",#SourceId],
+]
+!---------- AP Button AREA ----------
+
+
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+!RoleId
+#CDCODERoleId=x,20,S                  
+T(3,CdCode.RoleId)                  
+                                      
+#RoleIdHelp=x,200,S        
+
+!IdentityCd
+#CDCODEIdentityCd=x,30,S                  
+T(3,CdCode.CustType)                  
+                                        
+#IdentityCdHelp=x,50,S        
+
+!Sex
+#CDCODSex=x,30,S                  
+T(3,CdCode.AmlSex)                  
+                                         
+#AmlSexHelp=x,50,S
+
+!FunCode
+#CDCODEFunCode=x,20,S                  
+T(3,CdCode.FunCode)                  
+                                         
+#FunCodeHelp=x,100,S
+
+!ConfirmStatus
+#CDCODEConfirmStatus=x,30,S                  
+T(3,CdCode.ConfirmStatus)                  
+                                         
+#ConfirmStatusHelp=x,100,S
+
+!ConfirmCode
+#CDCODEConfirmCode=x,25,S                  
+T(3,CdCode.ConfirmCode)                  
+                                         
+#ConfirmCodeHelp=x,100,S
+    
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDCODERoleId,#CDCODEIdentityCd,#CDCODSex,#CDCODEFunCode,#CDCODEConfirmStatus,#CDCODEConfirmCode)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@RoleIdHelp,#HelpDesc1)
+T(2,@IdentityCdHelp,#HelpDesc2)
+T(2,@AmlSexHelp,#HelpDesc3)
+T(2,@FunCodeHelp,#HelpDesc4)
+T(2,@ConfirmStatusHelp,#HelpDesc5)
+T(2,@ConfirmCodeHelp,#HelpDesc6)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L8080進入),$)
+
+#NTXBUF=x,41,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@FunCode,#NTXBUF,1,1)
+T(1,@LogNo,#NTXBUF,2,8)
+
+#Fd=X,2,L
+
+#FdFunCode=X,2,L
+C(3,#CHAIN,1,T(3, ),T(3,*))
+C(3,#CHAIN,1,T(F,@FunCode,0),T(F,@FunCode,1))
+
+! 功能記號
+#FunCode=A,1,S
+C(2,#CHAIN,$,s)
+HELP(#FunCodeHelp)
+@V(H,#FunCodeHelp)
+E(0,@FUNCIND,#FunCode)
+
+#FunCodeX=X,20,L
+T(H,#FunCode,#FunCodeHelp)
+K(MODIFYBUTTON,#FunCodeX)
+
+!刪除隱藏重新交易按鈕
+#AGAIN=X,1,S
+C(3,#FunCode,1,S,$)
+E(0,1)ASGN(AGAIN$)
+
+#FdLogNo=X,2,L
+C(3,#CHAIN,1,T(3, ),C(3,#FunCode,1,T(3, ),T(3,*)))
+C(3,#FunCode,1,T(F,@LogNo,0),C(3,#CHAIN,1,T(F,@LogNo,0),T(F,@LogNo,1)))
+
+
+#FdTransactionId=X,2,L
+T(3, )
+C(3,#FunCode,1,T(F,@TransactionId2,1),T(F,@TransactionId2,0))
+
+#FdUnit=X,2,L
+
+#FdAcceptanceUnit=X,2,L
+C(3,#FunCode,1,T(F,@AcceptanceUnit,1),T(F,@AcceptanceUnit,0))
+
+#FdRoleId=X,2,L
+C(3,#FunCode,1,T(3,*),T(3, ))
+C(3,#FunCode,1,T(F,@RoleId,1),T(F,@RoleId,0))
+
+#FdAcctNo=X,2,L
+C(3,#FunCode,1,T(3,*),T(3, ))
+C(3,#FunCode,1,T(F,@AcctNo,1),T(F,@AcctNo,0))
+
+#FdCaseNo=X,2,L
+C(3,#FunCode,1,T(3,*),T(3, ))
+C(3,#FunCode,1,T(F,@CaseNo,1),T(F,@CaseNo,0))
+
+#FdName=X,2,L
+C(3,#FunCode,1,T(3,*),T(3, ))
+C(3,#FunCode,1,T(F,@Name,1),T(F,@Name,0))
+
+#FdEnglishName=X,2,L
+C(3,#FunCode,1,T(F,@EnglishName,1),T(F,@EnglishName,0))
+
+#FdCustKey=X,2,L
+C(3,#FunCode,1,T(F,@CustKey,1),T(F,@CustKey,0))
+
+#FdIdentityCd=X,2,L
+C(3,#FunCode,1,T(3,*),T(3, ))
+C(3,#FunCode,1,T(F,@IdentityCd,1),T(F,@IdentityCd,0))
+
+#FdNationalCd=X,2,L
+C(3,#FunCode,1,T(F,@NationalCd,1),T(F,@NationalCd,0))
+
+#FdBirthNationCd=X,2,L
+C(3,#FunCode,1,T(F,@BirthNationCd,1),T(F,@BirthNationCd,0))
+
+#FdNotifyEmail=X,2,L
+C(3,#FunCode,1,T(F,@NotifyEmail,1),T(F,@NotifyEmail,0))
+C(3,#FunCode,1,T(F,@Sex,1),T(F,@Sex,0))
+C(3,#FunCode,1,T(F,@BirthEstDt,1),T(F,@BirthEstDt,0))
+
+#FdQueryId=X,2,L
+#FdSourceId=X,2,L
+
+#FdConfirmCode=X,2,L
+C(3,#FunCode,3,T(3,*),T(3, ))
+C(3,#FunCode,3,T(F,@ConfirmCode,1),T(F,@ConfirmCode,0))
+
+! 檢核序號
+#LogNo=A,8,I
+C(2,#CHAIN,C(3,#FunCode,1,S,$),s)
+@
+V(2,0)
+
+#R1=A,1,S
+C(3,#FunCode,1,S,$)
+RESET_RIM(#R1,L8R52)
+S(L8R52,01,#FunCode,#LogNo,#END)
+R(1,L8R52)
+
+! AML@交易序號
+#TransactionId1=X,2,L
+T(3,03)
+
+#TransactionId2=X,40,I
+C(3,#FunCode,1,$,s)
+
+! 查詢單位
+#Unit=X,6,L
+T(3,10HC00)
+!T(2,#KINBR)
+
+! 代辦單位
+#AcceptanceUnit=X,6,I
+C(3,#FunCode,1,$,s)
+
+! 保單角色
+#RoleId=X,2,I
+C(3,#FunCode,1,$,s)
+HELP(#RoleIdHelp,cols:1)
+@T(3,@RoleIdX,)
+V(H,#RoleIdHelp)
+
+#RoleIdX=x,30,L
+T(H,#RoleId,#RoleIdHelp)
+
+! 放款案號
+#AcctNo=x,30,I
+C(3,#FunCode,1,$,s)
+@V(7)
+
+! 案號
+#CaseNo=x,30,I
+C(3,#FunCode,1,$,s)
+@V(7)
+
+! 姓名
+#Name=x,100,I
+C(3,#FunCode,1,$,s)
+@V(7)
+
+! 英文姓名
+#EnglishName=x,100,I
+C(3,#FunCode,1,$,s)
+
+! 身份證ID/居留證號碼
+#CustKey=X,24,I
+C(3,#FunCode,1,$,s)
+
+! 身份別
+#IdentityCd=X,1,I
+C(3,#FunCode,1,$,s)
+HELP(#IdentityCdHelp)
+@T(3,@IdentityCdX,)
+V(H,#IdentityCdHelp)
+
+#IdentityCdX=x,10,L
+T(H,#IdentityCd,#IdentityCdHelp)
+
+#FdSex=X,2,L
+C(3,#FunCode,1,C(3,#IdentityCd,2,T(3, ),T(3,*)),T(3, ))
+C(3,#IdentityCd,2,T(F,@Sex,0),T(F,@Sex,1))
+C(3,#IdentityCd,2,T(3,@Sex, )T(3,@SexX, ),$)
+C(5,#FdSex,*,T(F,@Sex,1),T(F,@Sex,0))
+
+#FdBirthEstDt=X,2,L
+C(3,#FunCode,1,C(3,#IdentityCd,2,T(F,@BirthEstDt,0),T(F,@BirthEstDt,1)),T(F,@BirthEstDt,0))
+
+! 國籍/註冊地(登記地)國籍
+#NationalCd=X,50,I
+C(3,#FunCode,1,$,s)
+
+! 營業地國籍/居住地國籍
+#BirthNationCd=X,50,I
+C(3,#FunCode,1,$,s)
+
+! 性別
+#Sex=X,1,I
+C(3,#FunCode,1,$,s)
+C(3,#IdentityCd,2,S,$)
+HELP(#AmlSexHelp)
+@T(3,@SexX,)
+V(H,#AmlSexHelp)
+
+#SexX=x,10,L
+C(3,#IdentityCd,2,S,$)
+T(H,#Sex,#AmlSexHelp)
+
+! 個人出生日
+#BirthEstDt=D,8,I
+C(3,#FunCode,1,$,s)
+C(3,#IdentityCd,2,S,$)
+D(8)
+@A(DATE,0,#BirthEstDt)
+
+! EMAIL
+#NotifyEmail=x,100,I
+C(3,#FunCode,1,$,s)
+
+! 查詢者ID
+#QueryId=x,10,L
+C(3,#FunCode,1,$,s)
+T(2,#TLRNO)
+
+! 查詢來源
+#SourceId=x,10,L
+T(3,Loan)
+
+
+</sub>
+
+<sub type="DC" name="p2" layout="cols=1;screen.width=[250,750];printer.width=[40,60];">
+[
+["回覆訊息"],
+["#Fd+狀　　態",#Status],
+["#Fd+狀態代碼",#StatusCode],
+["#Fd+狀態說明",#StatusDesc],
+["#Fd+是否有相似名單",#IsSimilar],
+["#Fd+疑似黑名單分類",#IsSan],
+["#Fd+是否為禁制國家",#IsBanNation],
+]
+
+!------------------
+
+#Status=x,10,L
+#StatusCode=x,10,L
+#StatusDesc=x,100,L
+#IsSimilar=X,1,L
+#IsSan=X,1,L
+#IsBanNation=X,1,L
+
+
+</sub>
+
+<sub type="DC" name="p3" layout="cols=1;screen.width=[250,750];printer.width=[40,60];">
+[
+["檢核資訊"],
+["#Fd+檢核狀態",#ConfirmStatus,#ConfirmStatusX],
+! ["#Fd+檢核狀態",#CDCODEConfirmStatus,#ConfirmStatusX],
+["#FdConfirmCode+人工確認狀態",#ConfirmCode,#ConfirmCodeX],
+["#Fd+人工確認人員",#ConfirmEmpNo],
+! ["#Fd+後續處理",#ConfirmTranCode],
+]
+
+! 檢核狀態
+#ConfirmStatus=X,1,L
+
+#ConfirmStatusX=X,50,L
+T(H,#ConfirmStatus,#ConfirmStatusHelp)
+
+! 人工確認狀態
+#ConfirmCode=X,1,I
+C(3,#FunCode,3,$,s)
+HELP(#ConfirmCodeHelp,cols:1)
+@T(3,@ConfirmCodeX,)
+V(H,#ConfirmCodeHelp)
+
+#ConfirmCodeX=X,50,L
+T(H,#ConfirmCode,#ConfirmCodeHelp)
+
+! 人工確認人員
+
+#ConfirmEmpNo=X,6,L
+C(3,#FunCode,3,T(2,#TLRNO),$)
+
+! 後續處理
+#ConfirmTranCode=X,5,L
+
+![確定傳送]自動或手動
+#TXMT=A,1,S
+C(3,#CHAIN,0,$,C(2,#FunCode,$,$,XMT(),$,$,XMT()))
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L8100 ----------
+<sub type="FORM" name="L8100">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L8100,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L8100] AML 姓名檢核)
+
+#ConfirmStatusX2=X,50,L
+T(H,@ConfirmStatusX,#ConfirmStatus,#ConfirmStatusHelp)
+
+#ConfirmCodeX2=X,50,L
+T(H,@ConfirmCodeX,#ConfirmCode,#ConfirmCodeHelp)
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#FunCode
+#LogNo
+#TransactionId1
+#TransactionId2
+#Unit
+#AcceptanceUnit
+#RoleId
+#AcctNo
+#CaseNo
+#Name
+#EnglishName
+#CustKey
+#IdentityCd
+#NationalCd
+#BirthNationCd
+#Sex
+#BirthEstDt
+#NotifyEmail
+#QueryId
+#SourceId
+#ConfirmStatus
+#ConfirmCode
+#ConfirmEmpNo
+#ConfirmTranCode
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+
+TXFORM=L8100
+#LogNo
+#Status
+#StatusCode
+#StatusDesc
+#IsSimilar
+#IsSan
+#IsBanNation
+#ConfirmStatus
+#ConfirmCode
+#ConfirmEmpNo
+#ConfirmTranCode
+^
+
+TXFORM=L8R52
+#LogNo
+#TransactionId1
+#TransactionId2
+#Unit
+#AcceptanceUnit
+#RoleId
+#AcctNo
+#CaseNo
+#Name
+#EnglishName
+#CustKey
+#IdentityCd
+#NationalCd
+#BirthNationCd
+#Sex
+#BirthEstDt
+#NotifyEmail
+#QueryId
+#SourceId
+#Status
+#StatusCode
+#StatusDesc
+#IsSimilar
+#IsSan
+#IsBanNation
+#ConfirmStatus
+#ConfirmCode
+#ConfirmEmpNo
+#ConfirmTranCode
+^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

@@ -137,12 +137,17 @@ public class L2631ReportA extends MakeReport {
 		this.print(1, 1, "");
 		this.print(1, 8, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 		this.print(1, 1, "");
-		this.print(1, 8, "※請將此張簽收回條簽章後寄回，謝謝！");
+//		this.print(1, 8, "※請將此張簽收回條簽章後寄回，謝謝！");
+		this.print(1, 1, "");
 		this.print(1, 1, "");
 		this.print(1, 8, "地 址：台北市松山區南京東路五段１２５號１３樓　　　　　　 放款服務課");
 		this.print(1, 1, "");
 		this.print(1, 8, "備 註：　　　　　　　　　　　　　　　　　　　　製表人：　" + tlrNoX);
 
+
+		this.setFontSize(18);
+		this.print(-25, 6, "※請將此張簽收回條簽章後寄回，謝謝！");
+		this.setFontSize(12);
 //		for (int i = 1; i <= 400; i++) {
 //			if ((i % 10) == 0) {
 //				this.print(-2, i, "" + (i / 10));

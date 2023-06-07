@@ -304,7 +304,7 @@ public class LQ007Report extends MakeReport {
 							// 最後月份的資料
 							if (iYear12Month == visibleMonth) {
 								makeExcel.setValue(12, endColBal, balSum, "#,##0");
-								makeExcel.setValue(6, endColBal, iaiiIntTotal, "#,##0");
+								makeExcel.setValue(6, endColInt, iaiiIntTotal, "#,##0");
 								makeExcel.setValue(13, endColBal, balTotal, "#,##0");
 								makeExcel.setValue(13, endColInt, intTotal, "#,##0");
 							}

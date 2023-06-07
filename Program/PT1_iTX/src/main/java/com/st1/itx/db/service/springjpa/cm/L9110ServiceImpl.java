@@ -710,8 +710,8 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("applNo", applNo);
-		query.setParameter("date", dateUtil.getNowIntegerForBC());
-		this.info("date =" + dateUtil.getNowIntegerForBC());
+		query.setParameter("date", titaVo.getEntDyI() + 19110000);
+		this.info("date =" + titaVo.getEntDyI());
 
 		return this.convertToMap(query);
 	}

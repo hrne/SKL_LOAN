@@ -50,7 +50,8 @@ public class L5801Report extends MakeReport {
 //		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5801", "補貼息申貸名冊工作檔", "L5801補貼息申貸名冊工作檔",
 //				"L5801_底稿_催收款明細表.xlsx", "工作表1", this.showRocDate(thisMonth * 100 + 1, 5));
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5801", "補貼息申貸名冊工作檔", "L5801補貼息申貸名冊工作檔" + thisMonth, "補貼息申貸名冊工作檔" + thisMonth);
+		int ithisMonth = thisMonth - 191100;
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5801", "補貼息申貸名冊工作檔"+ ithisMonth, "L5801補貼息申貸名冊工作檔" + ithisMonth, "補貼息申貸名冊工作檔" + ithisMonth);
 
 		fontStyleVo = new ExcelFontStyleVo();
 

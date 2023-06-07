@@ -198,7 +198,7 @@ public class L3005 extends TradeBuffer {
 				BigDecimal tempAmt = parse.stringToBigDecimal(result.get("TempAmt"));
 				BigDecimal overflow = parse.stringToBigDecimal(result.get("Overflow"));
 				BigDecimal loanBal = parse.stringToBigDecimal(result.get("LoanBal"));
-				BigDecimal rate = parse.stringToBigDecimal(result.get("Rate"));
+				BigDecimal rate = parse.stringToBigDecimal(result.get("FitRate"));     // 入帳日利率
 				BigDecimal unpaidAmt = parse.stringToBigDecimal(result.get("UnpaidInterest"))
 						.add(parse.stringToBigDecimal(result.get("UnpaidPrincipal")))
 						.add(parse.stringToBigDecimal(result.get("UnpaidCloseBreach")));

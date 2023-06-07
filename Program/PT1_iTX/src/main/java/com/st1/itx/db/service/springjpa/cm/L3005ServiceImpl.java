@@ -90,6 +90,16 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 5.利率變更(有撥款序號) => 不顯示<訂正>按紐
 		// 6.轉換的撥款、內容變更(有撥款序號) => 不顯示<訂正>按紐
 		// 7.其他 => 不顯示<訂正>按紐
+		String sqlCondition = "";
+		sqlCondition += "  WHERE ln.\"CustNo\" = :CustNo                ";
+		if (iAcDate == 0) {
+			sqlCondition += "      AND ln.\"EntryDate\" BETWEEN :EntryDateS AND :DateEnd 			";
+		} else {
+			sqlCondition += "      AND ln.\"AcDate\" BETWEEN :AcDateS AND :DateEnd 					";
+		}
+		if (iTitaHCode == 0) {
+			sqlCondition += "      AND ln.\"TitaHCode\" = '0'										";
+		}
 		String sql = "";
 		sql += " WITH TX1 AS (                ";
 		sql += "  SELECT                 ";
@@ -207,6 +217,22 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               WHEN NVL(TX1.\"LastFg\",0) = 1 THEN 1               ";
 		sql += "               ELSE 0              ";
 		sql += "          END = 1                ";
+		sql += ")                ";
+		sql += ", TXRATE AS (              ";
+		sql += "       select                                       ";
+		sql += "        ln.\"CustNo\"                               ";
+		sql += "       ,ln.\"FacmNo\"                               ";
+		sql += "       ,ln.\"BormNo\"                               ";
+		sql += "       ,ln.\"BorxNo\"                               ";
+		sql += "       ,rr.\"FitRate\"                              ";
+		sql += "       ,row_number() over (partition by rr.\"CustNo\", rr.\"FacmNo\", rr.\"BormNo\" order by rr.\"EffectDate\" Desc) as ROWNUMBER ";
+		sql += "       from \"LoanBorTx\" ln                            ";
+		sql += "       left join \"LoanRateChange\" rr ON rr.\"CustNo\" = ln.\"CustNo\" ";
+		sql += "                                      AND rr.\"FacmNo\" = ln.\"FacmNo\" ";
+		sql += "                                      AND rr.\"BormNo\" = ln.\"BormNo\" ";
+		sql += "                                      AND rr.\"EffectDate\" <= ln.\"EntryDate\" ";  // 入帳日利率
+		sql += sqlCondition;  
+		sql += "                       AND  ln.\"BormNo\" > 0                  ";
 		sql += ") ";
 		sql += "  SELECT																	";
 		sql += "   ln3.*          															";
@@ -222,6 +248,7 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  ,CASE WHEN NVL(la.\"AcDate\", 0) > 0 THEN 'Y' ";
 		sql += "        ELSE NVL(JSON_VALUE(ln3.\"OtherFields\", '$.HCodeFlag'), ' ')       ";
 		sql += "        END                     AS  \"HCodeFlag\" ";
+		sql += "  ,NVL(ra.\"FitRate\",0)        AS \"FitRate\"						";
 		sql += "  FROM																		";
 		sql += "  ( SELECT																	";
 		sql += "      ln.\"CustNo\"				AS	\"CustNo\"								";
@@ -234,15 +261,7 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     ,SUM(ln.\"TxAmt\")         AS  \"TotTxAmt\"			     			";
 		sql += "    FROM																	";
 		sql += "      \"LoanBorTx\"	ln														";
-		sql += "    WHERE ln.\"CustNo\" = :CustNo                               			";
-		if (iAcDate == 0) {
-			sql += "      AND ln.\"EntryDate\" BETWEEN :EntryDateS AND :DateEnd 			";
-		} else {
-			sql += "      AND ln.\"AcDate\" BETWEEN :AcDateS AND :DateEnd 					";
-		}
-		if (iTitaHCode == 0) {
-			sql += "      AND ln.\"TitaHCode\" = '0'										";
-		}
+		sql += sqlCondition; 
 		sql += "      GROUP BY	 ln.\"CustNo\" , ln.\"AcDate\" , ln.\"TitaKinBr\" ,ln.\"TitaTlrNo\" ,ln.\"TitaTxtNo\" 	";
 		sql += "  ) ln2										";
 		sql += " left join \"LoanBorTx\" ln3  											     ";
@@ -262,12 +281,19 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  AND  cdf.\"DefCode\" = 'AcctCode'   									     ";
 		sql += "  AND  cdf.\"Code\"    = ln3.\"AcctCode\" 									 ";
 		sql += " LEFT JOIN LASTTX la 			 											 ";
-		sql += "   on ln3.\"CustNo\" = la.\"CustNo\"										 ";
-		sql += "  and ln3.\"AcDate\" = la.\"AcDate\"										 ";
-		sql += "  and ln3.\"TitaKinBr\"	 = la.\"TitaKinBr\"									 ";
-		sql += "  and ln3.\"TitaTlrNo\"	 = la.\"TitaTlrNo\"									 ";
-		sql += "  and ln3.\"TitaTxtNo\"	 = la.\"TitaTxtNo\"									 ";
+		sql += "   on la.\"CustNo\" = ln3.\"CustNo\"										 ";
+		sql += "  and la.\"AcDate\" = ln3.\"AcDate\"										 ";
+		sql += "  and la.\"TitaKinBr\"	 = ln3.\"TitaKinBr\"									 ";
+		sql += "  and la.\"TitaTlrNo\"	 = ln3.\"TitaTlrNo\"									 ";
+		sql += "  and la.\"TitaTxtNo\"	 = ln3.\"TitaTxtNo\"									 ";
 		sql += "  and la.ROWNUMBER = 1								                      	 ";
+		sql += " LEFT JOIN TXRATE ra		 									     		 ";
+		sql += "   on ra.\"CustNo\" = ln3.\"CustNo\"										 ";
+		sql += "  and ra.\"FacmNo\" = ln3.\"FacmNo\"										 ";
+		sql += "  and ra.\"BormNo\" = ln3.\"BormNo\"				 					     ";
+		sql += "  and ra.\"BorxNo\" = ln3.\"BorxNo\"								     	 ";
+		sql += "  and ra.ROWNUMBER = 1								                      	 ";
+		sql += "  and ln3.\"BormNo\" > 0            								    	 ";
 		sql += " WHERE 											 							 ";
 		if (iTitaTxtNo.isEmpty()) {
 			sql += " ln3.\"FacmNo\" >= :FacmNoS											 	 ";
@@ -347,14 +373,14 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> checkIsArchive(TitaVo titaVo) throws Exception {
 
 		int iCustNo = this.parse.stringToInteger(titaVo.getParam("TimCustNo"));
-		
+
 		String sql = "";
 		sql += " SELECT TA.\"CustNo\" ";
 		sql += " FROM \"TxArchiveTableLog\" TA ";
 		sql += " WHERE TA.\"CustNo\" = :inputCustNo ";
 		sql += "   AND TA.\"DataFrom\" = 'ONLINE' ";
 		sql += "   AND TA.\"Type\" = '5YTX' ";
-		
+
 		this.info("sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);

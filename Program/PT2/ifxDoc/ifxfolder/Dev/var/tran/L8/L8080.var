@@ -359,8 +359,8 @@ ifxBatch:{
 #oConfirmEmpNo=確認人員
 {width:120,align:'left'}
 
-#oConfirmTranCode=後續處理
-{width:120,align:'left'}
+! #oConfirmTranCode=後續處理
+! {width:120,align:'left'}
 
 ^
 

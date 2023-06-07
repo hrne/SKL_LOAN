@@ -455,6 +455,8 @@ public class L4450Batch extends TradeBuffer {
 					result = c1.getDataKind() - c2.getDataKind();
 				} else if (c1.getRepayType() - c2.getRepayType() != 0) {
 					result = c1.getRepayType() - c2.getRepayType();
+				} else if (c1.getBormNo() - c2.getBormNo() != 0) { // 2023.6.7 modify 依撥款序號抵用暫收
+					result = c1.getBormNo() - c2.getBormNo();
 				} else if (c1.getPayIntDate() - c2.getPayIntDate() != 0) {
 					result = c1.getPayIntDate() - c2.getPayIntDate();
 				} else {

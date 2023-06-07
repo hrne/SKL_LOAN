@@ -676,7 +676,7 @@ public class L4211Report extends MakeReport {
 				this.print(1, 0, "");
 				this.print(1, 0,
 						"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-				this.print(1, 14, " 合計 ");
+				this.print(1, 14, " 總計 ");
 
 				totalAll();
 				pageCnt = pageCnt + 4;
@@ -768,7 +768,7 @@ public class L4211Report extends MakeReport {
 			count++;
 
 			String currentSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
-			
+
 			// 判斷當前的批號與批次號碼不同
 			if (!msName.equals(tfnAllList.get("ReconCode")) || !msNum.equals(tfnAllList.get("BatchNo"))) {
 
@@ -1042,7 +1042,7 @@ public class L4211Report extends MakeReport {
 				this.print(1, 0, "");
 				this.print(1, 0,
 						"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-				this.print(1, 14, " 合計 ");
+				this.print(1, 14, " 總計 ");
 
 				totalAll();
 				pageCnt = pageCnt + 4;
@@ -1131,6 +1131,7 @@ public class L4211Report extends MakeReport {
 			others = getBigDecimal(tfnAllList.get("Fee"));
 			count++;
 
+			String currentSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
 			// 判斷當前的批號與批次號碼不同
 			if (!msName.equals(tfnAllList.get("ReconCode")) || !msNum.equals(tfnAllList.get("BatchNo"))) {
 
@@ -1219,6 +1220,20 @@ public class L4211Report extends MakeReport {
 					totalsumCollection = totalsumCollection.add(allsumCollection);
 					totalsumShortPayment = totalsumShortPayment.add(allsumShortPayment);
 					totalsumOthers = totalsumOthers.add(allsumOthers);
+
+					if (currentSortingForSubTotal.equals("9999")) {
+						this.print(1, 0,
+								"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+
+						this.print(1, 2, "批次入帳");
+
+						this.print(0, 14, " 合計 ");
+
+						totalAll();
+
+						this.print(1, 0, "");
+
+					}
 
 					allsumTransferAmt = BigDecimal.ZERO;
 					allsumMakeferAmt = BigDecimal.ZERO;
@@ -1370,9 +1385,15 @@ public class L4211Report extends MakeReport {
 //				this.print(0, 14, " 小計 ");
 //
 //				atAll();
-				
-				
-				
+
+				if (currentSortingForSubTotal.equals("9999")) {
+					this.print(1, 0,
+							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+					this.print(1, 2, "人工入帳");
+					this.print(0, 14, " 合計 ");
+
+					atAll();
+				}
 
 				totalsumTransferAmt = totalsumTransferAmt.add(allsumTransferAmt);
 				totalsumMakerferAmt = totalsumMakerferAmt.add(allsumMakeferAmt);
@@ -1388,7 +1409,7 @@ public class L4211Report extends MakeReport {
 				this.print(1, 0, "");
 				this.print(1, 0,
 						"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-				this.print(1, 14, " 合計 ");
+				this.print(1, 14, " 總計 ");
 
 				totalAll();
 				pageCnt = pageCnt + 4;

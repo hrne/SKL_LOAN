@@ -62,18 +62,28 @@ public class L5736ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                       , CF.\"ClCode1\" ";
 		sql += "                       , CF.\"ClCode2\" ";
 		sql += "                       , CF.\"ClNo\" ";
-		// 20230522 佳怡說明：擔保品改成鑑價日最接近核准日期的評估
-		sql += "            ORDER BY ABS(NVL(CAS.\"ApproveDate\",0) - NVL(CE.\"EvaDate\",19110101) ) ASC ";
+		sql += "            ORDER BY ABS(NVL(LBM.\"DrawdownDate\",0) - NVL(CE.\"EvaDate\",19110101) ) ASC ";
+		sql += "        			, CE.\"EvaNo\" DESC";
 		sql += "          )                               AS \"Seq\" ";
 		sql += "        , NVL(CE.\"EvaNetWorth\",0) AS \"EvaNetWorth\" ";
-		sql += "   FROM \"ClFac\" CF ";
-		sql += "   LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = CF.\"CustNo\" ";
-		sql += "                            AND FAC.\"FacmNo\" = CF.\"FacmNo\" ";
-		sql += "   LEFT JOIN \"FacCaseAppl\" CAS ON CAS.\"ApplNo\" = CF.\"ApproveNo\" ";
+		sql += " FROM  \"MonthlyLoanBal\" MLB ";
+		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = MLB.\"CustNo\" ";
+		sql += " LEFT JOIN \"FacMain\" FM ON FM.\"CustNo\" = MLB.\"CustNo\" ";
+		sql += "                       AND FM.\"FacmNo\" = MLB.\"FacmNo\" ";
+		sql += " LEFT JOIN \"LoanBorMain\" LBM ON LBM.\"CustNo\" = MLB.\"CustNo\" ";
+		sql += "                            AND LBM.\"FacmNo\" = MLB.\"FacmNo\" ";
+		sql += "                            AND LBM.\"BormNo\" = MLB.\"BormNo\" ";
+		sql += " LEFT JOIN \"ClFac\" CF ON CF.\"CustNo\" = FM.\"CustNo\" ";
+		sql += "                    AND CF.\"FacmNo\" = FM.\"FacmNo\" ";
+		sql += "                    AND CF.\"MainFlag\" = 'Y' ";
 		sql += "   LEFT JOIN \"ClEva\" CE ON CE.\"ClCode1\" = CF.\"ClCode1\" ";
 		sql += "                         AND CE.\"ClCode2\" = CF.\"ClCode2\" ";
 		sql += "                         AND CE.\"ClNo\" = CF.\"ClNo\" ";
-		sql += "   WHERE NVL(CAS.\"ApproveDate\",0) > 0 ";
+		sql += " WHERE MLB.\"YearMonth\" = :inputYearMonth ";
+		sql += "   AND MLB.\"LoanBalance\" > 0 ";
+		sql += "   AND LBM.\"DrawdownDate\" <= :inputDrawdownDate ";
+		sql += "   AND LBM.\"Status\" = 0 ";
+		
 		sql += " ) ";
 		sql += " , \"CFSum\" AS ( ";
 		sql += "   SELECT \"CustNo\" ";

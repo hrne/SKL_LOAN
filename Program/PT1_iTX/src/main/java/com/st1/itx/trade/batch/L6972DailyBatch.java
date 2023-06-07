@@ -13,6 +13,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.db.service.TxArchiveTableService;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.BatchBase;
+import com.st1.itx.util.MySpring;
 
 @Service("L6972DailyBatch")
 @Scope("step")
@@ -49,6 +50,9 @@ public class L6972DailyBatch extends BatchBase implements Tasklet, InitializingB
 		this.info("active L6972DailyBatch ");
 
 		txArchiveTableService.Usp_L6_ArchiveFiveYearTx_Copy(titaVo.getEntDyI() + 19110000, titaVo.getTlrNo(), titaVo);
+		
+		// 2023-06-07 Wei 搬運完資料,發動刪除資料
+		MySpring.newTask("L6971p", this.txBuffer, titaVo);
 	}
 
 }
