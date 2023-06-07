@@ -210,7 +210,7 @@ public class L4002 extends TradeBuffer {
 				if (tBatxDetail.getProcStsCode().equals("6")) {
 					isBatchErase = true;
 				}
-				// 可刪除回復 => 刪除且未曾入過
+				// 可刪除回復 => 已刪除且未曾入過帳
 				if (isDeleteRecovery && tempVo.get("EraseCnt") != null) {
 					isDeleteRecovery = false;
 				}
@@ -245,7 +245,7 @@ public class L4002 extends TradeBuffer {
 					labelRankFlag = 3;
 				} else {
 					switch (tBatxDetail.getRepayCode()) {
-					case 1:
+					case 1:// 匯款轉帳於對帳類別顯示,其他於第一階[批號]顯示
 						grp1.setAcDate(tBatxDetail.getAcDate());
 						grp1.setBatchNo(tBatxDetail.getBatchNo());
 						grp1.setRepayCode(tBatxDetail.getRepayCode());
@@ -623,10 +623,14 @@ public class L4002 extends TradeBuffer {
 				String labelFgB = "";
 				String labelFgC = "";
 				String labelFgD = "";
-
+				// 隔日訂正寫入批號為RESV00不顯示按鈕
 				if (acDate != titaVo.getEntDyI() + 19110000
 						|| "RESV".equals(tempL4002Vo.getBatchNo().substring(0, 4))) {
 				} else {
+					// 第一階按[批號]顯示
+					// 如已刪除且未曾入過帳顯示[刪除回復]
+					// 如未入帳筆數則顯示[整批刪除]
+					// 如已批次入帳則顯示[整批訂正]
 					if (tempL4002Vo.getRankFlag() == 1) {
 						if ("8".equals(batxStatus)) {
 							if (isDeleteRecovery) {
@@ -643,11 +647,15 @@ public class L4002 extends TradeBuffer {
 						}
 					}
 					if (!"8".equals(batxStatus) && labelRankFlag == tempL4002Vo.getRankFlag()) {
+						// 依[對帳類別]顯示
+						// 需檢核(0:未檢核 2:人工處理 3:檢核錯誤 4:檢核正常 )筆數>0顯示[整批檢核]
 						if (canCheckCnt.get(tempL4002Vo) != null && canCheckCnt.get(tempL4002Vo) > 0) {
 							labelFgB = "C";
 						}
 					}
 					if (!"8".equals(batxStatus) && labelRankFlag == tempL4002Vo.getRankFlag()) {
+						// 依還款來源設定的階層顯示
+						// 可入帳(檢核成功且還款來源(1~4))筆數>0顯示[整批檢核]
 						if (canEnterCnt.get(tempL4002Vo) != null && canEnterCnt.get(tempL4002Vo) > 0) {
 							if (isRepayCode1To4) {
 								labelFgC = "E";
@@ -655,6 +663,8 @@ public class L4002 extends TradeBuffer {
 						}
 					}
 					if (!"8".equals(batxStatus) && labelRankFlag == tempL4002Vo.getRankFlag()) {
+						// 依[對帳類別]顯示
+						// 檢核未執行訂正且處理狀態(2:人工處理 3:檢核錯誤 4:檢核正常)筆數>0顯示[整批檢核]
 						if (canTempCnt.get(tempL4002Vo) != null && canTempCnt.get(tempL4002Vo) > 0) {
 							labelFgD = "T";
 						}

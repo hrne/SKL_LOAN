@@ -81,7 +81,8 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	  AND JSON_QUERY(T.\"Content\",'$[*].f' WITH WRAPPER) IS NOT NULL";
 		sql += "	  AND T.\"TlrNo\" <> 'E-LOAN'";
 		sql += "	  AND T.\"CustNo\" > 0";
-		sql += "	  AND T.\"TranNo\" NOT IN ('L5702','L8203') ";
+		sql += "	  AND (T.\"TranNo\" NOT IN ('L5702','L8203','L8204') ";
+		sql += "	   OR T.\"Reason\" LIKE '%刪除%') ";
 		sql += "	ORDER BY T.\"TxDate\" ASC";
 		sql += "			,T.\"TlrNo\" ASC";
 		sql += "			,T.\"TxSeq\" ASC";

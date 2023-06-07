@@ -85,9 +85,9 @@ BEGIN
                     , v_facmNo
                     , v_bormNo
                     , SUBSTR(p_description, 1, 200)
-                    , SYSDATE
+                    , SYSTIMESTAMP
                     , v_empNo
-                    , SYSDATE
+                    , SYSTIMESTAMP
                     , v_empNo
                     , p_records
                 );

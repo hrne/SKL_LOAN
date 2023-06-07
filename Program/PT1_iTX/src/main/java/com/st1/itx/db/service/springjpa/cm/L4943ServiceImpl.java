@@ -531,6 +531,7 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "   and NVL(T.\"CustNo\",0) > 0 ";
 			break;
 		}
+		sql += " order by BDD.\"EntryDate\" , BDD.\"CustNo\" ,BDD.\"FacmNo\" ,BDD.\"PrevIntDate\" ";
 
 		this.info("sql=" + sql);
 		Query query;

@@ -325,8 +325,10 @@ public class L4101ReportB extends MakeReport {
 			print(1, 1, "　　");
 			print(0, 7, FormatUtil.padX(StringCut.stringMask(custName), 20));// 戶名
 			print(0, 29, wkBranchItem);// 分行別
-			String wkCustId = custId.substring(0, custId.length() - 4) + "****";
-			print(0, 69, wkCustId);// 收款id
+			if (!custId.isEmpty()) {
+				String wkCustId = custId.substring(0, custId.length() - 4) + "****";
+				print(0, 69, wkCustId);// 收款id
+			}
 			print(0, 131, formatAmt(wkLineAmt, 0), "R");// 核貸金額
 			this.info("i  " + i);
 			this.info("lBankRemit size =   " + lBankRemit.size());

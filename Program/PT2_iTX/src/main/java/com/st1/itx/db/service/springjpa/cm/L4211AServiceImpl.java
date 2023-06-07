@@ -65,7 +65,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "   FROM \"LoanBorTx\"";
 			sql += "   WHERE \"AcDate\" = :inputAcDate";
 			sql += "    AND \"RepayCode\" = '01'"; // 匯款轉帳
-			sql += "    AND TO_NUMBER(SUBSTR(\"TitaTxtNo\",1,2)) > 0"; // 整批入帳(交易序號前兩碼為批號後兩碼)
+//			sql += "    AND TO_NUMBER(SUBSTR(\"TitaTxtNo\",1,2)) > 0"; // 整批入帳(交易序號前兩碼為批號後兩碼)
 			sql += "   GROUP BY \"CustNo\"";
 			sql += "          , \"AcDate\"";
 			sql += "          , \"TitaTlrNo\"";
@@ -108,10 +108,12 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "    , TX2.\"AcDate\" ";// 除錯時查資料用欄位
 			sql += "    , TX2.\"TitaTlrNo\" ";// 除錯時查資料用欄位
 			sql += "    , TX2.\"TitaTxtNo\""; // 除錯時查資料用欄位
-			sql += "    , CASE WHEN NVL(JSON_VALUE(BATX.\"ProcNote\", '$.FacStatus'), ' ') <> ' ' THEN '999' ";
+			sql += "    , CASE WHEN NVL(TX1.\"AcDate\",0) = 0 THEN '9999' ";
+			sql += "    	   WHEN NVL(JSON_VALUE(BATX.\"ProcNote\", '$.FacStatus'), ' ') <> ' ' THEN '999' ";
 			sql += "           WHEN TX1.\"FacmNo\" = 0 THEN '999' ";
 			sql += "           ELSE NVL(FAC.\"AcctCode\",'999') END AS \"SortingForSubTotal\""; // 配合小計產生的排序
-			sql += "    , CASE WHEN NVL(JSON_VALUE(BATX.\"ProcNote\", '$.FacStatus'), ' ') <> ' ' THEN '暫收款' ";
+			sql += "    , CASE WHEN NVL(TX1.\"AcDate\",0) = 0 THEN '人工入帳' ";
+			sql += "    	   WHEN NVL(JSON_VALUE(BATX.\"ProcNote\", '$.FacStatus'), ' ') <> ' ' THEN '暫收款' ";
 			sql += "           WHEN TX1.\"FacmNo\" = 0 THEN '暫收款' ";
 			sql += "           ELSE \"Fn_GetCdCode\"('AcctCode',FAC.\"AcctCode\") END AS \"AcctItem\"";
 			sql += " 	, \"Fn_GetCdCode\"('RepayType',BATX.\"RepayType\") AS \"RepayItem\"";
@@ -123,9 +125,15 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "            AND SUBSTR(TX1.\"TitaTxtNo\",1,2) = SUBSTR(BATX.\"BatchNo\",5,2)";
 			sql += "            AND TO_NUMBER(SUBSTR(TX1.\"TitaTxtNo\",3,6)) = BATX.\"DetailSeq\"";
 			sql += " LEFT JOIN \"LoanBorTx\" TX2 ";
-			sql += "             ON TX2.\"AcDate\" = TX1.\"AcDate\"";
-			sql += "            AND TX2.\"TitaTlrNo\" = TX1.\"TitaTlrNo\"";
-			sql += "            AND TX2.\"TitaTxtNo\" = TX1.\"TitaTxtNo\"";
+			sql += "             ON TX2.\"AcDate\" = CASE WHEN NVL(TX1.\"AcDate\",0) = 0 ";
+			sql += "									  THEN BATX.\"AcDate\"";
+			sql += "				   				      ELSE TX1.\"AcDate\" END ";
+			sql += "            AND TX2.\"TitaTlrNo\" = CASE WHEN NVL(TX1.\"AcDate\",0) = 0 ";
+			sql += "									  THEN BATX.\"TitaTlrNo\"";
+			sql += "				   				      ELSE TX1.\"TitaTlrNo\" END ";
+			sql += "            AND TX2.\"TitaTxtNo\" = CASE WHEN NVL(TX1.\"AcDate\",0) = 0 ";
+			sql += "									  THEN BATX.\"TitaTxtNo\"";
+			sql += "				   				      ELSE TX1.\"TitaTxtNo\" END ";
 			sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = TX2.\"CustNo\"";
 			sql += "                      AND FAC.\"FacmNo\" = TX2.\"FacmNo\"";
 			sql += "                      AND TX2.\"FacmNo\" > 0";

@@ -207,15 +207,7 @@ ASGN(AGAIN$)
 #Space=X,1,L
 T(2, )
 
-! 異動原因
-#TelChgRsnCode=A,2,L
-T(3,01)
-!C(3,#TelChgRsnCode,0,E(0,1),$)
-HELP(#TelChgRsnCodeHelp)
-@V(H,#TelChgRsnCodeHelp)
-! 異動原因中文
-#TelChgRsnItem=X,40,L
-T(H,#TelChgRsnCode,#TelChgRsnCodeHelp)
+
 
 !戶號
 #CustNo=A,7,L
@@ -277,6 +269,16 @@ IF(#TelTypeCode == 3 || #TelTypeCode == 5 || #TelTypeCode == 9,S,$)
 #TelNo=X,10,I
 C(3,#TelTypeCode,9,S,$)
 @V(9)
+
+! 異動原因
+#TelChgRsnCode=A,2,I
+!C(3,#TelChgRsnCode,0,E(0,1),$)
+HELP(#TelChgRsnCodeHelp)
+@V(H,#TelChgRsnCodeHelp)
+! 異動原因中文
+#TelChgRsnItem=X,40,L
+T(H,#TelChgRsnCode,#TelChgRsnCodeHelp)
+
 ! 電話號碼分機
 #TelExt=X,5,I
 IF(#TelTypeCode == 3 || #TelTypeCode == 5 || #TelTypeCode == 9,S,$)

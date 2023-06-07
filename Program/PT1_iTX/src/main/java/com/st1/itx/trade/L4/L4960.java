@@ -103,9 +103,7 @@ public class L4960 extends TradeBuffer {
 //			InsuYearMonth > InsuStartDate > InsuEndDate  DESC
 			lInsuRenew.sort((c1, c2) -> {
 				int result = 0;
-				if (c1.getRenewCode() - c2.getRenewCode() != 0) {
-					result = c2.getRenewCode() - c1.getRenewCode();
-				} else if (c1.getInsuYearMonth() - c2.getInsuYearMonth() != 0) {
+				if (c1.getInsuYearMonth() - c2.getInsuYearMonth() != 0) {
 					result = c2.getInsuYearMonth() - c1.getInsuYearMonth();
 				} else if (c1.getInsuStartDate() - c2.getInsuStartDate() != 0) {
 					result = c2.getInsuStartDate() - c1.getInsuStartDate();
@@ -123,11 +121,14 @@ public class L4960 extends TradeBuffer {
 
 				this.info(" tmp ... " + tmp);
 
-//				僅第一筆有按鈕 order by 火險年月
-				if (btnShowFlag.containsKey(tmp)) {
-					btnShowFlag.put(tmp, 0);
-				} else {
-					btnShowFlag.put(tmp, 1);
+				// 僅第一筆有按鈕 order by 火險年月
+				// 續保第一筆且無會計日
+				if (tInsuRenew.getRenewCode() == 2 && tInsuRenew.getAcDate() == 0) {
+					if (btnShowFlag.containsKey(tmp)) {
+						btnShowFlag.put(tmp, 0);
+					} else {
+						btnShowFlag.put(tmp, 1);
+					}
 				}
 
 				String entryFlag = "N";
@@ -169,7 +170,8 @@ public class L4960 extends TradeBuffer {
 				occursList.putParam("OOSelfInsuCode", selfInsuCode);
 				occursList.putParam("OOStatusCode", tInsuRenew.getStatusCode());
 				occursList.putParam("OOAcDate", tInsuRenew.getAcDate());
-				occursList.putParam("OOBtnFlag", btnShowFlag.get(tmp));
+				occursList.putParam("OOBtnFlag",
+						tInsuRenew.getRenewCode() == 2 && tInsuRenew.getAcDate() == 0 ? btnShowFlag.get(tmp) : "0");
 				occursList.putParam("OOEthqInsuCovrg", tInsuRenew.getEthqInsuCovrg()); // 地震險保險金額
 				occursList.putParam("OOEthqInsuPrem", tInsuRenew.getEthqInsuPrem()); // 地震險保費
 				occursList.putParam("OORemark", tInsuRenew.getRemark()); // 備註

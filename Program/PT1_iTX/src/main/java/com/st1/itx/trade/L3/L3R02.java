@@ -237,7 +237,7 @@ public class L3R02 extends TradeBuffer {
 		BankRemit tBankRemit = bankRemitService.findBormNoFirst(tLoanBorMain.getCustNo(), tLoanBorMain.getFacmNo(),
 				tLoanBorMain.getBormNo(), titaVo);
 
-		if (tBankRemit != null) {
+		if (tBankRemit != null && !"000".equals(tBankRemit.getRemitBank())) {
 			this.totaVo.putParam("L3r02RemitBank", tBankRemit.getRemitBank());
 			this.totaVo.putParam("L3r02RemitBranch", tBankRemit.getRemitBranch());
 			this.totaVo.putParam("L3r02RemitAcctNo", tBankRemit.getRemitAcctNo());
