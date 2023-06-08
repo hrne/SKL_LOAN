@@ -78,9 +78,8 @@ public class LM022Report extends MakeReport {
 				.setRptItem(fileItem).build();
 
 		// 開啟報表
-		makeExcel.open(titaVo, reportVo, fileName + "_" + defaultExcel);
+		makeExcel.open(titaVo, reportVo, fileName + "_" + defaultExcel,defaultSheet);
 
-		makeExcel.newSheet(defaultSheet);
 
 //		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM022", "中央銀行業務局921補貼息", "LM022_中央銀行業務局921補貼息", ROCyymm + "明細");
 

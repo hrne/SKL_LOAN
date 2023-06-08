@@ -238,9 +238,9 @@ C(3,#OOHasHistory,1,BIND(grid,{cmd=CHAIN;ntxcd=L6933;text=歷程;ntxbuf=#OOBUFHi
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 
 #button=x,100,S
-T(2,{cmd=CHAIN; ntxcd=L2074; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
+T(2,{cmd=CHAIN; ntxcd=L2074; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW2$)
 ! C(5,#OOAllowFg,0,BIND(grid,cancel),BIND(grid,{cmd=CHAIN; ntxcd=L2074; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$))
-C(5,#OOAllowFg,0,$,K(MODIFYBUTTON,1,查詢對照表))
+C(5,#OOAllowFg,0,$,K(MODIFYBUTTON,2,查詢對照表))
 
 
 #OOAllowFg=X,1,L

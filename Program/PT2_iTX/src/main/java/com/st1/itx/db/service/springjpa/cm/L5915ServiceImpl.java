@@ -222,9 +222,11 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   LEFT JOIN \"PfReward\"     pr ON pr.\"CustNo\" = pi.\"CustNo\"   ";
 		sql += "                              AND pr.\"FacmNo\" = pi.\"FacmNo\"   ";
 		sql += "                              AND pr.\"BormNo\" = pi.\"BormNo\"   ";
-		sql += "                              AND pr.\"RepayType\" = 0          ";
+		sql += "                              AND pr.\"RepayType\" = pi.\"RepayType\"    ";
+		sql += "                              AND pr.\"PieceCode\" = pi.\"PieceCode\"    ";
 		sql += "   WHERE                                                      ";
 		sql += "            pi.\"WorkMonth\" = :inputWorkMonth                  ";
+		sql += "        and pi.\"RepayType\"  = 0                             ";
 		sql += "  )                                                           ";
 		sql += " SELECT *                                                     ";
 		sql += " FROM                                                         ";
@@ -248,7 +250,7 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                         AND pco.\"EffectiveDate\" = \"Fn_GetPfCoOfficeEffectiveDate\"(pr.\"Coorgnizer\", :inputWorkMonth) ";
 		sql += "        WHERE                                                             ";
 		sql += "             nvl(pi.\"CustNo\",0) > 0                                       ";
-		sql += "            and pr.\"PieceCode\" IN ('1','2','A','B','8','9')               ";
+		sql += "            and pi.\"PieceCode\" IN ('1','2','A','B','8','9')               ";
 		sql += "            AND pi.\"ProdCode\" NOT IN ('TB')                               ";
 		sql += "            AND pi.\"RepayType\" = 0                                        ";
 		sql += "        GROUP BY                                                            ";

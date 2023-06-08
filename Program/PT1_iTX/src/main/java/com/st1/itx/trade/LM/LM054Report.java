@@ -42,7 +42,7 @@ public class LM054Report extends MakeReport {
 	 * 
 	 * @param titaVo
 	 * @param monthDate 西元年月底日
-	 * @throws LogicException 
+	 * @throws LogicException
 	 * 
 	 */
 	public void exec(TitaVo titaVo, int monthDate) throws LogicException {
@@ -51,8 +51,7 @@ public class LM054Report extends MakeReport {
 
 		this.info("LM054Report exec");
 
-		
-		//LM054
+		// LM054
 		String txcd = "LM054";
 		// 檔案名稱
 		String rptItem = "A041重要放款餘額明細表";
@@ -60,12 +59,12 @@ public class LM054Report extends MakeReport {
 		String fileName = "LM054-A041重要放款餘額明細表";
 		// 底稿名稱
 		String defaultName = "LM054_底稿_A041放款餘額彙總表.xlsx";
-		// 底稿工作表名 
+		// 底稿工作表名
 		String defaultSheetName = "A041重要放款餘額明細表(大額、逾期、催收、國外)";
 
-		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
-				.setRptCode(txcd).setRptItem(rptItem).build();
-		
+		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI()).setRptCode(txcd)
+				.setRptItem(rptItem).build();
+
 		makeExcel.open(titaVo, reportVo, fileName, defaultName, defaultSheetName);
 //		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM054", "A041重要放款餘額明細表", "LM054-A041重要放款餘額明細表",
 //				"LM054_底稿_A041放款餘額彙總表.xlsx", "A041重要放款餘額明細表(大額、逾期、催收、國外)");
@@ -83,6 +82,8 @@ public class LM054Report extends MakeReport {
 
 			exportExcel(fnAllList);
 
+			makeExcel.setFormula(row + 1, 13, BigDecimal.ZERO, "SUBTOTAL(M8:M" + (row + 1) + ")", "#,##0");
+			makeExcel.setFormula(row + 1, 14, BigDecimal.ZERO, "SUBTOTAL(N8:N" + (row + 1) + ")", "#,##0");
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -203,8 +204,8 @@ public class LM054Report extends MakeReport {
 			if (lM054Vo.get("F23").length() > 1) {
 				mark.add(lM054Vo.get("F23"));
 			}
-			if ((tempNo.equals(lM054Vo.get("F0")) && lM054Vo.get("F0").length() != 8) ) {
-				if(lM054Vo.get("F0") != null) {
+			if ((tempNo.equals(lM054Vo.get("F0")) && lM054Vo.get("F0").length() != 8)) {
+				if (lM054Vo.get("F0") != null) {
 					mark.add("同一擔保品");
 				}
 			}
