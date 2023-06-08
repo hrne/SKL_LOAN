@@ -10,11 +10,11 @@
 ![一段式/二段式/三段式]
 #RELCD=_,_,S
 C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)
-E(0,2)
+E(0,1)
 
 #ACTFG=_,_,S
 C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)
-E(0,1)
+E(0,0)
 
 </sub>
 
@@ -808,9 +808,11 @@ T(2,@Estimate,#L2r02Estimate)
 T(2,@BusinessOfficer,#L2r02LoanOfficer)
 T(2,@Introducer,#L2r02Introducer)
 T(2,@FireOfficer,#L2r02Introducer)
+T(2,@ApprovedLevel,#L2r02ApprovedLevel)
 T(2,@Supervisor,#L2r02Supervisor)
 T(2,@Coorgnizer,#L2r02Coorgnizer)
 T(2,@GroupId,#L2r02GroupId)
+C(4,#ApprovedLevel,$,T(H,@ApprovedLevelX,#ApprovedLevel,#ApprovedLevelHelp))
 C(4,#L2r07CustTypeCode,$,T(2,@CustTypeCode,#L2r07CustTypeCode))
 C(4,#L2r02GroupId,$,T(2,@CustTypeCode,06))
 E(0,@ExtraRepayCode,1)
@@ -943,6 +945,7 @@ T(2,@FireOfficer,#L2r50FireOfficer)
 T(2,@Estimate,#L2r50Estimate)
 T(2,@CreditOfficer,#L2r50CreditOfficer)
 T(2,@BusinessOfficer,#L2r50BusinessOfficer)
+T(2,@ApprovedLevel,#L2r50ApprovedLevel)
 T(2,@Supervisor,#L2r50Supervisor)
 T(2,@Coorgnizer,#L2r50Coorgnizer)
 E(0,@CreditScore,#L2r50CreditScore)
@@ -2243,7 +2246,6 @@ C(4,#BusinessOfficer,S,$)
 #BUF17A=X,7,S
 T(3,      Y)
 
-
 !核准層級
 #FdApprovedLevel=X,2,L
 
@@ -2256,14 +2258,13 @@ C(4,#ApprovedLevel,S,$)
 T(H,#ApprovedLevel,#ApprovedLevelHelp)
 C(3,#ApprovedLevel,9,T(F,@Supervisor,0)T(3,@FdSupervisor,),T(F,@Supervisor,1)T(3,@FdSupervisor,*))
 
-
-
 ![核決主管]
 !可不輸入
 #FdSupervisor=X,2,L
 
 #Supervisor=X,6,I
 C(3,#Hide6Flag,0,CALL(#HideP6),$)
+C(3,#ApprovedLevel,9,HIDE(#BTN17),SHOW(#BTN17))
 C(3,#ApprovedLevel,9,S,$)
 @V(7)
 

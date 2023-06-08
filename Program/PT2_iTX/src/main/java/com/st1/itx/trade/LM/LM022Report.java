@@ -44,7 +44,7 @@ public class LM022Report extends MakeReport {
 	}
 
 	public void printHeaderL() {
-		this.print(-3, 120, "機密等級："+makeExcel.getSecurity());
+		this.print(-3, 120, "機密等級：" + makeExcel.getSecurity());
 		this.print(-5, 3, showDate(titaVo.get("ENTDY").toString(), 1));
 		this.print(-6, 7, "戶號　額度　撥款　公司名稱　　放款餘額　　　繳息迄日　　利率＝＝＞　利率");
 
@@ -59,15 +59,16 @@ public class LM022Report extends MakeReport {
 		// 開啟EXCE
 		// 取民國年月(日)
 		String ROCyymm = titaVo.get("ENTDY").substring(1, 4) + "." + titaVo.get("ENTDY").substring(4, 6);
-		String ROCyymmdd = titaVo.get("ENTDY").substring(1, 4) + "." + titaVo.get("ENTDY").substring(4, 6) + "." + titaVo.get("ENTDY").substring(6, 8);
+		String ROCyymmdd = titaVo.get("ENTDY").substring(1, 4) + "." + titaVo.get("ENTDY").substring(4, 6) + "."
+				+ titaVo.get("ENTDY").substring(6, 8);
 
 		this.info("ROCyymm=" + ROCyymm);
-		
+
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "LM022";
 		String fileItem = "中央銀行業務局921補貼息";
-		String fileName = "LM022_中央銀行業務局921補貼息" ;
+		String fileName = "LM022_中央銀行業務局921補貼息";
 		String defaultExcel = ROCyymm;
 		String defaultSheet = "明細";
 
@@ -77,7 +78,9 @@ public class LM022Report extends MakeReport {
 				.setRptItem(fileItem).build();
 
 		// 開啟報表
-		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		makeExcel.open(titaVo, reportVo, fileName + "_" + defaultExcel);
+
+		makeExcel.newSheet(defaultSheet);
 
 //		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM022", "中央銀行業務局921補貼息", "LM022_中央銀行業務局921補貼息", ROCyymm + "明細");
 
@@ -180,11 +183,14 @@ public class LM022Report extends MakeReport {
 					}
 				}
 
-				f4total = tLM022Vo.get("F4") == null || tLM022Vo.get("F4").length() == 0 || tLM022Vo.get("F4").equals("0") ? BigDecimal.ZERO : new BigDecimal(tLM022Vo.get("F4").toString());
+				f4total = tLM022Vo.get("F4") == null || tLM022Vo.get("F4").length() == 0
+						|| tLM022Vo.get("F4").equals("0") ? BigDecimal.ZERO
+								: new BigDecimal(tLM022Vo.get("F4").toString());
 
 				// 繳息訖日(G欄)
-				String f5 = tLM022Vo.get("F5") == null || tLM022Vo.get("F5").length() == 0 || tLM022Vo.get("F4") == null || tLM022Vo.get("F4").length() == 0 || tLM022Vo.get("F4").equals("0") ? ""
-						: showRocDate(Integer.valueOf(tLM022Vo.get("F5")) - 19110000, 1);
+				String f5 = tLM022Vo.get("F5") == null || tLM022Vo.get("F5").length() == 0 || tLM022Vo.get("F4") == null
+						|| tLM022Vo.get("F4").length() == 0 || tLM022Vo.get("F4").equals("0") ? ""
+								: showRocDate(Integer.valueOf(tLM022Vo.get("F5")) - 19110000, 1);
 				makeExcel.setValue(row, 7, f5, "C");
 
 				// 利率==>(H欄) + 利率(I欄)
@@ -203,7 +209,8 @@ public class LM022Report extends MakeReport {
 				}
 
 				// 每期攤還金額(J欄)
-				if (tLM022Vo.get("F7") == null || tLM022Vo.get("F7") == "" || tLM022Vo.get("F4") == null || tLM022Vo.get("F4").length() == 0 || tLM022Vo.get("F4").equals("0")) {
+				if (tLM022Vo.get("F7") == null || tLM022Vo.get("F7") == "" || tLM022Vo.get("F4") == null
+						|| tLM022Vo.get("F4").length() == 0 || tLM022Vo.get("F4").equals("0")) {
 					makeExcel.setValue(row, 10, "-", "C");
 				} else {
 					BigDecimal f7 = new BigDecimal(tLM022Vo.get("F7"));
@@ -237,7 +244,8 @@ public class LM022Report extends MakeReport {
 //				makeExcel.setValue(row, 13, "-", "C");
 //				makeExcel.setValue(row, 14, "-", "C");
 
-				makeExcel.setValue(row, 15, tLM022Vo.get("F8") == null || tLM022Vo.get("F8").length() == 0 ? "" : tLM022Vo.get("F8"), "C");
+				makeExcel.setValue(row, 15,
+						tLM022Vo.get("F8") == null || tLM022Vo.get("F8").length() == 0 ? "" : tLM022Vo.get("F8"), "C");
 
 			}
 			makeExcel.setAddRengionBorder("A", 2, "K", row, 1);
@@ -247,19 +255,10 @@ public class LM022Report extends MakeReport {
 		}
 
 		makeExcel.setHeight(1, 20);
-		long closeExcel = makeExcel.close();
-		//makeExcel.toExcel(closeExcel);
+		makeExcel.close();
 
 	}
 
-//	private String padStart(String temp, int len, String tran) {
-//		if (temp.length() < len) {
-//			for (int i = temp.length(); i < len; i++) {
-//				temp = tran + temp;
-//			}
-//		}
-//		return temp;
-//	}
 
 	private String showDate(String date, int iType) {
 		this.info("MakeReport.toPdf showRocDate1 = " + date);

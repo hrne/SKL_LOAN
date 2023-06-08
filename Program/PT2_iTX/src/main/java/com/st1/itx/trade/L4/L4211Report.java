@@ -370,6 +370,8 @@ public class L4211Report extends MakeReport {
 				}
 			}
 		}
+
+		boolean isBatchFlag = false;
 		for (Map<String, String> tfnAllList : fnAllList) {
 
 			String dfMakeferAmt = formatAmt(tfnAllList.get("AcctAmt"), 0);
@@ -407,7 +409,7 @@ public class L4211Report extends MakeReport {
 			String currentSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
 			// 判斷當前的批號與批次號碼不同
 			if (!msName.equals(tfnAllList.get("ReconCode")) || !msNum.equals(tfnAllList.get("BatchNo"))) {
-
+				isBatchFlag = false;
 				if (npcount > 0) { // 除當頁第一筆
 					this.print(1, 0,
 							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
@@ -464,6 +466,9 @@ public class L4211Report extends MakeReport {
 					// 判斷前一筆與當筆是否相同科目
 					currentSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
 					if (!lastSortingForSubTotal.equals(currentSortingForSubTotal)) {
+						this.info("lastSort     = " + lastSortingForSubTotal);
+						lastSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
+						lastAcctItem = tfnAllList.get("AcctItem");
 						this.info("currSort     = " + currentSortingForSubTotal);
 						this.info("curracctItem = " + tfnAllList.get("AcctItem"));
 
@@ -491,7 +496,7 @@ public class L4211Report extends MakeReport {
 						totalsumShortPayment = totalsumShortPayment.add(allsumShortPayment);
 						totalsumOthers = totalsumOthers.add(allsumOthers);
 
-						if (currentSortingForSubTotal.equals("9999")) {
+						if (currentSortingForSubTotal.equals("9999") && !isBatchFlag) {
 							this.print(1, 0,
 									"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 
@@ -502,6 +507,8 @@ public class L4211Report extends MakeReport {
 							totalAll();
 
 							this.print(1, 0, "");
+
+							isBatchFlag = true;
 
 						}
 

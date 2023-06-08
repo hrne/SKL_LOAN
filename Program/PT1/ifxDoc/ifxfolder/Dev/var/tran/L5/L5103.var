@@ -475,7 +475,7 @@ C(3,#ApplCode,1,$,s)
 HELP(#CopyCodeHelp)
 @T(3,@CopyCodeX,)
 V(H,#CopyCodeHelp)
-#CopyCodeX=X,6,L
+#CopyCodeX=X,10,L
 T(H,#CopyCode,#CopyCodeHelp)
 
 
@@ -603,8 +603,8 @@ S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
 R(1,L2R08)
 T(2,@ReturnEmpNoX,#L2r08FullName)
 C(4,#ReturnEmpNo,s,$)
-T(2,@L5103ConfirmGroupNo,#L2r08GroupNo)
-T(2,@L5103ConfirmBrNo,#L2r08Brno)
+!T(2,@L5103ConfirmGroupNo,#L2r08GroupNo)
+!T(2,@L5103ConfirmBrNo,#L2r08Brno)
 
 #ReturnEmpNoX=X,8,L
 

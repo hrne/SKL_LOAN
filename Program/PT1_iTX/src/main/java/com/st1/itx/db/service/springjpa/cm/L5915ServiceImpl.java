@@ -199,50 +199,81 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// SKL User 李珮君 要求跟AS400產一樣的檔案
 		// 協辦人員業績金額的檔案要產出不只有協辦人員業績金額的檔案
 		String sql = " ";
-		sql += "SELECT * FROM ( ";	
-		sql += " SELECT PI.\"CustNo\"            AS \"CustNo\" "; // -- F0 戶號
-		sql += "      , PI.\"FacmNo\"            AS \"FacmNo\" "; // -- F1 額度
-		sql += "      , SUM(PI.\"DrawdownAmt\")  AS \"DrawdownAmt\" "; // -- F2 撥款金額
-		sql += "      , PI.\"PieceCode\"         AS \"PieceCode\" "; // -- F3 計件代碼
-		sql += "      , NVL(PR.\"Coorgnizer\",' ') ";
-		sql += "                                 AS \"EmpNo\"  "; // -- F4 員工代號
-		sql += "      , \"Fn_GetEmpName\"(PR.\"Coorgnizer\",0) ";
-		sql += "                                 AS \"EmpName\"     "; // -- F5 員工姓名
-		sql += "      , NVL(PCO.\"DeptItem\", ' ') ";
-		sql += "                                 AS \"Dept\"        "; // -- F6 部室
-		sql += "      , NVL(PCO.\"DistItem\", ' ') ";
-		sql += "                                 AS \"Dist\"        "; // -- F7 區部
-		sql += "      , NVL(PCO.\"AreaItem\", ' ') ";
-		sql += "                                 AS \"Unit\"        "; // -- F8 單位
-		sql += " FROM \"PfItDetail\" PI ";
-		sql += " LEFT JOIN \"PfReward\" PR ON PR.\"CustNo\" = PI.\"CustNo\" ";
-		sql += "                            AND PR.\"FacmNo\" = PI.\"FacmNo\" ";
-		sql += "                            AND PR.\"BormNo\" = PI.\"BormNo\" ";
-		sql += "                            AND PR.\"RepayType\" = 0 ";
-		sql += " LEFT JOIN \"PfCoOfficer\" PCO ON PCO.\"EmpNo\" = PR.\"Coorgnizer\" ";
-		sql += "                              AND PCO.\"EffectiveDate\" = \"Fn_GetPfCoOfficeEffectiveDate\"(PR.\"Coorgnizer\",:inputWorkMonth) ";
-		sql += " WHERE PI.\"PieceCode\" IN ('1','2','A','B','8','9') ";
-		sql += "   AND PI.\"ProdCode\" NOT IN ('TB') ";
-		sql += "   AND PI.\"RepayType\" = 0 ";
-		sql += "   AND PI.\"WorkMonth\" = :inputWorkMonth ";
-		sql += " GROUP BY PI.\"CustNo\" ";
-		sql += "        , PI.\"FacmNo\" ";
-		sql += "        , PI.\"PieceCode\" ";
-		sql += "        , NVL(PR.\"Coorgnizer\",' ')  ";
-		sql += "        , \"Fn_GetEmpName\"(PR.\"Coorgnizer\",0) ";
-		sql += "        , NVL(PCO.\"DeptItem\", ' ') ";
-		sql += "        , NVL(PCO.\"DistItem\", ' ') ";
-		sql += "        , NVL(PCO.\"AreaItem\", ' ') ";
-		sql += ") ";	
-		sql += " ORDER BY CASE ";
-		sql += "            WHEN \"EmpNo\" = ' ' ";
-		sql += "            THEN 1 ";
-		sql += "          ELSE 0 END ";
-		sql += "        , SUBSTR(\"EmpNo\",1,1) ";
-		sql += "        , CASE WHEN SUBSTR(\"EmpNo\",2,1) BETWEEN '0' AND '9' THEN 'B' ELSE 'A' END "; //數字排後面
-		sql += "        , SUBSTR(\"EmpNo\",3,4) " ;
-		sql += "        , \"CustNo\" ";
-		sql += "        , \"FacmNo\" ";
+		sql += " WITH UTIL AS (                                               ";
+		sql += "  SELECT                                                      ";
+		sql += "            \"CustNo\"                          AS \"CustNo\",    ";
+		sql += "            \"FacmNo\"                          AS \"FacmNo\",    ";
+		sql += "            \"BormNo\"                          AS \"BormNo\",    ";
+		sql += "            \"PieceCode\"                       AS \"PieceCode\", ";
+		sql += "            \"EmployeeNo\"                      AS \"Coorgnizer\" ";
+		sql += "   FROM     \"PfRewardMedia\"                                   ";
+		sql += "   WHERE    \"BonusType\" in (1,5)                              ";
+		sql += "    AND     \"WorkMonth\" = :inputWorkMonth                     ";
+		sql += "    AND     \"AdjustBonus\" > 0                                 ";
+		sql += "    AND     \"ManualFg\" = 1                                    ";
+		sql += "    union                                                       ";
+		sql += "  SELECT                                                      ";
+		sql += "            pi.\"CustNo\"                       AS \"CustNo\",    ";
+		sql += "            pi.\"FacmNo\"                       AS \"FacmNo\",    ";
+		sql += "            pi.\"BormNo\"                       AS \"BormNo\",    ";
+		sql += "            pi.\"PieceCode\"                    AS \"PieceCode\", ";
+		sql += "            nvl(pr.\"Coorgnizer\", ' ')         AS \"EmpNo\"      ";
+		sql += "   FROM \"PfItDetail\" pi                                       ";
+		sql += "   LEFT JOIN \"PfReward\"     pr ON pr.\"CustNo\" = pi.\"CustNo\"   ";
+		sql += "                              AND pr.\"FacmNo\" = pi.\"FacmNo\"   ";
+		sql += "                              AND pr.\"BormNo\" = pi.\"BormNo\"   ";
+		sql += "                              AND pr.\"RepayType\" = 0          ";
+		sql += "   WHERE                                                      ";
+		sql += "            pi.\"WorkMonth\" = :inputWorkMonth                  ";
+		sql += "  )                                                           ";
+		sql += " SELECT *                                                     ";
+		sql += " FROM                                                         ";
+		sql += "     (                                                        ";
+		sql += "        SELECT                                                ";
+		sql += "             pi.\"CustNo\"                                AS \"CustNo\",      ";
+		sql += "             pi.\"FacmNo\"                                AS \"FacmNo\",      ";
+		sql += "             SUM(pi.\"DrawdownAmt\")                      AS \"DrawdownAmt\", ";
+		sql += "             pi.\"PieceCode\"                             AS \"PieceCode\",   ";
+		sql += "             nvl(pr.\"Coorgnizer\", ' ')                  AS \"EmpNo\",       ";
+		sql += "             \"Fn_GetEmpName\"(pr.\"Coorgnizer\", 0)        AS \"EmpName\",     ";
+		sql += "             nvl(pco.\"DeptItem\", ' ')                   AS \"Dept\",        ";
+		sql += "             nvl(pco.\"DistItem\", ' ')                   AS \"Dist\",        ";
+		sql += "             nvl(pco.\"AreaItem\", ' ')                   AS \"Unit\"         ";
+ 		sql += "        FROM UTIL pr                                                      ";
+		sql += "             LEFT JOIN \"PfItDetail\"   pi on pi.\"CustNo\" = pr.\"CustNo\"     ";
+		sql += "                                      and pi.\"FacmNo\" = pr.\"FacmNo\"       ";
+		sql += "                                      and pi.\"BormNo\" = pr.\"BormNo\"       ";
+		sql += "                                      and pi.\"RepayType\" = 0              ";                         
+		sql += "             LEFT JOIN \"PfCoOfficer\"  pco ON pco.\"EmpNo\" = pr.\"Coorgnizer\" ";
+		sql += "                                         AND pco.\"EffectiveDate\" = \"Fn_GetPfCoOfficeEffectiveDate\"(pr.\"Coorgnizer\", :inputWorkMonth) ";
+		sql += "        WHERE                                                             ";
+		sql += "             nvl(pi.\"CustNo\",0) > 0                                       ";
+		sql += "            and pr.\"PieceCode\" IN ('1','2','A','B','8','9')               ";
+		sql += "            AND pi.\"ProdCode\" NOT IN ('TB')                               ";
+		sql += "            AND pi.\"RepayType\" = 0                                        ";
+		sql += "        GROUP BY                                                            ";
+		sql += "            pi.\"CustNo\",                                                  ";
+		sql += "            pi.\"FacmNo\",                                                  ";
+		sql += "            pi.\"PieceCode\",                                               ";
+		sql += "            nvl(pr.\"Coorgnizer\", ' '),                                    ";
+		sql += "            \"Fn_GetEmpName\"(pr.\"Coorgnizer\", 0),                        ";
+		sql += "            nvl(pco.\"DeptItem\", ' '),                                     ";
+		sql += "            nvl(pco.\"DistItem\", ' '),                                     ";
+		sql += "            nvl(pco.\"AreaItem\", ' ')                                      ";
+		sql += "    )                                                                       ";
+		sql += " ORDER BY                                                                   ";
+		sql += "    CASE                                                                    ";
+		sql += "        WHEN \"EmpNo\" = ' ' THEN    1                                      ";
+		sql += "        ELSE            0                                                   ";
+		sql += "    END,                                                                    ";
+		sql += "    substr(\"EmpNo\", 1, 1),                                                ";
+		sql += "    CASE                                                                    ";
+		sql += "            WHEN substr(\"EmpNo\", 2, 1) BETWEEN '0' AND '9' THEN 'B'       ";
+		sql += "            ELSE        'A'                                                 ";
+		sql += "        END,                                                                ";
+		sql += "    substr(\"EmpNo\", 3, 4),                                                ";
+		sql += "    \"CustNo\",                                                             ";
+		sql += "    \"FacmNo\"                                                              ";	
 		this.info("sql=" + sql);
 
 		Query query;

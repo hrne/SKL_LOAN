@@ -225,7 +225,8 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,ln.\"BormNo\"                               ";
 		sql += "       ,ln.\"BorxNo\"                               ";
 		sql += "       ,rr.\"FitRate\"                              ";
-		sql += "       ,row_number() over (partition by rr.\"CustNo\", rr.\"FacmNo\", rr.\"BormNo\" order by rr.\"EffectDate\" Desc) as ROWNUMBER ";
+		sql += "       ,row_number() over (partition by ln.\"CustNo\", ln.\"FacmNo\", ln.\"BormNo\", ln.\"BorxNo\" ";
+		sql += "                           order by rr.\"EffectDate\" Desc) as ROWNUMBER ";
 		sql += "       from \"LoanBorTx\" ln                            ";
 		sql += "       left join \"LoanRateChange\" rr ON rr.\"CustNo\" = ln.\"CustNo\" ";
 		sql += "                                      AND rr.\"FacmNo\" = ln.\"FacmNo\" ";
@@ -233,6 +234,7 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                      AND rr.\"EffectDate\" <= ln.\"EntryDate\" ";  // 入帳日利率
 		sql += sqlCondition;  
 		sql += "                       AND  ln.\"BormNo\" > 0                  ";
+		sql += "                       AND  ln.\"EntryDate\" > 0               ";
 		sql += ") ";
 		sql += "  SELECT																	";
 		sql += "   ln3.*          															";

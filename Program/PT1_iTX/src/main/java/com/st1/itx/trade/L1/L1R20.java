@@ -58,6 +58,7 @@ public class L1R20 extends TradeBuffer {
 		String s = "";
 
 		s = chkForm(titaVo, custNo, facmNo, formNo, flag);
+
 		if (!s.isEmpty()) {
 			if (flag == 1) {
 				// this.totaVo.init(titaVo);
@@ -69,6 +70,7 @@ public class L1R20 extends TradeBuffer {
 				TotaVo msgTotaVo = new TotaVo();
 				msgTotaVo.setWarnMsg("請詳閱「注意事項」");
 				this.addList(msgTotaVo);
+				this.info("L1R20 notPrintLetter =" + (notPrintLetter ? "Y" : "N"));
 				this.totaVo.putParam("notPrintLetter", notPrintLetter ? "Y" : "N");
 				this.totaVo.putParam("L1R20Msg", s);
 
@@ -104,15 +106,17 @@ public class L1R20 extends TradeBuffer {
 			Slice<FacMain> sFacMainService = facMainService.facmCustNoRange(custNo, custNo, 0, 999, 0,
 					Integer.MAX_VALUE, titaVo);
 			List<FacMain> lFacMain = sFacMainService == null ? null : sFacMainService.getContent();
-			if (lFacMain != null && lFacMain.size() > 0) {
-				CustNoticeId custNoticeid = new CustNoticeId();
-				custNoticeid.setCustNo(custNo);
-				custNoticeid.setFacmNo(facmNo);
-				custNoticeid.setFormNo(formNo);
-				CustNotice custNotice = custNoticeService.findById(custNoticeid, titaVo);
 
-				rs += chkNotice(custNotice, flag);
+			if (lFacMain.size() > 0) {
+				for (FacMain fm : lFacMain) {
 
+					CustNoticeId custNoticeid = new CustNoticeId();
+					custNoticeid.setCustNo(fm.getCustNo());
+					custNoticeid.setFacmNo(fm.getFacmNo());
+					custNoticeid.setFormNo(formNo);
+					CustNotice custNotice = custNoticeService.findById(custNoticeid, titaVo);
+					rs += chkNotice(custNotice, flag);
+				}
 			}
 		}
 

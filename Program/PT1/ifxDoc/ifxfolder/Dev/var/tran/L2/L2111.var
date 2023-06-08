@@ -113,9 +113,16 @@ T(3,CdCode.DepartmentCode)
 
 #DepartmentCodeHelp=x,1024,S
 
+!ApprovedLevel 核決層級
+#CDDEF07=x,25,S
+T(3,CdCode.ApprovedLevel)
+
+#ApprovedLevelHelp=x,1024,S 
+
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05,#CDDEF06)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05,#CDDEF06,#CDDEF07)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@FuncCodeHelp,#HelpDesc1)
@@ -124,6 +131,7 @@ T(2,@ProcessCodeHelp,#HelpDesc3)
 T(2,@CurrPrecisionHelp,#HelpDesc4)
 T(2,@YesNoHelp,#HelpDesc5)
 T(2,@DepartmentCodeHelp,#HelpDesc6)
+T(2,@ApprovedLevelHelp,#HelpDesc7)
 
 #Rim1=A,1,S
 
@@ -260,6 +268,7 @@ T(2,@PieceCode,#L2r02PieceCode)
 T(2,@CreditOfficer,#L2r02CreditOfficer)
 T(2,@LoanOfficer,#L2r02LoanOfficer)
 T(2,@Introducer,#L2r02Introducer)
+T(2,@ApprovedLevel,#L2r02ApprovedLevel)
 T(2,@Supervisor,#L2r02Supervisor)
 T(2,@Coorgnizer,#L2r02Coorgnizer)
 T(2,@ProcessCode,#L2r02ProcessCode)
@@ -992,12 +1001,26 @@ T(2,#L2r08FullName)
 #BIND8A=X,1,S
 BIND(#BTN8,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF8A;ntxbuf5=type<-1:Supervisor<-OOEmployeeNo:SupervisorX<-OOFullname})
 
+!核准層級
+#FdApprovedLevel=X,2,L
+
+#ApprovedLevel=X,1,I
+HELP(#ApprovedLevelHelp)
+@
+C(4,#ApprovedLevel,$,V(H,#ApprovedLevelHelp))
+
+#ApprovedLevelX=X,20,L
+C(4,#ApprovedLevel,S,$)
+T(H,#ApprovedLevel,#ApprovedLevelHelp)
+C(3,#ApprovedLevel,9,T(F,@Supervisor,0)T(3,@FdSupervisor,),T(F,@Supervisor,1)T(3,@FdSupervisor,*))
 
 ![核決主管]
 !可不輸入
-
 #Supervisor=X,6,I
 C(3,#UpdateCode,1,$,s)
+C(3,#ApprovedLevel,9,HIDE(#BTN8),SHOW(#BTN8))
+C(3,#ApprovedLevel,9,S,$)
+@C(4,#ApprovedLevel,$,V(7))
 
 !有輸入值時查詢L6088 也不該帶值QC1679
 #BUF8B=X,7,S
@@ -1190,7 +1213,8 @@ V(P,修改時，必須至少修改一個項目)
 [""],
 ["#FdEstimate+估價人員",#Estimate,#BTN4,#EstimateX],          
 ["#FdCreditOfficer+授信人員",#CreditOfficer,#BTN5,#CreditOfficerX],
-["#FdLoanOfficer+放款專員",#LoanOfficer,#BTN6,#LoanOfficerX],
+[#<->#,"#FdLoanOfficer+放款專員",#LoanOfficer,#BTN6,#LoanOfficerX],
+["#FdApprovedLevel+核准層級",#ApprovedLevel,#ApprovedLevelX],
 ["#FdSupervisor+核決主管",#Supervisor,#BTN8,#SupervisorX],  
 ["#FdCoorgnizer+協辦人",#Coorgnizer,#BTN9,#CoorgnizerX],  
 ["#FdIntroducer+介紹人",#Introducer,#BTN7,#IntroducerX],     
@@ -1248,6 +1272,7 @@ T(H,@ProcessCodeX,#ProcessCode,#ProcessCodeHelp)
 #CreditOfficer
 #LoanOfficer
 #Introducer
+#ApprovedLevel
 #Supervisor
 #Coorgnizer
 #ProcessCode

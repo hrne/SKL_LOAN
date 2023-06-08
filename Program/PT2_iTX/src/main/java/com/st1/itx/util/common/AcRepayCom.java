@@ -139,6 +139,7 @@ public class AcRepayCom extends TradeBuffer {
 		}
 
 		// step 2. 收付欄出帳
+
 		settlePayment(titaVo);
 
 		// step 3. 費用出帳
@@ -375,13 +376,52 @@ public class AcRepayCom extends TradeBuffer {
 
 	// 收付欄出帳
 	private void settlePayment(TitaVo titaVo) throws LogicException {
+		// 計算暫收抵繳總額
+		BigDecimal iTmpTotal = BigDecimal.ZERO;
+		for (int i = 1; i <= 50; i++) {
+			if (titaVo.get("RpCode" + i) == null || parse.stringToInteger(titaVo.getParam("RpCode" + i)) == 0)
+				break;
+			if (parse.stringToInteger(titaVo.getParam("RpCode" + i)) == 90) {
+				iTmpTotal = iTmpTotal.add(parse.stringToBigDecimal(titaVo.getParam("RpAmt" + i)));
+			}
+		}
+		// 計算暫收可抵繳總額
+		BigDecimal iTavTotal = BigDecimal.ZERO; //
+		if (this.baTxList != null) {
+			for (BaTxVo ba : this.baTxList) {
+				if (ba.getDataKind() == 3) {
+					iTavTotal = iTavTotal.add(ba.getUnPaidAmt());
+				}
+			}
+		}
+		// 是否總額出帳 0:否 1:是 2:已總額出帳
+		int tmpFlag = iTmpTotal.compareTo(BigDecimal.ZERO) > 0 && iTmpTotal.compareTo(iTavTotal) == 0 ? 1 : 0;
 		// 借方：收付欄
 		for (int i = 1; i <= 50; i++) {
 			/* 還款來源／撥款方式為 0 者跳出 */
 			if (titaVo.get("RpCode" + i) == null || parse.stringToInteger(titaVo.getParam("RpCode" + i)) == 0)
 				break;
 			if (parse.stringToBigDecimal(titaVo.getParam("RpAmt" + i)).compareTo(BigDecimal.ZERO) > 0) {
-				addPayment(i, titaVo);
+				if (parse.stringToInteger(titaVo.getParam("RpCode" + i)) == 90 && tmpFlag > 0) {
+					if (tmpFlag == 1) {
+						for (BaTxVo ba : this.baTxList) {
+							if (ba.getDataKind() == 3) {
+								AcDetail acDetail = new AcDetail();
+								acDetail.setDbCr("D");
+								acDetail.setTxAmt(ba.getUnPaidAmt());
+								acDetail.setSumNo("090");
+								acDetail.setRvNo(ba.getRvNo());
+								acDetail.setAcctCode(ba.getAcctCode());
+								acDetail.setCustNo(ba.getCustNo());
+								acDetail.setFacmNo(ba.getFacmNo());
+								this.lAcDetail.add(acDetail);
+							}
+						}
+						tmpFlag = 2; 
+					}
+				} else {
+					addPayment(i, titaVo);
+				}
 			}
 		}
 		for (AcDetail ac : this.lAcDetail) {
@@ -409,7 +449,8 @@ public class AcRepayCom extends TradeBuffer {
 		if (this.baTxList == null) {
 			return BigDecimal.ZERO;
 		}
-		this.info("settleFee , this.wkTxAmtRemaind=" + this.wkTxAmtRemaind + ", this.wkTempAmtRemaind=" + this.wkTempAmtRemaind);
+		this.info("settleFee , this.wkTxAmtRemaind=" + this.wkTxAmtRemaind + ", this.wkTempAmtRemaind="
+				+ this.wkTempAmtRemaind);
 		BigDecimal totalFee = BigDecimal.ZERO;
 		// 還放款為依序抵繳、暫收款為抵繳費用金額
 		for (BaTxVo ba : this.baTxList) {
@@ -700,8 +741,8 @@ public class AcRepayCom extends TradeBuffer {
 		// 彙總傳票批號
 		if (tx.getRepayCode() >= 1 && tx.getRepayCode() <= 4) {
 			if (titaVo.get("BATCHNO") != null && titaVo.get("BATCHNO").trim().length() == 6
-					&& "BATX".equals(titaVo.get("BATCHNO").substring(0, 4)) 
-				&& titaVo.getTxtNo().substring(0, 2).equals(titaVo.get("BATCHNO").substring(4, 6))) {
+					&& "BATX".equals(titaVo.get("BATCHNO").substring(0, 4))
+					&& titaVo.getTxtNo().substring(0, 2).equals(titaVo.get("BATCHNO").substring(4, 6))) {
 				tx.setSlipSumNo(parse.stringToInteger(titaVo.get("BATCHNO").substring(4, 6)));
 			}
 		}

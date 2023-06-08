@@ -1683,6 +1683,7 @@ TXFORM=L2R01
 #L2r02CreditOfficer=X,6,S
 #L2r02LoanOfficer=X,6,S
 #L2r02Introducer=X,6,S
+#L2r02ApprovedLevel=X,1,S
 #L2r02Supervisor=X,6,S
 #L2r02Coorgnizer=X,6,S
 #L2r02ProcessCode=A,1,S
@@ -1714,6 +1715,7 @@ TXFORM=L2R02
 #L2r02CreditOfficer
 #L2r02LoanOfficer
 #L2r02Introducer
+#L2r02ApprovedLevel
 #L2r02Supervisor
 #L2r02Coorgnizer
 #L2r02ProcessCode
@@ -3504,6 +3506,7 @@ TXFORM=L2R49
 #L2r50CreditOfficer=X,6,S
 #L2r50LoanOfficer=X,6,S
 #L2r50BusinessOfficer=X,6,S
+#L2r50ApprovedLevel=X,1,S
 #L2r50Supervisor=X,6,S
 #L2r50Coorgnizer=X,6,S
 #L2r50CreditScore=A,3,S
@@ -3554,6 +3557,7 @@ TXFORM=L2R50
 #L2r50CreditOfficer
 #L2r50LoanOfficer
 #L2r50BusinessOfficer
+#L2r50ApprovedLevel
 #L2r50Supervisor
 #L2r50Coorgnizer
 #L2r50CreditScore

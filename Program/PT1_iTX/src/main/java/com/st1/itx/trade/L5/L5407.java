@@ -213,24 +213,53 @@ public class L5407 extends TradeBuffer {
 		this.info("insertOrgLogiEmpNo    = " + iEmpNo);
 //		Slice<PfCoOfficerLog> slPfCoOfficerLog = pfCoOfficerLogService.findEmpNoEq(iEmpNo, 0, Integer.MAX_VALUE,
 //				titaVo);
-//		if (slPfCoOfficerLog == null && iFunctionCode == 1 ) {
-			PfCoOfficer oPf = pfCoOfficerService.effectiveDateFirst(iEmpNo, 0, 99991231, titaVo);
-			if (oPf != null) {
+////		if (slPfCoOfficerLog == null && iFunctionCode == 1 ) {
+//			PfCoOfficer oPf = pfCoOfficerService.effectiveDateFirst(iEmpNo, 0, 99991231, titaVo);
+//			if (oPf != null) {
 				PfCoOfficerLog tPfCoOfficerLog = new PfCoOfficerLog();
 				
-				tPfCoOfficerLog.setEmpNo(oPf.getEmpNo());
-				tPfCoOfficerLog.setEffectiveDate(oPf.getEffectiveDate());
-				tPfCoOfficerLog.setIneffectiveDate(oPf.getIneffectiveDate());
-				tPfCoOfficerLog.setEmpClass(oPf.getEmpClass());
-				tPfCoOfficerLog.setClassPass(oPf.getClassPass());
-				tPfCoOfficerLog.setAreaCode(oPf.getAreaCode());
-				tPfCoOfficerLog.setAreaItem(oPf.getAreaItem());
-				tPfCoOfficerLog.setDeptCode(oPf.getDeptCode());
-				tPfCoOfficerLog.setDeptItem(oPf.getDeptItem());
-				tPfCoOfficerLog.setDistCode(oPf.getDistCode());
-				tPfCoOfficerLog.setDistItem(oPf.getDistItem());
-				tPfCoOfficerLog.setUpdateTlrNo(oPf.getLastUpdateEmpNo());
-				tPfCoOfficerLog.setUpdateDate(oPf.getLastUpdate());
+//				tPfCoOfficerLog.setEmpNo(oPf.getEmpNo());
+//				tPfCoOfficerLog.setEffectiveDate(oPf.getEffectiveDate());
+//				tPfCoOfficerLog.setIneffectiveDate(oPf.getIneffectiveDate());
+//				tPfCoOfficerLog.setEmpClass(oPf.getEmpClass());
+//				tPfCoOfficerLog.setClassPass(oPf.getClassPass());
+//				tPfCoOfficerLog.setAreaCode(oPf.getAreaCode());
+//				tPfCoOfficerLog.setAreaItem(oPf.getAreaItem());
+//				tPfCoOfficerLog.setDeptCode(oPf.getDeptCode());
+//				tPfCoOfficerLog.setDeptItem(oPf.getDeptItem());
+//				tPfCoOfficerLog.setDistCode(oPf.getDistCode());
+//				tPfCoOfficerLog.setDistItem(oPf.getDistItem());
+//				tPfCoOfficerLog.setUpdateTlrNo(oPf.getLastUpdateEmpNo());
+//				tPfCoOfficerLog.setUpdateDate(oPf.getLastUpdate());
+//				tPfCoOfficerLog.setFunctionCode(1);		
+				
+				iFunctionCode = Integer.valueOf(titaVo.getParam("FunctionCd"));
+				iEmpNo = titaVo.getParam("EmpNo");
+				iEffectiveDate = Integer.valueOf(titaVo.getParam("EffectiveDate"));
+				iIneffectiveDate = Integer.valueOf(titaVo.getParam("IneffectiveDate"));
+				String iEmpClass = titaVo.getParam("EmpClass").trim();
+				String iClassPass = titaVo.getParam("ClassPass");
+				String iAreaCode = titaVo.getParam("UnitCode");
+				String iDistCode = titaVo.getParam("DistCode");
+				String iDeptCode = titaVo.getParam("DeptCode");
+				String iAreaItem = titaVo.getParam("UnitCodeX");
+				String iDistItem = titaVo.getParam("DistCodeX");
+				String iDeptItem = titaVo.getParam("DeptCodeX");
+				
+				tPfCoOfficerLog.setEmpNo(iEmpNo);
+				tPfCoOfficerLog.setEffectiveDate(iEffectiveDate);
+				tPfCoOfficerLog.setIneffectiveDate(iIneffectiveDate);
+				tPfCoOfficerLog.setEmpClass(iEmpClass);
+				tPfCoOfficerLog.setClassPass(iClassPass);
+				tPfCoOfficerLog.setAreaCode(iAreaCode);
+				tPfCoOfficerLog.setAreaItem(iAreaItem);
+				tPfCoOfficerLog.setDeptCode(iDeptCode);
+				tPfCoOfficerLog.setDeptItem(iDeptItem);
+				tPfCoOfficerLog.setDistCode(iDistCode);
+				tPfCoOfficerLog.setDistItem(iDistItem);
+				tPfCoOfficerLog.setUpdateTlrNo(titaVo.getTlrNo());
+				tPfCoOfficerLog
+						.setUpdateDate(parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime()));
 				tPfCoOfficerLog.setFunctionCode(1);
 
 				try {
@@ -238,10 +267,10 @@ public class L5407 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException("E0005", "新增歷程資料時發生錯誤");
 				}
-			}
-		}
+//			}
+//		}
 
-//	}
+	}
 
 //	private void updateLog(PfCoOfficer oPf, TitaVo titaVo) throws LogicException {
 //	private void updateLog(TitaVo titaVo) throws LogicException {

@@ -148,6 +148,7 @@ public class L2R02 extends TradeBuffer {
 			this.totaVo.putParam("L2r02CreditOfficer", tFacCaseAppl.getCreditOfficer());
 			this.totaVo.putParam("L2r02LoanOfficer", tFacCaseAppl.getLoanOfficer());
 			this.totaVo.putParam("L2r02Introducer", tFacCaseAppl.getIntroducer());
+			this.totaVo.putParam("L2r02ApprovedLevel", tFacCaseAppl.getApprovedLevel());
 			this.totaVo.putParam("L2r02Supervisor", tFacCaseAppl.getSupervisor());
 			this.totaVo.putParam("L2r02Coorgnizer", tFacCaseAppl.getCoorgnizer());
 			this.totaVo.putParam("L2r02ProcessCode", tFacCaseAppl.getProcessCode());

@@ -146,10 +146,13 @@ public class L6903 extends TradeBuffer {
 		if (this.index == 0 && (dList == null || dList.size() == 0)) {
 			throw new LogicException(titaVo, "E0001", "會計帳務明細檔");
 		}
-
+		
+		int cut = 0;
+		BigDecimal iwkDb = new BigDecimal(0);
+		BigDecimal iwkCr = new BigDecimal(0);
 		for (Map<String, String> d : dList) {
 			// 不含未入帳,例如:未放行之交易
-
+			cut++;
 			OccursList occursList = new OccursList();
 
 			occursList.putParam("OOAcNoCode", d.get("AcNoCode"));
@@ -162,12 +165,14 @@ public class L6903 extends TradeBuffer {
 			if ("D".equals(d.get("DbCr"))) {
 				occursList.putParam("OODbAmt", d.get("TxAmt"));
 				occursList.putParam("OOCrAmt", 0);
+				iwkDb = iwkDb.add(parse.stringToBigDecimal(d.get("TxAmt")));
 			} else {
 				occursList.putParam("OODbAmt", 0);
 				occursList.putParam("OOCrAmt", d.get("TxAmt"));
+				iwkCr = iwkCr.add(parse.stringToBigDecimal(d.get("TxAmt")));
 			}
 			String Odate = parse.stringToStringDateTime(d.get("CreateDate"));
-			this.info("CreateDate   = " + Odate);
+			
 			String Date = FormatUtil.left(Odate, 9);
 			occursList.putParam("OOLastDate", Date);
 			String Time = FormatUtil.right(Odate, 8);
@@ -192,12 +197,18 @@ public class L6903 extends TradeBuffer {
 			occursList.putParam("OOLastEmp", d.get("TitaTlrNo"));
 			occursList.putParam("OOLastEmpName", empName(titaVo, d.get("TitaTlrNo")));
 			occursList.putParam("OOAcDate", parse.stringToInteger(d.get("AcDate")) - 19110000);
+			
+
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
+			if (cut == dList.size()) {
+				this.totaVo.putParam("ODbAmt", iwkDb);
+				this.totaVo.putParam("OCrAmt", iwkCr);
+			}
 		}
 
-		this.totaVo.putParam("ODbAmt", wkDb);
-		this.totaVo.putParam("OCrAmt", wkCr);
+//		this.totaVo.putParam("ODbAmt", wkDb);
+//		this.totaVo.putParam("OCrAmt", wkCr);
 
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 		if (dList != null && dList.size() >= this.limit) {

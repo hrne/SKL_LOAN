@@ -286,6 +286,7 @@ public class L2111 extends TradeBuffer {
 				tFacCaseAppl.setCreditOfficer(titaVo.getParam("CreditOfficer"));
 				tFacCaseAppl.setLoanOfficer(titaVo.getParam("LoanOfficer"));
 				tFacCaseAppl.setIntroducer(titaVo.getParam("Introducer"));
+				tFacCaseAppl.setApprovedLevel(titaVo.getParam("ApprovedLevel")); // 6/1會議決議
 				tFacCaseAppl.setSupervisor(titaVo.getParam("Supervisor"));
 				tFacCaseAppl.setCoorgnizer(titaVo.getParam("Coorgnizer"));
 			} else {
@@ -347,6 +348,7 @@ public class L2111 extends TradeBuffer {
 		tFacCaseAppl.setIsDate(parse.stringToInteger(titaVo.getParam("IsDate")));
 
 		tFacCaseAppl.setIntroducer(titaVo.getParam("Introducer"));
+		tFacCaseAppl.setApprovedLevel(titaVo.getParam("ApprovedLevel")); // 6/1會議決議
 		tFacCaseAppl.setSupervisor(titaVo.getParam("Supervisor"));
 		tFacCaseAppl.setCoorgnizer(titaVo.getParam("Coorgnizer"));
 		tFacCaseAppl.setProcessCode(titaVo.getParam("ProcessCode"));
