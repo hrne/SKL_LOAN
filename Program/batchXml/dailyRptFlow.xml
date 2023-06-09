@@ -49,6 +49,13 @@
 				</step>
 			</flow>
 
+			<!-- L9139 暫收款日餘額前後差異比較表 -->
+			<flow>
+				<step id="sL9139Batch" parent="parentStep">
+					<tasklet ref="L9139Batch" />
+				</step>
+			</flow>
+
 			<flow>
 				<step id="sLW003" parent="parentStep">
 					<tasklet ref="LW003" />

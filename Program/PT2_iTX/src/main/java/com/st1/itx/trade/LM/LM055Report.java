@@ -56,9 +56,9 @@ public class LM055Report extends MakeReport {
 		// LM054
 		String txcd = "LM055";
 		// 檔案名稱
-		String rptItem = "A041重要放款餘額明細表";
+		String rptItem = "A042放款餘額彙總表";
 		// 輸出檔名
-		String fileName = "A042放款餘額彙總表_工作表";
+		String fileName = "LM055-A042放款餘額彙總表_工作表";
 		// 底稿名稱
 		String defaultName = "LM055_底稿_A042放款餘額彙總表.xlsx";
 		// 底稿工作表名
@@ -68,9 +68,6 @@ public class LM055Report extends MakeReport {
 				.setRptItem(rptItem).build();
 
 		makeExcel.open(titaVo, reportVo, fileName, defaultName, defaultSheetName);
-
-//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM055", "A042放款餘額彙總表_工作表", "LM055-A042放款餘額彙總表",
-//				"LM055_底稿_A042放款餘額彙總表.xlsx", "A042放款餘額彙總表");
 
 		makeExcel.setValue(2, 3, yearMonth);
 
@@ -100,6 +97,8 @@ public class LM055Report extends MakeReport {
 		int kind = 0;
 		BigDecimal amount = BigDecimal.ZERO;
 
+		makeExcel.setValue(12, 2, "C", "C");
+		
 		for (Map<String, String> r : listData) {
 
 			// 會null是因為MonthlyFacBal的AssetClass沒有更新到處於null狀態，需上傳L7205(五類資產分類上傳轉檔作業)

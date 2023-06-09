@@ -255,9 +255,7 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		if (functionCode == 1) {
 			sql += "   GROUP BY BDD.\"CustNo\" ";
-		} else {
-			sql += "   GROUP BY BDD.\"EntryDate\" ";
-		}
+		} 
 
 		this.info("sql=" + sql);
 		Query query;

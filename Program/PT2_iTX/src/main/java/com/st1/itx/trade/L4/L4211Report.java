@@ -370,7 +370,7 @@ public class L4211Report extends MakeReport {
 				}
 			}
 		}
-
+		boolean isBatchFlag = false;
 		for (Map<String, String> tfnAllList : fnAllList) {
 
 			String dfMakeferAmt = formatAmt(tfnAllList.get("AcctAmt"), 0);
@@ -398,12 +398,10 @@ public class L4211Report extends MakeReport {
 			String currentSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
 			// 判斷當前的批號與批次號碼不同
 			if (!msName.equals(tfnAllList.get("ReconCode")) || !msNum.equals(tfnAllList.get("BatchNo"))) {
-
+				isBatchFlag = false;
 				if (npcount > 0) { // 除當頁第一筆
 					this.print(1, 0,
 							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-
-					lastSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
 
 					this.print(1, 2, lastAcctItem);
 
@@ -455,9 +453,7 @@ public class L4211Report extends MakeReport {
 					// 判斷前一筆與當筆是否相同科目
 					currentSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
 					if (!lastSortingForSubTotal.equals(currentSortingForSubTotal)) {
-						this.info("lastSort     = " + lastSortingForSubTotal);
-						lastSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
-						lastAcctItem = tfnAllList.get("AcctItem");
+
 						this.info("currSort     = " + currentSortingForSubTotal);
 						this.info("curracctItem = " + tfnAllList.get("AcctItem"));
 
@@ -485,7 +481,7 @@ public class L4211Report extends MakeReport {
 						totalsumShortPayment = totalsumShortPayment.add(allsumShortPayment);
 						totalsumOthers = totalsumOthers.add(allsumOthers);
 
-						if (currentSortingForSubTotal.equals("9999")) {
+						if (currentSortingForSubTotal.equals("9999") && isBatchFlag) {
 							this.print(1, 0,
 									"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 
@@ -496,6 +492,8 @@ public class L4211Report extends MakeReport {
 							totalAll();
 
 							this.print(1, 0, "");
+
+							isBatchFlag = true;
 
 						}
 
@@ -736,6 +734,8 @@ public class L4211Report extends MakeReport {
 				}
 			}
 		}
+
+		boolean isBatchFlag = false;
 		for (Map<String, String> tfnAllList : fnAllList) {
 
 //			String dfTransferAmt = formatAmt(tfnAllList.get("TxAmt"), 0);
@@ -765,7 +765,7 @@ public class L4211Report extends MakeReport {
 
 			// 判斷當前的批號與批次號碼不同
 			if (!msName.equals(tfnAllList.get("ReconCode")) || !msNum.equals(tfnAllList.get("BatchNo"))) {
-
+				isBatchFlag = false;
 				if (npcount > 0) { // 除當頁第一筆
 					this.print(1, 0,
 							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
@@ -851,7 +851,7 @@ public class L4211Report extends MakeReport {
 						totalsumShortPayment = totalsumShortPayment.add(allsumShortPayment);
 						totalsumOthers = totalsumOthers.add(allsumOthers);
 
-						if (currentSortingForSubTotal.equals("9999")) {
+						if (currentSortingForSubTotal.equals("9999") && !isBatchFlag) {
 							this.print(1, 0,
 									"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 
@@ -862,6 +862,8 @@ public class L4211Report extends MakeReport {
 							totalAll();
 
 							this.print(1, 0, "");
+
+							isBatchFlag = true;
 
 						}
 
@@ -1070,7 +1072,7 @@ public class L4211Report extends MakeReport {
 	}
 
 	private void report3(List<Map<String, String>> fnAllList, boolean isBatchMapList) throws LogicException {
-//		String lastSortingForSubTotal = ""; // 上一個SortingForSubTotal
+		String lastSortingForSubTotal = ""; // 上一個SortingForSubTotal
 //		String lastAcctItem = ""; // 上一個AcctItem
 		String msName = ""; // 表頭P號
 		String msNum = ""; // 批次號碼
@@ -1128,6 +1130,21 @@ public class L4211Report extends MakeReport {
 			String currentSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
 			// 判斷當前的批號與批次號碼不同
 			if (!msName.equals(tfnAllList.get("ReconCode")) || !msNum.equals(tfnAllList.get("BatchNo"))) {
+
+				if (lastSortingForSubTotal.equals("9999") && isBatchFlag) {
+					this.print(1, 0,
+							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+
+					this.print(1, 2, "人工入帳");
+
+					this.print(0, 14, " 合計 ");
+
+					totalAll();
+
+					this.print(1, 0, "");
+
+				}
+
 				isBatchFlag = false;
 				if (npcount > 0) { // 除當頁第一筆
 //					this.print(1, 0,
@@ -1265,7 +1282,7 @@ public class L4211Report extends MakeReport {
 			pageCnt++;
 
 			// 第一筆或相同的時候放入暫存 給下次一筆 比對使用
-//			lastSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
+			lastSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
 
 //			lastAcctItem = tfnAllList.get("AcctItem");
 

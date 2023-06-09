@@ -238,16 +238,16 @@ E(0,@RimToday,#Today)
 RESET_RIM(#RimL4r11,L4R11)
 S(L4R11,1,#RimToday)
 R(1,L4R11)
-IF(#EntryDate < #L4r11EntryDate,$,s)
+!IF(#EntryDate < #L4r11EntryDate,$,s)
 E(0,@EntryDate,#L4r11EntryDate)
 
 ! 入帳日期
 #EntryDateL=D,7,L
+
 #EntryDate=D,7,I
 C(3,#FunctionCode,1,$,s)
-E(0,@EntryDate,#SYSNDATE)
+!E(0,@EntryDate,#SYSNDATE)
 @V(7)A(DATE,0,#EntryDate)
-
 ! 戶號
 #CustNoL=A,7,L
 #CustNo=A,7,I
@@ -270,6 +270,9 @@ R(1,L1R09)
 
 #checkL1r09=X,1,S
 T(2,@CustName,#L1r09CustName)
+
+#MRKEY=_,_,S
+T(2,#CustNo+-+#FacmNo)
 
 !戶名
 #CustName=X,50,L

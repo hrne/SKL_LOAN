@@ -9,8 +9,6 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.CdWorkMonth;
-import com.st1.itx.db.service.CdWorkMonthService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
@@ -22,14 +20,11 @@ import com.st1.itx.util.http.WebClient;
  * @version 1.0.0
  */
 @Service("L9139Batch")
-@Scope("prototype")
+@Scope("step")
 public class L9139Batch extends TradeBuffer {
 
 	@Autowired
 	L9139Report oL9139Report;
-
-	@Autowired
-	CdWorkMonthService cdWorkMonthService;
 
 	@Autowired
 	DateUtil dateUtil;
@@ -53,19 +48,8 @@ public class L9139Batch extends TradeBuffer {
 
 		// 帳務日(民國)
 		int tbsdy = this.txBuffer.getTxCom().getTbsdy();
-		
-		// 營業日(西元年)
-		int tbsdyf = this.txBuffer.getTxCom().getTbsdyf();
 
-//		CdWorkMonth cdWorkMonth = cdWorkMonthService.findDateFirst(tbsdyf, tbsdyf, titaVo);
-//		
-//		if (cdWorkMonth == null)
-//			throw new LogicException("E0001", "暫收款日餘額前後差異比較表");
-//
-//		int year = cdWorkMonth.getYear() - 1911;
-//		int month = cdWorkMonth.getMonth();
-
-		// ServiceImpl.findAll 接收民國年月
+		// ServiceImpl.findAll 接收民國年月日
 		titaVo.putParam("StartDate", tbsdy);	
 				
 		boolean isFinish = oL9139Report.exec(titaVo);

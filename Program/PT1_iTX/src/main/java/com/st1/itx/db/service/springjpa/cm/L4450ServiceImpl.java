@@ -204,16 +204,13 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    \"CustNo\" ";
 		sql += "   ,\"FacmNo\" ";
 		sql += "   ,\"ReceivableFlag\" ";
-		sql += "   ,\"RvBal\" ";
-		sql += "   ,\"AcctCode\" ";
-		sql += "   ,row_number() over (partition by \"CustNo\", \"FacmNo\" order by \"RvNo\" ASC) as seq ";
+		sql += "   ,row_number() over (partition by \"CustNo\", \"FacmNo\" order by \"ReceivableFlag\" DESC) as seq ";
 		sql += "   from \"AcReceivable\" ";
 		sql += "   where \"RvBal\" > 0 ";
 		sql += "     and case ";
-		sql += "           when \"ReceivableFlag\" in (3, 4) "; // 銷帳科目記號 3:未收費用 4:短繳期金
-		sql += "           then 1 ";
-		sql += "           when \"AcctCode\" like 'F%' "; // 費用類
-		sql += "           then 1 ";
+		sql += "           when \"AcctCode\" in ('TMI') then 0"; // 火險在rv2
+		sql += "           when \"ReceivableFlag\" in (3, 4)  then 1  "; // 銷帳科目記號 3:未收費用 4:短繳期金
+		sql += "           when \"AcctCode\" like 'F%' then 1 "; // 費用類
 		sql += "         else 0 end = 1 ";
 		sql += "  ) rv on rv.\"CustNo\" = b.\"CustNo\" ";
 		sql += "      and rv.\"FacmNo\" = b.\"FacmNo\" ";
@@ -432,8 +429,6 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> findSingle(TitaVo titaVo) throws Exception {
 		int custNo = Integer.parseInt(titaVo.getParam("CustNo").trim());
 		int facmNo = Integer.parseInt(titaVo.getParam("FacmNo").trim());
-		int entryDate = Integer.parseInt(titaVo.getParam("EntryDate")) + 19110000;
-		int repayType = Integer.parseInt(titaVo.getParam("RepayType")); // 還款類別
 
 		String iRepayBank = "";
 		if (titaVo.get("RepayBank") != null) {
@@ -463,25 +458,11 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  left join \"BankAuthAct\" ba on ba.\"CustNo\" = b.\"CustNo\"           ";
 		sql += "                      and ba.\"FacmNo\" = b.\"FacmNo\"                   ";
 		sql += "                  and ba.\"AuthType\" in ('00','01')                     ";
-		sql += "  left join ( ";
-		sql += "   select ";
-		sql += "    \"CustNo\" ";
-		sql += "   ,\"FacmNo\" ";
-		sql += "   ,\"ReceivableFlag\" ";
-		sql += "   ,\"RvBal\" ";
-		sql += "   ,\"AcctCode\" ";
-		sql += "   ,row_number() over (partition by \"CustNo\", \"FacmNo\" order by \"RvNo\" ASC) as seq ";
-		sql += "   from \"AcReceivable\") rv on  rv.\"CustNo\"         = b.\"CustNo\" ";
-		sql += "                            and  rv.\"FacmNo\"         = b.\"FacmNo\" ";
-		sql += "                            and  rv.\"RvBal\"          > 0 ";
-		sql += "                            and (   rv.\"ReceivableFlag\" in (3, 4) "; // 銷帳科目記號 3:未收費用 4:短繳期金
-		sql += "                                 or rv.\"AcctCode\" like 'F%' ) "; // 費用類
-		sql += "                            and  rv.seq = 1 ";
 		sql += "  left join (                                                            ";
 		sql += "   select                                                                ";
 		sql += "    \"CustNo\"                                                           ";
-		sql += "   ,\"AuthCode\"                                                           ";
-		sql += "   ,\"PostDepCode\"                                                        ";
+		sql += "   ,\"AuthCode\"                                                         ";
+		sql += "   ,\"PostDepCode\"                                                      ";
 		sql += "   ,\"RepayAcct\"                                                        ";
 		sql += "   ,\"RelationCode\"                                                     ";
 		sql += "   ,\"RelAcctName\"                                                      ";
@@ -519,25 +500,8 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (facmNo > 0) {
 			sql += "    and b.\"FacmNo\"= " + facmNo;
 		}
-
-		if (repayType == 1) {
-			sql += "    and b.\"Status\"= 0                                    ";
-			sql += "    and (   b.\"NextPayIntDate\" <= " + entryDate;
-			sql += "         or nvl(rv.\"ReceivableFlag\" ,0) = 4 ) ";
-			sql += "    and case                                               ";
-			sql += "          when b.\"AmortizedCode\" IN (3,4)                ";
-			sql += "          then                                             ";
-			sql += "            case                                           ";
-			sql += "              when b.\"DueAmt\" > 0                        ";
-			sql += "              then 1                                       ";
-			sql += "            else 0                                         ";
-			sql += "            end                                            ";
-			sql += "        else 1                                             ";
-			sql += "        end = 1                                            ";
-		}
-		// 回收時排序,依應繳日順序由小到大、利率順序由大到小、額度由小到大
-		sql += "   order by b.\"CustNo\" ASC, b.\"NextPayIntDate\" ASC, b.\"StoreRate\" DESC, b.\"FacmNo\" ASC, b.\"BormNo\" ASC ";
-
+		// 回收時排序,依應繳日順序由小到大、利率順序由大到小、額度由大到小
+		sql += "   order by b.\"CustNo\" ASC, b.\"NextPayIntDate\" ASC, b.\"FacmNo\" ASC, b.\"BormNo\" ASC ";
 		this.info("sql=" + sql);
 
 		Query query;

@@ -191,6 +191,19 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                        AND I.\"BormNo\" = MLB.\"BormNo\"";
 		sql += "        WHERE I.\"YearMonth\" IN (:yymm) ";
 		sql += "          AND MLB.\"AcctCode\" <> 990 ) R";
+		sql += "	),\"tempG\" AS (";
+		// --IFRS 9 預期損失增提金額
+		sql += "	SELECT 'C' AS \"TYPE\"";
+		sql += "		  ,13 AS \"KIND\"";
+		sql += "		  ,SUM(\"AMT\") AS \"AMT\"";
+		sql += "	FROM (";
+		sql += "		SELECT \"LegalLoss\" AS \"AMT\" ";
+		sql += "	    FROM \"MonthlyLM052Loss\"";
+		sql += "	    WHERE \"YearMonth\" = :lyymm";
+		sql += "		UNION";
+		sql += "		SELECT - \"AssetEvaTotal\" AS \"AMT\" ";
+		sql += "	    FROM \"MonthlyLM052Loss\"";
+		sql += "	    WHERE \"YearMonth\" = :yymm";
 		sql += "	)";
 		sql += "	SELECT R.\"TYPE\" AS F0";
 		sql += "		  ,R.\"KIND\" AS F1";
@@ -207,7 +220,8 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			 WHEN R.\"KIND\" = 9 THEN '備抵損失II' ";
 		sql += "			 WHEN R.\"KIND\" = 10 THEN '備抵損失III' ";
 		sql += "			 WHEN R.\"KIND\" = 11 THEN '備抵損失IV' ";
-		sql += "			 WHEN R.\"KIND\" =12 THEN '備抵損失V'";
+		sql += "			 WHEN R.\"KIND\" = 12 THEN '備抵損失V'";
+		sql += "			 WHEN R.\"KIND\" = 13 THEN 'IFRS 9預期損失增提金額'";
 		sql += "		   END AS F3";
 		sql += "	FROM ( ";
 		sql += "		SELECT E.\"TYPE\" AS \"TYPE\"";
@@ -260,6 +274,11 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			   END , 0 ) AS \"AMT\"";
 		sql += "		FROM \"tempF\" F";
 		sql += "		WHERE F.\"KIND\" IN (3,4)";
+		sql += "		UNION";
+		sql += "		SELECT G.\"TYPE\" AS \"TYPE\"";
+		sql += "			  ,G.\"KIND\" AS \"KIND\"";
+		sql += "			  ,NVL(G.\"AMT\",0) AS \"AMT\"";
+		sql += "		FROM \"tempG\" G";
 		sql += "	)R";
 		sql += "	ORDER BY R.\"KIND\"";
 
@@ -270,6 +289,7 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setParameter("yymm", yearMonth);
 		query.setParameter("lyymmdd", ilDate);
+		query.setParameter("lyymm", ilDate / 100);
 		return this.convertToMap(query);
 	}
 

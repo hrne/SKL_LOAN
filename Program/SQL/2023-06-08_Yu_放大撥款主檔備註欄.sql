@@ -1,0 +1,1 @@
+    ALTER TABLE "LoanBorMain" MODIFY "Remark" NVARCHAR2(200);

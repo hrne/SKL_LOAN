@@ -2,6 +2,7 @@ package com.st1.itx.trade.L4;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,6 +79,9 @@ public class L4101ReportC extends MakeReport {
 	int cnt = 0; // 總筆數
 	BigDecimal sumDbAmt = BigDecimal.ZERO;// 借方總金額
 	BigDecimal sumCrAmt = BigDecimal.ZERO;// 貸方總金額
+	private HashMap<CdAcCodeId, BigDecimal> acCodeTotalAmt = new HashMap<>();
+	private HashMap<CdAcCodeId, Integer> acCodeTotalSize = new HashMap<>();
+	private Boolean isRT = false;
 
 	// 自訂表頭
 	@Override
@@ -136,9 +140,7 @@ public class L4101ReportC extends MakeReport {
 		if ("RT".equals(batchNo.substring(0, 2))) {
 			this.print(-43, 1, "　　　　　　　　　　放款部　協理：　　　　　　　　經理：　　　　　　　　襄理：　　　　　　　　　　　　　　製表人：　　　　　　　　　　　　　　　　　");
 			this.print(-44, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
-
-			this.print(-43, 1, "　　　　　　　　　　財務部　協理：　　　　　　　　經理：　　　　　　　　襄理：　　　　　　　　　　　　　　製表人：　　　　　　　　　　　　　　　　　");
-			this.print(-44, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
+			this.print(-45, 1, "　　　　　　　　　　財務部　協理：　　　　　　　　經理：　　　　　　　　襄理：　　　　　　　　　　　　　　製表人：　　　　　　　　　　　　　　　　　");
 		} else {
 			this.print(-43, 1, "　　　　　　　　　　　　　　協理：　　　　　　　　經理：　　　　　　　　襄理：　　　　　　　　　　　　　　製表人：　　　　　　　　　　　　　　　　　");
 			this.print(-44, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
@@ -168,6 +170,7 @@ public class L4101ReportC extends MakeReport {
 			reportItem = "抽退票傳票明細表";
 		} else if ("RT".equals(batchNo.substring(0, 2))) {
 			reportItem = "退款傳票明細表";
+			isRT = true;
 		}
 		String wkName = "";
 		String wkBankCode = "";
@@ -215,8 +218,20 @@ public class L4101ReportC extends MakeReport {
 			String acNoCode = tAcDetail.getAcNoCode();
 			String acSubCode = tAcDetail.getAcSubCode();
 			String acDtlCode = "  ";
-			CdAcCode tCdAcCode = cdAcCodeService.findById(new CdAcCodeId(acNoCode, acSubCode, acDtlCode), titaVo);
-
+			CdAcCodeId tCdAcCodeId = new CdAcCodeId();
+			tCdAcCodeId.setAcNoCode(acNoCode);
+			tCdAcCodeId.setAcSubCode(acSubCode);
+			tCdAcCodeId.setAcDtlCode(acDtlCode);
+			CdAcCode tCdAcCode = cdAcCodeService.findById(tCdAcCodeId, titaVo);
+			if (isRT) {
+				if (acCodeTotalAmt.containsKey(tCdAcCodeId)) {
+					acCodeTotalAmt.put(tCdAcCodeId, acCodeTotalAmt.get(tCdAcCodeId).add(tAcDetail.getTxAmt()));
+					acCodeTotalSize.put(tCdAcCodeId, acCodeTotalSize.get(tCdAcCodeId) + 1);
+				} else {
+					acCodeTotalAmt.put(tCdAcCodeId, tAcDetail.getTxAmt());
+					acCodeTotalSize.put(tCdAcCodeId, 1);
+				}
+			}
 			TempVo tTempVo = new TempVo();
 			tTempVo = tTempVo.getVo(tAcDetail.getJsonFields());
 
@@ -272,11 +287,23 @@ public class L4101ReportC extends MakeReport {
 
 		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 		print(1, 1, "　　　　　　       共　" + cnt + "　筆數");
-
-//		print(0, 61, currencyCode);
 		print(0, 100, formatAmt(sumDbAmt, 0), "R");
 		print(0, 116, formatAmt(sumCrAmt, 0), "R");
+		if (isRT) {
+			print(2, 1, "");
+			print(1, 10, "註：");
+			for (CdAcCodeId t : acCodeTotalAmt.keySet()) {
 
+				CdAcCode tCdAcCode = cdAcCodeService.findById(t, titaVo);
+				if (tCdAcCode != null) {
+					if ("P02".equals(tCdAcCode.getAcctCode())) {
+						print(1, 15, tCdAcCode.getAcNoItem()); // 科子目名稱
+						print(0, 92, "計　" + parse.IntegerToString(acCodeTotalSize.get(t), 3) + "　筆　　$"); // 筆數
+						print(0, 130, formatAmt(acCodeTotalAmt.get(t), 0), "R"); // 科目總金額
+					}
+				}
+			}
+		}
 	}
 
 }

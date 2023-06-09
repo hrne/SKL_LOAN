@@ -502,7 +502,8 @@ T(F,@RelAcctBirthday,1)
 T(F,@RelAcctGender,1))
 
 #RimL4r03=X,1,S
-C(3,#FuncCode,1,$,s)
+C(3,#FuncCode,4,s,$)
+C(3,#FuncCode,5,s,$)
 C(3,#RelationCode,0,$,s)
 E(0,@RimCustNo,#CustNo)
 !RimType=1找尋客戶主檔，=2找郵局授權主檔
