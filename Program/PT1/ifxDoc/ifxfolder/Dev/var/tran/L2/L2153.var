@@ -483,6 +483,10 @@ T(3,CdCode.YesNo)
 
 #YesNoHelp=x,1024,S
 
+!是否適用違約適用方式
+#ProdBreachFlagHelp=x,1024,S
+T(3,Y:適用;N:不適用)
+
 !AchAuthCode 
 !#CDDEF07=x,20,S
 !T(3,CdCode.AchAuthCode)
@@ -1058,8 +1062,8 @@ E(0,@BreachPercent,#L2r01BreachPercent)
 E(0,@BreachDecreaseMonth,#L2r01BreachDecreaseMonth)
 E(0,@BreachDecrease,#L2r01BreachDecrease)
 E(0,@BreachStartPercent,#L2r01BreachStartPercent)
-C(3,#L2r01BreachCode,999,$,E(0,@BreachCode,#L2r01BreachCode))
-C(3,#L2r01BreachCode,999,$,E(0,@BreachGetCode,#L2r01BreachGetCode))
+C(3,#L2r01BreachCode,999,$,T(2,@BreachCode,#L2r01BreachCode))
+C(3,#L2r01BreachCode,999,$,T(2,@BreachGetCode,#L2r01BreachGetCode))
 T(2,@Breach,#L2r01Breach)
 ! T(2,@Breach1,#L2r01Breach)
 ##loop{times:10,n:1}
@@ -2389,30 +2393,32 @@ HELP(#YesNoHelp)
 #BreachFlagX=X,10,L
 T(H,#BreachFlag,#YesNoHelp)
 
-
 !違約適用方式是否按商品設定
 #FdProdBreachFlag=X,2,L
 ![是否限制清償]與商品設定不同時N否則Y
 ![是否限制清償]與商品設定相同時且[是否限制清償]為Y時[清償說明]放商品設定值,否則不需輸入
 #ProdBreachFlag=X,1,I
 C(3,#Hide7Flag,0,CALL(#HideP7),$)
-C(5,#BreachFlag,#L2r01BreachFlag,T(3,Y),T(3,N))
+C(5,#BreachFlag,N,T(3,Y),$)
+C(5,#BreachFlag,N,s,$)
+C(4,#ProdBreachFlag,T(3,Y),$)
+C(3,#DepartmentCode,0,T(3,Y),$)
 C(3,#DepartmentCode,0,s,$)
-C(5,#BreachFlag,#L2r01BreachFlag,C(5,#BreachFlag,Y,C(4,#Breach,T(2,@Breach,#L2r01Breach),$),T(F,@ProdBreachFlag,0)),T(F,@ProdBreachFlag,0))
-C(5,#BreachFlag,#L2r01BreachFlag,C(5,#BreachFlag,Y,C(4,#Breach,T(2,@Breach,#L2r01Breach),$),s),s)
-HELP(#YesNoHelp)
-@V(H,#YesNoHelp)
-
+HELP(#ProdBreachFlagHelp)
+T(3,@ProdBreachFlagX,)
+@V(H,#ProdBreachFlagHelp)
 
 #ProdBreachFlagX=X,10,L
 C(4,#ProdBreachFlag,S,$)
-T(H,#ProdBreachFlag,#YesNoHelp)
-
+C(5,#BreachFlag,N,T(3,無),$)
+C(5,#BreachFlag,N,s,$)
+T(H,#ProdBreachFlag,#ProdBreachFlagHelp)
 
 !違約適用方式
 #FdBreachCode=X,2,L
 #BreachCode=X,3,I
 C(5,#BreachFlag,N,S,$)
+C(5,#ProdBreachFlag,N,S,$)
 C(3,#Hide7Flag,0,CALL(#HideP7),$)
 HELP(#ProdBreachCodeHelp)
 @V(H,#ProdBreachCodeHelp)
@@ -2423,11 +2429,13 @@ IF(#BreachCode=="005",E(0,@BreachDecreaseMonth,0),$)
 #BreachCodeX=X,40,L
 T(H,#BreachCode,#ProdBreachCodeHelp)
 C(5,#BreachFlag,N,T(3,無),$)
+C(5,#ProdBreachFlag,N,T(3,無),$)
 
 !綁約期間
 #FdProhibitMonth=X,2,L
 #ProhibitMonth=A,3,I
 C(5,#BreachFlag,N,S,$)
+C(5,#ProdBreachFlag,N,S,$)
 C(3,#Hide7Flag,0,CALL(#HideP7),$)
 @
 V(2,0)
@@ -2436,6 +2444,7 @@ V(2,0)
 #FdBreachGetCode=X,2,L
 #BreachGetCode=X,1,I
 C(5,#BreachFlag,N,S,$)
+C(5,#ProdBreachFlag,N,S,$)
 C(3,#Hide7Flag,0,CALL(#HideP7),$)
 HELP(#BreachGetCodeHelp)
 @V(H,#BreachGetCodeHelp)
@@ -2444,11 +2453,13 @@ HELP(#BreachGetCodeHelp)
 T(H,#BreachGetCode,#BreachGetCodeHelp)
 C(5,#BreachFlag,N,T(3,@BreachGetCodeX,無),$)
 C(5,#BreachGetCode,0,T(3,@BreachGetCodeX,無),$)
+C(5,#ProdBreachFlag,N,T(3,@BreachGetCodeX,無),$)
 
 !違約金百分比
 #FdBreachPercent=X,2,L
 #BreachPercent=n,3.2,I
 C(5,#BreachFlag,N,S,$)
+C(5,#ProdBreachFlag,N,S,$)
 @V(2,0)
 V(5,0,100)
 
@@ -2456,6 +2467,7 @@ V(5,0,100)
 #FdBreachDecreaseMonth=X,2,L
 #BreachDecreaseMonth=n,3,I
 C(5,#BreachFlag,N,S,$)
+C(5,#ProdBreachFlag,N,S,$)
 IF(#BreachCode=="001",E(0,@BreachDecreaseMonth,12),$)
 IF(#BreachCode=="001",s,$)
 IF(#BreachCode=="005",E(0,@BreachDecreaseMonth,0),$)
@@ -2467,6 +2479,7 @@ IF(#BreachCode=="002",V(2,0),$)
 #FdBreachDecrease=X,2,L
 #BreachDecrease=n,3.2,I
 C(5,#BreachFlag,N,S,$)
+C(5,#ProdBreachFlag,N,S,$)
 C(3,#BreachDecreaseMonth,0,INVOKEJS(SHOW,p6,7,7,0),INVOKEJS(SHOW,p6,7,7,1))
 C(3,#BreachDecreaseMonth,0,S,$)
 @V(2,0)
@@ -2477,6 +2490,7 @@ IF(#BreachDecrease>#BreachPercent,V(P,不可大於違約金百分比),$)
 #FdBreachStartPercent=X,2,L
 #BreachStartPercent=n,3,I
 C(5,#BreachFlag,N,S,$)
+C(5,#ProdBreachFlag,N,S,$)
 @V(5,0,100)
 
 
@@ -2489,9 +2503,10 @@ T(2,@Breach,#L2r56Breach)
 C(3,#Hide7Flag,0,CALL(#HideP7),$)
 ! IF(#ProdBreachFlag=="Y"||#ProdBreachFlag=="",T(F,@Breach,0),T(F,@Breach,1))
 IF(#BreachFlag=="N",S,$)
+C(5,#ProdBreachFlag,N,$,s)
 ! IF(#ProdBreachFlag=="Y",T(2,@Breach,#L2r01Breach),$)
-C(5,#ProdBreachFlag,Y,s,$)
-C(4,#ProdBreachFlag,s,$)
+! C(5,#ProdBreachFlag,Y,s,$)
+! C(4,#ProdBreachFlag,s,$)
 
 
 #Wait=X,1,I 
@@ -2764,7 +2779,7 @@ C(3,#ExpandFlag,0,CALL(#Expand),$)
 [
 ["<font color=red>@清償金類型　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 　　　　　　　　"],
 [#<->#,"#FdBreachFlag+是否限制清償",#BreachFlag,#BreachFlagX],
-[#<->#,"#FdProdBreachFlag+違約適用方式是否按商品設定",#ProdBreachFlag,#ProdBreachFlagX],
+[#<->#,"#FdProdBreachFlag+是否適用違約適用方式",#ProdBreachFlag,#ProdBreachFlagX],
 [#<->#,"#FdBreachCode+違約適用方式",#BreachCode,#BreachCodeX],
 [#<->#,"#FdProhibitMonth+綁約期間",#ProhibitMonth,"月"],
 [#<->#,"#FdBreachGetCode+違約金收取方式",#BreachGetCode,#BreachGetCodeX],

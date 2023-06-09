@@ -136,8 +136,6 @@ public class L4450Batch extends TradeBuffer {
 	private HashMap<tmpBorm, BigDecimal> tmpAmtMap = new HashMap<>();
 //	扣款金額
 	private HashMap<tmpBorm, BigDecimal> repAmtMap = new HashMap<>();
-//	短欠繳金額
-	private HashMap<tmpBorm, BigDecimal> shortAmtMap = new HashMap<>();
 //	暫收款占用金額 = 未到期約定還本金額 + 法務費金額  + 已出檔未入帳
 	private HashMap<tmpBorm, BigDecimal> bookAmtMap = new HashMap<>();
 //  火險單號碼
@@ -324,7 +322,7 @@ public class L4450Batch extends TradeBuffer {
 			if (checkFlag) {
 				this.info("fnAllList.size() = " + fnAllList.size());
 				if (fnAllList.size() == 0) {
-					checkMsg = "E0001 查無吻合之撥款檔資料";
+					checkMsg = "無吻合的撥款檔資料";
 					checkFlag = false;
 				} else {
 
@@ -343,11 +341,11 @@ public class L4450Batch extends TradeBuffer {
 			}
 			if (checkFlag) {
 				// 是否有還款資料
-				if (iRepayType <= 3 && !isLoanRepay) {
+				if (!isLoanRepay) {
 					checkFlag = false;
-					checkMsg = "E0001 查無還本利資料";
+					checkMsg = "無該類別的還款資料";
 					if (iRepayType == 2) {
-						checkMsg += ", 請先登錄約定部分償還";
+						checkMsg = "請先登錄約定部分償還";
 					}
 				}
 			}
@@ -355,7 +353,6 @@ public class L4450Batch extends TradeBuffer {
 			if (checkFlag) {
 				setBankDeductDtl(shPayAmtMap, titaVo);
 				if (cnt == 0) {
-					checkMsg = "E0001 查無該還款類別資料";
 					checkFlag = false;
 				} else {
 					checkMsg = "銀行扣款檔新增完成，筆數=" + cnt;
@@ -491,7 +488,7 @@ public class L4450Batch extends TradeBuffer {
 //					continue;
 				}
 				// 是否有還款資料
-				if (tBaTxVo.getRepayType() >= 1 && tBaTxVo.getRepayType() <= 3) {
+				if (tBaTxVo.getRepayType() == iRepayType) {
 					isLoanRepay = true;
 				}
 

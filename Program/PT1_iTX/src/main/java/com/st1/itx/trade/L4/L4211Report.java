@@ -481,7 +481,7 @@ public class L4211Report extends MakeReport {
 						totalsumShortPayment = totalsumShortPayment.add(allsumShortPayment);
 						totalsumOthers = totalsumOthers.add(allsumOthers);
 
-						if (currentSortingForSubTotal.equals("9999") && isBatchFlag) {
+						if (currentSortingForSubTotal.equals("9999") && !isBatchFlag) {
 							this.print(1, 0,
 									"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 
@@ -769,15 +769,13 @@ public class L4211Report extends MakeReport {
 				if (npcount > 0) { // 除當頁第一筆
 					this.print(1, 0,
 							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-					lastSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
-					if (lastSortingForSubTotal.equals("999")) {
-						this.print(1, 2, "暫收款");
-					} else {
-						this.print(1, 2, lastAcctItem);
-					}
+
+					this.print(1, 2, lastAcctItem);
+
 					this.print(0, 14, " 小計 ");
 
 					atAll();
+
 
 					totalsumTransferAmt = totalsumTransferAmt.add(allsumTransferAmt);
 					totalsumMakerferAmt = totalsumMakerferAmt.add(allsumMakeferAmt);

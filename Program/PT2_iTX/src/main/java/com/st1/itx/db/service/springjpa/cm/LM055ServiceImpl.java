@@ -203,7 +203,7 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		UNION";
 		sql += "		SELECT - \"AssetEvaTotal\" AS \"AMT\" ";
 		sql += "	    FROM \"MonthlyLM052Loss\"";
-		sql += "	    WHERE \"YearMonth\" = :yymm";
+		sql += "	    WHERE \"YearMonth\" = :yymm )";
 		sql += "	)";
 		sql += "	SELECT R.\"TYPE\" AS F0";
 		sql += "		  ,R.\"KIND\" AS F1";

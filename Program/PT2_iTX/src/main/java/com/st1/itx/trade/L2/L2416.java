@@ -2,6 +2,7 @@ package com.st1.itx.trade.L2;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,6 +15,7 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdAcCodeId;
 import com.st1.itx.db.domain.ClLand;
 import com.st1.itx.db.domain.ClLandId;
 import com.st1.itx.db.domain.ClLandOwner;
@@ -22,6 +24,7 @@ import com.st1.itx.db.domain.ClLandReason;
 import com.st1.itx.db.domain.ClLandReasonId;
 import com.st1.itx.db.domain.ClMain;
 import com.st1.itx.db.domain.ClMainId;
+import com.st1.itx.db.domain.ClOtherRights;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.ClLandOwnerService;
 import com.st1.itx.db.service.ClLandReasonService;
@@ -88,6 +91,7 @@ public class L2416 extends TradeBuffer {
 	private ClLandReason tClLandReason = new ClLandReason();
 	private List<ClLandOwner> lClLandOwner = new ArrayList<ClLandOwner>();
 	private boolean isEloan = false;
+	private HashMap<Integer, Integer> clLandSeq = new HashMap<>();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -110,6 +114,7 @@ public class L2416 extends TradeBuffer {
 		iClCode2 = parse.stringToInteger(titaVo.getParam("ClCode2"));
 		iClNo = parse.stringToInteger(titaVo.getParam("ClNo"));
 		iLandSeq = parse.stringToInteger(titaVo.getParam("LandSeq"));
+		titaVo.putParam("FUNCIND", iFunCd);
 		if (iClCode1 == 2 && iLandSeq > 0) {
 			throw new LogicException("E0019", "土地擔保品土地序號應為0"); // 輸入資料錯誤
 		}
@@ -220,11 +225,29 @@ public class L2416 extends TradeBuffer {
 					} catch (DBException e) {
 						throw new LogicException("E0008", "擔保品土地所有權人檔");
 					}
+					titaVo.putParam("MRKEY",
+							parse.IntegerToString(tClLand.getClCode1(), 1) + "-"
+									+ parse.IntegerToString(tClLand.getClCode2(), 2) + "-"
+									+ parse.IntegerToString(tClLand.getClNo(), 7) + "-"
+									+ parse.IntegerToString(tClLand.getLandSeq(), 3));
+					dataLog.setEnv(titaVo, tClLand, tClLand);
+					dataLog.exec("刪除擔保品土地檔");
+
 				}
 				// delete 土地所有權人
 				deleteClLandOwner(titaVo);
 				// delete 土地修改原因檔
 				deleteClLandReason(titaVo);
+
+//				勾選完成最後一筆,重新編號流水號delete>insert
+				if (titaVo.get("selectTotal") == null || titaVo.get("selectTotal").equals(titaVo.get("selectIndex"))) {
+					// 重編土地序號
+					resetClLand(titaVo);
+					resetClLandOwner(titaVo);
+					resetClLandReason(titaVo);
+
+				}
+
 			}
 		}
 		// 土地
@@ -406,11 +429,18 @@ public class L2416 extends TradeBuffer {
 		lClLandOwner = slClLandOwner == null ? null : slClLandOwner.getContent();
 
 		if (lClLandOwner != null && lClLandOwner.size() > 0) {
-			try {
-				sClLandOwnerService.deleteAll(lClLandOwner);
-			} catch (DBException e) {
-				throw new LogicException("E0008", "擔保品土地所有權人檔");
+			for (ClLandOwner tClLandOwner : lClLandOwner) {
+
+				try {
+					sClLandOwnerService.delete(tClLandOwner, titaVo);
+				} catch (DBException e) {
+					throw new LogicException("E0008", "擔保品土地所有權人檔");
+				}
+
+				dataLog.setEnv(titaVo, tClLandOwner, tClLandOwner);
+				dataLog.exec("刪除擔保品土地所有權人檔");
 			}
+
 		}
 	}
 
@@ -454,8 +484,137 @@ public class L2416 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException("E0008", "擔保品土地修改原因檔");
 			}
+			dataLog.setEnv(titaVo, tClLandReason, tClLandReason);
+			dataLog.exec("刪除擔保品土地修改原因檔");
 
 		}
 	}
 
+	// 重編土地序號
+	private void resetClLand(TitaVo titaVo) throws LogicException {
+		this.info("resetClLand ...");
+
+		Slice<ClLand> slClLand = sClLandService.findClNo(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
+		if (slClLand != null) {
+			int i = 1;
+			List<ClLand> lClLandold = new ArrayList<ClLand>();
+			lClLandold = new ArrayList<>(slClLand.getContent());
+			for (ClLand t : slClLand.getContent()) {
+				if (!clLandSeq.containsKey(t.getClLandId().getLandSeq())) {
+					clLandSeq.put(t.getClLandId().getLandSeq(), i);
+				}
+				this.info("clLandSeq = " + i + " " + clLandSeq);
+				i++;
+			}
+			for (ClLand t2 : new ArrayList<>(lClLandold)) {
+				if (clLandSeq.get(t2.getClLandId().getLandSeq()) == t2.getClLandId().getLandSeq()) {
+					lClLandold.remove(t2);
+				}
+			}
+			try {
+				sClLandService.deleteAll(lClLandold, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0008", "擔保品土地所有權人檔");
+			}
+			for (ClLand t3 : lClLandold) {
+				ClLandId newClLandId = new ClLandId();
+				newClLandId.setClCode1(t3.getClCode1());
+				newClLandId.setClCode2(t3.getClCode2());
+				newClLandId.setClNo(t3.getClNo());
+				newClLandId.setLandSeq(clLandSeq.get(t3.getClLandId().getLandSeq()));
+				t3.setClLandId(newClLandId);
+				t3.setClCode1(newClLandId.getClCode1());
+				t3.setClCode2(newClLandId.getClCode2());
+				t3.setClNo(newClLandId.getClNo());
+				t3.setLandSeq(newClLandId.getLandSeq());
+			}
+			try {
+				sClLandService.insertAll(lClLandold, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E2009", "擔保品不動產土地檔");
+			}
+		}
+	}
+
+	// 重編土地所有權人檔土地序號
+	private void resetClLandOwner(TitaVo titaVo) throws LogicException {
+		this.info("resetClLandOwner ...");
+
+		Slice<ClLandOwner> slClLandOwner = sClLandOwnerService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE,
+				titaVo);
+		if (slClLandOwner != null) {
+
+			List<ClLandOwner> lClLandOwnerold = new ArrayList<ClLandOwner>();
+			lClLandOwnerold = new ArrayList<>(slClLandOwner.getContent());
+			for (ClLandOwner t2 : new ArrayList<>(slClLandOwner.getContent())) {
+				if (clLandSeq.get(t2.getClLandOwnerId().getLandSeq()) == t2.getClLandOwnerId().getLandSeq()) {
+					lClLandOwnerold.remove(t2);
+				}
+			}
+			try {
+				sClLandOwnerService.deleteAll(lClLandOwnerold, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0008", "擔保品土地所有權人檔");
+			}
+			for (ClLandOwner t3 : lClLandOwnerold) {
+
+				ClLandOwnerId newClLandOwnerId = new ClLandOwnerId();
+				newClLandOwnerId.setClCode1(t3.getClCode1());
+				newClLandOwnerId.setClCode2(t3.getClCode2());
+				newClLandOwnerId.setClNo(t3.getClNo());
+				newClLandOwnerId.setLandSeq(clLandSeq.get(t3.getClLandOwnerId().getLandSeq()));
+				newClLandOwnerId.setOwnerCustUKey(t3.getOwnerCustUKey());
+				t3.setClLandOwnerId(newClLandOwnerId);
+				t3.setClCode1(newClLandOwnerId.getClCode1());
+				t3.setClCode2(newClLandOwnerId.getClCode2());
+				t3.setClNo(newClLandOwnerId.getClNo());
+				t3.setOwnerCustUKey(newClLandOwnerId.getOwnerCustUKey());
+			}
+			try {
+				sClLandOwnerService.insertAll(lClLandOwnerold, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E2009", "擔保品不動產土地所有權人檔");
+			}
+		}
+	}
+
+	// 重編土地修改原因檔土地序號
+	private void resetClLandReason(TitaVo titaVo) throws LogicException {
+		this.info("resetClLandReason ...");
+
+		Slice<ClLandReason> slClLandReason = sClLandReasonService.clNoL2416Eq(iClCode1, iClCode2, iClNo, 0,
+				Integer.MAX_VALUE, titaVo);
+		if (slClLandReason != null) {
+			int i = 1;
+			List<ClLandReason> lClLandReasonold = new ArrayList<ClLandReason>();
+			lClLandReasonold = new ArrayList<>(slClLandReason.getContent());
+			for (ClLandReason t2 : new ArrayList<>(slClLandReason.getContent())) {
+				if (clLandSeq.get(t2.getClLandReasonId().getLandSeq()) == t2.getClLandReasonId().getLandSeq()) {
+					lClLandReasonold.remove(t2);
+				}
+			}
+			try {
+				sClLandReasonService.deleteAll(lClLandReasonold, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0008", "擔保品土地所有權人檔");
+			}
+			for (ClLandReason t3 : lClLandReasonold) {
+				ClLandReasonId newClLandReasonId = new ClLandReasonId();
+				newClLandReasonId.setClCode1(t3.getClCode1());
+				newClLandReasonId.setClCode2(t3.getClCode2());
+				newClLandReasonId.setClNo(t3.getClNo());
+				newClLandReasonId.setLandSeq(clLandSeq.get(t3.getClLandReasonId().getLandSeq()));
+				t3.setClLandReasonId(newClLandReasonId);
+				t3.setClCode1(newClLandReasonId.getClCode1());
+				t3.setClCode2(newClLandReasonId.getClCode2());
+				t3.setClNo(newClLandReasonId.getClNo());
+				t3.setLandSeq(newClLandReasonId.getLandSeq());
+			}
+			try {
+				sClLandReasonService.insertAll(lClLandReasonold, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E2009", "擔保品不動產土地修改原因檔");
+			}
+		}
+	}
 }
