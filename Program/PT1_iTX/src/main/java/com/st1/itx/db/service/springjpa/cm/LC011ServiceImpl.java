@@ -87,13 +87,16 @@ public class LC011ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "AND A.\"TranNo\" = :TranNo ";
 		}
 
-		if (iStatus == 0 || iStatus == 3 || iStatus == 4 || iStatus == 5) {
+		if (iStatus == 0 || iStatus == 3 || iStatus == 4 || iStatus == 5  || iStatus == 6 ) {
 			sql += "AND A.\"ActionFg\" = :ActionFg ";
 		} else if (iStatus == 1 || iStatus == 2) {
 			sql += "AND A.\"Hcode\" = :Hcode ";
 		}
-		if (iStatus == 0) {
+		if (iStatus == 0 || iStatus == 6) {
 			sql += "AND A.\"Hcode\" <> 1 ";
+		}
+		if (iStatus == 6) {
+			sql += "AND F.\"FlowMode\" = 1 ";
 		}
 
 		sql += "AND A.\"TxResult\" = 'S' AND substr(A.\"TranNo\",0,2) not in ('L9','L0','LC') ";
@@ -138,7 +141,8 @@ public class LC011ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (!iCustNo.equals("0000000")) {
 			query.setParameter("iMkey", iMkey);
 		}
-		if (iStatus == 0) {
+		// 0:正常交易;1:訂正交易;2:修正交易;3:已訂正交易;4:已修正交易;5:已沖正交易;9:全部交易
+		if (iStatus == 0 || iStatus == 6 ) {
 			query.setParameter("ActionFg", 0);
 		} else if (iStatus == 1) {
 			query.setParameter("Hcode", 1);

@@ -15,7 +15,6 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.CdAcCodeId;
 import com.st1.itx.db.domain.ClLand;
 import com.st1.itx.db.domain.ClLandId;
 import com.st1.itx.db.domain.ClLandOwner;
@@ -24,7 +23,6 @@ import com.st1.itx.db.domain.ClLandReason;
 import com.st1.itx.db.domain.ClLandReasonId;
 import com.st1.itx.db.domain.ClMain;
 import com.st1.itx.db.domain.ClMainId;
-import com.st1.itx.db.domain.ClOtherRights;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.ClLandOwnerService;
 import com.st1.itx.db.service.ClLandReasonService;
@@ -511,27 +509,30 @@ public class L2416 extends TradeBuffer {
 					lClLandold.remove(t2);
 				}
 			}
-			try {
-				sClLandService.deleteAll(lClLandold, titaVo);
-			} catch (DBException e) {
-				throw new LogicException("E0008", "擔保品土地所有權人檔");
-			}
-			for (ClLand t3 : lClLandold) {
-				ClLandId newClLandId = new ClLandId();
-				newClLandId.setClCode1(t3.getClCode1());
-				newClLandId.setClCode2(t3.getClCode2());
-				newClLandId.setClNo(t3.getClNo());
-				newClLandId.setLandSeq(clLandSeq.get(t3.getClLandId().getLandSeq()));
-				t3.setClLandId(newClLandId);
-				t3.setClCode1(newClLandId.getClCode1());
-				t3.setClCode2(newClLandId.getClCode2());
-				t3.setClNo(newClLandId.getClNo());
-				t3.setLandSeq(newClLandId.getLandSeq());
-			}
-			try {
-				sClLandService.insertAll(lClLandold, titaVo);
-			} catch (DBException e) {
-				throw new LogicException("E2009", "擔保品不動產土地檔");
+			this.info("lClLandold = " + lClLandold);
+			if (lClLandold.size() > 0) {
+				try {
+					sClLandService.deleteAll(lClLandold, titaVo);
+				} catch (DBException e) {
+					throw new LogicException("E0008", "擔保品土地所有權人檔");
+				}
+				for (ClLand t3 : lClLandold) {
+					ClLandId newClLandId = new ClLandId();
+					newClLandId.setClCode1(t3.getClCode1());
+					newClLandId.setClCode2(t3.getClCode2());
+					newClLandId.setClNo(t3.getClNo());
+					newClLandId.setLandSeq(clLandSeq.get(t3.getClLandId().getLandSeq()));
+					t3.setClLandId(newClLandId);
+					t3.setClCode1(newClLandId.getClCode1());
+					t3.setClCode2(newClLandId.getClCode2());
+					t3.setClNo(newClLandId.getClNo());
+					t3.setLandSeq(newClLandId.getLandSeq());
+				}
+				try {
+					sClLandService.insertAll(lClLandold, titaVo);
+				} catch (DBException e) {
+					throw new LogicException("E2009", "擔保品不動產土地檔");
+				}
 			}
 		}
 	}
@@ -551,29 +552,33 @@ public class L2416 extends TradeBuffer {
 					lClLandOwnerold.remove(t2);
 				}
 			}
-			try {
-				sClLandOwnerService.deleteAll(lClLandOwnerold, titaVo);
-			} catch (DBException e) {
-				throw new LogicException("E0008", "擔保品土地所有權人檔");
-			}
-			for (ClLandOwner t3 : lClLandOwnerold) {
+			this.info("lClLandOwnerold = " + lClLandOwnerold);
+			if (lClLandOwnerold.size() > 0) {
 
-				ClLandOwnerId newClLandOwnerId = new ClLandOwnerId();
-				newClLandOwnerId.setClCode1(t3.getClCode1());
-				newClLandOwnerId.setClCode2(t3.getClCode2());
-				newClLandOwnerId.setClNo(t3.getClNo());
-				newClLandOwnerId.setLandSeq(clLandSeq.get(t3.getClLandOwnerId().getLandSeq()));
-				newClLandOwnerId.setOwnerCustUKey(t3.getOwnerCustUKey());
-				t3.setClLandOwnerId(newClLandOwnerId);
-				t3.setClCode1(newClLandOwnerId.getClCode1());
-				t3.setClCode2(newClLandOwnerId.getClCode2());
-				t3.setClNo(newClLandOwnerId.getClNo());
-				t3.setOwnerCustUKey(newClLandOwnerId.getOwnerCustUKey());
-			}
-			try {
-				sClLandOwnerService.insertAll(lClLandOwnerold, titaVo);
-			} catch (DBException e) {
-				throw new LogicException("E2009", "擔保品不動產土地所有權人檔");
+				try {
+					sClLandOwnerService.deleteAll(lClLandOwnerold, titaVo);
+				} catch (DBException e) {
+					throw new LogicException("E0008", "擔保品土地所有權人檔");
+				}
+				for (ClLandOwner t3 : lClLandOwnerold) {
+
+					ClLandOwnerId newClLandOwnerId = new ClLandOwnerId();
+					newClLandOwnerId.setClCode1(t3.getClCode1());
+					newClLandOwnerId.setClCode2(t3.getClCode2());
+					newClLandOwnerId.setClNo(t3.getClNo());
+					newClLandOwnerId.setLandSeq(clLandSeq.get(t3.getClLandOwnerId().getLandSeq()));
+					newClLandOwnerId.setOwnerCustUKey(t3.getOwnerCustUKey());
+					t3.setClLandOwnerId(newClLandOwnerId);
+					t3.setClCode1(newClLandOwnerId.getClCode1());
+					t3.setClCode2(newClLandOwnerId.getClCode2());
+					t3.setClNo(newClLandOwnerId.getClNo());
+					t3.setOwnerCustUKey(newClLandOwnerId.getOwnerCustUKey());
+				}
+				try {
+					sClLandOwnerService.insertAll(lClLandOwnerold, titaVo);
+				} catch (DBException e) {
+					throw new LogicException("E2009", "擔保品不動產土地所有權人檔");
+				}
 			}
 		}
 	}
@@ -593,27 +598,31 @@ public class L2416 extends TradeBuffer {
 					lClLandReasonold.remove(t2);
 				}
 			}
-			try {
-				sClLandReasonService.deleteAll(lClLandReasonold, titaVo);
-			} catch (DBException e) {
-				throw new LogicException("E0008", "擔保品土地所有權人檔");
-			}
-			for (ClLandReason t3 : lClLandReasonold) {
-				ClLandReasonId newClLandReasonId = new ClLandReasonId();
-				newClLandReasonId.setClCode1(t3.getClCode1());
-				newClLandReasonId.setClCode2(t3.getClCode2());
-				newClLandReasonId.setClNo(t3.getClNo());
-				newClLandReasonId.setLandSeq(clLandSeq.get(t3.getClLandReasonId().getLandSeq()));
-				t3.setClLandReasonId(newClLandReasonId);
-				t3.setClCode1(newClLandReasonId.getClCode1());
-				t3.setClCode2(newClLandReasonId.getClCode2());
-				t3.setClNo(newClLandReasonId.getClNo());
-				t3.setLandSeq(newClLandReasonId.getLandSeq());
-			}
-			try {
-				sClLandReasonService.insertAll(lClLandReasonold, titaVo);
-			} catch (DBException e) {
-				throw new LogicException("E2009", "擔保品不動產土地修改原因檔");
+			this.info("lClLandReasonold = " + lClLandReasonold);
+			if (lClLandReasonold.size() > 0) {
+
+				try {
+					sClLandReasonService.deleteAll(lClLandReasonold, titaVo);
+				} catch (DBException e) {
+					throw new LogicException("E0008", "擔保品土地所有權人檔");
+				}
+				for (ClLandReason t3 : lClLandReasonold) {
+					ClLandReasonId newClLandReasonId = new ClLandReasonId();
+					newClLandReasonId.setClCode1(t3.getClCode1());
+					newClLandReasonId.setClCode2(t3.getClCode2());
+					newClLandReasonId.setClNo(t3.getClNo());
+					newClLandReasonId.setLandSeq(clLandSeq.get(t3.getClLandReasonId().getLandSeq()));
+					t3.setClLandReasonId(newClLandReasonId);
+					t3.setClCode1(newClLandReasonId.getClCode1());
+					t3.setClCode2(newClLandReasonId.getClCode2());
+					t3.setClNo(newClLandReasonId.getClNo());
+					t3.setLandSeq(newClLandReasonId.getLandSeq());
+				}
+				try {
+					sClLandReasonService.insertAll(lClLandReasonold, titaVo);
+				} catch (DBException e) {
+					throw new LogicException("E2009", "擔保品不動產土地修改原因檔");
+				}
 			}
 		}
 	}

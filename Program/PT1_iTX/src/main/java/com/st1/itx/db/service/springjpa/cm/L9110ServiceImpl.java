@@ -202,7 +202,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,S1.\"BdEvaunitprice\" AS \"BdEvaunitprice\"   ";
 		sql += " ,S1.\"BdSellerName\" AS \"BdSellerName\"   ";
 		sql += " ,S1.\"BdSellerId\" AS \"BdSellerId\"    ";
-		sql += " ,S1.\"LandSeq\" AS \"LandSeq\"   ";
+		sql += " ,lpad(S1.\"LandSeq\",3,'0') AS \"LandSeq\"   ";
 		sql += " ,S1.\"LandCityItem\" AS \"LandCityItem\"    ";
 		sql += " ,S1.\"LandAreaItem\" AS \"LandAreaItem\"   ";
 		sql += " ,S1.\"LandIrItem\" AS \"LandIrItem\"    ";
@@ -492,18 +492,18 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            , CDC2.\"Item\"            AS EvaCompany "; // -- F8 鑑定公司 只有不動產會有此欄位
 		sql += "            , CLI.\"BdRmk\"            AS BdRmk "; // -- F9 建物標示備註 只有不動產會有此欄位
 		sql += "            , CASE";
-		sql += "                WHEN CF.\"ClCode1\" IN ('1','2')";
+		sql += "                WHEN CF.\"ClCode1\" IN ('1','2') ";
 		sql += "                THEN CLI.\"SettingDate\" ";
-		sql += "                WHEN CF.\"ClCode1\" IN ('3','4')";
+		sql += "                WHEN CF.\"ClCode1\" IN ('3','4') ";
 		sql += "                THEN CLS.\"SettingDate\" ";
-		sql += "                WHEN CF.\"ClCode1\" = '5'";
+		sql += "                WHEN CF.\"ClCode1\" = '5' ";
 		sql += "                THEN CLO.\"SettingDate\" ";
-		sql += "                WHEN CF.\"ClCode1\" = '9'";
+		sql += "                WHEN CF.\"ClCode1\" = '9' ";
 		sql += "                THEN CLMOV.\"SettingDate\" ";
 		sql += "              ELSE 0 END               AS SettingDate "; // -- F10 設定日期
-		sql += "            , CF.\"ClCode1\"           AS ClCode1  "; // -- F11 擔保品代號1
-		sql += "            , CLS.\"StockCode\"";
-		sql += "              || ' '";
+		sql += "            , CF.\"ClCode1\"           AS ClCode1 "; // -- F11 擔保品代號1
+		sql += "            , CLS.\"StockCode\" ";
+		sql += "              || ' ' ";
 		sql += "              || CDS.\"StockItem\"     AS StockName "; // F12 股票代號及股票名稱
 		sql += "            , NVL(CLS.\"PledgeNo\",'無')         AS PledgeNo "; // F13 質權設定書號
 		sql += "            , CLS.\"ThreeMonthAvg\"    AS ThreeMonthAvg ";// F14 三個月平均價
@@ -663,7 +663,10 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// -- L9110 法人Query(火險)
 		String sql = "";
 		sql += " SELECT   ";
-		sql += "        IR.\"NowInsuNo\"      AS \"NowInsuNo\" "; // -- 保單號碼
+		sql += "        lpad(IR.\"ClCode1\",1,'0')      AS \"ClCode1\" "; // -- 保單號碼
+		sql += "      , lpad(IR.\"ClCode2\",2,'0')      AS \"ClCode2\" "; // -- 保單號碼
+		sql += "      , lpad(IR.\"ClNo\",7,'0')      AS \"ClNo\" "; // -- 保單號碼
+		sql += "      , IR.\"NowInsuNo\"      AS \"NowInsuNo\" "; // -- 保單號碼
 		sql += "      , IR.\"FireInsuAmt\"    AS \"FireInsuAmt\" "; // -- 火險金額
 		sql += "      , IR.\"InsuStartDate\"  AS \"InsuStartDate\" "; // -- 保險起日
 		sql += "      , IR.\"InsuEndDate\"    AS \"InsuEndDate\" "; // -- 保險迄日

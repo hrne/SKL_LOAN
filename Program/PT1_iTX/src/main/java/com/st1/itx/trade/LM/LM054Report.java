@@ -82,8 +82,6 @@ public class LM054Report extends MakeReport {
 
 			exportExcel(fnAllList);
 
-			makeExcel.setFormula(row + 1, 13, BigDecimal.ZERO, "SUBTOTAL(M8:M" + (row + 1) + ")", "#,##0");
-			makeExcel.setFormula(row + 1, 14, BigDecimal.ZERO, "SUBTOTAL(N8:N" + (row + 1) + ")", "#,##0");
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));

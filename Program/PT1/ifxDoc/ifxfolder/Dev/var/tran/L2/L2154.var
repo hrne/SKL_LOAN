@@ -1001,7 +1001,7 @@ C(3,#CHAIN,1,s,$)
 @V(2,0)
 
 #SendL2r05=X,1,S
-IF(#FKEY==0 || #FKEY==7,$,s)
+IF(#FKEY==0 || #FKEY==7,$,S)
 E(0,@RimFuncCode,#FuncCode)
 E(0,@RimCustNo,#CustNo)
 E(0,@RimFacmNo,#FacmNo)
@@ -1012,7 +1012,6 @@ S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#Rim
 R(1,L2R05)
 
 #SendL2r02=X,1,S
-! C(3,#FKEY,7,S,$)
 IF(#FKEY==0,$,s)
 E(0,@RimFuncCode,5)
 T(2,@RimCustId,#L2r05CustId)
@@ -1020,8 +1019,9 @@ E(0,@RimApplNo,#L2r05ApplNo)
 C(3,#UpdateCode,1,RESET_RIM(#SendL2r02,L2R02),$)
 S(L2R02,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimApplNo,#RimCustId)
 R(1,L2R02)
-! #RcvL2r05A=X,1,S
-! IF(#FKEY==0 || #FKEY==7,$,s)
+
+#RcvL2r05A=X,1,S
+IF(#FKEY==0 || #FKEY==7,$,s)
 T(2,@ProdNo,#L2r05ProdNo)
 E(0,@ApplNo,#L2r05ApplNo)
 T(2,@BaseRateCode,#L2r05BaseRateCode)
@@ -1216,15 +1216,15 @@ R(1,L2R09)
 T(2,@RepayBankX,#L2r09BankItem)
 
 #SendL2r01B=X,1,S
-IF(#FKEY==0 || #FKEY==7,$,s)
 E(0,@RimFuncCode,5)
 T(2,@RimProdNo,#ProdNo)
+C(3,#UpdateCode,1,RESET_RIM(#SendL2r01B,L2R01),$)
 S(L2R01,1,#RimFuncCode,#RimTxCode,#RimProdNo)
 R(1,L2R01)
-T(2,@ProdNoX,#L2r01ProdName)
 
 #RcvL2r01A=X,1,S
-C(3,#FuncCode,2,$,S)
+IF(#FKEY==0 || #FKEY==7,$,s)
+T(2,@ProdNoX,#L2r01ProdName)
 C(3,#L2r01AmortizedCode,9,$,E(0,@AmortizedCode,#L2r01AmortizedCode))
 C(3,#L2r01FreqBase,9,$,E(0,@FreqBase,#L2r01FreqBase))
 T(H,@AcctCodeX,#AcctCode,#FacmAcctCodeHelp)
@@ -1235,6 +1235,7 @@ T(H,@RepayFreqX,#FreqBase,#FreqBase2Help)
 C(3,#L2r01PayIntFreq,99,$,E(0,@PayIntFreq,#L2r01PayIntFreq))
 C(3,#L2r01RepayFreq,99,$,E(0,@RepayFreq,#L2r01RepayFreq))
 T(2,@BaseRateCode,#L2r01BaseRateCode)
+ALERT(#L2r01BaseRateCode,#BaseRateCode)
 T(H,@RateCodeX,#RateCode,#BaseRateHelp) 
 C(3,#L2r01ExtraRepayCode,9,$,E(0,@ExtraRepayCode,#L2r01ExtraRepayCode))
 C(3,#L2r01RecycleCode,9,$,E(0,@RecycleCode,#L2r01RecycleCode))

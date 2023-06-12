@@ -101,6 +101,24 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        GROUP BY r.\"CustNo\"";
 		sql += "               , r.\"FacmNo\"";
 		sql += "    )";
+		sql += "    , ProjectLoan AS (";
+		sql += "        SELECT JSON_VALUE(\"JsonFields\",'$.\"340LoanBal\"') +";
+		sql += "        	   JSON_VALUE(\"JsonFields\",'$.\"921LoanBal\"') +";
+		sql += "        	   JSON_VALUE(\"JsonFields\",'$.\"IALoanBal\"') +";
+		sql += "        	   JSON_VALUE(\"JsonFields\",'$.\"IBLoanBal\"') +";
+		sql += "        	   JSON_VALUE(\"JsonFields\",'$.\"ICLoanBal\"') +";
+		sql += "        	   JSON_VALUE(\"JsonFields\",'$.\"IDLoanBal\"') +";
+		sql += "        	   JSON_VALUE(\"JsonFields\",'$.\"IELoanBal\"') +";
+		sql += "        	   JSON_VALUE(\"JsonFields\",'$.\"IFLoanBal\"') +";
+		sql += "        	   JSON_VALUE(\"JsonFields\",'$.\"IGLoanBal\"') +";
+		sql += "        	   JSON_VALUE(\"JsonFields\",'$.\"IHLoanBal\"') +";
+		sql += "        	   JSON_VALUE(\"JsonFields\",'$.\"IILoanBal\"') AS \"LoanBal\"";
+		sql += "        FROM \"CdComm\"";
+		sql += "        WHERE \"CdType\" = '02' ";
+		sql += "          AND \"CdItem\" = '01' ";
+		sql += "          AND \"Enable\" = 'Y' ";
+		sql += "          AND TRUNC(\"EffectDate\" / 100) = :YearMonth ";
+		sql += "    )";
 		sql += "  , TotalData AS (  ";
 		sql += "      		SELECT DECODE(C.\"EntCode\",'1','1','0') AS \"EntCode\"  ";
 		sql += "                   ,R.\"IsRels\" AS \"IsRels\"  ";
@@ -190,7 +208,6 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                 GROUP BY \"CustNo\"  ";
 		sql += "                ) t2 ON t2.\"CustNo\" = t1.\"CustNo\"  ";
 		sql += "  )  ";
-
 		sql += "    ";
 		sql += "  (  ";
 		sql += "  SELECT \"EntCode\"";
@@ -232,7 +249,9 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ,u'以上合計' AS \"CustName\"  ";
 		sql += "        ,\"ClCode1\" AS \"ClCode1\"  ";
 		sql += "        ,ROUND(SUM(\"LineAmt\")) AS \"LineAmt\"  ";
-		sql += "        ,ROUND(SUM(\"BookValue\")) AS \"BookValue\"  ";
+		sql += "        ,ROUND( CASE ";
+		sql += "				  WHEN \"ClCode1\" = 0 THEN (SELECT \"LoanBal\" FROM ProjectLoan ) ";
+		sql += "				  ELSE SUM(\"BookValue\") END ) AS \"BookValue\"  ";
 		sql += "        ,NULL AS \"LineTotal\"  ";
 		sql += "  FROM TotalData_LineTotal  ";
 		sql += "  WHERE \"LineTotal\" >= :LineAmtThreshold  ";
@@ -264,7 +283,9 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ,u'以下合計' AS \"CustName\"  ";
 		sql += "        ,\"ClCode1\" AS \"ClCode1\"  ";
 		sql += "        ,ROUND(SUM(\"LineAmt\")) AS \"LineAmt\"  ";
-		sql += "        ,ROUND(SUM(\"BookValue\")) AS \"BookValue\"  ";
+		sql += "        ,ROUND( CASE ";
+		sql += "				  WHEN \"ClCode1\" = 0 THEN (SELECT \"LoanBal\" FROM ProjectLoan ) ";
+		sql += "				  ELSE SUM(\"BookValue\") END ) AS \"BookValue\"  ";
 		sql += "        ,NULL AS \"LineTotal\"  ";
 		sql += "  FROM TotalData_LineTotal  ";
 		sql += "  WHERE \"LineTotal\" < :LineAmtThreshold  ";
@@ -296,7 +317,9 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ,u'總計' AS \"CustName\"  ";
 		sql += "        ,\"ClCode1\" AS \"ClCode1\"  ";
 		sql += "        ,ROUND(SUM(\"LineAmt\")) AS \"LineAmt\"  ";
-		sql += "        ,ROUND(SUM(\"BookValue\")) AS \"BookValue\"  ";
+		sql += "        ,ROUND( CASE ";
+		sql += "				  WHEN \"ClCode1\" = 0 THEN (SELECT \"LoanBal\" FROM ProjectLoan ) ";
+		sql += "				  ELSE SUM(\"BookValue\") END ) AS \"BookValue\"  ";
 		sql += "        ,NULL AS \"LineTotal\"  ";
 		sql += "  FROM TotalData_LineTotal  ";
 		sql += "  WHERE \"EntCode\" LIKE :EntCodeCondition  ";

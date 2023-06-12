@@ -158,8 +158,8 @@ CALL(#HelpProc)
 T(2,@AdvanceCloseCodeHelp,#HelpDesc1)
 T(2,@CloseIndHelp,#HelpDesc2)
 T(2,@CollectWayCodeHelp,#HelpDesc3)
-T(HELP,@CollectWayCodeHelp,#CollectWayCodeHelp,+,01;02;07;13;21;25;26;27;28;29)
-T(HELP,@CollectWayCodeHelpY,#CollectWayCodeHelp,+,02;07;13;21;25;26;27;28;29)
+T(HELP,@CollectWayCodeHelp,#CollectWayCodeHelp,+,01;02;07;13;15;21;25;26;27;28;29)
+T(HELP,@CollectWayCodeHelpY,#CollectWayCodeHelp,+,02;07;13;15;21;25;26;27;28;29)
 T(2,@StatusHelp,#HelpDesc4)
 
 #FunCodHelp=x,100,S
@@ -515,7 +515,7 @@ E(0,@RimCaseCloseCode,#CloseInd)
 RESET_RIM(#SendL3R11A,L3R11)
 S(L3R11,1,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimBormNo,#RimEntryDate,#RimCaseCloseCode,#CollectFlag)
 R(1,L3R11)
-E(0,@CloseAmt,#L3r11CloseAmt)
+E(0,@CloseAmt,#L3r11CloseAmt)K(LIGHT,#CloseAmt,TXTRED,0,1)
 ! closefg = Y 時為不需輸入清償原因
 ! closefg = N 時為必須輸入清償原因
 ! L3r11CloseReasonCode = "" 時為到期清償closefg=Y
@@ -543,6 +543,8 @@ T(2,@CurrAddress,#L3r11CurrAddres)
 T(2,@BdRmk,#L3r11BdRmk)
 E(0,@Prohibitperiod,#L3r11Prohibitperiod)
 T(2,@ProhibitMonthMsg,#L3r11ProhibitMonthMsg)
+K(LIGHT,#Prohibitperiod,TXTRED,0,1)
+K(LIGHT,#ProhibitMonthMsg,TXTRED,0,1)
 T(2,@ClNoX,#L3r11ClNoX)
 CALL2(#ADJUSTDOT,#Precision,#Principal,#PrincipalX)
 CALL2(#ADJUSTDOT,#Precision,#Interest,#InterestX)

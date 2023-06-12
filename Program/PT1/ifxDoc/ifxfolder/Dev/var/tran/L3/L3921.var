@@ -394,7 +394,7 @@ C(3,#CHAIN,1,s,$)
 ! C(3,#FacmNo,0,S,$) 改為不檢核
 ! C(3,#BormNo,0,S,$) 改為不檢核
 @
-C(3,#LoanBal,0,V(P,此戶已結案),$)
+C(3,#LoanBal,0,V(P,此戶已結案或非正常戶),$)
 IF(#TwExtraRepay==#LoanBal,V(P,部分償還金額=放款餘額，請改由L3922結案試算),$)
 V(5,0,#WKREPAY)
 
@@ -406,7 +406,7 @@ C(3,#CHAIN,1,s,$)
 C(3,#FacmNo,0,S,$)
 C(3,#BormNo,0,S,$)
 @
-C(3,#LoanBal,0,V(P,此戶已結案),$)
+C(3,#LoanBal,0,V(P,此戶已結案或非正常戶),$)
 IF(#UsExtraRepay==#LoanBal,V(P,"部分償還金額=放款餘額，請改由L3922結案試算"),$)
 V(5,0,#WKREPAY)
 

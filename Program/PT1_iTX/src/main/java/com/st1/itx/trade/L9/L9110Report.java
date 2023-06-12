@@ -1143,7 +1143,7 @@ public class L9110Report extends MakeReport {
 			}
 
 			this.print(1, 2, clItem); // 擔保品別
-			this.print(0, 15, mBuilding.get("F4")); // 土地序號
+			this.print(0, 14, mBuilding.get("F4")); // 土地序號
 			this.print(0, 19, mBuilding.get("F5")); // 擔保品編號
 			if ("2".equals(mBuilding.get("F1"))) {
 				this.print(0, 32, mBuilding.get("F6") + "　" + mBuilding.get("F7")); // 提供人+土地坐落
@@ -1386,17 +1386,18 @@ public class L9110Report extends MakeReport {
 		 * --------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6-----
 		 * -----------123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345
 		 */
-		this.print(1, 5, " 保單號碼　　　　　　　 火險金額        地震險金額      保險起日　 保險迄日　 保險公司");
+		this.print(1, 5, " 　擔保品號碼　保單號碼　　　　　　　 火險金額        地震險金額      保險起日　 保險迄日　 保險公司");
 		this.print(1, 5,
 				"------------------------------------------------------------------------------------------------------------");
 		for (Map<String, String> mInsu : listInsuQuery) {
 //			this.print(1, 8, mInsu.get("F0"), "R");
-			this.print(1, 6, mInsu.get("F0"));
-			this.print(0, 37, formatAmt(mInsu.get("FireInsuAmt"), 0), "R");
-			this.print(0, 55, formatAmt(mInsu.get("EarthInsuAmt"), 0), "R");
-			this.print(0, 61, this.showRocDate(mInsu.get("F2"), 1));
-			this.print(0, 72, this.showRocDate(mInsu.get("F3"), 1));
-			this.print(0, 83, mInsu.get("F4"));
+			this.print(1, 6, mInsu.get("F0") + "-" + mInsu.get("F1") + "-" + mInsu.get("F2"));
+			this.print(0, 20, mInsu.get("F3"));
+			this.print(0, 51, formatAmt(mInsu.get("FireInsuAmt"), 0), "R");
+			this.print(0, 69, formatAmt(mInsu.get("EarthInsuAmt"), 0), "R");
+			this.print(0, 75, this.showRocDate(mInsu.get("F5"), 1));
+			this.print(0, 86, this.showRocDate(mInsu.get("F6"), 1));
+			this.print(0, 97, mInsu.get("F7"));
 		}
 	}
 

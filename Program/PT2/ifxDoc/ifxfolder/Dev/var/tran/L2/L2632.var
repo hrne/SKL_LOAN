@@ -89,6 +89,7 @@ T(3,CdCode.AdvanceCloseCode)
 T(3,CdCode.CollectWayCode)
 
 #CollectWayCodeHelp=x,1024,S
+#CollectWayCodeHelpY=x,1024,S
 
 !登放記號
 !ActFgX
@@ -115,6 +116,8 @@ R(1,XXR99)
 CALL(#HelpProc)
 T(2,@CloseReasonCodeHelp,#HelpDesc1)
 T(2,@CollectWayCodeHelp,#HelpDesc2)
+T(HELP,@CollectWayCodeHelp,#CollectWayCodeHelp,+,01;02;07;13;15;21;25;26;27;28;29)
+T(HELP,@CollectWayCodeHelpY,#CollectWayCodeHelp,+,02;07;13;15;21;25;26;27;28;29)
 T(2,@ActFgHelp,#HelpDesc3)
 T(2,@CloseIndHelp,#HelpDesc4)
 T(2,@CurrPrecisionHelp,#HelpDesc5)
@@ -171,6 +174,8 @@ T(H,@CollectWayCodeX,#CollectWayCode,#CollectWayCodeHelp)
 ! L2r36CarLoan=A,1,S
 ! L2r36ApplDate=D,7,S
 
+#ClLocation=x,200,S
+#CurrAddress=x,200,S
 
 
 #checkCloseDate=X,1,S
@@ -304,9 +309,12 @@ C(3,#FunCode,4,s,$)
 C(3,#FunCode,5,s,$)
 HELP(#YNHelp)
 @V(H,#YNHelp)
+C(5,#CollectFlag,"N",T(3,@CollectWayCode,01),$)
 
 #CollectFlagX=x,2,L
 T(H,#CollectFlag,#YNHelp)
+T(H,@CollectWayCodeX,#CollectWayCode,#CollectWayCodeHelp)
+C(5,#CollectFlag,"N",T(F,@CollectWayCode,0),T(F,@CollectWayCode,1))
 
 #RimEntryDate=D,7,S
 #RimCaseCloseCode=A,1,S
@@ -323,7 +331,8 @@ E(0,@RimCaseCloseCode,#CloseInd)
 RESET_RIM(#SendL3R11,L3R11)
 S(L3R11,1,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimBormNo,#RimEntryDate,#RimCaseCloseCode,#CollectFlag)
 R(1,L3R11)
-C(3,#L2r36CloseDate,0,$,S)
+T(2,@ClLocation,#L3r11BdLocation)
+T(2,@CurrAddress,#L3r11CurrAddres)
 ! E(0,@CloseReasonCode,0)
 E(0,@TwCloseAmt,#L3r11CloseAmt)
 C(5,#L3r11CloseReasonCode,00,T(3,@closefg,Y),T(3,@closefg,N))
@@ -390,12 +399,19 @@ T(H,#CloseReasonCode,#CloseReasonCodeHelp)
 !領取方式 修改時自動顯示可修改,其他自動顯示不需輸入
 #CollectWayCode=A,2,I
 C(2,#FunCode,S,S,$,S,s,s,S)
-HELP(#CollectWayCodeHelp,cols:5)
+C(5,#CollectFlag,"N",T(3,@CollectWayCode,01),$)
+C(5,#CollectFlag,"N",s,$)
+HELP(#CollectWayCodeHelpY,cols:5)
 @
-C(5,#CollectFlag,"N",V(1,01,20),C(5,#CollectFlag,"Y",V(2,01,20),V(H,#CollectWayCodeHelp)))
+C(4,#CollectWayCode,T(3,@CollectWayCodeX,),$)
+V(H,#CollectWayCodeHelpY)
+C(5,#CollectFlag,"Y",V(2,01,20),V(1,01,20))
 
 #CollectWayCodeX=X,50,L
 T(H,#CollectWayCode,#CollectWayCodeHelp)
+IF(#CollectWayCode==21||#CollectWayCode==26||#CollectWayCode==27,INVOKEJS(SHOW,p1,12,12,1),INVOKEJS(SHOW,p1,12,12,0))
+IF(#CollectWayCode==26,T(2,@PostAddress,#ClLocation),$)
+IF(#CollectWayCode==27,T(2,@PostAddress,#CurrAddress),$)
 
 !領取日期
 #FdReceiveDate=X,2,L
@@ -403,15 +419,16 @@ T(H,#CollectWayCode,#CollectWayCodeHelp)
 #ReceiveDate=D,7,I
 C(2,#FunCode,S,S,$,S,s,s,S)
 C(5,#CollectFlag,"Y",$,S)
-@V(7)A(DATE,0,#ReceiveDate)
+@
+C(4,#ReceiveDate,$,A(DATE,0,#ReceiveDate))
 
 
 ![郵寄地址]
 #FdPostAddress=X,2,L
 #PostAddress=x,200,I,maxWidth:50
-IF(#CollectWayCode==21||#CollectWayCode==26||#CollectWayCode==27,$,S)
 C(3,#FunCode,4,s,$)
 C(3,#FunCode,5,s,$)
+IF(#CollectWayCode==21||#CollectWayCode==26||#CollectWayCode==27,$,S)
 
 ! ["備註欄"],
 #Rmk=x,100,I
