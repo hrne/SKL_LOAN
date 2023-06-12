@@ -310,6 +310,7 @@ public class L4002 extends TradeBuffer {
 						break;
 
 					default:
+						// 除還款來源01:匯款轉帳 02:銀行扣款 03:員工扣款 04:支票兌現以外顯示第二階
 						grp1.setAcDate(tBatxDetail.getAcDate());
 						grp1.setBatchNo(tBatxDetail.getBatchNo());
 						grp1.setRepayCode(0);
@@ -322,6 +323,7 @@ public class L4002 extends TradeBuffer {
 						grp2.setReconCode(" ");
 						grp2.setFileName(" ");
 						grp2.setRankFlag(2);
+						labelRankFlag = 2;
 						break;
 					}
 				}
@@ -561,6 +563,11 @@ public class L4002 extends TradeBuffer {
 					if (tempVo.get("EraseCnt") == null) {
 						if (tBatxDetail.getProcStsCode().equals("2") || tBatxDetail.getProcStsCode().equals("3")
 								|| tBatxDetail.getProcStsCode().equals("4")) {
+							if (canTempCnt.containsKey(grp2)) {
+								canTempCnt.put(grp2, canTempCnt.get(grp2) + 1);
+							} else {
+								canTempCnt.put(grp2, 1);
+							}
 							if (canTempCnt.containsKey(grp3)) {
 								canTempCnt.put(grp3, canTempCnt.get(grp3) + 1);
 							} else {
@@ -655,7 +662,7 @@ public class L4002 extends TradeBuffer {
 					}
 					if (!"8".equals(batxStatus) && labelRankFlag == tempL4002Vo.getRankFlag()) {
 						// 依還款來源設定的階層顯示
-						// 可入帳(檢核成功且還款來源(1~4))筆數>0顯示[整批檢核]
+						// 可入帳(檢核成功且還款來源(1~4))筆數>0顯示[整批入帳]
 						if (canEnterCnt.get(tempL4002Vo) != null && canEnterCnt.get(tempL4002Vo) > 0) {
 							if (isRepayCode1To4) {
 								labelFgC = "E";
@@ -664,7 +671,7 @@ public class L4002 extends TradeBuffer {
 					}
 					if (!"8".equals(batxStatus) && labelRankFlag == tempL4002Vo.getRankFlag()) {
 						// 依[對帳類別]顯示
-						// 檢核未執行訂正且處理狀態(2:人工處理 3:檢核錯誤 4:檢核正常)筆數>0顯示[整批檢核]
+						// 檢核未執行訂正且處理狀態(2:人工處理 3:檢核錯誤 4:檢核正常)筆數>0顯示[勾選入帳]
 						if (canTempCnt.get(tempL4002Vo) != null && canTempCnt.get(tempL4002Vo) > 0) {
 							labelFgD = "T";
 						}

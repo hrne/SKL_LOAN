@@ -71,54 +71,54 @@ public class L698B extends TradeBuffer {
 		Slice<TxToDoDetail> slTxToDoDetail = null;
 //		! 1:昨日留存  0-上一營業日
 //		! 2:本日新增  本營業日-本營業日
-//		! 3:全部     0-9991231
-//		! 4:本日處理  本營業日-本營業日
-//		! 5:本日刪除  本營業日-本營業日
-//		! 6:保留     0-9991231
-//		! 7:未處理 0-9991231
-//		! 9:未處理 (按鈕處理) 0-9991231
+//		! 3:全部     0-99991231
+//		! 4:本日處理   0-99991231
+//		! 5:本日刪除   0-99991231
+//		! 6:保留     0-99991231
+//		! 7:未處理 0-99991231
+//		! 9:未處理 (按鈕處理) 0-99991231
 //   0.未處理
 //   1.已保留
 //   2.已處理
 //   3.已刪除
 
 		// 上一營業日
-		int lbsDy = this.txBuffer.getTxCom().getLbsdy();
+		int lbsDy = this.txBuffer.getTxCom().getLbsdy() + 19110000;
 		// 本營業日
-		int tbsDy = this.txBuffer.getTxCom().getTbsdy();
+		int tbsDy = this.txBuffer.getTxCom().getTbsdy() + 19110000;
 
 		switch (selectCode) {
 		case 1:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, 0 + 19110000, lbsDy + 19110000,
-					this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, 0, lbsDy, this.index, this.limit,
+					titaVo);
 			break;
 		case 2:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, tbsDy + 19110000, tbsDy + 19110000,
-					this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, tbsDy, tbsDy, this.index, this.limit,
+					titaVo);
 			break;
 		case 3:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, 0 + 19110000, 9991231 + 19110000,
-					this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, 0, 99991231, this.index, this.limit,
+					titaVo);
 			break;
 		case 4:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 2, 2, tbsDy + 19110000, tbsDy + 19110000,
-					this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 2, 2, 0, 99991231, this.index, this.limit,
+					titaVo);
 			break;
 		case 5:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 3, 3, tbsDy + 19110000, tbsDy + 19110000,
-					this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 3, 3, 0, 99991231, this.index, this.limit,
+					titaVo);
 			break;
 		case 6:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 1, 1, 0 + 19110000, 9991231 + 19110000,
-					this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 1, 1, 0, 99991231, this.index, this.limit,
+					titaVo);
 			break;
 		case 7:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 0, 0 + 19110000, 9991231 + 19110000,
-					this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 0, 0, 99991231, this.index, this.limit,
+					titaVo);
 			break;
 		case 9:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 0, 0 + 19110000, 9991231 + 19110000,
-					this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 0, 0, 99991231, this.index, this.limit,
+					titaVo);
 			break;
 		default:
 			break;

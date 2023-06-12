@@ -171,7 +171,6 @@ public class L2154 extends TradeBuffer {
 			if (iFuncCode == 4) { // 刪除
 				throw new LogicException(titaVo, "E0020", "額度主檔 戶號=" + iCustNo + " 額度編號=" + iFacmNo); // 已刪除資料，不可做修正
 			}
-			EntryEraseRoutine();
 			EntryNormalRoutine();
 		}
 		// 登錄 訂正
@@ -295,7 +294,7 @@ public class L2154 extends TradeBuffer {
 		}
 	}
 
-	// 放行及放行訂正
+	// 放行
 	private void ReleaseRoutine() throws LogicException {
 		this.info("ReleaseRoutine ... ");
 
@@ -323,68 +322,67 @@ public class L2154 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0006", "額度主檔"); // 鎖定資料時，發生錯誤
 			}
 			wkApplNo = tFacMain.getApplNo();
-			// 放行 一般
-			if (titaVo.isHcodeNormal()) {
-				if (tFacMain.getActFg() != 1) {
-					throw new LogicException(titaVo, "E0017", "額度主檔 戶號 = " + wkCustNo + "額度編號 = " + wkFacmNo); // 該筆交易狀態非待放行，不可做交易放行
-				}
-				switch (iFuncCode) {
-				case 2: // 修改, 更新額度主檔
-					// 新增交易暫存檔
-					TxTemp tTxTemp = new TxTemp();
-					TxTempId tTxTempId = new TxTempId();
-					loanCom.setTxTemp(tTxTempId, tTxTemp, wkCustNo, wkFacmNo, 0, 0, titaVo);
-					tTempVo.clear();
-					tTempVo.putParam("ActFg", tFacMain.getActFg());
-					tTxTemp.setText(tTempVo.getJsonString());
-					try {
-						txTempService.insert(tTxTemp, titaVo);
-					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0005", "交易暫存檔 Key = " + tTxTempId); // 新增資料時，發生錯誤
-					}
-					// 更新額度主檔
-					tFacMain.setActFg(titaVo.getActFgI());
-					try {
-						tFacMain = facMainService.update(tFacMain, titaVo);
-					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0008",
-								"額度主檔 戶號 = " + wkCustNo + "額度編號 = " + wkFacmNo + e.getErrorMsg()); // 新增資料時，發生錯誤
-					}
-					break;
-				case 4: // 刪除, 刪除額度資料及清償金類型
-					// 刪除時更新案件申請檔
-					UpdateAppl();
-					// 新增交易暫存檔
-					AddTxTempRoutine();
-					// 刪除時檢查為該戶號最後一筆額度 客戶主檔該額度-1
-					CustMain tCustMain = null;
-					tCustMain = custMainService.custNoFirst(tFacMain.getCustNo(), tFacMain.getCustNo(), titaVo);
-					if (tCustMain == null) {
-						throw new LogicException(titaVo, "E2003", "客戶資料主檔 = " + tFacMain.getCustNo()); // 查無資料
-					}
-					String wkCustUKey = tCustMain.getCustUKey().trim();
-					tCustMain = custMainService.holdById(wkCustUKey, titaVo);
-					if (tCustMain == null) {
-						throw new LogicException(titaVo, "E2011", "客戶資料主檔"); // 鎖定資料時，發生錯誤
-					}
-					if (tFacMain.getFacmNo() == tCustMain.getLastFacmNo()) {
-						tCustMain.setLastFacmNo(tCustMain.getLastFacmNo() - 1);
-						try {
-							custMainService.update(tCustMain, titaVo);
-						} catch (DBException e) {
-							throw new LogicException(titaVo, "E2010", "客戶資料主檔"); // 更新資料時，發生錯誤
-						}
-					}
-					try {
-						facMainService.delete(tFacMain, titaVo);
-					} catch (DBException e) {
-						throw new LogicException(titaVo, "E2008", "額度主檔"); // 刪除資料時，發生錯誤
-					}
-					// 刪除階梯式利率
-					DeleteFacProdStepRateRoutine();
-					break;
-				}
+
+			if (tFacMain.getActFg() != 1) {
+				throw new LogicException(titaVo, "E0017", "額度主檔 戶號 = " + wkCustNo + "額度編號 = " + wkFacmNo); // 該筆交易狀態非待放行，不可做交易放行
 			}
+			switch (iFuncCode) {
+			case 2: // 修改, 更新額度主檔
+				// 新增交易暫存檔
+				TxTemp tTxTemp = new TxTemp();
+				TxTempId tTxTempId = new TxTempId();
+				loanCom.setTxTemp(tTxTempId, tTxTemp, wkCustNo, wkFacmNo, 0, 0, titaVo);
+				tTempVo.clear();
+				tTempVo.putParam("ActFg", tFacMain.getActFg());
+				tTxTemp.setText(tTempVo.getJsonString());
+				try {
+					txTempService.insert(tTxTemp, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0005", "交易暫存檔 Key = " + tTxTempId); // 新增資料時，發生錯誤
+				}
+				// 更新額度主檔
+				tFacMain.setActFg(titaVo.getActFgI());
+				try {
+					tFacMain = facMainService.update(tFacMain, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0008",
+							"額度主檔 戶號 = " + wkCustNo + "額度編號 = " + wkFacmNo + e.getErrorMsg()); // 新增資料時，發生錯誤
+				}
+				break;
+			case 4: // 刪除, 刪除額度資料及清償金類型
+				// 刪除時更新案件申請檔
+				UpdateAppl();
+				// 新增交易暫存檔
+				AddTxTempRoutine();
+				// 刪除時檢查為該戶號最後一筆額度 客戶主檔該額度-1
+				CustMain tCustMain = null;
+				tCustMain = custMainService.custNoFirst(tFacMain.getCustNo(), tFacMain.getCustNo(), titaVo);
+				if (tCustMain == null) {
+					throw new LogicException(titaVo, "E2003", "客戶資料主檔 = " + tFacMain.getCustNo()); // 查無資料
+				}
+				String wkCustUKey = tCustMain.getCustUKey().trim();
+				tCustMain = custMainService.holdById(wkCustUKey, titaVo);
+				if (tCustMain == null) {
+					throw new LogicException(titaVo, "E2011", "客戶資料主檔"); // 鎖定資料時，發生錯誤
+				}
+				if (tFacMain.getFacmNo() == tCustMain.getLastFacmNo()) {
+					tCustMain.setLastFacmNo(tCustMain.getLastFacmNo() - 1);
+					try {
+						custMainService.update(tCustMain, titaVo);
+					} catch (DBException e) {
+						throw new LogicException(titaVo, "E2010", "客戶資料主檔"); // 更新資料時，發生錯誤
+					}
+				}
+				try {
+					facMainService.delete(tFacMain, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E2008", "額度主檔"); // 刪除資料時，發生錯誤
+				}
+				// 刪除階梯式利率
+				DeleteFacProdStepRateRoutine();
+				break;
+			}
+
 		}
 	}
 

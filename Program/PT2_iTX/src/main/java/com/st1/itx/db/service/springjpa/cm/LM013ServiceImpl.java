@@ -51,13 +51,57 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo, EntCodeCondition entCodeCondition, IsRelsCondition isRelsCondition) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, EntCodeCondition entCodeCondition,
+			IsRelsCondition isRelsCondition) throws Exception {
 		this.info("lM013.findAll ");
 
 		int entdy = (parse.stringToInteger(titaVo.getParam("inputDate")) + 19110000);
 
 		String sql = " ";
-		sql += "  WITH TotalData AS (  ";
+		sql += "   WITH rawData AS (";
+		sql += "        SELECT FSL.\"CustNo\"";
+		sql += "             , FSL.\"FacmNo\"";
+		sql += "             , FSL.\"MainApplNo\"";
+		sql += "             , FSL.\"KeyinSeq\"";
+		sql += "             , FSL.\"LineAmt\" AS \"LimitLineAmt\"";
+		sql += "             , FM.\"UtilBal\"";
+		sql += "        FROM \"FacShareLimit\" FSL";
+		sql += "        LEFT JOIN \"FacMain\" FM ON FM.\"CustNo\" = FSL.\"CustNo\"";
+		sql += "                              AND FM.\"FacmNo\" = FSL.\"FacmNo\"";
+		sql += "    )";
+		sql += "    , maxSeqData AS (";
+		sql += "        SELECT \"MainApplNo\"";
+		sql += "             , MAX(\"KeyinSeq\") AS \"MaxSeq\"";
+		sql += "        FROM rawData";
+		sql += "        GROUP BY \"MainApplNo\"";
+		sql += "    )";
+		sql += "    , lastSeqData AS (";
+		sql += "        SELECT r1.\"MainApplNo\"";
+		sql += "             , r1.\"CustNo\"";
+		sql += "             , r1.\"FacmNo\"";
+		sql += "             , r1.\"LimitLineAmt\" - SUM(r2.\"UtilBal\") AS \"LimitLineAmt\"";
+		sql += "        FROM rawData r1";
+		sql += "        LEFT JOIN rawData r2 ON r2.\"MainApplNo\" = r1.\"MainApplNo\"";
+		sql += "                            AND r2.\"KeyinSeq\" < r1.\"KeyinSeq\"";
+		sql += "        LEFT JOIN maxSeqData m ON m.\"MainApplNo\" = r1.\"MainApplNo\"";
+		sql += "        WHERE r1.\"KeyinSeq\" = m.\"MaxSeq\" ";
+		sql += "        GROUP BY r1.\"MainApplNo\"";
+		sql += "               , r1.\"CustNo\"";
+		sql += "               , r1.\"FacmNo\"";
+		sql += "               , r1.\"LimitLineAmt\"";
+		sql += "    )";
+		sql += "    , shareFacData AS (";
+		sql += "        SELECT r.\"CustNo\"";
+		sql += "             , r.\"FacmNo\"";
+		sql += "             , MAX(NVL(l.\"LimitLineAmt\",r.\"UtilBal\")) AS \"ShareLineAmt\" ";
+		sql += "        FROM rawData r";
+		sql += "        LEFT JOIN lastSeqData l ON l.\"MainApplNo\" = r.\"MainApplNo\"";
+		sql += "                               AND l.\"CustNo\" = r.\"CustNo\"";
+		sql += "                               AND l.\"FacmNo\" = r.\"FacmNo\"";
+		sql += "        GROUP BY r.\"CustNo\"";
+		sql += "               , r.\"FacmNo\"";
+		sql += "    )";
+		sql += "  , TotalData AS (  ";
 		sql += "      		SELECT DECODE(C.\"EntCode\",'1','1','0') AS \"EntCode\"  ";
 		sql += "                   ,R.\"IsRels\" AS \"IsRels\"  ";
 		sql += "                   ,LPAD(TO_CHAR(D.\"CustNo\"),7,'0') AS \"CustNo\"  ";
@@ -73,7 +117,7 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                           THEN 4  ";
 		sql += "                         ELSE CF.\"ClCode1\" END   ";
 		sql += "                    END AS \"ClCode1\"  ";
-		sql += "                   ,F.\"LineAmt\" AS \"LineAmt\"  ";
+		sql += "                   ,NVL(NVL(sfd.\"ShareLineAmt\",F.\"LineAmt\"),0) AS \"LineAmt\"  ";
 		sql += "                   ,SUM(NVL(IIM.\"BookValue\", D.\"LoanBalance\")) AS \"BookValue\"  ";
 		sql += "             FROM \"DailyLoanBal\" D  ";
 		sql += "             LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = D.\"CustNo\"  ";
@@ -109,6 +153,8 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             LEFT JOIN \"LoanBorMain\" LBM ON LBM.\"CustNo\" = D.\"CustNo\"  ";
 		sql += "                                          AND LBM.\"FacmNo\" = D.\"FacmNo\"  ";
 		sql += "                                          AND LBM.\"BormNo\" = D.\"BormNo\"  ";
+		sql += "             LEFT JOIN shareFacData sfd ON sfd.\"CustNo\" = D.\"CustNo\"  ";
+		sql += "                                       AND sfd.\"FacmNo\" = D.\"FacmNo\"  ";
 		sql += "             WHERE D.\"MonthEndYm\" = :YearMonth  ";
 		sql += "               AND F.\"FirstDrawdownDate\" <= :entdy  ";
 		sql += "               AND LBM.\"Status\" IN (0,4)  ";
@@ -127,7 +173,7 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                             THEN 4  ";
 		sql += "                           ELSE CF.\"ClCode1\" END  ";
 		sql += "                      END  ";
-		sql += "                     ,F.\"LineAmt\"  ";
+		sql += "                     ,NVL(NVL(sfd.\"ShareLineAmt\",F.\"LineAmt\"),0)  ";
 		sql += "      		 ORDER BY TO_NUMBER(\"CustNo\") ASC ";
 		sql += "              	 	 ,TO_NUMBER(\"FacmNo\") ASC ";
 		sql += "              		 ,\"EntCode\" ";
@@ -144,22 +190,9 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                 GROUP BY \"CustNo\"  ";
 		sql += "                ) t2 ON t2.\"CustNo\" = t1.\"CustNo\"  ";
 		sql += "  )  ";
+
 		sql += "    ";
 		sql += "  (  ";
-//		sql += "  SELECT :EntCodeCondition AS \"EntCode\"  ";
-//		sql += "        ,:IsRelsCondition AS \"IsRels\"  ";
-//		sql += "        ,' ' AS \"CustNo\"  ";
-//		sql += "        ,' ' AS \"FacmNo\"  ";
-//		sql += "        ,' ' AS \"CustId\"  ";
-//		sql += "        ,u' ' AS \"CustName\"  ";
-//		sql += "        ,8 AS \"ClCode1\"  ";
-//		sql += "        ,0 AS \"LineAmt\"  ";
-//		sql += "        ,0 AS \"BookValue\"  ";
-//		sql += "        ,NULL AS \"LineTotal\"  ";
-//		sql += "  FROM DUAL  ";
-//		sql += "    ";
-//		sql += "  UNION ";
-//		sql += "    ";
 		sql += "  SELECT \"EntCode\"";
 		sql += "  	    ,\"IsRels\" ";
 		sql += "  	    ,\"CustNo\" ";

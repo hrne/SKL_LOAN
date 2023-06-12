@@ -57,7 +57,6 @@ public class L6985 extends TradeBuffer {
 	public CdAcCodeService cdAcCodeService;
 
 	private int selectCode = 0;
-	private int trasCollDate = 0;
 	private String iItemCode = "";
 
 	@Override
@@ -72,64 +71,65 @@ public class L6985 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = Integer.MAX_VALUE;
 
-		trasCollDate = parse.stringToInteger(titaVo.getParam("AcDate"));
 		selectCode = parse.stringToInteger(titaVo.getParam("SelectCode"));
 		iItemCode = titaVo.getParam("cItemCode");
 
 		this.info("selectCode = " + selectCode);
-		this.info("trasCollDate = " + trasCollDate);
-		// 0.未處理
-		// 1.已保留
-		// 2.已處理
-		// 3.已刪除
 
 		List<TxToDoDetail> lTxToDoDetail = new ArrayList<TxToDoDetail>();
 
 		Slice<TxToDoDetail> slTxToDoDetail = null;
-		String fallMessage = "";
 //		ACCL00 各項提存作業
-
-//		! 1:昨日留存 
-//		! 2:本日新增 
-//		! 3:全部     
-//		! 4:本日處理 
-//		! 5:本日刪除 
-//		! 6:保留    
-//		! 7:未處理
-//		! 9:未處理 (按鈕處理)
+		// 上一營業日
+		int lbsDy = this.txBuffer.getTxCom().getLbsdy() + 19110000;
+		// 本營業日
+		int tbsDy = this.txBuffer.getTxCom().getTbsdy() + 19110000;
+		String itemCode = "ACCL00"; // 各項提存作業
+//		! 1:昨日留存  0-上一營業日
+//		! 2:本日新增  本營業日-本營業日
+//		! 3:全部     0-99991231
+//		! 4:本日處理   0-99991231
+//		! 5:本日刪除   0-99991231
+//		! 6:保留     0-99991231
+//		! 7:未處理 0-99991231
+//		! 9:未處理 (按鈕處理) 0-99991231
+//   0.未處理
+//   1.已保留
+//   2.已處理
+//   3.已刪除
 
 		switch (selectCode) {
 		case 1:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange(iItemCode, 0, 3, this.index, this.limit, titaVo);
-			fallMessage = "昨日留存";
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, 0, lbsDy, this.index, this.limit,
+					titaVo);
 			break;
 		case 2:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange(iItemCode, 0, 3, this.index, this.limit, titaVo);
-			fallMessage = "本日新增";
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, tbsDy, tbsDy, this.index, this.limit,
+					titaVo);
 			break;
 		case 3:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange(iItemCode, 0, 3, this.index, this.limit, titaVo);
-			fallMessage = "全部";
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, 0, 99991231, this.index, this.limit,
+					titaVo);
 			break;
 		case 4:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange(iItemCode, 2, 2, this.index, this.limit, titaVo);
-			fallMessage = "本日處理";
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 2, 2, 0, 99991231, this.index, this.limit,
+					titaVo);
 			break;
 		case 5:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange(iItemCode, 3, 3, this.index, this.limit, titaVo);
-			fallMessage = "本日刪除";
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 3, 3, 0, 99991231, this.index, this.limit,
+					titaVo);
 			break;
 		case 6:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange(iItemCode, 1, 1, this.index, this.limit, titaVo);
-			fallMessage = "保留";
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 1, 1, 0, 99991231, this.index, this.limit,
+					titaVo);
 			break;
 		case 7:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange(iItemCode, 0, 0, this.index, this.limit, titaVo);
-			fallMessage = "未處理";
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 0, 0, 99991231, this.index, this.limit,
+					titaVo);
 			break;
 		case 9:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange(iItemCode, 0, 0, this.index, this.limit, titaVo);
-			fallMessage = "未處理 (按鈕處理)";
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 0, 0, 99991231, this.index, this.limit,
+					titaVo);
 			break;
 		default:
 			break;
@@ -142,10 +142,6 @@ public class L6985 extends TradeBuffer {
 			for (TxToDoDetail tTxToDoDetail : lTxToDoDetail) {
 				OccursList occursList = new OccursList();
 
-				if (selectCodeIsNotQualify(tTxToDoDetail)) {
-					continue;
-				}
-
 				TempVo tTempVo = new TempVo();
 				tTempVo = tTempVo.getVo(tTxToDoDetail.getProcessNote());
 
@@ -154,8 +150,9 @@ public class L6985 extends TradeBuffer {
 				String AcclType = tTempVo.getParam("AcclType");
 				String SlipNote = tTempVo.getParam("SlipNote");
 				BigDecimal TxAmt = parse.stringToBigDecimal(tTempVo.getParam("DbTxAmt1"));
-				if ("ACCL04".equals(iItemCode) ) {//折溢價
-					TxAmt = parse.stringToBigDecimal(tTempVo.getParam("DbTxAmt1")).subtract(parse.stringToBigDecimal(tTempVo.getParam("CrTxAmt1")));
+				if ("ACCL04".equals(iItemCode)) {// 折溢價
+					TxAmt = parse.stringToBigDecimal(tTempVo.getParam("DbTxAmt1"))
+							.subtract(parse.stringToBigDecimal(tTempVo.getParam("CrTxAmt1")));
 				}
 				String AcctCode = tTempVo.getParam("AcctCode");
 				String AcBookCode = tTempVo.getParam("AcBookCode");
@@ -194,34 +191,9 @@ public class L6985 extends TradeBuffer {
 
 				this.totaVo.addOccursList(occursList);
 			}
-		} else {
-			throw new LogicException(titaVo, "E0001", "查詢範圍: " + fallMessage + " 查無資料");
 		}
 
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-
-	private Boolean selectCodeIsNotQualify(TxToDoDetail tTxToDoDetail) throws LogicException {
-		Boolean result = false;
-		int today = this.getTxBuffer().getTxCom().getTbsdy();
-		switch (selectCode) {
-		case 1:
-			if (tTxToDoDetail.getDataDate() >= today) {
-				result = true;
-			}
-			break;
-		case 2:
-			if (tTxToDoDetail.getDataDate() != today) {
-				result = true;
-			}
-			break;
-
-		default:
-			break;
-		}
-		this.info("result = " + result + " " + tTxToDoDetail);
-		return result;
-	}
-
 }

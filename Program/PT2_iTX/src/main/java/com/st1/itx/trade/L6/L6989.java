@@ -75,47 +75,62 @@ public class L6989 extends TradeBuffer {
 		// 3.已刪除
 
 		List<TxToDoDetail> lTxToDoDetail = new ArrayList<TxToDoDetail>();
-		List<AcReceivable> lAcReceivable = new ArrayList<AcReceivable>();
 		Slice<TxToDoDetail> slTxToDoDetail = null;
-		Slice<AcReceivable> slAcReceivable = null;
-
-//		! 1:昨日留存 
-//		! 2:本日新增 
-//		! 3:全部     
-//		! 4:本日處理 
-//		! 5:本日刪除 
-//		! 6:保留    
-//		! 7:未處理
-//		! 9:未處理 (按鈕處理)
+		// 上一營業日
+		int lbsDy = this.txBuffer.getTxCom().getLbsdy() + 19110000;
+		// 本營業日
+		int tbsDy = this.txBuffer.getTxCom().getTbsdy() + 19110000;
+		String itemCode = "SLCL00"; // 企金費用攤提入帳
+//		! 1:昨日留存  0-上一營業日
+//		! 2:本日新增  本營業日-本營業日
+//		! 3:全部     0-99991231
+//		! 4:本日處理   0-99991231
+//		! 5:本日刪除   0-99991231
+//		! 6:保留     0-99991231
+//		! 7:未處理 0-99991231
+//		! 9:未處理 (按鈕處理) 0-99991231
+//   0.未處理
+//   1.已保留
+//   2.已處理
+//   3.已刪除
 
 		switch (selectCode) {
 		case 1:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange("SLCL00", 0, 3, this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, 0, lbsDy, this.index, this.limit,
+					titaVo);
 			break;
 		case 2:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange("SLCL00", 0, 3, this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, tbsDy, tbsDy, this.index, this.limit,
+					titaVo);
 			break;
 		case 3:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange("SLCL00", 0, 3, this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, 0, 99991231, this.index, this.limit,
+					titaVo);
 			break;
 		case 4:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange("SLCL00", 2, 2, this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 2, 2, 0, 99991231, this.index, this.limit,
+					titaVo);
 			break;
 		case 5:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange("SLCL00", 3, 3, this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 3, 3, 0, 99991231, this.index, this.limit,
+					titaVo);
 			break;
 		case 6:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange("SLCL00", 1, 1, this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 1, 1, 0, 99991231, this.index, this.limit,
+					titaVo);
 			break;
 		case 7:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange("SLCL00", 0, 0, this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 0, 0, 99991231, this.index, this.limit,
+					titaVo);
 			break;
 		case 9:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange("SLCL00", 0, 0, this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 0, 0, 99991231, this.index, this.limit,
+					titaVo);
 			break;
 		default:
 			break;
 		}
+
 		lTxToDoDetail = slTxToDoDetail == null ? null : slTxToDoDetail.getContent();
 		this.info("lTxToDoDetail = " + lTxToDoDetail);
 
@@ -128,14 +143,11 @@ public class L6989 extends TradeBuffer {
 				int wkSyndFeeYYMM = 0;
 				int wkOpenAcDate = 0;
 				BigDecimal wkSyndFee = BigDecimal.ZERO;
-				if (selectCodeIsNotQualify(tTxToDoDetail)) {
-					continue;
-				}
-
 				tTempVo = tTempVo.getVo(tTxToDoDetail.getProcessNote());
 				wkAcctCode = tTempVo.get("AcctCode");
 				wkTempItemCode = wkAcctCode.substring(1, 3);
-				tAcReceivable = acReceivableService.findById(new AcReceivableId(wkAcctCode, tTxToDoDetail.getCustNo(), tTxToDoDetail.getFacmNo(), tTxToDoDetail.getDtlValue()), titaVo);
+				tAcReceivable = acReceivableService.findById(new AcReceivableId(wkAcctCode, tTxToDoDetail.getCustNo(),
+						tTxToDoDetail.getFacmNo(), tTxToDoDetail.getDtlValue()), titaVo);
 				if (tAcReceivable != null) {
 					wkSyndFeeYYMM = parse.stringToInteger(tAcReceivable.getRvNo().substring(10, 15));// SL-XX-XXX-YYYMM
 					wkSyndFee = tAcReceivable.getRvAmt();
@@ -151,7 +163,8 @@ public class L6989 extends TradeBuffer {
 				occursList.putParam("OOFeeCode", wkAcctCode); // 科目名稱代號
 				occursList.putParam("OOTitaCrDb", 1); // 借貸
 				occursList.putParam("OOAcDate", wkOpenAcDate); // 起帳日
-				occursList.putParam("OORelNo", tTxToDoDetail.getTitaEntdy() + tTxToDoDetail.getTitaKinbr() + tTxToDoDetail.getTitaTlrNo() + parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8));
+				occursList.putParam("OORelNo", tTxToDoDetail.getTitaEntdy() + tTxToDoDetail.getTitaKinbr()
+						+ tTxToDoDetail.getTitaTlrNo() + parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8));
 				occursList.putParam("OOItemCode", tTxToDoDetail.getItemCode());
 				occursList.putParam("OODtlValue", tTxToDoDetail.getDtlValue());
 				occursList.putParam("OOTempItemCode", wkTempItemCode);
@@ -178,34 +191,4 @@ public class L6989 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-//	! 1:昨日留存 
-//	! 2:本日新增 
-//	! 3:全部     
-//	! 4:本日處理 
-//	! 5:本日刪除 
-//	! 6:保留    
-//	! 7:未處理
-
-	private Boolean selectCodeIsNotQualify(TxToDoDetail tTxToDoDetail) throws LogicException {
-		Boolean result = false;
-		int today = this.getTxBuffer().getTxCom().getTbsdy();
-		switch (selectCode) {
-		case 1:
-			if (tTxToDoDetail.getDataDate() >= today) {
-				result = true;
-			}
-			break;
-		case 2:
-			if (tTxToDoDetail.getDataDate() != today) {
-				result = true;
-			}
-			break;
-
-		default:
-			break;
-		}
-
-		return result;
-	}
-
 }

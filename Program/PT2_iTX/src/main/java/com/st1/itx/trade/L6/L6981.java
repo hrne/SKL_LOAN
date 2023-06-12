@@ -48,7 +48,6 @@ public class L6981 extends TradeBuffer {
 	public CustMainService sCustMainService;
 
 	private int selectCode = 0;
-	private int trasCollDate = 0;
 
 	int ovduMonth = 0; // 逾期日期-月
 	int ovduDay = 0; // 逾期日期-日
@@ -69,50 +68,59 @@ public class L6981 extends TradeBuffer {
 		this.limit = 300; // 172 * 300 = 51600
 
 		selectCode = parse.stringToInteger(titaVo.getParam("SelectCode"));
-		trasCollDate = parse.stringToInteger(titaVo.getParam("TransCollDate"));
-
-// 0.未處理
-// 1.已保留
-// 2.已處理
-// 3.已刪除
-
 		List<TxToDoDetail> lTxToDoDetail = new ArrayList<TxToDoDetail>();
 		Slice<TxToDoDetail> slTxToDoDetail = null;
-//		TRLN00 放款轉列催收
 
-//		! 1:昨日留存 
-//		! 2:本日新增 
-//		! 3:全部     
-//		! 4:本日處理 
-//		! 5:本日刪除 
-//		! 6:保留    
-//		! 7:未處理
-//		! 9:未處理 (按鈕處理)
+		// 上一營業日
+		int lbsDy = this.txBuffer.getTxCom().getLbsdy() + 19110000;
+		// 本營業日
+		int tbsDy = this.txBuffer.getTxCom().getTbsdy() + 19110000;
+		String itemCode = "TRLN00"; // 放款轉列催收
+//		! 1:昨日留存  0-上一營業日
+//		! 2:本日新增  本營業日-本營業日
+//		! 3:全部     0-99991231
+//		! 4:本日處理   0-99991231
+//		! 5:本日刪除   0-99991231
+//		! 6:保留     0-99991231
+//		! 7:未處理 0-99991231
+//		! 9:未處理 (按鈕處理) 0-99991231
+//   0.未處理
+//   1.已保留
+//   2.已處理
+//   3.已刪除
 
 		switch (selectCode) {
 		case 1:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange("TRLN00", 0, 3, this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, 0, lbsDy, this.index, this.limit,
+					titaVo);
 			break;
 		case 2:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange("TRLN00", 0, 3, this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, tbsDy, tbsDy, this.index, this.limit,
+					titaVo);
 			break;
 		case 3:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange("TRLN00", 0, 3, this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, 0, 99991231, this.index, this.limit,
+					titaVo);
 			break;
 		case 4:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange("TRLN00", 2, 2, this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 2, 2, 0, 99991231, this.index, this.limit,
+					titaVo);
 			break;
 		case 5:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange("TRLN00", 3, 3, this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 3, 3, 0, 99991231, this.index, this.limit,
+					titaVo);
 			break;
 		case 6:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange("TRLN00", 1, 1, this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 1, 1, 0, 99991231, this.index, this.limit,
+					titaVo);
 			break;
 		case 7:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange("TRLN00", 0, 0, this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 0, 0, 99991231, this.index, this.limit,
+					titaVo);
 			break;
 		case 9:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange("TRLN00", 0, 0, this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 0, 0, 99991231, this.index, this.limit,
+					titaVo);
 			break;
 		default:
 			break;
@@ -123,10 +131,6 @@ public class L6981 extends TradeBuffer {
 		if (lTxToDoDetail != null && lTxToDoDetail.size() != 0) {
 			for (TxToDoDetail tTxToDoDetail : lTxToDoDetail) {
 				OccursList occursList = new OccursList();
-
-				if (selectCodeIsNotQualify(tTxToDoDetail)) {
-					continue;
-				}
 
 				CustMain tCustMain = new CustMain();
 				tCustMain = sCustMainService.custNoFirst(tTxToDoDetail.getCustNo(), tTxToDoDetail.getCustNo(), titaVo);
@@ -145,7 +149,8 @@ public class L6981 extends TradeBuffer {
 				occursList.putParam("OOOvduPrinAmt", tTempVo.get("OvduPrinAmt")); // 轉催收本金
 				occursList.putParam("OOOvduIntAmt", tTempVo.get("OvduIntAmt")); // 轉催收利息
 				occursList.putParam("OOOvduAmt", tTempVo.get("OvduAmt")); // 轉催收金額
-				occursList.putParam("OORelNo", tTxToDoDetail.getTitaEntdy() + tTxToDoDetail.getTitaKinbr() + tTxToDoDetail.getTitaTlrNo() + parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8));
+				occursList.putParam("OORelNo", tTxToDoDetail.getTitaEntdy() + tTxToDoDetail.getTitaKinbr()
+						+ tTxToDoDetail.getTitaTlrNo() + parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8));
 
 				occursList.putParam("OOItemCode", tTxToDoDetail.getItemCode());
 				occursList.putParam("OOBormNo", tTxToDoDetail.getBormNo());
@@ -171,25 +176,4 @@ public class L6981 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private Boolean selectCodeIsNotQualify(TxToDoDetail tTxToDoDetail) throws LogicException {
-		Boolean result = false;
-		int today = this.getTxBuffer().getTxCom().getTbsdy();
-
-		switch (selectCode) {
-		case 1:
-			if (tTxToDoDetail.getDataDate() >= today) {
-				result = true;
-			}
-			break;
-		case 2:
-			if (tTxToDoDetail.getDataDate() != today) {
-				result = true;
-			}
-			break;
-		default:
-			break;
-		}
-
-		return result;
-	}
 }

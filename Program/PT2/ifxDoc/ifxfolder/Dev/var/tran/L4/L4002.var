@@ -339,8 +339,8 @@ T(2,T+#AcDate+#OOBatchNo+#OOStatusCode+#OORepayCode
 ! 處理印記 0:入帳 1:刪除 2:訂正 3: 檢核
 #OOBUF_A=X,18,S
 T(2,1+#AcDate+#OOBatchNo+#OOReconCode)
-#OOBUF_B=X,18,S
-T(2,2+#AcDate+#OOBatchNo+#OOReconCode)
+#OOBUF_B=X,20,S
+T(2,2+#AcDate+#OOBatchNo+#OOReconCode+#OORepayCode)
 #OOBUF_C=X,18,S
 T(2,0+#AcDate+#OOBatchNo+#OOReconCode)
 #OOBUF_D=X,18,S

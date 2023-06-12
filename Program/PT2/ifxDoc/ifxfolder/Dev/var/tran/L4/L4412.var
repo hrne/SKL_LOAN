@@ -43,6 +43,12 @@ E(0,0)
 T(4,CHAIN$)
 IF(#CHAIN!=1,V(P,此為連動交易，請從交易: [L4043 郵局授權資料查詢]進入),$)
 
+!做完交易自動更新原畫面
+#AutoReFresh=A,1,S
+C(3,#CHAIN,1,$,S)
+E(0,1)
+ASGN(CAUTO$)
+
 #NTXBUF=X,45,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@FuncCode,#NTXBUF,1,1)
@@ -673,7 +679,7 @@ T(2,@RelAcctGenderX,)
 
 #RelationCodeX=X,4,L
 T(H,#RelationCode,#RelationCodeHelp)
-! IF(#RelationCode==00,T(2,@CustId,#CustIdTemp),$)
+IF(#RelationCode==00,C(4,#CustId,T(2,@CustId,#CustIdTemp),$),$)
 IF(#RelationCode==00,s,$)
 IF(#RelationCode==99
 ,T(2,@RelAcctGender,)

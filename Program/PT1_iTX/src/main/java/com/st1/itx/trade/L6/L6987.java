@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -38,8 +36,7 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L6987 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6987.class);
-
+	
 	@Autowired
 	public Parse parse;
 
@@ -85,25 +82,11 @@ public class L6987 extends TradeBuffer {
 
 		this.info("selectCode = " + selectCode);
 		this.info("trasCollDate = " + trasCollDate);
-		// 0.未處理
-		// 1.已保留
-		// 2.已處理
-		// 3.已刪除
-
 		List<TxToDoDetail> lTxToDoDetail = new ArrayList<TxToDoDetail>();
 		List<ForeclosureFee> lForeclosureFee = new ArrayList<ForeclosureFee>();
 		Slice<TxToDoDetail> slTxToDoDetail = null;
 		Slice<ForeclosureFee> slForeclosureFee = null;
-//		TRLW00 法務費轉列催收 F07
-
-//		! 1:昨日留存 
-//		! 2:本日新增 
-//		! 3:全部     
-//		! 4:本日處理 
-//		! 5:本日刪除 
-//		! 6:保留    
-//		! 7:未處理
-//		! 9:未處理 (按鈕處理)
+//		BDLW00 呆帳戶法務費墊付
 		if (custNo > 0) {
 			this.info("custno>0");
 			slForeclosureFee = sForeclosureFeeService.custNoEq(custNo, this.index, this.limit, titaVo);
@@ -168,46 +151,70 @@ public class L6987 extends TradeBuffer {
 			}
 
 		} else {
-			this.info("未輸入");
+			// 上一營業日
+			int lbsDy = this.txBuffer.getTxCom().getLbsdy() + 19110000;
+			// 本營業日
+			int tbsDy = this.txBuffer.getTxCom().getTbsdy() + 19110000;
+			String itemCode = "BDLW00"; // 呆帳戶法務費墊付
+//			! 1:昨日留存  0-上一營業日
+//			! 2:本日新增  本營業日-本營業日
+//			! 3:全部     0-99991231
+//			! 4:本日處理   0-99991231
+//			! 5:本日刪除   0-99991231
+//			! 6:保留     0-99991231
+//			! 7:未處理 0-99991231
+//			! 9:未處理 (按鈕處理) 0-99991231
+	//   0.未處理
+	//   1.已保留
+	//   2.已處理
+	//   3.已刪除
+
 			switch (selectCode) {
 			case 1:
-				slTxToDoDetail = txToDoDetailService.detailStatusRange("BDLW00", 0, 3, this.index, this.limit, titaVo);
+				slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, 0, lbsDy, this.index, this.limit,
+						titaVo);
 				break;
 			case 2:
-				slTxToDoDetail = txToDoDetailService.detailStatusRange("BDLW00", 0, 3, this.index, this.limit, titaVo);
+				slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, tbsDy, tbsDy, this.index, this.limit,
+						titaVo);
 				break;
 			case 3:
-				slTxToDoDetail = txToDoDetailService.detailStatusRange("BDLW00", 0, 3, this.index, this.limit, titaVo);
+				slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, 0, 99991231, this.index, this.limit,
+						titaVo);
 				break;
 			case 4:
-				slTxToDoDetail = txToDoDetailService.detailStatusRange("BDLW00", 2, 2, this.index, this.limit, titaVo);
+				slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 2, 2, 0, 99991231, this.index, this.limit,
+						titaVo);
 				break;
 			case 5:
-				slTxToDoDetail = txToDoDetailService.detailStatusRange("BDLW00", 3, 3, this.index, this.limit, titaVo);
+				slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 3, 3, 0, 99991231, this.index, this.limit,
+						titaVo);
 				break;
 			case 6:
-				slTxToDoDetail = txToDoDetailService.detailStatusRange("BDLW00", 1, 1, this.index, this.limit, titaVo);
+				slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 1, 1, 0, 99991231, this.index, this.limit,
+						titaVo);
 				break;
 			case 7:
-				slTxToDoDetail = txToDoDetailService.detailStatusRange("BDLW00", 0, 0, this.index, this.limit, titaVo);
+				slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 0, 0, 99991231, this.index, this.limit,
+						titaVo);
 				break;
 			case 9:
-				slTxToDoDetail = txToDoDetailService.detailStatusRange("BDLW00", 0, 0, this.index, this.limit, titaVo);
+				slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 0, 0, 99991231, this.index, this.limit,
+						titaVo);
 				break;
 			default:
 				break;
 			}
+
 			lTxToDoDetail = slTxToDoDetail == null ? null : slTxToDoDetail.getContent();
 			this.info("lTxToDoDetail = " + lTxToDoDetail);
 
 			if (lTxToDoDetail != null && lTxToDoDetail.size() != 0) {
 				for (TxToDoDetail tTxToDoDetail : lTxToDoDetail) {
-					OccursList occursList = new OccursList();
-
-					if (selectCodeIsNotQualify(tTxToDoDetail)) {
+					if (custNo > 0 && tTxToDoDetail.getCustNo() != custNo) {
 						continue;
 					}
-
+					OccursList occursList = new OccursList();
 					tTempVo = new TempVo();
 					CustMain tCustMain = new CustMain();
 
@@ -265,41 +272,6 @@ public class L6987 extends TradeBuffer {
 		}
 		this.addList(this.totaVo);
 		return this.sendList();
-	}
-//	! 1:昨日留存 
-//	! 2:本日新增 
-//	! 3:全部     
-//	! 4:本日處理 
-//	! 5:本日刪除 
-//	! 6:保留    
-//	! 7:未處理
-
-	private Boolean selectCodeIsNotQualify(TxToDoDetail tTxToDoDetail) throws LogicException {
-		Boolean result = false;
-		int today = this.getTxBuffer().getTxCom().getTbsdy();
-		switch (selectCode) {
-		case 1:
-			if (tTxToDoDetail.getDataDate() >= today) {
-				result = true;
-			}
-			break;
-		case 2:
-			if (tTxToDoDetail.getDataDate() != today) {
-				result = true;
-			}
-			break;
-
-		default:
-			break;
-		}
-
-		if (custNo > 0) {
-			if (tTxToDoDetail.getCustNo() != custNo) {
-				result = true;
-			}
-		}
-
-		return result;
 	}
 
 	private String settingUnPaid(ForeclosureFee f, ArrayList<BaTxVo> baTxList, String rvNo, TitaVo titaVo)

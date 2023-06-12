@@ -58,6 +58,12 @@ E(0,2)
 T(4,CHAIN$) 
 IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L4042進入),$)
 
+!做完交易自動更新原畫面
+#AutoReFresh=A,1,S
+C(3,#CHAIN,1,$,S)
+E(0,1)
+ASGN(CAUTO$)
+
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 ! 性別下拉選單
 #SexRimName=x,20,S

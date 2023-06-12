@@ -78,45 +78,70 @@ public class L4030 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		this.limit = 100;
-
 		selectCode = parse.stringToInteger(titaVo.getParam("SelectCode"));
-		Slice<TxToDoDetail> sTxToDoDetail = null;
+		Slice<TxToDoDetail> slTxToDoDetail = null;
 
 		List<TxToDoDetail> lTxToDoDetail = new ArrayList<TxToDoDetail>();
+		// 上一營業日
+		int lbsDy = this.txBuffer.getTxCom().getLbsdy() + 19110000;
+		// 本營業日
+		int tbsDy = this.txBuffer.getTxCom().getTbsdy() + 19110000;
+		String itemCode = "EMRT00"; // 員工利率調整
+//		! 1:昨日留存  0-上一營業日
+//		! 2:本日新增  本營業日-本營業日
+//		! 3:全部     0-99991231
+//		! 4:本日處理   0-99991231
+//		! 5:本日刪除   0-99991231
+//		! 6:保留     0-99991231
+//		! 7:未處理 0-99991231
+//		! 9:未處理 (按鈕處理) 0-99991231
+//   0.未處理
+//   1.已保留
+//   2.已處理
+//   3.已刪除
+
 		switch (selectCode) {
 		case 1:
-			sTxToDoDetail = txToDoDetailService.detailStatusRange("EMRT00", 0, 6, this.index, this.limit);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, 0, lbsDy, this.index, this.limit,
+					titaVo);
 			break;
 		case 2:
-			sTxToDoDetail = txToDoDetailService.detailStatusRange("EMRT00", 0, 6, this.index, this.limit);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, tbsDy, tbsDy, this.index, this.limit,
+					titaVo);
 			break;
 		case 3:
-			sTxToDoDetail = txToDoDetailService.detailStatusRange("EMRT00", 0, 6, this.index, this.limit);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, 0, 99991231, this.index, this.limit,
+					titaVo);
 			break;
 		case 4:
-			sTxToDoDetail = txToDoDetailService.detailStatusRange("EMRT00", 2, 2, this.index, this.limit);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 2, 2, 0, 99991231, this.index, this.limit,
+					titaVo);
 			break;
 		case 5:
-			sTxToDoDetail = txToDoDetailService.detailStatusRange("EMRT00", 3, 3, this.index, this.limit);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 3, 3, 0, 99991231, this.index, this.limit,
+					titaVo);
 			break;
 		case 6:
-			sTxToDoDetail = txToDoDetailService.detailStatusRange("EMRT00", 1, 1, this.index, this.limit);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 1, 1, 0, 99991231, this.index, this.limit,
+					titaVo);
 			break;
 		case 7:
-			sTxToDoDetail = txToDoDetailService.detailStatusRange("EMRT00", 0, 0, this.index, this.limit);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 0, 0, 99991231, this.index, this.limit,
+					titaVo);
 			break;
 		case 9:
-			sTxToDoDetail = txToDoDetailService.detailStatusRange("EMRT00", 0, 0, this.index, this.limit);
+			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 0, 0, 99991231, this.index, this.limit,
+					titaVo);
 			break;
 		default:
 			break;
 		}
 
-		lTxToDoDetail = sTxToDoDetail == null ? null : sTxToDoDetail.getContent();
+		lTxToDoDetail = slTxToDoDetail == null ? null : slTxToDoDetail.getContent();
 
 		if (lTxToDoDetail != null && lTxToDoDetail.size() != 0) {
 			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-			if (sTxToDoDetail != null && sTxToDoDetail.hasNext()) {
+			if (slTxToDoDetail != null && slTxToDoDetail.hasNext()) {
 				titaVo.setReturnIndex(this.setIndexNext());
 				/* 手動折返 */
 				this.totaVo.setMsgEndToEnter();

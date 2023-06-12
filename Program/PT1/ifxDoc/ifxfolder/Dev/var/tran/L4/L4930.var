@@ -74,13 +74,13 @@ T(3,1:訂正;2:整批轉暫收)
 #CHAIN=A,1,S
 T(4,CHAIN$) 
 
-#NTXBUF=X,19,S
+#NTXBUF=X,20,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@FunctionCode,#NTXBUF,1,1)
 T(1,@AcDate,#NTXBUF,2,7)
 T(1,@BatchNo,#NTXBUF,9,6)
 T(1,@ReconCode,#NTXBUF,15,3)
-
+T(1,@RepayCode,#NTXBUF,18,2)
 ! 功能
 #FunctionCode=A,1,S
 C(3,#CHAIN,0,$,s)
@@ -113,6 +113,7 @@ C(3,#CHAIN,0,$,s)
 ![對帳類別]
 #ReconCode=X,3,L
 C(3,#CHAIN,0,$,s)
+#RepayCode=A,2,S
 
 #MRKEY=_,_,S
 C(3,#CustNo,0,S,T(2,#CustNo))
@@ -120,6 +121,7 @@ C(3,#CustNo,0,S,T(2,#CustNo))
 ![顯示方式]
 #RPTFG=A,1,S
 C(3,#FunctionCode,2,E(0,0),E(0,1))
+C(3,#RepayCode,90,E(0,2),$)
 
 #CHAINXMT=X,1,S
 C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
@@ -449,4 +451,46 @@ ifxBatch:{
 {search:false,formatter:'cust:bind-button:#OOBTN_TXT',align:'center',canExport:false,width:35}
 
 ^
+
+#RPTFG=2,QUERY.GRID
+#any={caption:'[L4930]',width:2000,rowNum:40,
+ifxBatch:{
+	name:'不處理;入帳',
+	type:'5',
+	rim:'L420C',
+	txtno:'#secret-no',
+	pfnx:"L4930A.PFNX",
+	col_captions:["放行傳輸序號","狀態"],
+	col_names:["#batch-row-txtno","#batch-row-status"]
+	}
+}
+
+#secret-no
+
+#OOBatchNo=批號
+{width:70}
+#OODetailSeq=明細序號
+{width:65,align:'center'}
+#OOEntryDate=入帳日期
+{width:65,align:'center'}
+#OOCustNo=戶號
+{width:65}
+#OOFacmNo=額度
+{width:35,align:'center'}
+#OORepayTypeX=還款類別
+{width:95}
+#OORepayAmt=還款金額
+{width:95}
+#OOAcctAmt=已作帳金額
+{width:95}
+#OODisAcctAmt=入暫收金額
+{width:95}
+#OOProcNote=處理說明
+{width:450}
+#OOTxSn=交易序號
+{width:95}
+
+#OOBTN_B=
+{search:false,formatter:'cust:bind-button:#OOBTN_TXT',align:'center',canExport:false,width:35}
+
 </sub>
