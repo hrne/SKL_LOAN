@@ -353,12 +353,12 @@ T(3,*)
 #TwRepayAmt=m,14,I
 C(3,#Precision,0,$,S)
 @V(2,0)
-V(5,1,#WkLoanBal)
+! V(5,1,#WkLoanBal)
 
 #UsRepayAmt=m,14.2,I
 C(3,#Precision,0,S,$)
 @V(2,0)
-V(5,1,#WkLoanBal)
+! V(5,1,#WkLoanBal)
 
 #TimRepayAmt=m,14.2,S
 C(3,#Precision,0,E(0,#TwRepayAmt),E(0,#UsRepayAmt))
@@ -466,9 +466,16 @@ T(2,#WkORate+#WkPercent)
 P(L,#ORateX)
 
 #OExtraRepayName=X,20,L
-C(3,#OBormNo,0,T(3,溢繳金額),T(3,部分償還本金))
-
+C(3,#OOverflow,0,C(3,#OExtraRepay,0,T(3,溢繳金額),T(3,部分償還本金)),T(3,溢繳金額))
+#OOverflow=m,14.2,S
 #OExtraRepay=m,14.2,S
+
+#OOverflowX=X,22,L
+C(3,#OOverflow,0,CALL2(#ADJUSTDOT,#Precision,#OExtraRepay,#OOverflowX)
+                ,CALL2(#ADJUSTDOT,#Precision,#OOverflow,#OOverflowX))
+P(R,#OOverflowX)
+
+
 
 #OExtraRepayX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#OExtraRepay,#OExtraRepayX)
@@ -698,7 +705,7 @@ TXFORM=L3925
 #OInterest#ODelayInt#OBreachAmt#OCloseBreachAmt
 #OTempTax#OReduceAmt
 #OShortfall#OShortfallInt#OShortfallPrin#OShortCloseBreach#OExcessive
-#OExtraRepay#OLoanBal#ONewDueAmt#OLeftTerms
+#OExtraRepay#OOverflow#OLoanBal#ONewDueAmt#OLeftTerms
 #OOFacmNo#OOBormNo#OOIntStartDate#OOIntEndDate#OOAmount#OORate
 #OOPrincipal#OOInterest#OODelayInt#OOBreachAmt#OOCloseBreachAmt
 #OOLoanBal
@@ -721,7 +728,7 @@ TXFORM=L3925
 ["@還款分配金額",#ORepayAmtX],["@暫付所得稅",#OTempTaxX],
 ["@減免違約金",#OBreachFlagX],["@累溢收",#OExcessiveX],
 ["@入帳日期",#OEntryDate],["@累短收",#OShortfallX,#OShortfallXX],
-["@計息期間",#OIntStartDate,"@-",#OIntEndDate],[#OExtraRepayName,#OExtraRepayX],
+["@計息期間",#OIntStartDate,"@-",#OIntEndDate],[#OExtraRepayName,#OOverflowX],
 ["@利率",#ORateX],["<font color=red>@清償違約金",#OCloseBreachAmtX],
 ["@本金",#OPrincipalXX],["@放款餘額",#OLoanBalX],
 ["@利息",#OInterestX],["@新攤還金額",#ONewDueAmtX],

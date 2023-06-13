@@ -113,6 +113,9 @@ public class L2416 extends TradeBuffer {
 		iClNo = parse.stringToInteger(titaVo.getParam("ClNo"));
 		iLandSeq = parse.stringToInteger(titaVo.getParam("LandSeq"));
 		titaVo.putParam("FUNCIND", iFunCd);
+		if ("L2917".equals(titaVo.getTxcd())) {
+			titaVo.putParam("TXCODE", titaVo.getTxcd());
+		}
 		if (iClCode1 == 2 && iLandSeq > 0) {
 			throw new LogicException("E0019", "土地擔保品土地序號應為0"); // 輸入資料錯誤
 		}

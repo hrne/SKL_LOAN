@@ -294,7 +294,7 @@ TXFORM=L2066
 
 #OOSlipNote=備註
 {width:180,align:'left'}
-#OOClsX=
+#OOClsX=是否銷帳
 {width:50,align:'center'}
 ^
 #RPTFG2=2,QUERY.GRID,L2066
@@ -318,7 +318,7 @@ TXFORM=L2066
 
 #OOSlipNote=備註
 {width:180,align:'left'}
-#OOClsX=
+#OOClsX=是否銷帳
 {width:50,align:'center'}
 
 ^

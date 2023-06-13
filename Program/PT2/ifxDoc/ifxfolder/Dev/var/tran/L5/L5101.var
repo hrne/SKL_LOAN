@@ -168,13 +168,13 @@ E(0,@AlrdyBorAmt,#L5r32AldyLoanBal)
 ! 責任準備金
 #ResrvStndrd=m,14,I
 C(3,#FunctionCode,2,$,C(3,#FunctionCode,1,$,s))
-@V(2,0)
+! @V(2,0)
 
 ! 可放款比率%
 #PRE_PosbleBorPsn=m,10,S
 #PosbleBorPsn=m,3.2,I
 C(3,#FunctionCode,2,$,C(3,#FunctionCode,1,$,s))
-@V(2,0)
+! @V(2,0)
 
 ! 最高可放款金額
 #MaxPosbleBorAmt=m,14,S
@@ -195,12 +195,12 @@ C(3,#FunctionCode,2,$,C(3,#FunctionCode,1,$,s))
 ! 股東權益
 #StockHoldersEqt=m,14,I
 C(3,#FunctionCode,2,$,C(3,#FunctionCode,1,$,s))
-@V(2,0)
+! @V(2,0)
 
 ! 可運用資金
 #AvailableFunds=m,14,I
 C(3,#FunctionCode,2,$,C(3,#FunctionCode,1,$,s))
-@V(2,0)
+! @V(2,0)
 
 </sub>
 

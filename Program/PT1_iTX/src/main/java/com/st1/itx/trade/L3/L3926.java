@@ -137,7 +137,7 @@ public class L3926 extends TradeBuffer {
 			}
 
 			// 查詢各項費用
-			baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, 0, 0, BigDecimal.ZERO, titaVo); // 00-費用全部(已到期)
+			baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, 0, 98, BigDecimal.ZERO, titaVo); // 不分指定額度 98-全費用類別(已到期)
 
 			// 計算至入帳日應繳之期數
 			int wkTermNo = loanCom.getTermNo(2, tLoanBorMain.getFreqBase(), tLoanBorMain.getPayIntFreq(),
@@ -245,9 +245,16 @@ public class L3926 extends TradeBuffer {
 
 			Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, iFacmNo, iFacmNo, wkBormNoStart,
 					wkBormNoEnd, this.index, this.limit, titaVo);
-			lLoanBorMain = slLoanBorMain == null ? null : new ArrayList<LoanBorMain>(slLoanBorMain.getContent());
-			if (lLoanBorMain == null || lLoanBorMain.size() == 0) {
-				throw new LogicException(titaVo, "E0001", "放款主檔"); // 查詢資料不存在
+			if (slLoanBorMain != null) {
+				for (LoanBorMain ln : slLoanBorMain.getContent()) {
+					// 正常戶且非預撥
+					if (ln.getStatus() == 0 && ln.getDrawdownDate() < iEntryDate) {
+						lLoanBorMain.add(ln);
+					}
+				}
+			}
+			if (lLoanBorMain.size() == 0) {
+				throw new LogicException(titaVo, "E3070", ""); // 查無可計息的放款資料
 			}
 			Collections.sort(lLoanBorMain, new Comparator<LoanBorMain>() {
 				public int compare(LoanBorMain c1, LoanBorMain c2) {

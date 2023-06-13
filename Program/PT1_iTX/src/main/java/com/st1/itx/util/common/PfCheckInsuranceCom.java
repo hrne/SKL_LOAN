@@ -1,10 +1,11 @@
 package com.st1.itx.util.common;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.DBException;
@@ -63,12 +64,13 @@ public class PfCheckInsuranceCom extends TradeBuffer {
 	@Autowired
 	CheckInsurance checkInsurance;
 
+	private CheckInsuranceVo checkVo = new CheckInsuranceVo();
 	private PfInsCheckId tPfInsCheckId = new PfInsCheckId();
 	private PfInsCheck tPfInsCheck = new PfInsCheck();
 	private String checkResult = "N";
 	private int insDate = 0;
 	private String insNo = null;
-	private ArrayList<PfInsDetailVo> lDetailVo = new ArrayList<PfInsDetailVo>();
+	private List<PfInsDetailVo> lDetailVo = new ArrayList<>();
 
 	/**
 	 * 抓取核心系統保單資料，產生房貸獎勵保費檢核結果
@@ -123,11 +125,11 @@ public class PfCheckInsuranceCom extends TradeBuffer {
 
 		// 拆解回應訊息為保單明細資料
 		if (returnMsg != null && returnMsg.length() > 0) {
-			lDetailVo = getInsDetailList(returnMsg, titaVo);
+			getInsDetailList();
 		}
 
 		// 檢核保單明細資料
-		if (lDetailVo.size() > 0) {
+		if (lDetailVo != null && !lDetailVo.isEmpty()) {
 			for (PfInsDetailVo detailVo : lDetailVo) {
 				if (detailVo.getApplication_date() >= startDate && detailVo.getApplication_date() <= endDate) {
 					insDate = detailVo.getApplication_date();
@@ -191,33 +193,32 @@ public class PfCheckInsuranceCom extends TradeBuffer {
 
 	}
 
-	/**
-	 * 拆解回應訊息為保單明細資料
-	 * 
-	 * @param returnMsg 回應訊息
-	 * @param titaVo    TitaVo
-	 * @return 保單明細資料
-	 * @throws LogicException LogicException
-	 */
-	public ArrayList<PfInsDetailVo> getInsDetailList(String returnMsg, TitaVo titaVo) throws LogicException {
-		return lDetailVo;
-	}
-
 	// Query 核心系統保單資料
 	private String queryCoreInsurance(PfInsCheck iPf, TitaVo titaVo) throws LogicException {
 		checkInsurance.setTxBuffer(this.getTxBuffer());
-		CheckInsuranceVo checkVo = new CheckInsuranceVo();
+		checkVo = new CheckInsuranceVo();
 		checkVo.setCustId(iPf.getCustId());
 		checkVo = checkInsurance.checkInsurance(titaVo, checkVo);
 		this.info("MsgRs=" + checkVo.getMsgRs());
-		String returnStr = null;
-		return returnStr;
+		return checkVo.getMsgRs();
+	}
+
+	private void getInsDetailList() {
+		if (checkVo.isSuccess() && checkVo.getDetail() != null && !checkVo.getDetail().isEmpty()) {
+			lDetailVo = new ArrayList<>();
+			for (Map<String, String> dtl : checkVo.getDetail()) {
+				PfInsDetailVo pfInsDetailVo = new PfInsDetailVo();
+				pfInsDetailVo.setApplication_date(Integer.parseInt(dtl.get("application_date")));
+				pfInsDetailVo.setPolicy_no(dtl.get("policy_no"));
+				pfInsDetailVo.setPo_status_code(dtl.get("po_status_code"));
+				lDetailVo.add(pfInsDetailVo);
+			}
+		}
 	}
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<>();
 	}
 
 }

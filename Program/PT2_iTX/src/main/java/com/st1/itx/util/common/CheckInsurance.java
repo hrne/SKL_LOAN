@@ -80,7 +80,7 @@ public class CheckInsurance extends TradeBuffer {
 		apiFlag = tSystemParas.getAmlFg();
 		apiUrl = tSystemParas.getAmlUrl();
 		this.info("CheckInsurance.checkInsurance:apiFlag=" + apiFlag + ",apiUrl=" + apiUrl);
-		CheckVo(checkVo);
+		checkVo(checkVo);
 
 		String msgrq = makeXml(checkVo);
 
@@ -129,6 +129,8 @@ public class CheckInsurance extends TradeBuffer {
 
 		String statusCode = getXmlValue(doc, "StatusCode");
 
+		this.info("parseXml statusCode = " + statusCode);
+
 		if ("0".equals(statusCode)) {
 			iVo.setSuccess(true);
 //			public List<HashMap<String, String>> getNodeList(Document doc, String tagName) {
@@ -146,16 +148,16 @@ public class CheckInsurance extends TradeBuffer {
 					map.put("loan_bal", String.valueOf(highestLoan + loanAmt));
 				}
 				// 轉換日期
-				SimpleDateFormat dformatter1 = new SimpleDateFormat("yyyy-MM-dd");
-				SimpleDateFormat dformatter2 = new SimpleDateFormat("yyyyMMdd");
+				SimpleDateFormat sourceDf = new SimpleDateFormat("yyyy-MM-ddXXX"); // 來源帶時間
+				SimpleDateFormat targetDf = new SimpleDateFormat("yyyy-MM-dd"); // 產出不要帶時間
 				String issueDate = map.get("issue_date");
 				String applicationDate = map.get("application_date");
 
 				try {
 					if (!"".equals(issueDate) || issueDate != null) {
-						Date d = dformatter1.parse(issueDate);
-						issueDate = dformatter2.format(d);
-						int d7 = Integer.valueOf(issueDate) - 19110000;
+						Date d = sourceDf.parse(issueDate);
+						issueDate = targetDf.format(d);
+						int d7 = Integer.valueOf(issueDate) - 19110000; // 轉為民國年
 						issueDate = String.valueOf(d7);
 					} else {
 						issueDate = "0";
@@ -163,9 +165,9 @@ public class CheckInsurance extends TradeBuffer {
 					map.put("issue_date", issueDate);
 
 					if (!"".equals(applicationDate) || applicationDate != null) {
-						Date d = dformatter1.parse(applicationDate);
-						applicationDate = dformatter2.format(d);
-						int d7 = Integer.valueOf(applicationDate) - 19110000;
+						Date d = sourceDf.parse(applicationDate);
+						applicationDate = targetDf.format(d);
+						int d7 = Integer.valueOf(applicationDate) - 19110000; // 轉為民國年
 						applicationDate = String.valueOf(d7);
 					} else {
 						applicationDate = "0";
@@ -184,7 +186,7 @@ public class CheckInsurance extends TradeBuffer {
 		return iVo;
 	}
 
-	private void CheckVo(CheckInsuranceVo checkVo) throws LogicException {
+	private void checkVo(CheckInsuranceVo checkVo) throws LogicException {
 		if (checkVo.getCustId().isEmpty()) {
 			throw new LogicException("EC004", "CheckInsurance.CheckInsuranceVo : 參數 CustId 不可為空白");
 		}
@@ -342,23 +344,21 @@ public class CheckInsurance extends TradeBuffer {
 			factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
 			factory.setXIncludeAware(false);
 			factory.setExpandEntityReferences(false);
-			DocumentBuilder builder = null;
-			try {
-				builder = factory.newDocumentBuilder();
-				Document doc = builder.parse(new InputSource(new StringReader(xmlstring)));
-				return doc;
-			} catch (Exception e) {
-				return null;
-			}
 		} catch (ParserConfigurationException e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.warn("Set DocumentBuilderFactory Env Error");
 			this.warn(errors.toString());
-			return null;
 		}
 
-		
+		DocumentBuilder builder = null;
+		try {
+			builder = factory.newDocumentBuilder();
+			Document doc = builder.parse(new InputSource(new StringReader(xmlstring)));
+			return doc;
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	public String getXmlValue(Document doc, String tagName) {

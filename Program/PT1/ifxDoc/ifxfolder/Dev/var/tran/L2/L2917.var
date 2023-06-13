@@ -249,10 +249,10 @@ T(2,#OOClCode1+-+#OOClCode2+-+#OOClNo)
 
 #FunCd=A,1,S
 E(0,4)
-
-
+#TXCD=_,_,S
+T(2,L2917)
 #secret-no=x,1000,S
-T(6A,#FunCd+#OOClCode1+#OOClCode2+#OOClNo+#OOClLandSeq)
+T(6A,#TXCD+#FunCd+#OOClCode1+#OOClCode2+#OOClNo+#OOClLandSeq)
 
 
 #batch-detail=x,100000,S

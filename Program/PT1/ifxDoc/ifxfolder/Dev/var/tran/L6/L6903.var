@@ -191,6 +191,7 @@ S(L6R23,1,#RimFuncCode,#RimTxCode,#RimAcNoCode,#RimAcSubCode,#RimAcDtlCode)
 R(1,L6R23)
 
 #AcNoItem=X,80,L
+C(4,#AcNoCode,C(4,#AcSubCode,C(4,#AcDtlCode,S,$),,$),,$)
 T(2,#L6R23AcNoItem)
 
 !戶號

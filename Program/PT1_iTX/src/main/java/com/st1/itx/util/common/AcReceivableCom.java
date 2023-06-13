@@ -286,7 +286,11 @@ public class AcReceivableCom extends TradeBuffer {
 					// [契變手續費紀錄][帳管費]變更前變更後
 					if ("F29".equals(rv.getAcctCode()) || "F10".equals(rv.getAcctCode())) {
 						dataLog.setEnv(titaVo, beforeAcReceivable, tAcReceivable);
-						dataLog.exec();
+						if("F10".equals(rv.getAcctCode())) {
+							dataLog.exec("修改會計銷帳檔-帳管費");
+						}else {
+							dataLog.exec("修改會計銷帳檔-契變手續費");
+						}
 					}
 
 				}

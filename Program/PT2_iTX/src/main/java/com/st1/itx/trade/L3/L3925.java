@@ -79,7 +79,9 @@ public class L3925 extends TradeBuffer {
 	private int iEntryDate = 0;
 	private int iBreachFlag = 0;
 	private BigDecimal iRepayAmt = BigDecimal.ZERO;
-	private BigDecimal wkTotalAmt = BigDecimal.ZERO;
+	private BigDecimal wkRePayAmt = BigDecimal.ZERO;
+	private BigDecimal wkExtraRepayRemaind = BigDecimal.ZERO;
+	private BigDecimal wkTotalPaid = BigDecimal.ZERO;
 	private BigDecimal wkLoanBal = BigDecimal.ZERO;
 	private BigDecimal oLoanBal = BigDecimal.ZERO;
 	private BigDecimal oRate = BigDecimal.ZERO;
@@ -92,7 +94,7 @@ public class L3925 extends TradeBuffer {
 	private BigDecimal oExtraRepay = BigDecimal.ZERO;
 	private BigDecimal oNewDueAmt = BigDecimal.ZERO;
 	private BigDecimal oReduceAmt = BigDecimal.ZERO;
-	
+
 	private int oIntStartDate = 9991231;
 	private int oIntEndDate = 0;
 	private int oLeftTerms = 0;
@@ -141,7 +143,8 @@ public class L3925 extends TradeBuffer {
 				wkBormNoStart, wkBormNoEnd, this.index, this.limit, titaVo);
 		if (slLoanBorMain != null) {
 			for (LoanBorMain ln : slLoanBorMain.getContent()) {
-				if (ln.getStatus() == 0) {
+				// 正常戶且非預撥
+				if (ln.getStatus() == 0 && ln.getDrawdownDate() < iEntryDate) {
 					lLoanBorMain.add(ln);
 					oLoanBal = oLoanBal.add(ln.getLoanBal());
 					if (ln.getStoreRate().compareTo(oRate) > 0) {
@@ -154,9 +157,6 @@ public class L3925 extends TradeBuffer {
 			throw new LogicException(titaVo, "E3070", ""); // 查無可計息的放款資料
 		}
 
-		if (lLoanBorMain == null || lLoanBorMain.size() == 0) {
-			throw new LogicException(titaVo, "E0001", "放款主檔"); // 查詢資料不存在
-		}
 		// 排序,依應繳日順序由小到大
 		Collections.sort(lLoanBorMain, new Comparator<LoanBorMain>() {
 			public int compare(LoanBorMain c1, LoanBorMain c2) {
@@ -165,28 +165,35 @@ public class L3925 extends TradeBuffer {
 		});
 
 		// 查詢各項費用
-		baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, 0, 0, BigDecimal.ZERO, titaVo); // 00-費用全部(已到期)
-
+		baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, 0, 98, BigDecimal.ZERO, titaVo); // 不分指定額度 98-全費用類別(已到期)
+		wkRePayAmt = iRepayAmt.add(baTxCom.getExcessive()).subtract(baTxCom.getShortfall());
 		// 應繳期款試算
 		RepayTermRoutine(titaVo);
 
-		// 還款餘額
-		if (iRepayAmt.compareTo(wkTotalAmt) < 0) {
-			throw new LogicException(titaVo, "E3065", " 總金額 = " + wkTotalAmt); // 還款分配金額不足
-		}
-		this.info("iRepayAmt=" + iRepayAmt + ", wkTermAmt=" + wkTotalAmt + ", ExtraRepay="
-				+ iRepayAmt.subtract(wkTotalAmt));
-
-		// 部分還款試算
-		extraRepayRoutine(titaVo);
-
-		if (wkTotaCount == 0) {
-			throw new LogicException(titaVo, "E3070", ""); // 查無可計息的放款資料
-		}
 		if (iBreachFlag == 1) {
 			oReduceAmt = oBreachAmt.add(oDelayInt);
 			oBreachAmt = BigDecimal.ZERO;
 			oDelayInt = BigDecimal.ZERO;
+		}
+		wkTotalPaid = oPrincipal.add(oInterest).add(oDelayInt).add(oBreachAmt);
+		// 還款餘額
+		if (wkRePayAmt.compareTo(wkTotalPaid) < 0) {
+			throw new LogicException(titaVo, "E3065",
+					" 應繳期款金額 = " + wkTotalPaid + ", 累溢短收 = " + (baTxCom.getExcessive().add(baTxCom.getShortfall()))
+							+ ", 還款分配金額需 >= "
+							+ (wkTotalPaid.subtract(baTxCom.getExcessive()).add(baTxCom.getShortfall()))); // 還款分配金額不足
+		}
+		this.info("iRepayAmt=" + iRepayAmt + ", wkTermAmt=" + wkTotalPaid + ", ExtraRepay="
+				+ iRepayAmt.subtract(wkTotalPaid));
+
+		// 部分還款試算
+		wkExtraRepayRemaind = wkRePayAmt.subtract(wkTotalPaid);
+		extraRepayRoutine(titaVo);
+
+		wkTotalPaid = oPrincipal.add(oInterest).add(oDelayInt).add(oBreachAmt);
+		BigDecimal wkOverflow = wkRePayAmt.subtract(wkTotalPaid);
+		if (wkTotaCount == 0) {
+			throw new LogicException(titaVo, "E3070", ""); // 查無可計息的放款資料
 		}
 		this.totaVo.putParam("OPrincipal", oPrincipal);
 		this.totaVo.putParam("OIntStartDate", oIntStartDate == 9991231 ? 0 : oIntStartDate);
@@ -207,6 +214,7 @@ public class L3925 extends TradeBuffer {
 		this.totaVo.putParam("ONewDueAmt", oNewDueAmt);
 		this.totaVo.putParam("OLeftTerms", oLeftTerms);
 		this.totaVo.putParam("OReduceAmt", oReduceAmt);
+		this.totaVo.putParam("OOverflow", wkOverflow);
 
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -261,7 +269,8 @@ public class L3925 extends TradeBuffer {
 			if (ln.getLoanBal().compareTo(BigDecimal.ZERO) == 0) {
 				continue;
 			}
-			BigDecimal wkExtraRepay = iRepayAmt.subtract(oPrincipal).subtract(oInterest).subtract(oDelayInt)
+
+			BigDecimal wkExtraRepay = wkRePayAmt.subtract(oPrincipal).subtract(oInterest).subtract(oDelayInt)
 					.subtract(oBreachAmt);
 			if (wkExtraRepay.compareTo(BigDecimal.ZERO) <= 0) {
 				int wkLeftTerms = ln.getTotalPeriod() - ln.getPaidTerms();
@@ -308,7 +317,7 @@ public class L3925 extends TradeBuffer {
 			// oCloseBreachAmt =
 			// oCloseBreachAmt.add(loanCalcRepayIntCom.getCloseBreachAmtPaid());
 			oExtraRepay = oExtraRepay.add(loanCalcRepayIntCom.getExtraAmt());
-			wkTotalAmt = oPrincipal.add(oInterest).add(oDelayInt).add(oBreachAmt).add(oCloseBreachAmt);
+
 			wkLoanBal = ln.getLoanBal().subtract(loanCalcRepayIntCom.getPrincipal());
 			if (wkLoanBal.compareTo(BigDecimal.ZERO) > 0) {
 				int wkGracePeriod = loanCom.getGracePeriod(ln.getAmortizedCode(), ln.getFreqBase(), ln.getPayIntFreq(),
@@ -326,7 +335,7 @@ public class L3925 extends TradeBuffer {
 			this.info(" oInterest = " + oInterest + "*" + loanCalcRepayIntCom.getInterest());
 			this.info(" oDelayInt = " + oDelayInt + "*" + loanCalcRepayIntCom.getDelayInt());
 			this.info(" oBreachAmt = " + oBreachAmt + "*" + loanCalcRepayIntCom.getBreachAmt());
-			this.info(" wkTotalAmt = " + wkTotalAmt);
+
 			for (CalcRepayIntVo c : lCalcRepayIntVo) {
 				OccursList occursList = new OccursList();
 				wkLoanBal = wkLoanBal.subtract(c.getPrincipal());
@@ -401,7 +410,7 @@ public class L3925 extends TradeBuffer {
 				oInterest = oInterest.add(loanCalcRepayIntCom.getInterest());
 				oDelayInt = oDelayInt.add(loanCalcRepayIntCom.getDelayInt());
 				oBreachAmt = oBreachAmt.add(loanCalcRepayIntCom.getBreachAmt());
-				wkTotalAmt = oPrincipal.add(oInterest).add(oDelayInt).add(oBreachAmt);
+
 				ln.setStoreRate(loanCalcRepayIntCom.getStoreRate());
 				ln.setLoanBal(ln.getLoanBal().subtract(loanCalcRepayIntCom.getPrincipal()));
 				ln.setRepaidPeriod(ln.getRepaidPeriod() + loanCalcRepayIntCom.getRepaidPeriod());

@@ -17,6 +17,7 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.AcReceivableId;
 import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -131,9 +132,7 @@ public class L2606 extends TradeBuffer {
 			tAcReceivable.setSlipNote(titaVo.getParam("SlipNote")); // 備註
 
 			acReceivableList.add(tAcReceivable);
-
 			acReceivableCom.mnt(3, acReceivableList, titaVo); // 0-起帳 1-銷帳 2起帳刪除 3變更
-
 			// 刪除
 		} else if (iFunCd == 4) {
 
@@ -145,12 +144,14 @@ public class L2606 extends TradeBuffer {
 			// 鎖定這筆
 			tAcReceivable = acReceivableService.holdById(new AcReceivableId("F10", iCustNo, iFacmNo, iRvNo));
 
-			dataLog.clone(tAcReceivable);
+			AcReceivable beforeAcReceivable = (AcReceivable) dataLog.clone(tAcReceivable);
 
 			acReceivableList.add(tAcReceivable);
 
 			acReceivableCom.mnt(2, acReceivableList, titaVo); // 0-起帳 1-銷帳 2-起帳刪除
 
+			dataLog.setEnv(titaVo, tAcReceivable, tAcReceivable);
+			dataLog.exec("刪除會計銷帳檔-帳管費");
 			// 列印
 		} else {
 		}
