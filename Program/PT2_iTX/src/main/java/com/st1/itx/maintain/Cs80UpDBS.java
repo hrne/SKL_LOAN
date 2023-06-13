@@ -250,8 +250,9 @@ public class Cs80UpDBS extends CommBuffer {
 		this.titaVo.checkFlow();
 
 		TxFlowId tTxFlowId = new TxFlowId();
-		tTxFlowId.setEntdy(this.titaVo.getEntDyI());
+//		tTxFlowId.setEntdy(this.titaVo.getEntDyI());
 //		tTxFlowId.setEntdy(this.txBuffer.getTxCom().getFlowEntday());
+		tTxFlowId.setEntdy(this.txBuffer.getTxCom().getReldy());
 		tTxFlowId.setFlowNo(this.txBuffer.getTxCom().getFlowNo());
 
 		TxFlow tTxFlow = txFlowService.holdById(tTxFlowId);

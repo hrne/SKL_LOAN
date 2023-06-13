@@ -103,10 +103,16 @@ public class L9724Report extends MakeReport {
 
 				// for later date difference calculation uses.
 				// make LocalDates
-
 				dUtil.init();
-				dUtil.setDate_1(tLDVo.get("F4"));
-				dUtil.setDate_2(targetDate);
+				if (parse.stringToInteger(tLDVo.get("F4")) > parse.stringToInteger(targetDate)) {
+
+					dUtil.setDate_1(targetDate);
+					dUtil.setDate_2(tLDVo.get("F4"));
+				} else {
+
+					dUtil.setDate_1(tLDVo.get("F4"));
+					dUtil.setDate_2(targetDate);
+				}
 				dUtil.dateDiff();
 
 				// withDayOfMonth(1) since for cases like 3/31 and 4/1, it should show as 1

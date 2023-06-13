@@ -184,6 +184,7 @@ public class L2631 extends TradeBuffer {
 		tFacClose.setTelNo3(titaVo.getParam("TelNo3"));
 		tFacClose.setCloseReasonCode(titaVo.getParam("CloseReasonCode"));
 		tFacClose.setCollectWayCode(titaVo.getParam("CollectWayCode"));
+		tFacClose.setPostAddress(titaVo.getParam("PostAddress"));
 		tFacClose.setEntryDate(iTranDate);
 		tFacClose.setRmk(titaVo.getParam("Rmk1"));
 		// **[清償違約金即時收取]部分償還時一律記短收，連同下期期款收回，提前結案時計算清償違約金併入結案金額。
