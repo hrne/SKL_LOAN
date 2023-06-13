@@ -13,7 +13,6 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.PfCoOfficer;
 import com.st1.itx.db.domain.PfCoOfficerId;
 import com.st1.itx.db.domain.PfCoOfficerLog;
-import com.st1.itx.db.domain.PfCoOfficerLogId;
 import com.st1.itx.db.service.PfCoOfficerLogService;
 import com.st1.itx.db.service.PfCoOfficerService;
 import com.st1.itx.tradeService.TradeBuffer;

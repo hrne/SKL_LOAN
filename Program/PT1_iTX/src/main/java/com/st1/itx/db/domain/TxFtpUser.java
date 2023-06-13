@@ -2,7 +2,6 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -11,8 +10,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.Id;
 import javax.persistence.Column;
-import com.st1.itx.util.StaticTool;
-import com.st1.itx.Exception.LogicException;
 
 /**
  * TxFtpUser FTP權限檔<br>
@@ -27,7 +24,12 @@ import com.st1.itx.Exception.LogicException;
 public class TxFtpUser implements Serializable {
 
 
-  // 使用者ID
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 9021757516956866754L;
+
+// 使用者ID
   @Id
   @Column(name = "`UserId`", length = 64)
   private String userId = " ";

@@ -175,8 +175,9 @@ public class CheckInsurance extends TradeBuffer {
 					map.put("application_date", applicationDate);
 
 				} catch (ParseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					StringWriter errors = new StringWriter();
+					e.printStackTrace(new PrintWriter(errors));
+					this.error("parseXml error = " + errors.toString());
 				}
 			}
 			iVo.setDetail(lDetail);
@@ -201,8 +202,9 @@ public class CheckInsurance extends TradeBuffer {
 			db = factory.newDocumentBuilder();
 
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("makeXml error = " + errors.toString());
 		}
 		Document doc = db.newDocument();
 		doc.setXmlStandalone(true);
@@ -257,11 +259,15 @@ public class CheckInsurance extends TradeBuffer {
 			try {
 				transformer.transform(new DOMSource(doc), new StreamResult(sw));
 			} catch (TransformerException e) {
-				e.printStackTrace();
+				StringWriter errors = new StringWriter();
+				e.printStackTrace(new PrintWriter(errors));
+				this.error("makeXml error = " + errors.toString());
 			}
 			rs = sw.toString();
 		} catch (TransformerConfigurationException e) {
-			e.printStackTrace();
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("makeXml error = " + errors.toString());
 		}
 
 		this.info("XML = " + rs);
@@ -326,9 +332,15 @@ public class CheckInsurance extends TradeBuffer {
 			}
 		} catch (MalformedURLException e) {
 			this.connectSuccess = false;
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("connectAml error = " + errors.toString());
 			return "Exception = " + e.getMessage();
 		} catch (IOException e) {
 			this.connectSuccess = false;
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("connectAml error = " + errors.toString());
 			return "Exception = " + e.getMessage();
 		}
 	}
@@ -347,6 +359,7 @@ public class CheckInsurance extends TradeBuffer {
 		} catch (ParserConfigurationException e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
+			this.error("convertStringToXml error = " + errors.toString());
 			this.warn("Set DocumentBuilderFactory Env Error");
 			this.warn(errors.toString());
 		}
@@ -357,6 +370,9 @@ public class CheckInsurance extends TradeBuffer {
 			Document doc = builder.parse(new InputSource(new StringReader(xmlstring)));
 			return doc;
 		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("convertStringToXml error = " + errors.toString());
 			return null;
 		}
 	}

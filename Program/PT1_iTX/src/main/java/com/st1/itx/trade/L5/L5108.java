@@ -13,7 +13,6 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.InnDocRecord;
 import com.st1.itx.db.domain.InnDocRecordId;
-import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.InnDocRecordService;
 import com.st1.itx.db.service.TxTellerService;

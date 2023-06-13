@@ -29,7 +29,7 @@ public class SystemParas implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 4614415226803109040L;
+	private static final long serialVersionUID = 1765196238924056461L;
 
 // 業務類型
   /* LN */
@@ -361,6 +361,11 @@ public class SystemParas implements Serializable {
   /* 預設1500萬 */
   @Column(name = "`CoreRemitLimit`")
   private BigDecimal coreRemitLimit = new BigDecimal("0");
+
+  // 是否正在搬運資料
+  /* Y:是N:否 */
+  @Column(name = "`L6972Flag`", length = 1)
+  private String l6972Flag;
 
   // 建檔日期時間
   @CreatedDate
@@ -1784,6 +1789,27 @@ N:不啟用
   }
 
 /**
+	* 是否正在搬運資料<br>
+	* Y:是
+N:否
+	* @return String
+	*/
+  public String getL6972Flag() {
+    return this.l6972Flag == null ? "" : this.l6972Flag;
+  }
+
+/**
+	* 是否正在搬運資料<br>
+	* Y:是
+N:否
+  *
+  * @param l6972Flag 是否正在搬運資料
+	*/
+  public void setL6972Flag(String l6972Flag) {
+    this.l6972Flag = l6972Flag;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -1873,7 +1899,7 @@ N:不啟用
            + ", loanMediaFtpUrl=" + loanMediaFtpUrl + ", loanMediaFtpAuth=" + loanMediaFtpAuth + ", smsFtpUrl=" + smsFtpUrl + ", smsFtpAuth=" + smsFtpAuth + ", smsFtpFlag=" + smsFtpFlag + ", jcicEmpName=" + jcicEmpName
            + ", jcicEmpTel=" + jcicEmpTel + ", autoBatchFg=" + autoBatchFg + ", batchFireFeeFg=" + batchFireFeeFg + ", icsFg=" + icsFg + ", icsUrl=" + icsUrl + ", icsBatchMaxCount=" + icsBatchMaxCount
            + ", insuSettleDate=" + insuSettleDate + ", jcicZDep=" + jcicZDep + ", jcicZName=" + jcicZName + ", jcicZTel=" + jcicZTel + ", jcicMU1Dep=" + jcicMU1Dep + ", jcicMU1Name=" + jcicMU1Name
-           + ", jcicMU1Tel=" + jcicMU1Tel + ", coreRemitLimit=" + coreRemitLimit + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
-           + "]";
+           + ", jcicMU1Tel=" + jcicMU1Tel + ", coreRemitLimit=" + coreRemitLimit + ", l6972Flag=" + l6972Flag + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

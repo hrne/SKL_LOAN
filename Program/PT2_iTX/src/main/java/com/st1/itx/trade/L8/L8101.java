@@ -31,7 +31,6 @@ import com.st1.itx.trade.L9.L9705Report;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.TxToDoCom;
-import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L8101")

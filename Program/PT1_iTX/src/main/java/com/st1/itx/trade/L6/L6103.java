@@ -19,8 +19,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 
-import oracle.jdbc.datasource.OracleDataSource;
-
 import com.st1.itx.db.domain.TxBizDate;
 import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.TxBizDateService;

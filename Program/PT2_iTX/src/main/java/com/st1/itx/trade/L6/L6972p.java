@@ -5,9 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
+import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.SystemParas;
+import com.st1.itx.db.service.SystemParasService;
 import com.st1.itx.db.service.TxArchiveTableService;
 import com.st1.itx.db.service.springjpa.cm.L9729ServiceImpl.WorkType;
 import com.st1.itx.eum.ContentName;
@@ -34,6 +37,9 @@ public class L6972p extends TradeBuffer {
 	TxArchiveTableService txArchiveTableService;
 
 	@Autowired
+	SystemParasService systemParasService;
+
+	@Autowired
 	WebClient webClient;
 
 	@Autowired
@@ -49,6 +55,11 @@ public class L6972p extends TradeBuffer {
 		if (!ContentName.onLine.equals(titaVo.getDataBase())) {
 			throw new LogicException("E0008", "L6972 只允許在連線環境執行!!");
 		}
+
+		// 2023-06-13 Wei增加檢核
+		// SKL IT 琦欣測試本交易時會重複發動，看不到每一次搬運資料的結果
+		// 用資料庫管控，L6972若已經在運作中，則顯示"已在搬運中"的訊息
+		holdFlag(titaVo);
 
 		workType = WorkType.getWorkTypeByHelp(titaVo.getParam("InputType"));
 		int inputRoute = parse.stringToInteger(titaVo.getParam("InputRoute"));
@@ -75,6 +86,11 @@ public class L6972p extends TradeBuffer {
 
 		this.info("L6972 exit.");
 
+		// 2023-06-13 Wei增加檢核
+		// SKL IT 琦欣測試本交易時會重複發動，看不到每一次搬運資料的結果
+		// 用資料庫管控，L6972若已經在運作中，則顯示"已在搬運中"的訊息
+		releaseFlag(titaVo);
+
 		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", titaVo.getTlrNo(),
 				"L6972搬運資料已完成", titaVo);
 
@@ -85,5 +101,42 @@ public class L6972p extends TradeBuffer {
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+
+	private void holdFlag(TitaVo titaVo) throws LogicException {
+		SystemParas systemParas = systemParasService.findById("LN", titaVo);
+		String flag = systemParas.getL6972Flag();
+		if (flag.equals("Y")) {
+			throwException(titaVo);
+		} else {
+			systemParas = systemParasService.holdById("LN", titaVo);
+			flag = systemParas.getL6972Flag();
+			if (flag.equals("Y")) {
+				throwException(titaVo);
+			} else {
+				systemParas.setL6972Flag("Y");
+				try {
+					systemParasService.update(systemParas, titaVo);
+				} catch (DBException e) {
+					throwException(titaVo);
+				}
+			}
+		}
+	}
+
+	private void throwException(TitaVo titaVo) throws LogicException {
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", titaVo.getTlrNo(),
+				"L6972已在搬運中", titaVo);
+		throw new LogicException("E0008", "L6972已在搬運中");
+	}
+
+	private void releaseFlag(TitaVo titaVo) throws LogicException {
+		SystemParas systemParas = systemParasService.holdById("LN", titaVo);
+		systemParas.setL6972Flag("N");
+		try {
+			systemParasService.update(systemParas, titaVo);
+		} catch (DBException e) {
+			throw new LogicException("E0008", "SystemParas");
+		}
 	}
 }

@@ -2,12 +2,8 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import com.st1.itx.util.StaticTool;
-import com.st1.itx.Exception.LogicException;
 
 /**
  * ClNoMap 擔保品編號新舊對照檔<br>
@@ -20,7 +16,12 @@ import com.st1.itx.Exception.LogicException;
 public class ClNoMapId implements Serializable {
 
 
-  // 原擔保品代號1
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 8523471102772901791L;
+
+// 原擔保品代號1
   /* 原擔保品 */
   @Column(name = "`GdrId1`")
   private int gdrId1 = 0;

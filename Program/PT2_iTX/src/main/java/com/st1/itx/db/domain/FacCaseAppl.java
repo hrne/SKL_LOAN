@@ -2,7 +2,6 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -27,7 +26,12 @@ import com.st1.itx.Exception.LogicException;
 public class FacCaseAppl implements Serializable {
 
 
-  // 申請號碼
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -5107965191581928205L;
+
+// 申請號碼
   @Id
   @Column(name = "`ApplNo`")
   private int applNo = 0;
