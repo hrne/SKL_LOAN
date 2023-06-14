@@ -41,11 +41,11 @@ public class L1908ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,NVL(B.\"MsgNotice\",'Y')   AS \"MsgNotice\" ";
 		sql += " ,NVL(B.\"EmailNotice\",'Y') AS \"EmailNotice\" ";
 		sql += " ,CASE ";
-		sql += "    WHEN NVL(B.\"ApplyDate\"-19110000,0) != 0 ";
+		sql += "    WHEN NVL(B.\"ApplyDate\"-19110000,0) > 19110000 ";
 		sql += "    THEN NVL(B.\"ApplyDate\"-19110000,0) ";
-		sql += "    WHEN TO_NUMBER(TO_CHAR(B.\"CreateDate\",'YYYYMMDD')) != 0 ";
+		sql += "    WHEN TO_NUMBER(TO_CHAR(B.\"CreateDate\",'YYYYMMDD')) > 19110000 ";
 		sql += "    THEN TO_NUMBER(TO_CHAR(B.\"CreateDate\",'YYYYMMDD'))-19110000 ";
-		sql += "    WHEN TO_NUMBER(TO_CHAR(A.\"CreateDate\",'YYYYMMDD')) != 0 ";
+		sql += "    WHEN TO_NUMBER(TO_CHAR(A.\"CreateDate\",'YYYYMMDD')) > 19110000 ";
 		sql += "    THEN TO_NUMBER(TO_CHAR(A.\"CreateDate\",'YYYYMMDD'))-19110000 ";
 		sql += "  ELSE 0 END AS \"ApplyDate\" ";
 		sql += " ,NVL(B.\"LastUpdate\",A.\"LastUpdate\") AS \"LastUpdate\" ";

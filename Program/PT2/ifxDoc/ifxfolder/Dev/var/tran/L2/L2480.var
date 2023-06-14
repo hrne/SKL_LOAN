@@ -40,7 +40,7 @@ E(0,0)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=3;screen.width=[150,300,150,300];printer.width=[20,20,20,20];order=1;">
 [
-["[L2480]                                 擔保品重評資料登錄"],
+["[L2480]                                 擔保品鑑價資料登錄"],
 [#<->#,"#FdFuncd+功能",#FunCdX],
 ["#FdClCode+擔保品別",#ClCode1,"-",#ClCode2,#ClCodeX],["#FdClNo+擔保品號碼",#ClNo],
 [#<->#,"#FdEvaNo+鑑估序號",#EvaNo],
@@ -48,7 +48,7 @@ E(0,0)
 ["#FdEvaNetWorth+評估淨值",#EvaNetWorth],["#FdRentEvaValue+出租評估淨值",#RentEvaValue],
 ["#FdEvaCompanyId+估價公司代碼",#EvaCompanyId,#BTN1],["#FdEvaCompanyName+估價公司名稱",#EvaCompanyName],
 [#<->#,"#FdEvaEmpno+估價人員",#EvaEmpno,#BTN2,#EvaEmpnoX],
-[#<->#,"#FdEvaReason+重評原因",#EvaReason,#Reason,#EvaReasonX],
+[#<->#,"#FdEvaReason+鑑價歷程",#EvaReason,#Reason,#EvaReasonX],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -279,7 +279,6 @@ C(3,#FunCd,1,s,$)
 #RimClCode2=A,2,S
 #RimClNo=A,7,S
 #RimEvaNo=A,2,S
-
 
 !RIM查擔保品重評資料檔
 #RimL2r29EvaNo=X,1,S

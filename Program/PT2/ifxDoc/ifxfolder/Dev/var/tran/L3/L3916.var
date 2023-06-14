@@ -594,6 +594,12 @@ CALL2(#ADJUSTDOT,#Precision,#DrawdownAmt,#DrawdownAmtX)
 
 #LoanBalX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#LoanBal,#LoanBalX)
+#FinalBal=m,14.2,S
+#FinalBalX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#FinalBal,#FinalBalX)
+#FinalBalXX=X,50,L
+C(3,#FinalBal,0,S,$)
+T(2,最後本金餘額：+#FinalBalX)
 
 ![匯款銀行]
 #RemitBank=X,40,L
@@ -897,7 +903,7 @@ T(H,#RelationGender,#SexHelp)
 
 TXFORM=L3916
 #OCustNo#OFacmNo#OBormNo#ProdNo#ProdName#OApplNo#PROHIBITPERIOD#AcctCode#Status
-#CurrencyCode#DrawdownAmt#LoanBal#RemitBank#RemitBranch#RemitAcctNo#PaymentBank#CompensateAcct
+#CurrencyCode#DrawdownAmt#LoanBal#FinalBal#RemitBank#RemitBranch#RemitAcctNo#PaymentBank#CompensateAcct
 #DrawdownDate#DrawdownCode#MaturityDate#FirstDueDate#RepayCode#AcctFee#TotalPeriod#RepaidPeriod
 #IntCalcCode#AmortizedCode#DueAmt#FreqBase#RepayFreq#PayIntFreq#GraceDate#RenewFlag#PieceCode#StoreRate
 #RateCode#RateIncr#FirstAdjRateDate#IndividualIncr#RateAdjFreq#RepayBank#RepayBankItem
@@ -921,7 +927,7 @@ TXFORM=L3916
 [#<->#,"<font color=red>@金額資料區","@"],
 ["#FdOApplNo+核准號碼",#OApplNo],["#FdCurrencyCode+幣別",#CurrencyCode],
 ["#FdAcctCodeX+業務科目",#AcctCodeX],["#FdDrawdownAmtX+撥款金額",#DrawdownAmtX],
-["#FdAcctFeeX+帳管費",#AcctFeeX],["#FdLoanBalX+放款餘額",#LoanBalX],
+["#FdAcctFeeX+帳管費",#AcctFeeX],["#FdLoanBalX+放款餘額",#LoanBalX,#FinalBalXX],
 ["#FdDueAmtX+每期攤還金額",#DueAmtX],["#FdShortfallX+累短收",#ShortfallX,#ShortfallXX],
 [#<->#,"@","@"],
 [#<->#,"<font color=red>@日期資料區","@"],

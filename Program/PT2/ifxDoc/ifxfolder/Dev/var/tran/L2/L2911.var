@@ -57,7 +57,7 @@ E(0,40)ASGN(INQPRT$)
 ["#FdEvaNetWorth+評估淨值",#EvaNetWorth],["#FdLVITax+土地增值稅",#LVITax],
 ["#FdRentEvaValue+出租評估淨值",#RentEvaValue],["#FdRentPrice+押租金",#RentPrice],
 ["#FdEvaCompany+鑑價公司",#EvaCompany],["#FdEvaCompanyX+鑑價公司名稱",#EvaCompanyX],
-["#FdBtn+重評歷程",#BTN1],
+["#FdBtn+鑑價歷程",#BTN1],
 [#<->#,"@@@@@<font color=red>@抵押"],
 [#<->#,"#FdOwnershipCode+權利種類",#OwnershipCode,#OwnershipCodeX],
 ["#FdMtgCode+抵押權註記",#MtgCode,#MtgCodeX],["#FdKind+最高限額抵押權之擔保債權種類",#MtgAllfg,"全選",#MtgCheckfg,"票據",#MtgLoanfg,"借款",#MtgPledgefg,"保證債務"],
@@ -128,7 +128,7 @@ E(0,40)ASGN(INQPRT$)
 #FdClaimDate=X,2,L
 #FdSettingSeq=X,2,L
 
-#BTN1=X,15,I,ui:button;value:擔保品重評查詢;enable:1;tabbable:0
+#BTN1=X,15,I,ui:button;value:擔保品鑑價歷程查詢;enable:1;tabbable:0
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
 !---------- AP TEXT AREA Variables ----------

@@ -94,7 +94,7 @@ public class L4721Report2 extends TradeBuffer {
 
 		List<String> file = getData(sAdjDate, eAdjDate, sEntryDate, eEntryDate, data, titaVo);
 
-		String fileName = "L4721-" + kindItem;
+		String fileName = "L4721-" + kindItem + "(總筆數：" + data.size() + ")";
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getBrno())
 				.setRptCode(titaVo.getTxCode()).setRptItem(fileName).build();
@@ -136,13 +136,11 @@ public class L4721Report2 extends TradeBuffer {
 		int facmNo = 0;
 
 		int cntTrans = 0;
-		
+
 		for (Map<String, String> r : data) {
 
 			cntTrans++;
 
-		
-			
 			int iCustNo = parse.stringToInteger(r.get("CustNo"));
 			int iFacmNo = parse.stringToInteger(r.get("FacmNo"));
 
@@ -233,12 +231,12 @@ public class L4721Report2 extends TradeBuffer {
 
 				} // for
 			} // for
-			
+
 			if (cntTrans > 200) {
 				cntTrans = 0;
 				this.batchTransaction.commit();
 			}
-			
+
 		} // for
 		return result;
 	}

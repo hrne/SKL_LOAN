@@ -199,6 +199,7 @@ public class L3916 extends TradeBuffer {
 		this.totaVo.putParam("CurrencyCode", tLoanBorMain.getCurrencyCode());
 		this.totaVo.putParam("DrawdownAmt", tLoanBorMain.getDrawdownAmt());
 		this.totaVo.putParam("LoanBal", tLoanBorMain.getLoanBal());
+		this.totaVo.putParam("FinalBal", tLoanBorMain.getFinalBal());
 
 		// 改抓BankRemit
 		this.totaVo.putParam("RemitBank", "");

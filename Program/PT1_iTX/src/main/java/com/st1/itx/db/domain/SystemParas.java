@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class SystemParas implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1765196238924056461L;
-
-// 業務類型
+  // 業務類型
   /* LN */
   @Id
   @Column(name = "`BusinessType`", length = 2)
