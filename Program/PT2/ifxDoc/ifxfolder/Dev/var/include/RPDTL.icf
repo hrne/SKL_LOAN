@@ -69,8 +69,10 @@
 
 ! 累溢收
 #RP_EXCESSIVE=m,14.2,S
-
-
+! 累溢收2
+#RP_TAVAMT=m,14.2,S
+! 使用記號
+#RP_USEFG=A,1,S
 ! 可短收金額
 ! #RPSHORTAMT=m,14,S
 
@@ -683,11 +685,12 @@ C(3,#RP_IND,1,IF(#RpCode{i}==90||#RpCode{i}==91||#RpCode{i}==95,$,CALL(#RPTOT_DI
 C(3,#RP_IND,1,IF(#RpCode{i}==90||#RpCode{i}==91||#RpCode{i}==95,$,$),$)
 IF(#RPFG==7,IF(#RPTOTF{z}>0,$,s),$)
 IF(#RpCode{i}<90,s,$)
+C(3,#RpCode{i},90,C(3,#RP_USEFG,0,C(3,#RP_TAVAMT,0,$,E(0,#RP_TAVAMT)E(0,@RP_USEFG,1)),$),$)
 @
 IF(#DF1=={i},V(2,0),$)
 IF(#RpAmt{i}>0,
   IF(#RPFG==1||#RPFG==2,
-    IF(#RpCode{i}==90,C(3,#RpFacmNo{i},0,V(P,需有額度號碼，請先點選[未銷帳查詢]),$),$)
+    IF(#RpCode{i}==90,C(3,#RpFacmNo{i},0,C(3,#RP_TAVAMT,0,V(P,需有額度號碼，請先點選[未銷帳查詢]),C(3,#RpAmt{i},#RP_TAVAMT,$,V(P,若修改金額，則需點[未銷帳查詢]帶入額度))),$),$)
                       IF(#RpAmt{i}>#RPTOTF{z},$,$),
     IF(#RPFG==6 && (#RpCode{i}==91||#RpCode{i}==95),C(3,#RpFacmNo{i},0,V(P,需有額度號碼，請先點選[未銷帳查詢]),$),$)
     ),IF(#DF1!={i},E(0,@RpCode{i},0)INVOKEJS(SHOW,grd9_{i},0),INVOKEJS(SHOW,grd9_{i},0)))

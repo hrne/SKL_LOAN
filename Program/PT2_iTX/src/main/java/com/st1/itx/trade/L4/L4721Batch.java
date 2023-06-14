@@ -167,7 +167,7 @@ public class L4721Batch extends TradeBuffer {
 
 									this.sno = l4721Report.exec(titaVo, this.txBuffer, custNoTmp,
 											tmpKindItem[txkind - 1], isAdjDate, ieAdjDate, sEntryDate, eEntryDate);
-									this.info("CustNo =" + custNoTmp);
+
 									this.info("sno =" + this.sno);
 
 									cntTrans++;
@@ -208,11 +208,12 @@ public class L4721Batch extends TradeBuffer {
 					} // for
 				} // if
 
+				// 郵局
 				if (CntPaper > 0) {
 					this.batchTransaction.commit();
 					l4721Report2.setBatchTransaction(this.batchTransaction);
-					l4721Report2.exec(titaVo, this.txBuffer, letterCustList, tmpKindItem[txkind - 1], isAdjDate,
-							ieAdjDate, sEntryDate, eEntryDate);
+					CntPaper = l4721Report2.exec(titaVo, this.txBuffer, letterCustList, tmpKindItem[txkind - 1],
+							isAdjDate, ieAdjDate, sEntryDate, eEntryDate);
 
 				}
 			} // if

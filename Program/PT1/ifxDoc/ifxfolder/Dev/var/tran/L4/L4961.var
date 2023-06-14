@@ -47,6 +47,7 @@ E(0,0)
 [#<->#,"#FdReportYearMonth+報表年月",#ReportYearMonth],
 [#<->#,"#FdRepayCode+繳款方式",#RepayCode,#RepayCodeX],
 [#<->#,"#FdSearchOption+查詢選項",#SearchOption,#SearchOptionX],
+[#<->#,"#FdSearc+列印選項",#Searc,#SearcFlagX],
 ]
 
 #FdSearchFlag=X,2,L
@@ -59,6 +60,8 @@ T(3,*)
 T(3,*)
 #FdSearchOption=X,2,L
 
+#FdSearc=X,2,L
+T(3,*)
 
 ! Help
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
@@ -84,6 +87,9 @@ T(3,0:正常未繳;1:正常已繳;2:借支;3:催收;4:催收未繳;5:結案;7:�
 
 #StatusCodeHelp=x,50,S
 T(3,0:正常;1:借支;2:催收;3:呆帳;4:結案)
+
+#SearcHelp=x,50,S
+T(3,1:列印;2:畫面顯示)
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
@@ -164,8 +170,17 @@ T(3,)T(H,#SearchOption,#SearchOptionHelp)
 #CHAINXMT=X,1,S
 C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 
+#Searc=A,1,I
+C(3,#CHAIN,0,$,s)
+E(0,1)  
+HELP(#SearcHelp)
+@V(H,#SearcHelp)
+
+#SearcFlagX=X,8,L
+T(3,)T(H,#Searc,#SearcHelp)
 
 #RPTFG=A,1,S
+C(5,#Searc,1,E(0,1),E(0,0))
 
 </sub>
 
@@ -245,6 +260,7 @@ T(2,#OOAcDateYYY+/+#OOAcDateMM+/+#OOAcDateDD))
 #ReportYearMonth
 #SearchOption
 #RepayCode
+#Searc
 #END
 </sub>
 
@@ -278,6 +294,9 @@ TXFORM=L4961
 ]
 </sub>
 
+<sub type="PART" prompt='{{#SCRTIL}} world' name="L4961A" layout="cols=3;screen.width=[130,370,130,370];order=1;">
+
+</sub>
 <sub type="SELECT">
 
 #RPTFG=0,QUERY.GRID,L4961
@@ -303,6 +322,11 @@ TXFORM=L4961
 {width:85,align:'center'}
 #OOInsuReceiptDate=保單收件日
 {width:85,align:'center'}
+^
+
+#RPTFG=1,QUERY.GRID,L4961A
+#any={detail:false, header:'L4961A.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
+
 ^
 <include src="PRT.icf::INQ04.sel" map="i=L4961;cpi=15"/>
 #SearchFlag

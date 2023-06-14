@@ -1401,6 +1401,7 @@ C(5,#L2r01CharCode,2,E(0,0),$)
 E(3,@RPTOT,#SumRepayAmt-#TimReduceAmt)
 C(3,#RepayType,12,E(3,@RPTOT,#TimOvduRepay),$)
 E(0,@RP_EXCESSIVE,#TmpAmt)
+E(0,@RP_TAVAMT,#Excessive)
 
 !實際收付金額
 #RealRepayAmt=m,14.2,L

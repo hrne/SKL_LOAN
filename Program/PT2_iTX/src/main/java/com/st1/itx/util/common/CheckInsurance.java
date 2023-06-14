@@ -135,10 +135,8 @@ public class CheckInsurance extends TradeBuffer {
 			iVo.setSuccess(true);
 //			public List<HashMap<String, String>> getNodeList(Document doc, String tagName) {
 			List<HashMap<String, String>> lDetail = getNodeList(doc, "Detail");
-			for (int i = 0; i < lDetail.size() - 1; i++) {
-
+			for (HashMap<String, String> map : lDetail) {
 				// if (highest_loan == null) -> 0 else -> [loan_amt] + [highest_loan]
-				HashMap<String, String> map = lDetail.get(i);
 				if (map.get("highest_loan") != null) {
 					int highestLoan = Integer.valueOf(map.get("highest_loan"));
 					int loanAmt = 0;
@@ -149,7 +147,7 @@ public class CheckInsurance extends TradeBuffer {
 				}
 				// 轉換日期
 				SimpleDateFormat sourceDf = new SimpleDateFormat("yyyy-MM-ddXXX"); // 來源帶時間
-				SimpleDateFormat targetDf = new SimpleDateFormat("yyyy-MM-dd"); // 產出不要帶時間
+				SimpleDateFormat targetDf = new SimpleDateFormat("yyyyMMdd"); // 產出不要帶時間
 				String issueDate = map.get("issue_date");
 				String applicationDate = map.get("application_date");
 

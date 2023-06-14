@@ -65,7 +65,7 @@ public class L9707ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,CASE WHEN M.\"YearMonth\" IS NULL ";
 		sql += "             THEN 0 ";
 		sql += "        ELSE M.\"PrinBalance\" END \"UnpaidAmt\"";
-		sql += "       ,C.\"EntCode\" ";
+		sql += "       ,CF.\"ClCode1\" ";
 		sql += "       ,A.\"PieceCode\" ";
 		sql += " FROM \"FacCaseAppl\" A ";
 		sql += " LEFT JOIN \"FacMain\" F ON F.\"ApplNo\" = A.\"ApplNo\" ";
@@ -73,6 +73,9 @@ public class L9707ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                              AND M.\"FacmNo\" = F.\"FacmNo\" ";
 		sql += "                              AND M.\"OvduDays\" > 0";
 		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = F.\"CustNo\" ";
+		sql += " LEFT JOIN \"ClFac\" CF ON CF.\"CustNo\" = F.\"CustNo\" ";
+		sql += "                              AND CF.\"FacmNo\" = F.\"FacmNo\" ";
+		sql += "                              AND CF.\"MainFlag\" = 'Y' ";
 		sql += " WHERE A.\"ApproveDate\" BETWEEN :StartDate AND :EndDate ";
 		sql += " ORDER BY NVL(M.\"YearMonth\", 0) ASC";
 		sql += "         ,F.\"CustNo\" ASC";

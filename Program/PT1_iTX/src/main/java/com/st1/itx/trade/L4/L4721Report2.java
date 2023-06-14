@@ -67,6 +67,7 @@ public class L4721Report2 extends TradeBuffer {
 	String headerLoanBal = "0";
 	String headerExcessive = "";
 	String headerDueAmt = "";
+	int cnt = 0;
 
 	/**
 	 * 資料明細
@@ -82,7 +83,7 @@ public class L4721Report2 extends TradeBuffer {
 	 * @param eEntryDate 入帳止日
 	 * @throws LogicException
 	 */
-	public void exec(TitaVo titaVo, TxBuffer txbuffer, List<Map<String, String>> data, String kindItem, int sAdjDate,
+	public Integer exec(TitaVo titaVo, TxBuffer txbuffer, List<Map<String, String>> data, String kindItem, int sAdjDate,
 			int eAdjDate, int sEntryDate, int eEntryDate) throws LogicException {
 		this.info("L4721Report2 exec start");
 
@@ -94,7 +95,7 @@ public class L4721Report2 extends TradeBuffer {
 
 		List<String> file = getData(sAdjDate, eAdjDate, sEntryDate, eEntryDate, data, titaVo);
 
-		String fileName = "L4721-" + kindItem + "(總筆數：" + data.size() + ")";
+		String fileName = "L4721-" + kindItem + "(總筆數：" + cnt + ")";
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getBrno())
 				.setRptCode(titaVo.getTxCode()).setRptItem(fileName).build();
@@ -114,6 +115,7 @@ public class L4721Report2 extends TradeBuffer {
 		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
 				titaVo.getTlrNo() + "L4721", titaVo.getTxCode() + " 已產生L4721.txt", titaVo);
 
+		return cnt;
 	}
 
 	/**
@@ -154,6 +156,7 @@ public class L4721Report2 extends TradeBuffer {
 				continue;
 			}
 
+			cnt = cnt + 1;
 			custNo = iCustNo;
 			facmNo = iFacmNo;
 

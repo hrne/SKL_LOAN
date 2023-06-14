@@ -84,9 +84,12 @@ public class L9724Report extends MakeReport {
 			makeExcel.setSheet(SheetName);
 		}
 
+		// 月底日(西元)
+		int mfbsdy = this.txBuffer.getTxCom().getMfbsdyf();
+
 		// fill in inputDate with proper format
 		String targetDate = parse
-				.IntegerToString(parse.stringToInteger(titaVo.getParam("inputEndOfMonthDate")) + 19110000, 1); // YYYYMMDD
+				.IntegerToString(mfbsdy, 1); // YYYYMMDD
 
 		// at F1
 		makeExcel.setValue(1, 6, String.format("月差 %s/%s/%s", targetDate.substring(0, 4), targetDate.substring(4, 6),

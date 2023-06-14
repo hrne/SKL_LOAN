@@ -13,10 +13,10 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.db.domain.PfInsCheck;
 import com.st1.itx.db.domain.PfInsCheckId;
 import com.st1.itx.db.service.PfInsCheckService;
+import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.CheckInsurance;
 import com.st1.itx.util.common.data.CheckInsuranceVo;
 import com.st1.itx.util.parse.Parse;;
@@ -66,11 +66,11 @@ public class L5959 extends TradeBuffer {
 
 				// very importance
 				checkInsurance.setTxBuffer(this.txBuffer);
-				checkInsurance.checkInsurance(titaVo, checkVo);
+				checkVo = checkInsurance.checkInsurance(titaVo, checkVo);
 			} else {
 				checkVo.setSuccess(true);
 				checkVo.setMsgRs(pfInsCheck.getReturnMsg());
-				checkInsurance.parseXml(checkVo);
+				checkVo = checkInsurance.parseXml(checkVo);
 			}
 		}
 //		! eLoan案件編號  
@@ -106,11 +106,9 @@ public class L5959 extends TradeBuffer {
 			this.totaVo.putParam("oCheckWorkMonth", 0);
 		}
 
-		if (checkVo.isSuccess() && checkVo.getDetail().size() > 0) {
-
-			for (int i = 0; i < checkVo.getDetail().size() - 1; i++) {
+		if (checkVo.isSuccess() && !checkVo.getDetail().isEmpty()) {
+			for (HashMap<String, String> map : checkVo.getDetail()) {
 				// if (highest_loan == null) -> 0 else -> [loan_amt] + [highest_loan]
-				HashMap<String, String> map = checkVo.getDetail().get(i);
 
 				OccursList occursList = new OccursList();
 

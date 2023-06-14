@@ -118,16 +118,14 @@ public class L6972p extends TradeBuffer {
 				try {
 					systemParasService.update(systemParas, titaVo);
 				} catch (DBException e) {
-					throwException(titaVo);
+					throw new LogicException("E0007", "SystemParas"); // 更新失敗
 				}
 			}
 		}
 	}
 
 	private void throwException(TitaVo titaVo) throws LogicException {
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", titaVo.getTlrNo(),
-				"L6972已在搬運中", titaVo);
-		throw new LogicException("E0008", "L6972已在搬運中");
+		throw new LogicException("E0015", "已在搬運中"); // 檢查錯誤
 	}
 
 	private void releaseFlag(TitaVo titaVo) throws LogicException {
@@ -136,7 +134,7 @@ public class L6972p extends TradeBuffer {
 		try {
 			systemParasService.update(systemParas, titaVo);
 		} catch (DBException e) {
-			throw new LogicException("E0008", "SystemParas");
+			throw new LogicException("E0007", "SystemParas"); // 更新失敗
 		}
 	}
 }

@@ -142,8 +142,8 @@ public class L9707Report extends MakeReport {
 			}
 
 			// output totals
-			makeExcel.setValue(1, 3, formatAmt(totalDataCount, 0), "R");
-			makeExcel.setValue(1, 6, formatAmt(totalLoanAmt, 1), "R");
+			//makeExcel.setValue(1, 3, formatAmt(totalDataCount, 0), "R");
+			//makeExcel.setValue(1, 6, formatAmt(totalLoanAmt, 1), "R");
 
 		} else {
 			makeExcel.setValue(3, 1, "無資料");
