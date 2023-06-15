@@ -12,10 +12,14 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.CustNotice;
+import com.st1.itx.db.domain.CustNoticeId;
+import com.st1.itx.db.service.CustNoticeService;
 import com.st1.itx.db.service.springjpa.cm.L9701ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.common.data.ReportVo;
+import com.st1.itx.util.parse.Parse;
 
 @Component
 @Scope("prototype")
@@ -25,6 +29,11 @@ public class L9701Report2 extends MakeReport {
 	@Autowired
 	L9701ServiceImpl l9701ServiceImpl;
 
+	@Autowired
+	private CustNoticeService sCustNoticeService;
+
+	@Autowired
+	Parse parse;
 	// 製表日期
 	private String NowDate;
 	// 製表時間
@@ -184,6 +193,28 @@ public class L9701Report2 extends MakeReport {
 		int detailCounts = 0;
 		if (listL9701 != null && listL9701.size() > 0) {
 			for (Map<String, String> tL9701Vo : listL9701) {
+				
+				int custNo = parse.stringToInteger(tL9701Vo.get("CustNo"));
+				int facmNo = parse.stringToInteger(tL9701Vo.get("FacmNo"));
+
+				CustNotice lCustNotice = new CustNotice();
+				CustNoticeId lCustNoticeId = new CustNoticeId();
+
+				lCustNoticeId.setCustNo(custNo);
+				lCustNoticeId.setFacmNo(facmNo);
+				lCustNoticeId.setFormNo("L9701");
+				lCustNotice = sCustNoticeService.findById(lCustNoticeId, titaVo);
+
+				// paper為N 表示不印
+				if (lCustNotice == null) {
+				} else {
+					if ("N".equals(lCustNotice.getPaperNotice())) {
+						continue;
+					}
+				}
+				
+				
+				
 				if (this.NowRow - 7 >= 40) {
 					this.print(1, this.getMidXAxis(), nextPageText, "C");
 					this.newPage();

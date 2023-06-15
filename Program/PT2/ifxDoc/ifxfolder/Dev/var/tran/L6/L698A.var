@@ -41,12 +41,19 @@ E(0,1)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
 ["[L698A]                                 應處理明細                                                            "],
+["#FdTranCode+交易代號",#ItemCode],
+["#FdDtlValue+明細項目",#DtlValue],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
 !#BTN1=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
 !#BTN2=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
 !#BTN3=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
+
+#FdTranCode=X,2,L
+
+#FdDtlValue=X,2,L
+
 #BUF1=X,42,S
 !ENABLE(#BTN1)ENABLE(#BTN2)ENABLE(#BTN3)
 !---------- AP TEXT AREA Variables ----------
@@ -58,7 +65,7 @@ C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@SelectCode,#NTXBUF,1,1)
 T(1,@ItemCode,#NTXBUF,2,6)
 T(1,@AutoFg,#NTXBUF,38,1)
-
+ALERT(#NTXBUF)
 
 #SelectCode=A,1,S
 #SelectCodeX=X,16,L
@@ -75,7 +82,8 @@ C(2,#SelectCode,T(3,),
  )
 
 ! 處理之交易代號
-#ItemCode=X,6,S
+!#ItemCode=X,6,S
+#ItemCode=X,6,L
 
 #AutoFg=X,1,S
 
@@ -99,7 +107,9 @@ IF(#AutoFg=="Y",E(0,@RPTFG,7),$)
 ! C(3,#SelectCode,9,IF(#AutoFg=="I",E(0,@RPTFG,9),$),$)
 
 
+#TranCode=X,10,L
 
+#DtlValue=X,50,I
 
 
 #CHAINXMT=X,1,S
@@ -247,6 +257,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=#OOExcuteTxcd; ntxcd=#OOExcuteTxcd;ntxbuf=#OOBUF6})
 <sub type="TIM">
 #SelectCode
 #ItemCode
+#DtlValue
 #END
 </sub>
 

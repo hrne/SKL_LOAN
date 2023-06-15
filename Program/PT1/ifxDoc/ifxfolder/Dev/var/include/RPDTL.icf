@@ -658,6 +658,7 @@ T(2,金額不可高於+#RpXtypeRpTotF{i})
 ! 90不可溢繳款
 #RpAmt{i}=m,14,I
 C(3,#RP_IND,0,s,$)
+C(3,#RpCode{i},90,C(3,#RP_USEFG,0,C(3,#RP_TAVAMT,0,$,E(0,#RP_TAVAMT)E(0,@RP_USEFG,1)),$),$)
 CALL(#RPTOT_CAL{i})
 IF(#DF1=={i},$,IF(#RpAmt{z}==0,s,$))
 C(3,#RpCode{i},90,C(1,#RpAmt{i},$,$,INVOKEJS(SHOW,grd9_1,1)),$)
@@ -685,7 +686,6 @@ C(3,#RP_IND,1,IF(#RpCode{i}==90||#RpCode{i}==91||#RpCode{i}==95,$,CALL(#RPTOT_DI
 C(3,#RP_IND,1,IF(#RpCode{i}==90||#RpCode{i}==91||#RpCode{i}==95,$,$),$)
 IF(#RPFG==7,IF(#RPTOTF{z}>0,$,s),$)
 IF(#RpCode{i}<90,s,$)
-C(3,#RpCode{i},90,C(3,#RP_USEFG,0,C(3,#RP_TAVAMT,0,$,E(0,#RP_TAVAMT)E(0,@RP_USEFG,1)),$),$)
 @
 IF(#DF1=={i},V(2,0),$)
 IF(#RpAmt{i}>0,

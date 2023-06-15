@@ -133,6 +133,9 @@ public class L9135ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          , AC.\"AcctCode\" AS \"AcctCode\"";
 		sql += "          , AC.\"AcDtlCode\" AS \"AcDtlCode\"";
 		sql += "          , AC.\"DbCr\" AS \"DbCr\"";
+		sql += "          , CASE WHEN SUBSTR(NVL(AC.\"TitaBatchNo\",'000000'),1,2) = 'LN' AND SUBSTR(NVL(AC.\"TitaBatchNo\",'000000'),5,2) <> '00' THEN AC.\"TitaBatchNo\" ";
+		sql += "                 ELSE ' '  END AS \"TitaBatchNo\"  "; //撥款的整批匯款
+
 		sql += "     FROM \"AcDetail\" AC ";
 		sql += "     LEFT JOIN \"CdAcCode\" CDAC ON CDAC.\"AcNoCode\" = AC.\"AcNoCode\" ";
 		sql += "                              AND CDAC.\"AcSubCode\" = AC.\"AcSubCode\" ";
@@ -197,6 +200,29 @@ public class L9135ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            , R.\"AcSubBookItem\" ";
 		sql += "            , R.\"DbCr\"";
 		sql += " ) ";
+		//--
+		sql += " , groupData3 AS ( ";
+		sql += "     SELECT R.\"AcNoCode\" ";
+		sql += "          , R.\"AcNoItem\" ";
+		sql += "          , R.\"AcSubCode\" ";
+		sql += "          , R.\"AcDtlCode\" ";
+		sql += "          , MIN(R.\"SlipNo\") AS \"SlipNo\" ";
+		sql += "          , R.\"AcSubBookCode\" ";
+		sql += "          , R.\"AcSubBookItem\" ";
+		sql += "          , R.\"DbCr\" AS \"DbCr\"";
+		sql += "          , SUM(R.\"DbAmt\") AS \"DbAmt\" ";
+		sql += "          , SUM(R.\"CrAmt\") AS \"CrAmt\" ";
+		sql += "     FROM rawData R";
+		sql += "     WHERE R.\"EntAcCode\" = 0  AND R.\"TitaBatchNo\" <> ' ' ";
+		sql += "     GROUP BY R.\"AcNoCode\" ";
+		sql += "            , R.\"AcNoItem\" ";
+		sql += "            , R.\"AcSubCode\" ";
+		sql += "            , R.\"AcDtlCode\" ";
+		sql += "            , R.\"TitaBatchNo\" ";
+		sql += "            , R.\"AcSubBookCode\" ";
+		sql += "            , R.\"AcSubBookItem\" ";
+		sql += "            , R.\"DbCr\"";
+		sql += " ) ";
 		sql += " SELECT R.* FROM ( ";
 		sql += " SELECT \"AcNoCode\" ";
 		sql += "      , \"AcNoItem\" ";
@@ -241,6 +267,28 @@ public class L9135ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , \"AcDtlCode\"";
 		sql += "      , \"DbCr\"";
 		sql += " FROM groupData2";
+		sql += " UNION ";
+		sql += " SELECT \"AcNoCode\" ";
+		sql += "      , \"AcNoItem\" ";
+		sql += "      , \"AcSubCode\" ";
+		sql += "	  ,CASE";
+		sql += "		 WHEN \"AcSubCode\" = '01004' THEN '郵局  18471256'";
+		sql += "		 WHEN \"AcSubCode\" = '04004' THEN '新光  0116-10-000108-8'";
+		sql += "		 WHEN \"AcSubCode\" = '04007' THEN '新光  0116-10-100100-6'";
+		sql += "		 WHEN \"AcSubCode\" = '12005' THEN '台新  00201000001800'";
+		sql += "	   END AS \"AcctItem\"";
+		sql += "	  ,CASE";
+		sql += "		 WHEN \"AcSubCode\" = '01004' THEN '18471256  '";
+		sql += "		 WHEN \"AcSubCode\" = '04004' THEN '000108-8  '";
+		sql += "		 WHEN \"AcSubCode\" = '04007' THEN '100100-6  '";
+		sql += "		 WHEN \"AcSubCode\" = '12005' THEN '1000001800'";
+		sql += "	   END AS \"AcctItem2\"";
+		sql += "      , \"SlipNo\" AS \"SlipNo\" ";
+		sql += "      , \"DbAmt\" AS \"DbTxAmt\"";
+		sql += "      , \"CrAmt\"  AS \"CrTxAmt\"";
+		sql += "      , \"AcDtlCode\"";
+		sql += "      , \"DbCr\"";
+		sql += " FROM groupData3";
 		sql += " ) R";
 		sql += "     LEFT JOIN \"CdAcCode\" E ON E.\"AcNoCode\" = R.\"AcNoCode\"";
 		sql += "     						 AND E.\"AcSubCode\" = '     '";

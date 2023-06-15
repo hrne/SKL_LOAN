@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.AcDetail;
@@ -691,6 +693,19 @@ public interface AcDetailService {
    * @return Slice AcDetail AcDetail of List
    */
   public Slice<AcDetail> findSlipBatNo(int acDate_0, int slipBatNo_1, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * AcDate = ,AND SlipBatNo = ,AND EntAc =
+   *
+   * @param acDate_0 acDate_0
+   * @param slipBatNo_1 slipBatNo_1
+   * @param entAc_2 entAc_2
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice AcDetail AcDetail of List
+   */
+  public Slice<AcDetail> findSlipBatNoEntAc(int acDate_0, int slipBatNo_1, int entAc_2, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By AcDetail

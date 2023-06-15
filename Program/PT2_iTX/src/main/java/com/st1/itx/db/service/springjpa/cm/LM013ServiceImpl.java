@@ -208,9 +208,10 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                 GROUP BY \"CustNo\"  ";
 		sql += "                ) t2 ON t2.\"CustNo\" = t1.\"CustNo\"  ";
 		sql += "  ),  ";
-		sql += "    BookValueTmp";
+		sql += "    BookValueTmp AS (";
 		sql += "    	SELECT SUM(\"BookValue1\") AS \"upBookValue\"";
 		sql += "    		  ,SUM(\"BookValue2\") AS \"downBookValue\"";
+		sql += "    	FROM";
 		sql += "    	(";
 		sql += "  		SELECT 0 AS \"BookValue1\"";
 		sql += "			  ,ROUND(SUM(\"BookValue\")) AS \"BookValue2\"  ";
@@ -230,7 +231,7 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    	)";
 		sql += "  )  ";
 		sql += "    ";
-		sql += "  (  ";
+		sql += "    ";
 		sql += "  SELECT \"EntCode\"";
 		sql += "  	    ,\"IsRels\" ";
 		sql += "  	    ,\"CustNo\" ";
@@ -245,7 +246,7 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  WHERE \"LineTotal\" >= :LineAmtThreshold  ";
 		sql += "    AND \"EntCode\" LIKE :EntCodeCondition  ";
 		sql += "    AND \"IsRels\" LIKE :IsRelsCondition  ";
-		sql += "  )";
+		sql += "  ";
 		sql += "  UNION ALL  ";
 		sql += "  (  ";
 		sql += "  SELECT :EntCodeCondition AS \"EntCode\"  ";
@@ -272,7 +273,7 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ,ROUND(SUM(\"LineAmt\")) AS \"LineAmt\"  ";
 		sql += "        ,ROUND( CASE ";
 		sql += "				  WHEN \"ClCode1\" = 0 THEN (SELECT \"LoanBal\" FROM ProjectLoan ) ";
-		sql += "				  WHEN \"ClCode1\" = 2 THEN (SELECT \"upBoolValue\" FROM BoolValue ) ";
+		sql += "				  WHEN \"ClCode1\" = 2 THEN (SELECT \"upBookValue\" FROM BookValueTmp ) ";
 		sql += "				  						  - (SELECT \"LoanBal\" FROM ProjectLoan ) ";
 		sql += "				  ELSE SUM(\"BookValue\") END ) AS \"BookValue\"  ";
 		sql += "        ,NULL AS \"LineTotal\"  ";
@@ -308,8 +309,9 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ,ROUND(SUM(\"LineAmt\")) AS \"LineAmt\"  ";
 		sql += "        ,ROUND( CASE ";
 		sql += "				  WHEN \"ClCode1\" = 0 THEN (SELECT \"LoanBal\" FROM ProjectLoan ) ";
-		sql += "				  WHEN \"ClCode1\" = 2 THEN (SELECT \"upBoolValue\" FROM BoolValue ) ";
+		sql += "				  WHEN \"ClCode1\" = 2 THEN (SELECT \"downBookValue\" FROM BookValueTmp ) ";
 		sql += "				  						  - (SELECT \"LoanBal\" FROM ProjectLoan ) ";
+		sql += "				  ELSE SUM(\"BookValue\") END ) AS \"BookValue\"  ";
 		sql += "        ,NULL AS \"LineTotal\"  ";
 		sql += "  FROM TotalData_LineTotal  ";
 		sql += "  WHERE \"LineTotal\" < :LineAmtThreshold  ";
@@ -343,8 +345,9 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ,ROUND(SUM(\"LineAmt\")) AS \"LineAmt\"  ";
 		sql += "        ,ROUND( CASE ";
 		sql += "				  WHEN \"ClCode1\" = 0 THEN (SELECT \"LoanBal\" FROM ProjectLoan ) ";
-		sql += "				  WHEN \"ClCode1\" = 2 THEN (SELECT \"upBoolValue\" FROM BoolValue ) ";
+		sql += "				  WHEN \"ClCode1\" = 2 THEN (SELECT \"upBookValue\" + \"downBookValue\" FROM BookValueTmp ) ";
 		sql += "				  						  - (SELECT \"LoanBal\" FROM ProjectLoan ) ";
+		sql += "				  ELSE SUM(\"BookValue\") END ) AS \"BookValue\"  ";
 		sql += "        ,NULL AS \"LineTotal\"  ";
 		sql += "  FROM TotalData_LineTotal  ";
 		sql += "  WHERE \"EntCode\" LIKE :EntCodeCondition  ";

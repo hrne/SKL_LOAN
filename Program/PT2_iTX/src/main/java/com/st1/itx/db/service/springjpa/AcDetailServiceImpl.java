@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -1214,6 +1217,34 @@ em = null;
       slice = acDetailReposHist.findAllByAcDateIsAndSlipBatNoIs(acDate_0, slipBatNo_1, pageable);
     else 
       slice = acDetailRepos.findAllByAcDateIsAndSlipBatNoIs(acDate_0, slipBatNo_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<AcDetail> findSlipBatNoEntAc(int acDate_0, int slipBatNo_1, int entAc_2, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<AcDetail> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findSlipBatNoEntAc " + dbName + " : " + "acDate_0 : " + acDate_0 + " slipBatNo_1 : " +  slipBatNo_1 + " entAc_2 : " +  entAc_2);
+    if (dbName.equals(ContentName.onDay))
+      slice = acDetailReposDay.findAllByAcDateIsAndSlipBatNoIsAndEntAcIs(acDate_0, slipBatNo_1, entAc_2, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = acDetailReposMon.findAllByAcDateIsAndSlipBatNoIsAndEntAcIs(acDate_0, slipBatNo_1, entAc_2, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = acDetailReposHist.findAllByAcDateIsAndSlipBatNoIsAndEntAcIs(acDate_0, slipBatNo_1, entAc_2, pageable);
+    else 
+      slice = acDetailRepos.findAllByAcDateIsAndSlipBatNoIsAndEntAcIs(acDate_0, slipBatNo_1, entAc_2, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

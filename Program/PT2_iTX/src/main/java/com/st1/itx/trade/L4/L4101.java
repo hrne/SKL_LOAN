@@ -67,7 +67,7 @@ public class L4101 extends TradeBuffer {
 	public TotaVo totaB; // 未放行清單
 	@Autowired
 	public TotaVo totaWarnMsg; // 未放行清單
-	
+
 	@Autowired
 	public BankRemitService bankRemitService;
 	@Autowired
@@ -270,11 +270,14 @@ public class L4101 extends TradeBuffer {
 		this.info("new old BatchNo = " + batchNo + " " + wkBatchNo);
 		Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(iAcDate + 19110000, batchNo, 00, 99, 0, 0, 0,
 				Integer.MAX_VALUE, titaVo);
+		if (slBankRemit == null) {
+			throw new LogicException(titaVo, "E2003", "無狀態正常帳務資料"); // 查無資料
+		}
 		List<BankRemit> lBankRemit = slBankRemit.getContent();
 		List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 		for (BankRemit tBankRemit : lBankRemit) {
 			tBankRemit.setBatchNo(wkBatchNo);
-			
+
 			Slice<AcDetail> slAcDetail = acDetailService.acdtlRelTxseqEq(iAcDate + 19110000,
 					titaVo.getKinbr() + tBankRemit.getTitaTlrNo() + tBankRemit.getTitaTxtNo(), 0, Integer.MAX_VALUE,
 					titaVo);

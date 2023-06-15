@@ -112,7 +112,7 @@ public class L6101 extends TradeBuffer {
 
 	@Autowired
 	L6101ServiceImpl l6101ServiceImpl;
-	
+
 	@Autowired
 	private WebClient webClient;
 
@@ -200,13 +200,12 @@ public class L6101 extends TradeBuffer {
 
 		// 1:業務關帳作業
 		acClose(titaVo);
-		
 
-		//brNo –固定0000 
-		//tickNo – 訊息編號 (編號一致後蓋前)  
-		//stopTime – 顯示停止時間 西元 8 + 4 時間 
-		//msg – 訊息內容 
-		//mode – false : insert and replace mode ; true : delete mode titaVo – titaVo
+		// brNo –固定0000
+		// tickNo – 訊息編號 (編號一致後蓋前)
+		// stopTime – 顯示停止時間 西元 8 + 4 時間
+		// msg – 訊息內容
+		// mode – false : insert and replace mode ; true : delete mode titaVo – titaVo
 		if (iMsgCode == 0 && "09".equals(iSecNo)) {
 			if (iClsFg == 1) {
 				webClient.sendTicker("0000", "00001", "209912312300", "放款業務已關帳", false, titaVo);
@@ -855,18 +854,15 @@ public class L6101 extends TradeBuffer {
 	// 寫入應處理清單(該批號有帳務才寫)
 	private void txToDoL7400(TitaVo titaVo) throws LogicException {
 		this.info("txToDoL7400 ...");
-		Slice<AcDetail> slAcDetail = sAcDetailService.findSlipBatNo(iAcDateF, parse.stringToInteger(iBatNo), 0, 1,
-				titaVo);
+		Slice<AcDetail> slAcDetail = sAcDetailService.findSlipBatNoEntAc(iAcDateF, parse.stringToInteger(iBatNo), 1, 0,
+				1, titaVo);
+		boolean isL7400 = false;
 		if (slAcDetail == null) {
 			return;
+		} else {
+			isL7400 = true;
 		}
-		boolean isL7400 = false;
-		for (AcDetail ac : slAcDetail.getContent()) {
-			if (ac.getEntAc() > 0) {
-				isL7400 = true;
-				break;
-			}
-		}
+
 		if (!isL7400) {
 			return;
 		}

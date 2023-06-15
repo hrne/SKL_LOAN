@@ -3,11 +3,14 @@ package com.st1.itx.db.repository.online;
 
 import java.util.Optional;
 
+import java.math.BigDecimal;
+import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -141,6 +144,9 @@ public interface AcDetailRepository extends JpaRepository<AcDetail, AcDetailId> 
 
   // AcDate = ,AND SlipBatNo = 
   public Slice<AcDetail> findAllByAcDateIsAndSlipBatNoIs(int acDate_0, int slipBatNo_1, Pageable pageable);
+
+  // AcDate = ,AND SlipBatNo = ,AND EntAc =
+  public Slice<AcDetail> findAllByAcDateIsAndSlipBatNoIsAndEntAcIs(int acDate_0, int slipBatNo_1, int entAc_2, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

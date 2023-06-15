@@ -65,7 +65,8 @@ public class L698A extends TradeBuffer {
 
 		selectCode = parse.stringToInteger(titaVo.getParam("SelectCode"));
 
-		String itemCode = titaVo.getParam("ItemCode");
+		String itemCode  = titaVo.getParam("ItemCode");
+		String iDtlValue = titaVo.getParam("DtlValue");
 
 		List<TxToDoDetail> lTxToDoDetail = new ArrayList<TxToDoDetail>();
 		Slice<TxToDoDetail> slTxToDoDetail = null;
@@ -86,111 +87,180 @@ public class L698A extends TradeBuffer {
 		int lbsDy = this.txBuffer.getTxCom().getLbsdy() + 19110000;
 		// 本營業日
 		int tbsDy = this.txBuffer.getTxCom().getTbsdy() + 19110000;
-
-		switch (selectCode) {
-		case 1:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, 0, lbsDy, this.index, this.limit,
-					titaVo);
-			break;
-		case 2:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, tbsDy, tbsDy, this.index, this.limit,
-					titaVo);
-			break;
-		case 3:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, 0, 99991231, this.index, this.limit,
-					titaVo);
-			break;
-		case 4:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 2, 2, 0, 99991231, this.index, this.limit,
-					titaVo);
-			break;
-		case 5:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 3, 3, 0, 99991231, this.index, this.limit,
-					titaVo);
-			break;
-		case 6:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 1, 1, 0, 99991231, this.index, this.limit,
-					titaVo);
-			break;
-		case 7:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 0, 0, 99991231, this.index, this.limit,
-					titaVo);
-			break;
-		case 9:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 0, 0, 99991231, this.index, this.limit,
-					titaVo);
-			break;
-		default:
-			break;
-		}
-		lTxToDoDetail = slTxToDoDetail == null ? null : slTxToDoDetail.getContent();
-
-		Boolean showCustNo = false;
-		if (lTxToDoDetail != null && lTxToDoDetail.size() != 0) {
-
-			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-			if (slTxToDoDetail != null && slTxToDoDetail.hasNext()) {
-				titaVo.setReturnIndex(this.setIndexNext());
-				/* 手動折返 */
-				this.totaVo.setMsgEndToEnter();
+		if (titaVo.getParam("DtlValue").equals("")) {
+			switch (selectCode) {
+			case 1:
+				slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, 0, lbsDy, this.index, this.limit,
+						titaVo);
+				break;
+			case 2:
+				slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, tbsDy, tbsDy, this.index, this.limit,
+						titaVo);
+				break;
+			case 3:
+				slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, 0, 99991231, this.index, this.limit,
+						titaVo);
+				break;
+			case 4:
+				slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 2, 2, 0, 99991231, this.index, this.limit,
+						titaVo);
+				break;
+			case 5:
+				slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 3, 3, 0, 99991231, this.index, this.limit,
+						titaVo);
+				break;
+			case 6:
+				slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 1, 1, 0, 99991231, this.index, this.limit,
+						titaVo);
+				break;
+			case 7:
+				slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 0, 0, 99991231, this.index, this.limit,
+						titaVo);
+				break;
+			case 9:
+				slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 0, 0, 99991231, this.index, this.limit,
+						titaVo);
+				break;
+			default:
+				break;
 			}
+			lTxToDoDetail = slTxToDoDetail == null ? null : slTxToDoDetail.getContent();
 
-			for (TxToDoDetail tTxToDoDetail : lTxToDoDetail) {
+			Boolean showCustNo = false;
+			if (lTxToDoDetail != null && lTxToDoDetail.size() != 0) {
+
+				/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
+				if (slTxToDoDetail != null && slTxToDoDetail.hasNext()) {
+					titaVo.setReturnIndex(this.setIndexNext());
+					/* 手動折返 */
+					this.totaVo.setMsgEndToEnter();
+				}
+
+				for (TxToDoDetail tTxToDoDetail : lTxToDoDetail) {
 //				if (selectCodeIsNotQualify(tTxToDoDetail)) {
 //					continue;
 //				}
-				int custno = tTxToDoDetail.getCustNo();
-				String custName = "";
-				String custId = "";
+					int custno = tTxToDoDetail.getCustNo();
+					String custName = "";
+					String custId = "";
 
-				if (custno != 0) {
-					CustMain tCustMain = custMainService.custNoFirst(custno, custno);
-					if (tCustMain != null) {
-						custName = tCustMain.getCustName();
-						custId = tCustMain.getCustId();
+					if (custno != 0) {
+						CustMain tCustMain = custMainService.custNoFirst(custno, custno);
+						if (tCustMain != null) {
+							custName = tCustMain.getCustName();
+							custId = tCustMain.getCustId();
+						}
+						if (!showCustNo) {
+							showCustNo = true;
+						}
+
 					}
-					if (!showCustNo) {
-						showCustNo = true;
+
+					OccursList occursList = new OccursList();
+
+					int createDate = tTxToDoDetail.getDataDate();
+					if (tTxToDoDetail.getCreateDate() != null) {
+						Timestamp ts = tTxToDoDetail.getCreateDate();
+						DateFormat sdfdate = new SimpleDateFormat("yyyyMMdd");
+						String sCreateDate = sdfdate.format(ts);
+						createDate = parse.stringToInteger(sCreateDate) - 19110000;
 					}
+					occursList.putParam("OOAcDate", createDate);
+					occursList.putParam("OOStatus", tTxToDoDetail.getStatus());
+					occursList.putParam("OOCustNo", custno);
+					occursList.putParam("OOFacmNo", tTxToDoDetail.getFacmNo());
+					occursList.putParam("OOBormNo", tTxToDoDetail.getBormNo());
+					occursList.putParam("OOCustName", custName);
+					occursList.putParam("OOProcessNote", tTxToDoDetail.getProcessNote());
+					occursList.putParam("OOTxSn", tTxToDoDetail.getTitaEntdy() + titaVo.getKinbr()
+							+ tTxToDoDetail.getTitaTlrNo() + tTxToDoDetail.getTitaTxtNo()); // 登放序號
+					occursList.putParam("OOExcuteTxcd", tTxToDoDetail.getExcuteTxcd());
+					occursList.putParam("OOItemCode", tTxToDoDetail.getItemCode());
+					occursList.putParam("OODtlValue", tTxToDoDetail.getDtlValue());
+					occursList.putParam("OOCustId", custId);
+					cnt++;
+					/* 將每筆資料放入Tota的OcList */
+					this.totaVo.addOccursList(occursList);
 
 				}
-
-				OccursList occursList = new OccursList();
-
-				int createDate = tTxToDoDetail.getDataDate();
-				if (tTxToDoDetail.getCreateDate() != null) {
-					Timestamp ts = tTxToDoDetail.getCreateDate();
-					DateFormat sdfdate = new SimpleDateFormat("yyyyMMdd");
-					String sCreateDate = sdfdate.format(ts);
-					createDate = parse.stringToInteger(sCreateDate) - 19110000;
-				}
-				occursList.putParam("OOAcDate", createDate);
-				occursList.putParam("OOStatus", tTxToDoDetail.getStatus());
-				occursList.putParam("OOCustNo", custno);
-				occursList.putParam("OOFacmNo", tTxToDoDetail.getFacmNo());
-				occursList.putParam("OOBormNo", tTxToDoDetail.getBormNo());
-				occursList.putParam("OOCustName", custName);
-				occursList.putParam("OOProcessNote", tTxToDoDetail.getProcessNote());
-				occursList.putParam("OOTxSn", tTxToDoDetail.getTitaEntdy() + titaVo.getKinbr()
-						+ tTxToDoDetail.getTitaTlrNo() + tTxToDoDetail.getTitaTxtNo()); // 登放序號
-				occursList.putParam("OOExcuteTxcd", tTxToDoDetail.getExcuteTxcd());
-				occursList.putParam("OOItemCode", tTxToDoDetail.getItemCode());
-				occursList.putParam("OODtlValue", tTxToDoDetail.getDtlValue());
-				occursList.putParam("OOCustId", custId);
-				cnt++;
-				/* 將每筆資料放入Tota的OcList */
-				this.totaVo.addOccursList(occursList);
 
 			}
+			if (cnt == 0) {
+				throw new LogicException(titaVo, "E0001", ""); // 查詢資料不存在
+			}
+			if (showCustNo) {
+				this.totaVo.putParam("OShowCustNoFg", "Y");
+			}
+		} else {
+			slTxToDoDetail = txToDoDetailService.DtlValueLike(itemCode, "%"+iDtlValue+"%", this.index, this.limit, titaVo);
+			lTxToDoDetail = slTxToDoDetail == null ? null : slTxToDoDetail.getContent();
 
-		}
-		if (cnt == 0) {
-			throw new LogicException(titaVo, "E0001", ""); // 查詢資料不存在
-		}
-		if (showCustNo) {
-			this.totaVo.putParam("OShowCustNoFg", "Y");
-		}
+			Boolean showCustNo = false;
+			if (lTxToDoDetail != null && lTxToDoDetail.size() != 0) {
 
+				/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
+				if (slTxToDoDetail != null && slTxToDoDetail.hasNext()) {
+					titaVo.setReturnIndex(this.setIndexNext());
+					/* 手動折返 */
+					this.totaVo.setMsgEndToEnter();
+				}
+
+				for (TxToDoDetail tTxToDoDetail : lTxToDoDetail) {
+//				if (selectCodeIsNotQualify(tTxToDoDetail)) {
+//					continue;
+//				}
+					int custno = tTxToDoDetail.getCustNo();
+					String custName = "";
+					String custId = "";
+
+					if (custno != 0) {
+						CustMain tCustMain = custMainService.custNoFirst(custno, custno);
+						if (tCustMain != null) {
+							custName = tCustMain.getCustName();
+							custId = tCustMain.getCustId();
+						}
+						if (!showCustNo) {
+							showCustNo = true;
+						}
+
+					}
+
+					OccursList occursList = new OccursList();
+
+					int createDate = tTxToDoDetail.getDataDate();
+					if (tTxToDoDetail.getCreateDate() != null) {
+						Timestamp ts = tTxToDoDetail.getCreateDate();
+						DateFormat sdfdate = new SimpleDateFormat("yyyyMMdd");
+						String sCreateDate = sdfdate.format(ts);
+						createDate = parse.stringToInteger(sCreateDate) - 19110000;
+					}
+					occursList.putParam("OOAcDate", createDate);
+					occursList.putParam("OOStatus", tTxToDoDetail.getStatus());
+					occursList.putParam("OOCustNo", custno);
+					occursList.putParam("OOFacmNo", tTxToDoDetail.getFacmNo());
+					occursList.putParam("OOBormNo", tTxToDoDetail.getBormNo());
+					occursList.putParam("OOCustName", custName);
+					occursList.putParam("OOProcessNote", tTxToDoDetail.getProcessNote());
+					occursList.putParam("OOTxSn", tTxToDoDetail.getTitaEntdy() + titaVo.getKinbr()
+							+ tTxToDoDetail.getTitaTlrNo() + tTxToDoDetail.getTitaTxtNo()); // 登放序號
+					occursList.putParam("OOExcuteTxcd", tTxToDoDetail.getExcuteTxcd());
+					occursList.putParam("OOItemCode", tTxToDoDetail.getItemCode());
+					occursList.putParam("OODtlValue", tTxToDoDetail.getDtlValue());
+					occursList.putParam("OOCustId", custId);
+					cnt++;
+					/* 將每筆資料放入Tota的OcList */
+					this.totaVo.addOccursList(occursList);
+
+				}
+
+			}
+			if (cnt == 0) {
+				throw new LogicException(titaVo, "E0001", ""); // 查詢資料不存在
+			}
+			if (showCustNo) {
+				this.totaVo.putParam("OShowCustNoFg", "Y");
+			}
+		}
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

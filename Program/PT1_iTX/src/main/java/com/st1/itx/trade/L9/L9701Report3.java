@@ -12,9 +12,13 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.CustNotice;
+import com.st1.itx.db.domain.CustNoticeId;
+import com.st1.itx.db.service.CustNoticeService;
 import com.st1.itx.db.service.springjpa.cm.L9701ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
+import com.st1.itx.util.parse.Parse;
 
 @Component
 @Scope("prototype")
@@ -23,8 +27,12 @@ public class L9701Report3 extends MakeReport {
 	@Autowired
 	L9701ServiceImpl l9701ServiceImpl;
 
+	@Autowired
+	private CustNoticeService sCustNoticeService;
 
-	
+	@Autowired
+	Parse parse;
+
 	// 製表日期
 	private String nowDate;
 	// 製表時間
@@ -34,8 +42,6 @@ public class L9701Report3 extends MakeReport {
 	private String facmNo;
 
 	public int tempPage = 0;
-	
-	
 
 	String nextPageText = "=====  續下頁  =====";
 	String endText = "=====  報  表  結  束  =====";
@@ -101,7 +107,6 @@ public class L9701Report3 extends MakeReport {
 
 	private void printDataHeader() {
 
-
 		String tmpFacmNo = String.format("%03d", Integer.valueOf(facmNo));
 
 		this.print(1, 1, " ");
@@ -109,7 +114,7 @@ public class L9701Report3 extends MakeReport {
 		divider();
 		this.print(1, 2, "撥款");
 		this.print(0, 10, "入帳日期");
-		this.print(0, 28, "交易內容","C");
+		this.print(0, 28, "交易內容", "C");
 		this.print(0, 40, "交易金額");
 		this.print(0, 59, "暫收借");
 		this.print(0, 76, "本金");
@@ -131,7 +136,7 @@ public class L9701Report3 extends MakeReport {
 	public void divider() {
 		this.print(1, 2, "－－");
 		this.print(0, 9, "－－－－－");
-		this.print(0, 28, "－－－－－－","C");
+		this.print(0, 28, "－－－－－－", "C");
 		this.print(0, 38, "－－－－－－");
 		this.print(0, 56, "－－－－－－");
 		this.print(0, 72, "－－－－－－");
@@ -170,14 +175,33 @@ public class L9701Report3 extends MakeReport {
 		String tradeReportName = "客戶往來交易明細表";
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-				.setRptCode("L9701").setRptItem(tradeReportName)
-				.setRptSize("A4").setPageOrientation("L").build();
-		
+				.setRptCode("L9701").setRptItem(tradeReportName).setRptSize("A4").setPageOrientation("L").build();
+
 		this.open(titaVo, reportVo);
 
 		if (listL9701 != null && listL9701.size() > 0) {
 
 			for (Map<String, String> tL9701Vo : listL9701) {
+
+				int custNo = parse.stringToInteger(tL9701Vo.get("CustNo"));
+				int facmNo = parse.stringToInteger(tL9701Vo.get("FacmNo"));
+
+				CustNotice lCustNotice = new CustNotice();
+				CustNoticeId lCustNoticeId = new CustNoticeId();
+
+				lCustNoticeId.setCustNo(custNo);
+				lCustNoticeId.setFacmNo(facmNo);
+				lCustNoticeId.setFormNo("L9701");
+				lCustNotice = sCustNoticeService.findById(lCustNoticeId, titaVo);
+
+				// paper為N 表示不印
+				if (lCustNotice == null) {
+				} else {
+					if ("N".equals(lCustNotice.getPaperNotice())) {
+						continue;
+					}
+				}
+
 				if (this.NowRow - 7 >= 40) {
 					this.print(1, this.getMidXAxis(), nextPageText, "C");
 					this.newPage();
@@ -208,7 +232,6 @@ public class L9701Report3 extends MakeReport {
 						isFirst = true;
 					}
 				}
-
 
 				if (tL9701Vo.get("DB").equals("1")) {
 					printDetail1(tL9701Vo);
