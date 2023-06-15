@@ -15,6 +15,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.st1.itx.db.domain.LifeRelEmp;
+import com.st1.itx.db.domain.LifeRelEmpId;
 
 /**
  * Gen By Tool
@@ -22,7 +23,7 @@ import com.st1.itx.db.domain.LifeRelEmp;
  * @author AdamPan
  * @version 1.0.0
  */
-public interface LifeRelEmpRepositoryMon extends JpaRepository<LifeRelEmp, String> {
+public interface LifeRelEmpRepositoryMon extends JpaRepository<LifeRelEmp, LifeRelEmpId> {
 
   // AcDate = 
   public Slice<LifeRelEmp> findAllByAcDateIs(int acDate_0, Pageable pageable);
@@ -30,7 +31,7 @@ public interface LifeRelEmpRepositoryMon extends JpaRepository<LifeRelEmp, Strin
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)
-  public Optional<LifeRelEmp> findByEmpId(String empId);
+  public Optional<LifeRelEmp> findByLifeRelEmpId(LifeRelEmpId lifeRelEmpId);
 
 }
 

@@ -9,7 +9,7 @@ import javax.persistence.EntityListeners;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
-import javax.persistence.Id;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Column;
 import com.st1.itx.util.StaticTool;
 import com.st1.itx.Exception.LogicException;
@@ -28,14 +28,16 @@ import com.st1.itx.Exception.LogicException;
 public class LifeRelEmp implements Serializable {
 
 
-  // 職員身分證/統一編號
-  @Id
-  @Column(name = "`EmpId`", length = 10)
-  private String empId = " ";
+  @EmbeddedId
+  private LifeRelEmpId lifeRelEmpId;
 
   // 會計日期
-  @Column(name = "`AcDate`")
+  @Column(name = "`AcDate`", insertable = false, updatable = false)
   private int acDate = 0;
+
+  // 職員身分證/統一編號
+  @Column(name = "`EmpId`", length = 10, insertable = false, updatable = false)
+  private String empId;
 
   // 職員名稱
   @Column(name = "`EmpName`", length = 100)
@@ -64,23 +66,12 @@ public class LifeRelEmp implements Serializable {
   private String lastUpdateEmpNo;
 
 
-/**
-	* 職員身分證/統一編號<br>
-	* 
-	* @return String
-	*/
-  public String getEmpId() {
-    return this.empId == null ? "" : this.empId;
+  public LifeRelEmpId getLifeRelEmpId() {
+    return this.lifeRelEmpId;
   }
 
-/**
-	* 職員身分證/統一編號<br>
-	* 
-  *
-  * @param empId 職員身分證/統一編號
-	*/
-  public void setEmpId(String empId) {
-    this.empId = empId;
+  public void setLifeRelEmpId(LifeRelEmpId lifeRelEmpId) {
+    this.lifeRelEmpId = lifeRelEmpId;
   }
 
 /**
@@ -100,6 +91,25 @@ public class LifeRelEmp implements Serializable {
   * @throws LogicException when Date Is Warn	*/
   public void setAcDate(int acDate) throws LogicException {
     this.acDate = StaticTool.rocToBc(acDate);
+  }
+
+/**
+	* 職員身分證/統一編號<br>
+	* 
+	* @return String
+	*/
+  public String getEmpId() {
+    return this.empId == null ? "" : this.empId;
+  }
+
+/**
+	* 職員身分證/統一編號<br>
+	* 
+  *
+  * @param empId 職員身分證/統一編號
+	*/
+  public void setEmpId(String empId) {
+    this.empId = empId;
   }
 
 /**
@@ -219,7 +229,7 @@ public class LifeRelEmp implements Serializable {
 
   @Override
   public String toString() {
-    return "LifeRelEmp [empId=" + empId + ", acDate=" + acDate + ", empName=" + empName + ", loanBalance=" + loanBalance + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
+    return "LifeRelEmp [lifeRelEmpId=" + lifeRelEmpId + ", empName=" + empName + ", loanBalance=" + loanBalance + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
            + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

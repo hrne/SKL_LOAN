@@ -8,6 +8,7 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.LifeRelEmp;
 import org.springframework.data.domain.Slice;
+import com.st1.itx.db.domain.LifeRelEmpId;
 
 /**
  * Gen By Tool
@@ -20,11 +21,11 @@ public interface LifeRelEmpService {
   /**
    * findByPrimaryKey
    *
-   * @param empId PK
+   * @param lifeRelEmpId PK
    * @param titaVo Variable-Length Argument
    * @return LifeRelEmp LifeRelEmp
    */
-  public LifeRelEmp findById(String empId, TitaVo... titaVo);
+  public LifeRelEmp findById(LifeRelEmpId lifeRelEmpId, TitaVo... titaVo);
 
   /**
    * findAll
@@ -50,11 +51,11 @@ public interface LifeRelEmpService {
   /**
    * hold By LifeRelEmp
    * 
-   * @param empId key
+   * @param lifeRelEmpId key
    * @param titaVo Variable-Length Argument
    * @return LifeRelEmp LifeRelEmp
    */
-  public LifeRelEmp holdById(String empId, TitaVo... titaVo);
+  public LifeRelEmp holdById(LifeRelEmpId lifeRelEmpId, TitaVo... titaVo);
 
   /**
    * hold By LifeRelEmp

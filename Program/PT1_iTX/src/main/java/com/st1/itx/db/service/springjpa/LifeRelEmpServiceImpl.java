@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.LifeRelEmp;
+import com.st1.itx.db.domain.LifeRelEmpId;
 import com.st1.itx.db.repository.online.LifeRelEmpRepository;
 import com.st1.itx.db.repository.day.LifeRelEmpRepositoryDay;
 import com.st1.itx.db.repository.mon.LifeRelEmpRepositoryMon;
@@ -61,21 +62,21 @@ public class LifeRelEmpServiceImpl extends ASpringJpaParm implements LifeRelEmpS
   }
 
   @Override
-  public LifeRelEmp findById(String empId, TitaVo... titaVo) {
+  public LifeRelEmp findById(LifeRelEmpId lifeRelEmpId, TitaVo... titaVo) {
     String dbName = "";
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("findById " + dbName + " " + empId);
+    this.info("findById " + dbName + " " + lifeRelEmpId);
     Optional<LifeRelEmp> lifeRelEmp = null;
     if (dbName.equals(ContentName.onDay))
-      lifeRelEmp = lifeRelEmpReposDay.findById(empId);
+      lifeRelEmp = lifeRelEmpReposDay.findById(lifeRelEmpId);
     else if (dbName.equals(ContentName.onMon))
-      lifeRelEmp = lifeRelEmpReposMon.findById(empId);
+      lifeRelEmp = lifeRelEmpReposMon.findById(lifeRelEmpId);
     else if (dbName.equals(ContentName.onHist))
-      lifeRelEmp = lifeRelEmpReposHist.findById(empId);
+      lifeRelEmp = lifeRelEmpReposHist.findById(lifeRelEmpId);
     else 
-      lifeRelEmp = lifeRelEmpRepos.findById(empId);
+      lifeRelEmp = lifeRelEmpRepos.findById(lifeRelEmpId);
     LifeRelEmp obj = lifeRelEmp.isPresent() ? lifeRelEmp.get() : null;
       if(obj != null) {
         EntityManager em = this.baseEntityManager.getCurrentEntityManager(dbName);
@@ -93,9 +94,9 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "EmpId"));
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "EmpId", "AcDate"));
     else
-         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "EmpId"));
+         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "EmpId", "AcDate"));
     this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = lifeRelEmpReposDay.findAll(pageable);
@@ -141,20 +142,20 @@ em = null;
   }
 
   @Override
-  public LifeRelEmp holdById(String empId, TitaVo... titaVo) {
+  public LifeRelEmp holdById(LifeRelEmpId lifeRelEmpId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("Hold " + dbName + " " + empId);
+    this.info("Hold " + dbName + " " + lifeRelEmpId);
     Optional<LifeRelEmp> lifeRelEmp = null;
     if (dbName.equals(ContentName.onDay))
-      lifeRelEmp = lifeRelEmpReposDay.findByEmpId(empId);
+      lifeRelEmp = lifeRelEmpReposDay.findByLifeRelEmpId(lifeRelEmpId);
     else if (dbName.equals(ContentName.onMon))
-      lifeRelEmp = lifeRelEmpReposMon.findByEmpId(empId);
+      lifeRelEmp = lifeRelEmpReposMon.findByLifeRelEmpId(lifeRelEmpId);
     else if (dbName.equals(ContentName.onHist))
-      lifeRelEmp = lifeRelEmpReposHist.findByEmpId(empId);
+      lifeRelEmp = lifeRelEmpReposHist.findByLifeRelEmpId(lifeRelEmpId);
     else 
-      lifeRelEmp = lifeRelEmpRepos.findByEmpId(empId);
+      lifeRelEmp = lifeRelEmpRepos.findByLifeRelEmpId(lifeRelEmpId);
     return lifeRelEmp.isPresent() ? lifeRelEmp.get() : null;
   }
 
@@ -163,16 +164,16 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("Hold " + dbName + " " + lifeRelEmp.getEmpId());
+    this.info("Hold " + dbName + " " + lifeRelEmp.getLifeRelEmpId());
     Optional<LifeRelEmp> lifeRelEmpT = null;
     if (dbName.equals(ContentName.onDay))
-      lifeRelEmpT = lifeRelEmpReposDay.findByEmpId(lifeRelEmp.getEmpId());
+      lifeRelEmpT = lifeRelEmpReposDay.findByLifeRelEmpId(lifeRelEmp.getLifeRelEmpId());
     else if (dbName.equals(ContentName.onMon))
-      lifeRelEmpT = lifeRelEmpReposMon.findByEmpId(lifeRelEmp.getEmpId());
+      lifeRelEmpT = lifeRelEmpReposMon.findByLifeRelEmpId(lifeRelEmp.getLifeRelEmpId());
     else if (dbName.equals(ContentName.onHist))
-      lifeRelEmpT = lifeRelEmpReposHist.findByEmpId(lifeRelEmp.getEmpId());
+      lifeRelEmpT = lifeRelEmpReposHist.findByLifeRelEmpId(lifeRelEmp.getLifeRelEmpId());
     else 
-      lifeRelEmpT = lifeRelEmpRepos.findByEmpId(lifeRelEmp.getEmpId());
+      lifeRelEmpT = lifeRelEmpRepos.findByLifeRelEmpId(lifeRelEmp.getLifeRelEmpId());
     return lifeRelEmpT.isPresent() ? lifeRelEmpT.get() : null;
   }
 
@@ -187,8 +188,8 @@ em = null;
          empNot = empNot.isEmpty() ? "System" : empNot;		} else
        empNot = ThreadVariable.getEmpNot();
 
-    this.info("Insert..." + dbName + " " + lifeRelEmp.getEmpId());
-    if (this.findById(lifeRelEmp.getEmpId(), titaVo) != null)
+    this.info("Insert..." + dbName + " " + lifeRelEmp.getLifeRelEmpId());
+    if (this.findById(lifeRelEmp.getLifeRelEmpId(), titaVo) != null)
       throw new DBException(2);
 
     if (!empNot.isEmpty())
@@ -218,7 +219,7 @@ em = null;
 		} else
        empNot = ThreadVariable.getEmpNot();
 
-    this.info("Update..." + dbName + " " + lifeRelEmp.getEmpId());
+    this.info("Update..." + dbName + " " + lifeRelEmp.getLifeRelEmpId());
     if (!empNot.isEmpty())
       lifeRelEmp.setLastUpdateEmpNo(empNot);
 
@@ -243,7 +244,7 @@ em = null;
 		} else
        empNot = ThreadVariable.getEmpNot();
 
-    this.info("Update..." + dbName + " " + lifeRelEmp.getEmpId());
+    this.info("Update..." + dbName + " " + lifeRelEmp.getLifeRelEmpId());
     if (!empNot.isEmpty())
       lifeRelEmp.setLastUpdateEmpNo(empNot);
 
@@ -255,7 +256,7 @@ em = null;
         lifeRelEmpReposHist.saveAndFlush(lifeRelEmp);
     else 
       lifeRelEmpRepos.saveAndFlush(lifeRelEmp);	
-    return this.findById(lifeRelEmp.getEmpId());
+    return this.findById(lifeRelEmp.getLifeRelEmpId());
   }
 
   @Override
@@ -263,7 +264,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("Delete..." + dbName + " " + lifeRelEmp.getEmpId());
+    this.info("Delete..." + dbName + " " + lifeRelEmp.getLifeRelEmpId());
     if (dbName.equals(ContentName.onDay)) {
       lifeRelEmpReposDay.delete(lifeRelEmp);	
       lifeRelEmpReposDay.flush();
