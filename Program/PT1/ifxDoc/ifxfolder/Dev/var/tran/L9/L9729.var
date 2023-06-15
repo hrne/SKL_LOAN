@@ -49,6 +49,7 @@ E(0,0)
 ["[L9729]                             歷史封存資料搬運結果明細"],
 ["@執行日期",#InputDate],
 ["@查詢種類",#InputType,#InputTypeX],
+["@篩選條件",#FilterType,#FilterTypeX],
 ]
 !---------- AP TEXT AREA Variables ----------
 
@@ -81,12 +82,26 @@ IF(#InputDate>#DT,V(P,不可大於會計日),$)
 T(3,1:已結清並領取清償證明五年之交易明細)
 
 #InputType=A,1,I
+E(0,1)
 HELP(#InputTypeHelp)
 @T(3,@InputTypeX,)
 V(H,#InputTypeHelp)
 
 #InputTypeX=X,40,L
 T(H,#InputType,#InputTypeHelp)
+
+#FilterTypeHelp=X,40,S
+T(3,0:不篩選;1:最新一批)
+
+! 篩選條件
+#FilterType=A,1,I
+E(0,1)
+HELP(#FilterTypeHelp)
+@T(3,@FilterTypeX,)
+V(H,#FilterTypeHelp)
+
+#FilterTypeX=X,40,L
+T(H,#FilterType,#FilterTypeHelp)
 
 </sub>
 

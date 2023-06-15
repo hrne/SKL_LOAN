@@ -46,10 +46,20 @@ public class L9729Report extends MakeReport {
 		// 存取 inputDate
 		inputDate = parse.stringToInteger(titaVo.getParam("InputDate"));
 
+		int filterType = 1; // 0:不篩選;1:最新一批
+
+		if (titaVo.containsKey("FilterType")) {
+			filterType = parse.stringToInteger(titaVo.getParam("FilterType"));
+		}
+
 		List<Map<String, String>> listL9729 = null;
 
 		try {
-			listL9729 = l9729ServiceImpl.findAll(workType.getCode(), titaVo);
+			if (filterType == 0) {
+				listL9729 = l9729ServiceImpl.findAll(workType.getCode(), titaVo);
+			} else if (filterType == 1) {
+				listL9729 = l9729ServiceImpl.findLast(workType.getCode(), titaVo);
+			}
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));

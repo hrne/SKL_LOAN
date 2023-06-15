@@ -40,7 +40,7 @@ IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L9803月報]進入),$)
 E(0,#SYSDATE)
 @V(7)
 A(DATE,0,#DueDate)
-V(5,0,#SYSDATE)
+V(5,0,9991231)
 
 
 #PrinBal=M,14,I

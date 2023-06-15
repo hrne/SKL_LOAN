@@ -46,6 +46,8 @@ public class L9130 extends TradeBuffer {
 	private L9137 tranL9137;
 	@Autowired
 	private L9138 tranL9138;
+	@Autowired
+	private L9138 tranL9139;
 
 	@Autowired
 	private WebClient webClient;
@@ -213,6 +215,14 @@ public class L9130 extends TradeBuffer {
 
 			try {
 				tranL9138.run(titaVo);
+			} catch (Exception e) {
+				StringWriter errors = new StringWriter();
+				e.printStackTrace(new PrintWriter(errors));
+				this.error("L9130產生L9138放款授信日報表時發生錯誤 = " + errors.toString());
+			}
+
+			try {
+				tranL9139.run(titaVo);
 			} catch (Exception e) {
 				StringWriter errors = new StringWriter();
 				e.printStackTrace(new PrintWriter(errors));

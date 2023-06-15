@@ -72,7 +72,7 @@ public class L3130 extends TradeBuffer {
 		String iIncludeIntFlag = titaVo.getParam("IncludeIntFlag");
 		String iUnpaidIntFlag = titaVo.getParam("UnpaidIntFlag");
 		String iIncludeFeeFlag = titaVo.getParam("IncludeFeeFlag");
-
+		titaVo.putParam("FUNCIND", iFuncCode);
 		// 檢查輸入資料
 		if (!(iFuncCode >= 1 && iFuncCode <= 5)) {
 			throw new LogicException(titaVo, "E0010", "功能 = " + iFuncCode); // 功能選擇錯誤
@@ -144,7 +144,7 @@ public class L3130 extends TradeBuffer {
 				}
 
 				datalog.setEnv(titaVo, beforeLoanBook, tLoanBook);
-				datalog.exec();
+				datalog.exec("修改約定部分償還");
 
 				// 修改日期時先刪除後新增
 			} else {
@@ -187,7 +187,7 @@ public class L3130 extends TradeBuffer {
 				}
 
 				datalog.setEnv(titaVo, beforeLoanBook, tLoanBook);
-				datalog.exec();
+				datalog.exec("修改約定部分償還");
 			}
 
 			break;
@@ -200,12 +200,12 @@ public class L3130 extends TradeBuffer {
 				throw new LogicException(titaVo, "E3056", "放款約定還本檔"); // 該筆資料已回收
 			}
 			try {
-				datalog.setEnv(titaVo, tLoanBook, tLoanBook);
-				datalog.exec("刪除約定部分償還");
 				loanBookService.delete(tLoanBook, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0008", "放款約定還本檔 " + e.getErrorMsg()); // 刪除資料時，發生錯誤
 			}
+			datalog.setEnv(titaVo, tLoanBook, tLoanBook);
+			datalog.exec("刪除約定部分償還");
 			break;
 		case 5: // 查詢
 			break;

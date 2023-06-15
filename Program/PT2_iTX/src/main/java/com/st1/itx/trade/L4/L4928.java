@@ -55,7 +55,7 @@ public class L4928 extends TradeBuffer {
 		}
 
 		if (this.index == 0 && (resultList == null || resultList.size() == 0)) {
-			throw new LogicException(titaVo, "E0001", "撥款主檔"); // 查無資料
+			throw new LogicException(titaVo, "E2003", "同額度不同繳息迄日"); // 查無資料
 		}
 
 		// 如有找到資料
