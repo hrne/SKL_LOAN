@@ -9,7 +9,7 @@ import javax.persistence.EntityListeners;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
-import javax.persistence.Id;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Column;
 import com.st1.itx.util.StaticTool;
 import com.st1.itx.Exception.LogicException;
@@ -28,18 +28,20 @@ import com.st1.itx.Exception.LogicException;
 public class FinHoldRel implements Serializable {
 
 
-  // 身分證/統一編號
-  @Id
-  @Column(name = "`Id`", length = 10)
-  private String id = " ";
+  @EmbeddedId
+  private FinHoldRelId finHoldRelId;
 
   // 會計日期
-  @Column(name = "`AcDate`")
+  @Column(name = "`AcDate`", insertable = false, updatable = false)
   private int acDate = 0;
 
   // 所在公司
   @Column(name = "`CompanyName`", length = 100)
   private String companyName;
+
+  // 身分證/統一編號
+  @Column(name = "`Id`", length = 10, insertable = false, updatable = false)
+  private String id;
 
   // 姓名
   @Column(name = "`Name`", length = 100)
@@ -77,23 +79,12 @@ public class FinHoldRel implements Serializable {
   private String lastUpdateEmpNo;
 
 
-/**
-	* 身分證/統一編號<br>
-	* 
-	* @return String
-	*/
-  public String getId() {
-    return this.id == null ? "" : this.id;
+  public FinHoldRelId getFinHoldRelId() {
+    return this.finHoldRelId;
   }
 
-/**
-	* 身分證/統一編號<br>
-	* 
-  *
-  * @param id 身分證/統一編號
-	*/
-  public void setId(String id) {
-    this.id = id;
+  public void setFinHoldRelId(FinHoldRelId finHoldRelId) {
+    this.finHoldRelId = finHoldRelId;
   }
 
 /**
@@ -132,6 +123,25 @@ public class FinHoldRel implements Serializable {
 	*/
   public void setCompanyName(String companyName) {
     this.companyName = companyName;
+  }
+
+/**
+	* 身分證/統一編號<br>
+	* 
+	* @return String
+	*/
+  public String getId() {
+    return this.id == null ? "" : this.id;
+  }
+
+/**
+	* 身分證/統一編號<br>
+	* 
+  *
+  * @param id 身分證/統一編號
+	*/
+  public void setId(String id) {
+    this.id = id;
   }
 
 /**
@@ -309,7 +319,7 @@ J：其他
 
   @Override
   public String toString() {
-    return "FinHoldRel [id=" + id + ", acDate=" + acDate + ", companyName=" + companyName + ", name=" + name + ", busTitle=" + busTitle + ", lineAmt=" + lineAmt
+    return "FinHoldRel [finHoldRelId=" + finHoldRelId + ", companyName=" + companyName + ", name=" + name + ", busTitle=" + busTitle + ", lineAmt=" + lineAmt
            + ", loanBalance=" + loanBalance + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

@@ -8,6 +8,7 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.FinHoldRel;
 import org.springframework.data.domain.Slice;
+import com.st1.itx.db.domain.FinHoldRelId;
 
 /**
  * Gen By Tool
@@ -20,11 +21,11 @@ public interface FinHoldRelService {
   /**
    * findByPrimaryKey
    *
-   * @param id PK
+   * @param finHoldRelId PK
    * @param titaVo Variable-Length Argument
    * @return FinHoldRel FinHoldRel
    */
-  public FinHoldRel findById(String id, TitaVo... titaVo);
+  public FinHoldRel findById(FinHoldRelId finHoldRelId, TitaVo... titaVo);
 
   /**
    * findAll
@@ -50,11 +51,11 @@ public interface FinHoldRelService {
   /**
    * hold By FinHoldRel
    * 
-   * @param id key
+   * @param finHoldRelId key
    * @param titaVo Variable-Length Argument
    * @return FinHoldRel FinHoldRel
    */
-  public FinHoldRel holdById(String id, TitaVo... titaVo);
+  public FinHoldRel holdById(FinHoldRelId finHoldRelId, TitaVo... titaVo);
 
   /**
    * hold By FinHoldRel

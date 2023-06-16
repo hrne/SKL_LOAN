@@ -33,13 +33,18 @@ public class LifeRelHeadId implements Serializable {
   @Column(name = "`BusId`", length = 10)
   private String busId = " ";
 
+  // 會計日期
+  @Column(name = "`AcDate`")
+  private int acDate = 0;
+
   public LifeRelHeadId() {
   }
 
-  public LifeRelHeadId(String headId, String relId, String busId) {
+  public LifeRelHeadId(String headId, String relId, String busId, int acDate) {
     this.headId = headId;
     this.relId = relId;
     this.busId = busId;
+    this.acDate = acDate;
   }
 
 /**
@@ -99,10 +104,29 @@ public class LifeRelHeadId implements Serializable {
     this.busId = busId;
   }
 
+/**
+	* 會計日期<br>
+	* 
+	* @return Integer
+	*/
+  public int getAcDate() {
+    return  StaticTool.bcToRoc(this.acDate);
+  }
+
+/**
+	* 會計日期<br>
+	* 
+  *
+  * @param acDate 會計日期
+  * @throws LogicException when Date Is Warn	*/
+  public void setAcDate(int acDate) throws LogicException {
+    this.acDate = StaticTool.rocToBc(acDate);
+  }
+
 
   @Override
   public int hashCode() {
-    return Objects.hash(headId, relId, busId);
+    return Objects.hash(headId, relId, busId, acDate);
   }
 
   @Override
@@ -112,11 +136,11 @@ public class LifeRelHeadId implements Serializable {
     if(obj == null || getClass() != obj.getClass())
       return false;
     LifeRelHeadId lifeRelHeadId = (LifeRelHeadId) obj;
-    return headId.equals(lifeRelHeadId.headId) && relId.equals(lifeRelHeadId.relId) && busId.equals(lifeRelHeadId.busId);
+    return headId.equals(lifeRelHeadId.headId) && relId.equals(lifeRelHeadId.relId) && busId.equals(lifeRelHeadId.busId) && acDate == lifeRelHeadId.acDate;
   }
 
   @Override
   public String toString() {
-    return "LifeRelHeadId [headId=" + headId + ", relId=" + relId + ", busId=" + busId + "]";
+    return "LifeRelHeadId [headId=" + headId + ", relId=" + relId + ", busId=" + busId + ", acDate=" + acDate + "]";
   }
 }

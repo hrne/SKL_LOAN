@@ -15,6 +15,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.st1.itx.db.domain.FinHoldRel;
+import com.st1.itx.db.domain.FinHoldRelId;
 
 /**
  * Gen By Tool
@@ -22,7 +23,7 @@ import com.st1.itx.db.domain.FinHoldRel;
  * @author AdamPan
  * @version 1.0.0
  */
-public interface FinHoldRelRepositoryDay extends JpaRepository<FinHoldRel, String> {
+public interface FinHoldRelRepositoryDay extends JpaRepository<FinHoldRel, FinHoldRelId> {
 
   // AcDate = 
   public Slice<FinHoldRel> findAllByAcDateIs(int acDate_0, Pageable pageable);
@@ -30,7 +31,7 @@ public interface FinHoldRelRepositoryDay extends JpaRepository<FinHoldRel, Strin
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)
-  public Optional<FinHoldRel> findById(String id);
+  public Optional<FinHoldRel> findByFinHoldRelId(FinHoldRelId finHoldRelId);
 
   // 
   @Procedure(value = "\"Usp_L7_FinHoldRel_Upd\"")

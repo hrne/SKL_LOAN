@@ -53,35 +53,44 @@ public class L5737ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String sql = "  ";
 
-		sql += " WITH CF AS ( ";
-		sql += "   SELECT DISTINCT CF.\"CustNo\" AS \"CustNo\" ";
-		sql += "        , CF.\"FacmNo\" AS \"FacmNo\" ";
-		sql += "        , ROW_NUMBER() ";
-		sql += "          OVER ( ";
-		sql += "            PARTITION BY CF.\"CustNo\" ";
-		sql += "                       , CF.\"FacmNo\" ";
-		sql += "                       , CF.\"ClCode1\" ";
-		sql += "                       , CF.\"ClCode2\" ";
-		sql += "                       , CF.\"ClNo\" ";
-		// 20230522 佳怡說明：擔保品改成鑑價日最接近核准日期的評估
-		sql += "            ORDER BY ABS(NVL(CAS.\"ApproveDate\",0) - NVL(CE.\"EvaDate\",19110101) ) ASC ";
-		sql += "          )                               AS \"Seq\" ";
-		sql += "        , NVL(CE.\"EvaNetWorth\",0) AS \"EvaNetWorth\" ";
-		sql += "   FROM \"ClFac\" CF ";
-		sql += "   LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = CF.\"CustNo\" ";
-		sql += "                            AND FAC.\"FacmNo\" = CF.\"FacmNo\" ";
-		sql += "   LEFT JOIN \"FacCaseAppl\" CAS ON CAS.\"ApplNo\" = CF.\"ApproveNo\" ";
-		sql += "   LEFT JOIN \"ClEva\" CE ON CE.\"ClCode1\" = CF.\"ClCode1\" ";
-		sql += "                         AND CE.\"ClCode2\" = CF.\"ClCode2\" ";
-		sql += "                         AND CE.\"ClNo\" = CF.\"ClNo\" ";
-		sql += "   WHERE NVL(CAS.\"ApproveDate\",0) > 0 ";
-		sql += " ) ";
-		sql += " , \"CFSum\" AS ( ";
+//		sql += " WITH CF AS ( ";
+//		sql += "   SELECT DISTINCT CF.\"CustNo\" AS \"CustNo\" ";
+//		sql += "        , CF.\"FacmNo\" AS \"FacmNo\" ";
+//		sql += "        , ROW_NUMBER() ";
+//		sql += "          OVER ( ";
+//		sql += "            PARTITION BY CF.\"CustNo\" ";
+//		sql += "                       , CF.\"FacmNo\" ";
+//		sql += "                       , CF.\"ClCode1\" ";
+//		sql += "                       , CF.\"ClCode2\" ";
+//		sql += "                       , CF.\"ClNo\" ";
+//		// 20230522 佳怡說明：擔保品改成鑑價日最接近核准日期的評估
+//		sql += "            ORDER BY ABS(NVL(CAS.\"ApproveDate\",0) - NVL(CE.\"EvaDate\",19110101) ) ASC ";
+//		sql += "          )                               AS \"Seq\" ";
+//		sql += "        , NVL(CE.\"EvaNetWorth\",0) AS \"EvaNetWorth\" ";
+//		sql += "   FROM \"ClFac\" CF ";
+//		sql += "   LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = CF.\"CustNo\" ";
+//		sql += "                            AND FAC.\"FacmNo\" = CF.\"FacmNo\" ";
+//		sql += "   LEFT JOIN \"FacCaseAppl\" CAS ON CAS.\"ApplNo\" = CF.\"ApproveNo\" ";
+//		sql += "   LEFT JOIN \"ClEva\" CE ON CE.\"ClCode1\" = CF.\"ClCode1\" ";
+//		sql += "                         AND CE.\"ClCode2\" = CF.\"ClCode2\" ";
+//		sql += "                         AND CE.\"ClNo\" = CF.\"ClNo\" ";
+//		sql += "   WHERE NVL(CAS.\"ApproveDate\",0) > 0 ";
+//		sql += " ) ";
+//		sql += " , \"CFSum\" AS ( ";
+//		sql += "   SELECT \"CustNo\" ";
+//		sql += "        , \"FacmNo\" ";
+//		sql += "        , SUM(NVL(\"EvaNetWorth\",0)) AS \"EvaNetWorth\" ";
+//		sql += "   FROM CF ";
+//		sql += "   WHERE \"Seq\" = 1 "; // 每個擔保品只取一筆
+//		sql += "   GROUP BY \"CustNo\" ";
+//		sql += "          , \"FacmNo\" ";
+//		sql += " )";
+		sql += " WITH \"CFSum\" AS ( ";
 		sql += "   SELECT \"CustNo\" ";
 		sql += "        , \"FacmNo\" ";
-		sql += "        , SUM(NVL(\"EvaNetWorth\",0)) AS \"EvaNetWorth\" ";
-		sql += "   FROM CF ";
-		sql += "   WHERE \"Seq\" = 1 "; // 每個擔保品只取一筆
+		sql += "        , SUM(NVL(\"OriEvaNetWorth\",0)) AS \"EvaNetWorth\" ";
+		sql += "   FROM \"ClFac\"";
+		sql += "   WHERE \"MainFlag\" = 'Y' ";
 		sql += "   GROUP BY \"CustNo\" ";
 		sql += "          , \"FacmNo\" ";
 		sql += " )";
@@ -111,9 +120,9 @@ public class L5737ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"LoanBorMain\" LBM ON LBM.\"CustNo\" = MLB.\"CustNo\" ";
 		sql += "                            AND LBM.\"FacmNo\" = MLB.\"FacmNo\" ";
 		sql += "                            AND LBM.\"BormNo\" = MLB.\"BormNo\" ";
-		sql += " LEFT JOIN \"ClFac\" CF ON CF.\"CustNo\" = FM.\"CustNo\" ";
-		sql += "                       AND CF.\"FacmNo\" = FM.\"FacmNo\" ";
-		sql += "                       AND CF.\"MainFlag\" = 'Y' ";
+//		sql += " LEFT JOIN \"ClFac\" CF ON CF.\"CustNo\" = FM.\"CustNo\" ";
+//		sql += "                       AND CF.\"FacmNo\" = FM.\"FacmNo\" ";
+//		sql += "                       AND CF.\"MainFlag\" = 'Y' ";
 		sql += "LEFT JOIN \"CFSum\" CS ON CS.\"CustNo\" = FM.\"CustNo\" ";
 		sql += "                    AND CS.\"FacmNo\" = FM.\"FacmNo\" ";
 		sql += " WHERE MLB.\"YearMonth\" = :inputYearMonth ";

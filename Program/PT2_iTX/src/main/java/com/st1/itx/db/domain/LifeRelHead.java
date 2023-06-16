@@ -32,7 +32,7 @@ public class LifeRelHead implements Serializable {
   private LifeRelHeadId lifeRelHeadId;
 
   // 會計日期
-  @Column(name = "`AcDate`")
+  @Column(name = "`AcDate`", insertable = false, updatable = false)
   private int acDate = 0;
 
   // 與本公司關之關係
@@ -546,7 +546,7 @@ J：其他
 
   @Override
   public String toString() {
-    return "LifeRelHead [lifeRelHeadId=" + lifeRelHeadId + ", acDate=" + acDate + ", relWithCompany=" + relWithCompany + ", headName=" + headName + ", headTitle=" + headTitle
+    return "LifeRelHead [lifeRelHeadId=" + lifeRelHeadId + ", relWithCompany=" + relWithCompany + ", headName=" + headName + ", headTitle=" + headTitle
            + ", relName=" + relName + ", relKinShip=" + relKinShip + ", relTitle=" + relTitle + ", busName=" + busName + ", shareHoldingRatio=" + shareHoldingRatio
            + ", busTitle=" + busTitle + ", lineAmt=" + lineAmt + ", loanBalance=" + loanBalance + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
            + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";

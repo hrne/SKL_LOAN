@@ -190,7 +190,7 @@ public class L9135ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          , SUM(R.\"DbAmt\") AS \"DbAmt\" ";
 		sql += "          , SUM(R.\"CrAmt\") AS \"CrAmt\" ";
 		sql += "     FROM rawData R";
-		sql += "     WHERE R.\"EntAcCode\" = 0";
+		sql += "     WHERE R.\"EntAcCode\" = 0  AND R.\"TitaBatchNo\" = ' '";
 		sql += "     GROUP BY R.\"AcNoCode\" ";
 		sql += "            , R.\"AcNoItem\" ";
 		sql += "            , R.\"AcSubCode\" ";

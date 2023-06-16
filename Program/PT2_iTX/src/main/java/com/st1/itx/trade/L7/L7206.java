@@ -18,7 +18,9 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.FinHoldRel;
+import com.st1.itx.db.domain.FinHoldRelId;
 import com.st1.itx.db.domain.LifeRelEmp;
+import com.st1.itx.db.domain.LifeRelEmpId;
 import com.st1.itx.db.domain.LifeRelHead;
 import com.st1.itx.db.domain.LifeRelHeadId;
 import com.st1.itx.db.domain.StakeholdersStaff;
@@ -245,6 +247,8 @@ public class L7206 extends TradeBuffer {
 			delLifeRelHead = tLifeRelHead == null ? null : tLifeRelHead.getContent();
 			this.info("delLifeRelHead = " + delLifeRelHead);
 			int cntTrans = 0;
+
+			int cntInsert = 0;
 			for (OccursList tempOccursList : occursList) {
 
 				String iRelWithCompany = tempOccursList.get("RelWithCompany").toString();
@@ -266,9 +270,9 @@ public class L7206 extends TradeBuffer {
 				sLifeRelHeadId.setHeadId(iHeadId);
 				sLifeRelHeadId.setRelId(iRelId);
 				sLifeRelHeadId.setBusId(iBusId);
-
+				sLifeRelHeadId.setAcDate(acDate);
+				
 				LifeRelHead sLifeRelHead = new LifeRelHead();
-				sLifeRelHead.setAcDate(acDate);
 				sLifeRelHead.setLifeRelHeadId(sLifeRelHeadId);
 				sLifeRelHead.setRelWithCompany(iRelWithCompany);
 				sLifeRelHead.setHeadName(maskData(iHeadName));
@@ -295,10 +299,12 @@ public class L7206 extends TradeBuffer {
 
 					try {
 
-						if (delLifeRelHead != null) {
+						if (delLifeRelHead != null && cntInsert == 0) {
+
 							this.info("1.delete old data");
 							tLifeRelHeadService.deleteAll(delLifeRelHead, titaVo);
 						}
+
 						this.info("2.insert new data");
 						tLifeRelHeadService.insertAll(inLifeRelHead, titaVo);
 
@@ -311,10 +317,11 @@ public class L7206 extends TradeBuffer {
 
 					try {
 
-						if (delLifeRelHead != null) {
+						if (delLifeRelHead != null && cntInsert == 0) {
 							this.info("1.delete old data");
 							tLifeRelHeadService.deleteAll(delLifeRelHead, titaVo);
 						}
+
 						this.info("2.insert new data");
 						tLifeRelHeadService.insertAll(inLifeRelHead, titaVo);
 
@@ -323,21 +330,22 @@ public class L7206 extends TradeBuffer {
 					}
 
 					cntTrans = 0;
+					cntInsert++;
 					inLifeRelHead = new ArrayList<LifeRelHead>();
 
 				}
 			} // for
 
-			
 			titaVo.setDataBaseOnLine();// 指定連線報環境
 			this.info("onLine");
 
 			try {
 
-				if (delLifeRelHead != null) {
+				if (delLifeRelHead != null && cntInsert == 0) {
 					this.info("1.delete old data");
 					tLifeRelHeadService.deleteAll(delLifeRelHead, titaVo);
 				}
+
 				this.info("2.insert new data");
 				tLifeRelHeadService.insertAll(inLifeRelHead, titaVo);
 
@@ -350,7 +358,7 @@ public class L7206 extends TradeBuffer {
 
 			try {
 
-				if (delLifeRelHead != null) {
+				if (delLifeRelHead != null && cntInsert == 0) {
 					this.info("1.delete old data");
 					tLifeRelHeadService.deleteAll(delLifeRelHead, titaVo);
 				}
@@ -360,37 +368,6 @@ public class L7206 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
-			
-//			this.info("inLifeRelHead =" + inLifeRelHead.toString());
-//
-//			try {
-//
-//				if (delLifeRelHead != null) {
-//					this.info("1.delete old data");
-//					tLifeRelHeadService.deleteAll(delLifeRelHead, titaVo);
-//				}
-//				this.info("2.insert new data");
-//				tLifeRelHeadService.insertAll(inLifeRelHead, titaVo);
-//
-//			} catch (DBException e) {
-//				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
-//			}
-//
-//			titaVo.setDataBaseOnMon();// 指定月報環境
-//			this.info("onMon");
-//
-//			try {
-//
-//				if (delLifeRelHead != null) {
-//					this.info("1.delete old data");
-//					tLifeRelHeadService.deleteAll(delLifeRelHead, titaVo);
-//				}
-//				this.info("2.insert new data");
-//				tLifeRelHeadService.insertAll(inLifeRelHead, titaVo);
-//
-//			} catch (DBException e) {
-//				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
-//			}
 
 			// 2:人壽利關人職員名單[T07_2];xlsx xls
 		} else if (iFunctionCode == 2) {
@@ -410,9 +387,12 @@ public class L7206 extends TradeBuffer {
 				String iEmpName = tempOccursList.get("EmpName").toString();
 				BigDecimal iLoanBalance = new BigDecimal(tempOccursList.get("LoanBalance"));
 
+				LifeRelEmpId sLifeRelEmpId = new LifeRelEmpId();
+				sLifeRelEmpId.setAcDate(acDate);
+				sLifeRelEmpId.setEmpId(iEmpId);
+
 				LifeRelEmp sLifeRelEmp = new LifeRelEmp();
-				sLifeRelEmp.setAcDate(acDate);
-				sLifeRelEmp.setEmpId(iEmpId);
+				sLifeRelEmp.setLifeRelEmpId(sLifeRelEmpId);
 				sLifeRelEmp.setEmpName(maskData(iEmpName));
 				sLifeRelEmp.setLoanBalance(iLoanBalance);
 
@@ -473,10 +453,14 @@ public class L7206 extends TradeBuffer {
 				BigDecimal iLineAmt = new BigDecimal(tempOccursList.get("LineAmt"));
 				BigDecimal iLoanBalance = new BigDecimal(tempOccursList.get("LoanBalance"));
 
+				FinHoldRelId sFinHoldRelId = new FinHoldRelId();
+				sFinHoldRelId.setId(iId);
+				sFinHoldRelId.setAcDate(acDate);
+				
+				
 				FinHoldRel sFinHoldRel = new FinHoldRel();
-				sFinHoldRel.setAcDate(acDate);
+				sFinHoldRel.setFinHoldRelId(sFinHoldRelId);
 				sFinHoldRel.setCompanyName(maskData(iCompanyName));
-				sFinHoldRel.setId(iId);
 				sFinHoldRel.setName(maskData(iName));
 				sFinHoldRel.setBusTitle(iBusTitle);
 				sFinHoldRel.setLineAmt(iLineAmt);
@@ -512,6 +496,7 @@ public class L7206 extends TradeBuffer {
 					this.info("1.delete old data");
 					tFinHoldRelService.deleteAll(delFinHoldRel, titaVo);
 				}
+
 				this.info("2.insert new data");
 				tFinHoldRelService.insertAll(inFinHoldRel, titaVo);
 
@@ -530,24 +515,6 @@ public class L7206 extends TradeBuffer {
 		return this.sendList();
 
 	}
-
-//	public void updateData(TitaVo titaVo,List insData,List delData) throws LogicException {
-//
-//		
-//		try {
-//
-//			if (delData != null) {
-//				this.info("1.delete old data");
-//				tFinHoldRelService.deleteAll(delData, titaVo);
-//			}
-//			this.info("2.insert new data");
-//			tFinHoldRelService.insertAll(insData, titaVo);
-//
-//		} catch (DBException e) {
-//			throw new LogicException(titaVo, "E0007", e.getErrorMsg());
-//		}
-//		
-//	}
 
 	/**
 	 * 處理CSV檔案資料
@@ -872,7 +839,7 @@ public class L7206 extends TradeBuffer {
 
 	private String converntScientificNotation(String text) {
 		String resText = "";
-		this.info("text before= " + text);
+//		this.info("text before= " + text);
 		if (text.contains("E") && text.length() != 10) {
 			BigDecimal decimalFormat = new BigDecimal(text);
 			resText = decimalFormat.toPlainString();
@@ -882,7 +849,7 @@ public class L7206 extends TradeBuffer {
 			resText = text;
 		}
 
-		this.info("text after = " + resText);
+//		this.info("text after = " + resText);
 		return resText;
 	}
 

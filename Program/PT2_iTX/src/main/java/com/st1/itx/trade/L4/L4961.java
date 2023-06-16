@@ -173,9 +173,9 @@ public class L4961 extends TradeBuffer {
 				throw new LogicException("E0013", e.getMessage());
 			}
 			ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getKinbr()).setRptDate(titaVo.getEntDyI())
-					.setRptCode("L4961").setRptItem("測試EXCLE").build();
+					.setRptCode("L4961").setRptItem("L4961").build();
 			// open
-			makeExcel.open(titaVo, reportVo, "測試EXCLE"); 
+			makeExcel.open(titaVo, reportVo, "L4961"); 
 			makeExcel.setValue(1,1,"火險到期年月");
 			makeExcel.setValue(1,2,"原保單號碼");
 			makeExcel.setValue(1,3,"新保單號碼");

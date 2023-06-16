@@ -141,7 +141,7 @@ RESET_RIM(#RimL5r32,L5R32)
 E(0,@RimFuncCode,1)
 S(L5R32,1,#RimFuncCode,#RimAcDate)
 R(1,L5R32)
-E(0,@AcDate,#L5r32LastMonthEndDay)
+! E(0,@AcDate,#L5r32LastMonthEndDay)
 
 ! 日期
 #AcDate=D,7,I

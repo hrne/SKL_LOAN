@@ -80,23 +80,13 @@ public class BS050 extends TradeBuffer {
 				List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
 
 //				篩出未銷的未齊件資料
-				this.info("齊件銷號日期 = " + t.getCloseDate());
 				if (t.getCloseDate() != 0 || t.getYetDate() == 0) {
 					continue;
 				}
 //				篩出未齊件已到期資料 
-				this.info("齊件日期 = " + t.getYetDate());
-				this.info("上營業日 = " + this.txBuffer.getMgBizDate().getLbsDy());
 				if (t.getYetDate() > this.txBuffer.getMgBizDate().getLbsDy()) {
 					continue;
 				}
-//				取未齊件代碼中文 找不到時放入原代碼
-//				CdCode tCdCode = cdCodeService.findById(new CdCodeId("NotYetCode", t.getNotYetCode()), titaVo);
-//				if (tCdCode != null) {
-//					wkNotYetItem = tCdCode.getItem();
-//				} else {
-//					wkNotYetItem = t.getNotYetCode();
-//				}
 
 				/*
 				 * 未齊件代碼說明2022.2.9 by 昱衡
@@ -112,7 +102,8 @@ public class BS050 extends TradeBuffer {
 //				取額度建檔所列[房貸專員/企金人員]
 				if (tFacMain != null && !"".equals(tFacMain.getBusinessOfficer())) {
 
-					bodyText += " 案件編號 " + tFacMain.getCreditSysNo() + " 核准號碼 " + tFacMain.getApplNo() + " 初貸日 " + tFacMain.getFirstDrawdownDate() + " 房貸專員 " + tFacMain.getBusinessOfficer();
+					bodyText += " 案件編號 " + tFacMain.getCreditSysNo() + " 核准號碼 " + tFacMain.getApplNo() + " 初貸日 "
+							+ tFacMain.getFirstDrawdownDate() + " 房貸專員 " + tFacMain.getBusinessOfficer();
 					if (!"".equals(tFacMain.getBusinessOfficer())) {
 
 						tEmpNo = tFacMain.getBusinessOfficer();
@@ -121,7 +112,8 @@ public class BS050 extends TradeBuffer {
 					}
 
 				}
-				slLoanBorMain = loanBorMainService.bormCustNoEq(t.getCustNo(), t.getFacmNo(), t.getFacmNo(), 0, 900, 0, Integer.MAX_VALUE, titaVo);
+				slLoanBorMain = loanBorMainService.bormCustNoEq(t.getCustNo(), t.getFacmNo(), t.getFacmNo(), 0, 900, 0,
+						Integer.MAX_VALUE, titaVo);
 				lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 				if (lLoanBorMain != null && lLoanBorMain.size() > 0) {
 //				取「L3100撥款」登錄經辦
@@ -138,18 +130,16 @@ public class BS050 extends TradeBuffer {
 					}
 				}
 
-				String subject = "未齊件到期通知 借戶 " + FormatUtil.pad9("" + t.getCustNo(), 7) + "-" + FormatUtil.pad9("" + t.getFacmNo(), 3) + " 說明 :  " + wkNotYetItem;
+				String subject = "未齊件到期通知 借戶 " + FormatUtil.pad9("" + t.getCustNo(), 7) + "-"
+						+ FormatUtil.pad9("" + t.getFacmNo(), 3) + " 說明 :  " + wkNotYetItem;
 
 				bodyText += " 齊件到期日 " + t.getYetDate() + " 備註 " + t.getReMark();
-
-				this.info("subject=" + subject + " ,bodyText=" + bodyText);
 
 				// 經辦代號找員工姓名
 				for (String t3 : lEmpNo) {
 
 					TxTeller tTxTeller = txTellerService.findById(t3, titaVo);
 					if (tTxTeller != null && !"".equals(tTxTeller.getEmail().trim())) {
-						this.info("tTxTeller.getEmail()=" + tTxTeller.getEmail().trim());
 						mailService.setParams(tTxTeller.getEmail(), subject, bodyText);
 						mailService.exec();
 					}

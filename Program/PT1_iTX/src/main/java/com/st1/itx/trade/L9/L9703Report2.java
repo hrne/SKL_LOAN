@@ -15,7 +15,10 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.buffer.TxBuffer;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.CustNotice;
+import com.st1.itx.db.domain.CustNoticeId;
 import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.CustNoticeService;
 import com.st1.itx.db.service.springjpa.cm.L9703ServiceImpl;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.CustNoticeCom;
@@ -40,6 +43,9 @@ public class L9703Report2 extends MakeReport {
 
 	@Autowired
 	public CustMainService custMainService;
+
+	@Autowired
+	private CustNoticeService sCustNoticeService;
 
 	@Autowired
 	BaTxCom dBaTxCom;
@@ -109,12 +115,33 @@ public class L9703Report2 extends MakeReport {
 
 		this.info("L9703List-------->" + L9703List.size());
 		for (Map<String, String> tL9703Vo : L9703List) {
-			// 檢查 CustNotice 是否設定不通知
-			String custNoInput = titaVo.get("CustNo");
+			
 			int custNo = parse.stringToInteger(tL9703Vo.get("CustNo"));
 			int facmNo = parse.stringToInteger(tL9703Vo.get("FacmNo"));
-			if (custNoticeCom.checkIsLetterSendable(custNoInput, custNo, facmNo, "L9703", titaVo))
-				report(tL9703Vo, txbuffer, titaVo);
+
+			CustNotice lCustNotice = new CustNotice();
+			CustNoticeId lCustNoticeId = new CustNoticeId();
+
+			lCustNoticeId.setCustNo(custNo);
+			lCustNoticeId.setFacmNo(facmNo);
+			lCustNoticeId.setFormNo("L9701");
+			lCustNotice = sCustNoticeService.findById(lCustNoticeId, titaVo);
+
+			// paper為N 表示不印
+			if (lCustNotice == null) {
+			} else {
+				if ("N".equals(lCustNotice.getPaperNotice())) {
+					continue;
+				}
+			}
+			
+			report(tL9703Vo, txbuffer, titaVo);
+			// 檢查 CustNotice 是否設定不通知
+//			String custNoInput = titaVo.get("CustNo");
+//			int custNo = parse.stringToInteger(tL9703Vo.get("CustNo"));
+//			int facmNo = parse.stringToInteger(tL9703Vo.get("FacmNo"));
+//			if (custNoticeCom.checkIsLetterSendable(custNoInput, custNo, facmNo, "L9703", titaVo))
+				
 		}
 
 		if (this.getPrintCnt() == 0) {

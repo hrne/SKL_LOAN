@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.FinHoldRel;
+import com.st1.itx.db.domain.FinHoldRelId;
 import com.st1.itx.db.repository.online.FinHoldRelRepository;
 import com.st1.itx.db.repository.day.FinHoldRelRepositoryDay;
 import com.st1.itx.db.repository.mon.FinHoldRelRepositoryMon;
@@ -61,21 +62,21 @@ public class FinHoldRelServiceImpl extends ASpringJpaParm implements FinHoldRelS
   }
 
   @Override
-  public FinHoldRel findById(String id, TitaVo... titaVo) {
+  public FinHoldRel findById(FinHoldRelId finHoldRelId, TitaVo... titaVo) {
     String dbName = "";
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("findById " + dbName + " " + id);
+    this.info("findById " + dbName + " " + finHoldRelId);
     Optional<FinHoldRel> finHoldRel = null;
     if (dbName.equals(ContentName.onDay))
-      finHoldRel = finHoldRelReposDay.findById(id);
+      finHoldRel = finHoldRelReposDay.findById(finHoldRelId);
     else if (dbName.equals(ContentName.onMon))
-      finHoldRel = finHoldRelReposMon.findById(id);
+      finHoldRel = finHoldRelReposMon.findById(finHoldRelId);
     else if (dbName.equals(ContentName.onHist))
-      finHoldRel = finHoldRelReposHist.findById(id);
+      finHoldRel = finHoldRelReposHist.findById(finHoldRelId);
     else 
-      finHoldRel = finHoldRelRepos.findById(id);
+      finHoldRel = finHoldRelRepos.findById(finHoldRelId);
     FinHoldRel obj = finHoldRel.isPresent() ? finHoldRel.get() : null;
       if(obj != null) {
         EntityManager em = this.baseEntityManager.getCurrentEntityManager(dbName);
@@ -93,9 +94,9 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "Id"));
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "Id", "AcDate"));
     else
-         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "Id"));
+         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "Id", "AcDate"));
     this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = finHoldRelReposDay.findAll(pageable);
@@ -141,20 +142,20 @@ em = null;
   }
 
   @Override
-  public FinHoldRel holdById(String id, TitaVo... titaVo) {
+  public FinHoldRel holdById(FinHoldRelId finHoldRelId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("Hold " + dbName + " " + id);
+    this.info("Hold " + dbName + " " + finHoldRelId);
     Optional<FinHoldRel> finHoldRel = null;
     if (dbName.equals(ContentName.onDay))
-      finHoldRel = finHoldRelReposDay.findById(id);
+      finHoldRel = finHoldRelReposDay.findByFinHoldRelId(finHoldRelId);
     else if (dbName.equals(ContentName.onMon))
-      finHoldRel = finHoldRelReposMon.findById(id);
+      finHoldRel = finHoldRelReposMon.findByFinHoldRelId(finHoldRelId);
     else if (dbName.equals(ContentName.onHist))
-      finHoldRel = finHoldRelReposHist.findById(id);
+      finHoldRel = finHoldRelReposHist.findByFinHoldRelId(finHoldRelId);
     else 
-      finHoldRel = finHoldRelRepos.findById(id);
+      finHoldRel = finHoldRelRepos.findByFinHoldRelId(finHoldRelId);
     return finHoldRel.isPresent() ? finHoldRel.get() : null;
   }
 
@@ -163,16 +164,16 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("Hold " + dbName + " " + finHoldRel.getId());
+    this.info("Hold " + dbName + " " + finHoldRel.getFinHoldRelId());
     Optional<FinHoldRel> finHoldRelT = null;
     if (dbName.equals(ContentName.onDay))
-      finHoldRelT = finHoldRelReposDay.findById(finHoldRel.getId());
+      finHoldRelT = finHoldRelReposDay.findByFinHoldRelId(finHoldRel.getFinHoldRelId());
     else if (dbName.equals(ContentName.onMon))
-      finHoldRelT = finHoldRelReposMon.findById(finHoldRel.getId());
+      finHoldRelT = finHoldRelReposMon.findByFinHoldRelId(finHoldRel.getFinHoldRelId());
     else if (dbName.equals(ContentName.onHist))
-      finHoldRelT = finHoldRelReposHist.findById(finHoldRel.getId());
+      finHoldRelT = finHoldRelReposHist.findByFinHoldRelId(finHoldRel.getFinHoldRelId());
     else 
-      finHoldRelT = finHoldRelRepos.findById(finHoldRel.getId());
+      finHoldRelT = finHoldRelRepos.findByFinHoldRelId(finHoldRel.getFinHoldRelId());
     return finHoldRelT.isPresent() ? finHoldRelT.get() : null;
   }
 
@@ -187,8 +188,8 @@ em = null;
          empNot = empNot.isEmpty() ? "System" : empNot;		} else
        empNot = ThreadVariable.getEmpNot();
 
-    this.info("Insert..." + dbName + " " + finHoldRel.getId());
-    if (this.findById(finHoldRel.getId(), titaVo) != null)
+    this.info("Insert..." + dbName + " " + finHoldRel.getFinHoldRelId());
+    if (this.findById(finHoldRel.getFinHoldRelId(), titaVo) != null)
       throw new DBException(2);
 
     if (!empNot.isEmpty())
@@ -218,7 +219,7 @@ em = null;
 		} else
        empNot = ThreadVariable.getEmpNot();
 
-    this.info("Update..." + dbName + " " + finHoldRel.getId());
+    this.info("Update..." + dbName + " " + finHoldRel.getFinHoldRelId());
     if (!empNot.isEmpty())
       finHoldRel.setLastUpdateEmpNo(empNot);
 
@@ -243,7 +244,7 @@ em = null;
 		} else
        empNot = ThreadVariable.getEmpNot();
 
-    this.info("Update..." + dbName + " " + finHoldRel.getId());
+    this.info("Update..." + dbName + " " + finHoldRel.getFinHoldRelId());
     if (!empNot.isEmpty())
       finHoldRel.setLastUpdateEmpNo(empNot);
 
@@ -255,7 +256,7 @@ em = null;
         finHoldRelReposHist.saveAndFlush(finHoldRel);
     else 
       finHoldRelRepos.saveAndFlush(finHoldRel);	
-    return this.findById(finHoldRel.getId());
+    return this.findById(finHoldRel.getFinHoldRelId());
   }
 
   @Override
@@ -263,7 +264,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("Delete..." + dbName + " " + finHoldRel.getId());
+    this.info("Delete..." + dbName + " " + finHoldRel.getFinHoldRelId());
     if (dbName.equals(ContentName.onDay)) {
       finHoldRelReposDay.delete(finHoldRel);	
       finHoldRelReposDay.flush();

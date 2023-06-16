@@ -21,38 +21,19 @@ import com.st1.itx.Exception.LogicException;
 public class LifeRelEmpId implements Serializable {
 
 
-  // 職員身分證/統一編號
-  @Column(name = "`EmpId`", length = 10)
-  private String empId = " ";
-
   // 會計日期
   @Column(name = "`AcDate`")
   private int acDate = 0;
 
+  // 職員身分證/統一編號
+  @Column(name = "`EmpId`", length = 10)
+  private String empId = " ";
+
   public LifeRelEmpId() {
   }
 
-  public LifeRelEmpId(String empId, int acDate) {
-    this.empId = empId;
+  public LifeRelEmpId(int acDate, String empId) {
     this.acDate = acDate;
-  }
-
-/**
-	* 職員身分證/統一編號<br>
-	* 
-	* @return String
-	*/
-  public String getEmpId() {
-    return this.empId == null ? "" : this.empId;
-  }
-
-/**
-	* 職員身分證/統一編號<br>
-	* 
-  *
-  * @param empId 職員身分證/統一編號
-	*/
-  public void setEmpId(String empId) {
     this.empId = empId;
   }
 
@@ -75,10 +56,29 @@ public class LifeRelEmpId implements Serializable {
     this.acDate = StaticTool.rocToBc(acDate);
   }
 
+/**
+	* 職員身分證/統一編號<br>
+	* 
+	* @return String
+	*/
+  public String getEmpId() {
+    return this.empId == null ? "" : this.empId;
+  }
+
+/**
+	* 職員身分證/統一編號<br>
+	* 
+  *
+  * @param empId 職員身分證/統一編號
+	*/
+  public void setEmpId(String empId) {
+    this.empId = empId;
+  }
+
 
   @Override
   public int hashCode() {
-    return Objects.hash(empId, acDate);
+    return Objects.hash(acDate, empId);
   }
 
   @Override
@@ -88,11 +88,11 @@ public class LifeRelEmpId implements Serializable {
     if(obj == null || getClass() != obj.getClass())
       return false;
     LifeRelEmpId lifeRelEmpId = (LifeRelEmpId) obj;
-    return empId.equals(lifeRelEmpId.empId) && acDate == lifeRelEmpId.acDate;
+    return acDate == lifeRelEmpId.acDate && empId.equals(lifeRelEmpId.empId);
   }
 
   @Override
   public String toString() {
-    return "LifeRelEmpId [empId=" + empId + ", acDate=" + acDate + "]";
+    return "LifeRelEmpId [acDate=" + acDate + ", empId=" + empId + "]";
   }
 }

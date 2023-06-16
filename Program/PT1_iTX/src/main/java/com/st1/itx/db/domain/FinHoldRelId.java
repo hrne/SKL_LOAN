@@ -10,31 +10,31 @@ import com.st1.itx.util.StaticTool;
 import com.st1.itx.Exception.LogicException;
 
 /**
- * LifeRelEmp 人壽利關人職員檔 T07_2
-(使用報表：LM013)<br>
+ * FinHoldRel 金控利關人名單檔 T044
+(使用報表：LM049、LQ005)<br>
  * Gen By Tool
  * 
  * @author AdamPan
  * @version 1.0.0
  */
 @Embeddable
-public class LifeRelEmpId implements Serializable {
+public class FinHoldRelId implements Serializable {
 
 
   // 會計日期
   @Column(name = "`AcDate`")
   private int acDate = 0;
 
-  // 職員身分證/統一編號
-  @Column(name = "`EmpId`", length = 10)
-  private String empId = " ";
+  // 身分證/統一編號
+  @Column(name = "`Id`", length = 10)
+  private String id = " ";
 
-  public LifeRelEmpId() {
+  public FinHoldRelId() {
   }
 
-  public LifeRelEmpId(int acDate, String empId) {
+  public FinHoldRelId(int acDate, String id) {
     this.acDate = acDate;
-    this.empId = empId;
+    this.id = id;
   }
 
 /**
@@ -57,28 +57,28 @@ public class LifeRelEmpId implements Serializable {
   }
 
 /**
-	* 職員身分證/統一編號<br>
+	* 身分證/統一編號<br>
 	* 
 	* @return String
 	*/
-  public String getEmpId() {
-    return this.empId == null ? "" : this.empId;
+  public String getId() {
+    return this.id == null ? "" : this.id;
   }
 
 /**
-	* 職員身分證/統一編號<br>
+	* 身分證/統一編號<br>
 	* 
   *
-  * @param empId 職員身分證/統一編號
+  * @param id 身分證/統一編號
 	*/
-  public void setEmpId(String empId) {
-    this.empId = empId;
+  public void setId(String id) {
+    this.id = id;
   }
 
 
   @Override
   public int hashCode() {
-    return Objects.hash(acDate, empId);
+    return Objects.hash(acDate, id);
   }
 
   @Override
@@ -87,12 +87,12 @@ public class LifeRelEmpId implements Serializable {
       return true;
     if(obj == null || getClass() != obj.getClass())
       return false;
-    LifeRelEmpId lifeRelEmpId = (LifeRelEmpId) obj;
-    return acDate == lifeRelEmpId.acDate && empId.equals(lifeRelEmpId.empId);
+    FinHoldRelId finHoldRelId = (FinHoldRelId) obj;
+    return acDate == finHoldRelId.acDate && id.equals(finHoldRelId.id);
   }
 
   @Override
   public String toString() {
-    return "LifeRelEmpId [acDate=" + acDate + ", empId=" + empId + "]";
+    return "FinHoldRelId [acDate=" + acDate + ", id=" + id + "]";
   }
 }

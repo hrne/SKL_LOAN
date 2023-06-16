@@ -138,7 +138,7 @@ public class L1R20 extends TradeBuffer {
 		String s2 = "";
 
 		// 沒申請者 或 要書面通知(表示要列印)資料庫上為N者 不列印記號為Y
-		if (custNotice == null || "N".equals(custNotice.getPaperNotice())) {
+		if (custNotice == null || "Y".equals(custNotice.getPaperNotice())) {
 			notPrintLetter = false;
 		}
 

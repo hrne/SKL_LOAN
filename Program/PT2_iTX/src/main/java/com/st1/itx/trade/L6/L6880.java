@@ -264,26 +264,30 @@ public class L6880 extends TradeBuffer {
 	}
 
 	private void chgTxnoTo0(TitaVo titaVo) throws LogicException {
-		Slice<TxTeller> txTellerSlice = txTellerService.findAll(0, Integer.MAX_VALUE);
-		List<TxTeller> txTellerLi = txTellerSlice.hasContent() ? txTellerSlice.getContent() : null;
+        Slice<TxTeller> txTellerSlice = txTellerService.findAll(0, Integer.MAX_VALUE);
+        List<TxTeller> txTellerLi = txTellerSlice.hasContent() ? txTellerSlice.getContent() : null;
 
-		if (Objects.isNull(txTellerLi))
-			return;
+        //本身有預做不能是1
+        int txtNo = 1;
 
-		for (TxTeller te : txTellerLi)
-			if (te.getTlrNo().trim().equals(titaVo.getTlrNo().trim())) {
-				TxRecord txRecord = txRecordService.findEntdyFirst(this.getTxBuffer().getTxBizDate().getTbsDyf(), te.getTlrNo(), "00");
-				te.setTxtNo(Objects.isNull(txRecord) ? 1 : parse.stringToInteger(txRecord.getTxSeq()) + 1);
-			} else {
-				TxRecord txRecord = txRecordService.findEntdyFirst(this.getTxBuffer().getTxBizDate().getTbsDyf(), te.getTlrNo(), "00");
-				te.setTxtNo(Objects.isNull(txRecord) ? 0 : parse.stringToInteger(txRecord.getTxSeq()));
-			}
-		try {
-			txTellerService.updateAll(txTellerLi, titaVo);
-			titaVo.putParam(ContentName.txtno, FormatUtil.pad9("1", 8));
-		} catch (DBException e) {
-			this.error("TxTeller update all TxNo False!!!");
-		}
-	}
+        if (Objects.isNull(txTellerLi))
+            return;
+
+        for (TxTeller te : txTellerLi)
+            if (te.getTlrNo().trim().equals(titaVo.getTlrNo().trim())) {
+                TxRecord txRecord = txRecordService.findEntdyFirst(this.getTxBuffer().getTxBizDate().getTbsDyf(), te.getTlrNo(), "00");
+                te.setTxtNo(Objects.isNull(txRecord) ? 1 : parse.stringToInteger(txRecord.getTxSeq()) + 1);
+                txtNo = te.getTxtNo();
+            } else {
+                TxRecord txRecord = txRecordService.findEntdyFirst(this.getTxBuffer().getTxBizDate().getTbsDyf(), te.getTlrNo(), "00");
+                te.setTxtNo(Objects.isNull(txRecord) ? 0 : parse.stringToInteger(txRecord.getTxSeq()));
+            }
+        try {
+            txTellerService.updateAll(txTellerLi, titaVo);
+            titaVo.putParam(ContentName.txtno, FormatUtil.pad9(Integer.toString(txtNo), 8));
+        } catch (DBException e) {
+            this.error("TxTeller update all TxNo False!!!");
+        }
+    }
 
 }

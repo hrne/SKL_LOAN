@@ -350,7 +350,7 @@ T(3,[L9703] 滯繳客戶明細表)
 <include src="ROM.icf::L4R32.tom"/>
 ! 調Rim相關 結束
 TXFORM=L9703
-#NLetter
+
 ^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>

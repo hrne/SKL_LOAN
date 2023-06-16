@@ -65,7 +65,6 @@ C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@SelectCode,#NTXBUF,1,1)
 T(1,@ItemCode,#NTXBUF,2,6)
 T(1,@AutoFg,#NTXBUF,38,1)
-ALERT(#NTXBUF)
 
 #SelectCode=A,1,S
 #SelectCodeX=X,16,L
