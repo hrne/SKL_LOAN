@@ -88,7 +88,7 @@ public class L9724Report extends MakeReport {
 		int mfbsdy = parse.stringToInteger(titaVo.getParam("inputEndOfMonthDate")) + 19110000;
 		this.info("mfbsdy = " + mfbsdy);
 		// fill in inputDate with proper format
-		String targetDate = parse.IntegerToString(mfbsdy, 1); // YYYYMMDD
+		String targetDate = String.valueOf(mfbsdy); // YYYYMMDD
 
 		// at F1
 		makeExcel.setValue(1, 6, String.format("月差 %s/%s/%s", targetDate.substring(0, 4), targetDate.substring(4, 6),

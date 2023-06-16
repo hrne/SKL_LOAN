@@ -75,10 +75,7 @@ public class L2631ReportA extends MakeReport {
 	// 自訂表尾
 	@Override
 	public void printFooter() {
-		this.setFontSize(8);
-		this.print(-83, 2, "SKL-B#DBB94!5");
-
-//		this.print(-15, 25, "放款部部章：　　　　　　　　　　　　　　　　　　　經辦：" + this.titaVo.getTlrNo());
+		
 	}
 
 	public void exec(TitaVo titaVo) throws LogicException {

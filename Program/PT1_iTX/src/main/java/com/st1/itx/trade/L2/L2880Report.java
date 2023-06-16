@@ -156,26 +156,26 @@ public class L2880Report extends MakeReport {
 			this.print(3, 10, "備註 . . . . . .  " + titaVo.getParam("ReMark"));
 			break;
 		case 3:
-			this.print(1, 10, "調整原因 . . . .  3  延長寬限期 " + titaVo.getParam("GracePeriod"));
+			this.print(1, 10, "調整原因 . . . .  3  延長寬限期 " + titaVo.getParam("GracePeriod") + " 年");
 			this.print(3, 10, "備註 . . . . . .  " + titaVo.getParam("ReMark"));
 			break;
 		case 4:
-			this.print(1, 10, "調整原因 . . . .  4  縮短年限 " + titaVo.getParam("ShortenYear"));
+			this.print(1, 10, "調整原因 . . . .  4  縮短年限 " + titaVo.getParam("ShortenYear") + " 年");
 			this.print(3, 10, "備註 . . . . . .  " + titaVo.getParam("ReMark"));
 			break;
 		case 5:
-			this.print(1, 10, "調整原因 . . . .  5  延長年限 " + titaVo.getParam("ExtendYear"));
+			this.print(1, 10, "調整原因 . . . .  5  延長年限 " + titaVo.getParam("ExtendYear") + " 年");
 			this.print(3, 10, "備註 . . . . . .  " + titaVo.getParam("ReMark"));
 			break;
 		default:
 			break;
 		}
 
-		this.print(10, 16, "職業：  _____________ ");
+		this.print(9, 16, "職業：  _____________ ");
 		this.print(1, 16, "收入：  _____________ ");
 		this.print(1, 16, "地區：  _____________ ");
 
-		this.print(10, 10, "◎除利率調整外，有年期變更者，均須附申請書（借款人親自簽名、簽章）");
+		this.print(9, 10, "◎除利率調整外，有年期變更者，均須附申請書（借款人親自簽名、簽章）");
 		this.print(5, 10, "經                      經                          協");
 		this.print(1, 10, "辦                      理                          理");
 		long sno = this.close();

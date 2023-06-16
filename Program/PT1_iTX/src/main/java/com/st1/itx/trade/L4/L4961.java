@@ -186,6 +186,7 @@ public class L4961 extends TradeBuffer {
 			makeExcel.setValue(1,8,"處理代碼");
 			makeExcel.setValue(1,9,"會計日期");
 			makeExcel.setValue(1,10,"保單收件日");
+			int ixTotInsuPrem=0;
 			if (resultList != null && resultList.size() > 0) {
 				/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 				int R = 2;
@@ -199,9 +200,63 @@ public class L4961 extends TradeBuffer {
 					String iCustNo = result.get("F3");
 					String iFacmNo = result.get("F4");
 					String iCustName = result.get("F5");
-					String iTotInsuPrem = result.get("F6");
-					String iRepayCode = result.get("F7");
+					
+					int iTotInsuPrem = parse.stringToInteger(result.get("F6"));
+					
+					String iRepayCode = "";
+					int iF7	= parse.stringToInteger(result.get("F7"));
+					if(iF7==1) {
+						iRepayCode = "匯款轉帳";
+					}
+					if(iF7==2) {
+						iRepayCode = "銀行扣款";
+					}
+					if(iF7==3) {
+						iRepayCode = "員工扣薪";
+					}
+					if(iF7==4) {
+						iRepayCode = "支票";
+					}
+					if(iF7==5) {
+						iRepayCode = "特約金";
+					}
+					if(iF7==6) {
+						iRepayCode = "人事特約金";
+					}
+					if(iF7==7) {
+						iRepayCode = "定存特約";
+					}
+					if(iF7==8) {
+						iRepayCode = "劃撥存款";
+					}
+					if(iF7==9) {
+						iRepayCode = "其他";
+					}
+					if(iF7==90) {
+						iRepayCode = "暫收抵款";
+					}
+					if(iF7==99) {
+						iRepayCode = "全部";
+					}
 
+					String iStatusCode = "";
+					int iF8 = parse.stringToInteger(result.get("F8"));
+					if(iF8==0) {
+						iStatusCode= "正常";
+					}
+					if(iF8==1) {
+						iStatusCode= "借支";
+					}
+					if(iF8==2) {
+						iStatusCode= "催收";
+					}
+					if(iF8==3) {
+						iStatusCode= "呆帳";
+					}
+					if(iF8==4) {
+						iStatusCode= "結案";
+					}
+	
 					int insuMonth = parse.stringToInteger(result.get("F0"));
 					int acDate = parse.stringToInteger(result.get("F9"));
 					int insDate = parse.stringToInteger(result.get("F14"));
@@ -219,11 +274,11 @@ public class L4961 extends TradeBuffer {
 					makeExcel.setValue(R,1,insuMonth);
 					makeExcel.setValue(R,2,iPrevInsuNo);
 					makeExcel.setValue(R,3,iNowInsuNo);
-					makeExcel.setValue(R,4,iCustNo);
-					makeExcel.setValue(R,5,iFacmNo);
-					makeExcel.setValue(R,6,iCustName);
-					makeExcel.setValue(R,7,iTotInsuPrem);
-					makeExcel.setValue(R,8,iRepayCode);
+					makeExcel.setValue(R,4,iCustNo+"-"+iFacmNo);
+					makeExcel.setValue(R,5,iCustName);
+					makeExcel.setValue(R,6,iTotInsuPrem);
+					makeExcel.setValue(R,7,iRepayCode);
+					makeExcel.setValue(R,8,iStatusCode);
 					if(acDate == 0) {
 						makeExcel.setValue(R,9,"");	
 					}else {
@@ -235,6 +290,15 @@ public class L4961 extends TradeBuffer {
 						makeExcel.setValue(R,10,insDate);						
 					}
 					
+					
+					ixTotInsuPrem += iTotInsuPrem;
+					if((R-1)==resultList.size()) {
+						makeExcel.setValue(R+1,1, "合計筆數");
+						makeExcel.setValue(R+1,2, R-1);
+						makeExcel.setValue(R+1,5, "合計金額");
+						makeExcel.setValue(R+1,6,ixTotInsuPrem);
+					}
+						
 					R++;
 					
 				}

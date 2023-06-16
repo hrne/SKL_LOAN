@@ -121,8 +121,7 @@ public class L2631ReportD extends MakeReport {
 	// 自訂表尾
 	@Override
 	public void printFooter() {
-		this.setFontSize(8);
-		this.print(-83, 2, "SKL-B#DBB94!5");
+		
 	}
 
 	public Boolean exec(TitaVo titaVo, TotaVo totaVo) throws LogicException {
