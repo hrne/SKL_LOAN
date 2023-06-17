@@ -36,7 +36,7 @@ public class FinHoldRel implements Serializable {
   private int acDate = 0;
 
   // 所在公司
-  @Column(name = "`CompanyName`", length = 100)
+  @Column(name = "`CompanyName`", length = 100, insertable = false, updatable = false)
   private String companyName;
 
   // 身分證/統一編號
@@ -319,7 +319,7 @@ J：其他
 
   @Override
   public String toString() {
-    return "FinHoldRel [finHoldRelId=" + finHoldRelId + ", companyName=" + companyName + ", name=" + name + ", busTitle=" + busTitle + ", lineAmt=" + lineAmt
+    return "FinHoldRel [finHoldRelId=" + finHoldRelId + ", name=" + name + ", busTitle=" + busTitle + ", lineAmt=" + lineAmt
            + ", loanBalance=" + loanBalance + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

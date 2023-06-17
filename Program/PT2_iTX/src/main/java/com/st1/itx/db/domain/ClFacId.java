@@ -2,8 +2,12 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * ClFac 擔保品與額度關聯檔<br>
@@ -16,12 +20,7 @@ import javax.persistence.Embeddable;
 public class ClFacId implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -7358705965384503812L;
-
-// 擔保品代號1
+  // 擔保品代號1
   /* 擔保品代號檔CdCl */
   @Column(name = "`ClCode1`")
   private int clCode1 = 0;
@@ -36,7 +35,6 @@ public class ClFacId implements Serializable {
   private int clNo = 0;
 
   // 核准號碼
-  /* 規劃調整為ApplNo */
   @Column(name = "`ApproveNo`")
   private int approveNo = 0;
 
@@ -109,7 +107,7 @@ public class ClFacId implements Serializable {
 
 /**
 	* 核准號碼<br>
-	* 規劃調整為ApplNo
+	* 
 	* @return Integer
 	*/
   public int getApproveNo() {
@@ -118,7 +116,7 @@ public class ClFacId implements Serializable {
 
 /**
 	* 核准號碼<br>
-	* 規劃調整為ApplNo
+	* 
   *
   * @param approveNo 核准號碼
 	*/

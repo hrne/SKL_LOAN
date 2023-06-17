@@ -1,8 +1,8 @@
 #!/bin/bash
 # 2023-06-14 ST1-Wei 列出證書別名及有效期限
 
-# 設定 .pfx 檔案路徑
-PFX_PATH=startwca.pfx
+# 設定 .pfx 檔案名稱
+PFX_PATH="/home/weblogic/ca/startwca.pfx"
 
 # 提示輸入密碼
 echo "Please enter the keystore password:"

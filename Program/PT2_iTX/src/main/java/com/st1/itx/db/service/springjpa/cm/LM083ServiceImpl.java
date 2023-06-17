@@ -73,11 +73,7 @@ public class LM083ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   GROUP BY \"CustNo\" ";
 		sql += "          , \"FacmNo\" ";
 		sql += " )";
-		sql += " SELECT CASE ";
-		sql += "          WHEN c.\"EntCode\" = '0' ";
-		sql += "          THEN N' ' ";
-		sql += "        ELSE c.\"CustName\" ";
-		sql += "        END                        AS F0 "; // 戶名
+		sql += " SELECT c.\"CustName\"             AS F0 "; // 戶名
 		sql += "      , m.\"CustNo\" ";
 		sql += "        || '-' || m.\"FacmNo\"     AS F1 "; // 戶號-額度
 		sql += "      , CASE ";

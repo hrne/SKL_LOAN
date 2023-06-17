@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -10,6 +11,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Column;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * ClFac 擔保品與額度關聯檔<br>
@@ -24,12 +27,7 @@ import javax.persistence.Column;
 public class ClFac implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 6290702549507426016L;
-
-@EmbeddedId
+  @EmbeddedId
   private ClFacId clFacId;
 
   // 擔保品代號1
@@ -47,7 +45,6 @@ public class ClFac implements Serializable {
   private int clNo = 0;
 
   // 核准號碼
-  /* 規劃調整為ApplNo */
   @Column(name = "`ApproveNo`", insertable = false, updatable = false)
   private int approveNo = 0;
 
@@ -74,10 +71,15 @@ public class ClFac implements Serializable {
   @Column(name = "`ShareAmt`")
   private BigDecimal shareAmt = new BigDecimal("0");
 
-  // 設定金額/股數
+  // 原設定金額/股數
   /* 擔保品與額度綁定時當下的設定金額(擔保品最新的設定金額應到各類擔保品檔查詢) */
   @Column(name = "`OriSettingAmt`")
   private BigDecimal oriSettingAmt = new BigDecimal("0");
+
+  // 原評估淨值
+  /* 擔保品與額度綁定時當下的原評估淨值 */
+  @Column(name = "`OriEvaNotWorth`")
+  private BigDecimal oriEvaNotWorth = new BigDecimal("0");
 
   // 建檔日期時間
   @CreatedDate
@@ -165,7 +167,7 @@ public class ClFac implements Serializable {
 
 /**
 	* 核准號碼<br>
-	* 規劃調整為ApplNo
+	* 
 	* @return Integer
 	*/
   public int getApproveNo() {
@@ -174,7 +176,7 @@ public class ClFac implements Serializable {
 
 /**
 	* 核准號碼<br>
-	* 規劃調整為ApplNo
+	* 
   *
   * @param approveNo 核准號碼
 	*/
@@ -288,7 +290,7 @@ N:否
   }
 
 /**
-	* 設定金額/股數<br>
+	* 原設定金額/股數<br>
 	* 擔保品與額度綁定時當下的設定金額
 (擔保品最新的設定金額應到各類擔保品檔查詢)
 	* @return BigDecimal
@@ -298,14 +300,33 @@ N:否
   }
 
 /**
-	* 設定金額/股數<br>
+	* 原設定金額/股數<br>
 	* 擔保品與額度綁定時當下的設定金額
 (擔保品最新的設定金額應到各類擔保品檔查詢)
   *
-  * @param oriSettingAmt 設定金額/股數
+  * @param oriSettingAmt 原設定金額/股數
 	*/
   public void setOriSettingAmt(BigDecimal oriSettingAmt) {
     this.oriSettingAmt = oriSettingAmt;
+  }
+
+/**
+	* 原評估淨值<br>
+	* 擔保品與額度綁定時當下的原評估淨值
+	* @return BigDecimal
+	*/
+  public BigDecimal getOriEvaNotWorth() {
+    return this.oriEvaNotWorth;
+  }
+
+/**
+	* 原評估淨值<br>
+	* 擔保品與額度綁定時當下的原評估淨值
+  *
+  * @param oriEvaNotWorth 原評估淨值
+	*/
+  public void setOriEvaNotWorth(BigDecimal oriEvaNotWorth) {
+    this.oriEvaNotWorth = oriEvaNotWorth;
   }
 
 /**
@@ -388,7 +409,7 @@ N:否
   @Override
   public String toString() {
     return "ClFac [clFacId=" + clFacId + ", custNo=" + custNo + ", facmNo=" + facmNo
-           + ", mainFlag=" + mainFlag + ", facShareFlag=" + facShareFlag + ", shareAmt=" + shareAmt + ", oriSettingAmt=" + oriSettingAmt + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
-           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", mainFlag=" + mainFlag + ", facShareFlag=" + facShareFlag + ", shareAmt=" + shareAmt + ", oriSettingAmt=" + oriSettingAmt + ", oriEvaNotWorth=" + oriEvaNotWorth + ", createDate=" + createDate
+           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

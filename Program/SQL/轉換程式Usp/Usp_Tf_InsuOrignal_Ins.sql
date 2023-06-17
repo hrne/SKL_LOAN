@@ -62,6 +62,10 @@ BEGIN
              || LPAD(INSP.GDRNUM,7,'0')
              || LPAD(INSP.LGTSEQ,2,'0')
                 AS "EndoInsuNo"
+           , CASE
+               WHEN CNM."TfStatus" NOT IN (1,3)
+               THEN '轉換留存'
+             ELSE '' END AS "Remark"
       FROM "LA$INSP" INSP
       -- 2023-05-30 Wei 補正資料 from Sharepoint\19\資料轉換\不動產押品建物火險檔-擔保品號碼為0
       LEFT JOIN "ClNoMap" CNM ON CNM."GdrId1" = CASE
@@ -142,6 +146,7 @@ BEGIN
           , '999999'                     AS "CreateEmpNo"     -- 建檔人員 VARCHAR2 6 
           , JOB_START_TIME               AS "LastUpdate"      -- 最後更新日期時間 DATE  
           , '999999'                     AS "LastUpdateEmpNo" -- 最後更新人員 VARCHAR2 6 
+          , "Remark"                     AS "Remark"
       FROM INSP
     )
     SELECT S."ClCode1"                  AS "ClCode1"         -- 擔保品-代號1 DECIMAL 1 0
@@ -188,7 +193,7 @@ BEGIN
          , S."InsuStartDate"            AS "InsuStartDate"   -- 保險起日 DECIMAL 8 0
          , S."InsuEndDate"              AS "InsuEndDate"     -- 保險迄日 DECIMAL 8 0
          , ''                           AS "CommericalFlag"  -- 住宅險改商業險註記 VARCHAR2 1
-         , ''                           AS "Remark"          -- 備註 VARCHAR2 50
+         , S."Remark"                   AS "Remark"          -- 備註 VARCHAR2 50
          , S."CreateDate"               AS "CreateDate"      -- 建檔日期時間 DATE  
          , S."CreateEmpNo"              AS "CreateEmpNo"     -- 建檔人員 VARCHAR2 6 
          , S."LastUpdate"               AS "LastUpdate"      -- 最後更新日期時間 DATE  

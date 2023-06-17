@@ -94,9 +94,9 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "Id", "AcDate"));
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "Id", "AcDate", "CompanyName"));
     else
-         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "Id", "AcDate"));
+         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "Id", "AcDate", "CompanyName"));
     this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = finHoldRelReposDay.findAll(pageable);

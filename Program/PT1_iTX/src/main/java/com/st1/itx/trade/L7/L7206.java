@@ -456,11 +456,10 @@ public class L7206 extends TradeBuffer {
 				FinHoldRelId sFinHoldRelId = new FinHoldRelId();
 				sFinHoldRelId.setId(iId);
 				sFinHoldRelId.setAcDate(acDate);
-				
+				sFinHoldRelId.setCompanyName(maskData(iCompanyName));
 				
 				FinHoldRel sFinHoldRel = new FinHoldRel();
 				sFinHoldRel.setFinHoldRelId(sFinHoldRelId);
-				sFinHoldRel.setCompanyName(maskData(iCompanyName));
 				sFinHoldRel.setName(maskData(iName));
 				sFinHoldRel.setBusTitle(iBusTitle);
 				sFinHoldRel.setLineAmt(iLineAmt);

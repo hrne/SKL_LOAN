@@ -70,37 +70,23 @@ public class LY004Report2 extends MakeReport {
 
 //		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LY004", "非RBC_表14-4_會計部年度檢查報表", "LY004-非RBC_表14-4_會計部年度檢查報表", "LY004_底稿_非RBC_表14-4_會計部年度檢查報表.xlsx", "表14-4");
 
-
 		makeExcel.setValue(2, 2, inputYearMonth);
 
+		int row = 9;
 		if (lY004List != null && !lY004List.isEmpty()) {
-			// 有資料時處理
 
-			for (Map<String, String> tLDVo : lY004List) {
-				// F0~F12 在 row 6, col 2~14
-				// F13~F25 在 row 13, col 3~15
+			BigDecimal OvduAmt = new BigDecimal(lY004List.get(0).get("OvduAmt"));
+			BigDecimal DiffOvduAmt = new BigDecimal(lY004List.get(0).get("DiffOvduAmt"));
+			BigDecimal LoanBal = new BigDecimal(lY004List.get(0).get("LoanBal"));
+			BigDecimal DiffLoanBal = new BigDecimal(lY004List.get(0).get("DiffLoanBal"));
+			BigDecimal Ratio = new BigDecimal(lY004List.get(0).get("Ratio"));
 
-				for (int i = 0; i <= 25; i++) {
-					int col = i <= 12 ? i + 2 : i - 10;
-					int row = i <= 12 ? 6 : 13;
-					String valueStr = tLDVo.get("F" + i);
-					BigDecimal valueNum = BigDecimal.ZERO;
+			makeExcel.setValue(row, 2, OvduAmt, "#,##0");
+			makeExcel.setValue(row, 3, DiffOvduAmt, "#,##0");
+			makeExcel.setValue(row, 4, LoanBal, "#,##0");
+			makeExcel.setValue(row, 5, DiffLoanBal, "#,##0");
+			makeExcel.setValue(row, 6, Ratio, "0.00%");
 
-					if (valueStr != null && !valueStr.isEmpty() && parse.isNumeric(valueStr)) {
-						valueNum = getBigDecimal(valueStr);
-					}
-
-					// F4 是 % 數
-					switch (i) {
-					case 4:
-						makeExcel.setValue(row, col, valueNum, "0.00%");
-						break;
-					default:
-						makeExcel.setValue(row, col, valueNum, "#,##0");
-						break;
-					}
-				}
-			}
 		} else {
 			// 無資料時處理
 			makeExcel.setValue(6, 2, "本日無資料!!");

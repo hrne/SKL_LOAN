@@ -2,16 +2,16 @@
 # 2023-06-14 ST1-Wei 建立trustJKS
 
 # 設定 KeyStore 名稱
-KEYSTORE_NAME=trustJKS.jks
+KEYSTORE_NAME="/home/weblogic/catrustJKS.jks"
 
 # 設定 KeyStore 密碼
-KEYSTORE_PASS=23895858
+KEYSTORE_PASS="23895858"
 
 # 設定 root.cer 檔案路徑
-ROOT_CER_PATH=root.cer
+ROOT_CER_PATH="root.cer"
 
 # 設定 uac.cer 檔案路徑
-UCA_CER_PATH=uca.cer
+UCA_CER_PATH="uca.cer"
 
 # 刪除原來的JKS檔案
 rm $KEYSTORE_NAME

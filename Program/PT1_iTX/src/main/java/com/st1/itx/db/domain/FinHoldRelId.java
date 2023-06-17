@@ -21,19 +21,43 @@ import com.st1.itx.Exception.LogicException;
 public class FinHoldRelId implements Serializable {
 
 
-  // 會計日期
-  @Column(name = "`AcDate`")
-  private int acDate = 0;
-
   // 身分證/統一編號
   @Column(name = "`Id`", length = 10)
   private String id = " ";
 
+  // 會計日期
+  @Column(name = "`AcDate`")
+  private int acDate = 0;
+
+  // 所在公司
+  @Column(name = "`CompanyName`", length = 100)
+  private String companyName = " ";
+
   public FinHoldRelId() {
   }
 
-  public FinHoldRelId(int acDate, String id) {
+  public FinHoldRelId(String id, int acDate, String companyName) {
+    this.id = id;
     this.acDate = acDate;
+    this.companyName = companyName;
+  }
+
+/**
+	* 身分證/統一編號<br>
+	* 
+	* @return String
+	*/
+  public String getId() {
+    return this.id == null ? "" : this.id;
+  }
+
+/**
+	* 身分證/統一編號<br>
+	* 
+  *
+  * @param id 身分證/統一編號
+	*/
+  public void setId(String id) {
     this.id = id;
   }
 
@@ -57,28 +81,28 @@ public class FinHoldRelId implements Serializable {
   }
 
 /**
-	* 身分證/統一編號<br>
+	* 所在公司<br>
 	* 
 	* @return String
 	*/
-  public String getId() {
-    return this.id == null ? "" : this.id;
+  public String getCompanyName() {
+    return this.companyName == null ? "" : this.companyName;
   }
 
 /**
-	* 身分證/統一編號<br>
+	* 所在公司<br>
 	* 
   *
-  * @param id 身分證/統一編號
+  * @param companyName 所在公司
 	*/
-  public void setId(String id) {
-    this.id = id;
+  public void setCompanyName(String companyName) {
+    this.companyName = companyName;
   }
 
 
   @Override
   public int hashCode() {
-    return Objects.hash(acDate, id);
+    return Objects.hash(id, acDate, companyName);
   }
 
   @Override
@@ -88,11 +112,11 @@ public class FinHoldRelId implements Serializable {
     if(obj == null || getClass() != obj.getClass())
       return false;
     FinHoldRelId finHoldRelId = (FinHoldRelId) obj;
-    return acDate == finHoldRelId.acDate && id.equals(finHoldRelId.id);
+    return id.equals(finHoldRelId.id) && acDate == finHoldRelId.acDate && companyName.equals(finHoldRelId.companyName);
   }
 
   @Override
   public String toString() {
-    return "FinHoldRelId [acDate=" + acDate + ", id=" + id + "]";
+    return "FinHoldRelId [id=" + id + ", acDate=" + acDate + ", companyName=" + companyName + "]";
   }
 }

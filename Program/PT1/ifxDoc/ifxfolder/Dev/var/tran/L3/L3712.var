@@ -457,6 +457,16 @@ T(B,@ExcessiveXX,#ExcessiveX+（全戶：+#ExcessiveAllX+）)
 C(3,#FacmNo,0,T(2,#TimCustNo),T(2,#TimCustNo+-+#FacmNo))
 C(3,#BormNo,0,$,T(2,#TimCustNo+-+#FacmNo+-+#BormNo))
 
+#RpFlag=A,1,S
+E(0,1)
+#RpCustNo1=A,7,S
+E(0,#TimCustNo)
+#RpFacmNo1=A,3,S
+E(0,0)
+#RpCode1=A,2,S
+E(0,90)
+#RpAmt1=m,14,S
+E(0,#Excessive)
 
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L2Rim.dec"/>
@@ -470,6 +480,7 @@ C(3,#BormNo,0,$,T(2,#TimCustNo+-+#FacmNo+-+#BormNo))
 !---------- 輸出共用變數宣告區 ----------
 <sub type="RTN" name="AFXMT">
 <include src="PRT.icf::PRTHEAD.rtn"/>
+<include src="PRT.icf::FM101.rtn"/>
 </sub>
 
 
@@ -484,12 +495,19 @@ T(3,[L3712] 應繳日變更-可欠繳)
 
 </sub>
 
+<sub type="FORM" name="FM101">
+<include src="PRT.icf::FM101.form"/>
+</sub>
 !------ 上行電文 TEXT ------
 <sub type="TIM">
 
 #TimCustNo#FacmNo#BormNo#NewSpecificDd#NewPayIntDate
 #CustNo#CustId#ApplNo#Interest
-
+#RpFlag
+#RpCustNo1
+#RpFacmNo1
+#RpCode1
+#RpAmt1
 </sub>
 
 
@@ -499,6 +517,7 @@ TXFORM=L3712^
 
 <include src="COM.icf::TRCTL.tom"/>
 <include src="COM.icf::LockControl.tom"/>
+<include src="PRT.icf::FM101.tom"/>
 <include src="ROM.icf::L2R05.tom"/>
 <include src="ROM.icf::L2R07.tom"/>
 <include src="ROM.icf::L3R06.tom"/>
@@ -516,4 +535,5 @@ TXFORM=L3712^
 <include src="PRT.icf::FMR01.sel"/>
 <include src="PRT.icf::FMH01.sel"/>
 <include src="PRT.icf::FMHR01.sel"/>
+<include src="PRT.icf::FM101.sel" map="landscape=1;size=830:1170" />
 </sub>
