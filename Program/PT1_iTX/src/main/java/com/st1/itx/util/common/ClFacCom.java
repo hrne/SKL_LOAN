@@ -284,8 +284,10 @@ public class ClFacCom extends TradeBuffer {
 		tClFac.setMainFlag("Y");
 
 		BigDecimal settingAmt = settingAmt(titaVo, iClCode1, iClCode2, iClNo);
+		BigDecimal evaNotWorth = evaNotWorth(titaVo, iClCode1, iClCode2, iClNo);
 
 		tClFac.setOriSettingAmt(settingAmt);
+		tClFac.setOriEvaNotWorth(evaNotWorth);
 
 		try {
 			sClFacService.insert(tClFac, titaVo);
@@ -367,6 +369,51 @@ public class ClFacCom extends TradeBuffer {
 		}
 
 		return settingAmt;
+	}
+	/**
+	 * 擔保品與額度關聯檔的 OriEvaNotWorth 評估淨值
+	 * 
+	 * @param titaVo   titaVo
+	 * @param iClCode1 擔保品代號1
+	 * @param iClCode2 擔保品代號21
+	 * @param iClNo    擔保品編號
+	 * @return 設定金額
+	 */
+
+	public BigDecimal evaNotWorth(TitaVo titaVo, int iClCode1, int iClCode2, int iClNo) {
+		BigDecimal evaNotWorth = BigDecimal.ZERO;
+
+		// 依據擔保品代號1查不同Table
+		switch (iClCode1) {
+		case 1:
+		case 2:
+			ClImmId tClImmId = new ClImmId();
+			tClImmId.setClCode1(iClCode1);
+			tClImmId.setClCode2(iClCode2);
+			tClImmId.setClNo(iClNo);
+			ClImm tClImm = sClImmService.findById(tClImmId, titaVo);
+			if (tClImm == null) {
+				tClImm = new ClImm();
+			}
+			evaNotWorth = tClImm.getEvaNetWorth();
+			break;
+		case 3:
+		case 4:
+		case 5:
+		case 9:
+			ClMainId tClMainId = new ClMainId();
+			tClMainId.setClCode1(iClCode1);
+			tClMainId.setClCode2(iClCode2);
+			tClMainId.setClNo(iClNo);
+			ClMain tClMain = sClMainService.findById(tClMainId, titaVo);
+			if (tClMain == null) {
+				tClMain = new ClMain();
+			}
+			evaNotWorth = tClMain.getEvaAmt();
+			break;
+		}
+
+		return evaNotWorth;
 	}
 
 	// 擔保品提供人與授信戶關係

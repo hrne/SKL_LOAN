@@ -79,7 +79,7 @@ E(0,40)ASGN(INQPRT$)
 ["註記",#Gdrmrk],
 ["主建物建號2",#Hgtmhn2],
 ["獨立產權註記",#Hgtcip],
-["Field update / access identifier",#Hgtcip],
+["Field update / access identifier",#UpdateIdent],
 ]
 ! 2023-05-25 Wei 增加 from SKL-佳怡:新系統要可以查舊系統建物明細
 

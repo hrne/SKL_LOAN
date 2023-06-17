@@ -195,6 +195,7 @@ public class L2417 extends TradeBuffer {
 				tClFac.setApproveNo(iApproveNo);
 				tClFac.setMainFlag("Y");
 				BigDecimal settingAmt = BigDecimal.ZERO;
+				BigDecimal evaNotWorth = BigDecimal.ZERO;
 				// 依據擔保品代號1查不同Table
 				switch (iClCode1) {
 				case 1:
@@ -208,6 +209,7 @@ public class L2417 extends TradeBuffer {
 						tClImm = new ClImm();
 					}
 					settingAmt = tClImm.getSettingAmt();
+					evaNotWorth = tClImm.getEvaNetWorth();
 					break;
 				case 3:
 				case 4:
@@ -220,6 +222,7 @@ public class L2417 extends TradeBuffer {
 						tClStock = new ClStock();
 					}
 					settingAmt = tClStock.getSettingBalance();
+					evaNotWorth = tClMain.getEvaAmt();
 					break;
 				case 5:
 					ClOtherId tClOtherId = new ClOtherId();
@@ -231,7 +234,7 @@ public class L2417 extends TradeBuffer {
 						tClOther = new ClOther();
 					}
 					settingAmt = tClOther.getSettingAmt();
-
+					evaNotWorth = tClMain.getEvaAmt();
 					break;
 				case 9:
 					ClMovablesId tClMovablesId = new ClMovablesId();
@@ -243,11 +246,12 @@ public class L2417 extends TradeBuffer {
 						tClMovables = new ClMovables();
 					}
 					settingAmt = tClMovables.getSettingAmt();
+					evaNotWorth = tClMain.getEvaAmt();
 					break;
 				}
 
 				tClFac.setOriSettingAmt(settingAmt);
-
+				tClFac.setOriEvaNotWorth(evaNotWorth);
 				try {
 					sClFacService.insert(tClFac, titaVo);
 				} catch (DBException e) {
@@ -415,7 +419,8 @@ public class L2417 extends TradeBuffer {
 							// 紀錄變更前變更後
 							dataLog.setEnv(titaVo, beforeClOwnerRelation, clOwnerRelation);
 
-							CustMain tCustMain = sCustMainService.findById(titaVo.getParam("OwnerCustUKey" + i).trim(), titaVo);
+							CustMain tCustMain = sCustMainService.findById(titaVo.getParam("OwnerCustUKey" + i).trim(),
+									titaVo);
 							String CustName = "";
 							if (tCustMain != null) {
 								CustName = tCustMain.getCustName();

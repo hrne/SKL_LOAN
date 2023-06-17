@@ -777,6 +777,7 @@ public class L2419Batch extends TradeBuffer {
 				}
 			} else {
 				clFac.setOriSettingAmt(parse.stringToBigDecimal(settingAmt));
+				clFac.setOriEvaNotWorth(parse.stringToBigDecimal(netValue));
 				try {
 					sClFacService.insert(clFac, titaVo);
 				} catch (DBException e) {

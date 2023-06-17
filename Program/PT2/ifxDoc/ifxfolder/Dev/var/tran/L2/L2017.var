@@ -307,12 +307,17 @@ T(3,1)ASGN(LOOP$)
 !核准號碼
 #OOApplNo=A,7,L
 
-
-! 鑑價總值
+!鑑價總值
 #OOEvaAmt=m,14.2,L
 
 #OOEvaAmtX=X,21,L
 X(#OOEvaAmt)
+
+! 評估淨值
+#OOEvaNotWorth=m,14.2,L
+
+#OOEvaNotWorthX=X,21,L
+X(#OOEvaNotWorth)
 
 !設定金額
 #OOSettingAmt=m,14.2,S
@@ -464,6 +469,7 @@ TXFORM=L2017
 #OOCreditSysNo
 #OOApplNo
 #OOEvaAmt
+#OOEvaNotWorth
 #OOSettingAmt
 #OOApproveDate
 #OOLineAmt
@@ -526,6 +532,9 @@ TXFORM=L2017
 {width:90,align:'center'}
 
 #OOEvaAmtX=鑑價總值
+{width:110,align:'right'}
+
+#OOEvaNotWorthX=評估淨值
 {width:110,align:'right'}
 
 #OOSettingAmtX=設定金額/股數

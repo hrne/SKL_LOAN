@@ -42,7 +42,7 @@ E(0,0)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=1;screen.width=[130,870];printer.width=[20,20];">
 [
-["[L2079]                                 展期件新舊對照查詢"],
+["[L2079]                                 展期／借新還舊對照查詢"],
 ["#FdMain+查詢條件","@(借戶戶號、年月起訖，需擇一輸入)"],
 ["#FdCustNo+戶號",#CustNo],
 ["#FdYearStart+年月起訖",#YearStart,"/",#MonthStart,"@～@",#YearEnd,"/",#MonthEnd],
@@ -164,7 +164,7 @@ C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 !C(5,#TXFORM,L2079,$,S)
 
 #SCRTIL=_,_,S
-T(3,[L2079] 展期件新舊對照)
+T(3,[L2079] 展期／借新還舊對照查詢)
 
 
 !修改
@@ -235,7 +235,7 @@ TXFORM=L2079
 
 <sub type="PART" name="L2079" layout="cols=1;screen.width=[100,1000];printer.width=[15,30]">
 [
-["[L2079]                                 展期件新舊對照查詢"],
+["[L2079]                                 展期／借新還舊對照查詢"],
 [""],
 ]
 </sub>

@@ -228,6 +228,14 @@ T(2,#OOGdrid1+#OOGdrid2+#OOGdrnum+#OOLgtseq)
 #OOBtnL2943=X,1,S
 BIND(grid,{cmd=CHAIN;ntxcd=L2943;text=AS400建物明細資料查詢;ntxbuf=#L2943Buf})
 
+! 2023-06-17 Wei 增加 for 連動L2944 from SKL-佳怡:新系統要可以查舊系統AS400不動產押品主檔
+
+#L2944Buf=X,10,S
+T(2,#OOGdrid1+#OOGdrid2+#OOGdrnum)
+
+#OOBtnL2944=X,1,S
+BIND(grid,{cmd=CHAIN;ntxcd=L2944;text=AS400不動產押品主檔查詢;ntxbuf=#L2944Buf})
+
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 
 </sub>
@@ -294,6 +302,9 @@ TXFORM=L2040
 #OOBtnL2943=查詢
 {width:200,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
 
+#OOBtnL2944=查詢
+{width:200,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
+
 ^
 
 #RPTFG=1,QUERY.GRID,L2040
@@ -316,6 +327,9 @@ TXFORM=L2040
 {width:400,align:'center'}
 
 #OOBtnL2943=查詢
+{width:200,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
+
+#OOBtnL2944=查詢
 {width:200,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
 
 ^

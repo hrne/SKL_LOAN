@@ -86,8 +86,6 @@ T(2,@StatusHelp,#HelpDesc1)
 T(2,@CurrPrecisionHelp,#HelpDesc2)
 T(2,@UsageCodeHelp,#HelpDesc3)
 
-
-
 #FdMain=X,2,L
 T(3,*)
 #FdDrawdownDate=X,2,L
@@ -493,12 +491,11 @@ IF(#OOBookFlag==2,T(2,0000000          +#OOApplNo+#OOFacmNo+000),T(2,0000000    
 C(3,#OOBookFlag,0,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L3004; ntxbuf=#OOBUF2}))
 
 #OOBUF3=X,50,S
-C(3,#OOStatus,1,T(2,#OOCustNo+00000+00000+#OOFacmNo+000),T(2,#OOCustNo+00000+00000+000+#OOFacmNo))
+T(2,#OOCustNo+00000+00000+000+#OOFacmNo)
 
 
 #OOBTN3=X,1,S
-C(3,#OORenewFlag,0,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L2079; ntxbuf=#OOBUF3}))
-C(3,#OOStatus,1,BIND(grid,{ cmd=CHAIN; ntxcd=L2079; ntxbuf=#OOBUF3}),$)
+C(3,#OORenewFlag,2,BIND(grid,{ cmd=CHAIN; ntxcd=L2079; ntxbuf=#OOBUF3}),BIND(grid,cancel))
 
 </sub>
 
@@ -593,8 +590,8 @@ TXFORM=L3002
 #OOUsageCodeX=用途別
 {width:80,align:'center'}
 
-#OOBTN3=展期件
-{width:70,search:false,formatter:'cust:bind-button:展期件;L2079 展期件新舊對照查詢',align:'center',canExport:true}
+#OOBTN3=借新還舊
+{width:70,search:false,formatter:'cust:bind-button:新舊對照;L2079 展期／借新還舊對照查詢',align:'center',canExport:true}
 ^
 #RPTFG2=2,QUERY.GRID,L3002
 #any={detail:true, header:'L3002.part', caption:'', width:1110, rowNum:20, rowList:[20,40,60]}

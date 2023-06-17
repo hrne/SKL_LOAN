@@ -189,7 +189,8 @@ public class L7400 extends TradeBuffer {
 			dataJo.put("CURRENCY_CODE", slipMedia.getCurrencyCode());
 			dataJo.put("ISSUED_BY", tellerNo);
 			dataJo.put("ACCOUNTING_DATE", slipDate);
-			dataJo.put("JE_LINE_NUM", "" + lineNum);
+			// 原本用lineNum ,2023-06-17 SKL IT 琦欣指示用slipMedia.getSeq()
+			dataJo.put("JE_LINE_NUM", slipMedia.getSeq());
 			dataJo.put("SEGREGATE_CODE", slipMedia.getAcSubBookCode());
 			dataJo.put("ACCOUNT_CODE", slipMedia.getAcNoCode());
 			dataJo.put("SUBACCOUNT_CODE",
