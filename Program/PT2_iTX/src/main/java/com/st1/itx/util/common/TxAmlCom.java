@@ -770,6 +770,7 @@ public class TxAmlCom extends TradeBuffer {
 
 		Document doc = checkAml.convertStringToXml(tTxAmlLog.getMsgRg());
 		orgName = checkAml.getXmlValue(doc, "Name");
+		
 // ConfirmStatus 檢核狀態 0.非可疑名單/已完成名單確認 
 // ConfirmCode人工檢核狀態   ConfirmStatus檢核狀態
 //  1.確認正常              0.非可疑名單/已完成名單確認             
@@ -787,9 +788,10 @@ public class TxAmlCom extends TradeBuffer {
 		default:
 			confirmStatus = tTxAmlLog.getConfirmStatus();
 		}
-
-		// 檢核狀態 = 1.需審查/確認 => AML姓名再檢核
-		if ("1".equals(confirmStatus) || !orgName.equals(checkAmlVo.getName())) {
+        
+		this.info("confirmStatus" + confirmStatus + ", Name=" + orgName + " / " + checkAmlVo.getName());
+		// 檢核狀態 = 1.需審查/確認 、姓名不同再檢核		
+		if ("1".equals(confirmStatus) || (!"".equals(checkAmlVo.getName()) && !orgName.equals(checkAmlVo.getName()))) {
 			checkAmlVo.setLogNo(tTxAmlLog.getLogNo()); // LogNo
 			checkAmlVo.setEntdy(titaVo.getEntDyI()); // 帳務日
 			checkAmlVo.setBrNo(titaVo.getKinbr()); // 單位

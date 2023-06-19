@@ -2,7 +2,7 @@
 # 2023-06-14 ST1-Wei 建立trustJKS
 
 # 設定 KeyStore 名稱
-KEYSTORE_NAME="/home/weblogic/catrustJKS.jks"
+KEYSTORE_NAME="/home/weblogic/ca/trustJKS.jks"
 
 # 設定 KeyStore 密碼
 KEYSTORE_PASS="23895858"

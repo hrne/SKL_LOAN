@@ -36,6 +36,7 @@ public class LM056Report extends MakeReport {
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
+	 * @throws LogicException 
 	 * 
 	 */
 	public void exec(TitaVo titaVo, int yearMonth) throws LogicException {
@@ -62,7 +63,7 @@ public class LM056Report extends MakeReport {
 				.setRptItem(fileItem).build();
 		// 開啟報表
 		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
-		
+
 //		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM056", "表14-1、14-2會計部申報表",
 //				"LM056-表14-1、14-2_會計部申報表", "LM056_底稿_表14-1、14-2_會計部申報表.xlsx", "YYYMM");
 
@@ -178,6 +179,10 @@ public class LM056Report extends MakeReport {
 
 		// 參考 LM057的表14-5
 		for (Map<String, String> r : listData) {
+
+			if ("N".equals(r.get("F0").toString())) {
+				continue;
+			}
 
 			col = enToNumber(r.get("F0").toString().substring(0, 1));
 			row = Integer.valueOf(r.get("F0").toString().substring(1, 3));

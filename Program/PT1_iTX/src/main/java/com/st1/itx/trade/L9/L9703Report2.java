@@ -124,12 +124,19 @@ public class L9703Report2 extends MakeReport {
 
 			lCustNoticeId.setCustNo(custNo);
 			lCustNoticeId.setFacmNo(facmNo);
-			lCustNoticeId.setFormNo("L9701");
+			lCustNoticeId.setFormNo("L9703");
+		
 			lCustNotice = sCustNoticeService.findById(lCustNoticeId, titaVo);
 
+			
+			
+			
 			// paper為N 表示不印
 			if (lCustNotice == null) {
 			} else {
+				this.info("L9703notice custNo=" + custNo);
+				this.info("L9703notice facmNo=" + facmNo);
+				this.info("L9703notice getPaperNotice=" + lCustNotice.getPaperNotice());
 				if ("N".equals(lCustNotice.getPaperNotice())) {
 					continue;
 				}

@@ -193,11 +193,11 @@ public class L3943 extends TradeBuffer {
 			if (slLoanBorTx != null) {
 				for (LoanBorTx tLoanBorTx : slLoanBorTx.getContent()) {
 					if (tLoanBorTx.getTxAmt().compareTo(BigDecimal.ZERO) > 0) {
-						if (facTxAmt.get(tLoanBorTx.getFacmNo()) == null) {
-							facTxAmt.put(tLoanBorTx.getFacmNo(), tLoanBorTx.getTxAmt());
-						} else {
+						if (facTxAmt.containsKey(tLoanBorTx.getFacmNo())) {
 							facTxAmt.put(tLoanBorTx.getFacmNo(),
 									facTxAmt.get(tLoanBorTx.getFacmNo()).add(tLoanBorTx.getTxAmt()));
+						} else {
+							facTxAmt.put(tLoanBorTx.getFacmNo(), tLoanBorTx.getTxAmt());
 						}
 					}
 				}

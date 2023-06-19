@@ -363,6 +363,14 @@ public class SystemParas implements Serializable {
   @Column(name = "`L6972Flag`", length = 1)
   private String l6972Flag;
 
+  // 憑證路徑
+  @Column(name = "`PfxPath`", length = 100)
+  private String pfxPath;
+
+  // 憑證認證
+  @Column(name = "`PfxAuth`", length = 100)
+  private String pfxAuth;
+
   // 建檔日期時間
   @CreatedDate
   @Column(name = "`CreateDate`")
@@ -1806,6 +1814,44 @@ N:否
   }
 
 /**
+	* 憑證路徑<br>
+	* 
+	* @return String
+	*/
+  public String getPfxPath() {
+    return this.pfxPath == null ? "" : this.pfxPath;
+  }
+
+/**
+	* 憑證路徑<br>
+	* 
+  *
+  * @param pfxPath 憑證路徑
+	*/
+  public void setPfxPath(String pfxPath) {
+    this.pfxPath = pfxPath;
+  }
+
+/**
+	* 憑證認證<br>
+	* 
+	* @return String
+	*/
+  public String getPfxAuth() {
+    return this.pfxAuth == null ? "" : this.pfxAuth;
+  }
+
+/**
+	* 憑證認證<br>
+	* 
+  *
+  * @param pfxAuth 憑證認證
+	*/
+  public void setPfxAuth(String pfxAuth) {
+    this.pfxAuth = pfxAuth;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -1895,7 +1941,7 @@ N:否
            + ", loanMediaFtpUrl=" + loanMediaFtpUrl + ", loanMediaFtpAuth=" + loanMediaFtpAuth + ", smsFtpUrl=" + smsFtpUrl + ", smsFtpAuth=" + smsFtpAuth + ", smsFtpFlag=" + smsFtpFlag + ", jcicEmpName=" + jcicEmpName
            + ", jcicEmpTel=" + jcicEmpTel + ", autoBatchFg=" + autoBatchFg + ", batchFireFeeFg=" + batchFireFeeFg + ", icsFg=" + icsFg + ", icsUrl=" + icsUrl + ", icsBatchMaxCount=" + icsBatchMaxCount
            + ", insuSettleDate=" + insuSettleDate + ", jcicZDep=" + jcicZDep + ", jcicZName=" + jcicZName + ", jcicZTel=" + jcicZTel + ", jcicMU1Dep=" + jcicMU1Dep + ", jcicMU1Name=" + jcicMU1Name
-           + ", jcicMU1Tel=" + jcicMU1Tel + ", coreRemitLimit=" + coreRemitLimit + ", l6972Flag=" + l6972Flag + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", jcicMU1Tel=" + jcicMU1Tel + ", coreRemitLimit=" + coreRemitLimit + ", l6972Flag=" + l6972Flag + ", pfxPath=" + pfxPath + ", pfxAuth=" + pfxAuth + ", createDate=" + createDate
+           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

@@ -178,7 +178,7 @@ public class WebClient extends SysLogger {
 			response = httpclient.execute(httpPost);
 			StatusLine status = response.getStatusLine();
 			int state = status.getStatusCode();
-			if (state == HttpStatus.SC_OK) {
+			if (state == HttpStatus.SC_OK || state == HttpStatus.SC_CREATED) {
 				HttpEntity responseEntity = response.getEntity();
 				String jsonString = EntityUtils.toString(responseEntity);
 			} else {

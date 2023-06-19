@@ -313,9 +313,9 @@ public class MainProcess extends SysLogger {
 
 		/* 暫時添加 */
 		if (this.titaVo.isSpanDy())
-            txCom.setReldy(this.titaVo.getSpanDyI());
-        else
-            txCom.setReldy(entday);
+			txCom.setReldy(this.titaVo.getSpanDyI());
+		else
+			txCom.setReldy(entday);
 
 		txCom.setRelNo(no);
 		txCom.setRelKin(no.substring(0, 4));
@@ -580,9 +580,10 @@ public class MainProcess extends SysLogger {
 				if (tCustDataCtrl.getApplMark() == 2) {
 					if (titaVo.getReason().isEmpty()) {
 						throw new LogicException("EC998", "查詢結清滿五年客戶資料");
-					} else if (titaVo.getEmpNos().trim().isEmpty() && tTxTranCode.getCustDataCtrlFg() != 1) {
+					} else if (titaVo.getEmpNos().trim().isEmpty()) {
 						sendRsp.addvReason(this.txBuffer, titaVo, "0004", "查詢結清滿五年客戶資料,理由:" + titaVo.getReason());
-					}
+					} else if (!titaVo.getEmpNos().trim().isEmpty())
+						titaVo.putParam(ContentName.inq998, "Y");
 				} else if (tCustDataCtrl.getApplMark() == 1) {
 //					if ("L3".equals(this.titaVo.getTxcd().substring(0, 2))) {
 //						txCom.setCustDataCtrl(1);

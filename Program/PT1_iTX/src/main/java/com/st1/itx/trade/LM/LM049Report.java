@@ -34,10 +34,9 @@ public class LM049Report extends MakeReport {
 
 	@Autowired
 	InnFundAplService sInnFundAplService;
-	
+
 	@Autowired
 	MakeExcel makeExcel;
-
 
 	private BigDecimal totalOfLoanBal = BigDecimal.ZERO;
 
@@ -49,16 +48,13 @@ public class LM049Report extends MakeReport {
 
 	}
 
-	public void exec(TitaVo titaVo) throws LogicException {
+	public void exec(TitaVo titaVo, int mfbsdy) throws LogicException {
 
 		// 先取得淨值
 
 		int entdy = titaVo.getEntDyI() + 19110000;
 
 		entdy = entdy / 100;
-		
-		// 西元月底日
-		int mfbsdy = this.txBuffer.getTxCom().getMfbsdyf();
 
 		List<InnFundApl> lInnFundApl = new ArrayList<InnFundApl>();
 		// 先取得淨值
@@ -100,7 +96,7 @@ public class LM049Report extends MakeReport {
 		String brno = titaVo.getBrno();
 		String txcd = "LM049";
 		String fileItem = "放款金控法第44條利害關係人放款餘額表";
-		String fileName = "LM049放款金控法第44條利害關係人放款餘額表_限額控管" ;
+		String fileName = "LM049放款金控法第44條利害關係人放款餘額表_限額控管";
 		String defaultExcel = "LM049_底稿_放款金控法第44條利害關係人放款餘額表_限額控管.xlsx";
 		String defaultSheet = "108.04金控子公司表7-1";
 
@@ -111,7 +107,7 @@ public class LM049Report extends MakeReport {
 
 		// 開啟報表
 		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
-		
+
 //		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM049", "放款金控法第44條利害關係人放款餘額表", "LM049放款金控法第44條利害關係人放款餘額表_限額控管", "LM049_底稿_放款金控法第44條利害關係人放款餘額表_限額控管.xlsx", "108.04金控子公司表7-1");
 
 		String entdy = titaVo.getEntDy();
@@ -245,7 +241,8 @@ public class LM049Report extends MakeReport {
 
 		// 寫簽核
 		makeExcel.setMergedRegion(rowCursorTotal + 2, rowCursorTotal + 2, 2, 16);
-		makeExcel.setValue(rowCursorTotal + 2, 2, "經 辦：                      經理：                       風險管理人：                       協理：", efsVo);
+		makeExcel.setValue(rowCursorTotal + 2, 2,
+				"經 辦：                      經理：                       風險管理人：                       協理：", efsVo);
 
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);

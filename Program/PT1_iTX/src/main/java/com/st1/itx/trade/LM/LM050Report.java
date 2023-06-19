@@ -173,9 +173,9 @@ public class LM050Report extends MakeReport {
 				makeExcel.setValue(rowCursor, 4, formatThousand(loanBal), "#,##0");
 				makeExcel.setValue(rowCursor, 5, this.computeDivide(loanBal.multiply(new BigDecimal("100")), equity, 4),
 						"#,##0.00%");
-				this.info("bal:"+loanBal);
-				this.info("淨值:"+equity);
-				this.info("占淨比值:"+this.computeDivide(loanBal.multiply(new BigDecimal("100")), equity, 4));
+				this.info("bal:" + loanBal);
+				this.info("淨值:" + equity);
+				this.info("占淨比值:" + this.computeDivide(loanBal.multiply(new BigDecimal("100")), equity, 4));
 				makeExcel.setValue(rowCursor, 6, "2%"); // 限額標準 ???
 				makeExcel.setValue(rowCursor, 7, remark); // 備註
 
@@ -194,7 +194,7 @@ public class LM050Report extends MakeReport {
 
 		total = relLoanBal.add(custLoanBal);
 
-		printTotal(rowCursor+1);
+		printTotal(rowCursor + 2);
 	}
 
 	private void printTotal(int rowCursor) throws LogicException {

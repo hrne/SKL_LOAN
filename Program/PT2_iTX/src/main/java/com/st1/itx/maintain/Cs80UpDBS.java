@@ -167,7 +167,7 @@ public class Cs80UpDBS extends CommBuffer {
 		if (!this.titaVo.isTxcdSpecial() && this.titaVo.isTxcdInq() && !this.titaVo.isTxcdRim() && !this.titaVo.isRim() && this.titaVo.getReturnIndex() <= 1) {
 			TotaVo tota = this.totaVoList.get(0);
 //			if (!"EC998".equals(tota.getMsgId())) {
-			if (!tota.isError()) {
+			if (!tota.isError() && "Y".equals(this.titaVo.get(ContentName.inq998))) {
 				this.insTxInquiry(tota);
 			}
 		}

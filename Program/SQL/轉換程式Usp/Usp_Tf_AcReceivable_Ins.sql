@@ -457,6 +457,13 @@ BEGIN
           , "OpenTlrNo" -- 起帳經辦 VARCHAR2 6 
           , "OpenTxtNo" -- 起帳交易序號 DECIMAL 8 
     )
+    WITH txEmpData AS (
+        select DISTINCT
+               TRXDAT
+             , TRXMEM
+             , TRXNMT
+        from LA$TRXP
+    )
     SELECT 'F10'               AS "AcctCode"         -- 業務科目代號 
           ,LPAD(S1."LMSACN",7,0) 
                                AS "CustNo"           -- 戶號 
@@ -492,16 +499,20 @@ BEGIN
           ,S1."TRXDAT"         AS "LastTxDate"       -- 最後交易日 
           ,''                  AS "TitaTxCd"         -- 交易代號 
           ,''                  AS "TitaKinBr"        --  
-          ,'999999'            AS "TitaTlrNo"        -- 經辦 
+          -- 2023-06-19 Wei 修改 from Lai 要跟往來明細的經辦一樣
+          ,NVL(AEM1."EmpNo",'999999')
+                               AS "TitaTlrNo"        -- 經辦 
           ,S1."TRXNMT"         AS "TitaTxtNo"        -- 交易序號 
           ,''                  AS "JsonFields"       -- jason格式紀錄 
-          ,'999999'             AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
+          ,NVL(AEM1."EmpNo",'999999')
+                               AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
           ,CASE
              WHEN S1."TRXDAT" > 0
              THEN TO_DATE(TO_CHAR(S1."TRXDAT"),'YYYYMMDD')
            ELSE JOB_START_TIME
            END                  AS "CreateDate"          -- 建檔日期時間 DATE 8  
-          ,'999999'             AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6  
+          ,NVL(AEM1."EmpNo",'999999')
+                                AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6  
           ,CASE
              WHEN S1."TRXDAT" > 0
              THEN TO_DATE(TO_CHAR(S1."TRXDAT"),'YYYYMMDD')
@@ -515,6 +526,9 @@ BEGIN
     LEFT JOIN "LA$LMSP" S2 ON S2."LMSACN" = S1."LMSACN" 
                           AND S2."LMSAPN" = S1."LMSAPN" 
                           AND S2."LMSASQ" = S1."LMSASQ" 
+    LEFT JOIN txEmpData ON txEmpData.TRXDAT = S1.TRXDAT 
+                       AND txEmpData.TRXNMT = S1.TRXNMT 
+    LEFT JOIN "As400EmpNoMapping" AEM1 ON AEM1."As400TellerNo" = txEmpData."TRXMEM" 
 --    WHERE S2."LMSLLD" <= "TbsDyF" 
     ; 
  

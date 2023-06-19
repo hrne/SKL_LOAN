@@ -82,8 +82,29 @@ public class L4964 extends TradeBuffer {
 		sInsuOrignal = insuOrignalService.clNoEqual(clCode1, clCode2, clNo, this.index, this.limit);
 
 		l0InsuRenew = slInsuRenew == null ? null : slInsuRenew.getContent();
-		l0InsuOrignal = sInsuOrignal == null ? null : sInsuOrignal.getContent();
-
+		if (sInsuOrignal != null) {
+			for (InsuOrignal t : sInsuOrignal.getContent()) {
+				if ("轉換留存".equals(t.getRemark().trim())) {
+					continue;
+				}
+				Boolean isRenew = false;
+				if (l0InsuRenew != null) {
+					for (InsuRenew tR : l0InsuRenew) {
+						if (t.getOrigInsuNo().equals(tR.getNowInsuNo()) && tR.getInsuStartDate() == t.getInsuStartDate()
+								&& tR.getInsuEndDate() == t.getInsuEndDate()
+								&& tR.getFireInsuPrem().compareTo(t.getFireInsuPrem()) == 0
+								&& tR.getEthqInsuPrem().compareTo(t.getEthqInsuPrem()) == 0) {
+							isRenew = true;
+							break;
+						}
+					}
+					if (isRenew) {
+						continue;
+					}
+				}
+				l0InsuOrignal.add(t);
+			}
+		}
 		String bdLocation;
 		ClBuilding tClBuilding = new ClBuilding();
 		ClBuildingId tClBuildingId = new ClBuildingId();
@@ -139,7 +160,7 @@ public class L4964 extends TradeBuffer {
 			});
 
 			for (InsuRenew tInsuRenew : lInsuRenew) {
-				
+
 				this.info("1.tInsuRenew = " + tInsuRenew.toString());
 				tmpInsu tmp = new tmpInsu(tInsuRenew.getPrevInsuNo(), tInsuRenew.getInsuCompany());
 

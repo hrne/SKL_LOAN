@@ -256,8 +256,10 @@ T(2,#TLRNO)
 #LogFlag=X,1,S
 T(3,B)
 
-#oBUF2a=x,36,S
-T(2,#oDataDt+#oCustKey+#oRRSeq+#oReviewType+#oUnit+#oIsStatus)
+
+#oBUF2a=x,2000,S
+! T(2,#oDataDt+#oCustKey+#oRRSeq+#oReviewType+#oUnit+#oIsStatus)
+T(2,#oDataDt+#oCustKey+#oRRSeq+#oReviewType+#oUnit+#oUnitItem+#oIsStatus+#oProcessType+#oProcessCount)
 
 #oBUF2b=x,1000,S
 T(6A,#DataDt+#CustKey+#ProcessDate+#ProcessTlrNo+#ProcessNote+#LogFlag)
@@ -302,7 +304,7 @@ T(3,L8100)
 #batch-row-status=X,30,S
 
 !#batch-row-txtno 該列傳送序號
-#batch-row-txtno=X,18,O
+#batch-row-txtno=X,14,O
 
 
 !! ------- end of batch variables   -------------
@@ -329,6 +331,7 @@ TXFORM=L8081
 #oCustKey
 #oRRSeq
 #oReviewType
+#oUnit
 #oUnitItem
 #oIsStatus
 #oProcessType

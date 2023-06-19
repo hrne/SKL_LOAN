@@ -37,6 +37,8 @@ public class LM056ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @param titaVo
 	 * @param yearMonth 西元年月
 	 * @param isAllData 是否為產出明細
+	 * @return 
+	 * @throws Exception 
 	 * 
 	 */
 	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth, String isAllData) throws Exception {
@@ -52,7 +54,7 @@ public class LM056ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  ,(CASE";
 		sql += "			  WHEN FCA.\"SyndNo\" <> 0 THEN '聯貸'";
 		sql += "			  WHEN MLB2.\"CustNo\" IS NOT NULL THEN '**'";
-		sql += "			  WHEN R.\"ReltCode\" IS NOT NULL THEN '*'";
+		sql += "			  WHEN S.\"StaffId\" IS NOT NULL THEN '*'";
 		sql += "			ELSE ' ' END ) AS \"KIND\"";
 		sql += "		  ,'#N/A' AS \"isRelt\"";
 		sql += "	FROM \"MonthlyLoanBal\" MLB";
@@ -77,7 +79,7 @@ public class LM056ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "						    AND F2.\"FacmNo\" = MLB.\"FacmNo\"";
 		sql += "						    AND F2.\"LastBormNo\" = MLB.\"BormNo\"";
 		sql += "	LEFT JOIN \"FacCaseAppl\" FCA ON FCA.\"ApplNo\" = F2.\"ApplNo\"";
-		sql += "	LEFT JOIN \"ReltMain\" R ON R.\"CustNo\" = C.\"CustNo\"";
+		sql += "	LEFT JOIN \"StakeholdersStaff\" S ON S.\"StaffId\" = C.\"CustId\"";
 		sql += "	WHERE MLB.\"YearMonth\" = :yymm";
 		sql += "	  AND MLB.\"LoanBalance\" > 0 ";
 		if (isAllData == "N") {
@@ -89,7 +91,7 @@ public class LM056ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		    ,(CASE";
 		sql += "			    WHEN FCA.\"SyndNo\" <> 0 THEN '聯貸'";
 		sql += "			    WHEN MLB2.\"CustNo\" IS NOT NULL THEN '**'";
-		sql += "			    WHEN R.\"ReltCode\" IS NOT NULL THEN '*'";
+		sql += "			    WHEN S.\"StaffId\" IS NOT NULL THEN '*'";
 		sql += "			  ELSE ' ' END )";
 		sql += "		    ,'#N/A'";
 		sql += "	ORDER BY \"LoanBalance\" DESC";
@@ -109,6 +111,8 @@ public class LM056ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
+	 * @return 
+	 * @throws Exception 
 	 * 
 	 */
 	public List<Map<String, String>> findAll2(TitaVo titaVo, int yearMonth) throws Exception {
@@ -165,7 +169,7 @@ public class LM056ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	      ,SUM(\"Value\") AS \"Value\" ";
 		sql += "	FROM \"tempTotal\"";
 		sql += "	GROUP BY \"Column\" ";
-
+	
 		this.info("sql=" + sql);
 
 		Query query;

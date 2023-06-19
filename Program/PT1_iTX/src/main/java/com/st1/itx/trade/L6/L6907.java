@@ -143,18 +143,19 @@ public class L6907 extends TradeBuffer {
 			occursList.putParam("OOAcDtlCode", tAcReceivable.get("AcDtlCode"));
 			occursList.putParam("OOAcBookCode", tAcReceivable.get("AcBookCode"));
 
-			// Y-顯示[明細]按鈕
-			String l6908Flag = "Y";
+			// Y-顯示按紐連L6908
+			// N-顯示按紐連L3005
+			// 空白不顯示按紐
+			String l6908Flag = "";
 			// 未收費用未變動不顯示按鈕
-			if (parse.stringToInteger(tAcReceivable.get("ReceivableFlag")) >= 3
-					&& tAcReceivable.get("RvAmt").compareTo(tAcReceivable.get("RvBal")) == 0) {
-				l6908Flag = "";
-			}
-			if ("0".equals(tAcReceivable.get("TitaTxtNo"))) {
-				l6908Flag = "";
+			if (tAcReceivable.get("RvAmt").compareTo(tAcReceivable.get("RvBal")) != 0) {
+				if (parse.stringToInteger(tAcReceivable.get("ReceivableFlag")) >= 1) {
+					l6908Flag = "N";
+				} else {
+					l6908Flag = "Y";
+				}
 			}
 
-			// 交易序號 = 0不顯示按鈕
 			occursList.putParam("L6908Flag", l6908Flag);
 			// 戶號 OOCustNoX
 			occursList.putParam("OOCustNoX", tAcReceivable.get("CustNo") + '-' + tAcReceivable.get("FacmNo"));
@@ -176,6 +177,7 @@ public class L6907 extends TradeBuffer {
 			occursList.putParam("OORvAmt", tAcReceivable.get("RvAmt"));
 			// 最後交易日 #OOLastTxDate
 			occursList.putParam("OOLastTxDate", tAcReceivable.get("LastTxDate"));
+			occursList.putParam("OOTxtNo", "0000" + tAcReceivable.get("TitaTlrNo") + tAcReceivable.get("TitaTxtNo"));
 			// 未銷餘額 OORvBal
 			occursList.putParam("OORvBal", tAcReceivable.get("RvBal"));
 			// 業務科目合計 OO_SUM1

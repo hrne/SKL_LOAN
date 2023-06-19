@@ -17,6 +17,11 @@ T(3,H:高風險;M:中風險;L:低風險)
 
 #ProcessTypeH=x,100,S
 T(3,1:郵寄-定期審查客戶基本資料更新表（房貸自然人）;2:郵寄-放款本息攤還表暨息通知單;3:簡訊通知)
+
+#ProcessTypeHelp=X,500,S
+T(3,1:郵寄定期審查客戶基本資料更新表;2:郵寄放款本息攤還表暨息通知單;3:簡訊通知;9:全部)
+
+
 </sub>
 
 
@@ -54,10 +59,17 @@ ASGN(CAUTO$)
 
 #Fd=X,2,L
 
-#NTXBUF=x,36,S
+#NTXBUF=x,2000,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@DataDt,#NTXBUF,1,7)
 T(1,@CustKey,#NTXBUF,8,10)
+T(1,@RRSeq,#NTXBUF,18,20)
+T(1,@ReviewType,#NTXBUF,38,1)
+T(1,@Unit,#NTXBUF,39,6)
+T(1,@UnitItem,#NTXBUF,45,10)
+T(1,@IsStatus,#NTXBUF,65,2)
+T(1,@ProcessType,#NTXBUF,67,1)
+T(1,@ProcessCount,#NTXBUF,68,2)
 
 !不可重新交易
 #AGAIN=X,1,S
@@ -85,6 +97,7 @@ C(4,#CustKey,0,S,$)
 S(L8R53,01,#DataDt,#CustKey,#END)
 R(1,L8R53)
 
+
 #RRSeq=X,20,L
 #ReviewType=X,1,L
 #ReviewTypeX=X,6,L
@@ -101,7 +114,7 @@ T(H,#ConfirmStatus,#ConfirmStatusH)
 
 #ProcessType=X,1,L
 #ProcessTypeX=X,50,L
-T(H,#ProcessType,#ProcessTypeH)
+T(H,#ProcessType,#ProcessTypeHelp)
 #ProcessCount=A,2,L
 </sub>
 
@@ -116,6 +129,19 @@ T(H,#ProcessType,#ProcessTypeH)
 
 !------------------
 
+#RimL8R53A=X,1,S
+S(L8R53,01,#DataDt,#CustKey)
+R(1,L8R53)
+! E(0,@LastProcessDate,#L8R53LastProcessDate)
+T(2,@LastProcessDate,#L8R53LastProcessDate)
+T(2,@LastProcessBrNo,#L8R53LastProcessBrNo)
+T(2,@LastProcessBrNoX,#L8R53LastProcessBrNoX)
+T(2,@LastGroupNoX,#L8R53LastGroupNoX)
+T(2,@LastProcessTlrNo,#L8R53LastProcessTlrNo)
+T(2,@LastProcessTlrNoX,#L8R53LastProcessTlrNoX)
+T(2,@LastProcessNote,#L8R53LastProcessNote)
+
+
 #LastProcessDate=D,7,L
 #LastProcessBrNo=X,4,L
 #LastProcessBrNoX=X,30,L
@@ -123,6 +149,8 @@ T(H,#ProcessType,#ProcessTypeH)
 #LastProcessTlrNo=X,6,L
 #LastProcessTlrNoX=x,20,L
 #LastProcessNote=x,100,L
+
+
 </sub>
 
 <sub type="DC" name="p3" layout="cols=1;screen.width=[200,800];printer.width=[40,60];order=1;">
@@ -212,6 +240,8 @@ T(2,L81010000000000000+#LC014Mrkey+#LC014Note)
 #Button=x,100,S
 T(2,{cmd=CHAIN; ntxcd=LC104; ntxbuf=#BufLC014})ASGN(BTN_NEW1$)
 K(MODIFYBUTTON,1,上傳附件)
+
+<include src="ROM.icf::L8R53.dec"/>
 </sub>
 
 
@@ -263,6 +293,7 @@ TXFORM=L8R53
 #LastProcessNote
 ^
 <include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L8R53.tom"/>
 </sub>
 
 

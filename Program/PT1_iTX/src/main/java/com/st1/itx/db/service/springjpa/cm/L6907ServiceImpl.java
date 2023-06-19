@@ -90,6 +90,8 @@ public class L6907ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ELSE ";
 		sql += "            trunc(A.\"LastTxDate\" - 19110000) ";
 		sql += "    END AS \"LastTxDate\", ";
+		sql += "    A.\"TitaTlrNo\" AS \"TitaTlrNo\", ";
+		sql += "    A.\"TitaTxtNo\" AS \"TitaTxtNo\", ";
 		sql += "    A.\"RvBal\"             AS \"RvBal\", ";
 		sql += "    B.\"ToAml\"             AS \"SumRvBal\", ";
 		sql += "    A.\"AcBookCode\"        AS \"AcBookCode\", ";
@@ -175,8 +177,7 @@ public class L6907ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (iClsFlag != 2) {
 			sql += " and  A.\"ClsFlag\" = :iClsFlag";
 		}
-		sql += "  order by  A.\"AcctCode\" ";
-
+		sql += "  order by  A.\"AcctCode\" , A.\"CustNo\" , A.\"FacmNo\" ,A.\"RvNo\" ";
 		sql += " " + sqlRow;
 
 		this.info("L6907Service SQL=" + sql);

@@ -50,7 +50,7 @@ E(0,0)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=3;screen.width=[130,500,150,350];printer.width=[15,35,15,35];order=1">
 [
-["[L3731]                                    呆帳戶更改戶況"],
+["[L3731]                                    呆帳戶戶況維護"],
 [#<->#,"#FdCustNo+借戶戶號",#CustNo,"@@",#CustNoX],
 [#<->#,"#FdFacmNo+額度編號",#FacmNo],
 [#<->#,"#FdBormNo+撥款序號",#BormNo],

@@ -24,6 +24,8 @@ import com.st1.itx.db.domain.CdBranchGroupId;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.CdBranchService;
 import com.st1.itx.db.service.CdEmpService;
+import com.st1.itx.db.domain.TxTeller;
+import com.st1.itx.db.service.TxTellerService;
 
 @Service("L8R53")
 @Scope("prototype")
@@ -47,7 +49,7 @@ public class L8R53 extends TradeBuffer {
 
 	@Autowired
 	CdBranchGroupService cdBranchGroupService;
-
+	
 	@Autowired
 	CdEmpService cdEmpService;
 
@@ -61,7 +63,9 @@ public class L8R53 extends TradeBuffer {
 
 		int dataDt = parse.stringToInteger(titaVo.get("DataDt")) + 19110000;
 		String custKey = titaVo.get("CustKey").trim();
-
+		this.info("dataDt    = " + dataDt);
+		this.info("custKey   = " + custKey);
+		
 		TxAmlCreditId txAmlCreditId = new TxAmlCreditId(dataDt, custKey);
 		TxAmlCredit txAmlCredit = txAmlCreditService.findById(txAmlCreditId, titaVo);
 
@@ -85,17 +89,17 @@ public class L8R53 extends TradeBuffer {
 		this.totaVo.putParam("ProcessType", txAmlCredit.getProcessType());
 		this.totaVo.putParam("ProcessCount", txAmlCredit.getProcessCount());
 
-		this.totaVo.putParam("LastProcessDate", txAmlCredit.getProcessDate());
-
-		this.totaVo.putParam("LastProcessBrNo", txAmlCredit.getProcessBrNo());
+		this.totaVo.putParam("L8R53LastProcessDate", txAmlCredit.getProcessDate());
+	
+		this.totaVo.putParam("L8R53LastProcessBrNo", txAmlCredit.getProcessBrNo());
 
 		String brNoX = "";
 		CdBranch cdBranch = cdBranchService.findById(txAmlCredit.getProcessBrNo(), titaVo);
 		if (cdBranch != null) {
 			brNoX = cdBranch.getBranchShort();
 		}
-		this.totaVo.putParam("LastProcessBrNoX", brNoX);
-
+		this.totaVo.putParam("L8R53LastProcessBrNoX", brNoX);
+		
 		String groupNoX = "";
 		CdBranchGroupId cdBranchGroupId = new CdBranchGroupId();
 		cdBranchGroupId.setBranchNo(txAmlCredit.getProcessBrNo());
@@ -104,9 +108,9 @@ public class L8R53 extends TradeBuffer {
 		if (cdBranchGroup != null) {
 			groupNoX = cdBranchGroup.getGroupItem();
 		}
-		this.totaVo.putParam("LastGroupNoX", groupNoX);
+		this.totaVo.putParam("L8R53LastGroupNoX", groupNoX);
 
-		this.totaVo.putParam("LastProcessTlrNo", txAmlCredit.getProcessTlrNo());
+		this.totaVo.putParam("L8R53LastProcessTlrNo", txAmlCredit.getProcessTlrNo());
 
 		String tlrItem = "";
 		CdEmp cdEmp = cdEmpService.findById(txAmlCredit.getProcessTlrNo(), titaVo);
@@ -114,9 +118,9 @@ public class L8R53 extends TradeBuffer {
 			tlrItem = cdEmp.getFullname();
 		}
 
-		this.totaVo.putParam("LastProcessTlrNoX", tlrItem);
+		this.totaVo.putParam("L8R53LastProcessTlrNoX", tlrItem);
 
-		this.totaVo.putParam("LastProcessNote", txAmlCredit.getProcessNote());
+		this.totaVo.putParam("L8R53LastProcessNote", txAmlCredit.getProcessNote());
 
 		this.addList(this.totaVo);
 		return this.sendList();
