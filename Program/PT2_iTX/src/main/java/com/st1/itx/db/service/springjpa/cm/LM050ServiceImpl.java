@@ -134,7 +134,7 @@ public class LM050ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              ,NULL AS \"RelTitle\"  ";
 		sql += "              ,NULL AS \"BusTitle\"  ";
 		sql += "             FROM \"LifeRelEmp\" ";	
-		sql += "             AND TRUNC(\"AcDate\" / 100 ) = :inputYearMonth ";
+		sql += "             WHERE TRUNC(\"AcDate\" / 100 ) = :inputYearMonth ";
 		sql += "           ) S1 ON S1.\"RptId\" = CM.\"CustId\" ";
 		sql += " GROUP BY CASE ";
 		sql += "            WHEN NVL(S1.\"Rel\",' ') = ' ' ";

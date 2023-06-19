@@ -101,9 +101,6 @@ S(L2944,1,#Gdrid1,#Gdrid2,#Gdrnum)
 R(1,L2944)
 
 #Cusbrh=A,4,L
-#Gdrid1=A,1,L
-#Gdrid2=A,2,L
-#Gdrnum=A,7,L
 #Loclid=A,2,L
 #Gdtidt=A,8,L
 #Gdtrdt=A,8,L
@@ -149,7 +146,7 @@ R(1,L2944)
 !C(5,#TXFORM,L2944,$,S)
 
 #SCRTIL=_,_,S
-T(3,[L2944] 不動產建物資料)
+T(3,[L2944] AS400不動產押品主檔)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
@@ -164,7 +161,6 @@ T(3,[L2944] 不動產建物資料)
 #Gdrid1
 #Gdrid2
 #Gdrnum
-#Lgtseq
 #END
 </sub>
 

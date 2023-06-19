@@ -753,41 +753,9 @@ public class TxAmlCom extends TradeBuffer {
 				+ checkAmlVo.getTransactionId());
 		TxAmlLog tTxAmlLog = txAmlLogService.findByTransactionIdFirst(titaVo.getEntDyI() + 19110000,
 				checkAmlVo.getTransactionId(), titaVo);
+		String confirmStatus = "";
 		String orgName = "";
-		if (tTxAmlLog != null) {
-			Document doc = checkAml.convertStringToXml(tTxAmlLog.getMsgRg());
-			orgName = checkAml.getXmlValue(doc, "Name");
-		}
-
-		// AML紀錄檔存在，檢核狀態 = 1.需審查/確認 => AML姓名再檢核
-		if (tTxAmlLog != null) {
-			if ("1".equals(tTxAmlLog.getConfirmStatus()) || !orgName.equals(checkAmlVo.getName())) {
-				checkAmlVo.setLogNo(tTxAmlLog.getLogNo()); // LogNo
-				checkAmlVo.setEntdy(titaVo.getEntDyI()); // 帳務日
-				checkAmlVo.setBrNo(titaVo.getKinbr()); // 單位
-				checkAmlVo.setUnit("10HC00"); // 查詢單位：10HC00
-				checkAmlVo.setAcceptanceUnit(""); // 代辦單位：space
-				checkAmlVo.setNotifyEmail(empEmail(titaVo)); // EMAIL
-				checkAmlVo.setQueryId(titaVo.getTlrNo()); // 查詢者ID
-				checkAml.setTxBuffer(this.getTxBuffer());
-				if ("".equals(checkAmlVo.getName()))
-					checkAmlVo = checkAml.refreshStatus(tTxAmlLog.getLogNo(), titaVo); // 更新指定序號檢核狀態
-				else
-					checkAmlVo = checkAml.reCheckName(tTxAmlLog.getLogNo(), checkAmlVo, titaVo); // AML姓名再檢核
-			} else {
-				// 回應紀錄檔狀態
-				checkAmlVo.setLogNo(tTxAmlLog.getLogNo());
-				checkAmlVo.setStatus(tTxAmlLog.getStatus());
-				checkAmlVo.setStatusCode(tTxAmlLog.getStatusCode());
-				checkAmlVo.setStatusDesc(tTxAmlLog.getStatusDesc());
-				checkAmlVo.setIsSimilar(tTxAmlLog.getIsSimilar());
-				checkAmlVo.setIsSan(tTxAmlLog.getIsSan());
-				checkAmlVo.setIsBanNation(tTxAmlLog.getIsBanNation());
-				checkAmlVo.setConfirmStatus(tTxAmlLog.getConfirmStatus());
-			}
-		}
-		// AML紀錄檔不存在， AML姓名檢核
-		else {
+		if (tTxAmlLog == null) {
 			checkAmlVo.setEntdy(titaVo.getEntDyI()); // 帳務日
 			checkAmlVo.setBrNo(titaVo.getKinbr()); // 單位
 			checkAmlVo.setUnit("10HC00"); // 查詢單位：10HC00
@@ -797,6 +765,53 @@ public class TxAmlCom extends TradeBuffer {
 			// AML姓名檢核
 			checkAml.setTxBuffer(this.getTxBuffer());
 			checkAmlVo = checkAml.checkName(checkAmlVo, titaVo);
+			return checkAmlVo;
+		}
+
+		Document doc = checkAml.convertStringToXml(tTxAmlLog.getMsgRg());
+		orgName = checkAml.getXmlValue(doc, "Name");
+// ConfirmStatus 檢核狀態 0.非可疑名單/已完成名單確認 
+// ConfirmCode人工檢核狀態   ConfirmStatus檢核狀態
+//  1.確認正常              0.非可疑名單/已完成名單確認             
+//  2.確認可疑              2.為凍結名單/未確定名單
+//  3.確認未確定            2.為凍結名單/未確定名單
+		// ConfirmCode 人工檢核狀態 1.確認正常 2.確認可疑 3.確認未確定
+		switch (tTxAmlLog.getConfirmCode()) {
+		case "1":
+			confirmStatus = "0";
+			break;
+		case "2":
+		case "3":
+			confirmStatus = "2";
+			break;
+		default:
+			confirmStatus = tTxAmlLog.getConfirmStatus();
+		}
+
+		// 檢核狀態 = 1.需審查/確認 => AML姓名再檢核
+		if ("1".equals(confirmStatus) || !orgName.equals(checkAmlVo.getName())) {
+			checkAmlVo.setLogNo(tTxAmlLog.getLogNo()); // LogNo
+			checkAmlVo.setEntdy(titaVo.getEntDyI()); // 帳務日
+			checkAmlVo.setBrNo(titaVo.getKinbr()); // 單位
+			checkAmlVo.setUnit("10HC00"); // 查詢單位：10HC00
+			checkAmlVo.setAcceptanceUnit(""); // 代辦單位：space
+			checkAmlVo.setNotifyEmail(empEmail(titaVo)); // EMAIL
+			checkAmlVo.setQueryId(titaVo.getTlrNo()); // 查詢者ID
+			checkAml.setTxBuffer(this.getTxBuffer());
+			if ("".equals(checkAmlVo.getName())) 
+				checkAmlVo = checkAml.refreshStatus(tTxAmlLog.getLogNo(), titaVo); // 更新指定序號檢核狀態
+			else
+				checkAmlVo = checkAml.reCheckName(tTxAmlLog.getLogNo(), checkAmlVo, titaVo); // AML姓名再檢核
+		} else {
+			// 回應紀錄檔狀態
+			checkAmlVo.setLogNo(tTxAmlLog.getLogNo());
+			checkAmlVo.setStatus(tTxAmlLog.getStatus());
+			checkAmlVo.setStatusCode(tTxAmlLog.getStatusCode());
+			checkAmlVo.setStatusDesc(tTxAmlLog.getStatusDesc());
+			checkAmlVo.setIsSimilar(tTxAmlLog.getIsSimilar());
+			checkAmlVo.setIsSan(tTxAmlLog.getIsSan());
+			checkAmlVo.setIsBanNation(tTxAmlLog.getIsBanNation());
+			checkAmlVo.setConfirmStatus(confirmStatus);
 		}
 
 		return checkAmlVo;
