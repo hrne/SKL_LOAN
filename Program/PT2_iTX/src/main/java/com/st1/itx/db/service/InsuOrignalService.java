@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.InsuOrignal;
@@ -84,6 +86,29 @@ public interface InsuOrignalService {
    * @return Slice InsuOrignal InsuOrignal of List
    */
   public Slice<InsuOrignal> findOrigInsuNoEq(int clCode1_0, int clCode2_1, int clNo_2, String origInsuNo_3, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * OrigInsuNo =
+   *
+   * @param origInsuNo_0 origInsuNo_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice InsuOrignal InsuOrignal of List
+   */
+  public Slice<InsuOrignal> findOrigInsuNoAll(String origInsuNo_0, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * ClCode1 = ,AND ClCode2 = ,AND ClNo = ,AND OrigInsuNo =
+   *
+   * @param clCode1_0 clCode1_0
+   * @param clCode2_1 clCode2_1
+   * @param clNo_2 clNo_2
+   * @param origInsuNo_3 origInsuNo_3
+   * @param titaVo Variable-Length Argument
+   * @return Slice InsuOrignal InsuOrignal of List
+   */
+  public InsuOrignal findOrigInsuNoFirst(int clCode1_0, int clCode2_1, int clNo_2, String origInsuNo_3, TitaVo... titaVo);
 
   /**
    * hold By InsuOrignal

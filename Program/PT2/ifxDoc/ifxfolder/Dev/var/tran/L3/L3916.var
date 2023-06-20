@@ -923,7 +923,7 @@ TXFORM=L3916
 [
 ["[L3916]                                 撥款內容查詢"],
 [#<->#,"#FdOCustNo+借戶戶號",#OCustNo,"@-",#OFacmNo,"@-",#OBormNo,#OCustNoX],
-! [#<->#,"#FdStatusX+戶況",#StatusX],
+[#<->#,"#FdStatusX+戶況",#StatusX],
 [#<->#,"<font color=red>@金額資料區","@"],
 ["#FdOApplNo+核准號碼",#OApplNo],["#FdCurrencyCode+幣別",#CurrencyCode],
 ["#FdAcctCodeX+業務科目",#AcctCodeX],["#FdDrawdownAmtX+撥款金額",#DrawdownAmtX],

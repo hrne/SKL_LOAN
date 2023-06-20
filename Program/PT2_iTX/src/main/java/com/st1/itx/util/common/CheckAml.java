@@ -338,8 +338,8 @@ public class CheckAml extends TradeBuffer {
 	 * @throws LogicException LogicException
 	 */
 	public CheckAmlVo refreshStatus(Long logno, TitaVo titaVo) throws LogicException {
-		this.info("CheckAml refreshStatus amlflag=" + amlflag);
 		amlflag = this.txBuffer.getSystemParas().getAmlFg();
+		this.info("CheckAml refreshStatus amlflag=" + amlflag);
 		amlurl = this.txBuffer.getSystemParas().getAmlUrl();
 		TxAmlLog txAmlLog = txAmlLogService.holdById(logno);
 		if (txAmlLog == null) {
@@ -392,6 +392,46 @@ public class CheckAml extends TradeBuffer {
 		checkAmlVo = rspAmlVo(checkAmlVo, txAmlLog);
 
 		return checkAmlVo;
+	}
+
+	/**
+	 * 人工確認檢核
+	 * 
+	 * @param logno  AML檢查序號
+	 * @param titaVo TitaVo
+	 * @return true/falas
+	 * @throws LogicException LogicException
+	 */
+	public boolean isManualConFirm(Long logno, TitaVo titaVo) throws LogicException {
+		amlflag = this.txBuffer.getSystemParas().getAmlFg();
+		this.info("CheckAml isManualConFirm amlflag=" + amlflag);
+		amlurl = this.txBuffer.getSystemParas().getAmlUrl();
+		TxAmlLog txAmlLog = txAmlLogService.holdById(logno);
+		if (txAmlLog == null) {
+			throw new LogicException("EC001", "TxAmlLog.LogNo:" + logno);
+		}
+		if (amlflag > 0) {
+			return true;
+		} else {
+			String msgrs = connectAml(amlurl, txAmlLog.getMsgRg());
+			if (!this.connectSuccess) {
+				return true;
+			} else {
+				Document doc = convertStringToXml(msgrs);
+
+				String Status = getXmlValue(doc, "Severity");
+				String StatusCode = getXmlValue(doc, "StatusCode");
+				String StatusDesc = getXmlValue(doc, "StatusDesc");
+				this.info("refreshStatus.Severity = " + Status);
+				this.info("refreshStatus.StatusCode = " + StatusCode);
+				this.info("refreshStatus.StatusDesc = " + StatusDesc);
+				if ("0".equals(StatusCode) && "INFO".equals(Status)) {
+					return false;
+				} else {
+					return true;
+				}
+			}
+		}
 	}
 
 	private CheckAmlVo rspAmlVo(CheckAmlVo checkAmlVo, TxAmlLog txAmlLog) throws LogicException {
@@ -560,7 +600,8 @@ public class CheckAml extends TradeBuffer {
 		SvcRq = appendChildElement(doc, SvcRq, "Notify_Email", checkAmlVo.getNotifyEmail());
 		SvcRq = appendChildElement(doc, SvcRq, "Query_Id", checkAmlVo.getQueryId());
 		SvcRq = appendChildElement(doc, SvcRq, "Source_Id", checkAmlVo.getSourceId());
-		SvcRq = appendChildElement(doc, SvcRq, "Modify_Date", String.format("%08d%06d", dateUtil.getNowIntegerRoc(), dateUtil.getNowIntegerForBC()));
+		SvcRq = appendChildElement(doc, SvcRq, "Modify_Date",
+				String.format("%08d%06d", dateUtil.getNowIntegerRoc(), dateUtil.getNowIntegerForBC()));
 		SvcRq = appendChildElement(doc, SvcRq, "InsrNHdr_Same", checkAmlVo.getInsrNHdrSame());
 		SvcRq = appendChildElement(doc, SvcRq, "Role_Status", checkAmlVo.getRoleStatus());
 
@@ -692,19 +733,19 @@ public class CheckAml extends TradeBuffer {
 			factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
 			factory.setXIncludeAware(false);
 			factory.setExpandEntityReferences(false);
-			DocumentBuilder builder = null;
-			try {
-				builder = factory.newDocumentBuilder();
-				Document doc = builder.parse(new InputSource(new StringReader(xmlstring)));
-				return doc;
-			} catch (Exception e) {
-				return null;
-			}
 		} catch (ParserConfigurationException e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.warn("Set DocumentBuilderFactory Env Error");
 			this.warn(errors.toString());
+		}
+		DocumentBuilder builder = null;
+		try {
+			builder = factory.newDocumentBuilder();
+
+			Document doc = builder.parse(new InputSource(new StringReader(xmlstring)));
+			return doc;
+		} catch (Exception e) {
 			return null;
 		}
 

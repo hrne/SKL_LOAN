@@ -149,7 +149,7 @@ BEGIN
           ,CASE
              WHEN PROD."IncrFlag" = 'N'
              THEN APLP."IRTASC"
-           ELSE NVL(A1."ASCRAT",0)
+           ELSE 0 -- 2023-06-19 Wei修改 from 家興:ELSE 擺0 原為NVL(A1."ASCRAT",0)
            END                            AS "IndividualIncr"      -- 個別加碼 DECIMAL 6 4 
           ,APLP."APLRAT"                  AS "ApproveRate"         -- 核准利率 DECIMAL 6 4 
           ,0                              AS "AnnualIncr"          -- 年繳比重優惠加減碼 DECIMAL 6 4 
@@ -832,16 +832,6 @@ BEGIN
     LEFT JOIN "CU$CUSP" CUSP ON CUSP."LMSACN" = APLP."LMSACN" 
     LEFT JOIN "FacCaseAppl" APPL ON APPL."ApplNo" = APLP."APLNUM" 
     LEFT JOIN "FacProd" PROD ON PROD."ProdNo" = APLP."IRTBCD" 
-    LEFT JOIN (SELECT "LMSACN" 
-                     ,"LMSAPN" 
-                     ,"ASCRAT" 
-                     ,ROW_NUMBER() OVER (PARTITION BY "LMSACN","LMSAPN" ORDER BY "ASCADT" DESC) AS "SEQ" 
-               FROM "LA$ASCP" 
-               WHERE "ASCADT" <= TO_CHAR(SYSDATE,'YYYYMMDD') 
-               ) A1 
-               ON A1."LMSACN" = APLP."LMSACN" 
-              AND A1."LMSAPN" = APLP."LMSAPN" 
-              AND A1."SEQ" = 1 
     LEFT JOIN "TB$TBLP" R1 ON R1."IN$COD" = APLP."IRTBCD"  
     LEFT JOIN ( SELECT "LMSACN" 
                       ,"LMSAPN" 

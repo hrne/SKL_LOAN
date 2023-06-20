@@ -60,6 +60,9 @@ public class L5101 extends TradeBuffer {
 		this.info("acDate : " + acDate);
 		InnFundApl iInnFundApl = new InnFundApl();
 		InnFundApl xInnFundApl = innFundAplService.findById(acDate, titaVo);
+		
+		titaVo.keepOrgDataBase();// 保留原本記號
+		
 		switch (iFunctionCode) {
 		case 1:
 			if (xInnFundApl != null) {
@@ -72,11 +75,23 @@ public class L5101 extends TradeBuffer {
 				iInnFundApl.setPosbleBorAmt(parse.stringToBigDecimal(titaVo.getParam("PosbleBorAmt")));
 				iInnFundApl.setStockHoldersEqt(parse.stringToBigDecimal(titaVo.getParam("StockHoldersEqt")));
 				iInnFundApl.setAvailableFunds(parse.stringToBigDecimal(titaVo.getParam("AvailableFunds")));
+				
 				try {
 					innFundAplService.insert(iInnFundApl, titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0005", "L5101 InnFundApl insert " + e.getErrorMsg());
 				}
+				
+				titaVo.setDataBaseOnMon();// 指定月報環境
+
+				try {
+					innFundAplService.insert(iInnFundApl, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0005", "L5101 InnFundApl insert " + e.getErrorMsg());
+				}
+				
+				
+				
 			}
 			break;
 		case 2:
@@ -95,6 +110,14 @@ public class L5101 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", "L5101 InnFundApl update " + e.getErrorMsg());
 				}
+				
+				titaVo.setDataBaseOnMon();// 指定月報環境
+				
+				try {
+					innFundAplService.update(iInnFundApl, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0007", "L5101 InnFundApl update " + e.getErrorMsg());
+				}
 			}
 			break;
 		case 4:
@@ -107,11 +130,20 @@ public class L5101 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", "L5101 InnFundApl delete " + e.getErrorMsg());
 				}
+				
+				titaVo.setDataBaseOnMon();// 指定月報環境
+				try {
+					innFundAplService.delete(xInnFundApl, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0007", "L5101 InnFundApl delete " + e.getErrorMsg());
+				}
 			}
 			break;
 		case 5:
 			break;
 		}
+		
+		titaVo.setDataBaseOnOrg();// 還原原本的環境
 
 		this.addList(this.totaVo);
 		return this.sendList();

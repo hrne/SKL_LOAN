@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -211,6 +214,53 @@ em = null;
 			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<InsuOrignal> findOrigInsuNoAll(String origInsuNo_0, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<InsuOrignal> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findOrigInsuNoAll " + dbName + " : " + "origInsuNo_0 : " + origInsuNo_0);
+    if (dbName.equals(ContentName.onDay))
+      slice = insuOrignalReposDay.findAllByOrigInsuNoIsOrderByClCode1AscClCode2AscClNoAsc(origInsuNo_0, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = insuOrignalReposMon.findAllByOrigInsuNoIsOrderByClCode1AscClCode2AscClNoAsc(origInsuNo_0, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = insuOrignalReposHist.findAllByOrigInsuNoIsOrderByClCode1AscClCode2AscClNoAsc(origInsuNo_0, pageable);
+    else 
+      slice = insuOrignalRepos.findAllByOrigInsuNoIsOrderByClCode1AscClCode2AscClNoAsc(origInsuNo_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public InsuOrignal findOrigInsuNoFirst(int clCode1_0, int clCode2_1, int clNo_2, String origInsuNo_3, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("findOrigInsuNoFirst " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2 + " origInsuNo_3 : " +  origInsuNo_3);
+    Optional<InsuOrignal> insuOrignalT = null;
+    if (dbName.equals(ContentName.onDay))
+      insuOrignalT = insuOrignalReposDay.findTopByClCode1IsAndClCode2IsAndClNoIsAndOrigInsuNoIsOrderByCreateDateAsc(clCode1_0, clCode2_1, clNo_2, origInsuNo_3);
+    else if (dbName.equals(ContentName.onMon))
+      insuOrignalT = insuOrignalReposMon.findTopByClCode1IsAndClCode2IsAndClNoIsAndOrigInsuNoIsOrderByCreateDateAsc(clCode1_0, clCode2_1, clNo_2, origInsuNo_3);
+    else if (dbName.equals(ContentName.onHist))
+      insuOrignalT = insuOrignalReposHist.findTopByClCode1IsAndClCode2IsAndClNoIsAndOrigInsuNoIsOrderByCreateDateAsc(clCode1_0, clCode2_1, clNo_2, origInsuNo_3);
+    else 
+      insuOrignalT = insuOrignalRepos.findTopByClCode1IsAndClCode2IsAndClNoIsAndOrigInsuNoIsOrderByCreateDateAsc(clCode1_0, clCode2_1, clNo_2, origInsuNo_3);
+
+    return insuOrignalT.isPresent() ? insuOrignalT.get() : null;
   }
 
   @Override

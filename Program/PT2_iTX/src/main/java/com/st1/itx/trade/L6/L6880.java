@@ -162,7 +162,7 @@ public class L6880 extends TradeBuffer {
 		// stopTime – 顯示停止時間 西元 8 + 4 時間
 		// msg – 訊息內容
 		// mode – false : insert and replace mode ; true : delete mode titaVo – titaVo
-		String brtime = dDateUtil.getNowStringBc() + (this.txBuffer.getTxCom().getTxTime()/100 + 1);//1分鐘
+		String brtime = dDateUtil.getNowStringBc() + (this.txBuffer.getTxCom().getTxTime()/100 + 10);//10分鐘
 		webClient.sendTicker("0000", "00001", brtime, "系統已換日", false, titaVo);
 		
 		this.addList(this.totaVo);

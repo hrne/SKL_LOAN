@@ -2,11 +2,15 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
- * InsuOrignal 火險初保檔<br>
+ * InsuOrignal 擔保品火險檔<br>
  * Gen By Tool
  * 
  * @author AdamPan
@@ -16,12 +20,7 @@ import javax.persistence.Embeddable;
 public class InsuOrignalId implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -281421461567121318L;
-
-// 擔保品-代號1
+  // 擔保品-代號1
   @Column(name = "`ClCode1`")
   private int clCode1 = 0;
 

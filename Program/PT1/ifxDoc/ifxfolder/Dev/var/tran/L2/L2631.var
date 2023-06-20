@@ -24,7 +24,56 @@
 !<include src="COM.icf::ACTFGX-RUN.pre"/>
 !<include src="COM.icf::TITLE-RUN.pre"/>
 !<include src="TITF.icf::RPRUN.dec"/>
-
+#Clean=@,1,S
+T(3,#CloseNo,)
+T(3,#FunCode,)
+T(3,#FunCodX,)
+T(3,#TranDate,)
+T(3,#ApplDate,)
+T(3,#CloseInd,)
+T(3,#CloseIndX,)
+T(3,#FacmNo,)
+T(3,#CollectFlag,)
+T(3,#CollectFlagX,)
+T(3,#BdLocation,)
+T(3,#BdRmk,)
+T(3,#Prohibitperiod,)
+T(3,#ProhibitMonthMsg,)
+T(3,#IntStartDate,)
+T(3,#IntEndDate,)
+T(3,#ClNoX,)
+T(3,#PrincipalX,)
+T(3,#ModifyFeeX,)
+T(3,#InterestX,)
+T(3,#AcctFeeX,)
+T(3,#DelayIntX,)
+T(3,#FireFeeX,)
+T(3,#BreachAmtX,)
+T(3,#LawFeeX,)
+T(3,#CloseBreachAmtX,)
+T(3,#ShortfallX,)
+T(3,#ShortfallXX,)
+T(3,#ExcessiveX,)
+T(3,#CloseAmt,)
+T(3,#TelNo1,)
+T(3,#TelNo2,)
+T(3,#TelNo3,)
+T(3,#CloseReasonCode,)
+T(3,#CloseReasonCodeX,)
+T(3,#CollectWayCode,)
+T(3,#CollectWayCodeX,)
+T(3,#PostAddress,)
+T(3,#Rmk1,)
+##loop{times:20,l:0,n:1,m:2}
+T(3,#CustNo{n},)
+T(3,#HighGuaAmt{n},)
+T(3,#GuaAmt{n},)
+T(3,#CustName{n},)
+T(3,#CustStat{n},)
+T(3,#CustStatX{n},)
+T(3,#PayIntDate{n},)
+T(3,#PayIntDateX{n},)
+##end
 
 
 </sub>
@@ -250,6 +299,8 @@ SHOW(#BTN1,#BTN3)
 @
 T(2,@BUF1,#CustNo+          )
 T(3,#CustName,)
+C(3,#CustNo,0,$,C(3,#CustNo,#TimCustNo,$,CALL(#Clean)))
+
 
 #BIND1A=X,1,S
 BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1:CustNo<-OOCustNo:TimCustNo<-OOCustNo})
@@ -303,6 +354,7 @@ C(3,#CustNo,0,$,S)
 T(2,#L2r07CustName)
 
 #TimCustNo=A,7,S
+C(3,#CustNo,0,C(3,#L2r07CustNo,#TimCustNo,$,CALL(#Clean)),C(3,#CustNo,#TimCustNo,$,CALL(#Clean)))
 C(3,#CustNo,0,T(2,#L2r07CustNo),E(0,#CustNo))
 T(2,@RmkCustNo,#TimCustNo)
 <include src="COM.icf::CustRmk.rtn"/>
@@ -342,6 +394,7 @@ T(H,#FunCode,#FunCodHelp)
 C(3,#FunCode,0,$,T(3,@CollectFlag,Y))
 C(3,#FunCode,0,T(F,@CollectFlag,1),T(F,@CollectFlag,0))
 C(3,#FunCode,2,T(3,@FdCloseReasonCode, ),$)
+
 
 
 !調rim參數

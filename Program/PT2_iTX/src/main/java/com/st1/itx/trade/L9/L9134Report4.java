@@ -96,6 +96,7 @@ public class L9134Report4 extends MakeReport {
 				int nowday = iYear + iMon + iDay;
 				Slice<TxHoliday> nowDay = iTxHoliday.findHoliday("TW", nowday, nowday, iTmnDy, row, titaVo);
 				if (nowDay == null) {
+					
 					BigDecimal iTdBal = parse.stringToBigDecimal(r.get("TdBal"));
 					BigDecimal iDifTdBal = parse.stringToBigDecimal(r.get("DifTdBal"));
 					BigDecimal didTdBal = parse.stringToBigDecimal(r.get("didTdBal"));
@@ -107,18 +108,39 @@ public class L9134Report4 extends MakeReport {
 //				int AcDate = parse.stringToInteger(r.get("AcDate"));
 					BigDecimal ETal = iDifTdBal.add(didDifTdBal);
 					BigDecimal JTal = didCDrAmt.add(iTemTal);
-					makeExcel.setValue(row, 1, iTdBal, "#,##0");
-					makeExcel.setValue(row, 2, iDifTdBal, "#,##0");
-					makeExcel.setValue(row, 3, didTdBal, "#,##0");
-					makeExcel.setValue(row, 4, didDifTdBal, "#,##0");
-					makeExcel.setValue(row, 5, ETal, "#,##0");
-					makeExcel.setValue(row, 6, r.get("AcDate"), "R");
-					makeExcel.setValue(row, 7, didCDrAmt, "R");
-					makeExcel.setValue(row, 8, iTemTal, "#,##0");
-					makeExcel.setValue(row, 10, JTal, "#,##0");
-					makeExcel.setValue(row, 11, ETal.subtract(JTal), "#,##0");
-					makeExcel.setValue(row, 12, drAmt, "#,##0");
-					makeExcel.setValue(row, 13, crAmt, "#,##0");
+					
+					if(iTdBal.equals(BigDecimal.ZERO)&&iDifTdBal.equals(BigDecimal.ZERO)
+							&& didTdBal.equals(BigDecimal.ZERO)&& didDifTdBal.equals(BigDecimal.ZERO)) {
+						
+						makeExcel.setValue(row, 1, "");
+						makeExcel.setValue(row, 2, "");
+						makeExcel.setValue(row, 3, "");
+						makeExcel.setValue(row, 4, "");
+						makeExcel.setValue(row, 5, "");
+						makeExcel.setValue(row, 6, r.get("AcDate"), "R");
+						makeExcel.setValue(row, 7, "");
+						makeExcel.setValue(row, 8, "");
+						makeExcel.setValue(row, 10, "");
+						makeExcel.setValue(row, 11, "");
+						makeExcel.setValue(row, 12, "");
+						makeExcel.setValue(row, 13, "");
+						makeExcel.setValue(row, 14, "");
+					}else {
+						makeExcel.setValue(row, 1, (iTdBal.equals(BigDecimal.ZERO) )?"":iTdBal, "#,##0");
+						makeExcel.setValue(row, 2, iDifTdBal, "#,##0");
+						makeExcel.setValue(row, 3, didTdBal, "#,##0");
+						makeExcel.setValue(row, 4, didDifTdBal, "#,##0");
+						makeExcel.setValue(row, 5, ETal, "#,##0");
+						makeExcel.setValue(row, 6, r.get("AcDate"), "R");
+						makeExcel.setValue(row, 7, didCDrAmt, "R");
+						makeExcel.setValue(row, 8, iTemTal, "#,##0");
+						makeExcel.setValue(row, 10, JTal, "#,##0");
+						makeExcel.setValue(row, 11, ETal.subtract(JTal), "#,##0");
+						makeExcel.setValue(row, 12, drAmt, "#,##0");
+						makeExcel.setValue(row, 13, crAmt, "#,##0");
+					}
+					
+					
 					BigDecimal ix = crAmt.subtract(drAmt);
 					BigDecimal ii = iDifTdBal.add(didDifTdBal);
 					BigDecimal iy = ix.subtract(ii);
@@ -129,6 +151,7 @@ public class L9134Report4 extends MakeReport {
 						makeExcel.setValue(row, 14, "X");
 					}
 				} else {
+					
 					makeExcel.setValue(row, 1, "");
 					makeExcel.setValue(row, 2, "");
 					makeExcel.setValue(row, 3, "");

@@ -278,7 +278,11 @@ BEGIN
              THEN 1 
            ELSE LMSP."LMSSTS" END         AS "Status"              -- 戶況 DECIMAL 2  
           ,LMSP."IRTASC"                  AS "RateIncr"            -- 加碼利率 DECIMAL 6 4 
-          ,0                              AS "IndividualIncr"      -- 個別加碼利率 DECIMAL 6 4 
+          ,CASE
+             WHEN PROD."IncrFlag" = 'N'
+             THEN APLP."IRTASC"
+           ELSE 0 -- 2023-06-19 Wei修改 from 家興:ELSE 擺0 原為NVL(A1."ASCRAT",0)
+           END                            AS "IndividualIncr"      -- 個別加碼利率 DECIMAL 6 4 
           ,NVL(APLP."APLRAT",0)           AS "ApproveRate"         -- 核准利率 DECIMAL 6 4 
           ,NVL(IRTP."IRTRAT",NVL(APLP."APLRAT",0)) 
                                           AS "StoreRate"           -- 實際計息利率 DECIMAL 6 4 
@@ -449,6 +453,7 @@ BEGIN
                 AND T2."LMSASQ" = LMSP."LMSASQ" 
     LEFT JOIN "LA$APLP" APLP ON APLP."LMSACN" = LMSP."LMSACN" 
                             AND APLP."LMSAPN" = LMSP."LMSAPN" 
+    LEFT JOIN "FacProd" PROD ON PROD."ProdNo" = APLP."IRTBCD" 
     LEFT JOIN A1 ON A1."LMSACN" = LMSP."LMSACN" 
                 AND A1."LMSAPN" = LMSP."LMSAPN" 
                 AND A1."LMSASQ" = LMSP."LMSASQ" 

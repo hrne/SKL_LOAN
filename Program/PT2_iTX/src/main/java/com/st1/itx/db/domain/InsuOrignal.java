@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -14,7 +15,7 @@ import com.st1.itx.util.StaticTool;
 import com.st1.itx.Exception.LogicException;
 
 /**
- * InsuOrignal 火險初保檔<br>
+ * InsuOrignal 擔保品火險檔<br>
  * Gen By Tool
  * 
  * @author AdamPan
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class InsuOrignal implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 2279388520784850597L;
-
-@EmbeddedId
+  @EmbeddedId
   private InsuOrignalId insuOrignalId;
 
   // 擔保品-代號1
@@ -96,6 +92,7 @@ public class InsuOrignal implements Serializable {
   private int insuReceiptDate = 0;
 
   // 備註
+  /* 轉換留存(擔保品唯一性被合併之擔保品編號其保險單資料) */
   @Column(name = "`Remark`", length = 50)
   private String remark;
 
@@ -429,7 +426,7 @@ public class InsuOrignal implements Serializable {
 
 /**
 	* 備註<br>
-	* 
+	* 轉換留存(擔保品唯一性被合併之擔保品編號其保險單資料)
 	* @return String
 	*/
   public String getRemark() {
@@ -438,7 +435,7 @@ public class InsuOrignal implements Serializable {
 
 /**
 	* 備註<br>
-	* 
+	* 轉換留存(擔保品唯一性被合併之擔保品編號其保險單資料)
   *
   * @param remark 備註
 	*/

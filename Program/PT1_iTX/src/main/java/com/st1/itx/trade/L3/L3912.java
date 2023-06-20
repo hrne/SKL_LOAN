@@ -310,8 +310,8 @@ public class L3912 extends TradeBuffer {
 		this.totaVo.putParam("OMasterCustId", tTempVo.getParam("MasterCustId"));
 		this.totaVo.putParam("OMasterCustIdX", loanCom.getCustNameById(tTempVo.getParam("MasterCustId")));
 		this.totaVo.putParam("ORvNo", rvNo);
-		this.totaVo.putParam("OSupervisor", tTempVo.getParam("Supervisor"));
-		this.totaVo.putParam("OSupervisorX", loanCom.getEmpFullnameByEmpNo(tTempVo.getParam("Supervisor")));
+		this.totaVo.putParam("OSupervisor", tTempVo.getParam("Supervisor").trim());
+		this.totaVo.putParam("OSupervisorX", loanCom.getEmpFullnameByEmpNo(tTempVo.getParam("Supervisor").trim()));
 		this.totaVo.putParam("ORate", tLoanBorTx.getRate());
 		String slipSumNoX = "";
 		if (tLoanBorTx.getSlipSumNo() > 0) {

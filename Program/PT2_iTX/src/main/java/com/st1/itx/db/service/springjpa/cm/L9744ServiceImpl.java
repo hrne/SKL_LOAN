@@ -75,7 +75,7 @@ public class L9744ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                           AND B.\"CustNo\"      = I.\"CustNo\"";
 		sql += "                           AND B.\"FacmNo\"      = I.\"FacmNo\"";
 		sql += "                           AND B.\"BormNo\"      = I.\"BormNo\"";
-		sql += "                           AND B.\"PieceCode\"   = I.\"PieceCode\"";
+		//sql += "                           AND B.\"PieceCode\"   = I.\"PieceCode\"";
 		sql += "                           AND B.\"DrawdownAmt\" = I.\"DrawdownAmt\"";
 		sql += "                           AND B.\"RepayType\"   = I.\"RepayType\" ";
 		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = I.\"CustNo\"";
