@@ -184,9 +184,12 @@ BEGIN
             ,MAX(CASE 
                    WHEN TR1."TRXTCT" IS NOT NULL 
                    THEN CASE 
-                         --  WHEN TR1."TRXTCT" = '1' AND NVL(NOD."LMSACN",0) <> 0 THEN '2' 
-                          WHEN TR1."TRXTCT" = '1' AND ACN."IsSameFac" = 1 
-                                                  THEN '2' 
+                          -- WHEN TR1."TRXTCT" = '1' AND NVL(NOD."LMSACN",0) <> 0 THEN '2' 
+                          -- 2023-06-20 From Linda :賴桑說這二支程式借新還舊的判斷不能加同額度條件
+                          -- 改為 WHEN TR1."TRXTCT" = '0'  AND ACN的舊額度撥款存在 THEN '2'
+                          WHEN TR1."TRXTCT" = '0' 
+                               AND NVL(ACN."LMSACN",0) != 0
+                          THEN '2' 
                           WHEN TR1."TRXTCT" = '1' THEN '1' 
                           WHEN TR1."TRXTCT" = '2' THEN '3' 
                           WHEN TR1."TRXTCT" = '3' THEN '4' 

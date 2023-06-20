@@ -388,12 +388,15 @@ BEGIN
           /* 2021-03-19 智偉修改:原欄位值為0、1，新系統為Y/N */ 
           /* 2022-01-14 智偉修改:新系統修改欄位定義 0:正常 1.展期(不同額度) 2.借新還舊(同額度) */ 
           /* 2023-01-18 智偉修改:要跟舊系統一樣 */
+          /* 2023-06-20 智偉修改:要看LNACNP*/
           ,CASE 
-             WHEN LMSP."LMSNEW" = '1' 
+             WHEN LMSP."LMSNEW" = '1' -- 2023-01-18 智偉修改:要跟舊系統一樣
                   AND NVL(T2."RenewFlag",0) != 0
              THEN T2."RenewFlag" 
-             WHEN LMSP."LMSNEW" = '1' 
+             WHEN LMSP."LMSNEW" = '1' -- 2023-01-18 智偉修改:要跟舊系統一樣
              THEN 1 
+             WHEN NVL(T2."RenewFlag",0) != 0 -- 2023-06-20 智偉修改:要看LNACNP
+             THEN T2."RenewFlag" 
            ELSE 0 END                     AS "RenewFlag"           -- 借新還舊 DECIMAL 1  
           ,NVL(APLP."CASCDE",' ')         AS "PieceCode"           -- 計件代碼 VARCHAR2 1  
           ,''                             AS "PieceCodeSecond" 

@@ -316,7 +316,8 @@ T(2,#OCustNo+-+#OFacmNo+-+#OBormNo)
 
 !交易代號
 #OOTxCd=X,5,S
-
+!顯示交易按紐
+#OODisPlayBTN=X,1,S
 #BufA=X,50,S
 T(2,#OTxDate+#OTxSeq+#OTxSno)
 
@@ -331,7 +332,8 @@ T(2,#OTxSeq)
 T(6A,#Entdy+#TxNo)
 !交易
 #OOBtnB=X,1,S
-BIND(grid,{ cmd=DDCHECK; ntxcd=#OOTxCd; txno=#RimData;rim=LCR11})
+C(5,#OODisPlayBTN,N,$,BIND(grid,{ cmd=DDCHECK; ntxcd=#OOTxCd; txno=#RimData;rim=LCR11}))
+
 
 
 </sub>
@@ -371,6 +373,7 @@ TXFORM=L6932
 #OTxSeq
 #OTxSno
 #OOTxCd
+#OODisPlayBTN
 ^
 </sub>
 

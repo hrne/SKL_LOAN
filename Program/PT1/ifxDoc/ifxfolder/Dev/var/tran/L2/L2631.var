@@ -299,8 +299,6 @@ SHOW(#BTN1,#BTN3)
 @
 T(2,@BUF1,#CustNo+          )
 T(3,#CustName,)
-C(3,#CustNo,0,$,C(3,#CustNo,#TimCustNo,$,CALL(#Clean)))
-
 
 #BIND1A=X,1,S
 BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1:CustNo<-OOCustNo:TimCustNo<-OOCustNo})
@@ -316,7 +314,6 @@ R(1,L2R07)
 #CustName=X,100,L
 C(3,#CustNo,0,S,$)
 T(2,#L2r07CustName)
-
 
 #BUF9B=X,25,S
 T(2,1+#SysDate+#CustNo+#FacmNo+000)

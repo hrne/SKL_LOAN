@@ -388,6 +388,15 @@ T(2,@DistManagerName,#L2r08FullName)
 
 #DistManagerName=X,50,L
 
+
+<include src="ROM.icf::L2R66.dec"/>
+#RimUnitCode=X,6,S
+#RimTxCode1=X,6,S
+T(2,L5501)
+#RimErrorSkip1=X,1,S
+T(2,Y)
+
+
 ! 部室代號
 #DeptCodeBTN=X,1,I,ui:button;value:單位代號查詢;enable:1;tabbable:0
 #DeptCodeBUF=X,6,S
@@ -397,6 +406,15 @@ BIND(#DeptCodeBTN,click, {cmd=CHAIN; ntxcd=L6086; ntxbuf=#DeptCodeBUF;ntxbuf5=ty
 #DeptCode=X,6,I
 IF(#FunCode != 2,s,$)
 IF(#Option == 2,s,$)
+
+#SendL2r66A=X,1,S
+C(4,#DeptCode,S,$)
+T(2,@RimUnitCode,#DeptCode)
+RESET_RIM(#SendL2r66A,L2R66)
+S(L2R66,1,#RimTxCode1,#RimUnitCode,#RimErrorSkip1)
+R(1,L2R66)
+T(2,@DeptCodeX,#L2r66UnitItem)
+
 
 ! 部室名稱
 #DeptCodeX=x,40,L
@@ -411,6 +429,15 @@ BIND(#DistCodeBTN,click, {cmd=CHAIN; ntxcd=L6086; ntxbuf=#DistCodeBUF;ntxbuf5=ty
 IF(#FunCode != 2,s,$)
 IF(#Option == 2,s,$)
 
+#SendL2r66B=X,1,S
+C(4,#DistCode,S,$)
+T(2,@RimUnitCode,#DistCode)
+RESET_RIM(#SendL2r66B,L2R66)
+S(L2R66,1,#RimTxCode1,#RimUnitCode,#RimErrorSkip1)
+R(1,L2R66)
+T(2,@DistCodeX,#L2r66UnitItem)
+
+
 ! 區部名稱
 #DistCodeX=x,40,L
 
@@ -423,6 +450,14 @@ BIND(#UnitCodeBTN,click, {cmd=CHAIN; ntxcd=L6086; ntxbuf=#UnitCodeBUF;ntxbuf5=ty
 #UnitCode=X,6,I
 IF(#FunCode != 2,s,$)
 IF(#Option == 2,s,$)
+
+#SendL2r66C=X,1,S
+C(4,#UnitCode,S,$)
+T(2,@RimUnitCode,#UnitCode)
+RESET_RIM(#SendL2r66C,L2R66)
+S(L2R66,1,#RimTxCode1,#RimUnitCode,#RimErrorSkip1)
+R(1,L2R66)
+T(2,@UnitCodeX,#L2r66UnitItem)
 
 ! 單位名稱
 #UnitCodeX=x,40,L
@@ -565,6 +600,7 @@ TXFORM=L5501
 <include src="ROM.icf::L5R27.tom"/>
 <include src="ROM.icf::L5R28.tom"/>
 <include src="ROM.icf::L2R08.tom"/>
+<include src="ROM.icf::L2R66.tom"/>
 
 </sub>
 

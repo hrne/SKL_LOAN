@@ -419,8 +419,11 @@ BEGIN
           ,JSON_OBJECT(
                'TRXNM2' VALUE TO_CHAR(TR1.TRXNM2) ,
                'CaseCloseCode' VALUE TO_CHAR(CASE -- 結案區分
-                                       WHEN TR1."TRXTCT" = '1' AND ACN."IsSameFac" = 1 
-                                                               THEN '2' 
+                                       -- 2023-06-20 From Linda :賴桑說這二支程式借新還舊的判斷不能加同額度條件
+                                       -- 改為 WHEN TR1."TRXTCT" = '0'  AND ACN的舊額度撥款存在 THEN '2'
+                                       WHEN TR1."TRXTCT" = '0' 
+                                            AND NVL(ACN."LMSACN",0) != 0
+                                       THEN '2' 
                                        WHEN TR1."TRXTCT" = '1' THEN '1' 
                                        WHEN TR1."TRXTCT" = '2' THEN '3' 
                                        WHEN TR1."TRXTCT" = '3' THEN '4' 
@@ -605,7 +608,10 @@ BEGIN
              THEN '3244'
              WHEN TR1.TRXTRN='3033' AND JL."AcctCode" = 'F29'
              THEN '3260'
-             WHEN TR1.TRXTRN='3041' AND TR1.TRXTCT=1 AND ACN."IsSameFac" = 1 
+             -- 2023-06-20 From Linda :賴桑說這二支程式借新還舊的判斷不能加同額度條件
+             -- 改為 WHEN TR1."TRXTCT" = '0'  AND ACN的舊額度撥款存在 THEN '2'
+             WHEN TR1."TRXTCT" = '0' 
+                  AND NVL(ACN."LMSACN",0) != 0
              THEN '3422'
              WHEN TR1.TRXTRN='3041' AND TR1.TRXTCT=1
              THEN '3421'

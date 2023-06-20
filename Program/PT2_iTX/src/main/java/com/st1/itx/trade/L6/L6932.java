@@ -21,6 +21,7 @@ import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.TxDataLog;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.TxDataLogService;
+import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.TxTranCodeService;
@@ -101,6 +102,11 @@ public class L6932 extends TradeBuffer {
 			occursList.putParam("OTxSeq", d.get("TxSeq"));
 			occursList.putParam("OTxSno", d.get("TxSno"));
 			occursList.putParam("OOTxCd", d.get("TranNo"));
+			Boolean disPlayBTN = true;
+			if ("L2917".equals(d.get("TranNo").trim())) {
+				disPlayBTN = false;
+			}
+			occursList.putParam("OODisPlayBTN", disPlayBTN ? "Y" : "N");
 
 			this.totaVo.addOccursList(occursList);
 		}

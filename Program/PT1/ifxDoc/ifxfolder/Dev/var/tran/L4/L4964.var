@@ -110,7 +110,7 @@ T(2,@InsuTypeCodeHelp,#HelpDesc4)
 #SelfInsuCodeHelp=x,30,S
 T(3,0:自保;1:自保;2:自保)
 #SelfInsuCodeHelp2=x,30,S
-T(3,0:新保;1:自保;2:續保)
+T(3,0:;1:自保;2:續保)
 
 #ClCode1Help=x,1024,S
 T(3,1:房地;2:土地)
