@@ -42,13 +42,14 @@ T(3,Y: ;N: )
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="L4962" layout="cols=3;screen.width=[130,500,130,240];printer.width=[20,80];order=1">
+<sub type="DC" name="L4962" layout="cols=3;screen.width=[150,500,150,240];printer.width=[20,80];order=1">
 [
 ["[L4962]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@保險單資料檢核作業"],
 ["#FdFlagA+檢核表類別",#FlagA,"保費、保單未完成檢核表(1.無新保單 2.保費未入帳)"],["火險到期年月",#InsuEndMonthFrom,"~",#InsuEndMonthTo],
-["@",#FlagB,"額度無保單檢核表(1.無保單 2.已到期)"],["撥款區間",#DrawdownDateFrom,"~",#DrawdownDateTo],
-["@",""],["火險到期年月",#InsuEndMonthFrom2,"~",#InsuEndMonthTo2],
+["@",#FlagB,"額度無保單檢核表(1.無保單 2.已到期)"],["1.撥款區間",#DrawdownDateFrom,"~",#DrawdownDateTo],
+["@",""],["2.火險到期年月",#InsuEndMonthFrom2,"~",#InsuEndMonthTo2],
 ["@",#CommericalFlag,"險種註記明細表-",#CommericalFlagX],["火險到期年月",#InsuEndMonthFrom1,"~",#InsuEndMonthTo1],
+["@",#FlagD,"擔保品無保險單"],
 ]
 
 #FdFlagA=X,2,L
@@ -61,6 +62,7 @@ T(3,Y: ;N: )
 T(3,CdCode.CommericalFlag)
 
 #CommericalFlagHelp=x,1024,S
+#CommericalFlagYHelp=x,1024,S
 
 ![催收戶況]
 #CDDEF02=x,26,S
@@ -76,6 +78,7 @@ R(1,XXR99)
 CALL(#HelpProc)
 T(2,@CommericalFlagHelp,#HelpDesc1)
 T(2,@ColStatusHelp,#HelpDesc2)
+T(HELP,@CommericalFlagYHelp,#CommericalFlagHelp,-,N)
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
@@ -155,6 +158,7 @@ T(2,01)
 HELP(#TCommericalFlagHelp)
 @V(H,#TCommericalFlagHelp)
 
+
 #CommericalFlagX=X,30,L
 C(4,#CommericalFlag,S,$)
 T(H,#CommericalFlag,#TCommericalFlagHelp)
@@ -170,6 +174,11 @@ C(5,#CommericalFlag,N,S,$)
 T(1,@InsuEndMonthTo1,#SYSDATE,2,5)
 @A(YM,1,#InsuEndMonthTo1)
 IF(#InsuEndMonthTo1<#InsuEndMonthFrom1,V(P,訖年月不可小於起年月),$)
+
+#FlagD=X,1,I
+HELP(#YnH)
+@V(H,#YnH)
+
 
 #ReportA=A,1,S
 C(4,#FlagA,E(0,0),E(0,1))
@@ -324,6 +333,7 @@ T(3,[L4962] 保險單資料檢核作業)
 #DrawdownDateTo
 #InsuEndMonthFrom2
 #InsuEndMonthTo2
+#FlagD
 #END
 </sub>
 

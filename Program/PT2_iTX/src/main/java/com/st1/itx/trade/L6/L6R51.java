@@ -1,7 +1,9 @@
 package com.st1.itx.trade.L6;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -47,68 +49,139 @@ public class L6R51 extends TradeBuffer {
 	@Autowired
 	Parse parse;
 
+	private DecimalFormat df = new DecimalFormat("##,###,###,###,##0");
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6R51 ");
 		this.totaVo.init(titaVo);
 		this.index = titaVo.getReturnIndex();
+
 //		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 200;
-		this.info("titaVo  = " + titaVo);
+
+		int iTranKey_Tmp = titaVo.getParam("TranKey_Tmp").equals("") ? 0
+				: parse.stringToInteger(titaVo.getParam("TranKey_Tmp").trim());
+		int iEffectDate = Integer.valueOf(titaVo.getParam("RimEffectDate").trim()) + 19110000;
+
+		String txcd = titaVo.getTxcd();
+
+		this.info("L6R51 getTxcd= " + titaVo.getTxcd());
+		this.info("L6R51 iTranKey_Tmp= " + iTranKey_Tmp);
+		this.info("L6R51 iEffectDate= " + iEffectDate);
+
 		// 取得輸入資料
 		CdCommId tCdCommId = new CdCommId();
-		int iEffectDate = Integer.valueOf(titaVo.getParam("RimEffectDate").trim()) + 19110000;
-		int iTranKey_Tmp = Integer.valueOf(titaVo.getParam("TranKey_Tmp").trim());
 		Slice<CdCode> slCdCode = null;
-		slCdCode = cdCodeService.getCodeList(2, "GovOfferCode", 0, Integer.MAX_VALUE, titaVo);
 
-		if (slCdCode == null) {
+		if (txcd.equals("L6303")) {
 
-		} else {
+			slCdCode = cdCodeService.getCodeList(2, "GovOfferCode", 0, Integer.MAX_VALUE, titaVo);
 
-			String i1 = "01";
+			if (slCdCode != null) {
 
-			String iCdType = i1;
-			String iCdItem = i1;
+				tCdCommId.setCdType("01");
+				tCdCommId.setCdItem("01");
+				tCdCommId.setEffectDate(iEffectDate);
 
-			tCdCommId.setCdType(iCdType);
-			tCdCommId.setCdItem(iCdItem);
+				CdComm tCdComm = cdCommService.findById(tCdCommId, titaVo);
+
+				TempVo tTempVo = new TempVo();
+
+				if (tCdComm != null) {
+
+					if (iTranKey_Tmp == 1) {
+						throw new LogicException(titaVo, "E0001", "新增日期已存在");
+
+					}
+					tTempVo = tTempVo.getVo(tCdComm.getJsonFields());
+
+					totaVo.putParam("L6r51EffectDate", tCdComm.getEffectDate());
+					totaVo.putParam("L6r51Remark", tCdComm.getRemark());
+					totaVo.putParam("L6r51Enable", tCdComm.getEnable());
+				}
+
+				for (CdCode tCdCode : slCdCode.getContent()) {
+					if ("Y".equals(tCdCode.getCode()) || "N".equals(tCdCode.getCode())) {
+						continue;
+					}
+
+					BigDecimal rate = BigDecimal.ZERO;
+					rate = parse.stringToBigDecimal(tTempVo.getParam("SubsidyRate" + tCdCode.getCode()));
+					this.info("rate   = " + rate);
+					OccursList occursList = new OccursList();
+					occursList.putParam("L6r51CodeTypeNo", tCdCode.getCode());
+					occursList.putParam("L6r51CdItemNo", tCdCode.getItem());
+					occursList.putParam("L6r51JsonFieldsNo", rate);
+
+					this.totaVo.addOccursList(occursList);
+				}
+			}
+		} else if (txcd.equals("L6304")) {
+
+			tCdCommId.setCdType("02");
+			tCdCommId.setCdItem("01");
 			tCdCommId.setEffectDate(iEffectDate);
 
 			CdComm tCdComm = cdCommService.findById(tCdCommId, titaVo);
 
-			TempVo tTempVo = new TempVo();
+			//固定參數
+			slCdCode = cdCodeService.getCodeList(3, "GovOfferCode", 0, Integer.MAX_VALUE, titaVo);
 
-			if (tCdComm != null) {
+			if (slCdCode != null) {
+
+				String prodName = "";
+				String colName = "";
+				int cnt = 0;
 
 				if (iTranKey_Tmp == 1) {
-					throw new LogicException(titaVo, "E0001", "新增日期已存在");
+
+					if (tCdComm != null) {
+						throw new LogicException(titaVo, "E0002", "資料年月已存在");
+					}
+
+					for (CdCode tCdCode : slCdCode.getContent()) {
+
+						cnt++;
+
+						BigDecimal loanBal = BigDecimal.ZERO;
+						prodName = tCdCode.getItem();
+						colName = tCdCode.getCode();
+						if ("340".equals(prodName.substring(0, 3)) || "921".equals(prodName.substring(0, 3))
+								|| "990".equals(prodName.substring(0, 3))) {
+							prodName = prodName.substring(4);
+						}
+						this.totaVo.putParam("L6r51ColName" + cnt, colName);
+						this.totaVo.putParam("L6r51ProdName" + cnt, prodName);
+						this.totaVo.putParam("L6r51LoanBal" + cnt, df.format(loanBal));
+
+					}
+				}
+				if (iTranKey_Tmp != 1) {
+
+					TempVo tTempVo = new TempVo();
+
+					tTempVo = tTempVo.getVo(tCdComm.getJsonFields());
+
+					for (CdCode tCdCode : slCdCode.getContent()) {
+						cnt++;
+						BigDecimal loanBal = BigDecimal.ZERO;
+						loanBal = parse.stringToBigDecimal(tTempVo.getParam(tCdCode.getCode()));
+						prodName = tCdCode.getItem();
+						colName = tCdCode.getCode();
+						if ("340".equals(prodName.substring(0, 3)) || "921".equals(prodName.substring(0, 3))
+								|| "990".equals(prodName.substring(0, 3))) {
+							prodName = prodName.substring(4);
+						}
+						this.totaVo.putParam("L6r51ColName" + cnt, colName);
+						this.totaVo.putParam("L6r51ProdName" + cnt, prodName);
+						this.totaVo.putParam("L6r51LoanBal" + cnt, df.format(loanBal));
+
+					}
 				}
 
-				tTempVo = tTempVo.getVo(tCdComm.getJsonFields());
-
-				totaVo.putParam("L6r51EffectDate", tCdComm.getEffectDate());
-				totaVo.putParam("L6r51Remark", tCdComm.getRemark());
-				totaVo.putParam("L6r51Enable",tCdComm.getEnable());
-			}
-
-			for (CdCode tCdCode : slCdCode.getContent()) {
-				if ("Y".equals(tCdCode.getCode()) || "N".equals(tCdCode.getCode())) {
-					continue;
-				}
-
-				BigDecimal rate = BigDecimal.ZERO;
-				rate = parse.stringToBigDecimal(tTempVo.getParam("SubsidyRate" + tCdCode.getCode()));
-				this.info("rate   = " + rate);
-				OccursList occursList = new OccursList();
-				occursList.putParam("L6r51CodeTypeNo", tCdCode.getCode());
-				occursList.putParam("L6r51CdItemNo", tCdCode.getItem());
-				occursList.putParam("L6r51JsonFieldsNo", rate);
-
-				this.totaVo.addOccursList(occursList);
-			}
-		}
-
+			} // if
+		} // if
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

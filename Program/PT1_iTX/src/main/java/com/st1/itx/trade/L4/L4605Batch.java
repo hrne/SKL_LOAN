@@ -22,6 +22,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.CdCodeId;
+import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.CollList;
 import com.st1.itx.db.domain.CollListId;
 import com.st1.itx.db.domain.CustMain;
@@ -29,11 +30,13 @@ import com.st1.itx.db.domain.InsuOrignal;
 import com.st1.itx.db.domain.InsuOrignalId;
 import com.st1.itx.db.domain.InsuRenew;
 import com.st1.itx.db.service.CdCodeService;
+import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.CollListService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.InsuOrignalService;
 import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.FacStatusCom;
 import com.st1.itx.util.common.FileCom;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.data.ExcelFontStyleVo;
@@ -75,16 +78,22 @@ public class L4605Batch extends TradeBuffer {
 	public InsuOrignalService insuOrignalService;
 
 	@Autowired
-	MakeExcel makeExcel;
-
-	@Autowired
-	public WebClient webClient;
+	public ClFacService clFacService;
 
 	@Autowired
 	public CdCodeService cdCodeService;
 
 	@Autowired
 	public CollListService collListService;
+
+	@Autowired
+	public FacStatusCom facStatusCom;
+
+	@Autowired
+	MakeExcel makeExcel;
+
+	@Autowired
+	public WebClient webClient;
 
 	private int iInsuEndMonth = 0;
 	private int cnt = 0;
@@ -236,6 +245,7 @@ public class L4605Batch extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException("E0007", e.getErrorMsg());
 				}
+				// 續保新保險單新增擔保品火險檔
 				insertOrigInsuNo(tInsuRenew, titaVo);
 			}
 			Set<tmpInsu> tempSet = error.keySet();
@@ -261,54 +271,85 @@ public class L4605Batch extends TradeBuffer {
 
 	}
 
+	/**
+	 * 續保新保險單新增擔保品火險檔
+	 * 
+	 * @param tInsuRenew 火險續保檔
+	 * @param titaVo     TiTaVo
+	 * @throws LogicException ...
+	 */
 	private void insertOrigInsuNo(InsuRenew tInsuRenew, TitaVo titaVo) throws LogicException {
-		InsuOrignal tlInsuOrignal = insuOrignalService.findOrigInsuNoFirst(tInsuRenew.getClCode1(),
-				tInsuRenew.getClCode2(), tInsuRenew.getClNo(), tInsuRenew.getPrevInsuNo(), titaVo);
-		if (tlInsuOrignal == null) {
-			return;
-		}
+		this.info("insertOrigInsuNo ..." + tInsuRenew.toString());
 		Slice<InsuOrignal> slInsuOrignal = insuOrignalService.findOrigInsuNoAll(tInsuRenew.getPrevInsuNo(), 0,
 				Integer.MAX_VALUE, titaVo);
 		if (slInsuOrignal == null) {
 			return;
 		}
+		InsuOrignal tInsuOrignal = new InsuOrignal();
+		InsuOrignalId tInsuOrignalId = new InsuOrignalId();
 		for (InsuOrignal t : slInsuOrignal.getContent()) {
-			// 轉換留存(擔保品唯一性被合併之擔保品編號其保險單資料)
-			if ("轉換留存".equals(t.getRemark())) {
+			// 續約保單訖日不同剔除
+			if (t.getInsuEndDate() != tInsuRenew.getInsuStartDate()) {
+				this.info("skip InsuEndDate = " + t.toString());
+				continue;
+
+			}
+			// 擔保品編號重複剔除
+			if (tInsuOrignal.getClCode1() == t.getClCode1() && tInsuOrignal.getClCode2() == t.getClCode2()
+					&& tInsuOrignal.getClNo() == t.getClNo()) {
+				this.info("skip 擔保品編號重複 " + t.toString());
 				continue;
 			}
-			if (t.getInsuStartDate() == tlInsuOrignal.getInsuStartDate()
-					&& t.getInsuEndDate() == tlInsuOrignal.getInsuEndDate()
-					&& t.getFireInsuPrem().compareTo(tlInsuOrignal.getFireInsuPrem()) == 0
-					&& t.getEthqInsuPrem().compareTo(tlInsuOrignal.getEthqInsuPrem()) == 0) {
-				InsuOrignal tInsuOrignal = new InsuOrignal();
-				InsuOrignalId tInsuOrignalId = new InsuOrignalId();
-				tInsuOrignalId.setClCode1(t.getClCode1());
-				tInsuOrignalId.setClCode2(t.getClCode2());
-				tInsuOrignalId.setClNo(t.getClNo());
-				tInsuOrignalId.setOrigInsuNo(tInsuRenew.getNowInsuNo());
-				tInsuOrignalId.setEndoInsuNo(" ");
-				tInsuOrignal.setInsuOrignalId(tInsuOrignalId);
-				tInsuOrignal.setInsuCompany(tInsuRenew.getInsuCompany());
-				tInsuOrignal.setInsuTypeCode(tInsuRenew.getInsuTypeCode());
-				tInsuOrignal.setFireInsuCovrg(tInsuRenew.getFireInsuCovrg());
-				tInsuOrignal.setEthqInsuCovrg(tInsuRenew.getEthqInsuCovrg());
-				tInsuOrignal.setFireInsuPrem(tInsuRenew.getFireInsuPrem());
-				tInsuOrignal.setEthqInsuPrem(tInsuRenew.getEthqInsuPrem());
-				tInsuOrignal.setInsuStartDate(tInsuRenew.getInsuStartDate());
-				tInsuOrignal.setInsuEndDate(tInsuRenew.getInsuEndDate());
-				tInsuOrignal.setCommericalFlag(tInsuRenew.getCommericalFlag());
-				tInsuOrignal.setRemark(tInsuRenew.getRemark());
-				tInsuOrignal.setInsuReceiptDate(tInsuRenew.getInsuReceiptDate());
-				try {
-					insuOrignalService.insert(tInsuOrignal, titaVo);
-				} catch (DBException e) {
-					throw new LogicException("E0005", e.getErrorMsg());
-				}
+			// 排除結案戶、呆帳戶、未撥款戶
+			if (!isNormalLoan(t, titaVo)) {
+				this.info("排除結案戶、呆帳戶、未撥款戶 " + t.toString());
+				continue;
 			}
-
+			tInsuOrignal = new InsuOrignal();
+			tInsuOrignalId = new InsuOrignalId();
+			tInsuOrignalId.setClCode1(t.getClCode1());
+			tInsuOrignalId.setClCode2(t.getClCode2());
+			tInsuOrignalId.setClNo(t.getClNo());
+			tInsuOrignalId.setOrigInsuNo(tInsuRenew.getNowInsuNo());
+			tInsuOrignalId.setEndoInsuNo(" ");
+			tInsuOrignal.setInsuOrignalId(tInsuOrignalId);
+			tInsuOrignal.setInsuCompany(tInsuRenew.getInsuCompany());
+			tInsuOrignal.setInsuTypeCode(tInsuRenew.getInsuTypeCode());
+			tInsuOrignal.setFireInsuCovrg(tInsuRenew.getFireInsuCovrg());
+			tInsuOrignal.setEthqInsuCovrg(tInsuRenew.getEthqInsuCovrg());
+			tInsuOrignal.setFireInsuPrem(tInsuRenew.getFireInsuPrem());
+			tInsuOrignal.setEthqInsuPrem(tInsuRenew.getEthqInsuPrem());
+			tInsuOrignal.setInsuStartDate(tInsuRenew.getInsuStartDate());
+			tInsuOrignal.setInsuEndDate(tInsuRenew.getInsuEndDate());
+			tInsuOrignal.setCommericalFlag(tInsuRenew.getCommericalFlag());
+			tInsuOrignal.setRemark(tInsuRenew.getRemark());
+			tInsuOrignal.setInsuReceiptDate(tInsuRenew.getInsuReceiptDate());
+			try {
+				insuOrignalService.insert(tInsuOrignal, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0005", e.getErrorMsg());
+			}
 		}
-		return;
+	}
+
+	// 有撥款的正常戶、逾期戶、催收戶、催呆戶(排除結案戶、呆帳戶、未撥款戶)
+	private boolean isNormalLoan(InsuOrignal tlInsuOrignal, TitaVo titaVo) throws LogicException {
+		this.info("isNormalLoan ..." + tlInsuOrignal.toString());
+
+		Slice<ClFac> slClFac = clFacService.clNoEq(tlInsuOrignal.getClCode1(), tlInsuOrignal.getClCode2(),
+				tlInsuOrignal.getClNo(), 0, Integer.MAX_VALUE, titaVo);
+		if (slClFac == null) {
+			return false;
+		}
+
+		for (ClFac tClFac : slClFac.getContent()) {
+			int status = facStatusCom.getLoanStatus(tClFac.getCustNo(), tClFac.getFacmNo(),
+					tlInsuOrignal.getInsuEndDate(), titaVo);
+			if (status == 0 || status == 4 || status == 2 || status == 7) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 //	暫時紀錄戶號額度

@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
@@ -14,17 +15,20 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcReceivable;
+import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.InsuOrignal;
 import com.st1.itx.db.domain.InsuOrignalId;
 import com.st1.itx.db.domain.InsuRenew;
 import com.st1.itx.db.domain.InsuRenewId;
+import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.InsuOrignalService;
 import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcReceivableCom;
+import com.st1.itx.util.common.FacStatusCom;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
@@ -84,7 +88,13 @@ public class L4611 extends TradeBuffer {
 	public FacMainService facMainService;
 
 	@Autowired
+	public ClFacService clFacService;
+
+	@Autowired
 	public AcReceivableCom acReceivableCom;
+
+	@Autowired
+	public FacStatusCom facStatusCom;
 
 	private String iFunctionCode = "";
 	private int clCode1 = 1;
@@ -184,10 +194,10 @@ public class L4611 extends TradeBuffer {
 			tInsuRenew.setAcDate(0);
 			tInsuRenew.setTitaTlrNo(this.getTxBuffer().getTxCom().getRelTlr());
 			tInsuRenew.setTitaTxtNo("" + this.getTxBuffer().getTxCom().getRelTno());
-			
-			this.info("InsuReceiptDate     = "+ parse.stringToInteger(titaVo.getParam("InsuReceiptDateX")));
+
+			this.info("InsuReceiptDate     = " + parse.stringToInteger(titaVo.getParam("InsuReceiptDateX")));
 			tInsuRenew.setInsuReceiptDate(parse.stringToInteger(titaVo.getParam("InsuReceiptDateX")));
-			
+
 			if (tInsuRenew.getRenewCode() == 2) {
 				if (insuYearMonth <= noticeYearMonth) {
 					tInsuRenew.setNotiTempFg("N"); // N:未入(通知作業後新增)
@@ -209,6 +219,10 @@ public class L4611 extends TradeBuffer {
 			}
 
 			resetAcReceivable(0, tInsuRenew, titaVo); // 0-起帳
+			// 續保新保險單新增擔保品火險檔
+			if (!tInsuRenew.getNowInsuNo().isEmpty()) {
+				insertOrigInsuNo(tInsuRenew, titaVo);
+			}
 			break;
 
 		case "2": // 修改
@@ -231,6 +245,10 @@ public class L4611 extends TradeBuffer {
 
 			resetAcReceivable(2, tInsuRenew, titaVo); // 2-起帳刪除
 
+			// 續保新保險單刪除擔保品火險檔
+			if (!tInsuRenew.getNowInsuNo().isEmpty()) {
+				deleteOrigInsuNo(tInsuRenew, titaVo);
+			}
 			custNo = parse.stringToInteger(titaVo.getParam("NewCustNo"));
 			facmNo = parse.stringToInteger(titaVo.getParam("NewFacmNo"));
 
@@ -259,9 +277,9 @@ public class L4611 extends TradeBuffer {
 			totPrem = parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem"))
 					.add(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
 			tInsuRenew.setTotInsuPrem(totPrem);
-			this.info("InsuReceiptDate     = "+ parse.stringToInteger(titaVo.getParam("InsuReceiptDateX")));
+			this.info("InsuReceiptDate     = " + parse.stringToInteger(titaVo.getParam("InsuReceiptDateX")));
 			tInsuRenew.setInsuReceiptDate(parse.stringToInteger(titaVo.getParam("InsuReceiptDateX")));
-			
+
 			if (tInsuRenew.getRenewCode() == 2) {
 				if (insuYearMonth <= noticeYearMonth) {
 					if ("Y".equals(oldInsuRenew.getNotiTempFg())) {
@@ -281,6 +299,11 @@ public class L4611 extends TradeBuffer {
 			}
 
 			resetAcReceivable(0, tInsuRenew, titaVo); // 0-起帳刪除
+			// 續保新保險單新增擔保品火險檔
+			if (!tInsuRenew.getNowInsuNo().isEmpty()) {
+				insertOrigInsuNo(tInsuRenew, titaVo);
+			}
+
 			break;
 
 		case "4": // 刪除
@@ -305,6 +328,10 @@ public class L4611 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0008", e.getErrorMsg());
 			}
 			resetAcReceivable(2, tInsuRenew, titaVo); // 2-起帳刪除
+			// 續保新保險單刪除擔保品火險檔
+			if (!tInsuRenew.getNowInsuNo().isEmpty()) {
+				deleteOrigInsuNo(tInsuRenew, titaVo);
+			}
 			break;
 
 		case "6": // 自保
@@ -335,12 +362,16 @@ public class L4611 extends TradeBuffer {
 			totPrem = parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem"))
 					.add(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
 			tInsuRenew.setTotInsuPrem(totPrem);
-			this.info("InsuReceiptDate     = "+ parse.stringToInteger(titaVo.getParam("InsuReceiptDateX")));
+			this.info("InsuReceiptDate     = " + parse.stringToInteger(titaVo.getParam("InsuReceiptDateX")));
 			tInsuRenew.setInsuReceiptDate(parse.stringToInteger(titaVo.getParam("InsuReceiptDateX")));
 			try {
 				insuRenewService.update(tInsuRenew, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+			}
+			// 續保新保險單新增擔保品火險檔
+			if (!tInsuRenew.getNowInsuNo().isEmpty()) {
+				insertOrigInsuNo(tInsuRenew, titaVo);
 			}
 			break;
 		}
@@ -413,4 +444,110 @@ public class L4611 extends TradeBuffer {
 
 		return result;
 	}
+
+	/**
+	 * 續保新保險單新增擔保品火險檔
+	 * 
+	 * @param tInsuRenew 火險續保檔
+	 * @param titaVo     TiTaVo
+	 * @throws LogicException ...
+	 */
+	private void insertOrigInsuNo(InsuRenew tInsuRenew, TitaVo titaVo) throws LogicException {
+		this.info("insertOrigInsuNo ..." + tInsuRenew.toString());
+		Slice<InsuOrignal> slInsuOrignal = insuOrignalService.findOrigInsuNoAll(tInsuRenew.getPrevInsuNo(), 0,
+				Integer.MAX_VALUE, titaVo);
+		if (slInsuOrignal == null) {
+			return;
+		}
+		InsuOrignal tInsuOrignal = new InsuOrignal();
+		InsuOrignalId tInsuOrignalId = new InsuOrignalId();
+		for (InsuOrignal t : slInsuOrignal.getContent()) {
+			// 保單訖日不同剔除
+			if (t.getInsuEndDate() != tInsuRenew.getInsuEndDate()) {
+				this.info("skip InsuEndDate = " + t.toString());
+				continue;
+
+			}
+			// 擔保品編號重複剔除
+			if (tInsuOrignal.getClCode1() == t.getClCode1() && tInsuOrignal.getClCode2() == t.getClCode2()
+					&& tInsuOrignal.getClNo() == t.getClNo()) {
+				this.info("skip 擔保品編號重複 " + t.toString());
+				continue;
+			}
+			// 排除結案戶、呆帳戶、未撥款戶
+			if (!isNormalLoan(t, titaVo)) {
+				this.info("排除結案戶、呆帳戶、未撥款戶 " + t.toString());
+				continue;
+			}
+			tInsuOrignal = new InsuOrignal();
+			tInsuOrignalId = new InsuOrignalId();
+			tInsuOrignalId.setClCode1(t.getClCode1());
+			tInsuOrignalId.setClCode2(t.getClCode2());
+			tInsuOrignalId.setClNo(t.getClNo());
+			tInsuOrignalId.setOrigInsuNo(tInsuRenew.getNowInsuNo());
+			tInsuOrignalId.setEndoInsuNo(tInsuRenew.getEndoInsuNo());
+			tInsuOrignal.setInsuOrignalId(tInsuOrignalId);
+			tInsuOrignal.setInsuCompany(tInsuRenew.getInsuCompany());
+			tInsuOrignal.setInsuTypeCode(tInsuRenew.getInsuTypeCode());
+			tInsuOrignal.setFireInsuCovrg(tInsuRenew.getFireInsuCovrg());
+			tInsuOrignal.setEthqInsuCovrg(tInsuRenew.getEthqInsuCovrg());
+			tInsuOrignal.setFireInsuPrem(tInsuRenew.getFireInsuPrem());
+			tInsuOrignal.setEthqInsuPrem(tInsuRenew.getEthqInsuPrem());
+			tInsuOrignal.setInsuStartDate(tInsuRenew.getInsuStartDate());
+			tInsuOrignal.setInsuEndDate(tInsuRenew.getInsuEndDate());
+			tInsuOrignal.setCommericalFlag(tInsuRenew.getCommericalFlag());
+			tInsuOrignal.setRemark(tInsuRenew.getRemark());
+			tInsuOrignal.setInsuReceiptDate(tInsuRenew.getInsuReceiptDate());
+			try {
+				insuOrignalService.insert(tInsuOrignal, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0005", e.getErrorMsg());
+			}
+		}
+	}
+
+	// 排除結案戶、呆帳戶、未撥款戶
+	private boolean isNormalLoan(InsuOrignal tlInsuOrignal, TitaVo titaVo) throws LogicException {
+		this.info("isNormalLoan ..." + tlInsuOrignal.toString());
+
+		Slice<ClFac> slClFac = clFacService.clNoEq(tlInsuOrignal.getClCode1(), tlInsuOrignal.getClCode2(),
+				tlInsuOrignal.getClNo(), 0, Integer.MAX_VALUE, titaVo);
+		if (slClFac == null) {
+			return false;
+		}
+
+		for (ClFac tClFac : slClFac.getContent()) {
+			int status = facStatusCom.getLoanStatus(tClFac.getCustNo(), tClFac.getFacmNo(),
+					tlInsuOrignal.getInsuEndDate(), titaVo);
+			if (status == 0 || status == 4 || status == 2 || status == 7) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void deleteOrigInsuNo(InsuRenew tInsuRenew, TitaVo titaVo) throws LogicException {
+		this.info("deleteOrigInsuNo ..." + tInsuRenew.toString());
+		Slice<InsuOrignal> slInsuOrignal = insuOrignalService.findOrigInsuNoAll(tInsuRenew.getNowInsuNo(), 0,
+				Integer.MAX_VALUE, titaVo);
+		if (slInsuOrignal == null) {
+			return;
+		}
+		InsuOrignal tInsuOrignal = new InsuOrignal();
+		for (InsuOrignal t : slInsuOrignal.getContent()) {
+			// 保單訖日不同剔除
+			if (t.getInsuEndDate() != tInsuRenew.getInsuEndDate()) {
+				this.info("skip InsuEndDate = " + t.toString());
+				continue;
+
+			}
+			tInsuOrignal = insuOrignalService.holdById(t, titaVo);
+			try {
+				insuOrignalService.delete(tInsuOrignal, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0008", e.getErrorMsg());
+			}
+		}
+	}
+
 }

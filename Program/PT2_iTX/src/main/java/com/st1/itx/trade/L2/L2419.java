@@ -285,7 +285,7 @@ public class L2419 extends TradeBuffer {
 
 		lastOwnerList = new ArrayList<>();
 
-		int lastNo = 0;
+		int lastNo = 1;
 
 		for (int i = 0; i <= lastRowNum; i++) {
 
@@ -297,19 +297,22 @@ public class L2419 extends TradeBuffer {
 
 			// 編號
 			String columnA = makeExcel.getValue(row, L2419Column.NO.getIndex()).toString(); // NO
-			int no = (int) toNumeric(columnA);
+			int no;
 			this.info("columnA = " + columnA);
 
 			// 是否寫入資料庫
 			String insertFlag = makeExcel.getValue(row, L2419Column.INSERT_FLAG.getIndex()).toString();
 
-			if (no == 0 && insertFlag != null && !insertFlag.isEmpty()) {
-				no = lastNo + 1;
+			// 2023-06-21 Wei 增加判斷: User在這欄可能留空白,即使這欄空白若其他欄位有資料也需要做檢核
+			boolean isEntered = chectIsEnter(row);
+
+			if (isEntered) {
+				no = lastNo;
 				makeExcel.setValueInt(row, L2419Column.NO.getIndex(), no);
-			} else if (no == 0) {
+				lastNo++;
+			} else {
 				break;
 			}
-			lastNo = no;
 
 			// 擔保品代號1
 			String clCode1String = makeExcel.getValue(row, L2419Column.CL_CODE_1.getIndex()).toString();
@@ -896,6 +899,17 @@ public class L2419 extends TradeBuffer {
 
 			checkElseOwner(row, titaVo);
 		}
+	}
+
+	private boolean chectIsEnter(int row) throws LogicException {
+		// check 第1~41 若任一欄位有值,回true
+		for (int i = 1; i <= 41; i++) {
+			String value = (String) makeExcel.getValue(row, i);
+			if (value != null && !value.isEmpty()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private void setError(int row, int column) throws LogicException {

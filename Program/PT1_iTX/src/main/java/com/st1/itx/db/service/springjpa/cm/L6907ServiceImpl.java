@@ -93,7 +93,7 @@ public class L6907ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    A.\"TitaTlrNo\" AS \"TitaTlrNo\", ";
 		sql += "    A.\"TitaTxtNo\" AS \"TitaTxtNo\", ";
 		sql += "    A.\"RvBal\"             AS \"RvBal\", ";
-		sql += "    B.\"ToAml\"             AS \"SumRvBal\", ";
+		sql += "    NVL(B.\"ToBal\",0)      AS \"SumRvBal\", ";
 		sql += "    A.\"AcBookCode\"        AS \"AcBookCode\", ";
 		sql += "    A.\"AcSubBookCode\"     AS \"AcSubBookCode\", ";
 		sql += "    A.\"LastUpdate\"        AS \"LastUpdate\", ";
@@ -103,10 +103,12 @@ public class L6907ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN ( ";
 		sql += "    SELECT  ";
 		sql += "    \"AcctCode\"         , ";
-		sql += "    SUM(\"RvBal\") AS \"ToAml\" ";
+		sql += "    \"CustNo\"         , ";
+		sql += "    SUM(\"RvBal\") AS \"ToBal\" ";
 		sql += "    FROM \"AcReceivable\" ";
 		sql += "     where \"AcBookCode\" = 000 "; // 固定傳入
 		sql += "       and \"AcctFlag\"   = 0 ";
+		sql += "       and \"ClsFlag\"   = 0 ";
 		sql += "       and \"FacmNo\"   <= 999 ";
 		// 加入判斷空白跳過該篩選
 		// 區隔帳冊
@@ -138,8 +140,10 @@ public class L6907ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (iClsFlag != 2) {
 			sql += " and  \"ClsFlag\" = :iClsFlag";
 		}
-		sql += "         GROUP BY \"AcctCode\" ";
+		sql += "         GROUP BY \"AcctCode\", ";
+		sql += "         		  \"CustNo\" ";
 		sql += "    ) B ON A.\"AcctCode\" = B.\"AcctCode\" ";
+		sql += "   	   AND A.\"CustNo\" = B.\"CustNo\" ";
 		sql += " LEFT JOIN \"CdCode\" C ON C.\"DefCode\" = 'AcctCode' ";
 		sql += "                       AND C.\"Code\" = A.\"AcctCode\" ";
 		sql += " where A.\"AcBookCode\" = 000 "; // 固定傳入

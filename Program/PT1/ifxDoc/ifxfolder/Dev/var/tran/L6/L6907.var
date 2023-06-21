@@ -382,7 +382,7 @@ T(2,#TXCD+#OOCustNo+000+000+#OOLastTxDate+#OOTxtNo+9)
 C(4,#L6908Flag,BIND(grid,cancel),
             C(5,#OOAcctCode,TAV,BIND(grid,{ cmd=CHAIN; ntxcd=L6909; ntxbuf=#OOBUF5B}),
                                 C(5,#L6908Flag,Y,BIND(grid,{ cmd=CHAIN; ntxcd=L6908; ntxbuf=#OOBUF5A}),
-                                                BIND(grid,{ cmd=CHAIN; ntxcd=L3005;text=交易明細;ntxbuf=#OOBUF5C}))))
+                                                BIND(grid,{ cmd=CHAIN; ntxcd=L3005;text=交易;ntxbuf=#OOBUF5C}))))
 
 
 </sub>
@@ -483,7 +483,7 @@ TXFORM=L6907
 #OORvBal1=未銷餘額
 {width:150,align:'right',sum:true}
 
-#OO_SUM1=未銷餘額合計
+#OO_SUM1=同戶未銷餘額合計
 {width:150,align:'right'}
 
 #OOAcSubBookCode=區隔帳冊
@@ -528,7 +528,7 @@ TXFORM=L6907
 #OORvBal1=未銷餘額
 {width:180,align:'right',sum:true}
 
-#OO_SUM1=未銷餘額合計
+#OO_SUM1=同戶未銷餘額合計
 {width:180,align:'right'}
 
 #OOAcSubBookCode=區隔帳冊

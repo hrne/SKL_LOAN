@@ -263,6 +263,8 @@ public class L4961 extends TradeBuffer {
 					int insuMonth = parse.stringToInteger(result.get("F0"));
 					int acDate = parse.stringToInteger(result.get("F9"));
 					int insDate = parse.stringToInteger(result.get("F14"));
+					String id = parse.stringToStringDate(result.get("F9"));
+					this.info("id   = " + id) ;
 					if (insuMonth > 191100) {
 						insuMonth = insuMonth - 191100;
 					}
@@ -273,11 +275,13 @@ public class L4961 extends TradeBuffer {
 						insDate = insDate - 19110000;
 					}
 					
+					String iC = String.format("%07d", parse.stringToInteger(iCustNo));
+					String iF = String.format("%03d", parse.stringToInteger(iFacmNo));
 					
 					makeExcel.setValue(R,1,insuMonth);
 					makeExcel.setValue(R,2,iPrevInsuNo);
 					makeExcel.setValue(R,3,iNowInsuNo);
-					makeExcel.setValue(R,4,iCustNo+"-"+iFacmNo);
+					makeExcel.setValue(R,4,iC+"-"+iF);
 					makeExcel.setValue(R,5,iCustName);
 					makeExcel.setValue(R,6,iTotInsuPrem);
 					makeExcel.setValue(R,7,iRepayCode);
@@ -285,12 +289,23 @@ public class L4961 extends TradeBuffer {
 					if(acDate == 0) {
 						makeExcel.setValue(R,9,"");	
 					}else {
-						makeExcel.setValue(R,9,acDate);						
+//						makeExcel.setValue(R,9,acDate);	
+						String iY = parse.IntegerToString(acDate,7).substring(0,3);
+						String iM = parse.IntegerToString(acDate,7).substring(3,5);
+						String iD = parse.IntegerToString(acDate,7).substring(5,7);
+						this.info("iY   = " +iY);
+						this.info("iM   = " +iM);
+						this.info("iD   = " +iD);
+						makeExcel.setValue(R,9,iY+"/"+iM+"/"+iD);	
 					}
 					if(insDate == 0 ) {
 						makeExcel.setValue(R,10,"");
 					}else {
-						makeExcel.setValue(R,10,insDate);						
+//						makeExcel.setValue(R,10,insDate);	
+						String ixY = parse.IntegerToString(insDate,7).substring(0,3);
+						String ixM = parse.IntegerToString(insDate,7).substring(3,5);
+						String ixD = parse.IntegerToString(insDate,7).substring(5,7);
+						makeExcel.setValue(R,10,ixY+"/"+ixM+"/"+ixD);	
 					}
 					
 					

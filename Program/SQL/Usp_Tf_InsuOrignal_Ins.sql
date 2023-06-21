@@ -45,10 +45,68 @@ BEGIN
       , "LastUpdate"      -- 最後更新日期時間 DATE  
       , "LastUpdateEmpNo" -- 最後更新人員 VARCHAR2 6 
     )
-    WITH INSP AS (
-      SELECT CNM."ClCode1"
-           , CNM."ClCode2"
-           , CNM."ClNo"
+    WITH INSP_FIX AS (
+      -- 2023-05-30 Wei 補正資料 from Sharepoint\19\資料轉換\不動產押品建物火險檔-擔保品號碼為0
+      SELECT CASE
+               WHEN INSP."GDRID1" = 0
+                    AND INSP."GDRID2" = 0
+                    AND INSP."GDRNUM" = 0
+                    AND INSP."LGTSEQ" = 0
+               THEN CASE
+                      WHEN INSNUM = '130094FEP0182908'
+                      THEN 1
+                      WHEN INSNUM = '130094FEP0134611'
+                      THEN 1
+                      WHEN INSNUM = '130095FEP0233806'
+                      THEN 1
+                    ELSE 0 END
+             ELSE INSP."GDRID1"
+             END                            AS GDRID1
+           , CASE
+               WHEN INSP."GDRID1" = 0
+                    AND INSP."GDRID2" = 0
+                    AND INSP."GDRNUM" = 0
+                    AND INSP."LGTSEQ" = 0
+               THEN CASE
+                      WHEN INSNUM = '130094FEP0182908'
+                      THEN 1
+                      WHEN INSNUM = '130094FEP0134611'
+                      THEN 1
+                      WHEN INSNUM = '130095FEP0233806'
+                      THEN 1
+                    ELSE 0 END
+             ELSE INSP."GDRID2"
+             END                            AS GDRID2
+           , CASE
+               WHEN INSP."GDRID1" = 0
+                    AND INSP."GDRID2" = 0
+                    AND INSP."GDRNUM" = 0
+                    AND INSP."LGTSEQ" = 0
+               THEN CASE
+                      WHEN INSNUM = '130094FEP0182908'
+                      THEN 44930
+                      WHEN INSNUM = '130094FEP0134611'
+                      THEN 53354
+                      WHEN INSNUM = '130095FEP0233806'
+                      THEN 44930
+                    ELSE 0 END
+             ELSE INSP."GDRNUM"
+             END                            AS GDRNUM
+           , CASE
+               WHEN INSP."GDRID1" = 0
+                    AND INSP."GDRID2" = 0
+                    AND INSP."GDRNUM" = 0
+                    AND INSP."LGTSEQ" = 0
+               THEN CASE
+                      WHEN INSNUM = '130094FEP0182908'
+                      THEN 1
+                      WHEN INSNUM = '130094FEP0134611'
+                      THEN 1
+                      WHEN INSNUM = '130095FEP0233806'
+                      THEN 1
+                    ELSE 0 END
+             ELSE INSP."LGTSEQ"
+             END                            AS LGTSEQ
            , INSP."INSSDT"
            , INSP."INSEDT"
            , INSP."INSNUM"
@@ -57,84 +115,100 @@ BEGIN
            , INSP."INSPRM"
            , INSP."INSEPM"
            , INSP."INSIID"
-           , LPAD(INSP.GDRID1,1,'0')
-             || LPAD(INSP.GDRID2,2,'0')
-             || LPAD(INSP.GDRNUM,7,'0')
-             || LPAD(INSP.LGTSEQ,2,'0')
-                AS "EndoInsuNo"
-           , CASE
-               WHEN CNM."TfStatus" NOT IN (1,3)
-               THEN '轉換留存'
-             ELSE '' END AS "Remark"
       FROM "LA$INSP" INSP
-      -- 2023-05-30 Wei 補正資料 from Sharepoint\19\資料轉換\不動產押品建物火險檔-擔保品號碼為0
-      LEFT JOIN "ClNoMap" CNM ON CNM."GdrId1" = CASE
-                                                  WHEN INSP."GDRID1" = 0
-                                                       AND INSP."GDRID2" = 0
-                                                       AND INSP."GDRNUM" = 0
-                                                       AND INSP."LGTSEQ" = 0
-                                                  THEN CASE
-                                                         WHEN INSNUM = '130094FEP0182908'
-                                                         THEN 1
-                                                         WHEN INSNUM = '130094FEP0134611'
-                                                         THEN 1
-                                                         WHEN INSNUM = '130095FEP0233806'
-                                                         THEN 1
-                                                       ELSE 0 END
-                                                ELSE INSP."GDRID1"
-                                                END
-                             AND CNM."GdrId2" = CASE
-                                                  WHEN INSP."GDRID1" = 0
-                                                       AND INSP."GDRID2" = 0
-                                                       AND INSP."GDRNUM" = 0
-                                                       AND INSP."LGTSEQ" = 0
-                                                  THEN CASE
-                                                         WHEN INSNUM = '130094FEP0182908'
-                                                         THEN 1
-                                                         WHEN INSNUM = '130094FEP0134611'
-                                                         THEN 1
-                                                         WHEN INSNUM = '130095FEP0233806'
-                                                         THEN 1
-                                                       ELSE 0 END
-                                                ELSE INSP."GDRID2"
-                                                END
-                             AND CNM."GdrNum" = CASE
-                                                  WHEN INSP."GDRID1" = 0
-                                                       AND INSP."GDRID2" = 0
-                                                       AND INSP."GDRNUM" = 0
-                                                       AND INSP."LGTSEQ" = 0
-                                                  THEN CASE
-                                                         WHEN INSNUM = '130094FEP0182908'
-                                                         THEN 44930
-                                                         WHEN INSNUM = '130094FEP0134611'
-                                                         THEN 53354
-                                                         WHEN INSNUM = '130095FEP0233806'
-                                                         THEN 44930
-                                                       ELSE 0 END
-                                                ELSE INSP."GDRNUM"
-                                                END
-                             AND CNM."LgtSeq" = CASE
-                                                  WHEN INSP."GDRID1" = 0
-                                                       AND INSP."GDRID2" = 0
-                                                       AND INSP."GDRNUM" = 0
-                                                       AND INSP."LGTSEQ" = 0
-                                                  THEN CASE
-                                                         WHEN INSNUM = '130094FEP0182908'
-                                                         THEN 1
-                                                         WHEN INSNUM = '130094FEP0134611'
-                                                         THEN 1
-                                                         WHEN INSNUM = '130095FEP0233806'
-                                                         THEN 1
-                                                       ELSE 0 END
-                                                ELSE INSP."LGTSEQ"
-                                                END
+    )
+    , DISTINCT_INSP_FIX AS (
+      SELECT DISTINCT
+             GDRID1
+           , GDRID2
+           , GDRNUM
+           , LGTSEQ
+      FROM INSP_FIX
+    )
+    , COUNT_INSP_FIX AS (
+      SELECT GDRID1
+           , GDRID2
+           , GDRNUM
+           , COUNT(*) AS CNT
+      FROM DISTINCT_INSP_FIX
+      GROUP BY GDRID1
+             , GDRID2
+             , GDRNUM
+    )
+    , HGTP_RAW AS (
+      SELECT GDRID1
+           , GDRID2
+           , GDRNUM
+      FROM LA$HGTP_RAW
+      GROUP BY COUNT(*) >= 2
+    )
+    , HGTP AS (
+      SELECT R.GDRID1
+           , R.GDRID2
+           , R.GDRNUM
+           , H.LGTSEQ
+           , H.LGTADR
+      FROM LA$HGTP H ON H.GDRID1 = R.GDRID1
+                    AND H.GDRID2 = R.GDRID2
+                    AND H.GDRNUM = R.GDRNUM
+    )
+    , INSP_FIX_BY_CASE AS (
+      SELECT CASE
+               -- 一個擔保品有多個序號,且共用同一張火險單,每個新擔保品編號皆須轉入保險單
+               WHEN NVL(H.LGTSEQ,0) != 0
+               THEN '1'
+               -- 一個擔保品有多個序號,且多個序號各自有火險單,各自轉入
+               WHEN C.CNT >= 2
+               THEN '2'
+             ELSE '3' -- 其他情況
+             END               AS "Case"
+           , I.GDRID1
+           , I.GDRID2
+           , I.GDRNUM
+           , NVL(H.LGTSEQ,I.LGTSEQ) AS LGTSEQ
+           , I.INSSDT
+           , I.INSEDT
+           , I.INSNUM
+           , I.INSIAM
+           , I.INSIAE
+           , I.INSPRM
+           , I.INSEPM
+           , I.INSIID
+      FROM COUNT_INSP_FIX C
+      LEFT JOIN INSP_FIX I ON I.GDRID1 = C.GDRID1
+                          AND I.GDRID2 = C.GDRID2
+                          AND I.GDRNUM = C.GDRNUM
+      LEFT JOIN HGTP H ON H.GDRID1 = C.GDRID1
+                      AND H.GDRID2 = C.GDRID2
+                      AND H.GDRNUM = C.GDRNUM
+                      AND C.CNT = 1 -- 一個擔保品在初保檔,只有用一筆擔保品序號去寫
+    )
+    , INSP AS (
+      SELECT CNM."ClCode1"
+           , CNM."ClCode2"
+           , CNM."ClNo"
+           , INSP.INSSDT
+           , INSP.INSEDT
+           , INSP.INSNUM
+           , INSP.INSIAM
+           , INSP.INSIAE
+           , INSP.INSPRM
+           , INSP.INSEPM
+           , INSP.INSIID
+           , INSP."Case"
+      FROM INSP_FIX_BY_CASE INSP
+      LEFT JOIN "ClNoMap" CNM ON CNM."GdrId1" = INSP.GDRID1
+                             AND CNM."GdrId2" = INSP.GDRID2
+                             AND CNM."GdrNum" = INSP.GDRNUM
+                             AND CNM."LgtSeq" = INSP.LGTSEQ
+      WHERE CNM."TfStatus" IN (1,3) -- 轉換留存排掉
     )
     , S AS (
       SELECT NVL(INSP."ClCode1",0)       AS "ClCode1"         -- 擔保品-代號1 DECIMAL 1 0
           , NVL(INSP."ClCode2",0)        AS "ClCode2"         -- 擔保品-代號2 DECIMAL 2 0
           , NVL(INSP."ClNo",0)           AS "ClNo"            -- 擔保品編號 DECIMAL 7 0
           , TRIM(INSP."INSNUM")          AS "OrigInsuNo"      -- 原始保險單號碼 VARCHAR2 17 0
-          , INSP."EndoInsuNo"            AS "EndoInsuNo"      -- 批單號碼 VARCHAR2 17 0
+          , ''                           AS "EndoInsuNo"      -- 批單號碼 VARCHAR2 17 0
           , NVL(INSP."INSIID",' ')       AS "InsuCompany"     -- 保險公司 VARCHAR2 2 0
           , INSP."INSIAM"                AS "FireInsuCovrg"   -- 火災險保險金額 DECIMAL 16 2
           , INSP."INSIAE"                AS "EthqInsuCovrg"   -- 地震險保險金額 DECIMAL 16 2
@@ -146,7 +220,7 @@ BEGIN
           , '999999'                     AS "CreateEmpNo"     -- 建檔人員 VARCHAR2 6 
           , JOB_START_TIME               AS "LastUpdate"      -- 最後更新日期時間 DATE  
           , '999999'                     AS "LastUpdateEmpNo" -- 最後更新人員 VARCHAR2 6 
-          , "Remark"                     AS "Remark"
+          , INSP."Case"                  AS "Remark"
       FROM INSP
     )
     SELECT S."ClCode1"                  AS "ClCode1"         -- 擔保品-代號1 DECIMAL 1 0

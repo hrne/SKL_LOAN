@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class AchAuthLog implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1507319106665947712L;
-
-@EmbeddedId
+  @EmbeddedId
   private AchAuthLogId achAuthLogId;
 
   // 建檔日期
@@ -61,12 +57,12 @@ public class AchAuthLog implements Serializable {
   private int facmNo = 0;
 
   // 處理日期
-  /* 產出媒體檔之日期 */
+  /* 日曆日(新增授權檔、產出媒體檔、重置媒體碼) */
   @Column(name = "`ProcessDate`")
   private int processDate = 0;
 
   // 處理時間
-  /* 產出媒體檔之時間 */
+  /* 處理同處理日期 */
   @Column(name = "`ProcessTime`")
   private int processTime = 0;
 
@@ -75,7 +71,7 @@ public class AchAuthLog implements Serializable {
   private int stampFinishDate = 0;
 
   // 授權狀態
-  /* CdCode.AuthStatus空:再次授權單格空白:未授權0:成功授權/取消授權1:印鑑不符2:無此帳號3:委繳戶統一編號不符4:已核印成功在案5:原交易不存在6:電子資料與授權書內容不符7:帳戶已結清8:印鑑不清9:其他A:未收到授權書B:用戶號碼錯誤C;靜止戶D:未收到聲明書E:授權書資料不全F:警示戶G:本帳戶不適用授權扣繳H:已於他行授權扣款I:該用戶已死亡Z:未交易或匯入失敗資料 */
+  /* 空:再次授權單格空白:未授權CdCode.AuthStatus0:成功授權/取消授權1:印鑑不符2:無此帳號3:委繳戶統一編號不符4:已核印成功在案5:原交易不存在6:電子資料與授權書內容不符7:帳戶已結清8:印鑑不清9:其他A:未收到授權書B:用戶號碼錯誤C;靜止戶D:未收到聲明書E:授權書資料不全F:警示戶G:本帳戶不適用授權扣繳H:已於他行授權扣款I:該用戶已死亡Z:未交易或匯入失敗資料 */
   @Column(name = "`AuthStatus`", length = 1)
   private String authStatus;
 
@@ -99,6 +95,7 @@ public class AchAuthLog implements Serializable {
   private String batchNo;
 
   // 提出日期
+  /* 日曆日(資料篩選日、媒體產出日)重置媒體檔時清0 */
   @Column(name = "`PropDate`")
   private int propDate = 0;
 
@@ -115,21 +112,23 @@ public class AchAuthLog implements Serializable {
   @Column(name = "`RelationCode`", length = 2)
   private String relationCode;
 
-  // 第三人帳戶戶名
-  /* CdCode.RelationCode00:本人01:夫02:妻03:父04:母05:子06:女07:兄08:弟09:姊10:妹11:姪子99:其他 */
+  // 帳戶戶名
+  /* 第三人帳戶戶名CdCode.RelationCode00:本人01:夫02:妻03:父04:母05:子06:女07:兄08:弟09:姊10:妹11:姪子99:其他 */
   @Column(name = "`RelAcctName`", length = 100)
   private String relAcctName;
 
-  // 第三人身分證字號
+  // 身分證字號
+  /* 第三人身分證字號 */
   @Column(name = "`RelationId`", length = 10)
   private String relationId;
 
-  // 第三人出生日期
+  // 出生日期
+  /* 第三人出生日期 */
   @Column(name = "`RelAcctBirthday`")
   private int relAcctBirthday = 0;
 
-  // 第三人性別
-  /* CdCode.Sex */
+  // 性別
+  /* 第三人性別CdCode.Sex */
   @Column(name = "`RelAcctGender`", length = 1)
   private String relAcctGender;
 
@@ -291,7 +290,7 @@ Z:暫停授權(DeleteDate &amp;gt; 0時，顯示用)
 
 /**
 	* 處理日期<br>
-	* 產出媒體檔之日期
+	* 日曆日(新增授權檔、產出媒體檔、重置媒體碼)
 	* @return Integer
 	*/
   public int getProcessDate() {
@@ -300,7 +299,7 @@ Z:暫停授權(DeleteDate &amp;gt; 0時，顯示用)
 
 /**
 	* 處理日期<br>
-	* 產出媒體檔之日期
+	* 日曆日(新增授權檔、產出媒體檔、重置媒體碼)
   *
   * @param processDate 處理日期
   * @throws LogicException when Date Is Warn	*/
@@ -310,7 +309,7 @@ Z:暫停授權(DeleteDate &amp;gt; 0時，顯示用)
 
 /**
 	* 處理時間<br>
-	* 產出媒體檔之時間
+	* 處理同處理日期
 	* @return Integer
 	*/
   public int getProcessTime() {
@@ -319,7 +318,7 @@ Z:暫停授權(DeleteDate &amp;gt; 0時，顯示用)
 
 /**
 	* 處理時間<br>
-	* 產出媒體檔之時間
+	* 處理同處理日期
   *
   * @param processTime 處理時間
 	*/
@@ -348,9 +347,9 @@ Z:暫停授權(DeleteDate &amp;gt; 0時，顯示用)
 
 /**
 	* 授權狀態<br>
-	* CdCode.AuthStatus
-空:再次授權
+	* 空:再次授權
 單格空白:未授權
+CdCode.AuthStatus
 0:成功授權/取消授權
 1:印鑑不符
 2:無此帳號
@@ -379,9 +378,9 @@ Z:未交易或匯入失敗資料
 
 /**
 	* 授權狀態<br>
-	* CdCode.AuthStatus
-空:再次授權
+	* 空:再次授權
 單格空白:未授權
+CdCode.AuthStatus
 0:成功授權/取消授權
 1:印鑑不符
 2:無此帳號
@@ -497,7 +496,8 @@ Y:已產生媒體
 
 /**
 	* 提出日期<br>
-	* 
+	* 日曆日(資料篩選日、媒體產出日)
+重置媒體檔時清0
 	* @return Integer
 	*/
   public int getPropDate() {
@@ -506,7 +506,8 @@ Y:已產生媒體
 
 /**
 	* 提出日期<br>
-	* 
+	* 日曆日(資料篩選日、媒體產出日)
+重置媒體檔時清0
   *
   * @param propDate 提出日期
   * @throws LogicException when Date Is Warn	*/
@@ -572,8 +573,9 @@ Y:已產生媒體
   }
 
 /**
-	* 第三人帳戶戶名<br>
-	* CdCode.RelationCode
+	* 帳戶戶名<br>
+	* 第三人帳戶戶名
+CdCode.RelationCode
 00:本人
 01:夫
 02:妻
@@ -594,8 +596,9 @@ Y:已產生媒體
   }
 
 /**
-	* 第三人帳戶戶名<br>
-	* CdCode.RelationCode
+	* 帳戶戶名<br>
+	* 第三人帳戶戶名
+CdCode.RelationCode
 00:本人
 01:夫
 02:妻
@@ -610,15 +613,15 @@ Y:已產生媒體
 11:姪子
 99:其他
   *
-  * @param relAcctName 第三人帳戶戶名
+  * @param relAcctName 帳戶戶名
 	*/
   public void setRelAcctName(String relAcctName) {
     this.relAcctName = relAcctName;
   }
 
 /**
-	* 第三人身分證字號<br>
-	* 
+	* 身分證字號<br>
+	* 第三人身分證字號
 	* @return String
 	*/
   public String getRelationId() {
@@ -626,18 +629,18 @@ Y:已產生媒體
   }
 
 /**
-	* 第三人身分證字號<br>
-	* 
+	* 身分證字號<br>
+	* 第三人身分證字號
   *
-  * @param relationId 第三人身分證字號
+  * @param relationId 身分證字號
 	*/
   public void setRelationId(String relationId) {
     this.relationId = relationId;
   }
 
 /**
-	* 第三人出生日期<br>
-	* 
+	* 出生日期<br>
+	* 第三人出生日期
 	* @return Integer
 	*/
   public int getRelAcctBirthday() {
@@ -645,18 +648,19 @@ Y:已產生媒體
   }
 
 /**
-	* 第三人出生日期<br>
-	* 
+	* 出生日期<br>
+	* 第三人出生日期
   *
-  * @param relAcctBirthday 第三人出生日期
+  * @param relAcctBirthday 出生日期
   * @throws LogicException when Date Is Warn	*/
   public void setRelAcctBirthday(int relAcctBirthday) throws LogicException {
     this.relAcctBirthday = StaticTool.rocToBc(relAcctBirthday);
   }
 
 /**
-	* 第三人性別<br>
-	* CdCode.Sex
+	* 性別<br>
+	* 第三人性別
+CdCode.Sex
 	* @return String
 	*/
   public String getRelAcctGender() {
@@ -664,10 +668,11 @@ Y:已產生媒體
   }
 
 /**
-	* 第三人性別<br>
-	* CdCode.Sex
+	* 性別<br>
+	* 第三人性別
+CdCode.Sex
   *
-  * @param relAcctGender 第三人性別
+  * @param relAcctGender 性別
 	*/
   public void setRelAcctGender(String relAcctGender) {
     this.relAcctGender = relAcctGender;

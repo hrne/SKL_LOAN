@@ -45,7 +45,7 @@ E(0,40)ASGN(INQPRT$)
 ["押品別2",#Gdrid2],
 ["押品號碼",#Gdrnum],
 ["地區別",#Loclid],
-["鑑價期限",#Gdtidt],
+["鑑價日期",#Gdtidt],
 ["他項存續期限",#Gdtrdt],
 ["順位",#Gdtpty],
 ["前一順位金額",#Gdtp1a],

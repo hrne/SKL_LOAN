@@ -12,6 +12,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
@@ -28,18 +30,6 @@ public class L4962ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Autowired
 	private LoanBorMainRepository loanBorMainRepos;
 
-	// *** 折返控制相關 ***
-	private int index;
-
-	// *** 折返控制相關 ***
-	private int limit;
-
-	// *** 折返控制相關 ***
-	private int cnt;
-
-	// *** 折返控制相關 ***
-	private int size;
-
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
@@ -54,7 +44,6 @@ public class L4962ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iInsuEndMonthFrom2 = Integer.parseInt(titaVo.getParam("InsuEndMonthFrom2"));
 		int iInsuEndMonthTo2 = Integer.parseInt(titaVo.getParam("InsuEndMonthTo2"));
 
-
 		String sql = " select                                                    ";
 		sql += "  coll.\"CustNo\"                                        AS F0   ";
 		sql += " ,coll.\"FacmNo\"                                        AS F1   ";
@@ -68,16 +57,18 @@ public class L4962ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,NVL(rn.\"InsuStartDate\",NVL(og.\"InsuStartDate\",0))  AS F8   ";
 		sql += " ,NVL(rn.\"InsuEndDate\",NVL(og.\"InsuEndDate\",0))      AS F9   ";
 		sql += " ,NVL(rn.\"PrevInsuNo\",NVL(og.\"OrigInsuNo\",''))       AS F10  ";
-		sql += " ,coll.\"Status\"                                        AS F11  ";
+		sql += " ,cd.\"Item\"                                            AS F11  ";
 		sql += " ,NVL(rn.\"InsuYearMonth\",0)                            AS F12  ";
 		sql += " from(                                                           ";
 		sql += "   select                                                        ";
 		sql += "    \"CustNo\"                                                   ";
 		sql += "   ,\"FacmNo\"                                                   ";
-		sql += "   ,\"Status\"                                                   ";
+		sql += "   ,lpad(decode(\"Status\",'4','0',\"Status\"), 2, '0') as \"Status\" ";
 		sql += "     from \"CollList\"                                           ";
 		sql += "    where \"Status\" in ('0','2','4','7')                    ";
 		sql += " ) coll                                                          ";
+		sql += " left join \"CdCode\" cd on cd.\"DefCode\" = 'ColStatus'         ";
+		sql += "                        and cd.\"Code\" = coll.\"Status\"        ";
 		sql += " left join \"ClFac\" cf   on cf.\"CustNo\" = coll.\"CustNo\"     ";
 		sql += "                       and cf.\"FacmNo\" = coll.\"FacmNo\"       ";
 		sql += " left join \"CustMain\" c on  c.\"CustNo\" = coll.\"CustNo\"     ";
@@ -121,18 +112,17 @@ public class L4962ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  where NVL(f.\"FirstDrawdownDate\",0) != 0                      ";
 		sql += "    and cf.\"ClCode1\" = 1                                       ";
 
-		if (iDrawdownDateFrom > 0) {//撥款區間
+		if (iDrawdownDateFrom > 0) {// 撥款區間
 			sql += "   and NVL(LB.\"DrawdownDate\",0) >= :drawdownDateFrom ";
 			sql += "   and NVL(LB.\"DrawdownDate\",0) <= :drawdownDateTo ";
-			sql += " ORDER BY coll.\"CustNo\" ASC , coll.\"FacmNo\" ASC , LB.\"DrawdownDate\" ASC ";  
+			sql += " ORDER BY coll.\"CustNo\" ASC , coll.\"FacmNo\" ASC , LB.\"DrawdownDate\" ASC ";
 		}
 
-		if (iInsuEndMonthFrom2 > 0) {//火險年月
+		if (iInsuEndMonthFrom2 > 0) {// 火險年月
 			sql += "   and NVL(rn.\"InsuYearMonth\",0)  >= :insuEndMonthFrom2 ";
 			sql += "   and NVL(rn.\"InsuYearMonth\",0)  <= :insuEndMonthTo2 ";
-			sql += " ORDER BY coll.\"CustNo\" ASC , coll.\"FacmNo\" ASC , rn.\"InsuYearMonth\" ASC ";  
+			sql += " ORDER BY coll.\"CustNo\" ASC , coll.\"FacmNo\" ASC , rn.\"InsuYearMonth\" ASC ";
 		}
-		
 
 		this.info("sql=" + sql);
 		Query query;
@@ -148,34 +138,57 @@ public class L4962ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("insuEndMonthFrom2", iInsuEndMonthFrom2 + 191100);
 			query.setParameter("insuEndMonthTo2", iInsuEndMonthTo2 + 191100);
 		}
-		
-		cnt = query.getResultList().size();
-		this.info("Total cnt ..." + cnt);
 
-		// *** 折返控制相關 ***
-		// 設定從第幾筆開始抓,需在createNativeQuery後設定
-		query.setFirstResult(this.index * this.limit);
-
-		// *** 折返控制相關 ***
-		// 設定每次撈幾筆,需在createNativeQuery後設定
-		query.setMaxResults(this.limit);
-
-		List<Object> result = query.getResultList();
-
-		size = result.size();
-		this.info("Total size ..." + size);
-
-		return this.convertToMap(result);
+		return this.convertToMap(query);
 	}
 
-	public List<Map<String, String>> findAll(int index, int limit, TitaVo titaVo) throws Exception {
-		this.index = index;
-		this.limit = limit;
+	public List<Map<String, String>> findNoInsuCL(TitaVo titaVo) throws Exception {
+        // 擔保品無保險單
+		this.info("L4962.findClMain");
+		String sql = " select                                                    ";
+		sql += "  coll.\"CustNo\"                                        AS \"CustNo\"   ";
+		sql += " ,coll.\"FacmNo\"                                        AS \"FacmNo\"   ";
+		sql += " ,c.\"CustName\"                                         AS \"CustName\" ";
+		sql += " ,cd.\"Item\"                                            AS \"Status\"   ";
+		sql += " ,cf.\"ClCode1\"                                         AS \"ClCode1\"  ";
+		sql += " ,cf.\"ClCode2\"                                         AS \"ClCode2\"  ";
+		sql += " ,cf.\"ClNo\"                                            AS \"ClNo\"     ";
+		sql += " from(                                                           ";
+		sql += "   select                                                        ";
+		sql += "    \"CustNo\"                                                   ";
+		sql += "   ,\"FacmNo\"                                                   ";
+		sql += "   ,lpad(decode(\"Status\",'4','0',\"Status\"), 2, '0') as \"Status\" ";
+		sql += "    from \"CollList\"                                            ";
+		sql += "    where \"Status\" in ('0','2','4','7')                        "; // 撥款的正常戶、逾期戶、催收戶、催呆戶(排除結案戶、呆帳戶、未撥款戶)
+		sql += " ) coll                                                          ";
+		sql += " left join \"CdCode\" cd on cd.\"DefCode\" = 'ColStatus'         ";
+		sql += "                        and cd.\"Code\" = coll.\"Status\"        ";
+		sql += " left join \"CustMain\" c on  c.\"CustNo\" = coll.\"CustNo\"     ";
+		sql += " left join \"ClFac\" cf   on cf.\"CustNo\" = coll.\"CustNo\"     ";
+		sql += "                       and cf.\"FacmNo\" = coll.\"FacmNo\"       ";
+		sql += "                       and cf.\"ClCode1\" =  1                   ";
+		sql += " left join \"ClMain\" cm on cm.\"ClCode1\" = cf.\"ClCode1\"      ";
+		sql += "                        and cm.\"ClCode2\" = cf.\"ClCode2\"      "; 
+		sql += "                        and cm.\"ClNo\" = cf.\"ClNo\"            ";
+		sql += "                        and cm.\"ClStatus\" = '1'             "; // 已設定抵押的擔保品需有保險單， 擔保品狀況碼 :0:未抵押 1:已抵押
+		sql += " left join \"InsuOrignal\" io on io.\"ClCode1\" = cf.\"ClCode1\" ";
+		sql += "                             and io.\"ClCode2\" = cf.\"ClCode2\" ";
+		sql += "                             and io.\"ClNo\" = cf.\"ClNo\"       ";
+		sql += " where NVL(cm.\"ClStatus\",'0') = '1'                            ";
+		sql += "  and NVL(io.\"ClNo\",0) = 0                                     ";
+		sql += " group by coll.\"CustNo\"                                        ";
+		sql += "         ,coll.\"FacmNo\"                                        ";
+		sql += "         ,c.\"CustName\"                                         ";
+		sql += "         ,cd.\"Item\"                                            ";
+		sql += "         ,cf.\"ClCode1\"                                         ";
+		sql += "         ,cf.\"ClCode2\"                                         ";
+		sql += "         ,cf.\"ClNo\"                                            ";
 
-		return findAll(titaVo);
-	}
+		this.info("sql=" + sql);
+		Query query;
 
-	public int getSize() {
-		return cnt;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
+		query = em.createNativeQuery(sql);
+		return this.convertToMap(query);
 	}
 }

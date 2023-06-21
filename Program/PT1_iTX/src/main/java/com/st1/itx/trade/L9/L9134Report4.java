@@ -41,6 +41,11 @@ public class L9134Report4 extends MakeReport {
 
 	@Autowired
 	Parse parse;
+	
+	BigDecimal iDifTdBalSum=BigDecimal.ZERO;
+	BigDecimal ETalSum=BigDecimal.ZERO;
+	BigDecimal didCDrAmtSum=BigDecimal.ZERO;
+	BigDecimal JTalSum=BigDecimal.ZERO;
 
 	public void exec(int endDate, TitaVo titaVo) throws LogicException {
 		String reportCode = "L9134";
@@ -109,6 +114,8 @@ public class L9134Report4 extends MakeReport {
 					BigDecimal ETal = iDifTdBal.add(didDifTdBal);
 					BigDecimal JTal = didCDrAmt.add(iTemTal);
 					
+					
+					
 					if(iTdBal.equals(BigDecimal.ZERO)&&iDifTdBal.equals(BigDecimal.ZERO)
 							&& didTdBal.equals(BigDecimal.ZERO)&& didDifTdBal.equals(BigDecimal.ZERO)) {
 						
@@ -124,9 +131,9 @@ public class L9134Report4 extends MakeReport {
 						makeExcel.setValue(row, 11, "");
 						makeExcel.setValue(row, 12, "");
 						makeExcel.setValue(row, 13, "");
-						makeExcel.setValue(row, 14, "");
+						
 					}else {
-						makeExcel.setValue(row, 1, (iTdBal.equals(BigDecimal.ZERO) )?"":iTdBal, "#,##0");
+						makeExcel.setValue(row, 1, iTdBal, "#,##0");
 						makeExcel.setValue(row, 2, iDifTdBal, "#,##0");
 						makeExcel.setValue(row, 3, didTdBal, "#,##0");
 						makeExcel.setValue(row, 4, didDifTdBal, "#,##0");
@@ -138,6 +145,11 @@ public class L9134Report4 extends MakeReport {
 						makeExcel.setValue(row, 11, ETal.subtract(JTal), "#,##0");
 						makeExcel.setValue(row, 12, drAmt, "#,##0");
 						makeExcel.setValue(row, 13, crAmt, "#,##0");
+						
+						iDifTdBalSum=iDifTdBalSum.add(iDifTdBal);
+						ETalSum=ETalSum.add(ETal);
+						didCDrAmtSum=didCDrAmtSum.add(didCDrAmt);
+						JTalSum=JTalSum.add(JTal);
 					}
 					
 					
@@ -150,24 +162,13 @@ public class L9134Report4 extends MakeReport {
 					} else {
 						makeExcel.setValue(row, 14, "X");
 					}
-				} else {
-					
-					makeExcel.setValue(row, 1, "");
-					makeExcel.setValue(row, 2, "");
-					makeExcel.setValue(row, 3, "");
-					makeExcel.setValue(row, 4, "");
-					makeExcel.setValue(row, 5, "");
-					makeExcel.setValue(row, 6, "");
-					makeExcel.setValue(row, 7, "");
-					makeExcel.setValue(row, 8, "");
-					makeExcel.setValue(row, 10, "");
-					makeExcel.setValue(row, 11, "");
-					makeExcel.setValue(row, 12, "");
-					makeExcel.setValue(row, 13, "");
-					makeExcel.setValue(row, 14, "");
-				}
+				} 
 				row++;
 			}
+			makeExcel.setValue(row, 2, iDifTdBalSum, "#,##0");
+			makeExcel.setValue(row, 5, ETalSum, "#,##0");
+			makeExcel.setValue(row, 7, didCDrAmtSum, "R");
+			makeExcel.setValue(row, 10, JTalSum, "#,##0");
 		}
 		makeExcel.close();
 	}

@@ -484,20 +484,7 @@ BEGIN
                                           AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0 
           ,NVL(AEM1."EmpNo",'999999')     AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0 
           ,S."BSTBTN"                     AS "SlipSumNo" 
-          ,CASE  
-             WHEN S."JLNCRC" IS NULL 
-             THEN 0 
-             WHEN TO_NUMBER(NVL(S."JLNCRC",0)) = 0 -- 未訂正  
-             THEN 1 -- 已入帳 
-             WHEN TO_NUMBER(NVL(S."JLNCRC",0)) = 1 -- 訂正 
-             THEN 3 -- 沖正(隔日訂正) 
-             WHEN TO_NUMBER(NVL(S."JLNCRC",0)) = 2 -- 被訂正 
-             THEN 2 -- 被沖正(隔日訂正) 
-             WHEN TO_NUMBER(NVL(S."JLNCRC",0)) = 3 -- 沖正 
-             THEN 3 -- 沖正(隔日訂正) 
-             WHEN TO_NUMBER(NVL(S."JLNCRC",0)) = 4 -- 被沖正 
-             THEN 2 -- 被沖正(隔日訂正) 
-           ELSE 0 END                     AS "TitaHCode" 
+          ,TO_NUMBER(NVL(S."JLNCRC",0))   AS "TitaHCode" 
           ,''                             AS "MediaSlipNo"
     FROM S 
     LEFT JOIN ACT ON ACT."LMSACN" = NVL(S."LMSACN",0) 
