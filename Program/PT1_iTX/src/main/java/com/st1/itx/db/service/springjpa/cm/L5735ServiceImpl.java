@@ -90,7 +90,7 @@ public class L5735ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WITH \"CFSum\" AS ( ";
 		sql += "   SELECT \"CustNo\" ";
 		sql += "        , \"FacmNo\" ";
-		sql += "        , SUM(NVL(\"OriEvaNetWorth\",0)) AS \"EvaNetWorth\" ";
+		sql += "        , SUM(NVL(\"OriEvaNotWorth\",0)) AS \"EvaNetWorth\" ";
 		sql += "   FROM \"ClFac\"";
 		sql += "   WHERE \"MainFlag\" = 'Y' ";
 		sql += "   GROUP BY \"CustNo\" ";

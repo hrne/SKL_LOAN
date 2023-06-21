@@ -170,15 +170,15 @@ public class L4961 extends TradeBuffer {
 			List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 			try {
 				// *** 折返控制相關 ***
-				resultList = l4961ServiceImpl.findAll(this.index, this.limit, titaVo);
+				resultList = l4961ServiceImpl.findAll2(titaVo);
 			} catch (Exception e) {
 				this.error("l4961ServiceImpl findByCondition " + e.getMessage());
 				throw new LogicException("E0013", e.getMessage());
 			}
 			ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getKinbr()).setRptDate(titaVo.getEntDyI())
-					.setRptCode("L4961").setRptItem("L4961").build();
+					.setRptCode("L4961").setRptItem("火險保費明細查詢").build();
 			// open
-			makeExcel.open(titaVo, reportVo, "L4961"); 
+			makeExcel.open(titaVo, reportVo, "L4961火險保費明細查詢"); 
 			makeExcel.setValue(1,1,"火險到期年月");
 			makeExcel.setValue(1,2,"原保單號碼");
 			makeExcel.setValue(1,3,"新保單號碼");
