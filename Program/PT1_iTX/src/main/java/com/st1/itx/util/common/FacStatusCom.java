@@ -46,7 +46,7 @@ public class FacStatusCom {
 	 * 
 	 * @param lLoanBorMain List of LoanBorMain
 	 * @param tbsdy        會計日期
-	 * @return status 0.正常戶 1.展期戶 2.催收戶 3.結案戶 4.逾期戶(正常戶逾期超過一個月) 6.呆帳戶 7.部分轉呆戶
+	 * @return status 0.正常戶(含未撥款) 1.展期戶 2.催收戶 3.結案戶 4.逾期戶(正常戶逾期超過一個月) 6.呆帳戶 7.部分轉呆戶
 	 *         8.債權轉讓戶 9.呆帳結案戶
 	 * @throws LogicException LogicException
 	 */
@@ -149,6 +149,18 @@ public class FacStatusCom {
 		return status;
 	}
 
+	/**
+	 * 取得額度戶況
+	 * 
+	 * @param iCustNo 戶號
+	 * @param iFacmNo 額度
+	 * @param tbsdy   會計日期
+	 * @param titaVo  TiTaVo
+	 * @return status -1.未撥款 0.正常戶 1.展期戶 2.催收戶 3.結案戶 4.逾期戶(正常戶逾期超過一個月) 6.呆帳戶 7.部分轉呆戶
+	 *         8.債權轉讓戶 9.呆帳結案戶
+	 * @throws LogicException ....
+	 */
+
 	public int getLoanStatus(int iCustNo, int iFacmNo, int tbsdy, TitaVo titaVo) throws LogicException {
 		int priorty = 11;
 		int status = 0;
@@ -167,13 +179,14 @@ public class FacStatusCom {
 		List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
 		Slice<LoanBorMain> slLoanBorMain = null;
 
-		slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, iFacmNo, iFacmNo, 0, 900, 0, Integer.MAX_VALUE, titaVo);
+		slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, iFacmNo, iFacmNo, 0, 900, 0, Integer.MAX_VALUE,
+				titaVo);
 
 		lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 
 		// 2022-05-10 智偉增加:防呆
 		if (lLoanBorMain == null || lLoanBorMain.isEmpty()) {
-			return status;
+			return -1;
 		}
 		for (LoanBorMain tmpLoanBorMain : lLoanBorMain) {
 			if (tmpLoanBorMain.getStatus() < 90) {

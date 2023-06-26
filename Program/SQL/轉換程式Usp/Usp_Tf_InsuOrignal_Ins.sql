@@ -139,8 +139,11 @@ BEGIN
       SELECT GDRID1
            , GDRID2
            , GDRNUM
-      FROM LA$HGTP_RAW
-      GROUP BY COUNT(*) >= 2
+      FROM LA$HGTP
+      GROUP BY GDRID1
+             , GDRID2
+             , GDRNUM
+      HAVING COUNT(*) >= 2
     )
     , HGTP AS (
       SELECT R.GDRID1
@@ -148,9 +151,10 @@ BEGIN
            , R.GDRNUM
            , H.LGTSEQ
            , H.LGTADR
-      FROM LA$HGTP H ON H.GDRID1 = R.GDRID1
-                    AND H.GDRID2 = R.GDRID2
-                    AND H.GDRNUM = R.GDRNUM
+      FROM HGTP_RAW R
+      LEFT JOIN LA$HGTP H ON H.GDRID1 = R.GDRID1
+                         AND H.GDRID2 = R.GDRID2
+                         AND H.GDRNUM = R.GDRNUM
     )
     , INSP_FIX_BY_CASE AS (
       SELECT CASE

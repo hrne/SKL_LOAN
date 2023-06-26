@@ -55,6 +55,7 @@ import com.st1.itx.db.service.NegMainService;
 import com.st1.itx.db.service.TxErrCodeService;
 import com.st1.itx.db.service.TxRecordService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -1067,7 +1068,7 @@ public class TxBatchCom extends TradeBuffer {
 		l3420TitaVo.putParam("RqspFlag", ""); // 減免金額超過限額，Y.需主管核可
 		l3420TitaVo.putParam("ShortPrinPercent", "0"); // 短收本金比率
 		l3420TitaVo.putParam("ShortIntPercent", "0"); // 短收利息比率
-		// 提前清償原因 
+		// 提前清償原因
 		// CloseFg 1.正常結案因 2.提前結案
 		// 提前結案且無清償原因時，提前清償原因為 13-銀扣到期或02-自行還清
 		if ("2".equals(this.tTempVo.getParam("CloseFg"))) {
@@ -2177,11 +2178,11 @@ public class TxBatchCom extends TradeBuffer {
 // loanBal 放款餘額(還款前)
 // this.feeRepayType 費用還款類別
 		baTxList = new ArrayList<BaTxVo>();
-		// call 應繳試算，試算至應繳，可預收(批次可預收期數)， 應繳日設定為會計日
+		// call 應繳試算，試算至應繳，可預收(批次可預收期數)， 應繳日設定為入帳日
 		try {
-			baTxList = baTxCom.settleUnPaid(tDetail.getEntryDate(), this.txBuffer.getTxCom().getTbsdy(),
-					tDetail.getCustNo(), this.repayFacmNo, this.repayBormNo, tDetail.getRepayCode(), this.repayType,
-					tDetail.getRepayAmt(), tTempVo, titaVo);
+			baTxList = baTxCom.settleUnPaid(tDetail.getEntryDate(), tDetail.getEntryDate(), tDetail.getCustNo(),
+					this.repayFacmNo, this.repayBormNo, tDetail.getRepayCode(), this.repayType, tDetail.getRepayAmt(),
+					tTempVo, titaVo);
 		} catch (LogicException e) {
 			this.errorMsg = e.getMessage();
 			if (this.errorMsg.length() >= 5) {

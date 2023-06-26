@@ -48,13 +48,14 @@ E(0,0)
 ["#R2+@行庫代號",#BankCode,#BranchCode],
 ["#R3+@行庫名稱",#BankItem],
 ["#R4+@分行名稱",#BranchItem],
+["#R5+@啟用記號",#Enable]
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
 #BUF1=X,42,S
 
 ! 必輸欄位
-##loop{times:4,i:1}
+##loop{times:5,i:1}
 #R{i}=X,1,L
 INVOKEJS(SHOW,#R{i},0)
 !K(LIGHT,#R{i},TXTRED,0)
@@ -87,6 +88,19 @@ R(1,XXR99)
 CALL(#HelpProc)
 T(2,@FuncCode2Help,#HelpDesc1)
 
+#EnableH=X,100,S
+T(3,Y:啟用;N:未啟用)
+
+#CdEnableFg=x,20,S                  
+T(3,CdCode.EnableFg)   
+
+#HelpRim1=X,1,S
+RESET_RIM(#HelpRim1,XXR99)
+S(XXR99,01,#CdEnableFg)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@EnableH,#HelpDesc1)
+
 #CHAIN=A,1,S
 T(4,CHAIN$)
 T(2,@RimTxCode,#TXCD)
@@ -114,6 +128,7 @@ T(1,#NTXBUF,9,50)
 #CHAIN_BranchItem=x,100,S
 T(1,#NTXBUF,59,50)
 
+
 #CHAINSET=X,1,S
 C(3,#CHAIN,1,$,S)
 T(2,@FuncCode,#CHAIN_FuncCode)
@@ -122,6 +137,8 @@ T(2,@BankCode,#CHAIN_BankCode)
 T(2,@BranchCode,#CHAIN_BranchCode)
 T(2,@BankItem,#CHAIN_BankItem)
 T(2,@BranchItem,#CHAIN_BranchItem)
+
+
 
 ! 功能 必須輸入(1: 新增;2: 修改;4: 刪除)
 #FuncCode=A,1,S
@@ -156,9 +173,11 @@ C(3,#CHAIN,1,C(2,#FuncCode,S,T(3,*),S,S,S,S),T(3,*))
 #WKSTAR2=X,2,S
 C(2,#FuncCode,S,T(3,*),T(3,*),S,S,S)
 
+
 #WKNAME=X,1,S
 T(2,@R2,#WKSTAR1)
 T(2,@R3,#WKSTAR2)
+
 
 ! 行庫代號
 #BankCode=X,3,I
@@ -216,6 +235,12 @@ E(0,0)
 #MRKEY=_,_,S
 T(2,#BankCode)
 
+![啟用記號]
+#Enable=X,1,I
+C(2,#FuncCode,s,$,$,$,s,s)
+HELP(#EnableH)
+@V(H,#EnableH)
+
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L2Rim.dec"/>
 <include src="ROM.icf::L6R01Rim.dec"/>
@@ -244,7 +269,7 @@ T(3,[L6701] 行庫資料維護)
 !------ 上行電文 TEXT ------
 <sub type="TIM">
 
-#FuncCode#BankCode#BranchCode#BankItem#BranchItem#END
+#FuncCode#BankCode#BranchCode#BankItem#BranchItem#Enable#END
 
 </sub>
 
@@ -257,6 +282,7 @@ TXFORM=L6701
 <include src="ROM.icf::L2R09.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
+
 </sub>
 
 

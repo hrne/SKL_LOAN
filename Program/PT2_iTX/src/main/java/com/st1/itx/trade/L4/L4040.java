@@ -162,8 +162,7 @@ public class L4040 extends TradeBuffer {
 				txtitaVo.putParam("FunctionCode", "1");
 				try {
 					// *** 折返控制相關 ***
-					resultList = l4040ServiceImpl.checkIsMedia(nPropDate, this.index, Integer.MAX_VALUE,
-							txtitaVo);
+					resultList = l4040ServiceImpl.checkIsMedia(nPropDate, this.index, Integer.MAX_VALUE, txtitaVo);
 				} catch (Exception e) {
 					this.error("l4040ServiceImpl findByCondition " + e.getMessage());
 					throw new LogicException("E0013", e.getMessage());
@@ -242,8 +241,8 @@ public class L4040 extends TradeBuffer {
 						tAchAuthLogId.setRepayBank(result.get("F3"));
 
 						AchAuthLog tAchAuthLog = achAuthLogService.holdById(tAchAuthLogId, titaVo);
-
-						if ("A".equals(result.get("F5"))) {
+						// 新增授權需清除提出日期;取消授權及再次授權需刪除
+						if ("A".equals(result.get("F5")) && " ".equals(result.get("F9"))) {
 							tAchAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
 							tAchAuthLog.setProcessTime(dateUtil.getNowIntegerTime());
 							tAchAuthLog.setPropDate(0);

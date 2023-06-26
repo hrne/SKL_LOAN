@@ -84,9 +84,6 @@ public class L4964 extends TradeBuffer {
 		l0InsuRenew = slInsuRenew == null ? null : slInsuRenew.getContent();
 		if (sInsuOrignal != null) {
 			for (InsuOrignal t : sInsuOrignal.getContent()) {
-				if ("轉換留存".equals(t.getRemark().trim())) {
-					continue;
-				}
 				Boolean isRenew = false;
 				if (l0InsuRenew != null) {
 					for (InsuRenew tR : l0InsuRenew) {

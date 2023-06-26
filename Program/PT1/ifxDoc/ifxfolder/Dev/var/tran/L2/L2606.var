@@ -303,7 +303,7 @@ C(3,#FunCd,5,s,$)
 #AcDate=D,7,L
 
 ![交易序號]
-#TxtNo=A,8,L
+#TxtNo=X,8,L
 
 ![經辦編號]
 #TlrNo=X,6,L
@@ -347,30 +347,6 @@ T(3,[L2606] 帳管費維護)
 C(3,#FunCd,4,S,$)
 C(3,#FunCd,5,S,$)
 E(0,@CreateDate,#OCreateDate)
-
-#OAcDate=D,7,S
-C(3,#FunCd,4,S,$)
-C(3,#FunCd,5,S,$)
-E(0,@AcDate,#OAcDate)
-
-
-#OTitaTxtNo=A,8,S
-C(3,#FunCd,4,S,$)
-C(3,#FunCd,5,S,$)
-E(0,@TxtNo,#OTitaTxtNo)
-
-
-
-#OTlrNo=X,6,S
-C(3,#FunCd,4,S,$)
-C(3,#FunCd,5,S,$)
-T(2,@TlrNo,#OTlrNo)
-
-#OEmpName=X,10,S
-C(3,#FunCd,4,S,$)
-C(3,#FunCd,5,S,$)
-T(2,@EmpName,#OEmpName)
-
 
 #OCreateTime=X,10,S
 
@@ -426,10 +402,6 @@ T(2,@RvNo,#ORvNo)
 <sub type="TOM">
 TXFORM=L2606
 #ORvNo
-#OAcDate
-#OTitaTxtNo
-#OTlrNo
-#OEmpName
 #OCreateDate
 #OCreateTime
 ^

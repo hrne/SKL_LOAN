@@ -985,7 +985,7 @@ public class L3200 extends TradeBuffer {
 		switch (wkRepaykindCode) {
 		case 1: // 部分償還金額 > 0
 			if (ln.getNextPayIntDate() <= iEntryDate) {
-				throw new LogicException(titaVo, "E3072", checkMsg + " 應繳息日 = " + ln.getNextPayIntDate()); // 該筆放款尚有其款未回收
+				throw new LogicException(titaVo, "E3072", checkMsg + " 應繳息日 = " + ln.getNextPayIntDate()); // 該筆放款尚有期款未回收
 			}
 			wkTerms = 0;
 			break;
@@ -1837,9 +1837,9 @@ public class L3200 extends TradeBuffer {
 	// 貸方：費用、短繳期金
 	private void batxSettleUnpaid() throws LogicException {
 		this.baTxList = new ArrayList<BaTxVo>();
-		// call 應繳試算(整批入帳應繳日為會計入、連線用入帳日)
-		this.baTxList = baTxCom.settingUnPaid(titaVo.isTrmtypBatch() ? titaVo.getEntDyI() : iEntryDate, iCustNo,
-				this.wkTmpFacmNo, iBormNo, iRepayType <= 2 ? 0 : 9, iTxAmt, titaVo); // 00-費用全部(已到期)
+		// call 應繳試算
+		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo, this.wkTmpFacmNo, iBormNo, iRepayType <= 2 ? 0 : 9,
+				iTxAmt, titaVo); // 00-費用全部(已到期)
 		if (this.baTxList != null) {
 			if (!"Y".equals(iPayFeeFlag)) {
 				for (BaTxVo ba : this.baTxList) {

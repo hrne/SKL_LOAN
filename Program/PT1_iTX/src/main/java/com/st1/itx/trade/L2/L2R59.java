@@ -76,11 +76,11 @@ public class L2R59 extends TradeBuffer {
 				if (tAcReceivable.getClsFlag() == 1) {
 					this.totaVo.putParam("L2r59AcDate", tAcReceivable.getLastAcDate());// 會計日
 					this.totaVo.putParam("L2r59TlrNo", tAcReceivable.getTitaTlrNo());// 經辦
-					this.totaVo.putParam("L2r59TxtNo", tAcReceivable.getTitaTxtNo());// 交易序號
+					this.totaVo.putParam("L2r59TxtNo", parse.IntegerToString(tAcReceivable.getTitaTxtNo(), 8));// 交易序號
 				} else {
 					this.totaVo.putParam("L2r59AcDate", 0);// 會計日
 					this.totaVo.putParam("L2r59TlrNo", "");// 經辦
-					this.totaVo.putParam("L2r59TxtNo", 0);// 交易序號
+					this.totaVo.putParam("L2r59TxtNo", "");// 交易序號
 				}
 				this.totaVo.putParam("L2r59CreateDate", DbDateToRocDate(tAcReceivable.getCreateDate().toString())); // 作業日期
 				this.totaVo.putParam("L2r59CreateTime", DbDateToRocTime(tAcReceivable.getCreateDate().toString())); // 作業時間);

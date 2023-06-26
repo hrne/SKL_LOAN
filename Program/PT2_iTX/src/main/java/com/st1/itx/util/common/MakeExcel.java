@@ -1189,6 +1189,9 @@ public class MakeExcel extends CommBuffer {
 
 		if (prow != null) {
 			Cell tmpCell = prow.getCell(col - 1);
+			if (tmpCell == null) {
+				tmpCell = prow.createCell(col - 1, CellType.BLANK);
+			}
 			tmpCell.setCellValue(val);
 		} else {
 			throw new LogicException(titaVo, "E0013", "(MakeExcel) setValueInt error = " + row + "/" + col + "/" + val);

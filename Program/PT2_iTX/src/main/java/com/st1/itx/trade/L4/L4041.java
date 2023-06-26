@@ -501,8 +501,8 @@ public class L4041 extends TradeBuffer {
 						tPostAuthLogId.setAuthCode(result.get("F5"));
 
 						PostAuthLog newPostAuthLog = postAuthLogService.holdById(tPostAuthLogId, titaVo);
-
-						if (result.get("F1").equals("1")) {
+						// 新增授權需清除提出日期;取消授權及再次授權需刪除
+						if ("1".equals(result.get("F1")) && " ".equals(result.get("F14"))) {
 							newPostAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
 							newPostAuthLog.setProcessTime(dateUtil.getNowIntegerTime());
 							newPostAuthLog.setPropDate(0);

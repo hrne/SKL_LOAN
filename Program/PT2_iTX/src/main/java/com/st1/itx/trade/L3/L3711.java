@@ -186,7 +186,7 @@ public class L3711 extends TradeBuffer {
 
 		if (titaVo.isHcodeNormal()) {
 			// call 應繳試算
-			this.baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, iFacmNo, 0, 0, BigDecimal.ZERO, titaVo);
+			this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, 0, 0, BigDecimal.ZERO, titaVo);
 			SpecificNormalRoutine();
 			titaVo.setTxAmt(wkTotalInterest.subtract(iReduceAmt));
 		} else {

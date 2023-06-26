@@ -17,6 +17,7 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.AcReceivableId;
 import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -100,7 +101,7 @@ public class L2606 extends TradeBuffer {
 			tAcReceivable.setFacmNo(iFacmNo); // 額度
 			tAcReceivable.setRvNo(iRvNo); // 會計日期+序號
 			tAcReceivable.setOpenAcDate(iOpenAcDate); // 起帳日期必須輸入 預設會計日
-			tAcReceivable.setRvAmt(iAcctFee); // 帳管費
+			tAcReceivable.setRvAmt(iAcctFee.setScale(2)); // 帳管費
 			tAcReceivable.setSlipNote(titaVo.getParam("SlipNote")); // //備註
 			acReceivableList.add(tAcReceivable);
 
@@ -173,22 +174,6 @@ public class L2606 extends TradeBuffer {
 		this.info("createTime = " + createTime);
 
 		this.totaVo.putParam("ORvNo", cAcReceivable.getRvNo());
-		if (cAcReceivable.getClsFlag() == 1) {
-			this.totaVo.putParam("OAcDate", cAcReceivable.getLastAcDate());
-			this.totaVo.putParam("OTitaTxtNo", cAcReceivable.getTitaTxtNo());
-			this.totaVo.putParam("OTlrNo", cAcReceivable.getTitaTlrNo());
-			CdEmp tCdEmp = new CdEmp();
-			tCdEmp = sCdEmpService.findById(cAcReceivable.getTitaTlrNo(), titaVo);
-			if (tCdEmp != null) {
-				this.totaVo.putParam("OEmpName", tCdEmp.getFullname()); // 建檔人員姓名
-			}
-		} else {
-			this.totaVo.putParam("OAcDate", 0);
-			this.totaVo.putParam("OTitaTxtNo", 0);
-			this.totaVo.putParam("OTlrNo", "");
-			this.totaVo.putParam("OEmpName", "");
-		}
-
 		this.totaVo.putParam("OCreateDate", parse.stringToInteger(createDate) - 19110000);
 		this.totaVo.putParam("OCreateTime", createTime);
 

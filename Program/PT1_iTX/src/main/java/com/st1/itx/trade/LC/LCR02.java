@@ -28,7 +28,6 @@ import com.st1.itx.db.service.TxFlowService;
  * @version 1.0.0
  */
 public class LCR02 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(LCR02.class);
 
 	@Autowired
 	public TxRecordService txRecordService;
@@ -96,7 +95,11 @@ public class LCR02 extends TradeBuffer {
 		if (tTxFlow.getFlowStep() > flowstep) {
 			switch (tTxFlow.getFlowStep()) {
 			case 2:
-				throw new LogicException(titaVo, "EC008", "交易已放行");
+				// 四段式可修改
+				if (tTxFlow.getFlowType() != 4) {
+					throw new LogicException(titaVo, "EC008", "交易已放行");
+				}
+				break;
 			case 3:
 				throw new LogicException(titaVo, "EC008", "交易已審核");
 			case 4:

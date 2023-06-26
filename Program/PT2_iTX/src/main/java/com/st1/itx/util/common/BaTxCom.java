@@ -573,7 +573,7 @@ public class BaTxCom extends TradeBuffer {
 				}
 			}
 
-// 5).應繳日   >= 應繳日(會計日) -> 1.期款，不預繳
+// 5).應繳日   >= 下次應繳日 -> 1.期款，不預繳
 			if (iRepayType == 0 && this.nextPayIntDate > 0) {
 				if (this.nextPayIntDate <= iPayIntDate) {
 					iRepayType = 1;

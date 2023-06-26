@@ -129,8 +129,8 @@ BEGIN
            ELSE ' ' END                                 AS C3 -- c3 多額度多撥款
          , CASE
              WHEN NVL(R."CustNo",0) = 0
-             THEN 'V'
-           ELSE ' ' END                                 AS C4 -- c4 借新還舊件
+             THEN ' '
+           ELSE 'V' END                                 AS C4 -- c4 借新還舊件
          , CASE
              WHEN Y."LoanBal" = 0
              THEN 'V'
