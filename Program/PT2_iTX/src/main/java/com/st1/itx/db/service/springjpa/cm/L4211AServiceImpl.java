@@ -78,7 +78,8 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "    , BATX.\"DetailSeq\""; // 匯款序號
 			sql += "    , BATX.\"RepayAmt\" "; // 匯款金額（排序用）
 			sql += "    , TX2.\"AcSeq\" AS \"AcSeq\" ";
-			sql += "    , TX2.\"TxAmt\""; // 匯款金額
+			sql += "    , CASE WHEN NVL(TX1.\"AcDate\",0) = 0 THEN  BATX.\"RepayAmt\" ";
+			sql += "      	   ELSE TX2.\"TxAmt\" END AS \"TxAmt\""; // 匯款金額
 			sql += "    , TX2.\"Principal\"";
 			sql += "      + TX2.\"Interest\"";
 			sql += "      + TX2.\"DelayInt\"";
@@ -109,7 +110,6 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "    , TX2.\"TitaTlrNo\" ";// 除錯時查資料用欄位
 			sql += "    , TX2.\"TitaTxtNo\""; // 除錯時查資料用欄位
 			sql += "    , CASE WHEN NVL(TX1.\"AcDate\",0) = 0 THEN '9999' ";
-//			sql += "    , CASE WHEN BATX.\"DetailSeq\" > 10 THEN '9999' ";
 			sql += "    	   WHEN NVL(JSON_VALUE(BATX.\"ProcNote\", '$.FacStatus'), ' ') <> ' ' THEN '999' ";
 			sql += "           WHEN TX1.\"FacmNo\" = 0 THEN '999' ";
 			sql += "           ELSE NVL(FAC.\"AcctCode\",'999') END AS \"SortingForSubTotal\""; // 配合小計產生的排序

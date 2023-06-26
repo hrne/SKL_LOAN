@@ -1556,15 +1556,20 @@ public class BaTxCom extends TradeBuffer {
 			if (wkTerms > this.terms) {
 				this.terms = wkTerms; // 繳期數
 			}
-
+			// 逾期期數
+			if (ln.getNextPayIntDate() > 0 && ln.getNextPayIntDate() < iPayIntDate) {
+				int ovduTerms = loanCom.getOvduTerms(ln.getNextPayIntDate(), iPayIntDate, ln.getSpecificDd());
+				if (ovduTerms > this.ovduTerms) {
+					this.ovduTerms = ovduTerms;
+				}
+			}
 		}
-		// 逾期期數、逾期天數
+		// 逾期天數
 		if (nextPayIntDate > 0 && nextPayIntDate < iPayIntDate) {
 			dDateUtil.init();
 			dDateUtil.setDate_1(nextPayIntDate);
 			dDateUtil.setDate_2(iPayIntDate);
 			dDateUtil.dateDiff();
-			this.ovduTerms = dDateUtil.getMons();
 			this.ovduDays = dDateUtil.getDays();
 		}
 

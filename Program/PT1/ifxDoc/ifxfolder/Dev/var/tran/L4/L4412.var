@@ -38,7 +38,6 @@ E(0,0)
 ["#FdCreateDateX+建檔日",#CreateDate],["#FdLastUpdateX+異動日期",#LastUpdate],
 ]
 
-
 #CHAIN=A,1,S
 T(4,CHAIN$)
 IF(#CHAIN!=1,V(P,此為連動交易，請從交易: [L4043 郵局授權資料查詢]進入),$)
@@ -65,8 +64,10 @@ INVOKEJS(SHOW,p1,02,02,1)
 #FdFuncCodeX=X,2,L
 #FdCustNo=X,2,L
 T(3,*)
+
 #FdPostDepCode=X,2,L
 T(3,*)
+
 #FdRepayAcct=X,2,L
 T(3,*)
 
@@ -76,6 +77,7 @@ C(3,#FuncCode,2,T(3,*),T(3,))
 #FdLimitAmt=X,2,L
 #FdRelationCode=X,2,L
 T(3,*)
+
 #FdRelAcctName=X,2,L
 #FdRelationId=X,2,L
 #FdRelAcctBirthday=X,2,L
@@ -84,6 +86,7 @@ T(3,*)
 #FdRepayAcctSeq=X,2,L
 #FdCustId=X,2,L
 T(3,*)
+
 #FdRelAcctGender=X,2,L
 #FdAuthErrorCodeX=X,2,L
 #FdAmlRspX=X,2,L
@@ -98,7 +101,6 @@ T(3,*)
 
 !用戶編碼啟動記號 1啟動
 #CustCodeFg=A,1,S
-
 #RepayCode=A,2,S
 E(0,2)
 
@@ -587,11 +589,11 @@ E(0,@RimType,1)
 RESET_RIM(#RimL4r03,L4R03)
 S(L4R03,1,#RimType,#RimCustNo)
 R(1,L4R03)
-T(2,@RelAcctName,#L4r03CustName)
-T(2,@RelationId,#L4r03CustId)
-E(0,@RelAcctBirthday,#L4r03Birthday)
-T(2,@RelAcctGender,#L4r03Gender)
-T(H,@RelAcctGenderX,#RelAcctGender,#SexHelp)
+! T(2,@RelAcctName,#L4r03CustName)
+! T(2,@RelationId,#L4r03CustId)
+! E(0,@RelAcctBirthday,#L4r03Birthday)
+! T(2,@RelAcctGender,#L4r03Gender)
+! T(H,@RelAcctGenderX,#RelAcctGender,#SexHelp)
 
 #SetValue2=A,1,S
 IF(#FuncCode==4 || #FuncCode==5,s,$)
@@ -660,7 +662,7 @@ HELP(#RelationCodeHelp)
 V(H,#RelationCodeHelp)
 
 #closeRela=X,1,S
-IF(#FuncCode==1,$,s)
+IF(#FuncCode==4 || #FuncCode==5,s,$)
 C(3,#PostSuccessFg,1,s,$)
 C(3,#checkFlag,1,s,$)
 C(3,#RelationCode,0,

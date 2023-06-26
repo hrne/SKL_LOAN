@@ -289,15 +289,16 @@ public class L4600Batch extends TradeBuffer {
 			}
 
 //				排除自保件
-			InsuRenew nInsuRenew = insuRenewService.findById(new InsuRenewId(t.getClCode1(), t.getClCode2(),
-					t.getClNo(), t.getNowInsuNo(), " ", iInsuEndMonth + 191100), titaVo);
+			InsuRenew nInsuRenew = insuRenewService.findById(
+					new InsuRenewId(t.getClCode1(), t.getClCode2(), t.getClNo(), t.getNowInsuNo(), " ", iInsuEndMonth),
+					titaVo);
 
 			if (nInsuRenew != null) {
 				this.info("排除自保件 ... " + t.getNowInsuNo());
 				continue;
 			}
 
-		// 剔除重複保單
+			// 剔除重複保單
 			for (InsuRenew tNew : lInsuRenew) {
 				if (tNew.getPrevInsuNo().equals(t.getNowInsuNo())) {
 					if (tNew.getCustNo() != this.custNo) {
@@ -306,13 +307,12 @@ public class L4600Batch extends TradeBuffer {
 					continue;
 				}
 			}
-			
+
 			// 找額度
 			findFacmNo(t, titaVo);
 			if (this.facmNo == 0) {
 				continue;
 			}
-			
 
 			InsuRenew tInsuRenew = new InsuRenew();
 
@@ -321,8 +321,8 @@ public class L4600Batch extends TradeBuffer {
 			tInsuRenew.setClNo(t.getClNo());
 			tInsuRenew.setPrevInsuNo(t.getNowInsuNo());
 			tInsuRenew.setEndoInsuNo(" ");
-	   	tInsuRenew.setInsuRenewId(new InsuRenewId(t.getClCode1(), t.getClCode2(), t.getClNo(), t.getNowInsuNo(),
-					" ", iInsuEndMonth + 191100));
+			tInsuRenew.setInsuRenewId(
+					new InsuRenewId(t.getClCode1(), t.getClCode2(), t.getClNo(), t.getNowInsuNo(), " ", iInsuEndMonth));
 			tInsuRenew.setNowInsuNo("");
 			tInsuRenew.setOrigInsuNo(t.getOrigInsuNo());
 			tInsuRenew.setInsuYearMonth(iInsuEndMonth);
@@ -525,9 +525,9 @@ public class L4600Batch extends TradeBuffer {
 			}
 
 			DecimalFormat decimalFormat = new DecimalFormat("0000000.00");
-			mainArea = FormatUtil.padX(decimalFormat.format(tClBuilding.getFloorArea()).replaceAll("[.]",""), 9);
-			
-	//		subArea = tClBuilding.getBdSubArea();
+			mainArea = FormatUtil.padX(decimalFormat.format(tClBuilding.getFloorArea()).replaceAll("[.]", ""), 9);
+
+			// subArea = tClBuilding.getBdSubArea();
 			occursList.putParam("PostalCode", FormatUtil.padX("" + findZipCode(tCustMain, titaVo), 5));
 			occursList.putParam("Address", FormatUtil.padX(replaceComma(tClBuilding.getBdLocation()), 56));
 			occursList.putParam("BuildingSquare", mainArea);

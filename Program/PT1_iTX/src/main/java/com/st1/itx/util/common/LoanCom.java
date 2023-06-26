@@ -2,6 +2,9 @@ package com.st1.itx.util.common;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -800,7 +803,10 @@ public class LoanCom extends TradeBuffer {
 		this.info("   iStartDate   = " + iStartDate);
 		this.info("   iEndDate     = " + iEndDate);
 		this.info("   iSpecificDd   = " + iSpecificDd);
-
+		if (iSpecificDd == 0) {
+			this.info("iSpecificDd = 0 ");
+			return 0;
+		}
 		int wkOcduTerms = 0;
 		int wkSpecificDate = 0;
 		wkSpecificDate = (iStartDate / 10000) * 10000 + 100 + iSpecificDd;
@@ -1140,8 +1146,7 @@ public class LoanCom extends TradeBuffer {
 	}
 
 	/**
-	 * 檢查到同戶帳務交易需由最近一筆交易開始訂正
-	 * 改以檢核暫收款餘額是否足夠(AcReceivableCom)
+	 * 檢查到同戶帳務交易需由最近一筆交易開始訂正 改以檢核暫收款餘額是否足夠(AcReceivableCom)
 	 * 
 	 * @param iCustNo 戶號
 	 * @param titaVo  TitaVo

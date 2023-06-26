@@ -354,7 +354,7 @@ public class L4510Batch extends TradeBuffer {
 			listBaTxVo = baTxCom.settingPayintDate(iEntryDate, iPayIntDate, custNo, facmNo, 0, 1, BigDecimal.ZERO,
 					titaVo);
 			if (!"3".equals(result.get("RepayCode"))) {
-				if (baTxCom.getTerms() < 2) {
+				if (baTxCom.getOverTerms() < 2) {
 					this.info("skip terms < 2  " + result);
 					continue;
 				}

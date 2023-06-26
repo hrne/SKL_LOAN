@@ -120,10 +120,10 @@ C(3,#CHAIN,1,T(1,#NTXBUF,1,1),$)
 C(3,#CHAIN,1,s,$)
 HELP(#FuncHeplp)
 @V(H,#FuncHeplp)
-E(0,@FUNCIND,#FuncCode)
 
 #FuncCodeX=X,4,L
 T(H,#FuncCode,#FuncHeplp)
+E(0,@FUNCIND,#FuncCode)
 C(3,#FuncCode,5,T(F,@ApproveDate,0)K(NOBUTTON,CLOSEY),T(F,@ApproveDate,1))
 C(2,#FuncCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢),K(MODIFYBUTTON,核准),K(MODIFYBUTTON,駁回))
 

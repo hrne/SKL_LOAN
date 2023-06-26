@@ -30,7 +30,9 @@ import com.st1.itx.db.service.TxTellerService;
 
 import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.CdCodeId;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.CdCodeService;
+import com.st1.itx.db.service.CdEmpService;
 
 @Service("L8084")
 @Scope("prototype")
@@ -55,6 +57,10 @@ public class L8084 extends TradeBuffer {
 
 	@Autowired
 	public CdCodeService cdCodeService;
+	
+	
+	@Autowired
+	CdEmpService cdEmpService;
 
 	@Autowired
 	Parse parse;
@@ -159,12 +165,15 @@ public class L8084 extends TradeBuffer {
 //					groupNoX = cdBranchGroup.getGroupItem();
 //				}
 //				occursList.putParam("oProcessBrNo", txAmlNotice.getProcessBrNo());
+				this.info("通知經辦" + txAmlNotice.getProcessTlrNo());
 				occursList.putParam("oProcessGroupNoX", groupNoX);
 //				occursList.putParam("oProcessTlrNo", txAmlNotice.getProcessTlrNo());
-				occursList.putParam("oProcessTlrItem", getTlrItem(txAmlNotice.getProcessTlrNo().trim(), titaVo));
+				occursList.putParam("oProcessTlrItem", getTlrItem(txAmlNotice.getProcessTlrNo().trim(),titaVo));
+//				occursList.putParam("oProcessTlrItem", txAmlNotice.getProcessTlrNo());
 				occursList.putParam("oProcessMobile", txAmlNotice.getProcessMobile());
 				occursList.putParam("oProcessAddr", txAmlNotice.getProcessAddress());
 				occursList.putParam("oProcessName", txAmlNotice.getProcessName());
+				occursList.putParam("oProcessNote", txAmlNotice.getProcessNote());
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}
@@ -194,13 +203,17 @@ public class L8084 extends TradeBuffer {
 		}
 
 		if ("".equals(tlrItem)) {
-			TxTeller txTeller = txTellerService.findById(tlrNo, titaVo);
-			if (txTeller == null) {
-				tlrItem = tlrNo;
-			} else {
-				tlrItem = txTeller.getTlrItem();
+			CdEmp cdEmp = cdEmpService.findById(tlrNo, titaVo);
+			if (cdEmp != null) {
+				tlrItem = cdEmp.getFullname();
 				tlrItems.put(tlrNo, tlrItem);
 			}
+//			if (txTeller == null) {
+//				tlrItem = tlrNo;
+//			} else {
+//				tlrItem = txTeller.getTlrItem();
+//				tlrItems.put(tlrNo, tlrItem);
+//			}
 		}
 		return tlrItem;
 	}

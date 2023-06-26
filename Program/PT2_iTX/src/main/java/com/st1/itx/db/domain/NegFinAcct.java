@@ -1,6 +1,8 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -9,6 +11,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.Id;
 import javax.persistence.Column;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * NegFinAcct 債務協商債權機構帳戶檔<br>
@@ -23,12 +27,7 @@ import javax.persistence.Column;
 public class NegFinAcct implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 5467392219858494591L;
-
-// 債權機構代號
+  // 債權機構代號
   @Id
   @Column(name = "`FinCode`", length = 8)
   private String finCode = " ";
@@ -63,6 +62,11 @@ public class NegFinAcct implements Serializable {
   /* 20221122新增 */
   @Column(name = "`RemitAcct4`", length = 16)
   private String remitAcct4;
+
+  // 啟用記號
+  /* Y:啟用N:停用 */
+  @Column(name = "`Enable`", length = 1)
+  private String enable;
 
   // 建檔日期時間
   @CreatedDate
@@ -236,6 +240,27 @@ public class NegFinAcct implements Serializable {
   }
 
 /**
+	* 啟用記號<br>
+	* Y:啟用
+N:停用
+	* @return String
+	*/
+  public String getEnable() {
+    return this.enable == null ? "" : this.enable;
+  }
+
+/**
+	* 啟用記號<br>
+	* Y:啟用
+N:停用
+  *
+  * @param enable 啟用記號
+	*/
+  public void setEnable(String enable) {
+    this.enable = enable;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -315,7 +340,7 @@ public class NegFinAcct implements Serializable {
   @Override
   public String toString() {
     return "NegFinAcct [finCode=" + finCode + ", finItem=" + finItem + ", remitBank=" + remitBank + ", remitAcct=" + remitAcct + ", dataSendSection=" + dataSendSection + ", remitAcct2=" + remitAcct2
-           + ", remitAcct3=" + remitAcct3 + ", remitAcct4=" + remitAcct4 + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
-           + "]";
+           + ", remitAcct3=" + remitAcct3 + ", remitAcct4=" + remitAcct4 + ", enable=" + enable + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

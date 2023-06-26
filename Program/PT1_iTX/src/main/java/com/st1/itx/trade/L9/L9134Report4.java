@@ -66,11 +66,16 @@ public class L9134Report4 extends MakeReport {
 
 		// 上個月底日(民國年)
 		int iLmnDy = tTxBizDate.getLmnDy();
+		
 		// 本營業日(民國年)
-		int iTmnDy = tTxBizDate.getTmnDy();
+		//int iTmnDy = tTxBizDate.getTmnDy();
+		//輸入迄日(民國年)
+		int iTmnDy=Integer.valueOf(titaVo.get("EndDate"));
+		
 
 		this.info("iLmnDy    = " + tTxBizDate.getLmnDy());
-		this.info("iTmnDy    = " + tTxBizDate.getTbsDy());
+		//this.info("iTmnDy    = " + tTxBizDate.getTbsDy());
+		this.info("iTmnDy    = " + iTmnDy);
 
 		try {
 			findList = l9134ServiceImpl.doQueryL9134_4(titaVo, iLmnDy, iTmnDy);
@@ -119,20 +124,21 @@ public class L9134Report4 extends MakeReport {
 					if(iTdBal.equals(BigDecimal.ZERO)&&iDifTdBal.equals(BigDecimal.ZERO)
 							&& didTdBal.equals(BigDecimal.ZERO)&& didDifTdBal.equals(BigDecimal.ZERO)) {
 						
-						makeExcel.setValue(row, 1, "");
-						makeExcel.setValue(row, 2, "");
-						makeExcel.setValue(row, 3, "");
-						makeExcel.setValue(row, 4, "");
-						makeExcel.setValue(row, 5, "");
+						makeExcel.setValue(row, 1, " ");
+						makeExcel.setValue(row, 2, " ");
+						makeExcel.setValue(row, 3, " ");
+						makeExcel.setValue(row, 4, " ");
+						makeExcel.setValue(row, 5, " ");
 						makeExcel.setValue(row, 6, r.get("AcDate"), "R");
-						makeExcel.setValue(row, 7, "");
-						makeExcel.setValue(row, 8, "");
-						makeExcel.setValue(row, 10, "");
-						makeExcel.setValue(row, 11, "");
-						makeExcel.setValue(row, 12, "");
-						makeExcel.setValue(row, 13, "");
+						makeExcel.setValue(row, 7, " ");
+						makeExcel.setValue(row, 8, " ");
+						makeExcel.setValue(row, 10, " ");
+						makeExcel.setValue(row, 11, " ");
+						makeExcel.setValue(row, 12, " ");
+						makeExcel.setValue(row, 13, " ");
 						
 					}else {
+						
 						makeExcel.setValue(row, 1, iTdBal, "#,##0");
 						makeExcel.setValue(row, 2, iDifTdBal, "#,##0");
 						makeExcel.setValue(row, 3, didTdBal, "#,##0");
@@ -145,11 +151,13 @@ public class L9134Report4 extends MakeReport {
 						makeExcel.setValue(row, 11, ETal.subtract(JTal), "#,##0");
 						makeExcel.setValue(row, 12, drAmt, "#,##0");
 						makeExcel.setValue(row, 13, crAmt, "#,##0");
+						if(row>5) {	
+							iDifTdBalSum=iDifTdBalSum.add(iDifTdBal);
+							ETalSum=ETalSum.add(ETal);
+							didCDrAmtSum=didCDrAmtSum.add(didCDrAmt);
+							JTalSum=JTalSum.add(JTal);
+						}
 						
-						iDifTdBalSum=iDifTdBalSum.add(iDifTdBal);
-						ETalSum=ETalSum.add(ETal);
-						didCDrAmtSum=didCDrAmtSum.add(didCDrAmt);
-						JTalSum=JTalSum.add(JTal);
 					}
 					
 					

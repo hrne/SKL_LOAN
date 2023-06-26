@@ -116,9 +116,9 @@ C(3,#CHAIN,0,E(0,1),$)
 C(3,#FunctionCode,1,s,$)
 HELP(#FunctionHelp)
 @C(3,#CHAIN,0,V(1,1),V(H,#FunctionHelp))
-E(0,@FUNCIND,#FunctionCode)
 
 #FunctionCodeX=X,4,L
+E(0,@FUNCIND,#FunctionCode)
 T(3,)T(H,#FunctionCode,#FunctionHelp)
 C(2,#FunctionCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢))
 C(3,#FunctionCode,5,K(NOBUTTON,CLOSEY),$)
