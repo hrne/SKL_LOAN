@@ -3,11 +3,14 @@ package com.st1.itx.db.repository.hist;
 
 import java.util.Optional;
 
+import java.math.BigDecimal;
+import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,7 +56,7 @@ public interface BankDeductDtlRepositoryHist extends JpaRepository<BankDeductDtl
   public Optional<BankDeductDtl> findTopByCustNoIsAndFacmNoIsAndRepayTypeIsOrderByEntryDateDesc(int custNo_0, int facmNo_1, int repayType_2);
 
   // CustNo = ,AND FacmNo = ,AND PrevIntDate =
-  public Optional<BankDeductDtl> findTopByCustNoIsAndFacmNoIsAndPrevIntDateIsOrderByEntryDateDesc(int custNo_0, int facmNo_1, int prevIntDate_2);
+  public Optional<BankDeductDtl> findTopByCustNoIsAndFacmNoIsAndPrevIntDateIsOrderByEntryDateAsc(int custNo_0, int facmNo_1, int prevIntDate_2);
 
   // EntryDate >= ,AND EntryDate <= , AND MediaKind = 
   public Optional<BankDeductDtl> findTopByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndMediaKindIsOrderByMediaSeqDesc(int entryDate_0, int entryDate_1, String mediaKind_2);

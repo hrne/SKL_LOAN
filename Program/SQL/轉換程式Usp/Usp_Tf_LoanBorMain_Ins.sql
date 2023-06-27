@@ -130,85 +130,15 @@ BEGIN
                             AND S2."LMSASQ" = S1."LMSASQ" 
       WHERE S2."LMSSTS" <> 3 -- 若展期後之新額度亦為結案,則結案 
     )  
-    , T2RawData AS ( 
-      SELECT DISTINCT 
-             "LMSACN" 
-            ,"LMSAPN" -- 新額度號碼 
-            ,"LMSASQ" -- 新撥款序號 
-            ,"LMSAPN1" -- 原額度號碼 
-            ,"LMSASQ1" -- 原撥款序號 
-            ,CASE 
-               WHEN "LMSAPN1" = "LMSAPN" -- 0:正常 1.展期(不同額度) 2.借新還舊(同額度) 
-               THEN 2 
-             ELSE 1 END AS "RenewFlag" 
-      FROM "LNACNP" 
-    ) 
-    , T2OrderedData AS ( 
+    , ALR AS ( 
       SELECT "LMSACN" 
             ,"LMSAPN" -- 新額度號碼 
             ,"LMSASQ" -- 新撥款序號 
-            ,"LMSAPN1" -- 原額度號碼 
-            ,"LMSASQ1" -- 原撥款序號 
-            ,"RenewFlag" 
-            ,ROW_NUMBER() 
-             OVER ( 
-              PARTITION BY "LMSACN" 
-                          ,"LMSAPN1" 
-                          ,"LMSASQ1" 
-              ORDER BY "LMSACN" 
-                      ,"LMSAPN" 
-                      ,"LMSASQ" 
-             ) AS "OldSeq" -- 以原額度號碼、原撥款序號為基礎的排序 
-            ,ROW_NUMBER() 
-             OVER ( 
-              PARTITION BY "LMSACN" 
-                          ,"LMSAPN" 
-                          ,"LMSASQ" 
-              ORDER BY "LMSACN" 
-                      ,"LMSAPN1" 
-                      ,"LMSASQ1" 
-             ) AS "NewSeq" -- 以新額度號碼、新撥款序號為基礎的排序 
-      FROM T2RawData 
-    ) 
-    , T2UnionAllData AS ( 
-      SELECT S1."LMSACN" 
-            ,S1."LMSAPN" -- 新額度號碼 
-            ,S1."LMSASQ" -- 新撥款序號 
-            ,S1."RenewFlag" 
-            ,1 AS "OldNewFlag" 
-            ,S1."NewSeq" AS "Seq" 
-      FROM T2OrderedData S1 
-      UNION ALL 
-      SELECT S1."LMSACN" 
-            ,S1."LMSAPN1" AS "LMSAPN"-- 原額度號碼 
-            ,S1."LMSASQ1" AS "LMSASQ"-- 原撥款序號 
-            ,S1."RenewFlag" 
-            ,0 AS "OldNewFlag" 
-            ,S1."OldSeq" AS "Seq" 
-      FROM T2OrderedData S1 
-    ) 
-    , T2LastOrderdData AS ( 
-      SELECT S1."LMSACN" 
-            ,S1."LMSAPN" 
-            ,S1."LMSASQ" 
-            ,S1."RenewFlag" 
-            ,ROW_NUMBER() 
-             OVER ( 
-              PARTITION BY "LMSACN" 
-                          ,"LMSAPN" 
-                          ,"LMSASQ" 
-              ORDER BY "OldNewFlag" DESC 
-                      ,"Seq" DESC 
-             ) AS "Seq" -- 排出最後一筆情況 
-      FROM T2UnionAllData S1 
-    ) 
-    , T2 AS ( 
-      SELECT S1."LMSACN" 
-            ,S1."LMSAPN" 
-            ,S1."LMSASQ" 
-            ,S1."RenewFlag" 
-      FROM T2LastOrderdData S1 
-      WHERE "Seq" = 1 
+            ,MAX("RenewCode") AS "RenewFlag" 
+      FROM "AcLoanRenew" 
+      GROUP BY "LMSACN" 
+             , "LMSAPN" -- 新額度號碼 
+             , "LMSASQ" -- 新撥款序號 
     ) 
     , A1 AS ( 
       SELECT "LMSACN" 
@@ -389,14 +319,15 @@ BEGIN
           /* 2022-01-14 智偉修改:新系統修改欄位定義 0:正常 1.展期(不同額度) 2.借新還舊(同額度) */ 
           /* 2023-01-18 智偉修改:要跟舊系統一樣 */
           /* 2023-06-20 智偉修改:要看LNACNP*/
+          /* 2023-06-27 智偉修改:要跟AcLoanRenew一樣 */
           ,CASE 
              WHEN LMSP."LMSNEW" = '1' -- 2023-01-18 智偉修改:要跟舊系統一樣
-                  AND NVL(T2."RenewFlag",0) != 0
-             THEN T2."RenewFlag" 
+                  AND NVL(ALR."RenewFlag",0) != 0 -- 2023-06-27 智偉修改:要跟AcLoanRenew一樣
+             THEN ALR."RenewFlag" 
              WHEN LMSP."LMSNEW" = '1' -- 2023-01-18 智偉修改:要跟舊系統一樣
              THEN 1 
-             WHEN NVL(T2."RenewFlag",0) != 0 -- 2023-06-20 智偉修改:要看LNACNP
-             THEN T2."RenewFlag" 
+             WHEN NVL(ALR."RenewFlag",0) != 0 -- 2023-06-27 智偉修改:要跟AcLoanRenew一樣
+             THEN ALR."RenewFlag" 
            ELSE 0 END                     AS "RenewFlag"           -- 借新還舊 DECIMAL 1  
           ,NVL(APLP."CASCDE",' ')         AS "PieceCode"           -- 計件代碼 VARCHAR2 1  
           ,''                             AS "PieceCodeSecond" 
@@ -451,9 +382,9 @@ BEGIN
     LEFT JOIN T1 ON T1."LMSACN" = LMSP."LMSACN" 
                 AND T1."LMSAPN1" = LMSP."LMSAPN" 
                 AND T1."LMSASQ1" = LMSP."LMSASQ" 
-    LEFT JOIN T2 ON T2."LMSACN" = LMSP."LMSACN" 
-                AND T2."LMSAPN" = LMSP."LMSAPN" 
-                AND T2."LMSASQ" = LMSP."LMSASQ" 
+    LEFT JOIN ALR ON ALR."LMSACN" = LMSP."LMSACN" 
+                 AND ALR."LMSAPN" = LMSP."LMSAPN" 
+                 AND ALR."LMSASQ" = LMSP."LMSASQ" 
     LEFT JOIN "LA$APLP" APLP ON APLP."LMSACN" = LMSP."LMSACN" 
                             AND APLP."LMSAPN" = LMSP."LMSAPN" 
     LEFT JOIN "FacProd" PROD ON PROD."ProdNo" = APLP."IRTBCD" 

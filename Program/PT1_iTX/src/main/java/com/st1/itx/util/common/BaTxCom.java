@@ -1768,7 +1768,7 @@ public class BaTxCom extends TradeBuffer {
 			}
 		}
 		// 應繳本利
-		if (baTxVo.getPayIntDate() <= this.txBuffer.getTxCom().getTbsdy() || baTxVo.getRepayType() >= 2) {
+		if (baTxVo.getPayIntDate() <= iPayIntDate || baTxVo.getRepayType() >= 2) {
 			this.unPayLoan = this.unPayLoan.add(baTxVo.getUnPaidAmt());
 		}
 		this.baTxList.add(baTxVo);

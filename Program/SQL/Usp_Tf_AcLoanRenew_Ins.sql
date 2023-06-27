@@ -76,7 +76,8 @@ BEGIN
           ,S1."LMSASQ1"                   AS "OldBormNo"           -- 舊撥款序號 DECIMAL 6 
           -- 2023-05-04 Wei 修改 from 家興line: AcLoanRenew會計借新還舊檔的RenewCode展期記號更改
           -- 跟轉播款擋RenewFlag相同邏輯
-          ,LBM."RenewFlag"                AS "RenewCode"           -- 展期記號 VARCHAR2 1 (1:一般 2:協議) 
+          -- 2023-06-27 Wei 修改 from 家興line:賴桑說ACNP來的一定是借新還舊
+          ,'2'                            AS "RenewCode"           -- 展期記號 VARCHAR2 1 (1.展期件 2.借新還舊件) 
           -- 2022-01-03 智偉修改:最後統一更新 
           ,'N'                            AS "MainFlag"            -- 主要記號 VARCHAR2 1 (Y:新撥款對到舊撥款最早的一筆 ) 
           ,NVL(TX."TRXDAT",ACNP."AcDate") AS "AcDate"              -- 會計日期 DECIMAL 8 -- 新撥款序號在放款主檔的撥款日期 -- 2021-12-23 綺萍要求改為交易明細檔做撥款的會計日期 
@@ -104,9 +105,6 @@ BEGIN
                   AND ACNP."LMSAPN" = S1."LMSAPN" 
                   AND ACNP."LMSASQ" = S1."LMSASQ" 
                   AND ACNP."Seq" = 1 
-      LEFT JOIN "LoanBorMain" LBM ON LBM."CustNo" = S1."LMSACN" 
-                                 AND LBM."FacmNo" = S1."LMSAPN" 
-                                 AND LBM."BormNo" = S1."LMSASQ" 
     ; 
  
     -- 記錄寫入筆數 
@@ -149,7 +147,8 @@ BEGIN
             ,S1."OLD_LMSASQ"                AS "OldBormNo"           -- 舊撥款序號 DECIMAL 6 
           -- 2023-05-04 Wei 修改 from 家興line: AcLoanRenew會計借新還舊檔的RenewCode展期記號更改
           -- 跟轉播款擋RenewFlag相同邏輯
-            ,LBM."RenewFlag"                AS "RenewCode"           -- 展期記號 VARCHAR2 1 (1:一般 2:協議) 
+          -- 2023-06-27 Wei 修改 from 家興line:賴桑說ACNP來的一定是借新還舊
+            ,'2'                            AS "RenewCode"           -- 展期記號 VARCHAR2 1 (1.展期件 2.借新還舊件) 
             -- 2022-01-03 智偉修改:最後統一更新 
             ,'N'                            AS "MainFlag"            -- 主要記號 VARCHAR2 1 (Y:新撥款對到舊撥款最早的一筆 ) 
             ,NVL(S3."LMSLLD",0)             AS "AcDate"              -- 會計日期 DECIMAL 8 -- 新撥款序號在放款主檔的撥款日期 
@@ -165,9 +164,6 @@ BEGIN
       LEFT JOIN LA$LMSP S3 ON S3.LMSACN = S1.LMSACN 
                           AND S3.LMSAPN = S1.LMSAPN 
                           AND S3.LMSASQ = S1.LMSASQ 
-      LEFT JOIN "LoanBorMain" LBM ON LBM."CustNo" = S1."LMSACN" 
-                                 AND LBM."FacmNo" = S1."LMSAPN" 
-                                 AND LBM."BormNo" = S1."LMSASQ" 
       WHERE S1.LMSAPN != 0 
         AND S1.LMSASQ != 0 
         AND S1.OLD_LMSAPN != 0 

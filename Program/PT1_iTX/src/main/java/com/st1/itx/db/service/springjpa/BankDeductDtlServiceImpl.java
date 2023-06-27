@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -389,13 +392,13 @@ em = null;
     this.info("findL4450PrevIntDateFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " prevIntDate_2 : " +  prevIntDate_2);
     Optional<BankDeductDtl> bankDeductDtlT = null;
     if (dbName.equals(ContentName.onDay))
-      bankDeductDtlT = bankDeductDtlReposDay.findTopByCustNoIsAndFacmNoIsAndPrevIntDateIsOrderByEntryDateDesc(custNo_0, facmNo_1, prevIntDate_2);
+      bankDeductDtlT = bankDeductDtlReposDay.findTopByCustNoIsAndFacmNoIsAndPrevIntDateIsOrderByEntryDateAsc(custNo_0, facmNo_1, prevIntDate_2);
     else if (dbName.equals(ContentName.onMon))
-      bankDeductDtlT = bankDeductDtlReposMon.findTopByCustNoIsAndFacmNoIsAndPrevIntDateIsOrderByEntryDateDesc(custNo_0, facmNo_1, prevIntDate_2);
+      bankDeductDtlT = bankDeductDtlReposMon.findTopByCustNoIsAndFacmNoIsAndPrevIntDateIsOrderByEntryDateAsc(custNo_0, facmNo_1, prevIntDate_2);
     else if (dbName.equals(ContentName.onHist))
-      bankDeductDtlT = bankDeductDtlReposHist.findTopByCustNoIsAndFacmNoIsAndPrevIntDateIsOrderByEntryDateDesc(custNo_0, facmNo_1, prevIntDate_2);
+      bankDeductDtlT = bankDeductDtlReposHist.findTopByCustNoIsAndFacmNoIsAndPrevIntDateIsOrderByEntryDateAsc(custNo_0, facmNo_1, prevIntDate_2);
     else 
-      bankDeductDtlT = bankDeductDtlRepos.findTopByCustNoIsAndFacmNoIsAndPrevIntDateIsOrderByEntryDateDesc(custNo_0, facmNo_1, prevIntDate_2);
+      bankDeductDtlT = bankDeductDtlRepos.findTopByCustNoIsAndFacmNoIsAndPrevIntDateIsOrderByEntryDateAsc(custNo_0, facmNo_1, prevIntDate_2);
 
     return bankDeductDtlT.isPresent() ? bankDeductDtlT.get() : null;
   }

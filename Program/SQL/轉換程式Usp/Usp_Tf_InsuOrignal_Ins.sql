@@ -188,7 +188,8 @@ BEGIN
                       AND C.CNT = 1 -- 一個擔保品在初保檔,只有用一筆擔保品序號去寫
     )
     , INSP AS (
-      SELECT CNM."ClCode1"
+      SELECT DISTINCT
+             CNM."ClCode1"
            , CNM."ClCode2"
            , CNM."ClNo"
            , INSP.INSSDT
@@ -212,7 +213,7 @@ BEGIN
           , NVL(INSP."ClCode2",0)        AS "ClCode2"         -- 擔保品-代號2 DECIMAL 2 0
           , NVL(INSP."ClNo",0)           AS "ClNo"            -- 擔保品編號 DECIMAL 7 0
           , TRIM(INSP."INSNUM")          AS "OrigInsuNo"      -- 原始保險單號碼 VARCHAR2 17 0
-          , ''                           AS "EndoInsuNo"      -- 批單號碼 VARCHAR2 17 0
+          , ' '                          AS "EndoInsuNo"      -- 批單號碼 VARCHAR2 17 0
           , NVL(INSP."INSIID",' ')       AS "InsuCompany"     -- 保險公司 VARCHAR2 2 0
           , INSP."INSIAM"                AS "FireInsuCovrg"   -- 火災險保險金額 DECIMAL 16 2
           , INSP."INSIAE"                AS "EthqInsuCovrg"   -- 地震險保險金額 DECIMAL 16 2
