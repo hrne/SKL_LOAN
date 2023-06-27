@@ -62,9 +62,9 @@ public class L4510ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// EmployeeCom
 		// 2022-01-14 智偉修改: CommLineCode有非數值資料,比對時應以字串型態比較
 		// ex : e.\"CommLineCode\" = 21 修改為 e.\"CommLineCode\" = '21'
-		// 員工扣款一律為15日薪，且AgAgType1需等於0/2
+		// 員工扣款一律為15日薪，且AgAgType1需等於0/2;2023/6/27 Lai 暫時先不判斷
 		sql += "   AND CASE WHEN f.\"RepayCode\" = 3 AND e.\"AgType1\" in (0,2) THEN  5 "; // 15日薪-員工扣薪
-		sql += "            WHEN f.\"RepayCode\" = 3 THEN  0 ";
+		sql += "            WHEN f.\"RepayCode\" = 3 THEN  5 ";
 		sql += "            WHEN (    (e.\"CommLineCode\" = '21' AND substr(e.\"AgLevel\", 0, 1) NOT IN ( 'F','G','J','Z') ) ";
 		sql += "                   OR (e.\"CommLineCode\" = '31' AND substr(e.\"AgLevel\", 0, 1) NOT IN ('K','Z') ) ";
 		sql += "                   OR (e.\"CommLineCode\" NOT IN ('21','31','1C' ) AND e.\"AgPostIn\" NOT IN ('TU0036','TU0097')))";

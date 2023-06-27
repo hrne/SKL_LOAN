@@ -571,12 +571,13 @@ public class L2153 extends TradeBuffer {
 		tFacMain.setInvestigateOfficer(titaVo.getParam("InvestigateOfficer"));
 		tFacMain.setEstimateReview(titaVo.getParam("EstimateReview"));
 		tFacMain.setCoorgnizer(titaVo.getParam("Coorgnizer"));
-		tFacMain.setProdBreachFlag(titaVo.getParam("ProdBreachFlag"));
 
 		// Eloan 清償違約說明
 		if (this.isEloan) {
+			titaVo.putParam("ProdBreachFlag", 'Y');
 			titaVo.putParam("Breach", loanCloseBreachCom.getFacBreachDescription(tFacMain, titaVo));
 		}
+		tFacMain.setProdBreachFlag(titaVo.getParam("ProdBreachFlag"));
 		tFacMain.setBreachDescription(titaVo.getParam("Breach"));
 
 		tFacMain.setCreditScore(this.parse.stringToInteger(titaVo.getParam("CreditScore")));

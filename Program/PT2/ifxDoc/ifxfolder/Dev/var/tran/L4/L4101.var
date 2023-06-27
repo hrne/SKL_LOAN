@@ -209,7 +209,7 @@ E(0,1)ASGN(LOOP$)
 
 !------ 下行電文TOM ------
 <sub type="TOM">
-<include src="COM.icf::TRCTL.tom"/>=
+<include src="COM.icf::TRCTL.tom"/>
 TXFORM=L4101
 #OBatchNo
 ^

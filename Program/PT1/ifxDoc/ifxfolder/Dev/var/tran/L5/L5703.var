@@ -25,6 +25,7 @@ E(0,0)
 [#<->#,"#FdRemitAcct+債協匯款帳號",#RemitAcct],["#FdRemitAcct2+調解匯款帳號",#RemitAcct2],
 [#<->#,"#FdRemitAcct3+更生匯款帳號",#RemitAcct3],["#FdRemitAcct4+清算匯款帳號",#RemitAcct4],
 [#<->#,"#FdDataSendSection+資料傳送單位",#DataSendSection,#DataSendSectionX],
+[#<->#,"#FdEnable+啟用記號",#Enable]
 ]
 
 #FdFunCd=X,2,L
@@ -43,6 +44,10 @@ T(3, )
 T(3, )
 #FdRemitAcct4=X,2,L
 T(3, )
+
+!啟用記號使用
+#FdEnable=X,2,L
+C(2,#FunCode,s,T(3,*),T(3,*),S,S)
 
 !---------- AP TEXT AREA Variables ----------
 
@@ -93,6 +98,23 @@ E(0,@FUNCIND,#FunCode)
 
 <include src="ROM.icf::L5R12.dec"/>
 <include src="ROM.icf::L5R04.dec"/>
+
+!啟用記號使用---
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+#EnableH=X,100,S
+T(3,Y:啟用;N:未啟用)
+
+#CdEnableFg=x,20,S                  
+T(3,CdCode.EnableFg)   
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CdEnableFg)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@EnableH,#HelpDesc1)
+!啟用記號使用---
+
 
 !顯示框線
 #Flag=X,1,S
@@ -263,6 +285,13 @@ IF(#FunCode==1 || #FunCode==2,IF(#DataSendSection==#FinCode,T(2,#FinCodeX),$),$)
 #MRKEY=_,_,S
 T(2,#FinCode)
 
+
+![啟用記號]
+#Enable=X,1,I
+C(2,#FunCode,s,$,$,$,s,s)
+HELP(#EnableH)
+@V(H,#EnableH)
+
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -285,11 +314,13 @@ T(2,#FinCode)
 #RemitAcct3
 #RemitAcct4
 #DataSendSection
+#Enable
 </sub>
 
 !------ 下行電文TOM ------
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L5703
 ^
 ! 調Rim相關 開始

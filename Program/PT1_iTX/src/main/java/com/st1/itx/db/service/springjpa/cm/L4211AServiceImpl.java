@@ -120,6 +120,8 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += " 	, \"Fn_GetCdCode\"('RepayType',BATX.\"RepayType\") AS \"RepayItem\"";
 			sql += "    , NVL(TX2.\"PaidTerms\", 0) AS \"PaidTerms\" ";
 			sql += "    , LPAD(NVL(JSON_VALUE(TX2.\"OtherFields\", '$.AdvanceCloseCode'),0),2,0) AS \"CloseReasonCode\" ";
+			sql += "    , CD.\"Item\" AS \"CloseReason\" ";
+			sql += "    , NVL(JSON_VALUE(TX2.\"OtherFields\", '$.CaseCloseCode'),99) AS \"CaseCloseCode\" ";
 			sql += " FROM \"BatxDetail\" BATX";
 			sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = BATX.\"CustNo\"";
 			sql += " LEFT JOIN TX1 ON TX1.\"AcDate\" = BATX.\"AcDate\"";
@@ -138,6 +140,8 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = TX2.\"CustNo\"";
 			sql += "                      AND FAC.\"FacmNo\" = TX2.\"FacmNo\"";
 			sql += "                      AND TX2.\"FacmNo\" > 0";
+			sql += " LEFT JOIN \"CdCode\" CD ON CD.\"DefCode\" = 'AdvanceCloseCode' ";
+			sql += "                        AND CD.\"Code\" = LPAD(NVL(JSON_VALUE(TX2.\"OtherFields\", '$.AdvanceCloseCode'),0),2,0)";
 			sql += " WHERE BATX.\"AcDate\" = :inputAcDate";
 			sql += " AND SUBSTR(BATX.\"BatchNo\",1,4) = 'BATX'     ";
 			sql += " AND CASE";
@@ -147,7 +151,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "     END = BATX.\"ReconCode\"";
 			sql += " AND BATX.\"RepayCode\" = '01'"; // 匯款轉帳
 //			sql += " AND BATX.\"ProcStsCode\" <> 'D' ";// 刪除
-			
+
 
 		} else if (printNo == 2) {
 			// 入帳後檢核明細表
@@ -213,6 +217,8 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += " 	, \"Fn_GetCdCode\"('RepayType',BATX.\"RepayType\") AS \"RepayItem\"";
 			sql += "    , NVL(TX2.\"PaidTerms\", 0) AS \"PaidTerms\" ";
 			sql += "    , LPAD(NVL(JSON_VALUE(TX2.\"OtherFields\", '$.AdvanceCloseCode'),0),2,0) AS \"CloseReasonCode\" ";
+			sql += "    , CD.\"Item\" AS \"CloseReason\" ";
+			sql += "    , NVL(JSON_VALUE(TX2.\"OtherFields\", '$.CaseCloseCode'),99) AS \"CaseCloseCode\" ";
 			sql += " FROM \"BatxDetail\" BATX";
 			sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = BATX.\"CustNo\"";
 			sql += " LEFT JOIN TX1 ON TX1.\"AcDate\" = BATX.\"AcDate\"";
@@ -225,6 +231,8 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = TX2.\"CustNo\"";
 			sql += "                      AND FAC.\"FacmNo\" = TX2.\"FacmNo\"";
 			sql += "                      AND TX2.\"FacmNo\" > 0";
+			sql += " LEFT JOIN \"CdCode\" CD ON CD.\"DefCode\" = 'AdvanceCloseCode' ";
+			sql += "                        AND CD.\"Code\" = LPAD(NVL(JSON_VALUE(TX2.\"OtherFields\", '$.AdvanceCloseCode'),0),2,0)";
 			sql += " WHERE BATX.\"AcDate\" = :inputAcDate";
 			sql += " AND SUBSTR(BATX.\"BatchNo\",1,4) = 'BATX'     ";
 			sql += " AND CASE";
@@ -233,7 +241,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "     ELSE BATX.\"ReconCode\" ";
 			sql += "     END = BATX.\"ReconCode\"";
 			sql += " AND BATX.\"RepayCode\" = '01'"; // 匯款轉帳
-			sql += " AND BATX.\"ProcStsCode\" IN ( '5'  ";// 單筆入帳
+			sql += " AND BATX.\"ProcStsCode\" IN ( '2','3','4','5'  ";// 單筆入帳
 			sql += "                           , '6' "; // 批次入帳
 			sql += "                           , '7') ";// 批次人工
 
@@ -301,6 +309,8 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += " 	, \"Fn_GetCdCode\"('RepayType',BATX.\"RepayType\") AS \"RepayItem\"";
 			sql += "    , NVL(TX2.\"PaidTerms\", 0) AS \"PaidTerms\" ";
 			sql += "    , LPAD(NVL(JSON_VALUE(TX2.\"OtherFields\", '$.AdvanceCloseCode'),0),2,0) AS \"CloseReasonCode\" ";
+			sql += "    , CD.\"Item\" AS \"CloseReason\" ";
+			sql += "    , NVL(JSON_VALUE(TX2.\"OtherFields\", '$.CaseCloseCode'),99) AS \"CaseCloseCode\" ";
 			sql += " FROM \"BatxDetail\" BATX";
 			sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = BATX.\"CustNo\"";
 			sql += " LEFT JOIN TX1 ON TX1.\"AcDate\" = BATX.\"AcDate\"";
@@ -315,6 +325,8 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = TX2.\"CustNo\"";
 			sql += "                      AND FAC.\"FacmNo\" = TX2.\"FacmNo\"";
 			sql += "                      AND TX2.\"FacmNo\" > 0";
+			sql += " LEFT JOIN \"CdCode\" CD ON CD.\"DefCode\" = 'AdvanceCloseCode' ";
+			sql += "                        AND CD.\"Code\" = LPAD(NVL(JSON_VALUE(TX2.\"OtherFields\", '$.AdvanceCloseCode'),0),2,0)";
 			sql += " WHERE BATX.\"AcDate\" = :inputAcDate";
 			sql += " AND SUBSTR(BATX.\"BatchNo\",1,4) = 'BATX'     ";
 			sql += " AND CASE";

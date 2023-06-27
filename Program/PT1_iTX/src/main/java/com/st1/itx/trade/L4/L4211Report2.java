@@ -10,10 +10,13 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.EmpDeductMediaService;
 import com.st1.itx.db.service.springjpa.cm.L4211BServiceImpl;
@@ -41,6 +44,15 @@ public class L4211Report2 extends MakeReport {
 
 	@Autowired
 	public CustMainService custMainService;
+	
+	@Autowired
+	public Slice<CdEmp> iCdEmp;
+
+	@Autowired
+	public CdEmpService sCdEmpService;
+
+	@Autowired
+	public String tlrNoName;
 
 //		每頁筆數
 	private int pageIndex = 45;
@@ -272,7 +284,7 @@ public class L4211Report2 extends MakeReport {
 							"----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 					pageCnt = pageCnt + 13;
 					this.print(pageIndex - pageCnt - 2, 85, "=====報表結束=====", "C");
-					this.print(2, 90, "　　　　　　　　　　　　　　　　　　　　課長：　　　　　　　　　　製表人：", "C");
+					this.print(2, 90, "　　　　　　　　　　　　　　　　　　　　經理：　　　　　　　　　　製表人： "+ tlrNoName, "C");
 				}
 
 			} // for

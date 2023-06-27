@@ -81,7 +81,7 @@ public class L8100 extends TradeBuffer {
 		} else if ("3".equals(iFunCode)) {
 			
 			if (!checkAml.isManualConFirm(iLogNo, titaVo)) {
-				throw new LogicException("E0010", "AML系統運線正常，請至AML系統確認"); // 功能選擇錯誤
+				throw new LogicException("E0010", "AML系統連線正常，請至AML系統確認"); // 功能選擇錯誤
 			}
 			String iConfirmCode = titaVo.getParam("ConfirmCode");
 

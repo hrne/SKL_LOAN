@@ -796,8 +796,7 @@ public class L4510Batch extends TradeBuffer {
 
 		if (listBaTxVo != null && listBaTxVo.size() != 0) {
 			for (BaTxVo tBaTxVo : listBaTxVo) {
-				if (tBaTxVo.getDataKind() == 1 && tBaTxVo.getRepayType() >= 4
-						&& tBaTxVo.getAcctAmt().compareTo(BigDecimal.ZERO) == 0) {
+				if (tBaTxVo.getRepayType() >= 4 && tBaTxVo.getAcctAmt().compareTo(BigDecimal.ZERO) == 0) {
 					continue;
 				}
 				tmpFacm tmp = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), tBaTxVo.getBormNo(),

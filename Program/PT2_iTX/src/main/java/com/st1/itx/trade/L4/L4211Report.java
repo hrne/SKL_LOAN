@@ -10,10 +10,13 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.EmpDeductMediaService;
 import com.st1.itx.db.service.springjpa.cm.L4211AServiceImpl;
@@ -40,6 +43,15 @@ public class L4211Report extends MakeReport {
 
 	@Autowired
 	public CustMainService custMainService;
+
+	@Autowired
+	public Slice<CdEmp> iCdEmp;
+
+	@Autowired
+	public CdEmpService sCdEmpService;
+
+	@Autowired
+	public String tlrNoName;
 
 //	@Autowired
 //	private ReportVo reportVo;
@@ -93,6 +105,8 @@ public class L4211Report extends MakeReport {
 	BigDecimal batchFlagcollection = BigDecimal.ZERO;
 	BigDecimal batchFlagshortpayment = BigDecimal.ZERO;
 	BigDecimal batchFlagothers = BigDecimal.ZERO;
+
+	BigDecimal tmpUnProcessed = BigDecimal.ZERO;
 
 	// 欄位左右調整
 	int c1 = 1; // 匯款日
@@ -188,6 +202,12 @@ public class L4211Report extends MakeReport {
 				" 匯款日   匯款序號     匯款金額    作帳金額  戶號           	   戶名    	        計息起迄日       	      本金         利息       暫付款     違約金   	   暫收借           暫收貸   短繳    	   費用");
 		this.print(-8, 0,
 				"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+
+		iCdEmp = sCdEmpService.EmployeeNoLike(titaVo.getTlrNo(), 0, 1, titaVo);
+
+		List<CdEmp> dCdEmp = iCdEmp == null ? null : iCdEmp.getContent();
+
+		tlrNoName = dCdEmp.get(0).getFullname();
 	};
 
 	public void exec(TitaVo titaVo, int printNo) throws LogicException {
@@ -212,17 +232,27 @@ public class L4211Report extends MakeReport {
 		List<Map<String, String>> fnAllList2 = new ArrayList<Map<String, String>>();
 		List<Map<String, String>> fnAllList3 = new ArrayList<Map<String, String>>();
 
+		// 一般排序
 		fnAllList1 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
 				.ascString("SortingForSubTotal").ascString("EntryDate").ascString("DetailSeq").ascString("AcSeq")
 				.ascString("CustNo").getList();
-
+		// 金額排序
 		fnAllList2 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
-				.ascString("SortingForSubTotal").ascString("EntryDate").descNumber("RepayAmt").ascString("CustNo")
+				.ascString("SortingForSubTotal").ascString("CloseReasonCode").ascString("EntryDate")
+				.descNumber("RepayAmt").ascString("CustNo").ascString("DetailSeq").ascString("AcSeq").getList();
+
+		// 戶號排序
+//		SinputReconCode = String.valueOf(titaVo.get("ReconCode")).trim();
+//		fnAllList3 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
+//				.ascString("SortingForSubTotal").ascString("EntryDate").ascString("CustNo").ascString("DetailSeq")
+//				.ascString("AcSeq").getList();
+		fnAllList3 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
+				.ascString("CaseCloseCode").ascString("EntryDate").ascString("CustNo").descNumber("RepayAmt")
 				.ascString("DetailSeq").ascString("AcSeq").getList();
 
-		fnAllList3 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
-				.ascString("SortingForSubTotal").ascString("EntryDate").ascString("CustNo").ascString("DetailSeq")
-				.ascString("AcSeq").getList();
+//		fnAllList2 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
+//				.ascString("SortingForSubTotal").ascString("EntryDate").descNumber("RepayAmt").ascString("CustNo")
+//				.ascString("DetailSeq").ascString("AcSeq").getList();
 
 		makePdf(fnAllList1, fnAllList2, fnAllList3, false, titaVo);
 	}
@@ -262,17 +292,18 @@ public class L4211Report extends MakeReport {
 //        "BormNo" ASC
 
 		// facmno, bormno 已經在 query 裡面 concat 到 custno，所以不在這裡加sort
-
+		// 一般排序
 		fnAllList1 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
-				.ascString("SortingForSubTotal").ascString("EntryDate").ascNumber("DetailSeq").ascString("AcSeq")
+				.ascString("SortingForSubTotal").ascString("EntryDate").ascString("DetailSeq").ascString("AcSeq")
 				.ascString("CustNo").getList();
-
+		// 金額排序
 		fnAllList2 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
-				.ascString("SortingForSubTotal").ascString("EntryDate").descNumber("RepayAmt").ascString("CustNo")
-				.ascNumber("DetailSeq").ascString("AcSeq").getList();
+				.ascString("SortingForSubTotal").ascString("CloseReasonCode").ascString("EntryDate")
+				.descNumber("RepayAmt").ascString("CustNo").ascString("DetailSeq").ascString("AcSeq").getList();
 
+		// 戶號排序
 		fnAllList3 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
-				.ascString("SortingForSubTotal").ascString("EntryDate").ascString("CustNo").ascNumber("DetailSeq")
+				.ascString("SortingForSubTotal").ascString("EntryDate").ascString("CustNo").ascString("DetailSeq")
 				.ascString("AcSeq").getList();
 
 		makePdf(fnAllList1, fnAllList2, fnAllList3, false, titaVo);
@@ -327,13 +358,16 @@ public class L4211Report extends MakeReport {
 		this.info("fnAllList3=" + fnAllList3);
 		this.info("isBatchMapList=" + isBatchMapList);
 
+		tmpUnProcessed = BigDecimal.ZERO;
 		reportkind = 1;
 		report1(fnAllList1, isBatchMapList);
 
+		tmpUnProcessed = BigDecimal.ZERO;
 		reportkind = 2;
 		newPage();
 		report2(fnAllList2, isBatchMapList);
 
+		tmpUnProcessed = BigDecimal.ZERO;
 		reportkind = 3;
 		newPage();
 		report3(fnAllList3, isBatchMapList);
@@ -372,6 +406,11 @@ public class L4211Report extends MakeReport {
 		}
 		boolean isBatchFlag = false;
 		for (Map<String, String> tfnAllList : fnAllList) {
+
+			// 作帳金額0 表示(人工處理、檢核正常、檢核錯誤)
+			if ("0".equals(tfnAllList.get("AcctAmt"))) {
+				tmpUnProcessed = tmpUnProcessed.add(getBigDecimal(tfnAllList.get("AcctAmt")));
+			}
 
 			String dfMakeferAmt = formatAmt(tfnAllList.get("AcctAmt"), 0);
 			String dfPrincipal = formatAmt(tfnAllList.get("Principal"), 0);
@@ -574,10 +613,7 @@ public class L4211Report extends MakeReport {
 			}
 			this.print(0, c6, name);
 
-			String CloseReasonCodeText = "";
-			if (!"00".equals(tfnAllList.get("CloseReasonCode"))) {
-				CloseReasonCodeText = tfnAllList.get("CloseReasonCode");
-			}
+			String CloseReasonCodeText = tfnAllList.get("CloseReasonCode").toString();
 
 			this.print(0, c6 + 9, CloseReasonCodeText);
 
@@ -654,6 +690,15 @@ public class L4211Report extends MakeReport {
 
 				atAll();
 
+				// 2入帳後檢核明細表
+				if (printNo == 2) {
+					this.print(1, 0, "");
+					this.print(1, 0,
+							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+					this.print(1, 2, "應待處理總金額，共總計   " + formatAmt(allsumPrincipal, 0));
+
+				}
+
 				totalsumTransferAmt = totalsumTransferAmt.add(allsumTransferAmt);
 				totalsumMakerferAmt = totalsumMakerferAmt.add(allsumMakeferAmt);
 				totalsumPrincipal = totalsumPrincipal.add(allsumPrincipal);
@@ -695,7 +740,7 @@ public class L4211Report extends MakeReport {
 				totalsumOthers = BigDecimal.ZERO;
 
 				this.print(pageIndex - pageCnt - 2, this.getMidXAxis(), "=====報表結束=====", "C");
-				this.print(2, this.getMidXAxis(), "課長：　　　　　　　　　　製表人：", "C");
+				this.print(2, this.getMidXAxis(), "經理：　　　　　　　　　　製表人：" + " " + tlrNoName, "C");
 
 				pageCnt = 0;
 				npcount = 0;
@@ -738,6 +783,11 @@ public class L4211Report extends MakeReport {
 		boolean isBatchFlag = false;
 		for (Map<String, String> tfnAllList : fnAllList) {
 
+			// 作帳金額0 表示(人工處理、檢核正常、檢核錯誤)
+			if ("0".equals(tfnAllList.get("AcctAmt"))) {
+				tmpUnProcessed = tmpUnProcessed.add(getBigDecimal(tfnAllList.get("AcctAmt")));
+			}
+
 //			String dfTransferAmt = formatAmt(tfnAllList.get("TxAmt"), 0);
 			String dfMakeferAmt = formatAmt(tfnAllList.get("AcctAmt"), 0);
 			String dfPrincipal = formatAmt(tfnAllList.get("Principal"), 0);
@@ -775,7 +825,6 @@ public class L4211Report extends MakeReport {
 					this.print(0, 14, " 小計 ");
 
 					atAll();
-
 
 					totalsumTransferAmt = totalsumTransferAmt.add(allsumTransferAmt);
 					totalsumMakerferAmt = totalsumMakerferAmt.add(allsumMakeferAmt);
@@ -942,10 +991,7 @@ public class L4211Report extends MakeReport {
 			}
 			this.print(0, c6, name);
 
-			String CloseReasonCodeText = "";
-			if (!"00".equals(tfnAllList.get("CloseReasonCode"))) {
-				CloseReasonCodeText = tfnAllList.get("CloseReasonCode");
-			}
+			String CloseReasonCodeText = tfnAllList.get("CloseReasonCode").toString();
 
 			this.print(0, c6 + 9, CloseReasonCodeText);
 
@@ -1022,6 +1068,15 @@ public class L4211Report extends MakeReport {
 
 				atAll();
 
+				// 2入帳後檢核明細表
+				if (printNo == 2) {
+					this.print(1, 0, "");
+					this.print(1, 0,
+							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+					this.print(1, 2, "應待處理總金額，共總計   " + formatAmt(allsumPrincipal, 0));
+
+				}
+
 				totalsumTransferAmt = totalsumTransferAmt.add(allsumTransferAmt);
 				totalsumMakerferAmt = totalsumMakerferAmt.add(allsumMakeferAmt);
 				totalsumPrincipal = totalsumPrincipal.add(allsumPrincipal);
@@ -1063,7 +1118,7 @@ public class L4211Report extends MakeReport {
 				totalsumOthers = BigDecimal.ZERO;
 
 				this.print(pageIndex - pageCnt - 2, this.getMidXAxis(), "=====報表結束=====", "C");
-				this.print(2, this.getMidXAxis(), "課長：　　　　　　　　　　製表人：", "C");
+				this.print(2, this.getMidXAxis(), "經理：　　　　　　　　　　製表人：" + " " + tlrNoName, "C");
 			}
 
 		} // for
@@ -1101,6 +1156,11 @@ public class L4211Report extends MakeReport {
 		}
 		boolean isBatchFlag = false;
 		for (Map<String, String> tfnAllList : fnAllList) {
+
+			// 作帳金額0 表示(人工處理、檢核正常、檢核錯誤)
+			if ("0".equals(tfnAllList.get("AcctAmt"))) {
+				tmpUnProcessed = tmpUnProcessed.add(getBigDecimal(tfnAllList.get("AcctAmt")));
+			}
 
 //			String dfTransferAmt = formatAmt(tfnAllList.get("TxAmt"), 0);
 			String dfMakeferAmt = formatAmt(tfnAllList.get("AcctAmt"), 0);
@@ -1318,10 +1378,8 @@ public class L4211Report extends MakeReport {
 				name = name.substring(0, 5);
 			}
 			this.print(0, c6, name);
-			String CloseReasonCodeText = "";
-			if (!"00".equals(tfnAllList.get("CloseReasonCode"))) {
-				CloseReasonCodeText = tfnAllList.get("CloseReasonCode");
-			}
+
+			String CloseReasonCodeText = tfnAllList.get("CloseReasonCode").toString();
 
 			this.print(0, c6 + 9, CloseReasonCodeText);
 
@@ -1414,6 +1472,15 @@ public class L4211Report extends MakeReport {
 
 				}
 
+				// 2入帳後檢核明細表
+				if (printNo == 2) {
+					this.print(1, 0, "");
+					this.print(1, 0,
+							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+					this.print(1, 2, "應待處理總金額，共總計   " + formatAmt(allsumPrincipal, 0));
+
+				}
+
 				totalsumTransferAmt = totalsumTransferAmt.add(allsumTransferAmt);
 				totalsumMakerferAmt = totalsumMakerferAmt.add(allsumMakeferAmt);
 				totalsumPrincipal = totalsumPrincipal.add(allsumPrincipal);
@@ -1455,7 +1522,7 @@ public class L4211Report extends MakeReport {
 				totalsumOthers = BigDecimal.ZERO;
 
 				this.print(pageIndex - pageCnt - 2, this.getMidXAxis(), "=====報表結束=====", "C");
-				this.print(2, this.getMidXAxis(), "課長：　　　　　　　　　　製表人：", "C");
+				this.print(2, this.getMidXAxis(), "經理：　　　　　　　　　　製表人：" + " " + tlrNoName, "C");
 			}
 
 		} // for

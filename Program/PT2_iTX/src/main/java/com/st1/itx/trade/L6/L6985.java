@@ -84,7 +84,6 @@ public class L6985 extends TradeBuffer {
 		int lbsDy = this.txBuffer.getTxCom().getLbsdy() + 19110000;
 		// 本營業日
 		int tbsDy = this.txBuffer.getTxCom().getTbsdy() + 19110000;
-		String itemCode = "ACCL00"; // 各項提存作業
 //		! 1:昨日留存  0-上一營業日
 //		! 2:本日新增  本營業日-本營業日
 //		! 3:全部     0-99991231
@@ -100,35 +99,35 @@ public class L6985 extends TradeBuffer {
 
 		switch (selectCode) {
 		case 1:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, 0, lbsDy, this.index, this.limit,
+			slTxToDoDetail = txToDoDetailService.DataDateRange(iItemCode, 0, 3, 0, lbsDy, this.index, this.limit,
 					titaVo);
 			break;
 		case 2:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, tbsDy, tbsDy, this.index, this.limit,
+			slTxToDoDetail = txToDoDetailService.DataDateRange(iItemCode, 0, 3, tbsDy, tbsDy, this.index, this.limit,
 					titaVo);
 			break;
 		case 3:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 3, 0, 99991231, this.index, this.limit,
+			slTxToDoDetail = txToDoDetailService.DataDateRange(iItemCode, 0, 3, 0, 99991231, this.index, this.limit,
 					titaVo);
 			break;
 		case 4:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 2, 2, 0, 99991231, this.index, this.limit,
+			slTxToDoDetail = txToDoDetailService.DataDateRange(iItemCode, 2, 2, 0, 99991231, this.index, this.limit,
 					titaVo);
 			break;
 		case 5:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 3, 3, 0, 99991231, this.index, this.limit,
+			slTxToDoDetail = txToDoDetailService.DataDateRange(iItemCode, 3, 3, 0, 99991231, this.index, this.limit,
 					titaVo);
 			break;
 		case 6:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 1, 1, 0, 99991231, this.index, this.limit,
+			slTxToDoDetail = txToDoDetailService.DataDateRange(iItemCode, 1, 1, 0, 99991231, this.index, this.limit,
 					titaVo);
 			break;
 		case 7:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 0, 0, 99991231, this.index, this.limit,
+			slTxToDoDetail = txToDoDetailService.DataDateRange(iItemCode, 0, 0, 0, 99991231, this.index, this.limit,
 					titaVo);
 			break;
 		case 9:
-			slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 0, 0, 99991231, this.index, this.limit,
+			slTxToDoDetail = txToDoDetailService.DataDateRange(iItemCode, 0, 0, 0, 99991231, this.index, this.limit,
 					titaVo);
 			break;
 		default:
