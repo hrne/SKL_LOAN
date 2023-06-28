@@ -364,8 +364,8 @@ public class L4721Report2 extends TradeBuffer {
 //		line += showRocDate(tmap.get("EntryDate"), 3) + dateRange + " " + tmap.get("RepayCodeX") + "   "
 		line += FormatUtil.pad9(tmap.get("EntryDate"), 8) + dateRange + " " + FormatUtil.padX(tmap.get("RepayCodeX"), 8)
 				+ "   " + FormatUtil.pad9(tmap.get("TxAmt"), 10) + txAmtX + FormatUtil.pad9(tmap.get("Principal"), 10)
-				+ principalX + FormatUtil.pad9(tmap.get("Interest"), 10) + interestX
-				+ FormatUtil.pad9(tmap.get("BreachAmt"), 10) + breachAmtX + FormatUtil.pad9(tmap.get("OtherFee"), 10)
+				+ principalX + FormatUtil.pad9(tmap.get("Interest"), 8) + interestX
+				+ FormatUtil.pad9(tmap.get("BreachAmt"), 8) + breachAmtX + FormatUtil.pad9(tmap.get("OtherFee"), 8)
 				+ OtherFeeX;
 		// 加入明細
 		result.add(line);

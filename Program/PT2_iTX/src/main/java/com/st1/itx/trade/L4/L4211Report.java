@@ -44,15 +44,13 @@ public class L4211Report extends MakeReport {
 	@Autowired
 	public CustMainService custMainService;
 
-	@Autowired
-	public Slice<CdEmp> iCdEmp;
 
 	@Autowired
 	public CdEmpService sCdEmpService;
 
-	@Autowired
-	public String tlrNoName;
 
+	public Slice<CdEmp> iCdEmp = null;
+	public String tlrNoName = "";
 //	@Autowired
 //	private ReportVo reportVo;
 

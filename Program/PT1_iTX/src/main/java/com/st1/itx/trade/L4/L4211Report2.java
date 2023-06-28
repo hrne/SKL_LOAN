@@ -45,14 +45,13 @@ public class L4211Report2 extends MakeReport {
 	@Autowired
 	public CustMainService custMainService;
 	
-	@Autowired
-	public Slice<CdEmp> iCdEmp;
+
 
 	@Autowired
 	public CdEmpService sCdEmpService;
 
-	@Autowired
-	public String tlrNoName;
+	public String tlrNoName = "";
+	public Slice<CdEmp> iCdEmp = null;
 
 //		每頁筆數
 	private int pageIndex = 45;

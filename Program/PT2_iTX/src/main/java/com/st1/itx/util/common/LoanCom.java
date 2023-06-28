@@ -803,26 +803,45 @@ public class LoanCom extends TradeBuffer {
 		this.info("   iStartDate   = " + iStartDate);
 		this.info("   iEndDate     = " + iEndDate);
 		this.info("   iSpecificDd   = " + iSpecificDd);
-		if (iSpecificDd == 0) {
-			this.info("iSpecificDd = 0 ");
+		int wkOvduTerms = 0;
+		if (iStartDate >= iEndDate) {
+			this.info("iStartDate >= iEndDate, getOvduTerms = " + wkOvduTerms);
 			return 0;
 		}
-		int wkOcduTerms = 0;
 		int wkSpecificDate = 0;
-		wkSpecificDate = (iStartDate / 10000) * 10000 + 100 + iSpecificDd;
+		if (iSpecificDd == 0) {
+			wkSpecificDate = iStartDate;
+		} else {
+			wkSpecificDate = ((iStartDate / 10000) - 1) * 10000 + 100 + iSpecificDd;
+		}
+		// 起日應繳日期數
+		int wkStartDateTerms = 0;
 		dDateUtil.init();
 		dDateUtil.setDate_1(wkSpecificDate);
 		dDateUtil.setDate_2(iStartDate);
 		dDateUtil.dateDiff();
-		wkOcduTerms = dDateUtil.getMons();
+		wkStartDateTerms = dDateUtil.getMons();
+		// 止日應繳日期數
+		int wkEndDateTerms = 0;
 		dDateUtil.init();
 		dDateUtil.setDate_1(wkSpecificDate);
 		dDateUtil.setDate_2(iEndDate);
 		dDateUtil.dateDiff();
-		wkOcduTerms = dDateUtil.getMons() - wkOcduTerms;
-
-		this.info("getOvduTerms = " + wkOcduTerms);
-		return wkOcduTerms;
+		wkEndDateTerms = dDateUtil.getMons();
+		// 最近應繳日
+		int wkLatestIntDate = 0;
+		dDateUtil.init();
+		dDateUtil.setDate_1(wkSpecificDate);
+		dDateUtil.setMons(wkEndDateTerms);
+		wkLatestIntDate = dDateUtil.getCalenderDay();
+		// 逾期數 = 止日應繳日期數 - 起日應繳日期數
+		wkOvduTerms = wkEndDateTerms - wkStartDateTerms;
+		// 最近應繳日 < 止日 => 逾期數 + 1
+		if (wkLatestIntDate < iEndDate) {
+			wkOvduTerms++;
+		}
+		this.info("getOvduTerms=" + wkOvduTerms + ", LatestIntDate=" + wkLatestIntDate);
+		return wkOvduTerms;
 	}
 
 	/**

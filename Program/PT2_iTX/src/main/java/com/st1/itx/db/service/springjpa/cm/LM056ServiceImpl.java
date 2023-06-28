@@ -54,7 +54,7 @@ public class LM056ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  ,(CASE";
 		sql += "			  WHEN FCA.\"SyndNo\" <> 0 THEN '聯貸'";
 		sql += "			  WHEN MLB2.\"CustNo\" IS NOT NULL THEN '**'";
-		sql += "			  WHEN S.\"StaffId\" IS NOT NULL THEN '*'";
+		sql += "			  WHEN S.\"RptId\" IS NOT NULL THEN '*'";
 		sql += "			ELSE ' ' END ) AS \"KIND\"";
 		sql += "		  ,'#N/A' AS \"isRelt\"";
 		sql += "	FROM \"MonthlyLoanBal\" MLB";
@@ -79,7 +79,31 @@ public class LM056ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "						    AND F2.\"FacmNo\" = MLB.\"FacmNo\"";
 		sql += "						    AND F2.\"LastBormNo\" = MLB.\"BormNo\"";
 		sql += "	LEFT JOIN \"FacCaseAppl\" FCA ON FCA.\"ApplNo\" = F2.\"ApplNo\"";
-		sql += "	LEFT JOIN \"StakeholdersStaff\" S ON S.\"StaffId\" = C.\"CustId\"";
+		sql += " LEFT JOIN ( SELECT ";
+		sql += "             decode(\"BusId\",'-',decode(\"RelId\",'-',\"HeadName\",\"RelName\"),\"BusName\")as \"CustName\"  ";
+		sql += "             ,to_char(decode(\"BusId\",'-',decode(\"RelId\",'-',\"HeadId\",\"RelId\"),\"BusId\"))as \"RptId\"  ";
+		sql += "             ,\"RelWithCompany\" as \"Rel\"";
+		sql += "             ,\"HeadName\" ";
+		sql += "             ,\"HeadTitle\" ";
+		sql += "             ,\"RelName\" ";
+		sql += "             ,\"RelTitle\" ";
+		sql += "             ,\"BusTitle\" ";
+		sql += "             FROM \"LifeRelHead\" ";
+		sql += "             WHERE \"RelWithCompany\"='A' ";
+		sql += "             AND TRUNC(\"AcDate\" / 100 ) = :yymm ";
+		sql += "             AND \"LoanBalance\" > 0 ";
+		sql += "             UNION ";
+		sql += "             SELECT \"EmpName\" AS \"CustName\" ";
+		sql += "              ,TO_CHAR(\"EmpId\") AS \"RptId\" ";
+		sql += "                      ,'N' AS \"Rel\"  ";
+		sql += "              ,NULL AS \"HeadName\"  ";
+		sql += "              ,NULL AS \"HeadTitle\"  ";
+		sql += "              ,NULL AS \"RelName\"  ";
+		sql += "              ,NULL AS \"RelTitle\"  ";
+		sql += "              ,NULL AS \"BusTitle\"  ";
+		sql += "             FROM \"LifeRelEmp\" ";	
+		sql += "             AND TRUNC(\"AcDate\" / 100 ) = :yymm ";
+		sql += "           ) S ON S.\"RptId\" = C.\"CustId\" ";
 		sql += "	WHERE MLB.\"YearMonth\" = :yymm";
 		sql += "	  AND MLB.\"LoanBalance\" > 0 ";
 		if (isAllData == "N") {
@@ -91,11 +115,10 @@ public class LM056ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		    ,(CASE";
 		sql += "			    WHEN FCA.\"SyndNo\" <> 0 THEN '聯貸'";
 		sql += "			    WHEN MLB2.\"CustNo\" IS NOT NULL THEN '**'";
-		sql += "			    WHEN S.\"StaffId\" IS NOT NULL THEN '*'";
+		sql += "			    WHEN S.\"RptId\" IS NOT NULL THEN '*'";
 		sql += "			  ELSE ' ' END )";
 		sql += "		    ,'#N/A'";
 		sql += "	ORDER BY \"LoanBalance\" DESC";
-
 		this.info("sql=" + sql);
 
 		Query query;

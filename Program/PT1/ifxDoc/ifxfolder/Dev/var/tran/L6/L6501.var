@@ -462,7 +462,7 @@ T(H,#PostDeductMethod,#DeductMethodHelp)
 
 ! 回收時可短繳本金金額之百分比
 #ShortPrinPercent=N,3,I
-@V(5,0,50)
+@V(5,0,90)
 
 !限額
 #ShortPrinLimit=N,5,I

@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.MonthlyLM052AssetClass;
+import com.st1.itx.db.domain.MonthlyLM052AssetClassId;
 import com.st1.itx.db.service.springjpa.cm.LM050ServiceImpl;
 
 import com.st1.itx.util.common.MakeExcel;
@@ -26,6 +28,9 @@ public class LM050Report extends MakeReport {
 
 	@Autowired
 	LM050ServiceImpl lM050ServiceImpl;
+
+	@Autowired
+	MonthlyLM052AssetClass lMonthlyLM052AssetClass;
 
 	@Autowired
 	MakeExcel makeExcel;
@@ -48,6 +53,8 @@ public class LM050Report extends MakeReport {
 	// 放款總額
 	BigDecimal total = BigDecimal.ZERO;
 
+	private int yearMonth = 0;
+
 	public void exec(TitaVo titaVo) throws LogicException {
 		this.info("LM050Report exec");
 //		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(),
@@ -55,6 +62,9 @@ public class LM050Report extends MakeReport {
 //				"LM050放款保險法第3條利害關係人放款餘額表_限額控管",
 //				"LM050_底稿_放款保險法第3條利害關係人放款餘額表_限額控管.xlsx", "108.04");
 		int reportDate = titaVo.getEntDyI() + 19110000;
+
+		yearMonth = reportDate / 100;
+
 		String brno = titaVo.getBrno();
 		String txcd = "LM050";
 		String fileItem = "放款保險法第3條利害關係人放款餘額表_限額控管";
@@ -188,12 +198,27 @@ public class LM050Report extends MakeReport {
 				custLoanBal = custLoanBal.add(loanBal);
 			}
 		}
+		MonthlyLM052AssetClass sMonthlyLM052AssetClass = new MonthlyLM052AssetClass();
+		MonthlyLM052AssetClassId sMonthlyLM052AssetClassId = new MonthlyLM052AssetClassId();
+		sMonthlyLM052AssetClassId.setYearMonth(yearMonth);
+		sMonthlyLM052AssetClassId.setAssetClassNo("61");
+		sMonthlyLM052AssetClassId.setAcSubBookCode("999");
+		sMonthlyLM052AssetClass.setMonthlyLM052AssetClassId(sMonthlyLM052AssetClassId);
+		
+		custLoanBal = custLoanBal.add(sMonthlyLM052AssetClass.getLoanBal());
+		
+		sMonthlyLM052AssetClassId = new MonthlyLM052AssetClassId();
+		sMonthlyLM052AssetClassId.setYearMonth(yearMonth);
+		sMonthlyLM052AssetClassId.setAssetClassNo("62");
+		sMonthlyLM052AssetClassId.setAcSubBookCode("999");
+		sMonthlyLM052AssetClass.setMonthlyLM052AssetClassId(sMonthlyLM052AssetClassId);
+		
+		custLoanBal = custLoanBal.add(sMonthlyLM052AssetClass.getLoanBal());
 
 		relLoanBal = relLoanBal.add(detailTotal);
-		relLoanBal = relLoanBal.add(empLoanBal);
-
+		relLoanBal = relLoanBal.add(empLoanBal);		
 		total = relLoanBal.add(custLoanBal);
-
+		
 		printTotal(rowCursor + 2);
 	}
 
