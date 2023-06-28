@@ -5,7 +5,7 @@
 	<bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
 		<property name="locations">
 			<list>
-				
+				<value>classpath:version.properties</value>
 				<!-- 
 				<value>classpath:spring/queue.properties</value>
 				<value>classpath:spring/Env.properties</value>
