@@ -180,10 +180,7 @@ BEGIN
              ELSE 0 END                     AS "StatusCode"          -- 處理代碼 DECIMAL 1 0
            , NVL(FR1P."TFRBAD",0)           AS "OvduDate"            -- 轉催收日 DECIMAL 8 0
            , NVL(FR1P."TFRNO",0)            AS "OvduNo"              -- 轉催編號 DECIMAL 10 0
-           , LPAD(FR1P.GDRID1,1,'0')
-             || LPAD(FR1P.GDRID2,2,'0')
-             || LPAD(FR1P.GDRNUM,7,'0')
-             || LPAD(FR1P.LGTSEQ,2,'0')     AS "EndoInsuNo"
+           , ' '                            AS "EndoInsuNo"
            , FR1P.CHKPRO
       FROM "LN$FR1P" FR1P
       LEFT JOIN "TfFR1P" TF ON TF.CUSBRH = FR1P.CUSBRH

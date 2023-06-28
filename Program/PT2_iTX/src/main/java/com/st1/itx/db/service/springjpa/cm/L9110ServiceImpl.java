@@ -684,18 +684,6 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                  , IO.\"InsuEndDate\" ";
 		sql += "                  , IO.\"InsuCompany\"                             AS \"InsuCompany\" ";
 		sql += "             FROM \"InsuOrignal\" IO ";
-		sql += "             UNION ";
-		sql += "             SELECT IR.\"ClCode1\" ";
-		sql += "                  , IR.\"ClCode2\" ";
-		sql += "                  , IR.\"ClNo\" ";
-		sql += "                  , IR.\"NowInsuNo\" ";
-		sql += "                  , IR.\"FireInsuCovrg\" AS \"FireInsuAmt\" ";
-		sql += "                  , IR.\"EthqInsuCovrg\" AS \"EarthInsuAmt\" ";
-		sql += "                  , IR.\"InsuStartDate\" ";
-		sql += "                  , IR.\"InsuEndDate\" ";
-		sql += "                  , IR.\"InsuCompany\"                             AS \"InsuCompany\" ";
-		sql += "             FROM \"InsuRenew\" IR ";
-		sql += "             WHERE NVL(IR.\"NowInsuNo\",' ') != ' ' ";
 		sql += "           ) IR ON IR.\"ClCode1\" = CF.\"ClCode1\" ";
 		sql += "               AND IR.\"ClCode2\" = CF.\"ClCode2\" ";
 		sql += "               AND IR.\"ClNo\"    = CF.\"ClNo\" ";
