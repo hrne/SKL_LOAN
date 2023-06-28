@@ -11,6 +11,7 @@
 				<value>classpath:spring/Env.properties</value>
 				<value>classpath:spring/batch/batch.properties</value>
 				-->
+				<value>classpath:spring/version.properties</value>
 				
 				<!-- -->       
 				<value>file:${itx_Config}/spring/queue.properties</value>
