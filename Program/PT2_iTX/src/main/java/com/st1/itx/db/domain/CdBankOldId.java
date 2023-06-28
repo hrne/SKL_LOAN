@@ -2,12 +2,8 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import com.st1.itx.util.StaticTool;
-import com.st1.itx.Exception.LogicException;
 
 /**
  * CdBankOld 舊行庫資料檔<br>
@@ -20,7 +16,12 @@ import com.st1.itx.Exception.LogicException;
 public class CdBankOldId implements Serializable {
 
 
-  // 行庫代號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6899535040001525278L;
+
+// 行庫代號
   @Column(name = "`BankCode`", length = 3)
   private String bankCode = " ";
 

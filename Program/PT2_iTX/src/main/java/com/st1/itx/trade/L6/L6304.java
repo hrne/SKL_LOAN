@@ -1,14 +1,8 @@
 package com.st1.itx.trade.L6;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.List;
-
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.DBException;
@@ -16,8 +10,6 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.CdCode;
-import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.domain.CdComm;
 import com.st1.itx.db.domain.CdCommId;
 import com.st1.itx.db.service.CdCodeService;

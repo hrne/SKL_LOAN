@@ -2,8 +2,6 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import com.st1.itx.util.StaticTool;
@@ -21,7 +19,12 @@ import com.st1.itx.Exception.LogicException;
 public class LifeRelHeadId implements Serializable {
 
 
-  // 負責人身分證/統一編號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7826615869471075301L;
+
+// 負責人身分證/統一編號
   @Column(name = "`HeadId`", length = 10)
   private String headId = " ";
 

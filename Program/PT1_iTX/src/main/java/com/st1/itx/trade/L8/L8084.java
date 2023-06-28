@@ -25,7 +25,6 @@ import com.st1.itx.db.service.TxAmlNoticeService;
 import com.st1.itx.db.domain.CdBranchGroup;
 import com.st1.itx.db.domain.CdBranchGroupId;
 import com.st1.itx.db.service.CdBranchGroupService;
-import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.TxTellerService;
 
 import com.st1.itx.db.domain.CdCode;

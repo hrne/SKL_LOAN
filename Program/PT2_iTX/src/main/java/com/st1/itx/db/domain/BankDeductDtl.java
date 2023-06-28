@@ -2,7 +2,6 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -27,7 +26,12 @@ import com.st1.itx.Exception.LogicException;
 public class BankDeductDtl implements Serializable {
 
 
-  @EmbeddedId
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6324592265166395278L;
+
+@EmbeddedId
   private BankDeductDtlId bankDeductDtlId;
 
   // 入帳日期

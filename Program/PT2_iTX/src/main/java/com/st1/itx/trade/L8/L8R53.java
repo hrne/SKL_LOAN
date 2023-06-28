@@ -24,8 +24,6 @@ import com.st1.itx.db.domain.CdBranchGroupId;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.CdBranchService;
 import com.st1.itx.db.service.CdEmpService;
-import com.st1.itx.db.domain.TxTeller;
-import com.st1.itx.db.service.TxTellerService;
 
 @Service("L8R53")
 @Scope("prototype")

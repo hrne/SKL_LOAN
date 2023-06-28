@@ -2,12 +2,8 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import com.st1.itx.util.StaticTool;
-import com.st1.itx.Exception.LogicException;
 
 /**
  * Lagdtp AS400不動產押品主檔<br>
@@ -20,7 +16,12 @@ import com.st1.itx.Exception.LogicException;
 public class LagdtpId implements Serializable {
 
 
-  // 營業單位別
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1673617489666627212L;
+
+// 營業單位別
   @Column(name = "`Cusbrh`")
   private int cusbrh = 0;
 

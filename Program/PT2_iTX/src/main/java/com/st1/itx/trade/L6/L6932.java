@@ -21,7 +21,6 @@ import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.TxDataLog;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.TxDataLogService;
-import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.TxTranCodeService;

@@ -2,7 +2,6 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -11,8 +10,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Column;
-import com.st1.itx.util.StaticTool;
-import com.st1.itx.Exception.LogicException;
 
 /**
  * ClFac 擔保品與額度關聯檔<br>
@@ -27,7 +24,12 @@ import com.st1.itx.Exception.LogicException;
 public class ClFac implements Serializable {
 
 
-  @EmbeddedId
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3770453346344619675L;
+
+@EmbeddedId
   private ClFacId clFacId;
 
   // 擔保品代號1

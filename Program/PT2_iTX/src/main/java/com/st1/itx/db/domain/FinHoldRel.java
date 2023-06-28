@@ -2,7 +2,6 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -28,7 +27,12 @@ import com.st1.itx.Exception.LogicException;
 public class FinHoldRel implements Serializable {
 
 
-  @EmbeddedId
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5021906641001743258L;
+
+@EmbeddedId
   private FinHoldRelId finHoldRelId;
 
   // 會計日期

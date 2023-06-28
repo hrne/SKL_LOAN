@@ -2,8 +2,6 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import com.st1.itx.util.StaticTool;
@@ -21,7 +19,12 @@ import com.st1.itx.Exception.LogicException;
 public class FinHoldRelId implements Serializable {
 
 
-  // 身分證/統一編號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2382111430660430113L;
+
+// 身分證/統一編號
   @Column(name = "`Id`", length = 10)
   private String id = " ";
 
