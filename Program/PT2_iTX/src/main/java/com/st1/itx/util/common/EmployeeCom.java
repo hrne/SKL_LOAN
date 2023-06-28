@@ -69,31 +69,48 @@ public class EmployeeCom extends TradeBuffer {
 //	    	     and (AgLevel NOT LIKE 'Z%')
 //	    	     OR  (AgLineCode NOT IN ('21', '31', '1C')) 
 //	    	     and (InPostNo NOT IN ('TU0036','TU0097')) )
+		/*
+		 * String commLineCode = tCdEmp.getCommLineCode(); String agLevel = " "; if
+		 * (tCdEmp.getAgLevel() != null && tCdEmp.getAgLevel().length() > 0) { agLevel =
+		 * tCdEmp.getAgLevel().substring(0, 1); }
+		 * 
+		 * if ("21".equals(commLineCode)) { if (!("F".equals(agLevel) ||
+		 * "G".equals(agLevel) || "J".equals(agLevel) || "Z".equals(agLevel))) {
+		 * isSalary = true; } }
+		 * 
+		 * if ("31".equals(commLineCode)) { if (!("K".equals(agLevel) ||
+		 * "Z".equals(agLevel))) { isSalary = true; } }
+		 * 
+		 * if (!("21".equals(commLineCode) || "31".equals(commLineCode) ||
+		 * "1C".equals(commLineCode))) { if (!("TU0036".equals(tCdEmp.getAgPostIn()) ||
+		 * "TU0097".equals(tCdEmp.getAgPostIn()))) { isSalary = true; } }
+		 */
 
-		String commLineCode = tCdEmp.getCommLineCode();
-		String agLevel = " ";
-		if (tCdEmp.getAgLevel() != null && tCdEmp.getAgLevel().length() > 0) {
-			agLevel = tCdEmp.getAgLevel().substring(0, 1);
-		}
-
-		if ("21".equals(commLineCode)) {
-			if (!("F".equals(agLevel) || "G".equals(agLevel) || "J".equals(agLevel) || "Z".equals(agLevel))) {
+// 2023/6/28 修改
+//       AgStatusCode 業務人員任用狀況碼 IN (1.在職,9.未報聘/內勤)
+//  AND AgLevel 業務人員職等 IN ('00') 15日薪 or LIKE 'E%' 2/3階 處經理           
+// 業務人員任用狀況碼 AgStatusCode
+//      0:單位報備
+//      1:在職
+//      2:離職
+//      3:解聘
+//      4:留職停薪 
+//      5:退休離職
+//      9:未報聘/內勤 
+//      0:單位報備
+//      1:在職
+//      2:離職
+//      3:解聘
+//      4:留職停薪 
+//      5:退休離職
+//      9:未報聘/內勤 
+		String agStatusCode = tCdEmp.getAgStatusCode();
+		String agLevel = tCdEmp.getAgLevel();
+		if ("1".equals(agStatusCode) || "9".equals(agStatusCode)) {
+			if ("00".equals(agLevel) || (agLevel.length() > 0 && "E".equals(agLevel.substring(0, 1)))) {
 				isSalary = true;
 			}
 		}
-
-		if ("31".equals(commLineCode)) {
-			if (!("K".equals(agLevel) || "Z".equals(agLevel))) {
-				isSalary = true;
-			}
-		}
-
-		if (!("21".equals(commLineCode) || "31".equals(commLineCode) || "1C".equals(commLineCode))) {
-			if (!("TU0036".equals(tCdEmp.getAgPostIn()) || "TU0097".equals(tCdEmp.getAgPostIn()))) {
-				isSalary = true;
-			}
-		}
-
 		return isSalary;
 	}
 
@@ -111,9 +128,9 @@ public class EmployeeCom extends TradeBuffer {
 
 		// 2022-11-09 Wei 修改
 		// from 淳英 ask 核心系統-AG線-陳資宜
-		// COMM_LINE_CODE = '35'
-		// AND AG_STATUS_CODE = '1'
-		// AND AG_CUR_IND = 'Y'
+		// CommLineCode 業務線代號 = '35'
+		// AND AgStatusCode 業務人員任用狀況碼 = '1'  在職
+		// AND AgCurInd 現職指示碼 = 'Y':現職
 
 		String commLineCode = tCdEmp.getCommLineCode();
 		String agStatusCode = tCdEmp.getAgStatusCode();

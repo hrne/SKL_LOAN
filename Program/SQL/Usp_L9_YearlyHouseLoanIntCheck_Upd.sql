@@ -159,10 +159,11 @@ BEGIN
                          AND F."FacmNo" = Y."FacmNo"
     LEFT JOIN (
         SELECT "CustNo"
-             , "NewFacmNo" AS "FacmNo"
-        FROM "AcLoanRenew"
+             , "FacmNo"
+        FROM "LoanBorMain"
+        WHERE NVL("RenewFlag",' ') = '2' -- 借新還舊記號
         GROUP BY "CustNo"
-               , "NewFacmNo"
+               , "FacmNo"
     ) R ON Y."CustNo" = R."CustNo"
       AND Y."FacmNo" = R."FacmNo"
     -- 擔保品與額度關聯檔

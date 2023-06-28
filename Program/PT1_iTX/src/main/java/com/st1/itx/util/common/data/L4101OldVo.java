@@ -127,7 +127,7 @@ public class L4101OldVo extends FileVo {
 				if (remark == null || remark.length() == 0) {
 					thisLine += "　　　　　　　　　　　　　　　　　　　" + "  ";// 附言(19全形+2半形)1
 				} else {
-					thisLine += makeReport.fillUpWord("" + remark, 19, "　", "R") + "  ";// 附言(19全形+2半形)
+					thisLine += makeReport.fillUpWord("" + remark, 38, " ", "R") + "  ";// 附言(補半形空白補滿38位+2半形)
 				}
 				thisLine += "               ";// 空白(15個半形空白)
 				thisLine += "00174";// 單位代號

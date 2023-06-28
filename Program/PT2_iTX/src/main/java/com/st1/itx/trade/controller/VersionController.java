@@ -25,6 +25,7 @@ public class VersionController extends TradeController {
 	@PostConstruct
 	public void init() {
 		super.mustInfo("VersionController Init....");
+		super.mustInfo("VersionController appVersion = " + appVersion);
 	}
 
 	/* method = { RequestMethod.POST, RequestMethod.GET } */

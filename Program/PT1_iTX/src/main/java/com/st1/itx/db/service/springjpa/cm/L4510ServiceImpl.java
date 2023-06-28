@@ -60,19 +60,13 @@ public class L4510ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   and nvl(e.\"EmployeeNo\", ' ') <> ' ' ";
 
 		// EmployeeCom
-		// 2022-01-14 智偉修改: CommLineCode有非數值資料,比對時應以字串型態比較
-		// ex : e.\"CommLineCode\" = 21 修改為 e.\"CommLineCode\" = '21'
-		// 員工扣款一律為15日薪，且AgAgType1需等於0/2;2023/6/27 Lai 暫時先不判斷
-		sql += "   AND CASE WHEN f.\"RepayCode\" = 3 AND e.\"AgType1\" in (0,2) THEN  5 "; // 15日薪-員工扣薪
-		sql += "            WHEN f.\"RepayCode\" = 3 THEN  5 ";
-		sql += "            WHEN (    (e.\"CommLineCode\" = '21' AND substr(e.\"AgLevel\", 0, 1) NOT IN ( 'F','G','J','Z') ) ";
-		sql += "                   OR (e.\"CommLineCode\" = '31' AND substr(e.\"AgLevel\", 0, 1) NOT IN ('K','Z') ) ";
-		sql += "                   OR (e.\"CommLineCode\" NOT IN ('21','31','1C' ) AND e.\"AgPostIn\" NOT IN ('TU0036','TU0097')))";
-		sql += "                                      THEN  5";
+		// 2023/6/28 Lai 15日薪：AgLevel 業務人員職等 IN ('00') 15日薪 or LIKE 'E%' 2/3階 處經理
+		sql += "   AND CASE WHEN e.\"AgLevel\" IN ('00') THEN  5 ";  
+		sql += "            WHEN e.\"AgLevel\" LIKE 'E%' THEN  5 ";  
 		sql += "            ELSE 1                            ";
 		sql += "       END = :AgType1";
-		// 非員工扣款者判斷員工須在職 (AgStatusCode 任用狀況碼 = 1-在職)
-		sql += "   AND (f.\"RepayCode\" = 3 OR nvl(e.\"AgStatusCode\",'') = '1') ";
+		// 2023/6/28 Lai AgStatusCode 業務人員任用狀況碼 IN (1.在職,9.未報聘/內勤)	
+		sql += "   AND e.\"AgStatusCode\" IN ('1', '9') ";
 		sql += " GROUP BY f.\"CustNo\" , f.\"FacmNo\"  ,f.\"AcctCode\", f.\"RepayCode\", c.\"EmpNo\"  ";
 
 		this.info("sql=" + sql);
