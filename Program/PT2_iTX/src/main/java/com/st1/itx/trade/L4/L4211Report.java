@@ -44,10 +44,8 @@ public class L4211Report extends MakeReport {
 	@Autowired
 	public CustMainService custMainService;
 
-
 	@Autowired
 	public CdEmpService sCdEmpService;
-
 
 	public Slice<CdEmp> iCdEmp = null;
 	public String tlrNoName = "";
@@ -406,8 +404,9 @@ public class L4211Report extends MakeReport {
 		for (Map<String, String> tfnAllList : fnAllList) {
 
 			// 作帳金額0 表示(人工處理、檢核正常、檢核錯誤)
-			if ("0".equals(tfnAllList.get("AcctAmt"))) {
+			if ("0".equals(tfnAllList.get("AcctAmt")) && printNo == 2) {
 				tmpUnProcessed = tmpUnProcessed.add(getBigDecimal(tfnAllList.get("AcctAmt")));
+				continue;
 			}
 
 			String dfMakeferAmt = formatAmt(tfnAllList.get("AcctAmt"), 0);
@@ -693,7 +692,7 @@ public class L4211Report extends MakeReport {
 					this.print(1, 0, "");
 					this.print(1, 0,
 							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-					this.print(1, 2, "應待處理總金額，共總計   " + formatAmt(allsumPrincipal, 0));
+					this.print(1, 2, "應待處理總金額，共總計   " + formatAmt(tmpUnProcessed, 0));
 
 				}
 
@@ -782,8 +781,9 @@ public class L4211Report extends MakeReport {
 		for (Map<String, String> tfnAllList : fnAllList) {
 
 			// 作帳金額0 表示(人工處理、檢核正常、檢核錯誤)
-			if ("0".equals(tfnAllList.get("AcctAmt"))) {
+			if ("0".equals(tfnAllList.get("AcctAmt")) && printNo == 2) {
 				tmpUnProcessed = tmpUnProcessed.add(getBigDecimal(tfnAllList.get("AcctAmt")));
+				continue;
 			}
 
 //			String dfTransferAmt = formatAmt(tfnAllList.get("TxAmt"), 0);
@@ -1071,7 +1071,7 @@ public class L4211Report extends MakeReport {
 					this.print(1, 0, "");
 					this.print(1, 0,
 							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-					this.print(1, 2, "應待處理總金額，共總計   " + formatAmt(allsumPrincipal, 0));
+					this.print(1, 2, "應待處理總金額，共總計   " + formatAmt(tmpUnProcessed, 0));
 
 				}
 
@@ -1156,8 +1156,9 @@ public class L4211Report extends MakeReport {
 		for (Map<String, String> tfnAllList : fnAllList) {
 
 			// 作帳金額0 表示(人工處理、檢核正常、檢核錯誤)
-			if ("0".equals(tfnAllList.get("AcctAmt"))) {
+			if ("0".equals(tfnAllList.get("AcctAmt")) && printNo == 2) {
 				tmpUnProcessed = tmpUnProcessed.add(getBigDecimal(tfnAllList.get("AcctAmt")));
+				continue;
 			}
 
 //			String dfTransferAmt = formatAmt(tfnAllList.get("TxAmt"), 0);
@@ -1475,7 +1476,7 @@ public class L4211Report extends MakeReport {
 					this.print(1, 0, "");
 					this.print(1, 0,
 							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-					this.print(1, 2, "應待處理總金額，共總計   " + formatAmt(allsumPrincipal, 0));
+					this.print(1, 2, "應待處理總金額，共總計   " + formatAmt(tmpUnProcessed, 0));
 
 				}
 
