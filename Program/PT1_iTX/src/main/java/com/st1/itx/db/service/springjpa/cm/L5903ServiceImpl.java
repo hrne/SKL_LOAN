@@ -90,8 +90,38 @@ public class L5903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ,i.\"ReturnEmpNo\"                                ";
 		sql += "        ,i.\"TitaActFg\"                                  ";
 		sql += "        ,i.\"FacmNoMemo\"                                 ";
-		sql += "        ,case when nvl(cc.\"Enable\",' ') = 'Y' then 'Y'  ";
-		sql += "              else 'N'  end                        AS F18 ";
+		sql += "        ,CASE WHEN NVL(cc.\"Enable\",'N') = 'N' THEN 'N'  ";//非管理人則為N不可修改
+		sql += "              WHEN NVL(i.\"TitaActFg\",' ') = ' ' THEN 'Y' ";//舊資料無此值則為Y
+		sql += "              WHEN i.\"TitaActFg\" = '1' THEN 'N'          ";//未到審查則為N
+		sql += "              WHEN i.\"TitaActFg\" = '4'  THEN 'Y'        ";//審查已放行則為Y
+		sql += "              WHEN NVL(JSON_VALUE(i.\"JsonFields\", '$.RELCD'), ' ') = '2' "; 
+		sql += "                   AND i.\"TitaActFg\" in ('2') THEN 'Y'  ";  // 兩段式已放行則為Y
+		sql += "              ELSE 'N'  end                        AS F18 ";
+		sql += "        ,case WHEN i.\"TitaEntDy\" > 0 THEN i.\"TitaEntDy\" - 19110000";
+		sql += "              ELSE 0  END             AS \"TitaEntDy\"    ";
+		sql += "        ,i.\"TitaTlrNo\"                                  ";
+		sql += "        ,LPAD(i.\"TitaTxtNo\",8,'0')  AS \"TitaTxtNo\"    ";       
+		sql += "        ,i.\"JsonFields\"                                 ";
+		sql += "        ,CASE WHEN i.\"ApplCode\" IN ('2') THEN 'N'       "; 
+		sql += "              WHEN i.\"TitaTxtNo\" = 0 THEN 'N'       ";
+		sql += "              WHEN i.\"TitaActFg\" in ('3','4') THEN 'N'       ";  // 已審核不可修正
+		sql += "              WHEN i.\"ApplEmpNo\" <> :iteller THEN 'N'       ";   // 經辦與借閱人相同才可修正
+		sql += "              WHEN NVL(JSON_VALUE(i.\"JsonFields\", '$.RELCD'), ' ') = '2' "; 
+		sql += "                   AND i.\"TitaActFg\" in ('2') THEN 'N'       ";  // 兩段式已放行不可修正
+		sql += "              ELSE 'Y' END            AS  \"ModifyFg\"    ";
+		sql += "        ,CASE WHEN i.\"ApplCode\" IN ('2') THEN 'N'       ";
+		sql += "              WHEN i.\"TitaTxtNo\" = 0 THEN 'N'       ";
+		sql += "              WHEN i.\"TitaActFg\" in ('3','4') THEN 'N'       ";  // 已審核不可訂正
+		sql += "              WHEN i.\"ApplEmpNo\" <> :iteller THEN 'N'       ";   // 經辦與借閱人相同才可訂正
+		sql += "              ELSE 'Y' END            AS  \"DeleteFg\"    ";
+		sql += "        ,CASE WHEN i.\"ApplCode\" IN ('2') THEN 'N'       ";
+		sql += "              WHEN i.\"CopyCode\" = '2' THEN 'N'             ";
+		sql += "              WHEN i.\"TitaActFg\" in ('1','3') THEN 'N'       ";
+		sql += "              WHEN NVL(JSON_VALUE(i.\"JsonFields\", '$.RELCD'), ' ') = '4' ";
+		sql += "                   AND i.\"TitaActFg\" in ('2') THEN 'N'       ";
+		sql += "              ELSE 'Y' END            AS  \"ReturnFg\"    ";
+		sql += "        ,NVL(cc2.\"Enable\",'N')       AS  \"KeeperEnable\" ";//管理人是否啟用中
+		
 		sql += " from \"InnDocRecord\" i                                  ";
 		sql += " left join \"CustMain\" c on c.\"CustNo\" = i.\"CustNo\"  ";
 		sql += " left join \"CdEmp\" e1 on e1.\"EmployeeNo\" = i.\"KeeperEmpNo\"  ";
@@ -99,24 +129,8 @@ public class L5903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " left join \"CdEmp\" e3 on e3.\"EmployeeNo\" = i.\"ReturnEmpNo\"  ";
 		sql += " left join \"CdCode\" cc on cc.\"DefCode\"   = 'InnDocKeeper'  ";
 		sql += "                        and cc.\"Code\"      =  :iteller "  ;
-
-//		if ("01".equals(iApplCode)) {
-//			sql += " left join (                                              ";
-//			sql += "     select                                               ";
-//			sql += "      \"CustNo\"                                          ";
-//			sql += "     ,\"FacmNo\"                                          ";
-//			sql += "     ,\"ApplDate\"                                        ";
-//			sql += "     ,\"ApplSeq\"                                         ";
-//			sql += "     from \"InnDocRecord\"                                ";
-//			sql += "     where                                                ";
-//			sql += "           case when \"ApplCode\" = '2'  then 1           "; //已歸還
-//			sql += "                when \"CopyCode\" = '2'  then 1           "; //影本不需歸還
-//			sql += "           else 0 end = 1                                 ";
-//			sql += " ) i2  on i2.\"CustNo\"  = i.\"CustNo\"                   ";
-//			sql += "      and i2.\"FacmNo\"  = i.\"FacmNo\"                   ";
-//			sql += "      and i2.\"ApplSeq\" = i.\"ApplSeq\"                  ";
-//		}
-
+		sql += " left join \"CdCode\" cc2 on cc2.\"DefCode\" = 'InnDocKeeper'  ";
+		sql += "                         and cc2.\"Code\"    =  i.\"KeeperEmpNo\" "  ;
 		sql += " where i.\"ApplDate\" >= " + iApplDateFrom;
 		sql += "   and i.\"ApplDate\" <= " + iApplDateTo;
 

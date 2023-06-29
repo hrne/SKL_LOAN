@@ -83,53 +83,59 @@ public class L5103 extends TradeBuffer {
 
 			TxTeller t1txTeller = txTellerService.findById(sApplEmpNo, titaVo);
 			TxTeller t2txTeller = txTellerService.findById(sKeeperEmpNo, titaVo);
-			//若管理人員編非空白,則檢查管理人員編需存在且非停用CdCode.InnDocKeeper
+			// 若管理人員編非空白,則檢查管理人員編需存在且非停用CdCode.InnDocKeeper
 			if (!"".equals(sKeeperEmpNo)) {
-				CdCode tCdCode = sCdCodeDefService.getItemFirst(5, "InnDocKeeper", sKeeperEmpNo,
-						titaVo);
+				CdCode tCdCode = sCdCodeDefService.getItemFirst(5, "InnDocKeeper", sKeeperEmpNo, titaVo);
 				if (tCdCode == null) {
 					throw new LogicException(titaVo, "E0015", "該檔案借閱管理人不存在，需請放款部服務課變更");
 				}
-				if("N".equals(tCdCode.getEnable())) {
+				if ("N".equals(tCdCode.getEnable())) {
 					throw new LogicException(titaVo, "E0015", "該檔案借閱管理人已停用，需請放款部服務課變更");
 				}
 			}
-			
 
 //			若保管與借閱同單位改為2段式交易
-			if (t1txTeller != null && t2txTeller != null) {
-				if (t1txTeller.getGroupNo().equals(t2txTeller.getGroupNo())) {
-					titaVo.put("RELCD", "2");
-				}
-			}
-			// 登錄
-			if (titaVo.isActfgEntry() && titaVo.isHcodeNormal()) {
-				insertNormal(titaVo);
-				// 清償歸檔需更新清償作業檔的銷號欄
-				if ("2".equals(applCode) && "01".equals(usageCode)) {
-					FacClose mFacClose = facCloseService.findFacmNoMaxCloseNoFirst(
-							parse.stringToInteger(titaVo.getParam("CustNo")),
-							parse.stringToInteger(titaVo.getParam("FacmNo")), titaVo);
-					if (mFacClose != null && mFacClose.getClsNo().isEmpty()) {
-						int wkYy = parse.stringToInteger(titaVo.getParam("ReturnDate").substring(0, 3)); // 年
-						int wkMm = parse.stringToInteger(titaVo.getParam("ReturnDate").substring(3, 5)); // 月
-						int wkDd = parse.stringToInteger(titaVo.getParam("ReturnDate").substring(5, 7)); // 日
-						String clsDate = wkYy + "/" + wkMm + "/" + wkDd;
-						titaVo.putParam("ClsNo", clsDate);
+			if (titaVo.isHcodeNormal() || titaVo.isHcodeModify()) {
+				if (t1txTeller != null && t2txTeller != null) {
+					if (t1txTeller.getGroupNo().equals(t2txTeller.getGroupNo())) {
+						titaVo.put("RELCD", "2");
+					} else {
+						titaVo.put("RELCD", "4");
 					}
 				}
 			}
-			// 登錄 修正
-			if (titaVo.isActfgEntry() && titaVo.isHcodeModify()) {
-				updateModify(titaVo);
+			// 登錄
+			if (titaVo.isHcodeNormal()) {
+				if ("1".equals(applCode)) {
+					// 申請
+					insertNormal(titaVo);
+				} else {
+					// 歸還
+					returnNormal(titaVo);
+					// 清償歸檔需更新清償作業檔的銷號欄
+				}
+			}
+			// 修正
+			if (titaVo.isHcodeModify()) {
+				if ("1".equals(applCode)) {
+					// 申請
+					updateModify(titaVo);
+				}
 			}
 
-			// 登錄/歸還 訂正
-			if (titaVo.isActfgEntry() && titaVo.isHcodeErase()) {
-				updateErase(titaVo);
+			// 訂正
+			if (titaVo.isHcodeErase()) {
+				if ("1".equals(applCode)) {
+					// 申請
+					updateErase(titaVo);
+				} else {
+					// 歸還
+					returnErase(titaVo);
+
+				}
 			}
 		} else {
-
+			// 2.放 3.審 4.審放
 			tInnDocRecordId.setCustNo(parse.stringToInteger(titaVo.getParam("CustNo")));
 			tInnDocRecordId.setFacmNo(parse.stringToInteger(titaVo.getParam("FacmNo")));
 			tInnDocRecordId.setApplSeq(titaVo.getParam("ApplSeq"));
@@ -180,35 +186,44 @@ public class L5103 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", "InnDocRecord " + e.getErrorMsg());
 			}
 		}
-//		最後步驟更新清償作業檔的銷號欄
-		// 最後步驟更新
-		if ((titaVo.isHcodeNormal() && titaVo.getActFgI() == parse.stringToInteger(titaVo.getRelCode()))
-				|| (titaVo.isHcodeErase() && titaVo.isActfgEntry())) {
-			if (titaVo.get("ClsNo") != null) {
+//		 歸還清償正本時最後步驟更新清償作業檔的銷號欄
+		if ("2".equals(applCode) && "01".equals(usageCode)) {
+			if ((titaVo.isHcodeNormal() && titaVo.getActFgI() == parse.stringToInteger(titaVo.getRelCode()))
+					|| (titaVo.isHcodeErase() && titaVo.isActfgEntry())) {
 				FacClose mFacClose = facCloseService.findFacmNoMaxCloseNoFirst(
 						parse.stringToInteger(titaVo.getParam("CustNo")),
 						parse.stringToInteger(titaVo.getParam("FacmNo")), titaVo);
 				if (mFacClose != null) {
-					FacClose tFacClose = facCloseService.holdById(mFacClose, titaVo);
-					if (titaVo.isHcodeNormal()) {
-						tFacClose.setClsNo(titaVo.get("ClsNo"));
-					} else {
-						tFacClose.setClsNo("");
+					if (titaVo.isHcodeNormal() && mFacClose.getClsNo().isEmpty()) {
+						int wkYy = parse.stringToInteger(titaVo.getParam("ReturnDate").substring(0, 3)); // 年
+						int wkMm = parse.stringToInteger(titaVo.getParam("ReturnDate").substring(3, 5)); // 月
+						int wkDd = parse.stringToInteger(titaVo.getParam("ReturnDate").substring(5, 7)); // 日
+						String clsDate = wkYy + "/" + wkMm + "/" + wkDd;
+						titaVo.putParam("ClsNo", clsDate);
 					}
-					try {
-						facCloseService.update(tFacClose, titaVo);
-					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0007", "L5103 isHcodeNormal 2 update " + e.getErrorMsg());
+					if (titaVo.get("ClsNo") != null) {
+						FacClose tFacClose = facCloseService.holdById(mFacClose, titaVo);
+						if (titaVo.isHcodeNormal()) {
+							tFacClose.setClsNo(titaVo.get("ClsNo"));
+						} else {
+							tFacClose.setClsNo("");
+						}
+						try {
+							facCloseService.update(tFacClose, titaVo);
+						} catch (DBException e) {
+							throw new LogicException(titaVo, "E0007",
+									"L5103 isHcodeNormal 2 update " + e.getErrorMsg());
+						}
 					}
 				}
 			}
 		}
-
 		this.addList(this.totaVo);
 		return this.sendList();
 
 	}
 
+	// 申請登錄
 	public void insertNormal(TitaVo titaVo) throws LogicException {
 
 		tInnDocRecordId.setCustNo(parse.stringToInteger(titaVo.getParam("CustNo")));
@@ -216,164 +231,160 @@ public class L5103 extends TradeBuffer {
 		tInnDocRecordId.setApplSeq(titaVo.getParam("ApplSeq"));
 
 		InnDocRecord nInnDocRecord = innDocRecordService.findById(tInnDocRecordId, titaVo);
-
 		if (nInnDocRecord != null) {
-			if (("1").equals(nInnDocRecord.getTitaActFg())) {
-				throw new LogicException(titaVo, "E0005", "待放行");
-			}
+			throw new LogicException(titaVo, "E0002", "待放行"); // 新增資料已存在
+		}
+		tInnDocRecord.setInnDocRecordId(tInnDocRecordId);
+		setTitaToDb(titaVo);
+		tInnDocRecord.setJsonFields(tTempVo.getJsonString());
 
-			nInnDocRecord.setTitaActFg(titaVo.getActFgI() + "");
-			nInnDocRecord.setApplCode(titaVo.getParam("ApplCode"));
-			nInnDocRecord.setApplEmpNo(titaVo.getParam("ApplEmpNo"));
-			nInnDocRecord.setKeeperEmpNo(titaVo.getParam("KeeperEmpNo"));
-			nInnDocRecord.setUsageCode(titaVo.getParam("UsageCode"));
-			nInnDocRecord.setCopyCode(titaVo.getParam("CopyCode"));
-			nInnDocRecord.setApplDate(parse.stringToInteger(titaVo.getParam("ApplDate")));
-			nInnDocRecord.setReturnDate(parse.stringToInteger(titaVo.getParam("ReturnDate")));
-			nInnDocRecord.setReturnEmpNo(titaVo.getParam("ReturnEmpNo"));
-			nInnDocRecord.setRemark(titaVo.getParam("Remark"));
-			nInnDocRecord.setApplObj(titaVo.getParam("ApplObj"));
-			nInnDocRecord.setFacmNoMemo(titaVo.getParam("FacmNoMemo"));
+		try {
+			innDocRecordService.insert(tInnDocRecord, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0005", "L5103 InnDocRecord insert " + e.getErrorMsg());
+		}
+	}
 
-			try {
-				innDocRecordService.update(nInnDocRecord, titaVo);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0005", "L5103 InnDocRecord insert " + e.getErrorMsg());
-			}
+	// 歸還登錄
+	public void returnNormal(TitaVo titaVo) throws LogicException {
 
-		} else {
-			tInnDocRecord.setInnDocRecordId(tInnDocRecordId);
+		tInnDocRecordId.setCustNo(parse.stringToInteger(titaVo.getParam("CustNo")));
+		tInnDocRecordId.setFacmNo(parse.stringToInteger(titaVo.getParam("FacmNo")));
+		tInnDocRecordId.setApplSeq(titaVo.getParam("ApplSeq"));
 
-			tInnDocRecord.setTitaActFg(titaVo.getActFgI() + "");
-			tInnDocRecord.setApplCode(titaVo.getParam("ApplCode"));
-			tInnDocRecord.setApplEmpNo(titaVo.getParam("ApplEmpNo"));
-			tInnDocRecord.setKeeperEmpNo(titaVo.getParam("KeeperEmpNo"));
-			tInnDocRecord.setUsageCode(titaVo.getParam("UsageCode"));
-			tInnDocRecord.setCopyCode(titaVo.getParam("CopyCode"));
-			tInnDocRecord.setApplDate(parse.stringToInteger(titaVo.getParam("ApplDate")));
-			tInnDocRecord.setReturnDate(parse.stringToInteger(titaVo.getParam("ReturnDate")));
-			tInnDocRecord.setReturnEmpNo(titaVo.getParam("ReturnEmpNo"));
-			tInnDocRecord.setRemark(titaVo.getParam("Remark"));
-			tInnDocRecord.setApplObj(titaVo.getParam("ApplObj"));
-			tInnDocRecord.setFacmNoMemo(titaVo.getParam("FacmNoMemo"));
+		InnDocRecord nInnDocRecord = innDocRecordService.findById(tInnDocRecordId, titaVo);
+		if (tInnDocRecord == null) {
+			throw new LogicException(titaVo, "E0003", "");// 修改資料不存在
+		}
 
-			for (int i = 1; i <= 25; i++) {
-				if (Integer.parseInt(titaVo.getParam("OPTA" + i)) != 0) {
-					tTempVo.putParam("OPTA" + i, titaVo.getParam("OPTA" + i));
-					tTempVo.putParam("AMTA" + i, titaVo.getParam("AMTA" + i));
-				}
-			}
+		if (("1").equals(nInnDocRecord.getTitaActFg())) {
+			throw new LogicException(titaVo, "E0015", "待放行"); // 檢查錯誤
+		}
 
-			for (int i = 1; i <= 25; i++) {
-				if (Integer.parseInt(titaVo.getParam("OPTB" + i)) != 0) {
-					tTempVo.putParam("OPTB" + i, titaVo.getParam("OPTB" + i));
-					tTempVo.putParam("AMTB" + i, titaVo.getParam("AMTB" + i));
-				}
-			}
+		nInnDocRecord.setTitaActFg(titaVo.getActFgI() + "");
+		nInnDocRecord.setApplCode(titaVo.getParam("ApplCode"));
+		nInnDocRecord.setApplEmpNo(titaVo.getParam("ApplEmpNo"));
+		nInnDocRecord.setKeeperEmpNo(titaVo.getParam("KeeperEmpNo"));
+		nInnDocRecord.setUsageCode(titaVo.getParam("UsageCode"));
+		nInnDocRecord.setCopyCode(titaVo.getParam("CopyCode"));
+		nInnDocRecord.setApplDate(parse.stringToInteger(titaVo.getParam("ApplDate")));
+		nInnDocRecord.setReturnDate(parse.stringToInteger(titaVo.getParam("ReturnDate")));
+		nInnDocRecord.setReturnEmpNo(titaVo.getParam("ReturnEmpNo"));
+		nInnDocRecord.setRemark(titaVo.getParam("Remark"));
+		nInnDocRecord.setApplObj(titaVo.getParam("ApplObj"));
+		nInnDocRecord.setFacmNoMemo(titaVo.getParam("FacmNoMemo"));
 
-			for (int i = 1; i <= 25; i++) {
-				if (Integer.parseInt(titaVo.getParam("OPTC" + i)) != 0) {
-					tTempVo.putParam("OPTC" + i, titaVo.getParam("OPTC" + i));
-					tTempVo.putParam("AMTC" + i, titaVo.getParam("AMTC" + i));
-				}
-			}
-			tInnDocRecord.setJsonFields(tTempVo.getJsonString());
-
-			try {
-				innDocRecordService.insert(tInnDocRecord, titaVo);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0005", "L5103 InnDocRecord insert " + e.getErrorMsg());
-			}
+		try {
+			innDocRecordService.update(nInnDocRecord, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0005", "L5103 InnDocRecord insert " + e.getErrorMsg());
 		}
 
 	}
 
+	// 申請修正
 	public void updateModify(TitaVo titaVo) throws LogicException {
 		tInnDocRecordId.setCustNo(parse.stringToInteger(titaVo.getParam("CustNo")));
 		tInnDocRecordId.setFacmNo(parse.stringToInteger(titaVo.getParam("FacmNo")));
 		tInnDocRecordId.setApplSeq(titaVo.getParam("ApplSeq"));
 
 		tInnDocRecord = innDocRecordService.holdById(tInnDocRecordId, titaVo);
-
-		if (tInnDocRecord != null) {
-			tInnDocRecord.setInnDocRecordId(tInnDocRecordId);
-
-			tInnDocRecord.setTitaActFg(titaVo.getActFgI() + "");
-			tInnDocRecord.setApplCode(titaVo.getParam("ApplCode"));
-			tInnDocRecord.setApplEmpNo(titaVo.getParam("ApplEmpNo"));
-			tInnDocRecord.setKeeperEmpNo(titaVo.getParam("KeeperEmpNo"));
-			tInnDocRecord.setUsageCode(titaVo.getParam("UsageCode"));
-			tInnDocRecord.setCopyCode(titaVo.getParam("CopyCode"));
-			tInnDocRecord.setApplDate(parse.stringToInteger(titaVo.getParam("ApplDate")));
-			tInnDocRecord.setReturnDate(parse.stringToInteger(titaVo.getParam("ReturnDate")));
-			tInnDocRecord.setReturnEmpNo(titaVo.getParam("ReturnEmpNo"));
-			tInnDocRecord.setRemark(titaVo.getParam("Remark"));
-			tInnDocRecord.setApplObj(titaVo.getParam("ApplObj"));
-			tInnDocRecord.setFacmNoMemo(titaVo.getParam("FacmNoMemo"));
-
-			for (int i = 1; i <= 25; i++) {
-				if (Integer.parseInt(titaVo.getParam("OPTA" + i)) != 0) {
-					tTempVo.putParam("OPTA" + i, titaVo.getParam("OPTA" + i));
-					tTempVo.putParam("AMTA" + i, titaVo.getParam("AMTA" + i));
-				}
-			}
-
-			for (int i = 1; i <= 25; i++) {
-				if (Integer.parseInt(titaVo.getParam("OPTB" + i)) != 0) {
-					tTempVo.putParam("OPTB" + i, titaVo.getParam("OPTB" + i));
-					tTempVo.putParam("AMTB" + i, titaVo.getParam("AMTB" + i));
-				}
-			}
-
-			for (int i = 1; i <= 25; i++) {
-				if (Integer.parseInt(titaVo.getParam("OPTC" + i)) != 0) {
-					tTempVo.putParam("OPTC" + i, titaVo.getParam("OPTC" + i));
-					tTempVo.putParam("AMTC" + i, titaVo.getParam("AMTC" + i));
-				}
-			}
-			tInnDocRecord.setJsonFields(tTempVo.getJsonString());
-
-			try {
-				innDocRecordService.update(tInnDocRecord, titaVo);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0007", "L5103 updateModify " + e.getErrorMsg());
-			}
-		} else {
+		if (tInnDocRecord == null) {
 			throw new LogicException(titaVo, "E0003", "");// 修改資料不存在
+		}
+		tInnDocRecord.setInnDocRecordId(tInnDocRecordId);
+		setTitaToDb(titaVo);
+		tInnDocRecord.setJsonFields(tTempVo.getJsonString());
+		try {
+			innDocRecordService.update(tInnDocRecord, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0007", "L5103 updateModify " + e.getErrorMsg());
 		}
 	}
 
+	// Tita->DB
+	public void setTitaToDb(TitaVo titaVo) throws LogicException {
+		tInnDocRecord.setTitaActFg(titaVo.getActFgI() + "");
+		tInnDocRecord.setApplCode(titaVo.getParam("ApplCode"));
+		tInnDocRecord.setApplEmpNo(titaVo.getParam("ApplEmpNo"));
+		tInnDocRecord.setKeeperEmpNo(titaVo.getParam("KeeperEmpNo"));
+		tInnDocRecord.setUsageCode(titaVo.getParam("UsageCode"));
+		tInnDocRecord.setCopyCode(titaVo.getParam("CopyCode"));
+		tInnDocRecord.setApplDate(parse.stringToInteger(titaVo.getParam("ApplDate")));
+		tInnDocRecord.setReturnDate(parse.stringToInteger(titaVo.getParam("ReturnDate")));
+		tInnDocRecord.setReturnEmpNo(titaVo.getParam("ReturnEmpNo"));
+		tInnDocRecord.setRemark(titaVo.getParam("Remark"));
+		tInnDocRecord.setApplObj(titaVo.getParam("ApplObj"));
+		tInnDocRecord.setFacmNoMemo(titaVo.getParam("FacmNoMemo"));
+		tInnDocRecord.setTitaEntDy(titaVo.getEntDyI());
+		tInnDocRecord.setTitaTlrNo(titaVo.getTlrNo());
+		tInnDocRecord.setTitaTxtNo(parse.stringToInteger(titaVo.getTxtNo()));
+		tTempVo.putParam("RELCD", titaVo.get("RELCD"));
+
+		for (int i = 1; i <= 25; i++) {
+			if (Integer.parseInt(titaVo.getParam("OPTA" + i)) != 0) {
+				tTempVo.putParam("OPTA" + i, titaVo.getParam("OPTA" + i));
+				tTempVo.putParam("AMTA" + i, titaVo.getParam("AMTA" + i));
+
+			}
+		}
+
+		for (int i = 1; i <= 25; i++) {
+			if (Integer.parseInt(titaVo.getParam("OPTB" + i)) != 0) {
+				tTempVo.putParam("OPTB" + i, titaVo.getParam("OPTB" + i));
+				tTempVo.putParam("AMTB" + i, titaVo.getParam("AMTB" + i));
+			}
+		}
+
+		for (int i = 1; i <= 25; i++) {
+			if (Integer.parseInt(titaVo.getParam("OPTC" + i)) != 0) {
+				tTempVo.putParam("OPTC" + i, titaVo.getParam("OPTC" + i));
+				tTempVo.putParam("AMTC" + i, titaVo.getParam("AMTC" + i));
+			}
+		}
+	}
+
+	// 申請訂正
 	public void updateErase(TitaVo titaVo) throws LogicException {
 		tInnDocRecordId.setCustNo(parse.stringToInteger(titaVo.getParam("CustNo")));
 		tInnDocRecordId.setFacmNo(parse.stringToInteger(titaVo.getParam("FacmNo")));
 		tInnDocRecordId.setApplSeq(titaVo.getParam("ApplSeq"));
 
 		tInnDocRecord = innDocRecordService.holdById(tInnDocRecordId, titaVo);
-
-		if (tInnDocRecord != null) {
-			if (("1").equals(tInnDocRecord.getApplCode())) {// 申請登錄時才可刪除
-				try {
-					innDocRecordService.delete(tInnDocRecord, titaVo);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0004", "L5103 deleteErase " + e.getErrorMsg());
-				}
-
-			} else {// 登錄歸還恢復至未點選歸還時
-				tInnDocRecord.setInnDocRecordId(tInnDocRecordId);
-				tInnDocRecord.setTitaActFg("4");
-				tInnDocRecord.setApplCode("1");
-				tInnDocRecord.setReturnDate(0);
-				tInnDocRecord.setReturnEmpNo("");
-				try {
-					innDocRecordService.update(tInnDocRecord, titaVo);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0007", "L5103 updateModify " + e.getErrorMsg());
-				}
-			}
-
-		} else {
+		if (tInnDocRecord == null) {
 			throw new LogicException(titaVo, "E0004", "");// 刪除資料不存在
 		}
 
+		if (("2").equals(tInnDocRecord.getApplCode())) {// 申請登錄時才可刪除
+			throw new LogicException(titaVo, "E0015", "已歸還");// 檢查錯誤
+		}
+		try {
+			innDocRecordService.delete(tInnDocRecord, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0004", "L5103 deleteErase " + e.getErrorMsg());
+		}
+
+	}
+
+	// 歸還訂正
+	public void returnErase(TitaVo titaVo) throws LogicException {
+		tInnDocRecordId.setCustNo(parse.stringToInteger(titaVo.getParam("CustNo")));
+		tInnDocRecordId.setFacmNo(parse.stringToInteger(titaVo.getParam("FacmNo")));
+		tInnDocRecordId.setApplSeq(titaVo.getParam("ApplSeq"));
+
+		tInnDocRecord = innDocRecordService.holdById(tInnDocRecordId, titaVo);
+		if (tInnDocRecord == null) {
+			throw new LogicException(titaVo, "E0004", "");// 刪除資料不存在
+		}
+		tInnDocRecord.setInnDocRecordId(tInnDocRecordId);
+		tInnDocRecord.setTitaActFg("4");
+		tInnDocRecord.setApplCode("1");
+		tInnDocRecord.setReturnDate(0);
+		tInnDocRecord.setReturnEmpNo("");
+		try {
+			innDocRecordService.update(tInnDocRecord, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0007", "L5103 updateModify " + e.getErrorMsg());
+		}
 	}
 }

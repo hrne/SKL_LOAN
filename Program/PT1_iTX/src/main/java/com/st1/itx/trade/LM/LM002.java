@@ -97,7 +97,6 @@ public class LM002 extends BatchBase implements Tasklet, InitializingBean {
 			// 資料庫是否已存在
 			if (sCdComm != null) {
 
-				throw new LogicException(titaVo, "E0002", ""); // 新增資料已存在
 			} else {
 
 				sCdComm = new CdComm();
@@ -105,6 +104,8 @@ public class LM002 extends BatchBase implements Tasklet, InitializingBean {
 				sCdComm = setCdcomField(sCdComm, iDate01 / 100, titaVo);
 				sCdComm.setEnable("Y");
 				sCdComm.setRemark("專案放款餘額");
+
+				titaVo.keepOrgDataBase();// 保留原本記號
 
 				try {
 
@@ -118,6 +119,21 @@ public class LM002 extends BatchBase implements Tasklet, InitializingBean {
 					}
 				}
 
+				titaVo.setDataBaseOnLine();// 指定連線環境
+
+				try {
+
+					sCdCommService.insert(sCdComm, titaVo);
+
+				} catch (DBException e) {
+					if (e.getErrorId() == 2) {
+						throw new LogicException(titaVo, "E0002", e.getErrorMsg()); // 新增資料已存在
+					} else {
+						throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增資料時，發生錯誤
+					}
+				}
+
+				titaVo.setDataBaseOnOrg();// 還原原本的環境
 			}
 		}
 

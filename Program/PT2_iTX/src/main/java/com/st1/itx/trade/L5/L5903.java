@@ -6,8 +6,8 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Slice;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
@@ -20,8 +20,8 @@ import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.db.service.springjpa.cm.L5903ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
+import com.st1.itx.util.format.FormatUtil;
 
 /**
  * Tita<br>
@@ -53,13 +53,13 @@ public class L5903 extends TradeBuffer {
 
 	@Autowired
 	public L5903ServiceImpl l5903ServiceImpl;
-	
+
 	@Autowired
 	TxAttachmentService sTxAttachmentService;
 
 	@Autowired
 	public TxTellerService txTellerService;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5903 ");
@@ -76,7 +76,7 @@ public class L5903 extends TradeBuffer {
 			// *** 折返控制相關 ***
 			resultList = l5903ServiceImpl.findAll(this.index, this.limit, titaVo);
 		} catch (Exception e) {
-			this.error("l5903ServiceImpl findByCondition " + e.getMessage());
+			this.error("l5903ServiceImpl findAll " + e.getMessage());
 			throw new LogicException("E0013", e.getMessage());
 		}
 
@@ -89,30 +89,6 @@ public class L5903 extends TradeBuffer {
 			}
 
 			for (Map<String, String> result : resultList) {
-				
-				
-				TxTeller t1txTeller = txTellerService.findById(result.get("F13"), titaVo);
-				TxTeller t2txTeller = txTellerService.findById(result.get("F14"), titaVo);
-
-//				若保管與借閱同單位改為2段式交易
-				this.info("AcFg=="+result.get("F16"));
-				
-				if (t1txTeller != null && t2txTeller != null) {//已放行才顯示
-					
-					if (t1txTeller.getGroupNo().equals(t2txTeller.getGroupNo())) {
-						if(!("2").equals(result.get("F16"))) {
-							this.info("into 1");
-							continue;
-						}
-					} else {
-						if(!("4").equals(result.get("F16"))){
-						 
-							this.info("into 2");
-							continue;
-						}
-					}
-				}
-				
 
 				int applDate = parse.stringToInteger(result.get("F6"));
 				int returnDate = parse.stringToInteger(result.get("F7"));
@@ -131,37 +107,39 @@ public class L5903 extends TradeBuffer {
 				occursList.putParam("OOApplSeq", result.get("F2"));
 				occursList.putParam("OOCustName", result.get("F3"));
 				occursList.putParam("OOKeeperEmpName", result.get("F4"));
+				occursList.putParam("OOKeeperEmpNo", result.get("F13"));
 				occursList.putParam("OOApplEmpName", result.get("F5"));
+				occursList.putParam("OOApplEmpNo", result.get("F14"));
 				occursList.putParam("OOApplDate", applDate);
 				occursList.putParam("OOReturnDate", returnDate);
 				occursList.putParam("OOReturnEmpName", result.get("F8"));
+				occursList.putParam("OOReturnEmpNo", result.get("F15"));
 				occursList.putParam("OOUsageCode", result.get("F9"));
 				occursList.putParam("OOCopyCode", result.get("F10"));
 				occursList.putParam("OORemark", result.get("F11"));
 				occursList.putParam("OOApplObj", result.get("F12"));
-				occursList.putParam("OOKeeperEmpNo", result.get("F13"));
-				occursList.putParam("OOApplEmpNo", result.get("F14"));
-				occursList.putParam("OOReturnEmpNo", result.get("F15"));
+				occursList.putParam("OOModifyFg", result.get("ModifyFg"));
+				occursList.putParam("OODeleteFg", result.get("DeleteFg"));
+				occursList.putParam("OOEntDy", result.get("TitaEntDy"));
+				occursList.putParam("OOTxNo", "0000" + result.get("TitaTlrNo") + result.get("TitaTxtNo"));
+				occursList.putParam("OOReturnFg", result.get("ReturnFg"));
+				occursList.putParam("OOTitaActFg", result.get("TitaActFg"));
 				occursList.putParam("OOFacmNoMemo", result.get("F17"));
 				occursList.putParam("OOEnable", result.get("F18"));
-				
+				occursList.putParam("OOKeeperEnable", result.get("KeeperEnable"));
+
 				// 判斷是否應顯示【附件查詢】按鈕
 				
 				Slice<TxAttachment> slTxAttachment = sTxAttachmentService.findByTran("L5103", FormatUtil.pad9(result.get("F0"), 7)+"-"+FormatUtil.pad9(result.get("F1"), 3)+"-"+FormatUtil.pad9(result.get("F2"), 3), 0, 1, titaVo);
 				List<TxAttachment> lTxAttachment = slTxAttachment == null ? null : slTxAttachment.getContent();
-				
 				occursList.putParam("OOHasAttachment", lTxAttachment != null && !lTxAttachment.isEmpty() ? "Y" : "N");
+
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}
 		} else {
 			throw new LogicException(titaVo, "E0001", "查無資料");
 		}
-		
-		if(this.totaVo.getOccursList().size()==0) {
-			throw new LogicException(titaVo, "E0001", "查無資料");
-		}
-			
 
 		this.addList(this.totaVo);
 		return this.sendList();

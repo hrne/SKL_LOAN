@@ -193,6 +193,7 @@ T(1,@CopyCode,#NTXBUF,249,1)
 T(1,@ApplObj,#NTXBUF,250,1)
 T(1,@FacmNoMemo,#NTXBUF,251,20)
 T(1,@ApplEmpNoX,#NTXBUF,271,20)
+T(1,@KeeperEnable,#NTXBUF,291,1)
 INVOKEJS(SHOW,p1,02,02,1)
 
 
@@ -334,12 +335,15 @@ T(F,@AMTC{i},0)
 ##end
 ,$)
 
-
+#CHKDATA=X,1,S
+IF(#Rim5R48CustNo != 0,T(F,@CustNo,0)T(F,@FacmNo,0),T(F,@CustNo,1)T(F,@FacmNo,1))
+IF(#Rim5R48CustNo != 0,HIDE(#BTND),$)
 
 ! 借款人戶號
 #CustNo=A,7,I
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,1,$,s)
+IF(#Rim5R48CustNo != 0,s,$)
 @T(3,@CustName,)
 C(1,#CustNo,s,V(P,戶號不可為0),s)
 
@@ -363,6 +367,7 @@ IF(#FKEY == 7,$,E(0,@ApplSeq,#L5R33ApplSeq))
 #FacmNo=A,3,I
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,1,$,s)
+IF(#Rim5R48CustNo != 0,s,$)
 !@
 !C(3,#FacmNo,0,T(F,@FacmNoMemo,1),T(F,@FacmNoMemo,0))
 !@C(1,#FacmNo,s,V(P,額度不可為0),s)
@@ -519,11 +524,15 @@ E(0,@TmpApplDate,#ApplDate)
 !L5103ConfirmGroupNo<-OGroupNo})
 !IF(#InitApplCode == 1,BIND(grid,cancel),$)
 
+#KeeperEnable=X,1,S
+IF(#FKEY == 7,T(2,N),$)
+
 ! 管理人
 #KeeperEmpNo=X,6,I
 IF(#InitApplCode == 1,s,$)
-C(3,#ApplCode,1,$,s)
-C(3,#ApplCode,2,s,$)
+!C(3,#ApplCode,1,$,s)
+!C(3,#ApplCode,2,s,$)
+IF(#KeeperEnable=="Y",s,$)
 HELP(#InnDocKeeperHelp)
 @T(3,@KeeperEmpNoX,)
 V(H,#InnDocKeeperHelp)
