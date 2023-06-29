@@ -163,7 +163,7 @@ public class L3230 extends TradeBuffer {
 		iRemoveNo = titaVo.getParam("RemoveNo").trim(); // 銷帳編號
 		iAcSubBookCode = titaVo.getParam("AcSubBookCode"); // 區隔帳冊
 		iNote = titaVo.getParam("Description"); // 摘要內容
-
+		
 		wkTempBal = iTempAmt;
 
 		// 檢查輸入資料
@@ -243,8 +243,8 @@ public class L3230 extends TradeBuffer {
 			case "10": // 10.沖帳管費/手續費
 			case "24": // 24.沖催收法務費
 			case "25": // 25.沖催收火險費
-			case "12": // 12.聯貸件
-			case "27": // 27.聯貸管理費
+			case "12": // 12.聯貸管理費
+			case "27": // 27.放款帳管費
 			case "29": // 29.貸後契變手續費
 			case "30": // 30.沖呆帳戶法務費墊付
 				setUnPaidFee("F" + iTempItemCode);

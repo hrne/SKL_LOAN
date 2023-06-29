@@ -2638,8 +2638,8 @@ public class BaTxCom extends TradeBuffer {
 		// TMI 火險保費
 		// F29 契變手續費
 		// F10 帳管費/手續費
-		// F12 聯貸件
-		// F27 聯貸管理費
+		// F12 聯貸管理費
+		// F27 企金帳管費
 // 銷帳科目記號ReceivableFlag = 4-短繳期金
 		// Z10 短期擔保放款 310 短期擔保放款
 		// Z20 中期擔保放款 320 中期擔保放款
@@ -2755,8 +2755,8 @@ public class BaTxCom extends TradeBuffer {
 									break;
 
 								// 企金費用與期款分別收
-								case "F12": // 帳管費企金件
-								case "F27": // 聯貸管理費
+								case "F12": // 聯貸管理費
+								case "F27": // 帳管費企金件
 									baTxVo.setRepayType(4); // 04-帳管費/手續費
 									baTxVo.setFeeAmt(rv.getRvBal());
 									if (iRepayType == 3 || iRepayType >= 4) {

@@ -79,6 +79,7 @@ public class L6971p extends TradeBuffer {
 		}
 
 		if (deleteCount != 0) {
+			this.batchTransaction.commit();
 			int updateCount = 0;
 			try {
 				updateCount = l6971ServiceImpl.updateIsDeleted(workType, titaVo);
