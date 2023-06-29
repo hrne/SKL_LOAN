@@ -1,1 +1,0 @@
-ALTER TABLE "BatxRateChange" MODIFY "JsonFields" NVARCHAR2(2000);

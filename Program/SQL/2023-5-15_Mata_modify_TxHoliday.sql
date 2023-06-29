@@ -1,1 +1,0 @@
-ALTER TABLE "TxHoliday" MODIFY "TypeCode" varchar2(1);
