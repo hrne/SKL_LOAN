@@ -49,48 +49,29 @@ public class LM049Report extends MakeReport {
 	}
 
 	public void exec(TitaVo titaVo, int mfbsdy) throws LogicException {
+		this.info("LM049Report exec");
 
-		// 先取得淨值
-
-		int entdy = titaVo.getEntDyI() + 19110000;
-
-		entdy = entdy / 100;
-
-		List<InnFundApl> lInnFundApl = new ArrayList<InnFundApl>();
-		// 先取得淨值
-		Slice<InnFundApl> slInnFundApl = sInnFundAplService.acDateYearEq(mfbsdy, mfbsdy, 0, Integer.MAX_VALUE, titaVo);
-
-		lInnFundApl = slInnFundApl == null ? null : slInnFundApl.getContent();
-
-//		CdVarValue tCdVarValue = cdVarValueService.findYearMonthFirst(inputYearMonth, titaVo);
-//
-//		if (tCdVarValue != null) {
-//			this.info("淨值年月=" + tCdVarValue.getYearMonth());
-//			this.info("淨值=" + tCdVarValue.getTotalequity());
-//			netValueDataDate = tCdVarValue.getYearMonth();
-//			netValue = tCdVarValue.getTotalequity();
-//		}
-		if (lInnFundApl != null) {
-
-			this.info("淨值日期=" + lInnFundApl.get(0).getAcDate());
-			this.info("淨值=" + lInnFundApl.get(0).getStockHoldersEqt());
-			netValueDataDate = lInnFundApl.get(0).getAcDate() / 100;
-			netValue = lInnFundApl.get(0).getStockHoldersEqt();
-		}
+		List<Map<String, String>> findStockHoldersEqt = null;
 		List<Map<String, String>> listLM049 = null;
 
 		try {
+			this.info("lM049ServiceImpl.findStockHoldersEqt...");
+			findStockHoldersEqt = lM049ServiceImpl.findStockHoldersEqt(titaVo, mfbsdy);
+
+			this.info("lM049ServiceImpl.findAll...");
 			listLM049 = lM049ServiceImpl.findAll(titaVo);
+
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
-			this.info("LM049ServiceImpl.testExcel error = " + errors.toString());
+			this.info("LM049ServiceImpl error = " + errors.toString());
 		}
-		exportExcel(titaVo, listLM049);
+
+		exportExcel(listLM049, findStockHoldersEqt, mfbsdy, titaVo);
 	}
 
-	private void exportExcel(TitaVo titaVo, List<Map<String, String>> listLM049) throws LogicException {
-		this.info("LM049Report exportExcel");
+	private void exportExcel(List<Map<String, String>> listLM049, List<Map<String, String>> findStockHoldersEqt,
+			int date, TitaVo titaVo) throws LogicException {
 
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
@@ -100,6 +81,8 @@ public class LM049Report extends MakeReport {
 		String defaultExcel = "LM049_底稿_放款金控法第44條利害關係人放款餘額表_限額控管.xlsx";
 		String defaultSheet = "108.04金控子公司表7-1";
 
+		int rocYM = reportDate / 100;
+
 		this.info("reportVo open");
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
@@ -108,13 +91,9 @@ public class LM049Report extends MakeReport {
 		// 開啟報表
 		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
 
-//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM049", "放款金控法第44條利害關係人放款餘額表", "LM049放款金控法第44條利害關係人放款餘額表_限額控管", "LM049_底稿_放款金控法第44條利害關係人放款餘額表_限額控管.xlsx", "108.04金控子公司表7-1");
+		makeExcel.setSheet("108.04金控子公司表7-1", rocYM + "金控子公司表7-1");
 
-		String entdy = titaVo.getEntDy();
-
-		makeExcel.setSheet("108.04金控子公司表7-1", entdy.substring(1, 6) + "金控子公司表7-1");
-
-		makeExcel.setValue(1, 2, "           " + this.showRocDate(entdy, 0) + " 新光人壽對金控法第四十四條授信限制對象授信明細表");
+		makeExcel.setValue(1, 2, "           " + this.showRocDate(date, 0) + " 新光人壽對金控法第四十四條授信限制對象授信明細表", "C");
 
 		if (listLM049 == null || listLM049.isEmpty()) {
 			makeExcel.setValue(4, 2, "本日無資料");
@@ -124,14 +103,12 @@ public class LM049Report extends MakeReport {
 
 		// 寫入淨值
 		// 年.月 淨值（核閱數）
-		String outputNetValueDataDate = "";
-		if (netValueDataDate > 191100) {
-			netValueDataDate -= 191100;
-			outputNetValueDataDate = String.valueOf(netValueDataDate);
-			outputNetValueDataDate = outputNetValueDataDate.substring(0, 3) + "." + outputNetValueDataDate.substring(3);
-		}
+		String outputNetValueDataDate = String.valueOf(findStockHoldersEqt.get(0).get("AcDate"));
+		outputNetValueDataDate = outputNetValueDataDate.substring(0, 3) + "." + outputNetValueDataDate.substring(3);
+
 		makeExcel.setValue(2, 5, outputNetValueDataDate + " 淨值（核閱數）");
-		makeExcel.setValue(2, 7, divThousand(netValue), "#,##0");
+		makeExcel.setValue(2, 7, divThousand(new BigDecimal(findStockHoldersEqt.get(0).get("StockHoldersEqt"))),
+				"#,##0");
 
 		// 整理資料
 		// 根據CusType & CusSCD 區分大類 A B C D
@@ -147,28 +124,23 @@ public class LM049Report extends MakeReport {
 
 		for (Map<String, String> tLM049 : listLM049) {
 
-			String tCusType = tLM049.get("F0");
-			String tCusSCD = tLM049.get("F1");
-
-//			this.info("tCusType = " + tCusType);
-//			this.info("tCusSCD = " + tCusSCD);
+			String tCusType = tLM049.get("comSeq");
 
 			switch (tCusType) {
 			case "1":
 				listA = putData(tLM049, listA);
 				break;
 			case "2":
-				if (tCusSCD.equals("1")) {
-					listB = putData(tLM049, listB);
-				} else if (tCusSCD.equals("2")) {
-					listC = putData(tLM049, listC);
-				}
+				listB = putData(tLM049, listB);
 				break;
 			case "3":
+				listC = putData(tLM049, listD);
+				break;
+
+			case "4":
 				listD = putData(tLM049, listD);
 				break;
 			default:
-				this.error("out of cases. tCusType = " + tCusType);
 				break;
 			}
 		} // for
@@ -179,6 +151,13 @@ public class LM049Report extends MakeReport {
 		int rowCursorD = 13;
 		int rowCursorTotal = 15;
 
+		int[] a = new int[2];
+		int[] b = new int[2];
+		int[] c = new int[2];
+		int[] d = new int[2];
+
+		a[0] = rowCursorA;
+
 		if (listA.size() > 1) {
 			// 將表格往下移，移出空間
 			makeExcel.setShiftRow(rowCursorA + 1, listA.size() - 1);
@@ -188,10 +167,16 @@ public class LM049Report extends MakeReport {
 			rowCursorD += listA.size() - 1;
 			rowCursorTotal += listA.size() - 1;
 		}
+		// ex : 4 + 5 - 1 = 第8列
+		a[1] = a[0] + listA.size() - 1;
+
 		if (listA.size() > 0) {
 			// 寫入資料
 			setValueToExcel(rowCursorA, listA);
 		}
+
+		b[0] = rowCursorB;
+
 		if (listB.size() > 1) {
 			// 將表格往下移，移出空間
 			makeExcel.setShiftRow(rowCursorB + 1, listB.size() - 1);
@@ -200,10 +185,15 @@ public class LM049Report extends MakeReport {
 			rowCursorD += listB.size() - 1;
 			rowCursorTotal += listB.size() - 1;
 		}
+
+		b[1] = b[0] + listB.size() - 1;
 		if (listB.size() > 0) {
 			// 寫入資料
 			setValueToExcel(rowCursorB, listB);
 		}
+
+		c[0] = rowCursorC;
+
 		if (listC.size() > 1) {
 			// 將表格往下移，移出空間
 			makeExcel.setShiftRow(rowCursorC + 1, listC.size() - 1);
@@ -211,26 +201,52 @@ public class LM049Report extends MakeReport {
 			rowCursorD += listC.size() - 1;
 			rowCursorTotal += listC.size() - 1;
 		}
+
+		c[1] = c[0] + listC.size() - 1;
 		if (listC.size() > 0) {
 			// 寫入資料
 			setValueToExcel(rowCursorC, listC);
 		}
+
+		d[0] = rowCursorD;
 		if (listD.size() > 1) {
 			// 將表格往下移，移出空間
 			makeExcel.setShiftRow(rowCursorD + 1, listD.size() - 1);
 			// 更新行數指標
 			rowCursorTotal += listD.size() - 1;
 		}
+		d[1] = d[0] + listD.size() - 1;
+
 		if (listD.size() > 0) {
 			// 寫入資料
 			setValueToExcel(rowCursorD, listD);
 		}
 
+		makeExcel.setFormula(a[1] + 1, 11, BigDecimal.ZERO, "SUM(V" + a[0] + ":V" + a[1] + ")", "#,##0");
+		makeExcel.setFormula(a[1] + 1, 12, BigDecimal.ZERO, "(V" + a[1] + 1 + "/$P$2) * 100 ", "0.00");
+		makeExcel.formulaCaculate(a[1] + 1, 11);
+		makeExcel.formulaCaculate(a[1] + 1, 12);
+
+		makeExcel.setFormula(b[1] + 1, 11, BigDecimal.ZERO, "SUM(V" + b[0] + ":V" + b[1] + ")", "#,##0");
+		makeExcel.setFormula(b[1] + 1, 12, BigDecimal.ZERO, "(V" + b[1] + 1 + "/$P$2) * 100 ", "0.00");
+		makeExcel.formulaCaculate(b[1] + 1, 11);
+		makeExcel.formulaCaculate(b[1] + 1, 12);
+
+		makeExcel.setFormula(c[1] + 1, 11, BigDecimal.ZERO, "SUM(V" + c[0] + ":V" + c[1] + ")", "#,##0");
+		makeExcel.setFormula(c[1] + 1, 12, BigDecimal.ZERO, "(V" + c[1] + 1 + "/$P$2) * 100 ", "0.00");
+		makeExcel.formulaCaculate(c[1] + 1, 11);
+		makeExcel.formulaCaculate(c[1] + 1, 12);
+
+		makeExcel.setFormula(d[1] + 1, 11, BigDecimal.ZERO, "SUM(V" + d[0] + ":V" + d[1] + ")", "#,##0");
+		makeExcel.setFormula(d[1] + 1, 12, BigDecimal.ZERO, "(V" + d[1] + 1 + "/$P$2) * 100 ", "0.00");
+		makeExcel.formulaCaculate(d[1] + 1, 11);
+		makeExcel.formulaCaculate(d[1] + 1, 12);
+
 		// 寫入合計資料
-		makeExcel.setValue(rowCursorTotal, 13, divThousand(totalOfLoanBal), "#,##0");
+//		makeExcel.setValue(rowCursorTotal, 13, divThousand(totalOfLoanBal), "#,##0");
 
 		// 合計之佔淨值比
-		makeExcel.setValue(rowCursorTotal, 14, computeDivide(totalOfLoanBal, netValue, 8), "#,##0.00");
+//		makeExcel.setValue(rowCursorTotal, 14, computeDivide(totalOfLoanBal, netValue, 8), "#,##0.00");
 
 		ExcelFontStyleVo efsVo = new ExcelFontStyleVo();
 
@@ -242,7 +258,7 @@ public class LM049Report extends MakeReport {
 		// 寫簽核
 		makeExcel.setMergedRegion(rowCursorTotal + 2, rowCursorTotal + 2, 2, 16);
 		makeExcel.setValue(rowCursorTotal + 2, 2,
-				"經 辦：                      經理：                       風險管理人：                       協理：", efsVo);
+				"經 辦：                      經理：                       風險管理人：                       部主管：", efsVo);
 
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);
@@ -251,21 +267,19 @@ public class LM049Report extends MakeReport {
 	private List<Map<String, String>> putData(Map<String, String> tLM049, List<Map<String, String>> tmpList) {
 		Map<String, String> tmpMap = new HashMap<>();
 
-		tmpMap.put("CustName", tLM049.get("F4")); // 戶名
-		tmpMap.put("CusscdName", tLM049.get("F2")); // 子公司名稱
-		tmpMap.put("STSName", tLM049.get("F5") == null ? "" : tLM049.get("F5")); // 職位名稱
-		tmpMap.put("DrawdownDate", showRocDate(tLM049.get("F9"), 1)); // 放款期間-起日(撥款日)
-		tmpMap.put("MaturityDate", showRocDate(tLM049.get("F10"), 1)); // 放款期間-止日(到期日)
-		tmpMap.put("StoreRate", tLM049.get("F11")); // 放款利率
-		tmpMap.put("EvaAmt", tLM049.get("F12")); // 擔保品估價
-		tmpMap.put("LoanBal", tLM049.get("F13")); // 授信餘額
-		tmpMap.put("FacmNo", FormatUtil.pad9(tLM049.get("F8"), 3)); // 額度
-
-		tmpMap.put("CustNo", FormatUtil.pad9(tLM049.get("F7"), 7)); // 戶號
-
-		boolean isSameCollateral = tLM049.get("F14").equals("Y");
-		tmpMap.put("IsSameCollateral", isSameCollateral ? "同擔保品" : ""); // 備註說明
-		tmpMap.put("ClNo", isSameCollateral ? tLM049.get("F15") : ""); // 擔保品號碼
+		tmpMap.put("Name", tLM049.get("Name")); // 戶名
+		tmpMap.put("CompanyName", tLM049.get("CompanyName")); // 子公司名稱+ 職位名稱
+		tmpMap.put("FirstDrawdownDate", showRocDate(tLM049.get("FirstDrawdownDate"), 1)); // 放款期間-起日(撥款日)
+		tmpMap.put("MaturityDate", showRocDate(tLM049.get("MaturityDate"), 1)); // 放款期間-止日(到期日)
+		tmpMap.put("StoreRate", tLM049.get("StoreRate")); // 放款利率
+		tmpMap.put("EvaNetWorth", tLM049.get("EvaNetWorth")); // 擔保品估價
+		tmpMap.put("LoanRatio", tLM049.get("LoanRatio")); // 核貸成數
+		tmpMap.put("LoanBal", tLM049.get("LoanBal")); // 授信餘額
+		tmpMap.put("FacmNo", FormatUtil.pad9(tLM049.get("FacmNo"), 3)); // 額度
+		tmpMap.put("CustNo", FormatUtil.pad9(tLM049.get("CustNo"), 7)); // 戶號
+		boolean upToOneHundredMillion = tLM049.get("upToOneHundredMillion").equals("Y");
+		tmpMap.put("upToOneHundredMillion", upToOneHundredMillion ? "v" : "-"); // 達1億元且經董事會決議
+		tmpMap.put("ClNo", tLM049.get("ClNo")); // 擔保品號碼
 
 		tmpList.add(tmpMap);
 		return tmpList;
@@ -276,123 +290,92 @@ public class LM049Report extends MakeReport {
 		// 小計-授信餘額
 		BigDecimal loanBalTotal = BigDecimal.ZERO;
 
-		Map<String, BigDecimal> clEvaAmt = new HashMap<>();
-		Map<String, BigDecimal> clLoanBal = new HashMap<>();
+//		Map<String, BigDecimal> clEvaAmt = new HashMap<>();
+//		Map<String, BigDecimal> clLoanBal = new HashMap<>();
 
 		// 貸放成數特殊邏輯
 		// 同擔保品時,先合計放款餘額再除以擔保品估價
+//		for (Map<String, String> map : list) {
+//
+//			String custNoClNo = map.get("CustNo") + "-" + map.get("ClNo");
+//
+//			clEvaAmt.put(custNoClNo, getBigDecimal(map.get("EvaAmt")));
+//
+//			BigDecimal loanBal = getBigDecimal(map.get("LoanBal"));
+//
+//			loanBalTotal = loanBalTotal.add(loanBal);
+//
+//			BigDecimal computeLoanBal = loanBal;
+//
+//			if (clLoanBal.containsKey(custNoClNo)) {
+//				computeLoanBal = computeLoanBal.add(clLoanBal.get(custNoClNo));
+//			}
+//
+//			this.info("custNoClNo = " + custNoClNo);
+//			this.info("computeLoanBal = " + computeLoanBal);
+//
+//			clLoanBal.put(custNoClNo, computeLoanBal);
+//		}
+
+//		Map<String, int[]> sameCollateralRange = new HashMap<>();
+
+		String tmpCustNo = "";
+		boolean isSame = false;
+
 		for (Map<String, String> map : list) {
 
-			String custNoClNo = map.get("CustNo") + "-" + map.get("ClNo");
-
-			clEvaAmt.put(custNoClNo, getBigDecimal(map.get("EvaAmt")));
-
-			BigDecimal loanBal = getBigDecimal(map.get("LoanBal"));
-
-			loanBalTotal = loanBalTotal.add(loanBal);
-
-			BigDecimal computeLoanBal = loanBal;
-
-			if (clLoanBal.containsKey(custNoClNo)) {
-				computeLoanBal = computeLoanBal.add(clLoanBal.get(custNoClNo));
+			if (!tmpCustNo.equals(map.get("CustNo"))) {
+				isSame = false;
+			} else {
+				isSame = true;
 			}
 
-			this.info("custNoClNo = " + custNoClNo);
-			this.info("computeLoanBal = " + computeLoanBal);
-
-			clLoanBal.put(custNoClNo, computeLoanBal);
-		}
-
-		Map<String, int[]> sameCollateralRange = new HashMap<>();
-
-		for (Map<String, String> map : list) {
-
 			// 戶名
-			makeExcel.setValue(rowCursor, 2, map.get("CustName"));
+
+			makeExcel.setValue(rowCursor, 2, isSame ? "" : map.get("Name"));
 			// 金控公司負責人及大股東
-			makeExcel.setValue(rowCursor, 3, map.get("CusscdName") + "(" + map.get("STSName") + ")");
+			makeExcel.setValue(rowCursor, 3, isSame ? "" : map.get("CompanyName"));
 			// 放款期間
-			makeExcel.setValue(rowCursor, 4, map.get("DrawdownDate"));
+			makeExcel.setValue(rowCursor, 4, map.get("FirstDrawdownDate"));
 			makeExcel.setValue(rowCursor, 5, map.get("MaturityDate"));
 			// 放款利率
 			makeExcel.setValue(rowCursor, 6, getBigDecimal(map.get("StoreRate")), "#,##0.000");
 
-			// 貸放成數特殊邏輯
-			// 同擔保品時,先合計放款餘額再除以擔保品估價
-			String custNoClNo = map.get("CustNo") + "-" + map.get("ClNo");
-
-			BigDecimal evaAmt = clEvaAmt.get(custNoClNo);
-			BigDecimal loanBalGroupByCollateral = clLoanBal.get(custNoClNo);
-			BigDecimal loanToValue = computeDivide(loanBalGroupByCollateral, evaAmt, 2);
-
 			// 擔保品估價
-			makeExcel.setValue(rowCursor, 7, divThousand(evaAmt), "#,##0");
+			makeExcel.setValue(rowCursor, 7, isSame ? BigDecimal.ZERO : getBigDecimal(map.get("EvaNetWorth")), "#,##0");
 			// 貸放成數
-			makeExcel.setValue(rowCursor, 8, loanToValue, "#,##0.00%");
+			makeExcel.setValue(rowCursor, 8, isSame ? BigDecimal.ZERO : getBigDecimal(map.get("LoanRatio")),
+					"#,##0.00%");
 
-			// 十足擔保
-			if (evaAmt.compareTo(loanBalGroupByCollateral) > 0) {
-				makeExcel.setValue(rowCursor, 9, "v");
-			} else {
-				makeExcel.setValue(rowCursor, 9, "-");
-			}
+			// 十足擔保(舜雯說已取消欄位)
+
 			// 不優於同類授信對象
-			makeExcel.setValue(rowCursor, 10, "v");
+			makeExcel.setValue(rowCursor, 9, isSame ? "" : "v");
 			// 達1億元且經董事會決議
-			makeExcel.setValue(rowCursor, 11, "-");
-			// 符合金控法第44條
-			makeExcel.setValue(rowCursor, 12, "v");
+			makeExcel.setValue(rowCursor, 10, isSame ? "" : map.get("upToOneHundredMillion"));
+			// 符合金控法第44條(舜雯說已取消欄位)
+//			makeExcel.setValue(rowCursor, 12, "v");
 
 			// 授信餘額
-			makeExcel.setValue(rowCursor, 13, divThousand(loanBalGroupByCollateral), "#,##0");
+			makeExcel.setValue(rowCursor, 11, isSame ? BigDecimal.ZERO : getBigDecimal(map.get("LoanBal")), "#,##0");
 			// 佔淨值比
-			makeExcel.setValue(rowCursor, 14, computeDivide(loanBalGroupByCollateral, netValue, 8), "#,##0.00");
-			// 額度
-			makeExcel.setValue(rowCursor, 15, map.get("FacmNo"));
-			// 備註說明
-			makeExcel.setValue(rowCursor, 16, map.get("IsSameCollateral"));
+			if (!isSame) {
+				makeExcel.setFormula(rowCursor, 12, BigDecimal.ZERO, "(V" + rowCursor + "/$P$2) * 100", "0.00");
 
-			// 本程式putData有將此欄位"IsSameCollateral"值update成文字,query結果為Y/N
-			if (map.get("IsSameCollateral").equals("同擔保品")) {
-				// 同擔保品時紀錄行數起訖
-				// 迴圈結束後做合併
-
-				this.info("this row is same collateral. custNoClNo = " + custNoClNo);
-
-				int[] tmpRecord = new int[2];
-
-				if (sameCollateralRange.containsKey(custNoClNo)) {
-
-					tmpRecord = sameCollateralRange.get(custNoClNo);
-
-					if (tmpRecord[0] > rowCursor) {
-						tmpRecord[0] = rowCursor;
-					}
-					if (tmpRecord[1] < rowCursor) {
-						tmpRecord[1] = rowCursor;
-					}
-				} else {
-					tmpRecord[0] = rowCursor;
-					tmpRecord[1] = rowCursor;
-				}
-				this.info("tmpRecord[0] = " + tmpRecord[0]);
-				this.info("tmpRecord[1] = " + tmpRecord[1]);
-
-				sameCollateralRange.put(custNoClNo, tmpRecord);
+				makeExcel.formulaCaculate(rowCursor, 12);
 			}
-			rowCursor++;
-		}
+			// 額度
+			makeExcel.setValue(rowCursor, 13, map.get("FacmNo"));
+			// 備註說明
+//			makeExcel.setValue(rowCursor, 14, map.get("IsSameCollateral"));
 
-		// 合併儲存格
-		if (sameCollateralRange != null && !sameCollateralRange.isEmpty()) {
-			mergeColumns(sameCollateralRange);
 		}
 
 		// 印小計
-		makeExcel.setValue(rowCursor, 13, divThousand(loanBalTotal), "#,##0");
+//		makeExcel.setValue(rowCursor, 13, divThousand(loanBalTotal), "#,##0");
 
 		// 小計之佔淨值比
-		makeExcel.setValue(rowCursor, 14, computeDivide(loanBalTotal, netValue, 8), "#,##0.00");
+//		makeExcel.setValue(rowCursor, 14, computeDivide(loanBalTotal, netValue, 8), "#,##0.00");
 
 		// 計算總計
 		totalOfLoanBal = totalOfLoanBal.add(loanBalTotal);

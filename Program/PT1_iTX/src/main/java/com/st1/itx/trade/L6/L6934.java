@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ import com.st1.itx.db.service.TxDataLogService;
 import com.st1.itx.db.service.TxTranCodeService;
 import com.st1.itx.Exception.LogicException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
@@ -51,49 +54,38 @@ public class L6934 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6934 ");
 		this.totaVo.init(titaVo);
-
 		TxDataLogId txDataLogId = new TxDataLogId();
 		int txDate = Integer.valueOf(titaVo.getParam("TxDate"));
 		String txSeq = titaVo.getParam("TxSeq");
 		int txSno = Integer.valueOf(titaVo.getParam("TxSno"));
-
 		txDataLogId.setTxDate(txDate);
 		txDataLogId.setTxSeq(txSeq);
 		txDataLogId.setTxSno(txSno);
 		TxDataLog txDataLog = txDataLogService.findById(txDataLogId, titaVo);
-
 		if (txDataLog == null) {
 			throw new LogicException(titaVo, "E0001", "");
 		}
-
 		String tranName = txDataLog.getTranNo();
-
 		TxTranCode txTranCode = txTranCodeService.findById(txDataLog.getTranNo(), titaVo);
 		if (txTranCode != null) {
 			tranName += " " + txTranCode.getTranItem();
 		}
 		totaVo.putParam("OTranName", tranName);
-
 		this.totaVo.putParam("OCustNo", txDataLog.getCustNo());
 		this.totaVo.putParam("OFacmNo", txDataLog.getFacmNo());
 		this.totaVo.putParam("OBormNo", txDataLog.getBormNo());
 		this.totaVo.putParam("OMrKey", txDataLog.getMrKey());
-
 		totaVo.putParam("OReason", txDataLog.getReason());
-
 		String lastUpdate = parse.timeStampToString(txDataLog.getLastUpdate());
 		totaVo.putParam("OLastUpdate", lastUpdate);
-
 		String lastEmp = txDataLog.getLastUpdateEmpNo();
 		if (txDataLog.getLastUpdateEmpNo() != null && txDataLog.getLastUpdateEmpNo().toString().length() > 0) {
 			CdEmp cdEmp = cdEmpService.findById(txDataLog.getLastUpdateEmpNo(), titaVo);
 			if (cdEmp != null) {
 				lastEmp += " " + StringCut.stringCut(cdEmp.getFullname(), 0, 10);
 			}
-
 		}
 		totaVo.putParam("OLastEmp", lastEmp);
-
 		List<HashMap<String, Object>> listMap = new ArrayList<HashMap<String, Object>>();
 		try {
 			this.info("txDataLog.getContent()=" + txDataLog.getContent());
@@ -101,7 +93,6 @@ public class L6934 extends TradeBuffer {
 		} catch (IOException e) {
 			throw new LogicException("EC009", "資料格式");
 		}
-
 		for (HashMap<String, Object> map : listMap) {
 			String fld = "";
 			if (map.get("f") != null) {
@@ -110,14 +101,30 @@ public class L6934 extends TradeBuffer {
 				continue;
 			}
 			String oval = map.get("o").toString();
+
 			String nval = map.get("n").toString();
+
+			if (nval.length() > 3) {
+				if (".00".equals(nval.substring(nval.length() - 3, nval.length()))) {
+					nval = nval.substring(0, nval.length() - 3);
+				}
+			}
+			// 排除變更項目時需同時修正L9136Report
+			// 系統自動更新
 			if ("最後更新人員".equals(fld) || "交易進行記號".equals(fld) || "上次櫃員編號".equals(fld) || "上次交易序號".equals(fld)
 					|| "已編BorTx流水號".equals(fld) || "最後更新日期時間".equals(fld) || "上次會計日".equals(fld) || "會計日期".equals(fld)
 					|| "上次交易行別".equals(fld) || "上次交易日".equals(fld)) {
 				continue;
 			}
-			if("L8203".equals(txDataLog.getTranNo())) {
-				if("流程控制序號".equals(fld) || "流程控制帳務日".equals(fld)) {
+			// 系統控制用
+			if ("L8203".equals(txDataLog.getTranNo())) {
+				if ("流程控制序號".equals(fld) || "流程控制帳務日".equals(fld)) {
+					continue;
+				}
+			}
+			// 額度維護時個別加碼是系統自動計算,非人工修改
+			if ("L2154".equals(txDataLog.getTranNo())) {
+				if ("個別加碼".equals(fld)) {
 					continue;
 				}
 			}

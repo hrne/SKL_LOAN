@@ -25,9 +25,17 @@ public class LM050ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
-	
-	public List<Map<String, String>> fnEquity(TitaVo titaVo) throws Exception {
-		String entdy = String.valueOf(titaVo.getEntDyI() + 19110000);
+
+	/**
+	 * 查詢前一季淨值
+	 * 
+	 * @param iEntdy 西元年月日
+	 * @param titaVo
+	 * @return
+	 * @throws Exception
+	 **/
+	public List<Map<String, String>> fnEquity(int iEntdy, TitaVo titaVo) throws Exception {
+		String entdy = String.valueOf(iEntdy);
 		String yy = entdy.substring(0, 4);
 		String mm = entdy.substring(4, 6);
 		String yyqq = "";
@@ -61,7 +69,7 @@ public class LM050ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     WHERE \"AcDate\" = (";
 		sql += "     	SELECT MAX(\"AcDate\") ";
 		sql += "     	FROM \"InnFundApl\" ";
-		sql += "     	WHERE TRUNC(\"AcDate\" / 100) = :lyyqq";
+		sql += "     	WHERE TRUNC(\"AcDate\" / 100) < :lyyqq";
 		sql += "     )";
 		this.info("sql=" + sql);
 
@@ -72,11 +80,18 @@ public class LM050ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 
 	}
-	
-	
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
-		int inputYearMonth = (titaVo.getEntDyI() + 19110000) / 100;
+	/**
+	 * 查詢所有資料
+	 * 
+	 * @param iEntdy 西元年月日
+	 * @param titaVo
+	 * @return
+	 * @throws Exception
+	 **/
+	public List<Map<String, String>> findAll(int iEntdy, TitaVo titaVo) throws Exception {
+
+		int inputYearMonth = iEntdy / 100;
 
 		this.info("LM050ServiceImpl findAll inputYearMonth=" + inputYearMonth);
 
@@ -133,7 +148,7 @@ public class LM050ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              ,NULL AS \"RelName\"  ";
 		sql += "              ,NULL AS \"RelTitle\"  ";
 		sql += "              ,NULL AS \"BusTitle\"  ";
-		sql += "             FROM \"LifeRelEmp\" ";	
+		sql += "             FROM \"LifeRelEmp\" ";
 		sql += "             WHERE TRUNC(\"AcDate\" / 100 ) = :inputYearMonth ";
 		sql += "           ) S1 ON S1.\"RptId\" = CM.\"CustId\" ";
 		sql += " GROUP BY CASE ";
@@ -160,7 +175,6 @@ public class LM050ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ORDER BY \"RptType\" ";
 		sql += "        , \"LoanBal\" DESC  ";
 		this.info("sql=" + sql);
-	
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
@@ -169,6 +183,130 @@ public class LM050ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 
 	}
-	
+
+	public List<Map<String, String>> find(int iEntdy, TitaVo titaVo) throws Exception {
+
+		int inputYearMonth = iEntdy / 100;
+
+		this.info("LM050ServiceImpl findAll inputYearMonth=" + inputYearMonth);
+
+		String sql = " ";
+		sql += " SELECT CASE ";
+		sql += "          WHEN NVL(S1.\"Rel\",' ') = ' ' ";
+		sql += "          THEN '3' "; // -- 一般客戶
+		sql += "          WHEN S1.\"Rel\" = 'N' ";
+		sql += "          THEN '2' "; // -- 職員
+		sql += "          WHEN S1.\"Rel\" = 'A' ";
+		sql += "          THEN '1' "; // -- A
+		sql += "        ELSE '3' "; // -- 保險業利害關係人放款管理辦法第3條利害關係人
+		sql += "        END               AS \"RptType\" "; // F0
+		sql += "      , CASE ";
+		sql += "          WHEN NVL(S1.\"RptId\",' ') != ' ' ";
+		sql += "          THEN S0.\"CustNo\" ";
+		sql += "        ELSE 0 END        AS \"CustNo\"  "; // F1
+		sql += "      , CASE ";
+		sql += "          WHEN NVL(S1.\"RptId\",' ') != ' ' ";
+		sql += "          THEN CM.\"CustName\" ";
+		sql += "        ELSE N' ' END      AS \"CustName\"  "; // F2
+		sql += "      , SUM(S0.\"LoanBal\") AS \"LoanBal\" "; // F3
+		sql += "      ,decode(s1.\"BusTitle\",NULL,decode(\"RelName\",NULL";
+		sql += "      ,'為本公司負責人' || \"HeadTitle\" ";
+		sql += "      ,'為本公司負責人' ||'('|| \"HeadTitle\" || decode(\"RelTitle\",'本人',' ',\"HeadName\") || ')' || decode(\"RelTitle\",'本人',' ','之'||\"RelTitle\"))  ";
+		sql += "      ,'該公司' ||\"BusTitle\" ||'('|| \"RelName\" || ')'||'為本公司'||\"HeadTitle\" ||'之'||\"RelTitle\" )AS 	\"Remark\"  ";
+		sql += " FROM ( SELECT \"CustNo\" ";
+		sql += "             , SUM(\"LoanBalance\") AS \"LoanBal\" ";
+		sql += "        FROM \"MonthlyLoanBal\" ";
+		sql += "        WHERE \"YearMonth\" = :inputYearMonth  ";
+		sql += "          AND \"LoanBalance\" > 0 ";
+		sql += "        GROUP BY \"CustNo\" ";
+		sql += "      ) S0 ";
+		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = S0.\"CustNo\" ";
+		sql += " LEFT JOIN ( SELECT ";
+		sql += "             decode(\"BusId\",'-',decode(\"RelId\",'-',\"HeadName\",\"RelName\"),\"BusName\")as \"CustName\"  ";
+		sql += "             ,to_char(decode(\"BusId\",'-',decode(\"RelId\",'-',\"HeadId\",\"RelId\"),\"BusId\"))as \"RptId\"  ";
+		sql += "             ,\"RelWithCompany\" as \"Rel\"";
+		sql += "             ,\"HeadName\" ";
+		sql += "             ,\"HeadTitle\" ";
+		sql += "             ,\"RelName\" ";
+		sql += "             ,\"RelTitle\" ";
+		sql += "             ,\"BusTitle\" ";
+		sql += "             FROM \"LifeRelHead\" ";
+		sql += "             WHERE \"RelWithCompany\"='A' ";
+		sql += "             AND TRUNC(\"AcDate\" / 100 ) = :inputYearMonth ";
+		sql += "             AND \"LoanBalance\" > 0 ";
+		sql += "             UNION ";
+		sql += "             SELECT \"EmpName\" AS \"CustName\" ";
+		sql += "              ,TO_CHAR(\"EmpId\") AS \"RptId\" ";
+		sql += "                      ,'N' AS \"Rel\"  ";
+		sql += "              ,NULL AS \"HeadName\"  ";
+		sql += "              ,NULL AS \"HeadTitle\"  ";
+		sql += "              ,NULL AS \"RelName\"  ";
+		sql += "              ,NULL AS \"RelTitle\"  ";
+		sql += "              ,NULL AS \"BusTitle\"  ";
+		sql += "             FROM \"LifeRelEmp\" ";
+		sql += "             WHERE TRUNC(\"AcDate\" / 100 ) = :inputYearMonth ";
+		sql += "           ) S1 ON S1.\"RptId\" = CM.\"CustId\" ";
+		sql += " GROUP BY CASE ";
+		sql += "            WHEN NVL(S1.\"Rel\",' ') = ' ' ";
+		sql += "            THEN '3' "; // -- 一般客戶
+		sql += "            WHEN S1.\"Rel\" ='N' ";
+		sql += "            THEN '2' "; // -- 職員
+		sql += "          WHEN S1.\"Rel\" = 'A' ";
+		sql += "          THEN '1' "; // -- A
+		sql += "          ELSE '3' "; // -- 保險業利害關係人放款管理辦法第3條利害關係人
+		sql += "          END ";
+		sql += "        , CASE ";
+		sql += "            WHEN NVL(S1.\"RptId\",' ') != ' ' ";
+		sql += "            THEN S0.\"CustNo\" ";
+		sql += "          ELSE 0 END ";
+		sql += "        , CASE ";
+		sql += "            WHEN NVL(S1.\"RptId\",' ') != ' ' ";
+		sql += "            THEN CM.\"CustName\" ";
+		sql += "          ELSE N' ' END ";
+		sql += "      ,decode(s1.\"BusTitle\",NULL,decode(\"RelName\",NULL";
+		sql += "      ,'為本公司負責人' || \"HeadTitle\" ";
+		sql += "      ,'為本公司負責人' ||'('|| \"HeadTitle\" || decode(\"RelTitle\",'本人',' ',\"HeadName\")|| ')' ||decode(\"RelTitle\",'本人',' ','之'||\"RelTitle\"))  ";
+		sql += "      ,'該公司' ||\"BusTitle\" ||'('|| \"RelName\" || ')'||'為本公司'||\"HeadTitle\" ||'之'||\"RelTitle\")  ";
+		sql += " ORDER BY \"RptType\" ";
+		sql += "        , \"LoanBal\" DESC  ";
+		this.info("sql=" + sql);
+
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("inputYearMonth", inputYearMonth);
+		return this.convertToMap(query);
+
+	}
+
+	/**
+	 * 放款折溢價與催收費用的合計
+	 * 
+	 * @param iEntdy 西元年月日
+	 * @param titaVo
+	 * @return
+	 * @throws Exception
+	 **/
+	public List<Map<String, String>> findAmtTotal(int iEntdy, TitaVo titaVo) throws Exception {
+
+		int inputYearMonth = iEntdy / 100;
+
+		this.info("LM050ServiceImpl findAll inputYearMonth=" + inputYearMonth);
+
+		String sql = " ";
+		sql += " select  sum(\"LoanBal\") as \"LoanBal\"";
+		sql += " from \"MonthlyLM052AssetClass\"";
+		sql += " where \"YearMonth\" = :inputYearMonth";
+		sql += "   and \"AssetClassNo\" in ('61','62')";
+
+		this.info("sql=" + sql);
+
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("inputYearMonth", inputYearMonth);
+		return this.convertToMap(query);
+
+	}
 
 }

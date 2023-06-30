@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L5;
 
 import java.util.ArrayList;
+import java.text.SimpleDateFormat;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -13,15 +14,20 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.dataVO.TxCom;
 import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.FacClose;
 import com.st1.itx.db.domain.InnDocRecord;
 import com.st1.itx.db.domain.InnDocRecordId;
 import com.st1.itx.db.domain.TxTeller;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.FacCloseService;
 import com.st1.itx.db.service.InnDocRecordService;
 import com.st1.itx.db.service.TxTellerService;
+import com.st1.itx.db.service.CdEmpService;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.mail.MailService;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -52,6 +58,13 @@ public class L5103 extends TradeBuffer {
 	@Autowired
 	public CdCodeService sCdCodeDefService;
 
+	@Autowired
+	CdEmpService cdEmpService;
+	@Autowired
+	private MailService mailService;
+	@Autowired
+	public CustMainService custMainService;
+	
 	private InnDocRecord tInnDocRecord = new InnDocRecord();
 	private InnDocRecordId tInnDocRecordId = new InnDocRecordId();
 	private TempVo tTempVo = new TempVo();
@@ -75,6 +88,7 @@ public class L5103 extends TradeBuffer {
 		this.info("cfGroupNo==" + cfGroupNo);
 		txCom.setConfirmGroupNo(cfGroupNo);
 		this.txBuffer.setTxCom(txCom);
+		boolean emailfg = false;
 
 //		1.登 2.放 3.審 4.審放
 		if (titaVo.getActFgI() <= 1) {
@@ -154,6 +168,7 @@ public class L5103 extends TradeBuffer {
 						tInnDocRecord.setReturnDate(rdate);
 						tInnDocRecord.setReturnEmpNo(rEmpNo);
 					}
+					emailfg = true;
 					break;
 				case 3: // 審閱
 					if (rdate > 0) {
@@ -165,6 +180,7 @@ public class L5103 extends TradeBuffer {
 					break;
 				case 4: // 審閱放行
 					tInnDocRecord.setTitaActFg(titaVo.getActFgI() + "");
+					emailfg = true;
 					break;
 				}
 			} else {
@@ -184,6 +200,10 @@ public class L5103 extends TradeBuffer {
 				innDocRecordService.update(tInnDocRecord, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", "InnDocRecord " + e.getErrorMsg());
+			}
+			// email通知
+			if (emailfg) {
+				processEmail(tInnDocRecord, titaVo); 
 			}
 		}
 //		 歸還清償正本時最後步驟更新清償作業檔的銷號欄
@@ -387,4 +407,90 @@ public class L5103 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0007", "L5103 updateModify " + e.getErrorMsg());
 		}
 	}
+	
+	/*---------- 主管放行時email通知 管理人/借閱人 ----------*/
+	public void processEmail(InnDocRecord tInnDocRecord, TitaVo titaVo) throws LogicException {
+		this.info("processEmail");
+		String subject1 = "ＯＯ系統-文件調閱通知 " ;
+		String subject2 = "ＯＯ系統-文件調閱完成通知 " ;
+
+		String bodyText = "";
+		String applemail = "";
+		String keeperemail = "";
+		String applname = "";
+		String custname = "";
+		String copyCode = "";
+		String applObj= "";
+
+		if(!"".equals(tInnDocRecord.getApplEmpNo().trim())) {//借閱人
+			CdEmp tCdEmp = cdEmpService.findById(tInnDocRecord.getApplEmpNo(), titaVo);
+			if (tCdEmp != null && !"".equals(tCdEmp.getEmail().trim())) {
+				applname = tCdEmp.getFullname();
+				applemail = tCdEmp.getEmail();
+			}
+		}
+		if(!"".equals(tInnDocRecord.getKeeperEmpNo().trim())) {//管理人
+			CdEmp tCdEmp = cdEmpService.findById(tInnDocRecord.getKeeperEmpNo(), titaVo);
+			if (tCdEmp != null && !"".equals(tCdEmp.getEmail().trim())) {
+				keeperemail = tCdEmp.getEmail();
+			}
+		}
+
+		// 若為借閱人主管放行,則通知管理人
+		if (titaVo.getActFgI() == 2 && !"".equals(keeperemail.trim())) {
+			this.info("tCdEmp.getEmail()=" + keeperemail.trim());
+			if (tInnDocRecord.getCustNo() > 0) {// 戶名
+				CustMain tCustMain = custMainService.custNoFirst(tInnDocRecord.getCustNo(), tInnDocRecord.getCustNo(),
+						titaVo);
+				if (tCustMain != null) {
+					custname = tCustMain.getCustName();
+				}
+			}
+			if (!"".equals(tInnDocRecord.getCopyCode())) {// 正本/影本 項目中文
+				CdCode tCdCode = sCdCodeDefService.getItemFirst(5, "CopyCode", tInnDocRecord.getCopyCode(), titaVo);
+				if (tCdCode != null) {
+					copyCode = tCdCode.getItem();
+				}
+			}
+			if (!"".equals(tInnDocRecord.getApplObj())) {// 文件 項目中文
+				CdCode tCdCode = sCdCodeDefService.getItemFirst(5, "ApplObj", tInnDocRecord.getApplObj(), titaVo);
+				if (tCdCode != null) {
+					applObj = tCdCode.getItem();
+				}
+			}
+			
+			String createDate = DbDateToRocDate(tInnDocRecord.getCreateDate().toString());
+			String createTime = new SimpleDateFormat("HH:mm:ss").format(tInnDocRecord.getCreateDate());
+			
+			bodyText += "【新貸中系統】文件調閱，敬請協助後續處理。<br>";
+			bodyText += "申請時間：" + createDate + " " + createTime.substring(0, 5) + "<br>";
+			bodyText += "戶號：" + tInnDocRecord.getCustNo()+"<br>";
+			bodyText += "借戶：" + custname+"<br>";
+			bodyText += "正本/影本：" + copyCode+"<br>";
+			bodyText += "文件：" + applObj+"<br>";
+			bodyText += "申請人：" + applname+"<br>";
+			this.info("subject1=" + subject1 + " ,bodyText=" + bodyText);
+			mailService.setParams(keeperemail, subject1, bodyText);
+			mailService.exec();
+		}
+		// 若為管理人主管放行,則通知借閱人
+		if (titaVo.getActFgI() == 4 && !"".equals(applemail.trim())) {
+			this.info("tCdEmp.getEmail()=" + applemail.trim());
+			bodyText += "【新貸中系統】調閱文件已備妥，請盡速領取。";
+			this.info("subject2=" + subject2 + " ,bodyText=" + bodyText);
+			mailService.setParams(applemail, subject2, bodyText);
+			mailService.exec();
+		}
+	}
+	private String DbDateToRocDate(String DbDate) {
+		this.info("LC010 DbDateToRocDate : " + DbDate);
+
+		String SysDateY = DbDate.substring(0, 4);
+		int RocDate9 = Integer.valueOf(SysDateY) - 1911;
+		String RocDate = String.valueOf(RocDate9) + "/" + DbDate.substring(5, 7) + "/" + DbDate.substring(8, 10);
+
+		return RocDate;
+	}
+
+
 }

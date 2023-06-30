@@ -44,9 +44,9 @@ E(0,0)
 ]
 
 ! 2021-07-28 智偉增加
-#FUNCIND=_,_,S
-E(0,5)
-<include src="COM.icf::CheckAuth.rtn"/>
+!#FUNCIND=_,_,S
+!E(0,5)
+!<include src="COM.icf::CheckAuth.rtn"/>
 
 ! 必輸欄位
 ##loop{times:3,i:1}

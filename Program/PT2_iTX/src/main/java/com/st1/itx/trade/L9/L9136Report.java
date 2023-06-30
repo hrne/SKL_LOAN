@@ -152,8 +152,9 @@ public class L9136Report extends MakeReport {
 				String[] tmpNewContent = r.get("New").replaceAll("\\[", "").replaceAll("\\]", "")
 						.replaceAll("\\\\n", "").replaceAll("\\,", "@").split("@");
 				// 要排除的字段
+				// 參考L6934排除項目說明
 				String[] word = { "最後更新日期時間", "最後更新人員", "建檔日期時間", "交易進行記號", "上次櫃員編號", "上次交易序號", "已編BorTx流水號", "上次會計日",
-						"會計日期", "上次交易行別", "上次交易日", "經辦合理性說明", "流程控制帳務日", "流程控制序號" };
+						"會計日期", "上次交易行別", "上次交易日", "經辦合理性說明", "流程控制帳務日", "流程控制序號", "個別加碼" };
 
 				List<String> tmpWord = new ArrayList<String>(Arrays.asList(word));
 				List<String> tmp1 = new ArrayList<String>(Arrays.asList(tmpUpdateItem));
@@ -393,7 +394,8 @@ public class L9136Report extends MakeReport {
 			if (r.get("ApproveNo").trim().length() != 0) {
 
 				// 核准號碼
-				this.print(0, 56,  r.get("ApproveNo").trim().length() == 0 ? " " : fillUpWord(r.get("ApproveNo"), 7, "0", "L"));
+				this.print(0, 56,
+						r.get("ApproveNo").trim().length() == 0 ? " " : fillUpWord(r.get("ApproveNo"), 7, "0", "L"));
 				// 押品別
 				this.print(0, 66, r.get("ClCode1") == null ? " "
 						: r.get("ClCode1") + "  " + r.get("ClCode2") + "  " + r.get("ClName"));
@@ -408,7 +410,8 @@ public class L9136Report extends MakeReport {
 
 		} else {
 			// 核准號碼
-			this.print(0, 56, r.get("ApproveNo").trim().length() == 0 ? " " : fillUpWord(r.get("ApproveNo"), 7, "0", "L"));
+			this.print(0, 56,
+					r.get("ApproveNo").trim().length() == 0 ? " " : fillUpWord(r.get("ApproveNo"), 7, "0", "L"));
 			// 押品別
 			this.print(0, 66, r.get("ClCode1") + "  " + r.get("ClCode2") + "  " + r.get("ClName"));
 			// 押品號碼

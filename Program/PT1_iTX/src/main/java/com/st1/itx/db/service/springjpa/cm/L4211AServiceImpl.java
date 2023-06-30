@@ -109,6 +109,8 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "    , TX2.\"AcDate\" ";// 除錯時查資料用欄位
 			sql += "    , TX2.\"TitaTlrNo\" ";// 除錯時查資料用欄位
 			sql += "    , TX2.\"TitaTxtNo\""; // 除錯時查資料用欄位
+			sql += "    , CASE WHEN TX2.\"TitaTxCd\" IN ( 'L3410','L3420') THEN '1' ";
+			sql += "           ELSE '2' END AS \"SortingForClose\""; //1 結清 2入帳
 			sql += "    , CASE WHEN NVL(TX1.\"AcDate\",0) = 0 THEN '9999' ";
 			sql += "    	   WHEN NVL(JSON_VALUE(BATX.\"ProcNote\", '$.FacStatus'), ' ') <> ' ' THEN '999' ";
 			sql += "           WHEN TX1.\"FacmNo\" = 0 THEN '999' ";
@@ -150,7 +152,10 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "     ELSE BATX.\"ReconCode\" ";
 			sql += "     END = BATX.\"ReconCode\"";
 			sql += " AND BATX.\"RepayCode\" = '01'"; // 匯款轉帳
-//			sql += " AND BATX.\"ProcStsCode\" <> 'D' ";// 刪除
+			sql += " AND BATX.\"ProcStsCode\" IN ( '5'  ";// 單筆入帳
+			sql += "                           , '6' "; // 批次入帳
+			sql += "                           , '7') ";// 批次人工
+
 
 
 		} else if (printNo == 2) {
@@ -207,10 +212,14 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "    , TX2.\"AcDate\" ";// 除錯時查資料用欄位
 			sql += "    , TX2.\"TitaTlrNo\" ";// 除錯時查資料用欄位
 			sql += "    , TX2.\"TitaTxtNo\""; // 除錯時查資料用欄位
-			sql += "    , CASE WHEN NVL(JSON_VALUE(BATX.\"ProcNote\", '$.FacStatus'), ' ') <> ' ' THEN '999' ";
+			sql += "    , CASE WHEN TX2.\"TitaTxCd\" IN ( 'L3410','L3420') THEN '1' ";
+			sql += "           ELSE '2' END AS \"SortingForClose\""; //1 結清 2入帳
+			sql += "    , CASE WHEN BATX.\"ProcStsCode\" IN ( '2','3','4') THEN '99999' ";
+			sql += "    	   WHEN NVL(JSON_VALUE(BATX.\"ProcNote\", '$.FacStatus'), ' ') <> ' ' THEN '999' ";
 			sql += "           WHEN TX1.\"FacmNo\" = 0 THEN '999' ";
 			sql += "           ELSE NVL(FAC.\"AcctCode\",'999') END AS \"SortingForSubTotal\""; // 配合小計產生的排序
-			sql += "    , CASE WHEN NVL(JSON_VALUE(BATX.\"ProcNote\", '$.FacStatus'), ' ') <> ' ' THEN '暫收款' ";
+			sql += "    , CASE WHEN BATX.\"ProcStsCode\" IN ( '2','3','4') THEN '待處理' ";
+			sql += "   	       WHEN NVL(JSON_VALUE(BATX.\"ProcNote\", '$.FacStatus'), ' ') <> ' ' THEN '暫收款' ";
 			sql += "           WHEN TX1.\"FacmNo\" = 0 THEN '暫收款' ";
 			sql += "           ELSE \"Fn_GetCdCode\"('AcctCode',FAC.\"AcctCode\") END AS \"AcctItem\"";
 //			sql += " 	, \"Fn_GetCdCode\"('AcctCode',FAC.\"AcctCode\") AS \"AcctItem\"";
@@ -300,6 +309,8 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "    , TX2.\"AcDate\" ";// 除錯時查資料用欄位
 			sql += "    , TX2.\"TitaTlrNo\" ";// 除錯時查資料用欄位
 			sql += "    , TX2.\"TitaTxtNo\""; // 除錯時查資料用欄位
+			sql += "    , CASE WHEN TX2.\"TitaTxCd\" IN ( 'L3410','L3420') THEN '1' ";
+			sql += "           ELSE '2' END AS \"SortingForClose\""; //1 結清 2入帳
 			sql += "    , CASE WHEN NVL(JSON_VALUE(BATX.\"ProcNote\", '$.FacStatus'), ' ') <> ' ' THEN '999' ";
 			sql += "           WHEN TX1.\"FacmNo\" = 0 THEN '999' ";
 			sql += "           ELSE NVL(FAC.\"AcctCode\",'999') END AS \"SortingForSubTotal\""; // 配合小計產生的排序

@@ -228,31 +228,43 @@ public class L4211Report extends MakeReport {
 		List<Map<String, String>> fnAllList2 = new ArrayList<Map<String, String>>();
 		List<Map<String, String>> fnAllList3 = new ArrayList<Map<String, String>>();
 
-		// 一般排序
-		fnAllList1 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
-				.ascString("SortingForSubTotal").ascString("EntryDate").ascString("DetailSeq").ascString("AcSeq")
-				.ascString("CustNo").getList();
-		// 金額排序
-		fnAllList2 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
-				.ascString("SortingForSubTotal").ascString("CloseReasonCode").ascString("EntryDate")
-				.descNumber("RepayAmt").ascString("CustNo").ascString("DetailSeq").ascString("AcSeq").getList();
+		// 以金額及戶號排序區分已處理及待處理
+		for (Map<String, String> r : fnAllList) {
 
-		// 戶號排序
-//		SinputReconCode = String.valueOf(titaVo.get("ReconCode")).trim();
-//		fnAllList3 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
-//				.ascString("SortingForSubTotal").ascString("EntryDate").ascString("CustNo").ascString("DetailSeq")
-//				.ascString("AcSeq").getList();
-		fnAllList3 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
-				.ascString("CaseCloseCode").ascString("EntryDate").ascString("CustNo").descNumber("RepayAmt")
+			Map<String, String> r1 = new HashMap<>(r);
+			Map<String, String> r2 = new HashMap<>(r);
+			if ("99999".equals(r.get("SortingForSubTotal"))) {
+				r1.put("TxAmt", r.get("RepayAmt"));
+				r2.put("TxAmt", r.get("RepayAmt"));
+			} else {
+				r2.put("SortingForSubTotal", "888");
+				r2.put("AcctItem", "擔保放款");
+			}
+			fnAllList1.add(r1);
+			fnAllList2.add(r2);
+			fnAllList3.add(r2);
+		}
+		// 科目排序
+		fnAllList1 = sortMapListCom.beginSort(fnAllList1).ascString("ReconCode").ascString("BatchNo")
+				.ascString("SortingForSubTotal").ascString("DetailSeq").ascString("AcSeq").ascString("CustNo")
+				.getList();
+
+		// 金額排序:已處理/待處理 + 結清 + 金額 + 戶號
+		fnAllList2 = sortMapListCom.beginSort(fnAllList2).ascString("ReconCode").ascString("BatchNo")
+				.ascString("SortingForSubTotal").ascString("SortingForClose").descNumber("RepayAmt").ascString("CustNo")
 				.ascString("DetailSeq").ascString("AcSeq").getList();
 
-//		fnAllList2 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
-//				.ascString("SortingForSubTotal").ascString("EntryDate").descNumber("RepayAmt").ascString("CustNo")
-//				.ascString("DetailSeq").ascString("AcSeq").getList();
+		// 戶號排序:已處理/待處理 + 結清 + 戶號 + 金額
+		fnAllList3 = sortMapListCom.beginSort(fnAllList3).ascString("ReconCode").ascString("BatchNo")
+				.ascString("SortingForSubTotal").ascString("SortingForClose").ascString("CustNo").descNumber("RepayAmt")
+				.ascString("DetailSeq").ascString("AcSeq").getList();
 
 		makePdf(fnAllList1, fnAllList2, fnAllList3, false, titaVo);
 	}
 
+	/**
+	 * 由L420A進入
+	 */
 	public void execWithBatchMapList(List<Map<String, String>> fnAllList, TitaVo titaVo) throws LogicException {
 
 		List<Map<String, String>> fnAllList1 = new ArrayList<Map<String, String>>();
@@ -371,6 +383,9 @@ public class L4211Report extends MakeReport {
 		this.close();
 	}
 
+	/**
+	 * 科目排序
+	 */
 	private void report1(List<Map<String, String>> fnAllList, boolean isBatchMapList) throws LogicException {
 		String lastSortingForSubTotal = ""; // 上一個SortingForSubTotal
 		String lastAcctItem = ""; // 上一個AcctItem
@@ -402,12 +417,6 @@ public class L4211Report extends MakeReport {
 		}
 		boolean isBatchFlag = false;
 		for (Map<String, String> tfnAllList : fnAllList) {
-
-			// 作帳金額0 表示(人工處理、檢核正常、檢核錯誤)
-			if ("0".equals(tfnAllList.get("AcctAmt")) && printNo == 2) {
-				tmpUnProcessed = tmpUnProcessed.add(getBigDecimal(tfnAllList.get("AcctAmt")));
-				continue;
-			}
 
 			String dfMakeferAmt = formatAmt(tfnAllList.get("AcctAmt"), 0);
 			String dfPrincipal = formatAmt(tfnAllList.get("Principal"), 0);
@@ -687,15 +696,6 @@ public class L4211Report extends MakeReport {
 
 				atAll();
 
-				// 2入帳後檢核明細表
-				if (printNo == 2) {
-					this.print(1, 0, "");
-					this.print(1, 0,
-							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-					this.print(1, 2, "應待處理總金額，共總計   " + formatAmt(tmpUnProcessed, 0));
-
-				}
-
 				totalsumTransferAmt = totalsumTransferAmt.add(allsumTransferAmt);
 				totalsumMakerferAmt = totalsumMakerferAmt.add(allsumMakeferAmt);
 				totalsumPrincipal = totalsumPrincipal.add(allsumPrincipal);
@@ -747,6 +747,10 @@ public class L4211Report extends MakeReport {
 		} // for
 	}
 
+	/**
+	 * 金額排序
+	 */
+
 	private void report2(List<Map<String, String>> fnAllList, boolean isBatchMapList) throws LogicException {
 		String lastSortingForSubTotal = ""; // 上一個SortingForSubTotal
 		String lastAcctItem = ""; // 上一個AcctItem
@@ -779,12 +783,6 @@ public class L4211Report extends MakeReport {
 
 		boolean isBatchFlag = false;
 		for (Map<String, String> tfnAllList : fnAllList) {
-
-			// 作帳金額0 表示(人工處理、檢核正常、檢核錯誤)
-			if ("0".equals(tfnAllList.get("AcctAmt")) && printNo == 2) {
-				tmpUnProcessed = tmpUnProcessed.add(getBigDecimal(tfnAllList.get("AcctAmt")));
-				continue;
-			}
 
 //			String dfTransferAmt = formatAmt(tfnAllList.get("TxAmt"), 0);
 			String dfMakeferAmt = formatAmt(tfnAllList.get("AcctAmt"), 0);
@@ -895,22 +893,6 @@ public class L4211Report extends MakeReport {
 						totalsumCollection = totalsumCollection.add(allsumCollection);
 						totalsumShortPayment = totalsumShortPayment.add(allsumShortPayment);
 						totalsumOthers = totalsumOthers.add(allsumOthers);
-
-						if (currentSortingForSubTotal.equals("9999") && !isBatchFlag) {
-							this.print(1, 0,
-									"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-
-							this.print(1, 2, "批次入帳");
-
-							this.print(0, 14, " 合計 ");
-
-							totalAll();
-
-							this.print(1, 0, "");
-
-							isBatchFlag = true;
-
-						}
 
 						allsumTransferAmt = BigDecimal.ZERO;
 						allsumMakeferAmt = BigDecimal.ZERO;
@@ -1056,24 +1038,11 @@ public class L4211Report extends MakeReport {
 			if (count == fnAllList.size()) {
 				this.print(1, 0,
 						"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-				if (currentSortingForSubTotal.equals("9999")) {
-					this.print(1, 2, "人工入帳");
-					this.print(0, 14, " 合計 ");
-				} else {
-					this.print(1, 2, lastAcctItem);
-					this.print(0, 14, " 小計 ");
-				}
+
+				this.print(1, 2, lastAcctItem);
+				this.print(0, 14, " 小計 ");
 
 				atAll();
-
-				// 2入帳後檢核明細表
-				if (printNo == 2) {
-					this.print(1, 0, "");
-					this.print(1, 0,
-							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-					this.print(1, 2, "應待處理總金額，共總計   " + formatAmt(tmpUnProcessed, 0));
-
-				}
 
 				totalsumTransferAmt = totalsumTransferAmt.add(allsumTransferAmt);
 				totalsumMakerferAmt = totalsumMakerferAmt.add(allsumMakeferAmt);
@@ -1122,6 +1091,9 @@ public class L4211Report extends MakeReport {
 		} // for
 	}
 
+	/**
+	 * 戶號排序
+	 */
 	private void report3(List<Map<String, String>> fnAllList, boolean isBatchMapList) throws LogicException {
 		String lastSortingForSubTotal = ""; // 上一個SortingForSubTotal
 //		String lastAcctItem = ""; // 上一個AcctItem
@@ -1155,12 +1127,6 @@ public class L4211Report extends MakeReport {
 		boolean isBatchFlag = false;
 		for (Map<String, String> tfnAllList : fnAllList) {
 
-			// 作帳金額0 表示(人工處理、檢核正常、檢核錯誤)
-			if ("0".equals(tfnAllList.get("AcctAmt")) && printNo == 2) {
-				tmpUnProcessed = tmpUnProcessed.add(getBigDecimal(tfnAllList.get("AcctAmt")));
-				continue;
-			}
-
 //			String dfTransferAmt = formatAmt(tfnAllList.get("TxAmt"), 0);
 			String dfMakeferAmt = formatAmt(tfnAllList.get("AcctAmt"), 0);
 			String dfPrincipal = formatAmt(tfnAllList.get("Principal"), 0);
@@ -1187,20 +1153,6 @@ public class L4211Report extends MakeReport {
 			String currentSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
 			// 判斷當前的批號與批次號碼不同
 			if (!msName.equals(tfnAllList.get("ReconCode")) || !msNum.equals(tfnAllList.get("BatchNo"))) {
-
-				if (lastSortingForSubTotal.equals("9999") && isBatchFlag) {
-					this.print(1, 0,
-							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-
-					this.print(1, 2, "人工入帳");
-
-					this.print(0, 14, " 合計 ");
-
-					totalAll();
-
-					this.print(1, 0, "");
-
-				}
 
 				isBatchFlag = false;
 				if (npcount > 0) { // 除當頁第一筆
@@ -1288,22 +1240,6 @@ public class L4211Report extends MakeReport {
 					totalsumCollection = totalsumCollection.add(allsumCollection);
 					totalsumShortPayment = totalsumShortPayment.add(allsumShortPayment);
 					totalsumOthers = totalsumOthers.add(allsumOthers);
-
-					if (currentSortingForSubTotal.equals("9999") && !isBatchFlag) {
-						this.print(1, 0,
-								"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-
-						this.print(1, 2, "批次入帳");
-
-						this.print(0, 14, " 合計 ");
-
-						totalAll();
-
-						this.print(1, 0, "");
-
-						isBatchFlag = true;
-
-					}
 
 					allsumTransferAmt = BigDecimal.ZERO;
 					allsumMakeferAmt = BigDecimal.ZERO;
@@ -1454,29 +1390,13 @@ public class L4211Report extends MakeReport {
 //
 //				atAll();
 
-				if (currentSortingForSubTotal.equals("9999")) {
-					this.print(1, 0,
-							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-					this.print(1, 2, "人工入帳");
-					this.print(0, 14, " 合計 ");
-
-					atAll();
-				} else if (currentSortingForSubTotal.equals("999")) {
+				if (currentSortingForSubTotal.equals("999")) {
 					this.print(1, 0,
 							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 					this.print(1, 2, "暫收款");
 					this.print(0, 14, " 合計 ");
 
 					atAll();
-
-				}
-
-				// 2入帳後檢核明細表
-				if (printNo == 2) {
-					this.print(1, 0, "");
-					this.print(1, 0,
-							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-					this.print(1, 2, "應待處理總金額，共總計   " + formatAmt(tmpUnProcessed, 0));
 
 				}
 

@@ -47,11 +47,12 @@ public class LM049 extends BatchBase implements Tasklet, InitializingBean {
 	public void run() throws LogicException {
 		this.info("active LM049 ");
 
-
 		// 月底日(西元)
 		int mfbsdy = this.txBuffer.getTxCom().getMfbsdyf();
-		
-		lM049Report.exec(titaVo,mfbsdy);
+
+		this.info("mfbsdy =" + mfbsdy);
+
+		lM049Report.exec(titaVo, mfbsdy);
 
 		webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y", "LC009",
 				titaVo.getTlrNo(), "LM049放款金控法第44條利害關係人放款餘額表", titaVo);

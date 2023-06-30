@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
-
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
@@ -28,6 +27,7 @@ import com.st1.itx.db.service.FinHoldRelService;
 import com.st1.itx.db.service.LifeRelEmpService;
 import com.st1.itx.db.service.LifeRelHeadService;
 import com.st1.itx.db.service.StakeholdersStaffService;
+import com.st1.itx.util.format.StringCut;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.FileCom;
 import com.st1.itx.util.common.MakeExcel;
@@ -61,6 +61,8 @@ public class L7206 extends TradeBuffer {
 	@Autowired
 	MakeExcel makeExcel;
 
+	StringCut sStringCut;
+	
 	@Value("${iTXInFolder}")
 	private String inFolder = "";
 
@@ -198,7 +200,7 @@ public class L7206 extends TradeBuffer {
 				StakeholdersStaff sStakeholdersStaff = new StakeholdersStaff();
 
 				sStakeholdersStaff.setStaffId(id);
-				sStakeholdersStaff.setStaffName(maskData(name));
+				sStakeholdersStaff.setStaffName(StringCut.stringMask(name));
 				sStakeholdersStaff.setLoanAmount(loanAmount);
 				instakeholdersStaff.add(sStakeholdersStaff);
 
@@ -275,12 +277,12 @@ public class L7206 extends TradeBuffer {
 				LifeRelHead sLifeRelHead = new LifeRelHead();
 				sLifeRelHead.setLifeRelHeadId(sLifeRelHeadId);
 				sLifeRelHead.setRelWithCompany(iRelWithCompany);
-				sLifeRelHead.setHeadName(maskData(iHeadName));
+				sLifeRelHead.setHeadName(StringCut.stringMask(iHeadName));
 				sLifeRelHead.setHeadTitle(iHeadTitle);
-				sLifeRelHead.setRelName(maskData(iRelName));
+				sLifeRelHead.setRelName(StringCut.stringMask(iRelName));
 				sLifeRelHead.setRelKinShip(iRelKinShip);
 				sLifeRelHead.setRelTitle(iRelTitle);
-				sLifeRelHead.setBusName(maskData(iBusName));
+				sLifeRelHead.setBusName(StringCut.stringMask(iBusName));
 				sLifeRelHead.setShareHoldingRatio(iShareHoldingRatio.intValue());
 				sLifeRelHead.setBusTitle(iBusTitle);
 				sLifeRelHead.setLineAmt(iLineAmt);
@@ -393,7 +395,7 @@ public class L7206 extends TradeBuffer {
 
 				LifeRelEmp sLifeRelEmp = new LifeRelEmp();
 				sLifeRelEmp.setLifeRelEmpId(sLifeRelEmpId);
-				sLifeRelEmp.setEmpName(maskData(iEmpName));
+				sLifeRelEmp.setEmpName(StringCut.stringMask(iEmpName));
 				sLifeRelEmp.setLoanBalance(iLoanBalance);
 
 				inLifeRelEmp.add(sLifeRelEmp);
@@ -456,11 +458,11 @@ public class L7206 extends TradeBuffer {
 				FinHoldRelId sFinHoldRelId = new FinHoldRelId();
 				sFinHoldRelId.setId(iId);
 				sFinHoldRelId.setAcDate(acDate);
-				sFinHoldRelId.setCompanyName(maskData(iCompanyName));
+				sFinHoldRelId.setCompanyName(StringCut.stringMask(iCompanyName));
 				
 				FinHoldRel sFinHoldRel = new FinHoldRel();
 				sFinHoldRel.setFinHoldRelId(sFinHoldRelId);
-				sFinHoldRel.setName(maskData(iName));
+				sFinHoldRel.setName(StringCut.stringMask(iName));
 				sFinHoldRel.setBusTitle(iBusTitle);
 				sFinHoldRel.setLineAmt(iLineAmt);
 				sFinHoldRel.setLoanBalance(iLoanBalance);
