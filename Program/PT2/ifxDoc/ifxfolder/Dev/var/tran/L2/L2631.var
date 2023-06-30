@@ -251,6 +251,7 @@ T(1,@FacmNo,#NTXBUF,19,3)
 T(1,@oldFacmNo,#NTXBUF,19,3)
 
 #SetSysPar=X,1,S
+K(NOBUTTON,SHOWR)
 C(3,#CHAIN,1,S,$)
 E(0,0)ASGN(AGAIN$)
 

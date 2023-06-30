@@ -69,14 +69,15 @@ public class LM050ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     WHERE \"AcDate\" = (";
 		sql += "     	SELECT MAX(\"AcDate\") ";
 		sql += "     	FROM \"InnFundApl\" ";
-		sql += "     	WHERE TRUNC(\"AcDate\" / 100) < :lyyqq";
+		sql += "     	WHERE TRUNC(\"AcDate\" / 100) < :yyqq";
+		sql += " 	      AND \"PosbleBorPsn\" > 0 ";
 		sql += "     )";
 		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("lyyqq", yyqq);
+		query.setParameter("yyqq", yyqq);
 		return this.convertToMap(query);
 
 	}

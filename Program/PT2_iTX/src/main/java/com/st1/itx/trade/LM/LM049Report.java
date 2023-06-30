@@ -33,9 +33,6 @@ public class LM049Report extends MakeReport {
 	LM049ServiceImpl lM049ServiceImpl;
 
 	@Autowired
-	InnFundAplService sInnFundAplService;
-
-	@Autowired
 	MakeExcel makeExcel;
 
 	private BigDecimal totalOfLoanBal = BigDecimal.ZERO;
@@ -56,10 +53,10 @@ public class LM049Report extends MakeReport {
 
 		try {
 			this.info("lM049ServiceImpl.findStockHoldersEqt...");
-			findStockHoldersEqt = lM049ServiceImpl.findStockHoldersEqt(titaVo, mfbsdy);
+			findStockHoldersEqt = lM049ServiceImpl.findStockHoldersEqt(mfbsdy, titaVo);
 
 			this.info("lM049ServiceImpl.findAll...");
-			listLM049 = lM049ServiceImpl.findAll(titaVo);
+			listLM049 = lM049ServiceImpl.findAll(mfbsdy, titaVo);
 
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();

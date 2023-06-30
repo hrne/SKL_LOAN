@@ -26,7 +26,7 @@ public class LM049ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(int acDate, TitaVo titaVo) throws Exception {
 
 		this.info("lM049.findAll ");
 
@@ -332,16 +332,17 @@ public class LM049ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
+		query.setParameter("yymm", acDate / 100);
 		return this.convertToMap(query);
 	}
 
 	/*
 	 * 查前一季底的淨值(查核數)
 	 */
-	public List<Map<String, String>> findStockHoldersEqt(TitaVo titaVo, int acDate) throws Exception {
+	public List<Map<String, String>> findStockHoldersEqt(int acDate, TitaVo titaVo) throws Exception {
 
 		this.info("lM049.findStockHoldersEqt ");
-		
+
 		String entdy = String.valueOf(acDate);
 		String yy = entdy.substring(0, 4);
 		String mm = entdy.substring(4, 6);
@@ -368,14 +369,13 @@ public class LM049ServiceImpl extends ASpringJpaParm implements InitializingBean
 			yyqq = yy + "09";
 			break;
 		}
-		
-		
 
 		String sql = "";
 		sql += " select \"AcDate\" , \"StockHoldersEqt\" from \"InnFundApl\" ";
 		sql += " where \"AcDate\" = (";
 		sql += " 	select max(\"AcDate\") from \"InnFundApl\" ";
 		sql += " 	where trunc(\"AcDate\"/100) < :yymm ";
+		sql += " 	  and \"PosbleBorPsn\" > 0 ";
 		sql += " )";
 
 		this.info("sql=" + sql);
