@@ -503,7 +503,7 @@ public class L3R11 extends TradeBuffer {
 			this.totaVo.putParam("L3r11BdRmk", bdRmk); // 建物標示備註
 			this.totaVo.putParam("L3r11Prohibitperiod", Prohibitperiod); // 禁領清償日期
 			this.totaVo.putParam("L3r11ProhibitMonthMsg", prohibitMonthMsg); // 限制清償期限
-			
+
 		}
 
 		for (OccursList t : lOccursList) {
@@ -521,6 +521,7 @@ public class L3R11 extends TradeBuffer {
 		this.info("FacCloseCheck ...");
 		if (iCaseCloseCode == 0 || iCaseCloseCode == 4 || iCaseCloseCode == 5 || iCaseCloseCode == 6) {
 			boolean isAllClose = true;
+			// 輸入撥款序號=>檢核是否有其他撥款未結清
 			if (iBormNo > 0) {
 				for (LoanBorMain ln : lLoanBorMain) {
 					if (ln.getBormNo() != iBormNo && (ln.getStatus() == 0 || ln.getStatus() == 4)) {
@@ -529,6 +530,36 @@ public class L3R11 extends TradeBuffer {
 					}
 				}
 			}
+
+			// 輸入額度編號=>檢核同擔保品是否有其他額度未結清
+			if (iFacmNo > 0) {
+				Slice<ClFac> slClFac = clFacService.selectForL2017CustNo(iCustNo, iFacmNo, iFacmNo, 0,
+						Integer.MAX_VALUE, titaVo);
+				if (slClFac != null) {
+					for (ClFac t2 : slClFac.getContent()) {
+						Slice<ClFac> slClFac2 = clFacService.clNoEq(t2.getClCode1(), t2.getClCode2(), t2.getClNo(), 0,
+								Integer.MAX_VALUE, titaVo);
+						for (ClFac c : slClFac2.getContent()) {
+							if (c.getFacmNo() != iFacmNo) {
+								Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(c.getCustNo(),
+										c.getFacmNo(), c.getFacmNo(), 1, 900, 0, Integer.MAX_VALUE, titaVo);
+								if (slLoanBorMain != null) {
+									for (LoanBorMain tLoanBorMain : slLoanBorMain.getContent()) {
+										// 戶況 0: 正常戶1:展期2: 催收戶3: 結案戶4: 逾期戶5: 催收結案戶6: 呆帳戶7: 部分轉呆戶8: 債權轉讓戶9: 呆帳結案戶
+										if (tLoanBorMain.getStatus() == 0 || tLoanBorMain.getStatus() == 2
+												|| tLoanBorMain.getStatus() == 4 || tLoanBorMain.getStatus() == 6
+												|| tLoanBorMain.getStatus() == 7) {
+											isAllClose = false;
+											break;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
 			// 清償作業檔
 			if (isAllClose) {
 				boolean isFindFacClose = false;

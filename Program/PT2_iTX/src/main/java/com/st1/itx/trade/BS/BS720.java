@@ -253,7 +253,7 @@ public class BS720 extends TradeBuffer {
 		dateUtil.setDate_1(dateSent);
 		TxBizDate tTxBizDate = dateUtil.getForTxBizDate(true);// 若1號為假日,參數true則會找次一營業日,不會踢錯誤訊息
 
-		int iAcDate = tTxBizDate.getMfbsDy();// 畫面輸入年月的月底營業日
+		int iAcDate = tTxBizDate.getTmnDy();// 畫面輸入年月的月底日曆日
 
 		String acBookCode = this.txBuffer.getSystemParas().getAcBookCode();
 		String acSubBookCode = this.txBuffer.getSystemParas().getAcSubBookCode();

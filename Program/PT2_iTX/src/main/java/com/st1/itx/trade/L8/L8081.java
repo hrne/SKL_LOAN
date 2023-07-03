@@ -14,12 +14,16 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.MakeExcel;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.parse.Parse;
 import com.st1.itx.db.domain.TxAmlCredit;
 import com.st1.itx.db.service.TxAmlCreditService;
 
 import com.st1.itx.db.domain.CdBcm;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.CdBcmService;
+import com.st1.itx.db.service.CustMainService;
 
 @Service("L8081")
 @Scope("prototype")
@@ -37,6 +41,12 @@ public class L8081 extends TradeBuffer {
 
 	@Autowired
 	CdBcmService cdBcmService;
+
+	@Autowired
+	public MakeExcel makeExcel;
+
+	@Autowired
+	CustMainService sCustMainService;
 
 	@Autowired
 	Parse parse;
@@ -68,13 +78,16 @@ public class L8081 extends TradeBuffer {
 		Slice<TxAmlCredit> slTxAmlCredit = null;
 
 		List<String> reviewType = Arrays.asList("H");
-		
+
 		if ("9".equals(iStatus)) {
-			slTxAmlCredit = txAmlCreditService.processAll(reviewType, iAcDate1, iAcDate2, iProcessType, this.index, this.limit);
+			slTxAmlCredit = txAmlCreditService.processAll(reviewType, iAcDate1, iAcDate2, iProcessType, this.index,
+					this.limit);
 		} else if ("1".equals(iStatus)) {
-			slTxAmlCredit = txAmlCreditService.processYes(reviewType, iAcDate1, iAcDate2, iProcessType, 0, this.index, this.limit);
+			slTxAmlCredit = txAmlCreditService.processYes(reviewType, iAcDate1, iAcDate2, iProcessType, 0, this.index,
+					this.limit);
 		} else {
-			slTxAmlCredit = txAmlCreditService.processNo(reviewType, iAcDate1, iAcDate2, iProcessType, 0, this.index, this.limit);
+			slTxAmlCredit = txAmlCreditService.processNo(reviewType, iAcDate1, iAcDate2, iProcessType, 0, this.index,
+					this.limit);
 		}
 
 		List<TxAmlCredit> lTxAmlCredit = slTxAmlCredit == null ? null : slTxAmlCredit.getContent();
@@ -108,6 +121,58 @@ public class L8081 extends TradeBuffer {
 			this.totaVo.setMsgEndToEnter();// 手動折返
 		}
 
+		// 下載高風險郵寄名單及明細
+		// 列數
+
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "L8081";
+		String fileItem = "下載高風險郵寄名單及明細";
+		String fileName = "下載高風險郵寄名單及明細";
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+		makeExcel.open(titaVo, reportVo, fileName);
+		Slice<TxAmlCredit> slTxAmlCredit2 = null;
+
+		List<String> reviewType2 = Arrays.asList("H");
+
+		if ("9".equals(iStatus)) {
+			slTxAmlCredit2 = txAmlCreditService.processAll(reviewType2, iAcDate1, iAcDate2, iProcessType, this.index,
+					this.limit);
+		} else if ("1".equals(iStatus)) {
+			slTxAmlCredit2 = txAmlCreditService.processYes(reviewType2, iAcDate1, iAcDate2, iProcessType, 0, this.index,
+					this.limit);
+		} else {
+			slTxAmlCredit2 = txAmlCreditService.processNo(reviewType2, iAcDate1, iAcDate2, iProcessType, 0, this.index,
+					this.limit);
+		}
+
+		List<TxAmlCredit> lTxAmlCredit2 = slTxAmlCredit2 == null ? null : slTxAmlCredit2.getContent();
+
+		if (lTxAmlCredit2 == null) {
+			throw new LogicException("E0001", "");
+		} else {
+			makeExcel.setValue(1, 1, "郵遞區號");
+			makeExcel.setValue(1, 2, "地址");
+			makeExcel.setValue(1, 3, "姓名");
+			int row = 1;
+			for (TxAmlCredit txAmlCredit2 : lTxAmlCredit2) {
+				row++;
+				CustMain sCustMain2 = new CustMain();
+				sCustMain2 = sCustMainService.custIdFirst(txAmlCredit2.getCustKey(), titaVo);
+				makeExcel.setValue(row, 1, sCustMain2.getCurrZip3() + "-" + sCustMain2.getCurrZip2());
+				makeExcel.setValue(row, 2,
+						sCustMain2.getCurrCityCode() + sCustMain2.getCurrAreaCode() + sCustMain2.getCurrRoad()
+								+ sCustMain2.getCurrSection() + sCustMain2.getCurrAlley() + sCustMain2.getCurrLane()
+								+ sCustMain2.getCurrNum() + sCustMain2.getCurrNumDash() + sCustMain2.getCurrFloor()
+								+ sCustMain2.getCurrFloorDash());
+				makeExcel.setValue(row, 3, sCustMain2.getCustName());
+
+			}
+
+		}
+
+		makeExcel.close();
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

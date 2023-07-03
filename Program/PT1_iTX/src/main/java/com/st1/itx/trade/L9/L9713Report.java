@@ -16,6 +16,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
+import com.st1.itx.util.parse.Parse;
 
 @Component
 @Scope("prototype")
@@ -75,10 +76,10 @@ public class L9713Report extends MakeReport {
 
 	}
 
-	public boolean exec(TitaVo titaVo) throws LogicException {
+	public BigDecimal exec(TitaVo titaVo) throws LogicException {
 
 		this.info("L9713Report exec");
-
+		BigDecimal checqueAmt = BigDecimal.ZERO;
 		int iEntdy = Integer.valueOf(titaVo.getParam("ACCTDATE")) + 19110000;
 		int iYear = (Integer.valueOf(titaVo.getParam("ACCTDATE")) + 19110000) / 10000;
 		int iMonth = ((Integer.valueOf(titaVo.getParam("ACCTDATE")) + 19110000) / 100) % 100;
@@ -142,7 +143,7 @@ public class L9713Report extends MakeReport {
 		String tmpAmt = "";
 
 		if (makeExcel.getListMap().size() == 0) {
-			return false;
+			return checqueAmt;
 		}
 
 		for (Map<String, Object> map : makeExcel.getListMap()) {
@@ -181,6 +182,7 @@ public class L9713Report extends MakeReport {
 					tmp = (String) map.get("f6");
 					tmp = tmp.replaceAll("[^\\d.]", "");
 					tamt = Integer.valueOf(tmp);
+					checqueAmt = checqueAmt.add(BigDecimal.valueOf(tamt));
 					t7 += tamt;
 					// 排除低於當月份的
 
@@ -241,7 +243,7 @@ public class L9713Report extends MakeReport {
 		// 輸出結束
 		this.close();
 
-		return true;
+		return checqueAmt;
 
 	}
 

@@ -424,9 +424,11 @@ public class L5103 extends TradeBuffer {
 
 		if(!"".equals(tInnDocRecord.getApplEmpNo().trim()) && "1".equals(tInnDocRecord.getApplCode())) {//借閱人-借閱時
 			CdEmp tCdEmp = cdEmpService.findById(tInnDocRecord.getApplEmpNo(), titaVo);
-			if (tCdEmp != null && !"".equals(tCdEmp.getEmail().trim())) {
+			if (tCdEmp != null ) {
 				applname = tCdEmp.getFullname();
-				applemail = tCdEmp.getEmail();
+				if(!"".equals(tCdEmp.getEmail().trim())) {
+					applemail = tCdEmp.getEmail();
+				}
 			}
 		}
 		if(!"".equals(tInnDocRecord.getKeeperEmpNo().trim()) && "1".equals(tInnDocRecord.getApplCode())) {//管理人-借閱時

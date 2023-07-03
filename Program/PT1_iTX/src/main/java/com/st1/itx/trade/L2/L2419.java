@@ -904,7 +904,19 @@ public class L2419 extends TradeBuffer {
 	private boolean chectIsEnter(int row) throws LogicException {
 		// check 第1~41 若任一欄位有值,回true
 		for (int i = 1; i <= 41; i++) {
-			String value = (String) makeExcel.getValue(row, i);
+			Object cellValue = makeExcel.getValue(row, i);
+			String value = null;
+
+			if (cellValue instanceof String) {
+				value = (String) cellValue;
+			} else if (cellValue instanceof Double) {
+				Double doubleValue = (Double) cellValue;
+				value = Double.toString(doubleValue);
+			} else if (cellValue instanceof Boolean) {
+				Boolean booleanValue = (Boolean) cellValue;
+				value = Boolean.toString(booleanValue);
+			}
+
 			if (value != null && !value.isEmpty()) {
 				return true;
 			}

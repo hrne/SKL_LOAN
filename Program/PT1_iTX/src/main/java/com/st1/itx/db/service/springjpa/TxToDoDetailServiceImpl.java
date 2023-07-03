@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -152,13 +155,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("DtlValueRange " + dbName + " : " + "itemCode_0 : " + itemCode_0 + " dtlValue_1 : " +  dtlValue_1 + " dtlValue_2 : " +  dtlValue_2);
     if (dbName.equals(ContentName.onDay))
-      slice = txToDoDetailReposDay.findAllByItemCodeIsAndDtlValueGreaterThanEqualAndDtlValueLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAsc(itemCode_0, dtlValue_1, dtlValue_2, pageable);
+      slice = txToDoDetailReposDay.findAllByItemCodeIsAndDtlValueGreaterThanEqualAndDtlValueLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAscDtlValueAsc(itemCode_0, dtlValue_1, dtlValue_2, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = txToDoDetailReposMon.findAllByItemCodeIsAndDtlValueGreaterThanEqualAndDtlValueLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAsc(itemCode_0, dtlValue_1, dtlValue_2, pageable);
+      slice = txToDoDetailReposMon.findAllByItemCodeIsAndDtlValueGreaterThanEqualAndDtlValueLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAscDtlValueAsc(itemCode_0, dtlValue_1, dtlValue_2, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = txToDoDetailReposHist.findAllByItemCodeIsAndDtlValueGreaterThanEqualAndDtlValueLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAsc(itemCode_0, dtlValue_1, dtlValue_2, pageable);
+      slice = txToDoDetailReposHist.findAllByItemCodeIsAndDtlValueGreaterThanEqualAndDtlValueLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAscDtlValueAsc(itemCode_0, dtlValue_1, dtlValue_2, pageable);
     else 
-      slice = txToDoDetailRepos.findAllByItemCodeIsAndDtlValueGreaterThanEqualAndDtlValueLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAsc(itemCode_0, dtlValue_1, dtlValue_2, pageable);
+      slice = txToDoDetailRepos.findAllByItemCodeIsAndDtlValueGreaterThanEqualAndDtlValueLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAscDtlValueAsc(itemCode_0, dtlValue_1, dtlValue_2, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -180,13 +183,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("itemCodeRange " + dbName + " : " + "itemCode_0 : " + itemCode_0 + " dtlValue_1 : " +  dtlValue_1 + " status_2 : " +  status_2 + " status_3 : " +  status_3 + " dataDate_4 : " +  dataDate_4 + " dataDate_5 : " +  dataDate_5);
     if (dbName.equals(ContentName.onDay))
-      slice = txToDoDetailReposDay.findAllByItemCodeIsAndDtlValueIsAndStatusGreaterThanEqualAndStatusLessThanEqualAndDataDateGreaterThanEqualAndDataDateLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAsc(itemCode_0, dtlValue_1, status_2, status_3, dataDate_4, dataDate_5, pageable);
+      slice = txToDoDetailReposDay.findAllByItemCodeIsAndDtlValueIsAndStatusGreaterThanEqualAndStatusLessThanEqualAndDataDateGreaterThanEqualAndDataDateLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAscDtlValueAsc(itemCode_0, dtlValue_1, status_2, status_3, dataDate_4, dataDate_5, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = txToDoDetailReposMon.findAllByItemCodeIsAndDtlValueIsAndStatusGreaterThanEqualAndStatusLessThanEqualAndDataDateGreaterThanEqualAndDataDateLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAsc(itemCode_0, dtlValue_1, status_2, status_3, dataDate_4, dataDate_5, pageable);
+      slice = txToDoDetailReposMon.findAllByItemCodeIsAndDtlValueIsAndStatusGreaterThanEqualAndStatusLessThanEqualAndDataDateGreaterThanEqualAndDataDateLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAscDtlValueAsc(itemCode_0, dtlValue_1, status_2, status_3, dataDate_4, dataDate_5, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = txToDoDetailReposHist.findAllByItemCodeIsAndDtlValueIsAndStatusGreaterThanEqualAndStatusLessThanEqualAndDataDateGreaterThanEqualAndDataDateLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAsc(itemCode_0, dtlValue_1, status_2, status_3, dataDate_4, dataDate_5, pageable);
+      slice = txToDoDetailReposHist.findAllByItemCodeIsAndDtlValueIsAndStatusGreaterThanEqualAndStatusLessThanEqualAndDataDateGreaterThanEqualAndDataDateLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAscDtlValueAsc(itemCode_0, dtlValue_1, status_2, status_3, dataDate_4, dataDate_5, pageable);
     else 
-      slice = txToDoDetailRepos.findAllByItemCodeIsAndDtlValueIsAndStatusGreaterThanEqualAndStatusLessThanEqualAndDataDateGreaterThanEqualAndDataDateLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAsc(itemCode_0, dtlValue_1, status_2, status_3, dataDate_4, dataDate_5, pageable);
+      slice = txToDoDetailRepos.findAllByItemCodeIsAndDtlValueIsAndStatusGreaterThanEqualAndStatusLessThanEqualAndDataDateGreaterThanEqualAndDataDateLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAscDtlValueAsc(itemCode_0, dtlValue_1, status_2, status_3, dataDate_4, dataDate_5, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -208,13 +211,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("DataDateRange " + dbName + " : " + "itemCode_0 : " + itemCode_0 + " status_1 : " +  status_1 + " status_2 : " +  status_2 + " dataDate_3 : " +  dataDate_3 + " dataDate_4 : " +  dataDate_4);
     if (dbName.equals(ContentName.onDay))
-      slice = txToDoDetailReposDay.findAllByItemCodeIsAndStatusGreaterThanEqualAndStatusLessThanEqualAndDataDateGreaterThanEqualAndDataDateLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAsc(itemCode_0, status_1, status_2, dataDate_3, dataDate_4, pageable);
+      slice = txToDoDetailReposDay.findAllByItemCodeIsAndStatusGreaterThanEqualAndStatusLessThanEqualAndDataDateGreaterThanEqualAndDataDateLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAscDtlValueAsc(itemCode_0, status_1, status_2, dataDate_3, dataDate_4, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = txToDoDetailReposMon.findAllByItemCodeIsAndStatusGreaterThanEqualAndStatusLessThanEqualAndDataDateGreaterThanEqualAndDataDateLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAsc(itemCode_0, status_1, status_2, dataDate_3, dataDate_4, pageable);
+      slice = txToDoDetailReposMon.findAllByItemCodeIsAndStatusGreaterThanEqualAndStatusLessThanEqualAndDataDateGreaterThanEqualAndDataDateLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAscDtlValueAsc(itemCode_0, status_1, status_2, dataDate_3, dataDate_4, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = txToDoDetailReposHist.findAllByItemCodeIsAndStatusGreaterThanEqualAndStatusLessThanEqualAndDataDateGreaterThanEqualAndDataDateLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAsc(itemCode_0, status_1, status_2, dataDate_3, dataDate_4, pageable);
+      slice = txToDoDetailReposHist.findAllByItemCodeIsAndStatusGreaterThanEqualAndStatusLessThanEqualAndDataDateGreaterThanEqualAndDataDateLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAscDtlValueAsc(itemCode_0, status_1, status_2, dataDate_3, dataDate_4, pageable);
     else 
-      slice = txToDoDetailRepos.findAllByItemCodeIsAndStatusGreaterThanEqualAndStatusLessThanEqualAndDataDateGreaterThanEqualAndDataDateLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAsc(itemCode_0, status_1, status_2, dataDate_3, dataDate_4, pageable);
+      slice = txToDoDetailRepos.findAllByItemCodeIsAndStatusGreaterThanEqualAndStatusLessThanEqualAndDataDateGreaterThanEqualAndDataDateLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAscDtlValueAsc(itemCode_0, status_1, status_2, dataDate_3, dataDate_4, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -264,13 +267,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("DtlValueLike " + dbName + " : " + "itemCode_0 : " + itemCode_0 + " dtlValue_1 : " +  dtlValue_1);
     if (dbName.equals(ContentName.onDay))
-      slice = txToDoDetailReposDay.findAllByItemCodeIsAndDtlValueLikeOrderByStatusAscCustNoAscFacmNoAscBormNoAsc(itemCode_0, dtlValue_1, pageable);
+      slice = txToDoDetailReposDay.findAllByItemCodeIsAndDtlValueLikeOrderByStatusAscCustNoAscFacmNoAscBormNoAscDtlValueAsc(itemCode_0, dtlValue_1, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = txToDoDetailReposMon.findAllByItemCodeIsAndDtlValueLikeOrderByStatusAscCustNoAscFacmNoAscBormNoAsc(itemCode_0, dtlValue_1, pageable);
+      slice = txToDoDetailReposMon.findAllByItemCodeIsAndDtlValueLikeOrderByStatusAscCustNoAscFacmNoAscBormNoAscDtlValueAsc(itemCode_0, dtlValue_1, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = txToDoDetailReposHist.findAllByItemCodeIsAndDtlValueLikeOrderByStatusAscCustNoAscFacmNoAscBormNoAsc(itemCode_0, dtlValue_1, pageable);
+      slice = txToDoDetailReposHist.findAllByItemCodeIsAndDtlValueLikeOrderByStatusAscCustNoAscFacmNoAscBormNoAscDtlValueAsc(itemCode_0, dtlValue_1, pageable);
     else 
-      slice = txToDoDetailRepos.findAllByItemCodeIsAndDtlValueLikeOrderByStatusAscCustNoAscFacmNoAscBormNoAsc(itemCode_0, dtlValue_1, pageable);
+      slice = txToDoDetailRepos.findAllByItemCodeIsAndDtlValueLikeOrderByStatusAscCustNoAscFacmNoAscBormNoAscDtlValueAsc(itemCode_0, dtlValue_1, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

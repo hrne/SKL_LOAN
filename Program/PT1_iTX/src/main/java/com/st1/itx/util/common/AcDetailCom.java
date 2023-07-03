@@ -359,7 +359,7 @@ public class AcDetailCom extends TradeBuffer {
 				throw new LogicException("E6001", "AcDetailCom 金額小於零, amount =" + ac.getTxAmt() + ac);
 			}
 			// 支票繳款業務別
-			if ("RCK".equals(ac.getAcctCode()) && !"02".equals(titaVo.getSecNo())) {
+			if ("L3210".equals(titaVo.getTxcd()) && "RCK".equals(ac.getAcctCode()) && !"02".equals(titaVo.getSecNo())) {
 				throw new LogicException("E6001", "AcDetailCom 支票業務別需為02," + titaVo.getSecNo());
 			}
 			// 撥款匯款業務別 2xx ,201:整批匯款 202:單筆匯款 204:退款台新(存款憑條) 205:退款他行(整批匯款) 211:退款新光(存款憑條)

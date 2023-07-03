@@ -753,6 +753,9 @@ public class TxToDoCom extends TradeBuffer {
 		case "ACCL04":
 			settingValue = "ACCL04;Y;Y;Y;Y;-;L6985;L6985;L618D;Y;折溢價攤銷入帳";
 			break;
+		case "ACCL05":
+			settingValue = "ACCL05;Y;Y;-;-;-;L6985;L6985;L618D;Y;未兌現應收票據提存入帳";
+			break;
 		case "TEXT00":
 			settingValue = "TEXT00;Y;Y;Y;Y;-;L698A;     ;L4710;-;簡訊通知";
 			break;

@@ -33,7 +33,6 @@ E(0,40)ASGN(INQPRT$)
 !T(2,{cmd=CHAIN; ntxcd=L8101; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
 !K(MODIFYBUTTON,1,郵寄處理)
 K(MODIFYBUTTON,查詢)
-
 !#StatusH=X,100,S
 !T(3,0:未處理;1:已處理;9:全部)
 !#ReviewTypeH=x,100,S
@@ -141,10 +140,10 @@ T(3,H)
 !HELP(#AMLReviewTypeHelp,cols:1)
 !@V(H,#AMLReviewTypeHelp)
 
-#downButton=x,100,S
-C(5,#ReviewType,"H",$,s)
-T(2,{cmd=CHAIN; ntxcd=LC009; ntxbuf=      L8101; ntxbuf5=type})ASGN(BTN_NEW1$)
-K(MODIFYBUTTON,1,下載高風險郵寄名單及明細)
+#OOBUF1=X,18,S
+T(2,"A")
+
+
 
 #ReviewTypeX=X,6,L
 T(H,#ReviewType,#AMLReviewTypeHelp)
@@ -185,6 +184,8 @@ V(7)
 A(DATE,0,#AcDate2)
 V(5,#AcDate1,#SYSDATE)
 
+
+
 #RPTFG=A,1,S
 E(0,0)
 
@@ -195,6 +196,8 @@ E(0,0)
 #TXMT=A,1,S
 C(3,#AutoSubmit,1,$,S)
 C(3,#CHAIN,1,XMT(),$)
+
+
 
 </sub>
 
@@ -306,6 +309,12 @@ T(3,L8100)
 !#batch-row-txtno 該列傳送序號
 #batch-row-txtno=X,14,O
 
+
+#downButton=x,100,S
+C(5,#ReviewType,"H",$,s)
+! T(2,{cmd=CHAIN; ntxbuf=LC009; ntxbuf5=type})ASGN(BTN_NEW1$)
+T(2,{cmd=CHAIN; ntxcd=LC009; ntxbuf=      L8081; ntxbuf5=type})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,下載高風險郵寄名單及明細)
 
 !! ------- end of batch variables   -------------
 

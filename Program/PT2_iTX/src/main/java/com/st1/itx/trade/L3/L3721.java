@@ -87,7 +87,7 @@ public class L3721 extends TradeBuffer {
 	private String iBaseRateCode;
 	private String iIncrFlag;
 	private String iChangFg;
-	//	private BigDecimal iProdRate;
+	// private BigDecimal iProdRate;
 	private BigDecimal iFitRate;
 	private BigDecimal iRateIncr;
 	private BigDecimal iIndividualIncr;
@@ -637,14 +637,9 @@ public class L3721 extends TradeBuffer {
 		// 放行 一般
 		if (titaVo.isHcodeNormal()) {
 			// 更新撥款主檔
-
 			if (tLoanBorMain.getLastBorxNo() == wkBorxNo) {
 				tLoanBorMain.setActFg(titaVo.getActFgI());
 			}
-		}
-		// 放行訂正
-		if (titaVo.isHcodeErase()) {
-			tLoanBorMain.setActFg(1);
 		}
 		try {
 			tLoanBorMain = loanBorMainService.update2(tLoanBorMain, titaVo);

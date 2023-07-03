@@ -2,8 +2,12 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * TxToDoDetail 應處理明細檔<br>
@@ -16,12 +20,7 @@ import javax.persistence.Embeddable;
 public class TxToDoDetailId implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -5558323046511718352L;
-
-// 項目
+  // 項目
   @Column(name = "`ItemCode`", length = 6)
   private String itemCode = " ";
 
