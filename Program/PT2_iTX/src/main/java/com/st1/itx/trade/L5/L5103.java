@@ -411,8 +411,8 @@ public class L5103 extends TradeBuffer {
 	/*---------- 主管放行時email通知 管理人/借閱人 ----------*/
 	public void processEmail(InnDocRecord tInnDocRecord, TitaVo titaVo) throws LogicException {
 		this.info("processEmail");
-		String subject1 = "ＯＯ系統-文件調閱通知 " ;
-		String subject2 = "ＯＯ系統-文件調閱完成通知 " ;
+		String subject1 = "新貸中系統-文件調閱通知 " ;
+		String subject2 = "新貸中系統-文件調閱完成通知 " ;
 
 		String bodyText = "";
 		String applemail = "";
@@ -422,14 +422,14 @@ public class L5103 extends TradeBuffer {
 		String copyCode = "";
 		String applObj= "";
 
-		if(!"".equals(tInnDocRecord.getApplEmpNo().trim())) {//借閱人
+		if(!"".equals(tInnDocRecord.getApplEmpNo().trim()) && "1".equals(tInnDocRecord.getApplCode())) {//借閱人-借閱時
 			CdEmp tCdEmp = cdEmpService.findById(tInnDocRecord.getApplEmpNo(), titaVo);
 			if (tCdEmp != null && !"".equals(tCdEmp.getEmail().trim())) {
 				applname = tCdEmp.getFullname();
 				applemail = tCdEmp.getEmail();
 			}
 		}
-		if(!"".equals(tInnDocRecord.getKeeperEmpNo().trim())) {//管理人
+		if(!"".equals(tInnDocRecord.getKeeperEmpNo().trim()) && "1".equals(tInnDocRecord.getApplCode())) {//管理人-借閱時
 			CdEmp tCdEmp = cdEmpService.findById(tInnDocRecord.getKeeperEmpNo(), titaVo);
 			if (tCdEmp != null && !"".equals(tCdEmp.getEmail().trim())) {
 				keeperemail = tCdEmp.getEmail();

@@ -308,7 +308,7 @@ public class LM049ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            else 'N' end AS \"upToOneHundredMillion\" ";
 		sql += "        , trunc(m.\"LoanBalance\" / 1000 ) as \"LoanBal\"";
 		sql += "        , mf.\"FacmNo\"";
-		sql += "        , m.\"CustNo\"";
+		sql += "        , mf.\"CustNo\"";
 		sql += "        , cl.\"ClNo\"";
 		sql += "   from \"Main\" m";
 		sql += "   left join \"CustMain\" c on c.\"CustId\" = m.\"Id\"";

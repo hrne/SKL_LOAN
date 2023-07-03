@@ -110,6 +110,8 @@ public class BS720 extends TradeBuffer {
 
 		this.batchTransaction.commit();
 
+		titaVo.setDataBaseOnOrg();// 還原原本的環境
+
 // 2021/2/24 考慮四捨五入差額，只出表、不入帳(維持至核心會計系統輸入)	=> 2022/01改回要入帳	
 		// 寫入應處理清單 ACCL04-折溢價攤銷入帳
 
