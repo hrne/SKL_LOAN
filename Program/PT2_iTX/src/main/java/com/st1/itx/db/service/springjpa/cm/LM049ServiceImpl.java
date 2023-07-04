@@ -374,7 +374,7 @@ public class LM049ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " select \"AcDate\" , \"StockHoldersEqt\" from \"InnFundApl\" ";
 		sql += " where \"AcDate\" = (";
 		sql += " 	select max(\"AcDate\") from \"InnFundApl\" ";
-		sql += " 	where trunc(\"AcDate\"/100) < :yymm ";
+		sql += " 	where trunc(\"AcDate\"/100) <= :yymm ";
 		sql += " 	  and \"PosbleBorPsn\" > 0 ";
 		sql += " )";
 

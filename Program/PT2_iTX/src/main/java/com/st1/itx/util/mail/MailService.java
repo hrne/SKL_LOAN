@@ -108,8 +108,8 @@ public class MailService extends CommBuffer {
 //				return new PasswordAuthentication(username, mailPWD);
 //			}
 //		});
-		this.session.setDebug(true);
 		this.session = Session.getDefaultInstance(properties);
+		this.session.setDebug(true);
 		this.message = new MimeMessage(this.session);
 	}
 

@@ -69,12 +69,6 @@ public class LM050Report extends MakeReport {
 		// 取得民國年帳務日
 		String entdy = titaVo.getEntDy();
 
-		makeExcel.setSheet("108.04", entdy.substring(1, 4) + "." + entdy.substring(4, 6));
-		makeExcel.setValue(1, 2, entdy.substring(1, 4) + "年" + entdy.substring(4, 6) + "月" + entdy.substring(6, 8)
-				+ "日依「保險業利害關係人放款管理辦法」第3條利害關係人放款餘額表");
-		makeExcel.setValue(2, 4,
-				entdy.substring(1, 4) + "." + entdy.substring(4, 6) + "." + entdy.substring(6, 8) + " 淨值（核閱數）");
-
 		List<Map<String, String>> equityList = null;
 
 		try {
@@ -86,13 +80,21 @@ public class LM050Report extends MakeReport {
 			this.error("LM050ServiceImpl.fnEquity error = " + errors.toString());
 		}
 
+		makeExcel.setSheet("108.04", entdy.substring(1, 4) + "." + entdy.substring(4, 6));
+		makeExcel.setValue(1, 2, entdy.substring(1, 4) + "年" + entdy.substring(4, 6) + "月" + entdy.substring(6, 8)
+				+ "日依「保險業利害關係人放款管理辦法」第3條利害關係人放款餘額表");
+
 		if (equityList != null && equityList.size() > 0) {
 
 			String value = equityList.get(0).get("F0");
 
 			BigDecimal amt = getBigDecimal(value);
+			String acDate = equityList.get(0).get("AcDate");
 
 			equity = amt;
+
+			makeExcel.setValue(2, 4,
+					acDate.substring(1, 4) + "." + acDate.substring(4, 6) + "." + acDate.substring(6, 8) + " 淨值（核閱數）");
 
 			makeExcel.setValue(2, 6, formatThousand(amt), "#,##0");
 		}

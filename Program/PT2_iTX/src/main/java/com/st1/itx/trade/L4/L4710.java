@@ -14,6 +14,12 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
+import com.jcraft.jsch.Channel;
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
+import com.jcraft.jsch.SftpException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
@@ -87,6 +93,8 @@ public class L4710 extends TradeBuffer {
 
 	private static final Pattern patternPrefix = Pattern.compile("^<.+>");
 
+	String smsFtpFlag = "Y";
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4710 ");
@@ -146,23 +154,27 @@ public class L4710 extends TradeBuffer {
 		long sno = makeFile.close();
 
 		this.info("sno : " + sno);
-//		boolean result = sendToFTP(sno, titaVo);
+		boolean result = sendToFTP(sno, titaVo);
 
-//		if (!result)
-//			return;
+		if (!result)
+			return;
 
 		for (TxToDoDetail tTxToDoDetail : lTxToDoDetail) {
-			// 2023-05-29 Wei 改用API傳送 from SKL 琦欣
-			String proccessNote = tTxToDoDetail.getProcessNote();
-			String[] data = proccessNote.split(",");
+			// 2023-07-04 Wei 改回用FTP from SKL 琦欣
+			// 這裡改用參數修改 如果他們又想改用API 就把SystemParas.SmsFtpFlag改為A
+			if (smsFtpFlag.equals("A")) {
+				// 2023-05-29 Wei 改用API傳送 from SKL 琦欣
+				String proccessNote = tTxToDoDetail.getProcessNote();
+				String[] data = proccessNote.split(",");
 
-			if (data.length >= 4) {
-				String mobile = data[2];
-				String msg = data[3];
-				this.info("L4710 sendSms test mobile = " + mobile);
-				this.info("L4710 sendSms test msg = " + msg);
-				if (titaVo.getTlrNo().equals("001702")) {
-					smsCom.sendSms(titaVo, mobile, msg);
+				if (data.length >= 4) {
+					String mobile = data[2];
+					String msg = data[3];
+					this.info("L4710 sendSms test mobile = " + mobile);
+					this.info("L4710 sendSms test msg = " + msg);
+					if (titaVo.getTlrNo().equals("001702")) {
+						smsCom.sendSms(titaVo, mobile, msg);
+					}
 				}
 			}
 
@@ -188,12 +200,14 @@ public class L4710 extends TradeBuffer {
 			return false;
 		}
 
-		if (!"Y".equals(systemParas.getSmsFtpFlag())) {
+		smsFtpFlag = systemParas.getSmsFtpFlag();
+
+		if (!"Y".equals(smsFtpFlag)) {
 			this.info("sendToFTP: SmsFtpFlag != Y, skip uploading");
 			return true;
 		}
 
-		this.info("ScheduledL4701 sending to FTP...");
+		this.info("sendToFTP sending to FTP...");
 
 		TxFile txFile = txFileService.findById(fileSno, titaVo);
 
@@ -212,17 +226,50 @@ public class L4710 extends TradeBuffer {
 			return false;
 		}
 
-		String ftpPath = systemParas.getLoanMediaFtpUrl();
+		String smsUrl = systemParas.getSmsFtpUrl();
+		String smsPort = "22"; // 預設22
+		if (smsUrl.contains(":")) {
+			String[] s = smsUrl.split(":");
+			smsUrl = s[0];
+			smsPort = s[1];
+		}
 		String[] auth = systemParas.getSmsFtpAuth().split(":");
 		String fileName = txFile.getFileOutput();
 		Path pathToFile = Paths.get(outFolder, fileName);
 
+		JSch jsch = new JSch();
+		Session session = null;
+
 		try {
-			ftpClient.sendFile(ftpPath, auth[0], auth[1], pathToFile.toString(), "inbound");
-		} catch (Exception e) {
+			// 建立連線
+			session = jsch.getSession(auth[0], smsUrl, parse.stringToInteger(smsPort));
+			// 設定密碼
+			session.setPassword(auth[1]);
+
+			// 設定SSH連線的安全性設定
+			java.util.Properties config = new java.util.Properties();
+			config.put("StrictHostKeyChecking", "no");
+			session.setConfig(config);
+
+			// 連接到伺服器
+			session.connect();
+
+			// 創建SFTP通道
+			Channel channel = session.openChannel("sftp");
+			channel.connect();
+			ChannelSftp sftpChannel = (ChannelSftp) channel;
+
+			// 上傳檔案
+			// 第一個參數是本地文件的路徑，第二個參數是遠端伺服器的目錄
+			sftpChannel.put(pathToFile.toString(), "inbound");
+
+			// 關閉連線
+			sftpChannel.exit();
+			session.disconnect();
+		} catch (SftpException | JSchException e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
-			this.error("ScheduledL4710 error = " + errors.toString());
+			this.error("send SFTP error = " + errors.toString());
 			return false;
 		}
 

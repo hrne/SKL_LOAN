@@ -64,12 +64,12 @@ public class LM050ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("lM050.Totalequity yyqq=" + yyqq);
 		String sql = " ";
 		sql += "     SELECT \"StockHoldersEqt\" AS \"Totalequity\"";
-		sql += "           ,TRUNC(\"AcDate\" / 100 ) AS \"YearMonth\"";
+		sql += "           ,\"AcDate\"  AS \"AcDate\"";
 		sql += "     FROM \"InnFundApl\" ";
 		sql += "     WHERE \"AcDate\" = (";
 		sql += "     	SELECT MAX(\"AcDate\") ";
 		sql += "     	FROM \"InnFundApl\" ";
-		sql += "     	WHERE TRUNC(\"AcDate\" / 100) < :yyqq";
+		sql += "     	WHERE TRUNC(\"AcDate\" / 100) <= :yyqq";
 		sql += " 	      AND \"PosbleBorPsn\" > 0 ";
 		sql += "     )";
 		this.info("sql=" + sql);
