@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.st1.itx</groupId>
@@ -26,7 +27,8 @@
 		<Hibernate-Validator-Ver>6.1.4.Final</Hibernate-Validator-Ver>
 		<Tomcat-jdbc-Ver>9.0.34</Tomcat-jdbc-Ver>
 
-		<!-- <Spring-Integration-Ver>5.1.5.RELEASE</Spring-Integration-Ver> <Spring-Framework-Ver>5.1.7.RELEASE</Spring-Framework-Ver> <Spring-Security-Ver>5.1.5.RELEASE</Spring-Security-Ver> <Spring-Batch-Ver>4.1.1.RELEASE</Spring-Batch-Ver> 
+		<!-- <Spring-Integration-Ver>5.1.5.RELEASE</Spring-Integration-Ver> <Spring-Framework-Ver>5.1.7.RELEASE</Spring-Framework-Ver> 
+			<Spring-Security-Ver>5.1.5.RELEASE</Spring-Security-Ver> <Spring-Batch-Ver>4.1.1.RELEASE</Spring-Batch-Ver> 
 			<Spring-Data-Ver>2.1.8.RELEASE</Spring-Data-Ver> -->
 
 		<SLF4J-Ver>1.7.32</SLF4J-Ver>
@@ -78,14 +80,14 @@
 			<artifactId>guava</artifactId>
 			<version>29.0-jre</version>
 		</dependency>
-		
+
 		<!-- Ftp -->
 		<dependency>
-    		<groupId>commons-net</groupId>
-    		<artifactId>commons-net</artifactId>
-    		<version>${Commons-Net-Ver}</version>
+			<groupId>commons-net</groupId>
+			<artifactId>commons-net</artifactId>
+			<version>${Commons-Net-Ver}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.apache.ftpserver</groupId>
 			<artifactId>ftpserver-core</artifactId>
@@ -97,7 +99,7 @@
 			<artifactId>ftplet-api</artifactId>
 			<version>${Apache-FTP-Ver}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.apache.mina</groupId>
 			<artifactId>mina-core</artifactId>
@@ -455,11 +457,11 @@
 			<artifactId>commons-text</artifactId>
 			<version>${Commons-Text-Ver}</version>
 		</dependency>
-		
+
 		<dependency>
-    		<groupId>org.tukaani</groupId>
-    		<artifactId>xz</artifactId>
-    		<version>${Xz-Ver}</version>
+			<groupId>org.tukaani</groupId>
+			<artifactId>xz</artifactId>
+			<version>${Xz-Ver}</version>
 		</dependency>
 
 		<!-- iText -->
@@ -479,6 +481,13 @@
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcprov-jdk15on</artifactId>
 			<version>1.49</version>
+		</dependency>
+
+		<!-- SFTP client -->
+		<dependency>
+			<groupId>com.jcraft</groupId>
+			<artifactId>jsch</artifactId>
+			<version>0.1.55</version>
 		</dependency>
 	</dependencies>
 
@@ -536,7 +545,8 @@
 					</dependency>
 				</dependencies>
 			</plugin>
-			<!-- maven的核心外掛之-complier外掛預設只支援編譯Java 1.4，因此需要加上支援高版本jre的配置，在pom.xml裡面加上 增加編譯外掛 -->
+			<!-- maven的核心外掛之-complier外掛預設只支援編譯Java 1.4，因此需要加上支援高版本jre的配置，在pom.xml裡面加上 
+				增加編譯外掛 -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -550,9 +560,11 @@
 					<compilerArgument>-proc:none</compilerArgument>
 				</configuration>
 			</plugin>
-			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-war-plugin</artifactId> <version>2.4</version> <configuration> <outputDirectory>C:\Users\Adam\Desktop\</outputDirectory> </configuration> 
-				</plugin> -->
-			<!-- mvn install:install-file -Dfile=./iTXCore.jar -DgroupId=com.itx -DartifactId=iTXCore -Dversion=1.0.0 -Dpackaging=jar -->
+			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-war-plugin</artifactId> 
+				<version>2.4</version> <configuration> <outputDirectory>C:\Users\Adam\Desktop\</outputDirectory> 
+				</configuration> </plugin> -->
+			<!-- mvn install:install-file -Dfile=./iTXCore.jar -DgroupId=com.itx -DartifactId=iTXCore 
+				-Dversion=1.0.0 -Dpackaging=jar -->
 
 			<!--配置生成Javadoc包 -->
 			<plugin>
@@ -577,8 +589,11 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- <plugin> <artifactId>maven-assembly-plugin</artifactId> <configuration> <jarName>iTXCore-v1.0</jarName> <outputDirectory>C:\SKL\</outputDirectory> <descriptorRefs> <descriptorRef>src</descriptorRef> 
-				</descriptorRefs> </configuration> <executions> <execution> <id>make-assembly</id> <phase>package</phase> <goals> <goal>single</goal> </goals> </execution> </executions> </plugin> -->
+			<!-- <plugin> <artifactId>maven-assembly-plugin</artifactId> <configuration> 
+				<jarName>iTXCore-v1.0</jarName> <outputDirectory>C:\SKL\</outputDirectory> 
+				<descriptorRefs> <descriptorRef>src</descriptorRef> </descriptorRefs> </configuration> 
+				<executions> <execution> <id>make-assembly</id> <phase>package</phase> <goals> 
+				<goal>single</goal> </goals> </execution> </executions> </plugin> -->
 		</plugins>
 	</build>
 
