@@ -291,7 +291,7 @@ public class LM049ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   select m.\"comSeq\"";
 		sql += "		, m.\"Id\" ";
 		sql += "        , m.\"Name\"";
-		sql += "        , m.\"CompanyName\" || '(' || m.\"BusTitle\" || ')' as \"busName\"";
+		sql += "        , m.\"CompanyName\" || '(' || m.\"BusTitle\" || ')' as \"BusName\"";
 		sql += "        , f.\"FirstDrawdownDate\"";
 		sql += "        , f.\"MaturityDate\"";
 		sql += "        , mf.\"StoreRate\"";

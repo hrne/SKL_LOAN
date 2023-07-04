@@ -98,18 +98,18 @@ public class MailService extends CommBuffer {
 		this.properties.put("mail.smtp.auth", "true");// 需要驗證帳號密碼
 		// SSL authentication
 //		this.properties.put("mail.smtp.ssl.enable", "true");
-		this.properties.put("mail.smtp.starttls.enable", "true");
+//		this.properties.put("mail.smtp.starttls.enable", "true");
 
 		properties.setProperty(mailServer, mailHost);
-		this.session = Session.getInstance(properties, new javax.mail.Authenticator() {
+//		this.session = Session.getInstance(properties, new javax.mail.Authenticator() {
 //		this.session = Session.getDefaultInstance(properties, new javax.mail.Authenticator() {
-			@Override
-			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(username, mailPWD);
-			}
-		});
+//			@Override
+//			protected PasswordAuthentication getPasswordAuthentication() {
+//				return new PasswordAuthentication(username, mailPWD);
+//			}
+//		});
 		this.session.setDebug(true);
-//		this.session = Session.getDefaultInstance(properties);
+		this.session = Session.getDefaultInstance(properties);
 		this.message = new MimeMessage(this.session);
 	}
 

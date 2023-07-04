@@ -117,7 +117,7 @@ public class BS720 extends TradeBuffer {
 
 		// 1.刪除處理清單 ACCL04-折溢價攤銷入帳 //
 		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL04", 0, 3, this.index,
-				Integer.MAX_VALUE);
+				Integer.MAX_VALUE, titaVo);
 		lTxToDoDetail = slTxToDoDetail == null ? null : slTxToDoDetail.getContent();
 		if (lTxToDoDetail != null) {
 			txToDoCom.delByDetailList(lTxToDoDetail, titaVo);
@@ -198,7 +198,7 @@ public class BS720 extends TradeBuffer {
 					: new ArrayList<Ias39IntMethod>(slIas39IntMethod.getContent());
 			if (oListIas39IntMethod != null) {
 				try {
-					ias39IntMethodService.deleteAll(oListIas39IntMethod);
+					ias39IntMethodService.deleteAll(oListIas39IntMethod, titaVo);
 				} catch (DBException e) {
 					e.printStackTrace();
 					throw new LogicException(titaVo, "E0008", "Ias39IntMethod利息法帳面資料檔" + " " + e.getErrorMsg()); // 刪除資料時，發生錯誤
@@ -206,7 +206,7 @@ public class BS720 extends TradeBuffer {
 			}
 			// 新增
 			try {
-				ias39IntMethodService.insertAll(lIas39IntMethod);
+				ias39IntMethodService.insertAll(lIas39IntMethod, titaVo);
 			} catch (DBException e) {
 				e.printStackTrace();
 				throw new LogicException("E0005", e.getErrorMsg()); // 新增資料時，發生錯誤

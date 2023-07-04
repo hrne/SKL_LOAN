@@ -79,7 +79,7 @@ public class BS903 extends TradeBuffer {
 
 		// 1.刪除處理清單 ACCL05-未兌現應收票據提存 BS903 //
 		this.info("1.BS903 delete ACCL05");
-		slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL05", 0, 3, 0, Integer.MAX_VALUE);
+		slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL05", 0, 3, 0, Integer.MAX_VALUE, titaVo);
 		if (slTxToDoDetail != null) {
 			for (TxToDoDetail t : slTxToDoDetail.getContent()) {
 				txToDoCom.delByDetail(t, titaVo);

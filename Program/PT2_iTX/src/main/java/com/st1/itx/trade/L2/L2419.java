@@ -843,6 +843,11 @@ public class L2419 extends TradeBuffer {
 			// 所有權人1-身分證/統編
 			String ownerId1 = makeExcel.getValue(row, L2419Column.OWNER_ID_1.getIndex()).toString().trim();
 			this.info("ownerId1 = " + ownerId1);
+			// fix bug 客戶統編8碼數字時會以科學記號的數值轉入
+			if (isScientificNotation(ownerId1)) {
+				BigDecimal bd = new BigDecimal(ownerId1);
+				ownerId1 = bd.toPlainString();
+			}
 			if (ownerId1 == null || ownerId1.isEmpty()) {
 				// 有選擇所有權種類時,所有權人-身分證/統編不得為空白
 				setError(row, L2419Column.OWNER_ID_1.getIndex());
@@ -968,6 +973,11 @@ public class L2419 extends TradeBuffer {
 			String columnAO = makeExcel.getValue(row, column + 1).toString();
 			this.info("columnAO = " + columnAO);
 			String ownerId1 = columnAO.trim();
+			// fix bug 客戶統編8碼數字時會以科學記號的數值轉入
+			if (isScientificNotation(ownerId1)) {
+				BigDecimal bd = new BigDecimal(ownerId1);
+				ownerId1 = bd.toPlainString();
+			}
 			if (ownerId1 == null || ownerId1.isEmpty()) {
 //				throw new LogicException("E0015", "行數:" + row + ",有選擇所有權種類時,所有權人" + ownerSeq + "-身分證/統編不得為空白.");
 				setError(row, column + 1);
@@ -1209,5 +1219,9 @@ public class L2419 extends TradeBuffer {
 			}
 		}
 		return result;
+	}
+
+	private boolean isScientificNotation(String str) {
+		return str.matches("[+-]?\\d+(\\.\\d*)?[Ee][+-]?\\d+");
 	}
 }

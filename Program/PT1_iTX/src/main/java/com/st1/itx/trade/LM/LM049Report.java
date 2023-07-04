@@ -10,19 +10,17 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.domain.InnFundApl;
-import com.st1.itx.db.service.InnFundAplService;
 import com.st1.itx.db.service.springjpa.cm.LM049ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ExcelFontStyleVo;
 import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.format.FormatUtil;
+import com.st1.itx.util.parse.Parse;
 
 @Component
 @Scope("prototype")
@@ -35,10 +33,13 @@ public class LM049Report extends MakeReport {
 	@Autowired
 	MakeExcel makeExcel;
 
+	@Autowired
+	Parse parse;
+
 	private BigDecimal totalOfLoanBal = BigDecimal.ZERO;
 
-	private int netValueDataDate = 0;
-	private BigDecimal netValue = BigDecimal.ZERO;
+//	private int netValueDataDate = 0;
+//	private BigDecimal netValue = BigDecimal.ZERO;
 
 	@Override
 	public void printTitle() {
@@ -100,8 +101,10 @@ public class LM049Report extends MakeReport {
 
 		// 寫入淨值
 		// 年.月 淨值（核閱數）
-		String outputNetValueDataDate = String.valueOf(findStockHoldersEqt.get(0).get("AcDate"));
-		outputNetValueDataDate = outputNetValueDataDate.substring(0, 3) + "." + outputNetValueDataDate.substring(3);
+		String outputNetValueDataDate = String
+				.valueOf(parse.stringToInteger(findStockHoldersEqt.get(0).get("AcDate")) - 19110000);
+		outputNetValueDataDate = outputNetValueDataDate.substring(0, 3) + "." + outputNetValueDataDate.substring(3, 5)
+				+ "." + outputNetValueDataDate.substring(5);
 
 		makeExcel.setValue(2, 5, outputNetValueDataDate + " 淨值（核閱數）");
 		makeExcel.setValue(2, 7, divThousand(new BigDecimal(findStockHoldersEqt.get(0).get("StockHoldersEqt"))),
@@ -219,23 +222,23 @@ public class LM049Report extends MakeReport {
 			setValueToExcel(rowCursorD, listD);
 		}
 
-		makeExcel.setFormula(a[1] + 1, 11, BigDecimal.ZERO, "SUM(V" + a[0] + ":V" + a[1] + ")", "#,##0");
-		makeExcel.setFormula(a[1] + 1, 12, BigDecimal.ZERO, "(V" + a[1] + 1 + "/$P$2) * 100 ", "0.00");
+		makeExcel.setFormula(a[1] + 1, 11, BigDecimal.ZERO, "SUM(K" + a[0] + ":K" + a[1] + ")", "#,##0");
+		makeExcel.setFormula(a[1] + 1, 12, BigDecimal.ZERO, "(K" + a[1] + 1 + "/$G$2) * 100 ", "0.00");
 		makeExcel.formulaCaculate(a[1] + 1, 11);
 		makeExcel.formulaCaculate(a[1] + 1, 12);
 
-		makeExcel.setFormula(b[1] + 1, 11, BigDecimal.ZERO, "SUM(V" + b[0] + ":V" + b[1] + ")", "#,##0");
-		makeExcel.setFormula(b[1] + 1, 12, BigDecimal.ZERO, "(V" + b[1] + 1 + "/$P$2) * 100 ", "0.00");
+		makeExcel.setFormula(b[1] + 1, 11, BigDecimal.ZERO, "SUM(K" + b[0] + ":K" + b[1] + ")", "#,##0");
+		makeExcel.setFormula(b[1] + 1, 12, BigDecimal.ZERO, "(K" + b[1] + 1 + "/$G$2) * 100 ", "0.00");
 		makeExcel.formulaCaculate(b[1] + 1, 11);
 		makeExcel.formulaCaculate(b[1] + 1, 12);
 
-		makeExcel.setFormula(c[1] + 1, 11, BigDecimal.ZERO, "SUM(V" + c[0] + ":V" + c[1] + ")", "#,##0");
-		makeExcel.setFormula(c[1] + 1, 12, BigDecimal.ZERO, "(V" + c[1] + 1 + "/$P$2) * 100 ", "0.00");
+		makeExcel.setFormula(c[1] + 1, 11, BigDecimal.ZERO, "SUM(K" + c[0] + ":K" + c[1] + ")", "#,##0");
+		makeExcel.setFormula(c[1] + 1, 12, BigDecimal.ZERO, "(K" + c[1] + 1 + "/$G$2) * 100 ", "0.00");
 		makeExcel.formulaCaculate(c[1] + 1, 11);
 		makeExcel.formulaCaculate(c[1] + 1, 12);
 
-		makeExcel.setFormula(d[1] + 1, 11, BigDecimal.ZERO, "SUM(V" + d[0] + ":V" + d[1] + ")", "#,##0");
-		makeExcel.setFormula(d[1] + 1, 12, BigDecimal.ZERO, "(V" + d[1] + 1 + "/$P$2) * 100 ", "0.00");
+		makeExcel.setFormula(d[1] + 1, 11, BigDecimal.ZERO, "SUM(K" + d[0] + ":K" + d[1] + ")", "#,##0");
+		makeExcel.setFormula(d[1] + 1, 12, BigDecimal.ZERO, "(K" + d[1] + 1 + "/$G$2) * 100 ", "0.00");
 		makeExcel.formulaCaculate(d[1] + 1, 11);
 		makeExcel.formulaCaculate(d[1] + 1, 12);
 
@@ -265,7 +268,7 @@ public class LM049Report extends MakeReport {
 		Map<String, String> tmpMap = new HashMap<>();
 
 		tmpMap.put("Name", tLM049.get("Name")); // 戶名
-		tmpMap.put("CompanyName", tLM049.get("CompanyName")); // 子公司名稱+ 職位名稱
+		tmpMap.put("CompanyName", tLM049.get("BusName")); // 子公司名稱+ 職位名稱
 		tmpMap.put("FirstDrawdownDate", showRocDate(tLM049.get("FirstDrawdownDate"), 1)); // 放款期間-起日(撥款日)
 		tmpMap.put("MaturityDate", showRocDate(tLM049.get("MaturityDate"), 1)); // 放款期間-止日(到期日)
 		tmpMap.put("StoreRate", tLM049.get("StoreRate")); // 放款利率
@@ -357,7 +360,7 @@ public class LM049Report extends MakeReport {
 			makeExcel.setValue(rowCursor, 11, isSame ? BigDecimal.ZERO : getBigDecimal(map.get("LoanBal")), "#,##0");
 			// 佔淨值比
 			if (!isSame) {
-				makeExcel.setFormula(rowCursor, 12, BigDecimal.ZERO, "(V" + rowCursor + "/$P$2) * 100", "0.00");
+				makeExcel.setFormula(rowCursor, 12, BigDecimal.ZERO, "(K" + rowCursor + "/$G$2) * 100", "0.00");
 
 				makeExcel.formulaCaculate(rowCursor, 12);
 			}
@@ -365,6 +368,8 @@ public class LM049Report extends MakeReport {
 			makeExcel.setValue(rowCursor, 13, map.get("FacmNo"));
 			// 備註說明
 //			makeExcel.setValue(rowCursor, 14, map.get("IsSameCollateral"));
+
+			rowCursor++;
 
 		}
 

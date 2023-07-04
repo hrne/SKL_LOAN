@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -24,6 +25,7 @@ import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.LoanRateChangeService;
+import com.st1.itx.db.service.springjpa.cm.L3005ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.CustRmkCom;
 import com.st1.itx.util.common.LoanAvailableAmt;
@@ -52,15 +54,17 @@ public class L3001 extends TradeBuffer {
 
 	/* DB服務注入 */
 	@Autowired
-	public FacMainService facMainService;
+	FacMainService facMainService;
 	@Autowired
-	public LoanBorMainService loanBorMainService;
+	LoanBorMainService loanBorMainService;
 	@Autowired
-	public AcReceivableService acReceivableService;
+	AcReceivableService acReceivableService;
 	@Autowired
 	LoanBorTxService sLoanBorTxService;
 	@Autowired
 	LoanRateChangeService sLoanRateChangeService;
+	@Autowired
+	L3005ServiceImpl l3005ServiceImpl;
 
 	@Autowired
 	Parse parse;
@@ -106,7 +110,8 @@ public class L3001 extends TradeBuffer {
 					throw new LogicException(titaVo, "E0001", "額度主檔 案件編號 = " + iCaseNo); // 查詢資料不存在
 				}
 				tFacMain.getCustNo();
-				slFacMain = facMainService.facmCreditSysNoRange(iCaseNo, iCaseNo, 1, 999, this.index, this.limit, titaVo);
+				slFacMain = facMainService.facmCreditSysNoRange(iCaseNo, iCaseNo, 1, 999, this.index, this.limit,
+						titaVo);
 				lFacMain = slFacMain == null ? null : slFacMain.getContent();
 			} else {
 				if (iFacmNo > 0) {
@@ -116,7 +121,8 @@ public class L3001 extends TradeBuffer {
 					wkFacmNoStart = 1;
 					wkFacmNoEnd = 999;
 				}
-				slFacMain = facMainService.facmCustNoRange(iCustNo, iCustNo, wkFacmNoStart, wkFacmNoEnd, this.index, this.limit, titaVo);
+				slFacMain = facMainService.facmCustNoRange(iCustNo, iCustNo, wkFacmNoStart, wkFacmNoEnd, this.index,
+						this.limit, titaVo);
 				lFacMain = slFacMain == null ? null : slFacMain.getContent();
 			}
 			if (lFacMain == null || lFacMain.size() == 0) {
@@ -187,7 +193,8 @@ public class L3001 extends TradeBuffer {
 				wkFacmNoStart = 1;
 				wkFacmNoEnd = 999;
 			}
-			slFacMain = facMainService.facmCustNoRange(iCustNo, iCustNo, wkFacmNoStart, wkFacmNoEnd, this.index, this.limit, titaVo);
+			slFacMain = facMainService.facmCustNoRange(iCustNo, iCustNo, wkFacmNoStart, wkFacmNoEnd, this.index,
+					this.limit, titaVo);
 			lFacMain = slFacMain == null ? null : slFacMain.getContent();
 		}
 
@@ -195,7 +202,8 @@ public class L3001 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "額度主檔"); // 查詢資料不存在
 		}
 
-		Slice<AcReceivable> slAcReceivable = acReceivableService.acrvFacmNoRange(0, iCustNo, 0, 0, 999, this.index, Integer.MAX_VALUE, titaVo); // 銷帳記號 0-未銷, 業務科目記號 0: 一般科目
+		Slice<AcReceivable> slAcReceivable = acReceivableService.acrvFacmNoRange(0, iCustNo, 0, 0, 999, this.index,
+				Integer.MAX_VALUE, titaVo); // 銷帳記號 0-未銷, 業務科目記號 0: 一般科目
 
 		// 如有有找到資料
 		for (FacMain tFacMain : lFacMain) {
@@ -239,8 +247,16 @@ public class L3001 extends TradeBuffer {
 			// acdate: 本月第一天
 			int acDate = (titaVo.getEntDyI() + 19110000) / 100 * 100 + 1;
 
-			Slice<LoanBorTx> slLoanBorTx = sLoanBorTxService.borxAcDateRange(iCustNo, tFacMain.getFacmNo(), tFacMain.getFacmNo(), 0, 999, acDate, 99991231, Arrays.asList("Y", "I", "A", "F"),
-					this.index, 1, titaVo);
+			Slice<LoanBorTx> slLoanBorTx = sLoanBorTxService.borxAcDateRange(iCustNo, tFacMain.getFacmNo(),
+					tFacMain.getFacmNo(), 0, 999, acDate, 99991231, Arrays.asList("Y", "I", "A", "F"), this.index, 1,
+					titaVo);
+
+			// 2023-07-04 Wei QC:2473 IT佳怡要檢查搬運紀錄
+			if (slLoanBorTx == null || slLoanBorTx.isEmpty()) {
+				titaVo.putParam("TimCustNo", "" + iCustNo);
+				checkIsArchive(titaVo);
+			}
+
 			List<LoanBorTx> lLoanBorTx = slLoanBorTx != null ? slLoanBorTx.getContent() : null;
 
 			occursList.putParam("OOHasL3005", lLoanBorTx != null && !lLoanBorTx.isEmpty() ? "Y" : "N");
@@ -248,8 +264,9 @@ public class L3001 extends TradeBuffer {
 			// 檢查是否有【繳息】按鈕
 			// 邏輯同 L3911
 
-			slLoanBorTx = sLoanBorTxService.borxIntEndDateDescRange(iCustNo, tFacMain.getFacmNo(), tFacMain.getFacmNo(), 0, 999, 19110101, titaVo.getEntDyI() + 19110000, Arrays.asList("Y", "I", "F"),
-					this.index, this.limit, titaVo);
+			slLoanBorTx = sLoanBorTxService.borxIntEndDateDescRange(iCustNo, tFacMain.getFacmNo(), tFacMain.getFacmNo(),
+					0, 999, 19110101, titaVo.getEntDyI() + 19110000, Arrays.asList("Y", "I", "F"), this.index,
+					this.limit, titaVo);
 
 			lLoanBorTx = slLoanBorTx != null ? slLoanBorTx.getContent() : null;
 
@@ -258,7 +275,8 @@ public class L3001 extends TradeBuffer {
 			// 檢查是否有【利率】按鈕
 			// 邏輯同 L3932
 
-			Slice<LoanRateChange> slLoanRateChange = sLoanRateChangeService.rateChangeFacmNoRange(iCustNo, tFacMain.getFacmNo(), tFacMain.getFacmNo(), 0, 999, 0, 99991231, this.index, 1, titaVo);
+			Slice<LoanRateChange> slLoanRateChange = sLoanRateChangeService.rateChangeFacmNoRange(iCustNo,
+					tFacMain.getFacmNo(), tFacMain.getFacmNo(), 0, 999, 0, 99991231, this.index, 1, titaVo);
 
 			List<LoanRateChange> lLoanRateChange = slLoanRateChange != null ? slLoanRateChange.getContent() : null;
 
@@ -299,5 +317,32 @@ public class L3001 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 
+	}
+
+	/**
+	 * 
+	 * QC:2473 REOPEN時 IT 佳怡反應<BR>
+	 * L3001也會出現已搬移至歷史環境會查不到的情況<BR>
+	 * 增加判斷:若查無資料,且檢查交易資料已搬運至歷史環境時<BR>
+	 * 錯誤訊息改為"交易明細已搬運至歷史環境"
+	 * 
+	 * @param titaVo titaVo
+	 * @throws LogicException LogicException
+	 */
+	private void checkIsArchive(TitaVo titaVo) throws LogicException {
+		/**
+		 * 
+		 */
+		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
+
+		try {
+			resultList = l3005ServiceImpl.checkIsArchive(titaVo);
+		} catch (Exception e) {
+			this.info("Error ... " + e.getMessage());
+		}
+
+		if (resultList != null && !resultList.isEmpty()) {
+			throw new LogicException(titaVo, "E0001", "交易明細已搬運至歷史環境"); // 查詢資料不存在
+		}
 	}
 }

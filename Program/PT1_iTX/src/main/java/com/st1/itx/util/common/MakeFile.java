@@ -186,8 +186,6 @@ public class MakeFile extends CommBuffer {
 			throw new LogicException("EC007", "(MakeFile)輸出檔案格式不可為" + format);
 		}
 
-		checkCdReport(titaVo, fileCode);
-
 		this.fileName = fileName;
 		this.fileFormat = format;
 		listMap = new ArrayList<Map<String, Object>>();
@@ -444,32 +442,6 @@ public class MakeFile extends CommBuffer {
 		this.info("getSecurity.getItem = " + securityItem);
 
 		return securityItem;
-	}
-
-	/**
-	 * 檢查報表對照檔是否有設定資料<BR>
-	 * 檢查寄送方式
-	 * 
-	 * 
-	 * @return SecurityItem 機密等級中文
-	 * @throws LogicException
-	 *
-	 */
-	private void checkCdReport(TitaVo titaVo, String rptCode) throws LogicException {
-
-//		rptCode = rptCode.length() > 5 ? rptCode.substring(0, 5) : rptCode;
-//		this.info("checkCdReport.rptCode=" + rptCode);
-//		
-//		CdReport tCdReport = cdReportService.findById(rptCode, titaVo);
-//		if (tCdReport == null) {
-//			throw new LogicException("E0009", "未設定報表代號：" + rptCode + "，請至L6068報表代號對照檔設定此報表代號 ");
-//		} else {
-//			this.info("checkCdReport.getLetterFg=" + tCdReport.getLetterFg());
-//			if ("N".equals(tCdReport.getLetterFg())) {
-//				// E0015檢查錯誤
-//				throw new LogicException("E0015", "交易：" + tCdReport.getFormNo() + "，書面寄送設定為否，需調整請至L6068報表設定檔。 ");
-//			}
-//		}
 	}
 
 }

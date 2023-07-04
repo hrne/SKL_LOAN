@@ -223,18 +223,19 @@ public class L4101Batch extends TradeBuffer {
 			// 作業項目為1.撥款(核心匯款)
 			if (iItemCode == 1 && t.getDrawdownCode() == 1) {
 				// 核心匯款
-				lBankRemit4.add(t);
-				lBankRemit2.add(t);
+				lBankRemit4.add(t);// 核心匯款媒體檔
+				lBankRemit2.add(t); // 匯款單
 			}
 			// 作業項目為2.撥款(整批匯款)
 			if (iItemCode == 2 && t.getDrawdownCode() == 2) {
 				// 整批匯款
-				lBankRemit3.add(t);
-				lBankRemit2.add(t);
+				lBankRemit3.add(t);// 整批匯款媒體檔
+				lBankRemit2.add(t);// 匯款單
 			}
 			// 作業項目為3.退款(核心匯款)
 			if (iItemCode == 3 && t.getDrawdownCode() == 5) {
-				lBankRemit2.add(t);
+				lBankRemit4.add(t);// 核心匯款媒體檔
+				lBankRemit2.add(t);// 匯款單
 			}
 		}
 
@@ -242,9 +243,10 @@ public class L4101Batch extends TradeBuffer {
 		totaVo.put("PdfSnoF", "");
 
 //		step1.產出媒體檔
-		if (iItemCode == 1) {
+		if (lBankRemit4.size() > 0) {
 			procBankRemitMedia(lBankRemit4, titaVo);
-		} else if (iItemCode == 2) {
+		}
+		if (lBankRemit3.size() > 0) {
 			String reportItem = "-撥款匯款媒體檔(整批匯款)";
 			procBankRemitMediaOld(lBankRemit3, reportItem, titaVo);
 		}
@@ -254,22 +256,22 @@ public class L4101Batch extends TradeBuffer {
 
 //			step3產出整批匯款單
 		totaB.init(titaVo);
-//			1.匯款申請書
-		long snoF = printRemitForm(lBankRemit2, titaVo);
+
+		long snoF = printRemitForm(lBankRemit2, titaVo);// 匯款申請書
 
 		this.info("snoF : " + snoF);
 
 		totaVo.put("PdfSnoF", "" + snoF);
 
-//			4.匯款明細
+//			step4.匯款明細
 		doRptB(titaVo);
-//			5.傳票明細表
+//			step5.傳票明細表
 		doRptC(titaVo);
-
+		// 撥款作業(核心、整批匯款)時產出
 		if (iItemCode == 1 || iItemCode == 2) {
-//			6.撥款未齊件表
+//			step6.撥款未齊件表
 			doRptD(titaVo);
-//			7.貸款自動轉帳申請書明細表
+//			step7.貸款自動轉帳申請書明細表
 			doRptE(titaVo);
 		}
 

@@ -375,7 +375,7 @@ public class L2419Batch extends TradeBuffer {
 
 			// column AC 設定金額(仟元)
 			String settingAmt = makeExcel.getValue(row, L2419Column.SETTING_AMT.getIndex()).toString();
-
+			settingAmt = parse.stringToBigDecimal(settingAmt).multiply(new BigDecimal("1000")).toPlainString();// 單位為千元
 			// column AD 還款金額(仟元)
 			String repayAmt = makeExcel.getValue(row, L2419Column.REPAY_AMT.getIndex()).toString();
 
@@ -440,6 +440,12 @@ public class L2419Batch extends TradeBuffer {
 				// column AO 所有權人1-身分證/統編
 				String ownerId1 = makeExcel.getValue(row, L2419Column.OWNER_ID_1.getIndex()).toString().trim();
 
+				// fix bug 客戶統編8碼數字時會以科學記號的數值轉入
+				if (isScientificNotation(ownerId1)) {
+					BigDecimal bd = new BigDecimal(ownerId1);
+					ownerId1 = bd.toPlainString();
+				}
+
 				// column AP 所有權人1-姓名
 				String ownerName1 = makeExcel.getValue(row, L2419Column.OWNER_NAME_1.getIndex()).toString().trim();
 
@@ -496,9 +502,9 @@ public class L2419Batch extends TradeBuffer {
 
 			// 2023/05/18新增判斷:取得CustUKey記錄在ClMain
 			String custUKey = findCustUKey(titaVo);
-			
+
 			clMain.setCustUKey(custUKey);
-			
+
 			// 擔保品類別代碼
 			clMain.setClTypeCode(clTypeCode);
 			// 地區別
@@ -1318,6 +1324,11 @@ public class L2419Batch extends TradeBuffer {
 			String columnAO = makeExcel.getValue(row, column + 1).toString();
 			this.info("columnAO = " + columnAO);
 			String ownerId1 = columnAO.trim();
+			// fix bug 客戶統編8碼數字時會以科學記號的數值轉入
+			if (isScientificNotation(ownerId1)) {
+				BigDecimal bd = new BigDecimal(ownerId1);
+				ownerId1 = bd.toPlainString();
+			}
 			if (ownerId1 == null || ownerId1.isEmpty()) {
 				throwErrorMsg("E0015", "行數:" + row + ",有選擇所有權種類時,所有權人" + ownerSeq + "-身分證/統編不得為空白.");
 			}
@@ -1391,5 +1402,9 @@ public class L2419Batch extends TradeBuffer {
 			return cdLandSection.getIrItem();
 		}
 		return "";
+	}
+
+	private boolean isScientificNotation(String str) {
+		return str.matches("[+-]?\\d+(\\.\\d*)?[Ee][+-]?\\d+");
 	}
 }

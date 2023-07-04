@@ -117,7 +117,6 @@ public class MakeExcel extends CommBuffer {
 			throw new LogicException("EC004", "(MakeExcel)輸出檔名(outfile)必須有值(MakeExcel)");
 		}
 
-		checkCdReport(titaVo, fileCode);
 
 		this.outputFileName = fileName;
 		reportVo = ReportVo.builder().setRptDate(date).setBrno(brno).setRptCode(fileCode).setRptItem(fileItem).build();
@@ -142,8 +141,6 @@ public class MakeExcel extends CommBuffer {
 		if ("".equals(fileName)) {
 			throw new LogicException("EC004", "(MakeExcel)輸出檔名(outfile)必須有值(MakeExcel)");
 		}
-
-		checkCdReport(titaVo, reportVo.getRptCode());
 
 		this.outputFileName = fileName;
 		this.reportVo = reportVo;
@@ -1403,30 +1400,6 @@ public class MakeExcel extends CommBuffer {
 		this.info("getSecurity.getItem = " + securityItem);
 
 		return securityItem;
-	}
-
-	/**
-	 * 1.檢查報表對照檔是否有設定資料<br>
-	 * 2.檢查是否要書面寄送<br>
-	 * 
-	 * 
-	 * @return SecurityItem 機密等級中文
-	 * @throws LogicException
-	 *
-	 */
-	private void checkCdReport(TitaVo titaVo, String rptCode) throws LogicException {
-//		rptCode = rptCode.length() > 5 ? rptCode.substring(0, 5) : rptCode;
-//		this.info("checkCdReport.rptCode=" + rptCode);
-//		CdReport tCdReport = cdReportService.findById(rptCode, titaVo);
-//		if (tCdReport == null) {
-//			throw new LogicException("E0009", "未設定報表代號：" + rptCode + "，請至L6068報表代號對照檔設定此報表代號 ");
-//		} else {
-//			this.info("checkCdReport.getLetterFg=" + tCdReport.getLetterFg());
-//			if ("N".equals(tCdReport.getLetterFg())) {
-//				// EC0015檢查錯誤
-//				throw new LogicException("E0015", "交易：" + tCdReport.getFormNo() + "，書面寄送設定為否，需調整請至L6068報表設定檔。 ");
-//			}
-//		}
 	}
 
 	public void setNoBackgroundByRow(int row) throws LogicException {
