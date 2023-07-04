@@ -93,8 +93,8 @@ public class L2634 extends TradeBuffer {
 //		勾選完成最後一筆,列印
 		if (titaVo.get("selectTotal") == null || titaVo.get("selectTotal").equals(titaVo.get("selectIndex"))) {
 
-			Slice<ClOtherRights> slClOtherRights = ClOtherRightsService.findChoiceDateEq(choiceDate + 19110000,
-					titaVo.getTlrNo(), 0, Integer.MAX_VALUE, titaVo);
+			Slice<ClOtherRights> slClOtherRights = ClOtherRightsService.findChoiceDateEq(1, 99999999, titaVo.getTlrNo(),
+					0, Integer.MAX_VALUE, titaVo);
 
 			lClOtherRights = slClOtherRights == null ? null : slClOtherRights.getContent();
 			if (lClOtherRights != null) {
@@ -134,6 +134,10 @@ public class L2634 extends TradeBuffer {
 		if (titaVo.get("OOCloseNo") != null || !titaVo.get("OOCloseNo").isEmpty()) {
 			closeNo = parse.stringToInteger(titaVo.get("OOCloseNo"));
 		}
+		if (titaVo.get("OOApplDate") != null || !titaVo.get("OOApplDate").isEmpty()) {
+			choiceDate = parse.stringToInteger(titaVo.get("OOApplDate"));
+		}
+
 //		列印塗銷同意書更新清償作業檔領取記號
 		if (iType == 2) {
 			FacClose tFacClose = sFacCloseService.holdById(new FacCloseId(custNo, closeNo), titaVo);

@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class ClOtherRights implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1726836396543591466L;
-
-@EmbeddedId
+  @EmbeddedId
   private ClOtherRightsId clOtherRightsId;
 
   // 擔保品代號1
@@ -124,7 +120,7 @@ public class ClOtherRights implements Serializable {
   private int closeNo = 0;
 
   // 擔保債權確定日期
-  /* 資料轉換:擔保品設定日期 */
+  /* 資料轉換:擔保債權確定日期 */
   @Column(name = "`SecuredDate`")
   private int securedDate = 0;
 
@@ -528,7 +524,7 @@ CdCode.ClRightsNote
 
 /**
 	* 擔保債權確定日期<br>
-	* 資料轉換:擔保品設定日期
+	* 資料轉換:擔保債權確定日期
 	* @return Integer
 	*/
   public int getSecuredDate() {
@@ -537,7 +533,7 @@ CdCode.ClRightsNote
 
 /**
 	* 擔保債權確定日期<br>
-	* 資料轉換:擔保品設定日期
+	* 資料轉換:擔保債權確定日期
   *
   * @param securedDate 擔保債權確定日期
   * @throws LogicException when Date Is Warn	*/

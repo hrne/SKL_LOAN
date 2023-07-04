@@ -72,10 +72,12 @@ public class L2632 extends TradeBuffer {
 		BigDecimal iCloseAmt = parse.stringToBigDecimal(titaVo.getParam("TimCloseAmt"));
 		// 作業項目
 		int iItemCode = parse.stringToInteger(titaVo.getParam("ItemCode"));
+		// 申請日期
+		int iApplDate = parse.stringToInteger(titaVo.getParam("ApplDate"));
 
 		// new PK
 		FacCloseId FacCloseId = new FacCloseId();
-		FacCloseId.setCustNo(iCustNo);
+		FacCloseId.setApplDate(iApplDate);
 		FacCloseId.setCloseNo(iCloseNo);
 		// new table
 		FacClose tFacClose = new FacClose();

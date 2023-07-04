@@ -42,10 +42,10 @@ public class L2R36 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2R36 ");
 		this.totaVo.init(titaVo);
-
+	
 		// tita參數
 		// 戶號
-		int iCustNo = parse.stringToInteger(titaVo.getParam("RimCustNo"));
+		int iApplDate = parse.stringToInteger(titaVo.getParam("RimApplDate"));
 		// 清償序號
 		int iCloseNo = parse.stringToInteger(titaVo.getParam("RimCloseNo"));
 
@@ -54,7 +54,7 @@ public class L2R36 extends TradeBuffer {
 		// new table
 		FacClose tFacClose = new FacClose();
 
-		FacCloseId.setCustNo(iCustNo);
+		FacCloseId.setApplDate(iApplDate);
 		FacCloseId.setCloseNo(iCloseNo);
 
 		tFacClose = sFacCloseService.findById(FacCloseId, titaVo);

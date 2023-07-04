@@ -309,6 +309,7 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ,ROUND( CASE ";
 		sql += "				  WHEN \"ClCode1\" = 0 THEN (SELECT \"LoanBal\" FROM ProjectLoan ) ";
 		sql += "				  WHEN \"ClCode1\" = 2 THEN (SELECT \"downBookValue\" FROM BookValueTmp ) ";
+		sql += "										  - (SELECT \"LoanBal\" FROM ProjectLoan ) ";
 		sql += "				  ELSE SUM(\"BookValue\") END ) AS \"BookValue\"  ";
 		sql += "        ,NULL AS \"LineTotal\"  ";
 		sql += "  FROM TotalData_LineTotal  ";

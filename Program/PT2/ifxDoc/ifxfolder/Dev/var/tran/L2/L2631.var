@@ -431,12 +431,12 @@ V(2,0)
 
 ![申請日期]
 !補領或補發時必須輸入,補領時依申請日期計算是否限制清償日期內
-#ApplDate=D,7,I
+#ApplDate=D,7,L
 E(0,#SYSCDATE)
-IF(#FunCode==2||#FunCode==3,$,S)
-@V(7)
-A(DATE,0,#ApplDate)
-V(2,0)
+! IF(#FunCode==2||#FunCode==3,$,S)
+! @V(7)
+! A(DATE,0,#ApplDate)
+! V(2,0)
 
 ![結案區分]
 !必須輸入

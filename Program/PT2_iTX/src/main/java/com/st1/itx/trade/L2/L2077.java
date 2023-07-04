@@ -143,7 +143,6 @@ public class L2077 extends TradeBuffer {
 				this.info("FunCode = " + result.get("FunCode"));
 				if (("2".equals(result.get("FunCode")) || "3".equals(result.get("FunCode")))
 						&& baTxCom.getShortCloseBreach().compareTo(BigDecimal.ZERO) == 0) {
-
 					wkRepayFg = "Y";
 				}
 
@@ -215,11 +214,7 @@ public class L2077 extends TradeBuffer {
 				} else {
 					occursList.putParam("OOCreateDate", 0);
 				}
-				if ("20".equals(result.get("CollectWayCode"))) {
-					occursList.putParam("OORmk", result.get("Rmk"));
-				} else {
-					occursList.putParam("OORmk", "");
-				}
+				occursList.putParam("OORmk", result.get("Rmk"));
 				occursList.putParam("OOTelNo1", result.get("TelNo1"));
 				occursList.putParam("OODocNo", result.get("DocNo"));
 				occursList.putParam("OOAgreeNo", result.get("AgreeNo"));

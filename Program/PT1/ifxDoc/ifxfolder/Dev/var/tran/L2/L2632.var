@@ -27,6 +27,7 @@ E(0,0)
 ["[L2632]                                 清償作業維護"],
 [#<->#,"#FdFunCode+功能",#FunCodeX],
 [#<->#,"#FdCustNo+借戶戶號",#CustNo,#CustName],
+[#<->#,"#FdApplDate+申請日期",#ApplDate],
 [#<->#,"#FdCloseNo+清償序號",#CloseNo],
 [#<->#,"#FdFacmNo+額度編號",#FacmNo],
 [#<->#,"#FdEntryDate+入帳日期",#EntryDate],
@@ -136,17 +137,18 @@ IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L2077清償作業明細資�
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@FunCode,#NTXBUF,1,1)
 ! T(1,@CloseDate,#NTXBUF,2,7)
+T(1,@ApplDate,#NTXBUF,2,7)
 T(1,@CloseNo,#NTXBUF,9,3)
 T(1,@RimCloseNo,#NTXBUF,9,3)
 T(1,@CustNo,#NTXBUF,12,7)
-
+#RimApplDate=D,7,S
 !    L2R36B : 尋找清償作業檔資料
 #RimL2r36B=X,1,S
 C(3,#CHAIN,1,$,S)
-E(0,@RimCustNo,#CustNo)
+E(0,@RimApplDate,#ApplDate)
 T(2,@RimCloseNo,#CloseNo)
 RESET_RIM(#RimL2r36B,L2R36)
-S(L2R36,1,#RimCustNo,#RimCloseNo)
+S(L2R36,1,#RimApplDate,#RimCloseNo)
 R(1,L2R36)
 E(0,@FacmNo,#L2r36FacmNo)
 T(2,@CloseInd,#L2r36CloseInd)
@@ -170,7 +172,8 @@ E(0,@ItemCode,#L2r36FunCode)
 T(2,@CloseReasonCode,#L2r36CloseReasonCode)
 T(H,@CloseReasonCodeX,#CloseReasonCode,#CloseReasonCodeHelp)
 T(H,@CollectWayCodeX,#CollectWayCode,#CollectWayCodeHelp)
-
+#FdApplDate=X,2,L
+#ApplDate=D,7,L
 ! L2r36CarLoan=A,1,S
 ! L2r36ApplDate=D,7,S
 
@@ -365,24 +368,20 @@ E(0,#TwCloseAmt)
 ! #CloseAmtX=X,22,L
 ! CALL2(#ADJUSTDOT,#PRECISION,#TimCloseAmt,#CloseAmtX)
 
-
 !連絡電話１ 自動顯示不需輸入
 #TelNo1=X,15,I
 C(3,#FunCode,4,s,$)
 C(3,#FunCode,5,s,$)
-
 
 !連絡電話２ 自動顯示不需輸入
 #TelNo2=X,15,I
 C(3,#FunCode,4,s,$)
 C(3,#FunCode,5,s,$)
 
-
 !連絡電話３ 自動顯示不需輸入
 #TelNo3=X,15,I
 C(3,#FunCode,4,s,$)
 C(3,#FunCode,5,s,$)
-
 
 !清償原因 修改時自動顯示可修改,其他自動顯示不需輸入
 #CloseReasonCode=X,2,I
@@ -409,7 +408,7 @@ C(5,#CollectFlag,"Y",V(2,01,20),V(1,01,20))
 
 #CollectWayCodeX=X,50,L
 T(H,#CollectWayCode,#CollectWayCodeHelp)
-IF(#CollectWayCode==21||#CollectWayCode==26||#CollectWayCode==27,INVOKEJS(SHOW,p1,12,12,1),INVOKEJS(SHOW,p1,12,12,0))
+IF(#CollectWayCode==21||#CollectWayCode==26||#CollectWayCode==27,INVOKEJS(SHOW,p1,13,13,1),INVOKEJS(SHOW,p1,13,13,0))
 IF(#CollectWayCode==26,T(2,@PostAddress,#ClLocation),$)
 IF(#CollectWayCode==27,T(2,@PostAddress,#CurrAddress),$)
 
@@ -491,6 +490,7 @@ T(3,[L2632] 清償作業維護)
 !------ 上行電文 ------
 <sub type="TIM">
 #FunCode
+#ApplDate
 #CloseDate
 #CustNo
 #CloseNo

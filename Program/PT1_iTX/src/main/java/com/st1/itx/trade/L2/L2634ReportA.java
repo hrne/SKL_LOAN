@@ -116,9 +116,6 @@ public class L2634ReportA extends MakeReport {
 		this.reportDate = Integer.valueOf(titaVo.getEntDy());
 		this.brno = titaVo.getBrno();
 		int iAgreeNo = parse.stringToInteger(titaVo.getParam("AgreeNo"));
-//		this.NowDate = dDateUtil.getNowStringRoc();
-//		this.pageSize = "A5";
-//		this.NowTime = dDateUtil.getNowStringTime();
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(reportCode)
 				.setRptItem(reportItem).setSecurity(security).setRptSize(pageSize).setPageOrientation(pageOrientation)
@@ -159,7 +156,7 @@ public class L2634ReportA extends MakeReport {
 			String CustName = "";
 			CustName = sCustMainService.custNoFirst(iCustNo, iCustNo, titaVo).getCustName();
 			FacCloseId FacCloseId = new FacCloseId();
-			FacCloseId.setCustNo(iCustNo);
+			FacCloseId.setApplDate(t.getChoiceDate());
 			FacCloseId.setCloseNo(iCloseNo);
 //			更新公文編號
 			FacClose updFacClose = sFacCloseService.holdById(FacCloseId, titaVo);

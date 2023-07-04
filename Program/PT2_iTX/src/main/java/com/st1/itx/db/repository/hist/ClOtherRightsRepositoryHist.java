@@ -3,11 +3,14 @@ package com.st1.itx.db.repository.hist;
 
 import java.util.Optional;
 
+import java.math.BigDecimal;
+import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,8 +37,8 @@ public interface ClOtherRightsRepositoryHist extends JpaRepository<ClOtherRights
   // ClCode1 >= ,AND ClCode1 <= ,AND ClCode2 >= ,AND ClCode2 <= ,AND ClNo >= ,AND ClNo <=
   public Slice<ClOtherRights> findAllByClCode1GreaterThanEqualAndClCode1LessThanEqualAndClCode2GreaterThanEqualAndClCode2LessThanEqualAndClNoGreaterThanEqualAndClNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscSeqAsc(int clCode1_0, int clCode1_1, int clCode2_2, int clCode2_3, int clNo_4, int clNo_5, Pageable pageable);
 
-  // ChoiceDate = ,AND LastUpdateEmpNo =
-  public Slice<ClOtherRights> findAllByChoiceDateIsAndLastUpdateEmpNoIsOrderByCloseNoAsc(int choiceDate_0, String lastUpdateEmpNo_1, Pageable pageable);
+  // ChoiceDate >= ,AND ChoiceDate <= ,AND LastUpdateEmpNo =
+  public Slice<ClOtherRights> findAllByChoiceDateGreaterThanEqualAndChoiceDateLessThanEqualAndLastUpdateEmpNoIsOrderByCloseNoAsc(int choiceDate_0, int choiceDate_1, String lastUpdateEmpNo_2, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

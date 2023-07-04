@@ -138,9 +138,9 @@ C(3,#Type,2,INVOKEJS(SHOW,p1,5,5,1),INVOKEJS(SHOW,p1,5,5,0))
 T(H,#Type,#TypeHelp)
 
 !塗銷同意書編號起號
-#AgreeNo=A,10,I
+#AgreeNo=X,10,I
 C(3,#Type,2,$,S)
-@V(2,0)
+@V(7)
 
 
 #Search=A,1,I
@@ -230,7 +230,7 @@ T(H,#OORightsNote,#ClRightsNoteHelp)
 #OOAllClose=X,1,O
 
 #secret-no=x,1000,S
-T(6A,#EntryDate+#ApplDate+#Type+#OOCustNo+#OOCloseNo+#OOClCode1+#OOClCode2+#OOClNo+#OOSeq+#AgreeNo)
+T(6A,#EntryDate+#ApplDate+#Type+#OOCustNo+#OOCloseNo+#OOClCode1+#OOClCode2+#OOClNo+#OOSeq+#OOApplDate+#AgreeNo)
 
 
 

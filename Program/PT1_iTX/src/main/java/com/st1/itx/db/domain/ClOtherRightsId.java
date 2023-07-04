@@ -2,8 +2,12 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * ClOtherRights 擔保品他項權利檔<br>
@@ -16,12 +20,7 @@ import javax.persistence.Embeddable;
 public class ClOtherRightsId implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -3346732696726706955L;
-
-// 擔保品代號1
+  // 擔保品代號1
   /* 擔保品代號檔CdCl */
   @Column(name = "`ClCode1`")
   private int clCode1 = 0;

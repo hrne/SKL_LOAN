@@ -242,6 +242,13 @@ public class LM049Report extends MakeReport {
 		makeExcel.formulaCaculate(d[1] + 1, 11);
 		makeExcel.formulaCaculate(d[1] + 1, 12);
 
+		// 合計
+		makeExcel.setFormula(d[1] + 2, 11, BigDecimal.ZERO,
+				"SUM(K" + (a[1] + 1) + ",K" + (b[1] + 1) + ",K" + (c[1] + 1) + ",K" + (d[1] + 1) + ")", "#,##0");
+		makeExcel.setFormula(d[1] + 2, 12, BigDecimal.ZERO, "(K" + d[1] + 2 + "/$G$2) * 100 ", "0.00");
+		makeExcel.formulaCaculate(d[1] + 2, 11);
+		makeExcel.formulaCaculate(d[1] + 2, 12);
+
 		// 寫入合計資料
 //		makeExcel.setValue(rowCursorTotal, 13, divThousand(totalOfLoanBal), "#,##0");
 
@@ -323,8 +330,9 @@ public class LM049Report extends MakeReport {
 		boolean isSame = false;
 
 		for (Map<String, String> map : list) {
-
+			
 			if (!tmpCustNo.equals(map.get("CustNo"))) {
+				tmpCustNo = map.get("CustNo");
 				isSame = false;
 			} else {
 				isSame = true;

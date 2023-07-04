@@ -159,8 +159,6 @@ public class L2634ReportB extends MakeReport {
 				if (tFacClose == null) {
 					continue;
 				}
-
-
 				CustMain tCustMain = sCustMainService.custNoFirst(tFacClose.getCustNo(), tFacClose.getCustNo(), titaVo);
 				if (tCustMain != null) {
 					custId = tCustMain.getCustId();

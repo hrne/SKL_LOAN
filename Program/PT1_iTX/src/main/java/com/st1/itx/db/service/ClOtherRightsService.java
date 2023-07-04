@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.ClOtherRights;
@@ -88,16 +90,17 @@ public interface ClOtherRightsService {
   public Slice<ClOtherRights> findClCodeRange(int clCode1_0, int clCode1_1, int clCode2_2, int clCode2_3, int clNo_4, int clNo_5, int index, int limit, TitaVo... titaVo);
 
   /**
-   * ChoiceDate = ,AND LastUpdateEmpNo =
+   * ChoiceDate &gt;= ,AND ChoiceDate &lt;= ,AND LastUpdateEmpNo =
    *
    * @param choiceDate_0 choiceDate_0
-   * @param lastUpdateEmpNo_1 lastUpdateEmpNo_1
+   * @param choiceDate_1 choiceDate_1
+   * @param lastUpdateEmpNo_2 lastUpdateEmpNo_2
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice ClOtherRights ClOtherRights of List
    */
-  public Slice<ClOtherRights> findChoiceDateEq(int choiceDate_0, String lastUpdateEmpNo_1, int index, int limit, TitaVo... titaVo);
+  public Slice<ClOtherRights> findChoiceDateEq(int choiceDate_0, int choiceDate_1, String lastUpdateEmpNo_2, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By ClOtherRights

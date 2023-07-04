@@ -108,7 +108,7 @@ public class L2631 extends TradeBuffer {
 		// new PK
 		FacCloseId tFacCloseId = new FacCloseId();
 		// new table
-		FacClose tFacCloseMaxCloseNo = new FacClose();
+		FacClose tLastCloseNo = new FacClose();
 		FacClose tFacClose = new FacClose();
 		CustMain tCustMain = new CustMain();
 		List<ClFac> lClFac = new ArrayList<ClFac>();
@@ -148,13 +148,13 @@ public class L2631 extends TradeBuffer {
 		// wk
 		int wkDocNo = 0;
 		// 測試是否存在清償作業檔 如不存在清償序號為01,如存在取該戶號額度清償序號最大筆+1
-		tFacCloseMaxCloseNo = sFacCloseService.findMaxCloseNoFirst(iCustNo);
-		if (tFacCloseMaxCloseNo != null) {
-			wkcloseNo = tFacCloseMaxCloseNo.getCloseNo() + 1;
+		tLastCloseNo = sFacCloseService.findLastCloseNoFirst(iApplDate + 19110000, titaVo);
+		if (tLastCloseNo != null) {
+			wkcloseNo = tLastCloseNo.getCloseNo() + 1;
 		}
 		this.info("清償序號 = " + wkcloseNo);
 
-		tFacCloseId.setCustNo(iCustNo);
+		tFacCloseId.setApplDate(iApplDate);
 		tFacCloseId.setCloseNo(wkcloseNo);
 
 		tFacClose.setFacCloseId(tFacCloseId);

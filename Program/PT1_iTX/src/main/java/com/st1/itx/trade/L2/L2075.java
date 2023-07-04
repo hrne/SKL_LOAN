@@ -133,9 +133,10 @@ public class L2075 extends TradeBuffer {
 			for (Map<String, String> result : resultList) {
 				// funcd1 勾選資料
 				this.info("result = " + result);
+				applDate = parse.stringToInteger(result.get("ApplDate"));
 				custNo = parse.stringToInteger(result.get("CustNo"));
 				facmNo = parse.stringToInteger(result.get("FacmNo"));
-				closeNo = parse.stringToInteger(result.get("MAXNO"));
+				closeNo = parse.stringToInteger(result.get("MaxCloseNo"));
 				clCode1 = parse.stringToInteger(result.get("ClCode1"));
 				clCode2 = parse.stringToInteger(result.get("ClCode2"));
 				clNo = parse.stringToInteger(result.get("ClNo"));
@@ -145,9 +146,8 @@ public class L2075 extends TradeBuffer {
 				if (facmNoS > 0) {
 					facmNoE = facmNoS;
 				}
-				FacClose tFacClose = sFacCloseService.findById(new FacCloseId(custNo, closeNo), titaVo);
+				FacClose tFacClose = sFacCloseService.findById(new FacCloseId(applDate, closeNo), titaVo);
 				entryDate = 0;
-				applDate = 0;
 				closeDate = 0;
 				funCode = "";
 				if (tFacClose != null) {

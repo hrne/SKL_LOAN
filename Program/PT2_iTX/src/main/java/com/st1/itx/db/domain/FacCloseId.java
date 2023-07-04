@@ -2,8 +2,12 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * FacClose 清償作業檔<br>
@@ -15,82 +19,81 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class FacCloseId implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 7636277796977510217L;
 
-// 戶號
-	@Column(name = "`CustNo`")
-	private int custNo = 0;
+  // 申請日期
+  /* 日曆日 */
+  @Column(name = "`ApplDate`")
+  private int applDate = 0;
 
-	// 清償序號
-	@Column(name = "`CloseNo`")
-	private int closeNo = 0;
+  // 清償序號
+  /* 依申請日期由1續編 */
+  @Column(name = "`CloseNo`")
+  private int closeNo = 0;
 
-	public FacCloseId() {
-	}
+  public FacCloseId() {
+  }
 
-	public FacCloseId(int custNo, int closeNo) {
-		this.custNo = custNo;
-		this.closeNo = closeNo;
-	}
+  public FacCloseId(int applDate, int closeNo) {
+    this.applDate = applDate;
+    this.closeNo = closeNo;
+  }
 
-	/**
-	 * 戶號<br>
-	 * 
-	 * @return Integer
-	 */
-	public int getCustNo() {
-		return this.custNo;
-	}
+/**
+	* 申請日期<br>
+	* 日曆日
+	* @return Integer
+	*/
+  public int getApplDate() {
+    return  StaticTool.bcToRoc(this.applDate);
+  }
 
-	/**
-	 * 戶號<br>
-	 * 
-	 *
-	 * @param custNo 戶號
-	 */
-	public void setCustNo(int custNo) {
-		this.custNo = custNo;
-	}
+/**
+	* 申請日期<br>
+	* 日曆日
+  *
+  * @param applDate 申請日期
+  * @throws LogicException when Date Is Warn	*/
+  public void setApplDate(int applDate) throws LogicException {
+    this.applDate = StaticTool.rocToBc(applDate);
+  }
 
-	/**
-	 * 清償序號<br>
-	 * 
-	 * @return Integer
-	 */
-	public int getCloseNo() {
-		return this.closeNo;
-	}
+/**
+	* 清償序號<br>
+	* 依申請日期由1續編
+	* @return Integer
+	*/
+  public int getCloseNo() {
+    return this.closeNo;
+  }
 
-	/**
-	 * 清償序號<br>
-	 * 
-	 *
-	 * @param closeNo 清償序號
-	 */
-	public void setCloseNo(int closeNo) {
-		this.closeNo = closeNo;
-	}
+/**
+	* 清償序號<br>
+	* 依申請日期由1續編
+  *
+  * @param closeNo 清償序號
+	*/
+  public void setCloseNo(int closeNo) {
+    this.closeNo = closeNo;
+  }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(custNo, closeNo);
-	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null || getClass() != obj.getClass())
-			return false;
-		FacCloseId facCloseId = (FacCloseId) obj;
-		return custNo == facCloseId.custNo && closeNo == facCloseId.closeNo;
-	}
+  @Override
+  public int hashCode() {
+    return Objects.hash(applDate, closeNo);
+  }
 
-	@Override
-	public String toString() {
-		return "FacCloseId [custNo=" + custNo + ", closeNo=" + closeNo + "]";
-	}
+  @Override
+  public boolean equals(Object obj) {
+    if(this == obj)
+      return true;
+    if(obj == null || getClass() != obj.getClass())
+      return false;
+    FacCloseId facCloseId = (FacCloseId) obj;
+    return applDate == facCloseId.applDate && closeNo == facCloseId.closeNo;
+  }
+
+  @Override
+  public String toString() {
+    return "FacCloseId [applDate=" + applDate + ", closeNo=" + closeNo + "]";
+  }
 }

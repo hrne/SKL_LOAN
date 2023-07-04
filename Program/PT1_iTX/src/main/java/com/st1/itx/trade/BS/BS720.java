@@ -91,11 +91,7 @@ public class BS720 extends TradeBuffer {
 
 		// 利息法帳面資料檔更新
 		titaVo.keepOrgDataBase();// 保留原本記號
-		
-		procUpload(iYearMonth, titaVo);
-		
-		titaVo.setDataBaseOnMon();// 指定月報環境
-		
+
 		procUpload(iYearMonth, titaVo);
 
 		this.batchTransaction.commit();
@@ -109,8 +105,6 @@ public class BS720 extends TradeBuffer {
 		}
 
 		this.batchTransaction.commit();
-
-		titaVo.setDataBaseOnOrg();// 還原原本的環境
 
 // 2021/2/24 考慮四捨五入差額，只出表、不入帳(維持至核心會計系統輸入)	=> 2022/01改回要入帳	
 		// 寫入應處理清單 ACCL04-折溢價攤銷入帳
@@ -212,8 +206,27 @@ public class BS720 extends TradeBuffer {
 				throw new LogicException("E0005", e.getErrorMsg()); // 新增資料時，發生錯誤
 			}
 
+			titaVo.setDataBaseOnMon();// 指定月報環境
+
+			if (oListIas39IntMethod != null) {
+				try {
+					ias39IntMethodService.deleteAll(oListIas39IntMethod, titaVo);
+				} catch (DBException e) {
+					e.printStackTrace();
+					throw new LogicException(titaVo, "E0008", "Ias39IntMethod利息法帳面資料檔" + " " + e.getErrorMsg()); // 刪除資料時，發生錯誤
+				}
+			}
+			// 新增
+			try {
+				ias39IntMethodService.insertAll(lIas39IntMethod, titaVo);
+			} catch (DBException e) {
+				e.printStackTrace();
+				throw new LogicException("E0005", e.getErrorMsg()); // 新增資料時，發生錯誤
+			}
+
+			titaVo.setDataBaseOnOrg();// 還原原本的環境
+
 		}
-		
 
 	}
 
