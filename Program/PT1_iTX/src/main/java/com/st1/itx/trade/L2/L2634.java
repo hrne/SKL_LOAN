@@ -140,7 +140,7 @@ public class L2634 extends TradeBuffer {
 
 //		列印塗銷同意書更新清償作業檔領取記號
 		if (iType == 2) {
-			FacClose tFacClose = sFacCloseService.holdById(new FacCloseId(custNo, closeNo), titaVo);
+			FacClose tFacClose = sFacCloseService.holdById(new FacCloseId(choiceDate+19110000, closeNo), titaVo);
 			if (tFacClose != null) {
 
 				if (tFacClose.getCloseDate() == 0) {

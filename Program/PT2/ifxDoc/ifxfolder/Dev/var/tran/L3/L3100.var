@@ -2453,8 +2453,10 @@ C(3,#DSnoF,0,E(0,0),E(0,1))
 ##loop{times:10,n:1}
 #StepMonths{n}#StepMonthE{n}#StepRateType{n}#StepRateTypeX{n}#StepRateIncr{n}#StepRatePer{n}
 ##end
+#RepayCode
 #RepayCodeX
 #RepayAcctNo
+#RepayBank
 #RepayBankX
 #PostCode#PostCodeX
 #RelationCodeX

@@ -222,26 +222,33 @@ public class LM049Report extends MakeReport {
 			setValueToExcel(rowCursorD, listD);
 		}
 
-		makeExcel.setFormula(a[1] + 1, 11, BigDecimal.ZERO, "SUM(K" + a[0] + ":K" + a[1] + ")", "#,##0");
-		makeExcel.setFormula(a[1] + 1, 12, BigDecimal.ZERO, "(K" + a[1] + 1 + "/$G$2) * 100 ", "0.00");
-		makeExcel.formulaCaculate(a[1] + 1, 11);
-		makeExcel.formulaCaculate(a[1] + 1, 12);
+		if (listA.size() > 0) {
+			makeExcel.setFormula(a[1] + 1, 11, BigDecimal.ZERO, "SUM(K" + a[0] + ":K" + a[1] + ")", "#,##0");
+			makeExcel.setFormula(a[1] + 1, 12, BigDecimal.ZERO, "(K" + a[1] + 1 + "/$G$2) * 100 ", "0.00");
+			makeExcel.formulaCaculate(a[1] + 1, 11);
+			makeExcel.formulaCaculate(a[1] + 1, 12);
+		}
 
-		makeExcel.setFormula(b[1] + 1, 11, BigDecimal.ZERO, "SUM(K" + b[0] + ":K" + b[1] + ")", "#,##0");
-		makeExcel.setFormula(b[1] + 1, 12, BigDecimal.ZERO, "(K" + b[1] + 1 + "/$G$2) * 100 ", "0.00");
-		makeExcel.formulaCaculate(b[1] + 1, 11);
-		makeExcel.formulaCaculate(b[1] + 1, 12);
+		if (listB.size() > 0) {
+			makeExcel.setFormula(b[1] + 1, 11, BigDecimal.ZERO, "SUM(K" + b[0] + ":K" + b[1] + ")", "#,##0");
+			makeExcel.setFormula(b[1] + 1, 12, BigDecimal.ZERO, "(K" + b[1] + 1 + "/$G$2) * 100 ", "0.00");
+			makeExcel.formulaCaculate(b[1] + 1, 11);
+			makeExcel.formulaCaculate(b[1] + 1, 12);
+		}
 
-		makeExcel.setFormula(c[1] + 1, 11, BigDecimal.ZERO, "SUM(K" + c[0] + ":K" + c[1] + ")", "#,##0");
-		makeExcel.setFormula(c[1] + 1, 12, BigDecimal.ZERO, "(K" + c[1] + 1 + "/$G$2) * 100 ", "0.00");
-		makeExcel.formulaCaculate(c[1] + 1, 11);
-		makeExcel.formulaCaculate(c[1] + 1, 12);
+		if (listC.size() > 0) {
+			makeExcel.setFormula(c[1] + 1, 11, BigDecimal.ZERO, "SUM(K" + c[0] + ":K" + c[1] + ")", "#,##0");
+			makeExcel.setFormula(c[1] + 1, 12, BigDecimal.ZERO, "(K" + c[1] + 1 + "/$G$2) * 100 ", "0.00");
+			makeExcel.formulaCaculate(c[1] + 1, 11);
+			makeExcel.formulaCaculate(c[1] + 1, 12);
+		}
 
-		makeExcel.setFormula(d[1] + 1, 11, BigDecimal.ZERO, "SUM(K" + d[0] + ":K" + d[1] + ")", "#,##0");
-		makeExcel.setFormula(d[1] + 1, 12, BigDecimal.ZERO, "(K" + d[1] + 1 + "/$G$2) * 100 ", "0.00");
-		makeExcel.formulaCaculate(d[1] + 1, 11);
-		makeExcel.formulaCaculate(d[1] + 1, 12);
-
+		if (listD.size() > 0) {
+			makeExcel.setFormula(d[1] + 1, 11, BigDecimal.ZERO, "SUM(K" + d[0] + ":K" + d[1] + ")", "#,##0");
+			makeExcel.setFormula(d[1] + 1, 12, BigDecimal.ZERO, "(K" + d[1] + 1 + "/$G$2) * 100 ", "0.00");
+			makeExcel.formulaCaculate(d[1] + 1, 11);
+			makeExcel.formulaCaculate(d[1] + 1, 12);
+		}
 		// 合計
 		makeExcel.setFormula(d[1] + 2, 11, BigDecimal.ZERO,
 				"SUM(K" + (a[1] + 1) + ",K" + (b[1] + 1) + ",K" + (c[1] + 1) + ",K" + (d[1] + 1) + ")", "#,##0");
@@ -297,40 +304,15 @@ public class LM049Report extends MakeReport {
 		// 小計-授信餘額
 		BigDecimal loanBalTotal = BigDecimal.ZERO;
 
-//		Map<String, BigDecimal> clEvaAmt = new HashMap<>();
-//		Map<String, BigDecimal> clLoanBal = new HashMap<>();
-
-		// 貸放成數特殊邏輯
-		// 同擔保品時,先合計放款餘額再除以擔保品估價
-//		for (Map<String, String> map : list) {
-//
-//			String custNoClNo = map.get("CustNo") + "-" + map.get("ClNo");
-//
-//			clEvaAmt.put(custNoClNo, getBigDecimal(map.get("EvaAmt")));
-//
-//			BigDecimal loanBal = getBigDecimal(map.get("LoanBal"));
-//
-//			loanBalTotal = loanBalTotal.add(loanBal);
-//
-//			BigDecimal computeLoanBal = loanBal;
-//
-//			if (clLoanBal.containsKey(custNoClNo)) {
-//				computeLoanBal = computeLoanBal.add(clLoanBal.get(custNoClNo));
-//			}
-//
-//			this.info("custNoClNo = " + custNoClNo);
-//			this.info("computeLoanBal = " + computeLoanBal);
-//
-//			clLoanBal.put(custNoClNo, computeLoanBal);
-//		}
-
-//		Map<String, int[]> sameCollateralRange = new HashMap<>();
-
 		String tmpCustNo = "";
 		boolean isSame = false;
-
+		String tmpClNo = "";
+		String sameClNo = "";
+		int tmpRow = 0;
+		int clNocnt = 0;
+		int cnt = 0;
 		for (Map<String, String> map : list) {
-			
+
 			if (!tmpCustNo.equals(map.get("CustNo"))) {
 				tmpCustNo = map.get("CustNo");
 				isSame = false;
@@ -374,8 +356,30 @@ public class LM049Report extends MakeReport {
 			}
 			// 額度
 			makeExcel.setValue(rowCursor, 13, map.get("FacmNo"));
+
+			// 計算同押品別的數量
+			clNocnt++;
+			// 計算筆數
+			cnt++;
+
 			// 備註說明
-//			makeExcel.setValue(rowCursor, 14, map.get("IsSameCollateral"));
+			if (!tmpClNo.equals(map.get("ClNo"))) {
+
+				clNocnt = 1;
+				makeExcel.setValue(tmpRow, 14, sameClNo);
+				sameClNo = "";
+				tmpRow = rowCursor;
+
+			} else {
+				if (clNocnt > 1) {
+					sameClNo = "同押品";
+				}
+			}
+
+			if (cnt == list.size()) {
+				makeExcel.setValue(tmpRow, 14, sameClNo);
+			}
+
 
 			rowCursor++;
 

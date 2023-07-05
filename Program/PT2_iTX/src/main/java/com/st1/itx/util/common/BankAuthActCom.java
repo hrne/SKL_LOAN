@@ -45,12 +45,14 @@ import com.st1.itx.util.parse.Parse;
 /**
  * LOG、帳號檔維護 <BR>
  * 1.acctCheck <BR>
- * 1.1 L2153 僅新增：放行新增；訂正刪除 <BR>
+ * 1.1 L2153 僅建立授權帳號檔，放行新增；訂正刪除 <BR>
+ * 1.2 L3100 撥款建立授權記錄檔僅新增：放行新增；訂正刪除 <BR>
+ * 1.3 L2154 已授權成功之帳號更才可使用(更新帳號檔)：放行更新；訂正刪除更新 <BR>
  * 1.4 L4410、L4412 新增：若該額度已有授權成功帳號，僅寫入Log檔，待回傳檔L4414上傳更新帳號檔 <BR>
  * 1.5 L4410、L4412 維護：若為未授權可維護Key值以外欄位，否則僅能變更暫停或暫停回復記號 <BR>
  * 1.6 L4410、L4412 刪除：僅刪除Log檔 <BR>
  * 2 changeAcctNo <BR>
- * 1.2 L2154 維護：前端控制為原帳號或已授權之帳號，僅維護帳號檔 <BR>
+ * 2.2 L2154 維護：前端控制為原帳號或已授權之帳號，僅維護帳號檔 <BR>
  * 
  * @author St1
  * @version 1.0.0
@@ -152,7 +154,6 @@ public class BankAuthActCom extends TradeBuffer {
 	private String iRelationId = "";
 	private String iTitaTxCd = "";
 	private String txType = "";
-	private String iProcessTime = "";
 	private boolean isNewAct = false;
 	private boolean isNewLog = false;
 	private boolean isDelAct = false;
@@ -164,7 +165,7 @@ public class BankAuthActCom extends TradeBuffer {
 	}
 
 	/**
-	 * 新增授權資料
+	 * 新增授權資料<BR>
 	 * 
 	 * @param createFlag A.新增授權, D.取消授權
 	 * @param titaVo     ..
@@ -191,6 +192,7 @@ public class BankAuthActCom extends TradeBuffer {
 				addCancelDelete(titaVo);
 			}
 		}
+
 
 		// 新增授權應處理明細
 		if (this.isNewLog || this.isDelLog) {
@@ -827,7 +829,13 @@ public class BankAuthActCom extends TradeBuffer {
 		if (titaVo.getActFgI() == 1) {
 			return;
 		}
-		if (titaVo.isHcodeNormal()) {
+		
+		// L2153 核准額度僅建立授權帳號檔
+		if ("L2153".equals(iTitaTxCd)) {
+			this.isNewLog = false;
+		}
+		// L3100 撥款建立授權記錄檔
+		if (!"L3100".equals(iTitaTxCd) && titaVo.isHcodeNormal()) {
 			addRepayActChangeLog(status, titaVo);// 新增還款帳號變更(含還款方式)紀錄檔
 		}
 		if ("700".equals(iRepayBank)) {
@@ -1358,31 +1366,30 @@ public class BankAuthActCom extends TradeBuffer {
 
 	private void setVarValue(TitaVo titaVo) throws LogicException {
 		this.info("setVarValue ...");
-		if ("L2".equals(titaVo.getTxcd().substring(0, 2))) {
-			iPostDepCode = titaVo.get("PostCode");
-			iRepayAcct = titaVo.get("RepayAcctNo");
-			iRelationCode = titaVo.get("RelationCode");
-			iRelAcctName = titaVo.get("RelationName");
-			iRelAcctBirthday = titaVo.get("RelationBirthday");
-			iRelAcctGender = titaVo.get("RelationGender");
-			iProcessTime = "0";
-			iCustId = titaVo.getParam("CustId");
-
-		} else if ("L4".equals(titaVo.getTxcd().substring(0, 2))) {
+		if ("L4".equals(titaVo.getTxcd().substring(0, 2))) {
 			iPostDepCode = titaVo.get("PostDepCode");
 			iRepayAcct = titaVo.get("RepayAcct");
 			iRelationCode = titaVo.get("RelationCode");
 			iRelAcctName = titaVo.get("RelAcctName");
 			iRelAcctBirthday = titaVo.get("RelAcctBirthday");
 			iRelAcctGender = titaVo.get("RelAcctGender");
-			iProcessTime = titaVo.getParam("SysTime");
+			titaVo.getParam("SysTime");
 			this.info("TXCD ==" + titaVo.getTxcd());
 			if (!"L4410".equals(titaVo.getTxcd())) {
 				this.info("into 1");
 				iCustId = titaVo.getParam("CustId");
 			}
+		} else {
+			iPostDepCode = titaVo.get("PostCode");
+			iRepayAcct = titaVo.get("RepayAcctNo");
+			iRelationCode = titaVo.get("RelationCode");
+			iRelAcctName = titaVo.get("RelationName");
+			iRelAcctBirthday = titaVo.get("RelationBirthday");
+			iRelAcctGender = titaVo.get("RelationGender");
+			iCustId = titaVo.getParam("CustId");
 
 		}
+
 		if (iPostDepCode == null || "".equals(iPostDepCode)) {
 			iPostDepCode = " ";
 		}

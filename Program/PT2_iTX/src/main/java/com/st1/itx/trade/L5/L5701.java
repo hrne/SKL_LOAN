@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+
 /* 套件 */
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -21,6 +23,7 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.NegMain;
 import com.st1.itx.db.domain.NegMainId;
 import com.st1.itx.db.domain.NegTrans;
+import com.st1.itx.db.domain.NegTransId;
 import com.st1.itx.db.domain.NegFinShare;
 import com.st1.itx.db.domain.NegFinShareId;
 import com.st1.itx.db.domain.NegFinShareLog;
@@ -37,7 +40,6 @@ import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 import com.st1.itx.util.common.SendRsp;
-
 
 /*DB服務*/
 import com.st1.itx.db.service.CustMainService;
@@ -153,10 +155,10 @@ public class L5701 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 		this.titaVo = titaVo;
 		this.info("L5701 Run");
-		
-		//EM2661 02230223  檢核 簽約金額、債權比率、期款
+
+		// EM2661 02230223 檢核 簽約金額、債權比率、期款
 		checkContractAmt();
-		
+
 		String FunctionCode = titaVo.getParam("FunctionCode").trim(); // 功能代碼
 
 		String CustId = titaVo.getParam("CustId").trim(); // 身份證號
@@ -289,7 +291,7 @@ public class L5701 extends TradeBuffer {
 					// titaVo.getSupCode();
 					sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 				}
-				
+
 				try {
 					sNegMainService.holdById(NegMainId, titaVo);
 					sNegMainService.delete(NegMainVO, titaVo);
@@ -297,8 +299,8 @@ public class L5701 extends TradeBuffer {
 					// E0008 刪除資料時，發生錯誤
 					throw new LogicException(titaVo, "E0008", e.getErrorMsg());
 				}
-				iDataLog.setEnv(titaVo, NegMainVO, NegMainVO); 
-				iDataLog.exec("刪除債權主檔"); 
+				iDataLog.setEnv(titaVo, NegMainVO, NegMainVO);
+				iDataLog.exec("刪除債權主檔");
 
 				DelNegFinShare(intCustNo, IntCaseSeq);
 				DelNegFinShareLog(intCustNo, IntCaseSeq);
@@ -395,7 +397,8 @@ public class L5701 extends TradeBuffer {
 		default:
 
 		}
-		if (("02").equals(FunctionCode) || ("06").equals(FunctionCode) || ("09").equals(FunctionCode) || ("11").equals(FunctionCode)) {
+		if (("02").equals(FunctionCode) || ("06").equals(FunctionCode) || ("09").equals(FunctionCode)
+				|| ("11").equals(FunctionCode)) {
 			UpdateShareLog(intCustNo, IntCaseSeq, FunctionCode);// 修改ShareLog
 		}
 
@@ -410,7 +413,8 @@ public class L5701 extends TradeBuffer {
 	public int MaxIntCaseSeq(String CustNo) throws LogicException {
 		// 取號CustNo
 		int IntCaseSeq = 0;
-		Slice<NegMain> slNegMain = sNegMainService.custNoEq(parse.stringToInteger(CustNo), this.index, this.limit, titaVo);
+		Slice<NegMain> slNegMain = sNegMainService.custNoEq(parse.stringToInteger(CustNo), this.index, this.limit,
+				titaVo);
 		List<NegMain> lNegMain = slNegMain == null ? null : slNegMain.getContent();
 
 		if (lNegMain != null && lNegMain.size() != 0) {
@@ -424,7 +428,8 @@ public class L5701 extends TradeBuffer {
 		return IntCaseSeq + 1;
 	}
 
-	public void checkstatus(int custno, String functioncode, int caseseq, String status, TitaVo titaVo) throws LogicException {
+	public void checkstatus(int custno, String functioncode, int caseseq, String status, TitaVo titaVo)
+			throws LogicException {
 		// 一個戶號只可有一個戶況為0正常
 		Slice<NegMain> slNegMain = sNegMainService.custNoEq(custno, this.index, this.limit, titaVo);
 		List<NegMain> lNegMain = slNegMain == null ? null : slNegMain.getContent();
@@ -504,17 +509,18 @@ public class L5701 extends TradeBuffer {
 		return InputNegMain;
 	}
 
-	public void UpdInsertNegMain(NegMainId NegMainIdVO, NegMain InputNegMain, String FunctionCode) throws LogicException {
-	
-				
+	public void UpdInsertNegMain(NegMainId NegMainIdVO, NegMain InputNegMain, String FunctionCode)
+			throws LogicException {
+
 		if (NegMainIdVO.getCaseSeq() == 0) {
 			throw new LogicException(titaVo, "", "發生未預期的錯誤");
 		}
-		
+
 		InputNegMain.setNegMainId(NegMainIdVO);
 		NegMain NegMainVO = sNegMainService.findById(NegMainIdVO, titaVo);
 
 		BigDecimal cPrincipalBal = BigDecimal.ZERO;
+		BigDecimal totalCancelAmt = BigDecimal.ZERO;
 
 		if (!Code09 && ("09").equals(FunctionCode)) { // 變更還款條件第一次只更新戶況,所以總本金餘額為原來的
 			Code09 = true;
@@ -532,6 +538,7 @@ public class L5701 extends TradeBuffer {
 
 				if (NegFinShareCancelAmt[i] != null && NegFinShareCancelAmt[i].length() > 0) {
 					cPrincipalBal = cPrincipalBal.subtract(parse.stringToBigDecimal(NegFinShareCancelAmt[i]));
+					totalCancelAmt = totalCancelAmt.add(parse.stringToBigDecimal(NegFinShareCancelAmt[i]));
 				}
 			}
 			InputNegMain.setPrincipalBal(cPrincipalBal);// 總本金餘額=簽約總金額(或總本金餘額) - 註銷金額
@@ -546,9 +553,10 @@ public class L5701 extends TradeBuffer {
 			NegMain sNegMsain = sNegMainService.holdById(NegMainVO.getNegMainId(), titaVo);
 
 			if (InputNegMain.getDeferYMStart() > 0) {// 設定喘息期一併異動下次繳款日與還款結束日
-				if (sNegMsain.getDeferYMStart() != InputNegMain.getDeferYMStart() || sNegMsain.getDeferYMEnd() != InputNegMain.getDeferYMEnd()) {
-					int iday1 = sNegMsain.getFirstDueDate() +19110000;
-					String unitday =  parse.IntegerToString(iday1,8).substring(6);//每個月幾號繳款->目前債協應該都是10號
+				if (sNegMsain.getDeferYMStart() != InputNegMain.getDeferYMStart()
+						|| sNegMsain.getDeferYMEnd() != InputNegMain.getDeferYMEnd()) {
+					int iday1 = sNegMsain.getFirstDueDate() + 19110000;
+					String unitday = parse.IntegerToString(iday1, 8).substring(6);// 每個月幾號繳款->目前債協應該都是10號
 					int iunitday = parse.stringToInteger(unitday);
 					int daystart = InputNegMain.getDeferYMStart() * 100 - 19110000 + iunitday;
 					int dayend = InputNegMain.getDeferYMEnd() * 100 - 19110000 + iunitday;
@@ -562,7 +570,8 @@ public class L5701 extends TradeBuffer {
 						operiod = negCom.DiffMonth(1, odaystart, odayend) + 1;
 					}
 					if (daystart <= sNegMsain.getPayIntDate()) {
-						throw new LogicException(titaVo, "E0015", "輸入延期繳款年月時檢查延期繳款年月起月應大於繳息迄日=" + sNegMsain.getPayIntDate());
+						throw new LogicException(titaVo, "E0015",
+								"輸入延期繳款年月時檢查延期繳款年月起月應大於繳息迄日=" + sNegMsain.getPayIntDate());
 					}
 
 					if (daystart <= odayend) {// 已設定-修改區間
@@ -570,24 +579,30 @@ public class L5701 extends TradeBuffer {
 							if (daystart != odaystart) {
 								throw new LogicException(titaVo, "E0015", "下次繳款日與還款結束日已異動,只可修改延期繳款[迄]");
 							} else {
-								InputNegMain.setNextPayDate(negCom.getRepayDate(sNegMsain.getNextPayDate(), period - operiod, titaVo));
-								InputNegMain.setLastDueDate(negCom.getRepayDate(sNegMsain.getLastDueDate(), period - operiod, titaVo));
+								InputNegMain.setNextPayDate(
+										negCom.getRepayDate(sNegMsain.getNextPayDate(), period - operiod, titaVo));
+								InputNegMain.setLastDueDate(
+										negCom.getRepayDate(sNegMsain.getLastDueDate(), period - operiod, titaVo));
 							}
 						} else {// 未異動下次應繳日+還款結束日=>下次繳款日在喘息期區間內才異動
 							if (InputNegMain.getNextPayDate() >= daystart && InputNegMain.getNextPayDate() <= dayend) {
-								InputNegMain.setNextPayDate(negCom.getRepayDate(InputNegMain.getNextPayDate(), period, titaVo));
-								InputNegMain.setLastDueDate(negCom.getRepayDate(InputNegMain.getLastDueDate(), period, titaVo));
+								InputNegMain.setNextPayDate(
+										negCom.getRepayDate(InputNegMain.getNextPayDate(), period, titaVo));
+								InputNegMain.setLastDueDate(
+										negCom.getRepayDate(InputNegMain.getLastDueDate(), period, titaVo));
 							}
 						}
 					} else {// 新增設定區間- 下次繳款日在喘息期區間內才異動
 						if (InputNegMain.getNextPayDate() >= daystart && InputNegMain.getNextPayDate() <= dayend) {
-							InputNegMain.setNextPayDate(negCom.getRepayDate(InputNegMain.getNextPayDate(), period, titaVo));
-							InputNegMain.setLastDueDate(negCom.getRepayDate(InputNegMain.getLastDueDate(), period, titaVo));
+							InputNegMain
+									.setNextPayDate(negCom.getRepayDate(InputNegMain.getNextPayDate(), period, titaVo));
+							InputNegMain
+									.setLastDueDate(negCom.getRepayDate(InputNegMain.getLastDueDate(), period, titaVo));
 						}
 					}
 				}
 			}
-			//未曾繳款-才可修改簽約總金額,首次應繳日
+			// 未曾繳款-才可修改簽約總金額,首次應繳日
 			if (("02").equals(FunctionCode)) {
 				if (sNegMsain.getTotalContrAmt().compareTo(sNegMsain.getPrincipalBal()) == 0) {
 					if (sNegMsain.getTotalContrAmt().compareTo(InputNegMain.getTotalContrAmt()) != 0) {
@@ -607,6 +622,11 @@ public class L5701 extends TradeBuffer {
 			}
 			iDataLog.setEnv(titaVo, beforeNegMain, sNegMsain);
 			iDataLog.exec("修改債權主檔");
+			// 註銷債權時新增一筆交易明細
+			if ( totalCancelAmt.compareTo(BigDecimal.ZERO) != 0) {
+				updateNegTrans(sNegMsain, totalCancelAmt, titaVo);
+			}
+
 		} else {
 			// INSERT
 			if (("01").equals(FunctionCode)) {// 新增時繳息迄日=協商申請日
@@ -631,7 +651,8 @@ public class L5701 extends TradeBuffer {
 
 	public void DelNegFinShare(int intCustNo, int IntCaseSeq) throws LogicException {
 		// 全部清掉 NegFinShare
-		Slice<NegFinShare> slNegFinShare = sNegFinShareService.findFinCodeAll(intCustNo, IntCaseSeq, this.index, this.limit, titaVo);
+		Slice<NegFinShare> slNegFinShare = sNegFinShareService.findFinCodeAll(intCustNo, IntCaseSeq, this.index,
+				this.limit, titaVo);
 		List<NegFinShare> lNegFinShare = slNegFinShare == null ? null : slNegFinShare.getContent();
 
 		if (lNegFinShare != null && lNegFinShare.size() != 0) {
@@ -646,7 +667,8 @@ public class L5701 extends TradeBuffer {
 
 	public void DelNegFinShareLog(int intCustNo, int IntCaseSeq) throws LogicException {
 		// 全部清掉 NegFinShareLog
-		Slice<NegFinShareLog> slNegFinShareLog = sNegFinShareLogService.findFinCodeAll(intCustNo, IntCaseSeq, this.index, this.limit, titaVo);
+		Slice<NegFinShareLog> slNegFinShareLog = sNegFinShareLogService.findFinCodeAll(intCustNo, IntCaseSeq,
+				this.index, this.limit, titaVo);
 		List<NegFinShareLog> lNegFinShareLog = slNegFinShareLog == null ? null : slNegFinShareLog.getContent();
 
 		if (lNegFinShareLog != null && lNegFinShareLog.size() != 0) {
@@ -686,16 +708,16 @@ public class L5701 extends TradeBuffer {
 				NegFinShare.setContractAmt(parse.stringToBigDecimal(NegFinShareContractAmt[i]));
 				NegFinShare.setAmtRatio(parse.stringToBigDecimal(NegFinShareAmtRatio[i]));
 				NegFinShare.setDueAmt(parse.stringToBigDecimal(NegFinShareDueAmt[i]));
-				//NegFinShare.setCancelDate(parse.stringToInteger(NegFinShareCancelDate[i]));
-				//NegFinShare.setCancelAmt(parse.stringToBigDecimal(NegFinShareCancelAmt[i]));
+				// NegFinShare.setCancelDate(parse.stringToInteger(NegFinShareCancelDate[i]));
+				// NegFinShare.setCancelAmt(parse.stringToBigDecimal(NegFinShareCancelAmt[i]));
 
 				NegFinShare NegFinShareVO = sNegFinShareService.findById(NegFinShareId, titaVo);
 				if (NegFinShareVO != null) {
 					// UPDATE
 					try {
 						sNegFinShareService.holdById(NegFinShareVO.getNegFinShareId(), titaVo);
-						//NegFinShare.setCreateDate(NegFinShareVO.getCreateDate());
-						//NegFinShare.setCreateEmpNo(NegFinShareVO.getCreateEmpNo());
+						// NegFinShare.setCreateDate(NegFinShareVO.getCreateDate());
+						// NegFinShare.setCreateEmpNo(NegFinShareVO.getCreateEmpNo());
 						sNegFinShareService.update(NegFinShare, titaVo);
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0007", e.getErrorMsg());
@@ -715,23 +737,23 @@ public class L5701 extends TradeBuffer {
 
 		}
 	}
-	
-	/**
-	 * 01.檢核 簽約金額、債權比率、期款	
-	 * A.簽約總金額 = 債務協商債權分攤檔(簽約金額) +  債務協商債權分攤檔歷程檔(簽約金額)
-	 * B.債權比率 = 100%
-	 * C.期款 = 債務協商債權分攤檔(期款)
-	 */
-	public void checkContractAmt() throws LogicException {	
 
-		String isMainFin = titaVo.getParam("IsMainFin").trim(); // 最大債權 Y N	
-		if ("N".equals(isMainFin)) { return; } // 最大債權為N，不用檢核
-		
+	/**
+	 * 01.檢核 簽約金額、債權比率、期款 A.簽約總金額 = 債務協商債權分攤檔(簽約金額) + 債務協商債權分攤檔歷程檔(簽約金額) B.債權比率 =
+	 * 100% C.期款 = 債務協商債權分攤檔(期款)
+	 */
+	public void checkContractAmt() throws LogicException {
+
+		String isMainFin = titaVo.getParam("IsMainFin").trim(); // 最大債權 Y N
+		if ("N".equals(isMainFin)) {
+			return;
+		} // 最大債權為N，不用檢核
+
 		Integer custNo = parse.stringToInteger(titaVo.getParam("CustNo").trim()); // 戶號-MainKey
-		Integer caseSeq =  parse.stringToInteger(titaVo.getParam("CaseSeq").trim()); // 案件序號-MainKey
-		
+		Integer caseSeq = parse.stringToInteger(titaVo.getParam("CaseSeq").trim()); // 案件序號-MainKey
+
 		BigDecimal totalContrAmt = parse.stringToBigDecimal(titaVo.getParam("TotalContrAmt").trim()); // 簽約(新壽)總金額
-		BigDecimal dueAmt = parse.stringToBigDecimal(titaVo.getParam("DueAmt").trim()); // 期款 (月付金)		
+		BigDecimal dueAmt = parse.stringToBigDecimal(titaVo.getParam("DueAmt").trim()); // 期款 (月付金)
 
 		List<BigDecimal> negFinShareContractAmt = new ArrayList<BigDecimal>(); // 簽約金額
 		List<BigDecimal> negFinShareAmtRatio = new ArrayList<BigDecimal>(); // 債權比例%
@@ -739,70 +761,78 @@ public class L5701 extends TradeBuffer {
 
 		for (int i = 0; i < NegFinShareL; i++) {
 			int Row = i + 1;
-			negFinShareContractAmt.add(parse.stringToBigDecimal(titaVo.getParam("NegFinShareContractAmt" + Row + "").trim())); // 簽約金額
-			String iNegFinShareDate = titaVo.getParam("NegFinShareCancelDate"+Row+"").trim();
+			negFinShareContractAmt
+					.add(parse.stringToBigDecimal(titaVo.getParam("NegFinShareContractAmt" + Row + "").trim())); // 簽約金額
+			String iNegFinShareDate = titaVo.getParam("NegFinShareCancelDate" + Row + "").trim();
 			this.info("NegFinShareCancelDate1    =" + iNegFinShareDate);
-			if(iNegFinShareDate.equals("0000000")) {
-			negFinShareAmtRatio.add((parse.stringToBigDecimal(titaVo.getParam("NegFinShareAmtRatio" + Row + "").trim()))); // 債權比例%
-			negFinShareDueAmt.add((parse.stringToBigDecimal(titaVo.getParam("NegFinShareDueAmt" + Row + "").trim()))); // 期款
+			if (iNegFinShareDate.equals("0000000")) {
+				negFinShareAmtRatio
+						.add((parse.stringToBigDecimal(titaVo.getParam("NegFinShareAmtRatio" + Row + "").trim()))); // 債權比例%
+				negFinShareDueAmt
+						.add((parse.stringToBigDecimal(titaVo.getParam("NegFinShareDueAmt" + Row + "").trim()))); // 期款
 			}
 		}
-		
-		//01.債務協商債權分攤檔 累計 (簽約金額、債權比率、期款)
-		BigDecimal sumContractAmt = negFinShareContractAmt.stream().reduce(BigDecimal.ZERO, (total, amt) -> total.add(amt));
+
+		// 01.債務協商債權分攤檔 累計 (簽約金額、債權比率、期款)
+		BigDecimal sumContractAmt = negFinShareContractAmt.stream().reduce(BigDecimal.ZERO,
+				(total, amt) -> total.add(amt));
 		BigDecimal sumAmtRatio = negFinShareAmtRatio.stream().reduce(BigDecimal.ZERO, (total, amt) -> total.add(amt));
-		BigDecimal sumDueAmt = negFinShareDueAmt.stream().reduce(BigDecimal.ZERO, (total, amt) -> total.add(amt));		
-		
-		//02.債務協商債權分攤檔歷程檔  累計 (簽約金額)
-		BigDecimal sumContractAmtLog = getContractAmtFromLog(custNo, caseSeq);		
-		
-		//03.債務協商分攤檔 + 債務協商分攤歷程檔  累計(簽約金額)
-		BigDecimal totalContractAmt =new BigDecimal(0); 
-		totalContractAmt =totalContractAmt.add(sumContractAmt);
-		totalContractAmt =totalContractAmt.add(sumContractAmtLog);
-		
-		this.info( "--------------------------------------");
-		this.info( "index："+ this.index +",limit:"+this.limit);			
-		this.info( "簽約金額合計錯誤，總金額："+totalContrAmt+"，合計金額："+totalContractAmt+"，債務協商分攤檔合計金額："+sumContractAmt+"，債務協商分攤歷程檔合計金額："+sumContractAmtLog);
-		this.info( "債權比率合計錯誤，合計債權比例："+sumContractAmt);
-		this.info( "期款金額合計錯誤，期款："+dueAmt+"，合計期款："+sumDueAmt);
-		this.info( "--------------------------------------");
-		
-		if (totalContrAmt.compareTo(totalContractAmt) != 0 ) {			
-			if(sumContractAmtLog.compareTo(new BigDecimal(0)) >0 ) {
-				throw new LogicException(titaVo, "E0015", "簽約金額合計錯誤，總金額："+totalContrAmt+"，合計金額："+totalContractAmt+"，債務協商分攤檔合計金額："+sumContractAmt+"，債務協商分攤歷程檔合計金額："+sumContractAmtLog);
-			}else {
-				throw new LogicException(titaVo, "E0015", "簽約金額合計錯誤，總金額："+totalContrAmt+"，合計金額："+totalContractAmt);
+		BigDecimal sumDueAmt = negFinShareDueAmt.stream().reduce(BigDecimal.ZERO, (total, amt) -> total.add(amt));
+
+		// 02.債務協商債權分攤檔歷程檔 累計 (簽約金額)
+		BigDecimal sumContractAmtLog = getContractAmtFromLog(custNo, caseSeq);
+
+		// 03.債務協商分攤檔 + 債務協商分攤歷程檔 累計(簽約金額)
+		BigDecimal totalContractAmt = new BigDecimal(0);
+		totalContractAmt = totalContractAmt.add(sumContractAmt);
+		totalContractAmt = totalContractAmt.add(sumContractAmtLog);
+
+		this.info("--------------------------------------");
+		this.info("index：" + this.index + ",limit:" + this.limit);
+		this.info("簽約金額合計錯誤，總金額：" + totalContrAmt + "，合計金額：" + totalContractAmt + "，債務協商分攤檔合計金額：" + sumContractAmt
+				+ "，債務協商分攤歷程檔合計金額：" + sumContractAmtLog);
+		this.info("債權比率合計錯誤，合計債權比例：" + sumAmtRatio);
+		this.info("期款金額合計錯誤，期款：" + dueAmt + "，合計期款：" + sumDueAmt);
+		this.info("--------------------------------------");
+
+		if (totalContrAmt.compareTo(totalContractAmt) != 0) {
+			if (sumContractAmtLog.compareTo(new BigDecimal(0)) > 0) {
+				throw new LogicException(titaVo, "E0015", "簽約金額合計錯誤，總金額：" + totalContrAmt + "，合計金額：" + totalContractAmt
+						+ "，債務協商分攤檔合計金額：" + sumContractAmt + "，債務協商分攤歷程檔合計金額：" + sumContractAmtLog);
+			} else {
+				throw new LogicException(titaVo, "E0015",
+						"簽約金額合計錯誤，總金額：" + totalContrAmt + "，合計金額：" + totalContractAmt);
 			}
 		}
-		
-		if (new BigDecimal(100).compareTo(sumAmtRatio) != 0 ) {
-			throw new LogicException(titaVo, "E0015", "債權比率合計錯誤，合計債權比例："+sumAmtRatio);
+
+		if (new BigDecimal(100).compareTo(sumAmtRatio) != 0) {
+			throw new LogicException(titaVo, "E0015", "債權比率合計錯誤，合計債權比例：" + sumAmtRatio);
 		}
-		
-		if (dueAmt.compareTo(sumDueAmt) != 0 ) {
-			throw new LogicException(titaVo, "E0015", "期款金額合計錯誤，期款："+dueAmt+"，合計期款："+sumDueAmt);
+
+		if (dueAmt.compareTo(sumDueAmt) != 0) {
+			throw new LogicException(titaVo, "E0015", "期款金額合計錯誤，期款：" + dueAmt + "，合計期款：" + sumDueAmt);
 		}
-		
+
 	}
 
 	private BigDecimal getContractAmtFromLog(Integer custNo, Integer caseSeq) {
-		
-		Slice<NegFinShareLog> sNegFinShareLog = sNegFinShareLogService.findFinCodeAll(custNo, caseSeq, this.index, this.limit, titaVo);
-		List<NegFinShareLog> lNegFinShareLog = sNegFinShareLog == null ? null : sNegFinShareLog.getContent();		
-		
-		BigDecimal sumContractAmtLog =new BigDecimal(0); //01.債務協商分攤歷程檔 累計(簽約金額)
+
+		Slice<NegFinShareLog> sNegFinShareLog = sNegFinShareLogService.findFinCodeAll(custNo, caseSeq, this.index,
+				this.limit, titaVo);
+		List<NegFinShareLog> lNegFinShareLog = sNegFinShareLog == null ? null : sNegFinShareLog.getContent();
+
+		BigDecimal sumContractAmtLog = new BigDecimal(0); // 01.債務協商分攤歷程檔 累計(簽約金額)
 		if (lNegFinShareLog != null) {
-			sumContractAmtLog =lNegFinShareLog.stream().filter(s->s.getCancelDate() >0).map(s->s.getContractAmt()).reduce(BigDecimal.ZERO, (total, amt) -> total.add(amt));
-        	this.info( "NegFinShareLog 資料筆數："+lNegFinShareLog.size());
-        	this.info( "歷程檔，累計簽約金額："+sumContractAmtLog);
+			sumContractAmtLog = lNegFinShareLog.stream().filter(s -> s.getCancelDate() > 0).map(s -> s.getContractAmt())
+					.reduce(BigDecimal.ZERO, (total, amt) -> total.add(amt));
+			this.info("NegFinShareLog 資料筆數：" + lNegFinShareLog.size());
+			this.info("歷程檔，累計簽約金額：" + sumContractAmtLog);
 		}
 		return sumContractAmtLog;
 	}
 
-
 	public void InsertShareLog(int mCustNo, int mCaseSeq, String tFunctionCode) throws LogicException {
-				
+
 		for (int i = 0; i < NegFinShareL; i++) {
 
 			int Row = i + 1;
@@ -848,7 +878,7 @@ public class L5701 extends TradeBuffer {
 	}
 
 	public void UpdateShareLog(int mCustNo, int mCaseSeq, String tFunctionCode) throws LogicException {
-	
+
 		ArrayList<String> InArraylist;
 		InArraylist = new ArrayList<String>();
 		// 輸入資料
@@ -974,4 +1004,33 @@ public class L5701 extends TradeBuffer {
 
 		}
 	}
+
+	/* 產生債協入帳明細 */
+	private void updateNegTrans(NegMain sNegMain, BigDecimal txAmt, TitaVo titaVo) throws LogicException {
+		int entryDate = titaVo.getEntDyI();// 入帳日期
+		int custNo = sNegMain.getCustNo();
+		NegTransId tNegTransId = new NegTransId();
+		NegTrans tNegTrans = new NegTrans();
+
+		tNegTransId.setAcDate(titaVo.getEntDyI()+19110000);
+		tNegTransId.setTitaTlrNo(titaVo.getTlrNo());
+		tNegTransId.setTitaTxtNo(parse.stringToInteger(titaVo.getTxtNo()));
+		tNegTransId.setCustNo(custNo); // 戶號
+		tNegTrans.setNegTransId(tNegTransId);
+		// 新增交易明細
+		tNegTrans.setCaseSeq(sNegMain.getCaseSeq()); // 案件序號
+		tNegTrans.setEntryDate(entryDate); // 入帳日期
+		tNegTrans.setTxStatus(2); // 交易狀態 2:已入帳
+		tNegTrans.setTxKind("8"); // 交易別 8:註銷
+		tNegTrans.setTxAmt(txAmt); // 交易金額:註銷金額
+		tNegTrans.setPrincipalBal(sNegMain.getPrincipalBal());//本金餘額
+		tNegTrans.setPrincipalAmt(txAmt);//本次的本金金額
+		try {
+			sNegTransService.insert(tNegTrans, titaVo); // insert
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0005", "註銷債權時新增交易明細失敗 " + tNegTransId + e.getErrorMsg());
+		}
+
+	}
+
 }

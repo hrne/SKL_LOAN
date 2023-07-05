@@ -46,6 +46,7 @@ import com.st1.itx.util.common.AcDetailCom;
 import com.st1.itx.util.common.AcPaymentCom;
 import com.st1.itx.util.common.AcReceivableCom;
 import com.st1.itx.util.common.AuthLogCom;
+import com.st1.itx.util.common.BankAuthActCom;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.LoanDueAmtCom;
 import com.st1.itx.util.common.PfDetailCom;
@@ -116,6 +117,8 @@ public class L3100 extends TradeBuffer {
 	public AuthLogCom authLogCom;
 	@Autowired
 	TxAmlCom txAmlCom;
+	@Autowired
+	BankAuthActCom bankAuthActCom;
 
 	private TitaVo titaVo = new TitaVo();
 	private int iCustNo;
@@ -123,18 +126,15 @@ public class L3100 extends TradeBuffer {
 	private int iBormNo;
 	private int iDrawdownDate;
 	private int iMaturityDate;
-	private int iTxBormNo;
 	private BigDecimal iDrawdownAmt;
 	private BigDecimal iAcctFee = BigDecimal.ZERO;
 	private BigDecimal iHandlingFee = BigDecimal.ZERO;
 	private String iCompensateFlag;
 	// work area
 	private long sno = 0;
-	private int wkBormNo = 0;
 	private int wkBorxNo = 0;
 	private int wkTbsDy;
 	private String sProdStepNo = "";
-	private String isReleaseErase = "";
 	private int wkStartDate = 0;
 	private boolean isRenew = false;
 	private TempVo authLogTempVo = new TempVo();
@@ -176,7 +176,7 @@ public class L3100 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 		this.titaVo = titaVo;
 		loanCom.setTxBuffer(this.txBuffer);
-
+		bankAuthActCom.setTxBuffer(this.txBuffer);
 		wkTbsDy = this.txBuffer.getTxCom().getTbsdy();
 
 		// 取得輸入資料
@@ -189,7 +189,6 @@ public class L3100 extends TradeBuffer {
 		iDrawdownDate = this.parse.stringToInteger(titaVo.getParam("DrawdownDate"));
 		iMaturityDate = this.parse.stringToInteger(titaVo.getParam("MaturityDate"));
 		iCompensateFlag = titaVo.getParam("CompensateFlag");
-		iTxBormNo = this.parse.stringToInteger(titaVo.getParam("TxBormNo"));
 		// 展期／借新還舊件
 		if (("1".equals(titaVo.getParam("RenewFlag")) || "2".equals(titaVo.getParam("RenewFlag")))) {
 			isRenew = true;
@@ -261,8 +260,12 @@ public class L3100 extends TradeBuffer {
 //			撥款傳票主管審核
 			doRptA(titaVo);
 		}
+		// 撥款建立授權記錄檔
+		if ("02".equals(titaVo.getParam("RepayCode")) && iBormNo == 1) {
+			bankAuthActCom.add("A", titaVo);
+		}
 
-		this.totaVo.putParam("BormNo", wkBormNo);
+		this.totaVo.putParam("BormNo", iBormNo);
 		this.totaVo.put("PdfSnoF", "" + sno);
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -337,7 +340,6 @@ public class L3100 extends TradeBuffer {
 			if (tFacMain == null) {
 				throw new LogicException(titaVo, "E0001", "額度主檔 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo); // 查詢資料不存在
 			}
-			wkBormNo = iBormNo;
 			return;
 		}
 
@@ -386,14 +388,16 @@ public class L3100 extends TradeBuffer {
 			} else {
 				tFacMain.setUtilBal(tFacMain.getUtilBal().add(iDrawdownAmt));
 			}
+			//撥款序號 = 已撥款序號 + 1
+			iBormNo = tFacMain.getLastBormNo() + 1;
+			
 			// 首次撥款且為展期件時更新額度主檔展期次數、舊額度編號
-			if ("1".equals(titaVo.getParam("RenewFlag")) && wkBormNo == 0) {
+			if ("1".equals(titaVo.getParam("RenewFlag")) && iBormNo == 1) {
 				tFacMain.setRenewCnt(parse.stringToInteger(titaVo.getParam("RpFacmNo1")) == parse
 						.stringToInteger(titaVo.getParam("FacmNo")) ? tFacMain.getRenewCnt() + 1 : getRenewCnt(titaVo));
 				tFacMain.setOldFacmNo(parse.stringToInteger(titaVo.getParam("RpFacmNo1")));
 			}
 
-			wkBormNo = tFacMain.getLastBormNo() + 1;
 			// 新增交易暫存檔
 			tTxTemp = new TxTemp();
 			tTxTempId = new TxTempId();
@@ -403,7 +407,7 @@ public class L3100 extends TradeBuffer {
 			facTempVo.putParam("FirstDrawdownDate", tFacMain.getFirstDrawdownDate());
 			facTempVo.putParam("ApproveRate", tFacMain.getApproveRate());
 			facTempVo.putParam("MaturityDate", tFacMain.getMaturityDate());
-			facTempVo.putParam("BormNo", wkBormNo);
+			facTempVo.putParam("BormNo", iBormNo);
 
 			tTxTemp.setText(facTempVo.getJsonString());
 
@@ -412,14 +416,14 @@ public class L3100 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", "交易暫存檔 Key = " + tTxTempId); // 新增資料時，發生錯誤
 			}
-			titaVo.putParam("BormNo", wkBormNo);
+			titaVo.putParam("BormNo", iBormNo);
 			// 更新額度資料
-			if (tFacMain.getFirstDrawdownDate() == 0 || wkBormNo == 1) {
+			if (tFacMain.getFirstDrawdownDate() == 0 || iBormNo == 1) {
 				tFacMain.setFirstDrawdownDate(iDrawdownDate);
 //				10/27 少玄: 額度撥款需一致
 				tFacMain.setApproveRate(this.parse.stringToBigDecimal(titaVo.getParam("ApproveRate")));
 			}
-			if (tFacMain.getMaturityDate() == 0 || wkBormNo == 1) {
+			if (tFacMain.getMaturityDate() == 0 || iBormNo == 1) {
 				tFacMain.setMaturityDate(iMaturityDate);
 			}
 		}
@@ -439,7 +443,7 @@ public class L3100 extends TradeBuffer {
 			wkMaturityDate = this.parse.stringToInteger(facTempVo.get("MaturityDate"));
 			wkApproveRate = this.parse.stringToBigDecimal(facTempVo.getParam("ApproveRate"));
 
-			wkBormNo = this.parse.stringToInteger(facTempVo.get("BormNo"));
+			iBormNo = this.parse.stringToInteger(facTempVo.get("BormNo"));
 
 			// 準備更新額度資料
 			tFacMain.setUtilAmt(tFacMain.getUtilAmt().subtract(wkDrawdownAmt));
@@ -450,7 +454,7 @@ public class L3100 extends TradeBuffer {
 				tFacMain.setUtilBal(tFacMain.getUtilBal().subtract(wkDrawdownAmt));
 			}
 
-			if ("1".equals(titaVo.getParam("RenewFlag")) && wkBormNo == 1) {
+			if ("1".equals(titaVo.getParam("RenewFlag")) && iBormNo == 1) {
 				tFacMain.setRenewCnt(tFacMain.getRenewCnt() - 1);
 				tFacMain.setOldFacmNo(0);
 			}
@@ -461,12 +465,12 @@ public class L3100 extends TradeBuffer {
 		}
 		// 更新已撥款序號
 		if (titaVo.isHcodeNormal())
-			tFacMain.setLastBormNo(wkBormNo);
+			tFacMain.setLastBormNo(iBormNo);
 		else if (titaVo.isHcodeErase()) {
-			if (wkBormNo != tFacMain.getLastBormNo())
+			if (iBormNo != tFacMain.getLastBormNo())
 				throw new LogicException(titaVo, "E3088", "需先訂正，撥款依序 = " + tFacMain.getLastBormNo()); // 放款交易訂正須由最近一筆交易開始訂正
 			else
-				tFacMain.setLastBormNo(wkBormNo - 1);
+				tFacMain.setLastBormNo(iBormNo - 1);
 		}
 
 		if (titaVo.isHcodeModify()) {
@@ -479,7 +483,7 @@ public class L3100 extends TradeBuffer {
 			facTempVo.putParam("FirstDrawdownDate", tFacMain.getFirstDrawdownDate());
 			facTempVo.putParam("ApproveRate", tFacMain.getApproveRate());
 			facTempVo.putParam("MaturityDate", tFacMain.getMaturityDate());
-			facTempVo.putParam("BormNo", wkBormNo);
+			facTempVo.putParam("BormNo", iBormNo);
 			facTempVo.putParam("CompensateFlag", tFacMain.getCompensateFlag());
 			tTxTemp.setText(facTempVo.getJsonString());
 			this.info("test 5 =" + tFacMain.getCompensateFlag());
@@ -496,17 +500,17 @@ public class L3100 extends TradeBuffer {
 			} else {
 				tFacMain.setUtilBal(tFacMain.getUtilBal().add(iDrawdownAmt));
 			}
-			if (tFacMain.getFirstDrawdownDate() == 0 || wkBormNo == 1) {
+			if (tFacMain.getFirstDrawdownDate() == 0 || iBormNo == 1) {
 				tFacMain.setFirstDrawdownDate(iDrawdownDate);
 				tFacMain.setApproveRate(this.parse.stringToBigDecimal(titaVo.getParam("ApproveRate")));
 			}
-			if (tFacMain.getMaturityDate() == 0 || wkBormNo == 1) {
+			if (tFacMain.getMaturityDate() == 0 || iBormNo == 1) {
 				tFacMain.setMaturityDate(iMaturityDate);
 			}
 		}
 		// MRKEY
 		titaVo.putParam("MRKEY", FormatUtil.pad9(String.valueOf(iCustNo), 7) + "-"
-				+ FormatUtil.pad9(String.valueOf(iFacmNo), 3) + "-" + FormatUtil.pad9(String.valueOf(wkBormNo), 3));
+				+ FormatUtil.pad9(String.valueOf(iFacmNo), 3) + "-" + FormatUtil.pad9(String.valueOf(iBormNo), 3));
 
 		// 更新額度檔
 		try {
@@ -522,7 +526,7 @@ public class L3100 extends TradeBuffer {
 
 		// 登錄
 		if (titaVo.isActfgEntry() && titaVo.isHcodeNormal()) {
-			tLoanBorTx = loanBorTxService.bormNoDescFirst(iCustNo, iFacmNo, wkBormNo, titaVo);
+			tLoanBorTx = loanBorTxService.bormNoDescFirst(iCustNo, iFacmNo, iBormNo, titaVo);
 			if (tLoanBorTx != null) {
 				wkBorxNo = tLoanBorTx.getBorxNo() + 1;
 			} else {
@@ -545,7 +549,7 @@ public class L3100 extends TradeBuffer {
 		// 登錄訂正
 		if (titaVo.isActfgEntry() && titaVo.isHcodeErase()) {
 			// 刪除撥款檔
-			tLoanBorMain = loanBorMainService.holdById(new LoanBorMainId(iCustNo, iFacmNo, wkBormNo));
+			tLoanBorMain = loanBorMainService.holdById(new LoanBorMainId(iCustNo, iFacmNo, iBormNo));
 			if (tLoanBorMain == null) {
 				throw new LogicException(titaVo, "E0006", "撥款主檔"); // 鎖定資料時，發生錯誤
 			}
@@ -561,7 +565,7 @@ public class L3100 extends TradeBuffer {
 		// 登錄修正
 		if (titaVo.isActfgEntry() && titaVo.isHcodeModify()) {
 			// 修改撥款檔
-			tLoanBorMain = loanBorMainService.holdById(new LoanBorMainId(iCustNo, iFacmNo, wkBormNo));
+			tLoanBorMain = loanBorMainService.holdById(new LoanBorMainId(iCustNo, iFacmNo, iBormNo));
 			if (tLoanBorMain == null) {
 				throw new LogicException(titaVo, "E0006", "撥款主檔"); // 鎖定資料時，發生錯誤
 			}
@@ -578,7 +582,7 @@ public class L3100 extends TradeBuffer {
 			tLoanBorMain.setCreateDate(createDate);
 			tLoanBorMain.setCreateEmpNo(createEmpNo);
 
-			tLoanBorTx = loanBorTxService.bormNoDescFirst(iCustNo, iFacmNo, wkBormNo, titaVo);
+			tLoanBorTx = loanBorTxService.bormNoDescFirst(iCustNo, iFacmNo, iBormNo, titaVo);
 			// 主管訂正後修正，交易序號+2(訂正、修正)
 			if (tLoanBorTx != null && "2".equals(tLoanBorTx.getTitaHCode())) {
 				tLoanBorMain.setLastBorxNo(wkBorxNo + 2);
@@ -592,19 +596,19 @@ public class L3100 extends TradeBuffer {
 		}
 		// 放行
 		if (titaVo.isActfgSuprele() && titaVo.isHcodeNormal()) {
-			tLoanBorMain = loanBorMainService.holdById(new LoanBorMainId(iCustNo, iFacmNo, wkBormNo));
+			tLoanBorMain = loanBorMainService.holdById(new LoanBorMainId(iCustNo, iFacmNo, iBormNo));
 			if (tLoanBorMain == null) {
 				throw new LogicException(titaVo, "E0006", "撥款主檔"); // 鎖定資料時，發生錯誤
 			}
 			if (tLoanBorMain.getActFg() != 1) {
 				throw new LogicException(titaVo, "E0017",
-						"撥款主檔 戶號 = " + iCustNo + "額度編號 = " + iFacmNo + "撥款序號 = " + wkBormNo); // 該筆交易狀態非待放行，不可做交易放行
+						"撥款主檔 戶號 = " + iCustNo + "額度編號 = " + iFacmNo + "撥款序號 = " + iBormNo); // 該筆交易狀態非待放行，不可做交易放行
 			}
 			wkBorxNo = tLoanBorMain.getLastBorxNo();
 			// 新增交易暫存檔
 			tTxTemp = new TxTemp();
 			tTxTempId = new TxTempId();
-			loanCom.setTxTemp(tTxTempId, tTxTemp, iCustNo, iFacmNo, wkBormNo, 0, titaVo);
+			loanCom.setTxTemp(tTxTempId, tTxTemp, iCustNo, iFacmNo, iBormNo, 0, titaVo);
 			tTempVo.clear();
 			tTempVo.putParam("ActFg", tLoanBorMain.getActFg());
 			tTxTemp.setText(tTempVo.getJsonString());
@@ -691,7 +695,7 @@ public class L3100 extends TradeBuffer {
 			tLoanRateChangeId = new LoanRateChangeId();
 			tLoanRateChangeId.setCustNo(iCustNo);
 			tLoanRateChangeId.setFacmNo(iFacmNo);
-			tLoanRateChangeId.setBormNo(wkBormNo);
+			tLoanRateChangeId.setBormNo(iBormNo);
 			tLoanRateChangeId.setEffectDate(iDrawdownDate);
 			SetLoanRateChange1();
 			try {
@@ -757,7 +761,7 @@ public class L3100 extends TradeBuffer {
 		// 放行時更新主管編號
 		if (titaVo.isActfgSuprele()) {
 			tLoanBorTx = new LoanBorTx();
-			tLoanBorTx = loanBorTxService.holdById(new LoanBorTxId(iCustNo, iFacmNo, wkBormNo, wkBorxNo), titaVo);
+			tLoanBorTx = loanBorTxService.holdById(new LoanBorTxId(iCustNo, iFacmNo, iBormNo, wkBorxNo), titaVo);
 			if (tLoanBorTx == null) {
 				throw new LogicException(titaVo, "E0006", "放款交易內容檔"); // 鎖定資料時，發生錯誤
 			}
@@ -779,7 +783,7 @@ public class L3100 extends TradeBuffer {
 			// 新增放款交易內容檔
 			tLoanBorTx = new LoanBorTx();
 			tLoanBorTxId = new LoanBorTxId();
-			loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, wkBormNo, wkBorxNo, titaVo);
+			loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, iBormNo, wkBorxNo, titaVo);
 			moveLoanBorTx();
 			try {
 				loanBorTxService.insert(tLoanBorTx, titaVo);
@@ -790,7 +794,7 @@ public class L3100 extends TradeBuffer {
 		// 修正時，如為訂正後修正則需新增沖正交易明細、否則修改交易內容
 		if (titaVo.isHcodeModify()) {
 			// 修正 更新放款交易內容檔
-			tLoanBorTx = loanBorTxService.holdById(new LoanBorTxId(iCustNo, iFacmNo, wkBormNo, wkBorxNo));
+			tLoanBorTx = loanBorTxService.holdById(new LoanBorTxId(iCustNo, iFacmNo, iBormNo, wkBorxNo));
 			if (tLoanBorTx == null) {
 				throw new LogicException(titaVo, "E0006", "放款交易內容檔"); // 鎖定資料時，發生錯誤
 			}
@@ -813,12 +817,12 @@ public class L3100 extends TradeBuffer {
 		}
 		if (titaVo.isHcodeErase()) {
 			// 註記放款交易內容檔
-			tLoanBorTx = loanBorTxService.custNoTxtNoFirst(iCustNo, iFacmNo, wkBormNo, titaVo.getOrgEntdyI() + 19110000,
+			tLoanBorTx = loanBorTxService.custNoTxtNoFirst(iCustNo, iFacmNo, iBormNo, titaVo.getOrgEntdyI() + 19110000,
 					titaVo.getOrgTlr(), titaVo.getOrgTno(), titaVo);
 			if (tLoanBorTx == null) {
 				throw new LogicException(titaVo, "E0006", "放款交易內容檔"); // 鎖定資料時，發生錯誤
 			}
-			loanCom.setLoanBorTxHcode(iCustNo, iFacmNo, wkBormNo, tLoanBorTx.getBorxNo(), wkBorxNo + 1, iDrawdownAmt,
+			loanCom.setLoanBorTxHcode(iCustNo, iFacmNo, iBormNo, tLoanBorTx.getBorxNo(), wkBorxNo + 1, iDrawdownAmt,
 					titaVo);
 		}
 	}
@@ -835,7 +839,7 @@ public class L3100 extends TradeBuffer {
 			acDetail.setTxAmt(iDrawdownAmt);
 			acDetail.setCustNo(iCustNo);
 			acDetail.setFacmNo(iFacmNo);
-			acDetail.setBormNo(wkBormNo);
+			acDetail.setBormNo(iBormNo);
 			tTempVo.clear();
 			tTempVo.putParam("DrawdownCode", titaVo.getParam("RpCode1"));
 			tTempVo.putParam("RemitBank", titaVo.getParam("RpRemitBank1"));
@@ -869,7 +873,7 @@ public class L3100 extends TradeBuffer {
 			tAcReceivable.setAcctCode("F10"); // F10 帳管費
 			tAcReceivable.setCustNo(iCustNo);
 			tAcReceivable.setFacmNo(iFacmNo);
-			tAcReceivable.setRvNo(FormatUtil.pad9(String.valueOf(wkBormNo), 3));
+			tAcReceivable.setRvNo(FormatUtil.pad9(String.valueOf(iBormNo), 3));
 			tAcReceivable.setRvAmt(iAcctFee);
 			tAcReceivable.setOpenAcDate(this.parse.stringToInteger(titaVo.getParam("FirstDueDate")));
 			lAcReceivable.add(tAcReceivable);
@@ -889,7 +893,7 @@ public class L3100 extends TradeBuffer {
 			tAcReceivable.setAcctCode("F10"); // F10 帳管費
 			tAcReceivable.setCustNo(iCustNo);
 			tAcReceivable.setFacmNo(iFacmNo);
-			tAcReceivable.setRvNo(FormatUtil.pad9(String.valueOf(wkBormNo), 3) + "-2");
+			tAcReceivable.setRvNo(FormatUtil.pad9(String.valueOf(iBormNo), 3) + "-2");
 			tAcReceivable.setRvAmt(iHandlingFee);
 			tAcReceivable.setOpenAcDate(this.parse.stringToInteger(titaVo.getParam("FirstDueDate")));
 			lAcReceivable.add(tAcReceivable);
@@ -920,7 +924,7 @@ public class L3100 extends TradeBuffer {
 		PfDetailVo pf = new PfDetailVo();
 		pf.setCustNo(iCustNo); // 借款人戶號
 		pf.setFacmNo(iFacmNo); // 額度編號
-		pf.setBormNo(wkBormNo); // 撥款序號
+		pf.setBormNo(iBormNo); // 撥款序號
 		pf.setBorxNo(tLoanBorMain.getLastBorxNo()); // 交易內容檔序號
 		pf.setRepayType(0); // 還款類別 0.撥款
 		pf.setDrawdownAmt(tLoanBorMain.getDrawdownAmt());// 撥款金額/追回金額
@@ -943,8 +947,8 @@ public class L3100 extends TradeBuffer {
 		int wkNewSpecificDate = 0;
 		tLoanBorMain.setCustNo(iCustNo);
 		tLoanBorMain.setFacmNo(iFacmNo);
-		tLoanBorMain.setBormNo(wkBormNo);
-		tLoanBorMain.setLoanBorMainId(new LoanBorMainId(iCustNo, iFacmNo, wkBormNo));
+		tLoanBorMain.setBormNo(iBormNo);
+		tLoanBorMain.setLoanBorMainId(new LoanBorMainId(iCustNo, iFacmNo, iBormNo));
 		tLoanBorMain.setLastBorxNo(wkBorxNo);
 		tLoanBorMain.setLastOvduNo(0);
 		tLoanBorMain.setStatus(0);
@@ -1100,7 +1104,7 @@ public class L3100 extends TradeBuffer {
 
 		tLoanRateChange.setCustNo(iCustNo);
 		tLoanRateChange.setFacmNo(iFacmNo);
-		tLoanRateChange.setBormNo(wkBormNo);
+		tLoanRateChange.setBormNo(iBormNo);
 		tLoanRateChange.setEffectDate(iDrawdownDate);
 		tLoanRateChange.setLoanRateChangeId(tLoanRateChangeId);
 		tLoanRateChange.setStatus(0);
@@ -1142,12 +1146,12 @@ public class L3100 extends TradeBuffer {
 		tLoanRateChangeId = new LoanRateChangeId();
 		tLoanRateChangeId.setCustNo(tLoanBorMain.getCustNo());
 		tLoanRateChangeId.setFacmNo(tLoanBorMain.getFacmNo());
-		tLoanRateChangeId.setBormNo(wkBormNo);
+		tLoanRateChangeId.setBormNo(iBormNo);
 		tLoanRateChangeId.setEffectDate(wkEffectDate);
 		tLoanRateChange = new LoanRateChange();
 		tLoanRateChange.setCustNo(tLoanBorMain.getCustNo());
 		tLoanRateChange.setFacmNo(tLoanBorMain.getFacmNo());
-		tLoanRateChange.setBormNo(wkBormNo);
+		tLoanRateChange.setBormNo(iBormNo);
 		tLoanRateChange.setEffectDate(wkEffectDate);
 		tLoanRateChange.setLoanRateChangeId(tLoanRateChangeId);
 		tLoanRateChange.setStatus(2);

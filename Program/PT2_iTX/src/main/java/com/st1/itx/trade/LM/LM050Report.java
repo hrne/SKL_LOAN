@@ -144,6 +144,8 @@ public class LM050Report extends MakeReport {
 		}
 		makeExcel.setShiftRow(rowCursor, size - 1);
 
+		makeExcel.setIBU("");
+		
 		for (Map<String, String> tLM050 : listLM050) {
 
 			String rptType = tLM050.get("F0");
@@ -164,7 +166,7 @@ public class LM050Report extends MakeReport {
 
 				makeExcel.setValue(rowCursor, 2, custNo);
 				makeExcel.setValue(rowCursor, 3, custName);
-				makeExcel.setValue(rowCursor, 4, formatThousand(loanBal), "#,##0");
+				makeExcel.setValue(rowCursor, 4, formatThousand(loanBal), "#,##0","R");
 				makeExcel.setValue(rowCursor, 5, this.computeDivide(loanBal.multiply(new BigDecimal("100")), equity, 4),
 						"#,##0.00%");
 				this.info("bal:" + loanBal);

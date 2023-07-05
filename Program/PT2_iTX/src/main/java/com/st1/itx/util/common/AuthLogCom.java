@@ -14,12 +14,18 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AchAuthLog;
 import com.st1.itx.db.domain.BankAuthAct;
+import com.st1.itx.db.domain.LoanBorTx;
+import com.st1.itx.db.domain.LoanBorTxId;
 import com.st1.itx.db.domain.PostAuthLog;
+import com.st1.itx.db.domain.TxTemp;
 import com.st1.itx.db.service.AchAuthLogService;
 import com.st1.itx.db.service.BankAuthActService;
+import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.PostAuthLogService;
+import com.st1.itx.db.service.TxTempService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -33,8 +39,6 @@ import com.st1.itx.util.parse.Parse;
 @Component("authLogCom")
 @Scope("prototype")
 public class AuthLogCom extends TradeBuffer {
-
-	private TitaVo titaVo;
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -53,6 +57,9 @@ public class AuthLogCom extends TradeBuffer {
 	@Autowired
 	public PostAuthLogService postAuthLogService;
 
+	@Autowired
+	public LoanBorTxService loanBorTxService;;
+
 	private int iCustNo = 0;
 	private int iFacmNo = 0;
 	private TempVo tempVo = new TempVo();
@@ -61,7 +68,6 @@ public class AuthLogCom extends TradeBuffer {
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 
-		this.titaVo = titaVo;
 		this.totaVo.init(titaVo);
 
 		this.addList(this.totaVo);
@@ -100,14 +106,14 @@ public class AuthLogCom extends TradeBuffer {
 
 		tempVo = new TempVo();
 
-		Slice<BankAuthAct> sBankAuthAct = null;
-		List<BankAuthAct> lBankAuthAct = new ArrayList<BankAuthAct>();
+		Slice<BankAuthAct> slBankAuthAct = bankAuthActService.facmNoEq(iCustNo, iFacmNo, this.index, this.limit,
+				titaVo);
 
-		sBankAuthAct = bankAuthActService.facmNoEq(iCustNo, iFacmNo, this.index, this.limit, titaVo);
-		lBankAuthAct = sBankAuthAct == null ? null : sBankAuthAct.getContent();
-
-		if (lBankAuthAct != null && lBankAuthAct.size() != 0) {
-			for (BankAuthAct tBankAuthAct : lBankAuthAct) {
+		// 銀扣授權帳號檔不存在則回傳額度核准時的資料
+		if (slBankAuthAct == null) {
+			setLoanBorTxTempVo(custNo, facmNo, titaVo);
+		} else {
+			for (BankAuthAct tBankAuthAct : slBankAuthAct.getContent()) {
 				this.info("ALL RepayBank : " + tBankAuthAct.getRepayBank());
 
 				if (tBankAuthAct.getStatus() != null && "".equals(tBankAuthAct.getStatus().trim())) {
@@ -125,11 +131,8 @@ public class AuthLogCom extends TradeBuffer {
 					setAchTempVo(tBankAuthAct, titaVo);
 					break;
 				} else {
-//					throw new LogicException(titaVo, "E0001", "查無資料");
 				}
 			}
-		} else {
-//			throw new LogicException(titaVo, "E0001", "查無資料");
 		}
 		this.info("ALL tempVo : " + tempVo.toString());
 		return tempVo;
@@ -138,7 +141,8 @@ public class AuthLogCom extends TradeBuffer {
 	private void setPostTempVo(BankAuthAct tBankAuthAct, TitaVo titaVo) throws LogicException {
 
 		PostAuthLog tPostAuthLog = new PostAuthLog();
-		tPostAuthLog = postAuthLogService.repayAcctFirst(tBankAuthAct.getCustNo(), tBankAuthAct.getPostDepCode(), tBankAuthAct.getRepayAcct(), "1", titaVo);
+		tPostAuthLog = postAuthLogService.repayAcctFirst(tBankAuthAct.getCustNo(), tBankAuthAct.getPostDepCode(),
+				tBankAuthAct.getRepayAcct(), "1", titaVo);
 
 		if (tPostAuthLog != null) {
 			this.info("Post tPostAuthLog : " + tPostAuthLog.toString());
@@ -180,7 +184,7 @@ public class AuthLogCom extends TradeBuffer {
 //				throw new LogicException(titaVo, "E0001", "查無資料");
 			}
 		} else {
-			this.info("tPostAuthLog null... ");
+			setLoanBorTxTempVo(tBankAuthAct.getCustNo(), tBankAuthAct.getFacmNo(), titaVo);
 		}
 		this.info("Post tempVo : " + tempVo.toString());
 	}
@@ -188,7 +192,8 @@ public class AuthLogCom extends TradeBuffer {
 	private void setAchTempVo(BankAuthAct tBankAuthAct, TitaVo titaVo) throws LogicException {
 		AchAuthLog tAchAuthLog = new AchAuthLog();
 
-		tAchAuthLog = achAuthLogService.repayAcctFirst(tBankAuthAct.getCustNo(), tBankAuthAct.getRepayBank(), tBankAuthAct.getRepayAcct(), titaVo);
+		tAchAuthLog = achAuthLogService.repayAcctFirst(tBankAuthAct.getCustNo(), tBankAuthAct.getRepayBank(),
+				tBankAuthAct.getRepayAcct(), titaVo);
 
 		if (tAchAuthLog != null) {
 			this.info("ACH tAchAuthLog : " + tAchAuthLog.toString());
@@ -229,8 +234,26 @@ public class AuthLogCom extends TradeBuffer {
 //				throw new LogicException(titaVo, "E0001", "查無資料");
 			}
 		} else {
-			this.info("tAchAuthLog null... ");
+			setLoanBorTxTempVo(tBankAuthAct.getCustNo(), tBankAuthAct.getFacmNo(), titaVo);
 		}
 		this.info("ACH tempVo : " + tempVo.toString());
+	}
+
+	private void setLoanBorTxTempVo(int custNo, int facmNo, TitaVo titaVo) throws LogicException {
+		LoanBorTx tLoanBorTx = loanBorTxService.holdById(new LoanBorTxId(iCustNo, iFacmNo, 0, 1), titaVo);
+		if (tLoanBorTx != null) {
+			TempVo tTempVo = new TempVo();
+			tTempVo = tempVo.getVo(tLoanBorTx.getOtherFields());
+			if (tTempVo.get("RepayBank") != null) {
+				tempVo.putParam("RepayBank", FormatUtil.pad9(tTempVo.get("RepayBank"), 3));
+				tempVo.putParam("PostCode", tTempVo.get("PostCode"));
+				tempVo.putParam("RepayAcctNo", tTempVo.get("RepayAcctNo"));
+				tempVo.putParam("RelationCode", tTempVo.get("RelationCode"));
+				tempVo.putParam("RelationName", tTempVo.get("RelationName"));
+				tempVo.putParam("RelationBirthday", tTempVo.get("RelationGender"));
+				tempVo.putParam("RelationGender", tTempVo.get("RelationGender"));
+				tempVo.putParam("CustId", tTempVo.get("CustId"));
+			}
+		}
 	}
 }

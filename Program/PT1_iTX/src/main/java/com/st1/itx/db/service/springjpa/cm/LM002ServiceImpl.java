@@ -167,8 +167,8 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WHERE M.\"YearMonth\" = :yearMonth ";
 		sql += "   AND M.\"LoanBalance\" > 0 ";
 		sql += "   AND M.\"ProdNo\" BETWEEN 'IA' AND 'II' ";
-		sql += "   AND (  ( (TRUNC(:thisMonth / 100) - TRUNC(FA.\"FirstDrawdownDate\" / 10000) ) * 12 ";
-		sql += "           + MOD(:thisMonth,100) - MOD(TRUNC(FA.\"FirstDrawdownDate\" / 100),100) ";
+		sql += "   AND (  ( (TRUNC(:yearMonth / 100) - TRUNC(FA.\"FirstDrawdownDate\" / 10000) ) * 12 ";
+		sql += "           + MOD(:yearMonth,100) - MOD(TRUNC(FA.\"FirstDrawdownDate\" / 100),100) ";
 		sql += "        )  < 240 )    ";//-- 排除本月超過屆滿20年
 		sql += " ) R";
 		sql += " WHERE R.\"Type\" <> '0'";

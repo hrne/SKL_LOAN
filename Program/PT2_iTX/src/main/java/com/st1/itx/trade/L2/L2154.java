@@ -22,8 +22,8 @@ import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.FacProd;
 import com.st1.itx.db.domain.FacProdStepRate;
 import com.st1.itx.db.domain.FacProdStepRateId;
-import com.st1.itx.db.domain.TxTemp;
-import com.st1.itx.db.domain.TxTempId;
+import com.st1.itx.db.domain.LoanBorTx;
+import com.st1.itx.db.domain.LoanBorTxId;
 import com.st1.itx.db.service.CdGseqService;
 import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.CustMainService;
@@ -33,7 +33,7 @@ import com.st1.itx.db.service.FacProdBreachService;
 import com.st1.itx.db.service.FacProdService;
 import com.st1.itx.db.service.FacProdStepRateService;
 import com.st1.itx.db.service.LoanBorMainService;
-import com.st1.itx.db.service.TxTempService;
+import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BankAuthActCom;
 import com.st1.itx.util.common.LoanCom;
@@ -78,7 +78,7 @@ public class L2154 extends TradeBuffer {
 	@Autowired
 	public CdGseqService cdGseqService;
 	@Autowired
-	public TxTempService txTempService;
+	public LoanBorTxService loanBorTxService;;
 	@Autowired
 	public ClFacService sClFacService;
 
@@ -101,19 +101,11 @@ public class L2154 extends TradeBuffer {
 	private String iProdNo;
 
 	// work area
-	private int wkCustNo;
-	private int wkFacmNo;
-	private int wkApplNo;
-	private int wkIdx;
 	private String sProdNo = "";
 	private TempVo tTempVo = new TempVo();
-	private TxTemp tTxTemp;
-	private TxTempId tTxTempId;
 	private FacProd tFacProd;
 	private FacMain tFacMain;
 	private FacMain beforeFacMain;
-	private FacMainId tFacMainId;
-	private List<TxTemp> lTxTemp;
 	private TitaVo txtitaVo;
 
 	@Override
@@ -136,17 +128,14 @@ public class L2154 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 		this.titaVo = titaVo;
 
-		bankAuthActCom.setTxBuffer(txBuffer);
+		bankAuthActCom.setTxBuffer(this.txBuffer);
+		loanCom.setTxBuffer(this.txBuffer);
 
 		// 取得輸入資料
 		iFuncCode = this.parse.stringToInteger(titaVo.getParam("FuncCode"));
 		iCustNo = this.parse.stringToInteger(titaVo.getParam("CustNo"));
 		iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
 		iProdNo = titaVo.getParam("ProdNo");
-//		iBreachCode = titaVo.getParam("BreachCode");
-		wkCustNo = iCustNo;
-		wkFacmNo = iFacmNo;
-
 		// 檢查輸入資料
 		if (!(iFuncCode == 2 || iFuncCode == 4 || iFuncCode == 5)) {
 			throw new LogicException(titaVo, "E2004", "功能"); // 功能選擇錯誤
@@ -179,11 +168,16 @@ public class L2154 extends TradeBuffer {
 		}
 		// 放行
 		if (titaVo.isActfgSuprele()) {
-			if (iFuncCode == 4 & titaVo.isHcodeErase()) { // 刪除
-				throw new LogicException(titaVo, "E0010", "刪除後不可訂正"); // 功能選擇錯誤
+			if (titaVo.isHcodeErase()) { // 放行後不可訂正
+				throw new LogicException(titaVo, "E0010", "放行後不可訂正"); // 功能選擇錯誤
 			}
+
 			ReleaseRoutine();
 
+		}
+		// 一段式或兩段式放行 更新階梯式利率
+		if (titaVo.isActfgRelease()) {
+			UpdateFacProdStepRateRoutine();
 		}
 		// 銀扣授權帳號檔
 		bankAuthActRoutine();
@@ -196,13 +190,13 @@ public class L2154 extends TradeBuffer {
 	private void EntryNormalRoutine() throws LogicException {
 		this.info("EntryNormalRoutine ... ");
 
-		tFacMain = facMainService.holdById(new FacMainId(wkCustNo, wkFacmNo), titaVo);
+		tFacMain = facMainService.holdById(new FacMainId(iCustNo, iFacmNo), titaVo);
 		if (tFacMain == null) {
-			throw new LogicException(titaVo, "E0003", "額度主檔 戶號=" + wkCustNo + " 額度編號=" + wkFacmNo); // 修改資料不存在
+			throw new LogicException(titaVo, "E0003", "額度主檔 戶號=" + iCustNo + " 額度編號=" + iFacmNo); // 修改資料不存在
 		}
 
 		// 新增交易暫存檔
-		AddTxTempRoutine();
+		addLoanBorTxRoutine();
 
 		// 更新額度主檔
 		if (tFacMain.getActFg() == 1 && titaVo.isHcodeNormal()) {
@@ -240,159 +234,105 @@ public class L2154 extends TradeBuffer {
 			break;
 		}
 
-		// 更新階梯式利率
-		UpdateFacProdStepRateRoutine();
 	}
 
 	// 登錄 訂正
 	private void EntryEraseRoutine() throws LogicException {
 		this.info("EntryEraseRoutine ... ");
-
-		Slice<TxTemp> slTxTemp = txTempService.txTempTxtNoEq(titaVo.getOrgEntdyI() + 19110000, titaVo.getOrgKin(),
-				titaVo.getOrgTlr(), titaVo.getOrgTno(), this.index, Integer.MAX_VALUE, titaVo);
-		lTxTemp = slTxTemp == null ? null : slTxTemp.getContent();
-		if (lTxTemp == null || lTxTemp.size() == 0) {
-			throw new LogicException(titaVo, "E0001", "交易暫存檔 分行別 = " + titaVo.getOrgKin() + " 交易員代號 = "
-					+ titaVo.getOrgTlr() + " 交易序號 = " + titaVo.getOrgTno()); // 查詢資料不存在
+		LoanBorTx tLoanBorTx = loanBorTxService.custNoTxtNoFirst(iCustNo, iFacmNo, 0, titaVo.getOrgEntdyI() + 19110000,
+				titaVo.getOrgTlr(), titaVo.getOrgTno(), titaVo);
+		if (tLoanBorTx == null) {
+			throw new LogicException(titaVo, "E0006", "放款交易內容檔"); // 鎖定資料時，發生錯誤
 		}
-		for (TxTemp tx : lTxTemp) {
-			wkCustNo = this.parse.stringToInteger(tx.getSeqNo().substring(0, 7));
-			wkFacmNo = this.parse.stringToInteger(tx.getSeqNo().substring(7, 10));
-			wkIdx = this.parse.stringToInteger(tx.getSeqNo().substring(10, 13));
-			tTempVo = tTempVo.getVo(tx.getText());
-			this.info("   tTempVo = " + tTempVo.toString());
-			this.info("   wkCustNo = " + wkCustNo);
-			this.info("   wkFacmNo = " + wkFacmNo);
-			switch (iFuncCode) {
-			case 2: // 修改
-				if (wkIdx == 0) {
-					// 還原額度檔
-					RestoredFacMainRoutine();
-				} else {
-					// 還原清償金類型
+		tTempVo = tTempVo.getVo((tLoanBorTx.getOtherFields()));
+		tLoanBorTx = loanBorTxService.holdById(tLoanBorTx, titaVo);
+		try {
+			loanBorTxService.delete(tLoanBorTx, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0008", "放款交易內容檔"); // 刪除資料時，發生錯誤
+		}
+		switch (iFuncCode) {
+		case 2: // 修改
+				// 還原額度檔
+			RestoredFacMainRoutine();
 //					RestoredFacProdBreachRoutine();
-				}
-				break;
-			case 4: // 刪除 還原交序號
-				tFacMain = facMainService.holdById(new FacMainId(wkCustNo, wkFacmNo), titaVo);
-				if (tFacMain == null) {
-					throw new LogicException(titaVo, "E0006", "額度主檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo); // 鎖定資料時，發生錯誤
-				}
-				tFacMain.setActFg(this.parse.stringToInteger(tTempVo.getParam("ActFg")));
-				tFacMain.setLastAcctDate(this.parse.stringToInteger(tTempVo.getParam("LastAcctDate")));
-				tFacMain.setLastKinbr(tTempVo.getParam("LastKinbr"));
-				tFacMain.setLastTlrNo(tTempVo.getParam("LastTlrNo"));
-				tFacMain.setLastTxtNo(tTempVo.getParam("LastTxtNo"));
-				try {
-					tFacMain = facMainService.update(tFacMain, titaVo);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0007",
-							"額度主檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo + " " + e.getErrorMsg()); // 更新資料時，發生錯誤
-				}
-				break;
+			break;
+		case 4: // 刪除 還原交序號
+			tFacMain = facMainService.holdById(new FacMainId(iCustNo, iFacmNo), titaVo);
+			if (tFacMain == null) {
+				throw new LogicException(titaVo, "E0006", "額度主檔 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo); // 鎖定資料時，發生錯誤
 			}
+			tFacMain.setActFg(this.parse.stringToInteger(tTempVo.getParam("ActFg")));
+			tFacMain.setLastAcctDate(this.parse.stringToInteger(tTempVo.getParam("LastAcctDate")));
+			tFacMain.setLastKinbr(tTempVo.getParam("LastKinbr"));
+			tFacMain.setLastTlrNo(tTempVo.getParam("LastTlrNo"));
+			tFacMain.setLastTxtNo(tTempVo.getParam("LastTxtNo"));
+			try {
+				tFacMain = facMainService.update(tFacMain, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007",
+						"額度主檔 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " " + e.getErrorMsg()); // 更新資料時，發生錯誤
+			}
+			break;
 		}
+
 	}
 
 	// 放行
 	private void ReleaseRoutine() throws LogicException {
 		this.info("ReleaseRoutine ... ");
-
-		Slice<TxTemp> slTxTemp = txTempService.txTempTxtNoEq(titaVo.getOrgEntdyI() + 19110000, titaVo.getOrgKin(),
-				titaVo.getOrgTlr(), titaVo.getOrgTno(), this.index, Integer.MAX_VALUE, titaVo);
-		lTxTemp = slTxTemp == null ? null : slTxTemp.getContent();
-		if (lTxTemp == null || lTxTemp.size() == 0) {
-			throw new LogicException(titaVo, "E0001", "交易暫存檔 分行別 = " + titaVo.getOrgKin() + " 交易員代號 = "
-					+ titaVo.getOrgTlr() + " 交易序號 = " + titaVo.getOrgTno()); // 查詢資料不存在
+		tFacMain = facMainService.holdById(new FacMainId(iCustNo, iFacmNo), titaVo);
+		if (tFacMain == null) {
+			throw new LogicException(titaVo, "E0006", "額度主檔"); // 鎖定資料時，發生錯誤
 		}
-		for (TxTemp tx : lTxTemp) {
-			wkCustNo = this.parse.stringToInteger(tx.getSeqNo().substring(0, 7));
-			wkFacmNo = this.parse.stringToInteger(tx.getSeqNo().substring(7, 10));
-			wkIdx = this.parse.stringToInteger(tx.getSeqNo().substring(10, 13));
-			tTempVo = tTempVo.getVo(tx.getText());
-			this.info("   tTempVo = " + tTempVo);
-			this.info("   wkCustNo = " + wkCustNo);
-			this.info("   wkFacmNo = " + wkFacmNo);
-			this.info("   wkIdx    = " + wkIdx);
-			if (titaVo.isHcodeNormal() && wkIdx > 0) {
-				continue;
+		switch (iFuncCode) {
+		case 2: // 修改, 更新額度主檔
+			// 更新額度主檔
+			tFacMain.setActFg(titaVo.getActFgI());
+			try {
+				tFacMain = facMainService.update(tFacMain, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0008",
+						"額度主檔 戶號 = " + iCustNo + "額度編號 = " + iFacmNo + e.getErrorMsg()); // 新增資料時，發生錯誤
 			}
-			tFacMain = facMainService.holdById(new FacMainId(wkCustNo, wkFacmNo), titaVo);
-			if (tFacMain == null) {
-				throw new LogicException(titaVo, "E0006", "額度主檔"); // 鎖定資料時，發生錯誤
+			break;
+		case 4: // 刪除, 刪除額度資料及清償金類型
+			// 刪除時更新案件申請檔
+			UpdateAppl(tFacMain.getApplNo());
+			// 刪除時檢查為該戶號最後一筆額度 客戶主檔該額度-1
+			CustMain tCustMain = null;
+			tCustMain = custMainService.custNoFirst(tFacMain.getCustNo(), tFacMain.getCustNo(), titaVo);
+			if (tCustMain == null) {
+				throw new LogicException(titaVo, "E2003", "客戶資料主檔 = " + tFacMain.getCustNo()); // 查無資料
 			}
-			wkApplNo = tFacMain.getApplNo();
-
-			if (tFacMain.getActFg() != 1) {
-				throw new LogicException(titaVo, "E0017", "額度主檔 戶號 = " + wkCustNo + "額度編號 = " + wkFacmNo); // 該筆交易狀態非待放行，不可做交易放行
+			String wkCustUKey = tCustMain.getCustUKey().trim();
+			tCustMain = custMainService.holdById(wkCustUKey, titaVo);
+			if (tCustMain == null) {
+				throw new LogicException(titaVo, "E2011", "客戶資料主檔"); // 鎖定資料時，發生錯誤
 			}
-			switch (iFuncCode) {
-			case 2: // 修改, 更新額度主檔
-				// 新增交易暫存檔
-				TxTemp tTxTemp = new TxTemp();
-				TxTempId tTxTempId = new TxTempId();
-				loanCom.setTxTemp(tTxTempId, tTxTemp, wkCustNo, wkFacmNo, 0, 0, titaVo);
-				tTempVo.clear();
-				tTempVo.putParam("ActFg", tFacMain.getActFg());
-				tTxTemp.setText(tTempVo.getJsonString());
+			if (tFacMain.getFacmNo() == tCustMain.getLastFacmNo()) {
+				tCustMain.setLastFacmNo(tCustMain.getLastFacmNo() - 1);
 				try {
-					txTempService.insert(tTxTemp, titaVo);
+					custMainService.update(tCustMain, titaVo);
 				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0005", "交易暫存檔 Key = " + tTxTempId); // 新增資料時，發生錯誤
+					throw new LogicException(titaVo, "E2010", "客戶資料主檔"); // 更新資料時，發生錯誤
 				}
-				// 更新額度主檔
-				tFacMain.setActFg(titaVo.getActFgI());
-				try {
-					tFacMain = facMainService.update(tFacMain, titaVo);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0008",
-							"額度主檔 戶號 = " + wkCustNo + "額度編號 = " + wkFacmNo + e.getErrorMsg()); // 新增資料時，發生錯誤
-				}
-				break;
-			case 4: // 刪除, 刪除額度資料及清償金類型
-				// 刪除時更新案件申請檔
-				UpdateAppl();
-				// 新增交易暫存檔
-				AddTxTempRoutine();
-				// 刪除時檢查為該戶號最後一筆額度 客戶主檔該額度-1
-				CustMain tCustMain = null;
-				tCustMain = custMainService.custNoFirst(tFacMain.getCustNo(), tFacMain.getCustNo(), titaVo);
-				if (tCustMain == null) {
-					throw new LogicException(titaVo, "E2003", "客戶資料主檔 = " + tFacMain.getCustNo()); // 查無資料
-				}
-				String wkCustUKey = tCustMain.getCustUKey().trim();
-				tCustMain = custMainService.holdById(wkCustUKey, titaVo);
-				if (tCustMain == null) {
-					throw new LogicException(titaVo, "E2011", "客戶資料主檔"); // 鎖定資料時，發生錯誤
-				}
-				if (tFacMain.getFacmNo() == tCustMain.getLastFacmNo()) {
-					tCustMain.setLastFacmNo(tCustMain.getLastFacmNo() - 1);
-					try {
-						custMainService.update(tCustMain, titaVo);
-					} catch (DBException e) {
-						throw new LogicException(titaVo, "E2010", "客戶資料主檔"); // 更新資料時，發生錯誤
-					}
-				}
-				try {
-					facMainService.delete(tFacMain, titaVo);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E2008", "額度主檔"); // 刪除資料時，發生錯誤
-				}
-				// 刪除階梯式利率
-				DeleteFacProdStepRateRoutine();
-				break;
 			}
-
+			try {
+				facMainService.delete(tFacMain, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E2008", "額度主檔"); // 刪除資料時，發生錯誤
+			}
+			// 刪除階梯式利率
+			DeleteFacProdStepRateRoutine();
+			break;
 		}
 	}
 
-	// 刪除更新案件申請檔
-	private void UpdateAppl() throws LogicException {
+	// 刪除時更新案件申請檔
+	private void UpdateAppl(int applNo) throws LogicException {
 		this.info("UpdateAppl ...");
-		tTxTemp = new TxTemp();
-		tTxTempId = new TxTempId();
-
-		FacCaseAppl tfacCaseAppl = facCaseApplService.holdById(wkApplNo, titaVo);
+		FacCaseAppl tfacCaseAppl = facCaseApplService.holdById(applNo, titaVo);
 		tfacCaseAppl.setProcessCode("0");
 		try {
 			facCaseApplService.update(tfacCaseAppl, titaVo);
@@ -401,13 +341,43 @@ public class L2154 extends TradeBuffer {
 		}
 	}
 
-	// 新增交易暫存檔
-	private void AddTxTempRoutine() throws LogicException {
+	// 新增放款交易內容檔
+	private void addLoanBorTxRoutine() throws LogicException {
 		this.info("AddTxTempRoutine ...");
+		LoanBorTx tLoanBorTx = new LoanBorTx();
+		LoanBorTxId tLoanBorTxId = new LoanBorTxId();
+		// 修正時刪除放款交易內容檔
+		if (titaVo.isHcodeModify()) {
+			tLoanBorTx = loanBorTxService.custNoTxtNoFirst(iCustNo, iFacmNo, 0, titaVo.getOrgEntdyI() + 19110000,
+					titaVo.getOrgTlr(), titaVo.getOrgTno(), titaVo);
+			if (tLoanBorTx == null) {
+				throw new LogicException(titaVo, "E0006", "放款交易內容檔"); // 鎖定資料時，發生錯誤
+			}
+			// 登錄時的主檔保留資料
+			tTempVo = tTempVo.getVo(tLoanBorTx.getOtherFields());
+			tLoanBorTx = loanBorTxService.holdById(tLoanBorTx, titaVo);
+			try {
+				loanBorTxService.delete(tLoanBorTx, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0008", "放款交易內容檔"); // 刪除資料時，發生錯誤
+			}
+		}
+		// 新增放款交易內容檔
+		loanCom.setFacmBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, titaVo);
+		tLoanBorTx.setDisplayflag("N");
+		// 登錄時保留主檔資料
+		if (titaVo.isHcodeNormal()) {
+			setTempVo();
+		}
+		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
+		try {
+			loanBorTxService.insert(tLoanBorTx, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0005", "放款交易內容檔 Key = " + tLoanBorTxId); // 新增資料時，發生錯誤
+		}
+	}
 
-		tTxTemp = new TxTemp();
-		tTxTempId = new TxTempId();
-		loanCom.setTxTemp(tTxTempId, tTxTemp, wkCustNo, wkFacmNo, 0, 0, titaVo);
+	private void setTempVo() throws LogicException {
 		tTempVo.clear();
 		tTempVo.putParam("LastBormNo", tFacMain.getLastBormNo());
 		tTempVo.putParam("LastBormRvNo", tFacMain.getLastBormRvNo());
@@ -503,12 +473,6 @@ public class L2154 extends TradeBuffer {
 		tTempVo.putParam("LastTlrNo", tFacMain.getLastTlrNo());
 		tTempVo.putParam("LastTxtNo", tFacMain.getLastTxtNo());
 		tTempVo.putParam("AcDate", tFacMain.getAcDate());
-		tTxTemp.setText(tTempVo.getJsonString());
-		try {
-			txTempService.insert(tTxTemp, titaVo);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0005", "交易暫存檔 Key = " + tTxTempId); // 新增資料時，發生錯誤
-		}
 	}
 
 	private void UpdateFacMainRoutine() throws LogicException {
@@ -592,11 +556,6 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setAcDate(this.txBuffer.getTxCom().getTbsdy());
 
 		this.info("RepayCode = " + titaVo.getParam("RepayCode"));
-		if ("02".equals(titaVo.getParam("RepayCode")) || "2".equals(titaVo.getParam("RepayCode"))) {
-
-//			bankAuthActCom.changeAcctNo(titaVo);   TODO:修改ach授權
-
-		}
 
 		try {
 			tFacMain = facMainService.update2(tFacMain, titaVo);
@@ -612,9 +571,9 @@ public class L2154 extends TradeBuffer {
 	private void RestoredFacMainRoutine() throws LogicException {
 		this.info("RestoredFacMainRoutine ... ");
 
-		tFacMain = facMainService.holdById(new FacMainId(wkCustNo, wkFacmNo), titaVo);
+		tFacMain = facMainService.holdById(new FacMainId(iCustNo, iFacmNo), titaVo);
 		if (tFacMain == null) {
-			throw new LogicException(titaVo, "E0006", "額度主檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo); // 鎖定資料時，發生錯誤
+			throw new LogicException(titaVo, "E0006", "額度主檔 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo); // 鎖定資料時，發生錯誤
 		}
 		// 放款交易訂正交易須由最後一筆交易開始訂正
 		loanCom.checkEraseFacmTxSeqNo(tFacMain, titaVo);
@@ -695,118 +654,10 @@ public class L2154 extends TradeBuffer {
 			tFacMain = facMainService.update2(tFacMain, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007",
-					"額度主檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo + " " + e.getErrorMsg()); // 更新資料時，發生錯誤
+					"額度主檔 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " " + e.getErrorMsg()); // 更新資料時，發生錯誤
 		}
 		datalog.setEnv(titaVo, beforeFacMain, tFacMain);
 		datalog.exec("修改額度主檔資料");
-	}
-
-	// 放行訂正時, 還原被刪除的額度檔
-	private void RestoredDeletedFacMainRoutine() throws LogicException {
-		this.info("RestoredDeletedFacMainRoutine ... ");
-
-		tFacMain = new FacMain();
-		tFacMainId = new FacMainId();
-		tFacMainId.setCustNo(wkCustNo);
-		tFacMainId.setFacmNo(wkFacmNo);
-		tFacMain.setCustNo(wkCustNo);
-		tFacMain.setFacmNo(wkFacmNo);
-		tFacMain.setFacMainId(tFacMainId);
-		tFacMain.setLastBormNo(this.parse.stringToInteger(tTempVo.getParam("LastBormNo")));
-		tFacMain.setLastBormRvNo(this.parse.stringToInteger(tTempVo.getParam("LastBormRvNo")));
-		tFacMain.setApplNo(this.parse.stringToInteger(tTempVo.getParam("ApplNo")));
-		tFacMain.setAnnualIncr(this.parse.stringToBigDecimal(tTempVo.getParam("AnnualIncr")));
-		tFacMain.setEmailIncr(this.parse.stringToBigDecimal(tTempVo.getParam("EmailIncr")));
-		tFacMain.setGraceIncr(this.parse.stringToBigDecimal(tTempVo.getParam("GraceIncr")));
-		tFacMain.setCurrencyCode(tTempVo.getParam("CurrencyCode"));
-		tFacMain.setUtilAmt(this.parse.stringToBigDecimal(tTempVo.getParam("UtilAmt")));
-		tFacMain.setUtilBal(this.parse.stringToBigDecimal(tTempVo.getParam("UtilBal")));
-		tFacMain.setFirstDrawdownDate(this.parse.stringToInteger(tTempVo.getParam("FirstDrawdownDate")));
-		tFacMain.setMaturityDate(this.parse.stringToInteger(tTempVo.getParam("MaturityDate")));
-		tFacMain.setCreditScore(this.parse.stringToInteger(tTempVo.getParam("CreditScore")));
-		tFacMain.setGuaranteeDate(this.parse.stringToInteger(tTempVo.getParam("GuaranteeDate")));
-		tFacMain.setContractNo(tTempVo.getParam("ContractNo"));
-		tFacMain.setColSetFlag(tTempVo.getParam("ColSetFlag"));
-		tFacMain.setL9110Flag(tTempVo.getParam("L9110Flag"));
-		// 以下為可維護項目
-		tFacMain.setCreditSysNo(this.parse.stringToInteger(tTempVo.getParam("CreditSysNo")));
-		tFacMain.setProdNo(tTempVo.getParam("ProdNo"));
-		tFacMain.setBaseRateCode(tTempVo.getParam("BaseRateCode"));
-		tFacMain.setRateIncr(this.parse.stringToBigDecimal(tTempVo.getParam("RateIncr")));
-		tFacMain.setIndividualIncr(this.parse.stringToBigDecimal(tTempVo.getParam("IndividualIncr")));
-		tFacMain.setApproveRate(this.parse.stringToBigDecimal(tTempVo.getParam("ApproveRate")));
-		tFacMain.setRateCode(tTempVo.getParam("RateCode"));
-		tFacMain.setFirstRateAdjFreq(this.parse.stringToInteger(tTempVo.getParam("FirstRateAdjFreq")));
-		tFacMain.setRateAdjFreq(this.parse.stringToInteger(tTempVo.getParam("RateAdjFreq")));
-		tFacMain.setLineAmt(this.parse.stringToBigDecimal(tTempVo.getParam("TimApplAmt")));
-		tFacMain.setAcctCode(tTempVo.getParam("AcctCode"));
-		tFacMain.setLoanTermYy(this.parse.stringToInteger(tTempVo.getParam("LoanTermYy")));
-		tFacMain.setLoanTermMm(this.parse.stringToInteger(tTempVo.getParam("LoanTermMm")));
-		tFacMain.setLoanTermDd(this.parse.stringToInteger(tTempVo.getParam("LoanTermDd")));
-		tFacMain.setAmortizedCode(tTempVo.getParam("AmortizedCode"));
-		tFacMain.setFreqBase(tTempVo.getParam("FreqBase"));
-		tFacMain.setPayIntFreq(this.parse.stringToInteger(tTempVo.getParam("PayIntFreq")));
-		tFacMain.setRepayFreq(this.parse.stringToInteger(tTempVo.getParam("RepayFreq")));
-		tFacMain.setUtilDeadline(this.parse.stringToInteger(tTempVo.getParam("UtilDeadline")));
-		tFacMain.setGracePeriod(this.parse.stringToInteger(tTempVo.getParam("GracePeriod")));
-		tFacMain.setAcctFee(this.parse.stringToBigDecimal(tTempVo.getParam("AcctFee")));
-		tFacMain.setHandlingFee(this.parse.stringToBigDecimal(tTempVo.getParam("HandlingFee")));
-		tFacMain.setGuaranteeDate(this.parse.stringToInteger(tTempVo.getParam("GuaranteeDate")));
-		tFacMain.setExtraRepayCode(tTempVo.getParam("ExtraRepayCode"));
-		tFacMain.setCustTypeCode(tTempVo.getParam("CustTypeCode"));
-		tFacMain.setRuleCode(tTempVo.getParam("RuleCode"));
-		tFacMain.setRecycleCode(tTempVo.getParam("RecycleCode"));
-		tFacMain.setRecycleDeadline(this.parse.stringToInteger(tTempVo.getParam("RecycleDeadline")));
-		tFacMain.setUsageCode(tTempVo.getParam("UsageCode"));
-		tFacMain.setDepartmentCode(tTempVo.getParam("DepartmentCode"));
-		tFacMain.setIncomeTaxFlag(tTempVo.getParam("IncomeTaxFlag"));
-		tFacMain.setCompensateFlag(tTempVo.getParam("CompensateFlag"));
-		tFacMain.setIrrevocableFlag(tTempVo.getParam("IrrevocableFlag"));
-		tFacMain.setRateAdjNoticeCode(tTempVo.getParam("RateAdjNoticeCode"));
-		tFacMain.setPieceCode(tTempVo.getParam("PieceCode"));
-		tFacMain.setProdBreachFlag(tTempVo.getParam("ProdBreachFlag"));
-
-		tFacMain.setBreachFlag(tTempVo.getParam("BreachFlag"));
-		tFacMain.setBreachCode(tTempVo.getParam("BreachCode"));
-		tFacMain.setBreachGetCode(tTempVo.getParam("BreachGetCode"));
-		tFacMain.setProhibitMonth(parse.stringToInteger(tTempVo.getParam("ProhibitMonth")));
-		tFacMain.setBreachPercent(parse.stringToBigDecimal(tTempVo.getParam("BreachPercent")));
-		tFacMain.setBreachDecreaseMonth(parse.stringToInteger(tTempVo.getParam("BreachDecreaseMonth")));
-		tFacMain.setBreachDecrease(parse.stringToBigDecimal(tTempVo.getParam("BreachDecrease")));
-		tFacMain.setBreachStartPercent(parse.stringToInteger(tTempVo.getParam("BreachStartPercent")));
-
-		// ProdBreachFlag為N時寫入
-		if ("N".equals(tFacMain.getProdBreachFlag())) {
-			tFacMain.setBreachDescription(tTempVo.getParam("Breach"));
-		}
-		tFacMain.setCreditScore(this.parse.stringToInteger(tTempVo.getParam("CreditScore")));
-		tFacMain.setRepayCode(this.parse.stringToInteger(tTempVo.getParam("RepayCode")));
-
-		tFacMain.setIntroducer(tTempVo.getParam("Introducer"));
-		tFacMain.setDistrict(tTempVo.getParam("District"));
-		tFacMain.setFireOfficer(tTempVo.getParam("FireOfficer"));
-		tFacMain.setEstimate(tTempVo.getParam("Estimate"));
-		tFacMain.setCreditOfficer(tTempVo.getParam("CreditOfficer"));
-		tFacMain.setLoanOfficer(tTempVo.getParam("LoanOfficer"));
-		tFacMain.setBusinessOfficer(tTempVo.getParam("BusinessOfficer"));
-		tFacMain.setApprovedLevel(tTempVo.getParam("ApprovedLevel"));
-		tFacMain.setSupervisor(tTempVo.getParam("Supervisor"));
-		tFacMain.setInvestigateOfficer(tTempVo.getParam("InvestigateOfficer"));
-		tFacMain.setEstimateReview(tTempVo.getParam("EstimateReview"));
-		tFacMain.setCoorgnizer(tTempVo.getParam("Coorgnizer"));
-
-		tFacMain.setActFg(titaVo.getActFgI());
-		tFacMain.setLastAcctDate(this.parse.stringToInteger(tTempVo.getParam("LastAcctDate")));
-		tFacMain.setLastKinbr(tTempVo.getParam("LastKinbr"));
-		tFacMain.setLastTlrNo(tTempVo.getParam("LastTlrNo"));
-		tFacMain.setLastTxtNo(tTempVo.getParam("LastTxtNo"));
-		tFacMain.setAcDate(this.parse.stringToInteger(tTempVo.getParam("AcDate")));
-		try {
-			tFacMain = facMainService.insert(tFacMain, titaVo);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0005",
-					"額度主檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo + " " + e.getErrorMsg()); // 新增資料時，發生錯誤
-		}
 	}
 
 	private void bankAuthActRoutine() throws LogicException {
@@ -819,7 +670,7 @@ public class L2154 extends TradeBuffer {
 		this.info("titaVo.getParam(OldRepayAcctNo)" + titaVo.getParam("OldAcctNo"));
 		this.info("titaVo.getParam(RepayBank)" + titaVo.getParam("RepayBank"));
 		this.info("titaVo.getParam(OldRepayBank)" + titaVo.getParam("OldRepayBank"));
-
+		// 還款方式、授權帳號未變動則return
 		if (titaVo.getParam("RepayCode").equals(titaVo.getParam("OldRepayCode"))
 				&& titaVo.getParam("RepayBank").equals(titaVo.getParam("OldRepayBank"))
 				&& titaVo.getParam("PostCode").equals(titaVo.getParam("OldPostCode"))
@@ -838,12 +689,14 @@ public class L2154 extends TradeBuffer {
 		txtitaVo.putParam("RelationGender", titaVo.getParam("OldRelationGender"));
 		txtitaVo.putParam("RelationId", titaVo.getParam("OldRelationId"));
 		txtitaVo.putParam("RepayBank", titaVo.getParam("OldRepayBank"));
+		// 授權帳號變更時Rim會檢查須先建授權資料，此時僅作
 		// 2段式放行或1段式
 		if (titaVo.isActfgRelease()) {
 			// 舊還款帳號(含還款方式)刪除
 			if ("02".equals(titaVo.getParam("OldRepayCode"))) {
 				bankAuthActCom.del("A", txtitaVo);
 			}
+			// 變更帳號檔
 			if ("02".equals(titaVo.getParam("RepayCode"))) {
 				bankAuthActCom.add("A", titaVo);
 			}
@@ -852,7 +705,7 @@ public class L2154 extends TradeBuffer {
 				bankAuthActCom.addRepayActChangeLog(titaVo);
 			}
 		} else {
-			// 經辦登錄檢查
+			// 經辦登錄檢查:額度變更時Rim會檢查須先建授權帳號資料
 			if ("02".equals(titaVo.getParam("RepayCode"))) {
 				bankAuthActCom.add("A", titaVo);
 			}

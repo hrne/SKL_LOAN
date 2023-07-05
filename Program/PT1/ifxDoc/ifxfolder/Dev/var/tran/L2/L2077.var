@@ -332,7 +332,6 @@ C(3,#OOReceiveFg,1,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L2631;text=新
 
 !用於判定是否有歷程，Y/N
 #OOHasHistory=X,1,S
-
 #18sp=X,18,S
 
 #OOBUF1=X,61,S

@@ -48,6 +48,8 @@ import com.st1.itx.db.domain.NegFinShareLog;
 import com.st1.itx.db.domain.NegFinShareLogId;
 import com.st1.itx.db.domain.NegMain;
 import com.st1.itx.db.domain.NegMainId;
+import com.st1.itx.db.domain.NegTrans;
+import com.st1.itx.db.domain.NegTransId;
 /*DB服務*/
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.JcicAtomDetailService;
@@ -59,6 +61,7 @@ import com.st1.itx.db.service.NegFinShareLogService;
 import com.st1.itx.db.service.NegFinShareService;
 import com.st1.itx.db.service.NegMainService;
 import com.st1.itx.db.service.LoanBorMainService;
+import com.st1.itx.db.service.NegTransService;
 
 import com.st1.itx.util.common.FileCom;
 import com.st1.itx.util.common.NegCom;
@@ -84,6 +87,8 @@ public class L5706 extends TradeBuffer {
 	public NegFinShareLogService sNegFinShareLogService;
 	@Autowired
 	public NegMainService sNegMainService;
+	@Autowired
+	public NegTransService sNegTransService;
 	@Autowired
 	public CustMainService sCustMainService;
 	@Autowired
@@ -1215,6 +1220,11 @@ public class L5706 extends TradeBuffer {
 		dataLog.exec("修改債務協商案件主檔");// 資料異動後-3
 		isUPDATE = true;
 
+		// 註銷債權時新增一筆交易明細
+		if ( cancelAmt.compareTo(BigDecimal.ZERO) != 0) {
+			updateNegTrans(tNegMain, cancelAmt, titaVo);
+		}
+
 	}
 
 	public void UpdNegMain(NegMain tNegMain, int chgCondDate, TitaVo titaVo) throws LogicException {
@@ -1478,4 +1488,32 @@ public class L5706 extends TradeBuffer {
 			}
 		}
 	}
+	/* 產生債協交易明細 */
+	private void updateNegTrans(NegMain sNegMain, BigDecimal txAmt, TitaVo titaVo) throws LogicException {
+		int entryDate = titaVo.getEntDyI();// 入帳日期
+		int custNo = sNegMain.getCustNo();
+		NegTransId tNegTransId = new NegTransId();
+		NegTrans tNegTrans = new NegTrans();
+
+		tNegTransId.setAcDate(titaVo.getEntDyI()+19110000);
+		tNegTransId.setTitaTlrNo(titaVo.getTlrNo());
+		tNegTransId.setTitaTxtNo(parse.stringToInteger(titaVo.getTxtNo()));
+		tNegTransId.setCustNo(custNo); // 戶號
+		tNegTrans.setNegTransId(tNegTransId);
+		// 新增交易明細
+		tNegTrans.setCaseSeq(sNegMain.getCaseSeq()); // 案件序號
+		tNegTrans.setEntryDate(entryDate); // 入帳日期
+		tNegTrans.setTxStatus(2); // 交易狀態 2:已入帳
+		tNegTrans.setTxKind("8"); // 交易別 8:註銷
+		tNegTrans.setTxAmt(txAmt); // 交易金額:註銷金額
+		tNegTrans.setPrincipalBal(sNegMain.getPrincipalBal());//本金餘額
+		tNegTrans.setPrincipalAmt(txAmt);//本次的本金金額
+		try {
+			sNegTransService.insert(tNegTrans, titaVo); // insert
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0005", "註銷債權時新增交易明細失敗 " + tNegTransId + e.getErrorMsg());
+		}
+
+	}
+
 }

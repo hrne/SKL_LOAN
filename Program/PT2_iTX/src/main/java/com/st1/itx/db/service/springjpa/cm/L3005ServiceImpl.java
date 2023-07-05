@@ -90,8 +90,11 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 5.利率變更(有撥款序號) => 不顯示<訂正>按紐
 		// 6.轉換的撥款、內容變更(有撥款序號) => 不顯示<訂正>按紐
 		// 7.其他 => 不顯示<訂正>按紐
+		// 8.Displayflag 查詢時顯示否 => N時跳過
+
 		String sqlCondition = "";
 		sqlCondition += "  WHERE ln.\"CustNo\" = :CustNo                ";
+		sqlCondition += "          AND NVL(\"Displayflag\", 'N') <> 'N' ";
 		if (iAcDate == 0) {
 			sqlCondition += "      AND ln.\"EntryDate\" BETWEEN :EntryDateS AND :DateEnd 			";
 		} else {
@@ -122,7 +125,8 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   AND  \"FacmNo\" > 0                ";
 		sql += "   AND  \"BormNo\" > 0                ";
 		sql += "   AND  \"TitaHCode\" = '0'                ";
-		sql += "   AND  CASE WHEN \"TitaTxCd\" in ('L3721') THEN 5                 ";
+		sql += "   AND  CASE WHEN NVL(\"Displayflag\", 'N') in ('N') THEN 8        ";
+		sql += "             WHEN \"TitaTxCd\" in ('L3721') THEN 5                 ";
 		sql += "             WHEN \"CreateEmpNo\" in ('999999') AND \"TitaTxCd\" in ('L3100','L3701') THEN 6                ";
 		sql += "             ELSE 1                ";
 		sql += "        END = 1                ";
@@ -136,7 +140,8 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  WHERE l.\"CustNo\" = :CustNo                ";
 		sql += "   AND  l.\"FacmNo\" > 0                ";
 		sql += "   AND  l.\"BormNo\" > 0                ";
-		sql += "   AND  CASE WHEN \"TitaTxCd\" in ('L3721') THEN 5                 ";
+		sql += "   AND  CASE WHEN NVL(\"Displayflag\", 'N') in ('N') THEN 8        ";
+		sql += "             WHEN \"TitaTxCd\" in ('L3721') THEN 5                 ";
 		sql += "             WHEN \"CreateEmpNo\" in ('999999') AND \"TitaTxCd\" in ('L3100','L3701') THEN 6                ";
 		sql += "             ELSE 1                ";
 		sql += "        END = 1                ";
@@ -199,6 +204,7 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       FROM \"LoanBorTx\"              ";
 		sql += "       WHERE \"CustNo\" = :CustNo              ";
 		sql += "         AND  \"TitaHCode\" = '0'              ";
+		sql += "         AND  NVL(\"Displayflag\", 'N') <> 'N' ";
 		sql += "       GROUP BY \"CustNo\"              ";
 		sql += "               ,\"AcDate\"	                      ";
 		sql += "               ,\"TitaKinBr\"	      						              ";

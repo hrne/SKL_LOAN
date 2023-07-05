@@ -128,7 +128,7 @@ public class L2634ReportD extends MakeReport {
 				.setUseDefault(true).build();
 
 		this.open(titaVo, reportVo);
-		
+
 		String custId = "";
 
 		int custNo = 0;
@@ -140,7 +140,8 @@ public class L2634ReportD extends MakeReport {
 			if (custNo != t.getReceiveCustNo() || closeNo != t.getCloseNo()) {
 				custNo = t.getReceiveCustNo();
 				closeNo = t.getCloseNo();
-				FacClose tFacClose = sFacCloseService.findById(new FacCloseId(custNo, closeNo), titaVo);
+				FacClose tFacClose = sFacCloseService.findById(new FacCloseId(t.getChoiceDate() + 19110000, closeNo),
+						titaVo);
 				if (tFacClose == null) {
 					this.info("tFacClose = null continue 1");
 					continue;

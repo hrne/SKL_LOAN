@@ -50,8 +50,6 @@ import com.st1.itx.util.common.data.SmsVo;
 @Scope("prototype")
 public class SmsCom extends TradeBuffer {
 
-	// Web api check control flag 0.正常 1.aml系統異常改由人工確認 2.測試套不檢查,並預設非可疑名單
-	private int apiFlag = 0;
 	// web api url
 	private String apiUrl = "";
 
@@ -77,9 +75,8 @@ public class SmsCom extends TradeBuffer {
 		if (tSystemParas == null) {
 			throw new LogicException("E0001", "SmsCom,SystemParas");
 		}
-		apiFlag = tSystemParas.getAmlFg();
 		apiUrl = tSystemParas.getAmlUrl();
-		this.info("SmsCom.sendSms:apiFlag=" + apiFlag + ",apiUrl=" + apiUrl);
+		this.info("SmsCom.sendSms:apiUrl=" + apiUrl);
 
 		SmsVo smsVo = new SmsVo();
 		SmsDataVo smsDataVo = new SmsDataVo();
@@ -102,17 +99,9 @@ public class SmsCom extends TradeBuffer {
 		String msgrq = makeXml(smsVo);
 
 		String msgrs = "";
-		if (apiFlag == 0) {
-			this.info("SmsCom.sendSms apiFlag 0=" + apiFlag);
-			msgrs = connect(apiUrl, msgrq);
-		} else if (apiFlag == 1) {
-			this.info("SmsCom.sendSms apiFlag 1=" + apiFlag);
-			this.connectSuccess = false;
-			msgrs = "";
-		} else {
-			this.info("SmsCom.sendSms apiFlag 2=" + apiFlag);
-			this.connectSuccess = true;
-		}
+
+		msgrs = connect(apiUrl, msgrq);
+
 		// String
 		// test end
 

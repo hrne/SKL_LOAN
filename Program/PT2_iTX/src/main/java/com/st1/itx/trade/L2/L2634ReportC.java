@@ -144,7 +144,8 @@ public class L2634ReportC extends MakeReport {
 			if (custNo != t.getReceiveCustNo() || closeNo != t.getCloseNo()) {
 				custNo = t.getReceiveCustNo();
 				closeNo = t.getCloseNo();
-				FacClose tFacClose = sFacCloseService.findById(new FacCloseId(custNo, closeNo), titaVo);
+				FacClose tFacClose = sFacCloseService.findById(new FacCloseId(t.getChoiceDate() + 19110000, closeNo),
+						titaVo);
 				if (tFacClose == null) {
 					continue;
 				}

@@ -254,8 +254,9 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L5972; ntxbuf=#OOBufNegTrans})
 #OOBufB=X,17,S
 T(2,#OOExportDate+#CustId)
 #OOBtnB=A,2,O
-C(3,#OOTxKind,9,BIND(grid,cancel)
-							 ,BIND(grid,{ cmd=CHAIN; ntxcd=L5973; ntxbuf=#OOBufB}))
+!C(3,#OOTxKind,9,BIND(grid,cancel)
+!							 ,BIND(grid,{ cmd=CHAIN; ntxcd=L5973; ntxbuf=#OOBufB}))
+IF(#OOTxKind==8 || #OOTxKind==9,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L5973; ntxbuf=#OOBufB}))
 
 
 
@@ -267,8 +268,9 @@ T(2,#CustId+#OCustNo+#CaseSeq+#OOReturnAmt)
 #OOBtnC=A,2,O
 C(3,#OOExportDate,0,BIND(grid,{ cmd=CHAIN; ntxcd=L5711; ntxbuf=#OOBufC})
 									 ,BIND(grid,cancel))
-C(3,#OOTxKind,9,BIND(grid,cancel)
-							 ,$)
+!C(3,#OOTxKind,9,BIND(grid,cancel)
+!							 ,$)
+IF(#OOTxKind==8 || #OOTxKind==9,BIND(grid,cancel),$)
 
 ! ------OCCURS------
 

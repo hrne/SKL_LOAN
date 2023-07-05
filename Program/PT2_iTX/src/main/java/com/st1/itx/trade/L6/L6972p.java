@@ -1,6 +1,11 @@
 package com.st1.itx.trade.L6;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -12,6 +17,7 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.SystemParas;
 import com.st1.itx.db.service.SystemParasService;
 import com.st1.itx.db.service.TxArchiveTableService;
+import com.st1.itx.db.service.springjpa.cm.L6972ServiceImpl;
 import com.st1.itx.db.service.springjpa.cm.L9729ServiceImpl.WorkType;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -35,6 +41,9 @@ public class L6972p extends TradeBuffer {
 
 	@Autowired
 	TxArchiveTableService txArchiveTableService;
+
+	@Autowired
+	L6972ServiceImpl l6972ServiceImpl;
 
 	@Autowired
 	SystemParasService systemParasService;
@@ -75,9 +84,69 @@ public class L6972p extends TradeBuffer {
 				txArchiveTableService.Usp_L6_ArchiveFiveYearTx_Copy(titaVo.getEntDyI() + 19110000, titaVo.getTlrNo(),
 						titaVo);
 			} else {
-				this.info("L6972 execute UnarchiveFiveYearTx: " + custNo + "-" + facmNo + "-" + bormNo);
-				txArchiveTableService.Usp_L6_UnarchiveFiveYearTx_Copy(custNo, facmNo, bormNo,
-						titaVo.getEntDyI() + 19110000, titaVo.getTlrNo(), titaVo);
+				// 搬回來
+				// 2023-07-05 Wei from QC2473 BUG:使用者在L6972輸入的資料中,若額度號碼及撥款序號為0,表示要把整戶搬回來
+				if (facmNo == 0 && bormNo == 0) {
+					// 若額度號碼為零及撥款序號為零 找該戶的全部搬運資料
+					List<Map<String, String>> custAllMovedData = null;
+					try {
+						custAllMovedData = l6972ServiceImpl.findByCustNo(custNo, titaVo);
+					} catch (Exception e) {
+						StringWriter errors = new StringWriter();
+						e.printStackTrace(new PrintWriter(errors));
+						this.error("l6972ServiceImpl.findByCustNo error = " + errors.toString());
+					}
+					if (custAllMovedData == null || custAllMovedData.isEmpty()) {
+						// 查無資料
+						throw new LogicException("E0001", "查無須搬運的資料");
+					} else {
+						for (Map<String, String> d : custAllMovedData) {
+							int dFacmNo = parse.stringToInteger(d.get("FacmNo"));
+							int dBormNo = parse.stringToInteger(d.get("BormNo"));
+							this.info("L6972 execute UnarchiveFiveYearTx: " + custNo + "-" + dFacmNo + "-" + dBormNo);
+							txArchiveTableService.Usp_L6_UnarchiveFiveYearTx_Copy(custNo, dFacmNo, dBormNo,
+									titaVo.getEntDyI() + 19110000, titaVo.getTlrNo(), titaVo);
+						}
+					}
+				} else if (bormNo == 0) {
+					// 若撥款序號為零 找該戶該額度的全部搬運資料
+					List<Map<String, String>> facAllMovedData = null;
+					try {
+						facAllMovedData = l6972ServiceImpl.findByCustNoAndFacmNo(custNo, facmNo, titaVo);
+					} catch (Exception e) {
+						StringWriter errors = new StringWriter();
+						e.printStackTrace(new PrintWriter(errors));
+						this.error("l6972ServiceImpl.findByCustNoAndFacmNo error = " + errors.toString());
+					}
+					if (facAllMovedData == null || facAllMovedData.isEmpty()) {
+						// 查無資料
+						throw new LogicException("E0001", "查無須搬運的資料");
+					} else {
+						for (Map<String, String> d : facAllMovedData) {
+							int dBormNo = parse.stringToInteger(d.get("BormNo"));
+							this.info("L6972 execute UnarchiveFiveYearTx: " + custNo + "-" + facmNo + "-" + dBormNo);
+							txArchiveTableService.Usp_L6_UnarchiveFiveYearTx_Copy(custNo, facmNo, dBormNo,
+									titaVo.getEntDyI() + 19110000, titaVo.getTlrNo(), titaVo);
+						}
+					}
+				} else {
+					List<Map<String, String>> borAllMovedData = null;
+					try {
+						borAllMovedData = l6972ServiceImpl.findByCustNoAndFacmNoAndBormNo(custNo, facmNo, bormNo,
+								titaVo);
+					} catch (Exception e) {
+						StringWriter errors = new StringWriter();
+						e.printStackTrace(new PrintWriter(errors));
+						this.error("l6972ServiceImpl.findByCustNoAndFacmNoAndBormNo error = " + errors.toString());
+					}
+					if (borAllMovedData == null || borAllMovedData.isEmpty()) {
+						// 查無資料
+						throw new LogicException("E0001", "查無須搬運的資料");
+					}
+					this.info("L6972 execute UnarchiveFiveYearTx: " + custNo + "-" + facmNo + "-" + bormNo);
+					txArchiveTableService.Usp_L6_UnarchiveFiveYearTx_Copy(custNo, facmNo, bormNo,
+							titaVo.getEntDyI() + 19110000, titaVo.getTlrNo(), titaVo);
+				}
 			}
 			break;
 		default:

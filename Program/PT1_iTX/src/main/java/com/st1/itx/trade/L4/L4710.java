@@ -126,9 +126,29 @@ public class L4710 extends TradeBuffer {
 
 //			temp path = D:\\tmp\\LNM56OP.txt
 
+		SystemParas systemParas = systemParasService.findById("LN", titaVo);
+
+		if (systemParas != null) {
+			smsFtpFlag = systemParas.getSmsFtpFlag();
+		}
+
 		if (lTxToDoDetail == null || lTxToDoDetail.isEmpty()) {
 			this.info("簡訊媒體檔,本日無資料");
 			return;
+		} else if (smsFtpFlag.equals("T")) {
+			// 2023-07-05 Wei from SKL 琦欣 說資訊長要他測API能撐最多幾筆
+			String mobile = "0900000000";
+			String msg = "測試訊息";
+			this.info("L4710 sendSms test mobile = " + mobile);
+			this.info("L4710 sendSms test msg = " + msg);
+			for (int i = 1; i <= 10; i++) {
+				this.info("L4710 sendSms 測試第" + i + "次,連續發" + (i * 10) + "筆");
+				for (int j = 1; j <= i * 10; j++) {
+					this.info("L4710 sendSms 測試第" + i + "次,第" + j + "筆");
+					smsCom.sendSms(titaVo, mobile, msg);
+				}
+				this.info("L4710 sendSms 測試第" + i + "次,測試完成");
+			}
 		}
 
 		int reportDate = titaVo.getEntDyI() + 19110000;
@@ -140,9 +160,7 @@ public class L4710 extends TradeBuffer {
 				.setRptItem(fileItem).build();
 
 		// 開啟報表
-		// 2023-07-05 Wei from SKL 琦欣
-		// 簡訊媒體檔要傳到EFB(SFTP)上,原本預設是BIG-5
-		makeFile.open(titaVo, reportVo, fileName, 2);
+		makeFile.open(titaVo, reportVo, fileName);
 
 //		makeFile.open(titaVo, txBuffer.getTxCom().getTbsdy(), "0000", titaVo.getTxCode(), titaVo.getTxCode() + "-簡訊媒體檔",
 //				"LNM56OP.txt", 2);
@@ -158,8 +176,9 @@ public class L4710 extends TradeBuffer {
 		this.info("sno : " + sno);
 		boolean result = sendToFTP(sno, titaVo);
 
-		if (!result)
+		if (!result) {
 			return;
+		}
 
 		for (TxToDoDetail tTxToDoDetail : lTxToDoDetail) {
 			// 2023-07-04 Wei 改回用FTP from SKL 琦欣
@@ -172,11 +191,9 @@ public class L4710 extends TradeBuffer {
 				if (data.length >= 4) {
 					String mobile = data[2];
 					String msg = data[3];
-					this.info("L4710 sendSms test mobile = " + mobile);
-					this.info("L4710 sendSms test msg = " + msg);
-					if (titaVo.getTlrNo().equals("001702")) {
-						smsCom.sendSms(titaVo, mobile, msg);
-					}
+					this.info("L4710 sendSms api mobile = " + mobile);
+					this.info("L4710 sendSms api msg = " + msg);
+					smsCom.sendSms(titaVo, mobile, msg);
 				}
 			}
 

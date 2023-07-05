@@ -161,78 +161,80 @@ public class L8081 extends TradeBuffer {
 				CustMain sCustMain2 = new CustMain();
 				sCustMain2 = sCustMainService.custIdFirst(txAmlCredit2.getCustKey(), titaVo);
 
-				String iCurrZip3 = sCustMain2.getCurrZip3();
-				if (iCurrZip3.isEmpty()) {
-					iCurrZip3 = " ";
+				if (sCustMain2 != null) {
+
+					String iCurrZip3 = sCustMain2.getCurrZip3();
+					if (iCurrZip3.isEmpty()) {
+						iCurrZip3 = " ";
+					}
+
+					String iCurrZip2 = sCustMain2.getCurrZip2();
+					if (iCurrZip2.isEmpty()) {
+						iCurrZip2 = " ";
+					}
+
+					String iCurrCityCode = sCustMain2.getCurrCityCode();
+					if (iCurrCityCode.isEmpty()) {
+						iCurrCityCode = " ";
+					}
+
+					String iCurrAreaCode = sCustMain2.getCurrAreaCode();
+					if (iCurrAreaCode.isEmpty()) {
+						iCurrAreaCode = " ";
+					}
+
+					String iCurrRoad = sCustMain2.getCurrRoad();
+					if (iCurrRoad.isEmpty()) {
+						iCurrRoad = " ";
+					}
+
+					String iCurrSection = sCustMain2.getCurrSection();
+					if (iCurrSection.isEmpty()) {
+						iCurrSection = " ";
+					}
+
+					String iCurrAlley = sCustMain2.getCurrAlley();
+					if (iCurrAlley.isEmpty()) {
+						iCurrAlley = " ";
+					}
+
+					String iCurrLane = sCustMain2.getCurrLane();
+					if (iCurrLane.isEmpty()) {
+						iCurrLane = " ";
+					}
+
+					String iCurrNum = sCustMain2.getCurrNum();
+					if (iCurrNum.isEmpty()) {
+						iCurrNum = " ";
+					}
+
+					String iCurrNumDash = sCustMain2.getCurrNumDash();
+					if (iCurrNumDash.isEmpty()) {
+						iCurrNumDash = " ";
+					}
+
+					String iCurrFloor = sCustMain2.getCurrFloor();
+					if (iCurrFloor.isEmpty()) {
+						iCurrFloor = " ";
+					}
+
+					String iCurrFloorDash = sCustMain2.getCurrFloorDash();
+					if (iCurrFloorDash.isEmpty()) {
+						iCurrFloorDash = " ";
+					}
+
+					String iCustName = sCustMain2.getCustName();
+					if (iCustName.isEmpty()) {
+						iCustName = " ";
+					}
+
+					makeExcel.setValue(row, 1, iCurrZip3 + "-" + iCurrZip2);
+					makeExcel.setValue(row, 2, iCurrCityCode + iCurrAreaCode + iCurrRoad + iCurrSection + iCurrAlley
+							+ iCurrLane + iCurrNum + iCurrNumDash + iCurrFloor + iCurrFloorDash);
+					makeExcel.setValue(row, 3, iCustName);
+
 				}
-
-				String iCurrZip2 = sCustMain2.getCurrZip2();
-				if (iCurrZip2.isEmpty()) {
-					iCurrZip2 = " ";
-				}
-
-				String iCurrCityCode = sCustMain2.getCurrCityCode();
-				if (iCurrCityCode.isEmpty()) {
-					iCurrCityCode = " ";
-				}
-
-				String iCurrAreaCode = sCustMain2.getCurrAreaCode();
-				if (iCurrAreaCode.isEmpty()) {
-					iCurrAreaCode = " ";
-				}
-
-				String iCurrRoad = sCustMain2.getCurrRoad();
-				if (iCurrRoad.isEmpty()) {
-					iCurrRoad = " ";
-				}
-
-				String iCurrSection = sCustMain2.getCurrSection();
-				if (iCurrSection.isEmpty()) {
-					iCurrSection = " ";
-				}
-
-				String iCurrAlley = sCustMain2.getCurrAlley();
-				if (iCurrAlley.isEmpty()) {
-					iCurrAlley = " ";
-				}
-
-				String iCurrLane = sCustMain2.getCurrLane();
-				if (iCurrLane.isEmpty()) {
-					iCurrLane = " ";
-				}
-
-				String iCurrNum = sCustMain2.getCurrNum();
-				if (iCurrNum.isEmpty()) {
-					iCurrNum = " ";
-				}
-
-				String iCurrNumDash = sCustMain2.getCurrNumDash();
-				if (iCurrNumDash.isEmpty()) {
-					iCurrNumDash = " ";
-				}
-
-				String iCurrFloor = sCustMain2.getCurrFloor();
-				if (iCurrFloor.isEmpty()) {
-					iCurrFloor = " ";
-				}
-
-				String iCurrFloorDash = sCustMain2.getCurrFloorDash();
-				if (iCurrFloorDash.isEmpty()) {
-					iCurrFloorDash = " ";
-				}
-
-				String iCustName = sCustMain2.getCustName();
-				if (iCustName.isEmpty()) {
-					iCustName = " ";
-				}
-
-				makeExcel.setValue(row, 1, iCurrZip3 + "-" + iCurrZip2);
-				makeExcel.setValue(row, 2, iCurrCityCode + iCurrAreaCode + iCurrRoad + iCurrSection + iCurrAlley
-						+ iCurrLane + iCurrNum + iCurrNumDash + iCurrFloor + iCurrFloorDash);
-				makeExcel.setValue(row, 3, iCustName);
-
 			}
-
 		}
 
 		makeExcel.close();

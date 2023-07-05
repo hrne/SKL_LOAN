@@ -211,10 +211,10 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 //			sqlLeftJoin += "LEFT JOIN \"NegTrans\" NegTran ON NegTran.\"CustNo\"=c.\"CustNo\" AND NegAp02.\"AcDate\"=NegTran.\"AcDate\" ";
 			sqlWhere += "WHERE 1=1 ";
 
-			if (State == 18) {// 暫收解入:已做L4002整批入帳入一筆總金額到專戶
-				sqlWhere += "AND NegAp02.\"AcDate\" > 0 ";
-				sqlWhere += "AND NegAp02.\"StatusCode\" IN ('4001') ";
-				sqlWhere += "AND NegAp02.\"TxStatus\" = 0 ";
+			if (State == 18) {// 暫收解入:已做L4002整批入帳入一筆總金額到專戶,18已取消
+//				sqlWhere += "AND NegAp02.\"AcDate\" > 0 ";
+//				sqlWhere += "AND NegAp02.\"StatusCode\" IN ('4001') ";
+//				sqlWhere += "AND NegAp02.\"TxStatus\" = 0 ";
 			} else {
 				sqlWhere += "AND NegAp02.\"BringUpDate\" = (SELECT MAX(\"BringUpDate\") FROM \"NegAppr02\" WHERE \"BringUpDate\" > 0  )";
 			}
@@ -440,6 +440,9 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 					// 撥付提兌
 				}
 			}
+			//
+			sqlWhere += "AND NegTran.\"TxKind\" NOT IN ('8') ";// 2023/7/5新增:不顯示在撈取資料中 =>TxKind 交易別 8:註銷
+
 			sqlOrder += "ORDER BY c.\"CustId\" , NegTran.\"EntryDate\" ";
 		}
 

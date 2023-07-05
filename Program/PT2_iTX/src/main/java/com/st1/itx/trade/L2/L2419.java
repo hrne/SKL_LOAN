@@ -1053,7 +1053,13 @@ public class L2419 extends TradeBuffer {
 		} else {
 			// update
 			String oldGroupNo = tCdClBatch.getGroupNo();
-			groupNo = (Integer.parseInt(oldGroupNo) % 1000) + 1;
+			this.info("tCdClBatch.getGroupNo() = " + oldGroupNo);
+			if (oldGroupNo.length() > 3) {
+				// 取後三碼
+				oldGroupNo = oldGroupNo.substring(oldGroupNo.length() - 3);
+			}
+			this.info("oldGroupNo = " + oldGroupNo);
+			groupNo = Integer.parseInt(oldGroupNo) + 1;
 			newGroupNo = leftPadZero(applNo, 7) + leftPadZero(groupNo, 3);
 			tCdClBatch.setGroupNo(newGroupNo);
 			try {

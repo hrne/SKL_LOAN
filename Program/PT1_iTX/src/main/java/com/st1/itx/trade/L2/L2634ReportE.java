@@ -81,7 +81,8 @@ public class L2634ReportE extends MakeReport {
 			if (custNo != t.getReceiveCustNo() || closeNo != t.getCloseNo()) {
 				custNo = t.getReceiveCustNo();
 				closeNo = t.getCloseNo();
-				FacClose tFacClose = facCloseService.findById(new FacCloseId(custNo, closeNo), titaVo);
+				FacClose tFacClose = facCloseService.findById(new FacCloseId(t.getChoiceDate() + 19110000, closeNo),
+						titaVo);
 				if (tFacClose == null) {
 					continue;
 				}
@@ -126,10 +127,10 @@ public class L2634ReportE extends MakeReport {
 				this.info("E isLast = " + isLast);
 				if (isLast) {
 					break;
-				}else {
+				} else {
 					this.info("E newPage");
 					this.newPage(isLast);
-					
+
 				}
 			}
 
@@ -155,8 +156,7 @@ public class L2634ReportE extends MakeReport {
 		return selecTotal;
 	}
 
-	private boolean isFacmNo(int custNo, ClOtherRights tClOtherRights, TitaVo titaVo)
-			throws LogicException {
+	private boolean isFacmNo(int custNo, ClOtherRights tClOtherRights, TitaVo titaVo) throws LogicException {
 		boolean isFacmNo = true;
 //		clFacService.clNoEq(tClOtherRights.getClCode1(), tClOtherRights.getClCode2(), tClOtherRights.getClNo(), 0, Integer.MAX_VALUE, titaVo);
 		return isFacmNo;
