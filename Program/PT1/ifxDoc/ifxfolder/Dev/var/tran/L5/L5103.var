@@ -194,6 +194,7 @@ T(1,@ApplObj,#NTXBUF,250,1)
 T(1,@FacmNoMemo,#NTXBUF,251,20)
 T(1,@ApplEmpNoX,#NTXBUF,271,20)
 T(1,@KeeperEnable,#NTXBUF,291,1)
+T(1,@FunctionCode,#NTXBUF,292,2)
 INVOKEJS(SHOW,p1,02,02,1)
 
 
@@ -208,7 +209,8 @@ E(0,#FacmNo)
 T(2,#ApplSeq)
 
 #RimL5R48=X,1,S
-IF(#ApplObj==4&&#ApplCode==2,$,s)
+IF(#ApplObj==4,$,s)
+IF(#ApplCode==2 || #FunctionCode == 05,$,s )
 RESET_RIM(#RimL5R48,L5R48)
 S(L5R48,01,#Rim5R48CustNo,#Rim5R48FacmNo,#Rim5R48ApplSeq)
 R(1,L5R48)
@@ -236,6 +238,10 @@ C(3,#OPTA1,0,INVOKEJS(SHOW,L5103_10,0),$)
 C(3,#OPTB1,0,INVOKEJS(SHOW,L5103_11,0),$)
 C(3,#OPTC1,0,INVOKEJS(SHOW,L5103_12,0),$)
 
+#FunctionCode=X,2,S
+#FUNCIND=_,_,S
+IF(#FunctionCode==05,E(0,5),E(0,2))
+
 ! 藏欄位
 ! ApplCode 若=0預設1
 #PRE_GRDDIS=A,1,S
@@ -244,7 +250,7 @@ C(3,#ApplCode,0,E(0,@ApplCode,1),$)
 ! 登放記號
 #ACTFGX=X,8,L
 T(H,#ACTFG,#ActFgHelp)
-C(2,#ACTFG,$,K(MODIFYBUTTON,登錄),K(MODIFYBUTTON,放行),K(MODIFYBUTTON,審核))
+IF(#FunctionCode==05,K(NOBUTTON,CLOSEY),C(2,#ACTFG,$,K(MODIFYBUTTON,登錄),K(MODIFYBUTTON,放行),K(MODIFYBUTTON,審核)))
 
 !刪除隱藏重新交易按鈕
 #AGAIN=X,1,S
@@ -339,8 +345,34 @@ T(F,@AMTC{i},0)
 IF(#Rim5R48CustNo != 0,T(F,@CustNo,0)T(F,@FacmNo,0),T(F,@CustNo,1)T(F,@FacmNo,1))
 IF(#Rim5R48CustNo != 0,HIDE(#BTND),$)
 
+#CHKDATA2=X,1,S
+IF(#FunctionCode==05,
+T(F,@CustNo,0)
+T(F,@FacmNo,0)
+T(F,@ApplSeq,0)
+T(F,@ApplEmpNo,0)
+T(F,@UsageCode,0)
+T(F,@CopyCode,0)
+T(F,@KeeperEmpNo,0)
+T(F,@Remark,0)
+T(F,@ApplObj,0)
+T(F,@ApplDate,0)
+T(F,@FacmNoMemo,0)
+T(F,@ReturnDate,0)
+##loop {times:25,i:1}
+T(F,@OPTA{i},0)
+T(F,@AMTA{i},0)
+T(F,@OPTB{i},0)
+T(F,@AMTB{i},0)
+T(F,@OPTC{i},0)
+T(F,@AMTC{i},0)
+##end
+,$)
+
+
 ! 借款人戶號
 #CustNo=A,7,I
+IF(#FunctionCode==05,s,$)
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,1,$,s)
 IF(#Rim5R48CustNo != 0,s,$)
@@ -365,6 +397,7 @@ IF(#FKEY == 7,$,E(0,@ApplSeq,#L5R33ApplSeq))
 
 ! 額度編號
 #FacmNo=A,3,I
+IF(#FunctionCode==05,s,$)
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,1,$,s)
 IF(#Rim5R48CustNo != 0,s,$)
@@ -383,6 +416,7 @@ C(3,#ApplCode,0,$,s)
 IF(#FacmNo == 0,T(3,*),T(3,))
 
 #FacmNoMemo=X,20,I
+IF(#FunctionCode==05,s,$)
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,1,$,s)
 @C(3,#FacmNo,0,$,s)
@@ -407,6 +441,7 @@ T(2,#CustNo+-+#FacmNo+-+#ApplSeq+ 檔案借閱+#LC014Text)
 T(2,L5103+#CustNo+#FacmNo+000+#LC014Mrkey+#LC014Note)
 
 #Button=x,100,S
+IF(#FunctionCode==05,S,$)
 C(2,#FKEY,$,S,S,S,S,S,S,S,S,S,S)
 T(2,{cmd=CHAIN; ntxcd=LC104; ntxbuf=#BufLC014})ASGN(BTN_NEW1$)
 K(MODIFYBUTTON,1,LC104 上傳附件)
@@ -462,6 +497,7 @@ C(4,#L5103ConfirmBrNo,s,C(4,#L5103ConfirmGroupNo,s,$))
 
 ! 用途
 #UsageCode=x,2,I
+IF(#FunctionCode==05,s,$)
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,1,$,s)
 HELP(#UsageCodeXHelp)
@@ -475,6 +511,7 @@ T(H,#UsageCode,#UsageCodeXHelp)
 
 ! 正本/影本
 #CopyCode=A,1,I
+IF(#FunctionCode==05,s,$)
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,1,$,s)
 HELP(#CopyCodeHelp)
@@ -501,6 +538,7 @@ C(3,#ApplCode,2,C(3,#ReturnDate,0,E(0,@ReturnDate,#TODAY),$),C(3,#ApplDate,0,E(0
 
 ! 借閱日期
 #ApplDate=D,7,I
+IF(#FunctionCode==05,s,$)
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,2,s,$)
 @V(7)
@@ -529,6 +567,7 @@ IF(#FKEY == 7,T(2,N),$)
 
 ! 管理人
 #KeeperEmpNo=X,6,I
+IF(#FunctionCode==05,s,$)
 IF(#InitApplCode == 1,s,$)
 !C(3,#ApplCode,1,$,s)
 !C(3,#ApplCode,2,s,$)
@@ -563,6 +602,7 @@ T(2,歸還日期不可小於借閱日期+#TmpApplDate)
 
 ! 歸還日期
 #ReturnDate=D,7,I
+IF(#FunctionCode==05,s,$)
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,2,$,s)
 @V(7)
@@ -588,6 +628,7 @@ IF(#TmpReturnDate>#TODAY,V(P,歸還日期不可大於本日),$)
 
 ! 歸還人
 #ReturnEmpNo=X,6,L
+IF(#FunctionCode==05,s,$)
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,2,$,s)
 T(4,TLRNO$)
@@ -619,12 +660,14 @@ C(4,#ReturnEmpNo,s,$)
 
 ! 備註
 #Remark=X,100,I
+IF(#FunctionCode==05,s,$)
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,1,$,s)
 
 
 ! 借閱項目
 #ApplObj=A,1,I
+IF(#FunctionCode==05,s,$)
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,1,$,s)
 HELP(#ApplObjHelp)
@@ -671,6 +714,8 @@ INVOKEJS(SHOW,L5103,10,12,0)
 C(3,#ApplObj,4,$,S)
 IF(#ApplCode==1&&#ACTFG==1,$,s)
 INVOKEJS(SHOW,L5103_10,1)
+IF(#FunctionCode==05,C(3,#OPTA{i},0,INVOKEJS(SHOW,grd1,{i},{i},0),INVOKEJS(SHOW,grd1,{i},{i},1)),INVOKEJS(SHOW,grd1,{i},{i},1))
+IF(#FunctionCode==05,s,$)
 INVOKEJS(SHOW,grd1,{i},{i},1)
 C(3,{j},0,$,C(3,#OPTA{j},0,S,$))
 HELP(#ApplicationCodeHelp)
@@ -708,6 +753,7 @@ C(3,#OPTA{i},0,S,T(H,#OPTA{i},#ApplicationCodeHelp))
 
 
 #AMTA{i}=A,2,I
+IF(#FunctionCode==05,s,$)
 C(3,#ApplObj,4,$,S)
 IF(#ApplCode==1&&#ACTFG==1,$,s)
 C(3,#OPTA{i},0,S,$)
@@ -729,6 +775,8 @@ C(3,#OPTA{i},0,INVOKEJS(SHOW,grd1,{i},{i},0),INVOKEJS(SHOW,grd1,{k},{k},1))
 C(3,#ApplObj,4,$,S)
 IF(#ApplCode==1&&#ACTFG==1,$,s)
 INVOKEJS(SHOW,L5103_11,1)
+IF(#FunctionCode==05,C(3,#OPTB{i},0,INVOKEJS(SHOW,grd2,{i},{i},0),INVOKEJS(SHOW,grd2,{i},{i},1)),INVOKEJS(SHOW,grd2,{i},{i},1))
+IF(#FunctionCode==05,s,$)
 INVOKEJS(SHOW,grd2,{i},{i},1)
 C(3,{j},0,$,C(3,#OPTB{j},0,S,$))
 HELP(#SettingCodeHelp)
@@ -766,6 +814,7 @@ IF(#ApplCode==1&&#ACTFG==1,$,s)
 C(3,#OPTB{i},0,S,T(H,#OPTB{i},#SettingCodeHelp))
 
 #AMTB{i}=A,2,I
+IF(#FunctionCode==05,s,$)
 C(3,#ApplObj,4,$,S)
 IF(#ApplCode==1&&#ACTFG==1,$,s)
 C(3,#OPTB{i},0,S,$)
@@ -788,6 +837,8 @@ C(3,#OPTB{i},0,INVOKEJS(SHOW,grd2,{i},{i},0),INVOKEJS(SHOW,grd2,{k},{k},1))
 C(3,#ApplObj,4,$,S)
 IF(#ApplCode==1&&#ACTFG==1,$,s)
 INVOKEJS(SHOW,L5103_12,1)
+IF(#FunctionCode==05,C(3,#OPTC{i},0,INVOKEJS(SHOW,grd3,{i},{i},0),INVOKEJS(SHOW,grd3,{i},{i},1)),INVOKEJS(SHOW,grd3,{i},{i},1))
+IF(#FunctionCode==05,s,$)
 INVOKEJS(SHOW,grd3,{i},{i},1)
 C(3,{j},0,$,C(3,#OPTC{j},0,S,$))
 HELP(#GuaranteedCodeHelp)
@@ -824,6 +875,7 @@ IF(#ApplCode==1&&#ACTFG==1,$,s)
 C(3,#OPTC{i},0,S,T(H,#OPTC{i},#GuaranteedCodeHelp))
 
 #AMTC{i}=A,2,I
+IF(#FunctionCode==05,s,$)
 C(3,#ApplObj,4,$,S)
 IF(#ApplCode==1&&#ACTFG==1,$,s)
 C(3,#OPTC{i},0,S,$)
@@ -840,6 +892,7 @@ C(3,#OPTC{i},0,INVOKEJS(SHOW,grd3,{i},{i},0),INVOKEJS(SHOW,grd3,{k},{k},1))
 
 !歸還時不做這個檢查
 #Check=X,1,S
+IF(#FunctionCode==05,s,$)
 C(3,#ApplObj,4,$,s)
 IF(#ApplCode==2,s,$)
 IF(#OPTA1==0 && #OPTB1==0 && #OPTC1==0,$,s)

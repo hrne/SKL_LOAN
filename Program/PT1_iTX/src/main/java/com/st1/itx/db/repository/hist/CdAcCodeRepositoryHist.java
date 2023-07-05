@@ -3,11 +3,14 @@ package com.st1.itx.db.repository.hist;
 
 import java.util.Optional;
 
+import java.math.BigDecimal;
+import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +33,12 @@ public interface CdAcCodeRepositoryHist extends JpaRepository<CdAcCode, CdAcCode
 
   // AcNoCodeOld >= ,AND AcNoCodeOld <= ,AND AcSubCode >= ,AND AcSubCode <= ,AND AcDtlCode >= ,AND AcDtlCode <= 
   public Slice<CdAcCode> findAllByAcNoCodeOldGreaterThanEqualAndAcNoCodeOldLessThanEqualAndAcSubCodeGreaterThanEqualAndAcSubCodeLessThanEqualAndAcDtlCodeGreaterThanEqualAndAcDtlCodeLessThanEqualOrderByAcNoCodeOldAscAcSubCodeAscAcDtlCodeAsc(String acNoCodeOld_0, String acNoCodeOld_1, String acSubCode_2, String acSubCode_3, String acDtlCode_4, String acDtlCode_5, Pageable pageable);
+
+  // AcNoCode >= ,AND AcNoCode <= ,AND AcSubCode >= ,AND AcSubCode <= ,AND AcDtlCode >= ,AND AcDtlCode <= ,AND AcNoItem %
+  public Slice<CdAcCode> findAllByAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndAcSubCodeGreaterThanEqualAndAcSubCodeLessThanEqualAndAcDtlCodeGreaterThanEqualAndAcDtlCodeLessThanEqualAndAcNoItemLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAsc(String acNoCode_0, String acNoCode_1, String acSubCode_2, String acSubCode_3, String acDtlCode_4, String acDtlCode_5, String acNoItem_6, Pageable pageable);
+
+  // AcNoItem %
+  public Slice<CdAcCode> findAllByAcNoItemLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAsc(String acNoItem_0, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

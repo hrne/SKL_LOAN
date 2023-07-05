@@ -396,32 +396,32 @@ public class LM049Report extends MakeReport {
 	 * 
 	 * @param sameCollateralRange 一批資料中需要合併的起訖行數
 	 */
-	private void mergeColumns(Map<String, int[]> sameCollateralRange) {
-
-		sameCollateralRange.forEach((k, v) -> {
-//			this.info("mergeColumns k " + k);
-//			this.info("mergeColumns v[0] " + v[0]);
-//			this.info("mergeColumns v[1] " + v[1]);
-
-			if (v[0] < v[1]) {
-				// 戶名
-				makeExcel.setMergedRegion(v[0], v[1], 2, 2);
-				// 金控公司負責人及大股東
-				makeExcel.setMergedRegion(v[0], v[1], 3, 3);
-				// 擔保品估價
-				makeExcel.setMergedRegion(v[0], v[1], 7, 7);
-				// 貸放成數
-				makeExcel.setMergedRegion(v[0], v[1], 8, 8);
-				// 授信餘額
-				makeExcel.setMergedRegion(v[0], v[1], 13, 13);
-				// 佔淨值比
-				makeExcel.setMergedRegion(v[0], v[1], 14, 14);
-				// 備註說明
-				makeExcel.setMergedRegion(v[0], v[1], 16, 16);
-			}
-		});
-
-	}
+//	private void mergeColumns(Map<String, int[]> sameCollateralRange) {
+//
+//		sameCollateralRange.forEach((k, v) -> {
+////			this.info("mergeColumns k " + k);
+////			this.info("mergeColumns v[0] " + v[0]);
+////			this.info("mergeColumns v[1] " + v[1]);
+//
+//			if (v[0] < v[1]) {
+//				// 戶名
+//				makeExcel.setMergedRegion(v[0], v[1], 2, 2);
+//				// 金控公司負責人及大股東
+//				makeExcel.setMergedRegion(v[0], v[1], 3, 3);
+//				// 擔保品估價
+//				makeExcel.setMergedRegion(v[0], v[1], 7, 7);
+//				// 貸放成數
+//				makeExcel.setMergedRegion(v[0], v[1], 8, 8);
+//				// 授信餘額
+//				makeExcel.setMergedRegion(v[0], v[1], 13, 13);
+//				// 佔淨值比
+//				makeExcel.setMergedRegion(v[0], v[1], 14, 14);
+//				// 備註說明
+//				makeExcel.setMergedRegion(v[0], v[1], 16, 16);
+//			}
+//		});
+//
+//	}
 
 	/**
 	 * 千元單位運算

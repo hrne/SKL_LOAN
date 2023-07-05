@@ -140,7 +140,9 @@ public class L4710 extends TradeBuffer {
 				.setRptItem(fileItem).build();
 
 		// 開啟報表
-		makeFile.open(titaVo, reportVo, fileName);
+		// 2023-07-05 Wei from SKL 琦欣
+		// 簡訊媒體檔要傳到EFB(SFTP)上,原本預設是BIG-5
+		makeFile.open(titaVo, reportVo, fileName, 2);
 
 //		makeFile.open(titaVo, txBuffer.getTxCom().getTbsdy(), "0000", titaVo.getTxCode(), titaVo.getTxCode() + "-簡訊媒體檔",
 //				"LNM56OP.txt", 2);

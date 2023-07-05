@@ -89,12 +89,12 @@ public class LM050Report extends MakeReport {
 			String value = equityList.get(0).get("F0");
 
 			BigDecimal amt = getBigDecimal(value);
-			String acDate = equityList.get(0).get("AcDate");
+			String acDate = String.valueOf(Integer.valueOf(equityList.get(0).get("AcDate")) - 19110000);
 
 			equity = amt;
 
 			makeExcel.setValue(2, 4,
-					acDate.substring(1, 4) + "." + acDate.substring(4, 6) + "." + acDate.substring(6, 8) + " 淨值（核閱數）");
+					acDate.substring(0, 3) + "." + acDate.substring(3, 5) + "." + acDate.substring(5, 7) + " 淨值（核閱數）");
 
 			makeExcel.setValue(2, 6, formatThousand(amt), "#,##0");
 		}

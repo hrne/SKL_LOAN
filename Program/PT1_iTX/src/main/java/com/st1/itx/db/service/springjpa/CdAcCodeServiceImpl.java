@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -178,6 +181,62 @@ em = null;
       slice = cdAcCodeReposHist.findAllByAcNoCodeOldGreaterThanEqualAndAcNoCodeOldLessThanEqualAndAcSubCodeGreaterThanEqualAndAcSubCodeLessThanEqualAndAcDtlCodeGreaterThanEqualAndAcDtlCodeLessThanEqualOrderByAcNoCodeOldAscAcSubCodeAscAcDtlCodeAsc(acNoCodeOld_0, acNoCodeOld_1, acSubCode_2, acSubCode_3, acDtlCode_4, acDtlCode_5, pageable);
     else 
       slice = cdAcCodeRepos.findAllByAcNoCodeOldGreaterThanEqualAndAcNoCodeOldLessThanEqualAndAcSubCodeGreaterThanEqualAndAcSubCodeLessThanEqualAndAcDtlCodeGreaterThanEqualAndAcDtlCodeLessThanEqualOrderByAcNoCodeOldAscAcSubCodeAscAcDtlCodeAsc(acNoCodeOld_0, acNoCodeOld_1, acSubCode_2, acSubCode_3, acDtlCode_4, acDtlCode_5, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<CdAcCode> findAcItem(String acNoCode_0, String acNoCode_1, String acSubCode_2, String acSubCode_3, String acDtlCode_4, String acDtlCode_5, String acNoItem_6, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<CdAcCode> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findAcItem " + dbName + " : " + "acNoCode_0 : " + acNoCode_0 + " acNoCode_1 : " +  acNoCode_1 + " acSubCode_2 : " +  acSubCode_2 + " acSubCode_3 : " +  acSubCode_3 + " acDtlCode_4 : " +  acDtlCode_4 + " acDtlCode_5 : " +  acDtlCode_5 + " acNoItem_6 : " +  acNoItem_6);
+    if (dbName.equals(ContentName.onDay))
+      slice = cdAcCodeReposDay.findAllByAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndAcSubCodeGreaterThanEqualAndAcSubCodeLessThanEqualAndAcDtlCodeGreaterThanEqualAndAcDtlCodeLessThanEqualAndAcNoItemLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAsc(acNoCode_0, acNoCode_1, acSubCode_2, acSubCode_3, acDtlCode_4, acDtlCode_5, acNoItem_6, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = cdAcCodeReposMon.findAllByAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndAcSubCodeGreaterThanEqualAndAcSubCodeLessThanEqualAndAcDtlCodeGreaterThanEqualAndAcDtlCodeLessThanEqualAndAcNoItemLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAsc(acNoCode_0, acNoCode_1, acSubCode_2, acSubCode_3, acDtlCode_4, acDtlCode_5, acNoItem_6, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = cdAcCodeReposHist.findAllByAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndAcSubCodeGreaterThanEqualAndAcSubCodeLessThanEqualAndAcDtlCodeGreaterThanEqualAndAcDtlCodeLessThanEqualAndAcNoItemLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAsc(acNoCode_0, acNoCode_1, acSubCode_2, acSubCode_3, acDtlCode_4, acDtlCode_5, acNoItem_6, pageable);
+    else 
+      slice = cdAcCodeRepos.findAllByAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndAcSubCodeGreaterThanEqualAndAcSubCodeLessThanEqualAndAcDtlCodeGreaterThanEqualAndAcDtlCodeLessThanEqualAndAcNoItemLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAsc(acNoCode_0, acNoCode_1, acSubCode_2, acSubCode_3, acDtlCode_4, acDtlCode_5, acNoItem_6, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<CdAcCode> likeAcItem(String acNoItem_0, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<CdAcCode> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("likeAcItem " + dbName + " : " + "acNoItem_0 : " + acNoItem_0);
+    if (dbName.equals(ContentName.onDay))
+      slice = cdAcCodeReposDay.findAllByAcNoItemLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAsc(acNoItem_0, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = cdAcCodeReposMon.findAllByAcNoItemLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAsc(acNoItem_0, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = cdAcCodeReposHist.findAllByAcNoItemLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAsc(acNoItem_0, pageable);
+    else 
+      slice = cdAcCodeRepos.findAllByAcNoItemLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAsc(acNoItem_0, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

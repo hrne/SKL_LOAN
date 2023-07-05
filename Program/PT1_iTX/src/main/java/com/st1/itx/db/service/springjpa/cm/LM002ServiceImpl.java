@@ -37,7 +37,9 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 資料前兩年一月起至當月
 		String startYM = (parse.stringToInteger(titaVo.get("ENTDY").substring(0, 4)) + 1909) + "01";
 		String endYM = parse.IntegerToString(parse.stringToInteger(titaVo.get("ENTDY").substring(0, 6)) + 191100, 1);
-
+		
+		this.info("startYM = " + startYM);
+		this.info("endYM = " + endYM);
 		String sql = "";
 //		// 為了排除掉不是出表範圍的資料，實際Query包進subquery，以便篩選掉DataType=0者
 //		sql += " SELECT \"Year\" ";
@@ -143,7 +145,7 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("lM002.tmpProjectLoan");
 
 		String sql = "";
-
+		sql += " WITH \"tmpA\" AS (";
 		sql += " SELECT R.\"Type\"";
 		sql += "	   ,SUM(\"LoanBal\") AS \"LoanBal\"";
 		sql += " FROM (";
@@ -159,12 +161,47 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		ELSE '0' END AS \"Type\"";
 		sql += "       ,\"LoanBalance\" AS \"LoanBal\" ";
 		sql += " FROM \"MonthlyLoanBal\" M ";
+		sql += " LEFT JOIN \"FacMain\" FA  ON FA.\"CustNo\" = M.\"CustNo\"";
+		sql += "                          AND FA.\"FacmNo\" = M.\"FacmNo\"";
 		sql += " LEFT JOIN \"FacProd\" FP ON FP.\"ProdNo\" = M.\"ProdNo\"";
 		sql += " WHERE M.\"YearMonth\" = :yearMonth ";
 		sql += "   AND M.\"LoanBalance\" > 0 ";
+		sql += "   AND M.\"ProdNo\" BETWEEN 'IA' AND 'II' ";
+		sql += "   AND (  ( (TRUNC(:thisMonth / 100) - TRUNC(FA.\"FirstDrawdownDate\" / 10000) ) * 12 ";
+		sql += "           + MOD(:thisMonth,100) - MOD(TRUNC(FA.\"FirstDrawdownDate\" / 100),100) ";
+		sql += "        )  < 240 )    ";//-- 排除本月超過屆滿20年
 		sql += " ) R";
 		sql += " WHERE R.\"Type\" <> '0'";
 		sql += " GROUP BY R.\"Type\"";
+		sql += " ), \"tmpB\" AS (";
+		sql += " SELECT R.\"Type\"";
+		sql += "	   ,SUM(\"LoanBal\") AS \"LoanBal\"";
+		sql += " FROM (";
+		sql += " SELECT CASE ";
+		sql += "       	  WHEN M.\"AcctCode\" = '990' AND (FP.\"GovOfferFlag\" <> 'N' OR M.\"FacAcctCode\" = '340' )";
+		sql += "		  THEN '990' ";
+		sql += "       	  WHEN FP.\"GovOfferFlag\" <> 'N' ";
+		sql += "		  THEN M.\"ProdNo\" ";
+		sql += "       	  WHEN M.\"AcctCode\" = '340' ";
+		sql += "		  THEN '340' ";
+		sql += "       	  WHEN M.\"ProdNo\" BETWEEN '81' AND '83'";
+		sql += "		  THEN '921' ";
+		sql += "		ELSE '0' END AS \"Type\"";
+		sql += "       ,\"LoanBalance\" AS \"LoanBal\" ";
+		sql += " FROM \"MonthlyLoanBal\" M ";
+		sql += " LEFT JOIN \"FacMain\" FA  ON FA.\"CustNo\" = M.\"CustNo\"";
+		sql += "                          AND FA.\"FacmNo\" = M.\"FacmNo\"";
+		sql += " LEFT JOIN \"FacProd\" FP ON FP.\"ProdNo\" = M.\"ProdNo\"";
+		sql += " WHERE M.\"YearMonth\" = :yearMonth ";
+		sql += "   AND M.\"LoanBalance\" > 0 ";
+		sql += "   AND NOT M.\"ProdNo\" BETWEEN 'IA' AND 'II' ";
+		sql += " ) R";
+		sql += " WHERE R.\"Type\" <> '0'";
+		sql += " GROUP BY R.\"Type\"";
+		sql += " )";
+		sql += " SELECT * FROM \"tmpA\"";
+		sql += " UNION ";
+		sql += " SELECT * FROM \"tmpB\"";
 
 		this.info("sql=" + sql);
 

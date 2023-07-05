@@ -117,7 +117,7 @@ RESET_RIM(#SendL6R23,L6R23)
 S(L6R23,1,#RimFuncCode,#RimTxCode,#RimAcNoCode,#RimAcSubCode,#RimAcDtlCode)
 R(1,L6R23)
 
-#AcNoItem=x,80,L
+#AcNoItem=X,80,I
 T(2,#L6R23AcNoItem)
 
 
@@ -264,6 +264,7 @@ IF(#OOCHAIN==1,BIND(grid,cancel),$)
 #AcNoCode
 #AcSubCode
 #AcDtlCode
+#AcNoItem
 #END
 </sub>
 

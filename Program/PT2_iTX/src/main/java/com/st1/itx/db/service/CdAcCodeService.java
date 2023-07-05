@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.CdAcCode;
@@ -75,6 +77,34 @@ public interface CdAcCodeService {
    * @return Slice CdAcCode CdAcCode of List
    */
   public Slice<CdAcCode> findAcCodeOld(String acNoCodeOld_0, String acNoCodeOld_1, String acSubCode_2, String acSubCode_3, String acDtlCode_4, String acDtlCode_5, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * AcNoCode &gt;= ,AND AcNoCode &lt;= ,AND AcSubCode &gt;= ,AND AcSubCode &lt;= ,AND AcDtlCode &gt;= ,AND AcDtlCode &lt;= ,AND AcNoItem %
+   *
+   * @param acNoCode_0 acNoCode_0
+   * @param acNoCode_1 acNoCode_1
+   * @param acSubCode_2 acSubCode_2
+   * @param acSubCode_3 acSubCode_3
+   * @param acDtlCode_4 acDtlCode_4
+   * @param acDtlCode_5 acDtlCode_5
+   * @param acNoItem_6 acNoItem_6
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice CdAcCode CdAcCode of List
+   */
+  public Slice<CdAcCode> findAcItem(String acNoCode_0, String acNoCode_1, String acSubCode_2, String acSubCode_3, String acDtlCode_4, String acDtlCode_5, String acNoItem_6, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * AcNoItem %
+   *
+   * @param acNoItem_0 acNoItem_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice CdAcCode CdAcCode of List
+   */
+  public Slice<CdAcCode> likeAcItem(String acNoItem_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By CdAcCode

@@ -21,10 +21,13 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.FacMain;
+import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacCloseService;
+import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.springjpa.cm.L2077ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -53,12 +56,16 @@ public class L2077 extends TradeBuffer {
 	@Autowired
 	public LoanBorMainService loanBorMainService;
 	@Autowired
+	public FacMainService facMainService;
+	@Autowired
 	public ClFacService clFacService;
 	@Autowired
 	public L2077ServiceImpl l2077ServiceImpl;
 
 	@Autowired
 	public LoanCloseBreachCom loanCloseBreachCom;
+	@Autowired
+	private DateUtil dDateUtil;
 
 	/* 日期工具 */
 	@Autowired
@@ -214,7 +221,6 @@ public class L2077 extends TradeBuffer {
 				} else {
 					occursList.putParam("OOCreateDate", 0);
 				}
-				occursList.putParam("OORmk", result.get("Rmk"));
 				occursList.putParam("OOTelNo1", result.get("TelNo1"));
 				occursList.putParam("OODocNo", result.get("DocNo"));
 				occursList.putParam("OOAgreeNo", result.get("AgreeNo"));
@@ -227,6 +233,28 @@ public class L2077 extends TradeBuffer {
 				}
 				occursList.putParam("OORepayFg", wkRepayFg);
 				occursList.putParam("OOReceiveFg", result.get("ReceiveFg"));
+				FacMain tFacMain = new FacMain();
+				if (parse.stringToInteger(result.get("FacmNo")) == 0) {
+					tFacMain = facMainService.findLastFacmNoFirst(parse.stringToInteger(result.get("CustNo")), titaVo);
+				} else {
+					tFacMain = facMainService.findById(new FacMainId(parse.stringToInteger(result.get("CustNo")),
+							parse.stringToInteger(result.get("FacmNo"))), titaVo);
+				}
+				int Prohibitperiod = 0;
+				if (tFacMain != null) {
+					if (tFacMain.getProhibitMonth() > 0 && tFacMain.getFirstDrawdownDate() > 0) {
+						dDateUtil.init();
+						dDateUtil.setDate_1(tFacMain.getFirstDrawdownDate());
+						dDateUtil.setMons(tFacMain.getProhibitMonth()); // 限制清償年限
+						Prohibitperiod = dDateUtil.getCalenderDay(); // 綁約期限
+					}
+				}
+				occursList.putParam("OORmk", "");
+				this.info(" date = " + parse.stringToInteger(dDateUtil.getNowStringRoc()) + "-" + Prohibitperiod);
+				if (Prohibitperiod == 0 || parse.stringToInteger(dDateUtil.getNowStringRoc()) < Prohibitperiod) {
+					// SHOW
+					occursList.putParam("OORmk", result.get("Rmk"));
+				}
 
 				this.info("occursList L2077" + occursList);
 				this.totaVo.addOccursList(occursList);

@@ -85,7 +85,6 @@ T(3,#PayIntDateX{n},)
 ["[L2631]                                 清償作業"],
 [#<->#,"#FdCustNo+借戶戶號",#CustNo,"@@@",#BTN1,#BTN3,#CustName],
 [#<->#,"#FdCustId+統一編號",#CustId,#BTN2,#BTN4,#CustIdX],
-[#<->#,"#FdCloseNo+清償序號",#CloseNo],
 [#<->#,"#FdFunCode+作業功能",#FunCode,#FunCodX],
 [#<->#,"#FdTranDate+入帳日期",#TranDate],
 [#<->#,"#FdApplDate+申請日期",#ApplDate],
@@ -268,8 +267,8 @@ T(F,#CloseInd,0)
 
 #init=X,1,S
 INVOKEJS(SHOW,p2,0)
-INVOKEJS(SHOW,p1,9,9,0)
-INVOKEJS(SHOW,p1,26,26,0)
+INVOKEJS(SHOW,p1,8,8,0)
+INVOKEJS(SHOW,p1,25,25,0)
 K(MODIFYBUTTON,登錄)
 T(2,@RimTxCode,#TXCD)
 E(0,@RimFKey,#FKEY)
@@ -475,7 +474,7 @@ BIND(#BTN13,click, {cmd=CHAIN; ntxcd=L4960; ntxbuf=#BUFF})
 BIND(#BTN14,click, {cmd=CHAIN; ntxcd=L3007; ntxbuf=#BUFG})
 ![額度編號]
 #FacmNo=A,3,I
-C(2,#FunCode,INVOKEJS(SHOW,p1,9,9,1)SHOW(#BTN5,#BTN7,#BTN6),INVOKEJS(SHOW,p1,9,9,1)SHOW(#BTN5,#BTN6)HIDE(#BTN7),INVOKEJS(SHOW,p1,9,9,1)SHOW(#BTN5,#BTN6)HIDE(#BTN7),INVOKEJS(SHOW,p1,9,9,1)SHOW(#BTN6)HIDE(#BTN5,#BTN7),$,$)
+C(2,#FunCode,INVOKEJS(SHOW,p1,8,8,1)SHOW(#BTN5,#BTN7,#BTN6),INVOKEJS(SHOW,p1,8,8,1)SHOW(#BTN5,#BTN6)HIDE(#BTN7),INVOKEJS(SHOW,p1,8,8,1)SHOW(#BTN5,#BTN6)HIDE(#BTN7),INVOKEJS(SHOW,p1,8,8,1)SHOW(#BTN6)HIDE(#BTN5,#BTN7),$,$)
 C(3,#FunCode,2,C(3,#oldFacmNo,0,$,s),C(4,#NTXBUF,$,s))
 SHOW(#BTN8,#BTN12,#BTN13,#BTN14)
 @HIDE(#BTN8)
@@ -692,7 +691,7 @@ HELP(#CollectWayCodeHelpY,cols:5)
 C(4,#CollectWayCode,T(3,@CollectWayCodeX,),$)
 V(H,#CollectWayCodeHelpY)
 C(5,#CollectFlag,"Y",V(2,01,20),V(1,01,20))
-IF(#CollectWayCode==21||#CollectWayCode==26||#CollectWayCode==27,INVOKEJS(SHOW,p1,26,26,1),INVOKEJS(SHOW,p1,26,26,0))
+IF(#CollectWayCode==21||#CollectWayCode==26||#CollectWayCode==27,INVOKEJS(SHOW,p1,25,25,1),INVOKEJS(SHOW,p1,25,25,0))
 IF(#CollectWayCode==26,T(2,@PostAddress,#ClLocation),$)
 IF(#CollectWayCode==27,T(2,@PostAddress,#CurrAddress),$)
 

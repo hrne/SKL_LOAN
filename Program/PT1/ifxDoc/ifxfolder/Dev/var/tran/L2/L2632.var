@@ -28,7 +28,6 @@ E(0,0)
 [#<->#,"#FdFunCode+功能",#FunCodeX],
 [#<->#,"#FdCustNo+借戶戶號",#CustNo,#CustName],
 [#<->#,"#FdApplDate+申請日期",#ApplDate],
-[#<->#,"#FdCloseNo+清償序號",#CloseNo],
 [#<->#,"#FdFacmNo+額度編號",#FacmNo],
 [#<->#,"#FdEntryDate+入帳日期",#EntryDate],
 [#<->#,"#FdCloseInd+結案區分",#CloseInd,#CloseIndX],
@@ -408,7 +407,7 @@ C(5,#CollectFlag,"Y",V(2,01,20),V(1,01,20))
 
 #CollectWayCodeX=X,50,L
 T(H,#CollectWayCode,#CollectWayCodeHelp)
-IF(#CollectWayCode==21||#CollectWayCode==26||#CollectWayCode==27,INVOKEJS(SHOW,p1,13,13,1),INVOKEJS(SHOW,p1,13,13,0))
+IF(#CollectWayCode==21||#CollectWayCode==26||#CollectWayCode==27,INVOKEJS(SHOW,p1,12,12,1),INVOKEJS(SHOW,p1,12,12,0))
 IF(#CollectWayCode==26,T(2,@PostAddress,#ClLocation),$)
 IF(#CollectWayCode==27,T(2,@PostAddress,#CurrAddress),$)
 

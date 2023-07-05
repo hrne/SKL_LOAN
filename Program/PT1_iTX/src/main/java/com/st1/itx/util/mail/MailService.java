@@ -95,7 +95,8 @@ public class MailService extends CommBuffer {
 		this.properties.setProperty("mail.smtp.host", this.mailHost);
 		this.properties.setProperty("mail.smtp.port", this.mailPort);
 
-		this.properties.put("mail.smtp.auth", "true");// 需要驗證帳號密碼
+//		this.properties.put("mail.smtp.auth", "true");// 需要驗證帳號密碼
+		this.properties.put("mail.smtp.auth", "false");
 		// SSL authentication
 //		this.properties.put("mail.smtp.ssl.enable", "true");
 //		this.properties.put("mail.smtp.starttls.enable", "true");

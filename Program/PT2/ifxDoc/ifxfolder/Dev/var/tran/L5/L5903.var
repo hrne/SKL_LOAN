@@ -258,7 +258,6 @@ C(5,#OOReturnFg,Y,BIND(grid,{ cmd=CHAIN; ntxcd=L5103; ntxbuf=#OOBUF_RETURN}),BIN
 !管理人是否是啟用中
 #OOKeeperEnable=X,1,S
 
-
 #OOModifyFg=X,1,S
 
 #OODeleteFg=X,1,S
@@ -312,10 +311,18 @@ C(5,#OODeleteFg,Y,BIND(grid,{ cmd=EC; ntxcd=L5103;text=#OOBTN2NAME; txno=#RimDat
 ! C(5,#OOHCodeFlag,Y,BIND(grid,{ cmd=EC; ntxcd=#OOTxCd; txno=#RimData;rim=LCR01}),BIND(grid,cancel))
 
 
-
 !修正按鈕
 #BTN3=X,1,S
 C(5,#OOModifyFg,Y,BIND(grid,{ cmd=MODIFY;once=1; ntxcd=L5103; txno=#RimData;rim=LCR02}),BIND(grid,cancel))
+
+! 05:查詢
+#OOBufSearch=X,300,S
+T(2,#OOCustNo+#OOFacmNo+#OOApplSeq+#OOCustName+#OOKeeperEmpNo
+   +#OOApplEmpNo+#OOApplDate+#OOReturnDate+#OOReturnEmpNo
+   +#OOUsageCode+#OORemark+#tempFG+#OOCopyCode+#OOApplObj+#OOFacmNoMemo+#OOApplEmpName+Y+05)
+
+#OOBtnSearch=X,1,O
+BIND(grid,{ cmd=CHAIN; ntxcd=L5103; ntxbuf=#OOBufSearch})
 
 
 ! 檢查是否有附件資料，再顯示這個按鈕
@@ -396,6 +403,9 @@ TXFORM=L5903
 
 #BTN3=修改
 {width:40,search:false,formatter:'cust:bind-button:修改',canExport:false,align:'center'}
+
+#OOBtnSearch=查詢
+{width:40,search:false,formatter:'cust:bind-button:查詢',canExport:false,align:'center'}
 
 ! 戶號
 #OOCustNo=戶號

@@ -224,7 +224,6 @@ C(4,#OOCloseReasonCode,T(3,無),$)
 #OOCloseReasonCodeXX=X,25,L
 C(4,#OOCloseReasonCode,T(2,#OOCloseReasonCodeX),T(2,#OOCloseReasonCode+-+#OOCloseReasonCodeX))
 
-
 #OOCloseAmt=+m,14.2,S
 
 #OOCloseAmtX=X,22,L
@@ -273,14 +272,14 @@ C(3,#OOFunCode,2,T(H,@OOFunCodX,#OORepayFg,#CloseDateHelp2),$)
 
 !修改
 #OOBUF2=X,60,S
-T(2,#FUNC2+#OOCloseDate+#OOCloseNo+#OOCustNo+#OOFacmNo+#OOCloseReasonCode+#OOCloseAmt+#OOCollectWayCode+#OOReceiveDate+#OOCreateDate)
+T(2,#FUNC2+#OOApplDate+#OOCloseNo+#OOCustNo+#OOFacmNo+#OOCloseReasonCode+#OOCloseAmt+#OOCollectWayCode+#OOReceiveDate+#OOCreateDate)
 
 #OOBTN2=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L2632; ntxbuf=#OOBUF2})
 ! C(3,#OOReceiveFg,1,BIND(grid,cancel),$)
 !刪除
 #OOBUF4=X,60,S
-T(2,#FUNC4+#OOCloseDate+#OOCloseNo+#OOCustNo+#OOFacmNo+#OOCloseReasonCode+#OOCloseAmt+#OOCollectWayCode+#OOReceiveDate+#OOCreateDate)
+T(2,#FUNC4+#OOApplDate+#OOCloseNo+#OOCustNo+#OOFacmNo+#OOCloseReasonCode+#OOCloseAmt+#OOCollectWayCode+#OOReceiveDate+#OOCreateDate)
 
 #OOBTN4=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L2632; ntxbuf=#OOBUF4})
@@ -290,7 +289,7 @@ C(3,#OOFunCode,0,C(5,#CloseDateFg,Y,BIND(grid,cancel),$),BIND(grid,cancel))
 
 !查詢
 #OOBUF5=X,60,S
-T(2,#FUNC5+#OOCloseDate+#OOCloseNo+#OOCustNo+#OOFacmNo+#OOCloseReasonCode+#OOCloseAmt+#OOCollectWayCode+#OOReceiveDate+#OOCreateDate)
+T(2,#FUNC5+#OOApplDate+#OOCloseNo+#OOCustNo+#OOFacmNo+#OOCloseReasonCode+#OOCloseAmt+#OOCollectWayCode+#OOReceiveDate+#OOCreateDate)
 
 #OOBTN5=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L2632; ntxbuf=#OOBUF5})
@@ -419,9 +418,6 @@ TXFORM=L2077
 
 #OOApplDate=申請日期
 {width:100,align:'center'}
-
-#OOCloseNo=清償序號
-{width:80,align:'center'}
 
 #OOFunCodX=作業項目
 {width:110,align:'left'}

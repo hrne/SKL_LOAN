@@ -120,7 +120,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "           ELSE \"Fn_GetCdCode\"('AcctCode',FAC.\"AcctCode\") END AS \"AcctItem\"";
 			sql += " 	, \"Fn_GetCdCode\"('RepayType',BATX.\"RepayType\") AS \"RepayItem\"";
 			sql += "    , NVL(TX2.\"PaidTerms\", 0) AS \"PaidTerms\" ";
-			sql += "    , NVL(FC1.\"CloseReasonCode\",FC2.\"CloseReasonCode\") AS \"CloseReasonCode\"" ;
+			sql += "    , NVL(NVL(FC1.\"CloseReasonCode\",FC2.\"CloseReasonCode\"),'00') AS \"CloseReasonCode\"" ;
 			sql += "    , CD.\"Item\" AS \"CloseReason\" ";
 			sql += "    , NVL(JSON_VALUE(TX2.\"OtherFields\", '$.CaseCloseCode'),99) AS \"CaseCloseCode\" ";
 			sql += " FROM \"BatxDetail\" BATX";
@@ -148,7 +148,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "                           AND FC2.\"CustNo\" = TX2.\"CustNo\"";
 			sql += "                           AND FC2.\"FacmNo\" = 0 ";
 			sql += " LEFT JOIN \"CdCode\" CD ON CD.\"DefCode\" = 'AdvanceCloseCode' ";
-			sql += "                        AND CD.\"Code\" = LPAD(NVL(JSON_VALUE(TX2.\"OtherFields\", '$.AdvanceCloseCode'),0),2,0)";
+			sql += "                        AND CD.\"Code\" =  NVL(NVL(FC1.\"CloseReasonCode\",FC2.\"CloseReasonCode\"),'00')";
 			sql += " WHERE BATX.\"AcDate\" = :inputAcDate";
 			sql += " AND SUBSTR(BATX.\"BatchNo\",1,4) = 'BATX'     ";
 			sql += " AND CASE";
@@ -229,7 +229,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "           ELSE \"Fn_GetCdCode\"('AcctCode',FAC.\"AcctCode\") END AS \"AcctItem\"";
 			sql += " 	, \"Fn_GetCdCode\"('RepayType',BATX.\"RepayType\") AS \"RepayItem\"";
 			sql += "    , NVL(TX2.\"PaidTerms\", 0) AS \"PaidTerms\" ";
-			sql += "    , NVL(FC1.\"CloseReasonCode\",FC2.\"CloseReasonCode\") AS \"CloseReasonCode\"" ;
+			sql += "    , NVL(NVL(FC1.\"CloseReasonCode\",FC2.\"CloseReasonCode\"),'00') AS \"CloseReasonCode\"" ;
 			sql += "    , CD.\"Item\" AS \"CloseReason\" ";
 			sql += "    , NVL(JSON_VALUE(TX2.\"OtherFields\", '$.CaseCloseCode'),99) AS \"CaseCloseCode\" ";
 			sql += " FROM \"BatxDetail\" BATX";
@@ -251,7 +251,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "                           AND FC2.\"CustNo\" = TX2.\"CustNo\"";
 			sql += "                           AND FC2.\"FacmNo\" = 0 ";
 			sql += " LEFT JOIN \"CdCode\" CD ON CD.\"DefCode\" = 'AdvanceCloseCode' ";
-			sql += "                        AND CD.\"Code\" = LPAD(NVL(JSON_VALUE(TX2.\"OtherFields\", '$.AdvanceCloseCode'),0),2,0)";
+			sql += "                        AND CD.\"Code\" =  NVL(NVL(FC1.\"CloseReasonCode\",FC2.\"CloseReasonCode\"),'00')";
 			sql += " WHERE BATX.\"AcDate\" = :inputAcDate";
 			sql += " AND SUBSTR(BATX.\"BatchNo\",1,4) = 'BATX'     ";
 			sql += " AND CASE";
@@ -329,7 +329,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "           ELSE \"Fn_GetCdCode\"('AcctCode',FAC.\"AcctCode\") END AS \"AcctItem\"";
 			sql += " 	, \"Fn_GetCdCode\"('RepayType',BATX.\"RepayType\") AS \"RepayItem\"";
 			sql += "    , NVL(TX2.\"PaidTerms\", 0) AS \"PaidTerms\" ";
-			sql += "    , NVL(FC1.\"CloseReasonCode\",FC2.\"CloseReasonCode\") AS \"CloseReasonCode\"" ;
+			sql += "    , NVL(NVL(FC1.\"CloseReasonCode\",FC2.\"CloseReasonCode\"),'00') AS \"CloseReasonCode\"" ;
 			sql += "    , CD.\"Item\" AS \"CloseReason\" ";
 			sql += "    , NVL(JSON_VALUE(TX2.\"OtherFields\", '$.CaseCloseCode'),99) AS \"CaseCloseCode\" ";
 			sql += " FROM \"BatxDetail\" BATX";
@@ -351,7 +351,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "                           AND FC2.\"CustNo\" = TX2.\"CustNo\"";
 			sql += "                           AND FC2.\"FacmNo\" = 0 ";
 			sql += " LEFT JOIN \"CdCode\" CD ON CD.\"DefCode\" = 'AdvanceCloseCode' ";
-			sql += "                        AND CD.\"Code\" = LPAD(NVL(JSON_VALUE(TX2.\"OtherFields\", '$.AdvanceCloseCode'),0),2,0)";
+			sql += "                        AND CD.\"Code\" =  NVL(NVL(FC1.\"CloseReasonCode\",FC2.\"CloseReasonCode\"),'00')";
 			sql += " WHERE BATX.\"AcDate\" = :inputAcDate";
 			sql += " AND SUBSTR(BATX.\"BatchNo\",1,4) = 'BATX'     ";
 			sql += " AND CASE";

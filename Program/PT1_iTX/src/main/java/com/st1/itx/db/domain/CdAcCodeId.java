@@ -2,8 +2,12 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * CdAcCode 會計科子細目設定檔<br>
@@ -16,12 +20,7 @@ import javax.persistence.Embeddable;
 public class CdAcCodeId implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 3242146605569101291L;
-
-// 科目代號
+  // 科目代號
   @Column(name = "`AcNoCode`", length = 11)
   private String acNoCode = " ";
 
