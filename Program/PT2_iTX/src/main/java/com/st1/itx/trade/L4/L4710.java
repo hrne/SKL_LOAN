@@ -5,8 +5,6 @@ import java.io.StringWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,12 +12,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import com.jcraft.jsch.Channel;
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
-import com.jcraft.jsch.SftpException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
@@ -31,15 +23,11 @@ import com.st1.itx.db.service.SystemParasService;
 import com.st1.itx.db.service.TxFileService;
 import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.common.FtpClient;
+import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.MakeFile;
-import com.st1.itx.util.common.MakeReport;
-import com.st1.itx.util.common.SmsCom;
+import com.st1.itx.util.common.SftpClient;
 import com.st1.itx.util.common.TxToDoCom;
 import com.st1.itx.util.common.data.ReportVo;
-import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.mail.MailService;
-import com.st1.itx.util.parse.Parse;
 
 @Service("L4710")
 @Scope("prototype")
@@ -51,49 +39,28 @@ import com.st1.itx.util.parse.Parse;
  */
 public class L4710 extends TradeBuffer {
 
-	/* 轉型共用工具 */
 	@Autowired
-	public Parse parse;
-
-	/* 日期工具 */
-	@Autowired
-	DateUtil dateUtil;
+	private TxToDoDetailService txToDoDetailService;
 
 	@Autowired
-	TxToDoDetailService txToDoDetailService;
+	private MakeFile makeFile;
 
 	@Autowired
-	MakeFile makeFile;
+	private TxToDoCom txToDoCom;
 
 	@Autowired
-	MakeReport makeReport;
+	private TxFileService txFileService;
 
 	@Autowired
-	TxToDoCom txToDoCom;
+	private SystemParasService systemParasService;
 
 	@Autowired
-	TxFileService txFileService;
-
-	@Autowired
-	SystemParasService systemParasService;
-
-	@Autowired
-	FtpClient ftpClient;
-
-	@Autowired
-	SmsCom smsCom;
+	private SftpClient sftpClient;
 
 	@Value("${iTXOutFolder}")
 	private String outFolder = "";
 
-	@Autowired
-	MailService mailService;
-
-	private TitaVo titaVo = new TitaVo();
-
-	private static final Pattern patternPrefix = Pattern.compile("^<.+>");
-
-	String smsFtpFlag = "Y";
+	private String smsFtpFlag = "Y";
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -113,11 +80,7 @@ public class L4710 extends TradeBuffer {
 
 		Slice<TxToDoDetail> sTxToDoDetail = null;
 
-		List<TxToDoDetail> lTxToDoDetail = new ArrayList<TxToDoDetail>();
-
 		sTxToDoDetail = txToDoDetailService.detailStatusRange("TEXT00", 0, 0, 0, Integer.MAX_VALUE);
-
-		lTxToDoDetail = sTxToDoDetail == null ? null : sTxToDoDetail.getContent();
 
 		txBuffer.init(titaVo);
 
@@ -131,24 +94,16 @@ public class L4710 extends TradeBuffer {
 		if (systemParas != null) {
 			smsFtpFlag = systemParas.getSmsFtpFlag();
 		}
+		this.info("L4710 smsFtpFlag = " + smsFtpFlag);
 
-		if (lTxToDoDetail == null || lTxToDoDetail.isEmpty()) {
+		if (smsFtpFlag.equals("T") || smsFtpFlag.equals("A")) {
+			// 2023-07-06 Wei 用背景作業打API
+			MySpring.newTask("L4710p", this.txBuffer, titaVo);
+		}
+
+		if (sTxToDoDetail == null || sTxToDoDetail.isEmpty()) {
 			this.info("簡訊媒體檔,本日無資料");
 			return;
-		} else if (smsFtpFlag.equals("T")) {
-			// 2023-07-05 Wei from SKL 琦欣 說資訊長要他測API能撐最多幾筆
-			String mobile = "0900000000";
-			String msg = "測試訊息";
-			this.info("L4710 sendSms test mobile = " + mobile);
-			this.info("L4710 sendSms test msg = " + msg);
-			for (int i = 1; i <= 10; i++) {
-				this.info("L4710 sendSms 測試第" + i + "次,連續發" + (i * 10) + "筆");
-				for (int j = 1; j <= i * 10; j++) {
-					this.info("L4710 sendSms 測試第" + i + "次,第" + j + "筆");
-					smsCom.sendSms(titaVo, mobile, msg);
-				}
-				this.info("L4710 sendSms 測試第" + i + "次,測試完成");
-			}
 		}
 
 		int reportDate = titaVo.getEntDyI() + 19110000;
@@ -160,15 +115,11 @@ public class L4710 extends TradeBuffer {
 				.setRptItem(fileItem).build();
 
 		// 開啟報表
-		makeFile.open(titaVo, reportVo, fileName);
+		makeFile.open(titaVo, reportVo, fileName, 2); // 2:BIG 5
 
-//		makeFile.open(titaVo, txBuffer.getTxCom().getTbsdy(), "0000", titaVo.getTxCode(), titaVo.getTxCode() + "-簡訊媒體檔",
-//				"LNM56OP.txt", 2);
-
-		for (TxToDoDetail tTxToDoDetail : lTxToDoDetail) {
+		for (TxToDoDetail tTxToDoDetail : sTxToDoDetail) {
 //			1.產出
 			makeFile.put(tTxToDoDetail.getProcessNote());
-			this.info("tTxToDoDetail : " + tTxToDoDetail.toString());
 		}
 
 		long sno = makeFile.close();
@@ -177,26 +128,11 @@ public class L4710 extends TradeBuffer {
 		boolean result = sendToFTP(sno, titaVo);
 
 		if (!result) {
+			this.info("sendToFTP 失敗 不回寫TxToDoDetail狀態");
 			return;
 		}
 
-		for (TxToDoDetail tTxToDoDetail : lTxToDoDetail) {
-			// 2023-07-04 Wei 改回用FTP from SKL 琦欣
-			// 這裡改用參數修改 如果他們又想改用API 就把SystemParas.SmsFtpFlag改為A
-			if (smsFtpFlag.equals("A")) {
-				// 2023-05-29 Wei 改用API傳送 from SKL 琦欣
-				String proccessNote = tTxToDoDetail.getProcessNote();
-				String[] data = proccessNote.split(",");
-
-				if (data.length >= 4) {
-					String mobile = data[2];
-					String msg = data[3];
-					this.info("L4710 sendSms api mobile = " + mobile);
-					this.info("L4710 sendSms api msg = " + msg);
-					smsCom.sendSms(titaVo, mobile, msg);
-				}
-			}
-
+		for (TxToDoDetail tTxToDoDetail : sTxToDoDetail) {
 			// 2.回寫狀態
 			TxToDoDetailId tTxToDoDetailId = new TxToDoDetailId();
 			tTxToDoDetailId.setCustNo(tTxToDoDetail.getCustNo());
@@ -208,7 +144,6 @@ public class L4710 extends TradeBuffer {
 			txToDoCom.setTxBuffer(txBuffer);
 			txToDoCom.updDetailStatus(2, tTxToDoDetailId, titaVo);
 		}
-
 	}
 
 	private boolean sendToFTP(long fileSno, TitaVo titaVo) throws LogicException {
@@ -256,43 +191,8 @@ public class L4710 extends TradeBuffer {
 		String fileName = txFile.getFileOutput();
 		Path pathToFile = Paths.get(outFolder, fileName);
 
-		JSch jsch = new JSch();
-		Session session = null;
-
-		try {
-			// 建立連線
-			session = jsch.getSession(auth[0], smsUrl, parse.stringToInteger(smsPort));
-			// 設定密碼
-			session.setPassword(auth[1]);
-
-			// 設定SSH連線的安全性設定
-			java.util.Properties config = new java.util.Properties();
-			config.put("StrictHostKeyChecking", "no");
-			session.setConfig(config);
-
-			// 連接到伺服器
-			session.connect();
-
-			// 創建SFTP通道
-			Channel channel = session.openChannel("sftp");
-			channel.connect();
-			ChannelSftp sftpChannel = (ChannelSftp) channel;
-
-			// 上傳檔案
-			// 第一個參數是本地文件的路徑，第二個參數是遠端伺服器的目錄
-			sftpChannel.put(pathToFile.toString(), "inbound");
-
-			// 關閉連線
-			sftpChannel.exit();
-			session.disconnect();
-		} catch (SftpException | JSchException e) {
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.error("send SFTP error = " + errors.toString());
-			return false;
-		}
-
-		return true;
+		// 呼叫SFTPCient
+		return sftpClient.upload(smsUrl, smsPort, auth, pathToFile, "inbound", titaVo);
 	}
 
 }

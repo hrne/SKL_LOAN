@@ -85,6 +85,10 @@ T(3,*)
 #FdAcDate=X,2,L
 T(3,*)
 
+
+#AMLReviewTypeHelp=x,60,S        
+T(3,M:中風險;L:低風險;9:全部)
+
 #CHAIN=A,1,S
 T(4,CHAIN$) 
 
@@ -113,7 +117,7 @@ T(3,0:未處理;1:已處理;9:全部)
 #CDCODEAMLReviewType=x,30,S                  
 T(3,CdCode.AmlReviewType)                  
                                         
-#AMLReviewTypeHelp=x,60,S        
+!#AMLReviewTypeHelp=x,60,S        
 
 !AMLIsStatus
 #CDCODEAMLIsStatus=x,30,S                  
@@ -141,16 +145,13 @@ T(2,#KINBR)
 
 !評級
 #ReviewType=X,1,S
+C(3,#CHAIN,1,s,$)
 T(3,L)
-!C(3,#CHAIN,1,s,$)
-!C(3,#AutoSubmit,1,s,$)
-!HELP(#AMLReviewTypeHelp,cols:1)
-!@V(H,#AMLReviewTypeHelp)
+! HELP(#AMLReviewTypeHelp,cols:1)
+! @
+! V(H,#AMLReviewTypeHelp)
 
 #downButton=x,100,S
-C(5,#ReviewType,"H",$,s)
-T(2,{cmd=CHAIN; ntxcd=LC009; ntxbuf=      L9703A; ntxbuf5=type})ASGN(BTN_NEW1$)
-K(MODIFYBUTTON,1,下載高風險郵寄名單及明細)
 
 #ReviewTypeX=X,6,L
 T(H,#ReviewType,#AMLReviewTypeHelp)
@@ -262,8 +263,9 @@ T(2,#TLRNO)
 #LogFlag=X,1,S
 T(3,B)
 
-#oBUF2a=x,36,S
-T(2,#oDataDt+#oCustKey+#oRRSeq+#oReviewType+#oUnit+#oIsStatus)
+#oBUF2a=x,2000,S
+!T(2,#oDataDt+#oCustKey+#oRRSeq+#oReviewType+#oUnit+#oIsStatus)
+T(2,#oDataDt+#oCustKey+#oRRSeq+#oReviewType+#oUnit+#oUnitItem+#oIsStatus+#oProcessType+#oProcessCount)
 
 #oBUF2b=x,1000,S
 T(6A,#DataDt+#CustKey+#ProcessDate+#ProcessTlrNo+#ProcessNote+#LogFlag+#BatchNo+#ReviewTypeX))
@@ -313,7 +315,8 @@ T(3,L8100)
 
 !! ------- end of batch variables   -------------
 
-					
+	
+<include src="ROM.icf::L8R53.dec"/>							
 </sub>
 
 
@@ -335,12 +338,14 @@ TXFORM=L8083
 #oCustKey
 #oRRSeq
 #oReviewType
+#oUnit
 #oUnitItem
 #oIsStatus
 #oProcessType
 #oProcessCount
 ^
 <include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L8R53.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 

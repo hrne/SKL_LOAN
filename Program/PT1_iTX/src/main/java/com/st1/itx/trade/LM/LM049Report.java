@@ -366,9 +366,9 @@ public class LM049Report extends MakeReport {
 			if (!tmpClNo.equals(map.get("ClNo"))) {
 
 				clNocnt = 1;
+				tmpRow = rowCursor;
 				makeExcel.setValue(tmpRow, 14, sameClNo);
 				sameClNo = "";
-				tmpRow = rowCursor;
 
 			} else {
 				if (clNocnt > 1) {

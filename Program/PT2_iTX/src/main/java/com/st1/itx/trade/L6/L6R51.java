@@ -147,8 +147,7 @@ public class L6R51 extends TradeBuffer {
 						BigDecimal loanBal = BigDecimal.ZERO;
 						prodName = tCdCode.getItem();
 						colName = tCdCode.getCode();
-						if ("340".equals(prodName.substring(0, 3)) || "921".equals(prodName.substring(0, 3))
-								|| "990".equals(prodName.substring(0, 3))) {
+						if ("340".equals(prodName.substring(0, 3))) {
 							prodName = prodName.substring(4);
 						}
 						this.totaVo.putParam("L6r51ColName" + cnt, colName);
@@ -169,8 +168,7 @@ public class L6R51 extends TradeBuffer {
 						loanBal = parse.stringToBigDecimal(tTempVo.getParam(tCdCode.getCode()));
 						prodName = tCdCode.getItem();
 						colName = tCdCode.getCode();
-						if ("340".equals(prodName.substring(0, 3)) || "921".equals(prodName.substring(0, 3))
-								|| "990".equals(prodName.substring(0, 3))) {
+						if ("340".equals(prodName.substring(0, 3))) {
 							prodName = prodName.substring(4);
 						}
 						this.totaVo.putParam("L6r51ColName" + cnt, colName);

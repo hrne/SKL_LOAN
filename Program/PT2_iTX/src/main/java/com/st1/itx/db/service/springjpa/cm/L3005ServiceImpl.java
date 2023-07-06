@@ -11,15 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.util.parse.Parse;
 
-@Service("L3005ServiceImpl")
+@Service
 @Repository
-/* 逾期放款明細 */
 public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean {
 
 	@Autowired
@@ -48,7 +48,7 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Map<String, String>> findAll(int index, int limit, TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(int index, int limit, TitaVo titaVo) throws LogicException {
 
 		int iCustNo = this.parse.stringToInteger(titaVo.getParam("TimCustNo"));
 		int iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
@@ -75,6 +75,14 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int wkAcDateStart = iAcDate;
 		int wkEntryDateStart = iEntryDate;
 		int wkDateEnd = 99991231;
+		if (iFacmNo != 0) {
+			wkFacmNoStart = iFacmNo;
+			wkFacmNoEnd = iFacmNo;
+		}
+		if (iBormNo != 0) {
+			wkBormNoStart = iBormNo;
+			wkBormNoEnd = iBormNo;
+		}
 		if (iFacmNo != 0) {
 			wkFacmNoStart = iFacmNo;
 			wkFacmNoEnd = iFacmNo;
@@ -237,8 +245,8 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       left join \"LoanRateChange\" rr ON rr.\"CustNo\" = ln.\"CustNo\" ";
 		sql += "                                      AND rr.\"FacmNo\" = ln.\"FacmNo\" ";
 		sql += "                                      AND rr.\"BormNo\" = ln.\"BormNo\" ";
-		sql += "                                      AND rr.\"EffectDate\" <= ln.\"EntryDate\" ";  // 入帳日利率
-		sql += sqlCondition;  
+		sql += "                                      AND rr.\"EffectDate\" <= ln.\"EntryDate\" "; // 入帳日利率
+		sql += sqlCondition;
 		sql += "                       AND  ln.\"BormNo\" > 0                  ";
 		sql += "                       AND  ln.\"EntryDate\" > 0               ";
 		sql += ") ";
@@ -269,7 +277,7 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     ,SUM(ln.\"TxAmt\")         AS  \"TotTxAmt\"			     			";
 		sql += "    FROM																	";
 		sql += "      \"LoanBorTx\"	ln														";
-		sql += sqlCondition; 
+		sql += sqlCondition;
 		sql += "      GROUP BY	 ln.\"CustNo\" , ln.\"AcDate\" , ln.\"TitaKinBr\" ,ln.\"TitaTlrNo\" ,ln.\"TitaTxtNo\" 	";
 		sql += "  ) ln2										";
 		sql += " left join \"LoanBorTx\" ln3  											     ";
@@ -377,17 +385,58 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<Map<String, String>> checkIsArchive(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> checkIsArchive(TitaVo titaVo) throws LogicException {
+		this.info("L3005ServiceImpl checkIstArchive");
 
 		int iCustNo = this.parse.stringToInteger(titaVo.getParam("TimCustNo"));
+		int iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
+		int iBormNo = this.parse.stringToInteger(titaVo.getParam("BormNo"));
 
+		int facmNoSt = 0;
+		int facmNoEd = 999;
+		int bormNoSt = 0;
+		int bormNoEd = 900;
+
+		if (iFacmNo != 0) {
+			facmNoSt = iFacmNo;
+			facmNoEd = iFacmNo;
+		}
+		if (iBormNo != 0) {
+			bormNoSt = iBormNo;
+			bormNoEd = iBormNo;
+		}
+
+		this.info("checkIstArchive iCustNo = " + iCustNo);
+		this.info("checkIstArchive facmNoSt = " + facmNoSt);
+		this.info("checkIstArchive facmNoEd = " + facmNoEd);
+		this.info("checkIstArchive bormNoSt = " + bormNoSt);
+		this.info("checkIstArchive bormNoEd = " + bormNoEd);
 		String sql = "";
-		sql += " SELECT TA.\"CustNo\" ";
-		sql += " FROM \"TxArchiveTableLog\" TA ";
-		sql += " WHERE TA.\"CustNo\" = :inputCustNo ";
-		sql += "   AND TA.\"DataFrom\" = 'ONLINE' ";
-		sql += "   AND TA.\"Type\" = '5YTX' ";
+		sql += " WITH rawData AS ( ";
+		sql += "   SELECT T.\"CustNo\" ";
+		sql += "        , T.\"FacmNo\" ";
+		sql += "        , T.\"BormNo\" ";
+		sql += "        , T.\"IsDeleted\" ";
+		sql += "        , ROW_NUMBER() ";
+		sql += "          OVER ( ";
+		sql += "            PARTITION BY T.\"CustNo\" ";
+		sql += "                       , T.\"FacmNo\" ";
+		sql += "                       , T.\"BormNo\" ";
+		sql += "            ORDER BY T.\"BatchNo\" DESC ";
+		sql += "          ) AS \"LastDataSeq\" ";
+		sql += "   FROM \"TxArchiveTableLog\" T ";
+		sql += "   WHERE T.\"Result\" = 1 "; // 成功
+		sql += "     AND T.\"Type\" = '5YTx' ";
+		sql += "     AND T.\"CustNo\" = :inputCustNo ";
+		sql += "     AND T.\"FacmNo\" >= :inputFacmNoSt ";
+		sql += "     AND T.\"FacmNo\" <= :inputFacmNoEd ";
+		sql += "     AND T.\"BormNo\" >= :inputBormNoSt ";
+		sql += "     AND T.\"BormNo\" <= :inputBormNoEd ";
+		sql += " ) ";
+		sql += " SELECT DISTINCT R.\"CustNo\" ";
+		sql += " FROM rawData r ";
+		sql += " WHERE r.\"LastDataSeq\" = 1 "; // 最新一筆
+		sql += "   AND r.\"IsDeleted\" = 1 "; // 已刪除
 
 		this.info("sql=" + sql);
 		Query query;
@@ -395,6 +444,10 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 
 		query.setParameter("inputCustNo", iCustNo);
+		query.setParameter("inputFacmNoSt", facmNoSt);
+		query.setParameter("inputFacmNoEd", facmNoEd);
+		query.setParameter("inputBormNoSt", bormNoSt);
+		query.setParameter("inputBormNoEd", bormNoEd);
 
 		return this.convertToMap(query);
 	}

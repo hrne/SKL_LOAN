@@ -16,11 +16,14 @@ import com.st1.itx.db.domain.ClBuilding;
 import com.st1.itx.db.domain.ClBuildingId;
 import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.CustNotice;
+import com.st1.itx.db.domain.CustNoticeId;
 import com.st1.itx.db.domain.FacShareAppl;
 import com.st1.itx.db.domain.Guarantor;
 import com.st1.itx.db.service.ClBuildingService;
 import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.CustNoticeService;
 import com.st1.itx.db.service.FacShareApplService;
 import com.st1.itx.db.service.GuarantorService;
 import com.st1.itx.util.common.CustNoticeCom;
@@ -57,6 +60,8 @@ public class L9706Report extends MakeReport {
 	@Autowired
 	private CustNoticeCom custNoticeCom;
 	
+	@Autowired
+	private CustNoticeService sCustNoticeService;
 
 	@Autowired
 	private Parse parse;
@@ -136,6 +141,28 @@ public class L9706Report extends MakeReport {
 					this.newPage();
 					cnt = 0;
 				}
+				
+				
+				int custNo = parse.stringToInteger(tL9706Vo.get("CustNo"));
+				int facmNo = parse.stringToInteger(tL9706Vo.get("FacmNo"));
+
+				CustNotice lCustNotice = new CustNotice();
+				CustNoticeId lCustNoticeId = new CustNoticeId();
+
+				lCustNoticeId.setCustNo(custNo);
+				lCustNoticeId.setFacmNo(facmNo);
+				lCustNoticeId.setFormNo("L9706");
+			
+				lCustNotice = sCustNoticeService.findById(lCustNoticeId, titaVo);			
+				
+				// paper為N 表示不印
+				if (lCustNotice == null) {
+				} else {
+					if ("N".equals(lCustNotice.getPaperNotice())) {
+						continue;
+					}
+				}			
+				
 				report1(tL9706Vo);
 				cnt += 1;
 			}

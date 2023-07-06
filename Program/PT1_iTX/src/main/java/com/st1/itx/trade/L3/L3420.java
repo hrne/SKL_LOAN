@@ -396,11 +396,11 @@ public class L3420 extends TradeBuffer {
 
 			switch (iCaseCloseCode) { // 結案區分
 			case 0: // 0:正常結案
+			case 2: // 2:借新還舊
 				wkBorMainStatus = 3; // 3:結案戶
 				CaseClose0NormalRoutine();
 				break;
-			case 1: // 1:展期(新額度)
-			case 2: // 2:借新還舊(同額度)
+			case 1: // 1:展期
 				wkBorMainStatus = 1; // 1:展期
 				CaseClose0NormalRoutine();
 				break;
@@ -1567,18 +1567,18 @@ public class L3420 extends TradeBuffer {
 			tFacClose = facCloseService.findFacmNoFirst(iCustNo, 0, Arrays.asList(new String[] { "0" }), titaVo);
 		}
 		if (tFacClose == null || tFacClose.getEntryDate() != iEntryDate) {
-			FacClose t2FacClose = facCloseService.findMaxCloseNoFirst(iCustNo);
+			FacClose t2FacClose = facCloseService.findLastCloseNoFirst(dDateUtil.getNowIntegerRoc() + 19110000, titaVo);
 			if (t2FacClose == null) {
 				wkCloseNo = 1;
 			} else {
 				wkCloseNo = t2FacClose.getCloseNo() + 1;
 			}
 			tFacClose = new FacClose();
-			tFacClose.setFacCloseId(new FacCloseId(iCustNo, wkCloseNo));
+			tFacClose.setFacCloseId(new FacCloseId(dDateUtil.getNowIntegerRoc(), wkCloseNo));
 			tFacClose.setCustNo(iCustNo);
 			tFacClose.setCloseNo(wkCloseNo);
 			tFacClose.setFacmNo(iFacmNo);
-			tFacClose.setApplDate(0);// 申請日期自動寫入時為0
+			tFacClose.setApplDate(dDateUtil.getNowIntegerRoc());// 申請日期自動寫入日曆日
 			tFacClose.setFunCode("0");
 			tFacClose.setCollectFlag("N"); // 5/12郁宏:一律不領,經辦會進交易維護
 			tFacClose.setCollectWayCode("01");// 5/12郁宏:一律不領,經辦會進交易維護

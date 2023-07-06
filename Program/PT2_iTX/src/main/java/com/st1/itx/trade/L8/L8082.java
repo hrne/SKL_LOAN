@@ -69,11 +69,12 @@ public class L8082 extends TradeBuffer {
 
 		List<String> reviewType = null;
 		if ("9".equals(iReviewType)) {
-			reviewType = Arrays.asList("M", "L");
+			reviewType = Arrays.asList("M","L");
 		} else {
 			reviewType = Arrays.asList(iReviewType);
 		}
 
+		
 		if ("9".equals(iStatus)) {
 			slTxAmlCredit = txAmlCreditService.processAll(reviewType, iAcDate1, iAcDate2, iProcessType, this.index, this.limit);
 		} else if ("1".equals(iStatus)) {
@@ -95,12 +96,23 @@ public class L8082 extends TradeBuffer {
 				occursList.putParam("oCustKey", txAmlCredit.getCustKey());
 				occursList.putParam("oRRSeq", txAmlCredit.getRRSeq());
 				occursList.putParam("oReviewType", txAmlCredit.getReviewType());
-//				occursList.putParam("oUnit", txAmlCredit.getUnit());
+				occursList.putParam("oUnit", txAmlCredit.getUnit());
 				occursList.putParam("oUnitItem", getUnitItem(txAmlCredit.getUnit().trim(), titaVo));
 				occursList.putParam("oIsStatus", txAmlCredit.getIsStatus());
 //				this.info("txAmlCredit.ProcessType="+txAmlCredit.getProcessType());
 				occursList.putParam("oProcessType", txAmlCredit.getProcessType());
 				occursList.putParam("oProcessCount", txAmlCredit.getProcessCount());
+				
+//				occursList.putParam("oDataDt", txAmlCredit.getDataDt());
+//				occursList.putParam("oCustKey", txAmlCredit.getCustKey());
+//				occursList.putParam("oRRSeq", txAmlCredit.getRRSeq());
+//				occursList.putParam("oReviewType", txAmlCredit.getReviewType());
+////				occursList.putParam("oUnit", txAmlCredit.getUnit());
+//				occursList.putParam("oUnitItem", getUnitItem(txAmlCredit.getUnit().trim(), titaVo));
+//				occursList.putParam("oIsStatus", txAmlCredit.getIsStatus());
+////				this.info("txAmlCredit.ProcessType="+txAmlCredit.getProcessType());
+//				occursList.putParam("oProcessType", txAmlCredit.getProcessType());
+//				occursList.putParam("oProcessCount", txAmlCredit.getProcessCount());
 
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);

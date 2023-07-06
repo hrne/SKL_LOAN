@@ -47,7 +47,7 @@ public class L9130 extends TradeBuffer {
 	@Autowired
 	private L9138 tranL9138;
 	@Autowired
-	private L9138 tranL9139;
+	private L9139 tranL9139;
 
 	@Autowired
 	private WebClient webClient;

@@ -3,11 +3,14 @@ package com.st1.itx.db.repository.hist;
 
 import java.util.Optional;
 
+import java.math.BigDecimal;
+import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,6 +66,9 @@ public interface NegTransRepositoryHist extends JpaRepository<NegTrans, NegTrans
 
   // AcDate =, AND TitaTxtNo =
   public Slice<NegTrans> findAllByAcDateIsAndTitaTxtNoIs(int acDate_0, int titaTxtNo_1, Pageable pageable);
+
+  // CustNo = , AND CaseSeq =
+  public Slice<NegTrans> findAllByCustNoIsAndCaseSeqIsOrderByCaseSeqDescAcDateDesc(int custNo_0, int caseSeq_1, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

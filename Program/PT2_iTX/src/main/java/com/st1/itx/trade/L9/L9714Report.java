@@ -11,9 +11,13 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.CustNotice;
+import com.st1.itx.db.domain.CustNoticeId;
+import com.st1.itx.db.service.CustNoticeService;
 import com.st1.itx.db.service.springjpa.cm.L9714ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
+import com.st1.itx.util.parse.Parse;
 
 @Component
 @Scope("prototype")
@@ -22,6 +26,12 @@ public class L9714Report extends MakeReport {
 
 	@Autowired
 	L9714ServiceImpl l9714ServiceImpl;
+	
+	@Autowired
+	private CustNoticeService sCustNoticeService;
+
+	@Autowired
+	private Parse parse;
 
 	String f0 = "";
 	String f1 = "";
@@ -159,6 +169,28 @@ public class L9714Report extends MakeReport {
 		if (l9714List.size() > 0) {
 			for (Map<String, String> tL9714Vo : l9714List) {
 
+				
+				int custNo = parse.stringToInteger(tL9714Vo.get("F2"));
+				int facmNo = parse.stringToInteger(tL9714Vo.get("F3"));
+
+				CustNotice lCustNotice = new CustNotice();
+				CustNoticeId lCustNoticeId = new CustNoticeId();
+
+				lCustNoticeId.setCustNo(custNo);
+				lCustNoticeId.setFacmNo(facmNo);
+				lCustNoticeId.setFormNo("L9714");
+			
+				lCustNotice = sCustNoticeService.findById(lCustNoticeId, titaVo);
+
+				// paper為N 表示不印
+				if (lCustNotice == null) {
+				} else {
+					if ("N".equals(lCustNotice.getPaperNotice())) {
+						continue;
+					}
+				}
+				
+				
 				if (!tL9714Vo.get("F3").equals(f3)) {
 
 					f0 = tL9714Vo.get("F0").isEmpty() ? " " : tL9714Vo.get("F0");

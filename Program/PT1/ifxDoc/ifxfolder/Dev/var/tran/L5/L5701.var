@@ -346,7 +346,7 @@ SHOW(#BTNJ,#BTNL)
 IF(#Status=="0",SHOW(#BTND,#BTNF,#BTNG,#BTNH,#BTNI),$)
 IF(#Status=="2",SHOW(#BTNE),$)
 IF(#Status=="4",SHOW(#BTNF),$)
-IF(#CaseKindCode==1,HIDE(#BTND,#BTNG,#BTNI),$)
+!IF(#CaseKindCode==1,HIDE(#BTND,#BTNG,#BTNI),$)
 IF(#TwoStepCode=="N",HIDE(#BTNI),$)
 IF(#IsMainFin=="N",HIDE(#BTND,#BTNJ),$)
 
@@ -743,7 +743,7 @@ IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=
 @IF(#TotalContrAmt<#DueAmt,V(P,金額有誤),$)
 IF(#FunctionCode=="02",C(3,#L5r01TotalContrAmt,#L5r01PrincipalBal,$,C(3,#TotalContrAmt,#L5r01TotalContrAmt,$,V(P,總本金餘額已異動，不可修改簽約總金額))),$)
 IF(#IsMainFin=="N",s,$)
-IF(#FunctionCode=="02",IF(#CaseKindCode=="1",C(3,#TotalContrAmt,#L5r01TotalContrAmt,$,V(P,案件種類為債協，不可修改簽約總金額)),$),$)
+!IF(#FunctionCode=="02",IF(#CaseKindCode=="1",C(3,#TotalContrAmt,#L5r01TotalContrAmt,$,V(P,案件種類為債協，不可修改簽約總金額)),$),$)
 IF(#FunctionCode=="02",C(3,#L5r01TotalContrAmt,#RimContractAmtX,$,C(3,#TotalContrAmt,#L5r01TotalContrAmt,$,V(P,已註銷過債權機構，不可修改簽約總金額))),$)
 
 

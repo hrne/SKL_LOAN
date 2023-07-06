@@ -207,6 +207,9 @@ T(H,#OCustLoanKind,#CustLoanKindHelp)
 #OCustStatusX=X,6,L
 T(H,#OCustStatus,#StatusHelp)
 
+#OAccuOverX=X,12,L
+IF(#OCustStatus==1,T(2,前累溢收金額),T(2,累溢收金額))
+
 ! 累新壽分攤金額
 #OAccuSklShareAmt=m,14,L
 ! ------HEADER------
@@ -327,7 +330,7 @@ TXFORM=L5971
 ["案件序號：",#OCaseSeq],
 ["案件種類：",#OCaseKindCodeX],["債權戶別：",#OCustLoanKindX],["借戶狀態：",#OCustStatusX],
 ["總本金餘額：",#OMainPrincipalBal],["累繳金額：",#OAccuTempAmt],
-["累溢收金額：",#OAccuOverAmt],["累期款金額：",#OAccuDueAmt],["累新壽分攤金額：",#OAccuSklShareAmt],
+[#OAccuOverX,#OAccuOverAmt],["累期款金額：",#OAccuDueAmt],["累新壽分攤金額：",#OAccuSklShareAmt],
 ["期款：",#ODueAmt],["尚餘期數：",#ORemainPeriod],
 ]
 </sub>

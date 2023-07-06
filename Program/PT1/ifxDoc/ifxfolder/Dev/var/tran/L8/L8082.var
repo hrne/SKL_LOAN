@@ -90,6 +90,7 @@ T(1,@AcDate2,#NTXBUF,13,7)
 T(1,@AutoSubmit,#NTXBUF,20,1)
 !T(2,@FKEY,7)
 
+
 #TF=X,1,S
 C(3,#CHAIN,1,T(F,@ReviewType,0),T(F,@ReviewType,1))
 C(3,#CHAIN,1,T(3,@FdReviewType, ),T(3,@FdReviewType,*))
@@ -249,8 +250,9 @@ T(2,#TLRNO)
 #LogFlag=X,1,S
 T(3,B)
 
-#oBUF2a=x,36,S
-T(2,#oDataDt+#oCustKey+#oRRSeq+#oReviewType+#oUnit+#oIsStatus)
+#oBUF2a=x,2000,S
+! T(2,#oDataDt+#oCustKey+#oRRSeq+#oReviewType+#oUnit+#oIsStatus)
+T(2,#oDataDt+#oCustKey+#oRRSeq+#oReviewType+#oUnit+#oUnitItem+#oIsStatus+#oProcessType+#oProcessCount)
 
 #oBUF2b=x,1000,S
 T(6A,#DataDt+#CustKey+#ProcessDate+#ProcessTlrNo+#ProcessNote+#LogFlag+#BatchNo+#ReviewTypeX)
@@ -273,7 +275,7 @@ BIND(grid,{cmd=CHAIN;ntxcd=L8084;text=#oProcessCount;ntxbuf=#oBUF2c;visible=#oBT
 #L8100=X,5,S
 T(3,L8100)
 
-!! ---------------- batch variables -------------------------------
+! ---------------- batch variables -------------------------------
 
 #batch-detail=x,100000,S
 
@@ -300,7 +302,7 @@ T(3,L8100)
 
 !! ------- end of batch variables   -------------
 
-					
+<include src="ROM.icf::L8R53.dec"/>					
 </sub>
 
 
@@ -322,12 +324,14 @@ TXFORM=L8082
 #oCustKey
 #oRRSeq
 #oReviewType
+#oUnit
 #oUnitItem
 #oIsStatus
 #oProcessType
 #oProcessCount
 ^
 <include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L8R53.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 

@@ -150,6 +150,7 @@ public class LQ007Report extends MakeReport {
 
 				BigDecimal tmpBalSum = BigDecimal.ZERO;
 
+				BigDecimal intSum = BigDecimal.ZERO;
 				// 餘額
 				colBal = colBal + 2;
 				// 利收
@@ -175,7 +176,7 @@ public class LQ007Report extends MakeReport {
 					int visibleMonth = parse.stringToInteger(r.get("VisibleMonth"));
 					String prodNo = "";
 					BigDecimal balSum = BigDecimal.ZERO;
-					BigDecimal intSum = BigDecimal.ZERO;
+
 					int tmpYear = visibleMonth / 100;
 					int tmpMonth = visibleMonth % 100;
 					this.info("endY = " + endY);
@@ -186,12 +187,18 @@ public class LQ007Report extends MakeReport {
 					if (endY > tmpYear && tmpMonth != 12) {
 						continue;
 					}
+					
+					//每次遇到3月份利息收入重新計算
+					if (visibleMonth == 3) {
+						intSum = BigDecimal.ZERO;
+					}
+
+					intSum = intSum.add(getBigDecimal(r.get("IntSum")));
 
 					if (y == visibleMonth) {
 
 						prodNo = r.get("ProdNoShow");
 						balSum = getBigDecimal(r.get("BalSum"));
-						intSum = getBigDecimal(r.get("IntSum"));
 
 						// AA=>首次購物貸款
 						if ("AA".equals(prodNo)) {

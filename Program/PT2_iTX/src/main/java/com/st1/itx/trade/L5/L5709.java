@@ -211,6 +211,7 @@ public class L5709 extends TradeBuffer {
 						if (NegAppr01UpdVO != null) {
 							BigDecimal ApprAmt = new BigDecimal(Detail[7]);// 撥付金額
 							BigDecimal Hund = new BigDecimal(100);// 撥付金額
+							BigDecimal AccuApprAmt = NegAppr01UpdVO.getAccuApprAmt();// 累計撥付金額
 							ApprAmt = ApprAmt.divide(Hund);
 							this.info("ApprAmt==" + ApprAmt);
 							String ReplyCode = Detail[11];// 回應代碼
@@ -225,6 +226,11 @@ public class L5709 extends TradeBuffer {
 									}
 									NegAppr01UpdVO.setBringUpDate(IntBringUpDate);// 提兌日
 									NegAppr01UpdVO.setReplyCode(ReplyCode);// 回應代碼
+									//2023/7/5:撥付失敗時倒扣累計撥付金額
+									if(!"4001".equals(ReplyCode)) {
+										NegAppr01UpdVO.setAccuApprAmt(AccuApprAmt.subtract(ApprAmt));
+									}
+									
 								} else {
 									// 撥付日期
 									throw new LogicException(titaVo, "", "流程有誤,請查驗.[撥付傳票日]為空值.請確認是否已做過撥付出帳!");
@@ -234,6 +240,10 @@ public class L5709 extends TradeBuffer {
 								// 訂正
 								NegAppr01UpdVO.setBringUpDate(0);// 提兌日
 								NegAppr01UpdVO.setReplyCode("");// 回應代碼
+								//2023/7/5:訂正須加回累計撥付金額
+								if(!"4001".equals(ReplyCode)) {
+									NegAppr01UpdVO.setAccuApprAmt(AccuApprAmt.add(ApprAmt));
+								}
 							}
 
 							try {

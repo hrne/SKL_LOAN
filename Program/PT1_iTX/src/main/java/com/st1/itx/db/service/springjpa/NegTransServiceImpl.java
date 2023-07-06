@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -495,6 +498,34 @@ em = null;
       slice = negTransReposHist.findAllByAcDateIsAndTitaTxtNoIs(acDate_0, titaTxtNo_1, pageable);
     else 
       slice = negTransRepos.findAllByAcDateIsAndTitaTxtNoIs(acDate_0, titaTxtNo_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<NegTrans> custAndCaseSeq(int custNo_0, int caseSeq_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<NegTrans> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("custAndCaseSeq " + dbName + " : " + "custNo_0 : " + custNo_0 + " caseSeq_1 : " +  caseSeq_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = negTransReposDay.findAllByCustNoIsAndCaseSeqIsOrderByCaseSeqDescAcDateDesc(custNo_0, caseSeq_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = negTransReposMon.findAllByCustNoIsAndCaseSeqIsOrderByCaseSeqDescAcDateDesc(custNo_0, caseSeq_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = negTransReposHist.findAllByCustNoIsAndCaseSeqIsOrderByCaseSeqDescAcDateDesc(custNo_0, caseSeq_1, pageable);
+    else 
+      slice = negTransRepos.findAllByCustNoIsAndCaseSeqIsOrderByCaseSeqDescAcDateDesc(custNo_0, caseSeq_1, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
