@@ -252,7 +252,7 @@ public class LQ007Report extends MakeReport {
 
 						}
 						// ID IE => ID
-						if (prodNo.matches("ID")) {
+						if ("ID".equals(prodNo)) {
 							iaiiBalTotal = BigDecimal.ZERO;
 							iaiiBalTotal = iaiiBalTotal.add(balSum);
 							makeExcel.setValue(9, colBal, formatAmt(iaiiBalTotal, 3, 8));
@@ -265,7 +265,7 @@ public class LQ007Report extends MakeReport {
 
 						}
 						// IF IG=>IF
-						if (prodNo.matches("IF")) {
+						if ("IF".equals(prodNo)) {
 							iaiiBalTotal = BigDecimal.ZERO;
 							iaiiBalTotal = iaiiBalTotal.add(balSum);
 							makeExcel.setValue(10, colBal, formatAmt(iaiiBalTotal, 3, 8));
@@ -278,7 +278,7 @@ public class LQ007Report extends MakeReport {
 
 						}
 						// IH II=>IH
-						if (prodNo.matches("IH")) {
+						if ("IH".equals(prodNo)) {
 							iaiiBalTotal = BigDecimal.ZERO;
 							iaiiBalTotal = iaiiBalTotal.add(balSum);
 							makeExcel.setValue(11, colBal, formatAmt(iaiiBalTotal, 3, 8));

@@ -159,7 +159,7 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       	  WHEN M.\"ProdNo\" BETWEEN '81' AND '83'";
 		sql += "		  THEN '921' ";
 		sql += "		ELSE '0' END AS \"Type\"";
-		sql += "       ,\"LoanBalance\" AS \"LoanBal\" ";
+		sql += "       ,\"LoanBalance\" - DECODE(M.\"AcctCode\",'990',M.\"IntAmtRcv\",0) AS \"LoanBal\" ";
 		sql += " FROM \"MonthlyLoanBal\" M ";
 		sql += " LEFT JOIN \"FacMain\" FA  ON FA.\"CustNo\" = M.\"CustNo\"";
 		sql += "                          AND FA.\"FacmNo\" = M.\"FacmNo\"";
@@ -187,7 +187,7 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       	  WHEN M.\"ProdNo\" BETWEEN '81' AND '83'";
 		sql += "		  THEN '921' ";
 		sql += "		ELSE '0' END AS \"Type\"";
-		sql += "       ,\"LoanBalance\" AS \"LoanBal\" ";
+		sql += "       ,\"LoanBalance\" - DECODE(M.\"AcctCode\",'990',M.\"IntAmtRcv\",0) AS \"LoanBal\" ";
 		sql += " FROM \"MonthlyLoanBal\" M ";
 		sql += " LEFT JOIN \"FacMain\" FA  ON FA.\"CustNo\" = M.\"CustNo\"";
 		sql += "                          AND FA.\"FacmNo\" = M.\"FacmNo\"";

@@ -19,10 +19,14 @@ import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.parse.Parse;
 import com.st1.itx.db.domain.TxAmlCredit;
 import com.st1.itx.db.service.TxAmlCreditService;
-
+import com.st1.itx.db.domain.CdArea;
+import com.st1.itx.db.domain.CdAreaId;
 import com.st1.itx.db.domain.CdBcm;
+import com.st1.itx.db.domain.CdCity;
 import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.service.CdAreaService;
 import com.st1.itx.db.service.CdBcmService;
+import com.st1.itx.db.service.CdCityService;
 import com.st1.itx.db.service.CustMainService;
 
 @Service("L8081")
@@ -47,6 +51,12 @@ public class L8081 extends TradeBuffer {
 
 	@Autowired
 	CustMainService sCustMainService;
+	
+	@Autowired
+	public CdAreaService cdAreaService;
+
+	@Autowired
+	public CdCityService cdCityService;
 
 	@Autowired
 	Parse parse;
@@ -227,10 +237,54 @@ public class L8081 extends TradeBuffer {
 					if (iCustName.isEmpty()) {
 						iCustName = " ";
 					}
+					
+					String currAddress = "";
+					if (!"".equals(sCustMain2.getCurrCityCode())) {
+						CdCity cdCity = cdCityService.findById(sCustMain2.getCurrCityCode(), titaVo);
+						if (cdCity != null) {
+							currAddress += cdCity.getCityItem();
 
+							if (!"".equals(sCustMain2.getCurrAreaCode())) {
+								CdAreaId cdAreaId = new CdAreaId();
+								cdAreaId.setCityCode(sCustMain2.getCurrCityCode());
+								cdAreaId.setAreaCode(sCustMain2.getCurrAreaCode());
+								CdArea cdArea = cdAreaService.findById(cdAreaId, titaVo);
+								if (cdArea != null) {
+									currAddress += cdArea.getAreaItem();
+								}
+							}
+						}
+					}
+					
+					
+					currAddress += sCustMain2.getCurrRoad();
+					if (!"".equals(sCustMain2.getCurrSection())) {
+						currAddress += sCustMain2.getCurrSection() + "段";
+					}
+					if (!"".equals(sCustMain2.getCurrAlley())) {
+						currAddress += sCustMain2.getCurrAlley() + "巷";
+					}
+					if (!"".equals(sCustMain2.getCurrLane())) {
+						currAddress += sCustMain2.getCurrLane() + "弄";
+					}
+					if (!"".equals(sCustMain2.getCurrNum())) {
+						currAddress += sCustMain2.getCurrNum() + "號";
+					}
+					String numDash = "";
+					if (!"".equals(sCustMain2.getCurrNumDash())) {
+						currAddress += "-" + sCustMain2.getCurrNumDash();
+						numDash = "，";
+					}
+					if (!"".equals(sCustMain2.getCurrFloor())) {
+						currAddress += numDash + sCustMain2.getCurrFloor() + "樓";
+					}
+					if (!"".equals(sCustMain2.getCurrFloorDash())) {
+						currAddress += "-" + sCustMain2.getCurrFloorDash();
+					}
 					makeExcel.setValue(row, 1, iCurrZip3 + "-" + iCurrZip2);
-					makeExcel.setValue(row, 2, iCurrCityCode + iCurrAreaCode + iCurrRoad + iCurrSection + iCurrAlley
-							+ iCurrLane + iCurrNum + iCurrNumDash + iCurrFloor + iCurrFloorDash);
+//					makeExcel.setValue(row, 2, iCurrCityCode + iCurrAreaCode + iCurrRoad + iCurrSection + iCurrAlley
+//							+ iCurrLane + iCurrNum + iCurrNumDash + iCurrFloor + iCurrFloorDash);
+					makeExcel.setValue(row, 2, currAddress);
 					makeExcel.setValue(row, 3, iCustName);
 
 				}

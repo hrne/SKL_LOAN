@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -756,20 +759,20 @@ em = null;
   }
 
   @Override
-  public InsuRenew findNowInsuNoFirst(int custNo_0, int facmNo_1, String nowInsuNo_2, TitaVo... titaVo) {
+  public InsuRenew findNowInsuNoFirst(String nowInsuNo_0, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("findNowInsuNoFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " nowInsuNo_2 : " +  nowInsuNo_2);
+    this.info("findNowInsuNoFirst " + dbName + " : " + "nowInsuNo_0 : " + nowInsuNo_0);
     Optional<InsuRenew> insuRenewT = null;
     if (dbName.equals(ContentName.onDay))
-      insuRenewT = insuRenewReposDay.findTopByCustNoIsAndFacmNoIsAndNowInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(custNo_0, facmNo_1, nowInsuNo_2);
+      insuRenewT = insuRenewReposDay.findTopByNowInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(nowInsuNo_0);
     else if (dbName.equals(ContentName.onMon))
-      insuRenewT = insuRenewReposMon.findTopByCustNoIsAndFacmNoIsAndNowInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(custNo_0, facmNo_1, nowInsuNo_2);
+      insuRenewT = insuRenewReposMon.findTopByNowInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(nowInsuNo_0);
     else if (dbName.equals(ContentName.onHist))
-      insuRenewT = insuRenewReposHist.findTopByCustNoIsAndFacmNoIsAndNowInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(custNo_0, facmNo_1, nowInsuNo_2);
+      insuRenewT = insuRenewReposHist.findTopByNowInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(nowInsuNo_0);
     else 
-      insuRenewT = insuRenewRepos.findTopByCustNoIsAndFacmNoIsAndNowInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(custNo_0, facmNo_1, nowInsuNo_2);
+      insuRenewT = insuRenewRepos.findTopByNowInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(nowInsuNo_0);
 
     return insuRenewT.isPresent() ? insuRenewT.get() : null;
   }

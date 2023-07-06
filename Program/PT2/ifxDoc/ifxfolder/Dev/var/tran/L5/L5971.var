@@ -326,15 +326,14 @@ TXFORM=L5971
 <sub type="PART" prompt='{{#SCRTIL}} world' name="L5971" layout="cols=4;screen.width=[250,250,250,250];order=1;">
 [
 ["[L5971                                 債務協商交易資料查詢"],
-["戶號：",#OCustNo],
-["案件序號：",#OCaseSeq],
-["案件種類：",#OCaseKindCodeX],["債權戶別：",#OCustLoanKindX],["借戶狀態：",#OCustStatusX],
-["總本金餘額：",#OMainPrincipalBal],["累繳金額：",#OAccuTempAmt],
-[#OAccuOverX,#OAccuOverAmt],["累期款金額：",#OAccuDueAmt],["累新壽分攤金額：",#OAccuSklShareAmt],
-["期款：",#ODueAmt],["尚餘期數：",#ORemainPeriod],
+["戶號：",#OCustNo],["@案件序號：",#OCaseSeq],
+["案件種類：",#OCaseKindCodeX],["@債權戶別：",#OCustLoanKindX],
+["借戶狀態：",#OCustStatusX],["@總本金餘額：",#OMainPrincipalBal],
+["累繳金額：",#OAccuTempAmt],[#OAccuOverX,#OAccuOverAmt],
+["累期款金額：",#OAccuDueAmt],["@累新壽分攤金額：",#OAccuSklShareAmt],
+["期款：",#ODueAmt],["@尚餘期數：",#ORemainPeriod],
 ]
 </sub>
-
 
 <sub type="SELECT">
 #RPTFG=0,QUERY.GRID,L5971

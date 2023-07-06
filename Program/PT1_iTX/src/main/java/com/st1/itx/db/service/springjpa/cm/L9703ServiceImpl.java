@@ -47,10 +47,10 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if ("1".equals(unpay)) {
 			st = parse.stringToInteger(titaVo.getParam("UnpaidTermSt"));
 			ed = parse.stringToInteger(titaVo.getParam("UnpaidTermEd"));
-		} else if("L4703".equals(titaVo.getTxcd())){
-			st = 0;
-			ed = 9999;
-		}else {
+		} else if ("2".equals(unpay)) {
+			st = parse.stringToInteger(titaVo.getParam("UnpaidDaySt"));
+			ed = parse.stringToInteger(titaVo.getParam("UnpaidDayEd"));
+		} else {
 			st = parse.stringToInteger(titaVo.getParam("UnpaidDaySt"));
 			ed = parse.stringToInteger(titaVo.getParam("UnpaidDayEd"));
 		}
@@ -177,7 +177,7 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 				condition += "  AND  F.\"FacmNo\" = :ifacmno";
 			}
 		}
-		// 逾期數
+		// 滯繳期數
 		if ("1".equals(unpay)) {
 			condition += " AND CASE L.\"SpecificDd\" ";
 			condition += "     WHEN  0 ";
@@ -186,11 +186,14 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 			condition += "           TRUNC(MONTHS_BETWEEN(TO_DATE(:entryDate,'YYYYMMDD'), TO_DATE(19110100 + L.\"SpecificDd\", 'YYYYMMDD'))) ";
 			condition += "         - TRUNC(MONTHS_BETWEEN(TO_DATE(L.\"NextPayIntDate\",'YYYYMMDD'), TO_DATE(19110100 + L.\"SpecificDd\", 'YYYYMMDD'))) ";
 			condition += "     END BETWEEN :st AND :ed ";
-		} else {
-
+		//滯繳日數
+		} else if ("2".equals(unpay)) {
 			condition += "  AND (TO_DATE(:entryDate,'YYYYMMDD')  - TO_DATE(L.\"NextPayIntDate\",'YYYYMMDD'))  BETWEEN :st AND :ed ";
-
+		//L4703 滯繳日數
+		} else {
+			condition += "  AND (TO_DATE(:entryDate,'YYYYMMDD')  - TO_DATE(L.\"NextPayIntDate\",'YYYYMMDD'))  BETWEEN :st AND :ed ";
 		}
+
 		// repay == 0 時不篩選,
 		// repay == 9 時 篩選 RepayCode = 5,6,7,8
 		// else 篩選 RepayCode = repay

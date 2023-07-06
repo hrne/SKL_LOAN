@@ -67,7 +67,6 @@ public class L4610 extends TradeBuffer {
 	public InsuRenewService insuRenewService;
 
 	private Boolean typeInFlag = true;
-	private BigDecimal totPrem = BigDecimal.ZERO;
 
 	private boolean isEloan = false;
 
@@ -115,103 +114,45 @@ public class L4610 extends TradeBuffer {
 		if (iFunctionCode.equals("1")) {
 
 //			QC360.若需新增一筆批單號碼，於此交易新增
-//			1.檢核批單號碼是否存在，不存在提錯誤
-//			2.若存在若在renew則建在renew，orig則建在orig
-
-//			已輸入批單號碼
+//			檢核批單的保單號碼是否存在，不存在提錯誤
+//			輸入批單號碼
 			if (typeInFlag) {
-				InsuRenew tOldInsuRenew = insuRenewService.findL4600AFirst(clCode1, clCode2, clNo, origInsuNo, titaVo);
-				InsuRenew tNewInsuRenew = new InsuRenew();
-				InsuRenewId tInsuRenewId = new InsuRenewId();
-				if (tOldInsuRenew != null && !isEloan) {
-					tInsuRenewId.setClCode1(clCode1);
-					tInsuRenewId.setClCode2(clCode2);
-					tInsuRenewId.setClNo(clNo);
-					tInsuRenewId.setPrevInsuNo(tOldInsuRenew.getPrevInsuNo());
-					tInsuRenewId.setEndoInsuNo(endoInsuNo);
-					tInsuRenewId.setInsuYearMonth(tOldInsuRenew.getInsuYearMonth());
-					tNewInsuRenew.setInsuRenewId(tInsuRenewId);
-					tNewInsuRenew.setCustNo(tOldInsuRenew.getCustNo());
-					tNewInsuRenew.setFacmNo(tOldInsuRenew.getFacmNo());
-					tNewInsuRenew.setInsuYearMonth(tOldInsuRenew.getInsuYearMonth());
-					tNewInsuRenew.setNowInsuNo(tOldInsuRenew.getNowInsuNo());
-					tNewInsuRenew.setOrigInsuNo(tOldInsuRenew.getOrigInsuNo());
-					tNewInsuRenew.setRenewCode(1); // 1.自保
-					tNewInsuRenew.setInsuCompany(tOldInsuRenew.getInsuCompany());
-					tNewInsuRenew.setInsuTypeCode(tOldInsuRenew.getInsuTypeCode());
-					tNewInsuRenew.setRepayCode(tOldInsuRenew.getRepayCode());
-					tNewInsuRenew.setFireInsuCovrg(parse.stringToBigDecimal(titaVo.getParam("FireInsuCovrg")));
-					tNewInsuRenew.setFireInsuPrem(parse.stringToBigDecimal(titaVo.getParam("FireInsuPrem")));
-					tNewInsuRenew.setEthqInsuCovrg(parse.stringToBigDecimal(titaVo.getParam("EthqInsuCovrg")));
-					tNewInsuRenew.setEthqInsuPrem(parse.stringToBigDecimal(titaVo.getParam("EthqInsuPrem")));
-					tNewInsuRenew.setInsuStartDate(parse.stringToInteger(titaVo.getParam("InsuStartDate")));
-					tNewInsuRenew.setInsuEndDate(parse.stringToInteger(titaVo.getParam("InsuEndDate")));
-					tNewInsuRenew.setCommericalFlag(titaVo.getParam("CommericalFlag").trim());
-					tNewInsuRenew.setRemark(titaVo.getParam("Remark").trim());
-					tNewInsuRenew.setInsuReceiptDate(parse.stringToInteger(titaVo.getParam("InsuReceiptDate"))); //保單收件日
-					
-					
-					if (parse.stringToInteger(titaVo.getParam("InsuEndDate")) != tOldInsuRenew.getInsuEndDate()) {
-						throw new LogicException(titaVo, "E0007", "L4610 登打批單號碼時，保險迄日需相同");
-					}
+				InsuOrignalId tOldInsuOrignalId = new InsuOrignalId();
+				InsuOrignal tOldInsuOrignal = new InsuOrignal();
+				InsuOrignal tNewInsuOrignal = new InsuOrignal();
 
-					tNewInsuRenew.setAcDate(tOldInsuRenew.getAcDate());
-					tNewInsuRenew.setTitaTlrNo(this.getTxBuffer().getTxCom().getRelTlr());
-					tNewInsuRenew.setTitaTxtNo("" + this.getTxBuffer().getTxCom().getRelTno());
-					tNewInsuRenew.setNotiTempFg("");
-					tNewInsuRenew.setStatusCode(0);
-					tNewInsuRenew.setOvduDate(0);
-					tNewInsuRenew.setOvduNo(BigDecimal.ZERO);
+				tOldInsuOrignalId.setClCode1(clCode1);
+				tOldInsuOrignalId.setClCode2(clCode2);
+				tOldInsuOrignalId.setClNo(clNo);
+				tOldInsuOrignalId.setOrigInsuNo(origInsuNo);
+				tOldInsuOrignalId.setEndoInsuNo(" ");
 
-					totPrem = parse.stringToBigDecimal(titaVo.getParam("FireInsuPrem"))
-							.add(parse.stringToBigDecimal(titaVo.getParam("EthqInsuPrem")));
+				tOldInsuOrignal = insuOrignalService.findById(tOldInsuOrignalId, titaVo);
+				if (tOldInsuOrignal == null) {
+					throw new LogicException(titaVo, "E0015", "L4610 登打批單號碼時，需先有此保單號碼"); // 檢查錯誤
+				}
 
-					tNewInsuRenew.setTotInsuPrem(totPrem);
+				tNewInsuOrignal.setInsuOrignalId(tInsuOrignalId);
 
-					try {
-						// 送出到DB
-						insuRenewService.insert(tNewInsuRenew, titaVo);
-					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0007", "L4611 InsuRenew insert " + e.getErrorMsg());
-					}
-				} else {
-					InsuOrignalId tOldInsuOrignalId = new InsuOrignalId();
-					InsuOrignal tOldInsuOrignal = new InsuOrignal();
-					InsuOrignal tNewInsuOrignal = new InsuOrignal();
+				tNewInsuOrignal.setInsuCompany(titaVo.getParam("InsuCompany").trim());
+				tNewInsuOrignal.setInsuTypeCode(titaVo.getParam("InsuTypeCode").trim());
+				tNewInsuOrignal.setFireInsuCovrg(parse.stringToBigDecimal(titaVo.getParam("FireInsuCovrg").trim()));
+				tNewInsuOrignal.setEthqInsuCovrg(parse.stringToBigDecimal(titaVo.getParam("EthqInsuCovrg").trim()));
+				tNewInsuOrignal.setFireInsuPrem(parse.stringToBigDecimal(titaVo.getParam("FireInsuPrem").trim()));
+				tNewInsuOrignal.setEthqInsuPrem(parse.stringToBigDecimal(titaVo.getParam("EthqInsuPrem").trim()));
+				tNewInsuOrignal.setInsuStartDate(parse.stringToInteger(titaVo.getParam("InsuStartDate").trim()));
+				tNewInsuOrignal.setInsuEndDate(parse.stringToInteger(titaVo.getParam("InsuEndDate").trim()));
+				tNewInsuOrignal.setCommericalFlag(titaVo.getParam("CommericalFlag").trim());
+				tNewInsuOrignal.setRemark(titaVo.getParam("Remark").trim());
+				tNewInsuOrignal.setInsuReceiptDate(parse.stringToInteger(titaVo.getParam("InsuReceiptDate"))); // 保單收件日
+				if (parse.stringToInteger(titaVo.getParam("InsuEndDate")) != tOldInsuOrignal.getInsuEndDate()) {
+					throw new LogicException(titaVo, "E0015", "L4610 登打批單號碼時，保險迄日需相同");
+				}
 
-					tOldInsuOrignalId.setClCode1(clCode1);
-					tOldInsuOrignalId.setClCode2(clCode2);
-					tOldInsuOrignalId.setClNo(clNo);
-					tOldInsuOrignalId.setOrigInsuNo(origInsuNo);
-					tOldInsuOrignalId.setEndoInsuNo(" ");
-
-					tOldInsuOrignal = insuOrignalService.findById(tOldInsuOrignalId, titaVo);
-					if (tOldInsuOrignal == null) {
-						throw new LogicException(titaVo, "E0005", "L4610 登打批單號碼時，需先有此保單號碼");
-					}
-
-					tNewInsuOrignal.setInsuOrignalId(tInsuOrignalId);
-
-					tNewInsuOrignal.setInsuCompany(titaVo.getParam("InsuCompany").trim());
-					tNewInsuOrignal.setInsuTypeCode(titaVo.getParam("InsuTypeCode").trim());
-					tNewInsuOrignal.setFireInsuCovrg(parse.stringToBigDecimal(titaVo.getParam("FireInsuCovrg").trim()));
-					tNewInsuOrignal.setEthqInsuCovrg(parse.stringToBigDecimal(titaVo.getParam("EthqInsuCovrg").trim()));
-					tNewInsuOrignal.setFireInsuPrem(parse.stringToBigDecimal(titaVo.getParam("FireInsuPrem").trim()));
-					tNewInsuOrignal.setEthqInsuPrem(parse.stringToBigDecimal(titaVo.getParam("EthqInsuPrem").trim()));
-					tNewInsuOrignal.setInsuStartDate(parse.stringToInteger(titaVo.getParam("InsuStartDate").trim()));
-					tNewInsuOrignal.setInsuEndDate(parse.stringToInteger(titaVo.getParam("InsuEndDate").trim()));
-					tNewInsuOrignal.setCommericalFlag(titaVo.getParam("CommericalFlag").trim());
-					tNewInsuOrignal.setRemark(titaVo.getParam("Remark").trim());
-					tNewInsuOrignal.setInsuReceiptDate(parse.stringToInteger(titaVo.getParam("InsuReceiptDate"))); //保單收件日
-					if (parse.stringToInteger(titaVo.getParam("InsuEndDate")) != tOldInsuOrignal.getInsuEndDate()) {
-						throw new LogicException(titaVo, "E0007", "L4610 登打批單號碼時，保險迄日需相同");
-					}
-
-					try {
-						insuOrignalService.insert(tNewInsuOrignal, titaVo);
-					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0005", "L4610 InsuOrignal insert " + e.getErrorMsg());
-					}
+				try {
+					insuOrignalService.insert(tNewInsuOrignal, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0005", "L4610 InsuOrignal insert " + e.getErrorMsg());
 				}
 //			未輸入批單號碼
 			} else {
@@ -227,14 +168,16 @@ public class L4610 extends TradeBuffer {
 				tInsuOrignal.setInsuEndDate(parse.stringToInteger(titaVo.getParam("InsuEndDate").trim()));
 				tInsuOrignal.setCommericalFlag(titaVo.getParam("CommericalFlag").trim());
 				tInsuOrignal.setRemark(titaVo.getParam("Remark").trim());
-				tInsuOrignal.setInsuReceiptDate(parse.stringToInteger(titaVo.getParam("InsuReceiptDate"))); //保單收件日
+				tInsuOrignal.setInsuReceiptDate(parse.stringToInteger(titaVo.getParam("InsuReceiptDate"))); // 保單收件日
 				try {
 					insuOrignalService.insert(tInsuOrignal, titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0005", "L4610 InsuOrignal insert " + e.getErrorMsg());
 				}
 			}
-		} else if (iFunctionCode.equals("2")) {
+		}
+
+		else if (iFunctionCode.equals("2")) {
 			InsuOrignal editInsuOrignal = insuOrignalService.holdById(tInsuOrignalId, titaVo);
 
 			if (editInsuOrignal == null) {
@@ -250,7 +193,7 @@ public class L4610 extends TradeBuffer {
 			editInsuOrignal.setInsuEndDate(parse.stringToInteger(titaVo.getParam("InsuEndDate").trim()));
 			editInsuOrignal.setCommericalFlag(titaVo.getParam("CommericalFlag").trim());
 			editInsuOrignal.setRemark(titaVo.getParam("Remark").trim());
-			editInsuOrignal.setInsuReceiptDate(parse.stringToInteger(titaVo.getParam("InsuReceiptDate"))); //保單收件日
+			editInsuOrignal.setInsuReceiptDate(parse.stringToInteger(titaVo.getParam("InsuReceiptDate"))); // 保單收件日
 			try {
 				// 送出到DB
 				insuOrignalService.update(editInsuOrignal, titaVo);

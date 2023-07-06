@@ -69,6 +69,22 @@ C(3,#CHAIN,1,T(4,NTXBUF5$),S)
 <include src="ROM.icf::L5R12.dec"/>
 #RimBankCode=X,8,S
 
+!啟用記號使用---
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+#EnableH=X,100,S
+T(3,Y:啟用;N:停用)
+
+#CdEnableFg=x,20,S                  
+T(3,CdCode.EnableFg)   
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CdEnableFg)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@EnableH,#HelpDesc1)
+!啟用記號使用---
+
 ! 債權機構代號
 #FinCode=X,8,I
 IF(#CHAIN==0,$,s)
@@ -132,6 +148,12 @@ E(0,1)ASGN(LOOP$)
 #OODataSendSection=X,8,O
 #OODataSendSectionX=X,120,O
 
+!啟用記號
+#OOEnable=X,1,S
+#OOEnableX=X,6,O
+C(4,#OOEnable,S,$)
+T(H,#OOEnable,#EnableH)
+
 ! [修改]
 #CF1=X,1,S
 T(3,2)
@@ -164,6 +186,8 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L5703; ntxbuf=#OOBuf2})
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
 <include src="ROM.icf::L5R12.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+
 TXFORM=L5974
 #OOFinCode
 #OOFinCodeX
@@ -175,6 +199,7 @@ TXFORM=L5974
 #OORemitAcct4
 #OODataSendSection
 #OODataSendSectionX
+#OOEnable
 ^
 </sub>
 
@@ -212,6 +237,8 @@ TXFORM=L5974
 {width:150,align:'center'}
 #OODataSendSectionX=資料傳送單位
 {width:300,align:'left'}
+#OOEnableX=啟用記號
+{width:100,align:'left'}
 ^
 #RPTFG=2,QUERY.GRID,L5974
 #any={detail:true, header:'L5974.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
@@ -231,6 +258,9 @@ TXFORM=L5974
 {width:150,align:'center'}
 #OODataSendSectionX=資料傳送單位
 {width:300,align:'left'}
+#OOEnableX=啟用記號
+{width:100,align:'left'}
+
 ^
 <include src="PRT.icf::INQ04.sel" map="i=L5974;cpi=15"/>
 #FinCode
@@ -245,5 +275,6 @@ TXFORM=L5974
 #OORemitAcct4
 #OODataSendSection
 #OODataSendSectionX
+#OOEnableX
 @^
 </sub>

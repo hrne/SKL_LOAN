@@ -79,7 +79,7 @@ public interface CdAcCodeService {
   public Slice<CdAcCode> findAcCodeOld(String acNoCodeOld_0, String acNoCodeOld_1, String acSubCode_2, String acSubCode_3, String acDtlCode_4, String acDtlCode_5, int index, int limit, TitaVo... titaVo);
 
   /**
-   * AcNoCode &gt;= ,AND AcNoCode &lt;= ,AND AcSubCode &gt;= ,AND AcSubCode &lt;= ,AND AcDtlCode &gt;= ,AND AcDtlCode &lt;= ,AND AcNoItem %
+   * AcNoCode &gt;= ,AND AcNoCode &lt;= ,AND AcSubCode &gt;= ,AND AcSubCode &lt;= ,AND AcDtlCode &gt;= ,AND AcDtlCode &lt;= ,AND AcNoItem%
    *
    * @param acNoCode_0 acNoCode_0
    * @param acNoCode_1 acNoCode_1
@@ -96,7 +96,7 @@ public interface CdAcCodeService {
   public Slice<CdAcCode> findAcItem(String acNoCode_0, String acNoCode_1, String acSubCode_2, String acSubCode_3, String acDtlCode_4, String acDtlCode_5, String acNoItem_6, int index, int limit, TitaVo... titaVo);
 
   /**
-   * AcNoItem %
+   * AcNoItem%
    *
    * @param acNoItem_0 acNoItem_0
    * @param index Page Index

@@ -3,11 +3,14 @@ package com.st1.itx.db.repository.day;
 
 import java.util.Optional;
 
+import java.math.BigDecimal;
+import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -94,8 +97,8 @@ public interface InsuRenewRepositoryDay extends JpaRepository<InsuRenew, InsuRen
   // ClCode1 = ,AND ClCode2 = ,AND ClNo = ,AND NowInsuNo = 
   public Slice<InsuRenew> findAllByClCode1IsAndClCode2IsAndClNoIsAndNowInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(int clCode1_0, int clCode2_1, int clNo_2, String nowInsuNo_3, Pageable pageable);
 
-  // CustNo = ,AND FacmNo = ,AND NowInsuNo = 
-  public Optional<InsuRenew> findTopByCustNoIsAndFacmNoIsAndNowInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(int custNo_0, int facmNo_1, String nowInsuNo_2);
+  // NowInsuNo = 
+  public Optional<InsuRenew> findTopByNowInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(String nowInsuNo_0);
 
   // CustNo = ,AND FacmNo = ,AND PrevInsuNo = ,AND EndoInsuNo = 
   public Optional<InsuRenew> findTopByCustNoIsAndFacmNoIsAndPrevInsuNoIsAndEndoInsuNoIsOrderByInsuYearMonthDesc(int custNo_0, int facmNo_1, String prevInsuNo_2, String endoInsuNo_3);

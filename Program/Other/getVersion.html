@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>檢查版本</title>
+</head>
+<body>
+    <div id=".8">.8目前版本</div>
+    <div id=".8result"></div>
+
+    <script>
+        (function() {
+            fetch('http://192.168.10.8:7005/iTX/mvc/trade/VS')
+                .then(function(response) {
+                    if (!response.ok) {
+                        throw new Error("HTTP error " + response.status);
+                    }
+                    return response.json(); // 將回應解析成JSON
+                })
+                .then(function(json) {
+                    document.getElementById('.8result').innerText = json.appVersion; // 提取 "appVersion" 的值
+                })
+                .catch(function(error) {
+                    document.getElementById('.8result').innerText = 'An error occurred: ' + error.message;
+                });
+        })();
+    </script>
+</body>
+</html>

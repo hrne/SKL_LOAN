@@ -84,7 +84,7 @@ public class CdAcCode implements Serializable {
   @Column(name = "`ClsChkFlag`")
   private int clsChkFlag = 0;
 
-  // 使用記號
+  // 放款部使用記號
   /* 0:可以使用1:不可使用 */
   @Column(name = "`InuseFlag`")
   private int inuseFlag = 0;
@@ -381,7 +381,7 @@ C:貸(2,3,4,8)
   }
 
 /**
-	* 使用記號<br>
+	* 放款部使用記號<br>
 	* 0:可以使用
 1:不可使用
 	* @return Integer
@@ -391,11 +391,11 @@ C:貸(2,3,4,8)
   }
 
 /**
-	* 使用記號<br>
+	* 放款部使用記號<br>
 	* 0:可以使用
 1:不可使用
   *
-  * @param inuseFlag 使用記號
+  * @param inuseFlag 放款部使用記號
 	*/
   public void setInuseFlag(int inuseFlag) {
     this.inuseFlag = inuseFlag;

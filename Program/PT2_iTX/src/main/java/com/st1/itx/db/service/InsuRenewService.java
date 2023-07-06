@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.InsuRenew;
@@ -335,15 +337,13 @@ public interface InsuRenewService {
   public Slice<InsuRenew> findNowInsuNoEq(int clCode1_0, int clCode2_1, int clNo_2, String nowInsuNo_3, int index, int limit, TitaVo... titaVo);
 
   /**
-   * CustNo = ,AND FacmNo = ,AND NowInsuNo = 
+   * NowInsuNo = 
    *
-   * @param custNo_0 custNo_0
-   * @param facmNo_1 facmNo_1
-   * @param nowInsuNo_2 nowInsuNo_2
+   * @param nowInsuNo_0 nowInsuNo_0
    * @param titaVo Variable-Length Argument
    * @return Slice InsuRenew InsuRenew of List
    */
-  public InsuRenew findNowInsuNoFirst(int custNo_0, int facmNo_1, String nowInsuNo_2, TitaVo... titaVo);
+  public InsuRenew findNowInsuNoFirst(String nowInsuNo_0, TitaVo... titaVo);
 
   /**
    * CustNo = ,AND FacmNo = ,AND PrevInsuNo = ,AND EndoInsuNo = 

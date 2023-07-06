@@ -123,4 +123,57 @@ public class L4600ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
+	public List<Map<String, String>> findL4600(int iInsuEndMonth, TitaVo titaVo) throws Exception {
+		this.info("L4600ServiceImpl findL4600 start");
+
+		String sql = " ";
+		sql += "SELECT  * ";
+		sql += "FROM (";
+		sql += "      SELECT FA.\"CustNo\"             AS \"CustNo\"        "; // -- 戶號
+		sql += "          , FA.\"FacmNo\"              AS \"FacmNo\"        "; // -- 額度
+		sql += "          , FA.\"ApplNo\"              AS \"ApplNo\"        "; // -- 額度
+		sql += "          , FA.\"RepayCode\"           AS \"ApplNo\"        "; // -- 繳款方式
+		sql += "          , IO.\"ClCode1\"             AS \"ClCode1\"       "; // -- 押品別1
+		sql += "          , IO.\"ClCode2\"             AS \"ClCode2\"       "; // -- 押品別1
+		sql += "          , IO.\"ClNo\"                AS \"ClNo\"          "; // -- 押品號碼
+		sql += "          , IO.\"OrigInsuNo\"          AS \"NowInsuNo\"     "; // -- 保單號碼
+		sql += "          , IO.\"InsuEndDate\"         AS \"InsuEndDate\"   "; // -- 保險迄日
+		sql += "          , IO.\"InsuCompany\"         AS \"InsuCompany\"   "; // -- 保險公司
+		sql += "          , IO.\"InsuTypeCode\"        AS \"InsuTypeCode\"  "; // -- 保險類別
+		sql += "          , NVL(IRO.\"OrigInsuNo\",'') AS \"OrigInsuNo\"    "; // -- 原始保險單號碼
+		sql += "          , LM.\"Status\"              AS \"Status\"        ";  
+		sql += "          , LM.\"MaturityDate\"        AS \"MaturityDate\"  ";  
+        sql += "          , row_number() over (partition by IR.\"OrigInsuNo\" order by FA.\"ApplNo\", IR.\"ClCode1\", IR.\"ClCode2\", IR.\"ClNo\" ) as ROWNUMBER ";
+		sql += "     FROM \"InsuOrignal\" IO ";
+		sql += "     LEFT JOIN \"ClFac\" CF ON CF.\"ClCode1\" = IO.\"ClCode1\" ";
+		sql += "                           AND CF.\"ClCode2\" = IO.\"ClCode2\" ";
+		sql += "                           AND CF.\"ClNo\"  = IO.\"ClNo\" ";
+		sql += "     LEFT JOIN \"FacMain\" FA ON FA.\"CustNo\" = CF.\"CustNo\" ";
+		sql += "                             AND FA.\"FacmNo\" = CF.\"FacmNo\" ";
+		sql += "     LEFT JOIN \"LoanBorMain\" LM ON LM.\"CustNo\" = FA.\"CustNo\" ";
+		sql += "                                 AND LM.\"FacmNo\" = FA.\"FacmNo\" ";
+		sql += "     LEFT JOIN \"InsuRenew\" IR ON IR.\"PrevInsuNo\" = IO.\"OrigInsuNo\" ";
+		sql += "                               AND IR.\"InsuYearMonth\" = :inputYearMonth ";
+		sql += "     LEFT JOIN \"InsuRenew\" IRO ON NVL(IRO.\"NowInsuNo\",' ') = IO.\"OrigInsuNo\" ";
+		sql += "     WHERE (IR.\"InsuEndDate\") BETWEEN :inputStartDate AND :inputEndDate ";  
+		sql += "       AND TRIM(IR.\"EndoInsuNo\") is NUll ";   
+		sql += "       AND CASE WHEN NVL(LM.\"Status\", -1)  IN (0) AND LM.\"MaturityDate\" > :inputEndDate THEN 1 "; // 0:正常戶、到期日 > 續約年月         
+		sql += "                WHEN NVL(LM.\"Status\", -1)  IN (2, 7) THEN 2 ";   // 2:催收戶 7:部分轉呆戶     
+		sql += "                ELSE 0                                        ";   // 排除結案戶、呆帳戶、未撥款戶、續約年月已到期戶        
+		sql += "           END > 0                                            ";                    
+		sql += "       AND NVL(IR.\"RenewCode\", 0)  <> 1                     ";   //		排除已自保件
+		sql += " ) ";
+		sql += " WHERE ROWNUMBER = 1";
+		;
+
+		this.info("sql=" + sql);
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("inputYearMonth", iInsuEndMonth);
+		query.setParameter("inputStartDate", (iInsuEndMonth * 100) + 1);
+		query.setParameter("inputEndDate", (iInsuEndMonth * 100) + 31);
+
+		return this.convertToMap(query);
+	}
 }

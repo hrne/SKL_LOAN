@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +22,6 @@ import com.st1.itx.db.domain.ClBuilding;
 import com.st1.itx.db.domain.ClBuildingId;
 import com.st1.itx.db.domain.ClBuildingOwner;
 import com.st1.itx.db.domain.ClBuildingPublic;
-import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
@@ -40,10 +40,9 @@ import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.InsuOrignalService;
 import com.st1.itx.db.service.InsuRenewMediaTempService;
 import com.st1.itx.db.service.InsuRenewService;
-import com.st1.itx.db.service.LoanBorMainService;
+import com.st1.itx.db.service.springjpa.cm.L4600ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.CustNoticeCom;
-import com.st1.itx.util.common.FacStatusCom;
 import com.st1.itx.util.common.FileCom;
 import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.data.InsuRenewFileVo;
@@ -80,9 +79,6 @@ public class L4600Batch extends TradeBuffer {
 	public ClFacService clFacService;
 
 	@Autowired
-	public LoanBorMainService loanBorMainService;
-
-	@Autowired
 	public FacMainService facMainService;
 
 	@Autowired
@@ -107,9 +103,6 @@ public class L4600Batch extends TradeBuffer {
 	public CdAreaService cdAreaService;
 
 	@Autowired
-	public FacStatusCom facStatusCom;
-
-	@Autowired
 	public FileCom fileCom;
 
 	@Autowired
@@ -127,16 +120,13 @@ public class L4600Batch extends TradeBuffer {
 	@Autowired
 	public WebClient webClient;
 
+	@Autowired
+	L4600ServiceImpl l4600ServiceImpl;
+
 	private int iInsuEndMonth = 0;
-	private int insuEndDateFrom = 0;
-	private int insuEndDateTo = 0;
 	private ArrayList<OccursList> tmpList = new ArrayList<>();
-	private int custNo = 0;
-	private int facmNo = 0;
-	private int repayCode = 0;
 	private Boolean checkFlag = true;
 	private String sendMsg = " ";
-	private List<InsuRenew> lInsuRenewTemp = new ArrayList<InsuRenew>();
 	private List<InsuRenew> lInsuRenew = new ArrayList<InsuRenew>();
 
 	@Override
@@ -166,8 +156,6 @@ public class L4600Batch extends TradeBuffer {
 	private void execute(TitaVo titaVo) throws LogicException {
 //		火險到期檔產生作業(到期前一個月)
 		iInsuEndMonth = parse.stringToInteger(titaVo.getParam("InsuEndMonth")) + 191100;
-		insuEndDateFrom = parse.stringToInteger(iInsuEndMonth + "01");
-		insuEndDateTo = parse.stringToInteger(iInsuEndMonth + "31");
 
 //		檢核該月份是否做過詢價
 		check(titaVo);
@@ -176,22 +164,12 @@ public class L4600Batch extends TradeBuffer {
 		deleInsuRenew(iInsuEndMonth, titaVo);
 
 //		step1 將到期年月，加入續保List
-//		續保 ->續保
-		renewToList(titaVo);
-//		新保 ->續保
 		orignalToList(titaVo);
-
-//		續保 -> 續保(新年度)
-//		step2 將續保檔內到期年月與tita相同者產出下一期
-		toRenewList(titaVo);
 		if (lInsuRenew.size() == 0) {
 			throw new LogicException("E0001", "查無資料");
 		}
 
-//		續保(新年度) ->FILE
-//		step3 將下一期產出file
-//		因可能會有多筆保單合為一筆的情況，所以需先insert完再逐筆合計寫入File
-//		將到期資料寫入File
+//		step2 產出file
 		toFile(titaVo);
 		// 把明細資料容器裝到檔案資料容器內
 		insuRenewFileVo.setOccursList(tmpList);
@@ -220,126 +198,42 @@ public class L4600Batch extends TradeBuffer {
 	}
 
 	private void orignalToList(TitaVo titaVo) throws LogicException {
-		Slice<InsuOrignal> slInsuOrignal = insuOrignalService.insuEndDateRange(insuEndDateFrom, insuEndDateTo, 0,
-				Integer.MAX_VALUE, titaVo);
-		if (slInsuOrignal != null) {
-			for (InsuOrignal tInsuOrignal : slInsuOrignal.getContent()) {
-				InsuRenew tempInsuRenew = new InsuRenew();
-				tempInsuRenew.setClCode1(tInsuOrignal.getClCode1());
-				tempInsuRenew.setClCode2(tInsuOrignal.getClCode2());
-				tempInsuRenew.setClNo(tInsuOrignal.getClNo());
-				tempInsuRenew.setPrevInsuNo(tInsuOrignal.getOrigInsuNo());
-				tempInsuRenew.setOrigInsuNo(tInsuOrignal.getOrigInsuNo());
-				tempInsuRenew.setNowInsuNo(tInsuOrignal.getOrigInsuNo());
-				tempInsuRenew.setInsuCompany(tInsuOrignal.getInsuCompany());
-				tempInsuRenew.setInsuTypeCode(tInsuOrignal.getInsuTypeCode());
-				tempInsuRenew.setFireInsuCovrg(tInsuOrignal.getFireInsuCovrg());
-				tempInsuRenew.setFireInsuPrem(tInsuOrignal.getFireInsuPrem());
-				tempInsuRenew.setEthqInsuCovrg(tInsuOrignal.getEthqInsuCovrg());
-				tempInsuRenew.setEthqInsuPrem(tInsuOrignal.getEthqInsuPrem());
-				tempInsuRenew.setInsuStartDate(tInsuOrignal.getInsuStartDate());
-				tempInsuRenew.setInsuEndDate(tInsuOrignal.getInsuEndDate());
-				tempInsuRenew.setTotInsuPrem(tInsuOrignal.getFireInsuPrem().add(tInsuOrignal.getEthqInsuPrem()));
-				if ("".equals(tInsuOrignal.getEndoInsuNo().trim())) {
-					lInsuRenewTemp.add(tempInsuRenew);
-				} else {
-					endoInsuNoToList(tempInsuRenew, titaVo);
-				}
-			}
+		List<Map<String, String>> list = null;
+		try {
+			list = l4600ServiceImpl.findL4600(iInsuEndMonth, titaVo);
+		} catch (Exception e) {
+			this.error(e.getMessage());
 		}
-	}
-
-	private void endoInsuNoToList(InsuRenew tInsuRenew, TitaVo titaVo) throws LogicException {
-		for (InsuRenew t : lInsuRenewTemp) {
-			if (tInsuRenew.getClCode1() == t.getClCode1() && tInsuRenew.getClCode2() == t.getClCode2()
-					&& tInsuRenew.getClNo() == t.getClNo() && tInsuRenew.getClCode2() == t.getClCode2()
-					&& tInsuRenew.getPrevInsuNo().equals(t.getPrevInsuNo())
-					&& tInsuRenew.getInsuEndDate() == t.getInsuEndDate()) {
-				t.setFireInsuCovrg(t.getFireInsuCovrg().add(tInsuRenew.getFireInsuCovrg()));
-				t.setFireInsuPrem(t.getFireInsuPrem().add(tInsuRenew.getFireInsuPrem()));
-				t.setEthqInsuCovrg(t.getEthqInsuCovrg().add(tInsuRenew.getEthqInsuCovrg()));
-				t.setEthqInsuPrem(t.getEthqInsuPrem().add(tInsuRenew.getEthqInsuPrem()));
-				t.setTotInsuPrem(t.getTotInsuPrem().add(tInsuRenew.getTotInsuPrem()));
-			}
+		if (list == null) {
+			return;
 		}
-	}
 
-	private void renewToList(TitaVo titaVo) throws LogicException {
-		Slice<InsuRenew> slInsuRenew = insuRenewService.insuEndDateRange(insuEndDateFrom, insuEndDateTo, 0,
-				Integer.MAX_VALUE);
-		if (slInsuRenew != null) {
-			for (InsuRenew tInsuRenew : slInsuRenew.getContent()) {
-				if ("".equals(tInsuRenew.getEndoInsuNo().trim())) {
-					lInsuRenewTemp.add(tInsuRenew);
-				} else {
-					endoInsuNoToList(tInsuRenew, titaVo);
-				}
-			}
-		}
-	}
-
-	private void toRenewList(TitaVo titaVo) throws LogicException {
-
-		for (InsuRenew t : lInsuRenewTemp) {
-
-//				無新保單號碼
-			if ("".equals(t.getNowInsuNo())) {
-				this.info("無新保單號碼 ... " + t.getNowInsuNo());
-				continue;
-			}
-
-//				排除自保件
-			InsuRenew nInsuRenew = insuRenewService.findById(
-					new InsuRenewId(t.getClCode1(), t.getClCode2(), t.getClNo(), t.getNowInsuNo(), " ", iInsuEndMonth),
-					titaVo);
-
-			if (nInsuRenew != null) {
-				this.info("排除自保件 ... " + t.getNowInsuNo());
-				continue;
-			}
-
-			// 剔除重複保單
-			for (InsuRenew tNew : lInsuRenew) {
-				if (tNew.getPrevInsuNo().equals(t.getNowInsuNo())) {
-					if (tNew.getCustNo() != this.custNo) {
-						this.info("skip same InsuNo !!! CustNo=" + this.custNo + "" + tNew.getCustNo());
-					}
-					continue;
-				}
-			}
-
-			// 找額度
-			findFacmNo(t, titaVo);
-			if (this.facmNo == 0) {
-				continue;
-			}
-
+		for (Map<String, String> t : list) {
 			InsuRenew tInsuRenew = new InsuRenew();
-
-			tInsuRenew.setClCode1(t.getClCode1());
-			tInsuRenew.setClCode2(t.getClCode2());
-			tInsuRenew.setClNo(t.getClNo());
-			tInsuRenew.setPrevInsuNo(t.getNowInsuNo());
+			tInsuRenew.setClCode1(parse.stringToInteger(t.get("ClCode1")));
+			tInsuRenew.setClCode2(parse.stringToInteger(t.get("ClCode2")));
+			tInsuRenew.setClNo(parse.stringToInteger(t.get("ClNo")));
+			tInsuRenew.setPrevInsuNo(t.get("NowInsuNo"));
 			tInsuRenew.setEndoInsuNo(" ");
-			tInsuRenew.setInsuRenewId(
-					new InsuRenewId(t.getClCode1(), t.getClCode2(), t.getClNo(), t.getNowInsuNo(), " ", iInsuEndMonth));
-			tInsuRenew.setNowInsuNo("");
-			tInsuRenew.setOrigInsuNo(t.getOrigInsuNo());
 			tInsuRenew.setInsuYearMonth(iInsuEndMonth);
-			tInsuRenew.setCustNo(this.custNo);
-			tInsuRenew.setFacmNo(this.facmNo);
+			tInsuRenew.setInsuRenewId(new InsuRenewId(tInsuRenew.getClCode1(), tInsuRenew.getClCode2(),
+					tInsuRenew.getClNo(), tInsuRenew.getPrevInsuNo(), " ", iInsuEndMonth));
+			tInsuRenew.setNowInsuNo("");
+			tInsuRenew.setOrigInsuNo(t.get("OrigInsuNo"));
+			tInsuRenew.setCustNo(parse.stringToInteger(t.get("CustNo")));
+			tInsuRenew.setFacmNo(parse.stringToInteger(t.get("FacmNo")));
 			tInsuRenew.setRenewCode(2); // 續保
-			tInsuRenew.setInsuCompany(t.getInsuCompany());
-			tInsuRenew.setInsuTypeCode(t.getInsuTypeCode());
-			tInsuRenew.setRepayCode(this.repayCode);
+			tInsuRenew.setInsuCompany(t.get("InsuCompany"));
+			tInsuRenew.setInsuTypeCode(t.get("InsuTypeCode"));
+			tInsuRenew.setRepayCode(parse.stringToInteger(t.get("RepayCode")));
 			tInsuRenew.setFireInsuCovrg(BigDecimal.ZERO);
 			tInsuRenew.setFireInsuPrem(BigDecimal.ZERO);
 			tInsuRenew.setEthqInsuCovrg(BigDecimal.ZERO);
 			tInsuRenew.setEthqInsuPrem(BigDecimal.ZERO);
 			tInsuRenew.setTotInsuPrem(BigDecimal.ZERO);
-			tInsuRenew.setInsuStartDate(t.getInsuEndDate());
+			tInsuRenew.setInsuStartDate(parse.stringToInteger(t.get("InsuEndDate")));
 			dateUtil.init();
-			dateUtil.setDate_1(t.getInsuEndDate());
+			dateUtil.setDate_1(tInsuRenew.getInsuStartDate());
 			dateUtil.setYears(1);
 			tInsuRenew.setInsuEndDate(dateUtil.getCalenderDay());
 			tInsuRenew.setAcDate(0);
@@ -350,67 +244,8 @@ public class L4600Batch extends TradeBuffer {
 			tInsuRenew.setOvduDate(0);
 			tInsuRenew.setOvduNo(BigDecimal.ZERO);
 			lInsuRenew.add(tInsuRenew);
+
 		}
-	}
-
-	private void findFacmNo(InsuRenew tInsuRenew, TitaVo titaVo) throws LogicException {
-		this.info("findFacmNo " + tInsuRenew.toString());
-
-		this.custNo = 0;
-		this.facmNo = 0;
-		this.repayCode = 0;
-
-//	 1.排除結案戶、呆帳戶、未撥款戶。
-//   2.戶況順序 0.正常(4.逾期戶) > 2.催收> 7.部呆
-//	 3.戶況>原續保戶號額度>核准編號較小
-
-		int priorty = 9;
-		int approveNo = 9999999;
-		// 原額度為正常戶優先
-		if (tInsuRenew.getFacmNo() > 0) {
-			int status = facStatusCom.getLoanStatus(tInsuRenew.getCustNo(), tInsuRenew.getFacmNo(),
-					tInsuRenew.getInsuEndDate(), titaVo);
-			if (status == 0 || status == 4) {
-				priorty = 0;
-				custNo = tInsuRenew.getCustNo();
-				facmNo = tInsuRenew.getFacmNo();
-			}
-		}
-
-		if (priorty > 0) {
-			Slice<ClFac> slClFac = clFacService.clNoEq(tInsuRenew.getClCode1(), tInsuRenew.getClCode2(),
-					tInsuRenew.getClNo(), 0, Integer.MAX_VALUE, titaVo);
-			if (slClFac != null) {
-				for (ClFac tClFac : slClFac.getContent()) {
-					int priortyNow = 99;
-					int status = facStatusCom.getLoanStatus(tClFac.getCustNo(), tClFac.getFacmNo(),
-							tInsuRenew.getInsuEndDate(), titaVo);
-					if (status == 0 || status == 4) {
-						priortyNow = 1;
-					} else if (status == 2) {
-						priortyNow = 2;
-					} else if (status == 7) {
-						priortyNow = 3;
-					}
-					if (priortyNow < priorty) {
-						this.custNo = tClFac.getCustNo();
-						this.facmNo = tClFac.getFacmNo();
-						priorty = priortyNow;
-					}
-				}
-			}
-		}
-
-		if (priorty < 9) {
-			FacMain tFacMain = facMainService.findById(new FacMainId(custNo, facmNo), titaVo);
-			if (tFacMain != null) {
-				this.repayCode = tFacMain.getRepayCode();
-			}
-		}
-
-		this.info("findFacmNo CustNo=" + this.custNo + ", FacmNo=" + this.facmNo + ", priorty=" + priorty
-				+ ", approveNo=" + approveNo);
-
 	}
 
 	private void deleInsuRenew(int insuMonth, TitaVo titaVo) throws LogicException {
@@ -559,41 +394,26 @@ public class L4600Batch extends TradeBuffer {
 		BigDecimal ethqInsuCovrg = BigDecimal.ZERO;
 		BigDecimal eqthqInsuPrem = BigDecimal.ZERO;
 
-//		原保單之年月
-//		1.初保檔 = 原保險單號碼=原始保險單號碼
-		Slice<InsuOrignal> slInsuOrignal = insuOrignalService.findOrigInsuNoEq(t.getClCode1(), t.getClCode2(),
-				t.getClNo(), t.getPrevInsuNo(), 0, Integer.MAX_VALUE, titaVo);
-		if (slInsuOrignal != null) {
-			for (InsuOrignal t2 : slInsuOrignal.getContent()) {
-				if ("".equals(t2.getEndoInsuNo().trim())) {
-					b4StartDate = t2.getInsuStartDate();
-					b4EndDate = t2.getInsuEndDate();
-				}
-				fireInsuCovrg = fireInsuCovrg.add(t2.getFireInsuCovrg());
-				fireInsuPrem = fireInsuPrem.add(t2.getFireInsuPrem());
-				ethqInsuCovrg = ethqInsuCovrg.add(t2.getEthqInsuCovrg());
-				eqthqInsuPrem = eqthqInsuPrem.add(t2.getEthqInsuPrem());
-			}
-		}
-
-//		2.續保檔 = 原保險單號碼(t)=目前保險單號碼(t2)
-		Slice<InsuRenew> slInsuRenew = insuRenewService.findNowInsuNoEq(t.getClCode1(), t.getClCode2(), t.getClNo(),
-				t.getPrevInsuNo(), 0, Integer.MAX_VALUE, titaVo);
-		if (slInsuRenew != null) {
-			for (InsuRenew t2 : slInsuRenew.getContent()) {
-				if ("".equals(t2.getEndoInsuNo().trim())) {
-					b4StartDate = t2.getInsuStartDate();
-					b4EndDate = t2.getInsuEndDate();
-				}
-				fireInsuCovrg = fireInsuCovrg.add(t2.getFireInsuCovrg());
-				fireInsuPrem = fireInsuPrem.add(t2.getFireInsuPrem());
-				ethqInsuCovrg = ethqInsuCovrg.add(t2.getEthqInsuCovrg());
-				eqthqInsuPrem = eqthqInsuPrem.add(t2.getEthqInsuPrem());
-			}
-		}
 		occursList.putParam("InsuStartDate", FormatUtil.pad9("" + (b4StartDate + 19110000), 8));
 		occursList.putParam("InsuEndDate", FormatUtil.pad9("" + (b4EndDate + 19110000), 8));
+		// L4600 找擔保品火險檔，L4601 L4602找續保檔
 		if ("L4600".equals(iTxCode)) {
+//		原保單之年月
+//		1.初保檔 = 原保險單號碼=原始保險單號碼
+			Slice<InsuOrignal> slInsuOrignal = insuOrignalService.findOrigInsuNoEq(t.getClCode1(), t.getClCode2(),
+					t.getClNo(), t.getPrevInsuNo(), 0, Integer.MAX_VALUE, titaVo);
+			if (slInsuOrignal != null) {
+				for (InsuOrignal t2 : slInsuOrignal.getContent()) {
+					if ("".equals(t2.getEndoInsuNo().trim())) {
+						b4StartDate = t2.getInsuStartDate();
+						b4EndDate = t2.getInsuEndDate();
+					}
+					fireInsuCovrg = fireInsuCovrg.add(t2.getFireInsuCovrg());
+					fireInsuPrem = fireInsuPrem.add(t2.getFireInsuPrem());
+					ethqInsuCovrg = ethqInsuCovrg.add(t2.getEthqInsuCovrg());
+					eqthqInsuPrem = eqthqInsuPrem.add(t2.getEthqInsuPrem());
+				}
+			}
 			occursList.putParam("FireInsuAmt", FormatUtil.pad9("" + t.getFireInsuCovrg(), 11));
 			occursList.putParam("FireInsuFee", FormatUtil.pad9("" + t.getFireInsuPrem(), 6));
 			occursList.putParam("EqInsuAmt", FormatUtil.pad9("" + t.getEthqInsuCovrg(), 7));
@@ -607,6 +427,21 @@ public class L4600Batch extends TradeBuffer {
 			occursList.putParam("NewEqInsuFee", FormatUtil.padX("", 6));
 			occursList.putParam("NewTotalFee", FormatUtil.padX("", 6));
 		} else {
+//			2.續保檔 = 原保險單號碼(t)=目前保險單號碼(t2)
+			Slice<InsuRenew> slInsuRenew = insuRenewService.findNowInsuNoEq(t.getClCode1(), t.getClCode2(), t.getClNo(),
+					t.getPrevInsuNo(), 0, Integer.MAX_VALUE, titaVo);
+			if (slInsuRenew != null) {
+				for (InsuRenew t2 : slInsuRenew.getContent()) {
+					if ("".equals(t2.getEndoInsuNo().trim())) {
+						b4StartDate = t2.getInsuStartDate();
+						b4EndDate = t2.getInsuEndDate();
+					}
+					fireInsuCovrg = fireInsuCovrg.add(t2.getFireInsuCovrg());
+					fireInsuPrem = fireInsuPrem.add(t2.getFireInsuPrem());
+					ethqInsuCovrg = ethqInsuCovrg.add(t2.getEthqInsuCovrg());
+					eqthqInsuPrem = eqthqInsuPrem.add(t2.getEthqInsuPrem());
+				}
+			}
 			occursList.putParam("FireInsuAmt", FormatUtil.pad9("" + fireInsuCovrg, 11));
 			occursList.putParam("FireInsuFee", FormatUtil.pad9("" + fireInsuPrem, 6));
 			occursList.putParam("EqInsuAmt", FormatUtil.pad9("" + ethqInsuCovrg, 7));
@@ -679,5 +514,4 @@ public class L4600Batch extends TradeBuffer {
 			throw new LogicException("E0015", "該批已送回詢價，不可再產檔 ");
 		}
 	}
-
 }

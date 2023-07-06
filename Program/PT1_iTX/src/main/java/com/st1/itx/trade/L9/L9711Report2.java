@@ -47,7 +47,7 @@ public class L9711Report2 extends MakeReport {
 
 	@Autowired
 	private CdEmpService cdEmpService;
-	
+
 	@Autowired
 	private CustNoticeService sCustNoticeService;
 
@@ -96,7 +96,7 @@ public class L9711Report2 extends MakeReport {
 
 		// 書面列印通知書客戶
 		List<Map<String, String>> isLetterList = new ArrayList<Map<String, String>>();
-		
+
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(nTxCd)
 				.setRptItem(reportItem).setRptSize(pageSize).setPageOrientation(pageOrientation).build();
 		this.openForm(titaVo, reportVo);
@@ -108,7 +108,6 @@ public class L9711Report2 extends MakeReport {
 				if (count > 0) {
 					this.newPage();
 				}
-
 
 				// 確認 CustNoticeCom 檢查是否能產出郵寄通知
 
@@ -130,9 +129,7 @@ public class L9711Report2 extends MakeReport {
 //
 //				this.info("recordCustNoString2=" + recordCustNoString);
 //				this.info("recordFacmNo2=" + recordFacmNo);
-				
-				
-				
+
 				int custNo = parse.stringToInteger(tL9711Vo.get("CustNo"));
 				int facmNo = parse.stringToInteger(tL9711Vo.get("FacmNo"));
 
@@ -141,22 +138,21 @@ public class L9711Report2 extends MakeReport {
 
 				lCustNoticeId.setCustNo(custNo);
 				lCustNoticeId.setFacmNo(facmNo);
-				lCustNoticeId.setFormNo(nTxCd);
-			
-				lCustNotice = sCustNoticeService.findById(lCustNoticeId, titaVo);			
+				lCustNoticeId.setFormNo(nTxCd.substring(0, 5));
+
+				lCustNotice = sCustNoticeService.findById(lCustNoticeId, titaVo);
 				// paper為N 表示不印
 				if (lCustNotice == null) {
 				} else {
 					if ("N".equals(lCustNotice.getPaperNotice())) {
 						continue;
 					}
-				}			
-				
-				
+				}
+
 				// 每次戶號額度都不一樣
 				report(tL9711Vo, txbuffer);
-				
-				//有列印書面戶號額度的資料
+
+				// 有列印書面戶號額度的資料
 				isLetterList.add(tL9711Vo);
 
 				//
@@ -170,7 +166,6 @@ public class L9711Report2 extends MakeReport {
 		}
 
 		long sno = this.close();
-
 
 		l9711report4.exec(titaVo, isLetterList);
 

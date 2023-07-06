@@ -41,29 +41,29 @@ public class LQ007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String mm = tmpENTDY.substring(4, 6);
 		String endYM = "";
 		switch (mm) {
+		case "12":
 		case "01":
 		case "02":
-		case "03":
 			endYM = String.valueOf(Integer.valueOf(yy) - 1) + "12";
 			break;
+		case "03":
 		case "04":
 		case "05":
-		case "06":
 			endYM = yy + "03";
 			break;
+		case "06":
 		case "07":
 		case "08":
-		case "09":
 			endYM = yy + "06";
 			break;
+		case "09":
 		case "10":
 		case "11":
-		case "12":
 			endYM = yy + "09";
 			break;
 		}
 
-		int endY = parse.stringToInteger(endYM) / 10000;
+		int endY = parse.stringToInteger(endYM) / 100;
 
 		String startYM = (endY - 3) + "01";
 

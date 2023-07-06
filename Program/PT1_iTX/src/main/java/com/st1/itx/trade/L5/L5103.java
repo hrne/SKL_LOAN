@@ -30,6 +30,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.mail.MailService;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
+import com.st1.itx.util.data.DataLog;
 
 @Service("L5103")
 @Scope("prototype")
@@ -57,6 +58,8 @@ public class L5103 extends TradeBuffer {
 	public TxTellerService txTellerService;
 	@Autowired
 	public CdCodeService sCdCodeDefService;
+	@Autowired
+	public DataLog iDataLog;
 
 	@Autowired
 	CdEmpService cdEmpService;
@@ -374,7 +377,7 @@ public class L5103 extends TradeBuffer {
 		if (tInnDocRecord == null) {
 			throw new LogicException(titaVo, "E0004", "");// 刪除資料不存在
 		}
-
+		InnDocRecord beforeInnDocRecord = (InnDocRecord) iDataLog.clone(tInnDocRecord) ;
 		if (("2").equals(tInnDocRecord.getApplCode())) {// 申請登錄時才可刪除
 			throw new LogicException(titaVo, "E0015", "已歸還");// 檢查錯誤
 		}
@@ -383,6 +386,8 @@ public class L5103 extends TradeBuffer {
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0004", "L5103 deleteErase " + e.getErrorMsg());
 		}
+		iDataLog.setEnv(titaVo, beforeInnDocRecord, beforeInnDocRecord);
+		iDataLog.exec("刪除檔案借閱檔");
 
 	}
 

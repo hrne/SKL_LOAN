@@ -1235,6 +1235,9 @@ public class NegReportCom extends CommBuffer {
 			for (NegAppr01 tNegAppr01 : lNegAppr01) {
 				NegTransId tNegTransId = new NegTransId();
 
+				if(tNegAppr01.getApprAmt().compareTo(BigDecimal.ZERO) == 0) {//2023/7/5:撥款金額為0不寫入檔案batx01
+					continue;
+				}
 				tNegTransId.setAcDate(tNegAppr01.getNegAppr01Id().getAcDate());
 				tNegTransId.setTitaTlrNo(tNegAppr01.getNegAppr01Id().getTitaTlrNo());
 				tNegTransId.setTitaTxtNo(tNegAppr01.getNegAppr01Id().getTitaTxtNo());
