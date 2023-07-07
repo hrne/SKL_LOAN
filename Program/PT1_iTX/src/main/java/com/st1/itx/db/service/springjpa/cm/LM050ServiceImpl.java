@@ -119,6 +119,7 @@ public class LM050ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      ,'為本公司負責人' || \"HeadTitle\" ";
 		sql += "      ,'為本公司負責人' ||'('|| \"HeadTitle\" || decode(\"RelTitle\",'本人',' ',\"HeadName\") || ')' || decode(\"RelTitle\",'本人',' ','之'||\"RelTitle\"))  ";
 		sql += "      ,'該公司' ||\"BusTitle\" ||'('|| \"RelName\" || ')'||'為本公司'||\"HeadTitle\" ||'之'||\"RelTitle\" )AS 	\"Remark\"  ";
+		sql += "      ,decode(S1.\"Rel\",'A',CM.\"EntCode\",0) AS \"EntCode\"";
 		sql += " FROM ( SELECT \"CustNo\" ";
 		sql += "             , SUM(\"LoanBalance\") AS \"LoanBal\" ";
 		sql += "        FROM \"MonthlyLoanBal\" ";
@@ -173,6 +174,7 @@ public class LM050ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      ,'為本公司負責人' || \"HeadTitle\" ";
 		sql += "      ,'為本公司負責人' ||'('|| \"HeadTitle\" || decode(\"RelTitle\",'本人',' ',\"HeadName\")|| ')' ||decode(\"RelTitle\",'本人',' ','之'||\"RelTitle\"))  ";
 		sql += "      ,'該公司' ||\"BusTitle\" ||'('|| \"RelName\" || ')'||'為本公司'||\"HeadTitle\" ||'之'||\"RelTitle\")  ";
+		sql += "      ,decode(S1.\"Rel\",'A',CM.\"EntCode\",0) ";
 		sql += " ORDER BY \"RptType\" ";
 		sql += "        , \"LoanBal\" DESC  ";
 		this.info("sql=" + sql);

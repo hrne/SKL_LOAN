@@ -156,7 +156,7 @@ public class LM056ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql+="                     Decode( S.\"RelTitle\", '本人' , ' ' , '之' || S.\"RelTitle\" )";
 		sql+="             ), '該公司' || S.\"BusTitle\" || '(' || S.\"RelName\" || ')' || '為本公司' || S.\"HeadTitle\" || '之' || S.\"RelTitle\"";
 		sql+="       ) ";
-		sql+=" ORDER BY \"LoanBalance\" DESC;";
+		sql+=" ORDER BY \"LoanBalance\" DESC ";
 		
 		
 		

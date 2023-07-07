@@ -67,14 +67,12 @@ public class LQ007Report extends MakeReport {
 		List<Map<String, String>> LQ007List = new ArrayList<Map<String, String>>();
 
 		try {
-			//查非當年度
+			// 查非當年度
 			LQ007ListIsNotThisYear = lQ007ServiceImpl.findNotThisYear(titaVo);
-			//查當年度
-			LQ007ListIsThisYear = lQ007ServiceImpl.findThisYear(titaVo);
-
-		
-			LQ007List.addAll(LQ007ListIsThisYear);
 			LQ007List.addAll(LQ007ListIsNotThisYear);
+			// 查當年度
+			LQ007ListIsThisYear = lQ007ServiceImpl.findThisYear(titaVo);
+			LQ007List.addAll(LQ007ListIsThisYear);
 
 
 		} catch (Exception e) {
@@ -153,12 +151,10 @@ public class LQ007Report extends MakeReport {
 		if (LQ007List != null && !LQ007List.isEmpty()) {
 			int colBal = 0;
 			int colInt = 1;
-			int tmpYM = 0;
 
 			// 清單上只會有 3 6 9 12月份
 			for (Integer y : ymList) {
 
-				this.info("tmpYM = " + tmpYM);
 				this.info("y = " + y);
 
 				BigDecimal tmpBalSum = BigDecimal.ZERO;
@@ -189,25 +185,17 @@ public class LQ007Report extends MakeReport {
 					String prodNo = "";
 					BigDecimal balSum = BigDecimal.ZERO;
 					BigDecimal intSum = BigDecimal.ZERO;
-					int tmpYear = visibleMonth / 100;
-					int tmpMonth = visibleMonth % 100;
-					this.info("endY = " + endY);
-					this.info("tmpYear = " + tmpYear);
-					this.info("tmpMonth = " + tmpMonth);
+					this.info("visibleMonth = " + visibleMonth);
 
-
+					this.info("y == visibleMonth : " + y + "==" + visibleMonth);
 
 					if (y == visibleMonth) {
 
 						prodNo = r.get("ProdNoShow");
 						balSum = getBigDecimal(r.get("BalSum"));
-						intSum =  getBigDecimal(r.get("IntSum"));
+						intSum = getBigDecimal(r.get("IntSum"));
 						// AA=>首次購物貸款
 						if ("AA".equals(prodNo)) {
-//							// 餘額
-//							colBal = colBal + 2;
-//							// 利收
-//							colInt = colInt + 2;
 
 							makeExcel.setValue(5, colBal, formatAmt(balSum, 3, 8));
 							makeExcel.setValue(5, colInt, formatAmt(intSum, 3, 8));

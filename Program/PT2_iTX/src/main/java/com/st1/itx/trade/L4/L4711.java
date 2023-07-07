@@ -120,7 +120,7 @@ public class L4711 extends TradeBuffer {
 			// 信件標題
 			String subject = processNotesSplit[1];
 			// 信件內文
-			String bodyText = processNotesSplit[2].replace("\"", "");
+			String bodyText = processNotesSplit[2];
 			// 信件附件PDF
 			long pdfno = 0;
 

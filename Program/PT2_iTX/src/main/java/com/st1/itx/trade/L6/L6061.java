@@ -62,6 +62,9 @@ public class L6061 extends TradeBuffer {
 		if (iAcNoCode.isEmpty()) {
 			iAcNoCode = " ";
 		}
+		if (iAcNoItem.isEmpty()) {
+			iAcNoItem = " ";
+		}
 
 		this.info(" L6061 iAcNoCode : " + iAcNoCode + "-" + iAcSubCode + "-" + iAcDtlCode + ".");
 		this.info(" L6061 iAcNoItem : " + iAcNoItem);
@@ -75,21 +78,22 @@ public class L6061 extends TradeBuffer {
 		// 查詢會計科子細目設定檔
 		Slice<CdAcCode> slCdAcCode;
 
-		if (iAcNoCode.isEmpty() && iAcNoItem.isEmpty()) {
-			slCdAcCode = sCdAcCodeService.findAll(this.index, this.limit, titaVo);				
-		} else if (iAcSubCode.equals("     ") && iAcDtlCode.equals("  ")&& iAcNoItem.isEmpty()) {
+		if (iAcNoCode.equals(" ") && iAcNoItem.equals(" ")) {
+			slCdAcCode = sCdAcCodeService.findAll(this.index, this.limit, titaVo);		
+			
+		} else if (iAcSubCode.equals("     ") && iAcDtlCode.equals("  ")&& iAcNoItem.equals(" ")) {
 			slCdAcCode = sCdAcCodeService.findAcCode(iAcNoCode, iAcNoCode, "     ", "ZZZZZ", "  ", "ZZ", this.index, this.limit, titaVo);
 			
-		} else if (iAcDtlCode.equals("  ") && iAcNoItem.isEmpty()) {
+		} else if (iAcDtlCode.equals("  ") && iAcNoItem.equals(" ")) {
 			slCdAcCode = sCdAcCodeService.findAcCode(iAcNoCode, iAcNoCode, iAcSubCode, iAcSubCode, "  ", "ZZ", this.index, this.limit, titaVo);
 			
-		} else if (iAcSubCode.equals("     ") && iAcDtlCode.equals("  ") && iAcNoCode.equals(" ") && !iAcNoItem.isEmpty()) {
+		} else if (iAcSubCode.equals("     ") && iAcDtlCode.equals("  ") && iAcNoCode.equals(" ") && !iAcNoItem.equals(" ")) {
 			slCdAcCode = sCdAcCodeService.likeAcItem("%"+iAcNoItem+"%" ,this.index, this.limit, titaVo);	
 			
-		}else if (iAcSubCode.equals("     ") && iAcDtlCode.equals("  ")&& !iAcNoItem.isEmpty()) {
+		}else if (iAcSubCode.equals("     ") && iAcDtlCode.equals("  ")&& !iAcNoItem.equals(" ")) {
 			slCdAcCode = sCdAcCodeService.findAcItem(iAcNoCode, iAcNoCode, "     ", "ZZZZZ", "  ", "ZZ", "%"+iAcNoItem+"%" , this.index, this.limit, titaVo);
 				
-		} else if (iAcDtlCode.equals("  ") && !iAcNoItem.isEmpty()) {
+		} else if (iAcDtlCode.equals("  ") && !iAcNoItem.equals(" ")) {
 			slCdAcCode = sCdAcCodeService.findAcItem(iAcNoCode, iAcNoCode, iAcSubCode, iAcSubCode, "  ", "ZZ", "%"+iAcNoItem+"%" ,this.index, this.limit, titaVo);
 		
 		} else {

@@ -261,14 +261,14 @@ public class L4721Report2 extends TradeBuffer {
 				locationXX = toX(locationX.substring(i, i + 1), locationXX);
 			}
 			String X = "";
-			X = makeReport.fillUpWord(locationXX, 60, "　", "R");
+			X = makeReport.fillUpWord(locationXX, 60, " ", "R");
 
 			String C = "";
-			C = makeReport.fillUpWord(" ", 45, "　", "R");
+			C = makeReport.fillUpWord(" ", 45, " ", "R");
 
 			// 011 1 0 0 0 台北市信義區永吉路１２０巷５０弄１號３樓 0001743 陳清耀
 			line = "";
-			line = "01" + FormatUtil.padX("", 10) + X + "    " + C + " " + FormatUtil.pad9(tmap.get("CustNo"), 7) + " "
+			line = "01" + FormatUtil.padX("", 10) + X + C + FormatUtil.pad9(tmap.get("CustNo"), 7) + " "
 					+ FormatUtil.padX(tmap.get("CustName"), 10) + "    " + FormatUtil.padX("", 65);
 			// 加入明細
 			result.add(line);
@@ -325,8 +325,8 @@ public class L4721Report2 extends TradeBuffer {
 		// 組成yyymmdd-yyymmdd
 		if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
 
-			startDate = makeReport.showRocDate(tmap.get("IntStartDate"), 3);
-			endDate = makeReport.showRocDate(tmap.get("IntEndDate"), 3);
+			startDate = makeReport.showRocDate(startDate, 3);
+			endDate = makeReport.showRocDate(endDate, 3);
 
 			if (!"".equals(startDate)) {
 				startDate = FormatUtil.pad9(makeReport.showRocDate(startDate, 3), 8);

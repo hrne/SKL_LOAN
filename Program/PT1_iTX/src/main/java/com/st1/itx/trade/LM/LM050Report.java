@@ -167,12 +167,14 @@ public class LM050Report extends MakeReport {
 				makeExcel.setValue(rowCursor, 2, custNo);
 				makeExcel.setValue(rowCursor, 3, custName);
 				makeExcel.setValue(rowCursor, 4, formatThousand(loanBal), "#,##0","R");
-				makeExcel.setValue(rowCursor, 5, this.computeDivide(loanBal.multiply(new BigDecimal("100")), equity, 4),
-						"#,##0.00%");
+				makeExcel.setValue(rowCursor, 5, this.computeDivide(loanBal.multiply(new BigDecimal("100")), equity, 6),
+						"#,##0.0000%");
 				this.info("bal:" + loanBal);
 				this.info("淨值:" + equity);
-				this.info("占淨比值:" + this.computeDivide(loanBal.multiply(new BigDecimal("100")), equity, 4));
-				makeExcel.setValue(rowCursor, 6, "2%"); // 限額標準 ???
+				this.info("占淨比值:" + this.computeDivide(loanBal.multiply(new BigDecimal("100")), equity, 6));
+				
+				
+				makeExcel.setValue(rowCursor, 6,"1".equals(tLM050.get("EntCode"))? "10%": "2%"); // 限額標準 法人10% 個人2%
 				makeExcel.setValue(rowCursor, 7, remark); // 備註
 
 				detailTotal = detailTotal.add(loanBal);

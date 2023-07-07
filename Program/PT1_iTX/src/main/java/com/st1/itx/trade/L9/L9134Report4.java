@@ -74,17 +74,17 @@ public class L9134Report4 extends MakeReport {
 		
 		// 上個月底日(民國年)
 		int iLmnDy = tTxBizDate.getLmnDy();
-		// 本營業日(民國年)
-		int iTmnDy = tTxBizDate.getTmnDy();
+		// 本月底日(民國年)
+		int ixTmnDy = tTxBizDate.getTmnDy();
 		if(endDate > 19110000) {
-			iTmnDy = endDate - 19110000;//畫面輸入值
+			ixTmnDy = endDate - 19110000;//畫面輸入值
 		}
 
 		this.info("iLmnDy    = " + tTxBizDate.getLmnDy());
-		this.info("iTmnDy    = " + tTxBizDate.getTbsDy());
+		this.info("iTmnDy    = " + tTxBizDate.getTmnDy());
 
 		try {
-			findList = l9134ServiceImpl.doQueryL9134_4(titaVo, iLmnDy, iTmnDy);
+			findList = l9134ServiceImpl.doQueryL9134_4(titaVo, iLmnDy, ixTmnDy);
 
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
@@ -110,7 +110,7 @@ public class L9134Report4 extends MakeReport {
 				this.info("iMon    = " + iMon);
 				this.info("iDay    = " + iDay);
 				int nowday = iYear + iMon + iDay;
-				Slice<TxHoliday> nowDay = iTxHoliday.findHoliday("TW", nowday, nowday, iTmnDy, row, titaVo);
+				Slice<TxHoliday> nowDay = iTxHoliday.findHoliday("TW", nowday, nowday, ixTmnDy, row, titaVo);
 				if (nowDay == null) {
 					
 					BigDecimal iTdBal = parse.stringToBigDecimal(r.get("TdBal"));

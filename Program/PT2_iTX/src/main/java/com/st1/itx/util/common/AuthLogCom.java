@@ -121,7 +121,7 @@ public class AuthLogCom extends TradeBuffer {
 				if (tempVo2.get("RelationCode") != null) {
 					tempVo.putParam("RelationCode", tempVo2.get("RelationCode"));
 					tempVo.putParam("RelationName", tempVo2.get("RelationName"));
-					tempVo.putParam("CustId", tempVo2.get("CustId"));
+					tempVo.putParam("RelationId", tempVo2.get("RelationId"));
 					tempVo.putParam("RelationBirthday", tempVo2.get("RelationBirthday"));
 					tempVo.putParam("RelationGender", tempVo2.get("RelationGender"));
 				} else {

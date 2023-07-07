@@ -226,7 +226,7 @@ public class L9130 extends TradeBuffer {
 			} catch (Exception e) {
 				StringWriter errors = new StringWriter();
 				e.printStackTrace(new PrintWriter(errors));
-				this.error("L9130產生L9138放款授信日報表時發生錯誤 = " + errors.toString());
+				this.error("L9130產生L9139暫收款日餘額前後差異比較表時發生錯誤 = " + errors.toString());
 			}
 		} else {
 			doRpt(titaVo);
