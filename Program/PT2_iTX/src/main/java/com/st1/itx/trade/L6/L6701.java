@@ -54,6 +54,7 @@ public class L6701 extends TradeBuffer {
 		String iBranchCode = titaVo.getParam("BranchCode");
 		String iBankItem = titaVo.getParam("BankItem");
 		String iBranchItem = titaVo.getParam("BranchItem");
+		String iEnable = titaVo.getParam("Enable");
 		if (iBranchCode.isEmpty()) {
 			iBranchCode = "    ";
 		}
@@ -81,6 +82,7 @@ public class L6701 extends TradeBuffer {
 			tCdBank.setLastUpdate(
 					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			tCdBank.setLastUpdateEmpNo(titaVo.getTlrNo());
+			tCdBank.setEnable(iEnable);
 			try {
 				sCdBankService.insert(tCdBank, titaVo);
 				this.info("2");
@@ -107,6 +109,7 @@ public class L6701 extends TradeBuffer {
 						parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 				tCdBank.setLastUpdateEmpNo(titaVo.getTlrNo());
 				tCdBank = sCdBankService.update2(tCdBank, titaVo); ////
+				tCdBank.setEnable(iEnable);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}

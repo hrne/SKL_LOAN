@@ -47,6 +47,8 @@ public class L9134Report4 extends MakeReport {
 	BigDecimal ETalSum=BigDecimal.ZERO;
 	BigDecimal didCDrAmtSum=BigDecimal.ZERO;
 	BigDecimal JTalSum=BigDecimal.ZERO;
+	BigDecimal didDifTdBalSum=BigDecimal.ZERO;
+	BigDecimal iTemTalSum=BigDecimal.ZERO;
 
 	public void exec(int endDate, TitaVo titaVo) throws LogicException {
 		String reportCode = "L9134";
@@ -67,11 +69,16 @@ public class L9134Report4 extends MakeReport {
 
 		ExcelFontStyleVo efvo = new ExcelFontStyleVo();
 		
-		efvo.setBorderAll((short) 0);
+	
+		efvo.setAlign("R");
+		
 		// 上個月底日(民國年)
 		int iLmnDy = tTxBizDate.getLmnDy();
 		// 本營業日(民國年)
 		int iTmnDy = tTxBizDate.getTmnDy();
+		if(endDate > 19110000) {
+			iTmnDy = endDate - 19110000;//畫面輸入值
+		}
 
 		this.info("iLmnDy    = " + tTxBizDate.getLmnDy());
 		this.info("iTmnDy    = " + tTxBizDate.getTbsDy());
@@ -86,7 +93,7 @@ public class L9134Report4 extends MakeReport {
 		}
 		int row = 5;
 
-		makeExcel.setShiftRow(row, findList.size() - 1);
+		makeExcel.setShiftRow(row+1, findList.size() - 1);
 
 		if (findList.size() == 0 || findList.isEmpty()) {
 
@@ -138,23 +145,25 @@ public class L9134Report4 extends MakeReport {
 						
 					}else {
 						
-						makeExcel.setValue(row, 1, iTdBal, "#,##0");
-						makeExcel.setValue(row, 2, iDifTdBal, "#,##0");
-						makeExcel.setValue(row, 3, didTdBal, "#,##0");
-						makeExcel.setValue(row, 4, didDifTdBal, "#,##0");
-						makeExcel.setValue(row, 5, ETal, "#,##0");
-						makeExcel.setValue(row, 6, r.get("AcDate"), "R");
-						makeExcel.setValue(row, 7, didCDrAmt, "R");
-						makeExcel.setValue(row, 8, iTemTal, "#,##0");
-						makeExcel.setValue(row, 10, JTal, "#,##0");
-						makeExcel.setValue(row, 11, ETal.subtract(JTal), "#,##0");
-						makeExcel.setValue(row, 12, drAmt, "#,##0");
-						makeExcel.setValue(row, 13, crAmt, "#,##0");
+						makeExcel.setValue(row, 1, iTdBal, "#,##0", efvo);
+						makeExcel.setValue(row, 2, iDifTdBal, "#,##0", efvo);
+						makeExcel.setValue(row, 3, didTdBal, "#,##0", efvo);
+						makeExcel.setValue(row, 4, didDifTdBal, "#,##0", efvo);
+						makeExcel.setValue(row, 5, ETal, "#,##0", efvo);
+						makeExcel.setValue(row, 6, r.get("AcDate"), "C");
+						makeExcel.setValue(row, 7, didCDrAmt, efvo);
+						makeExcel.setValue(row, 8, iTemTal, "#,##0", efvo);
+						makeExcel.setValue(row, 10, JTal, "#,##0", efvo);
+						makeExcel.setValue(row, 11, ETal.subtract(JTal), "#,##0", efvo);
+						makeExcel.setValue(row, 12, drAmt, "#,##0", efvo);
+						makeExcel.setValue(row, 13, crAmt, "#,##0", efvo);
 						if(row>5) {
 							iDifTdBalSum=iDifTdBalSum.add(iDifTdBal);
 							ETalSum=ETalSum.add(ETal);
 							didCDrAmtSum=didCDrAmtSum.add(didCDrAmt);
 							JTalSum=JTalSum.add(JTal);
+							didDifTdBalSum=didDifTdBalSum.add(didDifTdBal);
+							iTemTalSum=iTemTalSum.add(iTemTal);
 						}
 						
 					}
@@ -172,10 +181,12 @@ public class L9134Report4 extends MakeReport {
 				} 
 				row++;
 			}
-			makeExcel.setValue(row, 2, iDifTdBalSum, "#,##0","C");
-			makeExcel.setValue(row, 5, ETalSum, "#,##0","C");
-			makeExcel.setValue(row, 7, didCDrAmtSum,"C");
-			makeExcel.setValue(row, 10, JTalSum, "#,##0","C");
+			makeExcel.setValue(row, 2, iDifTdBalSum, "#,##0",efvo);
+			makeExcel.setValue(row, 4, didDifTdBalSum, "#,##0",efvo);
+			makeExcel.setValue(row, 5, ETalSum, "#,##0",efvo);
+			makeExcel.setValue(row, 7, didCDrAmtSum,efvo);
+			makeExcel.setValue(row, 8, iTemTalSum,efvo);
+			makeExcel.setValue(row, 10, JTalSum, "#,##0",efvo);
 		}
 		makeExcel.close();
 	}

@@ -65,6 +65,7 @@ public class L5R04 extends TradeBuffer {
 			totaVo.putParam("L5r04RemitAcct3", NegFinAcctVO.getRemitAcct3());
 			totaVo.putParam("L5r04RemitAcct4", NegFinAcctVO.getRemitAcct4());
 			totaVo.putParam("L5r04DataSendSection", NegFinAcctVO.getDataSendSection());
+			totaVo.putParam("L5r04Enable", NegFinAcctVO.getEnable());
 		} else {
 			String RemitBank = RimFinCode;
 			totaVo.putParam("L5r04FinCode", RimFinCode);
@@ -75,6 +76,7 @@ public class L5R04 extends TradeBuffer {
 			totaVo.putParam("L5r04RemitAcct3", "");
 			totaVo.putParam("L5r04RemitAcct4", "");
 			totaVo.putParam("L5r04DataSendSection", "");
+			totaVo.putParam("L5r04Enable", "");
 		}
 		this.addList(this.totaVo);
 		return this.sendList();

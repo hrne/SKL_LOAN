@@ -1,7 +1,6 @@
 package com.st1.itx.util.common;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -14,15 +13,10 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AchAuthLog;
 import com.st1.itx.db.domain.BankAuthAct;
-import com.st1.itx.db.domain.LoanBorTx;
-import com.st1.itx.db.domain.LoanBorTxId;
 import com.st1.itx.db.domain.PostAuthLog;
-import com.st1.itx.db.domain.TxTemp;
 import com.st1.itx.db.service.AchAuthLogService;
 import com.st1.itx.db.service.BankAuthActService;
-import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.PostAuthLogService;
-import com.st1.itx.db.service.TxTempService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
@@ -56,9 +50,6 @@ public class AuthLogCom extends TradeBuffer {
 
 	@Autowired
 	public PostAuthLogService postAuthLogService;
-
-	@Autowired
-	public LoanBorTxService loanBorTxService;;
 
 	private int iCustNo = 0;
 	private int iFacmNo = 0;
@@ -111,11 +102,10 @@ public class AuthLogCom extends TradeBuffer {
 
 		// 銀扣授權帳號檔不存在則回傳額度核准時的資料
 		if (slBankAuthAct == null) {
-			setLoanBorTxTempVo(custNo, facmNo, titaVo);
+			return tempVo;
 		} else {
 			for (BankAuthAct tBankAuthAct : slBankAuthAct.getContent()) {
 				this.info("ALL RepayBank : " + tBankAuthAct.getRepayBank());
-
 				if (tBankAuthAct.getStatus() != null && "".equals(tBankAuthAct.getStatus().trim())) {
 					mainStatus = "N";
 				} else {
@@ -123,14 +113,27 @@ public class AuthLogCom extends TradeBuffer {
 				}
 				this.info("mainStatus : " + mainStatus);
 
-				if ("700".equals(tBankAuthAct.getRepayBank())) {
-					this.info("PostTempVo...");
-					setPostTempVo(tBankAuthAct, titaVo);
-				} else if (!"".equals(tBankAuthAct.getRepayBank())) {
-					this.info("AchTempVo...");
-					setAchTempVo(tBankAuthAct, titaVo);
-					break;
+				tempVo.putParam("RepayBank", FormatUtil.pad9(tBankAuthAct.getRepayBank(), 3));
+				tempVo.putParam("PostCode", tBankAuthAct.getPostDepCode());
+				tempVo.putParam("RepayAcctNo", tBankAuthAct.getRepayAcct());
+				TempVo tempVo2 = new TempVo();
+				tempVo2 = tempVo2.getVo(tBankAuthAct.getOtherFields());
+				if (tempVo2.get("RelationCode") != null) {
+					tempVo.putParam("RelationCode", tempVo2.get("RelationCode"));
+					tempVo.putParam("RelationName", tempVo2.get("RelationName"));
+					tempVo.putParam("CustId", tempVo2.get("CustId"));
+					tempVo.putParam("RelationBirthday", tempVo2.get("RelationBirthday"));
+					tempVo.putParam("RelationGender", tempVo2.get("RelationGender"));
 				} else {
+					if ("700".equals(tBankAuthAct.getRepayBank())) {
+						this.info("PostTempVo...");
+						setPostTempVo(tBankAuthAct, titaVo);
+					} else if (!"".equals(tBankAuthAct.getRepayBank())) {
+						this.info("AchTempVo...");
+						setAchTempVo(tBankAuthAct, titaVo);
+						break;
+					} else {
+					}
 				}
 			}
 		}
@@ -183,8 +186,6 @@ public class AuthLogCom extends TradeBuffer {
 			if (cnt == 0) {
 //				throw new LogicException(titaVo, "E0001", "查無資料");
 			}
-		} else {
-			setLoanBorTxTempVo(tBankAuthAct.getCustNo(), tBankAuthAct.getFacmNo(), titaVo);
 		}
 		this.info("Post tempVo : " + tempVo.toString());
 	}
@@ -233,27 +234,8 @@ public class AuthLogCom extends TradeBuffer {
 			if (cnt == 0) {
 //				throw new LogicException(titaVo, "E0001", "查無資料");
 			}
-		} else {
-			setLoanBorTxTempVo(tBankAuthAct.getCustNo(), tBankAuthAct.getFacmNo(), titaVo);
 		}
 		this.info("ACH tempVo : " + tempVo.toString());
 	}
 
-	private void setLoanBorTxTempVo(int custNo, int facmNo, TitaVo titaVo) throws LogicException {
-		LoanBorTx tLoanBorTx = loanBorTxService.holdById(new LoanBorTxId(iCustNo, iFacmNo, 0, 1), titaVo);
-		if (tLoanBorTx != null) {
-			TempVo tTempVo = new TempVo();
-			tTempVo = tempVo.getVo(tLoanBorTx.getOtherFields());
-			if (tTempVo.get("RepayBank") != null) {
-				tempVo.putParam("RepayBank", FormatUtil.pad9(tTempVo.get("RepayBank"), 3));
-				tempVo.putParam("PostCode", tTempVo.get("PostCode"));
-				tempVo.putParam("RepayAcctNo", tTempVo.get("RepayAcctNo"));
-				tempVo.putParam("RelationCode", tTempVo.get("RelationCode"));
-				tempVo.putParam("RelationName", tTempVo.get("RelationName"));
-				tempVo.putParam("RelationBirthday", tTempVo.get("RelationGender"));
-				tempVo.putParam("RelationGender", tTempVo.get("RelationGender"));
-				tempVo.putParam("CustId", tTempVo.get("CustId"));
-			}
-		}
-	}
 }

@@ -191,7 +191,8 @@ public class MailService extends CommBuffer {
 			// Create the message part
 			BodyPart messageBodyPart = new MimeBodyPart();
 			// Fill the message
-			messageBodyPart.setText(this.bodyText);
+//			messageBodyPart.setText(this.bodyText);
+			messageBodyPart.setContent(this.bodyText, "text/html; charset=UTF-8");
 
 			// Create a multipar message
 			Multipart multipart = new MimeMultipart();

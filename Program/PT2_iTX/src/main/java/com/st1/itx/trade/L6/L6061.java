@@ -51,6 +51,7 @@ public class L6061 extends TradeBuffer {
 		String iAcNoCode = titaVo.getParam("AcNoCode");
 		String iAcSubCode = titaVo.getParam("AcSubCode");
 		String iAcDtlCode = titaVo.getParam("AcDtlCode");
+		String iAcNoItem = titaVo.getParam("AcNoItem");
 
 		if (iAcSubCode.isEmpty()) {
 			iAcSubCode = "     ";
@@ -58,8 +59,12 @@ public class L6061 extends TradeBuffer {
 		if (iAcDtlCode.isEmpty()) {
 			iAcDtlCode = "  ";
 		}
+		if (iAcNoCode.isEmpty()) {
+			iAcNoCode = " ";
+		}
 
 		this.info(" L6061 iAcNoCode : " + iAcNoCode + "-" + iAcSubCode + "-" + iAcDtlCode + ".");
+		this.info(" L6061 iAcNoItem : " + iAcNoItem);
 
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
@@ -70,12 +75,23 @@ public class L6061 extends TradeBuffer {
 		// 查詢會計科子細目設定檔
 		Slice<CdAcCode> slCdAcCode;
 
-		if (iAcNoCode.isEmpty()) {
-			slCdAcCode = sCdAcCodeService.findAll(this.index, this.limit, titaVo);
-		} else if (iAcSubCode.equals("     ") && iAcDtlCode.equals("  ")) {
+		if (iAcNoCode.isEmpty() && iAcNoItem.isEmpty()) {
+			slCdAcCode = sCdAcCodeService.findAll(this.index, this.limit, titaVo);				
+		} else if (iAcSubCode.equals("     ") && iAcDtlCode.equals("  ")&& iAcNoItem.isEmpty()) {
 			slCdAcCode = sCdAcCodeService.findAcCode(iAcNoCode, iAcNoCode, "     ", "ZZZZZ", "  ", "ZZ", this.index, this.limit, titaVo);
-		} else if (iAcDtlCode.equals("  ")) {
+			
+		} else if (iAcDtlCode.equals("  ") && iAcNoItem.isEmpty()) {
 			slCdAcCode = sCdAcCodeService.findAcCode(iAcNoCode, iAcNoCode, iAcSubCode, iAcSubCode, "  ", "ZZ", this.index, this.limit, titaVo);
+			
+		} else if (iAcSubCode.equals("     ") && iAcDtlCode.equals("  ") && iAcNoCode.equals(" ") && !iAcNoItem.isEmpty()) {
+			slCdAcCode = sCdAcCodeService.likeAcItem("%"+iAcNoItem+"%" ,this.index, this.limit, titaVo);	
+			
+		}else if (iAcSubCode.equals("     ") && iAcDtlCode.equals("  ")&& !iAcNoItem.isEmpty()) {
+			slCdAcCode = sCdAcCodeService.findAcItem(iAcNoCode, iAcNoCode, "     ", "ZZZZZ", "  ", "ZZ", "%"+iAcNoItem+"%" , this.index, this.limit, titaVo);
+				
+		} else if (iAcDtlCode.equals("  ") && !iAcNoItem.isEmpty()) {
+			slCdAcCode = sCdAcCodeService.findAcItem(iAcNoCode, iAcNoCode, iAcSubCode, iAcSubCode, "  ", "ZZ", "%"+iAcNoItem+"%" ,this.index, this.limit, titaVo);
+		
 		} else {
 			slCdAcCode = sCdAcCodeService.findAcCode(iAcNoCode, iAcNoCode, iAcSubCode, iAcSubCode, iAcDtlCode, iAcDtlCode, this.index, this.limit, titaVo);
 		}
@@ -100,7 +116,7 @@ public class L6061 extends TradeBuffer {
 			occursList.putParam("OOReceivableFlag", tCdAcCode.getReceivableFlag());
 			occursList.putParam("OOClsChkFlag", tCdAcCode.getClsChkFlag());
 			occursList.putParam("OOInuseFlag", tCdAcCode.getInuseFlag());
-			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdAcCode.getLastUpdate()) + " " + parse.timeStampToStringTime(tCdAcCode.getLastUpdate()));
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdAcCode.getLastUpdate())+ " " +parse.timeStampToStringTime(tCdAcCode.getLastUpdate()));
 			occursList.putParam("OOLastEmp", tCdAcCode.getLastUpdateEmpNo() + " " + empName(titaVo, tCdAcCode.getLastUpdateEmpNo()));
 
 			/* 將每筆資料放入Tota的OcList */
@@ -116,7 +132,6 @@ public class L6061 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-
 	private String empName(TitaVo titaVo, String empNo) throws LogicException {
 		String rs = empNo;
 

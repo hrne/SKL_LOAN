@@ -120,7 +120,8 @@ public class L5971 extends TradeBuffer {
 			if (IntEntryDateStart != 0 || IntEntryDateEnd != 0) {
 				slNegTrans = sNegTransService.custAndAcDate(CustNo, IntEntryDateStart, IntEntryDateEnd, this.index, this.limit, titaVo);
 			} else {
-				slNegTrans = sNegTransService.custNoEq(CustNo, this.index, this.limit, titaVo);
+//				slNegTrans = sNegTransService.custNoEq(CustNo, this.index, this.limit, titaVo);
+				slNegTrans = sNegTransService.custAndCaseSeq(CustNo,iCaseSeq, this.index, this.limit, titaVo);
 			}
 		} else {
 			if (IntEntryDateStart != 0 && IntEntryDateEnd != 0) {

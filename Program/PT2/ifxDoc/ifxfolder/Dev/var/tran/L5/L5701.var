@@ -104,7 +104,7 @@ T(3,*)
 #FdChgCondDate=X,1,L
 T(3,*)
 #PayerCustNoFildName=X,10,L
-T(3,付款人戶號)
+T(3,借款人戶號)
 #ChgCondDateFildName=X,18,L
 T(3,申請變更還款條件日)
 #CourtCodeFildName=X,16,L

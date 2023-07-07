@@ -1011,6 +1011,9 @@ C(3,#UpdateCode,1,RESET_RIM(#SendL2r05,L2R05),$)
 S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
 R(1,L2R05)
 
+!最後撥款序號
+#wkLastBormNo=A,3,S
+
 #SendL2r02=X,1,S
 IF(#FKEY==0,$,s)
 E(0,@RimFuncCode,5)
@@ -1135,6 +1138,7 @@ E(0,@StarBuildingYM,#L2r05StarBuildingYM)
 E(0,@LbPreStarBuildingYM,#L2r05PreStarBuildingYM)
 E(0,@LbStarBuildingYM,#L2r05StarBuildingYM)
 E(0,@BaseRate,#L2r05BaseRate)
+E(0,@wkLastBormNo,#L2r05BormNo)
 ##loop{times:10,n:1}
 E(0,@StepMonthS{n},#L2r05StepRateMonths{n})
 E(0,@StepMonthE{n},#L2r05StepRateMonthE{n})
@@ -1145,7 +1149,6 @@ E(0,@StepMonthELb{n},#L2r05StepRateMonthE{n})
 E(0,@StepRateIncrLb{n},#L2r05StepRateIncr{n})
 T(3,@StepRatePer{n},%)
 ##end
-
 #SendL2r11A=X,1,S
 IF(#FKEY==0 || #FKEY==7,$,s)
 E(0,@RimApplNo,#L2r05ApplNo)
@@ -1204,7 +1207,14 @@ E(0,@LbRelationBirthday,#L2r05RelationBirthday)
 E(0,@LbCreditScore,#L2r05CreditScore)
 T(2,@LbCreditSysNo,#L2r05CreditSysNo)
 
-
+#RimType=A,1,S
+#RimL4r03=X,1,S
+IF(#FKEY==0 || #FKEY==7,$,s)
+E(0,@RimCustNo,#CustNo)
+E(0,@RimType,1)
+RESET_RIM(#RimL4r03,L4R03)
+S(L4R03,1,#RimType,#RimCustNo)
+R(1,L4R03)
 
 #RcvL2r09=X,1,S
 C(3,#RepayCode,2,$,S)
@@ -2803,25 +2813,27 @@ E(0,1)
 C(3,#RepayCode,02,$,S)
 C(3,#UpdateCode,0,S,$)
 C(3,#CheckFlag,1,S,$)
-C(3,#AcctCheckFlag,1,$,V(P,此帳號未授權，請至L4042／L4043新增授權資料))
+C(3,#wkLastBormNo,0,C(3,#AcctCheckFlag,1,$,ALERT(此帳號未授權)),C(3,#AcctCheckFlag,1,$,V(P,此帳號未授權，請至L4042／L4043新增授權資料)))
+
 
 ![與借款人關係]
 !修改時自動顯示可修改,其他自動顯示不必須輸入
 #FdRelationCode=X,2,L
 
-#RelationCode=X,2,L
-C(3,#RepayCode,2,$,S)
+#RelationCode=X,2,I
 C(3,#UpdateCode,1,$,s)
+C(3,#RepayCode,2,$,S)
+C(3,#AcctCheckFlag,1,s,$)
 C(3,#Hide5Fg,0,CALL(#HideP5),$)
 HELP(#RelationCodeHelp)
-@C(3,#RepayCode,2,s,V(H,#RelationCodeHelp))
+@V(H,#RelationCodeHelp)
 
 #RelationCodeX=X,4,L
 C(4,#RelationCode,S,$)
 T(H,#RelationCode,#RelationCodeHelp)
 
 #WkFDP5C=X,1,S
-C(3,#RelationCode,0,
+C(5,#RelationCode,00,
     T(3,@FdRelationName, )
     T(3,@FdRelationId, )
     T(3,@FdRelationBirthday, )
@@ -2830,14 +2842,29 @@ C(3,#RelationCode,0,
     T(2,@FdRelationId,)
     T(2,@FdRelationBirthday,)
     T(2,@FdRelationGender,))
+
+
+#closeRela=X,1,S
+IF(#FuncCode==4 || #FuncCode==5,S,$)
+C(3,#RepayCode,2,$,S)
+C(3,#AcctCheckFlag,1,S,$)
+C(5,#RelationCode,00,
+C(4,#RelationName,T(2,@RelationName,#L4r03CustName)
+T(2,@RelationId,#L4r03CustId)
+E(0,@RelationBirthday,#L4r03Birthday)
+T(2,@RelationGender,#L4r03Gender)
+T(H,@RelationGenderX,#RelationGender,#SexHelp),S)
+,S)
+
     
 ![帳戶戶名]
 #FdRelationName=X,2,L
 
-#RelationName=x,100,L
+#RelationName=x,100,I
 C(3,#RepayCode,2,$,S)
 C(3,#UpdateCode,1,$,s)
-C(3,#RelationCode,0,s,$)
+C(5,#RelationCode,00,s,$)
+C(3,#AcctCheckFlag,1,s,$)
 C(3,#Hide5Fg,0,CALL(#HideP5),$)
 @V(7)
 
@@ -2846,10 +2873,11 @@ C(3,#Hide5Fg,0,CALL(#HideP5),$)
 ![身份證字號]
 #FdRelationId=X,2,L
 
-#RelationId=X,10,L
-C(3,#RepayCode,2,$,S)
+#RelationId=X,10,I
 C(3,#UpdateCode,1,$,s)
-C(3,#RelationCode,0,s,$)
+C(3,#RepayCode,2,$,S)
+C(5,#RelationCode,00,s,$)
+C(3,#AcctCheckFlag,1,s,$)
 C(3,#Hide5Fg,0,CALL(#HideP5),$)
 @V(7)A(ID,0,#RelationId)
 V(4,#CustId)
@@ -2865,10 +2893,11 @@ T(4,STAT$)
 ![出生日期]
 #FdRelationBirthday=X,2,L
 
-#RelationBirthday=D,7,L
-C(3,#RepayCode,2,$,S)
+#RelationBirthday=D,7,I
 C(3,#UpdateCode,1,$,s)
-C(3,#RelationCode,0,s,$)
+C(3,#RepayCode,2,$,S)
+C(5,#RelationCode,00,s,$)
+C(3,#AcctCheckFlag,1,s,$)
 C(3,#Hide5Fg,0,CALL(#HideP5),$)
 D(8)
 
@@ -2877,16 +2906,16 @@ D(8)
 ![性別]
 #FdRelationGender=X,2,L
 
-#RelationGender=X,1,L
-C(3,#RepayCode,2,$,S)
+#RelationGender=X,1,I
 C(3,#UpdateCode,1,$,s)
-C(3,#RelationCode,0,s,$)
+C(3,#RepayCode,2,$,S)
+C(5,#RelationCode,00,s,$)
+C(3,#AcctCheckFlag,1,s,$)
 C(3,#Hide5Fg,0,CALL(#HideP5),$)
 HELP(#SexHelp)
-! @V(H,#SexHelp)
+@V(H,#SexHelp)
 
 #RelationGenderX=X,2,L
-C(3,#RepayCode,2,$,s)
 T(H,#RelationGender,#SexHelp)
 
 #what=X,1,I
@@ -3749,6 +3778,7 @@ C(3,#CheckCode,0,$,S)
 <include src="ROM.icf::L2R44.dec"/>
 <include src="ROM.icf::L2R56.dec"/>
 <include src="ROM.icf::L6R28.dec"/>
+<include src="ROM.icf::L4R03.dec"/>
 <include src="ROM.icf::L4R22.dec"/>
 
 </sub>
@@ -3966,6 +3996,7 @@ TXFORM=L2154
 <include src="ROM.icf::L2R53.tom"/>
 <include src="ROM.icf::L2R56.tom"/>
 <include src="ROM.icf::L6R28.tom"/>
+<include src="ROM.icf::L4R03.tom"/>
 <include src="ROM.icf::L4R22.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>

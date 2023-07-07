@@ -1425,6 +1425,34 @@ C(3,#FreqBase,1,D(7,2,#SpecificDate,0,#PayIntFreq),$)
 C(3,#FreqBase,2,D(7,2,#VirtualSpecificDate,#NextIntDateFreqBase,0),$)
 C(3,#FreqBase,3,D(7,2,#SpecificDate,0,#WKWEEKINT),$)
 
+!撥款首次應繳日
+#WkDrawdownDateBc=D,8,S
+E(0,#DrawdownDate+19110000)
+#wkDrawdownyymm=A,6,S
+T(1,#WkDrawdownDateBc,1,6)
+#wkDrawdownyy=A,4,S
+T(1,#WkDrawdownDateBc,1,4)
+#wkDrawdownyymmddold=A,8,S
+E(0,#wkDrawdownyymm*100+01)
+#wkDrawdownyymmddnow=A,8,S
+E(0,#wkDrawdownyy*10000+0101)
+#wkdiffDrawdown=A,8,S
+D(7,1,#wkDrawdownyymmddnow,#wkDrawdownyymmddold)
+T(1,@wkDiffmm,#wkdiffDrawdown,5,2)
+!差異月
+#wkDiffmm=A,2,S
+#wkVirtualFirstDueDate=A,8,S
+E(0,#wkDrawdownyy*10000+0100+#SpecificDd)
+D(7,2,#wkVirtualFirstDueDate,#wkDiffmm,0)
+#wkNextMVirtualFirstDueDate=A,8,S
+D(7,2,#wkVirtualFirstDueDate,1,0)
+!判斷虛擬首次應繳日是否滿25天
+!同月滿25天則使用虛擬首次應繳日
+#wkVirtualFirstDueDateis25dd=A,8,S
+D(7,1,#WkDrawdownDateBc,#wkVirtualFirstDueDate)
+
+
+
 ![首次應繳日]
 !自動顯示不必輸入
 !到期取息者,首次應繳日=到期日
@@ -1432,7 +1460,7 @@ C(3,#FreqBase,3,D(7,2,#SpecificDate,0,#WKWEEKINT),$)
 #FdFirstDueDate=X,2,L
 
 #FirstDueDate=D,7,I
-E(0,#NextIntDate)
+IF(#wkVirtualFirstDueDateis25dd>=25,E(0,#wkVirtualFirstDueDate-19110000),E(0,#wkNextMVirtualFirstDueDate-19110000))
 C(3,#HIDE4FG,0,CALL(#HIDEP4),$)
 @
 A(DATE,0,#FirstDueDate)
@@ -1468,6 +1496,8 @@ E(0,#DrawdownDateM)
 T(2,首次應繳日超過+#PayIntFreqA1+個月)
 
 !週期基準為月時顯示訊息
+!指定應繳日大於首次應繳日該月最後一天時,首次應繳日與該首次應繳月最後一天不同顯示錯誤訊息"不符合指定應繳日"
+!指定應繳日小於等於首次應繳日該月最後一天時,指定應繳日與首次應繳日不同時顯示錯誤訊息"不符合指定應繳日"
 !首次應繳日未滿撥款日期+24天時出現警告訊息"首次應繳日未滿25天"
 !首次應繳日超過撥款日期+繳息週期N+1個月時出現警告訊息"首次應繳日超過N個月"
 #CHECKFDD=A,8,S

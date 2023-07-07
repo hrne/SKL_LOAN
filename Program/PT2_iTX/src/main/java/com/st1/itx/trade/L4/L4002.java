@@ -308,9 +308,24 @@ public class L4002 extends TradeBuffer {
 						grp2.setFileName(tBatxDetail.getFileName());
 						grp2.setRankFlag(2);
 						break;
+						
+					case 90:
+						grp1.setAcDate(tBatxDetail.getAcDate());
+						grp1.setBatchNo(tBatxDetail.getBatchNo());
+						grp1.setRepayCode(tBatxDetail.getRepayCode());
+						grp1.setReconCode(" ");
+						grp1.setFileName(" ");
+						grp1.setRankFlag(1);
+						grp2.setAcDate(tBatxDetail.getAcDate());
+						grp2.setBatchNo(tBatxDetail.getBatchNo());
+						grp2.setRepayCode(tBatxDetail.getRepayCode());
+						grp2.setReconCode(tBatxDetail.getReconCode());
+						grp2.setFileName(tBatxDetail.getFileName());
+						grp2.setRankFlag(2);
+						break;
 
 					default:
-						// 除還款來源01:匯款轉帳 02:銀行扣款 03:員工扣款 04:支票兌現以外顯示第二階
+						// 除還款來源01:匯款轉帳 02:銀行扣款 03:員工扣款 04:支票兌現 90 暫收抵繳以外顯示第二階
 						grp1.setAcDate(tBatxDetail.getAcDate());
 						grp1.setBatchNo(tBatxDetail.getBatchNo());
 						grp1.setRepayCode(0);

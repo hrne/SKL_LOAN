@@ -6242,6 +6242,7 @@ TXFORM=L5R03
 #L5r04RemitAcct3=X,16,S
 #L5r04RemitAcct4=X,16,S
 #L5r04DataSendSection=X,8,S
+#L5r04Enable=X,1,S
 </L5R04.dec>
 
 <L5R04.tom>
@@ -6253,6 +6254,7 @@ TXFORM=L5R04
 #L5r04RemitAcct3
 #L5r04RemitAcct4
 #L5r04DataSendSection
+#L5r04Enable
 ^
 </L5R04.tom>
 

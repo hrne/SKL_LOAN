@@ -250,8 +250,8 @@ public class L2077 extends TradeBuffer {
 					}
 				}
 				occursList.putParam("OORmk", "");
-				this.info(" date = " + parse.stringToInteger(dDateUtil.getNowStringRoc()) + "-" + Prohibitperiod);
-				if (Prohibitperiod == 0 || parse.stringToInteger(dDateUtil.getNowStringRoc()) < Prohibitperiod) {
+				this.info(" date = " + dDateUtil.getNowIntegerRoc() + "-" + Prohibitperiod);
+				if (Prohibitperiod == 0 || dDateUtil.getNowIntegerRoc() < Prohibitperiod) {
 					// SHOW
 					occursList.putParam("OORmk", result.get("Rmk"));
 				}

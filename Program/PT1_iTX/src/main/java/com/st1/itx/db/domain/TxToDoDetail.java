@@ -58,7 +58,7 @@ public class TxToDoDetail implements Serializable {
 
   // 處理事項說明
   /* json format1.Note */
-  @Column(name = "`ProcessNote`", length = 300)
+  @Column(name = "`ProcessNote`", length = 2000)
   private String processNote;
 
   // 執行交易

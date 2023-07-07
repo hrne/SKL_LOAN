@@ -61,9 +61,11 @@ public class L6071 extends TradeBuffer {
 		// 查詢行庫資料檔
 		Slice<CdBank> slCdBank;
 		if (iBankItem.isEmpty()) {
-			slCdBank = sCdBankService.branchCodeLike(iBankCode.trim() + "%", iBranchCode.trim() + "%", this.index, this.limit, titaVo);
+			slCdBank = sCdBankService.branchCodeLike(iBankCode.trim() + "%", iBranchCode.trim() + "%", this.index,
+					this.limit, titaVo);
 		} else {
-			slCdBank = sCdBankService.bankItemLike(iBankCode.trim() + "%", iBranchCode.trim() + "%", "%" + iBankItem.trim() + "%", this.index, this.limit, titaVo);
+			slCdBank = sCdBankService.bankItemLike(iBankCode.trim() + "%", iBranchCode.trim() + "%",
+					"%" + iBankItem.trim() + "%", this.index, this.limit, titaVo);
 		}
 		List<CdBank> lCdBank = slCdBank == null ? null : slCdBank.getContent();
 
@@ -85,8 +87,11 @@ public class L6071 extends TradeBuffer {
 			occursList.putParam("OOBranchCode", tCdBank.getBranchCode());
 			occursList.putParam("OOBankItem", tCdBank.getBankItem());
 			occursList.putParam("OOBranchItem", tCdBank.getBranchItem());
-			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdBank.getLastUpdate()) + " " + parse.timeStampToStringTime(tCdBank.getLastUpdate()));
-			occursList.putParam("OOLastEmp", tCdBank.getLastUpdateEmpNo() + " " + empName(titaVo, tCdBank.getLastUpdateEmpNo()));
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdBank.getLastUpdate()) + " "
+					+ parse.timeStampToStringTime(tCdBank.getLastUpdate()));
+			occursList.putParam("OOLastEmp",
+					tCdBank.getLastUpdateEmpNo() + " " + empName(titaVo, tCdBank.getLastUpdateEmpNo()));
+			occursList.putParam("OOEnable", tCdBank.getEnable());
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 		}

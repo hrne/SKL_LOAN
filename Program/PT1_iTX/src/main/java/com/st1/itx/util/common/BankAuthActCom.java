@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AchAuthLog;
@@ -158,6 +159,7 @@ public class BankAuthActCom extends TradeBuffer {
 	private boolean isNewLog = false;
 	private boolean isDelAct = false;
 	private boolean isDelLog = false;
+	private TempVo tTempVo = new TempVo();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -192,7 +194,6 @@ public class BankAuthActCom extends TradeBuffer {
 				addCancelDelete(titaVo);
 			}
 		}
-
 
 		// 新增授權應處理明細
 		if (this.isNewLog || this.isDelLog) {
@@ -333,6 +334,12 @@ public class BankAuthActCom extends TradeBuffer {
 			break;
 		}
 
+		tTempVo.clear();
+		tTempVo.putParam("RelationCode", t.getRelationCode());
+		tTempVo.putParam("RelationName", t.getRelAcctName());
+		tTempVo.putParam("CustId", t.getRelationId());
+		tTempVo.putParam("RelationBirthday", t.getRelAcctBirthday());
+		tTempVo.putParam("RelationGender", t.getRelAcctGender());
 		if (isUpdAct) {
 			Slice<BankAuthAct> slBankAuthAct = bankAuthActService.findAcctNo(t.getCustNo(), t.getRepayAcct(), "700", 0,
 					999, 0, Integer.MAX_VALUE, titaVo);
@@ -341,6 +348,7 @@ public class BankAuthActCom extends TradeBuffer {
 					if (t1.getPostDepCode().equals(t.getPostDepCode())) {
 						tBankAuthAct = bankAuthActService.holdById(t1, titaVo);
 						tBankAuthAct.setStatus(status);
+						tBankAuthAct.setOtherFields(tTempVo.getJsonString());
 						try {
 							bankAuthActService.update(tBankAuthAct, titaVo);
 						} catch (DBException e) {
@@ -414,7 +422,14 @@ public class BankAuthActCom extends TradeBuffer {
 			break;
 		}
 
+		tTempVo.clear();
+		tTempVo.putParam("RelationCode", t.getRelationCode());
+		tTempVo.putParam("RelationName", t.getRelAcctName());
+		tTempVo.putParam("CustId", t.getRelationId());
+		tTempVo.putParam("RelationBirthday", t.getRelAcctBirthday());
+		tTempVo.putParam("RelationGender", t.getRelAcctGender());
 		if (isUpdFac) {
+
 			tBankAuthAct = bankAuthActService.holdById(tBankAuthAct, titaVo);
 			tBankAuthAct.setRepayBank(t.getRepayBank());
 			tBankAuthAct.setRepayAcct(t.getRepayAcct());
@@ -422,6 +437,7 @@ public class BankAuthActCom extends TradeBuffer {
 			tBankAuthAct.setLimitAmt(t.getLimitAmt());
 			tBankAuthAct.setAcctSeq("  ");
 			tBankAuthAct.setStatus(status);
+			tBankAuthAct.setOtherFields(tTempVo.getJsonString());
 			try {
 				bankAuthActService.update(tBankAuthAct, titaVo);
 			} catch (DBException e) {
@@ -436,6 +452,7 @@ public class BankAuthActCom extends TradeBuffer {
 				for (BankAuthAct t1 : slBankAuthAct.getContent()) {
 					tBankAuthAct = bankAuthActService.holdById(t1, titaVo);
 					tBankAuthAct.setStatus(status);
+					tBankAuthAct.setOtherFields(tTempVo.getJsonString());
 					try {
 						bankAuthActService.update(tBankAuthAct, titaVo);
 					} catch (DBException e) {
@@ -568,6 +585,7 @@ public class BankAuthActCom extends TradeBuffer {
 				// 更新授權帳號檔
 				BankAuthAct tBankAuthAct = bankAuthActService.holdById(t, titaVo);
 				tBankAuthAct.setStatus(iStatus);
+				tBankAuthAct.setOtherFields(tTempVo.getJsonString());
 				try {
 					bankAuthActService.update(tBankAuthAct, titaVo);
 				} catch (DBException e) {
@@ -729,6 +747,7 @@ public class BankAuthActCom extends TradeBuffer {
 				// 更新授權帳號檔
 				BankAuthAct tBankAuthAct = bankAuthActService.holdById(t, titaVo);
 				tBankAuthAct.setStatus(iStatus);
+				tBankAuthAct.setOtherFields(tTempVo.getJsonString());
 				try {
 					bankAuthActService.update(tBankAuthAct, titaVo);
 				} catch (DBException e) {
@@ -829,9 +848,9 @@ public class BankAuthActCom extends TradeBuffer {
 		if (titaVo.getActFgI() == 1) {
 			return;
 		}
-		
-		// L2153 核准額度僅建立授權帳號檔
-		if ("L2153".equals(iTitaTxCd)) {
+
+		// L2153、L2154僅建立授權帳號檔
+		if ("L2153".equals(iTitaTxCd) || "L2154".equals(iTitaTxCd)) {
 			this.isNewLog = false;
 		}
 		// L3100 撥款建立授權記錄檔
@@ -888,6 +907,10 @@ public class BankAuthActCom extends TradeBuffer {
 		if (tBankAuthAct != null) {
 			status = tBankAuthAct.getStatus();
 		}
+		// 帳號檔為核准額度及維護額度時建立,撥款訂正不可刪除
+		if ("L3100".equals(titaVo.getTxcd())) {
+			isDelAct = false;
+		}
 		if (this.isDelAct) {
 			BankAuthActId tBankAuthActId = new BankAuthActId();
 			tBankAuthActId.setCustNo(iCustNo);
@@ -902,25 +925,15 @@ public class BankAuthActCom extends TradeBuffer {
 				deleteBankAuthAct(tBankAuthActId, titaVo);
 			}
 		}
-		// 同戶扣款帳號
-
-		tBankAuthAct = getRepayAcct(titaVo);
+		// 核准額度及維護額度,不會寫入log
 		if ("L2154".equals(titaVo.getTxcd()) || "L2153".equals(titaVo.getTxcd())) {
-			if (titaVo.isActfgSuprele()) {
-				// 同戶無該扣款帳號、未授權
-				if (tBankAuthAct == null && "".equals(status.trim())) {
-					this.isDelLog = true;
-					if ("700".equals(iRepayBank)) {
-						deletePostAuthLog("1", "1", titaVo);
-						deletePostAuthLog("1", "2", titaVo);
-					} else {
-						deleteAchAuthLog("A", titaVo);
-					}
-				}
-			}
-		} else {
+			return;
+		}
+		// 同戶扣款帳號
+		tBankAuthAct = getRepayAcct(titaVo);
+		if (titaVo.isActfgRelease()) {
 			// 同戶無該扣款帳號、未授權
-			if (tBankAuthAct == null && "".equals(status.trim())) {
+			if ("".equals(status.trim())) {
 				this.isDelLog = true;
 				if ("700".equals(iRepayBank)) {
 					deletePostAuthLog("1", "1", titaVo);
@@ -1097,8 +1110,12 @@ public class BankAuthActCom extends TradeBuffer {
 			throw new LogicException("E0015", "此筆授權資料找不到"); // 檢查錯誤
 		}
 		if (authApplCode.equals("1")) {
-			if (tPostAuthLog.getPropDate() > 0) {
-				throw new LogicException("E0015", "此筆授權資料已提出"); // 檢查錯誤
+			if (tPostAuthLog.getFacmNo() == iFacmNo) {
+				if (tPostAuthLog.getPropDate() > 0) {
+					throw new LogicException("E0015", "此筆授權資料已提出"); // 檢查錯誤
+				}
+			} else {
+				return;
 			}
 		}
 		if (!authApplCode.equals(tPostAuthLog.getAuthApplCode())) {
@@ -1129,8 +1146,12 @@ public class BankAuthActCom extends TradeBuffer {
 			throw new LogicException("E0015", "此筆授權資料找不到"); // 檢查錯誤
 		}
 		if (createFlag.equals("A")) {
-			if (tAchAuthLog.getPropDate() > 0) {
-				throw new LogicException("E0015", "此筆授權資料已提出"); // 檢查錯誤
+			if (tAchAuthLog.getFacmNo() == iFacmNo) {
+				if (tAchAuthLog.getPropDate() > 0) {
+					throw new LogicException("E0015", "此筆授權資料已提出"); // 檢查錯誤
+				}
+			} else {
+				return;
 			}
 		}
 		if (("A".equals(createFlag) && !"A".equals(tAchAuthLog.getCreateFlag()))
@@ -1162,7 +1183,7 @@ public class BankAuthActCom extends TradeBuffer {
 		tBankAuthAct.setLimitAmt(iLimitAmt);
 		tBankAuthAct.setAcctSeq(acctSeq);
 		tBankAuthAct.setStatus(status);
-
+		tBankAuthAct.setOtherFields(tTempVo.getJsonString());
 		try {
 			bankAuthActService.insert(tBankAuthAct, titaVo);
 		} catch (DBException e) {
@@ -1213,6 +1234,7 @@ public class BankAuthActCom extends TradeBuffer {
 
 	// 同戶扣款帳號
 	private BankAuthAct getRepayAcct(TitaVo titaVo) throws LogicException {
+		this.info("getRepayAcct ...");
 		int minfacmNo = 999;
 		BankAuthAct tBankAuthAct = null;
 		Slice<BankAuthAct> slBankAuthAct = bankAuthActService.findAcctNo(iCustNo, iRepayAcct, iRepayBank, 0, 999, 0,
@@ -1224,6 +1246,7 @@ public class BankAuthActCom extends TradeBuffer {
 					break;
 				} else {
 					if (t.getFacmNo() < minfacmNo) {
+						minfacmNo = t.getFacmNo();
 						tBankAuthAct = t;
 					}
 				}
@@ -1400,7 +1423,11 @@ public class BankAuthActCom extends TradeBuffer {
 		iRepayBank = FormatUtil.pad9(titaVo.get("RepayBank"), 3);
 		iRelationId = titaVo.get("RelationId");
 		iTitaTxCd = titaVo.getTxcd();
-
+		tTempVo.putParam("RelationCode", iRelationCode);
+		tTempVo.putParam("RelationName", iRelAcctName);
+		tTempVo.putParam("RelationId", iCustId);
+		tTempVo.putParam("RelationBirthday", iRelAcctBirthday);
+		tTempVo.putParam("RelationGender", iRelAcctGender);
 		if (titaVo.get("LimitAmt") != null) {
 			iLimitAmt = parse.stringToBigDecimal(titaVo.get("LimitAmt"));
 		}

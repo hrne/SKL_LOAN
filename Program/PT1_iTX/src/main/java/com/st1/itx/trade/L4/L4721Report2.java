@@ -253,7 +253,6 @@ public class L4721Report2 extends TradeBuffer {
 			// 01
 
 			// 011 1 0 0 0 台北市信義區永吉路１２０巷５０弄１號３樓 0001743 陳清耀
-			// 011 1 0 0 0 台北市信義區永吉路１２０巷５０弄１號３樓 0001743 陳清耀
 
 			String locationX = tmap.get("Location").toString();
 			String locationXX = "";
@@ -262,14 +261,14 @@ public class L4721Report2 extends TradeBuffer {
 				locationXX = toX(locationX.substring(i, i + 1), locationXX);
 			}
 			String X = "";
-			X = toXX(locationXX, "　", 30);
+			X = makeReport.fillUpWord(locationXX, 60, "　", "R");
 
 			String C = "";
-			C = toXX("", "　", 20);
+			C = makeReport.fillUpWord(" ", 45, "　", "R");
 
+			// 011 1 0 0 0 台北市信義區永吉路１２０巷５０弄１號３樓 0001743 陳清耀
 			line = "";
-			line += "01";
-			line += FormatUtil.padX("", 10) + X + "    " + C + " " + FormatUtil.pad9(tmap.get("CustNo"), 7) + " "
+			line = "01" + FormatUtil.padX("", 10) + X + "    " + C + " " + FormatUtil.pad9(tmap.get("CustNo"), 7) + " "
 					+ FormatUtil.padX(tmap.get("CustName"), 10) + "    " + FormatUtil.padX("", 65);
 			// 加入明細
 			result.add(line);
@@ -302,11 +301,11 @@ public class L4721Report2 extends TradeBuffer {
 			}
 			line = "";
 			line += "02";
-			line += " " + FormatUtil.padX(tmap.get("CustName"), 40) + " " + FormatUtil.pad9(tmap.get("CustNo"), 7)
-					+ leftPadding(parse.IntegerToString(specificDd, 2), 6, ' ') + " 日" + "          "
-					+ FormatUtil.padX(tmap.get("RepayCodeX"), 8) + "   " + FormatUtil.pad9(titaVo.getCalDy(), 8)
-					+ FormatUtil.pad9(tmap.get("LoanBal"), 11) + loanBalX + FormatUtil.pad9(headerExcessive, 11)
-					+ headerExcessiveX;
+			line += " " + FormatUtil.padX(tmap.get("CustName"), 40) + " " + FormatUtil.pad9(tmap.get("CustNo"), 7) + "-"
+					+ FormatUtil.pad9(tmap.get("FacmNo"), 3) + leftPadding(parse.IntegerToString(specificDd, 2), 2, ' ')
+					+ " 日" + "          " + FormatUtil.padX(tmap.get("RepayCodeX"), 8) + "   "
+					+ FormatUtil.pad9(titaVo.getCalDy(), 8) + FormatUtil.pad9(tmap.get("LoanBal"), 11) + loanBalX
+					+ FormatUtil.pad9(headerExcessive, 11) + headerExcessiveX;
 			// 加入明細
 			result.add(line);
 
@@ -319,21 +318,24 @@ public class L4721Report2 extends TradeBuffer {
 		line += "03";
 
 		String dateRange = " ";
+
 		String startDate = tmap.get("IntStartDate");
 		String endDate = tmap.get("IntEndDate");
-		String tstartDate = "00000000";
-		String tendDate = "00000000";
+
 		// 組成yyymmdd-yyymmdd
 		if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
 
-			if (!"".equals(makeReport.showRocDate(startDate, 3))) {
-				tstartDate = FormatUtil.pad9(startDate, 8);
+			startDate = makeReport.showRocDate(tmap.get("IntStartDate"), 3);
+			endDate = makeReport.showRocDate(tmap.get("IntEndDate"), 3);
+
+			if (!"".equals(startDate)) {
+				startDate = FormatUtil.pad9(makeReport.showRocDate(startDate, 3), 8);
 			}
 
-			if (!"".equals(makeReport.showRocDate(endDate, 3))) {
-				tendDate = FormatUtil.pad9(endDate, 8);
+			if (!"".equals(endDate)) {
+				endDate = FormatUtil.pad9(makeReport.showRocDate(endDate, 3), 8);
 			}
-			dateRange = tstartDate + "-" + tendDate;
+			dateRange = startDate + "-" + endDate;
 		}
 
 		String txAmtX = "+";

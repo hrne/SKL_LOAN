@@ -663,15 +663,6 @@ public class L2153 extends TradeBuffer {
 		tTempVo.clear();
 		tTempVo.putParam("ProcessCode", tFacCaseAppl.getProcessCode());
 		tTempVo.putParam("ApproveDate", tFacCaseAppl.getApproveDate());
-		tTempVo.putParam("RepayCode", titaVo.get("RepayCode"));
-		tTempVo.putParam("RepayBank", FormatUtil.pad9(titaVo.get("RepayBank"), 3));
-		tTempVo.putParam("PostCode", titaVo.get("PostCode"));
-		tTempVo.putParam("RepayAcctNo", titaVo.get("RepayAcctNo"));
-		tTempVo.putParam("RelationCode", titaVo.get("RelationCode"));
-		tTempVo.putParam("RelationName", titaVo.get("RelationName"));
-		tTempVo.putParam("RelationBirthday", titaVo.get("RelationGender"));
-		tTempVo.putParam("RelationGender", titaVo.get("RelationGender"));
-		tTempVo.putParam("CustId", titaVo.get("CustId"));
 	}
 
 	// 更新階梯式利率

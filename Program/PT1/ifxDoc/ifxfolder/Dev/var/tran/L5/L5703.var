@@ -25,11 +25,11 @@ E(0,0)
 [#<->#,"#FdRemitAcct+債協匯款帳號",#RemitAcct],["#FdRemitAcct2+調解匯款帳號",#RemitAcct2],
 [#<->#,"#FdRemitAcct3+更生匯款帳號",#RemitAcct3],["#FdRemitAcct4+清算匯款帳號",#RemitAcct4],
 [#<->#,"#FdDataSendSection+資料傳送單位",#DataSendSection,#DataSendSectionX],
-[#<->#,"#FdEnable+啟用記號",#Enable]
+[#<->#,"#FdEnable+啟用記號",#Enable,#EnableX]
 ]
 
 #FdFunCd=X,2,L
-T(3,*)
+T(3,)
 #FdFinCode=X,2,L
 T(3,* )
 #FdRemitBank=X,2,L
@@ -47,7 +47,7 @@ T(3, )
 
 !啟用記號使用
 #FdEnable=X,2,L
-C(2,#FunCode,s,T(3,*),T(3,*),S,S)
+T(3,* )
 
 !---------- AP TEXT AREA Variables ----------
 
@@ -86,6 +86,17 @@ HELP(#FunCdHelp)
 @T(3,@FunCdX,)
 V(H,#FunCdHelp)
 
+#WkStar=X,2,S
+C(2,#FunCode,S,T(3,*),T(3,*),T(3,*),T(3, ),T(3, ))
+#WkFdName=X,1,S
+IF(#FunCode==1 || #FunCode==2 || #FunCode==3,s,$)
+T(2,@FdFinCode,#WkStar)
+T(2,@FdRemitBank,#WkStar)
+T(2,@FdRemitAcct,#WkStar)
+T(2,@FdDataSendSection,#WkStar)
+T(2,@FdEnable,#WkStar)
+
+
 #SetSysPar1=X,1,S
 IF(#FunCode ==1 || #FunCode ==3,E(0,0)ASGN(AGAIN$),$)
 
@@ -102,7 +113,7 @@ E(0,@FUNCIND,#FunCode)
 !啟用記號使用---
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 #EnableH=X,100,S
-T(3,Y:啟用;N:未啟用)
+T(3,Y:啟用;N:停用)
 
 #CdEnableFg=x,20,S                  
 T(3,CdCode.EnableFg)   
@@ -119,7 +130,7 @@ T(2,@EnableH,#HelpDesc1)
 !顯示框線
 #Flag=X,1,S
 IF(#FunCode==1,$,T(F,@FinCode,0))
-IF(#FunCode==4,T(F,@FinCode,0)T(F,@FinCodeX,0)T(F,@RemitBank,0)T(F,@RemitAcct,0)T(F,@RemitAcct2,0)T(F,@RemitAcct3,0)T(F,@RemitAcct4,0)T(F,@DataSendSection,0),$) 
+IF(#FunCode==4,T(F,@FinCode,0)T(F,@FinCodeX,0)T(F,@RemitBank,0)T(F,@RemitAcct,0)T(F,@RemitAcct2,0)T(F,@RemitAcct3,0)T(F,@RemitAcct4,0)T(F,@DataSendSection,0)T(F,#Enable,0),$) 
 
 #RimFinCode=X,8,S
 #RimBankCode=X,8,S
@@ -152,6 +163,7 @@ T(2,@RemitAcct2,#L5r04RemitAcct2)
 T(2,@RemitAcct3,#L5r04RemitAcct3)
 T(2,@RemitAcct4,#L5r04RemitAcct4)
 T(2,@DataSendSection,#L5r04DataSendSection)
+T(2,@Enable,#L5r04Enable)
 
 #RimL5r12A=X,1,S
 C(3,#CHAIN,1,$,s)
@@ -163,6 +175,11 @@ E(0,@RimErrFg,1)
 S(L5R12,1,#RimBankCode,#FunctionCode,#RimErrFg)
 R(1,L5R12)
 T(2,@RemitBankX,#L5r12BankItem)
+
+#EnableRIM=X,4,S
+C(4,#Enable,S,$)
+T(H,#Enable,#EnableH)
+T(2,@EnableX,#EnableRIM)
 
 ! 債權機構
 #FinCode=X,8,I
@@ -192,6 +209,7 @@ T(2,@RemitAcct2,#L5r04RemitAcct2)
 T(2,@RemitAcct3,#L5r04RemitAcct3)
 T(2,@RemitAcct4,#L5r04RemitAcct4)
 T(2,@DataSendSection,#L5r04DataSendSection)
+T(2,@Enable,#L5r04Enable)
 
 
 #RimL5r12B1=X,1,S
@@ -289,8 +307,12 @@ T(2,#FinCode)
 ![啟用記號]
 #Enable=X,1,I
 C(2,#FunCode,s,$,$,$,s,s)
+C(3,#FunCode,1,T(2,Y),$)
 HELP(#EnableH)
 @V(H,#EnableH)
+#EnableX=X,4,L
+C(4,#Enable,S,$)
+T(H,#Enable,#EnableH)
 
 </sub>
 

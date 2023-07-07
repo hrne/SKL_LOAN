@@ -132,7 +132,7 @@ public class L4600ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      SELECT FA.\"CustNo\"             AS \"CustNo\"        "; // -- 戶號
 		sql += "          , FA.\"FacmNo\"              AS \"FacmNo\"        "; // -- 額度
 		sql += "          , FA.\"ApplNo\"              AS \"ApplNo\"        "; // -- 額度
-		sql += "          , FA.\"RepayCode\"           AS \"ApplNo\"        "; // -- 繳款方式
+		sql += "          , FA.\"RepayCode\"           AS \"RepayCode\"     "; // -- 繳款方式
 		sql += "          , IO.\"ClCode1\"             AS \"ClCode1\"       "; // -- 押品別1
 		sql += "          , IO.\"ClCode2\"             AS \"ClCode2\"       "; // -- 押品別1
 		sql += "          , IO.\"ClNo\"                AS \"ClNo\"          "; // -- 押品號碼
@@ -143,7 +143,7 @@ public class L4600ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          , NVL(IRO.\"OrigInsuNo\",'') AS \"OrigInsuNo\"    "; // -- 原始保險單號碼
 		sql += "          , LM.\"Status\"              AS \"Status\"        ";  
 		sql += "          , LM.\"MaturityDate\"        AS \"MaturityDate\"  ";  
-        sql += "          , row_number() over (partition by IR.\"OrigInsuNo\" order by FA.\"ApplNo\", IR.\"ClCode1\", IR.\"ClCode2\", IR.\"ClNo\" ) as ROWNUMBER ";
+        sql += "          , row_number() over (partition by IR.\"OrigInsuNo\" order by FA.\"ApplNo\", IO.\"ClCode1\", IO.\"ClCode2\", IO	.\"ClNo\" ) as ROWNUMBER ";
 		sql += "     FROM \"InsuOrignal\" IO ";
 		sql += "     LEFT JOIN \"ClFac\" CF ON CF.\"ClCode1\" = IO.\"ClCode1\" ";
 		sql += "                           AND CF.\"ClCode2\" = IO.\"ClCode2\" ";
@@ -155,8 +155,8 @@ public class L4600ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     LEFT JOIN \"InsuRenew\" IR ON IR.\"PrevInsuNo\" = IO.\"OrigInsuNo\" ";
 		sql += "                               AND IR.\"InsuYearMonth\" = :inputYearMonth ";
 		sql += "     LEFT JOIN \"InsuRenew\" IRO ON NVL(IRO.\"NowInsuNo\",' ') = IO.\"OrigInsuNo\" ";
-		sql += "     WHERE (IR.\"InsuEndDate\") BETWEEN :inputStartDate AND :inputEndDate ";  
-		sql += "       AND TRIM(IR.\"EndoInsuNo\") is NUll ";   
+		sql += "     WHERE (IO.\"InsuEndDate\") BETWEEN :inputStartDate AND :inputEndDate ";  
+		sql += "       AND TRIM(IO.\"EndoInsuNo\") is NUll ";   
 		sql += "       AND CASE WHEN NVL(LM.\"Status\", -1)  IN (0) AND LM.\"MaturityDate\" > :inputEndDate THEN 1 "; // 0:正常戶、到期日 > 續約年月         
 		sql += "                WHEN NVL(LM.\"Status\", -1)  IN (2, 7) THEN 2 ";   // 2:催收戶 7:部分轉呆戶     
 		sql += "                ELSE 0                                        ";   // 排除結案戶、呆帳戶、未撥款戶、續約年月已到期戶        

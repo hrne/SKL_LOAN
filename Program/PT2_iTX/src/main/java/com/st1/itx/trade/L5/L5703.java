@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L5;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.NegAppr01;
+import com.st1.itx.db.domain.NegAppr01Id;
 /* DB容器 */
 import com.st1.itx.db.domain.NegFinAcct;
 import com.st1.itx.db.domain.NegFinShare;
@@ -89,6 +91,7 @@ public class L5703 extends TradeBuffer {
 		String RemitAcct3 = titaVo.getParam("RemitAcct3").trim(); // 更生匯款帳號
 		String RemitAcct4 = titaVo.getParam("RemitAcct4").trim(); // 清算匯款帳號
 		String DataSendSection = titaVo.getParam("DataSendSection").trim(); // 資料傳送單位
+		String Enable = titaVo.getParam("Enable").trim(); // 啟用記號
 
 		NegFinAcct NegFinAcctVO = new NegFinAcct();
 
@@ -110,6 +113,7 @@ public class L5703 extends TradeBuffer {
 			tNegFinAcct.setRemitAcct3(RemitAcct3);
 			tNegFinAcct.setRemitAcct4(RemitAcct4);
 			tNegFinAcct.setDataSendSection(DataSendSection);
+			tNegFinAcct.setEnable(Enable);
 			tNegFinAcct.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			tNegFinAcct.setCreateEmpNo(titaVo.get("TlrNo"));
 			tNegFinAcct.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
@@ -139,6 +143,7 @@ public class L5703 extends TradeBuffer {
 			NegFinAcctVO.setRemitAcct3(RemitAcct3);
 			NegFinAcctVO.setRemitAcct4(RemitAcct4);
 			NegFinAcctVO.setDataSendSection(DataSendSection);
+			NegFinAcctVO.setEnable(Enable);
 			//NegFinAcctVO.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			//NegFinAcctVO.setLastUpdateEmpNo(titaVo.get("TlrNo"));
 

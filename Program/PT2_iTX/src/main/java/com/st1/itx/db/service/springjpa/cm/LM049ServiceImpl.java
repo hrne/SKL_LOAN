@@ -232,7 +232,7 @@ public class LM049ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		sql += " with \"Main\" AS ( ";
 		sql += "   select case  ";
-		sql += "        	when \"CompanyName\" like '新%金%' then 1 ";
+		sql += "        	when \"CompanyName\" like '新%金%' and length(\"CompanyName\") = 4 then 1 ";
 		sql += "        	when \"CompanyName\" like '新%投%' then 4 ";
 		sql += "        	when \"CompanyName\" like '新%銀%' then 4 ";
 		sql += "        	when \"CompanyName\" like '新%人%' then 4 ";
@@ -249,11 +249,11 @@ public class LM049ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          OVER ( ";
 		sql += "            PARTITION BY \"Id\" ";
 		sql += "            ORDER BY case  ";
-		sql += "        			   when \"CompanyName\" like '新%金%' then 1 ";
-		sql += "        			   when \"CompanyName\" like '新%投%' then 4 ";
-		sql += "        			   when \"CompanyName\" like '新%銀%' then 4 ";
-		sql += "        		 	   when \"CompanyName\" like '新%人%' then 4 ";
-		sql += "          			else 9 end asc";
+		sql += "        			   when \"CompanyName\" like '新%金%' and length(\"CompanyName\") = 4 then 1 ";
+		sql += "        			   when \"CompanyName\" like '新%投%' then 23 ";
+		sql += "        			   when \"CompanyName\" like '新%銀%' then 22 ";
+		sql += "        		 	   when \"CompanyName\" like '新%人%' then 21 ";
+		sql += "          			else 99 end asc";
 		sql += "          )  as \"Seq\" ";
 		sql += "        , \"CompanyName\"";
 		sql += "        , \"Id\"";

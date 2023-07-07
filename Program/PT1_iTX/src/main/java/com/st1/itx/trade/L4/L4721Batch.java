@@ -212,8 +212,9 @@ public class L4721Batch extends TradeBuffer {
 				if (CntPaper > 0) {
 					this.batchTransaction.commit();
 					l4721Report2.setBatchTransaction(this.batchTransaction);
-					CntPaper = l4721Report2.exec(titaVo, this.txBuffer, letterCustList, tmpKindItem[txkind - 1],
-							isAdjDate, ieAdjDate, sEntryDate, eEntryDate);
+					CntPaper = l4721Report2.exec(titaVo, this.txBuffer, letterCustList,
+							this.iTxKind == 0 ? tmpKindItem[txkind - 1] : titaVo.getParam("TxKindX")
+, isAdjDate, ieAdjDate, sEntryDate, eEntryDate);
 
 				}
 			} // if
