@@ -143,9 +143,9 @@ public class L3916 extends TradeBuffer {
 		// 查詢各項費用
 		baTxCom.settingUnPaid(this.txBuffer.getTxCom().getTbsdy(), iCustNo, iFacmNo, iBormNo, 99, BigDecimal.ZERO,
 				titaVo); // 99-費用全部(含未到期)
-		// 2: 催收戶 5: 催收結案戶 6: 呆帳戶 7: 部分轉呆戶 9: 呆帳結案戶
+		// 2: 催收戶 5: 催收結案戶 6: 呆帳戶 7: 部分轉呆戶8:債權轉讓戶 9: 呆帳結案戶
 		if (tLoanBorMain.getStatus() == 2 || tLoanBorMain.getStatus() == 5 || tLoanBorMain.getStatus() == 6
-				|| tLoanBorMain.getStatus() == 7 || tLoanBorMain.getStatus() == 9) {
+				|| tLoanBorMain.getStatus() == 7 || tLoanBorMain.getStatus() == 8 || tLoanBorMain.getStatus() == 9) {
 			tLoanOverdue = loanOverdueService.findById(new LoanOverdueId(tLoanBorMain.getCustNo(),
 					tLoanBorMain.getFacmNo(), tLoanBorMain.getBormNo(), tLoanBorMain.getLastOvduNo()), titaVo);
 			if (tLoanOverdue == null) {

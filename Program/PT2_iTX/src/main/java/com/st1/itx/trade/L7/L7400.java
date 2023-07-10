@@ -23,14 +23,11 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.SlipMedia2022;
 import com.st1.itx.db.domain.TxToDoDetailId;
-import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.SlipMedia2022Service;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.StaticTool;
 import com.st1.itx.util.common.EbsCom;
 import com.st1.itx.util.common.TxToDoCom;
-import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -48,10 +45,6 @@ public class L7400 extends TradeBuffer {
 
 	/* DB服務注入 */
 	@Autowired
-	private AcDetailService sAcDetailService;
-
-	/* DB服務注入 */
-	@Autowired
 	private SlipMedia2022Service sSlipMedia2022Service;
 
 	@Autowired
@@ -60,12 +53,6 @@ public class L7400 extends TradeBuffer {
 	public Parse parse;
 	@Autowired
 	private TxToDoCom txToDoCom;
-
-	@Autowired
-	private WebClient webClient;
-
-	@Autowired
-	private DateUtil dDateUtil;
 
 	private JSONArray journalTbl;
 	private BigInteger groupId;
@@ -105,6 +92,7 @@ public class L7400 extends TradeBuffer {
 		this.info("L7400 iAcDate = " + iAcDate);
 		this.info("L7400 iBatchNo = " + iBatchNo);
 		this.info("L7400 iMediaSeq = " + iMediaSeq);
+		titaVo.putParam("MRKEY", titaVo.getParam("AcDate") + "-" + titaVo.getParam("BatchNo") + "-" + titaVo.getParam("MediaSeq"));
 
 		BigDecimal tmpGroupId = new BigDecimal(iAcDate + 19110000).multiply(new BigDecimal(1000))
 				.add(new BigDecimal(iMediaSeq));
@@ -140,7 +128,6 @@ public class L7400 extends TradeBuffer {
 			txBal = dbCr.equals("D") ? txAmt.toString() : txAmt.negate().toString();
 
 			putDataJo(slipMedia, tellerNo, txBal);
-
 			lineNum++;
 		}
 		// 統計並送出
@@ -161,6 +148,11 @@ public class L7400 extends TradeBuffer {
 			updateTxToDo(iAcDate, iBatchNo, iMediaSeq, titaVo);
 		} else {
 			totaVo.putParam("SendStatus", "F");
+			for (SlipMedia2022 slipMedia : listSlipMedia2022) {
+				slipMedia.setTransferFlag("Y");						
+				slipMedia.setErrorCode("");
+				slipMedia.setErrorMsg("");				
+			}
 			List<Map<String, String>> errorList = ebsCom.getErrorList();
 			for (Map<String, String> error : errorList) {
 				OccursList occurslist = new OccursList();
@@ -170,7 +162,15 @@ public class L7400 extends TradeBuffer {
 				occurslist.putParam("ErrorCode", error.get("ErrorCode"));
 				occurslist.putParam("ErrorMessage", error.get("ErrorMessage"));
 				this.totaVo.addOccursList(occurslist);
+				for (SlipMedia2022 slipMedia : listSlipMedia2022) {
+					if (parse.stringToInteger(error.get("JeLineNum")) == slipMedia.getSeq()) {
+						slipMedia.setTransferFlag("N");						
+						slipMedia.setErrorCode(error.get("ErrorCode"));
+						slipMedia.setErrorMsg(error.get("ErrorMessage"));
+					}
+				}
 			}
+			updateSlipMediaAll(listSlipMedia2022, titaVo);
 		}
 
 		this.addList(this.totaVo);

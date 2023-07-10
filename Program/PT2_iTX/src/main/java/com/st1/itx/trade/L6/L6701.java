@@ -101,15 +101,15 @@ public class L6701 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0003", "行庫代號:" + iBankCode + "-" + iBranchCode); // 修改資料不存在
 			}
 			CdBank tCdBank2 = (CdBank) dataLog.clone(tCdBank); ////
+			tCdBank.setBankItem(iBankItem);
+			tCdBank.setBranchCode(iBranchCode);
+			tCdBank.setBranchItem(iBranchItem);
+			tCdBank.setLastUpdate(
+					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+			tCdBank.setLastUpdateEmpNo(titaVo.getTlrNo());
+			tCdBank.setEnable(iEnable);
 			try {
-				tCdBank.setBankItem(iBankItem);
-				tCdBank.setBranchCode(iBranchCode);
-				tCdBank.setBranchItem(iBranchItem);
-				tCdBank.setLastUpdate(
-						parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-				tCdBank.setLastUpdateEmpNo(titaVo.getTlrNo());
 				tCdBank = sCdBankService.update2(tCdBank, titaVo); ////
-				tCdBank.setEnable(iEnable);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}

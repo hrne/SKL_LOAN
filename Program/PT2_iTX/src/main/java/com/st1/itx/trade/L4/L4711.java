@@ -14,8 +14,10 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.SystemParas;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.domain.TxToDoDetailId;
+import com.st1.itx.db.service.SystemParasService;
 import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.MakeFile;
@@ -53,6 +55,9 @@ public class L4711 extends TradeBuffer {
 	@Autowired
 	private MakeReport makeReport;
 
+	@Autowired
+	private SystemParasService systemParasService;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4711 ");
@@ -83,6 +88,16 @@ public class L4711 extends TradeBuffer {
 			return new ArrayList<>();
 		}
 
+		SystemParas systemParas = systemParasService.findById("LN", titaVo);
+
+		String emailFlag = "N";
+
+		if (systemParas != null) {
+			emailFlag = systemParas.getEmailFlag();
+		}
+
+		this.info("L4711 emailFlag = " + emailFlag);
+
 		for (TxToDoDetail tTxToDoDetail : sTxToDoDetail) {
 
 			int custNo = tTxToDoDetail.getCustNo();
@@ -111,48 +126,22 @@ public class L4711 extends TradeBuffer {
 
 			this.info("processNotes = " + processNotes);
 
-			if (!processNotes.contains("<s>")) {
-				this.info("processNotes 無項目區分標籤<s>,格式不合,跳過,讀下一筆");
-				continue;
+			if (emailFlag.equals("Y") || emailFlag.equals("T")) {
+				if (!processNotes.contains("<s>")) {
+					this.info("processNotes 無項目區分標籤<s>,格式不合,跳過,讀下一筆");
+					continue;
+				}
+
+				MailVo mailVo = new MailVo();
+
+				if (!mailVo.splitProcessNotes(processNotes)) {
+					this.info("processNotes 應有3~4個項目,格式不合,跳過,讀下一筆");
+					continue;
+				}
+				sendMail(emailFlag, mailVo);
 			}
 
 			makeFile.put(processNotes);
-			this.info("tTxToDoDetail : " + tTxToDoDetail.toString());
-
-			MailVo mailVo = new MailVo();
-
-			if (!mailVo.splitProcessNotes(processNotes)) {
-				this.info("processNotes 應有3~4個項目,格式不合,跳過,讀下一筆");
-				continue;
-			}
-
-			// 收件信箱
-			String email = mailVo.getEmail();
-
-			emailCheck(email);
-
-			// 信件標題
-			String subject = mailVo.getSubject();
-			// 信件內文
-			String bodyText = mailVo.getBodyText();
-			// 信件附件PDF
-			long pdfno = mailVo.getPdfNo();
-
-			// 該有的欄位都有，傳去 mailService
-			mailService.setParams(email, subject, bodyText);
-
-			if (pdfno > 0) {
-				String path = Paths.get(outFolder, pdfno + "-" + subject + ".pdf").toString();
-
-				// 先設好參數,後面發送Email時才會讀取
-				mailService.setParams("", path);
-
-				// 製作暫存表
-				makeReport.toPdf(pdfno, pdfno + "-" + subject);
-			}
-
-			// 發送Email
-			mailService.exec();
 
 			// 更新
 			TxToDoDetailId tTxToDoDetailId = new TxToDoDetailId();
@@ -171,6 +160,43 @@ public class L4711 extends TradeBuffer {
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+
+	private void sendMail(String emailFlag, MailVo mailVo) throws LogicException {
+		this.info("sendMail ... ");
+
+		// 收件信箱
+		String email = mailVo.getEmail();
+		// 信件標題
+		String subject = mailVo.getSubject();
+		// 信件內文
+		String bodyText = mailVo.getBodyText();
+		// 信件附件PDF
+		long pdfno = mailVo.getPdfNo();
+
+		if (emailFlag.equals("T")) {
+			// T:測試用(測試套固定發送到skcu31780001@skl.com.tw,信件標題增加"測試用")
+			email = "skcu31780001@skl.com.tw";
+			subject = "[測試用]" + subject;
+		}
+
+		emailCheck(email);
+
+		// 該有的欄位都有，傳去 mailService
+		mailService.setParams(email, subject, bodyText);
+
+		if (pdfno > 0) {
+			String path = Paths.get(outFolder, pdfno + "-" + subject + ".pdf").toString();
+
+			// 先設好參數,後面發送Email時才會讀取
+			mailService.setParams("", path);
+
+			// 製作暫存表
+			makeReport.toPdf(pdfno, pdfno + "-" + subject);
+		}
+
+		// 發送Email
+		mailService.exec();
 	}
 
 	private void emailCheck(String email) {

@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class SystemParas implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -3765169125586309079L;
-
-// 業務類型
+  // 業務類型
   /* LN */
   @Id
   @Column(name = "`BusinessType`", length = 2)
@@ -288,7 +284,7 @@ public class SystemParas implements Serializable {
   private String smsFtpAuth;
 
   // 是否上傳簡訊媒體檔
-  /* Y:啟用N:不啟用 */
+  /* Y:啟用(2023-07-04 改回用FTP from SKL 琦欣)N:不啟用A:API模式(2023-05-29 改用API傳送 from SKL 琦欣)T:測試模式(2023-07-05 SKL 琦欣 說資訊長要他測API能撐最多幾筆) */
   @Column(name = "`SmsFtpFlag`", length = 1)
   private String smsFtpFlag;
 
@@ -374,6 +370,11 @@ public class SystemParas implements Serializable {
   // 憑證認證
   @Column(name = "`PfxAuth`", length = 100)
   private String pfxAuth;
+
+  // Email記號
+  /* Y:是(限正式環境使用)N:否T:測試用(測試套固定發送到skcu31780001@skl.com.tw,信件標題增加"測試用") */
+  @Column(name = "`EmailFlag`", length = 1)
+  private String emailFlag;
 
   // 建檔日期時間
   @CreatedDate
@@ -1484,8 +1485,10 @@ N:不啟用
 
 /**
 	* 是否上傳簡訊媒體檔<br>
-	* Y:啟用
+	* Y:啟用(2023-07-04 改回用FTP from SKL 琦欣)
 N:不啟用
+A:API模式(2023-05-29 改用API傳送 from SKL 琦欣)
+T:測試模式(2023-07-05 SKL 琦欣 說資訊長要他測API能撐最多幾筆)
 	* @return String
 	*/
   public String getSmsFtpFlag() {
@@ -1494,8 +1497,10 @@ N:不啟用
 
 /**
 	* 是否上傳簡訊媒體檔<br>
-	* Y:啟用
+	* Y:啟用(2023-07-04 改回用FTP from SKL 琦欣)
 N:不啟用
+A:API模式(2023-05-29 改用API傳送 from SKL 琦欣)
+T:測試模式(2023-07-05 SKL 琦欣 說資訊長要他測API能撐最多幾筆)
   *
   * @param smsFtpFlag 是否上傳簡訊媒體檔
 	*/
@@ -1856,6 +1861,29 @@ N:否
   }
 
 /**
+	* Email記號<br>
+	* Y:是(限正式環境使用)
+N:否
+T:測試用(測試套固定發送到skcu31780001@skl.com.tw,信件標題增加"測試用")
+	* @return String
+	*/
+  public String getEmailFlag() {
+    return this.emailFlag == null ? "" : this.emailFlag;
+  }
+
+/**
+	* Email記號<br>
+	* Y:是(限正式環境使用)
+N:否
+T:測試用(測試套固定發送到skcu31780001@skl.com.tw,信件標題增加"測試用")
+  *
+  * @param emailFlag Email記號
+	*/
+  public void setEmailFlag(String emailFlag) {
+    this.emailFlag = emailFlag;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -1945,7 +1973,7 @@ N:否
            + ", loanMediaFtpUrl=" + loanMediaFtpUrl + ", loanMediaFtpAuth=" + loanMediaFtpAuth + ", smsFtpUrl=" + smsFtpUrl + ", smsFtpAuth=" + smsFtpAuth + ", smsFtpFlag=" + smsFtpFlag + ", jcicEmpName=" + jcicEmpName
            + ", jcicEmpTel=" + jcicEmpTel + ", autoBatchFg=" + autoBatchFg + ", batchFireFeeFg=" + batchFireFeeFg + ", icsFg=" + icsFg + ", icsUrl=" + icsUrl + ", icsBatchMaxCount=" + icsBatchMaxCount
            + ", insuSettleDate=" + insuSettleDate + ", jcicZDep=" + jcicZDep + ", jcicZName=" + jcicZName + ", jcicZTel=" + jcicZTel + ", jcicMU1Dep=" + jcicMU1Dep + ", jcicMU1Name=" + jcicMU1Name
-           + ", jcicMU1Tel=" + jcicMU1Tel + ", coreRemitLimit=" + coreRemitLimit + ", l6972Flag=" + l6972Flag + ", pfxPath=" + pfxPath + ", pfxAuth=" + pfxAuth + ", createDate=" + createDate
-           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", jcicMU1Tel=" + jcicMU1Tel + ", coreRemitLimit=" + coreRemitLimit + ", l6972Flag=" + l6972Flag + ", pfxPath=" + pfxPath + ", pfxAuth=" + pfxAuth + ", emailFlag=" + emailFlag
+           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }
