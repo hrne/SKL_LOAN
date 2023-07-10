@@ -26,6 +26,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.TxToDoCom;
+import com.st1.itx.util.common.data.MailVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
@@ -267,9 +268,8 @@ public class L4703 extends TradeBuffer {
 			for (CustNotice tCustNotice : lCustNoticeC) {
 
 				if ("L9703".equals(tCustNotice.getFormNo()) && "Y".equals(tCustNotice.getEmailNotice())) {
-					dataLines = "\"H1\",\"" + tCustMain.getCustId() + "\",\"" + noticeEmail
-							+ "\",\"親愛的客戶，繳款通知；新光人壽關心您。”,\"" + sEntryDate + "\"";
-					dataList.add(dataLines);
+					MailVo mailVo = new MailVo();
+					String processNote = mailVo.generateProcessNotes(noticeEmail, "滯繳通知", "親愛的客戶，繳款通知；新光人壽關心您。", 0);
 
 					TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 					tTxToDoDetail.setCustNo(custNo);
@@ -278,7 +278,7 @@ public class L4703 extends TradeBuffer {
 					tTxToDoDetail.setDtlValue("<滯繳通知>");
 					tTxToDoDetail.setItemCode("MAIL00");
 					tTxToDoDetail.setStatus(0);
-					tTxToDoDetail.setProcessNote(dataLines);
+					tTxToDoDetail.setProcessNote(processNote);
 
 					txToDoCom.addDetail(false, 9, tTxToDoDetail, titaVo);
 				}

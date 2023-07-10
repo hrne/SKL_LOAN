@@ -35,6 +35,7 @@ import com.st1.itx.util.common.AcReceivableCom;
 import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.TxToDoCom;
+import com.st1.itx.util.common.data.MailVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.http.WebClient;
@@ -392,17 +393,10 @@ public class L4603p extends TradeBuffer {
 		tCustMain = custMainService.custNoFirst(tInsuRenew.getCustNo(), tInsuRenew.getCustNo(), titaVo);
 
 		ArrayList<String> dataList = new ArrayList<String>();
-		String dataLines = "<" + noticeEmail + ">";
 
-		// 2022-01-14 智偉修改
-		// L4711 會用這段去切資料出來用
-		// L4711>String[] processNotes = tTxToDoDetail.getProcessNote().split(",");
-		// L4711>String email = processNotes[2];
-		// L4711>long pdfno = Long.parseLong(processNotes[3]);
-		// 若未來有修改此段落時,請一併修改L4711
-		dataLines += "\"H1\",\"" + tCustMain.getCustId() + "\"," + noticeEmail + "," + sno
-				+ ",\"親愛的客戶，繳款通知；新光人壽關心您。”,\"" + sEntryDate + "\"";
-		dataList.add(dataLines);
+		MailVo mailVo = new MailVo();
+		String processNote = mailVo.generateProcessNotes(noticeEmail, "火險保費",
+				"親愛的客戶，繳款通知；新光人壽關心您", 0);
 
 		txToDoCom.setTxBuffer(this.getTxBuffer());
 
@@ -413,7 +407,7 @@ public class L4603p extends TradeBuffer {
 		tTxToDoDetail.setDtlValue("<火險保費>" + tInsuRenew.getPrevInsuNo());
 		tTxToDoDetail.setItemCode("MAIL00");
 		tTxToDoDetail.setStatus(0);
-		tTxToDoDetail.setProcessNote(dataLines);
+		tTxToDoDetail.setProcessNote(processNote);
 
 		txToDoCom.addDetail(true, flag, tTxToDoDetail, titaVo);
 

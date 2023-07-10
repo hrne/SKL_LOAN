@@ -2,8 +2,6 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import com.st1.itx.util.StaticTool;
@@ -20,7 +18,12 @@ import com.st1.itx.Exception.LogicException;
 public class FacCloseId implements Serializable {
 
 
-  // 申請日期
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2125773983445743673L;
+
+// 申請日期
   /* 日曆日 */
   @Column(name = "`ApplDate`")
   private int applDate = 0;

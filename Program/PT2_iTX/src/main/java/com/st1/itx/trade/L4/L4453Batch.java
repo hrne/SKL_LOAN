@@ -27,6 +27,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.FileCom;
 import com.st1.itx.util.common.TxToDoCom;
+import com.st1.itx.util.common.data.MailVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.http.WebClient;
@@ -287,11 +288,11 @@ public class L4453Batch extends TradeBuffer {
 	private void setMail(tmpFacm tmp, TitaVo titaVo) throws LogicException {
 //		RepayType = 1.期款 2.部分償還 3.結案 4.帳管費 5.火險費 6.契變手續費 7.法務費 9.其他
 		this.info("setMail...");
-		String dataLines = "<" + noticeEmail + ">";
 		if (tmp.getRepayType() == 1 || tmp.getRepayType() == 3) {
 			this.info("RepayType() == 1 3...");
 			if (!custLoanFlag.containsKey(tmp.getCustNo())) {
-				dataLines += "親愛的客戶，繳款通知；新光人壽關心您。";
+				MailVo mailVo = new MailVo();
+				String processNote = mailVo.generateProcessNotes(noticeEmail, "期款扣款通知", "親愛的客戶，繳款通知；新光人壽關心您。", 0);
 				// Step3. send L6001
 				TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 				tTxToDoDetail.setCustNo(tmp.getCustNo());
@@ -300,7 +301,7 @@ public class L4453Batch extends TradeBuffer {
 				tTxToDoDetail.setDtlValue("<期款扣款通知>");
 				tTxToDoDetail.setItemCode("MAIL00");
 				tTxToDoDetail.setStatus(0);
-				tTxToDoDetail.setProcessNote(dataLines);
+				tTxToDoDetail.setProcessNote(processNote);
 
 				txToDoCom.addDetail(true, 9, tTxToDoDetail, titaVo);
 
@@ -316,7 +317,10 @@ public class L4453Batch extends TradeBuffer {
 				String sInsuAmt = toFullWidth("" + insuFee.get(tmp));
 				String sInsuMonth = FormatUtil.pad9(toFullWidth("" + insuMonth.get(tmp)), 5).substring(3, 5);
 
-				dataLines += "您好：提醒您" + sInsuMonth + "月份，除期款外，另加收年度火險地震險費＄" + sInsuAmt + "，請留意帳戶餘額。新光人壽關心您。";
+				MailVo mailVo = new MailVo();
+				String processNote = mailVo.generateProcessNotes(noticeEmail, "火險扣款通知",
+						"您好：提醒您" + sInsuMonth + "月份，除期款外，另加收年度火險地震險費＄" + sInsuAmt + "，請留意帳戶餘額。新光人壽關心您。", 0);
+
 				// Step3. send L6001
 				TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 				tTxToDoDetail.setCustNo(tmp.getCustNo());
@@ -325,7 +329,7 @@ public class L4453Batch extends TradeBuffer {
 				tTxToDoDetail.setDtlValue("<火險扣款通知>");
 				tTxToDoDetail.setItemCode("MAIL00");
 				tTxToDoDetail.setStatus(0);
-				tTxToDoDetail.setProcessNote(dataLines);
+				tTxToDoDetail.setProcessNote(processNote);
 
 				txToDoCom.addDetail(true, 9, tTxToDoDetail, titaVo);
 

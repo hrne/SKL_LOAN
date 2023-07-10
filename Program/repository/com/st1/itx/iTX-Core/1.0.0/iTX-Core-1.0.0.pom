@@ -5,7 +5,6 @@
 	<groupId>com.st1.itx</groupId>
 	<artifactId>iTX-Core</artifactId>
 	<version>1.0.0</version>
-	<packaging>jar</packaging>
 
 	<properties>
 		<!-- Generic properties -->

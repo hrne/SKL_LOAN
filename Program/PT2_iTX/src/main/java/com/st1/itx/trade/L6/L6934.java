@@ -5,25 +5,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.db.domain.CdEmp;
-import com.st1.itx.db.domain.TxTranCode;
-import com.st1.itx.db.domain.TxDataLog;
-import com.st1.itx.db.domain.TxDataLogId;
-import com.st1.itx.db.service.CdEmpService;
-import com.st1.itx.db.service.TxDataLogService;
-import com.st1.itx.db.service.TxTranCodeService;
-import com.st1.itx.Exception.LogicException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.st1.itx.Exception.DBException;
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.domain.TxDataLog;
+import com.st1.itx.db.domain.TxDataLogId;
+import com.st1.itx.db.domain.TxTranCode;
+import com.st1.itx.db.service.CdEmpService;
+import com.st1.itx.db.service.TxDataLogService;
+import com.st1.itx.db.service.TxTranCodeService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.format.StringCut;
 import com.st1.itx.util.parse.Parse;
@@ -103,7 +100,12 @@ public class L6934 extends TradeBuffer {
 			String oval = map.get("o").toString();
 
 			String nval = map.get("n").toString();
-
+			// 去除金額.00處理
+			if (oval.length() > 3) {
+				if (".00".equals(oval.substring(oval.length() - 3, oval.length()))) {
+					oval = oval.substring(0, oval.length() - 3);
+				}
+			}
 			if (nval.length() > 3) {
 				if (".00".equals(nval.substring(nval.length() - 3, nval.length()))) {
 					nval = nval.substring(0, nval.length() - 3);
@@ -127,6 +129,18 @@ public class L6934 extends TradeBuffer {
 				if ("個別加碼".equals(fld)) {
 					continue;
 				}
+			}
+			// L2606帳管費維護
+			if ("L2606".equals(txDataLog.getTranNo())) {
+				if ("業務科目代號加碼".equals(fld) || "科目代號".equals(fld) || "子目代號".equals(fld) || "細目代號".equals(fld)
+						|| "單位別".equals(fld) || "銷帳記號".equals(fld) || "業務科目記號".equals(fld) || "銷帳科目記號".equals(fld)
+						|| "起帳金額".equals(fld) || "會計日餘額".equals(fld) || "帳冊別".equals(fld) || "區隔帳冊".equals(fld)
+						|| "起帳交易代號".equals(fld) || "起帳單位別".equals(fld) || "起帳經辦".equals(fld) || "起帳交易序號".equals(fld)
+						|| "上次作帳日".equals(fld) || "最後交易日".equals(fld) || "交易代號".equals(fld) || "單位別".equals(fld)
+						|| "經辦".equals(fld) || "交易序號".equals(fld) || "jason格式紀錄欄".equals(fld)) {
+					continue;
+				}
+
 			}
 
 			this.info(fld + " = " + oval + " to " + nval);

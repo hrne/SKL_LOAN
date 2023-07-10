@@ -23,6 +23,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.TxToDoCom;
+import com.st1.itx.util.common.data.MailVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.http.WebClient;
@@ -213,8 +214,8 @@ public class L4721Batch extends TradeBuffer {
 					this.batchTransaction.commit();
 					l4721Report2.setBatchTransaction(this.batchTransaction);
 					CntPaper = l4721Report2.exec(titaVo, this.txBuffer, letterCustList,
-							this.iTxKind == 0 ? tmpKindItem[txkind - 1] : titaVo.getParam("TxKindX")
-, isAdjDate, ieAdjDate, sEntryDate, eEntryDate);
+							this.iTxKind == 0 ? tmpKindItem[txkind - 1] : titaVo.getParam("TxKindX"), isAdjDate,
+							ieAdjDate, sEntryDate, eEntryDate);
 
 				}
 			} // if
@@ -353,16 +354,9 @@ public class L4721Batch extends TradeBuffer {
 		tCustMain = custMainService.custNoFirst(parse.stringToInteger(tmpCustFacm.get("CustNo")),
 				parse.stringToInteger(tmpCustFacm.get("CustNo")), titaVo);
 
-		String dataLines = "<" + noticeEmail + ">";
-
-		// L4711>String[] processNotes = tTxToDoDetail.getProcessNote().split(",");
-		// L4711>String email = processNotes[2];
-		// L4711>long pdfno = Long.parseLong(processNotes[3]);
-		// 若未來有修改此段落時,請一併修改L4711
-		dataLines += "\"H1\",\"" + tCustMain.getCustId() + "\"," + noticeEmail + "," + this.sno
-				+ ",\"親愛的客戶您好，新光人壽通知您，房貸利率調整，敬請留意帳戶餘額以利扣款。\",\"" + this.getTxBuffer().getMgBizDate().getTbsDy() + "\"";
-
-		dataLines = "親愛的客戶您好，新光人壽通知您，房貸利率調整，敬請留意帳戶餘額以利扣款。";
+		MailVo mailVo = new MailVo();
+		String processNote = mailVo.generateProcessNotes(noticeEmail, "利率調整通知", "親愛的客戶您好，新光人壽通知您，房貸利率調整，敬請留意帳戶餘額以利扣款。",
+				this.sno);
 
 		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 		tTxToDoDetail.setCustNo(parse.stringToInteger(tmpCustFacm.get("CustNo")));
@@ -372,7 +366,7 @@ public class L4721Batch extends TradeBuffer {
 		tTxToDoDetail.setDtlValue("<利率調整通知>");
 		tTxToDoDetail.setItemCode("MAIL00");
 		tTxToDoDetail.setStatus(0);
-		tTxToDoDetail.setProcessNote(dataLines);
+		tTxToDoDetail.setProcessNote(processNote);
 
 		txToDoCom.addDetail(true, 9, tTxToDoDetail, titaVo);
 	}

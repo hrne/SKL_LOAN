@@ -34,6 +34,7 @@ import com.st1.itx.trade.L9.L9705Report;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.TxToDoCom;
+import com.st1.itx.util.common.data.MailVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.http.WebClient;
@@ -263,7 +264,7 @@ public class L4454 extends TradeBuffer {
 		repayType = parse.stringToInteger(t.get("RepayType"));
 		repayAmt = parse.stringToBigDecimal(t.get("RepayAmt"));
 		prevIntDate = parse.stringToInteger(t.get("PrevIntDate"));
-		
+
 		int collPrevIntDate = parse.stringToInteger(t.get("PrevIntDate"));
 		tTempVo = tTempVo.getVo(t.get("JsonFields"));
 		this.info("InsuYearMonth=" + t.get("InsuYearMonth"));
@@ -290,7 +291,7 @@ public class L4454 extends TradeBuffer {
 				int fistDeduct = 0;
 				// 目前繳息迄日>=扣帳檔繳息迄日，不出
 				if (parse.stringToInteger(t.get("CollPrevIntDate")) >= prevIntDate) {
-					this.info("目前繳息迄日>扣帳檔繳息迄日" + t.toString() );
+					this.info("目前繳息迄日>扣帳檔繳息迄日" + t.toString());
 					break;
 				}
 				unSuccText(iRepayBank, t, insuMon, titaVo); // 不成功簡訊通知
@@ -462,12 +463,12 @@ public class L4454 extends TradeBuffer {
 			throws LogicException {
 //		RepayType = 1.期款 2.部分償還 3.結案 4.帳管費 5.火險費 6.契變手續費 7.法務費 9.其他
 		this.info("setMail...");
-		String dataLines = "<" + emailAd + ">";
 		if (repayType == 1 || repayType == 3) {
 			this.info("RepayType() == 1...");
 			if (!custLoanFlag.containsKey(custNo)) {
 				cntEmail++;
-				dataLines += "親愛的客戶，繳款通知；新光人壽關心您。";
+				MailVo mailVo = new MailVo();
+				String processNote = mailVo.generateProcessNotes(emailAd, "期款扣款失敗", "親愛的客戶，繳款通知；新光人壽關心您。", 0);
 				// Step3. send L6001
 				TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 				tTxToDoDetail.setCustNo(custNo);
@@ -476,7 +477,7 @@ public class L4454 extends TradeBuffer {
 				tTxToDoDetail.setDtlValue("<期款扣款失敗>" + repayBank);
 				tTxToDoDetail.setItemCode("MAIL00");
 				tTxToDoDetail.setStatus(0);
-				tTxToDoDetail.setProcessNote(dataLines);
+				tTxToDoDetail.setProcessNote(processNote);
 
 				txToDoCom.addDetail(true, 9, tTxToDoDetail, titaVo);
 
@@ -496,8 +497,10 @@ public class L4454 extends TradeBuffer {
 
 				this.info("sInsuAmt ... " + sInsuAmt);
 				this.info("sInsuMonth ... " + toFullWidth("" + insuM));
+				MailVo mailVo = new MailVo();
+				String processNote = mailVo.generateProcessNotes(emailAd, "火險扣款失敗",
+						"您好：提醒您" + sInsuMonth + "月份，除期款外，另加收年度火險地震險費＄" + sInsuAmt + "，請留意帳戶餘額。新光人壽關心您。", 0);
 
-				dataLines += "您好：提醒您" + sInsuMonth + "月份，除期款外，另加收年度火險地震險費＄" + sInsuAmt + "，請留意帳戶餘額。新光人壽關心您。";
 				// Step3. send L6001
 				TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 				tTxToDoDetail.setCustNo(custNo);
@@ -506,7 +509,7 @@ public class L4454 extends TradeBuffer {
 				tTxToDoDetail.setDtlValue("<火險扣款失敗>" + repayBank);
 				tTxToDoDetail.setItemCode("MAIL00");
 				tTxToDoDetail.setStatus(0);
-				tTxToDoDetail.setProcessNote(dataLines);
+				tTxToDoDetail.setProcessNote(processNote);
 				txToDoCom.addDetail(true, 9, tTxToDoDetail, titaVo);
 
 //				目前為同一戶號僅寄一封簡訊，後續要改依狀況寄送需改key
