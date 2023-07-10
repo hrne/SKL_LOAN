@@ -143,7 +143,7 @@ public class L4600ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          , NVL(IRO.\"OrigInsuNo\",'') AS \"OrigInsuNo\"    "; // -- 原始保險單號碼
 		sql += "          , LM.\"Status\"              AS \"Status\"        ";  
 		sql += "          , LM.\"MaturityDate\"        AS \"MaturityDate\"  ";  
-        sql += "          , row_number() over (partition by IR.\"OrigInsuNo\" order by FA.\"ApplNo\", IO.\"ClCode1\", IO.\"ClCode2\", IO	.\"ClNo\" ) as ROWNUMBER ";
+        sql += "          , row_number() over (partition by IO.\"OrigInsuNo\" order by FA.\"ApplNo\", IO.\"ClCode1\", IO.\"ClCode2\", IO	.\"ClNo\" ) as ROWNUMBER ";
 		sql += "     FROM \"InsuOrignal\" IO ";
 		sql += "     LEFT JOIN \"ClFac\" CF ON CF.\"ClCode1\" = IO.\"ClCode1\" ";
 		sql += "                           AND CF.\"ClCode2\" = IO.\"ClCode2\" ";
