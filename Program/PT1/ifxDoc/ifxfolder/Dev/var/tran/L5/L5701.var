@@ -325,6 +325,7 @@ C(4,#L2r07CustName,S,T(2,@PayerCustName,#L2r07CustName))
 #CheckChgCondDateIsZero=X,1,S
 IF(#ChgCondDate!=0,CALL(#ShowChgCondDate),
     IF(#FunctionCode==9,CALL(#ShowChgCondDate),CALL(#HideChgCondDate)))
+
 !債權銀行3碼改為8碼
 #RimBankCode=X,8,S
 #RimErrFg=A,1,S
@@ -630,6 +631,11 @@ V(H,#StatusHelp)
 #StatusX=X,6,L
 T(H,#Status,#StatusHelp)
 
+!修改成已變更則須輸入變更條件日
+#CheckChgCondDateIsZero2=X,1,S
+ IF( #FunctionCode==2 && #Status ==1,CALL(#ShowChgCondDate),s)
+
+
 !延期繳款年月(起)
 #DeferYMStartX=X,5,I
 IF(#FunctionCode=="02"||#FunctionCode=="10",$,s)
@@ -664,12 +670,13 @@ IF(#FunctionCode=="01"||#FunctionCode=="02",$,s)
 D(8)
 @V(7)A(DATE,0,#ApplDate)
 
-! 變更還款日期
-! 設定毀諾->變更還款日期必填寫
+! 變更還款日期:20230707怡婷要求階段新增時也要填=>
+!    階段新增時戶況為未生效,應於變更戶況為已變更時填寫變更還款條件日
 #ChgCondDate=D,7,I
-IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
+IF(#FunctionCode=="09",$,IF(#FunctionCode=="02" && #Status==1,$,s))
+!IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
 D(8)
-IF(#FunctionCode==9,$,s)
+!IF(#FunctionCode==9,$,s)
 @V(7)
 A(DATE,0,#ChgCondDate)
 

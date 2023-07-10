@@ -46,7 +46,7 @@ public class LM004Report2 extends MakeReport {
 		makeExcel.setSheet(defaultSheet, newSheetName);
 
 		int row = 3;
-		int num = 1;
+		int num = 0;
 		makeExcel.setValue(1, 1, showDate(entdy, 2) + "長中短期放款到期追蹤表");
 
 		if (LM004List.size() != 0) {

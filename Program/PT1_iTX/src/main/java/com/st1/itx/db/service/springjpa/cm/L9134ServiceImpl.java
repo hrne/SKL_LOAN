@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.TxBizDate;
+import com.st1.itx.db.service.TxBizDateService;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.util.parse.Parse;
@@ -23,6 +25,9 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
+	
+	@Autowired
+	private TxBizDateService iTxBizDateService;
 
 	@Autowired
 	Parse parse;
@@ -213,16 +218,22 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 
 	 * @param titaVo TitaVo
 	 * @param iLmnDy 上個月底日(民國)
-	 * @param iTmnDy 本營業日(民國)
+	 * @param iTmnDy 本月底日(民國)
 	 * @return 查詢結果
 	 * @throws LogicException
 	 */
-	public List<Map<String, String>> doQueryL9134_4(TitaVo titaVo, int iLmnDy, int iTmnDy) throws LogicException {
+	public List<Map<String, String>> doQueryL9134_4(TitaVo titaVo, int iLmnDy, int ixTmnDy) throws LogicException {
 		this.info("doQueryL9134_4 Start");
+		
+		TxBizDate tTxBizDate = new TxBizDate();
 
+		tTxBizDate = iTxBizDateService.findById("ONLINE", titaVo);
+
+		int iTmnDy = tTxBizDate.getTmnDy();
+		
 		// 本營業日 民國年月(YYYMM)
 		String rocYM = iTmnDy / 100 + "";
-
+		this.info("iTmnDy  = " +iTmnDy);
 		// 民國年月(YYY/MM)
 		rocYM = rocYM.substring(0, 3) + "/" + rocYM.substring(3, 5);
 
@@ -238,21 +249,26 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String lastMonthEndDay = ixLmnDy.substring(0, 3) + "/" + ixLmnDy.substring(3, 5) + "/"
 				+ ixLmnDy.substring(5, 7);
 
+		//上個年月 民國(YYYMM)
+		String ixLmn = parse.IntegerToString(iLmnDy, 5);
+		
 
 		// for迴圈使用長度
 		String ixiTmnDy = parse.IntegerToString(iTmnDy, 7);
+		this.info("ixiTmnDy  ="+iTmnDy );
 		int length = parse.stringToInteger(ixiTmnDy.substring(5, 7));
 
 		//TEM是員工扣薪select * from "CdAcCode" where "AcctCode" = 'TEM'
 		String sql = " ";
-		sql += " select \"AcDate\" ";
-		sql += " , sum(\"TdBal\") as \"TdBal\"   ";
-		sql += " , sum(\"TdBal\") - sum(\"YdBal\")  as \"DifTdBal\"  ";
-		sql += " , sum(\"didTdal\") as \"didTdBal\"  ";
-		sql += " , sum(\"didTdal\")- sum(\"didYdBal\")  as \"didDifTdBal\" ";
-		sql += " , sum(\"DrAmt\") as \"DrAmt\" , sum(\"CrAmt\") as \"CrAmt\" ";
-		sql += " , sum(\"TTemTal\")- sum(\"YTemTal\")  as \"TemTal\" ";
-		sql += " , sum(\"CrAmt\") - sum(\"DrAmt\") as \"didCDrAmt\" ";
+		sql += " select \"AcDate\" "; //日期
+		sql += " , sum(\"TdBal\") as \"TdBal\"   "; //可抵繳當日餘額
+		sql += " , sum(\"TdBal\") - sum(\"YdBal\")  as \"DifTdBal\"  "; //可抵繳當日差額
+		sql += " , sum(\"didTdal\") as \"didTdBal\"  "; //不可抵繳未兌現支票
+		sql += " , sum(\"didTdal\")- sum(\"didYdBal\")  as \"didDifTdBal\" "; //不可抵繳未兌現支票差額
+		sql += " , sum(\"DrAmt\") as \"DrAmt\" , sum(\"CrAmt\") as \"CrAmt\" "; //擔保借(D)貸(C)
+//		sql += " , sum(\"TTemTal\")- sum(\"YTemTal\")  as \"TemTal\" ";//人事單位員工扣薪金額合計
+		sql += " , sum(\"TTemDrAmT\")- sum(\"TTemCrAmT\")  as \"TemTal\" ";//人事單位員工扣薪金額合計
+		sql += " , sum(\"CrAmt\") - sum(\"DrAmt\") as \"didCDrAmt\" "; //放款部暫收款傳票金額合計
 		sql += " from ";
 		sql += " ( ";
 		sql += " select";
@@ -262,11 +278,11 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  ,0 as \"didYdBal\"";
 		sql += "  ,0 as \"didTdal\" ";
 		sql += " , 0 as \"DrAmt\" , 0 as \"CrAmt\" ";
-		sql += " , 0 as \"YTemTal\" ";
-		sql += " , 0 as \"TTemTal\" ";
+		sql += " , 0 as \"TTemDrAmT\" ";
+		sql += " , 0 as \"TTemCrAmT\" ";
 		sql += " from \"AcMain\" ";
-		sql += " where \"AcDate\" = :acdate ";// 抓上個月的月底日
-		sql += "   AND  \"AcctCode\" in ('TAV','T10') ";
+		sql += " where \"MonthEndYm\" = :LacYM ";// 抓上個月的月底日 可抵繳
+		sql += "   AND  \"AcctCode\" in ('TAV','TAM','TSL') ";
 		sql += " union all ";
 		sql += " select ";
 		sql += " :lastMonthEnd as \"AcDate\" ";
@@ -275,10 +291,10 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,sum(\"YdBal\") as \"didYdBal\" ";
 		sql += " ,sum(\"TdBal\") as \"didTdal\" ";
 		sql += " , 0 as \"DrAmt\" , 0 as \"CrAmt\" ";
-		sql += " , 0 as \"YTemTal\" ";
-		sql += " , 0 as \"TTemTal\" ";
+		sql += " , 0 as \"TTemDrAmT\" ";
+		sql += " , 0 as \"TTemCrAmT\" ";
 		sql += " from \"AcMain\" ";
-		sql += " where \"AcDate\" = :acdate ";// 抓上個月的月底日
+		sql += " where \"MonthEndYm\" = :LacYM ";// 抓上個月的月底日 不可抵繳
 		sql += " and \"AcctCode\" in ('TCK')  ";
 		sql += " union all ";
 		sql += " select ";
@@ -288,10 +304,10 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " , 0 as \"didYdBal\"";
 		sql += " , 0 as \"didTdal\" ";
 		sql += " , 0 as \"DrAmt\" , 0 as \"CrAmt\" ";
-		sql += " , sum(\"YdBal\") as \"YTemTal\" ";
-		sql += " , sum(\"TdBal\") as \"TTemTal\" ";
+		sql += " , sum(\"DbAmt\") as \"TTemDrAmT\" ";
+		sql += " , sum(\"CrAmt\") as \"TTemCrAmT\" ";
 		sql += " from \"AcMain\" ";
-		sql += " where \"AcDate\" = :acdate ";// 抓上個月的月底日
+		sql += " where \"MonthEndYm\" = :LacYM ";// 抓上個月的月底日 人事單位員工扣薪金額
 		sql += " and \"AcctCode\" in ('TEM')  ";
 		for (int i = 1; i <= length; i++) {
 			sql += " union all ";
@@ -302,8 +318,8 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " ,0 as \"didYdBal\" ";
 			sql += " ,0 as \"didTdal\" ";
 			sql += " ,0 as \"DrAmt\" , 0 as \"CrAmt\" ";
-			sql += " ,0 as \"YTemTal\" ";
-			sql += " ,0 as \"TTemTal\" ";
+			sql += " ,0 as \"TTemDrAmT\" ";
+			sql += " ,0 as \"TTemCrAmT\" ";
 			sql += " from dual ";
 			sql += " union all ";
 			sql += " select  ";
@@ -313,11 +329,11 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " , 0 as \"didYdBal\" ";
 			sql += " , 0 as \"didTdal\" ";
 			sql += " , 0 as \"DrAmt\" , 0 as \"CrAmt\" ";
-			sql += " , 0 as \"YTemTal\" ";
-			sql += " , 0 as \"TTemTal\" ";
+			sql += " , 0 as \"TTemDrAmT\" ";
+			sql += " , 0 as \"TTemCrAmT\" ";
 			sql += " from \"AcMain\" ";
 			sql += " where \"AcDate\" = " + bcYM + parse.IntegerToString(i, 2) + "";
-			sql += "   AND  \"AcctCode\" in ('TAV','T10') ";
+			sql += "   AND  \"AcctCode\" in ('TAV','TAM','TSL') ";
 			sql += " union all ";
 			sql += " select ";
 			sql += " '" + rocYM + "" + '/' + "" + parse.IntegerToString(i, 2) + "'  as \"AcDate\" ";
@@ -326,8 +342,8 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " , sum(\"YdBal\") as \"didYdBal\"";
 			sql += " , sum(\"TdBal\") as \"didTdal\"";
 			sql += " ,0 as \"DrAmt\" , 0 as \"CrAmt\" ";
-			sql += " ,0 as \"YTemTal\" ";
-			sql += " ,0 as \"TTemTal\" ";
+			sql += " ,0 as \"TTemDrAmT\" ";
+			sql += " ,0 as \"TTemCrAmT\" ";
 			sql += " from \"AcMain\" ";
 			sql += " where \"AcctCode\" in ('TCK') ";
 			sql += " and \"AcDate\" = " + bcYM + parse.IntegerToString(i, 2) + " ";
@@ -339,30 +355,17 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " ,0 as \"didYdBal\" ";
 			sql += " ,0 as \"didTdal\" ";
 			sql += " ,sum(\"DrAmt\") as \"DrAmt\" , sum(\"CrAmt\") as \"CrAmt\" ";
-			sql += " ,0 as \"YTemTal\" ";
-			sql += " ,0 as \"TTemTal\" ";
+			sql += " ,0 as \"TTemDrAmT\" ";
+			sql += " ,0 as \"TTemCrAmT\" ";
 			sql += " from ( ";
 			sql += " select ";
-			sql += "   CASE";
-			sql += "     WHEN AD.\"DbCr\" = 'D' ";
-			sql += "     THEN AD.\"TxAmt\" ";
-			sql += "   ELSE 0 END AS \"DrAmt\"";
-			sql += " , CASE ";
-			sql += "     WHEN AD.\"DbCr\" = 'C' ";
-			sql += "     THEN AD.\"TxAmt\" ";
-			sql += "   ELSE 0 END AS \"CrAmt\" ";
-			sql += " FROM \"AcDetail\" AD  ";
-			sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = AD.\"CustNo\" ";
-			sql += "                           AND AD.\"CustNo\" != 0 ";
-			sql += " LEFT JOIN \"CdCode\" CC ON CC.\"DefCode\" = 'AcSubBookCode' ";
-			sql += "                         AND CC.\"Code\" = AD.\"AcSubBookCode\" ";
-			sql += " LEFT JOIN \"CdAcCode\" C ON C.\"AcNoCode\" = AD.\"AcNoCode\" ";
-			sql += "                          AND C.\"AcSubCode\" = AD.\"AcSubCode\"  ";
-			sql += "                          AND C.\"AcDtlCode\" = AD.\"AcDtlCode\" ";
-			sql += " WHERE AD.\"AcDate\" >=" + bcYM + parse.IntegerToString(i, 2) + " ";
-			sql += "   AND AD.\"AcDate\" <=" + bcYM + parse.IntegerToString(i, 2) + " ";
-			sql += "   AND  AD.\"AcctCode\" in ('TAV','TCK','T10') ";
-			sql += "   AND AD.\"EntAc\" > 0 ";
+			sql += "  \"DbAmt\" AS \"DrAmt\" ";
+			sql += " , \"CrAmt\" AS \"CrAmt\" ";
+			sql += " FROM \"AcMain\"   ";
+			sql += " WHERE \"AcDate\" >=" + bcYM + parse.IntegerToString(i, 2) + " ";
+			sql += "   AND \"AcDate\" <=" + bcYM + parse.IntegerToString(i, 2) + " ";
+//			sql += "   AND  AD.\"AcctCode\" in ('TAV','TCK','T10') ";
+			sql += "   AND  \"AcctCode\" in  ('TAV','TAM','TSL','TCK') ";
 			sql += " ) ";
 			sql += " union all ";
 			sql += " select  ";
@@ -372,8 +375,8 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " , 0 as \"didYdBal\" ";
 			sql += " , 0 as \"didTdal\" ";
 			sql += " , 0 as \"DrAmt\" , 0 as \"CrAmt\" ";
-			sql += " , sum(\"YdBal\") as \"YTemTal\" ";
-			sql += " , sum(\"TdBal\") as \"TTemTal\" ";
+			sql += " , sum(\"DbAmt\") as \"TTemDrAmT\" ";
+			sql += " , sum(\"CrAmt\") as \"TTemCrAmT\" ";
 			sql += " from \"AcMain\" ";
 			sql += " where \"AcDate\" = " + bcYM + parse.IntegerToString(i, 2) + "";
 			sql += "   AND  \"AcctCode\" in ('TEM') ";
@@ -385,8 +388,10 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("acdate", iLmnDy + 19110000);
+//		query.setParameter("acdate", iLmnDy + 19110000);
 		query.setParameter("lastMonthEnd", lastMonthEndDay);
+		query.setParameter("LacYM", ixLmn + 191100);
+		
 		return this.convertToMap(query);
 	}
 

@@ -279,7 +279,7 @@ public class LQ007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                    THEN Trunc(\"YearMonth\" / 100) * 100 + 12";
 		sql += "                  END ";
 		sql += "    )";
-		sql += "    SELECT M.\"ProdNo\"";
+		sql += "    SELECT M.\"ProdNo\" AS \"ProdNoShow\"";
 		sql += "         , M.\"YearMonth\"    AS \"VisibleMonth\"";
 		sql += "         , M.\"Bal\"          AS \"BalSum\"";
 		sql += "         , I.\"Int\"          AS \"IntSum\"";
@@ -467,7 +467,7 @@ public class LQ007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               , Trunc(\"AcDate\" / 10000) * 100 + 12 ";
 		// --合併利息收入
 		sql += "    ), \"tmpMainInt\" AS (";
-		sql += "        SELECT \"ProdNo\"";
+		sql += "        SELECT \"ProdNo\" AS \"ProdNoShow\"";
 		sql += "             , \"YearMonth\" AS \"YearMonth\"";
 		sql += "             , NVL(SUM(\"Int\"),0)  AS \"Int\"";
 		sql += "        FROM (";

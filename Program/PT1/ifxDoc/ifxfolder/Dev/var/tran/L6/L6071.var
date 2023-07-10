@@ -80,6 +80,22 @@ C(3,#CHAIN,1,S,K(MODIFYBUTTON,1,新增行庫))
 #RPTFG=A,1,S
 E(0,0)
 
+!啟用記號使用---
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+#EnableH=X,100,S
+T(3,Y:啟用;N:停用)
+
+#CdEnableFg=x,20,S                  
+T(3,CdCode.EnableFg)   
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CdEnableFg)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@EnableH,#HelpDesc1)
+!啟用記號使用---
+
 
 !行庫代號
 #BankCode=X,3,I
@@ -173,12 +189,19 @@ T(4,CHAIN$)
 
 #OOLastEmp=x,47,S
 
+!啟用記號
+#OOEnable=X,1,S
+#OOEnableX=X,6,O
+C(4,#OOEnable,S,$)
+T(H,#OOEnable,#EnableH)
+
+
 ! 修改的按鈕
 #OOFunc2=A,1,S
 E(0,2)
 
-#OOBUF2=X,208,S
-T(2,#OOFunc2+#OOBankCode+#OOBranchCode+#OOBankItem+#OOBranchItem)
+#OOBUF2=X,209,S
+T(2,#OOFunc2+#OOBankCode+#OOBranchCode+#OOBankItem+#OOBranchItem+#OOEnable)
 
 ! 連結時隱藏按鈕
 #OOBTN2=X,4,S
@@ -190,8 +213,8 @@ IF(#OOCHAIN==1,BIND(grid,cancel),$)
 #OOFunc4=A,1,S
 E(0,4)
 
-#OOBUF4=X,208,S
-T(2,#OOFunc4+#OOBankCode+#OOBranchCode+#OOBankItem+#OOBranchItem)
+#OOBUF4=X,209,S
+T(2,#OOFunc4+#OOBankCode+#OOBranchCode+#OOBankItem+#OOBranchItem+#OOEnable)
 
 ! 連結時隱藏按鈕
 #OOBTN4=X,4,S
@@ -213,6 +236,7 @@ IF(#OOCHAIN==1,BIND(grid,cancel),$)
 !------ 下行電文TOM ------
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L6071
 #OOBankCode
 #OOBranchCode
@@ -220,6 +244,7 @@ TXFORM=L6071
 #OOBranchItem
 #OOLastUpdate
 #OOLastEmp
+#OOEnable
 ^
 </sub>
 
@@ -257,6 +282,9 @@ TXFORM=L6071
 #OOBranchItem=分行名稱
 {width:230,align:'left'}
 
+#OOEnableX=啟用記號
+{width:100,align:'left'}
+
 #OOLastUpdate=最後修改日期
 {width:150,align:'center'}
 
@@ -291,6 +319,9 @@ TXFORM=L6071
 
 #OOBranchItem=分行名稱
 {width:230,align:'left'}
+
+#OOEnableX=啟用記號
+{width:100,align:'left'}
 
 #OOLastUpdate=最後修改日期
 {width:150,align:'center'}

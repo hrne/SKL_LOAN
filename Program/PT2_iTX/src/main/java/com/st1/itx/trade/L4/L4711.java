@@ -21,6 +21,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.TxToDoCom;
+import com.st1.itx.util.common.data.MailVo;
 import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.mail.MailService;
 
@@ -84,12 +85,31 @@ public class L4711 extends TradeBuffer {
 
 		for (TxToDoDetail tTxToDoDetail : sTxToDoDetail) {
 
+			int custNo = tTxToDoDetail.getCustNo();
+			int facmNo = tTxToDoDetail.getFacmNo();
+			int bormNo = tTxToDoDetail.getBormNo();
+			String dtlValue = tTxToDoDetail.getDtlValue();
+			String itemCode = tTxToDoDetail.getItemCode();
+			String executeTxcd = tTxToDoDetail.getExcuteTxcd();
+			String titaTlrNo = tTxToDoDetail.getTitaTlrNo();
+
+			this.info("tTxToDoDetail foreach ...");
+			this.info("custNo = " + custNo);
+			this.info("facmNo = " + facmNo);
+			this.info("bormNo = " + bormNo);
+			this.info("dtlValue = " + dtlValue);
+			this.info("itemCode = " + itemCode);
+			this.info("executeTxcd = " + executeTxcd);
+			this.info("titaTlrNo = " + titaTlrNo);
+
 			String processNotes = tTxToDoDetail.getProcessNote();
 
 			if (processNotes == null || processNotes.trim().isEmpty()) {
 				this.info("processNotes 為空,跳過,讀下一筆");
 				continue;
 			}
+
+			this.info("processNotes = " + processNotes);
 
 			if (!processNotes.contains("<s>")) {
 				this.info("processNotes 無項目區分標籤<s>,格式不合,跳過,讀下一筆");
@@ -99,34 +119,24 @@ public class L4711 extends TradeBuffer {
 			makeFile.put(processNotes);
 			this.info("tTxToDoDetail : " + tTxToDoDetail.toString());
 
-			String[] processNotesSplit = processNotes.split("<s>");
+			MailVo mailVo = new MailVo();
 
-			// 項目區分標籤為<s>
-			// 格式:email<s>subject<s>bodyText<s>pdfno
-			// 格式中文:收件信箱<s>信件標題<s>信件內文<s>信件附件PDF
-			// 有附件之範例:xxx@gmail.com<s>測試信件<s>這是\"測試\"信件<s>10134
-			// 無附件之範例:xxx@gmail.com<s>測試信件<s>這是\"測試\"信件
-
-			if (!(processNotesSplit.length >= 3 && processNotesSplit.length <= 4)) {
+			if (!mailVo.splitProcessNotes(processNotes)) {
 				this.info("processNotes 應有3~4個項目,格式不合,跳過,讀下一筆");
 				continue;
 			}
 
 			// 收件信箱
-			String email = processNotesSplit[0];
+			String email = mailVo.getEmail();
 
 			emailCheck(email);
 
 			// 信件標題
-			String subject = processNotesSplit[1];
+			String subject = mailVo.getSubject();
 			// 信件內文
-			String bodyText = processNotesSplit[2];
+			String bodyText = mailVo.getBodyText();
 			// 信件附件PDF
-			long pdfno = 0;
-
-			if (processNotesSplit.length == 4) {
-				pdfno = Long.parseLong(processNotesSplit[3]);
-			}
+			long pdfno = mailVo.getPdfNo();
 
 			// 該有的欄位都有，傳去 mailService
 			mailService.setParams(email, subject, bodyText);
@@ -144,14 +154,13 @@ public class L4711 extends TradeBuffer {
 			// 發送Email
 			mailService.exec();
 
-			// 先做更新
-
+			// 更新
 			TxToDoDetailId tTxToDoDetailId = new TxToDoDetailId();
-			tTxToDoDetailId.setCustNo(tTxToDoDetail.getCustNo());
-			tTxToDoDetailId.setFacmNo(tTxToDoDetail.getFacmNo());
-			tTxToDoDetailId.setBormNo(tTxToDoDetail.getBormNo());
-			tTxToDoDetailId.setDtlValue(tTxToDoDetail.getDtlValue());
-			tTxToDoDetailId.setItemCode(tTxToDoDetail.getItemCode());
+			tTxToDoDetailId.setCustNo(custNo);
+			tTxToDoDetailId.setFacmNo(facmNo);
+			tTxToDoDetailId.setBormNo(bormNo);
+			tTxToDoDetailId.setDtlValue(dtlValue);
+			tTxToDoDetailId.setItemCode(itemCode);
 
 			txToDoCom.updDetailStatus(2, tTxToDoDetailId, titaVo);
 		}

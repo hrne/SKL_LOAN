@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class SlipMedia2022 implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 8265997059849603491L;
-
-@EmbeddedId
+  @EmbeddedId
   private SlipMedia2022Id slipMedia2022Id;
 
   // 帳冊別
@@ -175,6 +171,14 @@ public class SlipMedia2022 implements Serializable {
   // 最後更新人員
   @Column(name = "`LastUpdateEmpNo`", length = 6)
   private String lastUpdateEmpNo;
+
+  // 回應錯誤代碼
+  @Column(name = "`ErrorCode`", length = 3)
+  private String errorCode;
+
+  // 回應錯誤訊息
+  @Column(name = "`ErrorMsg`", length = 2000)
+  private String errorMsg;
 
 
   public SlipMedia2022Id getSlipMedia2022Id() {
@@ -808,6 +812,44 @@ N:否
     this.lastUpdateEmpNo = lastUpdateEmpNo;
   }
 
+/**
+	* 回應錯誤代碼<br>
+	* 
+	* @return String
+	*/
+  public String getErrorCode() {
+    return this.errorCode == null ? "" : this.errorCode;
+  }
+
+/**
+	* 回應錯誤代碼<br>
+	* 
+  *
+  * @param errorCode 回應錯誤代碼
+	*/
+  public void setErrorCode(String errorCode) {
+    this.errorCode = errorCode;
+  }
+
+/**
+	* 回應錯誤訊息<br>
+	* 
+	* @return String
+	*/
+  public String getErrorMsg() {
+    return this.errorMsg == null ? "" : this.errorMsg;
+  }
+
+/**
+	* 回應錯誤訊息<br>
+	* 
+  *
+  * @param errorMsg 回應錯誤訊息
+	*/
+  public void setErrorMsg(String errorMsg) {
+    this.errorMsg = errorMsg;
+  }
+
 
   @Override
   public String toString() {
@@ -816,6 +858,6 @@ N:否
            + ", receiveCode=" + receiveCode + ", costMonth=" + costMonth + ", insuNo=" + insuNo + ", salesmanCode=" + salesmanCode + ", salaryCode=" + salaryCode + ", currencyCode=" + currencyCode
            + ", acSubBookCode=" + acSubBookCode + ", CostUnit=" + CostUnit + ", salesChannelType=" + salesChannelType + ", ifrsType=" + ifrsType + ", relationId=" + relationId + ", relateCode=" + relateCode
            + ", ifrs17Group=" + ifrs17Group + ", latestFlag=" + latestFlag + ", transferFlag=" + transferFlag + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", errorCode=" + errorCode + ", errorMsg=" + errorMsg + "]";
   }
 }

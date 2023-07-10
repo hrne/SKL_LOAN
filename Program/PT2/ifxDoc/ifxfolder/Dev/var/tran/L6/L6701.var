@@ -48,7 +48,7 @@ E(0,0)
 ["#R2+@行庫代號",#BankCode,#BranchCode],
 ["#R3+@行庫名稱",#BankItem],
 ["#R4+@分行名稱",#BranchItem],
-["#R5+@啟用記號",#Enable]
+["#R5+@啟用記號",#Enable,#EnableX]
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -89,7 +89,7 @@ CALL(#HelpProc)
 T(2,@FuncCode2Help,#HelpDesc1)
 
 #EnableH=X,100,S
-T(3,Y:啟用;N:未啟用)
+T(3,Y:啟用;N:停用)
 
 #CdEnableFg=x,20,S                  
 T(3,CdCode.EnableFg)   
@@ -128,6 +128,9 @@ T(1,#NTXBUF,9,50)
 #CHAIN_BranchItem=x,100,S
 T(1,#NTXBUF,59,50)
 
+#CHAIN_Enable=x,100,S
+T(1,#NTXBUF,109,1)
+
 
 #CHAINSET=X,1,S
 C(3,#CHAIN,1,$,S)
@@ -137,7 +140,10 @@ T(2,@BankCode,#CHAIN_BankCode)
 T(2,@BranchCode,#CHAIN_BranchCode)
 T(2,@BankItem,#CHAIN_BankItem)
 T(2,@BranchItem,#CHAIN_BranchItem)
+T(2,@Enable,#CHAIN_Enable)
 
+#CHK1=X,2,L
+IF(#FuncCode==1 || #FuncCode==2,T(3,@R5,*),$)
 
 
 ! 功能 必須輸入(1: 新增;2: 修改;4: 刪除)
@@ -161,8 +167,8 @@ E(0,#FuncCode)
 
 !顯示框線
 #WKTF=X,1,S
-IF (#FuncCode==1 || #FuncCode==2 ,T(F,@BankItem,1)T(F,@BranchItem,1),
-                                  T(F,@BankItem,0)T(F,@BranchItem,0))
+IF (#FuncCode==1 || #FuncCode==2 ,T(F,@BankItem,1)T(F,@BranchItem,1)T(F,@Enable,1),
+                                  T(F,@BankItem,0)T(F,@BranchItem,0)T(F,@Enable,0))
 IF (#FuncCode==1 || #CHAIN==0 ,T(F,@BankCode,1)T(F,@BranchCode,1),T(F,@BankCode,0)T(F,@BranchCode,0))
 
 #WKPSC=X,2,S
@@ -177,6 +183,11 @@ C(2,#FuncCode,S,T(3,*),T(3,*),S,S,S)
 #WKNAME=X,1,S
 T(2,@R2,#WKSTAR1)
 T(2,@R3,#WKSTAR2)
+
+#EnableRIM=X,4,S
+C(4,#Enable,S,$)
+T(H,#Enable,#EnableH)
+T(2,@EnableX,#EnableRIM)
 
 
 ! 行庫代號
@@ -238,8 +249,12 @@ T(2,#BankCode)
 ![啟用記號]
 #Enable=X,1,I
 C(2,#FuncCode,s,$,$,$,s,s)
+C(3,#FuncCode,1,T(2,Y),$)
 HELP(#EnableH)
 @V(H,#EnableH)
+#EnableX=X,4,L
+C(4,#Enable,S,$)
+T(H,#Enable,#EnableH)
 
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L2Rim.dec"/>

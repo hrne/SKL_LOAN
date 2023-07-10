@@ -207,8 +207,8 @@ T(H,#OCustLoanKind,#CustLoanKindHelp)
 #OCustStatusX=X,6,L
 T(H,#OCustStatus,#StatusHelp)
 
-#OAccuOverX=X,12,L
-IF(#OCustStatus==1,T(2,前累溢收金額),T(2,累溢收金額))
+#OAccuOverX=X,16,L
+IF(#OCustStatus==1,T(2,變更前累溢收金額),T(2,累溢收金額))
 
 ! 累新壽分攤金額
 #OAccuSklShareAmt=m,14,L
