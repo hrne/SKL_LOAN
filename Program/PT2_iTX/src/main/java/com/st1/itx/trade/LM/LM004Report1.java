@@ -37,7 +37,7 @@ public class LM004Report1 extends MakeReport {
 		int leftPos = 1;
 		int centerPos = 70;
 		int rightPos = 120;
-		this.print(-1, rightPos, "機密等級："+this.getSecurity());
+		this.print(-1, rightPos, "機密等級：" + this.getSecurity());
 		this.print(-2, leftPos, "　 程式 ID：" + this.getParentTranCode());
 		this.print(-2, centerPos, "新光人壽保險股份有限公司", "C");
 		this.print(-2, rightPos, "日　期：" + dDateUtil.getNowStringBc().substring(4, 6) + "/"
@@ -49,7 +49,7 @@ public class LM004Report1 extends MakeReport {
 		this.print(-4, rightPos, "頁　數：" + this.getNowPage());
 		this.print(-5, centerPos, getshowRocDate(this.getReportDate()), "C");
 		this.print(-5, rightPos, "單　位：元");
-		
+
 		setFontSize(8);
 		this.print(-7, 1, "　 是否　 商品");
 		this.print(-7, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 介紹人");
@@ -57,7 +57,6 @@ public class LM004Report1 extends MakeReport {
 				"　本利攤　代號　擔保品地區別　 房貸專員　　 戶號　　　 戶名　　　　　 到期日　　 應完成日　　　　 貸放餘額　 上次繳息日　 介紹人　　 代號　   部室　　　　 區部　　　　　　 通訊處");
 		this.print(-9, 0,
 				"--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-
 
 	}
 
@@ -78,7 +77,6 @@ public class LM004Report1 extends MakeReport {
 
 		this.open(titaVo, reportVo);
 
-	
 		if (LM004List.size() != 0) {
 
 			DecimalFormat df1 = new DecimalFormat("#,##0");
@@ -111,12 +109,13 @@ public class LM004Report1 extends MakeReport {
 		else {
 			String text = "本日無資料";
 			print(1, 5, text); // 本利攤
-	
+
 		}
 
+		print(1, 1, " ", "C"); 
 		
 		setFontSize(10);
-		
+
 		this.close();
 		// this.toPdf(sno);
 	}

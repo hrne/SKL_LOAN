@@ -79,12 +79,14 @@ public class LY003Report2 extends MakeReport {
 
 	}
 
+	
+	
 	private void reportExcelA142(List<Map<String, String>> listData) throws LogicException {
 
 		this.info("reportExcelA142 ");
 
 		makeExcel.setSheet("A142放款餘額彙總表");
-
+		
 		int col = 0;
 		int row = 0;
 
@@ -92,7 +94,15 @@ public class LY003Report2 extends MakeReport {
 		int kind = 0;
 		BigDecimal amount = BigDecimal.ZERO;
 
+		makeExcel.setValue(12, 2, "C", "C");
+		
 		for (Map<String, String> r : listData) {
+
+			// 會null是因為MonthlyFacBal的AssetClass沒有更新到處於null狀態，需上傳L7205(五類資產分類上傳轉檔作業)
+			if (r.get("F2") == null) {
+				continue;
+			}
+
 			type = r.get("F0");
 			kind = Integer.valueOf(r.get("F1"));
 			amount = new BigDecimal(r.get("F2"));

@@ -317,26 +317,26 @@ public class LQ007Report extends MakeReport {
 				}
 
 			}
-			//設定公式
+			// 設定公式
 			makeExcel.setFormula(13, 2, BigDecimal.ZERO, "SUM(B5:B12)", "0.000");
 			makeExcel.setFormula(13, 3, BigDecimal.ZERO, "SUM(C5:C12)", "0.000");
-			makeExcel.setFormula(13, 2, BigDecimal.ZERO, "SUM(D5:D12)", "0.000");
-			makeExcel.setFormula(13, 3, BigDecimal.ZERO, "SUM(E5:E12)", "0.000");
-			makeExcel.setFormula(13, 2, BigDecimal.ZERO, "SUM(F5:F12)", "0.000");
-			makeExcel.setFormula(13, 3, BigDecimal.ZERO, "SUM(G5:G12)", "0.000");
-			makeExcel.setFormula(13, 2, BigDecimal.ZERO, "SUM(H5:H12)", "0.000");
-			makeExcel.setFormula(13, 3, BigDecimal.ZERO, "SUM(I5:I12)", "0.000");
-			makeExcel.setFormula(13, 2, BigDecimal.ZERO, "SUM(J5:J12)", "0.000");
-			makeExcel.setFormula(13, 3, BigDecimal.ZERO, "SUM(K5:K12)", "0.000");
-			makeExcel.setFormula(13, 2, BigDecimal.ZERO, "SUM(L5:L12)", "0.000");
-			makeExcel.setFormula(13, 3, BigDecimal.ZERO, "SUM(M5:M12)", "0.000");
-			makeExcel.setFormula(13, 2, BigDecimal.ZERO, "SUM(N5:N12)", "0.000");
-			makeExcel.setFormula(13, 3, BigDecimal.ZERO, "SUM(O5:O12)", "0.000");
-			
-			makeExcel.setFormula(13, 2, BigDecimal.ZERO, "SUM(Q5:Q12)", "0.000");
-			makeExcel.setFormula(13, 3, BigDecimal.ZERO, "SUM(R5:R12)", "0.000");
-			
-			//重整
+			makeExcel.setFormula(13, 4, BigDecimal.ZERO, "SUM(D5:D12)", "0.000");
+			makeExcel.setFormula(13, 5, BigDecimal.ZERO, "SUM(E5:E12)", "0.000");
+			makeExcel.setFormula(13, 6, BigDecimal.ZERO, "SUM(F5:F12)", "0.000");
+			makeExcel.setFormula(13, 7, BigDecimal.ZERO, "SUM(G5:G12)", "0.000");
+			makeExcel.setFormula(13, 8, BigDecimal.ZERO, "SUM(H5:H12)", "0.000");
+			makeExcel.setFormula(13, 9, BigDecimal.ZERO, "SUM(I5:I12)", "0.000");
+			makeExcel.setFormula(13, 10, BigDecimal.ZERO, "SUM(J5:J12)", "0.000");
+			makeExcel.setFormula(13, 11, BigDecimal.ZERO, "SUM(K5:K12)", "0.000");
+			makeExcel.setFormula(13, 12, BigDecimal.ZERO, "SUM(L5:L12)", "0.000");
+			makeExcel.setFormula(13, 13, BigDecimal.ZERO, "SUM(M5:M12)", "0.000");
+			makeExcel.setFormula(13, 14, BigDecimal.ZERO, "SUM(N5:N12)", "0.000");
+			makeExcel.setFormula(13, 15, BigDecimal.ZERO, "SUM(O5:O12)", "0.000");
+
+			makeExcel.setFormula(13, 17, BigDecimal.ZERO, "SUM(Q5:Q12)", "0.000");
+			makeExcel.setFormula(13, 18, BigDecimal.ZERO, "SUM(R5:R12)", "0.000");
+
+			// 重整
 			for (int col = 2; col <= 18; col++) {
 				makeExcel.formulaCaculate(13, col);
 			}

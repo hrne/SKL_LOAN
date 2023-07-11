@@ -154,7 +154,7 @@ public class L4721Report2 extends TradeBuffer {
 		for (Map<String, String> r : data) {
 
 			cntTrans++;
-
+			custNo = parse.stringToInteger(r.get("CustNo"));
 			int MinSpecificDd = parse.stringToInteger(r.get("MinSpecificDd"));
 			int MaxSpecificDd = parse.stringToInteger(r.get("MaxSpecificDd"));
 			int tempfacmno = 999;
@@ -171,7 +171,7 @@ public class L4721Report2 extends TradeBuffer {
 				rDetail = l4721ServiceImpl.doDetailTxffect(custNo, sAdjDate, eAdjDate, sEntryDate, eEntryDate, true,
 						isSameSpecificDd, titaVo);
 			} catch (Exception e) {
-				this.error("l4721ServiceImpl doDetail = " + e.getMessage());
+				this.error("l4721ServiceImpl doDetailTxffect = " + e.getMessage());
 				throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
 			}
 
@@ -181,7 +181,7 @@ public class L4721Report2 extends TradeBuffer {
 						false, isSameSpecificDd, titaVo);
 
 			} catch (Exception e) {
-				this.error("l4721ServiceImpl doDetail = " + e.getMessage());
+				this.error("l4721ServiceImpl doDetailTxffect = " + e.getMessage());
 				throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
 			}
 
@@ -202,11 +202,11 @@ public class L4721Report2 extends TradeBuffer {
 						// 第一次
 						if (times == 0) {
 
-							result = sameFacmno(r, rTxffectDetail, result, true, isByCustNo, titaVo);
+							result = sameFacmno(r1, rTxffectDetail, result, true, isByCustNo, titaVo);
 
 						} else {
 
-							result = sameFacmno(r, rTxffectDetail, result, false, isByCustNo, titaVo);
+							result = sameFacmno(r1, rTxffectDetail, result, false, isByCustNo, titaVo);
 
 						}
 
@@ -274,7 +274,7 @@ public class L4721Report2 extends TradeBuffer {
 
 		String startDate = r.get("IntStartDate");
 		String endDate = r.get("IntEndDate");
-
+		String custName = r.get("CustName");
 		String RepayItem = "99991231".equals(startDate) || "99991231".equals(endDate) ? " " : r.get("RepayCodeX");
 
 		String line = "";
@@ -282,7 +282,9 @@ public class L4721Report2 extends TradeBuffer {
 		if (same) {
 			// 01
 			// 011 1 0 0 0 台北市信義區永吉路１２０巷５０弄１號３樓 0001743 陳清耀
-			String locationX = txEffectData.get(0).get("Location").toString();
+			String locationX = txEffectData.get(0).get("Location").length() > 0
+					? txEffectData.get(0).get("Location").toString()
+					: " ";
 			String locationXX = "";
 
 			for (int i = 0; i < locationX.length(); i++) {
@@ -297,7 +299,7 @@ public class L4721Report2 extends TradeBuffer {
 			// 011 1 0 0 0 台北市信義區永吉路１２０巷５０弄１號３樓 0001743 陳清耀
 			line = "";
 			line = "01" + FormatUtil.padX("", 10) + X + C + FormatUtil.pad9(r.get("CustNo"), 7) + " "
-					+ FormatUtil.padX(r.get("CustName"), 10) + "    " + FormatUtil.padX("", 65);
+					+ makeReport.fillUpWord(custName, 10, " ", "R") + "    " + makeReport.fillUpWord(" ", 65, " ", "R");
 			// 加入明細
 			result.add(line);
 
@@ -327,22 +329,14 @@ public class L4721Report2 extends TradeBuffer {
 				specificDd = parse.stringToInteger(r.get("SpecificDd"));
 			}
 
-			
-			String facmNo =isByCustNo ? "    " : "-" + FormatUtil.pad9(r.get("FacmNo"), 3);
+			String facmNo = isByCustNo ? "    " : "-" + FormatUtil.pad9(r.get("FacmNo"), 3);
 
 			line = "";
 			line += "02";
-			line += " " 
-					+ FormatUtil.padX(r.get("CustName"), 40) 
-					+ " " 
-					+ FormatUtil.pad9(r.get("CustNo"), 7) + facmNo
-					+ leftPadding(parse.IntegerToString(specificDd, 2), 2, ' ')
-					+ " 日" 
-					+ "          "
-					+ FormatUtil.padX(RepayItem, 8) + "   " 
-					+ FormatUtil.pad9(titaVo.getCalDy(), 8)
-					+ FormatUtil.pad9(r.get("LoanBal"), 11) 
-					+ loanBalX + FormatUtil.pad9(headerExcessive, 11)
+			line += " " + FormatUtil.padX(r.get("CustName"), 40) + " " + FormatUtil.pad9(r.get("CustNo"), 7) + facmNo
+					+ leftPadding(parse.IntegerToString(specificDd, 2), 2, ' ') + " 日" + "          "
+					+ FormatUtil.padX(RepayItem, 8) + "   " + FormatUtil.pad9(titaVo.getCalDy(), 8)
+					+ FormatUtil.pad9(r.get("LoanBal"), 11) + loanBalX + FormatUtil.pad9(headerExcessive, 11)
 					+ headerExcessiveX;
 			// 加入明細
 			result.add(line);

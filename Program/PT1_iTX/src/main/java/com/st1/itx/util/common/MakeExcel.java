@@ -117,7 +117,6 @@ public class MakeExcel extends CommBuffer {
 			throw new LogicException("EC004", "(MakeExcel)輸出檔名(outfile)必須有值(MakeExcel)");
 		}
 
-
 		this.outputFileName = fileName;
 		reportVo = ReportVo.builder().setRptDate(date).setBrno(brno).setRptCode(fileCode).setRptItem(fileItem).build();
 	}
@@ -320,6 +319,12 @@ public class MakeExcel extends CommBuffer {
 	}
 
 	public int getSheetLastRowNum() {
+		// 2023-07-11 Wei 增加
+		// 修改原因: user CQ3559 上傳L2419會改SheetName,導致Sheet null
+		// 增加檢核: 若該頁籤名稱不存在時,提示錯誤訊息
+		if (openedSheet == null) {
+			return -1;
+		}
 		return this.openedSheet.getLastRowNum();
 	}
 

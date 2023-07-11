@@ -21,9 +21,11 @@ import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.springjpa.cm.L4721ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.CustNoticeCom;
+import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.TxToDoCom;
 import com.st1.itx.util.common.data.MailVo;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.http.WebClient;
@@ -65,6 +67,11 @@ public class L4721Batch extends TradeBuffer {
 	public L4721ServiceImpl sL4721ServiceImpl;
 	@Autowired
 	private MakeReport makeReport;
+	@Autowired
+	MakeFile makeFileText;
+	@Autowired
+	MakeFile makeFileMail;
+	private int wkCalDy = 0;
 
 	// 利率調整日
 	private int isAdjDate = 0;
@@ -101,6 +108,13 @@ public class L4721Batch extends TradeBuffer {
 		this.limit = Integer.MAX_VALUE;
 		iTxKind = parse.stringToInteger(titaVo.getParam("TxKind"));
 		iCustType = parse.stringToInteger(titaVo.getParam("CustType"));
+		wkCalDy = dateUtil.getNowIntegerForBC();
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI() + 19110000).setBrno(titaVo.getBrno())
+				.setRptCode("L8102").setRptItem("期款扣款通知").build();
+		// 開啟報表
+		makeFileText.open(titaVo, reportVo, "簡訊檔.txt");
+		ReportVo mailReportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI() + 19110000).setBrno(titaVo.getBrno())
+				.setRptCode("L8102").setRptItem("期款扣款通知").build();
 
 		isAdjDate = Integer.parseInt(titaVo.getParam("sAdjDate")) + 19110000;
 		ieAdjDate = Integer.parseInt(titaVo.getParam("eAdjDate")) + 19110000;
@@ -321,6 +335,11 @@ public class L4721Batch extends TradeBuffer {
 
 			// 設定簡訊
 			txToDoCom.setTxBuffer(this.getTxBuffer());
+			String dataLines = txToDoCom
+					.getProcessNoteForText(
+							noticePhoneNo, "親愛的客戶您好，新光人壽通知您，房貸額度 " + t.get("FacmNo") + " 自" + t.get("rateChangeDate")
+									+ "起利率由" + t.get("originRate") + " 調整為" + t.get("newRate") + "，敬請留意帳戶餘額以利扣款。",
+							wkCalDy);
 
 			TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 			tTxToDoDetail.setCustNo(parse.stringToInteger(t.get("CustNo")));
@@ -330,10 +349,9 @@ public class L4721Batch extends TradeBuffer {
 			tTxToDoDetail.setDtlValue("<利率調整通知>");
 			tTxToDoDetail.setItemCode("TEXT00");
 			tTxToDoDetail.setStatus(0);
-			tTxToDoDetail.setProcessNote(txToDoCom.getProcessNoteForText(noticePhoneNo,
-					"親愛的客戶您好，新光人壽通知您，房貸額度 " + t.get("FacmNo") + " 自" + t.get("rateChangeDate") + "起利率由"
-							+ t.get("originRate") + " 調整為" + t.get("newRate") + "，敬請留意帳戶餘額以利扣款。",
-					this.getTxBuffer().getMgBizDate().getTbsDy()));
+			tTxToDoDetail.setProcessNote(dataLines);
+			makeFileText.put(parse.IntegerToString(parse.stringToInteger(t.get("CustNo")), 7) + "-"
+					+ parse.IntegerToString(parse.stringToInteger(t.get("FacmNo")), 3) + dataLines);
 
 			txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo);
 

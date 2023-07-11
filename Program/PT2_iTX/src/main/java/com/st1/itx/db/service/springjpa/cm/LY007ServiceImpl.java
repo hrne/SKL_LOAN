@@ -28,9 +28,9 @@ public class LY007ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	public List<Map<String, String>> queryDetail(int inputYearMonth, TitaVo titaVo) throws Exception {
 		this.info("LY007ServiceImpl queryDetail ");
-		
+
 		this.info("inputYearMonth=" + inputYearMonth);
-		
+
 		String sql = "";
 		sql += "	SELECT s1.\"Rel\" AS \"Rel\"";
 		sql += "	       ,s0.\"CustNo\" AS \"CustNo\"";
@@ -43,9 +43,9 @@ public class LY007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    END AS \"BdLocation\"     ";
 		sql += "	       ,l.\"DrawdownDate\" AS \"DrawdownDate\"";
 		sql += "	       ,m2.\"LoanBal\" AS \"LoanBal\"";
-		sql += "	,CASE WHEN fm.\"Supervisor\" = '999999' OR fm.\"Supervisor\" IS NULL THEN 'B'";			
+		sql += "	,CASE WHEN fm.\"Supervisor\" = '999999' OR fm.\"Supervisor\" IS NULL THEN 'B'";
 		sql += "	     ELSE to_char(ce.\"Fullname\")  ";
-		sql += "    END AS \"Supervisor\"     ";		
+		sql += "    END AS \"Supervisor\"     ";
 		sql += "	FROM \"MonthlyLoanBal\"  s0";
 		sql += "          LEFT JOIN (";
 		sql += "              SELECT \"CustNo\"";
@@ -59,8 +59,8 @@ public class LY007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                    AND l.\"FacmNo\" = s0.\"FacmNo\" ";
 		sql += "                                    AND l.\"BormNo\" = s0.\"BormNo\" ";
 		sql += "          LEFT JOIN (";
-		sql += "              SELECT \"CustNo\"";			
-		sql += "                    ,SUM(\"LoanBalance\") AS \"LoanBal\" ";		
+		sql += "              SELECT \"CustNo\"";
+		sql += "                    ,SUM(\"LoanBalance\") AS \"LoanBal\" ";
 		sql += "              FROM \"MonthlyLoanBal\" ";
 		sql += "              WHERE \"LoanBalance\" > 0 ";
 		sql += "                AND \"YearMonth\" = :inputYearMonth ";
@@ -114,12 +114,10 @@ public class LY007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    END ";
 		sql += "	       ,l.\"DrawdownDate\" ";
 		sql += "	       ,m2.\"LoanBal\" ";
-		sql += "	,CASE WHEN fm.\"Supervisor\" = '999999'OR fm.\"Supervisor\" IS NULL THEN 'B'";			
+		sql += "	,CASE WHEN fm.\"Supervisor\" = '999999'OR fm.\"Supervisor\" IS NULL THEN 'B'";
 		sql += "	     ELSE to_char(ce.\"Fullname\")  ";
 		sql += "    END ";
 		sql += "    ORDER BY cm.\"CustId\" ASC";
-		
-		
 
 		this.info("sql=" + sql);
 
@@ -129,6 +127,31 @@ public class LY007ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		query.setParameter("inputYearMonth", inputYearMonth);
 
+		return this.convertToMap(query);
+	}
+
+	/*
+	 * 查前一季底的淨值(查核數)
+	 */
+	public List<Map<String, String>> findStockHoldersEqt(int yearMonth, TitaVo titaVo) throws Exception {
+
+		this.info("LY007.findStockHoldersEqt ");
+
+		this.info("yearMonth =" + yearMonth);
+		String sql = "";
+		sql += " select \"AcDate\" , \"StockHoldersEqt\" from \"InnFundApl\" ";
+		sql += " where \"AcDate\" = (";
+		sql += " 	select max(\"AcDate\") from \"InnFundApl\" ";
+		sql += " 	where trunc(\"AcDate\"/100) <= :yymm ";
+		sql += " 	  and \"PosbleBorPsn\" > 0 ";
+		sql += " )";
+
+		this.info("sql=" + sql);
+
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("yymm", yearMonth);
 		return this.convertToMap(query);
 	}
 

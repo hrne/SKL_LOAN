@@ -102,8 +102,12 @@ public class LM054Report extends MakeReport {
 
 		String tempNo = "";
 		String memo = "";
+		String tmpClNo = lM054tLDVo.get(0).get("ClNo2").toString();
+		// 筆數
+		int cnt = 0;
 
 		for (Map<String, String> lM054Vo : lM054tLDVo) {
+			cnt++;
 			row++;
 			// 項目(戶號+額度)
 			makeExcel.setValue(row, 1, lM054Vo.get("F25"), "C");
@@ -202,11 +206,16 @@ public class LM054Report extends MakeReport {
 			if (lM054Vo.get("F23").length() > 1) {
 				mark.add(lM054Vo.get("F23"));
 			}
-			if ((tempNo.equals(lM054Vo.get("F0")) && lM054Vo.get("F0").length() != 8)) {
-				if (lM054Vo.get("F0") != null) {
-					mark.add("同一擔保品");
-				}
+
+			if (tmpClNo.equals(lM054Vo.get("ClNo2")) && cnt > 1) {
+				mark.add("同一擔保品");
 			}
+
+//			if ((tempNo.equals(lM054Vo.get("F0")) && lM054Vo.get("F0").length() != 8)) {
+//				if (lM054Vo.get("F0") != null) {
+//					mark.add("同一擔保品");
+//				}
+//			}
 
 			for (int i = 0; i < mark.size(); i++) {
 				memo += mark.get(i) + "、";

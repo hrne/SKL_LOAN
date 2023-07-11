@@ -26,7 +26,7 @@ public class LY006ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> queryDetail(int inputYearMonth,TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> queryDetail(int inputYearMonth, TitaVo titaVo) throws Exception {
 		this.info("LY006ServiceImpl queryDetail ");
 		String sql = "";
 		sql += " select ";
@@ -70,17 +70,16 @@ public class LY006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " \"LoanBalance\" ";
 		sql += " from \"LifeRelHead\" ";
 		sql += " WHERE TRUNC(\"AcDate\" / 100 ) = :inputYearMonth ";
+		sql += "   AND \"RelWithCompany\" <> 'E' ";
 		sql += " order by (case ";
-		sql += "			when\"RelWithCompany\"='C' then 0 "; 
-		sql += "			when \"RelWithCompany\"='D' then 1 " ; 
-		sql += "			when \"RelWithCompany\"='F' then 2 " ;
-		sql += "			else 6 " ; 
-		sql += "			end )" ; 
+		sql += "			when\"RelWithCompany\"='C' then 0 ";
+		sql += "			when \"RelWithCompany\"='D' then 1 ";
+		sql += "			when \"RelWithCompany\"='F' then 2 ";
+		sql += "			else 6 ";
+		sql += "			end )";
 		sql += " 		,\"RelWithCompany\" asc";
 		sql += "		,\"HeadId\" asc";
 		sql += "		,\"BusId\" asc";
-		
-		
 
 		this.info("sql=" + sql);
 
@@ -90,6 +89,5 @@ public class LY006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("inputYearMonth", inputYearMonth);
 		return this.convertToMap(query);
 	}
-
 
 }

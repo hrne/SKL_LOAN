@@ -111,7 +111,7 @@ C(5,#TXFORM,L461A,E(0,1),E(0,0))
 C(4,#ReportA,S,$)E(0,31)ASGN(INQHD$)
 ![每筆明細(OCCURS)長度]
 #L461ALN=n,3,S
-C(4,#ReportA,S,$)E(0,40)ASGN(INQLEN$)
+C(4,#ReportA,S,$)E(0,77)ASGN(INQLEN$)
 ![每張印錄單列印的筆數]
 #L461AQPRT=n,2,S
 C(4,#ReportA,S,$)E(0,30)ASGN(INQPRT$)
@@ -180,8 +180,9 @@ C(3,#ReportAClNo,0,S,E(0,@ReportAClNoT,#ReportAClNo))
 C(3,#ReportAClNo,0,S,$)
 T(2,@ReportAClNo,#ReportAClNoT)
 
+#ReportAPrevInsuNo=x,17,O
 
-#ReportAErrorMsg=c,20,O
+#ReportAErrorMsg=c,40,O
 ![防止二次單據]
 E(0,@L461CPRT,0)
 </sub>
@@ -291,6 +292,7 @@ TXFORM=L461A
 #ReportAClCode1
 #ReportAClCode2
 #ReportAClNo
+#ReportAPrevInsuNo
 #ReportAErrorMsg
 ^
 
@@ -323,6 +325,7 @@ TXFORM=L461C
 #ReportAClCode1
 #ReportAClCode2
 #ReportAClNo
+#ReportAPrevInsuNo
 #ReportAErrorMsg
 @
 #ErrorACnt

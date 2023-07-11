@@ -90,12 +90,12 @@ public class LY004Report2 extends MakeReport {
 		} else {
 			// 無資料時處理
 			makeExcel.setValue(6, 2, "本日無資料!!");
-
+			makeExcel.close();
 			return false;
 		}
 
-		makeExcel.close();
 
+		makeExcel.close();
 		return true;
 
 	}

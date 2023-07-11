@@ -159,7 +159,7 @@ public class L2419Batch extends TradeBuffer {
 
 		zipItems = new HashMap<>();
 
-		openFeedbackExcel(); // openExcel
+		openFeedbackExcel(titaVo); // openExcel
 
 		boolean isFirstLoop = true;
 
@@ -1207,7 +1207,7 @@ public class L2419Batch extends TradeBuffer {
 		return cdCode.getItem();
 	}
 
-	private void openFeedbackExcel() throws LogicException {
+	private void openFeedbackExcel(TitaVo titaVo) throws LogicException {
 		this.info("openFeedbackExcel ... ");
 
 		String fileItem = batchTitaVo.getParam("FileItem").trim();
@@ -1222,6 +1222,10 @@ public class L2419Batch extends TradeBuffer {
 		this.info("fileitem=" + fileItem);
 
 		makeExcel.openExcel(fileName, "擔保品明細表");
+
+		int lastRowNum = getSheetLastRowNum(titaVo);
+
+		this.info("lastRowNum=" + lastRowNum);
 
 		String groupNoOnExcelFileName = "";
 
@@ -1406,5 +1410,16 @@ public class L2419Batch extends TradeBuffer {
 
 	private boolean isScientificNotation(String str) {
 		return str.matches("[+-]?\\d+(\\.\\d*)?[Ee][+-]?\\d+");
+	}
+
+	private int getSheetLastRowNum(TitaVo titaVo) throws LogicException {
+		// 2023-07-11 Wei 增加
+		// 修改原因: user CQ3559 上傳L2419會改SheetName,導致Sheet null
+		// 增加檢核: 若該頁籤名稱不存在時,提示錯誤訊息
+		int result = makeExcel.getSheetLastRowNum();
+		if (result == -1) {
+			throw new LogicException(titaVo, "E0015", "頁籤名稱(擔保品明細表)不存在");
+		}
+		return result;
 	}
 }

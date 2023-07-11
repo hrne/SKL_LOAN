@@ -88,10 +88,10 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "			ELSE 'B' END ) AS F3";
 			//EntCode 0=個金,1=企金,2=企金自然人
 			sql += "		  ,(CASE";
-			sql += "			  WHEN R.\"ReltCode\" IS NULL AND M.\"EntCode\" <> 1 THEN 'D'";
-			sql += "			  WHEN R.\"ReltCode\" IS NULL AND M.\"EntCode\" = 1 THEN 'C'";
-			sql += "			  WHEN R.\"ReltCode\" IS NOT NULL AND M.\"EntCode\" <> 1 THEN 'B'";
-			sql += "			  WHEN R.\"ReltCode\" IS NOT NULL AND M.\"EntCode\" = 1 THEN 'A'";
+			sql += "			  WHEN H.\"Id\" IS NULL AND M.\"EntCode\" <> 1 THEN 'D'";
+			sql += "			  WHEN H.\"Id\" IS NULL AND M.\"EntCode\" = 1 THEN 'C'";
+			sql += "			  WHEN H.\"Id\" IS NOT NULL AND M.\"EntCode\" <> 1 THEN 'B'";
+			sql += "			  WHEN H.\"Id\" IS NOT NULL AND M.\"EntCode\" = 1 THEN 'A'";
 			sql += "			ELSE ' ' END ) AS F4";
 			sql += "		  ,(CASE";
 			sql += "			  WHEN REGEXP_LIKE(M2.\"ProdNo\",'I[A-Z]') OR M2.\"FacAcctCode\" = 340 THEN 'Y'";
@@ -120,6 +120,7 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "			ELSE ' ' END ) AS F23";
 			sql += "		  ,M2.\"OvduDays\" AS F24";
 			sql += "		  ,M.\"CustNo\" || M.\"FacmNo\" || L.\"BormNo\" AS F25";
+			sql += "		  ,M.\"ClNo\" AS \"ClNo2\"";//是否擔保品判斷用
 			sql += "	FROM \"MonthlyLoanBal\" M";
 			sql += "	LEFT JOIN ( ";
 			sql += "		SELECT DISTINCT \"CustNo\"";
@@ -153,6 +154,24 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "								   AND M2.\"FacmNo\" = M.\"FacmNo\"";
 			sql += "								   AND M2.\"YearMonth\" = :yymm";
 			sql += "	LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = M.\"CustNo\"";
+			sql += "	LEFT JOIN ( ";
+			sql += "		SELECT * FROM (";
+			sql += "			SELECT DISTINCT \"HeadId\" AS \"Id\"";
+			sql += "			      ,\"HeadName\" AS \"Name\"";
+			sql += "			FROM \"LifeRelHead\"";
+			sql += "			WHERE TRUNC(\"AcDate\" / 100 ) = :yymm ";
+			sql += "			UNION ALL";
+			sql += "			SELECT DISTINCT \"RelId\" AS \"Id\"";
+			sql += "			      ,\"RelName\" AS \"Name\"";
+			sql += "			FROM \"LifeRelHead\"";
+			sql += "			WHERE TRUNC(\"AcDate\" / 100 ) = :yymm ";
+			sql += "			UNION ALL";
+			sql += "			SELECT DISTINCT \"BusId\" AS \"Id\"";
+			sql += "			      ,\"BusName\" AS \"Name\"";
+			sql += "			FROM \"LifeRelHead\"";	
+			sql += "			WHERE TRUNC(\"AcDate\" / 100 ) = :yymm ";
+			sql += "		) WHERE \"Id\" <> '-' ";
+			sql += " 	) H ON H.\"Id\" = C.\"CustId\"";
 			sql += "	LEFT JOIN \"LoanBorMain\" L ON L.\"CustNo\" = M.\"CustNo\"";
 			sql += "							   AND L.\"FacmNo\" = M.\"FacmNo\"";
 			sql += "							   AND L.\"BormNo\" = M.\"BormNo\"";
@@ -162,7 +181,6 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\"";
 			sql += "						    AND F.\"FacmNo\" = M.\"FacmNo\"";
 			sql += "	LEFT JOIN \"FacCaseAppl\" FCA ON FCA.\"ApplNo\" = F.\"ApplNo\"";
-			sql += "	LEFT JOIN \"ReltMain\" R ON R.\"CustNo\" = C.\"CustNo\"";
 			sql += "	LEFT JOIN ( SELECT \"CustNo\"";
 			sql += "					  ,\"FacmNo\"";
 			sql += "					  ,\"TelDate\"";
@@ -308,16 +326,12 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "			ELSE '99' END ";
 			sql += "	UNION";
 			sql += "	SELECT 'A' AS \"ClNo\"";
-			sql += "          ,ROUND(SUM(NVL(I.\"AccumDPAmortized\",0)),0) AS \"LoanBalance\"";
-			sql += "          ,0 AS \"IntAmtAcc\"";
-			sql += "          ,ROUND(SUM(NVL(I.\"AccumDPAmortized\",0)),0) AS \"LineAmt\"";
-			sql += "	FROM \"Ias39IntMethod\" I";
-			sql += "	LEFT JOIN \"MonthlyLoanBal\" MLB ON MLB.\"YearMonth\" = I.\"YearMonth\"";
-			sql += "									AND MLB.\"CustNo\" = I.\"CustNo\"";
-			sql += "									AND MLB.\"FacmNo\" = I.\"FacmNo\"";
-			sql += "									AND MLB.\"BormNo\" = I.\"BormNo\"";
-			sql += "	WHERE I.\"YearMonth\" = :yymm ";
-			sql += "	  AND MLB.\"AcctCode\" <> 990 ";
+			sql += "		  ,\"LoanBal\" AS \"LoanBalance\"";
+			sql += "		  ,0 AS \"IntAmtAcc\"";
+			sql += "		  ,\"LoanBal\" AS \"LineAmt\"";
+			sql += "	FROM \"MonthlyLM052AssetClass\"";
+			sql += "	WHERE \"YearMonth\" = :yymm ";
+			sql += "	  AND \"AssetClassNo\" = 61 ";
 			sql += "	UNION";
 			sql += "	SELECT 'B' AS \"ClNo\"";
 			sql += "		  ,\"LoanBal\" AS \"LoanBalance\"";

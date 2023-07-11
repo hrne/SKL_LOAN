@@ -59,7 +59,10 @@ public class LY006Report extends MakeReport {
 		headerStyleVo.setBold(true);
 
 		List<Map<String, String>> lY006List = null;
-
+		/**
+		 * 20230711與User(舜雯)聯絡：此表還是以T07表資料輸出(排除一億元)，其它人工修正。
+		 * 
+		 * */
 		try {
 
 			// 各筆資料

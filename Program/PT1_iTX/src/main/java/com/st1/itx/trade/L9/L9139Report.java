@@ -1,6 +1,9 @@
 package com.st1.itx.trade.L9;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -38,14 +41,25 @@ public class L9139Report extends MakeReport {
 
 	public Boolean exec(TitaVo titaVo) throws LogicException {
 
-		List<Map<String, String>> oL9139List = null;
+		List<Map<String, String>> oL9139List =new ArrayList<>();
+		List<Map<String, String>> oL9139ListAll = new ArrayList<>();
+	    
+		int startDate =parse.stringToInteger(titaVo.getParam("StartDate"))+ 19110000;
+		int endDate =parse.stringToInteger(titaVo.getParam("EndDate"))+ 19110000;
+        List<Integer> dateDiffList = getDateDifferenceList(startDate, endDate);
+       
+        dateDiffList.forEach(number -> this.info("數字日期: " + number));
+		
 		try {
-			oL9139List = oL9139ServiceImpl.findAll(titaVo);
+			for (int acdate : dateDiffList) {
+				oL9139List = oL9139ServiceImpl.findAll(titaVo,acdate);
+				oL9139ListAll.addAll(oL9139List);
+			}
 		} catch (Exception e) {
 			this.info("L9139ServiceImpl.findAll error = " + e.toString());
 			return false;
 		}
-		setExcel(titaVo, oL9139List);
+		setExcel(titaVo, oL9139ListAll);
 		return true;
 	}
 
@@ -54,6 +68,7 @@ public class L9139Report extends MakeReport {
 		
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		int startDate =parse.stringToInteger(titaVo.getParam("StartDate"))+ 19110000;
+		int endDate =parse.stringToInteger(titaVo.getParam("EndDate"))+ 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "L9139";
 		String fileItem = "暫收款日餘額前後差異比較表";
@@ -67,7 +82,8 @@ public class L9139Report extends MakeReport {
 		// 開啟報表
 		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
 
-
+		this.info("oL9139List.size() = " + oL9139List.size());
+		
 		int row = 3;
 		BigDecimal total = BigDecimal.ZERO;
 		if (oL9139List != null && oL9139List.size() != 0) {
@@ -123,7 +139,8 @@ public class L9139Report extends MakeReport {
 				} // for
 				row++;
 			} // for
-			makeExcel.setValue(1, 2, startDate);
+			makeExcel.setValue(1, 2, startDate);			
+			makeExcel.setValue(1, 4, endDate);
 //			makeExcel.setFormula(row, 10, total, "SUBTOTAL(9,J2:J" + (row - 1) + ")", "#,##0");
 
 		} else {
@@ -132,5 +149,37 @@ public class L9139Report extends MakeReport {
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);
 	}
+	
+    public List<Integer> getDateDifferenceList(int number1, int number2) {
+    	// 將數字轉換為日期
+        LocalDate date1 = convertToDate(number1);
+        LocalDate date2 = convertToDate(number2);
+
+        // 計算日期之間的差異
+        int difference = date2.compareTo(date1);
+       
+        // 構建日期差異表
+        List<Integer> dateDiffList = new ArrayList<>();
+        for (int i = 0; i <= difference; i++) {
+            LocalDate currentDate = date1.plusDays(i);
+            int currentNumber = convertToNumber(currentDate);
+            dateDiffList.add(currentNumber);
+        }
+
+        return dateDiffList;
+    }
+
+    public LocalDate convertToDate(int number) {
+        String dateString = String.valueOf(number);
+        int year = Integer.parseInt(dateString.substring(0, 4));
+        int month = Integer.parseInt(dateString.substring(4, 6));
+        int day = Integer.parseInt(dateString.substring(6, 8));
+        return LocalDate.of(year, month, day);
+    }
+
+    public int convertToNumber(LocalDate date) {
+        String dateString = date.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        return Integer.parseInt(dateString);
+    }
 
 }

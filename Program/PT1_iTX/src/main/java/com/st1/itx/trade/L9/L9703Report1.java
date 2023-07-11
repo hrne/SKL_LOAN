@@ -195,7 +195,7 @@ public class L9703Report1 extends MakeReport {
 
 			lCustNoticeId.setCustNo(custNo);
 			lCustNoticeId.setFacmNo(facmNo);
-			lCustNoticeId.setFormNo("L9703");
+			lCustNoticeId.setFormNo(tran);
 
 			lCustNotice = sCustNoticeService.findById(lCustNoticeId, titaVo);
 

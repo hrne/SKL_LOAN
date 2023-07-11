@@ -161,7 +161,7 @@ public class L2419 extends TradeBuffer {
 				throw new LogicException("E0005", "批號已存在,擔保品整批匯入檔(ClBatch),批號(" + groupNo + ")");
 			}
 
-			int lastRowNum = makeExcel.getSheetLastRowNum();
+			int lastRowNum = getSheetLastRowNum(titaVo);
 
 			this.info("lastRowNum=" + lastRowNum);
 
@@ -279,7 +279,7 @@ public class L2419 extends TradeBuffer {
 			}
 		}
 
-		int lastRowNum = makeExcel.getSheetLastRowNum();
+		int lastRowNum = getSheetLastRowNum(titaVo);
 
 		this.info("lastRowNum=" + lastRowNum);
 
@@ -1101,7 +1101,7 @@ public class L2419 extends TradeBuffer {
 				throw new LogicException("E0015", "上傳的回饋檔檔名未含有系統產生的批次號碼,請使用L2419功能1所產生的回饋檔.");
 			}
 
-			int lastRowNum = makeExcel.getSheetLastRowNum();
+			int lastRowNum = getSheetLastRowNum(titaVo);
 
 			this.info("lastRowNum=" + lastRowNum);
 
@@ -1121,6 +1121,17 @@ public class L2419 extends TradeBuffer {
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
 					String.format("%-8s", titaVo.getTlrNo().trim()) + "L2419", msg, titaVo);
 		}
+	}
+
+	private int getSheetLastRowNum(TitaVo titaVo) throws LogicException {
+		// 2023-07-11 Wei 增加
+		// 修改原因: user CQ3559 上傳L2419會改SheetName,導致Sheet null
+		// 增加檢核: 若該頁籤名稱不存在時,提示錯誤訊息
+		int result = makeExcel.getSheetLastRowNum();
+		if (result == -1) {
+			throw new LogicException(titaVo, "E0015", "頁籤名稱(擔保品明細表)不存在");
+		}
+		return result;
 	}
 
 	private void report(TitaVo titaVo) throws LogicException {

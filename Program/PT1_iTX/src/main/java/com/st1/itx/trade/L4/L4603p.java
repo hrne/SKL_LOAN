@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TempVo;
@@ -37,6 +36,7 @@ import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.TxToDoCom;
 import com.st1.itx.util.common.data.MailVo;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.http.WebClient;
@@ -84,6 +84,10 @@ public class L4603p extends TradeBuffer {
 
 	@Autowired
 	private MakeFile makeFile;
+	@Autowired
+	MakeFile makeFileText;
+	@Autowired
+	MakeFile makeFileMail;
 
 	@Autowired
 	private TxToDoCom txToDoCom;
@@ -103,6 +107,7 @@ public class L4603p extends TradeBuffer {
 	private int noticeFlag = 0;
 	private int iEntryDate = 0;
 	private int specificDd = 0;
+	private int wkCalDy = 0;
 
 	private String sEntryDate = "";
 	private String noticePhoneNo = "";
@@ -121,6 +126,15 @@ public class L4603p extends TradeBuffer {
 		this.info("L4603p titaVo.getTxcd() = " + titaVo.getTxcd());
 
 		String parentTranCode = titaVo.getTxcd();
+		wkCalDy = dDateUtil.getNowIntegerForBC();
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI() + 19110000).setBrno(titaVo.getBrno())
+				.setRptCode("L4603").setRptItem("期款扣款通知").build();
+		// 開啟報表
+		makeFileText.open(titaVo, reportVo, "簡訊檔.txt");
+		ReportVo mailReportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI() + 19110000).setBrno(titaVo.getBrno())
+				.setRptCode("L4603").setRptItem("期款扣款通知").build();
+		// 開啟報表
+		makeFileMail.open(titaVo, mailReportVo, "email檔.txt");
 
 		int iInsuEndMonth = 0;
 		l4603report.setParentTranCode(parentTranCode);
@@ -369,6 +383,8 @@ public class L4603p extends TradeBuffer {
 		this.info("CustNotice is not null...");
 
 		txToDoCom.setTxBuffer(this.getTxBuffer());
+		String dataLines = txToDoCom.getProcessNoteForText(noticePhoneNo,
+				"您好：提醒您" + insuMonth + "月份，除期款外，另加收年度火險地震險費＄" + insuAmt + "，請留意帳戶餘額。新光人壽關心您。　　", wkCalDy);
 
 		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 		tTxToDoDetail.setCustNo(tInsuRenew.getCustNo());
@@ -377,10 +393,9 @@ public class L4603p extends TradeBuffer {
 		tTxToDoDetail.setDtlValue("<火險保費>" + tInsuRenew.getPrevInsuNo());
 		tTxToDoDetail.setItemCode("TEXT00");
 		tTxToDoDetail.setStatus(0);
-		tTxToDoDetail.setProcessNote(txToDoCom.getProcessNoteForText(noticePhoneNo,
-				"您好：提醒您" + insuMonth + "月份，除期款外，另加收年度火險地震險費＄" + insuAmt + "，請留意帳戶餘額。新光人壽關心您。　　",
-				this.getTxBuffer().getMgBizDate().getTbsDy()));
-
+		tTxToDoDetail.setProcessNote(dataLines);
+		makeFileText.put(parse.IntegerToString(tInsuRenew.getCustNo(), 7) + "-"
+				+ parse.IntegerToString(tInsuRenew.getFacmNo(), 3) + dataLines);
 		txToDoCom.addDetail(true, flag, tTxToDoDetail, titaVo);
 	}
 
@@ -396,8 +411,7 @@ public class L4603p extends TradeBuffer {
 		ArrayList<String> dataList = new ArrayList<String>();
 
 		MailVo mailVo = new MailVo();
-		String processNote = mailVo.generateProcessNotes(noticeEmail, "火險保費",
-				"親愛的客戶，繳款通知；新光人壽關心您", 0);
+		String processNote = mailVo.generateProcessNotes(noticeEmail, "火險保費", "親愛的客戶，繳款通知；新光人壽關心您", 0);
 
 		txToDoCom.setTxBuffer(this.getTxBuffer());
 
@@ -409,6 +423,8 @@ public class L4603p extends TradeBuffer {
 		tTxToDoDetail.setItemCode("MAIL00");
 		tTxToDoDetail.setStatus(0);
 		tTxToDoDetail.setProcessNote(processNote);
+		makeFileMail.put(parse.IntegerToString(tInsuRenew.getCustNo(), 7) + "-"
+				+ parse.IntegerToString(tInsuRenew.getFacmNo(), 3) + processNote);
 
 		txToDoCom.addDetail(true, flag, tTxToDoDetail, titaVo);
 

@@ -60,6 +60,7 @@ public class L9139Batch extends BatchBase implements Tasklet, InitializingBean {
 
 		// ServiceImpl.findAll 接收民國年月日
 		titaVo.putParam("StartDate", tbsdy);
+		titaVo.putParam("EndDate", tbsdy);
 
 		boolean isFinish = oL9139Report.exec(titaVo);
 

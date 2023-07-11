@@ -41,7 +41,7 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[230,770];printer.width=[20,20];">
 [
 ["[L9139]                                 暫收款日餘額前後差異比較表"],
-["#R1+@會計日期",#StartDate],
+["#R1+@會計日期",#StartDate,#EndDate],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -61,8 +61,6 @@ K(LIGHT,#R{i},TXTRED,0)
 ! 永遠為必輸欄位
 #ALWAYS_HIGHLIGHT=@,1,S
 T(3,@R1,*)
-
-
 
 !---------- AP TEXT AREA Variables ----------
 #CHAIN=A,1,S
@@ -85,11 +83,11 @@ V(5,0,#DT2)
 A(DATE,0,#StartDate)
 
 !會計日期-迄日
-! #EndDate=D,7,I
-! T(2,#DT2)
-! @V(7)
-! V(5,#StartDate,#DT2)
-! A(DATE,0,#EndDate)
+#EndDate=D,7,I
+T(2,#DT2)
+@V(7)
+V(5,#StartDate,#DT2)
+A(DATE,0,#EndDate)
 
 #RPTFG=A,1,S
 E(0,0)
@@ -122,6 +120,7 @@ T(3,[L9139] 暫收款日餘額前後差異比較表)
 !------ 上行電文 ------
 <sub type="TIM">
 #StartDate
+#EndDate
 </sub>
 
 

@@ -46,15 +46,10 @@ public class L4601 extends TradeBuffer {
 
 	@Autowired
 	public TotaVo totaA;
-
-	@Autowired
-	public TotaVo totaB;
-
 	@Autowired
 	public TotaVo totaC;
 
 	private int errorACnt = 0;
-//	private int errorBCnt = 0;
 	private int errorCCnt = 0;
 
 	private int iInsuEndMonth = 0;
@@ -91,7 +86,7 @@ public class L4601 extends TradeBuffer {
 						String[] checkResultA = t.getCheckResultA().split(",");
 						List<String> strListA = Arrays.asList(checkResultA);
 						for (String checkA : strListA) {
-							totaA = errorReportA(t, parse.stringToInteger(checkA), titaVo);
+							errorReportA(t, parse.stringToInteger(checkA), titaVo);
 						}
 					}
 				}
@@ -103,15 +98,16 @@ public class L4601 extends TradeBuffer {
 				}
 				if (list != null) {
 					for (Map<String, String> m : list) {
-						totaC = errorReportA1(m, titaVo);
+						errorReportA1(m, titaVo);
 					}
 				}
 				for (InsuRenewMediaTemp t : slInsuRenewMediaTemp.getContent()) {
+
 					if (!"".equals(reportC) && !"".equals(t.getCheckResultC())) {
 						String[] checkResultC = t.getCheckResultC().split(",");
 						List<String> strListC = Arrays.asList(checkResultC);
 						for (String checkC : strListC) {
-							totaC = errorReportC(t, parse.stringToInteger(checkC), titaVo);
+							errorReportC(t, parse.stringToInteger(checkC), titaVo);
 						}
 					}
 				}
@@ -125,7 +121,7 @@ public class L4601 extends TradeBuffer {
 //			totaB.putParam("ErrorBCnt", errorBCnt);
 //			this.addList(totaB);
 
-			this.info("errorCCnt  = ");
+			this.info("errorCCnt  = " + errorCCnt);
 			totaC.putParam("ErrorCCnt", errorCCnt);
 			this.addList(totaC);
 			// 產重複投保報表
@@ -137,7 +133,7 @@ public class L4601 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private TotaVo errorReportA(InsuRenewMediaTemp t, int errorCode, TitaVo titaVo) throws LogicException {
+	private void errorReportA(InsuRenewMediaTemp t, int errorCode, TitaVo titaVo) throws LogicException {
 		this.info("ReportA Start, errorCode :" + +errorCode);
 //			戶號 額度 擔保品序號 錯誤原因	總筆數
 		OccursList occursListReport = new OccursList();
@@ -146,6 +142,7 @@ public class L4601 extends TradeBuffer {
 		occursListReport.putParam("ReportAClCode1", t.getClCode1());
 		occursListReport.putParam("ReportAClCode2", t.getClCode2());
 		occursListReport.putParam("ReportAClNo", t.getClNo());
+		occursListReport.putParam("ReportAPrevInsuNo", t.getInsuNo());
 		if (errorCode == 10) {
 			occursListReport.putParam("ReportAErrorMsg", "無此保單號碼");
 		} else if (errorCode == 11) {
@@ -166,10 +163,9 @@ public class L4601 extends TradeBuffer {
 
 		totaA.addOccursList(occursListReport);
 		errorACnt = errorACnt + 1;
-		return totaA;
 	}
 
-	private TotaVo errorReportA1(Map<String, String> m, TitaVo titaVo) throws LogicException {
+	private void errorReportA1(Map<String, String> m, TitaVo titaVo) throws LogicException {
 		this.info("ReportA1 Start :");
 //			戶號 額度 擔保品序號 錯誤原因	總筆數
 		OccursList occursListReport = new OccursList();
@@ -178,14 +174,14 @@ public class L4601 extends TradeBuffer {
 		occursListReport.putParam("ReportAClCode1", m.get("ClCode1"));
 		occursListReport.putParam("ReportAClCode2", m.get("ClCode2"));
 		occursListReport.putParam("ReportAClNo", m.get("ClNo"));
-		occursListReport.putParam("ReportAErrorMsg", m.get("PrevInsuNo") + " 無詢價資料");
+		occursListReport.putParam("ReportAPrevInsuNo", m.get("PrevInsuNo"));
+		occursListReport.putParam("ReportAErrorMsg", "無詢價資料");
 
 		totaA.addOccursList(occursListReport);
 		errorACnt = errorACnt + 1;
-		return totaA;
 	}
 
-	private TotaVo errorReportC(InsuRenewMediaTemp t, int errorCode, TitaVo titaVo) throws LogicException {
+	private void errorReportC(InsuRenewMediaTemp t, int errorCode, TitaVo titaVo) throws LogicException {
 		this.info("ReportC Start, errorCode :" + +errorCode);
 //		押品號碼 原保單號碼 戶號 額度 戶名 新保險起日 新保險迄日 火險保額 火線保費 地震險保額 地震險保費 總保費 錯誤說明
 		OccursList occursListReport = new OccursList();
@@ -214,6 +210,5 @@ public class L4601 extends TradeBuffer {
 		totaC.addOccursList(occursListReport);
 
 		errorCCnt = errorCCnt + 1;
-		return totaC;
 	}
 }

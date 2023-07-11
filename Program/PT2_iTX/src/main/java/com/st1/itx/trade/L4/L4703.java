@@ -25,8 +25,10 @@ import com.st1.itx.db.service.springjpa.cm.L9703ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.CustNoticeCom;
+import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.TxToDoCom;
 import com.st1.itx.util.common.data.MailVo;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
@@ -81,6 +83,10 @@ public class L4703 extends TradeBuffer {
 
 	@Autowired
 	public L9703ServiceImpl l9703ServiceImpl;
+	@Autowired
+	MakeFile makeFileText;
+	@Autowired
+	MakeFile makeFileMail;
 
 	@Autowired
 	public WebClient webClient;
@@ -91,11 +97,22 @@ public class L4703 extends TradeBuffer {
 	private String sEntryDate = "";
 	private int totalCnt = 0;
 	private int deleteCnt = 0;
+	private int wkCalDy = 0;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4703 ");
 		this.totaVo.init(titaVo);
+		wkCalDy = dateUtil.getNowIntegerForBC();
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI() + 19110000).setBrno(titaVo.getBrno())
+				.setRptCode("L4703").setRptItem("期款扣款通知").build();
+		// 開啟報表
+		makeFileText.open(titaVo, reportVo, "簡訊檔.txt");
+		ReportVo mailReportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI() + 19110000).setBrno(titaVo.getBrno())
+				.setRptCode("L4703").setRptItem("期款扣款通知").build();
+		// 開啟報表
+		makeFileMail.open(titaVo, mailReportVo, "email檔.txt");
+
 		if (titaVo.isHcodeErase()) {
 //			刪除TxToDoDetail
 			dele("TEXT00", titaVo);
@@ -124,14 +141,6 @@ public class L4703 extends TradeBuffer {
 			int functionCode = parse.stringToInteger(titaVo.getParam("FunctionCode"));
 			int custNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 			int facmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
-
-			/*
-			 * L9703 titaVo ["#R1+@會計日期",#AcctDate], ["#R2+@戶號",#CustNo,"-",#FacmNo],
-			 * ["#R3+@滯繳條件",#UnpaidCond,#UnpaidCondx],
-			 * ["#R4+@滯繳期數",#UnpaidTermSt,"~",#UnpaidTermEd],
-			 * ["#R5+@滯繳日數",#UnpaidDaySt,"~",#UnpaidDayEd],
-			 * ["#R6+@繳款方式",#RepayType,#RepayTypex], ["#R7+@戶別",#CustType,#CustTypex],
-			 */
 
 			titaVo.putParam("UnpaidCond", 2); // 2 滯繳日數
 			// titaVo.putParam("UnpaidDaySt", 7); // 輸入
@@ -230,7 +239,7 @@ public class L4703 extends TradeBuffer {
 
 				if ("L9703".equals(tCustNotice.getFormNo()) && "Y".equals(tCustNotice.getMsgNotice())) {
 					dataLines = "\"H1\",\"" + tCustMain.getCustId() + "\",\"" + noticePhoneNo
-							+ "\",\"親愛的客戶，繳款通知；新光人壽關心您。”,\"" + sEntryDate + "\"";
+							+ "\",\"親愛的客戶，您好：房貸繳款通知；如已繳納則無須理會本訊息。新光人壽關心您。”,\"" + sEntryDate + "\"";
 					dataList.add(dataLines);
 
 					TxToDoDetail tTxToDoDetail = new TxToDoDetail();
@@ -241,6 +250,8 @@ public class L4703 extends TradeBuffer {
 					tTxToDoDetail.setItemCode("TEXT00");
 					tTxToDoDetail.setStatus(0);
 					tTxToDoDetail.setProcessNote(dataLines);
+					makeFileText
+							.put(parse.IntegerToString(custNo, 7) + "-" + parse.IntegerToString(facmNo, 3) + dataLines);
 
 					txToDoCom.addDetail(false, 9, tTxToDoDetail, titaVo);
 				}
@@ -269,7 +280,12 @@ public class L4703 extends TradeBuffer {
 
 				if ("L9703".equals(tCustNotice.getFormNo()) && "Y".equals(tCustNotice.getEmailNotice())) {
 					MailVo mailVo = new MailVo();
-					String processNote = mailVo.generateProcessNotes(noticeEmail, "滯繳通知", "親愛的客戶，繳款通知；新光人壽關心您。", 0);
+					String processNote = mailVo.generateProcessNotes(noticeEmail, "滯繳通知",
+							"親愛的客戶，您好：房貸繳款通知；如已繳納則無須理會本訊息。新光人壽關心您。", 0);
+
+					dataLines = "\"H1\",\"" + tCustMain.getCustId() + "\",\"" + noticeEmail
+							+ "\",\"親愛的客戶，您好：房貸繳款通知；如已繳納則無須理會本訊息。新光人壽關心您。”,\"" + sEntryDate + "\"";
+					dataList.add(dataLines);
 
 					TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 					tTxToDoDetail.setCustNo(custNo);
@@ -279,6 +295,8 @@ public class L4703 extends TradeBuffer {
 					tTxToDoDetail.setItemCode("MAIL00");
 					tTxToDoDetail.setStatus(0);
 					tTxToDoDetail.setProcessNote(processNote);
+					makeFileMail
+							.put(parse.IntegerToString(custNo, 7) + "-" + parse.IntegerToString(facmNo, 3) + processNote);
 
 					txToDoCom.addDetail(false, 9, tTxToDoDetail, titaVo);
 				}

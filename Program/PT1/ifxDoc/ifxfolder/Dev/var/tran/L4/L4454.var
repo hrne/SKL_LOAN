@@ -165,7 +165,11 @@ E(0,1)
 #FormNo=x,10,S
 T(3,L4454)
 
+
 #RimFlag=A,1,S
+
+#notPrintLetter=X,1,S
+#nLetter=X,1,S
 
 #L1R20Rim2=X,1,S
 C(3,#CustNo,0,S,$)
@@ -174,10 +178,12 @@ E(0,@RimFlag,0)
 S(L1R20,01,#CustNo,#FacmNo,#FormNo,#RimFlag)
 R(1,L1R20)
 T(2,@Msg,#L1R20Msg)
+T(2,@nLetter,#notPrintLetter)
 
 #ShowMsg=A,1,S
 C(3,#CustNo,0,E(0,0),C(4,#Msg,E(0,0),E(0,1)))
-INVOKEJS(SHOW,L4454,8,8,#ShowMsg)
+C(5,#nLetter,Y,K(NOBUTTON,CLOSEY),K(NOBUTTON,SHOWY))
+INVOKEJS(SHOW,p1,11,11,#ShowMsg)
 
 </sub>
 
