@@ -3,6 +3,7 @@ package com.st1.itx.trade.L4;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -16,6 +17,7 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.InsuRenewMediaTemp;
 import com.st1.itx.db.service.ClBuildingService;
 import com.st1.itx.db.service.InsuRenewMediaTempService;
+import com.st1.itx.db.service.springjpa.cm.L4601ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
 import com.st1.itx.util.parse.Parse;
@@ -38,6 +40,9 @@ public class L4601 extends TradeBuffer {
 
 	@Autowired
 	public ClBuildingService clBuildingService;
+
+	@Autowired
+	L4601ServiceImpl l4601ServiceImpl;
 
 	@Autowired
 	public TotaVo totaA;
@@ -69,6 +74,7 @@ public class L4601 extends TradeBuffer {
 //		this.limit = 500;
 		// 執行更新
 		if (titaVo.getParam("FunCd").equals("1")) {
+			this.totaVo.setWarnMsg("背景作業中,待處理完畢訊息通知");
 			MySpring.newTask("L4601Batch", this.txBuffer, titaVo);
 			this.addList(this.totaVo);
 		}
@@ -88,13 +94,19 @@ public class L4601 extends TradeBuffer {
 							totaA = errorReportA(t, parse.stringToInteger(checkA), titaVo);
 						}
 					}
-//					if (!"".equals(reportB) && !"".equals(t.getCheckResultB())) {
-//						String[] checkResultB = t.getCheckResultB().split(",");
-//						List<String> strListB = Arrays.asList(checkResultB);
-//						for (String checkB : strListB) {
-//							totaB = errorReportB(t, parse.stringToInteger(checkB), titaVo);
-//						}
-//					}
+				}
+				List<Map<String, String>> list = null;
+				try {
+					list = l4601ServiceImpl.findNoMediaTemp(titaVo);
+				} catch (Exception e) {
+					this.error(e.getMessage());
+				}
+				if (list != null) {
+					for (Map<String, String> m : list) {
+						totaC = errorReportA1(m, titaVo);
+					}
+				}
+				for (InsuRenewMediaTemp t : slInsuRenewMediaTemp.getContent()) {
 					if (!"".equals(reportC) && !"".equals(t.getCheckResultC())) {
 						String[] checkResultC = t.getCheckResultC().split(",");
 						List<String> strListC = Arrays.asList(checkResultC);
@@ -151,6 +163,22 @@ public class L4601 extends TradeBuffer {
 		} else {
 			occursListReport.putParam("ReportAErrorMsg", errorCode);
 		}
+
+		totaA.addOccursList(occursListReport);
+		errorACnt = errorACnt + 1;
+		return totaA;
+	}
+
+	private TotaVo errorReportA1(Map<String, String> m, TitaVo titaVo) throws LogicException {
+		this.info("ReportA1 Start :");
+//			戶號 額度 擔保品序號 錯誤原因	總筆數
+		OccursList occursListReport = new OccursList();
+		occursListReport.putParam("ReportACustNo", m.get("CustNo"));
+		occursListReport.putParam("ReportAFacmNo", m.get("FacmNo"));
+		occursListReport.putParam("ReportAClCode1", m.get("ClCode1"));
+		occursListReport.putParam("ReportAClCode2", m.get("ClCode2"));
+		occursListReport.putParam("ReportAClNo", m.get("ClNo"));
+		occursListReport.putParam("ReportAErrorMsg", m.get("PrevInsuNo") + " 無詢價資料");
 
 		totaA.addOccursList(occursListReport);
 		errorACnt = errorACnt + 1;

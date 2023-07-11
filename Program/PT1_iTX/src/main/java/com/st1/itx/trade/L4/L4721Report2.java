@@ -81,6 +81,7 @@ public class L4721Report2 extends TradeBuffer {
 	 * @param eAdjDate   利率調整止日
 	 * @param sEntryDate 入帳起日(六個月前月初)
 	 * @param eEntryDate 入帳止日
+	 * @return
 	 * @throws LogicException
 	 */
 	public Integer exec(TitaVo titaVo, TxBuffer txbuffer, List<Map<String, String>> data, String kindItem, int sAdjDate,
@@ -132,69 +133,84 @@ public class L4721Report2 extends TradeBuffer {
 	private List<String> getData(int sAdjDate, int eAdjDate, int sEntryDate, int eEntryDate,
 			List<Map<String, String>> data, TitaVo titaVo) throws LogicException {
 
+		// data 來源 findAll
+		// CustNo
+		// MaxSpecificDd
+		// MinSpecificDd
+
 		List<String> result = new ArrayList<>();
 
 		int custNo = 0;
-		int facmNo = 0;
 
 		int cntTrans = 0;
+
+//		 * @param isDoDetail 是否為明細(否則為額度變動日)
+//		 * @param isSameSpecificDd 應繳日額度是否一樣
+
+		boolean isSameSpecificDd = false;
+
+		boolean isByCustNo = isSameSpecificDd;
 
 		for (Map<String, String> r : data) {
 
 			cntTrans++;
 
-			int iCustNo = parse.stringToInteger(r.get("CustNo"));
-			int iFacmNo = parse.stringToInteger(r.get("FacmNo"));
-
-			// 相同戶號跳過
-			if (custNo == iCustNo) {
-				continue;
-			}
-
-			// 不同戶號額度相同跳過(也可能換戶號時額度相同)
-			if (custNo == iCustNo && facmNo == iFacmNo) {
-				continue;
-			}
+			int MinSpecificDd = parse.stringToInteger(r.get("MinSpecificDd"));
+			int MaxSpecificDd = parse.stringToInteger(r.get("MaxSpecificDd"));
+			int tempfacmno = 999;
+			// 應繳日是否一樣
+			isSameSpecificDd = MinSpecificDd == MaxSpecificDd;
 
 			cnt = cnt + 1;
-			custNo = iCustNo;
-			facmNo = iFacmNo;
 
-			List<Map<String, String>> listL4721Detail = new ArrayList<Map<String, String>>();
+			List<Map<String, String>> rDetail = new ArrayList<Map<String, String>>();
+			List<Map<String, String>> rTxffectDetail = new ArrayList<Map<String, String>>();
 
+			// 明細
 			try {
-				listL4721Detail = l4721ServiceImpl.doDetail(custNo, sAdjDate, eAdjDate, sEntryDate, eEntryDate, titaVo);
+				rDetail = l4721ServiceImpl.doDetailTxffect(custNo, sAdjDate, eAdjDate, sEntryDate, eEntryDate, true,
+						isSameSpecificDd, titaVo);
 			} catch (Exception e) {
 				this.error("l4721ServiceImpl doDetail = " + e.getMessage());
 				throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
 			}
 
-			if (listL4721Detail != null && !listL4721Detail.isEmpty()) {
+			// 利率變動明細
+			try {
+				rTxffectDetail = l4721ServiceImpl.doDetailTxffect(custNo, sAdjDate, eAdjDate, sEntryDate, eEntryDate,
+						false, isSameSpecificDd, titaVo);
+
+			} catch (Exception e) {
+				this.error("l4721ServiceImpl doDetail = " + e.getMessage());
+				throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
+			}
+
+			if (rDetail != null && !rDetail.isEmpty()) {
 
 				String line = "";
 
-				int tempdate = parse.stringToInteger(listL4721Detail.get(0).get("SpecificDd"));
-				for (Map<String, String> mapL4721Detail : listL4721Detail) {
-					if (tempdate != parse.stringToInteger(mapL4721Detail.get("SpecificDd"))) {
-//							sameFlg = true;
-						break;
-					}
-				}
-
-				int tempfacmno = parse.stringToInteger(listL4721Detail.get(0).get("FacmNo"));
 				int times = 0;
 
-				for (Map<String, String> mapL4721Detail : listL4721Detail) {
+				tempfacmno = parse.stringToInteger(rDetail.get(0).get("FacmNo"));
+
+				for (Map<String, String> r1 : rDetail) {
 
 					// 相同戶號不同額度的輸出
 
-					if (tempfacmno == parse.stringToInteger(mapL4721Detail.get("FacmNo"))) { // 相同額度
-						// 該額度第一次進要印0102
+					if (tempfacmno == parse.stringToInteger(r1.get("FacmNo"))) { // 相同額度
+
+						// 第一次
 						if (times == 0) {
-							result = sameFacmno(mapL4721Detail, result, true, titaVo);
+
+							result = sameFacmno(r, rTxffectDetail, result, true, isByCustNo, titaVo);
+
 						} else {
-							result = sameFacmno(mapL4721Detail, result, false, titaVo);
+
+							result = sameFacmno(r, rTxffectDetail, result, false, isByCustNo, titaVo);
+
 						}
+
+						result.add(line);
 						times++;
 					} else { // 不同額度 印04並且切到下一個額度循環
 						// 04
@@ -203,18 +219,27 @@ public class L4721Report2 extends TradeBuffer {
 						line += "04";
 						result.add(line);
 
-						// 45
-						// 45 額度 003 利率自 109 年 09 月 01 日起， 由 1.68% 調整為 1.41% 。
-						BigDecimal presentRate = parse.stringToBigDecimal(mapL4721Detail.get("PresentRate"));
-						BigDecimal adjustedRate = parse.stringToBigDecimal(mapL4721Detail.get("AdjustedRate"));
-						if (presentRate.compareTo(adjustedRate) != 0) {
-							line = "";
-							line += "45";
-							line += " 額度 " + FormatUtil.pad9(mapL4721Detail.get("FacmNo"), 3) + "     " + "利率自"
-									+ makeReport.showRocDate(mapL4721Detail.get("TxEffectDate"), 0) + "起，　由"
-									+ makeReport.formatAmt(mapL4721Detail.get("PresentRate"), 2) + "%" + "調整為"
-									+ makeReport.formatAmt(mapL4721Detail.get("AdjustedRate"), 2) + "。";
-							result.add(line);
+						for (Map<String, String> r2 : rTxffectDetail) {
+							// 45
+							// 45 額度 003 利率自 109 年 09 月 01 日起， 由 1.68% 調整為 1.41% 。
+
+							// 明細的額度是0的話表示 輸出再同一份 或是依據額度印
+							if (r1.get("FacmNo").equals(r2.get("FacmNo")) || "0".equals(r1.get("FacmNo"))) {
+
+								BigDecimal presentRate = parse.stringToBigDecimal(r1.get("PresentRate"));
+								BigDecimal adjustedRate = parse.stringToBigDecimal(r1.get("AdjustedRate"));
+								if (presentRate.compareTo(adjustedRate) != 0) {
+									line = "";
+									line += "45";
+									line += " 額度 " + FormatUtil.pad9(r2.get("FacmNo"), 3) + "     " + "利率自"
+											+ makeReport.showRocDate(r2.get("TxEffectDate"), 0) + "起，　由"
+											+ makeReport.formatAmt(r2.get("PresentRate"), 2) + "%" + "調整為"
+											+ makeReport.formatAmt(r2.get("AdjustedRate"), 2) + "% 。";
+									result.add(line);
+								}
+
+							}
+
 						}
 
 						// 05
@@ -223,11 +248,11 @@ public class L4721Report2 extends TradeBuffer {
 						line = "";
 						line += "05";
 						line += FormatUtil.pad9(headerDueAmt, 8) + "+" + "9510200"
-								+ FormatUtil.pad9(mapL4721Detail.get("CustNo"), 7) + "9510300"
-								+ FormatUtil.pad9(mapL4721Detail.get("CustNo"), 7);
+								+ FormatUtil.pad9(r1.get("CustNo"), 7) + "9510300"
+								+ FormatUtil.pad9(r1.get("CustNo"), 7);
 						result.add(line);
-						tempfacmno = parse.stringToInteger(mapL4721Detail.get("FacmNo"));
-						result = sameFacmno(mapL4721Detail, result, true, titaVo);
+						tempfacmno = parse.stringToInteger(r1.get("FacmNo"));
+						result = sameFacmno(r1, rTxffectDetail, result, true, isByCustNo, titaVo);
 						// 換額度要重新算次數
 						times = 0;
 					} // else
@@ -244,68 +269,81 @@ public class L4721Report2 extends TradeBuffer {
 		return result;
 	}
 
-	private List<String> sameFacmno(Map<String, String> tmap, List<String> result, Boolean same, TitaVo titaVo)
-			throws LogicException {
+	private List<String> sameFacmno(Map<String, String> r, List<Map<String, String>> txEffectData, List<String> result,
+			Boolean same, Boolean isByCustNo, TitaVo titaVo) throws LogicException {
+
+		String startDate = r.get("IntStartDate");
+		String endDate = r.get("IntEndDate");
+
+		String RepayItem = "99991231".equals(startDate) || "99991231".equals(endDate) ? " " : r.get("RepayCodeX");
 
 		String line = "";
 
 		if (same) {
 			// 01
-
 			// 011 1 0 0 0 台北市信義區永吉路１２０巷５０弄１號３樓 0001743 陳清耀
-
-			String locationX = tmap.get("Location").toString();
+			String locationX = txEffectData.get(0).get("Location").toString();
 			String locationXX = "";
 
 			for (int i = 0; i < locationX.length(); i++) {
 				locationXX = toX(locationX.substring(i, i + 1), locationXX);
 			}
-			String X = "";
-			X = makeReport.fillUpWord(locationXX, 60, " ", "R");
+			// 中文地址
+			String X = makeReport.fillUpWord(locationXX, 60, " ", "R");
 
-			String C = "";
-			C = makeReport.fillUpWord(" ", 45, " ", "R");
+			// 空白
+			String C = makeReport.fillUpWord(" ", 45, " ", "R");
 
 			// 011 1 0 0 0 台北市信義區永吉路１２０巷５０弄１號３樓 0001743 陳清耀
 			line = "";
-			line = "01" + FormatUtil.padX("", 10) + X + C + FormatUtil.pad9(tmap.get("CustNo"), 7) + " "
-					+ FormatUtil.padX(tmap.get("CustName"), 10) + "    " + FormatUtil.padX("", 65);
+			line = "01" + FormatUtil.padX("", 10) + X + C + FormatUtil.pad9(r.get("CustNo"), 7) + " "
+					+ FormatUtil.padX(r.get("CustName"), 10) + "    " + FormatUtil.padX("", 65);
 			// 加入明細
 			result.add(line);
 
 			// 02
-
-			int effectDate = parse.stringToInteger(tmap.get("TxEffectDate"));
+			int effectDate = parse.stringToInteger(txEffectData.get(0).get("TxEffectDate"));
 			if (effectDate != 0) {
-				baTxCom.getDueAmt(titaVo.getEntDyI(), parse.stringToInteger(tmap.get("CustNo")),
-						parse.stringToInteger(tmap.get("FacmNo")), 0, titaVo);
+				baTxCom.getDueAmt(titaVo.getEntDyI(), parse.stringToInteger(r.get("CustNo")),
+						parse.stringToInteger(r.get("FacmNo")), 0, titaVo);
 				headerDueAmt = "" + (baTxCom.getPrincipal().add(baTxCom.getInterest()));
 				headerExcessive = "" + baTxCom.getExcessive().subtract(baTxCom.getShortfall());
 			} else {
-				headerDueAmt = tmap.get("DueAmt");
+				headerDueAmt = r.get("DueAmt");
 			}
 			String loanBalX = "+";
-			if (parse.stringToBigDecimal(tmap.get("LoanBal")).compareTo(BigDecimal.ZERO) < 0) {
+			if (parse.stringToBigDecimal(r.get("LoanBal")).compareTo(BigDecimal.ZERO) < 0) {
 				loanBalX = "-";
 			}
 
 			String headerExcessiveX = "+";
-			if (parse.stringToBigDecimal(tmap.get("headerExcessive")).compareTo(BigDecimal.ZERO) < 0) {
+			if (parse.stringToBigDecimal(headerExcessive).compareTo(BigDecimal.ZERO) < 0) {
 				headerExcessiveX = "-";
 			}
 
 			// 02 陳＊耀 0001743 10 日 銀行扣款 0109091600003683931+00000000000+
 			int specificDd = 0;
-			if (tmap.get("SpecificDd") != null || !tmap.get("SpecificDd").isEmpty()) {
-				specificDd = parse.stringToInteger(tmap.get("SpecificDd"));
+			if (r.get("SpecificDd") != null || !r.get("SpecificDd").isEmpty()) {
+				specificDd = parse.stringToInteger(r.get("SpecificDd"));
 			}
+
+			
+			String facmNo =isByCustNo ? "    " : "-" + FormatUtil.pad9(r.get("FacmNo"), 3);
+
 			line = "";
 			line += "02";
-			line += " " + FormatUtil.padX(tmap.get("CustName"), 40) + " " + FormatUtil.pad9(tmap.get("CustNo"), 7) + "-"
-					+ FormatUtil.pad9(tmap.get("FacmNo"), 3) + leftPadding(parse.IntegerToString(specificDd, 2), 2, ' ')
-					+ " 日" + "          " + FormatUtil.padX(tmap.get("RepayCodeX"), 8) + "   "
-					+ FormatUtil.pad9(titaVo.getCalDy(), 8) + FormatUtil.pad9(tmap.get("LoanBal"), 11) + loanBalX
-					+ FormatUtil.pad9(headerExcessive, 11) + headerExcessiveX;
+			line += " " 
+					+ FormatUtil.padX(r.get("CustName"), 40) 
+					+ " " 
+					+ FormatUtil.pad9(r.get("CustNo"), 7) + facmNo
+					+ leftPadding(parse.IntegerToString(specificDd, 2), 2, ' ')
+					+ " 日" 
+					+ "          "
+					+ FormatUtil.padX(RepayItem, 8) + "   " 
+					+ FormatUtil.pad9(titaVo.getCalDy(), 8)
+					+ FormatUtil.pad9(r.get("LoanBal"), 11) 
+					+ loanBalX + FormatUtil.pad9(headerExcessive, 11)
+					+ headerExcessiveX;
 			// 加入明細
 			result.add(line);
 
@@ -317,58 +355,54 @@ public class L4721Report2 extends TradeBuffer {
 		line = "";
 		line += "03";
 
-		String dateRange = " ";
-
-		String startDate = tmap.get("IntStartDate");
-		String endDate = tmap.get("IntEndDate");
-
 		// 組成yyymmdd-yyymmdd
-		if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
 
-			startDate = makeReport.showRocDate(startDate, 3);
-			endDate = makeReport.showRocDate(endDate, 3);
+		// 西元年轉民國年
+		if ("99991231".equals(startDate)) {
 
-			if (!"".equals(startDate)) {
-				startDate = FormatUtil.pad9(makeReport.showRocDate(startDate, 3), 8);
-			}
-
-			if (!"".equals(endDate)) {
-				endDate = FormatUtil.pad9(makeReport.showRocDate(endDate, 3), 8);
-			}
-			dateRange = startDate + "-" + endDate;
+			startDate = FormatUtil.pad9("0", 8);
+		} else {
+			startDate = FormatUtil.pad9(makeReport.showRocDate(startDate, 3), 8);
 		}
 
+		if ("99991231".equals(endDate)) {
+
+			endDate = FormatUtil.pad9("0", 8);
+		} else {
+			endDate = FormatUtil.pad9(makeReport.showRocDate(endDate, 3), 8);
+		}
+
+		String dateRange = startDate + "-" + endDate;
+
 		String txAmtX = "+";
-		if (parse.stringToBigDecimal(tmap.get("TxAmt")).compareTo(BigDecimal.ZERO) < 0) {
+		if (parse.stringToBigDecimal(r.get("TxAmt")).compareTo(BigDecimal.ZERO) < 0) {
 			txAmtX = "-";
 		}
 
 		String principalX = "+";
-		if (parse.stringToBigDecimal(tmap.get("Principal")).compareTo(BigDecimal.ZERO) < 0) {
+		if (parse.stringToBigDecimal(r.get("Principal")).compareTo(BigDecimal.ZERO) < 0) {
 			principalX = "-";
 		}
 
 		String interestX = "+";
-		if (parse.stringToBigDecimal(tmap.get("Interest")).compareTo(BigDecimal.ZERO) < 0) {
+		if (parse.stringToBigDecimal(r.get("Interest")).compareTo(BigDecimal.ZERO) < 0) {
 			interestX = "-";
 		}
 
 		String breachAmtX = "+";
-		if (parse.stringToBigDecimal(tmap.get("BreachAmt")).compareTo(BigDecimal.ZERO) < 0) {
+		if (parse.stringToBigDecimal(r.get("BreachAmt")).compareTo(BigDecimal.ZERO) < 0) {
 			breachAmtX = "-";
 		}
 
 		String OtherFeeX = "+";
-		if (parse.stringToBigDecimal(tmap.get("OtherFee")).compareTo(BigDecimal.ZERO) < 0) {
+		if (parse.stringToBigDecimal(r.get("OtherFee")).compareTo(BigDecimal.ZERO) < 0) {
 			OtherFeeX = "-";
 		}
 
-//		line += showRocDate(tmap.get("EntryDate"), 3) + dateRange + " " + tmap.get("RepayCodeX") + "   "
-		line += FormatUtil.pad9(tmap.get("EntryDate"), 8) + dateRange + " " + FormatUtil.padX(tmap.get("RepayCodeX"), 8)
-				+ "   " + FormatUtil.pad9(tmap.get("TxAmt"), 10) + txAmtX + FormatUtil.pad9(tmap.get("Principal"), 10)
-				+ principalX + FormatUtil.pad9(tmap.get("Interest"), 8) + interestX
-				+ FormatUtil.pad9(tmap.get("BreachAmt"), 8) + breachAmtX + FormatUtil.pad9(tmap.get("OtherFee"), 8)
-				+ OtherFeeX;
+		line += FormatUtil.pad9(r.get("EntryDate"), 8) + dateRange + " " + FormatUtil.padX(RepayItem, 8) + "   "
+				+ FormatUtil.pad9(r.get("TxAmt"), 10) + txAmtX + FormatUtil.pad9(r.get("Principal"), 10) + principalX
+				+ FormatUtil.pad9(r.get("Interest"), 8) + interestX + FormatUtil.pad9(r.get("BreachAmt"), 8)
+				+ breachAmtX + FormatUtil.pad9(r.get("OtherFee"), 8) + OtherFeeX;
 		// 加入明細
 		result.add(line);
 
@@ -408,24 +442,6 @@ public class L4721Report2 extends TradeBuffer {
 			x += s;
 		}
 		return x;
-	}
-
-	// 改補足出出切位置
-	// s 傳入值
-	// x 補什麼值
-	// 長度
-	private String toXX(String s, String x, int i) {
-		String z = "";
-		if (s.length() < i) {
-			int il = i - s.length();
-			for (int ii = 0; ii < il; ii++) {
-				s += x;
-
-			}
-			z = s;
-		}
-
-		return z;
 	}
 
 //	向左補特定字元

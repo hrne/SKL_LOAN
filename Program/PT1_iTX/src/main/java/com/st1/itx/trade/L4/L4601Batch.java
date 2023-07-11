@@ -183,9 +183,9 @@ public class L4601Batch extends TradeBuffer {
 //		1.火險詢價上傳檔轉檔作業(檢核清單)
 //			1.總保費=0) 
 //			2.無資料(無此戶號額度、擔保品號碼
-					InsuRenew tInsuRenew = insuRenewService.prevInsuNoFirst(
-							parse.stringToInteger(t.get("CustNo").trim()),
-							parse.stringToInteger(t.get("FacmNo").trim()), t.get("InsuNo").trim(), titaVo);
+					InsuRenew tInsuRenew = insuRenewService.findCustNoFirst(
+							parse.stringToInteger(t.get("CustNo").trim()), iInsuEndMonth, t.get("InsuNo").trim(),
+							titaVo);
 //				無此保單號碼
 					if (tInsuRenew == null) {
 //					檢查無此戶號額度
@@ -203,8 +203,9 @@ public class L4601Batch extends TradeBuffer {
 					}
 //					a.檢核
 					if ("".equals(checkResultA)) {
-
 						resetAcReceivable(2, tInsuRenew, titaVo); // 2-起帳刪除
+						// 額度編號以詢價檔更新 2023/7/11
+						tInsuRenew.setFacmNo(parse.stringToInteger(t.get("FacmNo").trim()));
 						tInsuRenew.setFireInsuCovrg(parse.stringToBigDecimal(t.get("NewFireInsuAmt").trim()));
 						tInsuRenew.setEthqInsuCovrg(parse.stringToBigDecimal(t.get("NewEqInsuAmt").trim()));
 						tInsuRenew.setFireInsuPrem(parse.stringToBigDecimal(t.get("NewFireInsuFee").trim()));
@@ -287,11 +288,13 @@ public class L4601Batch extends TradeBuffer {
 			return;
 		}
 		if (tInsuRenew.getTotInsuPrem().compareTo(BigDecimal.ZERO) == 0) {
+			this.info("skip AcReceivable TotInsuPrem = 0");
 			return;
 		}
 
 		// 已入帳
 		if (tInsuRenew.getAcDate() > 0) {
+			this.info("skip AcReceivable AcDate > 0");
 			return;
 		}
 

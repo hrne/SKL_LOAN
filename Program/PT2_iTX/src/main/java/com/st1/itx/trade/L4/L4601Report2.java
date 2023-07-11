@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
@@ -18,7 +19,7 @@ import com.st1.itx.db.domain.InsuRenewMediaTemp;
 import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.InsuRenewMediaTempService;
 import com.st1.itx.db.service.InsuRenewService;
-import com.st1.itx.db.service.springjpa.cm.L4600ServiceImpl;
+import com.st1.itx.db.service.springjpa.cm.L4601ServiceImpl;
 import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
@@ -55,7 +56,7 @@ public class L4601Report2 extends MakeReport {
 	MakeFile makeFile;
 
 	@Autowired
-	L4600ServiceImpl l4600ServiceImpl;
+	L4601ServiceImpl l4601ServiceImpl;
 
 	@Autowired
 	Parse parse;
@@ -106,7 +107,7 @@ public class L4601Report2 extends MakeReport {
 		List<Map<String, String>> list = null;
 
 		try {
-			list = l4600ServiceImpl.findAll(titaVo);
+			list = l4601ServiceImpl.findAll(titaVo);
 		} catch (Exception e) {
 			this.error(e.getMessage());
 		}

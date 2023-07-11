@@ -73,7 +73,7 @@ public class L9134Report4 extends MakeReport {
 		efvo.setAlign("R");
 		
 		// 上個月底日(民國年)
-		int iLmnDy = tTxBizDate.getLmnDy();
+		int ixLmnDy = tTxBizDate.getLmnDy();
 		// 本月底日(民國年)
 		int ixTmnDy = tTxBizDate.getTmnDy();
 		if(endDate > 19110000) {
@@ -84,7 +84,7 @@ public class L9134Report4 extends MakeReport {
 		this.info("iTmnDy    = " + tTxBizDate.getTmnDy());
 
 		try {
-			findList = l9134ServiceImpl.doQueryL9134_4(titaVo, iLmnDy, ixTmnDy);
+			findList = l9134ServiceImpl.doQueryL9134_4(titaVo, ixLmnDy, ixTmnDy);
 
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();

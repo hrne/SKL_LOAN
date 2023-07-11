@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -789,6 +792,25 @@ em = null;
       insuRenewT = insuRenewReposHist.findTopByCustNoIsAndFacmNoIsAndPrevInsuNoIsAndEndoInsuNoIsOrderByInsuYearMonthDesc(custNo_0, facmNo_1, prevInsuNo_2, endoInsuNo_3);
     else 
       insuRenewT = insuRenewRepos.findTopByCustNoIsAndFacmNoIsAndPrevInsuNoIsAndEndoInsuNoIsOrderByInsuYearMonthDesc(custNo_0, facmNo_1, prevInsuNo_2, endoInsuNo_3);
+
+    return insuRenewT.isPresent() ? insuRenewT.get() : null;
+  }
+
+  @Override
+  public InsuRenew findCustNoFirst(int custNo_0, int insuYearMonth_1, String prevInsuNo_2, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("findCustNoFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " insuYearMonth_1 : " +  insuYearMonth_1 + " prevInsuNo_2 : " +  prevInsuNo_2);
+    Optional<InsuRenew> insuRenewT = null;
+    if (dbName.equals(ContentName.onDay))
+      insuRenewT = insuRenewReposDay.findTopByCustNoIsAndInsuYearMonthIsAndPrevInsuNoIsOrderByInsuEndDateDescInsuStartDateAscEndoInsuNoAsc(custNo_0, insuYearMonth_1, prevInsuNo_2);
+    else if (dbName.equals(ContentName.onMon))
+      insuRenewT = insuRenewReposMon.findTopByCustNoIsAndInsuYearMonthIsAndPrevInsuNoIsOrderByInsuEndDateDescInsuStartDateAscEndoInsuNoAsc(custNo_0, insuYearMonth_1, prevInsuNo_2);
+    else if (dbName.equals(ContentName.onHist))
+      insuRenewT = insuRenewReposHist.findTopByCustNoIsAndInsuYearMonthIsAndPrevInsuNoIsOrderByInsuEndDateDescInsuStartDateAscEndoInsuNoAsc(custNo_0, insuYearMonth_1, prevInsuNo_2);
+    else 
+      insuRenewT = insuRenewRepos.findTopByCustNoIsAndInsuYearMonthIsAndPrevInsuNoIsOrderByInsuEndDateDescInsuStartDateAscEndoInsuNoAsc(custNo_0, insuYearMonth_1, prevInsuNo_2);
 
     return insuRenewT.isPresent() ? insuRenewT.get() : null;
   }

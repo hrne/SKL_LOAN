@@ -222,7 +222,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @return 查詢結果
 	 * @throws LogicException
 	 */
-	public List<Map<String, String>> doQueryL9134_4(TitaVo titaVo, int iLmnDy, int ixTmnDy) throws LogicException {
+	public List<Map<String, String>> doQueryL9134_4(TitaVo titaVo, int ixLmnDy, int ixTmnDy) throws LogicException {
 		this.info("doQueryL9134_4 Start");
 		
 		TxBizDate tTxBizDate = new TxBizDate();
@@ -230,6 +230,9 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		tTxBizDate = iTxBizDateService.findById("ONLINE", titaVo);
 
 		int iTmnDy = tTxBizDate.getTmnDy();
+		
+		int iLmnDy = tTxBizDate.getLmnDy();
+		this.info("iLmnDy  =" + iLmnDy);
 		
 		// 本營業日 民國年月(YYYMM)
 		String rocYM = iTmnDy / 100 + "";
@@ -244,19 +247,19 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String bcYM = bcYMD.substring(0, 6);
 
 		// 上個月底日 民國(YYYMMDD)
-		String ixLmnDy = parse.IntegerToString(iLmnDy, 7);
+		String ioLmnDy = parse.IntegerToString(iLmnDy, 7);
 		// 上個月底日 民國(YYY/MM/DD)
-		String lastMonthEndDay = ixLmnDy.substring(0, 3) + "/" + ixLmnDy.substring(3, 5) + "/"
-				+ ixLmnDy.substring(5, 7);
+		String lastMonthEndDay = ioLmnDy.substring(0, 3) + "/" + ioLmnDy.substring(3, 5) + "/"
+				+ ioLmnDy.substring(5, 7);
 
 		//上個年月 民國(YYYMM)
-		String ixLmn = parse.IntegerToString(iLmnDy, 5);
+		String ixLmn = parse.IntegerToString((iLmnDy+19110000)/100, 5);
+		this.info("ixLmn  = " + ixLmn);
 		
-
 		// for迴圈使用長度
-		String ixiTmnDy = parse.IntegerToString(iTmnDy, 7);
-		this.info("ixiTmnDy  ="+iTmnDy );
-		int length = parse.stringToInteger(ixiTmnDy.substring(5, 7));
+		String ioiTmnDy = parse.IntegerToString(iTmnDy, 7);
+		this.info("ioiTmnDy  ="+ioiTmnDy );
+		int length = parse.stringToInteger(ioiTmnDy.substring(5, 7));
 
 		//TEM是員工扣薪select * from "CdAcCode" where "AcctCode" = 'TEM'
 		String sql = " ";
@@ -390,7 +393,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 //		query.setParameter("acdate", iLmnDy + 19110000);
 		query.setParameter("lastMonthEnd", lastMonthEndDay);
-		query.setParameter("LacYM", ixLmn + 191100);
+		query.setParameter("LacYM", ixLmn);
 		
 		return this.convertToMap(query);
 	}

@@ -193,7 +193,7 @@ public class L4721Report extends MakeReport {
 		List<Map<String, String>> listL4721Head = new ArrayList<Map<String, String>>();
 
 		try {
-			listL4721Temp = l4721ServiceImpl.TempQuery(iCustNo, sEntryDate, eEntryDate, titaVo);
+			listL4721Temp = l4721ServiceImpl.isTempQuery(iCustNo, sEntryDate, eEntryDate, true, titaVo);
 		} catch (Exception e) {
 			this.error("l4721ServiceImpl TempQuery = " + e.getMessage());
 			throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");

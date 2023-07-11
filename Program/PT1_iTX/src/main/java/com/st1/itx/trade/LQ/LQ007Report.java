@@ -74,7 +74,6 @@ public class LQ007Report extends MakeReport {
 			LQ007ListIsThisYear = lQ007ServiceImpl.findThisYear(titaVo);
 			LQ007List.addAll(LQ007ListIsThisYear);
 
-
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -86,7 +85,7 @@ public class LQ007Report extends MakeReport {
 		int entdy = (parse.stringToInteger(titaVo.getParam("ENTDY")) + 19110000);
 
 		int endY = entdy / 10000;
-		int iYear12Month = endY * 100 + 12;
+		int iEndYearMonth = entdy / 100;
 		int endM = entdy / 100 % 100;
 		int begY = endY - 3;
 		// 所有需要輸出的工作月/月份 - 同年一月到當月
@@ -197,11 +196,11 @@ public class LQ007Report extends MakeReport {
 						// AA=>首次購物貸款
 						if ("AA".equals(prodNo)) {
 
-							makeExcel.setValue(5, colBal, formatAmt(balSum, 3, 8));
-							makeExcel.setValue(5, colInt, formatAmt(intSum, 3, 8));
+							makeExcel.setValue(5, colBal, formatAmt(balSum, 4, 8));
+							makeExcel.setValue(5, colInt, formatAmt(intSum, 4, 8));
 
 							// 最後月份的資料
-							if (iYear12Month == visibleMonth) {
+							if (iEndYearMonth == visibleMonth) {
 								makeExcel.setValue(5, endColBal, balSum, "#,##0");
 								makeExcel.setValue(5, endColInt, intSum, "#,##0");
 							}
@@ -210,33 +209,33 @@ public class LQ007Report extends MakeReport {
 
 						// IA
 						if ("IA".equals(prodNo)) {
-							makeExcel.setValue(6, colBal, formatAmt(balSum, 3, 8));
+							makeExcel.setValue(6, colBal, formatAmt(balSum, 4, 8));
 							iaiiIntTotal = iaiiIntTotal.add(intSum);
 
 							// 最後月份的資料
-							if (iYear12Month == visibleMonth) {
+							if (iEndYearMonth == visibleMonth) {
 								makeExcel.setValue(6, endColBal, balSum, "#,##0");
 							}
 
 						}
 						// IB
 						if ("IB".equals(prodNo)) {
-							makeExcel.setValue(7, colBal, formatAmt(balSum, 3, 8));
+							makeExcel.setValue(7, colBal, formatAmt(balSum, 4, 8));
 							iaiiIntTotal = iaiiIntTotal.add(intSum);
 
 							// 最後月份的資料
-							if (iYear12Month == visibleMonth) {
+							if (iEndYearMonth == visibleMonth) {
 								makeExcel.setValue(7, endColBal, balSum, "#,##0");
 							}
 
 						}
 						// IC
 						if ("IC".equals(prodNo)) {
-							makeExcel.setValue(8, colBal, formatAmt(balSum, 3, 8));
+							makeExcel.setValue(8, colBal, formatAmt(balSum, 4, 8));
 							iaiiIntTotal = iaiiIntTotal.add(intSum);
 
 							// 最後月份的資料
-							if (iYear12Month == visibleMonth) {
+							if (iEndYearMonth == visibleMonth) {
 								makeExcel.setValue(8, endColBal, balSum, "#,##0");
 							}
 
@@ -245,11 +244,11 @@ public class LQ007Report extends MakeReport {
 						if ("ID".equals(prodNo)) {
 							iaiiBalTotal = BigDecimal.ZERO;
 							iaiiBalTotal = iaiiBalTotal.add(balSum);
-							makeExcel.setValue(9, colBal, formatAmt(iaiiBalTotal, 3, 8));
+							makeExcel.setValue(9, colBal, formatAmt(iaiiBalTotal, 4, 8));
 							iaiiIntTotal = iaiiIntTotal.add(intSum);
 
 							// 最後月份的資料
-							if (iYear12Month == visibleMonth) {
+							if (iEndYearMonth == visibleMonth) {
 								makeExcel.setValue(9, endColBal, iaiiBalTotal, "#,##0");
 							}
 
@@ -258,11 +257,11 @@ public class LQ007Report extends MakeReport {
 						if ("IF".equals(prodNo)) {
 							iaiiBalTotal = BigDecimal.ZERO;
 							iaiiBalTotal = iaiiBalTotal.add(balSum);
-							makeExcel.setValue(10, colBal, formatAmt(iaiiBalTotal, 3, 8));
+							makeExcel.setValue(10, colBal, formatAmt(iaiiBalTotal, 4, 8));
 							iaiiIntTotal = iaiiIntTotal.add(intSum);
 
 							// 最後月份的資料
-							if (iYear12Month == visibleMonth) {
+							if (iEndYearMonth == visibleMonth) {
 								makeExcel.setValue(10, endColBal, iaiiBalTotal, "#,##0");
 							}
 
@@ -271,11 +270,11 @@ public class LQ007Report extends MakeReport {
 						if ("IH".equals(prodNo)) {
 							iaiiBalTotal = BigDecimal.ZERO;
 							iaiiBalTotal = iaiiBalTotal.add(balSum);
-							makeExcel.setValue(11, colBal, formatAmt(iaiiBalTotal, 3, 8));
+							makeExcel.setValue(11, colBal, formatAmt(iaiiBalTotal, 4, 8));
 							iaiiIntTotal = iaiiIntTotal.add(intSum);
 
 							// 最後月份的資料
-							if (iYear12Month == visibleMonth) {
+							if (iEndYearMonth == visibleMonth) {
 								makeExcel.setValue(11, endColBal, iaiiBalTotal, "#,##0");
 							}
 
@@ -286,24 +285,24 @@ public class LQ007Report extends MakeReport {
 
 						// ZZ=>921重優惠房貸
 						if ("ZZ".equals(prodNo)) {
-							makeExcel.setValue(12, colBal, formatAmt(balSum, 3, 8));
+							makeExcel.setValue(12, colBal, formatAmt(balSum, 4, 8));
 
 							intTotal = intTotal.add(intSum);
 							iaiiIntTotal = iaiiIntTotal.add(intSum);
-							makeExcel.setValue(6, colInt, formatAmt(iaiiIntTotal, 3, 8));
+							makeExcel.setValue(6, colInt, formatAmt(iaiiIntTotal, 4, 8));
 
 							// ZZ為最後一筆 同合計印出
 							balTotal = balTotal.add(balSum);
 							intTotal = intTotal.add(intSum);
-							makeExcel.setValue(13, colBal, formatAmt(balTotal, 3, 8));
-							makeExcel.setValue(13, colInt, formatAmt(intTotal, 3, 8));
+//							makeExcel.setValue(13, colBal, formatAmt(balTotal, 4, 8));
+//							makeExcel.setValue(13, colInt, formatAmt(intTotal, 4, 8));
 
 							// 最後月份的資料
-							if (iYear12Month == visibleMonth) {
+							if (iEndYearMonth == visibleMonth) {
 								makeExcel.setValue(12, endColBal, balSum, "#,##0");
 								makeExcel.setValue(6, endColInt, iaiiIntTotal, "#,##0");
-								makeExcel.setValue(13, endColBal, balTotal, "#,##0");
-								makeExcel.setValue(13, endColInt, intTotal, "#,##0");
+//								makeExcel.setValue(13, endColBal, balTotal, "#,##0");
+//								makeExcel.setValue(13, endColInt, intTotal, "#,##0");
 							}
 
 							iaiiBalTotal = BigDecimal.ZERO;
@@ -318,6 +317,30 @@ public class LQ007Report extends MakeReport {
 				}
 
 			}
+			//設定公式
+			makeExcel.setFormula(13, 2, BigDecimal.ZERO, "SUM(B5:B12)", "0.000");
+			makeExcel.setFormula(13, 3, BigDecimal.ZERO, "SUM(C5:C12)", "0.000");
+			makeExcel.setFormula(13, 2, BigDecimal.ZERO, "SUM(D5:D12)", "0.000");
+			makeExcel.setFormula(13, 3, BigDecimal.ZERO, "SUM(E5:E12)", "0.000");
+			makeExcel.setFormula(13, 2, BigDecimal.ZERO, "SUM(F5:F12)", "0.000");
+			makeExcel.setFormula(13, 3, BigDecimal.ZERO, "SUM(G5:G12)", "0.000");
+			makeExcel.setFormula(13, 2, BigDecimal.ZERO, "SUM(H5:H12)", "0.000");
+			makeExcel.setFormula(13, 3, BigDecimal.ZERO, "SUM(I5:I12)", "0.000");
+			makeExcel.setFormula(13, 2, BigDecimal.ZERO, "SUM(J5:J12)", "0.000");
+			makeExcel.setFormula(13, 3, BigDecimal.ZERO, "SUM(K5:K12)", "0.000");
+			makeExcel.setFormula(13, 2, BigDecimal.ZERO, "SUM(L5:L12)", "0.000");
+			makeExcel.setFormula(13, 3, BigDecimal.ZERO, "SUM(M5:M12)", "0.000");
+			makeExcel.setFormula(13, 2, BigDecimal.ZERO, "SUM(N5:N12)", "0.000");
+			makeExcel.setFormula(13, 3, BigDecimal.ZERO, "SUM(O5:O12)", "0.000");
+			
+			makeExcel.setFormula(13, 2, BigDecimal.ZERO, "SUM(Q5:Q12)", "0.000");
+			makeExcel.setFormula(13, 3, BigDecimal.ZERO, "SUM(R5:R12)", "0.000");
+			
+			//重整
+			for (int col = 2; col <= 18; col++) {
+				makeExcel.formulaCaculate(13, col);
+			}
+
 		} else {
 			makeExcel.setValue(5, 2, "本日無資料");
 		}

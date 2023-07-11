@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.InsuRenew;
@@ -354,6 +356,17 @@ public interface InsuRenewService {
    * @return Slice InsuRenew InsuRenew of List
    */
   public InsuRenew findEndoInsuNoFirst(int custNo_0, int facmNo_1, String prevInsuNo_2, String endoInsuNo_3, TitaVo... titaVo);
+
+  /**
+   * CustNo = ,AND InsuYearMonth = ,AND  PrevInsuNo = 
+   *
+   * @param custNo_0 custNo_0
+   * @param insuYearMonth_1 insuYearMonth_1
+   * @param prevInsuNo_2 prevInsuNo_2
+   * @param titaVo Variable-Length Argument
+   * @return Slice InsuRenew InsuRenew of List
+   */
+  public InsuRenew findCustNoFirst(int custNo_0, int insuYearMonth_1, String prevInsuNo_2, TitaVo... titaVo);
 
   /**
    * hold By InsuRenew

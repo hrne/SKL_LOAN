@@ -37,7 +37,7 @@ public class LM004Report1 extends MakeReport {
 		int leftPos = 1;
 		int centerPos = 70;
 		int rightPos = 120;
-		this.print(-1, rightPos, "機密等級：密");
+		this.print(-1, rightPos, "機密等級："+this.getSecurity());
 		this.print(-2, leftPos, "　 程式 ID：" + this.getParentTranCode());
 		this.print(-2, centerPos, "新光人壽保險股份有限公司", "C");
 		this.print(-2, rightPos, "日　期：" + dDateUtil.getNowStringBc().substring(4, 6) + "/"
@@ -114,6 +114,9 @@ public class LM004Report1 extends MakeReport {
 	
 		}
 
+		
+		setFontSize(10);
+		
 		this.close();
 		// this.toPdf(sno);
 	}

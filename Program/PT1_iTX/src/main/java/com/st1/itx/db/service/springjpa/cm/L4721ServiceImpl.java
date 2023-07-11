@@ -61,11 +61,8 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		sql += " select  distinct ";
 		sql += "    r.\"CustNo\"                                 as \"CustNo\"  "; // 戶號
-//		sql += "   ,r.\"FacmNo\"                                 as \"FacmNo\"  "; // 額度
-//		sql += "   ,r.\"BormNo\"                                 as \"BormNo\"  "; // 撥款
-//		sql += "   ,r.\"EffectDate\"                             as \"TxEffectDate\"  "; // 利率生效日
-//		sql += "   ,r.\"FitRate\"			                     as \"AdjustedRate\" "; // 適用利率
-//		sql += "   ,r2.\"FitRate\"                 				 as \"PresentRate\" ";// 前次利率
+		sql += "   ,MAX(b.\"SpecificDd\")                        as \"MaxSpecificDd\"  ";
+		sql += "   ,MIN(b.\"SpecificDd\")                        as \"MinSpecificDd\"  ";
 		sql += " from (                                             ";
 		sql += "           select                                       ";
 		sql += "            \"CustNo\"                              ";
@@ -98,8 +95,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                       and  r2.\"seq\" = 2                          ";
 		sql += " left join \"FacProd\"  p on  p.\"ProdNo\" = r.\"ProdNo\"      ";
 		sql += " left join \"LoanBorMain\" b on b.\"CustNo\" = r.\"CustNo\" ";
-		sql += "       					    and b.\"FacmNo\" = r.\"FacmNo\" ";
-		sql += "                            and b.\"BormNo\" = r.\"BormNo\" ";
+
 		sql += " left join \"CustMain\" c on  c.\"CustNo\" = r.\"CustNo\"      ";
 		sql += " where b.\"Status\" = 0                                        ";
 		sql += "   and c.\"EntCode\" >= " + iEntCode1;
@@ -138,6 +134,8 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 			}
 		}
 
+		sql += " group by r.\"CustNo\" ";
+
 		sql += " order by r.\"CustNo\" ASC";
 
 		this.info("sql=" + sql);
@@ -149,17 +147,20 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	/**
+	 * 查是否暫收資料
+	 * 
 	 * @param custNo     戶號
 	 * @param sEntryDate 入帳起日(六個月前月初)
 	 * @param eEntryDate 入帳止日
+	 * @param isTemp     是否為暫收
 	 * @param titaVo
 	 * @return
 	 * @throws Exception
 	 * 
 	 * 
 	 */
-	public List<Map<String, String>> TempQuery(int custNo, int sEntryDate, int eEntryDate, TitaVo titaVo)
-			throws Exception {
+	public List<Map<String, String>> isTempQuery(int custNo, int sEntryDate, int eEntryDate, boolean isTemp,
+			TitaVo titaVo) throws Exception {
 
 		this.info("L4721ServiceImpl Temp");
 
@@ -169,20 +170,76 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 //		尋找該戶號是否有暫收款(回傳入帳日，金額，還款類別)
 
-		String sql = "SELECT    ";
-		sql += "    lb.\"EntryDate\"  AS \"EntryDate\",";
-		sql += "    cd.\"Item\"       AS \"RepayCodeX\",";
-		sql += "    lb.\"TxAmt\"      AS \"TxAmt\"";
-		sql += "    FROM";
-		sql += "    \"LoanBorTx\"   lb";
-		sql += "    LEFT JOIN \"CdCode\"      cd ON cd.\"DefCode\" = 'RepayCode'";
-		sql += "                             AND cd.\"Code\" = lb.\"RepayCode\"";
-		sql += "    WHERE";
-		sql += "    lb.\"CustNo\" = " + custNo;
-		sql += "    AND lb.\"FacmNo\" = 0";
-		sql += "    AND lb.\"BormNo\" = 0";
-		sql += "    AND lb.\"EntryDate\" >= " + sEntryDate;
-		sql += "    AND lb.\"EntryDate\" <= " + eEntryDate;
+		String sql = "	";
+
+//		sql += " SELECT ";
+//		sql += "    lb.\"EntryDate\"  AS \"EntryDate\",";
+//		sql += "    cd.\"Item\"       AS \"RepayCodeX\",";
+//		sql += "    lb.\"TxAmt\"      AS \"TxAmt\"";
+//		sql += "    FROM";
+//		sql += "    \"LoanBorTx\"   lb";
+//		sql += "    LEFT JOIN \"CdCode\"      cd ON cd.\"DefCode\" = 'RepayCode'";
+//		sql += "                             AND cd.\"Code\" = lb.\"RepayCode\"";
+//		sql += "    WHERE";
+//		sql += "    lb.\"CustNo\" = " + custNo;
+//		sql += "    AND lb.\"FacmNo\" = 0";
+//		sql += "    AND lb.\"BormNo\" = 0";
+//		sql += "    AND lb.\"EntryDate\" >= " + sEntryDate;
+//		sql += "    AND lb.\"EntryDate\" <= " + eEntryDate;
+
+		sql += " SELECT ";
+		sql += "     a.\"EntryDate\" ";
+		sql += "     , CASE ";
+		sql += "         WHEN a.\"IntStartDate\" = 99991231  ";
+		sql += "         THEN 0 ";
+		sql += "         ELSE a.\"IntStartDate\" ";
+		sql += "     END AS \"IntStartDate\" ";
+		sql += "     , a.\"IntEndDate\" ";
+		sql += "     , nvl(c.\"Item\", ' ') AS \"RepayCodeX\" ";
+		sql += "     , a.\"TxAmt\" ";
+		sql += "     , a.\"Principal\" ";
+		sql += "     , a.\"Interest\" ";
+		sql += "     , a.\"BreachAmt\" ";
+		sql += "     , a.\"FeeAmt\" ";
+		sql += "     , a.\"RepayCode\" ";
+		sql += " FROM ";
+		sql += "     ( ";
+		sql += "         SELECT ";
+		sql += "             \"EntryDate\" ";
+		sql += "             , MIN( ";
+		sql += "                 CASE ";
+		sql += "                     WHEN \"IntStartDate\" = 0  ";
+		sql += "                     THEN 99991231 ";
+		sql += "                     ELSE \"IntStartDate\" ";
+		sql += "                 END ";
+		sql += "             ) AS \"IntStartDate\" ";
+		sql += "             , MAX(\"IntEndDate\") AS \"IntEndDate\" ";
+		sql += "             , SUM(\"TxAmt\") AS \"TxAmt\" ";
+		sql += "             , SUM(\"Principal\") AS \"Principal\" ";
+		sql += "             , SUM(\"Interest\") AS \"Interest\" ";
+		sql += "             , SUM(\"DelayInt\" + \"BreachAmt\" + \"CloseBreachAmt\") AS \"BreachAmt\" ";
+		sql += "             , SUM(\"FeeAmt\") AS \"FeeAmt\" ";
+		sql += "             , \"RepayCode\" ";
+		sql += "         FROM \"LoanBorTx\" ";
+		sql += "         WHERE \"TitaHCode\" = '0' ";
+		sql += "   		   AND \"EntryDate\" >= " + sEntryDate;
+		sql += "    	   AND \"EntryDate\" <= " + eEntryDate;
+		sql += "    	   AND \"CustNo\" = " + custNo;
+		if (isTemp) {
+			sql += "    AND \"FacmNo\" = 0";
+			sql += "    AND \"BormNo\" = 0";
+		}
+		sql += "         GROUP BY ";
+		sql += "             \"EntryDate\" ";
+		sql += "             , \"RepayCode\" ";
+		sql += "         ORDER BY ";
+		sql += "             \"EntryDate\" ";
+		sql += "     ) a ";
+		sql += "     LEFT JOIN \"CdCode\" c ON c.\"DefCode\" = 'RepayCode' ";
+		sql += "                         AND lpad(c.\"Code\",2, '0') = a.\"RepayCode\" ";
+		sql += "                         AND a.\"RepayCode\" IN ( 1 , 2 , 3 , 4 ) ";
+		sql += " ORDER BY ";
+		sql += "     a.\"EntryDate\" ";
 
 		this.info("sql=" + sql);
 		Query query;
@@ -308,7 +365,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		因抓取不到費用類，第一層group by 到額度(同額度同調整日、同源利率
 
 		String sql = " ";
-		sql += " SELECT DISTINCT X.\"CustNo\"                                         AS \"CustNo\"   ";
+		sql += " SELECT DISTINCT X.\"CustNo\"                                AS \"CustNo\"   ";
 		sql += "       ,X.\"FacmNo\"                                         AS \"FacmNo\"   ";
 		sql += "       ,C.\"CustName\"                                        "; // 戶名
 		sql += "       ,LB.\"SpecificDd\"                                      "; // 應繳日
@@ -416,6 +473,206 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                            AND CB.\"ClNo\"    =  F.\"ClNo\"                          ";
 		sql += " WHERE LB.\"SpecificDd\" IS NOT NULL";
 		sql += " ORDER BY X.\"FacmNo\",X.\"EntryDate\"                                                             ";
+
+		this.info("sql=" + sql);
+		Query query;
+
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+
+		return this.convertToMap(query);
+	}
+
+	/**
+	 * 
+	 * 紙本資料(明細)
+	 * 
+	 * @param custNo           戶號
+	 * @param sAdjDate         利率調整起日
+	 * @param eAdjDate         利率調整止日
+	 * @param sEntryDate       入帳起日(六個月前月初)
+	 * @param eEntryDate       入帳止日
+	 * @param isDoDetail       是否為明細(否則為額度變動日)
+	 * @param isSameSpecificDd 應繳日額度是否一樣
+	 * @param titaVo
+	 * @return
+	 * @throws Exception
+	 * 
+	 * 
+	 */
+	public List<Map<String, String>> doDetailTxffect(int custNo, int sAdjDate, int eAdjDate, int sEntryDate,
+			int eEntryDate, boolean isDoDetail, boolean isSameSpecificDd, TitaVo titaVo) throws Exception {
+		dateUtil.init();
+
+		this.info("L4721ServiceImpl doDetailTxffect");
+
+		this.info("custNo ... " + custNo);
+
+		String sql = " ";
+
+		sql += "   with \"Main\" as (";
+		sql += "      SELECT MAX(T.\"CustNo\")                                 AS \"CustNo\"";
+
+		if (isSameSpecificDd) {
+			sql += "           , 0 AS \"FacmNo\"";
+		} else {
+			sql += "           , T.\"FacmNo\" AS \"FacmNo\"";
+		}
+		sql += "            , MAX(T.\"EntryDate\")                              AS \"EntryDate\"";
+		sql += "            , MAX( case when T.\"IntStartDate\" = 0 then  99991231";
+		sql += "            else  T.\"IntStartDate\"  end ) AS \"IntStartDate\"";
+		sql += "                     , MIN( case when T.\"IntEndDate\" = 0 then  99991231";
+		sql += "            else  T.\"IntEndDate\"  end ) AS \"IntEndDate\"";
+		sql += "            , MAX(T.\"Rate\")                                   AS \"Rate\"";
+		sql += "            , SUM(T.\"Interest\")                               AS \"Interest\"";
+		sql += "            , SUM(T.\"DelayInt\")                               AS \"DelayInt\"";
+		sql += "            , SUM(T.\"BreachAmt\" + T.\"CloseBreachAmt\")         AS \"BreachAmt\"";
+		sql += "            , SUM(T.\"Principal\")                              AS \"Principal\"";
+		sql += "            , MIN(T.\"RepayCode\")                              AS \"RepayCode\"";
+		sql += "            , SUM(T.\"TxAmt\")                                  AS \"TxAmt\"";
+		sql += "            , SUM(Nvl(";
+		sql += "           JSON_VALUE(T.\"OtherFields\", '$.AcctFee'), 0";
+		sql += "       )) AS Fee1";
+		sql += "            , SUM(Nvl(";
+		sql += "           JSON_VALUE(T.\"OtherFields\", '$.ModifyFee'), 0";
+		sql += "       )) AS Fee2";
+		sql += "            , SUM(Nvl(";
+		sql += "           JSON_VALUE(T.\"OtherFields\", '$.FireFee'), 0";
+		sql += "       )) AS Fee3";
+		sql += "            , SUM(Nvl(";
+		sql += "           JSON_VALUE(T.\"OtherFields\", '$.LawFee'), 0";
+		sql += "       )) AS Fee4";
+		sql += "       FROM \"LoanBorTx\" T";
+		sql += "       WHERE T.\"CustNo\" = " + custNo;
+		sql += "             AND";
+		sql += "             T.\"TitaHCode\" = 0";
+		sql += "           ";
+		sql += "             AND";
+		sql += "             T.\"EntryDate\" >= " + sEntryDate;
+		sql += "             AND";
+		sql += "             T.\"EntryDate\" <= " + eEntryDate;
+		sql += "       GROUP BY  ";
+		if (!isSameSpecificDd) {
+			sql += "           T.\"FacmNo\" ,";
+		}
+		sql += "      	 T.\"EntryDate\"";
+
+		sql += "   ),\"tmpMain\" as (";
+		sql += "   select ";
+		sql += "    distinct \"CustNo\",\"FacmNo\"";
+		sql += "   from \"Main\" where \"FacmNo\" > 0";
+		sql += "   )";
+		sql += "   ";
+
+		// 明細
+		if (isDoDetail) {
+
+			sql += "   SELECT DISTINCT X.\"CustNo\"                                         AS \"CustNo\"";
+			sql += "                 , X.\"FacmNo\"                                         AS \"FacmNo\"";
+			sql += "                 , C.\"CustName\"";
+			sql += "                 , Lb.\"SpecificDd\"";
+			sql += "                 , Lb.\"LoanBal\"";
+			sql += "                 , Lb.\"DueAmt\"";
+			sql += "                 , X.\"EntryDate\"";
+			sql += "                 , X.\"IntStartDate\"";
+			sql += "                 , X.\"IntEndDate\"";
+			sql += "                 , Cd.\"Item\"                                          AS \"RepayCodeX\"";
+			sql += "                 , X.\"TxAmt\"";
+			sql += "                 , X.\"Principal\"";
+			sql += "                 , X.\"Interest\"";
+			sql += "                 , X.\"BreachAmt\" + \"DelayInt\"                         AS \"BreachAmt\"";
+			sql += "                 , X.\"FEE1\" + X.\"FEE2\" + X.\"FEE3\" + X.\"FEE4\"          AS \"OtherFee\"";
+			sql += "   FROM  \"Main\" X";
+			sql += "   LEFT JOIN \"CdCode\"      Cd ON Cd.\"DefCode\" = 'RepayCode'";
+			sql += "                            AND";
+			sql += "                            Cd.\"Code\" = X.\"RepayCode\"";
+			sql += "   LEFT JOIN \"CustMain\"    C ON C.\"CustNo\" = X.\"CustNo\"";
+			sql += "   LEFT JOIN (";
+			sql += "       SELECT \"CustNo\"                  AS \"CustNo\"";
+			if (isSameSpecificDd) {
+				sql += "           , 0 AS \"FacmNo\"";
+			} else {
+				sql += "           , \"FacmNo\" AS \"FacmNo\"";
+			}
+			sql += "            , SUM(\"LoanBal\")            AS \"LoanBal\"";
+			sql += "            , SUM(\"DueAmt\")             AS \"DueAmt\"";
+			sql += "            , MIN(\"NextPayIntDate\")     AS \"NextPayIntDate\"";
+			sql += "            , MAX(\"SpecificDd\")         AS \"SpecificDd\"";
+			sql += "       FROM \"LoanBorMain\"";
+			sql += "       WHERE \"CustNo\" = " + custNo;
+			sql += "             AND \"Status\" != 3";
+			sql += "       GROUP BY \"CustNo\"";
+			if (!isSameSpecificDd) {
+				sql += "           , \"FacmNo\"";
+			}
+			sql += "   ";
+			sql += "   ) Lb ON Lb.\"CustNo\" = X.\"CustNo\"";
+			sql += "       AND Lb.\"FacmNo\" = X.\"FacmNo\"";
+			sql += "   ";
+			sql += "   WHERE Lb.\"SpecificDd\" IS NOT NULL";
+			sql += "   ORDER BY  X.\"EntryDate\"";
+
+			// 利率變動日及地址
+		} else {
+
+			sql += "   SELECT X.\"CustNo\"    AS \"CustNo\"";
+			sql += "        , X.\"FacmNo\"    AS \"FacmNo\"";
+			sql += "        , Nvl(R.\"EffectDate\", 0 ) AS \"TxEffectDate\"";
+			sql += "        , Nvl(R2.\"FitRate\", 0) AS \"PresentRate\"";
+			sql += "        , Nvl(R.\"FitRate\", 0) AS \"AdjustedRate\"";
+			sql += "        , Nvl(Cb.\"BdLocation\", ' ') AS \"Location\"";
+			sql += "   FROM \"tmpMain\"     X";
+			sql += "   LEFT JOIN \"FacMain\"   F ON F.\"CustNo\" = X.\"CustNo\"";
+			sql += "                            AND F.\"FacmNo\" = X.\"FacmNo\"";
+			sql += "   LEFT JOIN (";
+			sql += "       SELECT \"CustNo\"";
+			sql += "            , \"FacmNo\"";
+			sql += "            , \"BormNo\"";
+			sql += "            , \"FitRate\"";
+			sql += "            , \"EffectDate\"";
+			sql += "            , ROW_NUMBER() OVER(PARTITION BY \"CustNo\", \"FacmNo\"";
+			sql += "              , \"BormNo\"";
+			sql += "           ORDER BY \"EffectDate\" DESC";
+			sql += "       ) AS \"seq\"";
+			sql += "       FROM \"LoanRateChange\"";
+			sql += "       WHERE  \"EffectDate\" >=" + sAdjDate;
+			sql += "   		 AND \"EffectDate\" <=" + eAdjDate;
+			sql += "   ";
+			sql += "   ) R ON R.\"CustNo\" = F.\"CustNo\"";
+			sql += "          AND";
+			sql += "          R.\"FacmNo\" = F.\"FacmNo\"";
+			sql += "          AND";
+			sql += "          R.\"BormNo\" = F.\"LastBormNo\"";
+			sql += "          AND";
+			sql += "          R.\"seq\" = 1";
+			sql += "   LEFT JOIN (";
+			sql += "       SELECT \"CustNo\"";
+			sql += "            , \"FacmNo\"";
+			sql += "            , \"BormNo\"";
+			sql += "            , \"FitRate\"";
+			sql += "            , \"EffectDate\"";
+			sql += "            , ROW_NUMBER() OVER(PARTITION BY \"CustNo\", \"FacmNo\"";
+			sql += "              , \"BormNo\"";
+			sql += "           ORDER BY \"EffectDate\" DESC";
+			sql += "       ) AS \"seq\"";
+			sql += "       FROM \"LoanRateChange\" Rb";
+			sql += "       WHERE \"EffectDate\" <=" + eAdjDate;
+			sql += "   ) R2 ON R2.\"CustNo\" = R.\"CustNo\"";
+			sql += "           AND";
+			sql += "           R2.\"FacmNo\" = R.\"FacmNo\"";
+			sql += "           AND";
+			sql += "           R2.\"BormNo\" = R.\"BormNo\"";
+			sql += "           AND";
+			sql += "           R2.\"seq\" = 2";
+			sql += "   LEFT JOIN \"ClFac\"   F ON F.\"CustNo\" = X.\"CustNo\"";
+			sql += "                          AND F.\"FacmNo\" = X.\"FacmNo\"";
+			sql += "                          AND F.\"MainFlag\" = 'Y'";
+			sql += "   LEFT JOIN \"ClBuilding\"  Cb ON Cb.\"ClCode1\" = F.\"ClCode1\"";
+			sql += "                                AND Cb.\"ClCode2\" = F.\"ClCode2\"";
+			sql += "                                AND Cb.\"ClNo\" = F.\"ClNo\"";
+			sql += "   ORDER BY X.\"FacmNo\" ";
+
+		}
 
 		this.info("sql=" + sql);
 		Query query;

@@ -38,11 +38,11 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+<sub type="DC" name="p1" layout="cols=1;screen.width=[160,850];printer.width=[20,20];">
 [
 ["[L9710]                                 寬限到期明細表"],
 ["#R1+@寬限到期起訖日",#ACCTDATE_ST,#ACCTDATE_ED],
-["#R2+@戶號",#CustNo, " ( 0:全部 )"],
+["#R2+@戶號",#CustNo, "（輸入戶號:僅產製通知單； 輸入0：列印通知單並產製寬限到期明細表）"],
 ["#FdMsg+@注意事項",#Msg],
 ]
 !---------- AP Button AREA ----------
@@ -79,7 +79,7 @@ CALL(#ALWAYS_HIGHLIGHT)
 ! 取得系統會計日期
 #DT1=D,8,S
 T(4,DATE$)
-D(7,2,#DT1,2,0)
+D(7,2,#DT1,1,0)
 
 #WkDate=X,8,S
 T(1,#DT1,2,5)
@@ -103,6 +103,7 @@ T(B,#WkDate+01)
 ! 往回推一天
 #DT4=D,8,S
 E(0,#WkDate)
+D(7,2,#DT4,1,0)
 D(7,3,#DT4,0,1)
 
 ![寬限到期日-起日] 預設值：系統會計日期，必須輸入，不可大於本營業日

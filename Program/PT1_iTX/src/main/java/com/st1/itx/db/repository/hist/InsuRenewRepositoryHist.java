@@ -3,11 +3,14 @@ package com.st1.itx.db.repository.hist;
 
 import java.util.Optional;
 
+import java.math.BigDecimal;
+import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -99,6 +102,9 @@ public interface InsuRenewRepositoryHist extends JpaRepository<InsuRenew, InsuRe
 
   // CustNo = ,AND FacmNo = ,AND PrevInsuNo = ,AND EndoInsuNo = 
   public Optional<InsuRenew> findTopByCustNoIsAndFacmNoIsAndPrevInsuNoIsAndEndoInsuNoIsOrderByInsuYearMonthDesc(int custNo_0, int facmNo_1, String prevInsuNo_2, String endoInsuNo_3);
+
+  // CustNo = ,AND InsuYearMonth = ,AND  PrevInsuNo = 
+  public Optional<InsuRenew> findTopByCustNoIsAndInsuYearMonthIsAndPrevInsuNoIsOrderByInsuEndDateDescInsuStartDateAscEndoInsuNoAsc(int custNo_0, int insuYearMonth_1, String prevInsuNo_2);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

@@ -2,8 +2,12 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * InsuRenew 火險單續保檔<br>
@@ -16,12 +20,7 @@ import javax.persistence.Embeddable;
 public class InsuRenewId implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 6406209999577646466L;
-
-// 擔保品-代號1
+  // 擔保品-代號1
   @Column(name = "`ClCode1`")
   private int clCode1 = 0;
 
