@@ -375,6 +375,10 @@ public class L2419 extends TradeBuffer {
 			if (functionCode == 1 && !clNoString.isEmpty() && clNo != 0) {
 				// 功能1初次上傳時，擔保品號碼不可輸入
 				setError(row, L2419Column.CL_NO.getIndex());
+				// 2023-07-12 Wei
+				// 若使用功能1,則擔保品編號不得輸入,若要新增擔保品請使用空白表上傳,若使用系統產生的回饋檔,請保留原始檔名,並使用功能2上傳並寫入擔保品檔
+				throw new LogicException("E0015",
+						"本次使用L2419功能1,則擔保品編號不得輸入,若要新增擔保品請使用空白表上傳,若使用系統產生的回饋檔,請保留原始檔名,並使用L2419功能2上傳並寫入擔保品檔.");
 			}
 
 			// 是否寫入資料庫

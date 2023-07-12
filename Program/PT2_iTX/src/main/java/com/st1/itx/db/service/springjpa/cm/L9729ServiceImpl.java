@@ -138,7 +138,7 @@ public class L9729ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " FROM \"TxArchiveTableLog\" T ";
 		sql += " WHERE T.\"ExecuteDate\" = :inputDate ";
 		sql += "   AND T.\"Type\" = :inputType ";
-		sql += " WHERE NVL(T.\"BatchNo\",0) != 0 ";
+		sql += "   AND NVL(T.\"BatchNo\",0) != 0 ";
 		sql += " ORDER BY T.\"CustNo\" ASC ";
 		sql += "        , T.\"FacmNo\" ASC ";
 		sql += "        , T.\"BormNo\" ASC ";

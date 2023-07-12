@@ -50,11 +50,15 @@ public class L4970 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 //		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 200;
-
+		
+		int startDate = parse.stringToInteger(titaVo.get("StartDate"));
+		
+		int endDate = parse.stringToInteger(titaVo.get("EndDate"));
+		
 		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 		try {
 			// *** 折返控制相關 ***
-			resultList = l4970ServiceImpl.findAll(this.index, this.limit, titaVo);
+			resultList = l4970ServiceImpl.findAll(startDate,endDate,titaVo);
 		} catch (Exception e) {
 			this.error("l4970ServiceImpl findByCondition " + e.getMessage());
 			throw new LogicException("E0013", e.getMessage());
@@ -68,23 +72,23 @@ public class L4970 extends TradeBuffer {
 				OccursList occursList = new OccursList();
 
 				int insuMonth = parse.stringToInteger(result.get("F0"));
-				int acDate = parse.stringToInteger(result.get("F9"));
-				int insDate = parse.stringToInteger(result.get("F14"));
+				int insuStartDate = parse.stringToInteger(result.get("F3"));
+				int insuEndDate = parse.stringToInteger(result.get("F4"));
 				if (insuMonth > 191100) {
 					insuMonth = insuMonth - 191100;
 				}
-				if (acDate > 19110000) {
-					acDate = acDate - 19110000;
+				if (insuStartDate > 19110000) {
+					insuStartDate = insuStartDate - 19110000;
 				}
-				if (insDate > 19110000) {
-					insDate = insDate - 19110000;
+				if (insuEndDate > 19110000) {
+					insuEndDate = insuEndDate - 19110000;
 				}
 
-				occursList.putParam("OOInsuYearMonth", result.get("F0"));
+				occursList.putParam("OOInsuYearMonth", insuMonth);
 				occursList.putParam("OOPrevInsuNo", result.get("F1"));
 				occursList.putParam("OONowInsuNo", result.get("F2"));
-				occursList.putParam("OOInsuStartDate", result.get("F3"));
-				occursList.putParam("OOInsuEndDate", result.get("F4"));
+				occursList.putParam("OOInsuStartDate", insuStartDate);
+				occursList.putParam("OOInsuEndDate", insuEndDate);
 				occursList.putParam("OOCustNo", result.get("F5")+"-"+result.get("F6"));
 				occursList.putParam("OOCustName", result.get("F7"));
 				occursList.putParam("OOTotInsuPrem", result.get("F8"));

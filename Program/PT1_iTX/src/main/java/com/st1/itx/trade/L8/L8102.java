@@ -222,7 +222,8 @@ public class L8102 extends TradeBuffer {
 			makeExcel1.close();
 			makeExcel2.close();
 		}
-
+		makeFileText.close();
+		makeFileMail.close();
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
@@ -257,6 +258,9 @@ public class L8102 extends TradeBuffer {
 
 		// 發送簡訊內容,待處理
 		if ("3".equals(txAmlCredit.getProcessType())) {
+			String dataLines = txToDoCom.getProcessNoteForText(messagePhone,
+					"房貸客戶提醒：為維護您的權益，戶籍或通訊地址、電子信箱及連絡電話，或姓名、身分證統一編號等重要資訊有異動時，敬請洽詢公司服務人員或客戶服務部（０８００—０３１１１５）辦理變更。",
+					wkCalDy);
 
 			TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 			tTxToDoDetail.setCustNo(custMain.getCustNo());
@@ -265,13 +269,9 @@ public class L8102 extends TradeBuffer {
 			tTxToDoDetail.setDtlValue("<AML定審簡訊通知>");
 			tTxToDoDetail.setItemCode("TEXT00");
 			tTxToDoDetail.setStatus(0);
-			tTxToDoDetail.setProcessNote(txToDoCom.getProcessNoteForText(messagePhone,
-					"房貸客戶提醒：為維護您的權益，戶籍或通訊地址、電子信箱及連絡電話，或姓名、身分證統一編號等重要資訊有異動時，敬請洽詢公司服務人員或客戶服務部（０８００—０３１１１５）辦理變更。",
-					wkCalDy));
-			makeFileText.put(parse.IntegerToString(custMain.getCustNo(), 7) + "-" + parse.IntegerToString(0, 3)
-					+ txToDoCom.getProcessNoteForText(messagePhone,
-							"房貸客戶提醒：為維護您的權益，戶籍或通訊地址、電子信箱及連絡電話，或姓名、身分證統一編號等重要資訊有異動時，敬請洽詢公司服務人員或客戶服務部（０８００—０３１１１５）辦理變更。",
-							wkCalDy));
+			tTxToDoDetail.setProcessNote(dataLines);
+			makeFileText.put(
+					parse.IntegerToString(custMain.getCustNo(), 7) + "-" + parse.IntegerToString(0, 3) + dataLines);
 
 			txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo);
 		}

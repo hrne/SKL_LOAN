@@ -426,7 +426,7 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          ) AS \"LastDataSeq\" ";
 		sql += "   FROM \"TxArchiveTableLog\" T ";
 		sql += "   WHERE T.\"Result\" = 1 "; // 成功
-		sql += "     AND T.\"Type\" = '5YTx' ";
+		sql += "     AND T.\"Type\" = '5YTX' ";
 		sql += "     AND T.\"CustNo\" = :inputCustNo ";
 		sql += "     AND T.\"FacmNo\" >= :inputFacmNoSt ";
 		sql += "     AND T.\"FacmNo\" <= :inputFacmNoEd ";

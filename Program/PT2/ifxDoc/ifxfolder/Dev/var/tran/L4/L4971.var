@@ -1,0 +1,153 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L4971" layout="cols=3;screen.width=[150,400,150,300];printer.width=[20,80];order=1">
+[
+["[L4971]                                 匯款轉帳短繳查詢                                 "],
+[#<->#,"#FdAcDate+會計日期",#AcDate],
+[#<->#,"#FdReconCode+存摺代號",#ReconCode,#ReconCodeX],
+]
+
+#FdAcDate=X,2,L
+T(3,*)
+#FdReconCode=X,2,L
+T(3,*)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#NTXBUF=X,20,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+! 會計日期
+#AcDate=D,7,I
+E(0,#SYSDATE)
+@V(7)A(DATE,0,#AcDate)
+
+
+#ReconCodeHelp=X,100,S
+T(3,A1:企金;A2:期款;A3:還本; :查全部)
+
+#ReconCode=X,3,I
+HELP(#ReconCodeHelp)
+@
+C(4,#ReconCode,$,V(H,#ReconCodeHelp))
+
+#ReconCodeX=X,20,L
+T(H,#ReconCode,#ReconCodeHelp)
+#RPTFG=X,1,S
+E(0,0) 
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+
+#secret-no=x,1000,S
+T("")
+
+#batch-detail=x,100000,S
+#batch-print=A,1,S
+
+</sub>
+
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#AcDate
+#ReconCode
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+TXFORM=L4971
+^
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>
+
+<sub type="PART" name="L4971" layout="cols=3;screen.width=[1000];printer.width=[15,30,15,30];order=1">
+[
+["[L4971]                                 匯款轉帳短繳查詢                                "],
+]
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+#batch-print=1,L4971.PFNX,NA,,,,,,1169:827
+^
+#RPTFG=0,QUERY.GRID,L4971
+#any={detail:true, header:'L8403.part', caption:'[L4971]匯款轉帳短繳查詢', width:1000, rowNum:20, rowList:[20,40,60],
+ifxBatch:{
+	name:'列印',
+	type:'5',
+	rim:'L840A',
+	txtno:'#secret-no',
+	pfnx:"L8403.PFNX",
+	col_captions:["戶號","戶名","匯款金額","計息起日","計息迄日","本金","利息","違約金","費用","暫收抵繳","短繳金額"],
+	col_names:["#OOCustId","#SubmitKeyX2","#OORcDate","#batch-row-status"]
+	}
+}
+
+#secret-no
+#batch-row-status
+
+                        
+#OOCustNo=戶號
+{width:125,align:'center'}
+#OOCustName=戶名
+{width:125,align:'center'}
+#OOTxAmt=匯款金額
+{width:125,align:'center'}
+#OOIntStartDate=計息起日
+{width:85,align:'center'}
+#OOIntEndDate=計息迄日
+{width:85,align:'center'}
+#OOPrincipal=本金
+{width:85,align:'center'}
+#OOInterest=利息
+{width:85}
+#OOBreachAmt=違約金
+{width:85}
+#OOFee=費用
+{width:85}
+!暫收抵繳
+#OOTempDr=暫收抵繳
+{width:85,align:'center'}
+!短繳金額
+#OOShortAmt=短繳金額
+{width:85,align:'center'}
+
+!給L3005使用
+!#OOAcDate
+!給L3005使用
+!#TitaTlrNo
+!給L3005使用
+!#TitaTxtNo
+
+
+^
+
+
+
+</sub>
+

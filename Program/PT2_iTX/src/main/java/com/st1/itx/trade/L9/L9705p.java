@@ -50,29 +50,20 @@ public class L9705p extends TradeBuffer {
 		String parentTranCode = titaVo.getTxcd();
 
 		l9705Report.setParentTranCode(parentTranCode);
-		List<Map<String, String>> l9705ListA3 = null;
-		List<Map<String, String>> l9705ListN = null;
-		List<Map<String, String>> l9705ListAll = null;
+		List<Map<String, String>> l9705List = null;
 		try {
-			// 分兩次印 (A3 跟 非A3)
-			l9705ListA3 = l9705ServiceImpl.findAll(titaVo, "A3");
-			l9705ListN = l9705ServiceImpl.findAll(titaVo, "N");
-			l9705ListAll = l9705ServiceImpl.findAll(titaVo, "All");
+			l9705List = l9705ServiceImpl.findAll(titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.error("l9705ServiceImpl.findAll error = " + errors.toString());
 		}
-		if (l9705ListA3.size() > 0) {
-			// A3 通知單
-			l9705Report.exec(l9705ListA3, titaVo, txbuffer);
+		// 繳息通知單
+		if (l9705List != null) {
+			l9705Report.exec(l9705List, titaVo, txbuffer);
 		}
-		if (l9705ListN.size() > 0) {
-			// 非A3 通知單
-			l9705Report.exec(l9705ListN, titaVo, txbuffer);
-		}
-		// by eric 2021.12.10 明細表
-		l9705Form.exec(l9705ListAll, titaVo, txbuffer);
+        // 套印存入憑條
+		l9705Form.exec(l9705List, titaVo, txbuffer);
 
 		this.addList(this.totaVo);
 		return this.sendList();

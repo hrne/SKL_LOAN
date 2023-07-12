@@ -27,15 +27,7 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	/**
-	 * @param titaVo
-	 * @param reconCode 對帳類別(A3/N/All/null)
-	 * @return
-	 * @throws LogicException
-	 * 
-	 * 
-	 */
-	public List<Map<String, String>> findAll(TitaVo titaVo, String reconCode) throws LogicException {
+	public List<Map<String, String>> findAll(TitaVo titaVo) throws LogicException {
 
 		this.info("l9705.findAll");
 
@@ -64,16 +56,10 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,C.\"CustName\"           AS \"CustName\"  ";
 		sql += "            ,F.\"RepayCode\"          AS \"RepayCode\" ";
 		sql += "            ,C.\"EntCode\"            AS \"EntCode\"   ";
+		sql += "            ,'N'                      AS \"ReconCode\" ";
 		if ("4".equals(condition1)) {
-//			sql += "            ,BATX.\"ReconCode\"             AS \"ReconCode\"   ";
-//			sql += "            ,BATX.\"EntryDate\" - 19110000  AS \"EntryDate\"   ";
-//			sql += "            ,BATX.\"RepayAmt\"              AS \"RepayAmt\"   ";
-			sql += "            ,BATX.\"ReconCode\"             AS \"ReconCode\"   ";
 			sql += "            ,LBT.\"EntryDate\" - 19110000  AS \"EntryDate\"   ";
 			sql += "            ,LBT.\"ExtraRepay\"            AS \"RepayAmt\"   ";
-			sql += "            ,LBT.\"RepayKindCode\"         AS \"RepayKindCode\"   ";
-		} else {
-			sql += "            ,'N'            AS \"ReconCode\"   ";
 		}
 		sql += "      FROM \"LoanBorMain\" M";
 		sql += "      LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\"";
@@ -87,7 +73,7 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "      ,\"BormNo\"                             ";
 			sql += "      from \"LoanBorTx\"                      ";
 			sql += "      where \"TitaTxCd\" in ('L3711','L3712') ";
-			sql += "        and \"TitaHCode\" = 0                 ";
+			sql += "        and \"TitaHCode\" = '0'               ";
 			sql += "        and \"AcDate\" >= :sday            ";
 			sql += "        and \"AcDate\" <= :eday            ";
 			sql += " ) LBT on LBT.\"CustNo\" = M.\"CustNo\"       ";
@@ -108,7 +94,6 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "      and LRC.\"FacmNo\" = M.\"FacmNo\"       ";
 			sql += "      and LRC.\"BormNo\" = M.\"BormNo\"       ";
 		}
-		//從L4702的部分還款
 		if ("4".equals(condition1)) {
 			sql += " left join (                                  ";
 			sql += "      select                                  ";
@@ -119,29 +104,17 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "      ,\"TitaTlrNo\"                          ";
 			sql += "      ,\"EntryDate\"                          ";
 			sql += "      ,\"ExtraRepay\"                          ";
-			sql += "      ,JSON_VALUE(\"OtherFields\",'$.RepayKindCode') AS \"RepayKindCode\" ";
 			sql += "      from \"LoanBorTx\"                      ";
 			sql += "      where \"TitaTxCd\" in ('L3200')         ";
-			sql += "        and \"TitaHCode\" = 0                 ";
+			sql += "        and \"TitaHCode\" = '0'               ";
 			sql += "        and \"ExtraRepay\" > 0                ";
 			sql += "        and \"AcDate\" >= :sday            ";
 			sql += "        and \"AcDate\" <= :eday            ";
 			sql += " ) LBT on LBT.\"CustNo\" = M.\"CustNo\"       ";
 			sql += "      and LBT.\"FacmNo\" = M.\"FacmNo\"       ";
 			sql += "      and LBT.\"BormNo\" = M.\"BormNo\"       ";
-			sql += " left join \"BatxDetail\" BATX";
-			sql += " 		on BATX.\"TitaTxtNo\" = LBT.\"TitaTxtNo\"";
-			sql += " 	   and BATX.\"TitaTlrNo\" = LBT.\"TitaTlrNo\"";
 		}
 		sql += "      WHERE F.\"DepartmentCode\" = :corpInd ";
-
-		if ("4".equals(condition1)) {
-			if ("A3".equals(reconCode)) {
-				sql += "      	AND NVL(BATX.\"ReconCode\",' ') = 'A3' ";
-			} else if ("N".equals(reconCode)) {
-				sql += "      	AND NVL(BATX.\"ReconCode\",' ') <> 'A3' ";
-			}
-		}
 
 		if (Integer.valueOf(custNoStart) > 0) {
 			sql += "        AND M.\"CustNo\" >= :custno1 ";
@@ -160,7 +133,6 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "    AND LBT.\"CustNo\" IS NOT NULL";
 		case "3": // 利率變動
 			sql += "    AND M.\"CustNo\" > 0 ";
-//			sql += "    AND BATX.\"RepayType\" = '02' ";
 			dayFg = "1";
 			break;
 		case "5": // 償還方式變更
@@ -213,37 +185,7 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 		default:
 			break;
 		}
-		if ("4".equals(condition1)) {
-			sql += " order by DECODE(BATX.\"ReconCode\",'A3','0',BATX.\"ReconCode\"),M.\"CustNo\", M.\"FacmNo\"                     ";
-		} else {
-			sql += " order by M.\"CustNo\", M.\"FacmNo\"                     ";
-		}
-		/*
-		 * SELECT DISTINCT M."FacmNo" , C."CustName" FROM "LoanBorMain" M LEFT JOIN
-		 * "FacMain" F ON F."CustNo" = M."CustNo" AND F."FacmNo" = M."FacmNo" LEFT JOIN
-		 * "CustMain" C ON C."CustNo" = M."CustNo" WHERE M."CustNo" =
-		 * 
-		 * 新貸戶 AND M."DrawdownDate" >= AND M."DrawdownDate" <=
-		 * 
-		 * 應繳日變更 AND M."PrevPayIntDate" >= AND M."PrevPayIntDate" <=
-		 * 
-		 * 利率變動 AND M."" >= AND M."" <=
-		 * 
-		 * 部份還款 AND M."PrevRepaidDate" >= AND M."PrevRepaidDate" <=
-		 * 
-		 * 償還方式變更 AND M."" >= AND M."" <=
-		 * 
-		 * 匯款支票不印 F."RepayCode" NOT IN (1, 4)
-		 * 
-		 * 銀扣不印 F."RepayCode" != 2
-		 * 
-		 * 戶別 1.自然人 AND C."EntCode" IN ('0', '2') 戶別 2.自然人 AND C."EntCode" = '1'
-		 * 
-		 * 企金別 F."DepartmentCode" =
-		 * 
-		 * 業務科目 F."AcctCode" =
-		 * 
-		 */
+		sql += " order by M.\"CustNo\", M.\"FacmNo\"                     ";
 
 		this.info("sql=" + sql);
 		Query query;

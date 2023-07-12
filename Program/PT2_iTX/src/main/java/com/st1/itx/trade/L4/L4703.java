@@ -84,9 +84,9 @@ public class L4703 extends TradeBuffer {
 	@Autowired
 	public L9703ServiceImpl l9703ServiceImpl;
 	@Autowired
-	MakeFile makeFileText;
+	private MakeFile makeFileText;
 	@Autowired
-	MakeFile makeFileMail;
+	private MakeFile makeFileMail;
 
 	@Autowired
 	public WebClient webClient;
@@ -103,6 +103,7 @@ public class L4703 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4703 ");
 		this.totaVo.init(titaVo);
+		txToDoCom.setTxBuffer(txBuffer);
 		wkCalDy = dateUtil.getNowIntegerForBC();
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI() + 19110000).setBrno(titaVo.getBrno())
 				.setRptCode("L4703").setRptItem("期款扣款通知").build();
@@ -112,7 +113,6 @@ public class L4703 extends TradeBuffer {
 				.setRptCode("L4703").setRptItem("期款扣款通知").build();
 		// 開啟報表
 		makeFileMail.open(titaVo, mailReportVo, "email檔.txt");
-
 		if (titaVo.isHcodeErase()) {
 //			刪除TxToDoDetail
 			dele("TEXT00", titaVo);
@@ -193,15 +193,14 @@ public class L4703 extends TradeBuffer {
 						int facmNo1 = parse.stringToInteger(tL9703Vo.get("F5"));
 
 						tempVo = new TempVo();
-						tempVo = custNoticeCom.getCustNotice("L9703", custNo1, facmNo1, titaVo);
+						tempVo = custNoticeCom.getCustNotice("L4703", custNo1, facmNo1, titaVo);
 
 						noticePhoneNo = tempVo.getParam("MessagePhoneNo");
 						noticeEmail = tempVo.getParam("EmailAddress");
-
 						if (!"".equals(noticePhoneNo)) {
-							setTextFileVO(custNo, facmNo, titaVo);
+							setTextFileVO(custNo1, facmNo1, titaVo);
 						} else if (!"".equals(noticeEmail)) {
-							setEMailFileVO(custNo, facmNo, titaVo);
+							setEMailFileVO(custNo1, facmNo1, titaVo);
 						}
 					}
 				}
@@ -210,6 +209,8 @@ public class L4703 extends TradeBuffer {
 				break;
 			}
 
+			makeFileText.close();
+			makeFileMail.close();
 //		滯繳明細表 通知方式為書信者，於9703產出
 //		l9703p.run(titaVo);
 			MySpring.newTask("L9703p", this.txBuffer, titaVo);
@@ -237,7 +238,7 @@ public class L4703 extends TradeBuffer {
 		if (lCustNoticeC != null && lCustNoticeC.size() != 0) {
 			for (CustNotice tCustNotice : lCustNoticeC) {
 
-				if ("L9703".equals(tCustNotice.getFormNo()) && "Y".equals(tCustNotice.getMsgNotice())) {
+				if ("L4703".equals(tCustNotice.getFormNo()) && "Y".equals(tCustNotice.getMsgNotice())) {
 					dataLines = "\"H1\",\"" + tCustMain.getCustId() + "\",\"" + noticePhoneNo
 							+ "\",\"親愛的客戶，您好：房貸繳款通知；如已繳納則無須理會本訊息。新光人壽關心您。”,\"" + sEntryDate + "\"";
 					dataList.add(dataLines);
@@ -252,7 +253,6 @@ public class L4703 extends TradeBuffer {
 					tTxToDoDetail.setProcessNote(dataLines);
 					makeFileText
 							.put(parse.IntegerToString(custNo, 7) + "-" + parse.IntegerToString(facmNo, 3) + dataLines);
-
 					txToDoCom.addDetail(false, 9, tTxToDoDetail, titaVo);
 				}
 			}
@@ -278,7 +278,7 @@ public class L4703 extends TradeBuffer {
 		if (lCustNoticeC != null && lCustNoticeC.size() != 0) {
 			for (CustNotice tCustNotice : lCustNoticeC) {
 
-				if ("L9703".equals(tCustNotice.getFormNo()) && "Y".equals(tCustNotice.getEmailNotice())) {
+				if ("L4703".equals(tCustNotice.getFormNo()) && "Y".equals(tCustNotice.getEmailNotice())) {
 					MailVo mailVo = new MailVo();
 					String processNote = mailVo.generateProcessNotes(noticeEmail, "滯繳通知",
 							"親愛的客戶，您好：房貸繳款通知；如已繳納則無須理會本訊息。新光人壽關心您。", 0);
@@ -296,7 +296,7 @@ public class L4703 extends TradeBuffer {
 					tTxToDoDetail.setStatus(0);
 					tTxToDoDetail.setProcessNote(processNote);
 					makeFileMail
-							.put(parse.IntegerToString(custNo, 7) + "-" + parse.IntegerToString(facmNo, 3) + processNote);
+							.put(parse.IntegerToString(custNo, 7) + "-" + parse.IntegerToString(facmNo, 3) + dataLines);
 
 					txToDoCom.addDetail(false, 9, tTxToDoDetail, titaVo);
 				}

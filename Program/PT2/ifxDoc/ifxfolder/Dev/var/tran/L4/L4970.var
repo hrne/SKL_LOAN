@@ -42,10 +42,10 @@ E(0,0)
 <sub type="DC" name="L4970" layout="cols=1;screen.width=[150,850];printer.width=[20,80];order=1">
 [
 ["[L4970]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@暫收款可抵繳火險查詢"],
-[#<->#,"#FdInsuYearMonth+火險到期年月日",#InsuYearMonth," ~",#InsuYearMonthEnd],
+[#<->#,"#FdInsuStartDate+保險起日區間",#StartDate," ~",#EndDate],
 ]
 
-#FdInsuYearMonth=X,2,L
+#FdInsuStartDate=X,2,L
 T(3,*)
 
 ! Help
@@ -77,20 +77,21 @@ C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@InsuYearMonth,#NTXBUF,2,5)
 T(1,@InsuYearMonthEnd,#NTXBUF,2,5)
 
-! 火險到期年月
-#InsuYearMonth=A,7,I
-C(3,#CHAIN,0,$,s)
-!@A(YM,1,#InsuYearMonth)
-@
-V(7)A(DATE,0,#InsuYearMonth)
 
-#InsuYearMonthEnd=A,7,I
-C(3,#CHAIN,0,$,s)
-E(0,#InsuYearMonth)
-!@A(YM,1,#InsuYearMonthEnd)V(5,#InsuYearMonth,99912)
-@
-V(7)A(DATE,0,#InsuYearMonthEnd)
+! 保險起日
+#StartDate=A,7,I
+! C(3,#CHAIN,0,$,s)
+! @
+! V(7)A(DATE,0,#StartDate)
+! 保險迄日
+#CHECKMSG=X,20,S
+T(2,需輸入日期)
 
+#EndDate=A,7,I
+! E(0,#SYSDATE)
+! @V(7)A(DATE,0,#EndDate)
+@
+IF(#EndDate==0,V(P,#CHECKMSG),$)
 
 #RPTFG=A,1,S
 
@@ -160,8 +161,8 @@ T(3,0:正常;1:借支;2:催收;3:呆帳;4:結案)
 
 !------ 上行電文 TEXT ------
 <sub type="TIM">
-#InsuYearMonth
-#InsuYearMonthEnd
+#StartDate
+#EndDate
 #END
 </sub>
 

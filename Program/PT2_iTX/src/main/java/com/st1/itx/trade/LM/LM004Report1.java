@@ -61,9 +61,7 @@ public class LM004Report1 extends MakeReport {
 	}
 
 	public void exec(TitaVo titaVo, List<Map<String, String>> LM004List) throws LogicException {
-		this.setCharSpaces(0);
 
-//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM004", "長中短期放款到期明細表", "", "A4", "L");
 		String brno = titaVo.getBrno();
 		int rptDate = titaVo.getEntDyI();
 		String rptCode = titaVo.getTxcd();
@@ -117,7 +115,6 @@ public class LM004Report1 extends MakeReport {
 		setFontSize(10);
 
 		this.close();
-		// this.toPdf(sno);
 	}
 
 	private String showDate(String date, int iType) {

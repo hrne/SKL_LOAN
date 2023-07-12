@@ -94,10 +94,10 @@ public class LY004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          WHEN NVL(L.\"LoanBal\",0) > 0 ";
 		sql += "          THEN NVL(O.\"OvduAmt\",0) / L.\"LoanBal\" ";
 		sql += "        ELSE 0 END                                AS \"Ratio\" "; // 逾放比率(%)
-		sql += " FROM OvduAmt  O "; // 取本月放款總額
-		sql += " 	, LastOvduAmt LO"; // 取上月放款總額
-		sql += " 	, LoanAmt L"; // 取本月逾放總額
-		sql += " 	, LastLoanAmt LL"; // 取上月逾放總額
+		sql += " FROM \"OvduAmt\"  O "; // 取本月放款總額
+		sql += " 	, \"LastOvduAmt\" LO"; // 取上月放款總額
+		sql += " 	, \"LoanAmt\" L"; // 取本月逾放總額
+		sql += " 	, \"LastLoanAmt\" LL"; // 取上月逾放總額
 
 		this.info("sql=" + sql);
 

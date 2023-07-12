@@ -85,9 +85,9 @@ public class L4603p extends TradeBuffer {
 	@Autowired
 	private MakeFile makeFile;
 	@Autowired
-	MakeFile makeFileText;
+	private MakeFile makeFileText;
 	@Autowired
-	MakeFile makeFileMail;
+	private MakeFile makeFileMail;
 
 	@Autowired
 	private TxToDoCom txToDoCom;
@@ -326,6 +326,8 @@ public class L4603p extends TradeBuffer {
 
 		} // if
 
+		makeFileText.close();
+		makeFileMail.close();
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

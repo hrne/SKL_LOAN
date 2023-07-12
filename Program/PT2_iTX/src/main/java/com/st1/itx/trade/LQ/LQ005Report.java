@@ -68,10 +68,10 @@ public class LQ005Report extends MakeReport {
 			this.info("lQ005ServiceImpl.findAll error = " + errors.toString());
 		}
 
-		makeExcel.setSheet("YYY.MM.DD", this.showRocDate(yymm, 6));
+		makeExcel.setSheet("YYY.MM.DD", this.showRocDate(entdy, 6));
 		int rocYMD = entdy - 19110000;
 		int rocY = rocYMD / 10000;
-		String rocM = String.format(rocYMD / 100 % 100 + "", "%0d");
+		String rocM = String.format(rocYMD / 100 % 100 +"", "%0d");
 		String rocD = String.format(rocYMD % 100 + "", "%0d");
 
 		makeExcel.setValue(2, 1, "民國 " + rocY + " 年 " + rocM + " 月 " + rocD + " 日 ", "C");
@@ -97,7 +97,7 @@ public class LQ005Report extends MakeReport {
 
 				// 收受者 交易對象名稱(代號)
 				makeExcel.setValue(row, 5, "B", "C");
-				makeExcel.setValue(row, 6, r.get("ID"), "C");
+				makeExcel.setValue(row, 6, r.get("Id"), "C");
 				makeExcel.setValue(row, 7, r.get("Name"), "C");
 
 				// 交易性質

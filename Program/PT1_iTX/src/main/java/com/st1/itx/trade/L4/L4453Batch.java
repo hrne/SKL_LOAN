@@ -75,9 +75,9 @@ public class L4453Batch extends TradeBuffer {
 	@Autowired
 	public TxToDoDetailService txToDoDetailService;
 	@Autowired
-	MakeFile makeFileText;
+	private MakeFile makeFileText;
 	@Autowired
-	MakeFile makeFileMail;
+	private MakeFile makeFileMail;
 
 	@Autowired
 	public FileCom fileCom;
@@ -152,6 +152,8 @@ public class L4453Batch extends TradeBuffer {
 						titaVo.getTlrNo(), sendMsg, titaVo);
 			}
 		}
+		makeFileText.close();
+		makeFileMail.close();
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

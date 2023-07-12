@@ -83,8 +83,8 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "			ELSE '99' END ) AS \"ClNo\"";
 			sql += "		  ,\"Fn_ParseEOL\"(C.\"CustName\",0) AS F2";
 			sql += "		  ,(CASE";
-			sql += "			  WHEN R.\"ReltCode\" IS NULL THEN 'A'";
-			sql += "			  WHEN R.\"ReltCode\" ='08' THEN 'C'";
+			sql += "			  WHEN H.\"Id\" IS NULL THEN 'A'";
+//			sql += "			  WHEN R.\"ReltCode\" ='08' THEN 'C'";
 			sql += "			ELSE 'B' END ) AS F3";
 			//EntCode 0=個金,1=企金,2=企金自然人
 			sql += "		  ,(CASE";

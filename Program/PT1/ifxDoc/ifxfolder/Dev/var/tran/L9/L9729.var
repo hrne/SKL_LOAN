@@ -133,6 +133,7 @@ T(3,1)ASGN(LOOP$)
 <sub type="TIM">
 #InputDate
 #InputType
+#FilterType
 </sub>
 
 

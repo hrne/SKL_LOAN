@@ -68,9 +68,9 @@ public class L4721Batch extends TradeBuffer {
 	@Autowired
 	private MakeReport makeReport;
 	@Autowired
-	MakeFile makeFileText;
+	private MakeFile makeFileText;
 	@Autowired
-	MakeFile makeFileMail;
+	private MakeFile makeFileMail;
 	private int wkCalDy = 0;
 
 	// 利率調整日
@@ -115,6 +115,8 @@ public class L4721Batch extends TradeBuffer {
 		makeFileText.open(titaVo, reportVo, "簡訊檔.txt");
 		ReportVo mailReportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI() + 19110000).setBrno(titaVo.getBrno())
 				.setRptCode("L8102").setRptItem("期款扣款通知").build();
+		// 開啟報表
+		makeFileMail.open(titaVo, mailReportVo, "email檔.txt");
 
 		isAdjDate = Integer.parseInt(titaVo.getParam("sAdjDate")) + 19110000;
 		ieAdjDate = Integer.parseInt(titaVo.getParam("eAdjDate")) + 19110000;
@@ -246,7 +248,8 @@ public class L4721Batch extends TradeBuffer {
 
 		// 送出通知訊息
 		sendMessage(titaVo);
-
+		makeFileText.close();
+		makeFileMail.close();
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
@@ -385,6 +388,8 @@ public class L4721Batch extends TradeBuffer {
 		tTxToDoDetail.setItemCode("MAIL00");
 		tTxToDoDetail.setStatus(0);
 		tTxToDoDetail.setProcessNote(processNote);
+		makeFileMail.put(parse.IntegerToString(parse.stringToInteger(tmpCustFacm.get("CustNo")), 7) + "-"
+				+ parse.IntegerToString(0, 3) + processNote);
 
 		txToDoCom.addDetail(true, 9, tTxToDoDetail, titaVo);
 	}

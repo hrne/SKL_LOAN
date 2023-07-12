@@ -3,6 +3,7 @@ package com.st1.itx.trade.LQ;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -164,18 +165,18 @@ public class LQ007Report extends MakeReport {
 				colInt = colInt + 2;
 
 				// 無論查詢有無資料，一律先放零
-				makeExcel.setValue(5, colBal, formatAmt(tmpBalSum, 3, 8));
-				makeExcel.setValue(5, colInt, formatAmt(tmpBalSum, 3, 8));
-				makeExcel.setValue(6, colBal, formatAmt(tmpBalSum, 3, 8));
-				makeExcel.setValue(7, colBal, formatAmt(tmpBalSum, 3, 8));
-				makeExcel.setValue(8, colBal, formatAmt(tmpBalSum, 3, 8));
-				makeExcel.setValue(9, colBal, formatAmt(tmpBalSum, 3, 8));
-				makeExcel.setValue(10, colBal, formatAmt(tmpBalSum, 3, 8));
-				makeExcel.setValue(11, colBal, formatAmt(tmpBalSum, 3, 8));
-				makeExcel.setValue(12, colBal, formatAmt(tmpBalSum, 3, 8));
-				makeExcel.setValue(6, colInt, formatAmt(tmpBalSum, 3, 8));
-				makeExcel.setValue(13, colBal, formatAmt(tmpBalSum, 3, 8));
-				makeExcel.setValue(13, colInt, formatAmt(tmpBalSum, 3, 8));
+				makeExcel.setValue(5, colBal, tmpBalSum, "0.0000");
+				makeExcel.setValue(5, colInt, tmpBalSum, "0.0000");
+				makeExcel.setValue(6, colBal, tmpBalSum, "0.0000");
+				makeExcel.setValue(7, colBal, tmpBalSum, "0.0000");
+				makeExcel.setValue(8, colBal, tmpBalSum, "0.0000");
+				makeExcel.setValue(9, colBal, tmpBalSum, "0.0000");
+				makeExcel.setValue(10, colBal, tmpBalSum, "0.0000");
+				makeExcel.setValue(11, colBal, tmpBalSum, "0.0000");
+				makeExcel.setValue(12, colBal, tmpBalSum, "0.0000");
+				makeExcel.setValue(6, colInt, tmpBalSum, "0.0000");
+				makeExcel.setValue(13, colBal, tmpBalSum, "0.0000");
+				makeExcel.setValue(13, colInt, tmpBalSum, "0.0000");
 
 				// 查詢結果上只會有 3 6 9 12月份
 				for (Map<String, String> r : LQ007List) {
@@ -196,8 +197,8 @@ public class LQ007Report extends MakeReport {
 						// AA=>首次購物貸款
 						if ("AA".equals(prodNo)) {
 
-							makeExcel.setValue(5, colBal, formatAmt(balSum, 4, 8));
-							makeExcel.setValue(5, colInt, formatAmt(intSum, 4, 8));
+							makeExcel.setValue(5, colBal, hundredMillion(balSum), "0.0000");
+							makeExcel.setValue(5, colInt, hundredMillion(intSum), "0.0000");
 
 							// 最後月份的資料
 							if (iEndYearMonth == visibleMonth) {
@@ -209,7 +210,7 @@ public class LQ007Report extends MakeReport {
 
 						// IA
 						if ("IA".equals(prodNo)) {
-							makeExcel.setValue(6, colBal, formatAmt(balSum, 4, 8));
+							makeExcel.setValue(6, colBal, hundredMillion(balSum), "0.0000");
 							iaiiIntTotal = iaiiIntTotal.add(intSum);
 
 							// 最後月份的資料
@@ -220,7 +221,7 @@ public class LQ007Report extends MakeReport {
 						}
 						// IB
 						if ("IB".equals(prodNo)) {
-							makeExcel.setValue(7, colBal, formatAmt(balSum, 4, 8));
+							makeExcel.setValue(7, colBal, hundredMillion(balSum), "0.0000");
 							iaiiIntTotal = iaiiIntTotal.add(intSum);
 
 							// 最後月份的資料
@@ -231,7 +232,7 @@ public class LQ007Report extends MakeReport {
 						}
 						// IC
 						if ("IC".equals(prodNo)) {
-							makeExcel.setValue(8, colBal, formatAmt(balSum, 4, 8));
+							makeExcel.setValue(8, colBal, hundredMillion(balSum), "0.0000");
 							iaiiIntTotal = iaiiIntTotal.add(intSum);
 
 							// 最後月份的資料
@@ -244,7 +245,7 @@ public class LQ007Report extends MakeReport {
 						if ("ID".equals(prodNo)) {
 							iaiiBalTotal = BigDecimal.ZERO;
 							iaiiBalTotal = iaiiBalTotal.add(balSum);
-							makeExcel.setValue(9, colBal, formatAmt(iaiiBalTotal, 4, 8));
+							makeExcel.setValue(9, colBal, hundredMillion(iaiiBalTotal), "0.0000");
 							iaiiIntTotal = iaiiIntTotal.add(intSum);
 
 							// 最後月份的資料
@@ -257,7 +258,7 @@ public class LQ007Report extends MakeReport {
 						if ("IF".equals(prodNo)) {
 							iaiiBalTotal = BigDecimal.ZERO;
 							iaiiBalTotal = iaiiBalTotal.add(balSum);
-							makeExcel.setValue(10, colBal, formatAmt(iaiiBalTotal, 4, 8));
+							makeExcel.setValue(10, colBal, hundredMillion(iaiiBalTotal), "x0.0000");
 							iaiiIntTotal = iaiiIntTotal.add(intSum);
 
 							// 最後月份的資料
@@ -270,7 +271,7 @@ public class LQ007Report extends MakeReport {
 						if ("IH".equals(prodNo)) {
 							iaiiBalTotal = BigDecimal.ZERO;
 							iaiiBalTotal = iaiiBalTotal.add(balSum);
-							makeExcel.setValue(11, colBal, formatAmt(iaiiBalTotal, 4, 8));
+							makeExcel.setValue(11, colBal, hundredMillion(iaiiBalTotal), "0.0000");
 							iaiiIntTotal = iaiiIntTotal.add(intSum);
 
 							// 最後月份的資料
@@ -285,11 +286,11 @@ public class LQ007Report extends MakeReport {
 
 						// ZZ=>921重優惠房貸
 						if ("ZZ".equals(prodNo)) {
-							makeExcel.setValue(12, colBal, formatAmt(balSum, 4, 8));
+							makeExcel.setValue(12, colBal, hundredMillion(balSum), "0.0000");
 
 							intTotal = intTotal.add(intSum);
 							iaiiIntTotal = iaiiIntTotal.add(intSum);
-							makeExcel.setValue(6, colInt, formatAmt(iaiiIntTotal, 4, 8));
+							makeExcel.setValue(6, colInt, hundredMillion(iaiiIntTotal), "0.0000");
 
 							// ZZ為最後一筆 同合計印出
 							balTotal = balTotal.add(balSum);
@@ -346,6 +347,18 @@ public class LQ007Report extends MakeReport {
 		}
 
 		makeExcel.close();
+
+	}
+
+	private Double hundredMillion(BigDecimal val) {
+
+		
+		
+		BigDecimal hundredMillion = new BigDecimal("100000000");
+
+		Double resultVal = val.divide(hundredMillion).setScale(4, RoundingMode.HALF_UP).doubleValue();
+
+		return resultVal;
 
 	}
 

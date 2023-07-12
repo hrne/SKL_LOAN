@@ -648,13 +648,7 @@ public class L9705Report extends MakeReport {
 		printCm(4, 28, payIntAcct);
 		printCm(14, 28, payPriAcct);
 
-		String repayKindCode = "";
-
-		if ("4".equals(conditionCode)) {
-			repayKindCode = r.get(c).get("RepayKindCode");
-		}
-
-		if ("1".equals(repayKindCode) && ("A3".equals(reconcode) || "L4702".equals(titaVo.getTxCode()))) {
+		if ("A3".equals(reconcode) && "L4702".equals(titaVo.getTxCode())) {
 			String EntryDate = r.get(c).get("EntryDate"); // 入帳日期
 			BigDecimal RepayAmt = parse.stringToBigDecimal(r.get(c).get("RepayAmt"));
 

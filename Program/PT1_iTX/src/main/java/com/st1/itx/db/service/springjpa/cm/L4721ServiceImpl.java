@@ -510,14 +510,9 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String sql = " ";
 
-		sql += "   with \"Main\" as (";
+		sql += "   with \"MainByCustNo\" as (";
 		sql += "      SELECT MAX(T.\"CustNo\")                                 AS \"CustNo\"";
-
-		if (isSameSpecificDd) {
-			sql += "           , 0 AS \"FacmNo\"";
-		} else {
-			sql += "           , T.\"FacmNo\" AS \"FacmNo\"";
-		}
+		sql += "           , 0 AS \"FacmNo\"";
 		sql += "            , MAX(T.\"EntryDate\")                              AS \"EntryDate\"";
 		sql += "            , MAX( case when T.\"IntStartDate\" = 0 then  99991231";
 		sql += "            else  T.\"IntStartDate\"  end ) AS \"IntStartDate\"";
@@ -552,15 +547,50 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             AND";
 		sql += "             T.\"EntryDate\" <= " + eEntryDate;
 		sql += "       GROUP BY  ";
-		if (!isSameSpecificDd) {
-			sql += "           T.\"FacmNo\" ,";
-		}
 		sql += "      	 T.\"EntryDate\"";
-
+		sql += "   ), \"MainByFacmNo\" as (";
+		sql += "      SELECT MAX(T.\"CustNo\")                                 AS \"CustNo\"";
+		sql += "            , T.\"FacmNo\" AS \"FacmNo\"";
+		sql += "            , MAX(T.\"EntryDate\")                              AS \"EntryDate\"";
+		sql += "            , MAX( case when T.\"IntStartDate\" = 0 then  99991231";
+		sql += "            else  T.\"IntStartDate\"  end ) AS \"IntStartDate\"";
+		sql += "                     , MIN( case when T.\"IntEndDate\" = 0 then  99991231";
+		sql += "            else  T.\"IntEndDate\"  end ) AS \"IntEndDate\"";
+		sql += "            , MAX(T.\"Rate\")                                   AS \"Rate\"";
+		sql += "            , SUM(T.\"Interest\")                               AS \"Interest\"";
+		sql += "            , SUM(T.\"DelayInt\")                               AS \"DelayInt\"";
+		sql += "            , SUM(T.\"BreachAmt\" + T.\"CloseBreachAmt\")         AS \"BreachAmt\"";
+		sql += "            , SUM(T.\"Principal\")                              AS \"Principal\"";
+		sql += "            , MIN(T.\"RepayCode\")                              AS \"RepayCode\"";
+		sql += "            , SUM(T.\"TxAmt\")                                  AS \"TxAmt\"";
+		sql += "            , SUM(Nvl(";
+		sql += "           JSON_VALUE(T.\"OtherFields\", '$.AcctFee'), 0";
+		sql += "       )) AS Fee1";
+		sql += "            , SUM(Nvl(";
+		sql += "           JSON_VALUE(T.\"OtherFields\", '$.ModifyFee'), 0";
+		sql += "       )) AS Fee2";
+		sql += "            , SUM(Nvl(";
+		sql += "           JSON_VALUE(T.\"OtherFields\", '$.FireFee'), 0";
+		sql += "       )) AS Fee3";
+		sql += "            , SUM(Nvl(";
+		sql += "           JSON_VALUE(T.\"OtherFields\", '$.LawFee'), 0";
+		sql += "       )) AS Fee4";
+		sql += "       FROM \"LoanBorTx\" T";
+		sql += "       WHERE T.\"CustNo\" = " + custNo;
+		sql += "             AND";
+		sql += "             T.\"TitaHCode\" = 0";
+		sql += "           ";
+		sql += "             AND";
+		sql += "             T.\"EntryDate\" >= " + sEntryDate;
+		sql += "             AND";
+		sql += "             T.\"EntryDate\" <= " + eEntryDate;
+		sql += "       GROUP BY  ";
+		sql += "           T.\"FacmNo\" ,";
+		sql += "      	 T.\"EntryDate\"";
 		sql += "   ),\"tmpMain\" as (";
 		sql += "   select ";
 		sql += "    distinct \"CustNo\",\"FacmNo\"";
-		sql += "   from \"Main\" where \"FacmNo\" > 0";
+		sql += "   from \"MainByFacmNo\"";
 		sql += "   )";
 		sql += "   ";
 
@@ -582,7 +612,11 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "                 , X.\"Interest\"";
 			sql += "                 , X.\"BreachAmt\" + \"DelayInt\"                         AS \"BreachAmt\"";
 			sql += "                 , X.\"FEE1\" + X.\"FEE2\" + X.\"FEE3\" + X.\"FEE4\"          AS \"OtherFee\"";
-			sql += "   FROM  \"Main\" X";
+			if (isSameSpecificDd) {
+				sql += "   FROM  \"MainByCustNo\" X";
+			} else {
+				sql += "   FROM  \"MainByFacmNo\" X";
+			}
 			sql += "   LEFT JOIN \"CdCode\"      Cd ON Cd.\"DefCode\" = 'RepayCode'";
 			sql += "                            AND";
 			sql += "                            Cd.\"Code\" = X.\"RepayCode\"";
@@ -670,6 +704,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "   LEFT JOIN \"ClBuilding\"  Cb ON Cb.\"ClCode1\" = F.\"ClCode1\"";
 			sql += "                                AND Cb.\"ClCode2\" = F.\"ClCode2\"";
 			sql += "                                AND Cb.\"ClNo\" = F.\"ClNo\"";
+			sql += "   WHERE R.\"EffectDate\" > 0 ";
 			sql += "   ORDER BY X.\"FacmNo\" ";
 
 		}

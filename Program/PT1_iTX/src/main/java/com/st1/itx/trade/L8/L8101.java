@@ -82,9 +82,9 @@ public class L8101 extends TradeBuffer {
 	@Autowired
 	CustNoticeCom custNoticeCom;
 	@Autowired
-	MakeFile makeFileText;
+	private MakeFile makeFileText;
 	@Autowired
-	MakeFile makeFileMail;
+	private MakeFile makeFileMail;
 	private int wkCalDy = 0;
 
 	@Autowired
@@ -153,6 +153,9 @@ public class L8101 extends TradeBuffer {
 
 			// must
 			txToDoCom.setTxBuffer(this.getTxBuffer());
+			String dataLines = txToDoCom.getProcessNoteForText(custMobile,
+					"房貸客戶提醒：為維護您的權益，戶籍或通訊地址、電子信箱及連絡電話，或姓名、身分證統一編號等重要資訊有異動時，敬請洽詢公司服務人員或客戶服務部（０８００—０３１１１５）辦理變更。",
+					wkCalDy);
 
 			TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 			tTxToDoDetail.setCustNo(custMain.getCustNo());
@@ -161,14 +164,10 @@ public class L8101 extends TradeBuffer {
 			tTxToDoDetail.setDtlValue("<AML定審簡訊通知>");
 			tTxToDoDetail.setItemCode("TEXT00");
 			tTxToDoDetail.setStatus(0);
-			tTxToDoDetail.setProcessNote(txToDoCom.getProcessNoteForText(custMobile,
-					"房貸客戶提醒：為維護您的權益，戶籍或通訊地址、電子信箱及連絡電話，或姓名、身分證統一編號等重要資訊有異動時，敬請洽詢公司服務人員或客戶服務部（０８００—０３１１１５）辦理變更。",
-					wkCalDy));
+			tTxToDoDetail.setProcessNote(dataLines);
 
-			makeFileText.put(parse.IntegerToString(custMain.getCustNo(), 7) + "-" + parse.IntegerToString(0, 3)
-					+ txToDoCom.getProcessNoteForText(custMobile,
-							"房貸客戶提醒：為維護您的權益，戶籍或通訊地址、電子信箱及連絡電話，或姓名、身分證統一編號等重要資訊有異動時，敬請洽詢公司服務人員或客戶服務部（０８００—０３１１１５）辦理變更。",
-							wkCalDy));
+			makeFileText.put(
+					parse.IntegerToString(custMain.getCustNo(), 7) + "-" + parse.IntegerToString(0, 3) + dataLines);
 			txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo);
 
 		}
@@ -293,7 +292,7 @@ public class L8101 extends TradeBuffer {
 			l9705Report.setParentTranCode(titaVo.getTxcd());
 			List<Map<String, String>> l9705List = null;
 			try {
-				l9705List = l9705ServiceImpl.findAll(titaVo, "");
+				l9705List = l9705ServiceImpl.findAll(titaVo);
 			} catch (Exception e) {
 				StringWriter errors = new StringWriter();
 				e.printStackTrace(new PrintWriter(errors));
@@ -302,6 +301,8 @@ public class L8101 extends TradeBuffer {
 			pdfSno = l9705Report.exec(l9705List, titaVo, this.getTxBuffer());
 
 		}
+		makeFileText.close();
+		makeFileMail.close();
 
 		this.totaVo.putParam("CustAddr", custAddr);
 		this.totaVo.putParam("CustName", custName);

@@ -185,7 +185,7 @@ public class L4721Report2 extends TradeBuffer {
 				throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
 			}
 
-			if (rDetail != null && !rDetail.isEmpty()) {
+			if (rDetail != null && !rDetail.isEmpty() && rTxffectDetail != null && rTxffectDetail.isEmpty()) {
 
 				String line = "";
 

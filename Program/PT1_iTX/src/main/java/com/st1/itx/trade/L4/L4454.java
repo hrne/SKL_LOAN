@@ -42,21 +42,6 @@ import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * FunctionCode=9,1<br>
- * CustNo=9,7<br>
- * FacmNo=9,3<br>
- * CHKBXA=X,1<br>
- * CHKBXB=X,1<br>
- * CHKBXC=X,1<br>
- * CHKBXD=X,1<br>
- * CHKBXE=X,1<br>
- * CHKBXF=X,1<br>
- * CHKBXG=X,1<br>
- * END=X,1<br>
- */
-
 @Service("L4454")
 @Scope("prototype")
 /**
@@ -117,9 +102,9 @@ public class L4454 extends TradeBuffer {
 	@Autowired
 	L9705Form l9705Form;
 	@Autowired
-	MakeFile makeFileText;
+	private MakeFile makeFileText;
 	@Autowired
-	MakeFile makeFileMail;
+	private MakeFile makeFileMail;
 
 	private int reportACnt = 0;
 	private HashMap<Integer, Integer> custLoanFlag = new HashMap<>();
@@ -268,6 +253,9 @@ public class L4454 extends TradeBuffer {
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "", "", msg, titaVo);
 			}
 		}
+
+		makeFileText.close();
+		makeFileMail.close();
 		this.totaVo.putParam("ReportACnt", reportACnt);
 		this.addList(this.totaVo);
 		return this.sendList();

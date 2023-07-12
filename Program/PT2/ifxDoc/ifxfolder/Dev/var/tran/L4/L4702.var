@@ -19,7 +19,7 @@ E(0,0)
 [
 ["[L4702]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@產生放款本息攤還表暨繳息通知單"],
 [#<->#,"#FdFunctionCodeX+功能",#FunctionCode,#FunctionCodeX],
-[#<->#,"#FdACCTDATE_ST+會計日期",#ACCTDATE_ST,"～",#ACCTDATE_ED,"止有變動者"],
+[#<->#,"#FdACCTDATE_ST+會計日期",#ACCTDATE_ST,"～",#ACCTDATE_ED,#Text],
 [#<->#,"#FdCUSTNO+戶號",#CUSTNO,#BTNA,"～",#CUSTNOB,#BTNB],
 [#<->#,"#FdCONDITION1+選擇條件一",#CONDITION1,#CONDITION1X],
 [#<->#,"#FdCONDITION2+選擇條件二",#CONDITION2,#CONDITION2X],
@@ -124,6 +124,11 @@ C(3,#FunctionCode,2,INVOKEJS(SHOW,L4702,9,9,0),$)
 T(3,)T(H,#FunctionCode,#FunctionHelp)
 !SWITCH(#FunctionCode,1,T(2,個別列印),
 !                   2,T(2,整批列印))
+
+#Text=x,60,L
+C(3,#FunctionCode,2,T(2,95103（A3）部分還本),T(2,止有變動者))
+
+
 
 #ColDisplay=A,1,S
 C(3,#CHAIN,0,

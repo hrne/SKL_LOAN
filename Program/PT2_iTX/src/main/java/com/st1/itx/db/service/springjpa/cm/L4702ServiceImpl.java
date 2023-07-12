@@ -41,57 +41,72 @@ public class L4702ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		this.info("L4702.findAll");
 
-		int entDy = parse.stringToInteger(titaVo.get("ACCTDATE_ED")) + 19110000;
-		this.info("entDy = " + entDy);
-		// 本日匯款轉帳且有逾期未繳
-		String sql = " select                                            ";
-		sql += "  l.\"CustNo\"                          AS \"CustNo\"    ";
-		sql += " ,NVL(l.\"FacmNo\", x.\"FacmNo\")       AS \"FacmNo\"    ";
+		int acDate = parse.stringToInteger(titaVo.get("ACCTDATE_ED")) + 19110000;
+		this.info("acDate = " + acDate);
+		// 本日有匯款轉帳A3且部份還本
+		String sql = "";
+		sql += " WITH BATX AS (                             ";
+		sql += "  SELECT                                    ";
+		sql += "    \"AcDate\"                              ";
+		sql += "   ,\"CustNo\"		                        ";
+		sql += "   ,\"ReconCode\"                           ";
+		sql += "   ,MAX(\"EntryDate\")   AS \"EntryDate\"   ";
+		sql += "   ,SUM(\"RepayAmt\")    AS \"RepayAmt\"    ";
+		sql += "  FROM \"BatxDetail\"                       ";
+		sql += " where \"AcDate\" = :acDate                 ";
+		sql += "   and \"ReconCode\" in ('A3')              ";
+		sql += "   and \"ProcStsCode\" in ('5','6','7')     ";
+		sql += " group by \"AcDate\", \"CustNo\", \"ReconCode\" ";
+		sql += " )                       ";
+		sql += " , LNTX AS (                             ";
+		sql += "  SELECT                                    ";
+		sql += "    \"AcDate\"                              ";
+		sql += "   ,\"CustNo\"		                        ";
+		sql += "   ,\"FacmNo\"		                        ";
+		sql += "   ,MAX(\"EntryDate\")   AS \"EntryDate\"   ";
+		sql += "   ,SUM(\"ExtraRepay\")  AS \"ExtraRepay\"  ";
+		sql += "  FROM \"LoanBorTx\"                        ";
+		sql += " where \"AcDate\" = :acDate                 ";
+		sql += "   and \"TitaTxCd\" in ('L3200')            ";
+		sql += "   and \"TitaHCode\" = '0'                  ";
+		sql += "   and \"ExtraRepay\" > 0                   ";
+		sql += " group by \"AcDate\", \"CustNo\", \"FacmNo\" ";
+		sql += " )                       ";
+		sql += " select                                            ";
+		sql += "  x.\"CustNo\"                          AS \"CustNo\"    ";
+		sql += " ,x.\"FacmNo\"                          AS \"FacmNo\"    ";
 		sql += " ,c.\"CustName\"                        AS \"CustName\"  ";
-		sql += " ,d.\"RepayCode\"                       AS \"RepayCode\" ";
+		sql += " ,f.\"RepayCode\"                       AS \"RepayCode\" ";
 		sql += " ,c.\"EntCode\"                         AS \"EntCode\"   ";
 		sql += " ,d.\"EntryDate\"                       AS \"EntryDate\" ";
-		sql += " ,NVL(x.\"TxAmt\",0)                    AS \"RepayAmt\"  ";
-		sql += " ,d.\"ReconCode\"                       AS \"ReconCode\"  ";
-		sql += " ,JSON_VALUE(x.\"OtherFields\",'$.RepayKindCode') AS \"RepayKindCode\" ";
-		sql += " from \"BatxDetail\" d                                   ";
+		sql += " ,d.\"RepayAmt\"                        AS \"RepayAmt\"  ";
+		sql += " ,d.\"ReconCode\"                       AS \"ReconCode\" ";
+		sql += " from BATX d                                             ";
+		sql += " left join LNTX x on x.\"AcDate\" = d.\"AcDate\" ";
+		sql += "                 and x.\"EntryDate\" = d.\"EntryDate\"   ";
+		sql += "                 and x.\"CustNo\" = d.\"CustNo\" ";
 		sql += " left join \"CustMain\" c on c.\"CustNo\" = d.\"CustNo\" ";
-		sql += " left join \"LoanBorTx\" x on x.\"AcDate\" = d.\"AcDate\"        ";
-		sql += "                          and x.\"TitaTlrNo\" = d.\"TitaTlrNo\"  ";
-		sql += "                          and x.\"TitaTxtNo\"= d.\"TitaTxtNo\"   ";
-//		sql += "                          and x.\"TxAmt\"= d.\"RepayAmt\"        ";
-		sql += "                          and x.\"Displayflag\"= 'F'        ";
-		sql += " left join (                                             ";
-		sql += "     select                                              ";
-		sql += "       \"CustNo\"                                        ";
-		sql += "      ,\"FacmNo\"                                        ";
-		sql += "      ,min(\"NextPayIntDate\") as  \"NextPayIntDate\"    ";
-		sql += "      from \"LoanBorMain\"                               ";
-		sql += "      where \"Status\" = 0                               ";
-		sql += "       and \"NextPayIntDate\" <= :entDy                  ";
-		sql += "      group by \"CustNo\", \"FacmNo\"                    ";
-		sql += " ) l   on l.\"CustNo\" = d.\"CustNo\"                    ";
-		sql += "      and l.\"NextPayIntDate\" <= d.\"EntryDate\"        "; // 有逾期
-		sql += " left join \"CustNotice\" n                              "; //客戶通知設定檔
-		sql += "        on \"FormNo\" = 'L4702'                          ";
-		sql += "       and n.\"CustNo\" = l.\"CustNo\"                   ";
-		sql += "       and n.\"FacmNo\" = l.\"FacmNo\"                   ";  
-		sql += " where d.\"RepayCode\" = 1                               "; // 01.匯款轉帳
-		sql += "   and d.\"ProcStsCode\" <> 'D'                          ";
-		sql += "   and d.\"RepayType\" = 1                               ";
-		sql += "   and d.\"CustNo\" <> 0                                 ";
-		sql += "   and d.\"AcDate\" = :entDy                             ";
-		sql += "   and l.\"CustNo\" is not null                          "; // 有逾期
-		sql += "   and (l.\"NextPayIntDate\" <= d.\"EntryDate\" or x.\"FacmNo\" is not null) ";
+		sql += " left join \"FacMain\" f on f.\"CustNo\" = x.\"CustNo\"  ";
+		sql += "                        and f.\"FacmNo\" = x.\"FacmNo\"  ";  
+     	sql += " left join \"CustNotice\" n                              "; //客戶通知設定檔 By 額度
+		sql += "        on n.\"FormNo\" = 'L4702'                        ";
+		sql += "       and n.\"CustNo\" = x.\"CustNo\"                   ";
+		sql += "       and n.\"FacmNo\" = x.\"FacmNo\"                   ";  
+		sql += " left join \"CustNotice\" n0                             "; //客戶通知設定檔 by 戶號
+		sql += "        on n0.\"FormNo\" = 'L4702'                       ";
+		sql += "       and n0.\"CustNo\" = x.\"CustNo\"                  ";
+		sql += "       and n0.\"FacmNo\" = 0                             ";  
+		sql += " where x.\"CustNo\" is not null                          "; 
 		sql += "   and nvl(n.\"PaperNotice\",'Y') = 'Y'                  "; // 發送
-		sql += " order by l.\"CustNo\", NVL(l.\"FacmNo\", x.\"FacmNo\")  ";
+		sql += "   and nvl(n0.\"PaperNotice\",'Y') = 'Y'                 "; // 發送
+		sql += " order by x.\"CustNo\", x.\"FacmNo\"                     ";
 
 		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
-		query.setParameter("entDy", entDy);
+		query.setParameter("acDate", acDate);
 		return this.convertToMap(query);
 	}
 
