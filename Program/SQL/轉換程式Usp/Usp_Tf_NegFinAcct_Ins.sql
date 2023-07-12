@@ -35,6 +35,7 @@ BEGIN
       , "RemitAcct2" -- 匯款帳號 VARCHAR2 16 0
       , "RemitAcct3" -- 匯款帳號 VARCHAR2 16 0
       , "RemitAcct4" -- 匯款帳號 VARCHAR2 16 0
+      , "Enable"
     )
     SELECT JCIC.CREDIT_CODE               AS "FinCode" -- 債權機構代號 VARCHAR2 8 0
           ,JCIC.CREDIT_NAME               AS "FinItem" -- 債權機構名稱 NVARCHAR2 60 0
@@ -48,6 +49,7 @@ BEGIN
           ,R2.REMITACCT2                  AS "RemitAcct2" -- 匯款帳號 VARCHAR2 16 0
           ,TRIM(R3.REMITACCT3)            AS "RemitAcct3" -- 匯款帳號 VARCHAR2 16 0
           ,R4.REMITACCT4                  AS "RemitAcct4" -- 匯款帳號 VARCHAR2 16 0
+          ,'Y'                            AS "Enable"
     FROM REMIN_TBJCICACCOUNTDATA JCIC
     LEFT JOIN REMIT_ACCT_2 R2 ON R2.FINCODE = JCIC.CREDIT_CODE
     LEFT JOIN REMIT_ACCT_3 R3 ON R3.FINCODE = JCIC.CREDIT_CODE

@@ -1,5 +1,7 @@
 package com.st1.itx.trade.L8;
 
+import java.util.ArrayList;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -9,36 +11,39 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.TbJcicMu01;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.TbJcicMu01Service;
+import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.db.domain.SystemParas;
 import com.st1.itx.db.service.SystemParasService;
 
-
 @Component("L8351File")
 @Scope("prototype")
+public class L8351File extends TradeBuffer {
 
-public class L8351File extends MakeFile {
+	@Autowired
+	private MakeFile makeFile;
 
 	/* DB服務注入 */
 	@Autowired
-	public CdEmpService sCdEmpService;
+	private CdEmpService sCdEmpService;
 
 	@Autowired
-	DateUtil dDateUtil;
+	private DateUtil dDateUtil;
 
 	@Autowired
-	public TbJcicMu01Service iTbJcicMu01Service;
+	private TbJcicMu01Service iTbJcicMu01Service;
 
 	@Autowired
-	public SystemParasService sSystemParasService;
+	private SystemParasService sSystemParasService;
 
-	public void exec(TitaVo titaVo) throws LogicException {
+	public long exec(TitaVo titaVo) throws LogicException {
 
 		String iSubmitKey = titaVo.getParam("SubmitKey");
 		String iTxtDate = titaVo.getParam("TxtDate");
@@ -67,17 +72,17 @@ public class L8351File extends MakeFile {
 		}
 
 		// 檔名
-		//String filename = iSubmitKey + iTxtDate.substring(3) + iTxtCount + ".MU1";
-		String filename = iSubmitKey + iTxtDate.substring(3,7) + ".MU1";
-		this.open(titaVo, date, brno, filecode, fileitem, filename, 2);
+		// String filename = iSubmitKey + iTxtDate.substring(3) + iTxtCount + ".MU1";
+		String filename = iSubmitKey + iTxtDate.substring(3, 7) + ".MU1";
+		makeFile.open(titaVo, date, brno, filecode, fileitem, filename, 2);
 		// 用String.format()
 		Slice<TbJcicMu01> iTbJcicMu01 = iTbJcicMu01Service.findAll(0, Integer.MAX_VALUE, titaVo);
 
 		// 第一行
-		String iContactX = FormatUtil.padX(jcicMU1Dep+"聯絡人-"+jcicMU1Name, 80);
+		String iContactX = FormatUtil.padX(jcicMU1Dep + "聯絡人-" + jcicMU1Name, 80);
 //		String iFirstLine = String.format("JCIC-DAT-MU01-V%s-%s     %s01          02-23895858#7076"+iContactX, iTxtCount, iSubmitKey, iTxtDate, iTxtCount);
-		String iFirstLine = "JCIC-DAT-MU01-V01-458     " + iTxtDate + "01          "+jcicMU1Tel + iContactX;
-		this.put(iFirstLine);
+		String iFirstLine = "JCIC-DAT-MU01-V01-458     " + iTxtDate + "01          " + jcicMU1Tel + iContactX;
+		makeFile.put(iFirstLine);
 
 		if (iTbJcicMu01 == null) {
 			throw new LogicException(titaVo, "E0001", ""); // 資料新建錯誤
@@ -153,7 +158,7 @@ public class L8351File extends MakeFile {
 					iOther = FormatUtil.padX(iOther, 1);
 					iAuthMgrIdSX = FormatUtil.padX(iAuthMgrIdSX, 40);
 					iAuthMgrIdS = FormatUtil.padX(iAuthMgrIdS, 8);
-					iAuthMgrIdEX = FormatUtil.padX(iAuthMgrIdEX, 20); //2022.2.18 by eric 40 > 20
+					iAuthMgrIdEX = FormatUtil.padX(iAuthMgrIdEX, 20); // 2022.2.18 by eric 40 > 20
 					iAuthMgrIdE = FormatUtil.padX(iAuthMgrIdE, 8);
 					String iEmailAccount = FormatUtil.padX(aTbJcicMu01.getEmailAccount(), 50);
 					String iContent = " " + iHeadOfficeCode + iBranchCode + StringUtils.rightPad(sDataDate, 7, " ")
@@ -162,7 +167,7 @@ public class L8351File extends MakeFile {
 							+ StringUtils.rightPad(sAuthEndDay, 7, " ") + iAuthMgrIdEX + iAuthMgrIdE + iEmailAccount
 //							+ StringUtils.rightPad(aTbJcicMu01.getModifyUserId(), 25, " ");
 							+ "                         ";
-					this.put(iContent);
+					makeFile.put(iContent);
 					// 修改Jcic日期為今天日期
 					TbJcicMu01 bTbJcicMu01 = iTbJcicMu01Service.holdById(aTbJcicMu01.getTbJcicMu01Id(), titaVo);
 					bTbJcicMu01.setOutJcictxtDate(Integer.valueOf(titaVo.getCalDy()) + 19110000);
@@ -180,7 +185,16 @@ public class L8351File extends MakeFile {
 			String sCount = String.valueOf(iTotalCount);// update by Hedy (2021/11/3)
 //		String footText = "TRLR" + StringUtils.leftPad(sCount, 8, '0') + StringUtils.rightPad("", 129);
 			String footText = "TRLR" + StringUtils.leftPad(sCount, 8, '0');
-			this.put(footText);
+			makeFile.put(footText);
 		}
+		long fileNo = makeFile.close();
+		makeFile.toFile(fileNo, filename);
+		return fileNo;
+	}
+
+	@Override
+	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -3,6 +3,8 @@ package com.st1.itx.trade.LQ;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -16,159 +18,119 @@ import com.st1.itx.db.service.springjpa.cm.LQ005ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
-import com.st1.itx.util.format.FormatUtil;
+import com.st1.itx.util.parse.Parse;
 
 @Component
 @Scope("prototype")
+
 public class LQ005Report extends MakeReport {
 
 	@Autowired
-	LQ005ServiceImpl lQ005ServiceImpl;
+	public LQ005ServiceImpl lQ005ServiceImpl;
+
+	@Autowired
+	Parse parse;
 
 	@Autowired
 	MakeExcel makeExcel;
-
-	BigDecimal highestLoanBalTotal = BigDecimal.ZERO;
-	BigDecimal loanBalTotal = BigDecimal.ZERO;
-
+	
 	public void exec(TitaVo titaVo) throws LogicException {
-
-		int entDy = titaVo.getEntDyI();
-
-		entDy = entDy + 19110000;
-
-		int nowYearMonth = entDy / 100;
-
-		int inputYearMonthStart = 0;
-		int inputYearMonthEnd = 0;
-
-		int nowYear = nowYearMonth / 100;
-		int nowMonth = nowYearMonth % 100;
-
-		this.info("entDy = " + entDy);
-		this.info("nowYearMonth = " + nowYearMonth);
-		this.info("nowYear = " + nowYear);
-		this.info("nowMonth = " + nowMonth);
-
-		if (nowMonth >= 1 && nowMonth <= 3) {
-			inputYearMonthStart = nowYear * 100 + 1;
-			inputYearMonthEnd = nowYear * 100 + 3;
-		} else if (nowMonth >= 4 && nowMonth <= 6) {
-			inputYearMonthStart = nowYear * 100 + 4;
-			inputYearMonthEnd = nowYear * 100 + 6;
-		} else if (nowMonth >= 7 && nowMonth <= 9) {
-			inputYearMonthStart = nowYear * 100 + 7;
-			inputYearMonthEnd = nowYear * 100 + 9;
-		} else if (nowMonth >= 10 && nowMonth <= 12) {
-			inputYearMonthStart = nowYear * 100 + 10;
-			inputYearMonthEnd = nowYear * 100 + 12;
-		} else {
-			this.error("nowMonth out of range (01~12).");
-		}
-
-		List<Map<String, String>> listLQ005 = null;
-
-		try {
-			listLQ005 = lQ005ServiceImpl.findAll(inputYearMonthStart, inputYearMonthEnd, titaVo);
-		} catch (Exception e) {
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.error("LQ005ServiceImpl.testExcel error = " + errors.toString());
-		}
-		exportExcel(listLQ005, titaVo);
-	}
-
-	private void exportExcel(List<Map<String, String>> listLQ005, TitaVo titaVo) throws LogicException {
-		this.info("exportExcel ... ");
 
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "LQ005";
-		String fileItem = "表A18_會計部申報表";
-		String fileName = "LQ005表A18_會計部申報表";
-		String defaultExcel = "表A18_會計部申報表.xlsx";
-		String defaultSheet = "108.03.31";
+		String fileItem = "表18-金融控股公司及其利害關係人交易分析表";
+		String fileName = "LQ005-表18-金融控股公司及其利害關係人交易分析表";
+		String defaultExcel = "LQ005_底稿_表18.xlsx";
+		String defaultSheet = "YYY.MM.DD";
+
+		int entdy = (parse.stringToInteger(titaVo.getParam("ENTDY")) + 19110000);
+
+		int yymm = entdy / 100;
 
 		this.info("reportVo open");
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
 				.setRptItem(fileItem).build();
+		
 		// 開啟報表
 		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
-		
-//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LQ005", "表A18_會計部申報表", "LQ005表A18_會計部申報表", "表A18_會計部申報表.xlsx", "108.03.31");
 
-		makeExcel.setSheet("108.03.31", this.showRocDate(titaVo.getEntDyI(), 6));
+		List<Map<String, String>> lq005List = new ArrayList<Map<String, String>>();
 
-		makeExcel.setValue(2, 1, "民國" + this.showRocDate(titaVo.getEntDyI(), 0));
+		try {
+			
+			lq005List = lQ005ServiceImpl.findAll(yymm, titaVo);
 
-		int rowCursor = 8;
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.info("lQ005ServiceImpl.findAll error = " + errors.toString());
+		}
 
-		highestLoanBalTotal = BigDecimal.ZERO;
-		loanBalTotal = BigDecimal.ZERO;
+		makeExcel.setSheet("YYY.MM.DD", this.showRocDate(yymm, 6));
+		int rocYMD = entdy - 19110000;
+		int rocY = rocYMD / 10000;
+		String rocM = String.format(rocYMD / 100 % 100 + "", "%0d");
+		String rocD = String.format(rocYMD % 100 + "", "%0d");
 
-		if (listLQ005 != null && listLQ005.size() > 0) {
-			setDetail(rowCursor, listLQ005);
+		makeExcel.setValue(2, 1, "民國 " + rocY + " 年 " + rocM + " 月 " + rocD + " 日 ", "C");
+
+		if (lq005List != null && !lq005List.isEmpty()) {
+
+			// ex:size = 10,從第9列開始往下插入9列(10-1)
+			makeExcel.setShiftRow(9, lq005List.size() - 1);
+
+			int cnt = 0;// 筆數
+			int row = 7;// 列數
+			BigDecimal million = new BigDecimal("1000000");
+			for (Map<String, String> r : lq005List) {
+				cnt++;
+				row++;
+				// 交易序號
+				makeExcel.setValue(row, 1, String.format(cnt + "", "%03d"), "C");
+				// 交易對象別代號
+				makeExcel.setValue(row, 2, "02", "C");
+				// 提供者 交易對象名稱(代號)
+				makeExcel.setValue(row, 3, "03458902", "C");
+				makeExcel.setValue(row, 4, "新光人壽", "C");
+
+				// 收受者 交易對象名稱(代號)
+				makeExcel.setValue(row, 5, "B", "C");
+				makeExcel.setValue(row, 6, r.get("ID"), "C");
+				makeExcel.setValue(row, 7, r.get("Name"), "C");
+
+				// 交易性質
+				makeExcel.setValue(row, 8, "放款 02", "C");
+
+				// 當季最高餘額或本年累積交易總額
+				makeExcel.setValue(row, 9,
+						this.getBigDecimal(r.get("MaxLoanBal")).divide(million).setScale(2, RoundingMode.HALF_UP),
+						"#,##0.00", "R");
+
+				// 季底交易帳列餘額
+				makeExcel.setValue(row, 10,
+						this.getBigDecimal(r.get("LoanBal")).divide(million).setScale(2, RoundingMode.HALF_UP),
+						"#,##0.00", "R");
+
+			}
+
+			// 最後一筆的行數
+			int endRow = row;
+			row = row + 2;
+			// 設定公式
+			makeExcel.setFormula(row, 9, BigDecimal.ZERO, "SUM(I8:I" + endRow + ")", "#,##0.00");
+			makeExcel.setFormula(row, 10, BigDecimal.ZERO, "SUM(J8:J" + endRow + ")", "#,##0.00");
+			// 重整公式
+			makeExcel.formulaCaculate(row, 9);
+			makeExcel.formulaCaculate(row, 10);
+
 		} else {
-			makeExcel.setValue(rowCursor, 1, "本日無資料", "L");
-			rowCursor++;
+			makeExcel.setValue(8, 1, "本日無資料");
 		}
 
-		// 印合計
-		makeExcel.setValue(rowCursor, 9, formatMillion(highestLoanBalTotal));
-		makeExcel.setValue(rowCursor, 10, formatMillion(loanBalTotal));
+		makeExcel.close();
 
-		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
-	}
-
-	private int setDetail(int rowCursor, List<Map<String, String>> list) throws LogicException {
-
-		if (list.size() > 1) {
-			// 將表格往下移，移出空間
-			makeExcel.setShiftRow(rowCursor + 1, list.size() - 1);
-		}
-
-		int seq = 1;
-
-		for (Map<String, String> tLQ005 : list) {
-
-			String outputSeq = FormatUtil.pad9("" + seq, 4);
-			makeExcel.setValue(rowCursor, 1, outputSeq); // 交易序號
-
-			makeExcel.setValue(rowCursor, 2, "02"); // 交易對象別代號
-			makeExcel.setValue(rowCursor, 3, "03458902"); // 交易對象名稱-統編
-			makeExcel.setValue(rowCursor, 4, "新光人壽"); // 交易對象名稱-姓名
-			makeExcel.setValue(rowCursor, 5, "B"); // 交易對象別代號
-
-			String custId = tLQ005.get("F0"); // F0 資金或信用收受者-統編
-			makeExcel.setValue(rowCursor, 6, custId);
-
-			String custName = tLQ005.get("F1"); // F1 資金或信用收受者-姓名
-			makeExcel.setValue(rowCursor, 7, custName);
-
-			makeExcel.setValue(rowCursor, 8, "放款02"); // 交易性質
-
-			BigDecimal highestLoanBal = getBigDecimal(tLQ005.get("F2")); // F2 當季最高餘額
-			makeExcel.setValue(rowCursor, 9, formatMillion(highestLoanBal));
-
-			BigDecimal loanBal = getBigDecimal(tLQ005.get("F3")); // F3 季底交易帳列餘額
-			makeExcel.setValue(rowCursor, 10, formatMillion(loanBal));
-
-			highestLoanBalTotal = highestLoanBalTotal.add(highestLoanBal);
-			loanBalTotal = loanBalTotal.add(loanBal);
-
-			seq++;
-			rowCursor++;
-		}
-
-		return rowCursor;
-	}
-
-	private BigDecimal million = getBigDecimal("1000000");
-
-	private BigDecimal formatMillion(BigDecimal amt) {
-		return this.computeDivide(amt, million, 2);
 	}
 
 }

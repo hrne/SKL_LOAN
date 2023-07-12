@@ -277,6 +277,25 @@ public class L2419 extends TradeBuffer {
 			if (custMain == null) {
 				throw new LogicException("E0001", "客戶統編 = " + custId);
 			}
+		} else if (functionCode == 2) {
+			// 2023-07-12 Wei 若使用功能2時,需檢查檔案名稱是否包含系統產生的批次號碼,且須存在於擔保品整批匯入檔
+			String groupNoOnExcelFileName = "";
+
+			if (fileName.indexOf("_") >= 0) {
+				groupNoOnExcelFileName = fileName.substring(fileName.indexOf("_") + 1, fileName.indexOf("."));
+			} else {
+				throw new LogicException("E0015", "上傳的回饋檔檔名未含有系統產生的批次號碼,請使用L2419功能1所產生的回饋檔.");
+			}
+
+			this.info("groupNoOnExcelFileName=" + groupNoOnExcelFileName);
+
+			Slice<ClBatch> sliceClBatch = sClBatchService.findGroupNo(groupNoOnExcelFileName, 0, Integer.MAX_VALUE,
+					titaVo);
+
+			if (sliceClBatch == null || sliceClBatch.isEmpty()) {
+				throw new LogicException("E0015",
+						"上傳回饋檔的批次號碼(" + groupNoOnExcelFileName + ")在擔保品整批匯入檔查無資料,請使用L2419功能1,重新產生回饋檔.");
+			}
 		}
 
 		int lastRowNum = getSheetLastRowNum(titaVo);

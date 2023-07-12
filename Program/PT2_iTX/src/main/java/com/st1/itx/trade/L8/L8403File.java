@@ -12,6 +12,7 @@ import java.util.List;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.*;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.JcicZ040LogService;
@@ -69,6 +70,7 @@ import com.st1.itx.db.service.JcicZ574Service;
 import com.st1.itx.db.service.JcicZ575LogService;
 import com.st1.itx.db.service.JcicZ575Service;
 import com.st1.itx.db.service.SystemParasService;
+import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.db.service.JcicZ440Service;
 import com.st1.itx.db.service.JcicZ442LogService;
 import com.st1.itx.db.service.JcicZ442Service;
@@ -97,165 +99,167 @@ import com.st1.itx.util.parse.Parse;
 
 @Component("L8403File")
 @Scope("prototype")
+public class L8403File extends TradeBuffer {
 
-public class L8403File extends MakeFile {
 	@Autowired
-	public DataLog iDataLog;
+	private MakeFile makeFile;
 	@Autowired
-	public CustMainService sCustMainService;
+	private DataLog iDataLog;
 	@Autowired
-	public Parse parse;
+	private CustMainService sCustMainService;
 	@Autowired
-	public SystemParasService sSystemParasService;
+	private Parse parse;
+	@Autowired
+	private SystemParasService sSystemParasService;
 	/* DB服務注入 */
 	@Autowired
-	public JcicZ040Service sJcicZ040Service;
+	private JcicZ040Service sJcicZ040Service;
 	@Autowired
-	public JcicZ040LogService sJcicZ040LogService;
+	private JcicZ040LogService sJcicZ040LogService;
 	@Autowired
-	public JcicZ041Service sJcicZ041Service;
+	private JcicZ041Service sJcicZ041Service;
 	@Autowired
-	public JcicZ041LogService sJcicZ041LogService;
+	private JcicZ041LogService sJcicZ041LogService;
 	@Autowired
-	public JcicZ042Service sJcicZ042Service;
+	private JcicZ042Service sJcicZ042Service;
 	@Autowired
-	public JcicZ042LogService sJcicZ042LogService;
+	private JcicZ042LogService sJcicZ042LogService;
 	@Autowired
-	public JcicZ043Service sJcicZ043Service;
+	private JcicZ043Service sJcicZ043Service;
 	@Autowired
-	public JcicZ043LogService sJcicZ043LogService;
+	private JcicZ043LogService sJcicZ043LogService;
 	@Autowired
-	public JcicZ044Service sJcicZ044Service;
+	private JcicZ044Service sJcicZ044Service;
 	@Autowired
-	public JcicZ044LogService sJcicZ044LogService;
+	private JcicZ044LogService sJcicZ044LogService;
 	@Autowired
-	public JcicZ045Service sJcicZ045Service;
+	private JcicZ045Service sJcicZ045Service;
 	@Autowired
-	public JcicZ045LogService sJcicZ045LogService;
+	private JcicZ045LogService sJcicZ045LogService;
 	@Autowired
-	public JcicZ046Service sJcicZ046Service;
+	private JcicZ046Service sJcicZ046Service;
 	@Autowired
-	public JcicZ046LogService sJcicZ046LogService;
+	private JcicZ046LogService sJcicZ046LogService;
 	@Autowired
-	public JcicZ047Service sJcicZ047Service;
+	private JcicZ047Service sJcicZ047Service;
 	@Autowired
-	public JcicZ047LogService sJcicZ047LogService;
+	private JcicZ047LogService sJcicZ047LogService;
 	@Autowired
-	public JcicZ048Service sJcicZ048Service;
+	private JcicZ048Service sJcicZ048Service;
 	@Autowired
-	public JcicZ048LogService sJcicZ048LogService;
+	private JcicZ048LogService sJcicZ048LogService;
 	@Autowired
-	public JcicZ049Service sJcicZ049Service;
+	private JcicZ049Service sJcicZ049Service;
 	@Autowired
-	public JcicZ049LogService sJcicZ049LogService;
+	private JcicZ049LogService sJcicZ049LogService;
 	@Autowired
-	public JcicZ050Service sJcicZ050Service;
+	private JcicZ050Service sJcicZ050Service;
 	@Autowired
-	public JcicZ050LogService sJcicZ050LogService;
+	private JcicZ050LogService sJcicZ050LogService;
 	@Autowired
-	public JcicZ051Service sJcicZ051Service;
+	private JcicZ051Service sJcicZ051Service;
 	@Autowired
-	public JcicZ051LogService sJcicZ051LogService;
+	private JcicZ051LogService sJcicZ051LogService;
 	@Autowired
-	public JcicZ052Service sJcicZ052Service;
+	private JcicZ052Service sJcicZ052Service;
 	@Autowired
-	public JcicZ052LogService sJcicZ052LogService;
+	private JcicZ052LogService sJcicZ052LogService;
 	@Autowired
-	public JcicZ053Service sJcicZ053Service;
+	private JcicZ053Service sJcicZ053Service;
 	@Autowired
-	public JcicZ053LogService sJcicZ053LogService;
+	private JcicZ053LogService sJcicZ053LogService;
 	@Autowired
-	public JcicZ054Service sJcicZ054Service;
+	private JcicZ054Service sJcicZ054Service;
 	@Autowired
-	public JcicZ054LogService sJcicZ054LogService;
+	private JcicZ054LogService sJcicZ054LogService;
 	@Autowired
-	public JcicZ055Service sJcicZ055Service;
+	private JcicZ055Service sJcicZ055Service;
 	@Autowired
-	public JcicZ055LogService sJcicZ055LogService;
+	private JcicZ055LogService sJcicZ055LogService;
 	@Autowired
-	public JcicZ056Service sJcicZ056Service;
+	private JcicZ056Service sJcicZ056Service;
 	@Autowired
-	public JcicZ056LogService sJcicZ056LogService;
+	private JcicZ056LogService sJcicZ056LogService;
 	@Autowired
-	public JcicZ060Service sJcicZ060Service;
+	private JcicZ060Service sJcicZ060Service;
 	@Autowired
-	public JcicZ060LogService sJcicZ060LogService;
+	private JcicZ060LogService sJcicZ060LogService;
 	@Autowired
-	public JcicZ061Service sJcicZ061Service;
+	private JcicZ061Service sJcicZ061Service;
 	@Autowired
-	public JcicZ061LogService sJcicZ061LogService;
+	private JcicZ061LogService sJcicZ061LogService;
 	@Autowired
-	public JcicZ062Service sJcicZ062Service;
+	private JcicZ062Service sJcicZ062Service;
 	@Autowired
-	public JcicZ062LogService sJcicZ062LogService;
+	private JcicZ062LogService sJcicZ062LogService;
 	@Autowired
-	public JcicZ063Service sJcicZ063Service;
+	private JcicZ063Service sJcicZ063Service;
 	@Autowired
-	public JcicZ063LogService sJcicZ063LogService;
+	private JcicZ063LogService sJcicZ063LogService;
 	@Autowired
-	public JcicZ440Service sJcicZ440Service;
+	private JcicZ440Service sJcicZ440Service;
 	@Autowired
-	public JcicZ440LogService sJcicZ440LogService;
+	private JcicZ440LogService sJcicZ440LogService;
 	@Autowired
-	public JcicZ442Service sJcicZ442Service;
+	private JcicZ442Service sJcicZ442Service;
 	@Autowired
-	public JcicZ442LogService sJcicZ442LogService;
+	private JcicZ442LogService sJcicZ442LogService;
 	@Autowired
-	public JcicZ443Service sJcicZ443Service;
+	private JcicZ443Service sJcicZ443Service;
 	@Autowired
-	public JcicZ443LogService sJcicZ443LogService;
+	private JcicZ443LogService sJcicZ443LogService;
 	@Autowired
-	public JcicZ444Service sJcicZ444Service;
+	private JcicZ444Service sJcicZ444Service;
 	@Autowired
-	public JcicZ444LogService sJcicZ444LogService;
+	private JcicZ444LogService sJcicZ444LogService;
 	@Autowired
-	public JcicZ446Service sJcicZ446Service;
+	private JcicZ446Service sJcicZ446Service;
 	@Autowired
-	public JcicZ446LogService sJcicZ446LogService;
+	private JcicZ446LogService sJcicZ446LogService;
 	@Autowired
-	public JcicZ447Service sJcicZ447Service;
+	private JcicZ447Service sJcicZ447Service;
 	@Autowired
-	public JcicZ447LogService sJcicZ447LogService;
+	private JcicZ447LogService sJcicZ447LogService;
 	@Autowired
-	public JcicZ448Service sJcicZ448Service;
+	private JcicZ448Service sJcicZ448Service;
 	@Autowired
-	public JcicZ448LogService sJcicZ448LogService;
+	private JcicZ448LogService sJcicZ448LogService;
 	@Autowired
-	public JcicZ450Service sJcicZ450Service;
+	private JcicZ450Service sJcicZ450Service;
 	@Autowired
-	public JcicZ450LogService sJcicZ450LogService;
+	private JcicZ450LogService sJcicZ450LogService;
 	@Autowired
-	public JcicZ451Service sJcicZ451Service;
+	private JcicZ451Service sJcicZ451Service;
 	@Autowired
-	public JcicZ451LogService sJcicZ451LogService;
+	private JcicZ451LogService sJcicZ451LogService;
 	@Autowired
-	public JcicZ454Service sJcicZ454Service;
+	private JcicZ454Service sJcicZ454Service;
 	@Autowired
-	public JcicZ454LogService sJcicZ454LogService;
+	private JcicZ454LogService sJcicZ454LogService;
 	@Autowired
-	public JcicZ570Service sJcicZ570Service;
+	private JcicZ570Service sJcicZ570Service;
 	@Autowired
-	public JcicZ570LogService sJcicZ570LogService;
+	private JcicZ570LogService sJcicZ570LogService;
 	@Autowired
-	public JcicZ571Service sJcicZ571Service;
+	private JcicZ571Service sJcicZ571Service;
 	@Autowired
-	public JcicZ571LogService sJcicZ571LogService;
+	private JcicZ571LogService sJcicZ571LogService;
 	@Autowired
-	public JcicZ572Service sJcicZ572Service;
+	private JcicZ572Service sJcicZ572Service;
 	@Autowired
-	public JcicZ572LogService sJcicZ572LogService;
+	private JcicZ572LogService sJcicZ572LogService;
 	@Autowired
-	public JcicZ573Service sJcicZ573Service;
+	private JcicZ573Service sJcicZ573Service;
 	@Autowired
-	public JcicZ573LogService sJcicZ573LogService;
+	private JcicZ573LogService sJcicZ573LogService;
 	@Autowired
-	public JcicZ574Service sJcicZ574Service;
+	private JcicZ574Service sJcicZ574Service;
 	@Autowired
-	public JcicZ574LogService sJcicZ574LogService;
+	private JcicZ574LogService sJcicZ574LogService;
 	@Autowired
-	public JcicZ575Service sJcicZ575Service;
+	private JcicZ575Service sJcicZ575Service;
 	@Autowired
-	public JcicZ575LogService sJcicZ575LogService;
+	private JcicZ575LogService sJcicZ575LogService;
 
 	@Autowired
 	DateUtil dDateUtil;
@@ -288,6 +292,8 @@ public class L8403File extends MakeFile {
 	int iActualFilingDate;
 	String iActualFilingMark;
 
+	private TitaVo titaVo;
+
 	public long exec(TitaVo titaVo) throws LogicException {
 		this.titaVo = titaVo;
 		/*
@@ -306,7 +312,7 @@ public class L8403File extends MakeFile {
 		finalData();
 		// 末筆資料
 
-		return this.close();
+		return makeFile.close();
 		// return sno;
 
 	}
@@ -318,7 +324,7 @@ public class L8403File extends MakeFile {
 		this.info("finalDate Count = " + iCount);
 		String sCount = String.valueOf(iCount);
 		String footText = "TRLR" + StringUtils.leftPad(sCount, 8, '0') + StringUtils.rightPad("", 129);
-		this.put(footText);
+		makeFile.put(footText);
 	}
 
 	private void putDetailData() throws LogicException {
@@ -598,8 +604,8 @@ public class L8403File extends MakeFile {
 		String iSubmitKey = titaVo.getParam("SubmitKey");
 		String iReportTime = titaVo.getParam("ReportTime");
 		int ixReportTime = parse.stringToInteger(titaVo.getParam("ReportTime"));
-		if(ixReportTime<10) {
-			iReportTime = "0"+iReportTime;	
+		if (ixReportTime < 10) {
+			iReportTime = "0" + iReportTime;
 		}
 		String iRimBusinessType = "LN";
 		String jcicMU1Dep = "";
@@ -618,14 +624,15 @@ public class L8403File extends MakeFile {
 		} else {
 			throw new LogicException(titaVo, "E0001", "系統參數設定檔"); // 查無資料
 		}
-		String iContactX = FormatUtil.padX(jcicMU1Dep+"聯絡人-"+jcicMU1Name, 80);
-		headText = "JCIC-DAT-Z" + tranCode + "-V01-458     " + iReportDate + iReportTime+"          "+jcicMU1Tel + iContactX;
+		String iContactX = FormatUtil.padX(jcicMU1Dep + "聯絡人-" + jcicMU1Name, 80);
+		headText = "JCIC-DAT-Z" + tranCode + "-V01-458     " + iReportDate + iReportTime + "          " + jcicMU1Tel
+				+ iContactX;
 		// 檔名
 		// 金融機構總行代號+月份+日期+次數.檔案類別
 		fileName = iSubmitKey + iReportDate.substring(3) + iReportTime + "." + tranCode;
 
-		this.open(titaVo, date, brno, fileCode, fileItem, fileName, 2);
-		this.put(headText);
+		makeFile.open(titaVo, date, brno, fileCode, fileItem, fileName, 2);
+		makeFile.put(headText);
 	}
 
 	private void totalCount() throws LogicException {
@@ -639,9 +646,9 @@ public class L8403File extends MakeFile {
 			for (JcicZ040 iJcicZ040 : xJcicZ040) {
 				this.info("iJcicZ040 Count = " + iCount);
 //				if (iJcicZ040.getOutJcicTxtDate() == jcicdate || iJcicZ040.getActualFilingDate() == jcicdate) {
-				if (iJcicZ040.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ040.getActualFilingMark()) ) {
+				if (iJcicZ040.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ040.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 			}
 
 			break;
@@ -658,16 +665,16 @@ public class L8403File extends MakeFile {
 
 			JcicZ041 tJcicZ041 = new JcicZ041();
 			tJcicZ041 = sJcicZ041Service.findById(jcicZ041Id, titaVo);
-			
+
 			this.info("tJcicZ041   = " + tJcicZ041);
-			
+
 			Slice<JcicZ041> xJcicZ041 = sJcicZ041Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			this.info(" z041yu = " + xJcicZ041.getContent());
 			if (xJcicZ041.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ041 iJcicZ041 : xJcicZ041) {
-				if (iJcicZ041.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ041.getActualFilingMark()) ) {
+				if (iJcicZ041.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ041.getActualFilingMark())) {
 					iCount += 1;
 				}
 //				else if (iJcicZ041.getActualFilingDate() == jcicdate) {
@@ -681,9 +688,9 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ042 iJcicZ042 : xJcicZ042) {
-				if (iJcicZ042.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ042.getActualFilingMark())) {
+				if (iJcicZ042.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ042.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ042.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -695,9 +702,9 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ043 iJcicZ043 : xJcicZ043) {
-				if (iJcicZ043.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ043.getActualFilingMark())) {
+				if (iJcicZ043.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ043.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ043.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -709,9 +716,9 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ044 iJcicZ044 : xJcicZ044) {
-				if (iJcicZ044.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ044.getActualFilingMark()) ) {
+				if (iJcicZ044.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ044.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ044.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -723,9 +730,9 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ045 iJcicZ045 : xJcicZ045) {
-				if (iJcicZ045.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ045.getActualFilingMark())) {
+				if (iJcicZ045.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ045.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ045.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -737,9 +744,9 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ046 iJcicZ046 : xJcicZ046) {
-				if (iJcicZ046.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ046.getActualFilingMark())) {
+				if (iJcicZ046.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ046.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ046.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -751,9 +758,9 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ047 iJcicZ047 : xJcicZ047) {
-				if (iJcicZ047.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ047.getActualFilingMark()) ) {
+				if (iJcicZ047.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ047.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ047.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -765,9 +772,9 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ048 iJcicZ048 : xJcicZ048) {
-				if (iJcicZ048.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ048.getActualFilingMark())) {
+				if (iJcicZ048.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ048.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ048.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -779,9 +786,9 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ049 iJcicZ049 : xJcicZ049) {
-				if (iJcicZ049.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ049.getActualFilingMark())) {
+				if (iJcicZ049.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ049.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ049.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -793,9 +800,9 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ050 iJcicZ050 : xJcicZ050) {
-				if (iJcicZ050.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ050.getActualFilingMark())) {
+				if (iJcicZ050.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ050.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ050.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -807,9 +814,9 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ051 iJcicZ051 : xJcicZ051) {
-				if (iJcicZ051.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ051.getActualFilingMark())) {
+				if (iJcicZ051.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ051.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ051.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -821,9 +828,9 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ052 iJcicZ052 : xJcicZ052) {
-				if (iJcicZ052.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ052.getActualFilingMark())) {
+				if (iJcicZ052.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ052.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ052.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -835,9 +842,9 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ053 iJcicZ053 : xJcicZ053) {
-				if (iJcicZ053.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ053.getActualFilingMark())) {
+				if (iJcicZ053.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ053.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ053.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -849,9 +856,9 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ054 iJcicZ054 : xJcicZ054) {
-				if (iJcicZ054.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ054.getActualFilingMark()))  {
+				if (iJcicZ054.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ054.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ054.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -863,9 +870,9 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ055 iJcicZ055 : xJcicZ055) {
-				if (iJcicZ055.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ055.getActualFilingMark())) {
+				if (iJcicZ055.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ055.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ055.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -877,9 +884,9 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ056 iJcicZ056 : xJcicZ056) {
-				if (iJcicZ056.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ056.getActualFilingMark())) {
+				if (iJcicZ056.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ056.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ056.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -891,9 +898,9 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ060 iJcicZ060 : xJcicZ060) {
-				if (iJcicZ060.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ060.getActualFilingMark()))  {
+				if (iJcicZ060.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ060.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ060.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -905,9 +912,9 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ061 iJcicZ061 : xJcicZ061) {
-				if (iJcicZ061.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ061.getActualFilingMark()) ) {
+				if (iJcicZ061.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ061.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ061.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -919,9 +926,9 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ062 iJcicZ062 : xJcicZ062) {
-				if (iJcicZ062.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ062.getActualFilingMark())) {
+				if (iJcicZ062.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ062.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ062.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -935,7 +942,7 @@ public class L8403File extends MakeFile {
 			for (JcicZ063 iJcicZ063 : xJcicZ063) {
 				if (iJcicZ063.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ063.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ063.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -947,7 +954,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ440 iJcicZ440 : xJcicZ440) {
-				if (iJcicZ440.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ440.getActualFilingMark())) {
+				if (iJcicZ440.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ440.getActualFilingMark())) {
 					iCount += 1;
 				}
 //				else if (iJcicZ440.getActualFilingDate() == jcicdate) {
@@ -963,7 +970,7 @@ public class L8403File extends MakeFile {
 			for (JcicZ442 iJcicZ442 : xJcicZ442) {
 				if (iJcicZ442.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ442.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ442.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -977,7 +984,7 @@ public class L8403File extends MakeFile {
 			for (JcicZ443 iJcicZ443 : xJcicZ443) {
 				if (iJcicZ443.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ443.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ443.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -991,7 +998,7 @@ public class L8403File extends MakeFile {
 			for (JcicZ444 iJcicZ444 : xJcicZ444) {
 				if (iJcicZ444.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ444.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ444.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -1005,7 +1012,7 @@ public class L8403File extends MakeFile {
 			for (JcicZ446 iJcicZ446 : xJcicZ446) {
 				if (iJcicZ446.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ446.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ446.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -1019,7 +1026,7 @@ public class L8403File extends MakeFile {
 			for (JcicZ447 iJcicZ447 : xJcicZ447) {
 				if (iJcicZ447.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ447.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ447.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -1047,7 +1054,7 @@ public class L8403File extends MakeFile {
 			for (JcicZ450 iJcicZ450 : xJcicZ450) {
 				if (iJcicZ450.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ450.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ450.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -1061,7 +1068,7 @@ public class L8403File extends MakeFile {
 			for (JcicZ451 iJcicZ451 : xJcicZ451) {
 				if (iJcicZ451.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ451.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ451.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -1075,7 +1082,7 @@ public class L8403File extends MakeFile {
 			for (JcicZ454 iJcicZ454 : xJcicZ454) {
 				if (iJcicZ454.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ454.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ454.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -1089,7 +1096,7 @@ public class L8403File extends MakeFile {
 			for (JcicZ570 iJcicZ570 : xJcicZ570) {
 				if (iJcicZ570.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ570.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ570.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -1103,7 +1110,7 @@ public class L8403File extends MakeFile {
 			for (JcicZ571 iJcicZ571 : xJcicZ571) {
 				if (iJcicZ571.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ571.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ571.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -1117,7 +1124,7 @@ public class L8403File extends MakeFile {
 			for (JcicZ572 iJcicZ572 : xJcicZ572) {
 				if (iJcicZ572.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ572.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ572.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -1131,7 +1138,7 @@ public class L8403File extends MakeFile {
 			for (JcicZ573 iJcicZ573 : xJcicZ573) {
 				if (iJcicZ573.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ573.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ573.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -1145,7 +1152,7 @@ public class L8403File extends MakeFile {
 			for (JcicZ574 iJcicZ574 : xJcicZ574) {
 				if (iJcicZ574.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ574.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ574.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -1159,7 +1166,7 @@ public class L8403File extends MakeFile {
 			for (JcicZ575 iJcicZ575 : xJcicZ575) {
 				if (iJcicZ575.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ575.getActualFilingMark())) {
 					iCount += 1;
-				} 
+				}
 //				else if (iJcicZ575.getActualFilingDate() == jcicdate) {
 //					iCount += 1;
 //				}
@@ -1193,8 +1200,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		rJcicZ040 = sJcicZ040Service.findkeyFilingDate(iActualFilingDate , iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ040 = sJcicZ040Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ040 = rJcicZ040 == null ? null : rJcicZ040.getContent();
 		if (rJcicZ040 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -1203,7 +1210,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ040   = " + zJcicZ040);
 		for (JcicZ040 sJcicZ040 : zJcicZ040) {
-			if (sJcicZ040.getOutJcicTxtDate() == iJcicDate &&  "Y".equals(sJcicZ040.getActualFilingMark())) {
+			if (sJcicZ040.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ040.getActualFilingMark())) {
 //			if ("Y".equals(sJcicZ040.getActualFilingMark())) {
 				String iTranKey = sJcicZ040.getTranKey();
 				iTranKey = FormatUtil.padX(iTranKey, 1);
@@ -1236,7 +1243,7 @@ public class L8403File extends MakeFile {
 						+ StringUtils.rightPad("", 5) + StringUtils.leftPad(iRbDate, 7, '0') + iApplyType + iRefBankId
 						+ iNotBankId1 + iNotBankId2 + iNotBankId3 + iNotBankId4 + iNotBankId5 + iNotBankId6
 						+ StringUtils.rightPad("", 23);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ040.setOutJcicTxtDate(sJcicZ040.getOutJcicTxtDate());
@@ -1306,7 +1313,7 @@ public class L8403File extends MakeFile {
 		jcicZ041Id.setCustId(iCustId);
 		jcicZ041Id.setRcDate(iRcDate);
 		jcicZ041Id.setSubmitKey(iSubmitKey);
-		
+
 		if (iSubmitType == 1) {
 //			iActualFilingDate = iJcicDate+ 19110000;
 			iActualFilingDate = 0;
@@ -1315,9 +1322,9 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		
-		rJcicZ041 = sJcicZ041Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+
+		rJcicZ041 = sJcicZ041Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ041 = rJcicZ041 == null ? null : rJcicZ041.getContent();
 		if (rJcicZ041 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -1325,7 +1332,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ041   = " + zJcicZ041);
 		for (JcicZ041 sJcicZ041 : zJcicZ041) {
-			if (sJcicZ041.getOutJcicTxtDate() == iJcicDate && ("Y").equals(sJcicZ041.getActualFilingMark()) ) {
+			if (sJcicZ041.getOutJcicTxtDate() == iJcicDate && ("Y").equals(sJcicZ041.getActualFilingMark())) {
 				String iTranKey = sJcicZ041.getTranKey();
 				String iSubmitKey = sJcicZ041.getSubmitKey();
 				String iCustId = sJcicZ041.getCustId();
@@ -1345,7 +1352,7 @@ public class L8403File extends MakeFile {
 						+ StringUtils.rightPad("", 5) + StringUtils.leftPad(iNegoStartDate, 7, '0')
 						+ StringUtils.leftPad(iNonFinClaimAmt, 9, '0') + StringUtils.leftPad(iScDate, 7, '0')
 						+ StringUtils.rightPad("", 29);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ041.setOutJcicTxtDate(sJcicZ041.getOutJcicTxtDate());
@@ -1424,8 +1431,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		rJcicZ042 = sJcicZ042Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ042 = sJcicZ042Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ042 = rJcicZ042 == null ? null : rJcicZ042.getContent();
 		if (rJcicZ042 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -1505,7 +1512,7 @@ public class L8403File extends MakeFile {
 						+ StringUtils.leftPad(iCashCardOther, 9, '0') + StringUtils.leftPad(iCreditCardPrin, 9, '0')
 						+ StringUtils.leftPad(iCreditCardInte, 9, '0') + StringUtils.leftPad(iCreditCardPena, 9, '0')
 						+ StringUtils.leftPad(iCreditCardOther, 9, '0') + StringUtils.rightPad("", 72);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ042.setOutJcicTxtDate(sJcicZ042.getOutJcicTxtDate());
@@ -1602,8 +1609,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		rJcicZ043 = sJcicZ043Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ043 = sJcicZ043Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ043 = rJcicZ043 == null ? null : rJcicZ043.getContent();
 		if (rJcicZ043 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -1656,7 +1663,7 @@ public class L8403File extends MakeFile {
 						+ StringUtils.leftPad(iLastPayDate, 7, '0') + StringUtils.leftPad(iOutstandAmt, 10, '0')
 						+ StringUtils.leftPad(iRepayPerMonday, 2, '0') + StringUtils.leftPad(iContractStartYM, 5, '0')
 						+ StringUtils.leftPad(iContractEndYM, 5, '0') + StringUtils.rightPad("", 44);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ043.setOutJcicTxtDate(sJcicZ043.getOutJcicTxtDate());
@@ -1740,8 +1747,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		rJcicZ044 = sJcicZ044Service.findkeyFilingDate(iActualFilingDate , iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ044 = sJcicZ044Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ044 = rJcicZ044 == null ? null : rJcicZ044.getContent();
 		if (rJcicZ044 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -1845,7 +1852,7 @@ public class L8403File extends MakeFile {
 						+ StringUtils.rightPad(iGradeType, 1, "") + StringUtils.leftPad(iPayLastAmt, 9, '0')
 						+ outPeriod2 + outRate2 + StringUtils.leftPad(iMonthPayAmt2, 9, '0')
 						+ StringUtils.leftPad(iPayLastAmt2, 9, '0') + StringUtils.rightPad("", 21);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ044.setOutJcicTxtDate(sJcicZ044.getOutJcicTxtDate());
@@ -1947,8 +1954,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		rJcicZ045 = sJcicZ045Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ045 = sJcicZ045Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ045 = rJcicZ045 == null ? null : rJcicZ045.getContent();
 		if (rJcicZ045 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -1972,7 +1979,7 @@ public class L8403File extends MakeFile {
 				int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
 				String text = "45" + iTranKey + iSubmitKey + iCustId + StringUtils.leftPad(iRcDate, 7, '0')
 						+ StringUtils.rightPad("", 5) + iMaxMainCode + iAgreeCode + StringUtils.rightPad("", 48);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ045.setOutJcicTxtDate(sJcicZ045.getOutJcicTxtDate());
@@ -2048,8 +2055,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		rJcicZ046 = sJcicZ046Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ046 = sJcicZ046Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ046 = rJcicZ046 == null ? null : rJcicZ046.getContent();
 		if (rJcicZ046 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -2057,7 +2064,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ046   = " + zJcicZ046);
 		for (JcicZ046 sJcicZ046 : zJcicZ046) {
-			if (sJcicZ046.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ046.getActualFilingMark()) ) {
+			if (sJcicZ046.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ046.getActualFilingMark())) {
 				String iTranKey = sJcicZ046.getTranKey();
 				String iSubmitKey = sJcicZ046.getSubmitKey();
 				String iCustId = sJcicZ046.getCustId();
@@ -2076,7 +2083,7 @@ public class L8403File extends MakeFile {
 				String text = "46" + iTranKey + iSubmitKey + iCustId + StringUtils.leftPad(iRcDate, 7, '0')
 						+ StringUtils.leftPad(iBreakCode, 2, "") + StringUtils.rightPad("", 3) + iCloseCode
 						+ StringUtils.leftPad(iCloseDate, 7, '0') + StringUtils.rightPad("", 43);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ046.setOutJcicTxtDate(sJcicZ046.getOutJcicTxtDate());
@@ -2153,8 +2160,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		rJcicZ047 = sJcicZ047Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ047 = sJcicZ047Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ047 = rJcicZ047 == null ? null : rJcicZ047.getContent();
 		if (rJcicZ047 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -2258,7 +2265,7 @@ public class L8403File extends MakeFile {
 						+ StringUtils.rightPad(iGradeType, 1, "") + StringUtils.leftPad(iPayLastAmt, 9, '0')
 						+ outPeriod2 + outRate2 + StringUtils.leftPad(iMonthPayAmt2, 9, '0')
 						+ StringUtils.leftPad(iPayLastAmt2, 9, '0') + StringUtils.rightPad("", 14);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ047.setOutJcicTxtDate(sJcicZ047.getOutJcicTxtDate());
@@ -2355,8 +2362,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		rJcicZ048 = sJcicZ048Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ048 = sJcicZ048Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ048 = rJcicZ048 == null ? null : rJcicZ048.getContent();
 		if (rJcicZ048 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -2386,7 +2393,7 @@ public class L8403File extends MakeFile {
 						+ StringUtils.rightPad("", 5) + iCustRegAddr + iCustComAddr
 						+ StringUtils.rightPad(iCustRegTelNo, 16, "") + StringUtils.rightPad(iCustComTelNo, 16, "")
 						+ StringUtils.rightPad(iCustMobilNo, 16, "") + StringUtils.rightPad("", 32);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ048.setOutJcicTxtDate(sJcicZ048.getOutJcicTxtDate());
@@ -2466,8 +2473,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		rJcicZ049 = sJcicZ049Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ049 = sJcicZ049Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ049 = rJcicZ049 == null ? null : rJcicZ049.getContent();
 		if (rJcicZ049 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -2518,7 +2525,7 @@ public class L8403File extends MakeFile {
 						+ StringUtils.leftPad(iApplyDate, 7, '0') + iCourtCode + StringUtils.leftPad(iYear2, 3, "")
 						+ iCourtDiv + iCourtCaseNo + StringUtils.rightPad(iApprove, 1, "")
 						+ StringUtils.leftPad(iClaimDate, 7, '0') + StringUtils.rightPad("", 46);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ049.setOutJcicTxtDate(sJcicZ049.getOutJcicTxtDate());
@@ -2601,8 +2608,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		rJcicZ050 = sJcicZ050Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ050 = sJcicZ050Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ050 = rJcicZ050 == null ? null : rJcicZ050.getContent();
 		if (rJcicZ050 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -2641,7 +2648,7 @@ public class L8403File extends MakeFile {
 						+ StringUtils.leftPad(iSumRepayShouldAmt, 9, '0') + StringUtils.rightPad(iStatus, 1, "")
 						+ StringUtils.rightPad("0", 4, '0') + StringUtils.rightPad("", 33);
 
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ050.setOutJcicTxtDate(sJcicZ050.getOutJcicTxtDate());
@@ -2721,8 +2728,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		rJcicZ051 = sJcicZ051Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ051 = sJcicZ051Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ051 = rJcicZ051 == null ? null : rJcicZ051.getContent();
 		if (rJcicZ051 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -2747,7 +2754,7 @@ public class L8403File extends MakeFile {
 				String text = "51" + iTranKey + iSubmitKey + iCustId + StringUtils.leftPad(iRcDate, 7, '0')
 						+ StringUtils.rightPad("", 5) + StringUtils.rightPad(iDelayCode, 1, "")
 						+ StringUtils.leftPad(iDelayYM, 5, '0') + nDelayDesc + StringUtils.rightPad("", 46);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ051.setOutJcicTxtDate(sJcicZ051.getOutJcicTxtDate());
@@ -2823,8 +2830,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		rJcicZ052 = sJcicZ052Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ052 = sJcicZ052Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ052 = rJcicZ052 == null ? null : rJcicZ052.getContent();
 		if (rJcicZ052 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -2868,7 +2875,7 @@ public class L8403File extends MakeFile {
 						+ StringUtils.rightPad("", 5) + iBankCode1 + iDataCode1 + iBankCode2 + iDataCode2 + iBankCode3
 						+ iDataCode3 + iBankCode4 + iDataCode4 + iBankCode5 + iDataCode5
 						+ StringUtils.leftPad(iChangePayDate, 7, '0') + StringUtils.rightPad("", 20);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ052.setOutJcicTxtDate(sJcicZ052.getOutJcicTxtDate());
@@ -2954,8 +2961,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		rJcicZ053 = sJcicZ053Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ053 = sJcicZ053Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ053 = rJcicZ053 == null ? null : rJcicZ053.getContent();
 		if (rJcicZ053 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -2987,7 +2994,7 @@ public class L8403File extends MakeFile {
 				String text = "53" + iTranKey + iSubmitKey + iCustId + StringUtils.leftPad(iRcDate, 7, '0')
 						+ StringUtils.rightPad("", 5) + iMaxMainCode + iAgreeSend + iAgreeSendData1 + iAgreeSendData2
 						+ StringUtils.leftPad(iChangePayDate, 7, '0') + StringUtils.rightPad("", 37);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ053.setOutJcicTxtDate(sJcicZ053.getOutJcicTxtDate());
@@ -3093,7 +3100,7 @@ public class L8403File extends MakeFile {
 				String text = "54" + iTranKey + iSubmitKey + iCustId + StringUtils.leftPad(iRcDate, 7, '0')
 						+ StringUtils.rightPad("", 5) + iMaxMainCode + iPayOffResult
 						+ StringUtils.leftPad(iPayOffDate, 7, '0') + StringUtils.rightPad("", 41);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ054.setOutJcicTxtDate(sJcicZ054.getOutJcicTxtDate());
@@ -3169,8 +3176,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		rJcicZ055 = sJcicZ055Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ055 = sJcicZ055Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ055 = rJcicZ055 == null ? null : rJcicZ055.getContent();
 		if (rJcicZ055 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -3239,7 +3246,7 @@ public class L8403File extends MakeFile {
 						+ StringUtils.rightPad(iClaimStatus2, 1, "") + outSaveEndDate
 						+ StringUtils.rightPad(iIsImplement, 1, "") + StringUtils.rightPad(iInspectName, 10, "")
 						+ StringUtils.rightPad("", 54);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ055.setOutJcicTxtDate(sJcicZ055.getOutJcicTxtDate());
@@ -3327,8 +3334,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		rJcicZ056 = sJcicZ056Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ056 = sJcicZ056Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ056 = rJcicZ056 == null ? null : rJcicZ056.getContent();
 		if (rJcicZ056 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -3376,7 +3383,7 @@ public class L8403File extends MakeFile {
 						+ StringUtils.leftPad(iSubAmt, 9, '0') + StringUtils.rightPad(iClaimStatus1, 1, "")
 						+ StringUtils.leftPad(iSaveDate, 7, '0') + StringUtils.rightPad(iClaimStatus2, 1, "")
 						+ StringUtils.leftPad(iSaveEndDate, 7, '0') + iAdminName + StringUtils.rightPad("", 76);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ056.setOutJcicTxtDate(sJcicZ056.getOutJcicTxtDate());
@@ -3462,8 +3469,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		rJcicZ060 = sJcicZ060Service.findkeyFilingDate(iActualFilingDate , iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ060 = sJcicZ060Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ060 = rJcicZ060 == null ? null : rJcicZ060.getContent();
 		if (rJcicZ060 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -3471,7 +3478,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ060   = " + zJcicZ060);
 		for (JcicZ060 sJcicZ060 : zJcicZ060) {
-			if (sJcicZ060.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ060.getActualFilingMark()) ) {
+			if (sJcicZ060.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ060.getActualFilingMark())) {
 				String iTranKey = sJcicZ060.getTranKey();
 				String iSubmitKey = sJcicZ060.getSubmitKey();
 				String iCustId = sJcicZ060.getCustId();
@@ -3486,7 +3493,7 @@ public class L8403File extends MakeFile {
 				String text = "60" + iTranKey + iSubmitKey + iCustId + StringUtils.leftPad(iRcDate, 7, '0')
 						+ StringUtils.rightPad("", 5) + StringUtils.leftPad(iChangePayDate, 7, '0')
 						+ StringUtils.leftPad(iYM, 5, '0') + StringUtils.rightPad("", 30);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ060.setOutJcicTxtDate(sJcicZ060.getOutJcicTxtDate());
@@ -3562,8 +3569,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		rJcicZ061 = sJcicZ061Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ061 = sJcicZ061Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ061 = rJcicZ061 == null ? null : rJcicZ061.getContent();
 		if (rJcicZ061 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -3600,7 +3607,7 @@ public class L8403File extends MakeFile {
 						+ StringUtils.leftPad(iCreditBalanceAmt, 9, '0') + StringUtils.rightPad(iMaxMainNote, 1, "")
 						+ StringUtils.rightPad(iIsGuarantor, 1, "") + StringUtils.rightPad(iIsChangePayment, 1, "")
 						+ StringUtils.rightPad("", 42);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ061.setOutJcicTxtDate(sJcicZ061.getOutJcicTxtDate());
@@ -3680,8 +3687,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		rJcicZ062 = sJcicZ062Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ062 = sJcicZ062Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ062 = rJcicZ062 == null ? null : rJcicZ062.getContent();
 		if (rJcicZ062 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -3759,7 +3766,7 @@ public class L8403File extends MakeFile {
 						+ iPostAddr + StringUtils.leftPad(iMonthPayAmt, 9, '0')
 						+ StringUtils.rightPad(iGradeType, 1, "") + outPeriod2 + outRate2
 						+ StringUtils.leftPad(iMonthPayAmt2, 9, '0') + StringUtils.rightPad("", 66);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ062.setOutJcicTxtDate(sJcicZ062.getOutJcicTxtDate());
@@ -3852,8 +3859,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		rJcicZ063 = sJcicZ063Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ063 = sJcicZ063Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ063 = rJcicZ063 == null ? null : rJcicZ063.getContent();
 		if (rJcicZ063 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -3881,7 +3888,7 @@ public class L8403File extends MakeFile {
 						+ StringUtils.rightPad("", 5) + StringUtils.leftPad(iChangePayDate, 7, '0')
 						+ StringUtils.leftPad(iCloseDate, 7, '0') + StringUtils.rightPad(iClosedResult, 1, "")
 						+ StringUtils.rightPad("", 42);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ063.setOutJcicTxtDate(sJcicZ063.getOutJcicTxtDate());
@@ -3958,8 +3965,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		rJcicZ440 = sJcicZ440Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ440 = sJcicZ440Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ440 = rJcicZ440 == null ? null : rJcicZ440.getContent();
 		if (rJcicZ440 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -4006,7 +4013,7 @@ public class L8403File extends MakeFile {
 						+ StringUtils.leftPad(iRemindDate, 7, '0') + StringUtils.rightPad(iApplyType, 1, "")
 						+ StringUtils.rightPad(iReportYn, 1, "") + iNotBankId1 + iNotBankId2 + iNotBankId3 + iNotBankId4
 						+ iNotBankId5 + iNotBankId6 + StringUtils.rightPad("", 17);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ440.setOutJcicTxtDate(sJcicZ440.getOutJcicTxtDate());
@@ -4092,8 +4099,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		rJcicZ442 = sJcicZ442Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ442 = sJcicZ442Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ442 = rJcicZ442 == null ? null : rJcicZ442.getContent();
 		if (rJcicZ442 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -4176,7 +4183,7 @@ public class L8403File extends MakeFile {
 						+ StringUtils.leftPad(iGuarObliPrin, 9, '0') + StringUtils.leftPad(iGuarObliInte, 9, '0')
 						+ StringUtils.leftPad(iGuarObliPena, 9, '0') + StringUtils.leftPad(iGuarObliOther, 9, '0')
 						+ StringUtils.rightPad("", 56);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ442.setOutJcicTxtDate(sJcicZ442.getOutJcicTxtDate());
@@ -4275,8 +4282,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "";
 		}
-		rJcicZ443 = sJcicZ443Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ443 = sJcicZ443Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ443 = rJcicZ443 == null ? null : rJcicZ443.getContent();
 		if (rJcicZ443 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -4338,7 +4345,7 @@ public class L8403File extends MakeFile {
 						+ StringUtils.leftPad(ixNotyetacQuit, 10, '0') + StringUtils.leftPad(ixMothPayDay, 2, '0')
 						+ StringUtils.leftPad(ixBeginDate, 5, '0') + StringUtils.leftPad(ixEndDate, 5, '0')
 						+ StringUtils.rightPad("", 49);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ443.setOutJcicTxtDate(sJcicZ443.getOutJcicTxtDate());
@@ -4428,8 +4435,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		rJcicZ444 = sJcicZ444Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ444 = sJcicZ444Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ444 = rJcicZ444 == null ? null : rJcicZ444.getContent();
 		if (rJcicZ444 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -4465,7 +4472,7 @@ public class L8403File extends MakeFile {
 						+ iCourtCode + StringUtils.rightPad("", 5) + iCustRegAddr + iCustComAddr
 						+ StringUtils.rightPad(iCustRegTelNo, 16, "") + StringUtils.rightPad(iCustComTelNo, 16, "")
 						+ StringUtils.rightPad(iCustMobilNo, 16, "") + StringUtils.rightPad("", 18);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ444.setOutJcicTxtDate(sJcicZ444.getOutJcicTxtDate());
@@ -4545,8 +4552,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		rJcicZ446 = sJcicZ446Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ446 = sJcicZ446Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ446 = rJcicZ446 == null ? null : rJcicZ446.getContent();
 		if (rJcicZ446 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -4572,7 +4579,7 @@ public class L8403File extends MakeFile {
 						+ StringUtils.rightPad(iCourtCode, 3, "") + StringUtils.rightPad("", 5)
 						+ StringUtils.rightPad(iCloseCode, 2, "") + StringUtils.leftPad(iCloseDate, 7, '0')
 						+ StringUtils.rightPad("", 39);
-				this.put(text);
+				makeFile.put(text);
 				// 檔案產生後，回填JcicDate
 				sJcicZ446.setOutJcicTxtDate(sJcicZ446.getOutJcicTxtDate());
 				if (iSubmitType == 1) {
@@ -4647,8 +4654,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "";
 		}
-		rJcicZ447 = sJcicZ447Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ447 = sJcicZ447Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ447 = rJcicZ447 == null ? null : rJcicZ447.getContent();
 		if (rJcicZ447 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -4689,7 +4696,7 @@ public class L8403File extends MakeFile {
 						+ StringUtils.leftPad(ixPeriod, 3, '0') + StringUtils.leftPad(FormatRate(ixRate, 2), 5, '0')
 						+ StringUtils.leftPad(ixMonthPayAmt, 9, '0') + StringUtils.rightPad(iPayAccount, 20, "")
 						+ StringUtils.rightPad("", 27);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ447.setOutJcicTxtDate(sJcicZ447.getOutJcicTxtDate());
@@ -4773,8 +4780,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		rJcicZ448 = sJcicZ448Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ448 = sJcicZ448Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ448 = rJcicZ448 == null ? null : rJcicZ448.getContent();
 		if (rJcicZ448 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -4809,7 +4816,7 @@ public class L8403File extends MakeFile {
 						+ StringUtils.leftPad(iSignPrin, 9, '0') + StringUtils.leftPad(iSignOther, 9, '0')
 						+ StringUtils.leftPad(FormatRate(iOwnPercentage, 2), 6, '0')
 						+ StringUtils.leftPad(iAcQuitAmt, 9, '0') + StringUtils.rightPad("", 22);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ448.setOutJcicTxtDate(sJcicZ448.getOutJcicTxtDate());
@@ -4889,8 +4896,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		rJcicZ450 = sJcicZ450Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ450 = sJcicZ450Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ450 = rJcicZ450 == null ? null : rJcicZ450.getContent();
 		if (rJcicZ450 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -4924,7 +4931,7 @@ public class L8403File extends MakeFile {
 						+ StringUtils.leftPad(iSumRepayActualAmt, 9, '0')
 						+ StringUtils.leftPad(iSumRepayShouldAmt, 9, '0') + StringUtils.rightPad(iPayStatus, 1, "")
 						+ StringUtils.rightPad("", 23);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ450.setOutJcicTxtDate(sJcicZ450.getOutJcicTxtDate());
@@ -5003,8 +5010,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		rJcicZ451 = sJcicZ451Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ451 = sJcicZ451Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ451 = rJcicZ451 == null ? null : rJcicZ451.getContent();
 		if (rJcicZ451 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -5029,7 +5036,7 @@ public class L8403File extends MakeFile {
 						+ StringUtils.rightPad(iCourtCode, 3, "") + StringUtils.rightPad("", 5)
 						+ StringUtils.rightPad(iDelayCode, 1, "") + StringUtils.leftPad(iDelayYM, 5, '0')
 						+ StringUtils.rightPad("", 12);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ451.setOutJcicTxtDate(sJcicZ451.getOutJcicTxtDate());
@@ -5105,8 +5112,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		rJcicZ454 = sJcicZ454Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ454 = sJcicZ454Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ454 = rJcicZ454 == null ? null : rJcicZ454.getContent();
 		if (rJcicZ454 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -5134,7 +5141,7 @@ public class L8403File extends MakeFile {
 						+ StringUtils.rightPad(iCourtCode, 3, "") + StringUtils.rightPad("", 5) + iMaxMainCode
 						+ StringUtils.rightPad(iPayOffResult, 1, "") + StringUtils.leftPad(iPayOffDate, 7, '0')
 						+ StringUtils.rightPad("", 37);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ454.setOutJcicTxtDate(sJcicZ454.getOutJcicTxtDate());
@@ -5211,8 +5218,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		rJcicZ570 = sJcicZ570Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ570 = sJcicZ570Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ570 = rJcicZ570 == null ? null : rJcicZ570.getContent();
 		if (rJcicZ570 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -5282,7 +5289,7 @@ public class L8403File extends MakeFile {
 						+ StringUtils.rightPad(iBank27, 3, "") + StringUtils.rightPad(iBank28, 3, "")
 						+ StringUtils.rightPad(iBank29, 3, "") + StringUtils.rightPad(iBank30, 3, "")
 						+ StringUtils.rightPad("", 27);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ570.setOutJcicTxtDate(sJcicZ570.getOutJcicTxtDate());
@@ -5388,8 +5395,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		rJcicZ571 = sJcicZ571Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ571 = sJcicZ571Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ571 = rJcicZ571 == null ? null : rJcicZ571.getContent();
 		if (rJcicZ571 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -5422,7 +5429,7 @@ public class L8403File extends MakeFile {
 						+ StringUtils.rightPad(iPayYn, 1, "") + StringUtils.leftPad(iXOwnerAmt, 9, '0')
 						+ StringUtils.leftPad(iXAllotAmt, 9, '0') + StringUtils.leftPad(iXUnallotAmt, 9, '0')
 						+ StringUtils.rightPad("", 44);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ571.setOutJcicTxtDate(sJcicZ571.getOutJcicTxtDate());
@@ -5501,8 +5508,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		rJcicZ572 = sJcicZ572Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ572 = sJcicZ572Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ572 = rJcicZ572 == null ? null : rJcicZ572.getContent();
 		if (rJcicZ572 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -5533,7 +5540,7 @@ public class L8403File extends MakeFile {
 						+ StringUtils.leftPad(iStartDate, 7, '0') + StringUtils.leftPad(iPayDate, 7, '0')
 						+ StringUtils.rightPad(iBankId, 3, "") + StringUtils.leftPad(iAllotAmt, 9, '0')
 						+ StringUtils.leftPad(FormatRate(iOwnPercentage, 2), 6, '0') + StringUtils.rightPad("", 44);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ572.setOutJcicTxtDate(sJcicZ572.getOutJcicTxtDate());
@@ -5611,12 +5618,12 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-			rJcicZ573 = sJcicZ573Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
-					titaVo);
-			zJcicZ573 = rJcicZ573 == null ? null : rJcicZ573.getContent();
-			if (rJcicZ573 == null) {
-				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
-			}
+		rJcicZ573 = sJcicZ573Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
+		zJcicZ573 = rJcicZ573 == null ? null : rJcicZ573.getContent();
+		if (rJcicZ573 == null) {
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+		}
 		this.info("zJcicZ573   = " + zJcicZ573);
 		for (JcicZ573 sJcicZ573 : zJcicZ573) {
 			if (sJcicZ573.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ573.getActualFilingMark())) {
@@ -5638,7 +5645,7 @@ public class L8403File extends MakeFile {
 				String text = "573" + iTranKey + iSubmitKey + iCustId + StringUtils.leftPad(iApplyDate, 7, '0')
 						+ StringUtils.leftPad(iPayDate, 7, '0') + StringUtils.leftPad(iPayAmt, 9, '0')
 						+ StringUtils.leftPad(iTotalPayAmt, 9, '0') + StringUtils.rightPad("", 51);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ573.setOutJcicTxtDate(sJcicZ573.getOutJcicTxtDate());
@@ -5741,7 +5748,7 @@ public class L8403File extends MakeFile {
 				String text = "574" + iTranKey + iSubmitKey + iCustId + StringUtils.leftPad(iApplyDate, 7, '0')
 						+ StringUtils.leftPad(iCloseDate, 7, '0') + StringUtils.rightPad(iCloseMark, 2, "")
 						+ StringUtils.rightPad(iPhoneNo, 16, "") + StringUtils.rightPad("", 31);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ574.setOutJcicTxtDate(sJcicZ574.getOutJcicTxtDate());
@@ -5819,8 +5826,8 @@ public class L8403File extends MakeFile {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
 		}
-		rJcicZ575 = sJcicZ575Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
-				Integer.MAX_VALUE, titaVo);
+		rJcicZ575 = sJcicZ575Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
+				titaVo);
 		zJcicZ575 = rJcicZ575 == null ? null : rJcicZ575.getContent();
 		if (rJcicZ575 == null) {
 			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
@@ -5845,7 +5852,7 @@ public class L8403File extends MakeFile {
 				String text = "575" + iTranKey + iSubmitKey + iCustId + StringUtils.leftPad(iApplyDate, 7, '0')
 						+ StringUtils.rightPad(iModifyType, 1, "") + StringUtils.rightPad(iBankId, 3, "")
 						+ StringUtils.rightPad("", 52);
-				this.put(text);
+				makeFile.put(text);
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ575.setOutJcicTxtDate(sJcicZ575.getOutJcicTxtDate());
@@ -5941,5 +5948,11 @@ public class L8403File extends MakeFile {
 			reYear = String.valueOf(Year - 1911);
 		}
 		return reYear;
+	}
+
+	@Override
+	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

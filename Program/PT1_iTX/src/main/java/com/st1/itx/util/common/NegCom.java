@@ -91,66 +91,66 @@ import com.st1.itx.util.parse.Parse;
 public class NegCom extends CommBuffer {
 	/* DB服務注入 */
 	@Autowired
-	public NegMainService sNegMainService;
+	private NegMainService sNegMainService;
 
 	@Autowired
-	public NegTransService sNegTransService;
+	private NegTransService sNegTransService;
 
 	@Autowired
-	public NegApprService sNegApprService;
+	private NegApprService sNegApprService;
 
 	@Autowired
-	public CustMainService sCustMainService;
+	private CustMainService sCustMainService;
 
 	@Autowired
-	public AcReceivableService sAcReceivableService;
+	private AcReceivableService sAcReceivableService;
 
 	@Autowired
-	public NegAppr02Service sNegAppr02Service;
+	private NegAppr02Service sNegAppr02Service;
 
 	@Autowired
-	public NegAppr01Service sNegAppr01Service;
+	private NegAppr01Service sNegAppr01Service;
 
 	@Autowired
-	public NegFinShareService sNegFinShareService;
+	private NegFinShareService sNegFinShareService;
 
 	@Autowired
-	public NegFinAcctService sNegFinAcctService;
+	private NegFinAcctService sNegFinAcctService;
 
 	@Autowired
-	public JcicZ050Service sJcicZ050Service;
+	private JcicZ050Service sJcicZ050Service;
 	@Autowired
-	public JcicZ046Service sJcicZ046Service;
+	private JcicZ046Service sJcicZ046Service;
 	@Autowired
-	public JcicZ450Service sJcicZ450Service;
+	private JcicZ450Service sJcicZ450Service;
 	@Autowired
-	public JcicZ573Service sJcicZ573Service;
+	private JcicZ573Service sJcicZ573Service;
 	@Autowired
-	public JcicZ447Service sJcicZ447Service;
+	private JcicZ447Service sJcicZ447Service;
 	@Autowired
-	public JcicZ572Service sJcicZ572Service;
+	private JcicZ572Service sJcicZ572Service;
 
 	@Autowired
-	public TxTempService sTxTempService;
+	private TxTempService sTxTempService;
 
 	@Autowired
-	public L597AServiceImpl l597AServiceImpl;
+	private L597AServiceImpl l597AServiceImpl;
 	@Autowired
-	public L5051ServiceImpl l5051ServiceImpl;
+	private L5051ServiceImpl l5051ServiceImpl;
 
 	@Autowired
-	public GSeqCom gSeqCom;
+	private GSeqCom gSeqCom;
 	/* 日期工具 */
 	@Autowired
-	DateUtil dateUtil;
+	private DateUtil dateUtil;
 	@Autowired
-	public CdBankService cdBankService;
+	private CdBankService cdBankService;
 
 	/* 轉型共用工具 */
 	@Autowired
-	Parse parse;
+	private Parse parse;
 	@Autowired
-	public DataLog dataLog;
+	private DataLog dataLog;
 
 	private String ConnectWord = ",";// Key值區分字串
 	private int ChekUpdDB = 0;// 0:不異動 1:異動
@@ -189,11 +189,11 @@ public class NegCom extends CommBuffer {
 	private BigDecimal transApprAmt = BigDecimal.ZERO;// 撥付金額
 	private int transExportDate = 0;// 撥付製檔日
 	private int transExportAcDate = 0;// 撥付出帳日
-	BigDecimal transTempRepayAmt = BigDecimal.ZERO;// 暫收抵繳金額
-	BigDecimal transOverRepayAmt = BigDecimal.ZERO;// 溢收抵繳金額
-	BigDecimal transPrincipalAmt = BigDecimal.ZERO;// 本金金額
-	BigDecimal transInterestAmt = BigDecimal.ZERO;// 利息金額
-	BigDecimal transOverAmt = BigDecimal.ZERO;// 轉入溢收金額
+	private BigDecimal transTempRepayAmt = BigDecimal.ZERO;// 暫收抵繳金額
+	private BigDecimal transOverRepayAmt = BigDecimal.ZERO;// 溢收抵繳金額
+	private BigDecimal transPrincipalAmt = BigDecimal.ZERO;// 本金金額
+	private BigDecimal transInterestAmt = BigDecimal.ZERO;// 利息金額
+	private BigDecimal transOverAmt = BigDecimal.ZERO;// 轉入溢收金額
 	private int transIntStartDate = 0;// 繳息起日
 	private int transIntEndDate = 0;// 繳息迄日
 	private int transRepayPeriod = 0;// 還款期數
@@ -209,8 +209,8 @@ public class NegCom extends CommBuffer {
 	private int caseSeq = 0;
 	private Map<String, String> mapNeg = new HashMap<String, String>();
 	private CustMain tCustMain;
-	NegTrans tNegTransUpd = new NegTrans();
-	NegMain tNegMainUpd = new NegMain();
+	private NegTrans tNegTransUpd = new NegTrans();
+	private NegMain tNegMainUpd = new NegMain();
 
 	private String Data[][] = {
 			// RIM對應名稱,Map對應名稱,中文名稱,特殊規則
@@ -438,7 +438,6 @@ public class NegCom extends CommBuffer {
 //			}
 //		}
 
-		
 		// 用客戶繳款日期去算到本期為止應該還幾期
 		if (mainNextPayDate == 0) {
 			// E5009 資料檢核錯誤
@@ -1805,11 +1804,11 @@ public class NegCom extends CommBuffer {
 		return;
 	}
 
-	public String[] NegServiceList1(int AcDate, int IsMainFin, int State, int Detail, int ExportDateYN,
-			TitaVo titaVo) throws LogicException {
+	public String[] NegServiceList1(int AcDate, int IsMainFin, int State, int Detail, int ExportDateYN, TitaVo titaVo)
+			throws LogicException {
 		checkData(AcDate, IsMainFin, State, Detail, ExportDateYN);
 		this.info("NegService AcDate=[" + AcDate + "],IsMainFin=[" + IsMainFin + "],State=[" + State + "],Detail=["
-				+ Detail + "],ExportDateYN=[" + ExportDateYN );
+				+ Detail + "],ExportDateYN=[" + ExportDateYN);
 		String data[] = new String[2];// 筆數,總金額
 
 		String sql = "";
@@ -1857,8 +1856,7 @@ public class NegCom extends CommBuffer {
 	 * @throws LogicException 交易程式需承接LogicException
 	 * @author Jacky Lu
 	 */
-	public void checkData(int AcDate, int IsMainFin, int State, int Detail, int ExportDateYN)
-			throws LogicException {
+	public void checkData(int AcDate, int IsMainFin, int State, int Detail, int ExportDateYN) throws LogicException {
 		if (AcDate >= 0) {
 
 		} else {

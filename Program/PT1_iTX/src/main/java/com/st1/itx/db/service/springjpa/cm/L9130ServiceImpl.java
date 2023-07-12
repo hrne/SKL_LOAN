@@ -178,7 +178,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " FROM \"AcDetail\" ACD ";
 		sql += " LEFT JOIN \"CdAcCode\" CDAC ON CDAC.\"AcNoCode\" = ACD.\"AcNoCode\" ";
 		sql += "                            AND CDAC.\"AcSubCode\" = ACD.\"AcSubCode\" ";
-		sql += "                            AND CDAC.\"AcDtlCode\" = ACD.\"AcDtlCode\" ";
+		sql += "                            AND CDAC.\"AcDtlCode\" IN ('  ') ";
 		sql += " WHERE ACD.\"AcDate\" = :acDate ";
 		sql += "   AND ACD.\"SlipBatNo\" = :slipBatNo ";
 		sql += "   AND ACD.\"EntAc\" != 9 "; // 排除入總帳記號為9的資料

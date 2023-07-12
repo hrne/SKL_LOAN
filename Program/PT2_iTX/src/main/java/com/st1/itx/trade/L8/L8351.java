@@ -34,20 +34,16 @@ public class L8351 extends TradeBuffer {
 
 	/* 日期工具 */
 	@Autowired
-	public DateUtil dateUtil;
-
-	/* 轉型共用工具 */
-	@Autowired
-	public Parse parse;
+	private DateUtil dateUtil;
 
 	@Autowired
-	public TbJcicMu01Service iTbJcicMu01Service;
-	
+	private TbJcicMu01Service iTbJcicMu01Service;
+
 	@Autowired
-	public WebClient webClient;
-	
+	private WebClient webClient;
+
 	@Autowired
-	public L8351File iL8351File;
+	private L8351File iL8351File;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -59,25 +55,19 @@ public class L8351 extends TradeBuffer {
 		String iTxtDate = titaVo.getParam("TxtDate");
 		long fileNo = 0;
 		if (iSubmitType.equals("1")) {
-			// 檔名
-			String filename = iSubmitKey + iTxtDate.substring(3) + ".MU1";
-			
-			iL8351File.exec(titaVo);
+			fileNo = iL8351File.exec(titaVo);
 			String checkMsg = "MU1人員名冊報送檔案已產出。";
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-					titaVo.getTlrNo() , checkMsg, titaVo);
-		
-			fileNo = iL8351File.close();
-			iL8351File.toFile(fileNo, filename);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+					checkMsg, titaVo);
 			totaVo.put("ExcelSnoM", "" + fileNo);
-		}else {
+		} else {
 			Slice<TbJcicMu01> xTbJcicMu01 = null;
 			xTbJcicMu01 = iTbJcicMu01Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			if (xTbJcicMu01 != null) {
 				int aTxDate = Integer.valueOf(iTxtDate);
-				
+
 				for (TbJcicMu01 xxTbJcicMu01 : xTbJcicMu01) {
-					this.info("TESTTT="+xxTbJcicMu01.getOutJcictxtDate());
+					this.info("TESTTT=" + xxTbJcicMu01.getOutJcictxtDate());
 					if (xxTbJcicMu01.getOutJcictxtDate() == aTxDate) {
 						xxTbJcicMu01.setOutJcictxtDate(0);
 						try {
@@ -90,7 +80,6 @@ public class L8351 extends TradeBuffer {
 			}
 			totaVo.put("ExcelSnoM", "" + fileNo);
 		}
-
 
 		this.addList(this.totaVo);
 		return this.sendList();

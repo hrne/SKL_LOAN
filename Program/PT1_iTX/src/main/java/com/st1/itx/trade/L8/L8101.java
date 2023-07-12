@@ -10,33 +10,32 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.parse.Parse;
+import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.CustTelNo;
 import com.st1.itx.db.domain.TxAmlCredit;
 import com.st1.itx.db.domain.TxAmlCreditId;
-import com.st1.itx.db.service.TxAmlCreditService;
-
 import com.st1.itx.db.domain.TxAmlNotice;
 import com.st1.itx.db.domain.TxAmlNoticeId;
 import com.st1.itx.db.domain.TxToDoDetail;
+import com.st1.itx.db.domain.TxToDoDetailId;
+import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.CustTelNoService;
+import com.st1.itx.db.service.TxAmlCreditService;
 import com.st1.itx.db.service.TxAmlNoticeService;
 import com.st1.itx.db.service.TxFileService;
 import com.st1.itx.db.service.springjpa.cm.L9705ServiceImpl;
 import com.st1.itx.trade.L9.L9705Report;
-import com.st1.itx.db.domain.CustMain;
-import com.st1.itx.db.service.CustMainService;
-
-import com.st1.itx.db.domain.CustTelNo;
-import com.st1.itx.db.service.CustTelNoService;
-
-import com.st1.itx.util.common.TxToDoCom;
-import com.st1.itx.db.domain.TxToDoDetailId;
-
+import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.CustNoticeCom;
+import com.st1.itx.util.common.MakeFile;
+import com.st1.itx.util.common.TxToDoCom;
+import com.st1.itx.util.common.data.ReportVo;
+import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.parse.Parse;
 
 @Service("L8101")
 @Scope("prototype")
@@ -53,6 +52,9 @@ public class L8101 extends TradeBuffer {
 	@Autowired
 	TxFileService txFileService;
 
+	/* 日期工具 */
+	@Autowired
+	DateUtil dateUtil;
 	@Autowired
 	CustMainService custMainService;
 
@@ -70,7 +72,7 @@ public class L8101 extends TradeBuffer {
 
 //	@Autowired
 //	L9703Report2 l9703report2;
-	
+
 	@Autowired
 	private L9705ServiceImpl l9705ServiceImpl;
 
@@ -79,6 +81,11 @@ public class L8101 extends TradeBuffer {
 
 	@Autowired
 	CustNoticeCom custNoticeCom;
+	@Autowired
+	MakeFile makeFileText;
+	@Autowired
+	MakeFile makeFileMail;
+	private int wkCalDy = 0;
 
 	@Autowired
 	Parse parse;
@@ -87,6 +94,16 @@ public class L8101 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8101 ");
 		this.totaVo.init(titaVo);
+
+		wkCalDy = dateUtil.getNowIntegerForBC();
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI() + 19110000).setBrno(titaVo.getBrno())
+				.setRptCode("L8101").setRptItem("期款扣款通知").build();
+		// 開啟報表
+		makeFileText.open(titaVo, reportVo, "簡訊檔.txt");
+		ReportVo mailReportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI() + 19110000).setBrno(titaVo.getBrno())
+				.setRptCode("L8101").setRptItem("期款扣款通知").build();
+		// 開啟報表
+		makeFileMail.open(titaVo, mailReportVo, "email檔.txt");
 
 		int dataDt = parse.stringToInteger(titaVo.get("DataDt")) + 19110000;
 		String custKey = titaVo.get("CustKey").trim();
@@ -144,8 +161,14 @@ public class L8101 extends TradeBuffer {
 			tTxToDoDetail.setDtlValue("<AML定審簡訊通知>");
 			tTxToDoDetail.setItemCode("TEXT00");
 			tTxToDoDetail.setStatus(0);
-			tTxToDoDetail.setProcessNote(txToDoCom.getProcessNoteForText(custMobile, "房貸客戶提醒：為維護您的權益，戶籍或通訊地址、電子信箱及連絡電話，或姓名、身分證統一編號等重要資訊有異動時，敬請洽詢公司服務人員或客戶服務部（０８００—０３１１１５）辦理變更。", this.getTxBuffer().getTxCom().getTbsdy()));
+			tTxToDoDetail.setProcessNote(txToDoCom.getProcessNoteForText(custMobile,
+					"房貸客戶提醒：為維護您的權益，戶籍或通訊地址、電子信箱及連絡電話，或姓名、身分證統一編號等重要資訊有異動時，敬請洽詢公司服務人員或客戶服務部（０８００—０３１１１５）辦理變更。",
+					wkCalDy));
 
+			makeFileText.put(parse.IntegerToString(custMain.getCustNo(), 7) + "-" + parse.IntegerToString(0, 3)
+					+ txToDoCom.getProcessNoteForText(custMobile,
+							"房貸客戶提醒：為維護您的權益，戶籍或通訊地址、電子信箱及連絡電話，或姓名、身分證統一編號等重要資訊有異動時，敬請洽詢公司服務人員或客戶服務部（０８００—０３１１１５）辦理變更。",
+							wkCalDy));
 			txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo);
 
 		}
@@ -242,7 +265,7 @@ public class L8101 extends TradeBuffer {
 //			titaVo.putParam("UnpaidDayEd", "001");
 //			titaVo.putParam("RepayType", "0");
 //			titaVo.putParam("CustType", "0");
-			
+
 //			String acctDateStart = titaVo.getParam("ACCTDATE_ST");
 //			String acctDateEnd = titaVo.getParam("ACCTDATE_ED");
 //			String custNoStart = titaVo.getParam("CUSTNO");
@@ -252,7 +275,7 @@ public class L8101 extends TradeBuffer {
 //			String idType = titaVo.getParam("ID_TYPE");
 //			String corpInd = titaVo.getParam("CORP_IND");
 //			String apNo = titaVo.getParam("APNO");
-			
+
 //			l9703report2.setParentTranCode(titaVo.get("TXCD"));
 //			pdfSno = l9703report2.exec(titaVo, this.txBuffer);
 
@@ -265,12 +288,12 @@ public class L8101 extends TradeBuffer {
 			titaVo.putParam("ID_TYPE", 0);
 			titaVo.putParam("CORP_IND", 0);
 			titaVo.putParam("APNO", 0);
-			titaVo.putParam("Terms", 2); //只印2期
-			
+			titaVo.putParam("Terms", 2); // 只印2期
+
 			l9705Report.setParentTranCode(titaVo.getTxcd());
 			List<Map<String, String>> l9705List = null;
 			try {
-				l9705List = l9705ServiceImpl.findAll(titaVo,"");
+				l9705List = l9705ServiceImpl.findAll(titaVo, "");
 			} catch (Exception e) {
 				StringWriter errors = new StringWriter();
 				e.printStackTrace(new PrintWriter(errors));

@@ -52,8 +52,6 @@ import com.st1.itx.db.service.NegTransService;
 import com.st1.itx.db.service.springjpa.cm.L597AServiceImpl;
 import com.st1.itx.tradeService.CommBuffer;
 import com.st1.itx.util.data.DataLog;
-/* 交易共用組件 */
-import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 //import com.st1.itx.util.common.MakeFile;
@@ -68,51 +66,45 @@ public class NegReportCom extends CommBuffer {
 	/* DB服務注入 */
 
 	@Autowired
-	public NegMainService sNegMainService;
+	private NegMainService sNegMainService;
 
 	@Autowired
-	public NegTransService sNegTransService;
+	private NegTransService sNegTransService;
 
 	@Autowired
-	public CustMainService sCustMainService;
+	private CustMainService sCustMainService;
 
 	@Autowired
-	public AcReceivableService sAcReceivableService;
+	private AcReceivableService sAcReceivableService;
 	@Autowired
-	public NegApprService sNegApprService;
+	private NegApprService sNegApprService;
 	@Autowired
-	public NegAppr01Service sNegAppr01Service;
+	private NegAppr01Service sNegAppr01Service;
 	@Autowired
-	public NegAppr02Service sNegAppr02Service;
+	private NegAppr02Service sNegAppr02Service;
 	@Autowired
-	public NegFinShareService sNegFinShareService;
+	private NegFinShareService sNegFinShareService;
 	@Autowired
-	public NegFinAcctService sNegFinAcctService;
+	private NegFinAcctService sNegFinAcctService;
 
 	@Autowired
-	public GSeqCom gSeqCom;
+	private GSeqCom gSeqCom;
 
 	@Autowired
-	public NegCom NegCom;
-
-	@Autowired
-	public L597AServiceImpl l597AServiceImpl;
-	/* 日期工具 */
-	@Autowired
-	DateUtil dateUtil;
+	private L597AServiceImpl l597AServiceImpl;
 
 	/* 轉型共用工具 */
 	@Autowired
-	Parse parse;
+	private Parse parse;
 
 	@Autowired
-	public DataLog dataLog;
+	private DataLog dataLog;
 
 	/* 檔案上下傳工具 */
 //	@Autowired
 //	public FileCom fileCom;
 	@Autowired
-	public MakeFile makeFile;
+	private MakeFile makeFile;
 
 //	String ConnectWord=",";//Key值區分字串
 	String CombineWord = ";";// 連接字串
@@ -964,7 +956,7 @@ public class NegReportCom extends CommBuffer {
 	public List<NegAppr01> InsUpdNegApprO1(int intbringupdate, int Status, TitaVo titaVo) throws LogicException {
 		// IntDate =交易畫面輸入的提兌日-西元年
 		String pKindCode = CheckNegArrp(intbringupdate, Status, titaVo);// 資料檢核
-		//this.info("pKindCode  2==" + pKindCode);
+		// this.info("pKindCode 2==" + pKindCode);
 
 		List<NegAppr01> lNegAppr01 = new ArrayList<NegAppr01>();
 		// 找出最大債權,已入帳,未製檔
@@ -1021,7 +1013,7 @@ public class NegReportCom extends CommBuffer {
 				String AcDate = lData[7];// 會計日
 				String TitaTlrNo = lData[20];// 經辦
 				String TitaTxtNo = lData[21];// 交易序號
-				int custno = Integer.parseInt(lData[4]);//戶號
+				int custno = Integer.parseInt(lData[4]);// 戶號
 
 				// ---L5707 不計算只壓日期
 				if ("NegTrans".equals(UseDb)) {
@@ -1235,7 +1227,7 @@ public class NegReportCom extends CommBuffer {
 			for (NegAppr01 tNegAppr01 : lNegAppr01) {
 				NegTransId tNegTransId = new NegTransId();
 
-				if(tNegAppr01.getApprAmt().compareTo(BigDecimal.ZERO) == 0) {//2023/7/5:撥款金額為0不寫入檔案batx01
+				if (tNegAppr01.getApprAmt().compareTo(BigDecimal.ZERO) == 0) {// 2023/7/5:撥款金額為0不寫入檔案batx01
 					continue;
 				}
 				tNegTransId.setAcDate(tNegAppr01.getNegAppr01Id().getAcDate());

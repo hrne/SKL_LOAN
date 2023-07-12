@@ -11,40 +11,35 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.parse.Parse;
-import com.st1.itx.db.domain.TxAmlCredit;
-import com.st1.itx.db.domain.TxAmlCreditId;
-import com.st1.itx.db.service.TxAmlCreditService;
-
-import com.st1.itx.db.domain.TxAmlNotice;
-import com.st1.itx.db.service.TxAmlNoticeService;
-
-import com.st1.itx.db.service.TxToDoMainService;
-
-import com.st1.itx.db.domain.CustMain;
-import com.st1.itx.db.service.CustMainService;
-
-import com.st1.itx.db.service.CustTelNoService;
-
 import com.st1.itx.db.domain.CdBcm;
-import com.st1.itx.db.service.CdBcmService;
-
 import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.CdCodeId;
-import com.st1.itx.db.service.CdCodeService;
-
-import com.st1.itx.util.common.MakeExcel;
-import com.st1.itx.util.common.TxToDoCom;
+import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.TxAmlCredit;
+import com.st1.itx.db.domain.TxAmlCreditId;
+import com.st1.itx.db.domain.TxAmlNotice;
 import com.st1.itx.db.domain.TxToDoDetail;
-
+import com.st1.itx.db.service.CdBcmService;
+import com.st1.itx.db.service.CdCodeService;
+import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.CustTelNoService;
+import com.st1.itx.db.service.TxAmlCreditService;
+import com.st1.itx.db.service.TxAmlNoticeService;
 import com.st1.itx.db.service.TxToDoDetailService;
+import com.st1.itx.db.service.TxToDoMainService;
+import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.CustNoticeCom;
+import com.st1.itx.util.common.MakeExcel;
+import com.st1.itx.util.common.MakeFile;
+import com.st1.itx.util.common.TxToDoCom;
+import com.st1.itx.util.common.data.ReportVo;
+import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.parse.Parse;
 
 @Service("L8102")
 @Scope("prototype")
@@ -60,6 +55,9 @@ public class L8102 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	CustMainService custMainService;
+	/* 日期工具 */
+	@Autowired
+	DateUtil dateUtil;
 
 	@Autowired
 	CustTelNoService custTelNoService;
@@ -92,6 +90,11 @@ public class L8102 extends TradeBuffer {
 //	@Autowired
 	private MakeExcel makeExcel1;
 	private MakeExcel makeExcel2;
+	@Autowired
+	MakeFile makeFileText;
+	@Autowired
+	MakeFile makeFileMail;
+	private int wkCalDy = 0;
 
 	@Autowired
 	Parse parse;
@@ -110,6 +113,16 @@ public class L8102 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8102 ");
 		this.totaVo.init(titaVo);
+
+		wkCalDy = dateUtil.getNowIntegerForBC();
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI() + 19110000).setBrno(titaVo.getBrno())
+				.setRptCode("L8102").setRptItem("期款扣款通知").build();
+		// 開啟報表
+		makeFileText.open(titaVo, reportVo, "簡訊檔.txt");
+		ReportVo mailReportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI() + 19110000).setBrno(titaVo.getBrno())
+				.setRptCode("L8102").setRptItem("期款扣款通知").build();
+		// 開啟報表
+		makeFileMail.open(titaVo, mailReportVo, "email檔.txt");
 
 		int dataSource = 1;
 		if (titaVo.get("DataSource") != null) {
@@ -193,14 +206,14 @@ public class L8102 extends TradeBuffer {
 					txAmlCredit.setIsStatus(isStatus);
 					txAmlCredit.setWlfConfirmStatus(ConfirmStatus);
 
-					processDetail(titaVo, txAmlCredit,true);
+					processDetail(titaVo, txAmlCredit, true);
 				}
 			}
 		} else {
-			if (lTxAmlCredit != null && lTxAmlCredit.size()>0) {
+			if (lTxAmlCredit != null && lTxAmlCredit.size() > 0) {
 				this.info("L8102 lTxAmlCredit.size = " + lTxAmlCredit.size());
 				for (TxAmlCredit txAmlCredit : lTxAmlCredit) {
-					processDetail(titaVo, txAmlCredit,false);
+					processDetail(titaVo, txAmlCredit, false);
 				}
 			}
 		}
@@ -223,7 +236,7 @@ public class L8102 extends TradeBuffer {
 		}
 
 		txAmlCredit = checkProcessType(titaVo, txAmlCredit.getCustKey(), txAmlCredit);
-		
+
 		this.info("TxAmlCredit.ProcessType = " + txAmlCredit.getProcessType());
 		txAmlCredit.setProcessCount(0);
 
@@ -252,7 +265,13 @@ public class L8102 extends TradeBuffer {
 			tTxToDoDetail.setDtlValue("<AML定審簡訊通知>");
 			tTxToDoDetail.setItemCode("TEXT00");
 			tTxToDoDetail.setStatus(0);
-			tTxToDoDetail.setProcessNote(txToDoCom.getProcessNoteForText(messagePhone, "房貸客戶提醒：為維護您的權益，戶籍或通訊地址、電子信箱及連絡電話，或姓名、身分證統一編號等重要資訊有異動時，敬請洽詢公司服務人員或客戶服務部（０８００—０３１１１５）辦理變更。", this.getTxBuffer().getTxCom().getTbsdy()));
+			tTxToDoDetail.setProcessNote(txToDoCom.getProcessNoteForText(messagePhone,
+					"房貸客戶提醒：為維護您的權益，戶籍或通訊地址、電子信箱及連絡電話，或姓名、身分證統一編號等重要資訊有異動時，敬請洽詢公司服務人員或客戶服務部（０８００—０３１１１５）辦理變更。",
+					wkCalDy));
+			makeFileText.put(parse.IntegerToString(custMain.getCustNo(), 7) + "-" + parse.IntegerToString(0, 3)
+					+ txToDoCom.getProcessNoteForText(messagePhone,
+							"房貸客戶提醒：為維護您的權益，戶籍或通訊地址、電子信箱及連絡電話，或姓名、身分證統一編號等重要資訊有異動時，敬請洽詢公司服務人員或客戶服務部（０８００—０３１１１５）辦理變更。",
+							wkCalDy));
 
 			txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo);
 		}
