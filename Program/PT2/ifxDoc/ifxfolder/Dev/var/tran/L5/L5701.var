@@ -24,7 +24,7 @@ E(0,0)
 [#<->#,"#FdIsMainFin+最大債權",#IsMainFin],
 ["#FdCaseKindCode+案件種類",#CaseKindCode,#CaseKindCodeX],["#FdCourtCode+#CourtCodeFildName",#CourtCode,#CourtCodeX],
 ["#FdCustLoanKind+債權戶別",#CustLoanKind,#CustLoanKindX],["#FdPayerCustNo+#PayerCustNoFildName",#PayerCustNo,#PayerCustName],
-[#<->#,"#FdStatus+債權戶況",#Status,#StatusX],
+[#<->#,"#FdStatus+案件狀態",#Status,#StatusX],
 [#<->#,"#FdDeferYMStart+延期繳款年月+(+起+)",#DeferYMStartX],
 [#<->#,"#FdDeferYMEnd+延期繳款年月+(+訖+)",#DeferYMEndX],
 ["#FdApplDate+協商申請日",#ApplDate],["#FdChgCondDate+#ChgCondDateFildName",#ChgCondDate],
@@ -340,7 +340,7 @@ T(2,@MainFinCodeName,#L5r12BankItem)
 
 #B1=X,1,S
 IF(#FunctionCode=="05",$,S)
-!依戶況修改
+!依戶況(案件狀態)修改
 !SHOW(#BTND,#BTNF,#BTNE,#BTNG,#BTNH,#BTNI,#BTNJ)
 HIDE(#BTND,#BTNF,#BTNE,#BTNG,#BTNH,#BTNI)
 SHOW(#BTNJ,#BTNL)
@@ -437,7 +437,7 @@ IF (#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode
                         T(F,@CustId,0)T(F,@IsMainFin,0)T(F,@CaseKindCode,0)T(F,@CustLoanKind,0)T(F,@Status,0)
                         T(F,@DeferYMStartX,0)T(F,@DeferYMEndX,0)T(F,@ApplDate,0)T(F,@DueAmt,0)T(F,@TotalPeriod,0)
                         T(F,@IntRate,0)T(F,@FirstDueDate,0)T(F,@LastDueDate,0)T(F,@TotalContrAmt,0)T(F,@MainFinCode,0)T(F,@TwoStepCode,0)T(F,@PayerCustNo,0)T(F,@ChgCondDate,0)T(F,@CourtCode,0)T(F,@LastDueDate,0))                       
-!新增時戶況不可輸入,固定=0
+!新增時戶況(案件狀態)不可輸入,固定=0
 IF (#FunctionCode=="01",T(F,@Status,0),$) 
 !喘息期只能改此二欄位
 IF (#FunctionCode=="02" || #FunctionCode=="10",T(F,@DeferYMStartX,1)T(F,@DeferYMEndX,1),$) 
@@ -598,7 +598,7 @@ IF(#CustLoanKind==3,$,S)
 IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
 @T(3,@PayerCustName,)
 V(2,0)
-! 債權戶況
+! 債權戶況(案件狀態)
 ! 0:正常
 ! 1:已變更
 ! 2:毀諾
@@ -671,7 +671,7 @@ D(8)
 @V(7)A(DATE,0,#ApplDate)
 
 ! 變更還款日期:20230707怡婷要求階段新增時也要填=>
-!    階段新增時戶況為未生效,應於變更戶況為已變更時填寫變更還款條件日
+!    階段新增時戶況(案件狀態)為未生效,應於變更戶況為已變更時填寫變更還款條件日
 #ChgCondDate=D,7,I
 IF(#FunctionCode=="09",$,IF(#FunctionCode=="02" && #Status==1,$,s))
 !IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=="11",$,s)

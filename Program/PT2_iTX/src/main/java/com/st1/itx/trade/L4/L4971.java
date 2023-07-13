@@ -51,7 +51,7 @@ public class L4971 extends TradeBuffer {
 //		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 200;
 		
-		int inputAcDate  = parse.stringToInteger(titaVo.get("AcDate"));
+		int inputAcDate  = parse.stringToInteger(titaVo.get("AcDate"))+19110000;
 		String iReconCode = titaVo.get("ReconCode");
 		
 		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
@@ -63,7 +63,7 @@ public class L4971 extends TradeBuffer {
 			this.error("l4971ServiceImpl findByCondition " + e.getMessage());
 			throw new LogicException("E0013", e.getMessage());
 		}
-
+		
 		if (resultList != null && resultList.size() > 0) {
 			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 
@@ -71,8 +71,8 @@ public class L4971 extends TradeBuffer {
 
 				OccursList occursList = new OccursList();
 
-				int acDate = parse.stringToInteger(result.get("F3"));
-				int insDate = parse.stringToInteger(result.get("F4"));
+				int acDate = parse.stringToInteger(result.get("IntStartDate"));
+				int insDate = parse.stringToInteger(result.get("IntEndDate"));
 
 				if (acDate > 19110000) {
 					acDate = acDate - 19110000;
@@ -81,24 +81,26 @@ public class L4971 extends TradeBuffer {
 					insDate = insDate - 19110000;
 				}
 
-				occursList.putParam("OOCustNo", result.get("F0"));
-				occursList.putParam("OOCustName", result.get("F1"));
-				occursList.putParam("OOTxAmt", result.get("F2"));
-				occursList.putParam("OOIntStartDate", result.get("F3"));
-				occursList.putParam("OOIntEndDate", result.get("F4"));
-				occursList.putParam("OOPrincipal", result.get("F5"));
-				occursList.putParam("OOInterest", result.get("F6"));
-				occursList.putParam("OOBreachAmt", result.get("F7"));
-				occursList.putParam("OOFee", result.get("F8"));
-				occursList.putParam("OOTempDr", result.get("F9"));
-				occursList.putParam("OOShortAmt", result.get("F10"));
-				occursList.putParam("OOAcDate", result.get("F11"));
-				occursList.putParam("OOTitaTlrNo", result.get("F12"));
-				occursList.putParam("OOTitaTxtNo", result.get("F13"));
+				occursList.putParam("OOCustNo", result.get("CustNo"));
+				occursList.putParam("OOCustName", result.get("CustName"));
+				occursList.putParam("OOTxAmt", result.get("TxAmt"));
+				occursList.putParam("OOIntStartDate", acDate);
+				occursList.putParam("OOIntEndDate", insDate);
+				occursList.putParam("OOPrincipal", result.get("Principal"));
+				occursList.putParam("OOInterest", result.get("Interest"));
+				occursList.putParam("OOBreachAmt", result.get("BreachAmt"));
+				occursList.putParam("OOFee", result.get("Fee"));
+				occursList.putParam("OOTempDr", result.get("TempDr"));
+				occursList.putParam("OOShortAmt", result.get("ShortAmt"));
+				occursList.putParam("OOAcDate", result.get("OpenAcDate"));
+				occursList.putParam("OOTitaTlrNo", result.get("OpenTlrNo"));
+				occursList.putParam("OOTitaTxtNo", result.get("OpenTxtNo"));
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}
 
+		}else {
+			throw new LogicException("E0001","查無資料");
 		}
 
 		this.addList(this.totaVo);

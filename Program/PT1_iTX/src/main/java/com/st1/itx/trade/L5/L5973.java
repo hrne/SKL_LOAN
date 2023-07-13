@@ -160,6 +160,7 @@ public class L5973 extends TradeBuffer {
 				occursList.putParam("OOApprAmt", NegAppr01VO.getApprAmt());
 				occursList.putParam("OOAccuApprAmt", NegAppr01VO.getAccuApprAmt());
 				occursList.putParam("OOAmtRatio", NegAppr01VO.getAmtRatio());
+				occursList.putParam("OOReplyCode", NegAppr01VO.getReplyCode());
 				this.totaVo.addOccursList(occursList);
 			}
 

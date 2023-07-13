@@ -136,25 +136,25 @@ public class LM050Report extends MakeReport {
 		int size = 0;
 
 		for (Map<String, String> tLM050 : listLM050) {
-			String rptType = tLM050.get("F0");
+			String rptType = tLM050.get("RptType");
 			if (rptType.equals("1")) {
 				size++;
 			}
 
 		}
-		makeExcel.setShiftRow(rowCursor, size - 1);
+		makeExcel.setShiftRow(rowCursor + 1, size - 2);
 
 		makeExcel.setIBU("");
-		
+
 		for (Map<String, String> tLM050 : listLM050) {
 
-			String rptType = tLM050.get("F0");
-			BigDecimal loanBal = getBigDecimal(tLM050.get("F3"));
+			String rptType = tLM050.get("RptType");
+			BigDecimal loanBal = getBigDecimal(tLM050.get("LoanBal"));
 
 			if (rptType.equals("1")) { // 保險業利害關係人放款管理辦法第3條利害關係人
 
-				String custNo = tLM050.get("F1");
-				String custName = tLM050.get("F2");
+				String custNo = tLM050.get("CustNo");
+				String custName = tLM050.get("CustName");
 				String remark = tLM050.get("Remark");
 
 				if (!custNo.equals(tmpCustNo)) {
@@ -166,15 +166,14 @@ public class LM050Report extends MakeReport {
 
 				makeExcel.setValue(rowCursor, 2, custNo);
 				makeExcel.setValue(rowCursor, 3, custName);
-				makeExcel.setValue(rowCursor, 4, formatThousand(loanBal), "#,##0","R");
+				makeExcel.setValue(rowCursor, 4, formatThousand(loanBal), "#,##0", "R");
 				makeExcel.setValue(rowCursor, 5, this.computeDivide(loanBal.multiply(new BigDecimal("100")), equity, 6),
 						"#,##0.0000%");
 				this.info("bal:" + loanBal);
 				this.info("淨值:" + equity);
-				this.info("占淨比值:" + this.computeDivide(loanBal.multiply(new BigDecimal("100")), equity, 6));
-				
-				
-				makeExcel.setValue(rowCursor, 6,"1".equals(tLM050.get("EntCode"))? "10%": "2%"); // 限額標準 法人10% 個人2%
+				this.info("占淨比值:" + this.computeDivide(loanBal, equity, 4));
+
+				makeExcel.setValue(rowCursor, 6, "1".equals(tLM050.get("EntCode")) ? "10%" : "2%"); // 限額標準 法人10% 個人2%
 				makeExcel.setValue(rowCursor, 7, remark); // 備註
 
 				detailTotal = detailTotal.add(loanBal);

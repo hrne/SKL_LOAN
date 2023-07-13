@@ -1,7 +1,6 @@
 package com.st1.itx.trade.L1;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -105,10 +104,9 @@ public class L1R20 extends TradeBuffer {
 			// 排除一戶多額度中，有一額度沒有申請列印(表示需列印)，會被列為皆不列印之情況
 			Slice<FacMain> sFacMainService = facMainService.facmCustNoRange(custNo, custNo, 0, 999, 0,
 					Integer.MAX_VALUE, titaVo);
-			List<FacMain> lFacMain = sFacMainService == null ? null : sFacMainService.getContent();
 
-			if (lFacMain.size() > 0) {
-				for (FacMain fm : lFacMain) {
+			if (sFacMainService != null) {
+				for (FacMain fm : sFacMainService.getContent()) {
 
 					CustNoticeId custNoticeid = new CustNoticeId();
 					custNoticeid.setCustNo(fm.getCustNo());

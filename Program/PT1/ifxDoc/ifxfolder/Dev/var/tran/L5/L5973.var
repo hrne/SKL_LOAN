@@ -188,6 +188,9 @@ X(#OOAmtRatio)
 
 #OOAmtRatioX=X,10,O
 C(3,#XXAmtRatioX,0,T(2,),T(2,#XXAmtRatioX))
+
+#OOReplyCode=X,4,O
+
 </sub>
 
 !------ 上行電文 TEXT ------
@@ -215,6 +218,7 @@ TXFORM=L5973
 #OOApprAmt
 #OOAccuApprAmt
 #OOAmtRatio
+#OOReplyCode
 ^
 </sub>
 
@@ -252,6 +256,8 @@ TXFORM=L5973
 {width:120,align:'right'}
 #OOAmtRatioX=撥付比例％
 {width:85,align:'right'}
+#OOReplyCode=回應代碼
+{width:85,align:'center'}
 
 ^
 </sub>

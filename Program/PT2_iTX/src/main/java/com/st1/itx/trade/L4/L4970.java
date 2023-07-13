@@ -51,9 +51,9 @@ public class L4970 extends TradeBuffer {
 //		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 200;
 		
-		int startDate = parse.stringToInteger(titaVo.get("StartDate"));
+		int startDate = parse.stringToInteger(titaVo.get("StartDate"))+19110000;
 		
-		int endDate = parse.stringToInteger(titaVo.get("EndDate"));
+		int endDate = parse.stringToInteger(titaVo.get("EndDate"))+19110000;
 		
 		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 		try {
@@ -71,36 +71,30 @@ public class L4970 extends TradeBuffer {
 
 				OccursList occursList = new OccursList();
 
-				int insuMonth = parse.stringToInteger(result.get("F0"));
-				int insuStartDate = parse.stringToInteger(result.get("F3"));
-				int insuEndDate = parse.stringToInteger(result.get("F4"));
-				if (insuMonth > 191100) {
-					insuMonth = insuMonth - 191100;
-				}
-				if (insuStartDate > 19110000) {
-					insuStartDate = insuStartDate - 19110000;
-				}
-				if (insuEndDate > 19110000) {
-					insuEndDate = insuEndDate - 19110000;
-				}
+				int insuMonth = parse.stringToInteger(result.get("InsuYearMonth"));
+				int insuStartDate = parse.stringToInteger(result.get("InsuStartDate"));
+				int insuEndDate = parse.stringToInteger(result.get("InsuEndDate"));
 
 				occursList.putParam("OOInsuYearMonth", insuMonth);
-				occursList.putParam("OOPrevInsuNo", result.get("F1"));
-				occursList.putParam("OONowInsuNo", result.get("F2"));
+				occursList.putParam("OOPrevInsuNo", result.get("PrevInsuNo"));
+				occursList.putParam("OONowInsuNo", result.get("NowInsuNo"));
 				occursList.putParam("OOInsuStartDate", insuStartDate);
 				occursList.putParam("OOInsuEndDate", insuEndDate);
-				occursList.putParam("OOCustNo", result.get("F5")+"-"+result.get("F6"));
-				occursList.putParam("OOCustName", result.get("F7"));
-				occursList.putParam("OOTotInsuPrem", result.get("F8"));
-				occursList.putParam("OORepayCode", result.get("F9"));
-				occursList.putParam("OOStatusCode", result.get("F10"));
-				occursList.putParam("OOTavBal", result.get("F11"));
+				occursList.putParam("OOCustNo", result.get("CustNo")+"-"+result.get("FacmNo"));
+				occursList.putParam("OOCustName", result.get("CustName"));
+				occursList.putParam("OOTotInsuPrem", result.get("TotInsuPrem"));
+				occursList.putParam("OORepayCode", result.get("RepayCode"));
+				occursList.putParam("OOStatusCode", result.get("StatusCode"));
+				occursList.putParam("OOTavBal", result.get("TavBal"));
 
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}
 
 		}
+//		else {
+//			throw new LogicException("E0001","查無資料");
+//		}
 
 		this.addList(this.totaVo);
 
