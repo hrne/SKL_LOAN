@@ -114,6 +114,7 @@ public class L4603p extends TradeBuffer {
 	private String noticeEmail = "";
 	private String noticeAddress = "";
 	private String checkResultC = "";
+	private int iInsuEndMonth = 0;
 
 	private ArrayList<String> dataListLatter = new ArrayList<String>();
 	private List<AcReceivable> lAcReceivable = new ArrayList<AcReceivable>();
@@ -136,7 +137,6 @@ public class L4603p extends TradeBuffer {
 		// 開啟報表
 		makeFileMail.open(titaVo, mailReportVo, "email檔.txt");
 
-		int iInsuEndMonth = 0;
 		l4603report.setParentTranCode(parentTranCode);
 		l4603report2.setParentTranCode(parentTranCode);
 
@@ -169,15 +169,16 @@ public class L4603p extends TradeBuffer {
 
 			this.info("slInsuRenew ---------->" + slInsuRenew.getContent().size());
 
-			List<OccursList> reportlist = new ArrayList<>();
-			List<OccursList> reportlist1 = new ArrayList<>();
+			List<OccursList> reportlist = new ArrayList<>(); // 檢核錯誤
+			List<OccursList> reportlist1 = new ArrayList<>(); // 通知
+			List<OccursList> reportlist2 = new ArrayList<>(); // 不通知
 
 			for (InsuRenew t : lInsuRenew) {
 //				if ("Y".equals(t.getNotiTempFg())) {
 //					throw new LogicException("E0005", "已入通知，請先訂正此交易。");
 //				}
 
-//	1.找出客戶通知方式
+				// 1.找出客戶通知方式
 				CustMain t2CustMain = new CustMain();
 				String custName = "";
 				t2CustMain = custMainService.custNoFirst(t.getCustNo(), t.getCustNo(), titaVo);
@@ -185,7 +186,8 @@ public class L4603p extends TradeBuffer {
 					custName = t2CustMain.getCustName();
 				}
 				checkC(t.getCustNo(), t.getFacmNo(), titaVo);
-				if (!"".equals(checkResultC)) {
+				// 產生通知及寫入應處理清單
+				if (!"".equals(checkResultC)) { // 檢核錯誤
 					// 押品號碼 原保單號碼 戶號 額度 戶名 新保險起日 新保險迄日 火險保額 火線保費 地震險保額 地震險保費 總保費 錯誤說明
 					OccursList occursListReport = new OccursList();
 					occursListReport.putParam("ReportCClCode1", t.getClCode1());
@@ -209,9 +211,8 @@ public class L4603p extends TradeBuffer {
 						occursListReport.putParam("ReportCErrMsg", "此額度未撥款");
 					}
 					reportlist.add(occursListReport);
-//				totaC.addOccursList(occursListReport);
 				} else {
-//
+					notice(t, titaVo);
 					OccursList occursList = new OccursList();
 					occursList.putParam("OOCustNo", t.getCustNo());
 					occursList.putParam("OOFacmNo", t.getFacmNo());
@@ -220,94 +221,30 @@ public class L4603p extends TradeBuffer {
 					occursList.putParam("OOClNo", t.getClNo());
 					occursList.putParam("OOCustName", custName);
 					occursList.putParam("OOInsuNo", t.getPrevInsuNo());
-					occursList.putParam("OOLableA", noticeFlag);
-					reportlist1.add(occursList);
-//				this.totaVo.addOccursList(occursList);
-				} // else
-//			
-			} // for
+					occursList.putParam("OONoticeFlagX", getNoticeFlagX(noticeFlag, titaVo));
+					if (noticeFlag == 4) {
+						reportlist2.add(occursList);
+					} else {
+						reportlist1.add(occursList);
+					}
+				}
+			}
 
 			if (lAcReceivable.size() > 0) {
 				acReceivableCom.setTxBuffer(this.getTxBuffer());
 				acReceivableCom.mnt(0, lAcReceivable, titaVo); // 0-起帳 1-銷帳-刪除
 			}
 
+			// 續保資料錯誤明細表
 			if (reportlist.size() > 0) {
 				l4603report.exec(titaVo, reportlist, 1);
 			}
-
+			// 火險通知作業明細
 			if (reportlist1.size() > 0) {
-				l4603report.exec1(titaVo, reportlist1, 2);
+				l4603report.exec1(titaVo, reportlist1, reportlist2, 2);
 			}
-
-//			String subject = "火險及地震險保費-繳款通知單 ";
-			for (InsuRenew t : lInsuRenew) {
-
-				checkC(t.getCustNo(), t.getFacmNo(), titaVo);
-				dDateUtil.init();
-				dDateUtil.setDate_1(iInsuEndMonth * 100 + 01);
-				dDateUtil.setMons(0);
-				dDateUtil.getCalenderDay();
-				if (specificDd > dDateUtil.getDays()) {
-					specificDd = dDateUtil.getDays();
-				}
-
-				String sInsuEndMonth = Integer.toString(iInsuEndMonth);
-				String sspecificDd = FormatUtil.pad9(Integer.toString(specificDd), 2);
-
-				iEntryDate = parse.stringToInteger(sInsuEndMonth + sspecificDd);
-
-				sEntryDate = ("" + iEntryDate).substring(0, 4) + "/" + ("" + iEntryDate).substring(4, 6) + "/"
-						+ ("" + iEntryDate).substring(6);
-
-				this.info("iEntryDate : " + iEntryDate);
-
-				TempVo tempVo = new TempVo();
-				tempVo = custNoticeCom.getCustNotice("L4603", t.getCustNo(), t.getFacmNo(), titaVo);
-
-				noticeFlag = parse.stringToInteger(tempVo.getParam("NoticeFlag"));
-				noticePhoneNo = tempVo.getParam("MessagePhoneNo");
-				noticeEmail = tempVo.getParam("EmailAddress");
-				noticeAddress = tempVo.getParam("LetterAddress");
-
-				this.info("noticeFlag : " + noticeFlag);
-				this.info("noticePhoneNo : " + noticePhoneNo);
-				this.info("noticeEmail : " + noticeEmail);
-				this.info("noticeAddress : " + noticeAddress);
-
-//				2.依通知方式寫入L6001處理事項清單，之後在由批次程式去執行BatxNoticeCom寫File
-//				通知方式為書信者直接寫File
-//			           預設書信
-				if ("Y".equals(tempVo.getParam("isLetter"))) {
-					setLetterFileVO(t, titaVo);
-				}
-				if ("Y".equals(tempVo.getParam("isMessage"))) {
-					setTextFileVO(t, 0, titaVo);
-				}
-				if ("Y".equals(tempVo.getParam("isEmail"))) {
-
-					// 智偉修改
-					noticeEmail = tempVo.getParam("EmailAddress");
-
-					long sno = l4603report2.exec(titaVo, t, this.getTxBuffer());
-
-					// 2022-01-14 智偉修改
-					setEMailFileVO(t, 9, titaVo, sno);
-
-//					String bodyText = "親愛的客戶，繳款通知" + "\n" + "新光人壽關心您。";
-//					mailService.setParams(tempVo.getParam("EmailAddress"), subject, bodyText);
-
-//					mailService.setParams("skcu31780001@skl.com.tw", subject, bodyText);
-//					mailService.setParams("", outFolder + "火險及地震險保費-繳款通知單.pdf");
-//					mailService.exec();
-
-				}
-
-			}
-
-			if (dataListLatter.size() > 0)
-
-			{
+			// 產出txt供郵局產生通知函
+			if (dataListLatter.size() > 0) {
 				makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), "火險通知作業_LNM52P",
 						"LNM52P.txt", 2);
 
@@ -330,6 +267,7 @@ public class L4603p extends TradeBuffer {
 		makeFileMail.close();
 		this.addList(this.totaVo);
 		return this.sendList();
+
 	}
 
 	private void setLetterFileVO(InsuRenew tInsuRenew, TitaVo titaVo) throws LogicException {
@@ -338,11 +276,6 @@ public class L4603p extends TradeBuffer {
 		CustMain tCustMain = new CustMain();
 		tCustMain = custMainService.custNoFirst(tInsuRenew.getCustNo(), tInsuRenew.getCustNo(), titaVo);
 		if (tCustMain != null) {
-
-			// 判定是否有設定不通知
-			if (!custNoticeCom.checkIsLetterSendable(null, tCustMain.getCustNo(), tInsuRenew.getFacmNo(), "L4603",
-					titaVo))
-				return;
 
 //			QC 495 中文欄位前+半形空格
 			dataLines = " " + FormatUtil.padX(getZipCode(tCustMain), 9) + ", " + FormatUtil.padX(noticeAddress, 64)
@@ -564,27 +497,77 @@ public class L4603p extends TradeBuffer {
 		if (isUnLoan) {
 			checkResultC = "32";
 		}
-
-//		// 已結案
-//		if (isClose) {
-//			if ("".equals(checkResultC)) {
-//				checkResultC += "31";
-//			} else {
-//				checkResultC += ",31";
-//			}
-//		}
-//		// 未撥款
-//		if (isUnLoan) {
-//			if ("".equals(checkResultC)) {
-//				checkResultC += "32";
-//			} else {
-//				checkResultC = "32";
-//			}
-//		}
-
-//		if (!"".equals(checkResultC)) {
-//			errorCCnt = errorCCnt + 1;
-//		}
 	}
 
+//	
+	private void notice(InsuRenew t, TitaVo titaVo) throws LogicException {
+		dDateUtil.init();
+		dDateUtil.setDate_1(iInsuEndMonth * 100 + 01);
+		dDateUtil.setMons(0);
+		dDateUtil.getCalenderDay();
+		if (specificDd > dDateUtil.getDays()) {
+			specificDd = dDateUtil.getDays();
+		}
+
+		String sInsuEndMonth = Integer.toString(iInsuEndMonth);
+		String sspecificDd = FormatUtil.pad9(Integer.toString(specificDd), 2);
+
+		iEntryDate = parse.stringToInteger(sInsuEndMonth + sspecificDd);
+
+		sEntryDate = ("" + iEntryDate).substring(0, 4) + "/" + ("" + iEntryDate).substring(4, 6) + "/"
+				+ ("" + iEntryDate).substring(6);
+
+		this.info("iEntryDate : " + iEntryDate);
+
+		TempVo tempVo = new TempVo();
+		tempVo = custNoticeCom.getCustNotice("L4603", t.getCustNo(), t.getFacmNo(), titaVo);
+
+		noticeFlag = parse.stringToInteger(tempVo.getParam("NoticeFlag"));
+		noticePhoneNo = tempVo.getParam("MessagePhoneNo");
+		noticeEmail = tempVo.getParam("EmailAddress");
+		noticeAddress = tempVo.getParam("LetterAddress");
+
+		this.info("noticeFlag : " + noticeFlag);
+		this.info("noticePhoneNo : " + noticePhoneNo);
+		this.info("noticeEmail : " + noticeEmail);
+		this.info("noticeAddress : " + noticeAddress);
+
+//	2.依通知方式寫入L6001處理事項清單，之後在由批次程式去執行BatxNoticeCom寫File
+//	通知方式為書信者直接寫File
+//           預設書信
+		if ("Y".equals(tempVo.getParam("isLetter"))) {
+			setLetterFileVO(t, titaVo);
+		}
+		if ("Y".equals(tempVo.getParam("isMessage"))) {
+			setTextFileVO(t, 0, titaVo);
+		}
+		if ("Y".equals(tempVo.getParam("isEmail"))) {
+
+			// 智偉修改
+			noticeEmail = tempVo.getParam("EmailAddress");
+
+			long sno = l4603report2.exec(titaVo, t, this.getTxBuffer());
+
+			// 2022-01-14 智偉修改
+			setEMailFileVO(t, 9, titaVo, sno);
+
+		}
+	}
+
+	private String getNoticeFlagX(int noticeFlag, TitaVo titaVo) throws LogicException {
+		switch (noticeFlag) {
+		case 0:
+			return "火險通知單";
+		case 1:
+			return "書面通知";
+		case 2:
+			return "簡訊通知";
+		case 3:
+			return "電子郵件";
+		case 4:
+			return "不通知";
+		default:
+			return null;
+		}
+	}
 }

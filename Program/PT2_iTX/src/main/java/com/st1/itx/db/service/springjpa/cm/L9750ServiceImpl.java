@@ -129,6 +129,7 @@ public class L9750ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " select ari.\"CustNo\"       ";// 戶號
 		sql += "      , Json_VALUE(ari.\"JsonFields\",'$.ContractChgCode')  as \"ContractChgCode\" ";// 契約變更類型
 		sql += "      , cdl.\"Item\"         ";// 契約變更中文
+		sql += "      , ari.\"OpenAcDate\"   ";// 會計日
 		sql += " from \"AcReceivable\" ari  ";
 		sql += " left join \"CdCode\" cdl ";
 		sql += "        on cdl.\"DefCode\" = 'ChangeItemCode' ";

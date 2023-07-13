@@ -50,15 +50,15 @@ public class L4970 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 //		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 200;
-		
-		int startDate = parse.stringToInteger(titaVo.get("StartDate"))+19110000;
-		
-		int endDate = parse.stringToInteger(titaVo.get("EndDate"))+19110000;
-		
+
+		int startDate = parse.stringToInteger(titaVo.get("StartDate")) + 19110000;
+
+		int endDate = parse.stringToInteger(titaVo.get("EndDate")) + 19110000;
+
 		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 		try {
 			// *** 折返控制相關 ***
-			resultList = l4970ServiceImpl.findAll(startDate,endDate,titaVo);
+			resultList = l4970ServiceImpl.findAll(startDate, endDate, titaVo);
 		} catch (Exception e) {
 			this.error("l4970ServiceImpl findByCondition " + e.getMessage());
 			throw new LogicException("E0013", e.getMessage());
@@ -72,15 +72,16 @@ public class L4970 extends TradeBuffer {
 				OccursList occursList = new OccursList();
 
 				int insuMonth = parse.stringToInteger(result.get("InsuYearMonth"));
-				int insuStartDate = parse.stringToInteger(result.get("InsuStartDate"));
-				int insuEndDate = parse.stringToInteger(result.get("InsuEndDate"));
+//				int insuStartDate = parse.stringToInteger(result.get("InsuStartDate"));
+//				int insuEndDate = parse.stringToInteger(result.get("InsuEndDate"));
 
 				occursList.putParam("OOInsuYearMonth", insuMonth);
 				occursList.putParam("OOPrevInsuNo", result.get("PrevInsuNo"));
 				occursList.putParam("OONowInsuNo", result.get("NowInsuNo"));
-				occursList.putParam("OOInsuStartDate", insuStartDate);
-				occursList.putParam("OOInsuEndDate", insuEndDate);
-				occursList.putParam("OOCustNo", result.get("CustNo")+"-"+result.get("FacmNo"));
+				occursList.putParam("OOInsuStartDate", result.get("InsuStartDate"));
+				occursList.putParam("OOInsuEndDate", result.get("OOInsuEndDate"));
+				occursList.putParam("OOCustNo", result.get("CustNo"));
+				occursList.putParam("OOFacmNo",	result.get("FacmNo"));
 				occursList.putParam("OOCustName", result.get("CustName"));
 				occursList.putParam("OOTotInsuPrem", result.get("TotInsuPrem"));
 				occursList.putParam("OORepayCode", result.get("RepayCode"));
@@ -91,9 +92,23 @@ public class L4970 extends TradeBuffer {
 				this.totaVo.addOccursList(occursList);
 			}
 
-		}
+		} 
 //		else {
-//			throw new LogicException("E0001","查無資料");
+//			OccursList occursList = new OccursList();
+//			occursList.putParam("OOInsuYearMonth", "11106");
+//			occursList.putParam("OOPrevInsuNo", "l30010FEP0Z06714");
+//			occursList.putParam("OONowInsuNo", "");
+//			occursList.putParam("OOInsuStartDate", "1110629");
+//			occursList.putParam("OOInsuEndDate", "1110629");
+//			occursList.putParam("OOCustNo", "21183");
+//			occursList.putParam("OOFacmNo",	"1");
+//			occursList.putParam("OOCustName", "王XX");
+//			occursList.putParam("OOTotInsuPrem", "1052");
+//			occursList.putParam("OORepayCode", "1");
+//			occursList.putParam("OOStatusCode", 0);
+//			occursList.putParam("OOTavBal", "55968");
+//			/* 將每筆資料放入Tota的OcList */
+//			this.totaVo.addOccursList(occursList);
 //		}
 
 		this.addList(this.totaVo);

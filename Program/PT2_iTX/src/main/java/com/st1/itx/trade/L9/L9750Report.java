@@ -157,6 +157,7 @@ public class L9750Report extends CommBuffer {
 					makeExcel.setValue(rowCursor, 1, padStart(result.get("CustNo"), 7, "0"));
 					makeExcel.setValue(rowCursor, 2, result.get("ContractChgCode"), "L");
 					makeExcel.setValue(rowCursor, 3, result.get("Item"), "L");
+					makeExcel.setValue(rowCursor, 4, rptUtil.showRocDate(result.get("OpenAcDate"), 1), "L");
 				} else {
 					makeExcel.setValue(rowCursor, 1, padStart(result.get("CustNo"), 7, "0"));
 					makeExcel.setValue(rowCursor, 2, padStart(result.get("FacmNo"), 3, "0"));
@@ -201,9 +202,11 @@ public class L9750Report extends CommBuffer {
 			makeExcel.setValue(1, 1, "戶號");
 			makeExcel.setValue(1, 2, "契約變更類型");
 			makeExcel.setValue(1, 3, "契約變更中文");
+			makeExcel.setValue(1, 4, "會計日");
 			makeExcel.setWidth(1, 15);
 			makeExcel.setWidth(2, 20);
 			makeExcel.setWidth(3, 20);
+			makeExcel.setWidth(4, 20);
 		} else {
 			makeExcel.setValue(1, 1, "戶號");
 			makeExcel.setValue(1, 2, "額度編號");

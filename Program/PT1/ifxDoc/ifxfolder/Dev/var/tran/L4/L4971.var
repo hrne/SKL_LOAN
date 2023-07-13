@@ -57,15 +57,39 @@ E(0,0)
 <sub type="RTN" name="AFXMT">
 <include src="PRT.icf::PRTHEAD.rtn"/>
 
-#secret-no=x,1000,S
-T("")
-
-#batch-detail=x,100000,S
-#batch-print=A,1,S
-
 </sub>
 
+!------------ TXFORM = L4971 -----------
+<sub type="FORM" name="L4971">
+#SCRTIL=_,_,S
+T(3,[L4971] 匯款轉帳短繳查詢)
 
+#LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+
+#OOCustNo=A,7,O
+#OOCustName=X,100,O
+#OOTxAmt=m,14,O
+#OOIntStartDate=D,7,O
+#OOIntEndDate=D,7,O
+#OOPrincipal=m,14.2,O
+#OOInterest=m,14.2,O
+#OOBreachAmt=m,14.2,O
+#OOFee=A,5,O
+#OOTempDr=m,14.2,O
+#OOShortAmt=m,14.2,O
+#OOAcDate=D,7,O
+#OOTitaTlrNo=X,6,O
+#OOTitaTxtNo=A,8,O
+
+!查詢
+#OOBUF5=X,50,S
+T(2,#OOAcDate+#OOTitaTlrNo+#OOTitaTxtNo)
+
+#OOBTN5=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L3005; ntxbuf=#OOBUF5})
+
+</sub>
 !------ 上行電文 TEXT ------
 <sub type="TIM">
 #AcDate
@@ -76,66 +100,58 @@ T("")
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
 TXFORM=L4971
+#OOCustNo
+#OOCustName
+#OOTxAmt
+#OOIntStartDate
+#OOIntEndDate
+#OOPrincipal
+#OOInterest
+#OOBreachAmt
+#OOFee
+#OOTempDr
+#OOShortAmt
+#OOAcDate
+#OOTitaTlrNo
+#OOTitaTxtNo
+
+
 ^
 </sub>
 
 
 !---------- 單據輸出組合 ----------
 <sub type="SELECT">
-<include src="PRT.icf::UPD01.sel"/>
-</sub>
 
-<sub type="PART" name="L4971" layout="cols=3;screen.width=[1000];printer.width=[15,30,15,30];order=1">
-[
-["[L4971]                                 匯款轉帳短繳查詢                                "],
-]
-</sub>
-
-!---------- 單據輸出組合 ----------
-<sub type="SELECT">
-#batch-print=1,L4971.PFNX,NA,,,,,,1169:827
-^
 #RPTFG=0,QUERY.GRID,L4971
-#any={detail:true, header:'L8403.part', caption:'[L4971]匯款轉帳短繳查詢', width:1000, rowNum:20, rowList:[20,40,60],
-ifxBatch:{
-	name:'列印',
-	type:'5',
-	rim:'L840A',
-	txtno:'#secret-no',
-	pfnx:"L8403.PFNX",
-	col_captions:["戶號","戶名","匯款金額","計息起日","計息迄日","本金","利息","違約金","費用","暫收抵繳","短繳金額"],
-	col_names:["#OOCustId","#SubmitKeyX2","#OORcDate","#batch-row-status"]
-	}
-}
+#any={detail:true, header:'L4970.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
 
-#secret-no
-#batch-row-status
 
-                        
+#OOBTN5=查詢
+{width:50,search:false,formatter:'cust:bind-button:查詢;L3005 共同借款人資料明細查詢',align:'center',canExport:false}
+
 #OOCustNo=戶號
 {width:125,align:'center'}
 #OOCustName=戶名
 {width:125,align:'center'}
 #OOTxAmt=匯款金額
-{width:125,align:'center'}
+{width:125,align:'right'}
 #OOIntStartDate=計息起日
 {width:85,align:'center'}
 #OOIntEndDate=計息迄日
 {width:85,align:'center'}
 #OOPrincipal=本金
-{width:85,align:'center'}
+{width:85,align:'right'}
 #OOInterest=利息
-{width:85}
+{width:85,align:'right'}
 #OOBreachAmt=違約金
-{width:85}
+{width:85,align:'right'}
 #OOFee=費用
-{width:85}
-!暫收抵繳
+{width:85,align:'right'}
 #OOTempDr=暫收抵繳
 {width:85,align:'center'}
-!短繳金額
 #OOShortAmt=短繳金額
-{width:85,align:'center'}
+{width:85,align:'right'}
 
 !給L3005使用
 !#OOAcDate

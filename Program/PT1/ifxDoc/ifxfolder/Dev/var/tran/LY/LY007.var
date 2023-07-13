@@ -22,7 +22,7 @@ T(3,LY007)
 
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[140,300,110,200];printer.width=[20,20,20,20];order=1;">
+<sub type="DC" name="p1" layout="cols=1;screen.width=[140,900];printer.width=[20,80];order=1;">
 [
 ["[LY007]                                  LY007 Z100關係人交易明細表"],
 ["@年度",#RocYear],

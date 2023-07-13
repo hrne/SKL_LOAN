@@ -40,23 +40,23 @@ public class LM004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 本金餘額
 		String prinBal = titaVo.getParam("PrinBal");
 
-		String sql = "SELECT DECODE（M.\"AmortizedCode\", 3, 'Y', 'N') AS F0";
-		sql += "              ,F.\"ProdNo\" AS F1";
-		sql += "              ,C1.\"CityCode\" AS F2";
-		sql += "              ,C2.\"CityItem\" AS F3";
-		sql += "              ,E0.\"Fullname\" AS F4";
-		sql += "              ,M.\"CustNo\" AS F5";
-		sql += "              ,M.\"FacmNo\" AS F6";
-		sql += "              ,\"Fn_ParseEOL\"(C.\"CustName\",0) AS F7";
-		sql += "              ,M.\"MaturityDate\" AS F8";
-		sql += "              ,TO_CHAR(TO_DATE(M.\"MaturityDate\", 'YYYYMMDD') - 15, 'YYYYMMDD') AS F9";
-		sql += "              ,SUM(F.\"UtilAmt\") / COUNT(F.\"UtilAmt\") AS F10";
-		sql += "              ,M.\"PrevPayIntDate\" AS F11";
-		sql += "              ,E1.\"Fullname\" AS F12";
-		sql += "              ,F.\"Introducer\" AS F13";
-		sql += "              ,E1.\"CenterCode2Short\" AS F14";
-		sql += "              ,E1.\"CenterCode1Short\" AS F15";
-		sql += "              ,E1.\"CenterShortName\" AS F16";
+		String sql = "SELECT DECODE（M.\"AmortizedCode\", 3, 'Y', 'N') AS \"AmortizedCode\"";
+		sql += "              ,F.\"ProdNo\" AS \"ProdNo\"";
+		sql += "              ,C1.\"CityCode\" AS \"CityCode\"";
+		sql += "              ,C2.\"CityItem\" AS \"CityItem\"";
+		sql += "              ,E0.\"Fullname\" AS \"\"Fullname";
+		sql += "              ,M.\"CustNo\" AS \"CustNo\"";
+		sql += "              ,M.\"FacmNo\" AS \"FacmNo\"";
+		sql += "              ,\"Fn_ParseEOL\"(C.\"CustName\",0) AS \"CustName\"";
+		sql += "              ,M.\"MaturityDate\" AS \"MaturityDate\"";
+		sql += "              ,TO_CHAR(TO_DATE(M.\"MaturityDate\", 'YYYYMMDD') - 15, 'YYYYMMDD') AS \"15MaturityDate\"";
+		sql += "              ,SUM(F.\"UtilAmt\") / COUNT(F.\"UtilAmt\") AS \"UtilAmtAvg\"";
+		sql += "              ,M.\"PrevPayIntDate\" AS \"PrevPayIntDate\"";
+		sql += "              ,E1.\"Fullname\" AS \"Fullname\"";
+		sql += "              ,F.\"Introducer\" AS \"Introducer\"";
+		sql += "              ,E1.\"CenterCode2Short\" AS \"CenterCode2Short\"";
+		sql += "              ,E1.\"CenterCode1Short\" AS \"CenterCode1Short\"";
+		sql += "              ,E1.\"CenterShortName\" AS \"CenterShortName\"";
 		sql += "        FROM \"LoanBorMain\" M";
 		sql += "        LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\"";
 		sql += "                               AND F.\"FacmNo\" = M.\"FacmNo\"";
@@ -72,7 +72,6 @@ public class LM004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        LEFT JOIN \"CdCity\" C2 ON C2.\"CityCode\" = C1.\"CityCode\"";
 		sql += "        WHERE M.\"Status\" IN (0,4)";
 		sql += "          AND M.\"MaturityDate\" " + (kind.equals("excel") ? "<" : "") + "= :dueDate";
-//		sql += "          AND M.\"MaturityDate\" " + (kind.equals("excel") ? "<" : "") + "= :dueDate";
 		sql += "          AND M.\"LoanBal\" >= :prinBal";
 		sql += "		GROUP BY";
 		sql += "    		   DECODE（M.\"AmortizedCode\", 3, 'Y', 'N') ";
@@ -90,7 +89,7 @@ public class LM004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              ,E1.\"CenterCode2Short\" ";
 		sql += "              ,E1.\"CenterCode1Short\" ";
 		sql += "              ,E1.\"CenterShortName\" ";
-		sql += "		ORDER BY F8";
+		sql += "		ORDER BY \"MaturityDate\" ASC , \"CustNo\" ASC ,\"FacmNo\" ASC";
 
 		this.info("sql=" + sql);
 

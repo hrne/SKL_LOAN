@@ -79,19 +79,15 @@ T(1,@InsuYearMonthEnd,#NTXBUF,2,5)
 
 
 ! 保險起日
-#StartDate=A,7,I
-! C(3,#CHAIN,0,$,s)
-! @
-! V(7)A(DATE,0,#StartDate)
-! 保險迄日
-#CHECKMSG=X,20,S
-T(2,需輸入日期)
-
-#EndDate=A,7,I
-! E(0,#SYSDATE)
-! @V(7)A(DATE,0,#EndDate)
+#StartDate=D,7,I
+C(3,#CHAIN,0,$,s)
 @
-IF(#EndDate==0,V(P,#CHECKMSG),$)
+A(DATE,0,#StartDate)
+! 保險迄日
+#EndDate=D,7,I
+E(0,#SYSDATE)
+@V(7)A(DATE,0,#EndDate)
+
 
 #RPTFG=A,1,S
 
@@ -107,10 +103,6 @@ IF(#EndDate==0,V(P,#CHECKMSG),$)
 #SCRTIL=_,_,S
 T(3,[L4970] 暫收款可抵繳火險查詢)
 
-#OtotalCnt=m,6,L
-
-#OtotalAmt=m,14,L
-
 #LOOP=X,1,S
 E(0,1)ASGN(LOOP$)
 
@@ -121,17 +113,17 @@ E(0,1)ASGN(LOOP$)
 #OONowInsuNo=X,16,O
 
 !保險起日
-#OOInsuStartDate=A,8,O
+#OOInsuStartDate=D,7,O
 !新保單號碼
-#OOInsuEndDate=A,8,O
+#OOInsuEndDate=D,7,O
 
 ! 戶號
-#OOCustNo=A,11,O
+#OOCustNo=A,7,O
 ! 額度
-! #OOFacmNo=A,3,O
+#OOFacmNo=A,3,O
 
-! #OOCustNoA=X,11,O
-! T(2,#OOCustNo+-+#OOFacmNo)
+#OOCustNoA=X,11,O
+T(2,#OOCustNo+-+#OOFacmNo)
 ! 戶名
 #OOCustName=x,100,O
 ! 總保費
@@ -170,29 +162,25 @@ T(3,0:正常;1:借支;2:催收;3:呆帳;4:結案)
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
 TXFORM=L4970
-#OtotalCnt
-#OtotalAmt
 #OOInsuYearMonth
 #OOPrevInsuNo
 #OONowInsuNo
 #OOCustNo
+#OOFacmNo
 #OOTotalInsuAmt
 #OORepayCode
 #OOStatusCode
 #OOTavBal
+#OOInsuStartDate
+#OOInsuEndDate
+#OOCustName
+#OOTotInsuPrem
 ^
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 
 
 !---------- 單據輸出組合 ----------
-<sub type="PART" prompt='{{#SCRTIL}} world' name="L4970" layout="cols=3;screen.width=[130,370,130,370];order=1;">
-[
-["[L4970]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@暫收款可抵繳火險查詢"],
-["@合計筆數",#OtotalCnt,"筆"],["@@@合計金額",#OtotalAmt],
-]
-</sub>
-
 <sub type="PART" prompt='{{#SCRTIL}} world' name="L4970A" layout="cols=3;screen.width=[130,370,130,370];order=1;">
 
 </sub>
@@ -215,45 +203,22 @@ TXFORM=L4970
 {width:85,align:'center'}
 
 
-#OOCustNo=戶號 額度
+#OOCustNoA=戶號 額度
 {width:85,align:'center'}
 #OOCustName=戶名
-{width:85}
+{width:85,align:'center'}
 #OOTotInsuPrem=總保費
-{width:85}
+{width:85,align:'right'}
 #OORepayCode=繳款方式
-{width:85}
+{width:85,align:'center'}
 
 !#OOStatusCode
 
 
 #OOTavBal=暫收可抵繳金額
-{width:85,align:'center'}
+{width:85,align:'right'}
 
 
 ^
 
-#RPTFG=1,QUERY.GRID,L4970A
-#any={detail:false, header:'L4970A.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
-
-^
-<include src="PRT.icf::INQ04.sel" map="i=L4970;cpi=15"/>
-#SearchFlag
-#InsuYearMonth
-%
-#OtotalCnt
-#OtotalAmt
-#OOInsuYearMonth
-#OOPrevInsuNo
-#OONowInsuNo
-#OOInsuStartDate
-#OOInsuEndDate
-#OOCustNo
-#OOCustName
-#OOTotInsuPrem
-#OORepayCode
-#OOStatusCode
-#OOTavBal
-
-@^
 </sub>

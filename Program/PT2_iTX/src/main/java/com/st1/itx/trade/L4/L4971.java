@@ -98,8 +98,26 @@ public class L4971 extends TradeBuffer {
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}
+		}	
+		else {
+//			OccursList occursList = new OccursList();
+//			occursList.putParam("OOCustNo", "203871");
+//			occursList.putParam("OOCustName", "王XX");
+//			occursList.putParam("OOTxAmt", "3858");
+//			occursList.putParam("OOIntStartDate", "1110201");
+//			occursList.putParam("OOIntEndDate", "1110201");
+//			occursList.putParam("OOPrincipal","3444" );
+//			occursList.putParam("OOInterest", "407");
+//			occursList.putParam("OOBreachAmt","7" );
+//			occursList.putParam("OOFee", "0");
+//			occursList.putParam("OOTempDr", "0");
+//			occursList.putParam("OOShortAmt", "358");
+//			occursList.putParam("OOAcDate", "1110201");
+//			occursList.putParam("OOTitaTlrNo", "AT2777");
+//			occursList.putParam("OOTitaTxtNo", "0200014");
+//			/* 將每筆資料放入Tota的OcList */
+//			this.totaVo.addOccursList(occursList);
 
-		}else {
 			throw new LogicException("E0001","查無資料");
 		}
 

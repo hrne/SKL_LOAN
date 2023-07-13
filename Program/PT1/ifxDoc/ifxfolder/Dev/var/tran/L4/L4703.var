@@ -213,6 +213,7 @@ E(0,#L4R32Date7)
 #UnpaidDayEd=A,3,L
 
 #RimFlag=A,1,S
+#notPrintLetter=X,1,S
 
 #L1R20Rim2=X,1,S
 C(3,#CustNo,0,S,$)

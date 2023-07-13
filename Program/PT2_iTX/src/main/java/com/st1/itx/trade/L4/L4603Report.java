@@ -48,6 +48,8 @@ public class L4603Report extends MakeReport {
 //	每頁筆數
 	private int pageIndex = 48;
 
+	private int pageCnt = 0;
+
 	@Override
 	public void printHeader() {
 
@@ -72,7 +74,8 @@ public class L4603Report extends MakeReport {
 
 	public void printHeaderP1() {
 		this.print(-2, 84, "續保資料錯誤明細表", "C");
-		this.print(-4, 1, "  擔保品號碼    原保單號碼 戶號    額度 戶名                  新保險起日 新保險迄日     火險保額      火線保費      地震險保額      地震險保費       總保費      錯誤說明");
+		this.print(-4, 1,
+				"  擔保品號碼    原保單號碼 戶號    額度 戶名                  新保險起日 新保險迄日     火險保額      火線保費      地震險保額      地震險保費       總保費      錯誤說明");
 	}
 
 	public void exec(TitaVo titaVo, List<OccursList> reportlist, int reporttype) throws LogicException {
@@ -82,7 +85,8 @@ public class L4603Report extends MakeReport {
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4603", "續保資料錯誤明細表", "續保資料錯誤明細表", "A4", "L");
 		int pageCnt = 0;
 		for (OccursList t : reportlist) {
-			this.print(1, 3, t.get("ReportCClCode1") + "-" + FormatUtil.pad9(t.get("ReportCClCode2"), 2) + "-" + FormatUtil.pad9(t.get("ReportCClNo"), 7));
+			this.print(1, 3, t.get("ReportCClCode1") + "-" + FormatUtil.pad9(t.get("ReportCClCode2"), 2) + "-"
+					+ FormatUtil.pad9(t.get("ReportCClNo"), 7));
 
 			this.print(0, 16, t.get("ReportCPrevInsuNo"));
 			this.print(0, 26, FormatUtil.pad9(t.get("ReportCCustNo"), 7));
@@ -115,52 +119,23 @@ public class L4603Report extends MakeReport {
 		this.toPdf(sno);
 	}
 
-	public void exec1(TitaVo titaVo, List<OccursList> reportlist, int reporttype) throws LogicException {
+	public void exec1(TitaVo titaVo, List<OccursList> reportlist, List<OccursList> reportlist2, int reporttype)
+			throws LogicException {
 		this.info("L4603Report exec1");
 
 		this.reporttype = reporttype;
-		int pageCnt = 0;
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4603", "火險通知作業明細", "火險通知作業明細", "A4", "P");
 
 		String OOLableA = "";
 		for (OccursList t : reportlist) {
-			this.print(1, 3, FormatUtil.pad9(t.get("OOCustNo"), 7) + "-" + FormatUtil.pad9(t.get("OOFacmNo"), 3));
-			this.print(0, 18, t.get("OOClCode1") + "-" + FormatUtil.pad9(t.get("OOClCode2"), 2) + "-" + FormatUtil.pad9(t.get("OOClNo"), 7));
-			this.print(0, 35, t.get("OOInsuNo"));
-
-			int nameLength = 20;
-			if (StringCut.replaceLineUp(t.get("OOCustName")).length() < 20) {
-				nameLength = StringCut.replaceLineUp(t.get("OOCustName")).length();
-			}
-			this.print(0, 52, StringCut.replaceLineUp(t.get("OOCustName")).substring(0, nameLength));// 員工姓名
-
-			switch (t.get("OOLableA")) {
-			case "0":
-				OOLableA = "火險通知單";
-				break;
-			case "1":
-				OOLableA = "書面通知";
-				break;
-			case "2":
-				OOLableA = "簡訊通知";
-				break;
-			case "3":
-				OOLableA = "電子郵件";
-				break;
-			case "4":
-				OOLableA = "不通知";
-				break;
-			default:
-				break;
-
-			}
-			this.print(0, 74, OOLableA);
-
-			pageCnt++;
-
-			if (pageCnt >= pageIndex) {
-				pageCnt = 0;
-				this.newPage();
+			setVal(t);
+		}
+		if (reportlist2.size() > 0) {
+			this.newPage();
+			printHeaderP();
+			this.print(-3, 48, "(已申請不列印書面通知書客戶)", "C");
+			for (OccursList t : reportlist2) {
+				setVal(t);
 			}
 		}
 
@@ -179,6 +154,28 @@ public class L4603Report extends MakeReport {
 		result = result.substring(0, 3) + "/" + result.substring(3, 5) + "/" + result.substring(5);
 
 		return result;
+	}
+
+	private void setVal(OccursList t) {
+		this.print(1, 3, FormatUtil.pad9(t.get("OOCustNo"), 7) + "-" + FormatUtil.pad9(t.get("OOFacmNo"), 3));
+		this.print(0, 18, t.get("OOClCode1") + "-" + FormatUtil.pad9(t.get("OOClCode2"), 2) + "-"
+				+ FormatUtil.pad9(t.get("OOClNo"), 7));
+		this.print(0, 35, t.get("OOInsuNo"));
+
+		int nameLength = 20;
+		if (StringCut.replaceLineUp(t.get("OOCustName")).length() < 20) {
+			nameLength = StringCut.replaceLineUp(t.get("OOCustName")).length();
+		}
+		this.print(0, 52, StringCut.replaceLineUp(t.get("OOCustName")).substring(0, nameLength));// 員工姓名
+
+		this.print(0, 74, t.get("OONoticeFlagX"));
+
+		pageCnt++;
+
+		if (pageCnt >= pageIndex) {
+			pageCnt = 0;
+			this.newPage();
+		}
 	}
 
 }
