@@ -51,6 +51,21 @@ BEGIN
             WHERE LBM."SumLoanBal" = 0 -- 在放款主檔(LoanBorMain)放款餘額皆為0
               AND FC."CloseDate" >= 19110101 -- 確保有結清日期
         )
+        , NM AS (
+            SELECT DISTINCT
+                   "CustNo"
+            FROM "NegMain"
+        )
+        , MAX_AC_DATE_LBT AS (
+            SELECT "CustNo"
+                 , "FacmNo"
+                 , "BormNo"
+                 , MAX("AcDate") AS "AcDate"
+            FROM "LoanBorTx"
+            GROUP BY "CustNo"
+                   , "FacmNo"
+                   , "BormNo"
+        )
         SELECT DISTINCT
                LBT."CustNo"
               ,LBT."FacmNo"
@@ -58,10 +73,16 @@ BEGIN
         FROM FC
         LEFT JOIN "LoanBorTx" LBT ON LBT."CustNo" = FC."CustNo"
         LEFT JOIN "TxBizDate" TBD ON TBD."DateCode" = 'ONLINE'
+        LEFT JOIN NM ON NM."CustNo" = FC."CustNo"
+        LEFT JOIN MAX_AC_DATE_LBT MLBT ON MLBT."CustNo" = LBT."CustNo"
+                                      AND MLBT."FacmNo" = LBT."FacmNo"
+                                      AND MLBT."BormNo" = LBT."BormNo"
         WHERE FC."Seq" = 1
           AND NVL(FC."CloseDate",0) >= 19110101 -- 確保有結清日期
           AND NVL(LBT."CustNo",0) != 0 -- 確保有串到交易明細
           AND TRUNC(MONTHS_BETWEEN(TO_DATE(TO_CHAR(TBD."TbsDyf"), 'YYYYMMDD'), TO_DATE(TO_CHAR(FC."CloseDate"), 'YYYYMMDD'))) >= 5 * 12 -- 結清滿五年
+          AND NVL(NM."CustNo",0) = 0 -- 2023-07-14 Wei 增加 from 賴桑 : 債協戶的交易明細不可搬運
+          AND TRUNC(MONTHS_BETWEEN(TO_DATE(TO_CHAR(TBD."TbsDyf"), 'YYYYMMDD'), TO_DATE(TO_CHAR(MLBT."AcDate"), 'YYYYMMDD'))) >= 5 * 12 -- 2023-07-14 Wei 增加 from 賴桑 : 最後交易日滿五年
         ;
         
         SELECT COUNT(*) INTO v_tempCount FROM "TxArchivedTemp";

@@ -44,7 +44,7 @@ public class LM004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              ,F.\"ProdNo\" AS \"ProdNo\"";
 		sql += "              ,C1.\"CityCode\" AS \"CityCode\"";
 		sql += "              ,C2.\"CityItem\" AS \"CityItem\"";
-		sql += "              ,E0.\"Fullname\" AS \"Fullname\"";
+		sql += "              ,E0.\"Fullname\" AS \"BusFullname\"";
 		sql += "              ,M.\"CustNo\" AS \"CustNo\"";
 		sql += "              ,M.\"FacmNo\" AS \"FacmNo\"";
 		sql += "              ,\"Fn_ParseEOL\"(C.\"CustName\",0) AS \"CustName\"";
@@ -52,7 +52,7 @@ public class LM004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              ,TO_CHAR(TO_DATE(M.\"MaturityDate\", 'YYYYMMDD') - 15, 'YYYYMMDD') AS \"15MaturityDate\"";
 		sql += "              ,SUM(F.\"UtilAmt\") / COUNT(F.\"UtilAmt\") AS \"UtilAmtAvg\"";
 		sql += "              ,M.\"PrevPayIntDate\" AS \"PrevPayIntDate\"";
-		sql += "              ,E1.\"Fullname\" AS \"Fullname\"";
+		sql += "              ,E1.\"Fullname\" AS \"IntFullname\"";
 		sql += "              ,F.\"Introducer\" AS \"Introducer\"";
 		sql += "              ,E1.\"CenterCode2Short\" AS \"CenterCode2Short\"";
 		sql += "              ,E1.\"CenterCode1Short\" AS \"CenterCode1Short\"";

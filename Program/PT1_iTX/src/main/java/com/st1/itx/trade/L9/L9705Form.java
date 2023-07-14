@@ -13,6 +13,9 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.buffer.TxBuffer;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.CustNotice;
+import com.st1.itx.db.domain.CustNoticeId;
+import com.st1.itx.db.service.CustNoticeService;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.BaTxVo;
@@ -39,6 +42,9 @@ public class L9705Form extends MakeReport {
 
 	@Autowired
 	WebClient webClient;
+	
+	@Autowired
+	private CustNoticeService sCustNoticeService;
 
 	@Override
 	public void printTitle() {
@@ -104,15 +110,31 @@ public class L9705Form extends MakeReport {
 				if (tL9Vo.get("FacmNo") != null) {
 					facmNo = parse.stringToInteger(tL9Vo.get("FacmNo"));
 				}
-//				if (tL9Vo.get("RepayCode") != null) {
-//					repayCode = tL9Vo.get("RepayCode");
-//				}
 
 				if (tL9Vo.get("CustName") != null) {
 					custName = tL9Vo.get("CustName");
 				}
 
-//				ArrayList<BaTxVo> lBaTxVo = new ArrayList<>();
+				
+				CustNotice lCustNotice = new CustNotice();
+				CustNoticeId lCustNoticeId = new CustNoticeId();
+
+				lCustNoticeId.setCustNo(custNo);
+				lCustNoticeId.setFacmNo(facmNo);
+				lCustNoticeId.setFormNo(tran);
+			
+				lCustNotice = sCustNoticeService.findById(lCustNoticeId, titaVo);
+			
+				// paper為N 表示不印
+				if (lCustNotice == null) {
+				} else {
+
+					if ("N".equals(lCustNotice.getPaperNotice())) {
+						continue;
+					}
+				}
+
+				
 				ArrayList<BaTxVo> listBaTxVo = new ArrayList<>();
 
 				dBaTxCom.setTxBuffer(txbuffer);

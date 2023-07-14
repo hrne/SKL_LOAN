@@ -132,8 +132,9 @@ public class L4603Report extends MakeReport {
 		}
 		if (reportlist2.size() > 0) {
 			this.newPage();
-			printHeaderP();
 			this.print(-3, 48, "(已申請不列印書面通知書客戶)", "C");
+			this.print(1, 1, "");
+			pageCnt = 0;
 			for (OccursList t : reportlist2) {
 				setVal(t);
 			}
@@ -175,6 +176,8 @@ public class L4603Report extends MakeReport {
 		if (pageCnt >= pageIndex) {
 			pageCnt = 0;
 			this.newPage();
+			this.print(-3, 48, "(已申請不列印書面通知書客戶)", "C");
+			this.print(1, 1, "");
 		}
 	}
 

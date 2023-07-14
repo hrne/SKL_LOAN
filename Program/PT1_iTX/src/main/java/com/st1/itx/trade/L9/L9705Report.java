@@ -15,8 +15,11 @@ import com.st1.itx.buffer.TxBuffer;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.CustNotice;
+import com.st1.itx.db.domain.CustNoticeId;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.CustNoticeService;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.MakeReport;
@@ -45,6 +48,9 @@ public class L9705Report extends MakeReport {
 	@Autowired
 	public CustMainService custMainService;
 
+	@Autowired
+	private CustNoticeService sCustNoticeService;
+	
 	@Autowired
 	private Parse parse;
 
@@ -174,12 +180,24 @@ public class L9705Report extends MakeReport {
 				this.custNo = custNo;
 				this.facmNo = facmNo;
 
-				// 檢查 CustNoticeCom 確認此戶此報表是否能產出
-				// input parameter: CUSTNO
-				// L4702 會直接塞值呼叫這隻，那邊有分整批與個別功能，因此這裡透過判定 param CUSTNO 是否為空來看為個別或整批
-				if (!custNoticeCom.checkIsLetterSendable(titaVo.get("CUSTNO"), custNo, facmNo, tran, titaVo))
-					continue;
+	
+				CustNotice lCustNotice = new CustNotice();
+				CustNoticeId lCustNoticeId = new CustNoticeId();
 
+				lCustNoticeId.setCustNo(custNo);
+				lCustNoticeId.setFacmNo(facmNo);
+				lCustNoticeId.setFormNo(tran);
+			
+				lCustNotice = sCustNoticeService.findById(lCustNoticeId, titaVo);
+			
+				// paper為N 表示不印
+				if (lCustNotice == null) {
+				} else {
+
+					if ("N".equals(lCustNotice.getPaperNotice())) {
+						continue;
+					}
+				}
 				/**************************************************************************************/
 
 				ArrayList<BaTxVo> lBaTxVo = new ArrayList<>();

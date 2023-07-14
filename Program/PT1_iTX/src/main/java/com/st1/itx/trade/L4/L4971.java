@@ -73,12 +73,16 @@ public class L4971 extends TradeBuffer {
 
 				int acDate = parse.stringToInteger(result.get("IntStartDate"));
 				int insDate = parse.stringToInteger(result.get("IntEndDate"));
+				int l3005AcDate = parse.stringToInteger(result.get("OpenAcDate"));
 
 				if (acDate > 19110000) {
 					acDate = acDate - 19110000;
 				}
 				if (insDate > 19110000) {
 					insDate = insDate - 19110000;
+				}
+				if (l3005AcDate > 19110000) {
+					l3005AcDate = l3005AcDate - 19110000;
 				}
 
 				occursList.putParam("OOCustNo", result.get("CustNo"));
@@ -92,7 +96,7 @@ public class L4971 extends TradeBuffer {
 				occursList.putParam("OOFee", result.get("Fee"));
 				occursList.putParam("OOTempDr", result.get("TempDr"));
 				occursList.putParam("OOShortAmt", result.get("ShortAmt"));
-				occursList.putParam("OOAcDate", result.get("OpenAcDate"));
+				occursList.putParam("OOAcDate", l3005AcDate);
 				occursList.putParam("OOTitaTlrNo", result.get("OpenTlrNo"));
 				occursList.putParam("OOTitaTxtNo", result.get("OpenTxtNo"));
 				/* 將每筆資料放入Tota的OcList */

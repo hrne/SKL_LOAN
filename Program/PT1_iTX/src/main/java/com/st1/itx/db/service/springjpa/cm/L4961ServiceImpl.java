@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.eum.ContentName;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L4961ServiceImpl")
@@ -89,6 +90,7 @@ public class L4961ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " where i.\"AcDate\" = 0                                ";
 			sql += "   and i.\"RenewCode\" = 2                             ";
 			sql += "   and i.\"StatusCode\" in (0, 1, 2)                   ";
+			sql += "   and i.\"TotInsuPrem\" > 0                           ";//選項為未銷全部時,增加判斷總保費>0
 		}
 		// SearchOption 0:正常未繳 1:正常已繳 2:借支 3:轉催 4:催收未繳 5:結案 7:續保 8:自保 9:全部
 		// status 0:正常 1:借支 2:催收 4:結案
