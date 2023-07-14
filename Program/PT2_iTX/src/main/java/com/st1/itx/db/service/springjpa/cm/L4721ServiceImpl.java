@@ -656,8 +656,8 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "        , Nvl(R.\"FitRate\", 0) AS \"AdjustedRate\"";
 			sql += "        , Nvl(Cb.\"BdLocation\", ' ') AS \"Location\"";
 			sql += "   FROM \"tmpMain\"     X";
-			sql += "   LEFT JOIN \"FacMain\"   F ON F.\"CustNo\" = X.\"CustNo\"";
-			sql += "                            AND F.\"FacmNo\" = X.\"FacmNo\"";
+//			sql += "   LEFT JOIN \"FacMain\"   F ON F.\"CustNo\" = X.\"CustNo\"";
+//			sql += "                            AND F.\"FacmNo\" = X.\"FacmNo\"";
 			sql += "   LEFT JOIN (";
 			sql += "       SELECT \"CustNo\"";
 			sql += "            , \"FacmNo\"";
@@ -672,11 +672,9 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "       WHERE  \"EffectDate\" >=" + sAdjDate;
 			sql += "   		 AND \"EffectDate\" <=" + eAdjDate;
 			sql += "   ";
-			sql += "   ) R ON R.\"CustNo\" = F.\"CustNo\"";
+			sql += "   ) R ON R.\"CustNo\" = XF.\"CustNo\"";
 			sql += "          AND";
-			sql += "          R.\"FacmNo\" = F.\"FacmNo\"";
-			sql += "          AND";
-			sql += "          R.\"BormNo\" = F.\"LastBormNo\"";
+			sql += "          R.\"FacmNo\" = XF.\"FacmNo\"";
 			sql += "          AND";
 			sql += "          R.\"seq\" = 1";
 			sql += "   LEFT JOIN (";

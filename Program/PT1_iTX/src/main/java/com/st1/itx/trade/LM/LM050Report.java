@@ -167,7 +167,7 @@ public class LM050Report extends MakeReport {
 				makeExcel.setValue(rowCursor, 2, custNo);
 				makeExcel.setValue(rowCursor, 3, custName);
 				makeExcel.setValue(rowCursor, 4, formatThousand(loanBal), "#,##0", "R");
-				makeExcel.setValue(rowCursor, 5, this.computeDivide(loanBal, equity, 6), "#,##0.0000%");
+				makeExcel.setValue(rowCursor, 5, this.computeDivide(loanBal, equity, 6), "##0.0000%");
 				this.info("bal:" + loanBal);
 				this.info("淨值:" + equity);
 				this.info("占淨比值:" + this.computeDivide(loanBal, equity, 6));

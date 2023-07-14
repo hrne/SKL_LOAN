@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -180,13 +183,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("selectC " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0);
     if (dbName.equals(ContentName.onDay))
-      slice = insuRenewReposDay.findAllByInsuYearMonthIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, pageable);
+      slice = insuRenewReposDay.findAllByInsuYearMonthIsOrderByCustNoAscFacmNoAscInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = insuRenewReposMon.findAllByInsuYearMonthIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, pageable);
+      slice = insuRenewReposMon.findAllByInsuYearMonthIsOrderByCustNoAscFacmNoAscInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = insuRenewReposHist.findAllByInsuYearMonthIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, pageable);
+      slice = insuRenewReposHist.findAllByInsuYearMonthIsOrderByCustNoAscFacmNoAscInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, pageable);
     else 
-      slice = insuRenewRepos.findAllByInsuYearMonthIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, pageable);
+      slice = insuRenewRepos.findAllByInsuYearMonthIsOrderByCustNoAscFacmNoAscInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

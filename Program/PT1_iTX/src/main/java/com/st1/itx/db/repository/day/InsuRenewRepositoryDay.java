@@ -3,11 +3,14 @@ package com.st1.itx.db.repository.day;
 
 import java.util.Optional;
 
+import java.math.BigDecimal;
+import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +32,7 @@ public interface InsuRenewRepositoryDay extends JpaRepository<InsuRenew, InsuRen
   public Slice<InsuRenew> findAllByAcDateIsAndRepayCodeIsOrderByInsuEndDateDescInsuStartDateAsc(int acDate_0, int repayCode_1, Pageable pageable);
 
   // InsuYearMonth = 
-  public Slice<InsuRenew> findAllByInsuYearMonthIsOrderByInsuEndDateDescInsuStartDateAsc(int insuYearMonth_0, Pageable pageable);
+  public Slice<InsuRenew> findAllByInsuYearMonthIsOrderByCustNoAscFacmNoAscInsuEndDateDescInsuStartDateAsc(int insuYearMonth_0, Pageable pageable);
 
   // InsuYearMonth = ,AND RepayCode = 
   public Slice<InsuRenew> findAllByInsuYearMonthIsAndRepayCodeIsOrderByInsuEndDateDescInsuStartDateAsc(int insuYearMonth_0, int repayCode_1, Pageable pageable);

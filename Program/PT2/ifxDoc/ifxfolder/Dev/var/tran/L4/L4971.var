@@ -81,10 +81,12 @@ E(0,1)ASGN(LOOP$)
 #OOAcDate=D,7,O
 #OOTitaTlrNo=X,6,O
 #OOTitaTxtNo=A,8,O
+T(2,@OOTitaTxtNoX,#OOTitaTxtNo)
+#OOTitaTxtNoX=X,8,O
 
 !查詢
 #OOBUF5=X,50,S
-T(2,#OOAcDate+#OOTitaTlrNo+#OOTitaTxtNo)
+T(2,L4971+#OOCustNo+000+000+#OOAcDate+0000+#OOTitaTlrNo+#OOTitaTxtNoX+9)
 
 #OOBTN5=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L3005; ntxbuf=#OOBUF5})

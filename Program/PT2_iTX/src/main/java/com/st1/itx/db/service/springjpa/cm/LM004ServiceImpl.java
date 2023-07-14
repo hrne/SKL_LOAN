@@ -44,7 +44,7 @@ public class LM004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              ,F.\"ProdNo\" AS \"ProdNo\"";
 		sql += "              ,C1.\"CityCode\" AS \"CityCode\"";
 		sql += "              ,C2.\"CityItem\" AS \"CityItem\"";
-		sql += "              ,E0.\"Fullname\" AS \"\"Fullname";
+		sql += "              ,E0.\"Fullname\" AS \"Fullname\"";
 		sql += "              ,M.\"CustNo\" AS \"CustNo\"";
 		sql += "              ,M.\"FacmNo\" AS \"FacmNo\"";
 		sql += "              ,\"Fn_ParseEOL\"(C.\"CustName\",0) AS \"CustName\"";

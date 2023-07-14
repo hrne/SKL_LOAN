@@ -79,7 +79,7 @@ public class L4970 extends TradeBuffer {
 				occursList.putParam("OOPrevInsuNo", result.get("PrevInsuNo"));
 				occursList.putParam("OONowInsuNo", result.get("NowInsuNo"));
 				occursList.putParam("OOInsuStartDate", result.get("InsuStartDate"));
-				occursList.putParam("OOInsuEndDate", result.get("OOInsuEndDate"));
+				occursList.putParam("OOInsuEndDate", result.get("InsuEndDate"));
 				occursList.putParam("OOCustNo", result.get("CustNo"));
 				occursList.putParam("OOFacmNo",	result.get("FacmNo"));
 				occursList.putParam("OOCustName", result.get("CustName"));
