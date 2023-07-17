@@ -128,7 +128,7 @@ public class L4603Report extends MakeReport {
 
 		String OOLableA = "";
 		for (OccursList t : reportlist) {
-			setVal(t);
+			setVal(t, 1);
 		}
 		if (reportlist2.size() > 0) {
 			this.newPage();
@@ -136,7 +136,7 @@ public class L4603Report extends MakeReport {
 			this.print(1, 1, "");
 			pageCnt = 0;
 			for (OccursList t : reportlist2) {
-				setVal(t);
+				setVal(t, 2);
 			}
 		}
 
@@ -157,7 +157,7 @@ public class L4603Report extends MakeReport {
 		return result;
 	}
 
-	private void setVal(OccursList t) {
+	private void setVal(OccursList t, int flag) {
 		this.print(1, 3, FormatUtil.pad9(t.get("OOCustNo"), 7) + "-" + FormatUtil.pad9(t.get("OOFacmNo"), 3));
 		this.print(0, 18, t.get("OOClCode1") + "-" + FormatUtil.pad9(t.get("OOClCode2"), 2) + "-"
 				+ FormatUtil.pad9(t.get("OOClNo"), 7));
@@ -176,7 +176,9 @@ public class L4603Report extends MakeReport {
 		if (pageCnt >= pageIndex) {
 			pageCnt = 0;
 			this.newPage();
-			this.print(-3, 48, "(已申請不列印書面通知書客戶)", "C");
+			if (flag == 2) {
+				this.print(-3, 48, "(已申請不列印書面通知書客戶)", "C");
+			}
 			this.print(1, 1, "");
 		}
 	}

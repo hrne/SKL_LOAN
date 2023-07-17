@@ -97,11 +97,11 @@ public class L8101 extends TradeBuffer {
 
 		wkCalDy = dateUtil.getNowIntegerForBC();
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI() + 19110000).setBrno(titaVo.getBrno())
-				.setRptCode("L8101").setRptItem("期款扣款通知").build();
+				.setRptCode("L8101").setRptItem("期款扣款通知(簡訊)").build();
 		// 開啟報表
 		makeFileText.open(titaVo, reportVo, "簡訊檔.txt");
 		ReportVo mailReportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI() + 19110000).setBrno(titaVo.getBrno())
-				.setRptCode("L8101").setRptItem("期款扣款通知").build();
+				.setRptCode("L8101").setRptItem("期款扣款通知(EMail)").build();
 		// 開啟報表
 		makeFileMail.open(titaVo, mailReportVo, "email檔.txt");
 

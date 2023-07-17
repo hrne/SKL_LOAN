@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class AcDetail implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -6670873208160939522L;
-
-@EmbeddedId
+  @EmbeddedId
   private AcDetailId acDetailId;
 
   // 登放日期
@@ -89,7 +85,7 @@ public class AcDetail implements Serializable {
   private BigDecimal txAmt = new BigDecimal("0");
 
   // 入總帳記號
-  /* 0:未入帳1:已入帳9.提存傳票已上傳核心(產生傳票批號&amp;gt;=90上傳核心傳票檔時抓取EntAc=1,並更新為9，正常傳票與沖正傳票分批上傳核心時使用) */
+  /* 0:未入帳1:已入帳9.提存傳票已上傳核心(產生傳票批號&amp;gt;=90上傳核心傳票檔時抓取EntAc=8,並更新為9，正常傳票與沖正傳票分批上傳核心時使用) */
   @Column(name = "`EntAc`")
   private int entAc = 0;
 
@@ -203,7 +199,7 @@ public class AcDetail implements Serializable {
   @Column(name = "`TitaRelCd`")
   private int titaRelCd = 0;
 
-  // 彙總傳票批號
+  // 彙總傳票號碼
   @Column(name = "`SlipSumNo`")
   private int slipSumNo = 0;
 
@@ -211,8 +207,8 @@ public class AcDetail implements Serializable {
   @Column(name = "`JsonFields`", length = 300)
   private String jsonFields;
 
-  // 傳票號碼
-  /* 格式:F10+民國年+月份(1碼)+日期+3碼序號此欄位會由總帳傳票資料傳輸程式回寫 */
+  // 總帳傳票號碼
+  /* 格式:F10+民國年+月份(1碼)+日期+3碼序號由產生SlipMedia2022(總帳傳票媒體檔)L9130Report2022寫入 */
   @Column(name = "`MediaSlipNo`", length = 12)
   private String mediaSlipNo;
 
@@ -477,7 +473,7 @@ C:貸
 	* 入總帳記號<br>
 	* 0:未入帳
 1:已入帳
-9.提存傳票已上傳核心(產生傳票批號&amp;gt;=90上傳核心傳票檔時抓取EntAc=1,並更新為9，正常傳票與沖正傳票分批上傳核心時使用)
+9.提存傳票已上傳核心(產生傳票批號&amp;gt;=90上傳核心傳票檔時抓取EntAc=8,並更新為9，正常傳票與沖正傳票分批上傳核心時使用)
 	* @return Integer
 	*/
   public int getEntAc() {
@@ -488,7 +484,7 @@ C:貸
 	* 入總帳記號<br>
 	* 0:未入帳
 1:已入帳
-9.提存傳票已上傳核心(產生傳票批號&amp;gt;=90上傳核心傳票檔時抓取EntAc=1,並更新為9，正常傳票與沖正傳票分批上傳核心時使用)
+9.提存傳票已上傳核心(產生傳票批號&amp;gt;=90上傳核心傳票檔時抓取EntAc=8,並更新為9，正常傳票與沖正傳票分批上傳核心時使用)
   *
   * @param entAc 入總帳記號
 	*/
@@ -1057,7 +1053,7 @@ C:貸
   }
 
 /**
-	* 彙總傳票批號<br>
+	* 彙總傳票號碼<br>
 	* 
 	* @return Integer
 	*/
@@ -1066,10 +1062,10 @@ C:貸
   }
 
 /**
-	* 彙總傳票批號<br>
+	* 彙總傳票號碼<br>
 	* 
   *
-  * @param slipSumNo 彙總傳票批號
+  * @param slipSumNo 彙總傳票號碼
 	*/
   public void setSlipSumNo(int slipSumNo) {
     this.slipSumNo = slipSumNo;
@@ -1095,9 +1091,9 @@ C:貸
   }
 
 /**
-	* 傳票號碼<br>
+	* 總帳傳票號碼<br>
 	* 格式:F10+民國年+月份(1碼)+日期+3碼序號
-此欄位會由總帳傳票資料傳輸程式回寫
+由產生SlipMedia2022(總帳傳票媒體檔)L9130Report2022寫入
 	* @return String
 	*/
   public String getMediaSlipNo() {
@@ -1105,11 +1101,11 @@ C:貸
   }
 
 /**
-	* 傳票號碼<br>
+	* 總帳傳票號碼<br>
 	* 格式:F10+民國年+月份(1碼)+日期+3碼序號
-此欄位會由總帳傳票資料傳輸程式回寫
+由產生SlipMedia2022(總帳傳票媒體檔)L9130Report2022寫入
   *
-  * @param mediaSlipNo 傳票號碼
+  * @param mediaSlipNo 總帳傳票號碼
 	*/
   public void setMediaSlipNo(String mediaSlipNo) {
     this.mediaSlipNo = mediaSlipNo;

@@ -672,9 +672,9 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "       WHERE  \"EffectDate\" >=" + sAdjDate;
 			sql += "   		 AND \"EffectDate\" <=" + eAdjDate;
 			sql += "   ";
-			sql += "   ) R ON R.\"CustNo\" = XF.\"CustNo\"";
+			sql += "   ) R ON R.\"CustNo\" = X.\"CustNo\"";
 			sql += "          AND";
-			sql += "          R.\"FacmNo\" = XF.\"FacmNo\"";
+			sql += "          R.\"FacmNo\" = X.\"FacmNo\"";
 			sql += "          AND";
 			sql += "          R.\"seq\" = 1";
 			sql += "   LEFT JOIN (";

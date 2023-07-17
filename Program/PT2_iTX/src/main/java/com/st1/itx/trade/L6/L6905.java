@@ -134,11 +134,15 @@ public class L6905 extends TradeBuffer {
 			// 查詢會計科子細目設定檔
 			occursList.putParam("OOAcNoItem", d.get("AcNoItem"));
 			occursList.putParam("OOSlipNo", d.get("SlipNo"));
-			
+
 			// 傳票批號=SlipBatNo
 			occursList.putParam("OOSlipBatNo", d.get("SlipBatNo"));
-			// 彙總批號=SlipSumNo
-			occursList.putParam("OOSlipSumNo", d.get("SlipSumNo"));
+			// 彙總批號=SlipSumNo，TitaBatchNo
+			if (d.get("TitaBatchNo").length() == 6) {
+				occursList.putParam("OOSlipSumNo", d.get("TitaBatchNo").substring(4, 6));
+			} else {
+				occursList.putParam("OOSlipSumNo", d.get("SlipSumNo"));
+			}
 			// 入總帳記號=EntAc
 			occursList.putParam("OOEntAc", d.get("EntAc"));
 			// 總帳傳票號碼=MediaSlipNo

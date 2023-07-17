@@ -46,7 +46,7 @@ E(0,0)
 [
 ["[L6061]                                 會計科子細目查詢"],
 ["#FdAcNoCode+科子細目",#AcNoCode,"－",#AcSubCode,"－",#AcDtlCode],
-["#FdAcNoItem+科目名稱",#AcNoItem],
+["#FdAcNoItem+科子細目名稱",#AcNoItem],
 !["#FdRPTFG+顯示方式",
 !<include src="COM.icf::RPTFG.scr"/>
 !],

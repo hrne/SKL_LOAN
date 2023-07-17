@@ -137,12 +137,12 @@ public class L9705Report extends MakeReport {
 
 			for (Map<String, String> r : l9705List) {
 
-				try {
-					Thread.sleep(1 * 500);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+//				try {
+//					Thread.sleep(1 * 500);
+//				} catch (InterruptedException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
 
 				int custNo = 0;
 				int facmNo = 0;
@@ -153,6 +153,27 @@ public class L9705Report extends MakeReport {
 				if (r.get("FacmNo") != null) {
 					facmNo = parse.stringToInteger(r.get("FacmNo"));
 				}
+				
+				
+				CustNotice lCustNotice = new CustNotice();
+				CustNoticeId lCustNoticeId = new CustNoticeId();
+
+				lCustNoticeId.setCustNo(custNo);
+				lCustNoticeId.setFacmNo(facmNo);
+				lCustNoticeId.setFormNo(tran);
+			
+				lCustNotice = sCustNoticeService.findById(lCustNoticeId, titaVo);
+			
+				// paper為N 表示不印
+				if (lCustNotice == null) {
+				} else {
+
+					if ("N".equals(lCustNotice.getPaperNotice())) {
+						continue;
+					}
+				}
+				
+				
 				if (r.get("RepayCode") != null) {
 					repayCode = r.get("RepayCode");
 				}
@@ -181,23 +202,7 @@ public class L9705Report extends MakeReport {
 				this.facmNo = facmNo;
 
 	
-				CustNotice lCustNotice = new CustNotice();
-				CustNoticeId lCustNoticeId = new CustNoticeId();
-
-				lCustNoticeId.setCustNo(custNo);
-				lCustNoticeId.setFacmNo(facmNo);
-				lCustNoticeId.setFormNo(tran);
 			
-				lCustNotice = sCustNoticeService.findById(lCustNoticeId, titaVo);
-			
-				// paper為N 表示不印
-				if (lCustNotice == null) {
-				} else {
-
-					if ("N".equals(lCustNotice.getPaperNotice())) {
-						continue;
-					}
-				}
 				/**************************************************************************************/
 
 				ArrayList<BaTxVo> lBaTxVo = new ArrayList<>();

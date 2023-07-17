@@ -1,13 +1,16 @@
 package com.st1.itx.db.repository.hist;
 
+
 import java.util.Optional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,19 +25,19 @@ import com.st1.itx.db.domain.TxFlowId;
  */
 public interface TxFlowRepositoryHist extends JpaRepository<TxFlow, TxFlowId> {
 
-	// Entdy = ,AND FlowBrNo =
-	public Slice<TxFlow> findAllByEntdyIsAndFlowBrNoIsOrderByFlowNoAsc(int entdy_0, String flowBrNo_1, Pageable pageable);
+  // Entdy = ,AND FlowBrNo =
+  public Slice<TxFlow> findAllByEntdyIsAndFlowBrNoIsOrderByFlowNoAsc(int entdy_0, String flowBrNo_1, Pageable pageable);
 
-	// Entdy = ,AND FlowBrNo = ,AND FlowMode = ,AND TranNo % ,AND FlowGroupNo ^i
-	public Slice<TxFlow> findAllByEntdyIsAndFlowBrNoIsAndFlowModeIsAndTranNoLikeAndFlowGroupNoInOrderByFlowNoAsc(int entdy_0, String flowBrNo_1, int flowMode_2, String tranNo_3,
-			List<String> flowGroupNo_4, Pageable pageable);
+  // Entdy >= ,AND Entdy <= ,AND FlowBrNo = ,AND FlowMode = ,AND TranNo % ,AND FlowGroupNo ^i
+  public Slice<TxFlow> findAllByEntdyGreaterThanEqualAndEntdyLessThanEqualAndFlowBrNoIsAndFlowModeIsAndTranNoLikeAndFlowGroupNoInOrderByFlowNoAsc(int entdy_0, int entdy_1, String flowBrNo_2, int flowMode_3, String tranNo_4, List<String> flowGroupNo_5, Pageable pageable);
 
-	// Entdy = ,AND SecNo =
-	public Slice<TxFlow> findAllByEntdyIsAndSecNoIs(int entdy_0, String secNo_1, Pageable pageable);
+  // Entdy = ,AND SecNo =
+  public Slice<TxFlow> findAllByEntdyIsAndSecNoIs(int entdy_0, String secNo_1, Pageable pageable);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<TxFlow> findByTxFlowId(TxFlowId txFlowId);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<TxFlow> findByTxFlowId(TxFlowId txFlowId);
 
 }
+

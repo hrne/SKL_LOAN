@@ -566,12 +566,19 @@ public class L6101 extends TradeBuffer {
 		}
 
 		// 業務關帳次數 => 預設為00，關帳時+1、關帳取消則-1
+		// 02.支票繳款傳票批號固定為11，放款傳票批號為 ClsNo+1，跳過10以免重複
 		if (uClsFg == 1) {
 			tAcClose.setClsNo(tAcClose.getClsNo() + 1);
+			if ("09".equals(uSecNo) && tAcClose.getClsNo() == 10) {
+				tAcClose.setClsNo(11);
+			}
 		}
-
+		
 		if (uClsFg == 2) {
 			tAcClose.setClsNo(tAcClose.getClsNo() - 1);
+			if ("09".equals(uSecNo) && tAcClose.getClsNo() == 10) {
+				tAcClose.setClsNo(9);
+			}
 		}
 
 		tAcClose.setClsFg(uClsFg);
@@ -582,9 +589,7 @@ public class L6101 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 		}
 
-		if ("01".equals(uSecNo) && uClsFg == 1) { // 01.撥款匯款&關帳時，將整批批號帶到L4101
-			this.totaVo.putParam("OOResult", "4101");
-		} else if ("02".equals(uSecNo) && uClsFg == 1) { // 02.支票繳款&關帳時，自動連結[票據媒體製作]畫面
+		if ("02".equals(uSecNo) && uClsFg == 1) { // 02.支票繳款&關帳時，自動連結[票據媒體製作]畫面
 			this.totaVo.putParam("OOResult", "4701");
 		} else {
 			this.totaVo.putParam("OOResult", "0000");

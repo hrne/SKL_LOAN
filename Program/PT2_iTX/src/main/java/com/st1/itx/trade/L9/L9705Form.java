@@ -84,21 +84,6 @@ public class L9705Form extends MakeReport {
 			this.openForm(titaVo, reportVo);
 
 			for (Map<String, String> tL9Vo : l9705List) {
-				if (count > 0) {
-					this.newPage();
-				}
-
-				count++;
-				this.info("tran = " + tran + ",count = " + count);
-				this.info("CustNo = " + tL9Vo.get("CustNo"));
-				this.info("FacmNo = " + tL9Vo.get("FacmNo"));
-				this.info("ENTDY = " + titaVo.getParam("ENTDY"));
-				this.info("CustName = " + tL9Vo.get("CustName"));
-				this.info("RepayCode = " + tL9Vo.get("RepayCode"));
-//				if (!"2".equals(tL9Vo.get("RepayCode"))) {
-//					continue;
-//				}
-
 				int custNo = 0;
 				int facmNo = 0;
 				int entryDate = parse.stringToInteger(titaVo.getParam("ENTDY"));
@@ -114,7 +99,6 @@ public class L9705Form extends MakeReport {
 				if (tL9Vo.get("CustName") != null) {
 					custName = tL9Vo.get("CustName");
 				}
-
 				
 				CustNotice lCustNotice = new CustNotice();
 				CustNoticeId lCustNoticeId = new CustNoticeId();
@@ -128,11 +112,30 @@ public class L9705Form extends MakeReport {
 				// paper為N 表示不印
 				if (lCustNotice == null) {
 				} else {
-
 					if ("N".equals(lCustNotice.getPaperNotice())) {
 						continue;
 					}
 				}
+				
+				if (count > 0) {
+					this.newPage();
+				}
+
+				count++;
+				this.info("tran = " + tran + ",count = " + count);
+				this.info("CustNo = " + tL9Vo.get("CustNo"));
+				this.info("FacmNo = " + tL9Vo.get("FacmNo"));
+				this.info("ENTDY = " + titaVo.getParam("ENTDY"));
+				this.info("CustName = " + tL9Vo.get("CustName"));
+				this.info("RepayCode = " + tL9Vo.get("RepayCode"));
+//				if (!"2".equals(tL9Vo.get("RepayCode"))) {
+//					continue;
+//				}
+
+		
+
+				
+			
 
 				
 				ArrayList<BaTxVo> listBaTxVo = new ArrayList<>();

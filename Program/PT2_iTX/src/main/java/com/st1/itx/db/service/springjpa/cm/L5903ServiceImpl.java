@@ -60,6 +60,7 @@ public class L5903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (iApplDateTo == 19110000) {//無輸入起訖日時
 			iApplDateTo = 99991231;
 		}
+		int ientDy = titaVo.getEntDyI() + 19110000;
 		String iteller = titaVo.getParam("TLRNO");
 		
 		String iUsageCode = titaVo.getParam("UsageCode");
@@ -108,6 +109,7 @@ public class L5903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              WHEN i.\"ApplEmpNo\" <> :iteller THEN 'N'       ";   // 經辦與借閱人相同才可修正
 		sql += "              WHEN NVL(JSON_VALUE(i.\"JsonFields\", '$.RELCD'), ' ') = '2' "; 
 		sql += "                   AND i.\"TitaActFg\" in ('2') THEN 'N'       ";  // 兩段式已放行不可修正
+		sql += "              WHEN i.\"TitaEntDy\" <> :ientDy THEN 'N'       ";   // 隔日不可修正
 		sql += "              ELSE 'Y' END            AS  \"ModifyFg\"    ";
 		sql += "        ,CASE WHEN i.\"ApplCode\" IN ('2') THEN 'N'       ";
 		sql += "              WHEN i.\"TitaTxtNo\" = 0 THEN 'N'       ";
@@ -164,6 +166,7 @@ public class L5903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
 		query.setParameter("iteller", iteller);
+		query.setParameter("ientDy", ientDy);
 
 		cnt = query.getResultList().size();
 		this.info("Total cnt ..." + cnt);

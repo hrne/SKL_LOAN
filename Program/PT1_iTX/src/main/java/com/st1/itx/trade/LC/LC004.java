@@ -61,7 +61,14 @@ public class LC004 extends TradeBuffer {
 		this.info("active LC004 ");
 		this.totaVo.init(titaVo);
 
-		int iEntday = Integer.valueOf(titaVo.get("iEntdy").trim()) + 19110000;
+		int iEntday = Integer.valueOf(titaVo.get("iEntdy").trim());
+		int iEntdayS = 0;
+		int iEntdayE = 99991231;
+		if (iEntday > 0) {
+			iEntday = iEntday + 19110000;
+			iEntdayS = iEntday + 19110000;
+			iEntdayE = iEntday + 19110000;
+		}
 		String iBrNo = titaVo.get("iBrNo").trim();
 		titaVo.get("iGroupNo").trim();
 		String iTranNo = titaVo.get("iTranNo").trim();
@@ -85,7 +92,8 @@ public class LC004 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 40;
 
-		Slice<TxFlow> slTxFlow = txFlowService.findByLC003(iEntday, iBrNo, 2, iTranNo + "%", groupNoList, this.index, this.limit);
+		Slice<TxFlow> slTxFlow = txFlowService.findByLC003(iEntdayS, iEntdayE, iBrNo, 2, iTranNo + "%", groupNoList,
+				this.index, this.limit);
 		List<TxFlow> lTxFlow = slTxFlow == null ? null : slTxFlow.getContent();
 
 		if (lTxFlow == null) {
