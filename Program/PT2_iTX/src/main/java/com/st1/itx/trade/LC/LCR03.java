@@ -93,6 +93,13 @@ public class LCR03 extends TradeBuffer {
 
 			try {
 				TitaVo tita2 = titaVo.getVo(tTxRecord.getTranData());
+				if (tTxRecord.getEntdy() < titaVo.getEntDyI()) {
+					tita2.put("ENTDY", titaVo.getEntDy());
+					tita2.put("NBSDY", titaVo.getNbsDy());
+					tita2.put("NNBSDY", titaVo.getNnbsDy());
+				}
+				tita2.put("TLRNO", "");
+				tita2.put("TXTNO", "");
 				tita2.put("OrgEntdy", String.valueOf(tTxRecord.getEntdy()));
 				tita2.put("ORGKIN", tTxRecord.getBrNo());
 				tita2.put("ORGTLR", tTxRecord.getTlrNo());

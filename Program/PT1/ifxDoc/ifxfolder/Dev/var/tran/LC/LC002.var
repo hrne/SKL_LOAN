@@ -48,7 +48,7 @@ K(MODIFYBUTTON,查詢)
 !---------- AP Button AREA ----------
 
 #FdEntdy=X,2,L
-
+T(3,*)
 #FdBrNo=X,2,L
 
 #FdTlrNo=X,2,L

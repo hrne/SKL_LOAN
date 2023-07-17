@@ -644,7 +644,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "       AND Lb.\"FacmNo\" = X.\"FacmNo\"";
 			sql += "   ";
 			sql += "   WHERE Lb.\"SpecificDd\" IS NOT NULL";
-			sql += "   ORDER BY  X.\"EntryDate\"";
+			sql += "   ORDER BY  X.\"FacmNo\" , X.\"EntryDate\"";
 
 			// 利率變動日及地址
 		} else {

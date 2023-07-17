@@ -69,10 +69,10 @@ public class L9139ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "      from (                                                                              ";
 			sql += "            select                                                                        ";
 			sql += "             \"CustNo\"                                                                   ";
-			sql += "            ,0 AS  \"TdCkBal\"                                                            ";
-			sql += "            ,0 AS  \"TdAvBal\"                                                            ";
-			sql += "            ,case when \"AcctCode\" in ('TCK') then \"TavBal\" else 0 end  AS \"YdCkBal\" ";
-			sql += "            ,case when \"AcctCode\" in ('TCK') then  0 else \"TavBal\" end AS \"YdAvBal\" ";
+			sql += "            ,case when \"AcctCode\" in ('TCK') then \"TavBal\" else 0 end  AS \"TdCkBal\" ";
+			sql += "            ,case when \"AcctCode\" in ('TCK') then  0 else \"TavBal\" end AS \"TdAvBal\" ";
+			sql += "            ,0 AS  \"YdCkBal\"                                                            ";
+			sql += "            ,0 AS  \"YdAvBal\"                                                            ";
 			sql += "            from (                                                                        ";
 			sql += "                  select                                                                  ";
 			sql += "                   \"CustNo\"                                                             ";
@@ -83,7 +83,7 @@ public class L9139ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "                                          Order By \"AcDate\" DESC)  as ROWNO             ";
 			sql += "                  from \"DailyTav\"                                                       ";
 			sql += "                  where \"AcctCode\" in ('TAV','TCK','TAM','TSL')                         ";
-			sql += "                   and \"AcDate\" < TO_NUMBER(TO_CHAR(to_date(:AcDate,'YYYYMMDD')-1, 'YYYYMMDD')) ";
+			sql += "                   and \"AcDate\" = (select \"AcDate\" from (select \"AcDate\",rank() over (order by \"AcDate\" desc) as seq  from \"DailyTav\" where \"AcDate\"<=:AcDate group by \"AcDate\" order by \"AcDate\" desc) where seq =1) ";
 			sql += "                )                                                                         ";
 			sql += "            where  ROWNO = 1                                                              ";
 			sql += "            union all                                                                     ";
@@ -103,7 +103,7 @@ public class L9139ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "                                          Order By \"AcDate\" DESC)  as ROWNO             ";
 			sql += "                  from \"DailyTav\"                                                       ";
 			sql += "                  where \"AcctCode\" in ('TAV','TCK','TAM','TSL')                         ";
-			sql += "                   and \"AcDate\" < :AcDate                                               ";
+			sql += "                   and \"AcDate\" = (select \"AcDate\" from (select \"AcDate\",rank() over (order by \"AcDate\" desc) as seq  from \"DailyTav\" where \"AcDate\"<=:AcDate group by \"AcDate\" order by \"AcDate\" desc) where seq =2) ";
 			sql += "                )                                                                         ";
 			sql += "            where  ROWNO = 1                                                              ";
 			sql += "            )                                                                             ";
@@ -115,11 +115,11 @@ public class L9139ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "   order by \"CustNo\"                                                             ";
 			}
 		
-		//與會計日期同一日，使用會計銷帳檔與每日暫收款餘額檔計算暫收款
+		//與會計日期同一日，使用會計銷帳檔(今日)與每日暫收款餘額檔(昨日)計算暫收款
 		if (decision==2)
 		{
 		sql += "select                                                                                    ";
-		sql += " :AcDate as \"AcDate\"                                                                    ";
+		sql +=  " :AcDate as \"AcDate\"                                                                    ";
 		sql += ",LPAD(a.\"CustNo\",7,0)  as \"CustNo\"                                                    ";
 		sql += ",b.\"CustName\"                                                                           ";
 		sql += ",case when \"TdCkBal\" = \"YdCkBal\" then 0 else \"TdCkBal\" end as \"TdCkBal\"           ";

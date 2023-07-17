@@ -28,7 +28,6 @@ import com.st1.itx.db.service.TxFlowService;
  * @version 1.0.0
  */
 public class LCR05 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(LCR05.class);
 
 	@Autowired
 	public TxRecordService txRecordService;
@@ -58,16 +57,12 @@ public class LCR05 extends TradeBuffer {
 		} else {
 
 			int flowstep = tTxRecord.getFlowStep();
-			String actfg = "";
-
 			if (tTxRecord.getActionFg() == 1) {
 				throw new LogicException(titaVo, "EC004", "帳務日:" + entday + ",交易序號:" + txno + "已訂正");
 			} else if (tTxRecord.getActionFg() == 2) {
 				throw new LogicException(titaVo, "EC004", "帳務日:" + entday + ",交易序號:" + txno + "已修正");
 			} else if (flowstep == 1) {
-				actfg = "2";
 			} else if (flowstep == 3) {
-				actfg = "4";
 			} else {
 				throw new LogicException(titaVo, "EC004", "帳務日:" + entday + ",交易序號:" + txno + "狀態不符");
 			}
@@ -76,6 +71,13 @@ public class LCR05 extends TradeBuffer {
 
 			try {
 				TitaVo tita2 = titaVo.getVo(tTxRecord.getTranData());
+				if (tTxRecord.getEntdy() < titaVo.getEntDyI()) {
+					tita2.put("ENTDY", titaVo.getEntDy());
+					tita2.put("NBSDY", titaVo.getNbsDy());
+					tita2.put("NNBSDY", titaVo.getNnbsDy());
+				}
+				tita2.put("TLRNO", "");
+				tita2.put("TXTNO", "");
 				tita2.put("OrgEntdy", String.valueOf(tTxRecord.getEntdy()));
 				tita2.put("ORGKIN", tTxRecord.getBrNo());
 				tita2.put("ORGTLR", tTxRecord.getTlrNo());

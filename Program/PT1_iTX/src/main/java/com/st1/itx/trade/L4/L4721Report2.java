@@ -149,7 +149,7 @@ public class L4721Report2 extends TradeBuffer {
 
 		boolean isSameSpecificDd = false;
 
-		boolean isByCustNo = isSameSpecificDd;
+		boolean isByCustNo = false;
 
 		for (Map<String, String> r : data) {
 
@@ -160,6 +160,8 @@ public class L4721Report2 extends TradeBuffer {
 			int tempfacmno = 999;
 			// 應繳日是否一樣
 			isSameSpecificDd = MinSpecificDd == MaxSpecificDd;
+
+			isByCustNo = isSameSpecificDd;
 
 			cnt = cnt + 1;
 
@@ -210,9 +212,14 @@ public class L4721Report2 extends TradeBuffer {
 
 						}
 
-						result.add(line);
+//						result.add(line);
 						times++;
-					} else { // 不同額度 印04並且切到下一個額度循環
+						
+						//1.by 戶號 額度一定是0，只會六筆
+						//2.by 額度 不同額度 會各有六筆
+						// 
+					} else if ((tempfacmno == 0 && times == rDetail.size())
+							|| (tempfacmno != parse.stringToInteger(r1.get("FacmNo")))) { // 不同額度 印04並且切到下一個額度循環
 						// 04
 
 						line = "";
@@ -251,11 +258,13 @@ public class L4721Report2 extends TradeBuffer {
 								+ FormatUtil.pad9(r1.get("CustNo"), 7) + "9510300"
 								+ FormatUtil.pad9(r1.get("CustNo"), 7);
 						result.add(line);
-						tempfacmno = parse.stringToInteger(r1.get("FacmNo"));
+//						tempfacmno = parse.stringToInteger(r1.get("FacmNo"));
 						result = sameFacmno(r1, rTxffectDetail, result, true, isByCustNo, titaVo);
 						// 換額度要重新算次數
 						times = 0;
 					} // else
+
+					tempfacmno = parse.stringToInteger(r1.get("FacmNo"));
 
 				} // for
 			} // for
