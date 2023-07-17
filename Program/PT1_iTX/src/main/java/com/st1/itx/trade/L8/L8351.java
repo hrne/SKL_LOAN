@@ -19,7 +19,6 @@ import com.st1.itx.db.service.TbJcicMu01Service;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
-import com.st1.itx.util.parse.Parse;
 
 @Service("L8351")
 @Scope("prototype")
