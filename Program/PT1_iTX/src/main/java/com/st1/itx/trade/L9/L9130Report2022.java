@@ -15,11 +15,11 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.SlipMedia2022;
 import com.st1.itx.db.domain.SlipMedia2022Id;
-import com.st1.itx.db.service.AcCloseService;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.SlipMedia2022Service;
 import com.st1.itx.db.service.springjpa.cm.L9130ServiceImpl;
@@ -56,10 +56,6 @@ import com.st1.itx.util.format.FormatUtil;
 @Scope("prototype")
 public class L9130Report2022 extends MakeReport {
 
-	/* DB服務注入 */
-	@Autowired
-	private AcCloseService sAcCloseService;
-
 	@Autowired
 	private AcDetailService sAcDetailService;
 
@@ -93,12 +89,6 @@ public class L9130Report2022 extends MakeReport {
 	// 帳冊別
 	private String acBookCode = "";
 
-	// 帳冊別中文
-	private String acBookItem = "";
-
-	// 科目中文
-	private String acNoItem = "";
-
 	// 借貸別
 	private String dbCr = "";
 
@@ -127,13 +117,13 @@ public class L9130Report2022 extends MakeReport {
 	private String costMonth = " ";
 
 	// 保單號碼
-	private String insuNo = " ";
+	private String insuNo = "";
 
 	// 業務員代號
-	private String empNo = " ";
+	private String salesmanCode = "";
 
 	// 薪碼
-	private String salaryCode = " ";
+	private String salaryCode = "";
 
 	// 幣別
 	private String currencyCode = "NTD";
@@ -144,27 +134,25 @@ public class L9130Report2022 extends MakeReport {
 	// 部門代號
 	private String deptCode = "10H000";
 
-	// 業務員代號
-	private String salesmanCode = " ";
 
 	// 成本單位
 	private String costUnit = "10H000";
 
 	// 通路別
-	private String salesChannelType = " ";
+	private String salesChannelType = "";
 
 	// 會計準則類型
 	private String ifrsType = "1";
 
 	// 關係人ID
-	private String relationId = " ";
+	private String relationId = "";
 
 	// 關聯方代號
-	private String relateCode = " ";
+	private String relateCode = "";
 
 	// IFRS17群組
-	private String ifrs17Group = " ";
-
+	private String ifrs17Group = "";
+	
 	private String lastAcSubBookCode;
 
 	// 應收調撥款金額
@@ -173,9 +161,6 @@ public class L9130Report2022 extends MakeReport {
 	// For EBS WS P_SUMMARY_TBL.TOTAL_AMOUNT - 該批號下各幣別傳票借方總金額
 	private BigDecimal drAmtTotal;
 
-	// 作業人員
-	private String tellerNo = "";
-
 	// For EBS WS JE_LINE_NUM
 	private int lineNum;
 
@@ -183,9 +168,6 @@ public class L9130Report2022 extends MakeReport {
 
 	public void exec(TitaVo titaVo) throws LogicException {
 		this.info("L9130Report2022 exec ...");
-
-		// 作業人員
-		tellerNo = titaVo.getTlrNo();
 
 		// 會計日期 #AcDate=D,7,I
 		iAcDate = Integer.parseInt(titaVo.getParam("AcDate"));
@@ -315,6 +297,15 @@ public class L9130Report2022 extends MakeReport {
 			tSlipMedia2022.setDeptCode(deptCode);
 			tSlipMedia2022.setLatestFlag("Y");
 			tSlipMedia2022.setTransferFlag("N");
+			tSlipMedia2022.setInsuNo(insuNo);
+			tSlipMedia2022.setSalesmanCode(salesmanCode);
+			tSlipMedia2022.setSalaryCode(salaryCode);
+			tSlipMedia2022.setIfrsType(ifrsType);
+			tSlipMedia2022.setSalesChannelType(salesChannelType);
+			tSlipMedia2022.setRelationId(relationId);
+			tSlipMedia2022.setRelateCode(relateCode);
+			tSlipMedia2022.setIfrs17Group(ifrs17Group);
+			tSlipMedia2022.setCostUnit(costUnit);
 			lSlipMedia2022.add(tSlipMedia2022);
 			try {
 				sSlipMedia2022Service.insert(tSlipMedia2022, titaVo);
@@ -370,6 +361,15 @@ public class L9130Report2022 extends MakeReport {
 
 		makeExcel.toExcel(excelNo);
 
+		// 傳票號碼(彙總)清單
+		List<Map<String, String>> slipNoSumlList = null;
+		if (iBatchNo <= 10) {
+			slipNoSumlList = l9130ServiceImpl.doQuerySlipSumNo(iAcDate + 19110000, titaVo);
+			if (slipNoSumlList != null) {
+				this.info("slipNoSumlList=" + slipNoSumlList.toString());
+			}
+		}
+
 		// 2022-05-18 ST1 Wei 新增:
 		// 若 批號>=90 且 上傳EBS結果為成功時
 		// 將AcDetail內 本次上傳資料 的 EntAc 更新為9
@@ -398,6 +398,14 @@ public class L9130Report2022 extends MakeReport {
 							&& ac.getDbCr().equals(md.getDbCr()) && receivableCode.equals(md.getReceiveCode())) {
 						this.info("成功 >" + md.getMediaSlipNo());
 						ac.setMediaSlipNo(md.getMediaSlipNo());
+					}
+				}
+				// 彙總傳票號碼
+				if (ac.getSlipSumNo() > 0) {
+					for (Map<String, String> s : slipNoSumlList) {
+						if (ac.getSlipNo() == Integer.parseInt(s.get("SlipNo"))) {
+							ac.setSlipSumNo(Integer.parseInt(s.get("SlipSumNo")));
+						}
 					}
 				}
 			}

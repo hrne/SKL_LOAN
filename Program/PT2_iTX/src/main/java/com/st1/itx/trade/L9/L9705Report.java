@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.buffer.TxBuffer;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
@@ -50,7 +51,7 @@ public class L9705Report extends MakeReport {
 
 	@Autowired
 	private CustNoticeService sCustNoticeService;
-	
+
 	@Autowired
 	private Parse parse;
 
@@ -137,13 +138,6 @@ public class L9705Report extends MakeReport {
 
 			for (Map<String, String> r : l9705List) {
 
-//				try {
-//					Thread.sleep(1 * 500);
-//				} catch (InterruptedException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-
 				int custNo = 0;
 				int facmNo = 0;
 
@@ -153,27 +147,15 @@ public class L9705Report extends MakeReport {
 				if (r.get("FacmNo") != null) {
 					facmNo = parse.stringToInteger(r.get("FacmNo"));
 				}
-				
-				
-				CustNotice lCustNotice = new CustNotice();
-				CustNoticeId lCustNoticeId = new CustNoticeId();
 
-				lCustNoticeId.setCustNo(custNo);
-				lCustNoticeId.setFacmNo(facmNo);
-				lCustNoticeId.setFormNo(tran);
-			
-				lCustNotice = sCustNoticeService.findById(lCustNoticeId, titaVo);
-			
-				// paper為N 表示不印
-				if (lCustNotice == null) {
-				} else {
+				TempVo tempVo = new TempVo();
+				tempVo = custNoticeCom.getCustNotice(tran, custNo, facmNo, titaVo);
 
-					if ("N".equals(lCustNotice.getPaperNotice())) {
-						continue;
-					}
+				if (!"Y".equals(tempVo.get("isLetter"))) {
+					this.info("skip isLetter != Y");
+					continue;
 				}
-				
-				
+
 				if (r.get("RepayCode") != null) {
 					repayCode = r.get("RepayCode");
 				}
@@ -185,24 +167,14 @@ public class L9705Report extends MakeReport {
 					reconCode = r.get("ReconCode");
 				}
 
-				// 同戶號 同額度使用同一頁否則換新頁
-//				if (this.custNo == custNo && this.facmNo == facmNo) {
-				if (this.custNo == custNo) {
-					continue;
-				} else {
-					if (count > 0) {
-						this.info("0 newPage...");
-						this.newPage();
-
-					}
-
+				if (count > 0) {
+					this.info("0 newPage...");
+					this.newPage();
 				}
 
 				this.custNo = custNo;
 				this.facmNo = facmNo;
 
-	
-			
 				/**************************************************************************************/
 
 				ArrayList<BaTxVo> lBaTxVo = new ArrayList<>();
@@ -225,7 +197,7 @@ public class L9705Report extends MakeReport {
 				}
 
 				try {
-					lBaTxVo = dBaTxCom.termsPay(entryDate, custNo, 0, 0, terms, 0, titaVo);
+					lBaTxVo = dBaTxCom.termsPay(entryDate, custNo, facmNo, 0, terms, 0, titaVo);
 					listBaTxVo = dBaTxCom.addByPayintDate(lBaTxVo, titaVo);
 				} catch (LogicException e) {
 					this.error("listBaTxVo ErrorMsg :" + e.getMessage());
@@ -271,21 +243,22 @@ public class L9705Report extends MakeReport {
 
 				// 先算短繳
 				for (BaTxVo baTxVo : listBaTxVo) {
+
 					// 短繳
-					if (baTxVo.getDataKind() == 1 && baTxVo.getRepayType() == 1) {
+					if (baTxVo.getFacmNo() == facmNo && baTxVo.getDataKind() == 1 && baTxVo.getRepayType() == 1) {
 						shortFall = shortFall.add(baTxVo.getUnPaidAmt());
 					}
 
 					// 溢繳
-					if (baTxVo.getDataKind() == 3) {
+					if (baTxVo.getFacmNo() == facmNo && baTxVo.getDataKind() == 3) {
 						excessive = excessive.add(baTxVo.getUnPaidAmt());
 					}
 					// 溢短繳
-					if (baTxVo.getDataKind() == 3) {
+					if (baTxVo.getFacmNo() == facmNo && baTxVo.getDataKind() == 3) {
 						overShort = overShort.add(baTxVo.getUnPaidAmt());
 					}
 
-					if (baTxVo.getDataKind() == 1 && baTxVo.getRepayType() == 1) {
+					if (baTxVo.getFacmNo() == facmNo && baTxVo.getDataKind() == 1 && baTxVo.getRepayType() == 1) {
 						overShort = overShort.subtract(baTxVo.getUnPaidAmt());
 					}
 				}
@@ -464,11 +437,8 @@ public class L9705Report extends MakeReport {
 		printCm(16, y, repayCodeX(repayCode));
 
 		y = top + yy + (++l) * h;
-		this.info("listBaTxVo.get(0).getFacmNo()=" + listBaTxVo.get(0).getFacmNo());
-		printCm(1.5, y,
-				"戶    號：" + String.format("%07d", Integer.valueOf(custNo)) + "-"
-						+ String.format("%03d", Integer.valueOf(listBaTxVo.get(0).getFacmNo())) + "  目前利率："
-						+ padStart(6, "" + intRate) + "%");
+		printCm(1.5, y, "戶    號：" + String.format("%07d", Integer.valueOf(custNo)) + "-"
+				+ String.format("%03d", Integer.valueOf(facmNo)) + "  目前利率：" + padStart(6, "" + intRate) + "%");
 
 		y = top + yy + (++l) * h;
 

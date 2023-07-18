@@ -516,7 +516,7 @@ IF(#RpCode{i}==91||#RpCode{i}==95,SHOW(#GRD_COLM{i},#RpFacmNo{i}),
 C(3,#RpCode{i},90,SHOW(#GRD_COLM{i},#RpFacmNo{i},#BTN_GRD_A{i}),
 SHOW(#GRD_COLO{i},#GRD_COLP{i},#GRD_COLQ{i},#RpDetailSeq{i},#RpEntryDate{i},#RpType{i},#RpTypeX{i},#NOTE{i}))),$)
 IF(#RPFG==3||#RPFG==8,SHOW(#GRD_COLM{i},#GRD_COLQ{i},#RpFacmNo{i},#NOTE{i}),$)
-IF(#RPFG==4||#RPFG==5||#RPFG==6,IF(#RpCode{i}==91||#RpCode{i}==95,SHOW(#GRD_COLM{i},#RpFacmNo{i},#BTN_GRD_A{i}),SHOW(#GRD_COLM{i},#GRD_COLO{i},#GRD_COLR{i},#GRD_COLQ{i},#BTN_GRD_B{i},#RpRemitBankX{i},#RpRemitAcctNo{i},#RpCustName{i},#RpRemark{i})),$)
+IF(#RPFG==4||#RPFG==5||#RPFG==6,IF(#RpCode{i}==91||#RpCode{i}==95,SHOW(#GRD_COLM{i},#RpFacmNo{i},#BTN_GRD_A{i},#RpCustName{i}),SHOW(#GRD_COLM{i},#GRD_COLO{i},#GRD_COLR{i},#GRD_COLQ{i},#BTN_GRD_B{i},#RpRemitBankX{i},#RpRemitAcctNo{i},#RpCustName{i},#RpRemark{i})),$)
 IF(#RPFG==7,
 C(3,#RpCode{i},92,SHOW(#GRD_COLL{i},#RpCustNo{i},#RpFacmNo{i}),
 SHOW(#GRD_COLL{i},#RpCustNo{i})HIDE(#RpFacmNo{i})),$)
@@ -529,7 +529,7 @@ IF(#RpCode{i}==91||#RpCode{i}==95,SHOW(#GRD_COLM{i},#RpFacmNo{i}),
 C(3,#RpCode{i},90,SHOW(#GRD_COLM{i},#RpFacmNo{i},#BTN_GRD_A{i}),
 SHOW(#GRD_COLO{i},#GRD_COLP{i},#GRD_COLQ{i},#RpDetailSeq{i},#RpEntryDate{i},#RpType{i},#RpTypeX{i},#NOTE{i}))),$)
 IF(#RPFG==3||#RPFG==8,SHOW(#GRD_COLM{i},#GRD_COLQ{i},#RpFacmNo{i},#NOTE{i}),$)
-IF(#RPFG==4||#RPFG==5||#RPFG==6,IF(#RpCode{i}==91||#RpCode{i}==95,SHOW(#GRD_COLM{i},#RpFacmNo{i},#BTN_GRD_A{i}),SHOW(#GRD_COLM{i},#BTN_GRD_B{i},#GRD_COLO{i},#GRD_COLR{i},#GRD_COLQ{i},#BTN_GRD_B{i},#RpRemitBankX{i},#RpRemitAcctNo{i},#RpCustName{i},#RpRemark{i})),$)
+IF(#RPFG==4||#RPFG==5||#RPFG==6,IF(#RpCode{i}==91||#RpCode{i}==95,SHOW(#GRD_COLM{i},#RpFacmNo{i},#RpCustName{i},#BTN_GRD_A{i}),SHOW(#GRD_COLM{i},#BTN_GRD_B{i},#GRD_COLO{i},#GRD_COLR{i},#GRD_COLQ{i},#BTN_GRD_B{i},#RpRemitBankX{i},#RpRemitAcctNo{i},#RpCustName{i},#RpRemark{i})),$)
 IF(#RPFG==7,
 C(3,#RpCode{i},92,SHOW(#GRD_COLL{i},#RpCustNo{i},#RpFacmNo{i}),
 SHOW(#GRD_COLL{i},#RpCustNo{i})),$)
@@ -767,9 +767,9 @@ IF(#RP_IND==1,$,S)
 #RpCustName{i}=x,100,I
 C(3,#RP_IND,0,S,$)
 C(3,#RP_IND,2,$,C(3,#RP_IND,5,$,s))
-IF(#RpCode{i}==91||#RpCode{i}==95,s,$)
 IF(#DF1=={i},$,IF(#GRD_SKFG{i}==1&&#RpAmt{i}>0,$,s))
-@C(4,#RpCustName{i},V(P,請輸入戶名),$)
+@
+IF(#RpCode{i}==91||#RpCode{i}==95,$,C(4,#RpCustName{i},V(P,請輸入戶名),$))
 C(4,#RpCustName{i},s,T(2,@RP_AmlCheckName,#RpCustName{i}))
 
 ! 還款類別

@@ -148,7 +148,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        , RESULT.\"AcSubCode\" ";
 		sql += "        , RESULT.\"DbCr\" DESC ";
 
-		this.info("L9130ServiceImpl sql=" + sql);
+		this.info("L9130ServiceImpl doQuery sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
@@ -174,7 +174,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          WHEN ACD.\"ReceivableFlag\" = '8' ";
 		sql += "          THEN ACD.\"RvNo\" ";
 		sql += "        ELSE ' ' END              AS \"AcReceivableCode\" "; // 銷帳碼
-		sql += "      , ACD.\"AcctCode\" ";    
+		sql += "      , ACD.\"AcctCode\" ";
 		sql += " FROM \"AcDetail\" ACD ";
 		sql += " LEFT JOIN \"CdAcCode\" CDAC ON CDAC.\"AcNoCode\" = ACD.\"AcNoCode\" ";
 		sql += "                            AND CDAC.\"AcSubCode\" = ACD.\"AcSubCode\" ";
@@ -195,13 +195,13 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            WHEN ACD.\"ReceivableFlag\" = '8' ";
 		sql += "            THEN ACD.\"RvNo\" ";
 		sql += "          ELSE ' ' END "; // 銷帳碼
-		sql += "        , ACD.\"AcctCode\" "; 
+		sql += "        , ACD.\"AcctCode\" ";
 		sql += " ORDER BY ACD.\"AcDate\"        "; // 會計日期
 		sql += "        , ACD.\"AcBookCode\"    "; // 帳冊別: 000:全公司
 		sql += "        , ACD.\"AcSubBookCode\" "; // 區隔帳冊
 		sql += "        , ACD.\"AcNoCode\"      "; // 科目代號
 		sql += "        , ACD.\"AcSubCode\"     "; // 子目代號
-		sql += "        , ACD.\"AcctCode\" "; 
+		sql += "        , ACD.\"AcctCode\" ";
 		sql += "        , ACD.\"DbCr\" DESC     "; // 借貸別
 		sql += "        , RPAD(CDAC.\"AcNoItem\",40,' ') "; // 傳票摘要
 		sql += "        , CASE ";
@@ -209,13 +209,98 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            THEN ACD.\"RvNo\" ";
 		sql += "          ELSE ' ' END "; // 銷帳碼
 
-		this.info("L9130ServiceImpl sql=" + sql);
+		this.info("L9130ServiceImpl doQuery2022 sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("acDate", acDate);
 		query.setParameter("slipBatNo", slipBatNo);
+
+		return this.convertToMap(query);
+	}
+
+	// 傳票號碼(彙總)
+	public List<Map<String, String>> doQuerySlipSumNo(int acDate, TitaVo titaVo) {
+
+		String sql = " ";
+		sql += " WITH rawData AS ( ";
+		sql += "    SELECT AC.\"SlipNo\" ";
+		sql += "          ,AC.\"SlipBatNo\" ";
+		sql += "          ,AC.\"TitaBatchNo\" ";
+		sql += "          ,NVL(BD.\"ReconCode\",' ') AS \"ReconCode\" ";
+		sql += "          ,AC.\"TitaTlrNo\"  ";
+		sql += "          ,AC.\"AcNoCode\" ";
+		sql += "     	  ,AC.\"AcSubCode\" ";
+		sql += "     	  ,AC.\"AcSubBookCode\" ";
+		sql += "          ,AC.\"DbCr\"  ";
+		sql += "          ,AC.\"TxAmt\" ";
+		sql += "     FROM \"AcDetail\" AC ";
+		sql += "     LEFT JOIN \"BatxDetail\" BD ON BD.\"AcDate\" = AC.\"AcDate\" ";
+		sql += "                                AND BD.\"BatchNo\" = AC.\"TitaBatchNo\" ";
+		sql += "                                AND LPAD(BD.\"DetailSeq\",6,0) = AC.\"TitaBatchSeq\" ";
+		sql += "     WHERE AC.\"AcDate\" = :acDate ";
+		sql += "       AND AC.\"EntAc\" = 1 ";
+		sql += "       AND AC.\"SlipSumNo\"  > 0";
+		sql += " ) ";
+		sql += " , groupData AS ( ";
+		sql += "    SELECT  \"SlipBatNo\" ";
+		sql += "          , \"TitaBatchNo\" ";
+		sql += "          , \"ReconCode\" ";
+		sql += "          , \"TitaTlrNo\"  ";
+		sql += "          , \"AcNoCode\" ";
+		sql += "          , \"AcSubCode\" ";
+		sql += "          , \"AcSubBookCode\" ";
+		sql += "          , \"DbCr\" ";
+		sql += "    FROM rawData ";
+		sql += "    GROUP BY \"SlipBatNo\"        "; 
+		sql += "          , \"TitaBatchNo\" ";
+		sql += "          , \"ReconCode\" ";
+		sql += "          , \"TitaTlrNo\"  ";
+		sql += "          , \"AcNoCode\" ";
+		sql += "          , \"AcSubCode\" ";
+		sql += "          , \"AcSubBookCode\" ";
+		sql += "          , \"DbCr\" ";
+		sql += "    ORDER BY \"SlipBatNo\"        "; 
+		sql += "          , \"TitaBatchNo\" ";
+		sql += "          , \"ReconCode\" ";
+		sql += "          , \"TitaTlrNo\"  ";
+		sql += "          , \"AcNoCode\" ";
+		sql += "          , \"AcSubCode\" ";
+		sql += "          , \"AcSubBookCode\" ";
+		sql += "          , \"DbCr\" ";
+		sql += " ) ";
+		sql += " , slipData AS ( ";
+		sql += "    SELECT  \"SlipBatNo\" ";
+		sql += "          , \"TitaBatchNo\" ";
+		sql += "          , \"ReconCode\" ";
+		sql += "          , \"TitaTlrNo\"  ";
+		sql += "          , \"AcNoCode\" ";
+		sql += "          , \"AcSubCode\" ";
+		sql += "          , \"AcSubBookCode\" ";
+		sql += "          , \"DbCr\" ";
+		sql += "          , 90000 + ROWNUM AS \"SlipSumNo\" ";
+		sql += "    FROM groupData";
+		sql += " ) ";
+		sql += " SELECT r.\"SlipNo\" ";
+		sql += "       ,s.\"SlipSumNo\" ";
+		sql += " FROM rawData r ";
+		sql += " LEFT JOIN slipData s ";
+		sql += "        ON s.\"SlipBatNo\"  = r.\"SlipBatNo\" ";      
+		sql += "       AND s.\"TitaBatchNo\" = r.\"TitaBatchNo\" ";      
+		sql += "       AND s.\"ReconCode\"  = r.\"ReconCode\" ";      
+		sql += "       AND s.\"TitaTlrNo\"  = r.\"TitaTlrNo\" ";      
+		sql += "       AND s.\"AcNoCode\"  = r.\"AcNoCode\" ";      
+		sql += "       AND s.\"AcSubCode\"  = r.\"AcSubCode\" ";      
+		sql += "       AND s.\"AcSubBookCode\"  = r.\"AcSubBookCode\" ";      
+		sql += "       AND s.\"DbCr\"  = r.\"DbCr\" ";      
+
+		this.info("L9130ServiceImpl doQuerySlipSumNo sql=" + sql);
+		Query query;
+
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("acDate", acDate);
 
 		return this.convertToMap(query);
 	}

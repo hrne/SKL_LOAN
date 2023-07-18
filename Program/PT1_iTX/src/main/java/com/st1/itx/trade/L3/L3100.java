@@ -388,9 +388,9 @@ public class L3100 extends TradeBuffer {
 			} else {
 				tFacMain.setUtilBal(tFacMain.getUtilBal().add(iDrawdownAmt));
 			}
-			//撥款序號 = 已撥款序號 + 1
+			// 撥款序號 = 已撥款序號 + 1
 			iBormNo = tFacMain.getLastBormNo() + 1;
-			
+
 			// 首次撥款且為展期件時更新額度主檔展期次數、舊額度編號
 			if ("1".equals(titaVo.getParam("RenewFlag")) && iBormNo == 1) {
 				tFacMain.setRenewCnt(parse.stringToInteger(titaVo.getParam("RpFacmNo1")) == parse
@@ -1013,14 +1013,8 @@ public class L3100 extends TradeBuffer {
 		tLoanBorMain.setLastTlrNo(titaVo.getTlrNo());
 		tLoanBorMain.setLastTxtNo(titaVo.getTxtNo());
 		tLoanBorMain.setCompensateAcct("");
-		for (int i = 1; i <= 5; i++) {
-			if (titaVo.getSecNo().equals("01") && titaVo.get("RpCode" + i) != null) {
-				if (parse.stringToInteger(titaVo.getParam("RpCode" + i)) > 0
-						&& parse.stringToInteger(titaVo.getParam("RpCode" + i)) < 90) {
-					tLoanBorMain.setCompensateAcct(titaVo.getParam("RpCustName" + i));
-					tLoanBorMain.setRemark(titaVo.getParam("RpRemark" + i));
-				}
-			}
+		if (titaVo.get("RpCode1") != null) {
+			tLoanBorMain.setCompensateAcct(titaVo.getParam("RpCustName1"));
 		}
 
 		tLoanBorMain.setAcDate(titaVo.getEntDyI());

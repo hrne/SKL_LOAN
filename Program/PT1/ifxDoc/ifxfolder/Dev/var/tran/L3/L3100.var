@@ -2120,7 +2120,8 @@ E(3,@RPAMTZ,#TimDrawdownAmt)
 
 !匯款戶名
 #TMPNAME=X,1,S
-T(2,@RP_CUSTNM,#TimCustNoX)
+IF(#RenewFlag=="1"||#RenewFlag=="2",$,T(2,@RP_CUSTNM,#TimCustNoX))
+
 
 #CRpCustNO=X,1,S
 E(0,@RP_CUSTNO,#TimCustNo)

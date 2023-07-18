@@ -65,7 +65,10 @@ T(4,CHAIN$)
 #iEntdy=D,7,I
 E(0,#SYSDATE)
 D(8)
-@V(7)A(DATE,0,#iEntdy)
+@
+IF(#iEntdy==0,s,$)
+!V(7)
+A(DATE,0,#iEntdy)
 
 #iBrNo=X,4,L
 T(2,#KINBR)
@@ -233,8 +236,8 @@ ifxBatch:{
 
 #RimData
 
-#BTN=放行
-{width:40,search:false,formatter:'cust:bind-button:放行',canExport:false,align:'center'}
+#BTN=放行/退回
+{width:80,search:false,formatter:'cust:bind-button:放行/退回',canExport:false,align:'center'}
 
 #CalDate=交易日期
 {width:100,align:'center'}

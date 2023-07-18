@@ -158,6 +158,8 @@ public class L4721Report2 extends TradeBuffer {
 			int MinSpecificDd = parse.stringToInteger(r.get("MinSpecificDd"));
 			int MaxSpecificDd = parse.stringToInteger(r.get("MaxSpecificDd"));
 			int tempfacmno = 999;
+
+			int tempNextfacmno = 999;
 			// 應繳日是否一樣
 			isSameSpecificDd = MinSpecificDd == MaxSpecificDd;
 
@@ -197,6 +199,11 @@ public class L4721Report2 extends TradeBuffer {
 
 				for (Map<String, String> r1 : rDetail) {
 
+					if (times + 1 <= rDetail.size()) {
+						tempNextfacmno = parse.stringToInteger(rDetail.get(times).get("FacmNo"));
+
+					}
+
 					// 相同戶號不同額度的輸出
 
 					if (tempfacmno == parse.stringToInteger(r1.get("FacmNo"))) { // 相同額度
@@ -213,13 +220,17 @@ public class L4721Report2 extends TradeBuffer {
 						}
 
 //						result.add(line);
-						times++;
-						
-						//1.by 戶號 額度一定是0，只會六筆
-						//2.by 額度 不同額度 會各有六筆
-						// 
-					} else if ((tempfacmno == 0 && times == rDetail.size())
-							|| (tempfacmno != parse.stringToInteger(r1.get("FacmNo")))) { // 不同額度 印04並且切到下一個額度循環
+
+					}
+
+					tempfacmno = parse.stringToInteger(r1.get("FacmNo"));
+					times++;
+
+					// 1.by 戶號 額度一定是0，只會六筆
+					// 2.by 額度 不同額度 會各有六筆
+					// 當前額度和下一筆額度不同才進入
+					if (tempfacmno != tempNextfacmno) { // 不同額度
+														// 印04並且切到下一個額度循環
 						// 04
 
 						line = "";
@@ -248,23 +259,19 @@ public class L4721Report2 extends TradeBuffer {
 							}
 
 						}
+					}
+					// 05
 
-						// 05
-
-						// 0500036341+9510200000174395103000001743
-						line = "";
-						line += "05";
-						line += FormatUtil.pad9(headerDueAmt, 8) + "+" + "9510200"
-								+ FormatUtil.pad9(r1.get("CustNo"), 7) + "9510300"
-								+ FormatUtil.pad9(r1.get("CustNo"), 7);
-						result.add(line);
+					// 0500036341+9510200000174395103000001743
+					line = "";
+					line += "05";
+					line += FormatUtil.pad9(headerDueAmt, 8) + "+" + "9510200" + FormatUtil.pad9(r1.get("CustNo"), 7)
+							+ "9510300" + FormatUtil.pad9(r1.get("CustNo"), 7);
+					result.add(line);
 //						tempfacmno = parse.stringToInteger(r1.get("FacmNo"));
-						result = sameFacmno(r1, rTxffectDetail, result, true, isByCustNo, titaVo);
-						// 換額度要重新算次數
-						times = 0;
-					} // else
-
-					tempfacmno = parse.stringToInteger(r1.get("FacmNo"));
+					result = sameFacmno(r1, rTxffectDetail, result, true, isByCustNo, titaVo);
+					// 換額度要重新算次數
+//					times = 0;
 
 				} // for
 			} // for

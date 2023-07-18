@@ -126,18 +126,29 @@ public class L9750ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("endDate = " + endDate);
 
 		String sql = "";
-		sql += " select ari.\"CustNo\"       ";// 戶號
-		sql += "      , Json_VALUE(ari.\"JsonFields\",'$.ContractChgCode')  as \"ContractChgCode\" ";// 契約變更類型
-		sql += "      , cdl.\"Item\"         ";// 契約變更中文
-		sql += "      , ari.\"OpenAcDate\"   ";// 會計日
-		sql += " from \"AcReceivable\" ari  ";
-		sql += " left join \"CdCode\" cdl ";
-		sql += "        on cdl.\"DefCode\" = 'ChangeItemCode' ";
-		sql += "       and cdl.\"Code\" = Json_VALUE(ari.\"JsonFields\",'$.ContractChgCode') ";
-		sql += " where ari.\"AcctCode\"= 'F29' ";
-		sql += "   and ari.\"OpenAcDate\" BETWEEN :inputStartDate AND :inputEndDate ";
-		sql += "   and Json_VALUE(ari.\"JsonFields\",'$.ContractChgCode') = '01' ";
-		sql += " order by ari.\"CustNo\" ";
+		sql += " select  \"CustNo\"  ,                                      ";// 戶號
+		sql += "         \"AcDate\"  ,                                      ";// 會計日
+		sql += "         max(\"CompensateAcct\")  as  \"CompensateAcct\"    ";// 契約變更
+		sql += " from  (                               ";
+		sql += "        select  lb.\"CustNo\"  ,       ";
+		sql += "                lb.\"AcDate\"  ,       ";
+		sql += "                case                   ";
+		sql += "                  when  REGEXP_LIKE(l.\"CompensateAcct\",'寬延|延長|寬限|本寬')  then  ";
+		sql += "                        REGEXP_SUBSTR(l.\"CompensateAcct\",  '寬延|延長|寬限|本寬')       ";
+		sql += "                  else  l.\"CompensateAcct\"                                       ";
+		sql += "                end            AS  \"CompensateAcct\"                              ";
+		sql += "        from  \"LoanBorTx\"  lb                                                    ";
+		sql += "        left  join  \"LoanBorMain\"  l  on  l.\"CustNo\"  =  lb.\"CustNo\"         ";
+		sql += "                                       and  l.\"FacmNo\"  =  lb.\"FacmNo\"         ";
+		sql += "                                       and  l.\"BormNo\"  =  lb.\"BormNo\"         ";
+		sql += "        where  lb.\"AcDate\"  BETWEEN :inputStartDate AND :inputEndDate            ";
+		sql += "          and  lb.\"TitaTxCd\"   =  'L3100'                                        ";
+		sql += "          and  lb.\"TitaHCode\"  =  '0'                                            ";
+		sql += "          and  nvl(JSON_VALUE(lb.\"OtherFields\",'$.RemitBank'),'0000000') = '0000000' ";
+		sql += "          and  nvl(l.\"CompensateAcct\",'  ')  <> '  '    ";
+		sql += "       )                                   ";
+		sql += " group  by  \"AcDate\"  ,\"CustNo\"        ";
+		sql += " order  by  \"AcDate\"  ,\"CustNo\"        ";
 
 		this.info("sql=" + sql);
 

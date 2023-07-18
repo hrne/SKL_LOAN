@@ -42,7 +42,7 @@ public class L9705Form extends MakeReport {
 
 	@Autowired
 	WebClient webClient;
-	
+
 	@Autowired
 	private CustNoticeService sCustNoticeService;
 
@@ -57,6 +57,33 @@ public class L9705Form extends MakeReport {
 	public void exec(List<Map<String, String>> l9705List, TitaVo titaVo, TxBuffer txbuffer) throws LogicException {
 
 		String tran = "L9705".equals(titaVo.getTxcd()) ? "L9705" : titaVo.getTxcd();
+
+		List<Map<String, String>> tList = new ArrayList<Map<String, String>>();
+
+		for (Map<String, String> tL9Vo : l9705List) {
+
+			int custNo = parse.stringToInteger(tL9Vo.get("CustNo"));
+			int facmNo = parse.stringToInteger(tL9Vo.get("FacmNo"));
+
+			CustNotice lCustNotice = new CustNotice();
+			CustNoticeId lCustNoticeId = new CustNoticeId();
+
+			lCustNoticeId.setCustNo(custNo);
+			lCustNoticeId.setFacmNo(facmNo);
+			lCustNoticeId.setFormNo(tran);
+
+			lCustNotice = sCustNoticeService.findById(lCustNoticeId, titaVo);
+
+			// paper為N 表示不印
+			if (lCustNotice == null) {
+			} else {
+				if ("N".equals(lCustNotice.getPaperNotice())) {
+					continue;
+				}
+			}
+
+			tList.add(tL9Vo);
+		}
 
 		int terms = 6; // 預設印6期
 
@@ -76,14 +103,14 @@ public class L9705Form extends MakeReport {
 
 		dBaTxCom.setTxBuffer(txbuffer);
 
-		if (l9705List.size() > 0) {
+		if (tList.size() > 0) {
 			int count = 0;
 			ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
 					.setRptCode("L9705".equals(titaVo.getTxcd()) ? "L9705B" : tran + "C").setRptItem("存入憑條")
 					.setRptSize("cm,20,9.31333").setPageOrientation("P").build();
 			this.openForm(titaVo, reportVo);
 
-			for (Map<String, String> tL9Vo : l9705List) {
+			for (Map<String, String> tL9Vo : tList) {
 				int custNo = 0;
 				int facmNo = 0;
 				int entryDate = parse.stringToInteger(titaVo.getParam("ENTDY"));
@@ -99,24 +126,7 @@ public class L9705Form extends MakeReport {
 				if (tL9Vo.get("CustName") != null) {
 					custName = tL9Vo.get("CustName");
 				}
-				
-				CustNotice lCustNotice = new CustNotice();
-				CustNoticeId lCustNoticeId = new CustNoticeId();
 
-				lCustNoticeId.setCustNo(custNo);
-				lCustNoticeId.setFacmNo(facmNo);
-				lCustNoticeId.setFormNo(tran);
-			
-				lCustNotice = sCustNoticeService.findById(lCustNoticeId, titaVo);
-			
-				// paper為N 表示不印
-				if (lCustNotice == null) {
-				} else {
-					if ("N".equals(lCustNotice.getPaperNotice())) {
-						continue;
-					}
-				}
-				
 				if (count > 0) {
 					this.newPage();
 				}
@@ -132,12 +142,6 @@ public class L9705Form extends MakeReport {
 //					continue;
 //				}
 
-		
-
-				
-			
-
-				
 				ArrayList<BaTxVo> listBaTxVo = new ArrayList<>();
 
 				dBaTxCom.setTxBuffer(txbuffer);
@@ -222,12 +226,12 @@ public class L9705Form extends MakeReport {
 //						this.newPage();
 //					}
 //					cnt++;
-		
+
 					int tmpUnPaidAmt = 0;
 
 					if (excessive < 0) {
 						tmpUnPaidAmt = unPaidAmt.intValue() - excessive;
-						
+
 						excessive = 0;
 					} else {
 						if (unPaidAmt.intValue() > excessive) {
@@ -239,7 +243,7 @@ public class L9705Form extends MakeReport {
 						}
 					}
 					unPaidAmt = new BigDecimal(tmpUnPaidAmt);
-					
+
 					// 只有第一筆需要sum
 					if (count != 1) {
 						unPaidAmt = BigDecimal.ZERO;

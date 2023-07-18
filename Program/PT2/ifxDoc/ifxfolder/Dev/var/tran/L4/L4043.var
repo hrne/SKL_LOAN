@@ -321,8 +321,6 @@ T(2,5
 
 
 #OOBTN_EDIT=A,2,O
-C(5,#OOTitaTxType,L2,BIND(grid,cancel),$)
-C(5,#OOTitaTxType,L2,s,$)
 C(4,#OORetFlag,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L4412; ntxbuf=#OOBUF_EDIT}))
 C(4,#OORetFlag,s,$)
 C(4,#OOAuthErrorCode,IF(#OOPostMediaCode=="Y",BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L4412; ntxbuf=#OOBUF_EDIT})),BIND(grid,cancel))
@@ -335,8 +333,6 @@ BIND(grid,cancel))
 
 
 #OOBTN_DELETE=A,2,O
-C(5,#OOTitaTxType,L2,BIND(grid,cancel),$)
-C(5,#OOTitaTxType,L2,s,$)
 ! IF(#OOButtenFlagA=="1",$,BIND(grid,cancel))
 ! IF(#OOButtenFlagA=="1",$,s)
 ! IF(#OODeleteDate>0,BIND(grid,{ cmd=CHAIN; ntxcd=L4412; ntxbuf=#OOBUF_DELETE}),$)

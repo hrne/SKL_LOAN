@@ -334,8 +334,6 @@ T(2,5
 ! #OOBTN_CREAT=A,2,O 改為頁面上方新增
 ! BIND(grid,{ cmd=CHAIN; ntxcd=L4410; ntxbuf=#OOBUF_CREAT})
 #OOBTN_EDIT=A,2,O
-C(5,#OOTitaTxType,L2,BIND(grid,cancel),$)
-C(5,#OOTitaTxType,L2,s,$)
 C(4,#OOAuthStatus,IF(#OOMediaCode=="Y",BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L4410; ntxbuf=#OOBUF_EDIT})),BIND(grid,cancel))
 C(4,#OOAuthStatus,IF(#OOMediaCode=="Y",s,$),$)
 IF(#OOCreateFlag=="D"||#OOCreateFlag=="Z",BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L4410; ntxbuf=#OOBUF_EDIT}))
@@ -345,8 +343,6 @@ IF(#OOCreateFlag=="D",BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L4410; ntxb
 BIND(grid,cancel))
 
 #OOBTN_DELETE=A,2,O
-C(5,#OOTitaTxType,L2,BIND(grid,cancel),$)
-C(5,#OOTitaTxType,L2,s,$)
 IF(#OOMediaCode=="Y",BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L4410; ntxbuf=#OOBUF_DELETE}))
 IF(#OOMediaCode=="Y",s,$)
 

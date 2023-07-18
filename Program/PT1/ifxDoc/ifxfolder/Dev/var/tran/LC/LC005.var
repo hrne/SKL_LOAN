@@ -61,7 +61,10 @@ T(4,CHAIN$)
 #iEntdy=D,7,I
 E(0,#SYSDATE)
 D(8)
-@V(7)A(DATE,0,#iEntdy)
+@
+IF(#iEntdy==0,s,$)
+!V(7)
+A(DATE,0,#iEntdy)
 
 #iBrNo=X,4,L
 T(2,#KINBR) 
@@ -171,7 +174,6 @@ TXFORM=LC005
 ^
 <include src="COM.icf::TRCTL.tom"/>
 </sub>
-
 
 !--------- OUTPUT畫面 --------
 

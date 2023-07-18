@@ -738,4 +738,15 @@ public class DateUtil extends SysLogger {
 //		return holFg.charAt(day - 1) != ' ' ? true : false;
 	}
 
+	/**
+	 * 取傳入日期的前月底營業日(西元)
+	 * 
+	 * @param bcDate 傳入日期(西元)
+	 * @return 前月底營業日(西元)
+	 * @throws LogicException 轉換錯誤
+	 */
+	public int getLastMonthEndBussinessDate(int bcDate) throws LogicException {
+		int thisMonthStartDate = ((int) (bcDate % 100)) * 100 + 1;
+		return getbussDate(thisMonthStartDate, -1);
+	}
 }

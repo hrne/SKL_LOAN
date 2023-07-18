@@ -62,7 +62,10 @@ T(4,CHAIN$)
 #iEntdy=D,7,I
 E(0,#SYSDATE)
 D(8)
-@V(7)A(DATE,0,#iEntdy)
+@
+IF(#iEntdy==0,s,$)
+!V(7)
+A(DATE,0,#iEntdy)
 V(5,0010101,#SYSDATE)
 
 #iBrNo=X,4,L
