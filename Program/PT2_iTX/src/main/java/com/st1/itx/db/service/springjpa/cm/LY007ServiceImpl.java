@@ -164,7 +164,7 @@ public class LY007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          Nvl(";
 		sql += "              F.\"KeyinSeq\", 1";
 		sql += "          ) = 1";
-		sql += "    ORDER BY  Nvl(Cm1.\"CustId\", Cm2.\"CustId\")   ASC ;";
+		sql += "    ORDER BY  Nvl(Cm1.\"CustId\", Cm2.\"CustId\")  ASC ";
 		this.info("sql=" + sql);
 
 		

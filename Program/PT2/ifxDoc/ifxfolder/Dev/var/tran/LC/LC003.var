@@ -137,7 +137,7 @@ C(3,#TxAmt1,0,T(3,)T(3,@CurName,),X(#TxAmt1)) ! 金額為0時隱藏幣別與金�
 #iCode=X,20,S
 #FileNm=x,40,S
 #iItem=x,40,S
-
+#SubmitFg=A,1,S
 #TypeX=X,4,S
 C(3,#FlowStep,3,T(3,審核放行),T(3,放行))
 
@@ -148,7 +148,9 @@ T(3,1)
 T(6A,#Entdy+#TxNo+#Actfg)
 
 #BTN=X,1,S
-BIND(grid,{ cmd=APPROVAL;once=1; ntxcd=#TranCode; txno=#RimData;rim=LCR03})
+C(3,#SubmitFg,0,BIND(grid,{ cmd=APPROVAL;once=1; ntxcd=#TranCode;text=放行; txno=#RimData;rim=LCR03}),
+				BIND(grid,{ cmd=APPROVAL;once=1; ntxcd=#TranCode; txno=#RimData;rim=LCR03}))
+
 
 
 #Lc009Buf=x,100,S
@@ -209,6 +211,7 @@ TXFORM=LC003
 #iCode
 #FileNm
 #iItem
+#SubmitFg
 ^
 <include src="COM.icf::TRCTL.tom"/>
 </sub>

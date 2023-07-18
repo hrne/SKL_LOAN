@@ -63,6 +63,7 @@ public class LC003 extends TradeBuffer {
 				occursList.putParam("iCode", t.get("iCode"));
 				occursList.putParam("FileNm", t.get("FileNm"));
 				occursList.putParam("iItem", t.get("iItem"));
+				occursList.putParam("SubmitFg", t.get("SubmitFg"));
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}

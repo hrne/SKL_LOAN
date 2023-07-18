@@ -194,13 +194,13 @@ public class L4721Report2 extends TradeBuffer {
 				String line = "";
 
 				int times = 0;
-
+				int cnt = 0;
 				tempfacmno = parse.stringToInteger(rDetail.get(0).get("FacmNo"));
 
 				for (Map<String, String> r1 : rDetail) {
 
 					if (times + 1 <= rDetail.size()) {
-						tempNextfacmno = parse.stringToInteger(rDetail.get(times).get("FacmNo"));
+						tempNextfacmno = parse.stringToInteger(rDetail.get(cnt).get("FacmNo"));
 
 					}
 
@@ -224,6 +224,7 @@ public class L4721Report2 extends TradeBuffer {
 					}
 
 					tempfacmno = parse.stringToInteger(r1.get("FacmNo"));
+					cnt++;
 					times++;
 
 					// 1.by 戶號 額度一定是0，只會六筆
@@ -259,19 +260,20 @@ public class L4721Report2 extends TradeBuffer {
 							}
 
 						}
-					}
-					// 05
+						// 05
 
-					// 0500036341+9510200000174395103000001743
-					line = "";
-					line += "05";
-					line += FormatUtil.pad9(headerDueAmt, 8) + "+" + "9510200" + FormatUtil.pad9(r1.get("CustNo"), 7)
-							+ "9510300" + FormatUtil.pad9(r1.get("CustNo"), 7);
-					result.add(line);
+						// 0500036341+9510200000174395103000001743
+						line = "";
+						line += "05";
+						line += FormatUtil.pad9(headerDueAmt, 8) + "+" + "9510200"
+								+ FormatUtil.pad9(r1.get("CustNo"), 7) + "9510300"
+								+ FormatUtil.pad9(r1.get("CustNo"), 7);
+						result.add(line);
 //						tempfacmno = parse.stringToInteger(r1.get("FacmNo"));
-					result = sameFacmno(r1, rTxffectDetail, result, true, isByCustNo, titaVo);
-					// 換額度要重新算次數
-//					times = 0;
+						result = sameFacmno(r1, rTxffectDetail, result, true, isByCustNo, titaVo);
+						// 換額度要重新算次數
+						times = 0;
+					}
 
 				} // for
 			} // for

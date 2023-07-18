@@ -207,7 +207,7 @@ public class LM054Report extends MakeReport {
 				mark.add(lM054Vo.get("F23"));
 			}
 
-			if (tmpClNo.equals(lM054Vo.get("ClNo2")) && cnt > 1) {
+			if (!"999".equals(tmpClNo) && tmpClNo.equals(lM054Vo.get("ClNo2")) && cnt > 1) {
 				mark.add("同一擔保品");
 			}
 

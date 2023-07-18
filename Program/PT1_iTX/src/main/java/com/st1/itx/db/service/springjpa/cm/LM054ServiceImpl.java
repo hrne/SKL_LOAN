@@ -252,6 +252,7 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "		   ELSE ' ' END AS F23 ";
 			sql += "		  ,0 AS F24";
 			sql += "		  ,' ' AS F25";
+			sql += "		  ,'999' AS \"ClNo2\"";//是否擔保品判斷用
 			sql += "	FROM ( ";
 
 			sql += "	SELECT (CASE";
