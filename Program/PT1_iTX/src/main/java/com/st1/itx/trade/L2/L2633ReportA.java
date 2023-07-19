@@ -11,7 +11,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
-import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.CdCode;
@@ -174,23 +173,12 @@ public class L2633ReportA extends MakeReport {
 		if (allFacClose != null) {
 			for (FacClose msFacClose : allFacClose) {
 
-//				只找同戶號額度最後一筆序號
-				if (k < allFacClose.size() && msFacClose.getCustNo() == allFacClose.get(k).getCustNo()
-						&& msFacClose.getFacmNo() == allFacClose.get(k).getFacmNo()
-						&& msFacClose.getEntryDate() == allFacClose.get(k).getEntryDate()) {
-					k++;
-					continue;
-				}
 //				只找結案
 				if (msFacClose.getCloseDate() == 0) {
 					k++;
 					continue;
 				}
 				k++;
-				this.info("getCustNo = " + msFacClose.getCustNo());
-				this.info("getFacmNo = " + msFacClose.getFacmNo());
-				this.info("getCloseAmt = " + msFacClose.getCloseAmt());
-				this.info("getEntryDate = " + msFacClose.getEntryDate());
 				msCnt++;
 				msAmt = msAmt.add(msFacClose.getCloseAmt());
 			}
@@ -280,8 +268,7 @@ public class L2633ReportA extends MakeReport {
 				cnt++;
 
 				print(1, 1, " ");
-				// new occurs
-				OccursList occursList = new OccursList();
+
 				print(0, 2, parse.IntegerToString(custNo, 7) + "-" + parse.IntegerToString(facmNo, 3)); // 戶號
 				print(0, 15, FormatUtil.padX(loanCom.getCustNameByNo(custNo), 20)); // 戶名
 				String CloseReasonItem = "";

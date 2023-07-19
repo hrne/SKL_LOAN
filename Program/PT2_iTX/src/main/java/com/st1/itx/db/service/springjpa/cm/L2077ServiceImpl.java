@@ -52,18 +52,15 @@ public class L2077ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iCustNoE = parse.stringToInteger(titaVo.getParam("CustNoE"));
 
 		String sql = " SELECT f.* ";
-		sql += "FROM (SELECT \"CustNo\",\"FacmNo\",MAX(\"CloseNo\") AS MAXNO FROM \"FacClose\" GROUP BY \"CustNo\" ,\"FacmNo\" ) r  ";
-		sql += "inner join \"FacClose\" f ";
-		sql += "ON  r.\"CustNo\" = f.\"CustNo\"  ";
-		sql += "AND r.\"FacmNo\" = f.\"FacmNo\"  ";
-		sql += "AND r.\"MAXNO\" = f.\"CloseNo\"  ";
+		sql += "FROM \"FacClose\" f ";
+		sql += "WHERE   ";
 		if (iEntryDate > 19110000) {
-			sql += "AND f.\"EntryDate\"= " + iEntryDate;
+			sql += " f.\"EntryDate\"= :entryDate ";
 		} else if (iApplDate > 19110000) {
-			sql += "AND f.\"ApplDate\"= " + iApplDate;
+			sql += " f.\"ApplDate\"= :applDate";
 		} else if (iCustNoS > 0) {
-			sql += "AND f.\"CustNo\">= " + iCustNoS;
-			sql += "AND f.\"CustNo\"<= " + iCustNoE;
+			sql += " f.\"CustNo\">= :custNoS ";
+			sql += "AND f.\"CustNo\"<= :custNoE  ";
 		}
 		sql += "order by f.\"CustNo\" ASC,f.\"FacmNo\"					";
 
@@ -75,9 +72,15 @@ public class L2077ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 
 		query = em.createNativeQuery(sql);
-//		query.setParameter("entryDate", iEntryDate);
-//		query.setParameter("applDate", iApplDate);
-//		query.setParameter("type", iType);
+
+		if (iEntryDate > 19110000) {
+			query.setParameter("entryDate", iEntryDate);
+		} else if (iApplDate > 19110000) {
+			query.setParameter("applDate", iApplDate);
+		} else if (iCustNoS > 0) {
+			query.setParameter("custNoS", iCustNoS);
+			query.setParameter("custNoE", iCustNoE);
+		}
 		this.info("L2077Service FindData=" + query);
 
 		return switchback(query);

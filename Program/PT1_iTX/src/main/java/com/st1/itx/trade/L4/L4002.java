@@ -245,10 +245,11 @@ public class L4002 extends TradeBuffer {
 					labelRankFlag = 3;
 				} else {
 					switch (tBatxDetail.getRepayCode()) {
-					case 1:// 匯款轉帳於對帳類別顯示,其他於第一階[批號]顯示
+					case 1:
+						labelRankFlag = 3;
 						grp1.setAcDate(tBatxDetail.getAcDate());
 						grp1.setBatchNo(tBatxDetail.getBatchNo());
-						grp1.setRepayCode(tBatxDetail.getRepayCode());
+						grp1.setRepayCode(0);
 						grp1.setReconCode(" ");
 						grp1.setFileName(" ");
 						grp1.setRankFlag(1);
@@ -266,11 +267,11 @@ public class L4002 extends TradeBuffer {
 						grp3.setReconCode(tBatxDetail.getReconCode());
 						grp3.setFileName(" ");
 						grp3.setRankFlag(3);
-						labelRankFlag = 3;
 						break;
 
 					case 2:
 					case 3:
+						labelRankFlag = 1;
 						grp1.setAcDate(tBatxDetail.getAcDate());
 						grp1.setBatchNo(tBatxDetail.getBatchNo());
 						grp1.setRepayCode(tBatxDetail.getRepayCode());
@@ -294,6 +295,7 @@ public class L4002 extends TradeBuffer {
 						break;
 
 					case 4:
+						labelRankFlag = 1;
 						grp1.setAcDate(tBatxDetail.getAcDate());
 						grp1.setBatchNo(tBatxDetail.getBatchNo());
 						grp1.setRepayCode(tBatxDetail.getRepayCode());
@@ -308,8 +310,9 @@ public class L4002 extends TradeBuffer {
 						grp2.setFileName(tBatxDetail.getFileName());
 						grp2.setRankFlag(2);
 						break;
-						
+
 					case 90:
+						labelRankFlag = 1;
 						grp1.setAcDate(tBatxDetail.getAcDate());
 						grp1.setBatchNo(tBatxDetail.getBatchNo());
 						grp1.setRepayCode(tBatxDetail.getRepayCode());
@@ -325,7 +328,7 @@ public class L4002 extends TradeBuffer {
 						break;
 
 					default:
-						// 除還款來源01:匯款轉帳 02:銀行扣款 03:員工扣款 04:支票兌現 90 暫收抵繳以外顯示第二階
+						labelRankFlag = 2;
 						grp1.setAcDate(tBatxDetail.getAcDate());
 						grp1.setBatchNo(tBatxDetail.getBatchNo());
 						grp1.setRepayCode(0);
@@ -338,7 +341,6 @@ public class L4002 extends TradeBuffer {
 						grp2.setReconCode(" ");
 						grp2.setFileName(" ");
 						grp2.setRankFlag(2);
-						labelRankFlag = 2;
 						break;
 					}
 				}
@@ -618,11 +620,7 @@ public class L4002 extends TradeBuffer {
 				occursList.putParam("OOBatchNo", tempL4002Vo.getBatchNo());
 				occursList.putParam("OORankFlag", tempL4002Vo.getRankFlag());
 				occursList.putParam("OOStatusCode", batxStatus);
-				if (tempL4002Vo.getRankFlag() == 1) {
-					occursList.putParam("OORepayCode", 0);
-				} else {
-					occursList.putParam("OORepayCode", tempL4002Vo.getRepayCode());
-				}
+				occursList.putParam("OORepayCode", tempL4002Vo.getRepayCode());
 				occursList.putParam("OOReconCode", tempL4002Vo.getReconCode());
 				occursList.putParam("OOFileName", tempL4002Vo.getFileName());
 				occursList.putParam("OOFileCnt", fileCnt.get(tempL4002Vo));

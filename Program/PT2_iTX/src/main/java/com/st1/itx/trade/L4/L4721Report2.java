@@ -199,9 +199,9 @@ public class L4721Report2 extends TradeBuffer {
 
 				for (Map<String, String> r1 : rDetail) {
 
-					if (times + 1 <= rDetail.size()) {
-						tempNextfacmno = parse.stringToInteger(rDetail.get(cnt).get("FacmNo"));
-
+					if (cnt + 1 < rDetail.size()) {
+						tempNextfacmno = parse.stringToInteger(rDetail.get(cnt + 1).get("FacmNo"));
+//						this.info("tempNextfacmno = " + tempNextfacmno);
 					}
 
 					// 相同戶號不同額度的輸出
@@ -230,6 +230,7 @@ public class L4721Report2 extends TradeBuffer {
 					// 1.by 戶號 額度一定是0，只會六筆
 					// 2.by 額度 不同額度 會各有六筆
 					// 當前額度和下一筆額度不同才進入
+//					this.info(cnt + "=" + tempfacmno + ":" + tempNextfacmno);
 					if (tempfacmno != tempNextfacmno) { // 不同額度
 														// 印04並且切到下一個額度循環
 						// 04

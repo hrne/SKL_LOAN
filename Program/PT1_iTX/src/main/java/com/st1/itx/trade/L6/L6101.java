@@ -407,8 +407,7 @@ public class L6101 extends TradeBuffer {
 			for (BatxHead tBatxHead : lBatxHead) {
 
 				// 4.入帳完成 8.已刪除
-				if (tBatxHead.getBatxExeCode().equals("4") || tBatxHead.getBatxExeCode().equals("8")
-						|| tBatxHead.getUnfinishCnt() == 0) {
+				if (tBatxHead.getBatxExeCode().equals("4") || tBatxHead.getBatxExeCode().equals("8")) {
 					continue;
 				}
 				errocount = 1;
@@ -573,7 +572,7 @@ public class L6101 extends TradeBuffer {
 				tAcClose.setClsNo(11);
 			}
 		}
-		
+
 		if (uClsFg == 2) {
 			tAcClose.setClsNo(tAcClose.getClsNo() - 1);
 			if ("09".equals(uSecNo) && tAcClose.getClsNo() == 10) {

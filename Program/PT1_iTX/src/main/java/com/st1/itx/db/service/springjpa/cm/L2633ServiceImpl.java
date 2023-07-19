@@ -61,20 +61,14 @@ public class L2633ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iEntryDate = parse.stringToInteger(titaVo.getParam("TranDate")) + 19110000;
 
 		String sql = " SELECT f.* ";
-		sql += "FROM (SELECT \"CustNo\",\"FacmNo\",MAX(\"CloseNo\") AS MAXNO FROM \"FacClose\" GROUP BY \"CustNo\" ,\"FacmNo\" ) r  ";
-		sql += "inner join \"FacClose\" f ";
-		sql += "ON  r.\"CustNo\" = f.\"CustNo\"  ";
-		sql += "AND r.\"FacmNo\" = f.\"FacmNo\"  ";
-		sql += "AND r.\"MAXNO\" = f.\"CloseNo\"  ";
-		sql += "AND f.\"CloseDate\"> 0 ";
+		sql += " FROM  \"FacClose\" f ";
+		sql += " WHERE f.\"CloseDate\"> 0 ";
 
-		sql += "AND f.\"EntryDate\"= " + iEntryDate;
+		sql += " AND f.\"EntryDate\"= :entryDate ";
 		sql += " AND f.\"FunCode\" in ( '1','0')							";
-
-		sql += "order by ";
-
-		sql += "         CASE WHEN f.\"CollectWayCode\" IN (1,20)  THEN 0 ELSE 1 END DESC ,";
-		sql += "f.\"CustNo\" ASC,f.\"FacmNo\"					";
+		sql += " order by ";
+		sql += " CASE WHEN f.\"CollectWayCode\" IN (1,20)  THEN 0 ELSE 1 END DESC ,";
+		sql += " f.\"CustNo\" ASC,f.\"FacmNo\"					";
 
 		this.info("sql=" + sql);
 		Query query;
@@ -83,7 +77,7 @@ public class L2633ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 
 		query = em.createNativeQuery(sql);
-//		query.setParameter("entryDate", iEntryDate);
+		query.setParameter("entryDate", iEntryDate);
 //		query.setParameter("applDate", iApplDate);
 //		query.setParameter("type", iType);
 		this.info("L2633Service FindData=" + query);
@@ -123,20 +117,13 @@ public class L2633ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iApplDate = parse.stringToInteger(titaVo.getParam("ApplDate")) + 19110000;
 
 		String sql = " SELECT f.* ";
-		sql += "FROM (SELECT \"CustNo\",\"FacmNo\",MAX(\"CloseNo\") AS MAXNO FROM \"FacClose\" GROUP BY \"CustNo\" ,\"FacmNo\" ) r  ";
-		sql += "inner join \"FacClose\" f ";
-		sql += "ON  r.\"CustNo\" = f.\"CustNo\"  ";
-		sql += "AND r.\"FacmNo\" = f.\"FacmNo\"  ";
-		sql += "AND r.\"MAXNO\" = f.\"CloseNo\"  ";
-		sql += "AND f.\"CloseDate\"> 0 ";
-
-		sql += "AND f.\"ApplDate\"= " + iApplDate;
+		sql += " FROM \"FacClose\" f ";
+		sql += " WHERE f.\"CloseDate\"> 0 ";
+		sql += " AND f.\"ApplDate\"= :applDate ";
 		sql += " AND f.\"FunCode\" in ( '2','3')							";
-
-		sql += "order by ";
-
-		sql += "         CASE WHEN f.\"CollectWayCode\" IN (1,20)  THEN 0 ELSE 1 END DESC ,";
-		sql += "f.\"CustNo\" ASC,f.\"FacmNo\"					";
+		sql += " order by ";
+		sql += " CASE WHEN f.\"CollectWayCode\" IN (1,20)  THEN 0 ELSE 1 END DESC ,";
+		sql += " f.\"CustNo\" ASC,f.\"FacmNo\"					";
 
 		this.info("sql=" + sql);
 		Query query;
@@ -146,7 +133,7 @@ public class L2633ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		query = em.createNativeQuery(sql);
 //		query.setParameter("entryDate", iEntryDate);
-//		query.setParameter("applDate", iApplDate);
+		query.setParameter("applDate", iApplDate);
 //		query.setParameter("type", iType);
 		this.info("L2633Service FindData=" + query);
 

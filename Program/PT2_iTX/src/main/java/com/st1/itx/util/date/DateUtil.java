@@ -746,7 +746,7 @@ public class DateUtil extends SysLogger {
 	 * @throws LogicException 轉換錯誤
 	 */
 	public int getLastMonthEndBussinessDate(int bcDate) throws LogicException {
-		int thisMonthStartDate = ((int) (bcDate % 100)) * 100 + 1;
+		int thisMonthStartDate = ((int) (bcDate / 100)) * 100 + 1;
 		return getbussDate(thisMonthStartDate, -1);
 	}
 }
