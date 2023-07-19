@@ -64,7 +64,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         FROM \"AcDetail\" ACD ";
 		sql += "         LEFT JOIN \"CdAcCode\" CDAC ON CDAC.\"AcNoCode\" = ACD.\"AcNoCode\" ";
 		sql += "                                    AND CDAC.\"AcSubCode\" = ACD.\"AcSubCode\" ";
-		sql += "                                    AND CDAC.\"AcDtlCode\" = ACD.\"AcDtlCode\" ";
+		sql += "                                    AND CDAC.\"AcDtlCode\" = '  ' ";
 		sql += "         WHERE ACD.\"AcDate\" = :acDate ";
 		sql += "           AND ACD.\"SlipBatNo\" = :slipBatNo ";
 		sql += "           AND ACD.\"ReceivableFlag\" <> '8' ";
@@ -83,7 +83,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         FROM \"AcDetail\" ACD ";
 		sql += "         LEFT JOIN \"CdAcCode\" CDAC ON CDAC.\"AcNoCode\" = ACD.\"AcNoCode\" ";
 		sql += "                                    AND CDAC.\"AcSubCode\" = ACD.\"AcSubCode\" ";
-		sql += "                                    AND CDAC.\"AcDtlCode\" = ACD.\"AcDtlCode\" ";
+		sql += "                                    AND CDAC.\"AcDtlCode\" = '  ' ";
 		sql += "         WHERE ACD.\"AcDate\" = :acDate ";
 		sql += "           AND ACD.\"SlipBatNo\" = :slipBatNo ";
 		sql += "           AND ACD.\"ReceivableFlag\" <> '8' ";
@@ -104,7 +104,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         FROM \"AcDetail\" ACD ";
 		sql += "         LEFT JOIN \"CdAcCode\" CDAC ON CDAC.\"AcNoCode\" = ACD.\"AcNoCode\" ";
 		sql += "                                    AND CDAC.\"AcSubCode\" = ACD.\"AcSubCode\" ";
-		sql += "                                    AND CDAC.\"AcDtlCode\" = ACD.\"AcDtlCode\" ";
+		sql += "                                    AND CDAC.\"AcDtlCode\" = '  ' ";
 		sql += "         WHERE ACD.\"AcDate\" = :acDate ";
 		sql += "           AND ACD.\"SlipBatNo\"       = :slipBatNo ";
 		sql += "           AND ACD.\"ReceivableFlag\"  = '8' ";
@@ -123,7 +123,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         FROM \"AcDetail\" ACD ";
 		sql += "         LEFT JOIN \"CdAcCode\" CDAC ON CDAC.\"AcNoCode\" = ACD.\"AcNoCode\" ";
 		sql += "                                    AND CDAC.\"AcSubCode\" = ACD.\"AcSubCode\" ";
-		sql += "                                    AND CDAC.\"AcDtlCode\" = ACD.\"AcDtlCode\" ";
+		sql += "                                    AND CDAC.\"AcDtlCode\" = '  ' ";
 		sql += "         WHERE ACD.\"AcDate\" = :acDate ";
 		sql += "           AND ACD.\"SlipBatNo\"       = :slipBatNo ";
 		sql += "           AND ACD.\"ReceivableFlag\"  = '8' ";
@@ -159,6 +159,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
+	//L9130Report2022
 	public List<Map<String, String>> doQuery2022(int acDate, int slipBatNo, TitaVo titaVo) throws Exception {
 
 		String sql = " ";
@@ -220,7 +221,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-	// 傳票號碼(彙總)
+	// L9130Report2022 編傳票號碼(彙總) by 傳票批號、整批批號、對帳類別、經辦、科子目、區隔帳冊、借貸別
 	public List<Map<String, String>> doQuerySlipSumNo(int acDate, TitaVo titaVo) {
 
 		String sql = " ";

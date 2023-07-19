@@ -16,8 +16,6 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
-import com.st1.itx.db.domain.CustNotice;
-import com.st1.itx.db.domain.CustNoticeId;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.CustNoticeService;

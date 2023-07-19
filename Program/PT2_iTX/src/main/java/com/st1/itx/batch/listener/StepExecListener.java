@@ -1,8 +1,11 @@
 package com.st1.itx.batch.listener;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 import org.springframework.batch.core.ExitStatus;
@@ -37,9 +40,12 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 		ThreadVariable.setObject(ContentName.loggerFg, true);
 		if ("true".equals(stepExecution.getJobExecution().getJobParameters().getString("loogerFg")))
 			ThreadVariable.setObject(ContentName.loggerFg, true);
-		ThreadVariable.setObject(ContentName.empnot, stepExecution.getJobExecution().getJobParameters().getString(ContentName.tlrno, "BAT001"));
+		ThreadVariable.setObject(ContentName.empnot,
+				stepExecution.getJobExecution().getJobParameters().getString(ContentName.tlrno, "BAT001"));
 
 		String jobId = stepExecution.getJobExecution().getJobParameters().getString(ContentName.jobId);
+		String nestedJobId = stepExecution.getJobExecution().getJobInstance().getJobName();
+		this.info("Nested Job ID: " + nestedJobId);
 		String stepId = stepExecution.getStepName();
 		Date time = stepExecution.getJobExecution().getJobParameters().getDate(ContentName.batchDate);
 		int execDate = Integer.valueOf(new SimpleDateFormat("yyyyMMdd").format(time));
@@ -49,7 +55,7 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 		this.info("batch execDate    : " + execDate);
 		this.info("step startTime  : " + startTime);
 
-		this.updtaeJobDetail(jobId, stepId, execDate, startTime, true, stepExecution);
+		this.updtaeJobDetail(jobId, nestedJobId, stepId, execDate, startTime, true, stepExecution);
 	}
 
 	@Override
@@ -77,15 +83,15 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 			stepStatus = "F";
 			break;
 		}
-
 		this.info("StepExecListener.afterStep : " + stepId);
 		this.info("batch execDate     : " + execDate);
 		this.info("step endTime       : " + endTime);
 		this.info("step stepStatus   : " + stepExecution.getExitStatus().getExitCode());
 
-		this.updtaeJobDetail(jobId, stepId, execDate, endTime, false, stepExecution, stepStatus);
+		this.updtaeJobDetail(jobId, null, stepId, execDate, endTime, false, stepExecution, stepStatus);
 
-		if (!Thread.currentThread().getName().equals(stepExecution.getJobExecution().getExecutionContext().getString(ContentName.threadName)))
+		if (!Thread.currentThread().getName()
+				.equals(stepExecution.getJobExecution().getExecutionContext().getString(ContentName.threadName)))
 			ThreadVariable.clearThreadLocal();
 
 		return stepExecution.getExitStatus();
@@ -94,21 +100,26 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 	/**
 	 * 更新批次工作明細檔
 	 * 
-	 * @param jobId      批次代號
-	 * @param stepId     程式代號
-	 * @param execDate   批次執行日期
-	 * @param time       啟動時間 / 結束時間
-	 * @param seFg       啟動 / 結束
-	 * @param stepStatus 執行狀態
+	 * @param jobId       批次代號
+	 * @param nestedJobId 子批次代號
+	 * @param stepId      程式代號
+	 * @param execDate    批次執行日期
+	 * @param time        啟動時間 / 結束時間
+	 * @param seFg        啟動 / 結束
+	 * @param stepStatus  執行狀態
 	 */
-	private void updtaeJobDetail(String jobId, String stepId, int execDate, Timestamp time, boolean seFg, StepExecution stepExecution, String... stepStatus) {
+	private void updtaeJobDetail(String jobId, String nestedJobId, String stepId, int execDate, Timestamp time,
+			boolean seFg, StepExecution stepExecution, String... stepStatus) {
 		JobDetailId jobDetailId = new JobDetailId();
 		JobDetail jobDetail = new JobDetail();
 		TitaVo titaVo = new TitaVo();
 		titaVo.putParam(ContentName.empnot, stepExecution.getJobParameters().getString(ContentName.tlrno, "BAT001"));
 
 		String txSeq = stepExecution.getJobExecution().getJobParameters().getString(ContentName.txSeq);
-		txSeq = Objects.isNull(txSeq) || txSeq.trim().isEmpty() ? stepExecution.getJobExecution().getExecutionContext().getString(ContentName.txSeq, "") : txSeq;
+		String batchType = stepExecution.getJobExecution().getJobParameters().getString(ContentName.batchType);
+		txSeq = Objects.isNull(txSeq) || txSeq.trim().isEmpty()
+				? stepExecution.getJobExecution().getExecutionContext().getString(ContentName.txSeq, "")
+				: txSeq;
 
 		if (Objects.isNull(txSeq) || txSeq.trim().isEmpty()) {
 			this.info("txSeq is Null or Empty..");
@@ -130,10 +141,27 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 				jobDetail = new JobDetail();
 
 				jobDetail.setJobDetailId(jobDetailId);
+				jobDetail.setNestJobCode(nestedJobId);
+				jobDetail.setBatchType(batchType);
 				jobDetail.setStepStartTime(time);
 				jobDetailService.insert(jobDetail, titaVo);
 				this.info("jobDetail insert. " + jobDetail.toString());
 			} else {
+				List<Throwable> failureExceptions = stepExecution.getFailureExceptions();
+				String errorMsg = "";
+				for (Throwable t : failureExceptions) {
+					// 取得錯誤訊息
+					errorMsg = t.getMessage();
+					this.error("Error message: " + errorMsg);
+
+					// 獲取異常的堆疊軌跡
+					StringWriter errors = new StringWriter();
+					t.printStackTrace(new PrintWriter(errors));
+					String stackTrace = errors.toString();
+
+					// 將堆疊軌跡記錄到日誌
+					this.error("Stack trace: " + stackTrace);
+				}
 				jobDetailId.setExecDate(execDate);
 				jobDetailId.setJobCode(jobId);
 				jobDetailId.setStepId(stepId);
@@ -145,6 +173,7 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 						jobDetail.setStatus(stepStatus[0].substring(0, 1));
 					}
 					jobDetail.setStepEndTime(time);
+					jobDetail.setErrContent(errorMsg);
 					jobDetailService.update(jobDetail, titaVo);
 					this.info("jobDetail update. " + jobDetail.toString());
 				}

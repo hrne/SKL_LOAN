@@ -47,7 +47,7 @@ public class LY007Report extends MakeReport {
 		List<Map<String, String>> findStockHoldersEqt = null;
 
 		try {
-			//查核數(可運用資金中的股東權益)
+			// 查核數(可運用資金中的股東權益)
 			findStockHoldersEqt = lY007ServiceImpl.findStockHoldersEqt(inputYearMonth, titaVo);
 
 		} catch (Exception e) {
@@ -98,19 +98,12 @@ public class LY007Report extends MakeReport {
 		// 開啟報表
 		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
 
-//		int entdy = reportDate / 100;
-
 		makeExcel.setValue(2, 2, inputYearMonth, "L"); // 申報年月
-
-//		ExcelFontStyleVo headerStyleVo = new ExcelFontStyleVo();
-//		headerStyleVo.setBold(true);
 
 		// 通用處理
 		// 設定表中顯示的日期
 
 		makeExcel.setValue(6, 15, showRocDate(inputYearMonth * 100 + 31, 6)); // 資料日期
-
-//		makeExcel.setValue(6, 16, equityDataMonthOutput, "C"); // 核閱數資料日期
 
 		makeExcel.setValue(7, 15, totalEquity, "#,##0"); // 核閱數
 
@@ -127,8 +120,6 @@ public class LY007Report extends MakeReport {
 
 		if (lY007List != null && !lY007List.isEmpty()) {
 
-			makeExcel.setValue(7, 15, iYear + ".12.31", "C");
-			makeExcel.setValue(8, 15, formatAmt(totalEquity, 0), "C");
 			int rowCursor = 7; // 列指標
 			this.info("有值");
 			for (Map<String, String> r : lY007List) {
@@ -141,21 +132,24 @@ public class LY007Report extends MakeReport {
 				this.info("setShiftRow=" + rowCursor);
 				makeExcel.setShiftRow(rowCursor + 1, 1);
 				makeExcel.setValue(rowCursor, 1, r.get("Rel"));// 與本公司之關係
-				makeExcel.setValue(rowCursor, 2, r.get("CustNo"));// 交易對象代號
-				makeExcel.setValue(rowCursor, 3, r.get("CustName"));// 交易對象名稱
+				makeExcel.setValue(rowCursor, 2, r.get("CustId"), "L");// 交易對象代號
+				makeExcel.setValue(rowCursor, 3, r.get("CustName"), "L");// 交易對象名稱
 				makeExcel.setValue(rowCursor, 4, "A");// 交易種類
 				makeExcel.setValue(rowCursor, 5, "A");// 交易型態
-				makeExcel.setValue(rowCursor, 6, r.get("BdLoaction"));// 交易標的內容
+				makeExcel.setValue(rowCursor, 6, r.get("BdLocation"), "L");// 交易標的內容
 				makeExcel.setValue(rowCursor, 7, r.get("DrawdownDate"));// 交易日期
-				makeExcel.setValue(rowCursor, 8, loanBal);// 交易金額
+				makeExcel.setValue(rowCursor, 8, loanBal, "#,##0", "R");// 交易金額
 				makeExcel.setValue(rowCursor, 9, "");// 最近交易日之參考市價
 				makeExcel.setValue(rowCursor, 10, "");// 已實現損益
 				makeExcel.setValue(rowCursor, 11, "");// 未實現損益
-				makeExcel.setValue(rowCursor, 12, gPercent, "C");// 交易金額占業主權益比率%
+				makeExcel.setValue(rowCursor, 12, gPercent, "0.0000", "C");// 交易金額占業主權益比率%
 				makeExcel.setValue(rowCursor, 13, r.get("Supervisor"), "C");// 最後決定權人員
 				makeExcel.setValue(rowCursor, 14, "");// 備註
 				rowCursor++;
 			}
+
+			makeExcel.setValue(7, 15, iYear + ".12.31", "C");
+			makeExcel.setValue(8, 15, formatAmt(totalEquity, 0), "C");
 		} else {
 			// 無資料時處理
 			makeExcel.setValue(8, 1, "本日無資料", "L");

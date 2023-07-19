@@ -157,9 +157,10 @@ public class L4721Report2 extends TradeBuffer {
 			custNo = parse.stringToInteger(r.get("CustNo"));
 			int MinSpecificDd = parse.stringToInteger(r.get("MinSpecificDd"));
 			int MaxSpecificDd = parse.stringToInteger(r.get("MaxSpecificDd"));
-			int tempfacmno = 999;
-
-			int tempNextfacmno = 999;
+			int tempFacmNo = 999;
+			int tempNextFacmNo = 999;
+			int tempCustNo = 0;
+			int tempNextCustNo = 0;
 			// 應繳日是否一樣
 			isSameSpecificDd = MinSpecificDd == MaxSpecificDd;
 
@@ -195,18 +196,20 @@ public class L4721Report2 extends TradeBuffer {
 
 				int times = 0;
 				int cnt = 0;
-				tempfacmno = parse.stringToInteger(rDetail.get(0).get("FacmNo"));
-
+				tempFacmNo = parse.stringToInteger(rDetail.get(0).get("FacmNo"));
+				tempCustNo = parse.stringToInteger(rDetail.get(0).get("CustNo"));
 				for (Map<String, String> r1 : rDetail) {
-
+					this.info("size =" + rDetail.size());
+					this.info("cnt  =" + cnt + 1);
 					if (cnt + 1 < rDetail.size()) {
-						tempNextfacmno = parse.stringToInteger(rDetail.get(cnt + 1).get("FacmNo"));
+						tempNextCustNo = parse.stringToInteger(rDetail.get(cnt + 1).get("CustNo"));
+						tempNextFacmNo = parse.stringToInteger(rDetail.get(cnt + 1).get("FacmNo"));
 //						this.info("tempNextfacmno = " + tempNextfacmno);
 					}
 
 					// 相同戶號不同額度的輸出
 
-					if (tempfacmno == parse.stringToInteger(r1.get("FacmNo"))) { // 相同額度
+					if (tempFacmNo == parse.stringToInteger(r1.get("FacmNo"))) { // 相同額度
 
 						// 第一次
 						if (times == 0) {
@@ -222,17 +225,21 @@ public class L4721Report2 extends TradeBuffer {
 //						result.add(line);
 
 					}
-
-					tempfacmno = parse.stringToInteger(r1.get("FacmNo"));
+					tempCustNo = parse.stringToInteger(r1.get("CustNo"));
+					tempFacmNo = parse.stringToInteger(r1.get("FacmNo"));
 					cnt++;
 					times++;
 
+					this.info("tempCustNo =" + tempCustNo);
+					this.info("tempFacmno  =" + tempFacmNo);
+					this.info("tempNextCustNo =" + tempNextCustNo);
+					this.info("tempNextFacmNo  =" + tempNextFacmNo);
 					// 1.by 戶號 額度一定是0，只會六筆
 					// 2.by 額度 不同額度 會各有六筆
 					// 當前額度和下一筆額度不同才進入
 //					this.info(cnt + "=" + tempfacmno + ":" + tempNextfacmno);
-					if (tempfacmno != tempNextfacmno) { // 不同額度
-														// 印04並且切到下一個額度循環
+					if (tempFacmNo != tempNextFacmNo || tempCustNo != tempNextCustNo) { // 只要不同戶號或不同額度
+						// 印04並且切到下一個額度循環
 						// 04
 
 						line = "";

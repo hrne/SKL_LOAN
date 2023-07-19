@@ -26,14 +26,15 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
+
 	/**
 	 * 查詢資料
 	 * 
 	 * @param titaVo
-	 * @param monthDate 西元年月底日
+	 * @param monthDate  西元年月底日
 	 * @param isAcctCode 是否為會計科目項目
-	 * @return 
-	 * @throws Exception 
+	 * @return
+	 * @throws Exception
 	 * 
 	 */
 	public List<Map<String, String>> findAll(TitaVo titaVo, int monthDate, String isAcctCode) throws Exception {
@@ -46,7 +47,7 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 當前年月
 		String iYearMonth = iYear * 100 + iMonth + "";
 
-		//判斷前一個年月
+		// 判斷前一個年月
 		iYear = iMonth - 1 == 0 ? (iYear - 1) : iYear;
 		iMonth = iMonth - 1 == 0 ? 12 : iMonth - 1;
 
@@ -71,7 +72,7 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			 * (資金專案運用) F24 逾期天數
 			 */
 
-			sql += "	SELECT LPAD(M.\"CustNo\",7,0) AS F0";
+			sql += "	SELECT LPAD(M.\"CustNo\",7,0) AS \"CustNo\"";
 			sql += "		  ,(CASE";
 			sql += "			 WHEN M.\"ClCode1\" IN (3) THEN 'D'";
 			sql += "			 WHEN M.\"ClCode1\" IN (1,2) ";
@@ -80,47 +81,47 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "			  OR M.\"FacAcctCode\" = 340 ) ";
 			sql += "			 THEN 'Z' ";
 			sql += "			 WHEN M.\"ClCode1\" IN (1,2) THEN 'C'";
-			sql += "			ELSE '99' END ) AS \"ClNo\"";
-			sql += "		  ,\"Fn_ParseEOL\"(C.\"CustName\",0) AS F2";
+			sql += "			ELSE '99' END ) AS \"LoanType\"";
+			sql += "		  ,\"Fn_ParseEOL\"(C.\"CustName\",0) AS \"CustName\"";
 			sql += "		  ,(CASE";
 			sql += "			  WHEN H.\"Id\" IS NULL THEN 'A'";
 //			sql += "			  WHEN R.\"ReltCode\" ='08' THEN 'C'";
-			sql += "			ELSE 'B' END ) AS F3";
-			//EntCode 0=個金,1=企金,2=企金自然人
+			sql += "			ELSE 'B' END ) AS \"LoanRelCode\"";
+			// EntCode 0=個金,1=企金,2=企金自然人
 			sql += "		  ,(CASE";
 			sql += "			  WHEN H.\"Id\" IS NULL AND M.\"EntCode\" <> 1 THEN 'D'";
 			sql += "			  WHEN H.\"Id\" IS NULL AND M.\"EntCode\" = 1 THEN 'C'";
 			sql += "			  WHEN H.\"Id\" IS NOT NULL AND M.\"EntCode\" <> 1 THEN 'B'";
 			sql += "			  WHEN H.\"Id\" IS NOT NULL AND M.\"EntCode\" = 1 THEN 'A'";
-			sql += "			ELSE ' ' END ) AS F4";
+			sql += "			ELSE ' ' END ) AS \"RelCode\"";
 			sql += "		  ,(CASE";
 			sql += "			  WHEN REGEXP_LIKE(M2.\"ProdNo\",'I[A-Z]') OR M2.\"FacAcctCode\" = 340 THEN 'Y'";
-			sql += "			ELSE 'N' END ) AS F5";
-			sql += "		  ,DECODE(FCA.\"SyndNo\",0,'N','Y') AS F6";
-			sql += "		  ,'TWD' AS F7";
-			sql += "		  ,L.\"DrawdownDate\" AS F8";
-			sql += "		  ,L.\"MaturityDate\" AS F9";
-			sql += "		  ,M.\"StoreRate\" / 100 AS F10";
-			sql += "		  ,M.\"LoanBalance\" AS F11";
-			sql += "		  ,NVL(acInt.\"Interest\",0) AS F12";
-			sql += "		  ,'1' AS F13";
-			sql += "		  ,NVL(CM.\"EvaAmt\",0) AS F14";
-			sql += "		  ,NVL(F.\"LineAmt\",0) AS F15";
-			sql += "		  ,M2.\"OvduDate\" AS F16";
-			sql += "		  ,CT.\"ResultCode\" AS F17";
-			sql += "		  ,CT.\"TelDate\" AS F18";
+			sql += "			ELSE 'N' END ) AS \"isNotGoverDisCode\"";
+			sql += "		  ,DECODE(FCA.\"SyndNo\",0,'N','Y') AS \"SyndNo\"";
+			sql += "		  ,'TWD' AS \"Currency\"";
+			sql += "		  ,L.\"DrawdownDate\" AS \"DrawdownDate\"";
+			sql += "		  ,L.\"MaturityDate\" AS \"MaturityDate\"";
+			sql += "		  ,M.\"StoreRate\" / 100 AS \"StoreRate\"";
+			sql += "		  ,M.\"LoanBalance\" AS \"LoanBalance\"";
+			sql += "		  ,NVL(acInt.\"Interest\",0) AS \"Int\"";
+			sql += "		  ,'1' AS \"LoanSeq\"";
+			sql += "		  ,NVL(CM.\"EvaAmt\",0) AS \"EvaAmt\"";
+			sql += "		  ,NVL(F.\"LineAmt\",0) AS \"LineAmt\"";
+			sql += "		  ,M2.\"OvduDate\" AS \"OvduDate\"";
+			sql += "		  ,CT.\"ResultCode\" AS \"ResultCode\"";
+			sql += "		  ,CT.\"TelDate\" AS \"TelDate\"";
 			sql += "		  ,' ' AS F19";
-			sql += "		  ,NVL(SUBSTR(M2.\"AssetClass\",0,1),1) AS F20";
+			sql += "		  ,NVL(SUBSTR(M2.\"AssetClass\",0,1),1) AS \"Class\"";
 			sql += "		  ,' ' AS F21";
 			sql += "		  ,(CASE";
 			sql += "			  WHEN M2.\"ProdNo\" IN ('60','61','62') THEN '協議戶'";
-			sql += "			ELSE ' ' END ) AS F22";
+			sql += "			ELSE ' ' END ) AS \"Protocol\"";
 			sql += "		  ,(CASE";
 			sql += "			  WHEN  REGEXP_LIKE(M2.\"ProdNo\",'I[A-Z]') OR M2.\"FacAcctCode\" = 340 THEN '資金專案運用'";
-			sql += "			ELSE ' ' END ) AS F23";
-			sql += "		  ,M2.\"OvduDays\" AS F24";
-			sql += "		  ,M.\"CustNo\" || M.\"FacmNo\" || L.\"BormNo\" AS F25";
-			sql += "		  ,M.\"ClNo\" AS \"ClNo2\"";//是否擔保品判斷用
+			sql += "			ELSE ' ' END ) AS \"GoverDis\"";
+			sql += "		  ,M2.\"OvduDays\" AS \"OvduDays\"";
+			sql += "		  ,M.\"CustNo\" || M.\"FacmNo\" || L.\"BormNo\" AS \"CFBNo\"";
+			sql += "		  ,M.\"ClNo\" AS \"ClNo\"";// 是否擔保品判斷用
 			sql += "	FROM \"MonthlyLoanBal\" M";
 			sql += "	LEFT JOIN ( ";
 			sql += "		SELECT DISTINCT \"CustNo\"";
@@ -168,7 +169,7 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "			UNION ALL";
 			sql += "			SELECT DISTINCT \"BusId\" AS \"Id\"";
 			sql += "			      ,\"BusName\" AS \"Name\"";
-			sql += "			FROM \"LifeRelHead\"";	
+			sql += "			FROM \"LifeRelHead\"";
 			sql += "			WHERE TRUNC(\"AcDate\" / 100 ) = :yymm ";
 			sql += "		) WHERE \"Id\" <> '-' ";
 			sql += " 	) H ON H.\"Id\" = C.\"CustId\"";
@@ -192,10 +193,10 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "				FROM \"CollTel\" ) CT";
 			sql += "	ON CT.\"CustNo\" = M2.\"CustNo\" AND CT.\"FacmNo\" = M2.\"FacmNo\"";
 			sql += "									  AND CT.\"SEQ\" = 1 ";
-			sql += "	LEFT JOIN (SELECT \"CustNo\"        "; 
-			sql += "       				 ,\"FacmNo\"   "; 
-			sql += "       				 ,\"BormNo\"     "; 
-			sql += "       				 ,SUM(\"Interest\") AS \"Interest\" "; 
+			sql += "	LEFT JOIN (SELECT \"CustNo\"        ";
+			sql += "       				 ,\"FacmNo\"   ";
+			sql += "       				 ,\"BormNo\"     ";
+			sql += "       				 ,SUM(\"Interest\") AS \"Interest\" ";
 			sql += " 			   FROM \"AcLoanInt\" ";
 			sql += " 			   WHERE \"YearMonth\"    = :yymm ";
 			sql += "			   GROUP BY \"CustNo\" ";
@@ -203,58 +204,54 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "         		 	   ,\"BormNo\" ) acInt ";
 			sql += "	 ON acInt.\"CustNo\" = M.\"CustNo\"";
 			sql += "	AND acInt.\"FacmNo\" = M.\"FacmNo\"";
-			sql += "	AND acInt.\"BormNo\" = M.\"BormNo\"";	
+			sql += "	AND acInt.\"BormNo\" = M.\"BormNo\"";
 			sql += "	WHERE M.\"YearMonth\" = :yymm";
 			sql += "	  AND M.\"LoanBalance\" > 0 ";
-			sql += "	  AND R.\"CustNo\" IS NOT NULL";	
+			sql += "	  AND R.\"CustNo\" IS NOT NULL";
 			sql += "	ORDER BY M2.\"CustNo\"";
 			sql += "			,M2.\"FacmNo\"";
 			sql += "			,L.\"BormNo\"";
-			
-			
-	
-		
+
 		} else {
 
-			sql += "	SELECT :eymd  AS F0";
-			sql += "		  ,DECODE(R.\"ClNo\",'A','ZZ','B','ZZ',R.\"ClNo\") AS F1";
+			sql += "	SELECT :eymd  AS \"CustNo\"";
+			sql += "		  ,DECODE(R.\"ClNo\",'A','ZZ','B','ZZ',R.\"ClNo\") AS \"LoanType\"";
 			sql += "		  ,CASE";
 			sql += "		  	 WHEN R.\"ClNo\" = 'D' THEN '有價證券'";
 			sql += "		  	 WHEN R.\"ClNo\" = 'Z' THEN '不動產抵押放款'";
 			sql += "		  	 WHEN R.\"ClNo\" = 'C' THEN '不動產擔保放款'";
 			sql += "		  	 WHEN R.\"ClNo\" = 'A' THEN '放款折溢價'";
 			sql += "		  	 WHEN R.\"ClNo\" = 'B' THEN '放款催收費用與折溢價'";
-			sql += "		   ELSE ' ' END AS F2 ";
-			sql += "		  ,'A' AS F3";
-			sql += "		  ,'D' AS F4";
+			sql += "		   ELSE ' ' END AS \"CustName\" ";
+			sql += "		  ,'A' AS \"LoanRelCode\"";
+			sql += "		  ,'D' AS \"RelCode\"";
 			sql += "		  ,CASE";
 			sql += "		  	 WHEN R.\"ClNo\" = 'Z' THEN 'Y'";
-			sql += "		   ELSE 'N' END AS F5 ";
-			sql += "		  ,'N' AS F6";
-			sql += "		  ,'TWD' AS F7";
-			sql += "		  ,:symd AS F8";
-			sql += "		  ,:eymd AS F9";
-			sql += "		  ,0 AS F10";
-			sql += "		  ,NVL(R.\"LoanBalance\",0) AS F11";
-			sql += "		  ,NVL(R.\"IntAmtAcc\",0) AS F12";
-			sql += "		  ,1 AS F13";
-			sql += "		  ,0 AS F14";
-			sql += "		  ,NVL(R.\"LineAmt\",0) AS F15";
-			sql += "		  ,:eymd AS F16";
-			sql += "		  ,'A' AS F17";
-			sql += "		  ,:eymd AS F18";
+			sql += "		   ELSE 'N' END AS \"isNotGoverDisCode\" ";
+			sql += "		  ,'N' AS \"SyndNo\"";
+			sql += "		  ,'TWD' AS \"Currency\"";
+			sql += "		  ,:symd AS \"DrawdownDate\"";
+			sql += "		  ,:eymd AS \"MaturityDate\"";
+			sql += "		  ,0 AS \"StoreRate\"";
+			sql += "		  ,NVL(R.\"LoanBalance\",0) AS \"LoanBalance\"";
+			sql += "		  ,NVL(R.\"IntAmtAcc\",0) AS \"Int\"";
+			sql += "		  ,1 AS \"LoanSeq\"";
+			sql += "		  ,0 AS \"EvaAmt\"";
+			sql += "		  ,NVL(R.\"LineAmt\",0) AS \"LineAmt\"";
+			sql += "		  ,:eymd AS \"OvduDate\"";
+			sql += "		  ,'A' AS \"ResultCode\"";
+			sql += "		  ,:eymd AS \"TelDate\"";
 			sql += "		  ,1 AS F19";
-			sql += "		  ,1 AS F20";
+			sql += "		  ,1 AS \"Class\"";
 			sql += "		  ,' ' AS F21";
-			sql += "		  ,'1' AS F22";
+			sql += "		  ,'1' AS \"Protocol\"";
 			sql += "		  ,CASE";
 			sql += "		  	 WHEN R.\"ClNo\" = 'Z' THEN '資金專案運用'";
-			sql += "		   ELSE ' ' END AS F23 ";
-			sql += "		  ,0 AS F24";
-			sql += "		  ,' ' AS F25";
-			sql += "		  ,'999' AS \"ClNo2\"";//是否擔保品判斷用
+			sql += "		   ELSE ' ' END AS \"GoverDis\" ";
+			sql += "		  ,0 AS \"OvduDays\"";
+			sql += "		  ,' ' AS \"CFBNo\"";
+			sql += "		  ,'999' AS \"ClNo\"";// 是否擔保品判斷用
 			sql += "	FROM ( ";
-
 			sql += "	SELECT (CASE";
 			sql += "			  WHEN M.\"ClCode1\" IN (3) THEN 'D'";
 			sql += "			  WHEN M.\"ClCode1\" IN (1,2) ";
@@ -268,10 +265,10 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "		  ,SUM(NVL(acInt.\"Interest\",0)) AS \"IntAmtAcc\"";
 			sql += "		  ,SUM(NVL(F.\"LineAmt\",0)) AS \"LineAmt\"";
 			sql += "	FROM \"MonthlyLoanBal\" M";
-			sql += "	LEFT JOIN (SELECT \"CustNo\"        "; 
-			sql += "       				 ,\"FacmNo\"   "; 
-			sql += "       				 ,\"BormNo\"     "; 
-			sql += "       				 ,SUM(\"Interest\") AS \"Interest\" "; 
+			sql += "	LEFT JOIN (SELECT \"CustNo\"        ";
+			sql += "       				 ,\"FacmNo\"   ";
+			sql += "       				 ,\"BormNo\"     ";
+			sql += "       				 ,SUM(\"Interest\") AS \"Interest\" ";
 			sql += " 			   FROM \"AcLoanInt\" ";
 			sql += " 			   WHERE \"YearMonth\"    = :yymm ";
 			sql += "			   GROUP BY \"CustNo\" ";
@@ -279,7 +276,7 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "         		 	   ,\"BormNo\" ) acInt ";
 			sql += "	 ON acInt.\"CustNo\" = M.\"CustNo\"";
 			sql += "	AND acInt.\"FacmNo\" = M.\"FacmNo\"";
-			sql += "	AND acInt.\"BormNo\" = M.\"BormNo\"";	
+			sql += "	AND acInt.\"BormNo\" = M.\"BormNo\"";
 			sql += "	LEFT JOIN ( ";
 			sql += "		SELECT DISTINCT \"CustNo\"";
 			sql += "			  ,\"FacmNo\"";
@@ -315,7 +312,7 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "						    AND F.\"FacmNo\" = M.\"FacmNo\"";
 			sql += "	WHERE M.\"YearMonth\" = :yymm";
 			sql += "	  AND M.\"LoanBalance\" > 0 ";
-			sql += "	  AND R.\"CustNo\" IS NULL";	
+			sql += "	  AND R.\"CustNo\" IS NULL";
 			sql += "	GROUP BY CASE";
 			sql += "			   WHEN M.\"ClCode1\" IN (3) THEN 'D'";
 			sql += "			   WHEN M.\"ClCode1\" IN (1,2) ";
@@ -365,9 +362,10 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	/**
 	 * 查詢資料 Ias34Ap
+	 * 
 	 * @param titaVo
-	 * @return 
-	 * @throws Exception 
+	 * @return
+	 * @throws Exception
 	 * 
 	 */
 	public List<Map<String, String>> ias34Ap(TitaVo titaVo) throws Exception {

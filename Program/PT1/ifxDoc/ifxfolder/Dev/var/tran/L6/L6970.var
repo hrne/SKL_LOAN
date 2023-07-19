@@ -64,17 +64,25 @@ T(4,CHAIN$)
 ! 選單代碼
 #CdCodeBatchResultCode=x,30,S
 T(3,CdCode.BatchResultCode)
+#CdCodeJobCode=x,30,S
+T(3,CdCode.JobCode)
+#CdCodeStepCode=x,30,S
+T(3,CdCode.StepCode)
 
 ! 選單內容
 #BatchResultCodeH=x,100,S
+#JobCodeH=x,1000,S
+#StepCodeH=x,1000,S
 
 ! 根據選單代碼取得選單內容
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CdCodeBatchResultCode)
+S(XXR99,01,#CdCodeBatchResultCode,#CdCodeJobCode,#CdCodeStepCode)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@BatchResultCodeH,#HelpDesc1)
+T(2,@JobCodeH,#HelpDesc2)
+T(2,@StepCodeH,#HelpDesc3)
 
 ! 輸入欄位
 ! [執行結果篩選]
@@ -155,9 +163,23 @@ T(3,1)ASGN(LOOP$)
 !批次執行日期
 #OOExecDate=D,7,L
 !批次代號
-#OOJobCode=x,10,L
+#OOJobCode=x,30,L
+!批次名稱
+#OOJobItem=x,50,L
+T(3, )
+C(4,#OOJobCode,S,T(H,#OOJobCode,#JobCodeH))
+!子批次代號
+#OONestJobCode=x,30,L
+!子批次名稱
+#OONestJobItem=x,50,L
+T(3, )
+C(4,#OONestJobCode,S,T(H,#OONestJobCode,#JobCodeH))
 !步驟代號
 #OOStepId=x,30,L
+!步驟名稱
+#OOStepItem=x,50,L
+T(3, )
+C(4,#OOStepId,S,T(H,#OOStepId,#StepCodeH))
 !執行結果
 #OOStatus=x,1,L
 #OOStatusX=x,10,L
@@ -168,6 +190,10 @@ SWITCH(#OOStatus,S,T(3,成功),
 #OOStepStartTime=x,20,L
 !結束時間 yyyy-MM-dd hh:mm:ss
 #OOStepEndTime=x,20,L
+
+#OOSuccess=A,5,L
+#OOFalse=A,5,L
+
 
 ! use T(6A,...)
 ! 勾選幾個就會sendback幾次, 所以不需要concats
@@ -192,13 +218,18 @@ T(6A,#OOJobCode)
 TXFORM=L6970
 #OOExecDate
 #OOJobCode
+#OONestJobCode
 #OOStepId
 #OOStatus
 #OOStepStartTime
 #OOStepEndTime
+#OOSuccess
+#OOFalse
 ^
 
 </sub>
+ALERT(#OOSuccess)
+ALERT(#OOFalse)
 
 !---------- 單據輸出組合 ----------
 <sub type="PART" name="L6970" layout="cols=1;screen.width=[100,900];printer.width=[20,20];">
@@ -226,16 +257,28 @@ ifxBatch:{
 #Sendback
 
 #OOExecDate=批次執行日期
-{width:160,align:'center'}
+{width:120,align:'center'}
 
 #OOJobCode=批次代號
+{width:100,align:'left'}
+
+#OOJobItem=批次名稱
+{width:120,align:'left'}
+
+#OONestJobCode=子批次代號
+{width:100,align:'left'}
+
+#OONestJobItem=子批次名稱
 {width:120,align:'left'}
 
 #OOStepId=步驟代號
 {width:180,align:'left'}
 
+#OOStepItem=步驟名稱
+{width:120,align:'left'}
+
 #OOStatusX=執行結果
-{width:100,align:'left'}
+{width:80,align:'left'}
 
 #OOStepStartTime=啟動時間
 {width:120,align:'center'}

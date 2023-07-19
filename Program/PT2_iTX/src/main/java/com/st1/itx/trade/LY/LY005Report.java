@@ -21,6 +21,7 @@ import com.st1.itx.db.service.springjpa.cm.LY005ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
+import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Component
@@ -33,6 +34,8 @@ public class LY005Report extends MakeReport {
 	@Autowired
 	InnFundAplService sInnFundAplService;
 
+	@Autowired
+	public DateUtil dateUtil;
 
 	@Autowired
 	Parse parse;
@@ -47,8 +50,14 @@ public class LY005Report extends MakeReport {
 
 		int inputYearMonth = (Integer.valueOf(titaVo.getParam("RocYear")) + 1911) * 100 + 12;
 
+		dateUtil.init();
+		dateUtil.setDate_1(inputYearMonth * 100 + 31);
+		dateUtil.getMonLimit();
+
 		// 西元月底日
-		int mfbsdy = this.txBuffer.getTxCom().getMfbsdyf();
+		int mfbsdy = dateUtil.getCalenderDay();
+
+		this.info("mfbsdy = " + mfbsdy);
 
 		List<InnFundApl> lInnFundApl = new ArrayList<InnFundApl>();
 		// 先取得淨值
@@ -65,7 +74,6 @@ public class LY005Report extends MakeReport {
 					+ ".31";
 		}
 
-	
 		List<Map<String, String>> lY005List = null;
 
 		try {

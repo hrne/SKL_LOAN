@@ -2,8 +2,6 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import com.st1.itx.util.StaticTool;
@@ -20,7 +18,12 @@ import com.st1.itx.Exception.LogicException;
 public class TxFlowId implements Serializable {
 
 
-  // 帳務日
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 8451595610492535569L;
+
+// 帳務日
   @Column(name = "`Entdy`")
   private int entdy = 0;
 

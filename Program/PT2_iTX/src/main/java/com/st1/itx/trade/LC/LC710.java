@@ -50,10 +50,10 @@ public class LC710 extends TradeBuffer {
 
 		if (choice == 0) {
 			// 查全部
-			slJobDetail = jobDetailService.findExecDateIn(inputStartDate, inputEndDate, this.index, this.limit, titaVo);
+			slJobDetail = jobDetailService.findExecDateIn("eodFlow",inputStartDate, inputEndDate, this.index, this.limit, titaVo);
 		} else {
 			// 只查成功或失敗
-			slJobDetail = jobDetailService.findStatusExecDateIn(inputStartDate, inputEndDate, choice == 1 ? "S" : "F", this.index, this.limit, titaVo);
+			slJobDetail = jobDetailService.findStatusExecDateIn("eodFlow",inputStartDate, inputEndDate, choice == 1 ? "S" : "F", this.index, this.limit, titaVo);
 		}
 
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
