@@ -1,6 +1,9 @@
 package com.st1.itx.trade.L5;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -9,8 +12,10 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.InnDocRecord;
 import com.st1.itx.db.domain.InnDocRecordId;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.InnDocRecordService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
@@ -31,6 +36,8 @@ public class L5R48 extends TradeBuffer {
 
 	@Autowired
 	public InnDocRecordService innDocRecordService;
+	@Autowired
+	public CustMainService custMainService;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -52,10 +59,30 @@ public class L5R48 extends TradeBuffer {
 
 		TempVo tTempVo = new TempVo();
 
-		InnDocRecord tInnDocRecord = innDocRecordService.findById(new InnDocRecordId(iCustNo, iFacmNo, iApplSeq), titaVo);
+		InnDocRecord tInnDocRecord = innDocRecordService.findById(new InnDocRecordId(iCustNo, iFacmNo, iApplSeq),
+				titaVo);
 
 		String OPT = "";
 		if (tInnDocRecord != null) {
+			CustMain tCustMain = new CustMain();
+			tCustMain = custMainService.custNoFirst(iCustNo, iCustNo, titaVo);
+			String custName = "";
+			if (tCustMain != null) {
+				custName = tCustMain.getCustName();
+			}
+			this.totaVo.putParam("L5r48ApplCode", tInnDocRecord.getApplCode());
+			this.totaVo.putParam("L5r48CustName", custName);
+			this.totaVo.putParam("L5r48KeeperEmpNo", tInnDocRecord.getKeeperEmpNo());
+			this.totaVo.putParam("L5r48ApplEmpNo", tInnDocRecord.getApplEmpNo());
+			this.totaVo.putParam("L5r48ApplDate", tInnDocRecord.getApplDate());
+			this.totaVo.putParam("L5r48ReturnDate", tInnDocRecord.getReturnDate());
+			this.totaVo.putParam("L5r48ReturnEmpNo", tInnDocRecord.getReturnEmpNo());
+			this.totaVo.putParam("L5r48UsageCode", tInnDocRecord.getUsageCode());
+			this.totaVo.putParam("L5r48Remark", tInnDocRecord.getRemark());
+			this.totaVo.putParam("L5r48CopyCode", tInnDocRecord.getCopyCode());
+			this.totaVo.putParam("L5r48ApplObj", tInnDocRecord.getApplObj());
+			this.totaVo.putParam("L5r48FacmNoMemo", tInnDocRecord.getFacmNoMemo());
+
 			tTempVo = tTempVo.getVo(tInnDocRecord.getJsonFields());
 
 			this.info("tTempVo==" + tTempVo);

@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -462,6 +465,53 @@ em = null;
       negMainT = negMainReposHist.findTopByPayerCustNoIs(payerCustNo_0);
     else 
       negMainT = negMainRepos.findTopByPayerCustNoIs(payerCustNo_0);
+
+    return negMainT.isPresent() ? negMainT.get() : null;
+  }
+
+  @Override
+  public Slice<NegMain> negCustIdEq(String negCustId_0, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<NegMain> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("negCustIdEq " + dbName + " : " + "negCustId_0 : " + negCustId_0);
+    if (dbName.equals(ContentName.onDay))
+      slice = negMainReposDay.findAllByNegCustIdIsOrderByCustNoAsc(negCustId_0, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = negMainReposMon.findAllByNegCustIdIsOrderByCustNoAsc(negCustId_0, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = negMainReposHist.findAllByNegCustIdIsOrderByCustNoAsc(negCustId_0, pageable);
+    else 
+      slice = negMainRepos.findAllByNegCustIdIsOrderByCustNoAsc(negCustId_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public NegMain negCustIdFirst(String negCustId_0, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("negCustIdFirst " + dbName + " : " + "negCustId_0 : " + negCustId_0);
+    Optional<NegMain> negMainT = null;
+    if (dbName.equals(ContentName.onDay))
+      negMainT = negMainReposDay.findTopByNegCustIdIsOrderByCustNoDesc(negCustId_0);
+    else if (dbName.equals(ContentName.onMon))
+      negMainT = negMainReposMon.findTopByNegCustIdIsOrderByCustNoDesc(negCustId_0);
+    else if (dbName.equals(ContentName.onHist))
+      negMainT = negMainReposHist.findTopByNegCustIdIsOrderByCustNoDesc(negCustId_0);
+    else 
+      negMainT = negMainRepos.findTopByNegCustIdIsOrderByCustNoDesc(negCustId_0);
 
     return negMainT.isPresent() ? negMainT.get() : null;
   }

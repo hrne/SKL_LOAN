@@ -2,8 +2,12 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * NegMain 債務協商案件主檔<br>
@@ -16,13 +20,8 @@ import javax.persistence.Embeddable;
 public class NegMainId implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 4897551107033446749L;
-
-// 戶號
-  /* 保貸戶須建立客戶主檔 */
+  // 戶號
+  /* 若為保證人或保貸戶,戶號一律新編999nnnn,不維護客戶主檔 */
   @Column(name = "`CustNo`")
   private int custNo = 0;
 
@@ -40,7 +39,7 @@ public class NegMainId implements Serializable {
 
 /**
 	* 戶號<br>
-	* 保貸戶須建立客戶主檔
+	* 若為保證人或保貸戶,戶號一律新編999nnnn,不維護客戶主檔
 	* @return Integer
 	*/
   public int getCustNo() {
@@ -49,7 +48,7 @@ public class NegMainId implements Serializable {
 
 /**
 	* 戶號<br>
-	* 保貸戶須建立客戶主檔
+	* 若為保證人或保貸戶,戶號一律新編999nnnn,不維護客戶主檔
   *
   * @param custNo 戶號
 	*/

@@ -9162,8 +9162,8 @@ TXFORM=L6R02
 #L6R04Code=x,20,S
 #L6R04Item=X,50,S
 #L6R04Enable=X,1,S
-#L6R04MinCodeLength=A,1,S
-#L6R04MaxCodeLength=A,1,S
+#L6R04MinCodeLength=A,2,S
+#L6R04MaxCodeLength=A,2,S
 #L6R04IsNumeric=X,1,S
 </L6R04.dec>
 
@@ -9970,8 +9970,8 @@ TXFORM=L6R34
 !尋找各類代碼檔
 <L6R35.dec>
 #L6R35Item=X,80,S
-#L6R35MinCodeLength=A,1,S
-#L6R35MaxCodeLength=A,1,S
+#L6R35MinCodeLength=A,2,S
+#L6R35MaxCodeLength=A,2,S
 </L6R35.dec>
 
 <L6R35.tom>
@@ -10373,6 +10373,18 @@ TXFORM=L5R47
 </L5R47.tom>
 
 <L5R48.dec>
+#L5r48ApplCode=9,1,S
+#L5r48CustName=x,200,S
+#L5r48KeeperEmpNo=X,6,S
+#L5r48ApplEmpNo=X,6,S
+#L5r48ApplDate=D,7,S
+#L5r48ReturnDate=D,7,S
+#L5r48ReturnEmpNo=X,6,S
+#L5r48UsageCode=x,2,S
+#L5r48Remark=X,100,S
+#L5r48CopyCode=9,1,S
+#L5r48ApplObj=X,16,S
+#L5r48FacmNoMemo=X,20,S
 ##loop {times:25,i:1}
 #L5r48OPTA{i}=9,2,S
 #L5r48AMTA{i}=9,2,S
@@ -10389,6 +10401,18 @@ TXFORM=L5R47
 
 <L5R48.tom>
 TXFORM=L5R48
+#L5r48ApplCode
+#L5r48CustName
+#L5r48KeeperEmpNo
+#L5r48ApplEmpNo
+#L5r48ApplDate
+#L5r48ReturnDate
+#L5r48ReturnEmpNo
+#L5r48UsageCode
+#L5r48Remark
+#L5r48CopyCode
+#L5r48ApplObj
+#L5r48FacmNoMemo
 ##loop {times:25,i:1}
 #L5r48OPTA{i}
 #L5r48AMTA{i}

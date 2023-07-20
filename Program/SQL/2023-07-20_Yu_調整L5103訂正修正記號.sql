@@ -1,0 +1,1 @@
+UPDATE "TxTranCode"  SET "CancelFg" = 1 ,"ModifyFg" = 0 WHERE "TranNo" = 'L5103';

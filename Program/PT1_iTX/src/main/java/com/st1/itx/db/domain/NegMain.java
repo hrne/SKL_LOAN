@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,16 +27,11 @@ import com.st1.itx.Exception.LogicException;
 public class NegMain implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -3354707088890972407L;
-
-@EmbeddedId
+  @EmbeddedId
   private NegMainId negMainId;
 
   // 戶號
-  /* 保貸戶須建立客戶主檔 */
+  /* 若為保證人或保貸戶,戶號一律新編999nnnn,不維護客戶主檔 */
   @Column(name = "`CustNo`", insertable = false, updatable = false)
   private int custNo = 0;
 
@@ -58,7 +54,7 @@ public class NegMain implements Serializable {
   @Column(name = "`CustLoanKind`", length = 1)
   private String custLoanKind;
 
-  // 付款人戶號
+  // 借款人戶號
   /* 債權戶別為[保證人]才需要輸入依據問題單754保證人戶號債協還款時新壽分配款應存入此借款人戶號 */
   @Column(name = "`PayerCustNo`")
   private int payerCustNo = 0;
@@ -137,7 +133,7 @@ public class NegMain implements Serializable {
   @Column(name = "`RepaidPeriod`")
   private int repaidPeriod = 0;
 
-  // 二階段註記
+  // 階段註記
   /* YN若有N階段還款的情況,此區會存入大於0之自然數I代表第I階段還款 */
   @Column(name = "`TwoStepCode`", length = 1)
   private String twoStepCode;
@@ -205,6 +201,16 @@ public class NegMain implements Serializable {
   @Column(name = "`LastTitaTxtNo`")
   private int lastTitaTxtNo = 0;
 
+  // 保證人/保貸戶ID
+  /* 戶號為999nnnn則儲存身分證字號於此 */
+  @Column(name = "`NegCustId`", length = 10)
+  private String negCustId;
+
+  // 保證人/保貸戶戶名
+  /* 戶號為999nnnn則儲存戶名於此 */
+  @Column(name = "`NegCustName`", length = 100)
+  private String negCustName;
+
   // 建檔日期時間
   @CreatedDate
   @Column(name = "`CreateDate`")
@@ -234,7 +240,7 @@ public class NegMain implements Serializable {
 
 /**
 	* 戶號<br>
-	* 保貸戶須建立客戶主檔
+	* 若為保證人或保貸戶,戶號一律新編999nnnn,不維護客戶主檔
 	* @return Integer
 	*/
   public int getCustNo() {
@@ -243,7 +249,7 @@ public class NegMain implements Serializable {
 
 /**
 	* 戶號<br>
-	* 保貸戶須建立客戶主檔
+	* 若為保證人或保貸戶,戶號一律新編999nnnn,不維護客戶主檔
   *
   * @param custNo 戶號
 	*/
@@ -352,7 +358,7 @@ public class NegMain implements Serializable {
   }
 
 /**
-	* 付款人戶號<br>
+	* 借款人戶號<br>
 	* 債權戶別為[保證人]才需要輸入
 依據問題單754
 保證人戶號債協還款時新壽分配款應存入此借款人戶號
@@ -363,12 +369,12 @@ public class NegMain implements Serializable {
   }
 
 /**
-	* 付款人戶號<br>
+	* 借款人戶號<br>
 	* 債權戶別為[保證人]才需要輸入
 依據問題單754
 保證人戶號債協還款時新壽分配款應存入此借款人戶號
   *
-  * @param payerCustNo 付款人戶號
+  * @param payerCustNo 借款人戶號
 	*/
   public void setPayerCustNo(int payerCustNo) {
     this.payerCustNo = payerCustNo;
@@ -700,7 +706,7 @@ N:否
   }
 
 /**
-	* 二階段註記<br>
+	* 階段註記<br>
 	* Y
 N
 若有N階段還款的情況,此區會存入大於0之自然數I代表第I階段還款
@@ -711,12 +717,12 @@ N
   }
 
 /**
-	* 二階段註記<br>
+	* 階段註記<br>
 	* Y
 N
 若有N階段還款的情況,此區會存入大於0之自然數I代表第I階段還款
   *
-  * @param twoStepCode 二階段註記
+  * @param twoStepCode 階段註記
 	*/
   public void setTwoStepCode(String twoStepCode) {
     this.twoStepCode = twoStepCode;
@@ -970,6 +976,44 @@ N
   }
 
 /**
+	* 保證人/保貸戶ID<br>
+	* 戶號為999nnnn則儲存身分證字號於此
+	* @return String
+	*/
+  public String getNegCustId() {
+    return this.negCustId == null ? "" : this.negCustId;
+  }
+
+/**
+	* 保證人/保貸戶ID<br>
+	* 戶號為999nnnn則儲存身分證字號於此
+  *
+  * @param negCustId 保證人/保貸戶ID
+	*/
+  public void setNegCustId(String negCustId) {
+    this.negCustId = negCustId;
+  }
+
+/**
+	* 保證人/保貸戶戶名<br>
+	* 戶號為999nnnn則儲存戶名於此
+	* @return String
+	*/
+  public String getNegCustName() {
+    return this.negCustName == null ? "" : this.negCustName;
+  }
+
+/**
+	* 保證人/保貸戶戶名<br>
+	* 戶號為999nnnn則儲存戶名於此
+  *
+  * @param negCustName 保證人/保貸戶戶名
+	*/
+  public void setNegCustName(String negCustName) {
+    this.negCustName = negCustName;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -1054,6 +1098,7 @@ N
            + ", accuTempAmt=" + accuTempAmt + ", accuOverAmt=" + accuOverAmt + ", accuDueAmt=" + accuDueAmt + ", accuSklShareAmt=" + accuSklShareAmt + ", repaidPeriod=" + repaidPeriod + ", twoStepCode=" + twoStepCode
            + ", chgCondDate=" + chgCondDate + ", nextPayDate=" + nextPayDate + ", payIntDate=" + payIntDate + ", repayPrincipal=" + repayPrincipal + ", repayInterest=" + repayInterest + ", statusDate=" + statusDate
            + ", courtCode=" + courtCode + ", thisAcDate=" + thisAcDate + ", thisTitaTlrNo=" + thisTitaTlrNo + ", thisTitaTxtNo=" + thisTitaTxtNo + ", lastAcDate=" + lastAcDate + ", lastTitaTlrNo=" + lastTitaTlrNo
-           + ", lastTitaTxtNo=" + lastTitaTxtNo + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", lastTitaTxtNo=" + lastTitaTxtNo + ", negCustId=" + negCustId + ", negCustName=" + negCustName + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

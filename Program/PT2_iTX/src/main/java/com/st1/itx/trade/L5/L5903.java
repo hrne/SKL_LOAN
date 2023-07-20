@@ -14,6 +14,7 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.TxAttachment;
+import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.TxAttachmentService;
 import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.db.service.springjpa.cm.L5903ServiceImpl;
@@ -124,12 +125,17 @@ public class L5903 extends TradeBuffer {
 				occursList.putParam("OOReturnFg", result.get("ReturnFg"));
 				occursList.putParam("OOTitaActFg", result.get("TitaActFg"));
 				occursList.putParam("OOFacmNoMemo", result.get("F17"));
-				occursList.putParam("OOEnable", result.get("F18"));
+				occursList.putParam("OOEnable", result.get("Enable"));
 				occursList.putParam("OOKeeperEnable", result.get("KeeperEnable"));
+				occursList.putParam("OOActFgX", result.get("ActFgX"));
+				occursList.putParam("OORejectReason", result.get("RejectReason"));
 
 				// 判斷是否應顯示【附件查詢】按鈕
-				
-				Slice<TxAttachment> slTxAttachment = sTxAttachmentService.findByTran("L5103", FormatUtil.pad9(result.get("F0"), 7)+"-"+FormatUtil.pad9(result.get("F1"), 3)+"-"+FormatUtil.pad9(result.get("F2"), 3), 0, 1, titaVo);
+
+				Slice<TxAttachment> slTxAttachment = sTxAttachmentService.findByTran("L5103",
+						FormatUtil.pad9(result.get("F0"), 7) + "-" + FormatUtil.pad9(result.get("F1"), 3) + "-"
+								+ FormatUtil.pad9(result.get("F2"), 3),
+						0, 1, titaVo);
 				List<TxAttachment> lTxAttachment = slTxAttachment == null ? null : slTxAttachment.getContent();
 				occursList.putParam("OOHasAttachment", lTxAttachment != null && !lTxAttachment.isEmpty() ? "Y" : "N");
 

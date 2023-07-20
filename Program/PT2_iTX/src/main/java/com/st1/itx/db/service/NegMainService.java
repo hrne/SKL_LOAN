@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.NegMain;
@@ -198,6 +200,26 @@ public interface NegMainService {
    * @return Slice NegMain NegMain of List
    */
   public NegMain payerCustNoFirst(int payerCustNo_0, TitaVo... titaVo);
+
+  /**
+   * NegCustId=
+   *
+   * @param negCustId_0 negCustId_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice NegMain NegMain of List
+   */
+  public Slice<NegMain> negCustIdEq(String negCustId_0, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * NegCustId=
+   *
+   * @param negCustId_0 negCustId_0
+   * @param titaVo Variable-Length Argument
+   * @return Slice NegMain NegMain of List
+   */
+  public NegMain negCustIdFirst(String negCustId_0, TitaVo... titaVo);
 
   /**
    * hold By NegMain

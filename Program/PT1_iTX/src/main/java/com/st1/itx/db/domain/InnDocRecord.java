@@ -1,6 +1,8 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -25,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class InnDocRecord implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -8354633614084907051L;
-
-@EmbeddedId
+  @EmbeddedId
   private InnDocRecordId innDocRecordId;
 
   // 借款人戶號
@@ -42,11 +39,12 @@ public class InnDocRecord implements Serializable {
   private int facmNo = 0;
 
   // 申請序號
+  /* 依戶號編流水號 */
   @Column(name = "`ApplSeq`", length = 3, insertable = false, updatable = false)
   private String applSeq;
 
   // 登放記號
-  /* 1/2/3/4:3STEP TX */
+  /* CdCode.ActFgX1:登錄2:放行3:審核4:審核放行 */
   @Column(name = "`TitaActFg`", length = 1)
   private String titaActFg;
 
@@ -64,11 +62,12 @@ public class InnDocRecord implements Serializable {
   private String keeperEmpNo;
 
   // 用途
-  /* CdCode.UsageCodeX01:清償02:法拍03:增貸04:展期05:撥款06:查閱07:重估08:其他 */
+  /* CdCode.UsageCodeX01:清償02:法拍03:增貸04:展期05:撥款06:查閱07:重估08:其他09:查核10:補發11:部分塗銷12:領還暫不領 */
   @Column(name = "`UsageCode`", length = 2)
   private String usageCode;
 
   // 正本/影本
+  /* 1.正本 2.影本 3.正本及影本 */
   @Column(name = "`CopyCode`", length = 1)
   private String copyCode;
 
@@ -187,7 +186,7 @@ public class InnDocRecord implements Serializable {
 
 /**
 	* 申請序號<br>
-	* 
+	* 依戶號編流水號
 	* @return String
 	*/
   public String getApplSeq() {
@@ -196,7 +195,7 @@ public class InnDocRecord implements Serializable {
 
 /**
 	* 申請序號<br>
-	* 
+	* 依戶號編流水號
   *
   * @param applSeq 申請序號
 	*/
@@ -206,7 +205,11 @@ public class InnDocRecord implements Serializable {
 
 /**
 	* 登放記號<br>
-	* 1/2/3/4:3STEP TX
+	* CdCode.ActFgX
+1:登錄
+2:放行
+3:審核
+4:審核放行
 	* @return String
 	*/
   public String getTitaActFg() {
@@ -215,7 +218,11 @@ public class InnDocRecord implements Serializable {
 
 /**
 	* 登放記號<br>
-	* 1/2/3/4:3STEP TX
+	* CdCode.ActFgX
+1:登錄
+2:放行
+3:審核
+4:審核放行
   *
   * @param titaActFg 登放記號
 	*/
@@ -295,6 +302,10 @@ public class InnDocRecord implements Serializable {
 06:查閱
 07:重估
 08:其他
+09:查核
+10:補發
+11:部分塗銷
+12:領還暫不領
 	* @return String
 	*/
   public String getUsageCode() {
@@ -312,6 +323,10 @@ public class InnDocRecord implements Serializable {
 06:查閱
 07:重估
 08:其他
+09:查核
+10:補發
+11:部分塗銷
+12:領還暫不領
   *
   * @param usageCode 用途
 	*/
@@ -321,7 +336,7 @@ public class InnDocRecord implements Serializable {
 
 /**
 	* 正本/影本<br>
-	* 
+	* 1.正本 2.影本 3.正本及影本
 	* @return String
 	*/
   public String getCopyCode() {
@@ -330,7 +345,7 @@ public class InnDocRecord implements Serializable {
 
 /**
 	* 正本/影本<br>
-	* 
+	* 1.正本 2.影本 3.正本及影本
   *
   * @param copyCode 正本/影本
 	*/

@@ -243,9 +243,7 @@ T(2,#OOReturnEmpName)
 !T(2,#OOReturnEmpNo+ +#OOReturnEmpName)
 
 #OOBUF_RETURN=X,300,S
-T(2,#OOCustNo+#OOFacmNo+#OOApplSeq+#OOCustName+#OOKeeperEmpNo
-   +#OOApplEmpNo+#OOApplDate+#OOReturnDate+#OOReturnEmpNo
-   +#OOUsageCode+#OORemark+2+#OOCopyCode+#OOApplObj+#OOFacmNoMemo+#OOApplEmpName+#OOKeeperEnable)
+T(2,1+#OOCustNo+#OOFacmNo+#OOApplSeq+#OOKeeperEnable+2)
 
 #OOReturnFg=X,1,S
 
@@ -257,6 +255,10 @@ C(5,#OOReturnFg,Y,BIND(grid,{ cmd=CHAIN; ntxcd=L5103; ntxbuf=#OOBUF_RETURN}),BIN
 #OOEnable=X,1,S
 !管理人是否是啟用中
 #OOKeeperEnable=X,1,S
+
+#OOActFgX=x,12,O
+
+#OORejectReason=x,200,O
 
 #OOModifyFg=X,1,S
 
@@ -305,21 +307,24 @@ T(H,#OOTitaActFg,#TitaActFgHelp)
 #OOBTN2NAME=X,10,S
 IF(#OOTitaActFg >= 3,T(3,訂正),T(3,刪除))
 
-!訂正按鈕
+#OOBUF_Delete=X,15,S
+T(2,4+#OOCustNo+#OOFacmNo+#OOApplSeq+#OOKeeperEnable)
+!刪除按鈕
 #BTN2=X,1,S
-C(5,#OODeleteFg,Y,BIND(grid,{ cmd=EC; ntxcd=L5103;text=#OOBTN2NAME; txno=#RimData;rim=LCR01}),BIND(grid,cancel))
+C(5,#OODeleteFg,Y,BIND(grid,{ cmd=CHAIN; ntxcd=L5103; ntxbuf=#OOBUF_Delete}),BIND(grid,cancel))
+
 ! C(5,#OOHCodeFlag,Y,BIND(grid,{ cmd=EC; ntxcd=#OOTxCd; txno=#RimData;rim=LCR01}),BIND(grid,cancel))
 
-
-!修正按鈕
+#OOBUF_Modify=X,15,S
+T(2,2+#OOCustNo+#OOFacmNo+#OOApplSeq+#OOKeeperEnable)
+!修改按鈕
 #BTN3=X,1,S
-C(5,#OOModifyFg,Y,BIND(grid,{ cmd=MODIFY;once=1; ntxcd=L5103; txno=#RimData;rim=LCR02}),BIND(grid,cancel))
+C(5,#OOModifyFg,Y,BIND(grid,{ cmd=CHAIN; ntxcd=L5103; ntxbuf=#OOBUF_Modify}),BIND(grid,cancel))
+
 
 ! 05:查詢
 #OOBufSearch=X,300,S
-T(2,#OOCustNo+#OOFacmNo+#OOApplSeq+#OOCustName+#OOKeeperEmpNo
-   +#OOApplEmpNo+#OOApplDate+#OOReturnDate+#OOReturnEmpNo
-   +#OOUsageCode+#OORemark+#tempFG+#OOCopyCode+#OOApplObj+#OOFacmNoMemo+#OOApplEmpName+Y+05)
+T(2,5+#OOCustNo+#OOFacmNo+#OOApplSeq+Y)
 
 #OOBtnSearch=X,1,O
 BIND(grid,{ cmd=CHAIN; ntxcd=L5103; ntxbuf=#OOBufSearch})
@@ -374,6 +379,8 @@ TXFORM=L5903
 #OOReturnFg
 #OOTitaActFg
 #OOKeeperEnable
+#OOActFgX
+#OORejectReason
 ^
 </sub>
 
@@ -395,8 +402,8 @@ TXFORM=L5903
 #OOBTN_RETURN=歸還
 {search:false,formatter:'cust:bind-button:歸還',align:'center',canExport:false,width:35}
 
-#BTN=附件查詢
-{search:false,formatter:'cust:bind-button:附件查詢',align:'center',canExport:false,width:70}
+#BTN=附件
+{search:false,formatter:'cust:bind-button:附件',align:'center',canExport:false,width:35}
 
 #BTN2=刪除
 {width:40,search:false,formatter:'cust:bind-button:刪除',canExport:false,align:'center'}
@@ -412,18 +419,21 @@ TXFORM=L5903
 {width:65,align:'center'}
 ! 額度
 #OOFacmNo=額度
-{width:65,align:'center'}
+{width:40,align:'center'}
 #OOFacmNoMemo=同押品額度
 {width:85,align:'center'}
 ! 申請序號
 #OOApplSeq=申請序號
-{width:85,align:'center'}
+{width:65,align:'center'}
 ! 戶名
 #OOCustName=戶名
 {width:95,align:'left'}
 ! 登放記號
-#OOTitaActFgX=登放記號
+#OOActFgX=登放狀態
 {width:85,align:'left'}
+!主管退回原因
+#OORejectReason=主管退回原因
+{width:70,align:'left'}
 ! 管理人
 #OKeeperEmpNoX=管理人
 {width:85,align:'left'}
@@ -451,6 +461,7 @@ TXFORM=L5903
 ! 備註
 #OORemark=備註
 {width:200,align:'left'}
+
 
 ^
 <include src="PRT.icf::INQ04.sel" map="i=L5903;cpi=15"/>

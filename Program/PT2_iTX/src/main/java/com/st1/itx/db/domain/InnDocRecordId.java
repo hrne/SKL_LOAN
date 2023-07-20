@@ -2,8 +2,12 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * InnDocRecord 檔案借閱檔<br>
@@ -16,12 +20,7 @@ import javax.persistence.Embeddable;
 public class InnDocRecordId implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -359256040910122400L;
-
-// 借款人戶號
+  // 借款人戶號
   @Column(name = "`CustNo`")
   private int custNo = 0;
 
@@ -30,6 +29,7 @@ public class InnDocRecordId implements Serializable {
   private int facmNo = 0;
 
   // 申請序號
+  /* 依戶號編流水號 */
   @Column(name = "`ApplSeq`", length = 3)
   private String applSeq = " ";
 
@@ -82,7 +82,7 @@ public class InnDocRecordId implements Serializable {
 
 /**
 	* 申請序號<br>
-	* 
+	* 依戶號編流水號
 	* @return String
 	*/
   public String getApplSeq() {
@@ -91,7 +91,7 @@ public class InnDocRecordId implements Serializable {
 
 /**
 	* 申請序號<br>
-	* 
+	* 依戶號編流水號
   *
   * @param applSeq 申請序號
 	*/

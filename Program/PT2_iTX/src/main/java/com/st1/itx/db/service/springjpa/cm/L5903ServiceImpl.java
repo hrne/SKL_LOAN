@@ -57,12 +57,11 @@ public class L5903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 		int iApplDateFrom = parse.stringToInteger(titaVo.getParam("ApplDateFrom")) + 19110000;
 		int iApplDateTo = parse.stringToInteger(titaVo.getParam("ApplDateTo")) + 19110000;
-		if (iApplDateTo == 19110000) {//無輸入起訖日時
+		if (iApplDateTo == 19110000) {// 無輸入起訖日時
 			iApplDateTo = 99991231;
 		}
-		int ientDy = titaVo.getEntDyI() + 19110000;
 		String iteller = titaVo.getParam("TLRNO");
-		
+
 		String iUsageCode = titaVo.getParam("UsageCode");
 		String iApplCode = titaVo.getParam("ApplCode");
 //		T(3,01:未還;02:已還;09:全部)
@@ -91,30 +90,29 @@ public class L5903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ,i.\"ReturnEmpNo\"                                ";
 		sql += "        ,i.\"TitaActFg\"                                  ";
 		sql += "        ,i.\"FacmNoMemo\"                                 ";
-		sql += "        ,CASE WHEN NVL(cc.\"Enable\",'N') = 'N' THEN 'N'  ";//非管理人則為N不可修改
-		sql += "              WHEN NVL(i.\"TitaActFg\",' ') = ' ' THEN 'Y' ";//舊資料無此值則為Y
-		sql += "              WHEN i.\"TitaActFg\" = '1' THEN 'N'          ";//未到審查則為N
-		sql += "              WHEN i.\"TitaActFg\" = '4'  THEN 'Y'        ";//審查已放行則為Y
-		sql += "              WHEN NVL(JSON_VALUE(i.\"JsonFields\", '$.RELCD'), ' ') = '2' "; 
-		sql += "                   AND i.\"TitaActFg\" in ('2') THEN 'Y'  ";  // 兩段式已放行則為Y
-		sql += "              ELSE 'N'  end                        AS F18 ";
+		sql += "        ,CASE WHEN NVL(cc.\"Enable\",'N') = 'N' THEN 'N'  ";// 非管理人則為N不可修改
+		sql += "              WHEN NVL(i.\"TitaActFg\",' ') = ' ' THEN 'Y' ";// 舊資料無此值則為Y
+		sql += "              WHEN i.\"TitaActFg\" = '1' THEN 'N'          ";// 未到審查則為N
+		sql += "              WHEN i.\"TitaActFg\" = '4'  THEN 'Y'        ";// 審查已放行則為Y
+		sql += "              WHEN NVL(JSON_VALUE(i.\"JsonFields\", '$.RELCD'), ' ') = '2' ";
+		sql += "                   AND i.\"TitaActFg\" in ('2') THEN 'Y'  "; // 兩段式已放行則為Y
+		sql += "              ELSE 'N'  end                        AS \"Enable\" "; // 管理人員啟用記號
 		sql += "        ,case WHEN i.\"TitaEntDy\" > 0 THEN i.\"TitaEntDy\" - 19110000";
 		sql += "              ELSE 0  END             AS \"TitaEntDy\"    ";
 		sql += "        ,i.\"TitaTlrNo\"                                  ";
-		sql += "        ,LPAD(i.\"TitaTxtNo\",8,'0')  AS \"TitaTxtNo\"    ";       
+		sql += "        ,LPAD(i.\"TitaTxtNo\",8,'0')  AS \"TitaTxtNo\"    ";
 		sql += "        ,i.\"JsonFields\"                                 ";
-		sql += "        ,CASE WHEN i.\"ApplCode\" IN ('2') THEN 'N'       "; 
+		sql += "        ,CASE WHEN i.\"ApplCode\" IN ('2') THEN 'N'       ";
 		sql += "              WHEN i.\"TitaTxtNo\" = 0 THEN 'N'       ";
-		sql += "              WHEN i.\"TitaActFg\" in ('3','4') THEN 'N'       ";  // 已審核不可修正
-		sql += "              WHEN i.\"ApplEmpNo\" <> :iteller THEN 'N'       ";   // 經辦與借閱人相同才可修正
-		sql += "              WHEN NVL(JSON_VALUE(i.\"JsonFields\", '$.RELCD'), ' ') = '2' "; 
-		sql += "                   AND i.\"TitaActFg\" in ('2') THEN 'N'       ";  // 兩段式已放行不可修正
-		sql += "              WHEN i.\"TitaEntDy\" <> :ientDy THEN 'N'       ";   // 隔日不可修正
+		sql += "              WHEN i.\"TitaActFg\" in ('3','4') THEN 'N'       "; // 已審核不可修正
+		sql += "              WHEN i.\"ApplEmpNo\" <> :iteller THEN 'N'       "; // 經辦與借閱人相同才可修正
+		sql += "              WHEN NVL(JSON_VALUE(i.\"JsonFields\", '$.RELCD'), ' ') = '2' ";
+		sql += "                   AND i.\"TitaActFg\" in ('2') THEN 'N'       "; // 兩段式已放行不可修正
 		sql += "              ELSE 'Y' END            AS  \"ModifyFg\"    ";
 		sql += "        ,CASE WHEN i.\"ApplCode\" IN ('2') THEN 'N'       ";
 		sql += "              WHEN i.\"TitaTxtNo\" = 0 THEN 'N'       ";
-		sql += "              WHEN i.\"TitaActFg\" in ('3','4') THEN 'N'       ";  // 已審核不可訂正
-		sql += "              WHEN i.\"ApplEmpNo\" <> :iteller THEN 'N'       ";   // 經辦與借閱人相同才可訂正
+		sql += "              WHEN i.\"TitaActFg\" in ('3','4') THEN 'N'       "; // 已審核不可訂正
+		sql += "              WHEN i.\"ApplEmpNo\" <> :iteller THEN 'N'       "; // 經辦與借閱人相同才可訂正
 		sql += "              ELSE 'Y' END            AS  \"DeleteFg\"    ";
 		sql += "        ,CASE WHEN i.\"ApplCode\" IN ('2') THEN 'N'       ";
 		sql += "              WHEN i.\"CopyCode\" = '2' THEN 'N'             ";
@@ -122,17 +120,35 @@ public class L5903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              WHEN NVL(JSON_VALUE(i.\"JsonFields\", '$.RELCD'), ' ') = '4' ";
 		sql += "                   AND i.\"TitaActFg\" in ('2') THEN 'N'       ";
 		sql += "              ELSE 'Y' END            AS  \"ReturnFg\"    ";
-		sql += "        ,NVL(cc2.\"Enable\",'N')       AS  \"KeeperEnable\" ";//管理人是否啟用中
-		
+		sql += "        ,NVL(cc2.\"Enable\",'N')       AS  \"KeeperEnable\" ";// 管理人是否啟用中
+		sql += "        ,CASE WHEN i.\"TitaActFg\" = '1'   ";
+		sql += "				AND  NVL(tf.\"RejectReason\",' ') = ' ' THEN '待放行'     ";
+		sql += "			  WHEN  i.\"TitaActFg\" = '1'   ";
+		sql += "				AND  NVL(tf.\"RejectReason\",' ') <> ' ' THEN '放行已退回'    ";
+		sql += "			  WHEN NVL(JSON_VALUE(i.\"JsonFields\", '$.RELCD'), ' ') = '4'  ";
+		sql += "  				AND  i.\"TitaActFg\" = '2'   ";
+		sql += "				AND  NVL(tf.\"RejectReason\",' ') = ' ' THEN '待審核'    ";
+		sql += "			  WHEN NVL(JSON_VALUE(i.\"JsonFields\", '$.RELCD'), ' ') = '4'  ";
+		sql += "  				AND  i.\"TitaActFg\" = '2'   ";
+		sql += "				AND  NVL(tf.\"RejectReason\",' ') <> ' ' THEN '審核已退回'    ";
+		sql += "			  WHEN NVL(JSON_VALUE(i.\"JsonFields\", '$.RELCD'), ' ') = '4'  ";
+		sql += "  				AND  i.\"TitaActFg\" = '3' ";
+		sql += "				AND  NVL(tf.\"RejectReason\",' ') = ' ' THEN '待審核放行'    ";
+		sql += "			  WHEN NVL(JSON_VALUE(i.\"JsonFields\", '$.RELCD'), ' ') = '4'  ";
+		sql += "  				AND  i.\"TitaActFg\" = '3' ";
+		sql += "				AND  NVL(tf.\"RejectReason\",' ') <> ' ' THEN '待審核訂正'  ELSE ' ' END  AS \"ActFgX\" ";
+		sql += "  		,NVL(tf.\"RejectReason\",' ') AS \"RejectReason\" "; // 主管退回原因
 		sql += " from \"InnDocRecord\" i                                  ";
 		sql += " left join \"CustMain\" c on c.\"CustNo\" = i.\"CustNo\"  ";
 		sql += " left join \"CdEmp\" e1 on e1.\"EmployeeNo\" = i.\"KeeperEmpNo\"  ";
 		sql += " left join \"CdEmp\" e2 on e2.\"EmployeeNo\" = i.\"ApplEmpNo\"  ";
 		sql += " left join \"CdEmp\" e3 on e3.\"EmployeeNo\" = i.\"ReturnEmpNo\"  ";
 		sql += " left join \"CdCode\" cc on cc.\"DefCode\"   = 'InnDocKeeper'  ";
-		sql += "                        and cc.\"Code\"      =  :iteller "  ;
+		sql += "                        and cc.\"Code\"      =  :iteller ";
 		sql += " left join \"CdCode\" cc2 on cc2.\"DefCode\" = 'InnDocKeeper'  ";
-		sql += "                         and cc2.\"Code\"    =  i.\"KeeperEmpNo\" "  ;
+		sql += "                         and cc2.\"Code\"    =  i.\"KeeperEmpNo\" ";
+		sql += " left join \"TxFlow\" tf on tf.\"Entdy\" = i.\"TitaEntDy\"  ";
+		sql += "						and tf.\"FlowNo\" = '0000'||i.\"TitaTlrNo\"||LPAD(i.\"TitaTxtNo\",8,'0')  ";
 		sql += " where i.\"ApplDate\" >= " + iApplDateFrom;
 		sql += "   and i.\"ApplDate\" <= " + iApplDateTo;
 
@@ -145,16 +161,16 @@ public class L5903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		if (!"09".equals(iApplCode)) {
-			if ("01".equals(iApplCode)) {//01:未還
-				sql += "   and case when i.\"ApplCode\" = '2' then 0"  ;//已歸還
-				sql += "            when i.\"CopyCode\" = '2' then 0"  ;//影本
-				sql += "       else 1 end = 1"  ;
-				//				sql += " and NVL(i2.\"CustNo\",0) = 0                             ";
+			if ("01".equals(iApplCode)) {// 01:未還
+				sql += "   and case when i.\"ApplCode\" = '2' then 0";// 已歸還
+				sql += "            when i.\"CopyCode\" = '2' then 0";// 影本
+				sql += "       else 1 end = 1";
+				// sql += " and NVL(i2.\"CustNo\",0) = 0 ";
 			}
-			if ("02".equals(iApplCode)) {//01:已還
-				sql += "   and case when i.\"ApplCode\" = '2' then 1"  ;
-				sql += "            when i.\"CopyCode\" = '2' then 1"  ;
-				sql += "       else 0 end = 1"  ;
+			if ("02".equals(iApplCode)) {// 01:已還
+				sql += "   and case when i.\"ApplCode\" = '2' then 1";
+				sql += "            when i.\"CopyCode\" = '2' then 1";
+				sql += "       else 0 end = 1";
 			}
 
 		}
@@ -166,7 +182,6 @@ public class L5903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
 		query.setParameter("iteller", iteller);
-		query.setParameter("ientDy", ientDy);
 
 		cnt = query.getResultList().size();
 		this.info("Total cnt ..." + cnt);

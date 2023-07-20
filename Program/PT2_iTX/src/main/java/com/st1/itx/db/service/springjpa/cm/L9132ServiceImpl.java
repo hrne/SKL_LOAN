@@ -316,7 +316,6 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           END   AS \"CustName\" ";
 		sql += "          , \"Fn_GetEmpName\"(AC.\"TitaTlrNo\",1) ";
 		sql += "                                  AS \"EmpName\" ";
-		sql += "          , B.\"AcDate\" AS \"AcDate\"";
 		sql += "     FROM \"AcDetail\" AC ";
 		sql += "     LEFT JOIN \"CdAcCode\" CDAC ON CDAC.\"AcNoCode\" = AC.\"AcNoCode\" ";
 		sql += "                              AND CDAC.\"AcSubCode\" = AC.\"AcSubCode\" ";
@@ -467,7 +466,6 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           END   AS \"CustName\" ";
 		sql += "          , \"Fn_GetEmpName\"(AC.\"TitaTlrNo\",1) ";
 		sql += "                                  AS \"EmpName\" ";
-		sql += "          , B.\"AcDate\" AS \"AcDate\"";
 		sql += "     FROM \"AcDetail\" AC ";
 		sql += "     LEFT JOIN \"CdAcCode\" CDAC ON CDAC.\"AcNoCode\" = AC.\"AcNoCode\" ";
 		sql += "                              AND CDAC.\"AcSubCode\" = AC.\"AcSubCode\" ";

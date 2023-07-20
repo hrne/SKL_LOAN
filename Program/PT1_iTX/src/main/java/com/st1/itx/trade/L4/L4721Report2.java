@@ -67,7 +67,7 @@ public class L4721Report2 extends TradeBuffer {
 	String headerLoanBal = "0";
 	String headerExcessive = "";
 	String headerDueAmt = "";
-	int cnt = 0;
+	int cntAll = 0;
 
 	/**
 	 * 資料明細
@@ -96,7 +96,7 @@ public class L4721Report2 extends TradeBuffer {
 
 		List<String> file = getData(sAdjDate, eAdjDate, sEntryDate, eEntryDate, data, titaVo);
 
-		String fileName = "L4721-" + kindItem + "(總筆數：" + cnt + ")";
+		String fileName = "L4721-" + kindItem + "(總筆數：" + cntAll + ")";
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getBrno())
 				.setRptCode(titaVo.getTxCode()).setRptItem(fileName).build();
@@ -116,7 +116,7 @@ public class L4721Report2 extends TradeBuffer {
 		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
 				titaVo.getTlrNo() + "L4721", titaVo.getTxCode() + " 已產生L4721.txt", titaVo);
 
-		return cnt;
+		return cntAll;
 	}
 
 	/**
@@ -166,7 +166,7 @@ public class L4721Report2 extends TradeBuffer {
 
 			isByCustNo = isSameSpecificDd;
 
-			cnt = cnt + 1;
+			cntAll = cntAll + 1;
 
 			List<Map<String, String>> rDetail = new ArrayList<Map<String, String>>();
 			List<Map<String, String>> rTxffectDetail = new ArrayList<Map<String, String>>();
@@ -195,15 +195,15 @@ public class L4721Report2 extends TradeBuffer {
 				String line = "";
 
 				int times = 0;
-				int cnt = 0;
+				int cntNext = 1;
 				tempFacmNo = parse.stringToInteger(rDetail.get(0).get("FacmNo"));
 				tempCustNo = parse.stringToInteger(rDetail.get(0).get("CustNo"));
 				for (Map<String, String> r1 : rDetail) {
 					this.info("size =" + rDetail.size());
-					this.info("cnt  =" + cnt + 1);
-					if (cnt + 1 < rDetail.size()) {
-						tempNextCustNo = parse.stringToInteger(rDetail.get(cnt + 1).get("CustNo"));
-						tempNextFacmNo = parse.stringToInteger(rDetail.get(cnt + 1).get("FacmNo"));
+					this.info("cnt  =" + cntNext);
+					if (cntNext < rDetail.size()) {
+						tempNextCustNo = parse.stringToInteger(rDetail.get(cntNext).get("CustNo"));
+						tempNextFacmNo = parse.stringToInteger(rDetail.get(cntNext).get("FacmNo"));
 //						this.info("tempNextfacmno = " + tempNextfacmno);
 					}
 
@@ -227,7 +227,7 @@ public class L4721Report2 extends TradeBuffer {
 					}
 					tempCustNo = parse.stringToInteger(r1.get("CustNo"));
 					tempFacmNo = parse.stringToInteger(r1.get("FacmNo"));
-					cnt++;
+					cntNext++;
 					times++;
 
 					this.info("tempCustNo =" + tempCustNo);
@@ -238,7 +238,7 @@ public class L4721Report2 extends TradeBuffer {
 					// 2.by 額度 不同額度 會各有六筆
 					// 當前額度和下一筆額度不同才進入
 //					this.info(cnt + "=" + tempfacmno + ":" + tempNextfacmno);
-					if (tempFacmNo != tempNextFacmNo || tempCustNo != tempNextCustNo) { // 只要不同戶號或不同額度
+					if (tempFacmNo != tempNextFacmNo || tempCustNo != tempNextCustNo || cntNext == rDetail.size()) { // 只要不同戶號或不同額度
 						// 印04並且切到下一個額度循環
 						// 04
 
@@ -251,7 +251,7 @@ public class L4721Report2 extends TradeBuffer {
 							// 45 額度 003 利率自 109 年 09 月 01 日起， 由 1.68% 調整為 1.41% 。
 
 							// 明細的額度是0的話表示 輸出再同一份 或是依據額度印
-							if (r1.get("FacmNo").equals(r2.get("FacmNo")) || "0".equals(r1.get("FacmNo"))) {
+							if (r1.get("FacmNo").equals(r2.get("FacmNo")) || tempFacmNo == 0 ) {
 
 								BigDecimal presentRate = parse.stringToBigDecimal(r1.get("PresentRate"));
 								BigDecimal adjustedRate = parse.stringToBigDecimal(r1.get("AdjustedRate"));
@@ -277,7 +277,6 @@ public class L4721Report2 extends TradeBuffer {
 								+ FormatUtil.pad9(r1.get("CustNo"), 7) + "9510300"
 								+ FormatUtil.pad9(r1.get("CustNo"), 7);
 						result.add(line);
-//						tempfacmno = parse.stringToInteger(r1.get("FacmNo"));
 						result = sameFacmno(r1, rTxffectDetail, result, true, isByCustNo, titaVo);
 						// 換額度要重新算次數
 						times = 0;

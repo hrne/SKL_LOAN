@@ -48,7 +48,7 @@ HIDE(#BTND)
 <sub type="DC" name="L5103" layout="cols=3;screen.width=[130,370,130,370];printer.width=[20,80];order=1">
 [
 ["[L5103]                                 檔案借閱維護"],
-["#FdACTFGX+登放記號",#ACTFGX],["#FdApplCodeX+申請或歸還",#ApplCodeX],
+["#FdFuncCode+功能",#FuncCodeX],["#FdApplCodeX+申請或歸還",#ApplCodeX],
 [#<->#,"#FdCustNo+借款人戶號",#CustNo,"-",#FacmNo,#BTND,#CustName],
 [#<->#,"#FdFacmNoMemo+同押品額度",#FacmNoMemo],
 ["#FdApplSeq+申請序號",#ApplSeq],["#FdApplEmpNo+借閱人",#ApplEmpNo,#ApplEmpNoX],
@@ -70,7 +70,7 @@ HIDE(#BTND)
 
 ]
 
-#FdACTFGX=X,2,L
+#FdFuncCode=X,2,L
 #FdCustNo=X,2,L
 T(3,*)
 #FdApplSeq=X,2,L
@@ -149,10 +149,14 @@ T(3,CdCode.GuaranteedCode)
 T(3,CdCode.InnDocKeeper)
 #InnDocKeeperHelp=x,1024,S
 
+#FuncCodeRimName=x,30,S
+T(3,CdCode.FuncCode)
+#FuncCodeHelp=x,1024,S
+
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#ApplCodeRimName,#ApplObjRimName,#UsageCodeXRimName,#CopyCodeRimName,#ApplicationRimName,#SettingRimName,#GuaranteedRimName,#InnDocKeeperRimName)
+S(XXR99,01,#ApplCodeRimName,#ApplObjRimName,#UsageCodeXRimName,#CopyCodeRimName,#ApplicationRimName,#SettingRimName,#GuaranteedRimName,#InnDocKeeperRimName,#FuncCodeRimName)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@ApplCodeHelp,#HelpDesc1) 
@@ -163,6 +167,7 @@ T(2,@ApplicationCodeHelp,#HelpDesc5)
 T(2,@SettingCodeHelp,#HelpDesc6)
 T(2,@GuaranteedCodeHelp,#HelpDesc7)
 T(2,@InnDocKeeperHelp,#HelpDesc8)
+T(2,@FuncCodeHelp,#HelpDesc9)T(HELP,@FuncCodeHelp,#FuncCodeHelp,+,1;2;4;5)
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
@@ -176,25 +181,12 @@ HIDE(#BTND)
 ! 新增按鈕會帶入1 ??? 防呆
 #NTXBUF=X,300,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
-T(1,@ApplCode,#NTXBUF,248,1)
-C(3,#ApplCode,0,s,$)
-T(1,@CustNo,#NTXBUF,1,7)
-T(1,@FacmNo,#NTXBUF,8,3)
-T(1,@ApplSeq,#NTXBUF,11,3)
-T(1,@CustName,#NTXBUF,14,100)
-T(1,@KeeperEmpNo,#NTXBUF,114,6)
-T(1,@ApplEmpNo,#NTXBUF,120,6)
-T(1,@ApplDate,#NTXBUF,126,7)
-T(1,@ReturnDate,#NTXBUF,133,7)
-T(1,@ReturnEmpNo,#NTXBUF,140,6)
-T(1,@UsageCode,#NTXBUF,146,2)
-T(1,@Remark,#NTXBUF,148,100)
-T(1,@CopyCode,#NTXBUF,249,1)
-T(1,@ApplObj,#NTXBUF,250,1)
-T(1,@FacmNoMemo,#NTXBUF,251,20)
-T(1,@ApplEmpNoX,#NTXBUF,271,20)
-T(1,@KeeperEnable,#NTXBUF,291,1)
-T(1,@FunctionCode,#NTXBUF,292,2)
+T(1,@FuncCode,#NTXBUF,1,1)
+T(1,@CustNo,#NTXBUF,2,7)
+T(1,@FacmNo,#NTXBUF,9,3)
+T(1,@ApplSeq,#NTXBUF,12,3)
+T(1,@KeeperEnable,#NTXBUF,15,1)
+T(1,@ApplCode,#NTXBUF,16,1)
 INVOKEJS(SHOW,p1,02,02,1)
 
 
@@ -209,11 +201,22 @@ E(0,#FacmNo)
 T(2,#ApplSeq)
 
 #RimL5R48=X,1,S
-IF(#ApplObj==4,$,s)
-IF(#ApplCode==2 || #FunctionCode == 05,$,s )
+C(3,#ACTFG,1,$,s)
 RESET_RIM(#RimL5R48,L5R48)
 S(L5R48,01,#Rim5R48CustNo,#Rim5R48FacmNo,#Rim5R48ApplSeq)
 R(1,L5R48)
+C(3,#ApplCode,2,$,E(0,@ApplCode,#L5r48ApplCode))
+T(2,@CustName,#L5r48CustName)
+T(2,@KeeperEmpNo,#L5r48KeeperEmpNo)
+T(2,@ApplEmpNo,#L5r48ApplEmpNo)
+E(0,@ApplDate,#L5r48ApplDate)
+E(0,@ReturnDate,#L5r48ReturnDate)
+T(2,@ReturnEmpNo,#L5r48ReturnEmpNo)
+T(2,@UsageCode,#L5r48UsageCode)
+T(2,@Remark,#L5r48Remark)
+E(0,@CopyCode,#L5r48CopyCode)
+T(2,@ApplObj,#L5r48ApplObj)
+T(2,@FacmNoMemo,#L5r48FacmNoMemo)
 ##loop {times:25,i:1}
 E(0,@OPTA{i},#L5r48OPTA{i})
 E(0,@AMTA{i},#L5r48AMTA{i})
@@ -238,9 +241,7 @@ C(3,#OPTA1,0,INVOKEJS(SHOW,L5103_10,0),$)
 C(3,#OPTB1,0,INVOKEJS(SHOW,L5103_11,0),$)
 C(3,#OPTC1,0,INVOKEJS(SHOW,L5103_12,0),$)
 
-#FunctionCode=X,2,S
 #FUNCIND=_,_,S
-IF(#FunctionCode==05,E(0,5),E(0,2))
 
 ! 藏欄位
 ! ApplCode 若=0預設1
@@ -248,14 +249,22 @@ IF(#FunctionCode==05,E(0,5),E(0,2))
 IF(#ApplObj==4&&#ApplCode==2 ||#ACTFG==3,$,INVOKEJS(SHOW,L5103,10,14,0))
 C(3,#ApplCode,0,E(0,@ApplCode,1),$)
 ! 登放記號
-#ACTFGX=X,8,L
+#ACTFGX=X,8,S
 T(H,#ACTFG,#ActFgHelp)
-IF(#FunctionCode==05,K(NOBUTTON,CLOSEY),C(2,#ACTFG,$,K(MODIFYBUTTON,登錄),K(MODIFYBUTTON,放行),K(MODIFYBUTTON,審核)))
+IF(#FuncCode==5,K(NOBUTTON,CLOSEY),C(2,#ACTFG,$,K(MODIFYBUTTON,登錄),K(MODIFYBUTTON,放行),K(MODIFYBUTTON,審核)))
+! 功能
+#FuncCode=A,1,S
+#FuncCodeX=X,5,L
+T(H,#FuncCode,#FuncCodeHelp)
+C(3,#ApplCode,2,C(3,#FuncCode,1,T(2,歸還),$),$)
 
-!刪除隱藏重新交易按鈕
+E(0,@FUNCIND,#FuncCode)
+
+!新增顯示重新交易按鈕,其他隱藏
 #AGAIN=X,1,S
-C(3,#ACTFG,1,S,$)
+C(3,#FuncCode,1,S,$)
 E(0,1)ASGN(AGAIN$)             
+
 
 
 
@@ -346,7 +355,7 @@ IF(#Rim5R48CustNo != 0,T(F,@CustNo,0)T(F,@FacmNo,0),T(F,@CustNo,1)T(F,@FacmNo,1)
 IF(#Rim5R48CustNo != 0,HIDE(#BTND),$)
 
 #CHKDATA2=X,1,S
-IF(#FunctionCode==05,
+IF(#FuncCode==5||#FuncCode==4,
 T(F,@CustNo,0)
 T(F,@FacmNo,0)
 T(F,@ApplSeq,0)
@@ -372,7 +381,8 @@ T(F,@AMTC{i},0)
 
 ! 借款人戶號
 #CustNo=A,7,I
-IF(#FunctionCode==05,s,$)
+IF(#FuncCode==4,s,$)
+IF(#FuncCode==5,s,$)
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,1,$,s)
 IF(#Rim5R48CustNo != 0,s,$)
@@ -383,21 +393,21 @@ C(1,#CustNo,s,V(P,戶號不可為0),s)
 <include src="ROM.icf::L5R33.dec"/>     
 #RimL5R33=X,1,S
 #RimCustNo=A,7,S
+C(3,#ACTFG,1,$,s)
+C(3,#FuncCode,1,$,s)
 E(0,#CustNo)
 RESET_RIM(#RimL5R33,L5R33)
 S(L5R33,1,#RimCustNo)
 R(1,L5R33)
-
-! 歸還為帶入，不為調RIM
-#SetValue=A,1,S
 IF(#FKEY == 7,$,T(2,@CustName,#L5R33CustName))
-C(3,#ApplCode,2,S,$)
-IF(#InitApplCode == 1,s,$)
-IF(#FKEY == 7,$,E(0,@ApplSeq,#L5R33ApplSeq))
+C(3,#ApplCode,2,$,IF(#InitApplCode == 1,$,IF(#FKEY == 7,$,E(0,@ApplSeq,#L5R33ApplSeq))))
+
+
 
 ! 額度編號
 #FacmNo=A,3,I
-IF(#FunctionCode==05,s,$)
+IF(#FuncCode==4,s,$)
+IF(#FuncCode==5,s,$)
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,1,$,s)
 IF(#Rim5R48CustNo != 0,s,$)
@@ -416,7 +426,8 @@ C(3,#ApplCode,0,$,s)
 IF(#FacmNo == 0,T(3,*),T(3,))
 
 #FacmNoMemo=X,20,I
-IF(#FunctionCode==05,s,$)
+IF(#FuncCode==4,s,$)
+IF(#FuncCode==5,s,$)
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,1,$,s)
 @C(3,#FacmNo,0,$,s)
@@ -441,7 +452,8 @@ T(2,#CustNo+-+#FacmNo+-+#ApplSeq+ 檔案借閱+#LC014Text)
 T(2,L5103+#CustNo+#FacmNo+000+#LC014Mrkey+#LC014Note)
 
 #Button=x,100,S
-IF(#FunctionCode==05,S,$)
+IF(#FuncCode==4,s,$)
+IF(#FuncCode==5,s,$)
 C(2,#FKEY,$,S,S,S,S,S,S,S,S,S,S)
 T(2,{cmd=CHAIN; ntxcd=LC104; ntxbuf=#BufLC014})ASGN(BTN_NEW1$)
 K(MODIFYBUTTON,1,LC104 上傳附件)
@@ -498,7 +510,8 @@ C(4,#L5103ConfirmBrNo,s,C(4,#L5103ConfirmGroupNo,s,$))
 
 ! 用途
 #UsageCode=x,2,I
-IF(#FunctionCode==05,s,$)
+IF(#FuncCode==4,s,$)
+IF(#FuncCode==5,s,$)
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,1,$,s)
 HELP(#UsageCodeXHelp)
@@ -512,7 +525,8 @@ T(H,#UsageCode,#UsageCodeXHelp)
 
 ! 正本/影本
 #CopyCode=A,1,I
-IF(#FunctionCode==05,s,$)
+IF(#FuncCode==4,s,$)
+IF(#FuncCode==5,s,$)
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,1,$,s)
 HELP(#CopyCodeHelp)
@@ -539,7 +553,8 @@ C(3,#ApplCode,2,C(3,#ReturnDate,0,E(0,@ReturnDate,#TODAY),$),C(3,#ApplDate,0,E(0
 
 ! 借閱日期
 #ApplDate=D,7,I
-IF(#FunctionCode==05,s,$)
+IF(#FuncCode==4,s,$)
+IF(#FuncCode==5,s,$)
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,2,s,$)
 @V(7)
@@ -568,7 +583,8 @@ IF(#FKEY == 7,T(2,N),$)
 
 ! 管理人
 #KeeperEmpNo=X,6,I
-IF(#FunctionCode==05,s,$)
+IF(#FuncCode==4,s,$)
+IF(#FuncCode==5,s,$)
 IF(#InitApplCode == 1,s,$)
 !C(3,#ApplCode,1,$,s)
 !C(3,#ApplCode,2,s,$)
@@ -603,7 +619,8 @@ T(2,歸還日期不可小於借閱日期+#TmpApplDate)
 
 ! 歸還日期
 #ReturnDate=D,7,I
-IF(#FunctionCode==05,s,$)
+IF(#FuncCode==4,s,$)
+IF(#FuncCode==5,s,$)
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,2,$,s)
 @V(7)
@@ -629,7 +646,8 @@ IF(#TmpReturnDate>#TODAY,V(P,歸還日期不可大於本日),$)
 
 ! 歸還人
 #ReturnEmpNo=X,6,L
-IF(#FunctionCode==05,s,$)
+IF(#FuncCode==4,s,$)
+IF(#FuncCode==5,s,$)
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,2,$,s)
 T(4,TLRNO$)
@@ -661,14 +679,16 @@ C(4,#ReturnEmpNo,s,$)
 
 ! 備註
 #Remark=X,100,I
-IF(#FunctionCode==05,s,$)
+IF(#FuncCode==4,s,$)
+IF(#FuncCode==5,s,$)
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,1,$,s)
 
 
 ! 借閱項目
 #ApplObj=A,1,I
-IF(#FunctionCode==05,s,$)
+IF(#FuncCode==4,s,$)
+IF(#FuncCode==5,s,$)
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,1,$,s)
 HELP(#ApplObjHelp)
@@ -715,8 +735,9 @@ INVOKEJS(SHOW,L5103,10,12,0)
 C(3,#ApplObj,4,$,S)
 IF(#ApplCode==1&&#ACTFG==1,$,s)
 INVOKEJS(SHOW,L5103_10,1)
-IF(#FunctionCode==05,C(3,#OPTA{i},0,INVOKEJS(SHOW,grd1,{i},{i},0),INVOKEJS(SHOW,grd1,{i},{i},1)),INVOKEJS(SHOW,grd1,{i},{i},1))
-IF(#FunctionCode==05,s,$)
+IF(#FuncCode==5||#FuncCode==4,C(3,#OPTA{i},0,INVOKEJS(SHOW,grd1,{i},{i},0),INVOKEJS(SHOW,grd1,{i},{i},1)),INVOKEJS(SHOW,grd1,{i},{i},1))
+IF(#FuncCode==4,s,$)
+IF(#FuncCode==5,s,$)
 INVOKEJS(SHOW,grd1,{i},{i},1)
 C(3,{j},0,$,C(3,#OPTA{j},0,S,$))
 HELP(#ApplicationCodeHelp)
@@ -754,11 +775,12 @@ C(3,#OPTA{i},0,S,T(H,#OPTA{i},#ApplicationCodeHelp))
 
 
 #AMTA{i}=A,2,I
-IF(#FunctionCode==05,s,$)
+IF(#FuncCode==4,s,$)
+IF(#FuncCode==5,s,$)
 C(3,#ApplObj,4,$,S)
 IF(#ApplCode==1&&#ACTFG==1,$,s)
 C(3,#OPTA{i},0,S,$)
-IF(#ApplCode==1 && #ACTFG==1 && #FKEY != 7 ,E(0,0),$) 
+IF(#ApplCode==1 && #FuncCode==1 && #FKEY != 7 ,E(0,0),$) 
 @V(2,0)
 
 #COPTA{i}=X,1,S
@@ -776,8 +798,9 @@ C(3,#OPTA{i},0,INVOKEJS(SHOW,grd1,{i},{i},0),INVOKEJS(SHOW,grd1,{k},{k},1))
 C(3,#ApplObj,4,$,S)
 IF(#ApplCode==1&&#ACTFG==1,$,s)
 INVOKEJS(SHOW,L5103_11,1)
-IF(#FunctionCode==05,C(3,#OPTB{i},0,INVOKEJS(SHOW,grd2,{i},{i},0),INVOKEJS(SHOW,grd2,{i},{i},1)),INVOKEJS(SHOW,grd2,{i},{i},1))
-IF(#FunctionCode==05,s,$)
+IF(#FuncCode==5||#FuncCode==4,C(3,#OPTB{i},0,INVOKEJS(SHOW,grd2,{i},{i},0),INVOKEJS(SHOW,grd2,{i},{i},1)),INVOKEJS(SHOW,grd2,{i},{i},1))
+IF(#FuncCode==4,s,$)
+IF(#FuncCode==5,s,$)
 INVOKEJS(SHOW,grd2,{i},{i},1)
 C(3,{j},0,$,C(3,#OPTB{j},0,S,$))
 HELP(#SettingCodeHelp)
@@ -815,11 +838,12 @@ IF(#ApplCode==1&&#ACTFG==1,$,s)
 C(3,#OPTB{i},0,S,T(H,#OPTB{i},#SettingCodeHelp))
 
 #AMTB{i}=A,2,I
-IF(#FunctionCode==05,s,$)
+IF(#FuncCode==4,s,$)
+IF(#FuncCode==5,s,$)
 C(3,#ApplObj,4,$,S)
 IF(#ApplCode==1&&#ACTFG==1,$,s)
 C(3,#OPTB{i},0,S,$)
-IF(#ApplCode==1 && #ACTFG==1 && #FKEY != 7 ,E(0,0),$) 
+IF(#ApplCode==1 && #FuncCode==1 && #FKEY != 7 ,E(0,0),$) 
 @V(2,0)
 
 #COPTB{i}=X,1,S
@@ -838,8 +862,9 @@ C(3,#OPTB{i},0,INVOKEJS(SHOW,grd2,{i},{i},0),INVOKEJS(SHOW,grd2,{k},{k},1))
 C(3,#ApplObj,4,$,S)
 IF(#ApplCode==1&&#ACTFG==1,$,s)
 INVOKEJS(SHOW,L5103_12,1)
-IF(#FunctionCode==05,C(3,#OPTC{i},0,INVOKEJS(SHOW,grd3,{i},{i},0),INVOKEJS(SHOW,grd3,{i},{i},1)),INVOKEJS(SHOW,grd3,{i},{i},1))
-IF(#FunctionCode==05,s,$)
+IF(#FuncCode==5||#FuncCode==4,C(3,#OPTC{i},0,INVOKEJS(SHOW,grd3,{i},{i},0),INVOKEJS(SHOW,grd3,{i},{i},1)),INVOKEJS(SHOW,grd3,{i},{i},1))
+IF(#FuncCode==4,s,$)
+IF(#FuncCode==5,s,$)
 INVOKEJS(SHOW,grd3,{i},{i},1)
 C(3,{j},0,$,C(3,#OPTC{j},0,S,$))
 HELP(#GuaranteedCodeHelp)
@@ -876,11 +901,12 @@ IF(#ApplCode==1&&#ACTFG==1,$,s)
 C(3,#OPTC{i},0,S,T(H,#OPTC{i},#GuaranteedCodeHelp))
 
 #AMTC{i}=A,2,I
-IF(#FunctionCode==05,s,$)
+IF(#FuncCode==4,s,$)
+IF(#FuncCode==5,s,$)
 C(3,#ApplObj,4,$,S)
 IF(#ApplCode==1&&#ACTFG==1,$,s)
 C(3,#OPTC{i},0,S,$)
-IF(#ApplCode==1 && #ACTFG==1 && #FKEY != 7 ,E(0,0),$) 
+IF(#ApplCode==1 && #FuncCode==1 && #FKEY != 7 ,E(0,0),$) 
 @V(2,0)
 
 #COPTC{i}=X,1,S
@@ -893,7 +919,8 @@ C(3,#OPTC{i},0,INVOKEJS(SHOW,grd3,{i},{i},0),INVOKEJS(SHOW,grd3,{k},{k},1))
 
 !歸還時不做這個檢查
 #Check=X,1,S
-IF(#FunctionCode==05,s,$)
+IF(#FuncCode==4,s,$)
+IF(#FuncCode==5,s,$)
 C(3,#ApplObj,4,$,s)
 IF(#ApplCode==2,s,$)
 IF(#OPTA1==0 && #OPTB1==0 && #OPTC1==0,$,s)
@@ -916,6 +943,7 @@ T(2,#CustNo+-+#FacmNo+-+#ApplSeq)
 
 !------ 上行電文 TEXT ------
 <sub type="TIM">
+#FuncCode
 #CustNo
 #FacmNo
 #ApplCode
