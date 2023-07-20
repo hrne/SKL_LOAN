@@ -100,13 +100,6 @@ public class LY007Report extends MakeReport {
 
 		makeExcel.setValue(2, 2, inputYearMonth, "L"); // 申報年月
 
-		// 通用處理
-		// 設定表中顯示的日期
-
-		makeExcel.setValue(6, 15, showRocDate(inputYearMonth * 100 + 31, 6)); // 資料日期
-
-		makeExcel.setValue(7, 15, totalEquity, "#,##0"); // 核閱數
-
 		eptExcel(lY007List, titaVo);
 
 		return true;
@@ -121,7 +114,10 @@ public class LY007Report extends MakeReport {
 		if (lY007List != null && !lY007List.isEmpty()) {
 
 			int rowCursor = 7; // 列指標
-			this.info("有值");
+//			this.info("有值");
+
+			makeExcel.setShiftRow(9, lY007List.size() - 2);
+
 			for (Map<String, String> r : lY007List) {
 				BigDecimal loanBal = getBigDecimal(r.get("LoanBal"));
 				BigDecimal gPercent = this.computeDivide(loanBal, totalEquity, 4);
@@ -129,8 +125,7 @@ public class LY007Report extends MakeReport {
 				if (rel.equals("N")) {
 					continue;
 				}
-				this.info("setShiftRow=" + rowCursor);
-				makeExcel.setShiftRow(rowCursor + 1, 1);
+
 				makeExcel.setValue(rowCursor, 1, r.get("Rel"));// 與本公司之關係
 				makeExcel.setValue(rowCursor, 2, r.get("CustId"), "L");// 交易對象代號
 				makeExcel.setValue(rowCursor, 3, r.get("CustName"), "L");// 交易對象名稱
@@ -148,8 +143,8 @@ public class LY007Report extends MakeReport {
 				rowCursor++;
 			}
 
-			makeExcel.setValue(7, 15, iYear + ".12.31", "C");
-			makeExcel.setValue(8, 15, formatAmt(totalEquity, 0), "C");
+			makeExcel.setValue(6, 15, iYear + ".12.31", "C");
+			makeExcel.setValue(7, 15, formatAmt(totalEquity, 0), "C");
 		} else {
 			// 無資料時處理
 			makeExcel.setValue(8, 1, "本日無資料", "L");

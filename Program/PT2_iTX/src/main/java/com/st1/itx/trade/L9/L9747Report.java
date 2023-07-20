@@ -42,7 +42,7 @@ public class L9747Report extends MakeReport {
 	 * 
 	 * @param titaVo
 	 * @param dataDate 資料日期
-	 * @return 
+	 * @return
 	 * @throws LogicException
 	 * 
 	 */
@@ -58,13 +58,13 @@ public class L9747Report extends MakeReport {
 			this.info("L9747ServiceImpl.testExcel error = " + errors.toString());
 		}
 
-		if (L9747List.size() == 0 || L9747List == null) {
-			return false;
-		}
-
 		exportExcel(titaVo, L9747List, dataDate);
 
-		return true;
+		if (L9747List.size() == 0 || L9747List == null) {
+			return false;
+		} else {
+			return true;
+		}
 
 	}
 
@@ -115,7 +115,7 @@ public class L9747Report extends MakeReport {
 			} // for
 
 			int year = dataDate / 10000;
-			int month = dataDate /100 % 100;
+			int month = dataDate / 100 % 100;
 
 			makeExcel.setMergedRegion(row + 3, row + 3, 1, 7);
 			makeExcel.setValue(row + 3, 1,

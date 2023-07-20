@@ -209,7 +209,8 @@ public class L4721Report2 extends TradeBuffer {
 
 					// 相同戶號不同額度的輸出
 
-					if (tempFacmNo == parse.stringToInteger(r1.get("FacmNo"))) { // 相同額度
+					if (tempCustNo == parse.stringToInteger(r1.get("CustNo"))
+							&& tempFacmNo == parse.stringToInteger(r1.get("FacmNo"))) { // 相同額度
 
 						// 第一次
 						if (times == 0) {
@@ -237,11 +238,11 @@ public class L4721Report2 extends TradeBuffer {
 					// 1.by 戶號 額度一定是0，只會六筆
 					// 2.by 額度 不同額度 會各有六筆
 					// 當前額度和下一筆額度不同才進入
-//					this.info(cnt + "=" + tempfacmno + ":" + tempNextfacmno);
-					if (tempFacmNo != tempNextFacmNo || tempCustNo != tempNextCustNo || cntNext == rDetail.size()) { // 只要不同戶號或不同額度
+					if (tempFacmNo != tempNextFacmNo || tempCustNo != tempNextCustNo
+							|| cntNext == (rDetail.size() - 1)) { // 只要不同戶號或不同額度
 						// 印04並且切到下一個額度循環
 						// 04
-
+						cntNext = 1;
 						line = "";
 						line += "04";
 						result.add(line);
@@ -251,7 +252,7 @@ public class L4721Report2 extends TradeBuffer {
 							// 45 額度 003 利率自 109 年 09 月 01 日起， 由 1.68% 調整為 1.41% 。
 
 							// 明細的額度是0的話表示 輸出再同一份 或是依據額度印
-							if (r1.get("FacmNo").equals(r2.get("FacmNo")) || tempFacmNo == 0 ) {
+							if (r1.get("FacmNo").equals(r2.get("FacmNo")) || tempFacmNo == 0) {
 
 								BigDecimal presentRate = parse.stringToBigDecimal(r1.get("PresentRate"));
 								BigDecimal adjustedRate = parse.stringToBigDecimal(r1.get("AdjustedRate"));

@@ -164,8 +164,6 @@ public class L6101 extends TradeBuffer {
 	@Autowired
 	L9134Report l9134Report;
 
-	@Autowired
-	L6101Excel l6101Excel;
 
 	@Autowired
 	TxToDoCom txToDoCom;
@@ -688,7 +686,6 @@ public class L6101 extends TradeBuffer {
 			this.info("AcDate =" + titaVo.get("AcDate"));
 			// 2021-12-15 智誠修改
 //			MySpring.newTask("L6101Report", this.txBuffer, titaVo);
-			l6101Excel.exec(titaVo);
 			this.info("09=MySpring.newTask L9130");
 			// 2021-10-05 智偉修改: 透過L9130控制 L9130、L9131、L9132、L9133
 			MySpring.newTask("L9130", this.txBuffer, titaVo);

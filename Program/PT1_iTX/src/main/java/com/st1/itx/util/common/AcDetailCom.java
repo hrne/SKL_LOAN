@@ -390,8 +390,13 @@ public class AcDetailCom extends TradeBuffer {
 				&& "I".equals(tAcDetail.getAcctCode().substring(0, 1))) {
 			tTempVo.putParam("StampTaxFreeAmt", tAcDetail.getTxAmt());
 		}
+		// 3.銷帳業務科目，銷帳科目與入帳科目不同時寫入(ex.Z10->310)
 		if (!ac.getAcctCode().equals(tCdAcCode.getAcctCode())) {
 			tTempVo.putParam("RvAcctCode", ac.getAcctCode());
+		}
+		// 4.收付欄對帳費別 ex.A1~A6
+		if (titaVo.get("RpAcctCode1") != null ) {
+			tTempVo.putParam("ReconCode", titaVo.get("RpAcctCode1").trim());			
 		}
 
 		tAcDetail.setJsonFields(tTempVo.getJsonString());

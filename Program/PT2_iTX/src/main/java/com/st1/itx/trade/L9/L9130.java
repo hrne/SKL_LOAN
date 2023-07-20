@@ -48,6 +48,8 @@ public class L9130 extends TradeBuffer {
 	private L9138 tranL9138;
 	@Autowired
 	private L9139 tranL9139;
+	@Autowired
+	private L9140Report l9140Report;
 
 	@Autowired
 	private WebClient webClient;
@@ -59,7 +61,7 @@ public class L9130 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L9130 ");
 		this.totaVo.init(titaVo);
-
+		tranL9139.setTxBuffer(this.txBuffer);
 		// 取出tita值
 		// 會計日期 #AcDate=D,7,I
 		int iAcDate = Integer.parseInt(titaVo.getParam("AcDate"));
@@ -228,6 +230,14 @@ public class L9130 extends TradeBuffer {
 				e.printStackTrace(new PrintWriter(errors));
 				this.error("L9130產生L9139暫收款日餘額前後差異比較表時發生錯誤 = " + errors.toString());
 			}
+			try {
+				l9140Report.exec(titaVo);
+			} catch (Exception e) {
+				StringWriter errors = new StringWriter();
+				e.printStackTrace(new PrintWriter(errors));
+				this.error("L9140產生結清戶滿五年查詢清單時發生錯誤 = " + errors.toString());
+			}
+
 		} else {
 			doRpt(titaVo);
 

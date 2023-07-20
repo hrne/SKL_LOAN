@@ -96,7 +96,6 @@ public class LY005Report extends MakeReport {
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
 				.setRptItem(fileItem).build();
-
 		// 開啟報表
 		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
 		// makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LY005",
@@ -122,9 +121,6 @@ public class LY005Report extends MakeReport {
 
 		int iYear = Integer.valueOf(titaVo.getParam("RocYear"));
 		if (lY005List != null && !lY005List.isEmpty()) {
-
-			// 與本公司關係為G者 合併為一筆
-			lY005List = groupG(lY005List);
 
 			int rowCursor = 5; // 列指標
 
@@ -178,61 +174,4 @@ public class LY005Report extends MakeReport {
 
 	}
 
-	/**
-	 * 關係為G者合併為一筆
-	 * 
-	 * @param lY005List 資料明細
-	 * @return 排除G的資料明細
-	 */
-	private List<Map<String, String>> groupG(List<Map<String, String>> lY005List) {
-
-		String gCustName = "";
-		BigDecimal gTxAmt = BigDecimal.ZERO;
-
-		int counts = 0;
-
-		List<Map<String, String>> result = new ArrayList<>();
-
-		for (Map<String, String> m : lY005List) {
-			String rel = m.get("Rel");
-
-			if (rel.equals("N")) {
-				gCustName = m.get("CustName"); // 後蓋前取最後一筆姓名
-				gTxAmt = gTxAmt.add(getBigDecimal(m.get("LoanBal")));
-				counts++;
-			} else {
-				result.add(m);
-			}
-		}
-
-		gCustName += "等 " + counts + "筆";
-
-		BigDecimal gPercent = this.computeDivide(gTxAmt, totalEquity, 5);
-
-		// 合併後的結果add回LIST
-		this.info("gCustName = " + gCustName);
-		this.info("gTxAmt = " + gTxAmt);
-		this.info("gPercent = " + gPercent);
-
-		Map<String, String> gMap = new HashMap<>();
-
-		gMap.put("Rel", "G"); // 與本公司關係
-		gMap.put("CustNo", ""); // 交易對象代號
-		gMap.put("CustName", gCustName); // 交易對象名稱
-		gMap.put("F3", "A"); // 交易種類
-		gMap.put("F4", "C"); // 交易型態
-		gMap.put("BdLoaction", "合併列示不另表述"); // 交易標的內容
-		gMap.put("DrawdownDate", ""); // 交易日期
-		gMap.put("F7", gTxAmt.toString()); // 交易金額
-		gMap.put("F8", ""); // 最近交易日之市價
-		gMap.put("F9", ""); // 已實現損益
-		gMap.put("F10", ""); // 未實現損益
-		gMap.put("F11", gPercent.toString()); // 交易金額佔業主權益比率%
-		gMap.put("Supervisor", ""); // 最後決定權人員
-		gMap.put("F13", ""); // 備註
-
-		result.add(gMap);
-
-		return result;
-	}
 }

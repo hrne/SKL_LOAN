@@ -17,55 +17,22 @@
 					<tasklet ref="LD003" />
 				</step>
 			</flow>
-			<!-- L9742(原LD004) 企金戶還本收據及繳息收據 -->
-			<flow>
-				<step id="sL9742Batch" parent="parentStep">
-					<tasklet ref="L9742Batch" />
-				</step>
-			</flow>
-			<!-- L9743(原LD005)暫收支票收據列印(個人戶) -->
-			<flow>
-				<step id="sL9743Batch" parent="parentStep">
-					<tasklet ref="L9743Batch" />
-				</step>
-			</flow>
 
-			<!-- L9746(原LD010) 介紹人換算業績報酬檢核表 -->
-			<!-- <flow>
-				<step id="sL9746Batch" parent="parentStep">
-					<tasklet ref="L9746Batch" />
-				</step>
-			</flow> -->
-			<!-- L9137 (原LD008) 放款餘額總表 -->
-			<flow>
-				<step id="sL9137Batch" parent="parentStep">
-					<tasklet ref="L9137Batch" />
-				</step>
-			</flow>
-			<!-- L9138 (原LD009) 放款授信日報表 -->
-			<flow>
-				<step id="sL9138Batch" parent="parentStep">
-					<tasklet ref="L9138Batch" />
-				</step>
-			</flow>
-
-			<!-- L9139 暫收款日餘額前後差異比較表 -->
-			<flow>
-				<step id="sL9139Batch" parent="parentStep">
-					<tasklet ref="L9139Batch" />
-				</step>
-			</flow>
-
+			<!-- LW003 房貸獎勵費用率統計表(週) -->
 			<flow>
 				<step id="sLW003" parent="parentStep">
 					<tasklet ref="LW003" />
 				</step>
 			</flow>
+
+			<!-- LB204 聯徵每日新增授信及清償資料檔(日) -->
 			<flow>
 				<step id="sLB204" parent="parentStep">
 					<tasklet ref="LB204" />
 				</step>
 			</flow>
+
+			<!-- LB211 聯徵每日授信餘額變動資料檔(日) -->
 			<flow>
 				<step id="sLB211" parent="parentStep">
 					<tasklet ref="LB211" />

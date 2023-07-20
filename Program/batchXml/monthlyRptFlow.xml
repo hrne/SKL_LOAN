@@ -305,6 +305,12 @@
 					<tasklet ref="LM060" />
 				</step>
 			</flow>
+			<!-- Step: LM061 逾清償期二年案件追蹤控管表_內部控管 -->
+			<flow>
+				<step id="sLM061" parent="parentStep">
+					<tasklet ref="LM061" />
+				</step>
+			</flow>
 			<!-- Step: L9734Batch 覆審報表產製(原LM062-LM067)  -->
 			<flow>
 				<step id="sL9734Batch" parent="parentStep">

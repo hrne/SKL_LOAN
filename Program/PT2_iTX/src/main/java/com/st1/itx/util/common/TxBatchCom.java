@@ -55,6 +55,7 @@ import com.st1.itx.db.service.NegMainService;
 import com.st1.itx.db.service.TxErrCodeService;
 import com.st1.itx.db.service.TxRecordService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -760,8 +761,8 @@ public class TxBatchCom extends TradeBuffer {
 		// 收付欄
 		int ii = 1;
 		txTitaVo.putParam("RpFlag", "1"); // 1:應收
+		txTitaVo.putParam("RpType1", tDetail.getRepayType());
 		if (tDetail.getRepayAmt().compareTo(BigDecimal.ZERO) > 0) {
-			txTitaVo.putParam("RpType1", tDetail.getRepayType());
 			txTitaVo.putParam("RpCode1", tDetail.getRepayCode());
 			txTitaVo.putParam("RpCodeX1",
 					loanCom.getCdCodeX("BatchRepayCode", parse.IntegerToString(tDetail.getRepayCode(), 2), txTitaVo));
