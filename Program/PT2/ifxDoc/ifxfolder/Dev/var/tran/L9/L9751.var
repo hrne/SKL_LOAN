@@ -41,7 +41,7 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[120,850];printer.width=[20,20];">
 [
 ["[L9751]                      暫收款-火險費餘額表"],
-["#FdAcctDate+會計日",#DateInputStr,"~",#DateInputEnd],
+["#FdAcctDate+會計日",#EndDate],
 ]
 !---------- AP TEXT AREA Variables ----------
 !欄位必填星號
@@ -57,22 +57,11 @@ E(0,5)
 #DATE=D,8,S
 T(4,DATE$)
 
-!日期格式YYYMM
-#DT_YM=A,5,S
-T(1,#DATE,2,5)
-
-!會計日起日
-#DateInputStr=D,7,I
-T(2,#DT_YM+01)
-@V(7)
-A(4,0,#DateInputStr)
-
 !會計日迄日
-#DateInputEnd=D,7,I
+#EndDate=D,7,I
 T(1,#DATE,2,7)
 @V(7) 
-A(4,0,#DateInputEnd)
-IF(#DateInputEnd < #DateInputStr,V(P,起始日不可大於結束日),$)
+A(4,0,#EndDate)
 
 </sub>
 
@@ -90,8 +79,7 @@ IF(#DateInputEnd < #DateInputStr,V(P,起始日不可大於結束日),$)
 
 !------ 上行電文 ------
 <sub type="TIM">
-#DateInputStr
-#DateInputEnd
+#EndDate
 </sub>
 
 !------ 下行電文TOM ------

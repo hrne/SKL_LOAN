@@ -113,7 +113,7 @@ public class LY007Report extends MakeReport {
 
 		if (lY007List != null && !lY007List.isEmpty()) {
 
-			int rowCursor = 7; // 列指標
+			int rowCursor = 8; // 列指標
 //			this.info("有值");
 
 			makeExcel.setShiftRow(9, lY007List.size() - 2);

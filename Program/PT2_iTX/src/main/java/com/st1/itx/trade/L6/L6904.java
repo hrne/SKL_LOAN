@@ -16,6 +16,7 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.CdAcCode;
 import com.st1.itx.db.domain.CdAcCodeId;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.CdAcCodeService;
 import com.st1.itx.db.service.CdEmpService;
@@ -45,6 +46,8 @@ public class L6904 extends TradeBuffer {
 	public CdAcCodeService sCdAcCodeService;
 	@Autowired
 	public CdEmpService cdEmpService;
+	@Autowired
+	public CdEmpService iCdEmpService;
 	@Autowired
 	Parse parse;
 
@@ -80,6 +83,10 @@ public class L6904 extends TradeBuffer {
 		int totalCnt = 0;
 		int dbCnt = 0;
 		int crCnt = 0;
+		
+		String tLastUpdateEmpNo = "";
+		String tLastUpdateEmpNoX = "";
+		
 		BigDecimal dbAmt = new BigDecimal(0);
 		BigDecimal crAmt = new BigDecimal(0);
 
@@ -207,6 +214,16 @@ public class L6904 extends TradeBuffer {
 				sumNo = tAcDetail.getSumNo();
 				titaTlrNo = tAcDetail.getTitaTlrNo();
 				titaBatchNo = tAcDetail.getTitaBatchNo();
+				
+				CdEmp iCdEmp = iCdEmpService.findById(tAcDetail.getLastUpdateEmpNo(), titaVo);
+				if (iCdEmp == null) {
+					tLastUpdateEmpNoX = "";
+				} else {
+					tLastUpdateEmpNoX  = iCdEmp.getFullname();
+				}
+				
+				tLastUpdateEmpNo = tAcDetail.getLastUpdateEmpNo();
+				
 				dscptCode = tAcDetail.getDscptCode();
 				if (tAcDetail.getSlipNote() != null) {
 					slipNote = tAcDetail.getSlipNote().trim();
@@ -237,6 +254,7 @@ public class L6904 extends TradeBuffer {
 				}
 				continue;
 			}
+			
 			dAcSubBookCode = tAcDetail.getAcSubBookCode();
 			OccursList occursList = new OccursList();
 			occursList.putParam("OOAcSubBookCode", dAcSubBookCode);
@@ -248,6 +266,9 @@ public class L6904 extends TradeBuffer {
 			occursList.putParam("OOCrCnt", crCnt);
 			occursList.putParam("OOCrAmt", crAmt);
 			occursList.putParam("OOSlipNote", slipNote);
+			occursList.putParam("OOLastUpdateEmpNo",tLastUpdateEmpNo);
+			occursList.putParam("OOLastUpdateEmpNoX",tLastUpdateEmpNoX);
+			
 			switch (iInqType) {
 			case 0: // 全部彙計方式
 				occursList.putParam("OOInqData", "");
@@ -291,6 +312,7 @@ public class L6904 extends TradeBuffer {
 			titaTlrNo = tAcDetail.getTitaTlrNo();
 			titaBatchNo = tAcDetail.getTitaBatchNo();
 			dscptCode = tAcDetail.getDscptCode();
+			tLastUpdateEmpNo = tAcDetail.getLastUpdateEmpNo();
 			if (tAcDetail.getSlipNote() != null) {
 				slipNote = tAcDetail.getSlipNote().trim();
 			}
@@ -324,6 +346,9 @@ public class L6904 extends TradeBuffer {
 			occursList.putParam("OOCrCnt", crCnt);
 			occursList.putParam("OOCrAmt", crAmt);
 			occursList.putParam("OOSlipNote", slipNote);
+			occursList.putParam("OOLastUpdateEmpNo",tLastUpdateEmpNo);
+			occursList.putParam("OOLastUpdateEmpNoX",tLastUpdateEmpNoX);
+			
 			switch (iInqType) {
 			case 0: // 全部彙計方式
 				occursList.putParam("OOInqData", "");

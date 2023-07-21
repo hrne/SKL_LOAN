@@ -53,30 +53,13 @@ E(0,0)
 E(0,5)
 <include src="COM.icf::CheckAuth.rtn"/>
 
+#DT=N,7,S
+T(1,#SYSDATE,2,7)
 
-#tmpYear=N,3,S
-T(1,#SYSDATE,2,3)
-#tmpMonth=N,2,S
-T(1,#SYSDATE,5,2)
-#tmp01=N,2,S
-T(3,01)
-#tmp0=N,1,S
-T(3,0)
+!營業日本月份
+#nowMonth=N,5,S
+T(1,#DT,1,5)
 
-#defaultEntryDateMin=D,7,S
-T(2,#tmpYear+#tmp01+#tmp01)
-
-#tmpEntryDateMax=D,8,S
-T(2,#tmp0+#tmpYear+#tmpMonth+#tmp01)
-D(7,2,#tmpEntryDateMax,1,0)
-D(6,3,#tmpEntryDateMax,1)
-
-#defaultEntryDateMax=D,7,S
-T(1,#tmpEntryDateMax,2,7)
-! i don't know either but it works this way instead of ,2,7
-
-#DT=N,5,S
-T(1,#SYSDATE,2,5)
 
 ! 年月份
 #inputYearMonth=N,5,I
@@ -84,17 +67,54 @@ T(1,#SYSDATE,2,5)
 T(2,#DT)
 @V(7)
 V(5,0,#DT)
+!年
+#tmpYear=N,3,S
+T(1,#inputYearMonth,1,3)
+!月
+#tmpMonth=N,2,S
+T(1,#inputYearMonth,4,2)
+!日
+#tmpToday=N,2,S
+T(1,#DT,6,2)
+#tmp01=N,2,S
+T(3,01)
+
+!入帳起日
+#defaultEntryDateMin=D,7,S
+T(2,#tmpYear+#tmpMonth+#tmp01)
+
+!暫存年月 根據年月份輸入幾月判斷(西元年才可以使用D方法)
+#tmpMonthEnd=D,8,S
+E(0,#defaultEntryDateMin+19110000)
+D(7,2,#tmpMonthEnd,1,0)
+D(7,3,#tmpMonthEnd,0,1)
+
+!暫存年月 民國年月底
+#ThisMonthEnd=D,7,S
+E(0,#tmpMonthEnd-19110000)
+
+!入帳止日
+#defaultEntryDateMax=D,7,S
+T(2,#tmpYear+#tmpMonth+#tmpToday)
 
 ! 入帳日期範圍
 #inputEntryDateMin=D,7,I
 E(0,#defaultEntryDateMin)
 @V(7)
+@A(4,0,#inputEntryDateMin)
+IF(#DT < #inputEntryDateMin,V(P,入帳日期起日不得超過會計日),$)
+
+
 
 ! 入帳日期範圍
 #inputEntryDateMax=D,7,I
-E(0,#defaultEntryDateMax)
+IF(#inputYearMonth < #nowMonth ,E(0,#ThisMonthEnd),E(0,#defaultEntryDateMax))
+@IF(#inputYearMonth < #nowMonth && #ThisMonthEnd < #inputEntryDateMax,V(P,入帳日期止日不得超過年月份月底日),$)
 @V(7)
-IF(#inputEntryDateMin>#inputEntryDateMax,V(P,起始日不可大於終止日),$)
+@A(4,0,#inputEntryDateMax)
+IF(#inputEntryDateMin >= #inputEntryDateMax,V(P,起始日不可大於終止日),$)
+IF(#DT < #inputEntryDateMax,V(P,入帳日期止日不得超過會計日),$)
+
 
 ! 催收人員
 #inputCollectorShow=X,6,I

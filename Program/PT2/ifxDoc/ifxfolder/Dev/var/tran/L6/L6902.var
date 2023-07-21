@@ -168,8 +168,6 @@ T(2,#DT_MONTH+#DT_01)
 
 #AcDateEd=D,7,I
 IF(#AcDateSt>#DT,T(2,#AcDateSt),T(2,#DT))
-
-
 @V(7)A(4,0,#AcDateEd)V(5,#AcDateSt,9999999)
 
 <include src="ROM.icf::L0Rim.dec"/>
@@ -320,10 +318,6 @@ TXFORM=L6902
 {width:50,align:'center'}
 #OOTdBalX=餘額
 {width:150,align:'right'}
-#OOLastUpdate=最後修改日期
-{width:150,align:'center'}
-#OOLastEmp=最後修改人員
-{width:120,align:'left'}
 ^
 <include src="PRT.icf::INQ01.sel" map="i=L6902;cpi=15"/>
 %

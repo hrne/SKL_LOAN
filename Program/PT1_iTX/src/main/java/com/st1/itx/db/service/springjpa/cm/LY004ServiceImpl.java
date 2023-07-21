@@ -78,11 +78,11 @@ public class LY004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " 	FROM (";
 		sql += " 		SELECT SUM(\"PrinBalance\") AS \"LoanBal\"";
 		sql += " 		FROM \"MonthlyFacBal\"";
-		sql += " 		WHERE \"YearMonth\" = :inputYearMonth ";
+		sql += " 		WHERE \"YearMonth\" = :lastinputYearMonth ";
 		sql += " 		UNION";
 		sql += " 		SELECT \"LoanBal\" AS \"LoanBal\"";
 		sql += " 		FROM \"MonthlyLM052AssetClass\"";
-		sql += " 		WHERE \"YearMonth\" = :inputYearMonth ";
+		sql += " 		WHERE \"YearMonth\" = :lastinputYearMonth ";
 		sql += " 		  AND \"AssetClassNo\" IN ('61','62')";
 		sql += " 	)";
 		sql += " )";
