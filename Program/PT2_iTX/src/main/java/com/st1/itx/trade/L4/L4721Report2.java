@@ -252,7 +252,9 @@ public class L4721Report2 extends TradeBuffer {
 							// 45 額度 003 利率自 109 年 09 月 01 日起， 由 1.68% 調整為 1.41% 。
 
 							// 明細的額度是0的話表示 輸出再同一份 或是依據額度印
-							if (r1.get("FacmNo").equals(r2.get("FacmNo")) || tempFacmNo == 0) {
+							this.info("r1 tempFacmNo =" + tempFacmNo);
+							this.info("r2 tempFacmNo =" + parse.stringToInteger(r2.get("FacmNo")));
+							if (tempFacmNo == parse.stringToInteger(r2.get("FacmNo")) || tempFacmNo == 0) {
 
 								BigDecimal presentRate = parse.stringToBigDecimal(r1.get("PresentRate"));
 								BigDecimal adjustedRate = parse.stringToBigDecimal(r1.get("AdjustedRate"));

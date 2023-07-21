@@ -41,7 +41,6 @@ public class L9751ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int endDate = parse.stringToInteger(titaVo.get("EndDate")) + 19110000;
 
 		dateUtil.init();
-		dateUtil.setDate_1(endDate);
 		int startDate = dateUtil.getLastMonthEndBussinessDate(endDate);
 		
 		this.info("startDate = " + startDate);
@@ -50,12 +49,12 @@ public class L9751ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "";
 		sql += "	SELECT ";
 		sql += "	    \"AcAcctCheck\".\"AcDate\" AS \"AcDate\",";
-		sql += "	    NVL(\"AcctMasterBal\",0) AS \"AcctMasterBal\",";
-		sql += "	    NVL(\"TdBal\",0) AS \"TdBal\",";
-		sql += "	    NVL(\"DbAmt\",0) AS \"DbAmt\",";
-		sql += "	    NVL(\"CrAmt\",0) AS \"CrAmt\",";
-		sql += "	    NVL(\"MasterClsAmt\",0) AS \"MasterClsAmt\",";
-		sql += "	    NVL(\"TxAmt\",0) AS \"TxAmt\" ";
+		sql += "	    \"AcctMasterBal\",";
+		sql += "	    \"TdBal\",";
+		sql += "	    \"DbAmt\",";
+		sql += "	    \"CrAmt\",";
+		sql += "	    \"MasterClsAmt\",";
+		sql += "	    \"TxAmt\"";
 		sql += "	FROM";
 		sql += "	(";
 		sql += "	    SELECT";

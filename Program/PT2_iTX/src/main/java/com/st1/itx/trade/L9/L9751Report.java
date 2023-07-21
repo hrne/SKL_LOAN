@@ -117,20 +117,20 @@ public class L9751Report extends MakeReport {
 			for (int i = 1; i < resultList.size(); i++) {
 				result = resultList.get(i);
 				// A欄-已繳火險費尚未請款金額(正常件)
-				BigDecimal acctMasterBal = new BigDecimal(result.get("AcctMasterBal"));
+				BigDecimal acctMasterBal = getBigDecimal(result.get("AcctMasterBal"));
 				// G欄、N欄-日期
 				String date = (Integer.parseInt(result.get("AcDate").substring(0, 4)) - 1911) + "/"
 						+ result.get("AcDate").substring(4, 6) + "/" + result.get("AcDate").substring(6);
 				// I欄-會計帳累積餘額數
-				BigDecimal dbAmt = new BigDecimal(result.get("DbAmt"));
+				BigDecimal dbAmt = getBigDecimal(result.get("DbAmt"));
 				// J欄-當期借方傳票
-				BigDecimal tdBal = new BigDecimal(result.get("TdBal"));
+				BigDecimal tdBal = getBigDecimal(result.get("TdBal"));
 				// K欄-當期貸方傳票
-				BigDecimal crAmt = new BigDecimal(result.get("CrAmt"));
+				BigDecimal crAmt = getBigDecimal(result.get("CrAmt"));
 				// O欄-火險檔餘額
-				BigDecimal masterClsAmt = new BigDecimal(result.get("MasterClsAmt"));
+				BigDecimal masterClsAmt = getBigDecimal(result.get("MasterClsAmt"));
 				// P欄-沖銷請款/借支/轉催收傳票金額
-				BigDecimal txAmt = new BigDecimal(result.get("TxAmt"));
+				BigDecimal txAmt = getBigDecimal(result.get("TxAmt"));
 
 				// 公式
 				// D欄-當期火險費暫收款餘額: A欄+B欄+C欄 
@@ -170,9 +170,9 @@ public class L9751Report extends MakeReport {
 					preResult = resultList.get(i - 1);
 					
 					// E欄-當期火險費暫收款變動額: 本日A欄-前日A欄
-					BigDecimal acctMasterBalChg = acctMasterBal.subtract(new BigDecimal(preResult.get("AcctMasterBal")));
+					BigDecimal acctMasterBalChg = acctMasterBal.subtract(getBigDecimal(preResult.get("AcctMasterBal")));
 					// (前一筆)O欄-火險檔餘額
-					BigDecimal preMasterClsAmt = new BigDecimal(preResult.get("MasterClsAmt"));
+					BigDecimal preMasterClsAmt = getBigDecimal(preResult.get("MasterClsAmt"));
 					
 					makeExcel.setValue(rowCursor, 5, acctMasterBalChg, "#,##0");
 					makeExcel.setValue(rowCursor, 17, masterClsAmt.subtract(preMasterClsAmt).subtract(txAmt), "#,##0");
@@ -183,12 +183,12 @@ public class L9751Report extends MakeReport {
 				}
 				rowCursor++;
 			}
+			makeExcel.formulaRangeCalculate(4, rowCursor , 1, 18);
 		} else {
 			this.info("無資料");
 			makeExcel.setValue(rowCursor, 1, "查無資料");
 			
 		}
-		makeExcel.formulaRangeCalculate(5, rowCursor, 1, 18);
 		makeExcel.close();
 	}
 }

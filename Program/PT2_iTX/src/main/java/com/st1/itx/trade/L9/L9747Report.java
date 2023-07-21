@@ -92,6 +92,8 @@ public class L9747Report extends MakeReport {
 		} else {
 			int row = 3;
 			BigDecimal total = BigDecimal.ZERO;
+			String statusCode = "";
+
 			for (Map<String, String> tLDVo : LMList) {
 
 				for (int i = 0; i <= 6; i++) {
@@ -100,9 +102,19 @@ public class L9747Report extends MakeReport {
 					int col = i + 1;
 
 					switch (i) {
+					case 4:
+
+						statusCode = value;
+
+						makeExcel.setValue(row, col, "2".equals(value) ? "2：催收戶" : "6：呆帳戶");
+						
+						break;
 					case 6:
+
 						BigDecimal bd = getBigDecimal(value);
-						total = total.add(bd);
+						if ("6".equals(statusCode)) {
+							total = total.add(bd);
+						}
 						makeExcel.setValue(row, col, bd, "#,##0", "R");
 						break;
 					default:
@@ -114,6 +126,7 @@ public class L9747Report extends MakeReport {
 				row++;
 			} // for
 
+			
 			int year = dataDate / 10000;
 			int month = dataDate / 100 % 100;
 

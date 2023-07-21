@@ -46,14 +46,35 @@ public class L9140Report extends MakeReport {
 	CustMainService sCustMainService;
 
 	private String pageSize = "A4";
+	private String reportCode = "L9140";
+	private String reportItem = "結清戶滿五年查詢清單";
+	private String security = "機密";
+	private String brno = "";
+	// 製表日期
+	private String nowDate;
+	// 製表時間
+	private String nowTime;
 
 	@Override
 	public void printHeader() {
 		this.info("L9140Report.printHeader");
 
 		this.setCharSpaces(0);
+
+		this.setFontSize(10);
+
+		this.print(-4, 6, "", "L");
+		this.print(-1, 2, "程式ID：" + this.getParentTranCode());
+		this.print(-1, 85, "新光人壽保險股份有限公司", "C");
+		this.print(-1, 145, "機密等級：" + this.security);
+		this.print(-2, 2, "報　表：" + this.reportCode);
+		this.print(-2, 85, this.reportItem, "C");
+		this.print(-2, 145, "日　　期：" + showBcDate(this.nowDate, 1));
+		this.print(-3, 2, "來源別：放款服務課");
+		this.print(-3, 145, "時　　間：" + showTime(this.nowTime));
+		this.print(-4, 145, "頁　　次：" + this.getNowPage());
 		// 明細起始列(自訂亦必須)
-		this.setBeginRow(3);
+		this.setBeginRow(7);
 		// 設定明細列數(自訂亦必須)
 		this.setMaxRows(40);
 
@@ -62,7 +83,7 @@ public class L9140Report extends MakeReport {
 		 * ---------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
 		 * 1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 		 */
-		print(1, 64, "結清戶滿五年查詢清單", "C");
+		print(1, 1, " ");
 		print(1, 1, "　交易代號　　　　　　　　　　戶號　　　　　　　　　　查詢理由　　　　　　　　　　　　　　　經辦　　　　　　　　　交易日期　　　交易時間　");
 		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 
@@ -70,22 +91,22 @@ public class L9140Report extends MakeReport {
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
-		int reportDate = titaVo.getEntDyI() + 19110000;
-		String brno = titaVo.getBrno();
 		String txcd = "L9140";
-		String fileItem = "結清戶滿五年查詢清單";
 		String fileName = "L9140" + "_" + "結清戶滿五年查詢清單";
+		this.brno = titaVo.getBrno();
+		this.nowDate = dDateUtil.getNowStringRoc();
+		this.nowTime = dDateUtil.getNowStringTime();
 
 		// 開啟報表
-		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
-				.setRptItem(fileItem).setRptSize(pageSize).build();
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(brno).setRptCode(reportCode)
+				.setRptItem(reportItem).setRptSize(pageSize).build();
 
 		this.open(titaVo, reportVo);
 
 //		int Caldy = parse.stringToInteger(titaVo.getCalDy())+19110000;//20230511改用findEntdyImportFg且日期使用會計日
 
-		Slice<TxInquiry> sTxInquiry = sTxInquiryService.findEntdyImportFg(reportDate, reportDate, "1", 0, 9999999, 0,
-				Integer.MAX_VALUE, titaVo);
+		Slice<TxInquiry> sTxInquiry = sTxInquiryService.findEntdyImportFg(titaVo.getEntDyI() + 19110000,
+				titaVo.getEntDyI() + 19110000, "1", 0, 9999999, 0, Integer.MAX_VALUE, titaVo);
 
 		List<TxInquiry> iTxInquiry = sTxInquiry == null ? null : sTxInquiry.getContent();
 
@@ -128,22 +149,21 @@ public class L9140Report extends MakeReport {
 				time = this.showTime(time);
 				this.print(1, 1, "");
 				this.print(1, 1, "");
-				this.print(1, 1, "");
-				this.print(0, 3, tTempVo.get("TXCD") );
+				this.print(0, 3, tTempVo.get("TXCD"));
 				this.print(0, 30, parse.IntegerToString(custNo, 7));
 				this.print(0, 53, reason);
 				this.print(0, 90, tTempVo.get("TLRNO"));
 				this.print(0, 115, date);
 				this.print(0, 130, time);
 				this.print(1, 90, tTempVo.get("EMPNM"));
-				this.print(0, 3,  tranItem);
+				this.print(0, 3, tranItem);
 				if (tCustMain != null) {
 					this.print(0, 30, tCustMain.getCustName());
 				}
 
 			}
 		} else {
-			print(3, 1, "無資料");
+			print(2, 1, "無資料");
 		}
 
 		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),

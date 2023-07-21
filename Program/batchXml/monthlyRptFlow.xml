@@ -185,12 +185,6 @@
 					<tasklet ref="LM040" />
 				</step>
 			</flow>
-			<!-- Step: LM041 催收及呆帳戶暫收款明細表 -->
-			<flow>
-				<step id="sLM041" parent="parentStep">
-					<tasklet ref="LM041" />
-				</step>
-			</flow>
 			<!-- Step: LM042 RBC表 -->
 			<flow>
 				<step id="sLM042Batch" parent="parentStep">

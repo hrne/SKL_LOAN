@@ -231,6 +231,8 @@ public class L9130 extends TradeBuffer {
 				this.error("L9130產生L9139暫收款日餘額前後差異比較表時發生錯誤 = " + errors.toString());
 			}
 			try {
+				String parentTranCode = titaVo.getTxcd();
+				l9140Report.setParentTranCode(parentTranCode);
 				l9140Report.exec(titaVo);
 			} catch (Exception e) {
 				StringWriter errors = new StringWriter();

@@ -160,13 +160,8 @@ BEGIN
           ,APLP."IRTMSC"                  AS "RateAdjFreq"         -- 利率調整週期 DECIMAL 2  
           ,NVL(APLP."APLCUR",'TWD')       AS "CurrencyCode"        -- 核准幣別 VARCHAR2 3  
           ,APLP."APLPAM"                  AS "LineAmt"             -- 核准額度 DECIMAL 16 2 
-          ,NVL(LMSP."LMSLBL",APLP."APLLAM") 
-                                          AS "UtilAmt"             -- 貸出金額(放款餘額) DECIMAL 16 2 
-          ,CASE 
-             WHEN APLP."APLRCD" = 0  
-             THEN NVL(LMSP."LMSFLA",0) 
-           ELSE NVL(LMSP."LMSLBL",0) 
-           END                            AS "UtilBal"             -- 已動用額度餘額 DECIMAL 16 2 循環動用還款時會減少,非循環動用還款時不會減少 
+          ,APLP."APLLAM"                  AS "UtilAmt"             -- 貸出金額(放款餘額) DECIMAL 16 2 
+          ,APLP."APLUAM"                  AS "UtilBal"             -- 已動用額度餘額 DECIMAL 16 2 循環動用還款時會減少,非循環動用還款時不會減少 
           ,APLP."ACTACT"                  AS "AcctCode"            -- 核准科目 VARCHAR2 3  
           ,APLP."APLYER"                  AS "LoanTermYy"          -- 貸款期間年 DECIMAL 2  
           ,APLP."APLMON"                  AS "LoanTermMm"          -- 貸款期間月 DECIMAL 2  

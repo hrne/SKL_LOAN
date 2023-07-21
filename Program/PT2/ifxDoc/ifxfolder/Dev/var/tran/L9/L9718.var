@@ -97,22 +97,24 @@ E(0,#tmpMonthEnd-19110000)
 #defaultEntryDateMax=D,7,S
 T(2,#tmpYear+#tmpMonth+#tmpToday)
 
-! 入帳日期範圍
+
+! 入帳日期範圍-起日
 #inputEntryDateMin=D,7,I
 E(0,#defaultEntryDateMin)
 @V(7)
 @A(4,0,#inputEntryDateMin)
+@IF(#defaultEntryDateMin > #inputEntryDateMin,V(P,入帳日期起日不得少於年月份1日),$)
 IF(#DT < #inputEntryDateMin,V(P,入帳日期起日不得超過會計日),$)
 
 
 
-! 入帳日期範圍
+! 入帳日期範圍-止日
 #inputEntryDateMax=D,7,I
 IF(#inputYearMonth < #nowMonth ,E(0,#ThisMonthEnd),E(0,#defaultEntryDateMax))
 @IF(#inputYearMonth < #nowMonth && #ThisMonthEnd < #inputEntryDateMax,V(P,入帳日期止日不得超過年月份月底日),$)
 @V(7)
 @A(4,0,#inputEntryDateMax)
-IF(#inputEntryDateMin >= #inputEntryDateMax,V(P,起始日不可大於終止日),$)
+IF(#inputEntryDateMin >= #inputEntryDateMax,V(P,入帳起日不可大於入帳止日),$)
 IF(#DT < #inputEntryDateMax,V(P,入帳日期止日不得超過會計日),$)
 
 

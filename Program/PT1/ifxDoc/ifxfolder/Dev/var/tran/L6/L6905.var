@@ -409,10 +409,10 @@ T(2,#OOTitaTxCd+ +#OOTranItem)
 ! #OOSumNoX=X,20,S
 ! C(4,#OOSumNo,S,T(H,#OOSumNo,#SumNoTypeHelp))
 !主管
-#OOTitaSupNo=X,6,S
-#OOSupItem=X,20,S
+#OOSupItem=X,6,S
+#OOTitaSupNo=X,40,S
 #OOTitaSupNoX=X,27,S
-T(2,#OOTitaSupNo+ +#OOSupItem)
+T(2,#OOSupItem+ +#OOTitaSupNo)
 
 !登放日期
 #OORelDy=D,7,S
@@ -576,7 +576,7 @@ TXFORM=L6905
 #OOTitaTxtNo=交易序號
 {width:80,align:'center'}
 #OOTitaSupNoX=主管
-{width:100,align:'center'}
+{width:80,align:'center'}
 #OOSlipNote=傳票摘要
 {width:100,align:'left'}
 #OOTitaTxCdX=交易代號

@@ -35,24 +35,23 @@ public class L9747ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 
 	 * @param titaVo
 	 * @param dataDate 資料日期
-	 * @return 
-	 * @throws Exception 
+	 * @return
+	 * @throws Exception
 	 * 
 	 */
 	public List<Map<String, String>> findAll(TitaVo titaVo, int dataDate) throws Exception {
 		this.info("L9747.findAll ");
 		dataDate = dataDate + 19110000;
 		this.info("dataDate =" + dataDate);
-		
-		
-		String sql = "";
+
+		String sql = "	";
 		sql += " SELECT CT.\"CityItem\" ";
-		sql += "       ,v.\"CityCode\" ";
-		sql += "       ,v.\"CustNo\" ";
-		sql += "       ,v.\"FacmNo\" ";
-		sql += "       ,v.\"Status\" ";
-		sql += "       ,\"Fn_ParseEOL\"(C.\"CustName\",0) AS \"CustName\" ";
-		sql += "       ,A.\"RvBal\" ";
+		sql += "       ,ViableCusts.\"CityCode\" ";
+		sql += "       ,ViableCusts.\"CustNo\" ";
+		sql += "       ,ViableCusts.\"FacmNo\" ";
+		sql += "       ,ViableCusts.\"Status\" ";
+		sql += "       ,\"Fn_ParseEOL\"(C.\"CustName\",0) AS \"CustName\"";
+		sql += "       ,DECODE(ViableCusts.\"Status\",2,A2.\"RvBal\",A.\"RvBal\") AS \"RvBal\"";
 		sql += " FROM ( SELECT CL.\"CityCode\" AS \"CityCode\"";
 		sql += "              ,MAX(L.\"Status\") \"Status\" ";
 		sql += "              ,D.\"CustNo\" AS \"CustNo\"";
@@ -71,21 +70,33 @@ public class L9747ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          AND D.\"LatestFlag\" = 1 ";
 		sql += "          AND L.\"Status\" IN (2,6) ";
 		sql += "        GROUP BY CL.\"CityCode\" ";
-		sql += "                ,D.\"CustNo\" ) v ";
+		sql += "                ,D.\"CustNo\" ) ViableCusts ";
 		sql += " LEFT JOIN ( SELECT \"CustNo\" ";
-		sql += "                   ,SUM(\"RvBal\") \"RvBal\" ";
+		sql += "                   ,\"TxAmt\" AS  \"RvBal\" ";
+		sql += "             FROM \"AcDetail\" ";
+		sql += "             WHERE \"AcctCode\" = 'TAV' ";
+		sql += "               AND \"DbCr\" = 'D' ";
+		sql += "               AND \"AcDate\" = :dataday ";
+		sql += "             ) A ON A.\"CustNo\" = ViableCusts.\"CustNo\" ";
+		sql += "                AND ViableCusts.\"Status\" = 6 ";
+		sql += " LEFT JOIN ( SELECT \"CustNo\" ";
+		sql += "                   ,\"AcBal\" AS  \"RvBal\" ";
 		sql += "             FROM \"AcReceivable\" ";
 		sql += "             WHERE \"AcctCode\" = 'TAV' ";
-		sql += "             GROUP BY \"CustNo\" ) A ON A.\"CustNo\" = v.\"CustNo\" ";
-		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = v.\"CustNo\" ";
-		sql += " LEFT JOIN \"CdCity\" CT  ON CT.\"CityCode\" = v.\"CityCode\" ";
+		sql += "               AND \"OpenAcDate\" = :dataday ";
+		sql += "             ) A2 ON A2.\"CustNo\" = ViableCusts.\"CustNo\" ";
+		sql += "                 AND ViableCusts.\"Status\" = 2 ";
+		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = ViableCusts.\"CustNo\" ";
+		sql += " LEFT JOIN \"CdCity\" CT  ON CT.\"CityCode\" = ViableCusts.\"CityCode\" ";
 		sql += " WHERE NVL(A.\"RvBal\", 0) > 0 ";
+		sql += " 	OR NVL(A2.\"RvBal\", 0) > 0 ";
+
 		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("dataday",dataDate);
+		query.setParameter("dataday", dataDate);
 		return this.convertToMap(query);
 	}
 
