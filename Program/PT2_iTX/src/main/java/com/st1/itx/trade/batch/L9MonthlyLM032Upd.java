@@ -35,6 +35,8 @@ public class L9MonthlyLM032Upd extends BatchBase implements Tasklet, Initializin
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
+		String txSeq = chunkContext.getStepContext().getStepExecution().getExecutionContext().getString("txSeq");
+		this.titaVo.putParam("JobTxSeq", txSeq);
 		// 第二個參數
 		// D=日批
 		// M=月批
@@ -56,7 +58,9 @@ public class L9MonthlyLM032Upd extends BatchBase implements Tasklet, Initializin
 		// 此為月底日日終批次,讀onlineDB
 //		this.titaVo.putParam(ContentName.dataBase, ContentName.onLine);
 
-		sJobMainService.Usp_L9_MonthlyLM032_Upd(tbsdyf, empNo, lmndyf, titaVo);
+		String txSeq = titaVo.getParam("JobTxSeq");
+
+		sJobMainService.Usp_L9_MonthlyLM032_Upd(tbsdyf, empNo, lmndyf, txSeq, titaVo);
 	}
 
 }

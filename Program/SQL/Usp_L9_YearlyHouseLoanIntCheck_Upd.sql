@@ -10,7 +10,8 @@ CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L9_YearlyHouseLoanIntCheck_Upd"
     StartMonth     IN  INT,        -- 起月(西元)
     EndMonth       IN  INT,        -- 迄月(西元)
     CustNo         IN  INT,        -- 戶號
-    AcctCode       IN  VARCHAR2    -- 業務科目
+    AcctCode       IN  VARCHAR2,   -- 業務科目
+    JobTxSeq       IN  VARCHAR2    -- 啟動批次的交易序號
 )
 AS
 BEGIN
@@ -228,6 +229,9 @@ BEGIN
       , SQLERRM -- Sql Error Message (固定值)
       , dbms_utility.format_error_backtrace -- Sql Error Trace (固定值)
       , EmpNo -- 發動預存程序的員工編號
+      , JobTxSeq -- 啟動批次的交易序號
     );
+    COMMIT;
+    RAISE;
   END;
 END;

@@ -35,6 +35,8 @@ public class L6CdEmpIns extends BatchBase implements Tasklet, InitializingBean {
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
+		String txSeq = chunkContext.getStepContext().getStepExecution().getExecutionContext().getString("txSeq");
+		this.titaVo.putParam("JobTxSeq", txSeq);
 		// 第二個參數
 		// D=日批
 		// M=月批
@@ -47,7 +49,9 @@ public class L6CdEmpIns extends BatchBase implements Tasklet, InitializingBean {
 
 		String empNo = titaVo.getTlrNo();
 
-		sJobMainService.Usp_L6_CdEmp_Ins(empNo, titaVo);
+		String txSeq = titaVo.getParam("JobTxSeq");
+
+		sJobMainService.Usp_L6_CdEmp_Ins(empNo, txSeq, titaVo);
 	}
 
 }

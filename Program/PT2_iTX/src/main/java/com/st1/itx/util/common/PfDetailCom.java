@@ -147,7 +147,7 @@ public class PfDetailCom extends TradeBuffer {
 	private int workMonth; // 工作月(西元)
 	private int workSeason; // 工作季(西元)
 	private int workMonthDrawdown; // 撥款工作月(西元)
-	private boolean isRerun = false;
+	private boolean isReCompute = false;
 	private String bsOfficer = "";
 	private DecimalFormat mDecimalFormat = new DecimalFormat("#,###");
 
@@ -171,7 +171,7 @@ public class PfDetailCom extends TradeBuffer {
 		workMonth = 0;
 		workSeason = 0;
 		workMonthDrawdown = 0;
-		isRerun = false;
+		isReCompute = false;
 		bsOfficer = "";
 	}
 
@@ -209,9 +209,9 @@ public class PfDetailCom extends TradeBuffer {
 		}
 
 		// 重新計算業績
-		isRerun = false;
-		if ("Y".equals(iPf.getEmpResetFg()) || "N".equals(iPf.getEmpResetFg())) {
-			isRerun = true;
+		isReCompute = false;
+		if ("Y".equals(iPf.getEmpResetFg()) || "R".equals(iPf.getEmpResetFg()) || "N".equals(iPf.getEmpResetFg())) {
+			isReCompute = true;
 		}
 
 		// 部分償還、提前結案，已攤還期數>=3期，則跳過不處理
@@ -628,7 +628,7 @@ public class PfDetailCom extends TradeBuffer {
 		this.info("subject=" + subject + " ,bodyText=" + bodyText);
 
 		// 重算業績不處理
-		if (isRerun) {
+		if (isReCompute) {
 			return;
 		}
 
@@ -1289,13 +1289,18 @@ public class PfDetailCom extends TradeBuffer {
 	/* 設定業績明細欄位值 */
 	private PfDetail setPfDetail(PfDetail pf) throws LogicException {
 		this.info("PfDetailCom setPfDetail ...");
-		// 還款、計件代碼變更、重轉時更新記號=N => 抓最新介紹人及所屬資料(變動 by L5501房貸介紹人業績案件維護)
-		boolean isReNewEmpUnit = true;
-		if (pf.getRepayType() > 0 || "N".equals(pf.getIsReNewEmpUnit())) {
-			isReNewEmpUnit = false;
+// 業績重算註記
+//		Y:業績重算時以新員工資料更新介紹人所屬單位及介紹人、協辦是否為15日薪
+//		R:資料轉換業績重算(以新員工資料更新介紹人、協辦是否為15日薪)
+//		N:業績重算時不以新員工資料更新
+//		NULL:正常交易
+// 還款或更新記號=Y => 抓最新介紹人及所屬資料(變動 by L5501房貸介紹人業績案件維護)
+		boolean isNewEmpUnit = true;
+		if (pf.getRepayType() > 0 || "N".equals(pf.getIsReNewEmpUnit()) || "R".equals(pf.getIsReNewEmpUnit())) {
 			PfItDetail It = pfItDetailService.findBormNoLatestFirst(pf.getCustNo(), pf.getFacmNo(), pf.getBormNo(),
 					titaVo);
 			if (It != null) {
+				isNewEmpUnit = false;
 				pf.setUnitCode(It.getUnitCode());
 				pf.setDistCode(It.getDistCode());
 				pf.setDeptCode(It.getDeptCode());
@@ -1304,15 +1309,25 @@ public class PfDetailCom extends TradeBuffer {
 				pf.setDeptManager(It.getDeptManager());
 			}
 		}
+//		// 是否為15日薪人員，不論是否重轉均以員工檔現況判斷。
+// 還款或更新記號=Y => 抓最新介紹人及所屬資料(變動 by L5501房貸介紹人業績案件維護)
+		boolean isNewDay15 = true;
+		if (pf.getRepayType() > 0 || "N".equals(pf.getIsReNewEmpUnit())) {
+			isNewDay15 = false;
+		}
+		if (isNewDay15) {
+			pf.setIsIntroducerDay15("");
+			pf.setIsCoorgnizerDay15("");
+		}
 		// 介紹人是否為15日薪(Y/Null)，單位代號(介紹人)
 		CdEmp introducerCdEmp = null;
 		if (!"".equals(pf.getIntroducer())) {
 			introducerCdEmp = cdEmpService.findById(pf.getIntroducer(), titaVo);
 			if (introducerCdEmp != null) {
-				if (employeeCom.isDay15Salary(introducerCdEmp, titaVo)) {
+				if (isNewDay15 && employeeCom.isDay15Salary(introducerCdEmp, titaVo)) {
 					pf.setIsIntroducerDay15("Y");
 				}
-				if ("".equals(pf.getUnitCode())) {
+				if (isNewEmpUnit) {
 					pf.setUnitCode(introducerCdEmp.getCenterCode());
 				}
 			}
@@ -1322,7 +1337,7 @@ public class PfDetailCom extends TradeBuffer {
 		if (!"".equals(pf.getCoorgnizer())) {
 			CdEmp tCdEmp = cdEmpService.findById(pf.getCoorgnizer(), titaVo);
 			if (tCdEmp != null) {
-				if (employeeCom.isDay15Salary(tCdEmp, titaVo)) {
+				if (isNewDay15 && employeeCom.isDay15Salary(tCdEmp, titaVo)) {
 					pf.setIsCoorgnizerDay15("Y");
 				}
 			}
@@ -1394,7 +1409,7 @@ public class PfDetailCom extends TradeBuffer {
 		}
 
 		// 區部、部室及處經理代號、區經理代號、部經理代號
-		if (!"".equals(pf.getUnitCode()) && "".equals(pf.getDistCode())) {
+		if (isNewEmpUnit) {
 			// 分公司資料檔
 			CdBcm tCdBcm = cdBcmService.findById(pf.getUnitCode(), titaVo);
 			if (tCdBcm == null) {
@@ -1407,13 +1422,13 @@ public class PfDetailCom extends TradeBuffer {
 			pf.setDeptCode(tCdBcm.getDeptCode()); // 部室代號(介紹人)
 			pf.setUnitManager(tCdBcm.getUnitManager()); // 處經理代號(介紹人)
 			pf.setDeptManager(tCdBcm.getDeptManager()); // 部經理代號(介紹人)
-		}
-		// 區經理 : CdEmp(員工資料檔)的AgLevel(業務人員職等)第一碼為'H'為區經理
-		// 介紹人本身為區經理,否則依序找上層主管直到找到區經理
-		if (introducerCdEmp != null && "".equals(pf.getDistManager())) {
-			String deptManage = employeeCom.getDistManager(introducerCdEmp, titaVo);
-			if (deptManage != null) {
-				pf.setDistManager(deptManage); // 區經理代號(介紹人)
+			// 區經理 : CdEmp(員工資料檔)的AgLevel(業務人員職等)第一碼為'H'為區經理
+			// 介紹人本身為區經理,否則依序找上層主管直到找到區經理
+			if (introducerCdEmp != null && "".equals(pf.getDistManager())) {
+				String deptManage = employeeCom.getDistManager(introducerCdEmp, titaVo);
+				if (deptManage != null) {
+					pf.setDistManager(deptManage); // 區經理代號(介紹人)
+				}
 			}
 		}
 

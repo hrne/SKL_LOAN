@@ -212,6 +212,10 @@ public class L6904 extends TradeBuffer {
 //			}
 
 			totalCnt = totalCnt + 1;
+			
+			
+
+			
 			// 第一筆小計
 			if (totalCnt == 1) {
 				acNoCode = tAcDetail.getAcNoCode();
@@ -220,15 +224,15 @@ public class L6904 extends TradeBuffer {
 				sumNo = tAcDetail.getSumNo();
 				titaTlrNo = tAcDetail.getTitaTlrNo();
 				titaBatchNo = tAcDetail.getTitaBatchNo();
-				
+
+				tLastUpdateEmpNo = tAcDetail.getCreateEmpNo();
+
 				CdEmp iCdEmp = iCdEmpService.findById(tAcDetail.getCreateEmpNo(), titaVo);
 				if (iCdEmp == null) {
 					tLastUpdateEmpNoX = "";
 				} else {
 					tLastUpdateEmpNoX  = iCdEmp.getFullname();
 				}
-				
-				tLastUpdateEmpNo = tAcDetail.getCreateEmpNo();
 				
 				dscptCode = tAcDetail.getDscptCode();
 				if (tAcDetail.getSlipNote() != null) {
@@ -259,6 +263,13 @@ public class L6904 extends TradeBuffer {
 					crCnt = crCnt + 1;
 				}
 				continue;
+			}
+			tLastUpdateEmpNo = tAcDetail.getCreateEmpNo();
+			CdEmp iCdEmp = iCdEmpService.findById(tAcDetail.getCreateEmpNo(), titaVo);
+			if (iCdEmp == null) {
+				tLastUpdateEmpNoX = "";
+			} else {
+				tLastUpdateEmpNoX  = iCdEmp.getFullname();
 			}
 			
 			dAcSubBookCode = tAcDetail.getAcSubBookCode();

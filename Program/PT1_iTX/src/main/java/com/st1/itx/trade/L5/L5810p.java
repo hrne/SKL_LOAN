@@ -81,7 +81,7 @@ public class L5810p extends TradeBuffer {
 		this.info("acct = " + acct);
 
 		// 發動Usp
-		sJobMainService.Usp_L9_YearlyHouseLoanInt_Upd(tbsdyf, empNo, startMonth, endMonth, custNo, acct, titaVo);
+		sJobMainService.Usp_L9_YearlyHouseLoanInt_Upd(tbsdyf, empNo, startMonth, endMonth, custNo, acct,"", titaVo);
 
 		titaVo.putParam("Year", (startMonth - 191100) / 100);
 		// 產生檢核檔

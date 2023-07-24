@@ -130,12 +130,16 @@ public class BS996 extends TradeBuffer {
 		this.info("active BS996 ......");
 		pfDetailCom.setTxBuffer(this.getTxBuffer());
 		loanCom.setTxBuffer(this.getTxBuffer());
-		// 業績起日, 是否更新員工資料相關欄Y/N, 起戶號, 止戶號
+		// 業績起日, 是否更新員工資料相關欄Y/R/N, 起戶號, 止戶號
+		//業績重算註記
+		//Y:業績重算時以新員工資料更新介紹人所屬單位及介紹人、協辦是否為15日薪
+		//R:資料轉換業績重算(以新員工資料更新介紹人、協辦是否為15日薪)
+		//N:業績重算時不以新員工資料更新
 		// Parm = 1090101,N,0,0
 		String[] strAr = titaVo.getParam("Parm").split(",");
 		List<String> strList = Arrays.asList(strAr);
-		if (strList.size() != 4 || (!"Y".equals(strAr[1]) && !"N".equals(strAr[1]))) {
-			throw new LogicException(titaVo, "E0000", "參數：EX.1090402,Y,1,9999999( 業績起日,是否更新員工資料欄Y/N, 起戶號, 止戶號)");
+		if (strList.size() != 4 || (!"Y".equals(strAr[1]) && !"R".equals(strAr[1]) && !"N".equals(strAr[1]))) {
+			throw new LogicException(titaVo, "E0000", "參數：EX.1090402,Y,1,9999999( 業績起日,是否更新員工資料欄Y/R/N, 起戶號, 止戶號)");
 		}
 		iAcdate = this.parse.stringToInteger(strAr[0]); // 業績起日
 		iEmpResetFg = strAr[1]; // 是否更新員工資料欄
@@ -182,7 +186,7 @@ public class BS996 extends TradeBuffer {
 	private void updatePf(TitaVo titaVo) throws LogicException {
 		this.info("iAcdate=" + iAcdate + " , iEmpResetFg=" + iEmpResetFg + ", iCustNoS=" + iCustNoS + ", iCustNoE="
 				+ iCustNoE);
-        // 抓取業績已做人工調整的戶號、額度
+		// 抓取業績已做人工調整的戶號、額度
 		try {
 			adjustList = bs996ServiceImpl.findAdjustList(iAcdate + 19110000, titaVo);
 		} catch (Exception e) {
@@ -271,12 +275,12 @@ public class BS996 extends TradeBuffer {
 	}
 
 	private boolean checkAdjust(int custNo, int facmNo, TitaVo titaVo) throws LogicException {
-	// 檢查該戶號、額度是否已人工調整
+		// 檢查該戶號、額度是否已人工調整
 		if (adjustList != null) {
 			for (Map<String, String> d : adjustList) {
 				if (parse.stringToInteger(d.get("CustNo")) == custNo
 						&& parse.stringToInteger(d.get("FacmNo")) == facmNo) {
-					this.info("CheckAdjust ture CustNo=" + custNo + " FacmNo=" + facmNo );
+					this.info("CheckAdjust ture CustNo=" + custNo + " FacmNo=" + facmNo);
 					return true;
 				}
 			}

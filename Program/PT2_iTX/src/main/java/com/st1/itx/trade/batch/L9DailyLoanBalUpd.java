@@ -35,6 +35,8 @@ public class L9DailyLoanBalUpd extends BatchBase implements Tasklet, Initializin
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
+		String txSeq = chunkContext.getStepContext().getStepExecution().getExecutionContext().getString("txSeq");
+		this.titaVo.putParam("JobTxSeq", txSeq);
 		// 第二個參數
 		// D=日批
 		// M=月批
@@ -54,7 +56,9 @@ public class L9DailyLoanBalUpd extends BatchBase implements Tasklet, Initializin
 		// 此為日終維護,讀onlineDB
 //		this.titaVo.putParam(ContentName.dataBase, ContentName.onLine);
 
-		sJobMainService.Usp_L9_DailyLoanBal_Upd(tbsdyf, empNo, mfbsdyf, titaVo);
+		String txSeq = titaVo.getParam("JobTxSeq");
+
+		sJobMainService.Usp_L9_DailyLoanBal_Upd(tbsdyf, empNo, mfbsdyf, txSeq, titaVo);
 	}
 
 }

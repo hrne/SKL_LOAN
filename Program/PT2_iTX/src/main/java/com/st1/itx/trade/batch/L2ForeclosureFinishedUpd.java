@@ -40,6 +40,8 @@ public class L2ForeclosureFinishedUpd extends BatchBase implements Tasklet, Init
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
+		String txSeq = chunkContext.getStepContext().getStepExecution().getExecutionContext().getString("txSeq");
+		this.titaVo.putParam("JobTxSeq", txSeq);
 		// 第二個參數
 		// D=日批
 		// M=月批
@@ -57,7 +59,9 @@ public class L2ForeclosureFinishedUpd extends BatchBase implements Tasklet, Init
 		this.info("L2ForeclosureFinishedUpd tbsdyf = " + tbsdyf);
 		this.info("L2ForeclosureFinishedUpd empNo = " + empNo);
 
-		sJobMainService.Usp_L2_ForeclosureFinished_Upd(tbsdyf, empNo, titaVo);
+		String txSeq = titaVo.getParam("JobTxSeq");
+
+		sJobMainService.Usp_L2_ForeclosureFinished_Upd(tbsdyf, empNo, txSeq, titaVo);
 	}
 
 }

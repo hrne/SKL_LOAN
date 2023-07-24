@@ -42,12 +42,10 @@ public class LY007p extends TradeBuffer {
 
 		lY007Report.setParentTranCode(parentTranCode);
 
-		boolean isFinish = lY007Report.exec(titaVo);
-		if (isFinish) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "LY007 Z100關係人交易明細表已完成", titaVo);
-		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "LY007 Z100關係人交易明細表查無資料", titaVo);
-		}
+		lY007Report.exec(titaVo);
+
+		webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getParam("TLRNO"), "Y",
+				"LC009", titaVo.getParam("TLRNO"), "LY007 Z100關係人交易明細表 已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

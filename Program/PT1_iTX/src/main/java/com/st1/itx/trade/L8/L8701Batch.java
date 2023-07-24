@@ -91,7 +91,7 @@ public class L8701Batch extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("active BS996 ......");
+		this.info("active L8701Batch ......");
 		iTbsdy = titaVo.getEntDyI();
 		iTbsdyf = iTbsdy + 19110000;
 		String iCode = "";

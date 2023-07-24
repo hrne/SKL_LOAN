@@ -48,19 +48,21 @@ public class DailyCopyProcess extends TradeBuffer {
 		this.info("DailyCopyProcess tlrNo = " + tlrNo);
 		this.info("DailyCopyProcess targetEnv = " + targetEnv);
 
+		String txSeq = titaVo.getParam("JobTxSeq");
+
 		try {
 			// 關閉全部ForeignKey
 			this.info("DailyCopyProcess 關閉全部ForeignKey ...");
-			sJobMainService.Usp_Cp_ForeignKeyControl_Upd(tbsdyf, tlrNo, 0, titaVo);
+			sJobMainService.Usp_Cp_ForeignKeyControl_Upd(tbsdyf, tlrNo, 0, txSeq, titaVo);
 			doCommit();
 
 			// 複製資料
-			sJobMainService.Usp_L9_DailyBackup_Copy(tbsdyf, tlrNo, titaVo);
+			sJobMainService.Usp_L9_DailyBackup_Copy(tbsdyf, tlrNo, txSeq, titaVo);
 			doCommit();
 
 			// 開啟全部ForeignKey
 			this.info("DailyCopyProcess 開啟全部ForeignKey ...");
-			sJobMainService.Usp_Cp_ForeignKeyControl_Upd(tbsdyf, tlrNo, 1, titaVo);
+			sJobMainService.Usp_Cp_ForeignKeyControl_Upd(tbsdyf, tlrNo, 1, txSeq, titaVo);
 			doCommit();
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();

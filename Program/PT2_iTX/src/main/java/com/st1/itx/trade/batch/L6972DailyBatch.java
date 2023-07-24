@@ -39,6 +39,8 @@ public class L6972DailyBatch extends BatchBase implements Tasklet, InitializingB
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
+		String txSeq = chunkContext.getStepContext().getStepExecution().getExecutionContext().getString("txSeq");
+		this.titaVo.putParam("JobTxSeq", txSeq);
 		// 第二個參數
 		// D=日批
 		// M=月批

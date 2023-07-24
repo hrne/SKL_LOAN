@@ -42,7 +42,7 @@ public class LY005Report extends MakeReport {
 	private BigDecimal totalEquity = BigDecimal.ZERO;
 	private String equityDataMonthOutput = "";
 
-	public boolean exec(TitaVo titaVo) throws LogicException {
+	public void exec(TitaVo titaVo) throws LogicException {
 
 		int inputYearMonth = (Integer.valueOf(titaVo.getParam("RocYear")) + 1911) * 100 + 12;
 
@@ -93,9 +93,6 @@ public class LY005Report extends MakeReport {
 				.setRptItem(fileItem).build();
 		// 開啟報表
 		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
-		// makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LY005",
-		// "非RBC_表20_會計部年度檢查報表", "LY005_非RBC_表20_會計部年度檢查報表",
-		// "LY005_底稿_非RBC_表20_會計部年度檢查報表.xlsx", "YYY.MM");
 
 		String entdy = String.valueOf(inputYearMonth - 191100);
 
@@ -127,7 +124,11 @@ public class LY005Report extends MakeReport {
 				makeExcel.setValue(rowCursor, 2, seq, "C"); // 列號
 
 				BigDecimal loanBal = getBigDecimal(tLDVo.get("LoanBal"));
+
+				txAmtTotal = txAmtTotal.add(loanBal);
+
 				BigDecimal gPercent = this.computeDivide(loanBal, totalEquity, 4);
+
 				makeExcel.setValue(rowCursor, 3, tLDVo.get("Rel"));// 與本公司之關係
 				makeExcel.setValue(rowCursor, 4, tLDVo.get("CustNo"));// 交易對象代號
 				makeExcel.setValue(rowCursor, 5, tLDVo.get("CustName"));// 交易對象名稱
@@ -136,12 +137,12 @@ public class LY005Report extends MakeReport {
 				makeExcel.setValue(rowCursor, 8, tLDVo.get("BdLocation"));// 交易標的內容
 				makeExcel.setValue(rowCursor, 9, tLDVo.get("DrawdownDate"));// 交易日期
 				makeExcel.setValue(rowCursor, 10, loanBal);// 交易金額
-				makeExcel.setValue(rowCursor, 11, tLDVo.get("F8"));// 最近交易日之參考市價
-				makeExcel.setValue(rowCursor, 12, tLDVo.get("F9"));// 已實現損益
-				makeExcel.setValue(rowCursor, 13, tLDVo.get("F10"));// 未實現損益
-				makeExcel.setValue(rowCursor, 14, gPercent, "C");// 交易金額占業主權益比率%
+				makeExcel.setValue(rowCursor, 11, "");// 最近交易日之參考市價
+				makeExcel.setValue(rowCursor, 12, "");// 已實現損益
+				makeExcel.setValue(rowCursor, 13, "");// 未實現損益
+				makeExcel.setValue(rowCursor, 14, gPercent, "0.0000", "C");// 交易金額占業主權益比率%
 				makeExcel.setValue(rowCursor, 15, tLDVo.get("Supervisor"), "C");// 最後決定權人員
-				makeExcel.setValue(rowCursor, 16, tLDVo.get("F13"));// 備註
+				makeExcel.setValue(rowCursor, 16, "");// 備註
 
 				rowCursor++;
 				seq++;
@@ -158,14 +159,9 @@ public class LY005Report extends MakeReport {
 			// 無資料時處理
 			makeExcel.setValue(5, 5, "本日無資料", "L");
 
-			makeExcel.close();
-
-			return false;
 		}
 
 		makeExcel.close();
-
-		return true;
 
 	}
 

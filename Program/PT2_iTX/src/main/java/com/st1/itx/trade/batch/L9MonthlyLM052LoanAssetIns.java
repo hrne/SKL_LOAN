@@ -35,6 +35,8 @@ public class L9MonthlyLM052LoanAssetIns extends BatchBase implements Tasklet, In
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
+		String txSeq = chunkContext.getStepContext().getStepExecution().getExecutionContext().getString("txSeq");
+		this.titaVo.putParam("JobTxSeq", txSeq);
 		// 第二個參數
 		// D=日批
 		// M=月批
@@ -54,7 +56,9 @@ public class L9MonthlyLM052LoanAssetIns extends BatchBase implements Tasklet, In
 		// 此為月底日日終批次,讀onlineDB
 //		this.titaVo.putParam(ContentName.dataBase, ContentName.onLine);
 
-		sJobMainService.Usp_L9_MonthlyLM052LoanAsset_Ins(tbsdyf, empNo, titaVo);
+		String txSeq = titaVo.getParam("JobTxSeq");
+
+		sJobMainService.Usp_L9_MonthlyLM052LoanAsset_Ins(tbsdyf, empNo, txSeq, titaVo);
 	}
 
 }

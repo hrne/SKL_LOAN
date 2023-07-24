@@ -91,10 +91,10 @@ public class L8401 extends TradeBuffer {
 			if (!dateUtil.isHoliDay()) {
 				this.info("execDate " + execDate + " is not holiday exec usp ...");
 				if (titaVo.get("DAILY1").equals("Y")) {
-					jobMainService.Usp_L8_JcicB204_Upd(execDate, titaVo.getTlrNo(), titaVo);
+					jobMainService.Usp_L8_JcicB204_Upd(execDate, titaVo.getTlrNo(),"", titaVo);
 				}
 				if (titaVo.get("DAILY2").equals("Y")) {
-					jobMainService.Usp_L8_JcicB211_Upd(execDate, titaVo.getTlrNo(), titaVo);
+					jobMainService.Usp_L8_JcicB211_Upd(execDate, titaVo.getTlrNo(),"", titaVo);
 				}
 				this.info("execDate " + execDate + " exec usp finished.");
 			}

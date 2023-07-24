@@ -29,6 +29,9 @@ public class EomFinal extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+
+		String txSeq = chunkContext.getStepContext().getStepExecution().getExecutionContext().getString("txSeq");
+		this.titaVo.putParam("JobTxSeq", txSeq);
 		// 第二個參數
 		// D=日批
 		// M=月批
@@ -56,7 +59,7 @@ public class EomFinal extends BatchBase implements Tasklet, InitializingBean {
 			// TODO: 非年底日,發動Oracle DB鏡像備份
 			throw new LogicException("S0001", "本日非年底日,啟動備份.");
 		}
-
+		
 		this.info("EomFinal exit.");
 	}
 }

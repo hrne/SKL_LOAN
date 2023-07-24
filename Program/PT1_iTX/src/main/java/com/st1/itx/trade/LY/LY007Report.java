@@ -38,7 +38,7 @@ public class LY007Report extends MakeReport {
 	private BigDecimal totalEquity = BigDecimal.ZERO;
 	private String equityDataMonthOutput = "";
 
-	public boolean exec(TitaVo titaVo) throws LogicException {
+	public void exec(TitaVo titaVo) throws LogicException {
 
 		this.info("LY007Report exec");
 
@@ -100,21 +100,11 @@ public class LY007Report extends MakeReport {
 
 		makeExcel.setValue(2, 2, inputYearMonth, "L"); // 申報年月
 
-		eptExcel(lY007List, titaVo);
-
-		return true;
-
-	}
-
-	private void eptExcel(List<Map<String, String>> lY007List, TitaVo titaVo) throws LogicException {
-
-		this.info("eptExcel");
 		int iYear = Integer.valueOf(titaVo.getParam("RocYear"));
 
 		if (lY007List != null && !lY007List.isEmpty()) {
 
 			int rowCursor = 8; // 列指標
-//			this.info("有值");
 
 			makeExcel.setShiftRow(9, lY007List.size() - 2);
 
@@ -150,7 +140,6 @@ public class LY007Report extends MakeReport {
 			makeExcel.setValue(8, 1, "本日無資料", "L");
 		}
 		makeExcel.close();
-		this.info("eptExcel close");
 	}
 
 }

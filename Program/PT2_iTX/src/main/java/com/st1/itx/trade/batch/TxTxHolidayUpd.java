@@ -35,6 +35,8 @@ public class TxTxHolidayUpd extends BatchBase implements Tasklet, InitializingBe
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
+		String txSeq = chunkContext.getStepContext().getStepExecution().getExecutionContext().getString("txSeq");
+		this.titaVo.putParam("JobTxSeq", txSeq);
 		// 第二個參數
 		// D=日批
 		// M=月批
@@ -47,7 +49,9 @@ public class TxTxHolidayUpd extends BatchBase implements Tasklet, InitializingBe
 
 		String empNo = titaVo.getTlrNo();
 
-		sJobMainService.Usp_Tx_TxHoliday_Ins(empNo, titaVo);
+		String txSeq = titaVo.getParam("JobTxSeq");
+
+		sJobMainService.Usp_Tx_TxHoliday_Ins(empNo, txSeq, titaVo);
 	}
 
 }

@@ -56,6 +56,9 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 		this.info("step startTime  : " + startTime);
 
 		this.updtaeJobDetail(jobId, nestedJobId, stepId, execDate, startTime, true, stepExecution);
+
+		String txSeq = stepExecution.getJobExecution().getJobParameters().getString(ContentName.txSeq);
+		stepExecution.getExecutionContext().put("txSeq", txSeq);
 	}
 
 	@Override

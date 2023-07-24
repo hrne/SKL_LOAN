@@ -538,7 +538,7 @@ ifxBatch:{
 #any={detail:true, caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
 #OOBTN6=
-{width:100,search:false,formatter:'cust:bind-button:總帳傳票資料傳輸;L7400 總帳傳票資料傳輸',align:'center',canExport:false}
+{width:100,search:false,formatter:'cust:bind-button:;',align:'center',canExport:false}
 
 #OOStatus_LB=狀態
 {width:80,align:'center'}

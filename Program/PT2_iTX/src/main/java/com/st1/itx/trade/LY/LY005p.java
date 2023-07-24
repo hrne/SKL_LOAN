@@ -42,12 +42,8 @@ public class LY005p extends TradeBuffer {
 
 		lY005Report.setParentTranCode(parentTranCode);
 
-		boolean isFinish = lY005Report.exec(titaVo);
-		if (isFinish) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "LY005 非RBC_表20_會計部年度檢查報表已完成", titaVo);
-		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "LY005 非RBC_表20_會計部年度檢查報表查無資料", titaVo);
-		}
+		webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getParam("TLRNO"), "Y",
+				"LC009", titaVo.getParam("TLRNO"), "LY005 非RBC_表20_會計部年度檢查報表 已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

@@ -144,15 +144,6 @@ public class TxToDoCom extends TradeBuffer {
 				bormNo = parse.stringToInteger(titaVo.getMrKey().substring(12, 15));
 			}
 		}
-		if ("L3100".equals(titaVo.getTxcd())) {
-			tTempVo = new TempVo();
-			tTempVo.clear();
-			tTempVo.putParam("BormNo", bormNo);
-		}
-
-		if (titaVo.get("TxBormNo") != null) {
-			bormNo = this.parse.stringToInteger(titaVo.getParam("TxBormNo"));
-		}
 
 		String iDtlValue = titaVo.get("TxDtlValue");
 		if (iDtlValue == null || iDtlValue.trim().length() == 0)
@@ -721,7 +712,7 @@ public class TxToDoCom extends TradeBuffer {
 			settingValue = "BDLW00;Y;Y;-;Y;Y;L6987;L6987;L618E;Y;呆帳戶法務費墊付";
 			break;
 		case "BDCL00":
-			settingValue = "BDCL00;Y;C;-;-;-;L698A;L698A;L3731;-;呆帳還清待結案";
+			settingValue = "BDCL00;Y;C;-;-;-;L698A;     ;L3731;-;呆帳還清待結案";
 			break;
 		case "SLCL00":
 			settingValue = "SLCL00;Y;C;-;-;-;L6989;L6989;L3230;Y;企金費用攤提入帳";
@@ -730,7 +721,7 @@ public class TxToDoCom extends TradeBuffer {
 			settingValue = "EMRT00;Y;C;-;Y;-;L4030;L4030;L3721;-;員工利率調整";
 			break;
 		case "EMCU00":
-			settingValue = "EMCU00;Y;C;-;Y;-;L698A;L698A;L1103;-;員工客戶別調整";
+			settingValue = "EMCU00;Y;C;-;Y;-;L698A;     ;L1103;-;員工客戶別調整";
 			break;
 		case "ACHP00":
 			settingValue = "ACHP00;Y;Y;-;-;-;L698A;L4040;L4040;-;產生ACH授權資料";

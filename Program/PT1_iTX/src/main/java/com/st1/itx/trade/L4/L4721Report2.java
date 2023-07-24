@@ -238,7 +238,8 @@ public class L4721Report2 extends TradeBuffer {
 					// 1.by 戶號 額度一定是0，只會六筆
 					// 2.by 額度 不同額度 會各有六筆
 					// 當前額度和下一筆額度不同才進入
-					if (tempFacmNo != tempNextFacmNo || tempCustNo != tempNextCustNo || cntNext == rDetail.size()) { // 只要不同戶號或不同額度
+					if (tempFacmNo != tempNextFacmNo || tempCustNo != tempNextCustNo
+							|| (cntNext - 1) == rDetail.size()) { // 只要不同戶號或不同額度
 						// 印04並且切到下一個額度循環
 						// 04
 						cntNext = 1;
@@ -255,8 +256,12 @@ public class L4721Report2 extends TradeBuffer {
 							this.info("r2 tempFacmNo =" + parse.stringToInteger(r2.get("FacmNo")));
 							if (tempFacmNo == parse.stringToInteger(r2.get("FacmNo")) || tempFacmNo == 0) {
 
-								BigDecimal presentRate = parse.stringToBigDecimal(r1.get("PresentRate"));
-								BigDecimal adjustedRate = parse.stringToBigDecimal(r1.get("AdjustedRate"));
+								BigDecimal presentRate = new BigDecimal(r1.get("PresentRate"));
+								BigDecimal adjustedRate = new BigDecimal(r1.get("AdjustedRate"));
+
+								this.info("presentRate =" + presentRate.toString());
+								this.info("adjustedRate =" + adjustedRate.toString());
+								
 								if (presentRate.compareTo(adjustedRate) != 0) {
 									line = "";
 									line += "45";

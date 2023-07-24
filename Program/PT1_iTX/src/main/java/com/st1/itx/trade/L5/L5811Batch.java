@@ -85,7 +85,7 @@ public class L5811Batch extends TradeBuffer {
 
 		// 發動產生檢核檔的StoredProcedure
 		sJobMainService.Usp_L9_YearlyHouseLoanIntCheck_Upd(titaVo.getEntDyI(), titaVo.getTlrNo(), iYYYYMM, iStartMonth,
-				iEndMonth, iCustNo, iAcctCode, titaVo);
+				iEndMonth, iCustNo, iAcctCode,"", titaVo);
 
 		try {
 			makeExcel(iYear, iYYYYMM, iCustNo, iAcctCode, iStartMonth, iEndMonth, titaVo);
