@@ -72,7 +72,7 @@ T(3,CdCode.StepCode)
 ! 選單內容
 #BatchResultCodeH=x,100,S
 #JobCodeH=x,1000,S
-#StepCodeH=x,1000,S
+#StepCodeH=x,10000,S
 
 ! 根據選單代碼取得選單內容
 #HelpRim=X,1,S

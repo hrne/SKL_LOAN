@@ -238,8 +238,7 @@ public class L4721Report2 extends TradeBuffer {
 					// 1.by 戶號 額度一定是0，只會六筆
 					// 2.by 額度 不同額度 會各有六筆
 					// 當前額度和下一筆額度不同才進入
-					if (tempFacmNo != tempNextFacmNo || tempCustNo != tempNextCustNo
-							|| cntNext == (rDetail.size() - 1)) { // 只要不同戶號或不同額度
+					if (tempFacmNo != tempNextFacmNo || tempCustNo != tempNextCustNo || cntNext == rDetail.size()) { // 只要不同戶號或不同額度
 						// 印04並且切到下一個額度循環
 						// 04
 						cntNext = 1;

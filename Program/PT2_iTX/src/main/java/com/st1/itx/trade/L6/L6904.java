@@ -150,9 +150,15 @@ public class L6904 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
 		}
 		String dAcSubBookCode = "";
+		
+		int amtdbCnt = 0;
+		BigDecimal amtdbAmt = BigDecimal.ZERO;
+		int amtcrCnt = 0;
+		BigDecimal amtcrAmt = BigDecimal.ZERO;
+		int i =0;
 		// 如有找到資料
 		for (AcDetail tAcDetail : lAcDetail) {
-
+			i++;
 			this.info("L6904 AcNoCode : " + iAcBookCode + "-" + iAcNoCodeS + "-" + iAcSubCode + "-" + iAcDtlCode + "-" + tAcDetail.getAcNoCode() + "-" + tAcDetail.getAcSubCode() + "-"
 					+ tAcDetail.getAcDtlCode() + "-" + tAcDetail.getTxAmt() + "-" + tAcDetail.getAcBookFlag() + "-" + tAcDetail.getAcBookCode() + "-" + tAcDetail.getEntAc());
 
@@ -215,14 +221,14 @@ public class L6904 extends TradeBuffer {
 				titaTlrNo = tAcDetail.getTitaTlrNo();
 				titaBatchNo = tAcDetail.getTitaBatchNo();
 				
-				CdEmp iCdEmp = iCdEmpService.findById(tAcDetail.getLastUpdateEmpNo(), titaVo);
+				CdEmp iCdEmp = iCdEmpService.findById(tAcDetail.getCreateEmpNo(), titaVo);
 				if (iCdEmp == null) {
 					tLastUpdateEmpNoX = "";
 				} else {
 					tLastUpdateEmpNoX  = iCdEmp.getFullname();
 				}
 				
-				tLastUpdateEmpNo = tAcDetail.getLastUpdateEmpNo();
+				tLastUpdateEmpNo = tAcDetail.getCreateEmpNo();
 				
 				dscptCode = tAcDetail.getDscptCode();
 				if (tAcDetail.getSlipNote() != null) {
@@ -269,6 +275,27 @@ public class L6904 extends TradeBuffer {
 			occursList.putParam("OOLastUpdateEmpNo",tLastUpdateEmpNo);
 			occursList.putParam("OOLastUpdateEmpNoX",tLastUpdateEmpNoX);
 			
+			amtdbCnt += dbCnt;
+			if (i == lAcDetail.size()) {
+				occursList.putParam("OOamtdbCnt",amtdbCnt);
+			}
+
+			amtdbAmt = amtdbAmt.add(dbAmt);
+			if (i == lAcDetail.size()) {
+				occursList.putParam("OOamtdbAmt",amtdbAmt);
+			}
+			
+			amtcrCnt += crCnt;
+			if (i == lAcDetail.size()) {
+				occursList.putParam("OOamtcrCnt",amtcrCnt);
+			}
+			
+			amtcrAmt = amtcrAmt.add(crAmt);
+			if (i == lAcDetail.size()) {
+				occursList.putParam("OOamtcrAmt",amtcrAmt);
+			}
+
+			
 			switch (iInqType) {
 			case 0: // 全部彙計方式
 				occursList.putParam("OOInqData", "");
@@ -312,7 +339,7 @@ public class L6904 extends TradeBuffer {
 			titaTlrNo = tAcDetail.getTitaTlrNo();
 			titaBatchNo = tAcDetail.getTitaBatchNo();
 			dscptCode = tAcDetail.getDscptCode();
-			tLastUpdateEmpNo = tAcDetail.getLastUpdateEmpNo();
+			tLastUpdateEmpNo = tAcDetail.getCreateEmpNo();
 			if (tAcDetail.getSlipNote() != null) {
 				slipNote = tAcDetail.getSlipNote().trim();
 			}

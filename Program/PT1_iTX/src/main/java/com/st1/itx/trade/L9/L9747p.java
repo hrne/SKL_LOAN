@@ -44,19 +44,13 @@ public class L9747p extends TradeBuffer {
 		String parentTranCode = titaVo.getTxcd();
 
 		L9747Report.setParentTranCode(parentTranCode);
-		
-		int dataDate = Integer.valueOf(titaVo.getParam("dataDate"));
-//		this.info("dataDate = " + dataDate);
-				
-		boolean isFinish = L9747Report.exec(titaVo , dataDate);
 
-		if (isFinish) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), tranCode + tranName + " 已完成", titaVo);
-		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), tranCode + tranName + " 查無資料", titaVo);
-		}
+		int dataDate = Integer.valueOf(titaVo.getParam("dataDate"));
+
+		L9747Report.exec(titaVo, dataDate);
+
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
+				titaVo.getParam("TLRNO"), tranCode + tranName + " 已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

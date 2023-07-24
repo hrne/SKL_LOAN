@@ -57,14 +57,12 @@ public class LM030Report extends MakeReport {
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> listLM030) throws LogicException {
 		this.info("LM030Report exportExcel");
 
-//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM030", "轉催收明細總表", "LM030轉催收案件明細_核定總表",
-//				"LM030轉催收案件明細_核定總表.xlsx", "11005");
 
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "LM030";
-		String fileItem = "轉催收明細總表";
-		String fileName = "LM030轉催收案件明細_核定總表";
+		String fileItem = "轉催收案件明細";
+		String fileName = "LM030轉催收案件明細";
 		String defaultExcel = "LM030_底稿_轉催收案件明細_核定總表.xlsx";
 		String defaultSheet = "YYYMM";
 
@@ -87,7 +85,7 @@ public class LM030Report extends MakeReport {
 		int rocYM = yy * 100 + mm;
 
 		makeExcel.setSheet("YYYMM", rocYM + "");
-		makeExcel.setValue(1, 1, yy + "年 " + mm + " 月轉催收明細總表");
+		makeExcel.setValue(1, 1, yy + "年 " + mm + " 月轉催收明細表");
 		BigDecimal total = BigDecimal.ZERO;
 
 		int row = 3;
