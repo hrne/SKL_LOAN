@@ -68,7 +68,7 @@ BEGIN
         , S1."LMSLLD"                    AS "DrawdownDate"        -- 撥款日 DecimalD 8 0
         , RPAD(FAC."ProdNo",2,' ')       AS "ProdCode"            -- 商品代碼 VARCHAR2 5 0
         , S1."CASCDE"                    AS "PieceCode"           -- 計件代碼 VARCHAR2 1 0
-        , ''                             AS "CntingCode"          -- 是否計件 VARCHAR2 1 0
+        , S1."PRZCNT"                    AS "CntingCode"          -- 是否計件 VARCHAR2 1 0
         , S1."LMSFLA"                    AS "DrawdownAmt"         -- 撥款金額 DECIMAL 16 2
         , S1."BCMCOD"                    AS "UnitCode"            -- 單位代號 VARCHAR2 6 0
         , S1."UNTBRN"                    AS "DistCode"            -- 區部代號 VARCHAR2 6 0
@@ -77,7 +77,10 @@ BEGIN
         , S4."CUSEMP"                    AS "UnitManager"         -- 處經理 NVARCHAR2 8 0
         , S5."DistManager"               AS "DistManager"         -- 區經理 NVARCHAR2 8 0
         , S5."DeptManager"               AS "DeptManager"         -- 部經理 NVARCHAR2 8 0
-        , 1                              AS "PerfCnt"             -- 件數 DECIMAL 5 1
+        , CASE
+            WHEN S1."PRZCNT" = 'Y'
+            THEN 1
+          ELSE 0 END                     AS "PerfCnt"             -- 件數 DECIMAL 5 1
         , NVL(S1."YAG3LV",0)             AS "PerfEqAmt"           -- 換算業績 DECIMAL 16 2
         , NVL(S1."PAY3LV",0)             AS "PerfReward"          -- 業務報酬 DECIMAL 16 2
         , 0                              AS "PerfAmt"             -- 業績金額 DECIMAL 16 2
@@ -111,17 +114,27 @@ BEGIN
                 , QQ."ID7X"
                 , QQ."YAG3LV"
                 , QQ."PAY3LV"
-                , ROW_NUMBER() OVER (PARTITION BY A1."LMSLLD"
-                                                , A1."LMSACN"
-                                                , A1."LMSAPN"
-                                                , A1."LMSASQ"
-                                      ORDER BY "LMSFLA") AS "Seq"
+                , QQ."PRZCNT"
+                , ROW_NUMBER()
+                  OVER (
+                    PARTITION BY A1."LMSLLD"
+                               , A1."LMSACN"
+                               , A1."LMSAPN"
+                               , A1."LMSASQ"
+                    ORDER BY A1."LMSFLA"
+                           , CASE
+                               WHEN A1."LMSFLA" = QQ."APLUAM"
+                               THEN 0
+                               WHEN QQ."APLUAM" < A1."LMSFLA" 
+                               THEN 1
+                             ELSE 2 END
+                  ) AS "Seq"
             FROM "LN$AA1P" A1
             LEFT JOIN "TmpQQQP" QQ ON QQ."LMSACN" = A1."LMSACN"
                                   AND QQ."LMSAPN" = A1."LMSAPN"
                                   AND QQ."CASCDE" = A1."CASCDE"
-            WHERE NVL("LMSLLD",0) >= 20210101
-              AND NVL("LMSLLD",0) < 29101231) S1
+            WHERE NVL(A1."LMSLLD",0) >= 20210101
+              AND NVL(A1."LMSLLD",0) < 29101231) S1
     -- 計算累積撥款金額 (合計到額度層 ??? )
     LEFT JOIN "FacMain" FAC ON FAC."CustNo" = S1."LMSACN"
                            AND FAC."FacmNo" = S1."LMSAPN"

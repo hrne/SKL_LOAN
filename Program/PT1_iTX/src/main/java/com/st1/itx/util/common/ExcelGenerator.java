@@ -261,10 +261,13 @@ public class ExcelGenerator extends CommBuffer {
 	private void formulaCalculate(Map<String, Object> map) {
 		int calculateRow = Integer.parseInt(map.get("r").toString());
 		int calculateColumn = Integer.parseInt(map.get("c").toString());
+		this.info("MakeExcel.formulaCalculate calculateRow=" + calculateRow);
+		this.info("MakeExcel.formulaCalculate calculateColumn=" + calculateColumn);
 		Row pRow = this.sheet.getRow(calculateRow - 1);
 		if (pRow != null) {
 			Cell tmpCell = pRow.getCell(calculateColumn - 1);
 			if (tmpCell != null && tmpCell.getCellType() == CellType.FORMULA) {
+				this.info("MakeExcel.formulaCalculate do.");
 				this.workbook.getCreationHelper().createFormulaEvaluator().evaluateFormulaCell(tmpCell);
 			}
 		}

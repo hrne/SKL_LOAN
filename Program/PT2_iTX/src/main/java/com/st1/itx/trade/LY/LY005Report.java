@@ -107,7 +107,16 @@ public class LY005Report extends MakeReport {
 
 		makeExcel.setValue(1, 16, showRocDate(inputYearMonth * 100 + 31, 6)); // 資料日期
 
+		eptExcel(lY005List, titaVo);
+
+	}
+
+	private void eptExcel(List<Map<String, String>> lY005List, TitaVo titaVo) throws LogicException {
+
+		this.info("eptExcel");
+
 		int iYear = Integer.valueOf(titaVo.getParam("RocYear"));
+
 		if (lY005List != null && !lY005List.isEmpty()) {
 
 			int rowCursor = 5; // 列指標
@@ -162,7 +171,6 @@ public class LY005Report extends MakeReport {
 		}
 
 		makeExcel.close();
-
 	}
 
 }

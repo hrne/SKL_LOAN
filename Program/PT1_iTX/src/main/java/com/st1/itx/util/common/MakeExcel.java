@@ -294,9 +294,15 @@ public class MakeExcel extends CommBuffer {
 	 */
 	public void formulaRangeCalculate(int calculateRowTop, int calculateRowBottom, int calculateColumnLeft,
 			int calculateColumnRight) {
-		for (; calculateRowTop <= calculateRowBottom; calculateRowTop++)
-			for (; calculateColumnLeft <= calculateColumnRight; calculateColumnLeft++)
-				formulaCalculate(calculateRowTop, calculateColumnLeft);
+		this.info("calculateRowTop=" + calculateRowTop);
+		this.info("calculateRowBottom=" + calculateRowBottom);
+		this.info("calculateColumnLeft=" + calculateColumnLeft);
+		this.info("calculateColumnRight=" + calculateColumnRight);
+		for (int rowCursor = calculateRowTop; rowCursor <= calculateRowBottom; rowCursor++) {
+			for (int columnCursor = calculateColumnLeft; columnCursor <= calculateColumnRight; columnCursor++) {
+				formulaCalculate(rowCursor, columnCursor);
+			}
+		}
 	}
 
 	public int getDate() {

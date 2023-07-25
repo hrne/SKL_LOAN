@@ -252,8 +252,16 @@ T(2,#OOAcNoCode+-+#OOAcSubCode+-+#OOAcDtlCode)
 
 #OOSlipNote=X,60,S
 
+!經辦
+#OOLastUpdateEmpNo=X,8,S
+!經辦中文
+#OOLastUpdateEmpNoX=X,50,S
+
+!#OOLastUpdateEmpNo2X=X,58,L
+!T(2,#OOLastUpdateEmpNo+ +#OOLastUpdateEmpNoX)
+
 #OOSumNoX=X,20,S
-C(2,#InqType,S,T(H,#OOInqData,#SumNoTypeHelp),T(2,#OOInqData),T(2,#OOInqData),T(2,#OOSlipNote),T(2,#OOInqData),T(H,#OOInqData,#SecNoTypeHelp))
+C(2,#InqType,S,T(H,#OOInqData,#SumNoTypeHelp),T(2,#OOInqData+ +#OOLastUpdateEmpNoX),T(2,#OOInqData),T(2,#OOSlipNote),T(2,#OOInqData),T(H,#OOInqData,#SecNoTypeHelp))
 
 !借方筆數
 #OODbCnt=N,5,L
@@ -283,13 +291,14 @@ E(0,#OOCrAmt)
 IF(#OOCrAmt1==0,S,$)
 X(#OOCrAmt1)
 
-!經辦
-#OOLastUpdateEmpNo=X,8,S
-!經辦中文
-#OOLastUpdateEmpNoX=X,50,S
 
-#OOLastUpdateEmpNo2X=X,58,L
-T(2,#OOLastUpdateEmpNo+ +#OOLastUpdateEmpNoX)
+#OOamtdbCnt=m,14,S
+
+#OOamtdbAmt=m,14,S
+
+#OOamtcrCnt=m,14,S
+
+#OOamtcrAmt=m,14,S
 
 
 !明細
@@ -337,10 +346,26 @@ TXFORM=L6904
 #OOCrAmt
 #OOLastUpdateEmpNo
 #OOLastUpdateEmpNoX
+#OOamtdbCnt
+#OOamtdbAmt
+#OOamtcrCnt
+#OOamtcrAmt
+
 ^
 </sub>
 
 !--------- OUTPUT畫面 --------
+!---------- 單據輸出組合 ----------
+<sub type="PART" prompt='{{#SCRTIL}} world' name="L6904" layout="cols=3;screen.width=[200,300,100,400];order=1;">
+[
+["[L6904]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@日結彙計查詢@@@@"],
+[""],
+[#<->#,"@借方總筆數",#OOamtdbCnt],
+[#<->#,"@借方總金額",#OOamtdbAmt],
+[#<->#,"@貸方總筆數",#OOamtcrCnt],
+[#<->#,"@貸方總金額",#OOamtcrAmt],
+]
+</sub>
 
 !---------- 單據輸出組合 ----------
 <sub type="PART" name="L6904" layout="cols=1;screen.width=[150,1000];printer.width=[20,20];">
@@ -374,8 +399,6 @@ TXFORM=L6904
 {width:80,align:'right'}
 #OOCrAmtX=貸方金額
 {width:150,align:'right'}
-#OOLastUpdateEmpNo2X=經辦
-{width:150,align:'center'}
 
 ^
 <include src="PRT.icf::INQ01.sel" map="i=L6904;cpi=15"/>

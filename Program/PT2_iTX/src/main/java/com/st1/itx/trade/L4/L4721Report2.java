@@ -256,8 +256,8 @@ public class L4721Report2 extends TradeBuffer {
 							this.info("r2 tempFacmNo =" + parse.stringToInteger(r2.get("FacmNo")));
 							if (tempFacmNo == parse.stringToInteger(r2.get("FacmNo")) || tempFacmNo == 0) {
 
-								BigDecimal presentRate = new BigDecimal(r1.get("PresentRate"));
-								BigDecimal adjustedRate = new BigDecimal(r1.get("AdjustedRate"));
+								BigDecimal presentRate = new BigDecimal(r2.get("PresentRate"));
+								BigDecimal adjustedRate = new BigDecimal(r2.get("AdjustedRate"));
 
 								this.info("presentRate =" + presentRate.toString());
 								this.info("adjustedRate =" + adjustedRate.toString());

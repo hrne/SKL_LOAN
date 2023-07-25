@@ -16,7 +16,6 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.CdAcCode;
 import com.st1.itx.db.domain.CdAcCodeId;
-import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.CdAcCodeService;
 import com.st1.itx.db.service.CdEmpService;
@@ -84,11 +83,14 @@ public class L6904 extends TradeBuffer {
 		int dbCnt = 0;
 		int crCnt = 0;
 		
-		String tLastUpdateEmpNo = "";
-		String tLastUpdateEmpNoX = "";
-		
 		BigDecimal dbAmt = new BigDecimal(0);
 		BigDecimal crAmt = new BigDecimal(0);
+		
+		int dbCnt2 = 0;
+		int crCnt2 = 0;
+		
+		BigDecimal dbAmt2 = new BigDecimal(0);
+		BigDecimal crAmt2 = new BigDecimal(0);
 
 		this.index = titaVo.getReturnIndex();
 
@@ -159,6 +161,7 @@ public class L6904 extends TradeBuffer {
 		// 如有找到資料
 		for (AcDetail tAcDetail : lAcDetail) {
 			i++;
+
 			this.info("L6904 AcNoCode : " + iAcBookCode + "-" + iAcNoCodeS + "-" + iAcSubCode + "-" + iAcDtlCode + "-" + tAcDetail.getAcNoCode() + "-" + tAcDetail.getAcSubCode() + "-"
 					+ tAcDetail.getAcDtlCode() + "-" + tAcDetail.getTxAmt() + "-" + tAcDetail.getAcBookFlag() + "-" + tAcDetail.getAcBookCode() + "-" + tAcDetail.getEntAc());
 
@@ -192,7 +195,7 @@ public class L6904 extends TradeBuffer {
 
 //			if (tAcDetail.getAcBookFlag() == 0) {
 //				if (!(iAcBookCode.equals("000") || iAcBookCode.equals("10H"))) {
-//					this.info("L6904 4 ");
+//					this.info("L6904 4 "); 
 //					continue;
 //				}
 //			} else if (tAcDetail.getAcBookFlag() == 1) {
@@ -225,14 +228,6 @@ public class L6904 extends TradeBuffer {
 				titaTlrNo = tAcDetail.getTitaTlrNo();
 				titaBatchNo = tAcDetail.getTitaBatchNo();
 
-				tLastUpdateEmpNo = tAcDetail.getCreateEmpNo();
-
-				CdEmp iCdEmp = iCdEmpService.findById(tAcDetail.getCreateEmpNo(), titaVo);
-				if (iCdEmp == null) {
-					tLastUpdateEmpNoX = "";
-				} else {
-					tLastUpdateEmpNoX  = iCdEmp.getFullname();
-				}
 				
 				dscptCode = tAcDetail.getDscptCode();
 				if (tAcDetail.getSlipNote() != null) {
@@ -264,13 +259,6 @@ public class L6904 extends TradeBuffer {
 				}
 				continue;
 			}
-			tLastUpdateEmpNo = tAcDetail.getCreateEmpNo();
-			CdEmp iCdEmp = iCdEmpService.findById(tAcDetail.getCreateEmpNo(), titaVo);
-			if (iCdEmp == null) {
-				tLastUpdateEmpNoX = "";
-			} else {
-				tLastUpdateEmpNoX  = iCdEmp.getFullname();
-			}
 			
 			dAcSubBookCode = tAcDetail.getAcSubBookCode();
 			OccursList occursList = new OccursList();
@@ -283,29 +271,6 @@ public class L6904 extends TradeBuffer {
 			occursList.putParam("OOCrCnt", crCnt);
 			occursList.putParam("OOCrAmt", crAmt);
 			occursList.putParam("OOSlipNote", slipNote);
-			occursList.putParam("OOLastUpdateEmpNo",tLastUpdateEmpNo);
-			occursList.putParam("OOLastUpdateEmpNoX",tLastUpdateEmpNoX);
-			
-			amtdbCnt += dbCnt;
-			if (i == lAcDetail.size()) {
-				occursList.putParam("OOamtdbCnt",amtdbCnt);
-			}
-
-			amtdbAmt = amtdbAmt.add(dbAmt);
-			if (i == lAcDetail.size()) {
-				occursList.putParam("OOamtdbAmt",amtdbAmt);
-			}
-			
-			amtcrCnt += crCnt;
-			if (i == lAcDetail.size()) {
-				occursList.putParam("OOamtcrCnt",amtcrCnt);
-			}
-			
-			amtcrAmt = amtcrAmt.add(crAmt);
-			if (i == lAcDetail.size()) {
-				occursList.putParam("OOamtcrAmt",amtcrAmt);
-			}
-
 			
 			switch (iInqType) {
 			case 0: // 全部彙計方式
@@ -350,11 +315,6 @@ public class L6904 extends TradeBuffer {
 			titaTlrNo = tAcDetail.getTitaTlrNo();
 			titaBatchNo = tAcDetail.getTitaBatchNo();
 			dscptCode = tAcDetail.getDscptCode();
-			tLastUpdateEmpNo = tAcDetail.getCreateEmpNo();
-			if (tAcDetail.getSlipNote() != null) {
-				slipNote = tAcDetail.getSlipNote().trim();
-			}
-
 			slipBatNo = tAcDetail.getSlipBatNo();
 			titaSecNo = tAcDetail.getTitaSecNo();
 			dbCnt = 0;
@@ -368,6 +328,10 @@ public class L6904 extends TradeBuffer {
 				crAmt = crAmt.add(tAcDetail.getTxAmt());
 				crCnt = crCnt + 1;
 			}
+			amtdbCnt += dbCnt2;
+			amtdbAmt = amtdbAmt.add(dbAmt2);
+			amtcrCnt += crCnt2;
+			amtcrAmt = amtcrAmt.add(crAmt2);
 
 		}
 
@@ -384,8 +348,6 @@ public class L6904 extends TradeBuffer {
 			occursList.putParam("OOCrCnt", crCnt);
 			occursList.putParam("OOCrAmt", crAmt);
 			occursList.putParam("OOSlipNote", slipNote);
-			occursList.putParam("OOLastUpdateEmpNo",tLastUpdateEmpNo);
-			occursList.putParam("OOLastUpdateEmpNoX",tLastUpdateEmpNoX);
 			
 			switch (iInqType) {
 			case 0: // 全部彙計方式
@@ -410,7 +372,27 @@ public class L6904 extends TradeBuffer {
 				occursList.putParam("OOInqData", titaSecNo);
 				break;
 			}
+			
 
+			if (i == lAcDetail.size()) {
+				occursList.putParam("OOamtdbCnt",amtdbCnt);
+			}
+
+			if (i == lAcDetail.size()) {
+				occursList.putParam("OOamtdbAmt",amtdbAmt);
+			}
+
+			if (i == lAcDetail.size()) {
+				occursList.putParam("OOamtcrCnt",amtcrCnt);
+			}
+			
+			if (i == lAcDetail.size()) {
+				occursList.putParam("OOamtcrAmt",amtcrAmt);
+			}
+
+			
+			
+			
 			// 查詢會計科子細目設定檔
 			CdAcCode tCdAcCode = sCdAcCodeService.findById(new CdAcCodeId(acNoCode, acSubCode, acDtlCode), titaVo);
 			if (tCdAcCode == null) {

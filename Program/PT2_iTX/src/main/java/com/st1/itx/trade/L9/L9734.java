@@ -60,12 +60,13 @@ public class L9734 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-	//產表前更新最新(當前日期)InnReCheck資料
+
+	// 產表前更新最新(當前日期)InnReCheck資料
 	private void checkInnReCheckUpdate(int tbsdyf, TitaVo titaVo) {
 
 		String empNo = titaVo.getTlrNo();
 
-		sInnReCheckService.Usp_L5_InnReCheck_Upd(tbsdyf, empNo, titaVo);
+		sInnReCheckService.Usp_L5_InnReCheck_Upd(tbsdyf, empNo, "", titaVo);
 
 	}
 }

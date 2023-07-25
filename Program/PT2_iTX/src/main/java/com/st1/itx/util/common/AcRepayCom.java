@@ -610,6 +610,7 @@ public class AcRepayCom extends TradeBuffer {
 			break;
 		case "101": // 101.匯款轉帳
 			acDetail.setAcctCode("P03");
+			acDetail.setDscptCode(titaVo.getParam("RpDscpt" + i));
 			break;
 		case "102": // 102.銀行扣款 C01 暫收款－非核心資金運用 核心銷帳碼 0010060yyymmdd (銀扣 ACH), 郵局 P01
 			if ("C01".equals(acDetail.getAcctCode())) {
