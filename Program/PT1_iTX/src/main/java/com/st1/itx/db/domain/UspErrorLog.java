@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -10,6 +11,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.Id;
 import javax.persistence.Column;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * UspErrorLog 預存程序錯誤記錄檔<br>
@@ -24,12 +27,7 @@ import javax.persistence.Column;
 public class UspErrorLog implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -3115364925850917977L;
-
-// 記錄識別碼
+  // 記錄識別碼
   @Id
   @Column(name = "`LogUkey`", length = 32)
   private String logUkey = " ";
@@ -83,6 +81,10 @@ public class UspErrorLog implements Serializable {
   // 最後更新人員
   @Column(name = "`LastUpdateEmpNo`", length = 6)
   private String lastUpdateEmpNo;
+
+  // 啟動批次的交易序號
+  @Column(name = "`JobTxSeq`", length = 20)
+  private String jobTxSeq;
 
 
 /**
@@ -315,11 +317,30 @@ public class UspErrorLog implements Serializable {
     this.lastUpdateEmpNo = lastUpdateEmpNo;
   }
 
+/**
+	* 啟動批次的交易序號<br>
+	* 
+	* @return String
+	*/
+  public String getJobTxSeq() {
+    return this.jobTxSeq == null ? "" : this.jobTxSeq;
+  }
+
+/**
+	* 啟動批次的交易序號<br>
+	* 
+  *
+  * @param jobTxSeq 啟動批次的交易序號
+	*/
+  public void setJobTxSeq(String jobTxSeq) {
+    this.jobTxSeq = jobTxSeq;
+  }
+
 
   @Override
   public String toString() {
     return "UspErrorLog [logUkey=" + logUkey + ", logDate=" + logDate + ", logTime=" + logTime + ", uspName=" + uspName + ", errorCode=" + errorCode + ", errorMessage=" + errorMessage
            + ", errorBackTrace=" + errorBackTrace + ", execEmpNo=" + execEmpNo + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
-           + "]";
+           + ", jobTxSeq=" + jobTxSeq + "]";
   }
 }

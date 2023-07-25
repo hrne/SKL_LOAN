@@ -54,4 +54,35 @@ public class L6973ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return switchback(query);
 	}
 
+	public List<Map<String, String>> doQueryByJobTxSeq(String jobTxSeq, int index, int limit, TitaVo titaVo)
+			throws Exception {
+		this.info("L6973ServiceImpl.doQueryByJobTxSeq jobTxSeq:" + jobTxSeq + ",index:" + index + ",limit:" + limit);
+
+		// *** 折返控制相關 ***
+		this.index = index;
+		// *** 折返控制相關 ***
+		this.limit = limit;
+
+		String sql = "";
+		sql += " SELECT \"LogUkey\" ";
+		sql += "      , \"LogDate\" ";
+		sql += "      , LPAD(\"LogTime\",6,'0') AS \"LogTime\" ";
+		sql += "      , \"UspName\" ";
+		sql += "      , \"ErrorMessage\" ";
+		sql += "      , \"ErrorBackTrace\" ";
+		sql += "      , \"ExecEmpNo\" ";
+		sql += " FROM \"UspErrorLog\" ";
+		sql += " WHERE \"JobTxSeq\" = :jobTxSeq ";
+		sql += " ORDER BY \"LogDate\" DESC ";
+		sql += "        , LPAD(\"LogTime\",6,'0') DESC ";
+		this.info("sql = " + sql);
+
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+
+		Query query = em.createNativeQuery(sql);
+		query.setParameter("jobTxSeq", jobTxSeq);
+
+		return switchback(query);
+	}
+
 }

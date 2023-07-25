@@ -9,13 +9,14 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcLoanIntCashFlow;
 import com.st1.itx.db.domain.AcLoanIntCashFlowId;
 import com.st1.itx.db.domain.CdCashFlow;
+import com.st1.itx.db.domain.CdCashFlowId;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.service.AcLoanIntCashFlowService;
 import com.st1.itx.db.service.CdCashFlowService;
@@ -187,7 +188,11 @@ public class BS060 extends TradeBuffer {
 			}
 		}
 		this.info("AcLoanIntCashFlow cnt=" + cnt);
-		CdCashFlow tCdCashFlow = cdCashFlowService.holdById(yearMonth, titaVo);
+		CdCashFlowId cdCashFlowId = new CdCashFlowId();
+		cdCashFlowId.setBranchNo(titaVo.getBrno());
+		cdCashFlowId.setDataYearMonth(yearMonth);
+		cdCashFlowId.setTenDayPeriods(1);
+		CdCashFlow tCdCashFlow = cdCashFlowService.holdById(cdCashFlowId, titaVo);
 		if (tCdCashFlow == null) {
 			tCdCashFlow = new CdCashFlow();
 			tCdCashFlow.setDataYearMonth(yearMonth);

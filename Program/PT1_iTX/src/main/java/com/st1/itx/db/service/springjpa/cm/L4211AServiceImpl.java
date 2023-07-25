@@ -64,7 +64,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "        , Max(\"FacmNo\")           AS \"FacmNo\"";
 			sql += "   FROM \"LoanBorTx\"";
 			sql += "   WHERE \"AcDate\" = :inputAcDate";
-			sql += "    AND \"RepayCode\" = '01'"; // 匯款轉帳
+			sql += "    AND \"RepayCode\" = 1 "; // 匯款轉帳
 			sql += "   GROUP BY \"CustNo\"";
 			sql += "          , \"AcDate\"";
 			sql += "          , \"TitaTlrNo\"";
@@ -156,7 +156,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "       THEN :inputReconCode";
 			sql += "     ELSE BATX.\"ReconCode\" ";
 			sql += "     END = BATX.\"ReconCode\"";
-			sql += " AND BATX.\"RepayCode\" = '01'"; // 匯款轉帳
+			sql += " AND BATX.\"RepayCode\" = 1 "; // 匯款轉帳
 			sql += " AND BATX.\"ProcStsCode\" IN ( '5'  ";// 單筆入帳
 			sql += "                           , '6' "; // 批次入帳
 			sql += "                           , '7') ";// 批次人工
@@ -174,18 +174,95 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "        , Max(\"FacmNo\")           AS \"FacmNo\"";
 			sql += "   FROM \"LoanBorTx\"";
 			sql += "   WHERE \"AcDate\" = :inputAcDate";
-			sql += "    AND \"RepayCode\" = '01'"; // 匯款轉帳
+			sql += "    AND \"RepayCode\" = 1 "; // 匯款轉帳
 			sql += "   GROUP BY \"CustNo\"";
 			sql += "          , \"AcDate\"";
 			sql += "          , \"TitaTlrNo\"";
 			sql += "          , \"TitaTxtNo\"";
 			sql += "          , \"TitaTxCd\" ";
 			sql += " )";
+			sql += " , BATX AS (";
+			sql += "   SELECT \"ReconCode\" ";// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
+			sql += "    , \"BatchNo\""; // 批次號碼(表頭)
+			sql += "    , \"EntryDate\" ";// 匯款日
+			sql += "    , \"DetailSeq\""; // 匯款序號
+			sql += "    , \"RepayAmt\" "; // 匯款金額 
+			sql += "  	, \"RepayType\"";
+			sql += "    , \"CustNo\" ";
+			sql += "    , \"ProcStsCode\" ";
+			sql += "    , \"ProcNote\" ";
+			sql += "    , \"AcDate\"";
+			sql += "    , \"TitaTlrNo\"";
+			sql += "    , \"TitaTxtNo\"";
+			sql += "   FROM \"BatxDetail\"";
+			sql += "   WHERE \"AcDate\" = :inputAcDate";
+			sql += "    AND SUBSTR(\"BatchNo\",1,4) = 'BATX'     ";
+			sql += "    AND CASE";
+			sql += "          WHEN NVL(TRIM( :inputReconCode ),' ') != ' ' ";// 輸入空白時查全部
+			sql += "          THEN :inputReconCode";
+			sql += "        ELSE \"ReconCode\" ";
+			sql += "        END = \"ReconCode\"";
+			sql += "    AND \"RepayCode\" = 1 "; // 匯款轉帳
+			sql += "    AND \"ProcStsCode\" IN ( '2','3','4','5'  ";// 單筆入帳
+			sql += "                           , '6' "; // 批次入帳
+			sql += "                           , '7') ";// 批次人工
+			sql += "   UNION ALL " ;  // 同戶號最後一筆匯款入帳後後執行暫收抵繳
+			sql += "   SELECT B.\"ReconCode\" ";// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
+			sql += "    , B.\"BatchNo\""; // 批次號碼(表頭)
+			sql += "    , B.\"EntryDate\" ";// 匯款日
+			sql += "    , B.\"DetailSeq\""; // 匯款序號
+			sql += "    , B.\"RepayAmt\" "; // 匯款金額 
+			sql += "    , B.\"RepayType\"";
+			sql += "    , B.\"CustNo\" ";
+			sql += "    , B.\"ProcStsCode\" ";
+			sql += "    , B.\"ProcNote\" ";
+			sql += "    , B.\"AcDate\"";
+			sql += "    , TX.\"TitaTlrNo\"";
+			sql += "    , TX.\"TitaTxtNo\"";
+			sql += "   FROM (";
+			sql += "   SELECT \"ReconCode\" ";
+	  	sql += "        , \"AcDate\"";
+			sql += "        , \"BatchNo\""; 
+			sql += "        , \"DetailSeq\"";  
+			sql += "        , \"EntryDate\" "; 
+			sql += "        , \"RepayAmt\" ";  
+			sql += "  	    , \"RepayType\"";
+			sql += "        , \"CustNo\" ";
+			sql += "        , \"ProcStsCode\" ";
+			sql += "        , \"ProcNote\" ";
+			sql += "        , \"LastUpdate\" ";
+			sql += "        , ROW_NUMBER() OVER (Partition By \"CustNo\"             ";
+			sql += "    	                   	      ORDER BY \"LastUpdate\"          "; // 最後更新日期時間
+			sql += "	                    ) AS \"ROWNUMBER\"                         ";
+			sql += "       FROM \"BatxDetail\" ";
+			sql += "       WHERE \"AcDate\" = :inputAcDate";
+			sql += "        AND SUBSTR(\"BatchNo\",1,4) = 'BATX'     ";
+			sql += "        AND CASE";
+			sql += "              WHEN NVL(TRIM( :inputReconCode ),' ') != ' ' ";// 輸入空白時查全部
+			sql += "                  THEN :inputReconCode";
+			sql += "              ELSE \"ReconCode\" ";
+			sql += "            END = \"ReconCode\"";
+			sql += "        AND \"ReconCode\" IN ('A1','A2','A3')"; // 
+			sql += "        AND \"RepayCode\" = 1 "; // 匯款轉帳
+			sql += "        AND \"ProcStsCode\" IN ( '5' ";// 單筆入帳
+			sql += "                               , '6' "; // 批次入帳
+			sql += "                               , '7') ";// 批次人工
+			sql += "        ) B ";                 
+			sql += "   LEFT JOIN \"LoanBorTx\" TX ";
+			sql += "             ON TX.\"AcDate\" = B.\"AcDate\"";
+			sql += "            AND TX.\"CustNo\" = B.\"CustNo\"";
+			sql += "            AND TX.\"RepayCode\"  = 90 "; // 暫收抵繳
+			sql += "            AND TX.\"TitaHCode\"  = '0' "; // 正常交易
+ 			sql += "            AND TX.\"LastUpdate\"  >  B.\"LastUpdate\" "; // 入帳後後執行暫收抵繳
+			sql += "   WHERE B.ROWNUMBER = 1 ";
+			sql += "    AND  NVL(TX.\"AcDate\",0) = :inputAcDate";
+			sql += " )";
 			sql += " SELECT BATX.\"ReconCode\" ";// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
 			sql += "    , BATX.\"BatchNo\""; // 批次號碼(表頭)
 			sql += "    , BATX.\"EntryDate\" ";// 匯款日
 			sql += "    , BATX.\"DetailSeq\""; // 匯款序號
 			sql += "    , BATX.\"RepayAmt\" "; // 匯款金額（排序用）
+			sql += "    , TX2.\"RepayCode\""; // 還款方式
 			sql += "    , TX2.\"AcSeq\" AS \"AcSeq\" ";
 			sql += "    , TX2.\"TxAmt\""; // 匯款金額
 			sql += "    , TX2.\"Principal\"";
@@ -232,7 +309,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "    , NVL(NVL(FC1.\"CloseReasonCode\",FC2.\"CloseReasonCode\"),'00') AS \"CloseReasonCode\"" ;
 			sql += "    , CD.\"Item\" AS \"CloseReason\" ";
 			sql += "    , NVL(JSON_VALUE(TX2.\"OtherFields\", '$.CaseCloseCode'),99) AS \"CaseCloseCode\" ";
-			sql += " FROM \"BatxDetail\" BATX";
+			sql += " FROM BATX";
 			sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = BATX.\"CustNo\"";
 			sql += " LEFT JOIN TX1 ON TX1.\"AcDate\" = BATX.\"AcDate\"";
 			sql += "            AND TX1.\"TitaTlrNo\" = BATX.\"TitaTlrNo\"";
@@ -252,18 +329,6 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "                           AND FC2.\"FacmNo\" = 0 ";
 			sql += " LEFT JOIN \"CdCode\" CD ON CD.\"DefCode\" = 'AdvanceCloseCode' ";
 			sql += "                        AND CD.\"Code\" =  NVL(NVL(FC1.\"CloseReasonCode\",FC2.\"CloseReasonCode\"),'00')";
-			sql += " WHERE BATX.\"AcDate\" = :inputAcDate";
-			sql += " AND SUBSTR(BATX.\"BatchNo\",1,4) = 'BATX'     ";
-			sql += " AND CASE";
-			sql += "       WHEN NVL(TRIM( :inputReconCode ),' ') != ' ' ";// 輸入空白時查全部
-			sql += "       THEN :inputReconCode";
-			sql += "     ELSE BATX.\"ReconCode\" ";
-			sql += "     END = BATX.\"ReconCode\"";
-			sql += " AND BATX.\"RepayCode\" = '01'"; // 匯款轉帳
-			sql += " AND BATX.\"ProcStsCode\" IN ( '2','3','4','5'  ";// 單筆入帳
-			sql += "                           , '6' "; // 批次入帳
-			sql += "                           , '7') ";// 批次人工
-
 		} else if (printNo == 3) {
 
 			// 人工處理明細表
@@ -276,7 +341,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "        , Max(\"FacmNo\")           AS \"FacmNo\"";
 			sql += "   FROM \"LoanBorTx\"";
 			sql += "   WHERE \"AcDate\" = :inputAcDate";
-			sql += "    AND \"RepayCode\" = '01'"; // 匯款轉帳
+			sql += "    AND \"RepayCode\" = 1 "; // 匯款轉帳
 			sql += "   GROUP BY \"CustNo\"";
 			sql += "          , \"AcDate\"";
 			sql += "          , \"TitaTlrNo\"";
@@ -359,7 +424,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "       THEN :inputReconCode";
 			sql += "     ELSE BATX.\"ReconCode\" ";
 			sql += "     END = BATX.\"ReconCode\"";
-			sql += " AND BATX.\"RepayCode\" = '01'"; // 匯款轉帳
+			sql += " AND BATX.\"RepayCode\" = 1 "; // 匯款轉帳
 			sql += " AND BATX.\"ProcStsCode\" IN ( '5'  ";// 單筆入帳
 			sql += "                           , '7') ";// 批次人工
 			sql += " AND ( ";

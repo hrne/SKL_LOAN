@@ -1,7 +1,8 @@
-create or replace PROCEDURE "Usp_Tx_TxHoliday_Ins" 
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tx_TxHoliday_Ins" 
 (
     -- 參數
-    EmpNo          IN  VARCHAR2   -- 經辦
+    EmpNo          IN  VARCHAR2,   -- 經辦
+    JobTxSeq       IN  VARCHAR2    -- 啟動批次的交易序號
 )
 AS
 BEGIN
@@ -41,7 +42,10 @@ BEGIN
       , SQLERRM -- Sql Error Message (固定值)
       , dbms_utility.format_error_backtrace -- Sql Error Trace (固定值)
       , EmpNo -- 發動預存程序的員工編號
+      , JobTxSeq -- 啟動批次的交易序號
     );
+    COMMIT;
+    RAISE;
     END;
 END;
 

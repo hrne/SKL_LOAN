@@ -191,9 +191,14 @@ SWITCH(#OOStatus,S,T(3,成功),
 !結束時間 yyyy-MM-dd hh:mm:ss
 #OOStepEndTime=x,20,L
 
+#OOJobTxSeq=x,20,L
+#OOHaveUspErrorLog=x,1,L
+
+#OO_BTN_UspError=X,1,S
+IF(#OOHaveUspErrorLog=="Y",BIND(grid,{ cmd=CHAIN; ntxcd=L6973;text=資料庫批次錯誤查詢;ntxbuf=#OOJobTxSeq}),BIND(grid,cancel))
+
 #OOSuccess=A,5,L
 #OOFalse=A,5,L
-
 
 ! use T(6A,...)
 ! 勾選幾個就會sendback幾次, 所以不需要concats
@@ -223,6 +228,8 @@ TXFORM=L6970
 #OOStatus
 #OOStepStartTime
 #OOStepEndTime
+#OOJobTxSeq
+#OOHaveUspErrorLog
 #OOSuccess
 #OOFalse
 ^
@@ -279,6 +286,9 @@ ifxBatch:{
 
 #OOStatusX=執行結果
 {width:80,align:'left'}
+
+#OO_BTN_UspError=資料庫批次錯誤查詢
+{width:150,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
 
 #OOStepStartTime=啟動時間
 {width:120,align:'center'}

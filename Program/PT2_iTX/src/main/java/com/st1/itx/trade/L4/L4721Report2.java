@@ -284,7 +284,6 @@ public class L4721Report2 extends TradeBuffer {
 								+ FormatUtil.pad9(r1.get("CustNo"), 7) + "9510300"
 								+ FormatUtil.pad9(r1.get("CustNo"), 7);
 						result.add(line);
-						result = sameFacmno(r1, rTxffectDetail, result, true, isByCustNo, titaVo);
 						// 換額度要重新算次數
 						times = 0;
 					}

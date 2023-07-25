@@ -222,6 +222,10 @@ T(H,#InqType,#InqTypeHelp)
 #SCRTIL=_,_,S
 T(3,[L6904] 日結彙計)
 
+#OTotalDCnt=m,14,L
+#OTotalCCnt=m,14,L
+#OTotalDAmt=m,14,L
+#OTotalCAmt=m,14,L
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
@@ -250,18 +254,11 @@ T(2,#OOAcNoCode+-+#OOAcSubCode+-+#OOAcDtlCode)
 !彙計方式為6時,此欄位為"業務類別" (撥款匯款、支票繳款、債協、放款)
 #OOInqData=X,6,S
 
-#OOSlipNote=X,60,S
+#OOBankRmftItem=X,60,S
 
-!經辦
-#OOLastUpdateEmpNo=X,8,S
-!經辦中文
-#OOLastUpdateEmpNoX=X,50,S
-
-!#OOLastUpdateEmpNo2X=X,58,L
-!T(2,#OOLastUpdateEmpNo+ +#OOLastUpdateEmpNoX)
 
 #OOSumNoX=X,20,S
-C(2,#InqType,S,T(H,#OOInqData,#SumNoTypeHelp),T(2,#OOInqData+ +#OOLastUpdateEmpNoX),T(2,#OOInqData),T(2,#OOSlipNote),T(2,#OOInqData),T(H,#OOInqData,#SecNoTypeHelp))
+C(2,#InqType,S,T(H,#OOInqData,#SumNoTypeHelp),T(2,#OOInqData),T(2,#OOInqData),T(2,#OOInqData+ +#OOBankRmftItem),T(2,#OOInqData),T(H,#OOInqData,#SecNoTypeHelp),T(2,#OOInqData))
 
 !借方筆數
 #OODbCnt=N,5,L
@@ -291,14 +288,6 @@ E(0,#OOCrAmt)
 IF(#OOCrAmt1==0,S,$)
 X(#OOCrAmt1)
 
-
-#OOamtdbCnt=m,14,S
-
-#OOamtdbAmt=m,14,S
-
-#OOamtcrCnt=m,14,S
-
-#OOamtcrAmt=m,14,S
 
 
 !明細
@@ -333,23 +322,22 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L6905;text=明細;ntxbuf=#OOBUF5})
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 
 TXFORM=L6904
+
+#OTotalDCnt
+#OTotalCCnt
+#OTotalDAmt
+#OTotalCAmt
 #OOAcSubBookCode
 #OOAcNoCode
 #OOAcSubCode
 #OOAcDtlCode
 #OOAcNoItem
-#OOSlipNote
 #OOInqData
+#OOBankRmftItem
 #OODbCnt
 #OODbAmt
 #OOCrCnt
 #OOCrAmt
-#OOLastUpdateEmpNo
-#OOLastUpdateEmpNoX
-#OOamtdbCnt
-#OOamtdbAmt
-#OOamtcrCnt
-#OOamtcrAmt
 
 ^
 </sub>
@@ -360,10 +348,10 @@ TXFORM=L6904
 [
 ["[L6904]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@日結彙計查詢@@@@"],
 [""],
-[#<->#,"@借方總筆數",#OOamtdbCnt],
-[#<->#,"@借方總金額",#OOamtdbAmt],
-[#<->#,"@貸方總筆數",#OOamtcrCnt],
-[#<->#,"@貸方總金額",#OOamtcrAmt],
+[#<->#,"@借方總筆數",#OTotalDCnt],
+[#<->#,"@借方總金額",#OTotalDAmt],
+[#<->#,"@貸方總筆數",#OTotalCCnt],
+[#<->#,"@貸方總金額",#OTotalCAmt],
 ]
 </sub>
 

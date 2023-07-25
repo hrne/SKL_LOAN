@@ -13,7 +13,9 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.JobDetail;
+import com.st1.itx.db.domain.UspErrorLog;
 import com.st1.itx.db.service.JobDetailService;
+import com.st1.itx.db.service.UspErrorLogService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
@@ -29,6 +31,9 @@ public class L6970 extends TradeBuffer {
 
 	@Autowired
 	JobDetailService jobDetailService;
+
+	@Autowired
+	UspErrorLogService uspErrorLogService;
 
 	@Autowired
 	Parse parse;
@@ -105,17 +110,33 @@ public class L6970 extends TradeBuffer {
 				if (nestJobCode == null || nestJobCode.equals(jobCode)) {
 					nestJobCode = "";
 				}
+				String jobDetailStatus = tJobDetail.getStatus();
 				OccursList occursList = new OccursList();
 				occursList.putParam("OOExecDate", tJobDetail.getExecDate() - 19110000); // PK欄位的日期要自行轉為民國年
 				occursList.putParam("OOJobCode", jobCode);
 				occursList.putParam("OONestJobCode", nestJobCode);
 				occursList.putParam("OOStepId", tJobDetail.getStepId());
-				occursList.putParam("OOStatus", tJobDetail.getStatus());
+				occursList.putParam("OOStatus", jobDetailStatus);
 				occursList.putParam("OOStepStartTime", format.format(tJobDetail.getStepStartTime()));
 
 				// 2022-01-10 智偉修改: 批次執行中,StepEndTime可能為null
 				occursList.putParam("OOStepEndTime",
 						tJobDetail.getStepEndTime() == null ? "" : format.format(tJobDetail.getStepEndTime()));
+
+				// 2023-07-25 智偉修改: SKL-IT琦欣 要連動到L6973
+				String haveUspErrorLog = "";
+				String jobDetailTxSeq = tJobDetail.getTxSeq();
+				if (jobDetailStatus != null && jobDetailStatus.equals("F")) {
+					// 檢查UspErrorLog是否有相關資料
+					Slice<UspErrorLog> sliceUspErrorLog = uspErrorLogService.findByJobTxSeq(jobDetailTxSeq, 0,
+							Integer.MAX_VALUE, titaVo);
+					if (sliceUspErrorLog != null && !sliceUspErrorLog.isEmpty()) {
+						haveUspErrorLog = "Y";
+					}
+				}
+
+				occursList.putParam("OOJobTxSeq", jobDetailTxSeq);
+				occursList.putParam("OOHaveUspErrorLog", haveUspErrorLog);
 
 				this.totaVo.addOccursList(occursList);
 			}

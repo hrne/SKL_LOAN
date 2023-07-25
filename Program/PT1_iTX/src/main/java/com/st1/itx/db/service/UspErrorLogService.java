@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.UspErrorLog;
@@ -58,6 +60,17 @@ public interface UspErrorLogService {
    * @return Slice UspErrorLog UspErrorLog of List
    */
   public Slice<UspErrorLog> findByLogDateAndUspName(int logDate_0, int logDate_1, String uspName_2, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * JobTxSeq = 
+   *
+   * @param jobTxSeq_0 jobTxSeq_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice UspErrorLog UspErrorLog of List
+   */
+  public Slice<UspErrorLog> findByJobTxSeq(String jobTxSeq_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By UspErrorLog

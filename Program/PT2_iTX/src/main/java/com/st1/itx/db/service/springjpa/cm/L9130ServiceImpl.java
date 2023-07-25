@@ -233,6 +233,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          ,AC.\"TitaTlrNo\"  ";
 		sql += "          ,AC.\"AcNoCode\" ";
 		sql += "     	  ,AC.\"AcSubCode\" ";
+		sql += "     	  ,AC.\"AcDtlCode\" ";
 		sql += "     	  ,AC.\"AcSubBookCode\" ";
 		sql += "          ,AC.\"DbCr\"  ";
 		sql += "          ,AC.\"TxAmt\" ";
@@ -251,6 +252,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          , \"TitaTlrNo\"  ";
 		sql += "          , \"AcNoCode\" ";
 		sql += "          , \"AcSubCode\" ";
+		sql += "          , \"AcDtlCode\" ";
 		sql += "          , \"AcSubBookCode\" ";
 		sql += "          , \"DbCr\" ";
 		sql += "    FROM rawData ";
@@ -260,6 +262,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          , \"TitaTlrNo\"  ";
 		sql += "          , \"AcNoCode\" ";
 		sql += "          , \"AcSubCode\" ";
+		sql += "          , \"AcDtlCode\" ";
 		sql += "          , \"AcSubBookCode\" ";
 		sql += "          , \"DbCr\" ";
 		sql += "    ORDER BY \"SlipBatNo\"        "; 
@@ -268,6 +271,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          , \"TitaTlrNo\"  ";
 		sql += "          , \"AcNoCode\" ";
 		sql += "          , \"AcSubCode\" ";
+		sql += "          , \"AcDtlCode\" ";
 		sql += "          , \"AcSubBookCode\" ";
 		sql += "          , \"DbCr\" ";
 		sql += " ) ";
@@ -278,6 +282,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          , \"TitaTlrNo\"  ";
 		sql += "          , \"AcNoCode\" ";
 		sql += "          , \"AcSubCode\" ";
+		sql += "          , \"AcDtlCode\" ";
 		sql += "          , \"AcSubBookCode\" ";
 		sql += "          , \"DbCr\" ";
 		sql += "          , 90000 + ROWNUM AS \"SlipSumNo\" ";
@@ -293,6 +298,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       AND s.\"TitaTlrNo\"  = r.\"TitaTlrNo\" ";      
 		sql += "       AND s.\"AcNoCode\"  = r.\"AcNoCode\" ";      
 		sql += "       AND s.\"AcSubCode\"  = r.\"AcSubCode\" ";      
+		sql += "       AND s.\"AcDtlCode\"  = r.\"AcDtlCode\" ";      
 		sql += "       AND s.\"AcSubBookCode\"  = r.\"AcSubBookCode\" ";      
 		sql += "       AND s.\"DbCr\"  = r.\"DbCr\" ";      
 

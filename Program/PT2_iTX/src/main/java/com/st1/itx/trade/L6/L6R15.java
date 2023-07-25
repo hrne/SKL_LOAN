@@ -28,7 +28,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L6R15 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6R15.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -61,7 +60,7 @@ public class L6R15 extends TradeBuffer {
 		moveTotaCdCashFlow(new CdCashFlow());
 
 		// 查詢現金流量預估資料檔
-		CdCashFlow tCdCashFlow = sCdCashFlowService.findById(iRimYearMonth, titaVo);
+		CdCashFlow tCdCashFlow = sCdCashFlowService.findDataYearMonthFirst(titaVo.getBrno(), iRimYearMonth, titaVo);
 
 		/* 如有找到資料 */
 		if (tCdCashFlow != null) {

@@ -3,22 +3,20 @@ package com.st1.itx.trade.L6;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.AcDetail;
-import com.st1.itx.db.domain.CdAcCode;
-import com.st1.itx.db.domain.CdAcCodeId;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.CdAcCodeService;
 import com.st1.itx.db.service.CdEmpService;
+import com.st1.itx.db.service.springjpa.cm.L6904ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
@@ -49,6 +47,8 @@ public class L6904 extends TradeBuffer {
 	public CdEmpService iCdEmpService;
 	@Autowired
 	Parse parse;
+	@Autowired
+	private L6904ServiceImpl l6904ServiceImpl;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -56,58 +56,11 @@ public class L6904 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		// 取得輸入資料
-		String iAcBookCode = titaVo.getParam("AcBookCode");
-		String iAcSubBookCode = titaVo.getParam("AcSubBookCode");
-		String iBranchNo = titaVo.getParam("BranchNo");
-		String iCurrencyCode = titaVo.getParam("CurrencyCode");
-		String iAcNoCodeS = titaVo.getParam("AcNoCode").trim();
-		String iAcNoCodeE = "";
-		String iAcSubCode = titaVo.getParam("AcSubCode").trim();
-		String iAcDtlCode = titaVo.getParam("AcDtlCode").trim();
-		int iAcDate = this.parse.stringToInteger(titaVo.getParam("AcDate"));
-		int iFAcDate = iAcDate + 19110000;
-		int iInqType = this.parse.stringToInteger(titaVo.getParam("InqType"));
-
-		String acNoCode = "";
-		String acSubCode = "";
-		String acDtlCode = "";
-		String sumNo = "";
-		String titaTlrNo = "";
-		String titaBatchNo = "";
-		String dscptCode = "";
-		String slipNote = "";
-		String titaSecNo = "";
-		int slipBatNo = 0;
-
-		int totalCnt = 0;
-		int dbCnt = 0;
-		int crCnt = 0;
-		
-		BigDecimal dbAmt = new BigDecimal(0);
-		BigDecimal crAmt = new BigDecimal(0);
-		
-		int dbCnt2 = 0;
-		int crCnt2 = 0;
-		
-		BigDecimal dbAmt2 = new BigDecimal(0);
-		BigDecimal crAmt2 = new BigDecimal(0);
+		int iInqType = this.parse.stringToInteger(titaVo.getParam("InqType")); // 彙計方式
 
 		this.index = titaVo.getReturnIndex();
 
 		this.limit = Integer.MAX_VALUE;
-
-		if (iAcNoCodeS.isEmpty()) {
-			iAcNoCodeS = "           ";
-			iAcNoCodeE = "ZZZZZZZZZZZ";
-		} else {
-			iAcNoCodeE = titaVo.getParam("AcNoCode").trim();
-		}
-		if (iAcSubCode.isEmpty()) {
-			iAcSubCode = "     ";
-		}
-		if (iAcDtlCode.isEmpty()) {
-			iAcDtlCode = "  ";
-		}
 
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
@@ -116,304 +69,57 @@ public class L6904 extends TradeBuffer {
 		// this.limit = 200; // 157 * 200 = 31,400
 
 		// 查詢會計帳務明細檔
-		Slice<AcDetail> slAcDetail = null;
-		switch (iInqType) {
-		case 0: // 全部彙計方式
-			slAcDetail = sAcDetailService.SubBookAcNoCodeRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, this.index, this.limit, titaVo);
-			break;
-		case 1: // 彙總別
-			slAcDetail = sAcDetailService.SubBookSumNoRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, "   ", "ZZZ", this.index, this.limit,
-					titaVo);
-			break;
-		case 2: // 經辦別
-			slAcDetail = sAcDetailService.SubBookTitaTlrNoRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, "      ", "ZZZZZZ", this.index,
-					this.limit, titaVo);
-			break;
-		case 3: // 整批批號
-			slAcDetail = sAcDetailService.SubBookTitaBatchNoRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, "      ", "ZZZZZZ", this.index,
-					this.limit, titaVo);
-			break;
-		case 4: // 摘要代號
-			slAcDetail = sAcDetailService.SubBookDscptCodeRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, "    ", "ZZZZ", this.index,
-					this.limit, titaVo);
-			break;
-		case 5: // 傳票批號
-			slAcDetail = sAcDetailService.SubBookSlipBatNoRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, 00, 99, this.index, this.limit,
-					titaVo);
-			break;
-		case 6: // 業務類別
-			slAcDetail = sAcDetailService.SubBookTitaSecNoRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, "  ", "ZZ", this.index,
-					this.limit, titaVo);
-			break;
+		List<Map<String, String>> dList = null;
+		try {
+			dList = l6904ServiceImpl.FindData(titaVo, index, limit);
+		} catch (Exception e) {
+			// E5004 讀取DB時發生問題
+			throw new LogicException(titaVo, "E5004", "");
 		}
-		List<AcDetail> lAcDetail = slAcDetail == null ? null : slAcDetail.getContent();
 
-		if (lAcDetail == null || lAcDetail.size() == 0) {
+		if (this.index == 0 && (dList == null || dList.size() == 0)) {
 			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
 		}
-		String dAcSubBookCode = "";
-		
-		int amtdbCnt = 0;
-		BigDecimal amtdbAmt = BigDecimal.ZERO;
-		int amtcrCnt = 0;
-		BigDecimal amtcrAmt = BigDecimal.ZERO;
-		int i =0;
+		BigDecimal totalDCnt = BigDecimal.ZERO; // 貸方總筆數
+		BigDecimal totalCCnt = BigDecimal.ZERO; // 借方總筆數
+		BigDecimal totalDAmt = BigDecimal.ZERO; // 貸方總金額
+		BigDecimal totalCAmt = BigDecimal.ZERO; // 借方總金額
 		// 如有找到資料
-		for (AcDetail tAcDetail : lAcDetail) {
-			i++;
-
-			this.info("L6904 AcNoCode : " + iAcBookCode + "-" + iAcNoCodeS + "-" + iAcSubCode + "-" + iAcDtlCode + "-" + tAcDetail.getAcNoCode() + "-" + tAcDetail.getAcSubCode() + "-"
-					+ tAcDetail.getAcDtlCode() + "-" + tAcDetail.getTxAmt() + "-" + tAcDetail.getAcBookFlag() + "-" + tAcDetail.getAcBookCode() + "-" + tAcDetail.getEntAc());
-
-			// 不含未入帳,例如:未放行之交易
-			// 0:未入帳 1:已入帳 2:被沖正(隔日訂正) 3.沖正(隔日訂正)
-			if (tAcDetail.getEntAc() == 0) {
-				this.info("L6904 0 ");
-				continue;
-			}
-
-			// 科子細目可不輸入 ; 有輸入不等時找下一筆
-			// if (!(iAcNoCodeS.isEmpty() || iAcNoCodeS.equals(tAcDetail.getAcNoCode()))) {
-			// this.info("L6904 1 ");
-			// continue;
-			// }
-
-			if (!(titaVo.getParam("AcNoCode").trim().isEmpty())) {
-				if (!(iAcSubCode.equals(tAcDetail.getAcSubCode()))) {
-					this.info("L6904 2 ");
-					continue;
-				} else if (!(iAcDtlCode.equals(tAcDetail.getAcDtlCode()))) {
-					this.info("L6904 3 ");
-					continue;
-				}
-			}
-
-			// 0: 不細分 (000)
-			// 1: 兼全帳冊與特殊帳冊 (輸入000,輸出含000,201 ; 輸入201,只輸出201)
-			// 2: 特殊帳冊之應收調撥款，明細檔無(只寫入總帳檔)
-			// 3: 特殊帳冊(L6201:其他傳票輸入) (輸入000,只輸出000 ; 輸入201,只輸出201)
-
-//			if (tAcDetail.getAcBookFlag() == 0) {
-//				if (!(iAcBookCode.equals("000") || iAcBookCode.equals("10H"))) {
-//					this.info("L6904 4 "); 
-//					continue;
-//				}
-//			} else if (tAcDetail.getAcBookFlag() == 1) {
-//				if (!(iAcBookCode.equals("000") || iAcBookCode.equals("10H")
-//						|| iAcBookCode.equals(tAcDetail.getAcBookCode()))) {
-//					this.info("L6904 5 ");
-//					continue;
-//				}
-//			} else if (tAcDetail.getAcBookFlag() == 3) {
-//				if (!(iAcBookCode.equals(tAcDetail.getAcBookCode()) || iAcBookCode.equals("10H"))) {
-//					this.info("L6904 6 ");
-//					continue;
-//				}
-//			} else {
-//				this.info("L6904 7 ");
-//				continue;
-//			}
-
-			totalCnt = totalCnt + 1;
-			
-			
-
-			
-			// 第一筆小計
-			if (totalCnt == 1) {
-				acNoCode = tAcDetail.getAcNoCode();
-				acSubCode = tAcDetail.getAcSubCode();
-				acDtlCode = tAcDetail.getAcDtlCode();
-				sumNo = tAcDetail.getSumNo();
-				titaTlrNo = tAcDetail.getTitaTlrNo();
-				titaBatchNo = tAcDetail.getTitaBatchNo();
-
-				
-				dscptCode = tAcDetail.getDscptCode();
-				if (tAcDetail.getSlipNote() != null) {
-					slipNote = tAcDetail.getSlipNote().trim();
-				}
-				slipBatNo = tAcDetail.getSlipBatNo();
-				titaSecNo = tAcDetail.getTitaSecNo();
-				if (tAcDetail.getDbCr().equals("D")) {
-					dbAmt = dbAmt.add(tAcDetail.getTxAmt());
-					dbCnt = dbCnt + 1;
-				} else {
-					crAmt = crAmt.add(tAcDetail.getTxAmt());
-					crCnt = crCnt + 1;
-				}
-				continue;
-			}
-
-			// 條件一樣小計
-			if (acNoCode.equals(tAcDetail.getAcNoCode()) && acSubCode.equals(tAcDetail.getAcSubCode()) && acDtlCode.equals(tAcDetail.getAcDtlCode())
-					&& ((iInqType == 0) || (iInqType == 1 && sumNo.equals(tAcDetail.getSumNo())) || (iInqType == 2 && titaTlrNo.equals(tAcDetail.getTitaTlrNo()))
-							|| (iInqType == 3 && titaBatchNo.equals(tAcDetail.getTitaBatchNo())) || (iInqType == 4 && dscptCode.equals(tAcDetail.getDscptCode()))
-							|| (iInqType == 5 && slipBatNo == tAcDetail.getSlipBatNo()) || (iInqType == 6 && titaSecNo.equals(tAcDetail.getTitaSecNo())))) {
-				if (tAcDetail.getDbCr().equals("D")) {
-					dbAmt = dbAmt.add(tAcDetail.getTxAmt());
-					dbCnt = dbCnt + 1;
-				} else {
-					crAmt = crAmt.add(tAcDetail.getTxAmt());
-					crCnt = crCnt + 1;
-				}
-				continue;
-			}
-			
-			dAcSubBookCode = tAcDetail.getAcSubBookCode();
+		for (Map<String, String> d : dList) {
 			OccursList occursList = new OccursList();
-			occursList.putParam("OOAcSubBookCode", dAcSubBookCode);
-			occursList.putParam("OOAcNoCode", acNoCode);
-			occursList.putParam("OOAcSubCode", acSubCode);
-			occursList.putParam("OOAcDtlCode", acDtlCode);
-			occursList.putParam("OODbCnt", dbCnt);
-			occursList.putParam("OODbAmt", dbAmt);
-			occursList.putParam("OOCrCnt", crCnt);
-			occursList.putParam("OOCrAmt", crAmt);
-			occursList.putParam("OOSlipNote", slipNote);
-			
-			switch (iInqType) {
-			case 0: // 全部彙計方式
-				occursList.putParam("OOInqData", "");
-				break;
-			case 1: // 彙總別
-				occursList.putParam("OOInqData", sumNo);
-				break;
-			case 2: // 經辦別
-				occursList.putParam("OOInqData", titaTlrNo);
-				break;
-			case 3: // 整批批號
-				occursList.putParam("OOInqData", titaBatchNo);
-				break;
-			case 4: // 摘要代號
-				occursList.putParam("OOInqData", dscptCode);
-				break;
-			case 5: // 傳票批號
-				occursList.putParam("OOInqData", slipBatNo);
-				break;
-			case 6: // 業務類別
-				occursList.putParam("OOInqData", titaSecNo);
-				break;
+			if (d.get("AcNoCode").isEmpty()) { // 總筆數資料
+				totalDCnt = parse.stringToBigDecimal(d.get("SumDCnt"));
+				totalCCnt = parse.stringToBigDecimal(d.get("SumCCnt"));
+				totalDAmt = parse.stringToBigDecimal(d.get("SumDAmt"));
+				totalCAmt = parse.stringToBigDecimal(d.get("SumCAmt"));
+				continue;
 			}
-
-			// 查詢會計科子細目設定檔
-			CdAcCode tCdAcCode = sCdAcCodeService.findById(new CdAcCodeId(acNoCode, acSubCode, acDtlCode), titaVo);
-			if (tCdAcCode == null) {
-				occursList.putParam("OOAcNoItem", "");
-			} else {
-				occursList.putParam("OOAcNoItem", tCdAcCode.getAcNoItem());
+			occursList.putParam("OOAcSubBookCode", d.get("AcNoCode"));
+			occursList.putParam("OOAcNoCode", d.get("AcNoCode"));// AcNoCode
+			occursList.putParam("OOAcSubCode", d.get("AcSubCode"));// AcSubCode
+			occursList.putParam("OOAcDtlCode", d.get("AcDtlCode"));// AcDtlCode
+			occursList.putParam("OODbCnt", d.get("SumDCnt"));
+			occursList.putParam("OODbAmt", d.get("SumDAmt"));
+			occursList.putParam("OOCrCnt", d.get("SumCCnt"));
+			occursList.putParam("OOCrAmt", d.get("SumCAmt"));
+			occursList.putParam("OOInqData", d.get("DataInq"));// DataInq
+			occursList.putParam("OOAcNoItem", d.get("AcNoItem"));// AcNoItem
+			if (iInqType == 4) {
+				occursList.putParam("OOBankRmftItem", d.get("BankRmftItem"));// iInqType 4.
 			}
 
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
-
-			// 準備下一筆
-			acNoCode = tAcDetail.getAcNoCode();
-			acSubCode = tAcDetail.getAcSubCode();
-			acDtlCode = tAcDetail.getAcDtlCode();
-			sumNo = tAcDetail.getSumNo();
-			titaTlrNo = tAcDetail.getTitaTlrNo();
-			titaBatchNo = tAcDetail.getTitaBatchNo();
-			dscptCode = tAcDetail.getDscptCode();
-			slipBatNo = tAcDetail.getSlipBatNo();
-			titaSecNo = tAcDetail.getTitaSecNo();
-			dbCnt = 0;
-			crCnt = 0;
-			dbAmt = new BigDecimal(0);
-			crAmt = new BigDecimal(0);
-			if (tAcDetail.getDbCr().equals("D")) {
-				dbAmt = dbAmt.add(tAcDetail.getTxAmt());
-				dbCnt = dbCnt + 1;
-			} else {
-				crAmt = crAmt.add(tAcDetail.getTxAmt());
-				crCnt = crCnt + 1;
-			}
-			amtdbCnt += dbCnt2;
-			amtdbAmt = amtdbAmt.add(dbAmt2);
-			amtcrCnt += crCnt2;
-			amtcrAmt = amtcrAmt.add(crAmt2);
-
 		}
-
-		// 最後一筆資料放入Tota的OcList
-		if (!(dbAmt.compareTo(BigDecimal.ZERO) == 0 && crAmt.compareTo(BigDecimal.ZERO) == 0)) {
-
-			OccursList occursList = new OccursList();
-			occursList.putParam("OOAcSubBookCode", dAcSubBookCode);
-			occursList.putParam("OOAcNoCode", acNoCode);
-			occursList.putParam("OOAcSubCode", acSubCode);
-			occursList.putParam("OOAcDtlCode", acDtlCode);
-			occursList.putParam("OODbCnt", dbCnt);
-			occursList.putParam("OODbAmt", dbAmt);
-			occursList.putParam("OOCrCnt", crCnt);
-			occursList.putParam("OOCrAmt", crAmt);
-			occursList.putParam("OOSlipNote", slipNote);
-			
-			switch (iInqType) {
-			case 0: // 全部彙計方式
-				occursList.putParam("OOInqData", "");
-				break;
-			case 1: // 彙總別
-				occursList.putParam("OOInqData", sumNo);
-				break;
-			case 2: // 經辦別
-				occursList.putParam("OOInqData", titaTlrNo);
-				break;
-			case 3: // 整批批號
-				occursList.putParam("OOInqData", titaBatchNo);
-				break;
-			case 4: // 摘要代號
-				occursList.putParam("OOInqData", dscptCode);
-				break;
-			case 5: // 傳票批號
-				occursList.putParam("OOInqData", slipBatNo);
-				break;
-			case 6: // 業務類別
-				occursList.putParam("OOInqData", titaSecNo);
-				break;
-			}
-			
-
-			if (i == lAcDetail.size()) {
-				occursList.putParam("OOamtdbCnt",amtdbCnt);
-			}
-
-			if (i == lAcDetail.size()) {
-				occursList.putParam("OOamtdbAmt",amtdbAmt);
-			}
-
-			if (i == lAcDetail.size()) {
-				occursList.putParam("OOamtcrCnt",amtcrCnt);
-			}
-			
-			if (i == lAcDetail.size()) {
-				occursList.putParam("OOamtcrAmt",amtcrAmt);
-			}
-
-			
-			
-			
-			// 查詢會計科子細目設定檔
-			CdAcCode tCdAcCode = sCdAcCodeService.findById(new CdAcCodeId(acNoCode, acSubCode, acDtlCode), titaVo);
-			if (tCdAcCode == null) {
-				occursList.putParam("OOAcNoItem", "");
-			} else {
-				occursList.putParam("OOAcNoItem", tCdAcCode.getAcNoItem());
-			}
-
-			/* 將每筆資料放入Tota的OcList */
-			this.totaVo.addOccursList(occursList);
-
-		}
-
-		if (this.totaVo.getOccursList().size() == 0) {
-			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
-		}
+		this.totaVo.putParam("OTotalDCnt", totalDCnt);
+		this.totaVo.putParam("OTotalCCnt", totalCCnt);
+		this.totaVo.putParam("OTotalDAmt", totalDAmt);
+		this.totaVo.putParam("OTotalCAmt", totalCAmt);
 
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-		if (slAcDetail != null && slAcDetail.hasNext()) {
+		if (dList != null && dList.size() >= this.limit) {
 			titaVo.setReturnIndex(this.setIndexNext());
-			// this.totaVo.setMsgEndToEnter();// 手動折返
+//			 this.totaVo.setMsgEndToEnter();// 手動折返
 			this.totaVo.setMsgEndToAuto();// 自動折返
 		}
 

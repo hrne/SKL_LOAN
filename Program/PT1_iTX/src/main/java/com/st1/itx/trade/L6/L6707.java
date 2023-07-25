@@ -11,6 +11,7 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdCashFlow;
+import com.st1.itx.db.domain.CdCashFlowId;
 import com.st1.itx.db.service.CdCashFlowService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
@@ -62,6 +63,7 @@ public class L6707 extends TradeBuffer {
 
 		// 更新現金流量預估資料檔
 		CdCashFlow tCdCashFlow = new CdCashFlow();
+		CdCashFlowId cdCashFlowId;
 		switch (iFuncCode) {
 		case 1: // 新增
 			moveCdCashFlow(tCdCashFlow, iFuncCode, iYearMonth, titaVo);
@@ -79,7 +81,11 @@ public class L6707 extends TradeBuffer {
 			break;
 
 		case 2: // 修改
-			tCdCashFlow = sCdCashFlowService.holdById(iYearMonth);
+			cdCashFlowId = new CdCashFlowId();
+			cdCashFlowId.setBranchNo(titaVo.getBrno());
+			cdCashFlowId.setDataYearMonth(iYearMonth);
+			cdCashFlowId.setTenDayPeriods(1);
+			tCdCashFlow = sCdCashFlowService.holdById(cdCashFlowId);
 			if (tCdCashFlow == null) {
 				throw new LogicException(titaVo, "E0003", titaVo.getParam("DataYearMonth")); // 修改資料不存在
 			}
@@ -95,7 +101,11 @@ public class L6707 extends TradeBuffer {
 			break;
 
 		case 4: // 刪除
-			tCdCashFlow = sCdCashFlowService.holdById(iYearMonth);
+			cdCashFlowId = new CdCashFlowId();
+			cdCashFlowId.setBranchNo(titaVo.getBrno());
+			cdCashFlowId.setDataYearMonth(iYearMonth);
+			cdCashFlowId.setTenDayPeriods(1);
+			tCdCashFlow = sCdCashFlowService.holdById(cdCashFlowId);
 			if (tCdCashFlow != null) {
 				try {
 					sCdCashFlowService.delete(tCdCashFlow);
@@ -117,8 +127,16 @@ public class L6707 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private void moveCdCashFlow(CdCashFlow mCdCashFlow, int mFuncCode, int mYearMonth, TitaVo titaVo) throws LogicException {
+	private void moveCdCashFlow(CdCashFlow mCdCashFlow, int mFuncCode, int mYearMonth, TitaVo titaVo)
+			throws LogicException {
 
+		CdCashFlowId cdCashFlowId = new CdCashFlowId();
+		cdCashFlowId.setBranchNo(titaVo.getBrno());
+		cdCashFlowId.setDataYearMonth(mYearMonth);
+		cdCashFlowId.setTenDayPeriods(1);
+		
+		mCdCashFlow.setCdCashFlowId(cdCashFlowId);
+		
 		mCdCashFlow.setDataYearMonth(mYearMonth);
 		mCdCashFlow.setInterestIncome(this.parse.stringToBigDecimal(titaVo.getParam("InterestIncome")));
 		mCdCashFlow.setPrincipalAmortizeAmt(this.parse.stringToBigDecimal(titaVo.getParam("PrincipalAmortizeAmt")));
@@ -128,10 +146,12 @@ public class L6707 extends TradeBuffer {
 		mCdCashFlow.setLoanAmt(this.parse.stringToBigDecimal(titaVo.getParam("LoanAmt")));
 
 		if (mFuncCode != 2) {
-			mCdCashFlow.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+			mCdCashFlow.setCreateDate(
+					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			mCdCashFlow.setCreateEmpNo(titaVo.getTlrNo());
 		}
-		mCdCashFlow.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+		mCdCashFlow
+				.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 		mCdCashFlow.setLastUpdateEmpNo(titaVo.getTlrNo());
 	}
 }

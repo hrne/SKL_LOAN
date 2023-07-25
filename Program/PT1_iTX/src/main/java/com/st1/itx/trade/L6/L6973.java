@@ -44,14 +44,28 @@ public class L6973 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 100; // 252 * 100 = 25200
 
-		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
+		List<Map<String, String>> resultList;
 
-		try {
-			// *** 折返控制相關 ***
-			resultList = l6973ServiceImpl.doQuery(this.index, this.limit, titaVo);
-		} catch (Exception e) {
-			this.error("L6973ServiceImpl doQuery " + e.getMessage());
-			throw new LogicException("E0013", "L6973");
+		String jobTxSeq = titaVo.getParam("JobTxSeq");
+
+		this.info("jobTxSeq=" + jobTxSeq);
+
+		if (jobTxSeq != null && !jobTxSeq.isEmpty()) {
+			try {
+				// *** 折返控制相關 ***
+				resultList = l6973ServiceImpl.doQueryByJobTxSeq(jobTxSeq, this.index, this.limit, titaVo);
+			} catch (Exception e) {
+				this.error("L6973ServiceImpl doQueryByJobTxSeq " + e.getMessage());
+				throw new LogicException("E0013", "L6973");
+			}
+		} else {
+			try {
+				// *** 折返控制相關 ***
+				resultList = l6973ServiceImpl.doQuery(this.index, this.limit, titaVo);
+			} catch (Exception e) {
+				this.error("L6973ServiceImpl doQuery " + e.getMessage());
+				throw new LogicException("E0013", "L6973");
+			}
 		}
 
 		if (resultList != null && resultList.size() > 0) {
