@@ -76,6 +76,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "    , BATX.\"EntryDate\" ";// 匯款日
 			sql += "    , BATX.\"DetailSeq\""; // 匯款序號
 			sql += "    , BATX.\"RepayAmt\" "; // 匯款金額（排序用）
+			sql += "    , TX2.\"RepayCode\""; // 還款方式
 			sql += "    , TX2.\"AcSeq\" AS \"AcSeq\" ";
 			sql += "    , CASE WHEN NVL(TX1.\"AcDate\",0) = 0 THEN  BATX.\"RepayAmt\" ";
 			sql += "      	   ELSE TX2.\"TxAmt\" END AS \"TxAmt\""; // 匯款金額
@@ -174,7 +175,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "        , Max(\"FacmNo\")           AS \"FacmNo\"";
 			sql += "   FROM \"LoanBorTx\"";
 			sql += "   WHERE \"AcDate\" = :inputAcDate";
-			sql += "    AND \"RepayCode\" = 1 "; // 匯款轉帳
+			sql += "    AND \"RepayCode\" IN (1, 90) "; // 匯款轉帳、暫收抵繳
 			sql += "   GROUP BY \"CustNo\"";
 			sql += "          , \"AcDate\"";
 			sql += "          , \"TitaTlrNo\"";
@@ -353,6 +354,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "    , BATX.\"EntryDate\" ";// 匯款日
 			sql += "    , BATX.\"DetailSeq\""; // 匯款序號
 			sql += "    , BATX.\"RepayAmt\" "; // 匯款金額（排序用）
+			sql += "    , TX2.\"RepayCode\""; // 還款方式
 			sql += "    , TX2.\"AcSeq\" AS \"AcSeq\" ";
 			sql += "    , TX2.\"TxAmt\""; // 匯款金額
 			sql += "    , TX2.\"Principal\"";

@@ -16,6 +16,8 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.CustNotice;
+import com.st1.itx.db.domain.CustNoticeId;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.CustNoticeService;
@@ -177,6 +179,7 @@ public class L9705Report extends MakeReport {
 
 				ArrayList<BaTxVo> lBaTxVo = new ArrayList<>();
 				ArrayList<BaTxVo> listBaTxVo = new ArrayList<>();
+				ArrayList<BaTxVo> listBaTxVoCom = new ArrayList<>();
 
 				dBaTxCom.setTxBuffer(txbuffer);
 
@@ -196,12 +199,12 @@ public class L9705Report extends MakeReport {
 
 				try {
 					lBaTxVo = dBaTxCom.termsPay(entryDate, custNo, facmNo, 0, terms, 0, titaVo);
-					listBaTxVo = dBaTxCom.addByPayintDate(lBaTxVo, titaVo);
+					listBaTxVoCom = dBaTxCom.addByPayintDate(lBaTxVo, titaVo);
 				} catch (LogicException e) {
 					this.error("listBaTxVo ErrorMsg :" + e.getMessage());
 				}
 
-				this.info("listBaTxVo.size()=" + listBaTxVo.size());
+				this.info("listBaTxVo.size()=" + listBaTxVoCom.size());
 
 				// 是否最後一筆
 				if (l9705List.size() == (count + 1)) {
@@ -209,12 +212,9 @@ public class L9705Report extends MakeReport {
 					isLast = true;
 				}
 
-				if (listBaTxVo.size() == 0) {
-					continue;
-				}
 
 				// 排序 CustNo ASC,FacmNo ASC,PayIntDate ASC
-				listBaTxVo.sort((c1, c2) -> {
+				listBaTxVoCom.sort((c1, c2) -> {
 					if (c1.getCustNo() - c2.getCustNo() != 0) {
 						return c1.getCustNo() - c2.getCustNo();
 					} else if (c1.getFacmNo() - c2.getFacmNo() != 0) {
@@ -228,7 +228,7 @@ public class L9705Report extends MakeReport {
 					}
 				});
 
-				this.info("listBaTxVo1 = " + listBaTxVo.toString());
+				this.info("listBaTxVo1 = " + listBaTxVoCom.toString());
 				this.info("dBaTxCom getShortAmt = " + dBaTxCom.getShortAmt());
 				this.info("dBaTxCom getExcessive = " + dBaTxCom.getExcessive());
 				this.info("dBaTxCom getShortfall = " + dBaTxCom.getShortfall());
@@ -240,7 +240,7 @@ public class L9705Report extends MakeReport {
 				acctFee = BigDecimal.ZERO;
 
 				// 先算短繳
-				for (BaTxVo baTxVo : listBaTxVo) {
+				for (BaTxVo baTxVo : listBaTxVoCom) {
 
 					// 短繳
 					if (baTxVo.getFacmNo() == facmNo && baTxVo.getDataKind() == 1 && baTxVo.getRepayType() == 1) {
@@ -259,6 +259,12 @@ public class L9705Report extends MakeReport {
 					if (baTxVo.getFacmNo() == facmNo && baTxVo.getDataKind() == 1 && baTxVo.getRepayType() == 1) {
 						overShort = overShort.subtract(baTxVo.getUnPaidAmt());
 					}
+					if (baTxVo.getDataKind() == 2) {
+						listBaTxVo.add(baTxVo);
+					}
+				}
+				if (listBaTxVo.size() == 0) {
+					continue;
 				}
 
 				int con1Count = 0;
@@ -305,13 +311,12 @@ public class L9705Report extends MakeReport {
 					}
 
 					this.info("baTxVo =" + baTxVo.toString());
-
 					tmpCustNo = baTxVo.getCustNo();
 					tmpFacmNo = baTxVo.getFacmNo();
 					// listBaTxVo的最後一筆
 					if (listBaTxVo.size() == con2Count) {
-						exportData(l9705List, titaVo, tmplistBaTxVo, custMain, reconCode, count);
-						// 是否為全部資料的最後一筆
+						exportData(l9705List, titaVo, tmplistBaTxVo, custMain, reconCode, count); // 印出資料
+						// 全部資料的最後一筆
 						if (isLast) {
 							this.info("3 cust facm different....");
 							this.info("newPage....");

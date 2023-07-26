@@ -348,7 +348,7 @@ public class CheckAml extends TradeBuffer {
 
 		CheckAmlVo checkAmlVo = new CheckAmlVo();
 		if (amlflag == 2) {
-			txAmlLog.setConfirmStatus("0");
+//			txAmlLog.setConfirmStatus("0");
 			txAmlLog.setStatusCode("0008");
 			txAmlLog.setStatus("Success");
 			txAmlLog.setStatusDesc("測試套不檢查");

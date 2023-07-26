@@ -105,7 +105,6 @@ public class L4920 extends TradeBuffer {
 		}
 
 		if (resultPartList != null && resultPartList.size() > 0) {
-			
 
 			for (Map<String, String> result : resultPartList) {
 				OccursList occursList = new OccursList();
@@ -150,9 +149,11 @@ public class L4920 extends TradeBuffer {
 					if (tempVo.get("CheckMsg") != null && tempVo.get("CheckMsg").length() > 0) {
 						procNote += "檢核訊息:" + tempVo.get("CheckMsg") + " ";
 					}
-
-					if (tempVo.get("ErrorMsg") != null && tempVo.get("ErrorMsg").length() > 0) {
-						procNote += "錯誤訊息:" + tempVo.get("ErrorMsg") + " ";
+					if ((!"5".equals(result.get("ProcStsCode"))) && (!"6".equals(result.get("ProcStsCode")))
+							&& (!"7".equals(result.get("ProcStsCode")))) {
+						if (tempVo.get("ErrorMsg") != null && tempVo.get("ErrorMsg").length() > 0) {
+							procNote += "錯誤訊息:" + tempVo.get("ErrorMsg") + " ";
+						}
 					}
 
 					if ("9".equals(result.get("RepayType"))) {
@@ -205,7 +206,7 @@ public class L4920 extends TradeBuffer {
 		}
 
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-		if (resultPartList.size() >= this.limit ) {
+		if (resultPartList.size() >= this.limit) {
 			titaVo.setReturnIndex(this.setIndexNext());
 			/* 手動折返 */
 			this.totaVo.setMsgEndToEnter();

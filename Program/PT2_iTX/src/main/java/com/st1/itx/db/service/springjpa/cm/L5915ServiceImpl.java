@@ -97,12 +97,13 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           WHERE \"WorkMonth\" = :inputWorkMonth ";
 		sql += "             AND \"BonusType\" in (1,5) "; // 介紹及協辦
 		sql += "             AND \"AdjustBonus\" > 0 ";
+		sql += "             AND \"ManualFg\" = 0 ";//非人工新增(人工新增只計算金額不算件數)
 		sql += "           UNION ALL";
 		sql += "           SELECT \"CustNo\" ";
 		sql += "                , \"FacmNo\" ";
 		sql += "                , \"BormNo\" ";
 		sql += "           FROM \"PfReward\" ";
-		sql += "           WHERE \"WorkMonth\" = :inputWorkMonth ";
+		sql += "           WHERE \"WorkMonth\" = :inputWorkMonth ";//件數含當工作月全部撥款
 		sql += "         )  ";
 		sql += "    GROUP BY \"CustNo\" ";
 		sql += "           , \"FacmNo\" ";

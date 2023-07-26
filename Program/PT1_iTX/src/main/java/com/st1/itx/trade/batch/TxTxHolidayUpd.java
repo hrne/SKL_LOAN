@@ -51,7 +51,10 @@ public class TxTxHolidayUpd extends BatchBase implements Tasklet, InitializingBe
 
 		String txSeq = titaVo.getParam("JobTxSeq");
 
-		sJobMainService.Usp_Tx_TxHoliday_Ins(empNo, txSeq, titaVo);
+		try {
+			sJobMainService.Usp_Tx_TxHoliday_Ins(empNo, txSeq, titaVo);
+		} catch (Exception e) {
+			this.handleUspException(e);
+		}
 	}
-
 }

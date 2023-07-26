@@ -400,7 +400,7 @@ public class PfDetailCom extends TradeBuffer {
 			break;
 		}
 
-		// 更新計件代碼
+		// 更新是否計件
 		updCntingCode();
 
 		// 提前還款email通知
@@ -737,18 +737,18 @@ public class PfDetailCom extends TradeBuffer {
 				pf.setItPerfCnt(tCd.getUnitCnt());
 			}
 		}
-		// 是否計件，代碼(2&B)之是否計件寫入(代碼1&A)
-		if ("2".equals(pf.getPieceCode()) || "B".equals(pf.getPieceCode())) {
-			if (pf.getRepayType() == 0 && pf.getItPerfCnt().compareTo(BigDecimal.ZERO) > 0) {
-				for (PfDetail it : lPfDetail) {
-					if (it.getWorkMonth() == workMonthDrawdown && it.getItPerfCnt().compareTo(BigDecimal.ZERO) == 0
-							&& pf.getCreditSysNo() > 0 && it.getCreditSysNo() == pf.getCreditSysNo()
-							&& it.getPieceCode().equals(pf.getPieceCodeCombine())) {
-						lPfDetailCntingCode.add(it);
-					}
-				}
-			}
-		}
+		// 是否計件，代碼(2&B)之是否計件寫入(代碼1&A)，2023/07/26移除
+//		if ("2".equals(pf.getPieceCode()) || "B".equals(pf.getPieceCode())) {
+//			if (pf.getRepayType() == 0 && pf.getItPerfCnt().compareTo(BigDecimal.ZERO) > 0) {
+//				for (PfDetail it : lPfDetail) {
+//					if (it.getWorkMonth() == workMonthDrawdown && it.getItPerfCnt().compareTo(BigDecimal.ZERO) == 0
+//							&& pf.getCreditSysNo() > 0 && it.getCreditSysNo() == pf.getCreditSysNo()
+//							&& it.getPieceCode().equals(pf.getPieceCodeCombine())) {
+//						lPfDetailCntingCode.add(it);
+//					}
+//				}
+//			}
+//		}
 		// 是否計件，同額度、同撥款工作月相同
 		if (pf.getRepayType() == 0 && pf.getItPerfCnt().compareTo(BigDecimal.ZERO) > 0) {
 			for (PfDetail it : lPfDetail) {
