@@ -13,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -229,16 +231,58 @@ public abstract class BatchBase {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.error(errors.toString());
-			if (e.getErrorMsgId().equals("S0001"))
+			if (e.getErrorMsgId().equals("S0001")) {
 				sc.setExitStatus(ExitStatus.STOPPED);
-			else
+			} else {
 				sc.setExitStatus(ExitStatus.FAILED);
+				String errorCode = e.getErrorMsgId();
+				String errorMsg = e.getMessage();
+				this.titaVo.putParam("TaskErrorCode", errorCode);
+				this.titaVo.putParam("TaskErrorMsg", errorMsg);
+			}
 			return RepeatStatus.FINISHED;
 		} catch (Throwable e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.error(errors.toString());
 			sc.setExitStatus(ExitStatus.FAILED);
+			String errorMsg = e.getMessage();
+			this.titaVo.putParam("TaskErrorCode", "E0013");
+			this.titaVo.putParam("TaskErrorMsg", errorMsg);
+			return RepeatStatus.FINISHED;
+		}
+	}
+
+	public RepeatStatus exec(StepContribution sc, String md, ChunkContext chunkContext) {
+		this.info("batch run...." + md);
+		this.info(this.titaVo.toString());
+
+		ExecutionContext ec = chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext();
+
+		try {
+			this.run();
+			sc.setExitStatus(ExitStatus.COMPLETED);
+			return RepeatStatus.FINISHED;
+		} catch (LogicException e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error(errors.toString());
+			if (e.getErrorMsgId().equals("S0001")) {
+				sc.setExitStatus(ExitStatus.STOPPED);
+			} else {
+				sc.setExitStatus(ExitStatus.FAILED);
+				ec.put("TaskErrorCode", e.getErrorMsgId());
+				ec.put("TaskErrorMsg", e.getMessage());
+			}
+			return RepeatStatus.FINISHED;
+		} catch (Throwable e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error(errors.toString());
+			sc.setExitStatus(ExitStatus.FAILED);
+			String errorMsg = e.getMessage();
+			ec.put("TaskErrorCode", "E0013"); // 程式邏輯錯誤
+			ec.put("TaskErrorMsg", errorMsg);
 			return RepeatStatus.FINISHED;
 		}
 	}
@@ -265,6 +309,6 @@ public abstract class BatchBase {
 		String stackTrace = errors.toString();
 		// 完整錯誤輸出
 		this.error("Stack trace: " + stackTrace);
-		throw new LogicException("E0013", errorMsg);
+		throw new LogicException("EC007", errorMsg); // 資料庫批次錯誤
 	}
 }

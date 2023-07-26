@@ -1,7 +1,5 @@
 package com.st1.itx.batch.listener;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -11,6 +9,7 @@ import java.util.Objects;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -55,7 +54,7 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 		this.info("batch execDate    : " + execDate);
 		this.info("step startTime  : " + startTime);
 
-		this.updtaeJobDetail(jobId, nestedJobId, stepId, execDate, startTime, true, stepExecution);
+		this.updateJobDetail(jobId, nestedJobId, stepId, execDate, startTime, true, stepExecution);
 
 		String txSeq = stepExecution.getJobExecution().getJobParameters().getString(ContentName.txSeq);
 		stepExecution.getExecutionContext().put("txSeq", txSeq);
@@ -91,7 +90,7 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 		this.info("step endTime       : " + endTime);
 		this.info("step stepStatus   : " + stepExecution.getExitStatus().getExitCode());
 
-		this.updtaeJobDetail(jobId, null, stepId, execDate, endTime, false, stepExecution, stepStatus);
+		this.updateJobDetail(jobId, null, stepId, execDate, endTime, false, stepExecution, stepStatus);
 
 		if (!Thread.currentThread().getName()
 				.equals(stepExecution.getJobExecution().getExecutionContext().getString(ContentName.threadName)))
@@ -111,7 +110,7 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 	 * @param seFg        啟動 / 結束
 	 * @param stepStatus  執行狀態
 	 */
-	private void updtaeJobDetail(String jobId, String nestedJobId, String stepId, int execDate, Timestamp time,
+	private void updateJobDetail(String jobId, String nestedJobId, String stepId, int execDate, Timestamp time,
 			boolean seFg, StepExecution stepExecution, String... stepStatus) {
 		JobDetailId jobDetailId = new JobDetailId();
 		JobDetail jobDetail = new JobDetail();
@@ -150,21 +149,24 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 				jobDetailService.insert(jobDetail, titaVo);
 				this.info("jobDetail insert. " + jobDetail.toString());
 			} else {
-				List<Throwable> failureExceptions = stepExecution.getFailureExceptions();
+				String errorCode = "E0013"; // 程式邏輯錯誤
 				String errorMsg = "";
+				List<Throwable> failureExceptions = stepExecution.getFailureExceptions();
 				for (Throwable t : failureExceptions) {
 					// 取得錯誤訊息
 					errorMsg = t.getMessage();
 					this.error("Error message: " + errorMsg);
-
-					// 獲取異常的堆疊軌跡
-					StringWriter errors = new StringWriter();
-					t.printStackTrace(new PrintWriter(errors));
-					String stackTrace = errors.toString();
-
-					// 將堆疊軌跡記錄到日誌
-					this.error("Stack trace: " + stackTrace);
 				}
+
+				ExecutionContext ec = stepExecution.getJobExecution().getExecutionContext();
+				if (ec.containsKey("TaskErrorCode")) {
+					// 2023-07-26 智偉 把 task 在執行時出的錯誤記錄下來
+					errorCode = ec.getString("TaskErrorCode");
+					errorMsg = ec.getString("TaskErrorMsg");
+					this.error("TaskErrorCode: " + errorCode);
+					this.error("TaskErrorMsg: " + errorMsg);
+				}
+
 				jobDetailId.setExecDate(execDate);
 				jobDetailId.setJobCode(jobId);
 				jobDetailId.setStepId(stepId);
@@ -176,6 +178,7 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 						jobDetail.setStatus(stepStatus[0].substring(0, 1));
 					}
 					jobDetail.setStepEndTime(time);
+					jobDetail.setErrCode(errorCode);
 					jobDetail.setErrContent(errorMsg);
 					jobDetailService.update(jobDetail, titaVo);
 					this.info("jobDetail update. " + jobDetail.toString());
