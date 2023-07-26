@@ -3,10 +3,12 @@ package com.st1.itx.tradeService;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.sql.SQLException;
 import java.util.Objects;
 
 import javax.annotation.PostConstruct;
 
+import org.hibernate.exception.SQLGrammarException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.ExitStatus;
@@ -72,14 +74,14 @@ public abstract class BatchBase {
 				this.titaVo.putParam(ContentName.kinbr, "0000");
 				this.titaVo.putParam(ContentName.tlrno, tlrNo);
 				this.titaVo.putParam(ContentName.empnot, tlrNo);
-			} else 
+			} else
 				this.titaVo = this.titaVo.getVo(txCruiser.getParameter());
-			
+
 			if ("L6870".equals(this.getParent())) {
 				this.titaVo.putParam(ContentName.tlrno, "999999");
 				this.titaVo.putParam(ContentName.empnot, "999999");
 			}
-			
+
 			if ("0".equals(this.excuteMode))
 				this.titaVo.putParam(ContentName.dataBase, this.dataBase);
 			else {
@@ -241,4 +243,28 @@ public abstract class BatchBase {
 		}
 	}
 
+	public void handleUspException(Exception ex) throws LogicException {
+		Throwable cause = ex.getCause();
+		while (!(cause instanceof SQLException) && cause != null) {
+			cause = cause.getCause();
+		}
+		String errorMsg = ex.getMessage();
+		if (cause instanceof SQLException) {
+			SQLException sqlEx = (SQLException) cause;
+			errorMsg = sqlEx.getMessage();
+			this.error("SQLException Error Msg: " + errorMsg);
+		} else if (cause instanceof SQLGrammarException) {
+			SQLGrammarException sqlge = (SQLGrammarException) cause;
+			errorMsg = sqlge.getMessage();
+			this.error("SQLGrammarException Error Msg: " + errorMsg);
+		} else {
+			this.error("Unexpected sql exception Error Msg: " + errorMsg);
+		}
+		StringWriter errors = new StringWriter();
+		ex.printStackTrace(new PrintWriter(errors));
+		String stackTrace = errors.toString();
+		// 完整錯誤輸出
+		this.error("Stack trace: " + stackTrace);
+		throw new LogicException("E0013", errorMsg);
+	}
 }
