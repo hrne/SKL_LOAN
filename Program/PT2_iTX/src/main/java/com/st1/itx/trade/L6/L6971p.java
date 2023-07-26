@@ -3,7 +3,6 @@ package com.st1.itx.trade.L6;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.TxArchiveTableLog;
 import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.TxArchiveTableLogService;
 import com.st1.itx.db.service.TxArchiveTableService;
@@ -57,14 +55,16 @@ public class L6971p extends TradeBuffer {
 
 	WorkType workType;
 
-	private List<TxArchiveTableLog> listTxArchiveTableLog = new ArrayList<>();
-
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6971p ");
 		this.totaVo.init(titaVo);
 
-		workType = WorkType.getWorkTypeByHelp(titaVo.getParam("InputType"));
+		if (titaVo.containsKey("InputType")) {
+			workType = WorkType.getWorkTypeByHelp(titaVo.getParam("InputType"));
+		} else {
+			workType = WorkType.FiveYearsTX;
+		}
 
 		// 2023-06-07 Wei 從資料庫整批刪除
 		int deleteCount = 0;
