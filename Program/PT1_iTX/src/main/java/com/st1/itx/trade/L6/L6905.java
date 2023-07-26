@@ -137,10 +137,10 @@ public class L6905 extends TradeBuffer {
 
 			// 傳票批號=SlipBatNo
 			occursList.putParam("OOSlipBatNo", d.get("SlipBatNo"));
-			// 彙總批號=SlipSumNo，TitaBatchNo
-			if (d.get("TitaBatchNo").length() == 6) {
-				occursList.putParam("OOSlipSumNo", d.get("TitaBatchNo").substring(4, 6));
-			} else {
+			// 整批批號
+			occursList.putParam("OOTitaBatchNo", d.get("TitaBatchNo"));
+			// 彙總傳票號碼
+			if (!"0".equals(d.get("SlipSumNo").trim())) {
 				occursList.putParam("OOSlipSumNo", d.get("SlipSumNo"));
 			}
 			// 入總帳記號=EntAc

@@ -246,17 +246,17 @@ public class L4211Report extends MakeReport {
 		}
 		// 科目排序
 		fnAllList1 = sortMapListCom.beginSort(fnAllList1).ascString("ReconCode").ascString("BatchNo")
-				.ascString("SortingForSubTotal").ascString("DetailSeq").ascString("AcSeq").ascString("CustNo")
+				.ascString("SortingForSubTotal").ascString("RepayCode").ascString("DetailSeq").ascString("AcSeq").ascString("CustNo")
 				.getList();
 
 		// 金額排序:已處理/待處理 + 結清 + 金額 + 戶號
 		fnAllList2 = sortMapListCom.beginSort(fnAllList2).ascString("ReconCode").ascString("BatchNo")
-				.ascString("SortingForSubTotal").ascString("SortingForClose").descNumber("RepayAmt").ascString("CustNo")
+				.ascString("SortingForSubTotal").ascString("RepayCode").ascString("SortingForClose").descNumber("RepayAmt").ascString("CustNo")
 				.ascString("DetailSeq").ascString("AcSeq").getList();
 
 		// 戶號排序:已處理/待處理 + 結清 + 戶號 + 金額
 		fnAllList3 = sortMapListCom.beginSort(fnAllList3).ascString("ReconCode").ascString("BatchNo")
-				.ascString("SortingForSubTotal").ascString("SortingForClose").ascString("CustNo").descNumber("RepayAmt")
+				.ascString("SortingForSubTotal").ascString("RepayCode").ascString("SortingForClose").ascString("CustNo").descNumber("RepayAmt")
 				.ascString("DetailSeq").ascString("AcSeq").getList();
 
 		makePdf(fnAllList1, fnAllList2, fnAllList3, false, titaVo);

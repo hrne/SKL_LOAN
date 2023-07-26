@@ -44,7 +44,7 @@ E(0,0)
 ["#R1+@戶號",#CustNo],
 ["#R2+@日期",#DateType,#DateTypeX,#BeginDate,#EndDate],
 ["#R3+@訂正別",#CorrectType,#CorrectCodeX],
-["#R4+@報表",#ReportType,#ReportTypeX],
+
 ["#FdMsg+@注意事項",#Msg],
 ]
 !---------- AP Button AREA ----------
@@ -86,8 +86,7 @@ T(3,CdCode.DateType)
 !ReportType
 #CDCODEReportType=x,20,S                  
 T(3,CdCode.ReportType)                  
-                                         
-#ReportTypeHelp=x,100,S        
+    
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
@@ -95,9 +94,7 @@ S(XXR99,01,#CDCODEDateType,#CDCODEReportType)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@DateTypeHelp,#HelpDesc1)
-T(B,@ReportTypeHelp,#HelpDesc2+;9:全部)
 
-T(3,@ReportTypeHelp,1:客戶往來本息明細表（額度）;2:客戶往來本息明細表（撥款）;3:客戶往來交易明細表;9:全部)
 
 
 #CorrectTypeHelp=X,100,S
@@ -177,15 +174,7 @@ V(H,#CorrectTypeHelp)
 #CorrectCodeX=X,6,L
 T(H,#CorrectType,#CorrectTypeHelp) 
 
-!報表
-#ReportType=A,1,I
-E(0,1)
-HELP(#ReportTypeHelp)
-@T(3,@ReportTypeX,)
-V(H,#ReportTypeHelp)
 
-#ReportTypeX=X,30,L
-T(H,#ReportType,#ReportTypeHelp)
 
 <include src="ROM.icf::L1R20.dec"/>
 
@@ -247,7 +236,7 @@ T(3,[L9701] 客戶往來交易明細表)
 #BeginDate
 #EndDate
 #CorrectType
-#ReportType
+
 </sub>
 
 

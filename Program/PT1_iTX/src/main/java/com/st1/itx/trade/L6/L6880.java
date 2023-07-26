@@ -102,34 +102,37 @@ public class L6880 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0015", "須執行L6870-夜間批次"); // E0010 功能選擇錯誤
 			}
 		} else {
-			// Parm :1.系統換日異常，強制換至下營業日
-			// Parm :2.測試時系統日期強制換至指定日期
+			// Parm :1 => 系統換日異常，強制換至下營業日
+			// Parm :2,yyymmdd  => 測試時系統日期強制換至指定日期
 			if ("1".equals(titaVo.getParam("Parm"))) {
-				iEntday = "" + this.txBuffer.getTxBizDate().getTbsDy();
+				iEntday = "" + this.txBuffer.getTxBizDate().getNbsDy();
+				// 連線日期應為批次系統日期的下營業日
+				TxBizDate batchTxBizDate = sTxBizDateService.holdById("BATCH", titaVo);
+				if (parse.stringToInteger(iEntday) != batchTxBizDate.getNbsDy()) {
+					throw new LogicException(titaVo, "E0015", "須執行L6870-夜間批次"); // E0010 功能選擇錯誤
+				}
 				this.totaVo.setWarnMsg("系統換日異常，強制換至下營業日");
 			} else if ("2".equals(titaVo.getParam("Parm").substring(0, 1))) {
 				isChangeOnlineDate = false;
-				iEntday = titaVo.getParam("Parm").substring(1, 8);
+				iEntday = titaVo.getParam("Parm").substring(2, 9);
 				this.totaVo.setWarnMsg("測試時強制批次日期換至指定日期" + iEntday);
 				// 2-連線日期 -> 批次日期
 				acMainCom.setTxBuffer(this.txBuffer);
 				proc(titaVo, "BATCH", iEntday);
 				// 往前跳開批次日期需過總帳(測試時)，連線日期 -> 批次日期
 				if (parse.stringToInteger(iEntday) > this.txBuffer.getTxBizDate().getTbsDy()) {
-					Slice<AcMain> slAcMain = acMainService.acmainAcDateEq(this.txBuffer.getTxBizDate().getTbsDyf(), this.index, Integer.MAX_VALUE);
+					Slice<AcMain> slAcMain = acMainService.acmainAcDateEq(this.txBuffer.getTxBizDate().getTbsDyf(),
+							this.index, Integer.MAX_VALUE);
 					List<AcMain> lAcMain = slAcMain == null ? null : slAcMain.getContent();
 					if (lAcMain != null) {
-						acMainCom.changeDate(this.txBuffer.getTxBizDate().getTbsDy(), parse.stringToInteger(iEntday), lAcMain, titaVo);
+						acMainCom.changeDate(this.txBuffer.getTxBizDate().getTbsDy(), parse.stringToInteger(iEntday),
+								lAcMain, titaVo);
 					}
 				}
+				proc(titaVo, "ONLINE", String.valueOf(iEntday));
 			} else {
 				throw new LogicException(titaVo, "E0015", "參數：1/2 ，1-換至下營業日 2-換至指定日期"); // 檢查錯誤
 			}
-		}
-		// 連線日期應為批次系統日期的下營業日
-		TxBizDate batchTxBizDate = sTxBizDateService.holdById("BATCH", titaVo);
-		if (parse.stringToInteger(iEntday) != batchTxBizDate.getNbsDy()) {
-			throw new LogicException(titaVo, "E0015", "須執行L6870-夜間批次"); // E0010 功能選擇錯誤
 		}
 
 		// 更改連線日期
@@ -162,9 +165,9 @@ public class L6880 extends TradeBuffer {
 		// stopTime – 顯示停止時間 西元 8 + 4 時間
 		// msg – 訊息內容
 		// mode – false : insert and replace mode ; true : delete mode titaVo – titaVo
-		String brtime = dDateUtil.getNowStringBc() + (this.txBuffer.getTxCom().getTxTime()/100 + 10);//10分鐘
+		String brtime = dDateUtil.getNowStringBc() + (this.txBuffer.getTxCom().getTxTime() / 100 + 10);// 10分鐘
 		webClient.sendTicker("0000", "00001", brtime, "系統已換日", false, titaVo);
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
@@ -264,30 +267,32 @@ public class L6880 extends TradeBuffer {
 	}
 
 	private void chgTxnoTo0(TitaVo titaVo) throws LogicException {
-        Slice<TxTeller> txTellerSlice = txTellerService.findAll(0, Integer.MAX_VALUE);
-        List<TxTeller> txTellerLi = txTellerSlice.hasContent() ? txTellerSlice.getContent() : null;
+		Slice<TxTeller> txTellerSlice = txTellerService.findAll(0, Integer.MAX_VALUE);
+		List<TxTeller> txTellerLi = txTellerSlice.hasContent() ? txTellerSlice.getContent() : null;
 
-        //本身有預做不能是1
-        int txtNo = 1;
+		// 本身有預做不能是1
+		int txtNo = 1;
 
-        if (Objects.isNull(txTellerLi))
-            return;
+		if (Objects.isNull(txTellerLi))
+			return;
 
-        for (TxTeller te : txTellerLi)
-            if (te.getTlrNo().trim().equals(titaVo.getTlrNo().trim())) {
-                TxRecord txRecord = txRecordService.findEntdyFirst(this.getTxBuffer().getTxBizDate().getTbsDyf(), te.getTlrNo(), "00");
-                te.setTxtNo(Objects.isNull(txRecord) ? 1 : parse.stringToInteger(txRecord.getTxSeq()) + 1);
-                txtNo = te.getTxtNo();
-            } else {
-                TxRecord txRecord = txRecordService.findEntdyFirst(this.getTxBuffer().getTxBizDate().getTbsDyf(), te.getTlrNo(), "00");
-                te.setTxtNo(Objects.isNull(txRecord) ? 0 : parse.stringToInteger(txRecord.getTxSeq()));
-            }
-        try {
-            txTellerService.updateAll(txTellerLi, titaVo);
-            titaVo.putParam(ContentName.txtno, FormatUtil.pad9(Integer.toString(txtNo), 8));
-        } catch (DBException e) {
-            this.error("TxTeller update all TxNo False!!!");
-        }
-    }
+		for (TxTeller te : txTellerLi)
+			if (te.getTlrNo().trim().equals(titaVo.getTlrNo().trim())) {
+				TxRecord txRecord = txRecordService.findEntdyFirst(this.getTxBuffer().getTxBizDate().getTbsDyf(),
+						te.getTlrNo(), "00");
+				te.setTxtNo(Objects.isNull(txRecord) ? 1 : parse.stringToInteger(txRecord.getTxSeq()) + 1);
+				txtNo = te.getTxtNo();
+			} else {
+				TxRecord txRecord = txRecordService.findEntdyFirst(this.getTxBuffer().getTxBizDate().getTbsDyf(),
+						te.getTlrNo(), "00");
+				te.setTxtNo(Objects.isNull(txRecord) ? 0 : parse.stringToInteger(txRecord.getTxSeq()));
+			}
+		try {
+			txTellerService.updateAll(txTellerLi, titaVo);
+			titaVo.putParam(ContentName.txtno, FormatUtil.pad9(Integer.toString(txtNo), 8));
+		} catch (DBException e) {
+			this.error("TxTeller update all TxNo False!!!");
+		}
+	}
 
 }

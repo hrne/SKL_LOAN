@@ -649,15 +649,13 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 			// 利率變動日及地址
 		} else {
 
-			sql += "   SELECT X.\"CustNo\"    AS \"CustNo\"";
+			sql += "   SELECT DISTINCT X.\"CustNo\"    AS \"CustNo\"";
 			sql += "        , X.\"FacmNo\"    AS \"FacmNo\"";
 			sql += "        , Nvl(R.\"EffectDate\", 0 ) AS \"TxEffectDate\"";
 			sql += "        , Nvl(R2.\"FitRate\", 0) AS \"PresentRate\"";
 			sql += "        , Nvl(R.\"FitRate\", 0) AS \"AdjustedRate\"";
 			sql += "        , Nvl(Cb.\"BdLocation\", ' ') AS \"Location\"";
 			sql += "   FROM \"tmpMain\"     X";
-//			sql += "   LEFT JOIN \"FacMain\"   F ON F.\"CustNo\" = X.\"CustNo\"";
-//			sql += "                            AND F.\"FacmNo\" = X.\"FacmNo\"";
 			sql += "   LEFT JOIN (";
 			sql += "       SELECT \"CustNo\"";
 			sql += "            , \"FacmNo\"";

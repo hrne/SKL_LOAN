@@ -254,14 +254,13 @@ T(2,#OOAcNoCode+-+#OOAcSubCode+-+#OOAcDtlCode)
 !彙計方式為6時,此欄位為"業務類別" (撥款匯款、支票繳款、債協、放款)
 #OOInqData=X,6,S
 
-#OOBankRmftItem=X,60,S
-
+#OOInqDataX=x,60,S
 
 #OOSumNoX=X,20,S
-C(2,#InqType,S,T(H,#OOInqData,#SumNoTypeHelp),T(2,#OOInqData),T(2,#OOInqData),T(2,#OOInqData+ +#OOBankRmftItem),T(2,#OOInqData),T(H,#OOInqData,#SecNoTypeHelp),T(2,#OOInqData))
+C(2,#InqType,S,T(H,#OOInqData,#SumNoTypeHelp),T(2,#OOInqData+ +#OOInqDataX),T(2,#OOInqData),T(2,#OOInqData+ +#OOInqDataX),T(2,#OOInqData),T(H,#OOInqData,#SecNoTypeHelp),T(2,#OOInqData))
 
 !借方筆數
-#OODbCnt=N,5,L
+#OODbCnt=X,10,L
 !#OODbCntX=X,5,L
 !IF(#OODbCnt==0,S,$)
 !X(#OODbCnt)
@@ -275,7 +274,7 @@ IF(#OODbAmt1==0,S,$)
 X(#OODbAmt1)
 
 !貸方筆數
-#OOCrCnt=N,5,L
+#OOCrCnt=X,10,L
 !#OOCrCntX=X,5,L
 !IF(#OOCrCnt==0,S,$)
 !X(#OOCrCnt)
@@ -333,7 +332,7 @@ TXFORM=L6904
 #OOAcDtlCode
 #OOAcNoItem
 #OOInqData
-#OOBankRmftItem
+#OOInqDataX
 #OODbCnt
 #OODbAmt
 #OOCrCnt

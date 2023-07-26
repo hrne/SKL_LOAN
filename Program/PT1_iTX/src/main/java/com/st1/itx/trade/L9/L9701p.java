@@ -36,12 +36,6 @@ public class L9701p extends TradeBuffer {
 	L9701Report l9701Report;
 
 	@Autowired
-	L9701Report2 l9701Report2;
-
-	@Autowired
-	L9701Report3 l9701Report3;
-
-	@Autowired
 	CdReportService sCdReportService;
 
 	@Autowired
@@ -58,32 +52,15 @@ public class L9701p extends TradeBuffer {
 		this.info("active L9701p ");
 		this.totaVo.init(titaVo);
 
-
 		String parentTranCode = titaVo.getTxcd();
 
 		l9701Report.setParentTranCode(parentTranCode);
-		l9701Report2.setParentTranCode(parentTranCode);
-		l9701Report3.setParentTranCode(parentTranCode);
-
-		// 讀取VAR參數
-		String iReportType = titaVo.getParam("ReportType").trim();
 
 		List<BaTxVo> listBaTxVo = new ArrayList<>();
 
-		if (!iReportType.equals("3")) {
-			listBaTxVo = runBaTxCom(titaVo);
-		}
-		if (iReportType.equals("1") || iReportType.equals("9")) {
-			l9701Report.exec(titaVo, listBaTxVo);
-		}
+		listBaTxVo = runBaTxCom(titaVo);
 
-		if (iReportType.equals("2") || iReportType.equals("9")) {
-			l9701Report2.exec(titaVo, listBaTxVo);
-		}
-
-		if (iReportType.equals("3") || iReportType.equals("9")) {
-			l9701Report3.exec(titaVo);
-		}
+		l9701Report.exec(titaVo, listBaTxVo);
 
 		String nowBc = dDateUtil.getNowStringBc();
 		String tlrNo = titaVo.getTlrNo();

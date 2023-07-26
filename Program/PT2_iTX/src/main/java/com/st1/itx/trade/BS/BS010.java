@@ -30,7 +30,8 @@ import com.st1.itx.util.parse.Parse;
 /**
  * 新增應處理明細－轉列催收 <br>
  * 執行時機：日始作業，應處理清單維護(BS001)自動執行 <br>
- * 1.年底日呆帳產生法務費墊付 2.逾期放款應於清償期屆滿六個月內轉入「催收款項」(前三營業日寫入應處理清單)<br>
+ * 1.年底日呆帳產生法務費墊付 <br>
+ * 2.逾期放款應於清償期屆滿六個月內轉入「催收款項」(前三營業日寫入應處理清單)<br>
  * 3.月底日將逾三個月之火險費轉列催收<br>
  * 4.月底日將逾三個月之法務費轉列催收<br>
  * 
@@ -140,7 +141,8 @@ public class BS010 extends TradeBuffer {
 		baTxCom.setTxBuffer(this.getTxBuffer());
 
 		// find data
-		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.nextPayIntDateRange(0, iPayDate + 19110000, 0, this.index, Integer.MAX_VALUE);
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.nextPayIntDateRange(0, iPayDate + 19110000, 0, this.index,
+				Integer.MAX_VALUE);
 		List<LoanBorMain> lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 		// size > 0 -> 新增應處理明細
 		TxToDoDetail tTxToDoDetail;
@@ -212,7 +214,8 @@ public class BS010 extends TradeBuffer {
 		this.info("火險費轉列催收日期 < " + payDate);
 		// find data
 		// F09 暫付火險保費
-		Slice<AcReceivable> slAcReceivable = acReceivableService.acrvOpenAcDateLq("F09", 0, payDate, this.index, Integer.MAX_VALUE); // acctCode=, clsFlag=, openAcDate <
+		Slice<AcReceivable> slAcReceivable = acReceivableService.acrvOpenAcDateLq("F09", 0, payDate, this.index,
+				Integer.MAX_VALUE); // acctCode=, clsFlag=, openAcDate <
 		lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
 //test	lAcReceivable = acReceivableService.acrvOpenAcDateLq("F09", 0, 99999999); // acctCode=, clsFlag=, openAcDate <
 		// data size > 0 -> 新增應處理明細
@@ -241,7 +244,8 @@ public class BS010 extends TradeBuffer {
 		this.info("法務費轉列催收日期 < " + payDate);
 		// find data
 		// F07 暫付法務費
-		Slice<AcReceivable> slAcReceivable = acReceivableService.acrvOpenAcDateLq("F07", 0, payDate, this.index, Integer.MAX_VALUE); // acctCode=, clsFlag=, openAcDate <
+		Slice<AcReceivable> slAcReceivable = acReceivableService.acrvOpenAcDateLq("F07", 0, payDate, this.index,
+				Integer.MAX_VALUE); // acctCode=, clsFlag=, openAcDate <
 		lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
 		// acctCode=, clsFlag=, openAcDate <
 		// data size > 0 -> 新增應處理明細
@@ -312,14 +316,14 @@ public class BS010 extends TradeBuffer {
 	private Boolean checkStatus(AcReceivable rv, TitaVo titaVo) throws LogicException {
 		boolean isCheck = true;
 
-		Slice<LoanBorMain> slLoanBorMain = null;
-		List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
-		slLoanBorMain = loanBorMainService.bormCustNoEq(rv.getCustNo(), 0, 999, 0, 900, 0, Integer.MAX_VALUE, titaVo);
-		lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
-		for (LoanBorMain t : lLoanBorMain) {
-			if (!(t.getStatus() == 6 || t.getStatus() == 8 || t.getStatus() == 9)) {
-				isCheck = false;
-				break;
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(rv.getCustNo(), 0, 999, 0, 900, 0,
+				Integer.MAX_VALUE, titaVo);
+		if (slLoanBorMain != null) {
+			for (LoanBorMain t : slLoanBorMain.getContent()) {
+				if (!(t.getStatus() == 6 || t.getStatus() == 8 || t.getStatus() == 9)) {
+					isCheck = false;
+					break;
+				}
 			}
 		}
 		return isCheck;

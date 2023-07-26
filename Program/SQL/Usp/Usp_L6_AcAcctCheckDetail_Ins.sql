@@ -2,8 +2,7 @@ CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L6_AcAcctCheckDetail_Ins"
 (    
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
-    "EmpNo"        IN  VARCHAR2,   -- 經辦
-    JobTxSeq       IN  VARCHAR2    -- 啟動批次的交易序號
+    "EmpNo"        IN  VARCHAR2    -- 經辦
 )
 AS
 BEGIN
@@ -171,20 +170,6 @@ BEGIN
     JOB_END_TIME := SYSTIMESTAMP;
 
     commit;
-
-    -- 例外處理
-    Exception
-    WHEN OTHERS THEN
-    "Usp_L9_UspErrorLog_Ins"(
-        'Usp_L6_AcAcctCheckDetail_Ins' -- UspName 預存程序名稱
-      , SQLCODE -- Sql Error Code (固定值)
-      , SQLERRM -- Sql Error Message (固定值)
-      , dbms_utility.format_error_backtrace -- Sql Error Trace (固定值)
-      , "EmpNo" -- 發動預存程序的員工編號
-      , JobTxSeq -- 啟動批次的交易序號
-    );
-    COMMIT;
-    RAISE;
   END;
 END;
 

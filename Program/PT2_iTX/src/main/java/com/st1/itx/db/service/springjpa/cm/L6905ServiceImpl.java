@@ -71,9 +71,8 @@ public class L6905ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "LEFT JOIN \"CdEmp\" C on C.\"EmployeeNo\"=A.\"TitaTlrNo\" ";
 		sql += "LEFT JOIN \"CdEmp\" D on D.\"EmployeeNo\"=A.\"TitaSupNo\" ";
 		sql += "LEFT JOIN \"CdAcCode\" E on E.\"AcNoCode\"=A.\"AcNoCode\" and E.\"AcSubCode\"=A.\"AcSubCode\" and E.\"AcDtlCode\"=a.\"AcDtlCode\" ";
-		// sql += "WHERE （A.\"DrawdownAmt\" > 0 OR D.\"AdjRange\" > 0) ";
 		sql += "WHERE A.\"AcDate\" = :AcDate ";
-		// sql += " AND A.\"EntAc\" > 0 ";
+		sql += " AND A.\"EntAc\" > 0 ";
 
 		if (!iBranchNo.isEmpty()) {
 			sql += "AND A.\"BranchNo\" = :BranchNo ";
@@ -121,6 +120,8 @@ public class L6905ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "AND \"SlipBatNo\" = :SlipBatNo ";
 		} else if (iInqType == 6) {
 			sql += "AND \"TitaSecNo\" = :TitaSecNo ";
+		} else if (iInqType == 7) {
+			sql += "AND \"SlipSumNo\" = :SlipSumNo ";
 		}
 		sql += "ORDER BY A.\"SlipNo\" ASC  ";
 
@@ -184,9 +185,11 @@ public class L6905ServiceImpl extends ASpringJpaParm implements InitializingBean
 		} else if (iInqType == 4) {
 			query.setParameter("DscptCode", FormatUtil.padX(iInqData, 4));
 		} else if (iInqType == 5) {
-			query.setParameter("SlipBatNo", iInqData);
+			query.setParameter("SlipBatNo", iInqData.trim().isEmpty() ? 0 : parse.stringToInteger(iInqData.trim()));
 		} else if (iInqType == 6) {
 			query.setParameter("TitaSecNo", FormatUtil.padX(iInqData, 2));
+		} else if (iInqType == 7) {
+			query.setParameter("SlipSumNo", iInqData.trim().isEmpty() ? 0 : parse.stringToInteger(iInqData.trim()));
 		}
 
 		this.info("L6905Service FindData=" + query);

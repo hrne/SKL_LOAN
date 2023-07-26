@@ -170,26 +170,38 @@ public class L6904ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ,SUM(\"CAMT\")  AS \"SumCAmt\" ";
 		sql += "        ,TO_NCHAR('')  AS \"AcNoItem\" ";
 		sql += "        ,TO_NCHAR('')  AS \"DataInq\" ";
-		sql += "        ,TO_NCHAR('')  AS \"BankRmftItem\" ";
+		sql += "        ,TO_NCHAR('')  AS \"DataInqX\" ";
 		sql += "        FROM \"Data\"  ";
 		sql += "        UNION ALL  ";
 		sql += "        SELECT  ";
 		sql += "        d.\"AcNoCode\"  AS \"AcNoCode\" ";
 		sql += "        , d.\"AcSubCode\" AS \"AcSubCode\" ";
 		sql += "        , d.\"AcDtlCode\" AS \"AcDtlCode\" ";
-		sql += "        ,d.\"DCNT\" AS \"SumDCnt\" ";
+		sql += "        , d.\"DCNT\" AS \"SumDCnt\" ";
 		sql += "        , d.\"CCNT\" AS \"SumCCnt\" ";
 		sql += "        , d.\"DAMT\" AS \"SumDAmt\" ";
 		sql += "        , d.\"CAMT\" AS \"SumCAmt\"  ";
 		sql += "        , cac.\"AcNoItem\" AS \"AcNoItem\" ";
 		sql += "        , d.\"DataInq\"  AS \"DataInq\" ";
-		sql += "        , cd.\"Item\"  AS \"BankRmftItem\" ";
+		switch (iInqType) {
+		case 2: // 經辦別
+			sql += "        , NVL(ce.\"Fullname\",' ')  AS \"DataInqX\" ";
+			break;
+		case 4: // 摘要代號
+			sql += "        , cd.\"Item\"  AS \"DataInqX\" ";
+			break;
+		default:
+			sql += "        , TO_NCHAR('')  AS \"DataInqX\" ";
+			break;
+
+		}
 		sql += "        FROM \"Data\" d ";
 		sql += "        LEFT JOIN \"CdAcCode\" cac ON  cac.\"AcNoCode\" = d.\"AcNoCode\" ";
 		sql += "                        AND cac.\"AcSubCode\" = d.\"AcSubCode\" ";
 		sql += "                        AND cac.\"AcDtlCode\" = d.\"AcDtlCode\" ";
 		sql += "        LEFT JOIN \"CdCode\" cd ON cd.\"DefCode\" = 'BankRmftCode' ";
 		sql += "                        AND  cd.\"Code\" = d.\"DataInq\" ";
+		sql += "        LEFT JOIN \"CdEmp\" ce ON ce.\"EmployeeNo\" = d.\"DataInq\" ";
 
 		sql += sqlRow;
 

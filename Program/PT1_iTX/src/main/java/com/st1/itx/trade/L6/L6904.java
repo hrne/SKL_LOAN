@@ -80,33 +80,67 @@ public class L6904 extends TradeBuffer {
 		if (this.index == 0 && (dList == null || dList.size() == 0)) {
 			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
 		}
-		BigDecimal totalDCnt = BigDecimal.ZERO; // 貸方總筆數
-		BigDecimal totalCCnt = BigDecimal.ZERO; // 借方總筆數
+		int totalDCnt = 0; // 貸方總筆數
+		int totalCCnt = 0; // 借方總筆數
 		BigDecimal totalDAmt = BigDecimal.ZERO; // 貸方總金額
 		BigDecimal totalCAmt = BigDecimal.ZERO; // 借方總金額
-		// 如有找到資料
+		// 總筆數資料
+		// 彙總傳票號碼,彙總傳票筆數算一筆
 		for (Map<String, String> d : dList) {
-			OccursList occursList = new OccursList();
-			if (d.get("AcNoCode").isEmpty()) { // 總筆數資料
-				totalDCnt = parse.stringToBigDecimal(d.get("SumDCnt"));
-				totalCCnt = parse.stringToBigDecimal(d.get("SumCCnt"));
+			if (d.get("AcNoCode").isEmpty()) {
+				if (iInqType == 7) {
+					totalDCnt = 0;
+					totalCCnt = 0;
+				} else {
+					totalDCnt = parse.stringToInteger(d.get("SumDCnt"));
+					totalCCnt = parse.stringToInteger(d.get("SumCCnt"));
+				}
 				totalDAmt = parse.stringToBigDecimal(d.get("SumDAmt"));
 				totalCAmt = parse.stringToBigDecimal(d.get("SumCAmt"));
 				continue;
+			} else {
+				if (iInqType == 7) {
+					if ("0".equals(d.get("DataInq"))) {
+						totalDCnt = totalDCnt + parse.stringToInteger(d.get("SumDCnt"));
+						totalCCnt = totalCCnt + parse.stringToInteger(d.get("SumCCnt"));
+					} else {
+						if (parse.stringToInteger(d.get("SumDCnt")) > 0) {
+							totalDCnt = totalDCnt + 1;
+						}
+						if (parse.stringToInteger(d.get("SumCCnt")) > 0) {
+							totalCCnt = totalCCnt + 1;
+						}
+					}
+				}
 			}
+		}
+		for (Map<String, String> d : dList) {
+			OccursList occursList = new OccursList();
+			if (d.get("AcNoCode").isEmpty()) { // 總筆數資料
+				continue;
+			}
+
 			occursList.putParam("OOAcSubBookCode", d.get("AcNoCode"));
 			occursList.putParam("OOAcNoCode", d.get("AcNoCode"));// AcNoCode
 			occursList.putParam("OOAcSubCode", d.get("AcSubCode"));// AcSubCode
 			occursList.putParam("OOAcDtlCode", d.get("AcDtlCode"));// AcDtlCode
-			occursList.putParam("OODbCnt", d.get("SumDCnt"));
-			occursList.putParam("OODbAmt", d.get("SumDAmt"));
-			occursList.putParam("OOCrCnt", d.get("SumCCnt"));
-			occursList.putParam("OOCrAmt", d.get("SumCAmt"));
-			occursList.putParam("OOInqData", d.get("DataInq"));// DataInq
-			occursList.putParam("OOAcNoItem", d.get("AcNoItem"));// AcNoItem
-			if (iInqType == 4) {
-				occursList.putParam("OOBankRmftItem", d.get("BankRmftItem"));// iInqType 4.
+			// 彙總傳票號碼,彙總傳票筆數算一筆
+			if (iInqType == 7 && parse.stringToInteger(d.get("SumDCnt")) > 0 && !"0".equals(d.get("DataInq"))) {
+				occursList.putParam("OODbCnt", "1/" + d.get("SumDCnt"));
+			} else {
+				occursList.putParam("OODbCnt", d.get("SumDCnt"));
 			}
+			occursList.putParam("OODbAmt", d.get("SumDAmt"));
+			// 彙總傳票號碼,彙總傳票筆數算一筆
+			if (iInqType == 7 && parse.stringToInteger(d.get("SumCCnt")) > 0 && !"0".equals(d.get("DataInq"))) {
+				occursList.putParam("OOCrCnt", "1/" + d.get("SumCCnt"));
+			} else {
+				occursList.putParam("OOCrCnt", d.get("SumCCnt"));
+			}
+			occursList.putParam("OOCrAmt", d.get("SumCAmt"));
+			occursList.putParam("OOInqData", "0".equals(d.get("DataInq")) ? "" : d.get("DataInq"));
+			occursList.putParam("OOInqDataX", d.get("DataInqX"));
+			occursList.putParam("OOAcNoItem", d.get("AcNoItem"));// AcNoItem
 
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
@@ -115,13 +149,6 @@ public class L6904 extends TradeBuffer {
 		this.totaVo.putParam("OTotalCCnt", totalCCnt);
 		this.totaVo.putParam("OTotalDAmt", totalDAmt);
 		this.totaVo.putParam("OTotalCAmt", totalCAmt);
-
-		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-		if (dList != null && dList.size() >= this.limit) {
-			titaVo.setReturnIndex(this.setIndexNext());
-//			 this.totaVo.setMsgEndToEnter();// 手動折返
-			this.totaVo.setMsgEndToAuto();// 自動折返
-		}
 
 		this.addList(this.totaVo);
 		return this.sendList();

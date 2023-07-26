@@ -64,8 +64,6 @@ K(MODIFYBUTTON,查詢)
 !---------- AP TEXT AREA Variables ----------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 
-
-
 !帳冊別
 #CDCODEAcBookCode=x,20,S                  
 T(3,CdCode.AcBookCode)
@@ -456,7 +454,8 @@ T(2,#OOTitaTlrNo+ +#OOTlrItem)
 
 #OOSlipBatNo=A,2,S
 
-#OOSlipSumNo=A,2,S
+#OOTitaBatchNo=X,6,S
+#OOSlipSumNo=X,6,S
 
 #OOEntAc=A,1,S
 
@@ -519,6 +518,7 @@ TXFORM=L6905
 #OOSlipNo
 #OOLastUpdate
 #OOSlipBatNo
+#OOTitaBatchNo
 #OOSlipSumNo
 #OOEntAc
 #OOMediaSlipNo
@@ -563,11 +563,11 @@ TXFORM=L6905
 {width:50,align:'center'}
 #OOSlipBatNo=傳票批號
 {width:80,align:'center'}
-#OOSlipSumNo=彙總批號
-{width:80,align:'center'}
-#OOEntAc=入總帳記號
+#OOTitaBatchNo=整批批號
 {width:80,align:'center'}
 #OOMediaSlipNo=總帳傳票號碼
+{width:80,align:'center'}
+#OOSlipSumNo=彙總傳票號碼
 {width:80,align:'center'}
 #OORvNo=銷帳碼
 {width:80,align:'center'}
