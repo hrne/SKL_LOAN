@@ -142,6 +142,9 @@ BEGIN
       FROM "LoanBorTx"
       WHERE "TitaHCode" = '0' -- 訂正別 = 0:正常
         AND NVL(JSON_VALUE("OtherFields", '$.CaseCloseCode'), '0') IN ('0','1','2') -- 轉催收不算
+      group by "CustNo"
+           , "FacmNo"
+           , "BormNo"
     )
     SELECT D."MonthEndYm"             AS "YearMonth"           -- 資料年月
           ,D."CustNo"                 AS "CustNo"              -- 戶號 

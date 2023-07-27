@@ -522,13 +522,13 @@ BEGIN
            , M."FacmNo" 
            , CASE
                WHEN M."PrinBalance" = 1
-                AND M."AcctCode" = 990
+                AND M."AcctCode" = '990'
                THEN '5'        --(5)第五類-收回無望(應為法務進度901，現暫以餘額掛1為第五類)
                                --   無擔保部分--超過清償期12月者
                                --   或拍訂貨拍賣無實益之損失者
                                --   或放款資產經評估無法回收者   
               --將2之X的判斷由程式自行
-               WHEN M."AcctCode" = 990
+               WHEN M."AcctCode" = '990'
                 AND M."ProdNo" IN ('60','61','62')
                THEN '2'       --(23)第二類-應予注意：
                                --    有足無擔保--逾繳超過清償期7-12月者
@@ -538,23 +538,23 @@ BEGIN
                THEN '2'       --(23)第二類-應予注意：
                                --    有足無擔保--逾繳超過清償期7-12月者
                                --    或無擔保部分--超過清償期1-3月者    
-               WHEN M."AcctCode" = 990
+               WHEN M."AcctCode" = '990'
                 AND M."OvduTerm" <= 12
                THEN '2'       --(23)第二類-應予注意：
                                --    有足無擔保--逾繳超過清償期7-12月者
                                --    或無擔保部分--超過清償期1-3月者    
-               WHEN M."AcctCode" <> 990
+               WHEN M."AcctCode" <> '990'
                 AND M."ProdNo" IN ('60','61','62')
                 AND M."OvduTerm" = 0
                THEN '2'       --(21)第二類-應予注意：
                                --    有足額擔保--但債信以不良者
                                --    (有擔保分期協議且正常還款者)
-               WHEN M."AcctCode" <> 990
+               WHEN M."AcctCode" <> '990'
                 AND M."OvduTerm" >= 1
                 AND M."OvduTerm" <= 6
                THEN '2'       --(22)第二類-應予注意：
                                --    有足無擔保--逾繳超過清償期1-6月者
-               WHEN M."AcctCode" = 990
+               WHEN M."AcctCode" = '990'
                 AND M."OvduTerm" > 12
                THEN '3'        --(3)第三類-可望收回：
                                --   有足無擔保--逾繳超過清償期12月者

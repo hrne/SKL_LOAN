@@ -261,7 +261,7 @@ public class L4721Report2 extends TradeBuffer {
 
 								this.info("presentRate =" + presentRate.toString());
 								this.info("adjustedRate =" + adjustedRate.toString());
-								
+
 								if (presentRate.compareTo(adjustedRate) != 0) {
 									line = "";
 									line += "45";
@@ -274,6 +274,12 @@ public class L4721Report2 extends TradeBuffer {
 
 							}
 
+						}
+						if (rTxffectDetail.size() > 0) {
+							line = "";
+							line += "45";
+							line += " ※其他額度利率，若有調整另行通知。";
+							result.add(line);
 						}
 						// 05
 
