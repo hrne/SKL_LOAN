@@ -35,7 +35,7 @@ public class EomFinal extends BatchBase implements Tasklet, InitializingBean {
 		// 第二個參數
 		// D=日批
 		// M=月批
-		return this.exec(contribution, "M");
+		return this.exec(contribution, "M", chunkContext);
 	}
 
 	@Override

@@ -40,7 +40,7 @@ public class L7Ifrs9FacDataUpd extends BatchBase implements Tasklet, Initializin
 		// 第二個參數
 		// D=日批
 		// M=月批
-		return this.exec(contribution, "M");
+		return this.exec(contribution, "M", chunkContext);
 	}
 
 	@Override

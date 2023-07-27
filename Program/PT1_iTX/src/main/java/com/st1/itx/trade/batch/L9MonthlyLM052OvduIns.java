@@ -40,7 +40,7 @@ public class L9MonthlyLM052OvduIns extends BatchBase implements Tasklet, Initial
 		// 第二個參數
 		// D=日批
 		// M=月批
-		return this.exec(contribution, "M");
+		return this.exec(contribution, "M", chunkContext);
 	}
 
 	@Override

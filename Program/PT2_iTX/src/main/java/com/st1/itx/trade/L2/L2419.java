@@ -708,10 +708,10 @@ public class L2419 extends TradeBuffer {
 			this.info("loanAmt = " + loanAmt);
 
 			// 設定金額
-			String seetingAmtString = makeExcel.getValue(row, L2419Column.SETTING_AMT.getIndex()).toString();
-			this.info("seetingAmtString = " + seetingAmtString);
-			double seetingAmt = toNumeric(seetingAmtString) * 1000;
-			if (seetingAmt == 0) {
+			String settingAmtString = makeExcel.getValue(row, L2419Column.SETTING_AMT.getIndex()).toString();
+			this.info("settingAmtString = " + settingAmtString);
+			double settingAmt = toNumeric(settingAmtString);
+			if (settingAmt == 0) {
 				// 設定金額不得為0或空白
 				setError(row, L2419Column.SETTING_AMT.getIndex());
 			}

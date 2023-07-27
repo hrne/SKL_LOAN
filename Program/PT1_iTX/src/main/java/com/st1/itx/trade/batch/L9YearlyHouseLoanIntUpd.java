@@ -40,7 +40,7 @@ public class L9YearlyHouseLoanIntUpd extends BatchBase implements Tasklet, Initi
 		// 第二個參數
 		// D=日批
 		// M=月批
-		return this.exec(contribution, "Y");
+		return this.exec(contribution, "Y", chunkContext);
 	}
 
 	@Override

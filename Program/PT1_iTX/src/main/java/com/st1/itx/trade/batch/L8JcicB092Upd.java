@@ -40,7 +40,7 @@ public class L8JcicB092Upd extends BatchBase implements Tasklet, InitializingBea
 		// 第二個參數
 		// D=日批
 		// M=月批
-		return this.exec(contribution, "M");
+		return this.exec(contribution, "M", chunkContext);
 	}
 
 	@Override

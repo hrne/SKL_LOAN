@@ -57,7 +57,6 @@ public class LM030Report extends MakeReport {
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> listLM030) throws LogicException {
 		this.info("LM030Report exportExcel");
 
-
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "LM030";
@@ -93,7 +92,24 @@ public class LM030Report extends MakeReport {
 		if (listLM030 == null || listLM030.isEmpty()) {
 			makeExcel.setValue(3, 1, "本日無資料");
 		} else {
+
+			int custNoCnt = 0;
+			int tmpCustNo = 0;
 			for (Map<String, String> tLDVo : listLM030) {
+
+				int custNo = parse.stringToInteger(tLDVo.get("CustNo"));
+
+				//一樣表示是同一擔保品戶號
+				if (tmpCustNo == custNo) {
+					custNoCnt++;
+				}
+
+				
+				if (tmpCustNo != custNo) {
+					tmpCustNo = custNo;
+					custNoCnt = 1;
+				}
+
 
 				String value = "";
 				int col = 0;
@@ -119,6 +135,9 @@ public class LM030Report extends MakeReport {
 					case 8:
 						// 利率
 						makeExcel.setValue(row, col, getBigDecimal(value), "#,##0.0000");
+						if (custNoCnt > 1) {
+							makeExcel.setValue(row, 13, "同一擔保品", "C");
+						}
 						break;
 					case 9:
 						makeExcel.setValue(row, col,

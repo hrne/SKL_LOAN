@@ -227,6 +227,9 @@ public class L2419Report extends TradeBuffer {
 		String loanToValue = result.get("LoanToValue");
 		String settingDate = result.get("SettingDate");
 		String settingAmt = result.get("SettingAmt");
+		if (rptUtil.getBigDecimal(settingAmt).compareTo(BigDecimal.ZERO) != 0) {
+			settingAmt = rptUtil.getBigDecimal(settingAmt).divide(new BigDecimal("1000")).toPlainString();
+		}
 		String claimDate = result.get("ClaimDate");
 		String irCode = result.get("IrCode");
 		String road = result.get("Road");
