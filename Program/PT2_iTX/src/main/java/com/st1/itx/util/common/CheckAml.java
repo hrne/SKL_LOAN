@@ -374,7 +374,8 @@ public class CheckAml extends TradeBuffer {
 				txAmlLog.setStatusCode(StatusCode);
 				txAmlLog.setStatus(Status);
 				txAmlLog.setStatusDesc(StatusDesc);
-
+				txAmlLog.setConfirmStatus(txAmlLog.getConfirmStatus());
+				this.info("refreshStatus.ConfirmStatus =" + txAmlLog.getConfirmStatus());
 				if ("0".equals(StatusCode) && "INFO".equals(Status)) {
 					txAmlLog = parseResult(doc, txAmlLog);
 				} else {

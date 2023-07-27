@@ -126,7 +126,8 @@ public class L9701Report extends MakeReport {
 		this.print(0, 126, "費用");
 		this.print(0, 141, "短繳");
 		this.print(0, 155, "溢繳");
-		this.print(0, 160, "訂正別");// 未訂正的時候顯示代號
+
+		this.print(0, 160, "0".equals(titaVo.get("CorrectType")) ? "" : "訂正別");// 未訂正的時候顯示代號
 		divider();
 
 	}
@@ -147,7 +148,7 @@ public class L9701Report extends MakeReport {
 //		this.print(0, 122, "－－－－－－");
 //		this.print(0, 137, "－－－－－－");
 //		this.print(0, 152, "－－－－－－");
-		this.print(1, 5,
+		this.print(1, 3,
 				"－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 	}
 
@@ -228,6 +229,13 @@ public class L9701Report extends MakeReport {
 								continue;
 							}
 						}
+					}
+
+					// 當前額度0 下一筆額度不是0的
+					if ("0".equals(this.facmNo) && !"0".equals(tL9701Vo.get("FacmNo"))) {
+						printFacEnd900(listBaTxVo);
+						detailCounts = 0;
+						isFirst = true;
 					}
 
 					this.custName = tL9701Vo.get("CustName");
@@ -328,10 +336,44 @@ public class L9701Report extends MakeReport {
 		}
 
 		divider();
+
 		this.print(1, 9, "至" + showRocDate(entday, 1) + " 當日餘額：");
-		this.print(0, 42, formatAmt(loanBal, 0), "R"); // 放款餘額
+		this.print(0, 43, formatAmt(loanBal, 0), "R"); // 放款餘額
 		this.print(0, 52, "累溢短收：");
 		this.print(0, 72, formatAmt(excessive.subtract(shortFall), 0), "R"); // 累溢短收
+		this.print(0, 74, "小計：");
+		this.print(0, 93, formatAmt(principalTotal, 0), "R");
+		this.print(0, 103, formatAmt(interestTotal, 0), "R");
+		this.print(0, 116, formatAmt(breachAmtTotal, 0), "R");
+		this.print(0, 130, formatAmt(feeAmtTotal, 0), "R");
+
+		principalTotal = BigDecimal.ZERO;
+		interestTotal = BigDecimal.ZERO;
+		breachAmtTotal = BigDecimal.ZERO;
+		feeAmtTotal = BigDecimal.ZERO;
+	}
+
+	private void printFacEnd900(List<BaTxVo> listBaTxVo) {
+		shortFall = BigDecimal.ZERO;
+		excessive = BigDecimal.ZERO;
+
+		BigDecimal tmpOverAmt = BigDecimal.ZERO;
+		loanBal = BigDecimal.ZERO;
+		if (listBaTxVo != null && listBaTxVo.size() != 0) {
+			for (BaTxVo tBaTxVo : listBaTxVo) {
+				if (tBaTxVo.getDataKind() == 4) {
+					tmpOverAmt = "C".equals(tBaTxVo.getDbCr()) ? tmpOverAmt.add(tBaTxVo.getUnPaidAmt())
+							: tmpOverAmt.subtract(tBaTxVo.getUnPaidAmt());
+				}
+			}
+		}
+
+		divider();
+		this.print(1, 1, "(暫收款)");
+		this.print(1, 9, " 至" + showRocDate(entday, 1) + " 當日餘額：");
+		this.print(0, 43, formatAmt(loanBal, 0), "R"); // 放款餘額
+		this.print(0, 52, "累溢短收：");
+		this.print(0, 72, formatAmt(tmpOverAmt, 0), "R"); // 累溢短收
 		this.print(0, 74, "小計：");
 		this.print(0, 93, formatAmt(principalTotal, 0), "R");
 		this.print(0, 103, formatAmt(interestTotal, 0), "R");

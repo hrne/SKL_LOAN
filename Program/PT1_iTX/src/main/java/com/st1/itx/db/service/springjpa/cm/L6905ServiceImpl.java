@@ -113,9 +113,15 @@ public class L6905ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "AND \"TitaTxtNo\" >= :TitaTxtNoStart ";
 			sql += "AND \"TitaTxtNo\" <= :TitaTxtNoEnd ";
 		} else if (iInqType == 3) {
-			sql += "AND \"TitaBatchNo\" = :TitaBatchNo ";
+			sql += "AND CASE WHEN  NVL(\"TitaBatchNo\",' ') = ' '  AND :TitaBatchNo = ' '  THEN 1 ";
+			sql += "         WHEN  SUBSTR(\"TitaBatchNo\",1,1) = ' ' AND :TitaBatchNo = ' ' THEN 1   ";
+			sql += "         WHEN  \"TitaBatchNo\" = :TitaBatchNo THEN 1   ";
+			sql += "        ELSE 0 END = 1   ";
 		} else if (iInqType == 4) {
-			sql += "AND \"DscptCode\" = :DscptCode ";
+			sql += "AND CASE WHEN  NVL(\"DscptCode\",' ') = ' '  AND :DscptCode = ' '  THEN 1 ";
+			sql += "         WHEN  SUBSTR(\"DscptCode\",1,1) = ' ' AND :DscptCode = ' ' THEN 1   ";
+			sql += "         WHEN  \"DscptCode\" = :DscptCode THEN 1   ";
+			sql += "        ELSE 0 END = 1   ";
 		} else if (iInqType == 5) {
 			sql += "AND \"SlipBatNo\" = :SlipBatNo ";
 		} else if (iInqType == 6) {
@@ -181,9 +187,9 @@ public class L6905ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("TitaTxtNoStart", iInputTitaTxtNoStart);
 			query.setParameter("TitaTxtNoEnd", iInputTitaTxtNoEnd);
 		} else if (iInqType == 3) {
-			query.setParameter("TitaBatchNo", iInqData);
+			query.setParameter("TitaBatchNo", iInqData.trim().isEmpty() ? " " : iInqData);
 		} else if (iInqType == 4) {
-			query.setParameter("DscptCode", FormatUtil.padX(iInqData, 4));
+			query.setParameter("DscptCode", iInqData.trim().isEmpty() ? " " : iInqData);
 		} else if (iInqType == 5) {
 			query.setParameter("SlipBatNo", iInqData.trim().isEmpty() ? 0 : parse.stringToInteger(iInqData.trim()));
 		} else if (iInqType == 6) {

@@ -69,7 +69,9 @@ public class L6904 extends TradeBuffer {
 		// this.limit = 200; // 157 * 200 = 31,400
 
 		// 查詢會計帳務明細檔
-		List<Map<String, String>> dList = null;
+		List<Map<String, String>> dList = new ArrayList<Map<String, String>>();
+		List<Map<String, String>> dListHead = new ArrayList<Map<String, String>>();
+		List<Map<String, String>> dListOc = new ArrayList<Map<String, String>>();
 		try {
 			dList = l6904ServiceImpl.FindData(titaVo, index, limit);
 		} catch (Exception e) {
@@ -77,68 +79,77 @@ public class L6904 extends TradeBuffer {
 			throw new LogicException(titaVo, "E5004", "");
 		}
 
-		if (this.index == 0 && (dList == null || dList.size() == 0)) {
-			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
-		}
 		int totalDCnt = 0; // 貸方總筆數
 		int totalCCnt = 0; // 借方總筆數
 		BigDecimal totalDAmt = BigDecimal.ZERO; // 貸方總金額
 		BigDecimal totalCAmt = BigDecimal.ZERO; // 借方總金額
 		// 總筆數資料
 		// 彙總傳票號碼,彙總傳票筆數算一筆
+
+		if (this.index == 0 && (dList == null || dList.size() == 0)) {
+			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
+		}
 		for (Map<String, String> d : dList) {
 			if (d.get("AcNoCode").isEmpty()) {
-				if (iInqType == 7) {
-					totalDCnt = 0;
-					totalCCnt = 0;
-				} else {
-					totalDCnt = parse.stringToInteger(d.get("SumDCnt"));
-					totalCCnt = parse.stringToInteger(d.get("SumCCnt"));
-				}
-				totalDAmt = parse.stringToBigDecimal(d.get("SumDAmt"));
-				totalCAmt = parse.stringToBigDecimal(d.get("SumCAmt"));
-				continue;
+				dListHead.add(d);
 			} else {
-				if (iInqType == 7) {
-					if ("0".equals(d.get("DataInq"))) {
-						totalDCnt = totalDCnt + parse.stringToInteger(d.get("SumDCnt"));
-						totalCCnt = totalCCnt + parse.stringToInteger(d.get("SumCCnt"));
-					} else {
-						if (parse.stringToInteger(d.get("SumDCnt")) > 0) {
-							totalDCnt = totalDCnt + 1;
-						}
-						if (parse.stringToInteger(d.get("SumCCnt")) > 0) {
-							totalCCnt = totalCCnt + 1;
-						}
+				dListOc.add(d);
+			}
+		}
+		if (this.index == 0 && (dListOc == null || dListOc.size() == 0)) {
+			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
+		}
+		//共同輸出區
+		for (Map<String, String> d : dListHead) {
+			if (iInqType != 7) {
+				totalDCnt = parse.stringToInteger(d.get("SumDCnt"));
+				totalCCnt = parse.stringToInteger(d.get("SumCCnt"));
+			}
+			totalDAmt = parse.stringToBigDecimal(d.get("SumDAmt"));
+			totalCAmt = parse.stringToBigDecimal(d.get("SumCAmt"));
+		}
+		for (Map<String, String> d : dListOc) {
+			OccursList occursList = new OccursList();
+
+			if (iInqType == 7) {
+				if ("0".equals(d.get("DataInq"))) {
+					totalDCnt = totalDCnt + parse.stringToInteger(d.get("SumDCnt"));
+					totalCCnt = totalCCnt + parse.stringToInteger(d.get("SumCCnt"));
+				} else {
+					if (parse.stringToInteger(d.get("SumDCnt")) > 0) {
+						totalDCnt = totalDCnt + 1;
+					}
+					if (parse.stringToInteger(d.get("SumCCnt")) > 0) {
+						totalCCnt = totalCCnt + 1;
 					}
 				}
 			}
-		}
-		for (Map<String, String> d : dList) {
-			OccursList occursList = new OccursList();
-			if (d.get("AcNoCode").isEmpty()) { // 總筆數資料
-				continue;
-			}
-
 			occursList.putParam("OOAcSubBookCode", d.get("AcNoCode"));
 			occursList.putParam("OOAcNoCode", d.get("AcNoCode"));// AcNoCode
 			occursList.putParam("OOAcSubCode", d.get("AcSubCode"));// AcSubCode
 			occursList.putParam("OOAcDtlCode", d.get("AcDtlCode"));// AcDtlCode
 			// 彙總傳票號碼,彙總傳票筆數算一筆
-			if (iInqType == 7 && parse.stringToInteger(d.get("SumDCnt")) > 0 && !"0".equals(d.get("DataInq"))) {
-				occursList.putParam("OODbCnt", "1/" + d.get("SumDCnt"));
-			} else {
-				occursList.putParam("OODbCnt", d.get("SumDCnt"));
-			}
+//			if (iInqType == 7 && parse.stringToInteger(d.get("SumDCnt")) > 0 && !"0".equals(d.get("DataInq"))) {
+//				occursList.putParam("OODbCnt", "1/" + d.get("SumDCnt"));
+//			} else {
+//				occursList.putParam("OODbCnt", d.get("SumDCnt"));
+//			}
+			occursList.putParam("OODbCnt", d.get("SumDCnt"));
 			occursList.putParam("OODbAmt", d.get("SumDAmt"));
 			// 彙總傳票號碼,彙總傳票筆數算一筆
-			if (iInqType == 7 && parse.stringToInteger(d.get("SumCCnt")) > 0 && !"0".equals(d.get("DataInq"))) {
-				occursList.putParam("OOCrCnt", "1/" + d.get("SumCCnt"));
-			} else {
-				occursList.putParam("OOCrCnt", d.get("SumCCnt"));
-			}
+//			if (iInqType == 7 && parse.stringToInteger(d.get("SumCCnt")) > 0 && !"0".equals(d.get("DataInq"))) {
+//				occursList.putParam("OOCrCnt", "1/" + d.get("SumCCnt"));
+//			} else {
+//				occursList.putParam("OOCrCnt", d.get("SumCCnt"));
+//			}
+			occursList.putParam("OOCrCnt", d.get("SumCCnt"));
 			occursList.putParam("OOCrAmt", d.get("SumCAmt"));
-			occursList.putParam("OOInqData", "0".equals(d.get("DataInq")) ? "" : d.get("DataInq"));
+			if (iInqType == 5) {
+				occursList.putParam("OOInqData", "0".equals(d.get("DataInq")) ? ""
+						: parse.IntegerToString(parse.stringToInteger(d.get("DataInq")), 2));
+			} else {
+				occursList.putParam("OOInqData", "0".equals(d.get("DataInq")) ? "" : d.get("DataInq"));
+			}
 			occursList.putParam("OOInqDataX", d.get("DataInqX"));
 			occursList.putParam("OOAcNoItem", d.get("AcNoItem"));// AcNoItem
 

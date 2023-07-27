@@ -1,8 +1,8 @@
 CREATE OR REPLACE PROCEDURE "Usp_Check_NullData_Ins" AS
   v_sql       VARCHAR2(1000);
   v_count     NUMBER;
-  v_table     VARCHAR2(30);
-  v_column    VARCHAR2(30);
+  v_table     VARCHAR2(100);
+  v_column    VARCHAR2(100);
   v_cur       SYS_REFCURSOR;
 BEGIN
   
@@ -19,7 +19,7 @@ BEGIN
     EXIT WHEN v_cur%NOTFOUND;
     
     -- 創建動態SQL以查詢是否有NULL值
-    v_sql := 'SELECT COUNT(*) FROM ' || v_table || ' WHERE ' || v_column || ' IS NULL';
+    v_sql := 'SELECT COUNT(*) FROM "' || v_table || '" WHERE "' || v_column || '" IS NULL';
     EXECUTE IMMEDIATE v_sql INTO v_count;
 
     IF v_count > 0 THEN

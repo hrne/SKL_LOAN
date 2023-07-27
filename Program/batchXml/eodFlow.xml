@@ -78,13 +78,17 @@
 		<step id="startBS996" parent="parentStep" next="startDailyRptFlow">
 			<tasklet ref="StartBS996" />
 		</step>
-		<step id="startDailyRptFlow" parent="parentStep" next="l6972DailyBatch">
+		<step id="startDailyRptFlow" parent="parentStep">
 			<job ref="dailyRptFlow" job-launcher="jobLauncher" />
+			<!-- 這個批次成功或失敗 都要往下跑 -->
+			<next on="COMPLETED" to="l6972DailyBatch" />
+			<next on="FAILED" to="l6972DailyBatch" />
 		</step>
 		<step id="l6972DailyBatch" parent="parentStep">
 			<tasklet ref="L6972DailyBatch" />
+			<!-- 這個批次成功或失敗 都要往下跑 -->
 			<next on="COMPLETED" to="eodFinal" />
-			<end on="FAILED" />
+			<next on="FAILED" to="eodFinal" />
 		</step>
 		<!-- 每日批次結束，判斷是否需要執行月批 -->
 		<step id="eodFinal" parent="parentStep">
@@ -92,8 +96,11 @@
 			<next on="COMPLETED" to="startEomFlow" />
 			<next on="STOPPED" to="startDailyCopy" />
 		</step>
-		<step id="startEomFlow" parent="parentStep" next="startDailyCopy">
+		<step id="startEomFlow" parent="parentStep">
 			<job ref="eomFlow" job-launcher="jobLauncher" />
+			<!-- 這個批次成功或失敗 都要往下跑 -->
+			<next on="COMPLETED" to="startDailyCopy" />
+			<next on="FAILED" to="startDailyCopy" />
 		</step>
 		<!-- DailyCopy 每日資料庫複製 -->
 		<step id="startDailyCopy" parent="parentStep">

@@ -35,16 +35,17 @@ BEGIN
       , "LastUpdate"          -- 最後更新日期時間 DATE 0 0
       , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
     )
-    SELECT LPAD(OCP."OCPCOD",6,'0')       AS "IndustryCode"        -- 行業代號 VARCHAR2 6 0 -- 2021-07-22修改: 位數不足6碼者，前補零
-          ,OCP."OCPNAM"                   AS "IndustryItem"        -- 行業說明 NVARCHAR2 50 0
-          ,OCP."OCPTYP"                   AS "MainType"            -- 主計處大類 VARCHAR2 1 0
-          ,''                             AS "IndustryRating"      -- 企金放款產業評等 VARCHAR2 1 0
+    SELECT LPAD(O."OCPCOD",6,'0')         AS "IndustryCode"        -- 行業代號 VARCHAR2 6 0 -- 2021-07-22修改: 位數不足6碼者，前補零
+          ,O."OCPNAM"                     AS "IndustryItem"        -- 行業說明 NVARCHAR2 50 0
+          ,O."OCPTYP"                     AS "MainType"            -- 主計處大類 VARCHAR2 1 0
+          ,I."IndustryRating"             AS "IndustryRating"      -- 企金放款產業評等 VARCHAR2 1 0
           ,'Y'                            AS "Enable"              -- 啟用記號 VARCHAR2 1 0
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 0 0
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
-    FROM "TB$OCPP" OCP
+    FROM "TB$OCPP" O
+    LEFT JOIN "IndustryRatingData" I ON I."IndustryCode" = LPAD(O."OCPCOD",6,'0')
     ;
 
     -- 記錄寫入筆數

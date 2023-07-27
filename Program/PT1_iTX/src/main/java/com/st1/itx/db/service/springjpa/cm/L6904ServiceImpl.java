@@ -84,7 +84,8 @@ public class L6904ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info(" AcSubCode BETWEEN = " + iAcSubCodeS + " " + iAcSubCodeE);
 		this.info(" AcDtlCode BETWEEN = " + iAcDtlCodeS + " " + iAcDtlCodeE);
 
-		String sql = " WITH \"Data\" AS ( ";
+		String sql =  " SELECT * FROM  ";
+		sql += "  ( WITH \"Data\" AS ( ";
 		sql += "  select \"AcNoCode\"  AS \"AcNoCode\" ";
 		sql += "        , \"AcSubCode\" AS \"AcSubCode\" ";
 		sql += "        , \"AcDtlCode\" AS \"AcDtlCode\" ";
@@ -116,7 +117,7 @@ public class L6904ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "        , \"TitaSecNo\" AS \"DataInq\" ";
 			break;
 		case 7: // 彙總傳票號碼
-			sql += "        , \"SlipSumNo\" AS \"DataInq\"";
+			sql += "        , TO_NCHAR(\"SlipSumNo\") AS \"DataInq\"";
 			break;
 		}
 		sql += "        from \"AcDetail\"  ";
@@ -158,10 +159,11 @@ public class L6904ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "        , \"SlipSumNo\" ";
 			break;
 		}
-		sql += "        ORDER BY \"AcNoCode\"  ";
+		sql += "        ORDER BY   ";
+		sql += "         \"AcNoCode\" ";
 		sql += "        , \"AcSubCode\" ";
-		sql += "        , \"AcDtlCode\") ";
-		sql += "        SELECT  '' AS \"AcNoCode\"   ";
+		sql += "        , \"AcDtlCode\" ";
+		sql += "   )     SELECT  '' AS \"AcNoCode\"   ";
 		sql += "        , '' AS \"AcSubCode\" ";
 		sql += "        , '' AS \"AcDtlCode\" ";
 		sql += "        ,SUM(\"DCNT\")  AS \"SumDCnt\" ";
@@ -182,15 +184,21 @@ public class L6904ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        , d.\"DAMT\" AS \"SumDAmt\" ";
 		sql += "        , d.\"CAMT\" AS \"SumCAmt\"  ";
 		sql += "        , cac.\"AcNoItem\" AS \"AcNoItem\" ";
-		sql += "        , d.\"DataInq\"  AS \"DataInq\" ";
 		switch (iInqType) {
 		case 2: // 經辦別
+			sql += "        , d.\"DataInq\"  AS \"DataInq\" ";
 			sql += "        , NVL(ce.\"Fullname\",' ')  AS \"DataInqX\" ";
 			break;
 		case 4: // 摘要代號
+			sql += "        , d.\"DataInq\"  AS \"DataInq\" ";
+			sql += "        , cd.\"Item\"  AS \"DataInqX\" ";
+			break;
+		case 5: // 傳票批號
+			sql += "        , LPAD(NVL(d.\"DataInq\",0),2,'0')  AS \"DataInq\" ";
 			sql += "        , cd.\"Item\"  AS \"DataInqX\" ";
 			break;
 		default:
+			sql += "        , d.\"DataInq\"  AS \"DataInq\" ";
 			sql += "        , TO_NCHAR('')  AS \"DataInqX\" ";
 			break;
 
@@ -201,8 +209,15 @@ public class L6904ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                        AND cac.\"AcDtlCode\" = d.\"AcDtlCode\" ";
 		sql += "        LEFT JOIN \"CdCode\" cd ON cd.\"DefCode\" = 'BankRmftCode' ";
 		sql += "                        AND  cd.\"Code\" = d.\"DataInq\" ";
-		sql += "        LEFT JOIN \"CdEmp\" ce ON ce.\"EmployeeNo\" = d.\"DataInq\" ";
-
+		sql += "        LEFT JOIN \"CdEmp\" ce ON ce.\"EmployeeNo\" = d.\"DataInq\" ) a";
+		sql += "        ORDER BY ";
+		sql += "         CASE WHEN  a.\"AcNoCode\" =''   THEN 1      ";
+		sql += "              WHEN  SUBSTR(NVL(a.\"DataInq\",' '),1,1 ) <> ' '  THEN 2      ";
+		sql += "              ELSE 3 END     ";
+		sql += "        , a.\"DataInq\"   ";
+		sql += "        , a.\"AcNoCode\"   ";
+		sql += "        , a.\"AcSubCode\"  ";
+		sql += "        , a.\"AcDtlCode\"  ";
 		sql += sqlRow;
 
 		this.info("FindL6904 sql=" + sql);

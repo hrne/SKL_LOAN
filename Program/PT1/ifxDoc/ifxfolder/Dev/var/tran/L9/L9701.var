@@ -44,7 +44,6 @@ E(0,0)
 ["#R1+@戶號",#CustNo],
 ["#R2+@日期",#DateType,#DateTypeX,#BeginDate,#EndDate],
 ["#R3+@訂正別",#CorrectType,#CorrectCodeX],
-
 ["#FdMsg+@注意事項",#Msg],
 ]
 !---------- AP Button AREA ----------
@@ -73,7 +72,7 @@ T(3,@R4,*)
 #FdMsg=X,1,L
 #Msg=x,20.100,L
 K(LIGHT,#Msg,TXTRED,0)
-INVOKEJS(SHOW,p1,5,5,0)
+INVOKEJS(SHOW,p1,4,4,0)
 
 !---------- AP TEXT AREA Variables ----------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
@@ -201,7 +200,7 @@ T(2,@nLetter,#notPrintLetter)
 #ShowMsg=A,1,S
 C(3,#CustNo,0,E(0,0),C(4,#Msg,E(0,0),E(0,1)))
 C(5,#nLetter,Y,K(NOBUTTON,CLOSEY),K(NOBUTTON,SHOWY))
-INVOKEJS(SHOW,p1,5,5,#ShowMsg)
+INVOKEJS(SHOW,p1,4,4,#ShowMsg)
 
 
 </sub>
