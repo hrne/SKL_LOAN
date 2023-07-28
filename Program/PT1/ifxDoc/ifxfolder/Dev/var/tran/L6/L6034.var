@@ -35,10 +35,10 @@ E(0,40)ASGN(INQPRT$)
 #ORGFG=_,_,S
 E(0,0)
 
-#button=x,100,S
-T(2,{cmd=CHAIN; ntxcd=L6304; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
-K(MODIFYBUTTON,1,新增專案放款)
-K(MODIFYBUTTON,查詢)
+!#button=x,100,S
+!T(2,{cmd=CHAIN; ntxcd=L6304; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
+!K(MODIFYBUTTON,1,新增專案放款)
+!K(MODIFYBUTTON,查詢)
 
 </sub>
 

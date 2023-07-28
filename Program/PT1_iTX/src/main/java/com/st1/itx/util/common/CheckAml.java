@@ -233,7 +233,7 @@ public class CheckAml extends TradeBuffer {
 			txAmlLog.setStatus("Warning");
 			txAmlLog.setStatusDesc("AML系統異常，改由人工檢核");
 		} else if (amlflag == 2) {
-			txAmlLog.setConfirmStatus("0");
+//			txAmlLog.setConfirmStatus("0");
 			txAmlLog.setStatusCode("0008");
 			txAmlLog.setStatus("Success");
 			txAmlLog.setStatusDesc("測試套不檢查");

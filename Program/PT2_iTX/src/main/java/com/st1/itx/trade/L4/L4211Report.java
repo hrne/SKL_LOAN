@@ -242,7 +242,7 @@ public class L4211Report extends MakeReport {
 				r2.put("AcctItem", "擔保放款");
 			}
 			fnAllList1.add(r1);
-			if ("01".equals(r.get("RepayCode"))) {
+			if ("1".equals(r.get("RepayCode").toString())) {
 				fnAllList2.add(r2);
 				fnAllList3.add(r2);
 			}

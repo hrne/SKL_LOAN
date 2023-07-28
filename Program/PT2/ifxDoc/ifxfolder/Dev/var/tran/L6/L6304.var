@@ -103,19 +103,30 @@ IF(#CHAIN_FuncCode == 4 ,K(MODIFYBUTTON,刪除),$)
 ##loop {times:12,i:1}
 
 T(2,@ProdName{i},#L6r51ProdName{i})
+E(0,@oLoanBal{i},#oL6r51LoanBal{i})
 E(0,@LoanBal{i},#L6r51LoanBal{i})
 T(2,@ColName{i},#L6r51ColName{i})
+
+#tmpDLoanBal{i}=M,30,S
+E(0,#oLoanBal{i}-#LoanBal{i})
+
+E(0,@diffLoanBal{i},#tmpDLoanBal{i})
+
 
 ##end
 
 ##loop {times:12,i:1}
 
 #L6r51ProdName{i}=X,50,L
+#oL6r51LoanBal{i}=X,30,L
 #L6r51LoanBal{i}=X,30,L
 #L6r51ColName{i}=x,15,S
 
 #ProdName{i}=X,50,L
+#oLoanBal{i}=M,30,L
 #LoanBal{i}=M,30,I
+#diffLoanBal{i}=M,30,L
+@E(0,#oLoanBal{i}-#LoanBal{i})
 #ColName{i}=x,15,S
 
 ##end
@@ -127,8 +138,8 @@ T(2,@ColName{i},#L6r51ColName{i})
 [
 ["專案放款維護"],
 ["#grid#,{id:1,expand:false,loop:12,row_height:0,s_cols:[60,60], p_cols:[90,50]}","","",
-["中文項目名稱","放款金額"],
-[#ProdName1,#LoanBal1],
+["中文項目名稱","放款金額(主檔)","放款金額(報表)","差額"],
+[#ProdName1,#oLoanBal1,#LoanBal1,#diffLoanBal1],
 ],
 ]
 </sub>
@@ -159,6 +170,7 @@ T(2,@ColName{i},#L6r51ColName{i})
 #TranKey_Tmp
 ##loop{times:12,i:1}
 #ProdName{i}
+#oLoanBal{i}
 #LoanBal{i}
 #ColName{i}
 ##end
@@ -174,6 +186,7 @@ TXFORM=L6304
 TXFORM=L6R51
 ##loop{times:12,i:1}
 #L6r51ProdName{i}
+#oL6r51LoanBal{i}
 #L6r51LoanBal{i}
 #L6r51ColName{i}
 ##end

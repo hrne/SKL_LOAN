@@ -67,14 +67,14 @@ public class LM002 extends BatchBase implements Tasklet, InitializingBean {
 	public void run() throws LogicException {
 		this.info("active LM002 ");
 		lm002report.setTxBuffer(this.getTxBuffer());
-		checkProjectLoan();
+		checkProjectLoan("01");//專案放款產表時計算
 		lm002report.exec(titaVo);
 	}
 
 	/**
 	 * 檢查雜項代碼檔(CdComm) 是否有當月專案放款資料，沒有則系統query合計後新增進去。
 	 */
-	private void checkProjectLoan() throws LogicException {
+	private void checkProjectLoan(String CdItem) throws LogicException {
 		// 帳務日(西元)
 		int tbsdy = this.txBuffer.getTxCom().getTbsdyf();
 		// 月底日(西元)
@@ -88,7 +88,7 @@ public class LM002 extends BatchBase implements Tasklet, InitializingBean {
 			CdCommId tCdCommId = new CdCommId();
 
 			tCdCommId.setCdType("02");
-			tCdCommId.setCdItem("01");
+			tCdCommId.setCdItem(CdItem);
 			// 固定設定年月的1日(日期無作用，僅使用道年月)
 			tCdCommId.setEffectDate(iDate01);
 
@@ -151,6 +151,20 @@ public class LM002 extends BatchBase implements Tasklet, InitializingBean {
 		}
 
 		tTempVo.putParam("YearMonth", yearMonth);
+		//原始
+		tTempVo.putParam("o340LoanBal", "0");
+		tTempVo.putParam("oIALoanBal", "0");
+		tTempVo.putParam("oIBLoanBal", "0");
+		tTempVo.putParam("oICLoanBal", "0");
+		tTempVo.putParam("oIDLoanBal", "0");
+		tTempVo.putParam("oIELoanBal", "0");
+		tTempVo.putParam("oIFLoanBal", "0");
+		tTempVo.putParam("oIGLoanBal", "0");
+		tTempVo.putParam("oIHLoanBal", "0");
+		tTempVo.putParam("oIILoanBal", "0");
+		tTempVo.putParam("o921LoanBal", "0");
+		tTempVo.putParam("o990LoanBal", "0");
+		//調整後
 		tTempVo.putParam("340LoanBal", "0");
 		tTempVo.putParam("IALoanBal", "0");
 		tTempVo.putParam("IBLoanBal", "0");
@@ -163,7 +177,8 @@ public class LM002 extends BatchBase implements Tasklet, InitializingBean {
 		tTempVo.putParam("IILoanBal", "0");
 		tTempVo.putParam("921LoanBal", "0");
 		tTempVo.putParam("990LoanBal", "0");
-
+		
+		
 		for (Map<String, String> r : result) {
 			tTempVo.putParam(r.get("Type") + "LoanBal", r.get("LoanBal"));
 		}

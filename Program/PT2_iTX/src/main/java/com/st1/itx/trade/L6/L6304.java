@@ -93,8 +93,6 @@ public class L6304 extends TradeBuffer {
 			try {
 				sCdCommService.insert(sCdComm, titaVo);
 
-				webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", "新增資料成功",
-						titaVo);
 			} catch (DBException e) {
 				if (e.getErrorId() == 2) {
 					throw new LogicException(titaVo, "E0002", e.getErrorMsg()); // 新增資料已存在
@@ -108,8 +106,6 @@ public class L6304 extends TradeBuffer {
 			try {
 				sCdCommService.insert(sCdComm, titaVo);
 
-				webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", "新增資料成功",
-						titaVo);
 			} catch (DBException e) {
 				if (e.getErrorId() == 2) {
 					throw new LogicException(titaVo, "E0002", e.getErrorMsg()); // 新增資料已存在
@@ -117,6 +113,11 @@ public class L6304 extends TradeBuffer {
 					throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增資料時，發生錯誤
 				}
 			}
+			
+			titaVo.setDataBaseOnOrg();// 還原原本的環境
+			
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", "新增資料成功",
+					titaVo);
 
 			break;
 
@@ -131,28 +132,27 @@ public class L6304 extends TradeBuffer {
 			try {
 				sCdCommService.update(uCdComm, titaVo);
 
-				webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", "修改資料成功",
-						titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
-			
-			
+//
+//			titaVo.setDataBaseOnMon();// 指定月報環境
+//
+//			try {
+//				sCdCommService.update(uCdComm, titaVo);
+//
+//			} catch (DBException e) {
+//				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
+//			}
+//
+//			titaVo.setDataBaseOnOrg();// 還原原本的環境
+
 			iDataLog.setEnv(titaVo, oldCdComm, uCdComm);
 			iDataLog.exec("修改專案放款");
-			
-			
-			titaVo.setDataBaseOnMon();// 指定月報環境
 
-			try {
-				sCdCommService.update(uCdComm, titaVo);
 
-				webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", "修改資料成功",
-						titaVo);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
-			}
-			
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", "修改資料成功",
+					titaVo);
 			
 			break;
 
@@ -173,35 +173,31 @@ public class L6304 extends TradeBuffer {
 			try {
 				sCdCommService.delete(dCdComm);
 
-				webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", "刪除資料成功",
-						titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時，發生錯誤
 			}
+
+//			titaVo.setDataBaseOnMon();// 指定月報環境
+//
+//			try {
+//				sCdCommService.delete(dCdComm);
+//
+//			} catch (DBException e) {
+//				throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時，發生錯誤
+//			}
+//
+//			titaVo.setDataBaseOnOrg();// 還原原本的環境
 
 			iDataLog.setEnv(titaVo, oldDCdComm, dCdComm);
 			iDataLog.exec("刪除專案放款");
-			
-			titaVo.setDataBaseOnMon();// 指定月報環境
 
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", "刪除資料成功", titaVo);
 
-			try {
-				sCdCommService.delete(dCdComm);
-
-				webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", "刪除資料成功",
-						titaVo);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時，發生錯誤
-			}
-
-			
 			break;
 		case 5: // 查詢
 			this.addList(this.totaVo);
 			break;
 		}
-
-		titaVo.setDataBaseOnOrg();// 還原原本的環境
 
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -223,6 +219,7 @@ public class L6304 extends TradeBuffer {
 			if (titaVo.get("ProdName" + i) == null || "".equals(titaVo.get("LoanBal" + i).trim())) {
 				continue;
 			}
+			tTempVo.putParam("o" +titaVo.getParam("ColName" + i).trim(), titaVo.getParam("oLoanBal" + i));
 			tTempVo.putParam(titaVo.getParam("ColName" + i).trim(), titaVo.getParam("LoanBal" + i));
 		}
 

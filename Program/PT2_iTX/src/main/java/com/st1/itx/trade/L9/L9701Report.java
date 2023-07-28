@@ -101,7 +101,7 @@ public class L9701Report extends MakeReport {
 		this.setBeginRow(7);
 
 		// 設定明細列數(自訂亦必須)
-		this.setMaxRows(45);
+		this.setMaxRows(50);
 
 	}
 
@@ -212,7 +212,7 @@ public class L9701Report extends MakeReport {
 					}
 				}
 
-				if (this.NowRow - 8 >= 40) {
+				if (this.NowRow - 8 >= 45) {
 					this.print(1, this.getMidXAxis(), nextPageText, "C"); //
 					this.newPage();
 					this.print(1, 1, " "); //

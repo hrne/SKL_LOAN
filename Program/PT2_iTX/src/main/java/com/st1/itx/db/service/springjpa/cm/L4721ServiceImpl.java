@@ -514,7 +514,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      SELECT MAX(T.\"CustNo\")                                 AS \"CustNo\"";
 		sql += "           , 0 AS \"FacmNo\"";
 		sql += "            , MAX(T.\"EntryDate\")                              AS \"EntryDate\"";
-		sql += "            , MAX( case when T.\"IntStartDate\" = 0 then  99991231";
+		sql += "            , MIN( case when T.\"IntStartDate\" = 0 then  99991231";
 		sql += "            else  T.\"IntStartDate\"  end ) AS \"IntStartDate\"";
 		sql += "                     , MIN( case when T.\"IntEndDate\" = 0 then  99991231";
 		sql += "            else  T.\"IntEndDate\"  end ) AS \"IntEndDate\"";
@@ -552,7 +552,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      SELECT MAX(T.\"CustNo\")                                 AS \"CustNo\"";
 		sql += "            , T.\"FacmNo\" AS \"FacmNo\"";
 		sql += "            , MAX(T.\"EntryDate\")                              AS \"EntryDate\"";
-		sql += "            , MAX( case when T.\"IntStartDate\" = 0 then  99991231";
+		sql += "            , MIN( case when T.\"IntStartDate\" = 0 then  99991231";
 		sql += "            else  T.\"IntStartDate\"  end ) AS \"IntStartDate\"";
 		sql += "                     , MIN( case when T.\"IntEndDate\" = 0 then  99991231";
 		sql += "            else  T.\"IntEndDate\"  end ) AS \"IntEndDate\"";
