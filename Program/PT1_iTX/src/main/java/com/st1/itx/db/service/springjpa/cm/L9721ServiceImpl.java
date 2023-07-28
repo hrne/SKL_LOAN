@@ -33,17 +33,13 @@ public class L9721ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 		this.info("L9721ServiceImpl findAll ");
 
-		int year = parse.stringToInteger(titaVo.getParam("InputYear"));
-		int month = parse.stringToInteger(titaVo.getParam("InputMonth"));
-
-		int inputEndDate = year + 1911;
-		inputEndDate *= 100;
-		inputEndDate += month;
-		inputEndDate += 1;
-		inputEndDate *= 100;
-		inputEndDate += 1;
+		int inputEndDate = parse.stringToInteger(titaVo.getParam("InputEndDate"));
 
 		this.info("L9721ServiceImpl inputEndDate = " + inputEndDate);
+//		1.資料止日為該工作月的止日
+//		2.撥款日期>=資料止日
+//		3.戶況為0正常或已結案但結案日>資料止日
+//		4.商品參數主檔員工貸款記號為Y。
 
 		String sql = "SELECT m.\"CustNo\" AS \"戶號\"";
 		sql += "            ,m.\"FacmNo\" AS \"額度\"";
@@ -89,11 +85,11 @@ public class L9721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             LEFT JOIN \"LoanRateChange\" r ON r.\"CustNo\" = b.\"CustNo\"";
 		sql += "                                           AND r.\"FacmNo\" = b.\"FacmNo\"";
 		sql += "                                           AND r.\"BormNo\" = b.\"BormNo\"";
-		sql += "             WHERE b.\"Status\" = 0";
+		sql += "             WHERE b.\"DrawdownDate\" <= :inputEndDate";
+	    sql += "               AND (b.\"Status\" = 0 OR (b.\"Status\" > 0 AND b.\"AcDate\" > :inputEndDate )) ";
 		sql += "               AND p.\"EmpFlag\" = 'Y' ) m";
 		sql += "      LEFT JOIN \"ClFac\" c ON c.\"CustNo\" = m.\"CustNo\"";
 		sql += "                           AND c.\"FacmNo\" = m.\"FacmNo\"";
-		sql += "                           AND c.\"MainFlag\" = 'Y'";
 		sql += "      LEFT JOIN \"ClBuilding\"  cl ON cl.\"ClCode1\" = c.\"ClCode1\"";
 		sql += "                                  AND cl.\"ClCode2\" = c.\"ClCode2\"";
 		sql += "                                  AND cl.\"ClNo\" = c.\"ClNo\"";
@@ -101,7 +97,7 @@ public class L9721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      LEFT JOIN \"CdArea\" cda ON cda.\"CityCode\" = cl.\"CityCode\"";
 		sql += "                              AND cda.\"AreaCode\" = cl.\"AreaCode\"";
 		sql += "      WHERE m.row_number = 1";
-		sql += "        AND m.\"DrawdownDate\" < :inputEndDate";
+		sql += "      ORDER BY  m.\"CustNo\", m.\"FacmNo\", m.\"BormNo\"";
 
 		this.info("sql=" + sql);
 

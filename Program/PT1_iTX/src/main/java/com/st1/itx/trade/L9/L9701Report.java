@@ -370,7 +370,7 @@ public class L9701Report extends MakeReport {
 
 		divider();
 		this.print(1, 1, "(暫收款)");
-		this.print(1, 9, " 至" + showRocDate(entday, 1) + " 當日餘額：");
+		this.print(0, 9, " 至" + showRocDate(entday, 1) + " 當日餘額：");
 		this.print(0, 43, formatAmt(loanBal, 0), "R"); // 放款餘額
 		this.print(0, 52, "累溢短收：");
 		this.print(0, 72, formatAmt(tmpOverAmt, 0), "R"); // 累溢短收

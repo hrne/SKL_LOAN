@@ -32,16 +32,15 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 //	private int reportNo = 0;
 //	private int functionCode = 0;
 
-	public List<Map<String, String>> findAll(TitaVo titaVo , int printNo) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, int printNo) throws Exception {
 
-		
 //		printNo
 //		1 匯款總傳票明細表
 //		2入帳後檢核明細表
 //		3 人工處理明細表
-		
+
 //		reportNo = Integer.valueOf(titaVo.get("ReportNo"));
-		
+
 		inputReconCode = String.valueOf(titaVo.get("ReconCode")).trim();
 
 		inputAcDate = (Integer.valueOf(titaVo.get("AcDate")) + 19110000);
@@ -110,7 +109,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "    , TX2.\"TitaTlrNo\" ";// 除錯時查資料用欄位
 			sql += "    , TX2.\"TitaTxtNo\""; // 除錯時查資料用欄位
 			sql += "    , CASE WHEN TX2.\"TitaTxCd\" IN ( 'L3410','L3420') THEN '1' ";
-			sql += "           ELSE '2' END AS \"SortingForClose\""; //1 結清 2入帳
+			sql += "           ELSE '2' END AS \"SortingForClose\""; // 1 結清 2入帳
 			sql += "    , CASE WHEN NVL(TX1.\"AcDate\",0) = 0 THEN '9999' ";
 			sql += "    	   WHEN NVL(JSON_VALUE(BATX.\"ProcNote\", '$.FacStatus'), ' ') <> ' ' THEN '999' ";
 			sql += "           WHEN TX1.\"FacmNo\" = 0 THEN '999' ";
@@ -121,7 +120,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "           ELSE \"Fn_GetCdCode\"('AcctCode',FAC.\"AcctCode\") END AS \"AcctItem\"";
 			sql += " 	, \"Fn_GetCdCode\"('RepayType',BATX.\"RepayType\") AS \"RepayItem\"";
 			sql += "    , NVL(TX2.\"PaidTerms\", 0) AS \"PaidTerms\" ";
-			sql += "    , NVL(NVL(FC1.\"CloseReasonCode\",FC2.\"CloseReasonCode\"),'00') AS \"CloseReasonCode\"" ;
+			sql += "    , NVL(NVL(FC1.\"CloseReasonCode\",FC2.\"CloseReasonCode\"),'  ') AS \"CloseReasonCode\"";
 			sql += "    , CD.\"Item\" AS \"CloseReason\" ";
 			sql += "    , NVL(JSON_VALUE(TX2.\"OtherFields\", '$.CaseCloseCode'),99) AS \"CaseCloseCode\" ";
 			sql += " FROM \"BatxDetail\" BATX";
@@ -149,7 +148,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "                           AND FC2.\"CustNo\" = TX2.\"CustNo\"";
 			sql += "                           AND FC2.\"FacmNo\" = 0 ";
 			sql += " LEFT JOIN \"CdCode\" CD ON CD.\"DefCode\" = 'AdvanceCloseCode' ";
-			sql += "                        AND CD.\"Code\" =  NVL(NVL(FC1.\"CloseReasonCode\",FC2.\"CloseReasonCode\"),'00')";
+			sql += "                        AND CD.\"Code\" =  NVL(NVL(FC1.\"CloseReasonCode\",FC2.\"CloseReasonCode\"),'  ')";
 			sql += " WHERE BATX.\"AcDate\" = :inputAcDate";
 			sql += " AND SUBSTR(BATX.\"BatchNo\",1,4) = 'BATX'     ";
 			sql += " AND CASE";
@@ -161,8 +160,6 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += " AND BATX.\"ProcStsCode\" IN ( '5'  ";// 單筆入帳
 			sql += "                           , '6' "; // 批次入帳
 			sql += "                           , '7') ";// 批次人工
-
-
 
 		} else if (printNo == 2) {
 			// 入帳後檢核明細表
@@ -187,7 +184,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "    , \"BatchNo\""; // 批次號碼(表頭)
 			sql += "    , \"EntryDate\" ";// 匯款日
 			sql += "    , \"DetailSeq\""; // 匯款序號
-			sql += "    , \"RepayAmt\" "; // 匯款金額 
+			sql += "    , \"RepayAmt\" "; // 匯款金額
 			sql += "  	, \"RepayType\"";
 			sql += "    , \"CustNo\" ";
 			sql += "    , \"ProcStsCode\" ";
@@ -207,12 +204,12 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "    AND \"ProcStsCode\" IN ( '2','3','4','5'  ";// 單筆入帳
 			sql += "                           , '6' "; // 批次入帳
 			sql += "                           , '7') ";// 批次人工
-			sql += "   UNION ALL " ;  // 同戶號最後一筆匯款入帳後後執行暫收抵繳
+			sql += "   UNION ALL "; // 同戶號最後一筆匯款入帳後後執行暫收抵繳
 			sql += "   SELECT B.\"ReconCode\" ";// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
 			sql += "    , B.\"BatchNo\""; // 批次號碼(表頭)
 			sql += "    , B.\"EntryDate\" ";// 匯款日
 			sql += "    , B.\"DetailSeq\""; // 匯款序號
-			sql += "    , B.\"RepayAmt\" "; // 匯款金額 
+			sql += "    , B.\"RepayAmt\" "; // 匯款金額
 			sql += "    , B.\"RepayType\"";
 			sql += "    , B.\"CustNo\" ";
 			sql += "    , B.\"ProcStsCode\" ";
@@ -222,11 +219,11 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "    , TX.\"TitaTxtNo\"";
 			sql += "   FROM (";
 			sql += "   SELECT \"ReconCode\" ";
-	  	sql += "        , \"AcDate\"";
-			sql += "        , \"BatchNo\""; 
-			sql += "        , \"DetailSeq\"";  
-			sql += "        , \"EntryDate\" "; 
-			sql += "        , \"RepayAmt\" ";  
+			sql += "        , \"AcDate\"";
+			sql += "        , \"BatchNo\"";
+			sql += "        , \"DetailSeq\"";
+			sql += "        , \"EntryDate\" ";
+			sql += "        , \"RepayAmt\" ";
 			sql += "  	    , \"RepayType\"";
 			sql += "        , \"CustNo\" ";
 			sql += "        , \"ProcStsCode\" ";
@@ -243,18 +240,18 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "                  THEN :inputReconCode";
 			sql += "              ELSE \"ReconCode\" ";
 			sql += "            END = \"ReconCode\"";
-			sql += "        AND \"ReconCode\" IN ('A1','A2','A3')"; // 
+			sql += "        AND \"ReconCode\" IN ('A1','A2','A3')"; //
 			sql += "        AND \"RepayCode\" = 1 "; // 匯款轉帳
 			sql += "        AND \"ProcStsCode\" IN ( '5' ";// 單筆入帳
 			sql += "                               , '6' "; // 批次入帳
 			sql += "                               , '7') ";// 批次人工
-			sql += "        ) B ";                 
+			sql += "        ) B ";
 			sql += "   LEFT JOIN \"LoanBorTx\" TX ";
 			sql += "             ON TX.\"AcDate\" = B.\"AcDate\"";
 			sql += "            AND TX.\"CustNo\" = B.\"CustNo\"";
 			sql += "            AND TX.\"RepayCode\"  = 90 "; // 暫收抵繳
 			sql += "            AND TX.\"TitaHCode\"  = '0' "; // 正常交易
- 			sql += "            AND TX.\"LastUpdate\"  >  B.\"LastUpdate\" "; // 入帳後後執行暫收抵繳
+			sql += "            AND TX.\"LastUpdate\"  >  B.\"LastUpdate\" "; // 入帳後後執行暫收抵繳
 			sql += "   WHERE B.ROWNUMBER = 1 ";
 			sql += "    AND  NVL(TX.\"AcDate\",0) = :inputAcDate";
 			sql += " )";
@@ -296,7 +293,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "    , TX2.\"TitaTlrNo\" ";// 除錯時查資料用欄位
 			sql += "    , TX2.\"TitaTxtNo\""; // 除錯時查資料用欄位
 			sql += "    , CASE WHEN TX2.\"TitaTxCd\" IN ( 'L3410','L3420') THEN '1' ";
-			sql += "           ELSE '2' END AS \"SortingForClose\""; //1 結清 2入帳
+			sql += "           ELSE '2' END AS \"SortingForClose\""; // 1 結清 2入帳
 			sql += "    , CASE WHEN BATX.\"ProcStsCode\" IN ( '2','3','4') THEN '99999' ";
 			sql += "    	   WHEN NVL(JSON_VALUE(BATX.\"ProcNote\", '$.FacStatus'), ' ') <> ' ' THEN '999' ";
 			sql += "           WHEN TX1.\"FacmNo\" = 0 THEN '999' ";
@@ -307,7 +304,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "           ELSE \"Fn_GetCdCode\"('AcctCode',FAC.\"AcctCode\") END AS \"AcctItem\"";
 			sql += " 	, \"Fn_GetCdCode\"('RepayType',BATX.\"RepayType\") AS \"RepayItem\"";
 			sql += "    , NVL(TX2.\"PaidTerms\", 0) AS \"PaidTerms\" ";
-			sql += "    , NVL(NVL(FC1.\"CloseReasonCode\",FC2.\"CloseReasonCode\"),'00') AS \"CloseReasonCode\"" ;
+			sql += "    , NVL(NVL(FC1.\"CloseReasonCode\",FC2.\"CloseReasonCode\"),'  ') AS \"CloseReasonCode\"";
 			sql += "    , CD.\"Item\" AS \"CloseReason\" ";
 			sql += "    , NVL(JSON_VALUE(TX2.\"OtherFields\", '$.CaseCloseCode'),99) AS \"CaseCloseCode\" ";
 			sql += " FROM BATX";
@@ -329,7 +326,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "                           AND FC2.\"CustNo\" = TX2.\"CustNo\"";
 			sql += "                           AND FC2.\"FacmNo\" = 0 ";
 			sql += " LEFT JOIN \"CdCode\" CD ON CD.\"DefCode\" = 'AdvanceCloseCode' ";
-			sql += "                        AND CD.\"Code\" =  NVL(NVL(FC1.\"CloseReasonCode\",FC2.\"CloseReasonCode\"),'00')";
+			sql += "                        AND CD.\"Code\" =  NVL(NVL(FC1.\"CloseReasonCode\",FC2.\"CloseReasonCode\"),'  ')";
 		} else if (printNo == 3) {
 
 			// 人工處理明細表
@@ -387,7 +384,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "    , TX2.\"TitaTlrNo\" ";// 除錯時查資料用欄位
 			sql += "    , TX2.\"TitaTxtNo\""; // 除錯時查資料用欄位
 			sql += "    , CASE WHEN TX2.\"TitaTxCd\" IN ( 'L3410','L3420') THEN '1' ";
-			sql += "           ELSE '2' END AS \"SortingForClose\""; //1 結清 2入帳
+			sql += "           ELSE '2' END AS \"SortingForClose\""; // 1 結清 2入帳
 			sql += "    , CASE WHEN NVL(JSON_VALUE(BATX.\"ProcNote\", '$.FacStatus'), ' ') <> ' ' THEN '999' ";
 			sql += "           WHEN TX1.\"FacmNo\" = 0 THEN '999' ";
 			sql += "           ELSE NVL(FAC.\"AcctCode\",'999') END AS \"SortingForSubTotal\""; // 配合小計產生的排序
@@ -396,14 +393,14 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "           ELSE \"Fn_GetCdCode\"('AcctCode',FAC.\"AcctCode\") END AS \"AcctItem\"";
 			sql += " 	, \"Fn_GetCdCode\"('RepayType',BATX.\"RepayType\") AS \"RepayItem\"";
 			sql += "    , NVL(TX2.\"PaidTerms\", 0) AS \"PaidTerms\" ";
-			sql += "    , NVL(NVL(FC1.\"CloseReasonCode\",FC2.\"CloseReasonCode\"),'00') AS \"CloseReasonCode\"" ;
+			sql += "    , NVL(NVL(FC1.\"CloseReasonCode\",FC2.\"CloseReasonCode\"),'  ') AS \"CloseReasonCode\"";
 			sql += "    , CD.\"Item\" AS \"CloseReason\" ";
 			sql += "    , NVL(JSON_VALUE(TX2.\"OtherFields\", '$.CaseCloseCode'),99) AS \"CaseCloseCode\" ";
 			sql += " FROM \"BatxDetail\" BATX";
 			sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = BATX.\"CustNo\"";
 			sql += " LEFT JOIN TX1 ON TX1.\"AcDate\" = BATX.\"AcDate\"";
 			sql += "            AND TX1.\"TitaTlrNo\" = BATX.\"TitaTlrNo\"";
-			sql += "            AND TO_NUMBER(TX1.\"TitaTxtNo\") = BATX.\"TitaTxtNo\"";		
+			sql += "            AND TO_NUMBER(TX1.\"TitaTxtNo\") = BATX.\"TitaTxtNo\"";
 			sql += " LEFT JOIN \"LoanBorTx\" TX2 ";
 			sql += "             ON TX2.\"AcDate\" = TX1.\"AcDate\"";
 			sql += "            AND TX2.\"TitaTlrNo\" = TX1.\"TitaTlrNo\"";
@@ -418,7 +415,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "                           AND FC2.\"CustNo\" = TX2.\"CustNo\"";
 			sql += "                           AND FC2.\"FacmNo\" = 0 ";
 			sql += " LEFT JOIN \"CdCode\" CD ON CD.\"DefCode\" = 'AdvanceCloseCode' ";
-			sql += "                        AND CD.\"Code\" =  NVL(NVL(FC1.\"CloseReasonCode\",FC2.\"CloseReasonCode\"),'00')";
+			sql += "                        AND CD.\"Code\" =  NVL(NVL(FC1.\"CloseReasonCode\",FC2.\"CloseReasonCode\"),'  ')";
 			sql += " WHERE BATX.\"AcDate\" = :inputAcDate";
 			sql += " AND SUBSTR(BATX.\"BatchNo\",1,4) = 'BATX'     ";
 			sql += " AND CASE";

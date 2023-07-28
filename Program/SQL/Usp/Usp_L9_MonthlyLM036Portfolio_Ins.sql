@@ -42,10 +42,10 @@ BEGIN
     INSERT INTO "MonthlyLM036Portfolio"
     SELECT YYYYMM                          AS "DataMonth" -- 資料年月 DECIMAL 6  
          , 0                               AS "MonthEndDate" -- 月底日期 DECIMAL 8  
-         , S0."NaturalPersonLoanBal"
-           + S0."LegalPersonLoanBal"
-           + S2."AmortizeTotal"
-           + S1."OvduExpense"              AS "PortfolioTotal" -- 授信組合餘額 DECIMAL 16 2 自然人放款+法人放款+溢折價與催收費用
+         , NVL(S0."NaturalPersonLoanBal",0)
+           + NVL(S0."LegalPersonLoanBal",0)
+           + NVL(S2."AmortizeTotal",0)
+           + NVL(S1."OvduExpense",0)       AS "PortfolioTotal" -- 授信組合餘額 DECIMAL 16 2 自然人放款+法人放款+溢折價與催收費用
          , S0."NaturalPersonLoanBal"       AS "NaturalPersonLoanBal" -- 自然人放款 DECIMAL 16 2 
          , S0."LegalPersonLoanBal"         AS "LegalPersonLoanBal" -- 法人放款 DECIMAL 16 2 
          , S0."SyndLoanBal"                AS "SyndLoanBal" -- 聯貸案 DECIMAL 16 2 法人放款之細項

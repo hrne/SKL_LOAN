@@ -132,11 +132,11 @@ public class LM054Report extends MakeReport {
 			// 持有資產幣別
 			makeExcel.setValue(row, 9, lM054Vo.get("Currency"), "C");
 			// 放款日期
-			makeExcel.setValue(row, 10, parse.stringToInteger(lM054Vo.get("DrawdownDate")), "C");
+			makeExcel.setValue(row, 10, parse.stringToInteger(lM054Vo.get("DrawdownDate")), "0", "C");
 			// 到期日期
-			makeExcel.setValue(row, 11, parse.stringToInteger(lM054Vo.get("MaturityDate")), "C");
+			makeExcel.setValue(row, 11, parse.stringToInteger(lM054Vo.get("MaturityDate")), "0", "C");
 			// 放款年利率
-			makeExcel.setValue(row, 12, lM054Vo.get("StoreRate"), "0.0000", "R");
+			makeExcel.setValue(row, 12, new BigDecimal(lM054Vo.get("StoreRate")), "0.0000", "R");
 			// 放款餘額
 			makeExcel.setValue(row, 13, new BigDecimal(lM054Vo.get("LoanBalance")), "#,##0");
 			// 應收利息
@@ -170,17 +170,17 @@ public class LM054Report extends MakeReport {
 			// 備抵損失總額
 			// 參考報表中公式
 			if (lM054Vo.get("Class").equals("1")) {
-				allowanceForLose = new BigDecimal(lM054Vo.get("LoanBalance")).multiply(new BigDecimal("0.005")).setScale(0,
-						BigDecimal.ROUND_HALF_UP);
+				allowanceForLose = new BigDecimal(lM054Vo.get("LoanBalance")).multiply(new BigDecimal("0.005"))
+						.setScale(0, BigDecimal.ROUND_HALF_UP);
 			} else if (lM054Vo.get("Class").equals("2")) {
-				allowanceForLose = new BigDecimal(lM054Vo.get("LoanBalance")).multiply(new BigDecimal("0.02")).setScale(0,
-						BigDecimal.ROUND_HALF_UP);
+				allowanceForLose = new BigDecimal(lM054Vo.get("LoanBalance")).multiply(new BigDecimal("0.02"))
+						.setScale(0, BigDecimal.ROUND_HALF_UP);
 			} else if (lM054Vo.get("Class").equals("3")) {
-				allowanceForLose = new BigDecimal(lM054Vo.get("LoanBalance")).multiply(new BigDecimal("0.1")).setScale(0,
-						BigDecimal.ROUND_HALF_UP);
+				allowanceForLose = new BigDecimal(lM054Vo.get("LoanBalance")).multiply(new BigDecimal("0.1"))
+						.setScale(0, BigDecimal.ROUND_HALF_UP);
 			} else if (lM054Vo.get("Class").equals("4")) {
-				allowanceForLose = new BigDecimal(lM054Vo.get("LoanBalance")).multiply(new BigDecimal("0.5")).setScale(0,
-						BigDecimal.ROUND_HALF_UP);
+				allowanceForLose = new BigDecimal(lM054Vo.get("LoanBalance")).multiply(new BigDecimal("0.5"))
+						.setScale(0, BigDecimal.ROUND_HALF_UP);
 			} else if (lM054Vo.get("Class").equals("5")) {
 				allowanceForLose = new BigDecimal(lM054Vo.get("LoanBalance"));
 			}
@@ -214,7 +214,6 @@ public class LM054Report extends MakeReport {
 			if (!"999".equals(tmpClNo) && tmpClNo.equals(lM054Vo.get("ClNo")) && cnt > 1) {
 				mark.add("同一擔保品");
 			}
-
 
 			for (int i = 0; i < mark.size(); i++) {
 				memo += mark.get(i) + "、";

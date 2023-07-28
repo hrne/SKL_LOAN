@@ -352,9 +352,15 @@ BEGIN
          , NVL(M."IntAmt",0)                         AS "IntAmt"             -- 應收利息
          , NVL(AF."AvgLawFee",0)
            + NVL(AF."AvgInsuFee",0)                  AS "Fee"               -- 法拍及火險費用
-         , CASE WHEN M."NextPayIntDate" IS NULL  THEN 0
-                  ELSE ( TO_DATE(FF."FinishedDate",'yyyy-mm-dd') - 
-                         TO_DATE("Fn_GetNextRepayDate"(LT."IntEndDate",LB."SpecificDd",LB."FreqBase",LB."PayIntFreq",1),'yyyy-mm-dd') )
+         , CASE
+             WHEN M."NextPayIntDate" IS NULL
+             THEN 0
+             WHEN FF."FinishedDate" IS NULL
+             THEN 0
+             WHEN "Fn_GetNextRepayDate"(LT."IntEndDate",LB."SpecificDd",LB."FreqBase",LB."PayIntFreq",1) IS NULL
+             THEN 0
+           ELSE ( TO_DATE(FF."FinishedDate",'yyyy-mm-dd') - 
+                  TO_DATE("Fn_GetNextRepayDate"(LT."IntEndDate",LB."SpecificDd",LB."FreqBase",LB."PayIntFreq",1),'yyyy-mm-dd') )
            END                                       AS "OvduDays"           -- 逾期繳款天數  -- 應繳日～拍定完成日
          , CASE WHEN NVL(OD2."OvduDate",0) > 0 THEN OD2."OvduDate"
                 ELSE NVL(OD1."OvduDate",0)

@@ -43,6 +43,7 @@ K(MODIFYBUTTON,查詢)
 ["[L6970] 批次執行結果查詢 "],
 ["@執行結果篩選",#BatchResultCode,#BatchResultCodeX],
 ["@執行日期區間",#InputStartDate,#InputEndDate],
+["@類別",#ErrorTypeCode,#ErrorTypeCodeX],
 ]
 
 !---------- AP Button AREA ----------
@@ -113,6 +114,23 @@ C(4,#InputEndDate,E(0,#SYSCDATE),$)
 @V(7)
 A(4,0,#InputEndDate)
 V(5,#InputStartDate,#SYSCDATE)
+
+
+! 輸入欄位
+! [類別]
+#ErrorTypeCodeHelp=X,30,S
+T(3,0:全部;1:影響換日;2:不影響換日)
+#ErrorTypeCode=A,1,I
+HELP(#ErrorTypeCodeHelp)
+C(3,#BatchResultCode,2,$,S)
+@T(3,@ErrorTypeCodeX,)
+C(4,#ErrorTypeCode,$,V(H,#ErrorTypeCodeHelp))
+
+! 輸出欄位
+! [執行結果篩選]
+#ErrorTypeCodeX=X,20,L
+C(4,#ErrorTypeCode,S,T(H,#ErrorTypeCode,#ErrorTypeCodeHelp))
+
 
 #RPTFG=A,1,S
 E(0,0)
@@ -191,11 +209,15 @@ SWITCH(#OOStatus,S,T(3,成功),
 !結束時間 yyyy-MM-dd hh:mm:ss
 #OOStepEndTime=x,20,L
 
+
 #OOJobTxSeq=x,20,L
 #OOHaveUspErrorLog=x,1,L
 
+#OOEffectX=x,8,L
+IF(#OONestJobCode=="yearlyRptFlow" || #OONestJobCode=="monthlyRptFlow" ||#OONestJobCode=="dailyRptFlow",T(3,),T(3,影響換日))
+
 #OO_BTN_UspError=X,1,S
-IF(#OOHaveUspErrorLog=="Y",BIND(grid,{ cmd=CHAIN; ntxcd=L6973;text=資料庫批次錯誤查詢;ntxbuf=#OOJobTxSeq}),BIND(grid,cancel))
+IF(#OOHaveUspErrorLog=="Y",BIND(grid,{ cmd=CHAIN; ntxcd=L6973;text=錯誤查詢;ntxbuf=#OOJobTxSeq}),BIND(grid,cancel))
 
 #OOSuccess=A,5,L
 #OOFalse=A,5,L
@@ -213,6 +235,7 @@ T(6A,#OOJobCode)
 #BatchResultCode
 #InputStartDate
 #InputEndDate
+#ErrorTypeCode
 #END
 </sub>
 
@@ -287,14 +310,17 @@ ifxBatch:{
 #OOStatusX=執行結果
 {width:80,align:'left'}
 
-#OO_BTN_UspError=資料庫批次錯誤查詢
-{width:150,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
+#OO_BTN_UspError=錯誤查詢
+{width:80,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
 
 #OOStepStartTime=啟動時間
 {width:120,align:'center'}
 
 #OOStepEndTime=結束時間
 {width:120,align:'center'}
+
+#OOEffectX=影響換日
+{width:80,align:'center'}
 ^
 
 

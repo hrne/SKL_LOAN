@@ -208,9 +208,10 @@ public class L4721Report2 extends TradeBuffer {
 					}
 
 					// 相同戶號不同額度的輸出
-
-					if (tempCustNo == parse.stringToInteger(r1.get("CustNo"))
-							&& tempFacmNo == parse.stringToInteger(r1.get("FacmNo"))) { // 相同額度
+					
+					//新的一筆戶號的第一次 或 相同戶號時
+					if (times == 0 || (tempCustNo == parse.stringToInteger(r1.get("CustNo"))
+							&& tempFacmNo == parse.stringToInteger(r1.get("FacmNo")))) { // 相同額度
 
 						// 第一次
 						if (times == 0) {
@@ -372,7 +373,7 @@ public class L4721Report2 extends TradeBuffer {
 			line += "02";
 			line += " " + FormatUtil.padX(r.get("CustName"), 40) + " " + FormatUtil.pad9(r.get("CustNo"), 7) + facmNo
 					+ leftPadding(parse.IntegerToString(specificDd, 2), 2, ' ') + " 日" + "          "
-					+ FormatUtil.padX(RepayItem, 8) + "   " + FormatUtil.pad9(titaVo.getCalDy(), 8)
+					+ FormatUtil.padX(RepayItem, 8) + "   " + FormatUtil.pad9(titaVo.getEntDy(), 8)
 					+ FormatUtil.pad9(r.get("LoanBal"), 11) + loanBalX + FormatUtil.pad9(headerExcessive, 11)
 					+ headerExcessiveX;
 			// 加入明細

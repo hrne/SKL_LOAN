@@ -1533,6 +1533,7 @@ public class PfDetailCom extends TradeBuffer {
 
 	// 同額度已計件則更新N為否則依業績件數判斷
 	public String updCntingCode(PfDetail pf) throws LogicException {
+		this.info("PfDetailCom updCntingCode .....");
 		String cntingCode = "N";
 		Slice<PfItDetail> slPfItDetail = null;
 		if (pf.getBormNo() > 0 || this.cntingCodeFacmNo > 0) {

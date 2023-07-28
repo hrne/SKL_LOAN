@@ -94,11 +94,7 @@ public class LM030ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                ),";
 		sql += "                'YYYYMMDD'";
 		sql += "            )";
-		sql += "        ) AS \"DueDate\",";
-		sql += "        M.\"UnpaidPrincipal\",";
-		sql += "        M.\"UnpaidInterest\",";
-		sql += "        M.\"UnpaidBreachAmt\",";
-		sql += "        M.\"UnpaidDelayInt\"";
+		sql += "        ) AS \"DueDate\"";
 		sql += "    FROM \"Main\" M";
 		sql += "        LEFT JOIN \"CdCity\" Cd ON Cd.\"CityCode\" = M.\"CityCode\"";
 		sql += "        LEFT JOIN \"CustMain\" Cm ON Cm.\"CustNo\" = M.\"CustNo\"";

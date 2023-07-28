@@ -41,7 +41,7 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[120,850];printer.width=[20,20];">
 [
 ["[L9721]                                 員工房貸利率明細"],
-["@年月份",#InputYear,"@/@",#InputMonth],
+["@工作年月",#InputYear,"@/@",#InputMonth],
 ]
 !---------- AP TEXT AREA Variables ----------
 
@@ -92,7 +92,8 @@ V(5,0,#DefaultYear)
 #InputMonth=A,2,I
 E(0,#DefaultMonth)
 @V(2,0)
-IF(#InputYear==#DefaultYear,V(5,0,#DefaultMonth),V(5,0,12))
+V(5,1,13)
+!IF(#InputYear==#DefaultYear,V(5,0,#DefaultMonth),V(5,0,12))
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------

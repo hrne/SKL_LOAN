@@ -114,7 +114,7 @@ public class LM030Report extends MakeReport {
 				String value = "";
 				int col = 0;
 				for (int i = 0; i <= 11; i++) {
-
+					makeExcel.setFontType(1);
 					value = tLDVo.get("F" + i);
 					col++;
 					switch (i) {
@@ -122,29 +122,29 @@ public class LM030Report extends MakeReport {
 					case 10:
 					case 11:
 						makeExcel.setValue(row, col,
-								parse.isNumeric(value) ? parse.stringToInteger(this.showRocDate(value, 3)) : value);
+								parse.isNumeric(value) ? parse.stringToInteger(this.showRocDate(value, 3)) : value,"R");
 						break;
 					case 6:
 						// 金額
 						BigDecimal bd = getBigDecimal(value);
-						makeExcel.setValue(row, col, bd, "#,##0");
+						makeExcel.setValue(row, col, bd, "#,##0","R");
 						total = total.add(bd);
 						break;
 					case 7:// 利息金額(不顯示)
 						break;
 					case 8:
 						// 利率
-						makeExcel.setValue(row, col, getBigDecimal(value), "#,##0.0000");
+						makeExcel.setValue(row, col, getBigDecimal(value), "#,##0.0000","R");
 						if (custNoCnt > 1) {
 							makeExcel.setValue(row, 13, "同一擔保品", "C");
 						}
 						break;
 					case 9:
 						makeExcel.setValue(row, col,
-								parse.isNumeric(value) ? parse.stringToInteger(this.showRocDate(value, 3)) : value);
+								parse.isNumeric(value) ? parse.stringToInteger(this.showRocDate(value, 3)) : value,"R");
 						break;
 					default:
-						makeExcel.setValue(row, col, parse.isNumeric(value) ? parse.stringToBigDecimal(value) : value);
+						makeExcel.setValue(row, col, parse.isNumeric(value) ? parse.stringToBigDecimal(value) : value,"C");
 						break;
 					}
 				} // for

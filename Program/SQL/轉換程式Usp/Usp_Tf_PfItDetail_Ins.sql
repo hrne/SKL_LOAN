@@ -75,7 +75,7 @@ BEGIN
         , S1."BCMDPT"                    AS "DeptCode"            -- 部室代號 VARCHAR2 6 0
         , S3."CUSEMP"                    AS "Introducer"          -- 介紹人 NVARCHAR2 8 0
         , S4."CUSEMP"                    AS "UnitManager"         -- 處經理 NVARCHAR2 8 0
-        , S5."DistManager"               AS "DistManager"         -- 區經理 NVARCHAR2 8 0
+        , S6."CUSEMP"                    AS "DistManager"         -- 區經理 NVARCHAR2 8 0
         , S5."DeptManager"               AS "DeptManager"         -- 部經理 NVARCHAR2 8 0
         , CASE
             WHEN S1."PRZCNT" = 'Y'
@@ -111,6 +111,7 @@ BEGIN
                 , A1."BCMDPT"
                 , QQ."CUSEMP"
                 , QQ."ID1X"
+                , QQ."ID3X"
                 , QQ."ID7X"
                 , QQ."YAG3LV"
                 , QQ."PAY3LV"
@@ -151,6 +152,7 @@ BEGIN
                               = 1 
     LEFT JOIN "LN$DTYP" S4 ON S4.CUSID1 = S1.ID7X -- 處經理
     LEFT JOIN "CdBcm" S5 ON S5."UnitCode" = S1."BCMCOD"
+    LEFT JOIN "LN$DTYP" S6 ON S6.CUSID1 = S1.ID3X -- 2023-07-27 Wei 新增 from SKL 金靜 區經理
     WHERE S1."Seq" = 1
     ;
 
