@@ -153,7 +153,7 @@ public class L6R51 extends TradeBuffer {
 						this.totaVo.putParam("L6r51ColName" + cnt, colName);
 						this.totaVo.putParam("L6r51ProdName" + cnt, prodName);
 						this.totaVo.putParam("oL6r51LoanBal" + cnt, df.format(loanBal));
-						this.totaVo.putParam("nL6r51LoanBal" + cnt, df.format(loanBal));
+						this.totaVo.putParam("L6r51LoanBal" + cnt, df.format(loanBal));
 
 					}
 				}
@@ -175,7 +175,7 @@ public class L6R51 extends TradeBuffer {
 						this.totaVo.putParam("L6r51ColName" + cnt, colName);
 						this.totaVo.putParam("L6r51ProdName" + cnt, prodName);
 						this.totaVo.putParam("oL6r51LoanBal" + cnt, df.format(loanBal));
-						this.totaVo.putParam("nL6r51LoanBal" + cnt, df.format(loanBal));
+						this.totaVo.putParam("L6r51LoanBal" + cnt, df.format(loanBal));
 					}
 				}
 

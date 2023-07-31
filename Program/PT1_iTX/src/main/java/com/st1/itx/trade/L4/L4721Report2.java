@@ -208,8 +208,8 @@ public class L4721Report2 extends TradeBuffer {
 					}
 
 					// 相同戶號不同額度的輸出
-					
-					//新的一筆戶號的第一次 或 相同戶號時
+
+					// 新的一筆戶號的第一次 或 相同戶號時
 					if (times == 0 || (tempCustNo == parse.stringToInteger(r1.get("CustNo"))
 							&& tempFacmNo == parse.stringToInteger(r1.get("FacmNo")))) { // 相同額度
 
@@ -263,12 +263,25 @@ public class L4721Report2 extends TradeBuffer {
 								this.info("presentRate =" + presentRate.toString());
 								this.info("adjustedRate =" + adjustedRate.toString());
 
+							
+
 								if (presentRate.compareTo(adjustedRate) != 0) {
+									
+									// 20220101 => 1110101
+									int intTxeffect = parse.stringToInteger(r2.get("TxEffectDate")) - 19110000;
+									// 1110101 / 10000 = 111
+									String year = (intTxeffect / 10000) + " 年 ";
+									// 1110101 /100 % 100 = 01
+									String month = FormatUtil.pad9((intTxeffect / 100 % 100) + "", 2) + " 月 ";
+									// 1110101 % 100 = 01
+									String day = FormatUtil.pad9((intTxeffect % 100) + "", 2) + " 日 ";
+									String txeffect = year + month + day;
+									
+									
 									line = "";
 									line += "45";
-									line += " 額度 " + FormatUtil.pad9(r2.get("FacmNo"), 3) + "     " + "利率自"
-											+ makeReport.showRocDate(r2.get("TxEffectDate"), 0) + "起，　由"
-											+ makeReport.formatAmt(r2.get("PresentRate"), 2) + "%" + "調整為"
+									line += " 額度 " + FormatUtil.pad9(r2.get("FacmNo"), 3) + "     " + "利率自 " + txeffect
+											+ "起，　由 " + makeReport.formatAmt(r2.get("PresentRate"), 2) + "% " + "調整為 "
 											+ makeReport.formatAmt(r2.get("AdjustedRate"), 2) + "% 。";
 									result.add(line);
 								}
