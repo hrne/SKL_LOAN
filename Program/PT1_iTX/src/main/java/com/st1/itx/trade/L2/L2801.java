@@ -38,20 +38,20 @@ public class L2801 extends TradeBuffer {
 
 	/* DB服務注入 */
 	@Autowired
-	public LoanNotYetService loanNotYetService;
+	LoanNotYetService loanNotYetService;
 	@Autowired
-	public FacMainService facMainService;
+	FacMainService facMainService;
 	@Autowired
-	public CdLoanNotYetService cdLoanNotYetService;
+	CdLoanNotYetService cdLoanNotYetService;
 	@Autowired
 	Parse parse;
 	@Autowired
 	DateUtil dDateUtil;
 	@Autowired
-	public DataLog datalog;
+	DataLog datalog;
 
 	@Autowired
-	public SendRsp sendRsp;
+	SendRsp sendRsp;
 
 	// work area
 	TitaVo iTitaVo = new TitaVo();
@@ -99,24 +99,28 @@ public class L2801 extends TradeBuffer {
 		case 1:
 			tLoanNotYet = loanNotYetService.findById(tLoanNotYetId);
 			if (tLoanNotYet != null) {
-				throw new LogicException(titaVo, "E0002", "戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 未齊件代碼 = " + wkNotYetCode); // 新增資料已存在
+				throw new LogicException(titaVo, "E0002",
+						"戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 未齊件代碼 = " + wkNotYetCode); // 新增資料已存在
 			}
 			tLoanNotYet = new LoanNotYet();
 			moveLoanNotYet(iFunCd);
 			try {
 				loanNotYetService.insert(tLoanNotYet);
 			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0005", "戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 未齊件代碼 = " + wkNotYetCode + " " + e.getErrorMsg()); // 新增資料已存在
+				throw new LogicException(titaVo, "E0005",
+						"戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 未齊件代碼 = " + wkNotYetCode + " " + e.getErrorMsg()); // 新增資料已存在
 			}
 			break;
 		case 2:
 			tLoanNotYet = loanNotYetService.holdById(tLoanNotYetId);
 			if (tLoanNotYet == null) {
-				throw new LogicException(titaVo, "E0006", "戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 未齊件代碼 = " + wkNotYetCode); // 鎖定資料時，發生錯誤
+				throw new LogicException(titaVo, "E0006",
+						"戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 未齊件代碼 = " + wkNotYetCode); // 鎖定資料時，發生錯誤
 			}
 
 			// 異動銷帳日期須刷主管卡
-			if (tLoanNotYet.getCloseDate() != parse.stringToInteger(titaVo.getParam("CloseDate")) && titaVo.getEmpNos().trim().isEmpty()) {
+			if (tLoanNotYet.getCloseDate() != parse.stringToInteger(titaVo.getParam("CloseDate"))
+					&& titaVo.getEmpNos().trim().isEmpty()) {
 				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "修改銷帳日期");
 			}
 
@@ -126,7 +130,8 @@ public class L2801 extends TradeBuffer {
 			try {
 				loanNotYetService.update(tLoanNotYet);
 			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0007", "戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 未齊件代碼 = " + wkNotYetCode + " " + e.getErrorMsg()); // 更新資料時，發生錯誤
+				throw new LogicException(titaVo, "E0007",
+						"戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 未齊件代碼 = " + wkNotYetCode + " " + e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 			bLoanNotYet.setCreateDate(tLoanNotYet.getCreateDate()); // 排除建檔時間
 			datalog.setEnv(titaVo, bLoanNotYet, tLoanNotYet);
@@ -135,7 +140,8 @@ public class L2801 extends TradeBuffer {
 		case 4:
 			tLoanNotYet = loanNotYetService.holdById(tLoanNotYetId);
 			if (tLoanNotYet == null) {
-				throw new LogicException(titaVo, "E0006", "戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 未齊件代碼 = " + wkNotYetCode); // 鎖定資料時，發生錯誤
+				throw new LogicException(titaVo, "E0006",
+						"戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 未齊件代碼 = " + wkNotYetCode); // 鎖定資料時，發生錯誤
 			}
 
 			// 異動銷帳日期須刷主管卡
@@ -146,7 +152,8 @@ public class L2801 extends TradeBuffer {
 			try {
 				loanNotYetService.delete(tLoanNotYet);
 			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0008", "戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 未齊件代碼 = " + wkNotYetCode + " " + e.getErrorMsg()); // 刪除資料時，發生錯誤
+				throw new LogicException(titaVo, "E0008",
+						"戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 未齊件代碼 = " + wkNotYetCode + " " + e.getErrorMsg()); // 刪除資料時，發生錯誤
 			}
 		default:
 			break;
@@ -203,10 +210,13 @@ public class L2801 extends TradeBuffer {
 		tLoanNotYet.setCloseDate(this.parse.stringToInteger(iTitaVo.getParam("CloseDate")));
 		tLoanNotYet.setReMark(iTitaVo.getParam("ReMark"));
 		if (iFunCd == 1) { // 新增才填建檔日和人員
-			tLoanNotYet.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+			tLoanNotYet.setBranchNo(iTitaVo.getBrno());
+			tLoanNotYet.setCreateDate(
+					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			tLoanNotYet.setCreateEmpNo(iTitaVo.getTlrNo());
 		}
-		tLoanNotYet.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+		tLoanNotYet
+				.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 		tLoanNotYet.setLastUpdateEmpNo(iTitaVo.getTlrNo());
 	}
 }

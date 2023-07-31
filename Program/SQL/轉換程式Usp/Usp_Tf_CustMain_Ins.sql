@@ -247,7 +247,7 @@ BEGIN
           ,CUAP."AMLOTP"                  AS "AMLGroup"            -- AML組織 VARCHAR2 3 
           --,TRIM(CUAP."CUSNA8")       AS "IndigenousName"      -- 原住民姓名 NVARCHAR2 100 
           ,''                             AS "IndigenousName"      -- 原住民姓名 NVARCHAR2 100 
-          ,NVL(APLP."LastLMSAPN",0)       AS "LastFacmNo"          -- 已編額度編號 DECIMAL 3 
+          ,NVL(ACT.APLAPN,0)       AS "LastFacmNo"          -- 已編額度編號 DECIMAL 3 
           ,0                              AS "LastSyndNo"          -- 已編聯貸案序號 DECIMAL  
           -- 2021-11-09 新增邏輯 原值為2者轉2,其他皆轉1
           ,CASE
@@ -286,11 +286,7 @@ BEGIN
     LEFT JOIN "CU$CUAP" CUAP ON CUAP."CUSID1" = CUSP."CUSID1"
     LEFT JOIN "LN$ENPP" ENPP ON ENPP."LMSACN" = CUSP."LMSACN"
                        AND CUSP."LMSACN" > 0
-    LEFT JOIN (SELECT "LMSACN"
-                     ,MAX("LMSAPN") AS "LastLMSAPN" -- 取最後額度號碼
-               FROM "LA$APLP"
-               GROUP BY "LMSACN"
-              ) APLP ON APLP."LMSACN" = CUSP."LMSACN"
+    LEFT JOIN "LA$ACTP" ACT ON ACT."LMSACN" = CUSP."LMSACN" -- 取最後額度號碼
     LEFT JOIN "TfCust" TF ON TF."CustId" = CASE
                                              WHEN CUSP."LMSACN" = 601776 -- 2021-12-10 智偉修改 from Linda
                                              THEN 'A111111131'

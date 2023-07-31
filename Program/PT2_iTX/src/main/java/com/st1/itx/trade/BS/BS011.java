@@ -63,8 +63,6 @@ public class BS011 extends TradeBuffer {
 		procLawFeeOverdue(titaVo);
 		this.batchTransaction.commit();
 
-		this.batchTransaction.commit();
-
 		return null;
 	}
 

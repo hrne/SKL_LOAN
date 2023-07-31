@@ -393,12 +393,15 @@ public class L2419Batch extends TradeBuffer {
 
 			// column AH 火災險保險金額(仟元)
 			String fireInsuAmt = makeExcel.getValue(row, L2419Column.FIRE_INSU_AMT.getIndex()).toString();
+			fireInsuAmt = parse.stringToBigDecimal(fireInsuAmt).multiply(new BigDecimal("1000")).toPlainString();// 單位為千元
 
 			// column AI 火災險保費
 			String fireInsuExpense = makeExcel.getValue(row, L2419Column.FIRE_INSU_EXPENSE.getIndex()).toString();
 
 			// column AJ 地震險保險金額(仟元)
 			String earthquakeInsuAmt = makeExcel.getValue(row, L2419Column.EARTHQUAKE_INSU_AMT.getIndex()).toString();
+			earthquakeInsuAmt = parse.stringToBigDecimal(earthquakeInsuAmt).multiply(new BigDecimal("1000"))
+					.toPlainString();// 單位為千元
 
 			// column AK 地震險保費
 			String earthquakeInsuExpense = makeExcel.getValue(row, L2419Column.EARTHQUAKE_INSU_EXPENSE.getIndex())
@@ -1262,7 +1265,13 @@ public class L2419Batch extends TradeBuffer {
 	 * @return 處理後的字串
 	 */
 	private String leftPadZero(Object inputObject, int targetLength) {
-		String result = inputObject == null ? "" : inputObject.toString();
+		Integer tempInteger = 0;
+		try {
+			tempInteger = Integer.parseInt(inputObject == null ? "0" : inputObject.toString());
+		} catch (Exception e) {
+			tempInteger = 0;
+		}
+		String result = tempInteger.toString();
 		result = result == null ? "" : result;
 		int len = result.length();
 		if (len > targetLength) {

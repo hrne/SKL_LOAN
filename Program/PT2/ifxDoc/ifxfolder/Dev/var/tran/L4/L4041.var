@@ -118,8 +118,8 @@ T(1,@CustNo,#NTXBUF,11,7)
 #FunctionCode=A,1,I
 HELP(#FunctionHelp)
 @V(H,#FunctionHelp)
-C(3,#FunctionCode,1,INVOKEJS(SHOW,L4041,2,4,1),INVOKEJS(SHOW,L4041,2,4,0))
-C(3,#FunctionCode,1,INVOKEJS(SHOW,L4041,5,6,0),INVOKEJS(SHOW,L4041,5,6,1))
+C(3,#FunctionCode,1,INVOKEJS(SHOW,L4041,2,4,1)INVOKEJS(SHOW,L4041,5,6,0),INVOKEJS(SHOW,L4041,2,4,0)INVOKEJS(SHOW,L4041,5,6,1))
+
 ! 功能中文
 #FunctionCodeX=X,10,L
 T(3,)T(H,#FunctionCode,#FunctionHelp)
@@ -144,15 +144,13 @@ C(3,#AuthApplCode,1,S,$)
 C(3,#CustNo,0,S,T(2,#CustNo)) 
 
 #T1=X,1,S
-T(3,@FdPropDate,)
 
 ! 提出日期
 #PropDate=D,7,I
-T(3,@FdPropDate,*)
 C(3,#FunctionCode,1,$,S)
 C(3,#AuthApplCode,1,S,$)
-C(3,#CustNo,0,T(1,#SYSCDATE,2,7),E(0,0))
-@C(3,#CustNo,0,C(4,#PropDate,V(P,戶號及提出日期擇一輸入),$),$)
+C(3,#CustNo,0,T(1,#SYSCDATE,2,7),S)
+@
 A(DATE,0,#PropDate)
 
 #AuthCreateDate=D,7,I

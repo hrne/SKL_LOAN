@@ -131,14 +131,12 @@ C(3,#CreateFlag,1,S,$)
 C(3,#CustNo,0,S,T(2,#CustNo)) 
 
 #T1=X,1,S
-T(3,@FdPropDate,)
 ! 提出日期
 #PropDate=D,7,I
-T(3,@FdPropDate,)
 C(3,#FunctionCode,1,$,S)
 C(3,#CreateFlag,1,S,$)
-C(3,#CustNo,0,T(1,#SYSCDATE,2,7),E(0,0))
-@C(3,#CustNo,0,C(4,#PropDate,V(P,戶號及提出日期擇一輸入),$),$)
+C(3,#CustNo,0,T(1,#SYSCDATE,2,7),S)
+@
 C(3,#PropDate,0,$,A(DATE,0,#PropDate))
 
 #DataCreateDate=D,7,I

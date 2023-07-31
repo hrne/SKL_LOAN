@@ -174,15 +174,21 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("iFunctionCode = " + iFunctionCode);
 		switch (iFunctionCode) {
 		case 1: // 篩選資料
-			if (iCustNo > 0) {
-				sql += "   and a.\"CustNo\" = " + iCustNo;
-			}
+
 			sql += "   and a.\"MediaCode\" " + searchMediaCode;
-			if (iPropDate > 0) {
-				sql += "   and a.\"PropDate\" >= " + iPropDate;
-			}
-			if (iPropDate == 0 && iCustNo == 0) {
-				sql += "   and a.\"PropDate\" = 0 ";
+			if (iCreateFlag == 1) {
+
+				if (iPropDate == 0 && iCustNo == 0) {
+					sql += "   and a.\"PropDate\" = 0 ";
+				}
+			} else {
+				if (iCustNo > 0) {
+					sql += "   and a.\"CustNo\" = " + iCustNo;
+				} else if (iPropDate > 0) {
+					sql += "   and a.\"PropDate\" >= " + iPropDate;
+				} else {
+					sql += "   and a.\"PropDate\" > 0";
+				}
 			}
 
 			if (iCreateFlag == 3) {

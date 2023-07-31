@@ -31,7 +31,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 public class L5022 extends TradeBuffer {
 	/* 轉型共用工具 */
 	@Autowired
-	public L5022ServiceImpl iL5022ServiceImpl;
+	public L5022ServiceImpl l5022ServiceImpl;
 	@Autowired
 	public PfCoOfficerService iPfCoOfficerService;
 	@Autowired
@@ -44,11 +44,11 @@ public class L5022 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 		String iEmpNo = titaVo.getParam("EmpNo");
 		int cDate = Integer.valueOf(titaVo.getEntDy()) + 19110000;
-		Integer.valueOf(titaVo.getParam("EffectiveDateS"));
+		int iEffectiveDateS = Integer.valueOf(titaVo.getParam("EffectiveDateS"));
 		int iEffectiveDateE = Integer.valueOf(titaVo.getParam("EffectiveDateE")) + 19110000;
-		String iStatusFg = titaVo.getParam("StatusFlag");
+		int iStatusFg = Integer.valueOf(titaVo.getParam("StatusFlag"));
 
-		List<Map<String, String>> iL5022SqlReturn = new ArrayList<Map<String, String>>();
+		List<Map<String, String>> l5022SqlReturn = new ArrayList<Map<String, String>>();
 		new CdEmp();
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
@@ -59,151 +59,68 @@ public class L5022 extends TradeBuffer {
 		this.limit = 40;
 
 		try {
-			iL5022SqlReturn = iL5022ServiceImpl.findByStatus(cDate, iEmpNo, this.index, this.limit, titaVo);
+			l5022SqlReturn = l5022ServiceImpl.findByStatus(cDate, iEffectiveDateS, iEffectiveDateE, iEmpNo, iStatusFg,
+					this.index, this.limit, titaVo);
 		} catch (Exception e) {
 			throw new LogicException(titaVo, "E5004", "");
 		}
 
-		if (iL5022SqlReturn.size() == 0) {
-			throw new LogicException(titaVo, "E0001", "協辦人員等級檔查無 " + iEmpNo + " 資料");
+		if (this.index == 0 && (l5022SqlReturn == null || l5022SqlReturn.size() == 0)) {
+			throw new LogicException(titaVo, "E0001", "會計帳務明細檔");
 		}
 
-		if (iL5022SqlReturn != null && iL5022SqlReturn.size() >= this.limit) {
-			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
+		for (Map<String, String> result : l5022SqlReturn) {
+			OccursList occursList = new OccursList();
+			int ineffectiveDate = Integer.valueOf(result.get("IneffectiveDate"));
+			int effectiveDate = Integer.valueOf(result.get("EffectiveDate"));
+
+			occursList.putParam("OOEmpNo", result.get("EmpNo"));
+			occursList.putParam("OOFullname", result.get("Fullname"));
+			occursList.putParam("OOEffectiveDate", effectiveDate - 19110000);
+			occursList.putParam("OOIneffectiveDate", ineffectiveDate == 0 ? 0 : ineffectiveDate - 19110000);
+			occursList.putParam("OOEmpClass", result.get("EmpClass"));
+			occursList.putParam("OOClassPass", result.get("ClassPass"));
+			occursList.putParam("OOUnitCode", result.get("AreaCode"));
+			occursList.putParam("OODistCode", result.get("DistCode"));
+			occursList.putParam("OODeptCode", result.get("DeptCode"));
+			occursList.putParam("OOUnitCodeX", result.get("AreaItem"));
+			occursList.putParam("OODistCodeX", result.get("DistItem"));
+			occursList.putParam("OODeptCodeX", result.get("DeptItem"));
+			occursList.putParam("OOStatusFg", result.get("StatusFg"));
+			// <歷程>按鈕 => LogCount > 0 則顯示
+			occursList.putParam("OOLogCount", result.get("LogCount"));
+
+			
+			// <離調職異動>按鈕 ==> 離調職異動日 > 0 則顯示
+			// 按鈕連結<L5407>FunctionCd=6-離調職異動，將[離調職異動日[帶入[停效日期]欄，其他欄不可改
+			int quitDate = Integer.valueOf(result.get("QuitDate"));// 離職/停約日
+			int agPostChgDate = Integer.valueOf(result.get("AgPostChgDate")); // 職務異動日
+			int quitChgDateDate = 0; // 離調職異動日
+			// 離職/停約日在有在有效期間、 單位不同且職務異動日在有效期間
+			if (ineffectiveDate > quitDate) {
+				quitChgDateDate = quitDate;
+			} else {
+				if (result.get("CenterCode").equals(result.get("AreaCode"))) {
+					if (ineffectiveDate > agPostChgDate) {
+						quitChgDateDate = agPostChgDate;
+					}
+				}
+			}
+			occursList.putParam("OOquitChgDateDate", quitChgDateDate == 0 ? 0 : quitChgDateDate - 19110000); // 離調職異動日
+
+			int evalueChgDate = Integer.valueOf(result.get("EvalueChgDate")); // 考核職級異動日
+			// 考核職級異動日 > 0 則顯示<考核職級異動>按鈕，連結<L5407>FunctionCd=8-考核職級異動，
+			// 將[考核職級異動日]帶入[生效日期]欄、[考核職級]帶入[協辦等級]欄，其他欄不可改
+			occursList.putParam("OOEvalueChgDate", evalueChgDate == 0 ? 0 : evalueChgDate - 19110000);  // 考核職級異動日 
+			occursList.putParam("OOEvalueChgClass", result.get("EvalueChgClass")); // 考核職級 
+			this.totaVo.addOccursList(occursList);
+		}
+		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
+		if (l5022SqlReturn != null && l5022SqlReturn.size() >= this.limit) {
 			titaVo.setReturnIndex(this.setIndexNext());
 			this.totaVo.setMsgEndToEnter();// 手動折返
 		}
-		String rEmpNo = "";
-		String rStatusFg = "";
-		int reCount = 0;
-		
-		
-		for (Map<String, String> r5022SqlReturn : iL5022SqlReturn) {
-			OccursList occursList = new OccursList();
-//			String r5022EmpNo = r5022SqlReturn.get("EmpNo");
 
-			//6.如果該員工已離職但還是在有效日期區間內和單位代號與員工檔不同，該資料後面需要加上星號(*)
-			String iCent ="";
-			int iQuitDate =0;
-			CdEmp iCd = iCdEmpService.findById(r5022SqlReturn.get("EmpNo"), titaVo);
-			if(iCd != null) {
-				iCent = iCd.getCenterCode();
-				iQuitDate = iCd.getQuitDate();
-			}else {
-				iCent = "";
-				iQuitDate = 0;
-			}
-			this.info("單位       =  " + iCent);
-			this.info("離職日期 =  " + iQuitDate);
-			
-			if (!iStatusFg.trim().isEmpty()) { // 有輸入狀態
-				occursList.putParam("OOEmpNo", r5022SqlReturn.get("EmpNo"));
-				int iIneffectiveDate = Integer.valueOf(r5022SqlReturn.get("IneffectiveDate"));
-				int iEffectiveDate =  Integer.valueOf(r5022SqlReturn.get("EffectiveDate"));
-
-				if (r5022SqlReturn.get("EffectiveDate").equals("") || r5022SqlReturn.get("EffectiveDate").equals("0")) {
-					occursList.putParam("OOEffectiveDate", "");
-				} else {
-					occursList.putParam("OOEffectiveDate", iEffectiveDate - 19110000);
-				}
-				occursList.putParam("OOEmpClass", r5022SqlReturn.get("EmpClass"));
-				occursList.putParam("OOClassPass", r5022SqlReturn.get("ClassPass"));
-				if(iIneffectiveDate < iQuitDate && iQuitDate < iEffectiveDate ) {
-//					離職日期在有效期間內需在名字後加上*
-					occursList.putParam("OOStart1", "*");
-				}else {
-					occursList.putParam("OOStart1", "");
-				}
-				occursList.putParam("OOFullname", r5022SqlReturn.get("Fullname"));
-				String ixAreaCode =  r5022SqlReturn.get("AreaCode");
-				this.info("iCent      = " + iCent);
-				this.info("ixAreaCode = " + ixAreaCode);
-				if(!iCent.equals(ixAreaCode)) {
-					occursList.putParam("OOStart2", "*");
-				}else {
-					occursList.putParam("OOStart2", "");
-				}
-				occursList.putParam("OOUnitCode",ixAreaCode);
-				occursList.putParam("OODistCode", r5022SqlReturn.get("DistCode"));
-				occursList.putParam("OODeptCode", r5022SqlReturn.get("DeptCode"));
-				occursList.putParam("OOUnitCodeX", r5022SqlReturn.get("AreaItem"));
-				occursList.putParam("OODistCodeX", r5022SqlReturn.get("DistItem"));
-				occursList.putParam("OODeptCodeX", r5022SqlReturn.get("DeptItem"));
-				if (r5022SqlReturn.get("IneffectiveDate").equals("29101231") || r5022SqlReturn.get("IneffectiveDate").equals("0")) {
-					occursList.putParam("OOIneffectiveDate", "");
-				} else {
-
-					occursList.putParam("OOIneffectiveDate", iIneffectiveDate - 19110000);
-				}
-				rStatusFg = r5022SqlReturn.get("StatusFg");
-				if (rStatusFg.equals("1")) { // 若狀態為1:已生效，第一筆之後的狀態須改為已停用
-					if (rEmpNo.compareTo(r5022SqlReturn.get("EmpNo")) == 0) {
-						rStatusFg = "2";
-					} else {
-						rStatusFg = "1";
-						rEmpNo = r5022SqlReturn.get("EmpNo");
-					}
-				}
-
-				if (!iStatusFg.equals("9")) {
-					if (rStatusFg.compareTo(iStatusFg) == 0) {
-						occursList.putParam("OOStatusFg", rStatusFg);
-					} else {
-						continue;
-					}
-				} else {
-					occursList.putParam("OOStatusFg", rStatusFg);
-				}
-			} else { // 有輸入生效日期
-				// A.停效日等於0(1.生效日不大於迄日)
-				// B.停效日不等於0(1.生效日不大於迄日2.停效日大於起日)
-				if (Integer.valueOf(r5022SqlReturn.get("EffectiveDate")) > iEffectiveDateE) {
-					continue;
-				}
-				if (Integer.valueOf(r5022SqlReturn.get("IneffectiveDate")) != 19110000) {
-					if (Integer.valueOf(r5022SqlReturn.get("IneffectiveDate")) < iEffectiveDateE) {
-						continue;
-					}
-				}
-				occursList.putParam("OOEmpNo", r5022SqlReturn.get("EmpNo"));
-				if (r5022SqlReturn.get("EffectiveDate").equals("") || r5022SqlReturn.get("EffectiveDate").equals("0")) {
-					occursList.putParam("OOEffectiveDate", "");
-				} else {
-					occursList.putParam("OOEffectiveDate", Integer.valueOf(r5022SqlReturn.get("EffectiveDate")) - 19110000);
-				}
-				occursList.putParam("OOEmpClass", r5022SqlReturn.get("EmpClass"));
-				occursList.putParam("OOClassPass", r5022SqlReturn.get("ClassPass"));
-				occursList.putParam("OOFullname", r5022SqlReturn.get("Fullname"));
-				occursList.putParam("OOUnitCode", r5022SqlReturn.get("AreaCode"));
-				occursList.putParam("OODistCode", r5022SqlReturn.get("DistCode"));
-				occursList.putParam("OODeptCode", r5022SqlReturn.get("DeptCode"));
-				occursList.putParam("OOUnitCodeX", r5022SqlReturn.get("AreaItem"));
-				occursList.putParam("OODistCodeX", r5022SqlReturn.get("DistItem"));
-				occursList.putParam("OODeptCodeX", r5022SqlReturn.get("DeptItem"));
-				if (r5022SqlReturn.get("IneffectiveDate").equals("") || r5022SqlReturn.get("IneffectiveDate").equals("0")) {
-					occursList.putParam("OOIneffectiveDate", "");
-				} else {
-					occursList.putParam("OOIneffectiveDate", Integer.valueOf(r5022SqlReturn.get("IneffectiveDate")) - 19110000);
-				}
-				rStatusFg = r5022SqlReturn.get("StatusFg");
-				if (rStatusFg.equals("1")) { // 若狀態為1:已生效，第一筆之後的狀態須改為已停用
-					if (rEmpNo.compareTo(r5022SqlReturn.get("EmpNo")) == 0) {
-						rStatusFg = "2";
-					} else {
-						rStatusFg = "1";
-						rEmpNo = r5022SqlReturn.get("EmpNo");
-					}
-				}
-				occursList.putParam("OOStatusFg", rStatusFg);
-				occursList.putParam("OOLogCount", r5022SqlReturn.get("LogCount"));
-			}
-
-			reCount++;
-			this.totaVo.addOccursList(occursList);
-		}
-		if (reCount == 0) {
-			throw new LogicException(titaVo, "E0001", "查無資料");
-		}
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

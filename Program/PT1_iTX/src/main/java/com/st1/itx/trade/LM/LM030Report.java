@@ -119,7 +119,10 @@ public class LM030Report extends MakeReport {
 					case 5:
 					case 10:
 					case 11:
-						makeExcel.setValue(row, col, value, "R");
+						makeExcel.setValue(row, col,
+								parse.isNumeric(value) ? parse.stringToInteger(this.showRocDate(value, 3))
+										: parse.stringToInteger(value),
+								"R");
 						break;
 					case 6:
 						// 金額

@@ -197,7 +197,7 @@ BIND(#BTNB,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUFB;ntxbuf5=type<-1:CUSTNOB<
 
 !戶號
 #CUSTNO=A,7,I
-C(3,#FunctionCode,2,s,$)
+C(3,#FunctionCode,2,S,$)
 E(0,1)
 C(3,#CHAIN,0,$,s)
 @V(2,0)
@@ -205,7 +205,7 @@ C(3,#CUSTNO,1,E(0,@CUSTNOB,9999999),E(0,@CUSTNOB,#CUSTNO))
 
 !戶號
 #CUSTNOB=A,7,I
-C(3,#FunctionCode,2,s,$)
+C(3,#FunctionCode,2,S,$)
 C(3,#CHAIN,0,$,s)
 @V(2,0)
 V(5,#CUSTNO,9999999)
@@ -280,7 +280,7 @@ T(3,L4702)
 #nLetter=X,1,S
 
 #L1R20Rim2=X,1,S
-C(3,#CustNo,0,S,$)
+C(3,#CUSTNO,#CUSTNOB,$,S)
 RESET_RIM(#L1R20Rim2,L1R20)
 E(0,@RimFlag,0)
 S(L1R20,01,#CustNo,#FacmNo,#FormNo,#RimFlag)
@@ -289,9 +289,9 @@ T(2,@Msg,#L1R20Msg)
 T(2,@nLetter,#notPrintLetter)
 
 #ShowMsg=A,1,S
-C(3,#CustNo,0,E(0,0),C(4,#Msg,E(0,0),E(0,1)))
+C(3,#CUSTNO,#CUSTNOB,C(4,#Msg,E(0,0),E(0,1)),E(0,0))
 C(5,#nLetter,Y,K(NOBUTTON,CLOSEY),K(NOBUTTON,SHOWY))
-INVOKEJS(SHOW,p1,11,11,#ShowMsg)
+INVOKEJS(SHOW,p1,9,9,#ShowMsg)
 
 </sub>
 

@@ -177,11 +177,14 @@ public class L4041ServiceImpl extends ASpringJpaParm implements InitializingBean
 		switch (iFunctionCode) {
 		case 1:
 			sql += "   and \"PostMediaCode\" " + searchMediaCode;
-			if (iCustNo > 0) {
-				sql += "   and \"CustNo\" = " + iCustNo;
-			}
-			if (iPropDate > 0) {
-				sql += "   and \"PropDate\" >= " + iPropDate;
+			if (iAuthApplCode != 1) {
+				if (iCustNo > 0) {
+					sql += "   and \"CustNo\" = " + iCustNo;
+				} else if (iPropDate > 0) {
+					sql += "   and \"PropDate\" >= " + iPropDate;
+				} else {
+					sql += "   and \"PropDate\" >   0 ";
+				}
 			}
 			break;
 		case 2:

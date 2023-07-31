@@ -146,6 +146,7 @@ public class PfDetailCom extends TradeBuffer {
 	private int workMonth; // 工作月(西元)
 	private int workSeason; // 工作季(西元)
 	private int workMonthDrawdown; // 撥款工作月(西元)
+	private int workDrawdownPerDateF; // 撥款業績日期(西元)
 	private boolean isReCompute = false;
 	private String bsOfficer = "";
 	private int cntingCodeFacmNo = 0; // 代碼(2&B)之是否計件寫入(代碼1&A)的額度
@@ -170,6 +171,7 @@ public class PfDetailCom extends TradeBuffer {
 		workMonth = 0;
 		workSeason = 0;
 		workMonthDrawdown = 0;
+		workDrawdownPerDateF = 0;
 		isReCompute = false;
 		bsOfficer = "";
 		cntingCodeFacmNo = 0;
@@ -286,8 +288,10 @@ public class PfDetailCom extends TradeBuffer {
 		// 計件代碼變更，業績日期為撥款業績日期；不可跨撥款工作月；不可有提前還款
 		BigDecimal extraRepay = BigDecimal.ZERO;
 		workMonthDrawdown = 0;
+		workDrawdownPerDateF = 0;
 		if (iPf.getRepayType() == 0) {
 			workMonthDrawdown = workMonth;
+			workDrawdownPerDateF = perfDateF;
 		}
 		if (slPfDetail != null) {
 			for (PfDetail pf : slPfDetail.getContent()) {
@@ -299,6 +303,7 @@ public class PfDetailCom extends TradeBuffer {
 				if (pf.getFacmNo() == iPf.getFacmNo() && pf.getBormNo() == iPf.getBormNo()) {
 					if (pf.getRepayType() == 0) {
 						workMonthDrawdown = pf.getWorkMonth();
+						workDrawdownPerDateF = perfDateF;
 					} else {
 						extraRepay = extraRepay.add(pf.getDrawdownAmt());
 					}
@@ -329,10 +334,6 @@ public class PfDetailCom extends TradeBuffer {
 				// 計件代碼變更，回沖該筆撥款及之後撥款者，再重算
 				if (iPf.getRepayType() == 1) {
 					if (iPf.getFacmNo() == pf.getFacmNo() && iPf.getBormNo() == pf.getBormNo()) {
-						workMonthDrawdown = pf.getWorkMonth();// 撥款工作月(西曆)
-						if ("L3701".equals(titaVo.getTxCode()) && workMonth > workMonthDrawdown) {
-							throw new LogicException(titaVo, "E0015", "跨撥款工作月，不可變更計件代碼"); // 檢查錯誤
-						}
 						iPf.setPerfDate(pf.getPerfDate()); // 業績日期為撥款業績日期
 						perfDate = pf.getPerfDate();
 						perfDateF = perfDate + 19110000; // 業績日期(西元)
@@ -478,6 +479,7 @@ public class PfDetailCom extends TradeBuffer {
 				perfDateF = perfDate + 19110000; // 業績日期(西元)
 				workMonth = pf.getWorkMonth();// 工作月(西曆)
 				workMonthDrawdown = pf.getWorkMonth();// 撥款工作月(西曆)
+				workDrawdownPerDateF = perfDateF;
 				workSeason = pf.getWorkSeason();// 工作季(西曆)
 				procPfDetail(rPf, pf.getPieceCode(), pf.getDrawdownAmt());
 			}
@@ -802,7 +804,7 @@ public class PfDetailCom extends TradeBuffer {
 
 		// 計算協辦人員協辦獎金
 		if (pf.getCoorgnizer().trim().length() > 0) {
-			pf = procCoBonus(pf);
+			pf = procCoBonus(pf, workDrawdownPerDateF, workMonthDrawdown, lPfDetail, titaVo);
 		}
 
 // ---------------- 以額度累計計算金額(房貸專員)計算房貸專員業績  ------------------------
@@ -1132,31 +1134,42 @@ public class PfDetailCom extends TradeBuffer {
 		return isAddBonus;
 	}
 
-	/* 計算協辦人員協辦獎金 */
-	private PfDetail procCoBonus(PfDetail pf) throws LogicException {
+	/**
+	 * 計算協辦人員協辦獎金
+	 * 
+	 * @param pf                 業績計算明細
+	 * @param iDrawdownPerDateF  撥款業績日期(西元)
+	 * @param iDrawdownWorkMonth 撥款工作月(西元)
+	 * @param iPfDetailList      戶號下全部業績計算明細
+	 * @param titaVo             TitaVo
+	 * @return 業績計算明細
+	 * @throws LogicException ....
+	 */
+	public PfDetail procCoBonus(PfDetail pf, int iDrawdownPerDateF, int iDrawdownWorkMonth,
+			ArrayList<PfDetail> iPfDetailList, TitaVo titaVo) throws LogicException {
 		this.info("PfDetailCom compCoBonus ");
 		// 生效日期<=撥款日<停效日期
 		if ("".equals(pf.getCoorgnizer())) {
 			this.info("PfDetailCom PfCoOfficer space skip ");
 			return pf;
 		}
-		PfCoOfficer tPfCoOfficer = pfCoOfficerService.effectiveDateFirst(pf.getCoorgnizer(), 0,
-				pf.getDrawdownDate() + 19110000, titaVo);
+		PfCoOfficer tPfCoOfficer = pfCoOfficerService.effectiveDateFirst(pf.getCoorgnizer(), 0, iDrawdownPerDateF,
+				titaVo);
 		if (tPfCoOfficer == null) {
 			this.info("PfDetailCom PfCoOfficer null skip ");
 			return pf;
 		}
-		if (tPfCoOfficer.getIneffectiveDate() > 0 && pf.getDrawdownDate() >= tPfCoOfficer.getIneffectiveDate()) {
+		if (tPfCoOfficer.getIneffectiveDate() > 0
+				&& iDrawdownPerDateF > (tPfCoOfficer.getIneffectiveDate() + 19110000)) {
 			this.info("PfDetailCom PfCoOfficer IneffectiveDate skip " + tPfCoOfficer.toString());
 			return pf;
 		}
 		// CdBonusCo 協辦獎金標準設定
-		int workMonthCd; // 適用工作年月
-		CdBonusCo TCdBonusCo = cdBonusCoService.findWorkMonthFirst(workMonthDrawdown, titaVo);
+		CdBonusCo TCdBonusCo = cdBonusCoService.findWorkMonthFirst(iDrawdownWorkMonth, titaVo);
 		if (TCdBonusCo == null) {
 			throw new LogicException(titaVo, "E0001", "CdBonusCo 協辦獎金標準設定" + workMonthDrawdown); // 查詢資料不存在
 		}
-		workMonthCd = TCdBonusCo.getWorkMonth();
+		int workMonthCd = TCdBonusCo.getWorkMonth();// 適用工作年月
 		Slice<CdBonusCo> slCdBonusCo = cdBonusCoService.findYearMonth(workMonthCd, workMonthCd, this.index,
 				Integer.MAX_VALUE, titaVo); // 全部
 		List<CdBonusCo> lCdBonusCo = slCdBonusCo == null ? null : slCdBonusCo.getContent();
@@ -1191,7 +1204,7 @@ public class PfDetailCom extends TradeBuffer {
 		BigDecimal drawDownBonusFac = BigDecimal.ZERO;
 		BigDecimal repayBonusFac = BigDecimal.ZERO;
 		if (lPfDetail != null) {
-			for (PfDetail it : lPfDetail) {
+			for (PfDetail it : iPfDetailList) {
 				if (isCoBonusPieceCode(it.getPieceCode(), lCdBonusCo)) {
 					if (it.getFacmNo() == pf.getFacmNo() && it.getWorkMonth() == workMonthDrawdown) {
 						if (it.getRepayType() == 0) {
@@ -1288,6 +1301,9 @@ public class PfDetailCom extends TradeBuffer {
 			PfItDetail It = pfItDetailService.findBormNoLatestFirst(pf.getCustNo(), pf.getFacmNo(), pf.getBormNo(),
 					titaVo);
 			if (It != null) {
+				if (pf.getRepayType() == 1 && It.getMediaDate() > 0) {
+					throw new LogicException(titaVo, "E0015", "跨撥款工作月，不可變更計件代碼"); // 檢查錯誤
+				}
 				isNewEmpUnit = false;
 				pf.setUnitCode(It.getUnitCode());
 				pf.setDistCode(It.getDistCode());
@@ -1297,6 +1313,7 @@ public class PfDetailCom extends TradeBuffer {
 				pf.setDeptManager(It.getDeptManager());
 			}
 		}
+
 //		// 是否為15日薪人員，不論是否重轉均以員工檔現況判斷。
 // 還款或更新記號=Y => 抓最新介紹人及所屬資料(變動 by L5501房貸介紹人業績案件維護)
 		boolean isNewDay15 = true;
@@ -1543,12 +1560,13 @@ public class PfDetailCom extends TradeBuffer {
 		if ("2".equals(pf.getPieceCode()) || "B".equals(pf.getPieceCode())) {
 			cntingCode = "N";
 		} else {
-			// 同額度已計件則更新N為否則依業績件數判斷
+			// 同額度不同工作月已計件則更新N為否則依業績件數判斷
 			if (pf.getItPerfCnt().compareTo(BigDecimal.ZERO) > 0) {
 				cntingCode = "Y";
 				if (slPfItDetail != null) {
 					for (PfItDetail it : slPfItDetail.getContent()) {
-						if (it.getFacmNo() == pf.getFacmNo() && "Y".equals(it.getCntingCode())) {
+						if (it.getWorkMonth() < this.workMonth && it.getFacmNo() == pf.getFacmNo()
+								&& "Y".equals(it.getCntingCode())) {
 							cntingCode = "N";
 							break;
 						}

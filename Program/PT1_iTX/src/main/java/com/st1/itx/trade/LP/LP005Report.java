@@ -8,17 +8,24 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
+import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.CdWorkMonth;
 import com.st1.itx.db.domain.CdWorkMonthId;
+import com.st1.itx.db.domain.PfCoOfficer;
+import com.st1.itx.db.domain.PfCoOfficerLog;
 import com.st1.itx.db.service.CdWorkMonthService;
+import com.st1.itx.db.service.PfCoOfficerLogService;
 import com.st1.itx.db.service.springjpa.cm.LP005ServiceImpl;
+import com.st1.itx.trade.L5.L5407;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
+import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Component
@@ -26,7 +33,7 @@ import com.st1.itx.util.parse.Parse;
 public class LP005Report extends MakeReport {
 
 	@Autowired
-	LP005ServiceImpl lp005ServiceImpl;
+	private PfCoOfficerLogService pfCoOfficerLogService;
 
 	@Autowired
 	CdWorkMonthService sCdWorkMonthService;
@@ -35,22 +42,25 @@ public class LP005Report extends MakeReport {
 	MakeExcel makeExcel;
 
 	@Autowired
+	LP005ServiceImpl lp005ServiceImpl;
+
+	@Autowired
+	L5407 l5407;
+
+	@Autowired
 	private Parse parse;
+
+	@Autowired
+	private DateUtil dateUtil;
+
 	private int effectiveDateS = 0;
 	private int effectiveDateE = 0;
+	private List<Map<String, String>> listEmpClass = new ArrayList<>();
 
 	public void exec(TitaVo titaVo) throws LogicException {
 		this.info("LP005Report exec ...");
 
-		// 系統會計日期
 		int workMonth = parse.stringToInteger(titaVo.getParam("Ym")) + 191100;
-
-		// CdWorkMonth tCdWorkMonth = sCdWorkMonthService.findDateFirst(iEntdy, iEntdy,
-		// titaVo);
-
-//		if (tCdWorkMonth == null) {
-//			return;
-//		}
 
 		// 業績年度
 		int pfYear = workMonth / 100;
@@ -116,8 +126,6 @@ public class LP005Report extends MakeReport {
 			// 開啟報表
 			this.info("reportVo open");
 			makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
-//			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP005", "協辦考核核算底稿",
-//					"LP005_" + (pfYear - 1911) + "Q" + pfSeason + "協辦考核核算底稿", "LP005_底稿_協辦考核核算_第四季特別版.xlsx", "1月件數");
 		} else {
 
 			String fileName = "LP005_" + seasonItem + "協辦考核核算底稿";
@@ -127,8 +135,6 @@ public class LP005Report extends MakeReport {
 			// 開啟報表
 			this.info("reportVo open");
 			makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
-//			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP005", "協辦考核核算底稿",
-//					"LP005_" + (pfYear - 1911) + "Q" + pfSeason + "協辦考核核算底稿", "LP005_底稿_協辦考核核算.xlsx", "1月件數");
 		}
 
 		for (int i = 1; i <= maxOfLoops; i++) {
@@ -142,8 +148,6 @@ public class LP005Report extends MakeReport {
 			setAmt(i, inputWorkMonth, titaVo);
 		}
 
-		List<Map<String, String>> listEmpClass = new ArrayList<>();
-
 		listEmpClass = setDept(listEmpClass, "A0B000", "營管", pfYear, pfSeason, titaVo);
 		listEmpClass = setDept(listEmpClass, "A0F000", "營推", pfYear, pfSeason, titaVo);
 		listEmpClass = setDept(listEmpClass, "A0E000", "業推", pfYear, pfSeason, titaVo);
@@ -152,6 +156,47 @@ public class LP005Report extends MakeReport {
 		setEmpClassList(listEmpClass, pfYear, pfSeason, 0);
 
 		setEmpClassList(listEmpClass, pfYear, pfSeason, 1);
+
+	}
+
+	// 考核核算底稿寫入歷程檔
+	private void insertPfCoOfficerLog(int logFunctionCode, PfCoOfficer tPfCoOfficer, TitaVo titaVo)
+			throws LogicException {
+		this.info("insertPfCoOfficerLog  ... ");
+		if (listEmpClass == null || listEmpClass.isEmpty()) {
+			return;
+		}
+		// 設定生效日期為工作月止日+1日
+		dateUtil.init();
+		dateUtil.setDate_1(effectiveDateE - 19110000);
+		dateUtil.setDays(1);
+		int evaluteEffectiveDate = dateUtil.getCalenderDay();
+
+		List<PfCoOfficerLog> lPfCoOfficerLog = new ArrayList<PfCoOfficerLog>();
+
+		// 刪除重跑前資料
+		Slice<PfCoOfficerLog> slPfCoOfficerLog = pfCoOfficerLogService.findAll(0, Integer.MAX_VALUE, titaVo);
+		if (slPfCoOfficerLog != null) {
+			for (PfCoOfficerLog tPfCoOfficerLog : slPfCoOfficerLog.getContent()) {
+				if (tPfCoOfficerLog.getEffectiveDate() == evaluteEffectiveDate
+						&& tPfCoOfficerLog.getFunctionCode() == 7) {
+					lPfCoOfficerLog.add(tPfCoOfficerLog);
+				}
+			}
+			if (lPfCoOfficerLog.size() > 0) {
+				try {
+					pfCoOfficerLogService.deleteAll(lPfCoOfficerLog, titaVo);
+				} catch (DBException e) {
+					throw new LogicException("E0007", "刪除歷程資料時發生錯誤");
+				}
+			}
+		}
+
+		// 核核算底稿新增至歷程檔
+		for (Map<String, String> m : listEmpClass) {
+			l5407.insertEvalutePfCoOfficerLog(m.get("EmpNo"), parse.stringToInteger(m.get("EmpNo")),
+					evaluteEffectiveDate, m.get("AfterEmpClass"), titaVo);
+		}
 	}
 
 	private List<Map<String, String>> putDataToListEmpClass(List<Map<String, String>> listEmpClass,
@@ -165,6 +210,7 @@ public class LP005Report extends MakeReport {
 		mapEmpClass.put("Unit", m.get("F1")); // 單位
 		mapEmpClass.put("EmpName", m.get("F2")); // 姓名
 		mapEmpClass.put("EmpNo", m.get("F3")); // 員工代號
+		mapEmpClass.put("EffectiveDate", m.get("EffectiveDate")); // 生效日期
 		mapEmpClass.put("OriEmpClass", oriEmpClass); // 考核前職級
 		mapEmpClass.put("AfterEmpClass", afterEmpClass); // 考核後職級
 

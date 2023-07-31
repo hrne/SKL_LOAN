@@ -41,6 +41,8 @@ public class LY005p extends TradeBuffer {
 		String parentTranCode = titaVo.getTxcd();
 
 		lY005Report.setParentTranCode(parentTranCode);
+		
+		lY005Report.exec(titaVo);
 
 		webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getParam("TLRNO"), "Y",
 				"LC009", titaVo.getParam("TLRNO"), "LY005 非RBC_表20_會計部年度檢查報表 已完成", titaVo);

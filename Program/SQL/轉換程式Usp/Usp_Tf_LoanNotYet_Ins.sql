@@ -35,6 +35,7 @@ BEGIN
       , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
       , "LastUpdate"          -- 最後更新日期時間 DATE  
       , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+      , "BranchNo"
     )
     SELECT "LA$SDOP"."LMSACN"             AS "CustNo"              -- 借款人戶號 DECIMAL 7 
           ,"LA$SDOP"."LMSAPN"             AS "FacmNo"              -- 額度編號 DECIMAL 3 
@@ -46,6 +47,7 @@ BEGIN
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,'0000'                         AS "BranchNo"
     FROM "LA$SDOP"
     LEFT JOIN "TB$DOTP" ON "TB$DOTP"."DOTSID" = "LA$SDOP"."DOTSID"
     ;

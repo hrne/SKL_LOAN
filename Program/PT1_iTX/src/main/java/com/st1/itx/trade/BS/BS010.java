@@ -74,8 +74,6 @@ public class BS010 extends TradeBuffer {
 		procLoanOverdue(titaVo);
 		this.batchTransaction.commit();
 
-		this.batchTransaction.commit();
-
 		return null;
 	}
 

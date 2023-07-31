@@ -249,7 +249,13 @@ public class L2419Report extends TradeBuffer {
 		String insuCompany = result.get("InsuCompany");
 		String insuTypeCode = result.get("InsuTypeCode");
 		String fireInsuCovrg = result.get("FireInsuCovrg");
+		if (rptUtil.getBigDecimal(fireInsuCovrg).compareTo(BigDecimal.ZERO) != 0) {
+			fireInsuCovrg = rptUtil.getBigDecimal(fireInsuCovrg).divide(new BigDecimal("1000")).toPlainString();
+		}
 		String ethqInsuCovrg = result.get("EthqInsuCovrg");
+		if (rptUtil.getBigDecimal(ethqInsuCovrg).compareTo(BigDecimal.ZERO) != 0) {
+			ethqInsuCovrg = rptUtil.getBigDecimal(ethqInsuCovrg).divide(new BigDecimal("1000")).toPlainString();
+		}
 		String fireInsuPrem = result.get("FireInsuPrem");
 		String ethqInsuPrem = result.get("EthqInsuPrem");
 		String insuStartDate = result.get("InsuStartDate");
