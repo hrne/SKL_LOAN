@@ -37,7 +37,7 @@ public class L9139ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> findAll(TitaVo titaVo, int runDate) throws Exception {
 
 		int entDy = titaVo.getEntDyI() + 19110000;
-		int bussDate = 0;
+//		int bussDate = 0;
 
 		int decision = 1;
 		if (runDate == entDy) {
@@ -45,10 +45,11 @@ public class L9139ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		// 輸入日期非營業時間
-		dateUtil.init();
-		bussDate = dateUtil.getbussDate(runDate, -1);// 往前找營業日，參數給-1
+//		dateUtil.init();
+//		bussDate = dateUtil.getbussDate(runDate, -1);// 往前找營業日，參數給-1
 
-		this.info("runDate = " + runDate + ",entDy = " + entDy + ",decision = " + decision + ",bussDate = " + bussDate);
+//		this.info("runDate = " + runDate + ",entDy = " + entDy + ",decision = " + decision + ",bussDate = " + bussDate);
+		this.info("runDate = " + runDate + ",entDy = " + entDy + ",decision = " + decision);
 
 		String sql = "";
 
@@ -89,7 +90,7 @@ public class L9139ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "                                          Order By \"AcDate\" DESC)  as ROWNO             ";
 			sql += "                  from \"DailyTav\"                                                       ";
 			sql += "                  where \"AcctCode\" in ('TAV','TCK','TAM','TSL')                         ";
-			sql += "                   and \"AcDate\" = :AcDate ";
+			sql += "                   and \"AcDate\" <= :AcDate ";
 			sql += "                )                                                                         ";
 			sql += "            where  ROWNO = 1                                                              ";
 			sql += "            union all                                                                     ";
@@ -110,7 +111,7 @@ public class L9139ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "                                          Order By \"AcDate\" DESC)  as ROWNO             ";
 			sql += "                  from \"DailyTav\"                                                       ";
 			sql += "                  where \"AcctCode\" in ('TAV','TCK','TAM','TSL')                         ";
-			sql += "                   and \"AcDate\" = :BussDate ";
+			sql += "                   and \"AcDate\" < :AcDate ";
 			sql += "                )                                                                         ";
 			sql += "            where  ROWNO = 1                                                              ";
 			sql += "            )                                                                             ";
@@ -170,7 +171,7 @@ public class L9139ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "                                          Order By \"AcDate\" DESC)  as ROWNO             ";
 			sql += "                  from \"DailyTav\"                                                       ";
 			sql += "                  where \"AcctCode\" in ('TAV','TCK','TAM','TSL')                         ";
-			sql += "                   and \"AcDate\" = :BussDate                                               ";
+			sql += "                   and \"AcDate\" < :AcDate                                               ";
 			sql += "                )                                                                         ";
 			sql += "            where  ROWNO = 1                                                              ";
 			sql += "            )                                                                             ";
@@ -187,7 +188,6 @@ public class L9139ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("AcDate", runDate);
-		query.setParameter("BussDate", bussDate);
 
 		return this.convertToMap(query);
 	}

@@ -263,10 +263,8 @@ public class L4721Report2 extends TradeBuffer {
 								this.info("presentRate =" + presentRate.toString());
 								this.info("adjustedRate =" + adjustedRate.toString());
 
-							
-
 								if (presentRate.compareTo(adjustedRate) != 0) {
-									
+
 									// 20220101 => 1110101
 									int intTxeffect = parse.stringToInteger(r2.get("TxEffectDate")) - 19110000;
 									// 1110101 / 10000 = 111
@@ -276,8 +274,7 @@ public class L4721Report2 extends TradeBuffer {
 									// 1110101 % 100 = 01
 									String day = FormatUtil.pad9((intTxeffect % 100) + "", 2) + " 日 ";
 									String txeffect = year + month + day;
-									
-									
+
 									line = "";
 									line += "45";
 									line += " 額度 " + FormatUtil.pad9(r2.get("FacmNo"), 3) + "     " + "利率自 " + txeffect
@@ -417,7 +414,12 @@ public class L4721Report2 extends TradeBuffer {
 			endDate = FormatUtil.pad9(makeReport.showRocDate(endDate, 3), 8);
 		}
 
-		String dateRange = startDate + "-" + endDate;
+		String dateRange = "";
+		if ("99991231".equals(startDate) && "99991231".equals(endDate)) {
+			dateRange = startDate + " " + endDate;
+		} else {
+			dateRange = startDate + "-" + endDate;
+		}
 
 		String txAmtX = "+";
 		if (parse.stringToBigDecimal(r.get("TxAmt")).compareTo(BigDecimal.ZERO) < 0) {

@@ -201,17 +201,11 @@ BEGIN
            , INSP.INSEPM
            , INSP.INSIID
            , INSP."Case"
-           -- 2023-07-31 Wei from Lai : 戶號1426923-002的續保火險單掛在擔保品9xx底下，續保資料應掛在原擔保品號碼
-           -- 增加判斷,以原擔保品號碼優先
-           , CASE
-               WHEN CNM."GdrNum" = "ClNo"
-               THEN 0 -- 新舊擔保品號碼相同者 優先
-             ELSE CNM."LgtSeq" -- 否則依原擔保品明細序號由小到大排序
-             END                            AS "MappingSeq"
       FROM INSP_FIX_BY_CASE INSP
       LEFT JOIN "ClNoMap" CNM ON CNM."GdrId1" = INSP.GDRID1
                              AND CNM."GdrId2" = INSP.GDRID2
                              AND CNM."GdrNum" = INSP.GDRNUM
+                             AND CNM."LgtSeq" = INSP.LGTSEQ
       WHERE CNM."TfStatus" IN (1,3) -- 轉換留存排掉
     )
     , S AS (
@@ -233,7 +227,6 @@ BEGIN
           , '999999'                     AS "LastUpdateEmpNo" -- 最後更新人員 VARCHAR2 6 
           , INSP."Case"                  AS "Remark"
       FROM INSP
-      WHERE INSP."MappingSeq" = 1 -- 取1筆
     )
     SELECT S."ClCode1"                  AS "ClCode1"         -- 擔保品-代號1 DECIMAL 1 0
          , S."ClCode2"                  AS "ClCode2"         -- 擔保品-代號2 DECIMAL 2 0

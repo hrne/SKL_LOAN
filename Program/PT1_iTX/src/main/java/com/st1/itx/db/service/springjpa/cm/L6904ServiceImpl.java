@@ -225,9 +225,10 @@ public class L6904ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                        AND  cd.\"Code\" = d.\"DataInq\" ";
 		sql += "        LEFT JOIN \"CdEmp\" ce ON ce.\"EmployeeNo\" = d.\"DataInq\" ) a";
 		sql += "        ORDER BY ";
-		sql += "         CASE WHEN  a.\"AcNoCode\" =''   THEN 1      ";
-		sql += "              WHEN  SUBSTR(NVL(a.\"DataInq\",' '),1,1 ) <> ' '  THEN 2      ";
-		sql += "              ELSE 3 END     ";
+		sql += "         CASE WHEN  NVL(a.\"AcNoCode\",' ')  = ' '   THEN 1      ";
+		sql += "              WHEN  SUBSTR(NVL(a.\"DataInq\",' '),1,1 ) = ' '  THEN 3      ";
+		sql += "              WHEN  NVL(a.\"DataInq\",' ') = '0'  THEN 4      ";
+		sql += "              ELSE 2 END     ";
 		sql += "        , a.\"DataInq\"   ";
 		sql += "        , a.\"AcNoCode\"   ";
 		sql += "        , a.\"AcSubCode\"  ";

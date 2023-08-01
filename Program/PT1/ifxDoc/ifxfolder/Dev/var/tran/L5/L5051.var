@@ -39,6 +39,7 @@ T(3,111)
 T(2,{cmd=CHAIN; ntxcd=L9744; ntxbuf=#BufL9744})ASGN(BTN_NEW1$)
 K(MODIFYBUTTON,1,L9744 三階放款明細統計檔)
 
+
 </sub>
 !--使用資料庫 PfItDetail
 !---------- 交易畫面及個別交易變數宣告 ----------
@@ -307,14 +308,14 @@ IF(#OOCanModify == 1,T(2,修改),T(2,新增))
 !!BIND(grid,{ cmd=CHAIN; ntxcd=L5501; text=有修改; ntxbuf=#OOBufA}))
 BIND(grid,{ cmd=CHAIN; ntxcd=L5501; text=#BTNMSGA; ntxbuf=#OOBufA})
 !C(3,#OOCanModify,1,$,BIND(grid,cancel))
-IF(#OOCanModify == 1 || #OOCanModify ==2,$,BIND(grid,cancel))
+IF(#OOCanModify == 1 ,$,BIND(grid,cancel))
 
 !計件代碼
 #OOBufB=X,10,S
 T(2,2+#OOLogNo+#OORepayType)
 
 #OOBtnB=A,2,O
-BIND(grid,{ cmd=CHAIN; ntxcd=L5505; text=修改; ntxbuf=#OOBufB})
+BIND(grid,{ cmd=CHAIN; ntxcd=L5507; text=修改; ntxbuf=#OOBufB})
 !C(3,#OORepayType,0,$,BIND(grid,cancel))
 !C(3,#OOCanModify,1,$,BIND(grid,cancel))
 IF(#OORepayType == 0 && #OOCanModify==1,$,BIND(grid,cancel))
@@ -337,7 +338,7 @@ T(2,#OOCustNo+-+#OOFacmNo+-+#OOBormNo)
 T(1,#SYSCDATE,2,7)
 
 #OOBufD=x,100,S
-T(2,00000000000000L5501                  0000000000000+#OOMrKey+L55050010101+#SYSCDATE7)
+T(2,00000000000000L5501                  0000000000000+#OOMrKey+L55070010101+#SYSCDATE7)
 
 #OOHasHistory=X,1,S
 

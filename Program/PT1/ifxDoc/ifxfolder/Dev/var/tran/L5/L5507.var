@@ -1,0 +1,177 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+![一段式/二段式/三段式]
+#RELCD=_,_,S
+E(0,0)
+
+#ACTFG=_,_,S
+!C(2,#FKEY,E(0,1),$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+!<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+!#ORGFG=_,_,S
+!E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L5507" layout="cols=1;screen.width=[250,850];printer.width=[20,80];order=1">
+[
+["[L5507]                                 業績案件計件代碼維護"],
+[#<->#,"#FdCustNo+借款人戶號",#CustNo,"-",#FacmNo,"-",#BormNo],
+[#<->#,"#FdCustName+戶名",#CustName],
+[#<->#,"#FdIntroducer+介紹人",#Introducer,#IntroducerName],
+[#<->#,"#FdBsOfficer+房貸專員",#BsOfficer,#BsOfficerName],
+[#<->#,"#FdPerfAmt+業績金額",#PerfAmt],
+[#<->#,"#FdPieceCode+計件代碼",#PieceCode,#PieceCodeX],
+[#<->#,"#FdPieceCodeAft+調整後計件代碼",#PieceCodeAft,#PieceCodeAftX],
+]
+
+#button=x,100,S
+K(MODIFYBUTTON,修改)
+
+!不可重新交易
+#AGAIN=X,1,S
+E(0,1)ASGN(AGAIN$)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN==0,V(P,本交易為連動交易，請由L5051或L5052連動進入),$)
+
+#NTXBUF=X,21,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@LogNo,#NTXBUF,2,8)
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+#FdCustNo=X,2,L
+T(3,*)
+#FdCustName=X,2,L
+#FdIntroducer=X,2,L
+#FdBsOfficer=X,2,L
+#FdPerfAmt=X,2,L
+#FdPieceCode=X,2,L
+#FdPieceCodeAft=X,2,L
+T(3,*)
+
+#CDDEF01=x,25,S
+T(3,CdCode.PieceCode)
+
+#PieceCodeHelp=X,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF01)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@PieceCodeHelp,#HelpDesc1) 
+
+#RimL5R44=X,1,S
+RESET_RIM(#RimL5R44,L5R44)
+S(L5R46,1,#LogNo)
+R(1,L5R46)
+T(2,@PieceCodeAft,#PieceCode)
+T(H,@PieceCodeX,#PieceCode,#PieceCodeHelp)
+T(H,@PieceCodeAftX,#PieceCodeAft,#PieceCodeHelp)
+
+#CustNo=A,7,L
+!C(3,#CHAIN,1,s,$)
+!@
+!V(2,0)
+
+#FacmNo=A,3,L
+!C(3,#CHAIN,1,s,$)
+!@
+!V(2,0)
+
+#BormNo=A,3,L
+!C(3,#CHAIN,1,s,$)
+!@
+!V(2,0)
+
+#MRKEY=_,_,S
+T(2,#CustNo+-+#FacmNo+-+#BormNo)
+
+#CustName=x,2.50,L
+
+#LogNo=A,8,L
+
+#Introducer=x,8,L
+
+#IntroducerName=x,20,L
+
+#BsOfficer=x,8,L
+
+#BsOfficerName=x,20,L
+
+#PerfAmt=m,14.2,L
+
+#PieceCode=X,1,L
+
+#PieceCodeX=x,40,L
+
+#PieceCodeAft=X,1,I
+HELP(#PieceCodeHelp)
+@T(3,@PieceCodeAftX,)
+V(H,#PieceCodeHelp)
+IF(#PieceCodeAft == #PieceCode,V(P,計件代碼無異動),$)
+!V(4,#PieceCode)
+
+#PieceCodeAftX=x,40,L
+T(H,#PieceCodeAft,#PieceCodeHelp)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L5507 -----------
+<sub type="FORM" name="L5507">
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#LogNo
+#CustNo
+#FacmNo
+#BormNo
+#Introducer
+#IntroducerName
+#BsOfficer
+#BsOfficerName
+#PerfAmt
+#PieceCode
+#PieceCodeAft
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L5507
+^
+TXFORM=L5R46
+#LogNo
+#CustNo
+#FacmNo
+#BormNo
+#CustName
+#Introducer
+#IntroducerName
+#BsOfficer
+#BsOfficerName
+#PerfAmt
+#PieceCode
+^
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

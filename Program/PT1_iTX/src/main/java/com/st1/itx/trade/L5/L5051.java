@@ -1,5 +1,7 @@
 package com.st1.itx.trade.L5;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +16,8 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.TxControl;
+import com.st1.itx.db.service.TxControlService;
 import com.st1.itx.db.service.springjpa.cm.L5051ServiceImpl;
 import com.st1.itx.db.service.springjpa.cm.L6932ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -135,11 +139,7 @@ public class L5051 extends TradeBuffer {
 				int canmodify = 0;
 				if (d.get("MediaFg") == null || "".equals(d.get("MediaFg"))) {
 					canmodify = 1;
-				} else {
-					if ("0".equals(d.get("RepayType"))) {
-						canmodify = 2;
-					}					
-				}
+				} 
 				putTota(d, d.get("WorkMonth"), new BigDecimal(d.get("DrawdownAmt")), PerfEqAmt, PerfReward, PerfAmt, 1,
 						canmodify, SumByFacm, titaVo);
 			}

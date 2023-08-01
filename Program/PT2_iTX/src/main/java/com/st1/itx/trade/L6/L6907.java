@@ -156,6 +156,7 @@ public class L6907 extends TradeBuffer {
 				}
 			}
 
+			// 交易序號 = 0不顯示按鈕
 			occursList.putParam("L6908Flag", l6908Flag);
 			// 戶號 OOCustNoX
 			occursList.putParam("OOCustNoX", tAcReceivable.get("CustNo") + '-' + tAcReceivable.get("FacmNo"));
@@ -177,7 +178,6 @@ public class L6907 extends TradeBuffer {
 			occursList.putParam("OORvAmt", tAcReceivable.get("RvAmt"));
 			// 最後交易日 #OOLastTxDate
 			occursList.putParam("OOLastTxDate", tAcReceivable.get("LastTxDate"));
-			occursList.putParam("OOTxtNo", "0000" + tAcReceivable.get("TitaTlrNo") + tAcReceivable.get("TitaTxtNo"));
 			// 未銷餘額 OORvBal
 			occursList.putParam("OORvBal", tAcReceivable.get("RvBal"));
 			// 業務科目合計 OO_SUM1
@@ -194,10 +194,15 @@ public class L6907 extends TradeBuffer {
 					&& parse.stringToBigDecimal(tAcReceivable.get("RvBal")).compareTo(BigDecimal.ZERO) > 0) {
 				occursList.putParam("OOGetFeeTxt", "未收");
 			}
+			String txNo = "0000" + tAcReceivable.get("TitaTlrNo")
+					+ parse.IntegerToString(parse.stringToInteger(tAcReceivable.get("TitaTxtNo")), 8);
+			// 交易序號
+			occursList.putParam("OOTxtNo", txNo);
 
 			this.totaVo.addOccursList(occursList);
 
 		}
+
 		// 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可
 		if (L6907List != null && L6907List.size() >= this.limit) {
 			titaVo.setReturnIndex(this.setIndexNext());

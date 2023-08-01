@@ -542,8 +542,6 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             AND";
 		sql += "             T.\"TitaHCode\" = 0";
 		sql += "             AND";
-		sql += "             T.\"AcctCode\" <> '900' ";
-		sql += "             AND";
 		sql += "             T.\"TxDescCode\" <> '3100' ";
 		sql += "             AND";
 		sql += "             T.\"EntryDate\" >= " + sEntryDate;
@@ -582,8 +580,6 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       WHERE T.\"CustNo\" = " + custNo;
 		sql += "             AND";
 		sql += "             T.\"TitaHCode\" = 0";
-		sql += "             AND";
-		sql += "             T.\"AcctCode\" <> '900' ";
 		sql += "             AND";
 		sql += "             T.\"TxDescCode\" <> '3100' ";
 		sql += "             AND";

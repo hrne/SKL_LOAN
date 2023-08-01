@@ -178,22 +178,6 @@ BEGIN
            , NVL(FR1P."TFRNO",0)            AS "OvduNo"              -- 轉催編號 DECIMAL 10 0
            , ' '                            AS "EndoInsuNo"
            , FR1P.CHKPRO
-           -- 2023-07-31 Wei from Lai : 戶號1426923-002的續保火險單掛在擔保品9xx底下，續保資料應掛在原擔保品號碼
-           -- 增加判斷,以原擔保品號碼優先
-           , ROW_NUMBER()
-             OVER (
-              PARTITION BY NVL(CNM."ClCode1",0)
-                         , NVL(CNM."ClCode2",0)
-                         , NVL(CNM."ClNo",0)
-                         , FR1P."INSNUM"
-                         , FR1P."ADTYMT"
-                         , FR1P."INSNUM2"
-              ORDER BY CASE
-                         WHEN CNM."GdrNum" = "ClNo"
-                         THEN 0 -- 新舊擔保品號碼相同者 優先
-                       ELSE CNM."LgtSeq" -- 否則依原擔保品明細序號由小到大排序
-                       END
-             )                              AS "MappingSeq"
       FROM "LN$FR1P" FR1P
       LEFT JOIN "TfFR1P" TF ON TF.CUSBRH = FR1P.CUSBRH
                            AND TF.ADTYMT = FR1P.ADTYMT
@@ -206,6 +190,7 @@ BEGIN
       LEFT JOIN "ClNoMap" CNM ON CNM."GdrId1" = NVL(TF.N_GDRID1,FR1P."GDRID1")
                              AND CNM."GdrId2" = NVL(TF.N_GDRID2,FR1P."GDRID2")
                              AND CNM."GdrNum" = NVL(TF.N_GDRNUM,FR1P."GDRNUM")
+                             AND CNM."LgtSeq" = NVL(TF.N_LGTSEQ,FR1P."LGTSEQ")
       LEFT JOIN txData TX ON TX."TRXDAT" = FR1P."TRXDAT"
                          AND TX."TRXNMT" = FR1P."TRXNMT"
                          AND TX."TRXAMT" = FR1P."INSTOT"
@@ -251,7 +236,6 @@ BEGIN
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
           ,0                              AS "InsuReceiptDate"
     FROM FR1P S0
-    WHERE S0."MappingSeq" = 1 -- 取1筆
     ;
 
     -- 記錄寫入筆數

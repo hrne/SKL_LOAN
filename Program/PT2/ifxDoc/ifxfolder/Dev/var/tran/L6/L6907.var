@@ -382,7 +382,7 @@ T(2,#TXCD+#OOCustNo+000+000+#OOLastTxDate+#OOTxtNo+9)
 C(4,#L6908Flag,BIND(grid,cancel),
             C(5,#OOAcctCode,TAV,BIND(grid,{ cmd=CHAIN; ntxcd=L6909; ntxbuf=#OOBUF5B}),
                                 C(5,#L6908Flag,Y,BIND(grid,{ cmd=CHAIN; ntxcd=L6908; ntxbuf=#OOBUF5A}),
-                                                BIND(grid,{ cmd=CHAIN; ntxcd=L3005;text=交易;ntxbuf=#OOBUF5C}))))
+                                                 BIND(grid,{ cmd=CHAIN; ntxcd=L3005;text=交易;ntxbuf=#OOBUF5C}))))
 
 
 </sub>
@@ -498,6 +498,8 @@ TXFORM=L6907
 #OOFacmNo=
 {width:1,hidden:true}
 
+#OOTxtNo=交易序號
+{width:170}
 
 ^
 
@@ -542,6 +544,9 @@ TXFORM=L6907
 
 #OOFacmNo=
 {width:1,hidden:true}
+
+#OOTxtNo=交易序號
+{width:170}
 
 ^
 
