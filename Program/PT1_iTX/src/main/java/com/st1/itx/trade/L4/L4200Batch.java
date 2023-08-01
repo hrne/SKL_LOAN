@@ -13,8 +13,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
@@ -51,7 +51,6 @@ import com.st1.itx.db.service.LoanBookService;
 import com.st1.itx.db.service.LoanChequeService;
 import com.st1.itx.db.service.PostDeductMediaService;
 import com.st1.itx.db.service.TxErrCodeService;
-import com.st1.itx.trade.BS.BS001;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.BaTxCom;
@@ -158,9 +157,6 @@ public class L4200Batch extends TradeBuffer {
 
 	@Autowired
 	public WebClient webClient;
-
-	@Autowired
-	public BS001 bs001;
 
 	private int iAcDate = 0;
 	private String iBatchNo = "";
@@ -829,8 +825,8 @@ public class L4200Batch extends TradeBuffer {
 				int reFacmNo = parse.stringToInteger(tempOccursList.get("OccSenderRemarker").substring(7, 10));
 				int reRepayCode = parse.stringToInteger(tempOccursList.get("OccSenderRemarker").substring(10, 11));
 				int reIntEndDate = parse.stringToInteger(tempOccursList.get("OccSenderRemarker").substring(11, 19));
+				String reconCode = tempOccursList.get("OccSenderRemarker").substring(0, 3);
 				BigDecimal reRepayAmt = parse.stringToBigDecimal(tempOccursList.get("OccRepayAmt"));
-
 				tAchDeductMedia = achDeductMediaService.reseiveCheckFirst(reCustNo, reFacmNo, "" + reRepayCode,
 						reIntEndDate, reRepayAmt, titaVo);
 
@@ -890,7 +886,7 @@ public class L4200Batch extends TradeBuffer {
 				tBatxDetail.setFacmNo(reFacmNo);
 				tBatxDetail.setRvNo("");
 				tBatxDetail.setRepayType(achRepayType);
-				tBatxDetail.setReconCode("C01"); // 暫收款－非核心資金運用
+				tBatxDetail.setReconCode(reconCode); // 扣款銀行
 				tBatxDetail.setRepayAcCode("");
 				tBatxDetail.setRepayAmt(reRepayAmt);
 
@@ -1053,7 +1049,7 @@ public class L4200Batch extends TradeBuffer {
 				tBatxDetail.setFacmNo(parse.stringToInteger(tempOccursList.get("OccFacmNo")));
 				tBatxDetail.setRvNo("");
 				tBatxDetail.setRepayType(postRepayType);
-				tBatxDetail.setReconCode("P01");
+				tBatxDetail.setReconCode("700");
 				tBatxDetail.setRepayAcCode("");
 				tBatxDetail.setRepayAmt(reRepayAmt);
 

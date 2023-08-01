@@ -99,7 +99,7 @@ public class L6904 extends TradeBuffer {
 		if (this.index == 0 && (dListOc == null || dListOc.size() == 0)) {
 			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
 		}
-		//共同輸出區
+		// 共同輸出區
 		for (Map<String, String> d : dListHead) {
 			if (iInqType != 7) {
 				totalDCnt = parse.stringToInteger(d.get("SumDCnt"));
@@ -150,6 +150,7 @@ public class L6904 extends TradeBuffer {
 			} else {
 				occursList.putParam("OOInqData", "0".equals(d.get("DataInq")) ? "" : d.get("DataInq"));
 			}
+			occursList.putParam("OOReconCode", d.get("ReconCode"));
 			occursList.putParam("OOInqDataX", d.get("DataInqX"));
 			occursList.putParam("OOAcNoItem", d.get("AcNoItem"));// AcNoItem
 

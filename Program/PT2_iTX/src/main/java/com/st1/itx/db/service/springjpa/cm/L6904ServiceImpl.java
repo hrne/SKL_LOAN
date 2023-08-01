@@ -84,7 +84,7 @@ public class L6904ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info(" AcSubCode BETWEEN = " + iAcSubCodeS + " " + iAcSubCodeE);
 		this.info(" AcDtlCode BETWEEN = " + iAcDtlCodeS + " " + iAcDtlCodeE);
 
-		String sql =  " SELECT * FROM  ";
+		String sql = " SELECT * FROM  ";
 		sql += "  ( WITH \"Data\" AS ( ";
 		sql += "  select \"AcNoCode\"  AS \"AcNoCode\" ";
 		sql += "        , \"AcSubCode\" AS \"AcSubCode\" ";
@@ -117,7 +117,11 @@ public class L6904ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "        , \"TitaSecNo\" AS \"DataInq\" ";
 			break;
 		case 7: // 彙總傳票號碼
-			sql += "        , TO_NCHAR(\"SlipSumNo\") AS \"DataInq\"";
+			sql += "        ,   TO_NCHAR(\"SlipSumNo\")    AS \"DataInq\"";
+			sql += "        , case when \"SlipSumNo\" = 0  THEN ''  ";
+			sql += "               when \"SlipSumNo\" > 0  THEN  JSON_VALUE  (\"JsonFields\",'$.ReconCode')    ";
+			sql += "               ELSE ''    ";
+			sql += "        END     AS \"ReconCode\"";
 			break;
 		}
 		sql += "        from \"AcDetail\"  ";
@@ -156,7 +160,8 @@ public class L6904ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "        , \"TitaSecNo\" ";
 			break;
 		case 7: // 彙總傳票號碼
-			sql += "        , \"SlipSumNo\" ";
+			sql += "        ,   \"SlipSumNo\"    ";
+			sql += "        , JSON_VALUE  (\"JsonFields\",'$.ReconCode') ";
 			break;
 		}
 		sql += "        ORDER BY   ";
@@ -173,6 +178,9 @@ public class L6904ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ,TO_NCHAR('')  AS \"AcNoItem\" ";
 		sql += "        ,TO_NCHAR('')  AS \"DataInq\" ";
 		sql += "        ,TO_NCHAR('')  AS \"DataInqX\" ";
+		if (iInqType == 7) {
+			sql += "        ,TO_NCHAR('')  AS \"ReconCode\" ";
+		}
 		sql += "        FROM \"Data\"  ";
 		sql += "        UNION ALL  ";
 		sql += "        SELECT  ";
@@ -197,9 +205,15 @@ public class L6904ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "        , LPAD(NVL(d.\"DataInq\",0),2,'0')  AS \"DataInq\" ";
 			sql += "        , cd.\"Item\"  AS \"DataInqX\" ";
 			break;
+		case 7: 
+			sql += "        , d.\"DataInq\"  AS \"DataInq\" ";
+			sql += "        , TO_NCHAR('')  AS \"DataInqX\" ";
+			sql += "        , TO_NCHAR(\"ReconCode\")  AS \"ReconCode\" ";
+			break;
 		default:
 			sql += "        , d.\"DataInq\"  AS \"DataInq\" ";
 			sql += "        , TO_NCHAR('')  AS \"DataInqX\" ";
+
 			break;
 
 		}
@@ -211,10 +225,9 @@ public class L6904ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                        AND  cd.\"Code\" = d.\"DataInq\" ";
 		sql += "        LEFT JOIN \"CdEmp\" ce ON ce.\"EmployeeNo\" = d.\"DataInq\" ) a";
 		sql += "        ORDER BY ";
-		sql += "         CASE WHEN  NVL(a.\"AcNoCode\",' ')  = ' '   THEN 1      ";
-		sql += "              WHEN  SUBSTR(NVL(a.\"DataInq\",' '),1,1 ) = ' '  THEN 3      ";
-		sql += "              WHEN  NVL(a.\"DataInq\",' ') = '0'  THEN 4      ";
-		sql += "              ELSE 2 END     ";
+		sql += "         CASE WHEN  a.\"AcNoCode\" =''   THEN 1      ";
+		sql += "              WHEN  SUBSTR(NVL(a.\"DataInq\",' '),1,1 ) <> ' '  THEN 2      ";
+		sql += "              ELSE 3 END     ";
 		sql += "        , a.\"DataInq\"   ";
 		sql += "        , a.\"AcNoCode\"   ";
 		sql += "        , a.\"AcSubCode\"  ";

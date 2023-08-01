@@ -291,7 +291,7 @@ T(2,@nLetter,#notPrintLetter)
 #ShowMsg=A,1,S
 C(3,#CUSTNO,#CUSTNOB,C(4,#Msg,E(0,0),E(0,1)),E(0,0))
 C(5,#nLetter,Y,K(NOBUTTON,CLOSEY),K(NOBUTTON,SHOWY))
-INVOKEJS(SHOW,p1,9,9,#ShowMsg)
+INVOKEJS(SHOW,L4702,9,9,#ShowMsg)
 
 </sub>
 

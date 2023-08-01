@@ -107,6 +107,7 @@ public class AchDeductFileVo extends FileVo {
 //				OccRepayAmt			金額
 //				OccSenderRemarker	發動者專區
 //				OccReturnCode				
+				occursList.putParam("OccSenderNo", split(thisLine, 12, 19));
 				occursList.putParam("OccRepayAmt", split(thisLine, 54, 64));
 				occursList.putParam("OccSenderRemarker", split(thisLine, 128, 148));
 				occursList.putParam("OccReturnCode", split(thisLine, 64, 66));
@@ -160,8 +161,9 @@ public class AchDeductFileVo extends FileVo {
 //			6	HeadReceiveUnit	接收單位		A	7	30	37	1030000
 //			7	HeadNote		備用			X	123	37	160	
 
-			String thisLine = "" + this.get("HeadIndex") + this.get("HeadDataCode") + this.get("HeadProcessDate") + this.get("HeadProcessTime") + this.get("HeadSubmitUnit")
-					+ this.get("HeadReceiveUnit") + this.get("HeadNote");
+			String thisLine = "" + this.get("HeadIndex") + this.get("HeadDataCode") + this.get("HeadProcessDate")
+					+ this.get("HeadProcessTime") + this.get("HeadSubmitUnit") + this.get("HeadReceiveUnit")
+					+ this.get("HeadNote");
 			result.add(thisLine);
 		}
 
@@ -190,11 +192,14 @@ public class AchDeductFileVo extends FileVo {
 //			20	OccAbstract			存摺摘要		X	10	148	158	801 左靠右補空白
 //			21	OccNote				備用			X	2	158	160	空白
 
-			String thisLine = "" + occursList.get("OccTransType") + occursList.get("OccTransCate") + occursList.get("OccTransCode") + occursList.get("OccTransSeq") + occursList.get("OccSenderNo")
-					+ occursList.get("OccSenderAcct") + occursList.get("OccWdBankNo") + occursList.get("OccCustAcctNo") + occursList.get("OccRepayAmt") + occursList.get("OccReturnCode")
-					+ occursList.get("OccIndicator") + occursList.get("OccSenderId") + occursList.get("OccCustId") + occursList.get("OccCompanyCode") + occursList.get("OccOTransDate")
-					+ occursList.get("OccOTransSeq") + occursList.get("OccOTransOrder") + occursList.get("OccCustSeq") + occursList.get("OccSenderRemarker") + occursList.get("OccAbstract")
-					+ occursList.get("OccNote");
+			String thisLine = "" + occursList.get("OccTransType") + occursList.get("OccTransCate")
+					+ occursList.get("OccTransCode") + occursList.get("OccTransSeq") + occursList.get("OccSenderNo")
+					+ occursList.get("OccSenderAcct") + occursList.get("OccWdBankNo") + occursList.get("OccCustAcctNo")
+					+ occursList.get("OccRepayAmt") + occursList.get("OccReturnCode") + occursList.get("OccIndicator")
+					+ occursList.get("OccSenderId") + occursList.get("OccCustId") + occursList.get("OccCompanyCode")
+					+ occursList.get("OccOTransDate") + occursList.get("OccOTransSeq")
+					+ occursList.get("OccOTransOrder") + occursList.get("OccCustSeq")
+					+ occursList.get("OccSenderRemarker") + occursList.get("OccAbstract") + occursList.get("OccNote");
 			result.add(thisLine);
 		}
 
@@ -210,7 +215,8 @@ public class AchDeductFileVo extends FileVo {
 //			7	FootTotAmt			總金額		A	16	39	55	靠右左補0
 //			8	FootNote			備用			X	105	55	160	空白
 
-			String thisLine = "" + this.get("FootIndex") + this.get("FootDataCode") + this.get("FootProgressDate") + this.get("FootSenderUnit") + this.get("FootReceiveUnit") + this.get("FootTotCnt")
+			String thisLine = "" + this.get("FootIndex") + this.get("FootDataCode") + this.get("FootProgressDate")
+					+ this.get("FootSenderUnit") + this.get("FootReceiveUnit") + this.get("FootTotCnt")
 					+ this.get("FootTotAmt") + this.get("FootNote");
 
 			result.add(thisLine);

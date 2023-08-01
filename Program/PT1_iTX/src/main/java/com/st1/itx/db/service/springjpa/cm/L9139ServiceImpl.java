@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Service
@@ -26,6 +27,9 @@ public class L9139ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Autowired
 	Parse parse;
 
+	@Autowired
+	public DateUtil dateUtil;
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
@@ -33,15 +37,18 @@ public class L9139ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> findAll(TitaVo titaVo, int runDate) throws Exception {
 
 		int entDy = titaVo.getEntDyI() + 19110000;
+		int bussDate = 0;
 
 		int decision = 1;
 		if (runDate == entDy) {
 			decision = 2;
 		}
 
-//		this.info("startDate = " + startDate + ",endDate = " + endDate + ",runDate = " + runDate + ",entDy = " + entDy
-//				+ ",decision = " + decision);
-		this.info("runDate = " + runDate + ",entDy = " + entDy + ",decision = " + decision);
+		// 輸入日期非營業時間
+		dateUtil.init();
+		bussDate = dateUtil.getbussDate(runDate, -1);// 往前找營業日，參數給-1
+
+		this.info("runDate = " + runDate + ",entDy = " + entDy + ",decision = " + decision + ",bussDate = " + bussDate);
 
 		String sql = "";
 
@@ -51,6 +58,7 @@ public class L9139ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " :AcDate as \"AcDate\"                                                                    ";
 			sql += ",LPAD(a.\"CustNo\",7,0)  as \"CustNo\"                                                    ";
 			sql += ",b.\"CustName\"                                                                           ";
+			sql += ",a.\"FacmNo\"                                                                             ";
 			sql += ",case when \"TdCkBal\" = \"YdCkBal\" then 0 else \"TdCkBal\" end as \"TdCkBal\"           ";
 			sql += ",case when \"TdAvBal\" = \"YdAvBal\" then 0 else \"TdAvBal\" end as \"TdAvBal\"           ";
 			sql += ",case when \"TdCkBal\" = \"YdCkBal\" then 0 else \"YdCkBal\" end as \"YdCkBal\"           ";
@@ -58,6 +66,7 @@ public class L9139ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "from (                                                                                    ";
 			sql += "      select                                                                              ";
 			sql += "       \"CustNo\"                                                                         ";
+			sql += "      ,\"FacmNo\"                                                                         ";
 			sql += "      ,sum(\"TdCkBal\") as \"TdCkBal\"                                                    ";
 			sql += "      ,sum(\"TdAvBal\") as \"TdAvBal\"                                                    ";
 			sql += "      ,sum(\"YdCkBal\") as \"YdCkBal\"                                                    ";
@@ -65,6 +74,7 @@ public class L9139ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "      from (                                                                              ";
 			sql += "            select                                                                        ";
 			sql += "             \"CustNo\"                                                                   ";
+			sql += "            ,\"FacmNo\"                                                                   ";
 			sql += "            ,case when \"AcctCode\" in ('TCK') then \"TavBal\" else 0 end  AS \"TdCkBal\" ";
 			sql += "            ,case when \"AcctCode\" in ('TCK') then  0 else \"TavBal\" end AS \"TdAvBal\" ";
 			sql += "            ,0 AS  \"YdCkBal\"                                                            ";
@@ -80,12 +90,12 @@ public class L9139ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "                  from \"DailyTav\"                                                       ";
 			sql += "                  where \"AcctCode\" in ('TAV','TCK','TAM','TSL')                         ";
 			sql += "                   and \"AcDate\" = :AcDate ";
-//			sql += "                   and \"AcDate\" = (select \"AcDate\" from (select \"AcDate\",rank() over (order by \"AcDate\" desc) as seq  from \"DailyTav\" where \"AcDate\"<=:AcDate group by \"AcDate\" order by \"AcDate\" desc) where seq =1) ";			
 			sql += "                )                                                                         ";
 			sql += "            where  ROWNO = 1                                                              ";
 			sql += "            union all                                                                     ";
 			sql += "            select                                                                        ";
 			sql += "             \"CustNo\"                                                                   ";
+			sql += "            ,\"FacmNo\"                                                                   ";
 			sql += "            ,0 AS  \"TdCkBal\"                                                            ";
 			sql += "            ,0 AS  \"TdAvBal\"                                                            ";
 			sql += "            ,case when \"AcctCode\" in ('TCK') then \"TavBal\" else 0 end  AS \"YdCkBal\" ";
@@ -100,17 +110,16 @@ public class L9139ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "                                          Order By \"AcDate\" DESC)  as ROWNO             ";
 			sql += "                  from \"DailyTav\"                                                       ";
 			sql += "                  where \"AcctCode\" in ('TAV','TCK','TAM','TSL')                         ";
-			sql += "                   and \"AcDate\" < :AcDate ";
-			//sql += "                   and \"AcDate\" = (select \"AcDate\" from (select \"AcDate\",rank() over (order by \"AcDate\" desc) as seq  from \"DailyTav\" where \"AcDate\"<=:AcDate group by \"AcDate\" order by \"AcDate\" desc) where seq =2) ";
+			sql += "                   and \"AcDate\" = :BussDate ";
 			sql += "                )                                                                         ";
 			sql += "            where  ROWNO = 1                                                              ";
 			sql += "            )                                                                             ";
-			sql += "      Group by \"CustNo\"                                                                 ";
+			sql += "      Group by \"CustNo\",\"FacmNo\"                                                      ";
 			sql += "     ) a                                                                                  ";
 			sql += "left join \"CustMain\" b on b.\"CustNo\"= a.\"CustNo\"                                    ";
 			sql += "where \"TdCkBal\" <> \"YdCkBal\"                                                          ";
 			sql += "   or \"TdAvBal\" <> \"YdAvBal\"                                                          ";
-			sql += "   order by \"CustNo\"                                                             ";
+			sql += "   order by \"CustNo\",\"FacmNo\"                                                         ";
 		}
 
 		// 與會計日期同一日，使用會計銷帳檔(今日)與每日暫收款餘額檔(昨日)計算暫收款
@@ -119,6 +128,7 @@ public class L9139ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " :AcDate as \"AcDate\"                                                                    ";
 			sql += ",LPAD(a.\"CustNo\",7,0)  as \"CustNo\"                                                    ";
 			sql += ",b.\"CustName\"                                                                           ";
+			sql += ",a.\"FacmNo\"                                                                             ";
 			sql += ",case when \"TdCkBal\" = \"YdCkBal\" then 0 else \"TdCkBal\" end as \"TdCkBal\"           ";
 			sql += ",case when \"TdAvBal\" = \"YdAvBal\" then 0 else \"TdAvBal\" end as \"TdAvBal\"           ";
 			sql += ",case when \"TdCkBal\" = \"YdCkBal\" then 0 else \"YdCkBal\" end as \"YdCkBal\"           ";
@@ -126,6 +136,7 @@ public class L9139ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "from (                                                                                    ";
 			sql += "      select                                                                              ";
 			sql += "       \"CustNo\"                                                                         ";
+			sql += "      ,\"FacmNo\"                                                                         ";
 			sql += "      ,sum(\"TdCkBal\") as \"TdCkBal\"                                                    ";
 			sql += "      ,sum(\"TdAvBal\") as \"TdAvBal\"                                                    ";
 			sql += "      ,sum(\"YdCkBal\") as \"YdCkBal\"                                                    ";
@@ -133,6 +144,7 @@ public class L9139ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "      from (                                                                              ";
 			sql += "            select                                                                        ";
 			sql += "             \"CustNo\"                                                                   ";
+			sql += "            ,\"FacmNo\"                                                                   ";
 			sql += "            ,case when \"AcctCode\" in ('TCK') then \"RvBal\" else 0 end  AS \"TdCkBal\"  ";
 			sql += "            ,case when \"AcctCode\" in ('TCK') then  0 else \"RvBal\" end AS \"TdAvBal\"  ";
 			sql += "            ,0 AS  \"YdCkBal\"                                                            ";
@@ -143,6 +155,7 @@ public class L9139ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "            union all                                                                     ";
 			sql += "            select                                                                        ";
 			sql += "             \"CustNo\"                                                                   ";
+			sql += "            ,\"FacmNo\"                                                                   ";
 			sql += "            ,0 AS  \"TdCkBal\"                                                            ";
 			sql += "            ,0 AS  \"TdAvBal\"                                                            ";
 			sql += "            ,case when \"AcctCode\" in ('TCK') then \"TavBal\" else 0 end  AS \"YdCkBal\" ";
@@ -157,16 +170,16 @@ public class L9139ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "                                          Order By \"AcDate\" DESC)  as ROWNO             ";
 			sql += "                  from \"DailyTav\"                                                       ";
 			sql += "                  where \"AcctCode\" in ('TAV','TCK','TAM','TSL')                         ";
-			sql += "                   and \"AcDate\" < :AcDate                                              ";
+			sql += "                   and \"AcDate\" = :BussDate                                               ";
 			sql += "                )                                                                         ";
 			sql += "            where  ROWNO = 1                                                              ";
 			sql += "            )                                                                             ";
-			sql += "      Group by \"CustNo\"                                                                 ";
+			sql += "      Group by \"CustNo\",\"FacmNo\"                                                      ";
 			sql += "     ) a                                                                                  ";
 			sql += "left join \"CustMain\" b on b.\"CustNo\"= a.\"CustNo\"                                    ";
 			sql += "where \"TdCkBal\" <> \"YdCkBal\"                                                          ";
 			sql += "   or \"TdAvBal\" <> \"YdAvBal\"                                                          ";
-			sql += "   order by \"CustNo\"                                                             ";
+			sql += "   order by \"CustNo\",\"FacmNo\"                                                         ";
 		}
 		this.info("sql=" + sql);
 		Query query;
@@ -174,6 +187,7 @@ public class L9139ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("AcDate", runDate);
+		query.setParameter("BussDate", bussDate);
 
 		return this.convertToMap(query);
 	}

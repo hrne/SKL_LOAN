@@ -113,11 +113,10 @@ public class L6304 extends TradeBuffer {
 					throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增資料時，發生錯誤
 				}
 			}
-			
+
 			titaVo.setDataBaseOnOrg();// 還原原本的環境
-			
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", "新增資料成功",
-					titaVo);
+
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", "新增資料成功", titaVo);
 
 			break;
 
@@ -150,10 +149,8 @@ public class L6304 extends TradeBuffer {
 			iDataLog.setEnv(titaVo, oldCdComm, uCdComm);
 			iDataLog.exec("修改專案放款");
 
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", "修改資料成功", titaVo);
 
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", "修改資料成功",
-					titaVo);
-			
 			break;
 
 		case 4: // 刪除
@@ -219,8 +216,12 @@ public class L6304 extends TradeBuffer {
 			if (titaVo.get("ProdName" + i) == null || "".equals(titaVo.get("LoanBal" + i).trim())) {
 				continue;
 			}
-			tTempVo.putParam("o" +titaVo.getParam("ColName" + i).trim(), titaVo.getParam("oLoanBal" + i));
+			// 原放款主檔
+			tTempVo.putParam("o" + titaVo.getParam("ColName" + i).trim(), titaVo.getParam("oLoanBal" + i));
+			// 調整後放款主檔
 			tTempVo.putParam(titaVo.getParam("ColName" + i).trim(), titaVo.getParam("LoanBal" + i));
+			// 備註
+			tTempVo.putParam("Remark" + i, titaVo.getParam("Remark" + i));
 		}
 
 		t.setJsonFields(tTempVo.getJsonString());

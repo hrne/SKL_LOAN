@@ -17,8 +17,8 @@ import com.st1.itx.db.service.springjpa.cm.L9139ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
-import com.st1.itx.util.parse.Parse;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.parse.Parse;
 
 @Component
 @Scope("prototype")
@@ -85,7 +85,7 @@ public class L9139Report extends MakeReport {
 
 		this.info("oL9139List.size() = " + oL9139List.size());
 
-		int row = 3; // 起始資料
+		int row = 4; // 起始資料
 
 		// 小計
 		BigDecimal subTdCkBal = BigDecimal.ZERO; // 今日暫收支票
@@ -106,7 +106,7 @@ public class L9139Report extends MakeReport {
 				BigDecimal bValue = getBigDecimal(0);
 				int col = 0;
 
-				for (int i = 0; i <= 6; i++) {
+				for (int i = 0; i <= 7; i++) {
 
 					value = map.get("F" + i);
 
@@ -125,25 +125,28 @@ public class L9139Report extends MakeReport {
 					case 2: // 戶名
 						makeExcel.setValue(row, col, value);
 						break;
-					case 3: // 今日暫收支票
+					case 3: // 額度
+						makeExcel.setValue(row, col, value);
+						break;	
+					case 4: // 今日暫收支票
 						bValue = getBigDecimal(value);
 						makeExcel.setValue(row, col, bValue, "#,##0");
 						subTdCkBal = subTdCkBal.add(bValue);
 						totalTdCkBal = totalTdCkBal.add(bValue);
 						break;
-					case 4: // 今日暫收非支票
+					case 5: // 今日暫收非支票
 						bValue = getBigDecimal(value);
 						makeExcel.setValue(row, col, bValue, "#,##0");
 						subTdAvBal = subTdAvBal.add(bValue);
 						totalTdAvBal = totalTdAvBal.add(bValue);
 						break;
-					case 5: // 昨日暫收支票
+					case 6: // 昨日暫收支票
 						bValue = getBigDecimal(value);
 						makeExcel.setValue(row, col, bValue, "#,##0");
 						subYdCkBal = subYdCkBal.add(bValue);
 						totalYdCkBal = totalYdCkBal.add(bValue);
 						break;
-					case 6: // 昨日暫收非支票
+					case 7: // 昨日暫收非支票
 						bValue = getBigDecimal(value);
 						makeExcel.setValue(row, col, bValue, "#,##0");
 						subYdAvBal = subYdAvBal.add(bValue);
@@ -158,10 +161,10 @@ public class L9139Report extends MakeReport {
 			if (subTdCkBal.compareTo(BigDecimal.ZERO) > 0 || subTdAvBal.compareTo(BigDecimal.ZERO) > 0
 					|| subYdCkBal.compareTo(BigDecimal.ZERO) > 0 || subYdAvBal.compareTo(BigDecimal.ZERO) > 0) {
 				makeExcel.setValue(row, 1, "小計");
-				makeExcel.setValue(row, 4, subTdCkBal, "#,##0");
-				makeExcel.setValue(row, 5, subTdAvBal, "#,##0");
-				makeExcel.setValue(row, 6, subYdCkBal, "#,##0");
-				makeExcel.setValue(row, 7, subYdAvBal, "#,##0");
+				makeExcel.setValue(row, 5, subTdCkBal, "#,##0");
+				makeExcel.setValue(row, 6, subTdAvBal, "#,##0");
+				makeExcel.setValue(row, 7, subYdCkBal, "#,##0");
+				makeExcel.setValue(row, 8, subYdAvBal, "#,##0");
 				row++;
 				row++;
 			}
@@ -169,10 +172,14 @@ public class L9139Report extends MakeReport {
 			if (totalTdCkBal.compareTo(BigDecimal.ZERO) > 0 || totalTdAvBal.compareTo(BigDecimal.ZERO) > 0
 					|| totalYdCkBal.compareTo(BigDecimal.ZERO) > 0 || totalYdAvBal.compareTo(BigDecimal.ZERO) > 0) {
 				makeExcel.setValue(row, 1, "總計");
-				makeExcel.setValue(row, 4, totalTdCkBal, "#,##0");
-				makeExcel.setValue(row, 5, totalTdAvBal, "#,##0");
-				makeExcel.setValue(row, 6, totalYdCkBal, "#,##0");
-				makeExcel.setValue(row, 7, totalYdAvBal, "#,##0");
+				makeExcel.setValue(row, 5, totalTdCkBal, "#,##0");
+				makeExcel.setValue(row, 6, totalTdAvBal, "#,##0");
+				makeExcel.setValue(row, 7, totalYdCkBal, "#,##0");
+				makeExcel.setValue(row, 8, totalYdAvBal, "#,##0");
+				row++;
+				makeExcel.setValue(row, 1, "前後日差異");
+				makeExcel.setValue(row, 5, totalYdCkBal.subtract(totalTdCkBal), "#,##0");
+				makeExcel.setValue(row, 6, totalYdAvBal.subtract(totalTdAvBal), "#,##0");
 				row++;
 			}
 			makeExcel.setValue(1, 2, startDate);

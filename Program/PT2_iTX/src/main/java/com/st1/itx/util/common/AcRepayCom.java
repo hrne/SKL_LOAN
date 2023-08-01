@@ -417,7 +417,7 @@ public class AcRepayCom extends TradeBuffer {
 								this.lAcDetail.add(acDetail);
 							}
 						}
-						tmpFlag = 2; 
+						tmpFlag = 2;
 					}
 				} else {
 					addPayment(i, titaVo);
@@ -613,8 +613,11 @@ public class AcRepayCom extends TradeBuffer {
 			acDetail.setDscptCode(titaVo.getParam("RpDscpt" + i));
 			break;
 		case "102": // 102.銀行扣款 C01 暫收款－非核心資金運用 核心銷帳碼 0010060yyymmdd (銀扣 ACH), 郵局 P01
-			if ("C01".equals(acDetail.getAcctCode())) {
-				acDetail.setRvNo("0010060" + titaVo.getEntDyI());
+			if ("P01".equals(acDetail.getAcctCode()) || "700".equals(acDetail.getAcctCode())) {
+				acDetail.setAcctCode("P01");				
+			} else {
+				acDetail.setAcctCode("C01");				
+				acDetail.setRvNo("0010060" + titaVo.getEntDyI());				
 			}
 			break;
 		case "103": // 103.員工扣款 TEM
@@ -752,6 +755,7 @@ public class AcRepayCom extends TradeBuffer {
 		tTempVo = tTempVo.getVo(tx.getOtherFields());
 		// 整批
 		if (titaVo.getBacthNo().trim() != "") {
+			titaVo.putParam("BatchSeq", titaVo.get("RpDetailSeq1")); // 明細序號
 			tTempVo.putParam("BatchNo", titaVo.getBacthNo()); // 整批批號
 			tTempVo.putParam("DetailSeq", titaVo.get("RpDetailSeq1")); // 明細序號
 			tTempVo.putParam("ReconCode", titaVo.get("RpAcctCode1") == null ? "" : titaVo.get("RpAcctCode1").trim()); // 對帳類別
@@ -778,6 +782,13 @@ public class AcRepayCom extends TradeBuffer {
 			}
 			ac.setAcSeq(acSeq); // 分錄序號
 			ac.setSlipSumNo(tx.getSlipSumNo()); // 彙總傳票批號
+			// 收付欄對帳費別 ex.匯款轉帳 A1~A6， 銀行扣款:扣款銀行代號
+			if (titaVo.get("RpAcctCode1") != null) {
+				TempVo acTempVo = new TempVo();
+				acTempVo = acTempVo.getVo(tx.getOtherFields());
+				acTempVo.putParam("ReconCode", titaVo.get("RpAcctCode1").trim());
+				ac.setJsonFields(acTempVo.getJsonString());
+			}
 			// 作帳金額
 			if (parse.stringToInteger(ac.getSumNo()) == 0) {
 				if ("C".equals(ac.getDbCr())) {

@@ -32,7 +32,7 @@ public class L5022ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	// 協辦人員明細資料查詢
 	public List<Map<String, String>> findByStatus(int iAcDate, int iEffectiveDateS, int iEffectiveDateE, String iEmpNo,
-			int iStatus, int index, int limit, TitaVo titaVo) throws Exception {
+			String iStatus, int index, int limit, TitaVo titaVo) throws Exception {
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		String sql = "";
@@ -41,60 +41,64 @@ public class L5022ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      select          ";
 		sql += "        case when nvl(c.\"logcount\",0)> 0 then 1 else 0 end as \"LogCount\" ";
 		sql += "      , a.*           ";
-		sql += "      , case when a.\"EffectiveDate\" < :cDate  then 3                                           "; // 待生效
-		sql += "             when a.\"IneffectiveDate\" < :cDate and a.\"IneffectiveDate\" !='0' then 2           "; // 已停效
-		sql += "             when (a.\"EffectiveDate\" <= :cDate and a.\"IneffectiveDate\" = 0)                   ";
-		sql += "               or (a.\"IneffectiveDate\" > :cDate and a.\"EffectiveDate\" <= :cDate) then 1       "; // 已生效
-		sql += "             else 9                                                                               "; // 全部
+		sql += "      , case when a.\"EffectiveDate\" > :cdate  then '3'                                           "; // 待生效
+		sql += "             when a.\"IneffectiveDate\" < :cdate and a.\"IneffectiveDate\" !='0' then '2'           "; // 已停效
+		sql += "             when (a.\"EffectiveDate\" <= :cdate and a.\"IneffectiveDate\" =0 )                   ";
+		sql += "               or (a.\"IneffectiveDate\" > :cdate and a.\"EffectiveDate\" <= :cdate) then '1'       "; // 已生效
+		sql += "             else '9'                                                                               "; // 全部
 		sql += "        end as \"StatusFg\"        ";
-		sql += "      , NVL(b.\"Fullname\",''      ";
-		sql += "      , NVL(b.\"QuitDate\",0)      "; // 離職/停約日
-		sql += "      , NVL(b.\"AgPostChgDate\",0) "; // 職務異動日
-		sql += "      , NVL(b.\"CenterCode\",' ')  "; // 單位代號
+		sql += "      , NVL(b.\"Fullname\",'' )  AS \"Fullname\"    ";
+		sql += "      , NVL(b.\"QuitDate\",0)   AS \"QuitDate\"   "; // 離職/停約日
+		sql += "      , NVL(b.\"AgPostChgDate\",0) AS \"AgPostChgDate\" "; // 職務異動日
+		sql += "      , NVL(b.\"CenterCode\",' ') AS \"CenterCode\"  "; // 單位代號
 		sql += "      , NVL(d.\"EffectiveDate\",0) as \"EvalueChgDate\" "; // 考核職級異動
 		sql += "      , NVL(d.\"EmpClass\",' ')    as \"EvalueChgClass\""; // 考核職級
 		sql += "      from \"PfCoOfficer\" a  ";
+		sql += "      left join \"CdEmp\" b on b.\"EmployeeNo\" = a.\"EmpNo\" ";
+		sql += "      Left join (select \"EmpNo\" ,sum(1) as \"logcount\" ";
+		sql += "                 from \"PfCoOfficerLog\"                       ";
+		sql += "                 group by \"EmpNo\"  ";
+		sql += "                ) c on c.\"EmpNo\" = a.\"EmpNo\" ";
+		sql += "      Left join (select \"EmpNo\"              ";
+		sql += "                       ,\"EffectiveDate\"      "; // 生效日期
+		sql += "                       ,\"EmpClass\"           "; // 協辦等級
+		sql += "                       ,ROW_NUMBER() OVER (Partition By \"EmpNo\"              ";
+		sql += "    	                   	   ORDER BY \"EffectiveDate\" Desc 							               ";
+		sql += "	                    ) AS \"ROWNUMBER\"                              ";
+		sql += "                 from \"PfCoOfficerLog\"                       ";
+		sql += "                 where \"FunctionCode\"  = 7 "; // 7.考核核算底稿
+		sql += "                ) d on d.\"EmpNo\" = a.\"EmpNo\" and  d.\"ROWNUMBER\" = 1 ";
 		sql += "      where a.\"EffectiveDate\" > 0 ";
 		if (!iEmpNo.trim().isEmpty()) {
 			sql += "   and a.\"EmpNo\" = '" + iEmpNo + "' ";
 		}
 		if (iEffectiveDateS > 0) {
-			sql += "   and a.\"EffectiveDate\" >=  + iEffectiveDateS  ";
+			sql += "   and a.\"EffectiveDate\" >= " + iEffectiveDateS;
 		}
 		if (iEffectiveDateE > 0) {
-			sql += "   and a.\"EffectiveDate\" <=  + iEffectiveDateE  ";
+			sql += "   and a.\"EffectiveDate\" <= " + iEffectiveDateE;
 		}
 		switch (iEffectiveDateS) {
 		case 1: // 已生效
-			sql += "   and  (    (a.\"EffectiveDate\" <= :cDate and a.\"IneffectiveDate\" = 0)                   ";
-			sql += "          or (a.\"IneffectiveDate\" > :cDate and a.\"EffectiveDate\" <= :cDate))             "; // 已生效
+			sql += "   and  (    (a.\"EffectiveDate\" <= :cdate and a.\"IneffectiveDate\" = 0)                   ";
+			sql += "          or (a.\"IneffectiveDate\" > :cdate and a.\"EffectiveDate\" <= :cdate))             "; // 已生效
 			break;
 		case 2:
-			sql += "   and a.\"IneffectiveDate\" < :cDate and a.\"IneffectiveDate\" !='0' then 2           "; // 已停效
+			sql += "   and a.\"IneffectiveDate\" < :cdate and a.\"IneffectiveDate\" !='0' then 2           "; // 已停效
 			break;
 		case 3:
-			sql += "   and a.\"IneffectiveDate\" < :cDate and a.\"IneffectiveDate\" !='0' then 2           "; // 已停效
+			sql += "   and a.\"IneffectiveDate\" < :cdate and a.\"IneffectiveDate\" !='0' then 2           "; // 已停效
 			break;
 		}
 		if (iEffectiveDateE > 0) {
-			sql += "   and a.\"EffectiveDate\" < :cDate                                                    "; // 待生效
+			sql += "   and a.\"EffectiveDate\" < :cdate                                                    "; // 待生效
 		}
-		sql += "      left join \"CdEmp\" b on b.\"EmployeeNo\" = a.\"EmpNo\" ";
-		sql += "      Left join (select \"EmpNo\" ,sum(1) as \"logcount\" ";
-		sql += "                 from \"PfCoOfficerLog\"                       ";
-		sql += "                 group by \"EmpNo\" ) ";
-		sql += "                ) c on c.\"EmpNo\" = a.\"EmpNo\" ";
-		sql += "      Left join (select \"EmpNo\"              ";   
-		sql += "                       ,\"EffectiveDate\"      ";  // 生效日期
-		sql += "                       ,\"EmpClass\"           ";  // 協辦等級
-		sql += "                       ,ROW_NUMBER() OVER (Partition By \"EmpNo\"              ";
-		sql += "    	                   	   ORDER BY l.\"EffectiveDate\" Desc 							               ";
-		sql += "	                    ) AS \"ROWNUMBER\"                              ";
-		sql += "                 from \"PfCoOfficerLog\"                       ";
-		sql += "                 where \"FunctionCode\"  = 7 "; // 7.考核核算底稿 
-		sql += "                ) d on d.\"EmpNo\" = a.\"EmpNo\" and  \"ROWNUMBER\" = 1 ";
-		sql += "     )  ";
-		sql += "order by \"EmpNo\" ASC , \"EffectiveDate\" DESC) ";
+		sql += " ) ";
+		if (!(iStatus.trim().isEmpty() || "9".equals(iStatus.trim()))) {
+			sql += "   where \"StatusFg\" = '" + iStatus + "' ";
+		}
+
+		sql += "order by \"EmpNo\" ASC , \"EffectiveDate\" DESC ";
 		sql += sqlRow;
 		this.info("sql = " + sql);
 		// *** 折返控制相關 ***
@@ -104,7 +108,7 @@ public class L5022ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		query.setParameter("ThisIndex", index);
 		query.setParameter("ThisLimit", limit);
-		query.setParameter("cDate", iAcDate);
+		query.setParameter("cdate", iAcDate);
 
 		query.setFirstResult(0);// 因為已經在語法中下好限制條件(筆數),所以每次都從新查詢即可
 

@@ -202,6 +202,7 @@ V(H,#InqTypeHelp)
 
 #InqTypeX=X,12,L
 T(H,#InqType,#InqTypeHelp)
+C(3,#InqType,7,E(0,@RPTFG,2),E(0,@RPTFG,0))
 
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L6R23.dec"/>
@@ -256,6 +257,7 @@ T(2,#OOAcNoCode+-+#OOAcSubCode+-+#OOAcDtlCode)
 !彙計方式為5時,此欄位為"傳票批號"
 !彙計方式為6時,此欄位為"業務類別" (撥款匯款、支票繳款、債協、放款)
 #OOInqData=X,6,S
+#OOReconCode=X,3,S
 
 #OOInqDataX=x,60,S
 
@@ -335,6 +337,7 @@ TXFORM=L6904
 #OOAcDtlCode
 #OOAcNoItem
 #OOInqData
+#OOReconCode
 #OOInqDataX
 #OODbCnt
 #OODbAmt
@@ -380,6 +383,33 @@ TXFORM=L6904
 #OOAcNoItem=科子細目名稱
 {width:300,align:'left'}
 #OOSumNoX=#InqTypeX
+{width:120,align:'left'}
+#OODbCnt=借方筆數
+{width:80,align:'right'}
+#OODbAmtX=借方金額
+{width:150,align:'right'}
+#OOCrCnt=貸方筆數
+{width:80,align:'right'}
+#OOCrAmtX=貸方金額
+{width:150,align:'right'}
+
+^
+
+#RPTFG=2,QUERY.GRID,L6904
+#any={detail:true, header:'L6904.part', caption:'', width:1000 ,rowNum:20, rowList:[20,40,60]}
+#OOBTN5=明細
+{width:50,search:false,formatter:'cust:bind-button:明細',align:'center',canExport:false}
+#OOAcNoCode=科目
+{width:80,align:'center'}
+#OOAcSubCode=子目
+{width:50,align:'center'}
+#OOAcDtlCode=細目
+{width:50,align:'center'}
+#OOAcNoItem=科子細目名稱
+{width:300,align:'left'}
+#OOSumNoX=#InqTypeX
+{width:120,align:'left'}
+#OOReconCode=對帳類別
 {width:120,align:'left'}
 #OODbCnt=借方筆數
 {width:80,align:'right'}

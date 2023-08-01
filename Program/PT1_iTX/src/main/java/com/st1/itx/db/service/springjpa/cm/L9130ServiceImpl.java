@@ -159,7 +159,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-	//L9130Report2022
+	// L9130Report2022
 	public List<Map<String, String>> doQuery2022(int acDate, int slipBatNo, TitaVo titaVo) throws Exception {
 
 		String sql = " ";
@@ -229,7 +229,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    SELECT AC.\"SlipNo\" ";
 		sql += "          ,AC.\"SlipBatNo\" ";
 		sql += "          ,AC.\"TitaBatchNo\" ";
-		sql += "          ,NVL(BD.\"ReconCode\",' ') AS \"ReconCode\" ";
+		sql += "          ,NVL(JSON_VALUE(\"JsonFields\",  '$.ReconCode'), ' ') AS \"ReconCode\" ";
 		sql += "          ,AC.\"TitaTlrNo\"  ";
 		sql += "          ,AC.\"AcNoCode\" ";
 		sql += "     	  ,AC.\"AcSubCode\" ";
@@ -238,9 +238,6 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          ,AC.\"DbCr\"  ";
 		sql += "          ,AC.\"TxAmt\" ";
 		sql += "     FROM \"AcDetail\" AC ";
-		sql += "     LEFT JOIN \"BatxDetail\" BD ON BD.\"AcDate\" = AC.\"AcDate\" ";
-		sql += "                                AND BD.\"BatchNo\" = AC.\"TitaBatchNo\" ";
-		sql += "                                AND LPAD(BD.\"DetailSeq\",6,0) = AC.\"TitaBatchSeq\" ";
 		sql += "     WHERE AC.\"AcDate\" = :acDate ";
 		sql += "       AND AC.\"EntAc\" = 1 ";
 		sql += "       AND AC.\"SlipSumNo\"  > 0";
@@ -256,7 +253,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          , \"AcSubBookCode\" ";
 		sql += "          , \"DbCr\" ";
 		sql += "    FROM rawData ";
-		sql += "    GROUP BY \"SlipBatNo\"        "; 
+		sql += "    GROUP BY \"SlipBatNo\"        ";
 		sql += "          , \"TitaBatchNo\" ";
 		sql += "          , \"ReconCode\" ";
 		sql += "          , \"TitaTlrNo\"  ";
@@ -265,7 +262,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          , \"AcDtlCode\" ";
 		sql += "          , \"AcSubBookCode\" ";
 		sql += "          , \"DbCr\" ";
-		sql += "    ORDER BY \"SlipBatNo\"        "; 
+		sql += "    ORDER BY \"SlipBatNo\"        ";
 		sql += "          , \"TitaBatchNo\" ";
 		sql += "          , \"ReconCode\" ";
 		sql += "          , \"TitaTlrNo\"  ";
@@ -292,15 +289,15 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,s.\"SlipSumNo\" ";
 		sql += " FROM rawData r ";
 		sql += " LEFT JOIN slipData s ";
-		sql += "        ON s.\"SlipBatNo\"  = r.\"SlipBatNo\" ";      
-		sql += "       AND s.\"TitaBatchNo\" = r.\"TitaBatchNo\" ";      
-		sql += "       AND s.\"ReconCode\"  = r.\"ReconCode\" ";      
-		sql += "       AND s.\"TitaTlrNo\"  = r.\"TitaTlrNo\" ";      
-		sql += "       AND s.\"AcNoCode\"  = r.\"AcNoCode\" ";      
-		sql += "       AND s.\"AcSubCode\"  = r.\"AcSubCode\" ";      
-		sql += "       AND s.\"AcDtlCode\"  = r.\"AcDtlCode\" ";      
-		sql += "       AND s.\"AcSubBookCode\"  = r.\"AcSubBookCode\" ";      
-		sql += "       AND s.\"DbCr\"  = r.\"DbCr\" ";      
+		sql += "        ON s.\"SlipBatNo\"  = r.\"SlipBatNo\" ";
+		sql += "       AND s.\"TitaBatchNo\" = r.\"TitaBatchNo\" ";
+		sql += "       AND s.\"ReconCode\"  = r.\"ReconCode\" ";
+		sql += "       AND s.\"TitaTlrNo\"  = r.\"TitaTlrNo\" ";
+		sql += "       AND s.\"AcNoCode\"  = r.\"AcNoCode\" ";
+		sql += "       AND s.\"AcSubCode\"  = r.\"AcSubCode\" ";
+		sql += "       AND s.\"AcDtlCode\"  = r.\"AcDtlCode\" ";
+		sql += "       AND s.\"AcSubBookCode\"  = r.\"AcSubBookCode\" ";
+		sql += "       AND s.\"DbCr\"  = r.\"DbCr\" ";
 
 		this.info("L9130ServiceImpl doQuerySlipSumNo sql=" + sql);
 		Query query;

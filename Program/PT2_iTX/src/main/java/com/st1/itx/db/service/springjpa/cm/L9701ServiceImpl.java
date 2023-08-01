@@ -45,7 +45,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,T.\"FacmNo\"";
 		sql += "		    ,rpCode.\"Item\" AS \"RepayItem\"";
 		sql += "            ,CASE";
-		sql += "			   WHEN T.\"TxDescCode\" = '3202' THEN '回收登陸' "; // --回收利息都寫回收登陸
+		sql += "			   WHEN T.\"TxDescCode\" = '3202' THEN '回收登錄' "; // --回收利息都寫回收登陸
 		sql += "               WHEN CC1.\"Code\" IS NOT NULL THEN TO_CHAR(NVL(CC1.\"Item\",'  '))";
 		sql += "               WHEN CC2.\"Code\" IS NOT NULL THEN TO_CHAR(NVL(CC2.\"Item\",'  '))";
 		sql += "               ELSE ";
@@ -64,12 +64,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,T.\"FeeAmt\" AS \"FeeAmt\"";// --短繳
 		sql += "            ,T.\"TempAmt\"";// --暫收借
 		sql += "            ,T.\"Overflow\"";// --暫收貸
-		sql += "            ,T.\"ShortAmt\"";// --短繳
-//		sql += "            ,CASE WHEN T.\"TxDescCode\" = 'Fee' AND T.\"TitaTxCd\" = 'L3210' THEN '暫收銷'  ||  CDF.\"Item\" 	 ";
-//		sql += "                  WHEN T.\"TxDescCode\" = 'Fee' AND T.\"TitaTxCd\" = 'L3230' THEN '暫收退'  ||  CDF.\"Item\" 	 ";
-//		sql += "                  WHEN T.\"TxDescCode\" = 'Fee' THEN CDF.\"Item\"                                            ";
-//		sql += "                  ELSE NVL(CDT.\"Item\",T.\"Desc\")  	    	                                             ";
-//		sql += "                  END                     AS \"Desc\"	                                                 ";
+		sql += "            ,T.\"ShortAmt\"";// --短繳                                              ";
 		sql += "            ,T.\"DB\"";
 		sql += "            ,\"Fn_ParseEOL\"(C.\"CustName\",0) AS \"CustName\"";
 		sql += "            ,CASE ";

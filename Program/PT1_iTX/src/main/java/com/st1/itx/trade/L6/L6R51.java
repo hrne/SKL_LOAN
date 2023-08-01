@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -51,6 +53,7 @@ public class L6R51 extends TradeBuffer {
 
 	private DecimalFormat df = new DecimalFormat("##,###,###,###,##0");
 
+	@SuppressWarnings("unused")
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6R51 ");
@@ -125,14 +128,23 @@ public class L6R51 extends TradeBuffer {
 
 			CdComm tCdComm = cdCommService.findById(tCdCommId, titaVo);
 
-			//固定參數
+			// 固定參數
 			slCdCode = cdCodeService.getCodeList(3, "GovOfferCode", 0, Integer.MAX_VALUE, titaVo);
 
 			if (slCdCode != null) {
 
 				String prodName = "";
 				String colName = "";
+				String remark = "";
 				int cnt = 0;
+
+				JSONObject jsonField = null;
+				try {
+					jsonField = new JSONObject(tCdComm.getJsonFields().toString());
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
 				if (iTranKey_Tmp == 1) {
 
@@ -147,6 +159,7 @@ public class L6R51 extends TradeBuffer {
 						BigDecimal loanBal = BigDecimal.ZERO;
 						prodName = tCdCode.getItem();
 						colName = tCdCode.getCode();
+
 						if ("340".equals(prodName.substring(0, 3))) {
 							prodName = prodName.substring(4);
 						}
@@ -154,6 +167,15 @@ public class L6R51 extends TradeBuffer {
 						this.totaVo.putParam("L6r51ProdName" + cnt, prodName);
 						this.totaVo.putParam("oL6r51LoanBal" + cnt, df.format(loanBal));
 						this.totaVo.putParam("L6r51LoanBal" + cnt, df.format(loanBal));
+						try {
+							remark = jsonField.get("Remark" + cnt).toString();
+							this.info("remark=" + remark);
+						} catch (JSONException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+						this.totaVo.putParam("L6r51Remark" + cnt, remark);
 
 					}
 				}
@@ -176,8 +198,18 @@ public class L6R51 extends TradeBuffer {
 						this.totaVo.putParam("L6r51ProdName" + cnt, prodName);
 						this.totaVo.putParam("oL6r51LoanBal" + cnt, df.format(loanBal));
 						this.totaVo.putParam("L6r51LoanBal" + cnt, df.format(loanBal));
+						try {
+							remark = jsonField.get("Remark" + cnt).toString();
+							this.info("remark=" + remark);
+						} catch (JSONException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+						this.totaVo.putParam("L6r51Remark" + cnt, remark);
 					}
 				}
+		
 
 			} // if
 		} // if

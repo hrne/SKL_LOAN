@@ -999,7 +999,9 @@ public class ExcelGenerator extends CommBuffer {
 		if (needStyle && cellHasStyle) {
 			// 讀取原CellStyle設定寫進 outputFontStyleVo
 			CellStyle originalCellStyle = cell.getCellStyle();
-			cell.setCellStyle(setFontStyle(originalCellStyle, false));
+			if (originalCellStyle != null) {
+				cell.setCellStyle(setFontStyle(originalCellStyle, false));
+			}
 		}
 
 		// 取得當前表格內文字的高度，以文字高度去*1.5倍=適應文字的表格

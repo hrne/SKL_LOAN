@@ -106,6 +106,8 @@ T(2,@ProdName{i},#L6r51ProdName{i})
 E(0,@oLoanBal{i},#oL6r51LoanBal{i})
 E(0,@LoanBal{i},#L6r51LoanBal{i})
 T(2,@ColName{i},#L6r51ColName{i})
+T(2,@Remark{i},#L6r51Remark{i})
+
 
 #tmpDLoanBal{i}=M,30,S
 E(0,#oLoanBal{i}-#LoanBal{i})
@@ -117,17 +119,19 @@ E(0,@diffLoanBal{i},#tmpDLoanBal{i})
 
 ##loop {times:12,i:1}
 
-#L6r51ProdName{i}=X,50,L
-#oL6r51LoanBal{i}=X,30,L
-#L6r51LoanBal{i}=X,30,L
+#L6r51ProdName{i}=X,40,L
+#oL6r51LoanBal{i}=X,20,L
+#L6r51LoanBal{i}=X,20,L
 #L6r51ColName{i}=x,15,S
+#L6r51Remark{i}=x,40,L
 
-#ProdName{i}=X,50,L
-#oLoanBal{i}=M,30,L
-#LoanBal{i}=M,30,I
-#diffLoanBal{i}=M,30,L
+#ProdName{i}=X,40,L
+#oLoanBal{i}=M,20,L
+#LoanBal{i}=M,20,I
+#diffLoanBal{i}=M,20,L
 @E(0,#oLoanBal{i}-#LoanBal{i})
 #ColName{i}=x,15,S
+#Remark{i}=x,40,L
 
 ##end
 
@@ -137,9 +141,9 @@ E(0,@diffLoanBal{i},#tmpDLoanBal{i})
 <sub type="DC" name="p2" layout="cols=2;screen.width=[200,1000];printer.width=[45,70];order=1;">
 [
 ["專案放款維護"],
-["#grid#,{id:1,expand:false,loop:12,row_height:0,s_cols:[60,60], p_cols:[90,50]}","","",
-["中文項目名稱","放款金額(主檔)","放款金額(報表)","差額"],
-[#ProdName1,#oLoanBal1,#LoanBal1,#diffLoanBal1],
+["#grid#,{id:1,expand:false,loop:12,row_height:0,s_cols:[30,30,30,30], p_cols:[30,30,30,30]}","","",
+["中文項目名稱","放款金額(主檔)","放款金額(報表)","差額","備註"],
+[#ProdName1,#oLoanBal1,#LoanBal1,#diffLoanBal1,#Remark1],
 ],
 ]
 </sub>
@@ -173,6 +177,7 @@ E(0,@diffLoanBal{i},#tmpDLoanBal{i})
 #oLoanBal{i}
 #LoanBal{i}
 #ColName{i}
+#Remark{i}
 ##end
 
 #END
@@ -189,6 +194,7 @@ TXFORM=L6R51
 #oL6r51LoanBal{i}
 #L6r51LoanBal{i}
 #L6r51ColName{i}
+#L6r51Remark{i}
 ##end
 ^
 <include src="COM.icf::TRCTL.tom"/>

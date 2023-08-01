@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L6;
 
-import java.text.SimpleDateFormat;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -55,21 +56,6 @@ public class L6970 extends TradeBuffer {
 	private void doInquiry(TitaVo titaVo) throws LogicException {
 		this.info("L6970 doInquiry ... ");
 
-		// int batchResultCode =
-		// parse.stringToInteger(titaVo.getParam("BatchResultCode"));
-		// int inputStartDate = parse.stringToInteger(titaVo.getParam("InputStartDate"))
-		// + 19110000;
-		// int inputEndDate = parse.stringToInteger(titaVo.getParam("InputEndDate")) +
-		// 19110000;
-
-		/*
-		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
-		 */
-		this.index = titaVo.getReturnIndex();
-
-		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-		this.limit = 200;
-
 		// 2022-01-19 智偉新增:查Online的JobDetail
 		TitaVo onlineTitaVo = (TitaVo) titaVo.clone();
 		onlineTitaVo.setDataBaseOnLine();
@@ -77,49 +63,50 @@ public class L6970 extends TradeBuffer {
 		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 
 		try {
-			resultList = l6970ServiceImpl.findAll(this.index, this.limit, titaVo);
+			resultList = l6970ServiceImpl.findAll(titaVo);
 		} catch (Exception e) {
-			this.info("Error ... " + e.getMessage());
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("l6970ServiceImpl error: " + e.getMessage());
+			throw new LogicException("E0013", "L6970");
 		}
 
-		if (this.index == 0 && (resultList == null || resultList.size() == 0)) {
+		if (titaVo.getReturnIndex() == 0 && (resultList == null || resultList.isEmpty())) {
 			throw new LogicException(titaVo, "E0001", "批次工作明細檔");
 		}
-
-		SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
 
 		for (Map<String, String> result : resultList) {
 			String jobCode = result.get("JobCode");
 			String nestJobCode = result.get("NestJobCode");
+			String stepStartTime = result.get("StepStartTime");
+			String status = result.get("Status");
+			String execDate = result.get("ExecDate");
+			String stepId = result.get("StepId");
+			String stepEndTime = result.get("StepEndTime");
+			String haveUspErrorLog = result.get("HaveUspErrorLog");
+			String txSeq = result.get("TxSeq");
 			if (nestJobCode == null || nestJobCode.equals(jobCode)) {
 				nestJobCode = "";
 			}
-			String time = format.format(parse.StringToSqlDateO(result.get("StepStartTime"), result.get("StepStartTime")));
-			String jobDetailStatus = result.get("Status");
+			String jobDetailStatus = status;
 			OccursList occursList = new OccursList();
-			occursList.putParam("OOExecDate", parse.stringToInteger(result.get("ExecDate")) - 19110000); // PK欄位的日期要自行轉為民國年
+			occursList.putParam("OOExecDate", parse.stringToInteger(execDate) - 19110000); // PK欄位的日期要自行轉為民國年
 			occursList.putParam("OOJobCode", jobCode);
 			occursList.putParam("OONestJobCode", nestJobCode);
-			occursList.putParam("OOStepId", result.get("StepId"));
+			occursList.putParam("OOStepId", stepId);
 			occursList.putParam("OOStatus", jobDetailStatus);
-			occursList.putParam("OOStepStartTime", time);
-			if (result.get("StepEndTime") != null) {
-				time = format.format(parse.StringToSqlDateO(result.get("StepEndTime"), result.get("StepEndTime")));
-				occursList.putParam("OOStepEndTime",time);
-			}
-			occursList.putParam("OOHaveUspErrorLog", result.get("HaveUspErrorLog"));
-			occursList.putParam("OOJobTxSeq", result.get("TxSeq"));
+			occursList.putParam("OOStepStartTime", stepStartTime);
+			occursList.putParam("OOStepEndTime", stepEndTime);
+			occursList.putParam("OOHaveUspErrorLog", haveUspErrorLog);
+			occursList.putParam("OOJobTxSeq", txSeq);
 
 			this.totaVo.addOccursList(occursList);
 		}
 
-		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-		if (l6970ServiceImpl.hasNext()) {// resultList != null && resultList.size() >= this.limit
+		if (l6970ServiceImpl.hasNext()) {
 			titaVo.setReturnIndex(this.setIndexNext());
-			this.totaVo.setMsgEndToEnter();// 手動折返
-//			this.totaVo.setMsgEndToAuto();// 自動折返
+			this.totaVo.setMsgEndToEnter();
 		}
-
 	}
 
 	private void doExecution(TitaVo titaVo, String jobName) throws LogicException {

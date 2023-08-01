@@ -149,10 +149,11 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 				jobDetailService.insert(jobDetail, titaVo);
 				this.info("jobDetail insert. " + jobDetail.toString());
 			} else {
-				String errorCode = "E0013"; // 程式邏輯錯誤
+				String errorCode = "";
 				String errorMsg = "";
 				List<Throwable> failureExceptions = stepExecution.getFailureExceptions();
 				for (Throwable t : failureExceptions) {
+					errorCode = "E0013"; // 程式邏輯錯誤
 					// 取得錯誤訊息
 					errorMsg = t.getMessage();
 					this.error("Error message: " + errorMsg);

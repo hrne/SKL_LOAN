@@ -1,9 +1,5 @@
---------------------------------------------------------
---  DDL for Procedure Usp_Tf_InsuRenew_Ins
---------------------------------------------------------
-set define off;
-
-  CREATE OR REPLACE EDITIONABLE PROCEDURE "Usp_Tf_InsuRenew_Ins" 
+DROP PROCEDURE "Usp_Tf_InsuRenew_Ins" ;
+CREATE OR REPLACE PROCEDURE "Usp_Tf_InsuRenew_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -184,11 +180,20 @@ BEGIN
            , FR1P.CHKPRO
            -- 2023-07-31 Wei from Lai : 戶號1426923-002的續保火險單掛在擔保品9xx底下，續保資料應掛在原擔保品號碼
            -- 增加判斷,以原擔保品號碼優先
-           , CASE
-               WHEN CNM."GdrNum" = "ClNo"
-               THEN 0 -- 新舊擔保品號碼相同者 優先
-             ELSE CNM."LgtSeq" -- 否則依原擔保品明細序號由小到大排序
-             END                            AS "MappingSeq"
+           , ROW_NUMBER()
+             OVER (
+              PARTITION BY NVL(CNM."ClCode1",0)
+                         , NVL(CNM."ClCode2",0)
+                         , NVL(CNM."ClNo",0)
+                         , FR1P."INSNUM"
+                         , FR1P."ADTYMT"
+                         , FR1P."INSNUM2"
+              ORDER BY CASE
+                         WHEN CNM."GdrNum" = "ClNo"
+                         THEN 0 -- 新舊擔保品號碼相同者 優先
+                       ELSE CNM."LgtSeq" -- 否則依原擔保品明細序號由小到大排序
+                       END
+             )                              AS "MappingSeq"
       FROM "LN$FR1P" FR1P
       LEFT JOIN "TfFR1P" TF ON TF.CUSBRH = FR1P.CUSBRH
                            AND TF.ADTYMT = FR1P.ADTYMT
@@ -264,10 +269,3 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_InsuRenew_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
-
-
-
-
-
-
-/

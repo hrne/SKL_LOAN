@@ -157,13 +157,13 @@ BEGIN
         FROM "PO$AARP" 
       ) S 
     ) 
-    , txData AS {
+    , txData AS (
       SELECT DISTINCT
              TRXDAT
            , TRXNMT
            , TRXMEM
       FROM LA$TRXP
-    }
+    )
     SELECT MBK."TRXIDT"                   AS "EntryDate"           -- 入帳日期 Decimald 8 0 
           ,MBK."LMSACN"                   AS "CustNo"              -- 戶號 DECIMAL 7 0 
           ,MBK."MBKAPN"                   AS "FacmNo"              -- 額度 DECIMAL 3 0 
@@ -369,13 +369,13 @@ BEGIN
         FROM "PO$AARP" 
       ) S 
     ) 
-    , txData AS {
+    , txData AS (
       SELECT DISTINCT
              TRXDAT
            , TRXNMT
            , TRXMEM
       FROM LA$TRXP
-    }
+    )
     SELECT MBK."TRXIDT"                   AS "EntryDate"           -- 入帳日期 Decimald 8 0 
           ,MBK."LMSACN"                   AS "CustNo"              -- 戶號 DECIMAL 7 0 
           ,MBK."MBKAPN"                   AS "FacmNo"              -- 額度 DECIMAL 3 0 

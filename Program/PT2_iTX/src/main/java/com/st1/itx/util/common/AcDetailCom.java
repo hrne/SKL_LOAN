@@ -394,10 +394,6 @@ public class AcDetailCom extends TradeBuffer {
 		if (!ac.getAcctCode().equals(tCdAcCode.getAcctCode())) {
 			tTempVo.putParam("RvAcctCode", ac.getAcctCode());
 		}
-		// 4.收付欄對帳費別 ex.A1~A6
-		if (titaVo.get("RpAcctCode1") != null ) {
-			tTempVo.putParam("ReconCode", titaVo.get("RpAcctCode1").trim());			
-		}
 
 		tAcDetail.setJsonFields(tTempVo.getJsonString());
 	}

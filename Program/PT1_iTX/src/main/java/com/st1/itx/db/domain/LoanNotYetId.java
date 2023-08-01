@@ -16,7 +16,12 @@ import javax.persistence.Embeddable;
 public class LoanNotYetId implements Serializable {
 
 
-  // 借款人戶號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1087496537609650986L;
+
+// 借款人戶號
   @Column(name = "`CustNo`")
   private int custNo = 0;
 

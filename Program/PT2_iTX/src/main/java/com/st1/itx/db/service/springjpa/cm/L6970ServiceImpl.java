@@ -24,66 +24,90 @@ public class L6970ServiceImpl extends ASpringJpaParm implements InitializingBean
 	private BaseEntityManager baseEntityManager;
 
 	@Autowired
-	Parse parse;
-	private Query query;
+	private Parse parse;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(int index, int limit, TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 		this.info("L6970ServiceImpl.findAll");
-		// *** 折返控制相關 ***
-		this.index = index;
-		// *** 折返控制相關 ***
-		this.limit = limit;
+
+		this.index = titaVo.getReturnIndex();
+		this.limit = 200;
 
 		int batchResultCode = parse.stringToInteger(titaVo.getParam("BatchResultCode"));
 		int inputStartDate = parse.stringToInteger(titaVo.getParam("InputStartDate")) + 19110000;
 		int inputEndDate = parse.stringToInteger(titaVo.getParam("InputEndDate")) + 19110000;
 		int errorTypeCode = parse.stringToInteger(titaVo.getParam("ErrorTypeCode"));
 
-		// check titaVo for input values
 		String sql = "";
-		sql += " SELECT I.* ";
-		sql += " ,CASE WHEN NVL(E.\"JobTxSeq\",' ') = ' '  THEN 'N' ELSE 'Y' END  AS　\"HaveUspErrorLog\"";
+		sql += " WITH E AS ( ";
+		sql += "   SELECT DISTINCT ";
+		sql += "          \"JobTxSeq\"";
+		sql += "   FROM \"UspErrorLog\" ";
+		sql += " )";
+		sql += " SELECT I.\"JobCode\"       AS \"JobCode\" ";
+		sql += "      , I.\"NestJobCode\"   AS \"NestJobCode\" ";
+		sql += "      , CASE ";
+		sql += "          WHEN I.\"StepStartTime\" IS NOT NULL ";
+		sql += "          THEN TO_CHAR(I.\"StepStartTime\", 'HH24:MI:SS') ";
+		sql += "        ELSE ' ' ";
+		sql += "        END                 AS \"StepStartTime\" ";
+		sql += "      , I.\"Status\"        AS \"Status\" ";
+		sql += "      , I.\"ExecDate\"      AS \"ExecDate\" ";
+		sql += "      , I.\"StepId\"        AS \"StepId\" ";
+		sql += "      , CASE ";
+		sql += "          WHEN I.\"StepEndTime\" IS NOT NULL ";
+		sql += "          THEN TO_CHAR(I.\"StepEndTime\", 'HH24:MI:SS') ";
+		sql += "        ELSE ' ' ";
+		sql += "        END                  AS \"StepEndTime\" ";
+		sql += "      , I.\"TxSeq\"         AS \"TxSeq\" ";
+		sql += "      , CASE ";
+		sql += "          WHEN NVL(E.\"JobTxSeq\",' ') = ' ' ";
+		sql += "          THEN 'N' ";
+		sql += "        ELSE 'Y' ";
+		sql += "        END                 AS　\"HaveUspErrorLog\"";
 		sql += " FROM \"JobDetail\" I";
-		sql += " LEFT JOIN  \"UspErrorLog\" E ON　I.\"Status\" = 'F' ";
-		sql += "                             AND  E.\"JobTxSeq\" = I.\"TxSeq\"";
+		sql += " LEFT JOIN E ON I.\"Status\" = 'F' ";
+		sql += "            AND E.\"JobTxSeq\" = I.\"TxSeq\" ";
 		sql += " WHERE I.\"JobCode\" = 'eodFlow' ";
-		sql += "   AND I.\"ExecDate\" BETWEEN :inputStartDate AND :inputEndDate";
+		sql += "   AND I.\"ExecDate\" BETWEEN :inputStartDate AND :inputEndDate ";
 		switch (batchResultCode) {
 		case 0: // 全部
 			break;
 		case 1: // 成功
-			sql += "   AND I.\"Status\" = 'S' ";
+			sql += " AND I.\"Status\" = 'S' ";
 			break;
 		case 2: // 失敗
-			sql += "   AND I.\"Status\" = 'F' ";
+			sql += " AND I.\"Status\" = 'F' ";
+			break;
+		default:
+			this.error("unexpected batchResultCode : " + batchResultCode);
 			break;
 		}
 		switch (errorTypeCode) {
 		case 0: // 全部
 			break;
-		case 1: //  影響換日
-			sql += "   AND I.\"NestJobCode\" NOT LIKE '%RptFlow'  ";
+		case 1: // 影響換日
+			sql += " AND I.\"NestJobCode\" NOT LIKE '%RptFlow' ";
 			break;
 		case 2: // 不影響換日
-			sql += "   AND I.\"NestJobCode\"  LIKE '%RptFlow'  ";
+			sql += " AND I.\"NestJobCode\" LIKE '%RptFlow' ";
+			break;
+		default:
+			this.error("unexpected errorTypeCode : " + errorTypeCode);
 			break;
 		}
 		sql += " ORDER BY I.\"StepStartTime\" DESC ";
 
 		this.info("sql=" + sql);
 
- 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-		query = em.createNativeQuery(sql);
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		Query query = em.createNativeQuery(sql);
 		query.setParameter("inputStartDate", inputStartDate);
 		query.setParameter("inputEndDate", inputEndDate);
 
 		return switchback(query);
-
-	
 	}
-
 }
