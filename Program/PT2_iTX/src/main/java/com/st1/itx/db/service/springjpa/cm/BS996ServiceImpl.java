@@ -59,7 +59,7 @@ public class BS996ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            , BS.\"BormNo\"     ";
 		sql += "            , ' ' AS \"IsPieceCodeAdjust\" ";
 		sql += "            , ' ' AS \"IsItDetailAdjust\" ";
-		sql += "            , CASE WHEN BS.\"AdjPerfCnt\" <> 0  OR BS.\"AdjPerfAmt\" <> 0 THEN 'Y' ELSE ' ' END) AS \"IsBsDetailAjust\" "; // 已調整
+		sql += "            , CASE WHEN BS.\"AdjPerfCnt\" <> 0  OR BS.\"AdjPerfAmt\" <> 0 THEN 'Y' ELSE ' ' END AS \"IsBsDetailAjust\" "; // 已調整
 		sql += "       FROM \"PfBsDetail\" BS   ";
 		sql += "       WHERE BS.\"PerfDate\" >= :inputstartdate ";
 		sql += "         AND (   BS.\"AdjPerfCnt\" <> 0  OR BS.\"AdjPerfAmt\" <> 0 ) "; // 房貸專員業績已調整

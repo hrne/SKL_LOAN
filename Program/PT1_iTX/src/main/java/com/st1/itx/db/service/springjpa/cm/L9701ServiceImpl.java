@@ -46,6 +46,8 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		    ,rpCode.\"Item\" AS \"RepayItem\"";
 		sql += "            ,CASE";
 		sql += "			   WHEN T.\"TxDescCode\" = '3202' THEN '回收登錄' "; // --回收利息都寫回收登陸
+		sql += "			   WHEN T.\"TxDescCode\" IN ('3420','3421','3422') THEN '結案登錄' "; 
+		sql += "			   WHEN T.\"TxDescCode\" IN ('3101','3102') THEN '契約變更' "; 
 		sql += "               WHEN CC1.\"Code\" IS NOT NULL THEN TO_CHAR(NVL(CC1.\"Item\",'  '))";
 		sql += "               WHEN CC2.\"Code\" IS NOT NULL THEN TO_CHAR(NVL(CC2.\"Item\",'  '))";
 		sql += "               ELSE ";

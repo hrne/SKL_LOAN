@@ -739,6 +739,8 @@ public class BaTxCom extends TradeBuffer {
 		if (iRepayType <= 3 || iRepayType == 99) {
 			settleAcctAmt(4); // 4:短繳期金
 		}
+		// 還款應繳日(0 => 無實際還款)
+		this.repayIntDate = 0;
 		// 期款回收金額時排序,依應繳日由小到大、計息順序(利率由大到小)、額度由小到大
 		if (iRepayType == 1) {
 			for (BaTxVo ba : this.baTxList) {
@@ -748,7 +750,6 @@ public class BaTxCom extends TradeBuffer {
 			for (BaTxVo ba : this.baTxList) {
 				this.info("sort A: " + ba.toString());
 			}
-			// RepayIntDate 還款應繳日(0: -> 無實際還款
 			this.repayIntDate = settleByPayintDate(iPayIntDate);
 			tempVo.putParam("NextPayIntDate", this.nextPayIntDate); // 下次應繳日
 		}
@@ -1565,7 +1566,7 @@ public class BaTxCom extends TradeBuffer {
 			}
 		}
 		// 逾期天數
-		if (nextPayIntDate > 0 && nextPayIntDate < iPayIntDate) {
+		if (this.nextPayIntDate > 0 && this.nextPayIntDate < iPayIntDate) {
 			dDateUtil.init();
 			dDateUtil.setDate_1(nextPayIntDate);
 			dDateUtil.setDate_2(iPayIntDate);
@@ -1766,6 +1767,10 @@ public class BaTxCom extends TradeBuffer {
 					baTxVo.setCloseFg(2); // 2.提前結案
 				}
 			}
+		}
+		// 還款應繳日
+		if (loanCalcRepayIntCom.getPrevPaidIntDate() > this.repayIntDate) {
+			this.repayIntDate = loanCalcRepayIntCom.getPrevPaidIntDate();	
 		}
 		// 應繳本利
 		if (baTxVo.getPayIntDate() <= iPayIntDate || baTxVo.getRepayType() >= 2) {

@@ -134,11 +134,17 @@ public class L6934 extends TradeBuffer {
 			if ("L2606".equals(txDataLog.getTranNo())) {
 				if ("業務科目代號加碼".equals(fld) || "科目代號".equals(fld) || "子目代號".equals(fld) || "細目代號".equals(fld)
 						|| "單位別".equals(fld) || "銷帳記號".equals(fld) || "業務科目記號".equals(fld) || "銷帳科目記號".equals(fld)
-						|| "起帳金額".equals(fld) || "會計日餘額".equals(fld) || "帳冊別".equals(fld) || "區隔帳冊".equals(fld)
+						|| "起帳金額".equals(fld)|| "起帳總額".equals(fld) || "會計日餘額".equals(fld) || "帳冊別".equals(fld) || "區隔帳冊".equals(fld)
 						|| "起帳交易代號".equals(fld) || "起帳單位別".equals(fld) || "起帳經辦".equals(fld) || "起帳交易序號".equals(fld)
 						|| "上次作帳日".equals(fld) || "最後交易日".equals(fld) || "交易代號".equals(fld) || "單位別".equals(fld)
 						|| "經辦".equals(fld) || "交易序號".equals(fld) || "jason格式紀錄欄".equals(fld)) {
 					continue;
+				}
+				if ("未銷餘額".equals(fld)) {
+					fld = fld + "/帳管費";
+				}
+				if ("傳票摘要".equals(fld)) {
+					fld = fld + "/備註";
 				}
 
 			}

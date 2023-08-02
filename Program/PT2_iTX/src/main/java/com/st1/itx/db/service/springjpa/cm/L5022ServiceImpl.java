@@ -48,8 +48,8 @@ public class L5022ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             else '9'                                                                               "; // 全部
 		sql += "        end as \"StatusFg\"        ";
 		sql += "      , NVL(b.\"Fullname\",'' )  AS \"Fullname\"    ";
-		sql += "      , NVL(b.\"QuitDate\",0)   AS \"QuitDate\"   "; // 離職/停約日
-		sql += "      , NVL(b.\"AgPostChgDate\",0) AS \"AgPostChgDate\" "; // 職務異動日
+		sql += "      , CASE WHEN NVL(b.\"AgStatusCode\", ' ') in ('1') then 0 else NVL(b.\"QuitDate\",0)  end  AS \"QuitDate\"   "; // 離職/停約日
+		sql += "      , CASE WHEN NVL(b.\"AgStatusCode\", ' ') in ('1') then NVL(b.\"AgPostChgDate\",0)  else 0 end AS \"AgPostChgDate\" "; // 職務異動日
 		sql += "      , NVL(b.\"CenterCode\",' ') AS \"CenterCode\"  "; // 單位代號
 		sql += "      , NVL(d.\"EffectiveDate\",0) as \"EvalueChgDate\" "; // 考核職級異動
 		sql += "      , NVL(d.\"EmpClass\",' ')    as \"EvalueChgClass\""; // 考核職級
@@ -66,7 +66,7 @@ public class L5022ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    	                   	   ORDER BY \"EffectiveDate\" Desc 							               ";
 		sql += "	                    ) AS \"ROWNUMBER\"                              ";
 		sql += "                 from \"PfCoOfficerLog\"                       ";
-		sql += "                 where \"FunctionCode\"  = 7 "; // 7.考核核算底稿
+		sql += "                 where \"FunctionCode\"  = 9 "; // 9.考核核算底稿
 		sql += "                ) d on d.\"EmpNo\" = a.\"EmpNo\" and  d.\"ROWNUMBER\" = 1 ";
 		sql += "      where a.\"EffectiveDate\" > 0 ";
 		if (!iEmpNo.trim().isEmpty()) {
@@ -101,6 +101,7 @@ public class L5022ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "order by \"EmpNo\" ASC , \"EffectiveDate\" DESC ";
 		sql += sqlRow;
 		this.info("sql = " + sql);
+
 		// *** 折返控制相關 ***
 		this.limit = limit;
 		query = em.createNativeQuery(sql);

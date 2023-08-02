@@ -43,9 +43,15 @@ public class L5022 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.totaVo.init(titaVo);
 		String iEmpNo = titaVo.getParam("EmpNo");
-		int cDate = Integer.valueOf(titaVo.getEntDy()) + 19110000;
+		int cDate = Integer.valueOf(titaVo.getEntDyI()) + 19110000;
 		int iEffectiveDateS = Integer.valueOf(titaVo.getParam("EffectiveDateS"));
-		int iEffectiveDateE = Integer.valueOf(titaVo.getParam("EffectiveDateE")) + 19110000;
+		if (iEffectiveDateS > 0) {
+			iEffectiveDateS = iEffectiveDateS + 19110000;
+		}
+		int iEffectiveDateE = Integer.valueOf(titaVo.getParam("EffectiveDateE"));
+		if (iEffectiveDateE > 0) {
+			iEffectiveDateE = iEffectiveDateE + 19110000;
+		}
 		String iStatusFg = titaVo.getParam("StatusFlag");
 
 		List<Map<String, String>> l5022SqlReturn = new ArrayList<Map<String, String>>();
@@ -66,7 +72,7 @@ public class L5022 extends TradeBuffer {
 		}
 
 		if (this.index == 0 && (l5022SqlReturn == null || l5022SqlReturn.size() == 0)) {
-			throw new LogicException(titaVo, "E0001", "會計帳務明細檔");
+			throw new LogicException(titaVo, "E0001", "");
 		}
 
 		for (Map<String, String> result : l5022SqlReturn) {
@@ -90,29 +96,41 @@ public class L5022 extends TradeBuffer {
 			// <歷程>按鈕 => LogCount > 0 則顯示
 			occursList.putParam("OOLogCount", result.get("LogCount"));
 
-			
 			// <離調職異動>按鈕 ==> 離調職異動日 > 0 則顯示
 			// 按鈕連結<L5407>FunctionCd=6-離調職異動，將[離調職異動日[帶入[停效日期]欄，其他欄不可改
 			int quitDate = Integer.valueOf(result.get("QuitDate"));// 離職/停約日
 			int agPostChgDate = Integer.valueOf(result.get("AgPostChgDate")); // 職務異動日
-			int quitChgDateDate = 0; // 離調職異動日
+			int quitChgDate = 0; // 離職異動日
+			int postChgDate = 0; // 調職異動日
+
 			// 離職/停約日在有在有效期間、 單位不同且職務異動日在有效期間
-			if (ineffectiveDate > quitDate) {
-				quitChgDateDate = quitDate;
-			} else {
-				if (result.get("CenterCode").equals(result.get("AreaCode"))) {
-					if (ineffectiveDate > agPostChgDate) {
-						quitChgDateDate = agPostChgDate;
-					}
+			if (effectiveDate < quitDate && ineffectiveDate > quitDate) {
+				quitChgDate = quitDate;
+			}
+
+			if (result.get("CenterCode").equals(result.get("AreaCode"))) {
+				if (effectiveDate < agPostChgDate && ineffectiveDate > agPostChgDate) {
+					postChgDate = agPostChgDate;
 				}
 			}
-			occursList.putParam("OOquitChgDateDate", quitChgDateDate == 0 ? 0 : quitChgDateDate - 19110000); // 離調職異動日
+
+			// 離職異動 > 0 則顯示<離職異動>按鈕，連結<L5407>FunctionCd=6-離職異動，
+			occursList.putParam("OOQuitChgDate", quitChgDate == 0 ? 0 : quitChgDate - 19110000); // 離職異動日
+			// 調職異動 > 0 則顯示<調職異動>按鈕，連結<L5407>FunctionCd=7-調職異動，
+			occursList.putParam("OOPostChgDate", postChgDate == 0 ? 0 : postChgDate - 19110000); // 調職異動日
 
 			int evalueChgDate = Integer.valueOf(result.get("EvalueChgDate")); // 考核職級異動日
+			if (!(effectiveDate < evalueChgDate && ineffectiveDate > evalueChgDate)) {
+				evalueChgDate=0;
+			}
+			if(evalueChgDate>0 && result.get("EvalueChgClass").equals(result.get("EmpClass"))) {
+				evalueChgDate=0;				
+			}
+
 			// 考核職級異動日 > 0 則顯示<考核職級異動>按鈕，連結<L5407>FunctionCd=8-考核職級異動，
 			// 將[考核職級異動日]帶入[生效日期]欄、[考核職級]帶入[協辦等級]欄，其他欄不可改
-			occursList.putParam("OOEvalueChgDate", evalueChgDate == 0 ? 0 : evalueChgDate - 19110000);  // 考核職級異動日 
-			occursList.putParam("OOEvalueChgClass", result.get("EvalueChgClass")); // 考核職級 
+			occursList.putParam("OOEvalueChgDate", evalueChgDate == 0 ? 0 : evalueChgDate - 19110000); // 考核職級異動日
+			occursList.putParam("OOEvalueChgClass", result.get("EvalueChgClass")); // 考核職級
 			this.totaVo.addOccursList(occursList);
 		}
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */

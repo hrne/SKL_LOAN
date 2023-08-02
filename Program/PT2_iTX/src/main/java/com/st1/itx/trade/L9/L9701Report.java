@@ -131,23 +131,35 @@ public class L9701Report extends MakeReport {
 		divider();
 
 	}
+	
+	
+	private void printFacHead2() {
+
+		divider();
+		this.print(1, 5, "入帳日期");
+		this.print(0, 14, "繳款方式");
+		this.print(0, 26, "交易內容", "C");
+		this.print(0, 35, "計息本金");
+		this.print(0, 48, "計息期間");
+		this.print(0, 62, "利率");
+		this.print(0, 72, "交易金額");
+		this.print(0, 89, "本金");
+		this.print(0, 99, "利息");
+		this.print(0, 111, "違約金");
+		this.print(0, 126, "費用");
+		this.print(0, 141, "短繳");
+		this.print(0, 155, "溢繳");
+		this.print(0, 160, "0".equals(titaVo.get("CorrectType")) ? "" : "訂正別");// 未訂正的時候顯示代號
+		divider();
+
+	}
 
 	/**
 	 * 分割線
 	 * 
 	 */
 	public void divider() {
-//		this.print(1, 5, "－－－－－");
-//		this.print(0, 26, "－－－－－－","C");
-//		this.print(0, 33, "－－－－－－");
-//		this.print(0, 48, "－－－－－－－－");
-//		this.print(0, 67, "－－－－");
-//		this.print(0, 77, "－－－－－－");
-//		this.print(0, 92, "－－－－－－");
-//		this.print(0, 107, "－－－－－－");
-//		this.print(0, 122, "－－－－－－");
-//		this.print(0, 137, "－－－－－－");
-//		this.print(0, 152, "－－－－－－");
+
 		this.print(1, 3,
 				"－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 	}
@@ -216,6 +228,7 @@ public class L9701Report extends MakeReport {
 					this.print(1, this.getMidXAxis(), nextPageText, "C"); //
 					this.newPage();
 					this.print(1, 1, " "); //
+					printFacHead2();
 				}
 
 				if (!this.facmNo.equals(tL9701Vo.get("FacmNo")) || tL9701Vo.get("DB").equals("2")) {

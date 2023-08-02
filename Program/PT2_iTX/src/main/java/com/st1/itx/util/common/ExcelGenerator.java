@@ -492,7 +492,7 @@ public class ExcelGenerator extends CommBuffer {
 
 		String originalDataFormat = originalCellStyle.getDataFormatString();
 
-		if (!originalDataFormat.equals("0") && !originalDataFormat.equals("General")) {
+		if (originalDataFormat != null && !originalDataFormat.equals("0") && !originalDataFormat.equals("General")) {
 			outputFontStyleVo.setFormat(originalDataFormat);
 		}
 

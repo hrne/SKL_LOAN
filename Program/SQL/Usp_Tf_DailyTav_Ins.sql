@@ -74,7 +74,7 @@ BEGIN
       SELECT ACTP.BKPDAT 
            , ACTP.LMSACN 
            , ACTP.LMSTOA + ACTP.LMSTOH AS LMSTOA 
-           , NVL(OFN."FacmNo",1) AS "FacmNo" 
+           , NVL(OFN."FacmNo",0) AS "FacmNo" 
            , CASE 
                WHEN NVL(lastDateData.MAX_BKPDAT,0) != 0 
                THEN 'Y' 

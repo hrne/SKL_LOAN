@@ -263,6 +263,10 @@ T(2,#TLRNO)
 #LogFlag=X,1,S
 T(3,B)
 
+!日曆日
+#wkSYSCDATE=D,7,S
+E(0,#SYSCDATE)
+
 #oBUF2a=x,2000,S
 !T(2,#oDataDt+#oCustKey+#oRRSeq+#oReviewType+#oUnit+#oIsStatus)
 T(2,#oDataDt+#oCustKey+#oRRSeq+#oReviewType+#oUnit+#oUnitItem+#oIsStatus+#oProcessType+#oProcessCount)
@@ -374,7 +378,7 @@ ifxBatch:{
 	}
 }
 #oBUF2b
-
+#wkSYSCDATE
 
 #oBTN=
 {width:90,search:false,formatter:'cust:bind-button:#oBTN',align:'center',canExport:false}

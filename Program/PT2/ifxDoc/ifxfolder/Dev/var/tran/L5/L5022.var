@@ -193,10 +193,7 @@ T(H,#OOEmpClass,#ClassTypeHelp)
 #OOStatusFgX=X,10,S
 T(H,#OOStatusFg,#EffectiveStatusHelp)
 ! 1+6+8+3(6+16)+7+1+1=90
-!星號註記
-#OOStart1=X,1,S
-#OOStart2=X,1,S
-
+#OOEvalueChgClass=X,1,S
 #OOBUF_EDIT=X,41,S
 T(2,2+#OOEmpNo+#OOEffectiveDate+#OOStatusFg)
 #OOBUF_COPY=X,34,S
@@ -205,11 +202,19 @@ T(2,3+#OOEmpNo+#OOEffectiveDate)
 T(2,4+#OOEmpNo+#OOEffectiveDate)
 #OOBUF_SEARCH=X,34,S
 T(2,#OOEmpNo+#OOEffectiveDate)
+!6:離職異動 7:調職異動 8:考核職級異動
+#OOBUF_QuitChg=X,41,S
+T(2,6+#OOEmpNo+#OOEffectiveDate+#OOStatusFg+#OOQuitChgDate)
+#OOBUF_PostChg=X,41,S
+T(2,7+#OOEmpNo+#OOEffectiveDate+#OOStatusFg+OOPostChgDate)
+#OOBUF_EvalueChg=X,41,S
+T(2,8+#OOEmpNo+#OOEffectiveDate+#OOStatusFg+#OOEvalueChgDate+#OOEvalueChgClass)
 
 
 
 #OOBTN_EDIT=A,2,O
-C(3,#OOStatusFg,2,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L5407; ntxbuf=#OOBUF_EDIT}))
+BIND(grid,{ cmd=CHAIN; ntxcd=L5407; ntxbuf=#OOBUF_EDIT})
+!C(3,#OOStatusFg,2,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L5407; ntxbuf=#OOBUF_EDIT}))
 ! C(2,#OOStatusFg,$,BIND(grid,{ cmd=CHAIN; ntxcd=L5407; ntxbuf=#OOBUF_EDIT}),
 !                   BIND(grid,cancel),
 !                   BIND(grid,{ cmd=CHAIN; ntxcd=L5407; ntxbuf=#OOBUF_EDIT}))
@@ -222,9 +227,22 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L5407; ntxbuf=#OOBUF_DELETE})
 ! C(2,#OOStatusFg,$,BIND(grid,cancel),
 !                   BIND(grid,cancel),
 !                   BIND(grid,{ cmd=CHAIN; ntxcd=L5407; ntxbuf=#OOBUF_DELETE}))
-#OOBTN_SEARCH=A,2,O
-BIND(grid,{ cmd=CHAIN; ntxcd=L5914; ntxbuf=#OOBUF_SEARCH})
 
+#OOLogCount=A,6,S
+#OOBTN_SEARCH=A,2,O
+IF(#OOLogCount>0, BIND(grid,{ cmd=CHAIN; ntxcd=L5914; ntxbuf=#OOBUF_SEARCH}),BIND(grid,cancel))
+
+#OOQuitChgDate=D,7,S
+#OOBTN_QuitChg=A,2,O
+IF(#OOQuitChgDate>0, BIND(grid,{ cmd=CHAIN; ntxcd=L5407; ntxbuf=#OOBUF_QuitChg}),BIND(grid,cancel))
+
+#OOPostChgDate=D,7,S
+#OOBTN_PostChg=A,2,O
+IF(#OOPostChgDate>0, BIND(grid,{ cmd=CHAIN; ntxcd=L5407; ntxbuf=#OOBUF_PostChg}),BIND(grid,cancel))
+
+#OOEvalueChgDate=D,7,S
+#OOBTN_EvalueChg=A,2,O
+IF(#OOEvalueChgDate>0, BIND(grid,{ cmd=CHAIN; ntxcd=L5407; ntxbuf=#OOBUF_EvalueChg}),BIND(grid,cancel))
 
 </sub>
 
@@ -242,7 +260,12 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L5914; ntxbuf=#OOBUF_SEARCH})
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L5022
-#OOEmpNo#OOFullname#OOUnitCode#OOUnitCodeX#OODistCode#OODistCodeX#OODeptCode#OODeptCodeX#OOEffectiveDate#OOIneffectiveDate#OOEmpClass#OOClassPass#OOStatusFg#OOStart1#OOStart2
+#OOEmpNo#OOFullname#OOUnitCode#OOUnitCodeX#OODistCode#OODistCodeX#OODeptCode#OODeptCodeX#OOEffectiveDate#OOIneffectiveDate#OOEmpClass#OOClassPass#OOStatusFg
+#OOLogCount
+#OOQuitChgDate
+#OOPostChgDate
+#OOEvalueChgDate
+#OOEvalueChgClass
 ^
 </sub>
 
@@ -266,21 +289,19 @@ TXFORM=L5022
 {search:false,formatter:'cust:bind-button:複製',align:'center',canExport:false,width:40}
 #OOBTN_DELETE=刪除
 {search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false,width:40}
+#OOBTN_QuitChg=離職<BR>異動
+{search:false,formatter:'cust:bind-button:離職',align:'center',canExport:false,width:40}
+#OOBTN_PostChg=調職<BR>異動 
+{search:false,formatter:'cust:bind-button:調職',align:'center',canExport:false,width:40}
+#OOBTN_EvalueChg=考核職級<BR>異動
+{search:false,formatter:'cust:bind-button:考核',align:'center',canExport:false,width:80}
 #OOBTN_SEARCH=歷程
 {search:false,formatter:'cust:bind-button:歷程',align:'center',canExport:false,width:40}
-
-!星號註記
-#OOStart1=
-{width:15,align:'center'}
 
 #OOEmpNo=員工代號
 {width:80,align:'center'}
 #OOFullname=員工姓名
 {width:85}
-
-!星號註記
-#OOStart2=
-{width:15,align:'center'}
 
 #OOUnitCode=單位代號
 {width:95,align:'center'}

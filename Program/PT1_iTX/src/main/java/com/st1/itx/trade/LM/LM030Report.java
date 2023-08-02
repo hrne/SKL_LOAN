@@ -100,7 +100,7 @@ public class LM030Report extends MakeReport {
 			nextYY = yy;
 		}
 
-		int nextDueDate = nextYY * 10000 + nextMM * 100 + 1;
+		int nextDueDate = (nextYY + 1911) * 10000 + nextMM * 100 + 1;
 
 		this.info("nextDueDate = " + nextDueDate);
 
@@ -131,6 +131,16 @@ public class LM030Report extends MakeReport {
 					tmpCustNo = custNo;
 					custNoCnt = 1;
 				}
+
+				BigDecimal ovduIntAmt = BigDecimal.ZERO; // 轉催收利息
+
+				try {
+					baTxCom.settingUnPaid(nextDueDate, custNo, facmNo, 0, 3, BigDecimal.ZERO, titaVo); // 3-結案
+				} catch (LogicException e) {
+					this.info("ErrorMsg :" + e.getErrorMsg(titaVo) + " " + custNo + "-" + facmNo);
+				}
+				// 轉催收利息 = 短繳利息 + 利息
+				ovduIntAmt = baTxCom.getInterest().add(baTxCom.getShortfallInterest());
 
 				String value = "";
 				int col = 0;
@@ -164,6 +174,9 @@ public class LM030Report extends MakeReport {
 						if (custNoCnt > 1) {
 							makeExcel.setValue(row, 13, "同一擔保品", "C");
 						}
+						break;
+					case 11:
+						makeExcel.setValue(row, col, baTxCom.getRepayIntDate(), "R");
 						break;
 
 					default:
