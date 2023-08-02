@@ -242,7 +242,7 @@ S(L5R12,1,#RimBankCode,#FunctionCode,#RimErrFg)
 R(1,L5R12)
 T(2,@RemitBankX,#L5r12BankItem)
 
-#RemitBankX=X,100,L
+#RemitBankX=x,100,L
 IF(#FunCode==1 || #FunCode==2,IF(#RemitBank==#FinCode,T(2,#FinCodeX),$),$)
 
 ! 債協匯款帳號
@@ -294,7 +294,7 @@ S(L5R12,1,#RimBankCode,#FunctionCode,#RimErrFg)
 R(1,L5R12)
 T(2,@DataSendSectionX,#L5r12BankItem)
 
-#DataSendSectionX=X,100,L
+#DataSendSectionX=x,100,L
 IF(#FunCode==1 || #FunCode==2,IF(#DataSendSection==#FinCode,T(2,#FinCodeX),$),$)
 
 #RPTFG=A,1,S

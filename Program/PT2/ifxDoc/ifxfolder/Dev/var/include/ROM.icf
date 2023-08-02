@@ -6412,8 +6412,8 @@ TXFORM=L5R11
 </L5R11.tom>
 
 <L5R12.dec>
-#L5r12BankItem=X,120,S
-#L5r12BranchItem=X,120,S
+#L5r12BankItem=x,120,S
+#L5r12BranchItem=x,120,S
 </L5R12.dec>
 
 <L5R12.tom>

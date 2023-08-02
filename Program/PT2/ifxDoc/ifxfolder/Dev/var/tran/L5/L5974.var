@@ -128,7 +128,7 @@ E(0,1)ASGN(LOOP$)
 ! 債權機構代號
 #OOFinCode=X,8,O
 ! 債權機構名稱
-#OOFinCodeX=X,120,O
+#OOFinCodeX=x,120,O
 
 ! 匯款銀行
 #OORemitBank=X,7,O

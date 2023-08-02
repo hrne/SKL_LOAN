@@ -110,15 +110,15 @@ public class BS996 extends TradeBuffer {
 
 	@Autowired
 	PfDetailCom pfDetailCom;
+	
+	@Autowired
+	public BS996ServiceImpl bs996ServiceImpl;
 
 	@Autowired
 	public WebClient webClient;
 
-	@Autowired
-	public BS996ServiceImpl bs996ServiceImpl;
-
 	private int commitCnt = 20;
-	private int iAcdate = 0;
+	private int iStartDate = 0;
 	private String iEmpResetFg = null;
 	private int iCustNoS = 0;
 	private int iCustNoE = 0;
@@ -131,17 +131,21 @@ public class BS996 extends TradeBuffer {
 		pfDetailCom.setTxBuffer(this.getTxBuffer());
 		loanCom.setTxBuffer(this.getTxBuffer());
 		// 業績起日, 是否更新員工資料相關欄Y/R/N, 起戶號, 止戶號
-		//業績重算註記
-		//Y:業績重算時以新員工資料更新介紹人所屬單位及介紹人、協辦是否為15日薪
-		//R:資料轉換業績重算(以新員工資料更新介紹人、協辦是否為15日薪)
-		//N:業績重算時不以新員工資料更新
+		// 業績重算註記
+		// Y:業績重算時以新員工資料更新介紹人所屬單位及介紹人、協辦是否為15日薪
+		// R:資料轉換業績重算(以新員工資料更新介紹人、協辦是否為15日薪)
+		// N:業績重算時不以新員工資料更新
+		// C:協辦人員考核職級異動(同N)
 		// Parm = 1090101,N,0,0
 		String[] strAr = titaVo.getParam("Parm").split(",");
 		List<String> strList = Arrays.asList(strAr);
-		if (strList.size() != 4 || (!"Y".equals(strAr[1]) && !"R".equals(strAr[1]) && !"N".equals(strAr[1]))) {
+		if (strList.size() < 4) {
 			throw new LogicException(titaVo, "E0000", "參數：EX.1090402,Y,1,9999999( 業績起日,是否更新員工資料欄Y/R/N, 起戶號, 止戶號)");
 		}
-		iAcdate = this.parse.stringToInteger(strAr[0]); // 業績起日
+		if (!"Y".equals(strAr[1]) && !"R".equals(strAr[1]) && !"N".equals(strAr[1])) {
+			throw new LogicException(titaVo, "E0000", "參數：EX.1090402,Y,1,9999999( 業績起日,是否更新員工資料欄Y/R/N, 起戶號, 止戶號)");
+		}
+		iStartDate = this.parse.stringToInteger(strAr[0]); // 業績起日
 		iEmpResetFg = strAr[1]; // 是否更新員工資料欄
 		iCustNoS = this.parse.stringToInteger(strAr[2]); // 起戶號
 		iCustNoE = this.parse.stringToInteger(strAr[3]); // 止戶號
@@ -149,14 +153,14 @@ public class BS996 extends TradeBuffer {
 			iCustNoE = 9999999;
 		}
 		// 自動重算 Parm = 0,N,0,0
-		if (iAcdate == 0) {
+		if (iStartDate == 0) {
 			CdPfParms tCdPfParms = cdPfParmsService.findById(new CdPfParmsId("R", " ", " "), titaVo);
 			if (tCdPfParms != null) {
 				if (tCdPfParms.getWorkMonthEnd() == 0) {
 					CdWorkMonth tCdWorkMonth = cdWorkMonthService.findById(new CdWorkMonthId(
 							tCdPfParms.getWorkMonthStart() / 100, tCdPfParms.getWorkMonthStart() % 100), titaVo);
 					if (tCdWorkMonth != null) {
-						iAcdate = tCdWorkMonth.getStartDate();
+						iStartDate = tCdWorkMonth.getStartDate();
 						updatePf(titaVo);
 						tCdPfParms = cdPfParmsService.holdById(tCdPfParms, titaVo);
 						tCdPfParms.setWorkMonthEnd(tCdPfParms.getWorkMonthStart());
@@ -184,31 +188,30 @@ public class BS996 extends TradeBuffer {
 	}
 
 	private void updatePf(TitaVo titaVo) throws LogicException {
-		this.info("iAcdate=" + iAcdate + " , iEmpResetFg=" + iEmpResetFg + ", iCustNoS=" + iCustNoS + ", iCustNoE="
-				+ iCustNoE);
+		this.info("iStartDate=" + iStartDate + " , iEmpResetFg=" + iEmpResetFg + ", iCustNoS=" + iCustNoS
+				+ ", iCustNoE=" + iCustNoE);
 		// 抓取業績已做人工調整的戶號、額度
 		try {
-			adjustList = bs996ServiceImpl.findAdjustList(iAcdate + 19110000, titaVo);
+			adjustList = bs996ServiceImpl.findAdjustList(iStartDate + 19110000, titaVo);
 		} catch (Exception e) {
 			this.info("noToDoList" + e);
 			throw new LogicException(titaVo, "E5004", "");
 		}
 
 		// 清除業績明細檔的業績計算欄
-		clearPfDetail(iAcdate, iCustNoS, iCustNoE, titaVo);
+		// 清除業績明細檔的業績計算欄
+		clearPfDetail(iStartDate, iCustNoS, iCustNoE, titaVo);
 		cntTrans = 0;
 		// 重新計算業績，更新業績明細檔
-		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.findAcDateRange(iAcdate + 19110000, 99991231,
+		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.findAcDateRange(iStartDate + 19110000, 99991231,
 				Arrays.asList(new String[] { "0" }), 0, Integer.MAX_VALUE, titaVo);
 		if (slLoanBorTx != null) {
 			for (LoanBorTx tx : slLoanBorTx.getContent()) {
 				if (tx.getCustNo() >= iCustNoS && tx.getCustNo() <= iCustNoE) {
-					if (!checkAdjust(tx.getCustNo(), tx.getFacmNo(), titaVo)) {
-						if (updatePfDetail(iAcdate, iEmpResetFg, tx, titaVo)) {
-							cntTrans++;
-							if (cntTrans % this.commitCnt == 0) {
-								this.batchTransaction.commit();
-							}
+					if (updatePfDetail(iStartDate, iEmpResetFg, tx, titaVo)) {
+						cntTrans++;
+						if (cntTrans % this.commitCnt == 0) {
+							this.batchTransaction.commit();
 						}
 					}
 				}
@@ -274,14 +277,32 @@ public class BS996 extends TradeBuffer {
 		return true;
 	}
 
-	private boolean checkAdjust(int custNo, int facmNo, TitaVo titaVo) throws LogicException {
-		// 檢查該戶號、額度是否已人工調整
+	private boolean checkItDetailAdjust(int custNo, int facmNo, int bormNo, TitaVo titaVo) throws LogicException {
+		// 檢查計件代碼是否已人工調整
 		if (adjustList != null) {
 			for (Map<String, String> d : adjustList) {
-				if (parse.stringToInteger(d.get("CustNo")) == custNo
-						&& parse.stringToInteger(d.get("FacmNo")) == facmNo) {
-					this.info("CheckAdjust ture CustNo=" + custNo + " FacmNo=" + facmNo);
-					return true;
+				if (parse.stringToInteger(d.get("CustNo")) == custNo && parse.stringToInteger(d.get("FacmNo")) == facmNo
+						&& parse.stringToInteger(d.get("BormNo")) == bormNo) {
+					if ("Y".equals(d.get("IsPieceCodeAdjust")) || "Y".equals(d.get("IsItDetailAdjust"))) {
+						this.info("checkItDetailAdjust ture " + d.toString());
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	private boolean checkBsDetailAdjust(int custNo, int facmNo, int bormNo, TitaVo titaVo) throws LogicException {
+		// 檢查計件代碼是否已人工調整
+		if (adjustList != null) {
+			for (Map<String, String> d : adjustList) {
+				if (parse.stringToInteger(d.get("CustNo")) == custNo && parse.stringToInteger(d.get("FacmNo")) == facmNo
+						&& parse.stringToInteger(d.get("BormNo")) == bormNo) {
+					if ("Y".equals(d.get("IsBSDetailAdjust"))) {
+						this.info("checkBSDetailAdjust ture " + d.toString());
+						return true;
+					}
 				}
 			}
 		}
@@ -296,9 +317,7 @@ public class BS996 extends TradeBuffer {
 		if (slPfDetail != null) {
 			for (PfDetail pf : slPfDetail.getContent()) {
 				if (pf.getCustNo() >= iCustNoS && pf.getCustNo() <= iCustNoE) {
-					if (!checkAdjust(pf.getCustNo(), pf.getFacmNo(), titaVo)) {
-						pfList.add(pf);
-					}
+					pfList.add(pf);
 				}
 			}
 			if (pfList.size() > 0) {
@@ -309,14 +328,14 @@ public class BS996 extends TradeBuffer {
 				}
 			}
 		}
-		// 介紹人業績明細檔
+		// 清除介紹人業績資料(除計件代碼已調整或已調整外)
 		Slice<PfItDetail> slItDetail = pfItDetailService.findByPerfDate(iAcdate + 19110000, 99991231, 0,
 				Integer.MAX_VALUE, titaVo);
 		List<PfItDetail> itList = new ArrayList<PfItDetail>();
 		if (slItDetail != null) {
 			for (PfItDetail it : slItDetail.getContent()) {
 				if (it.getCustNo() >= iCustNoS && it.getCustNo() <= iCustNoE) {
-					if (!checkAdjust(it.getCustNo(), it.getFacmNo(), titaVo)) {
+					if (!checkItDetailAdjust(it.getCustNo(), it.getFacmNo(), it.getBormNo(), titaVo)) {
 						it.setDrawdownAmt(BigDecimal.ZERO); // 撥款金額/追回金額
 						it.setPerfCnt(BigDecimal.ZERO); // 件數
 						it.setPerfEqAmt(BigDecimal.ZERO); // 換算業績
@@ -337,14 +356,14 @@ public class BS996 extends TradeBuffer {
 
 		this.batchTransaction.commit();
 
-		// 房貸專員業績明細檔
+		// 清除房貸專員業績資料(除已調整外)
 		Slice<PfBsDetail> slbsDetail = pfBsDetailService.findByPerfDate(iAcdate + 19110000, 99991231, 0,
 				Integer.MAX_VALUE, titaVo);
 		List<PfBsDetail> bsList = new ArrayList<PfBsDetail>();
 		if (slbsDetail != null) {
 			for (PfBsDetail bs : slbsDetail.getContent()) {
 				if (bs.getCustNo() >= iCustNoS && bs.getCustNo() <= iCustNoE) {
-					if (!checkAdjust(bs.getCustNo(), bs.getFacmNo(), titaVo)) {
+					if (!checkBsDetailAdjust(bs.getCustNo(), bs.getFacmNo(), bs.getBormNo(), titaVo)) {
 						bs.setDrawdownAmt(BigDecimal.ZERO); // 撥款金額/追回金額
 						bs.setPerfCnt(BigDecimal.ZERO); // 件數
 						bs.setPerfAmt(BigDecimal.ZERO); // 業績金額
@@ -370,12 +389,10 @@ public class BS996 extends TradeBuffer {
 		if (slReward != null) {
 			for (PfReward rw : slReward.getContent()) {
 				if (rw.getCustNo() >= iCustNoS && rw.getCustNo() <= iCustNoE) {
-					if (!checkAdjust(rw.getCustNo(), rw.getFacmNo(), titaVo)) {
-						rw.setIntroducerBonus(BigDecimal.ZERO); // 介紹人介紹獎金
-						rw.setIntroducerAddBonus(BigDecimal.ZERO); // 介紹人加碼獎勵津貼
-						rw.setCoorgnizerBonus(BigDecimal.ZERO); // 協辦人員協辦獎金
-						rwList.add(rw);
-					}
+					rw.setIntroducerBonus(BigDecimal.ZERO); // 介紹人介紹獎金
+					rw.setIntroducerAddBonus(BigDecimal.ZERO); // 介紹人加碼獎勵津貼
+					rw.setCoorgnizerBonus(BigDecimal.ZERO); // 協辦人員協辦獎金
+					rwList.add(rw);
 				}
 			}
 			if (rwList.size() > 0) {

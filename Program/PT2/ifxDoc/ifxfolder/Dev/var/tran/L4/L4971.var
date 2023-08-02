@@ -41,7 +41,7 @@ E(0,#SYSDATE)
 #ReconCodeHelp=X,100,S
 T(3,A1:企金;A2:期款;A3:還本; :查全部)
 
-#ReconCode=X,3,I
+#ReconCode=X,2,I
 HELP(#ReconCodeHelp)
 @
 C(4,#ReconCode,$,V(H,#ReconCodeHelp))
@@ -151,7 +151,7 @@ TXFORM=L4971
 #OOFee=費用
 {width:85,align:'right'}
 #OOTempDr=暫收抵繳
-{width:85,align:'center'}
+{width:85,align:'right'}
 #OOShortAmt=短繳金額
 {width:85,align:'right'}
 
