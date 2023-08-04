@@ -94,11 +94,9 @@ public class L5407 extends TradeBuffer {
 		case 8: // 考核職級異動
 			updateOrignal(titaVo);
 			inSertPfCoOfficer(titaVo);
-			updateOrignal(titaVo);
-			inSertPfCoOfficer(titaVo);
 			// 職級不同重算獎金
 			if (!iEmpClass.equals(orignalEmpClass) || !iClassPass.equals(orignalClassPass)) {
-				updatePfReward(iEmpNo, iEffectiveDate, titaVo);
+				updatePfReward( titaVo);
 			}
 			break;
 		case 2:
@@ -107,7 +105,7 @@ public class L5407 extends TradeBuffer {
 			updatePfCoOfficer(titaVo);
 			// 職級不同重算獎金
 			if (!iEmpClass.equals(orignalEmpClass) || !iClassPass.equals(orignalClassPass)) {
-				updatePfReward(iEmpNo, iEffectiveDate, titaVo);
+				updatePfReward( titaVo);
 			}
 			break;
 		case 4: // 刪除
@@ -125,14 +123,17 @@ public class L5407 extends TradeBuffer {
 	}
 
 	// 重算協辦人員協辦獎金
-	private void updatePfReward(String iCoorgnizer, int iPerfStartDate, TitaVo titaVo) throws LogicException {
+	private void updatePfReward( TitaVo titaVo) throws LogicException {
 		this.info("updatePfReward  ... ");
-		Slice<PfReward> slPfReward = pfRewardService.findByPerfDate(iPerfStartDate + 19110000, 99991231, 0,
+		Slice<PfReward> slPfReward = pfRewardService.findByPerfDate(iEffectiveDate + 19110000, 99991231, 0,
 				Integer.MAX_VALUE, titaVo);
+		if(slPfReward==null) {
+			return;
+		}
 		int workMonthCd = 0;// 協辦獎勵津貼標準設定適用工作年月
 		Slice<CdBonusCo> slCdBonusCo = null;
 		ArrayList<PfReward> lPfRewardUpdate = new ArrayList<PfReward>();
-		for (PfReward tPfReward : slPfReward) {
+		for (PfReward tPfReward : slPfReward.getContent()) {
 			if (!iEmpNo.equals(tPfReward.getCoorgnizer())
 					|| tPfReward.getCoorgnizerBonus().compareTo(BigDecimal.ZERO) == 0
 					|| tPfReward.getCoorgnizerBonusDate() > 0) {
@@ -289,6 +290,14 @@ public class L5407 extends TradeBuffer {
 			tPfCoOfficer.setIneffectiveDate(iIneffectiveDate);
 		}
 		tPfCoOfficer.setEmpClass(iEmpClass);
+
+		tPfCoOfficer.setAreaCode(iAreaCode);
+		tPfCoOfficer.setDistCode(iDistCode);
+		tPfCoOfficer.setDeptCode(iDeptCode);
+		tPfCoOfficer.setAreaItem(iAreaItem);
+		tPfCoOfficer.setDistItem(iDistItem);
+		tPfCoOfficer.setDeptItem(iDeptItem);
+
 		try {
 			tPfCoOfficer = pfCoOfficerService.update(tPfCoOfficer, titaVo);
 		} catch (DBException e) {

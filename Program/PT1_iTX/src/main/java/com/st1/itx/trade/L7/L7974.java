@@ -1,17 +1,25 @@
 package com.st1.itx.trade.L7;
 
+import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.ForeclosureFee;
+import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.ForeclosureFeeService;
 import com.st1.itx.db.service.springjpa.cm.L7074ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
@@ -81,6 +89,7 @@ public class L7974 extends TradeBuffer {
 					occurslist.putParam("OOAcDate",          result.get("AcDate")          ); //傳票日期
 					occurslist.putParam("OOBatchNo",         result.get("BatchNo")         ); //傳票批號
 					occurslist.putParam("OOMediaSeq",        result.get("MediaSeq")        ); //上傳核心序號
+					occurslist.putParam("OOAcSubBookCode",   result.get("AcSubBookCode")   ); //區隔帳冊
 					occurslist.putParam("OOAcNoCode" ,       result.get("AcNoCode" )       ); //科目代號
 					occurslist.putParam("OOAcSubCode" ,      result.get("AcSubCode" )      ); //子目代號
 					occurslist.putParam("OODeptCode"   ,     result.get("DeptCode"   )     ); //部門代號

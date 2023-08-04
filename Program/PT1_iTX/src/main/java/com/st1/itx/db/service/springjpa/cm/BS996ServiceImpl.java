@@ -36,13 +36,15 @@ public class BS996ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " SELECT \"CustNo\"               ";
 		sql += "      , \"FacmNo\"               ";
 		sql += "      , \"BormNo\"               ";
+		sql += "      , MAX(\"PieceCode\")         AS  \"PieceCode\""; // 計件代碼
 		sql += "      , MAX(\"IsPieceCodeAdjust\") AS  \"IsPieceCodeAdjust\""; // 計件代碼已調整
-		sql += "      , MAX(\"IsItDetailAdjust\") AS  \"IsItDetailAdjust\""; // 介紹人業績已調整
-		sql += "      , MAX(\"IsBsDetailAdjust\") AS  \"IsBsDetailAdjust\""; // 房貸專員業績已調整
+		sql += "      , MAX(\"IsItDetailAdjust\")  AS  \"IsItDetailAdjust\""; // 介紹人業績已調整
+		sql += "      , MAX(\"IsBsDetailAdjust\")  AS  \"IsBsDetailAdjust\""; // 房貸專員業績已調整
 		sql += " FROM (                          ";
 		sql += "       SELECT PI.\"CustNo\"      ";
 		sql += "            , PI.\"FacmNo\"      ";
 		sql += "            , PI.\"BormNo\"      ";
+		sql += "            , PI.\"PieceCode\"   ";
 		sql += "            , CASE WHEN PI.\"PieceCode\" <> LN.\"PieceCode\"  THEN 'Y' ELSE ' ' END AS \"IsPieceCodeAdjust\" ";
 		sql += "            , CASE WHEN PI.\"AdjRange\" > 0  THEN 'Y' ELSE ' ' END  AS \"IsItDetailAdjust\" ";
 		sql += "            , ' ' AS \"IsBsDetailAdjust\" ";
@@ -51,17 +53,20 @@ public class BS996ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                   AND LN.\"FacmNo\" = PI.\"FacmNo\" ";
 		sql += "                                   AND LN.\"BormNo\" = PI.\"BormNo\" ";
 		sql += "       WHERE PI.\"PerfDate\" >= :inputstartdate ";
+		sql += "         AND PI.\"RepayType\" = 0      "; // 還款類別 0:撥款(計件代碼變更)
 		sql += "         AND (   PI.\"AdjRange\" > 0   "; // 介紹人業績已調整
 		sql += "              OR PI.\"PieceCode\" <> LN.\"PieceCode\" ) "; // 計件代碼已調整
 		sql += "       UNION ALL               ";
 		sql += "       SELECT BS.\"CustNo\"     ";
 		sql += "            , BS.\"FacmNo\"     ";
 		sql += "            , BS.\"BormNo\"     ";
+		sql += "            , ' ' AS \"PieceCode\"   ";
 		sql += "            , ' ' AS \"IsPieceCodeAdjust\" ";
 		sql += "            , ' ' AS \"IsItDetailAdjust\" ";
-		sql += "            , CASE WHEN BS.\"AdjPerfCnt\" <> 0  OR BS.\"AdjPerfAmt\" <> 0 THEN 'Y' ELSE ' ' END AS \"IsBsDetailAjust\" "; // 已調整
+		sql += "            , CASE WHEN BS.\"AdjPerfCnt\" <> 0  OR BS.\"AdjPerfAmt\" <> 0 THEN 'Y' ELSE ' ' END  AS \"IsBsDetailAjust\" "; // 已調整
 		sql += "       FROM \"PfBsDetail\" BS   ";
 		sql += "       WHERE BS.\"PerfDate\" >= :inputstartdate ";
+		sql += "         AND BS.\"RepayType\" = 0      "; // 還款類別 0:撥款(計件代碼變更)
 		sql += "         AND (   BS.\"AdjPerfCnt\" <> 0  OR BS.\"AdjPerfAmt\" <> 0 ) "; // 房貸專員業績已調整
 		sql += "      )                         ";
 		sql += " GROUP BY \"CustNo\"            ";

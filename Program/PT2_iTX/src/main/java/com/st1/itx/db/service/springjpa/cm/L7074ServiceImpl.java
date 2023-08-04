@@ -43,19 +43,21 @@ public class L7074ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   ,\"CurrencyCode\"  as  \"CurrencyCode\"  "; // 幣別 借方總金額
 		sql += "   ,\"TotalAmount\"   as  \"TotalAmount\"   "; // 借方總金額
 		sql += "   ,\"SendStatus\"    as  \"SendStatus\"    ";
-		sql += "   ,CASE WHEN \"SendStatus\" = 0 THEN '上傳成功'      ";
+		sql += "   ,CASE WHEN \"SendStatus\" = 0 THEN '未上傳'      ";
 		sql += "         WHEN \"SendStatus\" = 2 THEN '上傳失敗'      ";
-		sql += "         ELSE                       '未上傳'             ";
-		sql += "     END  AS \"SendStatusX\" "; // 1.未上傳/0.上傳成功/2.上傳失敗
+		sql += "         WHEN \"SendStatus\" = 3 THEN '關帳取消'      ";
+		sql += "         ELSE                         '上傳成功'             ";
+		sql += "     END  AS \"SendStatusX\" "; // 0.未上傳,1.上傳成功, 2.上傳失敗,3.關帳取消
 		sql += "from (     ";
 		sql += "   select  ";
 		sql += "     CONCAT(LPAD(\"AcDate\", 8,'0'),LPAD(\"MediaSeq\", 3,'0')) AS \"GroupId\"  ";
 		sql += "   , SUM(1) AS  \"TotalLines\"   ";
 		sql += "   , \"CurrencyCode\"  ";
 		sql += "   , SUM(CASE WHEN \"DbCr\" = 'D' THEN \"TxAmt\" ELSE 0 END) AS \"TotalAmount\" ";
-		sql += "   , MAX(CASE WHEN \"TransferFlag\" = 'Y' THEN 0 ";
-		sql += "              WHEN NVL(\"ErrorCode\",' ') = ' ' THEN 2 ";
-		sql += "              ELSE 1 ";
+		sql += "   , MAX(CASE WHEN NVL(\"LatestFlag\",' ') = 'N' THEN '3' ";  //Y:是 N:否		取消關帳再關帳時，原同批號未上傳之資料更新為N，新寫入為Y
+		sql += "              WHEN NVL(\"TransferFlag\",' ') = 'Y' THEN '1' "; 
+		sql += "              WHEN NVL(\"ErrorCode\",' ') = ' ' THEN '0' ";
+		sql += "              ELSE '2' ";
 		sql += "         END) AS \"SendStatus\" ";
 		sql += "    from \"SlipMedia2022\" ";
 		sql += "    WHERE \"AcDate\" =:iAccDateStart ";
@@ -111,10 +113,11 @@ public class L7074ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   ,\"LastUpdateEmpNo\"  as \"LastUpdateEmpNo\" "; // 最後更新人員
 		sql += "   ,\"ErrorCode\"        as \"ErrorCode\"       "; // 回應錯誤代碼
 		sql += "   ,\"ErrorMsg\"         as \"ErrorMsg\"        "; // 回應錯誤訊息
-		sql += "   ,CASE WHEN \"SendStatus\" = 0 THEN '上傳成功'      ";
-		sql += "         WHEN \"SendStatus\" = 2 THEN '上傳失敗'      ";
-		sql += "         ELSE                       '未上傳'             ";
-		sql += "     END  AS \"SendStatusX\" "; // 1.未上傳/0.上傳成功/2.上傳失敗
+		sql += "   ,CASE WHEN \"SendStatus\" = '0' THEN '未上傳'      ";
+		sql += "         WHEN \"SendStatus\" = '2' THEN '上傳失敗'      ";
+		sql += "         WHEN \"SendStatus\" = '3' THEN '關帳取消'      ";
+		sql += "         ELSE                           '上傳成功'    ";
+		sql += "     END  AS \"SendStatusX\" "; // 1.未上傳/0.上傳成功/2.上傳失敗/3.關帳取消
 		sql += "   ,\"GroupId\"          as \"GroupId\"         ";
 		sql += "from (     ";
 		sql += "   select  ";
@@ -144,9 +147,10 @@ public class L7074ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   ,\"ErrorMsg\"         as \"ErrorMsg\"        "; // 回應錯誤訊息
 		sql += "   , CONCAT(LPAD(\"AcDate\", 8,'0'),LPAD(\"MediaSeq\", 3,'0')) AS \"GroupId\"  ";
 		sql += "   , SUM(CASE WHEN \"DbCr\" = 'D' THEN \"TxAmt\" ELSE 0 END) AS \"TotalAmount\" ";
-		sql += "   , MAX(CASE WHEN \"TransferFlag\" = 'Y' THEN 0 ";
-		sql += "              WHEN NVL(\"ErrorCode\",' ') = ' ' THEN 2 ";
-		sql += "              ELSE 1 ";
+		sql += "   , MAX(CASE WHEN NVL(\"LatestFlag\",' ') = 'N' THEN '3' ";  //Y:是 N:否		取消關帳再關帳時，原同批號未上傳之資料更新為N，新寫入為Y
+		sql += "              WHEN NVL(\"TransferFlag\",' ') = 'Y' THEN '1' "; 
+		sql += "              WHEN NVL(\"ErrorCode\",' ') = ' ' THEN '0' ";
+		sql += "              ELSE '2' ";
 		sql += "         END) AS \"SendStatus\" ";
 		sql += "    from \"SlipMedia2022\" ";
 		sql += "    WHERE 1 = 1 ";

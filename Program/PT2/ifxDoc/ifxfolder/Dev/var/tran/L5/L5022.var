@@ -206,7 +206,7 @@ T(2,#OOEmpNo+#OOEffectiveDate)
 #OOBUF_QuitChg=X,41,S
 T(2,6+#OOEmpNo+#OOEffectiveDate+#OOStatusFg+#OOQuitChgDate)
 #OOBUF_PostChg=X,41,S
-T(2,7+#OOEmpNo+#OOEffectiveDate+#OOStatusFg+OOPostChgDate)
+T(2,7+#OOEmpNo+#OOEffectiveDate+#OOStatusFg+#OOPostChgDate)
 #OOBUF_EvalueChg=X,41,S
 T(2,8+#OOEmpNo+#OOEffectiveDate+#OOStatusFg+#OOEvalueChgDate+#OOEvalueChgClass)
 

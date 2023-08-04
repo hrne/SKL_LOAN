@@ -134,7 +134,10 @@ C(3,#OOFunctionCode,1,T(3,新增))
 C(3,#OOFunctionCode,2,T(3,修改))
 C(3,#OOFunctionCode,3,T(3,複製))
 C(3,#OOFunctionCode,4,T(3,刪除))
-
+C(3,#OOFunctionCode,6,T(3,離職異動))
+C(3,#OOFunctionCode,7,T(3,調職異動))
+C(3,#OOFunctionCode,8,T(3,考核職級異動))
+C(3,#OOFunctionCode,9,T(3,考核核算底稿))
 
 </sub>
 
@@ -180,7 +183,7 @@ TXFORM=L5914
 #RPTFG=0,QUERY.GRID,L5914
 #any={detail:true, header:'L5914.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
 #OOFunctionCode=功能
-{width:80,align:'center'}   
+{width:100,align:'center'}   
 #OOEmpNo=員工代號
 {width:80,align:'center'}    
 #OOAreaCode=單位代號	

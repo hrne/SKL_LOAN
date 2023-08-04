@@ -110,7 +110,7 @@ public class BS996 extends TradeBuffer {
 
 	@Autowired
 	PfDetailCom pfDetailCom;
-	
+
 	@Autowired
 	public BS996ServiceImpl bs996ServiceImpl;
 
@@ -249,8 +249,8 @@ public class BS996 extends TradeBuffer {
 		pf.setFacmNo(tx.getFacmNo()); // 額度編號
 		pf.setBormNo(tx.getBormNo()); // 撥款序號
 		pf.setBorxNo(tx.getBorxNo()); // 交易內容檔序號
-		pf.setPieceCode(ln.getPieceCode()); // 計件代碼
-		pf.setPieceCodeSecond(ln.getPieceCodeSecond()); // 計件代碼2
+		pf.setPieceCode(checkPieceCodeAdjust(ln.getCustNo(), ln.getFacmNo(), ln.getBormNo(), ln.getPieceCode(), titaVo)); // 計件代碼
+		pf.setPieceCodeSecond(""); // 計件代碼2
 		pf.setDrawdownDate(ln.getDrawdownDate());// 撥款日期
 		pf.setRepayType(repayType); // 還款類別 0.撥款 2.部分償還 3.提前結案
 		pf.setEmpResetFg(iEmpResetFg); // 是否更新介紹人所屬單位資料欄Y/N
@@ -277,13 +277,31 @@ public class BS996 extends TradeBuffer {
 		return true;
 	}
 
-	private boolean checkItDetailAdjust(int custNo, int facmNo, int bormNo, TitaVo titaVo) throws LogicException {
+	// 檢查計件代碼是否已調整
+	private String checkPieceCodeAdjust(int custNo, int facmNo, int bormNo, String pieceCode, TitaVo titaVo)
+			throws LogicException {
 		// 檢查計件代碼是否已人工調整
 		if (adjustList != null) {
 			for (Map<String, String> d : adjustList) {
 				if (parse.stringToInteger(d.get("CustNo")) == custNo && parse.stringToInteger(d.get("FacmNo")) == facmNo
 						&& parse.stringToInteger(d.get("BormNo")) == bormNo) {
-					if ("Y".equals(d.get("IsPieceCodeAdjust")) || "Y".equals(d.get("IsItDetailAdjust"))) {
+					if ("Y".equals(d.get("IsPieceCodeAdjust"))) {
+						this.info("checkPieceCodeAdjust ture " + d.toString());
+						return d.get("PieceCode");
+					}
+				}
+			}
+		}
+		return pieceCode;
+	}
+
+	// 檢查介紹人業績否已人工調整
+	private boolean checkItDetailAdjust(int custNo, int facmNo, int bormNo, TitaVo titaVo) throws LogicException {
+		if (adjustList != null) {
+			for (Map<String, String> d : adjustList) {
+				if (parse.stringToInteger(d.get("CustNo")) == custNo && parse.stringToInteger(d.get("FacmNo")) == facmNo
+						&& parse.stringToInteger(d.get("BormNo")) == bormNo) {
+					if ("Y".equals(d.get("IsItDetailAdjust"))) {
 						this.info("checkItDetailAdjust ture " + d.toString());
 						return true;
 					}
@@ -293,8 +311,8 @@ public class BS996 extends TradeBuffer {
 		return false;
 	}
 
+	// 檢查房貸專員業績是否已人工調整
 	private boolean checkBsDetailAdjust(int custNo, int facmNo, int bormNo, TitaVo titaVo) throws LogicException {
-		// 檢查計件代碼是否已人工調整
 		if (adjustList != null) {
 			for (Map<String, String> d : adjustList) {
 				if (parse.stringToInteger(d.get("CustNo")) == custNo && parse.stringToInteger(d.get("FacmNo")) == facmNo

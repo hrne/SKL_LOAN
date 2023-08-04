@@ -18,7 +18,6 @@ import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Component
@@ -100,7 +99,7 @@ public class LM030Report extends MakeReport {
 			nextYY = yy;
 		}
 
-		int nextDueDate = (nextYY + 1911) * 10000 + nextMM * 100 + 1;
+		int nextDueDate = nextYY * 10000 + nextMM * 100 + 1;
 
 		this.info("nextDueDate = " + nextDueDate);
 
@@ -165,7 +164,7 @@ public class LM030Report extends MakeReport {
 						break;
 					case 7:// 利息金額(不顯示)
 
-						makeExcel.setValue(row, col, ovduIntAmt(custNo, facmNo, nextDueDate, titaVo), "#,##0", "R");
+						makeExcel.setValue(row, col, ovduIntAmt, "#,##0", "R");
 
 						break;
 					case 8:
@@ -206,39 +205,8 @@ public class LM030Report extends MakeReport {
 		makeExcel.setSize(14);
 		makeExcel.setIBU("B");
 		makeExcel.setValue(row, 10, "部室主管", "C");
-		// block 4
-		makeExcel.setFontType(1);
-		if (listLM030 == null || listLM030.isEmpty()) {
-			makeExcel.setMergedRegionValue(row + 1, row + 1, 1, 7, "一、經查本月逾期放款，無清償期屆滿六個月需轉列催收款之案件。\r\n" + "二、陳核。 ");
-		} else {
-			makeExcel.setMergedRegionValue(row + 1, row + 1, 1, 7,
-					"一、經查本月逾期放款清償期屆滿六個月案件，依規將本金及應收利息轉列催收款項，金額共計 $" + FormatUtil.formatAmt(total, 0) + "元。 \r\n"
-							+ "二、本月轉入催收款案件未發生『撥款後繳款期數未滿18個月即轉入催收戶』之情事。\r\n" + "三、陳核。 ");
-		}
-		makeExcel.setColor("RED");
-		makeExcel.setValue(row + 3, 5, listLM030.size(), "C");
-		makeExcel.setColor("RED");
-		makeExcel.setValue(row + 3, 7, total, "#,##0");
-		makeExcel.setValue(row + 5, 1, "一、李案為年期延長後再協議案件，因未符合免列報逾放條件，故轉列催收款項。");
 
 		makeExcel.close();
-	}
-
-	private BigDecimal ovduIntAmt(int iCustno, int iFacmNo, int payIntDate, TitaVo titaVo) throws LogicException {
-		int tbsdy = this.txBuffer.getTxCom().getTbsdy();
-
-		BigDecimal ovduIntAmt = BigDecimal.ZERO; // 轉催收利息
-
-		try {
-			baTxCom.settingUnPaid(tbsdy, iCustno, iFacmNo, 0, 3, BigDecimal.ZERO, titaVo); // 3-結案
-		} catch (LogicException e) {
-			this.info("ErrorMsg :" + e.getErrorMsg(titaVo) + " " + iCustno + "-" + iFacmNo);
-		}
-		// 轉催收利息 = 短繳利息 + 利息
-		ovduIntAmt = baTxCom.getInterest().add(baTxCom.getShortfallInterest());
-
-		this.info("ovduIntAmt =" + ovduIntAmt);
-		return ovduIntAmt;
 	}
 
 }

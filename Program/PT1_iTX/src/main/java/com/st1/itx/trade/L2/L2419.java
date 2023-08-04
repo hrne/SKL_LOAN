@@ -702,6 +702,14 @@ public class L2419 extends TradeBuffer {
 				// 貸放成數不得為0或空白
 				setError(row, L2419Column.LOAN_TO_VALUE.getIndex());
 			}
+			// BigDecimal.stripTrailingZeros() : 移除尾部的零
+			// 避免12.120這個數值會被判出scale為3的問題
+			if (loanToValue.stripTrailingZeros().scale() > 2) {
+				// 2023-08-04 Wei from QC:2601
+				// 貸放成數(%)的小數位數不可超過2位
+				throw new LogicException("E0015",
+						"貸放成數(%)的小數位數不可超過2位(" + loanToValue.stripTrailingZeros().toPlainString() + ")");
+			}
 
 			// 借款金額
 			String loanAmt = makeExcel.getValue(row, L2419Column.LOAN_AMT.getIndex()).toString();

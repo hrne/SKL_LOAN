@@ -46,7 +46,7 @@ RESET_RIM(#HelpRim,XXR99)
 S(XXR99,01,#CDCODEFuncCode,#CDCODEClassType)
 R(1,XXR99)
 CALL(#HelpProc)
-T(2,@FuncCodeHelp,#HelpDesc1)
+T(B,@FuncCodeHelp,#HelpDesc1+;6:離職異動;7:調職異動;8:考核職級異動)
 T(2,@ClassTypeHelp,#HelpDesc2)
 
 #CHAIN=A,1,S
@@ -55,13 +55,20 @@ IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L5022進入),$)
 ! 狀態Fg 0:已生效 1:已停效 2:未生效
 #StatusFg=A,1,S
 E(0,3)
+
 #NTXBUF=X,34,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@FunctionCd,#NTXBUF,1,1)
 T(1,@EmpNo,#NTXBUF,2,6)
 T(1,@EffectiveDate,#NTXBUF,8,7)
 C(3,#FunctionCd,2,T(1,@StatusFg,#NTXBUF,15,1),$)
+!C(3,#FunctionCd,6,T(1,@IneffectiveDate,#NTXBUF,16,7),$)
+!C(3,#FunctionCd,7,T(1,@IneffectiveDate,#NTXBUF,16,7),$)
+!C(3,#FunctionCd,8,T(1,@EffectiveDate,#NTXBUF,16,7),$)
+!C(3,#FunctionCd,8,T(1,@EmpClass,#NTXBUF,23,1),$)
 C(2,#FunctionCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除))
+ALERT(#NTXBUF)
+
 #DealOther=X,1,S
 <include src="ROM.icf::L5R39.dec"/>
 #RimEmpNo=X,6,S
@@ -69,7 +76,7 @@ C(2,#FunctionCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,�
 #RimL5r39=X,1,S
 T(2,@RimEmpNo,#EmpNo)
 T(2,@RimEffectiveDate,#EffectiveDate)
-C(2,#FunctionCd,s,s,$,$,$)
+C(2,#FunctionCd,s,s,$,$,$,s,$,$,$)
 RESET_RIM(#RimL5r39,L5R39)
 S(L5R39,1,#RimEmpNo,#RimEffectiveDate)
 R(1,L5R39)
@@ -108,11 +115,16 @@ T(2, )
 
 IF(#FunctionCd == 2 ,T(2,@FdEmpNo, )T(2,@FdEffectiveDate, )T(2,@FdEmpClass, ),$)
 IF(#FunctionCd == 4 ,T(2,@FdEmpNo, )T(2,@FdEffectiveDate, )T(2,@FdEmpClass, ),$)
+IF(#FunctionCd == 6 ,T(2,@FdEmpNo, )T(2,@FdEffectiveDate, )T(2,@FdIneffectiveDate,*)T(2,@FdEmpClass, ),$)
+IF(#FunctionCd == 7 ,T(2,@FdEmpNo, )T(2,@FdEffectiveDate, )T(2,@FdIneffectiveDate,*)T(2,@FdEmpClass, ),$)
+IF(#FunctionCd == 8 ,T(2,@FdEmpNo, )T(2,@FdEffectiveDate,*),$)
 
 ! 功能
 #FunctionCd=A,1,S
 E(0,@FUNCIND,#FunctionCd)
-#FunctionCdX=X,4,L
+IF(#FunctionCd == 6 || #FunctionCd == 7,E(0,@FUNCIND,2),$)
+IF(#FunctionCd == 8,E(0,@FUNCIND,1),$)
+#FunctionCdX=X,14,L
 T(H,#FunctionCd,#FuncCodeHelp)
 
 !刪除隱藏重新交易按鈕
@@ -128,13 +140,19 @@ C(3,#FunctionCd,4,T(F,@EmpNo,0)T(F,@UnitCode,0)T(F,@DistCode,0)T(F,@DeptCode,0)T
 
 #WKTF2=X,1,S
 C(3,#FunctionCd,3,T(F,@EmpNo,0)T(F,@UnitCode,1)T(F,@DistCode,1)T(F,@DeptCode,1)T(F,@EffectiveDate,1),$)
+#WKTF6=X,1,S
+C(3,#FunctionCd,6,T(F,@EmpNo,0)T(F,@UnitCode,0)T(F,@DistCode,0)T(F,@DeptCode,0)T(F,@EffectiveDate,0)T(F,@IneffectiveDate,1)T(F,@EmpClass,0)T(F,@ClassPass,0),$)
+#WKTF7=X,1,S
+C(3,#FunctionCd,7,T(F,@EmpNo,0)T(F,@UnitCode,0)T(F,@DistCode,0)T(F,@DeptCode,0)T(F,@EffectiveDate,0)T(F,@IneffectiveDate,1)T(F,@EmpClass,0)T(F,@ClassPass,0),$)
+#WKTF8=X,1,S
+C(3,#FunctionCd,8,T(F,@EmpNo,0)T(F,@UnitCode,0)T(F,@DistCode,0)T(F,@DeptCode,0)T(F,@EffectiveDate,1)T(F,@IneffectiveDate,0)T(F,@EmpClass,1)T(F,@ClassPass,0),$)
 
 
 ! 停效說明隱藏，修改時若與原本不同才開啟
 ! INVOKEJS(SHOW,L5407,8,8,0)
 ! 員工代號
 #EmpNo=X,6,I
-C(2,#FunctionCd,S,$,s,s,s)
+C(2,#FunctionCd,S,$,s,s,s,s,s,s,s)
 @
 T(3,@Fullname,)
 T(3,@UnitCode,)
@@ -149,7 +167,7 @@ V(7)
 <include src="ROM.icf::L5R07.dec"/>
 #RimL5r07=X,1,S
 T(2,@RimEmpNo,#EmpNo)
-C(2,#FunctionCd,s,$,s,$,s)
+C(2,#FunctionCd,s,$,s,$,s,s,s,s,s)
 RESET_RIM(#RimL5r07,L5R07)
 S(L5R07,1,#RimEmpNo)
 R(1,L5R07)
@@ -173,7 +191,7 @@ T(2,@DeptCodeX,#L5r07DeptCodeX)
 
 ! 單位代號
 #UnitCode=X,6,I
-C(2,#FunctionCd,s,$,$,$,s)
+C(2,#FunctionCd,s,$,$,$,s,s,s,s,s)
 C(3,#FunctionCd,2,C(3,#StatusFg,1,s,$),$)
 !C(2,#FunctionCd,s,$,s,$,s)
 !C(2,#FunctionCd,s,$,s,s,s)
@@ -193,7 +211,7 @@ T(2,@DistCodeX,#L5R40DistItem)
 
 ! 區部代號
 #DistCode=X,6,I
-C(2,#FunctionCd,s,$,$,$,s)
+C(2,#FunctionCd,s,$,$,$,s,s,s,s,s)
 C(3,#FunctionCd,2,C(3,#StatusFg,1,s,$),$)
 !C(2,#FunctionCd,s,$,s,$,s)
 @C(4,#DistCode,s,$)
@@ -210,7 +228,7 @@ T(2,@DistCodeX,#L5R40DistItem)
 
 ! 部室代號
 #DeptCode=X,6,I
-C(2,#FunctionCd,s,$,$,$,s)
+C(2,#FunctionCd,s,$,$,$,s,s,s,s,s)
 C(3,#FunctionCd,2,C(3,#StatusFg,1,s,$),$)
 !C(2,#FunctionCd,s,$,s,$,s)
 @C(4,#DeptCode,s,$)
@@ -231,7 +249,9 @@ T(4,#SYSCDATE)
 ! 生效日期 
 #EffectiveDate=D,7,I
 ! C(2,#FunctionCd,s,$,$,$,s)
-C(2,#FunctionCd,s,$,s,$,s)
+C(2,#FunctionCd,s,$,s,$,s,s,s,s,$)
+C(3,#FunctionCd,8,T(1,@EffectiveDate,#NTXBUF,16,7),$)
+C(3,#FunctionCd,8,T(1,@EmpClass,#NTXBUF,23,1),$)
 C(3,#FunctionCd,1,T(1,#SYSTIMETMP,2,7),$)
 D(8)
 @A(DATE,0,#EffectiveDate)
@@ -243,7 +263,9 @@ V(7)
 E(0,0)
 ! 停效日期 
 #IneffectiveDate=D,7,I
-C(2,#FunctionCd,s,$,$,$,s)
+C(2,#FunctionCd,s,$,$,$,s,s,$,$,s)
+C(3,#FunctionCd,6,T(1,@IneffectiveDate,#NTXBUF,16,7),$)
+C(3,#FunctionCd,7,T(1,@IneffectiveDate,#NTXBUF,16,7),$)
 D(8)
 @
 C(4,#IneffectiveDate,S,$)
@@ -261,7 +283,7 @@ IF(#IneffectiveDate < #EffectiveDate,V(P,停效日期需大於生效日期),$)
 
 ! 協辦等級
 #EmpClass=A,1,I
-C(2,#FunctionCd,s,$,$,$,s)
+C(2,#FunctionCd,s,$,$,$,s,s,s,s,$)
 C(3,#FunctionCd,2,C(3,#StatusFg,1,s,$),$)
 HELP(#ClassTypeHelp)
 @T(3,#EmpClassX,)
@@ -272,7 +294,7 @@ T(H,#EmpClass,#ClassTypeHelp)
 
 ! 初階授信通過
 #ClassPass=X,1,I
-C(2,#FunctionCd,s,$,$,$,s)
+C(2,#FunctionCd,s,$,$,$,s,s,s,s,s)
 C(3,#FunctionCd,2,C(3,#StatusFg,1,s,$),$)
 @V(3, ,Y)
 </sub>

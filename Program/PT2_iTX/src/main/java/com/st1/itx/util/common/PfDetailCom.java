@@ -59,11 +59,14 @@ import com.st1.itx.util.parse.Parse;
 
 /**
  * 業績明細處理<BR>
- * addDetail 計算業績(撥款、提前償還追回、計件代碼變更) call by L3100, L3200, L3420, L3701<BR>
- * 1.寫入業績計算明細檔 PfDetail<BR>
- * 2.寫入介紹人業績明細檔 PfItDetail<BR>
- * 3.寫入房貸專員業績明細檔 PfBsDetail<BR>
- * 4.寫入介紹、協辦獎金發放檔 PfReward<BR>
+ * addDetail 計算業績，並寫入業績及獎金發放檔<BR>
+ * 1.1.計算業績(撥款、提前償還追回、計件代碼變更) call by L3100, L3200, L3420, L3701<BR>
+ * 1.2.業績參數異動時自動重算寫入業績<BR>
+ * 1.3.業績明細被更動時不更新<BR>
+ * 2.1.寫入業績計算明細檔 PfDetail<BR>
+ * 2.2.寫入介紹人業績明細檔 PfItDetail<BR>
+ * 3.3.寫入房貸專員業績明細檔 PfBsDetail<BR>
+ * 4.4.寫入介紹、協辦獎金發放檔 PfReward<BR>
  * 
  * 
  * @author st1
@@ -804,7 +807,7 @@ public class PfDetailCom extends TradeBuffer {
 
 		// 計算協辦人員協辦獎金
 		if (pf.getCoorgnizer().trim().length() > 0) {
-			pf = procCoBonus(pf, workDrawdownPerDateF, workMonthDrawdown, lPfDetail, titaVo);
+			pf = procCoBonus(pf);
 		}
 
 // ---------------- 以額度累計計算金額(房貸專員)計算房貸專員業績  ------------------------
@@ -1134,38 +1137,28 @@ public class PfDetailCom extends TradeBuffer {
 		return isAddBonus;
 	}
 
-	/**
-	 * 計算協辦人員協辦獎金
-	 * 
-	 * @param pf                 業績計算明細
-	 * @param iDrawdownPerDateF  撥款業績日期(西元)
-	 * @param iDrawdownWorkMonth 撥款工作月(西元)
-	 * @param iPfDetailList      戶號下全部業績計算明細
-	 * @param titaVo             TitaVo
-	 * @return 業績計算明細
-	 * @throws LogicException ....
-	 */
-	public PfDetail procCoBonus(PfDetail pf, int iDrawdownPerDateF, int iDrawdownWorkMonth,
-			ArrayList<PfDetail> iPfDetailList, TitaVo titaVo) throws LogicException {
+	// 計算協辦人員協辦獎金
+	private PfDetail procCoBonus(PfDetail pf) throws LogicException {
 		this.info("PfDetailCom compCoBonus ");
 		// 生效日期<=撥款日<停效日期
 		if ("".equals(pf.getCoorgnizer())) {
 			this.info("PfDetailCom PfCoOfficer space skip ");
 			return pf;
 		}
-		PfCoOfficer tPfCoOfficer = pfCoOfficerService.effectiveDateFirst(pf.getCoorgnizer(), 0, iDrawdownPerDateF,
+		//workDrawdownPerDateF, workMonthDrawdown, lPfDetail
+		PfCoOfficer tPfCoOfficer = pfCoOfficerService.effectiveDateFirst(pf.getCoorgnizer(), 0, workDrawdownPerDateF,
 				titaVo);
 		if (tPfCoOfficer == null) {
 			this.info("PfDetailCom PfCoOfficer null skip ");
 			return pf;
 		}
 		if (tPfCoOfficer.getIneffectiveDate() > 0
-				&& iDrawdownPerDateF > (tPfCoOfficer.getIneffectiveDate() + 19110000)) {
+				&& workDrawdownPerDateF > (tPfCoOfficer.getIneffectiveDate() + 19110000)) {
 			this.info("PfDetailCom PfCoOfficer IneffectiveDate skip " + tPfCoOfficer.toString());
 			return pf;
 		}
 		// CdBonusCo 協辦獎金標準設定
-		CdBonusCo TCdBonusCo = cdBonusCoService.findWorkMonthFirst(iDrawdownWorkMonth, titaVo);
+		CdBonusCo TCdBonusCo = cdBonusCoService.findWorkMonthFirst(workMonthDrawdown, titaVo);
 		if (TCdBonusCo == null) {
 			throw new LogicException(titaVo, "E0001", "CdBonusCo 協辦獎金標準設定" + workMonthDrawdown); // 查詢資料不存在
 		}
@@ -1204,7 +1197,7 @@ public class PfDetailCom extends TradeBuffer {
 		BigDecimal drawDownBonusFac = BigDecimal.ZERO;
 		BigDecimal repayBonusFac = BigDecimal.ZERO;
 		if (lPfDetail != null) {
-			for (PfDetail it : iPfDetailList) {
+			for (PfDetail it : lPfDetail) {
 				if (isCoBonusPieceCode(it.getPieceCode(), lCdBonusCo)) {
 					if (it.getFacmNo() == pf.getFacmNo() && it.getWorkMonth() == workMonthDrawdown) {
 						if (it.getRepayType() == 0) {
@@ -1486,6 +1479,13 @@ public class PfDetailCom extends TradeBuffer {
 		PfItDetail tPfItDetail = pfItDetailService.findByTxFirst(pf.getCustNo(), pf.getFacmNo(), pf.getBormNo(),
 				perfDateF, pf.getRepayType(), pf.getPieceCode(), titaVo);
 		if (tPfItDetail != null) {
+			// 業績重算若業績已調整則不更新
+			if (isReCompute) {
+				if (tPfItDetail.getAdjRange() > 0) {
+					this.info("Skip Update ItDetail AdjRange > 0 " + tPfItDetail.toString());
+					return;
+				}
+			}
 			isInsert = false;
 			tPfItDetail = pfItDetailService.holdById(tPfItDetail, titaVo);
 		} else {
@@ -1617,6 +1617,14 @@ public class PfDetailCom extends TradeBuffer {
 		PfBsDetail tPfBsDetail = pfBsDetailService.findByTxFirst(pf.getCustNo(), pf.getFacmNo(), pf.getBormNo(),
 				perfDateF, pf.getRepayType(), pf.getPieceCode(), titaVo);
 		if (tPfBsDetail != null) {
+			// 業績重算若業績已調整則不更新
+			if (isReCompute) {
+				if (tPfBsDetail.getAdjPerfCnt().compareTo(BigDecimal.ZERO) != 0
+						|| tPfBsDetail.getAdjPerfAmt().compareTo(BigDecimal.ZERO) != 0) {
+					this.info("Skip Update ItDetail Adjust " + tPfBsDetail.toString());
+					return;
+				}
+			}
 			isInsert = false;
 			tPfBsDetail = pfBsDetailService.holdById(tPfBsDetail, titaVo);
 		} else {

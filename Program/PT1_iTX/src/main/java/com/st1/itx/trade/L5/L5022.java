@@ -108,7 +108,7 @@ public class L5022 extends TradeBuffer {
 				quitChgDate = quitDate;
 			}
 
-			if (result.get("CenterCode").equals(result.get("AreaCode"))) {
+			if (!result.get("CenterCode").equals(result.get("AreaCode"))) {
 				if (effectiveDate < agPostChgDate && ineffectiveDate > agPostChgDate) {
 					postChgDate = agPostChgDate;
 				}

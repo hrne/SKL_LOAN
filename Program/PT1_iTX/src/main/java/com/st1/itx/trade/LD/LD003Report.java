@@ -201,8 +201,8 @@ public class LD003Report extends MakeReport {
 
 			this.print(-53, 0, ""); // 把 cursor 移動到最後一行以後，避免簽核歪掉
 			
-			this.print(-54, 60, "經辦：                                       主管：","C"); 
-			this.print(-55, 60, "=====　報　表　結　束　=====","C");
+			// this.print(-54, 60, "經辦：                                       主管：","C"); 
+			// this.print(-55, 60, "=====　報　表　結　束　=====","C");
 		} else {
 			this.print(-11, 115, "本日無資料", "R");
 		}
