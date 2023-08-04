@@ -50,7 +50,9 @@ public class L9130 extends TradeBuffer {
 	private L9139 tranL9139;
 	@Autowired
 	private L9140Report l9140Report;
-
+	@Autowired
+	private L9141 tranL9141;
+	
 	@Autowired
 	private WebClient webClient;
 
@@ -238,6 +240,14 @@ public class L9130 extends TradeBuffer {
 				StringWriter errors = new StringWriter();
 				e.printStackTrace(new PrintWriter(errors));
 				this.error("L9140產生結清戶滿五年查詢清單時發生錯誤 = " + errors.toString());
+			}
+			
+			try {
+				tranL9141.run(titaVo);
+			} catch (Exception e) {
+				StringWriter errors = new StringWriter();
+				e.printStackTrace(new PrintWriter(errors));
+				this.error("L9141產生暫收款-火險費餘額表時發生錯誤 = " + errors.toString());
 			}
 
 		} else {

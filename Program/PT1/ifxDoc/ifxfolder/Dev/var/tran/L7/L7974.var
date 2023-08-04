@@ -1,7 +1,5 @@
 ﻿----- BASIC LABEL Variables ----------
 <sub type="SYS">
-#Submit=A,1,S
-K(MODIFYBUTTON,查詢)
 </sub>
 
 <sub type="SYS" name="label">
@@ -49,6 +47,8 @@ E(0,0)
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
+#button=x,1,S
+K(MODIFYBUTTON,查詢)
 
 #BUF1=X,42,S
 
@@ -59,7 +59,7 @@ E(0,0)
 ! Help
 
 #TypeCodeHelp=x,100,S
-T(3,0:上傳成功;1:未上傳;2:上傳失敗;9:全部)
+T(3,0:未上傳;1:上傳成功;2:上傳失敗;3:關帳取消;9:全部)
 
 
 !---------- AP TEXT AREA Variables ----------
@@ -78,13 +78,13 @@ T(1,@GroupId,#NTXBUF,8,11)
 T(1,@SendStatus,#NTXBUF,19,1)
 
 !會計日期
-#AccDateStart=D,7,I
+#AccDateStart=D,7,L
 @A(DATE,0,#AccDateStart)
 V(7)
 
-#GroupId=X,11,I
+#GroupId=X,11,L
 
-#SendStatus=A,1,I
+#SendStatus=A,1,L
 HELP(#TypeCodeHelp)
 @
 V(H,#TypeCodeHelp)
@@ -93,6 +93,19 @@ V(H,#TypeCodeHelp)
 T(H,@SendStatusX,#SendStatus,#TypeCodeHelp)
 
 #RPTFG=A,1,S
+E(0,0)
+
+!功能 必須輸入
+#FunCd=A,1,S
+E(0,8)XMT()
+
+
+#RETURN=A,1,S
+E(0,0)
+
+![折返KEY]
+#RTNTXT=X,9,S
+
 
 </sub>
 

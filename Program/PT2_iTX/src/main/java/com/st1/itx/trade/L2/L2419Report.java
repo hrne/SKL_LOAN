@@ -147,11 +147,11 @@ public class L2419Report extends TradeBuffer {
 			resultList = l2419ServiceImpl.doQuery(titaVo);
 		} catch (Exception e) {
 			this.error("L2419ServiceImpl doQuery " + e.getMessage());
-			throw new LogicException("E0013", "L2419Report");
+			throw new LogicException("E0013", "此核准號碼在擔保品與額度關聯檔無不動產擔保品相關資料");
 		}
 
 		if (resultList == null || resultList.isEmpty()) {
-			throw new LogicException("E0013", "L2419Report");
+			throw new LogicException("E0001", "此核准號碼在擔保品與額度關聯檔無不動產擔保品相關資料");
 		}
 
 		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getKinbr()).setRptDate(titaVo.getEntDyI())
@@ -175,9 +175,9 @@ public class L2419Report extends TradeBuffer {
 
 			detailNo++;
 		}
-		
+
 		makeExcel.setLockColumn(3, detailNo - 1, L2419Column.NO.getIndex(), L2419Column.CL_NO.getIndex(), 142);
-		
+
 		makeExcel.setProtectSheet(groupNo);
 
 		makeExcel.toExcel(makeExcel.close());

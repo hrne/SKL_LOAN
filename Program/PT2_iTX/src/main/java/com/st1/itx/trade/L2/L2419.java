@@ -40,6 +40,7 @@ import com.st1.itx.db.service.ClBatchService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.TxFileService;
+import com.st1.itx.db.service.springjpa.cm.L2419ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.GSeqCom;
@@ -106,6 +107,9 @@ public class L2419 extends TradeBuffer {
 
 	private boolean noError = true;
 
+	@Autowired
+	private L2419ServiceImpl l2419ServiceImpl;
+	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2419 ");
@@ -1166,6 +1170,18 @@ public class L2419 extends TradeBuffer {
 	}
 
 	private void report(TitaVo titaVo) throws LogicException {
+
+		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
+		try {
+			resultList = l2419ServiceImpl.doQuery(titaVo);
+		} catch (Exception e) {
+			this.error("L2419ServiceImpl doQuery " + e.getMessage());
+			throw new LogicException("E0013", "此核准號碼在擔保品與額度關聯檔無不動產擔保品相關資料");
+		}
+
+		if (resultList == null || resultList.isEmpty()) {
+			throw new LogicException("E0001", "此核准號碼在擔保品與額度關聯檔無不動產擔保品相關資料");
+		}
 		// 執行背景交易
 		MySpring.newTask("L2419Report", this.txBuffer, titaVo);
 	}

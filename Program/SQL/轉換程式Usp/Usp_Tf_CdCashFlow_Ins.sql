@@ -25,37 +25,34 @@ BEGIN
 
     -- 寫入資料
     INSERT INTO "CdCashFlow" (
-        "DataYearMonth"       -- 年月份 DECIMAL 6 
-      , "InterestIncome"      -- 利息收入 DECIMAL 16 2
+        "BranchNo"             -- 單位別 VARCHAR2 4
+      , "DataYearMonth"        -- 年月份 DECIMAL 6 
+      , "TenDayPeriods"        -- 旬別 DECIMAL 1
+      , "InterestIncome"       -- 利息收入 DECIMAL 16 2
       , "PrincipalAmortizeAmt" -- 本金攤還金額 DECIMAL 16 2
-      , "PrepaymentAmt"       -- 提前還款金額 DECIMAL 16 2
-      , "DuePaymentAmt"       -- 到期清償金額 DECIMAL 16 2
-      , "ExtendAmt"           -- 展期金額 DECIMAL 16 2
-      , "LoanAmt"             -- 貸放金額 DECIMAL 16 2
-      , "CreateDate"          -- 建檔日期時間 DATE 0 
-      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
-      , "LastUpdate"          -- 最後更新日期時間 DATE 0 
-      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+      , "PrepaymentAmt"        -- 提前還款金額 DECIMAL 16 2
+      , "DuePaymentAmt"        -- 到期清償金額 DECIMAL 16 2
+      , "ExtendAmt"            -- 展期金額 DECIMAL 16 2
+      , "LoanAmt"              -- 貸放金額 DECIMAL 16 2
+      , "CreateDate"           -- 建檔日期時間 DATE 0 
+      , "CreateEmpNo"          -- 建檔人員 VARCHAR2 6 
+      , "LastUpdate"           -- 最後更新日期時間 DATE 0 
+      , "LastUpdateEmpNo"      -- 最後更新人員 VARCHAR2 6 
     )
-    SELECT S1."ADTYMT"                    AS "DataYearMonth"       -- 年月份 DECIMAL 6 
-          ,S2."CSTINS"                    AS "InterestIncome"      -- 利息收入 DECIMAL 16 2
-          ,S2."CSTRA1"                    AS "PrincipalAmortizeAmt" -- 本金攤還金額 DECIMAL 16 2
-          ,S2."CSTRA2"                    AS "PrepaymentAmt"       -- 提前還款金額 DECIMAL 16 2
-          ,S2."CSTRA3"                    AS "DuePaymentAmt"       -- 到期清償金額 DECIMAL 16 2
-          ,S2."CSTETA"                    AS "ExtendAmt"           -- 展期金額 DECIMAL 16 2
-          ,S2."CSTLAM"                    AS "LoanAmt"             -- 貸放金額 DECIMAL 16 2
-          ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 0 
-          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
-          ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 0 
-          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
-    FROM (SELECT "LA$CSTP"."ADTYMT"
-                ,"LA$CSTP"."CSTPRD"
-                ,ROW_NUMBER() OVER (PARTITION BY 0 ORDER BY "LA$CSTP"."ADTYMT" DESC,"LA$CSTP"."CSTPRD" DESC) AS "Seq"
-          FROM "LA$CSTP"
-         ) S1
-    LEFT JOIN "LA$CSTP" S2 ON S2."ADTYMT" = S1."ADTYMT"
-                          AND S2."CSTPRD" = S1."CSTPRD"
-    WHERE S1."Seq" = 1
+    SELECT LPAD(C.CUSBRH,4,'0')           AS "BranchNo"             -- 單位別 VARCHAR2 4
+         , C.ADTYMT                       AS "DataYearMonth"        -- 年月份 DECIMAL 6 
+         , C.CSTPRD                       AS "TenDayPeriods"        -- 旬別 DECIMAL 1
+         , C.CSTINS                       AS "InterestIncome"       -- 利息收入 DECIMAL 16 2
+         , C.CSTRA1                       AS "PrincipalAmortizeAmt" -- 本金攤還金額 DECIMAL 16 2
+         , C.CSTRA2                       AS "PrepaymentAmt"        -- 提前還款金額 DECIMAL 16 2
+         , C.CSTRA3                       AS "DuePaymentAmt"        -- 到期清償金額 DECIMAL 16 2
+         , C.CSTETA                       AS "ExtendAmt"            -- 展期金額 DECIMAL 16 2
+         , C.CSTLAM                       AS "LoanAmt"              -- 貸放金額 DECIMAL 16 2
+         , JOB_START_TIME                 AS "CreateDate"           -- 建檔日期時間 DATE 0 
+         , '999999'                       AS "CreateEmpNo"          -- 建檔人員 VARCHAR2 6 
+         , JOB_START_TIME                 AS "LastUpdate"           -- 最後更新日期時間 DATE 0 
+         , '999999'                       AS "LastUpdateEmpNo"      -- 最後更新人員 VARCHAR2 6 
+    FROM LA$CSTP C 
     ;
 
     -- 記錄寫入筆數

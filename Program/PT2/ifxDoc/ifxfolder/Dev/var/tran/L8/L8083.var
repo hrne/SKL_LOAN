@@ -253,7 +253,8 @@ T(2,#oDataDt)
 T(2,#oCustKey)
 
 #ProcessDate=D,7,S
-E(0,#SYSDATE)
+! E(0,#SYSDATE)
+E(0,#SYSCDATE)
 
 #ProcessTlrNo=X,6,S
 T(2,#TLRNO)
