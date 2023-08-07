@@ -542,7 +542,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             AND";
 		sql += "             T.\"TitaHCode\" = 0";
 		sql += "             AND";
-		sql += "             NOT T.\"TxDescCode\" IN ('3100','3101','3102','3420','3421','3422') ";//--撥款、結案登錄
+		sql += "             NOT T.\"TxDescCode\" IN ('3100','3420','3421','3422') ";//--撥款、結案登錄
 		sql += "             AND";
 		sql += "             T.\"EntryDate\" >= " + sEntryDate;
 		sql += "             AND";
@@ -581,7 +581,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             AND";
 		sql += "             T.\"TitaHCode\" = 0";
 		sql += "             AND";
-		sql += "             NOT T.\"TxDescCode\" IN ('3100','3101','3102','3420','3421','3422') ";//--撥款、結案登錄
+		sql += "             NOT T.\"TxDescCode\" IN ('3100','3420','3421','3422') ";//--撥款、結案登錄
 		sql += "             AND";
 		sql += "             T.\"EntryDate\" >= " + sEntryDate;
 		sql += "             AND";
@@ -658,6 +658,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "        , Nvl(R2.\"FitRate\", 0) AS \"PresentRate\"";
 			sql += "        , Nvl(R.\"FitRate\", 0) AS \"AdjustedRate\"";
 			sql += "        , Nvl(Cb.\"BdLocation\", ' ') AS \"Location\"";
+			sql += "        , Nvl(CM.\"Zip3\", ' ') || Nvl(CM.\"Zip2\", ' ') AS \"Zip\"";
 			sql += "   FROM \"tmpMain\"     X";
 			sql += "   LEFT JOIN (";
 			sql += "       SELECT \"CustNo\"";
@@ -697,6 +698,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "           R2.\"BormNo\" = R.\"BormNo\"";
 			sql += "           AND";
 			sql += "           R2.\"seq\" = 2";
+			sql += "   LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = X.\"CustNo\"";
 			sql += "   LEFT JOIN \"ClFac\"   F ON F.\"CustNo\" = X.\"CustNo\"";
 			sql += "                          AND F.\"FacmNo\" = X.\"FacmNo\"";
 			sql += "                          AND F.\"MainFlag\" = 'Y'";

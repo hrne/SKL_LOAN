@@ -344,9 +344,17 @@ public class L4721Report2 extends TradeBuffer {
 			// 空白
 			String C = makeReport.fillUpWord(" ", 45, " ", "R");
 
+			String zip = txEffectData.get(0).get("Zip");
+			String zipX = "";
+			// 5
+			System.out.println(zip.length());
+			for (int i = 0; i < zip.length(); i++) {
+				zipX = zipX + zip.substring(i, i + 1) + " ";
+			}
+
 			// 011 1 0 0 0 台北市信義區永吉路１２０巷５０弄１號３樓 0001743 陳清耀
-			line = "";
-			line = "01" + FormatUtil.padX("", 10) + X + C + FormatUtil.pad9(r.get("CustNo"), 7) + " "
+
+			line = "01" + zipX + X + C + FormatUtil.pad9(r.get("CustNo"), 7) + " "
 					+ makeReport.fillUpWord(custName, 10, " ", "R") + "    " + makeReport.fillUpWord(" ", 65, " ", "R");
 			// 加入明細
 			result.add(line);
@@ -445,8 +453,8 @@ public class L4721Report2 extends TradeBuffer {
 		if (parse.stringToBigDecimal(r.get("OtherFee")).compareTo(BigDecimal.ZERO) < 0) {
 			OtherFeeX = "-";
 		}
-
-		line += FormatUtil.pad9(r.get("EntryDate"), 8) + dateRange + " " + FormatUtil.padX(RepayItem, 8) + "   "
+		int entryDate = parse.stringToInteger(r.get("EntryDate")) - 19110000;
+		line += FormatUtil.pad9(entryDate + "", 8) + dateRange + " " + FormatUtil.padX(RepayItem, 8) + "   "
 				+ FormatUtil.pad9(r.get("TxAmt"), 10) + txAmtX + FormatUtil.pad9(r.get("Principal"), 10) + principalX
 				+ FormatUtil.pad9(r.get("Interest"), 8) + interestX + FormatUtil.pad9(r.get("BreachAmt"), 8)
 				+ breachAmtX + FormatUtil.pad9(r.get("OtherFee"), 8) + OtherFeeX;

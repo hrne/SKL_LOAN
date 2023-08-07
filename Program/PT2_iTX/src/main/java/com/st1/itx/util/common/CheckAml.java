@@ -338,6 +338,8 @@ public class CheckAml extends TradeBuffer {
 	 * @throws LogicException LogicException
 	 */
 	public CheckAmlVo refreshStatus(Long logno, TitaVo titaVo) throws LogicException {
+		this.info("FunCode   = " + titaVo.getParam("FunCode"));
+		String iFunCode = titaVo.getParam("FunCode");
 		amlflag = this.txBuffer.getSystemParas().getAmlFg();
 		this.info("CheckAml refreshStatus amlflag=" + amlflag);
 		amlurl = this.txBuffer.getSystemParas().getAmlUrl();
@@ -348,7 +350,6 @@ public class CheckAml extends TradeBuffer {
 
 		CheckAmlVo checkAmlVo = new CheckAmlVo();
 		if (amlflag == 2) {
-			
 //			txAmlLog.setConfirmStatus("0");
 			txAmlLog.setStatusCode("0008");
 			txAmlLog.setStatus("Success");
@@ -384,13 +385,13 @@ public class CheckAml extends TradeBuffer {
 				}
 			}
 		}
-
-		try {
-			txAmlLogService.update(txAmlLog, titaVo);
-		} catch (DBException e) {
-			throw new LogicException("EC003", "update TxAmlLog:" + e.getErrorMsg()); // 更新資料
+		if (!iFunCode.equals("5")) {
+			try {
+				txAmlLogService.update(txAmlLog, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("EC003", "update TxAmlLog:" + e.getErrorMsg()); // 更新資料
+			}
 		}
-
 		checkAmlVo = rspAmlVo(checkAmlVo, txAmlLog);
 
 		return checkAmlVo;

@@ -135,6 +135,7 @@ public class LM030Report extends MakeReport {
 
 				try {
 					baTxCom.settingUnPaid(nextDueDate, custNo, facmNo, 0, 3, BigDecimal.ZERO, titaVo); // 3-結案
+					baTxCom.setTxBuffer(txBuffer);
 				} catch (LogicException e) {
 					this.info("ErrorMsg :" + e.getErrorMsg(titaVo) + " " + custNo + "-" + facmNo);
 				}

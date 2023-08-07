@@ -43,6 +43,7 @@ E(0,0)
 [#<->#,"#FdCustId+身分證字號",#CustId,"(戶號/身分證字號，可擇一輸入)"],
 [#<->#,"#FdCaseKindCode+案件種類",#CaseKindCode,#CaseKindCodeX],
 [#<->#,"#FdCustLoanKind+債權戶別",#CustLoanKind,#CustLoanKindX],
+[#<->#,"#FdSelectType+查詢選項",#SelectType,#SelectTypeX],
 [#<->#,"#FdStatus+債權戶況",#Status,#StatusX],
 ]
 !---------- AP TEXT AREA Variables ----------
@@ -56,6 +57,9 @@ E(0,0)
 #FdCustLoanKind=X,2,L
 !T(3,*)
 #FdStatus=X,2,L
+!T(3,*)
+#FdSelectType=X,2,L
+T(3,*)
 
 ! #BtnInsert=X,1,S,ui:button;value:新增;enable:1;tabbable:0
 
@@ -70,10 +74,18 @@ K(MODIFYBUTTON,查詢)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 
+#NTXBUF=X,9,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@CustNo,#NTXBUF,1,7)
+T(1,@CaseKindCode,#NTXBUF,8,1)
+T(1,@SelectType,#NTXBUF,9,1)
+
+
 ! Status-1債權戶況
 #StatusCode=x,20,S
 T(3,CdCode.NegStatus)
 #StatusHelp=x,1024,S
+#StatusHelp2=x,1024,S
 
 ! CustLoanKind-2債權戶別
 #CustLoanKindCode=x,20,S
@@ -93,6 +105,8 @@ CALL(#HelpProc)
 T(2,@StatusHelp,#HelpDesc1)
 T(2,@CustLoanKindHelp,#HelpDesc2)
 T(2,@CaseKindCodeHelp,#HelpDesc3)
+T(HELP,@StatusHelp2,#StatusHelp,+,0;2;3)
+! T(HELP,@CustTypeCodeHelp,#CustTypeCodeHelp,-,01;02)
 
 !---------- 日期處理 ----------
 #ViewSysDate=D,8,S
@@ -103,6 +117,7 @@ T(1,@ViewSysDate1,#ViewSysDate,2,7)
 
 !戶號
 #CustNo=A,7,I
+C(3,#CHAIN,0,$,s)
 
 ! 身分證字號
 #CustId=X,10,I
@@ -141,9 +156,10 @@ C(3,#CustNo,0,T(2,#L2r07CustNo),T(2,#CustNo))
 
 ! 案件種類
 #CaseKindCode=X,1,I
+C(3,#CHAIN,0,$,s)
 HELP(#CaseKindCodeHelp)
 @IF(#CaseKindCode=="",s,$)
-@T(3,@CaseKindCodeX,)
+T(3,@CaseKindCodeX,)
 V(H,#CaseKindCodeHelp)
 
 #CaseKindCodeX=X,4,L
@@ -152,21 +168,37 @@ T(H,#CaseKindCode,#CaseKindCodeHelp)
 
 ! 債權戶別
 #CustLoanKind=X,1,I
+C(3,#CHAIN,0,$,s)
 HELP(#CustLoanKindHelp)
 @IF(#CustLoanKind=="",s,$)
-@T(3,@CustLoanKindX,)
+T(3,@CustLoanKindX,)
 V(H,#CustLoanKindHelp)
 
 #CustLoanKindX=X,6,L
 IF(#CustLoanKind=="",S,$)
 T(H,#CustLoanKind,#CustLoanKindHelp)
 
+!查詢選項-20230725新增,1:戶況只可選擇(0,2,3,不輸入),2:戶況可選清單中全部
+#SelectTypeHelp=X,30,S
+T(3,1:債權戶況;2:案件狀態)
+
+#SelectType=X,1,I
+C(3,#CHAIN,0,$,s)
+HELP(#SelectTypeHelp)
+T(2,1)
+@T(3,@SelectTypeX,)
+V(H,#SelectTypeHelp)
+#SelectTypeX=X,8,L
+T(H,#SelectType,#SelectTypeHelp)
+
+
 ! 債權戶況
 #Status=X,1,I
-HELP(#StatusHelp)
+C(3,#CHAIN,0,$,s)
+IF(#SelectType==1,HELP(#StatusHelp2),HELP(#StatusHelp))
 @IF(#Status=="",s,$)
-@T(3,@StatusX,)
-V(H,#StatusHelp)
+T(3,@StatusX,)
+IF(#SelectType==1,V(H,#StatusHelp2),V(H,#StatusHelp))
 
 #StatusX=X,6,L
 IF(#Status=="",S,$)
@@ -175,6 +207,9 @@ T(H,#Status,#StatusHelp)
 ![顯示方式]
 #RPTFG=A,1,S
 E(0,0)
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 
 </sub>
 
@@ -269,6 +304,10 @@ T(B,#OOIntRateX+%)
 ! 最大債權機構名稱
 #OOMainFinCodeName=X,100,O
 
+#OOCaseCount=A,3,O
+#OOTransCount=A,5,O
+#OOAppr01Count=A,5,O
+
 ! 01:新增 A;  
 ! 02:修改 B;  
 ! 04:刪除 C;  
@@ -316,6 +355,7 @@ T(2,05+#BufKey)
 #OOBtnDeatail=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L5971; ntxbuf=#BufDetail})
 IF(#OOCustIdWk=="XX",BIND(grid,cancel),$)
+IF(#OOTransCount==0,BIND(grid,cancel),$)
 
 !撥付統計
 #CountDetail=X,13,S
@@ -324,7 +364,16 @@ T(2,#OOCustId+#OOCaseSeq)
 #OOCountDetail=X,1,S
 IF(#OOIsMainFin=="N",BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L5977; ntxbuf=#CountDetail}))
 IF(#OOCustIdWk=="XX",BIND(grid,cancel),$)
+IF(#OOAppr01Count==0,BIND(grid,cancel),$)
 
+! 案件明細按鈕 :查出該戶號+案件種類的全部案件資料
+#BufCaseDetail=X,9,S
+T(2,#OOCustNo+#OOCaseKindCode+2)
+#OOBtnCaseDeatail=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L5071; ntxbuf=#BufCaseDetail})
+IF(#OOCustIdWk=="XX",BIND(grid,cancel),$)
+IF(#SelectType=="2",BIND(grid,cancel),$)
+IF(#OOCaseCount<2,BIND(grid,cancel),$)
 
 </sub>
 
@@ -335,6 +384,7 @@ IF(#OOCustIdWk=="XX",BIND(grid,cancel),$)
 #CaseKindCode
 #CustLoanKind
 #Status
+#SelectType
 </sub>
 
 !------ 下行電文TOM ------
@@ -360,6 +410,9 @@ TXFORM=L5071
 #OOTotalContrAmt
 #OOMainFinCode
 #OOMainFinCodeName
+#OOCaseCount
+#OOTransCount
+#OOAppr01Count
 ^
 </sub>
 
@@ -375,46 +428,48 @@ TXFORM=L5071
 #RPTFG=0,QUERY.GRID,L5071
 #any={detail:true, header:'L5071.part', caption:'', rowNum:20, rowList:[20,40,60]}
 #OOBtnSearch=查詢
-{search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:35}
+{search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:40}
 #OOBtnMaintain=修改
-{search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false,width:35}
+{search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false,width:40}
 #OOBtnDelete=刪除
-{search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false,width:35}
-#OOBtnDeatail=交易明細
-{search:false,formatter:'cust:bind-button:交易明細',align:'center',canExport:false,width:65}
-#OOCountDetail=撥付統計
-{search:false,formatter:'cust:bind-button:撥付統計',align:'center',canExport:false,width:75}
+{search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false,width:40}
+#OOBtnDeatail=交易
+{search:false,formatter:'cust:bind-button:明細',align:'center',canExport:false,width:40}
+#OOCountDetail=撥付
+{search:false,formatter:'cust:bind-button:統計',align:'center',canExport:false,width:40}
+#OOBtnCaseDeatail=案件
+{search:false,formatter:'cust:bind-button:明細',align:'center',canExport:false,width:40}
 
 #OOCustId=身分證字號
-{width:120,align:'center'}
+{width:100,align:'center'}
 #OOCustName=戶名
-{width:200,align:'left'}
-#OOCaseKindCodeX=案件種類
-{width:95,align:'center'}
-#OOCustLoanKindX=債權戶別
-{width:95,align:'center'}
-#OOStatusX=債權戶況
-{width:95,align:'left'}
+{width:160,align:'left'}
+#OOCaseKindCodeX=案件<BR>種類
+{width:50,align:'center'}
+#OOCustLoanKindX=債權<BR>戶別
+{width:60,align:'center'}
+#OOStatusX=債權<BR>戶況
+{width:60,align:'left'}
 #OOCustNo=戶號
-{width:95,align:'right'}
-#OOCaseSeq=案件序號
-{width:95,align:'right'}
+{width:60,align:'right'}
+#OOCaseSeq=案件<BR>序號
+{width:50,align:'center'}
 #OOApplDate=協商申請日
 {width:105,align:'center'}
 #OODueAmt=期款
-{width:95,align:'right'}
+{width:60,align:'right'}
 #OOTotalPeriod=期數
 {width:50,align:'center'}
 #OOIntRateX1=利率(%)
-{width:95,align:'right'}
+{width:65,align:'right'}
 #OOFirstDueDate=首次應繳日
-{width:105,align:'center'}
+{width:100,align:'center'}
 #OOLastDueDate=還款結束日
-{width:105,align:'center'}
-#OOIsMainFin=最大債權
-{width:80,align:'center'}
+{width:100,align:'center'}
+#OOIsMainFin=最大<BR>債權
+{width:50,align:'center'}
 #OOMainFinCodeName=最大債權機構
-{width:120,align:'left'}
+{width:150,align:'left'}
 #OOTotalContrAmt=總金額
 {width:95,align:'right'}
 ^
@@ -424,6 +479,7 @@ TXFORM=L5071
 #CaseKindCode
 #CustLoanKind
 #Status
+#SelectType
 %
 #OOCustId
 #OOCaseKindCode

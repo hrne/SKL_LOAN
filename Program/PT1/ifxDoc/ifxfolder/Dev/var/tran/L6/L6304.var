@@ -131,7 +131,7 @@ E(0,@diffLoanBal{i},#tmpDLoanBal{i})
 #diffLoanBal{i}=M,20,L
 @E(0,#oLoanBal{i}-#LoanBal{i})
 #ColName{i}=x,15,S
-#Remark{i}=x,40,L
+#Remark{i}=x,40,I
 
 ##end
 

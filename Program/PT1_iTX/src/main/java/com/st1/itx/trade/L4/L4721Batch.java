@@ -144,7 +144,7 @@ public class L4721Batch extends TradeBuffer {
 		String[] tmpKindItem = this.kindItem.split("、");
 
 		for (int txkind = 1; txkind <= 5; txkind++) {
-			CntPaper = 0;
+	
 
 			if (this.iTxKind == 0 || txkind == this.iTxKind) {
 				List<Map<String, String>> custList = new ArrayList<Map<String, String>>();

@@ -1,8 +1,3 @@
--- 程式功能：維護 MonthlyLM036Portfolio LM036Portfolio
--- 執行時機：每月底日終批次(換日前)
--- 執行方式：EXEC "Usp_L9_MonthlyLM036Portfolio_Ins"(20200430,'999999');
---
-
 CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L9_MonthlyLM036Portfolio_Ins"
 (
     -- 參數
@@ -12,6 +7,9 @@ CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L9_MonthlyLM036Portfolio_Ins"
 )
 AS
 BEGIN
+-- 程式功能：維護 MonthlyLM036Portfolio LM036Portfolio
+-- 執行時機：每月底日終批次(換日前)
+-- 執行方式：EXEC "Usp_L9_MonthlyLM036Portfolio_Ins"(20200430,'999999');
   DECLARE
     INS_CNT        INT;        -- 新增筆數
     UPD_CNT        INT;        -- 更新筆數
@@ -866,6 +864,7 @@ BEGIN
       , SQLERRM -- Sql Error Message (固定值)
       , dbms_utility.format_error_backtrace -- Sql Error Trace (固定值)
       , EmpNo -- 發動預存程序的員工編號
+      , JobTxSeq
     );
   END;
 END;

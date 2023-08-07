@@ -72,24 +72,27 @@ public class L5071 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5071 ");
 		this.totaVo.init(titaVo);
-		this.info("Run L5071");
 
 		/* 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值 */
 		this.index = titaVo.getReturnIndex();
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-		this.limit = 200;// 查全部
+		this.limit = 150;// 查全部
+
+		int iSelectType = Integer.valueOf(titaVo.getParam("SelectType"));
 
 		List<Map<String, String>> listL5071 = null;
 		try {
-			listL5071 = l5071ServiceImpl.findAll(titaVo, this.index, this.limit);
-
+			if (iSelectType == 1) {// staus只找0,2,3
+				listL5071 = l5071ServiceImpl.findType1(this.index, this.limit, titaVo);
+			} else {
+				listL5071 = l5071ServiceImpl.findAll(this.index, this.limit, titaVo);
+			}
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("L5071ServiceImpl.findAll error = " + errors.toString());
 		}
-
-		if (listL5071 != null && listL5071.size() >= this.limit) {
+		if (listL5071 != null && l5071ServiceImpl.hasNext()) {
 			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 			titaVo.setReturnIndex(this.setIndexNext());
 			// this.totaVo.setMsgEndToAuto();// 自動折返
@@ -103,11 +106,15 @@ public class L5071 extends TradeBuffer {
 			for (Map<String, String> t5071 : listL5071) {
 
 				OccursList occursList = new OccursList();
-				occursList.putParam("OOCustId", t5071.get("F0"));
-				tCustMain = sCustMainService.custIdFirst(t5071.get("F0"), titaVo);
-
-				if (tCustMain != null) {
-					CustName = StringCut.replaceLineUp(tCustMain.getCustName());
+				if (t5071.get("F15").length() != 0) {// 保證人或保貸戶此欄才有值
+					occursList.putParam("OOCustId", t5071.get("F15"));
+					CustName = t5071.get("F16");
+				} else {
+					occursList.putParam("OOCustId", t5071.get("CustId"));
+					tCustMain = sCustMainService.custIdFirst(t5071.get("CustId"), titaVo);
+					if (tCustMain != null) {
+						CustName = StringCut.replaceLineUp(tCustMain.getCustName());
+					}
 				}
 				occursList.putParam("OOCustName", CustName);
 				occursList.putParam("OOCaseKindCode", t5071.get("F1"));
@@ -131,184 +138,13 @@ public class L5071 extends TradeBuffer {
 				occursList.putParam("OOMainFinCode", t5071.get("F13"));
 				String MainFinCodeName = sNegCom.FindNegFinAcc(t5071.get("F13"), titaVo)[0];
 				occursList.putParam("OOMainFinCodeName", MainFinCodeName);
+				occursList.putParam("OOCaseCount", t5071.get("F17"));
+				occursList.putParam("OOTransCount", t5071.get("F18"));
+				occursList.putParam("OOAppr01Count", t5071.get("F19"));
 				this.totaVo.addOccursList(occursList);
 			} // for
 
 		}
-//		String CustId = titaVo.getParam("CustId").trim(); // 身份證號
-//		String CaseKindCode = titaVo.getParam("CaseKindCode").trim(); // 案件種類
-//		String CustLoanKind = titaVo.getParam("CustLoanKind").trim(); // 債權戶別
-//		String Status = titaVo.getParam("Status").trim(); // 戶況
-//
-//		int CustNo = 0;// 戶號
-//		if (CustId != null && CustId.length() != 0) {
-//			this.info("L5071 CustId=[" + CustId + "]");
-//			CustMain CustMainVO = sCustMainService.custIdFirst(CustId, titaVo);
-//			if (CustMainVO != null) {
-//				CustNo = CustMainVO.getCustNo();
-//				if (CustNo == 0) {
-//					// E1002 戶號不得為0
-//					throw new LogicException(titaVo, "E1002", "客戶資料主檔");
-//				}
-//			} else {
-//				// E0001 查詢資料不存在
-//				throw new LogicException(titaVo, "E0001", "客戶資料主檔");
-//			}
-//		}
-//		int TestType = 0;
-//		if (CaseKindCode != null && CaseKindCode.length() != 0) {
-//			TestType++;
-//		}
-//
-//		if (CustLoanKind != null && CustLoanKind.length() != 0) {
-//			TestType++;
-//		}
-//
-//		if (Status != null && Status.length() != 0) {
-//			TestType++;
-//		}
-//		/* 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值 */
-//		this.index = titaVo.getReturnIndex();
-//		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-//		this.limit = 60;// 查全部
-//
-//		Slice<NegMain> slNegMain = null;
-//		List<NegMain> lNegMain = new ArrayList<NegMain>();
-//		// 找資料庫資料而已
-//		int IsFind = 0;
-//		if (TestType == 3) {
-//			if (CustNo != 0) {
-//				slNegMain = sNegMainService.HaveCustNo(CaseKindCode, CustLoanKind, Status, CustNo, this.index, this.limit, titaVo);
-//			} else {
-//				slNegMain = sNegMainService.NoCustNo(CaseKindCode, CustLoanKind, Status, this.index, this.limit, titaVo);
-//			}
-//		} else if (TestType == 0) {
-//			if (CustNo != 0) {
-//				slNegMain = sNegMainService.CustNoEq(CustNo, this.index, this.limit, titaVo);
-//			} else {
-//				this.info("L5071 FindAll");
-//				slNegMain = sNegMainService.findAll(this.index, this.limit, titaVo);
-//			}
-//		} else if (TestType == 1) {
-//			if (CaseKindCode != null && CaseKindCode.length() != 0) {
-//				slNegMain = sNegMainService.CaseKindCodeEq(CaseKindCode, this.index, this.limit, titaVo);
-//			}
-//
-//			if (CustLoanKind != null && CustLoanKind.length() != 0) {
-//				slNegMain = sNegMainService.CustLoanKindEq(CustLoanKind, this.index, this.limit, titaVo);
-//			}
-//
-//			if (Status != null && Status.length() != 0) {
-//				slNegMain = sNegMainService.StatusEq(Status, this.index, this.limit, titaVo);
-//			}
-//		} else {
-//			if (CustNo != 0) {
-//				slNegMain = sNegMainService.CustNoEq(CustNo, this.index, this.limit, titaVo);
-//			} else {
-//				int TestHadData = 0;
-//				if (TestHadData == 0) {
-//					if (CaseKindCode != null && CaseKindCode.length() != 0) {
-//						slNegMain = sNegMainService.CaseKindCodeEq(CaseKindCode, this.index, this.limit, titaVo);
-//						TestHadData++;
-//					}
-//				}
-//
-//				if (TestHadData == 0) {
-//					if (CustLoanKind != null && CustLoanKind.length() != 0) {
-//						slNegMain = sNegMainService.CustLoanKindEq(CustLoanKind, this.index, this.limit, titaVo);
-//						TestHadData++;
-//					}
-//				}
-//
-//				if (TestHadData == 0) {
-//					if (Status != null && Status.length() != 0) {
-//						slNegMain = sNegMainService.StatusEq(Status, this.index, this.limit, titaVo);
-//						TestHadData++;
-//					}
-//				}
-//
-//			}
-//			IsFind = 1;
-//			lNegMain = slNegMain == null ? null : slNegMain.getContent();
-//			List<NegMain> lNegMainTemp = new ArrayList<NegMain>();
-//			if (lNegMain != null) {
-//				for (NegMain NegMainVO : lNegMain) {
-//					String NegMainCaseKindCode = NegMainVO.getCaseKindCode();
-//					String NegMainCustLoanKind = NegMainVO.getCustLoanKind();
-//					String NegMainStatus = NegMainVO.getStatus();
-//
-//					if (CaseKindCode != null && CaseKindCode.length() != 0) {
-//						if (!CaseKindCode.equals(NegMainCaseKindCode)) {
-//							continue;
-//						}
-//					}
-//
-//					if (CustLoanKind != null && CustLoanKind.length() != 0) {
-//						if (!CustLoanKind.equals(NegMainCustLoanKind)) {
-//							continue;
-//						}
-//					}
-//
-//					if (Status != null && Status.length() != 0) {
-//						if (!Status.equals(NegMainStatus)) {
-//							continue;
-//						}
-//					}
-//					lNegMainTemp.add(NegMainVO);
-//				}
-//				lNegMain = lNegMainTemp;
-//			} else {
-//				// lNegMain==null
-//			}
-//		}
-//		if (IsFind != 1) {
-//			lNegMain = slNegMain == null ? null : slNegMain.getContent();
-//		}
-//
-//		// 主要邏輯
-//		this.info("L5071 this.index=[" + this.index + "],this.limit=[" + this.limit + "],this.setIndexNext()=[" + this.setIndexNext() + "]");
-//		if (lNegMain != null && lNegMain.size() != 0) {
-//			// lNegMain=lNegMain.sor
-//			for (NegMain NegMainVO : lNegMain) {
-//				OccursList occursList = new OccursList();
-//				/* key 名稱需與L5071.tom相同 檔案位於.8的iTX/L5/L5071.tom */
-//				/* 將每筆資料放入Tota的OcList */
-//
-//				int ThisCustNo = NegMainVO.getCustNo();
-//				if (CustNo != 0 && CustNo != ThisCustNo) {
-//					continue;
-//				}
-//				String ThisCustId = CustId;
-//				CustMain CustMainVO = sCustMainService.custNoFirst(ThisCustNo, ThisCustNo, titaVo);
-//				ThisCustId = CustMainVO.getCustId();
-//				String MainFinCode = NegMainVO.getMainFinCode();
-//				String MainFinCodeName = sNegCom.FindCdBank(NegMainVO.getMainFinCode(), titaVo)[0];
-//				occursList.putParam("OOCustId", ThisCustId);
-//				occursList.putParam("OOCaseKindCode", NegMainVO.getCaseKindCode());
-//				occursList.putParam("OOCustLoanKind", NegMainVO.getCustLoanKind());
-//				occursList.putParam("OOStatus", NegMainVO.getStatus());
-//				occursList.putParam("OOCustNo", NegMainVO.getCustNo());
-//				occursList.putParam("OOCaseSeq", NegMainVO.getCaseSeq());
-//				occursList.putParam("OOApplDate", NegMainVO.getApplDate());
-//				occursList.putParam("OODueAmt", NegMainVO.getDueAmt());
-//				occursList.putParam("OOTotalPeriod", NegMainVO.getTotalPeriod());
-//				occursList.putParam("OOIntRate", NegMainVO.getIntRate());
-//				occursList.putParam("OOFirstDueDate", NegMainVO.getFirstDueDate());
-//				occursList.putParam("OOLastDueDate", NegMainVO.getLastDueDate());
-//				occursList.putParam("OOIsMainFin", NegMainVO.getIsMainFin());
-//				occursList.putParam("OOTotalContrAmt", NegMainVO.getTotalContrAmt());
-//				occursList.putParam("OOMainFinCode", MainFinCode);
-//				occursList.putParam("OOMainFinCodeName", MainFinCodeName);
-//				this.totaVo.addOccursList(occursList);
-//			}
-//			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-//			titaVo.setReturnIndex(this.setIndexNext());
-//			// this.totaVo.setMsgEndToAuto();// 自動折返
-//			this.totaVo.setMsgEndToEnter();// 手動折返
-//		} else {
-//			// 查無資料
-//			throw new LogicException(titaVo, "E0001", "債務協商案件主檔");
-//		}
 
 		this.addList(this.totaVo);
 		return this.sendList();
