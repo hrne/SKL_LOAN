@@ -18,16 +18,16 @@ import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.AcReceivableId;
 import com.st1.itx.db.domain.CdAcCode;
-import com.st1.itx.db.domain.InsuRenew;
 import com.st1.itx.db.domain.ForeclosureFee;
+import com.st1.itx.db.domain.InsuRenew;
 import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.CdAcCodeService;
 import com.st1.itx.db.service.ForeclosureFeeService;
 import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.data.DataLog;
-import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -71,6 +71,8 @@ public class AcReceivableCom extends TradeBuffer {
 
 	@Autowired
 	DateUtil dDateUtil;
+	@Autowired
+	GSeqCom gGSeqCom;
 
 	@Autowired
 	Parse parse;
@@ -90,6 +92,8 @@ public class AcReceivableCom extends TradeBuffer {
 	private CdAcCode tCdAcCode = new CdAcCode();
 	private TempVo tTempVo = new TempVo();
 	private List<AcReceivable> mntRvList = new ArrayList<AcReceivable>();
+	private List<ForeclosureFee> insForeclosureFeeList = new ArrayList<ForeclosureFee>();
+	private List<ForeclosureFee> delForeclosureFeeList = new ArrayList<ForeclosureFee>();
 
 	/*----------- 會計分錄更新銷帳檔 -------------- */
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -198,12 +202,16 @@ public class AcReceivableCom extends TradeBuffer {
 				if (!titaVo.getTxcd().equals("L618C")) {
 					if (ac.getAcctCode().equals("F07") || ac.getAcctCode().equals("F24")) {
 						updForeclosureFee(AcHCode, bizTbsdy, ac);
-
 					}
 				}
 
 				this.info("tAcReceivable=" + tAcReceivable);
 			}
+		}
+		// 新增或刪除沖銷法拍費用檔
+		// 不含L618C 法務費轉列催收作業
+		if (!titaVo.getTxcd().equals("L618C")) {
+			updateCloseForeclosureFee();
 		}
 
 		// 短繳本金，除銷放款科目帳外，需另作短繳本金Zxx銷帳
@@ -286,9 +294,9 @@ public class AcReceivableCom extends TradeBuffer {
 					// [契變手續費紀錄][帳管費]變更前變更後
 					if ("F29".equals(rv.getAcctCode()) || "F10".equals(rv.getAcctCode())) {
 						dataLog.setEnv(titaVo, beforeAcReceivable, tAcReceivable);
-						if("F10".equals(rv.getAcctCode())) {
+						if ("F10".equals(rv.getAcctCode())) {
 							dataLog.exec("修改會計銷帳檔-帳管費");
-						}else {
+						} else {
 							dataLog.exec("修改會計銷帳檔-契變手續費");
 						}
 					}
@@ -724,17 +732,26 @@ public class AcReceivableCom extends TradeBuffer {
 
 		ForeclosureFee tForeclosureFee = new ForeclosureFee();
 		tForeclosureFee = foreclosureFeeService.holdById(parse.stringToInteger(wkRvNo), titaVo);
-		if (tForeclosureFee == null)
+		if (tForeclosureFee == null) {
 			throw new LogicException(titaVo, "E6003", " AcReceivableCom updForeclosureFee Notfound" + wkRvNo);
-		else {
+		} else {
 			if (tForeclosureFee.getFee().compareTo(ac.getTxAmt()) != 0) {
 				throw new LogicException(titaVo, "E6003",
 						"銷帳金額與法務費不符 " + ac.getTxAmt() + "/" + tForeclosureFee.getFee());
 			}
-			if (tAcReceivable.getClsFlag() == 1) {
-				tForeclosureFee.setCloseDate(bizTbsdy); // 1-已銷
-			} else {
-				tForeclosureFee.setCloseDate(0); // 0-未銷
+			String feeCode = "F07".equals(ac.getAcctCode()) ? "11" : "15";
+			this.info("feeCode = " + feeCode);
+			this.info("ClsFlag = " + tAcReceivable.getClsFlag());
+			if (tAcReceivable.getClsFlag() == 1) {// 1-已銷
+				insForeclosureFeeList.add(tForeclosureFee);
+				tForeclosureFee.setCloseDate(bizTbsdy);
+				int closeNo = insForeclosureFee(ac, feeCode);
+				tForeclosureFee.setCloseNo(closeNo);
+
+			} else {// 0-未銷
+				tForeclosureFee.setCloseDate(0);
+				delForeclosureFee(ac, tForeclosureFee.getCloseNo(), feeCode);
+				tForeclosureFee.setCloseNo(0);
 			}
 			try {
 				foreclosureFeeService.update(tForeclosureFee, titaVo);
@@ -742,6 +759,81 @@ public class AcReceivableCom extends TradeBuffer {
 				e.printStackTrace();
 				throw new LogicException(titaVo, "E6003",
 						"AcReceivableCom updForeclosureFee " + tAcReceivableId + e.getErrorMsg());
+			}
+		}
+	}
+
+	// 新增或刪除沖銷法拍費用檔
+	private void updateCloseForeclosureFee() throws LogicException {
+		if (insForeclosureFeeList.size() > 0) {
+			try {
+				foreclosureFeeService.insertAll(insForeclosureFeeList);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0005", e.getErrorMsg());
+			}
+		}
+		if (delForeclosureFeeList.size() > 0) {
+			try {
+				foreclosureFeeService.deleteAll(delForeclosureFeeList);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+			}
+		}
+	}
+
+	private int insForeclosureFee(AcDetail ac, String feeCode) throws LogicException {
+		this.info("insForeclosureFee ....");
+		int closeNo = 0;
+		this.info("insForeclosureFeeList = " + insForeclosureFeeList.toString());
+		Boolean isAlredyInsert = false;
+		for (ForeclosureFee t : insForeclosureFeeList) {
+			if (t.getCustNo() == ac.getCustNo() && t.getFacmNo() == ac.getFacmNo() && feeCode.equals(t.getFeeCode())) {
+				t.setFee(t.getFee().subtract(ac.getTxAmt()));
+				closeNo = t.getCloseNo();
+				isAlredyInsert = true;
+			}
+		}
+		if (!isAlredyInsert) {
+
+			// new TABLE
+			ForeclosureFee tForeclosureFee = new ForeclosureFee();
+			// 自動取號程式
+			closeNo = gGSeqCom.getSeqNo(0, 0, "L2", "2601", 9999999, titaVo);
+			tForeclosureFee.setRecordNo(closeNo);
+			tForeclosureFee.setCustNo(ac.getCustNo());
+			tForeclosureFee.setFacmNo(ac.getFacmNo());
+			tForeclosureFee.setReceiveDate(titaVo.getEntDyI());
+			// 起帳日期 新增的會計日期
+			tForeclosureFee.setOpenAcDate(titaVo.getEntDyI());
+			tForeclosureFee.setDocDate(titaVo.getEntDyI());
+			tForeclosureFee.setFee(BigDecimal.ZERO.subtract(ac.getTxAmt()));
+			tForeclosureFee.setRemitBranch("0");
+			tForeclosureFee.setCaseNo("0");
+			tForeclosureFee.setFeeCode(feeCode);
+			tForeclosureFee.setLegalStaff("");
+			tForeclosureFee.setCloseNo(closeNo);
+			tForeclosureFee.setRmk("");
+			tForeclosureFee.setCloseDate(titaVo.getEntDyI());
+			insForeclosureFeeList.add(tForeclosureFee);
+		}
+
+		this.info("closeNo = " + closeNo);
+		return closeNo;
+	}
+
+	private void delForeclosureFee(AcDetail ac, int closeNo, String feeCode) throws LogicException {
+		Boolean isAlredyDelete = false;
+
+		for (ForeclosureFee t : delForeclosureFeeList) {
+			if (t.getCloseNo() == closeNo) {
+				isAlredyDelete = true;
+				break;
+			}
+		}
+		if (!isAlredyDelete) {
+			ForeclosureFee tForeclosureFee = foreclosureFeeService.holdById(closeNo, titaVo);
+			if (tForeclosureFee != null) {
+				delForeclosureFeeList.add(tForeclosureFee);
 			}
 		}
 	}

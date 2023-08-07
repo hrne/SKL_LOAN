@@ -502,13 +502,13 @@ em = null;
     this.info("negCustIdFirst " + dbName + " : " + "negCustId_0 : " + negCustId_0);
     Optional<NegMain> negMainT = null;
     if (dbName.equals(ContentName.onDay))
-      negMainT = negMainReposDay.findTopByNegCustIdIsOrderByCustNoDesc(negCustId_0);
+      negMainT = negMainReposDay.findTopByNegCustIdIsOrderByCustNoDescCaseSeqDesc(negCustId_0);
     else if (dbName.equals(ContentName.onMon))
-      negMainT = negMainReposMon.findTopByNegCustIdIsOrderByCustNoDesc(negCustId_0);
+      negMainT = negMainReposMon.findTopByNegCustIdIsOrderByCustNoDescCaseSeqDesc(negCustId_0);
     else if (dbName.equals(ContentName.onHist))
-      negMainT = negMainReposHist.findTopByNegCustIdIsOrderByCustNoDesc(negCustId_0);
+      negMainT = negMainReposHist.findTopByNegCustIdIsOrderByCustNoDescCaseSeqDesc(negCustId_0);
     else 
-      negMainT = negMainRepos.findTopByNegCustIdIsOrderByCustNoDesc(negCustId_0);
+      negMainT = negMainRepos.findTopByNegCustIdIsOrderByCustNoDescCaseSeqDesc(negCustId_0);
 
     return negMainT.isPresent() ? negMainT.get() : null;
   }

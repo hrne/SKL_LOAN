@@ -26,12 +26,7 @@ import com.st1.itx.Exception.LogicException;
 public class NegMain implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -5758678334281375022L;
-
-@EmbeddedId
+  @EmbeddedId
   private NegMainId negMainId;
 
   // 戶號

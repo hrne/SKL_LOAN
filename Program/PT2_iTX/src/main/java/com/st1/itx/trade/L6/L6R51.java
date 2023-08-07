@@ -156,6 +156,7 @@ public class L6R51 extends TradeBuffer {
 
 						cnt++;
 
+						BigDecimal oLoanBal = BigDecimal.ZERO;
 						BigDecimal loanBal = BigDecimal.ZERO;
 						prodName = tCdCode.getItem();
 						colName = tCdCode.getCode();
@@ -165,7 +166,7 @@ public class L6R51 extends TradeBuffer {
 						}
 						this.totaVo.putParam("L6r51ColName" + cnt, colName);
 						this.totaVo.putParam("L6r51ProdName" + cnt, prodName);
-						this.totaVo.putParam("oL6r51LoanBal" + cnt, df.format(loanBal));
+						this.totaVo.putParam("oL6r51LoanBal" + cnt, df.format(oLoanBal));
 						this.totaVo.putParam("L6r51LoanBal" + cnt, df.format(loanBal));
 						try {
 							remark = jsonField.get("Remark" + cnt).toString();
@@ -187,6 +188,7 @@ public class L6R51 extends TradeBuffer {
 
 					for (CdCode tCdCode : slCdCode.getContent()) {
 						cnt++;
+						BigDecimal oLoanBal = BigDecimal.ZERO;
 						BigDecimal loanBal = BigDecimal.ZERO;
 						loanBal = parse.stringToBigDecimal(tTempVo.getParam(tCdCode.getCode()));
 						prodName = tCdCode.getItem();
@@ -196,7 +198,7 @@ public class L6R51 extends TradeBuffer {
 						}
 						this.totaVo.putParam("L6r51ColName" + cnt, colName);
 						this.totaVo.putParam("L6r51ProdName" + cnt, prodName);
-						this.totaVo.putParam("oL6r51LoanBal" + cnt, df.format(loanBal));
+						this.totaVo.putParam("oL6r51LoanBal" + cnt, df.format(oLoanBal));
 						this.totaVo.putParam("L6r51LoanBal" + cnt, df.format(loanBal));
 						try {
 							remark = jsonField.get("Remark" + cnt).toString();

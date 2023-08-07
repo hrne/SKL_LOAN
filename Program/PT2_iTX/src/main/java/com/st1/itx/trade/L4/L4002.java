@@ -328,7 +328,7 @@ public class L4002 extends TradeBuffer {
 						break;
 
 					default:
-						labelRankFlag = 2;
+						labelRankFlag = 1;
 						grp1.setAcDate(tBatxDetail.getAcDate());
 						grp1.setBatchNo(tBatxDetail.getBatchNo());
 						grp1.setRepayCode(0);

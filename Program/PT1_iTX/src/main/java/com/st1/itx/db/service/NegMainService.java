@@ -211,7 +211,7 @@ public interface NegMainService {
   public Slice<NegMain> negCustIdEq(String negCustId_0, int index, int limit, TitaVo... titaVo);
 
   /**
-   * NegCustId=
+   * NegCustId= 
    *
    * @param negCustId_0 negCustId_0
    * @param titaVo Variable-Length Argument

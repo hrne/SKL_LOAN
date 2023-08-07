@@ -66,7 +66,9 @@ public class LM002 extends BatchBase implements Tasklet, InitializingBean {
 
 	public void run() throws LogicException {
 		this.info("active LM002 ");
+		String parentTranCode = titaVo.getTxcd();
 		lm002report.setTxBuffer(this.getTxBuffer());
+		lm002report.setParentTranCode(parentTranCode);
 		checkProjectLoan("01");//專案放款產表時計算
 		lm002report.exec(titaVo);
 	}

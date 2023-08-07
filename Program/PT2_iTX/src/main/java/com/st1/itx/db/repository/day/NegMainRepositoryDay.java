@@ -68,8 +68,8 @@ public interface NegMainRepositoryDay extends JpaRepository<NegMain, NegMainId> 
   // NegCustId=
   public Slice<NegMain> findAllByNegCustIdIsOrderByCustNoAsc(String negCustId_0, Pageable pageable);
 
-  // NegCustId=
-  public Optional<NegMain> findTopByNegCustIdIsOrderByCustNoDesc(String negCustId_0);
+  // NegCustId= 
+  public Optional<NegMain> findTopByNegCustIdIsOrderByCustNoDescCaseSeqDesc(String negCustId_0);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

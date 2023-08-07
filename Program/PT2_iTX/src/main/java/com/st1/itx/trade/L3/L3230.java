@@ -163,7 +163,7 @@ public class L3230 extends TradeBuffer {
 		iRemoveNo = titaVo.getParam("RemoveNo").trim(); // 銷帳編號
 		iAcSubBookCode = titaVo.getParam("AcSubBookCode"); // 區隔帳冊
 		iNote = titaVo.getParam("Description"); // 摘要內容
-		
+
 		wkTempBal = iTempAmt;
 
 		// 檢查輸入資料
@@ -318,6 +318,7 @@ public class L3230 extends TradeBuffer {
 
 		// 暫收款交易新增帳務及更新放款交易內容檔
 		if (titaVo.isHcodeNormal()) {
+			this.info("this.baTxList = " + this.baTxList.toString());
 			acRepayCom.settleTempRun(this.lLoanBorTx, this.baTxList, this.lAcDetail, titaVo);
 		}
 

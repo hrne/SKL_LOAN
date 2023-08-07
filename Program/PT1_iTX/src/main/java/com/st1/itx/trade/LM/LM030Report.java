@@ -41,6 +41,8 @@ public class LM030Report extends MakeReport {
 
 	public Boolean exec(TitaVo titaVo) throws LogicException {
 
+		baTxCom.setTxBuffer(this.txBuffer);
+		
 		List<Map<String, String>> listLM030 = null;
 
 		try {
@@ -60,6 +62,9 @@ public class LM030Report extends MakeReport {
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> listLM030) throws LogicException {
 		this.info("LM030Report exportExcel");
 
+	
+
+		
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "LM030";
@@ -135,7 +140,6 @@ public class LM030Report extends MakeReport {
 
 				try {
 					baTxCom.settingUnPaid(nextDueDate, custNo, facmNo, 0, 3, BigDecimal.ZERO, titaVo); // 3-結案
-					baTxCom.setTxBuffer(txBuffer);
 				} catch (LogicException e) {
 					this.info("ErrorMsg :" + e.getErrorMsg(titaVo) + " " + custNo + "-" + facmNo);
 				}

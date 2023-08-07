@@ -658,7 +658,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "        , Nvl(R2.\"FitRate\", 0) AS \"PresentRate\"";
 			sql += "        , Nvl(R.\"FitRate\", 0) AS \"AdjustedRate\"";
 			sql += "        , Nvl(Cb.\"BdLocation\", ' ') AS \"Location\"";
-			sql += "        , Nvl(CM.\"Zip3\", ' ') || Nvl(CM.\"Zip2\", ' ') AS \"Zip\"";
+			sql += "        , Nvl(CM.\"RegZip3\", ' ') || Nvl(CM.\"RegZip2\", ' ') AS \"Zip\"";
 			sql += "   FROM \"tmpMain\"     X";
 			sql += "   LEFT JOIN (";
 			sql += "       SELECT \"CustNo\"";

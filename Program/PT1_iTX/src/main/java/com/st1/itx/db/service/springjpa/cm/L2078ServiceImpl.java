@@ -81,12 +81,8 @@ public class L2078ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " AND  ff.\"CustNo\" >= :custNoS  ";
 		sql += " AND  ff.\"CustNo\" <= :custNoE  ";
 		sql += " ORDER BY   ";
-		sql += " CASE WHEN ff.\"CloseDate\" = 0 THEN 99991231    ";
-		sql += "      WHEN ff.\"CloseDate\" > 0 THEN ff.\"CloseDate\" ";
-		sql += "      END ASC ";
-		sql += " ,CASE WHEN ff.\"OverdueDate\" > 0 or ff.\"FeeCode\" = 15 THEN 'Y'    ";
-		sql += "     ELSE ' ' END ASC";
-		sql += " , ff.\"ReceiveDate\" ASC   ";
+		sql += "  ff.\"CloseNo\" ASC   ";
+		sql += " ,ff.\"RecordNo\" ASC   ";
 		sql += "     ";
 
 		this.info("sql=" + sql);

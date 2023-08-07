@@ -78,7 +78,7 @@ public class L2601 extends TradeBuffer {
 		tForeclosureFee.setCaseNo("0");
 		tForeclosureFee.setFeeCode(titaVo.getParam("FeeCode"));
 		tForeclosureFee.setLegalStaff(titaVo.getParam("LegalStaff"));
-		tForeclosureFee.setCloseNo(wkRecordNo);
+		tForeclosureFee.setCloseNo(0);
 		tForeclosureFee.setRmk(titaVo.getParam("Rmk"));
 
 		try {
@@ -88,7 +88,8 @@ public class L2601 extends TradeBuffer {
 		}
 
 		// 查詢各項費用
-		baTxCom.settingUnPaid(this.txBuffer.getTxCom().getTbsdy(), tForeclosureFee.getCustNo(), 000, 000, 99, BigDecimal.ZERO, titaVo); // 99-費用全部(含未到期)
+		baTxCom.settingUnPaid(this.txBuffer.getTxCom().getTbsdy(), tForeclosureFee.getCustNo(), 000, 000, 99,
+				BigDecimal.ZERO, titaVo); // 99-費用全部(含未到期)
 		this.info("累溢收 = " + baTxCom.getExcessive());
 		this.info("法拍費 = " + tForeclosureFee.getFee());
 		if (baTxCom.getExcessive().compareTo(tForeclosureFee.getFee()) >= 0) {
