@@ -23,7 +23,12 @@ import javax.persistence.Column;
 public class JobDetail implements Serializable {
 
 
-  @EmbeddedId
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -5013391170287566126L;
+
+@EmbeddedId
   private JobDetailId jobDetailId;
 
   // 交易序號

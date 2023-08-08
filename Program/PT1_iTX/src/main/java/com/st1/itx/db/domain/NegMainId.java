@@ -16,7 +16,12 @@ import javax.persistence.Embeddable;
 public class NegMainId implements Serializable {
 
 
-  // 戶號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4897551107033446749L;
+
+// 戶號
   /* 若為保證人或保貸戶,戶號一律新編999nnnn,不維護客戶主檔 */
   @Column(name = "`CustNo`")
   private int custNo = 0;

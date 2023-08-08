@@ -267,7 +267,7 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 			String oriOriTxSeq = getOriTxSeq(oriTxSeq, titaVo);
 			if (oriOriTxSeq != null && !oriOriTxSeq.isEmpty()) {
 				// 遞迴處理
-				chkOriJobDetail(oriTxSeq, jobId, stepId, oriStep, stepExecution);
+				chkOriJobDetail(oriOriTxSeq, jobId, stepId, oriStep, stepExecution);
 			}
 		}
 	}
