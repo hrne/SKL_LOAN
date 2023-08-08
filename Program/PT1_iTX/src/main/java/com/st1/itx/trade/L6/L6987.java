@@ -16,9 +16,11 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.ForeclosureFee;
+import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.ForeclosureFeeService;
+import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BaTxCom;
@@ -50,9 +52,9 @@ public class L6987 extends TradeBuffer {
 	public CustMainService sCustMainService;
 	@Autowired
 	public ForeclosureFeeService sForeclosureFeeService;
-
 	@Autowired
-	public FacStatusCom facStatusCom;
+	public LoanBorMainService loanBorMainService;
+
 	@Autowired
 	public BaTxCom baTxCom;
 
@@ -101,24 +103,25 @@ public class L6987 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0015", "查詢費用 " + e.getMessage()); // 檢查錯誤
 			}
 
+			Boolean isAllBadLoan = false;
+			isAllBadLoan = checkStatus(custNo, titaVo);
+			// 非呆帳戶、呆帳結案戶或債權轉讓戶
+			if (!isAllBadLoan) {
+				throw new LogicException("E0015", "全戶非呆帳戶、呆帳結案戶或債權轉讓戶");
+			}
+
 			for (ForeclosureFee tmpForeclosureFee : lForeclosureFee) {
 
 				// 取未銷 銷帳日期=0,轉催收日=0
 				if (tmpForeclosureFee.getCloseDate() == 0) {
 					int recordNo = tmpForeclosureFee.getRecordNo();
 					String wkAcctCode = "";
-					int wkLoanStatus = facStatusCom.getLoanStatus(tmpForeclosureFee.getCustNo(),
-							tmpForeclosureFee.getFacmNo(), this.txBuffer.getTxBizDate().getTbsDy(), titaVo);
-					// 非呆帳戶、呆帳結案戶或債權轉讓戶 跳掉
-					if (!(wkLoanStatus == 8 || wkLoanStatus == 9 || wkLoanStatus == 6)) {
-						continue;
-					}
 
 					OccursList occursList = new OccursList();
 
 					CustMain tCustMain = new CustMain();
 
-					wkAcctCode = settingUnPaid(tmpForeclosureFee, baTxList,
+					wkAcctCode = getAcctCode(tmpForeclosureFee, baTxList,
 							parse.IntegerToString(tmpForeclosureFee.getRecordNo(), 7), titaVo);
 					// 取戶名
 					tCustMain = sCustMainService.custNoFirst(tmpForeclosureFee.getCustNo(),
@@ -274,7 +277,7 @@ public class L6987 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private String settingUnPaid(ForeclosureFee f, ArrayList<BaTxVo> baTxList, String rvNo, TitaVo titaVo)
+	private String getAcctCode(ForeclosureFee f, ArrayList<BaTxVo> baTxList, String rvNo, TitaVo titaVo)
 			throws LogicException {
 		String wkAcctCode = "";
 		if (baTxList == null || baTxList.size() == 0) {
@@ -291,4 +294,20 @@ public class L6987 extends TradeBuffer {
 		return wkAcctCode;
 	}
 
+	// 檢查全戶為呆帳戶、債權轉讓戶、呆帳結案戶
+	private Boolean checkStatus(int custNo , TitaVo titaVo) throws LogicException {
+		boolean isAllBadLoan = true;
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(custNo, 0, 999, 0, 900, 0,
+				Integer.MAX_VALUE, titaVo);
+		if (slLoanBorMain != null) {
+			for (LoanBorMain t : slLoanBorMain.getContent()) {
+				if (t.getStatus() == 0 || t.getStatus() == 2 || t.getStatus() == 7) {
+					isAllBadLoan = false;					
+				}
+			}
+		}
+		return isAllBadLoan;
+
+	}
+	
 }

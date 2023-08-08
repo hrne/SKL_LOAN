@@ -191,6 +191,7 @@ public class L6R51 extends TradeBuffer {
 						BigDecimal oLoanBal = BigDecimal.ZERO;
 						BigDecimal loanBal = BigDecimal.ZERO;
 						loanBal = parse.stringToBigDecimal(tTempVo.getParam(tCdCode.getCode()));
+						oLoanBal = parse.stringToBigDecimal(tTempVo.getParam("o"+tCdCode.getCode()));
 						prodName = tCdCode.getItem();
 						colName = tCdCode.getCode();
 						if ("340".equals(prodName.substring(0, 3))) {

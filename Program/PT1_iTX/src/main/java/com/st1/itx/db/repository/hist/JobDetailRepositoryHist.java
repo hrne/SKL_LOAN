@@ -3,11 +3,14 @@ package com.st1.itx.db.repository.hist;
 
 import java.util.Optional;
 
+import java.math.BigDecimal;
+import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +39,9 @@ public interface JobDetailRepositoryHist extends JpaRepository<JobDetail, JobDet
 
   // JobCode = ,AND ExecDate >= ,AND ExecDate <= ,AND Status =
   public Slice<JobDetail> findAllByJobCodeIsAndExecDateGreaterThanEqualAndExecDateLessThanEqualAndStatusIsOrderByStepStartTimeDesc(String jobCode_0, int execDate_1, int execDate_2, String status_3, Pageable pageable);
+
+  // TxSeq = ,AND JobCode = ,AND StepId = 
+  public Optional<JobDetail> findTopByTxSeqIsAndJobCodeIsAndStepIdIsOrderByLastUpdateDesc(String txSeq_0, String jobCode_1, String stepId_2);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

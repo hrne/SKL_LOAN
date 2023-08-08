@@ -40,7 +40,7 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 		if ("true".equals(stepExecution.getJobExecution().getJobParameters().getString("loogerFg")))
 			ThreadVariable.setObject(ContentName.loggerFg, true);
 		ThreadVariable.setObject(ContentName.empnot,
-				stepExecution.getJobExecution().getJobParameters().getString(ContentName.tlrno, "BAT001"));
+				stepExecution.getJobExecution().getJobParameters().getString(ContentName.tlrno, "999999"));
 
 		String jobId = stepExecution.getJobExecution().getJobParameters().getString(ContentName.jobId);
 		String nestedJobId = stepExecution.getJobExecution().getJobInstance().getJobName();
@@ -50,14 +50,22 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 		int execDate = Integer.valueOf(new SimpleDateFormat("yyyyMMdd").format(time));
 		Timestamp startTime = new Timestamp(stepExecution.getStartTime().getTime());
 
+		String txSeq = stepExecution.getJobExecution().getJobParameters().getString(ContentName.txSeq);
+		String oriTxSeq = stepExecution.getJobExecution().getExecutionContext().getString("OriTxSeq");
+
 		this.info("StepExecListener.beforeStep : " + stepId);
 		this.info("batch execDate    : " + execDate);
 		this.info("step startTime  : " + startTime);
+		this.info("txSeq  : " + txSeq);
+		this.info("oriTxSeq  : " + oriTxSeq);
 
 		this.updateJobDetail(jobId, nestedJobId, stepId, execDate, startTime, true, stepExecution);
 
-		String txSeq = stepExecution.getJobExecution().getJobParameters().getString(ContentName.txSeq);
 		stepExecution.getExecutionContext().put("txSeq", txSeq);
+
+		if (!oriTxSeq.isEmpty()) {
+			this.chkOriJobDetail(oriTxSeq, jobId, stepId, stepExecution);
+		}
 	}
 
 	@Override
@@ -85,12 +93,24 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 			stepStatus = "F";
 			break;
 		}
+
+		// 2023-08-08 Wei
+		String oriStatus = "";
+		if (stepExecution.getExecutionContext().containsKey("OriStatus")) {
+			oriStatus = stepExecution.getExecutionContext().getString("OriStatus");
+		}
+
 		this.info("StepExecListener.afterStep : " + stepId);
 		this.info("batch execDate     : " + execDate);
 		this.info("step endTime       : " + endTime);
 		this.info("step stepStatus   : " + stepExecution.getExitStatus().getExitCode());
+		this.info("step oriStatus : " + oriStatus);
 
-		this.updateJobDetail(jobId, null, stepId, execDate, endTime, false, stepExecution, stepStatus);
+		if (oriStatus.equals("S")) {
+			this.deleteJobDetail(jobId, null, stepId, execDate, endTime, stepExecution);
+		} else {
+			this.updateJobDetail(jobId, null, stepId, execDate, endTime, false, stepExecution, stepStatus);
+		}
 
 		if (!Thread.currentThread().getName()
 				.equals(stepExecution.getJobExecution().getExecutionContext().getString(ContentName.threadName)))
@@ -102,20 +122,21 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 	/**
 	 * 更新批次工作明細檔
 	 * 
-	 * @param jobId       批次代號
-	 * @param nestedJobId 子批次代號
-	 * @param stepId      程式代號
-	 * @param execDate    批次執行日期
-	 * @param time        啟動時間 / 結束時間
-	 * @param seFg        啟動 / 結束
-	 * @param stepStatus  執行狀態
+	 * @param jobId         批次代號
+	 * @param nestedJobId   子批次代號
+	 * @param stepId        程式代號
+	 * @param execDate      批次執行日期
+	 * @param time          啟動時間 / 結束時間
+	 * @param seFg          啟動 / 結束
+	 * @param stepExecution 執行階段
+	 * @param stepStatus    執行狀態
 	 */
 	private void updateJobDetail(String jobId, String nestedJobId, String stepId, int execDate, Timestamp time,
 			boolean seFg, StepExecution stepExecution, String... stepStatus) {
 		JobDetailId jobDetailId = new JobDetailId();
 		JobDetail jobDetail = new JobDetail();
 		TitaVo titaVo = new TitaVo();
-		titaVo.putParam(ContentName.empnot, stepExecution.getJobParameters().getString(ContentName.tlrno, "BAT001"));
+		titaVo.putParam(ContentName.empnot, stepExecution.getJobParameters().getString(ContentName.tlrno, "999999"));
 
 		String txSeq = stepExecution.getJobExecution().getJobParameters().getString(ContentName.txSeq);
 		String batchType = stepExecution.getJobExecution().getJobParameters().getString(ContentName.batchType);
@@ -184,6 +205,64 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 					jobDetailService.update(jobDetail, titaVo);
 					this.info("jobDetail update. " + jobDetail.toString());
 				}
+			}
+		} catch (DBException e) {
+			this.error(e.getErrorId() + " " + e.getErrorMsg());
+		}
+	}
+
+	/**
+	 * 找原執行結果
+	 * 
+	 * @param oriTxSeq      原交易序號
+	 * @param jobId         原批次名稱
+	 * @param stepId        原步驟名稱
+	 * @param stepExecution 執行階段
+	 */
+	private void chkOriJobDetail(String oriTxSeq, String jobId, String stepId, StepExecution stepExecution) {
+		TitaVo titaVo = new TitaVo();
+		titaVo.putParam(ContentName.empnot, stepExecution.getJobParameters().getString(ContentName.tlrno, "999999"));
+		JobDetail oriJobDetail = jobDetailService.findStepFirst(oriTxSeq, jobId, stepId, titaVo);
+		if (oriJobDetail != null) {
+			String status = oriJobDetail.getStatus();
+			// 2023-08-08 Wei 新壽IT說在L6970勾重新執行的時候,已經成功的步驟不要重新執行
+			// 因此新增OriTxSeq找讓StepExecuter可以找出原本的步驟執行結果
+			stepExecution.getExecutionContext().putString("OriStatus", status);
+		} else {
+			this.error("chkOriJobDetail cannot find ori jobDetail.");
+		}
+	}
+
+	private void deleteJobDetail(String jobId, Object object, String stepId, int execDate, Timestamp endTime,
+			StepExecution stepExecution) {
+
+		JobDetailId jobDetailId = new JobDetailId();
+		JobDetail jobDetail = new JobDetail();
+		TitaVo titaVo = new TitaVo();
+		titaVo.putParam(ContentName.empnot, stepExecution.getJobParameters().getString(ContentName.tlrno, "999999"));
+
+		String txSeq = stepExecution.getJobExecution().getJobParameters().getString(ContentName.txSeq);
+		txSeq = txSeq.trim().isEmpty()
+				? stepExecution.getJobExecution().getExecutionContext().getString(ContentName.txSeq, "")
+				: txSeq;
+
+		if (txSeq.trim().isEmpty()) {
+			this.info("txSeq is Null or Empty..");
+			return;
+		} else {
+			jobDetailId.setTxSeq(txSeq);
+		}
+
+		try {
+			jobDetailId.setExecDate(execDate);
+			jobDetailId.setJobCode(jobId);
+			jobDetailId.setStepId(stepId);
+			jobDetail = jobDetailService.holdById(jobDetailId);
+			if (jobDetail == null) {
+				this.error("jobDetail is null. " + jobDetailId.toString());
+			} else {
+				jobDetailService.delete(jobDetail, titaVo);
+				this.info("jobDetail 這筆是重跑時的skip,進行 delete. " + jobDetail.toString());
 			}
 		} catch (DBException e) {
 			this.error(e.getErrorId() + " " + e.getErrorMsg());

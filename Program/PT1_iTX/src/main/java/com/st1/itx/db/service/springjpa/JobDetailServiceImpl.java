@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -239,6 +242,25 @@ em = null;
 			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public JobDetail findStepFirst(String txSeq_0, String jobCode_1, String stepId_2, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("findStepFirst " + dbName + " : " + "txSeq_0 : " + txSeq_0 + " jobCode_1 : " +  jobCode_1 + " stepId_2 : " +  stepId_2);
+    Optional<JobDetail> jobDetailT = null;
+    if (dbName.equals(ContentName.onDay))
+      jobDetailT = jobDetailReposDay.findTopByTxSeqIsAndJobCodeIsAndStepIdIsOrderByLastUpdateDesc(txSeq_0, jobCode_1, stepId_2);
+    else if (dbName.equals(ContentName.onMon))
+      jobDetailT = jobDetailReposMon.findTopByTxSeqIsAndJobCodeIsAndStepIdIsOrderByLastUpdateDesc(txSeq_0, jobCode_1, stepId_2);
+    else if (dbName.equals(ContentName.onHist))
+      jobDetailT = jobDetailReposHist.findTopByTxSeqIsAndJobCodeIsAndStepIdIsOrderByLastUpdateDesc(txSeq_0, jobCode_1, stepId_2);
+    else 
+      jobDetailT = jobDetailRepos.findTopByTxSeqIsAndJobCodeIsAndStepIdIsOrderByLastUpdateDesc(txSeq_0, jobCode_1, stepId_2);
+
+    return jobDetailT.isPresent() ? jobDetailT.get() : null;
   }
 
   @Override

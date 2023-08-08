@@ -89,7 +89,6 @@ T(3,[L6973] 資料庫批次錯誤查詢)
 #LOOP=X,1,S
 T(3,1)ASGN(LOOP$)
 
-#LogUkey=x,32,L
 #LogDate=A,8,L
 #LogTime=A,6,L
 #UspName=x,100,L
@@ -112,7 +111,6 @@ T(3,1)ASGN(LOOP$)
 !------ 下行電文TOM ------
 <sub type="TOM">
 TXFORM=L6973
-#LogUkey
 #LogDate
 #LogTime
 #UspName
@@ -134,8 +132,6 @@ TXFORM=L6973
 
 #RPTFG=0,QUERY.GRID,L6973
 #any={detail:true, header:'L6973.part', caption:'', width:1100, rowNum:20, rowList:[20,40,60]}
-
-#LogUkey
 
 #LogDate=記錄日期
 {width:80,align:'left'}

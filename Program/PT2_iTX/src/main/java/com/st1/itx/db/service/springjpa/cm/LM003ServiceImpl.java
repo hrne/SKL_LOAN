@@ -41,8 +41,9 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,SUM(lbm.\"DrawdownAmt\") \"Total\" ";
 		sql += " FROM \"LoanBorMain\" lbm ";
 		sql += " LEFT JOIN \"CustMain\" cm ON cm.\"CustNo\" = lbm.\"CustNo\" ";
-		sql += " WHERE lbm.\"RenewFlag\" = 'N' ";
+		sql += " WHERE lbm.\"RenewFlag\" = 0 ";
 		sql += "   AND cm.\"EntCode\" != 1 ";
+		sql += "   AND trunc(lbm.\"DrawdownDate\" / 100 ) between :yearMonthMin and :yearMonthMax ";
 		sql += " GROUP BY SUBSTR(lbm.\"DrawdownDate\", 1, 6) ";
 		sql += " ) ";
 		sql += "  ";
@@ -99,7 +100,7 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                   AND mlbLast.\"FacmNo\" = mlb.\"FacmNo\" ";
 		sql += "                                   AND mlbLast.\"BormNo\" = mlb.\"BormNo\" ";
 		sql += " WHERE mlb.\"EntCode\" != 1 ";
-		sql += "   AND lbm.\"RenewFlag\" = 'N' ";
+		sql += "   AND lbm.\"RenewFlag\" = 0 ";
 		sql += "   AND lbm.\"Status\" IN (0,3) ";
 		sql += "   AND lbtx.\"CustNo\" is not null ";
 		sql += "   AND mlb.\"YearMonth\" BETWEEN :yearMonthMin AND :yearMonthMax ";
@@ -117,6 +118,7 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WHERE lbtx.\"TitaTxCd\" = 'L3420' ";
 		sql += "   AND lbtx.\"TitaHCode\" = 0 ";
 		sql += "   AND JSON_VALUE(lbtx.\"OtherFields\", '$.CaseCloseCode') = 3 ";
+		sql += "   AND trunc(lbtx.\"AcDate\" / 100 ) between :yearMonthMin and :yearMonthMax ";
 		sql += " GROUP BY SUBSTR(lbtx.\"AcDate\", 1, 6) ";
 		sql += " ) ";
 		sql += "  ";
@@ -206,7 +208,7 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " FROM \"LoanBorMain\" lbm ";
 		sql += " LEFT JOIN \"CustMain\" cm ON cm.\"CustNo\" = lbm.\"CustNo\" ";
 		sql += " WHERE cm.\"EntCode\" = 2 ";
-		sql += "   AND lbm.\"RenewFlag\" = 'N' ";
+		sql += "   AND lbm.\"RenewFlag\" = 0 ";
 		sql += " GROUP BY SUBSTR(lbm.\"DrawdownDate\", 1, 4) ";
 		sql += " ) ";
 		sql += "  ";

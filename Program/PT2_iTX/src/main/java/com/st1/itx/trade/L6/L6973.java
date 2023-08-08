@@ -73,7 +73,6 @@ public class L6973 extends TradeBuffer {
 				// new occurs
 				OccursList occurslist = new OccursList();
 
-				occurslist.putParam("LogUkey", result.get("LogUkey"));
 				occurslist.putParam("LogDate", result.get("LogDate"));
 				occurslist.putParam("LogTime", result.get("LogTime"));
 				occurslist.putParam("UspName", result.get("UspName"));

@@ -1,6 +1,8 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -9,6 +11,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Column;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * JobDetail 批次工作明細檔<br>
@@ -23,12 +27,7 @@ import javax.persistence.Column;
 public class JobDetail implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -5013391170287566126L;
-
-@EmbeddedId
+  @EmbeddedId
   private JobDetailId jobDetailId;
 
   // 交易序號
@@ -101,7 +100,7 @@ public class JobDetail implements Serializable {
 
   // 子批次代號
   /* 子批次代號 */
-  @Column(name = "`NestJobCode`", length = 10)
+  @Column(name = "`NestJobCode`", length = 30)
   private String nestJobCode;
 
 

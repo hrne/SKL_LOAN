@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.JobDetail;
@@ -93,6 +95,17 @@ public interface JobDetailService {
    * @return Slice JobDetail JobDetail of List
    */
   public Slice<JobDetail> findStatusExecDateIn(String jobCode_0, int execDate_1, int execDate_2, String status_3, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * TxSeq = ,AND JobCode = ,AND StepId = 
+   *
+   * @param txSeq_0 txSeq_0
+   * @param jobCode_1 jobCode_1
+   * @param stepId_2 stepId_2
+   * @param titaVo Variable-Length Argument
+   * @return Slice JobDetail JobDetail of List
+   */
+  public JobDetail findStepFirst(String txSeq_0, String jobCode_1, String stepId_2, TitaVo... titaVo);
 
   /**
    * hold By JobDetail

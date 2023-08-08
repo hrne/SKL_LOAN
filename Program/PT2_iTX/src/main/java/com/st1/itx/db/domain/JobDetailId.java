@@ -2,8 +2,12 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * JobDetail 批次工作明細檔<br>
@@ -16,12 +20,7 @@ import javax.persistence.Embeddable;
 public class JobDetailId implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -5410080741249288032L;
-
-// 交易序號
+  // 交易序號
   /* 交易序號 */
   @Column(name = "`TxSeq`", length = 20)
   private String txSeq = " ";

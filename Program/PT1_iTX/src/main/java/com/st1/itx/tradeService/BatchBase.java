@@ -259,6 +259,19 @@ public abstract class BatchBase {
 
 		ExecutionContext ec = chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext();
 
+		// 2023-08-08 Wei 新壽IT說在L6970勾重新執行的時候,已經成功的步驟不要重新執行
+		// 因此新增OriTxSeq找讓StepExecuter可以找出原本的步驟執行結果
+		ExecutionContext stepEc = chunkContext.getStepContext().getStepExecution().getExecutionContext();
+		if (stepEc.containsKey("OriStatus")) {
+			String oriStatus = stepEc.getString("OriStatus");
+			if (oriStatus.equals("S")) {
+				// 原本執行成功 不重複執行
+				this.info("原本執行成功 不重複執行.");
+				sc.setExitStatus(ExitStatus.COMPLETED);
+				return RepeatStatus.FINISHED;
+			}
+		}
+
 		try {
 			this.run();
 			sc.setExitStatus(ExitStatus.COMPLETED);

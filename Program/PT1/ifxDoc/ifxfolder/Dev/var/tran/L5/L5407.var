@@ -67,7 +67,6 @@ C(3,#FunctionCd,2,T(1,@StatusFg,#NTXBUF,15,1),$)
 !C(3,#FunctionCd,8,T(1,@EffectiveDate,#NTXBUF,16,7),$)
 !C(3,#FunctionCd,8,T(1,@EmpClass,#NTXBUF,23,1),$)
 C(2,#FunctionCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除))
-ALERT(#NTXBUF)
 
 #DealOther=X,1,S
 <include src="ROM.icf::L5R39.dec"/>
