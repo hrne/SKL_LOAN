@@ -233,11 +233,6 @@ E(0,#OOTdBal)
 IF(#OOTdBal1==0,S,$)
 X(#OOTdBal1)
 
-! 最後修改日期
-#OOLastUpdate=x,20,S
-
-! 最後修改人員
-#OOLastEmp=x,47,S
 
 !判斷是否需顯示明細按鈕用
 !Y/N
@@ -278,8 +273,6 @@ TXFORM=L6902
 #OOCrAmt
 #OODbCr
 #OOTdBal
-#OOLastUpdate
-#OOLastEmp
 #OOHasDetail
 
 ^

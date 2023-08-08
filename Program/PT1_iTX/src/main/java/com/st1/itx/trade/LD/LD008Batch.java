@@ -43,7 +43,7 @@ public class LD008Batch extends BatchBase implements Tasklet, InitializingBean {
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		lD008Report.setParentTranCode(this.getParent());
-		return this.exec(contribution, "D");
+		return this.exec(contribution, "D", chunkContext);
 	}
 
 	@Override

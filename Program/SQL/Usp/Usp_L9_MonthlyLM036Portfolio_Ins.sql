@@ -49,7 +49,7 @@ BEGIN
          , S0."SyndLoanBal"                AS "SyndLoanBal" -- 聯貸案 DECIMAL 16 2 法人放款之細項
          , S0."StockLoanBal"               AS "StockLoanBal" -- 股票質押 DECIMAL 16 2 法人放款之細項
          , S0."OtherLoanBal"               AS "OtherLoanbal" -- 一般法人放款 DECIMAL 16 2 法人放款之細項
-         , S2."AmortizeTotal"              AS "AmortizeTotal" -- 溢折價 DECIMAL 16 2 
+         , NVL(S2."AmortizeTotal",0)       AS "AmortizeTotal" -- 溢折價 DECIMAL 16 2 
          , S1."OvduExpense"                AS "OvduExpense" -- 催收費用 DECIMAL 16 2 
          , S0."NaturalPersonLargeCounts"   AS "NaturalPersonLargeCounts" -- 自然人大額授信件件數 DECIMAL 16  自然人放款一千萬以上
          , S0."NaturalPersonLargeTotal"    AS "NaturalPersonLargeTotal" -- 自然人大額授信件餘額 DECIMAL 16 2 自然人放款一千萬以上

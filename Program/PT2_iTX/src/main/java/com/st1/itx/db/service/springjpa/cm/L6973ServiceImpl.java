@@ -87,6 +87,7 @@ public class L6973ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , \"CreateEmpNo\"     AS \"ExecEmpNo\" ";
 		sql += " FROM \"JobDetail\" ";
 		sql += " WHERE \"TxSeq\" = :jobTxSeq ";
+		sql += "   AND \"Status\" = 'F' ";
 		sql += "   AND \"ErrContent\" IS NOT NULL ";
 		sql += " )";
 		sql += " SELECT TO_CHAR(\"LogDate\") AS \"LogDate\" ";

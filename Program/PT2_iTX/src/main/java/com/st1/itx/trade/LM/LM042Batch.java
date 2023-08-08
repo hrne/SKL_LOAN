@@ -50,26 +50,26 @@ public class LM042Batch extends BatchBase implements Tasklet, InitializingBean {
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		lM042Report.setParentTranCode(this.getParent());
-		return this.exec(contribution, "D");
+		return this.exec(contribution, "D", chunkContext);
 	}
 
 	@Override
 	public void run() throws LogicException {
 		this.info("active LM042Batch");
-
+		
 		// 會計日期: 系統會計日 YYYMMDD
-		int acDate = titaVo.getEntDyI();
+		int acDate =titaVo.getEntDyI();
 		titaVo.putParam("YearMonth", acDate);
-
-		// 先檢查當月資料 新增或更新
+		
+		//先檢查當月資料 新增或更新
 		lMR42.run(titaVo);
-
+		
 		int yearMonth = (acDate / 100) + 191100;
-
+				
 		Slice<MonthlyLM042RBC> sMonthlyLM042RBC;
-		sMonthlyLM042RBC = sMonthlyLM042RBCService.findYearMonthAll(yearMonth, 0, 12, titaVo);
+		sMonthlyLM042RBC = sMonthlyLM042RBCService.findYearMonthAll(yearMonth, 0, 12, titaVo);		
 		List<MonthlyLM042RBC> lMonthlyLM042RBC = sMonthlyLM042RBC == null ? null : sMonthlyLM042RBC.getContent();
-
+		
 		for (MonthlyLM042RBC tMonthlyLM042RBC : lMonthlyLM042RBC) {
 			if ("1".equals(tMonthlyLM042RBC.getLoanType())) {
 				switch (tMonthlyLM042RBC.getLoanItem()) {
@@ -96,14 +96,14 @@ public class LM042Batch extends BatchBase implements Tasklet, InitializingBean {
 			}
 
 		}
-
+		
 		dateUtil.init();
 		dateUtil.setDate_1(dateUtil.getNowIntegerRoc() / 100 * 100 + dateUtil.getMonLimit());
-		dateUtil.setDate_2((dateUtil.getDate_1Integer() / 100 * 100) - 100 + dateUtil.getMonLimit());
+		dateUtil.setDate_2((dateUtil.getDate_1Integer() / 100 * 100)-100 + dateUtil.getMonLimit());
 
-		this.info("lastYMD=" + dateUtil.getDate_2Integer());
-		this.info("thisYMD=" + dateUtil.getDate_1Integer());
+		this.info("lastYMD="+dateUtil.getDate_2Integer());
+		this.info("thisYMD="+dateUtil.getDate_1Integer());
 
-		lM042Report.exec(titaVo, dateUtil.getDate_2Integer(), dateUtil.getDate_1Integer());
+		lM042Report.exec(titaVo,dateUtil.getDate_2Integer(),dateUtil.getDate_1Integer());
 	}
 }

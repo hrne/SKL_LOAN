@@ -32,7 +32,7 @@ public class LY006Batch extends BatchBase implements Tasklet, InitializingBean {
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		lY006Report.setParentTranCode(this.getParent());
-		return this.exec(contribution, "M");
+		return this.exec(contribution, "M", chunkContext);
 	}
 
 	@Override

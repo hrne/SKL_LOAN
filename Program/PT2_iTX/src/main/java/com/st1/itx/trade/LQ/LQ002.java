@@ -20,7 +20,6 @@
 //  */
 //public class LQ002 extends TradeBuffer {
 //	@SuppressWarnings("unused")
-//	// private static final Logger logger = LoggerFactory.getLogger(LQ002.class);
 //
 //	@Autowired
 //	public LQ002Report lq002report;
@@ -70,8 +69,7 @@ public class LQ002 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(LQ002.class);
-		return this.exec(contribution, "M");
+		return this.exec(contribution, "M", chunkContext);
 	}
 
 	@Override

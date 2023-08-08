@@ -24,7 +24,6 @@ import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BaTxCom;
-import com.st1.itx.util.common.FacStatusCom;
 import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;

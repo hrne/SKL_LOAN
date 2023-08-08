@@ -32,20 +32,20 @@ public class LM003Batch extends BatchBase implements Tasklet, InitializingBean {
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		lM003Report.setParentTranCode(this.getParent());
-		return this.exec(contribution, "M");
+		return this.exec(contribution, "M", chunkContext);
 	}
 
 	@Override
 	public void run() throws LogicException {
 		this.info("active LM003Batch ");
-
+		
 		// 年月: 年初~本月 YYY / MM
 		titaVo.putParam("inputYearStart", titaVo.getEntDyI() / 10000);
 		titaVo.putParam("inputMonthStart", 1);
-
+		
 		titaVo.putParam("inputYearEnd", titaVo.getEntDyI() / 10000);
 		titaVo.putParam("inputMonthEnd", titaVo.getEntDyI() / 100 % 100);
-
+		
 		lM003Report.exec(titaVo);
 	}
 }

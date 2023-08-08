@@ -15,7 +15,7 @@ import com.st1.itx.tradeService.BatchBase;
 /**
  * LM016Batch
  * 
- * @author
+ * @author  
  * @version 1.0.0
  */
 @Service("LM016Batch")
@@ -36,16 +36,16 @@ public class LM016Batch extends BatchBase implements Tasklet, InitializingBean {
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		LM016Report.setParentTranCode(this.getParent());
-		return this.exec(contribution, "D");
+		return this.exec(contribution, "D", chunkContext);
 	}
 
 	@Override
 	public void run() throws LogicException {
 		this.info("active LM016Batch");
 
-		String custNoMin = "0000000";
-		String custNoMax = "9999999";
-
+		String custNoMin = "0000000" ;
+		String custNoMax = "9999999" ;
+		
 		titaVo.putParam("CustNoMin", custNoMin);
 		titaVo.putParam("CustNoMax", custNoMax);
 

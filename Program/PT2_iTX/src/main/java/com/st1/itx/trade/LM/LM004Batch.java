@@ -13,10 +13,11 @@ import com.st1.itx.Exception.LogicException;
 
 import com.st1.itx.tradeService.BatchBase;
 
+
 /**
  * LM004Batch
  * 
- * @author
+ * @author 
  * @version 1.0.0
  */
 @Service("LM004Batch")
@@ -25,6 +26,7 @@ public class LM004Batch extends BatchBase implements Tasklet, InitializingBean {
 
 	@Autowired
 	LM004Report LM004Report;
+
 
 	String tranCode = "LM004";
 	String tranName = "長中短期放款到其明細表";
@@ -37,7 +39,7 @@ public class LM004Batch extends BatchBase implements Tasklet, InitializingBean {
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		LM004Report.setParentTranCode(this.getParent());
-		return this.exec(contribution, "D");
+		return this.exec(contribution, "D", chunkContext);
 	}
 
 	@Override

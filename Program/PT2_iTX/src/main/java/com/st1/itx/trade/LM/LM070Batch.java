@@ -17,7 +17,7 @@ import com.st1.itx.tradeService.BatchBase;
 /**
  * LM070Batch
  * 
- * @author
+ * @author  
  * @version 1.0.0
  */
 @Service("LM070Batch")
@@ -41,7 +41,7 @@ public class LM070Batch extends BatchBase implements Tasklet, InitializingBean {
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		LM070Report.setParentTranCode(this.getParent());
-		return this.exec(contribution, "D");
+		return this.exec(contribution, "D", chunkContext);
 	}
 
 	@Override
@@ -55,6 +55,7 @@ public class LM070Batch extends BatchBase implements Tasklet, InitializingBean {
 		int year = cdWorkMonth.getYear() - 1911;
 		int month = cdWorkMonth.getMonth();
 
+		
 		titaVo.putParam("inputYear", year);
 		titaVo.putParam("inputMonth", month);
 

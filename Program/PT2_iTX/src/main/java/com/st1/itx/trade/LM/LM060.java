@@ -32,7 +32,7 @@ public class LM060 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		return this.exec(contribution, "M");
+		return this.exec(contribution, "M", chunkContext);
 	}
 
 	@Override
@@ -52,7 +52,7 @@ public class LM060 extends BatchBase implements Tasklet, InitializingBean {
 		int iMonth = (mfbsdy / 100) % 100;
 		// 當年月
 		int thisYM = 0;
-		// 月底日
+		//月底日
 //		int ymEnd = mfbsdy;
 
 		// 月底日是否大於帳務日 判斷取哪個年月
@@ -65,6 +65,6 @@ public class LM060 extends BatchBase implements Tasklet, InitializingBean {
 
 		thisYM = iYear * 100 + iMonth;
 
-		lm060report.exec(titaVo, this.txBuffer.getTxCom(), thisYM);
+		lm060report.exec(titaVo, this.txBuffer.getTxCom(),thisYM);
 	}
 }

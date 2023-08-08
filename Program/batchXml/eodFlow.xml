@@ -26,6 +26,11 @@
 		</step>
 		<step id="l6QuitEmpIns" parent="parentStep">
 			<tasklet ref="L6QuitEmpIns" />
+			<next on="COMPLETED" to="l6CdStockIns" />
+			<end on="FAILED" />
+		</step>
+		<step id="l6CdStockIns" parent="parentStep">
+			<tasklet ref="L6CdStockIns" />
 			<next on="COMPLETED" to="l2CustDataCtrlIns" />
 			<end on="FAILED" />
 		</step>

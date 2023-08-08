@@ -32,13 +32,13 @@ public class LM057 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		return this.exec(contribution, "M");
+		return this.exec(contribution, "M", chunkContext);
 	}
 
 	@Override
 	public void run() throws LogicException {
 		this.info("active LM057 ");
-
+		
 		// 帳務日(西元)
 		int tbsdy = this.txBuffer.getTxCom().getTbsdyf();
 		// 月底日(西元)
@@ -46,12 +46,15 @@ public class LM057 extends BatchBase implements Tasklet, InitializingBean {
 		// 上個月底日(西元)
 		int lmndy = this.txBuffer.getTxCom().getLmndyf();
 
+
 		// 判斷帳務日與月底日是否同一天
 		if (tbsdy == mfbsdy) {
-			lm057report.exec(titaVo, mfbsdy);
-		} else {
+			lm057report.exec(titaVo,mfbsdy);
+		}else {
 			lm057report.exec(titaVo, lmndy);
 		}
-
+		
+		
+	
 	}
 }

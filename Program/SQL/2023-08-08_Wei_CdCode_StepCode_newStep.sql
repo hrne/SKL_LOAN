@@ -1,0 +1,4 @@
+Insert into "CdCode" ("DefCode","DefType","Code","Item","Enable","EffectFlag","CreateDate","CreateEmpNo","LastUpdate","LastUpdateEmpNo","MinCodeLength","MaxCodeLength","IsNumeric")
+values ('StepCode',6,'l9MonthlyLM036PortfolioIns','維護MonthlyLM036月報工作檔','Y',0,to_timestamp('2023-07-20 10:36:41.990000000','YYYY-MM-DD HH24:MI:SS.FF'),'001702',to_timestamp('2023-07-20 10:36:41.990000000','YYYY-MM-DD HH24:MI:SS.FF'),'001702',1,30,null);
+Insert into "CdCode" ("DefCode","DefType","Code","Item","Enable","EffectFlag","CreateDate","CreateEmpNo","LastUpdate","LastUpdateEmpNo","MinCodeLength","MaxCodeLength","IsNumeric")
+values ('StepCode',6,'l6CdStockIns','維護股票代號檔','Y',0,to_timestamp('2023-07-20 10:36:41.990000000','YYYY-MM-DD HH24:MI:SS.FF'),'001702',to_timestamp('2023-07-20 10:36:41.990000000','YYYY-MM-DD HH24:MI:SS.FF'),'001702',1,30,null);

@@ -172,6 +172,16 @@ public interface JobMainService {
 
   /**
    * Stored Procedure<br>
+   * (日終批次)更新股票代號檔
+   * @param  InputEmpNo String
+   * @param  JobTxSeq String
+   * @param titaVo Variable-Length Argument
+   *
+   */
+  public void Usp_L6_CdStock_Ins(String InputEmpNo, String JobTxSeq, TitaVo... titaVo);
+
+  /**
+   * Stored Procedure<br>
    * (日終批次)維護 CustDataCtrl 結清戶個資控管檔
    * @param  tbsdyf int
    * @param  empNo String

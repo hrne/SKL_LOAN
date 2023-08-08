@@ -61,7 +61,7 @@ public class LM002 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		return this.exec(contribution, "M");
+		return this.exec(contribution, "M", chunkContext);
 	}
 
 	public void run() throws LogicException {
@@ -182,6 +182,7 @@ public class LM002 extends BatchBase implements Tasklet, InitializingBean {
 		
 		
 		for (Map<String, String> r : result) {
+			tTempVo.putParam("o"+r.get("Type") + "LoanBal", r.get("LoanBal"));
 			tTempVo.putParam(r.get("Type") + "LoanBal", r.get("LoanBal"));
 		}
 

@@ -134,17 +134,18 @@ public class L6304 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
-//
-//			titaVo.setDataBaseOnMon();// 指定月報環境
-//
-//			try {
-//				sCdCommService.update(uCdComm, titaVo);
-//
-//			} catch (DBException e) {
-//				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
-//			}
-//
-//			titaVo.setDataBaseOnOrg();// 還原原本的環境
+
+			this.info("onMon");
+			titaVo.setDataBaseOnMon();// 指定月報環境
+
+			try {
+				sCdCommService.update(uCdComm, titaVo);
+
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
+			}
+
+			titaVo.setDataBaseOnOrg();// 還原原本的環境
 
 			iDataLog.setEnv(titaVo, oldCdComm, uCdComm);
 			iDataLog.exec("修改專案放款");
@@ -173,17 +174,18 @@ public class L6304 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時，發生錯誤
 			}
+			
+			this.info("onMon");
+			titaVo.setDataBaseOnMon();// 指定月報環境
 
-//			titaVo.setDataBaseOnMon();// 指定月報環境
-//
-//			try {
-//				sCdCommService.delete(dCdComm);
-//
-//			} catch (DBException e) {
-//				throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時，發生錯誤
-//			}
-//
-//			titaVo.setDataBaseOnOrg();// 還原原本的環境
+			try {
+				sCdCommService.delete(dCdComm);
+
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時，發生錯誤
+			}
+
+			titaVo.setDataBaseOnOrg();// 還原原本的環境
 
 			iDataLog.setEnv(titaVo, oldDCdComm, dCdComm);
 			iDataLog.exec("刪除專案放款");

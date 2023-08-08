@@ -63,7 +63,7 @@ public class LP004 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Autowired
 	LP004Report lP004Report;
-
+	
 	@Autowired
 	WebClient webClient;
 
@@ -76,7 +76,7 @@ public class LP004 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		return this.exec(contribution, "M");
+		return this.exec(contribution, "M", chunkContext);
 	}
 
 	@Override
@@ -85,7 +85,8 @@ public class LP004 extends BatchBase implements Tasklet, InitializingBean {
 		lP004Report.setTxBuffer(this.getTxBuffer());
 		lP004Report.setParentTranCode(this.getParent());
 		lP004Report.exec(titaVo);
-		webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "LP004單位成績(內部網站)", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y", "LC009",
+				titaVo.getTlrNo(), "LP004單位成績(內部網站)", titaVo);
 	}
 
 }

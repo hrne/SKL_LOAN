@@ -49,7 +49,7 @@ public class LD007Batch extends BatchBase implements Tasklet, InitializingBean {
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		lD007Report.setParentTranCode(this.getParent());
-		return this.exec(contribution, "D");
+		return this.exec(contribution, "D", chunkContext);
 	}
 
 	@Override
@@ -59,7 +59,7 @@ public class LD007Batch extends BatchBase implements Tasklet, InitializingBean {
 		int tbsdyf = this.txBuffer.getTxCom().getTbsdyf();
 
 		CdWorkMonth cdWorkMonth = sCdWorkMonthService.findDateFirst(tbsdyf, tbsdyf, titaVo);
-
+		
 		if (cdWorkMonth == null)
 			throw new LogicException("E0001", "放款業績工作月對照檔查無本日資料");
 
@@ -72,7 +72,7 @@ public class LD007Batch extends BatchBase implements Tasklet, InitializingBean {
 		titaVo.putParam("custNo", 0);
 		titaVo.putParam("facmNo", 0);
 		titaVo.putParam("bsOfficer", "");
-
+		
 		lD007Report.exec(titaVo);
 	}
 }

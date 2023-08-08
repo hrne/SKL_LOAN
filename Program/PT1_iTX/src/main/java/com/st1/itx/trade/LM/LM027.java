@@ -22,7 +22,6 @@ import com.st1.itx.tradeService.BatchBase;
 // */
 //public class LM027 extends TradeBuffer {
 //	@SuppressWarnings("unused")
-//	// private static final Logger logger = LoggerFactory.getLogger(LM027.class);
 //
 //	@Autowired
 //	public LM027Report lm027report;
@@ -60,8 +59,7 @@ public class LM027 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(LM027.class);
-		return this.exec(contribution, "M");
+		return this.exec(contribution, "M", chunkContext);
 	}
 
 	@Override

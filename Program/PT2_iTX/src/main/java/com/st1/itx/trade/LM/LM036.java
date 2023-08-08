@@ -40,7 +40,7 @@ public class LM036 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		return this.exec(contribution, "M");
+		return this.exec(contribution, "M", chunkContext);
 	}
 
 	@Override
@@ -65,6 +65,7 @@ public class LM036 extends BatchBase implements Tasklet, InitializingBean {
 		}
 
 		thisYM = iYear * 100 + iMonth;
+
 
 		lM036Report.exec(titaVo, thisYM);
 

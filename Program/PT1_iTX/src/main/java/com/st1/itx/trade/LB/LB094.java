@@ -28,7 +28,7 @@ public class LB094 extends BatchBase implements Tasklet, InitializingBean {
 	public LB094Report lb094Report;
 
 	@Autowired
-	DateUtil dDateUtil;
+	DateUtil dDateUtil; 
 
 	@Autowired
 	WebClient webClient;
@@ -41,7 +41,7 @@ public class LB094 extends BatchBase implements Tasklet, InitializingBean {
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		this.info("LB094 active RepeatStatus execute ");
-		return this.exec(contribution, "M");
+		return this.exec(contribution, "M", chunkContext);
 	}
 
 	@Override
@@ -49,18 +49,17 @@ public class LB094 extends BatchBase implements Tasklet, InitializingBean {
 		this.info("LB094 active LB094 ");
 		this.info("LB094 titaVo.getEntDyI() =" + this.titaVo.getEntDyI());
 
-		// String tranCode = "LB094";
-		// String tranName = "股票擔保品明細檔";
+		//String tranCode = "LB094";
+		//String tranName = "股票擔保品明細檔";
 
 		lb094Report.setTxBuffer(this.txBuffer);
 
 		// this.titaVo.setDataBaseOnMon(); // 月報資料庫
 		boolean isFinish = lb094Report.exec(titaVo); // 使用月報資料庫
 
-		// webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(),
-		// "Y", "LC009", titaVo.getTlrNo(),
-		// tranCode + tranName + (isFinish ? "已完成" : "查無資料"), titaVo);
-
+		//webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+		//		tranCode + tranName + (isFinish ? "已完成" : "查無資料"), titaVo);
+		
 	}
 
 }

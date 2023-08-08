@@ -31,7 +31,7 @@ public class LM059 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		return this.exec(contribution, "M");
+		return this.exec(contribution, "M", chunkContext);
 	}
 
 	@Override
@@ -67,6 +67,6 @@ public class LM059 extends BatchBase implements Tasklet, InitializingBean {
 		thisYM = iYear * 100 + iMonth;
 
 		lm059report.setTxBuffer(this.getTxBuffer());
-		lm059report.exec(titaVo, thisYM, ymEnd, lastYM);
+		lm059report.exec(titaVo, thisYM, ymEnd,lastYM);
 	}
 }

@@ -28,7 +28,7 @@ public class LNM39DP extends BatchBase implements Tasklet, InitializingBean {
 	public LNM39DPReport lnm39dpReport;
 
 	@Autowired
-	DateUtil dDateUtil;
+	DateUtil dDateUtil; 
 
 	@Autowired
 	WebClient webClient;
@@ -41,7 +41,7 @@ public class LNM39DP extends BatchBase implements Tasklet, InitializingBean {
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		this.info("LNM39DP active RepeatStatus execute ");
-		return this.exec(contribution, "M");
+		return this.exec(contribution, "M", chunkContext);
 	}
 
 	@Override
@@ -49,18 +49,17 @@ public class LNM39DP extends BatchBase implements Tasklet, InitializingBean {
 		this.info("LNM39DP active LNM39DP ");
 		this.info("LNM39DP titaVo.getEntDyI() =" + this.titaVo.getEntDyI());
 
-		// String tranCode = "LNM39DP";
-		// String tranName = "LNM39DP 欄位清單４";
+		//String tranCode = "LNM39DP";
+		//String tranName = "LNM39DP 欄位清單４";
 
 		lnm39dpReport.setTxBuffer(this.txBuffer);
 
 		// this.titaVo.setDataBaseOnMon(); // 月報資料庫
 		boolean isFinish = lnm39dpReport.exec(titaVo); // 使用月報資料庫
 
-		// webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(),
-		// "Y", "LC009", titaVo.getTlrNo(),
-		// tranCode + tranName + (isFinish ? "已完成" : "查無資料"), titaVo);
-
+		//webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+		//		tranCode + tranName + (isFinish ? "已完成" : "查無資料"), titaVo);
+		
 	}
 
 }

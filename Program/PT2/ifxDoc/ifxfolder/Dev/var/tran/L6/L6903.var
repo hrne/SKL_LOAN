@@ -66,11 +66,11 @@ T(4,CHAIN$)
 T(2,@RimTxCode,#TXCD)
 
 !從L9742帶值進來並自動查詢
-#NTXBUF=X,1,S
+#NTXBUF=X,100,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
-!E(0,@CustNo,0)
-!E(0,@AcDateSt,#SYSDATE)
-!E(0,@AcDateEd,#SYSDATE)
+! E(0,@CustNo,0)
+! E(0,@AcDateSt,#SYSDATE)
+! E(0,@AcDateEd,#SYSDATE)
 !XMT()
 
 #CHAIN_AcBookCode=X,3,S
@@ -98,7 +98,7 @@ C(3,#CHAIN,1,T(2,@AcSubCode,#CHAIN_AcSubCode),)
 C(3,#CHAIN,1,T(2,@AcDtlCode,#CHAIN_AcDtlCode),)
 C(3,#CHAIN,1,T(2,@AcDateSt,#CHAIN_AcDate),)
 C(3,#CHAIN,1,T(2,@AcDateEd,#CHAIN_AcDate),)
-
+ALERT(#NTXBUF)
 #FdAcBookCode=X,2,L
 #FdAcSubBookCode=X,2,L
 

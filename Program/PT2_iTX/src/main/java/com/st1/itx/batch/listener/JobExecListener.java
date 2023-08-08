@@ -134,14 +134,13 @@ public class JobExecListener extends SysLogger implements JobExecutionListener {
 					jobMain.setStatus("U");
 					jobMainService.insert(jobMain, titaVo);
 				}
-				
+
 				ExecutionContext jobExecutionContext = jobExecution.getExecutionContext();
 				// 若不存在才跑
 				if (!jobExecutionContext.containsKey("OriTxSeq")) {
 					// 2023-08-08 Wei 新壽IT說在L6970勾重新執行的時候,已經成功的步驟不要重新執行
 					// 因此新增OriTxSeq找讓StepExecuter可以找出原本的步驟執行結果
-					String oriTxSeq = getOriTxSeq(txSeq, titaVo);
-					jobExecution.getExecutionContext().putString("OriTxSeq", oriTxSeq);
+					getOriTxSeq(txSeq, jobExecutionContext, titaVo);
 				}
 			} else {
 				boolean status = true;
@@ -162,36 +161,38 @@ public class JobExecListener extends SysLogger implements JobExecutionListener {
 		}
 	}
 
-	private String getOriTxSeq(String txSeq, TitaVo titaVo) {
+	private void getOriTxSeq(String txSeq, ExecutionContext jobExecutionContext, TitaVo titaVo) {
 		String oriTxSeq = "";
 		TxCruiserId txCruiserId = new TxCruiserId();
 		txCruiserId.setTxSeq(txSeq);
 		if (!txSeq.contains("-")) {
 			this.error("getOriTxSeq txSeq has not \"-\" , txSeq = " + txSeq);
-			return oriTxSeq;
+			return;
 		}
 		String[] s = txSeq.split("-");
 		if (s.length < 2) {
 			this.error("getOriTxSeq txSeq.split(\"-\") length < 2 , txSeq = " + txSeq);
-			return oriTxSeq;
+			return;
 		}
 		txCruiserId.setTlrNo(s[1]);
 		TxCruiser txCruiser = txCruiserService.findById(txCruiserId, titaVo);
 		if (txCruiser == null) {
-			return oriTxSeq;
+			return;
 		}
 		String parameters = txCruiser.getParameter();
 		JSONObject p;
 		String oriStatus;
+		String oriStepId;
 		try {
 			p = new JSONObject(parameters);
 			oriTxSeq = p.getString("OOJobTxSeq");
 			oriStatus = p.getString("OOStatus");
 			if (oriStatus.equals("S")) {
-				// 若原本勾的那筆STEP是成功的 就全部重跑
-				// 只要將oriTxSeq放空白 就會全部重跑
-				return "";
+				// 若原本勾的那筆STEP是成功的 就這步開始重跑
+				oriStepId = p.getString("OOStepId");
+				jobExecutionContext.putString("OriStep", oriStepId);
 			}
+			jobExecutionContext.putString("OriTxSeq", oriTxSeq);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -199,9 +200,7 @@ public class JobExecListener extends SysLogger implements JobExecutionListener {
 					"getOriTxSeq parameters transfer to JSONObject and getString(\"OOJobTxSeq\") error, parameters = "
 							+ parameters);
 			this.error("Exception = " + e.getMessage());
-			return "";
 		}
-		return oriTxSeq;
 	}
 
 	protected String getNextHostTranC() {

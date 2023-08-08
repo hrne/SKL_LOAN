@@ -1209,9 +1209,9 @@ BEGIN
          , CASE
              WHEN NVL(ML."AcctCode",'0') = '990'  THEN 0
              WHEN M."DerDate" != 0  AND M."OvduDate" = 0                        -- 減損發生日,2022/12/6若無轉催日則計算起日為第一筆利率生效日
-             THEN "Fn_CalculateDerogationInterest"(M."CustNo",M."FacmNo",M."BormNo",NVL(ML."LoanBalance",0),NVL(LR."FitRate",0),LR1."EffectDate",M."DerDate")
+             THEN NVL("Fn_CalculateDerogationInterest"(M."CustNo",M."FacmNo",M."BormNo",NVL(ML."LoanBalance",0),NVL(LR."FitRate",0),LR1."EffectDate",M."DerDate"),0)
              WHEN M."DerDate" != 0  AND M."OvduDate" > 0                        -- 減損發生日,若有轉催日則計算起日為繳息迄日
-             THEN "Fn_CalculateDerogationInterest"(M."CustNo",M."FacmNo",M."BormNo",NVL(ML."LoanBalance",0),NVL(LR."FitRate",0),LT."IntEndDate",M."DerDate")
+             THEN NVL("Fn_CalculateDerogationInterest"(M."CustNo",M."FacmNo",M."BormNo",NVL(ML."LoanBalance",0),NVL(LR."FitRate",0),LT."IntEndDate",M."DerDate"),0)
            ELSE 0 END                       AS  "IntAmt"          -- 減損發生日月底 應收利息
          -- 2022-12-27 Wei 修改 from Linda
          , NVL(IFD."InsuFee",0)

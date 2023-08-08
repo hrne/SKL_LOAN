@@ -50,7 +50,8 @@ public class L6970ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   SELECT DISTINCT ";
 		sql += "          \"TxSeq\" AS \"JobTxSeq\" ";
 		sql += "   FROM \"JobDetail\" ";
-		sql += "   WHERE \"ErrContent\" IS NOT NULL ";
+		sql += "   WHERE \"Status\" = 'F' ";
+		sql += "     AND \"ErrContent\" IS NOT NULL ";
 		sql += " )";
 		sql += " SELECT I.\"JobCode\"       AS \"JobCode\" ";
 		sql += "      , I.\"NestJobCode\"   AS \"NestJobCode\" ";

@@ -47,6 +47,10 @@ public interface JobMainRepositoryDay extends JpaRepository<JobMain, JobMainId> 
   @Procedure(value = "\"Usp_L6_QuitEmp_Ins\"")
   public void uspL6QuitempIns(String InputEmpNo, String JobTxSeq);
 
+  // (日終批次)更新股票代號檔
+  @Procedure(value = "\"Usp_L6_CdStock_Ins\"")
+  public void uspL6CdstockIns(String InputEmpNo, String JobTxSeq);
+
   // (日終批次)維護 CustDataCtrl 結清戶個資控管檔
   @Procedure(value = "\"Usp_L2_CustDataCtrl_Ins\"")
   public void uspL2CustdatactrlIns(int tbsdyf,  String empNo, String JobTxSeq);

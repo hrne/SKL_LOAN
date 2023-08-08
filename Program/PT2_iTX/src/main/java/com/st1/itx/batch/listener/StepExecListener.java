@@ -1,12 +1,16 @@
 package com.st1.itx.batch.listener;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import org.codehaus.jettison.json.JSONObject;
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.item.ExecutionContext;
@@ -18,7 +22,10 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.JobDetail;
 import com.st1.itx.db.domain.JobDetailId;
+import com.st1.itx.db.domain.TxCruiser;
+import com.st1.itx.db.domain.TxCruiserId;
 import com.st1.itx.db.service.JobDetailService;
+import com.st1.itx.db.service.TxCruiserService;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.eum.ThreadVariable;
 import com.st1.itx.util.log.SysLogger;
@@ -32,6 +39,9 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 	JobDetailService jobDetailService;
 
 	@Autowired
+	private TxCruiserService txCruiserService;
+
+	@Autowired
 	Parse parse;
 
 	@Override
@@ -42,29 +52,40 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 		ThreadVariable.setObject(ContentName.empnot,
 				stepExecution.getJobExecution().getJobParameters().getString(ContentName.tlrno, "999999"));
 
-		String jobId = stepExecution.getJobExecution().getJobParameters().getString(ContentName.jobId);
+		JobExecution jobExecution = stepExecution.getJobExecution();
+
+		String jobId = jobExecution.getJobParameters().getString(ContentName.jobId);
 		String nestedJobId = stepExecution.getJobExecution().getJobInstance().getJobName();
 		this.info("Nested Job ID: " + nestedJobId);
 		String stepId = stepExecution.getStepName();
-		Date time = stepExecution.getJobExecution().getJobParameters().getDate(ContentName.batchDate);
+		Date time = jobExecution.getJobParameters().getDate(ContentName.batchDate);
 		int execDate = Integer.valueOf(new SimpleDateFormat("yyyyMMdd").format(time));
 		Timestamp startTime = new Timestamp(stepExecution.getStartTime().getTime());
 
-		String txSeq = stepExecution.getJobExecution().getJobParameters().getString(ContentName.txSeq);
-		String oriTxSeq = stepExecution.getJobExecution().getExecutionContext().getString("OriTxSeq");
+		String txSeq = jobExecution.getJobParameters().getString(ContentName.txSeq);
+
+		ExecutionContext jobEc = jobExecution.getExecutionContext();
+
+		String oriTxSeq = jobEc.getString("OriTxSeq");
+		String oriStep = "";
+
+		if (jobEc.containsKey("OriStep")) {
+			oriStep = jobEc.getString("OriStep");
+		}
 
 		this.info("StepExecListener.beforeStep : " + stepId);
 		this.info("batch execDate    : " + execDate);
 		this.info("step startTime  : " + startTime);
 		this.info("txSeq  : " + txSeq);
 		this.info("oriTxSeq  : " + oriTxSeq);
+		this.info("oriStep  : " + oriStep);
 
 		this.updateJobDetail(jobId, nestedJobId, stepId, execDate, startTime, true, stepExecution);
 
 		stepExecution.getExecutionContext().put("txSeq", txSeq);
 
 		if (!oriTxSeq.isEmpty()) {
-			this.chkOriJobDetail(oriTxSeq, jobId, stepId, stepExecution);
+			this.chkOriJobDetail(oriTxSeq, jobId, stepId, oriStep, stepExecution);
 		}
 	}
 
@@ -219,7 +240,19 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 	 * @param stepId        原步驟名稱
 	 * @param stepExecution 執行階段
 	 */
-	private void chkOriJobDetail(String oriTxSeq, String jobId, String stepId, StepExecution stepExecution) {
+	private void chkOriJobDetail(String oriTxSeq, String jobId, String stepId, String oriStep,
+			StepExecution stepExecution) {
+		if (!oriStep.isEmpty()) {
+			if (oriStep.equals(stepId)) {
+				// 如果是勾選已成功的且Step名稱相同,重跑該Step
+				stepExecution.getExecutionContext().putString("OriStatus", "F");
+				return;
+			} else {
+				// 如果是勾選已成功的且Step名稱不同,當作該Step已成功
+				stepExecution.getExecutionContext().putString("OriStatus", "S");
+				return;
+			}
+		}
 		TitaVo titaVo = new TitaVo();
 		titaVo.putParam(ContentName.empnot, stepExecution.getJobParameters().getString(ContentName.tlrno, "999999"));
 		JobDetail oriJobDetail = jobDetailService.findStepFirst(oriTxSeq, jobId, stepId, titaVo);
@@ -229,7 +262,13 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 			// 因此新增OriTxSeq找讓StepExecuter可以找出原本的步驟執行結果
 			stepExecution.getExecutionContext().putString("OriStatus", status);
 		} else {
-			this.error("chkOriJobDetail cannot find ori jobDetail.");
+			this.error("chkOriJobDetail cannot find ori jobDetail. oriTxSeq = " + oriTxSeq);
+			// 找出原交易序號的原交易序號,直到有用原交易序號找到對應jobDetail為止,或是原交易序號為空白
+			String oriOriTxSeq = getOriTxSeq(oriTxSeq, titaVo);
+			if (oriOriTxSeq != null && !oriOriTxSeq.isEmpty()) {
+				// 遞迴處理
+				chkOriJobDetail(oriTxSeq, jobId, stepId, oriStep, stepExecution);
+			}
 		}
 	}
 
@@ -267,5 +306,47 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 		} catch (DBException e) {
 			this.error(e.getErrorId() + " " + e.getErrorMsg());
 		}
+	}
+
+	private String getOriTxSeq(String txSeq, TitaVo titaVo) {
+		String oriTxSeq = "";
+		TxCruiserId txCruiserId = new TxCruiserId();
+		txCruiserId.setTxSeq(txSeq);
+		if (!txSeq.contains("-")) {
+			this.error("getOriTxSeq txSeq has not \"-\" , txSeq = " + txSeq);
+			return oriTxSeq;
+		}
+		String[] s = txSeq.split("-");
+		if (s.length < 2) {
+			this.error("getOriTxSeq txSeq.split(\"-\") length < 2 , txSeq = " + txSeq);
+			return oriTxSeq;
+		}
+		txCruiserId.setTlrNo(s[1]);
+		TxCruiser txCruiser = txCruiserService.findById(txCruiserId, titaVo);
+		if (txCruiser == null) {
+			return oriTxSeq;
+		}
+		String parameters = txCruiser.getParameter();
+		JSONObject p;
+		String oriStatus;
+		try {
+			p = new JSONObject(parameters);
+			oriTxSeq = p.getString("OOJobTxSeq");
+			oriStatus = p.getString("OOStatus");
+			if (oriStatus.equals("S")) {
+				// 若原本勾的那筆STEP是成功的 就全部重跑
+				// 只要將oriTxSeq放空白 就會全部重跑
+				return "";
+			}
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error(
+					"getOriTxSeq parameters transfer to JSONObject and getString(\"OOJobTxSeq\") error, parameters = "
+							+ parameters);
+			this.error("Exception = " + e.getMessage());
+			return "";
+		}
+		return oriTxSeq;
 	}
 }

@@ -449,6 +449,22 @@ em = null;
   }
 
   @Override
+  public void Usp_L6_CdStock_Ins(String InputEmpNo, String JobTxSeq, TitaVo... titaVo) {
+    String dbName = "";
+    
+    if (titaVo.length != 0)
+    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    if (dbName.equals(ContentName.onDay))
+      jobMainReposDay.uspL6CdstockIns(InputEmpNo, JobTxSeq);
+    else if (dbName.equals(ContentName.onMon))
+      jobMainReposMon.uspL6CdstockIns(InputEmpNo, JobTxSeq);
+    else if (dbName.equals(ContentName.onHist))
+      jobMainReposHist.uspL6CdstockIns(InputEmpNo, JobTxSeq);
+   else
+      jobMainRepos.uspL6CdstockIns(InputEmpNo, JobTxSeq);
+  }
+
+  @Override
   public void Usp_L2_CustDataCtrl_Ins(int tbsdyf,  String empNo, String JobTxSeq, TitaVo... titaVo) {
     String dbName = "";
     

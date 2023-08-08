@@ -40,7 +40,7 @@ public class LM085Batch extends BatchBase implements Tasklet, InitializingBean {
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		lM085Report.setParentTranCode(this.getParent());
-		return this.exec(contribution, "D");
+		return this.exec(contribution, "D", chunkContext);
 	}
 
 	@Override
@@ -77,6 +77,6 @@ public class LM085Batch extends BatchBase implements Tasklet, InitializingBean {
 		titaVo.putParam("UnitCode", "0");
 		titaVo.putParam("UnitName", "千元");
 
-		lM085Report.exec(titaVo, thisYM, lastYM);
+		lM085Report.exec(titaVo, thisYM,lastYM);
 	}
 }

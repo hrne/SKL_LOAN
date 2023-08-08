@@ -73,45 +73,45 @@ E(0,#currentYearMonth)
 @V(5,1,#currentYearMonth)
 
 
-#CustNo=N,7,I
-@C(3,#CustNo,0,INVOKEJS(SHOW,p1,3,3,0),INVOKEJS(SHOW,p1,3,3,1))
+!#CustNo=N,7,I
+!@C(3,#CustNo,0,INVOKEJS(SHOW,p1,3,3,0),INVOKEJS(SHOW,p1,3,3,1))
 
-#FacmNo=N,3,I
-C(3,#CustNo,0,S,$)
+!#FacmNo=N,3,I
+!C(3,#CustNo,0,S,$)
 
-#DelayCondition=A,1,I
-E(0,1)
-HELP(1:滯繳期數;2:滯繳日數)
-@V(1,1,2)
-C(3,#DelayCondition,1,INVOKEJS(SHOW,p1,5,5,0)INVOKEJS(SHOW,p1,6,6,1),INVOKEJS(SHOW,p1,5,5,1)INVOKEJS(SHOW,p1,6,6,0))
+!#DelayCondition=A,1,I
+!E(0,1)
+!HELP(1:滯繳期數;2:滯繳日數)
+!@V(1,1,2)
+!C(3,#DelayCondition,1,INVOKEJS(SHOW,p1,5,5,0)INVOKEJS(SHOW,p1,6,6,1),INVOKEJS(SHOW,p1,5,5,1)INVOKEJS(SHOW,p1,6,6,0))
 
-#DelayInputText=X,8,L
+!#DelayInputText=X,8,L
 
-#OvduTermMin=A,2,I
-C(3,#DelayCondition,2,S,$)
-@V(5,0,99)
-
-#OvduTermMax=A,2,I
-C(3,#DelayCondition,2,S,$)
-@V(5,#OvduTermMin,99)
-
-#OvduDayMin=A,3,I
-C(3,#DelayCondition,1,S,$)
-@V(5,0,999)
-
-#OvduDayMax=A,3,I
-C(3,#DelayCondition,1,S,$)
-@V(5,#OvduDayMin,999)
-
-#PayMethod=A,1,I
-E(0,0)
-HELP(0:全部;1:繳款;2:銀行扣款;3:扣薪;4:支票;9:其他)
-@V(1,0,1,2,3,4,9)
-
-#EntCode=A,1,I
-E(0,0)
-HELP(0:全部;1:自然人;2:法人)
-@V(1,0,1,2)
+!#OvduTermMin=A,2,I
+!C(3,#DelayCondition,2,S,$)
+!@V(5,0,99)
+!
+!#OvduTermMax=A,2,I
+!C(3,#DelayCondition,2,S,$)
+!@V(5,#OvduTermMin,99)
+!
+!#OvduDayMin=A,3,I
+!C(3,#DelayCondition,1,S,$)
+!@V(5,0,999)
+!
+!#OvduDayMax=A,3,I
+!C(3,#DelayCondition,1,S,$)
+!@V(5,#OvduDayMin,999)
+!
+!#PayMethod=A,1,I
+!E(0,0)
+!HELP(0:全部;1:繳款;2:銀行扣款;3:扣薪;4:支票;9:其他)
+!@V(1,0,1,2,3,4,9)
+!
+!#EntCode=A,1,I
+!E(0,0)
+!HELP(0:全部;1:自然人;2:法人)
+!@V(1,0,1,2)
 
 
 !-----------------------------------------------------
@@ -164,15 +164,7 @@ IF(#KINBR=="0009"||#KINBR=="0008",T(2,#KINBR+#TlrNoNO),T(2,#EMPNOS))
 !------ 上行電文TIM：BASIC LABEL + AP TEXT AREA + AP TEXT ------
 <sub type="TIM">
 #YearMonth
-!#CustNo
-!#FacmNo
-!#DelayCondition
-!OvduDayMin
-!#OvduTermMin
-!#OvduDayMax
-!#OvduTermMax
-!#PayMethod
-!#EntCode
+
 #END
 </sub>
 !------ 下行電文TOM ------

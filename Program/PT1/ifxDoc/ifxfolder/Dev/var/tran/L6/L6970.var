@@ -226,7 +226,7 @@ IF(#OOHaveUspErrorLog=="Y",BIND(grid,{ cmd=CHAIN; ntxcd=L6973;text=錯誤查詢;
 ! 勾選幾個就會sendback幾次, 所以不需要concats
 ! 長度似乎要大於某個值, 但實際進Vo的欄位長度會切剛好, 並且能用其原本名字存取
 #Sendback=x,10000,S
-T(6A,#OOJobCode+#OOJobTxSeq+#OOStatus)
+T(6A,#OOJobCode+#OOJobTxSeq+#OOStatus+#OOStepId)
 
 </sub>
 

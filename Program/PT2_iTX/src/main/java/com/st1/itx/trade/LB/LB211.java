@@ -28,10 +28,10 @@ public class LB211 extends BatchBase implements Tasklet, InitializingBean {
 	LB211Report lB211Report;
 
 	@Autowired
-	DateUtil dDateUtil;
+	DateUtil dDateUtil; 
 
 	@Autowired
-	WebClient webClient;
+	WebClient webClient; 
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -41,7 +41,7 @@ public class LB211 extends BatchBase implements Tasklet, InitializingBean {
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		this.info("LB211 active RepeatStatus execute ");
-		return this.exec(contribution, "M");
+		return this.exec(contribution, "M", chunkContext);
 	}
 
 	@Override
@@ -49,20 +49,19 @@ public class LB211 extends BatchBase implements Tasklet, InitializingBean {
 		this.info("LB211 active LB211 ");
 		this.info("LB211 titaVo.getEntDyI() =" + this.titaVo.getEntDyI());
 
-		// String tranCode = "LB211";
-		// String tranName = "聯徵每日授信餘額變動資料檔";
+		//String tranCode = "LB211";
+		//String tranName = "聯徵每日授信餘額變動資料檔";
 		String sFileNo = "01";
 
 		titaVo.putParam("AcDateStart", Integer.parseInt(titaVo.getEntDy()));
 		titaVo.putParam("AcDateEnd", Integer.parseInt(titaVo.getEntDy()));
 		titaVo.putParam("FileNo", sFileNo);
 		titaVo.putParam("FileDay", Integer.parseInt(titaVo.getEntDy()));
-
+		
 		boolean isFinish = lB211Report.exec(titaVo);
 
-		// webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(),
-		// "Y", "LC009", titaVo.getTlrNo(),
-		// tranCode + tranName + (isFinish ? "已完成" : "查無資料"), titaVo);
+		//webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+		//		tranCode + tranName + (isFinish ? "已完成" : "查無資料"), titaVo);
 	}
 
 }
