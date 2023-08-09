@@ -68,7 +68,10 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 
 		String oriTxSeq = jobEc.getString("OriTxSeq");
 		String oriStep = "";
-
+		String rerunType = "";
+		if (jobEc.containsKey("RerunType")) {
+			rerunType = jobEc.getString("RerunType");
+		}
 		if (jobEc.containsKey("OriStep")) {
 			oriStep = jobEc.getString("OriStep");
 		}
@@ -78,14 +81,16 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 		this.info("step startTime  : " + startTime);
 		this.info("txSeq  : " + txSeq);
 		this.info("oriTxSeq  : " + oriTxSeq);
+		this.info("rerunType  : " + rerunType);
 		this.info("oriStep  : " + oriStep);
 
 		this.updateJobDetail(jobId, nestedJobId, stepId, execDate, startTime, true, stepExecution);
 
 		stepExecution.getExecutionContext().put("txSeq", txSeq);
 
-		if (!oriTxSeq.isEmpty()) {
-			this.chkOriJobDetail(oriTxSeq, jobId, stepId, oriStep, stepExecution);
+		// rerunType為A時,全部重跑
+		if (!oriTxSeq.isEmpty() && !rerunType.isEmpty() && !rerunType.equals("A")) {
+			this.rerunHandler(oriTxSeq, jobId, rerunType, stepId, oriStep, stepExecution);
 		}
 	}
 
@@ -120,14 +125,23 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 		if (stepExecution.getExecutionContext().containsKey("OriStatus")) {
 			oriStatus = stepExecution.getExecutionContext().getString("OriStatus");
 		}
+		
+		// 2023-08-09 Wei
+		JobExecution jobExecution = stepExecution.getJobExecution();
+		ExecutionContext jobEc = jobExecution.getExecutionContext();
+		String rerunType = "";
+		if (jobEc.containsKey("RerunType")) {
+			rerunType = jobEc.getString("RerunType");
+		}
 
 		this.info("StepExecListener.afterStep : " + stepId);
 		this.info("batch execDate     : " + execDate);
 		this.info("step endTime       : " + endTime);
 		this.info("step stepStatus   : " + stepExecution.getExitStatus().getExitCode());
 		this.info("step oriStatus : " + oriStatus);
+		this.info("step rerunType : " + rerunType);
 
-		if (oriStatus.equals("S")) {
+		if ((!rerunType.equals("A")) && oriStatus.equals("S")) {
 			this.deleteJobDetail(jobId, null, stepId, execDate, endTime, stepExecution);
 		} else {
 			this.updateJobDetail(jobId, null, stepId, execDate, endTime, false, stepExecution, stepStatus);
@@ -232,27 +246,20 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 		}
 	}
 
-	/**
-	 * 找原執行結果
-	 * 
-	 * @param oriTxSeq      原交易序號
-	 * @param jobId         原批次名稱
-	 * @param stepId        原步驟名稱
-	 * @param stepExecution 執行階段
-	 */
-	private void chkOriJobDetail(String oriTxSeq, String jobId, String stepId, String oriStep,
+	private void rerunHandler(String oriTxSeq, String jobId, String rerunType, String stepId, String oriStep,
 			StepExecution stepExecution) {
-		if (!oriStep.isEmpty()) {
+		if (rerunType.equals("S")) {
 			if (oriStep.equals(stepId)) {
-				// 如果是勾選已成功的且Step名稱相同,重跑該Step
+				// 單支重跑:Step名稱相同,重跑該Step
 				stepExecution.getExecutionContext().putString("OriStatus", "F");
 				return;
 			} else {
-				// 如果是勾選已成功的且Step名稱不同,當作該Step已成功
+				// 單支重跑:Step名稱不同,當作該Step已成功
 				stepExecution.getExecutionContext().putString("OriStatus", "S");
 				return;
 			}
 		}
+
 		TitaVo titaVo = new TitaVo();
 		titaVo.putParam(ContentName.empnot, stepExecution.getJobParameters().getString(ContentName.tlrno, "999999"));
 		JobDetail oriJobDetail = jobDetailService.findStepFirst(oriTxSeq, jobId, stepId, titaVo);
@@ -267,7 +274,7 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 			String oriOriTxSeq = getOriTxSeq(oriTxSeq, titaVo);
 			if (oriOriTxSeq != null && !oriOriTxSeq.isEmpty()) {
 				// 遞迴處理
-				chkOriJobDetail(oriOriTxSeq, jobId, stepId, oriStep, stepExecution);
+				rerunHandler(oriOriTxSeq, jobId, rerunType, stepId, oriStep, stepExecution);
 			}
 		}
 	}
@@ -301,7 +308,7 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 				this.error("jobDetail is null. " + jobDetailId.toString());
 			} else {
 				jobDetailService.delete(jobDetail, titaVo);
-				this.info("jobDetail 這筆是重跑時的skip,進行 delete. " + jobDetail.toString());
+				this.info("jobDetail 這筆是單支重跑/失敗重跑時的skip,進行 delete. " + jobDetail.toString());
 			}
 		} catch (DBException e) {
 			this.error(e.getErrorId() + " " + e.getErrorMsg());

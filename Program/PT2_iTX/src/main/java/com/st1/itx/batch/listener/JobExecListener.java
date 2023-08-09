@@ -137,10 +137,12 @@ public class JobExecListener extends SysLogger implements JobExecutionListener {
 
 				ExecutionContext jobExecutionContext = jobExecution.getExecutionContext();
 				// 若不存在才跑
-				if (!jobExecutionContext.containsKey("OriTxSeq")) {
-					// 2023-08-08 Wei 新壽IT說在L6970勾重新執行的時候,已經成功的步驟不要重新執行
-					// 因此新增OriTxSeq找讓StepExecuter可以找出原本的步驟執行結果
-					getOriTxSeq(txSeq, jobExecutionContext, titaVo);
+				if (!jobExecutionContext.containsKey("RerunType")) {
+					// 2023-08-09 Wei RerunType
+					// S:single:單支重跑:只重跑選定的這支
+					// F:fail:失敗重跑::會執行同批號中失敗或尚未執行的批次
+					// A:all:整批重跑
+					getRerunType(txSeq, jobExecutionContext, titaVo);
 				}
 			} else {
 				boolean status = true;
@@ -161,8 +163,7 @@ public class JobExecListener extends SysLogger implements JobExecutionListener {
 		}
 	}
 
-	private void getOriTxSeq(String txSeq, ExecutionContext jobExecutionContext, TitaVo titaVo) {
-		String oriTxSeq = "";
+	private void getRerunType(String txSeq, ExecutionContext jobExecutionContext, TitaVo titaVo) {
 		TxCruiserId txCruiserId = new TxCruiserId();
 		txCruiserId.setTxSeq(txSeq);
 		if (!txSeq.contains("-")) {
@@ -181,18 +182,25 @@ public class JobExecListener extends SysLogger implements JobExecutionListener {
 		}
 		String parameters = txCruiser.getParameter();
 		JSONObject p;
+		String oriTxSeq;
 		String oriStatus;
 		String oriStepId;
 		try {
 			p = new JSONObject(parameters);
 			oriTxSeq = p.getString("OOJobTxSeq");
 			oriStatus = p.getString("OOStatus");
-			if (oriStatus.equals("S")) {
-				// 若原本勾的那筆STEP是成功的 就這步開始重跑
-				oriStepId = p.getString("OOStepId");
-				jobExecutionContext.putString("OriStep", oriStepId);
+			oriStepId = p.getString("OOStepId");
+			switch (oriStatus) {
+			case "S":
+			case "F":
+				jobExecutionContext.putString("RerunType", oriStatus);
+				break;
+			default:
+				jobExecutionContext.putString("RerunType", "A");
+				break;
 			}
 			jobExecutionContext.putString("OriTxSeq", oriTxSeq);
+			jobExecutionContext.putString("OriStep", oriStepId);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
