@@ -43,34 +43,34 @@ public class L9734Report extends MakeReport {
 	 * 執行報表輸出
 	 * 
 	 * @param titaVo
-	 * @param yearMonth 西元年月
+	 * @param acDate    會計日期
 	 * @param condition 報表區分代號
 	 * @return
 	 * @throws LogicException
 	 *
 	 * 
 	 */
-	public boolean exec(TitaVo titaVo, int yearMonth, int condition) throws LogicException {
+	public boolean exec(TitaVo titaVo, int acDate, int condition) throws LogicException {
 		this.info(txCD + " exec-" + condition);
 
 		switch (condition) {
 		case 1:
-			exportCond01(titaVo, yearMonth, condition);
+			exportCond01(titaVo, acDate, condition);
 			break;
 		case 2:
-			exportCond02(titaVo, yearMonth, condition);
+			exportCond02(titaVo, acDate, condition);
 			break;
 		case 3:
-			exportCond03(titaVo, yearMonth, condition);
+			exportCond03(titaVo, acDate, condition);
 			break;
 		case 4:
-			exportCond04(titaVo, yearMonth, condition);
+			exportCond04(titaVo, acDate, condition);
 			break;
 		case 5:
-			exportCond05(titaVo, yearMonth, condition);
+			exportCond05(titaVo, acDate, condition);
 			break;
 		case 6:
-			exportCond06(titaVo, yearMonth, condition);
+			exportCond06(titaVo, acDate, condition);
 			break;
 		default:
 			break;
@@ -83,30 +83,26 @@ public class L9734Report extends MakeReport {
 	 * 覆審案件資料表-個金3000萬以上
 	 * 
 	 * @param titaVo
-	 * @param yearMonth
+	 * @param acDate
 	 * @param condition
 	 * @throws LogicException
 	 */
-	public void exportCond01(TitaVo titaVo, int yearMonth, int condition) throws LogicException {
+	public void exportCond01(TitaVo titaVo, int acDate, int condition) throws LogicException {
 
 		// 取得會計日(同頁面上會計日)
 		// 年月日
 		// 年
-		int iYear = yearMonth / 100;
+		int iYear = acDate / 10000;
 		// 月
-		int iMonth = yearMonth % 100;
-
-		String iYearMonth = String.valueOf(((iYear - 1911) * 100) + iMonth);
-
-		this.info("yymm=" + iYearMonth);
+		int iMonth = acDate / 100 % 100;
 
 		String itemName = "01-個金3000萬以上";
 
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "L9734";
-		String fileItem = itemName + "-" + iYearMonth;
-		String fileName = txcd + "_" + itemName + "-" + iYearMonth;
+		String fileItem = itemName + "-" + acDate;
+		String fileName = txcd + "_" + itemName + "-" + acDate;
 		String defaultExcel = txCD + "_底稿_個金3000萬以上.xls";
 		String defaultSheet = "簡表";
 
@@ -127,19 +123,21 @@ public class L9734Report extends MakeReport {
 		makeExcel.setWidth(9, 15);
 		makeExcel.setWidth(10, 15);
 		makeExcel.setWidth(11, 15);
+		makeExcel.setWidth(12, 15);
+		makeExcel.setWidth(13, 15);
 
 		// 粗體
 		makeExcel.setIBU("B");
 
 		// 機密等級及基準日期
-		makeExcel.setValue(1, 12,
+		makeExcel.setValue(1, 11,
 				"機密等級：" + makeExcel.getSecurity() + "\n" + (iYear - 1911) + "." + String.format("%02d", iMonth), "R");
 
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 
 		try {
 
-			fnAllList = l9734ServiceImpl.findAll(titaVo, yearMonth, condition);
+			fnAllList = l9734ServiceImpl.findAll(titaVo, acDate, condition);
 		} catch (Exception e) {
 
 			StringWriter errors = new StringWriter();
@@ -272,6 +270,22 @@ public class L9734Report extends MakeReport {
 										: tLDVo.get(fdnm),
 								"C");
 						break;
+					case 13:
+						// 覆審人員
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 || tLDVo.get(fdnm).equals("0")
+										? ""
+										: tLDVo.get(fdnm),
+								"C");
+						break;
+					case 14:
+						// 經辦人員
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 || tLDVo.get(fdnm).equals("0")
+										? ""
+										: tLDVo.get(fdnm),
+								"C");
+						break;
 					default:
 
 						break;
@@ -300,26 +314,26 @@ public class L9734Report extends MakeReport {
 	 * 覆審案件資料表-企金3000萬以上
 	 * 
 	 * @param titaVo
-	 * @param yearMonth
+	 * @param acDate
 	 * @param condition
 	 * @throws LogicException
 	 */
-	public void exportCond02(TitaVo titaVo, int yearMonth, int condition) throws LogicException {
+	public void exportCond02(TitaVo titaVo, int acDate, int condition) throws LogicException {
 
+		// 取得會計日(同頁面上會計日)
+		// 年月日
 		// 年
-		int iYear = yearMonth / 100;
+		int iYear = acDate / 10000;
 		// 月
-		int iMonth = yearMonth % 100;
-
-		String iYearMonth = String.valueOf(((iYear - 1911) * 100) + iMonth);
+		int iMonth = acDate / 100 % 100;
 
 		String itemName = "02-企金3000萬以上";
 
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "L9734";
-		String fileItem = itemName + "-" + iYearMonth;
-		String fileName = txcd + "_" + itemName + "-" + iYearMonth;
+		String fileItem = itemName + "-" + acDate;
+		String fileName = txcd + "_" + itemName + "-" + acDate;
 		String defaultExcel = txCD + "_底稿_企金3000萬以上.xls";
 		String defaultSheet = "簡表";
 
@@ -340,18 +354,20 @@ public class L9734Report extends MakeReport {
 		makeExcel.setWidth(9, 15);
 		makeExcel.setWidth(10, 15);
 		makeExcel.setWidth(11, 15);
+		makeExcel.setWidth(12, 15);
+		makeExcel.setWidth(13, 15);
 
 		// 粗體
 		makeExcel.setIBU("B");
 
 		// 機密等級及基準日期
-		makeExcel.setValue(1, 12, "機密等級：機密\n" + (iYear - 1911) + "." + String.format("%02d", iMonth), "R");
+		makeExcel.setValue(1, 11, "機密等級：機密\n" + (iYear - 1911) + "." + String.format("%02d", iMonth), "R");
 
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 
 		try {
 
-			fnAllList = l9734ServiceImpl.findAll(titaVo, yearMonth, condition);
+			fnAllList = l9734ServiceImpl.findAll(titaVo, acDate, condition);
 
 		} catch (Exception e) {
 
@@ -481,6 +497,22 @@ public class L9734Report extends MakeReport {
 										: tLDVo.get(fdnm),
 								"C");
 						break;
+					case 13:
+						// 覆審人員
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 || tLDVo.get(fdnm).equals("0")
+										? ""
+										: tLDVo.get(fdnm),
+								"C");
+						break;
+					case 14:
+						// 經辦人員
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 || tLDVo.get(fdnm).equals("0")
+										? ""
+										: tLDVo.get(fdnm),
+								"C");
+						break;
 
 					}
 				}
@@ -502,29 +534,26 @@ public class L9734Report extends MakeReport {
 	 * 覆審案件資料表-個金2000萬以上小於3000萬
 	 * 
 	 * @param titaVo
-	 * @param yearMonth
+	 * @param acDate
 	 * @param condition
 	 * @throws LogicException
 	 */
-	public void exportCond03(TitaVo titaVo, int yearMonth, int condition) throws LogicException {
+	public void exportCond03(TitaVo titaVo, int acDate, int condition) throws LogicException {
 		this.info("L9734Report exec");
-
+		// 取得會計日(同頁面上會計日)
+		// 年月日
 		// 年
-		int iYear = yearMonth / 100;
+		int iYear = acDate / 10000;
 		// 月
-		int iMonth = yearMonth % 100;
-
-		String iYearMonth = String.valueOf(((iYear - 1911) * 100) + iMonth);
-
-		this.info("yymm=" + iYearMonth);
+		int iMonth = acDate / 100 % 100;
 
 		String itemName = "03-個金2000萬以上小於3000萬";
 
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "L9734";
-		String fileItem = itemName + "-" + iYearMonth;
-		String fileName = txcd + "_" + itemName + "-" + iYearMonth;
+		String fileItem = itemName + "-" + acDate;
+		String fileName = txcd + "_" + itemName + "-" + acDate;
 		String defaultExcel = txCD + "_底稿_個金2000萬以上小於3000萬.xls";
 		String defaultSheet = "簡表";
 
@@ -547,18 +576,20 @@ public class L9734Report extends MakeReport {
 		makeExcel.setWidth(11, 15);
 		makeExcel.setWidth(12, 15);
 		makeExcel.setWidth(13, 15);
+		makeExcel.setWidth(14, 15);
+		makeExcel.setWidth(15, 15);
 
 		// 粗體
 		makeExcel.setIBU("B");
 
 		// 機密等級及基準日期
-		makeExcel.setValue(1, 14, "機密等級：機密\n" + (iYear - 1911) + "." + String.format("%02d", iMonth), "R");
+		makeExcel.setValue(1, 10, "機密等級：機密\n" + (iYear - 1911) + "." + String.format("%02d", iMonth), "R");
 
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 
 		try {
 
-			fnAllList = l9734ServiceImpl.findAll(titaVo, yearMonth, condition);
+			fnAllList = l9734ServiceImpl.findAll(titaVo, acDate, condition);
 
 		} catch (Exception e) {
 
@@ -703,6 +734,22 @@ public class L9734Report extends MakeReport {
 										: tLDVo.get(fdnm),
 								"C");
 						break;
+					case 15:
+						// 覆審人員
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 || tLDVo.get(fdnm).equals("0")
+										? ""
+										: tLDVo.get(fdnm),
+								"C");
+						break;
+					case 16:
+						// 經辦人員
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 || tLDVo.get(fdnm).equals("0")
+										? ""
+										: tLDVo.get(fdnm),
+								"C");
+						break;
 					default:
 
 						break;
@@ -730,28 +777,26 @@ public class L9734Report extends MakeReport {
 	 * 覆審案件資料表-個金100萬以上小於2000萬
 	 * 
 	 * @param titaVo
-	 * @param yearMonth
+	 * @param acDate
 	 * @param condition
 	 * @throws LogicException
 	 */
-	public void exportCond04(TitaVo titaVo, int yearMonth, int condition) throws LogicException {
+	public void exportCond04(TitaVo titaVo, int acDate, int condition) throws LogicException {
 
+		// 取得會計日(同頁面上會計日)
+		// 年月日
 		// 年
-		int iYear = yearMonth / 100;
+		int iYear = acDate / 10000;
 		// 月
-		int iMonth = yearMonth % 100;
-
-		String iYearMonth = String.valueOf(((iYear - 1911) * 100) + iMonth);
-
-		this.info("yymm=" + iYearMonth);
+		int iMonth = acDate / 100 % 100;
 
 		String itemName = "04-個金100萬以上小於2000萬";
 
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "L9734";
-		String fileItem = itemName + "-" + iYearMonth;
-		String fileName = txcd + "_" + itemName + "-" + iYearMonth;
+		String fileItem = itemName + "-" + acDate;
+		String fileName = txcd + "_" + itemName + "-" + acDate;
 		String defaultExcel = txCD + "_底稿_個金100萬以上小於2000萬.xls";
 		String defaultSheet = "簡表";
 
@@ -773,18 +818,19 @@ public class L9734Report extends MakeReport {
 		makeExcel.setWidth(11, 15);
 		makeExcel.setWidth(12, 15);
 		makeExcel.setWidth(13, 15);
-
+		makeExcel.setWidth(14, 15);
+		makeExcel.setWidth(15, 15);
 		// 粗體
 		makeExcel.setIBU("B");
 
 		// 機密等級及基準日期
-		makeExcel.setValue(1, 14, "機密等級：機密\n" + (iYear - 1911) + "." + String.format("%02d", iMonth), "R");
+		makeExcel.setValue(1, 13, "機密等級：機密\n" + (iYear - 1911) + "." + String.format("%02d", iMonth), "R");
 
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 
 		try {
 
-			fnAllList = l9734ServiceImpl.findAll(titaVo, yearMonth, condition);
+			fnAllList = l9734ServiceImpl.findAll(titaVo, acDate, condition);
 
 		} catch (Exception e) {
 
@@ -924,6 +970,22 @@ public class L9734Report extends MakeReport {
 										: tLDVo.get(fdnm),
 								"C");
 						break;
+					case 15:
+						// 覆審人員
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 || tLDVo.get(fdnm).equals("0")
+										? ""
+										: tLDVo.get(fdnm),
+								"C");
+						break;
+					case 16:
+						// 經辦人員
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 || tLDVo.get(fdnm).equals("0")
+										? ""
+										: tLDVo.get(fdnm),
+								"C");
+						break;
 					default:
 
 						break;
@@ -951,28 +1013,26 @@ public class L9734Report extends MakeReport {
 	 * 覆審案件資料表-企金未達3000萬
 	 * 
 	 * @param titaVo
-	 * @param yearMonth
+	 * @param acDate
 	 * @param condition
 	 * @throws LogicException
 	 */
-	public void exportCond05(TitaVo titaVo, int yearMonth, int condition) throws LogicException {
+	public void exportCond05(TitaVo titaVo, int acDate, int condition) throws LogicException {
 
+		// 取得會計日(同頁面上會計日)
+		// 年月日
 		// 年
-		int iYear = yearMonth / 100;
+		int iYear = acDate / 10000;
 		// 月
-		int iMonth = yearMonth % 100;
-
-		String iYearMonth = String.valueOf(((iYear - 1911) * 100) + iMonth);
-
-		this.info("yymm=" + iYearMonth);
+		int iMonth = acDate / 100 % 100;
 
 		String itemName = "05-企金未達3000萬";
 
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "L9734";
-		String fileItem = itemName + "-" + iYearMonth;
-		String fileName = txcd + "_" + itemName + "-" + iYearMonth;
+		String fileItem = itemName + "-" + acDate;
+		String fileName = txcd + "_" + itemName + "-" + acDate;
 		String defaultExcel = txCD + "_底稿_企金未達3000萬.xls";
 		String defaultSheet = "簡表";
 
@@ -996,18 +1056,20 @@ public class L9734Report extends MakeReport {
 		makeExcel.setWidth(12, 10);
 		makeExcel.setWidth(13, 10);
 		makeExcel.setWidth(14, 10);
+		makeExcel.setWidth(15, 10);
+		makeExcel.setWidth(16, 10);
 
 		// 粗體
 		makeExcel.setIBU("B");
 
 		// 機密等級及基準日期
-		makeExcel.setValue(1, 15, "機密等級：機密\n" + (iYear - 1911) + "." + String.format("%02d", iMonth), "R");
+		makeExcel.setValue(1, 13, "機密等級：機密\n" + (iYear - 1911) + "." + String.format("%02d", iMonth), "R");
 
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 
 		try {
 
-			fnAllList = l9734ServiceImpl.findAll(titaVo, yearMonth, condition);
+			fnAllList = l9734ServiceImpl.findAll(titaVo, acDate, condition);
 
 		} catch (Exception e) {
 
@@ -1183,6 +1245,22 @@ public class L9734Report extends MakeReport {
 										: tLDVo.get(fdnm),
 								"C");
 						break;
+					case 16:
+						// 覆審人員
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 || tLDVo.get(fdnm).equals("0")
+										? ""
+										: tLDVo.get(fdnm),
+								"C");
+						break;
+					case 17:
+						// 經辦人員
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 || tLDVo.get(fdnm).equals("0")
+										? ""
+										: tLDVo.get(fdnm),
+								"C");
+						break;
 					default:
 
 						break;
@@ -1212,27 +1290,25 @@ public class L9734Report extends MakeReport {
 	 * 土地貸款覆審表
 	 * 
 	 * @param titaVo
-	 * @param yearMonth
+	 * @param acDate
 	 * @param condition
 	 * @throws LogicException
 	 */
-	public void exportCond06(TitaVo titaVo, int yearMonth, int condition) throws LogicException {
+	public void exportCond06(TitaVo titaVo, int acDate, int condition) throws LogicException {
+		// 取得會計日(同頁面上會計日)
+		// 年月日
 		// 年
-		int iYear = yearMonth / 100;
+		int iYear = acDate / 10000;
 		// 月
-		int iMonth = yearMonth % 100;
-
-		String iYearMonth = String.valueOf(((iYear - 1911) * 100) + iMonth);
-
-		this.info("yymm=" + iYearMonth);
+		int iMonth = acDate / 100 % 100;
 
 		String itemName = "06-土地覆審";
 
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "L9734";
-		String fileItem = itemName + "-" + iYearMonth;
-		String fileName = txcd + "_" + itemName + "-" + iYearMonth;
+		String fileItem = itemName + "-" + acDate;
+		String fileName = txcd + "_" + itemName + "-" + acDate;
 		String defaultExcel = txCD + "_底稿_土地追蹤.xls";
 		String defaultSheet = "簡表";
 
@@ -1258,17 +1334,19 @@ public class L9734Report extends MakeReport {
 		makeExcel.setWidth(14, 15);
 		makeExcel.setWidth(15, 15);
 		makeExcel.setWidth(16, 50);
+		makeExcel.setWidth(17, 15);
+		makeExcel.setWidth(18, 15);
 
 		// 粗體
 		makeExcel.setIBU("B");
 
 		// 機密等級及基準日期
-		makeExcel.setValue(1, 18, "機密等級：機密\n" + (iYear - 1911) + "." + String.format("%02d", iMonth), "R");
+		makeExcel.setValue(1, 17, "機密等級：機密\n" + (iYear - 1911) + "." + String.format("%02d", iMonth), "R");
 
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 
 		try {
-			fnAllList = l9734ServiceImpl.findAll(titaVo, yearMonth, condition);
+			fnAllList = l9734ServiceImpl.findAll(titaVo, acDate, condition);
 
 		} catch (Exception e) {
 
@@ -1427,9 +1505,25 @@ public class L9734Report extends MakeReport {
 								"C");
 						break;
 					case 17:
-						// 1備註
+						// 備註
 						makeExcel.setValue(row, i,
 								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "L");
+						break;
+					case 18:
+						// 覆審人員
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 || tLDVo.get(fdnm).equals("0")
+										? ""
+										: tLDVo.get(fdnm),
+								"C");
+						break;
+					case 19:
+						// 經辦人員
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 || tLDVo.get(fdnm).equals("0")
+										? ""
+										: tLDVo.get(fdnm),
+								"C");
 						break;
 					default:
 

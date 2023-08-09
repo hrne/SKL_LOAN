@@ -47,7 +47,7 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[140,850];printer.width=[20,20];">
 [
 ["[L9747]                                催收及呆帳戶暫收款明細表                                                             "],
-["@@@資料日期",#dataDate],
+["@@@會計日期",#dataDate],
 
 ]
 !---------- AP TEXT AREA Variables ----------
@@ -56,8 +56,8 @@ E(0,0)
 E(0,5)
 <include src="COM.icf::CheckAuth.rtn"/>
 
-!撥款日期
-#dataDate=D,7,I
+!會計日期
+#dataDate=D,7,L
 E(0,#SYSDATE)
 @V(7)
 A(DATE,0,#dataDate)

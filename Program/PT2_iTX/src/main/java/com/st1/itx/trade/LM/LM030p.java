@@ -22,7 +22,6 @@ import com.st1.itx.util.http.WebClient;
  * @version 1.0.0
  */
 public class LM030p extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(LM030p.class);
 
 	@Autowired
 	LM030Report lM030Report;
@@ -42,7 +41,9 @@ public class LM030p extends TradeBuffer {
 		String parentTranCode = titaVo.getTxcd();
 
 		lM030Report.setParentTranCode(parentTranCode);
-
+		
+		lM030Report.setTxBuffer(this.txBuffer);
+		
 		boolean isFinish = lM030Report.exec(titaVo);
 
 		if (isFinish) {

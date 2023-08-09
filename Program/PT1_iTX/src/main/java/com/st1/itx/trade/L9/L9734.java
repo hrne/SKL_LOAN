@@ -37,8 +37,6 @@ public class L9734 extends TradeBuffer {
 
 		// 帳務日(西元)
 		int tbsdy = this.txBuffer.getTxCom().getTbsdyf();
-		// 月底日(西元)
-//		int mfbsdy = this.txBuffer.getTxCom().getMfbsdyf();
 
 		int totalItem = Integer.parseInt(titaVo.getParam("TotalItem"));
 

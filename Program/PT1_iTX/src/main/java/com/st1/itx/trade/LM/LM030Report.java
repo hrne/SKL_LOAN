@@ -41,7 +41,6 @@ public class LM030Report extends MakeReport {
 
 	public Boolean exec(TitaVo titaVo) throws LogicException {
 
-		baTxCom.setTxBuffer(this.txBuffer);
 		
 		List<Map<String, String>> listLM030 = null;
 

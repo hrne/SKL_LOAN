@@ -42,8 +42,8 @@ E(0,0)
 
 [
 ["[L9734]                                 覆審報表產製"],
-["#FdYearMonth+資料年月",#YearMonth],
-
+["#FdAcDate+會計日期",#AcDate],
+["#FdYearMonth+覆審年月",#ReChkYearMonth,"（預設00000為全部）"],
 ["#grid#,{id:1,expand:false,loop:6,row_height:1,s_cols:[50,50,50], p_cols:[8,8]}","","",
 ["全選",#BtnAllShell1,"報表名稱"],
 ["",#BtnShell1,#ReportName1],
@@ -118,35 +118,75 @@ C(5,#BtnShell{i},V,T(3,@BtnShell{i},  ),T(3,@BtnShell{i},V))
 
 #FdYearMonth=X,1,L
 T(2,*)
+#FdAcDate=X,1,L
+T(2,*)
+
+!會計日期 必須輸入
+#DATE=D,8,S
+T(4,DATE$)
+
+#DT=D,7,S
+T(1,#DATE,2,7)
+
+#AcDate=D,7,I
+T(2,#DT)
+@V(7)A(4,0,#AcDate)
+IF(#AcDate > #DT,V(P,不可大於會計日),$)
+!#Today=A,8,S
+!D(6,2,#SYSDATE,0)
 
 
-!今天日期(系統日)
-#Today=A,8,S
-D(6,2,#SYSDATE,0)
+#DATEYear=A,3,S
+T(1,#DATE,2,3)
+
+![年月]
+#DataYear=A,3,S
+T(1,#DATE,2,3)
+@V(5,0,#DATEYear)
+
+#DataMonth=A,2,S
+T(1,#DATE,5,2)
+@V(5,1,12)
+
+
+#ReChkYearMonth=A,5,I
+E(0,0)
+
+#ReChkYear=A,3,S
+E(0,#ReChkYearMonth/100)
+
+
+#ReChkMonth=A,2,S
+T(1,#ReChkYearMonth,4,2)
+
+
+
+
+
 
 !前一個月日期
-#LastDay=A,8,S
-D(7,3,#Today,1,0)
+!#LastDay=A,8,S
+!D(7,3,#Today,1,0)
 
 !本月底營業日
-#MFBSDYDate=A,8,S
-D(6,2,#MFBSDY,0)
+!#MFBSDYDate=A,8,S
+!D(6,2,#MFBSDY,0)
 
 !當月年份    
-#ThisYearMonth=A,5,S
-T(1,#Today,2,5)
+!#ThisYearMonth=A,5,S
+!T(1,#Today,2,5)
 
 
 !上月年份    
-#LastYearMonth=A,5,S
-T(1,#LastDay,2,5)
+!#LastYearMonth=A,5,S
+!T(1,#LastDay,2,5)
 
 
-#YearMonth=A,5,I
-C(3,#Today,#MFBSDYDate,E(0,#ThisYearMonth),E(0,#LastYearMonth))
-E(0,#ThisYearMonth)
-@V(2,0)
-V(5,0,#ThisYearMonth)
+!#YearMonth=A,5,I
+!C(3,#Today,#MFBSDYDate,E(0,#ThisYearMonth),E(0,#LastYearMonth))
+!E(0,#ThisYearMonth)
+!@V(2,0)
+!V(5,0,#ThisYearMonth)
 
 
 #TotalItem=A,1,S
@@ -172,7 +212,8 @@ E(0,6)
 ! 修改這裡的 loop times
 <sub type="TIM">
 #TotalItem
-#YearMonth
+#AcDate
+#ReChkYearMonth
 ##loop{times:6,i:1}
 #BtnShell{i}
 #ReportCat{i}

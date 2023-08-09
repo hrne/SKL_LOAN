@@ -30,24 +30,26 @@ public class L9734ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 執行報表輸出(覆審報表)
 	 * 
 	 * @param titaVo
-	 * @param yearMonth
+	 * @param acDate
 	 * @param conditionCode
 	 * @return
 	 * @throws Exception
 	 */
 
-	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth, int conditionCode) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, int acDate, int conditionCode) throws Exception {
 		// 年
-		int iYear = yearMonth / 100;
+		int iYear = acDate / 100;
 		// 月
-		int iMonth = yearMonth % 100;
+		int iMonth = acDate / 100 % 100;
 
 		String iYearMonth = String.valueOf((iYear * 100) + iMonth);
+
+		int reChkYearMonth = Integer.valueOf(titaVo.getParam("ReChkYearMonth")) + 191100;
 
 		String sql = " ";
 		this.info("iYeariMonth=" + iYearMonth);
 		this.info("conditionCode=" + conditionCode);
-
+		this.info("reChkYearMonth=" + reChkYearMonth);
 		String iYearMonthL5 = "";
 
 		// 此表根據樣張明細備註有取五個月前的撥款日
@@ -74,6 +76,8 @@ public class L9734ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "			,NVL(RC.\"RenewCode\",' ') AS \"RenewCode\"";
 			sql += "			,DECODE(R.\"ReCheckCode\",'2','*',' ') AS \"ReCheckCode\"";
 			sql += "			,R.\"Evaluation\"";
+			sql += "			,CE2.\"Fullname\" AS \"ReChkName\"";
+			sql += "			,CE.\"Fullname\" AS \"TlrName\"";
 			sql += "	  FROM \"InnReCheck\" R";
 			sql += "	  LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = R.\"CustNo\"";
 			sql += "	  LEFT JOIN (SELECT \"CustNo\"";
@@ -99,9 +103,16 @@ public class L9734ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "				 GROUP BY \"CustNo\",\"FacmNo\") R3";
 			sql += "	    ON R3.\"CustNo\" = R.\"CustNo\" ";
 			sql += "	   AND R3.\"FacmNo\" = R.\"FacmNo\" ";
+			sql += "	  LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = R.\"CustNo\" ";
+			sql += "	   						 AND F.\"FacmNo\" = R.\"FacmNo\" ";
+			sql += "	  LEFT JOIN \"CdEmp\" CE ON CE.\"EmployeeNo\" = F.\"BusinessOfficer\" ";
+			sql += "	  LEFT JOIN \"CdEmp\" CE2 ON CE2.\"EmployeeNo\" = R.\"ReChkEmpNo\" ";
 			sql += "	  WHERE R.\"YearMonth\" = :yyyymm";
 			sql += "		AND R.\"ConditionCode\" = :cond ";
 			sql += "		AND R.\"LoanBal\" > 0 ";
+			if (reChkYearMonth != 0) {
+				sql += "		AND R.\"ReChkYearMonth\" = :reChkYearMonth ";
+			}
 			sql += "	  ORDER BY R.\"CustNo\",R.\"FacmNo\"";
 			break;
 
@@ -119,6 +130,8 @@ public class L9734ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "			,NVL(RC.\"RenewCode\",' ') AS \"RenewCode\"";
 			sql += "			,DECODE(R.\"ReCheckCode\",'2','*',' ') AS \"ReCheckCode\"";
 			sql += "			,R.\"Evaluation\"";
+			sql += "			,CE2.\"Fullname\" AS \"ReChkName\"";
+			sql += "			,CE.\"Fullname\" AS \"TlrName\"";
 			sql += "	  FROM \"InnReCheck\" R";
 			sql += "	  LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = R.\"CustNo\"";
 			sql += "	  LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = R.\"CustNo\"";
@@ -147,9 +160,16 @@ public class L9734ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "				 GROUP BY \"CustNo\",\"FacmNo\") R3";
 			sql += "	    ON R3.\"CustNo\" = R.\"CustNo\" ";
 			sql += "	   AND R3.\"FacmNo\" = R.\"FacmNo\" ";
+			sql += "	  LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = R.\"CustNo\" ";
+			sql += "	   						 AND F.\"FacmNo\" = R.\"FacmNo\" ";
+			sql += "	  LEFT JOIN \"CdEmp\" CE ON CE.\"EmployeeNo\" = F.\"BusinessOfficer\" ";
+			sql += "	  LEFT JOIN \"CdEmp\" CE2 ON CE2.\"EmployeeNo\" = R.\"ReChkEmpNo\" ";
 			sql += "	  WHERE R.\"YearMonth\" = :yyyymm";
 			sql += "		AND R.\"ConditionCode\" = :cond ";
 			sql += "		AND R.\"LoanBal\" > 0 ";
+			if (reChkYearMonth != 0) {
+				sql += "		AND R.\"ReChkYearMonth\" = :reChkYearMonth ";
+			}
 			sql += "	  ORDER BY R.\"CustNo\", R.\"FacmNo\"";
 			break;
 
@@ -168,6 +188,8 @@ public class L9734ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "			,NVL(RC.\"RenewCode\",' ') AS \"RenewCode\"";
 			sql += "			,DECODE(S1.\"ReCheckCode\",'2','*',' ') AS \"ReCheckCode\"";
 			sql += "			,S1.\"Evaluation\" ";
+			sql += "			,CE2.\"Fullname\" AS \"ReChkName\"";
+			sql += "			,CE.\"Fullname\" AS \"TlrName\"";
 			sql += "	  FROM(SELECT DISTINCT(R.\"CustNo\")";
 			sql += "	  	   FROM \"InnReCheck\" R";
 			sql += "	  	   LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = R.\"CustNo\"";
@@ -190,6 +212,7 @@ public class L9734ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "					  ,R.\"LoanBal\" \"LoanBal\"";
 			sql += "					  ,DECODE(R.\"ReCheckCode\",'2','*',' ') \"ReCheckCode\"";
 			sql += "					  ,R.\"Evaluation\" \"Evaluation\"";
+			sql += "					  ,R.\"ReChkEmpNo\" \"ReChkEmpNo\"";
 			sql += "	  		    FROM \"InnReCheck\" R";
 			sql += "	  	  	  	LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = R.\"CustNo\"";
 			sql += "	  		  	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = R.\"CustNo\"";
@@ -224,6 +247,13 @@ public class L9734ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "				 GROUP BY \"CustNo\",\"FacmNo\") R3";
 			sql += "	    ON R3.\"CustNo\" = S1.\"CustNo\" ";
 			sql += "	   AND R3.\"FacmNo\" = S1.\"FacmNo\" ";
+			sql += "	  LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = S1.\"CustNo\" ";
+			sql += "	   						 AND F.\"FacmNo\" = S1.\"FacmNo\" ";
+			sql += "	  LEFT JOIN \"CdEmp\" CE ON CE.\"EmployeeNo\" = F.\"BusinessOfficer\" ";
+			sql += "	  LEFT JOIN \"CdEmp\" CE2 ON CE2.\"EmployeeNo\" = R.\"ReChkEmpNo\" ";
+			if (reChkYearMonth != 0) {
+				sql += "	WHERE R.\"ReChkYearMonth\" = :reChkYearMonth ";
+			}
 			sql += "	  ORDER BY S1.\"CustNo\", S1.\"FacmNo\"";
 
 			break;
@@ -243,6 +273,8 @@ public class L9734ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "			,DECODE(R.\"ReChkYearMonth\",0,' ','V') AS \"ReChkYearMonthCode\"";
 			sql += "			,R.\"ReChkYearMonth\" ";
 			sql += "			,R.\"Evaluation\" ";
+			sql += "			,CE2.\"Fullname\" AS \"ReChkName\"";
+			sql += "			,CE.\"Fullname\" AS \"TlrName\"";
 			sql += "	  FROM \"InnReCheck\" R";
 			sql += "	  LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = R.\"CustNo\"";
 			sql += "	  LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = R.\"CustNo\"";
@@ -271,9 +303,14 @@ public class L9734ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "				 GROUP BY \"CustNo\",\"FacmNo\") R3";
 			sql += "	    ON R3.\"CustNo\" = R.\"CustNo\" ";
 			sql += "	   AND R3.\"FacmNo\" = R.\"FacmNo\" ";
+			sql += "	  LEFT JOIN \"CdEmp\" CE ON CE.\"EmployeeNo\" = F.\"BusinessOfficer\" ";
+			sql += "	  LEFT JOIN \"CdEmp\" CE2 ON CE2.\"EmployeeNo\" = R.\"ReChkEmpNo\" ";
 			sql += "	  WHERE R.\"YearMonth\" = :yyyymm";
 			sql += "		AND R.\"ConditionCode\" = :cond ";
 			sql += "		AND R.\"LoanBal\" > 0 ";
+			if (reChkYearMonth != 0) {
+				sql += "		AND R.\"ReChkYearMonth\" = :reChkYearMonth ";
+			}
 			sql += "	  ORDER BY R.\"CustNo\", R.\"FacmNo\"";
 			break;
 
@@ -301,6 +338,8 @@ public class L9734ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "			,R.\"ReChkUnit\" ";
 			sql += "			,R.\"Evaluation\" ";
 			sql += "			,R.\"Remark\" ";
+			sql += "			,CE2.\"Fullname\" AS \"ReChkName\"";
+			sql += "			,CE.\"Fullname\" AS \"TlrName\"";
 			sql += "	  FROM \"InnReCheck\" R";
 			sql += "	  LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = R.\"CustNo\"";
 			sql += "	  LEFT JOIN \"FacMain\" FM ON FM.\"CustNo\" = R.\"CustNo\"";
@@ -342,9 +381,14 @@ public class L9734ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "	   AND R3.\"FacmNo\" = R.\"FacmNo\" ";
 			sql += "	  LEFT JOIN \"TEMP\" TEMP ON TEMP.\"CustNo\" = R.\"CustNo\"";
 			sql += "	  						 AND TEMP.\"FacmNo\" = R.\"FacmNo\"";
+			sql += "	  LEFT JOIN \"CdEmp\" CE ON CE.\"EmployeeNo\" = FM.\"BusinessOfficer\" ";
+			sql += "	  LEFT JOIN \"CdEmp\" CE2 ON CE2.\"EmployeeNo\" = R.\"ReChkEmpNo\" ";
 			sql += "	  WHERE R.\"YearMonth\" = :yyyymm";
 			sql += "		AND R.\"ConditionCode\" = :cond";
 			sql += "		AND R.\"LoanBal\" > 0 ";
+			if (reChkYearMonth != 0) {
+				sql += "		AND R.\"ReChkYearMonth\" = :reChkYearMonth ";
+			}
 			sql += "	  ORDER BY R.\"CustNo\", R.\"FacmNo\"";
 			break;
 
@@ -360,6 +404,10 @@ public class L9734ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (conditionCode == 4) {
 			this.info("iYearMonthL5=" + iYearMonthL5);
 			query.setParameter("l5yymm", iYearMonthL5);
+		}
+
+		if (reChkYearMonth != 0) {
+			query.setParameter("reChkYearMonth", reChkYearMonth);
 		}
 		return this.convertToMap(query);
 	}

@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class InnReCheck implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 531753406149815268L;
-
-@EmbeddedId
+  @EmbeddedId
   private InnReCheckId innReCheckId;
 
   // 資料年月
@@ -112,6 +108,10 @@ public class InnReCheck implements Serializable {
   /* FollowMark=2時輸入 */
   @Column(name = "`TraceMonth`")
   private int traceMonth = 0;
+
+  // 覆審人員
+  @Column(name = "`ReChkEmpNo`", length = 6)
+  private String reChkEmpNo;
 
   // 建檔日期時間
   @CreatedDate
@@ -490,6 +490,25 @@ public class InnReCheck implements Serializable {
   }
 
 /**
+	* 覆審人員<br>
+	* 
+	* @return String
+	*/
+  public String getReChkEmpNo() {
+    return this.reChkEmpNo == null ? "" : this.reChkEmpNo;
+  }
+
+/**
+	* 覆審人員<br>
+	* 
+  *
+  * @param reChkEmpNo 覆審人員
+	*/
+  public void setReChkEmpNo(String reChkEmpNo) {
+    this.reChkEmpNo = reChkEmpNo;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -570,7 +589,7 @@ public class InnReCheck implements Serializable {
   public String toString() {
     return "InnReCheck [innReCheckId=" + innReCheckId + ", reCheckCode=" + reCheckCode + ", followMark=" + followMark
            + ", reChkYearMonth=" + reChkYearMonth + ", drawdownDate=" + drawdownDate + ", loanBal=" + loanBal + ", evaluation=" + evaluation + ", custTypeItem=" + custTypeItem + ", usageItem=" + usageItem
-           + ", cityItem=" + cityItem + ", reChkUnit=" + reChkUnit + ", specifyFg=" + specifyFg + ", remark=" + remark + ", traceMonth=" + traceMonth + ", createDate=" + createDate
-           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", cityItem=" + cityItem + ", reChkUnit=" + reChkUnit + ", specifyFg=" + specifyFg + ", remark=" + remark + ", traceMonth=" + traceMonth + ", reChkEmpNo=" + reChkEmpNo
+           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

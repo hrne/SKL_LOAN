@@ -102,6 +102,9 @@ public class LP005Report extends MakeReport {
 
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);
+		// 考核核算底稿寫入歷程檔
+		insertPfCoOfficerLog(titaVo);
+
 	}
 
 	private void exportExcel(int pfYear, int pfSeason, TitaVo titaVo) throws LogicException {
@@ -160,7 +163,7 @@ public class LP005Report extends MakeReport {
 	}
 
 	// 考核核算底稿寫入歷程檔
-	private void insertPfCoOfficerLog(int logFunctionCode, PfCoOfficer tPfCoOfficer, TitaVo titaVo)
+	private void insertPfCoOfficerLog(TitaVo titaVo)
 			throws LogicException {
 		this.info("insertPfCoOfficerLog  ... ");
 		if (listEmpClass == null || listEmpClass.isEmpty()) {

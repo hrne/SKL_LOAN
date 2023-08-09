@@ -111,7 +111,12 @@ public class L9701Report extends MakeReport {
 
 		this.print(1, 1, " ");
 		this.print(1, 1, "額度　　 : " + tmpFacmNo);
-		this.print(0, 22, "押品地址 : " + clAddr);
+		if (this.facmNo == "") {
+			this.print(0, 22, "押品地址 : " + clAddr);
+
+		} else {
+			this.print(0, 22, "(暫收款)");
+		}
 		divider();
 		this.print(1, 5, "入帳日期");
 		this.print(0, 14, "繳款方式");
@@ -131,8 +136,7 @@ public class L9701Report extends MakeReport {
 		divider();
 
 	}
-	
-	
+
 	private void printFacHead2() {
 
 		divider();
@@ -224,12 +228,8 @@ public class L9701Report extends MakeReport {
 					}
 				}
 
-				if (this.NowRow - 8 >= 45) {
-					this.print(1, this.getMidXAxis(), nextPageText, "C"); //
-					this.newPage();
-					this.print(1, 1, " "); //
-					printFacHead2();
-				}
+				// 換頁
+				nextPage();
 
 				if (!this.facmNo.equals(tL9701Vo.get("FacmNo")) || tL9701Vo.get("DB").equals("2")) {
 					// 無交易明細且無餘額
@@ -246,7 +246,7 @@ public class L9701Report extends MakeReport {
 
 					// 當前額度0 下一筆額度不是0的
 					if ("0".equals(this.facmNo) && !"0".equals(tL9701Vo.get("FacmNo"))) {
-						printFacEnd900(listBaTxVo);
+						divider();
 						detailCounts = 0;
 						isFirst = true;
 					}
@@ -254,6 +254,10 @@ public class L9701Report extends MakeReport {
 					this.custName = tL9701Vo.get("CustName");
 					this.facmNo = tL9701Vo.get("FacmNo");
 					this.clAddr = tL9701Vo.get("Location");
+
+					// 換頁
+					nextPage();
+
 					if (isFirst) {
 						printFacHead();
 						isFirst = false;
@@ -366,37 +370,14 @@ public class L9701Report extends MakeReport {
 		feeAmtTotal = BigDecimal.ZERO;
 	}
 
-	private void printFacEnd900(List<BaTxVo> listBaTxVo) {
-		shortFall = BigDecimal.ZERO;
-		excessive = BigDecimal.ZERO;
+	private void nextPage() {
 
-		BigDecimal tmpOverAmt = BigDecimal.ZERO;
-		loanBal = BigDecimal.ZERO;
-		if (listBaTxVo != null && listBaTxVo.size() != 0) {
-			for (BaTxVo tBaTxVo : listBaTxVo) {
-				if (tBaTxVo.getDataKind() == 4) {
-					tmpOverAmt = "C".equals(tBaTxVo.getDbCr()) ? tmpOverAmt.add(tBaTxVo.getUnPaidAmt())
-							: tmpOverAmt.subtract(tBaTxVo.getUnPaidAmt());
-				}
-			}
+		if (this.NowRow - 8 >= 45) {
+			this.print(1, this.getMidXAxis(), nextPageText, "C"); //
+			this.newPage();
+			this.print(1, 1, " "); //
+			printFacHead2();
 		}
-
-		divider();
-		this.print(1, 1, "(暫收款)");
-		this.print(0, 9, " 至" + showRocDate(entday, 1) + " 當日餘額：");
-		this.print(0, 43, formatAmt(loanBal, 0), "R"); // 放款餘額
-		this.print(0, 52, "累溢短收：");
-		this.print(0, 72, formatAmt(tmpOverAmt, 0), "R"); // 累溢短收
-		this.print(0, 74, "小計：");
-		this.print(0, 93, formatAmt(principalTotal, 0), "R");
-		this.print(0, 103, formatAmt(interestTotal, 0), "R");
-		this.print(0, 116, formatAmt(breachAmtTotal, 0), "R");
-		this.print(0, 130, formatAmt(feeAmtTotal, 0), "R");
-
-		principalTotal = BigDecimal.ZERO;
-		interestTotal = BigDecimal.ZERO;
-		breachAmtTotal = BigDecimal.ZERO;
-		feeAmtTotal = BigDecimal.ZERO;
 	}
 
 }

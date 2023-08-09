@@ -88,20 +88,23 @@ E(0,0)
 !科子細目
 #AcNoCode=X,11,I
 C(3,#CHAIN,1,T(1,#NTXBUF,1,4),$)
-C(3,#CHAIN,1,s,$)
+C(3,#AcNoCode,1,S,$)
+! C(3,#CHAIN,1,s,$)
 !C(3,#FirstIn,1,E(0,@CHAIN,1),$)
-!C(3,#FirstIn,1,S,$)
+! C(3,#FirstIn,1,S,$)
 
 #AcSubCode=X,5,I
 C(3,#CHAIN,1,T(1,#NTXBUF,1,4),$)
-C(3,#CHAIN,1,s,$)
+! C(3,#CHAIN,1,s,$)
+C(3,#AcSubCode,1,S,$)
 C(4,#AcNoCode,s,$)
 !C(3,#FirstIn,1,E(0,@CHAIN,1),$)
 !C(3,#FirstIn,1,S,$)
 
 #AcDtlCode=X,2,I
 C(3,#CHAIN,1,T(1,#NTXBUF,1,4),$)
-C(3,#CHAIN,1,s,$)
+! C(3,#CHAIN,1,s,$)
+C(3,#AcDtlCode,1,S,$)
 C(4,#AcNoCode,s,$)
 !C(3,#FirstIn,1,E(0,@CHAIN,1),$)
 !C(3,#FirstIn,1,S,$)

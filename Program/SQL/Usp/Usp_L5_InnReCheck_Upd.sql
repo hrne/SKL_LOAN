@@ -67,6 +67,7 @@ BEGIN
                  , NULL                   AS "SpecifyFg"           --指定覆審記號
                  , ' '                    AS "Remark"              --備註  
                  , 0                      AS "TraceMonth"          --追蹤年月
+                 , ' '                    AS "ReChkEmpNo"          --覆審人員
                  , JOB_START_TIME         AS "CreateDate"          -- 建檔日期時間  
                  , EMPNO                  AS "CreateEmpNo"         -- 建檔人員 
                  , JOB_START_TIME         AS "LastUpdate"          -- 最後更新日期時間  
@@ -154,6 +155,7 @@ BEGIN
                  , ''                  AS "SpecifyFg"           --指定覆審記號
                  , ' '                 AS "Remark"              --備註  
                  , 0                   AS "TraceMonth"          --追蹤年月
+                 , ' '                    AS "ReChkEmpNo"          --覆審人員
                  , JOB_START_TIME      AS "CreateDate"          -- 建檔日期時間  
                  , EMPNO               AS "CreateEmpNo"         -- 建檔人員 
                  , JOB_START_TIME      AS "LastUpdate"          -- 最後更新日期時間  

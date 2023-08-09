@@ -2,8 +2,12 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * InnReCheck 覆審案件明細檔<br>
@@ -16,12 +20,7 @@ import javax.persistence.Embeddable;
 public class InnReCheckId implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -8252281610986094654L;
-
-// 資料年月
+  // 資料年月
   /* 指定複審名單時為 0 紅字部分2021/11/5審查會議修改 */
   @Column(name = "`YearMonth`")
   private int yearMonth = 0;
