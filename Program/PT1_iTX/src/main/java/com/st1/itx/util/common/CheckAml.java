@@ -167,7 +167,7 @@ public class CheckAml extends TradeBuffer {
 			txAmlLog.setStatusDesc(getXmlValue(doc, "StatusDesc"));
 
 			if ("0".equals(txAmlLog.getStatusCode()) && "INFO".equals(txAmlLog.getStatus())) {
-				txAmlLog = parseResult(doc, txAmlLog);
+				txAmlLog = parseResult(doc, txAmlLog ,titaVo);
 			} else {
 				// 需審查/確認
 				txAmlLog.setConfirmStatus("1");
@@ -254,9 +254,10 @@ public class CheckAml extends TradeBuffer {
 			txAmlLog.setStatusCode(getXmlValue(doc, "StatusCode"));
 			txAmlLog.setStatus(getXmlValue(doc, "Severity"));
 			txAmlLog.setStatusDesc(getXmlValue(doc, "StatusDesc"));
-
+			txAmlLog.setConfirmStatus(titaVo.get("ConfirmStatus"));
+			
 			if ("0".equals(txAmlLog.getStatusCode()) && "INFO".equals(txAmlLog.getStatus())) {
-				txAmlLog = parseResult(doc, txAmlLog);
+				txAmlLog = parseResult(doc, txAmlLog ,titaVo);
 			} else {
 				// 需審查/確認
 				txAmlLog.setConfirmStatus("1");
@@ -357,11 +358,13 @@ public class CheckAml extends TradeBuffer {
 		} else {
 			String msgrs = connectAml(amlurl, txAmlLog.getMsgRg());
 			if (amlflag != 0) {
-			} else if (!this.connectSuccess) {
+			} 
+//			else if (!this.connectSuccess) {
 				// 需審查/確認
 //			txAmlLog.setConfirmStatus("1");
 //			throw new LogicException("EC009", "連結 "+amlurl+" 發生錯誤");
-			} else {
+//			} 
+			else {
 				Document doc = convertStringToXml(msgrs);
 
 				String Status = getXmlValue(doc, "Severity");
@@ -376,9 +379,10 @@ public class CheckAml extends TradeBuffer {
 				txAmlLog.setStatus(Status);
 				txAmlLog.setStatusDesc(StatusDesc);
 				txAmlLog.setConfirmStatus(txAmlLog.getConfirmStatus());
+				
 				this.info("refreshStatus.ConfirmStatus =" + txAmlLog.getConfirmStatus());
 				if ("0".equals(StatusCode) && "INFO".equals(Status)) {
-					txAmlLog = parseResult(doc, txAmlLog);
+					txAmlLog = parseResult(doc, txAmlLog, titaVo);
 				} else {
 					// 需審查/確認
 					txAmlLog.setConfirmStatus("1");
@@ -500,9 +504,9 @@ public class CheckAml extends TradeBuffer {
 	}
 
 	@SuppressWarnings("unchecked")
-	private TxAmlLog parseResult(Document doc, TxAmlLog txAmlLog) throws LogicException {
+	private TxAmlLog parseResult(Document doc, TxAmlLog txAmlLog ,TitaVo titaVo) throws LogicException {
 //		Document doc = convertStringToXml(msgrs);		
-
+		String iFunCode = titaVo.getParam("FunCode");
 		if ("0".equals(txAmlLog.getStatusCode()) && "INFO".equals(txAmlLog.getStatus())) {
 			String ResultString = getXmlValue(doc, "AML_SCAN_QUERY_FirstResult");
 
@@ -516,7 +520,7 @@ public class CheckAml extends TradeBuffer {
 				txAmlLog.setIsSimilar(ResultMap.get("Is_Similar").toString());
 				txAmlLog.setIsSan(ResultMap.get("Is_San").toString());
 				txAmlLog.setIsBanNation(ResultMap.get("Is_Ban_Nation").toString());
-
+				if (!iFunCode.equals("5")) {
 				// 疑似名單需確認
 				if ("Warning".equals(txAmlLog.getStatus()) || "Fail".equals(txAmlLog.getStatus())) {
 					txAmlLog.setConfirmStatus("1");
@@ -527,6 +531,7 @@ public class CheckAml extends TradeBuffer {
 						txAmlLog.setConfirmStatus("2");
 					}
 
+				}
 				}
 			} catch (JsonParseException e) {
 				// TODO Auto-generated catch block

@@ -191,7 +191,7 @@ T(2,@DeptCodeX,#L5r07DeptCodeX)
 ! 單位代號
 #UnitCode=X,6,I
 C(2,#FunctionCd,s,$,$,$,s,s,s,s,s)
-C(3,#FunctionCd,2,C(3,#StatusFg,1,s,$),$)
+!C(3,#FunctionCd,2,C(3,#StatusFg,1,s,$),$)
 !C(2,#FunctionCd,s,$,s,$,s)
 !C(2,#FunctionCd,s,$,s,s,s)
 @C(4,#UnitCode,s,$)
@@ -211,7 +211,7 @@ T(2,@DistCodeX,#L5R40DistItem)
 ! 區部代號
 #DistCode=X,6,I
 C(2,#FunctionCd,s,$,$,$,s,s,s,s,s)
-C(3,#FunctionCd,2,C(3,#StatusFg,1,s,$),$)
+!C(3,#FunctionCd,2,C(3,#StatusFg,1,s,$),$)
 !C(2,#FunctionCd,s,$,s,$,s)
 @C(4,#DistCode,s,$)
 T(2,@RimChoose,2)
@@ -228,7 +228,7 @@ T(2,@DistCodeX,#L5R40DistItem)
 ! 部室代號
 #DeptCode=X,6,I
 C(2,#FunctionCd,s,$,$,$,s,s,s,s,s)
-C(3,#FunctionCd,2,C(3,#StatusFg,1,s,$),$)
+!C(3,#FunctionCd,2,C(3,#StatusFg,1,s,$),$)
 !C(2,#FunctionCd,s,$,s,$,s)
 @C(4,#DeptCode,s,$)
 T(2,@RimChoose,3)

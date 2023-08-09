@@ -237,6 +237,7 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	LEFT JOIN \"TxTranCode\" TC ON TC.\"TranNo\" = T.\"TranNo\"";
 		sql += "	WHERE T.\"Entdy\" BETWEEN :sAcDate AND :eAcDate";
 		sql += "	  AND T.\"CustNo\" > 0 ";
+		sql += "	  AND T.\"ImportFg\" = 1 ";
 		sql += "	";
 		sql += "	) R";
 		sql += "	ORDER BY R.\"Seq\" ASC";
