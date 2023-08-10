@@ -199,8 +199,8 @@ public class JobExecListener extends SysLogger implements JobExecutionListener {
 				jobExecutionContext.putString("RerunType", "A");
 				break;
 			}
-			jobExecutionContext.putString("OriTxSeq", oriTxSeq);
-			jobExecutionContext.putString("OriStep", oriStepId);
+			jobExecutionContext.putString("OriTxSeq", oriTxSeq.trim());
+			jobExecutionContext.putString("OriStep", oriStepId.trim());
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));

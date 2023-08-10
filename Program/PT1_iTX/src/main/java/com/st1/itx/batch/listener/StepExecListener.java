@@ -66,9 +66,12 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 
 		ExecutionContext jobEc = jobExecution.getExecutionContext();
 
-		String oriTxSeq = jobEc.getString("OriTxSeq");
+		String oriTxSeq = "";
 		String oriStep = "";
 		String rerunType = "";
+		if (jobEc.containsKey("OriTxSeq")) {
+			rerunType = jobEc.getString("OriTxSeq");
+		}
 		if (jobEc.containsKey("RerunType")) {
 			rerunType = jobEc.getString("RerunType");
 		}
