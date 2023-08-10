@@ -93,7 +93,7 @@ public class PfCoOfficerLog implements Serializable {
   private java.sql.Timestamp updateDate;
 
   // 功能
-  /* 1.新增 2.修改 4.刪除 */
+  /* 1.新增 2.修改 4.刪除 6.離職異動 7.調職異動 8.考核職級異動9.考核核算底稿 */
   @Column(name = "`FunctionCode`")
   private int functionCode = 0;
 
@@ -385,7 +385,8 @@ public class PfCoOfficerLog implements Serializable {
 
 /**
 	* 功能<br>
-	* 1.新增 2.修改 4.刪除
+	* 1.新增 2.修改 4.刪除 
+6.離職異動 7.調職異動 8.考核職級異動9.考核核算底稿
 	* @return Integer
 	*/
   public int getFunctionCode() {
@@ -394,7 +395,8 @@ public class PfCoOfficerLog implements Serializable {
 
 /**
 	* 功能<br>
-	* 1.新增 2.修改 4.刪除
+	* 1.新增 2.修改 4.刪除 
+6.離職異動 7.調職異動 8.考核職級異動9.考核核算底稿
   *
   * @param functionCode 功能
 	*/

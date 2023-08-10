@@ -46,6 +46,16 @@ public interface PfCoOfficerLogService {
   public Slice<PfCoOfficerLog> findEmpNoEq(String empNo_0, int index, int limit, TitaVo... titaVo);
 
   /**
+   * EmpNo=, AND EffectiveDate= 
+   *
+   * @param empNo_0 empNo_0
+   * @param effectiveDate_1 effectiveDate_1
+   * @param titaVo Variable-Length Argument
+   * @return Slice PfCoOfficerLog PfCoOfficerLog of List
+   */
+  public PfCoOfficerLog findEmpEffectiveDateFirst(String empNo_0, int effectiveDate_1, TitaVo... titaVo);
+
+  /**
    * hold By PfCoOfficerLog
    * 
    * @param logNo key

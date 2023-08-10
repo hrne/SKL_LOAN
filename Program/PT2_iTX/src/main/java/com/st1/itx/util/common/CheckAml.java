@@ -167,7 +167,7 @@ public class CheckAml extends TradeBuffer {
 			txAmlLog.setStatusDesc(getXmlValue(doc, "StatusDesc"));
 
 			if ("0".equals(txAmlLog.getStatusCode()) && "INFO".equals(txAmlLog.getStatus())) {
-				txAmlLog = parseResult(doc, txAmlLog, titaVo);
+				txAmlLog = parseResult(doc, txAmlLog);
 			} else {
 				// 需審查/確認
 				txAmlLog.setConfirmStatus("1");
@@ -233,7 +233,7 @@ public class CheckAml extends TradeBuffer {
 			txAmlLog.setStatus("Warning");
 			txAmlLog.setStatusDesc("AML系統異常，改由人工檢核");
 		} else if (amlflag == 2) {
-//			txAmlLog.setConfirmStatus("0");
+			txAmlLog.setConfirmStatus("0");
 			txAmlLog.setStatusCode("0008");
 			txAmlLog.setStatus("Success");
 			txAmlLog.setStatusDesc("測試套不檢查");
@@ -254,10 +254,9 @@ public class CheckAml extends TradeBuffer {
 			txAmlLog.setStatusCode(getXmlValue(doc, "StatusCode"));
 			txAmlLog.setStatus(getXmlValue(doc, "Severity"));
 			txAmlLog.setStatusDesc(getXmlValue(doc, "StatusDesc"));
-			txAmlLog.setConfirmStatus(titaVo.get("ConfirmStatus"));
 
 			if ("0".equals(txAmlLog.getStatusCode()) && "INFO".equals(txAmlLog.getStatus())) {
-				txAmlLog = parseResult(doc, txAmlLog, titaVo);
+				txAmlLog = parseResult(doc, txAmlLog);
 			} else {
 				// 需審查/確認
 				txAmlLog.setConfirmStatus("1");
@@ -339,15 +338,10 @@ public class CheckAml extends TradeBuffer {
 	 * @throws LogicException LogicException
 	 */
 	public CheckAmlVo refreshStatus(Long logno, TitaVo titaVo) throws LogicException {
-		this.info("FunCode   = " + titaVo.getParam("FunCode"));
-		String iFunCode = "0";
-		if (titaVo.get("FunCode") != null) {
-			iFunCode = titaVo.get("FunCode");
-		}
 		amlflag = this.txBuffer.getSystemParas().getAmlFg();
 		this.info("CheckAml refreshStatus amlflag=" + amlflag);
 		amlurl = this.txBuffer.getSystemParas().getAmlUrl();
-		TxAmlLog txAmlLog = txAmlLogService.holdById(logno);
+		TxAmlLog txAmlLog = txAmlLogService.holdById(logno, titaVo);
 		if (txAmlLog == null) {
 			throw new LogicException("EC001", "TxAmlLog.LogNo:" + logno);
 		}
@@ -379,24 +373,22 @@ public class CheckAml extends TradeBuffer {
 				txAmlLog.setStatusCode(StatusCode);
 				txAmlLog.setStatus(Status);
 				txAmlLog.setStatusDesc(StatusDesc);
-				txAmlLog.setConfirmStatus(txAmlLog.getConfirmStatus());
 
-				this.info("refreshStatus.ConfirmStatus =" + txAmlLog.getConfirmStatus());
 				if ("0".equals(StatusCode) && "INFO".equals(Status)) {
-					txAmlLog = parseResult(doc, txAmlLog, titaVo);
+					txAmlLog = parseResult(doc, txAmlLog);
 				} else {
 					// 需審查/確認
 					txAmlLog.setConfirmStatus("1");
 				}
 			}
 		}
-		if (!iFunCode.equals("5")) {
-			try {
-				txAmlLogService.update(txAmlLog, titaVo);
-			} catch (DBException e) {
-				throw new LogicException("EC003", "update TxAmlLog:" + e.getErrorMsg()); // 更新資料
-			}
+
+		try {
+			txAmlLogService.update(txAmlLog, titaVo);
+		} catch (DBException e) {
+			throw new LogicException("EC003", "update TxAmlLog:" + e.getErrorMsg()); // 更新資料
 		}
+
 		checkAmlVo = rspAmlVo(checkAmlVo, txAmlLog);
 
 		return checkAmlVo;
@@ -414,7 +406,7 @@ public class CheckAml extends TradeBuffer {
 		amlflag = this.txBuffer.getSystemParas().getAmlFg();
 		this.info("CheckAml isManualConFirm amlflag=" + amlflag);
 		amlurl = this.txBuffer.getSystemParas().getAmlUrl();
-		TxAmlLog txAmlLog = txAmlLogService.holdById(logno);
+		TxAmlLog txAmlLog = txAmlLogService.holdById(logno, titaVo);
 		if (txAmlLog == null) {
 			throw new LogicException("EC001", "TxAmlLog.LogNo:" + logno);
 		}
@@ -505,12 +497,9 @@ public class CheckAml extends TradeBuffer {
 	}
 
 	@SuppressWarnings("unchecked")
-	private TxAmlLog parseResult(Document doc, TxAmlLog txAmlLog, TitaVo titaVo) throws LogicException {
+	private TxAmlLog parseResult(Document doc, TxAmlLog txAmlLog) throws LogicException {
 //		Document doc = convertStringToXml(msgrs);		
-		String iFunCode = "0";
-		if (titaVo.get("FunCode") != null) {
-			iFunCode = titaVo.get("FunCode");
-		}
+
 		if ("0".equals(txAmlLog.getStatusCode()) && "INFO".equals(txAmlLog.getStatus())) {
 			String ResultString = getXmlValue(doc, "AML_SCAN_QUERY_FirstResult");
 
@@ -524,18 +513,17 @@ public class CheckAml extends TradeBuffer {
 				txAmlLog.setIsSimilar(ResultMap.get("Is_Similar").toString());
 				txAmlLog.setIsSan(ResultMap.get("Is_San").toString());
 				txAmlLog.setIsBanNation(ResultMap.get("Is_Ban_Nation").toString());
-				if (!iFunCode.equals("5")) {
-					// 疑似名單需確認
-					if ("Warning".equals(txAmlLog.getStatus()) || "Fail".equals(txAmlLog.getStatus())) {
-						txAmlLog.setConfirmStatus("1");
-					} else if ("Success".equals(txAmlLog.getStatus())) {
-						if ("0008".equals(txAmlLog.getStatusCode()) || "0009".equals(txAmlLog.getStatusCode())) {
-							txAmlLog.setConfirmStatus("0");
-						} else if ("0010".equals(txAmlLog.getStatusCode())) {
-							txAmlLog.setConfirmStatus("2");
-						}
 
+				// 疑似名單需確認
+				if ("Warning".equals(txAmlLog.getStatus()) || "Fail".equals(txAmlLog.getStatus())) {
+					txAmlLog.setConfirmStatus("1");
+				} else if ("Success".equals(txAmlLog.getStatus())) {
+					if ("0008".equals(txAmlLog.getStatusCode()) || "0009".equals(txAmlLog.getStatusCode())) {
+						txAmlLog.setConfirmStatus("0");
+					} else if ("0010".equals(txAmlLog.getStatusCode())) {
+						txAmlLog.setConfirmStatus("2");
 					}
+
 				}
 			} catch (JsonParseException e) {
 				// TODO Auto-generated catch block

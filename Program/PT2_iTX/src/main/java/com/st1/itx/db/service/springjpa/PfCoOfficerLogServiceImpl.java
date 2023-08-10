@@ -138,6 +138,25 @@ em = null;
   }
 
   @Override
+  public PfCoOfficerLog findEmpEffectiveDateFirst(String empNo_0, int effectiveDate_1, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("findEmpEffectiveDateFirst " + dbName + " : " + "empNo_0 : " + empNo_0 + " effectiveDate_1 : " +  effectiveDate_1);
+    Optional<PfCoOfficerLog> pfCoOfficerLogT = null;
+    if (dbName.equals(ContentName.onDay))
+      pfCoOfficerLogT = pfCoOfficerLogReposDay.findTopByEmpNoIsAndEffectiveDateIsOrderByLogNoDesc(empNo_0, effectiveDate_1);
+    else if (dbName.equals(ContentName.onMon))
+      pfCoOfficerLogT = pfCoOfficerLogReposMon.findTopByEmpNoIsAndEffectiveDateIsOrderByLogNoDesc(empNo_0, effectiveDate_1);
+    else if (dbName.equals(ContentName.onHist))
+      pfCoOfficerLogT = pfCoOfficerLogReposHist.findTopByEmpNoIsAndEffectiveDateIsOrderByLogNoDesc(empNo_0, effectiveDate_1);
+    else 
+      pfCoOfficerLogT = pfCoOfficerLogRepos.findTopByEmpNoIsAndEffectiveDateIsOrderByLogNoDesc(empNo_0, effectiveDate_1);
+
+    return pfCoOfficerLogT.isPresent() ? pfCoOfficerLogT.get() : null;
+  }
+
+  @Override
   public PfCoOfficerLog holdById(Long logNo, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

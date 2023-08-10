@@ -24,6 +24,9 @@ public interface PfCoOfficerLogRepositoryDay extends JpaRepository<PfCoOfficerLo
   // EmpNo=
   public Slice<PfCoOfficerLog> findAllByEmpNoIsOrderByLogNoDesc(String empNo_0, Pageable pageable);
 
+  // EmpNo=, AND EffectiveDate= 
+  public Optional<PfCoOfficerLog> findTopByEmpNoIsAndEffectiveDateIsOrderByLogNoDesc(String empNo_0, int effectiveDate_1);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)
