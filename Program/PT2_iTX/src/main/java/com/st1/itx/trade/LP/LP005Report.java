@@ -195,10 +195,12 @@ public class LP005Report extends MakeReport {
 			}
 		}
 
-		// 核核算底稿新增至歷程檔
+		// 核算底稿新增至歷程檔(考核後職級不同)
 		for (Map<String, String> m : listEmpClass) {
-			l5407.insertEvalutePfCoOfficerLog(m.get("EmpNo"), parse.stringToInteger(m.get("EmpNo")),
-					evaluteEffectiveDate, m.get("AfterEmpClass"), titaVo);
+			if(!m.get("AfterEmpClass").equals(m.get("OriEmpClass"))) {
+				l5407.insertEvalutePfCoOfficerLog(m.get("EmpNo"), parse.stringToInteger(m.get("EffectiveDate"))-19110000,
+						evaluteEffectiveDate, m.get("AfterEmpClass"), titaVo);
+			}
 		}
 	}
 

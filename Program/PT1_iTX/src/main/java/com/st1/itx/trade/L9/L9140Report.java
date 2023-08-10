@@ -105,8 +105,10 @@ public class L9140Report extends MakeReport {
 
 //		int Caldy = parse.stringToInteger(titaVo.getCalDy())+19110000;//20230511改用findEntdyImportFg且日期使用會計日
 
-		Slice<TxInquiry> sTxInquiry = sTxInquiryService.findEntdyImportFg(titaVo.getEntDyI() + 19110000,
-				titaVo.getEntDyI() + 19110000, "1", 0, 9999999, 0, Integer.MAX_VALUE, titaVo);
+		int acdate = parse.stringToInteger(titaVo.get("AcDate")) + 19110000;
+		this.info("L9140 acdate =" + acdate);
+		Slice<TxInquiry> sTxInquiry = sTxInquiryService.findEntdyImportFg(acdate, acdate, "1", 0, 9999999, 0,
+				Integer.MAX_VALUE, titaVo);
 
 		List<TxInquiry> iTxInquiry = sTxInquiry == null ? null : sTxInquiry.getContent();
 

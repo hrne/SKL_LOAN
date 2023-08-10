@@ -1,0 +1,101 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+</sub>
+
+<sub type="DC" name="p1" layout="cols=1;screen.width=[120,880];printer.width=[15,45];order=1;">
+[
+["[L687A] 夜間批次重新執行"],
+["#FdJobTxSeq+批號",#OOJobTxSeq],
+["#FdRerunType+重跑方式",#RerunType],
+]
+
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+
+#FdJobTxSeq=X,2,L
+#FdRerunType=X,2,L
+
+! 功能 必須輸入(1: 新增;2: 修改;4: 刪除;5: 查詢)
+#FUNCIND=_,_,S
+E(0,5)
+K(MODIFYBUTTON,執行)
+
+!刪除隱藏重新交易按鈕
+#AGAIN=X,1,S
+E(0,1)ASGN(AGAIN$)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#NTXBUF=x,1000,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@OOJobCode,#NTXBUF,1,30)
+T(1,@OOJobTxSeq,#NTXBUF,31,20)
+T(1,@OOStatus,#NTXBUF,51,1)
+T(1,@OOStepId,#NTXBUF,52,30)
+
+!---------- AP TEXT AREA Variables ----------
+
+#OOJobCode=x,30,L
+
+![批號]
+#OOJobTxSeq=x,20,L
+
+#OOStatus=x,1,L
+
+#OOStepId=x,30,L
+
+#RerunType=x,10,L
+SWITCH(#OOStatus,F,T(3,失敗重跑),
+                 S,T(3,單支重跑),
+                 T(3,整批重跑))
+
+</sub>
+
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L687A ----------
+<sub type="FORM" name="L687A">
+
+#SCRTIL=_,_,S
+T(3,[L687A] 夜間批次重新執行)
+
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+
+</sub>
+
+!------ 上行電文TIM：BASIC LABEL + AP TEXT AREA + AP TEXT ------
+<sub type="TIM">
+#OOJobCode
+#OOJobTxSeq
+#OOStatus
+#OOStepId
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L687A
+^
+
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

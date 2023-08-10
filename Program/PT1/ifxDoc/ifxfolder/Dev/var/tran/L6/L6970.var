@@ -219,14 +219,26 @@ IF(#OONestJobCode=="yearlyRptFlow" || #OONestJobCode=="monthlyRptFlow" ||#OONest
 #OO_BTN_UspError=X,1,S
 IF(#OOHaveUspErrorLog=="Y",BIND(grid,{ cmd=CHAIN; ntxcd=L6973;text=錯誤查詢;ntxbuf=#OOJobTxSeq}),BIND(grid,cancel))
 
-#OOSuccess=A,5,L
-#OOFalse=A,5,L
+#OOFailRerunBuf=x,1000,S
+T(2,#OOJobCode+#OOJobTxSeq+#OOStatus+#OOStepId)
 
-! use T(6A,...)
-! 勾選幾個就會sendback幾次, 所以不需要concats
-! 長度似乎要大於某個值, 但實際進Vo的欄位長度會切剛好, 並且能用其原本名字存取
-#Sendback=x,10000,S
-T(6A,#OOJobCode+#OOJobTxSeq+#OOStatus+#OOStepId)
+! 失敗重跑 會執行同批號中失敗或尚未執行的批次的按鈕
+! 單支重跑 只重跑選定的這支
+#OO_BTN_FailRerun=X,1,S
+SWITCH(#OOStatus,
+	F,BIND(grid,{ cmd=CHAIN; ntxcd=L687A;text=失敗重跑;ntxbuf=#OOFailRerunBuf}),
+	S,BIND(grid,{ cmd=CHAIN; ntxcd=L687A;text=單支重跑;ntxbuf=#OOFailRerunBuf}),
+	BIND(grid,cancel))
+
+#OOAllRerunBuf=x,1000,S
+T(2,#OOJobCode+#OOJobTxSeq)
+
+! 整批重跑
+#OO_BTN_AllRerun=X,1,S
+SWITCH(#OOStatus,
+	F,BIND(grid,{ cmd=CHAIN; ntxcd=L687A;text=整批重跑;ntxbuf=#OOAllRerunBuf}),
+	S,BIND(grid,{ cmd=CHAIN; ntxcd=L687A;text=整批重跑;ntxbuf=#OOAllRerunBuf}),
+	BIND(grid,cancel))
 
 </sub>
 
@@ -253,13 +265,9 @@ TXFORM=L6970
 #OOStepEndTime
 #OOJobTxSeq
 #OOHaveUspErrorLog
-#OOSuccess
-#OOFalse
 ^
 
 </sub>
-ALERT(#OOSuccess)
-ALERT(#OOFalse)
 
 !---------- 單據輸出組合 ----------
 <sub type="PART" name="L6970" layout="cols=1;screen.width=[100,900];printer.width=[20,20];">
@@ -272,22 +280,13 @@ ALERT(#OOFalse)
 #batch-print=8,L6970.PFNX,NA,,,,,,1169:827
 ^
 #RPTFG=9,QUERY.GRID,L6970
-#any={detail:true, header:'L6970.part', caption:'', width:1005, rowNum:20, rowList:[20,40,60],
-ifxBatch:{
-	name:'重新執行',
-	type:'5',
-	rim:'L6970',
-	txtno:'#Sendback',
-	pfnx:"L6970.PFNX",
-	col_captions:["步驟代號","批次執行日期","處理結果        "],
-	col_names:["#OOStepId","#OOExecDate","#batch-row-status"]
-	}
-}
-
-#Sendback
+#any={detail:true, header:'L6970.part', caption:'', width:1005, rowNum:20, rowList:[20,40,60]}
 
 #OOExecDate=批次執行日期
 {width:120,align:'center'}
+
+#OOJobTxSeq=批號
+{width:160,align:'left'}
 
 #OOJobCode=批次代號
 {width:100,align:'left'}
@@ -313,6 +312,12 @@ ifxBatch:{
 #OO_BTN_UspError=錯誤查詢
 {width:80,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
 
+#OO_BTN_FailRerun=重跑
+{width:80,search:false,formatter:'cust:bind-button:重跑',align:'center',canExport:false}
+
+#OO_BTN_AllRerun=整批重跑
+{width:80,search:false,formatter:'cust:bind-button:整批重跑',align:'center',canExport:false}
+
 #OOStepStartTime=啟動時間
 {width:120,align:'center'}
 
@@ -323,7 +328,4 @@ ifxBatch:{
 {width:80,align:'center'}
 ^
 
-
 </sub>
-
-

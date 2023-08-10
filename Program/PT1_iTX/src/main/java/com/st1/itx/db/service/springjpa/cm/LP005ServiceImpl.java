@@ -197,6 +197,7 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       , \"DistItem\"      ";
 		sql += "       , \"AreaItem\"      ";
 		sql += "       , \"EmpClass\"      ";
+		sql += "       , \"EffectiveDate\"      ";
 		sql += "       , ROW_NUMBER() OVER (Partition By \"EmpNo\"              ";
 		sql += "    	                   	    ORDER BY \"EffectiveDate\" Desc      ";
 		sql += "	                       ) AS ROWNUMBER                            ";
@@ -221,6 +222,7 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , TRUNC(PR.amt4 / 10000)   AS amt4        "; // -- F12 金額4
 		sql += "      , PR.countTotal            AS countTotal  "; // -- F13 件數合計
 		sql += "      , TRUNC(PR.amtTotal / 10000)  AS amtTotal    "; // -- F14 金額合計
+		sql += "      , PCO.\"EffectiveDate\"    AS EffectiveDate";//--F15 生效日
 		sql += " FROM COOFFICER PCO ";
 		sql += " LEFT JOIN ( SELECT \"EmployeeNo\"                "; // -
 		sql += "                  , SUM(CASE ";

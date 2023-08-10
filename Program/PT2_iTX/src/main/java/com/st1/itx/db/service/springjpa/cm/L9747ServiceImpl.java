@@ -96,7 +96,7 @@ public class L9747ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        AND Cl.\"ClNo\" = Cf.\"ClNo\" ";
 		sql += "        LEFT JOIN \"CdCity\" Ct ON Ct.\"CityCode\" = Cl.\"CityCode\" ";
 		sql += "    WHERE Nvl(A.\"RvBal\", 0) > 0 ";
-		sql += "        OR Nvl(AA.\"RvBal\", 0) > 0; ";
+		sql += "        OR Nvl(AA.\"RvBal\", 0) > 0 ";
 
 		this.info("sql=" + sql);
 

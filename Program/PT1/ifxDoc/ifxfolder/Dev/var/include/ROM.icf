@@ -6764,6 +6764,7 @@ TXFORM=L5R26
 #L5r27DistCodeX=X,40,S
 #L5r27UnitCode=X,6,S
 #L5r27UnitCodeX=X,40,S
+#L5r27LastWorkMonth=A,5,S
 </L5R27.dec>
 
 <L5R27.tom>
@@ -6794,6 +6795,7 @@ TXFORM=L5R27
 #L5r27DistCodeX
 #L5r27UnitCode
 #L5r27UnitCodeX
+#L5r27LastWorkMonth
 ^
 </L5R27.tom>
 
@@ -8996,6 +8998,7 @@ TXFORM=L8R60
 #L5R38oStartDate=A,7,S
 #L5R38oEndDate=A,7,S
 #L5R38oBonusDate=A,7,S
+#L5R38LastWorkSeason=A,4,S
 </L5R38.rtn>
 
 <L5R38.tom>
@@ -9007,6 +9010,7 @@ TXFORM=L5R38
 #L5R38oStartDate
 #L5R38oEndDate
 #L5R38oBonusDate
+#L5R38LastWorkSeason
 ^
 </L5R38.tom>
 
@@ -10474,3 +10478,21 @@ TXFORM=L9R01
 #L9R01WorkMonth
 ^
 </L9R01.tom>
+
+<L5R51.dec>
+#L5r51CustId=X,10,S
+#L5r51CustNo=X,7,S
+#L5r51CaseSeq=X,3,S
+#L5r51CustName=X,100,S
+#L5r51104Fg=X,1,S
+</L5R51.dec>
+
+<L5R51.tom>
+TXFORM=L5R51
+#L5r51CustId
+#L5r51CustNo
+#L5r51CaseSeq
+#L5r51CustName
+#L5r51104Fg
+^
+</L5R51.tom>

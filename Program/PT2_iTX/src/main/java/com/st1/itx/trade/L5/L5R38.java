@@ -95,12 +95,12 @@ public class L5R38 extends TradeBuffer {
 			startDate = cdWorkMonth.getStartDate();
 			endDate = cdWorkMonth.getEndDate();
 			bonusDate = cdWorkMonth.getBonusDate();
-		}
+		} 
+
 
 		wYear -= 1911;
 
 		int wSeason = wYear * 10;
-
 		if (wMonth >= 1 && wMonth <= 3) {
 			wSeason += 1;
 		} else if (wMonth >= 4 && wMonth <= 6) {
@@ -110,6 +110,12 @@ public class L5R38 extends TradeBuffer {
 		} else if (wMonth >= 10 && wMonth <= 13) {
 			wSeason += 4;
 		}
+		int lastSeason = 0;
+		if (wSeason % 10 == 1) {
+			lastSeason = ((wSeason / 10) - 1) * 10 + 4;
+		} else {
+			lastSeason = wSeason - 1;
+		}
 
 		this.totaVo.putParam("L5R38oWorkYM", String.format("%03d%02d", wYear, wMonth));
 		this.totaVo.putParam("L5R38oWorkYear", wYear);
@@ -118,6 +124,7 @@ public class L5R38 extends TradeBuffer {
 		this.totaVo.putParam("L5R38oStartDate", startDate);
 		this.totaVo.putParam("L5R38oEndDate", endDate);
 		this.totaVo.putParam("L5R38oBonusDate", bonusDate);
+		this.totaVo.putParam("L5R38LastWorkSeason", lastSeason);
 
 		this.addList(this.totaVo);
 		return this.sendList();

@@ -37,7 +37,8 @@ E(0,0)
 #button=x,100,S
 T(2,{ cmd=CHAIN; ntxcd=L5407; ntxbuf=1})ASGN(BTN_NEW1$)
 K(MODIFYBUTTON,1,新增)
-!K(MODIFYBUTTON,查詢)
+
+
 
 </sub>
 
@@ -45,11 +46,15 @@ K(MODIFYBUTTON,1,新增)
 <sub type="DC" name="L5022" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
 [
 ["[L5022]                                 協辦人員等級明細資料查詢"],
+[#<->#,"#FdFunCd+功能",#FunCd,#FunCdX],
 [#<->#,"#FdEmpNo+員工代號",#EmpNo,"空白查全部協辦人員"],
 ["#FdMain+查詢條件","@(狀態、生效日期，必須擇一輸入)"],
 [#<->#,"#FdStatusFlag+．狀態",#StatusFlag,#StatusFlagX],
 [#<->#,"#FdEffectiveDate+．生效日期",#EffectiveDateS,#EffectiveDateE],
+[#<->#,"#FdWorkSeason+工作季",#WorkSeasonYY,"年"," 第 ",#WorkSeasonSS,"季"],
 ]
+#FdFunCd=X,2,L
+T(2,*)
 #FdMain=X,2,L
 #FdEmpNo=X,2,L
 #FdStatusFlag=X,2,L
@@ -87,14 +92,23 @@ T(2,@EffectiveStatusHelp,9:全部;+#EffectiveStatusHelp)
 #NTXBUF=X,6,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@EmpNo,#NTXBUF,1,6)
-INVOKEJS(SHOW,p1,02,02,1)
 
+#FunCdHelp=x,1024,S
+T(3,0:查詢;1:產生異動名單)
+#FunCd=A,1,I
+C(3,#FunCd,0,E(0,0),$)
+HELP(#FunCdHelp)
+@V(H,#FunCdHelp)
+#FunCdX=X,15,L
+T(H,#FunCd,#FunCdHelp)
+C(3,#FunCd,1,INVOKEJS(SHOW,L5022,2,5,0)INVOKEJS(SHOW,L5022,6,6,1),INVOKEJS(SHOW,L5022,2,5,1)INVOKEJS(SHOW,L5022,6,6,0))
 
 
 ! 員工代號
 ! 若不輸入, 員工代號由最小開始查詢,否則由輸入之員工代號開始查詢
 #EmpNo=X,6,I
 C(3,#CHAIN,0,$,s)
+C(3,#FunCd,1,S,$)
 
 ! #NewEmpNo=X,7,S
 ! T(2,1+#EmpNo)
@@ -109,6 +123,7 @@ ASGN(BTN_NEW2$)
 
 
 #StatusFlag=X,1,I
+C(3,#FunCd,1,S,$)
 HELP(#EffectiveStatusHelp)
 @T(3,#StatusFlagX,)
 C(4,#StatusFlag,T(2,@StatusFlagX, ),V(H,#EffectiveStatusHelp)T(H,@StatusFlagX,#StatusFlag,#EffectiveStatusHelp))
@@ -117,32 +132,49 @@ C(4,#StatusFlag,T(2,@StatusFlagX, ),V(H,#EffectiveStatusHelp)T(H,@StatusFlagX,#S
 #StatusFlagX=X,10,L
 
 #EffectiveDateS=D,7,I
+C(3,#FunCd,1,S,$)
 C(4,#StatusFlag,$,S)
 ! @C(4,#EffectiveDateS,$,A(DATE,0,#EffectiveDateS))
 @C(4,#StatusFlag,C(4,#EffectiveDateS,V(P,狀態、生效日期，必須擇一輸入),A(DATE,0,#EffectiveDateS)),$)
 #EffectiveDateE=D,7,I
+C(3,#FunCd,1,S,$)
 C(4,#StatusFlag,$,S)
 C(4,#EffectiveDateS,S,$)
 @C(4,#EffectiveDateS,$,V(7))
 C(4,#EffectiveDateE,$,A(DATE,0,#EffectiveDateE))
 IF(#EffectiveDateE<#EffectiveDateS,V(P,止日需大於起日),$)
+
+
+#RimL5r38=X,1,S
+C(3,#FunCd,1,$,S)
+E(0,@L5R38iCode,3)
+E(0,@L5R38iDate,#SYSCDATE)
+S(L5R38,1,#L5R38iCode,#L5R38iDate)
+R(1,L5R38)
+E(0,@WorkSeason,#L5R38LastWorkSeason)
+#WorkSeason=A,4,S
+
+
+
+!工作季
+#FdWorkSeason=X,1,L
+
+#WorkSeasonYY=A,3,L
+C(3,#FunCd,1,$,S)
+T(1,#WorkSeason,1,3)
+#WorkSeasonSS=A,1,L
+C(3,#FunCd,1,$,S)
+T(1,#WorkSeason,4,1)
+
 #RPTFG=A,1,S
 E(0,0)
 C(4,#NTXBUF5,E(0,0),E(0,1))
-
-! #Flag=A,1,I
-! HELP(#EffectiveFlagHelp)
-! @V(H,#EffectiveFlagHelp)
-
-! #FlagX=X,10,L
-! T(H,#Flag,#EffectiveFlagHelp)
-
-
 
 
 #CHAINXMT=X,1,S
 C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 
+<include src="ROM.icf::L5R38.rtn"/>
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -248,10 +280,14 @@ IF(#OOEvalueChgDate>0, BIND(grid,{ cmd=CHAIN; ntxcd=L5407; ntxbuf=#OOBUF_EvalueC
 
 !------ 上行電文 TEXT ------
 <sub type="TIM">
+#FunCd
 #EmpNo
 #StatusFlag
 #EffectiveDateS
 #EffectiveDateE
+#WorkSeason
+#WorkSeasonYY
+#WorkSeasonSS
 #END
 </sub>
 
@@ -259,6 +295,7 @@ IF(#OOEvalueChgDate>0, BIND(grid,{ cmd=CHAIN; ntxcd=L5407; ntxbuf=#OOBUF_EvalueC
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="ROM.icf::L5R38.tom"/>
 TXFORM=L5022
 #OOEmpNo#OOFullname#OOUnitCode#OOUnitCodeX#OODistCode#OODistCodeX#OODeptCode#OODeptCodeX#OOEffectiveDate#OOIneffectiveDate#OOEmpClass#OOClassPass#OOStatusFg
 #OOLogCount
