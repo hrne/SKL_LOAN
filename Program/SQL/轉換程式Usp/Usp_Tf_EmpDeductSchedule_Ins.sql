@@ -45,12 +45,19 @@ BEGIN
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
-    FROM (SELECT "YGYYMM"
-                ,"FLWCOD"
-                ,"TRXIDT"
-                ,"YGEPDT"
-                ,ROW_NUMBER() OVER (PARTITION BY "YGYYMM","FLWCOD" ORDER BY "TRXIDT" DESC) AS "Seq"
-          FROM "TBYGYMP") S1
+    FROM (
+      SELECT "YGYYMM"
+            ,"FLWCOD"
+            ,"TRXIDT"
+            ,"YGEPDT"
+            ,ROW_NUMBER()
+             OVER (
+              PARTITION BY "YGYYMM"
+                          ,"FLWCOD"
+              ORDER BY "TRXIDT" DESC
+             ) AS "Seq"
+      FROM "TBYGYMP"
+    ) S1
     WHERE S1."Seq" = 1
     ;
 

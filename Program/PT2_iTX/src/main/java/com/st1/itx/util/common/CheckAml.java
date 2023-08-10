@@ -507,7 +507,10 @@ public class CheckAml extends TradeBuffer {
 	@SuppressWarnings("unchecked")
 	private TxAmlLog parseResult(Document doc, TxAmlLog txAmlLog, TitaVo titaVo) throws LogicException {
 //		Document doc = convertStringToXml(msgrs);		
-		String iFunCode = titaVo.getParam("FunCode");
+		String iFunCode = "0";
+		if (titaVo.get("FunCode") != null) {
+			iFunCode = titaVo.get("FunCode");
+		}
 		if ("0".equals(txAmlLog.getStatusCode()) && "INFO".equals(txAmlLog.getStatus())) {
 			String ResultString = getXmlValue(doc, "AML_SCAN_QUERY_FirstResult");
 

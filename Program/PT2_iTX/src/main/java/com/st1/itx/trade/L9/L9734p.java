@@ -49,9 +49,12 @@ public class L9734p extends TradeBuffer {
 
 		l9734Report.setParentTranCode(parentTranCode);
 
-		int iYearMonth = Integer.valueOf(titaVo.getParam("YearMonth")) + 191100;
+		int iAcDate = Integer.valueOf(titaVo.getParam("AcDate")) + 19110000;
+		
+//		int iReCkYearMonth = Integer.valueOf(titaVo.getParam("ReChkYearMonth")) + 191100;
 
-		this.info("iYearMonth= " + iYearMonth);
+		this.info("iAcDate= " + iAcDate);
+//		this.info("iReCkYearMonth= " + iReCkYearMonth);
 
 		boolean isFinish = false;
 
@@ -64,7 +67,7 @@ public class L9734p extends TradeBuffer {
 			if (titaVo.getParam("BtnShell" + i).equals("V")) {
 
 				tradeName += (titaVo.getParam("ReportName" + i) + "、");
-				isFinish = l9734Report.exec(titaVo, iYearMonth, Integer.valueOf(titaVo.getParam("Condition" + i)));
+				isFinish = l9734Report.exec(titaVo, iAcDate, Integer.valueOf(titaVo.getParam("Condition" + i)));
 			}
 		}
 
