@@ -395,6 +395,28 @@ public class CheckAml extends TradeBuffer {
 	}
 
 	/**
+	 * 查詢指定序號檢核狀態
+	 * 
+	 * @param logno  AML檢查序號
+	 * @param titaVo TitaVo
+	 * @return CheckAmlVo
+	 * @throws LogicException LogicException
+	 */
+	public CheckAmlVo inquiryStatus(Long logno, TitaVo titaVo) throws LogicException {
+		this.info("CheckAml inquiryStatus ");
+		TxAmlLog txAmlLog = txAmlLogService.holdById(logno, titaVo);
+		if (txAmlLog == null) {
+			throw new LogicException("EC001", "TxAmlLog.LogNo:" + logno);
+		}
+
+		CheckAmlVo checkAmlVo = new CheckAmlVo();
+
+		checkAmlVo = rspAmlVo(checkAmlVo, txAmlLog);
+
+		return checkAmlVo;
+	}
+
+	/**
 	 * 人工確認檢核
 	 * 
 	 * @param logno  AML檢查序號
@@ -457,11 +479,12 @@ public class CheckAml extends TradeBuffer {
 	 * 
 	 * @param logno     AML檢查序號
 	 * @param autoError 不可承作時,回覆錯誤
+	 * @param titaVo    TitaVo
 	 * @return true.可承作 / false.不可承做
 	 * @throws LogicException LogicException
 	 */
-	public boolean canDo(Long logno, boolean autoError) throws LogicException {
-		TxAmlLog txAmlLog = txAmlLogService.findById(logno);
+	public boolean canDo(Long logno, boolean autoError, TitaVo titaVo) throws LogicException {
+		TxAmlLog txAmlLog = txAmlLogService.findById(logno, titaVo);
 		if (txAmlLog == null) {
 			throw new LogicException("EC001", "TxAmlLog.LogNo:" + logno);
 		}

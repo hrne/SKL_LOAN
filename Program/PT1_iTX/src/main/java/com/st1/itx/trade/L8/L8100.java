@@ -44,7 +44,7 @@ public class L8100 extends TradeBuffer {
 		checkAml.setTxBuffer(this.txBuffer);
 		String iFunCode = titaVo.getParam("FunCode");
 		Long iLogNo = Long.valueOf(titaVo.get("LogNo").trim());
-		this.info("iFunCodeL8100    = " + iFunCode);
+
 		CheckAmlVo checkAmlVo = new CheckAmlVo();
 		if ("1".equals(iFunCode)) {
 
@@ -79,6 +79,10 @@ public class L8100 extends TradeBuffer {
 			checkAmlVo = checkAml.refreshStatus(iLogNo, titaVo);
 
 		} else if ("3".equals(iFunCode)) {
+			
+			if (!checkAml.isManualConFirm(iLogNo, titaVo)) {
+				throw new LogicException("E0010", "AML系統運線正常，請至AML系統確認"); // 功能選擇錯誤
+			}
 			String iConfirmCode = titaVo.getParam("ConfirmCode");
 
 			TxAmlLog tTxAmlLog = txAmlLogService.holdById(iLogNo);
@@ -87,7 +91,10 @@ public class L8100 extends TradeBuffer {
 				throw new LogicException("EC001", "TxAmlLog.LogNo:" + iLogNo);
 			}
 			TxAmlLog oldtxAmlLog = (TxAmlLog)iDataLog.clone(tTxAmlLog);
-			tTxAmlLog.setConfirmStatus(iConfirmCode);
+			if ("1".equals(iConfirmCode)) {
+				tTxAmlLog.setConfirmStatus("0");
+			}else
+				tTxAmlLog.setConfirmStatus("2");
 			tTxAmlLog.setConfirmCode(titaVo.get("ConfirmCode"));
 			tTxAmlLog.setConfirmEmpNo(titaVo.get("ConfirmEmpNo"));
 			checkAmlVo.setLogNo(tTxAmlLog.getLogNo());
@@ -106,12 +113,12 @@ public class L8100 extends TradeBuffer {
 				txAmlLogService.update(tTxAmlLog);
 			} catch (DBException e) {
 				throw new LogicException("EC003", "update TxAmlLog:" + e.getErrorMsg()); // 更新資料
-			} 
+			}
 			iDataLog.setEnv(titaVo, oldtxAmlLog, tTxAmlLog);
 			iDataLog.exec();
 			
 		} else if ("5".equals(iFunCode)) {
-			checkAmlVo = checkAml.refreshStatus(iLogNo, titaVo);
+			checkAmlVo = checkAml.inquiryStatus(iLogNo, titaVo);
 		}
 
 		this.totaVo.putParam("LogNo", checkAmlVo.getLogNo());

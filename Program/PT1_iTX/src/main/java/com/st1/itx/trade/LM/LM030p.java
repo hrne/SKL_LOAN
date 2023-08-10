@@ -42,9 +42,8 @@ public class LM030p extends TradeBuffer {
 
 		lM030Report.setParentTranCode(parentTranCode);
 		
-		lM030Report.setTxBuffer(this.txBuffer);
 		
-		boolean isFinish = lM030Report.exec(titaVo);
+		boolean isFinish = lM030Report.exec(titaVo,this.txBuffer);
 
 		if (isFinish) {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "LM030轉催收明細總表已完成", titaVo);

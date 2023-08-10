@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.buffer.TxBuffer;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM030ServiceImpl;
 import com.st1.itx.util.common.BaTxCom;
@@ -39,8 +40,10 @@ public class LM030Report extends MakeReport {
 	@Autowired
 	public BaTxCom baTxCom;
 
-	public Boolean exec(TitaVo titaVo) throws LogicException {
+	public Boolean exec(TitaVo titaVo,TxBuffer txBuffer) throws LogicException {
 
+		
+		baTxCom.setTxBuffer(txBuffer);
 		
 		List<Map<String, String>> listLM030 = null;
 

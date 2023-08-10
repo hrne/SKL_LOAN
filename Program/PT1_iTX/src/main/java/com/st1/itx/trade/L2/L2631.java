@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.DBException;
@@ -102,7 +103,7 @@ public class L2631 extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("active L2631 ");
+		this.info("active L2631");
 		this.totaVo.init(titaVo);
 		l2631ReportD.setTxBuffer(this.txBuffer);
 		// new PK
@@ -159,7 +160,8 @@ public class L2631 extends TradeBuffer {
 
 		tFacClose.setFacCloseId(tFacCloseId);
 		if ("0".equals(iFunCode)) {
-
+			// 清償資料登錄時檢核不可重複建檔
+			checkisDup(titaVo);
 			// 清償日期
 			tFacClose.setCloseDate(0);
 			// 塗銷同意書編號L2632
@@ -289,6 +291,30 @@ public class L2631 extends TradeBuffer {
 			txTempService.insert(tTxTemp);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0005", "交易暫存檔 Key = " + tTxTempId); // 新增資料時，發生錯誤 }
+		}
+	}
+
+	public void checkisDup(TitaVo titaVo) throws LogicException {
+		this.info("checkisDup ....");
+
+		List<Integer> funCd = new ArrayList<Integer>();
+		funCd.add(0);
+		Slice<FacClose> slFacClose = sFacCloseService.findCustNo(iCustNo, 0, Integer.MAX_VALUE, titaVo);
+		// 檢核機制
+		if (slFacClose != null) {
+			for (FacClose t : slFacClose.getContent()) {
+				if (t.getCloseDate() == 0 && "0".equals(t.getFunCode())) {
+					// 同戶號額度未結案不可重複建檔
+					if (iFacmNo == t.getFacmNo()) {
+						throw new LogicException(titaVo, "E0005", "同戶號額度未結案不可重複建檔"); // 新增資料時，發生錯誤
+					}
+					// 額度輸入0則不可建其他額度資料
+					// 額度有輸入則可輸入其他額度或0
+					if (iFacmNo != 0 && t.getFacmNo() == 0) {
+						throw new LogicException(titaVo, "E0005", "已有額度為0未結案資料"); // 新增資料時，發生錯誤
+					}
+				}
+			}
 		}
 	}
 }
