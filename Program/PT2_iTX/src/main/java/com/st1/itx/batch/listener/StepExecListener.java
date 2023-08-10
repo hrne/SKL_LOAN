@@ -125,13 +125,17 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 		if (stepExecution.getExecutionContext().containsKey("OriStatus")) {
 			oriStatus = stepExecution.getExecutionContext().getString("OriStatus");
 		}
-		
+
 		// 2023-08-09 Wei
 		JobExecution jobExecution = stepExecution.getJobExecution();
 		ExecutionContext jobEc = jobExecution.getExecutionContext();
 		String rerunType = "";
+		String oriStep = "";
 		if (jobEc.containsKey("RerunType")) {
 			rerunType = jobEc.getString("RerunType");
+		}
+		if (jobEc.containsKey("OriStep")) {
+			oriStep = jobEc.getString("OriStep");
 		}
 
 		this.info("StepExecListener.afterStep : " + stepId);
@@ -140,8 +144,13 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 		this.info("step stepStatus   : " + stepExecution.getExitStatus().getExitCode());
 		this.info("step oriStatus : " + oriStatus);
 		this.info("step rerunType : " + rerunType);
+		this.info("step oriStep : " + oriStep);
 
-		if ((!rerunType.equals("A")) && oriStatus.equals("S")) {
+		if (rerunType.equals("S") && !oriStep.equals(stepId)) {
+			// 單支重跑 且 不是要跑的那支
+			this.deleteJobDetail(jobId, null, stepId, execDate, endTime, stepExecution);
+		} else if (rerunType.equals("F") && oriStatus.equals("S")) {
+			// 失敗重跑 且 原本成功的那支
 			this.deleteJobDetail(jobId, null, stepId, execDate, endTime, stepExecution);
 		} else {
 			this.updateJobDetail(jobId, null, stepId, execDate, endTime, false, stepExecution, stepStatus);
@@ -249,6 +258,7 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 	private void rerunHandler(String oriTxSeq, String jobId, String rerunType, String stepId, String oriStep,
 			StepExecution stepExecution) {
 		if (rerunType.equals("S")) {
+			this.info("RerunType = S, stepId = " + stepId + ", oriStep = " + oriStep);
 			if (oriStep.equals(stepId)) {
 				// 單支重跑:Step名稱相同,重跑該Step
 				stepExecution.getExecutionContext().putString("OriStatus", "F");
@@ -260,6 +270,7 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 			}
 		}
 
+		this.info("RerunType = F, stepId = " + stepId + ", oriStep = " + oriStep);
 		TitaVo titaVo = new TitaVo();
 		titaVo.putParam(ContentName.empnot, stepExecution.getJobParameters().getString(ContentName.tlrno, "999999"));
 		JobDetail oriJobDetail = jobDetailService.findStepFirst(oriTxSeq, jobId, stepId, titaVo);
@@ -268,6 +279,7 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 			// 2023-08-08 Wei 新壽IT說在L6970勾重新執行的時候,已經成功的步驟不要重新執行
 			// 因此新增OriTxSeq找讓StepExecuter可以找出原本的步驟執行結果
 			stepExecution.getExecutionContext().putString("OriStatus", status);
+			this.info("RerunType = F, stepId = " + stepId + ", oriStep = " + oriStep + ", OriStatus = " + status);
 		} else {
 			this.error("chkOriJobDetail cannot find ori jobDetail. oriTxSeq = " + oriTxSeq);
 			// 找出原交易序號的原交易序號,直到有用原交易序號找到對應jobDetail為止,或是原交易序號為空白
@@ -335,16 +347,9 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 		}
 		String parameters = txCruiser.getParameter();
 		JSONObject p;
-		String oriStatus;
 		try {
 			p = new JSONObject(parameters);
 			oriTxSeq = p.getString("OOJobTxSeq");
-			oriStatus = p.getString("OOStatus");
-			if (oriStatus.equals("S")) {
-				// 若原本勾的那筆STEP是成功的 就全部重跑
-				// 只要將oriTxSeq放空白 就會全部重跑
-				return "";
-			}
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
