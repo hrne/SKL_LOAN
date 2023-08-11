@@ -40,11 +40,10 @@ public class LM030Report extends MakeReport {
 	@Autowired
 	public BaTxCom baTxCom;
 
-	public Boolean exec(TitaVo titaVo,TxBuffer txBuffer) throws LogicException {
+	public Boolean exec(TitaVo titaVo, TxBuffer txBuffer) throws LogicException {
 
-		
 		baTxCom.setTxBuffer(txBuffer);
-		
+
 		List<Map<String, String>> listLM030 = null;
 
 		try {
@@ -64,9 +63,6 @@ public class LM030Report extends MakeReport {
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> listLM030) throws LogicException {
 		this.info("LM030Report exportExcel");
 
-	
-
-		
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "LM030";
@@ -114,7 +110,6 @@ public class LM030Report extends MakeReport {
 
 		makeExcel.setSheet("YYYMM", rocYM + "");
 		makeExcel.setValue(1, 1, yy + "年 " + mm + " 月轉催收明細表");
-		BigDecimal total = BigDecimal.ZERO;
 
 		int row = 3;
 
@@ -124,10 +119,10 @@ public class LM030Report extends MakeReport {
 
 			int custNoCnt = 0;
 			int tmpCustNo = 0;
-			for (Map<String, String> tLDVo : listLM030) {
+			for (Map<String, String> r : listLM030) {
 
-				int custNo = parse.stringToInteger(tLDVo.get("CustNo"));
-				int facmNo = parse.stringToInteger(tLDVo.get("FacmNo"));
+				int custNo = parse.stringToInteger(r.get("CustNo"));
+				int facmNo = parse.stringToInteger(r.get("FacmNo"));
 				// 一樣表示是同一擔保品戶號
 				if (tmpCustNo == custNo) {
 					custNoCnt++;
@@ -148,49 +143,38 @@ public class LM030Report extends MakeReport {
 				// 轉催收利息 = 短繳利息 + 利息
 				ovduIntAmt = baTxCom.getInterest().add(baTxCom.getShortfallInterest());
 
-				String value = "";
-				int col = 0;
-				for (int i = 0; i <= 11; i++) {
-					makeExcel.setFontType(1);
-					value = tLDVo.get("F" + i);
-					col++;
-					switch (i) {
-					case 5:
-					case 9:
-					case 10:
-						makeExcel.setValue(row, col,
-								parse.isNumeric(value) ? parse.stringToInteger(this.showRocDate(value, 3))
-										: parse.stringToInteger(value),
-								"R");
-						break;
-					case 6:
-						// 金額
-						BigDecimal bd = getBigDecimal(value);
-						makeExcel.setValue(row, col, bd, "#,##0", "R");
-						total = total.add(bd);
-						break;
-					case 7:// 利息金額(不顯示)
+				// 地區別
+				makeExcel.setValue(row, 1, r.get("CityItem"), "C");
+				// 催收人員
+				makeExcel.setValue(row, 2, r.get("AccCollPsn"), "C");
+				// 戶號
+				makeExcel.setValue(row, 3, parse.stringToInteger(r.get("CustNo")), "C");
+				// 額度
+				makeExcel.setValue(row, 4, parse.stringToInteger(r.get("FacmNo")), "C");
+				// 戶名
+				makeExcel.setValue(row, 5, r.get("CustName"), "C");
+				// 初貸日
+				makeExcel.setValue(row, 6, parse.stringToInteger(r.get("DrawdownDate")), "R");
+				// 本金餘額
+				makeExcel.setValue(row, 7, getBigDecimal(r.get("LoanBal")), "#,##0", "R");
+				// 利息
+				makeExcel.setValue(row, 8, ovduIntAmt, "#,##0", "R");
+				// 利率
+				makeExcel.setValue(row, 9, getBigDecimal(r.get("StoreRate")), "0.0000", "R");
+				// 到期日期
+				makeExcel.setValue(row, 10, parse.stringToInteger(r.get("MaturityDate")), "R");
+				// 繳息迄日
+				makeExcel.setValue(row, 11, parse.stringToInteger(r.get("PrevPayIntDate")), "R");
+				// 最近應繳日
+				makeExcel.setValue(row, 12, baTxCom.getRepayIntDate(), "R");
+				// 預計轉催日
+				makeExcel.setValue(row, 13, parse.stringToInteger(r.get("NextOvduDate")), "R");
 
-						makeExcel.setValue(row, col, ovduIntAmt, "#,##0", "R");
+				// 備註
+				if (custNoCnt > 1) {
+					makeExcel.setValue(row, 14, "同一擔保品", "C");
+				}
 
-						break;
-					case 8:
-						// 利率
-						makeExcel.setValue(row, col, getBigDecimal(value), "#,##0.0000", "R");
-						if (custNoCnt > 1) {
-							makeExcel.setValue(row, 13, "同一擔保品", "C");
-						}
-						break;
-					case 11:
-						makeExcel.setValue(row, col, baTxCom.getRepayIntDate(), "R");
-						break;
-
-					default:
-						makeExcel.setValue(row, col, parse.isNumeric(value) ? parse.stringToBigDecimal(value) : value,
-								"C");
-						break;
-					}
-				} // for
 				row++;
 			} // for
 		}

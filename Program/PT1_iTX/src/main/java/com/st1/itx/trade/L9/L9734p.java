@@ -51,10 +51,7 @@ public class L9734p extends TradeBuffer {
 
 		int iAcDate = Integer.valueOf(titaVo.getParam("AcDate")) + 19110000;
 		
-//		int iReCkYearMonth = Integer.valueOf(titaVo.getParam("ReChkYearMonth")) + 191100;
-
 		this.info("iAcDate= " + iAcDate);
-//		this.info("iReCkYearMonth= " + iReCkYearMonth);
 
 		boolean isFinish = false;
 

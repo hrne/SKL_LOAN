@@ -75,7 +75,7 @@ public class LoanCloseBreachCom extends TradeBuffer {
 	public ArrayList<LoanCloseBreachVo> getCloseBreachAmtPaid(int iCustNo, int iFacmNo, int iBormNo,
 			List<LoanCloseBreachVo> iListVo, TitaVo titaVo) throws LogicException {
 		this.info("getCloseBreachAmt  ... ");
-
+		lLoanCloseBreach = new ArrayList<LoanCloseBreachVo>();
 		int wkFacmNoStart = 1;
 		int wkFacmNoEnd = 999;
 		if (iFacmNo > 0) {
@@ -200,7 +200,7 @@ public class LoanCloseBreachCom extends TradeBuffer {
 	public ArrayList<LoanCloseBreachVo> getCloseBreachAmtAll(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo,
 			List<LoanCloseBreachVo> iListVo, TitaVo titaVo) throws LogicException {
 		this.info("getCloseBreachAmtAll  ");
-
+		lLoanCloseBreach = new ArrayList<LoanCloseBreachVo>();
 		int wkFacmNoStart = 1;
 		int wkFacmNoEnd = 999;
 		if (iFacmNo > 0) {

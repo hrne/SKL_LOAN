@@ -86,26 +86,26 @@ public class L5407 extends TradeBuffer {
 		iDistItem = titaVo.getParam("DistCodeX");
 		iDeptItem = titaVo.getParam("DeptCodeX");
 		// log無資料，新增最初歷程檔
-		insertPfCoOfficerLogFirst(titaVo);
+		insertPfCoOfficerLogFirst(iEmpNo,titaVo);
 
 		switch (iFunctionCode) {
 		case 1: // 新增
 		case 3: // 複製
+		case 7: // 調職異動
 		case 8: // 考核職級異動
 			updateOrignal(titaVo);
 			inSertPfCoOfficer(titaVo);
 			// 職級不同重算獎金
 			if (!iEmpClass.equals(orignalEmpClass) || !iClassPass.equals(orignalClassPass)) {
-				updatePfReward( titaVo);
+				updatePfReward(titaVo);
 			}
 			break;
 		case 2:
 		case 6: // 離職異動
-		case 7: // 調職異動
 			updatePfCoOfficer(titaVo);
 			// 職級不同重算獎金
 			if (!iEmpClass.equals(orignalEmpClass) || !iClassPass.equals(orignalClassPass)) {
-				updatePfReward( titaVo);
+				updatePfReward(titaVo);
 			}
 			break;
 		case 4: // 刪除
@@ -123,11 +123,11 @@ public class L5407 extends TradeBuffer {
 	}
 
 	// 重算協辦人員協辦獎金
-	private void updatePfReward( TitaVo titaVo) throws LogicException {
+	private void updatePfReward(TitaVo titaVo) throws LogicException {
 		this.info("updatePfReward  ... ");
 		Slice<PfReward> slPfReward = pfRewardService.findByPerfDate(iEffectiveDate + 19110000, 99991231, 0,
 				Integer.MAX_VALUE, titaVo);
-		if(slPfReward==null) {
+		if (slPfReward == null) {
 			return;
 		}
 		int workMonthCd = 0;// 協辦獎勵津貼標準設定適用工作年月
@@ -183,7 +183,7 @@ public class L5407 extends TradeBuffer {
 	}
 
 	/**
-	 * 核核算底稿新增至歷程檔
+	 * 核核算底稿新增至歷程檔 call by LP005
 	 * 
 	 * @param empNo                協辦人員
 	 * @param effectiveDate        原生效日
@@ -196,16 +196,15 @@ public class L5407 extends TradeBuffer {
 			String evalueChgClass, TitaVo titaVo) throws LogicException {
 		this.info("insertPfCoOfficerLog7  ... ");
 		// log無資料，新增最初歷程檔
-		insertPfCoOfficerLogFirst(titaVo);
+		insertPfCoOfficerLogFirst(empNo, titaVo);
 
 		tPfCoOfficerId = new PfCoOfficerId();
 		tPfCoOfficerId.setEffectiveDate(effectiveDate);
 		tPfCoOfficerId.setEmpNo(empNo);
-		tPfCoOfficer = pfCoOfficerService.findById(tPfCoOfficerId, titaVo);
+		tPfCoOfficer = pfCoOfficerService.holdById(tPfCoOfficerId, titaVo);
 		if (tPfCoOfficer == null) {
 			throw new LogicException("E0006", "PfCoOffice資料不存在"); // 鎖定資料時，發生錯誤
 		}
-
 		PfCoOfficerLog tPfCoOfficerLog = new PfCoOfficerLog();
 		tPfCoOfficerLog.setEmpNo(empNo);
 		tPfCoOfficerLog.setEffectiveDate(evaluteEffectiveDate);
@@ -227,27 +226,6 @@ public class L5407 extends TradeBuffer {
 			pfCoOfficerLogService.insert(tPfCoOfficerLog, titaVo);
 		} catch (DBException e) {
 			throw new LogicException("E0005", "新增歷程資料時發生錯誤");
-		}
-		tPfCoOfficerId = new PfCoOfficerId();
-		tPfCoOfficer = new PfCoOfficer();
-		tPfCoOfficerId.setEmpNo(iEmpNo);
-		tPfCoOfficerId.setEffectiveDate(iEffectiveDate);
-		tPfCoOfficer.setEmpNo(iEmpNo);
-		tPfCoOfficer.setEffectiveDate(iEffectiveDate);
-		tPfCoOfficer.setPfCoOfficerId(tPfCoOfficerId);
-		tPfCoOfficer.setEmpClass(iEmpClass);
-		tPfCoOfficer.setClassPass(iClassPass);
-		tPfCoOfficer.setIneffectiveDate(iIneffectiveDate > 0 ? iIneffectiveDate : 9991231);
-		tPfCoOfficer.setAreaCode(iAreaCode);
-		tPfCoOfficer.setDistCode(iDistCode);
-		tPfCoOfficer.setDeptCode(iDeptCode);
-		tPfCoOfficer.setAreaItem(iAreaItem);
-		tPfCoOfficer.setDistItem(iDistItem);
-		tPfCoOfficer.setDeptItem(iDeptItem);
-		try {
-			pfCoOfficerService.insert(tPfCoOfficer, titaVo);
-		} catch (DBException e) {
-			throw new LogicException("E0005", "新增時發生錯誤，該生效日期已存在");
 		}
 	}
 
@@ -342,14 +320,14 @@ public class L5407 extends TradeBuffer {
 	}
 
 	// log無資料，新增最初歷程檔
-	private void insertPfCoOfficerLogFirst(TitaVo titaVo) throws LogicException {
+	private void insertPfCoOfficerLogFirst(String empNo, TitaVo titaVo) throws LogicException {
 		this.info("insertPfCoOfficerLogFirst  ... ");
-		Slice<PfCoOfficerLog> slPfCoOfficerLog = pfCoOfficerLogService.findEmpNoEq(iEmpNo, 0, 1, titaVo);
+		Slice<PfCoOfficerLog> slPfCoOfficerLog = pfCoOfficerLogService.findEmpNoEq(empNo, 0, 1, titaVo);
 		if (slPfCoOfficerLog != null) {
 			return;
 		}
 		// log無資料則新增最初歷程檔
-		tPfCoOfficer = pfCoOfficerService.findByEmpNoFirst(iEmpNo, titaVo);
+		tPfCoOfficer = pfCoOfficerService.findByEmpNoFirst(empNo, titaVo);
 		if (tPfCoOfficer != null) {
 			PfCoOfficerLog tPfCoOfficerLog = new PfCoOfficerLog();
 			tPfCoOfficerLog.setEmpNo(tPfCoOfficer.getEmpNo());

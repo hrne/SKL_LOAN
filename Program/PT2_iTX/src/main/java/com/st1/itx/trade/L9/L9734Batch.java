@@ -49,12 +49,12 @@ public class L9734Batch extends BatchBase implements Tasklet, InitializingBean {
 
 		int tbsdyf = this.txBuffer.getTxCom().getTbsdyf();
 
-		l9734Report.exec(titaVo, tbsdyf / 100, 1);
-		l9734Report.exec(titaVo, tbsdyf / 100, 2);
-		l9734Report.exec(titaVo, tbsdyf / 100, 3);
-		l9734Report.exec(titaVo, tbsdyf / 100, 4);
-		l9734Report.exec(titaVo, tbsdyf / 100, 5);
-		l9734Report.exec(titaVo, tbsdyf / 100, 6);
+		l9734Report.exec(titaVo, tbsdyf, 1);
+		l9734Report.exec(titaVo, tbsdyf, 2);
+		l9734Report.exec(titaVo, tbsdyf, 3);
+		l9734Report.exec(titaVo, tbsdyf, 4);
+		l9734Report.exec(titaVo, tbsdyf, 5);
+		l9734Report.exec(titaVo, tbsdyf, 6);
 
 	}
 }

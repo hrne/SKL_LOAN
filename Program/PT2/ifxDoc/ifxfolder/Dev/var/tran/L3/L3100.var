@@ -703,7 +703,8 @@ C(4,#ApplNo,SHOW(#BTN4),HIDE(#BTN4))
 !用CustNo,FacmNo調L2R05
 #SendL2r05B=X,1,S
 IF(#FKEY==0 || #FKEY==7,$,s)
-E(0,@RimFuncCode,5)
+C(3,#FKEY,0,E(0,@RimFuncCode,1),$)
+C(3,#FKEY,7,E(0,@RimFuncCode,5),$)
 E(0,@RimCustNo,#TimCustNo)
 E(0,@RimFacmNo,#FacmNo)
 E(0,@RimApplNo,0)

@@ -46,6 +46,7 @@ public class L8100 extends TradeBuffer {
 		Long iLogNo = Long.valueOf(titaVo.get("LogNo").trim());
 
 		CheckAmlVo checkAmlVo = new CheckAmlVo();
+		//1.姓名檢核 2.更新狀態 3.人工確認 5.查詢
 		if ("1".equals(iFunCode)) {
 
 			String refno = (titaVo.getEntDyI() + 19110000) + titaVo.getKinbr() + titaVo.getTlrNo() + titaVo.getTxtNo();
@@ -81,7 +82,7 @@ public class L8100 extends TradeBuffer {
 		} else if ("3".equals(iFunCode)) {
 			
 			if (!checkAml.isManualConFirm(iLogNo, titaVo)) {
-				throw new LogicException("E0010", "AML系統運線正常，請至AML系統確認"); // 功能選擇錯誤
+				throw new LogicException("E0010", "AML系統連線正常，請至AML系統確認"); // 功能選擇錯誤
 			}
 			String iConfirmCode = titaVo.getParam("ConfirmCode");
 
@@ -91,11 +92,7 @@ public class L8100 extends TradeBuffer {
 				throw new LogicException("EC001", "TxAmlLog.LogNo:" + iLogNo);
 			}
 			TxAmlLog oldtxAmlLog = (TxAmlLog)iDataLog.clone(tTxAmlLog);
-			if ("1".equals(iConfirmCode)) {
-				tTxAmlLog.setConfirmStatus("0");
-			}else
-				tTxAmlLog.setConfirmStatus("2");
-			tTxAmlLog.setConfirmCode(titaVo.get("ConfirmCode"));
+			tTxAmlLog.setConfirmCode(iConfirmCode);
 			tTxAmlLog.setConfirmEmpNo(titaVo.get("ConfirmEmpNo"));
 			checkAmlVo.setLogNo(tTxAmlLog.getLogNo());
 			checkAmlVo.setStatus(tTxAmlLog.getStatus());

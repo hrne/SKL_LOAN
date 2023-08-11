@@ -67,7 +67,7 @@ public class L5022ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	                    ) AS \"ROWNUMBER\"                              ";
 		sql += "                 from \"PfCoOfficerLog\"                       ";
 		sql += "                 where \"FunctionCode\"  = 9 "; // 9.考核核算底稿
-		sql += "                ) d on d.\"EmpNo\" = a.\"EmpNo\" and  d.\"ROWNUMBER\" = 1 ";
+		sql += "                ) d on d.\"EmpNo\" = a.\"EmpNo\" and  d.\"EffectiveDate\" = a.\"EffectiveDate\"  and  d.\"ROWNUMBER\" = 1 ";
 		sql += "      where a.\"EffectiveDate\" > 0 ";
 		if (!iEmpNo.trim().isEmpty()) {
 			sql += "   and a.\"EmpNo\" = '" + iEmpNo + "' ";

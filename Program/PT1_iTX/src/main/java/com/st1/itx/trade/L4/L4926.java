@@ -16,11 +16,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.db.service.springjpa.cm.L4926ServiceImpl;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita ReconCode=X,3 EntryDate=9,7 CustNo=9,7
- * TraderInfo=X,20 END=X,1
- */
-
 @Service("L4926") // 匯款轉帳檔查詢
 @Scope("prototype")
 /**
@@ -35,10 +30,10 @@ public class L4926 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	Parse parse;
-	
-	@Autowired 
+
+	@Autowired
 	L4926ServiceImpl l4926Servicelmpl;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4926 ");
@@ -48,17 +43,17 @@ public class L4926 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = 100; //  
-						
+		this.limit = 100; //
+
 		List<Map<String, String>> resultList = null;
 		try {
-			resultList = l4926Servicelmpl.queryresult(this.index,this.limit,titaVo);
-	
+			resultList = l4926Servicelmpl.queryresult(this.index, this.limit, titaVo);
+
 		} catch (Exception e) {
 			this.error("l4926Servicelmpl findByCondition " + e.getMessage());
 			throw new LogicException("E0013", e.getMessage());
 		}
-				
+
 		if (this.index == 0 && (resultList == null || resultList.size() == 0)) {
 			throw new LogicException(titaVo, "E0001", "匯款轉帳檔"); // 查無資料
 		}
@@ -67,36 +62,41 @@ public class L4926 extends TradeBuffer {
 		if (resultList != null && resultList.size() > 0) {
 			for (Map<String, String> result : resultList) {
 				OccursList occursList = new OccursList();
-			
+
 				int iAcDate = parse.stringToInteger(result.get("AcDate")) - 19110000;
 				int iEntryDate = parse.stringToInteger(result.get("EntryDate")) - 19110000;
-				occursList.putParam("OOAcDate",  iAcDate); // 資料日期(會計日)
-				occursList.putParam("OOBatchNo",  result.get("BatchNo")); // 批號
-				occursList.putParam("OODetailSeq",  result.get("DetailSeq")); // 明細序號
+				int titaEntdy = parse.stringToInteger(result.get("EntryDate"));
+				if (titaEntdy >= 19110000) {
+					titaEntdy = titaEntdy - 19110000;
+				}
+
+				occursList.putParam("OOAcDate", iAcDate); // 資料日期(會計日)
+				occursList.putParam("OOBatchNo", result.get("BatchNo")); // 批號
+				occursList.putParam("OODetailSeq", result.get("DetailSeq")); // 明細序號
 				occursList.putParam("OOCustNo", result.get("CustNo")); // 戶號
 				occursList.putParam("OORepayType", result.get("RepayType")); // 還款類別
 				occursList.putParam("OORepayAmt", result.get("RepayAmt")); // 還款金額
-				occursList.putParam("OOEntryDate",  iEntryDate); // 入帳日期
-				occursList.putParam("OODscptCode",  result.get("DscptCode")); // 摘要代碼
-				occursList.putParam("OORemintBank",  result.get("RemintBank")); // 匯款銀行代碼
+				occursList.putParam("OOEntryDate", iEntryDate); // 入帳日期
+				occursList.putParam("OODscptCode", result.get("DscptCode")); // 摘要代碼
+				occursList.putParam("OORemintBank", result.get("RemintBank")); // 匯款銀行代碼
 				occursList.putParam("OOTraderInfo", result.get("TraderInfo")); // 交易人資料
 				occursList.putParam("OOReconCode", result.get("ReconCode")); // 對帳類別
-				occursList.putParam("OOTitaEntdy", result.get("TitaEntdy")); // 會計日期
+				occursList.putParam("OOTitaEntdy", titaEntdy); // 會計日期
 				occursList.putParam("OOTitaTlrNo", result.get("TitaTlrNo")); // 經辦
 				occursList.putParam("OOTitaTxtNo", result.get("TitaTxtNo")); // 交易序號
-						 
+
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
-		 }
+			}
 
-		 /* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
+			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 
-		 if (resultList.size() == this.limit && hasNext()) {
-	 		 titaVo.setReturnIndex(this.setIndexNext());
-		 	 /* 手動折返 */
-		 	 this.totaVo.setMsgEndToEnter();
-		 }
-		} 
+			if (resultList.size() == this.limit && hasNext()) {
+				titaVo.setReturnIndex(this.setIndexNext());
+				/* 手動折返 */
+				this.totaVo.setMsgEndToEnter();
+			}
+		}
 
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -122,5 +122,4 @@ public class L4926 extends TradeBuffer {
 		return result;
 	}
 
-	
 }

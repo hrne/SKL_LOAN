@@ -148,7 +148,7 @@ IF(#EffectiveDateE<#EffectiveDateS,V(P,止日需大於起日),$)
 #RimL5r38=X,1,S
 C(3,#FunCd,1,$,S)
 E(0,@L5R38iCode,3)
-E(0,@L5R38iDate,#SYSCDATE)
+E(0,@L5R38iDate,#SYSDATE)
 S(L5R38,1,#L5R38iCode,#L5R38iDate)
 R(1,L5R38)
 E(0,@WorkSeason,#L5R38LastWorkSeason)
@@ -168,7 +168,7 @@ T(1,#WorkSeason,4,1)
 
 #RPTFG=A,1,S
 E(0,0)
-C(4,#NTXBUF5,E(0,0),E(0,1))
+IF(#FunCd==1,E(0,2),C(4,#NTXBUF5,E(0,0),E(0,1)))
 
 
 #CHAINXMT=X,1,S
@@ -367,17 +367,11 @@ TXFORM=L5022
 #any={detail:true, header:'L5022.part', caption:'', width:1080, rowNum:20, rowList:[20,40,60]}
 
 
-!星號註記
-#OOStart1=
-{width:15,align:'center'}
 #OOEmpNo=員工代號
 {width:80,align:'center'}
 #OOFullname=員工姓名
 {width:85}
 
-!星號註記
-#OOStart2=
-{width:15,align:'center'}
 #OOUnitCode=單位代號
 {width:85,align:'center'}
 #OOUnitCodeX=單位中文
@@ -400,6 +394,11 @@ TXFORM=L5022
 {width:120,align:'center'}
 #OOStatusFgX=目前狀態
 {width:120,align:'center'}
+
+^
+#RPTFG=2,QUERY.GRID,L5022A
+#any={detail:false, header:'L5022A.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
+
 ^
 <include src="PRT.icf::INQ04.sel" map="i=L5022;cpi=15"/>
 #EmpNo

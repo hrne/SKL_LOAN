@@ -297,8 +297,6 @@ public class L2631 extends TradeBuffer {
 	public void checkisDup(TitaVo titaVo) throws LogicException {
 		this.info("checkisDup ....");
 
-		List<Integer> funCd = new ArrayList<Integer>();
-		funCd.add(0);
 		Slice<FacClose> slFacClose = sFacCloseService.findCustNo(iCustNo, 0, Integer.MAX_VALUE, titaVo);
 		// 檢核機制
 		if (slFacClose != null) {
