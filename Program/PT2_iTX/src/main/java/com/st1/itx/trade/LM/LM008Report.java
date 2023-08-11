@@ -185,7 +185,9 @@ public class LM008Report extends MakeReport {
 				if (tCdAcCode != null) {
 					acctItem = tCdAcCode.getAcctItem();
 				} else {
-					this.error("LM008Report acctCode = " + acctCode + ",查無對應中文名稱.");
+//					this.error("LM008Report acctCode = " + acctCode + ",查無對應中文名稱.");
+					this.info("LM008Report acctCode = " + acctCode + ",查無對應中文名稱.");
+					continue;
 				}
 
 				// 群組換頁

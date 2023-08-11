@@ -33,9 +33,11 @@ E(0,40)ASGN(INQPRT$)
 !起始交易記號  0:起始交易,1:非起始交易
 #ORGFG=_,_,S
 E(0,0)
+#ntxbuf=x,50,S
+T(2,1+       +   +   + + +Y)
 
 #button=x,100,S
-T(2,{cmd=CHAIN; ntxcd=L5103; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
+T(2,{cmd=CHAIN; ntxcd=L5103; ntxbuf=#ntxbuf; ntxbuf5=type})ASGN(BTN_NEW1$)
 K(MODIFYBUTTON,1,新增資料)
 K(MODIFYBUTTON,查詢)
 
@@ -315,8 +317,8 @@ C(5,#OODeleteFg,Y,BIND(grid,{ cmd=CHAIN; ntxcd=L5103; ntxbuf=#OOBUF_Delete}),BIN
 
 ! C(5,#OOHCodeFlag,Y,BIND(grid,{ cmd=EC; ntxcd=#OOTxCd; txno=#RimData;rim=LCR01}),BIND(grid,cancel))
 
-#OOBUF_Modify=X,15,S
-T(2,2+#OOCustNo+#OOFacmNo+#OOApplSeq+#OOKeeperEnable)
+#OOBUF_Modify=X,17,S
+T(2,2+#OOCustNo+#OOFacmNo+#OOApplSeq+#OOKeeperEnable+ +#OOModifyFg)
 !修改按鈕
 #BTN3=X,1,S
 C(5,#OOModifyFg,Y,BIND(grid,{ cmd=CHAIN; ntxcd=L5103; ntxbuf=#OOBUF_Modify}),BIND(grid,cancel))

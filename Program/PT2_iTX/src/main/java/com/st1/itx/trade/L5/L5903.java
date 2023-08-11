@@ -14,6 +14,7 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.TxAttachment;
+import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.TxAttachmentService;
 import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.db.service.springjpa.cm.L5903ServiceImpl;

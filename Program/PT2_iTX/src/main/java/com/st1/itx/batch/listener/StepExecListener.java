@@ -90,9 +90,11 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 		this.updateJobDetail(jobId, nestedJobId, stepId, execDate, startTime, true, stepExecution);
 
 		stepExecution.getExecutionContext().put("txSeq", txSeq);
-
-		// rerunType為A時,全部重跑,不為A的時候要去設定OriStatus
-		if (!oriTxSeq.isEmpty() && !rerunType.isEmpty() && !rerunType.equals("A")) {
+		if (stepId.equals("eodFinal") || stepId.equals("eomFinal")) {
+			// 日終批次結束判斷及月終批次結束判斷,無論是否為重跑,都必須執行
+			this.info("日終批次結束判斷及月終批次結束判斷,無論是否為重跑,都必須執行.");
+		} else if (!oriTxSeq.isEmpty() && !rerunType.isEmpty() && !rerunType.equals("A")) {
+			// rerunType為A時,全部重跑,不為A的時候要去設定OriStatus
 			this.rerunHandler(oriTxSeq, jobId, rerunType, stepId, oriStep, stepExecution);
 		}
 	}
@@ -149,7 +151,11 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 		this.info("step rerunType : " + rerunType);
 		this.info("step oriStep : " + oriStep);
 
-		if (rerunType.equals("S") && !oriStep.equals(stepId)) {
+		if (stepId.equals("eodFinal") || stepId.equals("eomFinal")) {
+			// 日終批次結束判斷及月終批次結束判斷,無論是否為重跑,都必須執行
+			this.info("日終批次結束判斷及月終批次結束判斷,無論是否為重跑,都必須執行.");
+			this.updateJobDetail(jobId, null, stepId, execDate, endTime, false, stepExecution, stepStatus);
+		} else if (rerunType.equals("S") && !oriStep.equals(stepId)) {
 			// 單支重跑 且 不是要跑的那支
 			this.deleteJobDetail(jobId, null, stepId, execDate, endTime, stepExecution);
 		} else if (rerunType.equals("F") && oriStatus.equals("S")) {
@@ -352,7 +358,11 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 		JSONObject p;
 		try {
 			p = new JSONObject(parameters);
-			oriTxSeq = p.getString("OOJobTxSeq");
+			if (p.has("OOJobTxSeq")) {
+				oriTxSeq = p.getString("OOJobTxSeq");
+			} else {
+				return "";
+			}
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));

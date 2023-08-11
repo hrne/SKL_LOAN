@@ -1145,7 +1145,7 @@ public class PfDetailCom extends TradeBuffer {
 			this.info("PfDetailCom PfCoOfficer space skip ");
 			return pf;
 		}
-		//workDrawdownPerDateF, workMonthDrawdown, lPfDetail
+		// workDrawdownPerDateF, workMonthDrawdown, lPfDetail
 		PfCoOfficer tPfCoOfficer = pfCoOfficerService.effectiveDateFirst(pf.getCoorgnizer(), 0, workDrawdownPerDateF,
 				titaVo);
 		if (tPfCoOfficer == null) {
@@ -1410,19 +1410,15 @@ public class PfDetailCom extends TradeBuffer {
 		if (isNewEmpUnit) {
 			// 分公司資料檔
 			CdBcm tCdBcm = cdBcmService.findById(pf.getUnitCode(), titaVo);
-			if (tCdBcm == null) {
-				throw new LogicException(titaVo, "E0001", "CdBcm 分公司資料檔" + pf.getUnitCode()); // 查詢資料不存在
+			if (tCdBcm != null) {
+				pf.setDistCode(tCdBcm.getDistCode()); // 區部代號(介紹人)
+				pf.setDeptCode(tCdBcm.getDeptCode()); // 部室代號(介紹人)
+				pf.setUnitManager(tCdBcm.getUnitManager()); // 處經理代號(介紹人)
+				pf.setDeptManager(tCdBcm.getDeptManager()); // 部經理代號(介紹人)
 			}
-			if ("N".equals(tCdBcm.getEnable())) {
-				throw new LogicException(titaVo, "E0019", "分公司資料未啟用" + pf.getUnitCode()); // 輸入資料錯誤
-			}
-			pf.setDistCode(tCdBcm.getDistCode()); // 區部代號(介紹人)
-			pf.setDeptCode(tCdBcm.getDeptCode()); // 部室代號(介紹人)
-			pf.setUnitManager(tCdBcm.getUnitManager()); // 處經理代號(介紹人)
-			pf.setDeptManager(tCdBcm.getDeptManager()); // 部經理代號(介紹人)
 			// 區經理 : CdEmp(員工資料檔)的AgLevel(業務人員職等)第一碼為'H'為區經理
 			// 介紹人本身為區經理,否則依序找上層主管直到找到區經理
-			if (introducerCdEmp != null && "".equals(pf.getDistManager())) {
+			if (introducerCdEmp != null) {
 				String deptManage = employeeCom.getDistManager(introducerCdEmp, titaVo);
 				if (deptManage != null) {
 					pf.setDistManager(deptManage); // 區經理代號(介紹人)
@@ -1476,8 +1472,17 @@ public class PfDetailCom extends TradeBuffer {
 	private void updItDetail(PfDetail pf) throws LogicException {
 		this.info("PfDetailCom updItDetail .....");
 		boolean isInsert = true;
-		PfItDetail tPfItDetail = pfItDetailService.findByTxFirst(pf.getCustNo(), pf.getFacmNo(), pf.getBormNo(),
-				perfDateF, pf.getRepayType(), pf.getPieceCode(), titaVo);
+		PfItDetail tPfItDetail = null;
+		if (pf.getRepayType() == 0) {
+			tPfItDetail = pfItDetailService.findBormNoFirst(pf.getCustNo(), pf.getFacmNo(), pf.getBormNo(), titaVo);
+			if (tPfItDetail != null && tPfItDetail.getRepayType() == 0) {
+				isInsert = false;
+			}
+		}
+		if (isInsert) {
+			tPfItDetail = pfItDetailService.findByTxFirst(pf.getCustNo(), pf.getFacmNo(), pf.getBormNo(), perfDateF,
+					pf.getRepayType(), pf.getPieceCode(), titaVo);
+		}
 		if (tPfItDetail != null) {
 			// 業績重算若業績已調整則不更新
 			if (isReCompute) {
@@ -1490,13 +1495,13 @@ public class PfDetailCom extends TradeBuffer {
 			tPfItDetail = pfItDetailService.holdById(tPfItDetail, titaVo);
 		} else {
 			tPfItDetail = new PfItDetail();
-			tPfItDetail.setCustNo(pf.getCustNo());// 戶號
-			tPfItDetail.setFacmNo(pf.getFacmNo()); // 額度編號
-			tPfItDetail.setBormNo(pf.getBormNo());// 撥款序號
-			tPfItDetail.setPerfDate(perfDate); // 業績日期
-			tPfItDetail.setRepayType(pf.getRepayType()); // 還款類別
-			tPfItDetail.setPieceCode(pf.getPieceCode()); // 計件代碼
 		}
+		tPfItDetail.setCustNo(pf.getCustNo());// 戶號
+		tPfItDetail.setFacmNo(pf.getFacmNo()); // 額度編號
+		tPfItDetail.setBormNo(pf.getBormNo());// 撥款序號
+		tPfItDetail.setPerfDate(perfDate); // 業績日期
+		tPfItDetail.setRepayType(pf.getRepayType()); // 還款類別
+		tPfItDetail.setPieceCode(pf.getPieceCode()); // 計件代碼
 		tPfItDetail.setDrawdownDate(pf.getDrawdownDate()); // 撥款日
 		tPfItDetail.setProdCode(pf.getProdCode()); // 商品代碼
 		tPfItDetail.setDrawdownAmt(tPfItDetail.getDrawdownAmt().add(pf.getDrawdownAmt())); // 撥款金額/追回金額
@@ -1614,8 +1619,17 @@ public class PfDetailCom extends TradeBuffer {
 	public void updBsDetail(PfDetail pf) throws LogicException {
 		this.info("PfDetailCom updBsDetail .....");
 		boolean isInsert = true;
-		PfBsDetail tPfBsDetail = pfBsDetailService.findByTxFirst(pf.getCustNo(), pf.getFacmNo(), pf.getBormNo(),
-				perfDateF, pf.getRepayType(), pf.getPieceCode(), titaVo);
+		PfBsDetail tPfBsDetail = null;
+		if (pf.getRepayType() == 0) {
+			tPfBsDetail = pfBsDetailService.findBormNoFirst(pf.getCustNo(), pf.getFacmNo(), pf.getBormNo(), titaVo);
+			if (tPfBsDetail != null && tPfBsDetail.getRepayType() == 0) {
+				isInsert = false;
+			}
+		}
+		if (isInsert) {
+			tPfBsDetail = pfBsDetailService.findByTxFirst(pf.getCustNo(), pf.getFacmNo(), pf.getBormNo(), perfDateF,
+					pf.getRepayType(), pf.getPieceCode(), titaVo);
+		}
 		if (tPfBsDetail != null) {
 			// 業績重算若業績已調整則不更新
 			if (isReCompute) {
@@ -1629,14 +1643,13 @@ public class PfDetailCom extends TradeBuffer {
 			tPfBsDetail = pfBsDetailService.holdById(tPfBsDetail, titaVo);
 		} else {
 			tPfBsDetail = new PfBsDetail();
-			tPfBsDetail.setCustNo(pf.getCustNo()); // 戶號
-			tPfBsDetail.setFacmNo(pf.getFacmNo()); // 額度編號
-			tPfBsDetail.setBormNo(pf.getBormNo()); // 撥款序號
-			tPfBsDetail.setPerfDate(perfDate); // 業績日期
-			tPfBsDetail.setRepayType(pf.getRepayType()); // 還款類別
-			tPfBsDetail.setPieceCode(pf.getPieceCode()); // 計件代碼
 		}
-
+		tPfBsDetail.setCustNo(pf.getCustNo()); // 戶號
+		tPfBsDetail.setFacmNo(pf.getFacmNo()); // 額度編號
+		tPfBsDetail.setBormNo(pf.getBormNo()); // 撥款序號
+		tPfBsDetail.setPerfDate(perfDate); // 業績日期
+		tPfBsDetail.setRepayType(pf.getRepayType()); // 還款類別
+		tPfBsDetail.setPieceCode(pf.getPieceCode()); // 計件代碼
 		tPfBsDetail.setBsOfficer(pf.getBsOfficer());// 房貸專員
 		tPfBsDetail.setDeptCode(pf.getBsDeptCode());// 部室代號
 		tPfBsDetail.setDrawdownDate(pf.getDrawdownDate()); // 撥款日/還款日

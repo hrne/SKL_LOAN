@@ -161,14 +161,15 @@ T(3,@UnitCodeX,)
 T(3,@DistCodeX,)
 T(3,@DeptCodeX,)
 V(7)
-
+#RimFunCd=A,1,S
 #DealNew=X,1,S
 <include src="ROM.icf::L5R07.dec"/>
 #RimL5r07=X,1,S
 T(2,@RimEmpNo,#EmpNo)
-C(2,#FunctionCd,s,$,s,$,s,s,s,s,s)
+E(0,@RimFunCd,#FunctionCd)
+C(2,#FunctionCd,s,$,s,s,s,s,s,s,s)
 RESET_RIM(#RimL5r07,L5R07)
-S(L5R07,1,#RimEmpNo)
+S(L5R07,1,#RimEmpNo,#RimFunCd)
 R(1,L5R07)
 T(2,@Fullname,#L5r07Fullname)
 T(2,@UnitCode,#L5r07UnitCode)

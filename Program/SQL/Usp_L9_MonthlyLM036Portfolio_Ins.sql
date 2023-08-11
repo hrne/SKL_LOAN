@@ -130,17 +130,17 @@ BEGIN
                        , 4)
            ELSE 0
            END                             AS "OtherPercent" -- 一般法人放款占比 DECIMAL 6 2 百分比
-         , S3."EntUsedPercent"             AS "EntUsedPercent" -- 企業放款動用率 DECIMAL 6 2 百分比
-         , S4."InsuDividendRate"           AS "InsuDividendRate" -- 保單分紅利率 DECIMAL 6 2 百分比
-         , S5."NaturalPersonRate"          AS "NaturalPersonRate" -- 自然人當月平均利率 DECIMAL 6 2 百分比
-         , S6."LegalPersonRate"            AS "LegalPersonRate" -- 法人當月平均利率 DECIMAL 6 2 百分比
-         , S7."SyndRate"                   AS "SyndRate" -- 聯貸案平均利率 DECIMAL 6 2 百分比
-         , S8."StockRate"                  AS "StockRate" -- 股票質押平均利率 DECIMAL 6 2 百分比
-         , S9."OtherRate"                  AS "OtherRate" -- 一般法人放款平均利率 DECIMAL 6 2 百分比
-         , S10."AvgRate"                    AS "AvgRate" -- 放款平均利率 DECIMAL 6 2 百分比
-         , S11."GrossRate"                 AS "HouseRateOfReturn" -- 房貸通路當月毛報酬率 DECIMAL 6 2 百分比
-         , S12."GrossRate"                 AS "EntRateOfReturn" -- 企金通路當月毛報酬率 DECIMAL 6 2 百分比
-         , S13."GrossRate"                 AS "RateOfReturn" -- 放款毛報酬率 DECIMAL 6 2 百分比
+         , NVL(S3."EntUsedPercent",0)      AS "EntUsedPercent" -- 企業放款動用率 DECIMAL 6 2 百分比
+         , NVL(S4."InsuDividendRate",0)    AS "InsuDividendRate" -- 保單分紅利率 DECIMAL 6 2 百分比
+         , NVL(S5."NaturalPersonRate",0)   AS "NaturalPersonRate" -- 自然人當月平均利率 DECIMAL 6 2 百分比
+         , NVL(S6."LegalPersonRate",0)     AS "LegalPersonRate" -- 法人當月平均利率 DECIMAL 6 2 百分比
+         , NVL(S7."SyndRate",0)            AS "SyndRate" -- 聯貸案平均利率 DECIMAL 6 2 百分比
+         , NVL(S8."StockRate",0)           AS "StockRate" -- 股票質押平均利率 DECIMAL 6 2 百分比
+         , NVL(S9."OtherRate",0)           AS "OtherRate" -- 一般法人放款平均利率 DECIMAL 6 2 百分比
+         , NVL(S10."AvgRate",0)            AS "AvgRate" -- 放款平均利率 DECIMAL 6 2 百分比
+         , NVL(S11."GrossRate",0)          AS "HouseRateOfReturn" -- 房貸通路當月毛報酬率 DECIMAL 6 2 百分比
+         , NVL(S12."GrossRate",0)          AS "EntRateOfReturn" -- 企金通路當月毛報酬率 DECIMAL 6 2 百分比
+         , NVL(S13."GrossRate",0)          AS "RateOfReturn" -- 放款毛報酬率 DECIMAL 6 2 百分比
          , JOB_START_TIME                  AS "CreateDate"      -- 建檔日期時間 DATE 
          , SUBSTR(EmpNo,0,6)               AS "CreateEmpNo"     -- 建檔人員 VARCHAR2 6
          , JOB_START_TIME                  AS "LastUpdate"      -- 最後更新日期時間 DATE 

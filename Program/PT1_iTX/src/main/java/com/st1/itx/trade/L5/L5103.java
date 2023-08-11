@@ -34,6 +34,7 @@ import com.st1.itx.util.mail.MailService;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 import com.st1.itx.util.data.DataLog;
+import com.st1.itx.util.common.SendRsp;
 
 @Service("L5103")
 @Scope("prototype")
@@ -72,10 +73,13 @@ public class L5103 extends TradeBuffer {
 	public CustMainService custMainService;
 	@Autowired
 	public TxFlowService txFlowService;
+	@Autowired
+	SendRsp sendRsp;
 
 	private InnDocRecord tInnDocRecord = new InnDocRecord();
 	private InnDocRecordId tInnDocRecordId = new InnDocRecordId();
 	private TempVo tTempVo = new TempVo();
+	private InnDocRecord beforeInnDocRecord = new InnDocRecord();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -102,7 +106,7 @@ public class L5103 extends TradeBuffer {
 //		1.登 2.放 3.審 4.審放
 		if (titaVo.getActFgI() <= 1) {
 			String sApplEmpNo = titaVo.getParam("ApplEmpNo");
-			String sKeeperEmpNo = titaVo.getParam("KeeperEmpNo"); 
+			String sKeeperEmpNo = titaVo.getParam("KeeperEmpNo");
 
 			TxTeller t1txTeller = txTellerService.findById("2".equals(applCode) ? rEmpNo : sApplEmpNo, titaVo);
 			TxTeller t2txTeller = txTellerService.findById(sKeeperEmpNo, titaVo);
@@ -117,16 +121,24 @@ public class L5103 extends TradeBuffer {
 				}
 			}
 
-//			若保管與借閱同單位改為2段式交易
-			if (titaVo.isHcodeNormal()) {
-				if (t1txTeller != null && t2txTeller != null) {
-					if (t1txTeller.getGroupNo().equals(t2txTeller.getGroupNo())) {
-						titaVo.put("RELCD", "2");
-					} else {
-						titaVo.put("RELCD", "4");
+			if (iFunCd != 4) {
+				// 若保管與借閱同單位改為2段式交易
+				if (titaVo.isHcodeNormal()) {
+					if (t1txTeller != null && t2txTeller != null) {
+						if (t1txTeller.getGroupNo().equals(t2txTeller.getGroupNo())) {
+							titaVo.put("RELCD", "2");
+						} else {
+							titaVo.put("RELCD", "4");
+						}
 					}
 				}
+			} else {
+				// 刪除須刷主管卡
+				if (titaVo.getEmpNos().trim().isEmpty()) {
+					sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");// 交易需主管核可
+				}
 			}
+
 			// 新增
 			if (iFunCd == 1) {
 				// 申請
@@ -181,7 +193,9 @@ public class L5103 extends TradeBuffer {
 						tInnDocRecord.setReturnDate(rdate);
 						tInnDocRecord.setReturnEmpNo(rEmpNo);
 					}
-					emailfg = true;
+					if (tInnDocRecord.getApplEmpNo() != tInnDocRecord.getKeeperEmpNo()) {// 借閱人與管理人不同才發mail
+						emailfg = true;
+					}
 					break;
 				case 3: // 審閱
 					if (rdate > 0) {
@@ -193,7 +207,9 @@ public class L5103 extends TradeBuffer {
 					break;
 				case 4: // 審閱放行
 					tInnDocRecord.setTitaActFg(titaVo.getActFgI() + "");
-					emailfg = true;
+					if (tInnDocRecord.getApplEmpNo() != tInnDocRecord.getKeeperEmpNo()) {// 借閱人與管理人不同才發mail
+						emailfg = true;
+					}
 					break;
 				}
 			} else {
@@ -267,6 +283,7 @@ public class L5103 extends TradeBuffer {
 		if (nInnDocRecord != null) {
 			throw new LogicException(titaVo, "E0002", "待放行"); // 新增資料已存在
 		}
+
 		tInnDocRecord.setInnDocRecordId(tInnDocRecordId);
 		setTitaToDb(titaVo);
 		tInnDocRecord.setJsonFields(tTempVo.getJsonString());
@@ -293,6 +310,7 @@ public class L5103 extends TradeBuffer {
 		if (("1").equals(nInnDocRecord.getTitaActFg())) {
 			throw new LogicException(titaVo, "E0015", "待放行"); // 檢查錯誤
 		}
+		beforeInnDocRecord = (InnDocRecord) iDataLog.clone(nInnDocRecord);
 
 		nInnDocRecord.setTitaActFg(titaVo.getActFgI() + "");
 		nInnDocRecord.setApplCode(titaVo.getParam("ApplCode"));
@@ -312,6 +330,8 @@ public class L5103 extends TradeBuffer {
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0005", "L5103 InnDocRecord insert " + e.getErrorMsg());
 		}
+		iDataLog.setEnv(titaVo, beforeInnDocRecord, beforeInnDocRecord);
+		iDataLog.exec("修改檔案借閱檔");
 
 	}
 
@@ -325,6 +345,8 @@ public class L5103 extends TradeBuffer {
 		if (tInnDocRecord == null) {
 			throw new LogicException(titaVo, "E0003", "");// 修改資料不存在
 		}
+		beforeInnDocRecord = (InnDocRecord) iDataLog.clone(tInnDocRecord);
+
 		tInnDocRecord.setInnDocRecordId(tInnDocRecordId);
 		setTitaToDb(titaVo);
 		tInnDocRecord.setJsonFields(tTempVo.getJsonString());
@@ -333,6 +355,9 @@ public class L5103 extends TradeBuffer {
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007", "L5103 updateModify " + e.getErrorMsg());
 		}
+		iDataLog.setEnv(titaVo, beforeInnDocRecord, beforeInnDocRecord);
+		iDataLog.exec("修改檔案借閱檔");
+
 	}
 
 	// Tita->DB
@@ -387,7 +412,7 @@ public class L5103 extends TradeBuffer {
 		if (tInnDocRecord == null) {
 			throw new LogicException(titaVo, "E0004", "");// 刪除資料不存在
 		}
-		InnDocRecord beforeInnDocRecord = (InnDocRecord) iDataLog.clone(tInnDocRecord);
+		beforeInnDocRecord = (InnDocRecord) iDataLog.clone(tInnDocRecord);
 		if (("2").equals(tInnDocRecord.getApplCode())) {// 申請登錄時才可刪除
 			throw new LogicException(titaVo, "E0015", "已歸還");// 檢查錯誤
 		}
@@ -396,6 +421,7 @@ public class L5103 extends TradeBuffer {
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0004", "L5103 deleteErase " + e.getErrorMsg());
 		}
+		this.info("***updateErase*e**"+tInnDocRecord.getTitaTlrNo()+"-"+parse.IntegerToString(tInnDocRecord.getTitaTxtNo(), 8));
 		iDataLog.setEnv(titaVo, beforeInnDocRecord, beforeInnDocRecord);
 		iDataLog.exec("刪除檔案借閱檔");
 
@@ -411,6 +437,7 @@ public class L5103 extends TradeBuffer {
 		if (tInnDocRecord == null) {
 			throw new LogicException(titaVo, "E0004", "");// 刪除資料不存在
 		}
+
 		tInnDocRecord.setInnDocRecordId(tInnDocRecordId);
 		tInnDocRecord.setTitaActFg("4");
 		tInnDocRecord.setApplCode("1");
@@ -419,8 +446,9 @@ public class L5103 extends TradeBuffer {
 		try {
 			innDocRecordService.update(tInnDocRecord, titaVo);
 		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0007", "L5103 updateModify " + e.getErrorMsg());
+			throw new LogicException(titaVo, "E0007", "L5103 returnErase " + e.getErrorMsg());
 		}
+
 	}
 
 	/*---------- 主管放行時email通知 管理人/借閱人 ----------*/
@@ -512,10 +540,11 @@ public class L5103 extends TradeBuffer {
 
 	private void deleteTxFlow(TitaVo titaVo) throws LogicException {
 		TxFlowId tTxFlowId = new TxFlowId();
-		tTxFlowId.setEntdy(tInnDocRecord.getTitaEntDy());
+		tTxFlowId.setEntdy(beforeInnDocRecord.getTitaEntDy());
 		tTxFlowId.setFlowNo(
-				"0000" + tInnDocRecord.getTitaTlrNo() + parse.IntegerToString(tInnDocRecord.getTitaTxtNo(), 8));
+				"0000" + beforeInnDocRecord.getTitaTlrNo() + parse.IntegerToString(beforeInnDocRecord.getTitaTxtNo(), 8));
 		TxFlow tTxFlow = txFlowService.holdById(tTxFlowId, titaVo);
+		this.info("***deleteTxFlow*"+beforeInnDocRecord.getTitaTlrNo()+"-"+parse.IntegerToString(beforeInnDocRecord.getTitaTxtNo(), 8));
 		if (tTxFlow != null) {
 			try {
 				txFlowService.delete(tTxFlow, titaVo);

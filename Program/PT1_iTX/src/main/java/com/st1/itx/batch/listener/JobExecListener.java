@@ -183,17 +183,26 @@ public class JobExecListener extends SysLogger implements JobExecutionListener {
 		String parameters = txCruiser.getParameter();
 		this.info("getRerunType txCruiser.getParameter() = " + parameters);
 		JSONObject p;
-		String oriTxSeq;
-		String oriStatus;
-		String oriStepId;
+		String oriTxSeq = "";
+		String oriStatus = "";
+		String oriStepId = "";
 		try {
 			p = new JSONObject(parameters);
-			oriTxSeq = p.getString("OOJobTxSeq");
-			oriStatus = p.getString("OOStatus");
-			oriStepId = p.getString("OOStepId");
+			if (p.has("OOJobTxSeq")) {
+				oriTxSeq = p.getString("OOJobTxSeq");
+			}
+			if (p.has("OOStatus")) {
+				oriStatus = p.getString("OOStatus");
+			}
+			if (p.has("OOStepId")) {
+				oriStepId = p.getString("OOStepId");
+			}
 			this.info("getRerunType oriTxSeq = " + oriTxSeq);
 			this.info("getRerunType oriStatus = " + oriStatus);
 			this.info("getRerunType oriStepId = " + oriStepId);
+			if (oriTxSeq.isEmpty()) {
+				return;
+			}
 			switch (oriStatus) {
 			case "S":
 			case "F":

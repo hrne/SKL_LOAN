@@ -128,26 +128,26 @@ public class L4701 extends TradeBuffer {
 			for (LoanCheque tLoanCheque : lLoanCheque) {
 				OccursList occursList = new OccursList();
 				AcDetail tAcDetail = new AcDetail();
-				int slipNo = 0;
+				String slipNo = "";
 				tAcDetail = acDetailService
 						.findL4701First("RCK", tLoanCheque.getCustNo(),
 								FormatUtil.pad9("" + tLoanCheque.getChequeAcct(), 9) + " "
 										+ FormatUtil.pad9("" + tLoanCheque.getChequeNo(), 7),
 								iAcDateF, "D", "0", titaVo);
 				if (tAcDetail != null) {
-					slipNo = tAcDetail.getSlipNo();
+					slipNo = tAcDetail.getMediaSlipNo();
 				}
 				occursList.putParam("ChequeNo", FormatUtil.pad9("" + tLoanCheque.getChequeNo(), 7));
 				occursList.putParam("ChequeDate", FormatUtil.pad9("" + tLoanCheque.getChequeDate(), 7));
 				occursList.putParam("BankCode", FormatUtil.padX("" + tLoanCheque.getBankCode(), 7));
 				occursList.putParam("ChequeAcct", FormatUtil.padX("" + tLoanCheque.getChequeAcct(), 9));
 				occursList.putParam("ChequeAmt", FormatUtil.pad9("" + tLoanCheque.getChequeAmt(), 7));
-				occursList.putParam("MediaDate", FormatUtil.pad9("" + titaVo.getCalDy(), 7));
+				occursList.putParam("MediaDate", FormatUtil.pad9("" + iAcDate, 7));
 				occursList.putParam("Teller", FormatUtil.padX(titaVo.getTlrNo(), 8));
 				occursList.putParam("UnitCode", "10H400");
 				occursList.putParam("SrcCode", "1");
 				occursList.putParam("SrcUnit", "10H400");
-				occursList.putParam("RecipeNo", FormatUtil.padX("" + slipNo, 5));
+				occursList.putParam("RecipeNo", FormatUtil.padX("" + slipNo, 12));
 				occursList.putParam("EntryDate", FormatUtil.pad9("" + tLoanCheque.getReceiveDate(), 7));
 				occursList.putParam("CustNo", FormatUtil.pad9("" + tLoanCheque.getCustNo(), 7));
 

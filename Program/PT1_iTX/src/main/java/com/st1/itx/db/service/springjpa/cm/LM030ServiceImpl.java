@@ -63,7 +63,6 @@ public class LM030ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            AND Mm.\"ClCode2\" = M.\"ClCode2\"";
 		sql += "            AND Mm.\"ClNo\" = M.\"ClNo\"";
 		sql += "            AND Mm.\"CustNo\" = M.\"CustNo\"";
-		sql += "            AND Mm.\"FacmNo\" = M.\"FacmNo\"";
 		sql += "        WHERE M.\"YearMonth\" = :Yymm";
 		sql += "            AND M.\"PrinBalance\" > 0";
 		sql += "            AND Mm.\"CustNo\" IS NOT NULL";

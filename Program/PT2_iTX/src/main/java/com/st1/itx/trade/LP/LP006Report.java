@@ -46,7 +46,7 @@ public class LP006Report extends MakeReport {
 
 	@Autowired
 	private Parse parse;
-	
+
 	@Autowired
 	public WebClient webClient;
 
@@ -116,10 +116,8 @@ public class LP006Report extends MakeReport {
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("LP006ServiceImpl.findAll error = " + errors.toString());
 		}
-		
-		exportExcel(titaVo);
 
-		makeExcel.close();
+		exportExcel(titaVo);
 
 		// 將產生房貸協辦人員異動名單新增至歷程檔
 		tPfCoOfficerLog = new PfCoOfficerLog();
@@ -165,25 +163,25 @@ public class LP006Report extends MakeReport {
 					makeExcel.setValue(row, 7, ""); // 7, "考核前職級"
 					makeExcel.setValue(row, 8, ""); // 8, "考核後職級"
 				} else {
-					makeExcel.setValue(row, 7, t.get("LastEmpClass")); // 7, "考核前職級"
-					makeExcel.setValue(row, 8, t.get("EmpClass")); // 8, "考核後職級"
+					makeExcel.setValue(row, 7, t.get("LastEmpClassX")); // 7, "考核前職級"
+					makeExcel.setValue(row, 8, t.get("EmpClassX")); // 8, "考核後職級"
 
 				}
 				String changeReason = "";
 				switch (t.get("FunctionCode")) {
 				case "1":
-					changeReason = "新增：生效日 " + dateCvt(t.get("EffectiveDate"));
+					changeReason = "新增協辦人員：生效日 " + dateCvt(t.get("EffectiveDate"));
 					break;
 				case "2":
-					changeReason = "修改 ";
+					changeReason = "異動生效日： " + dateCvt(t.get("EffectiveDate"));
+					break;
+				case "3":
+					changeReason = "修改生效日： " + dateCvt(t.get("EffectiveDate"));
 					if (!t.get("IneffectiveDate").equals(t.get("LastIneffectiveDate"))) {
 						changeReason += ", 停效日:" + dateCvt(t.get("IneffectiveDate"));
 					}
-					if (!t.get("EmpClass").equals(t.get("LastEmpClass"))) {
-						changeReason += ", 協辦等級:" + t.get("EmpClass");
-					}
 					if (!t.get("ClassPass").equals(t.get("LastClassPass"))) {
-						changeReason += ", 初階授信通過:" + t.get("EmpClass");
+						changeReason += ", 初階授信通過:" + t.get("ClassPass");
 					}
 					if (!t.get("DeptItem").equals(t.get("LastDeptItem"))) {
 						changeReason += ", 部室:" + t.get("DeptItem");
@@ -205,7 +203,7 @@ public class LP006Report extends MakeReport {
 					changeReason = "調職異動：調職日 " + dateCvt(t.get("EffectiveDate"));
 					break;
 				case "8":
-					changeReason = "考核職級異動：考核生效日" + dateCvt(t.get("EffectiveDate"));
+					changeReason = "考核異動：生效日" + dateCvt(t.get("EffectiveDate"));
 					break;
 				}
 				makeExcel.setValue(row, 9, changeReason); // 9, "異動原因"
@@ -249,6 +247,6 @@ public class LP006Report extends MakeReport {
 		makeExcel.setWidth(8, 20);
 
 		makeExcel.setValue(1, 9, "異動原因");
-		makeExcel.setWidth(9, 40);
+		makeExcel.setWidth(9, 60);
 	}
 }

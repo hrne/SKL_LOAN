@@ -2,8 +2,12 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * SlipMedia2022 傳票媒體檔2022年格式<br>
@@ -16,12 +20,7 @@ import javax.persistence.Embeddable;
 public class SlipMedia2022Id implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -1828069018445059553L;
-
-// 傳票號碼
+  // 傳票號碼
   /* F10+民國年+月份(1碼)+日期+3碼序號*3碼序號，從CdGSeq取號 */
   @Column(name = "`MediaSlipNo`", length = 12)
   private String mediaSlipNo = " ";

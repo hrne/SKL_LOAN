@@ -187,9 +187,11 @@ T(1,@FacmNo,#NTXBUF,9,3)
 T(1,@ApplSeq,#NTXBUF,12,3)
 T(1,@KeeperEnable,#NTXBUF,15,1)
 T(1,@ApplCode,#NTXBUF,16,1)
+T(1,@ModifyFg,#NTXBUF,17,1)
 INVOKEJS(SHOW,p1,02,02,1)
 
-
+!是否可修改管理人欄位記號
+#ModifyFg=X,1,S
 
 <include src="ROM.icf::L5R48.dec"/> 
 
@@ -257,6 +259,7 @@ IF(#FuncCode==5,K(NOBUTTON,CLOSEY),C(2,#ACTFG,$,K(MODIFYBUTTON,登錄),K(MODIFYB
 #FuncCodeX=X,5,L
 T(H,#FuncCode,#FuncCodeHelp)
 C(3,#ApplCode,2,C(3,#FuncCode,1,T(2,歸還),$),$)
+C(3,#FuncCode,4,E(0,@RELCD,1),$)
 
 E(0,@FUNCIND,#FuncCode)
 
@@ -277,6 +280,8 @@ CustName<-OOCustName})
 
 #TODAY=A,7,S
 E(0,#SYSCDATE)
+
+#TitaActFg=X,1,S
 
 ! 申請或歸還
 #ApplCode=A,1,S
@@ -583,12 +588,11 @@ IF(#FKEY == 7,T(2,N),$)
 
 ! 管理人
 #KeeperEmpNo=X,6,I
-IF(#FuncCode==4,s,$)
-IF(#FuncCode==5,s,$)
-IF(#InitApplCode == 1,s,$)
-!C(3,#ApplCode,1,$,s)
-!C(3,#ApplCode,2,s,$)
-IF(#KeeperEnable=="Y",s,$)
+IF(#FuncCode==4 ||#FuncCode==5 ,s,$)
+!IF(#InitApplCode == 1,s,$)
+IF(#ApplCode==1,IF(#ModifyFg=="Y",$,s),$)
+IF(#ApplCode==2,IF(#KeeperEnable=="Y",s,$),$)
+!IF(#KeeperEnable=="Y",s,$)
 HELP(#InnDocKeeperHelp)
 @T(3,@KeeperEmpNoX,)
 V(H,#InnDocKeeperHelp)

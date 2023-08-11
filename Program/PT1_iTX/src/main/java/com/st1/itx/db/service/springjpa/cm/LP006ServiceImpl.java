@@ -65,7 +65,7 @@ public class LP006ServiceImpl extends ASpringJpaParm implements InitializingBean
         	   	"                       when \"IneffectiveDate\" between :startdate and :enddate then 3               \r\n" +   // 本季起日 <= 停效日 <= 下季起日
         		"                       else 0                                                                 \r\n" + 
         		"                  end > 0     \r\n" + 
-        		"             and \"FunctionCode\" between 1 and 9    \r\n" + 
+        		"             and \"FunctionCode\" between 1 and 8    \r\n" + 
         		"          )       \r\n" + 
         		"       where ROWNUMBER = 1                                                                                                                                                 \r\n" + 
         		") ,LAST AS (                                                                        \r\n" + 
@@ -98,7 +98,7 @@ public class LP006ServiceImpl extends ASpringJpaParm implements InitializingBean
         		"            from DATA d\r\n" + 
         		"            left join \"PfCoOfficerLog\" l on l.\"EmpNo\" = d.\"EmpNo\"\r\n" + 
         		"                                        and l.\"LogNo\" < d.\"LogNo\"  \r\n" + 
-        		"                                        and l.\"FunctionCode\" <> 9    \r\n" + 
+        		"                                        and l.\"FunctionCode\" between 1 and 8    \r\n" + 
         		"           )      \r\n" + 
         		"       where ROWNUMBER = 1   \r\n" + 
         		")\r\n" + 
@@ -111,7 +111,8 @@ public class LP006ServiceImpl extends ASpringJpaParm implements InitializingBean
         		",d.\"EffectiveDate\"                                                                    \r\n" + 
         		",d.\"IneffectiveDate\"                                                                  \r\n" + 
         		",d.\"EmpClass\"  \r\n" + 
-        		",d.\"ClassPass\"   \r\n" + 
+        		",nvl(cd1.\"Item\",' ')        as  \"EmpClassX\"                                                                                                                                                               \r\n" + 
+       	    	",d.\"ClassPass\"   \r\n" + 
         		",d.\"FunctionCode\" \r\n" + 
         		",nvl(l.\"AreaItem\",' ')      as  \"LastAreaItem\"                                                                         \r\n" + 
         		",nvl(l.\"DistItem\",' ')      as  \"LastDistItem\"                                                                         \r\n" + 
@@ -119,11 +120,14 @@ public class LP006ServiceImpl extends ASpringJpaParm implements InitializingBean
         		",nvl(l.\"EffectiveDate\",0)   as  \"LastEffectiveDate\"                                                                    \r\n" + 
         		",nvl(l.\"IneffectiveDate\",0) as  \"LastIneffectiveDate\"                                                                  \r\n" + 
         		",nvl(l.\"EmpClass\",' ')      as  \"LastEmpClass\"                                                                                                                                                               \r\n" + 
+        		",nvl(cd2.\"Item\",' ')        as  \"LastEmpClassX\"                                                                                                                                                               \r\n" + 
         		",nvl(l.\"ClassPass\",' ')     as  \"LastClassPass\"                                                                                                                                                               \r\n" + 
         		",nvl(l.\"FunctionCode\",0)    as  \"LastFunctionCode\"                                                                                                                                                               \r\n" + 
         		"from DATA d                                                                          \r\n" + 
         		"left join LAST l on l.\"EmpNo\" =  d.\"EmpNo\" \r\n" + 
         		"left join \"CdEmp\" e on e.\"EmployeeNo\" = d.\"EmpNo\"  \r\n" + 
+        		"left join \"CdCode\" cd1 on cd1.\"DefCode\"= 'ClassType' and cd1.\"Code\" = d.\"EmpClass\"  \r\n" + 
+        		"left join \"CdCode\" cd2 on cd2.\"DefCode\"= 'ClassType' and cd2.\"Code\" = nvl(l.\"EmpClass\",' ')  \r\n" + 
         		"order by d.\"DeptItem\", d.\"DistItem\", d.\"AreaItem\", d.\"EmpNo\"   \r\n"; 
 		this.info("sql=" + sql);
 

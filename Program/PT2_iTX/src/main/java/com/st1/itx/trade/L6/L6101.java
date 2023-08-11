@@ -61,6 +61,7 @@ import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.TxToDoCom;
 //import com.st1.itx.util.MySpring;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
@@ -163,7 +164,6 @@ public class L6101 extends TradeBuffer {
 
 	@Autowired
 	L9134Report l9134Report;
-
 
 	@Autowired
 	TxToDoCom txToDoCom;
@@ -411,8 +411,8 @@ public class L6101 extends TradeBuffer {
 				errocount = 1;
 				OccursList occursList = new OccursList();
 				occursList.putParam("OOMsgCode", "錯誤");
-				occursList.putParam("OOMessage",
-						"整批入帳未完成，批號：" + tBatxHead.getBatchNo() + "，筆數：" + tBatxHead.getUnfinishCnt());
+				occursList.putParam("OOMessage", "整批入帳未完成，批號：" + tBatxHead.getBatchNo() + "，筆數："
+						+ (tBatxHead.getUnfinishCnt() == 0 ? tBatxHead.getBatxTotCnt() : tBatxHead.getUnfinishCnt()));
 				this.totaVo.addOccursList(occursList);
 
 				fBatxTotCnt = fBatxTotCnt + tBatxHead.getUnfinishCnt();
@@ -704,6 +704,16 @@ public class L6101 extends TradeBuffer {
 			l9132ReportB.close();
 			l9132ReportC.exec(titaVo);
 			l9132ReportC.close();
+			// MSG帶入預設值
+			String ntxbuf = titaVo.getTlrNo() + FormatUtil.padX("L9130", 60) + iAcDate;
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf,
+					"L9130總帳傳票媒體檔產生已完成", titaVo);
+			ntxbuf = titaVo.getTlrNo() + FormatUtil.padX("L9131", 60) + iAcDate;
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf,
+					"L9131總帳日結單代傳票已完成", titaVo);
+			ntxbuf = titaVo.getTlrNo() + FormatUtil.padX("L9132", 60) + iAcDate;
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf,
+					"L9132傳票媒體明細表(總帳)已完成", titaVo);
 
 		}
 	}
