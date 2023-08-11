@@ -70,7 +70,7 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 		String oriStep = "";
 		String rerunType = "";
 		if (jobEc.containsKey("OriTxSeq")) {
-			rerunType = jobEc.getString("OriTxSeq");
+			oriTxSeq = jobEc.getString("OriTxSeq");
 		}
 		if (jobEc.containsKey("RerunType")) {
 			rerunType = jobEc.getString("RerunType");
@@ -91,7 +91,7 @@ public class StepExecListener extends SysLogger implements StepExecutionListener
 
 		stepExecution.getExecutionContext().put("txSeq", txSeq);
 
-		// rerunType為A時,全部重跑
+		// rerunType為A時,全部重跑,不為A的時候要去設定OriStatus
 		if (!oriTxSeq.isEmpty() && !rerunType.isEmpty() && !rerunType.equals("A")) {
 			this.rerunHandler(oriTxSeq, jobId, rerunType, stepId, oriStep, stepExecution);
 		}
