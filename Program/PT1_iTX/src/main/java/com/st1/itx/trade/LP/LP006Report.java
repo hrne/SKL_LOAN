@@ -173,10 +173,12 @@ public class LP006Report extends MakeReport {
 					changeReason = "新增協辦人員：生效日 " + dateCvt(t.get("EffectiveDate"));
 					break;
 				case "2":
-					changeReason = "異動生效日： " + dateCvt(t.get("EffectiveDate"));
-					break;
 				case "3":
-					changeReason = "修改生效日： " + dateCvt(t.get("EffectiveDate"));
+					if ("2".equals(t.get("FunctionCode"))) {
+						changeReason = "異動生效日： " + dateCvt(t.get("EffectiveDate"));
+					} else {
+						changeReason = "修改生效日： " + dateCvt(t.get("EffectiveDate"));
+					}
 					if (!t.get("IneffectiveDate").equals(t.get("LastIneffectiveDate"))) {
 						changeReason += ", 停效日:" + dateCvt(t.get("IneffectiveDate"));
 					}

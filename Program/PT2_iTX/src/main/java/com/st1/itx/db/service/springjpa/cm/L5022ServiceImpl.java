@@ -61,13 +61,13 @@ public class L5022ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                ) c on c.\"EmpNo\" = a.\"EmpNo\" ";
 		sql += "      Left join (select \"EmpNo\"              ";
 		sql += "                       ,\"EffectiveDate\"      "; // 生效日期
+		sql += "                       ,\"FunctionCode\"       "; // 功能
 		sql += "                       ,\"EmpClass\"           "; // 協辦等級
 		sql += "                       ,ROW_NUMBER() OVER (Partition By \"EmpNo\"              ";
-		sql += "    	                   	   ORDER BY \"EffectiveDate\" Desc 							               ";
+		sql += "    	                   	   ORDER BY \"UpdateDate\" Desc 							               ";
 		sql += "	                    ) AS \"ROWNUMBER\"                              ";
 		sql += "                 from \"PfCoOfficerLog\"                       ";
-		sql += "                 where \"FunctionCode\"  = 9 "; // 9.考核核算底稿
-		sql += "                ) d on d.\"EmpNo\" = a.\"EmpNo\" and  d.\"EffectiveDate\" = a.\"EffectiveDate\"  and  d.\"ROWNUMBER\" = 1 ";
+		sql += "                ) d on d.\"EmpNo\" = a.\"EmpNo\" and  d.\"FunctionCode\" = 9 and  d.\"ROWNUMBER\" = 1 "; // 最後一筆為9.考核核算底稿
 		sql += "      where a.\"EffectiveDate\" > 0 ";
 		if (!iEmpNo.trim().isEmpty()) {
 			sql += "   and a.\"EmpNo\" = '" + iEmpNo + "' ";

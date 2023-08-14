@@ -188,13 +188,13 @@ public class L5407 extends TradeBuffer {
 	 * @param empNo                協辦人員
 	 * @param effectiveDate        原生效日
 	 * @param evaluteEffectiveDate 考核生效日
-	 * @param evalueChgClass       考核職級
+	 * @param evalueEmpClass       考核職級
 	 * @param titaVo               TitaVo
 	 * @throws LogicException ....
 	 */
 	public void insertEvalutePfCoOfficerLog(String empNo, int effectiveDate, int evaluteEffectiveDate,
-			String evalueChgClass, TitaVo titaVo) throws LogicException {
-		this.info("insertPfCoOfficerLog7  ... ");
+			String evalueEmpClass, TitaVo titaVo) throws LogicException {
+		this.info("insertPfCoOfficerLog9  ... ");
 		// log無資料，新增最初歷程檔
 		insertPfCoOfficerLogFirst(empNo, titaVo);
 
@@ -209,7 +209,7 @@ public class L5407 extends TradeBuffer {
 		tPfCoOfficerLog.setEmpNo(empNo);
 		tPfCoOfficerLog.setEffectiveDate(evaluteEffectiveDate);
 		tPfCoOfficerLog.setIneffectiveDate(9991231);
-		tPfCoOfficerLog.setEmpClass(evalueChgClass);
+		tPfCoOfficerLog.setEmpClass(evalueEmpClass);
 		tPfCoOfficerLog.setClassPass(tPfCoOfficer.getClassPass());
 		tPfCoOfficerLog.setAreaCode(tPfCoOfficer.getAreaCode());
 		tPfCoOfficerLog.setAreaItem(tPfCoOfficer.getAreaItem());

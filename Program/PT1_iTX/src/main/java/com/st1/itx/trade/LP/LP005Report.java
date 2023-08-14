@@ -181,7 +181,7 @@ public class LP005Report extends MakeReport {
 		if (slPfCoOfficerLog != null) {
 			for (PfCoOfficerLog tPfCoOfficerLog : slPfCoOfficerLog.getContent()) {
 				if (tPfCoOfficerLog.getEffectiveDate() == evaluteEffectiveDate
-						&& tPfCoOfficerLog.getFunctionCode() == 7) {
+						&& tPfCoOfficerLog.getFunctionCode() == 9) {
 					lPfCoOfficerLog.add(tPfCoOfficerLog);
 				}
 			}
@@ -197,15 +197,30 @@ public class LP005Report extends MakeReport {
 		// 核算底稿新增至歷程檔(考核後職級不同)
 		for (Map<String, String> m : listEmpClass) {
 			if(!m.get("AfterEmpClass").equals(m.get("OriEmpClass"))) {
+				this.info("insertPfCoOfficerLog " + m.toString());
+				String evalueEmpClass = "";
+				switch (m.get("AfterEmpClass")) {
+				case "初級":
+					evalueEmpClass = "1";
+					break;
+				case "中級":
+					evalueEmpClass = "2";
+					break;
+				case "高級":
+					evalueEmpClass = "3";
+					break;
+				default:
+					break;
+				}
+
 				l5407.insertEvalutePfCoOfficerLog(m.get("EmpNo"), parse.stringToInteger(m.get("EffectiveDate"))-19110000,
-						evaluteEffectiveDate, m.get("AfterEmpClass"), titaVo);
+						evaluteEffectiveDate, evalueEmpClass, titaVo);
 			}
 		}
 	}
 
 	private List<Map<String, String>> putDataToListEmpClass(List<Map<String, String>> listEmpClass,
 			Map<String, String> m, String deptSheetName, String oriEmpClass, String afterEmpClass) {
-		this.info("putDataToListEmpClass ... ");
 
 		Map<String, String> mapEmpClass = new HashMap<>();
 
@@ -214,11 +229,12 @@ public class LP005Report extends MakeReport {
 		mapEmpClass.put("Unit", m.get("F1")); // 單位
 		mapEmpClass.put("EmpName", m.get("F2")); // 姓名
 		mapEmpClass.put("EmpNo", m.get("F3")); // 員工代號
-		mapEmpClass.put("EffectiveDate", m.get("EffectiveDate")); // 生效日期
+		mapEmpClass.put("EffectiveDate", m.get("F15")); // 生效日期
 		mapEmpClass.put("OriEmpClass", oriEmpClass); // 考核前職級
 		mapEmpClass.put("AfterEmpClass", afterEmpClass); // 考核後職級
 
 		listEmpClass.add(mapEmpClass);
+		this.info("putDataToListEmpClass " + mapEmpClass.toString());
 
 		return listEmpClass;
 	}

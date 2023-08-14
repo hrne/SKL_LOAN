@@ -113,6 +113,8 @@ public class L5903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              WHEN i.\"TitaTxtNo\" = 0 THEN 'N'       ";
 		sql += "              WHEN i.\"TitaActFg\" in ('3','4') THEN 'N'       "; // 已審核不可訂正
 		sql += "              WHEN i.\"ApplEmpNo\" <> :iteller THEN 'N'       "; // 經辦與借閱人相同才可訂正
+		sql += "              WHEN NVL(JSON_VALUE(i.\"JsonFields\", '$.RELCD'), ' ') = '2' ";
+		sql += "                   AND i.\"TitaActFg\" in ('2') THEN 'N'       "; // 兩段式已放行不可刪除
 		sql += "              ELSE 'Y' END            AS  \"DeleteFg\"    ";
 		sql += "        ,CASE WHEN i.\"ApplCode\" IN ('2') THEN 'N'       ";
 		sql += "              WHEN i.\"CopyCode\" = '2' THEN 'N'             ";

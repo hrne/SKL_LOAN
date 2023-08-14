@@ -124,6 +124,7 @@ ASGN(BTN_NEW2$)
 
 #StatusFlag=X,1,I
 C(3,#FunCd,1,S,$)
+C(4,#StatusFlag,T(2,1),$)
 HELP(#EffectiveStatusHelp)
 @T(3,#StatusFlagX,)
 C(4,#StatusFlag,T(2,@StatusFlagX, ),V(H,#EffectiveStatusHelp)T(H,@StatusFlagX,#StatusFlag,#EffectiveStatusHelp))

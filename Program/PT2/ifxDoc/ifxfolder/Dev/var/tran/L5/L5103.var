@@ -227,6 +227,7 @@ E(0,@AMTB{i},#L5r48AMTB{i})
 E(0,@OPTC{i},#L5r48OPTC{i})
 E(0,@AMTC{i},#L5r48AMTC{i})
 ##end
+T(H,@UsageCodeX,#UsageCode,#UsageCodeXHelp)
 
 #Trol=X,1,S
 IF(#ApplObj==4&&#ApplCode==2,$,s)
@@ -327,7 +328,7 @@ T(F,@CustNo,0)
 T(F,@FacmNo,0)
 T(F,@ApplSeq,0)
 T(F,@ApplEmpNo,0)
-T(F,@UsageCode,0)
+IF(#L5r48UsageCode==01,T(F,@UsageCode,1),T(F,@UsageCode,0))
 T(F,@CopyCode,0)
 T(F,@KeeperEmpNo,0)
 T(F,@Remark,0)
@@ -342,7 +343,8 @@ T(F,@AMTB{i},0)
 T(F,@OPTC{i},0)
 T(F,@AMTC{i},0)
 ##end
-HIDE(#UsageCode,#CopyCode,#ApplObj)
+IF(#L5r48UsageCode==01,SHOW(#UsageCode),HIDE(#UsageCode))
+HIDE(#CopyCode,#ApplObj)
 HIDE(#BTND)
 ,$)
 T(H,#ApplCode,#ApplCodeHelp)
@@ -527,7 +529,7 @@ C(4,#L5103ConfirmBrNo,s,C(4,#L5103ConfirmGroupNo,s,$))
 !T(F,@KeeperEmpNo,0)
 
 
-! 用途- 2023/8/13歸還時若用途別為01可以改為01或12
+! 用途- 2023/8/14歸還時若用途別為01可以改為01或12
 #UsageCode=x,2,I
 IF(#FuncCode==4,s,$)
 IF(#FuncCode==5,s,$)

@@ -55,6 +55,7 @@ import com.st1.itx.db.service.NegMainService;
 import com.st1.itx.db.service.TxErrCodeService;
 import com.st1.itx.db.service.TxRecordService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -619,7 +620,7 @@ public class TxBatchCom extends TradeBuffer {
 		this.tTempVo = new TempVo();
 		this.tTempVo = this.tTempVo.getVo(tDetail.getProcNote());
 		this.otherTempVo = new TempVo();
-		this.otherTempVo = this.tTempVo.getVo(tDetail.getOtherNote());
+		this.otherTempVo = this.otherTempVo.getVo(tDetail.getOtherNote());
 // TXTNO = BatchNo[2] + eraseNo(1) + TxtSeq [5] 
 // 整批訂正只會有一次( 整批訂正會自動刪除、單筆需人工訂正)
 // BatchNo:Batx09, TotalCnt: 32321 
@@ -2136,7 +2137,7 @@ public class TxBatchCom extends TradeBuffer {
 		if (this.closeBreachAmt.compareTo(BigDecimal.ZERO) > 0)
 			this.tTempVo.putParam("CloseBreachAmt", this.closeBreachAmt);
 		if (this.closeFg > 0)
-			this.tTempVo.putParam("closeFg", this.closeFg);
+			this.tTempVo.putParam("CloseFg", this.closeFg);
 		// 暫收抵繳
 		if (this.tmpAmt.compareTo(BigDecimal.ZERO) > 0) {
 			int i = 1;

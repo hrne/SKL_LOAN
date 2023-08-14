@@ -13,6 +13,7 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.InnFundApl;
 import com.st1.itx.db.service.InnFundAplService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -47,6 +48,9 @@ public class L5101 extends TradeBuffer {
 
 	@Autowired
 	public InnFundAplService innFundAplService;
+	
+	@Autowired
+	DataLog iDataLog;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -99,17 +103,30 @@ public class L5101 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0006", "日期" + titaVo.getParam("AcDate") + "資料不存在");
 			} else {
 				iInnFundApl = innFundAplService.holdById(acDate, titaVo);
+				
+				if(iInnFundApl == null) {
+					throw new LogicException("EC001", "查無資料");
+				}
+				
+				// 變更前
+				InnFundApl BefInnFundApl = (InnFundApl) iDataLog.clone(iInnFundApl);
+				
 				iInnFundApl.setAlrdyBorAmt(parse.stringToBigDecimal(titaVo.getParam("AlrdyBorAmt")));
 				iInnFundApl.setResrvStndrd(parse.stringToBigDecimal(titaVo.getParam("ResrvStndrd")));
 				iInnFundApl.setPosbleBorPsn(parse.stringToBigDecimal(titaVo.getParam("PosbleBorPsn")));
 				iInnFundApl.setPosbleBorAmt(parse.stringToBigDecimal(titaVo.getParam("PosbleBorAmt")));
 				iInnFundApl.setStockHoldersEqt(parse.stringToBigDecimal(titaVo.getParam("StockHoldersEqt")));
 				iInnFundApl.setAvailableFunds(parse.stringToBigDecimal(titaVo.getParam("AvailableFunds")));
+				
 				try {
 					innFundAplService.update(iInnFundApl, titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", "L5101 InnFundApl update " + e.getErrorMsg());
 				}
+
+				// 紀錄變更前變更後
+				iDataLog.setEnv(titaVo, BefInnFundApl, iInnFundApl);
+				iDataLog.exec("修改資金運用概況");
 				
 				titaVo.setDataBaseOnMon();// 指定月報環境
 				
@@ -118,6 +135,7 @@ public class L5101 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", "L5101 InnFundApl update " + e.getErrorMsg());
 				}
+
 			}
 			break;
 		case 4:
@@ -125,11 +143,23 @@ public class L5101 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0006", "日期" + titaVo.getParam("AcDate") + "資料不存在");
 			} else {
 				iInnFundApl = innFundAplService.holdById(acDate, titaVo);
+				
+				if(iInnFundApl == null) {
+					throw new LogicException("EC001", "查無資料");
+				}
+				
+				// 變更前
+				InnFundApl BefInnFundApl = (InnFundApl) iDataLog.clone(iInnFundApl);
+				
 				try {
 					innFundAplService.delete(xInnFundApl, titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", "L5101 InnFundApl delete " + e.getErrorMsg());
 				}
+
+				// 紀錄變更前變更後
+				iDataLog.setEnv(titaVo, BefInnFundApl, iInnFundApl);
+				iDataLog.exec("刪除資金運用概況");
 				
 				titaVo.setDataBaseOnMon();// 指定月報環境
 				try {
@@ -137,6 +167,8 @@ public class L5101 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", "L5101 InnFundApl delete " + e.getErrorMsg());
 				}
+
+			
 			}
 			break;
 		case 5:
