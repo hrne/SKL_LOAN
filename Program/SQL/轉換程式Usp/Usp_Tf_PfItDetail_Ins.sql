@@ -67,9 +67,9 @@ BEGIN
            , QQ.ID1X
            , QQ.ID3X
            , QQ.ID7X
-           , QQ.YAG3LV
-           , QQ.PAY3LV
-           , QQ.APLUAM -- 2023-08-02 會議決議 from ST1 Lai : 這欄位是業績金額
+           , NVL(QQ.YAG3LV,0) AS YAG3LV
+           , NVL(QQ.PAY3LV,0) AS PAY3LV
+           , NVL(QQ.APLUAM,0) AS APLUAM -- 2023-08-02 會議決議 from ST1 Lai : 這欄位是業績金額
            , QQ.PRZCNT
            , S2.YGYYMM
            , ROW_NUMBER()
@@ -131,7 +131,9 @@ BEGIN
            , LMSACN
            , LMSAPN
            , COUNT(*) AS CNT
+           , SUM(LMSFLA) AS MonthLMSFLA
       FROM orderData
+      WHERE APLUAM != 0
       GROUP BY YGYYMM
              , LMSACN
              , LMSAPN
@@ -158,33 +160,24 @@ BEGIN
                THEN o.YAG3LV
                WHEN c.CNT = o."OrderSeq" -- 最後一筆=總數-前面幾筆的加總
                THEN o.YAG3LV -- 總數
-                    - (
-                        ROUND(o.YAG3LV / c.CNT,0) -- 前面幾筆
-                        * (c.CNT - 1) -- 前面幾筆的加總
-                      )
-             ELSE ROUND(o.YAG3LV / c.CNT,0) -- 前面幾筆
+                    - ROUND(o.YAG3LV * ROUND((c.MonthLMSFLA - o.LMSFLA) / c.MonthLMSFLA,15),0) -- 前面幾筆的加總
+             ELSE ROUND(o.YAG3LV * ROUND(o.LMSFLA / c.MonthLMSFLA,15),0) -- 前面幾筆
              END      AS YAG3LV
            , CASE
                WHEN c.CNT = 1 -- 只有一筆不用分攤
                THEN o.PAY3LV
                WHEN c.CNT = o."OrderSeq" -- 最後一筆=總數-前面幾筆的加總
                THEN o.PAY3LV -- 總數
-                    - (
-                        ROUND(o.PAY3LV / c.CNT,0) -- 前面幾筆
-                        * (c.CNT - 1) -- 前面幾筆的加總
-                      )
-             ELSE ROUND(o.PAY3LV / c.CNT,0) -- 前面幾筆
+                    - ROUND(o.PAY3LV * ROUND((c.MonthLMSFLA - o.LMSFLA) / c.MonthLMSFLA,15),0) -- 前面幾筆的加總
+             ELSE ROUND(o.PAY3LV * ROUND(o.LMSFLA / c.MonthLMSFLA,15),0) -- 前面幾筆
              END      AS PAY3LV
            , CASE
                WHEN c.CNT = 1 -- 只有一筆不用分攤
                THEN o.APLUAM
                WHEN c.CNT = o."OrderSeq" -- 最後一筆=總數-前面幾筆的加總
                THEN o.APLUAM -- 總數
-                    - (
-                        ROUND(o.APLUAM / c.CNT,0) -- 前面幾筆
-                        * (c.CNT - 1) -- 前面幾筆的加總
-                      )
-             ELSE ROUND(o.APLUAM / c.CNT,0) -- 前面幾筆
+                    - ROUND(o.APLUAM * ROUND((c.MonthLMSFLA - o.LMSFLA) / c.MonthLMSFLA,15),0) -- 前面幾筆的加總
+             ELSE ROUND(o.APLUAM * ROUND(o.LMSFLA / c.MonthLMSFLA,15),0) -- 前面幾筆
              END      AS APLUAM
            , o.PRZCNT
            , o.YGYYMM

@@ -301,18 +301,38 @@ public class L4211Report extends MakeReport {
 //        "BormNo" ASC
 
 		// facmno, bormno 已經在 query 裡面 concat 到 custno，所以不在這裡加sort
-		// 一般排序
-		fnAllList1 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
-				.ascString("SortingForSubTotal").ascString("EntryDate").ascString("DetailSeq").ascString("AcSeq")
-				.ascString("CustNo").getList();
-		// 金額排序
-		fnAllList2 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
-				.ascString("SortingForSubTotal").ascString("CloseReasonCode").ascString("EntryDate")
-				.descNumber("RepayAmt").ascString("CustNo").ascString("DetailSeq").ascString("AcSeq").getList();
+		// 以金額及戶號排序區分已處理及待處理
+		for (Map<String, String> r : fnAllList) {
 
-		// 戶號排序
-		fnAllList3 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
-				.ascString("SortingForSubTotal").ascString("EntryDate").ascString("CustNo").ascString("DetailSeq")
+			Map<String, String> r1 = new HashMap<>(r);
+			Map<String, String> r2 = new HashMap<>(r);
+			if ("99999".equals(r.get("SortingForSubTotal"))) {
+				r1.put("TxAmt", r.get("RepayAmt"));
+				r2.put("TxAmt", r.get("RepayAmt"));
+			} else {
+
+				r2.put("SortingForSubTotal", "888");
+				r2.put("AcctItem", "擔保放款");
+			}
+			fnAllList1.add(r1);
+			if ("1".equals(r.get("RepayCode").toString())) {
+				fnAllList2.add(r2);
+				fnAllList3.add(r2);
+			}
+		}
+		// 科目排序
+		fnAllList1 = sortMapListCom.beginSort(fnAllList1).ascString("ReconCode").ascString("BatchNo")
+				.ascString("SortingForSubTotal").ascString("DetailSeq").ascString("RepayCode").ascString("AcSeq")
+				.ascString("CustNo").getList();
+
+		// 金額排序:已處理/待處理 + 結清 + 金額 + 戶號 + 還款方式
+		fnAllList2 = sortMapListCom.beginSort(fnAllList2).ascString("ReconCode").ascString("BatchNo")
+				.ascString("SortingForSubTotal").ascString("SortingForClose").descNumber("RepayAmt").ascString("CustNo")
+				.ascString("DetailSeq").ascString("RepayCode").ascString("AcSeq").getList();
+
+		// 戶號排序:已處理/待處理+ 戶號 + 金額
+		fnAllList3 = sortMapListCom.beginSort(fnAllList3).ascString("ReconCode").ascString("BatchNo")
+				.ascString("SortingForSubTotal").ascString("CustNo").descNumber("RepayAmt").ascString("DetailSeq")
 				.ascString("AcSeq").getList();
 
 		makePdf(fnAllList1, fnAllList2, fnAllList3, false, titaVo);

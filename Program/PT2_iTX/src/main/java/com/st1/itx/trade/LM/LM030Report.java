@@ -166,9 +166,9 @@ public class LM030Report extends MakeReport {
 				// 繳息迄日
 				makeExcel.setValue(row, 11, parse.stringToInteger(r.get("PrevPayIntDate")), "R");
 				// 最近應繳日
-				makeExcel.setValue(row, 12, baTxCom.getRepayIntDate(), "R");
+				makeExcel.setValue(row, 12, parse.stringToInteger(r.get("DueDate")), "R");
 				// 預計轉催日
-				makeExcel.setValue(row, 13, parse.stringToInteger(r.get("NextOvduDate")), "R");
+//				makeExcel.setValue(row, 13, parse.stringToInteger(r.get("NextOvduDate")), "R");
 
 				// 備註
 				if (custNoCnt > 1) {

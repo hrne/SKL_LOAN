@@ -84,10 +84,10 @@ public class LM030ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                    To_Date(";
 		sql += "                        To_Char(";
 		sql += "                            Decode(";
-		sql += "                                M.\"PrevIntDate\",";
+		sql += "                                M.\"DueDate\",";
 		sql += "                                0,";
 		sql += "                                19110101,";
-		sql += "                                M.\"PrevIntDate\"";
+		sql += "                                M.\"DueDate\"";
 		sql += "                            )";
 		sql += "                        ),";
 		sql += "                        'YYYYMMDD'";
@@ -96,7 +96,7 @@ public class LM030ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                ),";
 		sql += "                'YYYYMMDD'";
 		sql += "            )";
-		sql += "        ) - 19110000 AS \"NextOvduDate\"";
+		sql += "        ) - 19110000 AS \"DueDate\"";
 		sql += "    FROM \"Main\" M";
 		sql += "        LEFT JOIN \"CdCity\" Cd ON Cd.\"CityCode\" = M.\"CityCode\"";
 		sql += "        LEFT JOIN \"CustMain\" Cm ON Cm.\"CustNo\" = M.\"CustNo\"";

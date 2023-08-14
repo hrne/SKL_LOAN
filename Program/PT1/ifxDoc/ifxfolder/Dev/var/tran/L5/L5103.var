@@ -253,7 +253,13 @@ C(3,#ApplCode,0,E(0,@ApplCode,1),$)
 ! 登放記號
 #ACTFGX=X,8,S
 T(H,#ACTFG,#ActFgHelp)
-IF(#FuncCode==5,K(NOBUTTON,CLOSEY),C(2,#ACTFG,$,K(MODIFYBUTTON,登錄),K(MODIFYBUTTON,放行),K(MODIFYBUTTON,審核)))
+!IF(#FuncCode==5,K(NOBUTTON,CLOSEY),C(2,#ACTFG,$,K(MODIFYBUTTON,登錄),K(MODIFYBUTTON,放行),K(MODIFYBUTTON,審核)))
+IF(#FuncCode==5,K(NOBUTTON,CLOSEY),IF(#FuncCode==2 && #InitApplCode==0,K(MODIFYBUTTON,修改),
+   IF(#FuncCode==4,K(MODIFYBUTTON,刪除),C(2,#ACTFG,$,K(MODIFYBUTTON,登錄),K(MODIFYBUTTON,放行),K(MODIFYBUTTON,審核)))))
+
+
+
+
 ! 功能
 #FuncCode=A,1,S
 #FuncCodeX=X,5,L
@@ -277,6 +283,13 @@ E(0,0)
 BIND(#BTND,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUFD;ntxbuf5=type<-1:
 CustNo<-OOCustNo:
 CustName<-OOCustName})
+
+!會計日期
+#DATE=D,8,S
+T(4,DATE$)
+
+#DT=D,7,S
+T(1,#DATE,2,7)
 
 #TODAY=A,7,S
 E(0,#SYSCDATE)
@@ -513,16 +526,18 @@ C(3,#ApplCode,1,$,s)
 C(4,#L5103ConfirmBrNo,s,C(4,#L5103ConfirmGroupNo,s,$))
 !T(F,@KeeperEmpNo,0)
 
-! 用途
+
+! 用途- 2023/8/13歸還時若用途別為01可以改為01或12
 #UsageCode=x,2,I
 IF(#FuncCode==4,s,$)
 IF(#FuncCode==5,s,$)
 IF(#InitApplCode == 1,s,$)
-C(3,#ApplCode,1,$,s)
+IF(#ApplCode==1,$,IF(#L5r48UsageCode==01,$,s))
 HELP(#UsageCodeXHelp)
 @T(3,@UsageCodeX,)
 V(H,#UsageCodeXHelp)
 V(NL)
+
 
 #UsageCodeX=X,16,L
 T(H,#UsageCode,#UsageCodeXHelp)
@@ -554,7 +569,7 @@ E(0,0)
 E(0,0)
 
 #TODAY1=X,1,S
-C(3,#ApplCode,2,C(3,#ReturnDate,0,E(0,@ReturnDate,#TODAY),$),C(3,#ApplDate,0,E(0,@ApplDate,#TODAY),$))
+C(3,#ApplCode,2,C(3,#ReturnDate,0,E(0,@ReturnDate,#TODAY),$),C(3,#ApplDate,0,E(0,@ApplDate,#DT),$))
 
 ! 借閱日期
 #ApplDate=D,7,I
@@ -564,7 +579,7 @@ IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,2,s,$)
 @V(7)
 A(DATE,0,#ApplDate)
-IF(#ApplDate>#TODAY,V(P,借閱日期不可大於本日),$)
+IF(#ApplDate>#DT,V(P,借閱日期不可大於本日),$)
 
 
 #SetTmpApplDate=A,1,S
@@ -686,7 +701,8 @@ C(4,#ReturnEmpNo,s,$)
 IF(#FuncCode==4,s,$)
 IF(#FuncCode==5,s,$)
 IF(#InitApplCode == 1,s,$)
-C(3,#ApplCode,1,$,s)
+T(F,@Remark,1)
+!C(3,#ApplCode,1,$,s)
 
 
 ! 借閱項目
@@ -784,7 +800,7 @@ IF(#FuncCode==5,s,$)
 C(3,#ApplObj,4,$,S)
 IF(#ApplCode==1&&#ACTFG==1,$,s)
 C(3,#OPTA{i},0,S,$)
-IF(#ApplCode==1 && #FuncCode==1 && #FKEY != 7 ,E(0,0),$) 
+IF(#ApplCode==1 && #FuncCode==1 && #FKEY != 7 ,E(0,1),$) 
 @V(2,0)
 
 #COPTA{i}=X,1,S
@@ -847,7 +863,7 @@ IF(#FuncCode==5,s,$)
 C(3,#ApplObj,4,$,S)
 IF(#ApplCode==1&&#ACTFG==1,$,s)
 C(3,#OPTB{i},0,S,$)
-IF(#ApplCode==1 && #FuncCode==1 && #FKEY != 7 ,E(0,0),$) 
+IF(#ApplCode==1 && #FuncCode==1 && #FKEY != 7 ,E(0,1),$) 
 @V(2,0)
 
 #COPTB{i}=X,1,S
@@ -910,7 +926,7 @@ IF(#FuncCode==5,s,$)
 C(3,#ApplObj,4,$,S)
 IF(#ApplCode==1&&#ACTFG==1,$,s)
 C(3,#OPTC{i},0,S,$)
-IF(#ApplCode==1 && #FuncCode==1 && #FKEY != 7 ,E(0,0),$) 
+IF(#ApplCode==1 && #FuncCode==1 && #FKEY != 7 ,E(0,1),$) 
 @V(2,0)
 
 #COPTC{i}=X,1,S
