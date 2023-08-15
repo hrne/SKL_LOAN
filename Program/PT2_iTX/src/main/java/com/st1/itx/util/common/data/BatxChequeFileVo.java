@@ -124,7 +124,7 @@ public class BatxChequeFileVo extends FileVo {
 //			ChequeAcct	支票銀行帳號	X	9	21	30	
 //			ChequeAmt	金額			A	10	30	40	
 //			MediaDate	輸入日期		A	7	40	47	YYYMMDD 轉檔的日期
-//			Teller		作業者		X	8	47	55	帶轉檔作業者
+//			Teller		作業者		X	8	47	55	帶轉檔作業者(員編六碼+01)
 //			UnitCode	部門代號		X	6	55	61	部門代號=來源單位
 //			SrcCode		支票來源碼2		X	1	61	62	* ----->
 //			SrcUnit		來源單位		X	6	62	68	

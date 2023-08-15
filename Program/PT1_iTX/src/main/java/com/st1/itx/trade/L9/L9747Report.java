@@ -76,14 +76,31 @@ public class L9747Report extends MakeReport {
 		String txcd = "L9747";
 		String fileItem = "催收及呆帳戶暫收款明細表";
 		String fileName = "L9747催收及呆帳戶暫收款明細表";
-		String defaultExcel = "L9747_底稿_催收及呆帳戶暫收款明細表.xlsx";
-		String defaultSheet = "D961211M";
+//		String defaultExcel = "L9747_底稿_催收及呆帳戶暫收款明細表.xlsx";
+		String sheet = "D961211M";
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
 				.setRptItem(fileItem).build();
 
 		// 開啟報表
-		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		makeExcel.open(titaVo, reportVo, fileName,sheet);
+			
+		makeExcel.setValue(1, 1, "LOCNAM");
+		makeExcel.setValue(1, 2, "LOCLID");
+		makeExcel.setValue(1, 3, "LMSACN");
+		makeExcel.setValue(1, 4, "LMSAPN");
+		makeExcel.setValue(1, 5, "LMSSTS04");
+		makeExcel.setValue(1, 6, "CUSNA1");
+		makeExcel.setValue(1, 7, "MORTOTWK");
+		
+		makeExcel.setValue(2, 1, "押品地區");
+		makeExcel.setValue(2, 2, "地區別");
+		makeExcel.setValue(2, 3, "戶號");
+		makeExcel.setValue(2, 4, "額度");
+		makeExcel.setValue(2, 5, "戶況");
+		makeExcel.setValue(2, 6, "戶名");
+		makeExcel.setValue(2, 7, "暫收款金額");
+		
 
 		if (LMList == null || LMList.isEmpty()) {
 
@@ -139,7 +156,6 @@ public class L9747Report extends MakeReport {
 		}
 
 		makeExcel.close();
-		// makeExcel.toExcel(sno);
 	}
 
 }

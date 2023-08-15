@@ -109,7 +109,7 @@ public class L4701 extends TradeBuffer {
 //		ChequeAcct	支票銀行帳號	X	9	21	30	
 //		ChequeAmt	金額			A	10	30	40	
 //		MediaDate	輸入日期		A	7	40	47	YYYMMDD 轉檔的日期
-//		Teller		作業者		X	8	47	55	帶轉檔作業者
+//		Teller		作業者		X	8	47	55	帶轉檔作業者(員編六碼+01)
 //		UnitCode	部門代號		X	6	55	61	部門代號=來源單位
 //		SrcCode		支票來源碼2		X	1	61	62	* ----->
 //		SrcUnit		來源單位		X	6	62	68	
@@ -143,7 +143,7 @@ public class L4701 extends TradeBuffer {
 				occursList.putParam("ChequeAcct", FormatUtil.padX("" + tLoanCheque.getChequeAcct(), 9));
 				occursList.putParam("ChequeAmt", FormatUtil.pad9("" + tLoanCheque.getChequeAmt(), 7));
 				occursList.putParam("MediaDate", FormatUtil.pad9("" + iAcDate, 7));
-				occursList.putParam("Teller", FormatUtil.padX(titaVo.getTlrNo(), 8));
+				occursList.putParam("Teller", FormatUtil.padX(titaVo.getTlrNo(), 6) + "01");
 				occursList.putParam("UnitCode", "10H400");
 				occursList.putParam("SrcCode", "1");
 				occursList.putParam("SrcUnit", "10H400");

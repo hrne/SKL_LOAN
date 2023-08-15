@@ -83,17 +83,11 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "			 WHEN M.\"ClCode1\" IN (1,2) THEN 'C'";
 			sql += "			ELSE '99' END ) AS \"LoanType\"";
 			sql += "		  ,\"Fn_ParseEOL\"(C.\"CustName\",0) AS \"CustName\"";
-			sql += "		  ,(CASE";
-			sql += "			  WHEN H.\"Id\" IS NULL THEN 'A'";
-//			sql += "			  WHEN R.\"ReltCode\" ='08' THEN 'C'";
-			sql += "			ELSE 'B' END ) AS \"LoanRelCode\"";
+			sql += "		  ,'A' AS \"LoanRelCode\"";//--因此表無利關人條件判斷，皆為A(非關係人)
 			// EntCode 0=個金,1=企金,2=企金自然人
 			sql += "		  ,(CASE";
-			sql += "			  WHEN H.\"Id\" IS NULL AND M.\"EntCode\" <> 1 THEN 'D'";
-			sql += "			  WHEN H.\"Id\" IS NULL AND M.\"EntCode\" = 1 THEN 'C'";
-			sql += "			  WHEN H.\"Id\" IS NOT NULL AND M.\"EntCode\" <> 1 THEN 'B'";
-			sql += "			  WHEN H.\"Id\" IS NOT NULL AND M.\"EntCode\" = 1 THEN 'A'";
-			sql += "			ELSE ' ' END ) AS \"RelCode\"";
+			sql += "			  WHEN M.\"EntCode\" <> 1 THEN 'D'";
+			sql += "			ELSE 'C' END ) AS \"RelCode\"";
 			sql += "		  ,(CASE";
 			sql += "			  WHEN REGEXP_LIKE(M2.\"ProdNo\",'I[A-Z]') OR M2.\"FacAcctCode\" = 340 THEN 'Y'";
 			sql += "			ELSE 'N' END ) AS \"isNotGoverDisCode\"";
