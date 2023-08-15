@@ -27,6 +27,7 @@ import com.st1.itx.db.domain.FacProdBreach;
 import com.st1.itx.db.domain.FacProdStepRate;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanBorMainId;
+import com.st1.itx.db.domain.LoanBorTx;
 import com.st1.itx.db.domain.LoanNotYet;
 import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.CustMainService;
@@ -35,6 +36,7 @@ import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.FacProdService;
 import com.st1.itx.db.service.FacProdStepRateService;
 import com.st1.itx.db.service.LoanBorMainService;
+import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.LoanNotYetService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AuthLogCom;
@@ -69,6 +71,9 @@ public class L2R05 extends TradeBuffer {
 	public AcReceivableService acReceivableService;
 	@Autowired
 	public LoanNotYetService sLoanNotYetService;
+	@Autowired
+	public LoanBorTxService loanBorTxService;
+
 	@Autowired
 	public AuthLogCom authLogCom;
 	@Autowired
@@ -230,6 +235,15 @@ public class L2R05 extends TradeBuffer {
 		this.info("tempVo =" + tempVo);
 		// 非查詢功能時檢查是否已放行
 		if (iFuncCode != 5 && tFacMain.getActFg() == 1 && iFKey == 0) {
+
+			LoanBorTx tLoanBorTx = loanBorTxService.custNoTxtNoFirst(iCustNo, iFacmNo, 0,
+					tFacMain.getLastAcctDate() + 19110000, tFacMain.getLastTlrNo(), tFacMain.getLastTxtNo(), titaVo);
+			if (tLoanBorTx != null) {
+				throw new LogicException(titaVo, "E0021",
+						"額度檔 戶號 = " + tFacMain.getCustNo() + " 額度編號 =  " + tFacMain.getFacmNo() + " 會計日期: "
+								+ tLoanBorTx.getAcDate() + " 交易代號: " + tLoanBorTx.getTitaTxCd() + " 經辦: "
+								+ tLoanBorTx.getTitaTlrNo()); // 該筆資料待放行中
+			}
 			throw new LogicException(titaVo, "E0021",
 					"額度檔 戶號 = " + tFacMain.getCustNo() + " 額度編號 =  " + tFacMain.getFacmNo()); // 該筆資料待放行中
 		}
@@ -401,7 +415,6 @@ public class L2R05 extends TradeBuffer {
 		this.totaVo.putParam("L2r05FirstRateAdjFreq", tFacMain.getFirstRateAdjFreq());
 		this.totaVo.putParam("L2r05FirstAdjRateDate", FirstAdjRateDate);
 		this.totaVo.putParam("L2r05FirstLoanBorRate", FirstLoanBorRate);
-		
 
 		this.totaVo.putParam("L2r05RateAdjFreq", tFacMain.getRateAdjFreq());
 		this.totaVo.putParam("L2r05CurrencyCode", tFacMain.getCurrencyCode());

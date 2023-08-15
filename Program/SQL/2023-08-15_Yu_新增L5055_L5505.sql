@@ -1,0 +1,8 @@
+Insert into "TxTranCode" ("TranNo","TranItem","Desc","TypeFg","CancelFg","ModifyFg","MenuNo","SubMenuNo","MenuFg","Status","CreateDate","CreateEmpNo","LastUpdate","LastUpdateEmpNo","SubmitFg","CustDataCtrlFg","CustRmkFg","ChainTranMsg","ApLogFlag","ApLogRim") 
+values ('L5055','換算業績及業務報酬獎金明細查詢','換算業績及業務報酬獎金明細查詢',1,0,0,'L5','3',1,0,to_timestamp('02-6月 -23 11.50.56.981000000 上午','DD-MON-RR HH.MI.SSXFF AM'),'001703',to_timestamp('02-6月 -23 11.50.56.981000000 上午','DD-MON-RR HH.MI.SSXFF AM'),'001703',0,0,0,null,0,null);
+Insert into "TxAuthority" ("AuthNo","TranNo","AuthFg","CreateDate","CreateEmpNo","LastUpdate","LastUpdateEmpNo") 
+values ('0000T1','L5055',2,to_date('01-5月 -23','DD-MON-RR'),'001722',to_date('01-5月 -23','DD-MON-RR'),'001722');
+Insert into "TxTranCode" ("TranNo","TranItem","Desc","TypeFg","CancelFg","ModifyFg","MenuNo","SubMenuNo","MenuFg","Status","CreateDate","CreateEmpNo","LastUpdate","LastUpdateEmpNo","SubmitFg","CustDataCtrlFg","CustRmkFg","ChainTranMsg","ApLogFlag","ApLogRim") 
+values ('L5505','換算業績及業務報酬獎金維護','換算業績及業務報酬獎金維護',1,0,0,'L5','3',1,0,to_timestamp('02-6月 -23 11.50.56.981000000 上午','DD-MON-RR HH.MI.SSXFF AM'),'001703',to_timestamp('02-6月 -23 11.50.56.981000000 上午','DD-MON-RR HH.MI.SSXFF AM'),'001703',0,0,0,null,0,null);
+Insert into "TxAuthority" ("AuthNo","TranNo","AuthFg","CreateDate","CreateEmpNo","LastUpdate","LastUpdateEmpNo") 
+values ('0000T1','L5505',2,to_date('01-5月 -23','DD-MON-RR'),'001722',to_date('01-5月 -23','DD-MON-RR'),'001722');

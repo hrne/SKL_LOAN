@@ -1,0 +1,547 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+![一段式/二段式/三段式]
+#RELCD=_,_,S
+E(0,1)
+
+#ACTFG=_,_,S
+C(2,#FKEY,E(0,1),$)
+
+#TXCD
+T(3,L5505)
+</sub>
+
+<sub type="PREDC" name="PreDC">
+
+<include src="COM.icf::TITLE-RUN.pre"/>
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L5505" layout="cols=3;screen.width=[180,350,180,350];printer.width=[20,80];order=1">
+[
+["[L5505]                                 換算業績及業務報酬獎金維護"],
+["#<->#,#FdFunCode+功能選項",#FunCodeX],
+["#<->#,#FdCustNo+借款人戶號",#CustNo,"-",#FacmNo,"-",#BormNo],
+["#<->#,#FdCustNm+戶名",#CustNm],
+["#<->#,#FdWorkMonth+工作月",#WorkMonth],
+["#<->#,#FdIntroducer+介紹人",#Introducer,#BTNA,#IntroducerName],
+["#<->#,#FdUnitManager+處經理",#UnitManager,#BTNB,#UnitManagerName],
+["#<->#,#FdDistManager+區經理",#DistManager,#BTNC,#DistManagerName],
+["#<->#,#FdDeptCode+部室",#DeptCode,#DeptCodeBTN,#DeptCodeX],
+["#<->#,#FdDistCode+區部",#DistCode,#DistCodeBTN,#DistCodeX],
+["#<->#,#FdUnitCode+單位",#UnitCode,#UnitCodeBTN,#UnitCodeX],
+["#<->#,#FdUtilBal+撥款金額",#UtilBal],
+["#<->#,#FdPerfEqAmt+換算業績",#AdjPerfEqAmt],
+["#<->#,#FdPerfReward+業務報酬",#AdjPerfReward],
+]
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+!不可重新交易
+#AGAIN=X,1,S
+E(0,1)ASGN(AGAIN$)
+
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN==0,V(P,本交易為連動交易，請由L5055連動進入),$)
+
+#NTXBUF=X,30,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@FunCode,#NTXBUF,1,1)
+
+#FdWorkMonth=X,2,L
+#FdTitle=X,2,L
+#FdFunCode=X,2,L
+#FdCustNo=X,2,L
+#FdCustNm=X,2,L
+#FdIntroducer=X,2,L
+#FdBsOfficer=X,2,L
+#FdUtilBal=X,2,L
+#FdPerfDate=X,2,L
+#FdPerfEqAmt=X,2,L
+C(3,#FunCode,2,T(3,*),T(3, ))
+#FdPerfReward=X,2,L
+C(3,#FunCode,2,T(3,*),T(3, ))
+#FdPerfAmt=X,2,L
+C(3,#FunCode,2,T(3,*),T(3, ))
+#FdUnitManager=X,2,L
+#FdDistManager=X,2,L
+#FdDeptCode=X,2,L
+#FdDistCode=X,2,L
+#FdUnitCode=X,2,L
+
+#BTNA=X,4,I,ui:button;value:員工資料查詢;enable:1;tabbable:0
+#BTNB=X,4,I,ui:button;value:員工資料查詢;enable:1;tabbable:0
+#BTNC=X,4,I,ui:button;value:員工資料查詢;enable:1;tabbable:0
+
+#CntingCodeH=X,10,S
+T(3,Y:是;N:否)
+
+!#BufEmpNo=X,7,S
+!T(3,      Y)
+!#BindEmpNo=X,1,S
+!BIND(#BtnEmpno,click, {cmd=CHAIN; ntxcd=L5022; ntxbuf=#BufEmpNo;ntxbuf5=type<-1:TempAdjIntroducer<-OOEmpNo:AdjIntroducer<-OOEmpNo:AdjIntroducerName<-OOFullname:L5r28FullName<-OOFullname})
+
+!FuncCode1(1:新增;2:修改;4:刪除;5:查詢)
+#CODEFuncCode1=x,20,S                  
+T(3,CdCode.FuncCode1)
+#FuncCode1Help=x,50,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CODEFuncCode1)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@FuncCode1Help,#HelpDesc1)
+
+! FuncCode1(1:新增;2:修改;4:刪除;5:查詢)
+#FunCode=A,1,S
+
+![維護記號名稱]
+#FunCodeX=X,4,L
+!C(3,#FunCode,5,T(3,查詢),T(H,#FunCode,#FuncCode1Help))
+T(H,#FunCode,#FuncCode1Help)
+K(MODIFYBUTTON,#FunCodeX)
+C(3,#FunCode,5,K(NOBUTTON,CLOSEY),$)
+
+
+! [調Rim相關]
+! 定義Rom欄位名稱、型態、長度
+#RimCustNo=A,7,S
+#RimFacmNo=A,3,S
+#RimBormNo=A,3,S
+#RimPerfDate=D,7,S
+
+#LogNo=A,8,S
+#RepayType=X,1,S
+
+#Tf=x,1,S
+C(3,#FunCode,4,$,S)
+T(F,@AdjPerfEqAmt,0)
+T(F,@AdjPerfReward,0)
+T(F,@Introducer,0)
+T(F,@UnitManager,0)
+T(F,@DistManager,0)
+T(F,@DeptCode,0)
+T(F,@DistCode,0)
+T(F,@UnitCode,0)
+ 
+! 借款人戶號
+#CustNo=A,7,I
+C(3,#FunCode,1,$,s)
+#RimCustId=X,10,S
+#RimFunCd=A,1,S
+#RimL1r09=X,1,S
+C(3,#FunCode,1,$,s)
+E(0,@RimCustNo,#CustNo)
+E(0,@RimFunCd,1)
+RESET_RIM(#RimL1r09,L1R09)
+S(L1R09,1,#RimCustId,#RimCustNo,#RimFunCd)
+R(1,L1R09)
+T(2,@CustNm,#L1r09CustName)
+
+! 額度編號
+#FacmNo=A,3,I
+C(3,#FunCode,1,$,s)
+
+! 撥款序號
+#BormNo=A,3,I
+C(3,#FunCode,1,$,s)
+
+
+#RimL5r27=X,1,S
+C(3,#CHAIN,1,$,S)
+RESET_RIM(#RimL5r27,L5R27)
+S(L5R27,1,#FunCode,#LogNo,#CustNo,#FacmNo,#BormNo)
+R(1,L5R27)
+E(0,@CustNo,#L5r27CustNo)
+E(0,@FacmNo,#L5r27FacmNo)
+E(0,@BormNo,#L5r27BormNo)
+T(2,@CustNm,#L5r27CustNm)
+T(2,@BsOfficer,#L5r27BsOfficer)
+T(2,@BsOfficerName,#L5r27BsOfficerName)
+T(2,@Introducer,#L5r27Introducer)
+T(2,@IntroducerName,#L5r27IntroducerName)
+E(0,@UtilBal,#L5r27UtilBal)
+E(0,@AdjPerfEqAmt,#L5r27AdjPerfEqAmt)
+E(0,@AdjPerfReward,#L5r27AdjPerfReward)
+T(2,@UnitManager,#L5r27UnitManager)
+T(2,@UnitManagerName,#L5r27UnitManagerName)
+T(2,@DistManager,#L5r27DistManager)
+T(2,@DistManagerName,#L5r27DistManagerName)
+T(2,@DeptCode,#L5r27DeptCode)
+T(2,@DeptCodeX,#L5r27DeptCodeX)
+T(2,@DistCode,#L5r27DistCode)
+T(2,@DistCodeX,#L5r27DistCodeX)
+T(2,@UnitCode,#L5r27UnitCode)
+T(2,@UnitCodeX,#L5r27UnitCodeX)
+
+
+#MRKEY=_,_,S
+T(2,#CustNo+-+#FacmNo+-+#BormNo)
+
+! 戶名
+#CustNm=X,2.100,L
+
+
+#MESSAGE=X,20,S
+T(2,需大於原工作月+#L5r27WorkMonth)
+!工作月
+#WorkMonth=X,5,I
+C(3,#FunCode,4,s,$)
+E(0,#L5r27LastWorkMonth)
+@
+A(YM13,1,#WorkMonth)
+IF(#WorkMonth <= #L5r27WorkMonth,V(P,#MESSAGE),$)
+
+
+#InitApplCode=A,1,S
+C(3,#FunCode,4,E(0,1),$)
+C(3,#FunCode,4,s,$)
+C(3,#FunCode,5,E(0,1),$)
+C(3,#FunCode,5,s,$)
+
+#checkApplcode=X,1,S
+C(3,#InitApplCode,1,HIDE(#BTNA,#BTNB,#BTNC,#DeptCodeBTN,#DistCodeBTN,#UnitCodeBTN),SHOW(#BTNA,#BTNB,#BTNC,#DeptCodeBTN,#DistCodeBTN,#UnitCodeBTN))
+
+
+#Tf2=x,1,S
+C(3,#FunCode,2,$,S)
+T(F,@AdjPerfEqAmt,0)
+T(F,@AdjPerfReward,0)
+T(F,@Introducer,1)
+T(F,@UnitManager,1)
+T(F,@DistManager,1)
+T(F,@DeptCode,1)
+T(F,@DistCode,1)
+T(F,@UnitCode,1)
+T(F,@WorkMonth,0)
+
+#Tf3=x,1,S
+C(3,#FunCode,2,$,S)
+T(F,@Introducer,0)
+T(F,@UnitManager,0)
+T(F,@DistManager,0)
+T(F,@AdjPerfEqAmt,1)
+T(F,@AdjPerfReward,1)
+T(F,@DeptCode,0)
+T(F,@DistCode,0)
+T(F,@UnitCode,0)
+
+
+#RimEmployeeNo=X,6,S
+#RimTxCode=X,6,S
+T(2,L5505)
+#RimErrorSkip=X,1,S
+T(2,Y)
+
+!<瀏覽-員工號碼>
+#BUFA=X,74,S
+T(2,      Y)
+
+#BINDA=X,1,S
+BIND(#BTNA,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUFA;ntxbuf5=type<-1:
+Introducer<-OOEmployeeNo:
+IntroducerName<-OOFullname})
+IF(#InitApplCode == 1,BIND(grid,cancel),$)
+)
+
+! 介紹人
+#Introducer=X,6,I
+C(3,#FunCode,4,s,$)
+C(3,#FunCode,5,s,$)
+@
+C(3,#FunCode,1,V(7),$)
+
+#SendL2r08A=X,1,S
+C(4,#Introducer,S,$)
+C(3,#FunCode,1,T(2,@RimErrorSkip,),T(2,@RimErrorSkip,Y))
+T(2,@RimErrorSkip,Y)
+T(2,@RimEmployeeNo,#Introducer)
+RESET_RIM(#SendL2r08A,L2R08)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+T(2,@IntroducerName,#L2r08FullName)
+
+#IntroducerName=X,50,L
+!! 調整後介紹人NM
+!#AdjIntroducer=X,6,S
+!@IF(#AdjIntroducer=="",T(2,@AdjIntroducerName,) T(2,@L5r28FullName,),$)
+
+#TempAdjIntroducer=X,6,S
+
+!<瀏覽-員工號碼>
+#BUFB=X,74,S
+T(2,      Y)
+
+#BINDB=X,1,S
+BIND(#BTNB,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUFB;ntxbuf5=type<-1:
+UnitManager<-OOEmployeeNo:
+UnitManagerName<-OOFullname})
+IF(#InitApplCode == 1,BIND(grid,cancel),$)
+
+! 處經理
+#UnitManager=X,6,I
+C(3,#FunCode,4,s,$)
+C(3,#FunCode,5,s,$)
+@
+C(3,#FunCode,1,V(7),$)
+
+
+#SendL2r08B=X,1,S
+C(4,#UnitManager,S,$)
+C(3,#FunCode,1,T(2,@RimErrorSkip,),T(2,@RimErrorSkip,Y))
+T(2,@RimErrorSkip,Y)
+T(2,@RimEmployeeNo,#UnitManager)
+RESET_RIM(#SendL2r08B,L2R08)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+T(2,@UnitManagerName,#L2r08FullName)
+
+#UnitManagerName=X,50,L
+
+!<瀏覽-員工號碼>
+#BUFC=X,74,S
+T(2,      Y)
+
+#BINDC=X,1,S
+BIND(#BTNC,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUFC;ntxbuf5=type<-1:
+DistManager<-OOEmployeeNo:
+DistManagerName<-OOFullname})
+IF(#InitApplCode == 1,BIND(grid,cancel),$)
+
+! 區經理
+#DistManager=X,6,I
+C(3,#FunCode,4,s,$)
+C(3,#FunCode,5,s,$)
+@
+C(3,#FunCode,1,V(7),$)
+
+
+#SendL2r08C=X,1,S
+C(4,#DistManager,S,$)
+C(3,#FunCode,1,T(2,@RimErrorSkip,),T(2,@RimErrorSkip,Y))
+T(2,@RimErrorSkip,Y)
+T(2,@RimEmployeeNo,#DistManager)
+RESET_RIM(#SendL2r08C,L2R08)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+T(2,@DistManagerName,#L2r08FullName)
+
+#DistManagerName=X,50,L
+
+
+#RimUnitCode=X,6,S
+#RimTxCode1=X,6,S
+T(2,L5505)
+#RimErrorSkip1=X,1,S
+T(2,Y)
+
+
+! 部室代號
+#DeptCodeBTN=X,1,I,ui:button;value:單位代號查詢;enable:1;tabbable:0
+#DeptCodeBUF=X,6,S
+#DeptCodeBIND=X,1,S
+BIND(#DeptCodeBTN,click, {cmd=CHAIN; ntxcd=L6086; ntxbuf=#DeptCodeBUF;ntxbuf5=type<-1:DeptCode<-OODeptCode:DeptCodeX<-OODeptItem})
+
+#DeptCode=X,6,I
+C(3,#FunCode,4,s,$)
+C(3,#FunCode,5,s,$)
+@
+C(4,#DeptCode,S,$)
+C(3,#FunCode,1,V(7),$)
+
+
+#SendL2r66A=X,1,S
+C(4,#DeptCode,S,$)
+C(3,#FunCode,1,T(2,@RimErrorSkip1,),T(2,@RimErrorSkip1,Y))
+T(2,@RimUnitCode,#DeptCode)
+RESET_RIM(#SendL2r66A,L2R66)
+S(L2R66,1,#RimTxCode1,#RimUnitCode,#RimErrorSkip1)
+R(1,L2R66)
+T(2,@DeptCodeX,#L2r66UnitItem)
+
+
+! 部室名稱
+#DeptCodeX=x,40,L
+
+! 區部代號
+#DistCodeBTN=X,1,I,ui:button;value:單位代號查詢;enable:1;tabbable:0
+#DistCodeBUF=X,6,S
+#DistCodeBIND=X,1,S
+BIND(#DistCodeBTN,click, {cmd=CHAIN; ntxcd=L6086; ntxbuf=#DistCodeBUF;ntxbuf5=type<-1:DistCode<-OODistCode:DistCodeX<-OODistItem})
+
+#DistCode=X,6,I
+C(3,#FunCode,4,s,$)
+C(3,#FunCode,5,s,$)
+@
+C(4,#DistCode,S,$)
+C(3,#FunCode,1,V(7),$)
+
+
+#SendL2r66B=X,1,S
+C(4,#DistCode,S,$)
+C(3,#FunCode,1,T(2,@RimErrorSkip1,),T(2,@RimErrorSkip1,Y))
+T(2,@RimUnitCode,#DistCode)
+RESET_RIM(#SendL2r66B,L2R66)
+S(L2R66,1,#RimTxCode1,#RimUnitCode,#RimErrorSkip1)
+R(1,L2R66)
+T(2,@DistCodeX,#L2r66UnitItem)
+
+
+! 區部名稱
+#DistCodeX=x,40,L
+
+! 單位代號
+#UnitCodeBTN=X,1,I,ui:button;value:單位代號查詢;enable:1;tabbable:0
+#UnitCodeBUF=X,6,S
+#UnitCodeBIND=X,1,S
+BIND(#UnitCodeBTN,click, {cmd=CHAIN; ntxcd=L6086; ntxbuf=#UnitCodeBUF;ntxbuf5=type<-1:UnitCode<-OOUnitCode:UnitCodeX<-OOUnitItem})
+
+#UnitCode=X,6,I
+C(3,#FunCode,4,s,$)
+C(3,#FunCode,5,s,$)
+@
+C(4,#UnitCode,S,$)
+C(3,#FunCode,1,V(7),$)
+
+
+#SendL2r66C=X,1,S
+C(4,#UnitCode,S,$)
+C(3,#FunCode,1,T(2,@RimErrorSkip1,),T(2,@RimErrorSkip1,Y))
+T(2,@RimErrorSkip1,Y)
+T(2,@RimUnitCode,#UnitCode)
+RESET_RIM(#SendL2r66C,L2R66)
+S(L2R66,1,#RimTxCode1,#RimUnitCode,#RimErrorSkip1)
+R(1,L2R66)
+T(2,@UnitCodeX,#L2r66UnitItem)
+
+! 單位名稱
+#UnitCodeX=x,40,L
+
+
+
+! 房貸專員NM 新增時隱藏,純顯示
+#BsOfficer=X,6,L
+#BsOfficerName=X,50,L
+! C(2,#FUNCTIONCD,S,$,s,s,s,s)
+!已用額度
+#UtilBal=+m,15,L
+! 業績日期
+#PerfDate=D,7,S
+
+
+!<include src="ROM.icf::L5R28.dec"/>
+!#RimEmployeeNo=X,6,S
+!#RimErrorSkip=X,1,S
+
+!#SendL5r28Introducer=X,1,S
+!IF(#TempAdjIntroducer!="" && #TempAdjIntroducer==#AdjIntroducer,S,$)
+!C(4,#AdjIntroducer,S,$)
+!T(2,@RimEmployeeNo,#AdjIntroducer)
+!T(2,@RimErrorSkip,Y)
+!RESET_RIM(#SendL5r28Introducer,L5R28)
+!S(L5R28,1,#RimErrorSkip,#RimEmployeeNo)
+!R(1,L5R28)
+
+!#AdjIntroducerName=X,50,S
+!T(2,@AdjIntroducerName,#L5r28FullName)
+
+!#CheckIsEmp=X,1,S
+!IF(#AdjIntroducer!="" ,$,S)
+!IF(#AdjIntroducerName=="" ,$,S)
+!V(P,此員工編號不存在)
+
+! 件數
+#PerfCnt=+m,2.1,S
+! 調整後件數
+#AdjPerfCnt=+m,2.1,S
+
+! 換算業績
+#PerfEqAmt=+m,15,L
+
+! 調整後換算業績
+#AdjPerfEqAmt=+m,15,I
+C(3,#FunCode,4,s,$)
+
+! 業務報酬
+#PerfReward=+m,15,L
+
+! 調整後業務報酬
+#AdjPerfReward=+m,15,I
+C(3,#FunCode,4,s,$)
+
+#FgPerfReward=X,1,L
+IF(#AdjPerfReward==#PerfReward,T(3,),T(3,X))
+
+! 業績金額
+#PerfAmt=+m,15,L
+
+
+! 是否計件
+#CntingCode=X,1,L
+
+
+<include src="ROM.icf::L5R27.dec"/>
+<include src="ROM.icf::L2R08.dec"/>
+<include src="ROM.icf::L2R66.dec"/>
+<include src="ROM.icf::L1R09.dec"/>
+</sub>
+
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L5505 -----------
+<sub type="FORM" name="L5505">
+</sub>
+
+!------ 上行電文 TEXT ------這邊別亂動關係到放行
+<sub type="TIM">
+#FunCode
+#LogNo
+#CustNo
+#FacmNo
+#BormNo
+#WorkMonth
+#AdjPerfEqAmt
+#AdjPerfReward
+#Introducer
+#UnitManager
+#DistManager
+#DeptCode
+#DistCode
+#UnitCode
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L5505
+^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="ROM.icf::L5R27.tom"/>
+<include src="ROM.icf::L5R28.tom"/>
+<include src="ROM.icf::L2R08.tom"/>
+<include src="ROM.icf::L2R66.tom"/>
+<include src="ROM.icf::L1R09.tom"/>
+
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>
+
+

@@ -118,6 +118,15 @@ IF (#CHAIN==1 ,T(F,@AcSubBookCode,0)T(F,@AcNoCode,0)T(F,@AcSubCode,0)T(F,@AcDtlC
 
 #RPTFG=A,1,S
 E(0,0)
+!功能 必須輸入
+#FunCd=A,1,S
+E(0,8)XMT()
+
+#RETURN=A,1,S
+E(0,0)
+
+![折返KEY]
+#RTNTXT=X,9,S
 
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 #ApHelp=x,1024,S
@@ -231,6 +240,9 @@ T(2,#DT)
 C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L6R23.dec"/>
+
+
+
 
 </sub>
 

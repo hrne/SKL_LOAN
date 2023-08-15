@@ -33,7 +33,7 @@ E(0,40)ASGN(INQPRT$)
 E(0,0)
 
 #BufL9744=X,3,S
-T(3,111)
+T(3,1)
 
 #Button=x,100,S
 T(2,{cmd=CHAIN; ntxcd=L9744; ntxbuf=#BufL9744})ASGN(BTN_NEW1$)

@@ -1,0 +1,244 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L5055)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,204)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,40)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+#BufL5505=X,3,S
+T(3,1)
+
+#Button=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L5505; ntxbuf=#BufL5505})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,L5505 新增換算業績及業務報酬獎金)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L5055" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L5055]                                 換算業績及業務報酬獎金明細查詢"],
+["#FdWorkYM+工作年月",#WorkYM],
+]
+
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+#NTXBUF=X,22,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@WorkYM,#NTXBUF,1,5)
+
+
+#FdWorkYM=X,2,L
+T(3,*)
+
+#WorkYM=A,5,I
+C(3,#CHAIN,1,s,$)
+@V(2,0)
+A(YM13,1,#WorkYM)
+
+
+
+![顯示方式]
+#RPTFG=A,1,S
+E(0,1)
+C(3,#CHAIN,1,XMT(),$)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L5055 -----------
+!PfReward
+<sub type="FORM" name="L5055">
+
+#SCRTIL=_,_,S
+T(3,[L5055] 換算業績、業務報酬發放明細)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+
+
+T(3,1)ASGN(LOOP$)
+
+#OOCustNo=A,7,S
+#OOFacmNo=A,3,S
+#OOBormNo=A,3,S
+#OOCustNoX=X,15,S
+T(2,#OOCustNo+-+#OOFacmNo+-+#OOBormNo)
+#OOCustName=x,60,S
+#OODrawdownDate=D,7,S
+#OOProdCode=X,5,S
+#OOPieceCode=X,1,S
+#OOCntingCode=X,1,S
+#OODrawdownAmt=m,14,S
+#OODeptCode=X,6,S
+#OODistCode=X,6,S
+#OOUnitCode=X,6,S
+#OOItDeptName=x,20,S
+#OOItDistName=x,20,S
+#OOItUnitName=x,20,S
+#OOIntroducer=X,6,S
+#OOIntroducerName=x,20,S
+#OOPerfEqAmt=m,14,S
+#OOPerfReward=m,14,S
+#OOMediaDate=D,7,S
+!調整記號=0秀空白
+#OOAdjFg=X,1,S
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#WorkYM
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+TXFORM=L5055
+#OOCustNo
+#OOFacmNo
+#OOBormNo
+#OOCustName
+#OODrawdownDate
+#OOProdCode
+#OOPieceCode
+#OOCntingCode
+#OODrawdownAmt
+#OODeptCode
+#OODistCode
+#OOUnitCode
+#OOItDeptName
+#OOItDistName
+#OOItUnitName
+#OOIntroducer
+#OOIntroducerName
+#OOPerfEqAmt
+#OOPerfReward
+#OOMediaDate
+#OOAdjFg
+^
+</sub>
+
+<sub type="PART" name="L5055" layout="cols=1;screen.width=[130,870];printer.width=[15,30,15,30];order=1">
+[
+["[L5055]                                  換算業績及業務報酬獎金明細查詢                                                                          "],
+]
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+#RPTFG=1,QUERY.GRID,L5055
+#any={detail:true, header:'L5055.part', caption:'', width:1020, rowNum:10, rowList:[20,40,60]}
+
+
+!戶號
+#OOCustNoX=戶號
+{width:120,align:'center'}
+
+!戶名
+#OOCustName=戶名
+{width:100,align:'left'}
+!撥款日期
+#OODrawdownDate=撥款日期
+{width:70,align:'center'}
+
+!商品代碼
+#OOProdCode=商品<BR>代碼
+{width:50,align:'center'}
+
+!計件代碼
+#OOPieceCode=計件<BR>代碼
+{width:50,align:'center'}
+
+!是否計件
+#OOCntingCode=是否<BR>計件
+{width:50,align:'center'}
+
+!撥款金額
+#OODrawdownAmt=撥款金額
+{width:100,align:'right'}
+
+!部室代號
+#OODeptCode=部室<BR>代號
+{width:50,align:'center'}
+
+!區部代號
+#OODistCode=區部<BR>代號
+{width:50,align:'center'}
+
+!單位代號
+#OOUnitCode=單位<BR>代號
+{width:50,align:'center'}
+
+!部室中文
+#OOItDeptName=部室中文
+{width:100,align:'left'}
+
+!區部中文
+#OOItDistName=區部中文
+{width:100,align:'left'}
+
+!單位中文
+#OOItUnitName=單位中文
+{width:100,align:'left'}
+
+!員工代號(介紹人)
+#OOIntroducer=介紹人
+{width:60,align:'center'}
+
+!員工姓名(介紹人)
+#OOIntroducerName=介紹人姓名
+{width:100,align:'left'}
+
+!換算業績
+#OOPerfEqAmt=換算業績
+{width:100,align:'right'}
+
+!業務報酬
+#OOPerfReward=業務報酬
+{width:100,align:'right'}
+
+#OOMediaDate=產出媒體日期
+{width:100,align:'center'}
+
+#OOAdjFg=調整記號
+{width:100,align:'center'}
+
+^
+</sub>

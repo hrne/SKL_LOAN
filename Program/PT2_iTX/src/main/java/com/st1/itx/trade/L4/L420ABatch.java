@@ -443,6 +443,7 @@ public class L420ABatch extends TradeBuffer {
 		da.put("BatchNo", "" + tDetail.getBatchNo());
 		da.put("EntryDate", "" + tDetail.getEntryDate());
 		da.put("DetailSeq", "" + tDetail.getDetailSeq());
+		da.put("RepayCode", "" + tDetail.getRepayCode());
 		da.put("RepayAmt", "" + tDetail.getRepayAmt());
 		da.put("AcSeq", parse.IntegerToString(baTxVo.getAcSeq(), 4));
 		da.put("TxAmt", "" + baTxVo.getTxAmt());
@@ -495,6 +496,7 @@ public class L420ABatch extends TradeBuffer {
 			da.put("BatchNo", "" + tDetail.getBatchNo());
 			da.put("EntryDate", "" + tDetail.getEntryDate());
 			da.put("DetailSeq", "" + tDetail.getDetailSeq());
+			da.put("RepayCode", "" + tDetail.getRepayCode());
 			da.put("RepayAmt", "" + tDetail.getRepayAmt());
 			da.put("AcSeq", parse.IntegerToString(baTxVo.getAcSeq(), 4));
 			da.put("TxAmt", "" + tDetail.getRepayAmt());
