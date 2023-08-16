@@ -20,6 +20,7 @@ import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.TxToDoCom;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
 @Component("BS012")
@@ -50,6 +51,9 @@ public class BS012 extends TradeBuffer {
 
 	@Autowired
 	public TxToDoCom txToDoCom;
+	
+	@Autowired
+	WebClient webClient;
 
 	int custNo = 0;
 
@@ -66,7 +70,9 @@ public class BS012 extends TradeBuffer {
 		// 年底呆帳戶產生法務費墊付
 		procBdLawFee(titaVo);
 		this.batchTransaction.commit();
-
+		if ("LC899".equals(titaVo.getTxcd())) {
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", "BS012已完成", titaVo);
+		}
 		return null;
 	}
 

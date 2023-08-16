@@ -107,7 +107,8 @@ public class BS900 extends TradeBuffer {
 				Integer.MAX_VALUE, titaVo);
 		if (slTxToDoDetail != null) {
 			this.addList(this.totaVo);
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", "本月利息提存已入帳，請執行訂正", titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", "本月利息提存已入帳，請執行訂正",
+					titaVo);
 			return this.sendList();
 		}
 
@@ -133,8 +134,7 @@ public class BS900 extends TradeBuffer {
 
 		// 2.刪除處理清單檔 ACCL01-應收利息提存入帳 //
 		this.info("2.bs900 delete ACCL01");
-		slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL01", 0, 3, this.index,
-				Integer.MAX_VALUE, titaVo);
+		slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL01", 0, 3, this.index, Integer.MAX_VALUE, titaVo);
 		lTxToDoDetail = slTxToDoDetail == null ? null : slTxToDoDetail.getContent();
 		if (lTxToDoDetail != null) {
 			txToDoCom.delByDetailList(lTxToDoDetail, titaVo);
@@ -146,8 +146,8 @@ public class BS900 extends TradeBuffer {
 
 		// 3.迴轉上月
 		this.info("3.bs900 last month ACCL01");
-		Slice<AcDetail> slAcDetail = acDetailService.findL9RptData(iAcDateReverse + 19110000, 99, this.index, Integer.MAX_VALUE,
-				titaVo);
+		Slice<AcDetail> slAcDetail = acDetailService.findL9RptData(iAcDateReverse + 19110000, 99, this.index,
+				Integer.MAX_VALUE, titaVo);
 		if (slAcDetail != null) {
 			for (AcDetail t : slAcDetail.getContent()) {
 				if (!"ICR".equals(t.getAcctCode()) && "0".equals(t.getTitaHCode())) {
@@ -222,9 +222,9 @@ public class BS900 extends TradeBuffer {
 		this.addList(this.totaVo);
 
 		this.info("bs900 process end");
-
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", "BS900已完成", titaVo);
-
+		if ("LC899".equals(titaVo.getTxcd())) {
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", "BS900已完成", titaVo);
+		}
 		return this.sendList();
 	}
 

@@ -143,6 +143,7 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WHERE PR.\"AdjustBonus\" > 0 ";
 		sql += "   AND PR.\"BonusType\" in (5) ";
 		sql += "   AND PR.\"WorkMonth\" = :inputWorkMonth ";
+		sql += "   AND PR.\"ManualFg\" = 0 ";//非人工新增(人工新增只計算金額不算件數)
 		sql += " UNION ALL";
 		sql += " SELECT 1                       AS \"RewardType\" "; // 獎金類別
 		sql += "      , PR.\"PieceCode\"        AS \"PieceCode\" "; // 計件代碼
@@ -228,36 +229,32 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   WHERE                                                      ";
 		sql += "            pi.\"WorkMonth\" = :inputWorkMonth                  ";
 		sql += "        and pi.\"RepayType\"  = 0                             ";
+		sql += "        and pi.\"PieceCode\" IN ('1','2','A','B','8','9')               ";
+		sql += "        and pi.\"ProdCode\" NOT IN ('TB')                               ";
 		sql += "  )                                                           ";
 		sql += " SELECT *                                                     ";
 		sql += " FROM                                                         ";
 		sql += "     (                                                        ";
 		sql += "        SELECT                                                ";
-		sql += "             pi.\"CustNo\"                                AS \"CustNo\",      ";
-		sql += "             pi.\"FacmNo\"                                AS \"FacmNo\",      ";
-		sql += "             SUM(pi.\"DrawdownAmt\")                      AS \"DrawdownAmt\", ";
-		sql += "             pi.\"PieceCode\"                             AS \"PieceCode\",   ";
+		sql += "             pr.\"CustNo\"                                AS \"CustNo\",      ";
+		sql += "             pr.\"FacmNo\"                                AS \"FacmNo\",      ";
+		sql += "             SUM(ln.\"DrawdownAmt\")                      AS \"DrawdownAmt\", ";
+		sql += "             pr.\"PieceCode\"                             AS \"PieceCode\",   ";
 		sql += "             nvl(pr.\"Coorgnizer\", ' ')                  AS \"EmpNo\",       ";
-		sql += "             \"Fn_GetEmpName\"(pr.\"Coorgnizer\", 0)        AS \"EmpName\",     ";
+		sql += "             \"Fn_GetEmpName\"(pr.\"Coorgnizer\", 0)      AS \"EmpName\",     ";
 		sql += "             nvl(pco.\"DeptItem\", ' ')                   AS \"Dept\",        ";
 		sql += "             nvl(pco.\"DistItem\", ' ')                   AS \"Dist\",        ";
 		sql += "             nvl(pco.\"AreaItem\", ' ')                   AS \"Unit\"         ";
  		sql += "        FROM UTIL pr                                                      ";
-		sql += "             LEFT JOIN \"PfItDetail\"   pi on pi.\"CustNo\" = pr.\"CustNo\"     ";
-		sql += "                                      and pi.\"FacmNo\" = pr.\"FacmNo\"       ";
-		sql += "                                      and pi.\"BormNo\" = pr.\"BormNo\"       ";
-		sql += "                                      and pi.\"RepayType\" = 0              ";                         
+		sql += "             LEFT JOIN \"LoanBorMain\" ln on ln.\"CustNo\" = pr.\"CustNo\"     ";
+		sql += "                                         and ln.\"FacmNo\" = pr.\"FacmNo\"       ";
+		sql += "                                         and ln.\"BormNo\" = pr.\"BormNo\"       ";
 		sql += "             LEFT JOIN \"PfCoOfficer\"  pco ON pco.\"EmpNo\" = pr.\"Coorgnizer\" ";
 		sql += "                                         AND pco.\"EffectiveDate\" = \"Fn_GetPfCoOfficeEffectiveDate\"(pr.\"Coorgnizer\", :inputWorkMonth) ";
-		sql += "        WHERE                                                             ";
-		sql += "             nvl(pi.\"CustNo\",0) > 0                                       ";
-		sql += "            and pi.\"PieceCode\" IN ('1','2','A','B','8','9')               ";
-		sql += "            AND pi.\"ProdCode\" NOT IN ('TB')                               ";
-		sql += "            AND pi.\"RepayType\" = 0                                        ";
 		sql += "        GROUP BY                                                            ";
-		sql += "            pi.\"CustNo\",                                                  ";
-		sql += "            pi.\"FacmNo\",                                                  ";
-		sql += "            pi.\"PieceCode\",                                               ";
+		sql += "            pr.\"CustNo\",                                                  ";
+		sql += "            pr.\"FacmNo\",                                                  ";
+		sql += "            pr.\"PieceCode\",                                               ";
 		sql += "            nvl(pr.\"Coorgnizer\", ' '),                                    ";
 		sql += "            \"Fn_GetEmpName\"(pr.\"Coorgnizer\", 0),                        ";
 		sql += "            nvl(pco.\"DeptItem\", ' '),                                     ";

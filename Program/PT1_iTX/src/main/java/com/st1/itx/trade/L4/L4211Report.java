@@ -327,8 +327,8 @@ public class L4211Report extends MakeReport {
 
 		// 金額排序:已處理/待處理 + 結清 + 金額 + 戶號 + 還款方式
 		fnAllList2 = sortMapListCom.beginSort(fnAllList2).ascString("ReconCode").ascString("BatchNo")
-				.ascString("SortingForSubTotal").ascString("SortingForClose").descNumber("RepayAmt").ascString("CustNo")
-				.ascString("DetailSeq").ascString("RepayCode").ascString("AcSeq").getList();
+				.ascString("SortingForSubTotal").descNumber("RepayAmt").ascString("CustNo").ascString("DetailSeq")
+				.ascString("RepayCode").ascString("AcSeq").getList();
 
 		// 戶號排序:已處理/待處理+ 戶號 + 金額
 		fnAllList3 = sortMapListCom.beginSort(fnAllList3).ascString("ReconCode").ascString("BatchNo")

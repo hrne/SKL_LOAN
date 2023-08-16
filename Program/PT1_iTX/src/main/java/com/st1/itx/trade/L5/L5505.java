@@ -85,7 +85,8 @@ public class L5505 extends TradeBuffer {
 		iWorkMonth = Integer.valueOf(titaVo.getParam("WorkMonth").trim()) + 191100; // 調整工作月
 		iAdjPerfEqAmt = new BigDecimal(titaVo.getParam("AdjPerfEqAmt").trim());
 		iAdjPerfReward = new BigDecimal(titaVo.getParam("AdjPerfReward").trim());
-		
+		perfDate = titaVo.getEntDyI();
+
 		String controlCode = "L5510." + iWorkMonth + ".2";
 		TxControl txControl = txControlService.findById(controlCode, titaVo);
 		if (txControl != null) {
@@ -98,7 +99,6 @@ public class L5505 extends TradeBuffer {
 			if (pfItDetail.getWorkMonth() == iWorkMonth) {
 				throw new LogicException(titaVo, "E0001", "介紹人業績資料");
 			}
-			perfDate = pfItDetail.getPerfDate();
 			pieceCode = pfItDetail.getPieceCode();
 			drawdownDate = pfItDetail.getDrawdownDate();
 			prodCode = pfItDetail.getProdCode();
@@ -111,8 +111,6 @@ public class L5505 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0001", "撥款資料");
 			}
 			FacMain tFacMain = facMainService.findById(new FacMainId(iCustNo, iFacmNo), titaVo);
-
-			perfDate = tLoanBorMain.getDrawdownDate();
 			pieceCode = tLoanBorMain.getPieceCode();
 			drawdownDate = tLoanBorMain.getDrawdownDate();
 			prodCode = tFacMain.getProdNo();
