@@ -13,6 +13,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.AcReceivableService;
@@ -22,6 +23,7 @@ import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.TxToDoCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
+import com.st1.itx.util.http.WebClient;
 
 @Component("BS010")
 @Scope("prototype")
@@ -55,6 +57,9 @@ public class BS010 extends TradeBuffer {
 	@Autowired
 	public BaTxCom baTxCom;
 
+	@Autowired
+	WebClient webClient;
+
 	int custNo = 0;
 	int facmNo = 0;
 	int ovduMonth = 0; // 逾期日期-月
@@ -73,6 +78,10 @@ public class BS010 extends TradeBuffer {
 		// 逾期放款應於清償期屆滿六個月內轉入「催收款項」(前三營業日寫入應處理清單)
 		procLoanOverdue(titaVo);
 		this.batchTransaction.commit();
+
+		if ("LC899".equals(titaVo.getTxcd())) {
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", "BS010已完成", titaVo);
+		}
 
 		return null;
 	}

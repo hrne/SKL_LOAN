@@ -64,6 +64,7 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WHERE \"WorkMonth\" = :inputWorkMonth ";
 		sql += "   AND \"BonusType\" in (5) "; // 協辦
 		sql += "   AND \"AdjustBonus\" > 0 ";
+		sql += "   AND \"ManualFg\" = 0 ";//非人工新增(人工新增只計算金額不算件數)
 		this.info("sql=" + sql);
 
 		Query query;
@@ -99,6 +100,7 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           WHERE \"WorkMonth\" = :inputWorkMonth ";
 		sql += "             AND \"BonusType\" in (5) "; // 協辦
 		sql += "             AND \"AdjustBonus\" > 0 ";
+		sql += "             AND \"ManualFg\" = 0 ";//非人工新增(人工新增只計算金額不算件數)
 		sql += "         )  ";
 		sql += "    GROUP BY \"CustNo\" ";
 		sql += "           , \"EmployeeNo\" ";

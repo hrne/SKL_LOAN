@@ -19,6 +19,7 @@ import com.st1.itx.db.service.LoanNotYetService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.TxToDoCom;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 
 @Service("BS007")
 @Scope("prototype")
@@ -37,6 +38,9 @@ public class BS007 extends TradeBuffer {
 
 	@Autowired
 	public CdLoanNotYetService cdLoanNotYetService;
+
+	@Autowired
+	WebClient webClient;
 
 	/* 日期工具 */
 	@Autowired
@@ -64,7 +68,7 @@ public class BS007 extends TradeBuffer {
 				tTxToDoDetail.setItemCode("L2921");
 				tTxToDoDetail.setCustNo(loanNotYet.getCustNo());
 				tTxToDoDetail.setFacmNo(loanNotYet.getFacmNo());
-
+				
 				/*
 				 * 未齊件代碼說明2022.2.9 by 昱衡
 				 */
@@ -77,9 +81,13 @@ public class BS007 extends TradeBuffer {
 					tTxToDoDetail.setDtlValue("");
 					tTxToDoDetail.setProcessNote("");
 				}
-
+				
 				txToDoCom.addDetail(false, 0, tTxToDoDetail, titaVo); // addDetail
 			}
+		}
+
+		if ("LC899".equals(titaVo.getTxcd())) {
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", "BS007已完成", titaVo);
 		}
 
 		this.batchTransaction.commit();

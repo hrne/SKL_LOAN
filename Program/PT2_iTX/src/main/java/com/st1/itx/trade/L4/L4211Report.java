@@ -332,7 +332,7 @@ public class L4211Report extends MakeReport {
 
 		// 戶號排序:已處理/待處理+ 戶號 + 金額
 		fnAllList3 = sortMapListCom.beginSort(fnAllList3).ascString("ReconCode").ascString("BatchNo")
-				.ascString("SortingForSubTotal").ascString("CustNo").descNumber("RepayAmt").ascString("DetailSeq")
+				.ascString("SortingForSubTotal").ascString("DetailSeq").ascString("CustNo").descNumber("RepayAmt")
 				.ascString("AcSeq").getList();
 
 		makePdf(fnAllList1, fnAllList2, fnAllList3, false, titaVo);

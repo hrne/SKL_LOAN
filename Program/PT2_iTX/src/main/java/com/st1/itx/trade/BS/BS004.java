@@ -17,6 +17,7 @@ import com.st1.itx.util.common.TxToDoCom;
 import com.st1.itx.util.common.data.BS004Vo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
+import com.st1.itx.util.http.WebClient;
 
 /**
  * 新增應處理明細－員工應處理 <br>
@@ -55,6 +56,9 @@ public class BS004 extends TradeBuffer {
 	@Autowired
 	public TxToDoCom txToDoCom;
 
+	@Autowired
+	WebClient webClient;
+
 	@Override
 	/* 員工資料檔上傳後更新 */
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -77,6 +81,10 @@ public class BS004 extends TradeBuffer {
 		empCustTyp(titaVo);
 
 		this.batchTransaction.commit();
+
+		if ("LC899".equals(titaVo.getTxcd())) {
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", "BS004已完成", titaVo);
+		}
 
 		return null;
 	}

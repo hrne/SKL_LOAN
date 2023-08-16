@@ -176,6 +176,7 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WHERE PR.\"BonusType\" in (1) ";
 		sql += "   AND PR.\"AdjustBonus\" > 0 ";
 		sql += "   AND PR.\"WorkMonth\" = :inputWorkMonth ";
+		sql += "   AND PR.\"ManualFg\" = 0 ";//非人工新增(人工新增只計算金額不算件數)
 		sql += ") ";
 		sql += " ORDER BY SUBSTR(\"EmpNo\",1,1) ";
 		sql += "        , CASE WHEN SUBSTR(\"EmpNo\",2,1) BETWEEN '0' AND '9' THEN 'B' ELSE 'A' END "; // 數字排後面

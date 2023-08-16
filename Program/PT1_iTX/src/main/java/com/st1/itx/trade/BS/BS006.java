@@ -19,6 +19,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.TxToDoCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
+import com.st1.itx.util.http.WebClient;
 
 /**
  * 新增應處理明細－支票兌現檢核 <br>
@@ -46,6 +47,9 @@ public class BS006 extends TradeBuffer {
 
 	@Autowired
 	public LoanChequeService loanChequeService;
+
+	@Autowired
+	WebClient webClient;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -81,6 +85,9 @@ public class BS006 extends TradeBuffer {
 					txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo); // DupSkip = true ->重複跳過
 				}
 			}
+		}
+		if ("LC899".equals(titaVo.getTxcd())) {
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", "BS006已完成", titaVo);
 		}
 		return null;
 	}
