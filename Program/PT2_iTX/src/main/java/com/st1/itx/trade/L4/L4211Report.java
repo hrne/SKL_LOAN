@@ -250,17 +250,18 @@ public class L4211Report extends MakeReport {
 		// 科目排序
 		fnAllList1 = sortMapListCom.beginSort(fnAllList1).ascString("ReconCode").ascString("BatchNo")
 				.ascString("SortingForSubTotal").ascString("DetailSeq").ascString("RepayCode").ascString("AcSeq")
-				.ascString("CustNo").getList();
+				.ascString("CustFacmBorm").getList();
 
 		// 金額排序:已處理/待處理 + 結清 + 金額 + 戶號 + 還款方式
 		fnAllList2 = sortMapListCom.beginSort(fnAllList2).ascString("ReconCode").ascString("BatchNo")
-				.ascString("SortingForSubTotal").ascString("SortingForClose").descNumber("RepayAmt").ascString("CustNo")
-				.ascString("DetailSeq").ascString("RepayCode").ascString("AcSeq").getList();
+				.ascString("SortingForSubTotal").ascString("SortingForClose").descNumber("RepayAmt")
+				.ascString("CustFacmBorm").ascString("DetailSeq").ascString("RepayCode").ascString("AcSeq").getList();
 
 		// 戶號排序:已處理/待處理 + 結清 + 戶號 + 金額 + 還款方式
 		fnAllList3 = sortMapListCom.beginSort(fnAllList3).ascString("ReconCode").ascString("BatchNo")
-				.ascString("SortingForSubTotal").ascString("SortingForClose").ascString("CustNo").descNumber("RepayAmt")
-				.ascString("DetailSeq").ascString("RepayCode").ascString("AcSeq").getList();
+				.ascString("SortingForSubTotal").ascString("SortingForClose").ascString("CustNo").ascString("DetailSeq")
+				.ascString("FacmNo").ascString("BormNo").descNumber("RepayAmt").ascString("RepayCode")
+				.ascString("AcSeq").getList();
 
 		makePdf(fnAllList1, fnAllList2, fnAllList3, false, titaVo);
 	}
@@ -323,17 +324,17 @@ public class L4211Report extends MakeReport {
 		// 科目排序
 		fnAllList1 = sortMapListCom.beginSort(fnAllList1).ascString("ReconCode").ascString("BatchNo")
 				.ascString("SortingForSubTotal").ascString("DetailSeq").ascString("RepayCode").ascString("AcSeq")
-				.ascString("CustNo").getList();
+				.ascString("CustFacmBorm").getList();
 
 		// 金額排序:已處理/待處理 + 結清 + 金額 + 戶號 + 還款方式
 		fnAllList2 = sortMapListCom.beginSort(fnAllList2).ascString("ReconCode").ascString("BatchNo")
-				.ascString("SortingForSubTotal").descNumber("RepayAmt").ascString("CustNo").ascString("DetailSeq")
+				.ascString("SortingForSubTotal").descNumber("RepayAmt").ascString("CustFacmBorm").ascString("DetailSeq")
 				.ascString("RepayCode").ascString("AcSeq").getList();
 
 		// 戶號排序:已處理/待處理+ 戶號 + 金額
 		fnAllList3 = sortMapListCom.beginSort(fnAllList3).ascString("ReconCode").ascString("BatchNo")
-				.ascString("SortingForSubTotal").ascString("DetailSeq").ascString("CustNo").descNumber("RepayAmt")
-				.ascString("AcSeq").getList();
+				.ascString("SortingForSubTotal").ascString("CustNo").ascString("DetailSeq").ascString("FacmNo")
+				.ascString("BormNo").descNumber("RepayAmt").ascString("AcSeq").getList();
 
 		makePdf(fnAllList1, fnAllList2, fnAllList3, false, titaVo);
 	}

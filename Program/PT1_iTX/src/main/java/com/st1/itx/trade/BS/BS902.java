@@ -19,6 +19,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.TxToDoCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
+import com.st1.itx.util.http.WebClient;
 
 @Component("BS902")
 @Scope("prototype")
@@ -45,6 +46,9 @@ public class BS902 extends TradeBuffer {
 
 	@Autowired
 	public TxToDoCom txToDoCom;
+
+	@Autowired
+	WebClient webClient;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -92,6 +96,9 @@ public class BS902 extends TradeBuffer {
 					txToDoCom.addDetail(true, titaVo.getHCodeI(), tTxToDoDetail, titaVo); // DupSkip = true ->重複跳過
 				}
 			}
+		}
+		if ("LC899".equals(titaVo.getTxcd())) {
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", "BS902已完成", titaVo);
 		}
 
 		return null;

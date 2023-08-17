@@ -27,6 +27,8 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.parse.Parse;
+import com.st1.itx.util.http.WebClient;
+import com.st1.itx.util.date.DateUtil;
 
 @Service("BS020")
 @Scope("prototype")
@@ -46,6 +48,10 @@ public class BS020 extends TradeBuffer {
 	@Autowired
 	public Parse parse;
 
+	/* 日期工具 */
+	@Autowired
+	public DateUtil dateUtil;
+
 	@Autowired
 	public BatxHeadService batxHeadService;
 
@@ -57,6 +63,9 @@ public class BS020 extends TradeBuffer {
 
 	@Autowired
 	public BaTxCom baTxCom;
+
+	@Autowired
+	WebClient webClient;
 
 	private int tbsdyf;
 	private int tbsdy;
@@ -76,6 +85,10 @@ public class BS020 extends TradeBuffer {
 		exec(titaVo, this.txBuffer);
 
 		this.batchTransaction.commit();
+
+		if ("LC899".equals(titaVo.getTxcd())) {
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", "BS020已完成", titaVo);
+		}
 
 		return null;
 	}

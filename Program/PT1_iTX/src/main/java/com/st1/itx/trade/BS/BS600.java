@@ -26,6 +26,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
+import com.st1.itx.util.http.WebClient;
 
 @Service("BS600")
 @Scope("prototype")
@@ -64,6 +65,9 @@ public class BS600 extends TradeBuffer {
 	@Autowired
 	TxTellerService txtellerService;
 
+	@Autowired
+	WebClient webClient;
+
 	private int cnt = 0;
 
 	@Override
@@ -80,7 +84,6 @@ public class BS600 extends TradeBuffer {
 		}
 		// 按分配順序排序
 		Collections.sort(lCdAcBook, new Comparator<CdAcBook>() {
-			@Override
 			public int compare(CdAcBook c1, CdAcBook c2) {
 				if (c1.getAssignSeq() != c2.getAssignSeq()) {
 					return c1.getAssignSeq() - c2.getAssignSeq();
@@ -208,6 +211,9 @@ public class BS600 extends TradeBuffer {
 					excuteTxCode(custNo, acBookCode, this.txBuffer.getSystemParas().getAcSubBookCode(), newAcSubBookCode, titaVo);
 				}
 			}
+		}
+		if ("LC899".equals(titaVo.getTxcd())) {
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", "BS600已完成", titaVo);
 		}
 
 		return null;

@@ -200,7 +200,7 @@ public class L420ABatch extends TradeBuffer {
 						tTempVo = tTempVo.getVo(t.getProcNote());
 						// 已訂正須人工處理
 						if (this.tTempVo.get("EraseCnt") != null) {
-							continue;							
+							continue;
 						}
 						tTempVo.remove("MergeCnt");
 						tTempVo.remove("MergeAmt");
@@ -382,7 +382,7 @@ public class L420ABatch extends TradeBuffer {
 			this.info("addL4211MapList iBatxList.size = 0 return ");
 			return;
 		}
-		
+
 		// 按AcSeq，小至大排序
 		Collections.sort(iBatxList, new Comparator<BaTxVo>() {
 			@Override
@@ -394,7 +394,6 @@ public class L420ABatch extends TradeBuffer {
 			}
 		});
 
-		
 		custName = " ";
 		CustMain tCustMain = custMainService.custNoFirst(tDetail.getCustNo(), tDetail.getCustNo(), titaVo);
 		if (tCustMain != null) {
@@ -448,8 +447,11 @@ public class L420ABatch extends TradeBuffer {
 		da.put("AcSeq", parse.IntegerToString(baTxVo.getAcSeq(), 4));
 		da.put("TxAmt", "" + baTxVo.getTxAmt());
 		da.put("AcctAmt", "" + baTxVo.getAcAmt().add(baTxVo.getOverflow().subtract(baTxVo.getTempAmt())));
-		da.put("CustNo", parse.IntegerToString(tDetail.getCustNo(), 7) + "-"
+		da.put("CustFacmBorm", parse.IntegerToString(tDetail.getCustNo(), 7) + "-"
 				+ parse.IntegerToString(baTxVo.getFacmNo(), 3) + "-" + parse.IntegerToString(baTxVo.getBormNo(), 3));
+		da.put("CustNo", parse.IntegerToString(baTxVo.getCustNo(), 7));
+		da.put("FacmNo", parse.IntegerToString(baTxVo.getFacmNo(), 3));
+		da.put("BormNo", parse.IntegerToString(baTxVo.getBormNo(), 3));
 		da.put("PaidTerms", baTxVo.getPaidTerms() > 0 ? "" + baTxVo.getPaidTerms() : "");
 		da.put("CustName", custName);
 		da.put("CloseReasonCode", iTempVo.getParam("CloseReasonCode"));

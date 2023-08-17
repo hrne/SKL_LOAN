@@ -27,6 +27,8 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.parse.Parse;
+import com.st1.itx.util.http.WebClient;
+import com.st1.itx.util.date.DateUtil;
 
 @Service("BS020")
 @Scope("prototype")
@@ -46,6 +48,10 @@ public class BS020 extends TradeBuffer {
 	@Autowired
 	public Parse parse;
 
+	/* 日期工具 */
+	@Autowired
+	public DateUtil dateUtil;
+
 	@Autowired
 	public BatxHeadService batxHeadService;
 
@@ -57,6 +63,9 @@ public class BS020 extends TradeBuffer {
 
 	@Autowired
 	public BaTxCom baTxCom;
+
+	@Autowired
+	WebClient webClient;
 
 	private int tbsdyf;
 	private int tbsdy;
@@ -76,6 +85,10 @@ public class BS020 extends TradeBuffer {
 		exec(titaVo, this.txBuffer);
 
 		this.batchTransaction.commit();
+
+		if ("LC899".equals(titaVo.getTxcd())) {
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", "BS020已完成", titaVo);
+		}
 
 		return null;
 	}
@@ -187,14 +200,15 @@ public class BS020 extends TradeBuffer {
 			}
 			TempVo tTempVo = new TempVo();
 			try {
-				listBaTxVo = baTxCom.settleUnPaid(tbsdy, tbsdy, custNo, facmNo, 0, 90, repayType,
-						BigDecimal.ZERO, tTempVo, titaVo);
+				listBaTxVo = baTxCom.settleUnPaid(tbsdy, tbsdy, custNo, facmNo, 0, 90, repayType, BigDecimal.ZERO,
+						tTempVo, titaVo);
 			} catch (LogicException e) {
 				this.info("baTxCom.settingUnPaid" + e.getMessage());
 				continue;
 			}
 			boolean isTermPay = false;
 			boolean isRecvPay = false;
+			boolean isFileFee = false;
 			// dataKind = 0; // 資料類型
 			// 1.應收費用+未收費用+短繳期金
 			// 2.本金利息
@@ -205,9 +219,14 @@ public class BS020 extends TradeBuffer {
 			if (listBaTxVo != null && listBaTxVo.size() != 0) {
 				for (BaTxVo ba : listBaTxVo) {
 					// 累溢收 > 費用
-					if (ba.getDataKind() == 1 && ba.getRepayType() >= 4  && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0
+					if (ba.getDataKind() == 1 && ba.getRepayType() >= 4
+							&& ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0
 							&& baTxCom.getExcessive().compareTo(ba.getUnPaidAmt()) >= 0) {
-						isRecvPay = true;
+						if (ba.getRepayType() == 5) {
+							isFileFee = true;
+						} else {
+							isRecvPay = true;
+						}
 					}
 					// 期款
 					if (baTxCom.getShortAmt().compareTo(BigDecimal.ZERO) == 0) {
@@ -221,9 +240,14 @@ public class BS020 extends TradeBuffer {
 				tTempVo.putParam("Note", "暫收抵繳期款");
 				addDetail(custNo, 1, tTempVo, titaVo);
 			} else {
-				if (isRecvPay) {
-					tTempVo.putParam("Note", "暫收抵繳費用");
-					addDetail(custNo, 9, tTempVo, titaVo); // 其他
+				if (isFileFee) {
+					tTempVo.putParam("Note", "暫收抵繳火險費 ");
+					addDetail(custNo, 5, tTempVo, titaVo); // 其他
+				} else {
+					if (isRecvPay) {
+						tTempVo.putParam("Note", "暫收抵繳費用");
+						addDetail(custNo, 9, tTempVo, titaVo); // 其他
+					}
 				}
 			}
 		}

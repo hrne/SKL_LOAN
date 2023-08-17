@@ -26,6 +26,7 @@ import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
+import com.st1.itx.util.http.WebClient;
 
 @Service("BS060")
 @Scope("prototype")
@@ -57,6 +58,9 @@ public class BS060 extends TradeBuffer {
 
 	@Autowired
 	private AcLoanIntCashFlowService acLoanIntCashFlowService;
+
+	@Autowired
+	WebClient webClient;
 
 	private int commitCnt = 20;
 
@@ -216,6 +220,9 @@ public class BS060 extends TradeBuffer {
 		}
 		// end
 		this.batchTransaction.commit();
+		if ("LC899".equals(titaVo.getTxcd())) {
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", "BS060已完成", titaVo);
+		}
 		return null;
 
 	}

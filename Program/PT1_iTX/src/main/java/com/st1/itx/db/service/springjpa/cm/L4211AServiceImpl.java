@@ -91,7 +91,10 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "      || '-'";
 			sql += "      || LPAD(NVL(TX2.\"FacmNo\",0),3,'0')";
 			sql += "      || '-'";
-			sql += "      || LPAD(NVL(TX2.\"BormNo\",0),3,'0') AS \"CustNo\"";// 戶號
+			sql += "      || LPAD(NVL(TX2.\"BormNo\",0),3,'0') AS \"CustFacmBorm\"";// 戶號
+			sql += "    , LPAD(NVL(TX2.\"CustNo\",BATX.\"CustNo\"),7,'0' ) AS \"CustNo\"";
+			sql += "    , LPAD(TX2.\"FacmNo\",3,'0' ) AS \"FacmNo\"";
+			sql += "    , LPAD(NVL(TX2.\"BormNo\",0),3,'0')  AS \"BormNo\"";
 			sql += "    , CM.\"CustName\""; // 戶名
 			sql += "    , TX2.\"IntStartDate\""; // 計息起日
 			sql += "    , TX2.\"IntEndDate\""; // 計息迄日
@@ -275,7 +278,10 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "      || '-'";
 			sql += "      || LPAD(NVL(TX2.\"FacmNo\",0),3,'0')";
 			sql += "      || '-'";
-			sql += "      || LPAD(NVL(TX2.\"BormNo\",0),3,'0') AS \"CustNo\"";// 戶號
+			sql += "      || LPAD(NVL(TX2.\"BormNo\",0),3,'0') AS \"CustFacmBorm\"";// 戶號
+			sql += "    , LPAD(NVL(TX2.\"CustNo\",BATX.\"CustNo\"),7,'0' ) AS \"CustNo\"";
+			sql += "    , LPAD(TX2.\"FacmNo\",3,'0' ) AS \"FacmNo\"";
+			sql += "    , LPAD(TX2.\"BormNo\",3,'0' ) AS \"BormNo\"";
 			sql += "    , CM.\"CustName\""; // 戶名
 			sql += "    , TX2.\"IntStartDate\""; // 計息起日
 			sql += "    , TX2.\"IntEndDate\""; // 計息迄日
@@ -366,7 +372,10 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "      || '-'";
 			sql += "      || LPAD(TX2.\"FacmNo\",3,'0')";
 			sql += "      || '-'";
-			sql += "      || LPAD(TX2.\"BormNo\",3,'0') AS \"CustNo\"";// 戶號
+			sql += "      || LPAD(TX2.\"BormNo\",3,'0') AS \"CustFacmBorm\"";// 戶號
+			sql += "    , LPAD(TX2.\"CustNo\",7,'0' ) AS \"CustNo\"";
+			sql += "    , LPAD(TX2.\"FacmNo\",3,'0' ) AS \"FacmNo\"";
+			sql += "    , LPAD(TX2.\"BormNo\",3,'0' ) AS \"BormNo\"";
 			sql += "    , CM.\"CustName\""; // 戶名
 			sql += "    , TX2.\"IntStartDate\""; // 計息起日
 			sql += "    , TX2.\"IntEndDate\""; // 計息迄日

@@ -44,7 +44,7 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
 ["[L8923]                                 疑似洗錢交易訪談記錄查詢"],
-["#FdSearch+查詢條件","(訪談日期、還款日期，擇一輸入)"],
+["#FdSearch+查詢條件","(訪談日期、還款日期、戶號，至少需輸入一項)"],
 ["#FdRecordDate+訪談日期  ",#RecordDateStart,"~",#RecordDateEnd],
 ["#FdActualRepayDate+還款日期",#ActualRepayDateStart,"~",#ActualRepayDateEnd],
 ["#FdCustNo+戶號","#CustNo],
@@ -145,20 +145,23 @@ V(5,#RecordDateStart,#CDATEX)
 #ActualRepayDateStart=D,7,I
 T(1,#DATE,2,7)
 D(8)
-C(3,#RecordDateStart,0,$,S)
-C(3,#RecordDateEnd,0,$,S)
-@V(7)A(DATE,0,#ActualRepayDateStart)
-V(5,0010101,#CDATEX)
+@A(DATE,0,#ActualRepayDateStart)
+C(4,#ActualRepayDateStart,S,V(5,0010101,#CDATEX))
 
 #ActualRepayDateEnd=D,7,I
+C(4,#ActualRepayDateStart,S,$)
 E(0,#ActualRepayDateStart)
 D(8)
-C(3,#RecordDateStart,0,$,S)
-C(3,#RecordDateEnd,0,$,S)
-@V(7)A(DATE,0,#ActualRepayDateEnd)
+@A(DATE,0,#ActualRepayDateEnd)
 V(5,#ActualRepayDateStart,#CDATEX)
 
 #CustNo=A,7,I
+@
+IF(#CustNo>0,s,$)
+IF(#ActualRepayDateStart>0,s,$)
+IF(#RecordDateStart>0,s,$)
+V(P,訪談日期、還款日期、戶號，至少需輸入一項)
+
 #CustName=X,50,I
 
 #RPTFG=A,1,S

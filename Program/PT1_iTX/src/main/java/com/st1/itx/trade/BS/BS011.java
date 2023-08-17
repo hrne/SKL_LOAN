@@ -18,6 +18,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.TxToDoCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
+import com.st1.itx.util.http.WebClient;
 
 @Component("BS011")
 @Scope("prototype")
@@ -45,6 +46,9 @@ public class BS011 extends TradeBuffer {
 	@Autowired
 	public TxToDoCom txToDoCom;
 
+	@Autowired
+	WebClient webClient;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("BS011 ......");
@@ -62,6 +66,10 @@ public class BS011 extends TradeBuffer {
 		// step 2. 月底日將逾三個月之法務費轉列催收
 		procLawFeeOverdue(titaVo);
 		this.batchTransaction.commit();
+
+		if ("LC899".equals(titaVo.getTxcd())) {
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", "BS011已完成", titaVo);
+		}
 
 		return null;
 	}

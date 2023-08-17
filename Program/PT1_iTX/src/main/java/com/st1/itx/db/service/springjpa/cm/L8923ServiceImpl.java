@@ -48,7 +48,7 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> queryfindbycustno(int index, int limit, TitaVo titaVo) throws Exception {
 
 		this.info("L8923ServiceImpl.queryfindbycustno");
-		//此段暫不使用
+		//此段queryfindbycustno暫不使用
 		
 		// *** 折返控制相關 ***
 		this.index = index;
@@ -57,16 +57,24 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		int iRecordDateStart = this.parse.stringToInteger(titaVo.getParam("RecordDateStart"));
 		int iRecordDateEnd = this.parse.stringToInteger(titaVo.getParam("RecordDateEnd"));
-		int iFRecordDateStart = iRecordDateStart + 19110000;
-		int iFRecordDateEnd = iRecordDateEnd + 19110000;
+		int iFRecordDateStart = 0;
+		int iFRecordDateEnd = 0;
+		if(iRecordDateStart > 0) {
+			iFRecordDateStart = iRecordDateStart + 19110000;
+			iFRecordDateEnd = iRecordDateEnd + 19110000;
+		}
 		this.info("iFRecordDateStart=" + iFRecordDateStart + ",iFRecordDateEnd=" + iFRecordDateEnd);
 		//若iRepayFlag=2代表是L3130連動須找預計還款日,iRepayFlag=3代表是L8922連動須找實際還款日
 		int iRepayFlag = this.parse.stringToInteger(titaVo.getParam("CHAIN_Flag"));
 
 		int iActualRepayDateStart = this.parse.stringToInteger(titaVo.getParam("ActualRepayDateStart"));
 		int iActualRepayDateEnd = this.parse.stringToInteger(titaVo.getParam("ActualRepayDateEnd"));
-		int iFActualRepayDateStart = iActualRepayDateStart + 19110000;
-		int iFActualRepayDateEnd = iActualRepayDateEnd + 19110000;
+		int iFActualRepayDateStart = 0;
+		int iFActualRepayDateEnd = 0;
+		if(iFActualRepayDateStart > 0) {
+			iFActualRepayDateStart = iActualRepayDateStart + 19110000;
+			iFActualRepayDateEnd = iActualRepayDateEnd + 19110000;
+		}
 		this.info("iFActualRepayDateStart=" + iFActualRepayDateStart + ",iFActualRepayDateEnd=" + iFActualRepayDateEnd);
 		int iCustNo = Integer.parseInt(titaVo.getParam("CustNo"));
 
@@ -91,14 +99,15 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ",\"ActualRepayAmt\" as F14				\n"; // 實際還款金額
 		sql += ",\"LogNo\" as F15                       \n";
 		sql += "from \"MlaundryRecord\" 				\n";
+		sql += "where 1 = 1  \n";
 		if (iRecordDateStart > 0 && !(iRepayFlag == 2)) { 
-			sql += "where \"RecordDate\" >= :recordDateStart and \"RecordDate\" <= :recordDateEnd  \n";
+			sql += " and \"RecordDate\" >= :recordDateStart and \"RecordDate\" <= :recordDateEnd  \n";
 		}
 		if (iRepayFlag == 2) {
-			sql += "where \"RepayDate\" >= :actualRepayDateStart  and \"RepayDate\" <= :actualRepayDateEnd  \n";
+			sql += " and \"RepayDate\" >= :actualRepayDateStart  and \"RepayDate\" <= :actualRepayDateEnd  \n";
 		}
 		if (iActualRepayDateStart > 0 && !(iRepayFlag == 2)) {
-			sql += "where \"ActualRepayDate\" >= :actualRepayDateStart  and \"ActualRepayDate\" <= :actualRepayDateEnd  \n";
+			sql += " and \"ActualRepayDate\" >= :actualRepayDateStart  and \"ActualRepayDate\" <= :actualRepayDateEnd  \n";
 		}
 		if (iCustNo > 0) {
 			sql += " and  \"CustNo\" = :custNo       \n";
@@ -153,16 +162,24 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		int iRecordDateStart = this.parse.stringToInteger(titaVo.getParam("RecordDateStart"));
 		int iRecordDateEnd = this.parse.stringToInteger(titaVo.getParam("RecordDateEnd"));
-		int iFRecordDateStart = iRecordDateStart + 19110000;
-		int iFRecordDateEnd = iRecordDateEnd + 19110000;
+		int iFRecordDateStart = 0;
+		int iFRecordDateEnd = 0;
+		if(iRecordDateStart > 0) {
+			iFRecordDateStart = iRecordDateStart + 19110000;
+			iFRecordDateEnd = iRecordDateEnd + 19110000;
+		}
 		this.info("iFRecordDateStart=" + iFRecordDateStart + ",iFRecordDateEnd=" + iFRecordDateEnd);
 		//若iRepayFlag=2代表是L3130連動須找預計還款日,iRepayFlag=3代表是L8922連動須找實際還款日
 		int iRepayFlag = this.parse.stringToInteger(titaVo.getParam("CHAIN_Flag"));
 
 		int iActualRepayDateStart = this.parse.stringToInteger(titaVo.getParam("ActualRepayDateStart"));
 		int iActualRepayDateEnd = this.parse.stringToInteger(titaVo.getParam("ActualRepayDateEnd"));
-		int iFActualRepayDateStart = iActualRepayDateStart + 19110000;
-		int iFActualRepayDateEnd = iActualRepayDateEnd + 19110000;
+		int iFActualRepayDateStart = 0;
+		int iFActualRepayDateEnd = 0;
+		if(iActualRepayDateStart > 0) {
+			iFActualRepayDateStart = iActualRepayDateStart + 19110000;
+			iFActualRepayDateEnd = iActualRepayDateEnd + 19110000;
+		}
 		this.info("iFActualRepayDateStart=" + iFActualRepayDateStart + ",iFActualRepayDateEnd=" + iFActualRepayDateEnd);
 		int iCustNo = Integer.parseInt(titaVo.getParam("CustNo"));
 		String iCustName = titaVo.getParam("CustName");
@@ -191,17 +208,18 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (!iCustName.isEmpty() && iCustNo == 0) {
 			sql += "left join \"CustMain\" C on C.\"CustNo\" = M.\"CustNo\" \n";
 		}
+		sql += " where 1 = 1  \n";
 		if (iRecordDateStart > 0 && !(iRepayFlag == 2)) {
-			sql += "where M.\"RecordDate\" >= :recordDateStart and M.\"RecordDate\" <= :recordDateEnd  \n";
+			sql += " and M.\"RecordDate\" >= :recordDateStart and M.\"RecordDate\" <= :recordDateEnd  \n";
 		}
 		if (iRepayFlag == 2) {//預計還款日期
-			sql += "where M.\"RepayDate\" >= :actualRepayDateStart  and M.\"RepayDate\" <= :actualRepayDateEnd  \n";
+			sql += " and M.\"RepayDate\" >= :actualRepayDateStart  and M.\"RepayDate\" <= :actualRepayDateEnd  \n";
 		}
 		if (iActualRepayDateStart > 0 && !(iRepayFlag == 2)) {
 			if (iRepayFlag == 3) {// iRepayFlag=3代表是L8922連動須找實際還款日
-				sql += "where M.\"ActualRepayDate\" >= :actualRepayDateStart  and M.\"ActualRepayDate\" <= :actualRepayDateEnd  \n";
+				sql += " and M.\"ActualRepayDate\" >= :actualRepayDateStart  and M.\"ActualRepayDate\" <= :actualRepayDateEnd  \n";
 			}else {//L8923若無實際還款日期則改抓預計還款日期
-				sql += "where case when M.\"ActualRepayDate\" >= :actualRepayDateStart  and M.\"ActualRepayDate\" <= :actualRepayDateEnd  then 1\n";
+				sql += " and case when M.\"ActualRepayDate\" >= :actualRepayDateStart  and M.\"ActualRepayDate\" <= :actualRepayDateEnd  then 1\n";
 				sql += "           when M.\"ActualRepayDate\" = 0 and M.\"RepayDate\" >= :actualRepayDateStart  and M.\"RepayDate\" <= :actualRepayDateEnd  then 1 \n";
 				sql += "      else 0 end = 1       \n";
 			}

@@ -27,6 +27,7 @@ import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.mail.MailService;
 import com.st1.itx.util.parse.Parse;
+import com.st1.itx.util.http.WebClient;
 
 @Service("BS050")
 @Scope("prototype")
@@ -59,6 +60,8 @@ public class BS050 extends TradeBuffer {
 	private LoanBorMainService loanBorMainService;
 	@Autowired
 	private FacMainService facMainService;
+	@Autowired
+	WebClient webClient;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -147,6 +150,10 @@ public class BS050 extends TradeBuffer {
 
 			}
 		}
+		if ("LC899".equals(titaVo.getTxcd())) {
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", "BS050已完成", titaVo);
+		}
+
 		return null;
 	}
 }
