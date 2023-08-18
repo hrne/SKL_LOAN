@@ -66,7 +66,7 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " SELECT mlb.\"YearMonth\" ";
 		sql += "       ,SUM(DECODE(NVL(fc.\"CloseReasonCode\", fm.\"AdvanceCloseCode\"), 4, mlbLast.\"LoanBalance\", 0)) \"CloseAmt4\" ";
 		sql += "       ,SUM(DECODE(NVL(fc.\"CloseReasonCode\", fm.\"AdvanceCloseCode\"), 1, mlbLast.\"LoanBalance\", 0)) \"CloseAmt1\" ";
-		sql += "       ,SUM(DECODE(NVL(fc.\"CloseReasonCode\", fm.\"AdvanceCloseCode\"), 1, 0, 4, 0, 0, 0, mlbLast.\"LoanBalance\")) \"CloseAmtOthers\" ";
+		sql += "       ,SUM(DECODE(NVL(fc.\"CloseReasonCode\", fm.\"AdvanceCloseCode\"), 2, mlbLast.\"LoanBalance\", 0)) \"CloseAmtOthers\" ";
 		sql += " FROM \"MonthlyLoanBal\" mlb ";
 		sql += " LEFT JOIN \"FacMain\" fm ON fm.\"CustNo\" = mlb.\"CustNo\" ";
 		sql += "                       AND fm.\"FacmNo\" = mlb.\"FacmNo\" ";

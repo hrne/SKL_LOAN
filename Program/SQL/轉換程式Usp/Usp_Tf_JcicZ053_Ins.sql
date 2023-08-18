@@ -34,10 +34,10 @@ BEGIN
           ,NVL("TBJCICZ053"."CHANGE_PAY_DATE",0) AS "ChangePayDate"       -- 申請變更還款條件日 Decimald 8 0
           ,NVL("TBJCICZ053"."JCICEXPORTDATE",0)  AS "OutJcicTxtDate"      -- 轉出JCIC文字檔日期 Decimald 8 0
           ,SYS_GUID()                     AS "Ukey"                -- 流水號 VARCHAR2 32
-          ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 8 0
-          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
-          ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 8 0
-          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+          ,"TBJCICZ053".LASTUPDATEDATE    AS "CreateDate"          -- 建檔日期時間 DATE 8 0
+          ,"TBJCICZ053".MODIFYUSERID      AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+          ,"TBJCICZ053".LASTUPDATEDATE    AS "LastUpdate"          -- 最後更新日期時間 DATE 8 0
+          ,"TBJCICZ053".MODIFYUSERID      AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
           ,0 AS "ActualFilingDate"
           ,NULL AS "ActualFilingMark"
     FROM "TBJCICZ053"

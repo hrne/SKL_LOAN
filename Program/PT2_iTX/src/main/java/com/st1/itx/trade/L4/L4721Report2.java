@@ -433,6 +433,10 @@ public class L4721Report2 extends TradeBuffer {
 		if (parse.stringToBigDecimal(r.get("TxAmt")).compareTo(BigDecimal.ZERO) < 0) {
 			txAmtX = "-";
 		}
+		// 如果TxAmt大於0 即使 計息起迄日是0，也需顯示
+		if (parse.stringToBigDecimal(r.get("TxAmt")).compareTo(BigDecimal.ZERO) > 1) {
+			RepayItem = r.get("RepayCodeX");
+		}
 
 		String principalX = "+";
 		if (parse.stringToBigDecimal(r.get("Principal")).compareTo(BigDecimal.ZERO) < 0) {

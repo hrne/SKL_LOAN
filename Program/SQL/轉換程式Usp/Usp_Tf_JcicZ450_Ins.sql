@@ -35,10 +35,10 @@ BEGIN
           ,"TBJCICZ450"."PAY_STATUS"      AS "PayStatus"           -- 債權結案註記 VARCHAR2 1 0
           ,NVL("TBJCICZ450"."JCICEXPORTDATE",0)  AS "OutJcicTxtDate"      -- 轉JCIC文字檔日期 Decimald 8 0
           ,SYS_GUID()                     AS "Ukey"                -- 流水號 VARCHAR2 32
-          ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 8 0
-          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
-          ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 8 0
-          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+          ,"TBJCICZ450".LASTUPDATEDATE    AS "CreateDate"          -- 建檔日期時間 DATE 8 0
+          ,"TBJCICZ450".MODIFYUSERID      AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+          ,"TBJCICZ450".LASTUPDATEDATE    AS "LastUpdate"          -- 最後更新日期時間 DATE 8 0
+          ,"TBJCICZ450".MODIFYUSERID      AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
           ,0 AS "ActualFilingDate"
           ,NULL AS "ActualFilingMark"
     FROM "TBJCICZ450"

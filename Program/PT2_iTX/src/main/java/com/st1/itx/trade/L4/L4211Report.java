@@ -645,6 +645,8 @@ public class L4211Report extends MakeReport {
 
 			String CloseReasonCodeText = tfnAllList.get("CloseReasonCode").toString();
 
+			CloseReasonCodeText = "99".equals(CloseReasonCodeText)? "":CloseReasonCodeText;
+			
 			this.print(0, c6 + 9, CloseReasonCodeText);
 
 			if ("999/12/31".equals(showRocDate(tfnAllList.get("IntStartDate"), 1))) { // 表繳短收的錢改空白日期
@@ -997,6 +999,8 @@ public class L4211Report extends MakeReport {
 
 			String CloseReasonCodeText = tfnAllList.get("CloseReasonCode").toString();
 
+			CloseReasonCodeText = "99".equals(CloseReasonCodeText)? "":CloseReasonCodeText;
+			
 			this.print(0, c6 + 9, CloseReasonCodeText);
 
 			if ("999/12/31".equals(showRocDate(tfnAllList.get("IntStartDate"), 1))) { // 表繳短收的錢改空白日期
@@ -1340,6 +1344,8 @@ public class L4211Report extends MakeReport {
 
 			String CloseReasonCodeText = tfnAllList.get("CloseReasonCode").toString();
 
+			CloseReasonCodeText = "99".equals(CloseReasonCodeText)? "":CloseReasonCodeText;
+			
 			this.print(0, c6 + 9, CloseReasonCodeText);
 
 			if ("999/12/31".equals(showRocDate(tfnAllList.get("IntStartDate"), 1))) { // 表繳短收的錢改空白日期

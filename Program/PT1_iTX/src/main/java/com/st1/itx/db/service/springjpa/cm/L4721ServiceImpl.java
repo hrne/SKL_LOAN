@@ -598,7 +598,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		// 明細
 		if (isDoDetail) {
-
+			sql += "   SELECT * FROM ( ";
 			sql += "   SELECT DISTINCT X.\"CustNo\"                                         AS \"CustNo\"";
 			sql += "                 , X.\"FacmNo\"                                         AS \"FacmNo\"";
 			sql += "                 , C.\"CustName\"";
@@ -614,6 +614,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "                 , X.\"Interest\"";
 			sql += "                 , X.\"BreachAmt\" + \"DelayInt\"                         AS \"BreachAmt\"";
 			sql += "                 , X.\"FEE1\" + X.\"FEE2\" + X.\"FEE3\" + X.\"FEE4\"          AS \"OtherFee\"";
+			sql += "                 ,ROW_NUMBER()OVER(PARTITION BY X.\"CustNo\",X.\"FacmNo\" ORDER BY X.\"EntryDate\" DESC)   AS \"Seq\"";
 			if (isSameSpecificDd) {
 				sql += "   FROM  \"MainByCustNo\" X";
 			} else {
@@ -647,7 +648,9 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "   ";
 			sql += "   WHERE Lb.\"SpecificDd\" IS NOT NULL";
 			sql += "     AND X.\"TxAmt\" >= 0";
-			sql += "   ORDER BY  X.\"FacmNo\" , X.\"EntryDate\"";
+			sql += "   ) ";
+			sql += "   ) WHERE \"Seq\" <= 8 ";
+			sql += "   ORDER BY  \"FacmNo\" , \"EntryDate\" ASC";
 
 			// 利率變動日及地址
 		} else {

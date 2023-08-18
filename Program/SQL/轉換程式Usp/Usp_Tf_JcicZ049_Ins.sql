@@ -37,10 +37,10 @@ BEGIN
           ,NVL(Z049."CLAIM_DATE",0)       AS "ClaimDate"           -- 法院裁定日期 Decimald 8 0
           ,Z049."JCICEXPORTDATE"          AS "OutJcicTxtDate"      -- 轉出JCIC文字檔日期 Decimald 8 0
           ,SYS_GUID                       AS "Ukey"                -- 流水號 VARCHAR2 32
-          ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 8 0
-          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
-          ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 8 0
-          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+          ,Z049.LASTUPDATEDATE            AS "CreateDate"          -- 建檔日期時間 DATE 8 0
+          ,Z049.MODIFYUSERID              AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+          ,Z049.LASTUPDATEDATE            AS "LastUpdate"          -- 最後更新日期時間 DATE 8 0
+          ,Z049.MODIFYUSERID              AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
           ,0 AS "ActualFilingDate"
           ,NULL AS "ActualFilingMark"
     FROM "TBJCICZ049" Z049

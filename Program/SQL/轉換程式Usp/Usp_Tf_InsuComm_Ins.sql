@@ -1,9 +1,4 @@
---------------------------------------------------------
---  DDL for Procedure Usp_Tf_InsuComm_Ins
---------------------------------------------------------
-set define off;
-
-  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_InsuComm_Ins" 
+CREATE OR REPLACE PROCEDURE "Usp_Tf_InsuComm_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -94,7 +89,8 @@ BEGIN
                 ,TRUNC(TO_NUMBER("LN$CMDP"."CMT01"))
                                                 AS "ManagerCode"         -- 經紀人代號 DECIMAL 3 0
                 ,TRIM("LN$CMDP"."CMT02")        AS "NowInsuNo"           -- 保單號碼 VARCHAR2 20 0
-                ,SUBSTR("LN$CMDP"."CMT03",0,6)  AS "BatchNo"             -- 批號 VARCHAR2 6 0
+                -- 2023-07-25 Wei from SKL資料轉換規格確認
+                ,"LN$CMDP"."CMT03"              AS "BatchNo"             -- 批號 VARCHAR2 6 0
                 ,LPAD(TRUNC(TO_NUMBER("LN$CMDP"."CMT04")),3,'0')
                                                 AS "InsuType"            -- 險別 VARCHAR2 3 0
                 ,"LN$CMDP"."CMT05"              AS "InsuSignDate"        -- 簽單日期 DECIMAL 8 0
