@@ -247,6 +247,7 @@ public class L4211Report extends MakeReport {
 				fnAllList3.add(r2);
 			}
 		}
+		// L4211 SortingForClose
 		// 科目排序
 		fnAllList1 = sortMapListCom.beginSort(fnAllList1).ascString("ReconCode").ascString("BatchNo")
 				.ascString("SortingForSubTotal").ascString("DetailSeq").ascString("RepayCode").ascString("AcSeq")
@@ -321,6 +322,7 @@ public class L4211Report extends MakeReport {
 				fnAllList3.add(r2);
 			}
 		}
+		// L420A
 		// 科目排序
 		fnAllList1 = sortMapListCom.beginSort(fnAllList1).ascString("ReconCode").ascString("BatchNo")
 				.ascString("SortingForSubTotal").ascString("DetailSeq").ascString("RepayCode").ascString("AcSeq")
@@ -328,13 +330,13 @@ public class L4211Report extends MakeReport {
 
 		// 金額排序:已處理/待處理 + 結清 + 金額 + 戶號 + 還款方式
 		fnAllList2 = sortMapListCom.beginSort(fnAllList2).ascString("ReconCode").ascString("BatchNo")
-				.ascString("SortingForSubTotal").descNumber("RepayAmt").ascString("CustFacmBorm").ascString("DetailSeq")
-				.ascString("RepayCode").ascString("AcSeq").getList();
+				.ascString("SortingForSubTotal").ascString("CloseReasonCode").descNumber("RepayAmt")
+				.ascString("CustFacmBorm").ascString("DetailSeq").ascString("RepayCode").ascString("AcSeq").getList();
 
 		// 戶號排序:已處理/待處理+ 戶號 + 金額
 		fnAllList3 = sortMapListCom.beginSort(fnAllList3).ascString("ReconCode").ascString("BatchNo")
-				.ascString("SortingForSubTotal").ascString("CustNo").ascString("DetailSeq").ascString("FacmNo")
-				.ascString("BormNo").descNumber("RepayAmt").ascString("AcSeq").getList();
+				.ascString("SortingForSubTotal").ascString("CloseReasonCode").ascString("CustNo").ascString("DetailSeq")
+				.ascString("FacmNo").ascString("BormNo").descNumber("RepayAmt").ascString("AcSeq").getList();
 
 		makePdf(fnAllList1, fnAllList2, fnAllList3, false, titaVo);
 	}
@@ -426,7 +428,7 @@ public class L4211Report extends MakeReport {
 		if ("L4211".equals(txCode) || "L420A".equals(txCode)) {
 			for (Map<String, String> tfnAllList : fnAllList) {
 
-				tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo").substring(0, 7)),
+				tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustFacmBorm").substring(0, 7)),
 						parse.stringToInteger(tfnAllList.get("DetailSeq")),
 						parse.stringToInteger(tfnAllList.get("SortingForSubTotal")));
 
@@ -617,7 +619,7 @@ public class L4211Report extends MakeReport {
 
 				if ("L4211".equals(txCode)) {
 
-					tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo").substring(0, 7)),
+					tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustFacmBorm").substring(0, 7)),
 							parse.stringToInteger(tfnAllList.get("DetailSeq")),
 							parse.stringToInteger(tfnAllList.get("SortingForSubTotal")));
 
@@ -631,7 +633,7 @@ public class L4211Report extends MakeReport {
 			}
 
 			this.print(0, c4, dfMakeferAmt, "R");// 作帳金額
-			String custNo = tfnAllList.get("CustNo");
+			String custNo = tfnAllList.get("CustFacmBorm");
 			custNo += isBatchMapList ? "-" : " ";
 			custNo += tfnAllList.get("PaidTerms");
 			this.print(0, c5, custNo);// 戶號
@@ -791,7 +793,7 @@ public class L4211Report extends MakeReport {
 		if ("L4211".equals(txCode)) {
 			for (Map<String, String> tfnAllList : fnAllList) {
 
-				tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo").substring(0, 7)),
+				tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustFacmBorm").substring(0, 7)),
 						parse.stringToInteger(tfnAllList.get("DetailSeq")),
 						parse.stringToInteger(tfnAllList.get("SortingForSubTotal")));
 
@@ -968,7 +970,7 @@ public class L4211Report extends MakeReport {
 
 				if ("L4211".equals(txCode)) {
 
-					tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo").substring(0, 7)),
+					tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustFacmBorm").substring(0, 7)),
 							parse.stringToInteger(tfnAllList.get("DetailSeq")),
 							parse.stringToInteger(tfnAllList.get("SortingForSubTotal")));
 
@@ -983,7 +985,7 @@ public class L4211Report extends MakeReport {
 			}
 
 			this.print(0, c4, dfMakeferAmt, "R");// 作帳金額
-			String custNo = tfnAllList.get("CustNo");
+			String custNo = tfnAllList.get("CustFacmBorm");
 			custNo += isBatchMapList ? "-" : " ";
 			custNo += tfnAllList.get("PaidTerms");
 			this.print(0, c5, custNo);// 戶號
@@ -1135,7 +1137,7 @@ public class L4211Report extends MakeReport {
 
 			for (Map<String, String> tfnAllList : fnAllList) {
 
-				tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo").substring(0, 7)),
+				tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustFacmBorm").substring(0, 7)),
 						parse.stringToInteger(tfnAllList.get("DetailSeq")),
 						parse.stringToInteger(tfnAllList.get("SortingForSubTotal")));
 
@@ -1312,7 +1314,7 @@ public class L4211Report extends MakeReport {
 					this.print(0, c3, formatAmt(new BigDecimal(tfnAllList.get("RepayAmt")), 0), "R");// 匯款金額
 				}
 				if ("L4211".equals(txCode)) {
-					tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo").substring(0, 7)),
+					tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustFacmBorm").substring(0, 7)),
 							parse.stringToInteger(tfnAllList.get("DetailSeq")),
 							parse.stringToInteger(tfnAllList.get("SortingForSubTotal")));
 
@@ -1326,7 +1328,7 @@ public class L4211Report extends MakeReport {
 			}
 
 			this.print(0, c4, dfMakeferAmt, "R");// 作帳金額
-			String custNo = tfnAllList.get("CustNo");
+			String custNo = tfnAllList.get("CustFacmBorm");
 			custNo += isBatchMapList ? "-" : " ";
 			custNo += tfnAllList.get("PaidTerms");
 			this.print(0, c5, custNo);// 戶號

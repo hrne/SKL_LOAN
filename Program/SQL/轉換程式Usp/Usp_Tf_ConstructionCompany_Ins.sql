@@ -33,7 +33,7 @@ BEGIN
       , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
     )
     SELECT BUDP."LMSACN"                  AS "CustNo"              -- 戶號 DECIMAL 7 0
-         , BUDP."LU$STAT"                 AS "BuilderStatus"       -- 建商狀況 VARCHAR2 20 0
+         , BUDP."LU$STAT"                 AS "DeleteFlag"       -- 刪除碼 VARCHAR2 1 0
          , CASE
              WHEN BUDP."CRTDTM" > 0
              THEN TO_DATE(BUDP."CRTDTM",'YYYYMMDDHH24MISS')
