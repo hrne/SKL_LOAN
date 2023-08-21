@@ -73,13 +73,7 @@ CloseReasonCode 需左補0 (2)
       , "DocNoE"              -- 公文編號(迄) DECIMAL 4 0
     )
     SELECT E."LMSACN"                     AS "CustNo"              -- 戶號 DECIMAL 7 0
-          ,ROW_NUMBER()
-           OVER (
-             PARTITION BY E."LMSACN"
-             ORDER BY E."ADTYMD"
-           )
-          --E."IN$SEQ"
-                                          AS "CloseNo"             -- 清償序號 DECIMAL 3 0
+          ,E."IN$SEQ"                     AS "CloseNo"             -- 清償序號 DECIMAL 3 0
           ,E."LMSAPN"                     AS "FacmNo"              -- 額度編號 DECIMAL 3 0
           ,0                              AS "ActFlag"             -- 登放記號 DECIMAL 1 0
           ,CASE

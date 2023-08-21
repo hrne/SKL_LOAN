@@ -17,7 +17,6 @@ import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanBorMainId;
 import com.st1.itx.db.domain.PfItDetail;
 import com.st1.itx.db.domain.TxControl;
-import com.st1.itx.db.service.CdBcmService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.PfItDetailService;

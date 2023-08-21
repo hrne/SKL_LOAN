@@ -144,12 +144,8 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"CustMain\" cm ON cm.\"CustNo\" = lbtx.\"CustNo\" ";
 		sql += " WHERE lbtx.\"AcDate\" BETWEEN :yearMonthMin || '01' AND :yearMonthMax || '31' ";
 		sql += "   AND lbtx.\"TitaHCode\" = 0 ";
-		sql += "   AND ((lbtx.\"TitaTxCd\" = 'L3200') ";
-		sql += "        OR ";
-		sql += "        (    lbtx.\"TitaTxCd\" = 'L3420' ";
-		sql += "         AND JSON_VALUE(lbtx.\"OtherFields\", '$.CaseCloseCode') = 0 ";
-		sql += "        ) ";
-		sql += "       ) ";
+		sql += "   AND lbtx.\"TitaTxCd\" = 'L3200' ";
+		sql += "   AND lbtx.\"TxDescCode\" = '3203' ";
 		sql += "   AND mfb.\"PrinBalance\" > 0 ";
 		sql += "   AND lbm.\"Status\" = 0 ";
 		sql += "   AND cm.\"EntCode\" != 1 ";
@@ -172,7 +168,8 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                               AND mlb.\"YearMonth\" = SUBSTR(lbtx.\"EntryDate\", 1, 6) ";
 		sql += " LEFT JOIN \"CustMain\" cm ON cm.\"CustNo\" = lbtx.\"CustNo\" ";
 		sql += " WHERE lbtx.\"EntryDate\" BETWEEN :yearMonthMin || '01' AND :yearMonthMax || '31' ";
-		sql += "   AND lbtx.\"TitaTxCd\" = 'L3200' ";
+		sql += "   AND lbtx.\"TitaTxCd\" IN ('L3200','L3440') ";
+		sql += "   AND lbtx.\"TxDescCode\" <> '3203' ";
 		sql += "   AND lbtx.\"TitaHCode\" = 0 ";
 		sql += "   AND mlb.\"LoanBalance\" > 0 ";
 		sql += "   AND lbm.\"Status\" = 0 ";

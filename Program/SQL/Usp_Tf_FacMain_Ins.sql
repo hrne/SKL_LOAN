@@ -192,53 +192,65 @@ BEGIN
           ,APLP."LMSGPT"                  AS "GracePeriod"         -- 寬限總月數 DECIMAL 3  
           ,APLP."ACTFEE"                  AS "AcctFee"             -- 帳管費 DECIMAL 16 2 
           ,0                              AS "HandlingFee"         -- 手續費 DECIMAL 16 2 
-          /* 
-           * AS400                        AS400                     iTX  
-           * 客戶別（CU$CUSP.CUSECD）　　  戶別 （CU$CUSP.CUSCCD）　　規定管制代碼（FacMain.RuleCode）　　 
-           * －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－ 
-           * 代碼　對照中文　　　　　　　　　代碼　對照中文　代碼　對照中文　　　　　　　　　　　　　　　　是否啟用 
-           * Ｉ　　自然人第３戶（央行管制）　　　　　　　　　０１　自然人第三戶以上　　　　　　　　　　　　　　Ｙ 
-           * 　　　　　　　　　　　　　　　　　　　　　　　　０２　自然人第三戶以上且為高價住宅（央行管制）　　Ｙ 
-           * 　　　　　　　　　　　　　　　　　　　　　　　　０３　自然人第四戶以上　　　　　　　　　　　　　　Ｙ 
-           * 　　　　　　　　　　　　　　　　　　　　　　　　０４　自然人第四戶以上且為高價住宅（央行管制）　　Ｙ 
-           * Ｘ　　購置高價住宅（央行管制）　１　　自然人　　０５　自然人購買高價住宅（央行管制）　　　　　　　Ｙ 
-           * Ｙ　　法人購買住宅第一戶（央行管制）　　　　　　０６　法人購置住宅第一戶（央行管制）　　　　　　　Ｙ 
-           * 　　　　　　　　　　　　　　　　　　　　　　　　０７　法人購置住宅第二戶以上（央行管制）　　　　　Ｙ 
-           * Ｏ　　土地受限戶（央行管制）　　　　　　　　　　０８　購地貸款（央行管制）　　　　　　　　　　　　Ｙ 
-           * Ｗ　　　　　　　　　　　　　　　　　　　　　　　０９　餘屋貸款（央行管制）　　　　　　　　　　　　Ｙ 
-           * 　　　　　　　　　　　　　　　　　　　　　　　　１０　工業區閒置土地抵押貸款（央行管制）　　　　　Ｙ 
-           * Ｌ　　增貸管制戶（央行管制）　　　　　　　　　　１１　增貸管制戶（舊央行管制）　　　　　　　　　　Ｙ 
-           * Ｋ　　自然人第二戶　　　　　　　　　　　　　　　１２　自然人特定地區第２戶購屋貸款（舊央行管制）　Ｎ 
-           * Ｕ　　投資戶（內部規範）　　　　　　　　　　　　１３　投資戶（內部規範）　　　　　　　　　　　　　Ｙ 
-           * 其他　　　　　　　　　　　　　　　　　　　　　　００　一般　　　　　　　　　　　　　　　　　　　　Ｙ 
-           */ 
-          ,CASE 
-             WHEN TRIM(APLP."CUSECD") = 'I' 
-             THEN '01' -- 自然人第三戶以上 
-             WHEN TRIM(APLP."CUSECD") = 'X' AND NVL(CUSP."CUSCCD",'1') = '1' 
-             THEN '05' -- 自然人購買高價住宅(央行管制) 
-             WHEN TRIM(APLP."CUSECD") = 'Y' 
-             THEN '06' --法人購置住宅第一戶(央行管制) 
-             WHEN TRIM(APLP."CUSECD") = 'O' 
-             THEN '08' -- 購地貸款(央行管制) 
-             WHEN TRIM(APLP."CUSECD") = 'W' 
-             THEN '09' -- 餘屋貸款(央行管制) 
-             WHEN TRIM(APLP."CUSECD") = 'L' 
-             THEN '11' -- 增貸管制戶(央行管制) 
-             WHEN TRIM(APLP."CUSECD") = 'K' 
-             THEN '12' -- 自然人特定地區第2戶購屋貸款(舊央行管制) 
-             WHEN TRIM(APLP."CUSECD") = 'U' 
-             THEN '13' -- 投資戶(內部規範) 
-           ELSE '00' END                  AS "RuleCode"            -- 規定管制代碼 VARCHAR2 
+          -- 2023-08-21 Wei 重寫 from 客戶別-央行管制代碼相關by盈如經理.xlsx
+          ,CASE TRIM(APLP."CUSECD")
+             WHEN 'I' THEN 'B471' -- 自然人第3戶以上購屋貸款
+             WHEN 'L' THEN 'A001' -- 增貸管制戶
+             WHEN 'O' THEN 'B421' -- 購地貸款上限6.5成
+             WHEN 'Q' THEN 'B472' -- 自然人第4戶以上購屋貸款
+             WHEN 'V' THEN 'B482' -- 自然人購置高價住宅-3戶以上
+             WHEN 'W' THEN 'B430' -- 餘屋貸款
+             WHEN 'X' THEN 'B481' -- 自然人購置高價住宅-2戶以下
+             WHEN 'Y' THEN 'B460' -- 公司法人購置住宅
+             WHEN 'Z' THEN 'B450' -- 工業區閒置土地抵押貸款
+           ELSE ''
+           END                            AS "RuleCode"            -- 規定管制代碼 VARCHAR2 
           ,APLP."APLPCD"                  AS "ExtraRepayCode"      -- 攤還額異動碼 VARCHAR2 1  
-          ,CASE 
-             WHEN TRIM(APLP."CUSECD") IN ('@','0','8','A','B','C','D','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y') 
-             THEN '00' 
-             WHEN TRIM(APLP."CUSECD") IN ('1','2','3','4','5','6','7','9') 
-             THEN LPAD(TRIM(APLP."CUSECD"),2,'0') 
-             WHEN TRIM(APLP."CUSECD") = 'E' 
-             THEN '01' 
-           ELSE TRIM(APLP."CUSECD") END   AS "CustTypeCode"        -- 客戶別 VARCHAR2 2  
+          -- 2023-08-21 Wei 重寫 from 客戶別-央行管制代碼相關by盈如經理.xlsx
+          -- 轉換對照表在NAS:\SKL\DB\00-ref-參考資料\客戶別及規定管制代碼轉換對照表.xlsx
+          ,CASE TRIM(APLP."CUSECD")
+             WHEN '0' THEN 'C01' -- 一般
+             WHEN '1' THEN 'C02' -- 員工
+             WHEN 'U' THEN 'C03' -- 投資戶(內部規範)
+             WHEN 'I' THEN 'S01' -- 央行管制
+             WHEN 'Q' THEN 'S01' -- 央行管制
+             WHEN 'O' THEN 'S01' -- 央行管制
+             WHEN 'X' THEN 'S01' -- 央行管制
+             WHEN 'V' THEN 'S01' -- 央行管制
+             WHEN 'Y' THEN 'S01' -- 央行管制
+             WHEN 'W' THEN 'S01' -- 央行管制
+             WHEN 'Z' THEN 'S01' -- 央行管制
+             WHEN 'K' THEN 'S01' -- 央行管制
+             WHEN 'L' THEN 'S01' -- 央行管制
+             WHEN 'M' THEN 'C04' -- 整合貸
+             WHEN 'P' THEN 'C05' -- 優惠轉貸
+             WHEN 'A' THEN 'C06' -- 信義房屋
+             WHEN 'T' THEN 'C07' -- VIP減帳管
+             WHEN '@' THEN 'C08' -- 固特利契轉
+             WHEN '2' THEN 'C09' -- 首購
+             WHEN '3' THEN 'C10' -- 關企公司
+             WHEN '4' THEN 'C11' -- 關企員工
+             WHEN '5' THEN 'C12' -- 保戶
+             WHEN '6' THEN 'C13' -- 團體戶
+             WHEN '7' THEN 'C14' -- 二等親屬
+             WHEN '8' THEN 'C15' -- 受災戶
+             WHEN '9' THEN 'C16' -- 新二階員工
+             WHEN '#' THEN 'C17' -- 991231+VIP-
+             WHEN '&' THEN 'C18' -- 永慶房屋
+             WHEN 'B' THEN 'C19' -- 千禧房貸
+             WHEN 'C' THEN 'C20' -- 青年優惠
+             WHEN 'D' THEN 'C21' -- 2000億優惠
+             WHEN 'E' THEN 'C22' -- 退休員工
+             WHEN 'F' THEN 'C23' -- 菁英專案
+             WHEN 'G' THEN 'C24' -- 東方帝國
+             WHEN 'H' THEN 'C25' -- 2000億優惠
+             WHEN 'J' THEN 'C26' -- 花木釀宅
+             WHEN 'N' THEN 'C27' -- 8000億優惠
+             WHEN 'R' THEN 'C28' -- 優惠重購
+             WHEN 'S' THEN 'C29' -- 88風災
+             WHEN 'Y' THEN 'C30' -- 法人購屋
+           ELSE TRIM(APLP."CUSECD")
+           END                            AS "CustTypeCode"        -- 客戶別 VARCHAR2 2  
           ,APLP."APLRCD"                  AS "RecycleCode"         -- 循環動用 VARCHAR2 1  
           ,APLP."APLRDT"                  AS "RecycleDeadline"     -- 循環動用期限 DECIMALD 8  
           -- 2021-02-08 補零 

@@ -205,6 +205,8 @@ public class L4964 extends TradeBuffer {
 					occursList.putParam("OOEthqInsuPrem", tInsuRenew.getEthqInsuPrem());
 					occursList.putParam("OOInsuYearMonth", InsuYearMonth);
 					occursList.putParam("OOBtnFlag", btnShowFlag.get(tmp));
+					occursList.putParam("OOAcDate", tInsuRenew.getAcDate());
+					occursList.putParam("OOStatusCode", tInsuRenew.getStatusCode());
 
 					/* 將每筆資料放入Tota的OcList */
 					this.totaVo.addOccursList(occursList);
@@ -229,6 +231,8 @@ public class L4964 extends TradeBuffer {
 						occursList.putParam("OOEthqInsuPrem", tInsuRenew.getEthqInsuPrem());
 						occursList.putParam("OOInsuYearMonth", InsuYearMonth);
 						occursList.putParam("OOBtnFlag", btnShowFlag.get(tmp));
+						occursList.putParam("OOAcDate", tInsuRenew.getAcDate());
+						occursList.putParam("OOStatusCode", tInsuRenew.getStatusCode());
 						/* 將每筆資料放入Tota的OcList */
 						this.totaVo.addOccursList(occursList);
 						occursflg = false;

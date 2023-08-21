@@ -64,6 +64,7 @@ public class L6041ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if(iLevelFgS != 0) {
 		sql += "    and a.\"LevelFg\"  = :LevelFgS  ";
 		}
+		this.info("sql=" + sql);
 		Query query;
 		EntityManager em = baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);

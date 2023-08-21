@@ -332,6 +332,7 @@ T(3,)T(H,#OOSelfInsuCode,#SelfInsuCodeHelp)
 ! BIND(grid,{ cmd=CHAIN; ntxcd=L4611; text=#OOSelfInsuCodeX; ntxbuf=#OOBUFA_renew}),
 ! 0,
 ! BIND(grid,{ cmd=CHAIN; ntxcd=L4610; text=#OOSelfInsuCodeX; ntxbuf=#OOBUFA_1}),
+
 ! 批單號碼有時
 ! 新保時不顯示自保按鈕
 #OOBTNA=A,2,O
@@ -345,7 +346,8 @@ SWITCH(#OOSelfInsuCode,
 1,
 BIND(grid,cancel),
 2,
-BIND(grid,{ cmd=CHAIN; ntxcd=L4611; text=#OOBtnAText; ntxbuf=#OOBUFA_2}),
+C(3,#OOAcDate,0,C(3,#OOStatusCode,0,BIND(grid,{ cmd=CHAIN; ntxcd=L4611; text=#OOBtnAText; ntxbuf=#OOBUFA_2}),BIND(grid,cancel)),BIND(grid,cancel))
+,
 0,
 BIND(grid,{ cmd=CHAIN; ntxcd=L4611; text=#OOBtnAText; ntxbuf=#OOBUFA_renew}),
 BIND(grid,cancel))
@@ -425,6 +427,8 @@ TXFORM=L4964
 #OOEthqInsuPrem
 #OOInsuYearMonth
 #OOBtnFlag
+#OOAcDate
+#OOStatusCode
 ^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>

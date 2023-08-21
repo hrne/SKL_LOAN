@@ -145,15 +145,50 @@ BEGIN
              THEN SUBSTR(REPLACE(TRIM(CUSP."CUSID1"),CHR(26),''),2,1)
            ELSE '0'
            END                           AS "Sex"                 -- 性別 VARCHAR2 1 
-          ,CASE
-             WHEN TRIM(CUSP."CUSECD") IN ('@','0','8','A','B','C','D','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y')
-             THEN '00'
-             WHEN TRIM(CUSP."CUSECD") IN ('1','2','3','4','5','6','7','9') -- 2021-07-22 賴桑確認修改 : 增加06:團體戶
-             THEN LPAD(TRIM(CUSP."CUSECD"),2,'0')
-             WHEN TRIM(CUSP."CUSECD") = 'E'
-             THEN '01'
-           ELSE TRIM(CUSP."CUSECD") END
-                                          AS "CustTypeCode"        -- 客戶別 VARCHAR2 2 
+          -- 2023-08-21 Wei 重寫 from 客戶別-央行管制代碼相關by盈如經理.xlsx
+          ,CASE TRIM(CUSP."CUSECD")
+             WHEN '0' THEN 'C01' -- 一般
+             WHEN '1' THEN 'C02' -- 員工
+             WHEN 'U' THEN 'C03' -- 投資戶(內部規範)
+             WHEN 'I' THEN 'S01' -- 央行管制
+             WHEN 'Q' THEN 'S01' -- 央行管制
+             WHEN 'O' THEN 'S01' -- 央行管制
+             WHEN 'X' THEN 'S01' -- 央行管制
+             WHEN 'V' THEN 'S01' -- 央行管制
+             WHEN 'Y' THEN 'S01' -- 央行管制
+             WHEN 'W' THEN 'S01' -- 央行管制
+             WHEN 'Z' THEN 'S01' -- 央行管制
+             WHEN 'K' THEN 'S01' -- 央行管制
+             WHEN 'L' THEN 'S01' -- 央行管制
+             WHEN 'M' THEN 'C04' -- 整合貸
+             WHEN 'P' THEN 'C05' -- 優惠轉貸
+             WHEN 'A' THEN 'C06' -- 信義房屋
+             WHEN 'T' THEN 'C07' -- VIP減帳管
+             WHEN '@' THEN 'C08' -- 固特利契轉
+             WHEN '2' THEN 'C09' -- 首購
+             WHEN '3' THEN 'C10' -- 關企公司
+             WHEN '4' THEN 'C11' -- 關企員工
+             WHEN '5' THEN 'C12' -- 保戶
+             WHEN '6' THEN 'C13' -- 團體戶
+             WHEN '7' THEN 'C14' -- 二等親屬
+             WHEN '8' THEN 'C15' -- 受災戶
+             WHEN '9' THEN 'C16' -- 新二階員工
+             WHEN '#' THEN 'C17' -- 991231+VIP-
+             WHEN '&' THEN 'C18' -- 永慶房屋
+             WHEN 'B' THEN 'C19' -- 千禧房貸
+             WHEN 'C' THEN 'C20' -- 青年優惠
+             WHEN 'D' THEN 'C21' -- 2000億優惠
+             WHEN 'E' THEN 'C22' -- 退休員工
+             WHEN 'F' THEN 'C23' -- 菁英專案
+             WHEN 'G' THEN 'C24' -- 東方帝國
+             WHEN 'H' THEN 'C25' -- 2000億優惠
+             WHEN 'J' THEN 'C26' -- 花木釀宅
+             WHEN 'N' THEN 'C27' -- 8000億優惠
+             WHEN 'R' THEN 'C28' -- 優惠重購
+             WHEN 'S' THEN 'C29' -- 88風災
+             WHEN 'Y' THEN 'C30' -- 法人購屋
+           ELSE TRIM(CUSP."CUSECD")
+           END                            AS "CustTypeCode"        -- 客戶別 VARCHAR2 2 
           ,CASE
              -- 2023-03-07 Wei from QC:2091
              WHEN NVL(QC2091.NEW_CUSOCD,' ') != ' '

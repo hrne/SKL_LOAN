@@ -648,7 +648,6 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "   ";
 			sql += "   WHERE Lb.\"SpecificDd\" IS NOT NULL";
 			sql += "     AND X.\"TxAmt\" >= 0";
-			sql += "   ) ";
 			sql += "   ) WHERE \"Seq\" <= 8 ";
 			sql += "   ORDER BY  \"FacmNo\" , \"EntryDate\" ASC";
 
