@@ -277,6 +277,8 @@ T(3,)T(H,#OOInsuTypeCode,#InsuTypeCodeHelp)
 ! 1:on 0:off
 #OOBtnFlag=A,1,S
 
+#OOAcDate=D,7,S
+#OOStatusCode=A,1,S
 
 ! 按鈕傳值不會補零，需先轉型態
 #OOFireInsuCovrgX=X,18,L

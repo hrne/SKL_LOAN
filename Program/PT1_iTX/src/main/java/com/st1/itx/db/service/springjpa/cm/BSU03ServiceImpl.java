@@ -40,7 +40,21 @@ public class BSU03ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , \"TACTAMT\"              AS  \"PerfAmt\" ";
 		sql += "      , \"YAG3LV\"               AS  \"PerfEqAmt\" ";
 		sql += "      , \"PAY3LV\"               AS  \"PerfReward\" ";
-		sql += " FROM \"TmpQQQp\" ";
+		sql += " FROM \"TMPQQQP\" ";
+//		sql += " GROUP BY \"LMSACN\"  ";
+//		sql += "        , \"LMSAPN\"  ";
+//		sql += "        , \"APLUAM\"  ";
+//		sql += "        , \"PRZCNT\"  ";
+//		sql += "        , \"TACTAMT\" ";
+//		sql += "        , \"YAG3LV\"  ";
+//		sql += "        , \"PAY3LV\"  ";
+		sql += " ORDER BY \"LMSACN\"  ";
+		sql += "        , \"LMSAPN\"  ";
+		sql += "        , \"SOURCE\"  ";
+		sql += "        , CASE WHEN \"APLUAM\" < 600000 AND \"PRZCNT\" = 'N' THEN 1 ";
+		sql += "        ,      WHEN \"APLUAM\" >= 600000 AND \"PRZCNT\" = 'Y' THEN 2 ";
+		sql += "        ,      ELSE  3 ";
+		sql += "        , END          ";
 
 		this.info("sql=" + sql);
 

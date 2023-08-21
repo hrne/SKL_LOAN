@@ -68,7 +68,7 @@ T(H,#RunMode,#RunModeH)
 IF(#RunMode==2,HELP(#ExePgmCodeHelp),$)
 @
 IF(#RunMode==2,T(3,@PrgmX,),$)
-IF(#RunMode==2,V(H,#ExePgmCodeHelp),V(7))
+V(7)
 
 #PrgmX=x,100,L
 IF(#RunMode==2,T(H,#Prgm,#ExePgmCodeHelp),T(2, ))

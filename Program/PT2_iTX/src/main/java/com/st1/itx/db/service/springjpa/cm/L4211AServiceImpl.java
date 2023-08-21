@@ -123,7 +123,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "           ELSE \"Fn_GetCdCode\"('AcctCode',FAC.\"AcctCode\") END AS \"AcctItem\"";
 			sql += " 	, \"Fn_GetCdCode\"('RepayType',BATX.\"RepayType\") AS \"RepayItem\"";
 			sql += "    , NVL(TX2.\"PaidTerms\", 0) AS \"PaidTerms\" ";
-			sql += "    , NVL(NVL(FC1.\"CloseReasonCode\",FC2.\"CloseReasonCode\"),'  ') AS \"CloseReasonCode\"";
+			sql += "    , NVL(NVL(FC1.\"CloseReasonCode\",FC2.\"CloseReasonCode\"),'99') AS \"CloseReasonCode\"";
 			sql += "    , CD.\"Item\" AS \"CloseReason\" ";
 			sql += "    , NVL(JSON_VALUE(TX2.\"OtherFields\", '$.CaseCloseCode'),99) AS \"CaseCloseCode\" ";
 			sql += " FROM \"BatxDetail\" BATX";
@@ -310,7 +310,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "           ELSE \"Fn_GetCdCode\"('AcctCode',FAC.\"AcctCode\") END AS \"AcctItem\"";
 			sql += " 	, \"Fn_GetCdCode\"('RepayType',BATX.\"RepayType\") AS \"RepayItem\"";
 			sql += "    , NVL(TX2.\"PaidTerms\", 0) AS \"PaidTerms\" ";
-			sql += "    , NVL(NVL(FC1.\"CloseReasonCode\",FC2.\"CloseReasonCode\"),'  ') AS \"CloseReasonCode\"";
+			sql += "    , NVL(NVL(FC1.\"CloseReasonCode\",FC2.\"CloseReasonCode\"),'99') AS \"CloseReasonCode\"";
 			sql += "    , CD.\"Item\" AS \"CloseReason\" ";
 			sql += "    , NVL(JSON_VALUE(TX2.\"OtherFields\", '$.CaseCloseCode'),99) AS \"CaseCloseCode\" ";
 			sql += " FROM BATX";
@@ -402,7 +402,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "           ELSE \"Fn_GetCdCode\"('AcctCode',FAC.\"AcctCode\") END AS \"AcctItem\"";
 			sql += " 	, \"Fn_GetCdCode\"('RepayType',BATX.\"RepayType\") AS \"RepayItem\"";
 			sql += "    , NVL(TX2.\"PaidTerms\", 0) AS \"PaidTerms\" ";
-			sql += "    , NVL(NVL(FC1.\"CloseReasonCode\",FC2.\"CloseReasonCode\"),'  ') AS \"CloseReasonCode\"";
+			sql += "    , NVL(NVL(FC1.\"CloseReasonCode\",FC2.\"CloseReasonCode\"),'99') AS \"CloseReasonCode\"";
 			sql += "    , CD.\"Item\" AS \"CloseReason\" ";
 			sql += "    , NVL(JSON_VALUE(TX2.\"OtherFields\", '$.CaseCloseCode'),99) AS \"CaseCloseCode\" ";
 			sql += " FROM \"BatxDetail\" BATX";

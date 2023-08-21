@@ -39,7 +39,7 @@ public class L6041ServiceImpl extends ASpringJpaParm implements InitializingBean
 		
 		String sql = " ";
 		sql += " select  ";
-		sql += " b.\"TlrNo\", ";
+		sql += " a.\"TlrNo\", ";
 		sql += " a.\"BrNo\", ";
 		sql += " a.\"GroupNo\", ";
 		sql += " a.\"LastUpdate\", ";
@@ -53,7 +53,7 @@ public class L6041ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   and b.\"AuthNo\" = :AuthNo ";
 		}
 		if (!iTlrNo.equals("")) {
-		sql += "   and b.\"TlrNo\"  = :TlrNo ";
+		sql += "   and a.\"TlrNo\"  = :TlrNo ";
 		}
 		if(!iBrNo.equals("")) {
 		sql += "   	and a.\"BrNo\"  = :BrNo ";

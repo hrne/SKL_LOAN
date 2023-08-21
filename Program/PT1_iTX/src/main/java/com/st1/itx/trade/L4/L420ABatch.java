@@ -513,7 +513,9 @@ public class L420ABatch extends TradeBuffer {
 			da.put("BormNo", parse.IntegerToString(baTxVo.getBormNo(), 3));
 			da.put("PaidTerms", "");
 			da.put("CustName", custName);
-			da.put("CloseReasonCode", "");
+			String closeReasonCode = iTempVo.getParam("CloseReasonCode");
+			da.put("CloseReasonCode",
+					closeReasonCode.trim().length() == 0 || closeReasonCode.equals("00") ? "99" : closeReasonCode);
 			da.put("IntStartDate", "");
 			da.put("IntEndDate", "");
 			da.put("Principal", "0");
