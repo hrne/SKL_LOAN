@@ -29,6 +29,7 @@ import com.st1.itx.db.service.LifeRelHeadService;
 import com.st1.itx.db.service.StakeholdersStaffService;
 import com.st1.itx.util.format.StringCut;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.FileCom;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.date.DateUtil;
@@ -62,7 +63,7 @@ public class L7206 extends TradeBuffer {
 	MakeExcel makeExcel;
 
 	StringCut sStringCut;
-	
+
 	@Value("${iTXInFolder}")
 	private String inFolder = "";
 
@@ -73,6 +74,28 @@ public class L7206 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L7206 ");
 		this.totaVo.init(titaVo);
+
+		// 上傳檔案
+		// 0:人壽利關人職員名單[LA$RLTP] ;csv xlsx xls
+		// 1:人壽利關人負責人名單[T07];xlsx xls
+		// 2:人壽負利關人職員名單[T07_2];xlsx xls
+		// 3:金控利關人名單[T044];xlsx xls
+		// 4:以 FTP 檔案更新資料庫
+		int iFunctionCode = Integer.valueOf(titaVo.getParam("FunctionCode"));
+
+		if (iFunctionCode != 4) {
+			uploadFile(iFunctionCode, titaVo);
+		} else {
+			// 2023-08-21 Wei 新增 from SKL-IT 葛經理
+			MySpring.newTask("L7206p", this.txBuffer, titaVo);
+		}
+
+		this.addList(this.totaVo);
+		return this.sendList();
+
+	}
+
+	private void uploadFile(int iFunctionCode, TitaVo titaVo) throws LogicException {
 
 		if (titaVo.getParam("FILENA").trim().length() == 0) {
 			throw new LogicException(titaVo, "E0014", "沒有選擇檔案");
@@ -87,13 +110,6 @@ public class L7206 extends TradeBuffer {
 		ArrayList<String> dataLineList = new ArrayList<>();
 
 		titaVo.keepOrgDataBase();// 保留原本記號
-
-		// 上傳檔案
-		// 0:人壽利關人職員名單[LA$RLTP] ;csv xlsx xls
-		// 1:人壽利關人負責人名單[T07];xlsx xls
-		// 2:人壽負利關人職員名單[T07_2];xlsx xls
-		// 3:金控利關人名單[T044];xlsx xls
-		int iFunctionCode = Integer.valueOf(titaVo.getParam("FunctionCode"));
 
 		String iFunctionName = titaVo.getParam("FunctionCodeX").toString();
 
@@ -273,7 +289,7 @@ public class L7206 extends TradeBuffer {
 				sLifeRelHeadId.setRelId(iRelId);
 				sLifeRelHeadId.setBusId(iBusId);
 				sLifeRelHeadId.setAcDate(acDate);
-				
+
 				LifeRelHead sLifeRelHead = new LifeRelHead();
 				sLifeRelHead.setLifeRelHeadId(sLifeRelHeadId);
 				sLifeRelHead.setRelWithCompany(iRelWithCompany);
@@ -459,7 +475,7 @@ public class L7206 extends TradeBuffer {
 				sFinHoldRelId.setId(iId);
 				sFinHoldRelId.setAcDate(acDate);
 				sFinHoldRelId.setCompanyName(StringCut.stringMask(iCompanyName));
-				
+
 				FinHoldRel sFinHoldRel = new FinHoldRel();
 				sFinHoldRel.setFinHoldRelId(sFinHoldRelId);
 				sFinHoldRel.setName(StringCut.stringMask(iName));
@@ -511,10 +527,6 @@ public class L7206 extends TradeBuffer {
 
 		this.totaVo.putParam("CountAll", CountAll);
 		this.totaVo.putParam("Count", CountS);
-
-		this.addList(this.totaVo);
-		return this.sendList();
-
 	}
 
 	/**

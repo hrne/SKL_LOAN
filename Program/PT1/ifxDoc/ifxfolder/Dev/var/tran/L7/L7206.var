@@ -31,21 +31,9 @@ K(MODIFYBUTTON,執行)
 !---------- AP TEXT AREA Variables ----------
 #BUTTON_FLD=X,1,O,ui:button;value:瀏覽;enable:1;tabbable:1;file:true;multiple:true;fieldName:#FILENA;width:600
 
-
 #FdYear=X,2,L
 T(3,*)
 #FdBUTTON_FLD=X,2,L
-
-! 宣告按鈕事件
-#BIND_ABA=X,1,S
-BIND(#BUTTON_FLD,click)
-
-! 上傳欄名返回傳接收變數
-#FILENA=x,1000,S
-
-
-
-
 
 #RPTFG=A,1,S
 E(0,0)
@@ -60,7 +48,7 @@ D(7,2,#SYSDATE,1,0)
 T(4,DATE$)
 
 #FunctionCodeHelp=X,200,S
-T(3,0:人壽利關人職員名單[LA$RLTP];1:人壽利關人負責人名單[T07];2:人壽利關人職員名單[T07_2];3:金控利關人名單[T044])
+T(3,0:人壽利關人職員名單[LA$RLTP];1:人壽利關人負責人名單[T07];2:人壽利關人職員名單[T07_2];3:金控利關人名單[T044];4:以 FTP 檔案更新資料庫)
 
 ! 作業項目
 #FunctionCode=A,1,I
@@ -69,6 +57,15 @@ HELP(#FunctionCodeHelp)
 
 #FunctionCodeX=X,30,L
 T(H,#FunctionCode,#FunctionCodeHelp)
+
+! 宣告按鈕事件
+#BIND_ABA=A,1,S
+IF(#FunctionCode==4,E(0,0),E(0,1))
+INVOKEJS(SHOW,p1,2,2,#BIND_ABA)
+T(3,@FILENA,X)
+
+! 上傳欄名返回傳接收變數
+#FILENA=x,1000,S
 
 </sub>
 
