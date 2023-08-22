@@ -78,10 +78,6 @@ public class L3924 extends TradeBuffer {
 		// work area
 		ArrayList<CalcRepayIntVo> lCalcRepayIntVo = new ArrayList<CalcRepayIntVo>();
 		int wkTerms = 0;
-		int wkMons = 0;
-		int wkWeeks = 0;
-		int wkTotaCount = 0;
-		int wkSpecificDate;
 		BigDecimal oLoanBal = BigDecimal.ZERO;
 		int oIntStartDate = 9991231;
 		int oIntEndDate = 0;
@@ -151,6 +147,7 @@ public class L3924 extends TradeBuffer {
 
 			for (CalcRepayIntVo c : lCalcRepayIntVo) {
 				OccursList occursList = new OccursList();
+				oRate = c.getStoreRate(); // 計息最後一筆利率
 				oIntStartDate = c.getStartDate() < oIntStartDate ? c.getStartDate() : oIntStartDate;
 				oIntEndDate = c.getEndDate() > oIntEndDate ? c.getEndDate() : oIntEndDate;
 				occursList.putParam("OOFacmNo", tLoanBorMain.getFacmNo());
@@ -166,7 +163,6 @@ public class L3924 extends TradeBuffer {
 				occursList.putParam("OOLoanBal", c.getLoanBal());
 				// 將每筆資料放入Tota的OcList
 				this.totaVo.addOccursList(occursList);
-				wkTotaCount++;
 			}
 		}
 

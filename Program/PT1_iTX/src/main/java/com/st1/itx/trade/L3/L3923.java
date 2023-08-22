@@ -211,6 +211,7 @@ public class L3923 extends TradeBuffer {
 			this.info("   wkDueAmt      = " + wkDueAmt);
 			for (CalcRepayIntVo c : lCalcRepayIntVo) {
 				OccursList occursList = new OccursList();
+				oRate = c.getStoreRate(); // 計息最後一筆利率
 				oIntStartDate = c.getStartDate() < oIntStartDate ? c.getStartDate() : oIntStartDate;
 				oIntEndDate = c.getEndDate() > oIntEndDate ? c.getEndDate() : oIntEndDate;
 				occursList.putParam("OOFacmNo", ln.getFacmNo());

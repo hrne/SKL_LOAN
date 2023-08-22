@@ -1,6 +1,5 @@
 package com.st1.itx.trade.L7;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
@@ -12,7 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
@@ -147,7 +145,7 @@ public class L7206p extends TradeBuffer {
 
 				try {
 					lifeRelHeadService.insert(lifeRelHead, titaVo);
-				} catch (DBException e) {
+				} catch (Exception e) {
 					String errorMsg = " L7206 T07 寫入資料錯誤,列號:" + columns[0];
 					StringWriter errors = new StringWriter();
 					e.printStackTrace(new PrintWriter(errors));
@@ -181,7 +179,7 @@ public class L7206p extends TradeBuffer {
 
 				try {
 					lifeRelEmpService.insert(lifeRelEmp, titaVo);
-				} catch (DBException e) {
+				} catch (Exception e) {
 					String errorMsg = " L7206 T07_2 寫入資料錯誤,列號:" + columns[0];
 					StringWriter errors = new StringWriter();
 					e.printStackTrace(new PrintWriter(errors));
@@ -216,7 +214,7 @@ public class L7206p extends TradeBuffer {
 
 				try {
 					finHoldRelService.insert(finHoldRel, titaVo);
-				} catch (DBException e) {
+				} catch (Exception e) {
 					String errorMsg = " L7206 T044 寫入資料錯誤,第" + i + "筆";
 					StringWriter errors = new StringWriter();
 					e.printStackTrace(new PrintWriter(errors));
@@ -251,12 +249,12 @@ public class L7206p extends TradeBuffer {
 		return i;
 	}
 
-	private List<String> readFtpFiles(String fileName, TitaVo titaVo) throws LogicException {
+	private List<String> readFtpFiles(String fileName, TitaVo titaVo) {
 		this.info("readFtpFiles fileName = " + fileName);
 		List<String> dataLineList = new ArrayList<>();
 		try {
 			dataLineList = fileCom.intputTxt(fileName, "big5");
-		} catch (IOException e) {
+		} catch (Exception e) {
 			String errorMsg = " L7206 檔案不存在,請查驗路徑.\r\n" + fileName;
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));

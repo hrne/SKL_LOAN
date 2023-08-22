@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
@@ -16,8 +17,10 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.CustNotice;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.CustNoticeService;
 import com.st1.itx.db.service.springjpa.cm.L4721ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.CustNoticeCom;
@@ -55,6 +58,9 @@ public class L4721Batch extends TradeBuffer {
 
 	@Autowired
 	private CustMainService custMainService;
+
+	@Autowired
+	private CustNoticeService custNoticeService;
 
 	@Autowired
 	private TxToDoCom txToDoCom;
@@ -144,7 +150,6 @@ public class L4721Batch extends TradeBuffer {
 		String[] tmpKindItem = this.kindItem.split("、");
 
 		for (int txkind = 1; txkind <= 5; txkind++) {
-	
 
 			if (this.iTxKind == 0 || txkind == this.iTxKind) {
 				List<Map<String, String>> custList = new ArrayList<Map<String, String>>();
@@ -163,6 +168,11 @@ public class L4721Batch extends TradeBuffer {
 				if (custList != null) {
 
 					int cntTrans = 0;
+
+					String isEmail = "Y";
+					String isMsg = "Y";
+					String isLetter = "Y";
+
 					for (Map<String, String> data : custList) {
 
 						// 序號初始化
@@ -171,11 +181,37 @@ public class L4721Batch extends TradeBuffer {
 
 						try {
 
-							TempVo tempVo = new TempVo();
-							tempVo = custNoticeCom.getCustNotice("L4721", custNoTmp, 0, titaVo);
+//							TempVo tempVo = new TempVo();
+//							tempVo = custNoticeCom.getCustNotice("L4721", custNoTmp, 0, titaVo);
+
+							Slice<CustNotice> custNoticeSlice = custNoticeService.findCustNoFormNo(custNoTmp, "L4721",
+									0, Integer.MAX_VALUE, titaVo);
+
+							List<CustNotice> listCustNotice = custNoticeSlice == null ? null
+									: custNoticeSlice.getContent();
+
+							// 只要有任一額度的通知N 皆為N，預設Y
+							for (CustNotice r : listCustNotice) {
+								if ("N".equals(r.getEmailNotice())) {
+									isEmail = "N";
+								}
+
+								if ("N".equals(r.getMsgNotice())) {
+									isMsg = "N";
+								}
+
+								if ("N".equals(r.getPaperNotice())) {
+									isLetter = "N";
+								}
+							}
+
+							this.info("CustNo =" + custNoTmp);
+							this.info("isMsg =" + isMsg);
+							this.info("isEmail =" + isEmail);
+							this.info("isLetter =" + isLetter);
 
 							// 先判斷是否為email，才產表，最後才設定寄信
-							if ("Y".equals(tempVo.getParam("isEmail"))) {
+							if ("Y".equals(isEmail)) {
 								this.info("isEmailCust : " + custNoTmp);
 								this.info("isEmailLastCust : " + custNoLast);
 
@@ -198,20 +234,25 @@ public class L4721Batch extends TradeBuffer {
 
 								if (this.sno > 0) {
 
-									String noticeEmail = tempVo.getParam("EmailAddress");
+									CustMain tCustMain = custMainService.custNoFirst(custNoTmp, custNoTmp, titaVo);
+									if (tCustMain == null) {
+										continue;
+									}
+
+									String noticeEmail = tCustMain.getEmail();
 
 									setMailMFileVO(data, noticeEmail, titaVo);
 								}
 
 								// 書面通知
-							} else if ("Y".equals(tempVo.getParam("isLetter"))) {
+							} else if ("Y".equals(isLetter)) {
 								if (custNoTmp != custNoLast) {
 									CntPaper = CntPaper + 1;
 									letterCustList.add(data);
 								}
 
 								// 簡訊通知
-							} else if ("Y".equals(tempVo.getParam("isMessage"))) {
+							} else if ("Y".equals(isMsg)) {
 								setTextFileVO(titaVo, data);
 							}
 
@@ -370,10 +411,6 @@ public class L4721Batch extends TradeBuffer {
 			throws LogicException {
 
 		txToDoCom.setTxBuffer(this.getTxBuffer());
-
-		CustMain tCustMain = new CustMain();
-		tCustMain = custMainService.custNoFirst(parse.stringToInteger(tmpCustFacm.get("CustNo")),
-				parse.stringToInteger(tmpCustFacm.get("CustNo")), titaVo);
 
 		MailVo mailVo = new MailVo();
 		String processNote = mailVo.generateProcessNotes(noticeEmail, "利率調整通知", "親愛的客戶您好，新光人壽通知您，房貸利率調整，敬請留意帳戶餘額以利扣款。",

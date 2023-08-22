@@ -52,9 +52,9 @@ public class BSU03ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        , \"LMSAPN\"  ";
 		sql += "        , \"SOURCE\"  ";
 		sql += "        , CASE WHEN \"APLUAM\" < 600000 AND \"PRZCNT\" = 'N' THEN 1 ";
-		sql += "        ,      WHEN \"APLUAM\" >= 600000 AND \"PRZCNT\" = 'Y' THEN 2 ";
-		sql += "        ,      ELSE  3 ";
-		sql += "        , END          ";
+		sql += "               WHEN \"APLUAM\" >= 600000 AND \"PRZCNT\" = 'Y' THEN 2 ";
+		sql += "               ELSE  3 ";
+		sql += "          END          ";
 
 		this.info("sql=" + sql);
 

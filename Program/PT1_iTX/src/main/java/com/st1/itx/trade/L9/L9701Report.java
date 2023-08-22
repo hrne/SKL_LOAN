@@ -371,7 +371,7 @@ public class L9701Report extends MakeReport {
 
 	private void nextPage() {
 
-		if (this.NowRow - 8 >= 45) {
+		if (this.NowRow >= 45) {
 			this.print(1, this.getMidXAxis(), nextPageText, "C"); //
 			this.newPage();
 			this.print(1, 1, " "); //

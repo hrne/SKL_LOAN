@@ -3,6 +3,7 @@ package com.st1.itx.trade.BS;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -56,6 +57,8 @@ public class BSU03 extends TradeBuffer {
 
 	private List<Map<String, String>> adjustList = null;
 	private int iStartDate = 0;
+	private int iCustNoS = 0;
+	private int iCustNoE = 0;
 	private ArrayList<PfItDetail> lPfItDetailAdjust = new ArrayList<PfItDetail>();
 	private ArrayList<PfItDetail> lPfItDetail = new ArrayList<PfItDetail>();
 	private ArrayList<PfItDetail> lPfItDetailUpdate = new ArrayList<PfItDetail>();
@@ -65,7 +68,13 @@ public class BSU03 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active BSU03 ......");
 		String[] strAr = titaVo.getParam("Parm").split(",");
+		List<String> strList = Arrays.asList(strAr);
+		if (strList.size() < 3) {
+			throw new LogicException(titaVo, "E0000", "參數：EX.1101229,1,9999999( 業績起日, 起戶號, 止戶號)");
+		}
 		iStartDate = this.parse.stringToInteger(strAr[0]); // 業績起日
+		iCustNoS = this.parse.stringToInteger(strAr[1]); // 起戶號
+		iCustNoE = this.parse.stringToInteger(strAr[2]); // 止戶號
 		loadPfItDetail(titaVo);
 		updatePfItDetail(titaVo);
 		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", "已完成更新業績明細檔", titaVo);
@@ -89,23 +98,25 @@ public class BSU03 extends TradeBuffer {
 			return;
 		}
 		for (Map<String, String> d : adjustList) {
-			PfItDetail t = new PfItDetail();
-			t.setCustNo(parse.stringToInteger(d.get("CustNo")));
-			t.setFacmNo(parse.stringToInteger(d.get("FacmNo")));
-			t.setCntingCode(d.get("CntingCode"));
-			t.setDrawdownAmt(parse.stringToBigDecimal(d.get("DrawdownAmt")));
-			t.setPerfEqAmt(parse.stringToBigDecimal(d.get("PerfEqAmt")));
-			t.setPerfReward(parse.stringToBigDecimal(d.get("PerfReward")));
-			t.setPerfAmt(parse.stringToBigDecimal(d.get("PerfAmt")));
-			lPfItDetailAdjust.add(t);
+			int custNo = parse.stringToInteger(d.get("CustNo"));
+			if (custNo >= iCustNoS && custNo <= iCustNoE) {
+				PfItDetail t = new PfItDetail();
+				t.setCustNo(parse.stringToInteger(d.get("CustNo")));
+				t.setFacmNo(parse.stringToInteger(d.get("FacmNo")));
+				t.setCntingCode(d.get("CntingCode"));
+				t.setDrawdownAmt(parse.stringToBigDecimal(d.get("DrawdownAmt")));
+				t.setPerfEqAmt(parse.stringToBigDecimal(d.get("PerfEqAmt")));
+				t.setPerfReward(parse.stringToBigDecimal(d.get("PerfReward")));
+				t.setPerfAmt(parse.stringToBigDecimal(d.get("PerfAmt")));
+				lPfItDetailAdjust.add(t);
+			}
 		}
-
 		// 清除介紹人業績資料(除計件代碼已調整或已調整外)
 		Slice<PfItDetail> slItDetail = pfItDetailService.findByPerfDate(iStartDate + 19110000, 99991231, 0,
 				Integer.MAX_VALUE, titaVo);
 		if (slItDetail != null) {
 			for (PfItDetail it : slItDetail.getContent()) {
-				if (it.getRepayType() == 0) {
+				if (it.getCustNo() >= iCustNoS && it.getCustNo() <= iCustNoE && it.getRepayType() == 0) {
 					it.setCntingCode(""); // 是否計件
 					it.setPerfEqAmt(BigDecimal.ZERO); // 換算業績
 					it.setPerfReward(BigDecimal.ZERO); // 業務報酬
