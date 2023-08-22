@@ -1574,7 +1574,7 @@ public class L3420 extends TradeBuffer {
 				wkCloseNo = t2FacClose.getCloseNo() + 1;
 			}
 			tFacClose = new FacClose();
-			tFacClose.setFacCloseId(new FacCloseId(dDateUtil.getNowIntegerRoc(), wkCloseNo));
+			tFacClose.setFacCloseId(new FacCloseId(dDateUtil.getNowIntegerForBC(), wkCloseNo));
 			tFacClose.setCustNo(iCustNo);
 			tFacClose.setCloseNo(wkCloseNo);
 			tFacClose.setFacmNo(iFacmNo);

@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.mon;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,12 +22,13 @@ import com.st1.itx.db.domain.PfInsCheckId;
  */
 public interface PfInsCheckRepositoryMon extends JpaRepository<PfInsCheck, PfInsCheckId> {
 
-	// CheckWorkMonth= ,AND Kind=
-	public Slice<PfInsCheck> findAllByCheckWorkMonthIsAndKindIsOrderByCustNoAscFacmNoAsc(int checkWorkMonth_0, int kind_1, Pageable pageable);
+  // CheckWorkMonth= ,AND Kind=
+  public Slice<PfInsCheck> findAllByCheckWorkMonthIsAndKindIsOrderByCustNoAscFacmNoAsc(int checkWorkMonth_0, int kind_1, Pageable pageable);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<PfInsCheck> findByPfInsCheckId(PfInsCheckId pfInsCheckId);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<PfInsCheck> findByPfInsCheckId(PfInsCheckId pfInsCheckId);
 
 }
+

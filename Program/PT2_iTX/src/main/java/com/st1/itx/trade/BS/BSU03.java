@@ -148,6 +148,8 @@ public class BSU03 extends TradeBuffer {
 			} else {
 				this.info("add" + it.toString());
 			}
+			custNo = it.getCustNo();
+			facmNo = it.getFacmNo();
 		}
 
 		if (lPfItDetail.size() > 0) {
@@ -197,16 +199,14 @@ public class BSU03 extends TradeBuffer {
 				t.setPerfReward(BigDecimal.ZERO); // 業務報酬
 				t.setPerfAmt(BigDecimal.ZERO); // 業績金額
 			} else {
-				it.setPerfEqAmt(t.getPerfEqAmt().multiply(it.getDrawdownAmt()).divide(this.drawdownAmt).setScale(0,
-						RoundingMode.HALF_UP));
-				it.setPerfReward(t.getPerfReward().multiply(it.getDrawdownAmt()).divide(this.drawdownAmt).setScale(0,
-						RoundingMode.HALF_UP));
-				it.setPerfAmt(t.getPerfAmt().multiply(it.getDrawdownAmt()).divide(this.drawdownAmt).setScale(0,
-						RoundingMode.HALF_UP));
+				BigDecimal rate = it.getDrawdownAmt().divide(this.drawdownAmt, 5, RoundingMode.HALF_UP);
+				it.setPerfEqAmt(t.getPerfEqAmt().multiply(rate).setScale(0, RoundingMode.HALF_UP));
+				it.setPerfReward(t.getPerfReward().multiply(rate).setScale(0, RoundingMode.HALF_UP));
+				it.setPerfAmt(t.getPerfAmt().multiply(rate).setScale(0, RoundingMode.HALF_UP));
 				t.setDrawdownAmt(t.getDrawdownAmt().subtract(it.getDrawdownAmt()));
 				t.setPerfEqAmt(t.getPerfEqAmt().subtract(it.getPerfEqAmt()));
 				t.setPerfReward(t.getPerfReward().subtract(it.getPerfReward()));
-				t.setPerfAmt(t.getDrawdownAmt().subtract(it.getPerfAmt()));
+				t.setPerfAmt(t.getPerfAmt().subtract(it.getPerfAmt()));
 			}
 			this.info("computePf it=" + it.toString() + ", t=" + t.toString());
 		}

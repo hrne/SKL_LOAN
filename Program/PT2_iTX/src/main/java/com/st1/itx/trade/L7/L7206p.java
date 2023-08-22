@@ -9,6 +9,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
@@ -91,22 +92,67 @@ public class L7206p extends TradeBuffer {
 		this.info("acDate = " + acDate);
 
 		String t07FileName = ftpFolder + "T07_" + acDate + ".csv"; // 寫入 LifeRelHead
-		String t072FileName = ftpFolder + "T07_2" + acDate + ".csv"; // 寫入 LifeRelEmp
-		String t044FileName = ftpFolder + "T44_" + acDate + ".csv"; // 寫入 FinHoldRel
+		String t072FileName = ftpFolder + "T07_2_" + acDate + ".csv"; // 寫入 LifeRelEmp
+		String t044FileName = ftpFolder + "T044_" + acDate + ".csv"; // 寫入 FinHoldRel
 
 		List<String> t07List = readFtpFiles(t07FileName, titaVo);
 		if (!t07List.isEmpty()) {
+			deleteLifeRelHeadIfExist(acDate, titaVo);
 			moveAndInsertLifeRelHead(acDate, t07List, titaVo);
 		}
 
 		List<String> t072List = readFtpFiles(t072FileName, titaVo);
 		if (!t072List.isEmpty()) {
+			deleteLifeRelEmpIfExist(acDate, titaVo);
 			moveAndInsertLifeRelEmp(acDate, t072List, titaVo);
 		}
 
 		List<String> t044List = readFtpFiles(t044FileName, titaVo);
 		if (!t044List.isEmpty()) {
+			deleteFinHoldRelIfExist(acDate, titaVo);
 			moveAndInsertFinHoldRel(acDate, t044List, titaVo);
+		}
+	}
+
+	private void deleteFinHoldRelIfExist(int acDate, TitaVo titaVo) {
+		Slice<FinHoldRel> slice = finHoldRelService.findAcDate(acDate, 0, Integer.MAX_VALUE, titaVo);
+		if (slice != null && !slice.isEmpty()) {
+			try {
+				finHoldRelService.deleteAll(slice.toList(), titaVo);
+			} catch (Exception e) {
+				StringWriter errors = new StringWriter();
+				e.printStackTrace(new PrintWriter(errors));
+				this.error(errors.toString());
+				sendErrorMsg("E0008 刪除資料時發生錯誤", titaVo);
+			}
+		}
+	}
+
+	private void deleteLifeRelEmpIfExist(int acDate, TitaVo titaVo) {
+		Slice<LifeRelEmp> slice = lifeRelEmpService.findAcDate(acDate, 0, Integer.MAX_VALUE, titaVo);
+		if (slice != null && !slice.isEmpty()) {
+			try {
+				lifeRelEmpService.deleteAll(slice.toList(), titaVo);
+			} catch (Exception e) {
+				StringWriter errors = new StringWriter();
+				e.printStackTrace(new PrintWriter(errors));
+				this.error(errors.toString());
+				sendErrorMsg("E0008 刪除資料時發生錯誤", titaVo);
+			}
+		}
+	}
+
+	private void deleteLifeRelHeadIfExist(int acDate, TitaVo titaVo) {
+		Slice<LifeRelHead> slice = lifeRelHeadService.findAcDate(acDate, 0, Integer.MAX_VALUE, titaVo);
+		if (slice != null && !slice.isEmpty()) {
+			try {
+				lifeRelHeadService.deleteAll(slice.toList(), titaVo);
+			} catch (Exception e) {
+				StringWriter errors = new StringWriter();
+				e.printStackTrace(new PrintWriter(errors));
+				this.error(errors.toString());
+				sendErrorMsg("E0008 刪除資料時發生錯誤", titaVo);
+			}
 		}
 	}
 
@@ -253,7 +299,7 @@ public class L7206p extends TradeBuffer {
 		this.info("readFtpFiles fileName = " + fileName);
 		List<String> dataLineList = new ArrayList<>();
 		try {
-			dataLineList = fileCom.intputTxt(fileName, "big5");
+			dataLineList = fileCom.intputTxt(fileName, "UTF-8");
 		} catch (Exception e) {
 			String errorMsg = " L7206 檔案不存在,請查驗路徑.\r\n" + fileName;
 			StringWriter errors = new StringWriter();

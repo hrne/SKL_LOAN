@@ -27,13 +27,14 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	/**
-	 * 客戶往來本息明細表（撥款）
+	 * 客戶往來本息明細表
 	 * 
+	 * @param isCalcuExcessive 是否要計算累溢短收 
 	 * @param titaVo
 	 * @return
 	 * @throws Exception
 	 */
-	public List<Map<String, String>> doQuery1(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> doQuery1(boolean isCalcuExcessive,TitaVo titaVo) throws Exception {
 
 		String iCUSTNO = titaVo.get("CustNo");
 		String iTYPE = titaVo.get("DateType");
@@ -67,6 +68,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,T.\"TempAmt\"";// --暫收借
 		sql += "            ,T.\"Overflow\"";// --暫收貸
 		sql += "            ,T.\"ShortAmt\"";// --短繳                                              ";
+		sql += "            ,T.\"Excessive\"";// --累溢短收                                              ";
 		sql += "            ,T.\"DB\"";
 		sql += "            ,\"Fn_ParseEOL\"(C.\"CustName\",0) AS \"CustName\"";
 		sql += "            ,CASE ";
@@ -97,6 +99,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                            ELSE \"FeeAmt\" END )  AS \"FeeAmt\"";
 		sql += "                  ,SUM(CASE WHEN \"TitaHCode\" IN (2,4) THEN - \"UnpaidInterest\" - \"UnpaidPrincipal\" - \"UnpaidCloseBreach\" ";
 		sql += "                            ELSE \"UnpaidInterest\" + \"UnpaidPrincipal\" + \"UnpaidCloseBreach\" END) AS \"ShortAmt\"";
+		sql += "				  ,SUM(NVL(JSON_VALUE(\"OtherFields\",'$.Excessive'),0)) AS \"Excessive\""; 
 		sql += "                  ,\"Desc\"        ";
 		sql += "                  ,\"TxDescCode\"  ";
 		sql += "                  ,\"AcctCode\"    ";
@@ -122,7 +125,9 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		if (iHFG.equals("0")) {
-			sql += "          AND \"TitaHCode\" = 0";
+			if(!isCalcuExcessive) {
+				sql += "          AND \"TitaHCode\" = 0";
+			}
 		}
 		sql += "            GROUP BY \"CustNo\", \"FacmNo\", \"AcDate\", \"IntStartDate\", \"IntEndDate\", \"Rate\", ";
 		sql += "                     \"Desc\", \"TxDescCode\", \"AcctCode\", \"TitaTlrNo\",  \"TitaTxtNo\" ";
@@ -145,6 +150,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                  ,0    AS \"ShortAmt\"";
 		sql += "                  ,0    AS \"Overflow\"";
 		sql += "                  ,0    AS \"FeeAmt\"";
+		sql += "				  ,0    AS \"Excessive\"";
 		sql += "                  ,NULL AS \"Desc\" ";
 		sql += "                  ,NULL AS \"TxDescCode\" ";
 		sql += "                  ,NULL AS \"AcctCode\"   ";

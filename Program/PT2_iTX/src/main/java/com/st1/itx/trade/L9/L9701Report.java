@@ -120,7 +120,7 @@ public class L9701Report extends MakeReport {
 		this.print(1, 5, "入帳日期");
 		this.print(0, 14, "繳款方式");
 		this.print(0, 26, "交易內容", "C");
-		this.print(0, 35, "計息本金");
+		this.print(0, 35, "放款金額");
 		this.print(0, 48, "計息期間");
 		this.print(0, 62, "利率");
 		this.print(0, 72, "交易金額");
@@ -142,7 +142,7 @@ public class L9701Report extends MakeReport {
 		this.print(1, 5, "入帳日期");
 		this.print(0, 14, "繳款方式");
 		this.print(0, 26, "交易內容", "C");
-		this.print(0, 35, "計息本金");
+		this.print(0, 35, "放款金額");
 		this.print(0, 48, "計息期間");
 		this.print(0, 62, "利率");
 		this.print(0, 72, "交易金額");
@@ -177,7 +177,7 @@ public class L9701Report extends MakeReport {
 		List<Map<String, String>> listL9701 = null;
 
 		try {
-			listL9701 = l9701ServiceImpl.doQuery1(titaVo);
+			listL9701 = l9701ServiceImpl.doQuery1(false, titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -262,7 +262,7 @@ public class L9701Report extends MakeReport {
 						isFirst = false;
 					}
 					if (tL9701Vo.get("DB").equals("2")) {
-						printFacEnd(tL9701Vo, listBaTxVo);
+						printFacEnd(this.facmNo);
 						detailCounts = 0;
 						isFirst = true;
 					}
@@ -292,7 +292,7 @@ public class L9701Report extends MakeReport {
 
 		// 交易內容
 		this.print(0, 26, tL9701Vo.get("Desc"), "C");
-		// 計息本金
+		// 放款金額
 		if (!"0".equals(tL9701Vo.get("Amount"))) {
 			this.print(0, 43, formatAmt(tL9701Vo.get("Amount"), 0), "R");
 		}
@@ -332,22 +332,39 @@ public class L9701Report extends MakeReport {
 		feeAmtTotal = feeAmtTotal.add(feeAmt);
 	}
 
-	private void printFacEnd(Map<String, String> tL9701Vo, List<BaTxVo> listBaTxVo) {
-		shortFall = BigDecimal.ZERO;
+	private void printFacEnd(String facmNo) {
+//		shortFall = BigDecimal.ZERO;
 		excessive = BigDecimal.ZERO;
 
-		int tmpFacmNo = Integer.parseInt(tL9701Vo.get("FacmNo"));
-		loanBal = new BigDecimal(tL9701Vo.get("Amount"));
-		if (listBaTxVo != null && listBaTxVo.size() != 0) {
-			for (BaTxVo tBaTxVo : listBaTxVo) {
-				if (tBaTxVo.getFacmNo() == tmpFacmNo) {
-					if (tBaTxVo.getDataKind() == 1 && tBaTxVo.getRepayType() == 1) {
-						shortFall = shortFall.add(tBaTxVo.getUnPaidAmt());
-					}
-					if (tBaTxVo.getDataKind() == 3) {
-						excessive = excessive.add(tBaTxVo.getUnPaidAmt());
-					}
-				}
+//		int tmpFacmNo = Integer.parseInt(tL9701Vo.get("FacmNo"));
+//		loanBal = new BigDecimal(tL9701Vo.get("Amount"));
+//		if (listBaTxVo != null && listBaTxVo.size() != 0) {
+//			for (BaTxVo tBaTxVo : listBaTxVo) {
+//				if (tBaTxVo.getFacmNo() == tmpFacmNo) {
+//					if (tBaTxVo.getDataKind() == 1 && tBaTxVo.getRepayType() == 1) {
+//						shortFall = shortFall.add(tBaTxVo.getUnPaidAmt());
+//					}
+//					if (tBaTxVo.getDataKind() == 3) {
+//						excessive = excessive.add(tBaTxVo.getUnPaidAmt());
+//					}
+//				}
+//			}
+//		}
+
+		List<Map<String, String>> listL9701 = null;
+
+		try {
+			listL9701 = l9701ServiceImpl.doQuery1(true, titaVo);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("L9701ServiceImpl.LoanBorTx error = " + errors.toString());
+		}
+
+		// 計算累溢短收
+		for (Map<String, String> tL9701Vo : listL9701) {
+			if (facmNo.equals(tL9701Vo.get("FacmNo"))) {
+				excessive = excessive.add(getBigDecimal(tL9701Vo.get("Excessive")));
 			}
 		}
 
@@ -356,7 +373,8 @@ public class L9701Report extends MakeReport {
 		this.print(1, 9, "至" + showRocDate(entday, 1) + " 當日餘額：");
 		this.print(0, 43, formatAmt(loanBal, 0), "R"); // 放款餘額
 		this.print(0, 52, "累溢短收：");
-		this.print(0, 72, formatAmt(excessive.subtract(shortFall), 0), "R"); // 累溢短收
+//		this.print(0, 72, formatAmt(excessive.subtract(shortFall), 0), "R"); // 累溢短收
+		this.print(0, 72, formatAmt(excessive, 0), "R"); // 累溢短收
 		this.print(0, 74, "小計：");
 		this.print(0, 93, formatAmt(principalTotal, 0), "R");
 		this.print(0, 103, formatAmt(interestTotal, 0), "R");

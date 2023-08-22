@@ -191,20 +191,27 @@ public class L4721Batch extends TradeBuffer {
 									: custNoticeSlice.getContent();
 
 							// 只要有任一額度的通知N 皆為N，預設Y
-							for (CustNotice r : listCustNotice) {
-								if ("N".equals(r.getEmailNotice())) {
-									isEmail = "N";
-								}
+							// 沒有申請表示都要通知
+							if (listCustNotice == null) {
+								isEmail = "Y";
+								isMsg = "Y";
+								isLetter = "Y";
 
-								if ("N".equals(r.getMsgNotice())) {
-									isMsg = "N";
-								}
+							} else {
+								for (CustNotice r : listCustNotice) {
+									if ("N".equals(r.getEmailNotice())) {
+										isEmail = "N";
+									}
 
-								if ("N".equals(r.getPaperNotice())) {
-									isLetter = "N";
+									if ("N".equals(r.getMsgNotice())) {
+										isMsg = "N";
+									}
+
+									if ("N".equals(r.getPaperNotice())) {
+										isLetter = "N";
+									}
 								}
 							}
-
 							this.info("CustNo =" + custNoTmp);
 							this.info("isMsg =" + isMsg);
 							this.info("isEmail =" + isEmail);

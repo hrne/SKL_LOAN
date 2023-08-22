@@ -69,7 +69,7 @@ public class L5959 extends TradeBuffer {
 				checkVo = checkInsurance.checkInsurance(titaVo, checkVo);
 			} else {
 				checkVo.setSuccess(true);
-				checkVo.setMsgRs(pfInsCheck.getReturnMsg());
+				checkVo.setMsgRs(pfInsCheck.getReturnMsg() + pfInsCheck.getReturnMsg2() + pfInsCheck.getReturnMsg3());
 				checkVo = checkInsurance.parseXml(checkVo);
 			}
 		}

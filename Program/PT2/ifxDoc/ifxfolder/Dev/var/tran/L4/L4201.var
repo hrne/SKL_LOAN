@@ -72,9 +72,9 @@ R(1,XXR99)
 CALL(#HelpProc)
 T(2,@RepayTypeHelp,#HelpDesc1)
 T(2,@ProcStsCodeHelp,#HelpDesc2)
+T(HELP,@ProcStsCodeHelp,#ProcStsCodeHelp,-,A;D;R;S;T)
 T(2,@ProcCodeHelp,#HelpDesc3)
 T(2,@BankCdHelp,#HelpDesc4)
-
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
@@ -97,23 +97,12 @@ T(1,@ProcCode,#NTXBUF,85,5)
 T(1,@ProcDscptCode,#NTXBUF,90,300)
 T(1,@TxSn,#NTXBUF,394,14)
 T(1,@FacmNoA,#NTXBUF,408,3)
-! T(1,@AcDate,#NTXBUF,1,7)
-! T(1,@BatchNo,#NTXBUF,8,6)
-! T(1,@DetailSeq,#NTXBUF,14,6)
-! T(1,@CustNo,#NTXBUF,20,7)
-! T(1,@RepayType,#NTXBUF,27,2)
-! T(1,@RepayAmtX,#NTXBUF,29,18)
-! T(1,@AcctAmtX,#NTXBUF,47,18)
-! T(1,@DisacctAmtX,#NTXBUF,65,18)
-! T(1,@ProcStsCode,#NTXBUF,83,1)
-! T(1,@ProcStsCodeTemp,#NTXBUF,83,1)
-! T(1,@ProcCode,#NTXBUF,84,5)
-! T(1,@ProcDscptCode,#NTXBUF,89,300)
-! T(1,@TxSn,#NTXBUF,393,14)
-! T(1,@FacmNoA,#NTXBUF,407,3)
-
 INVOKEJS(SHOW,p1,02,02,1)
-IF(#ProcStsCodeTemp == 4 || #ProcStsCodeTemp == 3 || #ProcStsCodeTemp == 2 || #ProcStsCodeTemp == 1 || #ProcStsCodeTemp == 0,T(F,@ProcStsCode,1),T(F,@ProcStsCode,0))
+IF(#ProcStsCodeTemp == 4 ||
+    #ProcStsCodeTemp == 3 || 
+    #ProcStsCodeTemp == 2 || 
+    #ProcStsCodeTemp == 1 || 
+    #ProcStsCodeTemp == 0,T(F,@ProcStsCode,1),T(F,@ProcStsCode,0))
 
 #RepayAmtX=X,18,S
 #AcctAmtX=X,18,S
@@ -135,7 +124,6 @@ IF(#FuncCode==1 || #FuncCode==2 || #FuncCode==3,E(0,1),E(0,0))
 #BatchNo=X,6,L
 !明細序號
 #DetailSeq=A,6,L
-
 
 #RimFunCode=A,1,S
 
@@ -160,11 +148,9 @@ T(2,@ProcDscptCode,#L4r35ProcDscptCode)
 T(2,@TxSn,#L4r35TxSn)
 E(0,@FacmNoA,#L4r35FacmNoA)
 
-
 !戶號
 #CustNo=A,7,L
 E(0,@RimEntryCode,2)
-
 
 #RimCustId=X,10,S
 
@@ -184,7 +170,6 @@ T(2,@CustName,#L4r02CustName)
 
 !戶名
 #CustName=X,60,L
-
 
 ! 會計日期
 #RimAcDate=D,7,S
@@ -214,25 +199,10 @@ T(2,@TitaTlrNo,#L4r04TitaTlrNo)
 T(2,@TitaTxtNo,#L4r04TitaTxtNo)
 
 #RepayType=A,2,L
-!HELP(01:期款;
-!     02:部分償還;
-!     03:結案;
-!     04:帳管費;
-!     05:火險費;
-!     06:契變手續費;
-!     07:法務費;
-!     09:其他)
+
 #RepayTypeX=X,10,L
 T(3,)T(H,#RepayType,#RepayTypeHelp)
-!SWITCH(#RepayType,01,T(3,期款),
-!                  02,T(3,部分償還),
-!                  03,T(3,結案),
-!                  04,T(3,帳管費),
-!                  05,T(3,火險費),
-!                  06,T(3,契變手續費),
-!                  07,T(3,法務費),
-!                  09,T(3,其他),
-!                  T(3, ))
+
 !還款金額
 #RepayAmt=m,14,L
 !已作帳金額
@@ -250,22 +220,21 @@ IF(#RepayAmt < 0,T(F,@ProcStsCode,0),T(F,@ProcStsCode,1))
 IF(#RepayAmt >= 0,$,s)
 IF(#ProcStsCode == 4 || #ProcStsCode == 3 || #ProcStsCode == 2 || #ProcStsCode == 1 || #ProcStsCode == 0,$,s)
 @
-C(3,#ProcStsCode,1,T(F,@CustNoA,0)T(F,@FacmNoA,0)T(F,@RepayTypeA,0),T(F,@CustNoA,1)T(F,@FacmNoA,1)T(F,@RepayTypeA,1))
-IF(#ProcStsCodeTemp == #ProcStsCode,s,IF(#ProcStsCodeTemp == 4 ,V(1,0,1),IF(#ProcStsCodeTemp == 3,V(1,1),IF(#ProcStsCodeTemp == 2,V(1,0,1),IF(#ProcStsCodeTemp == 0,V(1,1,2),V(1,0))))))
+C(5,#ProcStsCodeTemp,#ProcStsCode,s,C(5,#ProcStsCodeTemp,4,V(1,0,1),C(5,#ProcStsCodeTemp,3,V(1,1),C(5,#ProcStsCodeTemp,2,V(1,0,1),C(5,#ProcStsCodeTemp,0,V(1,1,2),V(1,0))))))
+! IF(#ProcStsCodeTemp == #ProcStsCode,s,IF(#ProcStsCodeTemp == 4 ,V(1,0,1),IF(#ProcStsCodeTemp == 3,V(1,1),IF(#ProcStsCodeTemp == 2,V(1,0,1),IF(#ProcStsCodeTemp == 0,V(1,1,2),V(1,0))))))
+
+
 
 #ProcStsCodeX=X,10,L
 T(3,)T(H,#ProcStsCode,#ProcStsCodeHelp)
-!SWITCH(#ProcStsCode,0,T(3,未檢核),
-!                 1,T(3,不處理),
-!                 2,T(3,人工處理),
-!                 3,T(3,檢核錯誤),
-!                 4,T(3,檢核正常),
-!                 5,T(3,人工入帳),
-!                 6,T(3,批次入帳),
-!                 7,T(3,虛擬暫收),
-!                 A,T(3,全部),
-!                 B,T(3,扣除不處理),
-!                 C,T(3,未入帳))
+@
+C(3,#ProcStsCode,1,T(F,@CustNoA,0)T(F,@FacmNoA,0)T(F,@RepayTypeA,0),T(F,@CustNoA,1)T(F,@FacmNoA,1)T(F,@RepayTypeA,1))
+C(5,#ProcStsCodeTemp,4,C(5,#ProcStsCode,0,s,C(5,#ProcStsCode,1,s,V(P,只可選擇0或1))),$)
+C(5,#ProcStsCodeTemp,3,C(5,#ProcStsCode,1,s,V(P,只可選擇1)),$)
+C(5,#ProcStsCodeTemp,2,C(5,#ProcStsCode,0,s,C(5,#ProcStsCode,1,s,V(P,只可選擇0或1))),$)
+C(5,#ProcStsCodeTemp,1,C(5,#ProcStsCode,0,s,V(P,只可選擇0)),$)
+C(5,#ProcStsCodeTemp,0,C(5,#ProcStsCode,1,s,C(5,#ProcStsCode,2,s,V(P,只可選擇1或2))),$)
+
 !處理說明
 #ProcCode=X,5,L
 #ProcCodeX=X,22,L

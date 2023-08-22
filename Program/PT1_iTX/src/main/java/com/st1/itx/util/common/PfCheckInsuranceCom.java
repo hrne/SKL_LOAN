@@ -147,7 +147,19 @@ public class PfCheckInsuranceCom extends TradeBuffer {
 		tPfInsCheck.setInsNo(insNo);// 保單號碼
 		tPfInsCheck.setCheckResult(checkResult); // 檢核結果(Y/N)
 		tPfInsCheck.setCheckWorkMonth(iCheckWorkMonth); // 檢核工作月
-		tPfInsCheck.setReturnMsg(returnMsg); // 回應訊息
+		tPfInsCheck.setReturnMsg(returnMsg.length() > 2000 ? returnMsg.substring(0, 2000) : returnMsg); // 回應訊息
+		if (returnMsg.length() > 2000) {
+			tPfInsCheck.setReturnMsg2(returnMsg.length() > 4000 ? returnMsg.substring(2000, 4000)
+					: returnMsg.substring(2000, returnMsg.length())); // 回應訊息
+			if (returnMsg.length() > 4000) {
+				tPfInsCheck.setReturnMsg3(returnMsg.length() > 6000 ? returnMsg.substring(4000, 6000)
+						: returnMsg.substring(4000, returnMsg.length())); // 回應訊息
+			}
+			if (returnMsg.length() > 6000) {
+				this.info("returnMsg Drop length = " + returnMsg.length());
+			}
+
+		}
 
 		// 更新房貸獎勵保費檢核檔
 		if (isInsert) {
