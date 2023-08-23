@@ -168,7 +168,7 @@ public class L4721Batch extends TradeBuffer {
 				if (custList != null) {
 
 					int cntTrans = 0;
-
+					
 					String isEmail = "Y";
 					String isMsg = "Y";
 					String isLetter = "Y";
@@ -190,8 +190,8 @@ public class L4721Batch extends TradeBuffer {
 							List<CustNotice> listCustNotice = custNoticeSlice == null ? null
 									: custNoticeSlice.getContent();
 
-							// 只要有任一額度的通知N 皆為N，預設Y
-							// 沒有申請表示都要通知
+							// 此預設Y為要印、要寄
+							// 或者 沒有申請 表示都要通知 設定為Y
 							if (listCustNotice == null) {
 								isEmail = "Y";
 								isMsg = "Y";
@@ -199,15 +199,18 @@ public class L4721Batch extends TradeBuffer {
 
 							} else {
 								for (CustNotice r : listCustNotice) {
-									if ("N".equals(r.getEmailNotice())) {
+									
+									//*在資料庫的Y視為有申請 不寄送、不發送簡訊Email
+									if ("Y".equals(r.getEmailNotice())) {
+										//有申請表是不要，須改為N
 										isEmail = "N";
 									}
 
-									if ("N".equals(r.getMsgNotice())) {
+									if ("Y".equals(r.getMsgNotice())) {
 										isMsg = "N";
 									}
 
-									if ("N".equals(r.getPaperNotice())) {
+									if ("Y".equals(r.getPaperNotice())) {
 										isLetter = "N";
 									}
 								}
@@ -251,15 +254,20 @@ public class L4721Batch extends TradeBuffer {
 									setMailMFileVO(data, noticeEmail, titaVo);
 								}
 
-								// 書面通知
-							} else if ("Y".equals(isLetter)) {
+							}  
+							
+							
+							// 書面通知
+							if ("Y".equals(isLetter)) {
 								if (custNoTmp != custNoLast) {
 									CntPaper = CntPaper + 1;
 									letterCustList.add(data);
 								}
 
-								// 簡訊通知
-							} else if ("Y".equals(isMsg)) {
+							}
+							
+							// 簡訊通知
+							if ("Y".equals(isMsg)) {
 								setTextFileVO(titaVo, data);
 							}
 

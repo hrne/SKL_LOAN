@@ -45,7 +45,10 @@ public class LM048p extends TradeBuffer {
 
 		lM048Report.setParentTranCode(parentTranCode);
 
-		lM048Report.exec(titaVo);
+		// 西元月底日
+		int mfbsdy = this.txBuffer.getTxCom().getMfbsdyf();
+		
+		lM048Report.exec(mfbsdy,titaVo);
 
 		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
 				txcd + txName + "已完成", titaVo);

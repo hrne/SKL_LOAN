@@ -138,7 +138,7 @@ C(3,#ClsFg,0,E(0,#L6R27BatNo+1),E(0,#L6R27BatNo))
 
 !上傳核心序號 ! 02支票繳款/09放款 關帳時＋１ , 上傳核心序號都是更新在 09 那筆
 #CoreSeqNo=A,3,L
-C(3,#SecNo,9,$,S))
+!C(3,#SecNo,9,$,S))
 @C(3,#ClsFg,1,E(0,#L6R27CoreSeqNo+1),S))
 
 

@@ -472,8 +472,8 @@ public class L5103 extends TradeBuffer {
 	/*---------- 主管放行時email通知 管理人/借閱人 ----------*/
 	public void processEmail(InnDocRecord tInnDocRecord, TitaVo titaVo) throws LogicException {
 		this.info("processEmail");
-		String subject1 = "新貸中系統-文件調閱通知 ";
-		String subject2 = "新貸中系統-文件調閱完成通知 ";
+		String subject1 = "放款帳務系統-文件調閱通知 ";
+		String subject2 = "放款帳務系統-文件調閱完成通知 ";
 
 		String bodyText = "";
 		String applemail = "";
@@ -525,7 +525,7 @@ public class L5103 extends TradeBuffer {
 			String createDate = DbDateToRocDate(tInnDocRecord.getCreateDate().toString());
 			String createTime = new SimpleDateFormat("HH:mm:ss").format(tInnDocRecord.getCreateDate());
 
-			bodyText += "【新貸中系統】文件調閱，敬請協助後續處理。<br>";
+			bodyText += "【放款帳務系統】文件調閱，敬請協助後續處理。<br>";
 			bodyText += "申請時間：" + createDate + " " + createTime.substring(0, 5) + "<br>";
 			bodyText += "戶號：" + tInnDocRecord.getCustNo() + "<br>";
 			bodyText += "借戶：" + custname + "<br>";
@@ -539,7 +539,7 @@ public class L5103 extends TradeBuffer {
 		// 若為管理人主管放行,則通知借閱人
 		if (titaVo.getActFgI() == 4 && !"".equals(applemail.trim())) {
 			this.info("tCdEmp.getEmail()=" + applemail.trim());
-			bodyText += "【新貸中系統】調閱文件已備妥，請盡速領取。";
+			bodyText += "【放款帳務系統】調閱文件已備妥，請盡速領取。";
 			this.info("subject2=" + subject2 + " ,bodyText=" + bodyText);
 			mailService.setParams(applemail, subject2, bodyText);
 			mailService.exec();

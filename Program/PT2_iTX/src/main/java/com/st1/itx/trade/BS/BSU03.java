@@ -75,6 +75,9 @@ public class BSU03 extends TradeBuffer {
 		iStartDate = this.parse.stringToInteger(strAr[0]); // 業績起日
 		iCustNoS = this.parse.stringToInteger(strAr[1]); // 起戶號
 		iCustNoE = this.parse.stringToInteger(strAr[2]); // 止戶號
+		if (iCustNoS == 0 && iCustNoE == 0) {
+			iCustNoE = 9999999;
+		}
 		loadPfItDetail(titaVo);
 		updatePfItDetail(titaVo);
 		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", "已完成更新業績明細檔", titaVo);
@@ -108,6 +111,7 @@ public class BSU03 extends TradeBuffer {
 				t.setPerfEqAmt(parse.stringToBigDecimal(d.get("PerfEqAmt")));
 				t.setPerfReward(parse.stringToBigDecimal(d.get("PerfReward")));
 				t.setPerfAmt(parse.stringToBigDecimal(d.get("PerfAmt")));
+				t.setIntroducer(d.get("Introducer"));
 				lPfItDetailAdjust.add(t);
 			}
 		}
@@ -190,6 +194,7 @@ public class BSU03 extends TradeBuffer {
 		this.info("computePf ... this.drawdownAmt=" + this.drawdownAmt + ", t=" + t.toString());
 		for (PfItDetail it : lPfItDetailUpate) {
 			it.setCntingCode(t.getCntingCode()); // 是否計件
+			it.setIntroducer(t.getIntroducer()); // 介紹人
 			if (it.getDrawdownAmt().compareTo(t.getDrawdownAmt()) == 0) {
 				it.setPerfEqAmt(t.getPerfEqAmt()); // 換算業績
 				it.setPerfReward(t.getPerfReward()); // 業務報酬

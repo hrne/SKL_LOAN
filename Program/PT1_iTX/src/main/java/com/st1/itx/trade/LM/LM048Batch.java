@@ -1,6 +1,5 @@
 package com.st1.itx.trade.LM;
 
-
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -37,7 +36,7 @@ public class LM048Batch extends BatchBase implements Tasklet, InitializingBean {
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		lM048Report.setParentTranCode(this.getParent());
-		return this.exec(contribution, "D", chunkContext);
+		return this.exec(contribution, "D");
 	}
 
 	@Override
@@ -48,9 +47,11 @@ public class LM048Batch extends BatchBase implements Tasklet, InitializingBean {
 
 		int entLoanBalLimit = 0;
 
+		int mfbsdy = this.txBuffer.getTxCom().getMfbsdyf();
+
 		titaVo.putParam("YearMonth", inputYearMonth);
 		titaVo.putParam("EntLoanBalLimit", entLoanBalLimit);
 
-		lM048Report.exec(titaVo);
+		lM048Report.exec(mfbsdy, titaVo);
 	}
 }

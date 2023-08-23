@@ -84,24 +84,6 @@ public class L5500Batch extends TradeBuffer {
 	@Autowired
 	private WebClient webClient;
 
-	/**
-	 * 三階放款明細統計（T9410051）
-	 */
-	@Autowired
-	private L9744Batch l9744Batch;
-
-	/**
-	 * 放款專員明細統計（T9410052）
-	 */
-	@Autowired
-	private L9745Batch l9745Batch;
-
-	/**
-	 * 介紹人換算業績報酬檢核表
-	 */
-	@Autowired
-	private L9746Batch l9746Batch;
-
 	private int entday;
 	private int bworkmonth = 0;
 	private String bworkmonthX = "";
@@ -117,9 +99,9 @@ public class L5500Batch extends TradeBuffer {
 		this.totaVo.init(titaVo);
 		if (titaVo.get("WorkDate") == null || titaVo.get("WorkDate").isEmpty()) {
 			if (titaVo.getEntDyI() > 0) {
-				titaVo.putParam("WorkDate", titaVo.getEntDyI());
+				titaVo.putParam("WorkDate", titaVo.getEntDyI());//經辦啟動-挑選業績日期資料大於等於會計日
 			} else {
-				titaVo.putParam("WorkDate", dateUtil.getNowIntegerRoc());
+				titaVo.putParam("WorkDate", dateUtil.getNowIntegerRoc());//schedule啟動-挑選業績日期資料大於等於日曆日
 			}
 		}
 		entday = Integer.valueOf(titaVo.getParam("WorkDate")) + 19110000;
@@ -164,13 +146,6 @@ public class L5500Batch extends TradeBuffer {
 
 		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", msg, titaVo);
 
-		l9744Batch.setTxBuffer(this.getTxBuffer());
-		l9745Batch.setTxBuffer(this.getTxBuffer());
-		l9746Batch.setTxBuffer(this.getTxBuffer());
-
-		l9744Batch.run(titaVo);
-		l9745Batch.run(titaVo);
-		l9746Batch.run(titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

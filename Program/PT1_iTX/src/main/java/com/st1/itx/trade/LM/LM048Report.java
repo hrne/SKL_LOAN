@@ -152,7 +152,7 @@ public class LM048Report extends MakeReport {
 
 	}
 
-	public void exec(TitaVo titaVo) throws LogicException {
+	public void exec(int mfbsdy,TitaVo titaVo) throws LogicException {
 
 		thousand = new BigDecimal("1000");
 
@@ -162,9 +162,6 @@ public class LM048Report extends MakeReport {
 		int inputYearMonth = Integer.parseInt(titaVo.getParam("YearMonth")) + 191100;
 
 		String entLoanBalLimit = titaVo.getParam("EntLoanBalLimit");
-
-		// 西元月底日
-		int mfbsdy = this.txBuffer.getTxCom().getMfbsdyf();
 
 		List<InnFundApl> lInnFundApl = new ArrayList<InnFundApl>();
 		// 先取得淨值

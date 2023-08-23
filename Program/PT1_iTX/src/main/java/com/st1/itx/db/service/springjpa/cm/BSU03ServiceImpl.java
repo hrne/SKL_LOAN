@@ -40,6 +40,7 @@ public class BSU03ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , \"TACTAMT\"              AS  \"PerfAmt\" ";
 		sql += "      , \"YAG3LV\"               AS  \"PerfEqAmt\" ";
 		sql += "      , \"PAY3LV\"               AS  \"PerfReward\" ";
+		sql += "      , \"CUSEMP\"               AS  \"Introducer\" ";
 		sql += " FROM \"TMPQQQP\" ";
 //		sql += " GROUP BY \"LMSACN\"  ";
 //		sql += "        , \"LMSAPN\"  ";

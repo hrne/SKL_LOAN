@@ -27,7 +27,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L6R27 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6R27.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -43,14 +42,26 @@ public class L6R27 extends TradeBuffer {
 		// 取得輸入資料
 		String iRimSecNo = titaVo.getParam("RimSecNo");
 		int clsFg = 0;
+		int coreSeqNo = 0;
 
 		// 查詢會計業務關帳控制檔
 		AcCloseId tAcCloseId = new AcCloseId();
 		tAcCloseId.setAcDate((this.txBuffer.getTxCom().getTbsdy()));
 		tAcCloseId.setBranchNo(titaVo.getAcbrNo());
-		tAcCloseId.setSecNo(iRimSecNo); // 業務類別: 01-撥款匯款 02-支票繳款 03-債協 09-放款
+		tAcCloseId.setSecNo("09"); // 業務類別: 01-撥款匯款 02-支票繳款 03-債協 09-放款
 		AcClose tAcClose = AcCloseService.findById(tAcCloseId, titaVo);
+		if (tAcClose != null) {
+			coreSeqNo = tAcClose.getCoreSeqNo();
+		}
 
+		// 查詢會計業務關帳控制檔
+		if (!iRimSecNo.equals("09")) {
+			tAcCloseId = new AcCloseId();
+			tAcCloseId.setAcDate((this.txBuffer.getTxCom().getTbsdy()));
+			tAcCloseId.setBranchNo(titaVo.getAcbrNo());
+			tAcCloseId.setSecNo(iRimSecNo); // 業務類別: 01-撥款匯款 02-支票繳款 03-債協 09-放款
+			tAcClose = AcCloseService.findById(tAcCloseId, titaVo);
+		}
 		if (tAcClose == null) {
 			throw new LogicException(titaVo, "E0001", "會計業務關帳控制檔"); // 查無資料
 		}
@@ -59,7 +70,7 @@ public class L6R27 extends TradeBuffer {
 		this.totaVo.putParam("L6R27SecNo", tAcClose.getSecNo());
 		this.totaVo.putParam("L6R27ClsNo", tAcClose.getClsNo());
 		this.totaVo.putParam("L6R27SlipNo", tAcClose.getSlipNo());
-		this.totaVo.putParam("L6R27CoreSeqNo", tAcClose.getCoreSeqNo());
+		this.totaVo.putParam("L6R27CoreSeqNo", coreSeqNo);
 
 		// 傳票批號 , 02:支票繳款時固定為11
 		if ("02".equals(iRimSecNo)) {

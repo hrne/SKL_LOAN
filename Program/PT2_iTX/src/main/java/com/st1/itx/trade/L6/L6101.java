@@ -569,6 +569,9 @@ public class L6101 extends TradeBuffer {
 			if ("09".equals(uSecNo) && tAcClose.getClsNo() == 10) {
 				tAcClose.setClsNo(11);
 			}
+			if("02".equals(uSecNo)) {//關帳時使用畫面上傳序號
+				tAcClose.setCoreSeqNo(iCoreSeqNo);
+			}
 		}
 
 		if (uClsFg == 2) {
@@ -646,7 +649,7 @@ public class L6101 extends TradeBuffer {
 
 		// 只更新特定筆(09:放款)預設為000，產生上傳媒體(02:支票繳款，09:放款)關帳時＋１
 		if (uClsFg == 1) {
-			tAcClose.setCoreSeqNo(tAcClose.getCoreSeqNo() + 1);
+			tAcClose.setCoreSeqNo(iCoreSeqNo);
 		}
 
 		try {
@@ -692,8 +695,8 @@ public class L6101 extends TradeBuffer {
 		} else if ("02".equals(uSecNo)) {
 			this.info("02=exec L9130、L9131、L9132、L9132A、L9132B、L9132C");
 
-			l9130Report.exec(titaVo);
-			// l9130Report2022.exec(titaVo);//2023/5/2點掉,文齡經理:支票使用舊格式媒體檔
+			//l9130Report.exec(titaVo);//20230816例會:支票關帳也改EBS上傳傳票媒體檔
+			l9130Report2022.exec(titaVo);
 			l9131Report.exec(titaVo);
 			l9131Report.close();
 			l9132Report.exec(titaVo);
@@ -764,8 +767,8 @@ public class L6101 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0015", "會計業務關帳控制檔 業務類別:" + iSecNo); // 檢查錯誤
 		}
 
-		// L7400 總帳傳票資料傳輸(只有放款，支票使用人工上傳)相關處理
-		if ("09".equals(iSecNo)) {
+		// L7400 總帳傳票資料傳輸相關處理=>(只有放款，支票使用人工上傳)於20230821修改為支票也使用EBS上傳
+		if ("02".equals(iSecNo) || "09".equals(iSecNo)) {
 			// 開帳及關帳取消時檢查資料傳輸是否已完成
 			if (iClsFg == 0 || iClsFg == 2) {
 				CheckSlipMedia2022(iClsFg, tAcClose, titaVo);
