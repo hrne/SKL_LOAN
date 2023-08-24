@@ -139,7 +139,6 @@ public class L5903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			  WHEN NVL(JSON_VALUE(i.\"JsonFields\", '$.RELCD'), ' ') = '4'  ";
 		sql += "  				AND  i.\"TitaActFg\" = '3' ";
 		sql += "				AND  NVL(tf.\"RejectReason\",' ') <> ' ' THEN '待審核訂正'  ELSE ' ' END  AS \"ActFgX\" ";
-		sql += "  		,NVL(tf.\"RejectReason\",' ') AS \"RejectReason\" "; // 主管退回原因
 		sql += " from \"InnDocRecord\" i                                  ";
 		sql += " left join \"CustMain\" c on c.\"CustNo\" = i.\"CustNo\"  ";
 		sql += " left join \"CdEmp\" e1 on e1.\"EmployeeNo\" = i.\"KeeperEmpNo\"  ";

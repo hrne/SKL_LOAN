@@ -260,7 +260,6 @@ C(5,#OOReturnFg,Y,BIND(grid,{ cmd=CHAIN; ntxcd=L5103; ntxbuf=#OOBUF_RETURN}),BIN
 
 #OOActFgX=x,12,O
 
-#OORejectReason=x,200,O
 
 #OOModifyFg=X,1,S
 
@@ -382,7 +381,6 @@ TXFORM=L5903
 #OOTitaActFg
 #OOKeeperEnable
 #OOActFgX
-#OORejectReason
 ^
 </sub>
 
@@ -433,9 +431,6 @@ TXFORM=L5903
 ! 登放記號
 #OOActFgX=登放狀態
 {width:85,align:'left'}
-!主管退回原因
-#OORejectReason=主管退回原因
-{width:70,align:'left'}
 ! 管理人
 #OKeeperEmpNoX=管理人
 {width:85,align:'left'}

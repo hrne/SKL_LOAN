@@ -96,19 +96,12 @@ BEGIN
           FROM "LN$YACP" YAC
           LEFT JOIN "LN$YG5P" YG5 ON YG5."EMPCOD" = YAC."EMPCOD"
                                  AND YG5."ADTYMT" = YAC."ADTYMT"
-          -- 2020-12-22 根據QC827 新壽IT:涂宇欣提供之附件 T9410052正式機匯出_1091216.xlsx
-          -- query T9410052 排除LN$YACP.EMPCOD為空的資料
-          WHERE NVL(YAC."EMPCOD",' ') <> ' ' -- 排除NULL 309筆
-          -- query T9410052 篩選LN$YACP.CUSCCD 須為 H
-            AND YAC."CUSCCD" = 'H'
-            AND YAC."LMSLLD" >= 20200610
          ) S1
     LEFT JOIN "FacMain" FAC ON FAC."CustNo" = S1."LMSACN"
                            AND FAC."FacmNo" = S1."LMSAPN"
     LEFT JOIN "LoanBorMain" BOR ON BOR."CustNo" = S1."LMSACN"
                                AND BOR."FacmNo" = S1."LMSAPN"
                                AND BOR."BormNo" = S1."LMSASQ"
-    WHERE S1."SEQ" = 1 -- 排除重複筆數 384筆
     ;
 
     -- 記錄寫入筆數

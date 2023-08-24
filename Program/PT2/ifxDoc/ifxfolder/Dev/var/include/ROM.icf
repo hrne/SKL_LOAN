@@ -10389,6 +10389,7 @@ TXFORM=L5R47
 #L5r48CopyCode=9,1,S
 #L5r48ApplObj=X,16,S
 #L5r48FacmNoMemo=X,20,S
+#L5r48RejectReason=x,200,S
 ##loop {times:25,i:1}
 #L5r48OPTA{i}=9,2,S
 #L5r48AMTA{i}=9,2,S
@@ -10417,6 +10418,7 @@ TXFORM=L5R48
 #L5r48CopyCode
 #L5r48ApplObj
 #L5r48FacmNoMemo
+#L5r48RejectReason
 ##loop {times:25,i:1}
 #L5r48OPTA{i}
 #L5r48AMTA{i}

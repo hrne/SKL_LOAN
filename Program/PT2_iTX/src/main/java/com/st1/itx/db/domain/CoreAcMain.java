@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class CoreAcMain implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -8650501122958344604L;
-
-@EmbeddedId
+  @EmbeddedId
   private CoreAcMainId coreAcMainId;
 
   // 帳冊別
@@ -53,7 +49,7 @@ public class CoreAcMain implements Serializable {
   private String acNoCode;
 
   // 科目名稱
-  @Column(name = "`AcNoName`", length = 100)
+  @Column(name = "`AcNoName`", length = 200)
   private String acNoName;
 
   // 子目代號

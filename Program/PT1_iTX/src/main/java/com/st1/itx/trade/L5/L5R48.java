@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L5;
 
 import java.util.ArrayList;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -12,8 +13,11 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.InnDocRecord;
 import com.st1.itx.db.domain.InnDocRecordId;
+import com.st1.itx.db.domain.TxFlow;
+import com.st1.itx.db.domain.TxFlowId;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.InnDocRecordService;
+import com.st1.itx.db.service.TxFlowService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
@@ -35,6 +39,8 @@ public class L5R48 extends TradeBuffer {
 	public InnDocRecordService innDocRecordService;
 	@Autowired
 	public CustMainService custMainService;
+	@Autowired
+	public TxFlowService txFlowService;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -64,8 +70,16 @@ public class L5R48 extends TradeBuffer {
 			CustMain tCustMain = new CustMain();
 			tCustMain = custMainService.custNoFirst(iCustNo, iCustNo, titaVo);
 			String custName = "";
+			String rejectReason = "";
 			if (tCustMain != null) {
 				custName = tCustMain.getCustName();
+			}
+			TxFlow tTxFlow = new TxFlow();
+			tTxFlow = txFlowService.findById(new TxFlowId(tInnDocRecord.getTitaEntDy() + 19110000,
+					"0000" + tInnDocRecord.getTitaTlrNo() + iParse.IntegerToString(tInnDocRecord.getTitaTxtNo(), 8)),
+					titaVo);
+			if (tTxFlow != null) {
+				rejectReason = tTxFlow.getRejectReason();
 			}
 			this.totaVo.putParam("L5r48ApplCode", tInnDocRecord.getApplCode());
 			this.totaVo.putParam("L5r48CustName", custName);
@@ -79,6 +93,7 @@ public class L5R48 extends TradeBuffer {
 			this.totaVo.putParam("L5r48CopyCode", tInnDocRecord.getCopyCode());
 			this.totaVo.putParam("L5r48ApplObj", tInnDocRecord.getApplObj());
 			this.totaVo.putParam("L5r48FacmNoMemo", tInnDocRecord.getFacmNoMemo());
+			this.totaVo.putParam("L5r48RejectReason", rejectReason);
 
 			tTempVo = tTempVo.getVo(tInnDocRecord.getJsonFields());
 

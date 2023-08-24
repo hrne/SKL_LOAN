@@ -148,9 +148,8 @@ public class BSU03 extends TradeBuffer {
 				}
 			}
 			if (checkPf(it, titaVo)) {
-				this.info("update" + it.toString());
 			} else {
-				this.info("add" + it.toString());
+				this.info("add " + it.toString());
 			}
 			custNo = it.getCustNo();
 			facmNo = it.getFacmNo();
@@ -192,26 +191,30 @@ public class BSU03 extends TradeBuffer {
 
 	private void computePf(PfItDetail t, ArrayList<PfItDetail> lPfItDetailUpate, TitaVo titaVo) throws LogicException {
 		this.info("computePf ... this.drawdownAmt=" + this.drawdownAmt + ", t=" + t.toString());
+		BigDecimal rmdDrawdownAmt = t.getDrawdownAmt();
+		BigDecimal rmdPerfEqAmt = t.getPerfEqAmt();
+		BigDecimal rmdPerfReward = t.getPerfReward();
+		BigDecimal rmdPerfAmt = t.getPerfAmt();
 		for (PfItDetail it : lPfItDetailUpate) {
 			it.setCntingCode(t.getCntingCode()); // 是否計件
 			it.setIntroducer(t.getIntroducer()); // 介紹人
-			if (it.getDrawdownAmt().compareTo(t.getDrawdownAmt()) == 0) {
-				it.setPerfEqAmt(t.getPerfEqAmt()); // 換算業績
-				it.setPerfReward(t.getPerfReward()); // 業務報酬
-				it.setPerfAmt(t.getPerfAmt()); // 業績金額
-				t.setDrawdownAmt(BigDecimal.ZERO); // 撥款金額
-				t.setPerfEqAmt(BigDecimal.ZERO); // 換算業績
-				t.setPerfReward(BigDecimal.ZERO); // 業務報酬
-				t.setPerfAmt(BigDecimal.ZERO); // 業績金額
+			if (it.getDrawdownAmt().compareTo(rmdDrawdownAmt) == 0) {
+				it.setPerfEqAmt(rmdPerfEqAmt); // 換算業績
+				it.setPerfReward(rmdPerfReward); // 業務報酬
+				it.setPerfAmt(rmdPerfAmt); // 業績金額
+				rmdDrawdownAmt = BigDecimal.ZERO; // 撥款金額
+				rmdPerfEqAmt = BigDecimal.ZERO; // 換算業績
+				rmdPerfReward =BigDecimal.ZERO; // 業務報酬
+				rmdPerfAmt = BigDecimal.ZERO; // 業績金額
 			} else {
 				BigDecimal rate = it.getDrawdownAmt().divide(this.drawdownAmt, 5, RoundingMode.HALF_UP);
 				it.setPerfEqAmt(t.getPerfEqAmt().multiply(rate).setScale(0, RoundingMode.HALF_UP));
 				it.setPerfReward(t.getPerfReward().multiply(rate).setScale(0, RoundingMode.HALF_UP));
 				it.setPerfAmt(t.getPerfAmt().multiply(rate).setScale(0, RoundingMode.HALF_UP));
-				t.setDrawdownAmt(t.getDrawdownAmt().subtract(it.getDrawdownAmt()));
-				t.setPerfEqAmt(t.getPerfEqAmt().subtract(it.getPerfEqAmt()));
-				t.setPerfReward(t.getPerfReward().subtract(it.getPerfReward()));
-				t.setPerfAmt(t.getPerfAmt().subtract(it.getPerfAmt()));
+				rmdDrawdownAmt = rmdDrawdownAmt.subtract(it.getDrawdownAmt());
+				rmdPerfEqAmt = rmdPerfEqAmt.subtract(it.getPerfEqAmt());
+				rmdPerfReward = rmdPerfReward.subtract(it.getPerfReward());
+				rmdPerfAmt = rmdPerfAmt.subtract(it.getPerfAmt());
 			}
 			this.info("computePf it=" + it.toString() + ", t=" + t.toString());
 		}
