@@ -1,7 +1,10 @@
 package com.st1.itx.db.repository.online;
 
+
 import java.util.Optional;
 
+import java.math.BigDecimal;
+import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
@@ -22,16 +25,17 @@ import com.st1.itx.db.domain.MonthlyFacBalId;
  */
 public interface MonthlyFacBalRepository extends JpaRepository<MonthlyFacBal, MonthlyFacBalId> {
 
-	// ClCustNo=, AND ClFacmNo=
-	public Slice<MonthlyFacBal> findAllByClCustNoIsAndClFacmNoIs(int clCustNo_0, int clFacmNo_1, Pageable pageable);
+  // ClCustNo=, AND ClFacmNo=
+  public Slice<MonthlyFacBal> findAllByClCustNoIsAndClFacmNoIs(int clCustNo_0, int clFacmNo_1, Pageable pageable);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<MonthlyFacBal> findByMonthlyFacBalId(MonthlyFacBalId monthlyFacBalId);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<MonthlyFacBal> findByMonthlyFacBalId(MonthlyFacBalId monthlyFacBalId);
 
-	// (月底日日終批次)維護 MonthlyFacBal 額度月報工作檔
-	@Procedure(value = "\"Usp_L9_MonthlyFacBal_Upd\"")
-	public void uspL9MonthlyfacbalUpd(int YYYYMM, String empNo);
+  // (月底日日終批次)維護 MonthlyFacBal 額度月報工作檔
+  @Procedure(value = "\"Usp_L9_MonthlyFacBal_Upd\"")
+  public void uspL9MonthlyfacbalUpd(int YYYYMM,  String empNo);
 
 }
+

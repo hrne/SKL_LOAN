@@ -113,12 +113,12 @@ public class PfCheckInsuranceCom extends TradeBuffer {
 		dateUtil.init();
 		dateUtil.setDate_1(tPfInsCheck.getApplDate());
 		dateUtil.setMons(-3);
-		int startDate = dateUtil.getCalenderDay() + 19110000;
+		int startDate = dateUtil.getCalenderDay();
 
 		dateUtil.init();
 		dateUtil.setDate_1(tPfInsCheck.getApplDate());
 		dateUtil.setMons(3);
-		int endDate = dateUtil.getCalenderDay() + 19110000;
+		int endDate = dateUtil.getCalenderDay();
 
 		// Query 核心系統保單資料
 		returnMsg = queryCoreInsurance(tPfInsCheck, titaVo);
@@ -130,7 +130,9 @@ public class PfCheckInsuranceCom extends TradeBuffer {
 
 		// 檢核保單明細資料
 		if (lDetailVo != null && !lDetailVo.isEmpty()) {
+			this.info("startDate=" + startDate + " endDate=" + endDate);
 			for (PfInsDetailVo detailVo : lDetailVo) {
+				this.info("detailVo=" + detailVo.toString());
 				if (detailVo.getApplication_date() >= startDate && detailVo.getApplication_date() <= endDate) {
 					insDate = detailVo.getApplication_date();
 					insNo = detailVo.getPolicy_no();

@@ -21,11 +21,14 @@ import com.st1.itx.db.domain.LifeRelEmp;
 import com.st1.itx.db.domain.LifeRelEmpId;
 import com.st1.itx.db.domain.LifeRelHead;
 import com.st1.itx.db.domain.LifeRelHeadId;
+import com.st1.itx.db.domain.SystemParas;
 import com.st1.itx.db.service.FinHoldRelService;
 import com.st1.itx.db.service.LifeRelEmpService;
 import com.st1.itx.db.service.LifeRelHeadService;
+import com.st1.itx.db.service.SystemParasService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.FileCom;
+import com.st1.itx.util.common.SftpClient;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
 
@@ -62,6 +65,12 @@ public class L7206p extends TradeBuffer {
 
 	private boolean isError = false;
 
+	@Autowired
+	private SftpClient sftpClient;
+
+	@Autowired
+	private SystemParasService systemParasService;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L7206p 以 FTP 檔案更新資料庫 ");
@@ -85,15 +94,14 @@ public class L7206p extends TradeBuffer {
 		// T044_YYYYMMDD
 		// TA07_YYYYMMDD
 		// 每日金控下傳一次
-		String ftpFolder = inFolder += "/FTP/L7206/";
 
 		int acDate = titaVo.getEntDyI() + 19110000;
 
 		this.info("acDate = " + acDate);
 
-		String t07FileName = ftpFolder + "T07_" + acDate + ".csv"; // 寫入 LifeRelHead
-		String t072FileName = ftpFolder + "T07_2_" + acDate + ".csv"; // 寫入 LifeRelEmp
-		String t044FileName = ftpFolder + "T044_" + acDate + ".csv"; // 寫入 FinHoldRel
+		String t07FileName = "T07_" + acDate + ".csv"; // 寫入 LifeRelHead
+		String t072FileName = "T07_2_" + acDate + ".csv"; // 寫入 LifeRelEmp
+		String t044FileName = "T044_" + acDate + ".csv"; // 寫入 FinHoldRel
 
 		List<String> t07List = readFtpFiles(t07FileName, titaVo);
 		if (!t07List.isEmpty()) {
@@ -295,13 +303,14 @@ public class L7206p extends TradeBuffer {
 		return i;
 	}
 
-	private List<String> readFtpFiles(String fileName, TitaVo titaVo) {
+	private List<String> readFtpFiles(String fileName, TitaVo titaVo) throws LogicException {
 		this.info("readFtpFiles fileName = " + fileName);
+		String localFile = downloadFromFtp(fileName, titaVo);
 		List<String> dataLineList = new ArrayList<>();
 		try {
-			dataLineList = fileCom.intputTxt(fileName, "UTF-8");
+			dataLineList = fileCom.intputTxt(localFile, "UTF-8");
 		} catch (Exception e) {
-			String errorMsg = " L7206 檔案不存在,請查驗路徑.\r\n" + fileName;
+			String errorMsg = " L7206 檔案不存在,請查驗路徑.\r\n" + localFile;
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.error(errors.toString());
@@ -320,5 +329,30 @@ public class L7206p extends TradeBuffer {
 		isError = true;
 		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", titaVo.getTlrNo(), msg,
 				titaVo);
+	}
+
+	private String downloadFromFtp(String fileName, TitaVo titaVo) throws LogicException {
+		SystemParas systemParas = systemParasService.findById("LN", titaVo);
+
+		if (systemParas == null) {
+			this.error("sendToFTP: SystemParas doesn't exist !?");
+			return "";
+		}
+
+		String smsUrl = systemParas.getSmsFtpUrl();
+		String smsPort = "22"; // 預設22
+		if (smsUrl.contains(":")) {
+			String[] s = smsUrl.split(":");
+			smsUrl = s[0];
+			smsPort = s[1];
+		}
+		String[] auth = systemParas.getSmsFtpAuth().split(":");
+
+		String localFile = inFolder + "/L7206/" + fileName;
+		String remoteFile = "inbound" + "/L7206/" + fileName;
+
+		// 呼叫SFTPCient
+		sftpClient.download(smsUrl, smsPort, auth, localFile, remoteFile, titaVo);
+		return localFile;
 	}
 }

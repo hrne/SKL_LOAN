@@ -261,7 +261,15 @@ public class L9701Report extends MakeReport {
 						printFacHead();
 						isFirst = false;
 					}
-					if (tL9701Vo.get("DB").equals("2")) {
+
+					String nextFacmNo = this.facmNo;
+
+					if (detailCounts + 1 < listL9701.size()) {
+						nextFacmNo = listL9701.get(detailCounts + 1).get("FacmNo");
+					} 
+
+					// 下一筆額度與現在不同 或是 最後一筆時
+					if (!this.facmNo.equals(nextFacmNo) || detailCounts == listL9701.size()) {
 						printFacEnd(this.facmNo);
 						detailCounts = 0;
 						isFirst = true;
@@ -273,7 +281,9 @@ public class L9701Report extends MakeReport {
 					detailCounts++;
 				}
 			}
-		} else {
+		} else
+
+		{
 
 			this.print(1, 20, "*******    查無資料   ******");
 		}

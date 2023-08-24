@@ -88,6 +88,60 @@ public class SftpClient extends CommBuffer {
 		return true;
 	}
 
+	/**
+	 * download
+	 * 
+	 * @param url        SFTP server url
+	 * @param port       SFTP server port
+	 * @param auth       username:password
+	 * @param localFile  localFile
+	 * @param remoteFile remoteFile
+	 * @param titaVo     titaVo
+	 * @return true when upload success else false
+	 * @throws LogicException parse exception
+	 */
+	public boolean download(String url, String port, String[] auth, String localFile, String remoteFile, TitaVo titaVo)
+			throws LogicException {
+
+		this.setTitaVo(titaVo);
+
+		JSch jsch = new JSch();
+		Session session = null;
+
+		try {
+			// 建立連線
+			session = jsch.getSession(auth[0], url, parse.stringToInteger(port));
+			// 設定密碼
+			session.setPassword(auth[1]);
+
+			// 設定SSH連線的安全性設定
+			java.util.Properties config = new java.util.Properties();
+			config.put("StrictHostKeyChecking", "no");
+			session.setConfig(config);
+
+			// 連接到伺服器
+			session.connect();
+
+			// 創建SFTP通道
+			Channel channel = session.openChannel("sftp");
+			channel.connect();
+			ChannelSftp sftpChannel = (ChannelSftp) channel;
+
+			// 下載檔案
+			sftpChannel.get(remoteFile, localFile);
+
+			// 關閉連線
+			sftpChannel.exit();
+			session.disconnect();
+		} catch (SftpException | JSchException e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("SftpClient download error = " + errors.toString());
+			return false;
+		}
+		return true;
+	}
+
 	@Override
 	public void exec() {
 		// use methods above instead!

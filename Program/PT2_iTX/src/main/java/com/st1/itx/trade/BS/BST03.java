@@ -1,5 +1,6 @@
 package com.st1.itx.trade.BS;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,13 +11,17 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.AcReceivableId;
 import com.st1.itx.db.domain.BankRmtf;
+import com.st1.itx.db.domain.DailyTav;
+import com.st1.itx.db.domain.DailyTavId;
 import com.st1.itx.db.domain.NegAppr02;
+import com.st1.itx.db.domain.NegAppr02Id;
 import com.st1.itx.db.domain.NegMain;
 import com.st1.itx.db.domain.NegTrans;
 import com.st1.itx.db.domain.NegTransId;
@@ -30,6 +35,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcDetailCom;
 import com.st1.itx.util.common.AcReceivableCom;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -74,6 +80,8 @@ public class BST03 extends TradeBuffer {
 	public AcReceivableCom acReceivableCom;
 	@Autowired
 	public AcDetailCom acDetailCom;
+	@Autowired
+	WebClient webClient;
 
 	@Override
 	/* 產生債協入帳明細 */
@@ -127,6 +135,7 @@ public class BST03 extends TradeBuffer {
 		acReceivableCom.run(titaVo);
 		lAcDetail = new ArrayList<AcDetail>();
 		this.txBuffer.setAcDetailList(lAcDetail);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", "BST03已完成", titaVo);
 
 		return null;
 
