@@ -589,7 +589,7 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<version>3.2.0</version>
 				<configuration>
-					<outputDirectory>D:\SKL\git\SKL_LOAN\Program\war\DEV\</outputDirectory>
+					<outputDirectory>D:\PKG\war\DEV\</outputDirectory>
 				</configuration>
 			</plugin>
 			<plugin>
