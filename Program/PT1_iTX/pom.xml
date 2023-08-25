@@ -27,7 +27,8 @@
 		<Hibernate-Validator-Ver>6.1.4.Final</Hibernate-Validator-Ver>
 		<Tomcat-jdbc-Ver>9.0.34</Tomcat-jdbc-Ver>
 
-		<!-- <Spring-Integration-Ver>5.1.5.RELEASE</Spring-Integration-Ver> <Spring-Framework-Ver>5.1.7.RELEASE</Spring-Framework-Ver> <Spring-Security-Ver>5.1.5.RELEASE</Spring-Security-Ver> <Spring-Batch-Ver>4.1.1.RELEASE</Spring-Batch-Ver> 
+		<!-- <Spring-Integration-Ver>5.1.5.RELEASE</Spring-Integration-Ver> <Spring-Framework-Ver>5.1.7.RELEASE</Spring-Framework-Ver> 
+			<Spring-Security-Ver>5.1.5.RELEASE</Spring-Security-Ver> <Spring-Batch-Ver>4.1.1.RELEASE</Spring-Batch-Ver> 
 			<Spring-Data-Ver>2.1.8.RELEASE</Spring-Data-Ver> -->
 
 		<SLF4J-Ver>1.7.32</SLF4J-Ver>
@@ -48,6 +49,7 @@
 		<Commons-Text-Ver>1.8</Commons-Text-Ver>
 		<Xz-Ver>1.9</Xz-Ver>
 		<Commons-FileUpload-Ver>1.4</Commons-FileUpload-Ver>
+		<Commons-Net-Ver>3.8.0</Commons-Net-Ver>
 		<Jackson-Databind-Ver>2.9.9</Jackson-Databind-Ver>
 		<Apache-POI-Ver>4.1.2</Apache-POI-Ver>
 		<JSoup-Ver>1.11.3</JSoup-Ver>
@@ -55,8 +57,13 @@
 		<IText-Asian-Ver>5.2.0</IText-Asian-Ver>
 		<Bouncy-Castle-Provider-Ver>1.61</Bouncy-Castle-Provider-Ver>
 		<Apache-HttpClient-Ver>4.5.12</Apache-HttpClient-Ver>
+		<Apache-FTP-Ver>1.2.0</Apache-FTP-Ver>
+		<Apache-Mina-Ver>2.2.1</Apache-Mina-Ver>
 
 		<Querydsl-JPA-Support-Ver>4.2.1</Querydsl-JPA-Support-Ver>
+
+		<maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
+		<app.version>${maven.build.timestamp}</app.version>
 	</properties>
 
 	<dependencies>
@@ -74,6 +81,31 @@
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>29.0-jre</version>
+		</dependency>
+
+		<!-- Ftp -->
+		<dependency>
+			<groupId>commons-net</groupId>
+			<artifactId>commons-net</artifactId>
+			<version>${Commons-Net-Ver}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.ftpserver</groupId>
+			<artifactId>ftpserver-core</artifactId>
+			<version>${Apache-FTP-Ver}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.ftpserver</groupId>
+			<artifactId>ftplet-api</artifactId>
+			<version>${Apache-FTP-Ver}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.mina</groupId>
+			<artifactId>mina-core</artifactId>
+			<version>${Apache-Mina-Ver}</version>
 		</dependency>
 
 		<!-- Mail -->
@@ -433,11 +465,11 @@
 			<artifactId>commons-text</artifactId>
 			<version>${Commons-Text-Ver}</version>
 		</dependency>
-		
+
 		<dependency>
-    		<groupId>org.tukaani</groupId>
-    		<artifactId>xz</artifactId>
-    		<version>${Xz-Ver}</version>
+			<groupId>org.tukaani</groupId>
+			<artifactId>xz</artifactId>
+			<version>${Xz-Ver}</version>
 		</dependency>
 
 		<!-- iText -->
@@ -458,11 +490,32 @@
 			<artifactId>bcprov-jdk15on</artifactId>
 			<version>1.49</version>
 		</dependency>
+		
+		<!-- SFTP client -->
+		<dependency>
+			<groupId>com.jcraft</groupId>
+			<artifactId>jsch</artifactId>
+			<version>0.1.55</version>
+		</dependency>
 	</dependencies>
 
 	<build>
 		<finalName>iTX</finalName>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.2.0</version>
+				<configuration>
+					<propertiesEncoding>UTF-8</propertiesEncoding>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.bsc.maven</groupId>
 				<artifactId>maven-processor-plugin</artifactId>
@@ -506,7 +559,7 @@
 				</executions>
 				<groupId>com.mysema.maven</groupId>
 				<artifactId>apt-maven-plugin</artifactId>
-				<!-- <version>1.0.8</version> -->
+				<version>1.1.3</version>
 				<dependencies>
 					<dependency>
 						<groupId>com.querydsl</groupId>
@@ -520,7 +573,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<!-- <version>3.8.0</version> -->
+				<version>3.1</version>
 				<configuration>
 					<source>${Java-Ver}</source>
 					<target>${Java-Ver}</target>
@@ -530,13 +583,20 @@
 					<compilerArgument>-proc:none</compilerArgument>
 				</configuration>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
-				<!-- <version>2.4</version> -->
+				<version>3.2.0</version>
 				<configuration>
-					<outputDirectory>D:\SKL\git\SKL_LOAN\Program\war\DEV\</outputDirectory>					
+					<outputDirectory>D:\SKL\git\SKL_LOAN\Program\war\DEV\</outputDirectory>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<additionalparam>-Xdoclint:none</additionalparam>
 				</configuration>
 			</plugin>
 		</plugins>
