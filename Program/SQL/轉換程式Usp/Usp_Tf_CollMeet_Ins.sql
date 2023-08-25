@@ -40,6 +40,8 @@ BEGIN
       , "MeetPlaceCode"       -- 面催地點選項 DECIMAL 1 0
       , "MeetPlace"           -- 面催地點 NVARCHAR2 60 0
       , "Remark"              -- 其他記錄 NVARCHAR2 500 0
+      -- 2023-08-25 Wei 新增 from ST1-Linda Mail 與SKL-User 舜雯確認之結果
+      , "MeetPsnNote"         -- 面晤人備註 NVARCHAR2 50
       , "CreateDate"          -- 建檔日期時間 DATE 8 0
       , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
       , "LastUpdate"          -- 最後更新日期時間 DATE 8 0
@@ -63,6 +65,8 @@ BEGIN
           ,0                              AS "MeetPlaceCode"       -- 面催地點選項 DECIMAL 1 0
           ,M.Presence_Addr                AS "MeetPlace"           -- 面催地點 NVARCHAR2 60 0
           ,M.Other_Record                 AS "Remark"              -- 其他記錄 NVARCHAR2 500 0
+          -- 2023-08-25 Wei 新增 from ST1-Linda Mail 與SKL-User 舜雯確認之結果
+          ,M.RECEIVE_PERSONNAME           AS "MeetPsnNote"         -- 面晤人備註 NVARCHAR2 50
           ,CASE
              WHEN M.entry_date IS NOT NULL
              THEN M.entry_date

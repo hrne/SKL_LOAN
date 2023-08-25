@@ -147,6 +147,8 @@ BEGIN
           ,JOB_START_TIME             AS "LastUpdate"          -- 最後更新日期時間
           ,EmpNo                      AS "LastUpdateEmpNo"     -- 最後更新人員
           ,'00A'                      AS "AcSubBookCode"       -- 區隔帳冊
+          ,''                         AS "LawAssetClass"       -- 無擔保資產分類代號
+
     FROM "CollList" L
     LEFT JOIN "FacMain" FAC ON FAC."CustNo" = L."CustNo"
                            AND FAC."FacmNo" = L."FacmNo"
@@ -506,6 +508,7 @@ BEGIN
         AND M."FacmNo"    =  D."FacmNo")
     WHEN MATCHED THEN UPDATE 
       SET M."LawAmount"   =  D."Amount"
+        , M."LawAssetClass"   =  '5'
     ;
 
     UPD_CNT := UPD_CNT + sql%rowcount;
@@ -526,39 +529,34 @@ BEGIN
                THEN '5'        --(5)第五類-收回無望(應為法務進度901，現暫以餘額掛1為第五類)
                                --   無擔保部分--超過清償期12月者
                                --   或拍訂貨拍賣無實益之損失者
-                               --   或放款資產經評估無法回收者   
-              --將2之X的判斷由程式自行
-               WHEN M."AcctCode" = '990'
-                AND M."ProdNo" IN ('60','61','62')
-               THEN '2'       --(23)第二類-應予注意：
-                               --    有足無擔保--逾繳超過清償期7-12月者
-                               --    或無擔保部分--超過清償期1-3月者         
-               WHEN M."OvduTerm" >= 7
-                AND M."OvduTerm" <= 12
-               THEN '2'       --(23)第二類-應予注意：
-                               --    有足無擔保--逾繳超過清償期7-12月者
-                               --    或無擔保部分--超過清償期1-3月者    
-               WHEN M."AcctCode" = '990'
-                AND M."OvduTerm" <= 12
-               THEN '2'       --(23)第二類-應予注意：
-                               --    有足無擔保--逾繳超過清償期7-12月者
-                               --    或無擔保部分--超過清償期1-3月者    
-               WHEN M."AcctCode" <> '990'
-                AND M."ProdNo" IN ('60','61','62')
-                AND M."OvduTerm" = 0
-               THEN '2'       --(21)第二類-應予注意：
-                               --    有足額擔保--但債信以不良者
-                               --    (有擔保分期協議且正常還款者)
-               WHEN M."AcctCode" <> '990'
-                AND M."OvduTerm" >= 1
-                AND M."OvduTerm" <= 6
-               THEN '2'       --(22)第二類-應予注意：
-                               --    有足無擔保--逾繳超過清償期1-6月者
+                               --   或放款資產經評估無法回收者    
+               WHEN M."ProdNo" IN ('60','61','62')
+                AND M."OvduTerm" > 12
+               THEN '3'         --(23)第三類-可望收回：
+                                --    協議件有足額擔保--逾繳超過清償期12月者     
+
+               WHEN M."ProdNo" IN ('60','61','62')
+               THEN '2'        --(23)第二類-應予注意：
+                               --    協議件
+                               --    協議件轉催收後如繳息不正常由人工修正後L7205上傳更新
                WHEN M."AcctCode" = '990'
                 AND M."OvduTerm" > 12
                THEN '3'        --(3)第三類-可望收回：
-                               --   有足無擔保--逾繳超過清償期12月者
+                               --   有足額擔保--逾繳超過清償期12月者
                                --   或無擔保部分--超過清償期3-6月者                         
+               WHEN M."AcctCode" = '990'
+               THEN '2'       --(23)第二類-應予注意：
+                               --    有足額擔保--逾繳超過清償期7-12月者
+                               --    或無擔保部分--超過清償期1-3月者
+               WHEN M."OvduTerm" >= 7
+                AND M."OvduTerm" <= 12
+               THEN '2'       --(23)第二類-應予注意：
+                               --    有足額擔保--逾繳超過清償期7-12月者
+                               --    或無擔保部分--超過清償期1-3月者    
+               WHEN M."OvduTerm" >= 1
+                AND M."OvduTerm" <= 6
+               THEN '2'       --(22)第二類-應予注意：
+                               --    有足額擔保--逾繳超過清償期1-6月者
                ELSE '1'       -- 正常繳息
              END                  AS "AssetClass"	--放款資產項目	  
       FROM "MonthlyFacBal" M

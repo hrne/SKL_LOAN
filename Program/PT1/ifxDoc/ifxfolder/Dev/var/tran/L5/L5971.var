@@ -108,7 +108,7 @@ INVOKEJS(SHOW,p1,03,03,0)
 #CustId=X,10,I
 IF(#CHAIN==0,$,s)
 @V(7)
-@C(4,#CustId,S,$)
+C(4,#CustId,S,$)
 A(ID_UNINO,0,#CustId)
 
 !身分證找戶號
@@ -126,8 +126,9 @@ R(1,L2R47)
 ! 案件序號
 #CaseSeq=A,3,I
 IF(#CHAIN==0,$,s)
+E(0,1)
 @V(7)
-@V(2,0)
+V(2,0)
 
 ! 入帳日期(起始)
 #EntryDateStart=D,7,I

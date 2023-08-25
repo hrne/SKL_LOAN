@@ -176,7 +176,7 @@ public class L9731Report extends MakeReport {
 		} else {
 
 			int row = 2;
-			makeExcel.setValue(1, 10, rocYearMonth, "C");
+			makeExcel.setValue(1, 11, rocYearMonth, "C");
 
 			for (Map<String, String> tLDVo : listL9731) {
 				makeExcel.setValue(row, 1, Integer.valueOf(tLDVo.get("F0").toString() + tLDVo.get("F1").toString()),
@@ -212,9 +212,11 @@ public class L9731Report extends MakeReport {
 						break;
 					case 14:// 資產分類
 						makeExcel.setValue(row, 8, fieldValue, "C");
-					case 17:// 是否有901 拍定不足額
+					case 17:// 無擔保金額
 						BigDecimal amt901 = getBigDecimal(fieldValue);
 						makeExcel.setValue(row, 9, amt901, "#,##0", "R");
+					case 18:// 無擔保資產分類
+						makeExcel.setValue(row, 10, fieldValue, "C");
 
 					default:
 

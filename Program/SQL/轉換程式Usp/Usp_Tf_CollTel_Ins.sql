@@ -41,6 +41,8 @@ BEGIN
       , "ResultCode"          -- 通話結果 VARCHAR2 1 0
       , "Remark"              -- 其他記錄 NVARCHAR2 500 0
       , "CallDate"            -- 通話日期 DecimalD 8 0
+      -- 2023-08-25 Wei 新增 from ST1-Linda Mail 與SKL-User 舜雯確認之結果
+      , "RecvrNote"           -- 接話人備註 NVARCHAR2 50
       , "CreateDate"          -- 建檔日期時間 DATE 8 0
       , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
       , "LastUpdate"          -- 最後更新日期時間 DATE 8 0
@@ -103,8 +105,11 @@ BEGIN
              WHEN '7' THEN '6'
            ELSE '9' END                   AS "ResultCode"          -- 通話結果 VARCHAR2 1 0
           ,S0.Other_Record                AS "Remark"              -- 其他記錄 NVARCHAR2 500 0
-          ,NVL(S0.Calling_Date,0)
+          -- 2023-08-25 Wei 修改 from ST1-Linda Mail 與SKL-User 舜雯確認之結果
+          ,NVL(S0.PAID_DATE ,0)
                                           AS "CallDate"            -- 通話日期 DecimalD 8 0
+          -- 2023-08-25 Wei 新增 from ST1-Linda Mail 與SKL-User 舜雯確認之結果
+          ,S0.RECEIVE_PERSONNAME          AS "RecvrNote"           -- 接話人備註 NVARCHAR2 50
           ,CASE
              WHEN S0.entry_date IS NOT NULL
              THEN S0.entry_date

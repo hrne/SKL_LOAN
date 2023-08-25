@@ -204,7 +204,7 @@ BEGIN
                                             WHEN  7  THEN  '17'
                                             WHEN  8  THEN  '68'
                                             WHEN  9  THEN  '79' 
-                                            END DESC
+                                            END ASC
                                            , "NextIntDate" ASC ) AS ROW_NO
                  ,"CustNo"
                  ,"FacmNo"
@@ -279,7 +279,7 @@ BEGIN
                                             WHEN  7  THEN  '17'
                                             WHEN  8  THEN  '68'
                                             WHEN  9  THEN  '79' 
-                                            END DESC
+                                            END ASC
                                            , "NextIntDate" ASC ) AS ROW_NO
                  ,"CustNo"
                  ,"FacmNo"
@@ -420,10 +420,18 @@ BEGIN
                OVER (
                  PARTITION BY "CustNo"
                             , "FacmNo"
-                 ORDER BY CASE
-                            WHEN "Status" in (2,6,7)
-                            THEN 10 + "Status"
-                          ELSE "Status" END -- 排序時,把戶況2、6、7的優先度往後排
+                 ORDER BY CASE "Status" 
+                         WHEN  0  THEN  '40'
+                         WHEN  1  THEN  '91'
+                         WHEN  2  THEN  '22' 
+                         WHEN  3  THEN  '83'                          
+                         WHEN  4  THEN  '34'                            
+                         WHEN  5  THEN  '55'
+                         WHEN  6  THEN  '06'
+                         WHEN  7  THEN  '17'
+                         WHEN  8  THEN  '68'
+                         WHEN  9  THEN  '79' 
+                         END ASC
                          ,"NextPayIntDate" 
                ) AS "Seq"
              , CASE WHEN "Status" IN (1,3,5,6,8,9) THEN 99991231

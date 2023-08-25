@@ -116,7 +116,7 @@ public class L7205p extends TradeBuffer {
 		this.info("filename=" + filename);
 
 		ArrayList<String> dataLineList = new ArrayList<>();
-		
+
 		titaVo.keepOrgDataBase();// 保留原本記號
 
 //       編碼參數，設定為UTF-8 || big5
@@ -130,7 +130,6 @@ public class L7205p extends TradeBuffer {
 			throw new LogicException(titaVo, "E0014", ErrorMsg);
 
 		}
-
 
 		String extension[] = filename.split("\\.");
 		this.info("file extension=" + extension[extension.length - 1]);
@@ -166,9 +165,11 @@ public class L7205p extends TradeBuffer {
 			int yearmonth = parse.stringToInteger(tempOccursList.get("YearMonth"));
 			String assetclass = tempOccursList.get("AssetClass");
 			BigDecimal lawAmount = BigDecimal.ZERO;
+			String lawAssetClass = "";
 
 			if ("xlsx".equals(extension) || "xls".equals(extension)) {
 				lawAmount = new BigDecimal(tempOccursList.get("LawAmount"));
+				lawAssetClass = tempOccursList.get("LawAssetClass");
 			}
 
 			// 維護monthlyFacBal
@@ -187,6 +188,7 @@ public class L7205p extends TradeBuffer {
 
 				if ("xlsx".equals(extension[extension.length - 1]) || "xls".equals(extension[extension.length - 1])) {
 					tMonthlyFacBal.setLawAmount(lawAmount);
+					tMonthlyFacBal.setLawAssetClass(lawAssetClass);
 				}
 
 				try {
@@ -196,9 +198,9 @@ public class L7205p extends TradeBuffer {
 
 					throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 				}
-				
+
 				titaVo.setDataBaseOnMon();// 指定月報環境
-				
+
 				try {
 					tMothlyFacBalService.update(tMonthlyFacBal, titaVo);
 
@@ -206,14 +208,12 @@ public class L7205p extends TradeBuffer {
 
 					throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 				}
-				
+
 				CountS++; // 成功筆數+1
 			}
-			
-			
+
 			titaVo.setDataBaseOnOrg();// 還原原本的環境
-			
-			
+
 			titaVo.keepOrgDataBase();// 保留原本記號
 			// 維護Ifrs9FacData
 			Ifrs9FacDataId ifrs9FacDataId = new Ifrs9FacDataId();
@@ -267,9 +267,8 @@ public class L7205p extends TradeBuffer {
 						throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 					}
 				}
-				
+
 				titaVo.setDataBaseOnMon();// 指定月報環境
-				
 
 				for (LoanIfrs9Ap t : lLoanIfrs9Ap) {
 					t.setAssetClass(parse.stringToInteger(assetclass));
@@ -279,11 +278,10 @@ public class L7205p extends TradeBuffer {
 						throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 					}
 				}
-				
-				
+
 			}
 		} // for
-		
+
 		titaVo.setDataBaseOnOrg();// 還原原本的環境
 
 //		this.totaVo.putParam("CountAll", CountAll);
@@ -369,8 +367,9 @@ public class L7205p extends TradeBuffer {
 		int iYearMonth = YearMonth;
 		BigDecimal iCustNo = BigDecimal.ZERO;
 		BigDecimal iFacmNo = BigDecimal.ZERO;
-		BigDecimal iAssetClass = BigDecimal.ZERO;
+		String iAssetClass = "";
 		BigDecimal iLawAmount = BigDecimal.ZERO;
+		String iLawAssetClass = "";
 
 		int fileYearMonth = new BigDecimal(makeExcel.getValue(1, 10).toString()).intValue() + 191100;
 
@@ -420,8 +419,9 @@ public class L7205p extends TradeBuffer {
 			try {
 				iCustNo = new BigDecimal(makeExcel.getValue(i, 2).toString());
 				iFacmNo = new BigDecimal(makeExcel.getValue(i, 3).toString());
-				iAssetClass = new BigDecimal(makeExcel.getValue(i, 8).toString());
+				iAssetClass = makeExcel.getValue(i, 8).toString();
 				iLawAmount = new BigDecimal(makeExcel.getValue(i, 9).toString());
+				iLawAssetClass = makeExcel.getValue(i, 10).toString();
 			} catch (Exception e) {
 
 				String ErrorMsg = "L7205(Excel欄位應為戶號在B欄、額度在C欄、資產分類為H欄)，請確認";
@@ -438,8 +438,9 @@ public class L7205p extends TradeBuffer {
 			occursList.putParam("YearMonth", iYearMonth);
 			occursList.putParam("CustNo", iCustNo.intValue());
 			occursList.putParam("FacmNo", iFacmNo.intValue());
-			occursList.putParam("AssetClass", iAssetClass.intValue());
+			occursList.putParam("AssetClass", iAssetClass);
 			occursList.putParam("LawAmount", iLawAmount.intValue());
+			occursList.putParam("LawAssetClass", iLawAssetClass);
 
 			this.occursList.add(occursList);
 		}
@@ -511,7 +512,7 @@ public class L7205p extends TradeBuffer {
 		this.info("upd LM052 SP start.");
 		String empNo = titaVo.getTlrNo();
 		this.info("empNo=" + empNo);
-	
+
 		sLM052AssetClass.Usp_L9_MonthlyLM052AssetClass_Ins(yearMonth, empNo, titaVo);
 		sLM052LoanAsset.Usp_L9_MonthlyLM052LoanAsset_Ins(yearMonth, empNo, titaVo);
 		sLM052Ovdu.Usp_L9_MonthlyLM052Ovdu_Ins(yearMonth, empNo, titaVo);
