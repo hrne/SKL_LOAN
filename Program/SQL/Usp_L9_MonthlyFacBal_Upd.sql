@@ -131,16 +131,7 @@ BEGIN
           , 0                         AS "OvduBreachBal"       -- 催收違約金餘額          
           , 0                         AS "OvduBal"             -- 催收餘額(呆帳餘額)   
           , 0                         AS "LawAmount"           -- 無擔保債權設定金額(法務進度:901)
-          , CASE WHEN L."OvduTerm" > 12                        -- 三	逾繳超過清償期12月者                   
-                      THEN '3'
-                 WHEN L."OvduTerm" >= 7                        -- 二之3 逾繳超過清償期7-12月者
-                      THEN '23'
-                 WHEN L."OvduTerm" >= 1                        -- 二之2 逾繳超過清償期1-6月者 
-                      THEN '22'
-                 WHEN FAC."ProdNo" IN('60','61','62')          -- 二之1 債信已不良者（有擔保分期協議且正常還款者） 
-                      THEN '2'                                 --  60:協議還款-定期機動 61:協議還款-機動 62:協議還款-固定
-                                                               -- 20220512 改由後續程式判斷
-            END                       AS "AssetClass"          -- 資產五分類代號
+          , ''                        AS "AssetClass"          -- 資產五分類代號
           , 0                         AS "StoreRate"           -- 計息利率
           ,JOB_START_TIME             AS "CreateDate"          -- 建檔日期時間
           ,EmpNo                      AS "CreateEmpNo"         -- 建檔人員
@@ -148,6 +139,8 @@ BEGIN
           ,EmpNo                      AS "LastUpdateEmpNo"     -- 最後更新人員
           ,'00A'                      AS "AcSubBookCode"       -- 區隔帳冊
           ,''                         AS "LawAssetClass"       -- 無擔保資產分類代號
+          ,''                         AS "AssetClass2"       -- 資產五分類代號2(有擔保部分)
+	
 
     FROM "CollList" L
     LEFT JOIN "FacMain" FAC ON FAC."CustNo" = L."CustNo"
@@ -588,6 +581,75 @@ BEGIN
     JOB_END_TIME := SYSTIMESTAMP;
 
     commit;
+
+    MERGE INTO "MonthlyFacBal" M
+    USING (
+      SELECT M."YearMonth"
+           , M."CustNo"
+           , M."FacmNo" 
+           ,  CASE
+                WHEN M."AssetClass" = 2
+                THEN 
+                  CASE  WHEN M."AcctCode" = '990'
+                      THEN '23'       --(23)第二類-應予注意：
+                                      --    有足無擔保--逾繳超過清償期7-12月者
+                                      --    或無擔保部分--超過清償期1-3月者        
+                      WHEN M."ProdNo" IN ('60','61','62')
+                      THEN '21'       --(21)第二類-應予注意：
+                                      --    有足額擔保--但債信以不良者
+                                      --    (有擔保分期協議且正常還款者)
+                      ELSE '22'       --(22)第二類-應予注意：
+                                      --    有足無擔保--逾繳超過清償期1-6月者
+                  END
+                WHEN  M."AssetClass" = 1
+                THEN CASE
+                    WHEN M."ClCode1" IN (1,2) 
+                      AND CDI."IndustryItem" LIKE '%不動產%'
+                    THEN '12'              -- 特定資產放款：建築貸款
+                    WHEN M."ClCode1" IN (1,2) 
+                      AND CDI."IndustryItem" LIKE '%建築%'
+                    THEN '12'              -- 特定資產放款：建築貸款
+                    WHEN M."ClCode1" IN (1,2) 
+                      AND F."FirstDrawdownDate" >= 20100101 
+                      AND M."FacAcctCode" = 340
+                    THEN '11'               -- 正常繳息
+                    WHEN M."ClCode1" IN (1,2) 
+                      AND F."FirstDrawdownDate" >= 20100101 
+                      AND REGEXP_LIKE(M."ProdNo",'I[A-Z]')
+                    THEN '11'               -- 正常繳息
+                    WHEN M."ClCode1" IN (1,2) 
+                      AND F."FirstDrawdownDate" >= 20100101 
+                      AND REGEXP_LIKE(M."ProdNo",'8[1-8]')
+                    THEN '11'               -- 正常繳息
+                    WHEN M."ClCode1" IN (1,2) 
+                      AND F."UsageCode" = '02' 
+                      AND TRUNC(M."PrevIntDate" / 100) >= LYYYYMM
+                    THEN '12'       -- 特定資產放款：購置住宅+修繕貸款              
+                    ELSE '11'       
+                    END
+              ELSE "AssetClass"
+              END                  AS "AssetClass2"	--資產分類2	  
+      FROM "MonthlyFacBal" M
+      LEFT JOIN "FacMain" F ON F."CustNo" = M."CustNo"
+                            AND F."FacmNo" = M."FacmNo"
+      LEFT JOIN "CustMain" CM ON CM."CustNo" = M."CustNo"
+      LEFT JOIN ( SELECT DISTINCT SUBSTR("IndustryCode",3,4) AS "IndustryCode"
+                        ,"IndustryItem"
+                  FROM "CdIndustry" ) CDI ON CDI."IndustryCode" = SUBSTR(CM."IndustryCode",3,4)
+      WHERE M."PrinBalance" > 0 
+        AND M."YearMonth" = YYYYMM
+    ) TMP
+    ON (
+      TMP."YearMonth" = M."YearMonth"
+      AND TMP."CustNo" = M."CustNo"
+      AND TMP."FacmNo" = M."FacmNo"
+    )
+    WHEN MATCHED THEN UPDATE SET
+    "AssetClass2" = TMP."AssetClass2"
+    ;
+
+
+
 
     -- 例外處理
     Exception

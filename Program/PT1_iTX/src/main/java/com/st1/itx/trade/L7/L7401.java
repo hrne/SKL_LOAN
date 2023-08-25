@@ -107,9 +107,18 @@ public class L7401 extends TradeBuffer {
 			Slice<CoreAcMain> fCoreAcMain = tCoreAcMainService.findByAcDate(bcDate, 0, Integer.MAX_VALUE, titaVo);
 			List<CoreAcMain> lCoreAcMain = fCoreAcMain == null ? null : fCoreAcMain.getContent();
 
-			if (addData(titaVo, filename, "SKL000_NTD", bcDate, lCoreAcMain)
-					&& addData(titaVo, filename, "SKL000_00A_NTD", bcDate, lCoreAcMain)) {
+//			addData(titaVo, filename, "SKL000_NTD", bcDate, lCoreAcMain)
+			if (addData(titaVo, filename, "SKL000_00A_NTD", bcDate, lCoreAcMain)) {
+
+				titaVo.keepOrgDataBase();// 保留原本記號
+
 				insertData(titaVo);
+
+				titaVo.setDataBaseOnMon();// 指定月報環境
+
+				insertData(titaVo);
+
+				titaVo.setDataBaseOnOrg();// 還原原本的環境
 
 				this.totaVo.putParam("Count", count);
 
@@ -248,10 +257,6 @@ public class L7401 extends TradeBuffer {
 
 		try {
 			tCoreAcMainService.insertAll(inCoreAcMain, titaVo);
-
-//			this.info("setDataBaseOnLine");
-//			titaVo.setDataBaseOnLine();
-//			tCoreAcMainService.insertAll(inCoreAcMain, titaVo);
 
 		} catch (DBException e) {
 			// TODO Auto-generated catch block

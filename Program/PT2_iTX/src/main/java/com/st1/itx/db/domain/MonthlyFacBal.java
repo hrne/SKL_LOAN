@@ -2,7 +2,6 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -251,8 +250,8 @@ public class MonthlyFacBal implements Serializable {
   private BigDecimal lawAmount = new BigDecimal("0");
 
   // 資產五分類代號(有擔保部分)
-  /* 11:一之112:一之2,21:二之122:二之223:二之33:三  4:四   5:五此為有擔保金額(PrinBalance-LawAmount)的分類 */
-  @Column(name = "`AssetClass`", length = 2)
+  /* 1~5 (有擔保部分) */
+  @Column(name = "`AssetClass`", length = 1)
   private String assetClass;
 
   // 計息利率
@@ -286,6 +285,11 @@ public class MonthlyFacBal implements Serializable {
   /* L7205上傳更新4:四5:五 */
   @Column(name = "`LawAssetClass`", length = 2)
   private String lawAssetClass;
+
+  // 資產五分類代號2(有擔保部分)
+  /* 11:一之112:一之2,21:二之122:二之223:二之33:三  4:四   5:五此為有擔保金額(PrinBalance-LawAmount)的分類 */
+  @Column(name = "`AssetClass2`", length = 2)
+  private String assetClass2;
 
 
   public MonthlyFacBalId getMonthlyFacBalId() {
@@ -1324,15 +1328,7 @@ public class MonthlyFacBal implements Serializable {
 
 /**
 	* 資產五分類代號(有擔保部分)<br>
-	* 11:一之1
-12:一之2,
-21:二之1
-22:二之2
-23:二之3
-3:三  
-4:四   
-5:五
-此為有擔保金額(PrinBalance-LawAmount)的分類
+	* 1~5 (有擔保部分)
 	* @return String
 	*/
   public String getAssetClass() {
@@ -1341,15 +1337,7 @@ public class MonthlyFacBal implements Serializable {
 
 /**
 	* 資產五分類代號(有擔保部分)<br>
-	* 11:一之1
-12:一之2,
-21:二之1
-22:二之2
-23:二之3
-3:三  
-4:四   
-5:五
-此為有擔保金額(PrinBalance-LawAmount)的分類
+	* 1~5 (有擔保部分)
   *
   * @param assetClass 資產五分類代號(有擔保部分)
 	*/
@@ -1496,6 +1484,41 @@ public class MonthlyFacBal implements Serializable {
     this.lawAssetClass = lawAssetClass;
   }
 
+/**
+	* 資產五分類代號2(有擔保部分)<br>
+	* 11:一之1
+12:一之2,
+21:二之1
+22:二之2
+23:二之3
+3:三  
+4:四   
+5:五
+此為有擔保金額(PrinBalance-LawAmount)的分類
+	* @return String
+	*/
+  public String getAssetClass2() {
+    return this.assetClass2 == null ? "" : this.assetClass2;
+  }
+
+/**
+	* 資產五分類代號2(有擔保部分)<br>
+	* 11:一之1
+12:一之2,
+21:二之1
+22:二之2
+23:二之3
+3:三  
+4:四   
+5:五
+此為有擔保金額(PrinBalance-LawAmount)的分類
+  *
+  * @param assetClass2 資產五分類代號2(有擔保部分)
+	*/
+  public void setAssetClass2(String assetClass2) {
+    this.assetClass2 = assetClass2;
+  }
+
 
   @Override
   public String toString() {
@@ -1508,6 +1531,6 @@ public class MonthlyFacBal implements Serializable {
            + ", acctFee=" + acctFee + ", shortfallPrin=" + shortfallPrin + ", shortfallInt=" + shortfallInt + ", tempAmt=" + tempAmt + ", clCode1=" + clCode1 + ", clCode2=" + clCode2
            + ", clNo=" + clNo + ", cityCode=" + cityCode + ", ovduDate=" + ovduDate + ", ovduPrinBal=" + ovduPrinBal + ", ovduIntBal=" + ovduIntBal + ", ovduBreachBal=" + ovduBreachBal
            + ", ovduBal=" + ovduBal + ", lawAmount=" + lawAmount + ", assetClass=" + assetClass + ", storeRate=" + storeRate + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
-           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", acSubBookCode=" + acSubBookCode + ", lawAssetClass=" + lawAssetClass + "]";
+           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", acSubBookCode=" + acSubBookCode + ", lawAssetClass=" + lawAssetClass + ", assetClass2=" + assetClass2 + "]";
   }
 }

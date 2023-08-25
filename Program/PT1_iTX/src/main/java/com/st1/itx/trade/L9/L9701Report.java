@@ -204,6 +204,7 @@ public class L9701Report extends MakeReport {
 		boolean isFirst = true;
 
 		int detailCounts = 0;
+		int cntAll = 0;
 		if (listL9701 != null && listL9701.size() > 0) {
 
 			for (Map<String, String> tL9701Vo : listL9701) {
@@ -227,13 +228,41 @@ public class L9701Report extends MakeReport {
 					}
 				}
 
-				// 換頁
-				nextPage();
+				String nextFacmNo = facmNo + "";
 
-				if (!this.facmNo.equals(tL9701Vo.get("FacmNo")) || tL9701Vo.get("DB").equals("2")) {
+				if (cntAll + 1 < listL9701.size()) {
+					nextFacmNo = listL9701.get(cntAll + 1).get("FacmNo");
+				}
+				this.info("facmNo = " + facmNo);
+				this.info("nextFacmNo = " + nextFacmNo);
+
+				String lastsFacmNo = facmNo + "";
+
+				if (cntAll > 0 && facmNo > 0) {
+					lastsFacmNo = listL9701.get(cntAll - 1).get("FacmNo");
+				}
+
+				// 計算筆數
+				cntAll++;
+				if (facmNo == 0) {
+					continue;
+				}
+
+				this.info("lastsFacmNo = " + lastsFacmNo);
+				this.info("lastsFacmNo vs facmno = " + lastsFacmNo + " vs " + tL9701Vo.get("FacmNo"));
+				if (!lastsFacmNo.equals(facmNo + "")) {
+					this.facmNo = tL9701Vo.get("FacmNo");
+					this.info("NNNNNNNNNNNNNNNNNNNN");
+					nextPage(true, cntAll == listL9701.size());
+				}
+
+				// 換頁
+				nextPage(false, cntAll == listL9701.size());
+
+				if (!this.facmNo.equals(nextFacmNo)) {
 					// 無交易明細且無餘額
 					if (detailCounts == 0) {
-						if (tL9701Vo.get("DB").equals("2")) {
+						if (!this.facmNo.equals(nextFacmNo) || detailCounts == listL9701.size()) {
 							BigDecimal unpaidLoanBal = tL9701Vo.get("Amount").isEmpty()
 									|| tL9701Vo.get("Amount") == null ? BigDecimal.ZERO
 											: new BigDecimal(tL9701Vo.get("Amount"));
@@ -247,7 +276,7 @@ public class L9701Report extends MakeReport {
 					if ("0".equals(this.facmNo) && !"0".equals(tL9701Vo.get("FacmNo"))) {
 						divider();
 						detailCounts = 0;
-						isFirst = true;
+//						isFirst = true;
 					}
 
 					this.custName = tL9701Vo.get("CustName");
@@ -255,36 +284,30 @@ public class L9701Report extends MakeReport {
 					this.clAddr = tL9701Vo.get("Location");
 
 					// 換頁
-					nextPage();
+					nextPage(false, cntAll == listL9701.size());
 
-					if (isFirst) {
-						printFacHead();
-						isFirst = false;
-					}
-
-					String nextFacmNo = this.facmNo;
-
-					if (detailCounts + 1 < listL9701.size()) {
-						nextFacmNo = listL9701.get(detailCounts + 1).get("FacmNo");
-					} 
-
-					// 下一筆額度與現在不同 或是 最後一筆時
-					if (!this.facmNo.equals(nextFacmNo) || detailCounts == listL9701.size()) {
-						printFacEnd(this.facmNo);
-						detailCounts = 0;
-						isFirst = true;
-					}
 				}
 
 				if (tL9701Vo.get("DB").equals("1")) {
 					printDetail(tL9701Vo);
 					detailCounts++;
+
 				}
+
+				// 下一筆額度與現在不同 或是 最後一筆時
+				if (!this.facmNo.equals(nextFacmNo)) {
+					printFacEnd(this.facmNo);
+					detailCounts = 0;
+				}
+
+				// 最後一筆 列印結束報表
+				if (cntAll == listL9701.size()) {
+					this.print(-45, this.getMidXAxis(), endText, "C");
+				}
+
 			}
-		} else
-
-		{
-
+		} else {
+			printFacHead2();
 			this.print(1, 20, "*******    查無資料   ******");
 		}
 
@@ -397,13 +420,26 @@ public class L9701Report extends MakeReport {
 		feeAmtTotal = BigDecimal.ZERO;
 	}
 
-	private void nextPage() {
+	private void nextPage(boolean forceNextPage, boolean isLast) {
 
-		if (this.NowRow >= 45) {
-			this.print(1, this.getMidXAxis(), nextPageText, "C"); //
-			this.newPage();
-			this.print(1, 1, " "); //
-			printFacHead2();
+		// 換頁1：資料滿列數換頁
+		if (this.NowRow >= 45 && !forceNextPage) {
+			this.print(1, this.getMidXAxis(), nextPageText, "C");
+			if (!isLast) {
+				this.newPage();
+				this.print(1, 1, " "); //
+				printFacHead2();
+			}
+		}
+
+		// 換頁2:強制換頁，表示下一筆額度與當前不同
+		if (forceNextPage) {
+			this.print(-45, this.getMidXAxis(), nextPageText, "C");
+			if (!isLast) {
+				this.newPage();
+				this.print(1, 1, " "); //
+				printFacHead();
+			}
 		}
 	}
 

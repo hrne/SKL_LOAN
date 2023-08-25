@@ -1,8 +1,6 @@
 package com.st1.itx.trade.BS;
 
 import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -13,29 +11,13 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcAcctCheck;
-import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcMain;
 import com.st1.itx.db.domain.AcMainId;
-import com.st1.itx.db.domain.AcReceivable;
-import com.st1.itx.db.domain.AcReceivableId;
-import com.st1.itx.db.domain.BankRmtf;
 import com.st1.itx.db.domain.CdAcCode;
-import com.st1.itx.db.domain.NegAppr02;
-import com.st1.itx.db.domain.NegMain;
-import com.st1.itx.db.domain.NegTrans;
-import com.st1.itx.db.domain.NegTransId;
 import com.st1.itx.db.service.AcAcctCheckService;
 import com.st1.itx.db.service.AcMainService;
-import com.st1.itx.db.service.AcReceivableService;
-import com.st1.itx.db.service.BankRmtfService;
 import com.st1.itx.db.service.CdAcCodeService;
-import com.st1.itx.db.service.DailyTavService;
-import com.st1.itx.db.service.NegAppr02Service;
-import com.st1.itx.db.service.NegMainService;
-import com.st1.itx.db.service.NegTransService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.common.AcDetailCom;
-import com.st1.itx.util.common.AcReceivableCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 

@@ -77,6 +77,17 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       	  ELSE 'C' END  AS F22";
 		sql += "       ,M.\"DepartmentCode\" 	                  AS F23 ";
 		sql += "       ,M.\"EntCode\" 	                          AS F24 ";
+		sql += "       , CASE WHEN M.\"ClCode1\" IN (1,2)  	      		 ";
+		sql += "         		AND CDI.\"IndustryItem\" LIKE '%不動產%' ";
+		sql += "       			THEN 'Y' 								";
+		sql += "       		  WHEN M.\"ClCode1\" IN (1,2)  	      		 ";
+		sql += "       		  	AND CDI.\"IndustryItem\" LIKE '%建築%'  	 ";
+		sql += "       		  	THEN 'Y'  	      		 				 ";
+		sql += "       	  	  ELSE ' ' END  AS F25							 ";
+		sql += "       ,M.\"AssetClass\" 	                          AS F26 ";
+		sql += "       ,M.\"AssetClass2\" 	                          AS F27 ";
+		sql += "       ,M.\"LawAmount\"	                          	  AS F28 ";
+		sql += "       ,M.\"LawAssetClass\"	                      	  AS F29 ";
 		sql += " FROM \"MonthlyLoanBal\" M ";
 		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = M.\"CustNo\" ";
 		sql += " LEFT JOIN \"LoanBorMain\" L ON L.\"CustNo\" = M.\"CustNo\" ";
@@ -93,6 +104,9 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"ClBuilding\" CB ON CB.\"ClCode1\" = M.\"ClCode1\"";
 		sql += "                            AND CB.\"ClCode2\" = M.\"ClCode2\"";
 		sql += "                            AND CB.\"ClNo\" = M.\"ClNo\"";
+		sql += " LEFT JOIN ( SELECT DISTINCT SUBSTR(\"IndustryCode\",3,4) AS \"IndustryCode\"   ";
+		sql += "                             ,\"IndustryItem\" ";
+		sql += "                       FROM \"CdIndustry\" ) CDI ON CDI.\"IndustryCode\" = SUBSTR(C.\"IndustryCode\",3,4)  ";
 		sql += " WHERE M.\"YearMonth\" = :yymm ";
 		sql += "   AND M.\"LoanBalance\" > 0 ";
 		sql += " ORDER BY F0,F1,F2 ";
@@ -212,7 +226,7 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          WHEN M.\"ProdNo\" IN ('60','61','62') THEN '協' ";
 		sql += "          WHEN M.\"AcctCode\" = 990  THEN '催' ";
 		sql += "        ELSE ' ' END AS F13";
-		sql += "       ,M.\"AssetClass\" AS F14";
+		sql += "       ,M.\"AssetClass2\" AS F14";
 		sql += "       ,CASE  ";
 		sql += "       	  WHEN (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]'))";
 		sql += "       	  THEN 'Z'";

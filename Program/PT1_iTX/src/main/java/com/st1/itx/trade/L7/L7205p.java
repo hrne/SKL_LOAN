@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -184,11 +185,12 @@ public class L7205p extends TradeBuffer {
 				CountF++; // 失敗筆數+1
 				this.info("fail custNo =" + custno + "-" + facmno);
 			} else {
-				tMonthlyFacBal.setAssetClass(assetclass);
+				tMonthlyFacBal.setAssetClass(assetclass.substring(0, 1));
 
 				if ("xlsx".equals(extension[extension.length - 1]) || "xls".equals(extension[extension.length - 1])) {
 					tMonthlyFacBal.setLawAmount(lawAmount);
 					tMonthlyFacBal.setLawAssetClass(lawAssetClass);
+					tMonthlyFacBal.setAssetClass2(assetclass);
 				}
 
 				try {
@@ -382,6 +384,8 @@ public class L7205p extends TradeBuffer {
 			throw new LogicException(titaVo, "E0015", ErrorMsg);
 		}
 
+		String assetClasss[] = { "11", "12", "21", "22", "23", "3", "4", "5" };
+		List<String> assetClasssList = Arrays.asList(assetClasss);
 		for (int i = 2; i <= lastRowNum; i++) {
 
 			OccursList occursList = new OccursList();
@@ -419,14 +423,30 @@ public class L7205p extends TradeBuffer {
 			try {
 				iCustNo = new BigDecimal(makeExcel.getValue(i, 2).toString());
 				iFacmNo = new BigDecimal(makeExcel.getValue(i, 3).toString());
-				iAssetClass = makeExcel.getValue(i, 8).toString();
+				iAssetClass = makeExcel.getValue(i, 8).toString().trim();
 				iLawAmount = new BigDecimal(makeExcel.getValue(i, 9).toString());
-				iLawAssetClass = makeExcel.getValue(i, 10).toString();
+				iLawAssetClass = makeExcel.getValue(i, 10).toString().trim();
 			} catch (Exception e) {
 
 				String ErrorMsg = "L7205(Excel欄位應為戶號在B欄、額度在C欄、資產分類為H欄)，請確認";
 
 				throw new LogicException(titaVo, "E0015", ErrorMsg);
+			}
+			// 檢查資產分類
+			if (!assetClasssList.contains(iAssetClass)) {
+				String ErrorMsg = "L7205(第" + i + "列，戶號 " + iCustNo + " 的資產分類錯誤)";
+				throw new LogicException(titaVo, "E0015", ErrorMsg);
+			}
+			// 檢查無擔保資產分類
+			if (iLawAmount.compareTo(BigDecimal.ZERO) > 0) {
+				if (iLawAssetClass.isEmpty()) {
+					String ErrorMsg = "L7205(第" + i + "列，戶號 " + iCustNo + " 的無擔保資產分類應有值)";
+					throw new LogicException(titaVo, "E0015", ErrorMsg);
+				}
+				if (!assetClasssList.contains(iLawAssetClass) || iLawAssetClass.equals(iAssetClass)) {
+					String ErrorMsg = "L7205(第" + i + "列，戶號 " + iCustNo + " 的無擔保資產分類錯誤)";
+					throw new LogicException(titaVo, "E0015", ErrorMsg);
+				}
 			}
 
 			// 設定明細欄位的擷取位置

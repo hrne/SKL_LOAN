@@ -79,21 +79,20 @@ public class L9731Report extends MakeReport {
 
 				rptItem = "人工檢核表(" + tradeName + ")";
 				// L9731-人工檢核表(XXXX)-YYYMM
-				fileName = txcd + "-" + rptItem +"-"+ rocYearMonth;
-				
+				fileName = txcd + "-" + rptItem + "-" + rocYearMonth;
+
 				defaultName = "L9731_底稿_人工檢核表" + i + ".xlsx";
-				
-				//開啟報表
+
+				// 開啟報表
 				ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
 						.setRptCode(txcd).setRptItem(rptItem).build();
-				
+
 				try {
 
 					switch (tradeCode) {
 					// 五類資產檢核表
 					case "HANDMADE1":
 
-					
 						makeExcel.open(titaVo, reportVo, fileName, defaultName, tradeName);
 
 //						makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9731",
@@ -105,11 +104,10 @@ public class L9731Report extends MakeReport {
 						exportSheet1(titaVo, findList, rocYearMonth);
 
 						break;
-						
+
 					// 放款總歸戶明細表
 					case "HANDMADE2":
 
-				
 						makeExcel.open(titaVo, reportVo, fileName, defaultName, tradeName);
 
 						findList = l9731ServiceImpl.findSheet2(titaVo, yearMonth);
@@ -117,11 +115,10 @@ public class L9731Report extends MakeReport {
 						exportSheet2(titaVo, findList);
 
 						break;
-						
+
 					// 放款額度明細表
 					case "HANDMADE3":
 
-					
 						makeExcel.open(titaVo, reportVo, fileName, defaultName, tradeName);
 
 						findList = l9731ServiceImpl.findSheet3_1(titaVo, yearMonth);
@@ -132,11 +129,9 @@ public class L9731Report extends MakeReport {
 //						exportSheet3(titaVo, findList, 2);
 
 						break;
-						
+
 					// 放款餘額明細表
 					case "HANDMADE4":
-
-	
 
 						makeExcel.open(titaVo, reportVo, fileName, defaultName, tradeName);
 
@@ -210,7 +205,7 @@ public class L9731Report extends MakeReport {
 
 						makeExcel.setValue(row, 7, fieldValue, "C");
 						break;
-					case 14:// 資產分類
+					case 14:// 資產分類2
 						makeExcel.setValue(row, 8, fieldValue, "C");
 					case 17:// 無擔保金額
 						BigDecimal amt901 = getBigDecimal(fieldValue);
@@ -442,6 +437,7 @@ public class L9731Report extends MakeReport {
 					case 14:// 核貸金額
 					case 15:// 撥款金額
 					case 16:// 放款餘額
+					case 28:// 無擔保金額
 						BigDecimal amt = getBigDecimal(fieldValue);
 						makeExcel.setValue(row, col, amt, "#,##0", "R");
 						break;
@@ -456,6 +452,10 @@ public class L9731Report extends MakeReport {
 					case 22:// 擔保品類別
 					case 23:// 案件隸屬單位
 					case 24:// 企金別
+					case 25:// 建築貸款
+					case 26:// 資產分類
+					case 27:// 資產分類2
+					case 29:// 無擔保資產分類
 						makeExcel.setValue(row, col, fieldValue, "C");
 						break;
 
