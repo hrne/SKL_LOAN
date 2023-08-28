@@ -59,7 +59,7 @@ BEGIN
            , M."CustNo"
            , M."FacmNo" 
            ,  CASE
-                WHEN M."AssetClass" = 2
+                WHEN M."AssetClass" = '2'
                 THEN 
                   CASE  WHEN M."AcctCode" = '990'
                       THEN '23'       --(23)第二類-應予注意：
@@ -72,7 +72,7 @@ BEGIN
                       ELSE '22'       --(22)第二類-應予注意：
                                       --    有足無擔保--逾繳超過清償期1-6月者
                   END
-                WHEN  M."AssetClass" = 1
+                WHEN  M."AssetClass" = '1'
                 THEN CASE
                     WHEN M."ClCode1" IN (1,2) 
                       AND CDI."IndustryItem" LIKE '%不動產%'
@@ -94,7 +94,6 @@ BEGIN
                     THEN '11'               -- 正常繳息
                     WHEN M."ClCode1" IN (1,2) 
                       AND F."UsageCode" = '02' 
-                      AND TRUNC(M."PrevIntDate" / 100) >= LYYYYMM
                     THEN '12'       -- 特定資產放款：購置住宅+修繕貸款              
                     ELSE '11'       
                     END
@@ -108,7 +107,7 @@ BEGIN
                         ,"IndustryItem"
                   FROM "CdIndustry" ) CDI ON CDI."IndustryCode" = SUBSTR(CM."IndustryCode",3,4)
       WHERE M."PrinBalance" > 0 
-        AND M."YearMonth" = YYYYMM
+        AND M."YearMonth" = TYYMM
         AND M."AssetClass2" IS NULL
     ) TMP
     ON (
@@ -125,23 +124,6 @@ BEGIN
 
     -- 寫入資料
     INSERT INTO "MonthlyLM052AssetClass"
-    WITH "tmpAssetClass" AS (
-      SELECT M."YearMonth"
-            ,M."CustNo"
-            ,M."FacmNo"
-            ,M."ClCode1"
-            ,M."FacAcctCode"
-            ,M."ProdNo"
-            ,M."PrevIntDate"
-            ,M."AssetClass2"      AS "AssetClass"	--放款資產項目	  
-             ,M."AcSubBookCode"    AS "AcSubBookCode" --區隔帳冊
-             ,M."PrinBalance"      --放款餘額     
-             ,M."LawAmount"    
-           FROM "MonthlyFacBal" M
-           WHERE M."PrinBalance" > 0
-             AND M."YearMonth" = TYYMM
-
-    )
     SELECT "YearMonth" 							AS "YearMonth"			--資料年月 DECIMAL 6 0
           ,"AssetClass" 						AS "AssetClassNo"		--資產五分類 VARCHAR2
 																				--1~5分類
@@ -159,10 +141,10 @@ BEGIN
 				  ,JOB_START_TIME           AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0
 				  ,EmpNo                    AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
     FROM ( SELECT M."YearMonth"
-                 ,M."AssetClass"
+                 ,M."AssetClass2"     AS "AssetClass"
                  ,M."AcSubBookCode"    AS "AcSubBookCode" --區隔帳冊
                  ,SUM(M."PrinBalance" - M."LawAmount")      AS "Amt"           --放款餘額
-           FROM "tmpAssetClass" M
+           FROM "MonthlyFacBal" M
            WHERE M."PrinBalance" > 0
              AND M."YearMonth" = TYYMM
            GROUP BY M."YearMonth"
@@ -182,16 +164,17 @@ BEGIN
                    ,M."AcSubBookCode"
           UNION 
           --擔保放款-折溢價
-          SELECT TYYMM                   AS "YearMonth"     --資料年月
+          SELECT "AcDate"/100                   AS "YearMonth"     --資料年月
                 ,'61'                    AS "AssetClass"    --資產分類
                 ,'999'                   AS "AcSubBookCode" --區隔帳冊
                 ,SUM("TdBal")  AS "Amt"   --(61)擔保品溢折價
           FROM "CoreAcMain" 
           WHERE "AcDate" =  TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR(TYYMM*100+1), 'YYYYMMDD')),'YYYYMMDD'))
             AND "AcNoCode" IN ('10600304000')
+          GROUP BY "AcDate"
           UNION 
           --催收款項-折溢價與催收費用
-          SELECT TYYMM                   AS "YearMonth"     --資料年月
+          SELECT "AcDate"/100                   AS "YearMonth"     --資料年月
                 ,'62'                    AS "AssetClass"    --資產分類
                 ,'999'                   AS "AcSubBookCode" --區隔帳冊
                 ,SUM("TdBal")            AS "Amt"           --(62)折溢價與催收費用
@@ -200,16 +183,20 @@ BEGIN
             AND "AcNoCode" IN ('10601301000'    --催收款項-法務費用
                               ,'10601302000'    --催收款項-火險費用
                               ,'10601304000')   --催收款項-折溢價
+          GROUP BY "AcDate"
+                  
           UNION 
           --應收利息
-          SELECT TYYMM             AS "YearMonth"     --資料年月
+          SELECT "YearMonth"             AS "YearMonth"     --資料年月
                 ,'7'                     AS "AssetClass"    --資產分類
                 ,'999'                   AS "AcSubBookCode" --區隔帳冊
                 ,SUM("IntAmtAcc")        AS "Amt"           --(7)應收利息
           FROM "MonthlyLoanBal"
           WHERE "LoanBalance" > 0
-          AND "YearMonth" = TYYMM
-        )
+            AND "YearMonth" = TYYMM
+          GROUP BY "YearMonth"
+                  ,'7'
+                  ,'999')
     GROUP BY "YearMonth" 
             ,"AssetClass"
             ,NVL("AcSubBookCode",'N')

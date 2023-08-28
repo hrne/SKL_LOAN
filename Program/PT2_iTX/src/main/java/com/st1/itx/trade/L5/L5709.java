@@ -190,15 +190,11 @@ public class L5709 extends TradeBuffer {
 			makeExcel.setValue(i, 12, Detail[13]);// 轉帳帳號
 			makeExcel.setValue(i, 13, Detail[14]);// 帳號ID
 			makeExcel.setValue(i, 14, Detail[15]);// 銷帳編號
-//			this.totaVo.addOccursList(occursList);
 			if (("+").equals(Detail[6])) {
 				// 檢核正確
 				// 從交易序號 找到正確的NEGAPPR01的資料
-//				int ApprDate = Integer.parseInt(Detail[3]);// 入/扣帳日
 				String FinCode = Detail[2].trim();// 收件單位
 				String BatchTxtNo = Detail[5];
-				// List<NegAppr01> lNegAppr01 =
-				// NegReportCom.InsUpdNegApprO1(IntBringUpdate,3,titaVo);
 				Slice<NegAppr01> slNegAppr01 = sNegAppr01Service.findBatch(BatchTxtNo, FinCode, tApprAcDate, 0, Integer.MAX_VALUE, titaVo);
 				List<NegAppr01> lNegAppr01 = slNegAppr01 == null ? null : slNegAppr01.getContent();
 				this.info("L5709 lNegAppr01!=null titaVo.isHcodeNormal()=[" + titaVo.isHcodeNormal() + "]");
@@ -211,7 +207,7 @@ public class L5709 extends TradeBuffer {
 						if (NegAppr01UpdVO != null) {
 							BigDecimal ApprAmt = new BigDecimal(Detail[7]);// 撥付金額
 							BigDecimal Hund = new BigDecimal(100);// 撥付金額
-							BigDecimal AccuApprAmt = NegAppr01UpdVO.getAccuApprAmt();// 累計撥付金額
+//							BigDecimal AccuApprAmt = NegAppr01UpdVO.getAccuApprAmt();// 累計撥付金額
 							ApprAmt = ApprAmt.divide(Hund);
 							this.info("ApprAmt==" + ApprAmt);
 							String ReplyCode = Detail[11];// 回應代碼
@@ -226,10 +222,10 @@ public class L5709 extends TradeBuffer {
 									}
 									NegAppr01UpdVO.setBringUpDate(IntBringUpDate);// 提兌日
 									NegAppr01UpdVO.setReplyCode(ReplyCode);// 回應代碼
-									//2023/7/5:撥付失敗時倒扣累計撥付金額
-									if(!"4001".equals(ReplyCode)) {
-										NegAppr01UpdVO.setAccuApprAmt(AccuApprAmt.subtract(ApprAmt));
-									}
+									//2023/7/5:撥付失敗時倒扣累計撥付金額 , 2023/8/26調整為失敗不到扣,重播不累加
+									//if(!"4001".equals(ReplyCode)) {
+									//	NegAppr01UpdVO.setAccuApprAmt(AccuApprAmt.subtract(ApprAmt));
+									//}
 									
 								} else {
 									// 撥付日期
@@ -240,10 +236,10 @@ public class L5709 extends TradeBuffer {
 								// 訂正
 								NegAppr01UpdVO.setBringUpDate(0);// 提兌日
 								NegAppr01UpdVO.setReplyCode("");// 回應代碼
-								//2023/7/5:訂正須加回累計撥付金額
-								if(!"4001".equals(ReplyCode)) {
-									NegAppr01UpdVO.setAccuApprAmt(AccuApprAmt.add(ApprAmt));
-								}
+								//2023/7/5:訂正須加回累計撥付金額 ,  2023/8/26調整正向不倒扣故點掉
+								//if(!"4001".equals(ReplyCode)) {
+								//	NegAppr01UpdVO.setAccuApprAmt(AccuApprAmt.add(ApprAmt));
+								//}
 							}
 
 							try {

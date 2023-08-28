@@ -2,11 +2,12 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.CdRuleCode;
 import org.springframework.data.domain.Slice;
-import com.st1.itx.db.domain.CdRuleCodeId;
 
 /**
  * Gen By Tool
@@ -19,11 +20,11 @@ public interface CdRuleCodeService {
   /**
    * findByPrimaryKey
    *
-   * @param cdRuleCodeId PK
+   * @param ruleCode PK
    * @param titaVo Variable-Length Argument
    * @return CdRuleCode CdRuleCode
    */
-  public CdRuleCode findById(CdRuleCodeId cdRuleCodeId, TitaVo... titaVo);
+  public CdRuleCode findById(String ruleCode, TitaVo... titaVo);
 
   /**
    * findAll
@@ -36,25 +37,24 @@ public interface CdRuleCodeService {
   public Slice<CdRuleCode> findAll(int index, int limit, TitaVo... titaVo);
 
   /**
-   * RuleCode =   ,AND RuleStDate =
+   * RuleStDate &gt;=
    *
-   * @param ruleCode_0 ruleCode_0
-   * @param ruleStDate_1 ruleStDate_1
+   * @param ruleStDate_0 ruleStDate_0
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice CdRuleCode CdRuleCode of List
    */
-  public Slice<CdRuleCode> findCodeDate(String ruleCode_0, int ruleStDate_1, int index, int limit, TitaVo... titaVo);
+  public Slice<CdRuleCode> findCodeDate(int ruleStDate_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By CdRuleCode
    * 
-   * @param cdRuleCodeId key
+   * @param ruleCode key
    * @param titaVo Variable-Length Argument
    * @return CdRuleCode CdRuleCode
    */
-  public CdRuleCode holdById(CdRuleCodeId cdRuleCodeId, TitaVo... titaVo);
+  public CdRuleCode holdById(String ruleCode, TitaVo... titaVo);
 
   /**
    * hold By CdRuleCode

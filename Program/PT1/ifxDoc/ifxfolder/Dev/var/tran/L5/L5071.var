@@ -126,7 +126,7 @@ C(3,#CustNo,0,$,S)
 @A(ID_UNINO,0,#CustId)
 
 ! 調RIM找CustNo
-<include src="ROM.icf::L2R07.dec"/>
+<include src="ROM.icf::L5R51.dec"/>
 #RimTxCode=X,5,S
 T(2,#TXCD)
 
@@ -134,18 +134,22 @@ T(2,#TXCD)
 T(2,#CustId)
 
 #RimCustNo=A,7,S
+#RimCaseSeq=A,3,S
+#RimErrorFg=X,1,S
 
-#SendL2r07=X,1,S
-!C(4,#CustId,S,$)
+!若輸入戶號找不到則要踢錯誤訊息
+#SendL5r51=X,1,S
 C(4,#CustId,C(3,#CustNo,0,S,$),$)
 T(2,@RimCustId,#CustId)
 E(0,@RimCustNo,#CustNo)
-RESET_RIM(#SEND_L2R07,L2R07)
-S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
-R(1,L2R07)
+E(0,@RimCaseSeq,0)
+T(2,@RimErrorFg,Y)
+RESET_RIM(#SEND_L5R51,L5R51)
+S(L5R51,1,#RimCustId,#RimCustNo,#RimCaseSeq,#RimErrorFg)
+R(1,L5R51)
 
 #MRKEY=_,_,S
-C(3,#CustNo,0,T(2,#L2r07CustNo),T(2,#CustNo))
+C(3,#CustNo,0,T(2,#L5r51CustNo),T(2,#CustNo))
 
 ! 01:新增
 
@@ -390,7 +394,7 @@ IF(#OOCaseCount<2,BIND(grid,cancel),$)
 !------ 下行電文TOM ------
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
-<include src="ROM.icf::L2R07.tom"/>
+<include src="ROM.icf::L5R51.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L5071
 #OOCustId

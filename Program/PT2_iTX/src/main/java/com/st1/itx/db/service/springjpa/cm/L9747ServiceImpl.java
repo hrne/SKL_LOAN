@@ -52,6 +52,7 @@ public class L9747ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        V.\"Status\", ";
 		sql += "        \"Fn_ParseEOL\"(C.\"CustName\", 0) AS \"CustName\", ";
 		sql += "        DECODE(V.\"Status\", 2, A.\"RvBal\", AA.\"RvBal\") AS \"RvBal\" ";
+		sql += "        NVL(AA.\"RvBal\", A.\"RvBal\") AS \"RvBal\" ";
 		sql += "    FROM ( ";
 		sql += "            select MAX(L.\"Status\") \"Status\", ";
 		sql += "                L.\"CustNo\" \"CustNo\", ";
@@ -77,8 +78,7 @@ public class L9747ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                and \"DbCr\" = 'D' ";
 		sql += "                and \"AcDate\" < :dataday ";
 		sql += "        ) AA ON AA.\"CustNo\" = V.\"CustNo\" ";
-		sql += "        AND V.\"Status\" = 6 ";
-		sql += "        AND AA.\"Seq\" = 1 ";
+		sql += "        AND  AA.\"Seq\" = 1 ";
 		sql += "        LEFT JOIN ( ";
 		sql += "            SELECT \"CustNo\", ";
 		sql += "                sum(\"RvBal\") as \"RvBal\" ";
@@ -86,7 +86,6 @@ public class L9747ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            WHERE \"AcctCode\" = 'TAV' ";
 		sql += "            GROUP BY \"CustNo\" ";
 		sql += "        ) A on A.\"CustNo\" = V.\"CustNo\" ";
-		sql += "        AND V.\"Status\" = 2 ";
 		sql += "        LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = V.\"CustNo\" ";
 		sql += "        LEFT JOIN \"ClFac\" Cf ON Cf.\"CustNo\" = V.\"CustNo\" ";
 		sql += "        AND Cf.\"FacmNo\" = V.\"minFacmNo\" ";

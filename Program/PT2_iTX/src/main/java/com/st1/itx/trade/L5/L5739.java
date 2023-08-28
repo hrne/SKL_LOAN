@@ -19,14 +19,14 @@ import com.st1.itx.util.data.DataLog;
 
 
 /**
- * L5983 建商名單維護
+ * L5739 建商名單維護
  * 
  * @author ST1-ChihWei
  * @version 1.0.0
  */
-@Service("L5983")
+@Service("L5739")
 @Scope("prototype")
-public class L5983 extends TradeBuffer {
+public class L5739 extends TradeBuffer {
 
 	@Autowired
 	ConstructionCompanyService constructionCompanyService;
@@ -39,7 +39,7 @@ public class L5983 extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("active L5983 ");
+		this.info("active L5739 ");
 		this.totaVo.init(titaVo);
 
 		String funCd = titaVo.getParam("FunCd");
@@ -55,8 +55,7 @@ public class L5983 extends TradeBuffer {
 			deleteConstructionCompany(titaVo);
 			break;
 		default:
-			// TODO: 回傳FunCd錯誤
-			break;
+			throw new LogicException(titaVo, "E0010", ""); // 功能選擇錯誤
 		}
 
 		this.addList(this.totaVo);

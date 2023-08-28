@@ -13,7 +13,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,168)ASGN(INQLEN$)
+E(0,7)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -36,31 +36,58 @@ E(0,40)ASGN(INQPRT$)
 E(0,0)
 !HIDE(#BTN1)
 
-#FirstIn=A,1,S
-E(0,1)
-
 #button=x,100,S
-T(2,{cmd=CHAIN; ntxcd=L4322; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
-K(MODIFYBUTTON,1,新增利率設定)
+T(2,{cmd=CHAIN; ntxcd=L6891; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,新增管制代碼)
 K(MODIFYBUTTON,查詢)
 
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+<sub type="DC" name="p1" layout="cols=1;screen.width=[200,850];printer.width=[20,20];">
 [
-["[L6090]                                 地區利率查詢"],
-["#FdWorkMonth+利率年月",#WorkMonth,"@(輸入0查全部)"],
+["[L6090]                                 管制代碼檔查詢"],
+["#FdRuleCode+規定管制項目代碼",#RuleCode],
+!["#FdRuleCodeItem+規定管制項目中文",#RuleCodeItem],
+!["#FdRmkItem+備註",#RmkItem],
+!["#FdRuleStDate+管制生效日",#RuleStDate],
+!["#FdRuleEdDate+管制取消日",#RuleEdDate],
+!["#FdEnableMark+是否啟用",#EnableMark],
 ]
+!---------- AP Button AREA ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
 
-#FdWorkMonth=X,2,L
+!---------- AP TEXT AREA Variables ----------
+#FdRuleCode=X,2,L
+T(3,*)
+!#FdRuleCodeItem=X,2,L
+!T(3, )
+!#FdRmkItem=X,2,L
+!T(3, )
+!#FdRuleStDate=X,2,L
+!T(3,*)
+!#FdRuleEdDate=X,2,L
+!T(3, )
+!#FdEnableMark=X,2,L
+!T(3,*)
 
-#WorkMonth=A,5,I
-@
-C(3,#WorkMonth,0,$,A(YM13,1,#WorkMonth))
+
+#RuleCode=X,5,I
+
+!#RuleCodeItem=X,30,I
+
+!#RmkItem=X,30,I
+
+!#RuleStDate=D,7,I
+
+!#RuleEdDate=D,7,I
+
+!#EnableMark=X,1,I
 
 #RPTFG=A,1,S
 E(0,0)
+
+
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -71,54 +98,65 @@ E(0,0)
 !---------- TXFORM = L6090 ----------
 <sub type="FORM" name="L6090">
 
-#SCRTIL=_,_,S
-T(3,[L6090] 業績件數及金額核算標準查詢)
+#OORuleCode=X,5,S
 
-!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
-!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
-#LOOP=X,1,S
-T(3,1)ASGN(LOOP$)
+#OORuleCodeItem=X,30,S
 
-! 計件代碼(TOTA)
-#OOWorkMonth=A,5,S
+#OORmkItem=X,30,S
 
-! 修改
-#OOBUF2=X,6,S
-T(2,2+#OOWorkMonth)
+#OORuleStDate=D,7,S
 
-#OOBTN2=X,4,S
-BIND(grid,{cmd=CHAIN;ntxcd=L4322;text=修改;ntxbuf=#OOBUF2})
+#OORuleEdDate=D,7,S
 
-! 複製
-#OOBUF3=X,6,S
-T(2,3+#OOWorkMonth)
+#OOEnableMark=X,1,S
 
-#OOBTN3=X,4,S
-BIND(grid,{cmd=CHAIN;ntxcd=L4322;text=複製;ntxbuf=#OOBUF3})
+! 修改的按鈕
+#OOFunc2=A,1,S
+E(0,2)
 
-! 刪除
-#OOBUF4=X,6,S
-T(2,4+#OOWorkMonth)
+#OOBUF2=x,100,S
+T(2,#OOFunc2+#OORuleCode+#OORuleCodeItem+#OORmkItem+#OORuleStDate+#OORuleEdDate+#OOEnableMark)
 
-#OOBTN4=X,4,S
-BIND(grid,{cmd=CHAIN;ntxcd=L4322;text=刪除;ntxbuf=#OOBUF4})
+#OOBTN2=X,100,S
+!C(5,#OORuleCode,CodeType,C(3,#IsAdmin,1,BIND(grid,{cmd=CHAIN;ntxcd=L6891;text=修改;ntxbuf=#OOBUF2}),BIND(grid,cancel)),BIND(grid,{cmd=CHAIN;ntxcd=L6891;text=修改;ntxbuf=#OOBUF2})) 
+BIND(grid,{cmd=CHAIN;ntxcd=L6891;text=修改;ntxbuf=#OOBUF2})
 
-! 查詢的按鈕
+!刪除的按鈕
+#OOFunc4=A,1,S
+E(0,4)
+
+#OOBUF4=x,100,S
+T(2,#OOFunc4+#OORuleCode+#OORuleCodeItem+#OORmkItem+#OORuleStDate+#OORuleEdDate+#OOEnableMark)
+
+#OOBTN4=X,100,S
+!C(5,#OORuleCode,CodeType,C(3,#IsAdmin,1,BIND(grid,{cmd=CHAIN;ntxcd=L6891;text=刪除;ntxbuf=#OOBUF4}),BIND(grid,cancel)),BIND(grid,{cmd=CHAIN;ntxcd=L6891;text=刪除;ntxbuf=#OOBUF4})) 
+BIND(grid,{cmd=CHAIN;ntxcd=L6891;text=刪除;ntxbuf=#OOBUF4})
+
+!查詢的按鈕
 #OOFunc5=A,1,S
 E(0,5)
 
-#OOBUF5=X,6,S
-T(2,5+#OOWorkMonth)
+#OOBUF5=x,100,S
+T(2,#OOFunc5+#OORuleCode+#OORuleCodeItem+#OORmkItem+#OORuleStDate+#OORuleEdDate+#OOEnableMark)
 
-#OOBTN5=X,4,S
-BIND(grid,{cmd=CHAIN;ntxcd=L4322;text=查詢;ntxbuf=#OOBUF5})
+#OOBTN5=X,100,S
+!C(5,#OORuleCode,CodeType,C(3,#IsAdmin,1,BIND(grid,{cmd=CHAIN;ntxcd=L6891;text=查詢;ntxbuf=#OOBUF5}),BIND(grid,cancel)),BIND(grid,{cmd=CHAIN;ntxcd=L6891;text=查詢;ntxbuf=#OOBUF5})) 
+BIND(grid,{cmd=CHAIN;ntxcd=L6891;text=查詢;ntxbuf=#OOBUF5})
+
+
+#SCRTIL=_,_,S
+T(3,[L6090] 管制代碼檔查詢)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
 </sub>
 
 
 !------ 上行電文 ------
 <sub type="TIM">
-#WorkMonth
-#END
+#RuleCode
+
 </sub>
 
 
@@ -126,19 +164,22 @@ BIND(grid,{cmd=CHAIN;ntxcd=L4322;text=查詢;ntxbuf=#OOBUF5})
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
-
 TXFORM=L6090
-#OOWorkMonth
+#OORuleCode
+#OORuleCodeItem
+#OORmkItem
+#OORuleStDate
+#OORuleEdDate
+#OOEnableMark
 ^
 </sub>
 
 !--------- OUTPUT畫面 --------
 <sub type="PART" name="L6090" layout="cols=1;screen.width=[100,900];printer.width=[20,20];">
 [
-["[L6090]                                 地區利率查詢                                             "],
+["[L6090]                                 管制代碼檔查詢                                             "],
 ]
 </sub>
-
 
 !---------- 單據輸出組合 ----------
 <sub type="SELECT">
@@ -147,20 +188,34 @@ TXFORM=L6090
 #any={detail:true, header:'L6090.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
 #OOBTN2=修改
-{width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
-
-#OOBTN3=複製
-{width:50,search:false,formatter:'cust:bind-button:#OOBTN3',align:'center',canExport:false}
-
+{width:50,search:false,formatter:'cust:bind-button:# ',align:'center',canExport:false}
 #OOBTN4=刪除
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN4',align:'center',canExport:false}
-
 #OOBTN5=查詢
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN5',align:'center',canExport:false}
 
-#OOWorkMonth=工作年月
-{width:70,align:'center'}
+#OORuleCode=規定管制項目代碼
+{width:140,align:'center'}
 
+#OORuleCodeItem=規定管制項目中文
+{width:140,align:'center'}
+
+#OORmkItem=備註
+{width:100,align:'center'}
+
+#OORuleStDate=管制生效日
+{width:100,align:'center'}
+
+#OORuleEdDate=管制取消日
+{width:100,align:'center'}
+
+#OOEnableMark=是否啟用
+{width:100,align:'center'}
+
+!#OOLastUpdate=最後更新日期時間
+!{width:150,align:'center'}
+
+!#OOLastUpdateEmpNo=最後更新人員
+!{width:100,align:'center'}
 ^
-
 </sub>

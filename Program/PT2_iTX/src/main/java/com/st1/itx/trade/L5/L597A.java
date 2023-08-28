@@ -106,7 +106,6 @@ public class L597A extends TradeBuffer {
 			this.info("L5051 ErrorForDB=" + e);
 			throw new LogicException(titaVo, "E5004", "");
 		}
-
 		if (Data != null && Data.size() != 0) {
 			int Seq = 0;
 			for (String[] lData : Data) {
@@ -331,6 +330,10 @@ public class L597A extends TradeBuffer {
 						occursList1.putParam("OOTitaTlrNo", lData[20]);// 經辦
 						occursList1.putParam("OOTitaTxtNo", lData[21]);// 交易序號
 
+						occursList1.putParam("OOCaseKindCode", lData[22]);// 案件種類
+						occursList1.putParam("OOPayerCustNo", lData[23]);// 借款人戶號
+						occursList1.putParam("OOPayerCustName", lData[24]);// 借款人戶名
+
 						occursList1.putParam("OONewtransTxKind", NewtransTxKind);// 試算交易別
 
 						occursList1.putParam("OOStatus", Status);
@@ -451,6 +454,9 @@ public class L597A extends TradeBuffer {
 					occursList1.putParam("OOReturnAmt", lData[19]);// 退還金額
 					occursList1.putParam("OOTitaTlrNo", lData[20]);// 經辦
 					occursList1.putParam("OOTitaTxtNo", lData[21]);// 交易序號
+					occursList1.putParam("OOCaseKindCode", lData[22]);// 案件種類
+					occursList1.putParam("OOPayerCustNo", lData[23]);// 借款人戶號
+					occursList1.putParam("OOPayerCustName", lData[24]);// 借款人戶名
 
 					occursList1.putParam("OONewtransTxKind", NewtransTxKind);// 試算交易別
 

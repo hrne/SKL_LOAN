@@ -142,7 +142,7 @@ CALL(#HelpProc)
 T(2,@TxKindHelp,#HelpDesc1)
 
 #TxKindHelp1=x,1024,S
-T(HELP,@TxKindHelp1,#TxKindHelp,-,9)
+T(HELP,@TxKindHelp1,#TxKindHelp,-,9;8;7;6)
 
 ! 查詢選項  新增最大債權跟一般債權可輸入範圍限制
 #SearchOption=X,2,I
@@ -272,7 +272,7 @@ E(0,#OOCustNo)
 #OOCustName=X,100,O
 ! 交易別
 #OOTxSts=A,1,O
-#OOTxStsX=X,10,O
+#OOTxStsX=X,12,O
 IF(#SearchOption=="13" || #SearchOption=="14" || #SearchOption=="15" || #SearchOption=="11" || #SearchOption=="18",S,$)
 SWITCH(#OOTxSts,0,T(2,正常),
                 1,T(2,溢繳),
@@ -280,12 +280,14 @@ SWITCH(#OOTxSts,0,T(2,正常),
                 3,T(2,提前還本),
                 4,T(2,結清),
                 5,T(2,提前清償),
-				        6,T(2,待處理),
+				        6,T(2,撥付失敗重撥),
+				        7,T(2,滿期),
+				        8,T(2,註銷),
 				        9,T(2,未處理)
 				)
 
 #OONewtransTxKind=X,1,O
-#OONewtransTxKindX=X,10,O
+#OONewtransTxKindX=X,12,O
 IF(#SearchOption=="13" || #SearchOption=="14" || #SearchOption=="15" || #SearchOption=="11" || #SearchOption=="18",S,$)
 C(4,#OONewtransTxKind,S,$)
 SWITCH(#OONewtransTxKind,0,T(2,正常),
@@ -294,7 +296,9 @@ SWITCH(#OONewtransTxKind,0,T(2,正常),
                 3,T(2,提前還本),
                 4,T(2,結清),
                 5,T(2,提前清償),
-				        6,T(2,待處理),
+				        6,T(2,撥付失敗重撥),
+				        7,T(2,滿期),
+				        8,T(2,註銷),
 				        9,T(2,未處理)
 				)
 				
@@ -416,6 +420,16 @@ E(0,#OOTitaTxtNo)
 #OOTransAccuOverAmt=m,14,L
 #OONewTransAccuOverAmt=m,14,L
 
+!20230827新增
+#OOCaseKindCode=A,1,L
+#OOCaseKindCodeX=X,4,O
+SWITCH(#OOCaseKindCode,1,T(2,債協),
+                       2,T(2,調解),
+                       3,T(2,更生),
+				               4,T(2,清算)
+				)
+#OOPayerCustNo=X,7,O
+#OOPayerCustName=X,100,O
 
 
 
@@ -818,6 +832,9 @@ TXFORM=L597A
 #OONewTransOrgAccuOverAmt
 #OOTransAccuOverAmt
 #OONewTransAccuOverAmt
+#OOCaseKindCode
+#OOPayerCustNo
+#OOPayerCustName
 ^
 </sub>
 
@@ -860,10 +877,20 @@ ifxBatch:{
 {width:100,align:'center'}
 #OOCustNoA=戶號
 {width:60,align:'right'}
-#OOCaseSeq=案件序號
-{width:80,align:'right'}
+#OOCaseSeq=案件<BR>序號
+{width:60,align:'center'}
+
+#OOCaseKindCodeX=案件<BR>種類
+{width:60,align:'center'}
+
 #OOCustName=戶名
 {width:80,align:'center'}
+
+#OOPayerCustNo=借款人<BR>戶號
+{width:60,align:'right'}
+#OOPayerCustName=借款人<BR>戶名
+{width:80,align:'center'}
+
 #OOTxStsX=交易別
 {width:60,align:'left'}
 #OONewtransTxKindX=試算交易別
@@ -918,9 +945,15 @@ ifxBatch:{
 {width:100,align:'center'}
 #OOCustNoA=戶號
 {width:60,align:'right'}
-#OOCaseSeq=案件序號
-{width:80,align:'right'}
+#OOCaseSeq=案件<BR>序號
+{width:60,align:'center'}
+#OOCaseKindCodeX=案件<BR>種類
+{width:60,align:'center'}
 #OOCustName=戶名
+{width:80,align:'center'}
+#OOPayerCustNo=借款人<BR>戶號
+{width:60,align:'right'}
+#OOPayerCustName=借款人<BR>戶名
 {width:80,align:'center'}
 #OOTxStsX=交易別
 {width:60,align:'left'}
@@ -966,13 +999,19 @@ ifxBatch:{
 {width:100,align:'center'}
 #OOCustNoA=戶號
 {width:60,align:'right'}
-#OOCaseSeq=案件序號
-{width:80,align:'right'}
+#OOCaseSeq=案件<BR>序號
+{width:60,align:'center'}
+#OOCaseKindCodeX=案件<BR>種類
+{width:60,align:'center'}
 #OOCustName=戶名
+{width:80,align:'center'}
+#OOPayerCustNo=借款人<BR>戶號
+{width:60,align:'right'}
+#OOPayerCustName=借款人<BR>戶名
 {width:80,align:'center'}
 #OOTxStsX=交易別
 {width:60,align:'left'}
-#OONewtransTxKindX=試算交易別
+#OONewtransTxKindX=試算<BR>交易別
 {width:85,align:'left'}
 #OOBtnSearch=入帳還款
 {search:false,formatter:'cust:bind-button:',align:'center',canExport:false,width:80}

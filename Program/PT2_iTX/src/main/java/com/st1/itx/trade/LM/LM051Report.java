@@ -551,6 +551,8 @@ public class LM051Report extends MakeReport {
 
 			for (Map<String, String> tLDVo : LDList) {
 				row++;
+				BigDecimal prinBalance = parse.stringToBigDecimal(tLDVo.get("F4"));
+				BigDecimal lawAmt = parse.stringToBigDecimal(tLDVo.get("F15"));
 				// F0+F1:1
 				makeExcel.setValue(row, 1, tLDVo.get("F0") + tLDVo.get("F1"));
 				// F0 戶號：2
@@ -563,14 +565,11 @@ public class LM051Report extends MakeReport {
 				// F3 戶名；5
 				makeExcel.setValue(row, 5, tLDVo.get("F3"), "L");
 				// F4 本金餘額；6
-				if (tLDVo.get("F4").equals("")) {
-					makeExcel.setValue(row, 6, 0);
-				} else {
-					makeExcel.setValue(row, 6, Float.valueOf(tLDVo.get("F4")), "#,##0");
-				}
+				makeExcel.setValue(row, 6, Float.valueOf("" + prinBalance), "#,##0");
 
 				// F5 科目；7
-				makeExcel.setValue(row, 7, (tLDVo.get("F5").equals("   ")||tLDVo.get("F5")==null)?0:Integer.valueOf(tLDVo.get("F5")), "L");
+				makeExcel.setValue(row, 7, (tLDVo.get("F5").equals("   ") || tLDVo.get("F5") == null) ? 0
+						: Integer.valueOf(tLDVo.get("F5")), "L");
 				// F6 逾期數；8
 
 				String ovduText = tLDVo.get("F6");
@@ -587,7 +586,7 @@ public class LM051Report extends MakeReport {
 				// F9分類項目:11
 				makeExcel.setValue(row, 11, tLDVo.get("F9"), "C");
 				// F4 五類金額(用F16區分F4)=；12~17
-				putAsset(row, tLDVo.get("F17"), tLDVo.get("F16"));
+				putAsset(row, prinBalance.subtract(lawAmt), tLDVo.get("F16"));
 				// F10 分類標準(文字)；18
 				String classText = "";
 				if (tLDVo.get("F13") == "60" || tLDVo.get("F13") == "61" || tLDVo.get("F13") == "62") {
@@ -601,7 +600,8 @@ public class LM051Report extends MakeReport {
 				}
 				makeExcel.setValue(row, 18, tLDVo.get("F10").isEmpty() ? "核貸估價" : classText, "L");
 				// F11 金額 19
-				makeExcel.setValue(row, 19, (tLDVo.get("F11").isEmpty())?0:Integer.valueOf(tLDVo.get("F11")), "#,##0");
+				makeExcel.setValue(row, 19, (tLDVo.get("F11").isEmpty()) ? 0 : Integer.valueOf(tLDVo.get("F11")),
+						"#,##0");
 				// F12 備註；20
 				makeExcel.setValue(row, 20, tLDVo.get("F12"), "L");
 				// F13 基本利率代碼(商品代號)；21
@@ -609,11 +609,8 @@ public class LM051Report extends MakeReport {
 
 				// F17 無擔保金額
 				// 本身資產分類不是5 且 金額不等於0 時，放入值
-				BigDecimal class5 = tLDVo.get("F15").isEmpty() || tLDVo.get("F15") == null ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F15"));
-				if (tLDVo.get("F16") != "5" && !BigDecimal.ZERO.equals(class5)) {
-					makeExcel.setValue(row, 17, class5, "#,##0");
-
+				if (lawAmt.compareTo(BigDecimal.ZERO) > 0) {
+					putAsset(row, lawAmt, tLDVo.get("F18"));
 				}
 
 			}
@@ -633,13 +630,12 @@ public class LM051Report extends MakeReport {
 	 * 
 	 */
 
-	private void putAsset(int row, String prinBalance, String assetClass) throws LogicException {
+	private void putAsset(int row, BigDecimal prinBalance, String assetClass) throws LogicException {
 		int col = 0;
 //			String memo = "";
 		switch (assetClass) {
 		case "21":
 			col = 12;
-
 			break;
 		case "22":
 			col = 13;
@@ -661,7 +657,7 @@ public class LM051Report extends MakeReport {
 			break;
 		}
 		if (col > 0) {
-			makeExcel.setValue(row, col, Float.valueOf(prinBalance), "#,##0");
+			makeExcel.setValue(row, col, "" + prinBalance, "#,##0");
 		}
 	}
 

@@ -37,7 +37,7 @@ K(MODIFYBUTTON,查詢)
 T(2,1)
 
 #InsertButton=x,100,S
-T(2,{cmd=CHAIN; ntxcd=L5983; ntxbuf=#InsertBuffer})
+T(2,{cmd=CHAIN; ntxcd=L5739; ntxbuf=#InsertBuffer})
 ASGN(BTN_NEW1$)
 C(3,#CHAIN,0,K(MODIFYBUTTON,1,新增),$)
 
@@ -84,9 +84,9 @@ E(0,1)ASGN(LOOP$)
 ![刪除碼]
 #OODeleteFlag=X,1,L
 
-!連動 L5983 建商名單維護
+!連動 L5739 建商名單維護
 #OOChainTxcd=X,5,S
-T(3,L5983)
+T(3,L5739)
 
 !修改
 #OOModifyFunCd=X,1,S

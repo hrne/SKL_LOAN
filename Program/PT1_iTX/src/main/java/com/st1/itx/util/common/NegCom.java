@@ -799,6 +799,7 @@ public class NegCom extends CommBuffer {
 		tNegMainUpd.setRepayInterest(mainRepayInterest);// 還本利息
 		tNegMainUpd.setAccuSklShareAmt(mainAccuSklShareAmt);// 累新壽攤分
 		tNegMainUpd.setStatus(status);// 戶況
+		tNegMainUpd.setStatusDate(newStatusDate);// 戶況日期 2023/8/26
 		tNegMainUpd.setLastDueDate(mainLastDueDate);// 還款結束日
 		tNegMainUpd.setThisAcDate(titaVo.getEntDyI());// AcDate 本次會計日期
 		tNegMainUpd.setThisTitaTlrNo(titaVo.getTlrNo());// TitaTlrNo 本次經辦
@@ -1076,22 +1077,26 @@ public class NegCom extends CommBuffer {
 	// 更新jcic報送檔
 	public void updateJcic(NegMain tNegMain, NegTrans tNegTrans, TitaVo titaVo) throws LogicException {
 		// CaseKindCode 1:協商 2:調解 3:更生 4:清算 ; 無JCIC報送日期 才可更正
-		switch (caseKindCode) {
-		case "1":
-			// 協商->JcicZ050 ->結案時報送 JCICZ046
-			DbJcicZ050(tCustMain.getCustId(), tNegMain, tNegTrans, titaVo);
-			break;
-		case "2":
-			// 調解->Jcic450
-			DbJcicZ450(tCustMain.getCustId(), tNegMain, tNegTrans, titaVo);
-		case "3":
-			// 更生->JcicZ573
-			DbJcicZ573(tCustMain.getCustId(), tNegMain, tNegTrans, titaVo);
-			break;
-		case "4":
-			// 清算->Jcic
 
-			break;
+		if (!"6".equals(tNegTrans.getTxKind())) {//6:撥付失敗重撥不申報
+			switch (caseKindCode) {
+			case "1":
+				// 協商->JcicZ050 ->結案時報送 JCICZ046
+				DbJcicZ050(tCustMain.getCustId(), tNegMain, tNegTrans, titaVo);
+				break;
+			case "2":
+				// 調解->Jcic450
+				DbJcicZ450(tCustMain.getCustId(), tNegMain, tNegTrans, titaVo);
+			case "3":
+				// 更生->JcicZ573
+				DbJcicZ573(tCustMain.getCustId(), tNegMain, tNegTrans, titaVo);
+				break;
+			case "4":
+				// 清算->Jcic
+
+				break;
+			}
+
 		}
 	}
 

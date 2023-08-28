@@ -54,7 +54,7 @@ public class L5055 extends TradeBuffer {
 
 		int WorkMonth = Integer.valueOf(titaVo.getParam("WorkYM").trim());
 
-		String controlCode = "L5510." + WorkMonth + ".1";
+		String controlCode = "L5510." + (WorkMonth + 191100) + ".1";
 		TxControl txControl = txControlService.findById(controlCode, titaVo);
 		if (txControl == null) {
 			throw new LogicException(titaVo, "E0010", "未執行 L5510 保費檢核");

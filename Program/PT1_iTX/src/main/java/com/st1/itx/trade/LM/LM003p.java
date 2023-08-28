@@ -42,13 +42,10 @@ public class LM003p extends TradeBuffer {
 
 		lM003Report.setParentTranCode(parentTranCode);
 
-		boolean isFinish = lM003Report.exec(titaVo);
+		lM003Report.exec(titaVo);
 
-		if (isFinish) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "LM003個人房貸戶 - 撥款／還款金額比較月報表已完成", titaVo);
-		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "LM003個人房貸戶 - 撥款／還款金額比較月報表查無資料", titaVo);
-		}
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
+				titaVo.getParam("TLRNO"), "LM003個人房貸戶 - 撥款／還款金額比較月報表已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

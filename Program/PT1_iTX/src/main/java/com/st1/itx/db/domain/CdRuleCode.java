@@ -1,13 +1,15 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
-import javax.persistence.EmbeddedId;
+import javax.persistence.Id;
 import javax.persistence.Column;
 import com.st1.itx.util.StaticTool;
 import com.st1.itx.Exception.LogicException;
@@ -25,12 +27,10 @@ import com.st1.itx.Exception.LogicException;
 public class CdRuleCode implements Serializable {
 
 
-  @EmbeddedId
-  private CdRuleCodeId cdRuleCodeId;
-
   // 規定管制項目代碼
-  @Column(name = "`RuleCode`", length = 4, insertable = false, updatable = false)
-  private String ruleCode;
+  @Id
+  @Column(name = "`RuleCode`", length = 5)
+  private String ruleCode = " ";
 
   // 規定管制項目中文
   @Column(name = "`RuleCodeItem`", length = 30)
@@ -41,7 +41,7 @@ public class CdRuleCode implements Serializable {
   private String rmkItem;
 
   // 管制生效日
-  @Column(name = "`RuleStDate`", insertable = false, updatable = false)
+  @Column(name = "`RuleStDate`")
   private int ruleStDate = 0;
 
   // 管制取消日
@@ -70,14 +70,6 @@ public class CdRuleCode implements Serializable {
   @Column(name = "`LastUpdateEmpNo`", length = 6)
   private String lastUpdateEmpNo;
 
-
-  public CdRuleCodeId getCdRuleCodeId() {
-    return this.cdRuleCodeId;
-  }
-
-  public void setCdRuleCodeId(CdRuleCodeId cdRuleCodeId) {
-    this.cdRuleCodeId = cdRuleCodeId;
-  }
 
 /**
 	* 規定管制項目代碼<br>
@@ -272,7 +264,7 @@ public class CdRuleCode implements Serializable {
 
   @Override
   public String toString() {
-    return "CdRuleCode [cdRuleCodeId=" + cdRuleCodeId + ", ruleCodeItem=" + ruleCodeItem + ", rmkItem=" + rmkItem + ", ruleEdDate=" + ruleEdDate + ", enableMark=" + enableMark
+    return "CdRuleCode [ruleCode=" + ruleCode + ", ruleCodeItem=" + ruleCodeItem + ", rmkItem=" + rmkItem + ", ruleStDate=" + ruleStDate + ", ruleEdDate=" + ruleEdDate + ", enableMark=" + enableMark
            + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

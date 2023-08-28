@@ -100,10 +100,10 @@ public class L5R27 extends TradeBuffer {
 		}
 		int workMonth = (tCdWorkMonth.getYear() * 100 + tCdWorkMonth.getMonth()) - 191100;
 		if ("L5505".equals(titaVo.getTxcd())) {
-			String controlCode = "L5510." + workMonth + ".1";
+			String controlCode = "L5510." + (workMonth + 191100) + ".1";
 			TxControl txControl = txControlService.findById(controlCode, titaVo);
 			if (txControl == null) {
-				throw new LogicException(titaVo, "E0010", "未執行 L5510 保費檢核"); 
+				throw new LogicException(titaVo, "E0010", "未執行 L5510 保費檢核");
 			}
 		}
 

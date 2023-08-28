@@ -3,16 +3,18 @@ package com.st1.itx.db.repository.mon;
 
 import java.util.Optional;
 
+import java.math.BigDecimal;
+import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.st1.itx.db.domain.CdRuleCode;
-import com.st1.itx.db.domain.CdRuleCodeId;
 
 /**
  * Gen By Tool
@@ -20,15 +22,15 @@ import com.st1.itx.db.domain.CdRuleCodeId;
  * @author AdamPan
  * @version 1.0.0
  */
-public interface CdRuleCodeRepositoryMon extends JpaRepository<CdRuleCode, CdRuleCodeId> {
+public interface CdRuleCodeRepositoryMon extends JpaRepository<CdRuleCode, String> {
 
-  // RuleCode =   ,AND RuleStDate =
-  public Slice<CdRuleCode> findAllByRuleCodeIsAndRuleStDateIs(String ruleCode_0, int ruleStDate_1, Pageable pageable);
+  // RuleStDate >=
+  public Slice<CdRuleCode> findAllByRuleStDateGreaterThanEqualOrderByRuleStDateAsc(int ruleStDate_0, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)
-  public Optional<CdRuleCode> findByCdRuleCodeId(CdRuleCodeId cdRuleCodeId);
+  public Optional<CdRuleCode> findByRuleCode(String ruleCode);
 
 }
 

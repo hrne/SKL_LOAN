@@ -190,8 +190,10 @@ public class L4721Batch extends TradeBuffer {
 							List<CustNotice> listCustNotice = custNoticeSlice == null ? null
 									: custNoticeSlice.getContent();
 
-							// 此預設Y為要印、要寄
-							// 或者 沒有申請 表示都要通知 設定為Y
+							//直接看資料庫
+							//Y 是 要寄 要送 要通知
+							//N 是 不寄 不送 不通知
+							//皆預設Y
 							if (listCustNotice == null) {
 								isEmail = "Y";
 								isMsg = "Y";
@@ -200,17 +202,17 @@ public class L4721Batch extends TradeBuffer {
 							} else {
 								for (CustNotice r : listCustNotice) {
 									
-									//*在資料庫的Y視為有申請 不寄送、不發送簡訊Email
-									if ("Y".equals(r.getEmailNotice())) {
+									//*在資料庫的N是不寄送 不發送
+									if ("N".equals(r.getEmailNotice())) {
 										//有申請表是不要，須改為N
 										isEmail = "N";
 									}
 
-									if ("Y".equals(r.getMsgNotice())) {
+									if ("N".equals(r.getMsgNotice())) {
 										isMsg = "N";
 									}
 
-									if ("Y".equals(r.getPaperNotice())) {
+									if ("N".equals(r.getPaperNotice())) {
 										isLetter = "N";
 									}
 								}

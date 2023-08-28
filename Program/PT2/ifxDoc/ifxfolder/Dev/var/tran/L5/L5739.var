@@ -1,0 +1,186 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L5739)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L5739]                                 建商名單維護 "],
+["#FdFunCd+功能",#FunCdX],
+["#FdCustNo+戶號",#CustNo,#CustName],
+["#FdDeleteFlag+刪除碼",#DeleteFlag],
+["#FdCreateDate+建檔日期",#CreateDate],
+["#FdCreateEmpNo+建檔人員",#CreateEmpNo,#CreateEmpName],
+["#FdLastUpdate+最後更新日期",#LastUpdate],
+["#FdLastUpdateEmpNo+最後更新人員",#LastUpdateEmpNo,#LastUpdateEmpName],
+]
+!---------- AP Button AREA ----------
+
+
+!---------- AP TEXT AREA Variables ----------
+
+#FdCreateDate=X,2,L
+#FdCreateEmpNo=X,2,L
+#FdLastUpdate=X,2,L
+#FdLastUpdateEmpNo=X,2,L
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L5080建商名單查詢]進入),$)
+
+#NTXBUF=X,200,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@FunCd,#NTXBUF,1,1)
+T(1,@CustNo,#NTXBUF,2,7)
+IF(#FunCd==1,$,s)
+INVOKEJS(SHOW,p1,3,7,0)
+
+#FdFunCd=X,2,L
+
+#FunCdHelp=x,50,S
+T(3,1:新增;2:修改;4:刪除;5:查詢)
+
+! [功能]
+#FunCd=A,1,S
+C(3,#CHAIN,1,s,$)
+HELP(#FunCdHelp)
+@V(H,#FunCdHelp)
+
+
+#AGAIN=X,1,S
+C(3,#FunCd,1,E(0,0),E(0,1))
+ASGN(AGAIN$)
+
+! 權限檢查
+#FUNCIND=_,_,S
+E(0,#FunCd)
+
+#FunCdX=X,5,L
+T(H,#FunCd,#FunCdHelp)
+C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSE))
+
+
+#FdCustNo=X,2,L
+IF(#FunCd==1,T(3,*),T(3,))
+
+!戶號
+#CustNo=A,7,I
+IF(#FunCd==1,T(F,1),T(F,0))
+IF(#FunCd==1,$,s)
+@V(2,0)
+
+!調Rim取資料
+#RimFunCd=A,1,S
+#RimCustNo=A,7,S
+
+<include src="ROM.icf::L5R50.dec"/>
+#RimL5r50=X,1,S
+E(0,@RimFunCd,#FunCd)
+E(0,@RimCustNo,#CustNo)
+RESET_RIM(#RimL5r50,L5R50)
+S(L5R50,1,#RimFunCd,#RimCustNo)
+R(1,L5R50)
+T(2,@CustName,#L5r50CustName)
+T(2,@DeleteFlag,#L5r50DeleteFlag)
+T(2,@CreateDate,#L5r50CreateDate)
+T(2,@CreateEmpNo,#L5r50CreateEmpNo)
+T(2,@CreateEmpName,#L5r50CreateEmpName)
+T(2,@LastUpdate,#L5r50LastUpdate)
+T(2,@LastUpdateEmpNo,#L5r50LastUpdateEmpNo)
+T(2,@LastUpdateEmpName,#L5r50LastUpdateEmpName)
+
+!戶名
+#CustName=X,100,L
+
+#FdDeleteFlag=X,2,L
+C(2,#FunCd,$,T(3,),T(3,*),T(3,*),T(3,),T(3,))
+
+!刪除碼
+#DeleteFlag=x,1,I
+C(2,#FunCd,$,T(F,0),T(F,1),T(F,1),T(F,0),T(F,0))
+C(2,#FunCd,$,s,$,$,s,s)
+@C(4,#DeleteFlag,s,$)
+IF(#DeleteFlag=="*",s,V(P,刪除碼只能為*號或空白))
+
+!建檔日期
+#CreateDate=X,9,L
+
+!建檔人員
+#CreateEmpNo=X,6,L
+#CreateEmpName=X,100,L
+
+!最後更新日期
+#LastUpdate=X,9,L
+
+!最後更新人員
+#LastUpdateEmpNo=X,6,L
+#LastUpdateEmpName=X,100,L
+
+#RPTFG=A,1,S
+E(0,0)
+
+</sub>
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L5739 ----------
+<sub type="FORM" name="L5739">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L5739,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L5739] 建商名單維護)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#FunCd
+#CustNo
+#DeleteFlag
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L5739
+^
+<include src="ROM.icf::L5R50.tom"/>
+<include src="COM.icf::TRCTL.tom"/>
+</sub>
+
+!--------- OUTPUT畫面 --------
+
+!---------- 單據輸出組合 ----------
+<sub type="PART" name="L5739" layout="cols=1;screen.width=[100,900];printer.width=[20,20];">
+[
+["[L5739]                                 建商名單維護                                                          "],
+]
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

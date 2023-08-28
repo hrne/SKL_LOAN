@@ -42,7 +42,7 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
 //注意異動此邊欄位,或SQL語法 請檢查L5074,L597A,L5708
 	private String slectDataHeaderName[] = { "使用表格", "合計資料", "身分證號", "案件序號", "戶號", "戶名", "交易別", "會計日", "入帳日", "入帳還款日", "暫收金額", "溢繳款", "繳期數", "還款金額", "應還期數", "應還金額", "累溢短收", "新壽攤分", "撥付金額",
-			"退還金額", "經辦", "交易序號" };
+			"退還金額", "經辦", "交易序號", "案件種類", "借款人戶號", "借款人戶名" };
 	private String slectSummaryDataHeaderName[] = { "筆數", "合計" };
 	// private String StatusCodeValue[][] = { { "4001", "入/扣帳成功", "0" }, { "4505",
 	// "存款不足", "0" }, { "4508", "非委託或已終止帳戶", "0" }, { "4806", "存戶查核資料錯誤", "0" }, {
@@ -145,10 +145,13 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 			sqlSelect += "SELECT ";
 			sqlSelect += "'AcReceivable' AS \"使用表格\",";
 			sqlSelect += "acRec.\"RvBal\" AS \"合計資料\",";
-			sqlSelect += "c.\"CustId\" AS \"身分證號\",";
-			sqlSelect += "acRec.\"FacmNo\" AS \"案件序號\",";
-			sqlSelect += "c.\"CustNo\" AS \"戶號\",";
-			sqlSelect += "c.\"CustName\" AS \"戶名\",";
+			sqlSelect += " case when  nvl(m.\"CustNo\" , 0) > 9990000 then   m.\"NegCustId\" ";
+			sqlSelect += "      else  c.\"CustId\" end   AS \"身分證號\",";
+//			sqlSelect += "acRec.\"FacmNo\" AS \"案件序號\",";
+			sqlSelect += " m.\"CaseSeq\" AS \"案件序號\",";
+			sqlSelect += " m.\"CustNo\"  AS \"戶號\",";
+			sqlSelect += " case when  nvl(m.\"CustNo\" , 0) > 9990000 then   m.\"NegCustName\" ";
+			sqlSelect += "      else  c.\"CustName\" end AS \"戶名\",";
 			sqlSelect += "' ' AS \"交易別\",";
 			sqlSelect += "'' AS \"會計日\",";
 			sqlSelect += "acRec.\"OpenAcDate\" AS \"入帳日\",";
@@ -164,16 +167,35 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 			sqlSelect += "'' AS \"撥付金額\",";
 			sqlSelect += "'' AS \"退還金額\",";
 			sqlSelect += "acRec.\"TitaTlrNo\" AS \"經辦\",";
-			sqlSelect += "acRec.\"TitaTxtNo\" AS \"交易序號\" ";
+			sqlSelect += "acRec.\"TitaTxtNo\" AS \"交易序號\", ";
+			sqlSelect += " m.\"CaseKindCode\" AS \"案件種類\",";
+			sqlSelect += " case when  nvl(m.\"CustLoanKind\", ' ') = '3'  then   to_char(c.\"CustNo\") ";//保證人的借款戶
+			sqlSelect += "      else ' '  end AS \"借款人戶號\",";
+			sqlSelect += " case when  nvl(m.\"CustLoanKind\", ' ') = '3'  then   to_char(c.\"CustName\") ";//保證人的借款戶
+			sqlSelect += "      else ' '  end AS \"借款人戶名\"";
 
-			sqlFrom += "FROM \"AcReceivable\" acRec ";
+			sqlFrom += " FROM \"AcReceivable\" acRec ";
 
-			sqlLeftJoin += "LEFT JOIN \"CustMain\" c ON acRec.\"CustNo\"=c.\"CustNo\" ";
+			sqlLeftJoin += "LEFT JOIN \"CustMain\" c ON acRec.\"CustNo\"= c.\"CustNo\" ";
+			sqlLeftJoin += "LEFT JOIN \"NegMain\" m ON m.\"CustNo\"=  ";
+			sqlLeftJoin += "                           case when  NVL(JSON_VALUE(acRec.\"JsonFields\", '$.NegCustNo'), 0)  > 0   ";
+			sqlLeftJoin += "                                      then to_number(NVL(JSON_VALUE(acRec.\"JsonFields\", '$.NegCustNo'), 0) )  ";
+			sqlLeftJoin += "                                else  acRec.\"CustNo\" end  ";
+			sqlLeftJoin += "                       AND m.\"CaseSeq\" = (SELECT MAX(\"CaseSeq\") FROM \"NegMain\" ";
+			sqlLeftJoin += "                                             WHERE \"CustNo\" =  ";
+			sqlLeftJoin += "                           case when  NVL(JSON_VALUE(acRec.\"JsonFields\", '$.NegCustNo'), 0)  > 0   ";
+			sqlLeftJoin += "                                      then to_number(NVL(JSON_VALUE(acRec.\"JsonFields\", '$.NegCustNo'), 0))   ";
+			sqlLeftJoin += "                                else  acRec.\"CustNo\" end   )";
+			sqlLeftJoin += "                       AND m.\"Status\" = '3' ";//已結案
+			sqlLeftJoin += "                       AND m.\"ThisAcDate\" = acRec.\"OpenAcDate\" ";
 
 			sqlWhere += "WHERE 1=1 ";
 			sqlWhere += "AND acRec.\"ClsFlag\"='0' ";
-			sqlWhere += "AND acRec.\"AcctCode\" IN ('T21','T22','T23') ";
+//			sqlWhere += "AND acRec.\"AcctCode\" IN ('T21','T22','T23') ";
+			sqlWhere += "AND acRec.\"AcctCode\" IN ('TAV') ";
 			sqlWhere += "AND acRec.\"RvBal\">0 ";
+			sqlWhere += "AND acRec.\"RvNo\" = ' ' ";
+			sqlWhere += "AND nvl(m.\"CustNo\" , 0)  > 0   ";
 
 			sqlOrder += "";
 		} else if (State == 13 || State == 14 || State == 15 ) {
@@ -184,9 +206,10 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 			sqlSelect += "'NegAppr02' AS \"使用表格\",";
 			sqlSelect += "NegAp02.\"TxAmt\" AS \"合計資料\",";
 			sqlSelect += "NegAp02.\"CustId\" AS \"身分證號\",";
-			sqlSelect += "' ' AS \"案件序號\",";
+			sqlSelect += "m.\"CaseSeq\" AS \"案件序號\",";
 			sqlSelect += "NegAp02.\"CustNo\" AS \"戶號\",";
-			sqlSelect += "c.\"CustName\" AS \"戶名\",";
+			sqlSelect += " case when m.\"CustLoanKind\" in ('2','3') then  m.\"NegCustName\" ";
+			sqlSelect += "      else  c.\"CustName\" end AS \"戶名\",";
 			sqlSelect += "' ' AS \"交易別\",";
 			sqlSelect += "NegAp02.\"AcDate\" AS \"會計日\",";
 			sqlSelect += "NegAp02.\"BringUpDate\" AS \"入帳日\",";
@@ -202,13 +225,22 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 			sqlSelect += "'' AS \"撥付金額\",";
 			sqlSelect += "'' AS \"退還金額\",";
 			sqlSelect += "'' AS \"經辦\",";
-			sqlSelect += "'' AS \"交易序號\"";
-//			sqlSelect+="NegAp02.\"TxSeq\" AS \"交易序號\" ";
+			sqlSelect += "'' AS \"交易序號\",";
+			sqlSelect += " m.\"CaseKindCode\" AS \"案件種類\",";
+			sqlSelect += " case when  nvl(m.\"CustLoanKind\", ' ') = '3'  then   to_char(m.\"PayerCustNo\") ";//保證人的借款戶
+			sqlSelect += "      else ' '  end AS \"借款人戶號\",";
+			sqlSelect += " case when  nvl(m.\"CustLoanKind\", ' ') = '3'  then   to_char(nvl(c2.\"CustName\",'')) ";//保證人的借款戶
+			sqlSelect += "      else ' '  end AS \"借款人戶名\"";
 
 			sqlFrom += "FROM \"NegAppr02\" NegAp02 ";
 
-			sqlLeftJoin += "LEFT JOIN \"CustMain\" c ON NegAp02.\"CustId\"=c.\"CustId\" ";
-//			sqlLeftJoin += "LEFT JOIN \"NegTrans\" NegTran ON NegTran.\"CustNo\"=c.\"CustNo\" AND NegAp02.\"AcDate\"=NegTran.\"AcDate\" ";
+			sqlLeftJoin += "LEFT JOIN \"CustMain\" c ON NegAp02.\"CustId\"= c.\"CustId\" ";
+			sqlLeftJoin += "LEFT JOIN \"NegMain\" m ON m.\"CustNo\"= NegAp02.\"CustNo\" ";
+			sqlLeftJoin += "                       AND m.\"CaseSeq\" = (SELECT MAX(\"CaseSeq\") FROM \"NegMain\" ";
+			sqlLeftJoin += "                                             WHERE \"CustNo\" =  NegAp02.\"CustNo\"    )";
+			sqlLeftJoin += "LEFT JOIN \"CustMain\" c2 ON c2.\"CustNo\"= nvl(m.\"PayerCustNo\",'0') ";
+			sqlLeftJoin += "                         and m.\"CustLoanKind\" = '3' ";
+
 			sqlWhere += "WHERE 1=1 ";
 
 			if (State == 18) {// 暫收解入:已做L4002整批入帳入一筆總金額到專戶,18已取消
@@ -218,6 +250,7 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 			} else {
 				sqlWhere += "AND NegAp02.\"BringUpDate\" = (SELECT MAX(\"BringUpDate\") FROM \"NegAppr02\" WHERE \"BringUpDate\" > 0  )";
 			}
+			
 			if (State == 13) {
 				// 撥入筆數 13
 			} else if (State == 14) {
@@ -254,7 +287,8 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 			sqlSelect += "c.\"CustId\" AS \"身分證號\",";
 			sqlSelect += "NegTran.\"CaseSeq\" AS \"案件序號\",";
 			sqlSelect += "NegTran.\"CustNo\" AS \"戶號\",";
-			sqlSelect += "c.\"CustName\" AS \"戶名\",";
+			sqlSelect += " case when  m.\"CustLoanKind\" in ('2','3') then   m.\"NegCustName\" ";
+			sqlSelect += "      else  c.\"CustName\" end AS \"戶名\",";
 			sqlSelect += "NegTran.\"TxKind\" AS \"交易別\",";
 			sqlSelect += "NegTran.\"AcDate\" AS \"會計日\",";
 			sqlSelect += "NegTran.\"EntryDate\" AS \"入帳日\",";
@@ -270,12 +304,19 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 			sqlSelect += "NegTran.\"ApprAmt\" AS \"撥付金額\",";
 			sqlSelect += "NegTran.\"ReturnAmt\" AS \"退還金額\",";
 			sqlSelect += "NegTran.\"TitaTlrNo\" AS \"經辦\",";
-			sqlSelect += "NegTran.\"TitaTxtNo\" AS \"交易序號\"";
+			sqlSelect += "NegTran.\"TitaTxtNo\" AS \"交易序號\",";
+			sqlSelect += " m.\"CaseKindCode\" AS \"案件種類\",";
+			sqlSelect += " case when  nvl(m.\"CustLoanKind\", ' ') = '3'  then   to_char(m.\"PayerCustNo\") ";//保證人的借款戶
+			sqlSelect += "      else ' '  end AS \"借款人戶號\",";
+			sqlSelect += " case when  nvl(m.\"CustLoanKind\", ' ') = '3'  then   to_char(nvl(c2.\"CustName\",'')) ";//保證人的借款戶
+			sqlSelect += "      else ' '  end AS \"借款人戶名\"";
 
 			sqlFrom += "FROM \"NegTrans\" NegTran ";
 
-			sqlLeftJoin += "LEFT JOIN \"CustMain\" c ON NegTran.\"CustNo\"=c.\"CustNo\" ";
+			sqlLeftJoin += "LEFT JOIN \"CustMain\" c ON NegTran.\"CustNo\"= c.\"CustNo\" ";
 			sqlLeftJoin += "LEFT JOIN \"NegMain\" m ON m.\"CustNo\"=NegTran.\"CustNo\" AND m.\"CaseSeq\"=NegTran.\"CaseSeq\"";
+			sqlLeftJoin += "LEFT JOIN \"CustMain\" c2 ON c2.\"CustNo\"= nvl(m.\"PayerCustNo\",'0') ";
+			sqlLeftJoin += "                         and m.\"CustLoanKind\" = '3' ";
 
 			sqlWhere += "WHERE 1=1 ";
 			// IsMainFin 是否為最大債權,1是0否
@@ -354,6 +395,7 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 					// 06:放款攤分
 					// 09:本月放款
 					sqlWhere += "AND c.\"CustTypeCode\" != '" + CustTypeCode + "' ";
+					sqlWhere += "AND NegTran.\"SklShareAmt\" > 0 ";
 				} else if (State == 7 || State == 10) {
 					// 07:保單攤分
 					// 10:本月保單
@@ -361,6 +403,7 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 				} else if (State == 8) {
 					sqlWhere += "AND NegTran.\"TxStatus\" = '2' ";// 已入帳
 					sqlWhere += "AND NegTran.\"TxKind\" IN ('4','5') ";// 4:結清 ,5:提前清償
+					sqlWhere += "AND NegTran.\"ReturnAmt\" > 0 ";
 				}
 			} else if (State == 12) {
 				// 12:本日匯入
@@ -443,7 +486,8 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 			//
 			sqlWhere += "AND NegTran.\"TxKind\" NOT IN ('8') ";// 2023/7/5新增:不顯示在撈取資料中 =>TxKind 交易別 8:註銷
 
-			sqlOrder += "ORDER BY c.\"CustId\" , NegTran.\"EntryDate\" ";
+			sqlOrder += " ORDER BY case when nvl(c.\"CustId\",' ') not in (' ') then c.\"CustId\" else m.\"NegCustId\" end ,  ";
+			sqlOrder += "         NegTran.\"EntryDate\" ";
 		}
 
 		String sql = sqlSelect + sqlFrom + sqlLeftJoin + sqlWhere + sqlOrder + sqlRow;

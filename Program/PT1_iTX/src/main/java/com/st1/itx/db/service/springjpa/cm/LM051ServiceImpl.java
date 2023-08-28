@@ -32,16 +32,14 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-
-
 	/**
 	 * 執行報表輸出
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
 	 * @param formNum   表格次序
-	 * @return 
-	 * @throws Exception 
+	 * @return
+	 * @throws Exception
 	 * 
 	 */
 
@@ -238,20 +236,20 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		return this.convertToMap(query);
 	}
-	
+
 	/**
 	 * 執行報表輸出(備呆總帳)
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
-	 * @param lastYM 上西元年月
-	 * @param formNum 表格次序
-	 * @return 
-	 * @throws Exception 
+	 * @param lastYM    上西元年月
+	 * @param formNum   表格次序
+	 * @return
+	 * @throws Exception
 	 * 
 	 */
-	
-	public List<Map<String, String>> findAll(TitaVo titaVo,int yearMonth,int lastYM, int formNum) throws Exception {
+
+	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth, int lastYM, int formNum) throws Exception {
 		this.info("lM051.findAll");
 
 		String iYearMonth = String.valueOf(yearMonth);
@@ -259,7 +257,7 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("yymm=" + iYearMonth + ",lyymm=" + lastYM);
 
 		String sql = " ";
-		
+
 		if (formNum == 1) {
 
 			sql += "WITH rawData AS ( ";
@@ -299,7 +297,7 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "          ,\"LoanBal\"";
 			sql += "    FROM \"MonthlyLM052AssetClass\"";
 			sql += "    WHERE \"YearMonth\" = :yymm ";
-			sql += "    UNION ";			
+			sql += "    UNION ";
 			sql += "    SELECT '61' AS \"AssetClassNo\" ";
 			sql += "      	  ,'999' AS \"AcSubBookCode\" ";
 			sql += "          ,CASE WHEN R.\"LnAmt\" >= 0 ";
@@ -307,7 +305,6 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "                ELSE ABS(R.\"LnAmt\") END AS \"LoanBal\"";
 			sql += "    FROM roundData R";
 
-			
 		} else if (formNum == 2) {
 
 			// 此年月為上個月
@@ -340,11 +337,11 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "    ORDER BY \"LoanAssetCode\"";
 
 		} else if (formNum == 5) {
-			
+
 			sql += "	SELECT \"YearMonth\" ";
-			sql += "          ,\"AssetEvaTotal\" "; //--五類資產評估合計
-			sql += "          ,\"LegalLoss\"";		//--法定備抵損失提撥
-			sql += "          ,\"ApprovedLoss\"";   //--會計部核定備抵損失
+			sql += "          ,\"AssetEvaTotal\" "; // --五類資產評估合計
+			sql += "          ,\"LegalLoss\""; // --法定備抵損失提撥
+			sql += "          ,\"ApprovedLoss\""; // --會計部核定備抵損失
 			sql += "    FROM \"MonthlyLM052Loss\"";
 			sql += "    WHERE \"YearMonth\" = :yymm ";
 
@@ -361,14 +358,14 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("yymm", iYearMonth);
 		return this.convertToMap(query);
 	}
-	
+
 	/**
 	 * 執行報表輸出(明細表)
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
-	 * @return 
-	 * @throws Exception 
+	 * @return
+	 * @throws Exception
 	 * 
 	 */
 	public List<Map<String, String>> findAll2(TitaVo titaVo, int yearMonth) throws Exception {
@@ -376,45 +373,6 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("lM051.findAll2 ");
 		this.info("yearMonth=" + yearMonth);
 		String sql = " ";
-		sql += " WITH \"tempClass\" AS (";
-		sql += "	SELECT M.\"YearMonth\"";
-		sql += "		  ,M.\"CustNo\"";
-		sql += "		  ,M.\"FacmNo\" ";
-		sql += "		  ,M.\"AssetClass\" || ";
-		sql += "		   CASE";
-		sql += "			 WHEN M.\"AcctCode\" = '990' ";
-		sql += "		 	  AND M.\"ProdNo\" IN ('60','61','62')";
-		sql += "		 	  AND M.\"AssetClass\" = 2 ";
-		sql += "			 THEN '3'";
-		sql += "			 WHEN M.\"OvduTerm\" >= 7";
-		sql += "			  AND M.\"OvduTerm\" <= 12";
-		sql += "		 	  AND M.\"AssetClass\" = 2 ";
-		sql += "			 THEN '3'";
-		sql += "			 WHEN M.\"AcctCode\" = '990'";
-		sql += "			  AND M.\"OvduTerm\" <= 12";
-		sql += "		 	  AND M.\"AssetClass\" = 2 ";
-		sql += "			 THEN '3'";
-		sql += "   		     WHEN M.\"AcctCode\" <> '990'";
-		sql += "			  AND M.\"ProdNo\" IN ('60','61','62')";
-		sql += "			  AND M.\"OvduTerm\" = 0";
-		sql += "		 	  AND M.\"AssetClass\" = 2 ";
-		sql += "			 THEN '1'";
-		sql += "			 WHEN M.\"AcctCode\" <> '990'";
-		sql += "			  AND M.\"OvduTerm\" >= 1";
-		sql += "			  AND M.\"OvduTerm\" <= 6";
-		sql += "		 	  AND M.\"AssetClass\" = 2 ";
-		sql += "			 THEN '2'";
-		sql += "			 ELSE '' END AS \"AssetClass\"";
-		sql += "	FROM \"MonthlyFacBal\" M";
-		sql += "	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\"";
-		sql += "						   AND F.\"FacmNo\" = M.\"FacmNo\"";
-		sql += "	LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = M.\"CustNo\"";
-		sql += "	LEFT JOIN ( SELECT DISTINCT SUBSTR(\"IndustryCode\",3,4) AS \"IndustryCode\"";
-		sql += "					  ,\"IndustryItem\"";
-		sql += "				FROM \"CdIndustry\" ) CDI ON CDI.\"IndustryCode\" = SUBSTR(CM.\"IndustryCode\",3,4)";
-		sql += "	WHERE M.\"PrinBalance\" > 0";
-		sql += "	  AND M.\"YearMonth\" = :yymm";
-		sql += ")";
 		sql += "	  SELECT M.\"CustNo\""; // F0
 		sql += "			,M.\"FacmNo\""; // F1
 		sql += "			,DECODE(M.\"AcSubBookCode\",' ',' ','00A','A') AS \"AcSubBookCode\""; // F2
@@ -424,7 +382,7 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			,M.\"OvduTerm2\" AS \"OvduTerm\"";// F6
 		sql += "			,M.\"CityCode\""; // F7
 		sql += "			,M.\"PrevIntDate\""; // F8
-		sql += "			,SUBSTR(M.\"AssetClass\",0,1) AS \"Class\""; // F9
+		sql += "			,M.\"AssetClass\" "; // F9
 		sql += "			,CD.\"Item\""; // F10
 		sql += "			,NVL(L.\"Amount\",0) AS \"Amount\""; // F11
 		sql += "			,(CASE ";
@@ -433,22 +391,23 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "				WHEN M.\"PrinBalance\" > 1 THEN '有足額擔保'";
 		sql += "			  ELSE '' END) ||";
 		sql += "			 (CASE ";
-		sql += "				WHEN M.\"AcctCode\" <> '990' THEN '--但債信不良(' || M.\"AssetNum\" || ')' ";
+		sql += "				WHEN M.\"AcctCode\" <> '990' THEN '--但債信不良(' || M.\"AssetClass\" || ')' ";
 		sql += "			  ELSE '' END) ||";
 		sql += "			 (CASE ";
 		sql += "				WHEN M.\"AcctCode\" = '990' AND M.\"ProdNo\" IN ('60','61','62') THEN '--協議後正常還款'";
 		sql += "				WHEN M.\"OvduTerm\" > 0 AND M.\"OvduTerm\" <= 5 AND M.\"OvduDays\" > 30 THEN '--逾期'";
 		sql += "				WHEN M.\"OvduDays\" = 0 THEN '--正常繳息'";
 		sql += "				WHEN M.\"OvduDays\" > 0 AND M.\"OvduDays\" <= 30 THEN '--逾期未滿30日'";
-		sql += "				WHEN M.\"OvduTerm\" > 6 AND M.\"OvduTerm\" <= 12 AND M.\"OvduDays\" > 30 THEN '--逾期7-12(' || M.\"AssetNum\" ||')'";
-		sql += "				WHEN M.\"OvduTerm\" > 12 THEN '--逾期12月(' || M.\"AssetNum\" || ')'";
-		sql += "				WHEN M.\"OvduDays\" = 0 AND M.\"ProdNo\" IN ('60','61','62') THEN '--協議後正常繳款(' || M.\"AssetNum\" || ')'";
+		sql += "				WHEN M.\"OvduTerm\" > 6 AND M.\"OvduTerm\" <= 12 AND M.\"OvduDays\" > 30 THEN '--逾期7-12(' || M.\"AssetClass\" ||')'";
+		sql += "				WHEN M.\"OvduTerm\" > 12 THEN '--逾期12月(' || M.\"AssetClass\" || ')'";
+		sql += "				WHEN M.\"OvduDays\" = 0 AND M.\"ProdNo\" IN ('60','61','62') THEN '--協議後正常繳款(' || M.\"AssetClass\" || ')'";
 		sql += "			  ELSE '' END) AS \"Memo\""; // F12
 		sql += "			,M.\"ProdNo\""; // F13
 		sql += "			,M.\"RenewCode\""; // F14
 		sql += "			,M.\"LawAmount\""; // F15
-		sql += "			,M.\"AssetClass\""; // F16
+		sql += "			,M.\"AssetClass2\""; // F16
 		sql += "			,M.\"PrinLawDiff\""; // F17
+		sql += "			,M.\"LawAssetClass\""; // F18
 		sql += "	  FROM(SELECT M.\"CustNo\"";
 		sql += "				 ,M.\"FacmNo\"";
 		sql += "				 ,DECODE(M.\"AcSubBookCode\",'201','00A',' ') AS \"AcSubBookCode\"";
@@ -467,23 +426,22 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "				 ,M.\"RenewCode\"";
 		sql += "				 ,M.\"LawAmount\"";
 		sql += "				 ,M.\"ProdNo\"";
-		sql += "				 ,SUBSTR(CLS.\"AssetClass\",0,1) AS \"AssetNum\"";
-		sql += "				 ,CLS.\"AssetClass\" AS \"AssetClass\"";
+		sql += "				 ,M.\"AssetClass\" ";
+		sql += "				 ,M.\"AssetClass2\" ";
+		sql += "				 ,M.\"LawAssetClass\" ";
 		sql += "		   FROM \"MonthlyFacBal\" M";
-		sql += "		   LEFT JOIN \"tempClass\" CLS ON CLS.\"CustNo\" = M.\"CustNo\"";
-		sql += "		   							  AND CLS.\"FacmNo\" = M.\"FacmNo\"";
-		sql += "		   							  AND CLS.\"YearMonth\" = M.\"YearMonth\"";
 		sql += "		   WHERE M.\"YearMonth\" = :yymm ";
 		sql += "		     AND M.\"PrinBalance\" > 0 ";
-		sql += "		     AND CLS.\"AssetClass\" IS NOT NULL ";
-		sql += "		     AND SUBSTR(CLS.\"AssetClass\",0,1) <> 1 ) M";
+		sql += "		     AND M.\"AssetClass\" IS NOT NULL ";
+		sql += "		     AND M.\"AssetClass\" IN ('2','3','4','5') ";
+		sql += "		   ) M";
 		sql += "	  LEFT JOIN(SELECT * ";
 		sql += "				FROM(SELECT L.\"CustNo\"";
 		sql += "						   ,L.\"FacmNo\"";
 		sql += "						   ,L.\"LegalProg\"";
 		sql += "						   ,L.\"Amount\"";
 		sql += "						   ,L.\"Memo\"";
-		sql += "						   ,ROW_NUMBER() OVER (PARTITION BY L.\"CustNo\", L.\"FacmNo\" ORDER BY L.\"TitaTxtNo\" DESC) AS SEQ";
+		sql += "						   ,ROW_NUMBER() OVER (PARTITION BY L.\"CustNo\", L.\"FacmNo\" ORDER BY L.\"RecordDate\" DESC,L.\"CreateDate\" DESC ) AS SEQ";
 		sql += "				     FROM \"CollLaw\" L";
 		sql += "					 WHERE TRUNC(L.\"AcDate\" / 100) <= :yymm ) L";
 		sql += "				WHERE L.SEQ = 1) L ";

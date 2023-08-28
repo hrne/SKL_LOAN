@@ -201,10 +201,11 @@ public class L9701Report extends MakeReport {
 		this.facmNo = "";
 		this.clAddr = "";
 
-		boolean isFirst = true;
+//		boolean isFirst = true;
 
 		int detailCounts = 0;
 		int cntAll = 0;
+		int cntFirst = 0;
 		if (listL9701 != null && listL9701.size() > 0) {
 
 			for (Map<String, String> tL9701Vo : listL9701) {
@@ -246,6 +247,14 @@ public class L9701Report extends MakeReport {
 				cntAll++;
 				if (facmNo == 0) {
 					continue;
+				}
+
+				// 不是額度0後的開始計算
+				cntFirst++;
+
+				// 表示第一筆，要列印表頭(只印一次)
+				if (cntFirst == 1) {
+					printFacHead();
 				}
 
 				this.info("lastsFacmNo = " + lastsFacmNo);
@@ -428,7 +437,7 @@ public class L9701Report extends MakeReport {
 			if (!isLast) {
 				this.newPage();
 				this.print(1, 1, " "); //
-				printFacHead2();
+				printFacHead();
 			}
 		}
 

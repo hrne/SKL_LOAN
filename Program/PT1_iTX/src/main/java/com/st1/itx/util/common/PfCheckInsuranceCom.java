@@ -89,7 +89,7 @@ public class PfCheckInsuranceCom extends TradeBuffer {
 
 		String returnMsg = null;
 		boolean isInsert = false;
-
+		init();
 		// hold房貸獎勵保費檢核檔
 		tPfInsCheckId.setKind(iKind);
 		tPfInsCheckId.setCustNo(iCustNo);
@@ -127,7 +127,6 @@ public class PfCheckInsuranceCom extends TradeBuffer {
 		if (returnMsg != null && returnMsg.length() > 0) {
 			getInsDetailList();
 		}
-
 		// 檢核保單明細資料
 		if (lDetailVo != null && !lDetailVo.isEmpty()) {
 			this.info("startDate=" + startDate + " endDate=" + endDate);
@@ -233,6 +232,16 @@ public class PfCheckInsuranceCom extends TradeBuffer {
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		return new ArrayList<>();
+	}
+
+	private void init() {
+		checkVo = new CheckInsuranceVo();
+		tPfInsCheckId = new PfInsCheckId();
+		tPfInsCheck = new PfInsCheck();
+		checkResult = "N";
+		insDate = 0;
+		insNo = null;
+		lDetailVo = new ArrayList<>();
 	}
 
 }

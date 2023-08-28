@@ -531,7 +531,7 @@ public class NegReportCom extends CommBuffer {
 							throw new LogicException(titaVo, "E0015", "提兌日與檔案日期不符");
 						}
 						String TransAccCode = Detail[4];// 轉帳類別
-						String CustId = Detail[10].trim();
+						String CustId = Detail[10].trim();//帳戶ID
 						String TxSeq = Detail[5];// (10)
 						String FinIns = Detail[8];// 轉帳行代碼
 						String RemitAcct = Detail[9];// 轉帳帳號
@@ -649,18 +649,24 @@ public class NegReportCom extends CommBuffer {
 						// 檢核
 						// 戶號要存在
 						int CustNo = 0;
+						NegMain tNegMain = new NegMain();
 						if (CustId != null && CustId.length() != 0) {
-							CustMain tCustMain = sCustMainService.custIdFirst(CustId, titaVo);
-							if (tCustMain != null) {
-								CustNo = tCustMain.getCustNo();
-							} // if
-						} // if
+							tNegMain = sNegMainService.negCustIdFirst(CustId, titaVo);// 優先判斷是否為保證人/保貸戶
+							if (tNegMain != null && "0".equals(tNegMain.getStatus())) {// 最新的一筆戶況是否=0正常
+								CustNo = tNegMain.getCustNo();
+							} else {
+								CustMain tCustMain = sCustMainService.custIdFirst(CustId, titaVo);
+								if (tCustMain != null) {
+									CustNo = tCustMain.getCustNo();
+								} 
+							} 
+						}
 						tNegAppr02.setCustNo(CustNo);
 
 						if (CustNo != 0) {
 							// 戶號存在
 							// 檢查NegMain在不在
-							NegMain tNegMain = sNegMainService.custNoFirst(CustNo, titaVo);
+							tNegMain = sNegMainService.custNoFirst(CustNo, titaVo);
 							if (tNegMain != null) {
 								// 已存在
 								StatusCode = "4001"; // 4001:入/扣帳成功
@@ -682,7 +688,6 @@ public class NegReportCom extends CommBuffer {
 						// 2999:其他錯誤
 						tNegAppr02.setStatusCode(StatusCode);
 						NegAppr02 NegAppr02Trial = sNegAppr02Service.holdById(tNegAppr02Id, titaVo);
-						NegAppr02 beforeNegAppr02 = (NegAppr02) dataLog.clone(NegAppr02Trial);
 
 						// tNegAppr02Id
 						if (NegAppr02Trial != null) {
@@ -692,9 +697,6 @@ public class NegReportCom extends CommBuffer {
 								// E0007 更新資料時，發生錯誤
 								throw new LogicException(titaVo, "E0007", "一般債權撥付資料檔");
 							}
-//							dataLog.setEnv(titaVo, beforeNegAppr02, tNegAppr02);
-//							dataLog.exec("修改一般債權撥付資料檔");
-
 						} else {
 							try {
 								sNegAppr02Service.insert(tNegAppr02, titaVo);
@@ -1024,7 +1026,7 @@ public class NegReportCom extends CommBuffer {
 					tNegTransId.setTitaTxtNo(Integer.parseInt(TitaTxtNo));
 					tNegTransId.setCustNo(custno); // 戶號
 					NegTrans tNegTrans = sNegTransService.holdById(tNegTransId, titaVo);
-					NegTrans beforeNegTrans = (NegTrans) dataLog.clone(tNegTrans);
+//					NegTrans beforeNegTrans = (NegTrans) dataLog.clone(tNegTrans);
 
 					if (tNegTrans != null) {
 						// 直接找NEGAPPR01即可 ,原使用SumCustNo改用FindTrans
@@ -1037,7 +1039,7 @@ public class NegReportCom extends CommBuffer {
 						if (lTempNegAppr01 != null && lTempNegAppr01.size() != 0) {
 							lNegAppr01.addAll(lTempNegAppr01);
 							for (NegAppr01 tNegAppr01 : lTempNegAppr01) {
-								NegAppr01 beforeNegAppr01 = (NegAppr01) dataLog.clone(tNegAppr01);
+//								NegAppr01 beforeNegAppr01 = (NegAppr01) dataLog.clone(tNegAppr01);
 								if (Status == 1) {
 									// 撥付製檔
 									int ExportDate = 0;
@@ -1227,7 +1229,7 @@ public class NegReportCom extends CommBuffer {
 			for (NegAppr01 tNegAppr01 : lNegAppr01) {
 				NegTransId tNegTransId = new NegTransId();
 
-				if (tNegAppr01.getApprAmt().compareTo(BigDecimal.ZERO) == 0) {// 2023/7/5:撥款金額為0不寫入檔案batx01
+				if (tNegAppr01.getApprAmt().compareTo(BigDecimal.ZERO) == 0) {// 2023/7/5:調整撥款金額後若為0則該筆不寫入檔案batx01
 					continue;
 				}
 				tNegTransId.setAcDate(tNegAppr01.getNegAppr01Id().getAcDate());
@@ -1284,10 +1286,20 @@ public class NegReportCom extends CommBuffer {
 								this.info("NegReportCom FromFinCode=[" + FromFinCode + "] ToFinCode=[" + ToFinCode
 										+ "] TransAccCode=[" + TransAccCode + "] AssigeDate=[" + AssigeDate + "]");
 							}
-
-							CustMain tCustMain = sCustMainService.custNoFirst(tNegMainId.getCustNo(),
-									tNegMainId.getCustNo(), titaVo);
-
+							String scustId = "";
+							if (tNegMain.getCustNo() > 9990000) {// 保證人或保貸戶特殊處理
+								scustId = tNegMain.getNegCustId();
+							} else {
+								CustMain tCustMain = sCustMainService.custNoFirst(tNegMainId.getCustNo(),
+										tNegMainId.getCustNo(), titaVo);
+								if (tCustMain != null) {
+									scustId = tCustMain.getCustId();
+								}
+							}
+							if("".equals(scustId)) {
+								throw new LogicException(titaVo, "E0015", "該帳戶ID空白,戶號[" + tNegMainId.getCustNo() + "]");
+							}
+							
 							String Detail16 = "";// 銷帳編號
 
 							switch (TransAccCode) {
@@ -1367,14 +1379,14 @@ public class NegReportCom extends CommBuffer {
 							TempData[7] = "9999";// 回應代碼
 							TempData[8] = tNegAppr01.getRemitBank();// 轉帳行代碼 //tNegAppr01-匯款銀行
 							TempData[9] = tNegAppr01.getRemitAcct();// 轉帳帳號 //tNegAppr01-匯款帳號
-							TempData[10] = tCustMain.getCustId();// 委託轉帳之事業單位統編
+							TempData[10] = scustId;// 委託轉帳之事業單位統編
 							TempData[11] = Detail16;// 銷帳編號
-							TempData[12] = tCustMain.getCustId();// 統編
+							TempData[12] = scustId;// 統編
 							TempData[13] = NegAppr01KeyToString(tNegAppr01);
 							lTempData.add(TempData);
 						} else {
 							// E0013 程式邏輯有誤
-							throw new LogicException(titaVo, "E0013", "不應為一般債權 戶號[" + tNegMainId.getCustNo() + "]");
+							throw new LogicException(titaVo, "E0015", "不應為一般債權 戶號[" + tNegMainId.getCustNo() + "]");
 						}
 					}
 				} else {
@@ -1455,9 +1467,6 @@ public class NegReportCom extends CommBuffer {
 					String Head5 = TransAccCode;
 					Head5 = LRFormat(Head5, 5, "R", "0");
 
-					// this.info("BatchTx01 Head1=[" + Head1 + "],Head2=[" + Head2 + "],Head3=[" +
-					// Head3 + "],Head4=[" + Head4 + "],Head5=[" + Head5 + "]");
-
 					// 性質別
 					String Head6 = "1";
 
@@ -1467,7 +1476,6 @@ public class NegReportCom extends CommBuffer {
 					// 保留欄
 					String Head8 = LRFormat("", 168, "R", " ");
 					Same2To5 = Head2 + Head3 + Head4 + Head5;
-					// this.info("BatchTx01 Same2To5=[" + Same2To5 + "]");
 
 					sbHead.append(Head1);
 					sbHead.append(Same2To5);
@@ -1514,7 +1522,7 @@ public class NegReportCom extends CommBuffer {
 							// 委託單位-委託轉帳之事業單位統編
 							// 1. 轉帳類別為 02960 02970時,該欄位置入最大債權銀行/發卡機構代號,左靠右補0,代號首位為[A]時請置入[10]
 							String Detail10 = "";
-							if (lTrialTrans1AccCode.contains(TransAccCode)) {
+							if (lTrialTrans1AccCode.contains(TransAccCode)) {// 目前只有債協02960,02950
 								// 最大債權銀行/發卡機構代號
 								Detail10 = CompanyId;
 							} else {
@@ -1541,11 +1549,6 @@ public class NegReportCom extends CommBuffer {
 							Detail14 = LRFormat(Detail14, 16, "R", "0");
 							// 帳戶ID
 							String Detail15 = TempData[10];
-							if (lTrialTrans1AccCode.contains(TransAccCode)) {
-								//
-							} else {
-								// 還款人身分證號
-							}
 							Detail15 = LRFormat(Detail15, 10, "L", " ");
 							// 銷帳編號
 							String Detail16 = TempData[11];
