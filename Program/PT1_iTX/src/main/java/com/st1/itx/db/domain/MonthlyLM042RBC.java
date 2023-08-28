@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -10,6 +11,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Column;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * MonthlyLM042RBC LM042RBC會計報表<br>
@@ -50,22 +53,6 @@ public class MonthlyLM042RBC implements Serializable {
   // 風險係數
   @Column(name = "`RiskFactor`")
   private BigDecimal riskFactor = new BigDecimal("0");
-
-  // 股票質押
-  @Column(name = "`StockLoanBal`")
-  private BigDecimal stockLoanBal = new BigDecimal("0");
-
-  // 一般法人放款
-  @Column(name = "`OtherLoanbal`")
-  private BigDecimal otherLoanbal = new BigDecimal("0");
-
-  // 溢折價
-  @Column(name = "`AmortizeTotal`")
-  private BigDecimal amortizeTotal = new BigDecimal("0");
-
-  // 催收費用
-  @Column(name = "`OvduExpense`")
-  private BigDecimal ovduExpense = new BigDecimal("0");
 
   // 建檔日期時間
   @CreatedDate
@@ -209,82 +196,6 @@ public class MonthlyLM042RBC implements Serializable {
   }
 
 /**
-	* 股票質押<br>
-	* 
-	* @return BigDecimal
-	*/
-  public BigDecimal getStockLoanBal() {
-    return this.stockLoanBal;
-  }
-
-/**
-	* 股票質押<br>
-	* 
-  *
-  * @param stockLoanBal 股票質押
-	*/
-  public void setStockLoanBal(BigDecimal stockLoanBal) {
-    this.stockLoanBal = stockLoanBal;
-  }
-
-/**
-	* 一般法人放款<br>
-	* 
-	* @return BigDecimal
-	*/
-  public BigDecimal getOtherLoanbal() {
-    return this.otherLoanbal;
-  }
-
-/**
-	* 一般法人放款<br>
-	* 
-  *
-  * @param otherLoanbal 一般法人放款
-	*/
-  public void setOtherLoanbal(BigDecimal otherLoanbal) {
-    this.otherLoanbal = otherLoanbal;
-  }
-
-/**
-	* 溢折價<br>
-	* 
-	* @return BigDecimal
-	*/
-  public BigDecimal getAmortizeTotal() {
-    return this.amortizeTotal;
-  }
-
-/**
-	* 溢折價<br>
-	* 
-  *
-  * @param amortizeTotal 溢折價
-	*/
-  public void setAmortizeTotal(BigDecimal amortizeTotal) {
-    this.amortizeTotal = amortizeTotal;
-  }
-
-/**
-	* 催收費用<br>
-	* 
-	* @return BigDecimal
-	*/
-  public BigDecimal getOvduExpense() {
-    return this.ovduExpense;
-  }
-
-/**
-	* 催收費用<br>
-	* 
-  *
-  * @param ovduExpense 催收費用
-	*/
-  public void setOvduExpense(BigDecimal ovduExpense) {
-    this.ovduExpense = ovduExpense;
-  }
-
-/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -364,7 +275,6 @@ public class MonthlyLM042RBC implements Serializable {
   @Override
   public String toString() {
     return "MonthlyLM042RBC [monthlyLM042RBCId=" + monthlyLM042RBCId + ", loanAmount=" + loanAmount + ", riskFactor=" + riskFactor
-           + ", stockLoanBal=" + stockLoanBal + ", otherLoanbal=" + otherLoanbal + ", amortizeTotal=" + amortizeTotal + ", ovduExpense=" + ovduExpense + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
-           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

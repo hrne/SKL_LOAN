@@ -2,6 +2,8 @@ package com.st1.itx.trade.L6;
 
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -53,7 +55,7 @@ public class L6870 extends TradeBuffer {
 		tAcCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
 		tAcCloseId.setBranchNo(titaVo.getAcbrNo());
 		tAcCloseId.setSecNo("09"); // 業務類別: 09-放款
-		tAcClose = sAcCloseService.holdById(tAcCloseId);
+		tAcClose = sAcCloseService.holdById(tAcCloseId, titaVo);
 		if (tAcClose == null) {
 			throw new LogicException(titaVo, "E0003", "關帳狀態(09:放款)"); // 修改資料不存在
 		}
@@ -97,7 +99,7 @@ public class L6870 extends TradeBuffer {
 
 		// update
 		try {
-			sAcCloseService.update(tAcClose);
+			sAcCloseService.update(tAcClose, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007", "更新關帳狀態(09:放款)"); // 更新資料時，發生錯誤
 		}

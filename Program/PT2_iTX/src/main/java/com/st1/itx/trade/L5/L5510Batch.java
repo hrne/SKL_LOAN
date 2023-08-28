@@ -240,10 +240,11 @@ public class L5510Batch extends TradeBuffer {
 		BigDecimal rewardMinus = BigDecimal.ZERO;
 		if (lPfItDetail != null) {
 			for (PfItDetail pfIt : lPfItDetail) {
+				this.info("pfIt=" + pfIt.toString());
 				if (pfIt.getWorkMonth() < iWorkMonth) {
 					eqAmtLM = eqAmtLM.add(pfIt.getPerfEqAmt());
 					rewardLM = rewardLM.add(pfIt.getPerfReward());
-					drawdownAmtLM = eqAmtLM.add(pfIt.getDrawdownAmt());
+					drawdownAmtLM = drawdownAmtLM.add(pfIt.getDrawdownAmt());
 				}
 				if (pfIt.getWorkMonth() == iWorkMonth) {
 					if (pfIt.getPerfEqAmt().compareTo(BigDecimal.ZERO) > 0) {
@@ -326,7 +327,7 @@ public class L5510Batch extends TradeBuffer {
 
 		// 寫入負業績，3.檢核結果為Y且檢核工作月為本月，追回前月累計
 		if ("Y".equals(tPfInsCheck.getCheckResult()) && tPfInsCheck.getCheckWorkMonth() == iWorkMonth) {
-			if (eqAmtPlus.compareTo(BigDecimal.ZERO) > 0 || rewardPlus.compareTo(BigDecimal.ZERO) > 0) {
+			if (eqAmtLM.compareTo(BigDecimal.ZERO) > 0 || rewardLM.compareTo(BigDecimal.ZERO) > 0) {
 				reverseUpdate(eqAmtLM, rewardLM, drawdownAmtLM, lPfItDetail, titaVo);
 			}
 		}
@@ -336,7 +337,7 @@ public class L5510Batch extends TradeBuffer {
 	// 寫入負業績，3.檢核結果為Y且檢核工作月為本月，追回金額
 	private void reverseUpdate(BigDecimal eqAmt, BigDecimal reward, BigDecimal drawdownAmt,
 			List<PfItDetail> lPfItDetail, TitaVo titaVo) throws LogicException {
-		this.info("reverseLM EqAmt=" + eqAmt + ", Reward=" + reward);
+		this.info("reverse EqAmt=" + eqAmt + ", Reward=" + reward);
 		minusCnt++;
 		eqAmt = BigDecimal.ZERO.subtract(eqAmt);
 		reward = BigDecimal.ZERO.subtract(reward);
@@ -369,10 +370,10 @@ public class L5510Batch extends TradeBuffer {
 		tPfItDetail.setFacmNo(pfIt.getFacmNo());
 		tPfItDetail.setBormNo(0);
 		tPfItDetail.setRepayType(5); // 還款類別 5.保費檢核追回
-		tPfItDetail.setDrawdownDate(pfIt.getDrawdownDate()); // 撥款日
+		tPfItDetail.setDrawdownDate(0); // 撥款日
 		tPfItDetail.setProdCode(pfIt.getProdCode()); // 商品代碼
 		tPfItDetail.setPieceCode(pfIt.getPieceCode()); // 計件代碼
-		tPfItDetail.setDrawdownAmt(tPfItDetail.getDrawdownAmt().add(drawdownAmt)); // 撥款金額/追回金額
+		tPfItDetail.setDrawdownAmt(BigDecimal.ZERO); // 撥款金額/追回金額
 		tPfItDetail.setUnitCode(pfIt.getUnitCode()); // 單位代號CdEmp.CenterCode單位代號
 		tPfItDetail.setDistCode(pfIt.getDistCode()); // 區部代號
 		tPfItDetail.setDeptCode(pfIt.getDeptCode()); // 部室代號
@@ -387,8 +388,8 @@ public class L5510Batch extends TradeBuffer {
 		tPfItDetail.setWorkSeason(workSeason); // 工作季
 		tPfItDetail.setRewardDate(this.txBuffer.getTxCom().getTbsdy()); // 保費檢核日
 		// 換算業績、業務報酬
-		tPfItDetail.setPerfEqAmt(tPfItDetail.getPerfEqAmt().add(eqAmt));
-		tPfItDetail.setPerfReward(tPfItDetail.getPerfReward().add(reward));
+		tPfItDetail.setPerfEqAmt(eqAmt);
+		tPfItDetail.setPerfReward(reward);
 
 		this.info("PfItDetailCom update " + tPfItDetail.toString());
 		try {

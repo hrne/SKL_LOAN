@@ -26,6 +26,7 @@ import com.st1.itx.db.domain.HlThreeDetail;
 import com.st1.itx.db.domain.HlThreeDetailId;
 import com.st1.itx.db.domain.HlThreeLaqhcp;
 import com.st1.itx.db.domain.HlThreeLaqhcpId;
+import com.st1.itx.db.domain.SystemParas;
 import com.st1.itx.db.service.CdWorkMonthService;
 import com.st1.itx.db.service.HlAreaDataService;
 import com.st1.itx.db.service.HlAreaLnYg6PtService;
@@ -33,7 +34,11 @@ import com.st1.itx.db.service.HlCusDataService;
 import com.st1.itx.db.service.HlEmpLnYg5PtService;
 import com.st1.itx.db.service.HlThreeDetailService;
 import com.st1.itx.db.service.HlThreeLaqhcpService;
+import com.st1.itx.db.service.SystemParasService;
 import com.st1.itx.db.service.springjpa.cm.L5500ServiceImpl;
+import com.st1.itx.trade.L9.L9744Batch;
+import com.st1.itx.trade.L9.L9745Batch;
+import com.st1.itx.trade.L9.L9746Batch;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
@@ -76,6 +81,9 @@ public class L5500Batch extends TradeBuffer {
 	private CdWorkMonthService cdWorkMonthService;
 
 	@Autowired
+	private SystemParasService systemParasService;
+
+	@Autowired
 	private L5500ServiceImpl l5500ServiceImpl;
 
 	@Autowired
@@ -95,11 +103,8 @@ public class L5500Batch extends TradeBuffer {
 		this.info("active L5500Batch ");
 		this.totaVo.init(titaVo);
 		if (titaVo.get("WorkDate") == null || titaVo.get("WorkDate").isEmpty()) {
-			if (titaVo.getEntDyI() > 0) {
-				titaVo.putParam("WorkDate", titaVo.getEntDyI());//經辦啟動-挑選業績日期資料大於等於會計日
-			} else {
-				titaVo.putParam("WorkDate", dateUtil.getNowIntegerRoc());//schedule啟動-挑選業績日期資料大於等於日曆日
-			}
+			SystemParas tSystemParas = systemParasService.findById("LN", titaVo);
+			titaVo.putParam("WorkDate", tSystemParas == null ? 0 : tSystemParas.getPerfDate());
 		}
 		entday = Integer.valueOf(titaVo.getParam("WorkDate")) + 19110000;
 
@@ -142,7 +147,6 @@ public class L5500Batch extends TradeBuffer {
 		String msg = "L5500已處理完畢";
 
 		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", msg, titaVo);
-
 
 		this.addList(this.totaVo);
 		return this.sendList();
