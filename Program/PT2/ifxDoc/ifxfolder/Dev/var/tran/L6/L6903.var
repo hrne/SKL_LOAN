@@ -111,22 +111,6 @@ C(3,#CHAIN,1,T(2,@AcDateEd,#CHAIN_AcDate),)
 #FdAcDate=X,2,L
 C(3,#CHAIN,1,T(3, ),T(3,*))
 
-! 顯示框線
-#WKTF=X,1,S
-IF (#CHAIN==1 ,T(F,@AcSubBookCode,0)T(F,@AcNoCode,0)T(F,@AcSubCode,0)T(F,@AcDtlCode,0)T(F,@AcDateSt,0)T(F,@AcDateEd,0),
-               T(F,@AcSubBookCode,1)T(F,@AcNoCode,1)T(F,@AcSubCode,1)T(F,@AcDtlCode,1)T(F,@AcDateSt,1)T(F,@AcDateEd,1))
-
-#RPTFG=A,1,S
-E(0,0)
-!功能 必須輸入
-#FunCd=A,1,S
-E(0,8)XMT()
-
-#RETURN=A,1,S
-E(0,0)
-
-![折返KEY]
-#RTNTXT=X,9,S
 
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 #ApHelp=x,1024,S
@@ -205,11 +189,14 @@ T(2,#L6R23AcNoItem)
 
 !戶號
 #CustNo=A,7,I
+C(3,#CHAIN,1,s,$)
 !總帳傳票號碼
 #MediaSlipNo=X,12,I
+C(3,#CHAIN,1,s,$)
 
 !銷帳碼
 #RvNo=X,30,I
+C(3,#CHAIN,1,s,$)
 
 
 !會計日期 必須輸入
@@ -231,13 +218,19 @@ T(2,#DT_MONTH+#DT_01)
 @V(7)A(4,0,#AcDateSt)
 !IF(#AcDateSt > #DT ,V(P,不可大於會計日),$)
 
+
 #AcDateEd=D,7,I
-C(3,#CHAIN,1,XMT(),$)
+C(3,#CHAIN,1,s,$)
 T(2,#DT)
 @V(7)A(4,0,#AcDateEd)V(5,#AcDateSt,#DT)
 
+#RPTFG=A,1,S
+E(0,0)
+
 #CHAINXMT=X,1,S
 C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+
+
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L6R23.dec"/>
 

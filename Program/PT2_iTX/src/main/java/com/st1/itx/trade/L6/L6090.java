@@ -14,7 +14,6 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.db.domain.CdRuleCode;
-import com.st1.itx.db.domain.CdRuleCodeId;
 import com.st1.itx.db.service.CdRuleCodeService;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;

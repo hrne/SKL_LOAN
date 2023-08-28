@@ -23,268 +23,348 @@ import javax.persistence.Column;
 @Table(name = "`MonthlyLM042RBC`")
 public class MonthlyLM042RBC implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -4408816963666083608L;
 
-	@EmbeddedId
-	private MonthlyLM042RBCId monthlyLM042RBCId;
+  @EmbeddedId
+  private MonthlyLM042RBCId monthlyLM042RBCId;
 
-	// 資料年月
-	@Column(name = "`YearMonth`", insertable = false, updatable = false)
-	private int yearMonth = 0;
+  // 資料年月
+  @Column(name = "`YearMonth`", insertable = false, updatable = false)
+  private int yearMonth = 0;
 
-	// 放款種類
-	/* 1：一般放款2：專案放款 */
-	@Column(name = "`LoanType`", length = 1, insertable = false, updatable = false)
-	private String loanType;
+  // 放款種類
+  @Column(name = "`LoanType`", length = 1, insertable = false, updatable = false)
+  private String loanType;
 
-	// 放款項目
-	/*
-	 * A：銀行保證放款B：動產擔保放款C：不動產擔保放款D：有價證券質押放款E：非控制與從屬關係F：具控制與從屬關係Z：政策性專案運用公共及社會福利事業投資N：
-	 * 無
-	 */
-	@Column(name = "`LoanItem`", length = 1, insertable = false, updatable = false)
-	private String loanItem;
+  // 放款項目
+  @Column(name = "`LoanItem`", length = 1, insertable = false, updatable = false)
+  private String loanItem;
 
-	// 對象關係人
-	/* N：非關係人(非授信限制對象)Y：關係人(授信限制對象) */
-	@Column(name = "`RelatedCode`", length = 1, insertable = false, updatable = false)
-	private String relatedCode;
+  // 對象關係人
+  @Column(name = "`RelatedCode`", length = 1, insertable = false, updatable = false)
+  private String relatedCode;
 
-	// 放款金額
-	@Column(name = "`LoanAmount`")
-	private BigDecimal loanAmount = new BigDecimal("0");
+  // 放款金額
+  @Column(name = "`LoanAmount`")
+  private BigDecimal loanAmount = new BigDecimal("0");
 
-	// 風險係數
-	@Column(name = "`RiskFactor`")
-	private BigDecimal riskFactor = new BigDecimal("0");
+  // 風險係數
+  @Column(name = "`RiskFactor`")
+  private BigDecimal riskFactor = new BigDecimal("0");
 
-	// 建檔日期時間
-	@CreatedDate
-	@Column(name = "`CreateDate`")
-	private java.sql.Timestamp createDate;
+  // 股票質押
+  @Column(name = "`StockLoanBal`")
+  private BigDecimal stockLoanBal = new BigDecimal("0");
 
-	// 建檔人員
-	@Column(name = "`CreateEmpNo`", length = 6)
-	private String createEmpNo;
+  // 一般法人放款
+  @Column(name = "`OtherLoanbal`")
+  private BigDecimal otherLoanbal = new BigDecimal("0");
 
-	// 最後更新日期時間
-	@LastModifiedDate
-	@Column(name = "`LastUpdate`")
-	private java.sql.Timestamp lastUpdate;
+  // 溢折價
+  @Column(name = "`AmortizeTotal`")
+  private BigDecimal amortizeTotal = new BigDecimal("0");
 
-	// 最後更新人員
-	@Column(name = "`LastUpdateEmpNo`", length = 6)
-	private String lastUpdateEmpNo;
+  // 催收費用
+  @Column(name = "`OvduExpense`")
+  private BigDecimal ovduExpense = new BigDecimal("0");
 
-	public MonthlyLM042RBCId getMonthlyLM042RBCId() {
-		return this.monthlyLM042RBCId;
-	}
+  // 建檔日期時間
+  @CreatedDate
+  @Column(name = "`CreateDate`")
+  private java.sql.Timestamp createDate;
 
-	public void setMonthlyLM042RBCId(MonthlyLM042RBCId monthlyLM042RBCId) {
-		this.monthlyLM042RBCId = monthlyLM042RBCId;
-	}
+  // 建檔人員
+  @Column(name = "`CreateEmpNo`", length = 6)
+  private String createEmpNo;
 
-	/**
-	 * 資料年月<br>
-	 * 
-	 * @return Integer
-	 */
-	public int getYearMonth() {
-		return this.yearMonth;
-	}
+  // 最後更新日期時間
+  @LastModifiedDate
+  @Column(name = "`LastUpdate`")
+  private java.sql.Timestamp lastUpdate;
 
-	/**
-	 * 資料年月<br>
-	 * 
-	 *
-	 * @param yearMonth 資料年月
-	 */
-	public void setYearMonth(int yearMonth) {
-		this.yearMonth = yearMonth;
-	}
+  // 最後更新人員
+  @Column(name = "`LastUpdateEmpNo`", length = 6)
+  private String lastUpdateEmpNo;
 
-	/**
-	 * 放款種類<br>
-	 * 1：一般放款 2：專案放款
-	 * 
-	 * @return String
-	 */
-	public String getLoanType() {
-		return this.loanType == null ? "" : this.loanType;
-	}
 
-	/**
-	 * 放款種類<br>
-	 * 1：一般放款 2：專案放款
-	 *
-	 * @param loanType 放款種類
-	 */
-	public void setLoanType(String loanType) {
-		this.loanType = loanType;
-	}
+  public MonthlyLM042RBCId getMonthlyLM042RBCId() {
+    return this.monthlyLM042RBCId;
+  }
 
-	/**
-	 * 放款項目<br>
-	 * A：銀行保證放款 B：動產擔保放款 C：不動產擔保放款 D：有價證券質押放款 E：非控制與從屬關係 F：具控制與從屬關係 Z：政策性專案運用公共
-	 * 及社會福利事業投資 N：無
-	 * 
-	 * @return String
-	 */
-	public String getLoanItem() {
-		return this.loanItem == null ? "" : this.loanItem;
-	}
+  public void setMonthlyLM042RBCId(MonthlyLM042RBCId monthlyLM042RBCId) {
+    this.monthlyLM042RBCId = monthlyLM042RBCId;
+  }
 
-	/**
-	 * 放款項目<br>
-	 * A：銀行保證放款 B：動產擔保放款 C：不動產擔保放款 D：有價證券質押放款 E：非控制與從屬關係 F：具控制與從屬關係 Z：政策性專案運用公共
-	 * 及社會福利事業投資 N：無
-	 *
-	 * @param loanItem 放款項目
-	 */
-	public void setLoanItem(String loanItem) {
-		this.loanItem = loanItem;
-	}
+/**
+	* 資料年月<br>
+	* 
+	* @return Integer
+	*/
+  public int getYearMonth() {
+    return this.yearMonth;
+  }
 
-	/**
-	 * 對象關係人<br>
-	 * N：非關係人(非授信限制對象) Y：關係人(授信限制對象)
-	 * 
-	 * @return String
-	 */
-	public String getRelatedCode() {
-		return this.relatedCode == null ? "" : this.relatedCode;
-	}
+/**
+	* 資料年月<br>
+	* 
+  *
+  * @param yearMonth 資料年月
+	*/
+  public void setYearMonth(int yearMonth) {
+    this.yearMonth = yearMonth;
+  }
 
-	/**
-	 * 對象關係人<br>
-	 * N：非關係人(非授信限制對象) Y：關係人(授信限制對象)
-	 *
-	 * @param relatedCode 對象關係人
-	 */
-	public void setRelatedCode(String relatedCode) {
-		this.relatedCode = relatedCode;
-	}
+/**
+	* 放款種類<br>
+	* 
+	* @return String
+	*/
+  public String getLoanType() {
+    return this.loanType == null ? "" : this.loanType;
+  }
 
-	/**
-	 * 放款金額<br>
-	 * 
-	 * @return BigDecimal
-	 */
-	public BigDecimal getLoanAmount() {
-		return this.loanAmount;
-	}
+/**
+	* 放款種類<br>
+	* 
+  *
+  * @param loanType 放款種類
+	*/
+  public void setLoanType(String loanType) {
+    this.loanType = loanType;
+  }
 
-	/**
-	 * 放款金額<br>
-	 * 
-	 *
-	 * @param loanAmount 放款金額
-	 */
-	public void setLoanAmount(BigDecimal loanAmount) {
-		this.loanAmount = loanAmount;
-	}
+/**
+	* 放款項目<br>
+	* 
+	* @return String
+	*/
+  public String getLoanItem() {
+    return this.loanItem == null ? "" : this.loanItem;
+  }
 
-	/**
-	 * 風險係數<br>
-	 * 
-	 * @return BigDecimal
-	 */
-	public BigDecimal getRiskFactor() {
-		return this.riskFactor;
-	}
+/**
+	* 放款項目<br>
+	* 
+  *
+  * @param loanItem 放款項目
+	*/
+  public void setLoanItem(String loanItem) {
+    this.loanItem = loanItem;
+  }
 
-	/**
-	 * 風險係數<br>
-	 * 
-	 *
-	 * @param riskFactor 風險係數
-	 */
-	public void setRiskFactor(BigDecimal riskFactor) {
-		this.riskFactor = riskFactor;
-	}
+/**
+	* 對象關係人<br>
+	* 
+	* @return String
+	*/
+  public String getRelatedCode() {
+    return this.relatedCode == null ? "" : this.relatedCode;
+  }
 
-	/**
-	 * 建檔日期時間<br>
-	 * 
-	 * @return java.sql.Timestamp
-	 */
-	public java.sql.Timestamp getCreateDate() {
-		return this.createDate;
-	}
+/**
+	* 對象關係人<br>
+	* 
+  *
+  * @param relatedCode 對象關係人
+	*/
+  public void setRelatedCode(String relatedCode) {
+    this.relatedCode = relatedCode;
+  }
 
-	/**
-	 * 建檔日期時間<br>
-	 * 
-	 *
-	 * @param createDate 建檔日期時間
-	 */
-	public void setCreateDate(java.sql.Timestamp createDate) {
-		this.createDate = createDate;
-	}
+/**
+	* 放款金額<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getLoanAmount() {
+    return this.loanAmount;
+  }
 
-	/**
-	 * 建檔人員<br>
-	 * 
-	 * @return String
-	 */
-	public String getCreateEmpNo() {
-		return this.createEmpNo == null ? "" : this.createEmpNo;
-	}
+/**
+	* 放款金額<br>
+	* 
+  *
+  * @param loanAmount 放款金額
+	*/
+  public void setLoanAmount(BigDecimal loanAmount) {
+    this.loanAmount = loanAmount;
+  }
 
-	/**
-	 * 建檔人員<br>
-	 * 
-	 *
-	 * @param createEmpNo 建檔人員
-	 */
-	public void setCreateEmpNo(String createEmpNo) {
-		this.createEmpNo = createEmpNo;
-	}
+/**
+	* 風險係數<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getRiskFactor() {
+    return this.riskFactor;
+  }
 
-	/**
-	 * 最後更新日期時間<br>
-	 * 
-	 * @return java.sql.Timestamp
-	 */
-	public java.sql.Timestamp getLastUpdate() {
-		return this.lastUpdate;
-	}
+/**
+	* 風險係數<br>
+	* 
+  *
+  * @param riskFactor 風險係數
+	*/
+  public void setRiskFactor(BigDecimal riskFactor) {
+    this.riskFactor = riskFactor;
+  }
 
-	/**
-	 * 最後更新日期時間<br>
-	 * 
-	 *
-	 * @param lastUpdate 最後更新日期時間
-	 */
-	public void setLastUpdate(java.sql.Timestamp lastUpdate) {
-		this.lastUpdate = lastUpdate;
-	}
+/**
+	* 股票質押<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getStockLoanBal() {
+    return this.stockLoanBal;
+  }
 
-	/**
-	 * 最後更新人員<br>
-	 * 
-	 * @return String
-	 */
-	public String getLastUpdateEmpNo() {
-		return this.lastUpdateEmpNo == null ? "" : this.lastUpdateEmpNo;
-	}
+/**
+	* 股票質押<br>
+	* 
+  *
+  * @param stockLoanBal 股票質押
+	*/
+  public void setStockLoanBal(BigDecimal stockLoanBal) {
+    this.stockLoanBal = stockLoanBal;
+  }
 
-	/**
-	 * 最後更新人員<br>
-	 * 
-	 *
-	 * @param lastUpdateEmpNo 最後更新人員
-	 */
-	public void setLastUpdateEmpNo(String lastUpdateEmpNo) {
-		this.lastUpdateEmpNo = lastUpdateEmpNo;
-	}
+/**
+	* 一般法人放款<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getOtherLoanbal() {
+    return this.otherLoanbal;
+  }
 
-	@Override
-	public String toString() {
-		return "MonthlyLM042RBC [monthlyLM042RBCId=" + monthlyLM042RBCId + ", loanAmount=" + loanAmount + ", riskFactor=" + riskFactor + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
-				+ ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
-	}
+/**
+	* 一般法人放款<br>
+	* 
+  *
+  * @param otherLoanbal 一般法人放款
+	*/
+  public void setOtherLoanbal(BigDecimal otherLoanbal) {
+    this.otherLoanbal = otherLoanbal;
+  }
+
+/**
+	* 溢折價<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getAmortizeTotal() {
+    return this.amortizeTotal;
+  }
+
+/**
+	* 溢折價<br>
+	* 
+  *
+  * @param amortizeTotal 溢折價
+	*/
+  public void setAmortizeTotal(BigDecimal amortizeTotal) {
+    this.amortizeTotal = amortizeTotal;
+  }
+
+/**
+	* 催收費用<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getOvduExpense() {
+    return this.ovduExpense;
+  }
+
+/**
+	* 催收費用<br>
+	* 
+  *
+  * @param ovduExpense 催收費用
+	*/
+  public void setOvduExpense(BigDecimal ovduExpense) {
+    this.ovduExpense = ovduExpense;
+  }
+
+/**
+	* 建檔日期時間<br>
+	* 
+	* @return java.sql.Timestamp
+	*/
+  public java.sql.Timestamp getCreateDate() {
+    return this.createDate;
+  }
+
+/**
+	* 建檔日期時間<br>
+	* 
+  *
+  * @param createDate 建檔日期時間
+	*/
+  public void setCreateDate(java.sql.Timestamp createDate) {
+    this.createDate = createDate;
+  }
+
+/**
+	* 建檔人員<br>
+	* 
+	* @return String
+	*/
+  public String getCreateEmpNo() {
+    return this.createEmpNo == null ? "" : this.createEmpNo;
+  }
+
+/**
+	* 建檔人員<br>
+	* 
+  *
+  * @param createEmpNo 建檔人員
+	*/
+  public void setCreateEmpNo(String createEmpNo) {
+    this.createEmpNo = createEmpNo;
+  }
+
+/**
+	* 最後更新日期時間<br>
+	* 
+	* @return java.sql.Timestamp
+	*/
+  public java.sql.Timestamp getLastUpdate() {
+    return this.lastUpdate;
+  }
+
+/**
+	* 最後更新日期時間<br>
+	* 
+  *
+  * @param lastUpdate 最後更新日期時間
+	*/
+  public void setLastUpdate(java.sql.Timestamp lastUpdate) {
+    this.lastUpdate = lastUpdate;
+  }
+
+/**
+	* 最後更新人員<br>
+	* 
+	* @return String
+	*/
+  public String getLastUpdateEmpNo() {
+    return this.lastUpdateEmpNo == null ? "" : this.lastUpdateEmpNo;
+  }
+
+/**
+	* 最後更新人員<br>
+	* 
+  *
+  * @param lastUpdateEmpNo 最後更新人員
+	*/
+  public void setLastUpdateEmpNo(String lastUpdateEmpNo) {
+    this.lastUpdateEmpNo = lastUpdateEmpNo;
+  }
+
+
+  @Override
+  public String toString() {
+    return "MonthlyLM042RBC [monthlyLM042RBCId=" + monthlyLM042RBCId + ", loanAmount=" + loanAmount + ", riskFactor=" + riskFactor
+           + ", stockLoanBal=" + stockLoanBal + ", otherLoanbal=" + otherLoanbal + ", amortizeTotal=" + amortizeTotal + ", ovduExpense=" + ovduExpense + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
+           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+  }
 }

@@ -253,20 +253,28 @@ public class L9701Report extends MakeReport {
 				cntFirst++;
 
 				// 表示第一筆，要列印表頭(只印一次)
-				if (cntFirst == 1) {
-					printFacHead();
+				if (cntFirst > 1) {
+					// 換頁
+					//不是滿45頁的
+					if (this.NowRow != 45) {
+						nextPage(false, cntAll == listL9701.size());
+					}
+					//在加上結算時的行數超過45就直接換頁
+					if (!(!lastsFacmNo.equals(facmNo + "") && this.NowRow >= 42)) {
+						nextPage(false, cntAll == listL9701.size());
+					}
 				}
 
 				this.info("lastsFacmNo = " + lastsFacmNo);
 				this.info("lastsFacmNo vs facmno = " + lastsFacmNo + " vs " + tL9701Vo.get("FacmNo"));
-				if (!lastsFacmNo.equals(facmNo + "")) {
-					this.facmNo = tL9701Vo.get("FacmNo");
-					this.info("NNNNNNNNNNNNNNNNNNNN");
-					nextPage(true, cntAll == listL9701.size());
-				}
+				if (cntAll > 0 && facmNo > 0) {
+					if (!lastsFacmNo.equals(facmNo + "")) {
 
-				// 換頁
-				nextPage(false, cntAll == listL9701.size());
+						this.facmNo = tL9701Vo.get("FacmNo");
+
+						nextPage(true, cntAll == listL9701.size());
+					}
+				}
 
 				if (!this.facmNo.equals(nextFacmNo)) {
 					// 無交易明細且無餘額

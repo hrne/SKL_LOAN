@@ -50,14 +50,23 @@ T(1,#SYSDATE,2,3)
 #currentMonth=A,2,S
 T(1,#SYSDATE,5,2)
 
-#inputYearStart=A,3,I
-@V(5,0,#currentYear)
-#inputMonthStart=A,2,I
+#inputMonthStart=A,2,L
+E(0,1)
 @C(3,#inputYearStart,#currentYear,V(5,1,#currentMonth),V(5,1,12))
 
+#inputYearStart=A,3,I
+T(2,#currentYear)
+@V(5,0,#currentYear)
+
+
+
 #inputYearEnd=A,3,I
+T(2,#inputYearStart)
+@IF(#inputYearStart > #inputYearEnd,V(P,不得小於起始年份),$)
+@IF(#inputYearStart == #inputYearEnd,$,V(P,需與起始年份同年份))
 @V(5,#inputYearStart,#currentYear)
 #inputMonthEnd=A,2,I
+T(2,#currentMonth)
 @C(3,#inputYearEnd,#currentYear,V(5,1,#currentMonth),V(5,1,12))
 
 </sub>

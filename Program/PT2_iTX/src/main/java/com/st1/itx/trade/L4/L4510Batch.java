@@ -288,11 +288,11 @@ public class L4510Batch extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private void getList(int flag, Slice<EmpDeductSchedule> slEmpDeductSchedule, String AgType1) throws LogicException {
+	private void getList(int flag, Slice<EmpDeductSchedule> slEmpDeductSchedule, String procCode) throws LogicException {
 //	iEntryDate  入帳日
 //  iRepayEndDate 應繳截止日
 		for (EmpDeductSchedule tEmpDeductSchedule : slEmpDeductSchedule.getContent()) {
-			if (AgType1.equals("" + tEmpDeductSchedule.getAgType1())) {
+			if (procCode.equals("" + tEmpDeductSchedule.getAgType1())) {
 				this.iEntryDate = tEmpDeductSchedule.getEntryDate();
 				this.iRepayEndDate = tEmpDeductSchedule.getRepayEndDate();
 			}
@@ -320,10 +320,10 @@ public class L4510Batch extends TradeBuffer {
 //			F3 1.15日薪 2.非15日薪
 //			F4 BormNo (逾兩期需指到撥款，無需扣費用)
 //			F5 ProcCode (流程別)
-			getList(flag, slEmpDeductSchedule, result.get("AgType1"));
+			getList(flag, slEmpDeductSchedule, result.get("ProcCode"));
 			int nextPayIntDate = parse.stringToInteger(result.get("NextPayIntDate")) - 19110000;
 			int firstDueDate = parse.stringToInteger(result.get("FirstDueDate")) - 19110000;
-			int procCode = parse.stringToInteger(result.get("AgType1"));
+			int procCode = parse.stringToInteger(result.get("ProcCode"));
 			if ("3".equals(result.get("RepayCode"))) {
 				if (nextPayIntDate > iRepayEndDate) {
 					this.info("skip NextPayIntDate > iPayIntDate " + result);
