@@ -76,7 +76,7 @@ public class L6090 extends TradeBuffer {
 			sCdRuleCode = sCdRuleCodeService.findAll(this.index, this.limit, titaVo);
 			List<CdRuleCode> lCdRuleCode = sCdRuleCode == null ? null : sCdRuleCode.getContent();
 			if (sCdRuleCode == null) {
-				throw new LogicException("E0005", "管制代碼檔");
+				throw new LogicException("E0001", "管制代碼檔");
 			}
 			for (CdRuleCode s : lCdRuleCode) {
 				OccursList occursList = new OccursList();
@@ -101,7 +101,7 @@ public class L6090 extends TradeBuffer {
 			CdRuleCode lCdRuleCode = new CdRuleCode();
 			lCdRuleCode = sCdRuleCodeService.findById(iRuleCode, titaVo);
 			if (lCdRuleCode == null) {
-				throw new LogicException("E0005", "管制代碼檔");
+				throw new LogicException("E0001", "管制代碼檔");
 			} else {
 				OccursList occursList = new OccursList();
 

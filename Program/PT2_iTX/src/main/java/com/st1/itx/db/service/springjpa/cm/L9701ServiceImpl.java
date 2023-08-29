@@ -98,6 +98,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                        '契約變更'";
 		sql += "                END";
 		sql += "        END AS \"Desc\",";
+		sql += "		RPCODE.\"Item\" AS \"RepayItem\",";
 		sql += "        T.\"EntryDate\",";
 		sql += "        NVL( T.\"Amount\",";
 		sql += "        0 ) AS \"Amount\",";

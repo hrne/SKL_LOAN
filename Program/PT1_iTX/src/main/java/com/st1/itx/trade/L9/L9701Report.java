@@ -252,23 +252,17 @@ public class L9701Report extends MakeReport {
 				// 不是額度0後的開始計算
 				cntFirst++;
 
-				// 表示第一筆，要列印表頭(只印一次)
-				if (cntFirst > 1) {
-					// 換頁
-					//不是滿45頁的
-					if (this.NowRow != 45) {
-						nextPage(false, cntAll == listL9701.size());
-					}
-					//在加上結算時的行數超過45就直接換頁
-					if (!(!lastsFacmNo.equals(facmNo + "") && this.NowRow >= 42)) {
-						nextPage(false, cntAll == listL9701.size());
-					}
+				// 第一頁的第一筆
+				if (cntFirst == 1 && this.getNowPage() == 1) {
+					this.print(1, 1, " ");
+					printFacHead();
 				}
+
 
 				this.info("lastsFacmNo = " + lastsFacmNo);
 				this.info("lastsFacmNo vs facmno = " + lastsFacmNo + " vs " + tL9701Vo.get("FacmNo"));
 				if (cntAll > 0 && facmNo > 0) {
-					if (!lastsFacmNo.equals(facmNo + "")) {
+					if (!lastsFacmNo.equals(facmNo + "") ||  (nextFacmNo.equals(facmNo + "") && this.NowRow >= 43)) {
 
 						this.facmNo = tL9701Vo.get("FacmNo");
 
@@ -319,6 +313,7 @@ public class L9701Report extends MakeReport {
 
 				// 最後一筆 列印結束報表
 				if (cntAll == listL9701.size()) {
+					printFacEnd(this.facmNo);
 					this.print(-45, this.getMidXAxis(), endText, "C");
 				}
 
@@ -440,7 +435,7 @@ public class L9701Report extends MakeReport {
 	private void nextPage(boolean forceNextPage, boolean isLast) {
 
 		// 換頁1：資料滿列數換頁
-		if (this.NowRow >= 45 && !forceNextPage) {
+		if (this.NowRow == 45 && !forceNextPage) {
 			this.print(1, this.getMidXAxis(), nextPageText, "C");
 			if (!isLast) {
 				this.newPage();

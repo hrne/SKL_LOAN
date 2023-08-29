@@ -102,7 +102,7 @@ T(F,@RuleStDate,0)T(F,@RuleEdDate,0)T(F,@EnableMark,0)
 C(5,#FunCode,5,$,S)
 T(F,@RuleCode,0)T(F,@RuleCodeItem,0)T(F,@RmkItem,0)
 T(F,@RuleStDate,0)T(F,@RuleEdDate,0)T(F,@EnableMark,0)
-
+K(NOBUTTON,CLOSEY)
 
 #RuleCode=X,5,I
 C(5,#FunCode,2,s,$)

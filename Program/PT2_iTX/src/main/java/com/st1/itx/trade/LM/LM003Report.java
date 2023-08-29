@@ -167,8 +167,8 @@ public class LM003Report extends MakeReport {
 				turnOvduAmt = turnOvduAmt.add(getBigDecimal(r.get("NoCloseAmtSeq3")));
 				// 企金自然人金額合計
 				entPerAmt = entPerAmt.add(getBigDecimal(r.get("EntPerAmt")));
-
-				repayAllTotal = repayAllTotal.add(entToTalAmt);
+				//帳載
+				repayAllTotal = repayAllTotal.add(lRepayTotal);
 			}
 
 			int rowP = 22;

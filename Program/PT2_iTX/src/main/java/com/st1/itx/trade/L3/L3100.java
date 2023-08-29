@@ -1049,6 +1049,12 @@ public class L3100 extends TradeBuffer {
 					tLoanBorMain.getPrevRepaidDate(), tLoanBorMain.getMaturityDate(), tLoanBorMain.getGraceDate());
 			tLoanBorMain.setNextRepayDate(wkNextRepayDate);
 		}
+		// 額度寬限期有值放1否則0 2023/08/29
+		if (tFacMain.getGracePeriod() > 0) {
+			tLoanBorMain.setGraceFlag(1);
+		} else {
+			tLoanBorMain.setGraceFlag(0);
+		}
 
 	}
 
