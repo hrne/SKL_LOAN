@@ -1,0 +1,321 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L5964)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,595)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,40)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+K(MODIFYBUTTON,查詢)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L5964" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L5964]                                 法務進度明細資料查詢"],
+[#<->#,"#FdCaseCode+案件種類",#CaseCode,#CaseCodeX],
+[#<->#,"#FdCustNo+借戶戶號",#CustNo,#CUSTNM],
+[#<->#,"#FdFacmNo+額度編號",#FacmNo],
+[#<->#,"#FdDateFlag+項目",#DateFlag,#DateFlagX],
+]
+!---------- AP TEXT AREA Variables ----------
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L5060案件處理清單]進入),$)
+
+#NTXBUF=X,11,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@CaseCode,#NTXBUF,1,1)
+T(1,@CustNo,#NTXBUF,2,7)
+T(1,@FacmNo,#NTXBUF,9,3)
+INVOKEJS(SHOW,p1,02,02,1)
+
+#FdCaseCode=X,1,L
+T(3,*)
+#FdCustNo=X,1,L
+T(3,*)
+#FdFacmNo=X,1,L
+T(3, )
+#FdDateFlag=X,1,L
+T(3,*)
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+! 案件種類下拉選單1
+#CaseCodeRimName=x,20,S
+T(3,CdCode.CaseCode)
+#CaseCodeHelp=x,1024,S
+
+! 項目期間下拉選單2
+#DateFlagRimName=x,20,S
+T(3,CdCode.DateFlag)
+#DateFlagHelp=x,1024,S
+
+! 法務進度下拉選單3
+#LegalProgRimName=x,20,S
+T(3,CdCode.LegalProg)
+#LegalProgHelp=x,1024,S
+
+! 紀錄下拉選單4
+#LawRemarkRimName=x,20,S
+T(3,CdCode.LawRemark)
+#LawRemarkHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CaseCodeRimName,#DateFlagRimName,#LegalProgRimName,#LawRemarkRimName)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@CaseCodeHelp,#HelpDesc1)
+T(2,@DateFlagHelp,#HelpDesc2)
+T(2,@LegalProgHelp,#HelpDesc3)
+T(2,@LawRemarkHelp,#HelpDesc4)
+
+
+! 案件種類
+#CaseCode=A,1,I
+HELP(#CaseCodeHelp)
+@T(3,@CaseCodeX,)
+V(H,#CaseCodeHelp)
+
+#CaseCodeX=X,4,L
+T(H,#CaseCode,#CaseCodeHelp)
+
+! 借戶戶號
+#CustNo=A,7,I
+! C(3,#CHAIN,0,$,s)
+@T(3,@CustName,)
+V(2,0)
+
+! 借款人戶名----調RIM
+#CUSTNM=X,100,L
+
+!抓戶名
+#oCustNo=A,7,L
+E(0,#CustNo)
+#CustNo2=A,7,S
+#RimFunCd=A,1,S
+#RimCustId=X,10,S
+#RimCustNo=A,7,S
+
+#RimL1r09=X,1,S
+C(3,#CustNo,#CustNo2,s,$)
+E(0,@RimFunCd,1)
+T(2,@RimCustId,)
+E(0,@RimCustNo,#CustNo)
+RESET_RIM(#RimL1r09,L1R09)
+S(L1R09,1,#RimFunCd,#RimCustId,#RimCustNo)
+R(1,L1R09)
+T(2,@CustName,#L1r09CustName)
+#CustName=x,100,L
+
+! 額度編號
+#FacmNo=A,3,I
+! C(3,#CHAIN,0,$,s)
+C(3,#CaseCode,2,S,$)
+@V(2,0)
+
+#MRKEY=_,_,S
+C(3,#CustNo,0,S,$)
+C(3,#FacmNo,0,T(2,#CustNo),T(2,#CustNo+-+#FacmNo)) 
+
+! 項目
+#DateFlag=A,1,I
+E(0,9)
+HELP(#DateFlagHelp)
+@T(3,@DateFlagX,)
+V(H,#DateFlagHelp)
+#DateFlagX=X,9,L
+T(H,#DateFlag,#DateFlagHelp)
+
+
+#RPTFG=A,1,S
+<include src="ROM.icf::L1R09.dec"/>
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L5964 -----------
+<sub type="FORM" name="L5964">
+#SCRTIL=_,_,S
+T(3,[L5964] 法催明細資料)
+
+#LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+! 額度
+#OOFacmNo=A,3,O
+! 記錄日期
+#OORecordDate=D,7,O
+! 法務進度
+#OOLegalProg=A,3,O
+#OOLegalProgX=X,30,O
+C(1,#OOLegalProg,S,S,$)
+T(H,#OOLegalProg,#LegalProgHelp)
+T(2,#OOLegalProg+ +#OOLegalProgX)
+
+! 金額
+#OOAmount=m,14,O
+! 記錄
+#OORemark=X,1,O
+#OORemarkX=X,20,O
+! C(1,#OORemark,S,S,$)
+T(H,#OORemark,#LawRemarkHelp)
+! 其他記錄(500)
+#OOMemo=x,10.50,O
+! 修改人員
+#OOEditEmpNo=X,6,O
+#OOEditEmpNoX=X,40,S
+#Space=X,1,S
+T(2, )
+#EditEmpCombine=X,47,S
+T(2,#OOEditEmpNo+#Space+#OOEditEmpNoX)
+! 交易序號
+#OOTitaTxtNo=X,8,L
+! 經辦
+#OOTitaTlrNo=X,6,L
+! 系統日期
+#OOTitaAcDate=D,7,L
+!擔保品編號
+#OOClCode1=A,1,L
+#OOClCode2=A,2,L
+#OOClNo=A,7,L
+#OOClDdata=X,12,O
+T(2,#OOClCode1+-+#OOClCode2+-+#OOClNo)
+
+! 1+7+3+1 +7+3+16+1+160+6+20=225
+#OOBUF_EDIT=X,586,S
+T(2,2+#CaseCode+#CustNo+#FacmNo+#OOTitaTlrNo+#OOTitaTxtNo+#OOTitaAcDate)
+#OOBUF_COPY=X,586,S
+T(2,3+#CaseCode+#CustNo+#FacmNo+#OOTitaTlrNo+#OOTitaTxtNo+#OOTitaAcDate)
+#OOBUF_DELETE=X,586,S
+T(2,4+#CaseCode+#CustNo+#FacmNo+#OOTitaTlrNo+#OOTitaTxtNo+#OOTitaAcDate)
+#OOBUF_SEARCH=X,586,S
+T(2,5+#CaseCode+#CustNo+#FacmNo+#OOTitaTlrNo+#OOTitaTxtNo+#OOTitaAcDate)
+
+#OOBTN_EDIT=A,2,O
+BIND(grid,{ cmd=CHAIN; ntxcd=L5604; ntxbuf=#OOBUF_EDIT})
+#OOBTN_COPY=A,2,O
+BIND(grid,{ cmd=CHAIN; ntxcd=L5604; ntxbuf=#OOBUF_COPY})
+#OOBTN_DELETE=A,2,O
+BIND(grid,{ cmd=CHAIN; ntxcd=L5604; ntxbuf=#OOBUF_DELETE})
+#OOBTN_SEARCH=A,2,O
+BIND(grid,{ cmd=CHAIN; ntxcd=L5604; ntxbuf=#OOBUF_SEARCH})
+
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#CustNo#FacmNo#DateFlag#CaseCode
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L5964
+#OOFacmNo
+#OORecordDate
+#OOLegalProg
+#OOAmount
+#OORemark
+#OOMemo
+#OOEditEmpNo
+#OOTitaTxtNo
+#OOTitaTlrNo
+#OOTitaAcDate
+#OOEditEmpNoX
+#OOClCode1
+#OOClCode2
+#OOClNo
+^
+<include src="ROM.icf::L1R09.tom"/>
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="PART" prompt='{{#SCRTIL}} world' name="L5964" layout="cols=1;screen.width=[130,870];order=1;">
+[
+["[L5964]                                 法務進度明細資料查詢                                                                   "],
+["戶號",#oCustNo],
+["戶名",#CustName],
+]
+</sub>
+
+<sub type="SELECT">
+
+#RPTFG=0,QUERY.GRID,L5964
+#any={detail:true, header:'L5964.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
+
+#OOBTN_EDIT=修改
+{search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false,width:40}
+#OOBTN_COPY=複製
+{search:false,formatter:'cust:bind-button:複製',align:'center',canExport:false,width:40}
+#OOBTN_DELETE=刪除
+{search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false,width:40}
+#OOBTN_SEARCH=查詢
+{search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:40}
+
+#OOFacmNo=額度
+{width:45,align:'center'}
+#OORecordDate=記錄日期
+{width:80,align:'center'}
+#OOLegalProgX=法務進度
+{width:135}
+#OOAmount=金額
+{width:70}
+#OORemarkX=記錄
+{width:135}
+#OOMemo=其他記錄
+{width:135}
+#OOClDdata=擔保品編號
+{width:100,align:'center'}
+#EditEmpCombine=修改人員
+{width:100,align:'center'}
+#OOTitaTxtNo=交易序號
+{width:85,align:'center'}
+
+^
+<include src="PRT.icf::INQ04.sel" map="i=L5964;cpi=15"/>
+#CustNo#FacmNo#DateFlag#CaseCode
+%
+#OOFacmNo
+#OORecordDate
+#OOLegalProg
+#OOAmount
+#OORemark
+#OOMemo
+#OOEditEmpNo
+@^
+</sub>

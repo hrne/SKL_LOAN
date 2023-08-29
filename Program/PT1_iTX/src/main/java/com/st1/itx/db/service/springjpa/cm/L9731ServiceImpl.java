@@ -131,7 +131,7 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 */
 	public List<Map<String, String>> findSheet2(TitaVo titaVo, int yearMonth) throws Exception {
 		// 年
-		int iYear = yearMonth / 100;
+//		int iYear = yearMonth / 100;
 
 		this.info("L9731.findSheet2 YYMM=" + yearMonth);
 
@@ -144,7 +144,7 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	 			  ,\"YearMonth\"";
 		sql += "	 			  ,SUM(\"LoanBalance\") AS \"MaxLoanBalance\"";
 		sql += "	 		FROM \"MonthlyLoanBal\"";
-		sql += "	 		WHERE TRUNC(\"YearMonth\" / 100 ) = :year";
+		sql += "	 		WHERE \"YearMonth\" <= :yymm ";
 		sql += "	 		  AND \"LoanBalance\" > 0 ";
 		sql += "	 		GROUP BY \"CustNo\"";
 		sql += "	 				,\"YearMonth\"";
@@ -166,26 +166,36 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	  FROM \"mainData\" M ";
 		sql += "	  LEFT JOIN \"allMonthMaxLoan\" M2 ON M2.\"CustNo\" = M.\"CustNo\"";
 		sql += "	  LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = M.\"CustNo\"";
-		sql += " 	  LEFT JOIN ( SELECT TO_CHAR(\"CustId\") AS \"RptId\" ";
-		sql += "             	  FROM \"BankRelationSelf\" ";
-		sql += "             	  WHERE \"LAW005\" = '1' ";
-		sql += "             	  UNION ";
-		sql += "             	  SELECT TO_CHAR(\"RelationId\") AS \"RptId\" ";
-		sql += "             	  FROM \"BankRelationFamily\" ";
-		sql += "             	  WHERE \"LAW005\" = '1' ";
-		sql += "             	  UNION ";
-		sql += "             	  SELECT TO_CHAR(\"CompanyId\") AS \"RptId\" ";
-		sql += "             	  FROM \"BankRelationCompany\" ";
-		sql += "             	  WHERE \"LAW005\" = '1' ";
-		sql += "           	    ) R ON R.\"RptId\" = C.\"CustId\" ";
+		sql += "      LEFT JOIN (";
+		sql += "      SELECT \"EmpId\" AS \"Id\"";
+		sql += "      FROM \"LifeRelEmp\"";
+		sql += "      WHERE \"AcDate\" = ( ";
+		sql += "      	SELECT MAX(\"AcDate\")";
+		sql += "      	FROM \"LifeRelEmp\"";
+		sql += "      	WHERE TRUNC(\"AcDate\"/100) <= :yymm ";
+		sql += "      	) ";
+		sql += "      UNION ALL";
+		sql += "      SELECT DISTINCT";
+		sql += "     		   CASE";
+		sql += "      		 WHEN \"BusId\" <> '-' THEN \"BusId\"";
+		sql += "      		 WHEN \"RelId\" <> '-' THEN \"RelId\"";
+		sql += "      		 WHEN \"HeadId\" <> '-' THEN \"HeadId\"";
+		sql += "      	   END AS \"Id\"";
+		sql += "      FROM \"LifeRelHead\"";
+		sql += "      WHERE \"RelWithCompany\" IN ('A','B')";
+		sql += "        AND \"AcDate\" = ( ";
+		sql += "      	SELECT MAX(\"AcDate\")";
+		sql += "      	FROM \"LifeRelHead\"";
+		sql += "      	WHERE TRUNC(\"AcDate\"/100) <= :yymm ";
+		sql += "      	) ";
+		sql += "        AND \"LoanBalance\" > 0";
+		sql += "           	    ) R ON R.\"Id\" = C.\"CustId\" ";
 		sql += "	  ORDER BY M.\"TotalLoanBal\" DESC";
-
 		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("year", iYear);
 		query.setParameter("yymm", yearMonth);
 
 		return this.convertToMap(query);

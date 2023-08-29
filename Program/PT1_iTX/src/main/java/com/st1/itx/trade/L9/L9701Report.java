@@ -253,16 +253,15 @@ public class L9701Report extends MakeReport {
 				cntFirst++;
 
 				// 第一頁的第一筆
-				if (cntFirst == 1 && this.getNowPage() == 1) {
+				if (cntAll == 1 || (cntFirst == 1 && this.getNowPage() == 1)) {
 					this.print(1, 1, " ");
 					printFacHead();
 				}
 
-
 				this.info("lastsFacmNo = " + lastsFacmNo);
 				this.info("lastsFacmNo vs facmno = " + lastsFacmNo + " vs " + tL9701Vo.get("FacmNo"));
 				if (cntAll > 0 && facmNo > 0) {
-					if (!lastsFacmNo.equals(facmNo + "") ||  (nextFacmNo.equals(facmNo + "") && this.NowRow >= 43)) {
+					if (!lastsFacmNo.equals(facmNo + "") || (nextFacmNo.equals(facmNo + "") && this.NowRow >= 43)) {
 
 						this.facmNo = tL9701Vo.get("FacmNo");
 

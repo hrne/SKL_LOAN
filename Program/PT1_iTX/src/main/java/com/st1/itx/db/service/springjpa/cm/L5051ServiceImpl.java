@@ -65,7 +65,8 @@ public class L5051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "A.\"CustNo\",";
 		sql += "A.\"FacmNo\",";
 		sql += "A.\"BormNo\",";
-		sql += "A.\"DrawdownDate\" - 19110000 AS \"DrawdownDate\",";
+		sql += " CASE WHEN A.\"DrawdownDate\" = 0 THEN  0 ";
+		sql += "      ELSE A.\"DrawdownDate\" - 19110000  END AS \"DrawdownDate\",";
 		sql += "A.\"ProdCode\",";
 		sql += "A.\"PieceCode\",";
 		sql += "A.\"CntingCode\",";
