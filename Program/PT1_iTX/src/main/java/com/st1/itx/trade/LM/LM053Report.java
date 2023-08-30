@@ -16,6 +16,7 @@ import com.st1.itx.db.service.springjpa.cm.LM053ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
+import com.st1.itx.util.parse.Parse;
 
 @Component
 @Scope("prototype")
@@ -28,11 +29,18 @@ public class LM053Report extends MakeReport {
 	@Autowired
 	MakeExcel makeExcel;
 
+	@Autowired
+	Parse parse;
+
 	@Override
 	public void printTitle() {
 
 	}
 
+	/**
+	 * @param titaVo
+	 * @throws LogicException
+	 */
 	public void exec(TitaVo titaVo) throws LogicException {
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 
@@ -54,7 +62,7 @@ public class LM053Report extends MakeReport {
 
 		// 開啟報表
 		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
-		
+
 		try {
 			fnAllList = lM053ServiceImpl.findAll(titaVo);
 		} catch (Exception e) {
@@ -62,73 +70,70 @@ public class LM053Report extends MakeReport {
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("LM053ServiceImpl.findAll error = " + errors.toString());
 		}
+
+
+		// 分配表日期 地區 戶號 額度 戶名 拍定金額 債權金額 分配金額 不足額 領取分配金額 入帳日 損失率 % 法務人員 備註
+
 		int row = 2;
 		if (fnAllList.size() > 0) {
-			String fdnm = "";
-			String xdate = "";
 
-			for (Map<String, String> tLDVo : fnAllList) {
-				this.info("tLDVo-------->" + tLDVo.toString());
+			for (Map<String, String> r : fnAllList) {
+
 				row++;
-				for (int i = 0; i < tLDVo.size(); i++) {
-					fdnm = "F" + String.valueOf(i);
-					switch (i) {
-					case 0:
-					case 8:
-						// 民國年
-						xdate = tLDVo.get(fdnm);
 
-						// 可以進入者：不是0並且不是空
-						if (xdate.length() > 7) {
-							// 如果是0 就掛0 不是零 應為正常西元年日期
-							xdate = String.valueOf(Integer.valueOf(xdate) == 0 ? 0 : Integer.valueOf(xdate) - 19110000);
-							if (i == 0) {
-								makeExcel.setValue(row, i + 1, xdate);
-							} else {
-								if (xdate.length() == 7) {
-									makeExcel.setValue(row, i + 1, xdate.substring(0, 3) + "." + xdate.substring(3, 5)
-											+ "." + xdate.substring(5, 7));
-								} else if (xdate.length() == 6) {
-									makeExcel.setValue(row, i + 1, xdate.substring(0, 2) + "." + xdate.substring(2, 4)
-											+ "." + xdate.substring(4, 6));
-								}
-
-							}
-						}
-						break;
-					case 2:
-					case 3:
-						// 戶號(數字右靠)
-						if (tLDVo.get(fdnm).equals("")) {
-							makeExcel.setValue(row, i + 1, 0);
-						} else {
-							makeExcel.setValue(row, i + 1, Integer.valueOf(tLDVo.get(fdnm)));
-						}
-						break;
-					case 5:
-					case 6:
-					case 7:
-						// 金額
-						if (tLDVo.get(fdnm).equals("")) {
-							makeExcel.setValue(row, i + 1, 0, "#,##0");
-						} else {
-							makeExcel.setValue(row, i + 1, Float.valueOf(tLDVo.get(fdnm)), "#,##0");
-						}
-						break;
-					case 9:
-						break;
-					default:
-						// 字串左靠
-						makeExcel.setValue(row, i + 1, tLDVo.get(fdnm));
-						break;
-					}
+				String entryDate = " ";
+				if (r.get("RecordDate") != null) {
+					entryDate = this.showRocDate(r.get("RecordDate"), 6);
 				}
+
+				//MainSeq判斷是否為 法務進度092
+				if ("1".equals(r.get("MainSeq"))) {
+
+					// 分配表日期
+					makeExcel.setValue(row, 1, this.showBcDate(r.get("RecordDate"), 2), "C");
+					// 地區
+					String cityItem = r.get("CityItem") == null ? " " : r.get("CityItem");
+					makeExcel.setValue(row, 2, cityItem, "C");
+					// 戶號
+					int custNo = parse.stringToInteger(r.get("CustNo"));
+					makeExcel.setValue(row, 3, custNo, "C");
+					// 額度
+					String facmNo = parse.stringToInteger(r.get("FacmNo")) == 0 ? " " : r.get("FacmNo");
+					makeExcel.setValue(row, 4, facmNo, "C");
+					// 戶名
+					String custName = r.get("CustName") == null ? " " : r.get("CustName");
+					makeExcel.setValue(row, 5, custName, "C");
+					// 拍定金額 56
+					makeExcel.setValue(row, 6, getBigDecimal(r.get("Amount056")), "#,##0", "R");
+					// 債權金額 57
+					makeExcel.setValue(row, 7, getBigDecimal(r.get("Amount057")), "#,##0", "R");
+					// 分配金額 58
+					makeExcel.setValue(row, 8, getBigDecimal(r.get("Amount058")), "#,##0", "R");
+					// 不足額 57(58)-60
+					makeExcel.setValue(row, 9, getBigDecimal(r.get("deficitAmount")), "#,##0", "R");
+					// 領取分配金額60
+					makeExcel.setValue(row, 10, getBigDecimal(r.get("Amount060")), "#,##0", "R");
+					// 入帳日
+					makeExcel.setValue(row, 11, entryDate, "C");
+					// 法催人員
+					String collName = r.get("Fullname") == null ? " " : r.get("Fullname");
+					makeExcel.setValue(row, 13, collName, "C");
+
+				} else {
+					// 領取分配金額92
+					makeExcel.setValue(row, 10, getBigDecimal(r.get("Amount092")), "#,##0", "R");
+					// 入帳日
+					makeExcel.setValue(row, 11, entryDate, "C");
+					// 法催人員
+					String collName = r.get("Fullname") == null ? " " : r.get("Fullname");
+					makeExcel.setValue(row, 13, collName, "C");
+				}
+
 			}
 		} else {
 			makeExcel.setValue(3, 1, "本日無資料");
 		}
 		makeExcel.setValue(1, 3, row - 2);
 		makeExcel.close();
-		//makeExcel.toExcel(sno);
 	}
 }

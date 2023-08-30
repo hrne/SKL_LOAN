@@ -25,7 +25,12 @@ import com.st1.itx.Exception.LogicException;
 public class CdRuleCode implements Serializable {
 
 
-  // 規定管制項目代碼
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8558094836835898523L;
+
+// 規定管制項目代碼
   @Id
   @Column(name = "`RuleCode`", length = 5)
   private String ruleCode = " ";

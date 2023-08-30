@@ -55,6 +55,8 @@ public class L7401 extends TradeBuffer {
 
 	private List<CoreAcMain> inCoreAcMain = new ArrayList<CoreAcMain>();
 
+	private List<CoreAcMain> updCoreAcMain = new ArrayList<CoreAcMain>();
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L7401 ");
@@ -102,23 +104,40 @@ public class L7401 extends TradeBuffer {
 
 			this.info("bcDate =" + bcDate);
 
-			this.info("setDataBaseOnMon");
-			titaVo.setDataBaseOnMon();
+//			this.info("setDataBaseOnMon");
+//			titaVo.setDataBaseOnMon();
 			Slice<CoreAcMain> fCoreAcMain = tCoreAcMainService.findByAcDate(bcDate, 0, Integer.MAX_VALUE, titaVo);
 			List<CoreAcMain> lCoreAcMain = fCoreAcMain == null ? null : fCoreAcMain.getContent();
 
 //			addData(titaVo, filename, "SKL000_NTD", bcDate, lCoreAcMain)
-			if (addData(titaVo, filename, "SKL000_00A_NTD", bcDate, lCoreAcMain)) {
+			if (addData(titaVo, filename, "SKL000_NTD", bcDate, lCoreAcMain)) {
 
 				titaVo.keepOrgDataBase();// 保留原本記號
 
 				insertData(titaVo);
 
 				titaVo.setDataBaseOnMon();// 指定月報環境
-
+//
 				insertData(titaVo);
-
+				
 				titaVo.setDataBaseOnOrg();// 還原原本的環境
+
+				if (addData(titaVo, filename, "SKL000_00A_NTD", bcDate, lCoreAcMain)) {
+
+					insertData(titaVo);
+
+					updateData(titaVo);
+					
+					titaVo.setDataBaseOnMon();// 指定月報環境
+					
+					insertData(titaVo);
+
+					updateData(titaVo);
+					
+					titaVo.setDataBaseOnOrg();// 指定月報環境
+					
+
+				}
 
 				this.totaVo.putParam("Count", count);
 
@@ -185,7 +204,7 @@ public class L7401 extends TradeBuffer {
 				iAcBookCode = String.valueOf(makeExcel.getValue(row, 1));
 				iAcBookCode = "SKL000".equals(iAcBookCode) ? "000" : iAcBookCode;
 				iCoreAcMainId.setAcBookCode(iAcBookCode);
-				// 區隔帳冊
+				// 區隔帳冊，因會先上傳全部帳冊，所以都先預設201
 				iAcSubBookCode = String.valueOf(makeExcel.getValue(row, 2));
 				iAcSubBookCode = "00A".equals(iAcSubBookCode) ? "00A" : "201";
 				iCoreAcMainId.setAcSubBookCode(iAcSubBookCode);
@@ -238,6 +257,38 @@ public class L7401 extends TradeBuffer {
 
 				inCoreAcMain.add(iCoreAcMain);
 
+				// 先確認日期相同和帳冊別是否已存在，存在表示要先把原本201的金額扣掉00A的金額 後更新201的金額後並新增00A的金額
+				if ("00A".equals(iAcSubBookCode)) {
+
+					CoreAcMainId uCoreAcMainId = new CoreAcMainId();
+
+					uCoreAcMainId.setAcBookCode(iAcBookCode);
+					uCoreAcMainId.setAcSubBookCode("201");
+					uCoreAcMainId.setCurrencyCode(iCurrencyCode);
+					uCoreAcMainId.setAcNoCode(converntScientificNotation(iAcNoCode));
+					uCoreAcMainId.setAcSubCode(iAcSubCode);
+					uCoreAcMainId.setAcDate(bcDate);
+//					uCoreAcMain.setCoreAcMainId(uCoreAcMainId);
+
+					CoreAcMain uCoreAcMain = tCoreAcMainService.findById(uCoreAcMainId, titaVo);
+
+					this.info("uCoreAcMain = " + uCoreAcMain.toString());
+
+					this.info("iTdBal = " + uCoreAcMain.getTdBal());
+					this.info("getDbAmt = " + uCoreAcMain.getDbAmt());
+					this.info("getDbAmt = " + uCoreAcMain.getDbAmt());
+
+					iTdBal = uCoreAcMain.getTdBal().subtract(iTdBal);
+					iDbAmt = uCoreAcMain.getDbAmt().subtract(iDbAmt);
+					iCrAmt = uCoreAcMain.getCrAmt().subtract(iCrAmt);
+
+					uCoreAcMain.setTdBal(iTdBal);
+					uCoreAcMain.setDbAmt(iDbAmt);
+					uCoreAcMain.setCrAmt(iCrAmt);
+
+					updCoreAcMain.add(uCoreAcMain);
+				}
+
 			}
 
 		} else {
@@ -257,6 +308,19 @@ public class L7401 extends TradeBuffer {
 
 		try {
 			tCoreAcMainService.insertAll(inCoreAcMain, titaVo);
+
+		} catch (DBException e) {
+			// TODO Auto-generated catch block
+			throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+
+		}
+
+	}
+
+	private void updateData(TitaVo titaVo) throws LogicException {
+
+		try {
+			tCoreAcMainService.updateAll(updCoreAcMain, titaVo);
 
 		} catch (DBException e) {
 			// TODO Auto-generated catch block

@@ -18,7 +18,12 @@ import com.st1.itx.Exception.LogicException;
 public class CoreAcMainId implements Serializable {
 
 
-  // 帳冊別
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4563246172689845577L;
+
+// 帳冊別
   /* 000:全公司 */
   @Column(name = "`AcBookCode`", length = 3)
   private String acBookCode = " ";

@@ -24,7 +24,12 @@ import javax.persistence.Column;
 public class MonthlyLM042RBC implements Serializable {
 
 
-  @EmbeddedId
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4408816963666083608L;
+
+@EmbeddedId
   private MonthlyLM042RBCId monthlyLM042RBCId;
 
   // 資料年月

@@ -26,7 +26,12 @@ import com.st1.itx.Exception.LogicException;
 public class MonthlyFacBal implements Serializable {
 
 
-  @EmbeddedId
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6601217413359667096L;
+
+@EmbeddedId
   private MonthlyFacBalId monthlyFacBalId;
 
   // 資料年月

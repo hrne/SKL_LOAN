@@ -18,7 +18,12 @@ import com.st1.itx.Exception.LogicException;
 public class CollTelId implements Serializable {
 
 
-  // 案件種類
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1973617661634982911L;
+
+// 案件種類
   @Column(name = "`CaseCode`", length = 1)
   private String caseCode = " ";
 

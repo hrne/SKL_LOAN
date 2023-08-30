@@ -16,7 +16,12 @@ import javax.persistence.Embeddable;
 public class MonthlyFacBalId implements Serializable {
 
 
-  // 資料年月
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5935390734492944073L;
+
+// 資料年月
   @Column(name = "`YearMonth`")
   private int yearMonth = 0;
 

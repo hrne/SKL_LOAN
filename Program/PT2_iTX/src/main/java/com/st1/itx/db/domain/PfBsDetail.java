@@ -29,7 +29,12 @@ import com.st1.itx.Exception.LogicException;
 public class PfBsDetail implements Serializable {
 
 
-  // 序號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7564591729739276483L;
+
+// 序號
   @Id
   @Column(name = "`LogNo`")
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "`PfBsDetail_SEQ`")

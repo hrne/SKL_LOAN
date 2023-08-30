@@ -8999,6 +8999,7 @@ TXFORM=L8R60
 #L5R38oEndDate=A,7,S
 #L5R38oBonusDate=A,7,S
 #L5R38LastWorkSeason=A,4,S
+#L5R38LastWorkMonth=A,5,S
 </L5R38.rtn>
 
 <L5R38.tom>
@@ -9011,6 +9012,7 @@ TXFORM=L5R38
 #L5R38oEndDate
 #L5R38oBonusDate
 #L5R38LastWorkSeason
+#L5R38LastWorkMonth
 ^
 </L5R38.tom>
 

@@ -24,13 +24,13 @@ K(MODIFYBUTTON,1,介紹人換算業績報酬檢核表)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="L5510" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+<sub type="DC" name="L5510" layout="cols=1;screen.width=[200,800];printer.width=[20,80];order=1">
 [
 ["[L5510]                           產生換算業績、業務報酬發放媒體"],
 [#<->#,"#FdFunCode+功能",#FunCode,#FunCodeX],
 [#<->#,"#FdWorkMonth+工作年月",#WorkMonth],
 [#<->#,"#FdDateFm+撥款起訖日",#DateFm,"~",#DateTo],
-[#<->#,"#FdMonths+檢核月數",#Months],
+[#<->#,"#FdMonths+檢核工作年月區間",#Months,#Monthe],
 ]
 
 !不可重新交易
@@ -66,6 +66,8 @@ E(0,@WorkMonth,#L5R38oWorkYM)
 E(0,@WorkMonth2,#L5R38oWorkYM)
 E(0,@DateFm,#L5R38oStartDate)
 E(0,@DateTo,#L5R38oEndDate)
+E(0,@Months,#L5R38LastWorkMonth)
+E(0,@Monthe,#L5R38oWorkYM)
 
 #FunCode=X,1,I
 HELP(#FunCodeHelp)
@@ -83,6 +85,7 @@ C(3,#FunCode,1,INVOKEJS(SHOW,L5510_4,1),INVOKEJS(SHOW,L5510_4,0))
 @E(0,@DateFm,0)
 E(0,@DateTo,0)
 A(YM13,1,#WorkMonth)
+E(0,@Monthe,#WorkMonth)
 
 #RimL5R38B=X,1,S
 !C(5,#WorkMonth,#WorkMonth2,S,$) 2022-03-18 xiangwei: 為求RIM正確更新，先註解掉這行
@@ -100,11 +103,13 @@ E(0,@DateTo,#L5R38oEndDate)
 ! 撥款結束日
 #DateTo=D,7,L
 
-#Months=m,2,I
+#Months=A,5,I
 C(3,#FunCode,1,$,S)
-C(3,#Months,0,E(0,4),$)
 @
 V(2,0)
+A(YM13,1,#Months)
+IF(#Months>#WorkMonth,V(P,不可大於工作年月),$)
+#Monthe=A,5,L
 
 </sub>
 
@@ -137,6 +142,7 @@ T(3,[L5510] 產生換算業績、業務報酬發放媒體)
 #DateFm
 #DateTo
 #Months
+#Monthe
 </sub>
 
 !------ 下行電文TOM ------

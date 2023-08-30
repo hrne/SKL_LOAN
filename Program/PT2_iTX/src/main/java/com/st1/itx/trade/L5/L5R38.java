@@ -39,6 +39,7 @@ public class L5R38 extends TradeBuffer {
 		int wMonth = 0;
 		int startDate = 0;
 		int endDate = 0;
+		int iWorkMonthS = 0;// tita前四工作月
 		int bonusDate = Integer.valueOf(titaVo.getCalDy());
 
 		if ("1".equals(iCode)) {
@@ -95,11 +96,17 @@ public class L5R38 extends TradeBuffer {
 			startDate = cdWorkMonth.getStartDate();
 			endDate = cdWorkMonth.getEndDate();
 			bonusDate = cdWorkMonth.getBonusDate();
-		} 
-
+		}
 
 		wYear -= 1911;
 
+		// 計算前4工作月
+		int iWorkMonth = wYear * 100 + wMonth;
+		if (iWorkMonth % 100 <= 3) {
+			iWorkMonthS = ((iWorkMonth / 100 - 1) * 100 + 13 + iWorkMonth % 100) - 3;
+		} else {
+			iWorkMonthS = iWorkMonth - 3;
+		}
 		int wSeason = wYear * 10;
 		if (wMonth >= 1 && wMonth <= 3) {
 			wSeason += 1;
@@ -125,6 +132,7 @@ public class L5R38 extends TradeBuffer {
 		this.totaVo.putParam("L5R38oEndDate", endDate);
 		this.totaVo.putParam("L5R38oBonusDate", bonusDate);
 		this.totaVo.putParam("L5R38LastWorkSeason", lastSeason);
+		this.totaVo.putParam("L5R38LastWorkMonth", iWorkMonthS);
 
 		this.addList(this.totaVo);
 		return this.sendList();

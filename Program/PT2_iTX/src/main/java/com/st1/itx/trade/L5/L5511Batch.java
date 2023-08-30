@@ -87,6 +87,7 @@ public class L5511Batch extends TradeBuffer {
 	private int iWorkMonth = 0;
 	private int commitCnt = 20;
 	private int processCnt = 0;
+	private int iWorkMonthS = 0; 
 	private ArrayList<PfReward> lPfPlus = new ArrayList<PfReward>(); // 正業績
 	private ArrayList<PfReward> lPfMinus = new ArrayList<PfReward>();// 負業績
 	private ArrayList<PfInsCheck> lPfInsCheck = new ArrayList<PfInsCheck>();// 房貸獎勵保費檢核檔.xlsx
@@ -100,6 +101,7 @@ public class L5511Batch extends TradeBuffer {
 
 		String iFunCode = titaVo.getParam("FunCode").trim();// 使用功能
 		iWorkMonth = parse.stringToInteger(titaVo.getParam("WorkMonth")) + 191100;
+		iWorkMonthS =  parse.stringToInteger(titaVo.getParam("Months")) + 191100;
 		CdWorkMonth tCdWorkMonth = cdWorkMonthService.findById(new CdWorkMonthId(iWorkMonth / 100, iWorkMonth % 100));
 
 		if (tCdWorkMonth == null) {
@@ -122,16 +124,9 @@ public class L5511Batch extends TradeBuffer {
 	// 檢查及匯入資料PfReward > PfRewardMedia
 
 	private void toCheck(TitaVo titaVo) throws LogicException {
-		int iWorkMonthS = 0;
 		int custNo = 0;
 		int facmNo = 0;
 
-		// 以前4工作月的資料作房貸獎勵保費檢核
-		if (iWorkMonth % 100 <= 3) {
-			iWorkMonthS = ((iWorkMonth / 100 - 1) * 100 + 13 + iWorkMonth % 100) - 3;
-		} else {
-			iWorkMonthS = iWorkMonth - 3;
-		}
 		Slice<PfReward> slPfReward = pfRewardService.findByWorkMonth(iWorkMonthS, iWorkMonth, 0, Integer.MAX_VALUE);
 
 		if (slPfReward != null) {

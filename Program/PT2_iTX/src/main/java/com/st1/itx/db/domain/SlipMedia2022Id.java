@@ -16,7 +16,12 @@ import javax.persistence.Embeddable;
 public class SlipMedia2022Id implements Serializable {
 
 
-  // 傳票號碼
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1828069018445059553L;
+
+// 傳票號碼
   /* F10+民國年+月份(1碼)+日期+3碼序號*3碼序號，從CdGSeq取號 */
   @Column(name = "`MediaSlipNo`", length = 12)
   private String mediaSlipNo = " ";

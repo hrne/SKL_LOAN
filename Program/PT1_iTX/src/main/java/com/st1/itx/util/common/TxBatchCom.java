@@ -55,6 +55,7 @@ import com.st1.itx.db.service.NegMainService;
 import com.st1.itx.db.service.TxErrCodeService;
 import com.st1.itx.db.service.TxRecordService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -475,7 +476,8 @@ public class TxBatchCom extends TradeBuffer {
 					tDetail.getCustNo(), titaVo);
 			if (lAcDetail == null || lAcDetail.size() == 0) {
 				this.checkMsg += " 不符一般債權撥付檔";
-				this.procStsCode = "2"; // 2.人工處理
+				this.repayType = 9; // 暫收
+				this.procStsCode = "4"; // 4.檢核正常
 			} else {
 				String custNoX = "";
 				for (AcDetail ac : lAcDetail) {

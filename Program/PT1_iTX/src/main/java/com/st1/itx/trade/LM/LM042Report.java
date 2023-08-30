@@ -95,6 +95,8 @@ public class LM042Report extends MakeReport {
 	BigDecimal zYTotalAmt = BigDecimal.ZERO;
 	BigDecimal zTotalAmt = BigDecimal.ZERO;
 	BigDecimal allTotalAmt = BigDecimal.ZERO;
+	BigDecimal oBadDebt = BigDecimal.ZERO;
+	
 	/*--------------------------------------------*/
 
 	@Override
@@ -310,7 +312,10 @@ public class LM042Report extends MakeReport {
 					col = 5;
 					oDisPreRemFees = oDisPreRemFees.add(amt);
 				}
-
+				//備抵呆帳
+				if ("BadDebt".equals(item)) {
+					oBadDebt = oBadDebt.add(amt);
+				}
 				// 應收利息
 				if ("IntRecv".equals(item)) {
 					row = 13;
@@ -593,9 +598,8 @@ public class LM042Report extends MakeReport {
 		makeExcel.formulaCalculate(26, 3);
 		makeExcel.formulaCalculate(27, 3);
 
-		// 待查
-		BigDecimal loss = BigDecimal.ZERO;
-		makeExcel.setValue(28, 1, "註：各類放款總餘額(含催收款)已扣除備抵呆帳(" + loss + ")。");
+		// 08/29 oBadDebt SUM(TdBal)科目10620300000、10604 
+		makeExcel.setValue(28, 1, "註：各類放款總餘額(含催收款)已扣除備抵呆帳(" + oBadDebt + ")。");
 
 		// 更新金額
 		updateData(titaVo, iYear * 100 + iMonth);

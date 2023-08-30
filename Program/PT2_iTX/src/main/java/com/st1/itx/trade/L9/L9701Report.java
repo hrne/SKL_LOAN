@@ -255,6 +255,7 @@ public class L9701Report extends MakeReport {
 				// 第一頁的第一筆
 				if (cntAll == 1 || (cntFirst == 1 && this.getNowPage() == 1)) {
 					this.print(1, 1, " ");
+					this.facmNo = tL9701Vo.get("FacmNo");
 					printFacHead();
 				}
 

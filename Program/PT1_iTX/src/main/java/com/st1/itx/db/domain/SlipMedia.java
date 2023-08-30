@@ -26,7 +26,12 @@ import com.st1.itx.Exception.LogicException;
 public class SlipMedia implements Serializable {
 
 
-  @EmbeddedId
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3011699800083077101L;
+
+@EmbeddedId
   private SlipMediaId slipMediaId;
 
   // 單位別

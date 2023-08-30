@@ -18,7 +18,12 @@ import com.st1.itx.Exception.LogicException;
 public class SlipMediaId implements Serializable {
 
 
-  // 單位別
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5708026316547809629L;
+
+// 單位別
   @Column(name = "`BranchNo`", length = 4)
   private String branchNo = " ";
 

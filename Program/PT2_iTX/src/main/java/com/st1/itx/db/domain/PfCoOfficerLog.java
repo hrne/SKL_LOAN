@@ -28,7 +28,12 @@ import com.st1.itx.Exception.LogicException;
 public class PfCoOfficerLog implements Serializable {
 
 
-  // 序號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 339581467659279712L;
+
+// 序號
   @Id
   @Column(name = "`LogNo`")
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "`PfCoOfficerLog_SEQ`")

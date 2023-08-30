@@ -25,7 +25,12 @@ import com.st1.itx.Exception.LogicException;
 public class CollMeet implements Serializable {
 
 
-  @EmbeddedId
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 9212196933380764145L;
+
+@EmbeddedId
   private CollMeetId collMeetId;
 
   // 案件種類

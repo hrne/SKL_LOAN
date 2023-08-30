@@ -26,7 +26,12 @@ import com.st1.itx.Exception.LogicException;
 public class CoreAcMain implements Serializable {
 
 
-  @EmbeddedId
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8650501122958344604L;
+
+@EmbeddedId
   private CoreAcMainId coreAcMainId;
 
   // 帳冊別

@@ -27,7 +27,12 @@ import javax.persistence.GenerationType;
 public class PfBsDetailAdjust implements Serializable {
 
 
-  // 序號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6968969355754285997L;
+
+// 序號
   @Id
   @Column(name = "`LogNo`")
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "`PfBsDetailAdjust_SEQ`")
