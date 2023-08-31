@@ -24,7 +24,12 @@ import javax.persistence.Column;
 public class LaLgtp implements Serializable {
 
 
-  @EmbeddedId
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2067455217563296081L;
+
+@EmbeddedId
   private LaLgtpId laLgtpId;
 
   // 營業單位別

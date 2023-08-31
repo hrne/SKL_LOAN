@@ -254,7 +254,7 @@ public abstract class BatchBase {
 	}
 
 	public RepeatStatus exec(StepContribution sc, String md, ChunkContext chunkContext) {
-		this.info("batch run...." + md);
+		this.info("batch run with chunkContext...." + md);
 		this.info(this.titaVo.toString());
 
 		ExecutionContext ec = chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext();
@@ -268,8 +268,10 @@ public abstract class BatchBase {
 		if (ec.containsKey("RerunType")) {
 			rerunType = ec.getString("RerunType");
 		}
+		this.info("rerunType = " + rerunType);
 		if ((!rerunType.equals("A")) && stepEc.containsKey("OriStatus")) {
 			String oriStatus = stepEc.getString("OriStatus");
+			this.info("oriStatus = " + oriStatus);
 			if (oriStatus.equals("S")) {
 				// 單支重跑/失敗重跑時 原本執行成功 不重複執行
 				this.info("單支重跑/失敗重跑時 原本執行成功 不重複執行.");

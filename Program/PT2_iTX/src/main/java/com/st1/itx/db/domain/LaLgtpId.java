@@ -16,7 +16,12 @@ import javax.persistence.Embeddable;
 public class LaLgtpId implements Serializable {
 
 
-  // 營業單位別
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1375712814229500538L;
+
+// 營業單位別
   @Column(name = "`Cusbrh`")
   private int cusbrh = 0;
 
