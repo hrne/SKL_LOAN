@@ -159,6 +159,7 @@ T(2,#OOCustNo+-+#OOFacmNo+-+#OOBormNo)
 #OOTellerNo=X,6,O
 #OOTellerId=X,10,O
 #OOTellerName=X,100,O
+#OOModifyFg=X,1,O
 #OORepayAmt=m,14,O
 
 #OOBUF_Edit=X,500,S
@@ -167,10 +168,17 @@ T(2,2+#OOEntryDate+#OOPerfMonth+#OOProcCode+#OOAcctCode+#OORepayCode+#OOAchRepay
 #OOBUF_Delete=X,500,S
 T(2,4+#OOEntryDate+#OOPerfMonth+#OOProcCode+#OOAcctCode+#OORepayCode+#OOAchRepayCode+#OOCustNo+#OOFacmNo+#OOBormNo)
 
+#OOBUF_5=X,500,S
+T(2,5+#OOEntryDate+#OOPerfMonth+#OOProcCode+#OOAcctCode+#OORepayCode+#OOAchRepayCode+#OOCustNo+#OOFacmNo+#OOBormNo)
+
 #OOBTN_Edit=A,2,O
 BIND(grid,{ cmd=CHAIN; ntxcd=L4512; ntxbuf=#OOBUF_Edit})
+C(5,#OOModifyFg,Y,$,BIND(grid,cancel))
 #OOBTN_Delete=A,2,O
 BIND(grid,{ cmd=CHAIN; ntxcd=L4512; ntxbuf=#OOBUF_Delete})
+C(5,#OOModifyFg,Y,$,BIND(grid,cancel))
+#OOBTN_5=A,2,O
+BIND(grid,{ cmd=CHAIN; ntxcd=L4512; ntxbuf=#OOBUF_5})
 
 </sub>
 
@@ -199,6 +207,7 @@ TXFORM=L4951
 #OOTellerNo
 #OOTellerId
 #OOTellerName
+#OOModifyFg
 ^
 </sub>
 
@@ -221,6 +230,9 @@ TXFORM=L4951
 {search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false,width:35}
 #OOBTN_Delete=
 {search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false,width:35}
+#OOBTN_5=
+{search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:35}
+
 #OOCustNoX=戶號
 {width:120,align:'center'}
 #OOAchRepayCodeX=入帳扣款別

@@ -9,8 +9,11 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.domain.EmpDeductDtl;
 import com.st1.itx.db.domain.EmpDeductDtlId;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.EmpDeductDtlService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
@@ -24,6 +27,8 @@ public class L4R29 extends TradeBuffer {
 
 	@Autowired
 	public EmpDeductDtlService empDeductDtlService;
+	@Autowired
+	public CdCodeService cdCodeService;
 
 	@Autowired
 	public Parse parse;
@@ -74,7 +79,10 @@ public class L4R29 extends TradeBuffer {
 			this.totaVo.putParam("L4R29IntStartDate", tEmpDeductDtl.getIntStartDate());
 			this.totaVo.putParam("L4R29BatchNo", tEmpDeductDtl.getBatchNo());
 			this.totaVo.putParam("L4R29IntEndDate", tEmpDeductDtl.getIntEndDate());
-			this.totaVo.putParam("L4R29ErrMsg", tEmpDeductDtl.getErrMsg());
+			this.totaVo.putParam("L4R29ErrMsg", tEmpDeductDtl.getErrMsg().trim());
+			CdCode tCdCode = cdCodeService.findById(new CdCodeId("ProcCode", "004" + tEmpDeductDtl.getErrMsg().trim()),
+					titaVo);
+			this.totaVo.putParam("L4R29ErrMsgX", tCdCode == null ? "" : tCdCode.getItem().trim());
 			this.totaVo.putParam("L4R29Acdate", tEmpDeductDtl.getAcdate());
 			this.totaVo.putParam("L4R29TitaTxtNo", tEmpDeductDtl.getTitaTxtNo());
 		} else {

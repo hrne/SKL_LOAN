@@ -52,7 +52,7 @@ T(3,CdCode.RepayType)
 T(3,CdCode.ProcStsCode)
 
 #ProcStsCodeHelp=x,1024,S
-
+#ProcStsCodeHelpB=x,1024,S
 ! 處理說明
 #CDDEF03=x,20,S
 T(3,CdCode.ProcCode)
@@ -72,7 +72,7 @@ R(1,XXR99)
 CALL(#HelpProc)
 T(2,@RepayTypeHelp,#HelpDesc1)
 T(2,@ProcStsCodeHelp,#HelpDesc2)
-T(HELP,@ProcStsCodeHelp,#ProcStsCodeHelp,-,A;D;R;S;T)
+T(HELP,@ProcStsCodeHelpB,#ProcStsCodeHelp,+,0;1;2)
 T(2,@ProcCodeHelp,#HelpDesc3)
 T(2,@BankCdHelp,#HelpDesc4)
 
@@ -213,7 +213,7 @@ T(3,)T(H,#RepayType,#RepayTypeHelp)
 #ProcStsCodeTemp=X,1,L
 
 #ProcStsCode=X,1,I
-HELP(#ProcStsCodeHelp)
+HELP(#ProcStsCodeHelpB)
 T(F,@ProcStsCode,0)
 C(3,#UpdateCode,1,$,s)
 IF(#RepayAmt < 0,T(F,@ProcStsCode,0),T(F,@ProcStsCode,1))

@@ -160,7 +160,7 @@ T(F,@BormNo,0)
 
 !刪除時關閉框線
 #WKTF1=X,1,S
-IF(#FunctionCode==4,
+IF(#FunctionCode==4||#FunctionCode==5,
 T(F,@EntryDate,0)
 T(F,@PerfMonth,0)
 T(F,@ProcCode,0)
@@ -307,7 +307,7 @@ E(0,@SumOvpayAmt,#L4R29SumOvpayAmt)
 T(2,@IntStartDate,#L4R29IntStartDate)
 T(2,@BatchNo,#L4R29BatchNo)
 T(2,@IntEndDate,#L4R29IntEndDate)
-T(2,@ErrMsg,#L4R29ErrMsg)
+T(2,@ErrMsg,#L4R29ErrMsg+-+#L4R29ErrMsgX)
 T(2,@Acdate,#L4R29Acdate)
 T(2,@TitaTxtNo,#L4R29TitaTxtNo)
 
@@ -329,6 +329,7 @@ T(2,@TitaTxtNo,#L4R29TitaTxtNo)
 ![應扣金額]
 #RepayAmt=m,14,I
 C(3,#FunctionCode,4,s,$)
+C(3,#FunctionCode,5,s,$)
 
 ![單位代號]
 #UnitCode=X,6,L
@@ -336,6 +337,7 @@ C(3,#FunctionCode,4,s,$)
 ![本金]
 #Principal=m,14,I
 C(3,#FunctionCode,4,s,$)
+C(3,#FunctionCode,5,s,$)
 
 ![離職代碼]
 #ResignCode=X,6,L
@@ -343,6 +345,7 @@ C(3,#FunctionCode,4,s,$)
 ![利息]
 #Interest=m,14,I
 C(3,#FunctionCode,4,s,$)
+C(3,#FunctionCode,5,s,$)
 
 ![職務代號]
 #PositCode=X,6,L
@@ -350,6 +353,7 @@ C(3,#FunctionCode,4,s,$)
 ![累溢短收]
 #SumOvpayAmt=+m,14,I
 C(3,#FunctionCode,4,s,$)
+C(3,#FunctionCode,5,s,$)
 
 ![計息起日]
 #IntStartDate=D,7,L

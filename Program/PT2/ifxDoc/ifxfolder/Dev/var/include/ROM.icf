@@ -5768,6 +5768,7 @@ TXFORM=L4R28
 #L4R29BatchNo=X,6,S
 #L4R29IntEndDate=D,7,S
 #L4R29ErrMsg=X,80,S
+#L4R29ErrMsgX=X,80,S
 #L4R29Acdate=D,7,S
 #L4R29TitaTxtNo=A,8,S
 </L4R29.dec>
@@ -5787,6 +5788,7 @@ TXFORM=L4R29
 #L4R29BatchNo
 #L4R29IntEndDate
 #L4R29ErrMsg
+#L4R29ErrMsgX
 #L4R29Acdate
 #L4R29TitaTxtNo
 ^
@@ -7070,6 +7072,7 @@ TXFORM=L5R41
 #L5R42TlrNo=X,6,S
 #L5R42TxtNo=N,8,S
 #L5R42TxAmt=m,14,S
+#L5R42TxKind=X,1,S
 ##loop {times:30,i:1}
 #L5R42FinCode{i}=X,8,S
 #L5R42FinCodeName{i}=X,100,S
@@ -7085,6 +7088,7 @@ TXFORM=L5R42
 #L5R42TlrNo
 #L5R42TxtNo
 #L5R42TxAmt
+#L5R42TxKind
 ##loop {times:30,i:1}
 #L5R42FinCode{i}
 #L5R42FinCodeName{i}

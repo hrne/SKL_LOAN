@@ -1207,6 +1207,15 @@ public class L4200Batch extends TradeBuffer {
 						e.printStackTrace();
 						throw new LogicException("E0007", "EmpDeductMedia update Fail");
 					}
+					for (EmpDeductDtl tEmpDeductDtl : slEmpDeductDtl.getContent()) {
+						tEmpDeductDtl.setErrMsg(tEmpDeductMedia.getErrorCode());
+						try {
+							empDeductDtlService.update(tEmpDeductDtl, titaVo);
+						} catch (DBException e) {
+							e.printStackTrace();
+							throw new LogicException("E0007", "tEmpDeductDtl update Fail");
+						}
+					}					
 				}
 				tBatxDetail.setProcCode(procCode);
 				tBatxDetailId.setAcDate(iAcDate);

@@ -107,6 +107,8 @@ public class L4951 extends TradeBuffer {
 				occursList.putParam("OOTellerId", tEmpDeductDtl.getCustId());
 				occursList.putParam("OOTellerName", tCustMain.getCustName());
 				occursList.putParam("OORepayAmt", tEmpDeductDtl.getRepayAmt());
+				occursList.putParam("OOProcCode", tEmpDeductDtl.getProcCode());
+				occursList.putParam("OOModifyFg", tEmpDeductDtl.getMediaSeq() == 0 ? "Y" : "N");// dtlseq=0才顯示修改刪除按鈕
 				this.totaVo.addOccursList(occursList);
 			}
 		} else {

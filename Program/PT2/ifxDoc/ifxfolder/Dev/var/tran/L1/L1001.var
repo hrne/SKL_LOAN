@@ -159,7 +159,7 @@ C(3,#CustNoSt,0,s,$)
 !C(3,#CustNoEd,0,INVOKEJS(SHOW,p1,2,2,1),$)
 C(3,#CustNoEd,0,$,S)
 @
-C(4,#CustId,$,A(ID_UNINO,0,#CustId))
+C(4,#CustId,$,A(ID_UNINO,1,#CustId))
 C(4,#CustId,SHOW(#BTN2),HIDE(#BTN2))
 !C(4,#CustId,INVOKEJS(SHOW,p1,2,2,0),INVOKEJS(SHOW,p1,3,4,0))
 
@@ -412,7 +412,7 @@ T(2,1+#OOCustId+0000000)
 #OOBTN14=X,1,S
 C(2,#OOCustTelNoBTNFg,BIND(grid,{ cmd=CHAIN; ntxcd=L1905; text=未設定; ntxbuf=#OOBUF14}),
 BIND(grid,{ cmd=CHAIN; ntxcd=L1905;text=已設定; ntxbuf=#OOBUF14}),
-BIND(grid,cancel))OOBTN13
+BIND(grid,cancel))
 
 !寬限控管
 #OOBUF15=X,7,S
