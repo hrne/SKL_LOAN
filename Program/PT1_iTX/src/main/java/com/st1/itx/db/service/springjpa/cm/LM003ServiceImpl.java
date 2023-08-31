@@ -348,6 +348,8 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        , \"NoCloseAmtSeq1\"";
 		sql += "        , \"NoCloseAmtSeq2\"";
 		sql += "        , \"NoCloseAmtSeq3\"";
+		sql += "        , \"RepayTotal\" ";
+		sql += "        + \"CloseAmtSeq1\" AS \"RepayTotal\"";
 		sql += "        , \"Ent0Amt\"";
 		sql += "        , \"Ent1Amt\"";
 		sql += "        , \"Ent0Amt\" ";

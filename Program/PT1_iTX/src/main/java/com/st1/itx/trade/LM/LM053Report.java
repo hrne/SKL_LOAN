@@ -71,7 +71,6 @@ public class LM053Report extends MakeReport {
 			this.info("LM053ServiceImpl.findAll error = " + errors.toString());
 		}
 
-
 		// 分配表日期 地區 戶號 額度 戶名 拍定金額 債權金額 分配金額 不足額 領取分配金額 入帳日 損失率 % 法務人員 備註
 
 		int row = 2;
@@ -86,11 +85,11 @@ public class LM053Report extends MakeReport {
 					entryDate = this.showRocDate(r.get("RecordDate"), 6);
 				}
 
-				//MainSeq判斷是否為 法務進度092
+				// MainSeq判斷是否為 法務進度092
 				if ("1".equals(r.get("MainSeq"))) {
 
 					// 分配表日期
-					makeExcel.setValue(row, 1, this.showBcDate(r.get("RecordDate"), 2), "C");
+					makeExcel.setValue(row, 1, this.showRocDate(r.get("RecordDate"), 3), "C");
 					// 地區
 					String cityItem = r.get("CityItem") == null ? " " : r.get("CityItem");
 					makeExcel.setValue(row, 2, cityItem, "C");

@@ -44,8 +44,11 @@ public class L9734ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String iYearMonth = String.valueOf((iYear * 100) + iMonth);
 
-		int reChkYearMonth = Integer.valueOf(titaVo.getParam("ReChkYearMonth")) + 191100;
-
+		int reChkYearMonth = Integer.valueOf(titaVo.getParam("ReChkYearMonth")) ;
+		if(reChkYearMonth > 0) {
+			reChkYearMonth = reChkYearMonth+ 191100;
+		}
+		
 		String sql = " ";
 		this.info("iYeariMonth=" + iYearMonth);
 		this.info("conditionCode=" + conditionCode);
@@ -250,9 +253,9 @@ public class L9734ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "	  LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = S1.\"CustNo\" ";
 			sql += "	   						 AND F.\"FacmNo\" = S1.\"FacmNo\" ";
 			sql += "	  LEFT JOIN \"CdEmp\" CE ON CE.\"EmployeeNo\" = F.\"BusinessOfficer\" ";
-			sql += "	  LEFT JOIN \"CdEmp\" CE2 ON CE2.\"EmployeeNo\" = R.\"ReChkEmpNo\" ";
+			sql += "	  LEFT JOIN \"CdEmp\" CE2 ON CE2.\"EmployeeNo\" = S1.\"ReChkEmpNo\" ";
 			if (reChkYearMonth != 0) {
-				sql += "	WHERE R.\"ReChkYearMonth\" = :reChkYearMonth ";
+				sql += "	WHERE S1.\"ReChkYearMonth\" = :reChkYearMonth ";
 			}
 			sql += "	  ORDER BY S1.\"CustNo\", S1.\"FacmNo\"";
 

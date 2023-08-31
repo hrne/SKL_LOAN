@@ -46,7 +46,7 @@ C(3,#CHAIN,0,K(MODIFYBUTTON,1,新增),$)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="L5080" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
 [
-["[L5080]                                 建商名單查詢"],
+["[L5080]                                 建商名單查詢                                 "],
 ]
 !---------- AP TEXT AREA Variables ----------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
