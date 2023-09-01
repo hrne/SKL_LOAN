@@ -112,7 +112,7 @@ public class L5510Batch extends TradeBuffer {
 		// 刪除本月保費檢核資料(重新執行用)
 		Slice<PfInsCheck> slPfInsCheck = pfInsCheckService.findCheckWorkMonthEq(iWorkMonth, 0, 0, Integer.MAX_VALUE,
 				titaVo);
-		if (slPfInsCheck != null) {
+		if (slPfInsCheck != null ) { 
 			List<PfInsCheck> lPfInsCheckDelete = new ArrayList<PfInsCheck>();
 			lPfInsCheckDelete = slPfInsCheck.getContent();
 			try {
@@ -133,14 +133,16 @@ public class L5510Batch extends TradeBuffer {
 					lPfItDetailDelete.add(pfIt);
 				}
 			}
-			try {
-				pfItDetailService.deleteAll(lPfItDetailDelete, titaVo); // update
-			} catch (DBException e) {
-				this.error(e.getMessage());
-				throw new LogicException(titaVo, "E0008", "PfItDetail " + e.getErrorMsg()); // 刪除資料時，發生錯誤
+			if(lPfItDetailDelete.size() > 0) {
+				try {
+					pfItDetailService.deleteAll(lPfItDetailDelete, titaVo); // update
+				} catch (DBException e) {
+					this.error(e.getMessage());
+					throw new LogicException(titaVo, "E0008", "PfItDetail " + e.getErrorMsg()); // 刪除資料時，發生錯誤
+				}
 			}
-
 		}
+
 		this.batchTransaction.commit();
 
 		int custNo = 0;

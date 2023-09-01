@@ -159,8 +159,12 @@ T(2,#OOCustNo+-+#OOFacmNo+-+#OOBormNo)
 #OOTellerNo=X,6,O
 #OOTellerId=X,10,O
 #OOTellerName=X,100,O
-#OOModifyFg=X,1,O
+
 #OORepayAmt=m,14,O
+
+#OOMediaDate=D,7,O
+#OOMediaKind=X,1,S
+#OOMediaSeq=A,6,O
 
 #OOBUF_Edit=X,500,S
 T(2,2+#OOEntryDate+#OOPerfMonth+#OOProcCode+#OOAcctCode+#OORepayCode+#OOAchRepayCode+#OOCustNo+#OOFacmNo+#OOBormNo)
@@ -169,14 +173,14 @@ T(2,2+#OOEntryDate+#OOPerfMonth+#OOProcCode+#OOAcctCode+#OORepayCode+#OOAchRepay
 T(2,4+#OOEntryDate+#OOPerfMonth+#OOProcCode+#OOAcctCode+#OORepayCode+#OOAchRepayCode+#OOCustNo+#OOFacmNo+#OOBormNo)
 
 #OOBUF_5=X,500,S
-T(2,5+#OOEntryDate+#OOPerfMonth+#OOProcCode+#OOAcctCode+#OORepayCode+#OOAchRepayCode+#OOCustNo+#OOFacmNo+#OOBormNo)
+T(2,5+#OOEntryDate+#OOPerfMonth+#OOProcCode+#OOAcctCode+#OORepayCode+#OOAchRepayCode+#OOCustNo+#OOFacmNo+#OOBormNo+#OOMediaDate+#OOMediaKind+#OOMediaSeq)
 
 #OOBTN_Edit=A,2,O
 BIND(grid,{ cmd=CHAIN; ntxcd=L4512; ntxbuf=#OOBUF_Edit})
-C(5,#OOModifyFg,Y,$,BIND(grid,cancel))
+C(3,#OOMediaSeq,0,$,BIND(grid,cancel))
 #OOBTN_Delete=A,2,O
 BIND(grid,{ cmd=CHAIN; ntxcd=L4512; ntxbuf=#OOBUF_Delete})
-C(5,#OOModifyFg,Y,$,BIND(grid,cancel))
+C(3,#OOMediaSeq,0,$,BIND(grid,cancel))
 #OOBTN_5=A,2,O
 BIND(grid,{ cmd=CHAIN; ntxcd=L4512; ntxbuf=#OOBUF_5})
 
@@ -207,7 +211,9 @@ TXFORM=L4951
 #OOTellerNo
 #OOTellerId
 #OOTellerName
-#OOModifyFg
+#OOMediaDate
+#OOMediaKind
+#OOMediaSeq
 ^
 </sub>
 

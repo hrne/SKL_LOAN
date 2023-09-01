@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.CustNotice;
 import com.st1.itx.db.domain.CustNoticeId;
@@ -55,7 +56,7 @@ public class L9711Report extends MakeReport {
 		this.setBeginRow(8);
 
 		// 設定明細列數(自訂亦必須)
-		this.setMaxRows(35);
+		this.setMaxRows(80);
 
 		// 字體大小
 		this.setFont(14);
@@ -191,12 +192,16 @@ public class L9711Report extends MakeReport {
 			this.print(1, startPos, "本日無資料");
 
 		}
+		//計算總筆數
+		int talcount = 0;
 
 		// 計算筆數
 		int count = 0;
 		if (isLetterList.size() > 0) {
 			// 書面列印通知書客戶
 			for (Map<String, String> tL9711Vo : isLetterList) {
+				talcount++;
+
 				count++;
 				printData(tL9711Vo);
 				// 每到 60 筆，換一頁
@@ -204,6 +209,9 @@ public class L9711Report extends MakeReport {
 //					this.info("換一頁：" + count + "筆");
 					count = 0;
 					newPage();
+				}
+				if(talcount == isLetterList.size()) {
+					this.print(-80, startPos + 53, "總筆數  : "+talcount+" 筆 ","C");
 				}
 			}
 
@@ -217,6 +225,7 @@ public class L9711Report extends MakeReport {
 		if (isNotLetterList.size() > 0) {
 			// 書面不列印通知書客戶
 			for (Map<String, String> tL9711Vo : isNotLetterList) {
+				talcount++;
 				count++;
 				printData(tL9711Vo);
 				// 每到 60 筆，換一頁
@@ -224,6 +233,9 @@ public class L9711Report extends MakeReport {
 //					this.info("換一頁：" + count + "筆");
 					count = 0;
 					newPage();
+				}
+				if(talcount == isLetterList.size()) {
+					this.print(-80, startPos + 53, "共  : "+talcount+" 筆 ","C");
 				}
 			}
 		} else {

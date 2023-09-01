@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
@@ -49,22 +50,58 @@ public class L4R29 extends TradeBuffer {
 		int CustNo = parse.stringToInteger(titaVo.getParam("RimCustNo"));
 		int FacmNo = parse.stringToInteger(titaVo.getParam("RimFacmNo"));
 		int BormNo = parse.stringToInteger(titaVo.getParam("RimBormNo"));
+		int mediaDate = parse.stringToInteger(titaVo.getParam("RimMediaDate"));
+		String mediaKind = titaVo.getParam("RimMediaKind");
+		int mediaSeq = parse.stringToInteger(titaVo.getParam("RimMediaSeq"));
 
-		EmpDeductDtl tEmpDeductDtl = new EmpDeductDtl();
-		EmpDeductDtlId tEmpDeductDtlId = new EmpDeductDtlId();
+		EmpDeductDtl tEmpDeductDtl = null;
+		if (mediaSeq == 0) {
+			EmpDeductDtlId tEmpDeductDtlId = new EmpDeductDtlId();
+			tEmpDeductDtl = new EmpDeductDtl();
+			tEmpDeductDtlId.setEntryDate(EntryDate);
+			tEmpDeductDtlId.setPerfMonth(PerfMonth);
+			tEmpDeductDtlId.setProcCode(ProcCode);
+			tEmpDeductDtlId.setAcctCode(AcctCode);
+			tEmpDeductDtlId.setRepayCode(RepayCode);
+			tEmpDeductDtlId.setAchRepayCode(AchRepayCode);
+			tEmpDeductDtlId.setCustNo(CustNo);
+			tEmpDeductDtlId.setFacmNo(FacmNo);
+			tEmpDeductDtlId.setBormNo(BormNo);
+			tEmpDeductDtl.setEmpDeductDtlId(tEmpDeductDtlId);
 
-		tEmpDeductDtlId.setEntryDate(EntryDate);
-		tEmpDeductDtlId.setPerfMonth(PerfMonth);
-		tEmpDeductDtlId.setProcCode(ProcCode);
-		tEmpDeductDtlId.setAcctCode(AcctCode);
-		tEmpDeductDtlId.setRepayCode(RepayCode);
-		tEmpDeductDtlId.setAchRepayCode(AchRepayCode);
-		tEmpDeductDtlId.setCustNo(CustNo);
-		tEmpDeductDtlId.setFacmNo(FacmNo);
-		tEmpDeductDtlId.setBormNo(BormNo);
-		tEmpDeductDtl.setEmpDeductDtlId(tEmpDeductDtlId);
-
-		tEmpDeductDtl = empDeductDtlService.findById(tEmpDeductDtlId, titaVo);
+			tEmpDeductDtl = empDeductDtlService.findById(tEmpDeductDtlId, titaVo);
+		} else {
+			Slice<EmpDeductDtl> slEmpDeductDtl = empDeductDtlService.mediaSeqEq(mediaDate + 19110000, mediaKind,
+					mediaSeq, 0, Integer.MAX_VALUE, titaVo);
+			if (slEmpDeductDtl != null && slEmpDeductDtl.getContent().size() > 0) {
+				for (EmpDeductDtl t : slEmpDeductDtl.getContent()) {
+					if (tEmpDeductDtl == null) {
+						tEmpDeductDtl = t;
+					} else {
+						if (t.getFacmNo() != tEmpDeductDtl.getFacmNo()) {
+							tEmpDeductDtl.setFacmNo(0);
+							tEmpDeductDtl.setBormNo(0);
+						}
+						if (t.getBormNo() != tEmpDeductDtl.getBormNo()) {
+							tEmpDeductDtl.setBormNo(0);
+						}
+						tEmpDeductDtl.setTxAmt(tEmpDeductDtl.getTxAmt().add(t.getTxAmt()));// 實扣金額
+						tEmpDeductDtl.setRepayAmt(tEmpDeductDtl.getRepayAmt().add(t.getRepayAmt()));// 應扣金額
+						tEmpDeductDtl.setPrincipal(tEmpDeductDtl.getPrincipal().add(t.getPrincipal()));// 本金
+						tEmpDeductDtl.setInterest(tEmpDeductDtl.getInterest().add(t.getInterest()));// 利息
+						tEmpDeductDtl.setCurrPrinAmt(tEmpDeductDtl.getCurrPrinAmt().add(t.getCurrPrinAmt()));// 當期本金
+						tEmpDeductDtl.setCurrIntAmt(tEmpDeductDtl.getCurrIntAmt().add(t.getCurrIntAmt()));// 當期利息
+						tEmpDeductDtl.setSumOvpayAmt(tEmpDeductDtl.getSumOvpayAmt().add(t.getSumOvpayAmt()));// 累溢收
+						if (t.getIntStartDate() < tEmpDeductDtl.getIntStartDate()) {
+							tEmpDeductDtl.setIntStartDate(t.getIntStartDate());
+						}
+						if (t.getIntEndDate() > tEmpDeductDtl.getIntEndDate()) {
+							tEmpDeductDtl.setIntEndDate(t.getIntEndDate());
+						}
+					}
+				}
+			}
+		}
 
 		if (tEmpDeductDtl != null) {
 			this.totaVo.putParam("L4R29TxAmt", tEmpDeductDtl.getTxAmt());

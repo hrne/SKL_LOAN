@@ -98,11 +98,13 @@ public class L9734Report extends MakeReport {
 
 		String itemName = "01-個金3000萬以上";
 
+		int rocYYYMMDD = acDate - 19110000;
+
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "L9734";
-		String fileItem = itemName + "-" + acDate;
-		String fileName = txcd + "_" + itemName + "-" + acDate;
+		String fileItem = itemName + "-" + rocYYYMMDD;
+		String fileName = txcd + "_" + itemName + "-" + rocYYYMMDD;
 		String defaultExcel = txCD + "_底稿_個金3000萬以上.xls";
 		String defaultSheet = "簡表";
 
@@ -157,7 +159,7 @@ public class L9734Report extends MakeReport {
 			// 總計
 			BigDecimal tot = new BigDecimal("0");
 
-			// 撥款日期
+			// 初貸日期
 			int day = 0;
 			int lday = 0;
 			String date = "";
@@ -210,7 +212,7 @@ public class L9734Report extends MakeReport {
 						makeExcel.setValue(row, i, day, "C");
 						break;
 					case 6:
-						// 撥款日期
+						// 初貸日期
 						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? 0
 								: Integer.parseInt(tLDVo.get(fdnm)) - 19110000, "R");
 
@@ -294,8 +296,8 @@ public class L9734Report extends MakeReport {
 			}
 
 			makeExcel.setValue(row + 1, 2, "總計", "L");
-			makeExcel.setValue(row + 1, 6, lday - 19110000, "R");
-			makeExcel.setValue(row + 1, 7, tot, "#,##0", "R");
+			makeExcel.setValue(row + 1, 7, lday - 19110000, "R");
+			makeExcel.setValue(row + 1, 9, tot, "#,##0", "R");
 
 			// 畫框線
 //			makeExcel.setAddRengionBorder("B", 3, "H", row + 1, 1);
@@ -329,11 +331,13 @@ public class L9734Report extends MakeReport {
 
 		String itemName = "02-企金3000萬以上";
 
+		int rocYYYMMDD = acDate - 19110000;
+		
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "L9734";
-		String fileItem = itemName + "-" + acDate;
-		String fileName = txcd + "_" + itemName + "-" + acDate;
+		String fileItem = itemName + "-" + rocYYYMMDD;
+		String fileName = txcd + "_" + itemName + "-" + rocYYYMMDD;
 		String defaultExcel = txCD + "_底稿_企金3000萬以上.xls";
 		String defaultSheet = "簡表";
 
@@ -388,7 +392,7 @@ public class L9734Report extends MakeReport {
 			// 總計
 			BigDecimal tot = new BigDecimal("0");
 
-			// 撥款日期
+			// 初貸日期
 			int day = 0;
 			int lday = 0;
 			String date = "";
@@ -437,7 +441,7 @@ public class L9734Report extends MakeReport {
 						makeExcel.setValue(row, i, day, "C");
 						break;
 					case 6:
-						// 撥款日期
+						// 初貸日期
 						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? 0
 								: Integer.parseInt(tLDVo.get(fdnm)) - 19110000, "R");
 
@@ -549,11 +553,13 @@ public class L9734Report extends MakeReport {
 
 		String itemName = "03-個金2000萬以上小於3000萬";
 
+		int rocYYYMMDD = acDate - 19110000;
+		
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "L9734";
-		String fileItem = itemName + "-" + acDate;
-		String fileName = txcd + "_" + itemName + "-" + acDate;
+		String fileItem = itemName + "-" + rocYYYMMDD;
+		String fileName = txcd + "_" + itemName + "-" + rocYYYMMDD;
 		String defaultExcel = txCD + "_底稿_個金2000萬以上小於3000萬.xls";
 		String defaultSheet = "簡表";
 
@@ -610,7 +616,7 @@ public class L9734Report extends MakeReport {
 			// 總計
 			BigDecimal tot = new BigDecimal("0");
 
-			// 撥款日期
+			// 初貸日期
 			int day = 0;
 			int lday = 0;
 			String date = "";
@@ -675,7 +681,7 @@ public class L9734Report extends MakeReport {
 						break;
 
 					case 8:
-						// 撥款日期
+						// 初貸日期
 						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? 0
 								: Integer.parseInt(tLDVo.get(fdnm)) - 19110000, "C");
 
@@ -792,11 +798,13 @@ public class L9734Report extends MakeReport {
 
 		String itemName = "04-個金100萬以上小於2000萬";
 
+		int rocYYYMMDD = acDate - 19110000;
+		
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "L9734";
-		String fileItem = itemName + "-" + acDate;
-		String fileName = txcd + "_" + itemName + "-" + acDate;
+		String fileItem = itemName + "-" + rocYYYMMDD;
+		String fileName = txcd + "_" + itemName + "-" + rocYYYMMDD;
 		String defaultExcel = txCD + "_底稿_個金100萬以上小於2000萬.xls";
 		String defaultSheet = "簡表";
 
@@ -851,7 +859,7 @@ public class L9734Report extends MakeReport {
 			// 總計
 			BigDecimal tot = new BigDecimal("0");
 
-			// 撥款日期
+			// 初貸日期
 			int day = 0;
 			int lday = 0;
 			String date = "";
@@ -912,7 +920,7 @@ public class L9734Report extends MakeReport {
 						break;
 
 					case 8:
-						// 撥款日期
+						// 初貸日期
 						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? 0
 								: Integer.parseInt(tLDVo.get(fdnm)) - 19110000, "C");
 
@@ -1027,12 +1035,14 @@ public class L9734Report extends MakeReport {
 		int iMonth = acDate / 100 % 100;
 
 		String itemName = "05-企金未達3000萬";
+		
+		int rocYYYMMDD = acDate - 19110000;
 
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "L9734";
-		String fileItem = itemName + "-" + acDate;
-		String fileName = txcd + "_" + itemName + "-" + acDate;
+		String fileItem = itemName + "-" + rocYYYMMDD;
+		String fileName = txcd + "_" + itemName + "-" + rocYYYMMDD;
 		String defaultExcel = txCD + "_底稿_企金未達3000萬.xls";
 		String defaultSheet = "簡表";
 
@@ -1090,7 +1100,7 @@ public class L9734Report extends MakeReport {
 			// 總計
 			BigDecimal tot = new BigDecimal("0");
 
-			// 撥款日期
+			// 初貸日期
 			int day = 0;
 			int lday = 0;
 			String date = "";
@@ -1154,7 +1164,7 @@ public class L9734Report extends MakeReport {
 						break;
 
 					case 7:
-						// 撥款日期
+						// 初貸日期
 						makeExcel.setValue(row, i,
 								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO
 										: Integer.parseInt(tLDVo.get(fdnm)) - 19110000,
@@ -1304,11 +1314,13 @@ public class L9734Report extends MakeReport {
 
 		String itemName = "06-土地覆審";
 
+		int rocYYYMMDD = acDate - 19110000;
+		
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "L9734";
-		String fileItem = itemName + "-" + acDate;
-		String fileName = txcd + "_" + itemName + "-" + acDate;
+		String fileItem = itemName + "-" + rocYYYMMDD;
+		String fileName = txcd + "_" + itemName + "-" + rocYYYMMDD;
 		String defaultExcel = txCD + "_底稿_土地追蹤.xls";
 		String defaultSheet = "簡表";
 
@@ -1367,7 +1379,7 @@ public class L9734Report extends MakeReport {
 			// 總計
 			BigDecimal tot = new BigDecimal("0");
 
-			// 撥款日期
+			// 初貸日期
 			int day = 0;
 			int lday = 0;
 
@@ -1437,10 +1449,10 @@ public class L9734Report extends MakeReport {
 
 						break;
 					case 9:
-						// 撥款日期
+						// 初貸日期
 						makeExcel.setValue(row, i,
 								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO
-										: Integer.parseInt(tLDVo.get(fdnm)),
+										: Integer.parseInt(tLDVo.get(fdnm)) - 19110000,
 								"R");
 
 						// 與前一筆是否相同
@@ -1598,7 +1610,7 @@ public class L9734Report extends MakeReport {
 			// 戶名
 			makeExcel.setValue(row, 6, custName, "L");
 
-			// 撥款日期
+			// 初貸日期
 			makeExcel.setValue(row, 7, drawdownDate, "", "R");
 			// 放款餘額
 			makeExcel.setValue(row, 8, loanBal, "#,##0", "R");

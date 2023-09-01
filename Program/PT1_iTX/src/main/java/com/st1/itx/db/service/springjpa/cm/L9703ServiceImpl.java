@@ -204,6 +204,7 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 			// 繳款方式 9
 			condition += "  AND F.\"RepayCode\" IN (5, 6, 7, 8) ";
 		} else if (functionCode == 2) {
+			//20230901根據QC2699 (雅琪)整批列印 繳款方式只出匯款選項
 			condition += "  AND F.\"RepayCode\" = 1 ";
 		} // else
 

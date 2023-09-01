@@ -40,7 +40,7 @@ public class L9711Report4 extends MakeReport {
 		this.setBeginRow(8);
 
 		// 設定明細列數(自訂亦必須)
-		this.setMaxRows(35);
+		this.setMaxRows(80);
 
 		// 字體大小
 		this.setFont(14);
@@ -135,11 +135,14 @@ public class L9711Report4 extends MakeReport {
 
 			// 計算筆數
 			int count = 0;
+			
+			int altcount = 0;
 
 			for (Map<String, String> tL9711Vo : List) {
 
 				count++;
-
+				altcount++;
+				
 				printData(tL9711Vo);
 
 				// 每到 60 筆，換一頁
@@ -151,6 +154,9 @@ public class L9711Report4 extends MakeReport {
 
 					newPage();
 
+				}
+				if (altcount == List.size()) {
+					this.print(-80, startPos + 53, "共  : "+altcount+" 筆 ","C");
 				}
 
 			}

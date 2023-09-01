@@ -1,9 +1,11 @@
 package com.st1.itx.trade.L5;
 
 import java.util.ArrayList;
+import java.util.List;
 /* 套件 */
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 /* 錯誤處理 */

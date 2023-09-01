@@ -1,5 +1,7 @@
 package com.st1.itx.db.transaction;
 
+import java.util.Objects;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
@@ -68,7 +70,7 @@ public class BaseEntityManager extends SysLogger {
 
 	public void clearEntityManager(String dbName) {
 		this.info("Clear Entity For Find..");
-		if (dbName == null)
+		if (Objects.isNull(dbName) || dbName.trim().isEmpty())
 			dbName = ContentName.onLine;
 		if (dbName.equals(ContentName.onLine))
 			this.emf.clear();

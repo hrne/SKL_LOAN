@@ -148,7 +148,7 @@ BEGIN
            WHERE M."PrinBalance" > 0
              AND M."YearMonth" = TYYMM
            GROUP BY M."YearMonth"
-                  , M."AssetClass"   	  
+                  , M."AssetClass2"   	  
                   , M."AcSubBookCode"          
            UNION 
            SELECT M."YearMonth"
@@ -171,6 +171,7 @@ BEGIN
           FROM "CoreAcMain" 
           WHERE "AcDate" =  TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR(TYYMM*100+1), 'YYYYMMDD')),'YYYYMMDD'))
             AND "AcNoCode" IN ('10600304000')
+            AND "CurrencyCode" ='NTD'
           GROUP BY "AcDate"
           UNION 
           --催收款項-折溢價與催收費用
@@ -183,6 +184,7 @@ BEGIN
             AND "AcNoCode" IN ('10601301000'    --催收款項-法務費用
                               ,'10601302000'    --催收款項-火險費用
                               ,'10601304000')   --催收款項-折溢價
+            AND "CurrencyCode" ='NTD'
           GROUP BY "AcDate"
                   
           UNION 

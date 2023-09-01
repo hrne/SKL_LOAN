@@ -59,6 +59,7 @@ public class L4951 extends TradeBuffer {
 		int mediaType = parse.stringToInteger(titaVo.getParam("MediaType"));
 
 		List<EmpDeductDtl> lEmpDeductDtl = new ArrayList<EmpDeductDtl>();
+		List<EmpDeductDtl> lEmpDeductDtlold = new ArrayList<EmpDeductDtl>();
 
 //		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
@@ -72,7 +73,8 @@ public class L4951 extends TradeBuffer {
 		if (mediaType == 1) {
 			type.add("4");
 			type.add("5");
-			sEmpDeductDtl = empDeductDtlService.entryDateRng(entryDate, entryDate, type, this.index, this.limit);
+			sEmpDeductDtl = empDeductDtlService.entryDateRng(entryDate, entryDate, type, this.index, this.limit,
+					titaVo);
 		} else if (mediaType == 2) {
 			type.add("1");
 			type.add("2");
@@ -81,17 +83,61 @@ public class L4951 extends TradeBuffer {
 			type.add("7");
 			type.add("8");
 			type.add("9");
-			sEmpDeductDtl = empDeductDtlService.entryDateRng(entryDate, entryDate, type, this.index, this.limit);
+			sEmpDeductDtl = empDeductDtlService.entryDateRng(entryDate, entryDate, type, this.index, this.limit,
+					titaVo);
 		}
+		lEmpDeductDtlold = sEmpDeductDtl == null ? null : sEmpDeductDtl.getContent();
+		if (lEmpDeductDtlold != null && lEmpDeductDtlold.size() != 0) {
 
-		lEmpDeductDtl = sEmpDeductDtl == null ? null : sEmpDeductDtl.getContent();
+			int lastMediaSeq = 0;
+			int lastMediaDate = 0;
+			String lastMediaKind = "";
+			EmpDeductDtl t = new EmpDeductDtl();
+			for (EmpDeductDtl tEmpDeductDtl : lEmpDeductDtlold) {
+				OccursList occursList = new OccursList();
+				CustMain tCustMain = new CustMain();
+				if (tEmpDeductDtl.getMediaSeq() == 0) {
+					lEmpDeductDtl.add(tEmpDeductDtl);
+					continue;
+				}
 
-		if (lEmpDeductDtl != null && lEmpDeductDtl.size() != 0) {
+				this.info("t = " + tEmpDeductDtl.toString());
+				if (tEmpDeductDtl.getMediaSeq() != lastMediaSeq || tEmpDeductDtl.getMediaDate() != lastMediaDate
+						|| !lastMediaKind.equals(tEmpDeductDtl.getMediaKind())) {
+					lEmpDeductDtl.add(tEmpDeductDtl);
+					t = tEmpDeductDtl;
+					lastMediaSeq = tEmpDeductDtl.getMediaSeq();
+					lastMediaDate = tEmpDeductDtl.getMediaDate();
+					lastMediaKind = tEmpDeductDtl.getMediaKind();
+					this.info("t1 = " + t.toString());
+				} else {
+					if (tEmpDeductDtl.getFacmNo() != t.getFacmNo()) {
+						t.setFacmNo(0);
+						t.setBormNo(0);
+					}
+					if (tEmpDeductDtl.getBormNo() != t.getBormNo()) {
+						t.setBormNo(0);
+					}
+					t.setTxAmt(t.getTxAmt().add(tEmpDeductDtl.getTxAmt()));// 實扣金額
+					t.setRepayAmt(t.getRepayAmt().add(tEmpDeductDtl.getRepayAmt()));// 應扣金額
+					t.setPrincipal(t.getPrincipal().add(tEmpDeductDtl.getPrincipal()));// 本金
+					t.setInterest(t.getInterest().add(tEmpDeductDtl.getInterest()));// 利息
+					t.setCurrPrinAmt(t.getCurrPrinAmt().add(tEmpDeductDtl.getCurrPrinAmt()));// 當期本金
+					t.setCurrIntAmt(t.getCurrIntAmt().add(tEmpDeductDtl.getCurrIntAmt()));// 當期利息
+					t.setSumOvpayAmt(t.getSumOvpayAmt().add(tEmpDeductDtl.getSumOvpayAmt()));// 累溢收
+					if (tEmpDeductDtl.getIntStartDate() < t.getIntStartDate()) {
+						t.setIntStartDate(tEmpDeductDtl.getIntStartDate());
+					}
+					if (tEmpDeductDtl.getIntEndDate() > t.getIntEndDate()) {
+						t.setIntEndDate(tEmpDeductDtl.getIntEndDate());
+					}
+					this.info("t2 = " + t.toString());
+				}
+			}
+
 			for (EmpDeductDtl tEmpDeductDtl : lEmpDeductDtl) {
 				OccursList occursList = new OccursList();
-
 				CustMain tCustMain = new CustMain();
-
 				tCustMain = custMainService.custNoFirst(tEmpDeductDtl.getCustNo(), tEmpDeductDtl.getCustNo());
 
 				occursList.putParam("OOEntryDate", tEmpDeductDtl.getEntryDate());
@@ -108,7 +154,9 @@ public class L4951 extends TradeBuffer {
 				occursList.putParam("OOTellerName", tCustMain.getCustName());
 				occursList.putParam("OORepayAmt", tEmpDeductDtl.getRepayAmt());
 				occursList.putParam("OOProcCode", tEmpDeductDtl.getProcCode());
-				occursList.putParam("OOModifyFg", tEmpDeductDtl.getMediaSeq() == 0 ? "Y" : "N");// dtlseq=0才顯示修改刪除按鈕
+				occursList.putParam("OOMediaDate", tEmpDeductDtl.getMediaDate());
+				occursList.putParam("OOMediaKind", tEmpDeductDtl.getMediaKind());
+				occursList.putParam("OOMediaSeq", tEmpDeductDtl.getMediaSeq());
 				this.totaVo.addOccursList(occursList);
 			}
 		} else {

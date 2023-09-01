@@ -111,7 +111,16 @@ T(1,@AchRepayCode,#NTXBUF,19,2)
 T(1,@CustNo,#NTXBUF,21,7)
 T(1,@FacmNo,#NTXBUF,28,3)
 T(1,@BormNo,#NTXBUF,31,3)
+T(1,@MediaDate,#NTXBUF,34,7)
+T(1,@MediaKind,#NTXBUF,41,1)
+T(1,@MediaSeq,#NTXBUF,42,6)
 
+#MediaDate=D,7,S
+#MediaKind=X,1,S
+#MediaSeq=A,6,S
+#RimMediaDate=D,7,S
+#RimMediaKind=X,1,S
+#RimMediaSeq=A,6,S
 ! 預先塞中文內容
 !T(H,@RepayCodeX,#RepayCode,#RepayCodeXHelp)
 !T(H,@PerfRepayCodeX,#PerfRepayCode,#PerfRepayCodeHelp)
@@ -292,8 +301,11 @@ E(0,@RimAchRepayCode,#AchRepayCode)
 E(0,@RimCustNo,#CustNo)
 E(0,@RimFacmNo,#FacmNo)
 E(0,@RimBormNo,#BormNo)
+E(0,@RimMediaDate,#MediaDate)
+T(2,@RimMediaKind,#MediaKind)
+E(0,@RimMediaSeq,#MediaSeq)
 RESET_RIM(#RimL4r29,L4R29)
-S(L4R29,1,#RimEntryDate,#RimPerfMonth,#RimProcCode,#RimAcctCode,#RimRepayCode,#RimAchRepayCode,#RimCustNo,#RimFacmNo,#RimBormNo)
+S(L4R29,1,#RimEntryDate,#RimPerfMonth,#RimProcCode,#RimAcctCode,#RimRepayCode,#RimAchRepayCode,#RimCustNo,#RimFacmNo,#RimBormNo,#RimMediaDate,#RimMediaKind,#RimMediaSeq)
 R(1,L4R29)
 E(0,@TxAmt,#L4R29TxAmt)
 T(2,@DeptCode,#L4R29DeptCode)
