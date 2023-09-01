@@ -18,12 +18,7 @@ import com.st1.itx.Exception.LogicException;
 public class NegAppr01Id implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 2140485611568328182L;
-
-// 會計日期
+  // 會計日期
   @Column(name = "`AcDate`")
   private int acDate = 0;
 

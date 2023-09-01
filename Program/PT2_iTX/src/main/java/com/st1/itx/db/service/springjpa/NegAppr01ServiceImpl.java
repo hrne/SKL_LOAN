@@ -447,6 +447,25 @@ em = null;
   }
 
   @Override
+  public NegAppr01 bringUpDateFirst(int bringUpDate_0, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("bringUpDateFirst " + dbName + " : " + "bringUpDate_0 : " + bringUpDate_0);
+    Optional<NegAppr01> negAppr01T = null;
+    if (dbName.equals(ContentName.onDay))
+      negAppr01T = negAppr01ReposDay.findTopByBringUpDateGreaterThanEqualOrderByBringUpDateDesc(bringUpDate_0);
+    else if (dbName.equals(ContentName.onMon))
+      negAppr01T = negAppr01ReposMon.findTopByBringUpDateGreaterThanEqualOrderByBringUpDateDesc(bringUpDate_0);
+    else if (dbName.equals(ContentName.onHist))
+      negAppr01T = negAppr01ReposHist.findTopByBringUpDateGreaterThanEqualOrderByBringUpDateDesc(bringUpDate_0);
+    else 
+      negAppr01T = negAppr01Repos.findTopByBringUpDateGreaterThanEqualOrderByBringUpDateDesc(bringUpDate_0);
+
+    return negAppr01T.isPresent() ? negAppr01T.get() : null;
+  }
+
+  @Override
   public NegAppr01 holdById(NegAppr01Id negAppr01Id, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

@@ -133,7 +133,9 @@ public class L5R27 extends TradeBuffer {
 			} else {
 				pfItDetail.setDrawdownAmt(tLoanBorMain.getDrawdownAmt());
 				pfItDetail.setDrawdownDate(tLoanBorMain.getDrawdownDate());
-
+				if (pfItDetail.getIntroducer().isEmpty()) {
+					pfItDetail.setIntroducer(tFacMain.getIntroducer());
+				}
 			}
 		} else {
 			pfItDetail = sPfItDetailService.findById(logNo, titaVo);

@@ -38,7 +38,7 @@ public class L9734ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	public List<Map<String, String>> findAll(TitaVo titaVo, int acDate, int conditionCode) throws Exception {
 		// 年
-		int iYear = acDate / 100;
+		int iYear = acDate / 10000;
 		// 月
 		int iMonth = acDate / 100 % 100;
 

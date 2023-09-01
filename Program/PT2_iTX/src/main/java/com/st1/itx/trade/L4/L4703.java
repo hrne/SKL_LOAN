@@ -183,7 +183,7 @@ public class L4703 extends TradeBuffer {
 					L9703List = l9703ServiceImpl.queryForNotice(titaVo);
 
 				} catch (Exception e) {
-					this.info("L9711ServiceImpl.LoanBorTx error = " + e.toString());
+					this.info("l9703ServiceImpl.queryForNotice error = " + e.toString());
 				}
 
 				if (L9703List != null && L9703List.size() != 0) {

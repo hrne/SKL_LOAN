@@ -69,7 +69,6 @@ public class L5R51 extends TradeBuffer {
 		String custName = "";
 		String errorFg = titaVo.getParam("RimErrorFg").trim();// 是否踢錯誤訊息
 		String icustId = "";
-//		String i104Fg = "";
 		int iCustNo = 0;
 		if (custNo != null && custNo.length() != 0) {
 			iCustNo = parse.stringToInteger(custNo);
@@ -79,8 +78,8 @@ public class L5R51 extends TradeBuffer {
 		if (caseSeq != null && caseSeq.length() != 0) {
 			iCaseSeq = parse.stringToInteger(caseSeq);
 		}
-		this.info("***L5R51**key="+custId+","+custNo+","+caseSeq+","+errorFg);
-		this.info("***iCustNo="+iCustNo+",iCaseSeq="+iCaseSeq);
+//		this.info("***L5R51**key="+custId+","+custNo+","+caseSeq+","+errorFg);
+//		this.info("***iCustNo="+iCustNo+",iCaseSeq="+iCaseSeq);
 		// 先檢查債協主檔
 		NegMain negMainVO = new NegMain();
 		CustMain custMainVO = new CustMain();
@@ -137,7 +136,7 @@ public class L5R51 extends TradeBuffer {
 			}
 		}
 
-		this.info("***custId="+custId+",length="+custId.length()+",iCustNo="+iCustNo);
+//		this.info("***custId="+custId+",length="+custId.length()+",iCustNo="+iCustNo);
 		if (custId != null && custId.length() != 0 && iCustNo == 0) {
 			if (iCaseSeq == 0) {
 				custMainVO = sCustMainService.custIdFirst(custId, titaVo);

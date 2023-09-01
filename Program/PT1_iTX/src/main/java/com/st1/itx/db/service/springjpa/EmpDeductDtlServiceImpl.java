@@ -130,7 +130,7 @@ em = null;
   }
 
   @Override
-  public Slice<EmpDeductDtl> entryDateRng(int entryDate_1, int entryDate_2, List<String> procCode_3, int index, int limit, TitaVo... titaVo) {
+  public Slice<EmpDeductDtl> entryDateRng(int entryDate_0, int entryDate_1, List<String> procCode_2, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<EmpDeductDtl> slice = null;
     if (titaVo.length != 0)
@@ -141,15 +141,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("entryDateRng " + dbName + " : " + "entryDate_1 : " + entryDate_1 + " entryDate_2 : " +  entryDate_2 + " procCode_3 : " +  procCode_3);
+    this.info("entryDateRng " + dbName + " : " + "entryDate_0 : " + entryDate_0 + " entryDate_1 : " +  entryDate_1 + " procCode_2 : " +  procCode_2);
     if (dbName.equals(ContentName.onDay))
-      slice = empDeductDtlReposDay.findAllByErrMsgIsNullAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndProcCodeInOrderByEntryDateAscCustNoAscAchRepayCodeDesc(entryDate_1, entryDate_2, procCode_3, pageable);
+      slice = empDeductDtlReposDay.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndProcCodeInOrderByEntryDateAscCustNoAscAchRepayCodeDesc(entryDate_0, entryDate_1, procCode_2, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = empDeductDtlReposMon.findAllByErrMsgIsNullAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndProcCodeInOrderByEntryDateAscCustNoAscAchRepayCodeDesc(entryDate_1, entryDate_2, procCode_3, pageable);
+      slice = empDeductDtlReposMon.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndProcCodeInOrderByEntryDateAscCustNoAscAchRepayCodeDesc(entryDate_0, entryDate_1, procCode_2, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = empDeductDtlReposHist.findAllByErrMsgIsNullAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndProcCodeInOrderByEntryDateAscCustNoAscAchRepayCodeDesc(entryDate_1, entryDate_2, procCode_3, pageable);
+      slice = empDeductDtlReposHist.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndProcCodeInOrderByEntryDateAscCustNoAscAchRepayCodeDesc(entryDate_0, entryDate_1, procCode_2, pageable);
     else 
-      slice = empDeductDtlRepos.findAllByErrMsgIsNullAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndProcCodeInOrderByEntryDateAscCustNoAscAchRepayCodeDesc(entryDate_1, entryDate_2, procCode_3, pageable);
+      slice = empDeductDtlRepos.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndProcCodeInOrderByEntryDateAscCustNoAscAchRepayCodeDesc(entryDate_0, entryDate_1, procCode_2, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

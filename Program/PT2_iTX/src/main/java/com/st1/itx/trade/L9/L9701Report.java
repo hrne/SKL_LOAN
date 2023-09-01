@@ -51,6 +51,8 @@ public class L9701Report extends MakeReport {
 	int entday = 0;
 	int stday = 0;
 
+	public int headNo = 1;
+
 	BigDecimal principal = BigDecimal.ZERO; // 本金
 	BigDecimal interest = BigDecimal.ZERO; // 利息
 	BigDecimal breachAmt = BigDecimal.ZERO; // 違約金
@@ -201,11 +203,9 @@ public class L9701Report extends MakeReport {
 		this.facmNo = "";
 		this.clAddr = "";
 
-//		boolean isFirst = true;
-
 		int detailCounts = 0;
 		int cntAll = 0;
-		int cntFirst = 0;
+//		int cntFirst = 0;
 		if (listL9701 != null && listL9701.size() > 0) {
 
 			for (Map<String, String> tL9701Vo : listL9701) {
@@ -230,46 +230,36 @@ public class L9701Report extends MakeReport {
 				}
 
 				String nextFacmNo = facmNo + "";
+				String lastsFacmNo = facmNo + "";
 
+				// 下一個額度
 				if (cntAll + 1 < listL9701.size()) {
 					nextFacmNo = listL9701.get(cntAll + 1).get("FacmNo");
 				}
-				this.info("facmNo = " + facmNo);
-				this.info("nextFacmNo = " + nextFacmNo);
 
-				String lastsFacmNo = facmNo + "";
-
+				// 上一個額度
 				if (cntAll > 0 && facmNo > 0) {
 					lastsFacmNo = listL9701.get(cntAll - 1).get("FacmNo");
 				}
 
 				// 計算筆數
 				cntAll++;
+
+				// 額度0跳過
 				if (facmNo == 0) {
 					continue;
 				}
 
 				// 不是額度0後的開始計算
-				cntFirst++;
+//				cntFirst++;
 
-				// 第一頁的第一筆
-				if (cntAll == 1 || (cntFirst == 1 && this.getNowPage() == 1)) {
-					this.print(1, 1, " ");
-					this.facmNo = tL9701Vo.get("FacmNo");
-					printFacHead();
-				}
+				this.facmNo = tL9701Vo.get("FacmNo");
+				this.facmNo = tL9701Vo.get("FacmNo");
+				this.clAddr = tL9701Vo.get("Location");
+				printHead();
 
-				this.info("lastsFacmNo = " + lastsFacmNo);
 				this.info("lastsFacmNo vs facmno = " + lastsFacmNo + " vs " + tL9701Vo.get("FacmNo"));
-				if (cntAll > 0 && facmNo > 0) {
-					if (!lastsFacmNo.equals(facmNo + "") || (nextFacmNo.equals(facmNo + "") && this.NowRow >= 43)) {
-
-						this.facmNo = tL9701Vo.get("FacmNo");
-
-						nextPage(true, cntAll == listL9701.size());
-					}
-				}
-
+				this.info("nextFacmNo vs facmno = " + nextFacmNo + " vs " + tL9701Vo.get("FacmNo"));
 				if (!this.facmNo.equals(nextFacmNo)) {
 					// 無交易明細且無餘額
 					if (detailCounts == 0) {
@@ -294,9 +284,6 @@ public class L9701Report extends MakeReport {
 					this.facmNo = tL9701Vo.get("FacmNo");
 					this.clAddr = tL9701Vo.get("Location");
 
-					// 換頁
-					nextPage(false, cntAll == listL9701.size());
-
 				}
 
 				if (tL9701Vo.get("DB").equals("1")) {
@@ -305,10 +292,47 @@ public class L9701Report extends MakeReport {
 
 				}
 
-				// 下一筆額度與現在不同 或是 最後一筆時
-				if (!this.facmNo.equals(nextFacmNo)) {
+				// 每一筆都會判斷是否換頁
+				this.nextPage(0);
+
+				// 先判斷大於43行 (是因為要結算留位置並換換下一頁新的額度
+				// 再判斷1 上一個額度與當前額度不同
+				boolean isNotSameFacmNo = tL9701Vo.get("FacmNo").equals(nextFacmNo);
+
+				this.info("isNotSameFacmNo = " + (isNotSameFacmNo ? "Yes" : "No"));
+				// 判斷額度
+				// 一樣 就判斷大於43 就要換頁
+				// 不一樣 先看 大於43列的話 就表委+ 換頁
+				// 不一樣 先看 大於38列的話 就表委 +表頭
+
+				// 判斷是否表頭是第二種還是第一種
+				// 換頁之後
+				// 要判斷額度看上一額度與現在額度 是否相同 不同的話用第一表頭 相同的話用 第二表頭
+
+				// 判斷換頁
+				// 額度相同 且 列數大於43 nextPage(2)表示換下頁時的表頭用表頭2
+				if (isNotSameFacmNo && this.NowRow >= 43) {
+					this.info("type1");
+					this.nextPage(2);
+				}
+				// 額度不同 且 列數大於43，列印總計的列數 nextPage(1)表示換下頁時的表頭用表頭1
+				if (!isNotSameFacmNo && this.NowRow >= 43) {
+					this.info("type2");
 					printFacEnd(this.facmNo);
-					detailCounts = 0;
+					this.nextPage(1);
+				}
+				// 額度不同 且 列數小於等於36，要列印總計列數加上表頭列數 nextPage(3)表示不用換頁但要印表頭1
+				if (!isNotSameFacmNo && this.NowRow <= 36) {
+					this.info("type3");
+					printFacEnd(this.facmNo);
+					this.nextPage(11);
+
+				}
+				// 額度不同 且 列數大於36，因36~43列數空間不足以列印總計加錶頭列數所以要換頁用表頭1
+				if (!isNotSameFacmNo && this.NowRow > 36) {
+					this.info("type4");
+					printFacEnd(this.facmNo);
+					this.nextPage(1);
 				}
 
 				// 最後一筆 列印結束報表
@@ -328,9 +352,10 @@ public class L9701Report extends MakeReport {
 	}
 
 	private void printDetail(Map<String, String> tL9701Vo) {
-
 		// 入帳日
 		this.print(1, 4, showRocDate(tL9701Vo.get("EntryDate"), 1));
+
+		this.print(0, 1, this.NowRow + "");
 
 		// 繳款方式RepayItem
 		this.print(0, 14, tL9701Vo.get("RepayItem"));
@@ -432,27 +457,32 @@ public class L9701Report extends MakeReport {
 		feeAmtTotal = BigDecimal.ZERO;
 	}
 
-	private void nextPage(boolean forceNextPage, boolean isLast) {
+	private void nextPage(int headNo) {
 
-		// 換頁1：資料滿列數換頁
-		if (this.NowRow == 45 && !forceNextPage) {
-			this.print(1, this.getMidXAxis(), nextPageText, "C");
-			if (!isLast) {
-				this.newPage();
-				this.print(1, 1, " "); //
-				printFacHead();
-			}
-		}
-
-		// 換頁2:強制換頁，表示下一筆額度與當前不同
-		if (forceNextPage) {
+		if (headNo == 1 || headNo == 2) {
 			this.print(-45, this.getMidXAxis(), nextPageText, "C");
-			if (!isLast) {
-				this.newPage();
-				this.print(1, 1, " "); //
-				printFacHead();
-			}
+			this.newPage();
 		}
+
+		this.headNo = headNo;
+
+	}
+
+	private void printHead() {
+
+		switch (headNo) {
+		case 1:
+			printFacHead();
+			break;
+		case 2:
+			printFacHead2();
+			break;
+		case 11:
+			printFacHead();
+			break;
+
+		}
+
 	}
 
 }

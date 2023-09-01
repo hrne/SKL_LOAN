@@ -67,7 +67,7 @@ public class LM030ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            AND M.\"PrinBalance\" > 0";
 		sql += "            AND Mm.\"CustNo\" IS NOT NULL";
 		sql += "    )";
-		sql += "    SELECT Cd.\"CityItem\",";
+		sql += "    SELECT DISTINCT Cd.\"CityItem\",";
 		sql += "        \"Fn_GetEmpName\"(M.\"AccCollPsn\", 1) \"AccCollPsn\",";
 		sql += "        M.\"CustNo\",";
 		sql += "        M.\"FacmNo\",";
@@ -114,8 +114,7 @@ public class LM030ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ) Ml ON Ml.\"CustNo\" = M.\"CustNo\"";
 		sql += "        AND Ml.\"FacmNo\" = M.\"FacmNo\"";
 		sql += "    ORDER BY M.\"CustNo\" ASC,";
-		sql += "        M.\"PrevIntDate\" ASC,";
-		sql += "        F.\"FirstDrawdownDate\" ASC";
+		sql += "             M.\"FacmNo\" ASC,";
 
 
 

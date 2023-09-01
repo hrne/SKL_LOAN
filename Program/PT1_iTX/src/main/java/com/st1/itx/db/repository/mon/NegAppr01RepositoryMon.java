@@ -58,6 +58,9 @@ public interface NegAppr01RepositoryMon extends JpaRepository<NegAppr01, NegAppr
   // ExportDate= , AND FinCode=
   public Slice<NegAppr01> findAllByExportDateIsAndFinCodeIsOrderByCustNoAsc(int exportDate_0, String finCode_1, Pageable pageable);
 
+  // BringUpDate>= 
+  public Optional<NegAppr01> findTopByBringUpDateGreaterThanEqualOrderByBringUpDateDesc(int bringUpDate_0);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

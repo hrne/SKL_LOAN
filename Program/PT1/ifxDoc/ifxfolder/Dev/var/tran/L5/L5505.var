@@ -35,8 +35,8 @@ E(0,0)
 ["#<->#,#FdCustNm+戶名",#CustNm],
 ["#<->#,#FdWorkMonth+工作月",#WorkMonth],
 ["#<->#,#FdIntroducer+介紹人",#Introducer,#BTNA,#IntroducerName],
-["#<->#,#FdUnitManager+處經理",#UnitManager,#BTNB,#UnitManagerName],
-["#<->#,#FdDistManager+區經理",#DistManager,#BTNC,#DistManagerName],
+! ["#<->#,#FdUnitManager+處經理",#UnitManager,#BTNB,#UnitManagerName],
+! ["#<->#,#FdDistManager+區經理",#DistManager,#BTNC,#DistManagerName],
 ["#<->#,#FdDeptCode+部室",#DeptCode,#DeptCodeBTN,#DeptCodeX],
 ["#<->#,#FdDistCode+區部",#DistCode,#DistCodeBTN,#DistCodeX],
 ["#<->#,#FdUnitCode+單位",#UnitCode,#UnitCodeBTN,#UnitCodeX],
@@ -80,8 +80,8 @@ C(3,#FunCode,2,T(3,*),T(3, ))
 #FdUnitCode=X,2,L
 
 #BTNA=X,4,I,ui:button;value:員工資料查詢;enable:1;tabbable:0
-#BTNB=X,4,I,ui:button;value:員工資料查詢;enable:1;tabbable:0
-#BTNC=X,4,I,ui:button;value:員工資料查詢;enable:1;tabbable:0
+! #BTNB=X,4,I,ui:button;value:員工資料查詢;enable:1;tabbable:0
+! #BTNC=X,4,I,ui:button;value:員工資料查詢;enable:1;tabbable:0
 
 #CntingCodeH=X,10,S
 T(3,Y:是;N:否)
@@ -211,7 +211,8 @@ C(3,#FunCode,5,E(0,1),$)
 C(3,#FunCode,5,s,$)
 
 #checkApplcode=X,1,S
-C(3,#InitApplCode,1,HIDE(#BTNA,#BTNB,#BTNC,#DeptCodeBTN,#DistCodeBTN,#UnitCodeBTN),SHOW(#BTNA,#BTNB,#BTNC,#DeptCodeBTN,#DistCodeBTN,#UnitCodeBTN))
+C(3,#InitApplCode,1,HIDE(#BTNA,#DeptCodeBTN,#DistCodeBTN,#UnitCodeBTN),SHOW(#BTNA,#DeptCodeBTN,#DistCodeBTN,#UnitCodeBTN))
+! C(3,#InitApplCode,1,HIDE(#BTNA,#BTNB,#BTNC,#DeptCodeBTN,#DistCodeBTN,#UnitCodeBTN),SHOW(#BTNA,#BTNB,#BTNC,#DeptCodeBTN,#DistCodeBTN,#UnitCodeBTN))
 
 
 #Tf2=x,1,S
@@ -283,18 +284,18 @@ T(2,@IntroducerName,#L2r08FullName)
 #BUFB=X,74,S
 T(2,      Y)
 
-#BINDB=X,1,S
-BIND(#BTNB,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUFB;ntxbuf5=type<-1:
-UnitManager<-OOEmployeeNo:
-UnitManagerName<-OOFullname})
-IF(#InitApplCode == 1,BIND(grid,cancel),$)
+! #BINDB=X,1,S
+! BIND(#BTNB,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUFB;ntxbuf5=type<-1:
+! UnitManager<-OOEmployeeNo:
+! UnitManagerName<-OOFullname})
+! IF(#InitApplCode == 1,BIND(grid,cancel),$)
 
 ! 處經理
-#UnitManager=X,6,I
-C(3,#FunCode,4,s,$)
-C(3,#FunCode,5,s,$)
-@
-C(3,#FunCode,1,V(7),$)
+#UnitManager=X,6,S
+! C(3,#FunCode,4,s,$)
+! C(3,#FunCode,5,s,$)
+! @
+! C(3,#FunCode,1,V(7),$)
 
 
 #SendL2r08B=X,1,S
@@ -313,18 +314,18 @@ T(2,@UnitManagerName,#L2r08FullName)
 #BUFC=X,74,S
 T(2,      Y)
 
-#BINDC=X,1,S
-BIND(#BTNC,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUFC;ntxbuf5=type<-1:
-DistManager<-OOEmployeeNo:
-DistManagerName<-OOFullname})
-IF(#InitApplCode == 1,BIND(grid,cancel),$)
+! #BINDC=X,1,S
+! BIND(#BTNC,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUFC;ntxbuf5=type<-1:
+! DistManager<-OOEmployeeNo:
+! DistManagerName<-OOFullname})
+! IF(#InitApplCode == 1,BIND(grid,cancel),$)
 
 ! 區經理
-#DistManager=X,6,I
-C(3,#FunCode,4,s,$)
-C(3,#FunCode,5,s,$)
-@
-C(3,#FunCode,1,V(7),$)
+#DistManager=X,6,S
+! C(3,#FunCode,4,s,$)
+! C(3,#FunCode,5,s,$)
+! @
+! C(3,#FunCode,1,V(7),$)
 
 
 #SendL2r08C=X,1,S
@@ -433,33 +434,12 @@ T(2,@UnitCodeX,#L2r66UnitItem)
 ! 房貸專員NM 新增時隱藏,純顯示
 #BsOfficer=X,6,L
 #BsOfficerName=X,50,L
-! C(2,#FUNCTIONCD,S,$,s,s,s,s)
+
 !已用額度
 #UtilBal=+m,15,L
 ! 業績日期
 #PerfDate=D,7,S
 
-
-!<include src="ROM.icf::L5R28.dec"/>
-!#RimEmployeeNo=X,6,S
-!#RimErrorSkip=X,1,S
-
-!#SendL5r28Introducer=X,1,S
-!IF(#TempAdjIntroducer!="" && #TempAdjIntroducer==#AdjIntroducer,S,$)
-!C(4,#AdjIntroducer,S,$)
-!T(2,@RimEmployeeNo,#AdjIntroducer)
-!T(2,@RimErrorSkip,Y)
-!RESET_RIM(#SendL5r28Introducer,L5R28)
-!S(L5R28,1,#RimErrorSkip,#RimEmployeeNo)
-!R(1,L5R28)
-
-!#AdjIntroducerName=X,50,S
-!T(2,@AdjIntroducerName,#L5r28FullName)
-
-!#CheckIsEmp=X,1,S
-!IF(#AdjIntroducer!="" ,$,S)
-!IF(#AdjIntroducerName=="" ,$,S)
-!V(P,此員工編號不存在)
 
 ! 件數
 #PerfCnt=+m,2.1,S

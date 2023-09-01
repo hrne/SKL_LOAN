@@ -39,6 +39,7 @@ import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CdWorkMonthService;
+import com.st1.itx.db.service.PfInsCheckService;
 import com.st1.itx.trade.L5.L5511Report;
 
 /**
@@ -70,6 +71,8 @@ public class L5511Batch extends TradeBuffer {
 	public CdEmpService cdEmpService;
 	@Autowired
 	CdWorkMonthService cdWorkMonthService;
+	@Autowired
+	public PfInsCheckService pfInsCheckService;
 
 	@Autowired
 	public DataLog dataLog;
@@ -124,6 +127,20 @@ public class L5511Batch extends TradeBuffer {
 	// 檢查及匯入資料PfReward > PfRewardMedia
 
 	private void toCheck(TitaVo titaVo) throws LogicException {
+		// 刪除本月保費檢核資料(重新執行用)
+		Slice<PfInsCheck> slPfInsCheck = pfInsCheckService.findCheckWorkMonthEq(iWorkMonth, 1, 0, Integer.MAX_VALUE,
+				titaVo);
+		if (slPfInsCheck != null) {
+			List<PfInsCheck> lPfInsCheckDelete = new ArrayList<PfInsCheck>();
+			lPfInsCheckDelete = slPfInsCheck.getContent();
+			try {
+				pfInsCheckService.deleteAll(lPfInsCheckDelete, titaVo); // update
+			} catch (DBException e) {
+				this.error(e.getMessage());
+				throw new LogicException(titaVo, "E0008", "PfInsCheck " + e.getErrorMsg()); // 刪除資料時，發生錯誤
+			}
+		}
+
 		int custNo = 0;
 		int facmNo = 0;
 

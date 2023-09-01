@@ -47,17 +47,17 @@ public interface EmpDeductDtlService {
   public EmpDeductDtl mediaSeqFirst(int mediaDate_0, String mediaKind_1, int mediaSeq_2, TitaVo... titaVo);
 
   /**
-   * ErrMsg !, AND EntryDate &gt;= , AND EntryDate &lt;= , AND ProcCode ^i
+   * EntryDate &gt;= , AND EntryDate &lt;= , AND ProcCode ^i
    *
+   * @param entryDate_0 entryDate_0
    * @param entryDate_1 entryDate_1
-   * @param entryDate_2 entryDate_2
-   * @param procCode_3 procCode_3
+   * @param procCode_2 procCode_2
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice EmpDeductDtl EmpDeductDtl of List
    */
-  public Slice<EmpDeductDtl> entryDateRng(int entryDate_1, int entryDate_2, List<String> procCode_3, int index, int limit, TitaVo... titaVo);
+  public Slice<EmpDeductDtl> entryDateRng(int entryDate_0, int entryDate_1, List<String> procCode_2, int index, int limit, TitaVo... titaVo);
 
   /**
    * MediaDate = , AND MediaKind = , AND MediaSeq = 

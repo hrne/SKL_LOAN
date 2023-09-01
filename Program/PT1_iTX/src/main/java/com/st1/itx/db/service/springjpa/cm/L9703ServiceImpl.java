@@ -37,7 +37,7 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	public List<Map<String, String>> queryForDetail(TitaVo titaVo) throws LogicException {
-
+		int functionCode = parse.stringToInteger(titaVo.getParam("FunctionCode"));
 		int icustno = parse.stringToInteger(titaVo.getParam("CustNo"));
 		int ifacmno = parse.stringToInteger(titaVo.getParam("FacmNo"));
 		String unpay = titaVo.getParam("UnpaidCond"); // 1-逾期期數 2-逾期日數
@@ -116,7 +116,7 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            WHERE L.\"Status\" = 0";
 		sql += "             AND  L.\"SpecificDd\" > 0";
 		sql += queryCondition(icustno, ifacmno, unpay, repay, custType, prinBalance, payIntDateSt, payIntDateEd,
-				entryDate);
+				entryDate, functionCode);
 		sql += "            GROUP BY L.\"CustNo\", L.\"FacmNo\", ";
 		sql += "                     F.\"FirstDrawdownDate\", F.\"UtilAmt\", F.\"RepayCode\", C.\"CustName\", C.\"CustUKey\" ";
 		sql += "           ) D";
@@ -166,7 +166,7 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	private String queryCondition(int icustno, int ifacmno, String unpay, String repay, String custType,
-			int prinBalance, int payIntDateSt, int payIntDateEd, int acdate) throws LogicException {
+			int prinBalance, int payIntDateSt, int payIntDateEd, int acdate, int functionCode) throws LogicException {
 
 		String condition = " ";
 
@@ -186,10 +186,10 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 			condition += "           TRUNC(MONTHS_BETWEEN(TO_DATE(:entryDate,'YYYYMMDD'), TO_DATE(19110100 + L.\"SpecificDd\", 'YYYYMMDD'))) ";
 			condition += "         - TRUNC(MONTHS_BETWEEN(TO_DATE(L.\"NextPayIntDate\",'YYYYMMDD'), TO_DATE(19110100 + L.\"SpecificDd\", 'YYYYMMDD'))) ";
 			condition += "     END BETWEEN :st AND :ed ";
-		//滯繳日數
+			// 滯繳日數
 		} else if ("2".equals(unpay)) {
 			condition += "  AND (TO_DATE(:entryDate,'YYYYMMDD')  - TO_DATE(L.\"NextPayIntDate\",'YYYYMMDD'))  BETWEEN :st AND :ed ";
-		//L4703 滯繳日數
+			// L4703 滯繳日數
 		} else {
 			condition += "  AND (TO_DATE(:entryDate,'YYYYMMDD')  - TO_DATE(L.\"NextPayIntDate\",'YYYYMMDD'))  BETWEEN :st AND :ed ";
 		}
@@ -203,6 +203,8 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		} else if ("9".equals(repay)) {
 			// 繳款方式 9
 			condition += "  AND F.\"RepayCode\" IN (5, 6, 7, 8) ";
+		} else if (functionCode == 2) {
+			condition += "  AND F.\"RepayCode\" = 1 ";
 		} // else
 
 		/*
@@ -288,6 +290,7 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	public List<Map<String, String>> queryForNotice(TitaVo titaVo) throws LogicException {
+		int functionCode = parse.stringToInteger(titaVo.getParam("FunctionCode"));
 		int icustno = parse.stringToInteger(titaVo.getParam("CustNo"));
 		int ifacmno = parse.stringToInteger(titaVo.getParam("FacmNo"));
 		String unpay = titaVo.getParam("UnpaidCond"); // 1-逾期期數 2-逾期日數
@@ -382,7 +385,7 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                   WHERE L.\"Status\" = 0";
 		sql += "                    AND  L.\"SpecificDd\" > 0";
 		sql += queryCondition(icustno, ifacmno, unpay, repay, custType, prinBalance, payIntDateSt, payIntDateEd,
-				entryDate);
+				entryDate, functionCode);
 		sql += "                   GROUP BY L.\"CustNo\", L.\"FacmNo\" ";
 		sql += "                  ) M";
 		sql += "             LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = M.\"CustNo\"";

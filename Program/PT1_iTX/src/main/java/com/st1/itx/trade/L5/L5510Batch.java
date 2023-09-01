@@ -23,6 +23,7 @@ import com.st1.itx.db.domain.PfItDetail;
 import com.st1.itx.db.domain.TxControl;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CdWorkMonthService;
+import com.st1.itx.db.service.PfInsCheckService;
 import com.st1.itx.db.service.PfItDetailService;
 import com.st1.itx.db.service.TxControlService;
 import com.st1.itx.db.service.springjpa.cm.L5510ServiceImpl;
@@ -51,6 +52,8 @@ public class L5510Batch extends TradeBuffer {
 	public TxControlService txControlService;
 	@Autowired
 	public PfItDetailService pfItDetailService;
+	@Autowired
+	public PfInsCheckService pfInsCheckService;
 	@Autowired
 	CdWorkMonthService cdWorkMonthService;
 	@Autowired
@@ -106,15 +109,37 @@ public class L5510Batch extends TradeBuffer {
 	private void toCheck(TitaVo titaVo) throws LogicException {
 		this.info("active L5510Batch.toCheck ");
 
+		// 刪除本月保費檢核資料(重新執行用)
+		Slice<PfInsCheck> slPfInsCheck = pfInsCheckService.findCheckWorkMonthEq(iWorkMonth, 0, 0, Integer.MAX_VALUE,
+				titaVo);
+		if (slPfInsCheck != null) {
+			List<PfInsCheck> lPfInsCheckDelete = new ArrayList<PfInsCheck>();
+			lPfInsCheckDelete = slPfInsCheck.getContent();
+			try {
+				pfInsCheckService.deleteAll(lPfInsCheckDelete, titaVo); // update
+			} catch (DBException e) {
+				this.error(e.getMessage());
+				throw new LogicException(titaVo, "E0008", "PfInsCheck " + e.getErrorMsg()); // 刪除資料時，發生錯誤
+			}
+		}
+
 		// 刪除本月保費檢核追回資料(重新執行用)
 		Slice<PfItDetail> slPfItDetail = pfItDetailService.findByWorkMonth(iWorkMonth, iWorkMonth, 0, Integer.MAX_VALUE,
 				titaVo);
+		List<PfItDetail> lPfItDetailDelete = new ArrayList<PfItDetail>();
 		if (slPfItDetail != null) {
 			for (PfItDetail pfIt : slPfItDetail.getContent()) {
 				if (pfIt.getWorkMonth() == iWorkMonth && pfIt.getRepayType() == 5) {
-					deletePfItDetail(pfIt, titaVo);
+					lPfItDetailDelete.add(pfIt);
 				}
 			}
+			try {
+				pfItDetailService.deleteAll(lPfItDetailDelete, titaVo); // update
+			} catch (DBException e) {
+				this.error(e.getMessage());
+				throw new LogicException(titaVo, "E0008", "PfItDetail " + e.getErrorMsg()); // 刪除資料時，發生錯誤
+			}
+
 		}
 		this.batchTransaction.commit();
 
@@ -290,7 +315,7 @@ public class L5510Batch extends TradeBuffer {
 
 		// 寫入負業績， 1.本工作月撥款，檢核結果為Y要追回，清除負業績(檢核結果為Y時已追回撥款，故還款不用追回)
 		if ("Y".equals(tPfInsCheck.getCheckResult())) {
-			if (eqAmtPlus.compareTo(BigDecimal.ZERO) > 0 || rewardPlus.compareTo(BigDecimal.ZERO) >= 0) {
+			if (eqAmtPlus.compareTo(BigDecimal.ZERO) > 0 || rewardPlus.compareTo(BigDecimal.ZERO) > 0) {
 				reverseUpdate(eqAmtPlus, rewardPlus, drawdownAmtPlus, lPfItDetail, titaVo);
 			}
 			for (PfItDetail pf : lPfItDetail) {
@@ -425,21 +450,6 @@ public class L5510Batch extends TradeBuffer {
 
 	}
 
-	// 清除負業績
-	private void deletePfItDetail(PfItDetail pf, TitaVo titaVo) throws LogicException {
-		this.info(" deletePfItDetail .....");
-		PfItDetail tPfItDetail = pfItDetailService.holdById(pf, titaVo);
-		if (tPfItDetail == null) {
-			throw new LogicException(titaVo, "E0006", "PfItDetail"); // 鎖定資料時，發生錯誤
-		}
-		try {
-			pfItDetailService.delete(tPfItDetail, titaVo); // update
-		} catch (DBException e) {
-			this.error(e.getMessage());
-			throw new LogicException(titaVo, "E0008", "PfItDetail " + e.getErrorMsg()); // 刪除資料時，發生錯誤
-		}
-
-	}
 
 	/**
 	 * 產生媒體檔

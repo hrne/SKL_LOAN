@@ -182,6 +182,15 @@ public interface NegAppr01Service {
   public Slice<NegAppr01> findExporFinCode(int exportDate_0, String finCode_1, int index, int limit, TitaVo... titaVo);
 
   /**
+   * BringUpDate&gt;= 
+   *
+   * @param bringUpDate_0 bringUpDate_0
+   * @param titaVo Variable-Length Argument
+   * @return Slice NegAppr01 NegAppr01 of List
+   */
+  public NegAppr01 bringUpDateFirst(int bringUpDate_0, TitaVo... titaVo);
+
+  /**
    * hold By NegAppr01
    * 
    * @param negAppr01Id key

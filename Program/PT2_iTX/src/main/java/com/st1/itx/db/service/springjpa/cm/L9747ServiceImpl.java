@@ -87,7 +87,7 @@ public class L9747ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("dataday", dataDate);
+//		query.setParameter("dataday", dataDate);
 		return this.convertToMap(query);
 	}
 

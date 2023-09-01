@@ -54,34 +54,6 @@ BEGIN
     -- 記錄寫入筆數
     INS_CNT := INS_CNT + sql%rowcount;
 
-    /* 更新組別號碼 已預設過GDRNUM2,GDRMRK判斷唯一性 */
-    MERGE INTO "TmpLA$LGTP" T1
-    USING (SELECT S2."GroupNo"
-                 ,S2."NewGroupNo"
-                 ,S1.LMSACN
-                 ,S1.LMSAPN
-                 ,S1.GDRID1
-                 ,S1.GDRID2
-                 ,S1.GDRNUM
-                 ,S1.LGTSEQ
-           FROM "TmpLA$LGTP" S1 -- 組員
-           LEFT JOIN "TmpLA$LGTP" S2 ON S2.GDRNUM2 = S1.GDRNUM2
-                                    AND S2.GDRMRK = 1 -- 組長
-           WHERE S1.GDRNUM2 > 0 -- 有被設定過唯一性
-             AND S1.GDRMRK = 0
-          ) SC1
-    ON (    SC1."LMSACN"  = T1."LMSACN"
-        AND SC1."LMSAPN"  = T1."LMSAPN"
-        AND SC1."GDRID1"  = T1."GDRID1"
-        AND SC1."GDRID2"  = T1."GDRID2"
-        AND SC1."GDRNUM"  = T1."GDRNUM"
-        AND SC1."LGTSEQ"  = T1."LGTSEQ"
-    )
-    WHEN MATCHED THEN UPDATE SET
-        T1."GroupNo"    = SC1."GroupNo"
-       ,T1."NewGroupNo" = SC1."NewGroupNo"
-    ;
-
     /* 更新TfFg */
     MERGE INTO "TmpLA$LGTP" T1
     USING (SELECT S1."GroupNo"

@@ -26,12 +26,7 @@ import com.st1.itx.Exception.LogicException;
 public class EmpDeductDtl implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -7322691085386636677L;
-
-@EmbeddedId
+  @EmbeddedId
   private EmpDeductDtlId empDeductDtlId;
 
   // 入帳日期
@@ -86,6 +81,7 @@ public class EmpDeductDtl implements Serializable {
   private BigDecimal txAmt = new BigDecimal("0");
 
   // 失敗原因
+  /* CdCode.ProcCode 處理說明員工扣薪：004 + ErrMsg(2)01:成功16:扣款失敗17:扣款不足 */
   @Column(name = "`ErrMsg`", length = 20)
   private String errMsg;
 
@@ -465,7 +461,11 @@ public class EmpDeductDtl implements Serializable {
 
 /**
 	* 失敗原因<br>
-	* 
+	* CdCode.ProcCode 處理說明
+員工扣薪：004 + ErrMsg(2)
+01:成功
+16:扣款失敗
+17:扣款不足
 	* @return String
 	*/
   public String getErrMsg() {
@@ -474,7 +474,11 @@ public class EmpDeductDtl implements Serializable {
 
 /**
 	* 失敗原因<br>
-	* 
+	* CdCode.ProcCode 處理說明
+員工扣薪：004 + ErrMsg(2)
+01:成功
+16:扣款失敗
+17:扣款不足
   *
   * @param errMsg 失敗原因
 	*/

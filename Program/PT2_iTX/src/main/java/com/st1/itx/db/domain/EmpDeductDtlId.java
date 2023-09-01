@@ -18,12 +18,7 @@ import com.st1.itx.Exception.LogicException;
 public class EmpDeductDtlId implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -548534702324679504L;
-
-// 入帳日期
+  // 入帳日期
   @Column(name = "`EntryDate`")
   private int entryDate = 0;
 

@@ -26,8 +26,8 @@ public interface EmpDeductDtlRepository extends JpaRepository<EmpDeductDtl, EmpD
   // MediaDate = , AND MediaKind = , AND MediaSeq = 
   public Optional<EmpDeductDtl> findTopByMediaDateIsAndMediaKindIsAndMediaSeqIs(int mediaDate_0, String mediaKind_1, int mediaSeq_2);
 
-  // ErrMsg !, AND EntryDate >= , AND EntryDate <= , AND ProcCode ^i
-  public Slice<EmpDeductDtl> findAllByErrMsgIsNullAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndProcCodeInOrderByEntryDateAscCustNoAscAchRepayCodeDesc(int entryDate_1, int entryDate_2, List<String> procCode_3, Pageable pageable);
+  // EntryDate >= , AND EntryDate <= , AND ProcCode ^i
+  public Slice<EmpDeductDtl> findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndProcCodeInOrderByEntryDateAscCustNoAscAchRepayCodeDesc(int entryDate_0, int entryDate_1, List<String> procCode_2, Pageable pageable);
 
   // MediaDate = , AND MediaKind = , AND MediaSeq = 
   public Slice<EmpDeductDtl> findAllByMediaDateIsAndMediaKindIsAndMediaSeqIs(int mediaDate_0, String mediaKind_1, int mediaSeq_2, Pageable pageable);

@@ -91,7 +91,7 @@ BEGIN
          , Mtgagm
          , Gdrnum2
          , Gdrmrk
-         , UpdateIdent
+         , Update_Ident
          , JOB_START_TIME AS "CreateDate" -- 建檔日期時間 DATE 
          , '999999'       AS "CreateEmpNo" -- 建檔人員 VARCHAR2 6
          , JOB_START_TIME AS "LastUpdate" -- 最後更新日期時間 DATE 

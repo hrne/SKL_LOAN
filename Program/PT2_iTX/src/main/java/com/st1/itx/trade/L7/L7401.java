@@ -104,22 +104,21 @@ public class L7401 extends TradeBuffer {
 
 			this.info("bcDate =" + bcDate);
 
-//			this.info("setDataBaseOnMon");
-//			titaVo.setDataBaseOnMon();
 			Slice<CoreAcMain> fCoreAcMain = tCoreAcMainService.findByAcDate(bcDate, 0, Integer.MAX_VALUE, titaVo);
 			List<CoreAcMain> lCoreAcMain = fCoreAcMain == null ? null : fCoreAcMain.getContent();
 
 //			addData(titaVo, filename, "SKL000_NTD", bcDate, lCoreAcMain)
-			if (addData(titaVo, filename, "SKL000_NTD", bcDate, lCoreAcMain)) {
+			if (addData(titaVo, filename, "SKL_TOL", bcDate, lCoreAcMain)
+					&& addData(titaVo, filename, "SKL000_NTD", bcDate, lCoreAcMain)) {
 
 				titaVo.keepOrgDataBase();// 保留原本記號
 
 				insertData(titaVo);
 
 				titaVo.setDataBaseOnMon();// 指定月報環境
-//
+
 				insertData(titaVo);
-				
+
 				titaVo.setDataBaseOnOrg();// 還原原本的環境
 
 				if (addData(titaVo, filename, "SKL000_00A_NTD", bcDate, lCoreAcMain)) {
@@ -127,15 +126,14 @@ public class L7401 extends TradeBuffer {
 					insertData(titaVo);
 
 					updateData(titaVo);
-					
+
 					titaVo.setDataBaseOnMon();// 指定月報環境
-					
+
 					insertData(titaVo);
 
 					updateData(titaVo);
-					
+
 					titaVo.setDataBaseOnOrg();// 指定月報環境
-					
 
 				}
 
@@ -202,14 +200,20 @@ public class L7401 extends TradeBuffer {
 
 				// 帳冊別
 				iAcBookCode = String.valueOf(makeExcel.getValue(row, 1));
-				iAcBookCode = "SKL000".equals(iAcBookCode) ? "000" : iAcBookCode;
+				iAcBookCode = "000";
 				iCoreAcMainId.setAcBookCode(iAcBookCode);
 				// 區隔帳冊，因會先上傳全部帳冊，所以都先預設201
 				iAcSubBookCode = String.valueOf(makeExcel.getValue(row, 2));
 				iAcSubBookCode = "00A".equals(iAcSubBookCode) ? "00A" : "201";
+				if("SKL_TOL".equals(sheetName)) {
+					iAcSubBookCode = "   ";
+				}
 				iCoreAcMainId.setAcSubBookCode(iAcSubBookCode);
 				// 幣別
 				iCurrencyCode = String.valueOf(makeExcel.getValue(row, 9));
+				if("SKL_TOL".equals(sheetName)) {
+					iCurrencyCode = "TOL";
+				}
 				iCoreAcMainId.setCurrencyCode(iCurrencyCode);
 				// 科目代號
 				iAcNoCode = String.valueOf(makeExcel.getValue(row, 4)).trim();
