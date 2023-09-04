@@ -26,12 +26,7 @@ import com.st1.itx.Exception.LogicException;
 public class SystemParas implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 3627202429174596916L;
-
-// 業務類型
+  // 業務類型
   /* LN */
   @Id
   @Column(name = "`BusinessType`", length = 2)
@@ -397,6 +392,21 @@ public class SystemParas implements Serializable {
   // 最後更新人員
   @Column(name = "`LastUpdateEmpNo`", length = 6)
   private String lastUpdateEmpNo;
+
+  // SFTP網址（金控利關人）
+  /* 正式套 SFTP 10.11.1.58 測試套用EFB替代 10.11.100.1 */
+  @Column(name = "`L7206SftpUrl`", length = 100)
+  private String l7206SftpUrl;
+
+  // SFTP帳號（金控利關人）
+  /* 格式:username：password正式套 帳密待申請測試套 loanuser:aA23895858 */
+  @Column(name = "`L7206SftpAuth`", length = 100)
+  private String l7206SftpAuth;
+
+  // SFTP資料夾（金控利關人）
+  /* 正式套 待確認測試套 inbound/L7206/ */
+  @Column(name = "`L7206SftpDir`", length = 100)
+  private String l7206SftpDir;
 
 
 /**
@@ -1963,6 +1973,71 @@ T:測試用(測試套固定發送到skcu31780001@skl.com.tw,信件標題增加"�
     this.lastUpdateEmpNo = lastUpdateEmpNo;
   }
 
+/**
+	* SFTP網址（金控利關人）<br>
+	* 正式套 SFTP 10.11.1.58 
+測試套用EFB替代 10.11.100.1
+	* @return String
+	*/
+  public String getL7206SftpUrl() {
+    return this.l7206SftpUrl == null ? "" : this.l7206SftpUrl;
+  }
+
+/**
+	* SFTP網址（金控利關人）<br>
+	* 正式套 SFTP 10.11.1.58 
+測試套用EFB替代 10.11.100.1
+  *
+  * @param l7206SftpUrl SFTP網址（金控利關人）
+	*/
+  public void setL7206SftpUrl(String l7206SftpUrl) {
+    this.l7206SftpUrl = l7206SftpUrl;
+  }
+
+/**
+	* SFTP帳號（金控利關人）<br>
+	* 格式:username：password
+正式套 帳密待申請
+測試套 loanuser:aA23895858
+	* @return String
+	*/
+  public String getL7206SftpAuth() {
+    return this.l7206SftpAuth == null ? "" : this.l7206SftpAuth;
+  }
+
+/**
+	* SFTP帳號（金控利關人）<br>
+	* 格式:username：password
+正式套 帳密待申請
+測試套 loanuser:aA23895858
+  *
+  * @param l7206SftpAuth SFTP帳號（金控利關人）
+	*/
+  public void setL7206SftpAuth(String l7206SftpAuth) {
+    this.l7206SftpAuth = l7206SftpAuth;
+  }
+
+/**
+	* SFTP資料夾（金控利關人）<br>
+	* 正式套 待確認
+測試套 inbound/L7206/
+	* @return String
+	*/
+  public String getL7206SftpDir() {
+    return this.l7206SftpDir == null ? "" : this.l7206SftpDir;
+  }
+
+/**
+	* SFTP資料夾（金控利關人）<br>
+	* 正式套 待確認
+測試套 inbound/L7206/
+  *
+  * @param l7206SftpDir SFTP資料夾（金控利關人）
+	*/
+  public void setL7206SftpDir(String l7206SftpDir) {
+    this.l7206SftpDir = l7206SftpDir;
+  }
+
 
   @Override
   public String toString() {
@@ -1978,6 +2053,7 @@ T:測試用(測試套固定發送到skcu31780001@skl.com.tw,信件標題增加"�
            + ", jcicEmpTel=" + jcicEmpTel + ", autoBatchFg=" + autoBatchFg + ", batchFireFeeFg=" + batchFireFeeFg + ", icsFg=" + icsFg + ", icsUrl=" + icsUrl + ", icsBatchMaxCount=" + icsBatchMaxCount
            + ", insuSettleDate=" + insuSettleDate + ", jcicZDep=" + jcicZDep + ", jcicZName=" + jcicZName + ", jcicZTel=" + jcicZTel + ", jcicMU1Dep=" + jcicMU1Dep + ", jcicMU1Name=" + jcicMU1Name
            + ", jcicMU1Tel=" + jcicMU1Tel + ", coreRemitLimit=" + coreRemitLimit + ", l6972Flag=" + l6972Flag + ", pfxPath=" + pfxPath + ", pfxAuth=" + pfxAuth + ", emailFlag=" + emailFlag
-           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", l7206SftpUrl=" + l7206SftpUrl + ", l7206SftpAuth=" + l7206SftpAuth
+           + ", l7206SftpDir=" + l7206SftpDir + "]";
   }
 }

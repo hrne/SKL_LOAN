@@ -336,11 +336,7 @@ BEGIN
                                     ORDER BY CASE 
                                                WHEN "AG_CUR_IND" = 'Y' THEN 0 
                                              ELSE 1 END 
-                                            ,CASE 
-                                               WHEN "AG_STATUS_CODE" = '1' THEN 0 
-                                             ELSE 1 END  
                                             ,NVL(TO_NUMBER(TO_CHAR("AG_STATUS_DATE",'YYYYMMDD')),0) DESC 
-                                            ,NVL(TO_NUMBER(TO_CHAR("LEVEL_DATE",'YYYYMMDD')),0) DESC 
                                             ,"AGENT_CODE" DESC 
                                             ) AS "Seq" 
           FROM TPSAS047

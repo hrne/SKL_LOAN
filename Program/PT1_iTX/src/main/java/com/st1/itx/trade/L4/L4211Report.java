@@ -361,7 +361,7 @@ public class L4211Report extends MakeReport {
 			reportName = "人工處理明細表";
 		}
 
-		acdate = titaVo.get("AcDate");
+		acdate = titaVo.getParam("AcDate");
 
 		if (fnAllList1.size() == 0) {
 			throw new LogicException("E2003", "查無資料"); // 查無資料

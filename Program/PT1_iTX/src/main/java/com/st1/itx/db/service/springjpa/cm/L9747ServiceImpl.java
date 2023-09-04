@@ -51,7 +51,7 @@ public class L9747ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        V.\"minFacmNo\", ";
 		sql += "        V.\"Status\", ";
 		sql += "        \"Fn_ParseEOL\"(C.\"CustName\", 0) AS \"CustName\", ";
-		sql += "        NVL( A.\"RvBal\",0) AS \"RvBal\" ";
+		sql += "        NVL( A.\"RvBal\",AA.\"RvBal\") AS \"RvBal\" ";
 		sql += "    FROM ( ";
 		sql += "            select MAX(L.\"Status\") \"Status\", ";
 		sql += "                L.\"CustNo\" \"CustNo\", ";
@@ -71,6 +71,20 @@ public class L9747ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            WHERE \"AcctCode\" = 'TAV' ";
 		sql += "            GROUP BY \"CustNo\" ";
 		sql += "        ) A on A.\"CustNo\" = V.\"CustNo\" ";
+		sql += "        LEFT JOIN ( ";
+		sql += "            select \"AcDate\", ";
+		sql += "                \"CustNo\", ";
+		sql += "                \"TxAmt\" AS \"RvBal\", ";
+		sql += "                row_number() over ( ";
+		sql += "                    partition by \"CustNo\" ";
+		sql += "                    order by \"AcDate\" desc ";
+		sql += "                ) AS \"Seq\" ";
+		sql += "            FROM \"AcDetail\" ";
+		sql += "            where \"AcctCode\" = 'TAV' ";
+		sql += "                and \"DbCr\" = 'D' ";
+		sql += "                and \"AcDate\" = :dataday ";
+		sql += "        ) AA ON AA.\"CustNo\" = V.\"CustNo\" ";
+		sql += "        AND  AA.\"Seq\" = 1 ";
 		sql += "        LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = V.\"CustNo\" ";
 		sql += "        LEFT JOIN \"ClFac\" Cf ON Cf.\"CustNo\" = V.\"CustNo\" ";
 		sql += "        					  AND Cf.\"FacmNo\" = V.\"minFacmNo\" ";
@@ -79,7 +93,7 @@ public class L9747ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        					   AND Cl.\"ClCode2\" = Cf.\"ClCode2\" ";
 		sql += "       						   AND Cl.\"ClNo\" = Cf.\"ClNo\" ";
 		sql += "        LEFT JOIN \"CdCity\" Ct ON Ct.\"CityCode\" = Cl.\"CityCode\" ";
-		sql += "    WHERE Nvl(A.\"RvBal\", 0) > 0 ";
+		sql += "    WHERE Nvl(A.\"RvBal\", 0) > 0 OR Nvl(AA.\"RvBal\", 0) > 0 ";
 
 
 		this.info("sql=" + sql);
@@ -87,7 +101,7 @@ public class L9747ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-//		query.setParameter("dataday", dataDate);
+		query.setParameter("dataday", dataDate);
 		return this.convertToMap(query);
 	}
 

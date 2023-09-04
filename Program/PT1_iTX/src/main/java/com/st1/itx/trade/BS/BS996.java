@@ -13,8 +13,10 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.AcLoanRenew;
 import com.st1.itx.db.domain.CdPfParms;
 import com.st1.itx.db.domain.CdPfParmsId;
 import com.st1.itx.db.domain.CdWorkMonth;
@@ -26,6 +28,7 @@ import com.st1.itx.db.domain.PfBsDetail;
 import com.st1.itx.db.domain.PfDetail;
 import com.st1.itx.db.domain.PfItDetail;
 import com.st1.itx.db.domain.PfReward;
+import com.st1.itx.db.service.AcLoanRenewService;
 import com.st1.itx.db.service.CdPfParmsService;
 import com.st1.itx.db.service.CdWorkMonthService;
 import com.st1.itx.db.service.LoanBorMainService;
@@ -98,6 +101,9 @@ public class BS996 extends TradeBuffer {
 
 	@Autowired
 	public LoanBorMainService loanBorMainService;
+
+	@Autowired
+	public AcLoanRenewService acLoanRenewService;
 
 	@Autowired
 	public CdPfParmsService cdPfParmsService;
@@ -221,6 +227,8 @@ public class BS996 extends TradeBuffer {
 
 	private boolean updatePfDetail(int iAcdate, String iEmpResetFg, LoanBorTx tx, TitaVo titaVo) throws LogicException {
 		int repayType = -1;
+		TempVo tTempVo = new TempVo();
+		tTempVo = tTempVo.getVo(tx.getOtherFields());
 
 		if ("L3100".equals(tx.getTitaTxCd())) {
 			repayType = 0; // 0.撥款
@@ -229,7 +237,9 @@ public class BS996 extends TradeBuffer {
 			repayType = 2; // 2.部分償還
 		}
 		if ("L3420".equals(tx.getTitaTxCd()) && tx.getExtraRepay().compareTo(BigDecimal.ZERO) > 0) {
-			repayType = 3; // 3.提前結案
+			if ("0".equals(tTempVo.getParam("CaseCloseCode"))) {
+				repayType = 3; // 3.提前結案
+			}
 		}
 
 		if (repayType == -1) {
@@ -242,6 +252,15 @@ public class BS996 extends TradeBuffer {
 			this.info("LoanBorMain notfound " + tx.toString());
 			return false;
 		}
+		
+		// 同額度展期、借新還舊撥款不算業績
+		if (repayType == 0 && !ln.getRenewFlag().isEmpty()) {
+			Slice<AcLoanRenew> slAcLoanRenew = acLoanRenewService.NewFacmNoNoRange(ln.getCustNo(), ln.getFacmNo(),
+					ln.getFacmNo(), ln.getBormNo(), ln.getBormNo(), 0, 1, titaVo);
+			if (slAcLoanRenew != null && slAcLoanRenew.getContent().get(0).getOldFacmNo() == ln.getFacmNo()) {
+				return false;
+			}
+		}
 
 		PfDetailVo pf = new PfDetailVo();
 		pf.setPerfDate(tx.getAcDate());
@@ -249,7 +268,8 @@ public class BS996 extends TradeBuffer {
 		pf.setFacmNo(tx.getFacmNo()); // 額度編號
 		pf.setBormNo(tx.getBormNo()); // 撥款序號
 		pf.setBorxNo(tx.getBorxNo()); // 交易內容檔序號
-		pf.setPieceCode(checkPieceCodeAdjust(ln.getCustNo(), ln.getFacmNo(), ln.getBormNo(), ln.getPieceCode(), titaVo)); // 計件代碼
+		pf.setPieceCode(
+				checkPieceCodeAdjust(ln.getCustNo(), ln.getFacmNo(), ln.getBormNo(), ln.getPieceCode(), titaVo)); // 計件代碼
 		pf.setPieceCodeSecond(""); // 計件代碼2
 		pf.setDrawdownDate(ln.getDrawdownDate());// 撥款日期
 		pf.setRepayType(repayType); // 還款類別 0.撥款 2.部分償還 3.提前結案

@@ -319,7 +319,7 @@ E(0,@SumOvpayAmt,#L4R29SumOvpayAmt)
 T(2,@IntStartDate,#L4R29IntStartDate)
 T(2,@BatchNo,#L4R29BatchNo)
 T(2,@IntEndDate,#L4R29IntEndDate)
-T(2,@ErrMsg,#L4R29ErrMsg+-+#L4R29ErrMsgX)
+T(B,@ErrMsg,#L4R29ErrMsg+-+#L4R29ErrMsgX)
 T(2,@Acdate,#L4R29Acdate)
 T(2,@TitaTxtNo,#L4R29TitaTxtNo)
 

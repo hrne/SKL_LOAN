@@ -329,7 +329,12 @@
 			<tasklet ref="LM082" />
 		</step>
 	</job>
-
+	<job id="jLM088" parent="parentJob"
+		xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLM088" parent="parentStep">
+			<tasklet ref="LM088" />
+		</step>
+	</job>
 	<!-- 工作月報 -->
 	<job id="jLP001" parent="parentJob"
 		xmlns="http://www.springframework.org/schema/batch">

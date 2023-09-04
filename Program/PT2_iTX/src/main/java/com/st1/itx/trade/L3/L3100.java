@@ -250,7 +250,7 @@ public class L3100 extends TradeBuffer {
 		// 帳務處理
 		AcDetailRoutine();
 
-		// 業績處理
+		// 業績處理(同額度展期或借新還舊不處理)
 		PfDetailRoutine();
 
 		totaVo.put("DPdfSnoF", 0);
@@ -920,6 +920,11 @@ public class L3100 extends TradeBuffer {
 	// 業績處理
 	private void PfDetailRoutine() throws LogicException {
 		this.info("   PfDetailRoutine ...");
+		// 同額度展期或借新還舊不寫業績
+		if (isRenew && parse.stringToInteger(titaVo.getParam("RpFacmNo1")) == parse
+				.stringToInteger(titaVo.getParam("FacmNo"))) {
+			return;
+		}
 		pfDetailCom.setTxBuffer(this.getTxBuffer());
 		PfDetailVo pf = new PfDetailVo();
 		pf.setCustNo(iCustNo); // 借款人戶號

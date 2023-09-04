@@ -52,8 +52,14 @@ public class ScheduledProcess extends SysLogger {
 	@Scheduled(fixedDelay = 60000)
 	private void lookUpTxCruiser() {
 		this.mustInfo("Active lookUpTxCruiser Every 60 Second...");
-
-		Slice<TxCruiser> txCruiserSi = txCruiserService.FindAllByStatus("U", 0, Integer.MAX_VALUE);
+		Slice<TxCruiser> txCruiserSi = null;
+		try {
+			txCruiserSi = txCruiserService.FindAllByStatus("U", 0, Integer.MAX_VALUE);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("txCruiserService.FindAllByStatus error:" + errors.toString());
+		}
 
 		if (txCruiserSi != null)
 			for (TxCruiser txs : txCruiserSi.getContent()) {

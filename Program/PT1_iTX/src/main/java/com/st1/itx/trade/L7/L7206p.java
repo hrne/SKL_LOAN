@@ -95,9 +95,9 @@ public class L7206p extends TradeBuffer {
 		// TA07_YYYYMMDD
 		// 每日金控下傳一次
 
-		int acDate = titaVo.getEntDyI() + 19110000;
+		int acDate = toInt(titaVo.getParam("inputAcDate")) + 19110000;
 
-		this.info("acDate = " + acDate);
+		this.info("inputAcDate = " + acDate);
 
 		String t07FileName = "T07_" + acDate + ".csv"; // 寫入 LifeRelHead
 		String t072FileName = "T07_2_" + acDate + ".csv"; // 寫入 LifeRelEmp
@@ -335,24 +335,26 @@ public class L7206p extends TradeBuffer {
 		SystemParas systemParas = systemParasService.findById("LN", titaVo);
 
 		if (systemParas == null) {
-			this.error("sendToFTP: SystemParas doesn't exist !?");
+			this.error("downloadFromFtp: SystemParas doesn't exist !?");
 			return "";
 		}
 
-		String smsUrl = systemParas.getSmsFtpUrl();
-		String smsPort = "22"; // 預設22
-		if (smsUrl.contains(":")) {
-			String[] s = smsUrl.split(":");
-			smsUrl = s[0];
-			smsPort = s[1];
+		String url = systemParas.getL7206SftpUrl();
+		String port = "22"; // 預設22
+		if (url.contains(":")) {
+			String[] s = url.split(":");
+			url = s[0];
+			port = s[1];
 		}
-		String[] auth = systemParas.getSmsFtpAuth().split(":");
+		String[] auth = systemParas.getL7206SftpAuth().split(":");
+
+		String remoteDir = systemParas.getL7206SftpDir();
 
 		String localFile = inFolder + "/L7206/" + fileName;
-		String remoteFile = "inbound" + "/L7206/" + fileName;
+		String remoteFile = remoteDir + fileName;
 
 		// 呼叫SFTPCient
-		sftpClient.download(smsUrl, smsPort, auth, localFile, remoteFile, titaVo);
+		sftpClient.download(url, port, auth, localFile, remoteFile, titaVo);
 		return localFile;
 	}
 }

@@ -110,7 +110,6 @@ public class LM003Report extends MakeReport {
 			BigDecimal lNoCloseAmtSeq3 = BigDecimal.ZERO;
 			BigDecimal lEnt0Amt = BigDecimal.ZERO;
 			BigDecimal lRepayTotal = BigDecimal.ZERO;
-
 			for (Map<String, String> r : rList) {
 
 				lDrawdownAmt = getBigDecimal(r.get("DrawdownAmt"));
@@ -167,12 +166,14 @@ public class LM003Report extends MakeReport {
 				turnOvduAmt = turnOvduAmt.add(getBigDecimal(r.get("NoCloseAmtSeq3")));
 				// 企金自然人金額合計
 				entPerAmt = entPerAmt.add(getBigDecimal(r.get("EntPerAmt")));
-				//帳載
+				// 帳載
 				repayAllTotal = repayAllTotal.add(lRepayTotal);
 			}
 
 			int rowP = 22;
-			lRepayTotal = new BigDecimal("5.55");
+
+			lRepayTotal = lRepayTotal.subtract(lNoCloseAmtSeq3);
+
 			makeExcel.setValue(rowP, 3, lCloseAmtSeq1.divide(lRepayTotal, 4, RoundingMode.HALF_UP), "0#.00%", "C");
 			makeExcel.setValue(rowP, 4, lCloseAmtSeq2.divide(lRepayTotal, 4, RoundingMode.HALF_UP), "0#.00%", "C");
 			makeExcel.setValue(rowP, 5, lCloseAmtSeq3.divide(lRepayTotal, 4, RoundingMode.HALF_UP), "0#.00%", "C");
