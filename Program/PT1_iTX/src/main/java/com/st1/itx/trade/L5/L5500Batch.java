@@ -443,6 +443,7 @@ public class L5500Batch extends TradeBuffer {
 
 				hlThreeLaqhcp.setHlThreeLaqhcpId(hlThreeLaqhcpId);
 
+				this.mustInfo("hlThreeLaqhcp setCalDate = entday = " + entday);
 				hlThreeLaqhcp.setCalDate(entday);
 				hlThreeLaqhcp.setEmpNo(d.get("EmpNo"));
 				hlThreeLaqhcp.setEmpName(d.get("EmpName"));
@@ -747,7 +748,8 @@ public class L5500Batch extends TradeBuffer {
 //				this.info(d.get("UnitCode") + "=" + d.get("UnitItem") + "/" + d.get("UnitItem").toString().length());
 				HlAreaData tHlAreaData = new HlAreaData();
 				tHlAreaData.setAreaUnitNo(d.get("UnitCode"));// 區域代碼--VARCHAR2(6)
-				tHlAreaData.setAreaName(d.get("UnitItem"));// 區域名稱--VARCHAR2(20)
+				// 2023-09-04 Wei from 琦欣 先截斷至十個中文字
+				tHlAreaData.setAreaName(d.get("UnitItem").substring(0, 10));// 區域名稱--VARCHAR2(20)
 				tHlAreaData.setAreaChiefEmpNo(d.get("UnitManager"));// 區域主管員編--VARCHAR2(6)
 				tHlAreaData.setAreaChiefName(d.get("Fullname"));// 區域主管名稱--NVARCHAR2(15)
 

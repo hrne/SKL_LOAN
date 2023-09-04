@@ -44,6 +44,7 @@ K(MODIFYBUTTON,查詢)
 ["@執行結果篩選",#BatchResultCode,#BatchResultCodeX],
 ["@執行日期區間",#InputStartDate,#InputEndDate],
 ["@類別",#ErrorTypeCode,#ErrorTypeCodeX],
+["@批號",#InputJobTxSeq],
 ]
 
 !---------- AP Button AREA ----------
@@ -131,6 +132,7 @@ C(4,#ErrorTypeCode,$,V(H,#ErrorTypeCodeHelp))
 #ErrorTypeCodeX=X,20,L
 C(4,#ErrorTypeCode,S,T(H,#ErrorTypeCode,#ErrorTypeCodeHelp))
 
+#JobTxSeq=x,20,I
 
 #RPTFG=A,1,S
 E(0,0)
@@ -248,6 +250,7 @@ SWITCH(#OOStatus,
 #InputStartDate
 #InputEndDate
 #ErrorTypeCode
+#InputJobTxSeq
 #END
 </sub>
 

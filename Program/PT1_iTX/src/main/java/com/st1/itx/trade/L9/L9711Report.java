@@ -164,18 +164,20 @@ public class L9711Report extends MakeReport {
 
 				lCustNoticeId.setCustNo(custNo);
 				lCustNoticeId.setFacmNo(facmNo);
-				lCustNoticeId.setFormNo("L9710");
+				lCustNoticeId.setFormNo(txcd);
 
 				lCustNotice = sCustNoticeService.findById(lCustNoticeId, titaVo);
-
+				this.info("lCustNotice   = " + lCustNotice);
+				
 //				TempVo tempVo = new TempVo();
 //				tempVo = sCustNoticeService....getCustNotice("L9703", custNo, facmNo, titaVo);
 
 //				if ("Y".equals(tempVo.getParam("isLetter"))) {
 				// custNotice 空的 表示 沒有申請列印 或 有值但是 paper為N 也是沒有申請列印
 				if (lCustNotice == null) {
-					isLetterList.add(r);
+					isNotLetterList.add(r);
 				} else {
+					this.info("lCustNotice.pare  = " + lCustNotice.getPaperNotice());
 					if ("Y".equals(lCustNotice.getPaperNotice())) {
 						isLetterList.add(r);
 					}
@@ -246,7 +248,7 @@ public class L9711Report extends MakeReport {
 
 		l9711report3.exec(titaVo, isLetterList);
 
-		return l9711List;
+		return isLetterList;
 
 	}
 

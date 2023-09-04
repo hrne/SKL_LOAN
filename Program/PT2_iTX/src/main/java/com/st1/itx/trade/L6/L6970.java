@@ -75,6 +75,15 @@ public class L6970 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "批次工作明細檔");
 		}
 
+		moveTota(resultList);
+
+		if (l6970ServiceImpl.hasNext()) {
+			titaVo.setReturnIndex(this.setIndexNext());
+			this.totaVo.setMsgEndToEnter();
+		}
+	}
+
+	private void moveTota(List<Map<String, String>> resultList) throws LogicException {
 		for (Map<String, String> result : resultList) {
 			String jobCode = result.get("JobCode");
 			String nestJobCode = result.get("NestJobCode");
@@ -101,11 +110,6 @@ public class L6970 extends TradeBuffer {
 			occursList.putParam("OOJobTxSeq", txSeq);
 
 			this.totaVo.addOccursList(occursList);
-		}
-
-		if (l6970ServiceImpl.hasNext()) {
-			titaVo.setReturnIndex(this.setIndexNext());
-			this.totaVo.setMsgEndToEnter();
 		}
 	}
 

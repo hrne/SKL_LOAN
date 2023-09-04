@@ -35,9 +35,11 @@ public class ScheduledCheckCa extends SysLogger {
 	 */
 	@Scheduled(cron = "0 30 08 * * ?")
 	public void doCheckCa() {
+		this.mustInfo("Active ScheduledCheckCa doCheckCa Every Day 08:30 ");
 		try {
 			boolean isHoliDay = this.init();
 			if (!isHoliDay) {
+				titaVo.putParam(ContentName.empnot, "999999");
 				checkCA.pfxExpiration(titaVo);
 			}
 		} catch (LogicException e) {

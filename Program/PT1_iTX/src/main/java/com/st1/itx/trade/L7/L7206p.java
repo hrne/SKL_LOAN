@@ -354,7 +354,10 @@ public class L7206p extends TradeBuffer {
 		String remoteFile = remoteDir + fileName;
 
 		// 呼叫SFTPCient
-		sftpClient.download(url, port, auth, localFile, remoteFile, titaVo);
+		boolean execError = sftpClient.download(url, port, auth, localFile, remoteFile, titaVo);
+		if (!execError) {
+			sendErrorMsg("從SFTP Server 無法下載到檔案(" + fileName + ")", titaVo);
+		}
 		return localFile;
 	}
 }

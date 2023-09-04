@@ -1,7 +1,5 @@
 package com.st1.itx.trade.L9;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 
@@ -104,20 +102,7 @@ public class L9711Report3 extends MakeReport {
 
 		this.info("L9711Report exec");
 
-		
 
-		try {
-
-			List = l9711ServiceImpl.findAll(titaVo);
-
-		} catch (Exception e) {
-
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.info("L9711ServiceImpl.LoanBorTx error = " + errors.toString());
-			return null;
-
-		}
 		String txcd = titaVo.getTxcd();
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();

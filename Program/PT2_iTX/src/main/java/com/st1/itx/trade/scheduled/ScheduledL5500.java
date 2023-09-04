@@ -74,13 +74,16 @@ public class ScheduledL5500 extends SysLogger {
 	 * SUN，MON，TUE，WED，THU，FRI，SAT）
 	 */
 	@Scheduled(cron = "0 30 15 * * ?")
-
-	public void tt() {
+	public void finalizePerformanceResults() {
+		this.mustInfo("Active ScheduledL5500 finalizePerformanceResults Every Day 15:30 ");
 		try {
 			boolean isHoliDay = this.init();
 			if (!isHoliDay) {
 				TitaVo tmpTitaVo = (TitaVo) this.titaVo.clone();
 				tmpTitaVo.putParam("BRNO", "0000");
+				// 2023-09-04 Wei 增加
+				tmpTitaVo.setDataBaseOnLine();
+				tmpTitaVo.putParam(ContentName.empnot, "999999");
 				MySpring.newTask("L5500", this.txBuffer, tmpTitaVo);
 			}
 		} catch (LogicException e) {

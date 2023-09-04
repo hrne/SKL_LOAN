@@ -142,12 +142,13 @@ public class L9711Report2 extends MakeReport {
 
 				lCustNotice = sCustNoticeService.findById(lCustNoticeId, titaVo);
 				// paper為N 表示不印
-				if (lCustNotice == null) {
-				} else {
-					if ("N".equals(lCustNotice.getPaperNotice())) {
-						continue;
-					}
-				}
+//				if (lCustNotice == null) {
+//					continue;
+//				} else {
+//					if ("N".equals(lCustNotice.getPaperNotice())) {
+//						continue;
+//					}
+//				}
 
 				// 每次戶號額度都不一樣
 				report(tL9711Vo, txbuffer);

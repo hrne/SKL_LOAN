@@ -16,12 +16,7 @@ import javax.persistence.Embeddable;
 public class PfInsCheckId implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 3931353147310242644L;
-
-// 類別
+  // 類別
   /* 0:換算業績、業務報酬1:介紹獎金、協辦獎金2:介紹人加碼獎勵津貼 */
   @Column(name = "`Kind`")
   private int kind = 0;

@@ -27,47 +27,26 @@ public class LM059ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 
 	}
-
 	/**
 	 * 執行報表輸出
 	 * 
 	 * @param titaVo
-	 * @param yearMonth   西元年月
+	 * @param yearMonth 西元年月
 	 * @param ilYearMonth 上西元年月
 	 */
-	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth, int ilYearMonth) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth,int ilYearMonth) throws Exception {
+
+		
 
 		String iYearMonth = String.valueOf(yearMonth);
 
 		this.info("lM059.findAll YYMM=" + iYearMonth);
 
-		String sql = "SELECT ROUND(SUM(NVL(D.\"LoanBalance\",0)),0)                  AS F0";
-		sql += "            ,SUM(NVL(D.\"TdBal\",0))                                 AS F1";
-		sql += "            ,SUM(NVL(D.\"LoanBalance\",0)) - SUM(NVL(D.\"TdBal\",0)) AS F2";
-		sql += "      FROM(SELECT 1 AS \"Group\"";
-		sql += "                 ,NVL(I.\"BookValue\",M.\"LoanBalance\") AS \"LoanBalance\"";
-		sql += "                 ,0 AS \"TdBal\"";
-		sql += "           FROM \"MonthlyLoanBal\" M ";
-		sql += "           LEFT JOIN \"Ias39IntMethod\" I ON I.\"CustNo\" = M.\"CustNo\"";
-		sql += "                                         AND I.\"FacmNo\" = M.\"FacmNo\"";
-		sql += "                                         AND I.\"BormNo\" = M.\"BormNo\"";
-		sql += "                                         AND I.\"YearMonth\" = M.\"YearMonth\"";
-		sql += "           WHERE M.\"YearMonth\" = :yymm";
-		sql += "           UNION ALL";
-		sql += "           SELECT 1 AS \"Group\"";
-		sql += "                 ,0 AS \"LoanBalance\"";
-		sql += "                 ,\"LegalLoss\" AS \"TdbBal\"";
-		sql += "           FROM \"MonthlyLM052Loss\" ";
-		sql += "           WHERE \"YearMonth\" = :lyymm";
-//		sql += "           UNION ALL";
-//		sql += "           SELECT 1 AS \"Group\"";
-//		sql += "                 ,0 AS \"LoanBalance\"";
-//		sql += "                 ,A.\"TdBal\"";
-//		sql += "           FROM \"AcMain\" A";
-//		sql += "           WHERE A.\"MonthEndYm\" = :yymm";
-//		sql += "             AND A.\"AcctCode\" IN ('F18')"; // 備抵呆帳－催收款項－放款部 2021/2/4
-		sql += "          ) D";
-		sql += "      GROUP BY D.\"Group\"";
+		String sql = "SELECT SUM(CASE WHEN \"AcNoCode\" IN ('10603','10604') THEN  \"TdBal\" ELSE 0 END )   AS F0";
+		sql += "            ,SUM(CASE WHEN \"AcNoCode\" IN ('10623','10624') THEN  \"TdBal\" ELSE 0 END )   AS F1";
+		sql += "            ,SUM(CASE WHEN \"AcNoCode\" IN ('10603','10604','10623','10624') THEN  \"TdBal\" ELSE 0 END ) AS F2";
+		sql += "           FROM \"CoreAcMain\" ";
+		sql += "           WHERE \"AcDate\" =  TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR(:yymm*100+1), 'YYYYMMDD')),'YYYYMMDD'))";
 		this.info("sql=" + sql);
 
 		Query query;

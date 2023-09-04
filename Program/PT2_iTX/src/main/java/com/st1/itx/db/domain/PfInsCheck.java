@@ -25,12 +25,7 @@ import com.st1.itx.Exception.LogicException;
 public class PfInsCheck implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -1227461952419821699L;
-
-@EmbeddedId
+  @EmbeddedId
   private PfInsCheckId pfInsCheckId;
 
   // 類別
@@ -86,6 +81,10 @@ public class PfInsCheck implements Serializable {
   // 回應訊息3
   @Column(name = "`ReturnMsg3`", length = 2000)
   private String returnMsg3;
+
+  // 業績工作月
+  @Column(name = "`PerfWorkMonth`")
+  private int perfWorkMonth = 0;
 
   // 建檔日期時間
   @CreatedDate
@@ -366,6 +365,25 @@ public class PfInsCheck implements Serializable {
   }
 
 /**
+	* 業績工作月<br>
+	* 
+	* @return Integer
+	*/
+  public int getPerfWorkMonth() {
+    return this.perfWorkMonth;
+  }
+
+/**
+	* 業績工作月<br>
+	* 
+  *
+  * @param perfWorkMonth 業績工作月
+	*/
+  public void setPerfWorkMonth(int perfWorkMonth) {
+    this.perfWorkMonth = perfWorkMonth;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -446,6 +464,7 @@ public class PfInsCheck implements Serializable {
   public String toString() {
     return "PfInsCheck [pfInsCheckId=" + pfInsCheckId + ", creditSysNo=" + creditSysNo + ", custId=" + custId + ", applDate=" + applDate
            + ", insDate=" + insDate + ", insNo=" + insNo + ", checkResult=" + checkResult + ", checkWorkMonth=" + checkWorkMonth + ", returnMsg=" + returnMsg + ", returnMsg2=" + returnMsg2
-           + ", returnMsg3=" + returnMsg3 + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", returnMsg3=" + returnMsg3 + ", perfWorkMonth=" + perfWorkMonth + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

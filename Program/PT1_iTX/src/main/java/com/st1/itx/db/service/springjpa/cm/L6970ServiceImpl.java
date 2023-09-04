@@ -40,6 +40,7 @@ public class L6970ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int inputStartDate = parse.stringToInteger(titaVo.getParam("InputStartDate")) + 19110000;
 		int inputEndDate = parse.stringToInteger(titaVo.getParam("InputEndDate")) + 19110000;
 		int errorTypeCode = parse.stringToInteger(titaVo.getParam("ErrorTypeCode"));
+		String inputJobSeq = titaVo.getParam("InputJobTxSeq");
 
 		String sql = "";
 		sql += " WITH E AS ( ";
@@ -105,6 +106,9 @@ public class L6970ServiceImpl extends ASpringJpaParm implements InitializingBean
 			this.error("unexpected errorTypeCode : " + errorTypeCode);
 			break;
 		}
+		if (inputJobSeq != null && !inputJobSeq.isEmpty()) {
+			sql += " AND I.\"TxSeq\" = :inputJobSeq";
+		}
 		sql += " ORDER BY I.\"StepStartTime\" DESC ";
 
 		this.info("sql=" + sql);
@@ -113,6 +117,7 @@ public class L6970ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query = em.createNativeQuery(sql);
 		query.setParameter("inputStartDate", inputStartDate);
 		query.setParameter("inputEndDate", inputEndDate);
+		query.setParameter("inputJobSeq", inputJobSeq);
 
 		return switchback(query);
 	}

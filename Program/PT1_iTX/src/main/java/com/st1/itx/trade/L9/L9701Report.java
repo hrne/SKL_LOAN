@@ -293,7 +293,7 @@ public class L9701Report extends MakeReport {
 				}
 
 				// 每一筆都會判斷是否換頁
-				this.headNo = 1;
+				this.headNo = 0;
 //				this.nextPage(0);
 
 				// 先判斷大於43行 (是因為要結算留位置並換換下一頁新的額度
