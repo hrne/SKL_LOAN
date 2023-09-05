@@ -2,8 +2,6 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
-import java.math.BigDecimal;
-
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.PfInsCheck;
@@ -48,6 +46,18 @@ public interface PfInsCheckService {
    * @return Slice PfInsCheck PfInsCheck of List
    */
   public Slice<PfInsCheck> findCheckWorkMonthEq(int checkWorkMonth_0, int kind_1, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * PerfWorkMonth= ,AND Kind= ,AND CustNo= ,AND FacmNo=
+   *
+   * @param perfWorkMonth_0 perfWorkMonth_0
+   * @param kind_1 kind_1
+   * @param custNo_2 custNo_2
+   * @param facmNo_3 facmNo_3
+   * @param titaVo Variable-Length Argument
+   * @return Slice PfInsCheck PfInsCheck of List
+   */
+  public PfInsCheck findPerfWorkMonthFirst(int perfWorkMonth_0, int kind_1, int custNo_2, int facmNo_3, TitaVo... titaVo);
 
   /**
    * hold By PfInsCheck

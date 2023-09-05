@@ -27,12 +27,7 @@ import javax.persistence.GenerationType;
 public class PfItDetailAdjust implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -4568209505456388685L;
-
-// 序號
+  // 序號
   @Id
   @Column(name = "`LogNo`")
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "`PfItDetailAdjust_SEQ`")

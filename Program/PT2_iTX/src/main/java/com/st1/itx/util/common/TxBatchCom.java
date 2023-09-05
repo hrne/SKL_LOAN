@@ -2177,10 +2177,17 @@ public class TxBatchCom extends TradeBuffer {
 
 // loanBal 放款餘額(還款前)
 // this.feeRepayType 費用還款類別
+		int payIntDate = tDetail.getEntryDate();
+		// 員工扣薪的15日薪應繳日為月底日
+		if (tDetail.getRepayCode() == 3 && "4".equals(tDetail.getMediaKind())) {
+			dDateUtil.init();
+			dDateUtil.setDate_1(tDetail.getEntryDate());
+			payIntDate = (tDetail.getEntryDate() / 100) * 100 + dDateUtil.getMonLimit();
+		}
 		baTxList = new ArrayList<BaTxVo>();
 		// call 應繳試算，試算至應繳，可預收(批次可預收期數)， 應繳日設定為入帳日
 		try {
-			baTxList = baTxCom.settleUnPaid(tDetail.getEntryDate(), tDetail.getEntryDate(), tDetail.getCustNo(),
+			baTxList = baTxCom.settleUnPaid(tDetail.getEntryDate(), payIntDate, tDetail.getCustNo(),
 					this.repayFacmNo, this.repayBormNo, tDetail.getRepayCode(), this.repayType, tDetail.getRepayAmt(),
 					tTempVo, titaVo);
 		} catch (LogicException e) {

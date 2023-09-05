@@ -49,16 +49,12 @@ public class L9711p extends TradeBuffer {
 		String parentTranCode = titaVo.getTxcd();
 
 		l9711report.setParentTranCode(parentTranCode);
-		
 
 		List<Map<String, String>> l9711List = l9711report.exec(titaVo);
 
-		if (l9711List != null && !l9711List.isEmpty()) {
-			l9711report2.exec(titaVo, txbuffer, l9711List,parentTranCode);
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "L9711放款到期明細表及通知單已完成", titaVo);
-		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "L9711放款到期明細表及通知單查無資料", titaVo);
-		}
+		l9711report2.exec(titaVo, txbuffer, l9711List, parentTranCode);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
+				titaVo.getParam("TLRNO"), "L9711放款到期明細表及通知單已完成", titaVo);
 
 		if (true) {
 			this.addList(this.totaVo);

@@ -29,12 +29,7 @@ import com.st1.itx.Exception.LogicException;
 public class PfRewardMedia implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 7050970612646871653L;
-
-// 系統序號
+  // 系統序號
   @Id
   @Column(name = "`BonusNo`")
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "`PfRewardMedia_SEQ`")

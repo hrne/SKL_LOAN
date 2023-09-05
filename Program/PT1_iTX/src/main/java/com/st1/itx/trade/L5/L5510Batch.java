@@ -84,8 +84,6 @@ public class L5510Batch extends TradeBuffer {
 	private int minusCnt;// 負業績
 	private int iWorkMonthS = 0; // 西元
 
-	private ArrayList<PfInsCheck> lPfInsCheck = new ArrayList<PfInsCheck>();// 房貸獎勵保費檢核檔.xlsx
-
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5510Batch ");
@@ -93,7 +91,7 @@ public class L5510Batch extends TradeBuffer {
 
 		String iFunCode = titaVo.getParam("FunCode").trim();// 使用功能
 		iWorkMonth = parse.stringToInteger(titaVo.getParam("WorkMonth")) + 191100;
-		iWorkMonthS =  parse.stringToInteger(titaVo.getParam("Months")) + 191100;
+		iWorkMonthS = parse.stringToInteger(titaVo.getParam("Months")) + 191100;
 		if ("1".equals(iFunCode)) {
 			toCheck(titaVo);
 		} else if ("2".equals(iFunCode)) {
@@ -112,7 +110,7 @@ public class L5510Batch extends TradeBuffer {
 		// 刪除本月保費檢核資料(重新執行用)
 		Slice<PfInsCheck> slPfInsCheck = pfInsCheckService.findCheckWorkMonthEq(iWorkMonth, 0, 0, Integer.MAX_VALUE,
 				titaVo);
-		if (slPfInsCheck != null ) { 
+		if (slPfInsCheck != null) {
 			List<PfInsCheck> lPfInsCheckDelete = new ArrayList<PfInsCheck>();
 			lPfInsCheckDelete = slPfInsCheck.getContent();
 			try {
@@ -133,7 +131,7 @@ public class L5510Batch extends TradeBuffer {
 					lPfItDetailDelete.add(pfIt);
 				}
 			}
-			if(lPfItDetailDelete.size() > 0) {
+			if (lPfItDetailDelete.size() > 0) {
 				try {
 					pfItDetailService.deleteAll(lPfItDetailDelete, titaVo); // update
 				} catch (DBException e) {
@@ -147,7 +145,7 @@ public class L5510Batch extends TradeBuffer {
 
 		int custNo = 0;
 		int facmNo = 0;
-
+		int bormNo = 0;
 
 		slPfItDetail = pfItDetailService.findByWorkMonth(iWorkMonthS, iWorkMonth, 0, Integer.MAX_VALUE);
 
@@ -171,12 +169,14 @@ public class L5510Batch extends TradeBuffer {
 			ArrayList<PfItDetail> lPfFac = new ArrayList<PfItDetail>(); // 額度業績
 			custNo = slPfItDetail.getContent().get(0).getCustNo();
 			facmNo = slPfItDetail.getContent().get(0).getFacmNo();
+			bormNo = slPfItDetail.getContent().get(0).getBormNo();
 			for (PfItDetail pfIt : lPfItDetail) {
-				// 額度不同則執行房貸獎勵保費檢核、產生發放媒體
-				if (pfIt.getCustNo() != custNo || pfIt.getFacmNo() != facmNo) {
+				// 撥款不同則執行房貸獎勵保費檢核、產生發放媒體
+				if (pfIt.getCustNo() != custNo || pfIt.getFacmNo() != facmNo || pfIt.getBormNo() != bormNo) {
 					calculate(custNo, facmNo, lPfFac, titaVo);
 					custNo = pfIt.getCustNo();
 					facmNo = pfIt.getFacmNo();
+					bormNo = pfIt.getBormNo();
 					lPfFac = new ArrayList<PfItDetail>();
 					this.batchTransaction.commit();
 				}
@@ -187,8 +187,9 @@ public class L5510Batch extends TradeBuffer {
 
 		this.batchTransaction.commit();
 
-		this.info("lPfInsCheck size=" + lPfInsCheck.size());
-		if (lPfInsCheck.size() > 0) {
+		slPfInsCheck = pfInsCheckService.findCheckWorkMonthEq(iWorkMonth, 0, 0, Integer.MAX_VALUE, titaVo);
+
+		if (slPfInsCheck != null) {
 			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5510.1", "房貸獎勵保費檢核檔(業績報酬)",
 					"房貸獎勵保費檢核檔(業績報酬)", "業績報酬");
 
@@ -202,9 +203,8 @@ public class L5510Batch extends TradeBuffer {
 			makeExcel.setValue(row, 7, "保單號碼");
 			makeExcel.setValue(row, 8, "檢核結果");
 			makeExcel.setValue(row, 9, "檢核工作月");
-			for (PfInsCheck pf : lPfInsCheck) {
-				this.info("lPfInsCheck =" + pf.toString());
-				this.info("lPfInsCheck2 =" + pf.getCustNo() + "/" + pf.getFacmNo());
+			makeExcel.setValue(row, 10, "業績工作月");
+			for (PfInsCheck pf : slPfInsCheck.getContent()) {
 				row++;
 				makeExcel.setValue(row, 1, String.format("%07d", pf.getCustNo()));
 				makeExcel.setValue(row, 2, String.format("%03d", pf.getFacmNo()));
@@ -215,6 +215,7 @@ public class L5510Batch extends TradeBuffer {
 				makeExcel.setValue(row, 7, pf.getInsNo());
 				makeExcel.setValue(row, 8, pf.getCheckResult());
 				makeExcel.setValue(row, 9, String.format("%05d", pf.getCheckWorkMonth() - 191100));
+				makeExcel.setValue(row, 10, String.format("%05d", pf.getPerfWorkMonth() - 191100));
 			}
 			makeExcel.close();
 		}
@@ -294,71 +295,102 @@ public class L5510Batch extends TradeBuffer {
 		}
 
 		// 執行房貸獎勵保費檢核
-		PfInsCheck tPfInsCheck = pfCheckInsuranceCom.check(0, iCustNo, iFacmNo, iWorkMonth, titaVo); // 0.換算業績、業務報酬
+		PfInsCheck tPfInsCheck = new PfInsCheck();
+		if (eqAmtPlus.compareTo(BigDecimal.ZERO) != 0
+				|| rewardPlus.compareTo(BigDecimal.ZERO) != 0 && eqAmtMinus.compareTo(BigDecimal.ZERO) != 0
+				|| rewardMinus.compareTo(BigDecimal.ZERO) != 0) {
+			tPfInsCheck = pfCheckInsuranceCom.check(0, iCustNo, iFacmNo, iWorkMonth, iWorkMonth, titaVo); // 0.換算業績、業務報酬
+			this.info("after pfCheckInsuranceCom = " + tPfInsCheck.toString());
 
-		this.info("after pfCheckInsuranceCom = " + tPfInsCheck.getCustNo() + "/" + tPfInsCheck.getFacmNo());
-		lPfInsCheck.add(tPfInsCheck);
+			// 計算正業績，本工作月正業績一率寫入
+			// 計算負業績
+			// 1.本工作月撥款，檢核結果為Y要追回
+			// 2.本工作月還款，檢核結果為N要追回(檢核結果為Y時已追回撥款，故還款不用追回)
+			// 3.檢核結果為Y且檢核工作月為本月，追回前月累計
 
-		// 計算正業績，本工作月正業績一率寫入
-		// 計算負業績
-		// 1.本工作月撥款，檢核結果為Y要追回
-		// 2.本工作月還款，檢核結果為N要追回(檢核結果為Y時已追回撥款，故還款不用追回)
-		// 3.檢核結果為Y且檢核工作月為本月，追回前月累計
-
-		// 寫入本月正業績
-		for (PfItDetail pf : lPfItDetail) {
-			if (pf.getWorkMonth() == iWorkMonth) {
-				if (pf.getPerfEqAmt().compareTo(BigDecimal.ZERO) > 0
-						|| pf.getPerfReward().compareTo(BigDecimal.ZERO) > 0) {
-					updatePfItDetail(pf, titaVo);
-				}
-			}
-		}
-
-		// 寫入負業績， 1.本工作月撥款，檢核結果為Y要追回，清除負業績(檢核結果為Y時已追回撥款，故還款不用追回)
-		if ("Y".equals(tPfInsCheck.getCheckResult())) {
-			if (eqAmtPlus.compareTo(BigDecimal.ZERO) > 0 || rewardPlus.compareTo(BigDecimal.ZERO) > 0) {
-				reverseUpdate(eqAmtPlus, rewardPlus, drawdownAmtPlus, lPfItDetail, titaVo);
-			}
+			// 寫入本月正業績
 			for (PfItDetail pf : lPfItDetail) {
 				if (pf.getWorkMonth() == iWorkMonth) {
-					updateMediaFg(3, pf, titaVo); // 3.保費檢核結果為Y時已追回撥款，還款不用追回
-				}
-			}
-		}
-
-		// 寫入負業績，2.本工作月還款，檢核結果為N要追回
-		if ("N".equals(tPfInsCheck.getCheckResult())) {
-			for (PfItDetail pf : lPfItDetail) {
-				if (pf.getWorkMonth() == iWorkMonth) {
-					if (pf.getPerfEqAmt().compareTo(BigDecimal.ZERO) < 0
-							|| pf.getPerfReward().compareTo(BigDecimal.ZERO) < 0) {
+					if (pf.getPerfEqAmt().compareTo(BigDecimal.ZERO) > 0
+							|| pf.getPerfReward().compareTo(BigDecimal.ZERO) > 0) {
 						updatePfItDetail(pf, titaVo);
-						minusCnt++;
+						if ("Y".equals(tPfInsCheck.getCheckResult())) {
+							if (eqAmtPlus.compareTo(BigDecimal.ZERO) > 0 || rewardPlus.compareTo(BigDecimal.ZERO) > 0) {
+								reverseUpdate(pf, pf.getPerfEqAmt(), pf.getPerfReward(), drawdownAmtPlus, titaVo);
+							}
+						}
+					}
+				}
+			}
+
+			// 寫入負業績， 1.本工作月撥款，檢核結果為Y要追回，清除負業績(檢核結果為Y時已追回撥款，故還款不用追回)
+			if ("Y".equals(tPfInsCheck.getCheckResult())) {
+				for (PfItDetail pf : lPfItDetail) {
+					if (pf.getWorkMonth() == iWorkMonth) {
+						if (pf.getPerfEqAmt().compareTo(BigDecimal.ZERO) < 0
+								|| pf.getPerfReward().compareTo(BigDecimal.ZERO) < 0) {
+							updateMediaFg(3, pf, titaVo); // 3.保費檢核結果為Y時已追回撥款，還款不用追回
+						}
+					}
+				}
+
+				// 寫入負業績，2.本工作月還款，檢核結果為N要追回
+				if (!"Y".equals(tPfInsCheck.getCheckResult())) {
+					for (PfItDetail pf : lPfItDetail) {
+						if (pf.getWorkMonth() == iWorkMonth) {
+							if (pf.getPerfEqAmt().compareTo(BigDecimal.ZERO) < 0
+									|| pf.getPerfReward().compareTo(BigDecimal.ZERO) < 0) {
+								updatePfItDetail(pf, titaVo);
+								minusCnt++;
+							}
+						}
 					}
 				}
 			}
 		}
-
 		// 寫入負業績，3.檢核結果為Y且檢核工作月為本月，追回前月累計
-		if ("Y".equals(tPfInsCheck.getCheckResult()) && tPfInsCheck.getCheckWorkMonth() == iWorkMonth) {
+
+		for (PfItDetail pf : lPfItDetail) {
 			if (eqAmtLM.compareTo(BigDecimal.ZERO) > 0 || rewardLM.compareTo(BigDecimal.ZERO) > 0) {
-				reverseUpdate(eqAmtLM, rewardLM, drawdownAmtLM, lPfItDetail, titaVo);
+				BigDecimal eqAmt = BigDecimal.ZERO;
+				BigDecimal reward = BigDecimal.ZERO;
+				if (pf.getWorkMonth() < iWorkMonth) {
+					if (pf.getPerfEqAmt().compareTo(BigDecimal.ZERO) > 0
+							|| pf.getPerfReward().compareTo(BigDecimal.ZERO) > 0) {
+						tPfInsCheck = pfCheckInsuranceCom.check(0, iCustNo, iFacmNo, pf.getWorkMonth(), iWorkMonth,
+								titaVo); // 0.換算業績、業務報酬
+						if ("Y".equals(tPfInsCheck.getCheckResult()) && tPfInsCheck.getCheckWorkMonth() == iWorkMonth) {
+							if (pf.getPerfEqAmt().compareTo(eqAmtLM) > 0) {
+								eqAmt = eqAmtLM;
+								eqAmtLM = BigDecimal.ZERO;
+							} else {
+								eqAmt = pf.getPerfEqAmt();
+								eqAmtLM = eqAmtLM.subtract(pf.getPerfEqAmt());
+							}
+							if (pf.getPerfEqAmt().compareTo(eqAmtLM) > 0) {
+								reward = rewardLM;
+								rewardLM = BigDecimal.ZERO;
+							} else {
+								reward = pf.getPerfReward();
+								rewardLM = rewardLM.subtract(pf.getPerfReward());
+							}
+							reverseUpdate(pf, eqAmt, reward, drawdownAmtLM, titaVo);
+						}
+					}
+				}
 			}
 		}
-
 	}
 
 	// 寫入負業績，3.檢核結果為Y且檢核工作月為本月，追回金額
-	private void reverseUpdate(BigDecimal eqAmt, BigDecimal reward, BigDecimal drawdownAmt,
-			List<PfItDetail> lPfItDetail, TitaVo titaVo) throws LogicException {
+	private void reverseUpdate(PfItDetail pfIt, BigDecimal eqAmt, BigDecimal reward, BigDecimal drawdownAmt,
+			TitaVo titaVo) throws LogicException {
 		this.info("reverse EqAmt=" + eqAmt + ", Reward=" + reward);
 		minusCnt++;
 		eqAmt = BigDecimal.ZERO.subtract(eqAmt);
 		reward = BigDecimal.ZERO.subtract(reward);
 		drawdownAmt = BigDecimal.ZERO.subtract(drawdownAmt);
 
-		PfItDetail pfIt = lPfItDetail.get(lPfItDetail.size() - 1); // 最新一筆
 		// 工作月(西曆)
 		CdWorkMonth tCdWorkMonth = cdWorkMonthService.findById(new CdWorkMonthId(iWorkMonth / 100, iWorkMonth % 100),
 				titaVo);
@@ -451,7 +483,6 @@ public class L5510Batch extends TradeBuffer {
 		}
 
 	}
-
 
 	/**
 	 * 產生媒體檔

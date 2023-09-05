@@ -2,12 +2,8 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import com.st1.itx.util.StaticTool;
-import com.st1.itx.Exception.LogicException;
 
 /**
  * PfInsCheck 房貸獎勵保費檢核檔<br>
@@ -33,13 +29,24 @@ public class PfInsCheckId implements Serializable {
   @Column(name = "`FacmNo`")
   private int facmNo = 0;
 
+  // 檢核工作月
+  /* 檢核結果已為Y者不再變動，N則篩選借款書申請日三個月內者再次檢核 */
+  @Column(name = "`CheckWorkMonth`")
+  private int checkWorkMonth = 0;
+
+  // 業績工作月
+  @Column(name = "`PerfWorkMonth`")
+  private int perfWorkMonth = 0;
+
   public PfInsCheckId() {
   }
 
-  public PfInsCheckId(int kind, int custNo, int facmNo) {
+  public PfInsCheckId(int kind, int custNo, int facmNo, int checkWorkMonth, int perfWorkMonth) {
     this.kind = kind;
     this.custNo = custNo;
     this.facmNo = facmNo;
+    this.checkWorkMonth = checkWorkMonth;
+    this.perfWorkMonth = perfWorkMonth;
   }
 
 /**
@@ -103,10 +110,48 @@ public class PfInsCheckId implements Serializable {
     this.facmNo = facmNo;
   }
 
+/**
+	* 檢核工作月<br>
+	* 檢核結果已為Y者不再變動，N則篩選借款書申請日三個月內者再次檢核
+	* @return Integer
+	*/
+  public int getCheckWorkMonth() {
+    return this.checkWorkMonth;
+  }
+
+/**
+	* 檢核工作月<br>
+	* 檢核結果已為Y者不再變動，N則篩選借款書申請日三個月內者再次檢核
+  *
+  * @param checkWorkMonth 檢核工作月
+	*/
+  public void setCheckWorkMonth(int checkWorkMonth) {
+    this.checkWorkMonth = checkWorkMonth;
+  }
+
+/**
+	* 業績工作月<br>
+	* 
+	* @return Integer
+	*/
+  public int getPerfWorkMonth() {
+    return this.perfWorkMonth;
+  }
+
+/**
+	* 業績工作月<br>
+	* 
+  *
+  * @param perfWorkMonth 業績工作月
+	*/
+  public void setPerfWorkMonth(int perfWorkMonth) {
+    this.perfWorkMonth = perfWorkMonth;
+  }
+
 
   @Override
   public int hashCode() {
-    return Objects.hash(kind, custNo, facmNo);
+    return Objects.hash(kind, custNo, facmNo, checkWorkMonth, perfWorkMonth);
   }
 
   @Override
@@ -116,11 +161,11 @@ public class PfInsCheckId implements Serializable {
     if(obj == null || getClass() != obj.getClass())
       return false;
     PfInsCheckId pfInsCheckId = (PfInsCheckId) obj;
-    return kind == pfInsCheckId.kind && custNo == pfInsCheckId.custNo && facmNo == pfInsCheckId.facmNo;
+    return kind == pfInsCheckId.kind && custNo == pfInsCheckId.custNo && facmNo == pfInsCheckId.facmNo && checkWorkMonth == pfInsCheckId.checkWorkMonth && perfWorkMonth == pfInsCheckId.perfWorkMonth;
   }
 
   @Override
   public String toString() {
-    return "PfInsCheckId [kind=" + kind + ", custNo=" + custNo + ", facmNo=" + facmNo + "]";
+    return "PfInsCheckId [kind=" + kind + ", custNo=" + custNo + ", facmNo=" + facmNo + ", checkWorkMonth=" + checkWorkMonth + ", perfWorkMonth=" + perfWorkMonth + "]";
   }
 }

@@ -1,8 +1,6 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -69,7 +67,7 @@ public class PfInsCheck implements Serializable {
 
   // 檢核工作月
   /* 檢核結果已為Y者不再變動，N則篩選借款書申請日三個月內者再次檢核 */
-  @Column(name = "`CheckWorkMonth`")
+  @Column(name = "`CheckWorkMonth`", insertable = false, updatable = false)
   private int checkWorkMonth = 0;
 
   // 回應訊息1
@@ -85,7 +83,7 @@ public class PfInsCheck implements Serializable {
   private String returnMsg3;
 
   // 業績工作月
-  @Column(name = "`PerfWorkMonth`")
+  @Column(name = "`PerfWorkMonth`", insertable = false, updatable = false)
   private int perfWorkMonth = 0;
 
   // 建檔日期時間
@@ -465,8 +463,8 @@ public class PfInsCheck implements Serializable {
   @Override
   public String toString() {
     return "PfInsCheck [pfInsCheckId=" + pfInsCheckId + ", creditSysNo=" + creditSysNo + ", custId=" + custId + ", applDate=" + applDate
-           + ", insDate=" + insDate + ", insNo=" + insNo + ", checkResult=" + checkResult + ", checkWorkMonth=" + checkWorkMonth + ", returnMsg=" + returnMsg + ", returnMsg2=" + returnMsg2
-           + ", returnMsg3=" + returnMsg3 + ", perfWorkMonth=" + perfWorkMonth + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + ", insDate=" + insDate + ", insNo=" + insNo + ", checkResult=" + checkResult + ", returnMsg=" + returnMsg + ", returnMsg2=" + returnMsg2
+           + ", returnMsg3=" + returnMsg3 + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
            + "]";
   }
 }

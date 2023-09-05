@@ -29,12 +29,7 @@ import com.st1.itx.Exception.LogicException;
 public class PfItDetail implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -2817704839027179827L;
-
-// 序號
+  // 序號
   @Id
   @Column(name = "`LogNo`")
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "`PfItDetail_SEQ`")
@@ -164,7 +159,7 @@ public class PfItDetail implements Serializable {
   private int mediaFg = 0;
 
   // 調整記號
-  /* 0:未調整(BS996業績重算時,只重算未調整)1:同工作月調整   2:跨工作月調整 */
+  /* 0:未調整(BS996業績重算時,只重算未調整)1:同工作月調整   2:跨工作月調整(新增) */
   @Column(name = "`AdjRange`")
   private int adjRange = 0;
 
@@ -721,7 +716,7 @@ public class PfItDetail implements Serializable {
 	* 調整記號<br>
 	* 0:未調整(BS996業績重算時,只重算未調整)
 1:同工作月調整   
-2:跨工作月調整
+2:跨工作月調整(新增)
 	* @return Integer
 	*/
   public int getAdjRange() {
@@ -732,7 +727,7 @@ public class PfItDetail implements Serializable {
 	* 調整記號<br>
 	* 0:未調整(BS996業績重算時,只重算未調整)
 1:同工作月調整   
-2:跨工作月調整
+2:跨工作月調整(新增)
   *
   * @param adjRange 調整記號
 	*/

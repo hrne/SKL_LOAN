@@ -93,7 +93,6 @@ public class L5511Batch extends TradeBuffer {
 	private int iWorkMonthS = 0; 
 	private ArrayList<PfReward> lPfPlus = new ArrayList<PfReward>(); // 正業績
 	private ArrayList<PfReward> lPfMinus = new ArrayList<PfReward>();// 負業績
-	private ArrayList<PfInsCheck> lPfInsCheck = new ArrayList<PfInsCheck>();// 房貸獎勵保費檢核檔.xlsx
 
 	private String msg = "";
 
@@ -180,10 +179,11 @@ public class L5511Batch extends TradeBuffer {
 			this.info("Minus =" + pf.toString());
 		}
 
-		this.info("lPfInsCheck size=" + lPfInsCheck.size());
-		if (lPfInsCheck.size() > 0) {
-			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5511.1", "房貸獎勵保費檢核檔(介紹、協辦人獎金)",
-					"房貸獎勵保費檢核檔(介紹、協辦人獎金)", "介紹、協辦人獎金");
+		slPfInsCheck = pfInsCheckService.findCheckWorkMonthEq(iWorkMonth, 1, 0, Integer.MAX_VALUE, titaVo);
+
+		if (slPfInsCheck != null) {
+			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5510.1", "房貸獎勵保費檢核檔(業績報酬)",
+					"房貸獎勵保費檢核檔(業績報酬)", "業績報酬");
 
 			int row = 1;
 			makeExcel.setValue(row, 1, "戶號");
@@ -195,8 +195,10 @@ public class L5511Batch extends TradeBuffer {
 			makeExcel.setValue(row, 7, "保單號碼");
 			makeExcel.setValue(row, 8, "檢核結果");
 			makeExcel.setValue(row, 9, "檢核工作月");
-			for (PfInsCheck pf : lPfInsCheck) {
+			makeExcel.setValue(row, 10, "業績工作月");
+			for (PfInsCheck pf : slPfInsCheck.getContent()) {
 				this.info("lPfInsCheck =" + pf.toString());
+				this.info("lPfInsCheck2 =" + pf.getCustNo() + "/" + pf.getFacmNo());
 				row++;
 				makeExcel.setValue(row, 1, String.format("%07d", pf.getCustNo()));
 				makeExcel.setValue(row, 2, String.format("%03d", pf.getFacmNo()));
@@ -207,6 +209,7 @@ public class L5511Batch extends TradeBuffer {
 				makeExcel.setValue(row, 7, pf.getInsNo());
 				makeExcel.setValue(row, 8, pf.getCheckResult());
 				makeExcel.setValue(row, 9, String.format("%05d", pf.getCheckWorkMonth() - 191100));
+				makeExcel.setValue(row, 10, String.format("%05d", pf.getPerfWorkMonth() - 191100));
 			}
 			makeExcel.close();
 		}
@@ -255,9 +258,8 @@ public class L5511Batch extends TradeBuffer {
 		}
 		// 執行房貸獎勵保費檢核
 		processCnt++;
-		PfInsCheck tPfInsCheck = pfCheckInsuranceCom.check(1, iCustNo, iFacmNo, iWorkMonth, titaVo); // 1.介紹獎金、協辦獎金
+		PfInsCheck tPfInsCheck = pfCheckInsuranceCom.check(1, iCustNo, iFacmNo, iWorkMonth, iWorkMonth, titaVo); // 1.介紹獎金、協辦獎金
 
-		lPfInsCheck.add(tPfInsCheck);
 
 		// 計算負業績，本工作月還款追回或房貸獎勵保費檢核追回(本工作月檢核結果為Y)
 		// 1.本工作月撥款，檢核結果為Y要追回

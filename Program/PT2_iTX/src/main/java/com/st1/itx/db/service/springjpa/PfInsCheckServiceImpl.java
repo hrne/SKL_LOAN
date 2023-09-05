@@ -1,10 +1,7 @@
 package com.st1.itx.db.service.springjpa;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.math.BigDecimal;
-
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -94,9 +91,9 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "Kind", "CustNo", "FacmNo"));
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "Kind", "CustNo", "FacmNo", "CheckWorkMonth", "PerfWorkMonth"));
     else
-         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "Kind", "CustNo", "FacmNo"));
+         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "Kind", "CustNo", "FacmNo", "CheckWorkMonth", "PerfWorkMonth"));
     this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = pfInsCheckReposDay.findAll(pageable);
@@ -127,18 +124,37 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("findCheckWorkMonthEq " + dbName + " : " + "checkWorkMonth_0 : " + checkWorkMonth_0 + " kind_1 : " +  kind_1);
     if (dbName.equals(ContentName.onDay))
-      slice = pfInsCheckReposDay.findAllByCheckWorkMonthIsAndKindIsOrderByCustNoAscFacmNoAsc(checkWorkMonth_0, kind_1, pageable);
+      slice = pfInsCheckReposDay.findAllByCheckWorkMonthIsAndKindIsOrderByCustNoAscFacmNoAscPerfWorkMonthDesc(checkWorkMonth_0, kind_1, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = pfInsCheckReposMon.findAllByCheckWorkMonthIsAndKindIsOrderByCustNoAscFacmNoAsc(checkWorkMonth_0, kind_1, pageable);
+      slice = pfInsCheckReposMon.findAllByCheckWorkMonthIsAndKindIsOrderByCustNoAscFacmNoAscPerfWorkMonthDesc(checkWorkMonth_0, kind_1, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = pfInsCheckReposHist.findAllByCheckWorkMonthIsAndKindIsOrderByCustNoAscFacmNoAsc(checkWorkMonth_0, kind_1, pageable);
+      slice = pfInsCheckReposHist.findAllByCheckWorkMonthIsAndKindIsOrderByCustNoAscFacmNoAscPerfWorkMonthDesc(checkWorkMonth_0, kind_1, pageable);
     else 
-      slice = pfInsCheckRepos.findAllByCheckWorkMonthIsAndKindIsOrderByCustNoAscFacmNoAsc(checkWorkMonth_0, kind_1, pageable);
+      slice = pfInsCheckRepos.findAllByCheckWorkMonthIsAndKindIsOrderByCustNoAscFacmNoAscPerfWorkMonthDesc(checkWorkMonth_0, kind_1, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public PfInsCheck findPerfWorkMonthFirst(int perfWorkMonth_0, int kind_1, int custNo_2, int facmNo_3, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("findPerfWorkMonthFirst " + dbName + " : " + "perfWorkMonth_0 : " + perfWorkMonth_0 + " kind_1 : " +  kind_1 + " custNo_2 : " +  custNo_2 + " facmNo_3 : " +  facmNo_3);
+    Optional<PfInsCheck> pfInsCheckT = null;
+    if (dbName.equals(ContentName.onDay))
+      pfInsCheckT = pfInsCheckReposDay.findTopByPerfWorkMonthIsAndKindIsAndCustNoIsAndFacmNoIsOrderByCheckWorkMonthDesc(perfWorkMonth_0, kind_1, custNo_2, facmNo_3);
+    else if (dbName.equals(ContentName.onMon))
+      pfInsCheckT = pfInsCheckReposMon.findTopByPerfWorkMonthIsAndKindIsAndCustNoIsAndFacmNoIsOrderByCheckWorkMonthDesc(perfWorkMonth_0, kind_1, custNo_2, facmNo_3);
+    else if (dbName.equals(ContentName.onHist))
+      pfInsCheckT = pfInsCheckReposHist.findTopByPerfWorkMonthIsAndKindIsAndCustNoIsAndFacmNoIsOrderByCheckWorkMonthDesc(perfWorkMonth_0, kind_1, custNo_2, facmNo_3);
+    else 
+      pfInsCheckT = pfInsCheckRepos.findTopByPerfWorkMonthIsAndKindIsAndCustNoIsAndFacmNoIsOrderByCheckWorkMonthDesc(perfWorkMonth_0, kind_1, custNo_2, facmNo_3);
+
+    return pfInsCheckT.isPresent() ? pfInsCheckT.get() : null;
   }
 
   @Override

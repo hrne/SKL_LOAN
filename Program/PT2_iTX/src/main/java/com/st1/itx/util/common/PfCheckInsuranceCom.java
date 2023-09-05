@@ -75,31 +75,39 @@ public class PfCheckInsuranceCom extends TradeBuffer {
 	/**
 	 * 抓取核心系統保單資料，產生房貸獎勵保費檢核結果
 	 * 
-	 * @param iKind           Kind
+	 * @param iKind           0:換算業績、業務報酬 1:介紹獎金、協辦獎金 2:介紹人加碼獎勵津貼
 	 * @param iCustNo         CustNo
 	 * @param iFacmNo         FacmNo
-	 * @param iCheckWorkMonth CheckWorkMonth
+	 * @param iPerfWorkMonth  業績工作月
+	 * @param iCheckWorkMonth 檢核工作月
 	 * @param titaVo          TitaVo
 	 * @return PfInsCheck
 	 * @throws LogicException ...
 	 */
-	public PfInsCheck check(int iKind, int iCustNo, int iFacmNo, int iCheckWorkMonth, TitaVo titaVo)
+	public PfInsCheck check(int iKind, int iCustNo, int iFacmNo, int iPerfWorkMonth, int iCheckWorkMonth, TitaVo titaVo)
 			throws LogicException {
 		this.info("PfInsCheck check ..... Kind = " + iKind + "," + iCustNo + "-" + iFacmNo + "," + iCheckWorkMonth);
 
 		String returnMsg = null;
 		boolean isInsert = false;
-		init();
+
+		tPfInsCheck = pfInsCheckService.findPerfWorkMonthFirst(iPerfWorkMonth, iKind, iCustNo, iFacmNo, titaVo);
+		//如前工作月的保費檢核已是Y者(已追回),則本月份不再做保費檢核
+		if (tPfInsCheck != null && tPfInsCheck.getPerfWorkMonth() != iCheckWorkMonth && "Y".equals(tPfInsCheck.getCheckResult())) {
+			return tPfInsCheck;
+		}
+		//如本工作月已做保費檢核則本月份不再做保費檢核
+		if (tPfInsCheck != null && tPfInsCheck.getCheckWorkMonth() == iCheckWorkMonth) {
+			return tPfInsCheck;
+		}
+
 		// hold房貸獎勵保費檢核檔
 		tPfInsCheckId.setKind(iKind);
 		tPfInsCheckId.setCustNo(iCustNo);
 		tPfInsCheckId.setFacmNo(iFacmNo);
+		tPfInsCheckId.setPerfWorkMonth(iPerfWorkMonth);
+		tPfInsCheckId.setCheckWorkMonth(iCheckWorkMonth);
 		tPfInsCheck = pfInsCheckService.holdById(tPfInsCheckId, titaVo);
-
-		// 檢核結果已為Y者不再變動，N則篩選借款書申請日三個月內者再次檢核
-		if (tPfInsCheck != null && "Y".equals(tPfInsCheck.getCheckResult())) {
-			return tPfInsCheck;
-		}
 
 		// 新增房貸獎勵保費檢核檔
 		if (tPfInsCheck == null) {

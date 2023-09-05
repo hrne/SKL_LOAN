@@ -151,13 +151,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("findByWorkMonth " + dbName + " : " + "workMonth_0 : " + workMonth_0 + " workMonth_1 : " +  workMonth_1);
     if (dbName.equals(ContentName.onDay))
-      slice = pfItDetailReposDay.findAllByWorkMonthGreaterThanEqualAndWorkMonthLessThanEqualOrderByCustNoAscFacmNoAscBormNoAsc(workMonth_0, workMonth_1, pageable);
+      slice = pfItDetailReposDay.findAllByWorkMonthGreaterThanEqualAndWorkMonthLessThanEqualOrderByCustNoAscFacmNoAscBormNoAscWorkMonthDesc(workMonth_0, workMonth_1, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = pfItDetailReposMon.findAllByWorkMonthGreaterThanEqualAndWorkMonthLessThanEqualOrderByCustNoAscFacmNoAscBormNoAsc(workMonth_0, workMonth_1, pageable);
+      slice = pfItDetailReposMon.findAllByWorkMonthGreaterThanEqualAndWorkMonthLessThanEqualOrderByCustNoAscFacmNoAscBormNoAscWorkMonthDesc(workMonth_0, workMonth_1, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = pfItDetailReposHist.findAllByWorkMonthGreaterThanEqualAndWorkMonthLessThanEqualOrderByCustNoAscFacmNoAscBormNoAsc(workMonth_0, workMonth_1, pageable);
+      slice = pfItDetailReposHist.findAllByWorkMonthGreaterThanEqualAndWorkMonthLessThanEqualOrderByCustNoAscFacmNoAscBormNoAscWorkMonthDesc(workMonth_0, workMonth_1, pageable);
     else 
-      slice = pfItDetailRepos.findAllByWorkMonthGreaterThanEqualAndWorkMonthLessThanEqualOrderByCustNoAscFacmNoAscBormNoAsc(workMonth_0, workMonth_1, pageable);
+      slice = pfItDetailRepos.findAllByWorkMonthGreaterThanEqualAndWorkMonthLessThanEqualOrderByCustNoAscFacmNoAscBormNoAscWorkMonthDesc(workMonth_0, workMonth_1, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

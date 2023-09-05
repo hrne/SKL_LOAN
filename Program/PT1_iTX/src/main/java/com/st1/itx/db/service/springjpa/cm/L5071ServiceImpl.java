@@ -73,14 +73,15 @@ public class L5071ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   LEFT JOIN \"CustMain\" C";
 		sql += "          ON C.\"CustNo\" = N.\"CustNo\"";
 
-		if (!"".equals(titaVo.getParam("CustId").trim())) {
-			sql += "         AND C.\"CustId\" = :CustId";
-		}
+		//if (!"".equals(titaVo.getParam("CustId").trim())) {
+		//	sql += "         AND C.\"CustId\" = :CustId";
+		//}
 
-		sql += "  WHERE \"CustId\" IS NOT NULL";
-		if (!"".equals(titaVo.getParam("CustId").trim())) {
-			sql += "      AND \"CustId\" = :CustId";
-		}
+		sql += "  WHERE  1 = 1 ";
+
+		//if (!"".equals(titaVo.getParam("CustId").trim())) {
+		//	sql += "      AND \"CustId\" = :CustId";
+		//}
 
 		if (iCustNo != 0) {
 			sql += "   AND N.\"CustNo\" = :CustNo";
@@ -135,7 +136,11 @@ public class L5071ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   LEFT JOIN COUNTAPPR01 CA ON CA.\"CustNo\" = A.\"CustNo\"  ";
 		sql += "                           AND CA.\"CaseSeq\" = A.\"CaseSeq\"    ";
 
-		sql += "  WHERE A.\"CustId\" IS NOT NULL   ";
+		sql += "  WHERE A.\"CustId\" IS NOT NULL  ";
+		
+		if (!"".equals(titaVo.getParam("CustId").trim())) {
+			sql += "      AND A.\"CustId\" = :CustId";
+		}
 		
 		sql += "   ORDER BY  A.\"CustId\", A.\"CaseSeq\" ";
 
@@ -173,29 +178,58 @@ public class L5071ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String sql = " ";
 
-		sql += " WITH AllData AS ( "; 
-		sql += "   SELECT  N.\"CustNo\"         "; 
-		sql += "         , N.\"CaseSeq\"   "; 
-		sql += "         , N.\"CaseKindCode\"   "; 
-		sql += "         , N.\"CustLoanKind\"    "; 
-		sql += "         , N.\"Status\"         "; 
+		sql += " WITH TmpData AS ( "; 
+		sql += "   SELECT  N.\"CustNo\"         AS  \"CustNo\"        "; 
+		sql += "         , N.\"CaseSeq\"        AS  \"CaseSeq\"       "; 
+		sql += "         , N.\"CaseKindCode\"   AS  \"CaseKindCode\"  "; 
 		sql += "         , CASE WHEN NVL(C.\"CustId\",' ') = ' ' THEN  N.\"NegCustId\"   "; // 身分證字號
-		sql += "             ELSE C.\"CustId\"  END  AS   \"CustId\"                     "; // 
-		sql += "         , ROW_NUMBER()       "; 
-		sql += "           OVER (     "; 
-		sql += "             PARTITION BY  N.\"CustNo\" , N.\"CaseKindCode\" "; 
-		sql += "             ORDER BY  N.\"CaseSeq\" DESC"; 
-		sql += "                )  AS \"Seq\"    "; 
-		sql += "   FROM \"NegMain\" N";
-		sql += "   LEFT JOIN \"CustMain\" C";
-		sql += "          ON C.\"CustNo\" = N.\"CustNo\"";
-		if (!"".equals(titaVo.getParam("CustId").trim())) {
-			sql += "         AND C.\"CustId\" = :CustId";
+		sql += "             ELSE C.\"CustId\"  END  AS   \"CustId\"      "; // 
+		sql += "   FROM \"NegMain\" N ";
+		sql += "   LEFT JOIN \"CustMain\" C ";
+		sql += "          ON C.\"CustNo\" = N.\"CustNo\" ";
+		sql += "   WHERE   1 = 1 ";
+		if (iCustNo != 0) {
+			sql += "     AND N.\"CustNo\" = :CustNo ";
 		}
 
-		sql += "  WHERE \"CustId\" IS NOT NULL";
+		if (!"".equals(titaVo.getParam("CaseKindCode").trim())) {
+			sql += "     AND N.\"CaseKindCode\" = :CaseKindCode ";
+		}
+
+		if (!"".equals(titaVo.getParam("CustLoanKind").trim())) {
+			sql += "     AND N.\"CustLoanKind\" = :CustLoanKind ";
+		}
+
+		if (!"".equals(titaVo.getParam("Status").trim())) {
+			sql += "     AND N.\"Status\" = :Status ";
+		}else {
+			sql += "     AND N.\"Status\" IN ('0','2','3') ";
+		}
+		sql += " ) ,"; 
+		
+
+		sql += " AllData AS ( "; 
+		sql += "   SELECT  N.\"CustNo\"        AS \"CustNo\"       "; 
+		sql += "         , N.\"CaseSeq\"       AS \"CaseSeq\"      "; 
+		sql += "         , N.\"CaseKindCode\"  AS \"CaseKindCode\" "; 
+		sql += "         , N.\"CustLoanKind\"  AS \"CustLoanKind\" "; 
+		sql += "         , N.\"Status\"        AS \"Status\"       "; 
+		sql += "         , T.\"CustId\"        AS  \"CustId\"      "; 
+		sql += "         , ROW_NUMBER()       "; 
+		sql += "           OVER (     "; 
+		sql += "             PARTITION BY  T.\"CustId\" , N.\"CaseKindCode\" "; 
+		sql += "             ORDER BY  N.\"CustNo\" ASC , N.\"CaseSeq\" DESC"; 
+		sql += "                )  AS \"Seq\"    "; 
+		sql += "   FROM TmpData   T";
+		sql += "   LEFT JOIN \"NegMain\" N  ON  N.\"CustNo\" = T.\"CustNo\"   ";
+		sql += "                           AND  N.\"CaseSeq\" = N.\"CaseSeq\" ";
+//		sql += "   LEFT JOIN \"CustMain\" C";
+//		sql += "          ON C.\"CustNo\" = N.\"CustNo\"";
+
+		sql += "  WHERE 1 = 1 ";
+		
 		if (!"".equals(titaVo.getParam("CustId").trim())) {
-			sql += "      AND \"CustId\" = :CustId";
+			sql += "      AND T.\"CustId\" = :CustId";
 		}
 
 		if (iCustNo != 0) {
@@ -285,7 +319,10 @@ public class L5071ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                           AND CA.\"CaseSeq\" = A.\"CaseSeq\"    ";
 
 		sql += "  WHERE A.\"CustId\" IS NOT NULL   ";
-		sql += "    AND A.\"Seq\" = 1              ";//個案件種類只取一筆
+		sql += "    AND A.\"Seq\" = 1              ";//各案件種類只取一筆
+//		if (!"".equals(titaVo.getParam("CustId").trim())) {
+//		sql += "    AND A.\"CustId\" = :CustId";
+//	}
 		
 		sql += "   ORDER BY  A.\"CustId\", N.\"CaseSeq\" ";
 

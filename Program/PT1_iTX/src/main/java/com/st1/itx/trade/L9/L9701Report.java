@@ -356,7 +356,7 @@ public class L9701Report extends MakeReport {
 		// 入帳日
 		this.print(1, 4, showRocDate(tL9701Vo.get("EntryDate"), 1));
 
-		this.print(0, 1, this.NowRow + "");
+//		this.print(0, 1, this.NowRow + "");
 
 		// 繳款方式RepayItem
 		this.print(0, 14, tL9701Vo.get("RepayItem"));

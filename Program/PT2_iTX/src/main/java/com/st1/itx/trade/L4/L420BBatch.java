@@ -380,16 +380,15 @@ public class L420BBatch extends TradeBuffer {
 		int unCheckTotalCnt = 0; // 待檢核
 		int checkErrorTotalCnt = 0; // 檢核錯誤
 		int tempCnt = 0; // 需轉暫收
-		boolean isBankDeduct = false; // 銀行扣款入帳
-		boolean isBankRmtF = false; // 匯款轉帳入帳
+		boolean isAutoTemp = false; // 入帳失敗自動轉暫收
 		boolean isRepayCode1To4 = false; // RepayCode 1 To 4
+		int repayCode = 0; //
 
 		for (BatxDetail t : lBatxDetail) {
-			if (t.getRepayCode() == 2) {
-				isBankDeduct = true;
-			}
-			if (t.getRepayCode() == 1) {
-				isBankRmtF = true;
+			// 銀扣、員工扣薪入帳失敗自動轉暫收
+			repayCode = t.getRepayCode();
+			if (t.getRepayCode() == 2 || t.getRepayCode() == 3) {
+				isAutoTemp = true;
 			}
 			if (t.getRepayCode() >= 1 && t.getRepayCode() <= 4) {
 				isRepayCode1To4 = true;
@@ -441,8 +440,8 @@ public class L420BBatch extends TradeBuffer {
 				break;
 			}
 		}
-//      銀扣整批入帳，自動轉暫收  
-		if (isBankDeduct) {
+//      銀扣、員工扣薪入帳失敗自動轉暫收
+		if (isAutoTemp) {
 			if (iFunctionCode == 0) {
 				tempCnt = tempCnt + checkErrorCnt + manualCnt + unDoCnt;
 				checkErrorCnt = 0;
@@ -511,8 +510,8 @@ public class L420BBatch extends TradeBuffer {
 			MySpring.newTask("L420BBatch", this.txBuffer, titaVo);
 			return msg;
 		}
-//      銀扣整批入帳，自動轉暫收  
-		if (isBankDeduct) {
+//     銀扣、員工扣薪入帳失敗自動轉暫收
+		if (isAutoTemp) {
 			if (iFunctionCode == 0 && toDoTotalCnt > 0) {
 				titaVo.putParam("FunctionCode", "2");
 				MySpring.newTask("L420BBatch", this.txBuffer, titaVo);
@@ -522,7 +521,7 @@ public class L420BBatch extends TradeBuffer {
 		TxToDoDetail tTxToDoDetail;
 
 //		若銀扣處理完畢，寫1筆進入應處理清單
-		if ("4".equals(batxExeCode) && isBankDeduct) {
+		if ("4".equals(batxExeCode) && repayCode == 2) {
 			// size > 0 -> 新增應處理明細
 			tTxToDoDetail = new TxToDoDetail();
 			tTxToDoDetail.setItemCode("L4454"); // 產生銀扣扣款失敗
@@ -530,7 +529,7 @@ public class L420BBatch extends TradeBuffer {
 		}
 
 //		若匯款轉帳處理完畢，寫1筆進入應處理清單
-		if ("4".equals(batxExeCode) && isBankRmtF) {
+		if ("4".equals(batxExeCode) && repayCode == 1) {
 			// size > 0 -> 新增應處理明細
 			tTxToDoDetail = new TxToDoDetail();
 			tTxToDoDetail.setItemCode("L4702"); // 產生繳息通知單

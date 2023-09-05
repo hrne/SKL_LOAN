@@ -25,7 +25,7 @@ public interface PfItDetailRepositoryMon extends JpaRepository<PfItDetail, Long>
   public Slice<PfItDetail> findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByPerfDateAscFacmNoAscBormNoAsc(int custNo_0, int facmNo_1, int facmNo_2, Pageable pageable);
 
   // WorkMonth >= ,AND WorkMonth<=
-  public Slice<PfItDetail> findAllByWorkMonthGreaterThanEqualAndWorkMonthLessThanEqualOrderByCustNoAscFacmNoAscBormNoAsc(int workMonth_0, int workMonth_1, Pageable pageable);
+  public Slice<PfItDetail> findAllByWorkMonthGreaterThanEqualAndWorkMonthLessThanEqualOrderByCustNoAscFacmNoAscBormNoAscWorkMonthDesc(int workMonth_0, int workMonth_1, Pageable pageable);
 
   // CustNo = ,AND FacmNo =
   public Slice<PfItDetail> findAllByCustNoIsAndFacmNoIsOrderByCustNoAscFacmNoAscBormNoAsc(int custNo_0, int facmNo_1, Pageable pageable);

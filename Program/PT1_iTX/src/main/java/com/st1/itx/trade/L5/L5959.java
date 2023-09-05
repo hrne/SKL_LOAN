@@ -51,10 +51,14 @@ public class L5959 extends TradeBuffer {
 		int iKind = parse.stringToInteger(titaVo.getParam("Kind"));
 		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 		int iFacmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
+		int iCheckWorkMonth = parse.stringToInteger(titaVo.getParam("CheckWorkMonth")) + 191100;
+		int iPerfWorkMonth = parse.stringToInteger(titaVo.getParam("PerfWorkMonth")) + 191100;
 
 		pfInsCheckId.setKind(iKind);
 		pfInsCheckId.setCustNo(iCustNo);
 		pfInsCheckId.setFacmNo(iFacmNo);
+		pfInsCheckId.setCheckWorkMonth(iCheckWorkMonth);
+		pfInsCheckId.setPerfWorkMonth(iPerfWorkMonth);
 
 		PfInsCheck pfInsCheck = pfInsCheckService.findById(pfInsCheckId, titaVo);
 		CheckInsuranceVo checkVo = new CheckInsuranceVo();
@@ -104,6 +108,11 @@ public class L5959 extends TradeBuffer {
 			this.totaVo.putParam("oCheckWorkMonth", pfInsCheck.getCheckWorkMonth() - 191100);
 		} else {
 			this.totaVo.putParam("oCheckWorkMonth", 0);
+		}
+		if (pfInsCheck.getPerfWorkMonth() > 0) {//業績工作月
+			this.totaVo.putParam("oPerfWorkMonth", pfInsCheck.getPerfWorkMonth() - 191100);
+		} else {
+			this.totaVo.putParam("oPerfWorkMonth", 0);
 		}
 
 		if (checkVo.isSuccess() && !checkVo.getDetail().isEmpty()) {

@@ -97,13 +97,14 @@ public class LM088Report extends MakeReport {
 				String groupName = r.get("GroupName");
 				int entCode = parse.stringToInteger(r.get("EntCode"));
 				int custNo = parse.stringToInteger(r.get("CustNo"));
+				int custNoMain = parse.stringToInteger(r.get("CustNoMain"));
 				String custName = r.get("CustName");
 				String custid = r.get("CustId");
 				BigDecimal loanBal = getBigDecimal(r.get("LoanBal"));
 				loanBalTol = loanBalTol.add(loanBal);
 
 				int entCodeNext = entCode;
-				int custNoNext = custNo;
+				int custNoNext = custNoMain;
 				if (cnt + 1 < lLM088List.size()) {
 					entCodeNext = parse.stringToInteger(lLM088List.get(cnt + 1).get("EntCode"));
 					custNoNext = parse.stringToInteger(lLM088List.get(cnt + 1).get("CustNo"));
@@ -117,6 +118,7 @@ public class LM088Report extends MakeReport {
 
 				if (entCode != entCodeNext) {
 					makeExcel.setValue(row, 5, "同一關係人", "L");
+					row++;
 				}
 
 				makeExcel.setValue(row, 5, custName, "L");
@@ -126,7 +128,7 @@ public class LM088Report extends MakeReport {
 
 				// 若當前戶號與下一個戶號不同 或 整資料的最後一筆 需列印統計數
 
-				if (custNo != custNoNext) {
+				if (custNoMain != custNoNext) {
 					// ex:目標是印第4列，當筆數到第7列結束(row=7)，同時紀錄同一關係企業戶號的4筆數量(custNoMain=4)最後再+1
 					int tmpRow = row - custNoMainCnt + 1;
 					makeExcel.setValue(tmpRow, 2, groupName, "L");

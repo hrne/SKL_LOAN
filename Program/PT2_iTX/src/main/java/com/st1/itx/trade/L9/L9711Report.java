@@ -235,7 +235,7 @@ public class L9711Report extends MakeReport {
 					count = 0;
 					newPage();
 				}
-				if(talcount == isLetterList.size()) {
+				if(talcount == isNotLetterList.size()) {
 					this.print(-80, startPos + 53, "共  : "+talcount+" 筆 ","C");
 				}
 			}
@@ -247,7 +247,7 @@ public class L9711Report extends MakeReport {
 		this.toPdf(sno);
 
 		l9711report3.exec(titaVo, isLetterList);
-
+		
 		return isLetterList;
 
 	}

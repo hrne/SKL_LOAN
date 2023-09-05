@@ -643,18 +643,12 @@ public class BaTxCom extends TradeBuffer {
 
 // 1). 01-期款
 		if (iRepayType == 1) {
-			// 暫收抵繳期款，不可預收，不可欠繳
-			if (iRepayCode == 90) {
-				this.preRepayTerms = 0;
-				this.unpaidFlag = "N";
-			} else
-			// 按設定預收期數
-			if (tempVo.get("PreRepayTerms") != null) {
+			if (iRepayCode == 90 || iRepayCode == 3) {
+				this.preRepayTerms = 0;// 員工扣薪、暫收抵繳期款，不可預收，不可欠繳
+			} else if (tempVo.get("PreRepayTerms") != null) { // 按設定預收期數
 				this.preRepayTerms = parse.stringToInteger(tempVo.get("PreRepayTerms"));
-			}
-			// 按批次預收期數
-			else {
-				this.preRepayTerms = this.txBuffer.getSystemParas().getPreRepayTermsBatch();
+			} else {
+				this.preRepayTerms = this.txBuffer.getSystemParas().getPreRepayTermsBatch(); // 按批次預收期數
 			}
 		}
 // 3). 02-部分償還
@@ -1770,7 +1764,7 @@ public class BaTxCom extends TradeBuffer {
 		}
 		// 還款應繳日
 		if (loanCalcRepayIntCom.getPrevPaidIntDate() > this.repayIntDate) {
-			this.repayIntDate = loanCalcRepayIntCom.getPrevPaidIntDate();	
+			this.repayIntDate = loanCalcRepayIntCom.getPrevPaidIntDate();
 		}
 		// 應繳本利
 		if (baTxVo.getPayIntDate() <= iPayIntDate || baTxVo.getRepayType() >= 2) {
