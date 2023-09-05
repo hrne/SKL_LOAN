@@ -122,9 +122,9 @@ public class L9141Report extends MakeReport {
 				String date = (Integer.parseInt(result.get("AcDate").substring(0, 4)) - 1911) + "/"
 						+ result.get("AcDate").substring(4, 6) + "/" + result.get("AcDate").substring(6);
 				// I欄-會計帳累積餘額數
-				BigDecimal dbAmt = getBigDecimal(result.get("DbAmt"));
-				// J欄-當期借方傳票
 				BigDecimal tdBal = getBigDecimal(result.get("TdBal"));
+				// J欄-當期借方傳票
+				BigDecimal dbAmt = getBigDecimal(result.get("DbAmt"));
 				// K欄-當期貸方傳票
 				BigDecimal crAmt = getBigDecimal(result.get("CrAmt"));
 				// O欄-火險檔餘額

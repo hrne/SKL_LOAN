@@ -191,8 +191,8 @@ public class L4721Batch extends TradeBuffer {
 									: custNoticeSlice.getContent();
 
 							//直接看資料庫
-							//Y 是 要寄 要送 要通知
-							//N 是 不寄 不送 不通知
+							//Y 是 要寄 要送 要通知 要列印
+							//N 是 不寄 不送 不通知 不列印
 							//皆預設Y
 							if (listCustNotice == null) {
 								isEmail = "Y";
@@ -256,6 +256,13 @@ public class L4721Batch extends TradeBuffer {
 									setMailMFileVO(data, noticeEmail, titaVo);
 								}
 
+								
+								// 簡訊通知
+								if ("Y".equals(isMsg)) {
+									CntMsg = CntMsg + 1;
+									setTextFileVO(titaVo, data);
+								}
+
 							}  
 							
 							
@@ -268,11 +275,7 @@ public class L4721Batch extends TradeBuffer {
 
 							}
 							
-							// 簡訊通知
-							if ("Y".equals(isMsg)) {
-								setTextFileVO(titaVo, data);
-							}
-
+						
 						} catch (LogicException e) {
 							sendMsg = e.getErrorMsg();
 							flag = false;
@@ -392,8 +395,7 @@ public class L4721Batch extends TradeBuffer {
 		this.info("isMessageLastCust : " + custNoLast);
 		this.info("lTmpCustFacm : " + lTmpCustFacm.toString());
 		for (Map<String, String> t : lTmpCustFacm) {
-			CntMsg = CntMsg + 1;
-
+			
 			// 設定簡訊
 			txToDoCom.setTxBuffer(this.getTxBuffer());
 			String dataLines = txToDoCom

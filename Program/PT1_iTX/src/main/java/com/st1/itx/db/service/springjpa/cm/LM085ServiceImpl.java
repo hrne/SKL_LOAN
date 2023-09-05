@@ -35,6 +35,8 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @param titaVo
 	 * @param yearMonth 當前西元年月
 	 * @param unitCode  金額單位
+	 * @return 
+	 * @throws Exception 
 	 * 
 	 */
 
@@ -44,32 +46,84 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int unit = unitChange(unitCode);
 
 		String sql = " ";
-		sql += "	WITH \"roundData\" AS (";
-		sql += "		SELECT ROUND(SUM(NVL(I.\"AccumDPAmortized\",0)),0) AS \"LnAmt\"";
-		sql += "		FROM \"Ias39IntMethod\" I";
-		sql += "		LEFT JOIN \"MonthlyLoanBal\" MLB ON MLB.\"YearMonth\" = I.\"YearMonth\"";
-		sql += "										AND MLB.\"CustNo\" = I.\"CustNo\"";
-		sql += "										AND MLB.\"FacmNo\" = I.\"FacmNo\"";
-		sql += "										AND MLB.\"BormNo\" = I.\"BormNo\"";
-		sql += "		WHERE I.\"YearMonth\" = :yymm ";
-		sql += "		  AND MLB.\"AcctCode\" <> 990 ";
-		sql += "	),\"tempTotal\" AS (";
+		sql += "	WITH \"tempTotal\" AS (";
 		sql += "		SELECT DECODE(M.\"EntCode\",'1','G7','G6') AS \"Column\"";
 		sql += "			  ,SUM(M.\"PrinBalance\") AS \"Value\"";
 		sql += "		FROM \"MonthlyFacBal\" M";
 		sql += "		WHERE M.\"YearMonth\" = :yymm ";
 		sql += "		  AND M.\"PrinBalance\" > 0 ";
 		sql += "		GROUP BY DECODE(M.\"EntCode\",'1','G7','G6')";
+
+		sql += "		UNION";
+		sql += "		SELECT 'H20' AS \"Column\"";
+		sql += "			  ,SUM(\"PrinBalance\") AS \"Value\"";
+		sql += "		FROM \"MonthlyFacBal\" M ";
+		sql += "		WHERE M.\"YearMonth\" = :yymm ";
+		sql += "		  AND \"DepartmentCode\" ='1' ";
+
 		sql += "		UNION";
 		sql += "		SELECT 'E9' AS \"Column\"";
-		sql += "			  ,\"LoanBal\" AS \"Value\"";
-		sql += "		FROM \"MonthlyLM052AssetClass\"";
-		sql += "		WHERE \"YearMonth\" = :yymm ";
-		sql += "		  AND \"AssetClassNo\" = 62 ";
+		sql += "			  ,SUM(\"TdBal\") AS \"Value\"";
+		sql += "		FROM \"CoreAcMain\"";
+		sql += "   		WHERE \"AcDate\" = TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR(:yymm*100+1), 'YYYYMMDD')),'YYYYMMDD')) ";
+		sql += "		  AND \"AcNoCode\" IN ('10601301000','10601302000') "; // 催收款項法務費用+催收款項火險費用
+		sql += "		  AND \"CurrencyCode\" = 'NTD' ";
+
+		sql += "		UNION";
+		sql += "		SELECT 'G24' AS \"Column\"";// 本月新轉催收金額
+		sql += "			  ,SUM(\"PrinBalance\") AS \"Value\"";
+		sql += "		FROM \"MonthlyFacBal\"";
+		sql += "   		WHERE \"OvduDate\" = BETWEEN :yymm*100+1 AND :yymm*100+31 ";
+		sql += "		  AND \"AcctCode\" = '990' "; // 催收放款
+		sql += "		  AND \"YearMonth\" = :yymm ";
+
+		sql += "		UNION";
+		sql += "		SELECT 'F24' AS \"Column\""; // 本月新轉催收筆數
+		sql += "			  ,SUM(1) AS \"Value\"";
+		sql += "		FROM \"MonthlyFacBal\"";
+		sql += "   		WHERE \"OvduDate\" = BETWEEN :yymm*100+1 AND :yymm*100+31 ";
+		sql += "		  AND \"AcctCode\" = '990' "; // 催收放款
+		sql += "		  AND \"PrinBalance\" > 0  ";
+		sql += "		  AND \"YearMonth\" = :yymm ";
+
+		sql += "		UNION";
+		sql += "		SELECT 'E9' AS \"Column\"";
+		sql += "			  ,SUM(\"TdBal\") AS \"Value\"";
+		sql += "		FROM \"CoreAcMain\"";
+		sql += "   		WHERE \"AcDate\" = TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR(:yymm*100+1), 'YYYYMMDD')),'YYYYMMDD')) ";
+		sql += "		  AND \"AcNoCode\" IN ('10601301000','10601302000') "; // 催收款項法務費用+催收款項火險費用
+		sql += "		  AND \"CurrencyCode\" = 'NTD' ";
+
 		sql += "		UNION";
 		sql += "		SELECT 'G8' AS \"Column\"";
-		sql += "			  ,NVL(R.\"LnAmt\",0) AS \"Value\"";
-		sql += "		FROM \"roundData\" R";
+		sql += "			  ,SUM(\"TdBal\") AS \"Value\"";
+		sql += "		FROM \"CoreAcMain\"";
+		sql += "   		WHERE \"AcDate\" = TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR(:yymm*100+1), 'YYYYMMDD')),'YYYYMMDD')) ";
+		sql += "		  AND \"AcNoCode\" IN ('10600304000','10601304000') "; // 放款折溢價+催收款項折溢價
+		sql += "		  AND \"CurrencyCode\" = 'NTD' ";
+
+		sql += "		UNION";
+		sql += "		SELECT 'E8' AS \"Column\"";
+		sql += "			  ,SUM(\"TdBal\") AS \"Value\"";
+		sql += "		FROM \"CoreAcMain\"";
+		sql += "   		WHERE \"AcDate\" = TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR(:yymm*100+1), 'YYYYMMDD')),'YYYYMMDD')) ";
+		sql += "		  AND \"AcNoCode\" IN ('10601304000') "; // 催收款項折溢價
+		sql += "		  AND \"CurrencyCode\" = 'NTD' ";
+		sql += "		UNION";
+		sql += "		SELECT 'H26' AS \"Column\"";// 保貸
+		sql += "			  ,SUM(\"TdBal\") AS \"Value\"";
+		sql += "		FROM \"CoreAcMain\"";
+		sql += "   		WHERE \"AcDate\" = TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR(:yymm*100+1), 'YYYYMMDD')),'YYYYMMDD')) ";
+		sql += "		  AND \"AcNoCode\" IN ('10601','10602') ";// 壽險貸款 墊繳保費
+		sql += "		  AND \"CurrencyCode\" = 'TOL' ";// 幣別合計
+
+		sql += "		UNION";
+		sql += "		SELECT 'B20' AS \"Column\"";
+		sql += "			  ,SUM(\"TdBal\") AS \"Value\"";
+		sql += "		FROM \"CoreAcMain\"";
+		sql += "   		WHERE \"AcDate\" = TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR(:yymm*100+1), 'YYYYMMDD')),'YYYYMMDD')) ";
+		sql += "		  AND \"AcNoCode\" IN ('10623','10624') "; // 備抵損失擔保放款+備抵損失催收款項擔保放款
+		sql += "		  AND \"CurrencyCode\" = 'NTD' ";
 		sql += "	),\"tempAmt\" AS (";
 		sql += "		SELECT CASE";
 		sql += "				 WHEN M.\"EntCode\" = '0' AND M.\"AcctCode\" <> '990' AND M.\"OvduTerm\" >=3 ";
@@ -331,6 +385,8 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @param titaVo
 	 * @param yearMonth 當前西元年月
 	 * @param unitCode  金額單位
+	 * @return 
+	 * @throws Exception 
 	 * 
 	 */
 	public List<Map<String, String>> findPart3(TitaVo titaVo, int yearMonth, String unitCode) throws Exception {
@@ -430,6 +486,8 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @param titaVo
 	 * @param data     西元年月資料群
 	 * @param unitCode 金額單位
+	 * @return 
+	 * @throws Exception 
 	 * 
 	 */
 	public List<Map<String, String>> findPart4(TitaVo titaVo, List<String> data, String unitCode) throws Exception {

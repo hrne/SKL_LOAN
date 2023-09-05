@@ -51,6 +51,7 @@ K(MODIFYBUTTON,查詢)
 [#<->#,"#FdApplDateFrom+借閱日期",#ApplDateFrom,"~",#ApplDateTo],
 [#<->#,"#FdUsageCode+用途",#UsageCode,#UsageCodeX],
 [#<->#,"#FdApplCode+狀態",#ApplCode,#ApplCodeX],
+[#<->#,"#FdSearc+列印選項",#Searc,#SearcFlagX],
 ]
 !---------- AP TEXT AREA Variables ----------
 #BTNA=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0
@@ -62,6 +63,8 @@ T(3, )
 #FdUsageCode=X,2,L
 T(3,*)
 #FdApplCode=X,2,L
+T(3,*)
+#FdSearc=X,2,L
 T(3,*)
 
 ! 用途
@@ -90,6 +93,9 @@ T(3,01:未還;02:已還;09:全部)
 !登放記號
 #TitaActFgHelp=X,50,S
 T(3,1:登錄;2:放行;3:審核;4:審核放行)
+
+#SearcHelp=x,50,S
+T(3,1:下載檔案;2:畫面顯示)
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
@@ -162,9 +168,19 @@ V(H,#ApplHelp)
 
 #ApplCodeX=X,4,L
 T(H,#ApplCode,#ApplHelp)
-                   
+
+#Searc=A,1,I
+C(3,#CHAIN,0,$,s)
+E(0,1)  
+HELP(#SearcHelp)
+@V(H,#SearcHelp)
+
+#SearcFlagX=X,8,L
+T(3,)T(H,#Searc,#SearcHelp)
+
 #RPTFG=A,1,S
-E(0,0)
+C(5,#Searc,1,E(0,1),E(0,0))
+
 
 </sub>
 
@@ -178,6 +194,7 @@ E(0,0)
 
 #SCRTIL=_,_,S
 T(3,[L5903] 檔案借閱明細資料)
+
 
 #LOOP=X,1,S
 E(0,1)ASGN(LOOP$)
@@ -346,6 +363,7 @@ C(5,#OOHasAttachment,"Y",BIND(grid,{ cmd=CHAIN; ntxcd=LC014; ntxbuf=#BufLC014}),
 #ApplDateTo
 #UsageCode
 #ApplCode
+#Searc
 #END
 </sub>
 
@@ -395,7 +413,6 @@ TXFORM=L5903
 !---------- 單據輸出組合 ----------
 
 <sub type="SELECT">
-
 #RPTFG=0,QUERY.GRID,L5903
 #any={detail:true, header:'L5903.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
@@ -459,7 +476,9 @@ TXFORM=L5903
 #OORemark=備註
 {width:200,align:'left'}
 
-
+^
+#RPTFG=1,QUERY.GRID,L5903
+#any={detail:false, header:'L5903.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
 ^
 <include src="PRT.icf::INQ04.sel" map="i=L5903;cpi=15"/>
 #CustNo

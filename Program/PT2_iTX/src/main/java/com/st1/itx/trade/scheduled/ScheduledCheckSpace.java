@@ -93,20 +93,23 @@ public class ScheduledCheckSpace extends SysLogger {
 	}
 
 	private BigDecimal getPercentage() {
-		BigDecimal usedSpace = new BigDecimal("81.00%");
+		BigDecimal usedSpace = new BigDecimal("81.00");
 		if (dataLineList != null && !dataLineList.isEmpty()) {
 			String usedSpaceTxt = dataLineList.get(0);
+			this.mustInfo("usedSpaceTxt=" + usedSpaceTxt);
 			if (usedSpaceTxt.contains(":")) {
 				String[] s = usedSpaceTxt.split(":");
 				this.mustInfo("s[0]=" + s[0]);
 				this.mustInfo("s[1]=" + s[1]);
+				String s1 = s[1].trim();
+				s1 = s1.substring(0, s1.lastIndexOf("%"));
 				try {
-					usedSpace = new BigDecimal(s[1].trim());
+					usedSpace = new BigDecimal(s1);
 				} catch (Exception e) {
 					StringWriter errors = new StringWriter();
 					e.printStackTrace(new PrintWriter(errors));
 					this.mustInfo(errors.toString());
-					usedSpace = new BigDecimal("81.00%");
+					usedSpace = new BigDecimal("81.00");
 				}
 			}
 		}
@@ -114,7 +117,7 @@ public class ScheduledCheckSpace extends SysLogger {
 	}
 
 	private void sendTickerIfUsedSpaceOver80(BigDecimal usedSpace) {
-		if (usedSpace.compareTo(new BigDecimal("80.00%")) > 0) {
+		if (usedSpace.compareTo(new BigDecimal("80.00")) > 0) {
 			try {
 				webClient.sendTicker("0000", "CHECK_SPACE", "" + dateUtil.getCalenderDay() + "0000", "硬碟已使用容量已超過80%",
 						false, titaVo);

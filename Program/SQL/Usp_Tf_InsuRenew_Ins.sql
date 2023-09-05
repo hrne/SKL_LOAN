@@ -87,7 +87,7 @@ BEGIN
     WITH txData AS (
       SELECT TX.TRXDAT
            , TX.TRXNMT
-           , NVL(AEM1."EmpNo",'999999')     AS "TitaTlrNo"
+           , NVL(AEM1."EmpNo",TX.TRXMEM)     AS "TitaTlrNo"
            , TX.TRXAMT
            , ROW_NUMBER()
              OVER (
@@ -157,7 +157,7 @@ BEGIN
            , NVL(FR1P."INSEDT2",0)          AS "InsuEndDate"         -- 保險迄日 Decimald 8 0
            , NVL(FR1P."INSTOT",0)           AS "TotInsuPrem"         -- 總保費 DECIMAL 14 0
            , NVL(FR1P."TRXDAT",0)           AS "AcDate"              -- 會計日期 Decimald 8 0
-           , NVL(TX."TitaTlrNo",'999999')   AS "TitaTlrNo"           -- 經辦 VARCHAR2 6 0
+           , TX."TitaTlrNo"                 AS "TitaTlrNo"           -- 經辦 VARCHAR2 6 0
            , LPAD(FR1P."TRXNMT" ,8,0)       AS "TitaTxtNo"           -- 交易序號 VARCHAR2 8 0
            , FR1P."CHKPRT"                  AS "NotiTempFg"          -- 入通知檔 VARCHAR2 1 0
            , CASE

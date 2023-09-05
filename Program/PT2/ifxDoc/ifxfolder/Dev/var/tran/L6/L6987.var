@@ -290,8 +290,10 @@ E(0,0)
 
 ! ifxBatch相關參數
 #secret-no=x,1000,S
+E(0,@PRTSCRFG,1)
+T(2,@TXFORM,L618E)
 IF(#SelectCode==4,T(2,@ORGKIN,#OOKINBR)T(2,@ORGTLR,#OOTlrNo)T(2,@ORGTNO,#OOTxtNo)E(0,@OrgEntdy,#SYSDATE)E(0,@HCODE,1),$)
-T(6A,#TxItemCode+#TxCustNo+#TxFacmNo+#TxBormNo+#TxDtlValue+#AcctCode+#TxSelectCode+#TXAMT+#MRKEY+#BATCHNO+#TITFCD+#ORGKIN+#ORGTLR+#ORGTNO+#OrgEntdy+#HCODE)
+T(6A,#TXFORM+#PRTSCRFG+#TxItemCode+#TxCustNo+#TxFacmNo+#TxBormNo+#TxDtlValue+#AcctCode+#TxSelectCode+#TXAMT+#MRKEY+#BATCHNO+#TITFCD+#ORGKIN+#ORGTLR+#ORGTNO+#OrgEntdy+#HCODE)
 
 
 
@@ -360,27 +362,7 @@ TXFORM=L6987
 ! ["@轉催收日",#OTR_OV_DT],
 ]
 </sub>
-! <sub type="PART" name="O2" layout="cols=1;screen.width=[100,900];printer.width=[20,20];order=1">
-! [
-! ["[L6987]                                 呆帳戶產生法務費墊付"],
-! ["@轉催收日",#OTR_OV_DT],
-! ["@查詢範圍",#O_SELECT_CD,#SelectCodeX],
-! ]
-! </sub>
-! <sub type="PART" name="O3" layout="cols=1;screen.width=[100,900];printer.width=[20,20];order=1">
-! [
-! ["[L6987]                                 呆帳戶產生法務費墊付"],
-! ["@戶號",#OCUSTNO],
-! ]
-! </sub>
-! <sub type="PART" name="O4" layout="cols=1;screen.width=[100,900];printer.width=[20,20];order=1">
-! [
-! ["[L6987]                                 呆帳戶產生法務費墊付"],
-! ["@戶號",#OCUSTNO],
-! ["@查詢範圍",#O_SELECT_CD,#SelectCodeX],
-! ]
-! </sub>
-!---------- 單據輸出組合 ----------
+
 
 <sub type="SELECT">
 #batch-print=2,L618E.PFNX,NA,,,,,,1169:827

@@ -132,7 +132,7 @@ C(4,#ErrorTypeCode,$,V(H,#ErrorTypeCodeHelp))
 #ErrorTypeCodeX=X,20,L
 C(4,#ErrorTypeCode,S,T(H,#ErrorTypeCode,#ErrorTypeCodeHelp))
 
-#JobTxSeq=x,20,I
+#InputJobTxSeq=x,20,I
 
 #RPTFG=A,1,S
 E(0,0)

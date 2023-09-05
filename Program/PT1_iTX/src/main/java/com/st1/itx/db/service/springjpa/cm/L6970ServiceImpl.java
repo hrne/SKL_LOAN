@@ -117,7 +117,9 @@ public class L6970ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query = em.createNativeQuery(sql);
 		query.setParameter("inputStartDate", inputStartDate);
 		query.setParameter("inputEndDate", inputEndDate);
-		query.setParameter("inputJobSeq", inputJobSeq);
+		if (inputJobSeq != null && !inputJobSeq.isEmpty()) {
+			query.setParameter("inputJobSeq", inputJobSeq);
+		}
 
 		return switchback(query);
 	}

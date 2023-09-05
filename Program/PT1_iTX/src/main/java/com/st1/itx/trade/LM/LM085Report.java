@@ -40,8 +40,8 @@ public class LM085Report extends MakeReport {
 	 * @param titaVo
 	 * @param yearMonth     當月西元年月
 	 * @param lastYearMonth 上個西元年月
-	 * @return 
-	 * @throws LogicException 
+	 * @return
+	 * @throws LogicException
 	 */
 	public boolean exec(TitaVo titaVo, int yearMonth, int lastYearMonth) throws LogicException {
 
@@ -61,13 +61,13 @@ public class LM085Report extends MakeReport {
 //		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM085",
 //				"放款逾期月報表-" + iRocYeatMonth + "(單位：" + unitName + ")", "LM085-" + iRocYeatMonth + "_放款逾期月報表",
 //				"LM085_底稿_放款逾期月報表.xlsx", "X月");
-		
+
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "LM085";
 		String fileItem = "放款逾期月報表-" + iRocYeatMonth + "(單位：" + unitName + ")";
 		String fileName = "LM085-" + iRocYeatMonth + "_放款逾期月報表";
-		String defaultExcel =  "LM085_底稿_放款逾期月報表.xlsx";
+		String defaultExcel = "LM085_底稿_放款逾期月報表.xlsx";
 		String defaultSheet = "X月";
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
@@ -75,8 +75,6 @@ public class LM085Report extends MakeReport {
 
 		// 開啟報表
 		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
-		
-		
 
 		makeExcel.setSheet("X月", iYearMonth % 100 + "月");
 
@@ -93,7 +91,7 @@ public class LM085Report extends MakeReport {
 
 			fnAllList = lm085ServiceImpl.findPart1(titaVo, yearMonth, unitCode);
 			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
-			// B6~G10
+			// B6~G10+H26
 			exportPart1(fnAllList);
 
 			// SQL未完成 待確認
@@ -144,7 +142,7 @@ public class LM085Report extends MakeReport {
 	}
 
 	/**
-	 * B6~G10列
+	 * B6~G10+H26列
 	 */
 	private void exportPart1(List<Map<String, String>> dataList) throws LogicException {
 
@@ -155,10 +153,7 @@ public class LM085Report extends MakeReport {
 		for (Map<String, String> r : dataList) {
 
 			col = enToNumber(r.get("F0").toString().substring(0, 1));
-			// 限制超出L欄以後不設值 略過
-			if (col > 12) {
-				break;
-			}
+
 			row = Integer.valueOf(r.get("F0").toString().substring(1, 2));
 			amt = getBigDecimal(r.get("F1").toString());
 
@@ -198,7 +193,9 @@ public class LM085Report extends MakeReport {
 			// B18
 			makeExcel.formulaCalculate(18, 2);
 
-			BigDecimal legalLoss =  dataList.get(0).get("LegalLoss")==null ||  dataList.get(0).get("LegalLoss").isEmpty() ? BigDecimal.ZERO:new BigDecimal(dataList.get(0).get("LegalLoss"));
+			BigDecimal legalLoss = dataList.get(0).get("LegalLoss") == null
+					|| dataList.get(0).get("LegalLoss").isEmpty() ? BigDecimal.ZERO
+							: new BigDecimal(dataList.get(0).get("LegalLoss"));
 			makeExcel.setValue(20, 2, legalLoss, "#,000", "C");
 
 			break;

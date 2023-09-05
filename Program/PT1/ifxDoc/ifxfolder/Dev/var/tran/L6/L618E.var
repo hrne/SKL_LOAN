@@ -3,6 +3,20 @@
 </sub>
 
 <sub type="SYS" name="label">
+
+!#TXCD
+!T(3,XW111)
+
+!#FKEY 0:登錄,1:更正,2:放行,3:審核/在途登錄,5:更正重登,6:在途設定,7修改,9檢視journal
+![一段式/二段式/三段式]
+#RELCD=_,_,S
+C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)
+E(0,0)
+
+#ACTFG=_,_,S
+T(2,@TXFORM,#TXCD)
+C(3,#FKEY,1,C(5,#TXFORM,#TXCD,E(0,@PRTSCRFG,1),E(0,@PRTSCRFG,0)),$)
+
 </sub>
 
 ![判斷是否有收付欄]
@@ -16,6 +30,9 @@ E(0,0)
 E(0,0)
 </sub>
 
+<sub type="PREDC" name="PreDC">
+<include src="COM.icf::TITLE-RUN.pre"/>
+</sub>
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="L618E" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
 [
@@ -27,9 +44,6 @@ E(0,0)
 [#<->#,"整批批號",#BATCHNO],
 ]
 
-#DF1=A,1,S
-E(0,1) 
-! INVOKEJS(SHOW,L618E_1,0)
 
 
 !項目
@@ -58,9 +72,18 @@ E(0,1)
 !---------- 輸出共用變數宣告區 ----------
 <sub type="RTN" name="AFXMT">
 <include src="PRT.icf::PRTHEAD.rtn"/>
-
 </sub>
 
+!---------- TXFORM = L618E ----------
+<sub type="FORM" name="L618E">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L618E,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L618E] 呆帳戶法務費墊付)
+
+</sub>
 
 !------ 上行電文 TEXT ------
 <sub type="TIM">
@@ -71,19 +94,24 @@ E(0,1)
 #TxDtlValue
 #TxSelectCode
 #AcctCode
-
+#PRTSCRFG
 </sub>
 
 !------ 下行電文TOM ------
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
 
-
+TXFORM=L618E
+^
 </sub>
 
 
 !---------- 單據輸出組合 ----------
 <sub type="SELECT">
-
 <include src="PRT.icf::UPD01.sel"/>
+<include src="PRT.icf::UPDH01.sel"/>
+<include src="PRT.icf::FM01.sel"/>
+<include src="PRT.icf::FMR01.sel"/>
+<include src="PRT.icf::FMH01.sel"/>
+<include src="PRT.icf::FMHR01.sel"/>
 </sub>

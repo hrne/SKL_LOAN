@@ -78,7 +78,7 @@ public class LM061ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,M.\"PrevIntDate\"";
 		sql += "            ,M.\"StoreRate\"";
 		sql += "            ,F.\"MaturityDate\"";
-		sql += "            ,LO.\"OvduDate\"";
+		sql += "            ,M.\"OvduDate\"";
 		sql += "            ,CD.\"Item\"";
 		sql += "            ,COL.\"Amount\"";
 		sql += "            ,COL.\"LegalProg\"";

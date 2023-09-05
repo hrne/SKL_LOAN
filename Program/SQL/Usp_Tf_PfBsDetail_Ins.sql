@@ -49,21 +49,19 @@ BEGIN
       , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
     )
     SELECT "PfBsDetail_SEQ".nextval       AS "LogNo"
-         , NVL(BOR."DrawdownDate",S1."LMSLLD")
-                                          AS "PerfDate"            -- 業績日期 DecimalD 8 0
+         , S1."LMSLLD"                    AS "PerfDate"            -- 業績日期 DecimalD 8 0
          , S1."LMSACN"                    AS "CustNo"              -- 戶號 DECIMAL 7 0
          , S1."LMSAPN"                    AS "FacmNo"              -- 額度編號 DECIMAL 3 0
          , S1."LMSASQ"                    AS "BormNo"              -- 撥款序號 DECIMAL 3 0
          , 0                              AS "RepayType"           -- 還款類別 DECIMAL 1 0
          , S1."EMPCOD"                    AS "BsOfficer"           -- 房貸專員 VARCHAR2 6 0
          , S1."BCMDPT"                    AS "DeptCode"            -- 部室代號 VARCHAR2 6 0
-         , NVL(BOR."DrawdownDate",S1."LMSLLD")
-                                          AS "DrawdownDate"        -- 撥款日 DecimalD 8 0
+         , S1."LMSLLD"                    AS "DrawdownDate"        -- 撥款日 DecimalD 8 0
          , RPAD(FAC."ProdNo",2,' ')       AS "ProdCode"            -- 商品代碼 VARCHAR2 5 0
          , S1."CASCDE"                    AS "PieceCode"           -- 計件代碼 VARCHAR2 1 0
-         , NVL(BOR."DrawdownAmt",0)       AS "DrawdownAmt"         -- 撥款金額 DECIMAL 16 2
+         , S1.LMSFLA                      AS "DrawdownAmt"         -- 撥款金額 DECIMAL 16 2
          , 0                              AS "PerfCnt"             -- 件數 DECIMAL 2 1
-         , NVL(BOR."DrawdownAmt",0)       AS "PerfAmt"             -- 業績金額 DECIMAL 16 2
+         , S1.LMSFLA                      AS "PerfAmt"             -- 業績金額 DECIMAL 16 2
          , 0                              AS "AdjPerfCnt"          -- 調整加減件數 DECIMAL 5 1 by eric 2021.11.4
          , 0                              AS "AdjPerfAmt"          -- 調整加減業績金額 DECIMAL 16 2 by eric 2021.11.4
          , S1."ADTYMT"                    AS "WorkMonth"           -- 工作月 DECIMAL 6 0
@@ -99,9 +97,6 @@ BEGIN
          ) S1
     LEFT JOIN "FacMain" FAC ON FAC."CustNo" = S1."LMSACN"
                            AND FAC."FacmNo" = S1."LMSAPN"
-    LEFT JOIN "LoanBorMain" BOR ON BOR."CustNo" = S1."LMSACN"
-                               AND BOR."FacmNo" = S1."LMSAPN"
-                               AND BOR."BormNo" = S1."LMSASQ"
     ;
 
     -- 記錄寫入筆數

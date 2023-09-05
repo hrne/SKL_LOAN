@@ -645,6 +645,7 @@ public class BaTxCom extends TradeBuffer {
 		if (iRepayType == 1) {
 			if (iRepayCode == 90 || iRepayCode == 3) {
 				this.preRepayTerms = 0;// 員工扣薪、暫收抵繳期款，不可預收，不可欠繳
+				this.unpaidFlag = "N";
 			} else if (tempVo.get("PreRepayTerms") != null) { // 按設定預收期數
 				this.preRepayTerms = parse.stringToInteger(tempVo.get("PreRepayTerms"));
 			} else {
