@@ -91,38 +91,28 @@ public class LM085Report extends MakeReport {
 
 			fnAllList = lm085ServiceImpl.findPart1(titaVo, yearMonth, unitCode);
 			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
-			// B6~G10+H26
 			exportPart1(fnAllList);
 
-			// SQL未完成 待確認
-			fnAllList = lm085ServiceImpl.findPart2_1(titaVo, lastYearMonth);
+			// 上個月變動表
+			fnAllList = lm085ServiceImpl.findPart2(titaVo, lastYearMonth);
 			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
-			// B16~B23
-			exportPart2(fnAllList, 1);
-			fnAllList = lm085ServiceImpl.findPart2_2(titaVo, yearMonth);
+			exportPart2(fnAllList, 8); // H欄
+			// 本月變動表
+			fnAllList = lm085ServiceImpl.findPart2(titaVo, yearMonth);
 			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
-			// F15~G20
-			exportPart2(fnAllList, 2);
-			fnAllList = lm085ServiceImpl.findPart2_3(titaVo, yearMonth);
+			exportPart2(fnAllList, 15); // O欄
+			// 去年同期變動表
+			fnAllList = lm085ServiceImpl.findPart2(titaVo, yearMonth - 100);
 			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
-			// F24~G25
-			exportPart2(fnAllList, 3);
-			// 上月資料
-			fnAllList = lm085ServiceImpl.findPart3(titaVo, lastYearMonth, unitCode);
-			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
-			// B29~D38
-			exportPart3(fnAllList, lastYearMonth, 1);
-			// 去年同期資料
-			fnAllList = lm085ServiceImpl.findPart3(titaVo, yearMonth - 100, unitCode);
-			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
-			// F29~D38
-			exportPart3(fnAllList, yearMonth - 100, 2);
-
+			exportPart2(fnAllList, 12); // L欄
 			fnAllList = lm085ServiceImpl.findPart4(titaVo, tranAllYearData(yearMonth, lastYearMonth), unitCode);
 			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
+			// 重新計算
+			exportPart3();
 			// A45~
 			exportPart4(fnAllList, tranAllYearData(yearMonth, lastYearMonth).size());
 
+			makeExcel.formulaRangeCalculate(1, 53, 1, 15);
 		} catch (Exception e) {
 
 			StringWriter errors = new StringWriter();
@@ -178,144 +168,85 @@ public class LM085Report extends MakeReport {
 		makeExcel.formulaCalculate(8, 7);
 		makeExcel.formulaCalculate(9, 7);
 
+		// B23
+		makeExcel.formulaCalculate(23, 2);
+		// B16
+		makeExcel.formulaCalculate(16, 2);
+		// B18
+		makeExcel.formulaCalculate(18, 2);
+		// F15
+		makeExcel.formulaCalculate(15, 6);
+		// F17
+		makeExcel.formulaCalculate(17, 6);
+		// F18
+		makeExcel.formulaCalculate(18, 6);
+		// F19
+		makeExcel.formulaCalculate(19, 6);
+		// F20
+		makeExcel.formulaCalculate(20, 6);
 	}
 
-	/**
-	 * B16~G25
-	 */
-	private void exportPart2(List<Map<String, String>> dataList, int form) throws LogicException {
+	private void exportPart2(List<Map<String, String>> dataList, int col) throws LogicException {
+
 		int row = 0;
+		BigDecimal amt = BigDecimal.ZERO;
 
-		switch (form) {
-		case 1:
-			// B16
-			makeExcel.formulaCalculate(16, 2);
-			// B18
-			makeExcel.formulaCalculate(18, 2);
+		for (Map<String, String> r : dataList) {
 
-			BigDecimal legalLoss = dataList.get(0).get("LegalLoss") == null
-					|| dataList.get(0).get("LegalLoss").isEmpty() ? BigDecimal.ZERO
-							: new BigDecimal(dataList.get(0).get("LegalLoss"));
-			makeExcel.setValue(20, 2, legalLoss, "#,000", "C");
+			row = Integer.valueOf(r.get("F0").toString());
+			amt = getBigDecimal(r.get("F1").toString());
 
-			break;
-		case 2:
-			row = 17;
-			for (Map<String, String> r : dataList) {
-				int rowSpace = Integer.valueOf(r.get("F0"));
-				BigDecimal percent = r.get("F1").isEmpty() || r.get("F1") == "0" ? BigDecimal.ZERO
-						: new BigDecimal(r.get("F1"));
+			this.info("col=" + col + ",row=" + row);
 
-				makeExcel.setValue(row + rowSpace, 6, percent, "0.000 %");
-			}
+			makeExcel.setValue(row, col, amt, "#,##0", "R");
 
-			// F15
-			makeExcel.formulaCalculate(15, 6);
-			break;
-		case 3:
-
-			row = 24;
-			for (Map<String, String> r : dataList) {
-				int count = Integer.valueOf(r.get("F0"));
-				BigDecimal amt = r.get("F1").isEmpty() || r.get("F1") == "0" ? BigDecimal.ZERO
-						: new BigDecimal(r.get("F1"));
-
-				this.info("count=" + count);
-				this.info("amt=" + amt);
-				makeExcel.setValue(row, 6, count, "R");
-				makeExcel.setValue(row, 7, amt, "#,##0", "R");
-				row++;
-			}
-			break;
 		}
 
+		makeExcel.formulaCalculate(20, col);
+		makeExcel.formulaCalculate(29, col);
+		makeExcel.formulaCalculate(33, col);
 	}
 
 	/**
 	 * B29~G38
 	 * 
 	 */
-	private void exportPart3(List<Map<String, String>> dataList, int yearMonth, int form) throws LogicException {
+	private void exportPart3() throws LogicException {
 
-		int col = 0;
-		int row = 0;
-		BigDecimal amt = BigDecimal.ZERO;
+		makeExcel.formulaCalculate(29, 2);
+		makeExcel.formulaCalculate(33, 2);
+		makeExcel.formulaCalculate(33, 2);
+		makeExcel.formulaCalculate(33, 2);
+		makeExcel.formulaCalculate(33, 2);
+		makeExcel.formulaCalculate(33, 2);
+		makeExcel.formulaCalculate(33, 2);
+		makeExcel.formulaCalculate(33, 2);
+		makeExcel.formulaCalculate(33, 2);
+		makeExcel.formulaCalculate(38, 2);
+		makeExcel.formulaCalculate(29, 4);
+		makeExcel.formulaCalculate(30, 4);
+		makeExcel.formulaCalculate(31, 4);
+		makeExcel.formulaCalculate(32, 4);
+		makeExcel.formulaCalculate(33, 4);
+		makeExcel.formulaCalculate(34, 4);
+		makeExcel.formulaCalculate(35, 4);
+		makeExcel.formulaCalculate(36, 4);
+		makeExcel.formulaCalculate(37, 4);
+		makeExcel.formulaCalculate(38, 4);
 
-		String rocYear = String.valueOf((yearMonth - 191100) / 100);
-		String rocMonth = String.format("%02d", yearMonth % 100);
-
-		switch (form) {
-		case 1:
-
-			makeExcel.setValue(27, 2, rocYear + "." + rocMonth + "(B)", "C");
-
-			for (Map<String, String> r : dataList) {
-
-				col = enToNumber(r.get("F0").toString().substring(0, 1));
-				// 限制超出L欄以後不設值 略過
-				if (col > 12) {
-					break;
-				}
-				row = Integer.valueOf(r.get("F0").toString().substring(1, 3));
-				amt = getBigDecimal(r.get("F1").toString());
-
-//				this.info("col=" + col + ",row=" + row);
-
-				makeExcel.setValue(row, col, amt, "#,##0", "R");
-
-			}
-
-			makeExcel.formulaCalculate(29, 2);
-			makeExcel.formulaCalculate(33, 2);
-			makeExcel.formulaCalculate(38, 2);
-			makeExcel.formulaCalculate(29, 4);
-			makeExcel.formulaCalculate(30, 4);
-			makeExcel.formulaCalculate(31, 4);
-			makeExcel.formulaCalculate(32, 4);
-			makeExcel.formulaCalculate(33, 4);
-			makeExcel.formulaCalculate(34, 4);
-			makeExcel.formulaCalculate(35, 4);
-			makeExcel.formulaCalculate(36, 4);
-			makeExcel.formulaCalculate(37, 4);
-			makeExcel.formulaCalculate(38, 4);
-
-			break;
-		case 2:
-
-			makeExcel.setValue(27, 6, rocYear + "." + rocMonth + "(C)", "C");
-
-			for (Map<String, String> r : dataList) {
-				// 因欄位不同無法更改
-				col = enToNumber(r.get("F0").toString().substring(0, 1)) + 4;
-				// 限制超出L欄以後不設值 略過
-				if (col > 12) {
-					break;
-				}
-				row = Integer.valueOf(r.get("F0").toString().substring(1, 3));
-				amt = getBigDecimal(r.get("F1").toString());
-
-//				this.info("col=" + col + ",row=" + row);
-
-				makeExcel.setValue(row, col, amt, "#,##0", "R");
-
-			}
-
-			makeExcel.formulaCalculate(29, 6);
-			makeExcel.formulaCalculate(33, 6);
-			makeExcel.formulaCalculate(38, 6);
-			makeExcel.formulaCalculate(29, 7);
-			makeExcel.formulaCalculate(30, 7);
-			makeExcel.formulaCalculate(31, 7);
-			makeExcel.formulaCalculate(32, 7);
-			makeExcel.formulaCalculate(33, 7);
-			makeExcel.formulaCalculate(34, 7);
-			makeExcel.formulaCalculate(35, 7);
-			makeExcel.formulaCalculate(36, 7);
-			makeExcel.formulaCalculate(37, 7);
-			makeExcel.formulaCalculate(38, 7);
-			break;
-		}
-
+		makeExcel.formulaCalculate(29, 6);
+		makeExcel.formulaCalculate(33, 6);
+		makeExcel.formulaCalculate(38, 6);
+		makeExcel.formulaCalculate(29, 7);
+		makeExcel.formulaCalculate(30, 7);
+		makeExcel.formulaCalculate(31, 7);
+		makeExcel.formulaCalculate(32, 7);
+		makeExcel.formulaCalculate(33, 7);
+		makeExcel.formulaCalculate(34, 7);
+		makeExcel.formulaCalculate(35, 7);
+		makeExcel.formulaCalculate(36, 7);
+		makeExcel.formulaCalculate(37, 7);
+		makeExcel.formulaCalculate(38, 7);
 	}
 
 	/**
@@ -323,9 +254,10 @@ public class LM085Report extends MakeReport {
 	 */
 	private void exportPart4(List<Map<String, String>> dataList, int dataSize) throws LogicException {
 
-		int col = 0;
 		int vaRow = 41;
-		BigDecimal amt = BigDecimal.ZERO;
+		BigDecimal loanBal = BigDecimal.ZERO;
+		BigDecimal ovduBal = BigDecimal.ZERO;
+		BigDecimal badAmt = BigDecimal.ZERO;
 
 		// 最少11列數，最多14列數，基礎為11個列數 根據資料筆數 做插入多少列
 		for (int i = 0; i < dataSize - 11; i++) {
@@ -340,8 +272,8 @@ public class LM085Report extends MakeReport {
 		// F5 G欄位
 		// F6 當年度轉呆金額
 		for (Map<String, String> r : dataList) {
-			int rocYear = (Integer.valueOf(r.get("F0")) - 191100) / 100;
-			int rocMonth = Integer.valueOf(r.get("F0")) % 100;
+			int rocYear = (Integer.valueOf(r.get("YearMonth")) - 191100) / 100;
+			int rocMonth = Integer.valueOf(r.get("YearMonth")) % 100;
 			String yearMonthText = rocYear + "";
 			switch (rocMonth) {
 			case 3:
@@ -366,45 +298,29 @@ public class LM085Report extends MakeReport {
 			makeExcel.setValue(vaRow, 1, yearMonthText, "C");
 
 			// 放款餘額
-			col = enToNumber(r.get("F1").toString());
-			amt = getBigDecimal(r.get("F2").toString());
+			loanBal = getBigDecimal(r.get("LoanBal").toString());
 
-			makeExcel.setValue(vaRow, col, amt, "#,###.##0", "R");
+			makeExcel.setValue(vaRow, 2, loanBal, "#,###.##0", "R");
 
 			// 逾放總額
-			col = enToNumber(r.get("F3").toString());
-			amt = getBigDecimal(r.get("F4").toString());
+			ovduBal = getBigDecimal(r.get("OvduBal").toString());
 
-			makeExcel.setValue(vaRow, col, amt, "#,###.##0", "R");
+			makeExcel.setValue(vaRow, 4, ovduBal, "#,###.##0", "R");
 
 			// 逾放比
-			makeExcel.setValue(vaRow, 6, getBigDecimal(r.get("F4").toString())
-					.divide(getBigDecimal(r.get("F2").toString()), 5, BigDecimal.ROUND_HALF_UP), "0.####0", "R");
+			if (loanBal.compareTo(BigDecimal.ZERO) == 0) {
+				makeExcel.setValue(vaRow, 6, " ", "R");
+			} else {
+				makeExcel.setValue(vaRow, 6, ovduBal.divide(loanBal, 5, BigDecimal.ROUND_HALF_UP), "0.####0", "R");
+			}
 
 			// 當年度轉呆金額
-			col = enToNumber(r.get("F5").toString());
-			amt = getBigDecimal(r.get("F6").toString());
+			badAmt = getBigDecimal(r.get("BadAmt").toString());
 
-			makeExcel.setValue(vaRow, col, amt, "#,###.##0", "R");
+			makeExcel.setValue(vaRow, 7, badAmt, "#,###.##0", "R");
 
 			vaRow++;
 		}
-
-//		for (int r = 45; r <= 55; r++) {
-//			makeExcel.formulaCalculate(r, 5);
-//		}
-//
-//		for (int c = 2; c <= 6; c++) {
-//			makeExcel.formulaCalculate(56, c);
-//			makeExcel.formulaCalculate(57, c);
-//		}
-
-		makeExcel.formulaCalculate(vaRow, 2);
-		makeExcel.formulaCalculate(vaRow, 4);
-		makeExcel.formulaCalculate(vaRow, 6);
-		makeExcel.formulaCalculate(vaRow + 1, 2);
-		makeExcel.formulaCalculate(vaRow + 1, 4);
-		makeExcel.formulaCalculate(vaRow + 1, 6);
 
 	}
 

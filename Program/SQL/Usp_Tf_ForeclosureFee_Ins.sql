@@ -33,40 +33,6 @@ BEGIN
     EXECUTE IMMEDIATE 'TRUNCATE TABLE "ForeclosureFee" DROP STORAGE';
     EXECUTE IMMEDIATE 'ALTER TABLE "ForeclosureFee" ENABLE PRIMARY KEY';
 
-    -- INSERT INTO "ForeclosureFee"
-    -- SELECT "LN$LG2P"."RECNUM"             AS "RecordNo"            -- 記錄號碼 DECIMAL 7 
-    --       ,"LN$LG2P"."LMSACN"             AS "CustNo"              -- 借款人戶號 DECIMAL 7 
-    --       ,0                              AS "FacmNo"              -- 額度編號 DECIMAL 3 
-    --       ,"LN$LG2P"."RCVDAT"             AS "ReceiveDate"         -- 收件日期 DecimalD 8 
-    --       ,"LN$LG2P"."RCVDAT"             AS "DocDate"             -- 單據日期 DecimalD 8 
-    --       ,"LN$LG2P"."TRXIDT"             AS "OpenAcDate"          -- 起帳日期 DecimalD 8 
-    --       ,"LN$LG2P"."DLTDAT"             AS "CloseDate"           -- 銷號日期 DecimalD 8 
-    --       ,"LN$LG2P"."LGFAMT"             AS "Fee"                 -- 法拍費用 DECIMAL 16 2
-    --       ,LPAD("LN$LG2P"."ACTCOD",2,'0') AS "FeeCode"             -- 科目 VARCHAR2 2 
-    --       ,''                             AS "LegalStaff"          -- 法務人員 VARCHAR2 6 
-    --       ,0                              AS "CloseNo"             -- 銷帳編號 DECIMAL 6 
-    --       ,"LN$LG2P"."NGRRMK"             AS "Rmk"                 -- 備註 NVARCHAR2 60 
-    --       ,NVL("LN$LG2P"."LGFCOD",0)      AS "CaseCode"            -- 件別 DECIMAL 1 
-    --       ,NVL("LN$LG2P"."EXGBRH",'')     AS "RemitBranch"         -- 匯款單位 VARCHAR2 3 
-    --       ,"LN$LG2P"."EXGEMP"             AS "Remitter"            -- 匯款人 VARCHAR2 10 
-    --       ,NVL("LN$LG2P"."CASNUM2",'')    AS "CaseNo"              -- 案號 VARCHAR2 3
-    --       ,0                              AS "OverdueDate"         -- 轉催收日 DecimalD 8 
-    --       ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
-    --       ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
-    --       ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
-    --       ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
-    -- FROM "LN$LG2P"
-    -- ;
-
-    -- -- 記錄寫入筆數
-    -- INS_CNT := INS_CNT + sql%rowcount;
-
-    -- DECLARE
-    --     "d_MaxRecordNo" DECIMAL(7);         --記錄號碼
-    -- BEGIN
-
-    -- SELECT MAX("RecordNo") INTO "d_MaxRecordNo" FROM "ForeclosureFee";
-
     -- 寫入資料
     INSERT INTO "ForeclosureFee" (
         "RecordNo"            -- 記錄號碼 DECIMAL 7 

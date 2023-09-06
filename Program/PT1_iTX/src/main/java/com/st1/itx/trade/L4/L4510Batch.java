@@ -736,8 +736,8 @@ public class L4510Batch extends TradeBuffer {
 			tEmpDeductDtl.setBatchNo("");
 			if (tCdEmp != null) {
 				tEmpDeductDtl.setResignCode(tCdEmp.getAgStatusCode());
-				tEmpDeductDtl.setDeptCode(tCdEmp.getCenterCodeAcc2());
-				tEmpDeductDtl.setUnitCode(tCdEmp.getCenterCodeAcc());
+				tEmpDeductDtl.setDeptCode(tCdEmp.getCenterCode2());
+				tEmpDeductDtl.setUnitCode(tCdEmp.getCenterCode());
 				tEmpDeductDtl.setPositCode(tCdEmp.getAgPost());
 			}
 			if (intStartDate.get(tmp) != null)

@@ -306,9 +306,7 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            AND cm.\"EntCode\" IN (";
 		sql += "                2";
 		sql += "            )";
-		sql += "            AND ( ( lbtx.\"TitaTxCd\" = 'L3200' )";
-		sql += "                  OR ( lbtx.\"TitaTxCd\" = 'L3420'";
-		sql += "                       AND JSON_VALUE(lbtx.\"OtherFields\", '$.CaseCloseCode') = 0 ) )";
+		sql += "            AND lbtx.\"TitaTxCd\" = 'L3200' ";
 		sql += "        GROUP BY";
 		sql += "            substr(lbtx.\"EntryDate\", 1, 6)";
 		sql += "    ), \"NaturalDrawdownAmtYearly\" AS (";

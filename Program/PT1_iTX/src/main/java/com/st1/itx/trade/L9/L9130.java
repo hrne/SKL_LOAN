@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.trade.L5.L5101;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
@@ -52,7 +53,9 @@ public class L9130 extends TradeBuffer {
 	private L9140Report l9140Report;
 	@Autowired
 	private L9141 tranL9141;
-	
+	@Autowired
+	private L5101 l5101;
+
 	@Autowired
 	private WebClient webClient;
 
@@ -248,6 +251,14 @@ public class L9130 extends TradeBuffer {
 				StringWriter errors = new StringWriter();
 				e.printStackTrace(new PrintWriter(errors));
 				this.error("L9141產生暫收款-火險費餘額表時發生錯誤 = " + errors.toString());
+			}
+			
+			try{
+				l5101.updateInnFundAplLoanBal(iAcDate,titaVo);
+			}catch (Exception e) {
+				StringWriter errors = new StringWriter();
+				e.printStackTrace(new PrintWriter(errors));
+				this.error("L5101更新資金運用概況檔已放款金額時發生錯誤 = " + errors.toString());
 			}
 
 		} else {

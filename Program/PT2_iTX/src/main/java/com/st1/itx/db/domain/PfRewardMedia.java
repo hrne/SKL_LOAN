@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -135,6 +136,10 @@ public class PfRewardMedia implements Serializable {
   // 最後更新人員
   @Column(name = "`LastUpdateEmpNo`", length = 6)
   private String lastUpdateEmpNo;
+
+  // 單位別
+  @Column(name = "`BranchNo`", length = 4)
+  private String branchNo;
 
 
 /**
@@ -595,12 +600,32 @@ public class PfRewardMedia implements Serializable {
     this.lastUpdateEmpNo = lastUpdateEmpNo;
   }
 
+/**
+	* 單位別<br>
+	* 
+	* @return String
+	*/
+  public String getBranchNo() {
+    return this.branchNo == null ? "" : this.branchNo;
+  }
+
+/**
+	* 單位別<br>
+	* 
+  *
+  * @param branchNo 單位別
+	*/
+  public void setBranchNo(String branchNo) {
+    this.branchNo = branchNo;
+  }
+
 
   @Override
   public String toString() {
     return "PfRewardMedia [bonusNo=" + bonusNo + ", bonusDate=" + bonusDate + ", perfDate=" + perfDate + ", custNo=" + custNo + ", facmNo=" + facmNo + ", bormNo=" + bormNo
            + ", bonusType=" + bonusType + ", employeeNo=" + employeeNo + ", prodCode=" + prodCode + ", pieceCode=" + pieceCode + ", bonus=" + bonus + ", adjustBonus=" + adjustBonus
            + ", adjustBonusDate=" + adjustBonusDate + ", workMonth=" + workMonth + ", workSeason=" + workSeason + ", remark=" + remark + ", mediaFg=" + mediaFg + ", mediaDate=" + mediaDate
-           + ", manualFg=" + manualFg + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", manualFg=" + manualFg + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", branchNo=" + branchNo
+           + "]";
   }
 }

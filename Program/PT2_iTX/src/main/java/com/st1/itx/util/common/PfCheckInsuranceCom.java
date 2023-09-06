@@ -87,7 +87,7 @@ public class PfCheckInsuranceCom extends TradeBuffer {
 	public PfInsCheck check(int iKind, int iCustNo, int iFacmNo, int iPerfWorkMonth, int iCheckWorkMonth, TitaVo titaVo)
 			throws LogicException {
 		this.info("PfInsCheck check ..... Kind = " + iKind + "," + iCustNo + "-" + iFacmNo + "," + iCheckWorkMonth);
-
+		init();
 		String returnMsg = null;
 		boolean isInsert = false;
 
