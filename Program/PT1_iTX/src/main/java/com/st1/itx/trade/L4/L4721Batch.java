@@ -168,7 +168,7 @@ public class L4721Batch extends TradeBuffer {
 				if (custList != null) {
 
 					int cntTrans = 0;
-					
+
 					String isEmail = "Y";
 					String isMsg = "Y";
 					String isLetter = "Y";
@@ -190,10 +190,10 @@ public class L4721Batch extends TradeBuffer {
 							List<CustNotice> listCustNotice = custNoticeSlice == null ? null
 									: custNoticeSlice.getContent();
 
-							//直接看資料庫
-							//Y 是 要寄 要送 要通知 要列印
-							//N 是 不寄 不送 不通知 不列印
-							//皆預設Y
+							// 直接看資料庫
+							// Y 是 要寄 要送 要通知 要列印
+							// N 是 不寄 不送 不通知 不列印
+							// 皆預設Y
 							if (listCustNotice == null) {
 								isEmail = "Y";
 								isMsg = "Y";
@@ -201,10 +201,10 @@ public class L4721Batch extends TradeBuffer {
 
 							} else {
 								for (CustNotice r : listCustNotice) {
-									
-									//*在資料庫的N是不寄送 不發送
+
+									// *在資料庫的N是不寄送 不發送
 									if ("N".equals(r.getEmailNotice())) {
-										//有申請表是不要，須改為N
+										// 有申請表是不要，須改為N
 										isEmail = "N";
 									}
 
@@ -256,16 +256,8 @@ public class L4721Batch extends TradeBuffer {
 									setMailMFileVO(data, noticeEmail, titaVo);
 								}
 
-								
-								// 簡訊通知
-								if ("Y".equals(isMsg)) {
-									CntMsg = CntMsg + 1;
-									setTextFileVO(titaVo, data);
-								}
+							}
 
-							}  
-							
-							
 							// 書面通知
 							if ("Y".equals(isLetter)) {
 								if (custNoTmp != custNoLast) {
@@ -274,8 +266,13 @@ public class L4721Batch extends TradeBuffer {
 								}
 
 							}
-							
-						
+
+							// 簡訊通知
+							if ("Y".equals(isMsg)) {
+								CntMsg = CntMsg + 1;
+								setTextFileVO(titaVo, data);
+							}
+
 						} catch (LogicException e) {
 							sendMsg = e.getErrorMsg();
 							flag = false;
@@ -395,7 +392,7 @@ public class L4721Batch extends TradeBuffer {
 		this.info("isMessageLastCust : " + custNoLast);
 		this.info("lTmpCustFacm : " + lTmpCustFacm.toString());
 		for (Map<String, String> t : lTmpCustFacm) {
-			
+
 			// 設定簡訊
 			txToDoCom.setTxBuffer(this.getTxBuffer());
 			String dataLines = txToDoCom

@@ -165,7 +165,7 @@ public class BSU03 extends TradeBuffer {
 
 		for (PfItDetail it : lPfItDetail) {
 			if (it.getCntingCode().isEmpty()) {
-				this.info("not update" + it.toString());
+				this.info("not update " + it.toString());
 			}
 		}
 
@@ -177,11 +177,21 @@ public class BSU03 extends TradeBuffer {
 		this.drawdownAmt = this.drawdownAmt.add(it.getDrawdownAmt());
 		for (PfItDetail t : lPfItDetailAdjust) {
 			if (t.getCustNo() == it.getCustNo() && t.getFacmNo() == it.getFacmNo()) {
-				if (this.drawdownAmt.compareTo(t.getDrawdownAmt()) == 0) {
+				if (it.getDrawdownAmt().compareTo(t.getDrawdownAmt()) == 0) {
+					lPfItDetailUpdate = new ArrayList<PfItDetail>();
+					lPfItDetailUpdate.add(it);
+					this.drawdownAmt = it.getDrawdownAmt();
 					isUpdate = true;
 					computePf(t, lPfItDetailUpdate, titaVo);
 					lPfItDetailUpdate = new ArrayList<PfItDetail>();
 					this.drawdownAmt = BigDecimal.ZERO;
+				} else {
+					if (this.drawdownAmt.compareTo(t.getDrawdownAmt()) == 0) {
+						isUpdate = true;
+						computePf(t, lPfItDetailUpdate, titaVo);
+						lPfItDetailUpdate = new ArrayList<PfItDetail>();
+						this.drawdownAmt = BigDecimal.ZERO;
+					}
 				}
 			}
 		}
@@ -204,7 +214,7 @@ public class BSU03 extends TradeBuffer {
 				it.setPerfAmt(rmdPerfAmt); // 業績金額
 				rmdDrawdownAmt = BigDecimal.ZERO; // 撥款金額
 				rmdPerfEqAmt = BigDecimal.ZERO; // 換算業績
-				rmdPerfReward =BigDecimal.ZERO; // 業務報酬
+				rmdPerfReward = BigDecimal.ZERO; // 業務報酬
 				rmdPerfAmt = BigDecimal.ZERO; // 業績金額
 			} else {
 				BigDecimal rate = it.getDrawdownAmt().divide(this.drawdownAmt, 5, RoundingMode.HALF_UP);

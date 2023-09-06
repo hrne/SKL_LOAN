@@ -64,7 +64,7 @@ public class LM088Report extends MakeReport {
 		String brno = titaVo.getBrno();
 		String txcd = "LM088";
 		String fileItem = "放款內部控制_關係企業查核" + rocYYYMM;
-		String fileName = "LM088_8-2 放款內部控制_關係企業查核" + rocYYYMM;
+		String fileName = "LM088_8-2放款內部控制_關係企業查核" + rocYYYMM;
 		String defaultExcel = "LM088_底稿_8-2 放款內部控制_關係企業查核.xlsx";
 		String defaultSheet = "同一關係企業";
 		String reNameSheet = rocYYYMM + "-同一關係企業";
@@ -107,7 +107,7 @@ public class LM088Report extends MakeReport {
 				int custNoNext = custNoMain;
 				if (cnt + 1 < lLM088List.size()) {
 					entCodeNext = parse.stringToInteger(lLM088List.get(cnt + 1).get("EntCode"));
-					custNoNext = parse.stringToInteger(lLM088List.get(cnt + 1).get("CustNo"));
+					custNoNext = parse.stringToInteger(lLM088List.get(cnt + 1).get("CustNoMain"));
 				}
 
 				this.info("custNo vs next custNo =" + custNo + " vs " + custNoNext);

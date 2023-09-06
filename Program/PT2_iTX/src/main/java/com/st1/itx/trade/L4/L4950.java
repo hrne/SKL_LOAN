@@ -101,6 +101,7 @@ public class L4950 extends TradeBuffer {
 								}
 								// 2023/6/28 Lai 15日薪：AgLevel 業務人員職等 IN ('00') 15日薪 or LIKE 'E%' 2/3階 處經理
 								if (!employeeCom.isDay15Employee(tCdEmp, titaVo)) {
+									errCnt = errCnt + 1;
 									setreport(tFacMain, tCustMain, 4);
 								}
 							} else {

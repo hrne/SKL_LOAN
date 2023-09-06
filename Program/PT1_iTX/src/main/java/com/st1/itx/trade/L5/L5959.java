@@ -104,6 +104,7 @@ public class L5959 extends TradeBuffer {
 		this.totaVo.putParam("oInsDate", pfInsCheck.getInsDate());
 		this.totaVo.putParam("oInsNo", pfInsCheck.getInsNo());
 		this.totaVo.putParam("oCheckResult", pfInsCheck.getCheckResult());
+
 		if (pfInsCheck.getCheckWorkMonth() > 0) {
 			this.totaVo.putParam("oCheckWorkMonth", pfInsCheck.getCheckWorkMonth() - 191100);
 		} else {

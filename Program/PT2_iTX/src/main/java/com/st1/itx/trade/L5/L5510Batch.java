@@ -227,7 +227,7 @@ public class L5510Batch extends TradeBuffer {
 
 		this.batchTransaction.commit();
 
-		String msg = "房貸獎勵保費檢核檔(業績報酬)，業績筆數=" + plusCnt + ", 追回業績筆數=" + minusCnt;
+		String msg = "房貸獎勵保費檢核檔(業績報酬)，已完成" ;
 		msg += ",【報表及製檔】下傳檢核檔";
 
 		this.info("L5510Batch end = " + msg);

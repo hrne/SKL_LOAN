@@ -103,7 +103,6 @@ C(3,#CHAIN,1,s,$)
 @
 A(YM13,1,#PerfWorkMonth)
 
-
 ![顯示方式]
 #RPTFG=A,1,S
 E(0,1)
