@@ -324,7 +324,12 @@ public class L4510Batch extends TradeBuffer {
 			int nextPayIntDate = parse.stringToInteger(result.get("NextPayIntDate")) - 19110000;
 			int firstDueDate = parse.stringToInteger(result.get("FirstDueDate")) - 19110000;
 			int procCode = parse.stringToInteger(result.get("ProcCode"));
+			// 員工扣薪限15日薪
 			if ("3".equals(result.get("RepayCode"))) {
+				if (flag == 2) {
+					this.info("skip 員工扣薪限15日薪 RepayCode=3, flag = 2 " + result);
+					continue;
+				}
 				if (nextPayIntDate > iRepayEndDate) {
 					this.info("skip NextPayIntDate > iPayIntDate " + result);
 					continue;

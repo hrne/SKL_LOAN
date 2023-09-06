@@ -26,7 +26,6 @@ T(3,LM048)
 [
 ["[LM048]                                 LM048 企業放款風險承擔限額控管表"],
 ["@資料年月",#DataYear,"@年",#DataMonth,"@月"],
-["@企業放款餘額限額",#EntLoanBalLimit,"@元"],
 ]
 
 
@@ -66,9 +65,6 @@ T(1,#DATE,5,2)
 #YearMonth=A,5,S
 E(0,#DataYear*100)
 E(0,#YearMonth+#DataMonth)
-
-#EntLoanBalLimit=m,14,I
-@V(5,0,9999999999999)
 
 </sub>
 
@@ -115,7 +111,6 @@ IF(#KINBR=="0009"||#KINBR=="0008",T(2,#KINBR+#TlrNoNO),T(2,#EMPNOS))
 !------ 上行電文TIM：BASIC LABEL + AP TEXT AREA + AP TEXT ------
 <sub type="TIM">
 #YearMonth
-#EntLoanBalLimit
 #END
 </sub>
 !------ 下行電文TOM ------

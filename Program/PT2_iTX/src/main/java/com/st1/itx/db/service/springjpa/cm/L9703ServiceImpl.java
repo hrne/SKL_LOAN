@@ -38,7 +38,7 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	public List<Map<String, String>> queryForDetail(TitaVo titaVo) throws LogicException {
 		int functionCode = 0;
-		if ("L4703".equals(titaVo.getTxcd())) {
+		if (!"L9703".equals(titaVo.getTxcd())) {
 			functionCode = parse.stringToInteger(titaVo.getParam("FunctionCode"));
 		}
 
@@ -296,7 +296,7 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	public List<Map<String, String>> queryForNotice(TitaVo titaVo) throws LogicException {
 		int functionCode = 0;
-		if ("L4703".equals(titaVo.getTxcd())) {
+		if (!"L9703".equals(titaVo.getTxcd())) {
 			functionCode = parse.stringToInteger(titaVo.getParam("FunctionCode"));
 		}
 
