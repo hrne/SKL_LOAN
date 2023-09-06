@@ -37,7 +37,11 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	public List<Map<String, String>> queryForDetail(TitaVo titaVo) throws LogicException {
-		int functionCode = parse.stringToInteger(titaVo.getParam("FunctionCode"));
+		int functionCode = 0;
+		if ("L4703".equals(titaVo.getTxcd())) {
+			functionCode = parse.stringToInteger(titaVo.getParam("FunctionCode"));
+		}
+
 		int icustno = parse.stringToInteger(titaVo.getParam("CustNo"));
 		int ifacmno = parse.stringToInteger(titaVo.getParam("FacmNo"));
 		String unpay = titaVo.getParam("UnpaidCond"); // 1-逾期期數 2-逾期日數
@@ -204,7 +208,7 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 			// 繳款方式 9
 			condition += "  AND F.\"RepayCode\" IN (5, 6, 7, 8) ";
 		} else if (functionCode == 2) {
-			//20230901根據QC2699 (雅琪)整批列印 繳款方式只出匯款選項
+			// 20230901根據QC2699 (雅琪)整批列印 繳款方式只出匯款選項
 			condition += "  AND F.\"RepayCode\" = 1 ";
 		} // else
 
@@ -291,7 +295,11 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	public List<Map<String, String>> queryForNotice(TitaVo titaVo) throws LogicException {
-		int functionCode = parse.stringToInteger(titaVo.getParam("FunctionCode"));
+		int functionCode = 0;
+		if ("L4703".equals(titaVo.getTxcd())) {
+			functionCode = parse.stringToInteger(titaVo.getParam("FunctionCode"));
+		}
+
 		int icustno = parse.stringToInteger(titaVo.getParam("CustNo"));
 		int ifacmno = parse.stringToInteger(titaVo.getParam("FacmNo"));
 		String unpay = titaVo.getParam("UnpaidCond"); // 1-逾期期數 2-逾期日數

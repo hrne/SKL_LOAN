@@ -8,9 +8,11 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.CustNotice;
 import com.st1.itx.db.domain.CustNoticeId;
@@ -167,7 +169,7 @@ public class L9711Report extends MakeReport {
 				lCustNoticeId.setFormNo(txcd);
 
 				lCustNotice = sCustNoticeService.findById(lCustNoticeId, titaVo);
-				this.info("lCustNotice   = " + lCustNotice);
+//				this.info("lCustNotice   = " + lCustNotice);
 				
 //				TempVo tempVo = new TempVo();
 //				tempVo = sCustNoticeService....getCustNotice("L9703", custNo, facmNo, titaVo);
@@ -175,7 +177,7 @@ public class L9711Report extends MakeReport {
 //				if ("Y".equals(tempVo.getParam("isLetter"))) {
 				// custNotice 空的 表示 沒有申請列印 或 有值但是 paper為N 也是沒有申請列印
 				if (lCustNotice == null) {
-					isNotLetterList.add(r);
+					isLetterList.add(r);
 				} else {
 					this.info("lCustNotice.pare  = " + lCustNotice.getPaperNotice());
 					if ("Y".equals(lCustNotice.getPaperNotice())) {

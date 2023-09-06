@@ -93,14 +93,11 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                    , CASE";
 		sql += "                        WHEN lbtx.\"TitaTxCd\" IN (";
 		sql += "                            'L3200'";
-		sql += "                            , 'L3440'";
 		sql += "                        )";
 		sql += "                             AND lbtx.\"TxDescCode\" <> 3203 THEN";
 		sql += "                            'Tenty'";
-		sql += "                        WHEN ( ( lbtx.\"TitaTxCd\" = 'L3200' )";
-		sql += "                               OR ( lbtx.\"TitaTxCd\" = 'L3420'";
-		sql += "                                    AND JSON_VALUE(lbtx.\"OtherFields\", '$.CaseCloseCode') = 0 ) ) THEN";
-		sql += "                            'PartlyRepay'";
+		sql += "                        WHEN  lbtx.\"TitaTxCd\" = 'L3200'";
+		sql += "                        THEN 'PartlyRepay'";
 		sql += "                        ELSE";
 		sql += "                            '其他'";
 		sql += "                    END AS \"Type\"";
@@ -116,7 +113,7 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                                      AND mlb.\"YearMonth\" = substr(lbtx.\"EntryDate\", 1, 6)";
 		sql += "                    LEFT JOIN \"CustMain\"         cm ON cm.\"CustNo\" = lbtx.\"CustNo\"";
 		sql += "                WHERE";
-		sql += "                    trunc(lbtx.\"EntryDate\" / 100) BETWEEN :YearMonthMin AND :YearMonthMax";
+		sql += "                    trunc(lbtx.\"AcDate\" / 100) BETWEEN :YearMonthMin AND :YearMonthMax";
 		sql += "                    AND lbtx.\"TitaHCode\" = 0";
 		sql += "                    AND mlb.\"LoanBalance\" > 0";
 		sql += "                    AND lbm.\"Status\" IN (";

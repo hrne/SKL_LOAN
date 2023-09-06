@@ -55,8 +55,9 @@ public class L4950 extends TradeBuffer {
 	@Autowired
 	EmployeeCom employeeCom;
 
-	int nextPayIntDateFrom = 0;
-	int nextPayIntDateTo = 0;
+	private int nextPayIntDateFrom = 0;
+	private int nextPayIntDateTo = 0;
+	private CdEmp tCdEmp = new CdEmp();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -77,6 +78,7 @@ public class L4950 extends TradeBuffer {
 //		2.Facm repayCode = 03(員工扣薪)
 //		3.CdEmp 檢查是否在職
 
+		CdEmp tCdEmp = new CdEmp();
 		if (slFacMain != null) {
 			for (FacMain tFacMain : slFacMain.getContent()) {
 				if (tFacMain != null) {
@@ -87,22 +89,18 @@ public class L4950 extends TradeBuffer {
 						CustMain tCustMain = custMainService.custNoFirst(tFacMain.getCustNo(), tFacMain.getCustNo(),
 								titaVo);
 						if (tCustMain != null) {
-							CdEmp tCdEmp = new CdEmp();
 							tCdEmp = cdEmpService.findById(tCustMain.getEmpNo());
 							if (tCdEmp != null) {
-								if (!"0".equals(tCdEmp.getAgType1()) && !"2".equals(tCdEmp.getAgType1())
-										&& !"3".equals(tCdEmp.getAgType1()) && !"5".equals(tCdEmp.getAgType1())) {
-									errCnt = errCnt + 1;
-									setreport(tFacMain, tCustMain, 2);
-								}
-								if (!"0".equals(tCdEmp.getAgType1()) && !"2".equals(tCdEmp.getAgType1())) {
-									errCnt = errCnt + 1;
-									setreport(tFacMain, tCustMain, 3);
-								}
 								// 2023/6/28 Lai 15日薪：AgLevel 業務人員職等 IN ('00') 15日薪 or LIKE 'E%' 2/3階 處經理
 								if (!employeeCom.isDay15Employee(tCdEmp, titaVo)) {
 									errCnt = errCnt + 1;
-									setreport(tFacMain, tCustMain, 4);
+									setreport(tFacMain, tCustMain, 3);
+								} else {
+									if (!"0".equals(tCdEmp.getAgType1()) && !"2".equals(tCdEmp.getAgType1())
+											&& !"3".equals(tCdEmp.getAgType1()) && !"5".equals(tCdEmp.getAgType1())) {
+										errCnt = errCnt + 1;
+										setreport(tFacMain, tCustMain, 2);
+									}
 								}
 							} else {
 								errCnt = errCnt + 1;
@@ -147,19 +145,22 @@ public class L4950 extends TradeBuffer {
 			occursList.putParam("OOEmpName", tCustMain.getCustName().substring(0, nameLength));
 			occursList.putParam("OOEmpNo", tCustMain.getEmpNo());
 			occursList.putParam("OOEmpId", tCustMain.getCustId());
-			occursList.putParam("OOErrMsg", "制度別不屬於員工扣薪(0/2/3/5)");
+			occursList.putParam("OOErrMsg", "制度別= " + tCdEmp.getAgType1() + ",不屬於員工扣薪(0/2/3/5)");
 			break;
 		case 3:
 			occursList.putParam("OOEmpName", tCustMain.getCustName().substring(0, nameLength));
 			occursList.putParam("OOEmpNo", tCustMain.getEmpNo());
 			occursList.putParam("OOEmpId", tCustMain.getCustId());
-			occursList.putParam("OOErrMsg", "非車貸，制度別0/2才可設定員工扣薪");
+			if (!"1".equals(tCdEmp.getAgStatusCode()) && !"9".equals(tCdEmp.getAgStatusCode())) {
+				occursList.putParam("OOErrMsg", "業務人員任用狀況碼=" + tCdEmp.getAgStatusCode() + ", 非現職人員");
+			} else {
+				occursList.putParam("OOErrMsg", "業務人員職等=" + tCdEmp.getAgLevel() + ", 00或第一碼為E，才可設定員工扣薪");
+			}
 			break;
 		case 4:
 			occursList.putParam("OOEmpName", tCustMain.getCustName().substring(0, nameLength));
 			occursList.putParam("OOEmpNo", tCustMain.getEmpNo());
 			occursList.putParam("OOEmpId", tCustMain.getCustId());
-			occursList.putParam("OOErrMsg", "業務人員職等=00或第一碼為E，才可設定員工扣薪");
 			break;
 		default:
 			occursList.putParam("OOErrMsg", "");
