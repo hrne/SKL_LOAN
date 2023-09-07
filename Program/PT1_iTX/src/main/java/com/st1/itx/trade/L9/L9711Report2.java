@@ -14,11 +14,8 @@ import com.st1.itx.buffer.TxBuffer;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
-import com.st1.itx.db.domain.CustNotice;
-import com.st1.itx.db.domain.CustNoticeId;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
-import com.st1.itx.db.service.CustNoticeService;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.MakeReport;
@@ -41,15 +38,11 @@ public class L9711Report2 extends MakeReport {
 	@Autowired
 	CustNoticeCom custNoticeCom;
 
-//	L9711ServiceImpl L9711ServiceIml
 	@Autowired
 	DateUtil dDateUtil;
 
 	@Autowired
 	private CdEmpService cdEmpService;
-
-	@Autowired
-	private CustNoticeService sCustNoticeService;
 
 	@Autowired
 	BaTxCom dBaTxCom;
@@ -108,55 +101,11 @@ public class L9711Report2 extends MakeReport {
 				if (count > 0) {
 					this.newPage();
 				}
-
-				// 確認 CustNoticeCom 檢查是否能產出郵寄通知
-
-				// inputCustNo: #CUSTNO
-				// CustNo: Query.F4
-				// FacmNo: Query.F5
-
-//				String inputCustNo = titaVo.get("CustNo");
-//				String recordCustNoString = tL9711Vo.get("F4");
-//				String recordFacmNoString = tL9711Vo.get("F5");
-//				int recordCustNo = parse.stringToInteger(recordCustNoString);
-//				int recordFacmNo = parse.stringToInteger(recordFacmNoString);
-//				this.info("recordCustNoString=" + recordCustNoString);
-//				this.info("recordFacmNo=" + recordFacmNo);
-//
-//				if (!custNoticeCom.checkIsLetterSendable(inputCustNo, recordCustNo, recordFacmNo, "L9711", titaVo)) {
-//					continue;
-//				}
-//
-//				this.info("recordCustNoString2=" + recordCustNoString);
-//				this.info("recordFacmNo2=" + recordFacmNo);
-
-				int custNo = parse.stringToInteger(tL9711Vo.get("CustNo"));
-				int facmNo = parse.stringToInteger(tL9711Vo.get("FacmNo"));
-
-				CustNotice lCustNotice = new CustNotice();
-				CustNoticeId lCustNoticeId = new CustNoticeId();
-
-				lCustNoticeId.setCustNo(custNo);
-				lCustNoticeId.setFacmNo(facmNo);
-				lCustNoticeId.setFormNo(nTxCd.substring(0, 5));
-
-				lCustNotice = sCustNoticeService.findById(lCustNoticeId, titaVo);
-				// paper為N 表示不印
-//				if (lCustNotice == null) {
-//					continue;
-//				} else {
-//					if ("N".equals(lCustNotice.getPaperNotice())) {
-//						continue;
-//					}
-//				}
-
 				// 每次戶號額度都不一樣
 				report(tL9711Vo, txbuffer);
 
 				// 有列印書面戶號額度的資料
 				isLetterList.add(tL9711Vo);
-
-				//
 
 				count++;
 			} // for

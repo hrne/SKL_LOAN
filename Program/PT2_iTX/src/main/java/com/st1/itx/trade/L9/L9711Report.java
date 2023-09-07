@@ -8,18 +8,15 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
-import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.CustNotice;
 import com.st1.itx.db.domain.CustNoticeId;
 import com.st1.itx.db.service.CustNoticeService;
 import com.st1.itx.db.service.springjpa.cm.L9711ServiceImpl;
 import com.st1.itx.util.common.BaTxCom;
-import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.parse.Parse;
@@ -41,9 +38,6 @@ public class L9711Report extends MakeReport {
 	@Autowired
 	Parse parse;
 
-	@Autowired
-	private CustNoticeCom custNoticeCom;
-	
 	@Autowired
 	private CustNoticeService sCustNoticeService;
 
@@ -169,12 +163,7 @@ public class L9711Report extends MakeReport {
 				lCustNoticeId.setFormNo(txcd);
 
 				lCustNotice = sCustNoticeService.findById(lCustNoticeId, titaVo);
-//				this.info("lCustNotice   = " + lCustNotice);
-				
-//				TempVo tempVo = new TempVo();
-//				tempVo = sCustNoticeService....getCustNotice("L9703", custNo, facmNo, titaVo);
 
-//				if ("Y".equals(tempVo.getParam("isLetter"))) {
 				// custNotice 空的 表示 沒有申請列印 或 有值但是 paper為N 也是沒有申請列印
 				if (lCustNotice == null) {
 					isLetterList.add(r);
@@ -195,7 +184,7 @@ public class L9711Report extends MakeReport {
 			this.print(1, startPos, "本日無資料");
 
 		}
-		//計算總筆數
+		// 計算總筆數
 		int talcount = 0;
 
 		// 計算筆數
@@ -213,8 +202,8 @@ public class L9711Report extends MakeReport {
 					count = 0;
 					newPage();
 				}
-				if(talcount == isLetterList.size()) {
-					this.print(-80, startPos + 53, "總筆數  : "+talcount+" 筆 ","C");
+				if (talcount == isLetterList.size()) {
+					this.print(-80, startPos + 53, "總筆數  : " + talcount + " 筆 ", "C");
 				}
 			}
 
@@ -237,8 +226,8 @@ public class L9711Report extends MakeReport {
 					count = 0;
 					newPage();
 				}
-				if(talcount == isNotLetterList.size()) {
-					this.print(-80, startPos + 53, "共  : "+talcount+" 筆 ","C");
+				if (talcount == isNotLetterList.size()) {
+					this.print(-80, startPos + 53, "共  : " + talcount + " 筆 ", "C");
 				}
 			}
 		} else {
@@ -248,8 +237,8 @@ public class L9711Report extends MakeReport {
 
 		this.toPdf(sno);
 
-		l9711report3.exec(titaVo, isLetterList);
-		
+		l9711report3.exec(titaVo, checkAllCustNoMaturityDate(isLetterList, titaVo));
+
 		return isLetterList;
 
 	}
@@ -313,6 +302,80 @@ public class L9711Report extends MakeReport {
 		int amt = Integer.valueOf(xamt);
 
 		return String.format("%,d", amt);
+	}
+
+	/**
+	 * 檢查要列印的戶號所有額度資料是否有到期日 需判斷全戶號額度的同一個擔保品的到期日都要到期才會印後面三張表
+	 * 
+	 * @throws LogicException
+	 */
+	private List<Map<String, String>> checkAllCustNoMaturityDate(List<Map<String, String>> list, TitaVo titaVo)
+			throws LogicException {
+//		String iSDAY = String.valueOf(Integer.valueOf(titaVo.get("ACCTDATE_ST")) + 19110000);
+		int iEDAY = Integer.valueOf(titaVo.get("ACCTDATE_ED")) + 19110000;
+
+		List<String> checkForDupList = new ArrayList<String>();
+
+		List<Map<String, String>> isLetterList = new ArrayList<Map<String, String>>();
+
+		int custNo = 0;
+		int clCode1 = 0;
+		int clCode2 = 0;
+		int clNo = 0;
+
+		int maturityDate = 0;
+
+		boolean isPrint = true;
+
+		String tmpCkStr = "";
+		List<Map<String, String>> tmpData = new ArrayList<Map<String, String>>();
+
+		for (Map<String, String> r : list) {
+			custNo = parse.stringToInteger(r.get("CustNo"));
+			clCode1 = parse.stringToInteger(r.get("ClCode1"));
+			clCode2 = parse.stringToInteger(r.get("ClCode2"));
+			clNo = parse.stringToInteger(r.get("ClNo"));
+
+			try {
+
+				tmpData = l9711ServiceImpl.checkAllCustNo(custNo, clCode1, clCode2, clNo, titaVo);
+
+			} catch (Exception e) {
+
+				StringWriter errors = new StringWriter();
+				e.printStackTrace(new PrintWriter(errors));
+				this.info("L9711ServiceImpl.checkAllCustNo error = " + errors.toString());
+				return null;
+
+			}
+
+			isPrint = true;
+
+			if (tmpData == null || tmpData.size() == 0) {
+				isPrint = false;
+			} else {
+				for (Map<String, String> t : tmpData) {
+					maturityDate = parse.stringToInteger(t.get("MaturityDate"));
+					// 所有戶號額度的到期日 大於 到期止日 就不要印
+					if (iEDAY < maturityDate) {
+						isPrint = false;
+					}
+				}
+			}
+			tmpCkStr = custNo + "," + clCode1 + "," + "," + clCode2 + "," + clNo;
+
+			if (isPrint) {
+				// 確定要印後，排除放過的擔保品
+				if (!checkForDupList.contains(tmpCkStr)) {
+					checkForDupList.add(tmpCkStr);
+					isLetterList.add(r);
+				}
+			}
+
+		}
+
+		return isLetterList;
+
 	}
 
 }

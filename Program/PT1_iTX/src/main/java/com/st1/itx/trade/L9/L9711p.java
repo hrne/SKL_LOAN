@@ -50,6 +50,9 @@ public class L9711p extends TradeBuffer {
 
 		l9711report.setParentTranCode(parentTranCode);
 
+		
+		//順序report 1 => 3 => 2 => 4
+		//明細表 => 需列印到期通知單清單 => 放款本息攤還表暨繳息通知單 => 通知單列印成功清單
 		List<Map<String, String>> l9711List = l9711report.exec(titaVo);
 
 		l9711report2.exec(titaVo, txbuffer, l9711List, parentTranCode);

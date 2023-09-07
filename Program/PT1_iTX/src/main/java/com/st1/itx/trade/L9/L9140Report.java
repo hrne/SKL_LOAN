@@ -169,7 +169,7 @@ public class L9140Report extends MakeReport {
 		}
 
 		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
-				"結清戶滿五年查詢清單完成", titaVo);
+				"L9140 結清戶滿五年查詢清單已完成", titaVo);
 
 		this.close();
 	}

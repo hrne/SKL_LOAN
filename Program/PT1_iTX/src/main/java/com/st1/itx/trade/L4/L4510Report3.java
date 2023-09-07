@@ -241,7 +241,7 @@ public class L4510Report3 extends MakeReport {
 
 						this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
 
-						this.print(1, 44, "總　計：");
+						this.print(1, 44, "小　計：");
 						this.print(0, 15, "" + perfMonth);
 						this.print(0, 25, procCode);
 						this.print(0, 51, FormatUtil.pad9("" + timeBs, 7));
@@ -319,7 +319,10 @@ public class L4510Report3 extends MakeReport {
 //				3.若為最後一筆，則固定產出小計、總計、報表合計
 					if (total == fnAllList.size()) {
 						this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
-						this.print(1, 51, FormatUtil.pad9("" + timeAs, 7));
+						this.print(1, 44, "小　計：");
+						this.print(0, 15, "" + perfMonth);
+						this.print(0, 25, procCode);
+						this.print(0, 51, FormatUtil.pad9("" + timeAs, 7));
 						this.print(0, 72, format4Amt(sumA1), "R");// 扣款金額
 						this.print(0, 83, format4Amt(sumA2), "R");// 本金
 						this.print(0, 92, format4Amt(sumA3), "R");// 利息
@@ -331,7 +334,6 @@ public class L4510Report3 extends MakeReport {
 
 						this.print(1, 44, "總　計：");
 						this.print(0, 15, "" + perfMonth);
-						this.print(0, 25, procCode);
 						this.print(0, 51, FormatUtil.pad9("" + timeBs, 7));
 						this.print(0, 72, format4Amt(sumB1), "R");// 扣款金額
 						this.print(0, 83, format4Amt(sumB2), "R");// 本金

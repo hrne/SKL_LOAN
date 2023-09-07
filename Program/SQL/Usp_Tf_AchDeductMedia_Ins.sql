@@ -120,7 +120,7 @@ BEGIN
           ,MBK."TRXDAT"                   AS "AcDate"              -- 會計日期 DECIMAL 8 
           ,CASE
              WHEN NVL(MBK."MBKRSN",' ') != ' '
-             THEN MBK.BSTBTN
+             THEN TO_CHAR(MBK.BSTBTN)
            ELSE '' END                    AS "BatchNo"             -- 批號 VARCHAR2 6 
           ,CASE
              WHEN NVL(MBK."MBKRSN",' ') != ' '

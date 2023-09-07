@@ -129,21 +129,21 @@ BEGIN
           ,NULL                                    AS "LastTlrNo"       -- 上次交易員代號 VARCHAR2(6 BYTE)
           ,NULL                                    AS "LastTxtNo"       -- 上次交易序號 VARCHAR2(8 BYTE)
           ,NULL                                    AS "LastSeqNo"       -- 上次序號 VARCHAR2(30 BYTE)
-          ,LASTUPDATEDATE                          AS "CreateDate"      -- 建檔日期時間 DATE 8 0
+          ,BS.LASTUPDATEDATE                          AS "CreateDate"      -- 建檔日期時間 DATE 8 0
           -- 2023-09-06 Wei from SKL-IT 盈倩
           ,CASE
-             WHEN MODIFYUSERID = 'A227210094'
+             WHEN BS.MODIFYUSERID = 'A227210094'
              THEN 'EC0416' -- 離職員工
-             WHEN MODIFYUSERID = 'F224601758'
+             WHEN BS.MODIFYUSERID = 'F224601758'
              THEN '999999'
-           ELSE MODIFYUSERID END                   AS "CreateEmpNo"     -- 建檔人員 VARCHAR2 6 0
-          ,LASTUPDATEDATE                          AS "LastUpdate"      -- 最後更新日期時間 DATE 8 0
+           ELSE BS.MODIFYUSERID END                   AS "CreateEmpNo"     -- 建檔人員 VARCHAR2 6 0
+          ,BS.LASTUPDATEDATE                          AS "LastUpdate"      -- 最後更新日期時間 DATE 8 0
           ,CASE
-             WHEN MODIFYUSERID = 'A227210094'
+             WHEN BS.MODIFYUSERID = 'A227210094'
              THEN 'EC0416' -- 離職員工
-             WHEN MODIFYUSERID = 'F224601758'
+             WHEN BS.MODIFYUSERID = 'F224601758'
              THEN '999999'
-           ELSE MODIFYUSERID END                   AS "LastUpdateEmpNo" -- 最後更新人員 VARCHAR2 6 0
+           ELSE BS.MODIFYUSERID END                   AS "LastUpdateEmpNo" -- 最後更新人員 VARCHAR2 6 0
     FROM "NegTranNoMapping" MAP
     LEFT JOIN REMIN_TBJCICBUSINESS BS ON BS.CustIDN       = MAP."CustIDN"
                                      AND BS.RC_DATE       = MAP."RC_DATE"

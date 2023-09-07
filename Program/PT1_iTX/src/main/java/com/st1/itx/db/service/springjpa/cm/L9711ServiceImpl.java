@@ -32,7 +32,6 @@ public class L9711ServiceImpl extends ASpringJpaParm implements InitializingBean
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 		this.info("L9711.findAll");
@@ -78,6 +77,9 @@ public class L9711ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ,M.\"AmortizedCode\" F21";
 		sql += "        ,F.\"AcctCode\" F22";
 		sql += "        ,C.\"EntCode\" AS \"EntCode\"";
+		sql += "        ,CF.\"ClCode1\" AS \"ClCode1\"";
+		sql += "        ,CF.\"ClCode2\" AS \"ClCode2\"";
+		sql += "        ,CF.\"ClNo\" AS \"ClNo\"";
 		sql += "        ,ROW_NUMBER() OVER (PARTITION BY M.\"CustNo\", M.\"FacmNo\" ORDER BY T.\"TelTypeCode\") AS SEQ";
 		sql += "	FROM(SELECT \"CustNo\"";
 		sql += "			   ,\"FacmNo\"";
@@ -130,7 +132,48 @@ public class L9711ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("icustno", iCUSTNO);
 		}
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
+	}
+
+	
+	/**
+	 * 找所有戶號的擔保品到期日
+	 * @param custNo 
+	 * @param clCode1 
+	 * @param clCode2 
+	 * @param clNo 
+	 * @param titaVo 
+	 * @return 
+	 * @throws Exception 
+	 * 
+	 * */
+	public List<Map<String, String>> checkAllCustNo(int custNo, int clCode1, int clCode2, int clNo, TitaVo titaVo)
+			throws Exception {
+
+		this.info("L9711.checkAllCustNo ... ");
+
+		String sql = "";
+		sql += "	SELECT C.\"ClCode1\"";
+		sql += "	  	  ,C.\"ClCode2\"";
+		sql += "	  	  ,C.\"ClNo\"";
+		sql += "	  	  ,C.\"CustNo\"";
+		sql += "	  	  ,C.\"FacmNo\"";
+		sql += "	  	  ,F.\"MaturityDate\"";
+		sql += "	FROM \"ClFac\" C";
+		sql += "	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = C.\"CustNo\"";
+		sql += "	 					   AND F.\"FacmNo\" = C.\"FacmNo\"";
+		sql += "	WHERE C.\"CustNo\" = " + custNo;
+		sql += "	  AND C.\"ClCode1\" = " + clCode1;
+		sql += "	  AND C.\"ClCode2\" = " + clCode2;
+		sql += "	  AND C.\"ClNo\" = " + clNo;
+		sql += "	  AND C.\"MainFlag\" = 'Y' ";
+
+		this.info("sql=" + sql);
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+
+		return this.convertToMap(query);
 	}
 
 }
