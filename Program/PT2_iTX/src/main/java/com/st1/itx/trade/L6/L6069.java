@@ -14,6 +14,8 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.MakeExcel;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.parse.Parse;
 import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.springjpa.cm.L6069ServiceImpl;
@@ -34,6 +36,9 @@ public class L6069 extends TradeBuffer {
 
 	@Autowired
 	private L6069ServiceImpl l6069ServiceImpl;
+	
+	@Autowired
+	private MakeExcel makeExcel;
 
 	@Autowired
 	Parse parse;
@@ -42,14 +47,52 @@ public class L6069 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6069 ");
 		this.totaVo.init(titaVo);
-
+ 
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
+
+		List<Map<String, String>> L6069List = null;
+		
+		int printRow = 1;
+
+		String Searc = titaVo.getParam("Searc");
+		this.info("Searc   = " + Searc);
+		
+		if (Searc.equals("1")) {
+			// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
+			this.limit = Integer.MAX_VALUE; // 64 * 200 = 12,800
+			try {
+				L6069List = l6069ServiceImpl.FindAll(titaVo, this.index, this.limit);
+			} catch (Exception e) {
+				// E5004 讀取DB時發生問題
+				throw new LogicException(titaVo, "E0001", "SQL ERROR");
+			}
+			ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getKinbr()).setRptDate(titaVo.getEntDyI())
+					.setRptCode("L6069").setRptItem("代碼檔代號查詢").build();
+			// open
+			makeExcel.open(titaVo, reportVo, "L6069代碼檔代號查詢");
+
+			for (Map<String, String> c : L6069List) {
+
+				makeExcel.setValue(printRow, 1, c.get("ACODE"));
+				makeExcel.setValue(printRow, 2, c.get("ADEFCODE"));
+				makeExcel.setValue(printRow, 3, c.get("AITEM"));
+				makeExcel.setValue(printRow, 4, c.get("BITEM"));
+				makeExcel.setValue(printRow, 5, c.get("ADEFTYPE"));
+				makeExcel.setValue(printRow, 6, c.get("BCODE"));
+
+				printRow++;
+
+			}
+			long sno = makeExcel.close();
+			makeExcel.toExcel(sno);
+
+		}		
+		
 
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 100; // 64 * 200 = 12,800
 
-		List<Map<String, String>> L6069List = null;
 
 		try {
 			L6069List = l6069ServiceImpl.FindAll(titaVo, this.index, this.limit);
@@ -57,7 +100,7 @@ public class L6069 extends TradeBuffer {
 			// E5004 讀取DB時發生問題
 			throw new LogicException(titaVo, "E0001", "SQL ERROR");
 		}
-
+		
 		List<LinkedHashMap<String, String>> chkOccursList = null;
 		if (L6069List != null && L6069List.size() > 0) {
 			for (Map<String, String> c : L6069List) {
@@ -88,7 +131,7 @@ public class L6069 extends TradeBuffer {
 
 		if (chkOccursList == null && titaVo.getReturnIndex() == 0) {
 			throw new LogicException("E0001", "查詢資料不存在(共用代碼檔)"); // 查無資料
-			// throw new LogicException("E2003", ""); // 查無資料
+		//	throw new LogicException("E2003", ""); // 查無資料
 		}
 
 		this.addList(this.totaVo);

@@ -270,14 +270,6 @@ IF(#TelTypeCode == 3 || #TelTypeCode == 5 || #TelTypeCode == 9,S,$)
 C(3,#TelTypeCode,9,S,$)
 @V(9)
 
-! 異動原因
-#TelChgRsnCode=A,2,I
-!C(3,#TelChgRsnCode,0,E(0,1),$)
-HELP(#TelChgRsnCodeHelp)
-@V(H,#TelChgRsnCodeHelp)
-! 異動原因中文
-#TelChgRsnItem=X,40,L
-T(H,#TelChgRsnCode,#TelChgRsnCodeHelp)
 
 ! 電話號碼分機
 #TelExt=X,5,I
@@ -288,6 +280,14 @@ IF(#TelTypeCode == 3 || #TelTypeCode == 5 || #TelTypeCode == 9,S,$)
 IF(#TelTypeCode == 9,$,S)
 @IF(#TelTypeCode == 9,V(9),S)
 
+! 異動原因
+#TelChgRsnCode=A,2,I
+!C(3,#TelChgRsnCode,0,E(0,1),$)
+HELP(#TelChgRsnCodeHelp)
+@V(H,#TelChgRsnCodeHelp)
+! 異動原因中文
+#TelChgRsnItem=X,40,L
+T(H,#TelChgRsnCode,#TelChgRsnCodeHelp)
 
 ! 與借款人關係
 #RelationCode=X,2,I

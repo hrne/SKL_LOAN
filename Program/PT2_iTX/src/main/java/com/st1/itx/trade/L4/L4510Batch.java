@@ -427,45 +427,6 @@ public class L4510Batch extends TradeBuffer {
 					+ achRepayCode + ", flag=" + flag + ", procCode=" + procCode + "]";
 		}
 
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + getEnclosingInstance().hashCode();
-			result = prime * result + BormNo;
-			result = prime * result + achRepayCode;
-			result = prime * result + custNo;
-			result = prime * result + facmNo;
-			result = prime * result + flag;
-			result = prime * result + procCode;
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			tmpFacm other = (tmpFacm) obj;
-			if (!getEnclosingInstance().equals(other.getEnclosingInstance()))
-				return false;
-			if (BormNo != other.BormNo)
-				return false;
-			if (achRepayCode != other.achRepayCode)
-				return false;
-			if (custNo != other.custNo)
-				return false;
-			if (facmNo != other.facmNo)
-				return false;
-			if (flag != other.flag)
-				return false;
-			if (procCode != other.procCode)
-				return false;
-			return true;
-		}
 
 		private int getCustNo() {
 			return custNo;
@@ -595,7 +556,7 @@ public class L4510Batch extends TradeBuffer {
 			EmpDeductDtl tEmpDeductDtl = new EmpDeductDtl();
 			EmpDeductDtlId tEmpDeductDtlId = new EmpDeductDtlId();
 
-			tmpFacm tmp2 = new tmpFacm(tmp.getCustNo(), tmp.getFacmNo(), tmp.getBormNo(), 0, tmp.getFlag(),
+			tmpFacm tmp2 = new tmpFacm(tmp.getCustNo(), tmp.getFacmNo(), 0, 0, tmp.getFlag(),
 					tmp.getProcCode());
 			tmpFacm tmp3 = new tmpFacm(tmp.getCustNo(), tmp.getFacmNo(), 0, 0, tmp.getFlag(), tmp.getProcCode());
 
@@ -804,10 +765,10 @@ public class L4510Batch extends TradeBuffer {
 				if (tBaTxVo.getRepayType() >= 4 && tBaTxVo.getAcctAmt().compareTo(BigDecimal.ZERO) == 0) {
 					continue;
 				}
-				tmpFacm tmp = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), tBaTxVo.getBormNo(),
+				tmpFacm tmp = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), 0,
 						tBaTxVo.getRepayType(), flag, procCode);
 
-				tmpFacm tmp2 = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), tBaTxVo.getBormNo(), 0, flag,
+				tmpFacm tmp2 = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), 0, 0, flag,
 						procCode);
 				tmpFacm tmp3 = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), 0, 0, flag, procCode);
 

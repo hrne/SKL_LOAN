@@ -19,9 +19,9 @@ BEGIN
     JOB_START_TIME := SYSTIMESTAMP;
 
     -- 刪除舊資料
-    EXECUTE IMMEDIATE 'ALTER TABLE "BankRelationCompany" DISABLE PRIMARY KEY CASCADE';
+    -- EXECUTE IMMEDIATE 'ALTER TABLE "BankRelationCompany" DISABLE PRIMARY KEY CASCADE';
     EXECUTE IMMEDIATE 'TRUNCATE TABLE "BankRelationCompany" DROP STORAGE';
-    EXECUTE IMMEDIATE 'ALTER TABLE "BankRelationCompany" ENABLE PRIMARY KEY';
+    -- EXECUTE IMMEDIATE 'ALTER TABLE "BankRelationCompany" ENABLE PRIMARY KEY';
 
     -- 寫入資料
     INSERT INTO "BankRelationCompany" (
@@ -46,9 +46,9 @@ BEGIN
           ,NVL(S1."LAW003",'0')           AS "LAW003"              -- 金控法第45條 VARCHAR2 1 0
           ,NVL(S1."LAW005",'0')           AS "LAW005"              -- 保險法(放款) VARCHAR2 1 0
           ,NVL(S1."LAW008",'0')           AS "LAW008"              -- 準利害關係人 VARCHAR2 1 0
-          ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 0 
+          ,LASTUPDATE_DATE                AS "CreateDate"          -- 建檔日期時間 DATE 0 
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
-          ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 0 
+          ,LASTUPDATE_DATE                AS "LastUpdate"          -- 最後更新日期時間 DATE 0 
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
     FROM "INFOR_BANKRELATIONCOMPANY" S1
     ;

@@ -30,6 +30,7 @@ E(0,0)
 ["#FdRepayAmt+應扣金額",#RepayAmt],["#FdUnitCode+單位代號",#UnitCode],
 ["#FdPrincipal+本金",#Principal],["#FdResignCode+離職代碼",#ResignCode],
 ["#FdInterest+利息",#Interest],["#FdPositCode+職務代號",#PositCode],
+[#<->#,"#FdBreachAmt+違約金",#BreachAmt],
 [#<->#,"#FdSumOvpayAmt+累溢短收",#SumOvpayAmt],
 ["#FdIntStartDate+計息起日",#IntStartDate],["#FdBatchNo+批次號碼",#BatchNo],
 ["#FdIntEndDate+計息迄日",#IntEndDate],["#FdErrMsg+失敗原因",#ErrMsg],
@@ -55,6 +56,7 @@ E(0,0)
 #FdResignCode=X,2,L
 #FdInterest=X,2,L
 #FdPositCode=X,2,L
+#FdBreachAmt=X,2,L
 #FdSumOvpayAmt=X,2,L
 #FdIntStartDate=X,2,L
 #FdBatchNo=X,2,L
@@ -180,9 +182,6 @@ T(F,@CustNo,0)
 T(F,@FacmNo,0)
 T(F,@BormNo,0)
 T(F,@RepayAmt,0)
-T(F,@Principal,0)
-T(F,@Interest,0)
-T(F,@SumOvpayAmt,0)
 ,$)
 
 ![入帳日期]
@@ -314,6 +313,7 @@ T(2,@UnitCode,#L4R29UnitCode)
 E(0,@Principal,#L4R29Principal)
 T(2,@ResignCode,#L4R29ResignCode)
 E(0,@Interest,#L4R29Interest)
+E(0,@BreachAmt,#L4R29BreachAmt)
 T(2,@PositCode,#L4R29PositCode)
 E(0,@SumOvpayAmt,#L4R29SumOvpayAmt)
 T(2,@IntStartDate,#L4R29IntStartDate)
@@ -333,13 +333,13 @@ T(2,@TitaTxtNo,#L4R29TitaTxtNo)
 #CustId=X,10,L
 
 ![交易金額]
-#TxAmt=m,14,L
+#TxAmt=+m,14,L
 
 ![部室代號]
 #DeptCode=X,6,L
 
 ![應扣金額]
-#RepayAmt=m,14,I
+#RepayAmt=+m,14,I
 C(3,#FunctionCode,4,s,$)
 C(3,#FunctionCode,5,s,$)
 
@@ -347,25 +347,22 @@ C(3,#FunctionCode,5,s,$)
 #UnitCode=X,6,L
 
 ![本金]
-#Principal=m,14,I
-C(3,#FunctionCode,4,s,$)
-C(3,#FunctionCode,5,s,$)
+#Principal=+m,14,L
 
 ![離職代碼]
 #ResignCode=X,6,L
 
 ![利息]
-#Interest=m,14,I
-C(3,#FunctionCode,4,s,$)
-C(3,#FunctionCode,5,s,$)
+#Interest=+m,14,L
+
+![違約金]
+#BreachAmt=+m,14,L
 
 ![職務代號]
 #PositCode=X,6,L
 
 ![累溢短收]
-#SumOvpayAmt=+m,14,I
-C(3,#FunctionCode,4,s,$)
-C(3,#FunctionCode,5,s,$)
+#SumOvpayAmt=+m,14,L
 
 ![計息起日]
 #IntStartDate=D,7,L
@@ -411,6 +408,7 @@ C(3,#FunctionCode,5,s,$)
 #RepayAmt
 #Principal
 #Interest
+#BreachAmt
 #SumOvpayAmt
 </sub>
 

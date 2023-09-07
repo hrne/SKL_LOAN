@@ -5762,6 +5762,7 @@ TXFORM=L4R28
 #L4R29Principal=m,14,S
 #L4R29ResignCode=X,6,S
 #L4R29Interest=m,14.2,S
+#L4R29BreachAmt=m,14.2,S
 #L4R29PositCode=X,6,S
 #L4R29SumOvpayAmt=+m,14,S
 #L4R29IntStartDate=D,7,S
@@ -5782,6 +5783,7 @@ TXFORM=L4R29
 #L4R29Principal
 #L4R29ResignCode
 #L4R29Interest
+#L4R29BreachAmt
 #L4R29PositCode
 #L4R29SumOvpayAmt
 #L4R29IntStartDate

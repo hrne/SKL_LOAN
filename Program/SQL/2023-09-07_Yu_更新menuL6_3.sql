@@ -1,0 +1,1 @@
+UPDATE "CdCode" SET "Item" = '共同資料(利率、營業日、政府專案)' WHERE "DefCode" = 'SubMenuL6'  AND  "Code" = '3';

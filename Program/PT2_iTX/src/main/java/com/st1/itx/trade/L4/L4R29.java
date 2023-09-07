@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L4;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdCode;
@@ -55,6 +57,12 @@ public class L4R29 extends TradeBuffer {
 		int mediaSeq = parse.stringToInteger(titaVo.getParam("RimMediaSeq"));
 
 		EmpDeductDtl tEmpDeductDtl = null;
+		TempVo tempVo = new TempVo();
+		BigDecimal tempAmt = BigDecimal.ZERO;
+		BigDecimal breachAmt = BigDecimal.ZERO;
+		BigDecimal shortPri = BigDecimal.ZERO;
+		BigDecimal shortInt = BigDecimal.ZERO;
+
 		if (mediaSeq == 0) {
 			EmpDeductDtlId tEmpDeductDtlId = new EmpDeductDtlId();
 			tEmpDeductDtl = new EmpDeductDtl();
@@ -70,6 +78,22 @@ public class L4R29 extends TradeBuffer {
 			tEmpDeductDtl.setEmpDeductDtlId(tEmpDeductDtlId);
 
 			tEmpDeductDtl = empDeductDtlService.findById(tEmpDeductDtlId, titaVo);
+			if (tEmpDeductDtl != null) {
+				tempVo = tempVo.getVo(tEmpDeductDtl.getJsonFields());
+				if (tempVo.get("Breach") != null && tempVo.get("Breach").length() > 0) {
+					breachAmt = parse.stringToBigDecimal(tempVo.get("Breach"));
+				}
+				if (tempVo.get("ShortPri") != null && tempVo.get("ShortPri").length() > 0) {
+					shortPri = parse.stringToBigDecimal(tempVo.get("ShortPri"));
+				}
+				if (tempVo.get("ShortInt") != null && tempVo.get("ShortInt").length() > 0) {
+					shortInt = parse.stringToBigDecimal(tempVo.get("ShortInt"));
+				}
+				if (tempVo.get("TempAmt") != null && tempVo.get("TempAmt").length() > 0) {
+					tempAmt = parse.stringToBigDecimal(tempVo.get("TempAmt"));
+				}
+
+			}
 		} else {
 			Slice<EmpDeductDtl> slEmpDeductDtl = empDeductDtlService.mediaSeqEq(mediaDate + 19110000, mediaKind,
 					mediaSeq, 0, Integer.MAX_VALUE, titaVo);
@@ -77,6 +101,20 @@ public class L4R29 extends TradeBuffer {
 				for (EmpDeductDtl t : slEmpDeductDtl.getContent()) {
 					if (tEmpDeductDtl == null) {
 						tEmpDeductDtl = t;
+						tempVo = new TempVo();
+						tempVo = tempVo.getVo(t.getJsonFields());
+						if (tempVo.get("Breach") != null && tempVo.get("Breach").length() > 0) {
+							breachAmt = parse.stringToBigDecimal(tempVo.get("Breach"));
+						}
+						if (tempVo.get("ShortPri") != null && tempVo.get("ShortPri").length() > 0) {
+							shortPri = parse.stringToBigDecimal(tempVo.get("ShortPri"));
+						}
+						if (tempVo.get("ShortInt") != null && tempVo.get("ShortInt").length() > 0) {
+							shortInt = parse.stringToBigDecimal(tempVo.get("ShortInt"));
+						}
+						if (tempVo.get("TempAmt") != null && tempVo.get("TempAmt").length() > 0) {
+							tempAmt = parse.stringToBigDecimal(tempVo.get("TempAmt"));
+						}
 					} else {
 						if (t.getFacmNo() != tEmpDeductDtl.getFacmNo()) {
 							tEmpDeductDtl.setFacmNo(0);
@@ -98,6 +136,19 @@ public class L4R29 extends TradeBuffer {
 						if (t.getIntEndDate() > tEmpDeductDtl.getIntEndDate()) {
 							tEmpDeductDtl.setIntEndDate(t.getIntEndDate());
 						}
+						tempVo = tempVo.getVo(tEmpDeductDtl.getJsonFields());
+						if (tempVo.get("Breach") != null && tempVo.get("Breach").length() > 0) {
+							breachAmt = breachAmt.add(parse.stringToBigDecimal(tempVo.get("Breach")));
+						}
+						if (tempVo.get("ShortPri") != null && tempVo.get("ShortPri").length() > 0) {
+							shortPri = shortPri.add(parse.stringToBigDecimal(tempVo.get("ShortPri")));
+						}
+						if (tempVo.get("ShortInt") != null && tempVo.get("ShortInt").length() > 0) {
+							shortInt = shortInt.add(parse.stringToBigDecimal(tempVo.get("ShortInt")));
+						}
+						if (tempVo.get("TempAmt") != null && tempVo.get("TempAmt").length() > 0) {
+							tempAmt = tempAmt.add(parse.stringToBigDecimal(tempVo.get("TempAmt")));
+						}
 					}
 				}
 			}
@@ -111,6 +162,7 @@ public class L4R29 extends TradeBuffer {
 			this.totaVo.putParam("L4R29Principal", tEmpDeductDtl.getPrincipal());
 			this.totaVo.putParam("L4R29ResignCode", tEmpDeductDtl.getResignCode());
 			this.totaVo.putParam("L4R29Interest", tEmpDeductDtl.getInterest());
+			this.totaVo.putParam("L4R29BreachAmt", breachAmt);
 			this.totaVo.putParam("L4R29PositCode", tEmpDeductDtl.getPositCode());
 			this.totaVo.putParam("L4R29SumOvpayAmt", tEmpDeductDtl.getSumOvpayAmt());
 			this.totaVo.putParam("L4R29IntStartDate", tEmpDeductDtl.getIntStartDate());
