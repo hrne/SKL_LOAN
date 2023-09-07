@@ -87,9 +87,6 @@ public class L9711Report2 extends MakeReport {
 		String pageSize = "A4";
 		String pageOrientation = "P";
 
-		// 書面列印通知書客戶
-		List<Map<String, String>> isLetterList = new ArrayList<Map<String, String>>();
-
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(nTxCd)
 				.setRptItem(reportItem).setRptSize(pageSize).setPageOrientation(pageOrientation).build();
 		this.openForm(titaVo, reportVo);
@@ -104,9 +101,6 @@ public class L9711Report2 extends MakeReport {
 				// 每次戶號額度都不一樣
 				report(tL9711Vo, txbuffer);
 
-				// 有列印書面戶號額度的資料
-				isLetterList.add(tL9711Vo);
-
 				count++;
 			} // for
 
@@ -117,7 +111,7 @@ public class L9711Report2 extends MakeReport {
 
 		long sno = this.close();
 
-		l9711report4.exec(titaVo, isLetterList);
+		l9711report4.exec(titaVo, L9711List);
 
 		return sno;
 	}

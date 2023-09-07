@@ -38,8 +38,9 @@ E(0,40)ASGN(INQPRT$)
 [
 ["[L6069]                                 代碼檔代號查詢"],
 ["@業務類別",#DefType,#DefTypeX],
-["@代碼類別名稱",#Code],
-["@代碼類別說明",#Item],
+["@代碼名稱",#Code],
+["@代碼說明",#Item],
+["@列印選項",#Searc,#SearcFlagX],
 !["@顯示方式",
 !<include src="COM.icf::RPTFG.scr"/>
 !],
@@ -65,6 +66,9 @@ S(XXR99,01,#CDCODEMenuCode)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@DefTypeH,#HelpDesc1)
+
+#SearcHelp=x,50,S
+T(3,1:下載檔案;2:畫面顯示)
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
@@ -105,6 +109,17 @@ C(4,#DefType,S,T(H,#DefType,#DefTypeH))
 
 !代碼檔名稱
 #Item=X,80,I
+
+#Searc=A,1,I
+E(0,1)  
+HELP(#SearcHelp)
+@V(H,#SearcHelp)
+
+#SearcFlagX=X,8,L
+T(3,)T(H,#Searc,#SearcHelp)
+
+#RPTFG3=A,1,S
+C(5,#Searc,1,E(0,1),E(0,0))
 
 #RPTFG2=A,1,S
 C(3,#RPTFG,0,$,S)
@@ -186,6 +201,7 @@ IF(#OOCHAIN==1,BIND(grid,cancel),$)
 !------ 上行電文 ------
 <sub type="TIM">
 #DefType#Code#Item#CustNo
+#Searc
 #END
 </sub>
 

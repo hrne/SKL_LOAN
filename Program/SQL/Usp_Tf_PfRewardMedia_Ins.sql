@@ -56,7 +56,19 @@ BEGIN
          , Q.LMSACN                            AS "CustNo" -- 戶號 DECIMAL 7 
          , Q.LMSAPN                            AS "FacmNo" -- 額度編號 DECIMAL 3 
          , Q.LMSASQ                            AS "BormNo" -- 撥款序號 DECIMAL 3 
-         , Q.PRZTYP                            AS "BonusType" -- 獎金類別 DECIMAL 1 
+         -- 寄件者： 陳瀅如 經理 <juliechen@skl.com.tw>
+         -- 2023年9月7日 下午3:15
+         -- 主旨： FW: 業績獎金媒體檔 轉換問題
+         -- 珮琪回覆如下
+         -- 原先1~6的獎金類別就是我們整理後提供的，所以智偉的問題應該只有0跟8要怎麼處理，
+         -- 類別0的有44筆，類別8的有3筆，判斷可能為早期使用者新增的發放資料，建議可轉成99其他。
+         , CASE
+             WHEN Q.PRZTYP IN (1,2,3,4,5,6)
+             THEN Q.PRZTYP
+             WHEN Q.PRZTYP IN (0,8)
+             THEN 99
+           ELSE RAISE_APPLICATION_ERROR(-20001, '不正確的PRZTYP值: ' || Q.PRZTYP)
+           END                                 AS "BonusType" -- 獎金類別 DECIMAL 1 
          , Q.CUSEM3                            AS "EmployeeNo" -- 獎金發放員工編號 VARCHAR2 6 
          , ''                                  AS "ProdCode" -- 商品代碼 VARCHAR2 5 
          , ''                                  AS "PieceCode" -- 計件代碼 VARCHAR2 1 

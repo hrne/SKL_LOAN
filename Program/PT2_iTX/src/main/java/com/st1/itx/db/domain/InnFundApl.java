@@ -10,6 +10,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.Id;
 import javax.persistence.Column;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * InnFundApl 資金運用概況檔<br>
@@ -24,12 +26,7 @@ import javax.persistence.Column;
 public class InnFundApl implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 6264395277715864743L;
-
-// 日期
+  // 日期
   @Id
   @Column(name = "`AcDate`")
   private int acDate = 0;
@@ -83,7 +80,7 @@ public class InnFundApl implements Serializable {
 	* @return Integer
 	*/
   public int getAcDate() {
-    return this.acDate;
+    return StaticTool.bcToRoc(this.acDate);
   }
 
 /**
@@ -91,9 +88,9 @@ public class InnFundApl implements Serializable {
 	* 
   *
   * @param acDate 日期
-	*/
-  public void setAcDate(int acDate) {
-    this.acDate = acDate;
+  * @throws LogicException when Date Is Warn	*/
+  public void setAcDate(int acDate) throws LogicException {
+    this.acDate = StaticTool.rocToBc(acDate);
   }
 
 /**

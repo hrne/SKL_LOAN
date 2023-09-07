@@ -38,7 +38,7 @@ BEGIN
     SELECT S1."YGYYMM"                    AS "WorkMonth"           -- 工作年月 DECIMAL 6 0
           ,S1."FLWCOD"                    AS "AgType1"             -- 流程/制度別 VARCHAR2 1 0
           ,S1."TRXIDT"                    AS "EntryDate"           -- 入賬日期 DECIMAL 8 0
-          ,S1."TRXIDT"                    AS "MediaDate"           -- 媒體日期 DECIMAL 8 0
+          ,T.MEDIADATE                    AS "MediaDate"           -- 媒體日期 DECIMAL 8 0
           -- 2022-03-11 新增欄位
           ,S1."YGEPDT"                    AS "RepayEndDate"        -- 應繳截止日 DECIMAL 8 0
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
@@ -58,6 +58,8 @@ BEGIN
              ) AS "Seq"
       FROM "TBYGYMP"
     ) S1
+    LEFT JOIN TF_EMP_MEDIA T ON T.WORKMONTH = S1.YGYYMM
+                            AND T.AGTYPE1 = S1.FLWCOD
     WHERE S1."Seq" = 1
     ;
 

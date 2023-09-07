@@ -141,7 +141,7 @@ public class L4510Batch extends TradeBuffer {
 //
 	private HashMap<tmpFacm, Integer> bormMap = new HashMap<>();
 
-	private HashMap<tmpFacm, Integer> tmpAmtFacmNo = new HashMap<>();
+	private HashMap<tmpFacm, Integer> tmpFacmNo = new HashMap<>();
 
 	private int mediaDate = 0;
 //	private int entryDate = 0;
@@ -288,7 +288,8 @@ public class L4510Batch extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private void getList(int flag, Slice<EmpDeductSchedule> slEmpDeductSchedule, String procCode) throws LogicException {
+	private void getList(int flag, Slice<EmpDeductSchedule> slEmpDeductSchedule, String procCode)
+			throws LogicException {
 //	iEntryDate  入帳日
 //  iRepayEndDate 應繳截止日
 		for (EmpDeductSchedule tEmpDeductSchedule : slEmpDeductSchedule.getContent()) {
@@ -375,7 +376,7 @@ public class L4510Batch extends TradeBuffer {
 
 			// 取得暫收指定額度：000-全部非指定額度，或 > 0 => 單一額度
 			int wkTmpFacmNo = loanCom.getTmpFacmNo(custNo, 0, facmNo, titaVo);
-			tmpAmtFacmNo.put(tmp2, wkTmpFacmNo);
+			tmpFacmNo.put(tmp2, wkTmpFacmNo);
 
 			tmpFacm tmpAmtFacmNo = new tmpFacm(custNo, wkTmpFacmNo, 0, 0, flag, procCode);
 
@@ -427,6 +428,45 @@ public class L4510Batch extends TradeBuffer {
 					+ achRepayCode + ", flag=" + flag + ", procCode=" + procCode + "]";
 		}
 
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + getEnclosingInstance().hashCode();
+			result = prime * result + BormNo;
+			result = prime * result + achRepayCode;
+			result = prime * result + custNo;
+			result = prime * result + facmNo;
+			result = prime * result + flag;
+			result = prime * result + procCode;
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			tmpFacm other = (tmpFacm) obj;
+			if (!getEnclosingInstance().equals(other.getEnclosingInstance()))
+				return false;
+			if (BormNo != other.BormNo)
+				return false;
+			if (achRepayCode != other.achRepayCode)
+				return false;
+			if (custNo != other.custNo)
+				return false;
+			if (facmNo != other.facmNo)
+				return false;
+			if (flag != other.flag)
+				return false;
+			if (procCode != other.procCode)
+				return false;
+			return true;
+		}
 
 		private int getCustNo() {
 			return custNo;
@@ -556,11 +596,10 @@ public class L4510Batch extends TradeBuffer {
 			EmpDeductDtl tEmpDeductDtl = new EmpDeductDtl();
 			EmpDeductDtlId tEmpDeductDtlId = new EmpDeductDtlId();
 
-			tmpFacm tmp2 = new tmpFacm(tmp.getCustNo(), tmp.getFacmNo(), 0, 0, tmp.getFlag(),
-					tmp.getProcCode());
+			tmpFacm tmp2 = new tmpFacm(tmp.getCustNo(), tmp.getFacmNo(), 0, 0, tmp.getFlag(), tmp.getProcCode());
 			tmpFacm tmp3 = new tmpFacm(tmp.getCustNo(), tmp.getFacmNo(), 0, 0, tmp.getFlag(), tmp.getProcCode());
 
-			int wkTmpFacmNo = tmpAmtFacmNo.get(tmp3);
+			int wkTmpFacmNo = tmpFacmNo.get(tmp2);
 			tmpFacm tmpAmtFacmNo = new tmpFacm(tmp.getCustNo(), wkTmpFacmNo, 0, 0, tmp.getFlag(), tmp.getProcCode());
 
 //			暫收抵繳僅寫入第一筆為期款撥款(報表用)
@@ -765,11 +804,10 @@ public class L4510Batch extends TradeBuffer {
 				if (tBaTxVo.getRepayType() >= 4 && tBaTxVo.getAcctAmt().compareTo(BigDecimal.ZERO) == 0) {
 					continue;
 				}
-				tmpFacm tmp = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), 0,
-						tBaTxVo.getRepayType(), flag, procCode);
-
-				tmpFacm tmp2 = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), 0, 0, flag,
+				tmpFacm tmp = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), 0, tBaTxVo.getRepayType(), flag,
 						procCode);
+
+				tmpFacm tmp2 = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), 0, 0, flag, procCode);
 				tmpFacm tmp3 = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), 0, 0, flag, procCode);
 
 				if (!mapFlag.containsKey(tmp)) {

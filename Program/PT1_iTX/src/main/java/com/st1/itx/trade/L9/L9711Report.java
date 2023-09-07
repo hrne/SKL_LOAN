@@ -357,7 +357,8 @@ public class L9711Report extends MakeReport {
 				for (Map<String, String> t : tmpData) {
 					maturityDate = parse.stringToInteger(t.get("MaturityDate"));
 					// 所有戶號額度的到期日 大於 到期止日 就不要印
-					if (iEDAY < maturityDate) {
+					if (iEDAY >= maturityDate) {
+					} else {
 						isPrint = false;
 					}
 				}
@@ -367,6 +368,8 @@ public class L9711Report extends MakeReport {
 			if (isPrint) {
 				// 確定要印後，排除放過的擔保品
 				if (!checkForDupList.contains(tmpCkStr)) {
+					this.info("tmpCkStr = " + tmpCkStr);
+					this.info("list =" + r.toString());
 					checkForDupList.add(tmpCkStr);
 					isLetterList.add(r);
 				}
