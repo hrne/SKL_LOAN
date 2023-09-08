@@ -14,7 +14,6 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdCity;
-import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.CdStock;
 import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.ClMain;

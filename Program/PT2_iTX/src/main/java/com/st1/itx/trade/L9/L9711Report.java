@@ -237,7 +237,7 @@ public class L9711Report extends MakeReport {
 
 		this.toPdf(sno);
 
-		l9711report3.exec(titaVo, checkAllCustNoMaturityDate(isLetterList, titaVo));
+//		l9711report3.exec(titaVo, checkAllCustNoMaturityDate(isLetterList, titaVo));
 
 		return isLetterList;
 
