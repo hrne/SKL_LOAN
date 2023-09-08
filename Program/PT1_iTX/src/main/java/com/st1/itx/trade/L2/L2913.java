@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdCity;
 import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdStock;
 import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.ClMain;
 import com.st1.itx.db.domain.ClMainId;
@@ -24,6 +25,7 @@ import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.service.CdCityService;
 import com.st1.itx.db.service.CdCodeService;
+import com.st1.itx.db.service.CdStockService;
 import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.ClMainService;
 import com.st1.itx.db.service.ClStockService;
@@ -73,6 +75,10 @@ public class L2913 extends TradeBuffer {
 	@Autowired
 	public FacStatusCom facStatusCom;
 
+	/* DB服務注入 */
+	@Autowired
+	CdStockService sCdStockService;
+	
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -135,10 +141,10 @@ public class L2913 extends TradeBuffer {
 		this.totaVo.putParam("OClTypeCode", tClMain.getClTypeCode());
 		this.totaVo.putParam("OStockCode", tClStock.getStockCode());
 
-		CdCode tCdCode = sCdCodeDefService.getItemFirst(2, "StockCode", tClStock.getStockCode(), titaVo);
+		CdStock tCdStock = sCdStockService.findById(tClStock.getStockCode(), titaVo);
 
-		if (tCdCode != null) {
-			this.totaVo.putParam("OStockCodeX", tCdCode.getItem());
+		if (tCdStock != null) {
+			this.totaVo.putParam("OStockCodeX", tCdStock.getStockItem());
 		} else {
 			this.totaVo.putParam("OStockCodeX", "");
 		}

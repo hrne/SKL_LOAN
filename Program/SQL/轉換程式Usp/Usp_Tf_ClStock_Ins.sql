@@ -144,13 +144,13 @@ BEGIN
             ,MAX(S2."SGTSBN")               AS "PledgeNo"            -- 質權設定書號 VARCHAR2 14 
             ,SUM(NVL(S3."SGDQTY",0))        AS "SettingBalance"      -- 設質股數餘額 DECIMAL 16 2
             ,MAX(S2."SGTMNN")               AS "CustodyNo"           -- 保管條號碼 VARCHAR2 5 
-      FROM "ClNoMapping" S1
-      LEFT JOIN "LA$SGTP" S2 ON S2."GDRID1" = S1."GDRID1"
-                            AND S2."GDRID2" = S1."GDRID2"
-                            AND S2."GDRNUM" = S1."GDRNUM"
-      LEFT JOIN "LA$SGDP" S3 ON S3."GDRID1" = S1."GDRID1"
-                            AND S3."GDRID2" = S1."GDRID2"
-                            AND S3."GDRNUM" = S1."GDRNUM"
+      FROM "ClNoMap" S1
+      LEFT JOIN "LA$SGTP" S2 ON S2."GDRID1" = S1."GdrId1"
+                            AND S2."GDRID2" = S1."GdrId2"
+                            AND S2."GDRNUM" = S1."GdrNum"
+      LEFT JOIN "LA$SGDP" S3 ON S3."GDRID1" = S1."GdrId1"
+                            AND S3."GDRID2" = S1."GdrId2"
+                            AND S3."GDRNUM" = S1."GdrNum"
       LEFT JOIN "CU$CUSP" CU ON CU."CUSCIF" = S3."LGTCIF"
                             AND S3."LGTCIF" > 0
       LEFT JOIN DAT_LN$SPRP SPRP ON SPRP."SGTNO1" = S2."SGTNO1"
@@ -159,6 +159,7 @@ BEGIN
                                         AND TCS."STKNO2" = S2."SGTNO2"
       WHERE S1."ClCode1" >= 3
         AND S1."ClCode1" <= 4
+        AND S1."TfStatus" IN (1,3)
       GROUP BY S1."ClCode1"
               ,S1."ClCode2"
               ,S1."ClNo"

@@ -13,8 +13,11 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.AcClose;
+import com.st1.itx.db.domain.AcCloseId;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.LoanCheque;
+import com.st1.itx.db.service.AcCloseService;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.BatxChequeService;
 import com.st1.itx.db.service.CustMainService;
@@ -67,6 +70,9 @@ public class L4701 extends TradeBuffer {
 
 	@Autowired
 	public BatxChequeService batxChequeService;
+	
+	@Autowired
+	AcCloseService acCloseService;
 
 	@Autowired
 	public MakeFile makeFile;
@@ -85,6 +91,16 @@ public class L4701 extends TradeBuffer {
 		// tita
 		int iAcDate = parse.stringToInteger(titaVo.getParam("EntryDate"));
 		int iAcDateF = parse.stringToInteger(titaVo.getParam("EntryDate")) + 19110000;
+		AcClose tAcClose = new AcClose();
+		AcCloseId tAcCloseId = new AcCloseId();
+
+		tAcCloseId.setAcDate(iAcDate);
+		tAcCloseId.setBranchNo(titaVo.getAcbrNo());
+		tAcCloseId.setSecNo("02"); // 業務類別: 01-撥款匯款 02-支票繳款 09-放款
+		tAcClose = acCloseService.findById(tAcCloseId);
+		if (tAcClose == null || tAcClose.getClsFg() != 1) {
+			throw new LogicException("E0015", "請先執行L6101-支票繳款業務關帳作業 "); // 檢查錯誤
+		}
 
 		Slice<LoanCheque> sLoanCheque = null;
 
@@ -117,10 +133,6 @@ public class L4701 extends TradeBuffer {
 //		EntryDate	作帳日期		A	7	78	85	YYYMMDD
 //		CustNo		相關資訊		X	10	85	95	放款戶戶號
 
-		int chequeCnt = 0;
-		int chequeOutCnt = 0;
-		int chequeInCnt = 0;
-		BigDecimal chequeTotAmt = BigDecimal.ZERO;
 
 		totaVo.put("PdfSnoM", "");
 

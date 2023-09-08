@@ -52,16 +52,17 @@ BEGIN
                 ,S0."LandSeq"
                 ,NVL(S2."LGTCIF",0) AS "LGTCIF"
           FROM "ClLand" S0
-          LEFT JOIN "ClNoMapping" S1 ON S1."ClCode1" = S0."ClCode1"
+          LEFT JOIN "ClNoMap" S1 ON S1."ClCode1" = S0."ClCode1"
                                     AND S1."ClCode2" = S0."ClCode2"
                                     AND S1."ClNo"    = S0."ClNo"
-          LEFT JOIN "LA$LGTP" S2 ON S2."GDRID1" = S1."GDRID1"
-                                AND S2."GDRID2" = S1."GDRID2"
-                                AND S2."GDRNUM" = S1."GDRNUM"
+          LEFT JOIN "LA$LGTP" S2 ON S2."GDRID1" = S1."GdrId1"
+                                AND S2."GDRID2" = S1."GdrId2"
+                                AND S2."GDRNUM" = S1."GdrNum"
                                 AND LPAD(REPLACE(TRIM(S2.LGTNM1),'-',''),4,'0') = S0."LandNo1"
                                 AND LPAD(REPLACE(TRIM(S2.LGTNM2),'-',''),4,'0') = S0."LandNo2"
           WHERE NVL(S2."LGTCIF",0) != 0
             AND S0."ClCode1" = 2 -- 純土地
+            AND S1."TfStatus" IN (1,3)
          ) LG
     LEFT JOIN "CU$CUSP" CU ON CU."CUSCIF" = LG."LGTCIF"
     LEFT JOIN "CustMain" CM ON TRIM(CM."CustId") = TRIM(CU."CUSID1")

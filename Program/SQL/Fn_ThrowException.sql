@@ -1,0 +1,8 @@
+CREATE OR REPLACE NONEDITIONABLE FUNCTION "Fn_ThrowException"
+(
+    error_msg IN VARCHAR2 -- 錯誤訊息
+) RETURN NUMBER IS "Result" NUMBER; -- 固定回傳-1
+BEGIN
+    RAISE_APPLICATION_ERROR(-20001, error_msg);
+    RETURN -1;
+END;

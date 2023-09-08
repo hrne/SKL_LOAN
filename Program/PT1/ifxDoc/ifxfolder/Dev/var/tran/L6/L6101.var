@@ -184,20 +184,6 @@ C(3,#ClsFg,1,K(MODIFYBUTTON,1,總帳傳票資料傳輸),$)
 #OOBatNo01=A,2,L
 #OOCoreSeqNo=A,3,L
 
-#SETNTXCD=X,5,S
-C(2,#SecNo,T(3,),T(3,L4101),T(3,L4701))
-C(3,#OOResult,4101,ASGN(NTXCD$),$)
-C(3,#OOResult,4701,ASGN(NTXCD$),$)
-
-#NTXCDSHOW=X,40,S
-C(2,#SecNo,T(3,),T(3,撥款匯款作業),T(3,票據媒體製作))
-C(3,#OOResult,4101,ASGN(NTXCDSHOW$),$)
-C(3,#OOResult,4701,ASGN(NTXCDSHOW$),$)
-
-#NTXBUF=X,6,S
-C(2,#SecNo,T(3,),T(2,LN+#OOBatNo09+#OOBatNo01),T(3,))
-C(3,#OOResult,4101,ASGN(NTXBUF$),$)
-C(3,#OOResult,4701,ASGN(NTXBUF$),$)
 
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 

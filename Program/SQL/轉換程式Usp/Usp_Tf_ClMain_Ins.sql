@@ -108,21 +108,21 @@ BEGIN
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
           ,0                              AS "LastClOtherSeq"
-    FROM "ClNoMapping" S1
-    LEFT JOIN "LA$HGTP" HGTP ON HGTP."GDRID1" = S1."GDRID1"
-                            AND HGTP."GDRID2" = S1."GDRID2"
-                            AND HGTP."GDRNUM" = S1."GDRNUM"
-                            AND HGTP."LGTSEQ" = S1."LGTSEQ"
-    LEFT JOIN "LA$LGTP" LGTP ON LGTP."GDRID1" = S1."GDRID1"
-                            AND LGTP."GDRID2" = S1."GDRID2"
-                            AND LGTP."GDRNUM" = S1."GDRNUM"
-                            AND LGTP."LGTSEQ" = S1."LGTSEQ"
-    LEFT JOIN "LA$GDTP" GDTP ON GDTP."GDRID1" = S1."GDRID1"
-                            AND GDTP."GDRID2" = S1."GDRID2"
-                            AND GDTP."GDRNUM" = S1."GDRNUM"
-    LEFT JOIN "LA$APLP" APLP ON APLP."GDRID1" = S1."GDRID1"
-                            AND APLP."GDRID2" = S1."GDRID2"
-                            AND APLP."GDRNUM" = S1."GDRNUM"
+    FROM "ClNoMap" S1
+    LEFT JOIN "LA$HGTP" HGTP ON HGTP."GDRID1" = S1."GdrId1"
+                            AND HGTP."GDRID2" = S1."GdrId2"
+                            AND HGTP."GDRNUM" = S1."GdrNum"
+                            AND HGTP."LGTSEQ" = S1."LgtSeq"
+    LEFT JOIN "LA$LGTP" LGTP ON LGTP."GDRID1" = S1."GdrId1"
+                            AND LGTP."GDRID2" = S1."GdrId2"
+                            AND LGTP."GDRNUM" = S1."GdrNum"
+                            AND LGTP."LGTSEQ" = S1."LgtSeq"
+    LEFT JOIN "LA$GDTP" GDTP ON GDTP."GDRID1" = S1."GdrId1"
+                            AND GDTP."GDRID2" = S1."GdrId2"
+                            AND GDTP."GDRNUM" = S1."GdrNum"
+    LEFT JOIN "LA$APLP" APLP ON APLP."GDRID1" = S1."GdrId1"
+                            AND APLP."GDRID2" = S1."GdrId2"
+                            AND APLP."GDRNUM" = S1."GdrNum"
     LEFT JOIN "CU$CUSP" CUSP ON CUSP."CUSCIF" = HGTP."LGTCIF" -- 建物擔保品提供人識別碼
                             AND NVL(HGTP."LGTCIF",0) > 0
     LEFT JOIN "CU$CUSP" CUSP2 ON CUSP2."CUSCIF" = LGTP."LGTCIF" -- 土地擔保品提供人識別碼
@@ -147,6 +147,7 @@ BEGIN
                             AND AREA3."AreaItem" = NVL(LGTP."LGTTWN",' ')
                             AND NVL(CITY3."CityCode",' ') <> ' '
     WHERE S1."ClCode1" IN (1,2)
+      AND S1."TfStatus" IN (1,3)
     ;
 
     -- 記錄寫入筆數
@@ -200,14 +201,15 @@ BEGIN
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
           ,0                              AS "LastClOtherSeq"
-    FROM "ClNoMapping" S1
-    LEFT JOIN "LN$CGTP" S2 ON S2."GDRID1" = S1."GDRID1"
-                          AND S2."GDRID2" = S1."GDRID2"
-                          AND S2."GDRNUM" = S1."GDRNUM"
+    FROM "ClNoMap" S1
+    LEFT JOIN "LN$CGTP" S2 ON S2."GDRID1" = S1."GdrId1"
+                          AND S2."GDRID2" = S1."GdrId2"
+                          AND S2."GDRNUM" = S1."GdrNum"
     LEFT JOIN "CU$CUSP" CU ON CU."CUSID1" = S2."CUSID1"
     LEFT JOIN "CustMain" CM ON CM."CustId" = CU."CUSID1"
     LEFT JOIN "CdCity" CITY ON CITY."CityCode" = NVL(S2."LOCLID",0)
     WHERE S1."ClCode1" = 9
+      AND S1."TfStatus" IN (1,3)
     ;
 
     -- 記錄寫入筆數
@@ -270,10 +272,10 @@ BEGIN
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
           ,0                              AS "LastClOtherSeq"
-    FROM "ClNoMapping" S1
-    LEFT JOIN "LA$SGTP" S2 ON S2."GDRID1" = S1."GDRID1"
-                          AND S2."GDRID2" = S1."GDRID2"
-                          AND S2."GDRNUM" = S1."GDRNUM"
+    FROM "ClNoMap" S1
+    LEFT JOIN "LA$SGTP" S2 ON S2."GDRID1" = S1."GdrId1"
+                          AND S2."GDRID2" = S1."GdrId2"
+                          AND S2."GDRNUM" = S1."GdrNum"
     LEFT JOIN (SELECT SG."GDRID1"
                     , SG."GDRID2"
                     , SG."GDRNUM"
@@ -287,13 +289,14 @@ BEGIN
                LEFT JOIN "CU$CUSP" CU ON CU."CUSCIF" = SG."LGTCIF"
                LEFT JOIN "CustMain" CM ON CM."CustId" = CU."CUSID1"
                WHERE NVL(CM."CustUKey",' ') <> ' '
-              ) S3 ON S3."GDRID1" = S1."GDRID1"
-                  AND S3."GDRID2" = S1."GDRID2"
-                  AND S3."GDRNUM" = S1."GDRNUM"
+              ) S3 ON S3."GDRID1" = S1."GdrId1"
+                  AND S3."GDRID2" = S1."GdrId2"
+                  AND S3."GDRNUM" = S1."GdrNum"
                   AND S3."Seq" = 1
     LEFT JOIN "CdCity" CITY ON CITY."CityCode" = NVL(S2."LOCLID",0)
     WHERE S1."ClCode1" >= 3
       AND S1."ClCode1" <= 4
+      AND S1."TfStatus" IN (1,3)
     ;
 
     -- 記錄寫入筆數
@@ -344,12 +347,13 @@ BEGIN
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
           ,0                              AS "LastClOtherSeq"
-    FROM "ClNoMapping" S1
-    LEFT JOIN "LA$BGTP" S2 ON S2."GDRID1" = S1."GDRID1"
-                          AND S2."GDRID2" = S1."GDRID2"
-                          AND S2."GDRNUM" = S1."GDRNUM"
+    FROM "ClNoMap" S1
+    LEFT JOIN "LA$BGTP" S2 ON S2."GDRID1" = S1."GdrId1"
+                          AND S2."GDRID2" = S1."GdrId2"
+                          AND S2."GDRNUM" = S1."GdrNum"
     LEFT JOIN "CdCity" CITY ON CITY."CityCode" = NVL(S2."LOCLID",0)
     WHERE S1."ClCode1" = 5
+      AND S1."TfStatus" IN (1,3)
     ;
 
     -- 記錄寫入筆數

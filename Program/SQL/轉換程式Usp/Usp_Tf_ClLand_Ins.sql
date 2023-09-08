@@ -221,14 +221,11 @@ BEGIN
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE   
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6  
-    FROM "ClNoMapping" S1 
-    LEFT JOIN "LA$LGTP" S2 ON S2."GDRID1" = S1."GDRID1" 
-                          AND S2."GDRID2" = S1."GDRID2" 
-                          AND S2."GDRNUM" = S1."GDRNUM" 
-                          AND CASE 
-                                WHEN S1."GDRID1" = 1 THEN S1."LGTSEQ" 
-                              ELSE S2."LGTSEQ" END 
-                              = S1."LGTSEQ" 
+    FROM "ClNoMap" S1 
+    LEFT JOIN "LA$LGTP" S2 ON S2."GDRID1" = S1."GdrId1" 
+                          AND S2."GDRID2" = S1."GdrId2" 
+                          AND S2."GDRNUM" = S1."GdrNum" 
+                          AND S2."LGTSEQ" = S1."LgtSeq" 
     LEFT JOIN ( SELECT CITY."CityCode" 
                       ,CITY."CityItem" 
                       ,AREA."AreaCode" 
@@ -295,6 +292,7 @@ BEGIN
                                                     THEN S2."LGTSSG" || '小段' 
                                                   ELSE '' END 
     WHERE S1."GDRID1" = '2' -- 撈土地 
+      AND S1."TfStatus" IN (1,3)
     ; 
  
     -- 記錄寫入筆數 
@@ -324,11 +322,12 @@ BEGIN
          LEFT JOIN "ClNoMapping" M ON M."ClCode1" = B0."ClCode1" 
                                   AND M."ClCode2" = B0."ClCode2" 
                                   AND M."ClNo"    = B0."ClNo" 
-         LEFT JOIN "LA$LGTP" LG ON LG."GDRID1" = M."GDRID1" 
-                               AND LG."GDRID2" = M."GDRID2" 
-                               AND LG."GDRNUM" = M."GDRNUM" 
+         LEFT JOIN "LA$LGTP" LG ON LG."GDRID1" = M."GdrId1" 
+                               AND LG."GDRID2" = M."GdrId2" 
+                               AND LG."GDRNUM" = M."GdrNum" 
          WHERE B0."ClCode1" = '1' -- 撈建物 
            AND NVL(LG."LGTNM1",0) != 0 
+           AND M."TfStatus" IN (1,3)
     ) 
     SELECT S1."ClCode1"                   AS "ClCode1"             -- 擔保品代號1 DECIMAL 1  
          , S1."ClCode2"                   AS "ClCode2"             -- 擔保品代號2 DECIMAL 2  
@@ -596,12 +595,13 @@ BEGIN
                  ,S1."ClCode2" 
                  ,S1."ClNo" 
                  ,S2."LGTSAM" 
-           FROM "ClNoMapping" S1 
-           LEFT JOIN "LA$LGTP" S2 ON S2."GDRID1" = S1."GDRID1" 
-                                 AND S2."GDRID2" = S1."GDRID2" 
-                                 AND S2."GDRNUM" = S1."GDRNUM" 
-                                 AND S2."LGTSEQ" = S1."LGTSEQ" 
+           FROM "ClNoMap" S1 
+           LEFT JOIN "LA$LGTP" S2 ON S2."GDRID1" = S1."GdrId1" 
+                                 AND S2."GDRID2" = S1."GdrId2" 
+                                 AND S2."GDRNUM" = S1."GdrNum" 
+                                 AND S2."LGTSEQ" = S1."LgtSeq" 
            WHERE S1."ClCode1" = 2 
+             AND S1."TfStatus" IN (1,3)
           ) SC1 
     ON (    SC1."ClCode1" = T1."ClCode1" 
         AND SC1."ClCode2" = T1."ClCode2" 

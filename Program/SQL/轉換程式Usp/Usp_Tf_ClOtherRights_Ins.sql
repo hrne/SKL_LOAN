@@ -60,23 +60,24 @@ BEGIN
                ELSE 0 END           AS LGTSAM
              , TFM.GDTRDT           AS GDTRDT
         FROM "TfClOtherRightsMap" TFM
-        LEFT JOIN "ClNoMapping" CNM ON CNM."ClCode1" = TFM."ClCode1"
-                                   AND CNM."ClCode2" = TFM."ClCode2"
-                                   AND CNM."ClNo" = TFM."ClNo"
-        LEFT JOIN "LA$HGTP" S4 ON S4."GDRID1" = CNM."GDRID1" 
-                              AND S4."GDRID2" = CNM."GDRID2" 
-                              AND S4."GDRNUM" = CNM."GDRNUM" 
-                              AND S4."LGTSEQ" = CNM."LGTSEQ" 
+        LEFT JOIN "ClNoMap" CNM ON CNM."ClCode1" = TFM."ClCode1"
+                               AND CNM."ClCode2" = TFM."ClCode2"
+                               AND CNM."ClNo" = TFM."ClNo"
+        LEFT JOIN "LA$HGTP" S4 ON S4."GDRID1" = CNM."GdrId1" 
+                              AND S4."GDRID2" = CNM."GdrId2" 
+                              AND S4."GDRNUM" = CNM."GdrNum" 
+                              AND S4."LGTSEQ" = CNM."LgtSeq" 
                               AND CNM."ClCode1" = 1 
-        LEFT JOIN "LA$LGTP" S5 ON S5."GDRID1" = CNM."GDRID1" 
-                              AND S5."GDRID2" = CNM."GDRID2" 
-                              AND S5."GDRNUM" = CNM."GDRNUM" 
-                              AND S5."LGTSEQ" = CNM."LGTSEQ" 
+        LEFT JOIN "LA$LGTP" S5 ON S5."GDRID1" = CNM."GdrId1" 
+                              AND S5."GDRID2" = CNM."GdrId2" 
+                              AND S5."GDRNUM" = CNM."GdrNum" 
+                              AND S5."LGTSEQ" = CNM."LgtSeq" 
                               AND CNM."ClCode1" = 2
-        LEFT JOIN "LA$BGTP" BG ON BG."GDRID1" = CNM."GDRID1"
-                              AND BG."GDRID2" = CNM."GDRID2"
-                              AND BG."GDRNUM" = CNM."GDRNUM"
+        LEFT JOIN "LA$BGTP" BG ON BG."GDRID1" = CNM."GdrId1"
+                              AND BG."GDRID2" = CNM."GdrId2"
+                              AND BG."GDRNUM" = CNM."GdrNum"
                               AND CNM."ClCode1" = 5
+        WHERE CNM."TfStatus" IN (1,3)
     )
     SELECT "ClCode1"                 AS "ClCode1"         -- 擔保品代號1 DECIMAL 1
          , "ClCode2"                 AS "ClCode2"         -- 擔保品代號2 DECIMAL 2

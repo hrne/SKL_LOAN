@@ -569,7 +569,7 @@ public class L6101 extends TradeBuffer {
 			if ("09".equals(uSecNo) && tAcClose.getClsNo() == 10) {
 				tAcClose.setClsNo(11);
 			}
-			if("02".equals(uSecNo)) {//關帳時使用畫面上傳序號
+			if ("02".equals(uSecNo)) {// 關帳時使用畫面上傳序號
 				tAcClose.setCoreSeqNo(iCoreSeqNo);
 			}
 		}
@@ -695,7 +695,7 @@ public class L6101 extends TradeBuffer {
 		} else if ("02".equals(uSecNo)) {
 			this.info("02=exec L9130、L9131、L9132、L9132A、L9132B、L9132C");
 
-			//l9130Report.exec(titaVo);//20230816例會:支票關帳也改EBS上傳傳票媒體檔
+			// l9130Report.exec(titaVo);//20230816例會:支票關帳也改EBS上傳傳票媒體檔
 			l9130Report2022.exec(titaVo);
 			l9131Report.exec(titaVo);
 			l9131Report.close();
@@ -717,6 +717,8 @@ public class L6101 extends TradeBuffer {
 			ntxbuf = titaVo.getTlrNo() + FormatUtil.padX("L9132", 60) + iAcDate;
 			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf,
 					"L9132傳票媒體明細表(總帳)已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4701", "" + iAcDate,
+					"執行L4701-票據媒體製作", titaVo);
 
 		}
 	}

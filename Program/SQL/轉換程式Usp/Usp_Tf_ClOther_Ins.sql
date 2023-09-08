@@ -92,10 +92,11 @@ BEGIN
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
     FROM "ClNoMapping" S1
-    LEFT JOIN "LA$BGTP" S2 ON S2."GDRID1" = S1."GDRID1"
-                          AND S2."GDRID2" = S1."GDRID2"
-                          AND S2."GDRNUM" = S1."GDRNUM"
+    LEFT JOIN "LA$BGTP" S2 ON S2."GDRID1" = S1."GdrId1"
+                          AND S2."GDRID2" = S1."GdrId2"
+                          AND S2."GDRNUM" = S1."GdrNum"
     WHERE S1."ClCode1" = 5
+      AND S1."TfStatus" IN (1,3)
     ;
 
     -- 記錄寫入筆數

@@ -107,12 +107,13 @@ BEGIN
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 0 
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
-    FROM "ClNoMapping" S1
-    LEFT JOIN "LN$CGTP" S2 ON S2."GDRID1" = S1."GDRID1"
-                          AND S2."GDRID2" = S1."GDRID2"
-                          AND S2."GDRNUM" = S1."GDRNUM"
+    FROM "ClNoMap" S1
+    LEFT JOIN "LN$CGTP" S2 ON S2."GDRID1" = S1."GdrId1"
+                          AND S2."GDRID2" = S1."GdrId2"
+                          AND S2."GDRNUM" = S1."GdrNum"
     LEFT JOIN "CustMain" CM ON TRIM(CM."CustId") = SUBSTR(TRIM(S2."CGT015"),0,10)
     WHERE S1."ClCode1" = 9
+      AND S1."TfStatus" IN (1,3)
     ;
 
     -- 記錄寫入筆數

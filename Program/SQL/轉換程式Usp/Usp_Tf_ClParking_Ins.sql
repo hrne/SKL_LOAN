@@ -70,14 +70,15 @@ BEGIN
          , JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0
          , '999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
     FROM "ClBuilding" CB
-    LEFT JOIN "ClNoMapping" CNM ON CNM."ClCode1" = CB."ClCode1"
+    LEFT JOIN "ClNoMap" CNM ON CNM."ClCode1" = CB."ClCode1"
                                AND CNM."ClCode2" = CB."ClCode2"
                                AND CNM."ClNo"    = CB."ClNo"
-    LEFT JOIN "LA$HGTP" HG ON HG."GDRID1" = CNM."GDRID1"
-                          AND HG."GDRID2" = CNM."GDRID2"
-                          AND HG."GDRNUM" = CNM."GDRNUM"
-                          AND HG."LGTSEQ" = CNM."LGTSEQ"
+    LEFT JOIN "LA$HGTP" HG ON HG."GDRID1" = CNM."GdrId1"
+                          AND HG."GDRID2" = CNM."GdrId2"
+                          AND HG."GDRNUM" = CNM."GdrNum"
+                          AND HG."LGTSEQ" = CNM."LgtSeq"
     WHERE NVL(HG."HGTCAM",0) > 0
+      AND CNM."TfStatus" IN (1,3)
     ;
 
     -- 記錄寫入筆數

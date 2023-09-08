@@ -139,10 +139,10 @@ BEGIN
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE   
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6  
-    FROM "ClNoMapping" S1 
-    LEFT JOIN "LA$GDTP" S2 ON S2."GDRID1" = S1."GDRID1" 
-                          AND S2."GDRID2" = S1."GDRID2" 
-                          AND S2."GDRNUM" = S1."GDRNUM" 
+    FROM "ClNoMap" S1 
+    LEFT JOIN "LA$GDTP" S2 ON S2."GDRID1" = S1."GdrId1" 
+                          AND S2."GDRID2" = S1."GdrId2" 
+                          AND S2."GDRNUM" = S1."GdrNum" 
     LEFT JOIN (SELECT "GDRID1" 
                      ,"GDRID2" 
                      ,"GDRNUM" 
@@ -153,22 +153,23 @@ BEGIN
                                                      ,"GDRNUM" 
                                          ORDER BY "GTRDAT" DESC) AS "Seq" 
                FROM "LA$GTRP" 
-    ) S3 ON S3."GDRID1" = S1."GDRID1" 
-        AND S3."GDRID2" = S1."GDRID2" 
-        AND S3."GDRNUM" = S1."GDRNUM" 
+    ) S3 ON S3."GDRID1" = S1."GdrId1" 
+        AND S3."GDRID2" = S1."GdrId2" 
+        AND S3."GDRNUM" = S1."GdrNum" 
         AND S3."Seq" = 1 
-    LEFT JOIN "LA$HGTP" S4 ON S4."GDRID1" = S1."GDRID1" 
-                          AND S4."GDRID2" = S1."GDRID2" 
-                          AND S4."GDRNUM" = S1."GDRNUM" 
-                          AND S4."LGTSEQ" = S1."LGTSEQ" 
+    LEFT JOIN "LA$HGTP" S4 ON S4."GDRID1" = S1."GdrId1" 
+                          AND S4."GDRID2" = S1."GdrId2" 
+                          AND S4."GDRNUM" = S1."GdrNum" 
+                          AND S4."LGTSEQ" = S1."LgtSeq" 
                           AND S1."ClCode1" = 1 
-    LEFT JOIN "LA$LGTP" S5 ON S5."GDRID1" = S1."GDRID1" 
-                          AND S5."GDRID2" = S1."GDRID2" 
-                          AND S5."GDRNUM" = S1."GDRNUM" 
-                          AND S5."LGTSEQ" = S1."LGTSEQ" 
+    LEFT JOIN "LA$LGTP" S5 ON S5."GDRID1" = S1."GdrId1" 
+                          AND S5."GDRID2" = S1."GdrId2" 
+                          AND S5."GDRNUM" = S1."GdrNum" 
+                          AND S5."LGTSEQ" = S1."LgtSeq" 
                           AND S1."ClCode1" = 2 
     WHERE S1."ClCode1" >= 1 
       AND S1."ClCode1" <= 2 
+      AND S1."TfStatus" IN (1,3)
     ; 
  
     -- 記錄寫入筆數 

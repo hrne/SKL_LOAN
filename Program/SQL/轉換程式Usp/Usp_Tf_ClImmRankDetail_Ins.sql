@@ -81,7 +81,8 @@ BEGIN
       FROM "LA$GDTP"
       WHERE GDTPTY = 4
     )
-    SELECT S1."ClCode1"                   AS "ClCode1"             -- 擔保品代號1 DECIMAL 1 
+    SELECT DISTINCT
+           S1."ClCode1"                   AS "ClCode1"             -- 擔保品代號1 DECIMAL 1 
          , S1."ClCode2"                   AS "ClCode2"             -- 擔保品代號2 DECIMAL 2 
          , S1."ClNo"                      AS "ClNo"                -- 擔保品編號 DECIMAL 7 
          , S2."SettingSeq"                AS "SettingSeq"          -- 設定順位(1~9) VARCHAR2 1 
@@ -91,12 +92,13 @@ BEGIN
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
-    FROM "ClNoMapping" S1
-    LEFT JOIN GDTP S2 ON S2."GDRID1" = S1."GDRID1"
-                     AND S2."GDRID2" = S1."GDRID2"
-                     AND S2."GDRNUM" = S1."GDRNUM"
+    FROM "ClNoMap" S1
+    LEFT JOIN GDTP S2 ON S2."GDRID1" = S1."GdrId1"
+                     AND S2."GDRID2" = S1."GdrId2"
+                     AND S2."GDRNUM" = S1."GdrNum"
     WHERE S1."ClCode1" >= 1
       AND S1."ClCode1" <= 2
+      AND S1."TfStatus" IN (1,3)
       AND S2."SettingSeq" > 0
     ;
 

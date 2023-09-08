@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdStock;
 import com.st1.itx.db.domain.ClBuilding;
 import com.st1.itx.db.domain.ClBuildingId;
 import com.st1.itx.db.domain.ClLand;
@@ -24,6 +25,7 @@ import com.st1.itx.db.domain.ClMovablesId;
 import com.st1.itx.db.domain.ClStock;
 import com.st1.itx.db.domain.ClStockId;
 import com.st1.itx.db.service.CdCodeService;
+import com.st1.itx.db.service.CdStockService;
 import com.st1.itx.db.service.ClBuildingService;
 import com.st1.itx.db.service.ClLandService;
 import com.st1.itx.db.service.ClMovablesService;
@@ -65,7 +67,11 @@ public class L2038 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	CdCodeService sCdCodeDefService;
-
+	
+	/* DB服務注入 */
+	@Autowired
+	CdStockService sCdStockService;
+	
 	/* 日期工具 */
 	@Autowired
 	DateUtil dateUtil;
@@ -222,11 +228,10 @@ public class L2038 extends TradeBuffer {
 
 					if (tClStock != null) {
 
-						CdCode tCdCode = sCdCodeDefService.getItemFirst(2, "StockCode", tClStock.getStockCode(),
-								titaVo);
+						CdStock tCdStock = sCdStockService.findById(tClStock.getStockCode(), titaVo);
 
-						if (tCdCode != null) {
-							occurslist.putParam("OOOther", tClStock.getStockCode() + " " + tCdCode.getItem());
+						if (tCdStock != null) {
+							occurslist.putParam("OOOther", tClStock.getStockCode() + " " + tCdStock.getStockItem());
 							occurslist.putParam("OOOther1", "");
 						} else {
 							occurslist.putParam("OOOther", tClStock.getStockCode());

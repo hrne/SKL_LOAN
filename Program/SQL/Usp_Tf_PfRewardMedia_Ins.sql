@@ -67,7 +67,7 @@ BEGIN
              THEN Q.PRZTYP
              WHEN Q.PRZTYP IN (0,8)
              THEN 99
-           ELSE RAISE_APPLICATION_ERROR(-20001, '不正確的PRZTYP值: ' || Q.PRZTYP)
+           ELSE "Fn_ThrowException"('不正確的PRZTYP值: ' || Q.PRZTYP)
            END                                 AS "BonusType" -- 獎金類別 DECIMAL 1 
          , Q.CUSEM3                            AS "EmployeeNo" -- 獎金發放員工編號 VARCHAR2 6 
          , ''                                  AS "ProdCode" -- 商品代碼 VARCHAR2 5 
@@ -76,9 +76,12 @@ BEGIN
          , Q.PRZCMT                            AS "AdjustBonus" -- 發放獎金 DECIMAL 14 2
          , Q.PRZCMD                            AS "AdjustBonusDate" -- 調整獎金日期 DECIMALD 8 
          , 0                                   AS "WorkMonth" -- 工作月 DECIMAL 6 
-         , LPAD(Q.PRZYER,4,'0') || LPAD(Q.PRZSEN,2,'0') AS "WorkSeason" -- 工作季 DECIMAL 5 
+         , LPAD(Q.PRZYER,4,'0') || LPAD(Q.PRZSEN,1,'0') AS "WorkSeason" -- 工作季 DECIMAL 5 
          , ''                                  AS "Remark" -- 備註 NVARCHAR2 50 
-         , Q.PRZCNT                            AS "MediaFg" -- 產出媒體檔記號 DECIMAL 1 
+         , CASE
+             WHEN Q.PRZDAT != 0
+             THEN 1
+           ELSE 0 END                          AS "MediaFg" -- 產出媒體檔記號 DECIMAL 1 
          , Q.PRZDAT                            AS "MediaDate" -- 產出媒體檔日期 DECIMALD 8 
          , 0                                   AS "ManualFg" -- 人工新增記號 DECIMAL 1 
          , JOB_START_TIME                      AS "CreateDate" -- 建檔日期時間 DATE  
