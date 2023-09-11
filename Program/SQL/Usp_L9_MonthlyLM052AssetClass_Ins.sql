@@ -61,7 +61,7 @@ BEGIN
            ,  CASE
                 WHEN M."AssetClass" = '2'
                 THEN 
-                  CASE  WHEN M."AcctCode" = '990'
+                  (CASE  WHEN M."AcctCode" = '990'
                       THEN '23'       --(23)第二類-應予注意：
                                       --    有足無擔保--逾繳超過清償期7-12月者
                                       --    或無擔保部分--超過清償期1-3月者        
@@ -71,9 +71,9 @@ BEGIN
                                       --    (有擔保分期協議且正常還款者)
                       ELSE '22'       --(22)第二類-應予注意：
                                       --    有足無擔保--逾繳超過清償期1-6月者
-                  END
+                   END)
                 WHEN  M."AssetClass" = '1'
-                THEN CASE
+                THEN (CASE
                     WHEN M."ClCode1" IN (1,2) 
                       AND CDI."IndustryItem" LIKE '%不動產%'
                     THEN '12'              -- 特定資產放款：建築貸款
@@ -96,7 +96,7 @@ BEGIN
                       AND F."UsageCode" = '02' 
                     THEN '12'       -- 特定資產放款：購置住宅+修繕貸款              
                     ELSE '11'       
-                    END
+                    END)
               ELSE "AssetClass"
               END                  AS "AssetClass2"	--資產分類2	  
       FROM "MonthlyFacBal" M
@@ -130,17 +130,39 @@ BEGIN
 																				--61：擔保放款-折溢價
                                         --62：催收放款-折溢價與催收費用
 																				--7：應收利息
-          ,NVL("AcSubBookCode",'N')				AS "AcSubBookCode"  --區隔帳冊 VARCHAR2
+          ,"AcSubBookCode"				AS "AcSubBookCode"  --區隔帳冊 VARCHAR2
 																				--00A：一般
 																				--201：利變
 																				--999：其他(無)
 																				--N：NULL
-          ,SUM("Amt")								AS "LoanBal"
-				  ,JOB_START_TIME           AS "CreateDate"          -- 建檔日期時間 DATE 0 0
-				  ,EmpNo                    AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
-				  ,JOB_START_TIME           AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0
-				  ,EmpNo                    AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
-    FROM ( SELECT M."YearMonth"
+          ,"Amt"								AS "LoanBal"
+          ,JOB_START_TIME           AS "CreateDate"          -- 建檔日期時間 DATE 0 0
+          ,EmpNo                    AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+          ,JOB_START_TIME           AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0
+          ,EmpNo                    AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+          ,"StorageRate" AS "StorageRate"
+          ,ROUND("Amt" * "StorageRate") AS "StorageAmt"
+    FROM (
+      
+      SELECT "YearMonth"
+            ,"AssetClass"
+            ,NVL("AcSubBookCode",'N')  AS "AcSubBookCode"
+            ,CASE 
+               WHEN "AssetClass" ='11' THEN 0.05  
+               WHEN "AssetClass" ='12' THEN 0.15                 
+               WHEN "AssetClass" ='21' THEN 0.02                 
+               WHEN "AssetClass" ='22' THEN 0.02                 
+               WHEN "AssetClass" ='23' THEN 0.02                 
+               WHEN "AssetClass" ='3' THEN 0.1                 
+               WHEN "AssetClass" ='4' THEN 0.5                 
+               WHEN "AssetClass" ='5' THEN 1                 
+               WHEN "AssetClass" ='61' THEN 0.05
+               WHEN "AssetClass" ='62' THEN 0.02
+               WHEN "AssetClass" ='7' THEN 0.02 
+            ELSE 0 END AS "StorageRate"
+            ,SUM("Amt") AS "Amt"
+      FROM (
+           SELECT M."YearMonth"
                  ,M."AssetClass2"     AS "AssetClass"
                  ,M."AcSubBookCode"    AS "AcSubBookCode" --區隔帳冊
                  ,SUM(M."PrinBalance" - M."LawAmount")      AS "Amt"           --放款餘額
@@ -198,10 +220,25 @@ BEGIN
             AND "YearMonth" = TYYMM
           GROUP BY "YearMonth"
                   ,'7'
-                  ,'999')
-    GROUP BY "YearMonth" 
-            ,"AssetClass"
-            ,NVL("AcSubBookCode",'N')
+                  ,'999'
+          ) 
+          GROUP BY "YearMonth"
+                  ,"AssetClass"
+                  ,NVL("AcSubBookCode",'N') 
+                  ,CASE 
+                     WHEN "AssetClass" ='11' THEN 0.05  
+                     WHEN "AssetClass" ='12' THEN 0.15                 
+                     WHEN "AssetClass" ='21' THEN 0.02                 
+                     WHEN "AssetClass" ='22' THEN 0.02                 
+                     WHEN "AssetClass" ='23' THEN 0.02                 
+                     WHEN "AssetClass" ='3' THEN 0.1                 
+                     WHEN "AssetClass" ='4' THEN 0.5                 
+                     WHEN "AssetClass" ='5' THEN 1                 
+                     WHEN "AssetClass" ='61' THEN 0.05
+                     WHEN "AssetClass" ='62' THEN 0.02
+                     WHEN "AssetClass" ='7' THEN 0.02 
+                  ELSE 0 END 
+    )              
     ;
 
     INS_CNT := INS_CNT + sql%rowcount;

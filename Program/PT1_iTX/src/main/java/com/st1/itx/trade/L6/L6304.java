@@ -1,7 +1,10 @@
 package com.st1.itx.trade.L6;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -69,7 +72,7 @@ public class L6304 extends TradeBuffer {
 		CdCommId tCdCommId = new CdCommId();
 
 		tCdCommId.setCdType("02");
-		tCdCommId.setCdItem("01");
+		tCdCommId.setCdItem("02");
 		tCdCommId.setEffectDate(iEffectDate);
 
 		CdComm sCdComm = sCdCommService.findById(tCdCommId, titaVo);
@@ -174,7 +177,7 @@ public class L6304 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時，發生錯誤
 			}
-			
+
 			this.info("onMon");
 			titaVo.setDataBaseOnMon();// 指定月報環境
 
@@ -207,24 +210,61 @@ public class L6304 extends TradeBuffer {
 		int effectDate = parse.stringToInteger(titaVo.getParam("RimEffectDate").trim());
 
 		t.setCdType("02");
-		t.setCdItem("01");
+		t.setCdItem("02");
 		t.setEffectDate(effectDate);
+
+		JSONObject jsonField = null;
+		try {
+			jsonField = new JSONObject(t.getJsonFields().toString());
+			this.info("jsonField = " + jsonField.toString());
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		tTempVo.clear();
 
+		BigDecimal oTotalLoan = BigDecimal.ZERO;
+		BigDecimal nTotalLoan = BigDecimal.ZERO;
+
+		BigDecimal tmpOLoan = BigDecimal.ZERO;
+		BigDecimal tmpNLoan = BigDecimal.ZERO;
+
 		tTempVo.putParam("YearMonth", (effectDate + 19110000) / 100);
 
-		for (int i = 1; i <= 12; i++) {
+		for (int i = 1; i <= 13; i++) {
 			if (titaVo.get("ProdName" + i) == null || "".equals(titaVo.get("LoanBal" + i).trim())) {
 				continue;
 			}
+
+			// 88風災不列入
+			if ("88".equals(titaVo.get("ColName" + i).substring(0, 2))) {
+				continue;
+			}
+
+			tmpOLoan = new BigDecimal(titaVo.getParam("oLoanBal" + i));
+			oTotalLoan = oTotalLoan.add(tmpOLoan);
 			// 原放款主檔
 			tTempVo.putParam("o" + titaVo.getParam("ColName" + i).trim(), titaVo.getParam("oLoanBal" + i));
+
+			tmpNLoan = new BigDecimal(titaVo.getParam("LoanBal" + i));
+			nTotalLoan = oTotalLoan.add(tmpNLoan);
 			// 調整後放款主檔
 			tTempVo.putParam(titaVo.getParam("ColName" + i).trim(), titaVo.getParam("LoanBal" + i));
 			// 備註
-			tTempVo.putParam("Remark" + i, titaVo.getParam("Remark" + i));
+			String prodNo = titaVo.getParam("ColName" + i).replace("LoanBal", "").trim();
+			tTempVo.putParam(prodNo + "Remark", titaVo.getParam("Remark" + i));
 		}
+
+		// 八八風災
+		try {
+			tTempVo.putParam("88LoanBal", jsonField.get("88LoanBal"));
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		tTempVo.putParam("oLoanBal", oTotalLoan.toString());
+		tTempVo.putParam("LoanBal", nTotalLoan.toString());
 
 		t.setJsonFields(tTempVo.getJsonString());
 

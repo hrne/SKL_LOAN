@@ -147,6 +147,12 @@ public class L2078 extends TradeBuffer {
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 		}
+
+		if (l2078ServiceImpl.hasNext()) {
+			titaVo.setReturnIndex(this.setIndexNext());
+			/* 手動折返 */
+			this.totaVo.setMsgEndToEnter();
+		}
 		this.totaVo.putParam("FeeTotal", feeTotal);
 		this.totaVo.putParam("OvduFeeTotal", ovduFeeTotal);
 

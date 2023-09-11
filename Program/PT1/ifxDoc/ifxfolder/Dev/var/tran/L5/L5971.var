@@ -203,6 +203,7 @@ T(H,#OCustLoanKind,#CustLoanKindHelp)
 ! 尚餘期數=期數TotalPeriod-已繳期數RepaidPeriod
 #ORemainPeriod=A,3,L
 
+
 ! 借戶狀態
 #OCustStatus=X,1,L
 #OCustStatusX=X,6,L
@@ -223,8 +224,8 @@ E(0,1)ASGN(LOOP$)
 ! 入帳日期
 #OOEntryDate=D,7,O
 ! 交易別
-#OOTxKind=A,1,O
-#OOTxKindX=X,8,O
+#OOTxKind=X,1,O
+#OOTxKindX=X,12,O
 T(H,#OOTxKind,#TxKindHelp)
 
 ! 交易金額

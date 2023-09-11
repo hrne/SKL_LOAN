@@ -41,39 +41,6 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("startYM = " + startYM);
 		this.info("endYM = " + endYM);
 		String sql = "";
-//		// 為了排除掉不是出表範圍的資料，實際Query包進subquery，以便篩選掉DataType=0者
-//		sql += " SELECT \"Year\" ";
-//		sql += "       ,\"DataType\" ";
-//		sql += "       ,\"Month\" ";
-//		sql += "       ,SUM(\"LoanBalance\") \"LoanSum\" ";
-//
-//		sql += " FROM ( SELECT TRUNC(MLB.\"YearMonth\" / 100) AS \"Year\" ";
-//		sql += "              ,CASE WHEN MLB.\"AcctCode\" != '990' ";
-//		sql += "                    THEN CASE WHEN NVL(FP.\"GovOfferFlag\", 'N') <> 'N' ";
-//		sql += "                              THEN 2 "; // 政府優惠: 非990; 政府優惠記號為Y
-//		sql += "                              WHEN MLB.\"AcctCode\" = '340' ";
-//		sql += "                              THEN 3 "; // 首購: 非990; 交易代號為340
-//		sql += "                              WHEN MLB.\"ProdNo\" IN ('81','82','83') ";
-//		sql += "                              THEN 1 "; // 921: 非990; 商品代號為81, 82, 83
-//		sql += "                         ELSE 0 END "; // 非資料範圍者標記為0，在外層去除掉
-//		sql += "                    WHEN NVL(FP.\"GovOfferFlag\", 'N') <> 'N' ";
-//		sql += "                      OR MLB.\"FacAcctCode\" = '340' ";
-//		sql += "                    THEN 4 "; // 催收款項: 是990; GovOfferFlag為Y 或 原會計科目為340者
-//		sql += "               ELSE 0 END AS \"DataType\" "; // 非資料範圍者標記為0，在外層去除掉
-//		// 非催收三種的子條件做成巢狀稍微難讀，但會使速度較快
-//
-//		sql += "              ,MOD(MLB.\"YearMonth\", 100) AS \"Month\" ";
-//		sql += "              ,MLB.\"LoanBalance\" AS \"LoanBalance\" ";
-//		sql += "        FROM \"MonthlyLoanBal\" MLB ";
-//		sql += "        LEFT JOIN \"FacProd\" FP ON FP.\"ProdNo\" = MLB.\"ProdNo\" ";
-//		sql += "        WHERE MLB.\"YearMonth\" BETWEEN :startYM AND :endYM ";
-//		sql += "          AND MLB.\"LoanBalance\" > 0 ";
-//		sql += "          AND NVL(FP.\"ProdNo\", 'XXX') != 'XXX' ";
-//		sql += " ) ";
-//		sql += " WHERE \"DataType\" != 0 ";
-//		sql += " GROUP BY \"Year\" "; // 為了DRY，把GROUP BY拉出來外層做，否則DataType條件會需要寫兩次
-//		sql += "         ,\"DataType\" "; // 對於效能並無顯著影響
-//		sql += "         ,\"Month\" ";
 
 		sql += " SELECT SUBSTR(JSON_VALUE(\"JsonFields\",'$.\"YearMonth\"'),1,4) AS \"Year\"";
 		sql += "       ,'1' AS \"DataType\" ";
@@ -81,7 +48,7 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       , TO_NUMBER(JSON_VALUE(\"JsonFields\",'$.\"921LoanBal\"')) AS \"LoanSum\"";
 		sql += " FROM \"CdComm\" ";
 		sql += " WHERE \"CdType\" = '02' ";
-		sql += "   AND \"CdItem\" = '01'";
+		sql += "   AND \"CdItem\" = '02'";
 		sql += "   AND TRUNC(\"EffectDate\" / 100 ) BETWEEN :startYM AND :endYM";
 		
 		sql += " UNION ALL";
@@ -101,7 +68,7 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           	  + JSON_VALUE(\"JsonFields\",'$.\"IILoanBal\"') ) AS \"LoanSum\"";
 		sql += " FROM \"CdComm\" ";
 		sql += " WHERE \"CdType\" = '02' ";
-		sql += "   AND \"CdItem\" = '01'";
+		sql += "   AND \"CdItem\" = '02'";
 		sql += "   AND TRUNC(\"EffectDate\" / 100 ) BETWEEN :startYM AND :endYM";
 		
 		sql += " UNION ALL";
@@ -112,7 +79,7 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       , TO_NUMBER(JSON_VALUE(\"JsonFields\",'$.\"340LoanBal\"')) AS \"LoanSum\"";
 		sql += " FROM \"CdComm\" ";
 		sql += " WHERE \"CdType\" = '02' ";
-		sql += "   AND \"CdItem\" = '01'";
+		sql += "   AND \"CdItem\" = '02'";
 		sql += "   AND TRUNC(\"EffectDate\" / 100 ) BETWEEN :startYM AND :endYM";
 		
 		sql += " UNION ALL";
@@ -123,7 +90,7 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       , TO_NUMBER(JSON_VALUE(\"JsonFields\",'$.\"990LoanBal\"')) AS \"LoanSum\"";
 		sql += " FROM \"CdComm\" ";
 		sql += " WHERE \"CdType\" = '02' ";
-		sql += "   AND \"CdItem\" = '01'";
+		sql += "   AND \"CdItem\" = '02'";
 		sql += "   AND TRUNC(\"EffectDate\" / 100 ) BETWEEN :startYM AND :endYM";
 
 
@@ -156,10 +123,13 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  THEN M.\"ProdNo\" ";
 		sql += "       	  WHEN M.\"AcctCode\" = '340' ";
 		sql += "		  THEN '340' ";
+		sql += "       	  WHEN M.\"ProdNo\" IN ('88')";
+		sql += "		  THEN '88' ";
 		sql += "       	  WHEN M.\"ProdNo\" BETWEEN '81' AND '83'";
 		sql += "		  THEN '921' ";
 		sql += "		ELSE '0' END AS \"Type\"";
-		sql += "       ,\"LoanBalance\" - DECODE(M.\"AcctCode\",'990',M.\"IntAmtRcv\",0) AS \"LoanBal\" ";
+		//990 只要抓UnpaidPrincipal
+		sql += "       ,  DECODE(M.\"AcctCode\",'990',M.\"OvduPrinAmt\",M.\"LoanBalance\") AS \"LoanBal\" ";
 		sql += " FROM \"MonthlyLoanBal\" M ";
 		sql += " LEFT JOIN \"FacMain\" FA  ON FA.\"CustNo\" = M.\"CustNo\"";
 		sql += "                          AND FA.\"FacmNo\" = M.\"FacmNo\"";
@@ -167,9 +137,9 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WHERE M.\"YearMonth\" = :yearMonth ";
 		sql += "   AND M.\"LoanBalance\" > 0 ";
 		sql += "   AND M.\"ProdNo\" BETWEEN 'IA' AND 'II' ";
-		sql += "   AND (  ( (TRUNC(:yearMonth / 100) - TRUNC(FA.\"FirstDrawdownDate\" / 10000) ) * 12 ";
-		sql += "           + MOD(:yearMonth,100) - MOD(TRUNC(FA.\"FirstDrawdownDate\" / 100),100) ";
-		sql += "        )  < 240 )    ";//-- 排除本月超過屆滿20年
+		// sql += "   AND (  ( (TRUNC(:yearMonth / 100) - TRUNC(FA.\"FirstDrawdownDate\" / 10000) ) * 12 ";
+		// sql += "           + MOD(:yearMonth,100) - MOD(TRUNC(FA.\"FirstDrawdownDate\" / 100),100) ";
+		// sql += "        )  < 240 )    ";//-- 排除本月超過屆滿20年
 		sql += " ) R";
 		sql += " WHERE R.\"Type\" <> '0'";
 		sql += " GROUP BY R.\"Type\"";
@@ -184,10 +154,12 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  THEN M.\"ProdNo\" ";
 		sql += "       	  WHEN M.\"AcctCode\" = '340' ";
 		sql += "		  THEN '340' ";
+		sql += "       	  WHEN M.\"ProdNo\" IN ('88')";
+		sql += "		  THEN '88' ";
 		sql += "       	  WHEN M.\"ProdNo\" BETWEEN '81' AND '83'";
 		sql += "		  THEN '921' ";
 		sql += "		ELSE '0' END AS \"Type\"";
-		sql += "       ,\"LoanBalance\" - DECODE(M.\"AcctCode\",'990',M.\"IntAmtRcv\",0) AS \"LoanBal\" ";
+		sql += "       ,  DECODE(M.\"AcctCode\",'990',M.\"OvduPrinAmt\",M.\"LoanBalance\") AS \"LoanBal\" ";
 		sql += " FROM \"MonthlyLoanBal\" M ";
 		sql += " LEFT JOIN \"FacMain\" FA  ON FA.\"CustNo\" = M.\"CustNo\"";
 		sql += "                          AND FA.\"FacmNo\" = M.\"FacmNo\"";
@@ -202,7 +174,14 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " SELECT * FROM \"tmpA\"";
 		sql += " UNION ";
 		sql += " SELECT * FROM \"tmpB\"";
-
+		sql += " UNION ";
+		sql += " SELECT '' AS \"Type\"";
+		sql += "       ,SUM(\"LoanBal\") AS \"LoanBal\"";
+		sql += " FROM (";
+		sql += " 	SELECT * FROM \"tmpA\"";
+		sql += " 	UNION ";
+		sql += " 	SELECT * FROM \"tmpB\"";
+		sql += " ) ";
 		this.info("sql=" + sql);
 
 		Query query;

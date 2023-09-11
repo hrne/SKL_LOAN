@@ -142,6 +142,15 @@ public class L9130 extends TradeBuffer {
 
 			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf,
 					"L9130總帳傳票媒體檔產生已完成", titaVo);
+			//更新資金運用概況檔已放款金額
+			try{
+				l5101.updateInnFundAplLoanBal(iAcDate,titaVo);
+			}catch (Exception e) {
+				StringWriter errors = new StringWriter();
+				e.printStackTrace(new PrintWriter(errors));
+				this.error("L5101更新資金運用概況檔已放款金額時發生錯誤 = " + errors.toString());
+			}
+
 
 			try {
 				tranL9131.run(titaVo);
@@ -253,13 +262,7 @@ public class L9130 extends TradeBuffer {
 				this.error("L9141產生暫收款-火險費餘額表時發生錯誤 = " + errors.toString());
 			}
 			
-			try{
-				l5101.updateInnFundAplLoanBal(iAcDate,titaVo);
-			}catch (Exception e) {
-				StringWriter errors = new StringWriter();
-				e.printStackTrace(new PrintWriter(errors));
-				this.error("L5101更新資金運用概況檔已放款金額時發生錯誤 = " + errors.toString());
-			}
+			
 
 		} else {
 			doRpt(titaVo);

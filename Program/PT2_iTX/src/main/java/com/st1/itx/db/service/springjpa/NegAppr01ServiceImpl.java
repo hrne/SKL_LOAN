@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -463,6 +466,53 @@ em = null;
       negAppr01T = negAppr01Repos.findTopByBringUpDateGreaterThanEqualOrderByBringUpDateDesc(bringUpDate_0);
 
     return negAppr01T.isPresent() ? negAppr01T.get() : null;
+  }
+
+  @Override
+  public NegAppr01 bringUpDateCustNoFirst(int custNo_0, int bringUpDate_1, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("bringUpDateCustNoFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " bringUpDate_1 : " +  bringUpDate_1);
+    Optional<NegAppr01> negAppr01T = null;
+    if (dbName.equals(ContentName.onDay))
+      negAppr01T = negAppr01ReposDay.findTopByCustNoIsAndBringUpDateGreaterThanEqualOrderByBringUpDateDesc(custNo_0, bringUpDate_1);
+    else if (dbName.equals(ContentName.onMon))
+      negAppr01T = negAppr01ReposMon.findTopByCustNoIsAndBringUpDateGreaterThanEqualOrderByBringUpDateDesc(custNo_0, bringUpDate_1);
+    else if (dbName.equals(ContentName.onHist))
+      negAppr01T = negAppr01ReposHist.findTopByCustNoIsAndBringUpDateGreaterThanEqualOrderByBringUpDateDesc(custNo_0, bringUpDate_1);
+    else 
+      negAppr01T = negAppr01Repos.findTopByCustNoIsAndBringUpDateGreaterThanEqualOrderByBringUpDateDesc(custNo_0, bringUpDate_1);
+
+    return negAppr01T.isPresent() ? negAppr01T.get() : null;
+  }
+
+  @Override
+  public Slice<NegAppr01> bringUpDateCustNoEq(int custNo_0, int bringUpDate_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<NegAppr01> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("bringUpDateCustNoEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " bringUpDate_1 : " +  bringUpDate_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = negAppr01ReposDay.findAllByCustNoIsAndBringUpDateIsOrderByFinCodeAsc(custNo_0, bringUpDate_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = negAppr01ReposMon.findAllByCustNoIsAndBringUpDateIsOrderByFinCodeAsc(custNo_0, bringUpDate_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = negAppr01ReposHist.findAllByCustNoIsAndBringUpDateIsOrderByFinCodeAsc(custNo_0, bringUpDate_1, pageable);
+    else 
+      slice = negAppr01Repos.findAllByCustNoIsAndBringUpDateIsOrderByFinCodeAsc(custNo_0, bringUpDate_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
   }
 
   @Override

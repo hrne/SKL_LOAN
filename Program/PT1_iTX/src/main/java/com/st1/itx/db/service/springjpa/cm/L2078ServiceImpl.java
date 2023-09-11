@@ -31,16 +31,10 @@ public class L2078ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Autowired
 	private DateUtil dateUtil;
 
-	// *** 折返控制相關 ***
-	private int index;
-
-	// *** 折返控制相關 ***
-	private int limit;
 
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-//		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
 	public List<Map<String, String>> findAll(TitaVo titaVo, int index, int limit) throws Exception {
@@ -51,6 +45,7 @@ public class L2078ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.index = index;
 		// *** 折返控制相關 ***
 		this.limit = limit;
+		
 		// tita
 		int iReceiveDateStart = parse.stringToInteger(titaVo.getParam("ReceiveDateStart")) + 19110000;
 		int iReceiveDateEnd = parse.stringToInteger(titaVo.getParam("ReceiveDateEnd")) + 19110000;

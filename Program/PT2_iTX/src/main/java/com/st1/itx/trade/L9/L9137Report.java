@@ -580,8 +580,8 @@ public class L9137Report extends MakeReport {
 			fundsLimit = tInnFundApl.getPosbleBorPsn();
 			fundsLimitAmt = tInnFundApl.getPosbleBorAmt();
 			String acDate = parse.IntegerToString(tInnFundApl.getAcDate(), 1);
-			fundsMonth = acDate.substring(4, 6);
-			fundsDay = acDate.substring(6, 8);
+			fundsMonth = acDate.substring(3, 5);
+			fundsDay = acDate.substring(5, 7);
 		}
 	}
 }

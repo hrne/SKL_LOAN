@@ -61,7 +61,7 @@ public class LM002 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		return this.exec(contribution, "M", chunkContext);
+		return this.exec(contribution, "M");
 	}
 
 	public void run() throws LogicException {
@@ -69,7 +69,7 @@ public class LM002 extends BatchBase implements Tasklet, InitializingBean {
 		String parentTranCode = titaVo.getTxcd();
 		lm002report.setTxBuffer(this.getTxBuffer());
 		lm002report.setParentTranCode(parentTranCode);
-		checkProjectLoan("01");//專案放款產表時計算
+		checkProjectLoan("02");//專案放款產表時計算
 		lm002report.exec(titaVo);
 	}
 
@@ -166,6 +166,8 @@ public class LM002 extends BatchBase implements Tasklet, InitializingBean {
 		tTempVo.putParam("oIILoanBal", "0");
 		tTempVo.putParam("o921LoanBal", "0");
 		tTempVo.putParam("o990LoanBal", "0");
+		tTempVo.putParam("oLoanBal", "0");
+
 		//調整後
 		tTempVo.putParam("340LoanBal", "0");
 		tTempVo.putParam("IALoanBal", "0");
@@ -179,9 +181,11 @@ public class LM002 extends BatchBase implements Tasklet, InitializingBean {
 		tTempVo.putParam("IILoanBal", "0");
 		tTempVo.putParam("921LoanBal", "0");
 		tTempVo.putParam("990LoanBal", "0");
-		
+		tTempVo.putParam("88LoanBal", "0");//88風災另外寫
+		tTempVo.putParam("LoanBal", "0");
 		
 		for (Map<String, String> r : result) {
+
 			tTempVo.putParam("o"+r.get("Type") + "LoanBal", r.get("LoanBal"));
 			tTempVo.putParam(r.get("Type") + "LoanBal", r.get("LoanBal"));
 		}

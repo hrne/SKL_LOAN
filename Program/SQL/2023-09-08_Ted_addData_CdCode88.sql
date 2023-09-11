@@ -1,0 +1,2 @@
+Insert into "CdCode" ("DefCode","DefType","Code","Item","Enable","EffectFlag","CreateDate","CreateEmpNo","LastUpdate","LastUpdateEmpNo","MinCodeLength","MaxCodeLength","IsNumeric") values ('GovOfferCode',3,'88LoanBal','88 風災專案貸款','Y',0,to_timestamp('21-6月 -23 06.52.12.302000000 下午','DD-MON-RR HH.MI.SSXFF AM'),'001718',to_timestamp('21-6月 -23 06.52.12.302000000 下午','DD-MON-RR HH.MI.SSXFF AM'),'001718',0,0,null);
+commit;

@@ -110,18 +110,9 @@ T(3,[L6034] 專案放款查詢)
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 
 #OOYearMonth=A,5,L
-#OO340LoanBal=X,20,L
-#OOIALoanBal=X,20,L
-#OOIBLoanBal=X,20,L
-#OOICLoanBal=X,20,L
-#OOIDLoanBal=X,20,L
-#OOIELoanBal=X,20,L
-#OOIFLoanBal=X,20,L
-#OOIGLoanBal=X,20,L
-#OOIHLoanBal=X,20,L
-#OOIILoanBal=X,20,L
-#OO921LoanBal=X,20,L
-#OO990LoanBal=X,20,L
+#OOOLoanBal=X,20,L
+#OONLoanBal=X,20,L
+#OODLoanBal=X,20,L
 #OORemark=X,100,L
 
 
@@ -161,18 +152,9 @@ BIND(grid,{cmd=CHAIN;ntxcd=L6304;text=刪除;ntxbuf=#OOBUF_4}))
 TXFORM=L6034
 #OOYearMonth
 #OORemark
-#OO340LoanBal
-#OOIALoanBal
-#OOIBLoanBal
-#OOICLoanBal
-#OOIDLoanBal
-#OOIELoanBal
-#OOIFLoanBal
-#OOIGLoanBal
-#OOIHLoanBal
-#OOIILoanBal
-#OO921LoanBal
-#OO990LoanBal
+#OOOLoanBal
+#OONLoanBal
+#OODLoanBal
 ^
 
 <include src="COM.icf::TRCTL.tom"/>
@@ -205,31 +187,13 @@ TXFORM=L6034
 
 #OOYearMonth=資料年月
 {width:70,align:'center'}
-#OORemark=備註
-{width:100,align:'center'}
-#OO340LoanBal=首次購屋貸款
+#OORemark=項目
 {width:180,align:'center'}
-#OOIALoanBal=IA 1200億年優惠房屋貸款
+#OOOLoanBal=放款總額(主檔)
 {width:180,align:'center'}
-#OOIBLoanBal=IB 2000億優惠購屋專案貸款
+#OONLoanBal=專案放款總額
 {width:180,align:'center'}
-#OOICLoanBal=IC 2000億優惠購屋專案貸款
-{width:180,align:'center'}
-#OOIDLoanBal=ID 20億優惠購屋專案貸款
-{width:180,align:'center'}
-#OOIELoanBal=IE 15億優惠購屋專案貸款
-{width:180,align:'center'}
-#OOIFLoanBal=IF 12億優惠購屋專案貸款
-{width:180,align:'center'}
-#OOIGLoanBal=IG 10億優惠購屋專案貸款
-{width:180,align:'center'}
-#OOIHLoanBal=IH 2000億優惠購屋專案貸款
-{width:180,align:'center'}
-#OOIILoanBal=II 2000億優惠購屋專案貸款-續
-{width:180,align:'center'}
-#OO921LoanBal=921 重建優惠房貸
-{width:180,align:'center'}
-#OO990LoanBal=專案放款-催收款項
+#OODLoanBal=差額
 {width:180,align:'center'}
 
 ^

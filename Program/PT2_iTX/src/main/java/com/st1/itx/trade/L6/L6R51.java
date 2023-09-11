@@ -123,7 +123,7 @@ public class L6R51 extends TradeBuffer {
 		} else if (txcd.equals("L6304")) {
 
 			tCdCommId.setCdType("02");
-			tCdCommId.setCdItem("01");
+			tCdCommId.setCdItem("02");
 			tCdCommId.setEffectDate(iEffectDate);
 
 			CdComm tCdComm = cdCommService.findById(tCdCommId, titaVo);
@@ -154,6 +154,11 @@ public class L6R51 extends TradeBuffer {
 
 					for (CdCode tCdCode : slCdCode.getContent()) {
 
+						// 八八風災不列入
+						if ("88LoanBal".equals(tCdCode.getCode())) {
+							continue;
+						}
+
 						cnt++;
 
 						BigDecimal oLoanBal = BigDecimal.ZERO;
@@ -169,7 +174,9 @@ public class L6R51 extends TradeBuffer {
 						this.totaVo.putParam("oL6r51LoanBal" + cnt, df.format(oLoanBal));
 						this.totaVo.putParam("L6r51LoanBal" + cnt, df.format(loanBal));
 						try {
-							remark = jsonField.get("Remark" + cnt).toString();
+
+							String prodNo = titaVo.getParam("L6r51ColName" + cnt).replace("LoanBal", "").trim();
+							remark = jsonField.get(prodNo + "Remark").toString();
 							this.info("remark=" + remark);
 						} catch (JSONException e) {
 							// TODO Auto-generated catch block
@@ -187,11 +194,17 @@ public class L6R51 extends TradeBuffer {
 					tTempVo = tTempVo.getVo(tCdComm.getJsonFields());
 
 					for (CdCode tCdCode : slCdCode.getContent()) {
+
+						// 八八風災不列入
+						if ("88LoanBal".equals(tCdCode.getCode())) {
+							continue;
+						}
+
 						cnt++;
 						BigDecimal oLoanBal = BigDecimal.ZERO;
 						BigDecimal loanBal = BigDecimal.ZERO;
 						loanBal = parse.stringToBigDecimal(tTempVo.getParam(tCdCode.getCode()));
-						oLoanBal = parse.stringToBigDecimal(tTempVo.getParam("o"+tCdCode.getCode()));
+						oLoanBal = parse.stringToBigDecimal(tTempVo.getParam("o" + tCdCode.getCode()));
 						prodName = tCdCode.getItem();
 						colName = tCdCode.getCode();
 						if ("340".equals(prodName.substring(0, 3))) {
@@ -212,7 +225,6 @@ public class L6R51 extends TradeBuffer {
 						this.totaVo.putParam("L6r51Remark" + cnt, remark);
 					}
 				}
-		
 
 			} // if
 		} // if

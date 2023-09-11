@@ -142,7 +142,7 @@ CALL(#HelpProc)
 T(2,@TxKindHelp,#HelpDesc1)
 
 #TxKindHelp1=x,1024,S
-T(HELP,@TxKindHelp1,#TxKindHelp,-,9;8;7;6)
+T(HELP,@TxKindHelp1,#TxKindHelp,-,9;8;6;5)
 
 ! 查詢選項  新增最大債權跟一般債權可輸入範圍限制
 #SearchOption=X,2,I

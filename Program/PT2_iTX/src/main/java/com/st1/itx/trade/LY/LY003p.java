@@ -43,28 +43,14 @@ public class LY003p extends TradeBuffer {
 		this.info("LY003p titaVo.getTxcd() = " + titaVo.getTxcd());
 		String parentTranCode = titaVo.getTxcd();
 
-		// 1 舊版報表，2新版報表
-		// 報表項目
-		int reportVer = Integer.valueOf(titaVo.getParam("ReportCode"));
 		String noticeText = "";
-		boolean isFinish = true;
-		if (reportVer == 1) {
-			lY003Report.setParentTranCode(parentTranCode);
-			noticeText = "LY003 -非RBC_表14-2_會計部年度檢查報表";
-			isFinish = lY003Report.exec(titaVo);
-		} else {
-			lY003Report2.setParentTranCode(parentTranCode);
-			noticeText = "LY003 A142放款餘額彙總表";
-			isFinish = lY003Report2.exec(titaVo);
-		}
+		noticeText = "LY003 A142放款餘額彙總表";
+		
+		lY003Report2.setParentTranCode(parentTranCode);
+		lY003Report2.exec(titaVo);
 
-		if (isFinish) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), noticeText + "已完成", titaVo);
-		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), noticeText + "查無資料", titaVo);
-		}
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
+				titaVo.getParam("TLRNO"), noticeText + "已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

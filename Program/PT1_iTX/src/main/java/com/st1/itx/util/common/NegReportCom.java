@@ -1352,14 +1352,18 @@ public class NegReportCom extends CommBuffer {
 							case "02960":// 債協與調解
 								// 還款狀況-0:正常,1:溢繳,2:短繳,3:大額還本,4:結清
 								Detail16 = tNegTrans.getTxKind();// tNegTrans-交易別
-								if (("5").equals(Detail16)) {// tNegTrans-交易別=5:提前清償
-									Detail16 = "4";
+								if (("3").equals(Detail16) || ("4").equals(Detail16)) {
+								}else if (("7").equals(Detail16)) {// tNegTrans-交易別=7滿期 則放1溢繳   
+									Detail16 = "1";
+								}else {
+									Detail16 = "0";
 								}
+								
 								if (("2").equals(tCaseKindCode)) {// 調解需多加B
 									Detail16 = Detail16 + "B";
 								}
 								break;
-							case "02970":
+							case "02970"://已改用02950
 								// 還款狀況-0:正常,1:溢繳,2:短繳,3:大額還本,4:結清
 								Detail16 = tNegTrans.getTxKind();// tNegTrans-交易別
 								break;

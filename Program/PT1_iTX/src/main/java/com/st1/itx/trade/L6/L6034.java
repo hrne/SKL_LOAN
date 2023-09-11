@@ -57,18 +57,10 @@ public class L6034 extends TradeBuffer {
 		int eAcDate = 99999999;
 
 		JSONObject jsonField;
-		BigDecimal i340LoanBal = BigDecimal.ZERO;
-		BigDecimal IALoanBal = BigDecimal.ZERO;
-		BigDecimal IBLoanBal = BigDecimal.ZERO;
-		BigDecimal ICLoanBal = BigDecimal.ZERO;
-		BigDecimal IDLoanBal = BigDecimal.ZERO;
-		BigDecimal IELoanBal = BigDecimal.ZERO;
-		BigDecimal IFLoanBal = BigDecimal.ZERO;
-		BigDecimal IGLoanBal = BigDecimal.ZERO;
-		BigDecimal IHLoanBal = BigDecimal.ZERO;
-		BigDecimal IILoanBal = BigDecimal.ZERO;
-		BigDecimal i921LoanBal = BigDecimal.ZERO;
-		BigDecimal i990LoanBal = BigDecimal.ZERO;
+		BigDecimal oLoanBal = BigDecimal.ZERO;
+		BigDecimal nLoanBal = BigDecimal.ZERO;
+		BigDecimal dLoanBal = BigDecimal.ZERO;
+		String remark = "放款合計(含催收)";
 
 		// 全部查詢
 		if (sYearMonth == 0 && sYearMonth == 0) {
@@ -90,19 +82,9 @@ public class L6034 extends TradeBuffer {
 
 				try {
 					jsonField = new JSONObject(sCdComm.getJsonFields().toString());
-
-					i340LoanBal = new BigDecimal(jsonField.get("340LoanBal").toString());
-					IALoanBal = new BigDecimal(jsonField.get("IALoanBal").toString());
-					IBLoanBal = new BigDecimal(jsonField.get("IBLoanBal").toString());
-					ICLoanBal = new BigDecimal(jsonField.get("ICLoanBal").toString());
-					IDLoanBal = new BigDecimal(jsonField.get("IDLoanBal").toString());
-					IELoanBal = new BigDecimal(jsonField.get("IELoanBal").toString());
-					IFLoanBal = new BigDecimal(jsonField.get("IFLoanBal").toString());
-					IGLoanBal = new BigDecimal(jsonField.get("IGLoanBal").toString());
-					IHLoanBal = new BigDecimal(jsonField.get("IHLoanBal").toString());
-					IILoanBal = new BigDecimal(jsonField.get("IILoanBal").toString());
-					i921LoanBal = new BigDecimal(jsonField.get("921LoanBal").toString());
-					i990LoanBal = new BigDecimal(jsonField.get("990LoanBal").toString());
+					oLoanBal = new BigDecimal(jsonField.get("oLoanBal").toString());
+					nLoanBal = new BigDecimal(jsonField.get("LoanBal").toString());
+					dLoanBal = oLoanBal.subtract(nLoanBal);
 
 				} catch (JSONException e) {
 
@@ -112,19 +94,10 @@ public class L6034 extends TradeBuffer {
 				OccursList occursList = new OccursList();
 
 				occursList.putParam("OOYearMonth", sCdComm.getEffectDate() / 100);
-				occursList.putParam("OORemark", sCdComm.getRemark());
-				occursList.putParam("OO340LoanBal", df.format(i340LoanBal));
-				occursList.putParam("OOIALoanBal", df.format(IALoanBal));
-				occursList.putParam("OOIBLoanBal", df.format(IBLoanBal));
-				occursList.putParam("OOICLoanBal", df.format(ICLoanBal));
-				occursList.putParam("OOIDLoanBal", df.format(IDLoanBal));
-				occursList.putParam("OOIELoanBal", df.format(IELoanBal));
-				occursList.putParam("OOIFLoanBal", df.format(IFLoanBal));
-				occursList.putParam("OOIGLoanBal", df.format(IGLoanBal));
-				occursList.putParam("OOIHLoanBal", df.format(IHLoanBal));
-				occursList.putParam("OOIILoanBal", df.format(IILoanBal));
-				occursList.putParam("OO921LoanBal", df.format(i921LoanBal));
-				occursList.putParam("OO990LoanBal", df.format(i990LoanBal));
+				occursList.putParam("OORemark", remark);
+				occursList.putParam("OOOLoanBal", df.format(oLoanBal));
+				occursList.putParam("OONLoanBal", df.format(nLoanBal));
+				occursList.putParam("OODLoanBal", df.format(dLoanBal));
 
 				this.totaVo.addOccursList(occursList);
 			}
@@ -155,20 +128,9 @@ public class L6034 extends TradeBuffer {
 
 			try {
 				jsonField = new JSONObject(sCdComm.getJsonFields().toString());
-
-				i340LoanBal = new BigDecimal(jsonField.get("340LoanBal").toString());
-				IALoanBal = new BigDecimal(jsonField.get("IALoanBal").toString());
-				IBLoanBal = new BigDecimal(jsonField.get("IBLoanBal").toString());
-				ICLoanBal = new BigDecimal(jsonField.get("ICLoanBal").toString());
-				IDLoanBal = new BigDecimal(jsonField.get("IDLoanBal").toString());
-				IELoanBal = new BigDecimal(jsonField.get("IELoanBal").toString());
-				IFLoanBal = new BigDecimal(jsonField.get("IFLoanBal").toString());
-				IGLoanBal = new BigDecimal(jsonField.get("IGLoanBal").toString());
-				IHLoanBal = new BigDecimal(jsonField.get("IHLoanBal").toString());
-				IILoanBal = new BigDecimal(jsonField.get("IILoanBal").toString());
-				i921LoanBal = new BigDecimal(jsonField.get("921LoanBal").toString());
-				i990LoanBal = new BigDecimal(jsonField.get("990LoanBal").toString());
-
+				oLoanBal = new BigDecimal(jsonField.get("oLoanBal").toString());
+				nLoanBal = new BigDecimal(jsonField.get("LoanBal").toString());
+				dLoanBal = oLoanBal.subtract(nLoanBal);
 			} catch (JSONException e) {
 
 				e.printStackTrace();
@@ -177,19 +139,10 @@ public class L6034 extends TradeBuffer {
 			this.info("getEffectDate =" + sCdComm.getEffectDate());
 			OccursList occursList = new OccursList();
 			occursList.putParam("OOYearMonth", sCdComm.getEffectDate() / 100);
-			occursList.putParam("OORemark", sCdComm.getRemark());
-			occursList.putParam("OO340LoanBal", df.format(i340LoanBal));
-			occursList.putParam("OOIALoanBal", df.format(IALoanBal));
-			occursList.putParam("OOIBLoanBal", df.format(IBLoanBal));
-			occursList.putParam("OOICLoanBal", df.format(ICLoanBal));
-			occursList.putParam("OOIDLoanBal", df.format(IDLoanBal));
-			occursList.putParam("OOIELoanBal", df.format(IELoanBal));
-			occursList.putParam("OOIFLoanBal", df.format(IFLoanBal));
-			occursList.putParam("OOIGLoanBal", df.format(IGLoanBal));
-			occursList.putParam("OOIHLoanBal", df.format(IHLoanBal));
-			occursList.putParam("OOIILoanBal", df.format(IILoanBal));
-			occursList.putParam("OO921LoanBal", df.format(i921LoanBal));
-			occursList.putParam("OO990LoanBal", df.format(i990LoanBal));
+			occursList.putParam("OORemark", remark);
+			occursList.putParam("OOOLoanBal", df.format(oLoanBal));
+			occursList.putParam("OONLoanBal", df.format(nLoanBal));
+			occursList.putParam("OODLoanBal", df.format(dLoanBal));
 			this.totaVo.addOccursList(occursList);
 
 		}
