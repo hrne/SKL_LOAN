@@ -3,6 +3,8 @@ package com.st1.itx.db.repository.day;
 
 import java.util.Optional;
 
+import java.math.BigDecimal;
+import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
@@ -34,6 +36,10 @@ public interface MonthlyFacBalRepositoryDay extends JpaRepository<MonthlyFacBal,
   // (月底日日終批次)維護 MonthlyFacBal 額度月報工作檔
   @Procedure(value = "\"Usp_L9_MonthlyFacBal_Upd\"")
   public void uspL9MonthlyfacbalUpd(int YYYYMM,  String empNo);
+
+  // 
+  @Procedure(value = "\"Usp_L7_UploadToMothlyFacBal_Upd\"")
+  public void uspL7UploadtomothlyfacbalUpd(int YYYYMM,  String txcd,  String empNo);
 
 }
 

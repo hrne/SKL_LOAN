@@ -220,7 +220,7 @@ public class L5R37 extends TradeBuffer {
 					}
 				}
 
-				this.totaVo.putParam("BonusNo", pfRewardMedia.getBonusNo());
+				this.totaVo.putParam("BonusNo", pfRewardMedia.getLogNo());
 				this.totaVo.putParam("BonusDate", pfRewardMedia.getBonusDate());
 				this.totaVo.putParam("BonusType", pfRewardMedia.getBonusType());
 				this.totaVo.putParam("PerfDate", pfRewardMedia.getPerfDate());

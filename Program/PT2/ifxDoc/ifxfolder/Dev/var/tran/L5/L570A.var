@@ -134,7 +134,7 @@ T(1,@TransCustNo,#NegTransKey,22,7)
 ! 測試是否為一開始的 0是一開始 1是後面修改資料後的調Rim
 #RimTrialFunc=X,1,S
 T(2,0)
-#RimTxKind=A,1,S
+#RimTxKind=X,1,S
 #RimReturnAmt=m,14,S
 #RimCustNo=A,7,S
 
@@ -209,8 +209,8 @@ T(2,@TransCaseSeqR,#L5r03TransCaseSeq)
 E(0,@TransEntryDate,#L5r03TransEntryDate)
 E(0,@TransTxStatus,#L5r03TransTxStatus)
 E(0,@NewTransTxStatus,#L5r03NewTransTxStatus)
-E(0,@TransTxKind,#L5r03TransTxKind)
-E(0,@NewTransTxKind,#L5r03NewTransTxKind)
+T(2,@TransTxKind,#L5r03TransTxKind)
+T(2,@NewTransTxKind,#L5r03NewTransTxKind)
 E(0,@TransTxAmt,#L5r03TransTxAmt)
 E(0,@NewTransTxAmt,#L5r03NewTransTxAmt)
 E(0,@TransPrincipalBal,#L5r03TransPrincipalBal)
@@ -255,8 +255,8 @@ T(H,@NewTransTxKindX,#NewTransTxKind,#TxKindHelp)
 T(H,@NewStatusX,#NewStatus,#StatusHelp)
 T(H,@CustLoanKindX,#CustLoanKind,#CustLoanKindHelp)
 
-#TempTransTxKind=A,1,S
-E(0,#L5r03NewTransTxKind)
+#TempTransTxKind=X,1,S
+T(2,#L5r03NewTransTxKind)
 
 #RimBankCode=X,8,S
 #FunctionCode=X,2,S
@@ -285,6 +285,7 @@ E(0,#CaseSeqR)
 
 ! 戶號
 #CustNo=X,7,L
+
 
 #CustName=x,100,L
 
@@ -378,6 +379,7 @@ T(2,@MainFinCodeX,#L5r12BankItem)
 ! 戶號
 #TransCustNo=X,7,L
 
+
 ! 案件序號-NegMain
 #TransCaseSeqR=X,3,L
 #TransCaseSeq=A,3,L  
@@ -401,19 +403,19 @@ HELP(#TxStatusHelp)
 T(H,#NewTransTxStatus,#TxStatusHelp)
 
 ! 交易別
-#TransTxKind=A,1,L
+#TransTxKind=X,1,L
 HELP(#TxKindHelp,cols:3)
 @V(H,#TxKindHelp)
-#TransTxKindX=X,8,L
+#TransTxKindX=X,12,L
 T(H,#TransTxKind,#TxKindHelp)
 
-#NewTransTxKind=A,1,I
+#NewTransTxKind=X,1,I
 HELP(#TxKindHelp,cols:3)
 @V(H,#TxKindHelp)
-@IF(#NewTransTxKind==9,V(P,請勿輸入9),$)
-@IF(#NewTransTxKind==6,s,$)
+!IF(#NewTransTxKind==9,V(P,請勿輸入9),$)
+!IF(#NewTransTxKind==6,s,$)
 
-#NewTransTxKindX=X,8,L
+#NewTransTxKindX=X,12,L
 T(H,#NewTransTxKind,#TxKindHelp)
 
 #CheckTxKindX=X,1,S

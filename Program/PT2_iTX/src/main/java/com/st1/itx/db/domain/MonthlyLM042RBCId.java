@@ -2,8 +2,12 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * MonthlyLM042RBC LM042RBC會計報表<br>
@@ -16,24 +20,22 @@ import javax.persistence.Embeddable;
 public class MonthlyLM042RBCId implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -8934106641639033698L;
-
-// 資料年月
+  // 資料年月
   @Column(name = "`YearMonth`")
   private int yearMonth = 0;
 
   // 放款種類
+  /* 1:一般放款2:專案放款 */
   @Column(name = "`LoanType`", length = 1)
   private String loanType = " ";
 
   // 放款項目
+  /* A：非授信限制對象-銀行保證放款B：非授信限制對象-動產擔保放款C： 非授信限制對象-不動產擔保放款D：非授信限制對象-有價證券質押放款E： 授信限制對象-非具控制與從屬關係F：授信限制對象-具控制與從屬關係 */
   @Column(name = "`LoanItem`", length = 1)
   private String loanItem = " ";
 
-  // 對象關係人
+  // 是否為利害關係人
+  /* Y/N */
   @Column(name = "`RelatedCode`", length = 1)
   private String relatedCode = " ";
 
@@ -68,7 +70,8 @@ public class MonthlyLM042RBCId implements Serializable {
 
 /**
 	* 放款種類<br>
-	* 
+	* 1:一般放款
+2:專案放款
 	* @return String
 	*/
   public String getLoanType() {
@@ -77,7 +80,8 @@ public class MonthlyLM042RBCId implements Serializable {
 
 /**
 	* 放款種類<br>
-	* 
+	* 1:一般放款
+2:專案放款
   *
   * @param loanType 放款種類
 	*/
@@ -87,7 +91,12 @@ public class MonthlyLM042RBCId implements Serializable {
 
 /**
 	* 放款項目<br>
-	* 
+	* A：非授信限制對象-銀行保證放款
+B：非授信限制對象-動產擔保放款
+C： 非授信限制對象-不動產擔保放款
+D：非授信限制對象-有價證券質押放款
+E： 授信限制對象-非具控制與從屬關係
+F：授信限制對象-具控制與從屬關係
 	* @return String
 	*/
   public String getLoanItem() {
@@ -96,7 +105,12 @@ public class MonthlyLM042RBCId implements Serializable {
 
 /**
 	* 放款項目<br>
-	* 
+	* A：非授信限制對象-銀行保證放款
+B：非授信限制對象-動產擔保放款
+C： 非授信限制對象-不動產擔保放款
+D：非授信限制對象-有價證券質押放款
+E： 授信限制對象-非具控制與從屬關係
+F：授信限制對象-具控制與從屬關係
   *
   * @param loanItem 放款項目
 	*/
@@ -105,8 +119,8 @@ public class MonthlyLM042RBCId implements Serializable {
   }
 
 /**
-	* 對象關係人<br>
-	* 
+	* 是否為利害關係人<br>
+	* Y/N
 	* @return String
 	*/
   public String getRelatedCode() {
@@ -114,10 +128,10 @@ public class MonthlyLM042RBCId implements Serializable {
   }
 
 /**
-	* 對象關係人<br>
-	* 
+	* 是否為利害關係人<br>
+	* Y/N
   *
-  * @param relatedCode 對象關係人
+  * @param relatedCode 是否為利害關係人
 	*/
   public void setRelatedCode(String relatedCode) {
     this.relatedCode = relatedCode;

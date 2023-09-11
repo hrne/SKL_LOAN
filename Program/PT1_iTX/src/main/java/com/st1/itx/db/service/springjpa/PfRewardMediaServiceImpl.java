@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -58,21 +61,21 @@ public class PfRewardMediaServiceImpl extends ASpringJpaParm implements PfReward
   }
 
   @Override
-  public PfRewardMedia findById(Long bonusNo, TitaVo... titaVo) {
+  public PfRewardMedia findById(Long logNo, TitaVo... titaVo) {
     String dbName = "";
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("findById " + dbName + " " + bonusNo);
+    this.info("findById " + dbName + " " + logNo);
     Optional<PfRewardMedia> pfRewardMedia = null;
     if (dbName.equals(ContentName.onDay))
-      pfRewardMedia = pfRewardMediaReposDay.findById(bonusNo);
+      pfRewardMedia = pfRewardMediaReposDay.findById(logNo);
     else if (dbName.equals(ContentName.onMon))
-      pfRewardMedia = pfRewardMediaReposMon.findById(bonusNo);
+      pfRewardMedia = pfRewardMediaReposMon.findById(logNo);
     else if (dbName.equals(ContentName.onHist))
-      pfRewardMedia = pfRewardMediaReposHist.findById(bonusNo);
+      pfRewardMedia = pfRewardMediaReposHist.findById(logNo);
     else 
-      pfRewardMedia = pfRewardMediaRepos.findById(bonusNo);
+      pfRewardMedia = pfRewardMediaRepos.findById(logNo);
     PfRewardMedia obj = pfRewardMedia.isPresent() ? pfRewardMedia.get() : null;
       if(obj != null) {
         EntityManager em = this.baseEntityManager.getCurrentEntityManager(dbName);
@@ -90,9 +93,9 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "BonusNo"));
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "LogNo"));
     else
-         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "BonusNo"));
+         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "LogNo"));
     this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = pfRewardMediaReposDay.findAll(pageable);
@@ -185,20 +188,20 @@ em = null;
   }
 
   @Override
-  public PfRewardMedia holdById(Long bonusNo, TitaVo... titaVo) {
+  public PfRewardMedia holdById(Long logNo, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("Hold " + dbName + " " + bonusNo);
+    this.info("Hold " + dbName + " " + logNo);
     Optional<PfRewardMedia> pfRewardMedia = null;
     if (dbName.equals(ContentName.onDay))
-      pfRewardMedia = pfRewardMediaReposDay.findByBonusNo(bonusNo);
+      pfRewardMedia = pfRewardMediaReposDay.findByLogNo(logNo);
     else if (dbName.equals(ContentName.onMon))
-      pfRewardMedia = pfRewardMediaReposMon.findByBonusNo(bonusNo);
+      pfRewardMedia = pfRewardMediaReposMon.findByLogNo(logNo);
     else if (dbName.equals(ContentName.onHist))
-      pfRewardMedia = pfRewardMediaReposHist.findByBonusNo(bonusNo);
+      pfRewardMedia = pfRewardMediaReposHist.findByLogNo(logNo);
     else 
-      pfRewardMedia = pfRewardMediaRepos.findByBonusNo(bonusNo);
+      pfRewardMedia = pfRewardMediaRepos.findByLogNo(logNo);
     return pfRewardMedia.isPresent() ? pfRewardMedia.get() : null;
   }
 
@@ -207,16 +210,16 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("Hold " + dbName + " " + pfRewardMedia.getBonusNo());
+    this.info("Hold " + dbName + " " + pfRewardMedia.getLogNo());
     Optional<PfRewardMedia> pfRewardMediaT = null;
     if (dbName.equals(ContentName.onDay))
-      pfRewardMediaT = pfRewardMediaReposDay.findByBonusNo(pfRewardMedia.getBonusNo());
+      pfRewardMediaT = pfRewardMediaReposDay.findByLogNo(pfRewardMedia.getLogNo());
     else if (dbName.equals(ContentName.onMon))
-      pfRewardMediaT = pfRewardMediaReposMon.findByBonusNo(pfRewardMedia.getBonusNo());
+      pfRewardMediaT = pfRewardMediaReposMon.findByLogNo(pfRewardMedia.getLogNo());
     else if (dbName.equals(ContentName.onHist))
-      pfRewardMediaT = pfRewardMediaReposHist.findByBonusNo(pfRewardMedia.getBonusNo());
+      pfRewardMediaT = pfRewardMediaReposHist.findByLogNo(pfRewardMedia.getLogNo());
     else 
-      pfRewardMediaT = pfRewardMediaRepos.findByBonusNo(pfRewardMedia.getBonusNo());
+      pfRewardMediaT = pfRewardMediaRepos.findByLogNo(pfRewardMedia.getLogNo());
     return pfRewardMediaT.isPresent() ? pfRewardMediaT.get() : null;
   }
 
@@ -231,8 +234,8 @@ em = null;
          empNot = empNot.isEmpty() ? "System" : empNot;		} else
        empNot = ThreadVariable.getEmpNot();
 
-    this.info("Insert..." + dbName + " " + pfRewardMedia.getBonusNo());
-    if (this.findById(pfRewardMedia.getBonusNo(), titaVo) != null)
+    this.info("Insert..." + dbName + " " + pfRewardMedia.getLogNo());
+    if (this.findById(pfRewardMedia.getLogNo(), titaVo) != null)
       throw new DBException(2);
 
     if (!empNot.isEmpty())
@@ -262,7 +265,7 @@ em = null;
 		} else
        empNot = ThreadVariable.getEmpNot();
 
-    this.info("Update..." + dbName + " " + pfRewardMedia.getBonusNo());
+    this.info("Update..." + dbName + " " + pfRewardMedia.getLogNo());
     if (!empNot.isEmpty())
       pfRewardMedia.setLastUpdateEmpNo(empNot);
 
@@ -287,7 +290,7 @@ em = null;
 		} else
        empNot = ThreadVariable.getEmpNot();
 
-    this.info("Update..." + dbName + " " + pfRewardMedia.getBonusNo());
+    this.info("Update..." + dbName + " " + pfRewardMedia.getLogNo());
     if (!empNot.isEmpty())
       pfRewardMedia.setLastUpdateEmpNo(empNot);
 
@@ -299,7 +302,7 @@ em = null;
         pfRewardMediaReposHist.saveAndFlush(pfRewardMedia);
     else 
       pfRewardMediaRepos.saveAndFlush(pfRewardMedia);	
-    return this.findById(pfRewardMedia.getBonusNo());
+    return this.findById(pfRewardMedia.getLogNo());
   }
 
   @Override
@@ -307,7 +310,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("Delete..." + dbName + " " + pfRewardMedia.getBonusNo());
+    this.info("Delete..." + dbName + " " + pfRewardMedia.getLogNo());
     if (dbName.equals(ContentName.onDay)) {
       pfRewardMediaReposDay.delete(pfRewardMedia);	
       pfRewardMediaReposDay.flush();

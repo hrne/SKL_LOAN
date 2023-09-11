@@ -207,22 +207,22 @@ public class L5708 extends TradeBuffer {
 						// 經辦登帳非訂正交易
 						if (this.txBuffer.getTxCom().isBookAcYes()) {
 							List<AcDetail> acDetailList = new ArrayList<AcDetail>();
-
-							/* 借：債協暫收款－抵繳款 */
 							AcDetail acDetail = new AcDetail();
-							acDetail.setDbCr("D");
-							acDetail.setAcctCode(acNegCom.getAcctCode(CustNo, titaVo));
-							acDetail.setTxAmt(apprAmt.add(sklAmt).add(returnAmt)); // 撥付+新壽攤分金額+結清退還款
-							acDetail.setCustNo(CustNo);// 戶號
-							acDetailList.add(acDetail);
+							// 2023/9/10 第一套帳改在L5702出,故點掉
+							/* 借：債協暫收款－抵繳款 */
+//							acDetail.setDbCr("D");
+//							acDetail.setAcctCode(acNegCom.getAcctCode(CustNo, titaVo));
+//							acDetail.setTxAmt(apprAmt.add(sklAmt).add(returnAmt)); // 撥付+新壽攤分金額+結清退還款
+//							acDetail.setCustNo(CustNo);// 戶號
+//							acDetailList.add(acDetail);
 
 							/* 貸：應付代收款 */
-							acDetail = new AcDetail();
-							acDetail.setDbCr("C");
-							acDetail.setAcctCode(acNegCom.getApprAcctCode(CustNo, titaVo));
-							acDetail.setTxAmt(apprAmt.add(sklAmt).add(returnAmt)); // 撥付+新壽攤分金額+結清退還款
-							acDetail.setCustNo(CustNo);// 戶號
-							acDetailList.add(acDetail);
+//							acDetail = new AcDetail();
+//							acDetail.setDbCr("C");
+//							acDetail.setAcctCode(acNegCom.getApprAcctCode(CustNo, titaVo));
+//							acDetail.setTxAmt(apprAmt.add(sklAmt).add(returnAmt)); // 撥付+新壽攤分金額+結清退還款
+//							acDetail.setCustNo(CustNo);// 戶號
+//							acDetailList.add(acDetail);
 
 							/* 借：應付代收款 */
 							acDetail = new AcDetail();
@@ -256,7 +256,7 @@ public class L5708 extends TradeBuffer {
 							acDetail.setCustNo(tempCustNoMap.get(CustNo));//實際借款人戶號
 							acDetail.setFacmNo(parse.stringToInteger(tTempVo.getParam("FacmNo")));
 							acDetail.setAcctCode(tTempVo.getParam("AcctCode"));
-							acDetail.setTxAmt(sklAmt); // 結清退還款
+							acDetail.setTxAmt(sklAmt); //  新壽攤分金額
 							acDetailList.add(acDetail);
 
 							/* 借：應付代收款 */
@@ -275,7 +275,7 @@ public class L5708 extends TradeBuffer {
 							acDetail.setCustNo(tempCustNoMap.get(CustNo));//實際借款人戶號
 							acDetail.setFacmNo(parse.stringToInteger(tTempVo2.getParam("FacmNo")));
 							acDetail.setAcctCode(tTempVo.getParam("AcctCode"));
-							acDetail.setTxAmt(returnAmt); // 新壽攤分金額
+							acDetail.setTxAmt(returnAmt); //結清退還款
 							acDetailList.add(acDetail);
 
 							this.txBuffer.addAllAcDetailList(acDetailList);

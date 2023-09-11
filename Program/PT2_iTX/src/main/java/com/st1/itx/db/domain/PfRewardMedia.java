@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -31,10 +32,10 @@ public class PfRewardMedia implements Serializable {
 
   // 系統序號
   @Id
-  @Column(name = "`BonusNo`")
+  @Column(name = "`LogNo`")
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "`PfRewardMedia_SEQ`")
   @SequenceGenerator(name = "`PfRewardMedia_SEQ`", sequenceName = "`PfRewardMedia_SEQ`", allocationSize = 1)
-  private Long bonusNo = 0L;
+  private Long logNo = 0L;
 
   // 獎金發放日
   @Column(name = "`BonusDate`")
@@ -59,7 +60,7 @@ public class PfRewardMedia implements Serializable {
   private int bormNo = 0;
 
   // 獎金類別
-  /* CdCode.BonusType1:介紹獎金(L5511寫入)2:放款業務專員津貼(暫時取消)3:晤談一人員津貼(目前沒有)4:晤談二人員津貼(目前沒有)5:協辦獎金(L5511寫入)6:專業獎勵金(L5407，初階授信通過時寫入，只寫一次)7:加碼獎金(L5512寫入)(依照LN270檔-獎勵金發放檔) */
+  /* CdCode.BonusType1:介紹獎金(L5511寫入)2:放款業務專員津貼(暫時取消)3:晤談一人員津貼(目前沒有)4:晤談二人員津貼(目前沒有)5:協辦獎金(L5511寫入)6:專業獎勵金(L5407，初階授信通過時寫入，只寫一次)7:加碼獎金(L5512寫入)(依照LN270檔-獎勵金發放檔)99:其他 */
   @Column(name = "`BonusType`")
   private int bonusType = 0;
 
@@ -147,18 +148,18 @@ public class PfRewardMedia implements Serializable {
 	* @return Long
 	*/
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  public Long getBonusNo() {
-    return this.bonusNo;
+  public Long getLogNo() {
+    return this.logNo;
   }
 
 /**
 	* 系統序號<br>
 	* 
   *
-  * @param bonusNo 系統序號
+  * @param logNo 系統序號
 	*/
-  public void setBonusNo(Long bonusNo) {
-    this.bonusNo = bonusNo;
+  public void setLogNo(Long logNo) {
+    this.logNo = logNo;
   }
 
 /**
@@ -267,6 +268,7 @@ public class PfRewardMedia implements Serializable {
 6:專業獎勵金(L5407，初階授信通過時寫入，只寫一次)
 7:加碼獎金(L5512寫入)
 (依照LN270檔-獎勵金發放檔)
+99:其他
 	* @return Integer
 	*/
   public int getBonusType() {
@@ -284,6 +286,7 @@ public class PfRewardMedia implements Serializable {
 6:專業獎勵金(L5407，初階授信通過時寫入，只寫一次)
 7:加碼獎金(L5512寫入)
 (依照LN270檔-獎勵金發放檔)
+99:其他
   *
   * @param bonusType 獎金類別
 	*/
@@ -621,7 +624,7 @@ public class PfRewardMedia implements Serializable {
 
   @Override
   public String toString() {
-    return "PfRewardMedia [bonusNo=" + bonusNo + ", bonusDate=" + bonusDate + ", perfDate=" + perfDate + ", custNo=" + custNo + ", facmNo=" + facmNo + ", bormNo=" + bormNo
+    return "PfRewardMedia [logNo=" + logNo + ", bonusDate=" + bonusDate + ", perfDate=" + perfDate + ", custNo=" + custNo + ", facmNo=" + facmNo + ", bormNo=" + bormNo
            + ", bonusType=" + bonusType + ", employeeNo=" + employeeNo + ", prodCode=" + prodCode + ", pieceCode=" + pieceCode + ", bonus=" + bonus + ", adjustBonus=" + adjustBonus
            + ", adjustBonusDate=" + adjustBonusDate + ", workMonth=" + workMonth + ", workSeason=" + workSeason + ", remark=" + remark + ", mediaFg=" + mediaFg + ", mediaDate=" + mediaDate
            + ", manualFg=" + manualFg + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", branchNo=" + branchNo

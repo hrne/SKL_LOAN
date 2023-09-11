@@ -114,7 +114,6 @@ public class L9711Report2 extends MakeReport {
 
 		long sno = this.close();
 
-		l9711report3.exec(titaVo, L9711List);
 		l9711report4.exec(titaVo, L9711List);
 
 		return sno;

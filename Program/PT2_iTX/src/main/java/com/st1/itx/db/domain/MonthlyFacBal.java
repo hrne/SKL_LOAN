@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class MonthlyFacBal implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -6601217413359667096L;
-
-@EmbeddedId
+  @EmbeddedId
   private MonthlyFacBalId monthlyFacBalId;
 
   // 資料年月
@@ -211,7 +207,7 @@ public class MonthlyFacBal implements Serializable {
   private BigDecimal tempAmt = new BigDecimal("0");
 
   // 主要擔保品代號1
-  /* 擔保品代號檔CdCl */
+  /* 擔保品代號檔CdCl1 房地2 土地3 股票4 其他有價證券5 銀行保證9 動產 */
   @Column(name = "`ClCode1`")
   private int clCode1 = 0;
 
@@ -292,9 +288,29 @@ public class MonthlyFacBal implements Serializable {
   private String lawAssetClass;
 
   // 資產五分類代號2(有擔保部分)
-  /* 11:一之112:一之2,21:二之122:二之223:二之33:三  4:四   5:五此為有擔保金額(PrinBalance-LawAmount)的分類 */
+  /* L7205上傳更新11:一之1(正常繳息)12:一之2(特定放款資產項目)21:二之122:二之223:二之33:三  4:四   5:五此為有擔保金額(PrinBalance-LawAmount)的分類 */
   @Column(name = "`AssetClass2`", length = 2)
   private String assetClass2;
+
+  // 是否為利害關係人
+  /* 寫入時為空值，由L7206[利關人名單檔上傳]上傳更新Y/N */
+  @Column(name = "`BankRelationFlag`", length = 1)
+  private String bankRelationFlag;
+
+  // 政策性專案貸款
+  /* 寫入時為空值，L7205上傳更新Y:初貸日大於等於20110101C:初貸日小於20110101N:無 */
+  @Column(name = "`GovProjectFlag`", length = 1)
+  private String govProjectFlag;
+
+  // 建築貸款記號
+  /* 寫入時為空值，L7205上傳更新Y/N */
+  @Column(name = "`BuildingFlag`", length = 1)
+  private String buildingFlag;
+
+  // 特定資產記號
+  /* 寫入時為空值，L7205上傳更新Y/N */
+  @Column(name = "`SpecialAssetFlag`", length = 1)
+  private String specialAssetFlag;
 
 
   public MonthlyFacBalId getMonthlyFacBalId() {
@@ -1142,6 +1158,12 @@ public class MonthlyFacBal implements Serializable {
 /**
 	* 主要擔保品代號1<br>
 	* 擔保品代號檔CdCl
+1 房地
+2 土地
+3 股票
+4 其他有價證券
+5 銀行保證
+9 動產
 	* @return Integer
 	*/
   public int getClCode1() {
@@ -1151,6 +1173,12 @@ public class MonthlyFacBal implements Serializable {
 /**
 	* 主要擔保品代號1<br>
 	* 擔保品代號檔CdCl
+1 房地
+2 土地
+3 股票
+4 其他有價證券
+5 銀行保證
+9 動產
   *
   * @param clCode1 主要擔保品代號1
 	*/
@@ -1491,8 +1519,9 @@ public class MonthlyFacBal implements Serializable {
 
 /**
 	* 資產五分類代號2(有擔保部分)<br>
-	* 11:一之1
-12:一之2,
+	* L7205上傳更新
+11:一之1(正常繳息)
+12:一之2(特定放款資產項目)
 21:二之1
 22:二之2
 23:二之3
@@ -1508,8 +1537,9 @@ public class MonthlyFacBal implements Serializable {
 
 /**
 	* 資產五分類代號2(有擔保部分)<br>
-	* 11:一之1
-12:一之2,
+	* L7205上傳更新
+11:一之1(正常繳息)
+12:一之2(特定放款資產項目)
 21:二之1
 22:二之2
 23:二之3
@@ -1524,6 +1554,94 @@ public class MonthlyFacBal implements Serializable {
     this.assetClass2 = assetClass2;
   }
 
+/**
+	* 是否為利害關係人<br>
+	* 寫入時為空值，由L7206[利關人名單檔上傳]上傳更新
+Y/N
+	* @return String
+	*/
+  public String getBankRelationFlag() {
+    return this.bankRelationFlag == null ? "" : this.bankRelationFlag;
+  }
+
+/**
+	* 是否為利害關係人<br>
+	* 寫入時為空值，由L7206[利關人名單檔上傳]上傳更新
+Y/N
+  *
+  * @param bankRelationFlag 是否為利害關係人
+	*/
+  public void setBankRelationFlag(String bankRelationFlag) {
+    this.bankRelationFlag = bankRelationFlag;
+  }
+
+/**
+	* 政策性專案貸款<br>
+	* 寫入時為空值，L7205上傳更新
+Y:初貸日大於等於20110101
+C:初貸日小於20110101
+N:無
+	* @return String
+	*/
+  public String getGovProjectFlag() {
+    return this.govProjectFlag == null ? "" : this.govProjectFlag;
+  }
+
+/**
+	* 政策性專案貸款<br>
+	* 寫入時為空值，L7205上傳更新
+Y:初貸日大於等於20110101
+C:初貸日小於20110101
+N:無
+  *
+  * @param govProjectFlag 政策性專案貸款
+	*/
+  public void setGovProjectFlag(String govProjectFlag) {
+    this.govProjectFlag = govProjectFlag;
+  }
+
+/**
+	* 建築貸款記號<br>
+	* 寫入時為空值，L7205上傳更新
+Y/N
+	* @return String
+	*/
+  public String getBuildingFlag() {
+    return this.buildingFlag == null ? "" : this.buildingFlag;
+  }
+
+/**
+	* 建築貸款記號<br>
+	* 寫入時為空值，L7205上傳更新
+Y/N
+  *
+  * @param buildingFlag 建築貸款記號
+	*/
+  public void setBuildingFlag(String buildingFlag) {
+    this.buildingFlag = buildingFlag;
+  }
+
+/**
+	* 特定資產記號<br>
+	* 寫入時為空值，L7205上傳更新
+Y/N
+	* @return String
+	*/
+  public String getSpecialAssetFlag() {
+    return this.specialAssetFlag == null ? "" : this.specialAssetFlag;
+  }
+
+/**
+	* 特定資產記號<br>
+	* 寫入時為空值，L7205上傳更新
+Y/N
+  *
+  * @param specialAssetFlag 特定資產記號
+	*/
+  public void setSpecialAssetFlag(String specialAssetFlag) {
+    this.specialAssetFlag = specialAssetFlag;
+  }
+
 
   @Override
   public String toString() {
@@ -1536,6 +1654,7 @@ public class MonthlyFacBal implements Serializable {
            + ", acctFee=" + acctFee + ", shortfallPrin=" + shortfallPrin + ", shortfallInt=" + shortfallInt + ", tempAmt=" + tempAmt + ", clCode1=" + clCode1 + ", clCode2=" + clCode2
            + ", clNo=" + clNo + ", cityCode=" + cityCode + ", ovduDate=" + ovduDate + ", ovduPrinBal=" + ovduPrinBal + ", ovduIntBal=" + ovduIntBal + ", ovduBreachBal=" + ovduBreachBal
            + ", ovduBal=" + ovduBal + ", lawAmount=" + lawAmount + ", assetClass=" + assetClass + ", storeRate=" + storeRate + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
-           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", acSubBookCode=" + acSubBookCode + ", lawAssetClass=" + lawAssetClass + ", assetClass2=" + assetClass2 + "]";
+           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", acSubBookCode=" + acSubBookCode + ", lawAssetClass=" + lawAssetClass + ", assetClass2=" + assetClass2 + ", bankRelationFlag=" + bankRelationFlag
+           + ", govProjectFlag=" + govProjectFlag + ", buildingFlag=" + buildingFlag + ", specialAssetFlag=" + specialAssetFlag + "]";
   }
 }

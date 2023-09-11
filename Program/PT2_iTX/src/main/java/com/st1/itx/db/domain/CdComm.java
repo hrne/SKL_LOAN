@@ -1,6 +1,8 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -25,30 +27,26 @@ import com.st1.itx.Exception.LogicException;
 public class CdComm implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 6850222877246280909L;
-
-@EmbeddedId
+  @EmbeddedId
   private CdCommId cdCommId;
 
   // 代碼類別
-  /* 01:政府補貼利率 */
+  /* 01:政府補貼利率02:專案放款 */
   @Column(name = "`CdType`", length = 5, insertable = false, updatable = false)
   private String cdType;
 
   // 代碼項目
-  /* 01:補貼息 */
+  /* 01:補貼息02:放款金額 */
   @Column(name = "`CdItem`", length = 5, insertable = false, updatable = false)
   private String cdItem;
 
   // 生效日期
+  /* 專案放款生效日期固定取1日(02:專案放款) */
   @Column(name = "`EffectDate`", insertable = false, updatable = false)
   private int effectDate = 0;
 
   // 啟用記號
-  /* Y:啟用N:未啟用 */
+  /* 政府補貼利率: N:未生效(未執行整批利率變更) Y:已生效(不可修改、刪除) */
   @Column(name = "`Enable`", length = 1)
   private String enable;
 
@@ -57,7 +55,7 @@ public class CdComm implements Serializable {
   private String remark;
 
   // jason格式紀錄欄
-  @Column(name = "`JsonFields`", length = 300)
+  @Column(name = "`JsonFields`", length = 1000)
   private String jsonFields;
 
   // 建檔日期時間
@@ -90,6 +88,7 @@ public class CdComm implements Serializable {
 /**
 	* 代碼類別<br>
 	* 01:政府補貼利率
+02:專案放款
 	* @return String
 	*/
   public String getCdType() {
@@ -99,6 +98,7 @@ public class CdComm implements Serializable {
 /**
 	* 代碼類別<br>
 	* 01:政府補貼利率
+02:專案放款
   *
   * @param cdType 代碼類別
 	*/
@@ -109,6 +109,7 @@ public class CdComm implements Serializable {
 /**
 	* 代碼項目<br>
 	* 01:補貼息
+02:放款金額
 	* @return String
 	*/
   public String getCdItem() {
@@ -118,6 +119,7 @@ public class CdComm implements Serializable {
 /**
 	* 代碼項目<br>
 	* 01:補貼息
+02:放款金額
   *
   * @param cdItem 代碼項目
 	*/
@@ -127,7 +129,7 @@ public class CdComm implements Serializable {
 
 /**
 	* 生效日期<br>
-	* 
+	* 專案放款生效日期固定取1日(02:專案放款)
 	* @return Integer
 	*/
   public int getEffectDate() {
@@ -136,7 +138,7 @@ public class CdComm implements Serializable {
 
 /**
 	* 生效日期<br>
-	* 
+	* 專案放款生效日期固定取1日(02:專案放款)
   *
   * @param effectDate 生效日期
   * @throws LogicException when Date Is Warn	*/
@@ -146,8 +148,9 @@ public class CdComm implements Serializable {
 
 /**
 	* 啟用記號<br>
-	* Y:啟用
-N:未啟用
+	* 政府補貼利率:
+ N:未生效(未執行整批利率變更)
+ Y:已生效(不可修改、刪除)
 	* @return String
 	*/
   public String getEnable() {
@@ -156,8 +159,9 @@ N:未啟用
 
 /**
 	* 啟用記號<br>
-	* Y:啟用
-N:未啟用
+	* 政府補貼利率:
+ N:未生效(未執行整批利率變更)
+ Y:已生效(不可修改、刪除)
   *
   * @param enable 啟用記號
 	*/

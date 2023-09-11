@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.PfRewardMedia;
@@ -18,11 +20,11 @@ public interface PfRewardMediaService {
   /**
    * findByPrimaryKey
    *
-   * @param bonusNo PK
+   * @param logNo PK
    * @param titaVo Variable-Length Argument
    * @return PfRewardMedia PfRewardMedia
    */
-  public PfRewardMedia findById(Long bonusNo, TitaVo... titaVo);
+  public PfRewardMedia findById(Long logNo, TitaVo... titaVo);
 
   /**
    * findAll
@@ -75,11 +77,11 @@ public interface PfRewardMediaService {
   /**
    * hold By PfRewardMedia
    * 
-   * @param bonusNo key
+   * @param logNo key
    * @param titaVo Variable-Length Argument
    * @return PfRewardMedia PfRewardMedia
    */
-  public PfRewardMedia holdById(Long bonusNo, TitaVo... titaVo);
+  public PfRewardMedia holdById(Long logNo, TitaVo... titaVo);
 
   /**
    * hold By PfRewardMedia

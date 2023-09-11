@@ -242,13 +242,15 @@ public class L4450Report extends MakeReport {
 				String amlRsp = lBankDeductDtl.get(i).getAmlRsp();
 
 				String procNote = "";
-//				欄位不夠長，順序為帳號、AML、扣帳金額為零
+//				欄位不夠長，順序為帳號、AML、扣帳金額為零、扣款帳號授權提醒
 				if (tempVo.get("Auth") != null && tempVo.get("Auth").length() > 0) {
 					procNote = procNote + "帳號授權檢核:" + authX(tempVo.get("Auth")) + "。";
 				} else if (!"0".equals(amlRsp)) {
 					procNote = "Aml檢核:" + amlRspX(amlRsp) + "。";
 				} else if (tempVo.get("Deduct") != null && tempVo.get("Deduct").length() > 0) {
 					procNote = procNote + "扣款檢核：" + tempVo.get("Deduct") + "。";
+				} else if (tempVo.get("AuthWarn") != null && tempVo.get("AuthWarn").length() > 0) {
+					procNote = procNote + "帳號授權提醒:" + tempVo.get("AuthWarn");					
 				}
 
 				this.print(0, 115, procNote);// AML檢核
@@ -407,7 +409,7 @@ public class L4450Report extends MakeReport {
 	}
 
 	private String authX(String auth) {
-		String result = "";
+		String result = "未授權";
 
 		CdCode cdCode = cdCodeService.getItemFirst(4, "AuthStatusCode", auth, titaVo);
 

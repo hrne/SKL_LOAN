@@ -99,11 +99,11 @@ T(2,L5702)
 CALL(#ShowDataNew)
 
 #ShowDataOrg=@,1,S
-HIDE(#NewRepaidPeriod,#NewPrincipalBal,#NewAccuTempAmt,#NewAccuOverAmt,#NewAccuDueAmt,#NewAccuSklShareAmt,#NewNextPayDate,#NewRepayPrincipal,#NewRepayInterest,#NewStatusDate,#NewTransTxStatus,#NewTransTxStatusX,#NewTransTxKind,#NewTransTxKindX,#NewTransReturnAmt,#NewTransSklShareAmt,#NewTransApprAmt,#NewTransTempRepayAmt,#NewTransOverRepayAmt,#NewTransPrincipalAmt,#NewTransInterestAmt,#NewSunPrincInter,#NewTransOverAmt,#NewTransIntStartDate,#NewTransIntEndDate,#NewTransRepayPeriod,#NewTransShouldPayPeriod,#NewTransDueAmt,#NewRemaindPeriod)
+HIDE(#NewRepaidPeriod,#NewPrincipalBal,#NewAccuTempAmt,#NewAccuOverAmt,#NewAccuDueAmt,#NewAccuSklShareAmt,#NewNextPayDate,#NewRepayPrincipal,#NewRepayInterest,#NewStatusDate,#NewTransTxStatus,#NewTransTxStatusX,#NewTransTxKind,#NewTransTxKindX,#NewTransTxAmt,#NewTransReturnAmt,#NewTransSklShareAmt,#NewTransApprAmt,#NewTransTempRepayAmt,#NewTransOverRepayAmt,#NewTransPrincipalAmt,#NewTransInterestAmt,#NewSunPrincInter,#NewTransOverAmt,#NewTransIntStartDate,#NewTransIntEndDate,#NewTransRepayPeriod,#NewTransShouldPayPeriod,#NewTransDueAmt,#NewRemaindPeriod)
 SHOW(#RepaidPeriod,#OrgPrincipalBal,#OrgAccuTempAmt,#OrgAccuOverAmt,#OrgAccuDueAmt,#OrgAccuSklShareAmt,#OrgNextPayDate,#OrgRepayPrincipal,#OrgRepayInterest,#OrgStatusDate,#TransTxStatus,#TransTxStatusX,#TransTxKind,#TransTxKindX,#TransReturnAmt,#TransSklShareAmt,#TransApprAmt,#TransTempRepayAmt,#TransOverRepayAmt,#TransPrincipalAmt,#TransInterestAmt,#SunPrincInter,#TransOverAmt,#TransIntStartDate,#TransIntEndDate,#TransRepayPeriod,#TransShouldPayPeriod,#TransDueAmt,#RemaindPeriod)
 
 #ShowDataNew=@,1,S
-SHOW(#NewRepaidPeriod,#NewPrincipalBal,#NewAccuTempAmt,#NewAccuOverAmt,#NewAccuDueAmt,#NewAccuSklShareAmt,#NewNextPayDate,#NewRepayPrincipal,#NewRepayInterest,#NewStatusDate,#NewTransTxStatus,#NewTransTxStatusX,#NewTransTxKind,#NewTransTxKindX,#NewTransReturnAmt,#NewTransSklShareAmt,#NewTransApprAmt,#NewTransTempRepayAmt,#NewTransOverRepayAmt,#NewTransPrincipalAmt,#NewTransInterestAmt,#NewSunPrincInter,#NewTransOverAmt,#NewTransIntStartDate,#NewTransIntEndDate,#NewTransRepayPeriod,#NewTransShouldPayPeriod,#NewTransDueAmt,#NewRemaindPeriod)
+SHOW(#NewRepaidPeriod,#NewPrincipalBal,#NewAccuTempAmt,#NewAccuOverAmt,#NewAccuDueAmt,#NewAccuSklShareAmt,#NewNextPayDate,#NewRepayPrincipal,#NewRepayInterest,#NewStatusDate,#NewTransTxStatus,#NewTransTxStatusX,#NewTransTxKind,#NewTransTxKindX,#NewTransTxAmt,#NewTransReturnAmt,#NewTransSklShareAmt,#NewTransApprAmt,#NewTransTempRepayAmt,#NewTransOverRepayAmt,#NewTransPrincipalAmt,#NewTransInterestAmt,#NewSunPrincInter,#NewTransOverAmt,#NewTransIntStartDate,#NewTransIntEndDate,#NewTransRepayPeriod,#NewTransShouldPayPeriod,#NewTransDueAmt,#NewRemaindPeriod)
 HIDE(#RepaidPeriod,#OrgPrincipalBal,#OrgAccuTempAmt,#OrgAccuOverAmt,#OrgAccuDueAmt,#OrgAccuSklShareAmt,#OrgNextPayDate,#OrgRepayPrincipal,#OrgRepayInterest,#OrgStatusDate,#TransTxStatus,#TransTxStatusX,#TransTxKind,#TransTxKindX,#TransReturnAmt,#TransSklShareAmt,#TransApprAmt,#TransTempRepayAmt,#TransOverRepayAmt,#TransPrincipalAmt,#TransInterestAmt,#SunPrincInter,#TransOverAmt,#TransIntStartDate,#TransIntEndDate,#TransRepayPeriod,#TransShouldPayPeriod,#TransDueAmt,#RemaindPeriod)
 
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
@@ -137,6 +137,7 @@ T(2,@TxKindHelp,#HelpDesc2)
 T(2,@StatusHelp,#HelpDesc3)
 T(2,@CustLoanKindHelp,#HelpDesc4)
 
+
 ! NegMain-Key-CustNo(7),CaseSeq(3)
 ! 轉入L5702用的東東 NegTrans-Key-AcDate(7),TitaTlrNo(6),TitaTxtNo(8),2023/2/14增加CustNo(7)
 ! #OONegTransKey=X,21,O
@@ -167,7 +168,7 @@ T(1,@TransCustNo,#NegTransKey,22,7)
 ! 測試是否為一開始的 0是一開始 1是後面修改資料後的調Rim
 #RimTrialFunc=X,1,S
 T(2,0)
-#RimTxKind=A,1,S
+#RimTxKind=X,1,S
 #RimReturnAmt=m,14,S
 #RimCustNo=A,7,S
 
@@ -241,8 +242,8 @@ T(2,@TransCaseSeqR,#L5r03TransCaseSeq)
 E(0,@TransEntryDate,#L5r03TransEntryDate)
 E(0,@TransTxStatus,#L5r03TransTxStatus)
 E(0,@NewTransTxStatus,#L5r03NewTransTxStatus)
-E(0,@TransTxKind,#L5r03TransTxKind)
-E(0,@NewTransTxKind,#L5r03NewTransTxKind)
+T(2,@TransTxKind,#L5r03TransTxKind)
+T(2,@NewTransTxKind,#L5r03NewTransTxKind)
 E(0,@TransTxAmt,#L5r03TransTxAmt)
 E(0,@NewTransTxAmt,#L5r03NewTransTxAmt)
 E(0,@TransPrincipalBal,#L5r03TransPrincipalBal)
@@ -282,14 +283,16 @@ E(0,@NewTransOrgAccuOverAmt,#L5r03NewTransOrgAccuOverAmt)
 E(0,@TransAccuOverAmt,#L5r03TransAccuOverAmt)
 E(0,@NewTransAccuOverAmt,#L5r03NewTransAccuOverAmt)
 T(2,@CaseKindCode,#L5r03CaseKindCode)
+T(2,@Hasfincodefg,#L5r03Hasfincodefg)
+T(2,@FullPeriodfg,#L5r03FullPeriodfg)
 
 T(H,@NewTransTxStatusX,#NewTransTxStatus,#TxStatusHelp)
 T(H,@NewTransTxKindX,#NewTransTxKind,#TxKindHelp)
 T(H,@NewStatusX,#NewStatus,#StatusHelp)
 T(H,@CustLoanKindX,#CustLoanKind,#CustLoanKindHelp)
 
-#TempTransTxKind=A,1,S
-E(0,#L5r03NewTransTxKind)
+#TempTransTxKind=X,1,S
+T(2,#L5r03NewTransTxKind)
 
 #RimBankCode=X,8,S
 #FunctionCode=X,2,S
@@ -441,26 +444,37 @@ E(0,#TransCaseSeqR)
 !T(H,#NewTransTxStatus,#TxStatusHelp)
 
 ! 交易別
-#TransTxKind=A,1,L
+#TransTxKind=X,1,L
 
-#TransTxKindX=X,8,L
+#TransTxKindX=X,12,L
 !T(H,#TransTxKind,#TxKindHelp)
 
-#NewTransTxKind=A,1,I
-HELP(#TxKindHelp,cols:3)
-@T(3,@NewTransTxKindX,)
-V(H,#TxKindHelp)
-IF(#NewTransTxKind>5,V(P,請勿輸入5以上選項),$)
-!IF(#NewTransTxKind==6,s,$)
+!前一期是否有失敗才可重撥
+#Hasfincodefg=X,1,S
+!是否滿期
+#FullPeriodfg=X,1,S
 
-#NewTransTxKindX=X,8,L
-T(H,#NewTransTxKind,#TxKindHelp)
-!案件種類是更生時,且金額>=期款,才可讓使用者選擇要還1期或提前還本
+#TxKindHelp1=x,1024,S
+T(HELP,@TxKindHelp1,#TxKindHelp,-,9;8;5;6;7)
+IF(#Hasfincodefg=="Y" || #FullPeriodfg=="Y",$,s)
+IF(#Hasfincodefg=="Y" && #FullPeriodfg=="Y",T(HELP,@TxKindHelp1,#TxKindHelp,+,6;7),
+    IF(#Hasfincodefg=="Y",T(HELP,@TxKindHelp1,#TxKindHelp,-,9;8;5;7),T(HELP,@TxKindHelp1,#TxKindHelp,+,7)))
+
+#NewTransTxKind=X,1,I
+HELP(#TxKindHelp1,cols:3)
+@T(3,@NewTransTxKindX,)
+V(H,#TxKindHelp1)
+
+#NewTransTxKindX=X,12,L
+T(H,#NewTransTxKind,#TxKindHelp1)
+!案件種類是更生時,且金額>=期款,可讓使用者選擇要還1期或提前還本
 #CheckTxKindX=X,1,S
-@IF(#NewTransTxKind>5,s,$)
+@
 IF(#CaseKindCode==3,IF(#L5r03NewTransTxKind==0 || #L5r03NewTransTxKind==1 || #L5r03NewTransTxKind==3,IF(#NewTransTxKind==3,s,$),$),$)
 IF(#L5r03NewTransTxKind==3,IF(#NewTransTxKind==1 || #NewTransTxKind==3,s,$),IF(#TempTransTxKind!=#NewTransTxKind,$,s))
-IF(#CaseKindCode==3,V(P,更生僅金額大於等於期款可換成提前還本，其餘不可變更),V(P,僅提前還本可換成溢繳，其餘不可變更))
+IF(#NewTransTxKind==6,s,$)
+IF(#NewTransTxKind==7 && #RemaindPeriod == 0,s,$)
+IF(#CaseKindCode==3,V(P,失敗重撥與滿期以外，更生僅金額大於等於期款可換成提前還本，其餘不可變更),V(P,失敗重撥與滿期以外，僅提前還本可換成溢繳，其餘不可變更))
 
 ! 暫收金額-NegTrans
 #TransTxAmt=m,14,L
@@ -582,6 +596,7 @@ E(0,@NewTransOrgAccuOverAmt,#L5r03NewTransOrgAccuOverAmt)
 E(0,@TransAccuOverAmt,#L5r03TransAccuOverAmt)
 E(0,@NewTransAccuOverAmt,#L5r03NewTransAccuOverAmt)
 T(2,@CaseKindCode,#L5r03CaseKindCode)
+T(2,@Hasfincodefg,#L5r03Hasfincodefg)
 
 T(H,@NewTransTxStatusX,#NewTransTxStatus,#TxStatusHelp)
 T(H,@NewTransTxKindX,#NewTransTxKind,#TxKindHelp)
@@ -668,11 +683,12 @@ E(0,#NewTransPrincipalAmt+#NewTransInterestAmt)
 #NewTransAccuOverAmt=m,14,L
 ! 尚餘期數
 #RemaindPeriod=A,3,L
-E(0,#TotalPeriod-#RepaidPeriod)
+IF(#TotalPeriod > #RepaidPeriod,E(0,#TotalPeriod-#RepaidPeriod),E(0,0))
+
 
 #NewRemaindPeriod=A,3,L
 IF(#NewTransTxKind==6,E(0,#RemaindPeriod),$)
-IF(#TotalPeriod-#NewRepaidPeriod<0,E(0,0),IF(#NewTransTxKind==4 || #NewTransTxKind==5,E(0,0),E(0,#TotalPeriod-#NewRepaidPeriod)))
+IF(#TotalPeriod-#NewRepaidPeriod<0,E(0,0),IF(#NewTransTxKind==4 ,E(0,0),E(0,#TotalPeriod-#NewRepaidPeriod)))
 
 
 ! 程式內部需用 0:一開始試算 1:異動後 試算 2:UPDATE 3:多筆

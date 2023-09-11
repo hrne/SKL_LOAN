@@ -192,7 +192,13 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,NVL(p.\"RelAcctBirthday\",NVL(a.\"RelAcctBirthday\", 0))   AS \"RelAcctBirthday\" ";
 		sql += " ,NVL(p.\"RelAcctGender\",NVL(a.\"RelAcctGender\",' '))      AS \"RelAcctGender\" ";
 		sql += " ,NVL(ba.\"AcctSeq\",' ')                                    AS \"AcctSeq\" ";
-		sql += " ,NVL(ba.\"Status\",' ')                                     AS \"Status\" ";
+		// 郵局狀況代號:14-用戶編號已存在，視作授權成功，放提醒訊息
+		sql += " ,CASE WHEN NVL(p.\"AuthErrorCode\",' ') = '14' THEN '0'                               ";		
+		sql += "       ELSE NVL(ba.\"Status\",' ')                                                  ";
+		sql += "  END                                                        AS \"AuthStatusCode\"  ";
+		sql += " ,CASE WHEN NVL(p.\"AuthErrorCode\",' ') = '14' THEN '用戶編號已存在'                               ";		
+		sql += "       ELSE ''                                                                      ";
+		sql += "  END                                                        AS \"AuthWarn\"        ";
 		sql += "  from \"LoanBorMain\" b ";
 		sql += "  left join \"FacMain\" f on f.\"CustNo\" = b.\"CustNo\" ";
 		sql += "                         and f.\"FacmNo\" = b.\"FacmNo\" ";
@@ -244,6 +250,7 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   ,\"RelationId\" ";
 		sql += "   ,\"RelAcctBirthday\" ";
 		sql += "   ,\"RelAcctGender\" ";
+		sql += "   ,\"AuthErrorCode\" ";
 		sql += "   ,row_number() over (partition by \"CustNo\", \"RepayAcct\" order by \"AuthCreateDate\" Desc) as seq ";
 		sql += "   from \"PostAuthLog\" ";
 		sql += "   where \"AuthCode\" = '1' ";
@@ -462,7 +469,13 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,NVL(p.\"RelAcctBirthday\",NVL(a.\"RelAcctBirthday\", 0))   AS \"RelAcctBirthday\" ";
 		sql += " ,NVL(p.\"RelAcctGender\",NVL(a.\"RelAcctGender\",' '))      AS \"RelAcctGender\"   ";
 		sql += " ,NVL(ba.\"AcctSeq\",' ')                                    AS \"AcctSeq\"         ";
-		sql += " ,NVL(ba.\"Status\",' ')                                     AS \"Status\"          ";
+		// 郵局狀況代號:14-用戶編號已存在，視作授權成功，放提醒訊息
+		sql += " ,CASE WHEN NVL(p.\"AuthErrorCode\",' ') = '14' THEN '0'                               ";		
+		sql += "       ELSE NVL(ba.\"Status\",' ')                                                  ";
+		sql += "  END                                                        AS \"AuthStatusCode\"  ";
+		sql += " ,CASE WHEN NVL(p.\"AuthErrorCode\",' ') = '14' THEN '用戶編號已存在'                               ";		
+		sql += "       ELSE ''                                                                      ";
+		sql += "  END                                                        AS \"AuthWarn\"        ";
 		sql += " ,NVL(ba.\"LimitAmt\",0)                                     AS \"LimitAmt\"        ";
 		sql += "  from \"LoanBorMain\" b                                                 ";
 		sql += "  left join \"FacMain\" f on f.\"CustNo\" = b.\"CustNo\"                 ";
@@ -497,6 +510,7 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   ,\"RelationId\"                                                       ";
 		sql += "   ,\"RelAcctBirthday\"                                                  ";
 		sql += "   ,\"RelAcctGender\"                                                    ";
+		sql += "   ,\"AuthErrorCode\" ";
 		sql += "   ,row_number() over (partition by \"CustNo\", \"RepayAcct\" order by \"AuthCreateDate\" Desc) as seq ";
 		sql += "   from \"PostAuthLog\") p   on  ba.\"RepayBank\"   = 700               ";
 		sql += "                            and  p.\"CustNo\"       = ba.\"CustNo\"      ";

@@ -6102,8 +6102,8 @@ TXFORM=L5R02
 #L5r03TransEntryDate=D,7,S
 #L5r03TransTxStatus=A,1,S
 #L5r03NewTransTxStatus=A,1,S
-#L5r03TransTxKind=A,1,S
-#L5r03NewTransTxKind=A,1,S
+#L5r03TransTxKind=X,1,S
+#L5r03NewTransTxKind=X,1,S
 #L5r03TransTxAmt=m,14,S
 #L5r03NewTransTxAmt=m,14,S
 #L5r03TransPrincipalBal=m,14,S
@@ -6144,6 +6144,8 @@ TXFORM=L5R02
 #L5r03NewTransAccuOverAmt=m,14,S
 #L5r03TrialFunc=A,1,S
 #L5r03CaseKindCode=X,1,S
+#L5r03Hasfincodefg=X,1,S
+#L5r03FullPeriodfg=X,1,S
 </L5R03.dec>
 
 <L5R03.tom>
@@ -6235,6 +6237,8 @@ TXFORM=L5R03
 #L5r03NewTransAccuOverAmt
 #L5r03TrialFunc
 #L5r03CaseKindCode
+#L5r03Hasfincodefg
+#L5r03FullPeriodfg
 ^
 </L5R03.tom>
 
@@ -7074,7 +7078,6 @@ TXFORM=L5R41
 #L5R42TlrNo=X,6,S
 #L5R42TxtNo=N,8,S
 #L5R42TxAmt=m,14,S
-#L5R42TxKind=X,1,S
 ##loop {times:30,i:1}
 #L5R42FinCode{i}=X,8,S
 #L5R42FinCodeName{i}=X,100,S
@@ -7090,7 +7093,6 @@ TXFORM=L5R42
 #L5R42TlrNo
 #L5R42TxtNo
 #L5R42TxAmt
-#L5R42TxKind
 ##loop {times:30,i:1}
 #L5R42FinCode{i}
 #L5R42FinCodeName{i}

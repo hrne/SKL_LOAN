@@ -124,7 +124,8 @@ public class L4450Batch extends TradeBuffer {
 	private HashMap<tmpBorm, Integer> relAcctBirthday = new HashMap<>();
 	private HashMap<tmpBorm, String> relAcctGender = new HashMap<>();
 	private HashMap<tmpBorm, String> repayAcctSeq = new HashMap<>();
-	private HashMap<tmpBorm, String> status = new HashMap<>();
+	private HashMap<tmpBorm, String> authStatus = new HashMap<>();
+	private HashMap<tmpBorm, String> authWarn = new HashMap<>();
 	private HashMap<tmpBorm, BigDecimal> limitAmt = new HashMap<>();
 
 //	皆取最小的
@@ -329,7 +330,6 @@ public class L4450Batch extends TradeBuffer {
 					int i = 0;
 					for (int j = 1; j <= fnAllList.size(); j++) {
 						i = j - 1;
-
 						setFacmValue(fnAllList, i);
 
 						// 還款試算
@@ -766,22 +766,27 @@ public class L4450Batch extends TradeBuffer {
 			tBankDeductDtl.setAmlRsp(amlRsp);
 //			tmp.getPayIntDate() 需放入tempVo給AML檢核用
 
-			String failFlag = status.get(tmp2);
+			String authStatusCode = authStatus.get(tmp2);
 
 			this.info("amlRsp ... " + amlRsp);
-			this.info("failFlag ... " + failFlag);
+			this.info("authStatusCode ... " + authStatusCode);
 			this.info("repAmtMap.get(tmp) ... " + repAmtMap.get(tmp));
 			this.info("limitAmt ... " + limitAmt.get(tmp2));
 
 			TempVo tTempVo = new TempVo();
-//			帳號授權檢核未過
-			if (!"0".equals(failFlag)) {
-				tTempVo.putParam("Auth", failFlag);
+//			帳號授權檢核結果
+			if (!"0".equals(authStatusCode)) {
+				tTempVo.putParam("Auth", authStatusCode);
 			} else {
 				if (relationCode.get(tmp2) == null || relationCode.get(tmp2).trim().isEmpty()) {
 					tTempVo.putParam("Auth", 1);
 				}
 			}
+//			帳號授權檢核提醒
+			if (authWarn.get(tmp2) != null) {
+				tTempVo.putParam("AuthWarn", authWarn.get(tmp2));
+			}
+
 //			Deduct 兩個只會發生一個
 //			繳款金額=0(抵繳)
 			if (repAmtMap.get(tmp).compareTo(BigDecimal.ZERO) == 0) {
@@ -919,6 +924,7 @@ public class L4450Batch extends TradeBuffer {
 
 //	設定變數值
 	private void setFacmValue(List<Map<String, String>> fnAllList, int i) throws LogicException {
+		this.info(fnAllList.get(i).toString());
 		int custNo = parse.stringToInteger(fnAllList.get(i).get("CustNo"));
 		int facmNo = parse.stringToInteger(fnAllList.get(i).get("FacmNo"));
 
@@ -946,8 +952,10 @@ public class L4450Batch extends TradeBuffer {
 			relAcctGender.put(tmp2, fnAllList.get(i).get("RelAcctGender"));
 		if (!repayAcctSeq.containsKey(tmp2))
 			repayAcctSeq.put(tmp2, fnAllList.get(i).get("AcctSeq"));
-		if (!status.containsKey(tmp2))
-			status.put(tmp2, fnAllList.get(i).get("Status"));
+		if (!authStatus.containsKey(tmp2))
+			authStatus.put(tmp2, fnAllList.get(i).get("AuthStatusCode"));
+		if (!authWarn.containsKey(tmp2))
+			authWarn.put(tmp2, fnAllList.get(i).get("AuthWarn"));
 		if (!limitAmt.containsKey(tmp2))
 			limitAmt.put(tmp2, parse.stringToBigDecimal(fnAllList.get(i).get("LimitAmt")));
 	}

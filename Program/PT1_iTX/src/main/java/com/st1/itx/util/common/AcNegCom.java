@@ -16,6 +16,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.LoanOverdue;
+import com.st1.itx.db.domain.NegAppr01;
 import com.st1.itx.db.domain.NegAppr02;
 import com.st1.itx.db.domain.NegAppr02Id;
 import com.st1.itx.db.domain.NegMain;
@@ -23,6 +24,7 @@ import com.st1.itx.db.domain.NegTrans;
 import com.st1.itx.db.domain.NegTransId;
 import com.st1.itx.db.service.LoanOverdueService;
 import com.st1.itx.db.service.NegAppr02Service;
+import com.st1.itx.db.service.NegAppr01Service;
 import com.st1.itx.db.service.NegMainService;
 import com.st1.itx.db.service.NegTransService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -62,6 +64,8 @@ public class AcNegCom extends TradeBuffer {
 	@Autowired
 	public NegAppr02Service negAppr02Service;
 	@Autowired
+	public NegAppr01Service negAppr01Service;
+	@Autowired
 	public LoanOverdueService loanOverdueService;
 
 	@Override
@@ -79,12 +83,11 @@ public class AcNegCom extends TradeBuffer {
 				if (ac.getAcctCode().equals("TAV") && "一般債權".equals(ac.getSlipNote())						) {
 					int custNo = this.parse.stringToInteger(titaVo.getParam("TimCustNo"));
 					if ("L3230".equals(titaVo.getTxcd())) {
-						custNo = ac.getCustNo();//20230315程式需再修改,使用JsonFields裡存的原戶號才抓的到債協戶號???RmCustNo
+						custNo = ac.getCustNo();
 						TempVo tTempVo = new TempVo();
 						tTempVo = tTempVo.getVo(ac.getJsonFields());
 						if(tTempVo.get("RmCustNo") != null) {
-								custNo = parse.stringToInteger(tTempVo.get("RmCustNo"));
-							
+								custNo = parse.stringToInteger(tTempVo.get("RmCustNo"));//使用JsonFields裡存的原戶號才抓的到債協戶號
 						}
 					}
 					updateNegTrans(custNo, ac.getTxAmt(), titaVo);
@@ -143,7 +146,6 @@ public class AcNegCom extends TradeBuffer {
 		NegTransId tNegTransId = new NegTransId();
 		NegTrans tNegTrans = new NegTrans();
 		NegMain tNegMain = new NegMain();
-
 		tNegTransId.setAcDate(this.txBuffer.getTxCom().getReldy());
 		tNegTransId.setTitaTlrNo(this.txBuffer.getTxCom().getRelTlr());
 		tNegTransId.setTitaTxtNo(this.txBuffer.getTxCom().getRelTno());
@@ -152,8 +154,20 @@ public class AcNegCom extends TradeBuffer {
 		// 正常交易新增、訂正交易要刪除
 		if (this.txBuffer.getTxCom().getBookAcHcode() == 0) { // 帳務訂正記號 AcHCode 0.正常 1.訂正 2.3.沖正
 			tNegMain = negMainService.statusFirst("0", custNo, titaVo); // 0-正常
-			if (tNegMain == null) {
-				throw new LogicException(titaVo, "E6003", "acNegCom 非債協戶 " + custNo);
+			if (tNegMain == null) {//無戶況正常且為L3230:若為撥付失敗重撥需再找最新一筆,允許戶況非0正常
+				if(!"L3230".equals(titaVo.getTxcd())) {
+					throw new LogicException(titaVo, "E6003", "acNegCom 非債協戶 " + custNo);
+				}
+				tNegMain = negMainService.custNoFirst(custNo, titaVo);
+				if(tNegMain == null) {
+					throw new LogicException(titaVo, "E6003", "acNegCom 非債協戶 " + custNo);
+				}
+				if("N".equals(tNegMain.getIsMainFin())) {
+					throw new LogicException(titaVo, "E6003", "acNegCom 非債協戶 " + custNo);
+				}
+				if (!ishasfincode(custNo,txAmt,titaVo)) {
+					throw new LogicException(titaVo, "E6003", "acNegCom 金額與撥付失敗總金額不符,不允許戶況非正常,戶號= " + custNo);
+				}
 			}
 			tNegTrans.setCaseSeq(tNegMain.getCaseSeq()); // 案件序號
 			tNegTrans.setEntryDate(entryDate); // 入帳日期
@@ -405,6 +419,49 @@ public class AcNegCom extends TradeBuffer {
 			}
 		}
 		return lAcDetail;
+	}
+
+	/**
+	 * 是否為債協撥付失敗重撥 if (acNegCom.ishasfincode(CustNo,titaVo));
+	 * 
+	 * @param custNo 戶號
+	 * @param txAmt 金額
+	 * @param titaVo TitaVo
+	 * @return true/false
+	 * @throws LogicException ...
+	 */
+	public boolean ishasfincode(int custNo, BigDecimal txAmt,TitaVo titaVo) throws LogicException {
+
+		NegAppr01 lNegAppr01 = new NegAppr01();
+		boolean hasfincodefg= false;
+		 BigDecimal tshareAmSum = BigDecimal.ZERO;
+		// 本會計日前2個月
+		dDateUtil.init();
+		dDateUtil.setDate_1(titaVo.getEntDyI());
+		dDateUtil.setMons(-2);
+		int	lastmonthDate = dDateUtil.getCalenderDay() +19110000;
+		
+		lNegAppr01 = negAppr01Service.bringUpDateCustNoFirst(custNo, lastmonthDate, titaVo);// 找該戶最近一個提兌日
+		if (lNegAppr01 != null) {
+			int bringUpDate = lNegAppr01.getBringUpDate() + 19110000;
+			Slice<NegAppr01> slNegAppr01 = negAppr01Service.bringUpDateCustNoEq(custNo, bringUpDate, this.index,
+					this.limit, titaVo);
+			if (slNegAppr01 != null) {
+				List<NegAppr01> tNegAppr01 = slNegAppr01 == null ? null : slNegAppr01.getContent();
+				for (int i = 0; i < tNegAppr01.size(); i++) {
+					lNegAppr01 = tNegAppr01.get(i);
+					if (!lNegAppr01.getReplyCode().equals("4001")) {
+						hasfincodefg = true;
+						tshareAmSum = tshareAmSum.add(lNegAppr01.getApprAmt());
+					}
+				}
+				if (hasfincodefg && tshareAmSum.compareTo(txAmt) != 0) {// 金額不符
+					hasfincodefg = false;
+				}
+			}
+		}
+
+		return hasfincodefg;
 	}
 
 }

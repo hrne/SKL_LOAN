@@ -17,6 +17,7 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
+import com.st1.itx.db.domain.CdCl;
 import com.st1.itx.db.domain.NegAppr02;
 import com.st1.itx.db.domain.NegMain;
 import com.st1.itx.db.domain.NegMainId;
@@ -152,10 +153,10 @@ public class L5702 extends TradeBuffer {
 			if ("".equals(btnIndex) || "1".equals(btnIndex)) {
 				sNegCom.trialNegtrans(tNegTrans, "2", TransTxKind, titaVo);
 				// 會計帳
-				if (Arrays.asList(new String[] { "0", "1", "2", "3", "4", "5" }).contains(TransTxKind)) {
-//					if ("N".equals(tNegMain.getIsMainFin())) {// 一般債權才做- 2023/2/8取消出帳,改由L3210出
-//						UpdAcDB(tNegTransId, iPayerCustNo, titaVo);
-//					}
+				if (Arrays.asList(new String[] { "0", "1", "2", "3", "4", "7" }).contains(TransTxKind)) {
+					if ("Y".equals(tNegMain.getIsMainFin())) {// 一般債權改由L3210出,2023/9/10最大債權第一套要在此出帳
+						UpdAcDB(tNegTransId, iPayerCustNo, titaVo);
+					}
 				}
 //				updateNegAppr02(tNegTransId, titaVo);// 維護NegAppr02,2022-3-22取消L5712暫收解入功能
 
@@ -215,6 +216,7 @@ public class L5702 extends TradeBuffer {
 		/* 帳務 */
 		// 經辦登帳非訂正交易
 		// 2023/2/8一般債權原要出帳,改為L4200整批入帳發動L3210時出帳,專戶直接入借款戶的暫收可抵繳,故以下不做
+		// 2023/9/10第一套帳改在L5702出
 		this.info("UpdAcDB Run");
 
 		if (this.txBuffer.getTxCom().isBookAcYes()) {
@@ -222,26 +224,20 @@ public class L5702 extends TradeBuffer {
 			NegTrans tNegTrans = sNegTransService.findById(tNegTransId, titaVo);
 
 			List<AcDetail> acDetailList = new ArrayList<AcDetail>();
-			/* 借：債協暫收款科目 */
+			/* 借：債協暫收款科目 */  
 			AcDetail acDetail = new AcDetail();
 			acDetail.setDbCr("D");
 			acDetail.setAcctCode(acNegCom.getAcctCode(tNegTrans.getCustNo(), titaVo));
-			acDetail.setTxAmt(tNegTrans.getSklShareAmt()); // 新壽攤分金額
+			acDetail.setTxAmt(tNegTrans.getApprAmt().add(tNegTrans.getSklShareAmt()).add(tNegTrans.getReturnAmt())); //撥付+新壽攤分金額+結清退還款
 			acDetail.setCustNo(tNegTrans.getCustNo());// 客戶戶號
 			acDetailList.add(acDetail);
-			/* 貸：暫收可抵繳科目 */
+			/* 貸：應付代收款 */
 			acDetail = new AcDetail();
 			acDetail.setDbCr("C");
 			int custNo = tNegTrans.getCustNo();
-			if (iPayerCustNo > 0) {
-				custNo = iPayerCustNo;// 有保證人時使用付款人戶號
-			}
-			TempVo tTempVo = new TempVo();
-			tTempVo = acNegCom.getReturnAcctCode(custNo, titaVo);
-			acDetail.setCustNo(custNo);
-			acDetail.setFacmNo(parse.stringToInteger(tTempVo.getParam("FacmNo")));
-			acDetail.setAcctCode(tTempVo.getParam("AcctCode"));
-			acDetail.setTxAmt(tNegTrans.getSklShareAmt()); // 新壽攤分金額
+			acDetail.setAcctCode(acNegCom.getApprAcctCode(custNo, titaVo));
+			acDetail.setTxAmt(tNegTrans.getApprAmt().add(tNegTrans.getSklShareAmt()).add(tNegTrans.getReturnAmt())); //撥付+新壽攤分金額+結清退還款
+			acDetail.setCustNo(custNo);// 戶號
 			acDetailList.add(acDetail);
 
 			this.txBuffer.addAllAcDetailList(acDetailList);

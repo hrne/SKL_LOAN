@@ -22,6 +22,9 @@ public class L9711Report3 extends MakeReport {
 
 	@Autowired
 	L9711ServiceImpl l9711ServiceImpl;
+	
+	@Autowired
+	L9711Report4 l9711report4;
 
 	@Autowired
 	BaTxCom dBaTxCom;
@@ -101,7 +104,7 @@ public class L9711Report3 extends MakeReport {
 	public List<Map<String, String>> exec(TitaVo titaVo,List<Map<String, String>> List ) throws LogicException {
 
 		this.info("L9711Report exec");
-
+		//問佳怡篩選條件為?
 
 		String txcd = titaVo.getTxcd();
 		int reportDate = titaVo.getEntDyI() + 19110000;
@@ -155,7 +158,7 @@ public class L9711Report3 extends MakeReport {
 
 		this.toPdf(sno);
 		
-		
+//		l9711report4.exec(titaVo, List);
 
 		return List;
 

@@ -1,0 +1,1 @@
+alter table "PfRewardMedia" RENAME COLUMN "BonusNo" TO "LogNo";

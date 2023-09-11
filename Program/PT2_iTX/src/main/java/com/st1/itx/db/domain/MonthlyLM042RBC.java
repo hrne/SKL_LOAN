@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -10,6 +11,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Column;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * MonthlyLM042RBC LM042RBC會計報表<br>
@@ -24,12 +27,7 @@ import javax.persistence.Column;
 public class MonthlyLM042RBC implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -4408816963666083608L;
-
-@EmbeddedId
+  @EmbeddedId
   private MonthlyLM042RBCId monthlyLM042RBCId;
 
   // 資料年月
@@ -37,24 +35,45 @@ public class MonthlyLM042RBC implements Serializable {
   private int yearMonth = 0;
 
   // 放款種類
+  /* 1:一般放款2:專案放款 */
   @Column(name = "`LoanType`", length = 1, insertable = false, updatable = false)
   private String loanType;
 
   // 放款項目
+  /* A：非授信限制對象-銀行保證放款B：非授信限制對象-動產擔保放款C： 非授信限制對象-不動產擔保放款D：非授信限制對象-有價證券質押放款E： 授信限制對象-非具控制與從屬關係F：授信限制對象-具控制與從屬關係 */
   @Column(name = "`LoanItem`", length = 1, insertable = false, updatable = false)
   private String loanItem;
 
-  // 對象關係人
+  // 是否為利害關係人
+  /* Y/N */
   @Column(name = "`RelatedCode`", length = 1, insertable = false, updatable = false)
   private String relatedCode;
 
   // 放款金額
+  /* 放款餘額扣除備呆 */
   @Column(name = "`LoanAmount`")
   private BigDecimal loanAmount = new BigDecimal("0");
 
   // 風險係數
   @Column(name = "`RiskFactor`")
   private BigDecimal riskFactor = new BigDecimal("0");
+
+  // 風險量金額
+  /* 放款金額*風險係數=LoanAmount * RiskFactor */
+  @Column(name = "`RiskFactorAmount`")
+  private BigDecimal riskFactorAmount = new BigDecimal("0");
+
+  // 放款餘額
+  @Column(name = "`LoanBal`")
+  private BigDecimal loanBal = new BigDecimal("0");
+
+  // 備呆提存比率
+  @Column(name = "`ReserveLossRate`")
+  private BigDecimal reserveLossRate = new BigDecimal("0");
+
+  // 備呆金額
+  @Column(name = "`ReserveLossAmt`")
+  private BigDecimal reserveLossAmt = new BigDecimal("0");
 
   // 建檔日期時間
   @CreatedDate
@@ -104,7 +123,8 @@ public class MonthlyLM042RBC implements Serializable {
 
 /**
 	* 放款種類<br>
-	* 
+	* 1:一般放款
+2:專案放款
 	* @return String
 	*/
   public String getLoanType() {
@@ -113,7 +133,8 @@ public class MonthlyLM042RBC implements Serializable {
 
 /**
 	* 放款種類<br>
-	* 
+	* 1:一般放款
+2:專案放款
   *
   * @param loanType 放款種類
 	*/
@@ -123,7 +144,12 @@ public class MonthlyLM042RBC implements Serializable {
 
 /**
 	* 放款項目<br>
-	* 
+	* A：非授信限制對象-銀行保證放款
+B：非授信限制對象-動產擔保放款
+C： 非授信限制對象-不動產擔保放款
+D：非授信限制對象-有價證券質押放款
+E： 授信限制對象-非具控制與從屬關係
+F：授信限制對象-具控制與從屬關係
 	* @return String
 	*/
   public String getLoanItem() {
@@ -132,7 +158,12 @@ public class MonthlyLM042RBC implements Serializable {
 
 /**
 	* 放款項目<br>
-	* 
+	* A：非授信限制對象-銀行保證放款
+B：非授信限制對象-動產擔保放款
+C： 非授信限制對象-不動產擔保放款
+D：非授信限制對象-有價證券質押放款
+E： 授信限制對象-非具控制與從屬關係
+F：授信限制對象-具控制與從屬關係
   *
   * @param loanItem 放款項目
 	*/
@@ -141,8 +172,8 @@ public class MonthlyLM042RBC implements Serializable {
   }
 
 /**
-	* 對象關係人<br>
-	* 
+	* 是否為利害關係人<br>
+	* Y/N
 	* @return String
 	*/
   public String getRelatedCode() {
@@ -150,10 +181,10 @@ public class MonthlyLM042RBC implements Serializable {
   }
 
 /**
-	* 對象關係人<br>
-	* 
+	* 是否為利害關係人<br>
+	* Y/N
   *
-  * @param relatedCode 對象關係人
+  * @param relatedCode 是否為利害關係人
 	*/
   public void setRelatedCode(String relatedCode) {
     this.relatedCode = relatedCode;
@@ -161,7 +192,7 @@ public class MonthlyLM042RBC implements Serializable {
 
 /**
 	* 放款金額<br>
-	* 
+	* 放款餘額扣除備呆
 	* @return BigDecimal
 	*/
   public BigDecimal getLoanAmount() {
@@ -170,7 +201,7 @@ public class MonthlyLM042RBC implements Serializable {
 
 /**
 	* 放款金額<br>
-	* 
+	* 放款餘額扣除備呆
   *
   * @param loanAmount 放款金額
 	*/
@@ -195,6 +226,82 @@ public class MonthlyLM042RBC implements Serializable {
 	*/
   public void setRiskFactor(BigDecimal riskFactor) {
     this.riskFactor = riskFactor;
+  }
+
+/**
+	* 風險量金額<br>
+	* 放款金額*風險係數=LoanAmount * RiskFactor
+	* @return BigDecimal
+	*/
+  public BigDecimal getRiskFactorAmount() {
+    return this.riskFactorAmount;
+  }
+
+/**
+	* 風險量金額<br>
+	* 放款金額*風險係數=LoanAmount * RiskFactor
+  *
+  * @param riskFactorAmount 風險量金額
+	*/
+  public void setRiskFactorAmount(BigDecimal riskFactorAmount) {
+    this.riskFactorAmount = riskFactorAmount;
+  }
+
+/**
+	* 放款餘額<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getLoanBal() {
+    return this.loanBal;
+  }
+
+/**
+	* 放款餘額<br>
+	* 
+  *
+  * @param loanBal 放款餘額
+	*/
+  public void setLoanBal(BigDecimal loanBal) {
+    this.loanBal = loanBal;
+  }
+
+/**
+	* 備呆提存比率<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getReserveLossRate() {
+    return this.reserveLossRate;
+  }
+
+/**
+	* 備呆提存比率<br>
+	* 
+  *
+  * @param reserveLossRate 備呆提存比率
+	*/
+  public void setReserveLossRate(BigDecimal reserveLossRate) {
+    this.reserveLossRate = reserveLossRate;
+  }
+
+/**
+	* 備呆金額<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getReserveLossAmt() {
+    return this.reserveLossAmt;
+  }
+
+/**
+	* 備呆金額<br>
+	* 
+  *
+  * @param reserveLossAmt 備呆金額
+	*/
+  public void setReserveLossAmt(BigDecimal reserveLossAmt) {
+    this.reserveLossAmt = reserveLossAmt;
   }
 
 /**
@@ -277,6 +384,7 @@ public class MonthlyLM042RBC implements Serializable {
   @Override
   public String toString() {
     return "MonthlyLM042RBC [monthlyLM042RBCId=" + monthlyLM042RBCId + ", loanAmount=" + loanAmount + ", riskFactor=" + riskFactor
-           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", riskFactorAmount=" + riskFactorAmount + ", loanBal=" + loanBal + ", reserveLossRate=" + reserveLossRate + ", reserveLossAmt=" + reserveLossAmt + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
+           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

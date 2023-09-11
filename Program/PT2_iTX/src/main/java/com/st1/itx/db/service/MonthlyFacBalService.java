@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.MonthlyFacBal;
@@ -140,5 +142,16 @@ public interface MonthlyFacBalService {
    *
    */
   public void Usp_L9_MonthlyFacBal_Upd(int YYYYMM,  String empNo, TitaVo... titaVo);
+
+  /**
+   * Stored Procedure<br>
+   * 
+   * @param  YYYYMM int
+   * @param  txcd String
+   * @param  empNo String
+   * @param titaVo Variable-Length Argument
+   *
+   */
+  public void Usp_L7_UploadToMothlyFacBal_Upd(int YYYYMM,  String txcd,  String empNo, TitaVo... titaVo);
 
 }

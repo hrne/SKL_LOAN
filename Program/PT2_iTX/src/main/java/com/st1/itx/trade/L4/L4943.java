@@ -184,6 +184,8 @@ public class L4943 extends TradeBuffer {
 							procNote = "Aml檢核:" + amlX(amlRsp, titaVo) + "。";
 						} else if (tempVo.get("Deduct") != null && tempVo.get("Deduct").length() > 0) {
 							procNote = "扣款檢核：" + tempVo.get("Deduct") + "。";
+						} else if (tempVo.get("AuthWarn") != null && tempVo.get("AuthWarn").length() > 0) {
+							procNote = procNote + "帳號授權提醒:" + tempVo.get("AuthWarn");					
 						}
 					} else {
 						if ("00".equals(returnCode)) {
@@ -243,7 +245,7 @@ public class L4943 extends TradeBuffer {
 	}
 
 	private String authX(String auth, TitaVo titaVo) {
-		String result = "";
+		String result = "未授權";
 
 		CdCode cdCode = cdCodeService.getItemFirst(4, "AuthStatusCode", auth, titaVo);
 

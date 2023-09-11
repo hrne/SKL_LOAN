@@ -69,7 +69,7 @@ public class LM003Report extends MakeReport {
 		String brno = titaVo.getBrno();
 		String txcd = "LM003";
 		String fileItem = "撥款／還款金額比較月報表" + rocYMMin + "~" + rocYMMax ;
-		String fileName = "LM003-撥款／還款金額比較月報表 " + rocYMMin + "~" + rocYMMax;
+		String fileName = "LM003-撥款／還款金額比較月報表" + rocYMMin + "~" + rocYMMax;
 		String defaultExcel = "LM003_底稿_撥款還款比較月報表.xlsx";
 		String defaultSheet = "還款-撥還款比較";
 
