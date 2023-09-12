@@ -1315,6 +1315,9 @@ public class L5706 extends TradeBuffer {
 			// E5009 資料檢核錯誤
 			throw new LogicException(titaVo, "E5009", "身分證字號[" + IDN_BAN + "] 戶號:[" + CustNo + "] 最大債權銀行:[" + MAIN_CODE + "] 未有債權資料");
 		}
+		//累繳金額,累應還金額,需承接上一筆
+		BigDecimal accuTempAmt = tNegMain.getAccuTempAmt();//累繳金額
+		BigDecimal accuDueAmt = tNegMain.getAccuDueAmt();//累應還金額
 		// 本筆資料改為已變更,申請變更還款條件日也需寫入
 		UpdNegMain(tNegMain, chgCondDate, titaVo);
 		// 新增一筆NegMain
@@ -1355,12 +1358,12 @@ public class L5706 extends TradeBuffer {
 		InserttNegMain.setPrincipalBal(new BigDecimal(CHANGE_TOTAL_AMT));// 總本金餘額
 		InserttNegMain.setDeferYMStart(0);// 延期繳款年月(起)
 		InserttNegMain.setDeferYMEnd(0);// 延期繳款年月(訖)
-		InserttNegMain.setAccuTempAmt(BigDecimal.ZERO);// 累繳金額
+		InserttNegMain.setAccuTempAmt(accuTempAmt);// 累繳金額
 		InserttNegMain.setAccuOverAmt(BigDecimal.ZERO);// 累溢繳金額
-		InserttNegMain.setAccuDueAmt(BigDecimal.ZERO);// 累應還金額
+		InserttNegMain.setAccuDueAmt(accuDueAmt);// 累應還金額
 		InserttNegMain.setAccuSklShareAmt(BigDecimal.ZERO);// 累新壽分攤金額
-		InserttNegMain.setRepayPrincipal(BigDecimal.ZERO);// 累償還本金
-		InserttNegMain.setRepayInterest(BigDecimal.ZERO);// 累償還利息
+		InserttNegMain.setRepayPrincipal(BigDecimal.ZERO);// 償還本金
+		InserttNegMain.setRepayInterest(BigDecimal.ZERO);// 償還利息
 		InserttNegMain.setStatusDate(0);// 戶況日期
 		String isMainFin = "";
 		if (("458").equals(MAIN_CODE)) {

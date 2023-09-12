@@ -186,7 +186,7 @@ BEGIN
                    ,M."AcSubBookCode"
           UNION 
           --擔保放款-折溢價
-          SELECT "AcDate"/100                   AS "YearMonth"     --資料年月
+          SELECT TRUNC()"AcDate"/100)                  AS "YearMonth"     --資料年月
                 ,'61'                    AS "AssetClass"    --資產分類
                 ,'999'                   AS "AcSubBookCode" --區隔帳冊
                 ,SUM("TdBal")  AS "Amt"   --(61)擔保品溢折價
@@ -197,7 +197,7 @@ BEGIN
           GROUP BY "AcDate"
           UNION 
           --催收款項-折溢價與催收費用
-          SELECT "AcDate"/100                   AS "YearMonth"     --資料年月
+          SELECT TRUNC("AcDate"/100)                   AS "YearMonth"     --資料年月
                 ,'62'                    AS "AssetClass"    --資產分類
                 ,'999'                   AS "AcSubBookCode" --區隔帳冊
                 ,SUM("TdBal")            AS "Amt"           --(62)折溢價與催收費用

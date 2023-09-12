@@ -78,7 +78,6 @@ public class L9711Report extends MakeReport {
 		this.print(-2, centerPos, "長中短期放款到期明細表", "C");
 		this.print(-4, centerPos, "到期起訖日...　" + showRocDate(titaVo.get("ACCTDATE_ST"), 1) + " -  "
 				+ showRocDate(titaVo.get("ACCTDATE_ED"), 1), "C");
-//		this.print(-4, centerPos, "（　需列印到期通知單之清單　　）", "C");
 		if (!isLetterNoticeFlag) {
 			this.print(-3, centerPos, "(已申請不列印書面通知書客戶)", "C");
 		}
@@ -222,7 +221,6 @@ public class L9711Report extends MakeReport {
 				printData(tL9711Vo);
 				// 每到 60 筆，換一頁
 				if (count >= 60) {
-//					this.info("換一頁：" + count + "筆");
 					count = 0;
 					newPage();
 				}
@@ -312,15 +310,12 @@ public class L9711Report extends MakeReport {
 	 */
 	private List<Map<String, String>> checkAllCustNoMaturityDate(List<Map<String, String>> list, TitaVo titaVo)
 			throws LogicException {
-		this.info("start  checkAllCustNoMaturityDate");
-		this.info("Start List  = " + list);
-//		String iSDAY = String.valueOf(Integer.valueOf(titaVo.get("ACCTDATE_ST")) + 19110000);
 		int iEDAY = Integer.valueOf(titaVo.get("ACCTDATE_ED")) + 19110000;
 
 		List<String> checkForDupList = new ArrayList<String>();
 
 		List<Map<String, String>> isLetterList = new ArrayList<Map<String, String>>();
-
+		
 		int custNo = 0;
 		int clCode1 = 0;
 		int clCode2 = 0;
@@ -335,11 +330,13 @@ public class L9711Report extends MakeReport {
 		List<Map<String, String>> tmpData = new ArrayList<Map<String, String>>();
 
 		for (Map<String, String> r : list) {
-			custNo = parse.stringToInteger(r.get("CustNo"));
+			custNo = parse.stringToInteger(r.get("F4"));
 			clCode1 = parse.stringToInteger(r.get("ClCode1"));
 			clCode2 = parse.stringToInteger(r.get("ClCode2"));
 			clNo = parse.stringToInteger(r.get("ClNo"));
-			facmNo = parse.stringToInteger(r.get("FacmNo"));
+			facmNo = parse.stringToInteger(r.get("F5"));
+
+			
 
 			try {
 
@@ -361,7 +358,7 @@ public class L9711Report extends MakeReport {
 			} else {
 				for (Map<String, String> t : tmpData) {
 					maturityDate = parse.stringToInteger(t.get("MaturityDate"));
-
+					
 					// 所有戶號額度的到期日 大於 到期止日 且 該戶號額度未全出 就不要印 
 					if (iEDAY >= maturityDate) {
 					} else {
@@ -374,8 +371,6 @@ public class L9711Report extends MakeReport {
 			if (isPrint) {
 				// 確定要印後，排除放過的擔保品
 				if (!checkForDupList.contains(tmpCkStr)) {
-					this.info("tmpCkStr = " + tmpCkStr);
-					this.info("list =" + r.toString());
 					checkForDupList.add(tmpCkStr);
 					isLetterList.add(r);
 				}

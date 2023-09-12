@@ -15,6 +15,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.db.domain.CdBranch;
 import com.st1.itx.db.domain.CdBranchGroup;
 import com.st1.itx.db.service.CdBranchService;
+import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.CdBcm;
 import com.st1.itx.db.service.CdBcmService;
 import com.st1.itx.db.service.CdBranchGroupService;
@@ -27,9 +28,11 @@ import com.st1.itx.db.service.TxAuthGroupService;
 import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.db.domain.CdLoanNotYet;
+import com.st1.itx.db.domain.CdRuleCode;
 import com.st1.itx.db.domain.CdSyndFee;
 import com.st1.itx.db.domain.TxAttachType;
 import com.st1.itx.db.service.CdLoanNotYetService;
+import com.st1.itx.db.service.CdRuleCodeService;
 import com.st1.itx.db.service.CdSyndFeeService;
 import com.st1.itx.db.service.TxAttachTypeService;
 import com.st1.itx.db.domain.CdGuarantor;
@@ -72,6 +75,8 @@ public class XXR99 extends TradeBuffer {
 
 	@Autowired
 	public CdSyndFeeService sCdSyndFeeService;
+	@Autowired
+	public CdRuleCodeService cdRuleCodeService;
 
 	@Autowired
 	public TxAttachTypeService txAttachTypeService;
@@ -138,6 +143,8 @@ public class XXR99 extends TradeBuffer {
 				s = getCdGuarantor();
 			} else if ("CdSyndFee".equals(k)) {
 				s = getSyndFeeCode();
+			} else if ("CdRuleCode".equals(k)) {
+				s = getCdRuleCode();
 			} else {
 				throw new LogicException(titaVo, "E0010", "HELP類別:" + k);
 			}
@@ -472,7 +479,7 @@ public class XXR99 extends TradeBuffer {
 		return s;
 	}
 
-	private String getAuthGroup(String branchNo, String levelFg) throws LogicException{
+	private String getAuthGroup(String branchNo, String levelFg) throws LogicException {
 		this.info("XXR99 getAuthGroup = " + branchNo + "/" + levelFg);
 		String s = "";
 
@@ -485,7 +492,7 @@ public class XXR99 extends TradeBuffer {
 		this.limit = Integer.MAX_VALUE;
 		Slice<TxAuthGroup> slTxAuthGroup = null;
 		if (!branchNo.equals("") && (!levelFg.equals("") && !levelFg.equals("0"))) {
-			slTxAuthGroup = sTxAuthGroupService.BranchAll(branchNo, Integer.valueOf(levelFg), this.index, this.limit);		
+			slTxAuthGroup = sTxAuthGroupService.BranchAll(branchNo, Integer.valueOf(levelFg), this.index, this.limit);
 		} else {
 			slTxAuthGroup = sTxAuthGroupService.findAll(this.index, this.limit);
 		}
@@ -497,7 +504,7 @@ public class XXR99 extends TradeBuffer {
 				}
 				s += tTxAuthGroup.getAuthNo().trim() + ":" + tTxAuthGroup.getAuthItem().trim();
 			}
-		}else {
+		} else {
 			throw new LogicException("E0001", "查無資料");
 		}
 		this.info("XXR99 getAuthGroup = " + branchNo + "/" + s);
@@ -585,6 +592,34 @@ public class XXR99 extends TradeBuffer {
 		}
 
 		return s;
+	}
+
+	private String getCdRuleCode() {
+		this.info("XXR99 getCdRuleCode");
+		String s = "";
+
+		/*
+		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
+		 */
+		this.index = 0;
+
+		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
+		this.limit = Integer.MAX_VALUE;
+
+		Slice<CdRuleCode> slCdRuleCode = cdRuleCodeService.findAll(this.index, this.limit);
+		List<CdRuleCode> lCdRuleCode = slCdRuleCode == null ? null : slCdRuleCode.getContent();
+
+		if (lCdRuleCode != null) {
+			for (CdRuleCode tCdRuleCode : lCdRuleCode) {
+				if (!"".equals(s)) {
+					s += ";";
+				}
+				s += tCdRuleCode.getRuleCode().trim() + ":" + tCdRuleCode.getRuleCodeItem().trim();
+			}
+		}
+
+		return s;
+
 	}
 
 	// 中文以2位計算長度

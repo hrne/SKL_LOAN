@@ -69,10 +69,10 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       	  THEN 'D'";
 		sql += "       	  ELSE 'C' END  AS F22";
 		sql += "       ,Mf.\"BuildingFlag\"  					  AS F23 ";
-		sql += "       ,M.\"SpecialAssetFlag\" 	                  AS F24 ";
-		sql += "       ,M.\"BankRelationFlag\" 	                  AS F25 ";
-		sql += "       ,M.\"DepartmentCode\" 	    	              AS F26 ";
-		sql += "       ,M.\"EntCode\" 	                          AS F27 ";
+		sql += "       ,Mf.\"SpecialAssetFlag\" 	                  AS F24 ";
+		sql += "       ,Mf.\"BankRelationFlag\" 	                  AS F25 ";
+		sql += "       ,Mf.\"DepartmentCode\" 	    	              AS F26 ";
+		sql += "       ,Mf.\"EntCode\" 	                          AS F27 ";
 		sql += "       ,Mf.\"AssetClass\" 	                          AS F28 ";
 		sql += "       ,Mf.\"AssetClass2\" 	                          AS F29 ";
 		sql += "       ,Mf.\"LawAmount\"	                          	  AS F30 ";

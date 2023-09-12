@@ -104,7 +104,12 @@ public class L6304 extends TradeBuffer {
 				}
 			}
 
-			titaVo.setDataBaseOnMon();// 指定月報環境
+			this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
+			if ("onLine".equals(titaVo.getDataBase())) {
+				titaVo.setDataBaseOnMon();// 指定月報環境
+			} else {
+				titaVo.setDataBaseOnLine();// 指定連線環境
+			}
 
 			try {
 				sCdCommService.insert(sCdComm, titaVo);
@@ -138,8 +143,12 @@ public class L6304 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 
-			this.info("onMon");
-			titaVo.setDataBaseOnMon();// 指定月報環境
+			this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
+			if ("onLine".equals(titaVo.getDataBase())) {
+				titaVo.setDataBaseOnMon();// 指定月報環境
+			} else {
+				titaVo.setDataBaseOnLine();// 指定連線環境
+			}
 
 			try {
 				sCdCommService.update(uCdComm, titaVo);
@@ -178,8 +187,12 @@ public class L6304 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時，發生錯誤
 			}
 
-			this.info("onMon");
-			titaVo.setDataBaseOnMon();// 指定月報環境
+			this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
+			if ("onLine".equals(titaVo.getDataBase())) {
+				titaVo.setDataBaseOnMon();// 指定月報環境
+			} else {
+				titaVo.setDataBaseOnLine();// 指定連線環境
+			}
 
 			try {
 				sCdCommService.delete(dCdComm);

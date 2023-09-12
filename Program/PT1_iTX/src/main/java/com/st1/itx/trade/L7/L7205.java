@@ -122,26 +122,17 @@ public class L7205 extends TradeBuffer {
 
 		}
 
-		titaVo.setDataBaseOnMon();// 指定月報環境
-
 		String extension[] = filename.split("\\.");
 		this.info("file extension=" + extension[extension.length - 1]);
 		if ("xlsx".equals(extension[extension.length - 1]) || "xls".equals(extension[extension.length - 1])) {
 			// 打開上傳的excel檔案，預設讀取第1個工作表
 			makeExcel.openExcel(filename, 1);
-
-			// 檢查資料
-			setValueFromFileExcelNew(titaVo, iYearMonth);
+			checkExcelData(titaVo, iYearMonth);
 		} else if ("csv".equals(extension[extension.length - 1].toLowerCase())) {
-			// 檢查資料
-			setValueFromFile(titaVo, dataLineList, iYearMonth);
-
+			checkCSVData(titaVo, dataLineList, iYearMonth);
 		} else {
-
 			String ErrorMsg = "請上傳正確附檔名之檔案-csv,xls,xlsx";
-
 			throw new LogicException(titaVo, "E0014", ErrorMsg);
-
 		}
 
 		MySpring.newTask("L7205p", this.txBuffer, titaVo);
@@ -151,59 +142,31 @@ public class L7205 extends TradeBuffer {
 
 	}
 
-	public void setValueFromFile(TitaVo titaVo, ArrayList<String> lineList, int iYearMonth) throws LogicException {
+	public void checkCSVData(TitaVo titaVo, ArrayList<String> lineList, int iYearMonth) throws LogicException {
+		// 設定明細欄位的擷取位置
+		// 1 YearMonth 年月份 Decimal 6 YYYYMM 西元年月
+		// 2 CustNo 戶號 Decimal 7
+		// 3 FacmNo 額度編號 Decimal 3
+		// 4 AssetClass 資產五分類代號(有擔保部分) Decimal 1
+		String[] thisColumn = lineList.get(0).split(",");
+		String yearMonth = "";
+		if (Integer.valueOf(thisColumn[0].toString()) < 191100) {
+			yearMonth = String.valueOf((Integer.valueOf(thisColumn[0].toString()) + 191100));
+		} else {
+			yearMonth = thisColumn[0];
+		}
 
-		// 依照行數擷取明細資料
-		for (String thisLine : lineList) {
+		if (Integer.valueOf(yearMonth) != iYearMonth) {
 
-			// 設定明細欄位的擷取位置
-			// 1 YearMonth 年月份 Decimal 6 YYYYMM 西元年月
-			// 2 CustNo 戶號 Decimal 7
-			// 3 FacmNo 額度編號 Decimal 3
-			// 4 AssetClass 資產五分類代號(有擔保部分) Decimal 1
+			String ErrorMsg = "年月份錯誤 : 應為" + iYearMonth + ",資料上為：" + yearMonth;
 
-			String[] thisColumn = thisLine.split(",");
-			String yearMonth = "";
-			if (thisColumn.length >= 1 && thisColumn != null) {
-
-				if (Integer.valueOf(thisColumn[0].toString()) < 191100) {
-					yearMonth = String.valueOf((Integer.valueOf(thisColumn[0].toString()) + 191100));
-				} else {
-					yearMonth = thisColumn[0];
-				}
-
-				if (Integer.valueOf(yearMonth) != iYearMonth) {
-
-					String ErrorMsg = "年月份錯誤 : 應為" + iYearMonth + ",資料上為：" + yearMonth;
-
-					throw new LogicException(titaVo, "E0015", ErrorMsg);
-				}
-
-
-
-				// 判斷資產分類位置是否為空
-				if (thisColumn[3].trim().length() == 0) {
-					String ErrorMsg = "L7205(戶號 " + thisColumn[1] + "  的資產分類欄位不得為空值，請重新上傳)";
-
-					throw new LogicException(titaVo, "E0015", ErrorMsg);
-				}
-
-
-			}
-
+			throw new LogicException(titaVo, "E0015", ErrorMsg);
 		}
 
 	}
 
-	public void setValueFromFileExcelNew(TitaVo titaVo, int YearMonth) throws LogicException {
+	public void checkExcelData(TitaVo titaVo, int iYearMonth) throws LogicException {
 
-		// 取得工作表資料的最後一列
-		int lastRowNum = makeExcel.getSheetLastRowNum() + 1;
-
-		this.info("lastRowNum=" + lastRowNum);
-
-		int iYearMonth = YearMonth;
-		
 		int fileYearMonth = new BigDecimal(makeExcel.getValue(1, 10).toString()).intValue() + 191100;
 
 		this.info("輸入的年份：" + iYearMonth);
@@ -213,27 +176,6 @@ public class L7205 extends TradeBuffer {
 			String ErrorMsg = "年月份錯誤 : 應為" + iYearMonth + ",資料上為：" + fileYearMonth;
 
 			throw new LogicException(titaVo, "E0015", ErrorMsg);
-		}
-
-		for (int i = 2; i <= lastRowNum; i++) {
-
-
-
-			if (makeExcel.getValue(i, 2).toString().trim().length() == 0
-					|| makeExcel.getValue(i, 2).toString().trim() == "") {
-				break;
-			}
-
-			// 第8欄位為資產分類
-			if (makeExcel.getValue(i, 8).toString().trim().length() == 0) {
-
-				String ErrorMsg = "L7205(第" + i + "列，戶號 " + makeExcel.getValue(i, 2).toString()
-						+ " 的資產分類欄位不得為空值，請重新上傳)";
-
-				throw new LogicException(titaVo, "E0015", ErrorMsg);
-			}
-
-
 		}
 
 	}

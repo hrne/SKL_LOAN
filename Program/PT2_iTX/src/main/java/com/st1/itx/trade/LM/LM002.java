@@ -69,7 +69,7 @@ public class LM002 extends BatchBase implements Tasklet, InitializingBean {
 		String parentTranCode = titaVo.getTxcd();
 		lm002report.setTxBuffer(this.getTxBuffer());
 		lm002report.setParentTranCode(parentTranCode);
-		checkProjectLoan("02");//專案放款產表時計算
+		checkProjectLoan("02");// 專案放款產表時計算
 		lm002report.exec(titaVo);
 	}
 
@@ -120,8 +120,13 @@ public class LM002 extends BatchBase implements Tasklet, InitializingBean {
 						throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增資料時，發生錯誤
 					}
 				}
-
-				titaVo.setDataBaseOnLine();// 指定連線環境
+				
+				this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
+				if ("onLine".equals(titaVo.getDataBase())) {
+					titaVo.setDataBaseOnMon();// 指定月報環境
+				} else {
+					titaVo.setDataBaseOnLine();// 指定連線環境
+				}
 
 				try {
 
@@ -153,7 +158,7 @@ public class LM002 extends BatchBase implements Tasklet, InitializingBean {
 		}
 
 		tTempVo.putParam("YearMonth", yearMonth);
-		//原始
+		// 原始
 		tTempVo.putParam("o340LoanBal", "0");
 		tTempVo.putParam("oIALoanBal", "0");
 		tTempVo.putParam("oIBLoanBal", "0");
@@ -168,7 +173,7 @@ public class LM002 extends BatchBase implements Tasklet, InitializingBean {
 		tTempVo.putParam("o990LoanBal", "0");
 		tTempVo.putParam("oLoanBal", "0");
 
-		//調整後
+		// 調整後
 		tTempVo.putParam("340LoanBal", "0");
 		tTempVo.putParam("IALoanBal", "0");
 		tTempVo.putParam("IBLoanBal", "0");
@@ -181,12 +186,12 @@ public class LM002 extends BatchBase implements Tasklet, InitializingBean {
 		tTempVo.putParam("IILoanBal", "0");
 		tTempVo.putParam("921LoanBal", "0");
 		tTempVo.putParam("990LoanBal", "0");
-		tTempVo.putParam("88LoanBal", "0");//88風災另外寫
+		tTempVo.putParam("88LoanBal", "0");// 88風災另外寫
 		tTempVo.putParam("LoanBal", "0");
-		
+
 		for (Map<String, String> r : result) {
 
-			tTempVo.putParam("o"+r.get("Type") + "LoanBal", r.get("LoanBal"));
+			tTempVo.putParam("o" + r.get("Type") + "LoanBal", r.get("LoanBal"));
 			tTempVo.putParam(r.get("Type") + "LoanBal", r.get("LoanBal"));
 		}
 

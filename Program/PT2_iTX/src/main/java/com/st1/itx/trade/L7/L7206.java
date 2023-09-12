@@ -101,7 +101,12 @@ public class L7206 extends TradeBuffer {
 		titaVo.keepOrgDataBase();// 保留原本記號
 		tMonthlyFacBalService.Usp_L7_UploadToMothlyFacBal_Upd(iYYMM, txcd, tlrno,"", titaVo);
 	
-		titaVo.setDataBaseOnMon();// 指定月報環境
+		this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
+		if ("onLine".equals(titaVo.getDataBase())) {
+			titaVo.setDataBaseOnMon();// 指定月報環境
+		} else {
+			titaVo.setDataBaseOnLine();// 指定連線環境
+		}
 		tMonthlyFacBalService.Usp_L7_UploadToMothlyFacBal_Upd(iYYMM, txcd, tlrno,"", titaVo);
 		titaVo.setDataBaseOnOrg();// 還原原本的環境
 		
@@ -253,9 +258,12 @@ public class L7206 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
 
-			titaVo.setDataBaseOnMon();// 指定月報環境
-			this.info("onMon");
-
+			this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
+			if ("onLine".equals(titaVo.getDataBase())) {
+				titaVo.setDataBaseOnMon();// 指定月報環境
+			} else {
+				titaVo.setDataBaseOnLine();// 指定連線環境
+			}
 			try {
 
 				if (delStakeholdersStaff != null) {
@@ -346,8 +354,12 @@ public class L7206 extends TradeBuffer {
 						throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 					}
 
-					titaVo.setDataBaseOnMon();// 指定月報環境
-					this.info("onMon");
+					this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
+					if ("onLine".equals(titaVo.getDataBase())) {
+						titaVo.setDataBaseOnMon();// 指定月報環境
+					} else {
+						titaVo.setDataBaseOnLine();// 指定連線環境
+					}
 
 					try {
 
@@ -387,8 +399,12 @@ public class L7206 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
 
-			titaVo.setDataBaseOnMon();// 指定月報環境
-			this.info("onMon");
+			this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
+			if ("onLine".equals(titaVo.getDataBase())) {
+				titaVo.setDataBaseOnMon();// 指定月報環境
+			} else {
+				titaVo.setDataBaseOnLine();// 指定連線環境
+			}
 
 			try {
 
@@ -450,8 +466,12 @@ public class L7206 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
 
-			titaVo.setDataBaseOnMon();// 指定月報環境
-			this.info("onMon");
+			this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
+			if ("onLine".equals(titaVo.getDataBase())) {
+				titaVo.setDataBaseOnMon();// 指定月報環境
+			} else {
+				titaVo.setDataBaseOnLine();// 指定連線環境
+			}
 
 			try {
 
@@ -520,9 +540,12 @@ public class L7206 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
 
-			titaVo.setDataBaseOnMon();// 指定月報環境
-			this.info("onMon");
-
+			this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
+			if ("onLine".equals(titaVo.getDataBase())) {
+				titaVo.setDataBaseOnMon();// 指定月報環境
+			} else {
+				titaVo.setDataBaseOnLine();// 指定連線環境
+			}
 			try {
 
 				if (delFinHoldRel != null) {

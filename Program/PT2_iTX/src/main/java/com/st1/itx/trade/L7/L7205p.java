@@ -159,6 +159,8 @@ public class L7205p extends TradeBuffer {
 		Slice<Ias34Ap> sIas34Ap = null;
 		Slice<LoanIfrs9Ap> sLoanIfrs9Ap = null;
 
+		titaVo.keepOrgDataBase();// 保留原本記號
+
 		for (OccursList tempOccursList : occursList) {
 
 			int custno = parse.stringToInteger(tempOccursList.get("CustNo"));
@@ -172,6 +174,8 @@ public class L7205p extends TradeBuffer {
 				lawAmount = new BigDecimal(tempOccursList.get("LawAmount"));
 				lawAssetClass = tempOccursList.get("LawAssetClass");
 			}
+
+			titaVo.setDataBaseOnLine(); // 連線環境
 
 			// 維護monthlyFacBal
 			MonthlyFacBalId monthlyFacBalId = new MonthlyFacBalId();
@@ -214,9 +218,12 @@ public class L7205p extends TradeBuffer {
 				CountS++; // 成功筆數+1
 			}
 
-			titaVo.setDataBaseOnOrg();// 還原原本的環境
+			titaVo.setDataBaseOnLine(); // 連線環境
+			this.batchTransaction.commit();
+			titaVo.setDataBaseOnMon();// 指定月報環境
+			this.batchTransaction.commit();
 
-			titaVo.keepOrgDataBase();// 保留原本記號
+			titaVo.setDataBaseOnLine(); // 連線環境
 			// 維護Ifrs9FacData
 			Ifrs9FacDataId ifrs9FacDataId = new Ifrs9FacDataId();
 			ifrs9FacDataId.setCustNo(custno);
@@ -234,6 +241,7 @@ public class L7205p extends TradeBuffer {
 					throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 				}
 			}
+
 			// 維護Ias34Ap
 
 			sIas34Ap = tIas34ApService.dataEq(custno, facmno, yearmonth, this.index, this.limit, titaVo);
@@ -270,7 +278,12 @@ public class L7205p extends TradeBuffer {
 					}
 				}
 
-				titaVo.setDataBaseOnMon();// 指定月報環境
+				this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
+				if ("onLine".equals(titaVo.getDataBase())) {
+					titaVo.setDataBaseOnMon();// 指定月報環境
+				} else {
+					titaVo.setDataBaseOnLine();// 指定連線環境
+				}
 
 				for (LoanIfrs9Ap t : lLoanIfrs9Ap) {
 					t.setAssetClass(parse.stringToInteger(assetclass));
@@ -286,16 +299,26 @@ public class L7205p extends TradeBuffer {
 
 		String note = "總筆數：" + CountAll + ",成功筆數：" + CountS + ",失敗筆數：" + CountF;
 
+		this.totaVo.putParam("CountAll", CountAll);
+		this.totaVo.putParam("CountS", CountS);
+		this.totaVo.putParam("CountF", CountF);
+
 		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "",
 				titaVo.getParam("TLRNO"), note, titaVo);
 
-		titaVo.keepOrgDataBase();// 保留原本記號
+		titaVo.setDataBaseOnLine(); // 連線環境
+		this.batchTransaction.commit();
+		titaVo.setDataBaseOnMon();// 指定月報環境
+		this.batchTransaction.commit();
+
+		titaVo.setDataBaseOnLine(); // 連線環境
 		updLM052ReportSPAndMonthlyFacBalData(titaVo, iYearMonth);
 
 		titaVo.setDataBaseOnMon();// 指定月報環境
-//		 重產LM051報表
-		titaVo.setBatchJobId("jLM051");
 		updLM052ReportSPAndMonthlyFacBalData(titaVo, iYearMonth);
+
+		// 重產LM051報表
+		titaVo.setBatchJobId("jLM051");
 
 		titaVo.setDataBaseOnOrg();// 還原原本的環境
 
