@@ -360,19 +360,19 @@ em = null;
   }
 
   @Override
-  public void Usp_L9_MonthlyLM052AssetClass_Ins(int tbsdyf,  String empNo, TitaVo... titaVo) {
+  public void Usp_L9_MonthlyLM052AssetClass_Ins(int tbsdyf,  String empNo,  String jobTxSeq, TitaVo... titaVo) {
     String dbName = "";
     
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     if (dbName.equals(ContentName.onDay))
-      monthlyLM052AssetClassReposDay.uspL9Monthlylm052assetclassIns(tbsdyf,  empNo);
+      monthlyLM052AssetClassReposDay.uspL9Monthlylm052assetclassIns(tbsdyf,  empNo,  jobTxSeq);
     else if (dbName.equals(ContentName.onMon))
-      monthlyLM052AssetClassReposMon.uspL9Monthlylm052assetclassIns(tbsdyf,  empNo);
+      monthlyLM052AssetClassReposMon.uspL9Monthlylm052assetclassIns(tbsdyf,  empNo,  jobTxSeq);
     else if (dbName.equals(ContentName.onHist))
-      monthlyLM052AssetClassReposHist.uspL9Monthlylm052assetclassIns(tbsdyf,  empNo);
+      monthlyLM052AssetClassReposHist.uspL9Monthlylm052assetclassIns(tbsdyf,  empNo,  jobTxSeq);
    else
-      monthlyLM052AssetClassRepos.uspL9Monthlylm052assetclassIns(tbsdyf,  empNo);
+      monthlyLM052AssetClassRepos.uspL9Monthlylm052assetclassIns(tbsdyf,  empNo,  jobTxSeq);
   }
 
 }

@@ -26,6 +26,7 @@ import com.st1.itx.db.domain.StakeholdersStaff;
 import com.st1.itx.db.service.FinHoldRelService;
 import com.st1.itx.db.service.LifeRelEmpService;
 import com.st1.itx.db.service.LifeRelHeadService;
+import com.st1.itx.db.service.MonthlyFacBalService;
 import com.st1.itx.db.service.StakeholdersStaffService;
 import com.st1.itx.util.format.StringCut;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -60,6 +61,8 @@ public class L7206 extends TradeBuffer {
 	@Autowired
 	public FinHoldRelService tFinHoldRelService;
 	@Autowired
+	public MonthlyFacBalService tMonthlyFacBalService;
+	@Autowired
 	MakeExcel makeExcel;
 
 	StringCut sStringCut;
@@ -89,6 +92,19 @@ public class L7206 extends TradeBuffer {
 			// 2023-08-21 Wei 新增 from SKL-IT 葛經理
 			MySpring.newTask("L7206p", this.txBuffer, titaVo);
 		}
+		
+		//2023-09-12 更新MonthlyFacBal BankRelationFlag
+		int iYYMM = Integer.valueOf(titaVo.getParam("inputAcDate")) / 100;
+		String tlrno = titaVo.getTlrNo();
+		String txcd = titaVo.getTxcd();
+		
+		titaVo.keepOrgDataBase();// 保留原本記號
+		tMonthlyFacBalService.Usp_L7_UploadToMothlyFacBal_Upd(iYYMM, txcd, tlrno,"", titaVo);
+	
+		titaVo.setDataBaseOnMon();// 指定月報環境
+		tMonthlyFacBalService.Usp_L7_UploadToMothlyFacBal_Upd(iYYMM, txcd, tlrno,"", titaVo);
+		titaVo.setDataBaseOnOrg();// 還原原本的環境
+		
 
 		this.addList(this.totaVo);
 		return this.sendList();

@@ -126,9 +126,10 @@ public interface MonthlyLM052AssetClassService {
    * 
    * @param  tbsdyf int
    * @param  empNo String
+   * @param  jobTxSeq String
    * @param titaVo Variable-Length Argument
    *
    */
-  public void Usp_L9_MonthlyLM052AssetClass_Ins(int tbsdyf,  String empNo, TitaVo... titaVo);
+  public void Usp_L9_MonthlyLM052AssetClass_Ins(int tbsdyf,  String empNo,  String jobTxSeq, TitaVo... titaVo);
 
 }

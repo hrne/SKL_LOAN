@@ -127,12 +127,13 @@ C(3,#CHAIN,1,s,$)
 HELP(#FunCdHelp) 
 @V(H,#FunCdHelp)
 IF(#RecordNo == 0,V(P,請先至L2941查詢),$)
-E(0,@FUNCIND,#FunCd)
 
 #FunCdX=X,4,L
 C(4,#FunCd,S,$)
 T(H,#FunCd,#FunCdHelp)
 C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSEY))
+E(0,@FUNCIND,#FunCd)
+T(2,@RimTxCode,#TXCD)
 
 #ShowFd=X,1,S
 IF(#FunCd == 2,T(3,*),S)
@@ -197,6 +198,7 @@ T(2,@RmkCustNo,#TimCustNo)
 
 #RimCustId=X,10,S
 #RimCustNo=A,7,S
+#RimTxCode=X,5,S
 #SENDL2R07A=X,1,S
 T(3,@RimCustId, )
 E(0,@RimCustNo,#TimCustNo)

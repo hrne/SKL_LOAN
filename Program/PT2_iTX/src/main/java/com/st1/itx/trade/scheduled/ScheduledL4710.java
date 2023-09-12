@@ -112,6 +112,7 @@ public class ScheduledL4710 extends SysLogger {
 		titaVo.putParam(ContentName.actfg, "0");
 		titaVo.putParam(ContentName.dataBase, ContentName.onLine);
 		titaVo.putParam(ContentName.empnot, "999999");
+		titaVo.putParam(ContentName.kinbr,"0000");
 
 		txBuffer.init(titaVo);
 

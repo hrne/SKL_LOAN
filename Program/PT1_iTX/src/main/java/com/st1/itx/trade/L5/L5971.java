@@ -82,23 +82,10 @@ public class L5971 extends TradeBuffer {
 
 		String CustId = titaVo.getParam("CustId").trim(); // 身份證號
 		String CaseSeq = titaVo.getParam("CaseSeq").trim(); // 案件序號
+		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo").trim()); // 戶號
 		String EntryDateStart = titaVo.getParam("EntryDateStart").trim(); // 入帳日期(起始)
 		String EntryDateEnd = titaVo.getParam("EntryDateEnd").trim(); // 入帳日期(結束)
-
-		int CustNo = 0;// 戶號
-		if (CustId != null && CustId.length() != 0) {
-			CustMain CustMainVO = sCustMainService.custIdFirst(CustId, titaVo);
-			if (CustMainVO != null) {
-				CustNo = CustMainVO.getCustNo();
-				if (CustNo == 0) {
-					// E1002 戶號不得為0
-					throw new LogicException(titaVo, "E1002", "客戶資料主檔");
-				}
-			} else {
-				// E0001 查詢資料不存在
-				throw new LogicException(titaVo, "E0001", "客戶資料主檔");
-			}
-		}
+		
 		int iCaseSeq = 0;
 		if (CaseSeq != null && CaseSeq.length() != 0) {
 			iCaseSeq = parse.stringToInteger(CaseSeq);
@@ -114,18 +101,52 @@ public class L5971 extends TradeBuffer {
 			IntEntryDateEnd = parse.stringToInteger(EntryDateEnd) + 19110000;
 		}
 
-		Slice<NegTrans> slNegTrans = null;
+		NegMainId NegMainId = new NegMainId();
+		NegMainId.setCaseSeq(iCaseSeq);
+		NegMainId.setCustNo(iCustNo);
 
-		if (CustNo != 0) {
+		NegMain NegMainVO = new NegMain();
+		NegMainVO = sNegMainService.findById(NegMainId, titaVo);
+		String NegMainCaseKindCode = "";// 案件種類
+		BigDecimal NegMainPrincipalBal = new BigDecimal(0);// 總本金餘額
+		BigDecimal NegMainAccuOverAmt = new BigDecimal(0);// 累溢收金額
+		BigDecimal NegMainDueAmt = new BigDecimal(0);// 月付金(期款)
+		String NegMainCustLoanKind = "";// 債權戶別
+		BigDecimal NegMainAccuTempAmt = new BigDecimal(0);// 累暫收金額
+		BigDecimal NegMainAccuDueAmt = new BigDecimal(0);// 累期款金額
+		int OORemainPeriod = 0;// 尚餘期數=期數TotalPeriod-已繳期數RepaidPeriod
+		String NegMainStatus = "";// 狀態
+		BigDecimal NegMainAccuSklShareAmt = new BigDecimal(0);// 累新壽分攤金額
+
+		if (NegMainVO != null) {
+			NegMainCaseKindCode = NegMainVO.getCaseKindCode();
+			NegMainPrincipalBal = NegMainVO.getPrincipalBal();
+			NegMainAccuOverAmt = NegMainVO.getAccuOverAmt();
+			NegMainDueAmt = NegMainVO.getDueAmt();
+			NegMainCustLoanKind = NegMainVO.getCustLoanKind();
+			NegMainAccuTempAmt = NegMainVO.getAccuTempAmt();
+			NegMainAccuDueAmt = NegMainVO.getAccuDueAmt();
+			int TotalPeriod = NegMainVO.getTotalPeriod();// 期數
+			int RepaidPeriod = NegMainVO.getRepaidPeriod();// 已繳期數
+			OORemainPeriod = TotalPeriod - RepaidPeriod;
+			if (OORemainPeriod < 0) {//轉舊資料時有錯誤的已經期數造成期數為負值,調整為0 - 2022/10/28
+				OORemainPeriod = 0;
+			}
+			NegMainStatus = NegMainVO.getStatus();
+			NegMainAccuSklShareAmt = NegMainVO.getAccuSklShareAmt();
+		}
+
+		
+		Slice<NegTrans> slNegTrans = null;
+		if (iCustNo != 0) {
 			if (IntEntryDateStart != 0 || IntEntryDateEnd != 0) {
-				slNegTrans = sNegTransService.custAndAcDate(CustNo, IntEntryDateStart, IntEntryDateEnd, this.index, this.limit, titaVo);
+				slNegTrans = sNegTransService.custAndentryDateBetween(iCustNo,iCaseSeq, IntEntryDateStart, IntEntryDateEnd, this.index, this.limit, titaVo);
 			} else {
-//				slNegTrans = sNegTransService.custNoEq(CustNo, this.index, this.limit, titaVo);
-				slNegTrans = sNegTransService.custAndCaseSeq(CustNo,iCaseSeq, this.index, this.limit, titaVo);
+				slNegTrans = sNegTransService.custAndCaseSeq(iCustNo,iCaseSeq, this.index, this.limit, titaVo);
 			}
 		} else {
 			if (IntEntryDateStart != 0 && IntEntryDateEnd != 0) {
-				slNegTrans = sNegTransService.acDateBetween(IntEntryDateStart, IntEntryDateEnd, this.index, this.limit, titaVo);
+				slNegTrans = sNegTransService.entryDateBetween(IntEntryDateStart, IntEntryDateEnd, this.index, this.limit, titaVo);
 			}
 		}
 		List<NegTrans> lNegTrans = slNegTrans == null ? null : slNegTrans.getContent();
@@ -142,41 +163,6 @@ public class L5971 extends TradeBuffer {
 				}
 				OccursList occursList = new OccursList();
 
-				NegMainId NegMainId = new NegMainId();
-				NegMainId.setCaseSeq(NegTransCaseSeq);
-				NegMainId.setCustNo(parse.stringToInteger(String.valueOf(NegTransCustNo)));
-
-				NegMain NegMainVO = new NegMain();
-				NegMainVO = sNegMainService.findById(NegMainId, titaVo);
-				String NegMainCaseKindCode = "";// 案件種類
-				BigDecimal NegMainPrincipalBal = new BigDecimal(0);// 總本金餘額
-				BigDecimal NegMainAccuOverAmt = new BigDecimal(0);// 累溢收金額
-				BigDecimal NegMainDueAmt = new BigDecimal(0);// 月付金(期款)
-				String NegMainCustLoanKind = "";// 債權戶別
-				BigDecimal NegMainAccuTempAmt = new BigDecimal(0);// 累暫收金額
-				BigDecimal NegMainAccuDueAmt = new BigDecimal(0);// 累期款金額
-				int OORemainPeriod = 0;// 尚餘期數=期數TotalPeriod-已繳期數RepaidPeriod
-				String NegMainStatus = "";// 狀態
-
-				BigDecimal NegMainAccuSklShareAmt = new BigDecimal(0);// 累新壽分攤金額
-
-				if (NegMainVO != null) {
-					NegMainCaseKindCode = NegMainVO.getCaseKindCode();
-					NegMainPrincipalBal = NegMainVO.getPrincipalBal();
-					NegMainAccuOverAmt = NegMainVO.getAccuOverAmt();
-					NegMainDueAmt = NegMainVO.getDueAmt();
-					NegMainCustLoanKind = NegMainVO.getCustLoanKind();
-					NegMainAccuTempAmt = NegMainVO.getAccuTempAmt();
-					NegMainAccuDueAmt = NegMainVO.getAccuDueAmt();
-					int TotalPeriod = NegMainVO.getTotalPeriod();// 期數
-					int RepaidPeriod = NegMainVO.getRepaidPeriod();// 已繳期數
-					OORemainPeriod = TotalPeriod - RepaidPeriod;
-					if (OORemainPeriod < 0) {//轉舊資料時有錯誤的已經期數造成期數為負值,調整為0 - 2022/10/28
-						OORemainPeriod = 0;
-					}
-					NegMainStatus = NegMainVO.getStatus();
-					NegMainAccuSklShareAmt = NegMainVO.getAccuSklShareAmt();
-				}
 				this.info("L5971 " + String.valueOf(NegTransCustNo));
 				totaVo.putParam("OCustNo", NegTransCustNo);// 戶號
 				if (iCaseSeq != 0) {

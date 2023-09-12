@@ -59,14 +59,7 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,CB.\"BdLocation\"                         AS F18 ";
 		sql += "       ,M.\"ProdNo\" 	                          AS F19 ";
 		sql += "       ,F.\"FirstDrawdownDate\"                   AS F20 ";
-		sql += "       ,CASE  ";
-		sql += "       	  WHEN F.\"FirstDrawdownDate\" >= 20100101 ";
-		sql += "           AND (MF.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]'))";
-		sql += "       	  THEN '**'";
-		sql += "       	  WHEN F.\"FirstDrawdownDate\" < 20100101 ";
-		sql += "           AND (MF.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]'))";
-		sql += "       	  THEN '*'";
-		sql += "       	  ELSE ' ' END	AS F21";
+		sql += "       ,MF.\"GovProjectFlag\"	AS F21";
 		sql += "       ,CASE  ";
 		sql += "       	  WHEN (MF.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]'))";
 		sql += "       	  THEN 'Z'";
@@ -75,19 +68,15 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       	  WHEN M.\"ClCode1\" IN (3) ";
 		sql += "       	  THEN 'D'";
 		sql += "       	  ELSE 'C' END  AS F22";
-		sql += "       ,M.\"DepartmentCode\" 	                  AS F23 ";
-		sql += "       ,M.\"EntCode\" 	                          AS F24 ";
-		sql += "       , CASE WHEN M.\"ClCode1\" IN (1,2)  	      		 ";
-		sql += "         		AND CDI.\"IndustryItem\" LIKE '%不動產%' ";
-		sql += "       			THEN 'Y' 								";
-		sql += "       		  WHEN M.\"ClCode1\" IN (1,2)  	      		 ";
-		sql += "       		  	AND CDI.\"IndustryItem\" LIKE '%建築%'  	 ";
-		sql += "       		  	THEN 'Y'  	      		 				 ";
-		sql += "       	  	  ELSE ' ' END  AS F25							 ";
-		sql += "       ,M.\"AssetClass\" 	                          AS F26 ";
-		sql += "       ,M.\"AssetClass2\" 	                          AS F27 ";
-		sql += "       ,M.\"LawAmount\"	                          	  AS F28 ";
-		sql += "       ,M.\"LawAssetClass\"	                      	  AS F29 ";
+		sql += "       ,Mf.\"BuildingFlag\"  					  AS F23 ";
+		sql += "       ,M.\"SpecialAssetFlag\" 	                  AS F24 ";
+		sql += "       ,M.\"BankRelationFlag\" 	                  AS F25 ";
+		sql += "       ,M.\"DepartmentCode\" 	    	              AS F26 ";
+		sql += "       ,M.\"EntCode\" 	                          AS F27 ";
+		sql += "       ,Mf.\"AssetClass\" 	                          AS F28 ";
+		sql += "       ,Mf.\"AssetClass2\" 	                          AS F29 ";
+		sql += "       ,Mf.\"LawAmount\"	                          	  AS F30 ";
+		sql += "       ,Mf.\"LawAssetClass\"	                      	  AS F31 ";
 		sql += " FROM \"MonthlyLoanBal\" M ";
 		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = M.\"CustNo\" ";
 		sql += " LEFT JOIN \"LoanBorMain\" L ON L.\"CustNo\" = M.\"CustNo\" ";
@@ -111,6 +100,8 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   AND M.\"LoanBalance\" > 0 ";
 		sql += " ORDER BY F0,F1,F2 ";
 
+		
+		
 		this.info("sql=" + sql);
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);

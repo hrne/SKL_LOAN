@@ -284,24 +284,20 @@ public class L7205p extends TradeBuffer {
 			}
 		} // for
 
-		titaVo.setDataBaseOnOrg();// 還原原本的環境
-
-//		this.totaVo.putParam("CountAll", CountAll);
-//		this.totaVo.putParam("CountS", CountS);
-//		this.totaVo.putParam("CountF", CountF);
-
 		String note = "總筆數：" + CountAll + ",成功筆數：" + CountS + ",失敗筆數：" + CountF;
-		// 如果有失敗筆數屬於失敗
-//		if (CountF > 0) {
-//			note = "更新資料失敗。總筆數：" + CountAll + ",成功筆數：" + CountS + ",失敗筆數：" + CountF;
-//		}
 
 		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "",
 				titaVo.getParam("TLRNO"), note, titaVo);
 
+		titaVo.keepOrgDataBase();// 保留原本記號
+		updLM052ReportSPAndMonthlyFacBalData(titaVo, iYearMonth);
+
+		titaVo.setDataBaseOnMon();// 指定月報環境
 //		 重產LM051報表
 		titaVo.setBatchJobId("jLM051");
-		updLM052ReportSP(titaVo, iYearMonth);
+		updLM052ReportSPAndMonthlyFacBalData(titaVo, iYearMonth);
+
+		titaVo.setDataBaseOnOrg();// 還原原本的環境
 
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -390,22 +386,7 @@ public class L7205p extends TradeBuffer {
 
 			OccursList occursList = new OccursList();
 
-			// 等於1，表示前大於後
-			// 等於0，表示前等於後
-			// 等於-1，表示前小於後
-//			if ((iCustNo.compareTo(BigDecimal.ZERO) == -1 || iCustNo == null)
-//					&& (iFacmNo.compareTo(BigDecimal.ZERO) == -1 || iFacmNo == null)
-//					&& (iAssetClass.compareTo(BigDecimal.ZERO) == -1 || iAssetClass == null)) {
-//		}
-
-//			this.info("iCustNo=" + makeExcel.getValue(i, 2).toString());
-//			this.info("iFacmNo=" + makeExcel.getValue(i, 3).toString());
-//			this.info("iAssetClass=" + makeExcel.getValue(i, 8).toString());
-
 			// 正常是連續的資料串，遇到空值強行結束
-//			if (makeExcel.getValue(i, 2).toString().length() == 0 || makeExcel.getValue(i, 3).toString().length() == 0
-//					|| makeExcel.getValue(i, 8).toString().length() == 0
-//					|| makeExcel.getValue(i, 9).toString().length() == 0)
 			if (makeExcel.getValue(i, 2).toString().trim().length() == 0
 					|| makeExcel.getValue(i, 2).toString().trim() == "") {
 				break;
@@ -528,14 +509,24 @@ public class L7205p extends TradeBuffer {
 
 	}
 
-	private void updLM052ReportSP(TitaVo titaVo, int yearMonth) {
+	/**
+	 * 上傳五類資產檔案後，同步更新以下檔案 MonthlyLM052AssetClass 資產分類檔 MonthlyLM052LoanAsset 特定資產分類檔
+	 * MonthlyLM052Ovdu 逾期分類表
+	 * 
+	 * 20230912新增 MothlyFacBal SpecialAssetFlag 特定資產記號 MothlyFacBal BuildingFlag
+	 * 建築貸款記號 MothlyFacBal GovProjectFlag 政策性貸款記號
+	 */
+	private void updLM052ReportSPAndMonthlyFacBalData(TitaVo titaVo, int yearMonth) {
 		this.info("upd LM052 SP start.");
 		String empNo = titaVo.getTlrNo();
 		this.info("empNo=" + empNo);
 
-		sLM052AssetClass.Usp_L9_MonthlyLM052AssetClass_Ins(yearMonth, empNo, titaVo);
-		sLM052LoanAsset.Usp_L9_MonthlyLM052LoanAsset_Ins(yearMonth, empNo, titaVo);
-		sLM052Ovdu.Usp_L9_MonthlyLM052Ovdu_Ins(yearMonth, empNo, titaVo);
+		sLM052AssetClass.Usp_L9_MonthlyLM052AssetClass_Ins(yearMonth, empNo, "", titaVo);
+		sLM052LoanAsset.Usp_L9_MonthlyLM052LoanAsset_Ins(yearMonth, empNo, "", titaVo);
+		sLM052Ovdu.Usp_L9_MonthlyLM052Ovdu_Ins(yearMonth, empNo, "", titaVo);
+		// 更新MonthlyFacBal 利害關係人欄位
+		String txcd = titaVo.getTxcd();
+		tMothlyFacBalService.Usp_L7_UploadToMothlyFacBal_Upd(yearMonth, txcd, empNo, "", titaVo);
 
 		this.info("upd LM052 SP finished.");
 	}

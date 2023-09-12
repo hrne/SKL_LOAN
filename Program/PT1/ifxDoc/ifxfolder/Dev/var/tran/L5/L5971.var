@@ -100,7 +100,7 @@ C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@FunctionCode,#ChainSearch,1,2)
 IF(#FunctionCode=="05",$,S)
 T(1,@CustId,#ChainSearch,3,10)
-! T(1,@CustNo,#ChainSearch,13,7)
+T(1,@CustNo,#ChainSearch,13,7)
 T(1,@CaseSeq,#ChainSearch,20,3)
 INVOKEJS(SHOW,p1,03,03,0)
 
@@ -111,22 +111,50 @@ IF(#CHAIN==0,$,s)
 C(4,#CustId,S,$)
 A(ID_UNINO,0,#CustId)
 
-!身分證找戶號
-<include src="ROM.icf::L2R47.dec"/>
-#Rim2R47CustId=X,10,S
 
-#RimL2R47=X,1,S
-C(4,#CustId,S,$)
-T(2,@Rim2R47CustId,#CustId)
-RESET_RIM(#RimL2R47,L2R47)
-S(L2R47,1,#Rim2R47CustId)
-R(1,L2R47)
+! 調RIM找CustNo
+<include src="ROM.icf::L5R51.dec"/>
+#RimTxCode=X,5,S
+T(2,L5971)
+
+#RimCustId=X,10,S
+T(2,#CustId)
+
+#RimCustNo=A,7,S
+#RimCaseSeq=A,3,S
+#RimErrorFg=X,1,S
+
+!非連動需調rim
+#SendL5r51=X,1,S
+IF(#CHAIN==0,$,S)
+T(2,@RimCustId,#CustId)
+E(0,@RimCustNo,0)
+E(0,@RimCaseSeq,0)
+T(2,@RimErrorFg,Y)
+RESET_RIM(#SEND_L5R51,L5R51)
+S(L5R51,1,#RimCustId,#RimCustNo,#RimCaseSeq,#RimErrorFg)
+R(1,L5R51)
+
+#CustNo=A,7,S
+IF(#CHAIN==0,$,s)
+E(0,#L5r51CustNo)
+
+!身分證找戶號
+!<include src="ROM.icf::L2R47.dec"/>
+!#Rim2R47CustId=X,10,S
+!
+!#RimL2R47=X,1,S
+!C(4,#CustId,S,$)
+!T(2,@Rim2R47CustId,#CustId)
+!RESET_RIM(#RimL2R47,L2R47)
+!S(L2R47,1,#Rim2R47CustId)
+!R(1,L2R47)
 
 
 ! 案件序號
 #CaseSeq=A,3,I
 IF(#CHAIN==0,$,s)
-E(0,1)
+E(0,#L5r51CaseSeq)
 @V(7)
 V(2,0)
 
@@ -146,8 +174,7 @@ D(8)
 
 
 #MRKEY=_,_,S
-C(4,#CustId,S,$)
-T(2,#L2R47CustNo)
+T(2,#CustNo)
 
 #RPTFG=A,1,S
 E(0,0)
@@ -288,12 +315,13 @@ IF(#OOTxKind==8 || #OOTxKind==9,BIND(grid,cancel),$)
 #CaseSeq
 #EntryDateStart
 #EntryDateEnd
+#CustNo
 </sub>
 
 !------ 下行電文TOM ------
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
-<include src="ROM.icf::L2R47.tom"/>
+<include src="ROM.icf::L5R51.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L5971
 #OCustNo

@@ -360,19 +360,19 @@ em = null;
   }
 
   @Override
-  public void Usp_L9_MonthlyLM052LoanAsset_Ins(int tbsdyf,  String empNo, TitaVo... titaVo) {
+  public void Usp_L9_MonthlyLM052LoanAsset_Ins(int tbsdyf,  String empNo,  String jobTxSeq, TitaVo... titaVo) {
     String dbName = "";
     
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     if (dbName.equals(ContentName.onDay))
-      monthlyLM052LoanAssetReposDay.uspL9Monthlylm052loanassetIns(tbsdyf,  empNo);
+      monthlyLM052LoanAssetReposDay.uspL9Monthlylm052loanassetIns(tbsdyf,  empNo,  jobTxSeq);
     else if (dbName.equals(ContentName.onMon))
-      monthlyLM052LoanAssetReposMon.uspL9Monthlylm052loanassetIns(tbsdyf,  empNo);
+      monthlyLM052LoanAssetReposMon.uspL9Monthlylm052loanassetIns(tbsdyf,  empNo,  jobTxSeq);
     else if (dbName.equals(ContentName.onHist))
-      monthlyLM052LoanAssetReposHist.uspL9Monthlylm052loanassetIns(tbsdyf,  empNo);
+      monthlyLM052LoanAssetReposHist.uspL9Monthlylm052loanassetIns(tbsdyf,  empNo,  jobTxSeq);
    else
-      monthlyLM052LoanAssetRepos.uspL9Monthlylm052loanassetIns(tbsdyf,  empNo);
+      monthlyLM052LoanAssetRepos.uspL9Monthlylm052loanassetIns(tbsdyf,  empNo,  jobTxSeq);
   }
 
 }

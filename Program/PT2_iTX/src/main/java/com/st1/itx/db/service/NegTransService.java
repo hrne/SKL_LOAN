@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.NegTrans;
@@ -215,6 +217,20 @@ public interface NegTransService {
    * @return Slice NegTrans NegTrans of List
    */
   public Slice<NegTrans> custAndCaseSeq(int custNo_0, int caseSeq_1, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * CustNo = , AND CaseSeq = , AND EntryDate &gt;= , AND EntryDate &lt;=
+   *
+   * @param custNo_0 custNo_0
+   * @param caseSeq_1 caseSeq_1
+   * @param entryDate_2 entryDate_2
+   * @param entryDate_3 entryDate_3
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice NegTrans NegTrans of List
+   */
+  public Slice<NegTrans> custAndentryDateBetween(int custNo_0, int caseSeq_1, int entryDate_2, int entryDate_3, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By NegTrans

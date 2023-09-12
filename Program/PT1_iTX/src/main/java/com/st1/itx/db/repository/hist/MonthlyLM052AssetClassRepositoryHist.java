@@ -32,7 +32,7 @@ public interface MonthlyLM052AssetClassRepositoryHist extends JpaRepository<Mont
 
   // 
   @Procedure(value = "\"Usp_L9_MonthlyLM052AssetClass_Ins\"")
-  public void uspL9Monthlylm052assetclassIns(int tbsdyf,  String empNo);
+  public void uspL9Monthlylm052assetclassIns(int tbsdyf,  String empNo,  String jobTxSeq);
 
 }
 

@@ -37,9 +37,9 @@ public interface MonthlyFacBalRepositoryHist extends JpaRepository<MonthlyFacBal
   @Procedure(value = "\"Usp_L9_MonthlyFacBal_Upd\"")
   public void uspL9MonthlyfacbalUpd(int YYYYMM,  String empNo);
 
-  // 
+  // 上傳檔案(L7交易)並更新MonthlyFacBal相關欄位
   @Procedure(value = "\"Usp_L7_UploadToMothlyFacBal_Upd\"")
-  public void uspL7UploadtomothlyfacbalUpd(int YYYYMM,  String txcd,  String empNo);
+  public void uspL7UploadtomothlyfacbalUpd(int YYYYMM,  String txcd,  String empNo,  String jobTxSeq);
 
 }
 

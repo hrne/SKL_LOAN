@@ -194,15 +194,15 @@ BEGIN
           ,0                              AS "HandlingFee"         -- 手續費 DECIMAL 16 2 
           -- 2023-08-21 Wei 重寫 from 客戶別-央行管制代碼相關by盈如經理.xlsx
           ,CASE TRIM(APLP."CUSECD")
-             WHEN 'I' THEN 'B471' -- 自然人第3戶以上購屋貸款
-             WHEN 'L' THEN 'A001' -- 增貸管制戶
-             WHEN 'O' THEN 'B421' -- 購地貸款上限6.5成
-             WHEN 'Q' THEN 'B472' -- 自然人第4戶以上購屋貸款
-             WHEN 'V' THEN 'B482' -- 自然人購置高價住宅-3戶以上
-             WHEN 'W' THEN 'B430' -- 餘屋貸款
-             WHEN 'X' THEN 'B481' -- 自然人購置高價住宅-2戶以下
-             WHEN 'Y' THEN 'B460' -- 公司法人購置住宅
-             WHEN 'Z' THEN 'B450' -- 工業區閒置土地抵押貸款
+          --    WHEN 'I' THEN 'B0471' -- 自然人第3戶以上購屋貸款
+             WHEN 'L' THEN 'A0001' -- 增貸管制戶
+             WHEN 'O' THEN 'B0421' -- 購地貸款上限6.5成
+          --    WHEN 'Q' THEN 'B0472' -- 自然人第4戶以上購屋貸款
+             WHEN 'V' THEN 'B0482' -- 自然人購置高價住宅-3戶以上
+             WHEN 'W' THEN 'B0430' -- 餘屋貸款
+             WHEN 'X' THEN 'B0481' -- 自然人購置高價住宅-2戶以下
+             WHEN 'Y' THEN 'B0460' -- 公司法人購置住宅
+             WHEN 'Z' THEN 'B0450' -- 工業區閒置土地抵押貸款
            ELSE ''
            END                            AS "RuleCode"            -- 規定管制代碼 VARCHAR2 
           ,APLP."APLPCD"                  AS "ExtraRepayCode"      -- 攤還額異動碼 VARCHAR2 1  

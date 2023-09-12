@@ -1,4 +1,4 @@
-create or replace NONEDITIONABLE PROCEDURE "Usp_L9_MonthlyFacBal_Upd" 
+create or replace PROCEDURE "Usp_L9_MonthlyFacBal_Upd" 
 (
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
@@ -140,8 +140,10 @@ BEGIN
           ,'00A'                      AS "AcSubBookCode"       -- 區隔帳冊
           ,''                         AS "LawAssetClass"       -- 無擔保資產分類代號
           ,''                         AS "AssetClass2"       -- 資產五分類代號2(有擔保部分)
-	
-
+          ,''                         AS "BankRelationFlag"       -- 是否為利害關係人
+          ,''                      AS "GovProjectFlag"       -- 政策性專案貸款
+          ,''                      AS "BuildingFlag"       -- 建築貸款記號
+          ,''                      AS "SpecialAssetFlag"       -- 特定資產記號
     FROM "CollList" L
     LEFT JOIN "FacMain" FAC ON FAC."CustNo" = L."CustNo"
                            AND FAC."FacmNo" = L."FacmNo"
@@ -575,12 +577,7 @@ BEGIN
 
     DBMS_OUTPUT.PUT_LINE('UPDATE AssetClass1 END');
 
-
-
-    -- 記錄程式結束時間
-    JOB_END_TIME := SYSTIMESTAMP;
-
-    commit;
+    DBMS_OUTPUT.PUT_LINE('UPDATE AssetClass2 START');
 
     MERGE INTO "MonthlyFacBal" M
     USING (
@@ -647,9 +644,14 @@ BEGIN
     WHEN MATCHED THEN UPDATE SET
     "AssetClass2" = TMP."AssetClass2"
     ;
+   
+    UPD_CNT := UPD_CNT + sql%rowcount;
 
+    DBMS_OUTPUT.PUT_LINE('UPDATE AssetClass2 END');
 
-
+    COMMIT;
+    -- 記錄程式結束時間
+    JOB_END_TIME := SYSTIMESTAMP;
 
     -- 例外處理
     Exception
@@ -666,4 +668,3 @@ BEGIN
     RAISE;
   END;
 END;
-

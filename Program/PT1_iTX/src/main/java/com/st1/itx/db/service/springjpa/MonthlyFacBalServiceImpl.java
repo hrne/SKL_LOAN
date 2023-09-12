@@ -404,19 +404,19 @@ em = null;
   }
 
   @Override
-  public void Usp_L7_UploadToMothlyFacBal_Upd(int YYYYMM,  String txcd,  String empNo, TitaVo... titaVo) {
+  public void Usp_L7_UploadToMothlyFacBal_Upd(int YYYYMM,  String txcd,  String empNo,  String jobTxSeq, TitaVo... titaVo) {
     String dbName = "";
     
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     if (dbName.equals(ContentName.onDay))
-      monthlyFacBalReposDay.uspL7UploadtomothlyfacbalUpd(YYYYMM,  txcd,  empNo);
+      monthlyFacBalReposDay.uspL7UploadtomothlyfacbalUpd(YYYYMM,  txcd,  empNo,  jobTxSeq);
     else if (dbName.equals(ContentName.onMon))
-      monthlyFacBalReposMon.uspL7UploadtomothlyfacbalUpd(YYYYMM,  txcd,  empNo);
+      monthlyFacBalReposMon.uspL7UploadtomothlyfacbalUpd(YYYYMM,  txcd,  empNo,  jobTxSeq);
     else if (dbName.equals(ContentName.onHist))
-      monthlyFacBalReposHist.uspL7UploadtomothlyfacbalUpd(YYYYMM,  txcd,  empNo);
+      monthlyFacBalReposHist.uspL7UploadtomothlyfacbalUpd(YYYYMM,  txcd,  empNo,  jobTxSeq);
    else
-      monthlyFacBalRepos.uspL7UploadtomothlyfacbalUpd(YYYYMM,  txcd,  empNo);
+      monthlyFacBalRepos.uspL7UploadtomothlyfacbalUpd(YYYYMM,  txcd,  empNo,  jobTxSeq);
   }
 
 }

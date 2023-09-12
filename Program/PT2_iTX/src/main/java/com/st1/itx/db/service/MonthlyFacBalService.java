@@ -145,13 +145,14 @@ public interface MonthlyFacBalService {
 
   /**
    * Stored Procedure<br>
-   * 
+   * 上傳檔案(L7交易)並更新MonthlyFacBal相關欄位
    * @param  YYYYMM int
    * @param  txcd String
    * @param  empNo String
+   * @param  jobTxSeq String
    * @param titaVo Variable-Length Argument
    *
    */
-  public void Usp_L7_UploadToMothlyFacBal_Upd(int YYYYMM,  String txcd,  String empNo, TitaVo... titaVo);
+  public void Usp_L7_UploadToMothlyFacBal_Upd(int YYYYMM,  String txcd,  String empNo,  String jobTxSeq, TitaVo... titaVo);
 
 }

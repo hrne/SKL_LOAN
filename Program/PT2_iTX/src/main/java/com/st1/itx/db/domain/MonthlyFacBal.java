@@ -298,7 +298,7 @@ public class MonthlyFacBal implements Serializable {
   private String bankRelationFlag;
 
   // 政策性專案貸款
-  /* 寫入時為空值，L7205上傳更新Y:初貸日大於等於20110101C:初貸日小於20110101N:無 */
+  /* 寫入時為空值，L7205上傳更新政策性專案中:Y:初貸日大於等於20110101C:初貸日小於20110101N:無 */
   @Column(name = "`GovProjectFlag`", length = 1)
   private String govProjectFlag;
 
@@ -1578,6 +1578,7 @@ Y/N
 /**
 	* 政策性專案貸款<br>
 	* 寫入時為空值，L7205上傳更新
+政策性專案中:
 Y:初貸日大於等於20110101
 C:初貸日小於20110101
 N:無
@@ -1590,6 +1591,7 @@ N:無
 /**
 	* 政策性專案貸款<br>
 	* 寫入時為空值，L7205上傳更新
+政策性專案中:
 Y:初貸日大於等於20110101
 C:初貸日小於20110101
 N:無

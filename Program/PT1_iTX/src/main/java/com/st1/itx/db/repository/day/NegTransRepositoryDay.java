@@ -3,11 +3,14 @@ package com.st1.itx.db.repository.day;
 
 import java.util.Optional;
 
+import java.math.BigDecimal;
+import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,7 +68,10 @@ public interface NegTransRepositoryDay extends JpaRepository<NegTrans, NegTransI
   public Slice<NegTrans> findAllByAcDateIsAndTitaTxtNoIs(int acDate_0, int titaTxtNo_1, Pageable pageable);
 
   // CustNo = , AND CaseSeq =
-  public Slice<NegTrans> findAllByCustNoIsAndCaseSeqIsOrderByCaseSeqDescAcDateDesc(int custNo_0, int caseSeq_1, Pageable pageable);
+  public Slice<NegTrans> findAllByCustNoIsAndCaseSeqIsOrderByEntryDateDescAcDateDesc(int custNo_0, int caseSeq_1, Pageable pageable);
+
+  // CustNo = , AND CaseSeq = , AND EntryDate >= , AND EntryDate <=
+  public Slice<NegTrans> findAllByCustNoIsAndCaseSeqIsAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByEntryDateDescAcDateDesc(int custNo_0, int caseSeq_1, int entryDate_2, int entryDate_3, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

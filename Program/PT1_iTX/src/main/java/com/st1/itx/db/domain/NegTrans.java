@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class NegTrans implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -2284379722208849524L;
-
-@EmbeddedId
+  @EmbeddedId
   private NegTransId negTransId;
 
   // 會計日期
@@ -65,7 +61,7 @@ public class NegTrans implements Serializable {
   private int txStatus = 0;
 
   // 交易別
-  /* 0:正常-匯入款＋溢收款 &amp;gt;= 期款1:溢繳(預收多期)-匯入款 &amp;gt; 期款2:短繳-匯入款＋溢收款 &amp;lt; 期款3:提前還本-匯入款 &amp;gt;= 5期期款4:結清-匯入款＋溢收款 &amp;gt;=最後一期期款5:提前清償-匯入款＋溢收款 &amp;gt;= 剩餘期款6:撥付失敗重撥7:滿期8:註銷9:未處理※入帳訂正需在撥付產擋前，依反向順序訂正 */
+  /* 0:正常-匯入款＋溢收款 &amp;gt;= 期款1:溢繳(預收多期)-匯入款 &amp;gt; 期款2:短繳-匯入款＋溢收款 &amp;lt; 期款3:提前還本-匯入款 &amp;gt;= 5期期款4:結清-匯入款＋溢收款 &amp;gt;=剩餘期款5:預收還款6:撥付失敗重撥7:滿期8:註銷9:未處理※入帳訂正需在撥付產擋前，依反向順序訂正 */
   @Column(name = "`TxKind`", length = 1)
   private String txKind;
 
@@ -383,8 +379,8 @@ public class NegTrans implements Serializable {
 1:溢繳(預收多期)-匯入款 &amp;gt; 期款
 2:短繳-匯入款＋溢收款 &amp;lt; 期款
 3:提前還本-匯入款 &amp;gt;= 5期期款
-4:結清-匯入款＋溢收款 &amp;gt;=最後一期期款
-5:提前清償-匯入款＋溢收款 &amp;gt;= 剩餘期款
+4:結清-匯入款＋溢收款 &amp;gt;=剩餘期款
+5:預收還款
 6:撥付失敗重撥
 7:滿期
 8:註銷
@@ -402,8 +398,8 @@ public class NegTrans implements Serializable {
 1:溢繳(預收多期)-匯入款 &amp;gt; 期款
 2:短繳-匯入款＋溢收款 &amp;lt; 期款
 3:提前還本-匯入款 &amp;gt;= 5期期款
-4:結清-匯入款＋溢收款 &amp;gt;=最後一期期款
-5:提前清償-匯入款＋溢收款 &amp;gt;= 剩餘期款
+4:結清-匯入款＋溢收款 &amp;gt;=剩餘期款
+5:預收還款
 6:撥付失敗重撥
 7:滿期
 8:註銷

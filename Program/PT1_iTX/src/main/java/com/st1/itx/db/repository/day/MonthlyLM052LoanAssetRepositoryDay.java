@@ -32,7 +32,7 @@ public interface MonthlyLM052LoanAssetRepositoryDay extends JpaRepository<Monthl
 
   // 
   @Procedure(value = "\"Usp_L9_MonthlyLM052LoanAsset_Ins\"")
-  public void uspL9Monthlylm052loanassetIns(int tbsdyf,  String empNo);
+  public void uspL9Monthlylm052loanassetIns(int tbsdyf,  String empNo,  String jobTxSeq);
 
 }
 
