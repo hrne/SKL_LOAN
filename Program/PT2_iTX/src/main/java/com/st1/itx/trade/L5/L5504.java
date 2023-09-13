@@ -14,7 +14,9 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.db.domain.CdLoanNotYet;
 import com.st1.itx.db.domain.PfRewardMedia;
+import com.st1.itx.db.domain.PfRewardMediaId;
 import com.st1.itx.db.domain.TxControl;
 import com.st1.itx.db.service.PfRewardMediaService;
 import com.st1.itx.db.service.TxControlService;
@@ -75,9 +77,9 @@ public class L5504 extends TradeBuffer {
 			sendRsp.addvReason(this.txBuffer, titaVo, "0004", "異動獎金資料");
 		}
 
-		long iBonusNo = Long.valueOf(titaVo.get("BonusNo").trim());
+		long iLogNo = Long.valueOf(titaVo.get("BonusNo").trim());
 
-		PfRewardMedia pfRewardMedia = pfRewardMediaService.holdById(iBonusNo, titaVo);
+		PfRewardMedia pfRewardMedia = pfRewardMediaService.holdById(iLogNo, titaVo);
 
 		if (pfRewardMedia == null) {
 			if ("1".equals(iFunCode)) {

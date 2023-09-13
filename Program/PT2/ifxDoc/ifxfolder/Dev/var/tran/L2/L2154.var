@@ -773,7 +773,6 @@ T(3,CdCode.FreqBase2)
 
 #FreqBase2Help=x,1024,S
 
-
 ![綠色支出類別]
 #CDDEF33=x,30,S
 T(3,CdCode.GrKind)
@@ -791,9 +790,15 @@ T(3,CdCode.ProdBreachCode)
 
 #ProdBreachCodeHelp=x,1024,S
 
+!CdRuleCode
+#CDDEF36=x,30,S
+T(3,CdRuleCode)
+
+#CdRuleCodeHelp=x,1024,S
+
 #HelpRim4=X,1,S
 RESET_RIM(#HelpRim4,XXR99)
-S(XXR99,01,#CDDEF31,#CDDEF32,#CDDEF33,#CDDEF34,#CDDEF35)
+S(XXR99,01,#CDDEF31,#CDDEF32,#CDDEF33,#CDDEF34,#CDDEF35,#CDDEF36)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@ClTypeCodeHelp,#HelpDesc1)
@@ -801,6 +806,8 @@ T(2,@FreqBase2Help,#HelpDesc2)
 T(2,@GrKindHelp,#HelpDesc3)
 T(2,@EsGKindHelp,#HelpDesc4)
 T(2,@ProdBreachCodeHelp,#HelpDesc5)
+T(2,@CdRuleCodeHelp,#HelpDesc6)
+T(B,@RuleCodeHelp,#RuleCodeHelp+;+#CdRuleCodeHelp)
 
 #FuncCodeHelp=x,40,S
 T(3,1:新增;2:修改;4:刪除;5:查詢)
@@ -857,7 +864,7 @@ C(3,#FuncCode,5,K(MODIFYBUTTON,查詢)E(0,@RELCD,0)E(0,@ACTFG,0),$)
 C(3,#FuncCode,5,K(NOBUTTON,CLOSEY),$)
 C(3,#FuncCode,5,SHOW(#LbBaseRateX),SHOW(#BaseRate,#BaseRateX))
 
-!刪除隱藏重新交易按鈕
+!新增以外隱藏重新交易按鈕
 #AGAIN=X,1,S
 C(3,#FuncCode,1,S,$)
 E(0,1)ASGN(AGAIN$)
@@ -2453,7 +2460,7 @@ C(3,#UpdateCode,1,$,s)
 C(3,#Hide4Fg,0,CALL(#HideP4),$)
 HELP(#CustTypeCodeHelp)
 @V(H,#CustTypeCodeHelp)
-C(3,#CustTypeCode,1,E(0,@RuleCode,00)T(F,@RuleCode,0)T(3,@FdRuleCode,),T(F,@RuleCode,1)T(3,@FdRuleCode,*))
+C(3,#CustTypeCode,1,T(2,@RuleCode,00)T(F,@RuleCode,0)T(3,@FdRuleCode,),T(F,@RuleCode,1)T(3,@FdRuleCode,*))
 
 #CustTypeCodeX=X,20,L
 T(H,#CustTypeCode,#CustTypeCodeHelp)
@@ -2461,7 +2468,7 @@ T(H,#CustTypeCode,#CustTypeCodeHelp)
 ![規定管制代碼]
 #FdRuleCode=X,2,L
 
-#RuleCode=A,2,I
+#RuleCode=X,5,I
 C(3,#UpdateCode,1,$,s)
 C(3,#CustTypeCode,1,s,$)
 HELP(#RuleCodeHelp)

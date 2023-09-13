@@ -91,25 +91,9 @@ public class L7206 extends TradeBuffer {
 		} else {
 			// 2023-08-21 Wei 新增 from SKL-IT 葛經理
 			MySpring.newTask("L7206p", this.txBuffer, titaVo);
+
+			updL7UploadData(titaVo);
 		}
-		
-		//2023-09-12 更新MonthlyFacBal BankRelationFlag
-		int iYYMM = Integer.valueOf(titaVo.getParam("inputAcDate")) / 100;
-		String tlrno = titaVo.getTlrNo();
-		String txcd = titaVo.getTxcd();
-		
-		titaVo.keepOrgDataBase();// 保留原本記號
-		tMonthlyFacBalService.Usp_L7_UploadToMothlyFacBal_Upd(iYYMM, txcd, tlrno,"", titaVo);
-	
-		this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
-		if ("onLine".equals(titaVo.getDataBase())) {
-			titaVo.setDataBaseOnMon();// 指定月報環境
-		} else {
-			titaVo.setDataBaseOnLine();// 指定連線環境
-		}
-		tMonthlyFacBalService.Usp_L7_UploadToMothlyFacBal_Upd(iYYMM, txcd, tlrno,"", titaVo);
-		titaVo.setDataBaseOnOrg();// 還原原本的環境
-		
 
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -418,6 +402,8 @@ public class L7206 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
+
+			updL7UploadData(titaVo);
 
 			// 2:人壽利關人職員名單[T07_2];xlsx xls
 		} else if (iFunctionCode == 2) {
@@ -905,22 +891,24 @@ public class L7206 extends TradeBuffer {
 		return resText;
 	}
 
-	private String maskData(String text) {
-		String resText = "";
-		int textCount = text.length();
-		String tmpChar = "";
-		for (int i = 0; i < textCount; i++) {
 
-			if ((i + 1) % 2 == 0) {
-				tmpChar = "Ｏ";
-			} else {
-				tmpChar = text.substring(i, i + 1);
-			}
+	
+	/**
+	 * 更新MonthlyFacBal.BankRelationFlag 利害關係人欄位
+	 * */
+	private void updL7UploadData(TitaVo titaVo) throws LogicException {
 
-			resText = resText + tmpChar;
-		}
+		// 2023-09-12 更新MonthlyFacBal BankRelationFlag
+		int iYYMM = Integer.valueOf(titaVo.getParam("inputAcDate")) / 100;
+		String tlrno = titaVo.getTlrNo();
+		String txcd = titaVo.getTxcd();
 
-		return resText;
+		titaVo.setDataBaseOnLine();// 指定連線環境
+		tMonthlyFacBalService.Usp_L7_UploadToMothlyFacBal_Upd(iYYMM, txcd, tlrno, "", titaVo);
+
+		titaVo.setDataBaseOnMon();// 指定月報環境
+		tMonthlyFacBalService.Usp_L7_UploadToMothlyFacBal_Upd(iYYMM, txcd, tlrno, "", titaVo);
+
 	}
 
 }

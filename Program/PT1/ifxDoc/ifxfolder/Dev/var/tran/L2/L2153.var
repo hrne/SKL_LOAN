@@ -631,6 +631,11 @@ T(3,CdCode.ProdBreachCode)
 
 #ProdBreachCodeHelp=x,1024,S
 
+!CdRuleCode
+#CDDEF29=x,30,S
+T(3,CdRuleCode)
+
+#CdRuleCodeHelp=x,1024,S
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
@@ -666,7 +671,7 @@ T(2,@BaseRate0Help,#HelpDesc10)
 
 #HelpRim3=X,1,S
 RESET_RIM(#HelpRim3,XXR99)
-S(XXR99,01,#CDDEF21,#CDDEF22,#CDDEF23,#CDDEF24,#CDDEF25,#CDDEF26,#CDDEF27,#CDDEF28)
+S(XXR99,01,#CDDEF21,#CDDEF22,#CDDEF23,#CDDEF24,#CDDEF25,#CDDEF26,#CDDEF27,#CDDEF28,#CDDEF29)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@ProdIntCalcCodeHelp,#HelpDesc1)
@@ -677,6 +682,10 @@ T(2,@FreqBase2Help,#HelpDesc5)
 T(2,@GrKindHelp,#HelpDesc6)
 T(2,@EsGKindHelp,#HelpDesc7)
 T(2,@ProdBreachCodeHelp,#HelpDesc8)
+T(2,@CdRuleCodeHelp,#HelpDesc9)
+ALERT(A,#RuleCodeHelp)
+T(B,@RuleCodeHelp,#RuleCodeHelp+;+#CdRuleCodeHelp)
+ALERT(B,#RuleCodeHelp)
 
 #BankCdHelp2=x,1024,S
 T(2,700:郵局;+#BankCdHelp)
@@ -937,7 +946,7 @@ E(0,@UtilDeadline,#L2r50UtilDeadline)
 E(0,@GracePeriod,#L2r50GracePeriod)
 E(0,@ExtraRepayCode,#L2r50ExtraRepayCode)
 E(0,@IntCalcCode,#L2r50IntCalcCode)
-E(0,@RuleCode,#L2r50RuleCode)
+T(2,@RuleCode,#L2r50RuleCode)
 E(0,@RecycleCode,#L2r50RecycleCode)
 E(0,@RecycleDeadline,#L2r50RecycleDeadline)
 E(0,@UsageCode,#L2r50UsageCode)
@@ -1776,7 +1785,7 @@ T(H,#IntCalcCode,#ProdIntCalcCodeHelp)
 C(4,#CustTypeCode,T(3,00),$)
 HELP(#CustTypeCodeHelp)
 @V(H,#CustTypeCodeHelp)
-C(3,#CustTypeCode,1,E(0,@RuleCode,00)T(F,@RuleCode,0)T(3,@FdRuleCode,),T(F,@RuleCode,1)T(3,@FdRuleCode,*))
+C(3,#CustTypeCode,1,T(2,@RuleCode,00)T(F,@RuleCode,0)T(3,@FdRuleCode,),T(F,@RuleCode,1)T(3,@FdRuleCode,*))
 
 #CustTypeCodeX=X,20,L
 T(H,#CustTypeCode,#CustTypeCodeHelp)
@@ -1785,7 +1794,7 @@ T(H,#CustTypeCode,#CustTypeCodeHelp)
 ![規定管制代碼]
 #FdRuleCode=X,2,L
 
-#RuleCode=A,2,I
+#RuleCode=X,5,I
 C(3,#CustTypeCode,1,s,$)
 HELP(#RuleCodeHelp)
 @V(H,#RuleCodeHelp)

@@ -1,6 +1,9 @@
 package com.st1.itx.trade.L5;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -19,10 +22,12 @@ import com.st1.itx.db.service.PfRewardService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.TxControlService;
 import com.st1.itx.db.domain.FacProd;
+import com.st1.itx.db.domain.PfDetail;
 import com.st1.itx.db.domain.PfReward;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanBorMainId;
 import com.st1.itx.db.service.FacProdService;
+import com.st1.itx.db.service.PfDetailService;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CdWorkMonth;
 import com.st1.itx.db.domain.CdWorkMonthId;
@@ -200,8 +205,8 @@ public class L5R37 extends TradeBuffer {
 			this.totaVo.putParam("LastUpdate", "");
 			this.totaVo.putParam("LastEmpName", "");
 		} else {
-			long iBonusNo = Long.valueOf(titaVo.get("BonusNo").trim());
-			PfRewardMedia pfRewardMedia = pfRewardMediaService.findById(iBonusNo, titaVo);
+			long iLogNo = Long.valueOf(titaVo.get("BonusNo").trim());
+			PfRewardMedia pfRewardMedia = pfRewardMediaService.findById(iLogNo, titaVo);
 
 			if (pfRewardMedia == null) {
 				throw new LogicException("E0001", "");

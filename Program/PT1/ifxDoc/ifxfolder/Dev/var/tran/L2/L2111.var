@@ -430,7 +430,6 @@ E(0,0)
 ![申請號碼]
 !新增時不必輸入由電腦自動給號,其他必須輸入
 
-
 #ApplNo=A,7,L
 
 #SendL2r02=X,1,S
@@ -602,10 +601,12 @@ T(2,@CurrencyCode,#L2r01CurrencyCode)
 
 #WkLB=X,1,S
 C(3,#UpdateCode,1,
-   SHOW(#ApplDate,#ProdName,#CurrencyCode,#TwApplAmt,#PieceCodeX,#ProcessCode,#ProcessCodeX,#Estimate,#EstimateX,#CreditOfficer,#CreditOfficerX,#LoanOfficer,#LoanOfficerX,#Introducer,#IntroducerX,#Supervisor,#SupervisorX,#ProcessCodeX,#GroupId,#GroupIdX)
+   SHOW(#ApplDate,#ProdName,#CurrencyCode,#TwApplAmt,#PieceCodeX,#ProcessCode,#ProcessCodeX,#Estimate,#EstimateX,#CreditOfficer,
+   #CreditOfficerX,#LoanOfficer,#LoanOfficerX,#Introducer,#IntroducerX,#Supervisor,#SupervisorX,#ProcessCodeX,#GroupId,#GroupIdX)
    SHOW(#BTN3,#BTN4,#BTN5,#BTN6,#BTN7,#BTN8)
    HIDE(#LbApplDate,#UsApplAmt,#LbApplAmt)
-  ,SHOW(#LbApplDate,#ProdName,#CurrencyCode,#LbApplAmt,#PieceCodeX,#ProcessCodeX,#EstimateX,#CreditOfficerX,#LoanOfficerX,#IntroducerX,#SupervisorX,#ProcessCodeX,#GroupIdX)
+  ,SHOW(#LbApplDate,#ProdName,#CurrencyCode,#LbApplAmt,#PieceCodeX,#ProcessCodeX,#EstimateX,#CreditOfficerX,#LoanOfficerX,
+  #IntroducerX,#SupervisorX,#ProcessCodeX,#GroupIdX)
    HIDE(#BTN1,#BTN3,#BTN4,#BTN5,#BTN6,#BTN7,#BTN8,#BTN9)
    HIDE(#ApplDate,#TwApplAmt,#UsApplAmt,#ProcessCode))
 
@@ -640,6 +641,7 @@ T(F,#Estimate,0)
 T(F,#CreditOfficer,0)
 T(F,#LoanOfficer,0)
 T(F,#Introducer,0)
+T(F,@ApprovedLevel,0)
 T(F,#Supervisor,0)
 T(F,#Coorgnizer,0)
 T(F,#GroupId,0)
@@ -1005,6 +1007,7 @@ BIND(#BTN8,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF8A;ntxbuf5=type<-1:Supervi
 #FdApprovedLevel=X,2,L
 
 #ApprovedLevel=X,1,I
+C(3,#UpdateCode,1,$,s)
 HELP(#ApprovedLevelHelp)
 @
 C(4,#ApprovedLevel,$,V(H,#ApprovedLevelHelp))

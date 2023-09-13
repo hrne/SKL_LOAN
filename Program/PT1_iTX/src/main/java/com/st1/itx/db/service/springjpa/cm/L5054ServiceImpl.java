@@ -84,7 +84,7 @@ public class L5054ServiceImpl extends ASpringJpaParm implements InitializingBean
 				+ "d.\"CreateDate\" as \"MediaDate\", " // 產出媒體檔日期
 				+ "a.\"ManualFg\", " // 人工新增記號
 				+ "a.\"BonusType\", " // 獎金類別 15
-				+ "a.\"BonusNo\", " // 序號 16
+				+ "a.\"LogNo\", " // 序號 16
 				+ "a.\"Remark\", " // 備註
 				+ "a.\"CreateDate\", " // 建檔日期時間
 				+ "a.\"CreateEmpNo\", " // 建檔人員

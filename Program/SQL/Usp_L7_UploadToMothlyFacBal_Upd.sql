@@ -1,5 +1,5 @@
 --上傳檔案去更新月報額度明細
-CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L7_UploadToMothlyFacBal_Upd" 
+CREATE OR REPLACE PROCEDURE "Usp_L7_UploadToMothlyFacBal_Upd" 
 (
     -- 參數
     TYYMM          IN  INT,        -- 本月資料年月(西元)
