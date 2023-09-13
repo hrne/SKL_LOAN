@@ -81,7 +81,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     FROM \"AcDetail\" AC ";
 		sql += "     LEFT JOIN \"CdAcCode\" CDAC ON CDAC.\"AcNoCode\" = AC.\"AcNoCode\" ";
 		sql += "                              AND CDAC.\"AcSubCode\" = AC.\"AcSubCode\" ";
-		sql += "                              AND CDAC.\"AcDtlCode\" = AC.\"AcDtlCode\" ";
+		sql += "                              AND CDAC.\"AcDtlCode\" = '  ' ";
 		sql += "     LEFT JOIN \"CdCode\" CD ON CD.\"DefCode\" = 'AcSubBookCode' ";
 		sql += "                              AND CD.\"Code\" = AC.\"AcSubBookCode\" ";
 		sql += "     LEFT JOIN \"CustMain\" CM ON AC.\"CustNo\" != 0 ";

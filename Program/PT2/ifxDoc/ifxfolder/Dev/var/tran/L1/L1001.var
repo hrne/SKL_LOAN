@@ -294,7 +294,7 @@ T(3,1)ASGN(LOOP$)
 #OOGraceConditionFg=A,1,S
 #OOCustId=X,10,L
 #OOCustNo=A,7,L
-#OOCustTypeCode=A,2,S
+#OOCustTypeCode=X,3,S
 #OOCustTypeItem=X,10,S
 T(H,#OOCustTypeCode,#CustTypeCodeHelp)
 #OOCustName=x,100,L

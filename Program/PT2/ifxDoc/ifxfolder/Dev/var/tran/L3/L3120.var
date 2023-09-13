@@ -1068,7 +1068,7 @@ BIND(#BTNHIDEP6,click, {cmd=CALLSEND;DOCODE=HIDEP6})
 ![客戶別]
 #FdCustTypeCode=X,2,L
 
-#CustTypeCode=X,2,S
+#CustTypeCode=X,3,S
 T(2,#L2r05CustTypeCode)
 
 #CustTypeCodeX=X,20,L

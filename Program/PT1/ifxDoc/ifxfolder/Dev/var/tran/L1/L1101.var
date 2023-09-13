@@ -642,7 +642,7 @@ HELP(#SexHelp)
 T(H,#Sex,#SexHelp)
 
 !客戶別
-#CustTypeCode=X,2,I
+#CustTypeCode=X,3,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(4,#CustTypeCode,T(3,00),$)
@@ -1497,7 +1497,7 @@ T(H,#OTypeCode,#TypeCodeHelp)
 #OSexX=X,2,L
 T(H,#OSex,#SexHelp)
 !客戶別
-#OCustTypeCode=X,2,L
+#OCustTypeCode=X,3,L
 #OCustTypeCodeX=X,10,L
 T(H,#OCustTypeCode,#CustTypeCodeHelp)
 !行業別

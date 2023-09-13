@@ -69,6 +69,8 @@ public class L9701Report extends MakeReport {
 	String nextPageText = "=====  續下頁  =====";
 	String endText = "=====  報  表  結  束  =====";
 
+	int rowMax = 60;
+
 	@Override
 	public void printHeader() {
 
@@ -103,7 +105,7 @@ public class L9701Report extends MakeReport {
 		this.setBeginRow(7);
 
 		// 設定明細列數(自訂亦必須)
-		this.setMaxRows(50);
+		this.setMaxRows(rowMax);
 
 	}
 
@@ -311,26 +313,26 @@ public class L9701Report extends MakeReport {
 				// 要判斷額度看上一額度與現在額度 是否相同 不同的話用第一表頭 相同的話用 第二表頭
 
 				// 判斷換頁
-				// 額度相同 且 列數大於43 nextPage(2)表示換下頁時的表頭用表頭2
-				if (isNotSameFacmNo && this.NowRow >= 43) {
+				// 額度相同 且 列數大於52 nextPage(2)表示換下頁時的表頭用表頭2
+				if (isNotSameFacmNo && this.NowRow >= 52) {
 					this.info("type1");
 					this.nextPage(2);
 				}
-				// 額度不同 且 列數大於43，列印總計的列數 nextPage(1)表示換下頁時的表頭用表頭1
-				if (!isNotSameFacmNo && this.NowRow >= 43) {
+				// 額度不同 且 列數大於52，列印總計的列數 nextPage(1)表示換下頁時的表頭用表頭1
+				if (!isNotSameFacmNo && this.NowRow >= 52) {
 					this.info("type2");
 					printFacEnd(this.facmNo);
 					this.nextPage(1);
 				}
-				// 額度不同 且 列數小於等於36，要列印總計列數加上表頭列數 nextPage(3)表示不用換頁但要印表頭1
-				if (!isNotSameFacmNo && this.NowRow <= 36) {
+				// 額度不同 且 列數小於等於46，要列印總計列數加上表頭列數 nextPage(3)表示不用換頁但要印表頭1
+				if (!isNotSameFacmNo && this.NowRow <= 46) {
 					this.info("type3");
 					printFacEnd(this.facmNo);
 					this.nextPage(11);
 
 				}
-				// 額度不同 且 列數大於36，因36~43列數空間不足以列印總計加錶頭列數所以要換頁用表頭1
-				if (!isNotSameFacmNo && this.NowRow > 36) {
+				// 額度不同 且 列數大於46，因36~43列數空間不足以列印總計加錶頭列數所以要換頁用表頭1
+				if (!isNotSameFacmNo && (this.NowRow > 46)) {
 					this.info("type4");
 					printFacEnd(this.facmNo);
 					this.nextPage(1);
@@ -339,7 +341,7 @@ public class L9701Report extends MakeReport {
 				// 最後一筆 列印結束報表
 				if (cntAll == listL9701.size()) {
 					printFacEnd(this.facmNo);
-					this.print(-45, this.getMidXAxis(), endText, "C");
+				
 				}
 
 			}
@@ -347,6 +349,8 @@ public class L9701Report extends MakeReport {
 			printFacHead2();
 			this.print(1, 20, "*******    查無資料   ******");
 		}
+		//列印結束報表
+		this.print(-56, this.getMidXAxis(), endText, "C");
 
 		this.close();
 
@@ -355,8 +359,6 @@ public class L9701Report extends MakeReport {
 	private void printDetail(Map<String, String> tL9701Vo) {
 		// 入帳日
 		this.print(1, 4, showRocDate(tL9701Vo.get("EntryDate"), 1));
-
-//		this.print(0, 1, this.NowRow + "");
 
 		// 繳款方式RepayItem
 		this.print(0, 14, tL9701Vo.get("RepayItem"));
@@ -393,6 +395,8 @@ public class L9701Report extends MakeReport {
 
 		this.print(0, 165, "0".equals(titaVo.get("CorrectType")) ? "  " : tL9701Vo.get("TitaHCode"), "R");
 
+		loanBal = new BigDecimal(tL9701Vo.get("Amount"));
+
 		principal = new BigDecimal(tL9701Vo.get("Principal"));
 		interest = new BigDecimal(tL9701Vo.get("Interest"));
 		breachAmt = new BigDecimal(tL9701Vo.get("BreachAmt"));
@@ -404,24 +408,6 @@ public class L9701Report extends MakeReport {
 	}
 
 	private void printFacEnd(String facmNo) {
-//		shortFall = BigDecimal.ZERO;
-		excessive = BigDecimal.ZERO;
-
-//		int tmpFacmNo = Integer.parseInt(tL9701Vo.get("FacmNo"));
-//		loanBal = new BigDecimal(tL9701Vo.get("Amount"));
-//		if (listBaTxVo != null && listBaTxVo.size() != 0) {
-//			for (BaTxVo tBaTxVo : listBaTxVo) {
-//				if (tBaTxVo.getFacmNo() == tmpFacmNo) {
-//					if (tBaTxVo.getDataKind() == 1 && tBaTxVo.getRepayType() == 1) {
-//						shortFall = shortFall.add(tBaTxVo.getUnPaidAmt());
-//					}
-//					if (tBaTxVo.getDataKind() == 3) {
-//						excessive = excessive.add(tBaTxVo.getUnPaidAmt());
-//					}
-//				}
-//			}
-//		}
-
 		List<Map<String, String>> listL9701 = null;
 
 		try {
@@ -432,10 +418,10 @@ public class L9701Report extends MakeReport {
 			this.error("L9701ServiceImpl.LoanBorTx error = " + errors.toString());
 		}
 
-		// 計算累溢短收
+		// 只抓每個額度的最後一筆
 		for (Map<String, String> tL9701Vo : listL9701) {
 			if (facmNo.equals(tL9701Vo.get("FacmNo"))) {
-				excessive = excessive.add(getBigDecimal(tL9701Vo.get("Excessive")));
+				excessive = getBigDecimal(tL9701Vo.get("OverShort"));
 			}
 		}
 
@@ -452,6 +438,8 @@ public class L9701Report extends MakeReport {
 		this.print(0, 116, formatAmt(breachAmtTotal, 0), "R");
 		this.print(0, 130, formatAmt(feeAmtTotal, 0), "R");
 
+		loanBal = BigDecimal.ZERO;
+		excessive = BigDecimal.ZERO;
 		principalTotal = BigDecimal.ZERO;
 		interestTotal = BigDecimal.ZERO;
 		breachAmtTotal = BigDecimal.ZERO;
@@ -461,7 +449,7 @@ public class L9701Report extends MakeReport {
 	private void nextPage(int headNo) {
 
 		if (headNo == 1 || headNo == 2) {
-			this.print(-45, this.getMidXAxis(), nextPageText, "C");
+			this.print(-56, this.getMidXAxis(), nextPageText, "C");
 			this.newPage();
 		}
 

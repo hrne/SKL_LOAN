@@ -230,7 +230,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			}
 
 		}
-		
+
 		// 移除計算金額=0
 		int wkRemoveCnt = 0;
 		for (int i = wkCalcVoCount; i >= 0; i--) {
@@ -2226,16 +2226,10 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			}
 			// 部分還本金額利息計篹
 			else {
-				// 聯貸案件不計算利息，聯貸案件 Y:是 N:否
-				if (iSyndFlag.equals("Y")) {
-					vCalcRepayIntVo.setAmount(BigDecimal.ZERO);
-					vCalcRepayIntVo.setInterest(BigDecimal.ZERO);
-				} else {
-					// 部分償還本金計算利息，計息止日大於期款止日
-					vCalcRepayIntVo.setAmount(wkExtraRepay);
-					wkIntAmt = calcInterestRoutine();
-					vCalcRepayIntVo.setInterest(wkIntAmt);
-				}
+				// 部分償還本金計算利息，計息止日大於期款止日
+				vCalcRepayIntVo.setAmount(wkExtraRepay);
+				wkIntAmt = calcInterestRoutine();
+				vCalcRepayIntVo.setInterest(wkIntAmt);
 				lCalcRepayIntVo.set(wkIndex, vCalcRepayIntVo);
 				// 部分償還內含利息(結案不內涵
 				if (iExtraRepayFlag.equals("Y")) {
@@ -2345,16 +2339,9 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		}
 
 		vCalcRepayIntVo.setLoanBal(wkLoanBal);
-		switch (iSyndFlag) {
-		case "Y":
+		if (vCalcRepayIntVo.getDuraFlag() == 1
+				|| (vCalcRepayIntVo.getDuraFlag() != 1 && vCalcRepayIntVo.getExtraRepayFlag() == 0)) {
 			oPrevPaidIntDate = vCalcRepayIntVo.getEndDate(); // 上次收息日
-			break;
-		case "N":
-			if (vCalcRepayIntVo.getDuraFlag() == 1
-					|| (vCalcRepayIntVo.getDuraFlag() != 1 && vCalcRepayIntVo.getExtraRepayFlag() == 0)) {
-				oPrevPaidIntDate = vCalcRepayIntVo.getEndDate(); // 上次收息日
-			}
-			break;
 		}
 		oRateIncr = vCalcRepayIntVo.getRateIncr(); // 加碼利率
 		oIndividualIncr = vCalcRepayIntVo.getIndividualIncr(); // 個別加碼利率

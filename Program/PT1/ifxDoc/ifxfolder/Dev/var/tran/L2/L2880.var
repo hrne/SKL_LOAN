@@ -314,7 +314,7 @@ R(1,L1R01)
 ![客戶別]
 #FdCustTypeCode=X,2,L
 
-#CustTypeCode=X,2,L
+#CustTypeCode=X,3,L
 T(2,#L1r01CustTypeCode)
 
 #CustTypeCodeX=X,10,L

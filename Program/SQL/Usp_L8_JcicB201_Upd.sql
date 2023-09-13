@@ -533,7 +533,7 @@ BEGIN
 --      LEFT JOIN "FacMain" FM ON FM."CustNo" = TD."CustNo"
 --                            AND FM."FacmNo" = TD."FacmNo"
 --      WHERE TD."DataYM" = YYYYMM
---        AND FM."RuleCode" = '08'  -- 規定管制代碼08:購地貸款(央行管制)
+--        AND FM."RuleCode" = 'B042X'  -- 規定管制代碼B042X:購地貸款(央行管制)
 --    )
 
       SELECT
@@ -698,7 +698,7 @@ BEGIN
            , ' '            AS "NegNo"             -- 債權處理案號
            , ' '            AS "NegTransYM"        -- 債權轉讓年月/債權轉讓後原債權機構買回年月
            , CASE WHEN YYYYMM < 202211 THEN ' '    -- 111/11開始申報購地貸款相關欄位
-                  WHEN F."RuleCode" = '08' THEN                           -- 規定管制代碼08:購地貸款(央行管制)
+                  WHEN SUBSTR(NVL(F."RuleCode",'00000'),1,4)  = 'B042' THEN   -- 規定管制代碼B042X:購地貸款(央行管制)
                     CASE WHEN NVL(F."SettingDate",0) < 20211217 THEN 'N'  -- 設定日期須>=20211217才報Y
                          ELSE 'Y'
                     END     
