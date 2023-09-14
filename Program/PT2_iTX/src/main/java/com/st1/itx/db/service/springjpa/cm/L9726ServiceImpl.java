@@ -88,7 +88,7 @@ public class L9726ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ELSE 0 END                 AS LTV "; // F9 放款成數
 		sql += "      , FAC.\"RecycleCode\" "; // F10 循環動用
 		sql += "      , CL2.\"ClCode1Item\" "; // F11 擔保品類別
-		sql += "      , CCD.\"Item\" AS \"RuleCode\" "; // F12 管制代碼
+		sql += "      , CDR.\"RuleCodeItem\" AS \"RuleCode\" "; // F12 管制代碼
 		sql += "      , CASE ";
 		sql += "          WHEN CM.\"EntCode\" = 1 ";
 		sql += "          THEN '法人' ";
@@ -141,9 +141,8 @@ public class L9726ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            WHERE CF.\"MainFlag\" = 'Y' ";
 		sql += "           ) CL2 ON CL2.\"CustNo\" = LBM.\"CustNo\" ";
 		sql += "                AND CL2.\"FacmNo\" = LBM.\"FacmNo\" ";
-		sql += " LEFT JOIN \"CdCode\" CCD ON CCD.\"DefCode\" = 'RuleCode' ";
-		sql += "                       AND CCD.\"Code\" = FAC.\"RuleCode\" ";
 		sql += " LEFT JOIN \"CdEmp\" CE ON CE.\"EmployeeNo\" = FAC.\"BusinessOfficer\" ";
+		sql += " LEFT JOIN \"CdRuleCode\" CDR ON CDR.\"RuleCode\" = FAC.\"RuleCode\" "; // 規定管制代碼
 		sql += " WHERE CM.\"EntCode\" IN ('1','2') ";
 		sql += " ORDER BY LBM.\"DrawdownDate\" ";
 		sql += "        , LBM.\"CustNo\" ";

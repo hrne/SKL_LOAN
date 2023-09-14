@@ -177,6 +177,11 @@ public class L6906 extends TradeBuffer {
 				occursList.putParam("OOCrAmt", tAcDetail.getTxAmt());
 			}
 
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tAcDetail.getLastUpdate()) + " "
+					+ parse.timeStampToStringTime(tAcDetail.getLastUpdate()));
+			occursList.putParam("OOLastEmp",
+					tAcDetail.getLastUpdateEmpNo() + " " + empName(titaVo, tAcDetail.getLastUpdateEmpNo()));
+
 			// 查詢會計科子細目設定檔
 			CdAcCode tCdAcCode = sCdAcCodeService.findById(
 					new CdAcCodeId(tAcDetail.getAcNoCode(), tAcDetail.getAcSubCode(), tAcDetail.getAcDtlCode()),
@@ -186,10 +191,6 @@ public class L6906 extends TradeBuffer {
 			} else {
 				occursList.putParam("OOAcNoItem", tCdAcCode.getAcNoItem());
 			}
-			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdAcCode.getLastUpdate()) + " "
-					+ parse.timeStampToStringTime(tCdAcCode.getLastUpdate()));
-			occursList.putParam("OOLastEmp",
-					tCdAcCode.getLastUpdateEmpNo() + " " + empName(titaVo, tCdAcCode.getLastUpdateEmpNo()));
 
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);

@@ -324,18 +324,18 @@ public class L9701Report extends MakeReport {
 					printFacEnd(this.facmNo);
 					this.nextPage(1);
 				}
+				// 額度不同 且 列數大於46，因36~43列數空間不足以列印總計加錶頭列數所以要換頁用表頭1
+				if (!isNotSameFacmNo && (this.NowRow > 46)) {
+					this.info("type3");
+					printFacEnd(this.facmNo);
+					this.nextPage(1);
+				}
 				// 額度不同 且 列數小於等於46，要列印總計列數加上表頭列數 nextPage(3)表示不用換頁但要印表頭1
 				if (!isNotSameFacmNo && this.NowRow <= 46) {
-					this.info("type3");
+					this.info("type4");
 					printFacEnd(this.facmNo);
 					this.nextPage(11);
 
-				}
-				// 額度不同 且 列數大於46，因36~43列數空間不足以列印總計加錶頭列數所以要換頁用表頭1
-				if (!isNotSameFacmNo && (this.NowRow > 46)) {
-					this.info("type4");
-					printFacEnd(this.facmNo);
-					this.nextPage(1);
 				}
 
 				// 最後一筆 列印結束報表

@@ -314,9 +314,6 @@ BEGIN
             ,S4."TRXIDT" 
             ,S3."AcSubBookCode"
       FROM "LA$JLNP" S1 
-      LEFT JOIN "LA$JLNP" S2 ON S2."TRXDAT" = S1."TRXDAT" 
-                            AND S2."JLNOVN" = S1."JLNVNO" -- 串取訂正資料 
-                            AND S2."JLNVNO" = 0 
       LEFT JOIN acMap S3 ON S3."ACNACC" = S1."ACNACC" 
                             AND NVL(S3."ACNACS",' ') = NVL(S1."ACNACS",' ') 
                             AND NVL(S3."ACNASS",' ') = NVL(S1."ACNASS",' ') 
@@ -350,48 +347,46 @@ BEGIN
                   AND FF."DailyFeeTotal" = S1."JLNAMT" 
                   AND NVL(S5."AcctCode",' ') NOT IN ('310','320','330','340','990') 
                   AND NVL(S4."LMSACN",0) = 0 
-      WHERE NVL(S1."TRXDAT",0) > 0      -- 傳票檔會計日期不為0 *日期為0者為問題資料,則排除 
-        AND NVL(S1."JLNVNO",0) > 0      -- 傳票檔傳票號碼不為0 *傳票號碼為0者為訂正資料,則排除 
-        AND NVL(S2."TRXDAT",0) = 0      -- 若在S2有資料,表示S1此筆為被訂正資料,則排除 
-        AND NVL(S5."AcNoCode",' ') != ' ' -- 2021-07-15 新增判斷 有串到最新的11碼會科才寫入 
-        AND S1."JLNCRC" = '0' 
-        AND S1."TRXDAT" >= "DateStart"
+      WHERE S1."TRXDAT" >= "DateStart"
         AND S1."TRXDAT" <= "DateEnd"
---        AND S1."TRXDAT" <= "TbsDyF" 
-        AND CASE 
-              WHEN NVL(S5."AcctCode",' ') IN ('310','320','330','340','990' 
-                                             ,'IC1','IC2','IC3','IC4','IOP','IOV' 
-                                             ,'F15','F16' 
-                                             ,'TMI','T12' 
-                                             ,'F08','F29','F10'
-                                             ,'P02') 
-                   AND NVL(S4."TRXTRN",' ') <> ' ' 
-              THEN 1 
-              WHEN NVL(S5."AcctCode",' ') NOT IN ('310','320','330','340','990' 
-                                                 ,'IC1','IC2','IC3','IC4','IOP','IOV' 
-                                                 ,'F15','F16' 
-                                                 ,'TMI','T12' 
-                                                 ,'F08','F29','F10'
-                                                 ,'P02') 
-                   AND NVL(S4."LMSACN",0) = 0 
-              THEN 1 
-              WHEN NVL(S5."AcctCode",' ') IN ('TMI','T12','P02','IC3','330') 
-                   AND S1."TRXTRN" = '3079' 
-              THEN 1 
-              WHEN NVL(S5."AcctCode",' ') IN ('TMI','T12') 
-                   AND NVL(S1."TRXTRN",' ') = ' ' 
-                   AND S4."TRXTRN" IS NULL 
-              THEN 1 
-              WHEN NVL(S5."AcctCode",' ') IN ('F25','T13','F13','F07','F27','F24','BCK') 
-                   AND NVL(S1."TRXTRN",' ') = ' ' 
-                   AND S4."TRXTRN" = '3037' 
-              THEN 1
-              WHEN NVL(S5."AcctCode",' ') IN ('C02','OPL') 
-                   AND NVL(S1."TRXTRN",' ') = ' ' 
-                   AND S4."TRXTRN" = '3036' 
-              THEN 1
-            ELSE 0  
-            END = 1 
+        -- AND NVL(S1."TRXDAT",0) > 0      -- 傳票檔會計日期不為0 *日期為0者為問題資料,則排除 
+        -- AND NVL(S1."JLNVNO",0) > 0      -- 傳票檔傳票號碼不為0 *傳票號碼為0者為訂正資料,則排除 
+        AND NVL(S5."AcNoCode",' ') != ' ' -- 2021-07-15 新增判斷 有串到最新的11碼會科才寫入 
+        -- AND S1."JLNCRC" = '0' 
+        -- AND CASE 
+        --       WHEN NVL(S5."AcctCode",' ') IN ('310','320','330','340','990' 
+        --                                      ,'IC1','IC2','IC3','IC4','IOP','IOV' 
+        --                                      ,'F15','F16' 
+        --                                      ,'TMI','T12' 
+        --                                      ,'F08','F29','F10'
+        --                                      ,'P02') 
+        --            AND NVL(S4."TRXTRN",' ') <> ' ' 
+        --       THEN 1 
+        --       WHEN NVL(S5."AcctCode",' ') NOT IN ('310','320','330','340','990' 
+        --                                          ,'IC1','IC2','IC3','IC4','IOP','IOV' 
+        --                                          ,'F15','F16' 
+        --                                          ,'TMI','T12' 
+        --                                          ,'F08','F29','F10'
+        --                                          ,'P02') 
+        --            AND NVL(S4."LMSACN",0) = 0 
+        --       THEN 1 
+        --       WHEN NVL(S5."AcctCode",' ') IN ('TMI','T12','P02','IC3','330') 
+        --            AND S1."TRXTRN" = '3079' 
+        --       THEN 1 
+        --       WHEN NVL(S5."AcctCode",' ') IN ('TMI','T12') 
+        --            AND NVL(S1."TRXTRN",' ') = ' ' 
+        --            AND S4."TRXTRN" IS NULL 
+        --       THEN 1 
+        --       WHEN NVL(S5."AcctCode",' ') IN ('F25','T13','F13','F07','F27','F24','BCK') 
+        --            AND NVL(S1."TRXTRN",' ') = ' ' 
+        --            AND S4."TRXTRN" = '3037' 
+        --       THEN 1
+        --       WHEN NVL(S5."AcctCode",' ') IN ('C02','OPL') 
+        --            AND NVL(S1."TRXTRN",' ') = ' ' 
+        --            AND S4."TRXTRN" = '3036' 
+        --       THEN 1
+        --     ELSE 0  
+        --     END = 1 
     ) 
     , ACT AS ( 
       SELECT "LMSACN" 

@@ -2363,7 +2363,7 @@ IF({n}==1,S,IF(#StepMonthS{n}==0,INVOKEJS(SHOW,grd4_{k},0),INVOKEJS(SHOW,grd4_{k
 
 #HIDESTEP{n}=X,1,S
 IF(#StepMonthS{n}==0,HIDE(#StepMonthS{n},#StepMonthE{n},#StepRateType{n},#StepRateTypeX{n},#StepRateIncr{n},#StepRatePer{n}),$)
-  
+
 ##end
 
 
@@ -2455,7 +2455,7 @@ T(H,#IntCalcCode,#ProdIntCalcCodeHelp)
 !修改時自動顯示可修改,其他自動顯示不必須輸入
 #FdCustTypeCode=X,2,L
 
-#CustTypeCode=X,2,I
+#CustTypeCode=X,3,I
 C(3,#UpdateCode,1,$,s)
 C(3,#Hide4Fg,0,CALL(#HideP4),$)
 HELP(#CustTypeCodeHelp)

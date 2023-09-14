@@ -158,6 +158,7 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	  LEFT JOIN \"allMonthMaxLoan\" M2 ON M2.\"CustNo\" = M.\"CustNo\"";
 		sql += "	  LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = M.\"CustNo\"";
 		sql += "      LEFT JOIN (";
+		sql += "      SELECT DISTINCT \"Id\" FROM (";
 		sql += "      SELECT \"EmpId\" AS \"Id\"";
 		sql += "      FROM \"LifeRelEmp\"";
 		sql += "      WHERE \"AcDate\" = ( ";
@@ -180,7 +181,7 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      	WHERE TRUNC(\"AcDate\"/100) <= :yymm ";
 		sql += "      	) ";
 		sql += "        AND \"LoanBalance\" > 0";
-		sql += "           	    ) R ON R.\"Id\" = C.\"CustId\" ";
+		sql += "           	    )) R ON R.\"Id\" = C.\"CustId\" ";
 		sql += "	  ORDER BY M.\"TotalLoanBal\" DESC";
 		this.info("sql=" + sql);
 

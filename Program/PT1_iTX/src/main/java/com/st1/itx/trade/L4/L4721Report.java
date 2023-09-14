@@ -182,8 +182,9 @@ public class L4721Report extends MakeReport {
 //
 //		this.openForm(titaVo, reportVo);
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4721", "放款本息對帳單暨繳息通知單" + kindItem, "密",
-				"8.5,12", "P");
+		String fileName = "繳息通知單(" + kindItem + ")_" + iCustNo;
+
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4721", fileName, "密", "8.5,12", "P");
 
 		Boolean Firstfg = false;
 

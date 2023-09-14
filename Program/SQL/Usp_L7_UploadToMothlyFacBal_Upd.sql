@@ -37,13 +37,12 @@ BEGIN
           FROM "MonthlyFacBal" M
           LEFT JOIN "CustMain" CM ON CM."CustNo" = M."CustNo"
           LEFT JOIN(
-              SELECT
+              SELECT DISTINCT
                   "Id"
               FROM
                   (
                       SELECT DISTINCT
                           "HeadId"     AS "Id"
-                          , "HeadName"   AS "Name"
                       FROM
                           "LifeRelHead"
                       WHERE
@@ -51,7 +50,6 @@ BEGIN
                       UNION ALL
                       SELECT DISTINCT
                           "RelId"     AS "Id"
-                          , "RelName"   AS "Name"
                       FROM
                           "LifeRelHead"
                       WHERE
@@ -59,7 +57,6 @@ BEGIN
                       UNION ALL
                       SELECT DISTINCT
                           "BusId"     AS "Id"
-                          , "BusName"   AS "Name"
                       FROM
                           "LifeRelHead"
                       WHERE

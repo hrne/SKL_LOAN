@@ -683,9 +683,7 @@ T(2,@GrKindHelp,#HelpDesc6)
 T(2,@EsGKindHelp,#HelpDesc7)
 T(2,@ProdBreachCodeHelp,#HelpDesc8)
 T(2,@CdRuleCodeHelp,#HelpDesc9)
-ALERT(A,#RuleCodeHelp)
 T(B,@RuleCodeHelp,#RuleCodeHelp+;+#CdRuleCodeHelp)
-ALERT(B,#RuleCodeHelp)
 
 #BankCdHelp2=x,1024,S
 T(2,700:郵局;+#BankCdHelp)
@@ -1781,7 +1779,7 @@ T(H,#IntCalcCode,#ProdIntCalcCodeHelp)
 !必須輸入
 #FdCustTypeCode=X,2,L
 
-#CustTypeCode=X,2,I
+#CustTypeCode=X,3,I
 C(4,#CustTypeCode,T(3,00),$)
 HELP(#CustTypeCodeHelp)
 @V(H,#CustTypeCodeHelp)

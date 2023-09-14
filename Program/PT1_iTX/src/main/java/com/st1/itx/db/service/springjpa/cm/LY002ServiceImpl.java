@@ -155,7 +155,7 @@ public class LY002ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "								   AND M2.\"YearMonth\" = :yymm";
 			sql += "	LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = M.\"CustNo\"";
 			sql += "	LEFT JOIN ( ";
-			sql += "		SELECT * FROM (";
+			sql += "		SELECT DISTINCT \"Id\",\"Name\" FROM (";
 			sql += "			SELECT DISTINCT \"HeadId\" AS \"Id\"";
 			sql += "			      ,\"HeadName\" AS \"Name\"";
 			sql += "			FROM \"LifeRelHead\"";
