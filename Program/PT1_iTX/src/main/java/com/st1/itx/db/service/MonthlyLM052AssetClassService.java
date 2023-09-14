@@ -38,6 +38,17 @@ public interface MonthlyLM052AssetClassService {
   public Slice<MonthlyLM052AssetClass> findAll(int index, int limit, TitaVo... titaVo);
 
   /**
+   * YearMonth = 
+   *
+   * @param yearMonth_0 yearMonth_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice MonthlyLM052AssetClass MonthlyLM052AssetClass of List
+   */
+  public Slice<MonthlyLM052AssetClass> findYearMonthAll(int yearMonth_0, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By MonthlyLM052AssetClass
    * 
    * @param monthlyLM052AssetClassId key

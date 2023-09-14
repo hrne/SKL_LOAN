@@ -177,10 +177,10 @@ public class L6906 extends TradeBuffer {
 				occursList.putParam("OOCrAmt", tAcDetail.getTxAmt());
 			}
 
-			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tAcDetail.getLastUpdate()) + " "
-					+ parse.timeStampToStringTime(tAcDetail.getLastUpdate()));
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tAcDetail.getCreateDate()) + " "
+					+ parse.timeStampToStringTime(tAcDetail.getCreateDate()));
 			occursList.putParam("OOLastEmp",
-					tAcDetail.getLastUpdateEmpNo() + " " + empName(titaVo, tAcDetail.getLastUpdateEmpNo()));
+					tAcDetail.getCreateEmpNo() + " " + empName(titaVo, tAcDetail.getCreateEmpNo()));
 
 			// 查詢會計科子細目設定檔
 			CdAcCode tCdAcCode = sCdAcCodeService.findById(

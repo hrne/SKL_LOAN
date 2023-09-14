@@ -1,9 +1,11 @@
 package com.st1.itx.trade.L5;
 
 import java.util.ArrayList;
+import java.util.List;
 /* 套件 */
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 /* 錯誤處理 */
@@ -73,13 +75,13 @@ public class L5R51 extends TradeBuffer {
 		if (custNo != null && custNo.length() != 0) {
 			iCustNo = parse.stringToInteger(custNo);
 		}
+		boolean hasStatus = false;
 
 		int iCaseSeq = 0;
 		if (caseSeq != null && caseSeq.length() != 0) {
 			iCaseSeq = parse.stringToInteger(caseSeq);
 		}
-//		this.info("***L5R51**key="+custId+","+custNo+","+caseSeq+","+errorFg);
-//		this.info("***iCustNo="+iCustNo+",iCaseSeq="+iCaseSeq);
+
 		// 先檢查債協主檔
 		NegMain negMainVO = new NegMain();
 		CustMain custMainVO = new CustMain();
@@ -136,7 +138,6 @@ public class L5R51 extends TradeBuffer {
 			}
 		}
 
-//		this.info("***custId="+custId+",length="+custId.length()+",iCustNo="+iCustNo);
 		if (custId != null && custId.length() != 0 && iCustNo == 0) {
 			if (iCaseSeq == 0) {
 				custMainVO = sCustMainService.custIdFirst(custId, titaVo);
@@ -202,52 +203,35 @@ public class L5R51 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "[身分證字號]或[戶號]須擇一填寫");
 		}
 
-//		NegMainIdVO.setCustNo(iCustNo);
-//		NegMainIdVO.setCaseSeq(iCaseSeq);
-//		negMainVO = sNegMainService.findById(NegMainIdVO, titaVo);
-//		if (negMainVO != null) {
-//			totaVo.putParam("L5r01CustId", custId);//
-//			totaVo.putParam("L5r01CustNo", NegMainVO.getCustNo());//
-//			totaVo.putParam("L5r01CaseSeq", NegMainVO.getCaseSeq());//
-//			totaVo.putParam("L5r01CaseKindCode", NegMainVO.getCaseKindCode());//
-//			totaVo.putParam("L5r01CustLoanKind", NegMainVO.getCustLoanKind());//
-//			totaVo.putParam("L5r01Status", NegMainVO.getStatus());//
-//			if (NegMainVO.getDeferYMStart() == 0) {
-//				totaVo.putParam("L5r01DeferYMStart", NegMainVO.getDeferYMStart());//
-//			} else {
-//				totaVo.putParam("L5r01DeferYMStart", NegMainVO.getDeferYMStart() - 191100);//
-//			}
-
-//			if (NegMainVO.getDeferYMStart() == 0) {
-//				totaVo.putParam("L5r01DeferYMEnd", NegMainVO.getDeferYMEnd());//
-//			} else {
-//				totaVo.putParam("L5r01DeferYMEnd", NegMainVO.getDeferYMEnd() - 191100);//
-//			}
-
-//			totaVo.putParam("L5r01ApplDate", NegMainVO.getApplDate());//
-//			totaVo.putParam("L5r01DueAmt", NegMainVO.getDueAmt());//
-//			totaVo.putParam("L5r01TotalPeriod", NegMainVO.getTotalPeriod());//
-//			totaVo.putParam("L5r01IntRate", NegMainVO.getIntRate());//
-//			totaVo.putParam("L5r01FirstDueDate", NegMainVO.getFirstDueDate());//
-//			totaVo.putParam("L5r01LastDueDate", NegMainVO.getLastDueDate());//
-//			totaVo.putParam("L5r01NextPayDate", NegMainVO.getNextPayDate());//
-//			totaVo.putParam("L5r01IsMainFin", NegMainVO.getIsMainFin());//
-//			totaVo.putParam("L5r01TotalContrAmt", NegMainVO.getTotalContrAmt());//
-//			totaVo.putParam("L5r01MainFinCode", NegMainVO.getMainFinCode());//
-//			totaVo.putParam("L5r01PrincipalBal", NegMainVO.getPrincipalBal());//
-//			totaVo.putParam("L5r01TwoStepCode", NegMainVO.getTwoStepCode());//
-//			totaVo.putParam("L5r01PayerCustNo", NegMainVO.getPayerCustNo());//
-//			totaVo.putParam("L5r01ChgCondDate", NegMainVO.getChgCondDate());//
-//			totaVo.putParam("L5r01CourtCode", NegMainVO.getCourtCode());//
-//		} else {
-			// E0001 查詢資料不存在
-//			throw new LogicException(titaVo, "E0001", "查無資料");
-//		}
+		//檢查是否有戶況0資料
+		if (custId != null && custId.length() != 0) {
+			custMainVO = sCustMainService.custIdFirst(custId, titaVo);
+			if (custMainVO != null) {
+				negMainVO = sNegMainService.statusFirst("0",custMainVO.getCustNo(), titaVo);
+				if(negMainVO != null) {
+					hasStatus = true;//有戶況為0資料
+				}
+			}
+			negMainVO = sNegMainService.negCustIdFirst(custId, titaVo);
+			if(negMainVO != null) {
+				int custNo2=negMainVO.getCustNo() ;
+				negMainVO = sNegMainService.statusFirst("0",custNo2, titaVo);
+				if(negMainVO != null) {
+					hasStatus = true;//有戶況為0資料
+				}
+			}
+		}
+		
 
 		totaVo.putParam("L5r51CustNo", iCustNo);
 		totaVo.putParam("L5r51CustId", custId);
 		totaVo.putParam("L5r51CustName", custName);
 		totaVo.putParam("L5r51CaseSeq", iCaseSeq);
+		if(hasStatus) {
+			totaVo.putParam("L5r51hasStatus", "Y");
+		}else {
+			totaVo.putParam("L5r51hasStatus", " ");
+		}
 		
 		this.addList(this.totaVo);
 		return this.sendList();

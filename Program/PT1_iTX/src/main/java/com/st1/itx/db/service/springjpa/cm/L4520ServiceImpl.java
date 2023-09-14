@@ -46,16 +46,16 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int ProcCode = parse.stringToInteger(titaVo.getParam("ProcCode"));
 		String BatchNoFm = "BATX" + titaVo.getParam("BatchNoFm");
 		String BatchNoTo = "BATX" + titaVo.getParam("BatchNoTo");
-		
+
 		String sql = "  SELECT * FROM \"EmpDeductMedia\" ";
-		sql += "  WHERE \"AcDate\" = :AcDate " ;
-		sql += "  AND   \"PerfMonth\" = :PerfMonth " ;
-		if(ProcCode != 0) {
-			sql += "  AND   \"FlowCode\" = :ProcCode " ;
+		sql += "  WHERE \"AcDate\" = :AcDate ";
+		sql += "  AND   \"PerfMonth\" = :PerfMonth ";
+		if (ProcCode != 0) {
+			sql += "  AND   \"FlowCode\" = :ProcCode ";
 		}
-		sql += "  AND   \"BatchNo\" >= :BatchNoFm " ;
-		sql += "  AND   \"BatchNo\" <= :BatchNoTo " ;
-		sql += "  ORDER BY  \"MediaKind\",\"FlowCode\",\"MediaSeq\"  " ;
+		sql += "  AND   \"BatchNo\" >= :BatchNoFm ";
+		sql += "  AND   \"BatchNo\" <= :BatchNoTo ";
+		sql += "  ORDER BY  \"MediaKind\",\"FlowCode\",\"MediaSeq\"  ";
 		this.info("sql=" + sql);
 		Query query;
 
@@ -63,15 +63,15 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setParameter("AcDate", AcDate);
 		query.setParameter("PerfMonth", PerfMonth);
-		if(ProcCode != 0) {
-		  query.setParameter("ProcCode", ProcCode);
+		if (ProcCode != 0) {
+			query.setParameter("ProcCode", ProcCode);
 		}
 		query.setParameter("BatchNoFm", BatchNoFm);
 		query.setParameter("BatchNoTo", BatchNoTo);
-		
+
 		return this.convertToMap(query);
 	}
-	
+
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 		this.info("L4520.findAll");
@@ -81,80 +81,82 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String BatchNoTo = "BATX" + titaVo.getParam("BatchNoTo");
 		String ProcCode = titaVo.getParam("ProcCode");
 		int AcDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
-		String sql = "WITH tx1 AS ("; 
-		sql += "      SELECT" ; 
-		sql += "          \"CustNo\"," ; 
-		sql += "          \"IntStartDate\"," ; 
-		sql += "          \"IntEndDate\"," ; 
-		sql += "          \"AcDate\"," ; 
-		sql += "          \"TitaTlrNo\"," ; 
-		sql += "          \"TitaTxtNo\"," ;
-		sql += "          \"AcctCode\"" ; 
-		sql += "      FROM" ;
-		sql += "          \"LoanBorTx\"" ; 
-		sql += "      WHERE" ; 
-		sql += "          \"AcDate\" = :inputacdate" ; 
-		sql += "          AND \"TitaHCode\" = 0" ;
-		sql += "          AND (\"IntStartDate\" > 0 " ; 
-		sql += "           OR \"TitaTxCd\" = 'L3210' )" ; 
-		sql += "      GROUP BY" ; 
-		sql += "          \"CustNo\"," ; 
-		sql += "          \"IntStartDate\"," ; 
-		sql += "          \"IntEndDate\"," ; 
-		sql += "          \"AcDate\"," ; 
-		sql += "          \"TitaTlrNo\"," ; 
-		sql += "          \"TitaTxtNo\"," ; 
-		sql += "          \"AcctCode\"" ; 
-		sql += "  ), tx2 AS (" ; 
-		sql += "      SELECT" ; 
-		sql += "          \"CustNo\"," ; 
-		sql += "          \"FacmNo\"," ; 
-		sql += "          \"BormNo\"," ; 
-		sql += "          \"IntStartDate\"," ; 
-		sql += "          \"IntEndDate\"," ; 
-		sql += "          \"AcDate\"," ; 
+		String sql = "WITH tx1 AS (";
+		sql += "      SELECT";
+		sql += "          \"SlipSumNo\",";
+		sql += "          \"CustNo\",";
+		sql += "          \"IntStartDate\",";
+		sql += "          \"IntEndDate\",";
+		sql += "          \"AcDate\",";
+		sql += "          \"TitaTlrNo\",";
+		sql += "          \"TitaTxtNo\",";
+		sql += "          \"AcctCode\"";
+		sql += "      FROM";
+		sql += "          \"LoanBorTx\"";
+		sql += "      WHERE";
+		sql += "          \"AcDate\" = :inputacdate";
+		sql += "          AND \"SlipSumNo\" > 0  ";
+		sql += "          AND \"RepayCode\" = 3  ";
+		sql += "    	 AND \"SlipSumNo\" >= :BatchNoFm";
+		sql += "    	 AND \"SlipSumNo\" <= :BatchNoTo";
+		sql += "      GROUP BY";
+		sql += "          \"SlipSumNo\",";
+		sql += "          \"CustNo\",";
+		sql += "          \"IntStartDate\",";
+		sql += "          \"IntEndDate\",";
+		sql += "          \"AcDate\",";
+		sql += "          \"TitaTlrNo\",";
+		sql += "          \"TitaTxtNo\",";
+		sql += "          \"AcctCode\"";
+		sql += "  ), tx2 AS ( ";
+		sql += "      SELECT";
+		sql += "          \"CustNo\",";
+		sql += "          \"FacmNo\",";
+		sql += "          \"BormNo\",";
+		sql += "          \"IntStartDate\",";
+		sql += "          \"IntEndDate\",";
+		sql += "          \"AcDate\",";
 		sql += "          \"TitaTxCd\",";
-		sql += "          \"TitaTlrNo\"," ; 
-		sql += "          \"TitaTxtNo\"," ; 
-		sql += "          \"AcctCode\"," ; 
-		sql += "          SUM(\"TxAmt\") AS \"TxAmt\"," ; 
-		sql += "          SUM(\"Principal\") AS \"Principal\"," ; 
-		sql += "          SUM(\"Interest\") AS \"Interest\"," ; 
-		sql += "          SUM(\"DelayInt\") AS \"DelayInt\"," ; 
-		sql += "          SUM(\"BreachAmt\") AS \"BreachAmt\"," ; 
-		sql += "          SUM(\"CloseBreachAmt\") AS \"CloseBreachAmt\"," ; 
-		sql += "          SUM(\"TempAmt\") AS \"TempAmt\"," ; 
-		sql += "          SUM(\"Overflow\") AS \"Overflow\"," ; 
-		sql += "          SUM(\"UnpaidInterest\"+\"UnpaidPrincipal\"+\"UnpaidCloseBreach\") AS \"Shortfall\"," ; 
-		sql += "          SUM(nvl(JSON_VALUE(\"OtherFields\", '$.AcctFee'), 0)) AS \"AcctFee\"," ; 
-		sql += "          SUM(nvl(JSON_VALUE(\"OtherFields\", '$.ModifyFee'), 0)) AS \"ModifyFee\"," ; 
-		sql += "          SUM(nvl(JSON_VALUE(\"OtherFields\", '$.FireFee'), 0)) AS \"FireFee\"," ; 
-		sql += "          SUM(nvl(JSON_VALUE(\"OtherFields\", '$.LawFee'), 0)) AS \"LawFee\"," ; 
-		sql += "          SUM(nvl(JSON_VALUE(\"OtherFields\", '$.ShortPri'), 0)) AS \"ShortPri\"," ; 
-		sql += "          SUM(nvl(JSON_VALUE(\"OtherFields\", '$.ShortInt'), 0)) AS \"ShortInt\"," ; 
-		sql += "          DECODE(\"AcSeq\",1,1,2) AS \"AcSeq\"" ;
-		sql += "      FROM" ; 
-		sql += "          \"LoanBorTx\"" ; 
-		sql += "      WHERE" ; 
-		sql += "          \"AcDate\" = :inputacdate" ; 
-		sql += "          AND \"TitaHCode\" = 0" ; 
-		sql += "          AND (\"IntStartDate\" > 0 " ; 
-		sql += "           OR \"TitaTxCd\" = 'L3210' )" ; 
-		sql += "      GROUP BY" ; 
-		sql += "          \"CustNo\"," ; 
-		sql += "          \"FacmNo\"," ; 
-		sql += "          \"BormNo\"," ; 
-		sql += "          \"IntStartDate\"," ; 
-		sql += "          \"IntEndDate\"," ; 
-		sql += "          \"AcDate\"," ; 
+		sql += "          \"TitaTlrNo\",";
+		sql += "          \"TitaTxtNo\",";
+		sql += "          \"AcctCode\",";
+		sql += "          SUM(\"TxAmt\") AS \"TxAmt\",";
+		sql += "          SUM(\"Principal\") AS \"Principal\",";
+		sql += "          SUM(\"Interest\") AS \"Interest\",";
+		sql += "          SUM(\"DelayInt\") AS \"DelayInt\",";
+		sql += "          SUM(\"BreachAmt\") AS \"BreachAmt\",";
+		sql += "          SUM(\"CloseBreachAmt\") AS \"CloseBreachAmt\",";
+		sql += "          SUM(\"TempAmt\") AS \"TempAmt\",";
+		sql += "          SUM(\"Overflow\") AS \"Overflow\",";
+		sql += "          SUM(\"UnpaidInterest\"+\"UnpaidPrincipal\"+\"UnpaidCloseBreach\") AS \"Shortfall\",";
+		sql += "          SUM(nvl(JSON_VALUE(\"OtherFields\", '$.AcctFee'), 0)) AS \"AcctFee\",";
+		sql += "          SUM(nvl(JSON_VALUE(\"OtherFields\", '$.ModifyFee'), 0)) AS \"ModifyFee\",";
+		sql += "          SUM(nvl(JSON_VALUE(\"OtherFields\", '$.FireFee'), 0)) AS \"FireFee\",";
+		sql += "          SUM(nvl(JSON_VALUE(\"OtherFields\", '$.LawFee'), 0)) AS \"LawFee\",";
+		sql += "          SUM(nvl(JSON_VALUE(\"OtherFields\", '$.ShortPri'), 0)) AS \"ShortPri\",";
+		sql += "          SUM(nvl(JSON_VALUE(\"OtherFields\", '$.ShortInt'), 0)) AS \"ShortInt\",";
+		sql += "          DECODE(\"AcSeq\",1,1,2) AS \"AcSeq\"";
+		sql += "      FROM";
+		sql += "          \"LoanBorTx\"";
+		sql += "      WHERE";
+		sql += "          \"AcDate\" = :inputacdate";
+		sql += "          AND \"SlipSumNo\" > 0  ";
+		sql += "          AND \"RepayCode\" = 3  ";
+		sql += "      GROUP BY";
+		sql += "          \"CustNo\",";
+		sql += "          \"FacmNo\",";
+		sql += "          \"BormNo\",";
+		sql += "          \"IntStartDate\",";
+		sql += "          \"IntEndDate\",";
+		sql += "          \"AcDate\",";
 		sql += "          \"TitaTxCd\",";
-		sql += "          \"TitaTlrNo\"," ; 
-		sql += "          \"TitaTxtNo\"," ; 
-		sql += "          DECODE(\"AcSeq\",1,1,2), " ;
-		sql += "          \"AcctCode\"" ;
+		sql += "          \"TitaTlrNo\",";
+		sql += "          \"TitaTxtNo\",";
+		sql += "          DECODE(\"AcSeq\",1,1,2), ";
+		sql += "          \"AcctCode\"";
 		sql += "  )";
 		sql += "  SELECT ";
-		sql += "  MIN(substr(ed.\"TitaTxtNo\", 0, 2)) AS \"BaTxNo\",";
+		sql += "  substr(tx1.\"TitaTxtNo\", 0, 2) AS \"BaTxNo\",";
 		sql += "  ed.\"CustNo\" AS \"CustNo\",   ";
 		sql += "  MIN(tx2.\"IntStartDate\") AS \"IntStartDate\",";
 		sql += "  MAX(tx2.\"IntEndDate\") AS \"IntEndDate\",  ";
@@ -172,12 +174,12 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  MIN(cm.\"CustId\") AS \"CustId\", ";
 		sql += "  MIN(ed.\"RepayCode\") AS \"RepayCode\",  ";
 		sql += "  MIN(ed.\"ProcCode\") as \"ProcCode\",";
-		sql += "  MIN(ed.\"Acdate\") as \"Acdate\"," ;
-		sql += "  CASE " ;
-		sql += "  	WHEN tx2.\"TitaTxCd\" = 'L3210' " ;
-		sql += "    THEN tx2.\"AcSeq\" " ;
-		sql += "   ELSE 0 END AS \"AcSeq\"," ;
-		sql += "   tx2.\"AcctCode\" AS \"AcctCode\"" ;
+		sql += "  MIN(ed.\"Acdate\") as \"Acdate\",";
+		sql += "  CASE ";
+		sql += "  	WHEN tx2.\"TitaTxCd\" = 'L3210' ";
+		sql += "    THEN tx2.\"AcSeq\" ";
+		sql += "   ELSE 0 END AS \"AcSeq\",";
+		sql += "   tx2.\"AcctCode\" AS \"AcctCode\"";
 		sql += "  FROM";
 		sql += "  ( ";
 		sql += "  SELECT DISTINCT";
@@ -191,37 +193,36 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  FROM \"EmpDeductDtl\" ";
 		sql += "  WHERE \"AchRepayCode\" IN ( 1, 5) ";
 		sql += "    AND \"PerfMonth\" = :PerfMonth";
-		sql += "    AND \"BatchNo\" >= :BatchNoFm";
-		sql += "    AND \"BatchNo\" <= :BatchNoTo";
-		if(!"0".equals(ProcCode)) {
+		if (!"0".equals(ProcCode)) {
 			sql += "    AND \"ProcCode\" = :ProcCode";
 		}
 		sql += "  ) ed ";
 		sql += "  LEFT JOIN \"CustMain\"       cm ON cm.\"CustNo\" = ed.\"CustNo\"        ";
 		sql += "  LEFT JOIN \"CdEmp\"          ce ON ce.\"EmployeeNo\" = ed.\"EmpNo\"       ";
-		sql += "  LEFT JOIN \"BatxDetail\" BD ON BD.\"AcDate\" = ed.\"Acdate\"" ;
-		sql += "                             AND BD.\"TitaTlrNo\" = ed.\"TitaTlrNo\""; 
+		sql += "  LEFT JOIN \"BatxDetail\" BD ON BD.\"AcDate\" = ed.\"Acdate\"";
+		sql += "                             AND BD.\"TitaTlrNo\" = ed.\"TitaTlrNo\"";
 		sql += "                             AND BD.\"TitaTxtNo\" = ed.\"TitaTxtNo\"";
 		sql += "  LEFT JOIN tx1 ON tx1.\"CustNo\" = ed.\"CustNo\"";
 		sql += "               AND tx1.\"AcDate\" = ed.\"Acdate\"";
-		sql += "               AND SUBSTR(tx1.\"TitaTxtNo\",1,2) = SUBSTR(BD.\"BatchNo\",5,2)";
 		sql += "               AND TO_NUMBER(SUBSTR(tx1.\"TitaTxtNo\",3,6)) = BD.\"DetailSeq\"";
 		sql += "  LEFT JOIN tx2 ON tx2.\"CustNo\" = tx1.\"CustNo\"";
 		sql += "                       AND tx2.\"IntStartDate\" = tx1.\"IntStartDate\"";
 		sql += "                       AND tx2.\"IntEndDate\" = tx1.\"IntEndDate\"";
 		sql += "                       AND tx2.\"AcDate\" = tx1.\"AcDate\"";
-		sql += "                       AND tx2.\"TitaTlrNo\" = tx1.\"TitaTlrNo\""; 
+		sql += "                       AND tx2.\"TitaTlrNo\" = tx1.\"TitaTlrNo\"";
 		sql += "                       AND tx2.\"TitaTxtNo\" = tx1.\"TitaTxtNo\"";
-		sql += "               		   AND tx2.\"AcctCode\" = tx1.\"AcctCode\""; 
+		sql += "               		   AND tx2.\"AcctCode\" = tx1.\"AcctCode\"";
 		sql += " LEFT JOIN \"FacMain\" fac ON fac.\"CustNo\" = tx2.\"CustNo\"";
 		sql += "                      AND fac.\"FacmNo\" = tx2.\"FacmNo\"";
-		sql += "  GROUP BY ed.\"CustNo\",";
-		sql += " 		   CASE " ;
-		sql += "  			 WHEN tx2.\"TitaTxCd\" = 'L3210' " ;
-		sql += "    		 THEN tx2.\"AcSeq\" " ;
-		sql += "   		   ELSE 0 END ," ;
-		sql += "          tx2.\"AcctCode\""; 
-		sql += "  ORDER BY   \"RepayCode\", \"AcctCode\", \"ProcCode\", \"CustNo\",\"AcSeq\", \"IntStartDate\", \"IntEndDate\"";
+		sql += "  WHERE tx1.\"SlipSumNo\" is not Null  ";
+		sql += "  GROUP BY substr(tx1.\"TitaTxtNo\", 0, 2),";
+		sql += "  		   tx1.\"CustNo\",";
+		sql += " 		   CASE ";
+		sql += "  			 WHEN tx2.\"TitaTxCd\" = 'L3210' ";
+		sql += "    		 THEN tx2.\"AcSeq\" ";
+		sql += "   		   ELSE 0 END ,";
+		sql += "          tx2.\"AcctCode\"";
+		sql += "  ORDER BY   substr(tx1.\"TitaTxtNo\", 0, 2),\"BatchNo\",\"RepayCode\", \"AcctCode\", \"ProcCode\", \"CustNo\",\"AcSeq\", \"IntStartDate\", \"IntEndDate\"";
 
 		this.info("sql=" + sql);
 		Query query;
@@ -232,8 +233,8 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("BatchNoTo", BatchNoTo);
 		query.setParameter("PerfMonth", PerfMonth);
 		query.setParameter("inputacdate", AcDate);
-		if(!"0".equals(ProcCode)) {
-		  query.setParameter("ProcCode", ProcCode);
+		if (!"0".equals(ProcCode)) {
+			query.setParameter("ProcCode", ProcCode);
 		}
 		return this.convertToMap(query);
 	}

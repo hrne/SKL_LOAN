@@ -10496,6 +10496,7 @@ TXFORM=L9R01
 #L5r51CustNo=X,7,S
 #L5r51CaseSeq=X,3,S
 #L5r51CustName=X,100,S
+#L5r51hasStatus=X,1,S
 </L5R51.dec>
 
 <L5R51.tom>
@@ -10504,5 +10505,6 @@ TXFORM=L5R51
 #L5r51CustNo
 #L5r51CaseSeq
 #L5r51CustName
+#L5r51hasStatus
 ^
 </L5R51.tom>

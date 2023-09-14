@@ -159,7 +159,7 @@ public class L7205p extends TradeBuffer {
 		Slice<Ias34Ap> sIas34Ap = null;
 		Slice<LoanIfrs9Ap> sLoanIfrs9Ap = null;
 
-		titaVo.keepOrgDataBase();// 保留原本記號
+		List<MonthlyFacBal> updMonthlyFacBal = new ArrayList<MonthlyFacBal>();
 
 		for (OccursList tempOccursList : occursList) {
 
@@ -175,55 +175,58 @@ public class L7205p extends TradeBuffer {
 				lawAssetClass = tempOccursList.get("LawAssetClass");
 			}
 
-			titaVo.setDataBaseOnLine(); // 連線環境
-
 			// 維護monthlyFacBal
 			MonthlyFacBalId monthlyFacBalId = new MonthlyFacBalId();
 			monthlyFacBalId.setCustNo(custno);
 			monthlyFacBalId.setFacmNo(facmno);
 			monthlyFacBalId.setYearMonth(yearmonth);
 
-			MonthlyFacBal tMonthlyFacBal = tMothlyFacBalService.findById(monthlyFacBalId, titaVo);
+			MonthlyFacBal tMonthlyFacBal = new MonthlyFacBal();
 
-			if (tMonthlyFacBal == null) {
-				CountF++; // 失敗筆數+1
-				this.info("fail custNo =" + custno + "-" + facmno);
-			} else {
-				tMonthlyFacBal.setAssetClass(assetclass.substring(0, 1));
+			tMonthlyFacBal.setAssetClass(assetclass.substring(0, 1));
 
-				if ("xlsx".equals(extension[extension.length - 1]) || "xls".equals(extension[extension.length - 1])) {
-					tMonthlyFacBal.setLawAmount(lawAmount);
-					tMonthlyFacBal.setLawAssetClass(lawAssetClass);
-					tMonthlyFacBal.setAssetClass2(assetclass);
-				}
-
-				try {
-					tMothlyFacBalService.update(tMonthlyFacBal, titaVo);
-
-				} catch (DBException e) {
-
-					throw new LogicException(titaVo, "E0007", e.getErrorMsg());
-				}
-
-				titaVo.setDataBaseOnMon();// 指定月報環境
-
-				try {
-					tMothlyFacBalService.update(tMonthlyFacBal, titaVo);
-
-				} catch (DBException e) {
-
-					throw new LogicException(titaVo, "E0007", e.getErrorMsg());
-				}
-
-				CountS++; // 成功筆數+1
+			if ("xlsx".equals(extension[extension.length - 1]) || "xls".equals(extension[extension.length - 1])) {
+				tMonthlyFacBal.setLawAmount(lawAmount);
+				tMonthlyFacBal.setLawAssetClass(lawAssetClass);
+				tMonthlyFacBal.setAssetClass2(assetclass);
 			}
 
-			titaVo.setDataBaseOnLine(); // 連線環境
-			this.batchTransaction.commit();
-			titaVo.setDataBaseOnMon();// 指定月報環境
-			this.batchTransaction.commit();
+			updMonthlyFacBal.add(tMonthlyFacBal);
 
-			titaVo.setDataBaseOnLine(); // 連線環境
+		}
+
+		titaVo.keepOrgDataBase();// 保留原本記號
+
+		titaVo.setDataBaseOnLine(); // 連線環境
+		try {
+			tMothlyFacBalService.updateAll(updMonthlyFacBal, titaVo);
+
+		} catch (DBException e) {
+
+			throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+		}
+
+		titaVo.setDataBaseOnMon();// 指定月報環境
+
+		try {
+			tMothlyFacBalService.updateAll(updMonthlyFacBal, titaVo);
+		} catch (DBException e) {
+
+			throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+		}
+
+		CountS++; // 成功筆數+1
+
+
+		titaVo.setDataBaseOnLine(); // 連線環境
+
+		for (OccursList tempOccursList : occursList) {
+
+			int custno = parse.stringToInteger(tempOccursList.get("CustNo"));
+			int facmno = parse.stringToInteger(tempOccursList.get("FacmNo"));
+			int yearmonth = parse.stringToInteger(tempOccursList.get("YearMonth"));
+			String assetclass = tempOccursList.get("AssetClass");
+
 			// 維護Ifrs9FacData
 			Ifrs9FacDataId ifrs9FacDataId = new Ifrs9FacDataId();
 			ifrs9FacDataId.setCustNo(custno);
@@ -243,7 +246,7 @@ public class L7205p extends TradeBuffer {
 			}
 
 			// 維護Ias34Ap
-
+			titaVo.setDataBaseOnLine(); // 連線環境
 			sIas34Ap = tIas34ApService.dataEq(custno, facmno, yearmonth, this.index, this.limit, titaVo);
 
 			List<Ias34Ap> lIas34Ap = sIas34Ap == null ? null : sIas34Ap.getContent();
@@ -259,10 +262,28 @@ public class L7205p extends TradeBuffer {
 						throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 					}
 				}
+
+				this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
+				if ("onLine".equals(titaVo.getDataBase())) {
+					titaVo.setDataBaseOnMon();// 指定月報環境
+				} else {
+					titaVo.setDataBaseOnLine();// 指定連線環境
+				}
+
+				for (Ias34Ap t : lIas34Ap) {
+					t.setAssetClass(parse.stringToInteger(assetclass));
+					try {
+						tIas34ApService.update(t, titaVo);
+					} catch (DBException e) {
+
+						throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+					}
+				}
+
 			}
 
 			// 維護LoanIfrs9Ap
-
+			titaVo.setDataBaseOnLine(); // 連線環境
 			sLoanIfrs9Ap = tLoanIfrs9ApService.dataEq(custno, facmno, yearmonth, this.index, this.limit, titaVo);
 
 			List<LoanIfrs9Ap> lLoanIfrs9Ap = sLoanIfrs9Ap == null ? null : sLoanIfrs9Ap.getContent();
@@ -549,6 +570,7 @@ public class L7205p extends TradeBuffer {
 		sLM052Ovdu.Usp_L9_MonthlyLM052Ovdu_Ins(yearMonth, empNo, "", titaVo);
 		// 更新MonthlyFacBal 利害關係人欄位
 		String txcd = titaVo.getTxcd();
+		this.info("txcd=" + txcd);
 		tMothlyFacBalService.Usp_L7_UploadToMothlyFacBal_Upd(yearMonth, txcd, empNo, "", titaVo);
 
 		this.info("upd LM052 SP finished.");

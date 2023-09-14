@@ -19,7 +19,7 @@ E(0,0)
 [
 ["[L5976]                                 債權案件主檔內容查詢"],
 [#<->#,"#FdFunctionCodeX+功能",#FunctionCodeX],
-[#<->#,"#FdCustId+身分證字號",#CustId,#BtnDetail],
+[#<->#,"#FdCustId+身分證字號",#CustId,#CustName],
 ["#FdCustNo+戶號",#CustNo],["#FdCaseSeq+案件序號",#CaseSeq],
 [#<->#,"#FdIsMainFin+最大債權",#IsMainFin],
 ["#FdCaseKindCode+案件種類",#CaseKindCode,#CaseKindCodeX],["#FdCourtCode+#CourtCodeFildName",#CourtCode,#CourtCodeX],
@@ -117,11 +117,11 @@ T(3,受理調解機構代號)
 
 #Hide=X,1,S
 INVOKEJS(SHOW,grd1,0)
-HIDE(#BtnDetail)
+!HIDE(#BtnDetail)
 HIDE(#BTND,#BTNF,#BTNE,#BTNG,#BTNH,#BTNI,#BTNJ,#BTNL)
 !HIDE(#BtnBankCode)
 
-#BtnDetail=X,1,S,ui:button;value:交易明細;enable:1;tabbable:0
+!#BtnDetail=X,1,S,ui:button;value:交易明細;enable:1;tabbable:0
 #BtnConnect=X,1,S,ui:button;value:聯絡電話;enable:1;tabbable:0
 #BTND=X,1,S,ui:button;value:註銷債權;enable:1;tabbable:0
 #BTNF=X,1,S,ui:button;value:毀諾;enable:1;tabbable:0
@@ -354,11 +354,11 @@ IF(#NegFinShareFinCode{i} !="",INVOKEJS(SHOW,grd1,{i},{i},1),INVOKEJS(SHOW,grd1,
 ##end
 
 ! <交易明細>
-#BufDetail=X,22,S
-T(2,05+#CustId+#CustNo+#CaseSeq)
+!#BufDetail=X,22,S
+!T(2,05+#CustId+#CustNo+#CaseSeq)
 
-#BindInsert=X,1,S
-BIND(#BtnDetail,click, {cmd=CHAIN; ntxcd=L5971; ntxbuf=#BufDetail})
+!#BindInsert=X,1,S
+!BIND(#BtnDetail,click, {cmd=CHAIN; ntxcd=L5971; ntxbuf=#BufDetail})
 
 ! 毀諾註記 1:設定 2:取消
 #RUINFG=X,1,S
@@ -377,7 +377,7 @@ T(2,05)
 #FunctionCode=X,2,S
 C(3,#CHAIN,0,T(2,01),s)
 C(3,#CHAIN,0,s,$)
-@IF(#FunctionCode=="01",SHOW(#BtnDetail),HIDE(#BtnDetail))
+@
 E(0,@FUNCIND,#FunctionCode)
 
 #FunctionCodeX=X,24,L
@@ -450,26 +450,45 @@ C(2,#WKTF2,HIDE(#BtnBankCode{i}),SHOW(#BtnBankCode{i}))
 ##end
                                   
 ! 身分證字號 //
-#CustId=X,10,I
+#CustId=X,10,L
 IF(#FunctionCode==#SearchCode,s,$)
 C(3,#CHAIN,0,$,IF(#L5r01CustId!="",s,$))
 @T(3,@CustNo,)
+V(7)
+A(ID_UNINO,0,#CustId)
+
+! 調RIM找CustNo及戶名
+<include src="ROM.icf::L5R51.dec"/>
+#RimErrorFg=X,1,S
+#SendL5r51=X,1,S
+C(4,#CustId,S,$)
+T(2,@RimCustId,#CustId)
+IF(#FunctionCode=="01",E(0,@RimCustNo,0),E(0,@RimCustNo,#L5r01CustNo))
+IF(#FunctionCode=="01",E(0,@RimCaseSeq,0),E(0,@RimCaseSeq,#L5r01CaseSeq))
+T(2,@RimErrorFg, )
+RESET_RIM(#SEND_L5R51,L5R51)
+S(L5R51,1,#RimCustId,#RimCustNo,#RimCaseSeq,#RimErrorFg)
+R(1,L5R51)
+IF(#FunctionCode=="01",T(2,@CustNo,#L5r51CustNo),$)
+
+#CustName=X,100,L
+T(2,#L5r51CustName)
+T(F,@CustName,0)
+IF(#FunctionCode=="01" || #FunctionCode=="02",$,s)
+IF(#L5r51CustNo == 0 || #L5r51CustNo > 9990000,$,s)
 @V(7)
-@A(ID_UNINO,0,#CustId)
 
 ! 調RIM找CustNo
 <include src="ROM.icf::L5R09.dec"/>
-
-
-#SendL5r09=X,1,S
-IF(#FunctionCode=="01",$,S)
-C(4,#CustId,S,$)
-T(2,@RimCustId,#CustId)
-E(0,@RimCustNo,0)
-RESET_RIM(#SEND_L5R09,L5R09)
-S(L5R09,1,#RimTxCode,#RimCustId,#RimCustNo)
-R(1,L5R09)
-T(2,@CustNo,#L5r09CustNo)
+!#SendL5r09=X,1,S
+!IF(#FunctionCode=="01",$,S)
+!C(4,#CustId,S,$)
+!T(2,@RimCustId,#CustId)
+!E(0,@RimCustNo,0)
+!RESET_RIM(#SEND_L5R09,L5R09)
+!S(L5R09,1,#RimTxCode,#RimCustId,#RimCustNo)
+!R(1,L5R09)
+!T(2,@CustNo,#L5r09CustNo)
 
 ! 戶號
 #CustNo=A,7,L
@@ -1164,6 +1183,7 @@ INVOKEJS(SHOW,grd1,{i},{i},0)
 <include src="ROM.icf::L5R12.tom"/>
 <include src="ROM.icf::L2R07.tom"/>
 <include src="ROM.icf::L5R43.tom"/>
+<include src="ROM.icf::L5R51.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L5701
 #CustNo

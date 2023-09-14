@@ -50,6 +50,17 @@ public interface MonthlyFacBalService {
   public Slice<MonthlyFacBal> findCl(int clCustNo_0, int clFacmNo_1, int index, int limit, TitaVo... titaVo);
 
   /**
+   * YearMonth = 
+   *
+   * @param yearMonth_0 yearMonth_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice MonthlyFacBal MonthlyFacBal of List
+   */
+  public Slice<MonthlyFacBal> findYearMonthAll(int yearMonth_0, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By MonthlyFacBal
    * 
    * @param monthlyFacBalId key

@@ -114,6 +114,34 @@ em = null;
   }
 
   @Override
+  public Slice<MonthlyLM052AssetClass> findYearMonthAll(int yearMonth_0, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<MonthlyLM052AssetClass> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findYearMonthAll " + dbName + " : " + "yearMonth_0 : " + yearMonth_0);
+    if (dbName.equals(ContentName.onDay))
+      slice = monthlyLM052AssetClassReposDay.findAllByYearMonthIs(yearMonth_0, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = monthlyLM052AssetClassReposMon.findAllByYearMonthIs(yearMonth_0, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = monthlyLM052AssetClassReposHist.findAllByYearMonthIs(yearMonth_0, pageable);
+    else 
+      slice = monthlyLM052AssetClassRepos.findAllByYearMonthIs(yearMonth_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
   public MonthlyLM052AssetClass holdById(MonthlyLM052AssetClassId monthlyLM052AssetClassId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

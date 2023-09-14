@@ -28,6 +28,9 @@ public interface MonthlyFacBalRepositoryMon extends JpaRepository<MonthlyFacBal,
   // ClCustNo=, AND ClFacmNo=
   public Slice<MonthlyFacBal> findAllByClCustNoIsAndClFacmNoIs(int clCustNo_0, int clFacmNo_1, Pageable pageable);
 
+  // YearMonth = 
+  public Slice<MonthlyFacBal> findAllByYearMonthIs(int yearMonth_0, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

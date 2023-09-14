@@ -1,0 +1,6 @@
+nano ~/.bashrc
+
+alias runmyscript='bash /home/CU3178/StartWeblogicServer.sh'
+
+source ~/.bashrc
+

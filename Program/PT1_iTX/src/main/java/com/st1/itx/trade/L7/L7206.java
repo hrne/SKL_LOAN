@@ -275,6 +275,8 @@ public class L7206 extends TradeBuffer {
 			int cntTrans = 0;
 
 			int cntInsert = 0;
+			
+			//因筆數大量 所以逐批update
 			for (OccursList tempOccursList : occursList) {
 
 				String iRelWithCompany = tempOccursList.get("RelWithCompany").toString();
@@ -339,7 +341,7 @@ public class L7206 extends TradeBuffer {
 					}
 
 					
-					this.batchTransaction.commit();
+				
 					
 					this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
 					if ("onLine".equals(titaVo.getDataBase())) {
@@ -361,8 +363,10 @@ public class L7206 extends TradeBuffer {
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 					}
-
 					
+					titaVo.setDataBaseOnLine();// 指定連線報環境
+					this.batchTransaction.commit();
+					titaVo.setDataBaseOnMon();// 指定月報環境
 					this.batchTransaction.commit();
 					
 					cntTrans = 0;
@@ -389,7 +393,6 @@ public class L7206 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
 
-			this.batchTransaction.commit();
 			
 			this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
 			if ("onLine".equals(titaVo.getDataBase())) {
@@ -411,7 +414,11 @@ public class L7206 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
 			
+			titaVo.setDataBaseOnLine();// 指定連線報環境
 			this.batchTransaction.commit();
+			titaVo.setDataBaseOnMon();// 指定月報環境
+			this.batchTransaction.commit();
+			
 			
 
 			updL7UploadData(titaVo);
@@ -462,7 +469,7 @@ public class L7206 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
-
+			
 			this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
 			if ("onLine".equals(titaVo.getDataBase())) {
 				titaVo.setDataBaseOnMon();// 指定月報環境
@@ -482,7 +489,11 @@ public class L7206 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
-
+			titaVo.setDataBaseOnLine();// 指定連線報環境
+			this.batchTransaction.commit();
+			titaVo.setDataBaseOnMon();// 指定月報環境
+			this.batchTransaction.commit();
+			
 			// 3:金控利關人名單[T044];xlsx xls
 		} else if (iFunctionCode == 3) {
 
@@ -537,6 +548,7 @@ public class L7206 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
 
+			
 			this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
 			if ("onLine".equals(titaVo.getDataBase())) {
 				titaVo.setDataBaseOnMon();// 指定月報環境
@@ -559,6 +571,12 @@ public class L7206 extends TradeBuffer {
 
 		}
 
+		titaVo.setDataBaseOnLine();// 指定連線報環境
+		this.batchTransaction.commit();
+		titaVo.setDataBaseOnMon();// 指定月報環境
+		this.batchTransaction.commit();
+		
+		
 		titaVo.setDataBaseOnOrg();// 還原原本的環境
 
 		this.totaVo.putParam("CountAll", CountAll);

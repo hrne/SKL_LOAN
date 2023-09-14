@@ -2,6 +2,9 @@ package com.st1.itx.util.common;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -269,7 +272,7 @@ public class LoanCom extends TradeBuffer {
 
 		int wkAcDate = 0;
 
-		LoanBorTx tLoanBorTx = loanBorTxService.holdById(new LoanBorTxId(iCustNo, iFacmNo, iBormNo, iBorxNo));
+		LoanBorTx tLoanBorTx = loanBorTxService.holdById(new LoanBorTxId(iCustNo, iFacmNo, iBormNo, iBorxNo), titaVo);
 		if (tLoanBorTx == null) {
 			throw new LogicException(titaVo, "E0006",
 					"放款交易內容檔 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 撥款序號 = " + iBormNo + " 交易內容檔序號 = " + iBorxNo); // 鎖定資料時，發生錯誤
@@ -278,7 +281,7 @@ public class LoanCom extends TradeBuffer {
 		tLoanBorTx.setTitaHCode(wkAcDate == titaVo.getEntDyI() ? "2" : "4"); // 0: 未訂正 1: 訂正 2: 被訂正 3: 沖正 4: 被沖正
 		tLoanBorTx.setCorrectSeq(parse.IntegerToString(titaVo.getEntDyI() + 19110000, 8) + titaVo.getTxSeq());
 		try {
-			loanBorTxService.update(tLoanBorTx);
+			loanBorTxService.update(tLoanBorTx, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
 		}
@@ -291,7 +294,7 @@ public class LoanCom extends TradeBuffer {
 		tLoanBorTx2.setCorrectSeq(parse.IntegerToString(tLoanBorTx.getAcDate() + 19110000, 8)
 				+ tLoanBorTx.getTitaKinBr() + tLoanBorTx.getTitaTlrNo() + tLoanBorTx.getTitaTxtNo());
 		// 訂正時彙總傳票批號為0
-		tLoanBorTx.setSlipSumNo(0);
+		tLoanBorTx2.setSlipSumNo(0);
 		// 修正時放主管放訂正主管
 		if (titaVo.isHcodeModify()) {
 			tLoanBorTx2.setTitaEmpNoS(titaVo.getParam("EraseSupNo"));
@@ -1250,8 +1253,8 @@ public class LoanCom extends TradeBuffer {
 
 		if (fac.getLastAcctDate() != titaVo.getOrgEntdyI() || !fac.getLastKinbr().equals(titaVo.getOrgKin())
 				|| !fac.getLastTlrNo().equals(titaVo.getOrgTlr()) || !fac.getLastTxtNo().equals(titaVo.getOrgTno())) {
-			throw new LogicException(titaVo, "E3088", "額度檔最近一筆交易序號 = " + fac.getLastAcctDate() + "-" + fac.getLastKinbr()
-					+ "-" + fac.getLastTlrNo() + "-" + fac.getLastTxtNo()); // 放款交易訂正須由最後一筆交易開始訂正
+			throw new LogicException(titaVo, "E3088", "額度檔最近一筆交易序號 = " + fac.getLastAcctDate() + "-"
+					+ fac.getLastKinbr() + "-" + fac.getLastTlrNo() + "-" + fac.getLastTxtNo()); // 放款交易訂正須由最後一筆交易開始訂正
 		}
 		// 登錄訂正
 		if (titaVo.isActfgEntry() && titaVo.isHcodeErase()) {

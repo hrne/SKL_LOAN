@@ -25,6 +25,9 @@ import com.st1.itx.db.domain.MonthlyLM052AssetClassId;
  */
 public interface MonthlyLM052AssetClassRepository extends JpaRepository<MonthlyLM052AssetClass, MonthlyLM052AssetClassId> {
 
+  // YearMonth = 
+  public Slice<MonthlyLM052AssetClass> findAllByYearMonthIs(int yearMonth_0, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)
