@@ -2,12 +2,8 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import com.st1.itx.util.StaticTool;
-import com.st1.itx.Exception.LogicException;
 
 /**
  * MonthlyFacBal 額度月報工作檔<br>
@@ -20,7 +16,12 @@ import com.st1.itx.Exception.LogicException;
 public class MonthlyFacBalId implements Serializable {
 
 
-  // 資料年月
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5935390734492944073L;
+
+// 資料年月
   @Column(name = "`YearMonth`")
   private int yearMonth = 0;
 

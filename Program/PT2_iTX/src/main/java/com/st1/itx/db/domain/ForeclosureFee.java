@@ -26,7 +26,12 @@ import com.st1.itx.Exception.LogicException;
 public class ForeclosureFee implements Serializable {
 
 
-  // 記錄號碼
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 946614038615169161L;
+
+// 記錄號碼
   @Id
   @Column(name = "`RecordNo`")
   private int recordNo = 0;

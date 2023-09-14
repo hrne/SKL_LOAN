@@ -1,17 +1,7 @@
 package com.st1.itx.trade.scheduled;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Slice;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,10 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.buffer.TxBuffer;
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.domain.SystemParas;
-import com.st1.itx.db.domain.TxFile;
-import com.st1.itx.db.domain.TxToDoDetail;
-import com.st1.itx.db.domain.TxToDoDetailId;
 import com.st1.itx.db.service.SystemParasService;
 import com.st1.itx.db.service.TxFileService;
 import com.st1.itx.db.service.TxToDoDetailService;

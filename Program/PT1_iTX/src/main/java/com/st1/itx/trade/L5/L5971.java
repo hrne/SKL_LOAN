@@ -30,9 +30,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/* DB容器 */
-import com.st1.itx.db.domain.CustMain;
-
 /*DB服務*/
 import com.st1.itx.db.service.CustMainService;
 

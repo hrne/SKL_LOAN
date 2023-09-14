@@ -25,7 +25,12 @@ import com.st1.itx.Exception.LogicException;
 public class PfInsCheck implements Serializable {
 
 
-  @EmbeddedId
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8410431879436859898L;
+
+@EmbeddedId
   private PfInsCheckId pfInsCheckId;
 
   // 類別

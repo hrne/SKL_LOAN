@@ -2,7 +2,6 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -30,7 +29,12 @@ import com.st1.itx.Exception.LogicException;
 public class PfRewardMedia implements Serializable {
 
 
-  // 系統序號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7647917832322504027L;
+
+// 系統序號
   @Id
   @Column(name = "`LogNo`")
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "`PfRewardMedia_SEQ`")

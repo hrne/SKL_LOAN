@@ -26,7 +26,12 @@ import com.st1.itx.Exception.LogicException;
 public class EmpDeductDtl implements Serializable {
 
 
-  @EmbeddedId
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7322691085386636677L;
+
+@EmbeddedId
   private EmpDeductDtlId empDeductDtlId;
 
   // 入帳日期

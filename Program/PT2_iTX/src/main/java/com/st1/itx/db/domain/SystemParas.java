@@ -26,7 +26,12 @@ import com.st1.itx.Exception.LogicException;
 public class SystemParas implements Serializable {
 
 
-  // 業務類型
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1441901623451345659L;
+
+// 業務類型
   /* LN */
   @Id
   @Column(name = "`BusinessType`", length = 2)

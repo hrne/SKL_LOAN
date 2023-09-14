@@ -2,12 +2,8 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import com.st1.itx.util.StaticTool;
-import com.st1.itx.Exception.LogicException;
 
 /**
  * MonthlyLM052AssetClass LM052資產分類表<br>
@@ -20,7 +16,12 @@ import com.st1.itx.Exception.LogicException;
 public class MonthlyLM052AssetClassId implements Serializable {
 
 
-  // 資料年月
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6060313610339822491L;
+
+// 資料年月
   @Column(name = "`YearMonth`")
   private int yearMonth = 0;
 

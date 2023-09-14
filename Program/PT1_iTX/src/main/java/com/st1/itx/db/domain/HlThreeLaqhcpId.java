@@ -16,7 +16,12 @@ import javax.persistence.Embeddable;
 public class HlThreeLaqhcpId implements Serializable {
 
 
-  // 部室代號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -5260834081353962669L;
+
+// 部室代號
   @Column(name = "`DeptCode`", length = 6)
   private String deptCode = " ";
 

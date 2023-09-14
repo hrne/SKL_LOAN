@@ -26,7 +26,12 @@ import com.st1.itx.Exception.LogicException;
 public class HlThreeLaqhcp implements Serializable {
 
 
-  @EmbeddedId
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7117061325269473341L;
+
+@EmbeddedId
   private HlThreeLaqhcpId hlThreeLaqhcpId;
 
   // 年月日

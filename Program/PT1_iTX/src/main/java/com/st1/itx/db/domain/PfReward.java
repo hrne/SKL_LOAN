@@ -29,7 +29,12 @@ import com.st1.itx.Exception.LogicException;
 public class PfReward implements Serializable {
 
 
-  // 序號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2080162054487347593L;
+
+// 序號
   @Id
   @Column(name = "`LogNo`")
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "`PfReward_SEQ`")
