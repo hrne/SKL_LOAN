@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -10,6 +11,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Column;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * MonthlyLM055AssetLoss LM055重要放款餘額明細表<br>
@@ -24,12 +27,7 @@ import javax.persistence.Column;
 public class MonthlyLM055AssetLoss implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -5801997508538735402L;
-
-@EmbeddedId
+  @EmbeddedId
   private MonthlyLM055AssetLossId monthlyLM055AssetLossId;
 
   // 資料年月
@@ -41,17 +39,20 @@ public class MonthlyLM055AssetLoss implements Serializable {
   @Column(name = "`LoanType`", length = 1, insertable = false, updatable = false)
   private String loanType;
 
-  // 放款項目
-  /* F(逾期放款) ：逾期數3至6期+催收G(應于評估) :  逾期數1-2+協議逾期數0H(正常放款) :  逾期數0(扣除協議逾期數0) */
-  @Column(name = "`LoanItem`", length = 1, insertable = false, updatable = false)
-  private String loanItem;
+  // 逾期放款
+  @Column(name = "`OverdueAmount`")
+  private BigDecimal overdueAmount = new BigDecimal("0");
 
-  // 放款餘額
-  @Column(name = "`LoanBal`")
-  private BigDecimal loanBal = new BigDecimal("0");
+  // 未列入逾期應予評估放款
+  @Column(name = "`ObserveAmount`")
+  private BigDecimal observeAmount = new BigDecimal("0");
+
+  // 正常放款
+  @Column(name = "`NormalAmount`")
+  private BigDecimal normalAmount = new BigDecimal("0");
 
   // 政策性專案貸款調整數
-  /* 放款種類=G.政策性專案貸款： ToTalLoanBal 專案貸款總額-調整-oToTalLoanBal 專案貸款總額- 88風災調整數放款種類=C.不動產抵押放款-ToTalLoanBal 專案貸款總額-調整+oToTalLoanBal 專案貸款總額+88風災調整數 */
+  /* ToTalLoanBal 專案貸款總額-調整-oToTalLoanBal 專案貸款總額-88LoanBal 88風災調整數G.政策性專案貸款：GovProjectAdjustAmtC.不動產抵押放款  : 0 - GovProjectAdjustAmt */
   @Column(name = "`GovProjectAdjustAmt`")
   private BigDecimal govProjectAdjustAmt = new BigDecimal("0");
 
@@ -83,13 +84,17 @@ public class MonthlyLM055AssetLoss implements Serializable {
   @Column(name = "`LoanAmountNeg0`")
   private BigDecimal loanAmountNeg0 = new BigDecimal("0");
 
+  // 催收金額
+  @Column(name = "`LoanAmount990`")
+  private BigDecimal loanAmount990 = new BigDecimal("0");
+
   // 正常逾期數0放款金額
   /* 放款餘額+政策性專案貸款調整數 */
   @Column(name = "`LoanAmountNor0`")
   private BigDecimal loanAmountNor0 = new BigDecimal("0");
 
   // 備呆金額五分類1
-  /* 總金額、備呆比率 ref MonthlyLM052AssetClass LM052資產分類表調整數放放款種類=C.不動產抵押放款A.銀行保證放款  按備呆比率重算B.動產擔保放款  按備呆比率重算C.不動產抵押放款    總金額-其他D.有價證券質押放款 按備呆比率重算G.政策性專案貸款  按備呆比率重算 */
+  /* 備呆總金額(不含應收利息)、備呆比率 ref MonthlyLM052AssetClass(LM052資產分類表)調整數放放款種類=C.不動產抵押放款A.銀行保證放款=&amp;gt;按備呆比率重算B.動產擔保放款=&amp;gt;按備呆比率重算C.不動產抵押放款=&amp;gt;總金額-其他重算金額D.有價證券質押放款=&amp;gt;按備呆比率重算G.政策性專案貸款 =&amp;gt;按備呆比率重算 */
   @Column(name = "`ReserveLossAmt1`")
   private BigDecimal reserveLossAmt1 = new BigDecimal("0");
 
@@ -114,7 +119,7 @@ public class MonthlyLM055AssetLoss implements Serializable {
   private BigDecimal reserveLossAmt5 = new BigDecimal("0");
 
   // IFRS9增提金額(含應收利息)
-  /* 放款種類=C.不動產抵押放款MonthlyLM052Loss LM052備抵損失資料檔ApprovedLoss會計部核定備抵損失-AssetEvaTotal 法定備抵提存(五類資產評估) */
+  /* 放款種類=C.不動產抵押放款備呆總金額(不含應收利息) - 會計部核定備抵損失(MonthlyLM052Loss.ApprovedLoss) */
   @Column(name = "`IFRS9AdjustAmt`")
   private BigDecimal iFRS9AdjustAmt = new BigDecimal("0");
 
@@ -194,57 +199,69 @@ Z.折溢價與費用
   }
 
 /**
-	* 放款項目<br>
-	* F(逾期放款) ：逾期數3至6期+催收
-G(應于評估) :  逾期數1-2+協議逾期數0
-H(正常放款) :  逾期數0(扣除協議逾期數0)
-	* @return String
-	*/
-  public String getLoanItem() {
-    return this.loanItem == null ? "" : this.loanItem;
-  }
-
-/**
-	* 放款項目<br>
-	* F(逾期放款) ：逾期數3至6期+催收
-G(應于評估) :  逾期數1-2+協議逾期數0
-H(正常放款) :  逾期數0(扣除協議逾期數0)
-  *
-  * @param loanItem 放款項目
-	*/
-  public void setLoanItem(String loanItem) {
-    this.loanItem = loanItem;
-  }
-
-/**
-	* 放款餘額<br>
+	* 逾期放款<br>
 	* 
 	* @return BigDecimal
 	*/
-  public BigDecimal getLoanBal() {
-    return this.loanBal;
+  public BigDecimal getOverdueAmount() {
+    return this.overdueAmount;
   }
 
 /**
-	* 放款餘額<br>
+	* 逾期放款<br>
 	* 
   *
-  * @param loanBal 放款餘額
+  * @param overdueAmount 逾期放款
 	*/
-  public void setLoanBal(BigDecimal loanBal) {
-    this.loanBal = loanBal;
+  public void setOverdueAmount(BigDecimal overdueAmount) {
+    this.overdueAmount = overdueAmount;
+  }
+
+/**
+	* 未列入逾期應予評估放款<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getObserveAmount() {
+    return this.observeAmount;
+  }
+
+/**
+	* 未列入逾期應予評估放款<br>
+	* 
+  *
+  * @param observeAmount 未列入逾期應予評估放款
+	*/
+  public void setObserveAmount(BigDecimal observeAmount) {
+    this.observeAmount = observeAmount;
+  }
+
+/**
+	* 正常放款<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getNormalAmount() {
+    return this.normalAmount;
+  }
+
+/**
+	* 正常放款<br>
+	* 
+  *
+  * @param normalAmount 正常放款
+	*/
+  public void setNormalAmount(BigDecimal normalAmount) {
+    this.normalAmount = normalAmount;
   }
 
 /**
 	* 政策性專案貸款調整數<br>
-	* 放款種類=G.政策性專案貸款：
- ToTalLoanBal 專案貸款總額-調整
+	* ToTalLoanBal 專案貸款總額-調整
 -oToTalLoanBal 專案貸款總額
-- 88風災調整數
-放款種類=C.不動產抵押放款
--ToTalLoanBal 專案貸款總額-調整
-+oToTalLoanBal 專案貸款總額
-+88風災調整數
+-88LoanBal 88風災調整數
+G.政策性專案貸款：GovProjectAdjustAmt
+C.不動產抵押放款  : 0 - GovProjectAdjustAmt
 	* @return BigDecimal
 	*/
   public BigDecimal getGovProjectAdjustAmt() {
@@ -253,14 +270,11 @@ H(正常放款) :  逾期數0(扣除協議逾期數0)
 
 /**
 	* 政策性專案貸款調整數<br>
-	* 放款種類=G.政策性專案貸款：
- ToTalLoanBal 專案貸款總額-調整
+	* ToTalLoanBal 專案貸款總額-調整
 -oToTalLoanBal 專案貸款總額
-- 88風災調整數
-放款種類=C.不動產抵押放款
--ToTalLoanBal 專案貸款總額-調整
-+oToTalLoanBal 專案貸款總額
-+88風災調整數
+-88LoanBal 88風災調整數
+G.政策性專案貸款：GovProjectAdjustAmt
+C.不動產抵押放款  : 0 - GovProjectAdjustAmt
   *
   * @param govProjectAdjustAmt 政策性專案貸款調整數
 	*/
@@ -402,6 +416,25 @@ H(正常放款) :  逾期數0(扣除協議逾期數0)
   }
 
 /**
+	* 催收金額<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getLoanAmount990() {
+    return this.loanAmount990;
+  }
+
+/**
+	* 催收金額<br>
+	* 
+  *
+  * @param loanAmount990 催收金額
+	*/
+  public void setLoanAmount990(BigDecimal loanAmount990) {
+    this.loanAmount990 = loanAmount990;
+  }
+
+/**
 	* 正常逾期數0放款金額<br>
 	* 放款餘額+政策性專案貸款調整數
 	* @return BigDecimal
@@ -422,13 +455,14 @@ H(正常放款) :  逾期數0(扣除協議逾期數0)
 
 /**
 	* 備呆金額五分類1<br>
-	* 總金額、備呆比率 ref MonthlyLM052AssetClass LM052資產分類表
+	* 備呆總金額(不含應收利息)、備呆比率 
+ref MonthlyLM052AssetClass(LM052資產分類表)
 調整數放放款種類=C.不動產抵押放款
-A.銀行保證放款  按備呆比率重算
-B.動產擔保放款  按備呆比率重算
-C.不動產抵押放款    總金額-其他
-D.有價證券質押放款 按備呆比率重算
-G.政策性專案貸款  按備呆比率重算
+A.銀行保證放款=&amp;gt;按備呆比率重算
+B.動產擔保放款=&amp;gt;按備呆比率重算
+C.不動產抵押放款=&amp;gt;總金額-其他重算金額
+D.有價證券質押放款=&amp;gt;按備呆比率重算
+G.政策性專案貸款 =&amp;gt;按備呆比率重算
 	* @return BigDecimal
 	*/
   public BigDecimal getReserveLossAmt1() {
@@ -437,13 +471,14 @@ G.政策性專案貸款  按備呆比率重算
 
 /**
 	* 備呆金額五分類1<br>
-	* 總金額、備呆比率 ref MonthlyLM052AssetClass LM052資產分類表
+	* 備呆總金額(不含應收利息)、備呆比率 
+ref MonthlyLM052AssetClass(LM052資產分類表)
 調整數放放款種類=C.不動產抵押放款
-A.銀行保證放款  按備呆比率重算
-B.動產擔保放款  按備呆比率重算
-C.不動產抵押放款    總金額-其他
-D.有價證券質押放款 按備呆比率重算
-G.政策性專案貸款  按備呆比率重算
+A.銀行保證放款=&amp;gt;按備呆比率重算
+B.動產擔保放款=&amp;gt;按備呆比率重算
+C.不動產抵押放款=&amp;gt;總金額-其他重算金額
+D.有價證券質押放款=&amp;gt;按備呆比率重算
+G.政策性專案貸款 =&amp;gt;按備呆比率重算
   *
   * @param reserveLossAmt1 備呆金額五分類1
 	*/
@@ -530,9 +565,8 @@ G.政策性專案貸款  按備呆比率重算
 /**
 	* IFRS9增提金額(含應收利息)<br>
 	* 放款種類=C.不動產抵押放款
-MonthlyLM052Loss LM052備抵損失資料檔
-ApprovedLoss會計部核定備抵損失
--AssetEvaTotal 法定備抵提存(五類資產評估)
+備呆總金額(不含應收利息) 
+- 會計部核定備抵損失(MonthlyLM052Loss.ApprovedLoss)
 	* @return BigDecimal
 	*/
   public BigDecimal getIFRS9AdjustAmt() {
@@ -542,9 +576,8 @@ ApprovedLoss會計部核定備抵損失
 /**
 	* IFRS9增提金額(含應收利息)<br>
 	* 放款種類=C.不動產抵押放款
-MonthlyLM052Loss LM052備抵損失資料檔
-ApprovedLoss會計部核定備抵損失
--AssetEvaTotal 法定備抵提存(五類資產評估)
+備呆總金額(不含應收利息) 
+- 會計部核定備抵損失(MonthlyLM052Loss.ApprovedLoss)
   *
   * @param iFRS9AdjustAmt IFRS9增提金額(含應收利息)
 	*/
@@ -631,9 +664,10 @@ ApprovedLoss會計部核定備抵損失
 
   @Override
   public String toString() {
-    return "MonthlyLM055AssetLoss [monthlyLM055AssetLossId=" + monthlyLM055AssetLossId + ", loanBal=" + loanBal + ", govProjectAdjustAmt=" + govProjectAdjustAmt + ", loanAmount1=" + loanAmount1
-           + ", loanAmount2=" + loanAmount2 + ", loanAmount3=" + loanAmount3 + ", loanAmount4=" + loanAmount4 + ", loanAmount5=" + loanAmount5 + ", loanAmount6=" + loanAmount6 + ", loanAmountNeg0=" + loanAmountNeg0
-           + ", loanAmountNor0=" + loanAmountNor0 + ", reserveLossAmt1=" + reserveLossAmt1 + ", reserveLossAmt2=" + reserveLossAmt2 + ", reserveLossAmt3=" + reserveLossAmt3 + ", reserveLossAmt4=" + reserveLossAmt4 + ", reserveLossAmt5=" + reserveLossAmt5
-           + ", iFRS9AdjustAmt=" + iFRS9AdjustAmt + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "MonthlyLM055AssetLoss [monthlyLM055AssetLossId=" + monthlyLM055AssetLossId + ", overdueAmount=" + overdueAmount + ", observeAmount=" + observeAmount + ", normalAmount=" + normalAmount + ", govProjectAdjustAmt=" + govProjectAdjustAmt
+           + ", loanAmount1=" + loanAmount1 + ", loanAmount2=" + loanAmount2 + ", loanAmount3=" + loanAmount3 + ", loanAmount4=" + loanAmount4 + ", loanAmount5=" + loanAmount5 + ", loanAmount6=" + loanAmount6
+           + ", loanAmountNeg0=" + loanAmountNeg0 + ", loanAmount990=" + loanAmount990 + ", loanAmountNor0=" + loanAmountNor0 + ", reserveLossAmt1=" + reserveLossAmt1 + ", reserveLossAmt2=" + reserveLossAmt2 + ", reserveLossAmt3=" + reserveLossAmt3
+           + ", reserveLossAmt4=" + reserveLossAmt4 + ", reserveLossAmt5=" + reserveLossAmt5 + ", iFRS9AdjustAmt=" + iFRS9AdjustAmt + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

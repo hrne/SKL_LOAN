@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -91,9 +94,9 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "YearMonth", "LoanType", "LoanItem"));
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "YearMonth", "LoanType"));
     else
-         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "YearMonth", "LoanType", "LoanItem"));
+         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "YearMonth", "LoanType"));
     this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = monthlyLM055AssetLossReposDay.findAll(pageable);

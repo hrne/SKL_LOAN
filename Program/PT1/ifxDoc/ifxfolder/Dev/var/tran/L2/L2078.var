@@ -52,12 +52,15 @@ K(MODIFYBUTTON,1,新增)
 ["[L2078]                                 法拍費用明細資料查詢"],
 ["#FdReceiveDateStart+收件日",#ReceiveDateStart,"@-@",#ReceiveDateEnd],
 ["#FdCustNoStart+借戶戶號",#CustNoStart,"@-@",#CustNoEnd],
+["#FdSearc+列印選項",#Searc,#SearcFlagX],
 ]
 
 #FdReceiveDateStart=X,2,L
 T(3,*)
 
 #FdCustNoStart=X,2,L
+T(3,*)
+#FdSearc=X,2,L
 T(3,*)
 
 !---------- AP Button AREA ----------
@@ -71,6 +74,8 @@ T(3,CdCode.CurrPrecision)
 
 #CDDEF0002=x,26,S
 T(3,CdCode.FeeCode)
+#SearcHelp=x,50,S
+T(3,1:下載檔案;2:畫面顯示)
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
@@ -125,7 +130,18 @@ C(3,#CustNoStart,0,E(0,9999999),E(0,#CustNoStart))
 C(3,#CHAIN,1,s,$)
 @V(2,0)V(5,#CustNoStart,9999999)
 
+#Searc=A,1,I
+C(3,#Searc,0,E(0,2) ,$)
+C(3,#CHAIN,1,s,$)
+HELP(#SearcHelp)
+@V(H,#SearcHelp)
+
+#SearcFlagX=X,8,L
+T(3,)T(H,#Searc,#SearcHelp)
+
 #RPTFG=A,1,S
+C(3,#CHAIN,1,s,$)
+C(5,#Searc,1,E(0,@RPTFG2,1),E(0,@RPTFG2,0))
 
 
 #CHAINXMT=X,1,S
@@ -238,7 +254,6 @@ T(2,#OOFeeCode+-+#OOFeeCodeX)
 
 #ZRO37=X,37,S
 
-
 !修改
 #OOBUF2=X,179,S
 T(2,#FUNC2+#OORecordNo+#OOCustNo+#OOFacmNo+#OOReceiveDate+0000000+#OOFee+#OOFeeCode+#OOCaseCode+000+          +#OOCaseNo+#OOCloseDate+#SPC60+#OOCloseNo)
@@ -246,14 +261,12 @@ T(2,#FUNC2+#OORecordNo+#OOCustNo+#OOFacmNo+#OOReceiveDate+0000000+#OOFee+#OOFeeC
 #OOBTN2=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L2602; ntxbuf=#OOBUF2})
 
-
 !複製
 #OOBUF3=X,179,S
 T(2,#OOCustNo+#OOFacmNo+#OOReceiveDate+#OODocDate+#OOFee+#OOFeeCode+#OOLegalStaff+#OORecordNo+#OORmk)
 
 #OOBTN3=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L2601; ntxbuf=#OOBUF3})
-
 
 !刪除
 #OOBUF4=X,179,S
@@ -282,6 +295,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L2602; ntxbuf=#OOBUF5})
 #ReceiveDateEnd
 #CustNoStart
 #CustNoEnd
+#Searc
 #END
 </sub>
 
@@ -319,10 +333,17 @@ TXFORM=L2078
 ["催收法務費",#OvduFeeTotal],
 ]
 </sub>
+
+<sub type="PART" name="L2078R" layout="cols=1;screen.width=[100,1000];printer.width=[15,30]">
+[
+["[L2078]                                 法拍費用明細資料查詢"],
+["",""],
+]
+</sub>
 !---------- 單據輸出組合 ----------
 <sub type="SELECT">
 
-#RPTFG2=1,QUERY.GRID,L2078
+#RPTFG2=0,QUERY.GRID,L2078
 #any={detail:true, header:'L2078.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
 #OOBTN2=修改
@@ -374,6 +395,7 @@ TXFORM=L2078
 
 ^
 
+
 #RPTFG2=2,QUERY.GRID,L2078
 #any={detail:true, header:'L2078.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
@@ -412,6 +434,9 @@ TXFORM=L2078
 #OOCloseNo=銷帳編號
 {width:100,align:'center'}
 
+^
+#RPTFG2=1,QUERY.GRID,L2078R
+#any={detail:false, header:'L2078R.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
 ^
 <include src="PRT.icf::INQ01.sel" map="i=L2078;cpi=15"/>
 

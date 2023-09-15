@@ -396,7 +396,7 @@ BEGIN
     ) 
     SELECT S."TRXDAT"                     AS "RelDy"               -- 登放日期 Decimald 8 0 
           ,'0000' 
-           || NVL(AEM1."EmpNo",'999999')
+           || NVL(AEM1."EmpNo",LPAD(txEmpData."TRXMEM",6,'0'))
           -- 2021-11-30 修改 只紀錄TRXNMT 
            || LPAD(S."TRXNMT",8,'0')      AS "RelTxseq"            -- 登放序號 VARCHAR2 18 0 
           ,ROW_NUMBER() 
@@ -445,7 +445,8 @@ BEGIN
           ,S."AGLVBN"                     AS "SlipBatNo"           -- 傳票批號 DECIMAL 2 0 
           ,S."JLNVNO"                     AS "SlipNo"              -- 傳票號碼 DECIMAL 6 0 
           ,'0000'                         AS "TitaKinbr"           -- 登錄單位別 VARCHAR2 4 0 
-          ,NVL(AEM1."EmpNo",'999999')     AS "TitaTlrNo"           -- 登錄經辦 VARCHAR2 6 0 
+          ,NVL(AEM1."EmpNo",LPAD(txEmpData."TRXMEM",6,'0'))
+                                          AS "TitaTlrNo"           -- 登錄經辦 VARCHAR2 6 0 
           ,LPAD(S."TRXNMT",8,'0')         AS "TitaTxtNo"           -- 登錄交易序號 DECIMAL 8 0 
           ,CASE
              WHEN S."AGLVBN" >= 90
@@ -474,10 +475,10 @@ BEGIN
            || '}'                         AS "JsonFields"          -- jason格式紀錄欄 VARCHAR2 300 0 
           ,TO_DATE(NVL(S."TRXIDT",S."TRXDAT"),'YYYYMMDD')
                                           AS "CreateDate"          -- 建檔日期時間 DATE 0 0 
-          ,NVL(AEM1."EmpNo",'999999')     AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0 
+          ,NVL(AEM1."EmpNo",LPAD(txEmpData."TRXMEM",6,'0'))     AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0 
           ,TO_DATE(NVL(S."TRXIDT",S."TRXDAT"),'YYYYMMDD')
                                           AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0 
-          ,NVL(AEM1."EmpNo",'999999')     AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0 
+          ,NVL(AEM1."EmpNo",LPAD(txEmpData."TRXMEM",6,'0'))     AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0 
           ,S."BSTBTN"                     AS "SlipSumNo" 
           ,TO_NUMBER(NVL(S."JLNCRC",0))   AS "TitaHCode" 
           ,''                             AS "MediaSlipNo"
@@ -498,27 +499,27 @@ BEGIN
  
     /* 更新交易代號 */ 
     UPDATE "AcDetail" SET 
-    "TitaTxCd" = CASE "TitaTxCd" 
-                   WHEN '3021' THEN 'L3701' 
-                   WHEN '3025' THEN 'L3100' -- D 
-                   WHEN '3031' THEN 'L3200' -- C 
-                   WHEN '3033' THEN 'L3230' --  
-                   WHEN '3036' THEN 'L3210' 
-                   WHEN '3037' THEN 'L3220' 
-                   WHEN '3041' THEN 'L3420' 
-                   WHEN '3046' THEN 'L3711' 
-                   WHEN '3066' THEN 'L3200' 
-                   WHEN '3079' THEN 'L6201' -- 2023-04-24 Wei 新增 from Lai
-                   WHEN '3080' THEN 'L3200' 
-                   WHEN '3081' THEN 'L3200' 
-                   WHEN '3082' THEN 'L3210' 
-                   WHEN '3083' THEN 'L3230' 
-                   WHEN '3084' THEN 'L3200' 
-                   WHEN '3085' THEN 'L3200' 
-                   WHEN '3086' THEN 'L3420' 
-                   WHEN '3087' THEN 'L3420' 
-                   WHEN '3088' THEN 'L3210' 
-                   WHEN '3089' THEN 'L3420' 
+    "TitaTxCd" = CASE 
+                   WHEN "TitaTxCd" = '3021' THEN 'L3701' 
+                   WHEN "TitaTxCd" = '3025' THEN 'L3100' -- D 
+                   WHEN "TitaTxCd" = '3031' THEN 'L3200' -- C 
+                   WHEN "TitaTxCd" = '3033' THEN 'L3230' --  
+                   WHEN "TitaTxCd" = '3036' THEN 'L3210' 
+                   WHEN "TitaTxCd" = '3037' THEN 'L3220' 
+                   WHEN "TitaTxCd" = '3041' THEN 'L3420' 
+                   WHEN "TitaTxCd" = '3046' THEN 'L3711' 
+                   WHEN "TitaTxCd" = '3066' THEN 'L3200' 
+                   WHEN "TitaTxCd" = '3079' THEN 'L6201' -- 2023-04-24 Wei 新增 from Lai
+                   WHEN "TitaTxCd" = '3080' THEN 'L3200' 
+                   WHEN "TitaTxCd" = '3081' THEN 'L3200' 
+                   WHEN "TitaTxCd" = '3082' THEN 'L3210' 
+                   WHEN "TitaTxCd" = '3083' THEN 'L3230' 
+                   WHEN "TitaTxCd" = '3084' THEN 'L3200' 
+                   WHEN "TitaTxCd" = '3085' THEN 'L3200' 
+                   WHEN "TitaTxCd" = '3086' THEN 'L3420' 
+                   WHEN "TitaTxCd" = '3087' THEN 'L3100' 
+                   WHEN "TitaTxCd" = '3088' THEN 'L3210' 
+                   WHEN "TitaTxCd" = '3089' THEN 'L3420' 
                  ELSE "TitaTxCd" END  
     ; 
  
@@ -699,6 +700,183 @@ BEGIN
       AND JORP."TRXDAT" <= "DateEnd"
     ; 
  
+    -- 寫入資料 
+    INSERT INTO "AcDetail" (
+            "RelDy"               -- 登放日期 Decimald 8 0 
+          , "RelTxseq"            -- 登放序號 VARCHAR2 18 0 
+          , "AcSeq"               -- 分錄序號 DECIMAL 4 0 
+          , "AcDate"              -- 會計日期 Decimald 8 0 
+          , "BranchNo"            -- 單位別 VARCHAR2 4 0 
+          , "CurrencyCode"        -- 幣別 VARCHAR2 3 0 
+          , "AcNoCode"            -- 科目代號 VARCHAR2 11 0 -- 2021-07-15 修改為新版11碼 
+          , "AcSubCode"           -- 子目代號 VARCHAR2 5 0 
+          , "AcDtlCode"           -- 細目代號 VARCHAR2 2 0 
+          , "AcctCode"            -- 業務科目代號 VARCHAR2 3 0 
+          , "DbCr"                -- 借貸別 VARCHAR2 1 0 
+          , "TxAmt"               -- 記帳金額 DECIMAL 16 2 
+          , "EntAc"               -- 入總帳記號 DECIMAL 1 0 
+          , "CustNo"              -- 戶號 DECIMAL 7 0 
+          , "FacmNo"              -- 額度編號 DECIMAL 3 0 
+          , "BormNo"              -- 撥款序號 DECIMAL 3 0 
+          , "RvNo"                -- 銷帳編號 VARCHAR2 30 0 
+          , "AcctFlag"            -- 業務科目記號 DECIMAL 1 0 
+          , "ReceivableFlag"      -- 銷帳科目記號 DECIMAL 1 0 
+          , "AcBookFlag"          -- 帳冊別記號 DECIMAL 1 0 
+          , "AcBookCode"          -- 帳冊別 VARCHAR2 3  -- 2021-07-15 舊資料固定為000:全公司 
+          , "AcSubBookCode"       -- 區隔帳冊 VARCHAR2 3 0 -- 2021-07-15 新增欄位,00A傳統帳冊、201利變帳冊 
+          , "SumNo"               -- 彙總別 VARCHAR2 3 0 
+          , "DscptCode"           -- 摘要代號 VARCHAR2 4 0 
+          , "SlipNote"            -- 傳票摘要 NVARCHAR2 80 0 
+          , "SlipBatNo"           -- 傳票批號 DECIMAL 2 0 
+          , "SlipNo"              -- 傳票號碼 DECIMAL 6 0 
+          , "TitaKinbr"           -- 登錄單位別 VARCHAR2 4 0 
+          , "TitaTlrNo"           -- 登錄經辦 VARCHAR2 6 0 
+          , "TitaTxtNo"           -- 登錄交易序號 DECIMAL 8 0 
+          , "TitaTxCd"            -- 交易代號 VARCHAR2 5 0 
+          , "TitaSecNo"           -- 業務類別 VARCHAR2 2 0 
+          , "TitaBatchNo"         -- 整批批號 VARCHAR2 6 0 
+          , "TitaBatchSeq"        -- 整批明細序號 VARCHAR2 6 0 
+          , "TitaSupNo"           -- 核准主管 VARCHAR2 6 0 
+          , "TitaRelCd"           -- 作業模式 DECIMAL 1 0 
+          , "JsonFields"          -- jason格式紀錄欄 VARCHAR2 300 0 
+          , "CreateDate"          -- 建檔日期時間 DATE 0 0 
+          , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0 
+          , "LastUpdate"          -- 最後更新日期時間 DATE 0 0 
+          , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0 
+          , "SlipSumNo" 
+          , "TitaHCode" 
+          , "MediaSlipNo"
+    )
+    WITH BOKOTHERS AS ( 
+        SELECT AGLACC 
+             , AGLACS 
+             , AGLVBN 
+             , TRXDAT 
+             , TRXATP 
+             , SUM(CORAMT) AS CORAMT 
+        FROM DAT_LN$AVRP
+        WHERE AGLVBN > 90 
+          AND ACNBOK != '000' 
+        GROUP BY AGLACC 
+               , AGLACS 
+               , AGLVBN 
+               , TRXDAT 
+               , TRXATP 
+    )  
+    , JORP AS ( 
+        SELECT AGLACC -- CORACC 
+             , AGLACS -- CORACS 
+             , CORAMT -- CORAMT 
+             , ACNBOK -- ACNBOK 
+             , AGLVBN -- NEWVBN 
+             , TRXDAT -- TRXDAT 
+             , TRXATP -- TRXATP 
+             , ACRNUM -- CORVNO 
+             , ACRSRN -- CORVNS 
+             , CORVDS -- CORVDS 
+        FROM DAT_LN$AVRP
+        WHERE AGLVBN > 90 
+    ) 
+    SELECT JORP."TRXDAT"                  AS "RelDy"               -- 登放日期 Decimald 8 0 
+          ,'000099999900000000'           AS "RelTxseq"            -- 登放序號 VARCHAR2 18 0 
+          ,ROW_NUMBER() OVER (PARTITION BY JORP."TRXDAT" 
+                              ORDER BY JORP."AGLVBN"   
+                                     , JORP."ACRSRN" 
+                                     , JORP."ACNBOK" 
+                             )            AS "AcSeq"               -- 分錄序號 DECIMAL 4 0 
+          ,JORP."TRXDAT"                  AS "AcDate"              -- 會計日期 Decimald 8 0 
+          ,'0000'                         AS "BranchNo"            -- 單位別 VARCHAR2 4 0 
+          ,'TWD'                          AS "CurrencyCode"        -- 幣別 VARCHAR2 3 0 
+          ,S5."AcNoCode"                  AS "AcNoCode"            -- 科目代號 VARCHAR2 11 0 -- 2021-07-15 修改為新版11碼 
+          ,S5."AcSubCode"                 AS "AcSubCode"           -- 子目代號 VARCHAR2 5 0 
+          ,S5."AcDtlCode"                 AS "AcDtlCode"           -- 細目代號 VARCHAR2 2 0 
+          ,S5."AcctCode"                  AS "AcctCode"            -- 業務科目代號 VARCHAR2 3 0 
+          ,JORP."TRXATP"                  AS "DbCr"                -- 借貸別 VARCHAR2 1 0 
+          ,JORP."CORAMT" 
+           - CASE 
+               WHEN NVL(JORP."ACNBOK",' ') = '000' 
+               THEN NVL(BOKOTHERS."CORAMT",0) 
+             ELSE 0 END                   AS "TxAmt"               -- 記帳金額 DECIMAL 16 2 
+          ,CASE
+             WHEN JORP.AGLVBN > 90
+             THEN 9
+           ELSE 1 END                     AS "EntAc"               -- 入總帳記號 DECIMAL 1 0 
+          ,0                              AS "CustNo"              -- 戶號 DECIMAL 7 0 
+          ,0                              AS "FacmNo"              -- 額度編號 DECIMAL 3 0 
+          ,0                              AS "BormNo"              -- 撥款序號 DECIMAL 3 0 
+          ,''                             AS "RvNo"                -- 銷帳編號 VARCHAR2 30 0 
+          ,NVL(S5."AcctFlag",0)           AS "AcctFlag"            -- 業務科目記號 DECIMAL 1 0 
+          ,NVL(S5."ReceivableFlag",0)     AS "ReceivableFlag"      -- 銷帳科目記號 DECIMAL 1 0 
+          ,NVL(S5."AcBookFlag",0)         AS "AcBookFlag"          -- 帳冊別記號 DECIMAL 1 0 
+          ,'000'                          AS "AcBookCode"          -- 帳冊別 VARCHAR2 3  -- 2021-07-15 舊資料固定為000:全公司 
+          ,CASE 
+             WHEN NVL(JORP."ACNBOK",' ') = '201' 
+             THEN '201' 
+           ELSE '00A' END                 AS "AcSubBookCode"       -- 區隔帳冊 VARCHAR2 3 0 -- 2021-07-15 新增欄位,00A傳統帳冊、201利變帳冊 
+          ,''                             AS "SumNo"               -- 彙總別 VARCHAR2 3 0 
+          ,''                             AS "DscptCode"           -- 摘要代號 VARCHAR2 4 0 
+          ,u''                            AS "SlipNote"            -- 傳票摘要 NVARCHAR2 80 0 
+          ,JORP.AGLVBN                    AS "SlipBatNo"           -- 傳票批號 DECIMAL 2 0 
+          ,JORP.ACRSRN                    AS "SlipNo"              -- 傳票號碼 DECIMAL 6 0 
+          ,'0000'                         AS "TitaKinbr"           -- 登錄單位別 VARCHAR2 4 0 
+          ,'999999'                       AS "TitaTlrNo"           -- 登錄經辦 VARCHAR2 6 0 
+          ,0                              AS "TitaTxtNo"           -- 登錄交易序號 DECIMAL 8 0 
+          ,'L618D'                        AS "TitaTxCd"            -- 交易代號 VARCHAR2 5 0 
+          ,''                             AS "TitaSecNo"           -- 業務類別 VARCHAR2 2 0 
+          ,''                             AS "TitaBatchNo"         -- 整批批號 VARCHAR2 6 0 
+          ,''                             AS "TitaBatchSeq"        -- 整批明細序號 VARCHAR2 6 0 
+          ,''                             AS "TitaSupNo"           -- 核准主管 VARCHAR2 6 0 
+          ,0                              AS "TitaRelCd"           -- 作業模式 DECIMAL 1 0 
+          ,''                             AS "JsonFields"          -- jason格式紀錄欄 VARCHAR2 300 0 
+          ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 0 0 
+          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0 
+          ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0 
+          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0 
+          ,JORP.AGLVBN                    AS "SlipSumNo" 
+          ,0                              AS "TitaHCode" 
+          ,''                             AS "MediaSlipNo"
+    FROM JORP 
+    LEFT JOIN "CdAcCode" S5 ON S5."AcNoCode" = JORP."AGLACC" 
+                           AND S5."AcSubCode" = NVL(JORP."AGLACS",'     ') 
+                           AND S5."AcDtlCode" = CASE 
+                                                  WHEN JORP."AGLACC" = '40903030000' 
+                                                       AND NVL(JORP."AGLACS",'     ') = '     ' 
+                                                  THEN '01' -- 放款帳管費 
+                                                  -- 2022-06-30 Wei From Lai Email: 
+                                                  -- AcNoCode = 20222020000 
+                                                  -- 轉 AcDtlCode = 01 
+                                                  --    and AcctCode = TAV 
+                                                  WHEN JORP."AGLACC" = '20222020000' 
+                                                       AND NVL(JORP."AGLACS",'     ') = '     ' 
+                                                  THEN '01' 
+                                                  -- 2022-09-08 Wei FROM yoko line 
+                                                  WHEN JORP."AGLACC" = '20222180200' 
+                                                       AND NVL(JORP."AGLACS",'     ') = '     ' 
+                                                  THEN '01' 
+                                                  -- 2022-09-08 Wei fix bug 
+                                                  WHEN JORP."AGLACC" = '20222180000' 
+                                                       AND NVL(JORP."AGLACS",'     ') = '     ' 
+                                                  THEN '01' 
+                                                  -- 2022-09-08 Wei fix bug 
+                                                  WHEN JORP."AGLACC" = '20222180100' 
+                                                       AND NVL(JORP."AGLACS",'     ') = '     ' 
+                                                  THEN '01' 
+                                                  -- 2022-09-08 Wei fix bug 
+                                                  WHEN JORP."AGLACC" = '40906040000' 
+                                                       AND NVL(JORP."AGLACS",'     ') = '     ' 
+                                                  THEN '01' 
+                                                ELSE '  ' END 
+    LEFT JOIN BOKOTHERS ON NVL(JORP."ACNBOK",' ') = '000' 
+                       AND BOKOTHERS."AGLACC" = JORP."AGLACC" 
+                       AND NVL(BOKOTHERS."AGLACS",' ') = NVL(JORP."AGLACS",' ') 
+                       AND BOKOTHERS.AGLVBN = JORP.AGLVBN
+                       AND BOKOTHERS."TRXDAT" = JORP."TRXDAT" 
+                       AND BOKOTHERS."TRXATP" = JORP."TRXATP" 
+    WHERE NVL(S5."AcNoCode",' ') != ' ' -- 2021-07-15 新增判斷 有串到最新的11碼會科才寫入 
+      AND JORP."TRXDAT" >= "DateStart"
+      AND JORP."TRXDAT" <= "DateEnd"
+    ; 
+
     MERGE INTO "AcDetail" T 
     USING ( 
       SELECT "AcctCode" 

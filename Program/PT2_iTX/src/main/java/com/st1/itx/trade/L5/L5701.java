@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+
 /* 套件 */
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -146,6 +148,8 @@ public class L5701 extends TradeBuffer {
 	private String NegFinShareCancelDate[] = new String[NegFinShareL];// 註銷日期
 	private String NegFinShareCancelAmt[] = new String[NegFinShareL];// 註銷本金
 	private boolean Code09 = false;
+	private String CustId = "";
+	private String negCustName="";
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -159,11 +163,12 @@ public class L5701 extends TradeBuffer {
 
 		String FunctionCode = titaVo.getParam("FunctionCode").trim(); // 功能代碼
 
-		String CustId = titaVo.getParam("CustId").trim(); // 身份證號
+		CustId = titaVo.getParam("CustId").trim(); // 身份證號
 		String CustNo = titaVo.getParam("CustNo").trim(); // 戶號-MainKey
 		String CaseSeq = titaVo.getParam("CaseSeq").trim(); // 案件序號-MainKey
 		String ChgCondDate = titaVo.getParam("ChgCondDate").trim(); // 申請變更還款條件日
 		String Status = titaVo.getParam("Status").trim(); // 債權戶況
+		negCustName = titaVo.getParam("CustName").trim();
 
 		NegMainId NegMainId = new NegMainId();
 
@@ -184,9 +189,7 @@ public class L5701 extends TradeBuffer {
 			// 取個CustNo
 			intCustNo = negCom.getNewCustNo(CustId, titaVo);
 			CustNo = String.valueOf(intCustNo);
-			if (intCustNo != 0) {
-
-			} else {
+			if (intCustNo == 0) {
 				throw new LogicException(titaVo, "E5005", "");
 			}
 		}
@@ -612,6 +615,11 @@ public class L5701 extends TradeBuffer {
 				}
 			}
 
+			if (InputNegMain.getCustNo() > 9990000) {
+				InputNegMain.setNegCustId(CustId);
+				InputNegMain.setNegCustName(negCustName);
+			}
+
 			NegMain beforeNegMain = (NegMain) iDataLog.clone(sNegMsain);
 			try {
 				sNegMsain = sNegMainService.update(InputNegMain, titaVo);
@@ -637,7 +645,10 @@ public class L5701 extends TradeBuffer {
 			if (("11").equals(FunctionCode)) {// 階段新增時繳息迄日=首次繳款日前一個月
 				InputNegMain.setPayIntDate(negCom.getRepayDate(InputNegMain.getFirstDueDate(), -1, titaVo));
 			}
-
+			if (InputNegMain.getCustNo() > 9990000) {
+				InputNegMain.setNegCustId(CustId);
+				InputNegMain.setNegCustName(negCustName);
+			}
 			try {
 				this.info("InputNegMain==" + InputNegMain);
 				sNegMainService.insert(InputNegMain, titaVo);

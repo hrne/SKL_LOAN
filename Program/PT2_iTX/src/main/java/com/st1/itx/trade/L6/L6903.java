@@ -85,7 +85,6 @@ public class L6903 extends TradeBuffer {
 		BigDecimal wkBal = new BigDecimal(0);
 		BigDecimal wkDb = new BigDecimal(0);
 		BigDecimal wkCr = new BigDecimal(0);
-		String iTranItem = "";
 		int classcode = 0;
 		if (iAcSubCode.isEmpty()) {
 			iAcSubCode = "     ";
@@ -99,6 +98,8 @@ public class L6903 extends TradeBuffer {
 
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 90;
+		
+		
 
 		// 查詢會計科子細目設定檔
 		if (!(iAcNoCode.isEmpty())) {
@@ -135,7 +136,7 @@ public class L6903 extends TradeBuffer {
 		}
 
 		List<Map<String, String>> dList = null;
-
+		
 		try {
 			dList = l6903ServiceImpl.FindData(titaVo, this.index, this.limit);
 		} catch (Exception e) {
@@ -150,6 +151,23 @@ public class L6903 extends TradeBuffer {
 		int cut = 0;
 		BigDecimal iwkDb = new BigDecimal(0);
 		BigDecimal iwkCr = new BigDecimal(0);
+		List<Map<String, String>> aList = null;
+		try {
+			aList = l6903ServiceImpl.FindAmt(titaVo);
+		} catch (Exception e) {
+			// E5004 讀取DB時發生問題
+			throw new LogicException(titaVo, "E5004", "FindAmt有誤");
+		}
+		for(Map<String, String> a : aList) {
+			if ("D".equals(a.get("DbCr"))) {
+				iwkDb = parse.stringToBigDecimal(a.get("TxAmt"));
+			} else {
+				iwkCr = parse.stringToBigDecimal(a.get("TxAmt"));
+			}
+			this.totaVo.putParam("ODbAmt", iwkDb);
+			this.totaVo.putParam("OCrAmt", iwkCr);
+		}
+		
 		for (Map<String, String> d : dList) {
 			// 不含未入帳,例如:未放行之交易
 			cut++;
@@ -165,11 +183,11 @@ public class L6903 extends TradeBuffer {
 			if ("D".equals(d.get("DbCr"))) {
 				occursList.putParam("OODbAmt", d.get("TxAmt"));
 				occursList.putParam("OOCrAmt", 0);
-				iwkDb = iwkDb.add(parse.stringToBigDecimal(d.get("TxAmt")));
+//				iwkDb = iwkDb.add(parse.stringToBigDecimal(d.get("TxAmt")));
 			} else {
 				occursList.putParam("OODbAmt", 0);
 				occursList.putParam("OOCrAmt", d.get("TxAmt"));
-				iwkCr = iwkCr.add(parse.stringToBigDecimal(d.get("TxAmt")));
+//				iwkCr = iwkCr.add(parse.stringToBigDecimal(d.get("TxAmt")));
 			}
 			String Odate = parse.stringToStringDateTime(d.get("CreateDate"));
 
@@ -204,10 +222,10 @@ public class L6903 extends TradeBuffer {
 
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
-			if (cut == dList.size()) {
-				this.totaVo.putParam("ODbAmt", iwkDb);
-				this.totaVo.putParam("OCrAmt", iwkCr);
-			}
+//			if (cut == dList.size()) {
+//				this.totaVo.putParam("ODbAmt", iwkDb);
+//				this.totaVo.putParam("OCrAmt", iwkCr);
+//			}
 		}
 
 //		this.totaVo.putParam("ODbAmt", wkDb);

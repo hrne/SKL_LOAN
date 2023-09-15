@@ -274,9 +274,6 @@ T(2,#OOTitaSupNo+ +#OOSupItem)
 ! 最後修改日期
 #OOLastUpdate=x,20,S
 
-! 最後修改人員
-#OOLastEmp=x,47,S
-
 !分錄清單
 #OOBUF5=X,32,S
 T(2,#AcDate+0000000+#OORelTxseq)
@@ -324,7 +321,7 @@ TXFORM=L6906
 #OOTitaSupNo
 #OOSupItem
 #OOLastUpdate
-#OOLastEmp
+
 ^
 </sub>
 
@@ -371,10 +368,9 @@ TXFORM=L6906
 {width:100,align:'center'}
 #OOTitaSupNoX=主管
 {width:100,align:'center'}
-#OOLastUpdate=最後修改日期
+#OOLastUpdate=交易日期
 {width:150,align:'center'}
-#OOLastEmp=最後修改人員
-{width:120,align:'left'}
+
 
 ^
 <include src="PRT.icf::INQ01.sel" map="i=L6906;cpi=15"/>

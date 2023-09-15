@@ -2,8 +2,12 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * MonthlyLM055AssetLoss LM055重要放款餘額明細表<br>
@@ -16,12 +20,7 @@ import javax.persistence.Embeddable;
 public class MonthlyLM055AssetLossId implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 403042494730790662L;
-
-// 資料年月
+  // 資料年月
   @Column(name = "`YearMonth`")
   private int yearMonth = 0;
 
@@ -30,18 +29,12 @@ public class MonthlyLM055AssetLossId implements Serializable {
   @Column(name = "`LoanType`", length = 1)
   private String loanType = " ";
 
-  // 放款項目
-  /* F(逾期放款) ：逾期數3至6期+催收G(應于評估) :  逾期數1-2+協議逾期數0H(正常放款) :  逾期數0(扣除協議逾期數0) */
-  @Column(name = "`LoanItem`", length = 1)
-  private String loanItem = " ";
-
   public MonthlyLM055AssetLossId() {
   }
 
-  public MonthlyLM055AssetLossId(int yearMonth, String loanType, String loanItem) {
+  public MonthlyLM055AssetLossId(int yearMonth, String loanType) {
     this.yearMonth = yearMonth;
     this.loanType = loanType;
-    this.loanItem = loanItem;
   }
 
 /**
@@ -92,33 +85,10 @@ Z.折溢價與費用
     this.loanType = loanType;
   }
 
-/**
-	* 放款項目<br>
-	* F(逾期放款) ：逾期數3至6期+催收
-G(應于評估) :  逾期數1-2+協議逾期數0
-H(正常放款) :  逾期數0(扣除協議逾期數0)
-	* @return String
-	*/
-  public String getLoanItem() {
-    return this.loanItem == null ? "" : this.loanItem;
-  }
-
-/**
-	* 放款項目<br>
-	* F(逾期放款) ：逾期數3至6期+催收
-G(應于評估) :  逾期數1-2+協議逾期數0
-H(正常放款) :  逾期數0(扣除協議逾期數0)
-  *
-  * @param loanItem 放款項目
-	*/
-  public void setLoanItem(String loanItem) {
-    this.loanItem = loanItem;
-  }
-
 
   @Override
   public int hashCode() {
-    return Objects.hash(yearMonth, loanType, loanItem);
+    return Objects.hash(yearMonth, loanType);
   }
 
   @Override
@@ -128,11 +98,11 @@ H(正常放款) :  逾期數0(扣除協議逾期數0)
     if(obj == null || getClass() != obj.getClass())
       return false;
     MonthlyLM055AssetLossId monthlyLM055AssetLossId = (MonthlyLM055AssetLossId) obj;
-    return yearMonth == monthlyLM055AssetLossId.yearMonth && loanType.equals(monthlyLM055AssetLossId.loanType) && loanItem.equals(monthlyLM055AssetLossId.loanItem);
+    return yearMonth == monthlyLM055AssetLossId.yearMonth && loanType.equals(monthlyLM055AssetLossId.loanType);
   }
 
   @Override
   public String toString() {
-    return "MonthlyLM055AssetLossId [yearMonth=" + yearMonth + ", loanType=" + loanType + ", loanItem=" + loanItem + "]";
+    return "MonthlyLM055AssetLossId [yearMonth=" + yearMonth + ", loanType=" + loanType + "]";
   }
 }

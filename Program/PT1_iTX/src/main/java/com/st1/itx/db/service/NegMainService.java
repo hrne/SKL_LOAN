@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.NegMain;
@@ -218,6 +220,15 @@ public interface NegMainService {
    * @return Slice NegMain NegMain of List
    */
   public NegMain negCustIdFirst(String negCustId_0, TitaVo... titaVo);
+
+  /**
+   * CustNo&gt;=
+   *
+   * @param custNo_0 custNo_0
+   * @param titaVo Variable-Length Argument
+   * @return Slice NegMain NegMain of List
+   */
+  public NegMain negCustNoFirst(int custNo_0, TitaVo... titaVo);
 
   /**
    * hold By NegMain

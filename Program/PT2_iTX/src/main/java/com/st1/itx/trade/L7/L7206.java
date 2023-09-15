@@ -363,11 +363,7 @@ public class L7206 extends TradeBuffer {
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 					}
-					
-					titaVo.setDataBaseOnLine();// 指定連線報環境
-					this.batchTransaction.commit();
-					titaVo.setDataBaseOnMon();// 指定月報環境
-					this.batchTransaction.commit();
+
 					
 					cntTrans = 0;
 					cntInsert++;
@@ -413,11 +409,7 @@ public class L7206 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
-			
-			titaVo.setDataBaseOnLine();// 指定連線報環境
-			this.batchTransaction.commit();
-			titaVo.setDataBaseOnMon();// 指定月報環境
-			this.batchTransaction.commit();
+
 			
 			
 
@@ -489,10 +481,7 @@ public class L7206 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
-			titaVo.setDataBaseOnLine();// 指定連線報環境
-			this.batchTransaction.commit();
-			titaVo.setDataBaseOnMon();// 指定月報環境
-			this.batchTransaction.commit();
+
 			
 			// 3:金控利關人名單[T044];xlsx xls
 		} else if (iFunctionCode == 3) {
@@ -571,11 +560,6 @@ public class L7206 extends TradeBuffer {
 
 		}
 
-		titaVo.setDataBaseOnLine();// 指定連線報環境
-		this.batchTransaction.commit();
-		titaVo.setDataBaseOnMon();// 指定月報環境
-		this.batchTransaction.commit();
-		
 		
 		titaVo.setDataBaseOnOrg();// 還原原本的環境
 

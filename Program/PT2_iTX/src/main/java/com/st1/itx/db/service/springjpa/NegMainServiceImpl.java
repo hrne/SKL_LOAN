@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -509,6 +512,25 @@ em = null;
       negMainT = negMainReposHist.findTopByNegCustIdIsOrderByCustNoDescCaseSeqDesc(negCustId_0);
     else 
       negMainT = negMainRepos.findTopByNegCustIdIsOrderByCustNoDescCaseSeqDesc(negCustId_0);
+
+    return negMainT.isPresent() ? negMainT.get() : null;
+  }
+
+  @Override
+  public NegMain negCustNoFirst(int custNo_0, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("negCustNoFirst " + dbName + " : " + "custNo_0 : " + custNo_0);
+    Optional<NegMain> negMainT = null;
+    if (dbName.equals(ContentName.onDay))
+      negMainT = negMainReposDay.findTopByCustNoGreaterThanEqualOrderByCustNoDesc(custNo_0);
+    else if (dbName.equals(ContentName.onMon))
+      negMainT = negMainReposMon.findTopByCustNoGreaterThanEqualOrderByCustNoDesc(custNo_0);
+    else if (dbName.equals(ContentName.onHist))
+      negMainT = negMainReposHist.findTopByCustNoGreaterThanEqualOrderByCustNoDesc(custNo_0);
+    else 
+      negMainT = negMainRepos.findTopByCustNoGreaterThanEqualOrderByCustNoDesc(custNo_0);
 
     return negMainT.isPresent() ? negMainT.get() : null;
   }

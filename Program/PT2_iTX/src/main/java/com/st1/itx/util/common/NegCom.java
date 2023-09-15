@@ -2443,40 +2443,17 @@ public class NegCom extends CommBuffer {
 		int custNo = 0;
 		if (CustId != null && CustId.length() != 0) {
 			CustMain custMain = sCustMainService.custIdFirst(CustId, titaVo);
-			if (custMain.getCustNo() == 0) {// 2023-1-10:與怡婷確認債協不需管客戶別,一律可以自動取號
-				// 共用代碼檔 00一般 01員工 02首購 03關企公司 04關企員工 05保戶 07員工二親等 09新二階員工
-//				List<String> CustTypeCode = new ArrayList<String>();
-//				CustTypeCode.add("05");
-//				this.info("NegCom CustTypeCode=[" + custMain.getCustTypeCode() + "]");
-//				if (CustTypeCode.contains(custMain.getCustTypeCode())) {
-				// 如果屬於保戶,可以自動給戶號 參考L2153
-				CustMain updCustMain = sCustMainService.holdById(custMain, titaVo);
-				CustMain beforeCustMain = (CustMain) dataLog.clone(updCustMain);
-				if (updCustMain != null) {
-					custNo = gSeqCom.getSeqNo(0, 0, "L2", "0001", 9999999, titaVo);
-					if (custNo != 0) {
-						this.info("NegCom custNo=[" + custNo + "]");
-						updCustMain.setCustNo(custNo);
-						try {
-							sCustMainService.update(updCustMain, titaVo);
-						} catch (DBException e) {
-							// E0007 更新資料時，發生錯誤
-							throw new LogicException(titaVo, "E0007", "客戶資料主檔");
-						}
-						dataLog.setEnv(titaVo, beforeCustMain, updCustMain);
-						dataLog.exec("修改客戶資料主檔:" + custNo);
-
-					} else {
-						// E0007 更新資料時，發生錯誤
-						throw new LogicException(titaVo, "E0007", "");
-					}
-				} else {
-					// E0006 鎖定資料時，發生錯誤
-					throw new LogicException(titaVo, "E0006", "");
+			NegMain negMainVO = new NegMain();
+			if(custMain != null) {
+				custNo = custMain.getCustNo();
+			}
+			if (custNo == 0) {// 2023/09/14:無戶號一律只建戶號戶名ID在債協主檔,不維護客戶主檔,從9990001起編
+				negMainVO = sNegMainService.negCustNoFirst(9990000, titaVo);
+				if(negMainVO != null){
+					custNo = negMainVO.getCustNo() + 1;
+				}else {
+					custNo = 9990001;
 				}
-//				} else {
-//					throw new LogicException(titaVo, "E0007", "此客戶非保貸戶,不可直接給予戶號");
-//				}
 			}
 		}
 

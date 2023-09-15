@@ -120,7 +120,7 @@ public class BSU03 extends TradeBuffer {
 				Integer.MAX_VALUE, titaVo);
 		if (slItDetail != null) {
 			for (PfItDetail it : slItDetail.getContent()) {
-				if (it.getCustNo() >= iCustNoS && it.getCustNo() <= iCustNoE && it.getRepayType() == 0) {
+				if (it.getCustNo() >= iCustNoS && it.getCustNo() <= iCustNoE && it.getRepayType() == 0 && it.getAdjRange()==0) {
 					it.setCntingCode(""); // 是否計件
 					it.setPerfEqAmt(BigDecimal.ZERO); // 換算業績
 					it.setPerfReward(BigDecimal.ZERO); // 業務報酬

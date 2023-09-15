@@ -159,4 +159,117 @@ public class L6903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
+	public List<Map<String, String>> FindAmt(TitaVo titaVo) throws Exception {
+		this.info("L6903FindData");
+
+		String iAcBookCode = titaVo.getParam("AcBookCode").trim();
+		String iAcSubBookCode = titaVo.getParam("AcSubBookCode").trim();
+		String iBranchNo = titaVo.getParam("BranchNo").trim();
+		String iCurrencyCode = titaVo.getParam("CurrencyCode").trim();
+		String iAcNoCode = titaVo.getParam("AcNoCode").trim();
+		String iAcSubCode = titaVo.getParam("AcSubCode").trim();
+		String iAcDtlCode = titaVo.getParam("AcDtlCode").trim();
+		int iCustNo = this.parse.stringToInteger(titaVo.getParam("CustNo"));
+		String iMediaSlipNo = titaVo.getParam("MediaSlipNo").trim();
+		String iRvNo = titaVo.getParam("RvNo").trim();
+		int iAcDateS = this.parse.stringToInteger(titaVo.getParam("AcDateSt")) + 19110000;
+		int iAcDateE = this.parse.stringToInteger(titaVo.getParam("AcDateEd")) + 19110000;
+		this.info("AcBookCode   ="+iAcBookCode);
+		this.info("CurrencyCode ="+iCurrencyCode);
+		this.info("BranchNo     ="+iBranchNo);
+		this.info("acdates      ="+iAcDateS);
+		this.info("acdatee      ="+iAcDateE);
+
+
+		String sql = "SELECT  sum(a.\"TxAmt\") AS \"TxAmt\", ";  
+		sql += "                  a.\"DbCr\"   AS  \"DbCr\" ";
+		sql += " FROM \"AcDetail\" A ";
+		sql += " LEFT JOIN \"TxTranCode\" B on B.\"TranNo\"= A.\"TitaTxCd\" ";
+		sql += " LEFT JOIN \"CdEmp\" C on C.\"EmployeeNo\"= A.\"TitaTlrNo\" ";
+		sql += " LEFT JOIN \"CdEmp\" D on D.\"EmployeeNo\"= A.\"TitaSupNo\" ";
+		sql += " LEFT JOIN \"CdAcCode\" E on E.\"AcNoCode\"= A.\"AcNoCode\" and E.\"AcSubCode\"= A.\"AcSubCode\" and E.\"AcDtlCode\"= a.\"AcDtlCode\" ";
+		sql += " WHERE A.\"AcDate\" BETWEEN :AcDateS AND :AcDateE ";
+		sql += " AND A.\"EntAc\" > 0 ";
+
+		if (!iAcBookCode.isEmpty()) {
+			sql += "AND A.\"AcBookCode\" = :AcBookCode ";
+		}
+		if (!iAcSubBookCode.isEmpty()) {
+			sql += "AND A.\"AcSubBookCode\" = :AcSubBookCode ";
+		}
+		if (!iBranchNo.isEmpty()) {
+			sql += "AND A.\"BranchNo\" = :BranchNo ";
+		}
+		if (!iCurrencyCode.isEmpty()) {
+			sql += "AND A.\"CurrencyCode\" = :CurrencyCode ";
+		}
+		if (!iAcNoCode.isEmpty()) {
+			sql += "AND A.\"AcNoCode\" = :AcNoCode ";
+		}
+		if (!iAcSubCode.isEmpty()) {
+			sql += "AND A.\"AcSubCode\" = :AcSubCode ";
+		}
+		if (!iAcDtlCode.isEmpty()) {
+			sql += "AND A.\"AcDtlCode\" = :AcDtlCode ";
+		}
+		if (iCustNo > 0) {
+			sql += "AND A.\"CustNo\" = :CustNo ";
+		}
+		if (!iMediaSlipNo.isEmpty()) {
+			sql += "AND A.\"MediaSlipNo\" = :MediaSlipNo ";
+		}
+		if (!iRvNo.isEmpty()) {
+			sql += "AND A.\"RvNo\" like :RvNo ";
+		}
+		sql += "GROUP BY A.\"DbCr\" ";
+//		sql += "ORDER BY A.\"AcDate\" ASC ";
+
+
+
+		this.info("FindL6903Amt sql=" + sql);
+		
+
+
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("AcDateS", iAcDateS);
+		query.setParameter("AcDateE", iAcDateE);
+
+		if (!iAcBookCode.isEmpty()) {
+			query.setParameter("AcBookCode", iAcBookCode);
+		}
+		if (!iAcSubBookCode.isEmpty()) {
+			query.setParameter("AcSubBookCode", iAcSubBookCode);
+		}
+		if (!iBranchNo.isEmpty()) {
+			query.setParameter("BranchNo", iBranchNo);
+		}
+		if (!iCurrencyCode.isEmpty()) {
+			query.setParameter("CurrencyCode", iCurrencyCode);
+		}
+		if (!iAcNoCode.isEmpty()) {
+			query.setParameter("AcNoCode", iAcNoCode);
+		}
+		if (!iAcSubCode.isEmpty()) {
+			query.setParameter("AcSubCode", iAcSubCode);
+		}
+		if (!iAcDtlCode.isEmpty()) {
+			query.setParameter("AcDtlCode", iAcDtlCode);
+		}
+		if (iCustNo > 0) {
+			query.setParameter("CustNo", iCustNo);
+		}
+		if (!iMediaSlipNo.isEmpty()) {
+			query.setParameter("MediaSlipNo", iMediaSlipNo);
+		}
+		if (!iRvNo.isEmpty()) {
+			query.setParameter("RvNo", iRvNo);
+		}
+
+		this.info("L6903Service FindData=" + query);
+
+
+		return this.convertToMap(query);
+	}
 }

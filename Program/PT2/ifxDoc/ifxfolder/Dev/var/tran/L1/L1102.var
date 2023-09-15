@@ -232,7 +232,7 @@ T(3,0:借戶;1:保證人;2:擔保品提供人;3:交易關係人;4:借戶關係�
 T(3,CdCode.CustTypeCode)
 
 #CustTypeCodeHelp=x,1024,S
-T(3,00:一般;02:首購;03:關企公司;05:保戶;06:團體戶)
+! T(3,00:一般;02:首購;03:關企公司;05:保戶;06:團體戶)
 
 
 !NationalityCode 國籍
@@ -281,7 +281,7 @@ RESET_RIM(#HelpRim,XXR99)
 S(XXR99,01,#CDDEF0001,#CDDEF0002,#CDDEF0003,#CDDEF0004,#CDDEF0005,#CDDEF0006,#CDDEF0007,#StationCode)
 R(1,XXR99)
 CALL(#HelpProc)
-!T(2,@CustTypeCodeHelp,#HelpDesc1)
+T(2,@CustTypeCodeHelp,#HelpDesc1)
 T(2,@NationalityCodeHelp,#HelpDesc2)
 T(2,@EntCodeHelp,#HelpDesc3)
 T(2,@TelTypeCodeHelp,#HelpDesc4)
@@ -291,7 +291,7 @@ T(2,@SubCompanyCodeHelp,#HelpDesc7)
 T(2,@StationHelp,#HelpDesc8)
 
 #X1=X,1,S
-T(HELP,@CustTypeCodeHelp,#CustTypeCodeHelp,-,01)
+! T(HELP,@CustTypeCodeHelp,#CustTypeCodeHelp,-,01)
 
 #FunCdHelp=x,50,S
 T(3,1:新增;5:查詢)

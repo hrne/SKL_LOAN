@@ -310,7 +310,7 @@ BEGIN
           ,TR1."TRXTDT"                   AS "TitaCalDy"           -- 交易日期 DECIMALD 8  
           ,TR1."TRXTIM" * 100             AS "TitaCalTm"           -- 交易時間 DECIMAL 8  
           ,'0000'                         AS "TitaKinBr"           -- 單位別 VARCHAR2 4 
-          ,NVL(AEM1."EmpNo",'999999')     AS "TitaTlrNo"           -- 經辦 VARCHAR2 6  
+          ,NVL(AEM1."EmpNo",LPAD(TR1."TRXMEM",6,'0')) AS "TitaTlrNo"           -- 經辦 VARCHAR2 6  
 	        -- "TRXNMT" NUMBER(7,0), 目前最大20519 
 	        -- "TRXNM2" NUMBER(3,0), 目前最大72 
           -- 左補零,總長度8 
@@ -344,7 +344,7 @@ BEGIN
           ,REPLACE(TRIM(TO_SINGLE_BYTE(TCD."TRXDSC")),'','')  
                                           AS "Desc"                -- 摘要 NVARCHAR2 10  
           ,TR1."TRXDAT"                   AS "AcDate"              -- 會計日期 DECIMALD 8  
-          ,TR1."TRXEDT" || '0000' || NVL(AEM3."EmpNo",'999999') || LPAD(TR1."TRXENM",8,'0') 
+          ,TR1."TRXEDT" || '0000' || NVL(AEM3."EmpNo",LPAD(COR."TRXMEM",6,'0')) || LPAD(TR1."TRXENM",8,'0') 
                                           AS "CorrectSeq"          -- 更正序號, 原交易序號 VARCHAR2 26  
           -- 2022-09-22 賴桑增加邏輯 
           -- A:帳務 = 除了L3701之外都是帳務 
@@ -514,9 +514,9 @@ BEGIN
                'Excessive' VALUE TO_CHAR(TR1.TRXAOS) -- 累溢短收 2022-12-20 Wei新增
           )                               AS "OtherFields"         -- 其他欄位 VARCHAR2 1000
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE   
-          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
+          ,NVL(AEM1."EmpNo",LPAD(TR1."TRXMEM",6,'0')) AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE   
-          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6  
+          ,NVL(AEM1."EmpNo",LPAD(TR1."TRXMEM",6,'0')) AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6  
           ,CASE 
              WHEN TR1."TRXCRC" IN ('1','3') 
              THEN 0 - NVL(JL."JLNAMT",0) 

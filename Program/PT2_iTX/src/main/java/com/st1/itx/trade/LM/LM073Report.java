@@ -96,7 +96,7 @@ public class LM073Report extends MakeReport {
 					switch (i) {
 					// if specific column needs special treatment, insert case here.
 					case 1:
-						value = tLDVo.get("F1") + " " + tLDVo.get("F2"); // 戶號 中文敘述
+						value = tLDVo.get("CustNo") + " " + tLDVo.get("FacmNo"); // 戶號 中文敘述
 						makeExcel.setValue(row, col + colShift, value, "R");
 						break;
 					case 2:

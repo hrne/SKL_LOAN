@@ -110,7 +110,13 @@ public class L6906 extends TradeBuffer {
 		} else {
 			throw new LogicException(titaVo, "E6011", "戶號或經辦或整批批號或交易代號擇一輸入"); // 查詢資料不可為空白
 		}
-		List<AcDetail> lAcDetail = slAcDetail == null ? null : new ArrayList<AcDetail>(slAcDetail.getContent());
+		List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
+
+		for (AcDetail s : slAcDetail) {
+			if (s.getEntAc() == 1) {
+				lAcDetail.add(s);
+			}
+		}
 
 		// 排序依 交易序號 戶號 由小到大
 		lAcDetail.sort((c1, c2) -> {
@@ -179,8 +185,8 @@ public class L6906 extends TradeBuffer {
 
 			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tAcDetail.getCreateDate()) + " "
 					+ parse.timeStampToStringTime(tAcDetail.getCreateDate()));
-			occursList.putParam("OOLastEmp",
-					tAcDetail.getCreateEmpNo() + " " + empName(titaVo, tAcDetail.getCreateEmpNo()));
+//			occursList.putParam("OOLastEmp",
+//					tAcDetail.getCreateEmpNo() + " " + empName(titaVo, tAcDetail.getCreateEmpNo()));
 
 			// 查詢會計科子細目設定檔
 			CdAcCode tCdAcCode = sCdAcCodeService.findById(
@@ -205,9 +211,9 @@ public class L6906 extends TradeBuffer {
 			titaVo.setReturnIndex(this.setIndexNext());
 			this.totaVo.setMsgEndToEnter();// 手動折返
 		}
-
 		this.addList(this.totaVo);
 		return this.sendList();
+
 	}
 
 	// 查詢交易控制檔

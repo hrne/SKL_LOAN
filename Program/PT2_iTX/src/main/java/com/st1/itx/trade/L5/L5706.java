@@ -501,25 +501,32 @@ public class L5706 extends TradeBuffer {
 	public int CheckCustId(String id, TitaVo titaVo) throws LogicException {
 		this.info("L5706 CheckCustId Run");
 		int CustNo = 0;
-		// 查驗此客戶編號存在不存在,回傳CustNo
+		// 查驗此客戶編號存在不存在,回傳CustNo  =>20230915客戶檔無戶號不允許建檔
 		if (id != null && id.trim().length() != 0) {
+//			NegMain negMainVO = new NegMain();
 			CustMain tCustMain = sCustMainService.custIdFirst(id.trim(), titaVo);
 			if (tCustMain != null) {
 				CustNo = tCustMain.getCustNo();
-
 				if (CustNo == 0) {
-					// 取號
-					CustNo = negCom.getNewCustNo(id.trim(), titaVo);
-
-					// E5008 戶號為0
-					// throw new LogicException(titaVo, "E5008","");
+					throw new LogicException(titaVo, "E5008","");
+					//					negMainVO = sNegMainService.negCustIdFirst(id, titaVo);
+//					if (negMainVO != null) {
+//						CustNo = negMainVO.getCustNo();
+//					} else {// 取號
+//						CustNo = negCom.getNewCustNo(id.trim(), titaVo);
+//					}
 				}
 			} else {
-
 				if (errorMsg == 1) {
 					throw new LogicException(titaVo, "E0001", "查無客戶主檔資料[" + id + "]");
 				}
-
+				// 無客戶檔須找債協主檔
+//				negMainVO = sNegMainService.negCustIdFirst(id, titaVo);
+//				if (negMainVO != null) {
+//					CustNo = negMainVO.getCustNo();
+//				} else {// 取號
+//					CustNo = negCom.getNewCustNo(id.trim(), titaVo);
+//				}
 			}
 		} else {
 			if (errorMsg == 1) {

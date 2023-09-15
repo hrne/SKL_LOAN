@@ -3,6 +3,7 @@ package com.st1.itx.trade.L7;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -16,14 +17,21 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdComm;
+import com.st1.itx.db.domain.CdCommId;
 import com.st1.itx.db.domain.Ias34Ap;
 import com.st1.itx.db.domain.Ifrs9FacData;
 import com.st1.itx.db.domain.Ifrs9FacDataId;
 import com.st1.itx.db.domain.LoanIfrs9Ap;
 import com.st1.itx.db.domain.MonthlyFacBal;
 import com.st1.itx.db.domain.MonthlyFacBalId;
+import com.st1.itx.db.domain.MonthlyLM052AssetClass;
+import com.st1.itx.db.domain.MonthlyLM052Loss;
+import com.st1.itx.db.domain.MonthlyLM055AssetLoss;
+import com.st1.itx.db.service.CdCommService;
 import com.st1.itx.db.service.Ias34ApService;
 import com.st1.itx.db.service.Ifrs9FacDataService;
 import com.st1.itx.db.service.JobMainService;
@@ -31,7 +39,9 @@ import com.st1.itx.db.service.LoanIfrs9ApService;
 import com.st1.itx.db.service.MonthlyFacBalService;
 import com.st1.itx.db.service.MonthlyLM052AssetClassService;
 import com.st1.itx.db.service.MonthlyLM052LoanAssetService;
+import com.st1.itx.db.service.MonthlyLM052LossService;
 import com.st1.itx.db.service.MonthlyLM052OvduService;
+import com.st1.itx.db.service.MonthlyLM055AssetLossService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.FileCom;
 import com.st1.itx.util.common.MakeExcel;
@@ -69,6 +79,12 @@ public class L7205p extends TradeBuffer {
 	MonthlyLM052LoanAssetService sLM052LoanAsset;
 	@Autowired
 	MonthlyLM052OvduService sLM052Ovdu;
+	@Autowired
+	MonthlyLM052LossService sLM052LossService;
+	@Autowired
+	MonthlyLM055AssetLossService sLM055AssetLossService;
+	@Autowired
+	CdCommService sCdCommService;
 
 	@Autowired
 	L7205 l7205;
@@ -92,6 +108,9 @@ public class L7205p extends TradeBuffer {
 
 	// 明細資料容器
 	private ArrayList<OccursList> occursList = new ArrayList<>();
+	private List<MonthlyFacBal> facBalSumList = new ArrayList<MonthlyFacBal>();
+	private List<MonthlyLM052AssetClass> lLM052AssetClass = new ArrayList<MonthlyLM052AssetClass>();
+	private List<MonthlyLM055AssetLoss> lLM055AssetLoss = new ArrayList<MonthlyLM055AssetLoss>();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -183,6 +202,8 @@ public class L7205p extends TradeBuffer {
 
 			MonthlyFacBal tMonthlyFacBal = new MonthlyFacBal();
 
+			tMonthlyFacBal.setMonthlyFacBalId(monthlyFacBalId);
+
 			tMonthlyFacBal.setAssetClass(assetclass.substring(0, 1));
 
 			if ("xlsx".equals(extension[extension.length - 1]) || "xls".equals(extension[extension.length - 1])) {
@@ -216,7 +237,6 @@ public class L7205p extends TradeBuffer {
 		}
 
 		CountS++; // 成功筆數+1
-
 
 		titaVo.setDataBaseOnLine(); // 連線環境
 
@@ -337,6 +357,21 @@ public class L7205p extends TradeBuffer {
 
 		titaVo.setDataBaseOnMon();// 指定月報環境
 		updLM052ReportSPAndMonthlyFacBalData(titaVo, iYearMonth);
+
+		// 更新MonthlyLM055AssetLoss LM055重要放款餘額明細表
+		getMonthlyLM055AssetLoss(titaVo, iYearMonth);
+		titaVo.setDataBaseOnLine(); // 連線環境
+		try {
+			sLM055AssetLossService.updateAll(this.lLM055AssetLoss, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+		}
+		titaVo.setDataBaseOnMon();// 指定月報環境
+		try {
+			sLM055AssetLossService.updateAll(this.lLM055AssetLoss, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+		}
 
 		// 重產LM051報表
 		titaVo.setBatchJobId("jLM051");
@@ -575,4 +610,304 @@ public class L7205p extends TradeBuffer {
 
 		this.info("upd LM052 SP finished.");
 	}
+	/**
+	 * 更新MonthlyLM055AssetLoss LM055重要放款餘額明細表
+	 * @param titaVo TitaVo
+	 * @param yearMonth 西元年月
+	 * @throws LogicException ...
+	 */
+	public void getMonthlyLM055AssetLoss(TitaVo titaVo, int yearMonth) throws LogicException {
+		this.info("updMonthlyLM055AssetLoss ...");
+// Load MonthlyLM052AssetClass LM052資產分類表
+		Slice<MonthlyLM052AssetClass> sLM052LoanAsset = sLM052AssetClass.findYearMonthAll(yearMonth, 0,
+				Integer.MAX_VALUE, titaVo);
+		if (sLM052LoanAsset == null) {
+			throw new LogicException(titaVo, "E0001", "MonthlyLM052AssetClass LM052資產分類表"); // 查詢資料不存在
+		}
+		this.lLM052AssetClass = sLM052LoanAsset.getContent();
+// Load MothlyFacBal 額度月報工作檔
+		Slice<MonthlyFacBal> slMothlyFacBal = tMothlyFacBalService.findYearMonthAll(yearMonth, 0, Integer.MAX_VALUE,
+				titaVo);
+		if (slMothlyFacBal == null) {
+			throw new LogicException(titaVo, "E0001", "MothlyFacBal"); // 查詢資料不存在
+		}
+
+// govProjectAdjustAmt 政策性專案貸款調整數=	 ToTalLoanBal 專案貸款總額-調整 - oToTalLoanBal 專案貸款總額 - 88LoanBal 88風災調整數		
+		CdComm tCdComm = sCdCommService.findById(new CdCommId("02", "02", yearMonth * 100 + 1), titaVo);
+		if (tCdComm == null) {
+			throw new LogicException(titaVo, "E0001", "CdComm 雜項資料檔 政策性專案貸款"); // 查詢資料不存在
+		}
+		TempVo tTempVo = new TempVo();
+		tTempVo = tTempVo.getVo(tCdComm.getJsonFields());
+		if (tTempVo.get("ToTalLoanBal") == null || tTempVo.get("oToTalLoanBal") == null
+				|| tTempVo.get("88LoanBal") == null) {
+			throw new LogicException(titaVo, "E0001", "CdComm 政策性專案貸款"); // 查詢資料不存在
+		}
+		BigDecimal govProjectAdjustAmt = parse.stringToBigDecimal(tTempVo.get("ToTalLoanBal"))
+				.subtract(parse.stringToBigDecimal(tTempVo.get("oToTalLoanBal")))
+				.subtract(parse.stringToBigDecimal(tTempVo.get("88LoanBal")));
+
+// totalStorageAmt 備呆總金額(不含應收利息)
+// totalEvaAmt 折溢價與催收費用
+		BigDecimal totalStorageAmt = BigDecimal.ZERO;
+		BigDecimal totalEvaAmt = BigDecimal.ZERO;
+		for (MonthlyLM052AssetClass t : lLM052AssetClass) {
+			if (!"7".equals(t.getAssetClassNo())) {
+				totalStorageAmt = totalStorageAmt.add(t.getStorageAmt());
+			}
+			if ("6".equals(t.getAssetClassNo())) {
+				totalEvaAmt = totalEvaAmt.add(t.getLoanBal());
+			}
+		}
+// iFRS9AdjustAmt IFRS9增提金額(含應收利息) = 備呆總金額(不含應收利息) - 會計部核定備抵損失(MonthlyLM052Loss.ApprovedLoss)		
+		MonthlyLM052Loss tMonthlyLM052Loss = sLM052LossService.findById(yearMonth, titaVo);
+		if (tMonthlyLM052Loss == null) {
+			throw new LogicException(titaVo, "E0001", "MonthlyLM052Loss LM052備抵損失資料檔"); // 查詢資料不存在
+		}
+		BigDecimal iFRS9AdjustAmt = totalStorageAmt.subtract(tMonthlyLM052Loss.getApprovedLoss());
+
+// 刪除舊表資料
+		Slice<MonthlyLM055AssetLoss> slMonthlyLM055AssetLoss = sLM055AssetLossService.findYearMonthAll(yearMonth, 0,
+				Integer.MAX_VALUE, titaVo);
+		if (slMonthlyLM055AssetLoss != null) {
+			try {
+				sLM055AssetLossService.deleteAll(slMonthlyLM055AssetLoss.getContent(), titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0004", e.getErrorMsg());
+			}
+		}
+// 
+		this.lLM055AssetLoss = new ArrayList<MonthlyLM055AssetLoss>();
+		MonthlyLM055AssetLoss l = new MonthlyLM055AssetLoss();
+
+// 政策性專案貸款調整		
+		// G.政策性專案貸款：GovProjectAdjustAmt
+		// C.不動產抵押放款 : 0 - GovProjectAdjustAmt
+		l.setYearMonth(yearMonth);
+		l.setLoanType("C");
+		l.setNormalAmount(BigDecimal.ZERO.subtract(govProjectAdjustAmt));
+		l.setLoanAmountNor0(BigDecimal.ZERO.subtract(govProjectAdjustAmt));
+		l.setIFRS9AdjustAmt(iFRS9AdjustAmt);
+		this.lLM055AssetLoss.add(l);
+		l = new MonthlyLM055AssetLoss();
+		l.setYearMonth(yearMonth);
+		l.setLoanType("G");
+		l.setNormalAmount(govProjectAdjustAmt);
+		l.setLoanAmountNor0(govProjectAdjustAmt);
+		this.lLM055AssetLoss.add(l);
+
+		// 借用欄位 : loanType => BuildingFlag
+
+		MonthlyFacBal a = new MonthlyFacBal();
+		a = new MonthlyFacBal();
+		a.setBuildingFlag("G");
+		a.setAssetClass2("11");
+		a.setPrinBalance(govProjectAdjustAmt);
+		this.facBalSumList.add(a);
+		a.setBuildingFlag("C");
+		a.setAssetClass2("11");
+		a.setPrinBalance(BigDecimal.ZERO.subtract(govProjectAdjustAmt));
+		this.facBalSumList.add(a);
+
+// 按放款種類累計資產五分類(2)本金餘額至 facBalSumList
+		String loanType;
+		for (MonthlyFacBal m : slMothlyFacBal.getContent()) {
+			if (m.getPrinBalance().compareTo(BigDecimal.ZERO) == 0) {
+				continue;
+			}
+			if (m.getAssetClass2().length() == 0) {
+				throw new LogicException(titaVo, "E0015", "MonthlyFacBal AssetClass2 " + m.toString()); // 檢查錯誤
+			}
+			switch (m.getClCode1()) {
+			case 1:
+			case 2:
+				if ("N".equals(m.getGovProjectFlag())) {
+					loanType = "C";
+					break;
+				} else {
+					loanType = "G";
+				}
+				break;
+			case 3:
+			case 4:
+				loanType = "D";
+				break;
+			case 5:
+				loanType = "A";
+				break;
+			case 9:
+				loanType = "B";
+				break;
+			default:
+				loanType = "C";
+				break;
+			}
+			// load 放款餘額至 LM055 List
+			addFacBalToLM055List(loanType, m);
+			// 加總五分類金額
+			sumfacBal(loanType, m.getAssetClass2(), m.getPrinBalance().subtract(m.getLawAmount()));
+			if (m.getLawAmount().compareTo(BigDecimal.ZERO) > 0) {
+				sumfacBal(loanType, m.getLawAssetClass(), m.getLawAmount());
+			}
+		}
+		// 計算 & 放入lLM055AssetLoss
+		for (MonthlyFacBal f : this.facBalSumList) {
+			// 借用欄位 : loanType => BuildingFlag, loanItem=> GovProjectFlag
+			// C.不動產抵押放款 H(正常放款 除外
+			if (!("C".equals(f.getBuildingFlag()) && "H".equals(f.getGovProjectFlag()))) {
+				computeStorageAmt(f.getBuildingFlag(), f.getAssetClass2(), f.getPrinBalance());
+			}
+		}
+
+		// Load 折溢價與費用
+		for (MonthlyLM052AssetClass t : lLM052AssetClass) {
+			if ("6".equals(t.getAssetClassNo().substring(0, 1))) {
+				addLM052ToLM055List("Z", t.getAssetClassNo(), t.getStorageAmt());
+				addLM052ToLM055List("Z", "99", t.getLoanBal());
+			}
+		}
+		// 調整提存差額至C.不動產抵押放款 H(正常放款)
+		for (MonthlyLM052AssetClass e : lLM052AssetClass) {
+			if (!"7".equals(e.getAssetClassNo().substring(0, 1))) {
+				addLM052ToLM055List("C", e.getAssetClassNo(), e.getStorageAmt());
+			}
+		}
+		// 調整提存差額至C.不動產抵押放款
+		for (MonthlyLM055AssetLoss e : this.lLM055AssetLoss) {
+			if (!("C".equals(e.getLoanType()))) {
+				addLM052ToLM055List("C", "1", BigDecimal.ZERO.subtract(e.getReserveLossAmt1()));
+				addLM052ToLM055List("C", "2", BigDecimal.ZERO.subtract(e.getReserveLossAmt2()));
+				addLM052ToLM055List("C", "3", BigDecimal.ZERO.subtract(e.getReserveLossAmt3()));
+				addLM052ToLM055List("C", "4", BigDecimal.ZERO.subtract(e.getReserveLossAmt4()));
+				addLM052ToLM055List("C", "5", BigDecimal.ZERO.subtract(e.getReserveLossAmt5()));
+			}
+		}
+
+		for (MonthlyLM055AssetLoss n : this.lLM055AssetLoss) {
+			n.setYearMonth(yearMonth);
+			this.info("LM055AssetLoss=" + n.toString());
+		}
+
+		this.info("updMonthlyLM055AssetLoss finished.");
+	}
+
+	private void computeStorageAmt(String loanType, String assetClassNo2, BigDecimal loanAmt) {
+		BigDecimal storageRate = BigDecimal.ZERO;
+		// 借用欄位 : loanType => BuildingFlag, loanItem=> GovProjectFlag
+		for (MonthlyLM052AssetClass t : this.lLM052AssetClass) {
+			if (assetClassNo2.equals(t.getAssetClassNo())) {
+				storageRate = t.getStorageRate();
+				break;
+			}
+		}
+		//
+		for (MonthlyLM052AssetClass t : this.lLM052AssetClass) {
+			if (assetClassNo2.equals(t.getAssetClassNo())) {
+				storageRate = t.getStorageRate();
+				break;
+			}
+		}
+		BigDecimal storageAmt = loanAmt.multiply(storageRate).setScale(0, RoundingMode.HALF_UP);
+		addLM052ToLM055List(loanType, assetClassNo2, storageAmt);
+		this.info(" loanType=" + loanType + ", loanAmt=" + loanAmt + ", storageRate=" + storageRate + ", storageAmt="
+				+ storageAmt);
+	}
+
+	private void addLM052ToLM055List(String loanType, String assetClassNo, BigDecimal storageAmt) {
+		MonthlyLM055AssetLoss t = new MonthlyLM055AssetLoss();
+		for (MonthlyLM055AssetLoss l : this.lLM055AssetLoss) {
+			if (loanType.equals(l.getLoanType())) {
+				t = l;
+				break;
+			}
+		}
+		t.setLoanType(loanType);
+		if ("Z".equals(loanType) && "99".equals(assetClassNo)) {
+			t.setOverdueAmount(t.getOverdueAmount().add(storageAmt));
+		}
+		switch (assetClassNo.substring(0, 1)) {
+		case "1":
+			t.setReserveLossAmt1(t.getReserveLossAmt1().add(storageAmt));
+			break;
+		case "2":
+			t.setReserveLossAmt2(t.getReserveLossAmt2().add(storageAmt));
+			break;
+		case "3":
+			t.setReserveLossAmt3(t.getReserveLossAmt3().add(storageAmt));
+			break;
+		case "4":
+			t.setReserveLossAmt4(t.getReserveLossAmt4().add(storageAmt));
+			break;
+		case "5":
+			t.setReserveLossAmt5(t.getReserveLossAmt5().add(storageAmt));
+			break;
+		}
+	}
+
+	private void addFacBalToLM055List(String loanType, MonthlyFacBal m) {
+		MonthlyLM055AssetLoss t = new MonthlyLM055AssetLoss();
+		for (MonthlyLM055AssetLoss l : this.lLM055AssetLoss) {
+			if (loanType.equals(l.getLoanType())) {
+				t = l;
+				break;
+			}
+		}
+		t.setLoanType(loanType);
+		if ("990".equals(m.getAcctCode())) {
+			t.setOverdueAmount(t.getOverdueAmount().add(m.getPrinBalance()));
+			t.setLoanAmount990(t.getLoanAmount990().add(m.getPrinBalance()));
+		} else {
+			switch (m.getOvduTerm()) {
+			case 0:
+				if ("60".equals(m.getProdNo()) || "61".equals(m.getProdNo()) || "62".equals(m.getProdNo())) {
+					t.setObserveAmount(t.getObserveAmount().add(m.getPrinBalance()));
+					t.setLoanAmountNeg0(t.getLoanAmountNeg0().add(m.getPrinBalance()));
+				} else {
+					t.setNormalAmount(t.getNormalAmount().add(m.getPrinBalance()));
+					t.setLoanAmountNor0(t.getLoanAmountNor0().add(m.getPrinBalance()));
+				}
+				break;
+			case 1:
+				t.setObserveAmount(t.getObserveAmount().add(m.getPrinBalance()));
+				t.setLoanAmount1(t.getLoanAmount1().add(m.getPrinBalance()));
+				break;
+			case 2:
+				t.setObserveAmount(t.getObserveAmount().add(m.getPrinBalance()));
+				t.setLoanAmount2(t.getLoanAmount2().add(m.getPrinBalance()));
+				break;
+			case 3:
+				t.setOverdueAmount(t.getOverdueAmount().add(m.getPrinBalance()));
+				t.setLoanAmount3(t.getLoanAmount3().add(m.getPrinBalance()));
+				break;
+			case 4:
+				t.setOverdueAmount(t.getOverdueAmount().add(m.getPrinBalance()));
+				t.setLoanAmount4(t.getLoanAmount4().add(m.getPrinBalance()));
+				break;
+			case 5:
+				t.setOverdueAmount(t.getOverdueAmount().add(m.getPrinBalance()));
+				t.setLoanAmount5(t.getLoanAmount5().add(m.getPrinBalance()));
+				break;
+			default:
+				t.setOverdueAmount(t.getOverdueAmount().add(m.getPrinBalance()));
+				t.setLoanAmount6(t.getLoanAmount6().add(m.getPrinBalance()));
+				break;
+			}
+		}
+	}
+
+	private void sumfacBal(String loanType, String assetClass2, BigDecimal loanBal) {
+		MonthlyFacBal a = new MonthlyFacBal();
+		// 借用欄位 : loanType => BuildingFlag
+		for (MonthlyFacBal t : this.facBalSumList) {
+			if (loanType.equals(t.getBuildingFlag()) && assetClass2.equals(t.getAssetClass2())) {
+				a = t;
+				break;
+			}
+		}
+
+		a.setBuildingFlag(loanType);
+		a.setAssetClass2(assetClass2);
+		a.setPrinBalance(a.getPrinBalance().add(loanBal));
+		this.facBalSumList.add(a);
+	}	
 }
