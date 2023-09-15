@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
@@ -93,8 +94,8 @@ public class L5051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "D.\"AdjCntingCode\", ";
 		sql += "NVL(G.\"Code\",'') AS \"MediaFg\", ";
 		sql += "NVL(G.\"CreateDate\",'') AS \"MediaDate\", ";
-		sql += "A.\"LastUpdate\", ";
-		sql += "A.\"LastUpdateEmpNo\", ";
+		sql += " CASE WHEN F6.\"Fullname\" IS NULL THEN A.\"LastUpdate\" ELSE D.\"LastUpdate\" END AS \"LastUpdate\" , ";
+		sql += " CASE WHEN F6.\"Fullname\" IS NULL THEN A.\"LastUpdateEmpNo\" ELSE D.\"LastUpdateEmpNo\" END AS \"LastUpdateEmpNo\" , ";
 		sql += "CASE WHEN A.\"RepayType\" = 4 THEN 'Y'";		
 		sql += "     WHEN A.\"LastUpdate\" = A.\"CreateDate\" THEN 'N' ";		
 		sql += "     ELSE 'Y' END AS \"HasHistory\", ";		

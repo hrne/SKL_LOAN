@@ -50,7 +50,9 @@ BEGIN
     SELECT '000'                          AS "AcBookCode"          -- 帳冊別 VARCHAR2 3 -- 2021-07-15 修改: 000:全公司
          , CASE
              WHEN FSC."ACTFSC" = 'A' THEN '201'
-           ELSE '00A' END                 AS "AcSubBookCode"       -- 區隔帳冊 VARCHAR2 3 -- 2021-07-15 新增 00A:傳統帳冊、201:利變帳冊
+           -- 2023-09-15 Wei 修改 from SKL-IT 珮琪 出現A以外的值要提示錯誤,不能寫入
+           ELSE "Fn_ThrowException"('LN$FSCP.ACTFSC出現 A 以外的值:' || FSC.ACTFSC)
+           END                            AS "AcSubBookCode"       -- 區隔帳冊 VARCHAR2 3 -- 2021-07-15 新增 00A:傳統帳冊、201:利變帳冊
          , 'TWD'                          AS "CurrencyCode"        -- 幣別
          , FSC."FSCQTA"                   AS "TargetAmt"           -- 放款目標金額 DECIMAL 16 2
          , G1."LoanBalSum"                AS "ActualAmt"           -- 放款實際金額 DECIMAL 16 2
@@ -68,7 +70,6 @@ BEGIN
       LEFT JOIN "LA$ACTP" S2 ON S2."LMSACN" = S1."LMSACN"
       WHERE S2."ACTFSC" = 'A'
         AND S1."LMSLBL" > 0
-        AND S1."LMSLLD" <= "TbsDyF"
       GROUP BY S2."ACTFSC"
     ) G1 ON G1."ACTFSC" = FSC."ACTFSC"
     ;

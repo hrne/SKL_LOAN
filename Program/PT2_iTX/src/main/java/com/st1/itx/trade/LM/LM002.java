@@ -120,7 +120,7 @@ public class LM002 extends BatchBase implements Tasklet, InitializingBean {
 						throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增資料時，發生錯誤
 					}
 				}
-				
+
 				this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
 				if ("onLine".equals(titaVo.getDataBase())) {
 					titaVo.setDataBaseOnMon();// 指定月報環境
@@ -190,8 +190,11 @@ public class LM002 extends BatchBase implements Tasklet, InitializingBean {
 		tTempVo.putParam("LoanBal", "0");
 
 		for (Map<String, String> r : result) {
-
-			tTempVo.putParam("o" + r.get("Type") + "LoanBal", r.get("LoanBal"));
+ 
+			//此維護不需要維護88風災項目
+			if (!"88".equals(r.get("Type"))) {
+				tTempVo.putParam("o" + r.get("Type") + "LoanBal", r.get("LoanBal"));
+			}
 			tTempVo.putParam(r.get("Type") + "LoanBal", r.get("LoanBal"));
 		}
 

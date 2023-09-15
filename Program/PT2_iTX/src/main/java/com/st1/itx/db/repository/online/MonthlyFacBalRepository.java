@@ -3,6 +3,8 @@ package com.st1.itx.db.repository.online;
 
 import java.util.Optional;
 
+import java.math.BigDecimal;
+import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
@@ -39,8 +41,8 @@ public interface MonthlyFacBalRepository extends JpaRepository<MonthlyFacBal, Mo
   public void uspL9MonthlyfacbalUpd(int YYYYMM,  String empNo);
 
   // 上傳檔案(L7交易)並更新MonthlyFacBal相關欄位
-  @Procedure(value = "\"Usp_L7_UploadToMothlyFacBal_Upd\"")
-  public void uspL7UploadtomothlyfacbalUpd(int YYYYMM,  String txcd,  String empNo,  String jobTxSeq);
+  @Procedure(value = "\"Usp_L7_UploadToMonthlyFacBal_Upd\"")
+  public void uspL7UploadtomonthlyfacbalUpd(int YYYYMM,  String txcd,  String empNo,  String jobTxSeq);
 
 }
 

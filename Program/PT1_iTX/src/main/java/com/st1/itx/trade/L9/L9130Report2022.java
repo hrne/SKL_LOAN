@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.SlipMedia2022;
@@ -133,7 +134,6 @@ public class L9130Report2022 extends MakeReport {
 	// 部門代號
 	private String deptCode = "10H000";
 
-
 	// 成本單位
 	private String costUnit = "10H000";
 
@@ -151,7 +151,7 @@ public class L9130Report2022 extends MakeReport {
 
 	// IFRS17群組
 	private String ifrs17Group = "";
-	
+
 	private String lastAcSubBookCode;
 
 	// 應收調撥款金額
@@ -193,7 +193,6 @@ public class L9130Report2022 extends MakeReport {
 		Slice<SlipMedia2022> sSlipMedia2022 = sSlipMedia2022Service.findBatchNo(iAcDate + 19110000, iBatchNo, 0,
 				Integer.MAX_VALUE, titaVo);
 
-		SlipMedia2022 tempTableSlipMedia2022;
 		List<SlipMedia2022> lSlipMedia2022old = new ArrayList<SlipMedia2022>();
 
 		// 若已存在,是重新製作傳票媒體
@@ -362,11 +361,9 @@ public class L9130Report2022 extends MakeReport {
 
 		// 傳票號碼(彙總)清單
 		List<Map<String, String>> slipNoSumlList = null;
-		if (iBatchNo <= 10) {
-			slipNoSumlList = l9130ServiceImpl.doQuerySlipSumNo(iAcDate + 19110000, titaVo);
-			if (slipNoSumlList != null) {
-				this.info("slipNoSumlList=" + slipNoSumlList.toString());
-			}
+		slipNoSumlList = l9130ServiceImpl.doQuerySlipSumNo(iAcDate + 19110000, titaVo);
+		if (slipNoSumlList != null) {
+			this.info("slipNoSumlList=" + slipNoSumlList.toString());
 		}
 
 		// 2022-05-18 ST1 Wei 新增:
@@ -380,7 +377,12 @@ public class L9130Report2022 extends MakeReport {
 		if (slAcDetail == null || slAcDetail.isEmpty()) {
 			return;
 		} else {
-			List<AcDetail> lAcDetail = slAcDetail.getContent();
+			List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
+			for (AcDetail ac : slAcDetail.getContent()) {
+				if (ac.getEntAc() > 0) {
+					lAcDetail.add(ac);
+				}
+			}
 			for (AcDetail ac : lAcDetail) {
 				if (iBatchNo >= 90) {
 					ac.setEntAc(9);
@@ -399,7 +401,7 @@ public class L9130Report2022 extends MakeReport {
 						ac.setMediaSlipNo(md.getMediaSlipNo());
 					}
 				}
-				// 彙總傳票號碼
+				// 彙總傳票號碼(整批入帳時寫入彙總傳票批號(01~99)，L9130Report2022產生SlipMedia2022(總帳傳票媒體檔)時更新為9NNNNN)
 				if (ac.getSlipSumNo() > 0) {
 					for (Map<String, String> s : slipNoSumlList) {
 						if (ac.getSlipNo() == Integer.parseInt(s.get("SlipNo"))) {
@@ -408,10 +410,12 @@ public class L9130Report2022 extends MakeReport {
 					}
 				}
 			}
-			try {
-				sAcDetailService.updateAll(lAcDetail, titaVo);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
+			if (lAcDetail.size() > 0) {
+				try {
+					sAcDetailService.updateAll(lAcDetail, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
+				}
 			}
 		}
 

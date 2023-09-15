@@ -10508,3 +10508,13 @@ TXFORM=L5R51
 #L5r51hasStatus
 ^
 </L5R51.tom>
+
+<L5R52.dec>
+#L5r52CustName=x,200,S
+</L5R52.dec>
+
+<L5R52.tom>
+TXFORM=L5R52
+#L5r52CustName
+^
+</L5R52.tom>

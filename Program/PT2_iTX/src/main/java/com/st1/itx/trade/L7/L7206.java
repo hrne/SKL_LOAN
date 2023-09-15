@@ -900,7 +900,6 @@ public class L7206 extends TradeBuffer {
 			resText = text;
 		}
 
-//		this.info("text after = " + resText);
 		return resText;
 	}
 
@@ -918,10 +917,10 @@ public class L7206 extends TradeBuffer {
 		String txcd = titaVo.getTxcd();
 		this.info("txcd =" + txcd);
 		titaVo.setDataBaseOnLine();// 指定連線環境
-		tMonthlyFacBalService.Usp_L7_UploadToMothlyFacBal_Upd(iYYMM, txcd, tlrno, "", titaVo);
+		tMonthlyFacBalService.Usp_L7_UploadToMonthlyFacBal_Upd(iYYMM, txcd, tlrno, "", titaVo);
 
 		titaVo.setDataBaseOnMon();// 指定月報環境
-		tMonthlyFacBalService.Usp_L7_UploadToMothlyFacBal_Upd(iYYMM, txcd, tlrno, "", titaVo);
+		tMonthlyFacBalService.Usp_L7_UploadToMonthlyFacBal_Upd(iYYMM, txcd, tlrno, "", titaVo);
 		this.info("upd updL7UploadData end.");
 	}
 

@@ -52,6 +52,6 @@ public class LM048Batch extends BatchBase implements Tasklet, InitializingBean {
 		titaVo.putParam("YearMonth", inputYearMonth);
 		titaVo.putParam("EntLoanBalLimit", entLoanBalLimit);
 
-		lM048Report.exec(mfbsdy, titaVo);
+		lM048Report.exec(titaVo);
 	}
 }

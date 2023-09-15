@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -429,19 +432,19 @@ em = null;
   }
 
   @Override
-  public void Usp_L7_UploadToMothlyFacBal_Upd(int YYYYMM,  String txcd,  String empNo,  String jobTxSeq, TitaVo... titaVo) {
+  public void Usp_L7_UploadToMonthlyFacBal_Upd(int YYYYMM,  String txcd,  String empNo,  String jobTxSeq, TitaVo... titaVo) {
     String dbName = "";
     
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     if (dbName.equals(ContentName.onDay))
-      monthlyFacBalReposDay.uspL7UploadtomothlyfacbalUpd(YYYYMM,  txcd,  empNo,  jobTxSeq);
+      monthlyFacBalReposDay.uspL7UploadtomonthlyfacbalUpd(YYYYMM,  txcd,  empNo,  jobTxSeq);
     else if (dbName.equals(ContentName.onMon))
-      monthlyFacBalReposMon.uspL7UploadtomothlyfacbalUpd(YYYYMM,  txcd,  empNo,  jobTxSeq);
+      monthlyFacBalReposMon.uspL7UploadtomonthlyfacbalUpd(YYYYMM,  txcd,  empNo,  jobTxSeq);
     else if (dbName.equals(ContentName.onHist))
-      monthlyFacBalReposHist.uspL7UploadtomothlyfacbalUpd(YYYYMM,  txcd,  empNo,  jobTxSeq);
+      monthlyFacBalReposHist.uspL7UploadtomonthlyfacbalUpd(YYYYMM,  txcd,  empNo,  jobTxSeq);
    else
-      monthlyFacBalRepos.uspL7UploadtomothlyfacbalUpd(YYYYMM,  txcd,  empNo,  jobTxSeq);
+      monthlyFacBalRepos.uspL7UploadtomonthlyfacbalUpd(YYYYMM,  txcd,  empNo,  jobTxSeq);
   }
 
 }

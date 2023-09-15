@@ -259,8 +259,8 @@ T(2,@CustNameBef,#L1r01CustName)
 T(2,@CustNameAft,#L1r01CustName)
 E(0,@BirthdayBef,#L1r01Birthday)
 E(0,@BirthdayAft,#L1r01Birthday)
-E(0,@CustTypeBef,#L1r01CustTypeCode)
-E(0,@CustTypeAft,#L1r01CustTypeCode)
+T(2,@CustTypeBef,#L1r01CustTypeCode)
+T(2,@CustTypeAft,#L1r01CustTypeCode)
 T(2,@IndustryBef,#L1r01IndustryCode)
 T(2,@IndustryAft,#L1r01IndustryCode)
 T(2,@NationalityCodeBef,#L1r01NationalityCode)
@@ -571,14 +571,14 @@ E(0,#BirthdayBef-#BirthdayAft)
 IF(#Birthdaydiff == 0,T(3,),T(3,X))
 
 !客戶別
-#CustTypeBef=A,2,L
+#CustTypeBef=X,3,L
 
 #CustTypeBefX=X,10,L
 T(H,#CustTypeBef,#CustTypeCodeHelp)
 
 #CustTypeInd=X,1,L
 
-#CustTypeAft=A,2,I
+#CustTypeAft=X,3,I
 HELP(#CustTypeCodeHelp)
 @V(H,#CustTypeCodeHelp)
 

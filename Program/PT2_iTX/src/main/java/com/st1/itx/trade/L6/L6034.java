@@ -119,7 +119,7 @@ public class L6034 extends TradeBuffer {
 			this.info("sAcDate =" + sAcDate);
 			this.info("eAcDate =" + eAcDate);
 
-			sCdComm = sCdCommService.CdTypeAscFirst("02", "01", sAcDate, eAcDate, titaVo);
+			sCdComm = sCdCommService.CdTypeAscFirst("02", "02", sAcDate, eAcDate, titaVo);
 
 			// 查無資料
 			if (sCdComm == null) {

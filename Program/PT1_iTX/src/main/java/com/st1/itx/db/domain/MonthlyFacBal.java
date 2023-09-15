@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class MonthlyFacBal implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -8818155280015931607L;
-
-@EmbeddedId
+  @EmbeddedId
   private MonthlyFacBalId monthlyFacBalId;
 
   // 資料年月
