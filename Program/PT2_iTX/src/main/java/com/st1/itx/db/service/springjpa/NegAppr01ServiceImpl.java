@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -510,6 +513,25 @@ em = null;
 			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public NegAppr01 findCustNoFinCodeFirst(int custNo_0, int caseSeq_1, String finCode_2, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("findCustNoFinCodeFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " caseSeq_1 : " +  caseSeq_1 + " finCode_2 : " +  finCode_2);
+    Optional<NegAppr01> negAppr01T = null;
+    if (dbName.equals(ContentName.onDay))
+      negAppr01T = negAppr01ReposDay.findTopByCustNoIsAndCaseSeqIsAndFinCodeIsOrderByBringUpDateDesc(custNo_0, caseSeq_1, finCode_2);
+    else if (dbName.equals(ContentName.onMon))
+      negAppr01T = negAppr01ReposMon.findTopByCustNoIsAndCaseSeqIsAndFinCodeIsOrderByBringUpDateDesc(custNo_0, caseSeq_1, finCode_2);
+    else if (dbName.equals(ContentName.onHist))
+      negAppr01T = negAppr01ReposHist.findTopByCustNoIsAndCaseSeqIsAndFinCodeIsOrderByBringUpDateDesc(custNo_0, caseSeq_1, finCode_2);
+    else 
+      negAppr01T = negAppr01Repos.findTopByCustNoIsAndCaseSeqIsAndFinCodeIsOrderByBringUpDateDesc(custNo_0, caseSeq_1, finCode_2);
+
+    return negAppr01T.isPresent() ? negAppr01T.get() : null;
   }
 
   @Override

@@ -1,9 +1,11 @@
 package com.st1.itx.trade.L5;
 
 import java.util.ArrayList;
+import java.util.List;
 /* 套件 */
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 /* 錯誤處理 */
@@ -117,7 +119,7 @@ public class L5R51 extends TradeBuffer {
 				NegMainIdVO.setCaseSeq(iCaseSeq);
 				negMainVO = sNegMainService.findById(NegMainIdVO, titaVo);
 				if (negMainVO != null) {
-					if (!"1".equals(negMainVO.getCustLoanKind())) {// 保證人或保貸戶
+					if (iCustNo > 9990000) {// 保證人或保貸戶
 						icustId = negMainVO.getNegCustId();
 						custName = negMainVO.getNegCustName();
 					} else {

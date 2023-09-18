@@ -97,7 +97,10 @@ public class L2078 extends TradeBuffer {
 			if (this.index == 0 && (dList == null || dList.size() == 0)) {
 				throw new LogicException(titaVo, "E2003", "查無資料,請至L2601新增"); // 查無資料
 			}
-
+			if (this.index != 0) {
+				feeTotal = parse.stringToBigDecimal(titaVo.getParam("FeeTotal"));
+				ovduFeeTotal = parse.stringToBigDecimal(titaVo.getParam("OvduFeeTotal"));
+			}
 			for (Map<String, String> t : dList) {
 				// new occurs
 				OccursList occursList = new OccursList();
@@ -162,6 +165,9 @@ public class L2078 extends TradeBuffer {
 		} else {
 			getExcel(titaVo);
 		}
+
+		titaVo.put("FeeTotal", "" + feeTotal);
+		titaVo.put("OvduFeeTotal", "" + ovduFeeTotal);
 		this.totaVo.putParam("FeeTotal", feeTotal);
 		this.totaVo.putParam("OvduFeeTotal", ovduFeeTotal);
 

@@ -16,6 +16,8 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 
 import com.st1.itx.db.domain.NegAppr01;
+import com.st1.itx.db.domain.NegMain;
+import com.st1.itx.db.domain.NegMainId;
 /*DB服務*/
 import com.st1.itx.db.service.NegMainService;
 import com.st1.itx.db.service.NegTransService;
@@ -87,11 +89,17 @@ public class L5973 extends TradeBuffer {
 		int iDD = parse.stringToInteger(DD);
 		String CustId = titaVo.getParam("CustId").trim(); // 身分證號
 
-		int iCustNo = 0;
-		if (CustId != null && CustId.length() != 0) {
+		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo").trim());
+		int tCustNo = 0;
+		if (CustId != null && CustId.length() != 0 && iCustNo == 0) {
 			CustMain CustMainVO = sCustMainService.custIdFirst(CustId, titaVo);
 			if (CustMainVO != null) {
 				iCustNo = CustMainVO.getCustNo();
+			}
+			NegMain  tNegMain = new NegMain();
+			tNegMain = sNegMainService.negCustIdFirst(CustId, titaVo);
+			if(tNegMain != null) {
+				tCustNo = tNegMain.getCustNo();
 			}
 		}
 		/* 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值 */
@@ -131,6 +139,24 @@ public class L5973 extends TradeBuffer {
 				slNegAppr01 = sNegAppr01Service.findAll(this.index, this.limit, titaVo);
 			}
 		}
+		// 若客戶檔戶號找不到需再以債協主檔戶號找
+		if (iCustNo != 0 && iCustNo < 9990000  && slNegAppr01 == null && tCustNo > 0) {
+			if (ExportDate != null && ExportDate.length() != 0 && parse.stringToInteger(ExportDate) > 0) {
+				intExportDate = parse.stringToInteger(ExportDate) + 19110000;
+				if (DD != null && DD.length() != 0 && iDD > 0) {
+					slNegAppr01 = sNegAppr01Service.custNoExportDateEq(tCustNo, intExportDate, this.index, this.limit,
+							titaVo);
+				} else {
+					DateFrom = intExportDate + 01;
+					DateTo = intExportDate + 31;
+					slNegAppr01 = sNegAppr01Service.custExporBetween(tCustNo, DateFrom, DateTo, this.index, this.limit,
+							titaVo);
+				}
+			} else {
+				slNegAppr01 = sNegAppr01Service.custNoEq(tCustNo, this.index, this.limit, titaVo);
+			}
+		}
+		
 		List<NegAppr01> lNegAppr01 = slNegAppr01 == null ? null : slNegAppr01.getContent();
 
 		if (lNegAppr01 != null && lNegAppr01.size() >= this.limit) {
@@ -142,19 +168,36 @@ public class L5973 extends TradeBuffer {
 
 		if (lNegAppr01 != null) {
 			CustMain CustMainVO = new CustMain();
+			NegMain negMainVO = new NegMain();
+			NegMainId negMainIdVO = new NegMainId();
 			for (NegAppr01 NegAppr01VO : lNegAppr01) {
 				OccursList occursList = new OccursList();
 
 				int ThisCustNo = NegAppr01VO.getCustNo();
-
-				CustMainVO = sCustMainService.custNoFirst(ThisCustNo, ThisCustNo, titaVo);
+				String tCustId = "";
+				String tCustName ="";		
+				if(ThisCustNo > 9990000) {
+					negMainIdVO.setCustNo(NegAppr01VO.getCustNo());
+					negMainIdVO.setCaseSeq(NegAppr01VO.getCaseSeq());
+					negMainVO = sNegMainService.findById(negMainIdVO, titaVo);
+					if(negMainVO != null) {
+						tCustId = negMainVO.getNegCustId();
+						tCustName = negMainVO.getNegCustName();
+					}
+				}else {
+					CustMainVO = sCustMainService.custNoFirst(ThisCustNo, ThisCustNo, titaVo);
+					if(CustMainVO != null) {
+						tCustId= CustMainVO.getCustId();
+						tCustName = CustMainVO.getCustName();
+					}
+				}
 
 				occursList.putParam("OORank", "0");//
 				occursList.putParam("OOExportDate", NegAppr01VO.getExportDate());
 				occursList.putParam("OOCaseKindCode", NegAppr01VO.getCaseKindCode());
-				occursList.putParam("OOCustId", CustMainVO.getCustId());
+				occursList.putParam("OOCustId", tCustId);
+				occursList.putParam("OOCustName", StringCut.replaceLineUp(tCustName));
 				occursList.putParam("OOCustNo", NegAppr01VO.getCustNo());
-				occursList.putParam("OOCustName", StringCut.replaceLineUp(CustMainVO.getCustName()));
 				occursList.putParam("OOFinCodeName", NegAppr01VO.getFinCode());
 				occursList.putParam("OOFinCodeNameNM", sNegCom.FindNegFinAcc(NegAppr01VO.getFinCode(), titaVo)[0]);// 債權機構名稱
 				occursList.putParam("OOApprAmt", NegAppr01VO.getApprAmt());

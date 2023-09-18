@@ -362,8 +362,8 @@ IF(#OOCustIdWk=="XX",BIND(grid,cancel),$)
 IF(#OOTransCount==0,BIND(grid,cancel),$)
 
 !撥付統計
-#CountDetail=X,13,S
-T(2,#OOCustId+#OOCaseSeq)
+#CountDetail=X,20,S
+T(2,#OOCustId+#OOCaseSeq+#OOCustNo)
 
 #OOCountDetail=X,1,S
 IF(#OOIsMainFin=="N",BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L5977; ntxbuf=#CountDetail}))

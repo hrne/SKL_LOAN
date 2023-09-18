@@ -42,15 +42,18 @@ E(0,0)
 <sub type="DC" name="L5977" layout="cols=1;screen.width=[150,850];printer.width=[20,80];order=1">
 [
 ["[L5977]                                 客戶最大債權撥付統計查詢"],
-[#<->#,"#FdCustId+身分證字號",#CustId],
+[#<->#,"#FdCustNo+戶號",#CustNo],
+[#<->#,"#FdCustId+身分證字號",#CustId,"(戶號/身分證字號，可擇一輸入)"],
 [#<->#,"#FdCaseSeq+案件序號",#CaseSeq],
 ]
-#RimFunCd=A,1,S
-#RimCustId=X,10,S
-#RimCustNo=A,7,S
+!#RimFunCd=A,1,S
+!#RimCustId=X,10,S
+!#RimCustNo=A,7,S
 
+#FdCustNo=X,2,L
+T(3, )
 #FdCustId=X,1,L
-T(3,*)
+T(3, )
 #FdCaseSeq=X,1,L
 T(3, )
 
@@ -58,32 +61,68 @@ T(3, )
 #CHAIN=A,1,S
 T(4,CHAIN$) 
 
-#NTXBUF=X,13,S
+#NTXBUF=X,20,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
-
 #POSINTDT=D,8,S
 T(4,DATE$)
 
 
+#CustNo=A,7,I
+C(3,#CHAIN,1,T(1,#NTXBUF,14,7),$)
+C(3,#CHAIN,1,s,$)
+
 #CustId=X,10,I
 C(3,#CHAIN,1,T(1,#NTXBUF,1,10),$)
 C(3,#CHAIN,1,s,$)
+C(3,#CustNo,0,$,S)
 @T(3,@CustName,)
 V(7)
 A(ID_UNINO,0,#CustId)
 
-#RimL1r09=X,1,S
-C(4,#CustId,s,$)
-E(0,@RimFunCd,1)
+
+
+! 調RIM找CustNo
+<include src="ROM.icf::L5R51.dec"/>
+#RimTxCode=X,5,S
+T(2,L5973)
+
+#RimCustId=X,10,S
+T(2,#CustId)
+
+#RimCustNo=A,7,S
+#RimCaseSeq=A,3,S
+C(3,#CHAIN,1,T(1,#NTXBUF,11,3),E(0,0))
+#RimErrorFg=X,1,S
+
+
+!若輸入戶號找不到則要踢錯誤訊息
+#SendL5r51=X,1,S
+!C(4,#CustId,S,$)
 T(2,@RimCustId,#CustId)
-E(0,@RimCustNo,0)
-S(L1R09,1,#RimFunCd,#RimCustId,#RimCustNo)
-R(1,L1R09)
-T(2,@CustName,#L1r09CustName)
+E(0,@RimCustNo,#CustNo)
+!E(0,@RimCaseSeq,#CaseSeq)
+T(2,@RimErrorFg,Y)
+RESET_RIM(#SEND_L5R51,L5R51)
+S(L5R51,1,#RimCustId,#RimCustNo,#RimCaseSeq,#RimErrorFg)
+R(1,L5R51)
+T(2,@CustName,#L5r51CustName)
+E(0,@CustNo,#L5r51CustNo)
+E(0,@CaseSeq,#L5r51CaseSeq)
+T(2,@CustId,#L5r51CustId)
+
+!#RimL1r09=X,1,S
+!C(4,#CustId,s,$)
+!E(0,@RimFunCd,1)
+!T(2,@RimCustId,#CustId)
+!E(0,@RimCustNo,0)
+!S(L1R09,1,#RimFunCd,#RimCustId,#RimCustNo)
+!R(1,L1R09)
+!T(2,@CustName,#L1r09CustName)
 
 #CaseSeq=A,3,I
-C(3,#CHAIN,1,T(1,#NTXBUF,11,3),$)
+C(3,#CHAIN,1,T(1,#NTXBUF,11,3),#L5r51CaseSeq)
 C(3,#CHAIN,1,s,$)
+
 
 
 #CustName=x,100,L
@@ -93,7 +132,7 @@ C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 
 #RPTFG=A,1,S
 
-<include src="ROM.icf::L1R09.dec"/>
+!<include src="ROM.icf::L1R09.dec"/>
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -130,12 +169,14 @@ E(0,1)ASGN(LOOP$)
 <sub type="TIM">
 #CustId
 #CaseSeq
+#CustNo
 </sub>
 
 !------ 下行電文TOM ------
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
-<include src="ROM.icf::L1R09.tom"/>
+<include src="ROM.icf::L5R51.tom"/>
+
 TXFORM=L5977
 #OOFinCode
 #OOFinCodeName

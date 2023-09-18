@@ -125,16 +125,39 @@ D(8)
 @C(4,#CustId,S,$)
 A(ID_UNINO,0,#CustId)
 
-!身分證找戶號
-<include src="ROM.icf::L2R47.dec"/>
-#Rim2R47CustId=X,10,S
+! 調RIM找CustNo
+<include src="ROM.icf::L5R51.dec"/>
+#RimTxCode=X,5,S
+T(2,#TXCD)
 
-#RimL2R47=X,1,S
+#RimCustId=X,10,S
+T(2,#CustId)
+
+#RimCustNo=A,7,S
+#RimCaseSeq=A,3,S
+#RimErrorFg=X,1,S
+
+!若輸入戶號找不到則要踢錯誤訊息
+#SendL5r51=X,1,S
 C(4,#CustId,S,$)
-T(2,@Rim2R47CustId,#CustId)
-RESET_RIM(#RimL2R47,L2R47)
-S(L2R47,1,#Rim2R47CustId)
-R(1,L2R47)
+T(2,@RimCustId,#CustId)
+E(0,@RimCustNo,0)
+E(0,@RimCaseSeq,0)
+T(2,@RimErrorFg,Y)
+RESET_RIM(#SEND_L5R51,L5R51)
+S(L5R51,1,#RimCustId,#RimCustNo,#RimCaseSeq,#RimErrorFg)
+R(1,L5R51)
+
+!身分證找戶號
+!<include src="ROM.icf::L2R47.dec"/>
+!#Rim2R47CustId=X,10,S
+
+!#RimL2R47=X,1,S
+!C(4,#CustId,S,$)
+!T(2,@Rim2R47CustId,#CustId)
+!RESET_RIM(#RimL2R47,L2R47)
+!S(L2R47,1,#Rim2R47CustId)
+!R(1,L2R47)
 
 ! 會計日期
 #AcDate=D,7,L
@@ -143,7 +166,7 @@ E(0,#SYSDATE)
 
 #MRKEY=_,_,S
 C(4,#CustId,S,$)
-T(2,#L2R47CustNo)
+T(2,#L5r51CustNo)
 
 ![顯示方式]
 #RPTFG=A,1,S
@@ -295,7 +318,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L5960; ntxbuf=#OOBufG})
 
 !------ 下行電文TOM ------
 <sub type="TOM">
-<include src="ROM.icf::L2R47.tom"/>
+<include src="ROM.icf::L5R51.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L5075

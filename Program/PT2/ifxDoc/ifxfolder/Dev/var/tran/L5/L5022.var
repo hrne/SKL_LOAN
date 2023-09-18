@@ -94,21 +94,23 @@ C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@EmpNo,#NTXBUF,1,6)
 
 #FunCdHelp=x,1024,S
-T(3,0:查詢;1:產生異動名單)
+T(3,0:查詢;1:產生異動名單;2:產生職級名冊)
 #FunCd=A,1,I
 C(3,#FunCd,0,E(0,0),$)
 HELP(#FunCdHelp)
 @V(H,#FunCdHelp)
 #FunCdX=X,15,L
 T(H,#FunCd,#FunCdHelp)
-C(3,#FunCd,1,INVOKEJS(SHOW,L5022,2,5,0)INVOKEJS(SHOW,L5022,6,6,1),INVOKEJS(SHOW,L5022,2,5,1)INVOKEJS(SHOW,L5022,6,6,0))
+IF(#FunCd==1||#FunCd==2,INVOKEJS(SHOW,L5022,2,5,0)INVOKEJS(SHOW,L5022,6,6,1),INVOKEJS(SHOW,L5022,2,5,1)INVOKEJS(SHOW,L5022,6,6,0))
+! C(3,#FunCd,1,INVOKEJS(SHOW,L5022,2,5,0)INVOKEJS(SHOW,L5022,6,6,1),INVOKEJS(SHOW,L5022,2,5,1)INVOKEJS(SHOW,L5022,6,6,0))
 
 
 ! 員工代號
 ! 若不輸入, 員工代號由最小開始查詢,否則由輸入之員工代號開始查詢
 #EmpNo=X,6,I
 C(3,#CHAIN,0,$,s)
-C(3,#FunCd,1,S,$)
+! C(3,#FunCd,1,S,$)
+IF(#FunCd==1||#FunCd==2,S,$)
 
 ! #NewEmpNo=X,7,S
 ! T(2,1+#EmpNo)
@@ -123,7 +125,8 @@ ASGN(BTN_NEW2$)
 
 
 #StatusFlag=X,1,I
-C(3,#FunCd,1,S,$)
+! C(3,#FunCd,1,S,$)
+IF(#FunCd==1||#FunCd==2,S,$)
 C(4,#StatusFlag,T(2,1),$)
 HELP(#EffectiveStatusHelp)
 @T(3,#StatusFlagX,)
@@ -133,12 +136,14 @@ C(4,#StatusFlag,T(2,@StatusFlagX, ),V(H,#EffectiveStatusHelp)T(H,@StatusFlagX,#S
 #StatusFlagX=X,10,L
 
 #EffectiveDateS=D,7,I
-C(3,#FunCd,1,S,$)
+! C(3,#FunCd,1,S,$)
+IF(#FunCd==1||#FunCd==2,S,$)
 C(4,#StatusFlag,$,S)
 ! @C(4,#EffectiveDateS,$,A(DATE,0,#EffectiveDateS))
 @C(4,#StatusFlag,C(4,#EffectiveDateS,V(P,狀態、生效日期，必須擇一輸入),A(DATE,0,#EffectiveDateS)),$)
 #EffectiveDateE=D,7,I
-C(3,#FunCd,1,S,$)
+! C(3,#FunCd,1,S,$)
+IF(#FunCd==1||#FunCd==2,S,$)
 C(4,#StatusFlag,$,S)
 C(4,#EffectiveDateS,S,$)
 @C(4,#EffectiveDateS,$,V(7))
@@ -147,12 +152,16 @@ IF(#EffectiveDateE<#EffectiveDateS,V(P,止日需大於起日),$)
 
 
 #RimL5r38=X,1,S
-C(3,#FunCd,1,$,S)
+! C(3,#FunCd,1,$,S)
+IF(#FunCd==1||#FunCd==2,$,S)
 E(0,@L5R38iCode,3)
 E(0,@L5R38iDate,#SYSDATE)
+RESET_RIM(#RimL5r38,L5R38)
 S(L5R38,1,#L5R38iCode,#L5R38iDate)
 R(1,L5R38)
-E(0,@WorkSeason,#L5R38LastWorkSeason)
+C(3,#FunCd,2,E(0,@WorkSeason,#L5R38oWorkSeason),E(0,@WorkSeason,#L5R38LastWorkSeason))
+
+
 #WorkSeason=A,4,S
 
 
@@ -161,15 +170,18 @@ E(0,@WorkSeason,#L5R38LastWorkSeason)
 #FdWorkSeason=X,1,L
 
 #WorkSeasonYY=A,3,L
-C(3,#FunCd,1,$,S)
+! C(3,#FunCd,1,$,S)
+IF(#FunCd==1||#FunCd==2,$,S)
 T(1,#WorkSeason,1,3)
 #WorkSeasonSS=A,1,L
-C(3,#FunCd,1,$,S)
+! C(3,#FunCd,1,$,S)
+IF(#FunCd==1||#FunCd==2,$,S)
 T(1,#WorkSeason,4,1)
 
 #RPTFG=A,1,S
 E(0,0)
-IF(#FunCd==1,E(0,2),C(4,#NTXBUF5,E(0,0),E(0,1)))
+! IF(#FunCd==1,E(0,2),C(4,#NTXBUF5,E(0,0),E(0,1)))
+IF(#FunCd==1||#FunCd==2,E(0,2),C(4,#NTXBUF5,E(0,0),E(0,1)))
 
 
 #CHAINXMT=X,1,S

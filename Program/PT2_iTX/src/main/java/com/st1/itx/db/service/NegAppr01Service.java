@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.NegAppr01;
@@ -211,6 +213,17 @@ public interface NegAppr01Service {
    * @return Slice NegAppr01 NegAppr01 of List
    */
   public Slice<NegAppr01> bringUpDateCustNoEq(int custNo_0, int bringUpDate_1, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * CustNo = , AND CaseSeq = , AND FinCode=
+   *
+   * @param custNo_0 custNo_0
+   * @param caseSeq_1 caseSeq_1
+   * @param finCode_2 finCode_2
+   * @param titaVo Variable-Length Argument
+   * @return Slice NegAppr01 NegAppr01 of List
+   */
+  public NegAppr01 findCustNoFinCodeFirst(int custNo_0, int caseSeq_1, String finCode_2, TitaVo... titaVo);
 
   /**
    * hold By NegAppr01

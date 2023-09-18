@@ -208,7 +208,7 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 			sqlSelect += "NegAp02.\"CustId\" AS \"身分證號\",";
 			sqlSelect += "m.\"CaseSeq\" AS \"案件序號\",";
 			sqlSelect += "NegAp02.\"CustNo\" AS \"戶號\",";
-			sqlSelect += " case when m.\"CustLoanKind\" in ('2','3') then  m.\"NegCustName\" ";
+			sqlSelect += " case when NegAp02.\"CustNo\" > 9990000 then  m.\"NegCustName\" ";
 			sqlSelect += "      else  c.\"CustName\" end AS \"戶名\",";
 			sqlSelect += "' ' AS \"交易別\",";
 			sqlSelect += "NegAp02.\"AcDate\" AS \"會計日\",";
@@ -284,10 +284,11 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 			}
 
 			sqlSelect += SumSql;
-			sqlSelect += "c.\"CustId\" AS \"身分證號\",";
+			sqlSelect += "case when  m.\"CustNo\" > 9990000 then  m.\"NegCustId\" ";
+			sqlSelect += "     else c.\"CustId\" end AS \"身分證號\",";
 			sqlSelect += "NegTran.\"CaseSeq\" AS \"案件序號\",";
 			sqlSelect += "NegTran.\"CustNo\" AS \"戶號\",";
-			sqlSelect += " case when  m.\"CustLoanKind\" in ('2','3') then   m.\"NegCustName\" ";
+			sqlSelect += " case when  m.\"CustNo\" > 9990000 then   m.\"NegCustName\" ";
 			sqlSelect += "      else  c.\"CustName\" end AS \"戶名\",";
 			sqlSelect += "NegTran.\"TxKind\" AS \"交易別\",";
 			sqlSelect += "NegTran.\"AcDate\" AS \"會計日\",";

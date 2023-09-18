@@ -455,8 +455,8 @@ T(2,05+#CustId+#CustNo+#CaseSeq)
 #TransExportDate=D,7,L
 
 ! <已撥付明細>
-#BufL5973=X,17,S
-T(2,#TransExportDate+#CustId)
+#BufL5973=X,24,S
+T(2,#TransExportDate+#CustId+#CustNo)
 
 #BindExportDate=X,1,S
 BIND(#BtnShareAmt,click, {cmd=CHAIN; ntxcd=L5973; ntxbuf=#BufL5973})

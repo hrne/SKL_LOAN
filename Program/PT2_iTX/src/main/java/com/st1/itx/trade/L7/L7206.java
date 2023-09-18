@@ -178,7 +178,7 @@ public class L7206 extends TradeBuffer {
 			try {
 
 				dataLineList = fileCom.intputTxt(filename, "UTF-8");
-				this.info("dataLineList = " + dataLineList);
+//				this.info("dataLineList = " + dataLineList);
 
 			} catch (IOException e) {
 				this.info("L7206(" + filename + ") : " + e.getMessage());
@@ -275,8 +275,8 @@ public class L7206 extends TradeBuffer {
 			int cntTrans = 0;
 
 			int cntInsert = 0;
-			
-			//因筆數大量 所以逐批update
+
+			// 因筆數大量 所以逐批update
 			for (OccursList tempOccursList : occursList) {
 
 				String iRelWithCompany = tempOccursList.get("RelWithCompany").toString();
@@ -323,7 +323,6 @@ public class L7206 extends TradeBuffer {
 				if (cntTrans > 1000) {
 
 					titaVo.setDataBaseOnLine();// 指定連線報環境
-					this.info("onLine");
 
 					try {
 
@@ -340,9 +339,6 @@ public class L7206 extends TradeBuffer {
 						throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 					}
 
-					
-				
-					
 					this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
 					if ("onLine".equals(titaVo.getDataBase())) {
 						titaVo.setDataBaseOnMon();// 指定月報環境
@@ -364,7 +360,6 @@ public class L7206 extends TradeBuffer {
 						throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 					}
 
-					
 					cntTrans = 0;
 					cntInsert++;
 					inLifeRelHead = new ArrayList<LifeRelHead>();
@@ -389,7 +384,6 @@ public class L7206 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
 
-			
 			this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
 			if ("onLine".equals(titaVo.getDataBase())) {
 				titaVo.setDataBaseOnMon();// 指定月報環境
@@ -409,9 +403,6 @@ public class L7206 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
-
-			
-			
 
 			updL7UploadData(titaVo);
 
@@ -461,7 +452,7 @@ public class L7206 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
-			
+
 			this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
 			if ("onLine".equals(titaVo.getDataBase())) {
 				titaVo.setDataBaseOnMon();// 指定月報環境
@@ -482,7 +473,6 @@ public class L7206 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
 
-			
 			// 3:金控利關人名單[T044];xlsx xls
 		} else if (iFunctionCode == 3) {
 
@@ -537,7 +527,6 @@ public class L7206 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
 
-			
 			this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
 			if ("onLine".equals(titaVo.getDataBase())) {
 				titaVo.setDataBaseOnMon();// 指定月報環境
@@ -560,7 +549,6 @@ public class L7206 extends TradeBuffer {
 
 		}
 
-		
 		titaVo.setDataBaseOnOrg();// 還原原本的環境
 
 		this.totaVo.putParam("CountAll", CountAll);
@@ -890,7 +878,6 @@ public class L7206 extends TradeBuffer {
 
 	private String converntScientificNotation(String text) {
 		String resText = "";
-//		this.info("text before= " + text);
 		if (text.contains("E") && text.length() != 10) {
 			BigDecimal decimalFormat = new BigDecimal(text);
 			resText = decimalFormat.toPlainString();
@@ -903,16 +890,14 @@ public class L7206 extends TradeBuffer {
 		return resText;
 	}
 
-
-	
 	/**
 	 * 更新MonthlyFacBal.BankRelationFlag 利害關係人欄位
-	 * */
+	 */
 	private void updL7UploadData(TitaVo titaVo) throws LogicException {
 		this.info("upd updL7UploadData start.");
-	
+
 		// 2023-09-12 更新MonthlyFacBal BankRelationFlag
-		int iYYMM = Integer.valueOf(titaVo.getParam("inputAcDate")) / 100;
+		int iYYMM = Integer.valueOf(titaVo.getParam("inputAcDate")) / 100 + 191100;
 		String tlrno = titaVo.getTlrNo();
 		String txcd = titaVo.getTxcd();
 		this.info("txcd =" + txcd);

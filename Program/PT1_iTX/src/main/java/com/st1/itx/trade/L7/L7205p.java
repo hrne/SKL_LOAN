@@ -192,7 +192,6 @@ public class L7205p extends TradeBuffer {
 
 			int custno = parse.stringToInteger(tempOccursList.get("CustNo"));
 			int facmno = parse.stringToInteger(tempOccursList.get("FacmNo"));
-			int yearmonth = parse.stringToInteger(tempOccursList.get("YearMonth"));
 			String assetclass = tempOccursList.get("AssetClass");
 			BigDecimal lawAmount = BigDecimal.ZERO;
 			String lawAssetClass = "";
@@ -213,6 +212,8 @@ public class L7205p extends TradeBuffer {
 						t.setAssetClass2(assetclass);
 
 					}
+
+					CountS++; // 成功筆數+1
 					continue;
 				}
 			}
@@ -221,7 +222,6 @@ public class L7205p extends TradeBuffer {
 
 		titaVo.keepOrgDataBase();// 保留原本記號
 
-		titaVo.setDataBaseOnLine(); // 連線環境
 		try {
 			tMothlyFacBalService.updateAll(lMonthlyFacBal, titaVo);
 
@@ -230,7 +230,7 @@ public class L7205p extends TradeBuffer {
 			throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 		}
 
-		//titaVo.setDataBaseOnMon();// 指定月報環境
+		titaVo.setDataBaseOnMon();// 指定月報環境
 
 		try {
 			tMothlyFacBalService.updateAll(lMonthlyFacBal, titaVo);
@@ -238,8 +238,6 @@ public class L7205p extends TradeBuffer {
 
 			throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 		}
-
-		CountS++; // 成功筆數+1
 
 		titaVo.setDataBaseOnLine(); // 連線環境
 
@@ -269,7 +267,7 @@ public class L7205p extends TradeBuffer {
 			}
 
 			// 維護Ias34Ap
-			titaVo.setDataBaseOnLine(); // 連線環境
+
 			sIas34Ap = tIas34ApService.dataEq(custno, facmno, yearmonth, this.index, this.limit, titaVo);
 
 			List<Ias34Ap> lIas34Ap = sIas34Ap == null ? null : sIas34Ap.getContent();
@@ -286,12 +284,7 @@ public class L7205p extends TradeBuffer {
 					}
 				}
 
-				this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
-				if ("onLine".equals(titaVo.getDataBase())) {
-					//titaVo.setDataBaseOnMon();// 指定月報環境
-				} else {
-					titaVo.setDataBaseOnLine();// 指定連線環境
-				}
+				titaVo.setDataBaseOnMon();// 指定月報環境
 
 				for (Ias34Ap t : lIas34Ap) {
 					t.setAssetClass(parse.stringToInteger(assetclass));
@@ -322,12 +315,7 @@ public class L7205p extends TradeBuffer {
 					}
 				}
 
-				this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
-				if ("onLine".equals(titaVo.getDataBase())) {
-					//titaVo.setDataBaseOnMon();// 指定月報環境
-				} else {
-					titaVo.setDataBaseOnLine();// 指定連線環境
-				}
+				titaVo.setDataBaseOnMon();// 指定月報環境
 
 				for (LoanIfrs9Ap t : lLoanIfrs9Ap) {
 					t.setAssetClass(parse.stringToInteger(assetclass));
@@ -341,35 +329,26 @@ public class L7205p extends TradeBuffer {
 			}
 		} // for
 
-		String note = "總筆數：" + CountAll + ",成功筆數：" + CountS + ",失敗筆數：" + CountF;
-
-		this.totaVo.putParam("CountAll", CountAll);
-		this.totaVo.putParam("CountS", CountS);
-		this.totaVo.putParam("CountF", CountF);
-
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "",
-				titaVo.getParam("TLRNO"), note, titaVo);
-
-		titaVo.setDataBaseOnLine(); // 連線環境
 		this.batchTransaction.commit();
-		//titaVo.setDataBaseOnMon();// 指定月報環境
+		titaVo.setDataBaseOnMon();// 指定月報環境
 		this.batchTransaction.commit();
 
 		titaVo.setDataBaseOnLine(); // 連線環境
 		updLM052ReportSPAndMonthlyFacBalData(titaVo, iYearMonth);
 
-		//titaVo.setDataBaseOnMon();// 指定月報環境
+		titaVo.setDataBaseOnMon();// 指定月報環境
 		updLM052ReportSPAndMonthlyFacBalData(titaVo, iYearMonth);
 
 		// 更新MonthlyLM055AssetLoss LM055重要放款餘額明細表
 		getMonthlyLM055AssetLoss(titaVo, iYearMonth);
+
 		titaVo.setDataBaseOnLine(); // 連線環境
 		try {
 			sLM055AssetLossService.updateAll(this.lLM055AssetLoss, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 		}
-		//titaVo.setDataBaseOnMon();// 指定月報環境
+		titaVo.setDataBaseOnMon();// 指定月報環境
 		try {
 			sLM055AssetLossService.updateAll(this.lLM055AssetLoss, titaVo);
 		} catch (DBException e) {
@@ -380,6 +359,14 @@ public class L7205p extends TradeBuffer {
 		titaVo.setBatchJobId("jLM051");
 
 		titaVo.setDataBaseOnOrg();// 還原原本的環境
+		String note = "總筆數：" + CountAll + ",成功筆數：" + CountS + ",失敗筆數：" + CountF;
+
+		this.totaVo.putParam("CountAll", CountAll);
+		this.totaVo.putParam("CountS", CountS);
+		this.totaVo.putParam("CountF", CountF);
+
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "",
+				titaVo.getParam("TLRNO"), note, titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

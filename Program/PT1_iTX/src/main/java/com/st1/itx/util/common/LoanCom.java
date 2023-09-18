@@ -2,6 +2,9 @@ package com.st1.itx.util.common;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -246,7 +249,6 @@ public class LoanCom extends TradeBuffer {
 		tLoanBorTx.setTitaCurCd(titaVo.getCurName());
 		tLoanBorTx.setTitaEmpNoS(titaVo.getEmpNos());
 		tLoanBorTx.setAcDate(titaVo.getEntDyI());
-		tLoanBorTx.setDisplayflag("Y");
 		this.info("   TitaCurCd = " + tLoanBorTx.getTitaCurCd());
 		this.info("setLoanBorTx end ");
 	}

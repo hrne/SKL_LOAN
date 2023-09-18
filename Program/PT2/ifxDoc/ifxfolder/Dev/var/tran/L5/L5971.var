@@ -283,8 +283,8 @@ T(2,01+#CustId+#OCustNo+#OOCaseSeq+#OOAcDate+#OOTitaTlrNo+#OOTitaTxtNo)
 BIND(grid,{ cmd=CHAIN; ntxcd=L5972; ntxbuf=#OOBufNegTrans})
 
 ! <撥付明細>
-#OOBufB=X,17,S
-T(2,#OOExportDate+#CustId)
+#OOBufB=X,24,S
+T(2,#OOExportDate+#CustId+#OCustNo)
 #OOBtnB=A,2,O
 !C(3,#OOTxKind,9,BIND(grid,cancel)
 !							 ,BIND(grid,{ cmd=CHAIN; ntxcd=L5973; ntxbuf=#OOBufB}))

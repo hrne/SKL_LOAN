@@ -13,11 +13,11 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,41)ASGN(INQLEN$)
+E(0,52)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
-E(0,20)ASGN(INQREC$)
+E(0,25)ASGN(INQREC$)
 
 ![畫面顯示的明細間的高度]
 #LOOPH=n,3,S
@@ -30,127 +30,69 @@ E(0,40)ASGN(INQPRT$)
 </sub>
 
 <sub type="DC" name="BFHEAD">
-<include src="COM.icf::BFHEAD2.dec"/>
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+#button=x,1,S
+K(MODIFYBUTTON,試算)
+
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+<sub type="DC" name="p1" layout="cols=1;screen.width=[130,370,130,370];printer.width=[20,20];order=1">
 [
-["[L5983]                                 建商名單維護 "],
-["#FdFunCd+功能",#FunCdX],
-["#FdCustNo+戶號",#CustNo,#CustName],
-["#FdDeleteFlag+刪除碼",#DeleteFlag],
-["#FdCreateDate+建檔日期",#CreateDate],
-["#FdCreateEmpNo+建檔人員",#CreateEmpNo,#CreateEmpName],
-["#FdLastUpdate+最後更新日期",#LastUpdate],
-["#FdLastUpdateEmpNo+最後更新人員",#LastUpdateEmpNo,#LastUpdateEmpName],
+["[L5983]                                 結 清 試 算                                 "],
+["@*@身分證字號",#CustId],
+["@*@入帳日期",#EntryDate],
+["@*@顯示方式",
+<include src="COM.icf::RPTFG.scr"/>
+],
 ]
-!---------- AP Button AREA ----------
-
 
 !---------- AP TEXT AREA Variables ----------
-
-#FdCreateDate=X,2,L
-#FdCreateEmpNo=X,2,L
-#FdLastUpdate=X,2,L
-#FdLastUpdateEmpNo=X,2,L
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
 
 #CHAIN=A,1,S
-T(4,CHAIN$)
-IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L5080建商名單查詢]進入),$)
+T(4,CHAIN$) 
 
-#NTXBUF=X,200,S
-C(3,#CHAIN,1,T(4,NTXBUF$),S)
-T(1,@FunCd,#NTXBUF,1,1)
-T(1,@CustNo,#NTXBUF,2,7)
-IF(#FunCd==1,$,s)
-INVOKEJS(SHOW,p1,3,7,0)
+#CustId=X,10,I
+@A(ID_UNINO,0,#CustId)
 
-#FdFunCd=X,2,L
-
-#FunCdHelp=x,50,S
-T(3,1:新增;2:修改;4:刪除;5:查詢)
-
-! [功能]
-#FunCd=A,1,S
-C(3,#CHAIN,1,s,$)
-HELP(#FunCdHelp)
-@V(H,#FunCdHelp)
-
-
-! 權限檢查
-#FUNCIND=_,_,S
-E(0,#FunCd)
-
-#FunCdX=X,5,L
-T(H,#FunCd,#FunCdHelp)
-C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢))
-IF(#FunCd==5,K(NOBUTTON,CLOSE),$)
-
-#FdCustNo=X,2,L
-IF(#FunCd==1,T(3,*),T(3,))
-
-!戶號
-#CustNo=A,7,I
-IF(#FunCd==1,T(F,1),T(F,0))
-IF(#FunCd==1,$,s)
-@V(2,0)
-
-!調Rim取資料
-#RimFunCd=A,1,S
+#RimCustId=X,10,S
 #RimCustNo=A,7,S
+#RimCaseSeq=A,3,S
+#RimErrorFg=X,1,S
+!L5R51找出戶號及案件序號,需檢查戶況須為0正常
+#SendL5r51=X,1,S
+T(2,@RimCustId,#CustId)
+E(0,@RimCustNo,0)
+E(0,@RimCaseSeq,0)
+T(2,@RimErrorFg,Y)
+RESET_RIM(#SendL5r51,L5R51)
+S(L5R51,1,#RimCustId,#RimCustNo,#RimCaseSeq,#RimErrorFg)
+R(1,L5R51)
+E(0,@CustNo,#L5r51CustNo)
+E(0,@CaseSeq,#L5r51CaseSeq)
 
-<include src="ROM.icf::L5R50.dec"/>
-#RimL5r50=X,1,S
-E(0,@RimFunCd,#FunCd)
-E(0,@RimCustNo,#CustNo)
-RESET_RIM(#RimL5r50,L5R50)
-S(L5R50,1,#RimFunCd,#RimCustNo)
-R(1,L5R50)
-T(2,@CustName,#L5r50CustName)
-T(2,@DeleteFlag,#L5r50DeleteFlag)
-T(2,@CreateDate,#L5r50CreateDate)
-T(2,@CreateEmpNo,#L5r50CreateEmpNo)
-T(2,@CreateEmpName,#L5r50CreateEmpName)
-T(2,@LastUpdate,#L5r50LastUpdate)
-T(2,@LastUpdateEmpNo,#L5r50LastUpdateEmpNo)
-T(2,@LastUpdateEmpName,#L5r50LastUpdateEmpName)
+#CustNo=A,7,S
+#CaseSeq=A,3,S
 
-!戶名
-#CustName=X,100,L
+#EntryDate=D,7,I
+C(3,#EntryDate,0,E(0,#SYSDATE),$)
+@V(7)V(5,#SYSDATE,9991231)
 
-#FdDeleteFlag=X,2,L
-C(2,#FunCd,$,T(3,),T(3,*),T(3,*),T(3,),T(3,))
 
-!刪除碼
-#DeleteFlag=x,1,I
-C(2,#FunCd,$,T(F,0),T(F,1),T(F,1),T(F,0),T(F,0))
-C(2,#FunCd,$,s,$,$,s,s)
-@C(4,#DeleteFlag,s,$)
-IF(#DeleteFlag=="*",s,V(P,刪除碼只能為*號或空白))
-
-!建檔日期
-#CreateDate=X,9,L
-
-!建檔人員
-#CreateEmpNo=X,6,L
-#CreateEmpName=X,100,L
-
-!最後更新日期
-#LastUpdate=X,9,L
-
-!最後更新人員
-#LastUpdateEmpNo=X,6,L
-#LastUpdateEmpName=X,100,L
-
-#RPTFG=A,1,S
-E(0,0)
-
+<include src="COM.icf::RPTFG.dec"/>
+<include src="ROM.icf::L5R51.dec"/>
 </sub>
+
 !---------- 輸出共用變數宣告區 ----------
 <sub type="RTN" name="AFXMT">
 <include src="PRT.icf::PRTHEAD.rtn"/>
 </sub>
+
 
 !---------- TXFORM = L5983 ----------
 <sub type="FORM" name="L5983">
@@ -159,46 +101,103 @@ E(0,0)
 !C(5,#TXFORM,L5983,$,S)
 
 #SCRTIL=_,_,S
-T(3,[L5983] 建商名單維護)
+T(3,[L5983] 貸款試算)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
-
-#CloseButtonIfInsert=X,1,S
-IF(#FunCd==1,K(NOBUTTON,CLOSE),$)
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#OCustId=X,10,L
+#OCustNo=A,7,L
+#OCaseSeq=A,3,L
+#OPrincipalBal=m,14,L
+#OAccuOverAmt=m,14,L
+#ODueAmt=m,14,L
+#OIntRate=N,2.4,L
+#OEntryDate=D,7,L
+#OIsMainFin=X,1,L
+#OTempAmt=m,14,L
+#ORevivAmtX=X,60,L
 
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 #LOOP=X,1,S
 T(3,1)ASGN(LOOP$)
+
+#OOFinCode=X,5,O
+#OOFinItem=x,50,O
+#OOApprAmt=m,14,O
+#OOAccuApprAmt=m,14,O
 
 </sub>
 
 
 !------ 上行電文 ------
 <sub type="TIM">
-#FunCd
+#CustId
 #CustNo
-#DeleteFlag
-#END
+#CaseSeq
+#EntryDate
 </sub>
+
 
 !------ 下行電文TOM ------
 <sub type="TOM">
+
 TXFORM=L5983
+#OCustId
+#OCustNo
+#OCaseSeq
+#OPrincipalBal
+#OAccuOverAmt
+#ODueAmt
+#OIntRate
+#OEntryDate
+#OIsMainFin
+#OTempAmt
+#ORevivAmtX
+#OOFinCode
+#OOFinItem
+#OOApprAmt
+#OOAccuApprAmt
 ^
-<include src="ROM.icf::L5R50.tom"/>
+
+<include src="HELPRIM.icf::HELPRIM.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L5R51.tom"/>
 </sub>
 
 !--------- OUTPUT畫面 --------
 
-!---------- 單據輸出組合 ----------
-<sub type="PART" name="L5983" layout="cols=1;screen.width=[100,900];printer.width=[20,20];">
+<sub type="PART" name="L5983" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1;">
 [
-["[L5983]                                 建商名單維護                                                          "],
+["[L5983]                                 結 清 試 算"],
+[#<->#,"身分證字號",#OCustId],
+["戶號",#OCustNo],["案件序號",#OCaseSeq],
+["總本金餘額",#OPrincipalBal],["累溢收金額",#OAccuOverAmt],
+["期款",#ODueAmt],["利率",#OIntRate],
+["入帳日期",#OEntryDate],["是否為最大債權銀行",#OIsMainFin],
+["暫收抵繳",#OTempAmt],["溢收抵繳",#OAccuOverAmt],
+[#<->#,"應還金額",#ORevivAmtX],
 ]
 </sub>
 
 !---------- 單據輸出組合 ----------
 <sub type="SELECT">
-<include src="PRT.icf::UPD01.sel"/>
+
+#RPTFG=0,QUERY.GRID,L5983
+#any={header:'L5983.part',caption:'[L5983] 結清試算',shrinkToFit:'false',width:1030,rowNum:12, rowList:[12,36,60]}
+
+#OOFinCode=債權機構
+{width:90,align:'center'}
+
+#OOFinItem=機構名稱
+{width:180}
+
+#OOApprAmt=撥付金額
+{width:180}
+
+#OOAccuApprAmt=累計撥付金額
+{width:180}
+
+
+^
+
 </sub>

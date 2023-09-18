@@ -109,14 +109,18 @@ public class L5075 extends TradeBuffer {
 			// 有找到資料
 			for (NegMain NegMainVO : lNegMain) {
 				int ThisCustNo = NegMainVO.getCustNo();
-				CustMain CustMainVO = sCustMainService.custNoFirst(ThisCustNo, ThisCustNo, titaVo);
-				String ThisCustId = "";
 				String ThisCustName = "";
-				if (CustMainVO != null) {
-					ThisCustId = CustMainVO.getCustId();
-					ThisCustName = StringCut.replaceLineUp(CustMainVO.getCustName());
+				String ThisCustId = "";
+				if (ThisCustNo > 9990000) {//保證人或保貸戶
+					ThisCustId = NegMainVO.getNegCustId();
+					ThisCustName = StringCut.replaceLineUp(NegMainVO.getNegCustName());
+				} else {
+					CustMain CustMainVO = sCustMainService.custNoFirst(ThisCustNo, ThisCustNo, titaVo);
+					if (CustMainVO != null) {
+						ThisCustId = CustMainVO.getCustId();
+						ThisCustName = StringCut.replaceLineUp(CustMainVO.getCustName());
+					}
 				}
-
 				NegTrans NegTransVO = new NegTrans();
 
 				Slice<NegTrans> slNegTransVO = sNegTransService.custNoEq(ThisCustNo, this.index, this.limit, titaVo);

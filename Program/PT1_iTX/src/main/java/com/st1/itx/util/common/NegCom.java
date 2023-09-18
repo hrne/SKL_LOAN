@@ -346,14 +346,14 @@ public class NegCom extends CommBuffer {
 		tNegMainId.setCaseSeq(this.caseSeq);
 		tNegMainId.setCustNo(this.custNo);
 		tNegMain = sNegMainService.findById(tNegMainId, titaVo);
-		tCustMain = sCustMainService.custNoFirst(custNo, custNo, titaVo);
-		if (tCustMain == null) {
-			throw new LogicException(titaVo, "E0001", "客戶資料主檔");
-		}
 
 		// 2.得到Main的資料
 		if (tNegMain == null) {
 			throw new LogicException(titaVo, "E0001", "債務協商案件主檔");
+		}
+		tCustMain = sCustMainService.custNoFirst(custNo, custNo, titaVo);
+		if (tCustMain == null && tNegMain.getCustNo() < 9990000) {
+			throw new LogicException(titaVo, "E0001", "客戶資料主檔");
 		}
 
 		// NegMain
@@ -880,10 +880,15 @@ public class NegCom extends CommBuffer {
 
 	public void mapNegPut(String iTrialFunc, NegTrans tNegTrans, NegMain tNegMain, TitaVo titaVo)
 			throws LogicException {
-		mapNeg.put("CustId", tCustMain.getCustId());
 		mapNeg.put("CaseSeq", String.valueOf(tNegMain.getCaseSeq()));
 		mapNeg.put("CustNo", String.valueOf(custNo));
-		mapNeg.put("CustName", tCustMain.getCustName());
+		if(tNegMain.getCustNo() > 9990000) {
+			mapNeg.put("CustId", tNegMain.getNegCustId());
+			mapNeg.put("CustName", tNegMain.getNegCustName());
+		}else {
+			mapNeg.put("CustId", tCustMain.getCustId());
+			mapNeg.put("CustName", tCustMain.getCustName());
+		}
 		mapNeg.put("Status", status);
 		mapNeg.put("NewStatus", status);
 		mapNeg.put("CustLoanKind", tNegMain.getCustLoanKind());
@@ -1192,18 +1197,25 @@ public class NegCom extends CommBuffer {
 	// 更新jcic報送檔
 	public void updateJcic(NegMain tNegMain, NegTrans tNegTrans,String oTxkind, TitaVo titaVo) throws LogicException {
 		// CaseKindCode 1:協商 2:調解 3:更生 4:清算 ; 無JCIC報送日期 才可更正
+		String jcicCustId = "";
+		if(tNegMain.getCustNo() > 9990000) {
+			jcicCustId = tNegMain.getNegCustId();
+		}else {
+			jcicCustId = tCustMain.getCustId();
+		}
+		
 		if (!"6".equals(oTxkind)) {// 6:撥付失敗重撥不申報
 			switch (caseKindCode) {
 			case "1":
 				// 協商->JcicZ050 ->結案時報送 JCICZ046
-				DbJcicZ050(tCustMain.getCustId(), tNegMain, tNegTrans, titaVo);
+				DbJcicZ050(jcicCustId, tNegMain, tNegTrans, titaVo);
 				break;
 			case "2":
 				// 調解->Jcic450
-				DbJcicZ450(tCustMain.getCustId(), tNegMain, tNegTrans, titaVo);
+				DbJcicZ450(jcicCustId, tNegMain, tNegTrans, titaVo);
 			case "3":
 				// 更生->JcicZ573
-				DbJcicZ573(tCustMain.getCustId(), tNegMain, tNegTrans, titaVo);
+				DbJcicZ573(jcicCustId, tNegMain, tNegTrans, titaVo);
 				break;
 			case "4":
 				// 清算->Jcic
@@ -1692,7 +1704,7 @@ public class NegCom extends CommBuffer {
 			}
 
 			tCustMain = sCustMainService.custNoFirst(custNo, custNo, titaVo);
-			if (tCustMain == null) {
+			if (tCustMain == null && custNo < 9990000) {
 				throw new LogicException(titaVo, "E0001", "客戶資料主檔處理時發生錯誤 戶號[" + custNo + "]");// E0001 查詢資料不存在
 			}
 
