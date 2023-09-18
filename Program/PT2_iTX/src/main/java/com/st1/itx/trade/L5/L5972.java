@@ -29,7 +29,8 @@ import com.st1.itx.util.parse.Parse;
 
 /* DB容器 */
 import com.st1.itx.db.domain.CustMain;
-
+import com.st1.itx.db.domain.NegMain;
+import com.st1.itx.db.domain.NegMainId;
 /*DB服務*/
 import com.st1.itx.db.service.CustMainService;
 
@@ -125,13 +126,14 @@ public class L5972 extends TradeBuffer {
 				}
 				this.info("L5972 FunctionCode IS Null iDateFrom=[" + iDateFrom + "],iDateTo=[" + iDateTo + "]");
 				if (CustId != null && CustId.length() != 0) {
-					CustMain CustMainVO = sCustMainService.custIdFirst(CustId, titaVo);
-					if (CustMainVO != null) {
-						iCustNo = CustMainVO.getCustNo();
-					} else {
+					iCustNo = parse.stringToInteger(CustNo);
+					//CustMain CustMainVO = sCustMainService.custIdFirst(CustId, titaVo);
+					//if (CustMainVO != null) {
+					//	iCustNo = CustMainVO.getCustNo();
+					//} else {
 						// E0001 查詢資料不存在
-						throw new LogicException("E0001", "客戶資料主檔");
-					}
+					//	throw new LogicException("E0001", "客戶資料主檔");
+					//}
 
 					if (("1").equals(DateType)) {
 						// 會計日期
@@ -183,11 +185,29 @@ public class L5972 extends TradeBuffer {
 			for (NegTrans NegTransVO : lNegTrans) {
 				OccursList occursList = new OccursList();
 				int ThisCustNo = NegTransVO.getCustNo();
-				CustMain CustMainVO = sCustMainService.custNoFirst(ThisCustNo, ThisCustNo, titaVo);
+				NegMain tNegMain = new NegMain();
+				NegMainId tNegMainId = new NegMainId();
+				tNegMainId.setCustNo(NegTransVO.getCustNo());
+				tNegMainId.setCaseSeq(NegTransVO.getCaseSeq());
+				tNegMain = sNegMainService.findById(tNegMainId, titaVo);
+				String tCustId = "";
+				String tCustName="";
+				if(tNegMain != null) {
+					if(tNegMain.getCustNo() > 9990000) {
+						tCustId= tNegMain.getNegCustId();
+						tCustName = tNegMain.getNegCustName();
+					}else {
+						CustMain CustMainVO = sCustMainService.custNoFirst(ThisCustNo, ThisCustNo, titaVo);
+						if(CustMainVO != null) {
+							tCustId=CustMainVO.getCustId();
+							tCustName = CustMainVO.getCustName();
+						}
+					}
+				}
+				occursList.putParam("OOCustId", tCustId);// 身分證號
+				occursList.putParam("OOCustNM", StringCut.replaceLineUp(tCustName));// 戶名
 
-				occursList.putParam("OOCustId", CustMainVO.getCustId());// 身分證號
 				occursList.putParam("OOCustNo", ThisCustNo);// 戶號
-				occursList.putParam("OOCustNM", StringCut.replaceLineUp(CustMainVO.getCustName()));// 戶名
 				occursList.putParam("OOEntryDate", NegTransVO.getEntryDate());// 入帳日期
 				occursList.putParam("OOTxKind", NegTransVO.getTxKind());// 交易別
 				occursList.putParam("OOTxAmt", NegTransVO.getTxAmt());// 交易金額

@@ -600,7 +600,6 @@ public class L7205p extends TradeBuffer {
 
 		this.info("upd LM052 SP finished.");
 	}
-
 	/**
 	 * 更新MonthlyLM055AssetLoss LM055重要放款餘額明細表
 	 * 
@@ -637,8 +636,11 @@ public class L7205p extends TradeBuffer {
 		BigDecimal govProjectAdjustAmt = parse.stringToBigDecimal(tTempVo.get("LoanBal"))
 				.subtract(parse.stringToBigDecimal(tTempVo.get("oLoanBal")))
 				.subtract(parse.stringToBigDecimal(tTempVo.get("88LoanBal")));
-
-// totalStorageAmt 備呆總金額(不含應收利息)
+		this.info("LoanBal=" + tTempVo.get("LoanBal"));
+		this.info("oLoanBal=" + tTempVo.get("oLoanBal"));
+		this.info("88LoanBal=" + tTempVo.get("88LoanBal"));
+		this.info("govProjectAdjustAmt=" + govProjectAdjustAmt);
+		// totalStorageAmt 備呆總金額(不含應收利息)
 // totalEvaAmt 折溢價與催收費用
 		BigDecimal totalStorageAmt = BigDecimal.ZERO;
 		BigDecimal totalEvaAmt = BigDecimal.ZERO;
@@ -754,9 +756,9 @@ public class L7205p extends TradeBuffer {
 		}
 		// 計算 & 放入lLM055AssetLoss
 		for (MonthlyFacBal f : this.facBalSumList) {
-			// 借用欄位 : loanType => BuildingFlag, loanItem=> GovProjectFlag
-			// C.不動產抵押放款 H(正常放款 除外
-			if (!("C".equals(f.getBuildingFlag()) && "H".equals(f.getGovProjectFlag()))) {
+			// 借用欄位 : loanType => BuildingFlag
+			// C.不動產抵押放款的正常放款由總額減去其他計算
+			if (!("C".equals(f.getBuildingFlag()) && "11".equals(f.getAssetClass2()))) {
 				computeStorageAmt(f.getBuildingFlag(), f.getAssetClass2(), f.getPrinBalance());
 			}
 		}
@@ -764,24 +766,23 @@ public class L7205p extends TradeBuffer {
 		// Load 折溢價與費用
 		for (MonthlyLM052AssetClass t : lLM052AssetClass) {
 			if ("6".equals(t.getAssetClassNo().substring(0, 1))) {
-				addLM052ToLM055List("Z", t.getAssetClassNo(), t.getStorageAmt());
-				addLM052ToLM055List("Z", "99", t.getLoanBal());
+				addLM052ToLM055List("Z", t.getAssetClassNo(), t.getLoanBal(), t.getStorageAmt());
 			}
 		}
 		// 調整提存差額至C.不動產抵押放款 H(正常放款)
 		for (MonthlyLM052AssetClass e : lLM052AssetClass) {
 			if (!"7".equals(e.getAssetClassNo().substring(0, 1))) {
-				addLM052ToLM055List("C", e.getAssetClassNo(), e.getStorageAmt());
+				addLM052ToLM055List("C", e.getAssetClassNo(), BigDecimal.ZERO, e.getStorageAmt());
 			}
 		}
 		// 調整提存差額至C.不動產抵押放款
 		for (MonthlyLM055AssetLoss e : this.lLM055AssetLoss) {
 			if (!("C".equals(e.getLoanType()))) {
-				addLM052ToLM055List("C", "1", BigDecimal.ZERO.subtract(e.getReserveLossAmt1()));
-				addLM052ToLM055List("C", "2", BigDecimal.ZERO.subtract(e.getReserveLossAmt2()));
-				addLM052ToLM055List("C", "3", BigDecimal.ZERO.subtract(e.getReserveLossAmt3()));
-				addLM052ToLM055List("C", "4", BigDecimal.ZERO.subtract(e.getReserveLossAmt4()));
-				addLM052ToLM055List("C", "5", BigDecimal.ZERO.subtract(e.getReserveLossAmt5()));
+				addLM052ToLM055List("C", "1", BigDecimal.ZERO, BigDecimal.ZERO.subtract(e.getReserveLossAmt1()));
+				addLM052ToLM055List("C", "2", BigDecimal.ZERO, BigDecimal.ZERO.subtract(e.getReserveLossAmt2()));
+				addLM052ToLM055List("C", "3", BigDecimal.ZERO, BigDecimal.ZERO.subtract(e.getReserveLossAmt3()));
+				addLM052ToLM055List("C", "4", BigDecimal.ZERO, BigDecimal.ZERO.subtract(e.getReserveLossAmt4()));
+				addLM052ToLM055List("C", "5", BigDecimal.ZERO, BigDecimal.ZERO.subtract(e.getReserveLossAmt5()));
 			}
 		}
 
@@ -796,7 +797,7 @@ public class L7205p extends TradeBuffer {
 
 	private void computeStorageAmt(String loanType, String assetClassNo2, BigDecimal loanAmt) {
 		BigDecimal storageRate = BigDecimal.ZERO;
-		// 借用欄位 : loanType => BuildingFlag, loanItem=> GovProjectFlag
+		// 借用欄位 : loanType => BuildingFlag
 		for (MonthlyLM052AssetClass t : this.lLM052AssetClass) {
 			if (assetClassNo2.equals(t.getAssetClassNo())) {
 				storageRate = t.getStorageRate();
@@ -811,31 +812,32 @@ public class L7205p extends TradeBuffer {
 			}
 		}
 		BigDecimal storageAmt = loanAmt.multiply(storageRate).setScale(0, RoundingMode.HALF_UP);
-		addLM052ToLM055List(loanType, assetClassNo2, storageAmt);
+		addLM052ToLM055List(loanType, assetClassNo2, loanAmt, storageAmt);
 		this.info("omputeStorageAmt loanType=" + loanType + ", loanAmt=" + loanAmt + ", storageRate=" + storageRate
 				+ ", storageAmt=" + storageAmt);
 	}
 
-	private void addLM052ToLM055List(String loanType, String assetClassNo, BigDecimal storageAmt) {
+	private void addLM052ToLM055List(String loanType, String assetClassNo, BigDecimal loanAmt, BigDecimal storageAmt) {
 		for (MonthlyLM055AssetLoss t : this.lLM055AssetLoss) {
 			if (loanType.equals(t.getLoanType())) {
-				if ("Z".equals(loanType) && "99".equals(assetClassNo)) {
-					t.setOverdueAmount(t.getOverdueAmount().add(storageAmt));
-				}
 				switch (assetClassNo.substring(0, 1)) {
 				case "1":
 					t.setReserveLossAmt1(t.getReserveLossAmt1().add(storageAmt));
 					break;
 				case "2":
+					t.setLoanAmountClass2(t.getLoanAmountClass2().add(loanAmt));
 					t.setReserveLossAmt2(t.getReserveLossAmt2().add(storageAmt));
 					break;
 				case "3":
+					t.setLoanAmountClass3(t.getLoanAmountClass2().add(loanAmt));
 					t.setReserveLossAmt3(t.getReserveLossAmt3().add(storageAmt));
 					break;
 				case "4":
+					t.setLoanAmountClass4(t.getLoanAmountClass2().add(loanAmt));
 					t.setReserveLossAmt4(t.getReserveLossAmt4().add(storageAmt));
 					break;
 				case "5":
+					t.setLoanAmountClass5(t.getLoanAmountClass2().add(loanAmt));
 					t.setReserveLossAmt5(t.getReserveLossAmt5().add(storageAmt));
 					break;
 				}
@@ -898,6 +900,7 @@ public class L7205p extends TradeBuffer {
 		for (MonthlyFacBal t : this.facBalSumList) {
 			if (loanType.equals(t.getBuildingFlag()) && assetClass2.equals(t.getAssetClass2())) {
 				t.setPrinBalance(t.getPrinBalance().add(loanBal));
+				isNew = false;
 				break;
 			}
 		}

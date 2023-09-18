@@ -46,9 +46,9 @@ public class L5022 extends TradeBuffer {
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.totaVo.init(titaVo);
-		if ("1".equals(titaVo.getParam("FunCd"))) {
+		if ("1".equals(titaVo.getParam("FunCd")) || "2".equals(titaVo.getParam("FunCd"))) {
 			lP006Report.setTxBuffer(this.getTxBuffer());
-			lP006Report.setParentTranCode("L5022"); //房貸協辦人員異動名單
+			lP006Report.setParentTranCode("L5022"); //房貸協辦人員異動名單、職級名冊
 			lP006Report.exec(titaVo);
 		} else {
 			String iEmpNo = titaVo.getParam("EmpNo");

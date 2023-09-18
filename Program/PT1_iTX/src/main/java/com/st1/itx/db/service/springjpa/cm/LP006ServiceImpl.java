@@ -27,9 +27,9 @@ public class LP006ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	}
 
-	public List<Map<String, String>> findAll(int effectiveDateS, int effectiveDateE, String updateDate, TitaVo titaVo) {
+	public List<Map<String, String>> findChange(int effectiveDateS, int effectiveDateE, TitaVo titaVo) {
 
-		this.info("LP006ServiceImpl findAll startdate=" + effectiveDateS + ", enddate=" + effectiveDateE + ", updatedate=" + updateDate);
+		this.info("LP006ServiceImpl findChange startdate(本季起日)=" + effectiveDateS + ", enddate(下季起日)=" + effectiveDateE);
 
 		String sql = "";
         sql += "with DATA AS (                                                                        \r\n" + 
@@ -61,7 +61,6 @@ public class LP006ServiceImpl extends ASpringJpaParm implements InitializingBean
         		"      	                       ) AS \"ROWNUMBER\"                                                  \r\n" + 
         		"            from \"PfCoOfficerLog\"                                                             \r\n" + 
         		"            where case when \"EffectiveDate\" > :startdate and \"EffectiveDate\" <= :enddate then 1   \r\n" +  // 本季起日 < 生效日 <= 下季起日
-         		"                       when \"EffectiveDate\" <= :startdate and \"UpdateDate\" > to_date(:updatedate,'yyyy-mm-dd hh24:mi:ss') then 2     \r\n" +  //  生效日 <= 本季起日  && 更新日期時間 > 上季列印日期時間 
         	   	"                       when \"IneffectiveDate\" between :startdate and :enddate then 3               \r\n" +   // 本季起日 <= 停效日 <= 下季起日
         		"                       else 0                                                                 \r\n" + 
         		"                  end > 0     \r\n" + 
@@ -136,9 +135,66 @@ public class LP006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setParameter("startdate", effectiveDateS);
 		query.setParameter("enddate", effectiveDateE);
-		query.setParameter("updatedate", updateDate);
 
 		return this.convertToMap(query);
 	}
 
+	public List<Map<String, String>> findAll(int effectiveDateS, int effectiveDateE, TitaVo titaVo) {
+		this.info("LP006ServiceImpl findAllChange startdate(本季起日)=" + effectiveDateS + ", enddate(下季起日)=" + effectiveDateE);
+
+		String sql = "";
+	sql += "WITH COOFFICER AS ( ";
+	sql += "  SELECT \"EmpNo\"         ";
+	sql += "       , \"DistItem\"      ";
+	sql += "       , \"AreaItem\"      ";
+	sql += "       , \"EmpClass\"      ";
+	sql += "       , \"EffectiveDate\"      ";
+	sql += "       , ROW_NUMBER() OVER (Partition By \"EmpNo\"              ";
+	sql += "    	                   	    ORDER BY \"EffectiveDate\" Desc      ";
+	sql += "	                       ) AS ROWNUMBER                            ";
+	sql += " FROM \"PfCoOfficer\" ";
+	sql += " WHERE \"DeptCode\" = :inputDeptCode ";
+	sql += "   AND \"EffectiveDate\"  < :effectiveDateE ";
+	sql += "   AND \"IneffectiveDate\" >= :effectiveDateS ";
+	sql += " ) ";
+	sql += ", COOFFICERLAST AS ( ";
+	sql += "  SELECT \"EmpNo\"         ";
+	sql += "       , \"DistItem\"      ";
+	sql += "       , \"AreaItem\"      ";
+	sql += "       , \"EmpClass\"      ";
+	sql += "       , \"EffectiveDate\"      ";
+	sql += "       , \"IneffectiveDate\"    ";
+	sql += "       , ROW_NUMBER() OVER (Partition By \"EmpNo\"              ";
+	sql += "    	                   	    ORDER BY \"EffectiveDate\" Desc      ";
+	sql += "	                       ) AS ROWNUMBER                            ";
+	sql += " FROM \"PfCoOfficer\" ";
+	sql += " WHERE \"EffectiveDate\"  < :effectiveDateS ";
+	sql += " ) ";
+	sql += " SELECT PCO.\"DistItem\"         AS Dist        "; // -- 區部
+	sql += "      , PCO.\"AreaItem\"         AS Area        "; // -- 單位
+	sql += "      , \"Fn_GetEmpName\"(PCO.\"EmpNo\",0) ";
+	sql += "                                 AS EmpName     "; // -- 員工姓名
+	sql += "      , PCO.\"EmpNo\"            AS Coorgnizer  "; // -- F3 員工代號
+	sql += "      , PCO.\"EmpClass\"         AS EmpClass    "; // -- F4 考核前職級
+	sql += "      , PCO.\"EffectiveDate\"    AS EffectiveDate";   // --F15 生效日
+	sql += "      , PCO.\"IneffectiveDate\"  AS IneffectiveDate"; // --F16 停效日
+	sql += "      , NVL(LCO.\"EmpClass\",' ' AS LastEmpClass  "; // -- 前季職級
+	sql += " FROM COOFFICER PCO ";
+	sql += " LEFT JOIN \"CdEmp\" EMP on EMP.\"EmployeeNo\" = PCO.\"EmpNo\" ";
+	sql += " LEFT JOIN COOFFICERLAST LCO  ON LCO.\"EmpNo\" = PCO.\"EmpNo\" ";
+	sql += "                             AND LCO.ROWNUMBER = 1 ";
+	sql += " WHERE PCO.ROWNUMBER = 1 ";
+	sql += " ORDER BY Dist ";
+	sql += "        , Area ";
+	sql += "        , Coorgnizer ";
+	this.info("sql=" + sql);
+
+	Query query;
+	EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+	query = em.createNativeQuery(sql);
+	query.setParameter("startdate", effectiveDateS);
+	query.setParameter("enddate", effectiveDateE);
+
+	return this.convertToMap(query);
+	}
 }

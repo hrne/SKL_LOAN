@@ -89,9 +89,24 @@ public class MonthlyLM055AssetLoss implements Serializable {
   private BigDecimal loanAmount990 = new BigDecimal("0");
 
   // 正常逾期數0放款金額
-  /* 放款餘額+政策性專案貸款調整數 */
   @Column(name = "`LoanAmountNor0`")
   private BigDecimal loanAmountNor0 = new BigDecimal("0");
+
+  // 放款金額備呆金額五分類2
+  @Column(name = "`LoanAmountClass2`")
+  private BigDecimal loanAmountClass2 = new BigDecimal("0");
+
+  // 放款金額備呆金額五分類3
+  @Column(name = "`LoanAmountClass3`")
+  private BigDecimal loanAmountClass3 = new BigDecimal("0");
+
+  // 放款金額備呆金額五分類4
+  @Column(name = "`LoanAmountClass4`")
+  private BigDecimal loanAmountClass4 = new BigDecimal("0");
+
+  // 放款金額備呆金額五分類5
+  @Column(name = "`LoanAmountClass5`")
+  private BigDecimal loanAmountClass5 = new BigDecimal("0");
 
   // 備呆金額五分類1
   /* 備呆總金額(不含應收利息)、備呆比率 ref MonthlyLM052AssetClass(LM052資產分類表)調整數放放款種類=C.不動產抵押放款A.銀行保證放款=&amp;gt;按備呆比率重算B.動產擔保放款=&amp;gt;按備呆比率重算C.不動產抵押放款=&amp;gt;總金額-其他重算金額D.有價證券質押放款=&amp;gt;按備呆比率重算G.政策性專案貸款 =&amp;gt;按備呆比率重算 */
@@ -436,7 +451,7 @@ C.不動產抵押放款  : 0 - GovProjectAdjustAmt
 
 /**
 	* 正常逾期數0放款金額<br>
-	* 放款餘額+政策性專案貸款調整數
+	* 
 	* @return BigDecimal
 	*/
   public BigDecimal getLoanAmountNor0() {
@@ -445,12 +460,88 @@ C.不動產抵押放款  : 0 - GovProjectAdjustAmt
 
 /**
 	* 正常逾期數0放款金額<br>
-	* 放款餘額+政策性專案貸款調整數
+	* 
   *
   * @param loanAmountNor0 正常逾期數0放款金額
 	*/
   public void setLoanAmountNor0(BigDecimal loanAmountNor0) {
     this.loanAmountNor0 = loanAmountNor0;
+  }
+
+/**
+	* 放款金額備呆金額五分類2<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getLoanAmountClass2() {
+    return this.loanAmountClass2;
+  }
+
+/**
+	* 放款金額備呆金額五分類2<br>
+	* 
+  *
+  * @param loanAmountClass2 放款金額備呆金額五分類2
+	*/
+  public void setLoanAmountClass2(BigDecimal loanAmountClass2) {
+    this.loanAmountClass2 = loanAmountClass2;
+  }
+
+/**
+	* 放款金額備呆金額五分類3<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getLoanAmountClass3() {
+    return this.loanAmountClass3;
+  }
+
+/**
+	* 放款金額備呆金額五分類3<br>
+	* 
+  *
+  * @param loanAmountClass3 放款金額備呆金額五分類3
+	*/
+  public void setLoanAmountClass3(BigDecimal loanAmountClass3) {
+    this.loanAmountClass3 = loanAmountClass3;
+  }
+
+/**
+	* 放款金額備呆金額五分類4<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getLoanAmountClass4() {
+    return this.loanAmountClass4;
+  }
+
+/**
+	* 放款金額備呆金額五分類4<br>
+	* 
+  *
+  * @param loanAmountClass4 放款金額備呆金額五分類4
+	*/
+  public void setLoanAmountClass4(BigDecimal loanAmountClass4) {
+    this.loanAmountClass4 = loanAmountClass4;
+  }
+
+/**
+	* 放款金額備呆金額五分類5<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getLoanAmountClass5() {
+    return this.loanAmountClass5;
+  }
+
+/**
+	* 放款金額備呆金額五分類5<br>
+	* 
+  *
+  * @param loanAmountClass5 放款金額備呆金額五分類5
+	*/
+  public void setLoanAmountClass5(BigDecimal loanAmountClass5) {
+    this.loanAmountClass5 = loanAmountClass5;
   }
 
 /**
@@ -666,8 +757,8 @@ G.政策性專案貸款 =&amp;gt;按備呆比率重算
   public String toString() {
     return "MonthlyLM055AssetLoss [monthlyLM055AssetLossId=" + monthlyLM055AssetLossId + ", overdueAmount=" + overdueAmount + ", observeAmount=" + observeAmount + ", normalAmount=" + normalAmount + ", govProjectAdjustAmt=" + govProjectAdjustAmt
            + ", loanAmount1=" + loanAmount1 + ", loanAmount2=" + loanAmount2 + ", loanAmount3=" + loanAmount3 + ", loanAmount4=" + loanAmount4 + ", loanAmount5=" + loanAmount5 + ", loanAmount6=" + loanAmount6
-           + ", loanAmountNeg0=" + loanAmountNeg0 + ", loanAmount990=" + loanAmount990 + ", loanAmountNor0=" + loanAmountNor0 + ", reserveLossAmt1=" + reserveLossAmt1 + ", reserveLossAmt2=" + reserveLossAmt2 + ", reserveLossAmt3=" + reserveLossAmt3
-           + ", reserveLossAmt4=" + reserveLossAmt4 + ", reserveLossAmt5=" + reserveLossAmt5 + ", iFRS9AdjustAmt=" + iFRS9AdjustAmt + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", loanAmountNeg0=" + loanAmountNeg0 + ", loanAmount990=" + loanAmount990 + ", loanAmountNor0=" + loanAmountNor0 + ", loanAmountClass2=" + loanAmountClass2 + ", loanAmountClass3=" + loanAmountClass3 + ", loanAmountClass4=" + loanAmountClass4
+           + ", loanAmountClass5=" + loanAmountClass5 + ", reserveLossAmt1=" + reserveLossAmt1 + ", reserveLossAmt2=" + reserveLossAmt2 + ", reserveLossAmt3=" + reserveLossAmt3 + ", reserveLossAmt4=" + reserveLossAmt4 + ", reserveLossAmt5=" + reserveLossAmt5
+           + ", iFRS9AdjustAmt=" + iFRS9AdjustAmt + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

@@ -16,6 +16,10 @@ create table "MonthlyLM055AssetLoss" (
   "LoanAmountNeg0" decimal(16, 2) default 0 not null,
   "LoanAmount990" decimal(16, 2) default 0 not null,
   "LoanAmountNor0" decimal(16, 2) default 0 not null,
+  "LoanAmountClass2" decimal(16, 2) default 0 not null,
+  "LoanAmountClass3" decimal(16, 2) default 0 not null,
+  "LoanAmountClass4" decimal(16, 2) default 0 not null,
+  "LoanAmountClass5" decimal(16, 2) default 0 not null,
   "ReserveLossAmt1" decimal(16, 2) default 0 not null,
   "ReserveLossAmt2" decimal(16, 2) default 0 not null,
   "ReserveLossAmt3" decimal(16, 2) default 0 not null,
@@ -46,6 +50,10 @@ comment on column "MonthlyLM055AssetLoss"."LoanAmount6" is '逾期6放款金額'
 comment on column "MonthlyLM055AssetLoss"."LoanAmountNeg0" is '協議逾期數0放款金額';
 comment on column "MonthlyLM055AssetLoss"."LoanAmount990" is '催收金額';
 comment on column "MonthlyLM055AssetLoss"."LoanAmountNor0" is '正常逾期數0放款金額';
+comment on column "MonthlyLM055AssetLoss"."LoanAmountClass2" is '放款金額備呆金額五分類2';
+comment on column "MonthlyLM055AssetLoss"."LoanAmountClass3" is '放款金額備呆金額五分類3';
+comment on column "MonthlyLM055AssetLoss"."LoanAmountClass4" is '放款金額備呆金額五分類4';
+comment on column "MonthlyLM055AssetLoss"."LoanAmountClass5" is '放款金額備呆金額五分類5';
 comment on column "MonthlyLM055AssetLoss"."ReserveLossAmt1" is '備呆金額五分類1';
 comment on column "MonthlyLM055AssetLoss"."ReserveLossAmt2" is '備呆金額五分類2';
 comment on column "MonthlyLM055AssetLoss"."ReserveLossAmt3" is '備呆金額五分類3';

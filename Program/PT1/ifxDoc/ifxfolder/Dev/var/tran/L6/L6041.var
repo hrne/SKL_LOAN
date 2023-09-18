@@ -295,6 +295,8 @@ T(2,L6401+CODE:+#OTlrNo)
 !是否有歷程 Y/N
 #OHasHistory=X,1,S
 
+#OPermitory=X,1,S
+
 #OBTN6=X,4,S
 
 !BIND(grid,{cmd=CHAIN;ntxcd=L6933;text=歷程;ntxbuf=#OBUF6})
@@ -307,7 +309,7 @@ E(0,5)
 T(2,#OFunc7+#OTlrNo)
 
 #OBTN7=X,4,S
-BIND(grid,{cmd=CHAIN;ntxcd=L6080;text=查詢;ntxbuf=#OBUF7})
+C(5,#OPermitory,"Y",BIND(grid,{cmd=CHAIN;ntxcd=L6080;text=查詢;ntxbuf=#OBUF7}),BIND(grid,cancel))    
 
 ! 修改的按鈕
 #OFunc2=A,1,S
@@ -364,6 +366,7 @@ TXFORM=L6041
 #OLastUpdate
 #OLastUpdateEmpNo
 #OHasHistory
+#OPermitory
 ^
 <include src="ROM.icf::L6R44.tom"/>
 <include src="COM.icf::TRCTL.tom"/>

@@ -37,7 +37,7 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 資料前兩年一月起至當月
 		String startYM = (parse.stringToInteger(titaVo.get("ENTDY").substring(0, 4)) + 1909) + "01";
 		String endYM = parse.IntegerToString(parse.stringToInteger(titaVo.get("ENTDY").substring(0, 6)) + 191100, 1);
-		
+
 		this.info("startYM = " + startYM);
 		this.info("endYM = " + endYM);
 		String sql = "";
@@ -50,9 +50,9 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WHERE \"CdType\" = '02' ";
 		sql += "   AND \"CdItem\" = '02'";
 		sql += "   AND TRUNC(\"EffectDate\" / 100 ) BETWEEN :startYM AND :endYM";
-		
+
 		sql += " UNION ALL";
-		
+
 		sql += " SELECT SUBSTR(JSON_VALUE(\"JsonFields\",'$.\"YearMonth\"'),1,4) AS \"Year\"";
 		sql += "       ,'2' AS \"DataType\" ";
 		sql += "       , SUBSTR(JSON_VALUE(\"JsonFields\",'$.\"YearMonth\"'),5,6) AS \"Month\"";
@@ -70,9 +70,9 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WHERE \"CdType\" = '02' ";
 		sql += "   AND \"CdItem\" = '02'";
 		sql += "   AND TRUNC(\"EffectDate\" / 100 ) BETWEEN :startYM AND :endYM";
-		
+
 		sql += " UNION ALL";
-		
+
 		sql += " SELECT SUBSTR(JSON_VALUE(\"JsonFields\",'$.\"YearMonth\"'),1,4) AS \"Year\"";
 		sql += "       ,'3' AS \"DataType\" ";
 		sql += "       , SUBSTR(JSON_VALUE(\"JsonFields\",'$.\"YearMonth\"'),5,6) AS \"Month\"";
@@ -81,9 +81,9 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WHERE \"CdType\" = '02' ";
 		sql += "   AND \"CdItem\" = '02'";
 		sql += "   AND TRUNC(\"EffectDate\" / 100 ) BETWEEN :startYM AND :endYM";
-		
+
 		sql += " UNION ALL";
-		
+
 		sql += " SELECT SUBSTR(JSON_VALUE(\"JsonFields\",'$.\"YearMonth\"'),1,4) AS \"Year\"";
 		sql += "       ,'4' AS \"DataType\" ";
 		sql += "       , SUBSTR(JSON_VALUE(\"JsonFields\",'$.\"YearMonth\"'),5,6) AS \"Month\"";
@@ -92,9 +92,6 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WHERE \"CdType\" = '02' ";
 		sql += "   AND \"CdItem\" = '02'";
 		sql += "   AND TRUNC(\"EffectDate\" / 100 ) BETWEEN :startYM AND :endYM";
-
-
-		
 
 		this.info("sql=" + sql);
 
@@ -128,8 +125,9 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       	  WHEN M.\"ProdNo\" BETWEEN '81' AND '83'";
 		sql += "		  THEN '921' ";
 		sql += "		ELSE '0' END AS \"Type\"";
-		//990 只要抓UnpaidPrincipal
+		// 990--轉催收金額
 		sql += "       ,  DECODE(M.\"AcctCode\",'990',M.\"OvduPrinAmt\",M.\"LoanBalance\") AS \"LoanBal\" ";
+		sql += "       ,  M.\"LoanBalance\" AS \"LoanBal2\" ";
 		sql += " FROM \"MonthlyLoanBal\" M ";
 		sql += " LEFT JOIN \"FacMain\" FA  ON FA.\"CustNo\" = M.\"CustNo\"";
 		sql += "                          AND FA.\"FacmNo\" = M.\"FacmNo\"";
@@ -137,9 +135,11 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WHERE M.\"YearMonth\" = :yearMonth ";
 		sql += "   AND M.\"LoanBalance\" > 0 ";
 		sql += "   AND M.\"ProdNo\" BETWEEN 'IA' AND 'II' ";
-		// sql += "   AND (  ( (TRUNC(:yearMonth / 100) - TRUNC(FA.\"FirstDrawdownDate\" / 10000) ) * 12 ";
-		// sql += "           + MOD(:yearMonth,100) - MOD(TRUNC(FA.\"FirstDrawdownDate\" / 100),100) ";
-		// sql += "        )  < 240 )    ";//-- 排除本月超過屆滿20年
+		// sql += " AND ( ( (TRUNC(:yearMonth / 100) - TRUNC(FA.\"FirstDrawdownDate\" /
+		// 10000) ) * 12 ";
+		// sql += " + MOD(:yearMonth,100) - MOD(TRUNC(FA.\"FirstDrawdownDate\" /
+		// 100),100) ";
+		// sql += " ) < 240 ) ";//-- 排除本月超過屆滿20年
 		sql += " ) R";
 		sql += " WHERE R.\"Type\" <> '0'";
 		sql += " GROUP BY R.\"Type\"";
@@ -160,6 +160,7 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  THEN '921' ";
 		sql += "		ELSE '0' END AS \"Type\"";
 		sql += "       ,  DECODE(M.\"AcctCode\",'990',M.\"OvduPrinAmt\",M.\"LoanBalance\") AS \"LoanBal\" ";
+		sql += "       ,  M.\"LoanBalance\" AS \"LoanBal2\" ";
 		sql += " FROM \"MonthlyLoanBal\" M ";
 		sql += " LEFT JOIN \"FacMain\" FA  ON FA.\"CustNo\" = M.\"CustNo\"";
 		sql += "                          AND FA.\"FacmNo\" = M.\"FacmNo\"";
@@ -171,12 +172,16 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WHERE R.\"Type\" <> '0'";
 		sql += " GROUP BY R.\"Type\"";
 		sql += " )";
-		sql += " SELECT * FROM \"tmpA\"";
+		sql += " SELECT \"Type\" ";
+		sql += "       ,\"LoanBal\"";
+		sql += " FROM \"tmpA\"";
 		sql += " UNION ";
-		sql += " SELECT * FROM \"tmpB\"";
+		sql += " SELECT \"Type\" ";
+		sql += "       ,\"LoanBal\"";
+		sql += " FROM \"tmpB\"";
 		sql += " UNION ";
 		sql += " SELECT '' AS \"Type\"";
-		sql += "       ,SUM(\"LoanBal\") AS \"LoanBal\"";
+		sql += "       ,SUM(\"LoanBal2\") AS \"LoanBal\"";
 		sql += " FROM (";
 		sql += " 	SELECT * FROM \"tmpA\"";
 		sql += " 	UNION ";

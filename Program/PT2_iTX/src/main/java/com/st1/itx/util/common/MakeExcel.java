@@ -8,6 +8,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -223,28 +225,86 @@ public class MakeExcel extends CommBuffer {
 	}
 
 	private String doSetSheet(Object sheet, String newSheetName) throws LogicException {
-		String sheetname = "";
+		String sheetObjectName = sheet.toString();
+		String oriSheetName = "";
+		if (sheet instanceof String) {
+			getSheetWithName(sheetObjectName);
+		} else {
+			getSheetWithIndex(Integer.parseInt(sheetObjectName));
+		}
+		oriSheetName = this.openedSheet.getSheetName();
+		changeSheetName(newSheetName);
+
+		return oriSheetName;
+	}
+
+	private String doSetSheet(String sheetName, String newSheetName) throws LogicException {
+		String oriSheetName = "";
+		getSheetWithName(sheetName);
+		oriSheetName = this.openedSheet.getSheetName();
+		changeSheetName(newSheetName);
+		return oriSheetName;
+	}
+
+	private String doSetSheet(int sheetIndex, String newSheetName) throws LogicException {
+		String oriSheetName = "";
+		getSheetWithIndex(sheetIndex);
+		oriSheetName = this.openedSheet.getSheetName();
+		changeSheetName(newSheetName);
+		return oriSheetName;
+	}
+
+	private void getSheetWithIndex(int sheetIndex) throws LogicException {
 		try {
-			if (sheet instanceof String) {
-				this.openedSheet = this.openedWorkbook.getSheet(sheet.toString());
-				sheetname = sheet.toString();
-			} else {
-				this.openedSheet = this.openedWorkbook.getSheetAt(Integer.valueOf(sheet.toString()) - 1);
-				sheetname = this.openedSheet.getSheetName();
-			}
-			if (!"".equals(newSheetName)) {
-				int sheetindex = this.openedWorkbook.getSheetIndex(this.openedSheet);
-				this.openedWorkbook.setSheetName(sheetindex, newSheetName);
-			}
+			this.openedSheet = this.openedWorkbook.getSheetAt(sheetIndex - 1);
 		} catch (Exception e) {
-			throw new LogicException(titaVo, "E0013", "(MakeExcel)指定 SHEET (" + sheet + ") 不存在");
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error(errors.toString());
+			throw new LogicException(titaVo, "E0013", "(MakeExcel)指定 SheetIndex (" + sheetIndex + ") 不存在");
 		}
-
 		if (this.openedSheet == null) {
-			throw new LogicException(titaVo, "E0013", "(MakeExcel)指定 SHEET (" + sheet + ") 不存在");
+			throw new LogicException(titaVo, "E0013", "(MakeExcel)指定 SheetIndex (" + sheetIndex + ") 不存在");
 		}
+	}
 
-		return sheetname;
+	private void getSheetWithName(String sheetName) throws LogicException {
+		try {
+			int realSheetIndex = this.openedWorkbook.getSheetIndex(sheetName);
+			if (realSheetIndex == -1) {
+				int size = this.openedWorkbook.getNumberOfSheets();
+				this.info("Number of Sheets : " + size);
+				for (int i = 0; i < size; i++) {
+					Sheet tempSheet = this.openedWorkbook.getSheetAt(i);
+					String tempSheetName = tempSheet.getSheetName();
+					this.info("Sheet [" + i + "] ,name: [" + tempSheetName + "]");
+				}
+				throw new LogicException(titaVo, "E0013", "(MakeExcel)指定 SheetName (" + sheetName + ") 不存在");
+			}
+			this.openedSheet = this.openedWorkbook.getSheetAt(realSheetIndex);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error(errors.toString());
+			throw new LogicException(titaVo, "E0013", "(MakeExcel)指定 SheetName (" + sheetName + ") 不存在");
+		}
+		if (this.openedSheet == null) {
+			int size = this.openedWorkbook.getNumberOfSheets();
+			this.info("Number of Sheets : " + size);
+			for (int i = 0; i < size; i++) {
+				Sheet tempSheet = this.openedWorkbook.getSheetAt(i);
+				String tempSheetName = tempSheet.getSheetName();
+				this.info("Sheet [" + i + "] ,name: [" + tempSheetName + "]");
+			}
+			throw new LogicException(titaVo, "E0013", "(MakeExcel)指定 SheetName (" + sheetName + ") 不存在");
+		}
+	}
+
+	private void changeSheetName(String newSheetName) {
+		if (newSheetName != null && !newSheetName.isEmpty()) {
+			int realSheetIndex = this.openedWorkbook.getSheetIndex(this.openedSheet);
+			this.openedWorkbook.setSheetName(realSheetIndex, newSheetName);
+		}
 	}
 
 	private void doSetWidth(int col, int width) {
@@ -502,7 +562,40 @@ public class MakeExcel extends CommBuffer {
 	 */
 	@Deprecated
 	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName,
-			String defaultExcel, Object defaultSheet, String newSheetName) throws LogicException {
+			String defaultExcel, int defaultSheet, String newSheetName) throws LogicException {
+		this.titaVo = titaVo;
+		this.checkParameters(date, brno, fileCode, fileItem, fileName);
+
+		this.doOpen(defaultExcel);
+
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("t", 0);
+		map.put("e", defaultExcel);
+		listMap.add(map);
+
+		this.setSheet(defaultSheet, newSheetName);
+	}
+
+	/**
+	 * 開啟excel製檔<br>
+	 * 
+	 * @deprecated use
+	 *             {@link #open(TitaVo titaVo, ReportVo reportVo, String fileName, String defaultExcel, Object defaultSheet, String newSheetName)}
+	 *             instead.
+	 * @param titaVo       titaVo
+	 * @param date         日期
+	 * @param brno         單位
+	 * @param fileCode     檔案編號
+	 * @param fileItem     檔案說明
+	 * @param fileName     輸出檔案名稱 (不含副檔名,預設為.xlsx)
+	 * @param defaultExcel 預設excel底稿檔 (需含副檔名)
+	 * @param defaultSheet 預設sheet,可指定 sheet index or sheet name
+	 * @param newSheetName 修改sheet名稱
+	 * @throws LogicException LogicException
+	 */
+	@Deprecated
+	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName,
+			String defaultExcel, String defaultSheet, String newSheetName) throws LogicException {
 		this.titaVo = titaVo;
 		this.checkParameters(date, brno, fileCode, fileItem, fileName);
 
@@ -563,7 +656,33 @@ public class MakeExcel extends CommBuffer {
 	 * @param defaultSheet 底稿頁籤名稱
 	 * @throws LogicException
 	 */
-	public void open(TitaVo titaVo, ReportVo reportVo, String fileName, String defaultExcel, Object defaultSheet)
+	public void open(TitaVo titaVo, ReportVo reportVo, String fileName, String defaultExcel, int defaultSheet)
+			throws LogicException {
+		this.titaVo = titaVo;
+		this.checkParameters(reportVo, fileName);
+
+		this.doOpen(defaultExcel);
+
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("t", 0);
+		map.put("e", defaultExcel);
+		listMap.add(map);
+
+		this.setSheet(defaultSheet);
+	}
+
+	/**
+	 * 開啟excel製檔<br>
+	 * 指定底稿
+	 * 
+	 * @param titaVo       titaVo
+	 * @param reportVo     reportVo
+	 * @param fileName     檔案實際輸出名稱
+	 * @param defaultExcel 底稿檔案名稱
+	 * @param defaultSheet 底稿頁籤名稱
+	 * @throws LogicException
+	 */
+	public void open(TitaVo titaVo, ReportVo reportVo, String fileName, String defaultExcel, String defaultSheet)
 			throws LogicException {
 		this.titaVo = titaVo;
 		this.checkParameters(reportVo, fileName);
@@ -590,7 +709,34 @@ public class MakeExcel extends CommBuffer {
 	 * @param newSheetName 修改頁籤名稱
 	 * @throws LogicException LogicException
 	 */
-	public void open(TitaVo titaVo, ReportVo reportVo, String fileName, String defaultExcel, Object defaultSheet,
+	public void open(TitaVo titaVo, ReportVo reportVo, String fileName, String defaultExcel, int defaultSheet,
+			String newSheetName) throws LogicException {
+		this.titaVo = titaVo;
+		this.checkParameters(reportVo, fileName);
+
+		this.doOpen(defaultExcel);
+
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("t", 0);
+		map.put("e", defaultExcel);
+		listMap.add(map);
+
+		this.setSheet(defaultSheet, newSheetName);
+	}
+
+	/**
+	 * 開啟excel製檔<br>
+	 * 指定底稿,並修改頁籤名稱
+	 * 
+	 * @param titaVo       titaVo
+	 * @param reportVo     reportVo
+	 * @param fileName     檔案實際輸出名稱
+	 * @param defaultExcel 底稿檔案名稱
+	 * @param defaultSheet 底稿頁籤名稱
+	 * @param newSheetName 修改頁籤名稱
+	 * @throws LogicException LogicException
+	 */
+	public void open(TitaVo titaVo, ReportVo reportVo, String fileName, String defaultExcel, String defaultSheet,
 			String newSheetName) throws LogicException {
 		this.titaVo = titaVo;
 		this.checkParameters(reportVo, fileName);
@@ -954,6 +1100,26 @@ public class MakeExcel extends CommBuffer {
 	/**
 	 * 指定Sheet<br>
 	 * 
+	 * @param sheet 可指定 sheet index or sheet name
+	 * @throws LogicException LogicException
+	 */
+	public void setSheet(int sheet) throws LogicException {
+		this.setSheetToMap(sheet, "");
+	}
+
+	/**
+	 * 指定Sheet<br>
+	 * 
+	 * @param sheet 可指定 sheet index or sheet name
+	 * @throws LogicException LogicException
+	 */
+	public void setSheet(String sheet) throws LogicException {
+		this.setSheetToMap(sheet, "");
+	}
+
+	/**
+	 * 指定Sheet<br>
+	 * 
 	 * @param sheet        可指定 sheet index or sheet name
 	 * @param newSheetName 修改指定sheet名稱
 	 * @throws LogicException LogicException
@@ -962,11 +1128,51 @@ public class MakeExcel extends CommBuffer {
 		this.setSheetToMap(sheet, newSheetName);
 	}
 
+	/**
+	 * 指定Sheet<br>
+	 * 
+	 * @param sheetIndex   指定 sheet index
+	 * @param newSheetName 修改指定sheet名稱
+	 * @throws LogicException LogicException
+	 */
+	public void setSheet(int sheetIndex, String newSheetName) throws LogicException {
+		this.setSheetToMap(sheetIndex, newSheetName);
+	}
+
+	/**
+	 * 指定Sheet<br>
+	 * 
+	 * @param sheetName    指定 sheet name
+	 * @param newSheetName 修改指定sheet名稱
+	 * @throws LogicException LogicException
+	 */
+	public void setSheet(String sheetName, String newSheetName) throws LogicException {
+		this.setSheetToMap(sheetName, newSheetName);
+	}
+
 	private void setSheetToMap(Object sheet, String newSheetName) throws LogicException {
 		String sheetname = this.doSetSheet(sheet, newSheetName);
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("t", 1);
 		map.put("s", sheetname);
+		map.put("n", newSheetName);
+		listMap.add(map);
+	}
+
+	private void setSheetToMap(int sheetIndex, String newSheetName) throws LogicException {
+		String sheetname = this.doSetSheet(sheetIndex, newSheetName);
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("t", 1);
+		map.put("s", sheetname);
+		map.put("n", newSheetName);
+		listMap.add(map);
+	}
+
+	private void setSheetToMap(String sheetName, String newSheetName) throws LogicException {
+		this.doSetSheet(sheetName, newSheetName);
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("t", 1);
+		map.put("s", sheetName);
 		map.put("n", newSheetName);
 		listMap.add(map);
 	}

@@ -69,7 +69,7 @@ public class LM003Report extends MakeReport {
 		String brno = titaVo.getBrno();
 		String txcd = "LM003";
 		String fileItem = "撥款／還款金額比較月報表" + rocYMMin + "~" + rocYMMax ;
-		String fileName = "LM003-撥款／還款金額比較月報表" + rocYMMin + "~" + rocYMMax;
+		String fileName = "LM003-撥款／還款金額比較月報表 " + rocYMMin + "~" + rocYMMax;
 		String defaultExcel = "LM003_底稿_撥款還款比較月報表.xlsx";
 		String defaultSheet = "還款-撥還款比較";
 
@@ -191,7 +191,7 @@ public class LM003Report extends MakeReport {
 
 		}
 
-		BigDecimal memo4Diff = repayAllTotal.subtract(memo3Amt).subtract(turnOvduAmt).subtract(entPerAmt);
+		BigDecimal memo4Diff = repayAllTotal.subtract(memo3Amt).subtract(turnOvduAmt);
 
 		// 備註
 //		String memo1 = "=CONCATENATE(\"●\",N20,\"年\",N19,\"月\",\"底貸款總餘額：\",TEXT(" + entToTalAmt
@@ -206,7 +206,7 @@ public class LM003Report extends MakeReport {
 		String memo2 = "●依報表：LN6361編製；撥款金額含催收回復，還款金額含轉催收。";
 		String memo3 = "●自行還款含內部代償、借新還舊、大額還款（1月~" + rocM + "月累積數" + memo3Amt + "億)";
 		String memo4 = "●" + rocM + "月實際還款數：" + repayAllTotal + "（帳載） -" + memo3Amt + "（內部轉帳）-" + turnOvduAmt
-				+ "（轉催收）- " + entPerAmt + "(企金件以自然人申貸還款) ＝" + memo4Diff + "億";
+				+ "（轉催收） ＝" + memo4Diff + "億";
 
 		makeExcel.setValue(24, 1, memo1);
 		makeExcel.setValue(25, 1, memo2);

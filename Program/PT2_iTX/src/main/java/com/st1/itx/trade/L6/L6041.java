@@ -113,6 +113,7 @@ public class L6041 extends TradeBuffer {
 			CdBranch cdBranch = null;
 			CdBranchGroup cdBranchGroup = null;
 			for (Map<String, String> t : sL6041ServiceImpl) {
+
 				if (first) {
 					cdBranch = cdBranchService.findById(t.get("F1"), titaVo);
 					first = false;
@@ -158,6 +159,11 @@ public class L6041 extends TradeBuffer {
 						1, titaVo);
 				List<TxDataLog> lTxDataLog = slTxDataLog != null ? slTxDataLog.getContent() : null;
 				occursList.putParam("OHasHistory", lTxDataLog != null && !lTxDataLog.isEmpty() ? "Y" : "N");
+				if(sL6041ServiceImpl.size() ==1) {
+					occursList.putParam("OPermitory", "Y");
+				}else {
+					occursList.putParam("OPermitory", "N");
+				}
 //				occursList.putParam("OAuthNo", tTxTeller.getAuthNo());
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);

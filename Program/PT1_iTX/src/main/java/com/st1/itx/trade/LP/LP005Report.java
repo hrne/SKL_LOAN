@@ -54,6 +54,7 @@ public class LP005Report extends MakeReport {
 
 	private int effectiveDateS = 0;
 	private int effectiveDateE = 0;
+	private int effectiveDateL = 0;
 	private List<Map<String, String>> listEmpClass = new ArrayList<>();
 
 	public void exec(TitaVo titaVo) throws LogicException {
@@ -93,9 +94,29 @@ public class LP005Report extends MakeReport {
 		if (tCdWorkMonth != null) {
 			effectiveDateE = tCdWorkMonth.getEndDate() + 19110000;
 		}
-		this.info("pfYear = " + pfYear);
-		this.info("pfMonth = " + pfMonth);
-		this.info("pfSeason = " + pfSeason);
+
+		// 前一季度
+		int lPfYear = pfYear;
+		int lPfMonth = 0;
+		// 判斷季度
+		if (pfSeason == 1) {
+			lPfYear--;
+			lPfMonth = 10;
+		} else if (pfSeason == 2) {
+			lPfMonth = 1;
+		} else if (pfSeason == 3) {
+			lPfMonth = 4;
+		} else if (pfSeason == 4) {
+			lPfMonth = 7;
+		}
+		tCdWorkMonth = sCdWorkMonthService.findById(new CdWorkMonthId(lPfYear, lPfMonth), titaVo);
+		if (tCdWorkMonth != null) {
+			effectiveDateL = tCdWorkMonth.getEndDate() + 19110000;
+		}
+
+		this.info("effectiveDateS = " + effectiveDateS);
+		this.info("effectiveDateE = " + effectiveDateE);
+		this.info("effectiveDateL = " + effectiveDateL);
 
 		exportExcel(pfYear, pfSeason, titaVo);
 
@@ -156,14 +177,12 @@ public class LP005Report extends MakeReport {
 		listEmpClass = setDept(listEmpClass, "A0M000", "業開", pfYear, pfSeason, titaVo);
 
 		setEmpClassList(listEmpClass, pfYear, pfSeason, 0);
-
 		setEmpClassList(listEmpClass, pfYear, pfSeason, 1);
 
 	}
 
 	// 考核核算底稿寫入歷程檔
-	private void insertPfCoOfficerLog(TitaVo titaVo)
-			throws LogicException {
+	private void insertPfCoOfficerLog(TitaVo titaVo) throws LogicException {
 		this.info("insertPfCoOfficerLog  ... ");
 		if (listEmpClass == null || listEmpClass.isEmpty()) {
 			return;
@@ -196,7 +215,7 @@ public class LP005Report extends MakeReport {
 
 		// 核算底稿新增至歷程檔(考核後職級不同)
 		for (Map<String, String> m : listEmpClass) {
-			if(!m.get("AfterEmpClass").equals(m.get("OriEmpClass"))) {
+			if (!m.get("AfterEmpClass").equals(m.get("OriEmpClass"))) {
 				this.info("insertPfCoOfficerLog " + m.toString());
 				String evalueEmpClass = "";
 				switch (m.get("AfterEmpClass")) {
@@ -213,8 +232,9 @@ public class LP005Report extends MakeReport {
 					break;
 				}
 
-				l5407.insertEvalutePfCoOfficerLog(m.get("EmpNo"), parse.stringToInteger(m.get("EffectiveDate"))-19110000,
-						evaluteEffectiveDate, evalueEmpClass, titaVo);
+				l5407.insertEvalutePfCoOfficerLog(m.get("EmpNo"),
+						parse.stringToInteger(m.get("EffectiveDate")) - 19110000, evaluteEffectiveDate, evalueEmpClass,
+						titaVo);
 			}
 		}
 	}
@@ -232,7 +252,35 @@ public class LP005Report extends MakeReport {
 		mapEmpClass.put("EffectiveDate", m.get("F15")); // 生效日期
 		mapEmpClass.put("OriEmpClass", oriEmpClass); // 考核前職級
 		mapEmpClass.put("AfterEmpClass", afterEmpClass); // 考核後職級
+		int effectiveDate = Integer.valueOf(m.get("EffectiveDate"));
+		int ineffectiveDate = Integer.valueOf(m.get("IneffectiveDate"));
+		int quitDate = Integer.valueOf(m.get("QuitDate"));// 離職/停約日
+		int agPostChgDate = Integer.valueOf(m.get("AgPostChgDate")); // 職務異動日
+		// 離職/停約日在有在有效期間、 單位不同且職務異動日在有效期間
+		if (effectiveDate < quitDate && ineffectiveDate > quitDate) {
+			mapEmpClass.put("Remark", "離職/停約日" + (quitDate - 19110000));
+		}
+		if (!m.get("CenterCode").equals(m.get("AreaCode"))) {
+			if (effectiveDate < agPostChgDate && ineffectiveDate > agPostChgDate) {
+				mapEmpClass.put("Remark", "職務異動日" + (agPostChgDate - 19110000));
+			}
+		}
+		String lastEmpClass = " ";
+		switch (m.get("LastEmpClass")) {
+		case "1":
+			lastEmpClass = "初級";
+			break;
+		case "2":
+			lastEmpClass = "中級";
+			break;
+		case "3":
+			lastEmpClass = "高級";
+			break;
+		default:
+			break;
+		}
 
+		mapEmpClass.put("LastEmpClass", lastEmpClass); // 前季職級
 		listEmpClass.add(mapEmpClass);
 		this.info("putDataToListEmpClass " + mapEmpClass.toString());
 
@@ -573,30 +621,26 @@ public class LP005Report extends MakeReport {
 			// 員工代號
 			makeExcel.setValue(rowCursor, 6, m.get("EmpNo"));
 
-			if (type == 1) {
-				// 考核後職級
-				makeExcel.setValue(rowCursor, 7, m.get("AfterEmpClass"));
-			} else {
+			switch (type) {
+			case 0:
+				// 前季職級
+				makeExcel.setValue(rowCursor, 7, m.get("LastEmpClass"));
+				// 現在職級
+				makeExcel.setValue(rowCursor, 8, m.get("OriEmpClass"));
+				// 備註
+				makeExcel.setValue(rowCursor, 9, m.get("Remark"));
+				break;
+			case 1:
 				// 考核前職級
 				makeExcel.setValue(rowCursor, 7, m.get("OriEmpClass"));
-			}
-
-			// 考核後職級
-			makeExcel.setValue(rowCursor, 8, m.get("AfterEmpClass"));
-
-			if (type == 0) {
-				String oriEmpClass = m.get("OriEmpClass");
-				String afterEmpClass = m.get("AfterEmpClass");
-				this.info("oriEmpClass = " + oriEmpClass);
-				this.info("afterEmpClass = " + afterEmpClass);
-				if (oriEmpClass.equals(afterEmpClass)) {
-					this.info("EmpClass same");
-				} else {
-					this.info("EmpClass different");
+				// 考核後職級
+				makeExcel.setValue(rowCursor, 8, m.get("AfterEmpClass"));
+				// 職級異動(Y)
+				if (!m.get("OriEmpClass").equals(m.get("AfterEmpClass"))) {
 					makeExcel.setValue(rowCursor, 9, "Yes");
 				}
+				break;
 			}
-
 			rowCursor++;
 		}
 	}

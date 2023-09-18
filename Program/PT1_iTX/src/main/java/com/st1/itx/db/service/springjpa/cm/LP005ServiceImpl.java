@@ -64,7 +64,7 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WHERE \"WorkMonth\" = :inputWorkMonth ";
 		sql += "   AND \"BonusType\" in (5) "; // 協辦
 		sql += "   AND \"AdjustBonus\" > 0 ";
-		sql += "   AND \"ManualFg\" = 0 ";//非人工新增(人工新增只計算金額不算件數)
+		sql += "   AND \"ManualFg\" = 0 ";// 非人工新增(人工新增只計算金額不算件數)
 		this.info("sql=" + sql);
 
 		Query query;
@@ -76,7 +76,7 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	public List<Map<String, String>> queryAmt(int inputWorkMonth, TitaVo titaVo) {
-		//有協辦獎金戶號下全部額度
+		// 有協辦獎金戶號下全部額度
 		this.info("LP005ServiceImpl queryAmt inputWorkMonth = " + inputWorkMonth);
 
 		String sql = " ";
@@ -100,7 +100,7 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           WHERE \"WorkMonth\" = :inputWorkMonth ";
 		sql += "             AND \"BonusType\" in (5) "; // 協辦
 		sql += "             AND \"AdjustBonus\" > 0 ";
-		sql += "             AND \"ManualFg\" = 0 ";//非人工新增(人工新增只計算金額不算件數)
+		sql += "             AND \"ManualFg\" = 0 ";// 非人工新增(人工新增只計算金額不算件數)
 		sql += "         )  ";
 		sql += "    GROUP BY \"CustNo\" ";
 		sql += "           , \"EmployeeNo\" ";
@@ -180,6 +180,7 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           WHERE \"WorkSeason\" = :inputWorkSeason ";
 		sql += "             AND \"BonusType\" in (5) "; // 協辦
 		sql += "             AND \"AdjustBonus\" > 0  ";
+		sql += "             AND \"ManualFg\" = 0 ";// 非人工新增
 		sql += "         )  ";
 		sql += "    GROUP BY \"CustNo\" ";
 		sql += "           , \"EmployeeNo\" ";
@@ -208,6 +209,20 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   AND \"EffectiveDate\"  <= :effectiveDateE ";
 		sql += "   AND \"IneffectiveDate\" >= :effectiveDateS ";
 		sql += " ) ";
+		sql += ", COOFFICERLAST AS ( ";
+		sql += "  SELECT \"EmpNo\"         ";
+		sql += "       , \"DistItem\"      ";
+		sql += "       , \"AreaItem\"      ";
+		sql += "       , \"EmpClass\"      ";
+		sql += "       , \"EffectiveDate\"      ";
+		sql += "       , \"IneffectiveDate\"    ";
+		sql += "       , ROW_NUMBER() OVER (Partition By \"EmpNo\"              ";
+		sql += "    	                   	    ORDER BY \"EffectiveDate\" Desc      ";
+		sql += "	                       ) AS ROWNUMBER                            ";
+		sql += " FROM \"PfCoOfficer\" ";
+		sql += " WHERE \"DeptCode\" = :inputDeptCode ";
+		sql += "   AND \"EffectiveDate\"  < :effectiveDateE ";
+		sql += " ) ";
 		sql += " SELECT PCO.\"DistItem\"         AS Dist        "; // -- F0 區部
 		sql += "      , PCO.\"AreaItem\"         AS Area        "; // -- F1 單位
 		sql += "      , \"Fn_GetEmpName\"(PCO.\"EmpNo\",0) ";
@@ -224,8 +239,16 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , TRUNC(PR.amt4 / 10000)   AS amt4        "; // -- F12 金額4
 		sql += "      , PR.countTotal            AS countTotal  "; // -- F13 件數合計
 		sql += "      , TRUNC(PR.amtTotal / 10000)  AS amtTotal    "; // -- F14 金額合計
-		sql += "      , PCO.\"EffectiveDate\"    AS EffectiveDate";//--F15 生效日
+		sql += "      , PCO.\"EffectiveDate\"    AS EffectiveDate";   // --F15 生效日
+		sql += "      , PCO.\"IneffectiveDate\"  AS IneffectiveDate"; // --F16 停效日
+		sql += "      , CASE WHEN NVL(EMP.\"AgStatusCode\", ' ') in ('1') then 0 else NVL(EMP.\"QuitDate\",0)  end  AS \"QuitDate\"   "; // 離職/停約日
+		sql += "      , CASE WHEN NVL(EMP.\"AgStatusCode\", ' ') in ('1') then NVL(EMP.\"AgPostChgDate\",0)  else 0 end AS \"AgPostChgDate\" "; // 職務異動日
+		sql += "      , NVL(EMP.\"CenterCode\",' ') AS CenterCode  "; // 單位代號
+		sql += "      , NVL(LCO.\"EmpClass\",' '    AS LastEmpClass  "; // -- 前季職級
 		sql += " FROM COOFFICER PCO ";
+		sql += " LEFT JOIN \"CdEmp\" EMP on EMP.\"EmployeeNo\" = PCO.\"EmpNo\" ";
+		sql += " LEFT JOIN COOFFICERLAST LCO  ON LCO.\"EmpNo\" = PCO.\"EmpNo\" ";
+		sql += "                             AND LCO.ROWNUMBER = 1 ";
 		sql += " LEFT JOIN ( SELECT \"EmployeeNo\"                "; // -
 		sql += "                  , SUM(CASE ";
 		sql += "                          WHEN \"WorkMonth\" = :inputWorkMonth1 ";
