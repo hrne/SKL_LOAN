@@ -492,7 +492,9 @@ T(F,@CustName,0)
 IF(#FunctionCode=="01" || #FunctionCode=="02",$,s)
 IF(#L5r51CustNo == 0 || #L5r51CustNo > 9990000,$,s)
 T(F,@CustName,1)
-@V(7)
+@IF(#FunctionCode=="01" || #FunctionCode=="02",$,s)
+C(4,#CustName,V(P,戶名不可空白),s)
+!V(7)
 
 ! 調RIM找CustNo
 <include src="ROM.icf::L5R09.dec"/>

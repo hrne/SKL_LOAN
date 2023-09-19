@@ -269,7 +269,8 @@ public class LM048Report extends MakeReport {
 				tPrevPayIntDate = this.showBcDate(r.get("PrevPayIntDate"), 0);
 				makeExcel.setValue(row, 9, tPrevPayIntDate, "C");
 
-				makeExcel.setValue(row, 12, tLineAmt.divide(tNetWorth, 4, BigDecimal.ROUND_HALF_UP), "0.00%", "C");
+				makeExcel.setValue(row, 12, tLineAmt.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO
+						: tLineAmt.divide(tNetWorth, 4, BigDecimal.ROUND_HALF_UP), "0.00%", "C");
 
 				tGroupName = r.get("CustNameMain").trim().length() == 0 ? "" : r.get("CustNameMain");
 				tCustNoMain = r.get("CustNoMain") == null ? 0 : parse.stringToInteger(r.get("CustNoMain"));
@@ -710,9 +711,9 @@ public class LM048Report extends MakeReport {
 		makeExcel.setMergedRegionValue(netRowC + 3, netRowC + 4, 16, 16, mark2, "C");
 		makeExcel.setMergedRegionValue(netRowC + 3, netRowC + 4, 17, 17, mark3, "C");
 
-		makeExcel.setMergedRegionValue(netRowA, endRowA, 14, 14, "V","C");
-		makeExcel.setMergedRegionValue(netRowB, endRowB, 14, 14, "V","C");
-		makeExcel.setMergedRegionValue(netRowC, endRowC, 14, 14, "V","C");
+		makeExcel.setMergedRegionValue(netRowA, endRowA, 14, 14, "V", "C");
+		makeExcel.setMergedRegionValue(netRowB, endRowB, 14, 14, "V", "C");
+		makeExcel.setMergedRegionValue(netRowC, endRowC, 14, 14, "V", "C");
 
 	}
 

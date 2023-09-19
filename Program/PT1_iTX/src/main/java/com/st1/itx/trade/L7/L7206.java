@@ -242,12 +242,8 @@ public class L7206 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
 
-			this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
-			if ("onLine".equals(titaVo.getDataBase())) {
-				titaVo.setDataBaseOnMon();// 指定月報環境
-			} else {
-				titaVo.setDataBaseOnLine();// 指定連線環境
-			}
+			changeDBEnv(titaVo);
+			
 			try {
 
 				if (delStakeholdersStaff != null) {
@@ -322,7 +318,7 @@ public class L7206 extends TradeBuffer {
 				// 每1000筆，新增一次
 				if (cntTrans > 1000) {
 
-					titaVo.setDataBaseOnLine();// 指定連線報環境
+					changeDBEnv(titaVo);
 
 					try {
 
@@ -339,12 +335,7 @@ public class L7206 extends TradeBuffer {
 						throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 					}
 
-					this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
-					if ("onLine".equals(titaVo.getDataBase())) {
-						titaVo.setDataBaseOnMon();// 指定月報環境
-					} else {
-						titaVo.setDataBaseOnLine();// 指定連線環境
-					}
+					changeDBEnv(titaVo);
 
 					try {
 
@@ -367,8 +358,7 @@ public class L7206 extends TradeBuffer {
 				}
 			} // for
 
-			titaVo.setDataBaseOnLine();// 指定連線報環境
-			this.info("onLine");
+			changeDBEnv(titaVo);
 
 			try {
 
@@ -384,12 +374,7 @@ public class L7206 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
 
-			this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
-			if ("onLine".equals(titaVo.getDataBase())) {
-				titaVo.setDataBaseOnMon();// 指定月報環境
-			} else {
-				titaVo.setDataBaseOnLine();// 指定連線環境
-			}
+			changeDBEnv(titaVo);
 
 			try {
 
@@ -453,12 +438,7 @@ public class L7206 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
 
-			this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
-			if ("onLine".equals(titaVo.getDataBase())) {
-				titaVo.setDataBaseOnMon();// 指定月報環境
-			} else {
-				titaVo.setDataBaseOnLine();// 指定連線環境
-			}
+			changeDBEnv(titaVo);
 
 			try {
 
@@ -527,12 +507,7 @@ public class L7206 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
 
-			this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
-			if ("onLine".equals(titaVo.getDataBase())) {
-				titaVo.setDataBaseOnMon();// 指定月報環境
-			} else {
-				titaVo.setDataBaseOnLine();// 指定連線環境
-			}
+			changeDBEnv(titaVo);
 			try {
 
 				if (delFinHoldRel != null) {
@@ -754,16 +729,6 @@ public class L7206 extends TradeBuffer {
 				iLineAmt = new BigDecimal(makeExcel.getValue(i, 14).toString());
 				iLoanBalance = new BigDecimal(makeExcel.getValue(i, 15).toString());
 
-//				try {
-//
-//				
-//				} catch (Exception e) {
-//
-//					String ErrorMsg = "L7206(Excel欄位讀取有誤，請確認";
-//					throw new LogicException(titaVo, "E0015", ErrorMsg);
-//
-//				}
-
 				occursList.putParam("RelWithCompany", iRelWithCompany);
 				occursList.putParam("HeadId", iHeadId);
 				occursList.putParam("HeadName", iHeadName);
@@ -901,12 +866,33 @@ public class L7206 extends TradeBuffer {
 		String tlrno = titaVo.getTlrNo();
 		String txcd = titaVo.getTxcd();
 		this.info("txcd =" + txcd);
-		titaVo.setDataBaseOnLine();// 指定連線環境
+		changeDBEnv(titaVo);
+
 		tMonthlyFacBalService.Usp_L7_UploadToMonthlyFacBal_Upd(iYYMM, txcd, tlrno, "", titaVo);
 
-		titaVo.setDataBaseOnMon();// 指定月報環境
+		changeDBEnv(titaVo);
+
 		tMonthlyFacBalService.Usp_L7_UploadToMonthlyFacBal_Upd(iYYMM, txcd, tlrno, "", titaVo);
 		this.info("upd updL7UploadData end.");
+	}
+
+	/**
+	 * 切換環境
+	 */
+	private void changeDBEnv(TitaVo titaVo) {
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		if ("onLine".equals(titaVo.getDataBase())) {
+			titaVo.setDataBaseOnMon();// 指定月報環境
+		} else {
+			titaVo.setDataBaseOnLine();// 指定連線環境
+		}
+
 	}
 
 }

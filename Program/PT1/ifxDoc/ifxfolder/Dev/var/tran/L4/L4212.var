@@ -1,0 +1,113 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L4212)
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L4212" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L4212]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@支票兌現總傳票明細表"],
+[#<->#,"#FdAcDate+會計日期",#AcDate],
+[#<->#,"#FdBatchNo+批次號碼",#BatchNoFm,"-",#BatchNoTo],
+] 
+
+#FdAcDate=X,2,L
+T(3,*)                                                                                    
+#FdBatchNo=X,2,L
+T(3,*) 
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+#NEXT_DATE=D,8,S
+T(4,NBSDY$)
+
+! 會計日期
+#AcDate=D,7,I
+T(1,#SYSDATE,2,7)
+@
+V(7)A(DATE,0,#AcDate)
+
+
+#BatchNoFm=A,2,I
+E(0,0)
+
+#BatchNoTo=A,2,I
+E(0,99)
+@
+IF(#BatchNoFm > #BatchNoTo,V(5,#BatchNoFm,99),$)
+
+#ReportA=A,1,S
+E(0,1)
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+#L452APRT=A,1,S
+C(4,#ReportA,E(0,0),E(0,1))
+![資料表頭(HEADER)長度]
+#L452AHD=n,3,S
+C(4,#ReportA,S,$)E(0,68)ASGN(INQHD$)
+![每筆明細(OCCURS)長度]
+#L452ALN=n,3,S
+C(4,#ReportA,S,$)E(0,118)ASGN(INQLEN$)
+![每張印錄單列印的筆數]
+#L452AQPRT=n,2,S
+C(4,#ReportA,S,$)E(0,30)ASGN(INQPRT$)
+![畫面顯示的明細間的高度]
+#L452ALOOP=n,3,S
+C(4,#ReportA,S,$)E(0,1)ASGN(LOOPHEIGHT$)
+
+#L452BPRT=A,1,S
+C(4,#ReportA,E(0,0),E(0,1))
+![資料表頭(HEADER)長度]
+#L452BHD=n,3,S
+C(4,#ReportA,S,$)E(0,68)ASGN(INQHD$)
+![每筆明細(OCCURS)長度]
+#L452BLN=n,3,S
+C(4,#ReportA,S,$)E(0,118)ASGN(INQLEN$)
+![每張印錄單列印的筆數]
+#L452BQPRT=n,2,S
+C(4,#ReportA,S,$)E(0,30)ASGN(INQPRT$)
+![畫面顯示的明細間的高度]
+#L452BLOOP=n,3,S
+C(4,#ReportA,S,$)E(0,1)ASGN(LOOPHEIGHT$)
+</sub>
+
+!------------ TXFORM = L4212 -----------
+<sub type="FORM" name="L452A" tota-mode="1">
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#AcDate
+#BatchNoFm
+#BatchNoTo
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+TXFORM=L452A
+^
+
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+^
+
+</sub>

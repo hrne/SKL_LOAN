@@ -59,8 +59,7 @@ BEGIN
                     WHEN M."ClCode1" IN (3,4) THEN 'NS2' 
                     --購置不動產+修繕貸款
                     WHEN M."ClCode1" IN (1,2) 
-                      AND F."UsageCode" = '02' 
-                      AND M."ProdNo" NOT IN ('60','61','62') THEN 'S1'
+                      AND F."UsageCode" = '02' THEN 'S1'
                     --個金不動產抵押貸款
                     ELSE 'NS3'  END        AS "LoanAssetCode"	--放款資產項目
               ,SUM(M."PrinBalance") AS "LoanBal"	  
@@ -90,8 +89,7 @@ BEGIN
                     WHEN M."ClCode1" IN (3,4) THEN 'NS2' 
                     --購置不動產+修繕貸款
                     WHEN M."ClCode1" IN (1,2) 
-                      AND F."UsageCode" = '02' 
-                      AND M."ProdNo" NOT IN ('60','61','62') THEN 'S1'
+                      AND F."UsageCode" = '02' THEN 'S1'
                     --個金不動產抵押貸款
                     ELSE 'NS3'  END 
           UNION

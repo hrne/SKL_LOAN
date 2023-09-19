@@ -220,7 +220,6 @@ public class L7205p extends TradeBuffer {
 
 		}
 
-		titaVo.keepOrgDataBase();// 保留原本記號
 
 		try {
 			tMothlyFacBalService.updateAll(lMonthlyFacBal, titaVo);
@@ -230,7 +229,7 @@ public class L7205p extends TradeBuffer {
 			throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 		}
 
-		titaVo.setDataBaseOnMon();// 指定月報環境
+		changeDBEnv(titaVo);
 
 		try {
 			tMothlyFacBalService.updateAll(lMonthlyFacBal, titaVo);
@@ -239,7 +238,7 @@ public class L7205p extends TradeBuffer {
 			throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 		}
 
-		titaVo.setDataBaseOnLine(); // 連線環境
+		changeDBEnv(titaVo);
 
 		for (OccursList tempOccursList : occursList) {
 
@@ -284,7 +283,7 @@ public class L7205p extends TradeBuffer {
 					}
 				}
 
-				titaVo.setDataBaseOnMon();// 指定月報環境
+				changeDBEnv(titaVo);
 
 				for (Ias34Ap t : lIas34Ap) {
 					t.setAssetClass(parse.stringToInteger(assetclass));
@@ -299,7 +298,7 @@ public class L7205p extends TradeBuffer {
 			}
 
 			// 維護LoanIfrs9Ap
-			titaVo.setDataBaseOnLine(); // 連線環境
+			changeDBEnv(titaVo);
 			sLoanIfrs9Ap = tLoanIfrs9ApService.dataEq(custno, facmno, yearmonth, this.index, this.limit, titaVo);
 
 			List<LoanIfrs9Ap> lLoanIfrs9Ap = sLoanIfrs9Ap == null ? null : sLoanIfrs9Ap.getContent();
@@ -315,7 +314,7 @@ public class L7205p extends TradeBuffer {
 					}
 				}
 
-				titaVo.setDataBaseOnMon();// 指定月報環境
+				changeDBEnv(titaVo);
 
 				for (LoanIfrs9Ap t : lLoanIfrs9Ap) {
 					t.setAssetClass(parse.stringToInteger(assetclass));
@@ -330,25 +329,25 @@ public class L7205p extends TradeBuffer {
 		} // for
 
 		this.batchTransaction.commit();
-		titaVo.setDataBaseOnMon();// 指定月報環境
+		changeDBEnv(titaVo);
 		this.batchTransaction.commit();
 
-		titaVo.setDataBaseOnLine(); // 連線環境
+		changeDBEnv(titaVo);
 		updLM052ReportSPAndMonthlyFacBalData(titaVo, iYearMonth);
 
-		titaVo.setDataBaseOnMon();// 指定月報環境
+		changeDBEnv(titaVo);
 		updLM052ReportSPAndMonthlyFacBalData(titaVo, iYearMonth);
 
 		// 更新MonthlyLM055AssetLoss LM055重要放款餘額明細表
 		getMonthlyLM055AssetLoss(titaVo, iYearMonth);
 
-		titaVo.setDataBaseOnLine(); // 連線環境
+		changeDBEnv(titaVo);
 		try {
 			sLM055AssetLossService.updateAll(this.lLM055AssetLoss, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 		}
-		titaVo.setDataBaseOnMon();// 指定月報環境
+		changeDBEnv(titaVo);
 		try {
 			sLM055AssetLossService.updateAll(this.lLM055AssetLoss, titaVo);
 		} catch (DBException e) {
@@ -598,6 +597,13 @@ public class L7205p extends TradeBuffer {
 		this.info("txcd=" + txcd);
 		tMothlyFacBalService.Usp_L7_UploadToMonthlyFacBal_Upd(yearMonth, txcd, empNo, "", titaVo);
 
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		this.info("upd LM052 SP finished.");
 	}
 
@@ -684,6 +690,7 @@ public class L7205p extends TradeBuffer {
 		this.lLM055AssetLoss.add(l);
 		l = new MonthlyLM055AssetLoss();
 		l.setLoanType("C");
+		l.setGovProjectAdjustAmt(BigDecimal.ZERO.subtract(govProjectAdjustAmt));
 		l.setNormalAmount(BigDecimal.ZERO.subtract(govProjectAdjustAmt));
 		l.setLoanAmountNor0(BigDecimal.ZERO.subtract(govProjectAdjustAmt));
 		l.setIFRS9AdjustAmt(iFRS9AdjustAmt);
@@ -693,6 +700,7 @@ public class L7205p extends TradeBuffer {
 		this.lLM055AssetLoss.add(l);
 		l = new MonthlyLM055AssetLoss();
 		l.setLoanType("G");
+		l.setGovProjectAdjustAmt(govProjectAdjustAmt);
 		l.setNormalAmount(govProjectAdjustAmt);
 		l.setLoanAmountNor0(govProjectAdjustAmt);
 		this.lLM055AssetLoss.add(l);
@@ -749,7 +757,6 @@ public class L7205p extends TradeBuffer {
 			}
 			// load 放款餘額至 LM055 List
 			addFacBalToLM055List(loanType, m);
-			// 加總五分類金額
 			sumfacBal(loanType, m.getAssetClass2(), m.getPrinBalance().subtract(m.getLawAmount()));
 			if (m.getLawAmount().compareTo(BigDecimal.ZERO) > 0) {
 				sumfacBal(loanType, m.getLawAssetClass(), m.getLawAmount());
@@ -822,8 +829,8 @@ public class L7205p extends TradeBuffer {
 		}
 		BigDecimal storageAmt = loanAmt.multiply(storageRate).setScale(0, RoundingMode.HALF_UP);
 		addLM052ToLM055List(loanType, assetClassNo2, loanAmt, storageAmt);
-		this.info("computeStorageAmt loanType=" + loanType + ", loanAmt=" + loanAmt + ", storageRate=" + storageRate
-				+ ", storageAmt=" + storageAmt);
+		this.info("computeStorageAmt loanType=" + loanType + ", assetClassNo2=" + assetClassNo2 + ", loanAmt=" + loanAmt
+				+ ", storageRate=" + storageRate + ", storageAmt=" + storageAmt);
 	}
 
 	private void addLM052ToLM055List(String loanType, String assetClassNo, BigDecimal loanAmt, BigDecimal storageAmt) {
@@ -933,5 +940,24 @@ public class L7205p extends TradeBuffer {
 			a.setPrinBalance(a.getPrinBalance().add(loanBal));
 			this.facBalSumList.add(a);
 		}
+	}
+
+	/**
+	 * 切換環境
+	 */
+	private void changeDBEnv(TitaVo titaVo) {
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		if ("onLine".equals(titaVo.getDataBase())) {
+			titaVo.setDataBaseOnMon();// 指定月報環境
+		} else {
+			titaVo.setDataBaseOnLine();// 指定連線環境
+		}
+
 	}
 }

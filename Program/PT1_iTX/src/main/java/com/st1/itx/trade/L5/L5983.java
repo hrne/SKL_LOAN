@@ -64,7 +64,7 @@ public class L5983 extends TradeBuffer {
 
 		NegMain tNegMain = negMainService.findById(new NegMainId(iCustNo, iCaseSeq), titaVo);
 		if (tNegMain == null) {
-			// 錯誤訊息 查無資料
+			throw new LogicException("E0001", "債務協商案件主檔");// 查無資料
 		}
 		BigDecimal tempAmt = BigDecimal.ZERO; // 暫收抵繳
 		int diffdd = 0;

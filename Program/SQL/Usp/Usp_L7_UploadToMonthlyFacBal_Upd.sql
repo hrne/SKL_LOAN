@@ -181,13 +181,11 @@ BEGIN
                           OR (M."AcctCode" = '990' AND M."FacAcctCode" = '340')
                           OR M."AcctCode" = '340')
                           AND F."FirstDrawdownDate" >= 20110101 THEN 'N' 
-                        --股票質押
                         WHEN M."ClCode1" IN (3,4) THEN 'N' 
                         --購置不動產+修繕貸款
                         WHEN M."ClCode1" IN (1,2) 
-                          AND F."UsageCode" = '02' 
-                          AND M."ProdNo" NOT IN ('60','61','62') THEN 'Y'
-                        --個金不動產抵押貸款
+                          AND F."UsageCode" = '02' THEN 'Y'
+                        --個金不動產抵押貸款 和 股票質押
                         ELSE 'N'  END        AS "SpecialAssetFlag"
               FROM "MonthlyFacBal" M
               LEFT JOIN "FacMain" F ON F."CustNo" = M."CustNo"
@@ -199,6 +197,7 @@ BEGIN
                           WHERE "IndustryItem" LIKE '%不動產%'
                              OR "IndustryItem" LIKE '%建築%'
                           ) CDI ON CDI."IndustryCode" = SUBSTR(CM."IndustryCode",3,4)
+                               AND M."ClCode" IN ('1','2')
               WHERE  M."YearMonth" = TYYMM 
         ) TMP
         ON (

@@ -51,7 +51,7 @@ E(0,0)
 !#RimCustNo=A,7,S
 
 #FdCustNo=X,2,L
-T(3, )
+T(3,*)
 #FdCustId=X,1,L
 T(3, )
 #FdCaseSeq=X,1,L

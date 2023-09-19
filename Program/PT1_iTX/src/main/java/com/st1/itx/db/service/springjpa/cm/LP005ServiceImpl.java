@@ -224,28 +224,28 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WHERE \"DeptCode\" = :inputDeptCode ";
 		sql += "   AND \"EffectiveDate\"  < :effectiveDateE ";
 		sql += " ) ";
-		sql += " SELECT PCO.\"DistItem\"         AS Dist        "; // -- F0 區部
-		sql += "      , PCO.\"AreaItem\"         AS Area        "; // -- F1 單位
+		sql += " SELECT PCO.\"DistItem\"         AS \"Dist\"        "; // -- F0 區部
+		sql += "      , PCO.\"AreaItem\"         AS \"Area\"        "; // -- F1 單位
 		sql += "      , \"Fn_GetEmpName\"(PCO.\"EmpNo\",0) ";
-		sql += "                                 AS EmpName     "; // -- F2 員工姓名
-		sql += "      , PCO.\"EmpNo\"            AS Coorgnizer  "; // -- F3 員工代號
-		sql += "      , PCO.\"EmpClass\"         AS EmpClass    "; // -- F4 考核前職級
-		sql += "      , PR.count1                AS count1      "; // -- F5 件數1
-		sql += "      , TRUNC(PR.amt1 / 10000)   AS amt1        "; // -- F6 金額1
-		sql += "      , PR.count2                AS count2      "; // -- F7 件數2
-		sql += "      , TRUNC(PR.amt2 / 10000)   AS amt2        "; // -- F8 金額2
-		sql += "      , PR.count3                AS count3      "; // -- F9 件數3
-		sql += "      , TRUNC(PR.amt3 / 10000)   AS amt3        "; // -- F10 金額3
-		sql += "      , PR.count4                AS count4      "; // -- F11 件數4
-		sql += "      , TRUNC(PR.amt4 / 10000)   AS amt4        "; // -- F12 金額4
-		sql += "      , PR.countTotal            AS countTotal  "; // -- F13 件數合計
-		sql += "      , TRUNC(PR.amtTotal / 10000)  AS amtTotal    "; // -- F14 金額合計
-		sql += "      , PCO.\"EffectiveDate\"    AS EffectiveDate";   // --F15 生效日
-		sql += "      , PCO.\"IneffectiveDate\"  AS IneffectiveDate"; // --F16 停效日
+		sql += "                                 AS \"EmpName\"     "; // -- F2 員工姓名
+		sql += "      , PCO.\"EmpNo\"            AS \"Coorgnizer\"  "; // -- F3 員工代號
+		sql += "      , PCO.\"EmpClass\"         AS \"EmpClass\"    "; // -- F4 考核前職級
+		sql += "      , PR.count1                AS \"count1\"      "; // -- F5 件數1
+		sql += "      , TRUNC(PR.amt1 / 10000)   AS \"amt1\"        "; // -- F6 金額1
+		sql += "      , PR.count2                AS \"count2\"      "; // -- F7 件數2
+		sql += "      , TRUNC(PR.amt2 / 10000)   AS \"amt2\"        "; // -- F8 金額2
+		sql += "      , PR.count3                AS \"count3\"      "; // -- F9 件數3
+		sql += "      , TRUNC(PR.amt3 / 10000)   AS \"amt3\"        "; // -- F10 金額3
+		sql += "      , PR.count4                AS \"count4\"      "; // -- F11 件數4
+		sql += "      , TRUNC(PR.amt4 / 10000)   AS \"amt4\"        "; // -- F12 金額4
+		sql += "      , PR.countTotal            AS \"countTotal\"  "; // -- F13 件數合計
+		sql += "      , TRUNC(PR.amtTotal / 10000)  AS \"amtTotal\"    "; // -- F14 金額合計
+		sql += "      , PCO.\"EffectiveDate\"    AS \"EffectiveDate\" ";   // --F15 生效日
+		sql += "      , PCO.\"IneffectiveDate\"  AS \"IneffectiveDate\" "; // --F16 停效日
 		sql += "      , CASE WHEN NVL(EMP.\"AgStatusCode\", ' ') in ('1') then 0 else NVL(EMP.\"QuitDate\",0)  end  AS \"QuitDate\"   "; // 離職/停約日
 		sql += "      , CASE WHEN NVL(EMP.\"AgStatusCode\", ' ') in ('1') then NVL(EMP.\"AgPostChgDate\",0)  else 0 end AS \"AgPostChgDate\" "; // 職務異動日
-		sql += "      , NVL(EMP.\"CenterCode\",' ') AS CenterCode  "; // 單位代號
-		sql += "      , NVL(LCO.\"EmpClass\",' ')   AS LastEmpClass  "; // -- 前季職級
+		sql += "      , NVL(EMP.\"CenterCode\",' ') AS \"CenterCode\"  "; // 單位代號
+		sql += "      , NVL(LCO.\"EmpClass\",' ')   AS \"LastEmpClass\"  "; // -- 前季職級
 		sql += " FROM COOFFICER PCO ";
 		sql += " LEFT JOIN \"CdEmp\" EMP on EMP.\"EmployeeNo\" = PCO.\"EmpNo\" ";
 		sql += " LEFT JOIN COOFFICERLAST LCO  ON LCO.\"EmpNo\" = PCO.\"EmpNo\" ";

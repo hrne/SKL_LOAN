@@ -32,19 +32,13 @@ public class L5975ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	// *** 折返控制相關 ***
-	private int index;
-
-	// *** 折返控制相關 ***
 	private int limit;
 
 	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findFindCode(TitaVo titaVo, int index, int limit) throws Exception {
 		this.info("L5975ServiceImpl.findAll ");
 
-		// *** 折返控制相關 ***
-		this.index = index;
 		// *** 折返控制相關 ***
 		this.limit = limit;
 
@@ -78,12 +72,9 @@ public class L5975ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findDataSendUnit(TitaVo titaVo, int index, int limit) throws Exception {
 		this.info("L5975ServiceImpl.findAll ");
 
-		// *** 折返控制相關 ***
-		this.index = index;
 		// *** 折返控制相關 ***
 		this.limit = limit;
 
@@ -121,8 +112,6 @@ public class L5975ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("L5975ServiceImpl.findAll ");
 
 		// *** 折返控制相關 ***
-		this.index = index;
-		// *** 折返控制相關 ***
 		this.limit = limit;
 
 		String sql = " ";
@@ -132,6 +121,7 @@ public class L5975ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , COUNT(\"FinCode\")                AS \"CNT\"                 "; // -- F2 總筆數
 		sql += " FROM \"NegAppr01\" ";
 		sql += "  WHERE \"CustNo\" = " + CustNo + " and \"CaseSeq\" = " + CaseSeq;
+		sql += "    AND NVL(\"ReplyCode\",'0000')  IN ('4001','0000') " ;
 		sql += "   GROUP BY  \"FinCode\" ";
 		sql += "   ORDER BY  \"FinCode\" ";
 		sql += sqlRow;
@@ -158,8 +148,6 @@ public class L5975ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("L5975ServiceImpl.findAll ");
 
 		// *** 折返控制相關 ***
-		this.index = index;
-		// *** 折返控制相關 ***
 		this.limit = limit;
 
 		String sql = " ";
@@ -169,6 +157,7 @@ public class L5975ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , COUNT(\"FinCode\")                AS \"CNT\"                 "; // -- F2 總筆數
 		sql += " FROM \"NegAppr01\" ";
 		sql += "  WHERE \"CustNo\" = " + CustNo;
+		sql += "    AND NVL(\"ReplyCode\",'0000')  IN ('4001','0000') " ;
 		sql += "   GROUP BY  \"FinCode\" ";
 		sql += "   ORDER BY  \"FinCode\" ";
 		sql += sqlRow;

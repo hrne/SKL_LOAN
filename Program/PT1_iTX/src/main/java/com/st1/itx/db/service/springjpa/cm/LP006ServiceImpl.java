@@ -170,15 +170,15 @@ public class LP006ServiceImpl extends ASpringJpaParm implements InitializingBean
 	sql += " FROM \"PfCoOfficer\" ";
 	sql += " WHERE \"EffectiveDate\"  < :effectiveDateS ";
 	sql += " ) ";
-	sql += " SELECT PCO.\"DistItem\"         AS Dist        "; // -- 區部
-	sql += "      , PCO.\"AreaItem\"         AS Area        "; // -- 單位
+	sql += " SELECT PCO.\"DistItem\"         AS \"Dist\"        "; // -- 區部
+	sql += "      , PCO.\"AreaItem\"         AS \"Area\"        "; // -- 單位
 	sql += "      , \"Fn_GetEmpName\"(PCO.\"EmpNo\",0) ";
-	sql += "                                 AS EmpName     "; // -- 員工姓名
-	sql += "      , PCO.\"EmpNo\"            AS Coorgnizer  "; // -- F3 員工代號
-	sql += "      , PCO.\"EmpClass\"         AS EmpClass    "; // -- F4 考核前職級
-	sql += "      , PCO.\"EffectiveDate\"    AS EffectiveDate";   // --F15 生效日
-	sql += "      , PCO.\"IneffectiveDate\"  AS IneffectiveDate"; // --F16 停效日
-	sql += "      , NVL(LCO.\"EmpClass\",' ' AS LastEmpClass  "; // -- 前季職級
+	sql += "                                 AS \"EmpName\"     "; // -- 員工姓名
+	sql += "      , PCO.\"EmpNo\"            AS \"Coorgnizer\"  "; // -- F3 員工代號
+	sql += "      , PCO.\"EmpClass\"         AS \"EmpClass\"    "; // -- F4 考核前職級
+	sql += "      , PCO.\"EffectiveDate\"    AS \"EffectiveDate\" ";   // --F15 生效日
+	sql += "      , PCO.\"IneffectiveDate\"  AS \"IneffectiveDate\" "; // --F16 停效日
+	sql += "      , NVL(LCO.\"EmpClass\",' ' AS \"LastEmpClass\"  "; // -- 前季職級
 	sql += " FROM COOFFICER PCO ";
 	sql += " LEFT JOIN \"CdEmp\" EMP on EMP.\"EmployeeNo\" = PCO.\"EmpNo\" ";
 	sql += " LEFT JOIN COOFFICERLAST LCO  ON LCO.\"EmpNo\" = PCO.\"EmpNo\" ";
