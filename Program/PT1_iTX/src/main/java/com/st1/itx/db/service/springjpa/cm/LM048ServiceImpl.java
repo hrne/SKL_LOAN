@@ -105,7 +105,7 @@ public class LM048ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                              , M.\"CustNo\" ";
 		sql += "                              , M.\"FacmNo\" ";
 		sql += "                              , M.\"StoreRate\" ";
-		sql += "                              , M.\"PrevPayIntDate\"";
+		sql += "                              , M2.\"PrevPayIntDate\"";
 		sql += "                FROM \"MonthlyLoanBal\" M ";
 		sql += "                LEFT JOIN (";
 		sql += "   						SELECT  M.\"YearMonth\" ";
@@ -291,47 +291,27 @@ public class LM048ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-	public List<Map<String, String>> groupLineAmt(int inputYearMonth, int custNoMain, TitaVo titaVo) {
+	public List<Map<String, String>> groupLineAmt(int inputYearMonth,  TitaVo titaVo) {
 
 		this.info("LM048ServiceImpl groupLineAmt ");
 		this.info("inputYearMonth = " + inputYearMonth);
 
 		String sql = " ";
-		sql += "    SELECT SUM(M.\"LineAmt\") AS \"ToTalLineAmt\" ";
-		sql += "         , M.\"CustNo\" AS \"CustNoMain\" ";
-		sql += "         , M.\"CustName\" AS \"CustNameMain\" ";
+		sql += "    SELECT M.\"CustNoMain\" AS \"CustNoMain\" ";
+		sql += "         , M.\"CustNameMain\" AS \"CustNameMain\" ";
+		sql += "     	 , SUM(M.\"LineAmt\") AS \"ToTalLineAmt\" ";
 		sql += "    FROM ( ";
-		sql += "        SELECT DISTINCT Substr( ";
-		sql += "            \"IndustryCode\", 3 ";
-		sql += "         , 4 ";
-		sql += "        ) AS \"IndustryCode\" ";
-		sql += "                      , \"IndustryItem\" ";
-		sql += "                      , \"IndustryRating\" ";
-		sql += "        FROM \"CdIndustry\" ";
-		sql += "        WHERE \"IndustryRating\" IS NOT NULL ";
-		sql += "              AND ";
-		sql += "              \"MainType\" IS NOT NULL ";
-		sql += "    ) Ci ";
-		sql += "    left join ( ";
-		sql += "    SELECT Cm.\"CustNo\" ";
+		sql += "    SELECT DISTINCT Cm.\"CustNo\" ";
 		sql += "         , Cm.\"CustName\" ";
 		sql += "         , Round( NVL(  ";
 		sql += "         		CASE";
 		sql += "         		  WHEN Fsa.\"CustNo\" IS NOT NULL ";
 		sql += "         		  THEN Fsl.\"LineAmt\"";
 		sql += "         		  ELSE Fm.\"LineAmt\"";
-		sql += "         		END , 0 )";
+		sql += "         		END , 0 ) / 1000 ";
 		sql += "         )      AS \"LineAmt\" ";
-		sql += "         , Round(M.\"PrinBalance\" / 1000)   AS \"PrinBalance\" ";
-		sql += "         , M2.\"StoreRate\" ";
-		sql += "         , Fm.\"MaturityDate\" ";
-		sql += "         , M2.\"PrevPayIntDate\" ";
 		sql += "         , Cg.\"CustNo\"                   AS \"CustNoMain\" ";
-		sql += "         , Decode( ";
-		sql += "        Cg.\"CustName\", NULL ";
-		sql += "         , '        ' ";
-		sql += "         , To_Char(Cg.\"CustName\" || '關係企業') ";
-		sql += "    )                   AS \"CustNameMain\" ";
+		sql += "         , Cg.\"CustName\"                   AS \"CustNameMain\" ";
 		sql += "         , Cm.\"IndustryCode\" ";
 		sql += "         , Substr( ";
 		sql += "        Cm.\"IndustryCode\", 3 ";
@@ -354,7 +334,7 @@ public class LM048ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                              , M.\"CustNo\" ";
 		sql += "                              , M.\"FacmNo\" ";
 		sql += "                              , M.\"StoreRate\" ";
-		sql += "                              , M.\"PrevPayIntDate\"";
+		sql += "                              , M2.\"PrevPayIntDate\"";
 		sql += "                FROM \"MonthlyLoanBal\" M ";
 		sql += "                LEFT JOIN (";
 		sql += "   						SELECT  M.\"YearMonth\" ";
@@ -374,10 +354,10 @@ public class LM048ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    where m.\"YearMonth\"= :yymm ";
 		sql += "    and trunc(m2.\"PrevPayIntDate\"/100) >=  :yymm ";
 		sql += "    and m.\"EntCode\" IN (1)  ";
-		sql += "    ) m on m.\"IndustryCode2\" = ci.\"IndustryCode\" ";
-		sql += "    Where  M.\"CustNoMain\" = " + custNoMain;
-		sql += "    Group By M.\"CustNo\" ";
-		sql += "           , M.\"CustName\" ";
+		sql += "    and rm.\"CustNo\" is not null  ";
+		sql += "    ) m ";
+		sql += "    Group By M.\"CustNoMain\" ";
+		sql += "           , M.\"CustNameMain\" ";
 
 		this.info("sql=" + sql);
 
@@ -389,7 +369,9 @@ public class LM048ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("yymm", inputYearMonth);
 
 		return this.convertToMap(query);
+
 	}
+	
 
 	public List<Map<String, String>> queryLoanBal(int inputYearMonth, TitaVo titaVo) {
 		this.info("LM048ServiceImpl queryLoanBal ");
@@ -434,24 +416,6 @@ public class LM048ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    ) ";
 		sql += "    GROUP BY \"Name\" ";
 
-//		sql += " SELECT CASE ";
-//		sql += "          WHEN CM.\"EntCode\" = '1' ";
-//		sql += "          THEN '1' ";
-//		sql += "        ELSE '0' END               AS EntCode "; // -- F0 企金別
-//		sql += "      , SUM(NVL(ML.\"LoanBal\",0)) AS LoanBal "; // -- F1 企業放款總餘額
-//		sql += " FROM \"CustMain\" CM ";
-//		sql += " LEFT JOIN ( SELECT \"CustNo\" ";
-//		sql += "                  , SUM(\"LoanBalance\") AS \"LoanBal\" ";
-//		sql += "             FROM \"MonthlyLoanBal\" ";
-//		sql += "             WHERE \"LoanBalance\" > 0 ";
-//		sql += "               AND \"YearMonth\" = :inputYearMonth ";
-//		sql += "             GROUP BY \"CustNo\" ";
-//		sql += "           ) ML ON ML.\"CustNo\" = CM.\"CustNo\" ";
-//		sql += " WHERE ML.\"LoanBal\" > 0 "; // -- 當月底有放款餘額
-//		sql += " GROUP BY CASE ";
-//		sql += "          WHEN CM.\"EntCode\" = '1' ";
-//		sql += "          THEN '1' ";
-//		sql += "        ELSE '0' END ";
 
 		this.info("sql=" + sql);
 

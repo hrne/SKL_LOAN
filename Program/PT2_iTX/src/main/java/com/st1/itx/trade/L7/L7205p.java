@@ -822,7 +822,7 @@ public class L7205p extends TradeBuffer {
 		}
 		BigDecimal storageAmt = loanAmt.multiply(storageRate).setScale(0, RoundingMode.HALF_UP);
 		addLM052ToLM055List(loanType, assetClassNo2, loanAmt, storageAmt);
-		this.info("omputeStorageAmt loanType=" + loanType + ", loanAmt=" + loanAmt + ", storageRate=" + storageRate
+		this.info("computeStorageAmt loanType=" + loanType + ", loanAmt=" + loanAmt + ", storageRate=" + storageRate
 				+ ", storageAmt=" + storageAmt);
 	}
 
@@ -838,15 +838,15 @@ public class L7205p extends TradeBuffer {
 					t.setReserveLossAmt2(t.getReserveLossAmt2().add(storageAmt));
 					break;
 				case "3":
-					t.setLoanAmountClass3(t.getLoanAmountClass2().add(loanAmt));
+					t.setLoanAmountClass3(t.getLoanAmountClass3().add(loanAmt));
 					t.setReserveLossAmt3(t.getReserveLossAmt3().add(storageAmt));
 					break;
 				case "4":
-					t.setLoanAmountClass4(t.getLoanAmountClass2().add(loanAmt));
+					t.setLoanAmountClass4(t.getLoanAmountClass4().add(loanAmt));
 					t.setReserveLossAmt4(t.getReserveLossAmt4().add(storageAmt));
 					break;
 				case "5":
-					t.setLoanAmountClass5(t.getLoanAmountClass2().add(loanAmt));
+					t.setLoanAmountClass5(t.getLoanAmountClass5().add(loanAmt));
 					t.setReserveLossAmt5(t.getReserveLossAmt5().add(storageAmt));
 					break;
 				case "6": // 61:擔保放款折溢價, 62:催收折溢價與催收費用
@@ -864,6 +864,7 @@ public class L7205p extends TradeBuffer {
 				}
 				break;
 			}
+			break;
 		}
 	}
 
