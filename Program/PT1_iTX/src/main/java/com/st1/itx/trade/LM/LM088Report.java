@@ -117,10 +117,7 @@ public class LM088Report extends MakeReport {
 				row++;	
 				
 				
-				if (entCode != entCodeNext) {
-					makeExcel.setValue(row, 5, "同一關係人", "L");
-					row++;
-				}
+	
 
 				makeExcel.setValue(row, 5, custName, "L");
 				makeExcel.setValue(row, 6, custNo, "C");
@@ -141,6 +138,11 @@ public class LM088Report extends MakeReport {
 					loanBalTol = BigDecimal.ZERO;
 
 					row++;// 空一列
+				}
+				
+				if (entCode != entCodeNext) {
+					makeExcel.setValue(row, 5, "同一關係人", "L");
+					row++;
 				}
 
 			}

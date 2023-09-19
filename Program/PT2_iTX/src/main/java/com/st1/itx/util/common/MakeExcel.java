@@ -273,6 +273,7 @@ public class MakeExcel extends CommBuffer {
 			int realSheetIndex = this.openedWorkbook.getSheetIndex(sheetName);
 			if (realSheetIndex == -1) {
 				int size = this.openedWorkbook.getNumberOfSheets();
+				this.info("");
 				this.info("Number of Sheets : " + size);
 				for (int i = 0; i < size; i++) {
 					Sheet tempSheet = this.openedWorkbook.getSheetAt(i);
@@ -461,11 +462,8 @@ public class MakeExcel extends CommBuffer {
 	}
 
 	/**
-	 * 開啟excel製檔<br>
+	 * 開啟全新excel製檔<br>
 	 * 
-	 * @deprecated use
-	 *             {@link #open(TitaVo titaVo, ReportVo reportVo, String fileName)}
-	 *             instead.
 	 * @param titaVo   titaVo
 	 * @param date     日期
 	 * @param brno     單位
@@ -474,7 +472,6 @@ public class MakeExcel extends CommBuffer {
 	 * @param fileName 輸出檔案名稱(不含副檔名,預設檔案編號為.xlsx)
 	 * @throws LogicException LogicException
 	 */
-	@Deprecated
 	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName)
 			throws LogicException {
 		// 未指定sheetnanme時,預設以檔案編號為sheetnanme
@@ -482,11 +479,9 @@ public class MakeExcel extends CommBuffer {
 	}
 
 	/**
-	 * 開啟excel製檔<br>
+	 * 開啟全新excel製檔<br>
+	 * 並指定新頁籤名稱
 	 * 
-	 * @deprecated use
-	 *             {@link #open(TitaVo titaVo, ReportVo reportVo, String fileName, String sheetName)}
-	 *             instead.
 	 * @param titaVo    titaVo
 	 * @param date      日期
 	 * @param brno      單位
@@ -496,7 +491,6 @@ public class MakeExcel extends CommBuffer {
 	 * @param sheetName 新建Sheet名稱
 	 * @throws LogicException LogicException
 	 */
-	@Deprecated
 	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName,
 			String sheetName) throws LogicException {
 		this.titaVo = titaVo;
@@ -513,10 +507,9 @@ public class MakeExcel extends CommBuffer {
 	}
 
 	/**
+	 * 開啟excel製檔<br>
+	 * 並指定底稿,指定頁籤名稱
 	 * 
-	 * @deprecated use
-	 *             {@link #open(TitaVo titaVo, ReportVo reportVo, String fileName, String defaultExcel, Object defaultSheet)}
-	 *             instead.
 	 * @param titaVo       titaVo
 	 * @param date         日期
 	 * @param brno         單位
@@ -527,7 +520,6 @@ public class MakeExcel extends CommBuffer {
 	 * @param defaultSheet 預設sheet,可指定 sheet index or sheet name
 	 * @throws LogicException LogicException
 	 */
-	@Deprecated
 	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName,
 			String defaultExcel, Object defaultSheet) throws LogicException {
 		this.titaVo = titaVo;
@@ -545,10 +537,8 @@ public class MakeExcel extends CommBuffer {
 
 	/**
 	 * 開啟excel製檔<br>
+	 * 並指定底稿,指定頁籤名稱,指定新頁籤名稱
 	 * 
-	 * @deprecated use
-	 *             {@link #open(TitaVo titaVo, ReportVo reportVo, String fileName, String defaultExcel, Object defaultSheet, String newSheetName)}
-	 *             instead.
 	 * @param titaVo       titaVo
 	 * @param date         日期
 	 * @param brno         單位
@@ -560,7 +550,6 @@ public class MakeExcel extends CommBuffer {
 	 * @param newSheetName 修改sheet名稱
 	 * @throws LogicException LogicException
 	 */
-	@Deprecated
 	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName,
 			String defaultExcel, int defaultSheet, String newSheetName) throws LogicException {
 		this.titaVo = titaVo;
@@ -578,10 +567,8 @@ public class MakeExcel extends CommBuffer {
 
 	/**
 	 * 開啟excel製檔<br>
+	 * 並指定底稿,指定頁籤名稱,指定新頁籤名稱
 	 * 
-	 * @deprecated use
-	 *             {@link #open(TitaVo titaVo, ReportVo reportVo, String fileName, String defaultExcel, Object defaultSheet, String newSheetName)}
-	 *             instead.
 	 * @param titaVo       titaVo
 	 * @param date         日期
 	 * @param brno         單位
@@ -593,7 +580,6 @@ public class MakeExcel extends CommBuffer {
 	 * @param newSheetName 修改sheet名稱
 	 * @throws LogicException LogicException
 	 */
-	@Deprecated
 	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName,
 			String defaultExcel, String defaultSheet, String newSheetName) throws LogicException {
 		this.titaVo = titaVo;
@@ -610,7 +596,7 @@ public class MakeExcel extends CommBuffer {
 	}
 
 	/**
-	 * 開啟excel製檔<br>
+	 * 開啟全新excel製檔<br>
 	 * 
 	 * @param titaVo   titaVo
 	 * @param reportVo reportVo
@@ -623,7 +609,7 @@ public class MakeExcel extends CommBuffer {
 	}
 
 	/**
-	 * 開啟excel製檔<br>
+	 * 開啟全新excel製檔<br>
 	 * 
 	 * @param titaVo    titaVo
 	 * @param reportVo  reportVo

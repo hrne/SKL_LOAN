@@ -657,7 +657,6 @@ public class MakeReport extends CommBuffer {
 	}
 
 	/**
-	 * @deprecated use {@link #open(TitaVo titaVo, ReportVo reportVo)} instead.
 	 * @param titaVo   titaVo
 	 * @param date     日期
 	 * @param brno     單位
@@ -666,7 +665,6 @@ public class MakeReport extends CommBuffer {
 	 * @param security 報表機密等級(中文敍述)
 	 * @throws LogicException LogicException
 	 */
-	@Deprecated
 	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String security)
 			throws LogicException {
 
@@ -725,9 +723,6 @@ public class MakeReport extends CommBuffer {
 
 	/**
 	 * 
-	 * @deprecated use
-	 *             {@link #open(TitaVo titaVo, ReportVo reportVo, String defaultPdf)}
-	 *             instead.
 	 * @param titaVo     titaVo
 	 * @param date       日期
 	 * @param brno       單位
@@ -737,7 +732,6 @@ public class MakeReport extends CommBuffer {
 	 * @param defaultPdf 預設PDF底稿
 	 * @throws LogicException LogicException
 	 */
-	@Deprecated
 	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String security,
 			String defaultPdf) throws LogicException {
 		this.titaVo = titaVo;
@@ -770,7 +764,6 @@ public class MakeReport extends CommBuffer {
 	/**
 	 * 開始製作報表<br>
 	 * 
-	 * @deprecated use {@link #open(TitaVo titaVo, ReportVo reportVo)} instead.
 	 * @param titaVo          titaVo
 	 * @param date            日期
 	 * @param brno            單位
@@ -781,7 +774,6 @@ public class MakeReport extends CommBuffer {
 	 * @param pageOrientation 報表方向,P:直印/L:橫印
 	 * @throws LogicException LogicException
 	 */
-	@Deprecated
 	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security,
 			String pageSize, String pageOrientation) throws LogicException {
 
@@ -848,7 +840,6 @@ public class MakeReport extends CommBuffer {
 	/**
 	 * 開始製作印表機套印格式<BR>
 	 * 
-	 * @deprecated use {@link #openForm(TitaVo titaVo, ReportVo reportVo)} instead.
 	 * @param titaVo          titaVo
 	 * @param date            日期
 	 * @param brno            單位
@@ -858,7 +849,6 @@ public class MakeReport extends CommBuffer {
 	 * @param pageOrientation 報表方向,P:直印/L:橫印
 	 * @throws LogicException LogicException
 	 */
-	@Deprecated
 	public void openForm(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String pageSize,
 			String pageOrientation) throws LogicException {
 

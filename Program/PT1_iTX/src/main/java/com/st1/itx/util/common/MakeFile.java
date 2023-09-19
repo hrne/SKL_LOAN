@@ -94,9 +94,6 @@ public class MakeFile extends CommBuffer {
 	/**
 	 * 開始製檔<br>
 	 * 
-	 * @deprecated use
-	 *             {@link #open(TitaVo titaVo, ReportVo reportVo, String fileName, int format)}
-	 *             instead.
 	 * @param titaVo   titaVo
 	 * @param date     日期
 	 * @param brno     單位
@@ -106,7 +103,6 @@ public class MakeFile extends CommBuffer {
 	 * @param format   輸出檔案格式 1.UTF8 2.BIG5
 	 * @throws LogicException LogicException
 	 */
-	@Deprecated
 	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName,
 			int format) throws LogicException {
 		this.titaVo = titaVo;
@@ -116,9 +112,6 @@ public class MakeFile extends CommBuffer {
 	/**
 	 * 開始製檔<br>
 	 * 
-	 * @deprecated use
-	 *             {@link #open(TitaVo titaVo, ReportVo reportVo, String fileName)}
-	 *             instead.
 	 * @param titaVo   titaVo
 	 * @param date     日期
 	 * @param brno     單位
@@ -127,7 +120,6 @@ public class MakeFile extends CommBuffer {
 	 * @param fileName 輸出檔案名稱
 	 * @throws LogicException LogicException
 	 */
-	@Deprecated
 	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName)
 			throws LogicException {
 		this.titaVo = titaVo;

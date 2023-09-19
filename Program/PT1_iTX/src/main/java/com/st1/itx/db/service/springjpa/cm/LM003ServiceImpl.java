@@ -191,10 +191,11 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                            , \"TitaTxCd\"";
 		sql += "                            , \"TxDescCode\"";
 		sql += "                            , \"AcDate\"";
+		sql += "                            , \"EntryDate\"";
 		sql += "                            , ROW_NUMBER() OVER(";
-		sql += "                                PARTITION BY \"CustNo\", \"FacmNo\", \"BormNo\", substr(\"AcDate\", 1, 6)";
+		sql += "                                PARTITION BY \"CustNo\", \"FacmNo\", \"BormNo\", substr(\"EntryDate\", 1, 6)";
 		sql += "                                ORDER BY";
-		sql += "                                    \"AcDate\" DESC";
+		sql += "                                    \"EntryDate\" DESC";
 		sql += "                            ) \"Seq\"";
 		sql += "                        FROM";
 		sql += "                            \"LoanBorTx\"";

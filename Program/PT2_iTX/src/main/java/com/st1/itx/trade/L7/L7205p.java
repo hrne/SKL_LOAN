@@ -600,6 +600,7 @@ public class L7205p extends TradeBuffer {
 
 		this.info("upd LM052 SP finished.");
 	}
+
 	/**
 	 * 更新MonthlyLM055AssetLoss LM055重要放款餘額明細表
 	 * 
@@ -758,7 +759,7 @@ public class L7205p extends TradeBuffer {
 		for (MonthlyFacBal f : this.facBalSumList) {
 			// 借用欄位 : loanType => BuildingFlag
 			// C.不動產抵押放款的正常放款由總額減去其他計算
-			if (!("C".equals(f.getBuildingFlag()) && "11".equals(f.getAssetClass2()))) {
+			if (!("C".equals(f.getBuildingFlag()) && "1".equals(f.getAssetClass2().substring(0, 1)))) {
 				computeStorageAmt(f.getBuildingFlag(), f.getAssetClass2(), f.getPrinBalance());
 			}
 		}
@@ -769,20 +770,28 @@ public class L7205p extends TradeBuffer {
 				addLM052ToLM055List("Z", t.getAssetClassNo(), t.getLoanBal(), t.getStorageAmt());
 			}
 		}
+		// Load 應收利息(本金不計，備呆金額放五分類2
+		for (MonthlyLM052AssetClass t : lLM052AssetClass) {
+			if ("7".equals(t.getAssetClassNo().substring(0, 1))) {
+				addLM052ToLM055List("C", t.getAssetClassNo(), BigDecimal.ZERO, t.getStorageAmt());
+			}
+		}
 		// 調整提存差額至C.不動產抵押放款 H(正常放款)
 		for (MonthlyLM052AssetClass e : lLM052AssetClass) {
-			if (!"7".equals(e.getAssetClassNo().substring(0, 1))) {
+			if (!"6".equals(e.getAssetClassNo().substring(0, 1)) && !"7".equals(e.getAssetClassNo().substring(0, 1))) {
 				addLM052ToLM055List("C", e.getAssetClassNo(), BigDecimal.ZERO, e.getStorageAmt());
 			}
 		}
 		// 調整提存差額至C.不動產抵押放款
 		for (MonthlyLM055AssetLoss e : this.lLM055AssetLoss) {
-			if (!("C".equals(e.getLoanType()))) {
-				addLM052ToLM055List("C", "1", BigDecimal.ZERO, BigDecimal.ZERO.subtract(e.getReserveLossAmt1()));
-				addLM052ToLM055List("C", "2", BigDecimal.ZERO, BigDecimal.ZERO.subtract(e.getReserveLossAmt2()));
-				addLM052ToLM055List("C", "3", BigDecimal.ZERO, BigDecimal.ZERO.subtract(e.getReserveLossAmt3()));
-				addLM052ToLM055List("C", "4", BigDecimal.ZERO, BigDecimal.ZERO.subtract(e.getReserveLossAmt4()));
-				addLM052ToLM055List("C", "5", BigDecimal.ZERO, BigDecimal.ZERO.subtract(e.getReserveLossAmt5()));
+			if (!"Z".equals(e.getLoanType())) {
+				if (!("C".equals(e.getLoanType()))) {
+					addLM052ToLM055List("C", "1", BigDecimal.ZERO, BigDecimal.ZERO.subtract(e.getReserveLossAmt1()));
+					addLM052ToLM055List("C", "2", BigDecimal.ZERO, BigDecimal.ZERO.subtract(e.getReserveLossAmt2()));
+					addLM052ToLM055List("C", "3", BigDecimal.ZERO, BigDecimal.ZERO.subtract(e.getReserveLossAmt3()));
+					addLM052ToLM055List("C", "4", BigDecimal.ZERO, BigDecimal.ZERO.subtract(e.getReserveLossAmt4()));
+					addLM052ToLM055List("C", "5", BigDecimal.ZERO, BigDecimal.ZERO.subtract(e.getReserveLossAmt5()));
+				}
 			}
 		}
 
@@ -839,6 +848,18 @@ public class L7205p extends TradeBuffer {
 				case "5":
 					t.setLoanAmountClass5(t.getLoanAmountClass2().add(loanAmt));
 					t.setReserveLossAmt5(t.getReserveLossAmt5().add(storageAmt));
+					break;
+				case "6": // 61:擔保放款折溢價, 62:催收折溢價與催收費用
+					if ("61".equals(assetClassNo)) {
+						t.setNormalAmount(t.getNormalAmount().add(loanAmt)); // 正常放款
+						t.setReserveLossAmt1(t.getReserveLossAmt1().add(storageAmt)); // 備呆金額五分類1
+					} else {
+						t.setOverdueAmount(t.getOverdueAmount().add(loanAmt)); // 逾期放款
+						t.setReserveLossAmt2(t.getReserveLossAmt2().add(storageAmt)); // 備呆金額五分類2
+					}
+					break;
+				case "7":
+					t.setReserveLossAmt2(t.getReserveLossAmt2().add(storageAmt));
 					break;
 				}
 				break;

@@ -84,7 +84,7 @@ public class LM073Report extends MakeReport {
 			for (Map<String, String> tLDVo : lList) {
 				int colShift = 0;
 
-				for (int i = 0; i <= 8; i++) {
+				for (int i = 0; i <= 13; i++) {
 
 					int col = i + pivotCol; // 1-based for col
 
@@ -96,7 +96,7 @@ public class LM073Report extends MakeReport {
 					switch (i) {
 					// if specific column needs special treatment, insert case here.
 					case 1:
-						value = tLDVo.get("CustNo") + " " + tLDVo.get("FacmNo"); // 戶號 中文敘述
+//						value = tLDVo.get("CustNo") + " " + tLDVo.get("FacmNo"); // 戶號 中文敘述
 						makeExcel.setValue(row, col + colShift, value, "R");
 						break;
 					case 2:

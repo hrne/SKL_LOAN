@@ -29,12 +29,12 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 	/**
 	 * 客戶往來本息明細表
 	 * 
-	 * @param isCalcuExcessive 是否要計算累溢短收 
+	 * @param isCalcuExcessive 是否要計算累溢短收
 	 * @param titaVo
 	 * @return
 	 * @throws Exception
 	 */
-	public List<Map<String, String>> doQuery1(boolean isCalcuExcessive,TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> doQuery1(boolean isCalcuExcessive, TitaVo titaVo) throws Exception {
 
 		String iCUSTNO = titaVo.get("CustNo");
 		String iTYPE = titaVo.get("DateType");
@@ -42,7 +42,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String iEDAY = String.valueOf(Integer.valueOf(titaVo.get("EndDate")) + 19110000);
 		String iHFG = titaVo.get("CorrectType");
 		String sql = "";
-		//找明細中最小額度
+		// 找明細中最小額度
 		sql += "    WITH \"tmpMain\" AS (";
 		sql += "        SELECT";
 		sql += "          MIN(T.\"FacmNo\") \"FacmNo\"";
@@ -65,8 +65,14 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                '回收登錄'";
 		sql += "            WHEN T.\"TxDescCode\" IN ( '3420', '3421', '3422' ) THEN";
 		sql += "                '結案登錄'";
-		sql += "            WHEN T.\"TxDescCode\" IN ( '3100','3101', '3102' ) THEN";
+		sql += "            WHEN T.\"TxDescCode\" IN ( '3101', '3102' ) THEN";
 		sql += "                '契約變更'";
+		sql += "            WHEN T.\"TxDescCode\" IN ( '3100') AND T.\"RenewFlag\" IN ('0') THEN";
+		sql += "                '撥款'";
+		sql += "            WHEN T.\"TxDescCode\" IN ( '3100') AND T.\"RenewFlag\" IN ('1') THEN";
+		sql += "                '展期'";
+		sql += "            WHEN T.\"TxDescCode\" IN ( '3100') AND T.\"RenewFlag\" IN ('2') THEN";
+		sql += "                '借新還舊'";
 		sql += "            WHEN CC1.\"Code\" IS NOT NULL THEN";
 		sql += "                TO_CHAR( NVL( CC1.\"Item\", '  ' ) )";
 		sql += "            WHEN CC2.\"Code\" IS NOT NULL THEN";
@@ -184,6 +190,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                MAX(T.\"TitaCalTm\")                                         AS \"TitaCalTm\",";
 		sql += "                T.\"TitaHCode\"                                              AS \"TitaHCode\",";
 		sql += "                T.\"RepayCode\",";
+		sql += "                MIN(L.\"RenewFlag\")                                         AS \"RenewFlag\",";
 		sql += "                1 AS \"DB\"";
 		sql += "            FROM";
 		sql += "                \"LoanBorTx\" T";
@@ -205,27 +212,32 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            		AND DECODE( T.\"EntryDate\", 0, T.\"AcDate\", T.\"EntryDate\" ) <= :IEDAY";
 		sql += "            		AND IR.\"CustNo\" IS NOT NULL ) IR";
 		sql += "             ON IR.\"AcDate\" =T.\"AcDate\"";
-		sql += "            AND IR.\"CustNo\" = T.\"CustNo\"";		
+		sql += "            AND IR.\"CustNo\" = T.\"CustNo\"";
 		sql += "            AND JSON_VALUE(T.\"OtherFields\", '$.FireFee') IS NOT NULL ";
-		
+
 		sql += "            LEFT JOIN \"AcReceivable\" AC";
 		sql += "             ON AC.\"TitaTlrNo\" =T.\"TitaTlrNo\"";
 		sql += "            AND AC.\"CustNo\" = T.\"CustNo\"";
 		sql += "            AND JSON_VALUE(T.\"OtherFields\", '$.AcctFee') IS NOT NULL ";
-		
+
 		sql += "            LEFT JOIN (";
 		sql += "            		SELECT DISTINCT \"CustNo\",\"FacmNo\" FROM \"ForeclosureFee\"";
 		sql += "            ) FF";
 
 		sql += "             ON FF.\"CustNo\" =T.\"CustNo\"";
 		sql += "            AND JSON_VALUE(T.\"OtherFields\", '$.LawFee') IS NOT NULL ";
+		
+		sql += "            LEFT JOIN \"LoanBorMain\" L";
+		sql += "             ON L.\"CustNo\" =T.\"CustNo\"";
+		sql += "            AND L.\"FacmNo\" = T.\"FacmNo\"";
+		sql += "            AND L.\"BormNo\" = T.\"BormNo\"";
+		
 		sql += "            WHERE";
 		sql += "                T.\"CustNo\" = :ICUSTNO";
 		sql += "                AND NVL( JSON_VALUE(T.\"OtherFields\", '$.TempReasonCode'), ' ' ) NOT IN ( '03', '06' )";
 		sql += "                AND ( T.\"TxAmt\" <> 0";
 		sql += "                OR T.\"TempAmt\" <> 0 )";
 
-		
 		if (iTYPE.equals("1")) {
 			sql += "                AND DECODE( T.\"EntryDate\", 0, T.\"AcDate\", T.\"EntryDate\" ) >= :ISDAY";
 			sql += "                AND DECODE( T.\"EntryDate\", 0, T.\"AcDate\", T.\"EntryDate\" ) <= :IEDAY";
@@ -235,11 +247,11 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		if (iHFG.equals("0")) {
-			if(!isCalcuExcessive) {
+			if (!isCalcuExcessive) {
 				sql += "          AND T.\"TitaHCode\" = 0";
 			}
 		}
-		
+
 		sql += "            GROUP BY";
 		sql += "                T.\"CustNo\", DECODE(T.\"FacmNo\",0,NVL(IR.\"FacmNo\",NVL(AC.\"FacmNo\",FF.\"FacmNo\")),T.\"FacmNo\") , T.\"AcDate\", T.\"IntStartDate\", T.\"IntEndDate\", T.\"Rate\", T.\"Desc\", T.\"TxDescCode\", T.\"AcctCode\", T.\"TitaTlrNo\", T.\"TitaTxtNo\", T.\"TitaHCode\", T.\"RepayCode\"";
 		sql += "        )            T";

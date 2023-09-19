@@ -169,7 +169,6 @@ BEGIN
            WHERE M."PrinBalance" > 0 
              AND M."YearMonth" = TYYMM 
              AND M."AssetClass2" IS NOT NULL
-             AND M."AssetClass2" <> '5'
            GROUP BY M."YearMonth" 
                   , M."AssetClass2"   	   
                   , M."AcSubBookCode"           
@@ -181,7 +180,6 @@ BEGIN
            FROM "MonthlyFacBal" M 
            WHERE M."LawAmount" > 0 
              AND M."YearMonth" = TYYMM 
-              AND M."AssetClass2" = '5'
            GROUP BY M."YearMonth" 
                    ,M."LawAssetClass" 
                    ,M."AcSubBookCode" 
