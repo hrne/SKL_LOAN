@@ -49,6 +49,11 @@ BEGIN
       ,"LastUpdate"          -- 最後更新日期時間 DATE   
       ,"LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6  
       ,"TitaEntdy" -- 2023-04-17 Wei 新增 from 家興,賴桑
+      -- 2023-09-20 Wei from SKL IT 佳怡
+      ,"CloseReasonCode" -- varchar2(2);
+      ,"CloseFacmNo" -- decimal(3, 0) default 0 not null;
+      ,"BranchNo" -- varchar2(3);
+      ,"Dpssts" -- varchar2(1);
     )
     WITH txEmpData AS (
       SELECT DISTINCT
@@ -86,17 +91,27 @@ BEGIN
           ,0                              AS "WithdrawAmt"         -- 提款 DECIMAL 14 
           ,0                              AS "DepositAmt"          -- 存款 DECIMAL 14 
           ,0                              AS "Balance"             -- 結餘 DECIMAL 14 
-          ,NVL(DPSP.DPSBN3, ' ')          AS "RemintBank"          -- 匯款銀行代碼 VARCHAR2 7 
+          ,CASE
+             WHEN DPSP.DPSBN3 IS NOT NULL
+             THEN DPSP.DPSBN3
+             WHEN DPSP.BDTBN2 IS NOT NULL
+             THEN DPSP.BDTBN2
+           ELSE ' ' END                   AS "RemintBank"          -- 匯款銀行代碼 VARCHAR2 7 
           ,DPSP.DPSTRA                    AS "TraderInfo"          -- 交易人資料 NVARCHAR2 20 
           ,'0'                            AS "AmlRsp"              -- AML 回應碼 VARCHAR2 1 
           ,DPSP.DPSATC                    AS "ReconCode"           -- 對帳類別 VARCHAR2 3 
-          ,NVL(AEM1."EmpNo",'999999')     AS "TitaTlrNo"           -- 經辦 VARCHAR2 6 
+          ,NVL(AEM1."EmpNo",NVL(t.TRXMEM,'999999')) AS "TitaTlrNo"           -- 經辦 VARCHAR2 6 
           ,LPAD(DPSP."TRXNMT",8,'0')      AS "TitaTxtNo"           -- 交易序號 VARCHAR2 8 
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE   
-          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
+          ,NVL(AEM1."EmpNo",NVL(t.TRXMEM,'999999')) AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE   
-          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6  
+          ,NVL(AEM1."EmpNo",NVL(t.TRXMEM,'999999')) AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6  
           ,DPSP.TRXDAT                    AS "TitaEntdy"
+          -- 2023-09-20 Wei from SKL IT 佳怡
+          ,DPSP.APLPSN AS "CloseReasonCode" -- varchar2(2);
+          ,DPSP.DPSAPN AS "CloseFacmNo" -- decimal(3, 0) default 0 not null;
+          ,DPSP.CUSBRH AS "BranchNo" -- varchar2(3);
+          ,DPSP.DPSSTA AS "Dpssts" -- varchar2(1);
     FROM DAT_LA$DPSP DPSP -- 匯款轉帳檔 
     LEFT JOIN TB$SPLP SPLP ON SPLP.TB$FNM = 'DPSATC' -- 特殊代碼檔: 調存摺代號 DPSATC 對應的定義 
                           AND SPLP.TB$FCD = DPSP.DPSATC 

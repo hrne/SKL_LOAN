@@ -1,0 +1,14 @@
+alter table "Guarantor" add "BranchNo" varchar2(4);
+comment on column "Guarantor"."BranchNo" is '單位別';
+alter table "BankRemit" add "BranchNo" varchar2(4);
+alter table "BankRemit" add "TitaHCode" varchar2(1);
+comment on column "BankRemit"."BranchNo" is '單位別';
+comment on column "BankRemit"."TitaHCode" is '訂正別';
+alter table "BankRmtf" add "CloseReasonCode" varchar2(2);
+alter table "BankRmtf" add "CloseFacmNo" decimal(3, 0) default 0 not null;
+alter table "BankRmtf" add "BranchNo" varchar2(3);
+alter table "BankRmtf" add "Dpssts" varchar2(1);
+comment on column "BankRmtf"."CloseReasonCode" is '清償原因';
+comment on column "BankRmtf"."CloseFacmNo" is '清償額度號碼';
+comment on column "BankRmtf"."BranchNo" is '單位別';
+comment on column "BankRmtf"."Dpssts" is '作業方式';

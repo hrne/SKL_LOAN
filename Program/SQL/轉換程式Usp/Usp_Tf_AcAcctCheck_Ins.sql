@@ -132,12 +132,7 @@ BEGIN
     GROUP BY S1."TRXDAT" 
             ,S3."AcctCode" 
             ,S3."AcctItem" 
-            ,CASE 
-               WHEN NVL(S2."ACTFSC",'00A') = '00A' 
-               THEN '00A' 
-               WHEN NVL(S2."ACTFSC",'00A') = 'A' 
-               THEN '201' 
-             ELSE 'XXX' END 
+            ,S2."AcSubBookCode"
     ORDER BY S1."TRXDAT" 
             ,S3."AcctCode" 
             ,S3."AcctItem" 

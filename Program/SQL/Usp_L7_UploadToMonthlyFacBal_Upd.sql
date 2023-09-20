@@ -73,7 +73,9 @@ BEGIN
           AND TMP."FacmNo" = M."FacmNo"
         )
         WHEN MATCHED THEN UPDATE SET
-        "BankRelationFlag" = TMP."BankRelationFlag";
+        "BankRelationFlag" = TMP."BankRelationFlag"
+        , "LastUpdate" = SYSTIMESTAMP
+        , "LastUpdateEmpNo" = EmpNo ;
     END IF;
     
     --L7205 上傳資產五分類 
@@ -135,7 +137,7 @@ BEGIN
           AND TMP."FacmNo" = M."FacmNo"
         )
         WHEN MATCHED THEN UPDATE SET
-        "GovProjectFlag" = TMP."GovProjectFlag";
+        "GovProjectFlag" = TMP."GovProjectFlag"
 
         DBMS_OUTPUT.PUT_LINE('MonthlyFacBal.BuildingFlag');
         MERGE INTO "MonthlyFacBal" M
@@ -206,7 +208,9 @@ BEGIN
           AND TMP."FacmNo" = M."FacmNo"
         )
         WHEN MATCHED THEN UPDATE SET
-        "SpecialAssetFlag" = TMP."SpecialAssetFlag";
+        "SpecialAssetFlag" = TMP."SpecialAssetFlag"
+      , "LastUpdate" = SYSTIMESTAMP
+      , "LastUpdateEmpNo" = EmpNo ;
     END IF;
  
     -- 記錄程式結束時間

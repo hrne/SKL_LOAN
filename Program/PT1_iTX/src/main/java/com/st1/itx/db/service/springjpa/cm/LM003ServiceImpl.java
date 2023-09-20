@@ -61,7 +61,7 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            LEFT JOIN \"CustMain\"      cm ON cm.\"CustNo\" = lbm.\"CustNo\"";
 		sql += "        WHERE";
 		sql += "            lbm.\"RenewFlag\" = 0";
-		sql += "            AND cm.\"EntCode\" != 1";
+		sql += "            AND cm.\"EntCode\" = 0";
 		sql += "              AND trunc(lbm.\"DrawdownDate\" / 100) BETWEEN :YearMonthMin AND :YearMonthMax";
 		sql += "        GROUP BY";
 		sql += "            substr(lbm.\"DrawdownDate\", 1, 6)";
@@ -120,7 +120,6 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                        0";
 		sql += "                        , 3";
 		sql += "                    )";
-		sql += "                    AND cm.\"EntCode\" = 0";
 		sql += "            )";
 		sql += "        GROUP BY";
 		sql += "            \"YearMonth\"";
@@ -244,6 +243,7 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                , '330'";
 		sql += "                , '340'";
 		sql += "            )";
+		sql += "            AND mlb.\"EntCode\" <> 2";
 		sql += "        GROUP BY";
 		sql += "            mlb.\"YearMonth\"";
 		sql += "    ), \"NaturalDrawdownAmtYearly\" AS (";
@@ -275,6 +275,7 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                , '330'";
 		sql += "                , '340'";
 		sql += "            )";
+		sql += "            AND mlb.\"EntCode\" <> 2";
 		sql += "        GROUP BY";
 		sql += "            mlb.\"YearMonth\"";
 		sql += "            , TO_CHAR(add_months(TO_DATE(mlb.\"YearMonth\" || '01', 'yyyymmdd'), 1), 'yyyymm')";
@@ -291,6 +292,7 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            AND mlb.\"AcctCode\" IN (";
 		sql += "                990";
 		sql += "            )";
+		sql += "            AND mlb.\"EntCode\" <> 2";
 		sql += "        GROUP BY";
 		sql += "            mlb.\"YearMonth\"";
 		sql += "    ), \"EntPersonPartlyRepay\" AS (";
@@ -310,18 +312,6 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            AND lbtx.\"TitaTxCd\" = 'L3200' ";
 		sql += "        GROUP BY";
 		sql += "            substr(lbtx.\"AcDate\", 1, 6)";
-		sql += "    ), \"NaturalDrawdownAmtYearly\" AS (";
-		sql += "        SELECT";
-		sql += "            substr(lbm.\"DrawdownDate\", 1, 4) \"DrawdownYear\"";
-		sql += "            , SUM(lbm.\"DrawdownAmt\") \"TxAmt\"";
-		sql += "        FROM";
-		sql += "            \"LoanBorMain\"   lbm";
-		sql += "            LEFT JOIN \"CustMain\"      cm ON cm.\"CustNo\" = lbm.\"CustNo\"";
-		sql += "        WHERE";
-		sql += "            cm.\"EntCode\" = 2";
-		sql += "            AND lbm.\"RenewFlag\" = 0";
-		sql += "        GROUP BY";
-		sql += "            substr(lbm.\"DrawdownDate\", 1, 4)";
 		sql += "    ), \"OutputYearMonth\" AS (";
 		sql += "        SELECT";
 		sql += "            TO_CHAR(add_months(TO_DATE(:YearMonthMin, 'YYYYMM'), level - 1), 'YYYYMM') \"YearMonth\"";

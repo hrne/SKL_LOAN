@@ -56,7 +56,8 @@ public class L5970 extends TradeBuffer {
 		BigDecimal iRate = this.parse.stringToBigDecimal(titaVo.getParam("Rate").trim());// 利率(年)
 		int iLoanTerm = this.parse.stringToInteger(titaVo.getParam("LoanTerm").trim());// 期數
 		BigDecimal iDueAmt = this.parse.stringToBigDecimal(titaVo.getParam("DueAmt").trim());// 期金
-
+		int iFirstDueDate = this.parse.stringToInteger(titaVo.getParam("FirstDueDate").trim());//首次應繳日
+		int iDate = 0;
 		if (iPrincipal.compareTo(BigDecimal.ZERO) <= 0) {
 			throw new LogicException(titaVo, "", "本金請大於零"); //
 		}
@@ -96,9 +97,14 @@ public class L5970 extends TradeBuffer {
 				if (OPrincipal.add(OInterest).compareTo(iDueAmt) != 0) {
 
 				}
+				// 應繳日計算
+				iDate = sNegCom.getRepayDate(iFirstDueDate, i - 1, titaVo);
+				occursList.putParam("ODate", iDate);// 應繳日
+				
 				occursList.putParam("OPrincipal", OPrincipal);// 應繳本金
 				occursList.putParam("OInterest", OInterest);// 應繳利息
 				occursList.putParam("OBalance", OBalance);// 剩餘本金
+				
 				this.totaVo.addOccursList(occursList);
 
 			}
@@ -162,6 +168,9 @@ public class L5970 extends TradeBuffer {
 						occursList.putParam("OBalance", wkBalance);
 					}
 				}
+				// 應繳日計算
+				iDate = sNegCom.getRepayDate(iFirstDueDate, i - 1, titaVo);
+				occursList.putParam("ODate", iDate);// 應繳日
 
 				// 將每筆資料放入Tota的OcList
 				this.totaVo.addOccursList(occursList);

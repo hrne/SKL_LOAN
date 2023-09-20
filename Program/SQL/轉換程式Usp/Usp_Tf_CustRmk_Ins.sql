@@ -59,7 +59,8 @@ BEGIN
              THEN TO_DATE(S1."TRXTDT",'YYYYMMDD')
            ELSE JOB_START_TIME
            END                            AS "CreateDate"          -- 建檔日期時間 DATE  
-          ,NVL(AEM1."EmpNo",'999999')     AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+          -- 2023-09-20 Wei from SKL IT 承憲,串不到員工編號資料時以原資料寫入
+          ,NVL(AEM1."EmpNo",S1."TRXMEM")     AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,CASE
              -- 2022-10-17 Wei 由葛經理回覆Email同意更正
              WHEN S1."LMSACN" = 1412658
@@ -69,7 +70,8 @@ BEGIN
              THEN TO_DATE(S1."TRXTDT",'YYYYMMDD')
            ELSE JOB_START_TIME
            END                            AS "LastUpdate"          -- 最後更新日期時間 DATE  
-          ,NVL(AEM1."EmpNo",'999999')     AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          -- 2023-09-20 Wei from SKL IT 承憲,串不到員工編號資料時以原資料寫入
+          ,NVL(AEM1."EmpNo",S1."TRXMEM")     AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
     FROM (
       SELECT "LMSACN"
            , "TRXTDT"

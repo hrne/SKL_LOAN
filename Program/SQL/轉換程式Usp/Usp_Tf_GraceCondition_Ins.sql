@@ -41,13 +41,15 @@ BEGIN
              THEN TO_DATE(GRPP."CRTDTM",'YYYYMMDDHH24MISS') 
            ELSE JOB_START_TIME 
            END                            AS "CreateDate"          -- 建檔日期時間 DATE 0 0 
-          ,NVL(AEM1."EmpNo",'999999')     AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0 
+          -- 2023-09-20 Wei from SKL IT 承憲,串不到員工編號資料時以原資料寫入
+          ,NVL(AEM1."EmpNo",GRPP."CRTEMP") AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0 
           ,CASE 
              WHEN GRPP."CHGDTM" > 0 
              THEN TO_DATE(GRPP."CHGDTM",'YYYYMMDDHH24MISS') 
            ELSE JOB_START_TIME 
            END                            AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0 
-          ,NVL(AEM2."EmpNo",'999999')     AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0 
+          -- 2023-09-20 Wei from SKL IT 承憲,串不到員工編號資料時以原資料寫入
+          ,NVL(AEM2."EmpNo",GRPP."CHGEMP" ) AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0 
     FROM "LN$GRPP" GRPP 
     LEFT JOIN "As400EmpNoMapping" AEM1 ON AEM1."As400TellerNo" = GRPP."CRTEMP" 
     LEFT JOIN "As400EmpNoMapping" AEM2 ON AEM2."As400TellerNo" = GRPP."CHGEMP" 

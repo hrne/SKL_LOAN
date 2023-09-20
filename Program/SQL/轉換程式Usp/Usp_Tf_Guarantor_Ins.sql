@@ -37,6 +37,7 @@ BEGIN
       , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
       , "LastUpdate"          -- 最後更新日期時間 DATE  
       , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+      , "BranchNo"
     )
     SELECT "LA$GRTP"."APLNUM"             AS "ApproveNo"           -- 核准號碼 DECIMAL 7 
           ,"CustMain"."CustUKey"          AS "GuaUKey"             -- 保證人客戶識別碼 VARCHAR2 32 
@@ -60,7 +61,8 @@ BEGIN
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
-          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6
+          ,"LA$GRTP"."CUSBRH"             AS "BranchNo"
     FROM "LA$GRTP"
     LEFT JOIN "CU$CUSP" ON "CU$CUSP"."CUSCIF"  = "LA$GRTP"."CUSCIF"
     LEFT JOIN "CustMain" ON TRIM("CustMain"."CustId") = TRIM("CU$CUSP"."CUSID1")

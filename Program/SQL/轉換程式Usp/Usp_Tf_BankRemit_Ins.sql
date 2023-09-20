@@ -62,7 +62,7 @@ BEGIN
       FROM LA$TRXP
     )
     SELECT EXGP.TRXDAT                         AS "AcDate" -- 會計日期 Decimald 8
-         , NVL(AEM1."EmpNo",'999999')          AS "TitaTlrNo" -- 經辦 VARCHAR2 6
+         , NVL(AEM1."EmpNo",NVL(t.TRXMEM,'999999'))          AS "TitaTlrNo" -- 經辦 VARCHAR2 6
          , LPAD(EXGP.TRXNMT,8,'0')             AS "TitaTxtNo" -- 交易序號 VARCHAR2 8
          , ROW_NUMBER()
            OVER (
@@ -73,7 +73,9 @@ BEGIN
             ORDER BY
               EXGP.EXGASQ
            )                                   AS "Seq"
-         , 'LN01  '                            AS "BatchNo" -- 整批批號 VARCHAR2 6
+         -- 2023-09-20 Wei from SKL IT 佳怡 改用 匯款批號 EXGBAT
+         --  , 'LN01  '                            AS "BatchNo" -- 整批批號 VARCHAR2 6
+         , EXGP.EXGBAT                         AS "BatchNo" -- 整批批號 VARCHAR2 6
          , 1                                   AS "DrawdownCode" -- 撥款方式 DECIMAL 2
          , 0                                   AS "StatusCode" -- 狀態 DECIMAL 1
          , SUBSTR(LPAD(EXGP.EXGBBC,7,'0'),0,3) AS "RemitBank" -- 匯款銀行 VARCHAR2 3
@@ -94,9 +96,11 @@ BEGIN
          , ''                                  AS "ModifyContent" -- 產檔後修正後內容 NVARCHAR2 500
          , ''                                  AS "PayCode" -- 付款狀況碼 VARCHAR2 1
          , TO_DATE(EXGP.TRXDAT,'YYYYMMDD')     AS "CreateDate" -- 建檔日期時間 DATE 
-         , NVL(AEM1."EmpNo",'999999')          AS "CreateEmpNo" -- 建檔人員 VARCHAR2 6
+         , NVL(AEM1."EmpNo",NVL(t.TRXMEM,'999999')) AS "CreateEmpNo" -- 建檔人員 VARCHAR2 6
          , TO_DATE(EXGP.TRXDAT,'YYYYMMDD')     AS "LastUpdate" -- 最後更新日期時間 DATE 
-         , NVL(AEM1."EmpNo",'999999')          AS "LastUpdateEmpNo" -- 最後更新人員 VARCHAR2 6
+         , NVL(AEM1."EmpNo",NVL(t.TRXMEM,'999999')) AS "LastUpdateEmpNo" -- 最後更新人員 VARCHAR2 6
+         , EXGP.CUSBRH                         AS "BranchNo"
+         , EXGP.TRXCRC                         AS "TitaHCode"
     FROM DAT_LA$EXGP EXGP
     LEFT JOIN "LoanBorMain" LBM ON LBM."CustNo" = EXGP.LMSACN
                                AND LBM."FacmNo" = EXGP.LMSAPN
