@@ -2,6 +2,8 @@ package com.st1.itx.trade.LP;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -10,15 +12,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.CdWorkMonth;
 import com.st1.itx.db.domain.CdWorkMonthId;
+import com.st1.itx.db.domain.PfCoOfficerLog;
 import com.st1.itx.db.service.CdWorkMonthService;
+import com.st1.itx.db.service.PfCoOfficerLogService;
 import com.st1.itx.db.service.springjpa.cm.LP006ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
+import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
@@ -37,6 +43,9 @@ public class LP006Report extends MakeReport {
 	CdWorkMonthService sCdWorkMonthService;
 
 	@Autowired
+	private PfCoOfficerLogService pfCoOfficerLogService;
+
+	@Autowired
 	MakeExcel makeExcel;
 
 	@Autowired
@@ -48,6 +57,8 @@ public class LP006Report extends MakeReport {
 	@Autowired
 	public WebClient webClient;
 
+	@Autowired
+	private DateUtil dateUtil;
 	private List<Map<String, String>> fnAllList = new ArrayList<>();
 	private int workSeasonYY = 0;
 	private int workSeasonSS = 0;
@@ -119,11 +130,33 @@ public class LP006Report extends MakeReport {
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(titaVo.getBrno()).setRptCode("LP006")
 				.setRptItem(fileNm).build();
 		// 開啟報表
-		makeExcel.open(titaVo, reportVo, fileNm,defaultExcel, defualtSheet, newSheetName);
+		makeExcel.open(titaVo, reportVo, fileNm, defaultExcel, defualtSheet, newSheetName);
 
 		makeExcel.setValue(1, 1, workSeasonYY + "年第" + workSeasonSS + "季房貸協辦異動名單");
+		// 上次日期列印時間
+		String updateDate = "2000-01-01 00:00:00";
+		PfCoOfficerLog tPfCoOfficerLog = pfCoOfficerLogService.findEmpEffectiveDateFirst("LP006", effectiveDateS,
+				titaVo);
+		if (tPfCoOfficerLog != null) {
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+			updateDate = df.format(tPfCoOfficerLog.getUpdateDate());
+		}
+		// 將產生房貸協辦人員異動名單新增至歷程檔
+		tPfCoOfficerLog = new PfCoOfficerLog();
+		tPfCoOfficerLog.setEmpNo("LP006");
+		tPfCoOfficerLog.setEffectiveDate(effectiveDateE);
+		tPfCoOfficerLog.setUpdateTlrNo(titaVo.getTlrNo());
+		tPfCoOfficerLog
+				.setUpdateDate(parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime()));
+
 		try {
-			fnAllList = LP006ServiceImpl.findChange(effectiveDateS, effectiveDateE, titaVo);
+			pfCoOfficerLogService.insert(tPfCoOfficerLog, titaVo);
+		} catch (DBException e) {
+			throw new LogicException("E0005", "新增歷程資料時發生錯誤");
+		}
+
+		try {
+			fnAllList = LP006ServiceImpl.findChange(effectiveDateS, effectiveDateE, updateDate, titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -160,25 +193,20 @@ public class LP006Report extends MakeReport {
 					changeReason = "新增協辦人員：生效日 " + dateCvt(t.get("EffectiveDate"));
 					break;
 				case "2":
-					changeReason = "異動生效日： " + dateCvt(t.get("EffectiveDate"));
-					break;
 				case "3":
-					changeReason = "修改生效日： " + dateCvt(t.get("EffectiveDate"));
-					if (!t.get("IneffectiveDate").equals(t.get("LastIneffectiveDate"))) {
-						changeReason += ", 停效日:" + dateCvt(t.get("IneffectiveDate"));
+					if (!t.get("EmpClass").equals(t.get("LastEmpClass"))) {
+						changeReason = "職級異動：生效日" + dateCvt(t.get("EffectiveDate"));
+						break;
 					}
 					if (!t.get("ClassPass").equals(t.get("LastClassPass"))) {
-						changeReason += ", 初階授信通過:" + t.get("ClassPass");
+						changeReason += "初階授信通過:" + t.get("ClassPass");
+						break;
 					}
-					if (!t.get("DeptItem").equals(t.get("LastDeptItem"))) {
-						changeReason += ", 部室:" + t.get("DeptItem");
+					if (!t.get("IneffectiveDate").equals(t.get("LastIneffectiveDate"))) {
+						changeReason += "停效日:" + dateCvt(t.get("IneffectiveDate"));
+						break;
 					}
-					if (!t.get("DistItem").equals(t.get("LastDistItem"))) {
-						changeReason += ", 區部:" + t.get("DistItem");
-					}
-					if (!t.get("AreaItem").equals(t.get("LastAreaItem"))) {
-						changeReason += ", 單位:" + t.get("AreaItem");
-					}
+					changeReason += "單位異動" + t.get("DeptItem");
 					break;
 				case "4":
 					changeReason = "刪除：生效日 " + dateCvt(t.get("EffectiveDate"));
@@ -190,7 +218,7 @@ public class LP006Report extends MakeReport {
 					changeReason = "調職異動：調職日 " + dateCvt(t.get("EffectiveDate"));
 					break;
 				case "8":
-					changeReason = "考核異動：生效日" + dateCvt(t.get("EffectiveDate"));
+					changeReason = "職級異動：生效日" + dateCvt(t.get("EffectiveDate"));
 					break;
 				}
 				makeExcel.setValue(row, 9, changeReason); // 9, "異動原因"
@@ -215,10 +243,10 @@ public class LP006Report extends MakeReport {
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(titaVo.getBrno()).setRptCode("LP006")
 				.setRptItem(fileNm).build();
 		// 開啟報表
-		makeExcel.open(titaVo, reportVo, fileNm,defaultExcel, defualtSheet, newSheetName);
+		makeExcel.open(titaVo, reportVo, fileNm, defaultExcel, defualtSheet, newSheetName);
 		makeExcel.setValue(1, 1, workSeasonYY + "年第" + workSeasonSS + "季房貸協辦職級名冊");
 		try {
-			fnAllList = LP006ServiceImpl.findChange(effectiveDateS, effectiveDateE, titaVo);
+			fnAllList = LP006ServiceImpl.findAll(effectiveDateS, effectiveDateE, titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));

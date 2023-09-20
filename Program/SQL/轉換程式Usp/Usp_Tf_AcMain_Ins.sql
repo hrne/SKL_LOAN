@@ -60,29 +60,60 @@ BEGIN
       , "LastUpdate"          -- 最後更新日期時間 DATE 0 0 
       , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0 
     )
+    with acMap as (
+      SELECT ACNACC
+           , ACNACS
+           , ACNASS
+           , "AcNoCode"
+           , "AcSubCode"
+           , "AcDtlCode"
+           , '00A' AS "AcSubBookCode"
+      FROM "TfActblMapping"
+      UNION
+      SELECT L.ACNACC
+           , L.ACNACS
+           , L.ACNASS
+           , C."AcNoCode"
+           , C."AcSubCode"
+           , C."AcDtlCode"
+           -- 2023-04-06 Wei 增加 from Lai
+           -- AcDetail AcSubBookCode轉換
+           -- 依TB$LCDP.ACNAS區分
+           -- 傳統A轉1
+           -- 利變A轉201
+           -- 利變B轉B
+           -- 其他轉00A
+           , CASE
+               WHEN NVL(L.ACTFSC,' ') = '1'
+               THEN '1'
+               WHEN NVL(L.ACTFSC,' ') = 'A'
+               THEN '201'
+               WHEN NVL(L.ACTFSC,' ') = 'B'
+               THEN 'B'
+             ELSE '00A' END AS "AcSubBookCode"
+      FROM "TB$LCDP" L
+      LEFT JOIN "CdAcCode" C ON C."AcNoCodeOld" = L."CORACC" 
+                            AND C."AcSubCode" = NVL(L."CORACS",'     ') 
+                            AND C."AcDtlCode" = CASE 
+                                                  WHEN L."CORACC" IN ('40903300' -- 放款帳管費 2022-06-30 Wei From Lai Email: 
+                                                                     ,'20232020' -- 2022-09-08 Wei FROM yoko line 
+                                                                     ,'20232182' -- 2022-09-08 Wei fix bug 
+                                                                     ,'20232180' -- 2022-09-08 Wei fix bug 
+                                                                     ,'20232181' -- 2022-09-08 Wei fix bug 
+                                                                     ,'40907400'  -- 2022-09-08 Wei fix bug 
+                                                                     )
+                                                       AND NVL(L."CORACS",'     ') = '     ' 
+                                                  THEN '01' 
+                                                ELSE '  ' END
+      WHERE NVL(C."AcNoCode",' ') != ' '
+    )
     SELECT '000'                          AS "AcBookCode"          -- 帳冊別 VARCHAR2 3 0 
-          ,CASE 
-             WHEN NVL(S2."ACTFSC",' ') = 'A' 
-             THEN '201' 
-           ELSE '00A' END                 AS "AcSubBookCode"       -- 區隔帳冊 VARCHAR2 3 0 -- 2021-07-15 新增 
+          ,S2."AcSubBookCode"             AS "AcSubBookCode"       -- 區隔帳冊 VARCHAR2 3 0 -- 2021-07-15 新增 
           ,'0000'                         AS "BranchNo"            -- 單位別 VARCHAR2 4 0 
           ,'TWD'                          AS "CurrencyCode"        -- 幣別 VARCHAR2 3 0 
           ,S3."AcNoCode"                  AS "AcNoCode"            -- 科目代號 VARCHAR2 11 0 -- 2021-07-15 修改 取11碼會科 
-          ,NVL(S2."CORACS",'     ')       AS "AcSubCode"           -- 子目代號 VARCHAR2 5 0 
-          ,CASE 
-             WHEN S3."AcNoCode" = '40903030000' -- 手續費收入－放款帳管費 
-                  AND NVL(S2."CORACS",'     ') = '     ' 
-             THEN '01' 
-             WHEN S2."CORACC" IN ('40903300'
-                                 ,'20232020'
-                                 ,'20232180'
-                                 ,'20232181'
-                                 ,'20232182'
-                                 ,'40907400'
-                                 ) 
-                  AND NVL(S2."CORACS",'     ') = '     ' 
-             THEN '01' 
-           ELSE '  ' END                  AS "AcDtlCode"           -- 細目代號 VARCHAR2 2 0 
+          ,S3."AcSubCode"                 AS "AcSubCode"           -- 子目代號 VARCHAR2 5 0 
+          ,S3."AcDtlCode"                 AS "AcDtlCode"           -- 細目代號 VARCHAR2 2 0 
           ,S1."TRXDAT"                    AS "AcDate"              -- 會計日期 Decimald 8 0 
           ,SUM(CASE 
              WHEN S3."DbCr" = 'D' THEN S1."LCDPDA" - S1."LCDPCA" -- 前日借方金額 
@@ -107,44 +138,16 @@ BEGIN
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0 
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0 
     FROM "LA$LDGP" S1 
-    LEFT JOIN "TB$LCDP" S2 ON S2."ACNACC" = S1."ACNACC" 
+    LEFT JOIN acMap S2 ON S2."ACNACC" = S1."ACNACC" 
                           AND NVL(S2."ACNACS",' ') = NVL(S1."ACNACS",' ') 
                           AND NVL(S2."ACNASS",' ') = NVL(S1."ACNASS",' ') 
-    LEFT JOIN "CdAcCode" S3 ON S3."AcNoCodeOld" = S2."CORACC" -- 2021-07-15 修改以8碼會科串接 
-                           AND S3."AcSubCode" = NVL(S2."CORACS",'     ') 
-                           AND S3."AcDtlCode" = CASE 
-                                                  WHEN S2."CORACC" IN ('40903300'
-                                                                      ,'20232020'
-                                                                      ,'20232180'
-                                                                      ,'20232181'
-                                                                      ,'20232182'
-                                                                      ,'40907400'
-                                                                      ) 
-                                                       AND NVL(S2."CORACS",'     ') = '     ' 
-                                                  THEN '01' 
-                                                ELSE '  ' END 
-    WHERE NVL(S2."CORACC",' ') <> ' ' -- 有串到新會科才寫入 
-      AND NVL(S3."AcNoCode",' ') <> ' ' -- 2021-07-15 新增判斷 有串到最新的11碼會科才寫入 
-    GROUP BY CASE 
-               WHEN NVL(S2."ACTFSC",' ') = 'A' 
-               THEN '201' 
-             ELSE '00A' END 
+    LEFT JOIN "CdAcCode" S3 ON S3."AcNoCode" = S2."AcNoCode"
+                           AND S3."AcSubCode" = S2."AcSubCode"
+                           AND S3."AcDtlCode" = S2."AcDtlCode"
+    GROUP BY S2."AcSubBookCode"
            , S3."AcNoCode" 
-           , NVL(S2."CORACS",'     ')  
-           , CASE 
-               WHEN S3."AcNoCode" = '40903030000' -- 手續費收入－放款帳管費 
-                    AND NVL(S2."CORACS",'     ') = '     ' 
-               THEN '01' 
-               WHEN S2."CORACC" IN ('40903300'
-                                   ,'20232020'
-                                   ,'20232180'
-                                   ,'20232181'
-                                   ,'20232182'
-                                   ,'40907400'
-                                   ) 
-                    AND NVL(S2."CORACS",'     ') = '     ' 
-               THEN '01' 
-             ELSE '  ' END
+           , S3."AcSubCode" 
+           , S3."AcDtlCode"
            , S1."TRXDAT" 
            , S3."AcctCode" 
     ; 

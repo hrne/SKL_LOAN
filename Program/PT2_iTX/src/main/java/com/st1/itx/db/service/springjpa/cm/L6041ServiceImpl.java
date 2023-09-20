@@ -33,10 +33,11 @@ public class L6041ServiceImpl extends ASpringJpaParm implements InitializingBean
 	// *** 折返控制相關 ***
 	private int limit;
 
-	public List<Map<String, String>> findByTrol(String iAuthNo , String iTlrNo , String iBrNo , String iGroupNoS , int iLevelFgS ,int index, int limit, TitaVo titaVo) throws LogicException {
+	public List<Map<String, String>> findByTrol(String iAuthNo, String iTlrNo, String iBrNo, String iGroupNoS,
+			int iLevelFgS, int index, int limit, TitaVo titaVo) throws LogicException {
 
 		this.info("L6041ServiceImpl findByTrol active");
-		
+
 		String sql = " ";
 		sql += " select  ";
 		sql += " a.\"TlrNo\", ";
@@ -44,26 +45,34 @@ public class L6041ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " a.\"GroupNo\", ";
 		sql += " a.\"LastUpdate\", ";
 		sql += " a.\"LevelFg\", ";
-		sql += " a.\"MntEmpNo\" ";
+		sql += " a.\"MntEmpNo\", ";
+		sql += " case when MAX(b.\"TlrNo\") IS NOT NULL THEN 'Y' ELSE 'N' END AS \"TellerAuthFg\" ";
 		sql += " from \"TxTeller\" a ";
 		sql += " left join \"TxTellerAuth\" b on a.\"TlrNo\" = b.\"TlrNo\" ";
 		sql += " left join \"CdEmp\" c on a.\"TlrNo\" = c.\"EmployeeNo\" ";
 		sql += " where 1=1 ";
 		if (!iAuthNo.equals("")) {
-		sql += "   and b.\"AuthNo\" = :AuthNo ";
+			sql += "   and b.\"AuthNo\" = :AuthNo ";
 		}
 		if (!iTlrNo.equals("")) {
-		sql += "   and a.\"TlrNo\"  = :TlrNo ";
+			sql += "   and a.\"TlrNo\"  = :TlrNo ";
 		}
-		if(!iBrNo.equals("")) {
-		sql += "   	and a.\"BrNo\"  = :BrNo ";
+		if (!iBrNo.equals("")) {
+			sql += "   	and a.\"BrNo\"  = :BrNo ";
 		}
 		if (!iGroupNoS.equals("")) {
-		sql += "   	and a.\"GroupNo\"  = :GroupNoS  ";
+			sql += "   	and a.\"GroupNo\"  = :GroupNoS  ";
 		}
-		if(iLevelFgS != 0) {
-		sql += "    and a.\"LevelFg\"  = :LevelFgS  ";
+		if (iLevelFgS != 0) {
+			sql += "    and a.\"LevelFg\"  = :LevelFgS  ";
 		}
+		sql += "    GROUP BY  ";
+		sql += " 			a.\"TlrNo\", ";
+		sql += " 			a.\"BrNo\", ";
+		sql += " 			a.\"GroupNo\", ";
+		sql += " 			a.\"LastUpdate\", ";
+		sql += " 			a.\"LevelFg\", ";
+		sql += " 			a.\"MntEmpNo\" ";
 		this.info("sql=" + sql);
 		Query query;
 		EntityManager em = baseEntityManager.getCurrentEntityManager(titaVo);
@@ -81,7 +90,7 @@ public class L6041ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (!iGroupNoS.equals("")) {
 			query.setParameter("GroupNoS", iGroupNoS);
 		}
-		if(iLevelFgS != 0) {
+		if (iLevelFgS != 0) {
 			query.setParameter("LevelFgS", iLevelFgS);
 		}
 		// *** 折返控制相關 ***
@@ -100,10 +109,11 @@ public class L6041ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		return this.convertToMap(query);
 	}
-	
-	public List<Map<String, String>> findByTrolAll(String iTlro ,int index, int limit, TitaVo titaVo) throws LogicException {
+
+	public List<Map<String, String>> findByTrolAll(String iTlro, int index, int limit, TitaVo titaVo)
+			throws LogicException {
 		this.info("L6041ServiceImpl findByTrolAll active");
-		
+
 		String sql = " ";
 		sql += " select  ";
 		sql += " A.\"TlrNo\" , ";
@@ -113,11 +123,11 @@ public class L6041ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " A.\"LastUpdateEmpNo\" ";
 		sql += " from \"TxTellerAuth\" A ";
 		sql += " left join \"TxAuthGroup\" B on a.\"AuthNo\" = b.\"AuthNo\" ";
-		
+
 		if (!iTlro.equals("")) {
-		sql += " where \"TlrNo\" = :TlrNo ";
+			sql += " where \"TlrNo\" = :TlrNo ";
 		}
-		
+
 		Query query;
 		EntityManager em = baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
@@ -125,7 +135,7 @@ public class L6041ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (!iTlro.equals("")) {
 			query.setParameter("TlrNo", iTlro);
 		}
-		
+
 		// *** 折返控制相關 ***
 		this.index = index;
 		// *** 折返控制相關 ***

@@ -93,17 +93,7 @@ public class L6041 extends TradeBuffer {
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 500;
-//		Slice<TxTeller> slTxTeller = null;	
-//		if (iBrNo.isEmpty()) {
-//			slTxTeller = txTellerService.findByTlrNo(iTlrNo + "%", this.index, this.limit, titaVo);
-//		} else if (!iTlrNo.isEmpty()) {
-//			slTxTeller = txTellerService.findByL6041(iBrNo, iTlrNo + "%", this.index, this.limit, titaVo);
-//		} else {
-//			slTxTeller = txTellerService.findByGroupNo(iBrNo, iGroupNoS, iGroupNoE, iLevelFgS, iLevelFgE, this.index,
-//					this.limit, titaVo);
-//		}
-//		List<TxTeller> lTxTeller = slTxTeller == null ? null : slTxTeller.getContent();
-		
+
 		List<Map<String, String>> sL6041ServiceImpl =null;
 		sL6041ServiceImpl = iL6041ServiceImpl.findByTrol(iAuthNo, iTlrNo, iBrNo , iGroupNoS , iLevelFgS ,0, Integer.MAX_VALUE, titaVo);
 
@@ -113,7 +103,6 @@ public class L6041 extends TradeBuffer {
 			CdBranch cdBranch = null;
 			CdBranchGroup cdBranchGroup = null;
 			for (Map<String, String> t : sL6041ServiceImpl) {
-
 				if (first) {
 					cdBranch = cdBranchService.findById(t.get("F1"), titaVo);
 					first = false;
@@ -153,17 +142,13 @@ public class L6041 extends TradeBuffer {
 				} else {
 					occursList.putParam("OGroupItem", "");
 				}
+				occursList.putParam("OPermitory", t.get("TellerAuthFg"));
 				
 				//若有歷程就顯示，無則不顯示
 				Slice<TxDataLog> slTxDataLog = sTxDataLogService.findByTranNo("L6401", "CODE:" +  t.get("F0"), 0,
 						1, titaVo);
 				List<TxDataLog> lTxDataLog = slTxDataLog != null ? slTxDataLog.getContent() : null;
 				occursList.putParam("OHasHistory", lTxDataLog != null && !lTxDataLog.isEmpty() ? "Y" : "N");
-				if(sL6041ServiceImpl.size() ==1) {
-					occursList.putParam("OPermitory", "Y");
-				}else {
-					occursList.putParam("OPermitory", "N");
-				}
 //				occursList.putParam("OAuthNo", tTxTeller.getAuthNo());
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);

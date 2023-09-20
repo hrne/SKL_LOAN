@@ -208,6 +208,53 @@ BEGIN
       FROM LA$TRXP 
       WHERE TRXTRN = '3037' 
     ) 
+    , acMap as (
+      SELECT ACNACC
+           , ACNACS
+           , ACNASS
+           , "AcNoCode"
+           , "AcSubCode"
+           , "AcDtlCode"
+           , '00A' AS "AcSubBookCode"
+      FROM "TfActblMapping"
+      UNION
+      SELECT L.ACNACC
+           , L.ACNACS
+           , L.ACNASS
+           , C."AcNoCode"
+           , C."AcSubCode"
+           , C."AcDtlCode"
+           -- 2023-04-06 Wei 增加 from Lai
+           -- AcDetail AcSubBookCode轉換
+           -- 依TB$LCDP.ACNAS區分
+           -- 傳統A轉1
+           -- 利變A轉201
+           -- 利變B轉B
+           -- 其他轉00A
+           , CASE
+               WHEN NVL(L.ACTFSC,' ') = '1'
+               THEN '1'
+               WHEN NVL(L.ACTFSC,' ') = 'A'
+               THEN '201'
+               WHEN NVL(L.ACTFSC,' ') = 'B'
+               THEN 'B'
+             ELSE '00A' END AS "AcSubBookCode"
+      FROM "TB$LCDP" L
+      LEFT JOIN "CdAcCode" C ON C."AcNoCodeOld" = L."CORACC" 
+                            AND C."AcSubCode" = NVL(L."CORACS",'     ') 
+                            AND C."AcDtlCode" = CASE 
+                                                  WHEN L."CORACC" IN ('40903300' -- 放款帳管費 2022-06-30 Wei From Lai Email: 
+                                                                     ,'20232020' -- 2022-09-08 Wei FROM yoko line 
+                                                                     ,'20232182' -- 2022-09-08 Wei fix bug 
+                                                                     ,'20232180' -- 2022-09-08 Wei fix bug 
+                                                                     ,'20232181' -- 2022-09-08 Wei fix bug 
+                                                                     ,'40907400'  -- 2022-09-08 Wei fix bug 
+                                                                     )
+                                                       AND NVL(L."CORACS",'     ') = '     ' 
+                                                  THEN '01' 
+                                                ELSE '  ' END
+      WHERE NVL(C."AcNoCode",' ') != ' '
+    )
     , JLData AS ( 
       SELECT T.TRXDAT 
            , T.TRXNMT 
@@ -223,21 +270,12 @@ BEGIN
       FROM TRXP_3037 T 
       LEFT JOIN LA$JLNP J ON J.TRXDAT = T.TRXDAT 
                          AND J.TRXNMT = T.TRXNMT 
-      LEFT JOIN TB$LCDP L ON L.ACNACC = J.ACNACC 
-                         AND NVL(L.ACNACS,' ') = NVL(J.ACNACS,' ') 
-                         AND NVL(L.ACNASS,' ') = NVL(J.ACNASS,' ') 
-      LEFT JOIN "CdAcCode" CAC ON CAC."AcNoCodeOld" = L.CORACC 
-                              AND CAC."AcSubCode" = NVL(L.CORACS,'     ') 
-                              AND CAC."AcDtlCode" = CASE 
-                                                      WHEN L.CORACC IN ('40903300'
-                                                                       ,'20232020'
-                                                                       ,'20232182'
-                                                                       ,'20232180'
-                                                                       ,'20232181'
-                                                                       ,'40907400') 
-                                                           AND NVL(L.CORACS,'     ') = '     ' 
-                                                      THEN '01' 
-                                                    ELSE '  ' END 
+      LEFT JOIN acMap S2 ON S2."ACNACC" = J."ACNACC" 
+                            AND NVL(S2."ACNACS",' ') = NVL(J."ACNACS",' ') 
+                            AND NVL(S2."ACNASS",' ') = NVL(J."ACNASS",' ') 
+      LEFT JOIN "CdAcCode" CAC ON CAC."AcNoCode" = S2."AcNoCode"
+                              AND CAC."AcSubCode" = S2."AcSubCode"
+                              AND CAC."AcDtlCode" = S2."AcDtlCode"
       WHERE NVL(J.TRXTRN,' ') != '3037' 
         AND T.TRXAMT = NVL(J.JLNAMT,0) 
         AND CAC."AcctCode" IN ('F07' -- 暫付法務費

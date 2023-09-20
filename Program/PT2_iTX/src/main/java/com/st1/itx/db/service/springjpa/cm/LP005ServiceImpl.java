@@ -289,9 +289,9 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             GROUP BY \"EmployeeNo\" ";
 		sql += "           ) PR ON PR.\"EmployeeNo\" = PCO.\"EmpNo\" ";
 		sql += " WHERE PCO.ROWNUMBER = 1 ";
-		sql += " ORDER BY Dist ";
-		sql += "        , Area ";
-		sql += "        , Coorgnizer ";
+		sql += " ORDER BY \"Dist\" ";
+		sql += "        , \"Area\" ";
+		sql += "        , \"Coorgnizer\" ";
 		this.info("sql=" + sql);
 
 		Query query;

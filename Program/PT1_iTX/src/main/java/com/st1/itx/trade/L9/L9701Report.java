@@ -341,7 +341,7 @@ public class L9701Report extends MakeReport {
 				// 最後一筆 列印結束報表
 				if (cntAll == listL9701.size()) {
 					printFacEnd(this.facmNo);
-				
+
 				}
 
 			}
@@ -349,7 +349,7 @@ public class L9701Report extends MakeReport {
 			printFacHead2();
 			this.print(1, 20, "*******    查無資料   ******");
 		}
-		//列印結束報表
+		// 列印結束報表
 		this.print(-56, this.getMidXAxis(), endText, "C");
 
 		this.close();
@@ -395,7 +395,9 @@ public class L9701Report extends MakeReport {
 
 		this.print(0, 165, "0".equals(titaVo.get("CorrectType")) ? "  " : tL9701Vo.get("TitaHCode"), "R");
 
-		loanBal = new BigDecimal(tL9701Vo.get("Amount"));
+		BigDecimal tmpLoanBal = new BigDecimal(tL9701Vo.get("Amount"));
+
+		loanBal = tmpLoanBal.compareTo(BigDecimal.ZERO) == 0 ? loanBal : tmpLoanBal;
 
 		principal = new BigDecimal(tL9701Vo.get("Principal"));
 		interest = new BigDecimal(tL9701Vo.get("Interest"));

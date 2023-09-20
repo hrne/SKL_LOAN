@@ -220,7 +220,6 @@ public class L7205p extends TradeBuffer {
 
 		}
 
-
 		try {
 			tMothlyFacBalService.updateAll(lMonthlyFacBal, titaVo);
 
@@ -338,6 +337,7 @@ public class L7205p extends TradeBuffer {
 		changeDBEnv(titaVo);
 		updLM052ReportSPAndMonthlyFacBalData(titaVo, iYearMonth);
 
+		changeDBEnv(titaVo);
 		// 更新MonthlyLM055AssetLoss LM055重要放款餘額明細表
 		getMonthlyLM055AssetLoss(titaVo, iYearMonth);
 
@@ -952,6 +952,8 @@ public class L7205p extends TradeBuffer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+		this.info("getDataBase = " + titaVo.getDataBase());
 
 		if ("onLine".equals(titaVo.getDataBase())) {
 			titaVo.setDataBaseOnMon();// 指定月報環境

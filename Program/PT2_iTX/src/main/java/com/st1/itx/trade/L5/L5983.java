@@ -16,10 +16,12 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.NegAppr01;
 import com.st1.itx.db.domain.NegFinAcct;
 import com.st1.itx.db.domain.NegFinShare;
+import com.st1.itx.db.domain.NegFinShareLog;
 import com.st1.itx.db.domain.NegMain;
 import com.st1.itx.db.domain.NegMainId;
 import com.st1.itx.db.service.NegAppr01Service;
 import com.st1.itx.db.service.NegFinAcctService;
+import com.st1.itx.db.service.NegFinShareLogService;
 import com.st1.itx.db.service.NegFinShareService;
 import com.st1.itx.db.service.NegMainService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -40,6 +42,8 @@ public class L5983 extends TradeBuffer {
 	public NegMainService negMainService;
 	@Autowired
 	public NegFinShareService negFinShareService;
+	@Autowired
+	public NegFinShareLogService negFinShareLogService;
 	@Autowired
 	public NegAppr01Service negAppr01Service;
 	@Autowired
@@ -75,7 +79,8 @@ public class L5983 extends TradeBuffer {
 			diffdd = negCom.diffday(iEntryDate, lastPayIntDate);// 利息倒扣區間:本次繳款日~上次繳息止日
 		}
 		BigDecimal intAmt = tNegMain.getPrincipalBal().multiply(tNegMain.getIntRate())
-				.divide(parse.stringToBigDecimal("100")).multiply(new BigDecimal(diffdd)).divide(new BigDecimal(365));
+				.divide(parse.stringToBigDecimal("100")).multiply(parse.stringToBigDecimal("" + diffdd))
+				.divide(parse.stringToBigDecimal("365"));
 		tempAmt = tNegMain.getPrincipalBal().add(intAmt).subtract(tNegMain.getAccuOverAmt());
 		BigDecimal revivAmt = tNegMain.getPrincipalBal().add(intAmt);
 		String revivAmtX = df.format(revivAmt) + "(本金：" + df.format(tNegMain.getPrincipalBal()) + "利息："
@@ -119,6 +124,35 @@ public class L5983 extends TradeBuffer {
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}
+		}
+		Slice<NegFinShareLog> slNegFinShareLog = negFinShareLogService.findFinCodeAll(tNegMain.getCustNo(),
+				tNegMain.getCaseSeq(), 0, Integer.MAX_VALUE, titaVo);
+		if (slNegFinShareLog != null && slNegFinShareLog.getContent().size() > 0) {
+			for (NegFinShareLog tNegFinShareLog : slNegFinShareLog.getContent()) {
+				OccursList occursList = new OccursList();
+				if (tNegFinShareLog.getCancelDate() > 0) {
+
+					String FinItem = "";
+					BigDecimal accuApprAmt = BigDecimal.ZERO; // 暫收抵繳
+					NegFinAcct tNegFinAcct = negFinAcctService.findById(tNegFinShareLog.getFinCode(), titaVo);
+					if (tNegFinAcct != null) {
+						FinItem = tNegFinAcct.getFinItem();
+					}
+					// 抓該戶該機構最後一筆累計撥付金額
+					NegAppr01 tNegAppr01 = negAppr01Service.findCustNoFinCodeFirst(tNegFinShareLog.getCustNo(),
+							tNegFinShareLog.getCaseSeq(), tNegFinShareLog.getFinCode(), titaVo);
+					if (tNegAppr01 != null) {
+						accuApprAmt = tNegAppr01.getAccuApprAmt();
+					}
+					occursList.putParam("OOFinCode", tNegFinShareLog.getFinCode());// 債權機構
+					occursList.putParam("OOFinItem", FinItem); // 機構名稱
+					occursList.putParam("OOApprAmt", "0");// 撥付金額
+					occursList.putParam("OOAccuApprAmt", accuApprAmt);// 累計撥付金額
+					/* 將每筆資料放入Tota的OcList */
+					this.totaVo.addOccursList(occursList);
+				}
+			}
+
 		}
 
 		this.addList(this.totaVo);
