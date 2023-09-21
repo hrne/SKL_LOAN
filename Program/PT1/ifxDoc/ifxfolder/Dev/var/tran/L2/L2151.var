@@ -202,7 +202,7 @@ T(2,@GroupId,#L2r02GroupId)
 
 #CustId=X,10,L
 @C(4,#CustId,S,$)
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 
 
 #SendL2r07A=X,1,S

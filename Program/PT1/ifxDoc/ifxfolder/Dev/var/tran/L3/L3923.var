@@ -160,7 +160,7 @@ HIDE(#BTN2)
 C(4,#CustId,S,$)
 V(7)
 T(3,#CustIdX,)
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 
 #BUF2B=X,100,S
 T(2,0000000+#CustId)
@@ -170,7 +170,7 @@ BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustId<
 
 #CheckCustId=X,1,S
 C(4,#CustId,S,$)
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 
 
 #SendL2r07B=X,1,S

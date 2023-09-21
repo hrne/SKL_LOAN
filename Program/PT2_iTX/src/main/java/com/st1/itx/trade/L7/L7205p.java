@@ -751,7 +751,7 @@ public class L7205p extends TradeBuffer {
 			switch (m.getClCode1()) {                                                                                                       
 			case 1:                                                                                                                         
 			case 2:                                                                                                                         
-				if ("N".equals(m.getGovProjectFlag())) {                                                                                      
+				if ("Y".equals(m.getGovProjectFlag()) || "C".equals(m.getGovProjectFlag())) {                                                                                      
 					loanType = "C";                                                                                                             
 					break;                                                                                                                      
 				} else {                                                                                                                      
@@ -894,44 +894,42 @@ public class L7205p extends TradeBuffer {
 	private void addFacBalToLM055List(String loanType, MonthlyFacBal m) {                                                               
 		for (MonthlyLM055AssetLoss t : this.lLM055AssetLoss) {                                                                            
 			if (loanType.equals(t.getLoanType())) {                                                                                         
-				switch (m.getAssetClass()) {                                                                                                  
-				case "1":                                                                                                                     
-					t.setNormalAmount(t.getNormalAmount().add(m.getPrinBalance()));                                                             
-					break;                                                                                                                      
-				case "2":                                                                                                                     
-					t.setObserveAmount(t.getObserveAmount().add(m.getPrinBalance()));                                                           
-					break;                                                                                                                      
-				default:                                                                                                                      
-					t.setOverdueAmount(t.getOverdueAmount().add(m.getPrinBalance()));                                                           
-					break;                                                                                                                      
-				}                                                                                                                             
 				if ("990".equals(m.getAcctCode())) {                                                                                          
+					t.setOverdueAmount(t.getOverdueAmount().add(m.getPrinBalance()));                                                           
 					t.setLoanAmount990(t.getLoanAmount990().add(m.getPrinBalance()));                                                           
 				} else {                                                                                                                      
 					switch (m.getOvduTerm()) {                                                                                                  
 					case 0:                                                                                                                     
 						if ("60".equals(m.getProdNo()) || "61".equals(m.getProdNo()) || "62".equals(m.getProdNo())) {                             
 							t.setLoanAmountNeg0(t.getLoanAmountNeg0().add(m.getPrinBalance()));                                                     
+							t.setObserveAmount(t.getObserveAmount().add(m.getPrinBalance()));                                                           
 						} else {                                                                                                                  
+							t.setNormalAmount(t.getNormalAmount().add(m.getPrinBalance()));                                                             
 							t.setLoanAmountNor0(t.getLoanAmountNor0().add(m.getPrinBalance()));                                                     
 						}                                                                                                                         
 						break;                                                                                                                    
 					case 1:                                                                                                                     
+						t.setOverdueAmount(t.getOverdueAmount().add(m.getPrinBalance()));                                                           
 						t.setLoanAmount1(t.getLoanAmount1().add(m.getPrinBalance()));                                                             
 						break;                                                                                                                    
 					case 2:                                                                                                                     
+						t.setOverdueAmount(t.getOverdueAmount().add(m.getPrinBalance()));                                                           
 						t.setLoanAmount2(t.getLoanAmount2().add(m.getPrinBalance()));                                                             
 						break;                                                                                                                    
 					case 3:                                                                                                                     
+						t.setOverdueAmount(t.getOverdueAmount().add(m.getPrinBalance()));                                                           
 						t.setLoanAmount3(t.getLoanAmount3().add(m.getPrinBalance()));                                                             
 						break;                                                                                                                    
 					case 4:                                                                                                                     
+						t.setOverdueAmount(t.getOverdueAmount().add(m.getPrinBalance()));                                                           
 						t.setLoanAmount4(t.getLoanAmount4().add(m.getPrinBalance()));                                                             
 						break;                                                                                                                    
 					case 5:                                                                                                                     
+						t.setOverdueAmount(t.getOverdueAmount().add(m.getPrinBalance()));                                                           
 						t.setLoanAmount5(t.getLoanAmount5().add(m.getPrinBalance()));                                                             
 						break;                                                                                                                    
 					default:                                                                                                                    
+						t.setOverdueAmount(t.getOverdueAmount().add(m.getPrinBalance()));                                                           
 						t.setLoanAmount6(t.getLoanAmount6().add(m.getPrinBalance()));                                                             
 						break;                                                                                                                    
 					}                                                                                                                           

@@ -340,7 +340,7 @@ IF(#EntryDate<=#AcDate,$,V(P,輸入範圍需<=會計日))
 #RepayId=X,10,I
 C(3,#FunctionCode,4,s,$)
 C(3,#FunctionCode,5,s,$)
-@V(7)A(ID_UNINO,0,#RepayId)
+@V(7)A(ID_UNINO,1,#RepayId)
 E(0,@RimEntryCode,1)
 
 #RimL4r02_RepayId=X,1,S

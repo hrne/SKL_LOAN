@@ -136,7 +136,7 @@ T(3,)T(H,#TypeCode,#TypeCodeHelp)
 
 !客戶ID
 #CustId=X,10,I
-@C(4,#CustId,$,A(ID_UNINO,0,#CustId))
+@C(4,#CustId,$,A(ID_UNINO,1,#CustId))
 
 !戶號
 #CustNo=A,7,I

@@ -136,14 +136,6 @@ T(2,#CustName2,#Space,51,50)
 T(2,#SubCompanyFg,#Space)
 T(2,#SubCompanyFgX,#Space)
 
-! INVOKEJS(SHOW,p1,2,3,1)
-! C(3,#CHAIN,1,T(F,#CustId,0),T(F,#CustId,1))
-! C(3,#CHAIN,1,T(2,#CHAIN_CustId),$)
-! C(3,#CHAIN,1,s,$)
-! @
-! C(4,#CustId,INVOKEJS(SHOW,p1,2,2,0),INVOKEJS(SHOW,p1,3,3,0))
-! C(4,#CustId,$,A(ID_UNINO,0,#CustId))
-
 
 
 <include src="ROM.icf::L1R06.dec"/>

@@ -128,13 +128,21 @@ public class L5911 extends TradeBuffer {
 				if (!r5911SqlReturn.get("F1").equals("") && !r5911SqlReturn.get("F10").equals("")) {
 					if (r5911SqlReturn.get("F11").equals("0")) {
 						// 無租押金
-						iPercentage = bLineAmt.divide(bTotalEvaAmt, 4, RoundingMode.HALF_UP);
+						if(bTotalEvaAmt.compareTo(BigDecimal.ZERO) > 0) {
+							iPercentage = bLineAmt.divide(bTotalEvaAmt, 4, RoundingMode.HALF_UP);
+						}else {
+							iPercentage = BigDecimal.ZERO;
+						}
 					} else {
 						BigDecimal a = new BigDecimal("0");
 						BigDecimal b = new BigDecimal("0");
 						a = bTotalEvaAmt.subtract(bTotalRentPrice);
 						this.info("a==" + a);
-						b = bLineAmt.divide(a, 4, RoundingMode.HALF_UP);
+						if(a.compareTo(BigDecimal.ZERO) > 0) {
+							b = bLineAmt.divide(a, 4, RoundingMode.HALF_UP);
+						}else {
+							b=BigDecimal.ZERO;
+						}
 						this.info("b==" + b);
 						iPercentage = b.divide(iConstCount, 4, RoundingMode.HALF_UP);
 						this.info("成數==" + iPercentage);

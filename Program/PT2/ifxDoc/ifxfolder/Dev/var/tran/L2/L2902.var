@@ -112,7 +112,7 @@ C(3,#CHAIN,1,s,$)
 @
 T(3,#CustName,)
 T(2,@BUF5,0000000+#CustId+                                                                                                                    0)
-V(7)A(ID_UNINO,0,#CustId)
+V(7)A(ID_UNINO,1,#CustId)
 
 #BIND5=X,1,S
 BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF5;ntxbuf5=type<-1:CustId<-OOCustId})

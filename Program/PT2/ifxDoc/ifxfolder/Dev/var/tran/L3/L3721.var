@@ -250,7 +250,7 @@ INVOKEJS(SHOW,p1,3,4,1)
 SHOW(#BTN2)HIDE(#BTN1,#BTN3)
 CALL(#InitValue)
 @C(4,#CustId,S,$)
-V(7)A(ID_UNINO,0,#CustId)
+V(7)A(ID_UNINO,1,#CustId)
 
 #WKBTN2=X,1,S
 C(4,#CustId,HIDE(#BTN2),SHOW(#BTN2))

@@ -475,7 +475,7 @@ C(3,#FunCd,1,I,s)
 !C(5,#FunCd,3,$,s)
 @
 V(7)
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 
 
 <include src="ROM.icf::L1R01.dec"/>

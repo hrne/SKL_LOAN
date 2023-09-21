@@ -396,7 +396,7 @@ T(3,#CustIdX,)
 #CheckCustId=X,1,S
 C(3,#FKEY,0,$,s)
 C(4,#CustId,S,$)
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 
 #SendL2r07B=X,1,S
 C(3,#FKEY,0,$,s)

@@ -171,7 +171,7 @@ C(3,#CustNo,0,$,S)
 @
 T(3,#CustName1,)
 C(4,#CustId,S,$)
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 
 #SendL2r07B=X,1,S
 C(4,#CustId,S,$)

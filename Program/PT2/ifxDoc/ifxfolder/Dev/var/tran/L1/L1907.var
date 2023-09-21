@@ -89,7 +89,7 @@ C(3,#CHAIN,1,s,$)
 @
 T(2,#CustName,)
 V(7)
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 
 
 !RIM參數使用

@@ -271,7 +271,7 @@ ASGN(AGAIN$)
 !C(3,#CHAIN,1,s,$)
 !@
 !V(7)
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 
 #MRKEY=_,_,S
 T(2,#CustId)
@@ -536,7 +536,7 @@ IF(#BranchNoBef == #BranchNo,T(3,),T(3,X))
 #CustIdAft=X,10,L
 !@
 !V(7)
-A(ID_UNINO,0,#CustIdAft)
+A(ID_UNINO,1,#CustIdAft)
 
 #IdSTAT=A,1,S
 T(4,STAT$)
@@ -880,7 +880,7 @@ IF(#BussNationalityCodeBef==#BussNationalityCodeAft || #BussNationalityCodeAft =
 #SpouseIdInd=X,1,L
 
 #SpouseIdAft=X,10,I
-@C(4,#SpouseIdAft,S,A(ID_UNINO,0,#SpouseIdAft))
+@C(4,#SpouseIdAft,S,A(ID_UNINO,1,#SpouseIdAft))
 
 #SpouseIdInd=_,_,L
 IF(#SpouseIdAft==#SpouseIdBef,T(3,),T(3,X))
@@ -1485,7 +1485,7 @@ IF(#OwnedhomeAft==#OwnedhomeBef,T(3,),T(3,X))
 #CurrcompidAft=X,8,I
 @
 C(5,#CurrcompidBef,#CurrcompidAft,s,$)
-C(4,#CurrcompidAft,s,A(ID_UNINO,0,#CurrcompidAft))
+C(4,#CurrcompidAft,s,A(ID_UNINO,1,#CurrcompidAft))
 
 #CurrcompidInd=_,_,L
 IF(#CurrcompidAft==#CurrcompidBef,T(3,),T(3,X))

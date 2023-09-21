@@ -134,7 +134,7 @@ C(3,#SearchFlag,2,$,s)
 @
 T(3,#CidName,)
 V(7)
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 
 
 #RimL4r02_CustId=X,1,S
@@ -166,9 +166,10 @@ R(1,L2R47)
 
 #MRKEY=_,_,S
 C(4,#CustId,C(3,#CustNo,0,S,T(2,#CustNo)),T(2,#L2R47CustNo)) 
-
+!會計日
 #date=D,7,S
 E(0,#SYSDATE)
+
 ! 系統參數-查詢
 #RPTFG=A,1,S
 E(0,0)
@@ -275,6 +276,9 @@ T(2,6+#OOClCode1+#OOClCode2+#OOClNo+#OOPrevInsuNo+#OOEndoInsuNo+#OOSelfInsuCode+
 C(3,#OOSelfInsuCode,0,BIND(grid,cancel),
 BIND(grid,{ cmd=CHAIN; ntxcd=L4611; ntxbuf=#OOBUFB_M}))
 
+!程式判斷會計日>0或自保時隱藏自保按鈕
+!保單迄日小於會計日隱藏自保按鈕
+!處理代碼為1.借支時隱藏按鈕
 #OOBTNA=A,2,O
 IF(#OOInsuEndDate<#date,BIND(grid,cancel),$)
 IF(#OOInsuEndDate<#date,s,$)

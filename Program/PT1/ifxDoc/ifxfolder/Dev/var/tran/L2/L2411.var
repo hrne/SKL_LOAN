@@ -1359,7 +1359,7 @@ C(4,#OwnerId{j},S,$)
 @IF({i} == 1,V(7),$)
 C(4,#OwnerId{i},CALL(#HIDE_OWNER_ROW_{i}),$)
 C(4,#OwnerId{i},s,$)
-V(7)A(ID_UNINO,0,#OwnerId{i})
+V(7)A(ID_UNINO,1,#OwnerId{i})
 V(4,#CheckCustId1,#CheckCustId2,#CheckCustId3,#CheckCustId4,#CheckCustId5,#CheckCustId6,#CheckCustId7,#CheckCustId8,#CheckCustId9,#CheckCustId10)
 
 

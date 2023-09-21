@@ -38,6 +38,7 @@ T(2,{cmd=CHAIN; ntxcd=L2703; ntxbuf=#BTNADDBUF; ntxbuf5=type})
 ASGN(BTN_NEW1$)
 K(MODIFYBUTTON,1,新增設定)
 
+
 </sub>
 
 <sub type="DC" name="BFHEAD">
@@ -61,6 +62,13 @@ E(0,0)
 T(3,*)
 #FdCustId=X,2,L
 #FdCustNo=X,2,L
+
+#button=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L2074; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW2$)
+! C(5,#OOAllowFg,0,BIND(grid,cancel),BIND(grid,{cmd=CHAIN; ntxcd=L2074; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$))
+C(5,#OOAllowFg,0,$,K(MODIFYBUTTON,2,查詢對照表))
+
+
 
 #RimFunCd=A,1,S
 #RimCustId=X,10,S
@@ -96,7 +104,7 @@ T(H,#IdNo,#IdNoHelp)
 !統一編號
 #CustId=X,10,I
 C(3,#IdNo,1,$,S)
-@V(7)A(ID_UNINO,0,#CustId)
+@V(7)A(ID_UNINO,1,#CustId)
 
 !身分證找戶號
 <include src="ROM.icf::L2R47.dec"/>
@@ -237,10 +245,10 @@ C(3,#OOHasHistory,1,BIND(grid,{cmd=CHAIN;ntxcd=L6933;text=歷程;ntxbuf=#OOBUFHi
 
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 
-#button=x,100,S
-T(2,{cmd=CHAIN; ntxcd=L2074; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW2$)
-! C(5,#OOAllowFg,0,BIND(grid,cancel),BIND(grid,{cmd=CHAIN; ntxcd=L2074; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$))
-C(5,#OOAllowFg,0,$,K(MODIFYBUTTON,2,查詢對照表))
+! #button=x,100,S
+! T(2,{cmd=CHAIN; ntxcd=L2074; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW2$)
+! ! C(5,#OOAllowFg,0,BIND(grid,cancel),BIND(grid,{cmd=CHAIN; ntxcd=L2074; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$))
+! C(5,#OOAllowFg,0,$,K(MODIFYBUTTON,2,查詢對照表))
 
 
 #OOAllowFg=X,1,L

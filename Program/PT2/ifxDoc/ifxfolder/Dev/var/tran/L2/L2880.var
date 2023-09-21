@@ -209,7 +209,7 @@ BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1;ntxbuf5=type<-1:CustId<-
 #CustId=X,10,I
 C(3,#CustNo,0,$,s)
 T(3,@FdCustId,*)
-@V(7)A(ID_UNINO,0,#CustId)
+@V(7)A(ID_UNINO,1,#CustId)
 
 #SendL2r07A=X,1,S
 T(2,@RimCustId,#CustId)

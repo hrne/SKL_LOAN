@@ -451,7 +451,7 @@ C(5,#TranKey_Tmp,4,s,$)
 #CompId=X,8,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-@A(ID_UNINO,0,#CompId)
+@A(ID_UNINO,1,#CompId)
 !債務人名下車輛數量
 #CarCnt=M,2,I
 C(5,#TranKey_Tmp,5,s,$)

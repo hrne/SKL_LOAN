@@ -699,7 +699,7 @@ C(3,#PostSuccessFg,1,s,$)
 C(3,#checkFlag,1,s,$)
 @
 V(7)
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 E(0,@CustCodeFg,1)
 C(3,#CustCodeFg,1,CALL(#wkCustCode),$)
 C(5,#RelationCode,#OldRelationCode,s,$)
@@ -767,7 +767,7 @@ IF(#AcctCheckFlag==0 || #AcctCheckFlag==8,$,s)
 ! 11/5 非本人時自動帶扣款人ID
 C(3,#RelationCode,0,s,$)
 ! IF(#RelationCode==00,$,T(2,@RelationId,#CustId))
-@V(7)A(ID_UNINO,0,#RelationId)
+@V(7)A(ID_UNINO,1,#RelationId)
 
 #CustIdLen=m,2,S
 P(1,#RelationId)

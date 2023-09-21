@@ -543,7 +543,7 @@ C(3,#RelationCode,0,s,$)
 IF(#FuncCode==4 || #FuncCode==5,s,$)
 IF(#AcctCheckFlag==0 || #AcctCheckFlag==8,$,s)
 C(3,#RelationCode,0,s,$)
-@V(7)A(ID_UNINO,0,#RelationId)
+@V(7)A(ID_UNINO,1,#RelationId)
 
 #CustIdLen=m,2,S
 E(0,0)

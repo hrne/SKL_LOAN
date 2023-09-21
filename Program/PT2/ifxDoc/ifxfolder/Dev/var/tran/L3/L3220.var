@@ -190,7 +190,7 @@ BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustId<
 
 #CheckCustId=X,1,S
 C(4,#CustId,S,$)
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 
 #WKBTN2=X,1,S
 C(4,#CustId,HIDE(#BTN2),SHOW(#BTN2))
@@ -619,7 +619,7 @@ T(3,)T(H,#RpRemitIdKind,#CustTypeHelp)
 IF(#TempItemCode==4||#TempItemCode==5||#TempItemCode==11,$,S)
 IF(#RpCustName1!=#TimCustNoX&&#RpCustName1!=#RelationName,$,S)
 @C(4,#RpRemitId,s,$)
-IF(#RpRemitIdKind=="1",A(ID,0,#RpRemitId),A(ID_UNINO,0,#RpRemitId))
+IF(#RpRemitIdKind=="1",A(ID,0,#RpRemitId),A(ID_UNINO,1,#RpRemitId))
 
 !性別
 #RpRemitGender=X,1,I

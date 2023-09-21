@@ -657,7 +657,7 @@ V(7)
 ! [所有權人統編]
 #OwnerId=X,10,I
 IF(#FunCd==4,s,$)
-@V(7)A(ID_UNINO,0,#OwnerId)
+@V(7)A(ID_UNINO,1,#OwnerId)
 
 
 #RimL1r09=X,1,S
@@ -697,7 +697,7 @@ T(H,#OwnerRelCode,#RelationCodeHelp)
 ! [發行機構統編]
 #IssuingId=X,10,I
 IF(#FunCd==4,s,$)
-@C(4,#IssuingId,$,A(ID_UNINO,0,#IssuingId))
+@C(4,#IssuingId,$,A(ID_UNINO,1,#IssuingId))
 
 
 ! [發行機構所在國別]

@@ -413,7 +413,7 @@ C(3,#FunCd,1,$,s)
 C(3,#FunCd,1,T(F,@CustId,1),T(F,@CustId,0))
 @
 V(7)
-C(3,#FunCd,1,A(ID_UNINO,0,#CustId),s)
+C(3,#FunCd,1,A(ID_UNINO,1,#CustId),s)
 
 
 #MRKEY=_,_,S
@@ -627,7 +627,7 @@ C(3,#FunCd,1,T(F,@SpouseId,1),T(F,@SpouseId,0))
 P(1,@checkIdlen,#SpouseId)
 C(5,#NationalityCode,TW,C(4,#SpouseId,V(P,當公司註冊地為TW時，不可空白),$),$)
 !C(3,#checkIdlen,10,$,V(P,當公司註冊地為TW時，不可空白))
-C(4,#SpouseId,1,A(ID_UNINO,0,#SpouseId),s)
+C(4,#SpouseId,1,A(ID_UNINO,1,#SpouseId),s)
 
 !負責人姓名
 #SpouseName=x,100,I

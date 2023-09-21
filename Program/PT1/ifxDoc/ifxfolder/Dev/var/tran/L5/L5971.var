@@ -109,7 +109,7 @@ INVOKEJS(SHOW,p1,03,03,0)
 IF(#CHAIN==0,$,s)
 @V(7)
 C(4,#CustId,S,$)
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 
 
 ! 調RIM找CustNo

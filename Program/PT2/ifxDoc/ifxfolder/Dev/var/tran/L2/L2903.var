@@ -67,7 +67,7 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1;ntxbuf5=type<-1:CustId<-
 
 !統一編號
 #CustId=X,10,I
-@C(4,#CustId,S,A(ID_UNINO,0,#CustId))
+@C(4,#CustId,S,A(ID_UNINO,1,#CustId))
 
 !身分證找戶號
 <include src="ROM.icf::L2R47.dec"/>

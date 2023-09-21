@@ -38,7 +38,7 @@ T(3,*)
 #CustId=X,10,I
 @
 V(7)
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 
 </sub>
 

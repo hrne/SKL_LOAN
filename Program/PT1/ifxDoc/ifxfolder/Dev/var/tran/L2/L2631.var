@@ -307,7 +307,7 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1:CustNo<-OOCustNo:TimCust
 C(3,#CustNo,0,S,$)
 T(3,@RimCustId, )
 E(0,@RimCustNo,#CustNo)
-RESET_RIM(#WKC,L2R07)
+RESET_RIM(#SENDL2R07A,L2R07)
 S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
 R(1,L2R07)
 
@@ -333,7 +333,7 @@ C(4,#NTXBUF,$,s)
 SHOW(#BTN2,#BTN4)
 @C(4,#CustId,V(P,需擇一輸入),$)
 T(2,@BUF2,0000000+#CustId)
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 
 #BIND2B=X,1,S
 BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2:CustId<-OOCustId})

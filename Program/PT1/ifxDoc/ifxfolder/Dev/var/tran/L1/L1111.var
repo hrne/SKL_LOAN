@@ -100,14 +100,14 @@ T(2,#CustName,)
 T(2,#CustIdAfter,)
 T(2,#Mark,)
 T(2,#MarkX,)
-A(ID_UNINO,0,#CustIdBefore)
+A(ID_UNINO,1,#CustIdBefore)
 C(3,#CHAIN,1,s,$)
 
 #MRKEY=_,_,S
 T(2,#CustIdBefore)
 
 #IdStatBef=A,1,S
-C(3,#CHAIN,1,A(ID_UNINO,0,#CustIdBefore),$)
+C(3,#CHAIN,1,A(ID_UNINO,1,#CustIdBefore),$)
 T(4,STAT$)
 
 #RimCustNo=A,7,S
@@ -130,7 +130,7 @@ T(2,@CustName,#L1R18CustName)
 @
 V(2,#CustIdBefore)
 V(7)
-A(ID_UNINO,0,#CustIdAfter)
+A(ID_UNINO,1,#CustIdAfter)
 
 
 

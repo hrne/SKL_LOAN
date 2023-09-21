@@ -139,7 +139,7 @@ T(H,#TranCode,#TranCodeHelp)
 ![身分證字號]
 #CustId=X,10,I
 C(3,#CHAIN,1,s,$)
-@T(3,@CustIdX,)V(7)A(ID_UNINO,0,#CustId)
+@T(3,@CustIdX,)V(7)A(ID_UNINO,1,#CustId)
 
 #RimCustId=X,10,S
 <include src="ROM.icf::L8R57.dec"/>

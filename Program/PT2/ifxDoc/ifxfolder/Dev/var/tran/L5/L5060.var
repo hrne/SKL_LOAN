@@ -197,7 +197,7 @@ C(3,#Identity,2,$,S)
 ! 借款人身分證
 #CustId=X,10,I
 C(3,#Identity,3,$,S)
-@V(7)A(ID_UNINO,0,#CustId)
+@V(7)A(ID_UNINO,1,#CustId)
 ! 催收人員員編
 #AccCollPsn=X,6,I
 C(3,#Identity,4,$,S)
@@ -522,8 +522,6 @@ TXFORM=L5060
 ["[L5060]                                 案件處理清單                                                                                                                "],
 ]
 </sub>
-
-
 
 <sub type="SELECT">
 #batch-print=1,L5060.PFNX,NA,,,,,,1169:827

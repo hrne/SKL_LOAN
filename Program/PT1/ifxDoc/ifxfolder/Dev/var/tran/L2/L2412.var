@@ -815,7 +815,7 @@ T(2,@OwnerRelCode,#L2r52OwnerRelCode1)
 IF(#FunCd==4,s,$)
 IF(#PageFg==1,$,CALL(#Show1))
 @V(7)
-A(ID_UNINO,0,#OwnerId)
+A(ID_UNINO,1,#OwnerId)
 
 
 

@@ -1,0 +1,342 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+#TXCD=_,_,S
+T(3,L3111)
+
+</sub>
+<sub type="PREDC" name="PreDC">
+
+<include src="COM.icf::TITLE-RUN.pre"/>
+</sub>
+
+<sub type="PREDC" name="PreDC2">
+#jk=X,12,S
+
+#AAS=X,10,S
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+C(3,#FKEY,0,K(MODIFYBUTTON,撥款),$)
+!打開暫存
+K(MODIFYBUTTON,acsave)
+</sub>
+
+
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[120,0,0,0];printer.width=[20,20,20,20];order=1;">
+[
+["[L3111]                                 預約撥款(ERIC測試用)"],
+[#<->#,"年月測試1",#YM1,"YYYMM月份可輸入12月"],
+[#<->#,"年月測試2",#YM2,"YYYMM月份可輸入13月"],
+[#<->#,"#TEXT+(1)@@@@@@@@@測試欄位+#TEXT2",#X1,#X3,#A1],
+[#<->#,"@選擇檔案","#BUTTON_FLD"],
+[#<->#,"測試選單",#iYn,#iAuthNo],
+[#<->#,"數字欄位",#Num1,],
+[#<->#,"金額欄位",#Amt1,],
+[#<->#,"金額欄位@@@@@@@@@@@@@@@(可負數)",#Amt2,],
+[#<->#,"日曆選單",#aa,#date,#tt],
+[#<->#,"@流程種類",#RELCD,"@段式交易"],
+[#<->#,"@ACTFG",#ACTFG,#ACTFGX],
+[#<->#,"@日期",#DD],
+[#<->#,"@借款人戶號",#CustNo],
+![#<->#,"@oLockCustNo",#oLockCustNo],
+["@統一編號",#CustId,#IDSTATUS],
+["@核准編號",#ApplNo],
+["@交易參考編號",#MRKEY],
+["@交易金額",#TXAMTS],
+["@測試代號",#itxcd],
+["@FKEY",#FKEY],
+]
+
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+#AMTJ=m,11.2,S
+E(0,100)
+
+#TTTT=X,72,S
+T(2,abcd+#AMTJ)
+
+#tempAmt=X,15,S
+T(1,#TTTT,5,13)
+
+#YM1=A,5,I
+@
+A(YM,0,#YM1)
+
+#YM2=X,5,I
+@
+A(YM13,0,#YM2)
+
+#iYn=X,1,I
+HELP(Y:YES;N:NO)
+
+#AuthGroupT=x,14,S
+T(2,AUTHGROUP00003)
+
+#AuthGroupH=x,1024,S
+
+#X22=X,1,S
+C(5,#iYn,Y,$,S)
+RESET_RIM(#X2,XXR99)
+S(XXR99,01,#AuthGroupT)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@AuthGroupH,#HelpDesc1)
+
+#iAuthNo=X,6,I
+C(5,#iYn,Y,$,S)
+HELP(#AuthGroupH)
+@
+V(H,#AuthGroupH)
+
+#TEXT=X,3,L
+T(2,123)
+
+#TEXT2=X,3,L
+T(2,456)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#NTXBUF=X,999,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+![一般數值 multiple:true 可上船多個檔案]
+#BUTTON_FLD=X,1,O,ui:button;value:瀏覽;enable:1;tabbable:1;file:true;multiple:true;fieldName:#FILENE;width:600
+
+
+#BIND_ABA=X,1,S
+BIND(#BUTTON_FLD,click)
+
+#X1=x,20,I
+@
+!T(F,0)
+!S(L3RTT,01,1)
+T(4,IP$)
+
+
+#X2=x,100,S
+T(2,#X1)
+
+#X3=x,100,I,maxWidth:50
+T(2,#X2)
+@
+V(7)
+
+#A1=A,4,I
+!C(4,#X1,E(0,0),T(2,#X1))
+#Num1=+m,10,I
+
+#Amt1=m,11,I
+
+#Amt2=+m,11,I
+
+#aa=x,60,I
+@
+!A(M,0,#aa)
+!C(3,#aa,12,T(2,xx),T(2,yy))
+!A(DATE,0,#aa)
+!K(NOBUTTON,CLOSEY)
+!V(5,10101,9991231)
+
+#date=D,7,I
+!IF(#aa!=0,s,$)
+
+#tt=X,10,O
+T(1,#date,1,10)
+!D(7,2,#aa,2,0)
+
+!#TYB=@,1,S
+!
+!##loop{times:5,i:1}
+!
+!#NJ{i}=X,1,S
+!CALL(#TYB)
+!
+!##end
+
+#FILENE=x,1000,S
+
+#CDATE=X,8,S
+T(4,CDATE$)
+
+
+#RELCD=_,_,I
+
+#ACTFG=_,_,I
+
+#ACTFGX=X,10,L
+C(2,#ACTFG,T(3,登錄),T(3,登錄),T(3,放行),T(3,審核),T(3,審核放行),$)
+
+!-----------------------------------------------------
+
+!#LockNo=_,_,S
+!E(0,0)
+
+!#DD=A,4,I
+!@
+!(TIME,HHmm)
+#DD=D,7,I
+!E(0,#SYSCDATE)
+D(8)
+@C(4,#DD,S,$)
+V(7)A(DATE,0,#DD)
+
+
+!借款人戶號, 統一編號或核准編號擇一輸入
+#CustNo=A,7,I
+@
+T(2,@LockCustNo,#CustNo)
+!STATUS(OD,1)
+
+<include src="COM.icf::LockControl.rtn"/>
+
+#CustId=X,10,I
+@C(4,#CustId,S,$)
+A(ID_UNINO,1,#CustId)
+!V(PH,#CustId)
+!A(ID_UNINO,1,#CustId)
+
+#IDSTATUS=A,1,S
+T(4,STAT$)
+
+
+![核准編號]
+#ApplNo=A,7,I
+
+#MRKEY=_,_,I
+
+#TXAMTS=m,14,I
+
+#itxcd=A,5,I
+
+#FKEY=_,_,S
+
+#TXMT=A,1,S
+C(3,#FKEY,9,$,S)
+!XMT()
+
+!按列印時調rim
+#PRINTRIM=x,200,S
+T(6B,LCR98+1+#ApplNo)
+
+
+#EEE=X,20,S
+T(2,123556)
+!ASGN(RQSP1$) 端末授權
+
+#ABC=X,1,S
+T(2,1)
+ASGN(AGAIN$)
+
+#CAUTO=A,1,S
+IF(#CHAIN==1,$,S)
+E(0,1)
+ASGN(CAUTO$)
+
+!#RQSP=X,4,S
+!T(2,0001)
+!ASGN(RQSP$)
+</sub>
+
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+
+#PRTSC_RFG=X,1,S
+C(5,#TXFORM,L3111,$,S)
+C(3,#FKEY,2,E(0,0),E(0,1))
+
+</sub>
+
+
+!---------- TXFORM = L3111 ----------
+<sub type="FORM" name="L3111">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L3111,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L3111] 預約撥款(測試鎖定用))
+
+!印錄PDF序號
+#PdfSno=x,10,S
+!T(3,30447)
+T(3,37914)
+
+!序印控制變數
+#PdfPrt=A,1,S
+C(3,#PdfSno,0,E(0,1),E(0,1))
+
+!#TXTNO=X,8,S
+!T(4,TXTNO$)
+
+#Entdy=X,8,S
+T(2,#ENTDY)
+
+#TxNo=X,18,S
+T(2,#KINBR+#TLRNO+#TXTNO)
+
+#RimData=x,100,S
+T(6A,#Entdy+#TxNo)
+
+#button=x,100,S
+T(2,{ cmd=SendOut;once=1; ntxcd=L3111; txno=#RimData;rim=LCR05;auto=true})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,提交)
+K(NOBUTTON,SHOWAG)
+</sub>
+
+
+!------ 上行電文TIM：BASIC LABEL + AP TEXT AREA + AP TEXT ------
+<sub type="TIM">
+#ABC
+#CustNo
+#CustId
+#ApplNo
+#itxcd
+#FILENE
+#iAuthNo
+#iYn
+#END
+#aa
+#X1
+#date
+</sub>
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="COM.icf::LockControl.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+
+TXFORM=L3111
+#PdfSno
+^
+
+</sub>
+!#PdfPrt=1,PDF,,,,,,,,,,,,,PdfSno,國內匯款申請書(兼取款憑條),PRINTRIM
+!#PdfPrt=1,REPORT,,,,,,,,,,,,,PdfSno,國內匯款申請書(兼取款憑條),PRINTRIM
+!#PdfPrt=1,FILE,,,,,,,,,,,,,PdfSno,國內匯款申請書(兼取款憑條),PRINTRIM
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel" map="printNo=PRINTRIM"/>
+<include src="PRT.icf::UPDH01.sel"/>
+<include src="PRT.icf::FMR01.sel"/>
+<include src="PRT.icf::FMH01.sel"/>
+<include src="PRT.icf::FMHR01.sel"/>
+<include src="PRT.icf::FM01.sel"/>
+<include src="PRT.icf::FMR01.sel"/>
+<include src="PRT.icf::FMH01.sel"/>
+<include src="PRT.icf::FMHR01.sel"/>
+#PdfPrt=1,FILE,,,,,,,,,,,,,PdfSno,下載,
+^
+</sub>
+

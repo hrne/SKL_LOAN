@@ -103,7 +103,7 @@ IF(#DD==0,s,$)
 #CustId=X,10,I
 C(3,#CHAIN,0,$,s)
 @C(4,#CustId,S,$)
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 
 ! 戶號
 #CustNo=A,7,S
@@ -298,7 +298,7 @@ TXFORM=L5973
 #OOAmtRatioX=撥付比例％
 {width:85,align:'right'}
 #OOReplyCodeX1=回應代碼
-{width:130,align:'center'}
+{width:130,align:'left'}
 
 ^
 </sub>

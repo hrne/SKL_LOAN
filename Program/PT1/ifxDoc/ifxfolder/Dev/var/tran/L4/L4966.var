@@ -74,7 +74,7 @@ C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
 
 #CustId=X,10,I
-@A(ID_UNINO,0,#CustId)
+@A(ID_UNINO,1,#CustId)
 
 #CustNo=A,7,I
 C(4,#CustId,$,S)
@@ -99,7 +99,7 @@ C(4,#CustId,C(3,#CustNo,0,S,T(2,#CustNo)),T(2,#L2R47CustNo))
 #EmpId=X,10,I
 C(4,#CustId,$,S)
 C(3,#CustNo,0,$,S)
-@A(ID_UNINO,0,#EmpId)
+@A(ID_UNINO,1,#EmpId)
 
 #FireOfficer=X,6,I
 C(4,#CustId,$,S)

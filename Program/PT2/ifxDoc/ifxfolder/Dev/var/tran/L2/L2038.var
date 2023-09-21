@@ -29,8 +29,6 @@ E(0,1)ASGN(LOOPHEIGHT$)
 #INQPRT=n,2,S
 E(0,40)ASGN(INQPRT$)
 
-
-
 #BUF0=X,20,S
 T(2,1+0000000000000000000)
 
@@ -438,7 +436,7 @@ BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2;ntxbuf5=type<-1:CustId<-
 #CustId=X,10,I
 C(3,#CHAIN,1,s,$)
 @C(4,#CustId,S,$)
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 
 !身分證找戶號
 <include src="ROM.icf::L2R47.dec"/>
@@ -498,7 +496,7 @@ BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF4;ntxbuf5=type<-1:OwnerId<
 #OwnerId=X,10,I
 C(3,#CHAIN,1,s,$)
 @C(4,#OwnerId,S,$)
-A(ID_UNINO,0,#OwnerId)
+A(ID_UNINO,1,#OwnerId)
 
 !設定狀態
 #SettingStat=X,1,I
@@ -705,7 +703,7 @@ IF(#ClMainType==2,$,S)
 C(3,#CHAIN,1,s,$)
 IF(#ClMainType==3||#ClCode1==3||#ClCode1==4,$,S)
 @C(4,#CompanyId,S,$)
-A(ID_UNINO,0,#CompanyId)
+A(ID_UNINO,1,#CompanyId)
 
 
 #RPTFG=A,1,S
@@ -1003,15 +1001,17 @@ SWITCH(#OOClCode1,1,T(3,額度關聯;L2017 額度與擔保品關聯查詢),
 
 #ELSE_TXNM=X,50,S
 T(3,他項權利;L2918 擔保品他項權利查詢)
-                  
+
 #COL_BUF=X,17,S
 T(2,#OOClCode1+#OOClCode2+#OOClNo+#OOApproveNo)
 
 #CHANGE_BUF=X,20,S
-T(2,#FUNC2+#OOApproveNo+#OOClNoX)
+C(3,#CustNo,0,T(2,#FUNC2+#OOApproveNo+#OOClNoX+#OOCustNo),T(2,#FUNC2+#OOApproveNo+#OOClNoX+#CustNo))
+
 
 #DEL_BUF=X,20,S
-T(2,#FUNC4+#OOApproveNo+#OOClNoX)
+C(3,#CustNo,0,T(2,#FUNC4+#OOApproveNo+#OOClNoX+#OOCustNo),T(2,#FUNC4+#OOApproveNo+#OOClNoX+#CustNo))
+! T(2,#FUNC4+#OOApproveNo+#OOClNoX)
 
 #OO_BTN1_COL=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=#CHANGE_TXCD;text=#CHANGE_TXNM;ntxbuf=#CHANGE_BUF})
@@ -1038,6 +1038,9 @@ T(2,#OOClCode1+#OOClCode2+#OOClNo)
 IF(#OOHasOtherRights == "Y",IF(#OOClCode1 == 1 || #OOClCode1 == 2,BIND(grid,{ cmd=CHAIN; ntxcd=L2918;text=#ELSE_TXNM;ntxbuf=#COL_BUF3}), BIND(grid,cancel)),BIND(grid,cancel))
 
 !IF(#OOHasOtherRights == "Y" && #OOClCode1 == 1 || #OOClCode1 == 2,BIND(grid,{ cmd=CHAIN; ntxcd=L2918;text=#ELSE_TXNM;ntxbuf=#COL_BUF3}), BIND(grid,cancel))
+
+#OO_BTNCl_COL=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=#CHANGE_TXCD;text=#OOClStatX;ntxbuf=#CHANGE_BUF})
 
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 
@@ -1159,7 +1162,6 @@ TXFORM=L2038
 #Amt1=可分配金額
 {width:120,align:'right'}
 
-
 ^
 
 #RPTFG=1,QUERY.GRID,L2038
@@ -1196,7 +1198,6 @@ TXFORM=L2038
 
 #OOCl=擔保品狀態
 {width:85,align:'center'}
-
 #Amt1=可分配金額
 {width:120,align:'right'}
 

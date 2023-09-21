@@ -179,7 +179,7 @@ BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF3B;ntxbuf5=type<-1:CustId<
 
 #CheckCustId=X,1,S
 C(4,#CustId,S,$)
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 
 #WKBTN3=X,1,S
 !C(4,#CustId,HIDE(#BTN3),SHOW(#BTN3))

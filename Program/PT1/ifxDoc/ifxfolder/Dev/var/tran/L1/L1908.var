@@ -119,7 +119,7 @@ C(3,#CustNo,0,$,S)
 @
 T(2,#CustNameB,)
 C(3,#CustNo,0,C(4,#CustId,V(P,需擇一輸入查詢條件),$),S)
-C(3,#CustNo,0,V(7)A(ID_UNINO,0,#CustId),$)
+C(3,#CustNo,0,V(7)A(ID_UNINO,1,#CustId),$)
 
 #Space=X,1,S
 T(2,@RimCustId,#CustId)

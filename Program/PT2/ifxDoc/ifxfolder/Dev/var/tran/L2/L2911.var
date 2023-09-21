@@ -432,7 +432,7 @@ C(4,#OwnerId{j},S,$)
 @
 C(4,#OwnerId{i},CALL(#HIDE_OWNER_ROW_{i}),$)
 C(4,#OwnerId{i},s,$)
-V(7)A(ID_UNINO,0,#OwnerId{i})
+V(7)A(ID_UNINO,1,#OwnerId{i})
 
 !RIM取擔保主檔
 #RimL2r43{i}=X,1,S

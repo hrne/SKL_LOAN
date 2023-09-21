@@ -1,0 +1,99 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+
+
+</sub>
+
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[250,750];printer.width=[40,60];">
+[
+["[L8103] 保費發查"],
+["#Fd+保戶身份證字號",#CustId],
+]
+!---------- AP Button AREA ----------
+
+
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#NTXBUF=x,41,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#Fd=X,2,L
+T(3,*)
+
+#CustId=X,10,I
+@
+V(7)
+A(ID_UNINO,1,#CustId)
+
+</sub>
+
+<sub type="DC" name="p2" layout="cols=1;screen.width=[250,750];printer.width=[40,60];">
+[
+["回覆訊息"],
+["#Fd2+狀　　態",#Success],
+["#Fd2+回覆訊息",#MsgRs],
+]
+
+!------------------
+#Fd2=X,2,L
+
+#Success=X,10,L
+#MsgRs=X,50.80,L
+
+</sub>
+
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L8103 ----------
+<sub type="FORM" name="L8103">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L8103,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L8103] 保費發查)
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#CustId
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L8103
+#Success
+#MsgRs
+^
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

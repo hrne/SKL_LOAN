@@ -258,7 +258,7 @@ C(3,#Flag,0,$,S)
 SHOW(#BTN2)
 HIDE(#BTN6,#BTN3)
 @C(4,#CustId,S,$)
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 HIDE(#BTN2)
 V(7)
 T(3,#CustIdX,)
@@ -272,7 +272,7 @@ BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustId<
 
 #CheckCustId=X,1,S
 C(4,#CustId,S,$)
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 
 #SendL2r07B=X,1,S
 C(4,#CustId,S,$)
@@ -512,10 +512,12 @@ BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L492A; ntxbuf=#BUF4A;ntxbuf5=type<-1
 :RP_REPCAT<-OORepayType
 :TempSourceCode<-OORepayCodeA})
 
+#L492aFacmNo=A,3,S
+
+! #BTN4=X,16,I,ui:button;value:已入帳未還款查詢;enable:0;tabbable:1;backNext:true;title:L492A 已入帳未還款查詢
 !backNext=true 當值帶回原本畫面將會自動往下執行
 #BTN4=X,16,I,ui:button;value:已入帳未還款查詢;enable:0;tabbable:1;backNext:true;title:L492A 已入帳未還款查詢
 
-#L492aFacmNo=A,3,S
 
 ![入帳日期]
 #FdEntryDate=X,2,L

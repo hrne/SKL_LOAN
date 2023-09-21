@@ -174,7 +174,7 @@ BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustId<
 
 #CheckCustId=X,1,S
 C(4,#CustId,S,$)
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 
 #WKBTN2=X,1,S
 C(4,#CustId,HIDE(#BTN2),SHOW(#BTN2))
@@ -502,7 +502,6 @@ T(3,[利息 )
 #WKPRIX=X,5,S
 T(3,本金 )
 
-
 #WKCBX=X,10,S
 T(3,清償違約金 )
 
@@ -525,29 +524,22 @@ P(R,#OShortfallIntXX)
 CALL2(#ADJUSTDOT,#Precision,#OShortfallPrin,#OShortfallPrinX)
 P(L,#OShortfallPrinX)
 
-
 #OShortfallPrinXX=X,27,S
 T(2,#WKPRIX+#OShortfallPrinX)
 P(L,#OShortfallPrinXX)
-
 
 #OShortCloseBreach=m,14.2,S
 
 #OShortCloseBreachAmtX=X,22,S
 CALL2(#ADJUSTDOT,#Precision,#OShortCloseBreach,#OShortCloseBreachAmtX)
 
-
 #OShortCloseBreachAmtXX=X,33,S
 T(2,#WKCBX+#OShortCloseBreachAmtX)
 P(L,#OShortCloseBreachAmtXX)
 
-
 #OShortfallXX=X,90,L
 T(B,#OShortfallIntXX+#WKSPC2+#OShortfallPrinXX+#WKSPC2+#OShortCloseBreachAmtXX+#WKBRAX)
 P(L,#OShortfallXX)
-
-
-
 
 #OExcessive=m,14.2,S
 

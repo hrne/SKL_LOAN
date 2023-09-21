@@ -68,16 +68,23 @@ K(MODIFYBUTTON,查詢)
 T(3,CdCode.AgCurInd)
 #CDDEF0002=x,20,S
 T(3,CdCode.EmpIdentity)
+!YesNo YesNo
+#CDDEF0003=x,20,S
+T(3,CdCode.YesNo)
+
+
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF0001,#CDDEF0002)
+S(XXR99,01,#CDDEF0001,#CDDEF0002,#CDDEF0003)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@AgCurIndHelp,#HelpDesc1)
 T(2,@EmpIdentityHelp,#HelpDesc2)
+T(2,@YesNoHelp,#HelpDesc3)
 #AgCurIndHelp=x,50,S
 #EmpIdentityHelp=x,1024,S
+#YesNoHelp=x,1024,S
 !---------- AP TEXT AREA Variables ----------
 
 #FdCenterCode=X,2,L
@@ -145,7 +152,7 @@ C(4,#CenterCode,$,S)
 C(4,#CenterCode,$,S)
 C(4,#EmployeeNo,$,S)
 @
-C(4,#EmpId,$,A(ID_UNINO,0,#EmpId))
+C(4,#EmpId,$,A(ID_UNINO,1,#EmpId))
 
 
 ! 員工姓名
@@ -236,7 +243,7 @@ T(3,1)ASGN(LOOP$)
 ! 部室名稱
 #OOCenterCode2Name=x,40,L
 
-! ! 員工身份別(TOTA)
+! 員工身份別(TOTA)
 ! #OOCommLineType=X,1,S
 ! #OOCommLineTypeX=X,20,L
 ! C(4,#OOCommLineType,S,$)
@@ -244,9 +251,30 @@ T(3,1)ASGN(LOOP$)
 
 ! 員工身份別
 #OOAgStatus=x,100,L
+!業務線代號
+#OOCommLineCode=X,2,L
+!業務人員職等
+#OOAgLevel=X,2,L
+!業務人員任用狀況碼
+#OOAgStatusCode=X,1,L
 
 ! 現職(TOTA)
 #OOAgCurInd=X,1,L
+
+#OOIsDay15Employee=X,1,S
+#OOIsDay15EmployeeX=X,2,S
+T(3,)
+T(H,#OOIsDay15Employee,#YesNoHelp)
+
+#OOIsDay15Salary=X,1,S
+#OOIsDay15SalaryX=X,2,S
+T(3,)
+T(H,#OOIsDay15Salary,#YesNoHelp)
+
+#OOIsGAInsDepartent=X,1,S
+#OOIsGAInsDepartentX=X,2,S
+T(3,)
+T(H,#OOIsGAInsDepartent,#YesNoHelp)
 
 ! 資料日期
 #OODataDate=X,10,L
@@ -286,7 +314,13 @@ TXFORM=L6088
 #OOCenterCode2
 #OOCenterCode2Name
 #OOAgStatus
+#OOCommLineCode
+#OOAgLevel
+#OOAgStatusCode
 #OOAgCurInd
+#OOIsDay15Employee
+#OOIsDay15Salary
+#OOIsGAInsDepartent
 #OODataDate
 
 ^
@@ -345,14 +379,27 @@ TXFORM=L6088
 #OOCenterCode2Name=部室名稱
 {width:120,align:'left'}
 
-! #OOCommLineTypeX=員工身份別
-! {width:100,align:'left'}
-
 #OOAgStatus=員工身份別
 {width:90,align:'left'}
 
+#OOCommLineCode=業務線代號
+{width:90,align:'center'}
+
+#OOAgLevel=業務人員職等
+{width:100,align:'center'}
+
+#OOAgStatusCode=業務人員任用狀況碼
+{width:150,align:'center'}
+
 #OOAgCurInd=現職
 {width:40,align:'center'}
+
+#OOIsDay15EmployeeX=15日薪員工
+{width:90,align:'center'}
+#OOIsDay15SalaryX=15日薪非業績人員
+{width:140,align:'center'}
+#OOIsGAInsDepartentX=團體意外險部門員工
+{width:150,align:'center'}
 
 #OODataDate=資料日期
 {width:75,align:'center'}

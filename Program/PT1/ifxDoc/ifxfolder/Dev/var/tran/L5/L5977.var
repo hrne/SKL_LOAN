@@ -77,7 +77,7 @@ C(3,#CHAIN,1,s,$)
 C(3,#CustNo,0,$,S)
 @T(3,@CustName,)
 V(7)
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 
 
 

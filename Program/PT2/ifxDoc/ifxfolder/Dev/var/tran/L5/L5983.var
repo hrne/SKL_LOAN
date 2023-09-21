@@ -58,7 +58,7 @@ K(MODIFYBUTTON,試算)
 T(4,CHAIN$) 
 
 #CustId=X,10,I
-@A(ID_UNINO,0,#CustId)
+@A(ID_UNINO,1,#CustId)
 
 #RimCustId=X,10,S
 #RimCustNo=A,7,S

@@ -176,7 +176,7 @@ SHOW(#BTN1)
 
 #CustId=X,10,S
 @C(4,#CustId,S,$)
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 
 !調RIM參數
 #RimCustId=X,10,S

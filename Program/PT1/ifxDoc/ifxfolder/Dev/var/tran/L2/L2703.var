@@ -170,7 +170,7 @@ IF(#FunCd==2 || #FunCd==5,T(F,0)HIDE(#BTN1)T(3,@FdCustId, ),$)
 IF(#FunCd==2 || #FunCd==5,s,$)
 @V(7)
 T(1,@CustIdFirstTwo,#CustId,1,2)
-C(5,#CustIdFirstTwo,XX,$,A(ID_UNINO,0,#CustId))
+C(5,#CustIdFirstTwo,XX,$,A(ID_UNINO,1,#CustId))
 
 !RIM查顧客檔(取得戶號,戶名,建立者,建立時間)
 !調RIM參數

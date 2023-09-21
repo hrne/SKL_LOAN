@@ -51,7 +51,7 @@ T(4,DATE$)
 
 
 !#CustId=X,8,I
-!@V(7)A(ID_UNINO,0,#CustId)
+!@V(7)A(ID_UNINO,1,#CustId)
 
 !#DataDate=D,7,I
 !E(0,#DATE)

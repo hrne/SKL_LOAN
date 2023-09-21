@@ -154,6 +154,7 @@ C(3,#CustNoEd,0,SHOW(#BTN2),HIDE(#BTN2))
 !IF(#CustNoEd == 0,INVOKEJS(SHOW,p1,1,1,0),INVOKEJS(SHOW,p1,2,4,0))
 C(3,#CustNoSt,0,s,$)
 
+
 !統一編號
 #CustId=X,10,I
 !C(3,#CustNoEd,0,INVOKEJS(SHOW,p1,2,2,1),$)
@@ -162,6 +163,10 @@ C(3,#CustNoEd,0,$,S)
 C(4,#CustId,$,A(ID_UNINO,1,#CustId))
 C(4,#CustId,SHOW(#BTN2),HIDE(#BTN2))
 !C(4,#CustId,INVOKEJS(SHOW,p1,2,2,0),INVOKEJS(SHOW,p1,3,4,0))
+
+#CHKDG=A,1,S
+T(4,STAT$)
+
 
 !戶名
 #CustName=c,100,I

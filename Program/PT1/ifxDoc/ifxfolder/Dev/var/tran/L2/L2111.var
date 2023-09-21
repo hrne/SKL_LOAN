@@ -378,7 +378,7 @@ T(2,@CoorgnizerX,#L2r13FullName)
 #CustId=X,10,I
 IF(#FuncCode ==1 || #FuncCode == 3, T(F,#CustId,1),T(F,#CustId,0)HIDE(#BTN1))
 IF(#CHAIN==1 && #FuncCode!=1 && #FuncCode!=3,s,$)
-@V(7)A(ID_UNINO,0,#CustId)
+@V(7)A(ID_UNINO,1,#CustId)
 
 #CustNo=A,7,S
 
@@ -1129,7 +1129,7 @@ BIND(#BTN10,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1A;ntxbuf5=type<-1:GroupI
 IF(#FuncCode ==4 || #FuncCode == 5, HIDE(#BTN10),$)
 C(3,#UpdateCode,1,$,s)
 C(3,#ApproveFlag,1,s,$)
-@A(ID_UNINO,0,#GroupId)
+@A(ID_UNINO,1,#GroupId)
 
 #SendL2r07B=X,1,S
 C(4,#GroupId,S,$)

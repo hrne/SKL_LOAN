@@ -72,7 +72,7 @@ C(4,#NTXBUF5,E(0,@RPTFG2,0),E(0,@RPTFG2,2))
 T(3,*)
 
 #CustId=X,10,I
-@V(7)A(ID_UNINO,0,#CustId)
+@V(7)A(ID_UNINO,1,#CustId)
 
 #CustIdX=X,10,L
 T(2,#CustId)

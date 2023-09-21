@@ -137,7 +137,7 @@ C(3,#CHAIN,1,s,$)
 ! INVOKEJS(SHOW,p1,1,2,1)
 @
 T(2,#CustIdName,)
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 ! C(4,#CustId,T(3,@CustIdName,)INVOKEJS(SHOW,p1,1,1,0),INVOKEJS(SHOW,p1,2,2,0))
 C(4,#CustId,$,T(2,@BTNADDBUF,1+#CustId+0000000))
 

@@ -107,7 +107,6 @@ T(1,@TxtNo,#NTXBUF,26,18)
 T(1,@TitaHCode,#NTXBUF,44,1)
 
 
-
 #ChainTxCd=X,5,S
 
 #BUF1A=X,18,S
@@ -174,7 +173,7 @@ BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustId<
 
 #CheckCustId=X,1,S
 C(4,#CustId,S,$)
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 
 #WKBTN2=X,1,S
 C(4,#CustId,HIDE(#BTN2),SHOW(#BTN2))
@@ -568,7 +567,6 @@ C(3,#OOTxAmt,0,
 T(2,#OCustNo+#OOAcDate+#OOTellerNo+#OOTxtNo+#OOTempAmt+#OODesc+#OOEntryDate),
 T(2,#OCustNo+#OOAcDate+#OOTellerNo+#OOTxtNo+#OOTxAmt+#OODesc+#OOEntryDate))
 
-
 !訂正按鈕
 #BTN=X,1,S
 C(5,#OOHCodeFlag,Y,BIND(grid,{ cmd=EC; ntxcd=#OOTxCd; txno=#RimData;rim=LCR01}),BIND(grid,cancel))
@@ -578,6 +576,7 @@ IF(#OOEraseTxCd=="L3250",BIND(grid,{ cmd=CHAIN; ntxcd=L3250;text=訂正;ntxbuf=#
 ! IF(#OOAcFg=="",BIND(grid,cancel),IF(#OOTxCd=="L3100"||#OOTxCd=="L3240"||#OOTxCd=="L3250",BIND(grid,cancel),C(3,#OOTitaHCode,0,BIND(grid,{ cmd=EC; ntxcd=#OOTxCd; txno=#RimData;rim=LCR01}),BIND(grid,cancel))))
 ! C(5,#OOCreateEmpNo,999999,BIND(grid,cancel),$)
 ! C(5,#OODisplayFlag,Y,BIND(grid,cancel),$)
+
 !查詢
 #OOBUF1=X,80,S
 IF(#OOTxCd=="L3701",T(2,#OOAcDate+#OOAcDate+#5sp+#OOl6932+#OCustNo+#OOFacmNo+#OOBormNo),T(2,#OOAcDate+#OOTellerNo+#OOTxtNo+#OCustNo+#OOFacmNo+#OOBormNo+#OOTotTxAmt+#OOBorxNo))
@@ -605,12 +604,10 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L6901;text=分錄;ntxbuf=#OOBUF3})
 C(5,#OOAcFg,"Y",$,BIND(grid,cancel))
 
 !交易
-
 #OOBTN2=X,1,S
 BIND(grid,{ cmd=DDCHECK; ntxcd=#OOTxCd; txno=#RimData;rim=LCR11})
 C(5,#OOCreateEmpNo,999999,BIND(grid,cancel),$)
 IF(#OOAcFg=="",BIND(grid,cancel),$)
-
 
 !計息明細
 #OOBUF4=X,34,S
@@ -726,7 +723,6 @@ TXFORM=L3005
 
 #OOCurrencyCode=幣別 
 {width:50,align:'center'}
-
 
 #OOTxAmtX=交易金額 
 {width:180}

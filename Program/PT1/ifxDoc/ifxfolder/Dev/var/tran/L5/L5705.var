@@ -69,7 +69,7 @@ K(MODIFYBUTTON,產生媒體檔)
 C(3,{i},1,$,C(4,#CustId{h},INVOKEJS(SHOW,grd1_{j},0),INVOKEJS(SHOW,grd1_{j},1)))
 C(3,{i},1,$,C(4,#CustId{h},S,$))
 INVOKEJS(SHOW,grd1_{j},1)
-@A(ID_UNINO,0,#CustId{i})
+@A(ID_UNINO,1,#CustId{i})
 C(4,#CustId{i},$,C(5,#CustId{i},#CheckCustId{i},$,V(4,#CheckCustId1,#CheckCustId2,#CheckCustId3,#CheckCustId4,#CheckCustId5,#CheckCustId6,#CheckCustId7,#CheckCustId8,#CheckCustId9,#CheckCustId10)))
 
 !調rim檢查統編是否存在JcicZ048

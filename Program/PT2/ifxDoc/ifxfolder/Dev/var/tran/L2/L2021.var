@@ -113,7 +113,7 @@ C(3,#CaseNo,0,T(3,*),S)
 #CustId=X,10,I
 C(3,#CHAIN,1,s,$)
 C(3,#CaseNo,0,$,S)
-@V(7)A(ID_UNINO,0,#CustId)
+@V(7)A(ID_UNINO,1,#CustId)
 
 #SendL2r07B=X,1,S
 C(4,#CustId,S,$)

@@ -137,7 +137,7 @@ BEGIN
           AND TMP."FacmNo" = M."FacmNo"
         )
         WHEN MATCHED THEN UPDATE SET
-        "GovProjectFlag" = TMP."GovProjectFlag"
+        "GovProjectFlag" = TMP."GovProjectFlag";
 
         DBMS_OUTPUT.PUT_LINE('MonthlyFacBal.BuildingFlag');
         MERGE INTO "MonthlyFacBal" M
@@ -199,7 +199,7 @@ BEGIN
                           WHERE "IndustryItem" LIKE '%不動產%'
                              OR "IndustryItem" LIKE '%建築%'
                           ) CDI ON CDI."IndustryCode" = SUBSTR(CM."IndustryCode",3,4)
-                               AND M."ClCode" IN ('1','2')
+                               AND M."ClCode1" IN ('1','2')
               WHERE  M."YearMonth" = TYYMM 
         ) TMP
         ON (

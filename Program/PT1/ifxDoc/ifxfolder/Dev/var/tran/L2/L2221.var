@@ -123,7 +123,7 @@ R(1,L2R10)
 ![身分證號/統號]
 #CustId=X,10,I
 C(3,#FunCd,1,$,s)
-@V(7)A(ID_UNINO,0,#CustId)
+@V(7)A(ID_UNINO,1,#CustId)
 
 !RIM參數使用
 #RimCustId=X,10,S

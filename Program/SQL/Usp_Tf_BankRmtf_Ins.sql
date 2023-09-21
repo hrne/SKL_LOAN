@@ -111,7 +111,7 @@ BEGIN
           ,DPSP.APLPSN AS "CloseReasonCode" -- varchar2(2);
           ,DPSP.DPSAPN AS "CloseFacmNo" -- decimal(3, 0) default 0 not null;
           ,DPSP.CUSBRH AS "BranchNo" -- varchar2(3);
-          ,DPSP.DPSSTA AS "Dpssts" -- varchar2(1);
+          ,DPSP.DPSSTS AS "Dpssts" -- varchar2(1);
     FROM DAT_LA$DPSP DPSP -- 匯款轉帳檔 
     LEFT JOIN TB$SPLP SPLP ON SPLP.TB$FNM = 'DPSATC' -- 特殊代碼檔: 調存摺代號 DPSATC 對應的定義 
                           AND SPLP.TB$FCD = DPSP.DPSATC 

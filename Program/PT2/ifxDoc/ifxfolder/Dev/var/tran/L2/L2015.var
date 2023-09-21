@@ -103,7 +103,7 @@ C(3,#CHAIN,1,T(1,#NTXBUF,1,7),$)
 #CustId=X,10,I
 !C(3,#CHAIN,1,T(1,#NTXBUF,8,10),$)
 C(3,#CHAIN,1,s,$)
-@A(ID_UNINO,0,#CustId)
+@A(ID_UNINO,1,#CustId)
 
 #RimCustId=X,10,L
 #RimCustNo=A,7,L

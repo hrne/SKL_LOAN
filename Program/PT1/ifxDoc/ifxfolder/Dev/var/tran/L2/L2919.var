@@ -85,7 +85,7 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1;ntxbuf5=type<-1:CustId<-
 #CustId=X,10,I
 @V(7)
 C(4,#CustId,S,$)
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 
 !身分證找戶號
 #Rim2R47CustId=X,10,S

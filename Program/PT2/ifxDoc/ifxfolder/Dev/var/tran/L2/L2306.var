@@ -199,7 +199,7 @@ C(3,#FunCd,1,$,s)
 C(3,#FunCd,2,s,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
-@V(7)A(ID_UNINO,0,#RelId)
+@V(7)A(ID_UNINO,1,#RelId)
 !關係人姓名 新增、修改時必須輸入,其他自動顯示不必輸入 若統一編號存在於顧客檔,則自動顯示不必輸入
 
 #RimL1r09B=X,1,S
@@ -216,7 +216,6 @@ R(1,L1R09)
 T(2,@TempName,#L1r09CustName)
 
 #RimReltId=X,10,L
-
 #TempName=X,100,L
 T(2,@RelName,#TempName)
 
@@ -226,10 +225,9 @@ T(2,@RimCaseNo,#CaseNo)
 T(2,@RimCustNo,#CustNo)
 T(2,@RimReltId,#RelId)
 E(0,@RimFuncCode,#FunCd)
-! RESET_RIM(#RimL2r15,L2R15)
+ RESET_RIM(#RimL2r15,L2R15)
 S(L2R15,1,#RimCaseNo,#RimCustNo,#RimReltId,#RimFuncCode)
 R(1,L2R15)
-
 
 #CheckL2R15=X,1,S
 C(4,#TempName,s,$)

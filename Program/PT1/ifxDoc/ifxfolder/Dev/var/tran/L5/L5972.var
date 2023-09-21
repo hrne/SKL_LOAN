@@ -117,7 +117,7 @@ INVOKEJS(SHOW,p1,02,02,1)
 #CustId=X,10,I
 C(3,#CHAIN,0,$,s)
 @C(4,#CustId,S,$)
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 
 ! 調RIM找CustNo
 <include src="ROM.icf::L5R51.dec"/>

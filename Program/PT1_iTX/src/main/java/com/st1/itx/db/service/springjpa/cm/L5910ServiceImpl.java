@@ -78,8 +78,9 @@ public class L5910ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 
 		String sql = "select sum(a.\"DrawdownAmt\") as \"Total\", " + "a.\"DeptCode\", " + "g.\"Fullname\", " + "g.\"DepItem\", " + "sum(a.\"DrawdownAmt\"*b.\"ApproveRate\") as \"Dulp\" , "
-				+ "sum(a.\"DrawdownAmt\"*b.\"ApproveRate\")/ sum(a.\"DrawdownAmt\") as \"Divid\", "
-				+ "row_number () over (order by sum(a.\"DrawdownAmt\"*b.\"ApproveRate\")/ sum(a.\"DrawdownAmt\") asc ) as \"sort\" " + " from \"PfBsDetail\" a "
+				+ "CASE WHEN sum(a.\"DrawdownAmt\") > 0 THEN sum(a.\"DrawdownAmt\"*b.\"ApproveRate\")/ sum(a.\"DrawdownAmt\")  "
+				+ "     ELSE 0 END as \"Divid\", "
+				+ "row_number () over (order by ( CASE WHEN sum(a.\"DrawdownAmt\") > 0 THEN sum(a.\"DrawdownAmt\"*b.\"ApproveRate\")/ sum(a.\"DrawdownAmt\") ELSE 0 END ) asc ) as \"sort\" " + " from \"PfBsDetail\" a "
 				+ "left join \"PfBsOfficer\" g  on a.\"BsOfficer\" = g.\"EmpNo\" and a.\"WorkMonth\" = g.\"WorkMonth\" "
 				+ "left join \"LoanBorMain\" b on  a.\"CustNo\" = b.\"CustNo\" and a.\"FacmNo\" = b.\"FacmNo\" and a.\"BormNo\" = b.\"BormNo\"   "
 				+ "where a.\"DrawdownDate\" between :StartDate and :EndDate and \"RepayType\" = '0' and a.\"BsOfficer\" is not null and g.\"Fullname\" is not null "
@@ -103,8 +104,8 @@ public class L5910ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 
 		String sql = "select  " + "sum(a.\"DrawdownAmt\") as \"Total\", " + "a.\"DeptCode\", " + "g.\"DepItem\",  " + "sum(a.\"DrawdownAmt\"*b.\"ApproveRate\") as \"Dulp\" , "
-				+ "sum(a.\"DrawdownAmt\"*b.\"ApproveRate\")/ sum(a.\"DrawdownAmt\") as \"Divid\",  "
-				+ "row_number () over (order by sum(a.\"DrawdownAmt\"*b.\"ApproveRate\")/ sum(a.\"DrawdownAmt\") asc ) as \"sort\"   " + "from \"PfBsDetail\" a  "
+				+ " CASE WHEN sum(a.\"DrawdownAmt\") > 0 THEN sum(a.\"DrawdownAmt\"*b.\"ApproveRate\")/ sum(a.\"DrawdownAmt\")  ELSE 0 END as \"Divid\",  "
+				+ "row_number () over (order by ( CASE WHEN sum(a.\"DrawdownAmt\") > 0 THEN sum(a.\"DrawdownAmt\"*b.\"ApproveRate\")/ sum(a.\"DrawdownAmt\") ELSE 0 END )asc ) as \"sort\"   " + "from \"PfBsDetail\" a  "
 				+ "left join \"PfBsOfficer\" g  on a.\"BsOfficer\" = g.\"EmpNo\" and a.\"WorkMonth\" = g.\"WorkMonth\"  "
 				+ "left join \"LoanBorMain\" b on  a.\"CustNo\" = b.\"CustNo\" and a.\"FacmNo\" = b.\"FacmNo\" and a.\"BormNo\" = b.\"BormNo\"    "
 				+ "where a.\"DrawdownDate\" between :StartDate and :EndDate and \"RepayType\" = '0' and a.\"BsOfficer\" is not null and g.\"Fullname\" is not null  "

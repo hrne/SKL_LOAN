@@ -158,7 +158,7 @@ T(2,@RmkCustNo,#TimCustNo)
 
 #CUSTID=X,10,S
 @C(4,#CUSTID,S,$)
-A(ID_UNINO,0,#CUSTID)
+A(ID_UNINO,1,#CUSTID)
 
 !調RIM參數
 #RimCustId=X,10,S

@@ -149,7 +149,7 @@ K(MODIFYBUTTON,1,新增)
 #CustIdCheck=X,1,S
 @
 T(3,#CustIdX,)
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 
 !#BIND1=X,1,S
 !BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2111; ntxbuf=#BUF1})
@@ -191,7 +191,7 @@ IF(#CustId ==  "" && #ApplNo == 0,T(3,*),T(3, ))
 IF(#CustId ==  "" && #ApplNo == 0,$,S)
 @V(7)
 T(3,#GroupIdX,)
-A(ID_UNINO,0,#GroupId)
+A(ID_UNINO,1,#GroupId)
 
 #RcvL2r07B=X,1,S
 C(4,#GroupId,S,$)
@@ -213,7 +213,7 @@ T(2,#ProcessCodeHelp+;9:全部)
 
 #ProcessCode=X,1,I
 C(3,#CHAIN,1,T(1,#NTXBUF,18,1),$)
-C(4,#ProcessCode,$,s)
+! C(4,#ProcessCode,$,s)
 HELP(#ProcessCodeHelpX)
 E(0,9)
 ! C(3,#FirstIn,1,s,$)

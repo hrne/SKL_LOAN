@@ -181,7 +181,7 @@ C(3,#CustNo,0,S,T(2,#L2r07CustId))
 
 #CheckCustId=X,1,S
 C(4,#CustId,S,$)
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 
 
 #SendL2r07C=X,1,S

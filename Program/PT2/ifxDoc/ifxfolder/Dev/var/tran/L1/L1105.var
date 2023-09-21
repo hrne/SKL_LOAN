@@ -225,7 +225,7 @@ C(3,#CHAIN,1,s,$)
 C(3,#CustNo,0,$,S)
 C(3,#FunCd,1,$,s)
 @V(7)
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 
 #CustNameB=X,100,L
 C(4,#CustId,S,s)

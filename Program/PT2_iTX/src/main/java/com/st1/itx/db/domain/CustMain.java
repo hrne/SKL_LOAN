@@ -1,6 +1,8 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -25,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class CustMain implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -4978593393417917685L;
-
-// 客戶識別碼
+  // 客戶識別碼
   @Id
   @Column(name = "`CustUKey`", length = 32)
   private String custUKey = " ";
@@ -62,8 +59,8 @@ public class CustMain implements Serializable {
   private String sex;
 
   // 客戶別
-  /* 共用代碼檔00:一般01:員工02:首購03:關企公司04:關企員工05:保戶06:團體戶07:員工二親等09:新二階員工 */
-  @Column(name = "`CustTypeCode`", length = 2)
+  /* 客戶別代碼 */
+  @Column(name = "`CustTypeCode`", length = 3)
   private String custTypeCode;
 
   // 行業別
@@ -363,6 +360,16 @@ public class CustMain implements Serializable {
   @Column(name = "`LastUpdateEmpNo`", length = 6)
   private String lastUpdateEmpNo;
 
+  // 身份證字號/統一編號錯誤註記
+  /* Y:A:舊資料轉換B:舊資料轉換 */
+  @Column(name = "`CustIdErrFg`", length = 1)
+  private String custIdErrFg;
+
+  // 配偶身份證號/負責人身分證錯誤註記
+  /* Y:A:舊資料轉換B:舊資料轉換 */
+  @Column(name = "`SpouseIdErrFg`", length = 1)
+  private String spouseIdErrFg;
+
 
 /**
 	* 客戶識別碼<br>
@@ -501,16 +508,7 @@ public class CustMain implements Serializable {
 
 /**
 	* 客戶別<br>
-	* 共用代碼檔
-00:一般
-01:員工
-02:首購
-03:關企公司
-04:關企員工
-05:保戶
-06:團體戶
-07:員工二親等
-09:新二階員工
+	* 客戶別代碼
 	* @return String
 	*/
   public String getCustTypeCode() {
@@ -519,16 +517,7 @@ public class CustMain implements Serializable {
 
 /**
 	* 客戶別<br>
-	* 共用代碼檔
-00:一般
-01:員工
-02:首購
-03:關企公司
-04:關企員工
-05:保戶
-06:團體戶
-07:員工二親等
-09:新二階員工
+	* 客戶別代碼
   *
   * @param custTypeCode 客戶別
 	*/
@@ -1881,6 +1870,52 @@ N:否
     this.lastUpdateEmpNo = lastUpdateEmpNo;
   }
 
+/**
+	* 身份證字號/統一編號錯誤註記<br>
+	* Y:
+A:舊資料轉換
+B:舊資料轉換
+	* @return String
+	*/
+  public String getCustIdErrFg() {
+    return this.custIdErrFg == null ? "" : this.custIdErrFg;
+  }
+
+/**
+	* 身份證字號/統一編號錯誤註記<br>
+	* Y:
+A:舊資料轉換
+B:舊資料轉換
+  *
+  * @param custIdErrFg 身份證字號/統一編號錯誤註記
+	*/
+  public void setCustIdErrFg(String custIdErrFg) {
+    this.custIdErrFg = custIdErrFg;
+  }
+
+/**
+	* 配偶身份證號/負責人身分證錯誤註記<br>
+	* Y:
+A:舊資料轉換
+B:舊資料轉換
+	* @return String
+	*/
+  public String getSpouseIdErrFg() {
+    return this.spouseIdErrFg == null ? "" : this.spouseIdErrFg;
+  }
+
+/**
+	* 配偶身份證號/負責人身分證錯誤註記<br>
+	* Y:
+A:舊資料轉換
+B:舊資料轉換
+  *
+  * @param spouseIdErrFg 配偶身份證號/負責人身分證錯誤註記
+	*/
+  public void setSpouseIdErrFg(String spouseIdErrFg) {
+    this.spouseIdErrFg = spouseIdErrFg;
+  }
+
 
   @Override
   public String toString() {
@@ -1896,6 +1931,6 @@ N:否
            + ", lastFacmNo=" + lastFacmNo + ", lastSyndNo=" + lastSyndNo + ", allowInquire=" + allowInquire + ", email=" + email + ", actFg=" + actFg + ", introducer=" + introducer
            + ", businessOfficer=" + businessOfficer + ", isSuspected=" + isSuspected + ", isSuspectedCheck=" + isSuspectedCheck + ", isSuspectedCheckType=" + isSuspectedCheckType + ", isLimit=" + isLimit + ", isRelated=" + isRelated
            + ", isLnrelNear=" + isLnrelNear + ", isDate=" + isDate + ", dataStatus=" + dataStatus + ", typeCode=" + typeCode + ", station=" + station + ", createDate=" + createDate
-           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", custIdErrFg=" + custIdErrFg + ", spouseIdErrFg=" + spouseIdErrFg + "]";
   }
 }

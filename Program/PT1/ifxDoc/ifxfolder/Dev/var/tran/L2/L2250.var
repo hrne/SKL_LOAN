@@ -1,0 +1,517 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L2250)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,27)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,75)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[250,1000];printer.width=[20,160];">
+[
+["[L2250]                                 保證人資料登錄"],
+["#FdFunCd+功能",#FunCdX],
+["#FdApplNo+核准號碼",#ApplNo,#BTN1],
+["#FdCustNo+借戶戶號",#CustNo,"@",#CustNoX],
+["#FdFacmNo+額度編號",#FacmNo],
+["#FdGuaId+保證人統編",#GuaId,#BTN3,#GuaIdX],
+["#FdRelInd+保證人關係",#RelInd,#RelIndX],
+["#FdGuaAmt+保證金額",#GuaAmt],
+["#FdGuaType+保證類別",#GuaType,#GuaTypeX],
+["#FdGuaDt+對保日期",#GuaDt],
+["#FdStatCd+保證狀況碼",#StatCd,#StatCdX],
+["#FdCancelDt+解除日期",#CancelDt],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+#BTN1=X,15,I,ui:button;value:核准號碼查詢;enable:1;tabbable:0;
+! #BTN2=X,15,I,ui:button;value:保證人明細資料查詢;enable:1;tabbable:0;
+#BTN3=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0;
+#BUF1=X,17,S
+
+
+! 必輸欄位
+#FdCustNo=X,2,L
+#FdFacmNo=X,2,L
+#FdRelInd=X,2,L
+#FdGuaAmt=X,2,L
+#FdGuaType=X,2,L
+#FdGuaDt=X,2,L
+#FdStatCd=X,2,L
+#FdCancelDt=X,2,L
+
+
+! 永遠為必輸欄位
+#FdFunCd=X,2,L
+T(3,*)
+#FdApplNo=X,2,L
+T(3,*)
+#FdGuaId=X,2,L
+T(3,*)
+
+
+
+!---------- AP TEXT AREA Variables ----------
+
+#SetSysPar=X,1,S
+E(0,1)ASGN(AGAIN$)
+
+#FunCdHelp=x,100,S
+T(3,1:新增;2:修改;3:新增;4:刪除;5:查詢)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L2020保證人明細資料查詢]進入),$)
+
+
+#NTXBUF=X,58,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@CHAINFUNCD,#NTXBUF,1,1)
+E(0,@FunCd,#CHAINFUNCD)
+T(1,@ApplNo,#NTXBUF,2,7)
+T(1,@GuaId,#NTXBUF,9,10)
+
+
+!CHAIN進查詢時隱藏按鈕
+#chainF5HIDE=X,1,S
+C(3,#FunCd,3,HIDE(#BTN1),$)
+C(3,#CHAIN,1,C(2,#FunCd,S,S,S,S,$,$),S)
+HIDE(#BTN1,#BTN3)
+!CHAIN進查詢時隱藏所有輸入框
+T(F,@FunCd,0)T(F,@ApplNo,0)T(F,@CustNo,0)T(F,@FacmNo,0)T(F,@GuaId,0)T(F,@RelInd,0)T(F,@GuaAmt,0)T(F,@GuaType,0)T(F,@GuaDt,0)T(F,@StatCd,0)T(F,@CancelDt,0)     
+
+
+<include src="ROM.icf::L2R35.dec"/>
+!調保證人檔RIM
+#RIMApproveNo=A,7,S
+
+!    L2R35A : 依核准號碼,保證人統編尋找保證人資料
+#RimL2r35A=X,1,S
+C(3,#CHAIN,1,C(3,#FunCd,1,S,$),S)
+E(0,@RIMApproveNo,#ApplNo)
+T(2,@RimCustId,#GuaId)
+RESET_RIM(#RimL2r35A,L2R35)
+S(L2R35,1,#RimFunCd,#RIMApproveNo,#RimCustId)
+R(1,L2R35)
+
+#checkL2R35A=X,1,S
+C(3,#CHAIN,1,C(3,#FunCd,1,S,$),S)
+T(2,@RelInd,#L2r35RelInd)
+E(0,@GuaAmt,#L2r35GuaAmt)
+E(0,@GuaType,#L2r35GuaType)
+E(0,@GuaDt,#L2r35GuaDt)
+E(0,@StatCd,#L2r35StatCd)
+E(0,@CancelDt,#L2r35CancelDt)
+
+
+!用核准號碼(ApplNo)調L2R21
+#RimL2r21ApplNoA=X,1,S
+C(3,#CHAIN,1,C(3,#FunCd,1,S,$),S)
+E(0,@RimFunCd,#FunCd)
+E(0,@RimApplNo,#ApplNo)
+RESET_RIM(#RimL2r21ApplNoA,L2R21)
+S(L2R21,1,#RimFunCd,#RimApplNo)
+R(1,L2R21)
+
+
+#checkL2r21A=X,1,S
+C(3,#CHAIN,1,C(3,#FunCd,1,S,$),S)
+E(0,@CustNo,#L2r21CustNo)
+E(0,@FacmNo,#L2r21FacmNo)
+T(2,@CustNoX,#L2r21CustName)
+
+#RimL1r01GuaIdA=X,1,S
+C(3,#CHAIN,1,C(3,#FunCd,1,S,$),S)
+E(0,@RimFunCd,5)
+T(2,@RimCustId,#GuaId)
+RESET_RIM(#RimL1r01GuaIdA,L1R01)
+S(L1R01,1,#RimFunCd,#RimCustId,#RimCustNo)
+R(1,L1R01)
+
+#GuaIdXA=X,100,L
+C(3,#CHAIN,1,C(3,#FunCd,1,S,$),S)
+C(3,#FunCd,3,T(3, )T(3,@GuaIdX, ),$)
+T(2,@GuaIdX,#L1r01CustName)
+
+
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+! 保證人關係下拉選單
+#GuaRelRimName=x,40,S
+!T(3,CdCode.GuaRelCode)
+T(3,CdGuarantor)
+
+#GuaRelHelp=x,3000,S
+
+#CDDEFStatCd=x,20,S
+T(3,CdCode.GuaStatCode)
+
+#StatCdHelp=x,1024,S
+
+#CDDEFGuaType=x,20,S
+T(3,CdCode.GuaTypeCode)
+
+#GuaTypeHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#GuaRelRimName,#CDDEFStatCd,#CDDEFGuaType)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@GuaRelHelp,#HelpDesc1)
+T(2,@StatCdHelp,#HelpDesc2)
+T(2,@GuaTypeHelp,#HelpDesc3)
+
+#CHAINFUNCD=A,1,S
+
+![功能]
+! 下拉式選單 1.新增 2.修改 3.複製 4.刪除 5.查詢
+#FunCd=A,1,S
+E(0,#CHAINFUNCD)
+C(4,#RelInd,$,T(H,@RelIndX,#RelInd,#GuaRelHelp))
+C(4,#GuaType,$,T(H,@GuaTypeX,#GuaType,#GuaTypeHelp))
+C(3,#CHAIN,1,s,$)
+HELP(#FunCdHelp) 
+@V(H,#FunCdHelp)
+E(0,@FUNCIND,#FunCd)
+
+#SetSysPar1=X,1,S
+IF(#FunCd ==1 || #FunCd ==3,E(0,0)ASGN(AGAIN$),$)
+
+#FunCdX=X,4,L
+C(4,#FunCd,S,$)
+T(H,#FunCd,#FunCdHelp)
+C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,複製),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSEY))
+
+
+#ShowFd=X,1,S
+C(2,#FunCd,T(3, ),T(3,*),T(3,*),T(3,*),T(3, ),T(3, ))
+T(2,@FdFunCd,#ShowFd)     
+T(2,@FdApplNo,#ShowFd)
+T(2,@FdGuaId,#ShowFd)
+
+!控制有無框限 FunCd=1,2顯示框限 其他不顯示
+#WKTF=X,1,S
+IF(#FunCd==1 ,E(0,@StatCd,1)T(H,@StatCdX,#StatCd,#StatCdHelp)T(F,@StatCd,0),$)
+IF (#FunCd==1 || #FunCd==2 || #FunCd==3,T(F,@RelInd,1)T(F,@GuaAmt,1)T(F,@GuaType,1)T(F,@GuaDt,1)T(F,@CancelDt,1),
+                           T(F,@RelInd,0)T(F,@GuaAmt,0)T(F,@GuaType,0)T(F,@GuaDt,0)T(F,@StatCd,0)T(F,@CancelDt,0))
+IF (#FunCd==2,HIDE(#BTN1,#BTN3)T(F,@GuaId,0)T(H,@StatCdX,#StatCd,#StatCdHelp),$)
+IF (#FunCd==3,T(F,@ApplNo,0)T(H,@StatCdX,#StatCd,#StatCdHelp),$)             
+
+#WKSPC=X,2,S
+
+#WKSTAR=X,2,S
+C(2,#FunCd,T(3, ),T(3,*),T(3,*),T(3,*),T(3, ),T(3, ))
+
+
+
+#WKNAME=X,1,S
+T(2,@FdRelInd,#WKSTAR)
+T(2,@FdGuaType,#WKSTAR)
+T(2,@FdGuaAmt,#WKSTAR)
+T(2,@FdGuaDt,#WKSTAR)
+T(2,@FdStatCd,#WKSTAR)
+
+#7spc=X,7,S
+T(3,       )
+#10spc=X,10,S
+T(3,          )
+#7A=A,7,S
+
+#BUF1A=X,18,S
+T(2,0000001+9999999+0000000+0+0)
+
+#BIND1A=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF1A;ntxbuf5=type<-1:ApplNo<-OOApplNo})
+
+![核准號碼]
+! 必須輸入
+#ApplNo=A,7,I
+C(3,#FunCd,2,T(F,@ApplNo,0),$) 
+C(3,#CHAIN,1,C(2,#FunCd,s,$,s,s,s,s),$) 
+@V(2,0)
+
+! #BUF2A=X,31,S
+! T(2,#7A+#7A+#10spc+#ApplNo)
+
+! !瀏覽 連結 保證人明細資料查詢 L2020
+! #BIND2=X,1,S
+! BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L2020; ntxbuf=#BUF2A;ntxbuf5=type<-1:ApplNo<-OOApplNo})
+
+
+<include src="ROM.icf::L2R21.dec"/>
+!調Rim參數
+#RimFunCd=A,1,S
+#RimApplNo=A,7,S
+
+
+!用核准號碼(ApplNo)調L2R21
+#RimL2r21ApplNoB=X,1,S
+!C(3,#CHAIN,1,S,$)
+C(3,#FunCd,1,$,S)
+E(0,@RimFunCd,#FunCd)
+E(0,@RimApplNo,#ApplNo)
+! RESET_RIM(#RimL2r21ApplNoB,L2R21)
+S(L2R21,1,#RimFunCd,#RimApplNo)
+R(1,L2R21)
+
+
+#TimCustNo=A,7,S
+C(3,#ApplNo,0,$,E(0,#L2r21CustNo))
+T(2,@RmkCustNo,#TimCustNo)
+<include src="COM.icf::CustRmk.rtn"/>
+
+#checkL2r21B=X,1,S
+!C(3,#CHAIN,1,S,$)
+C(3,#FunCd,1,$,S)
+E(0,@CustNo,#L2r21CustNo)
+E(0,@FacmNo,#L2r21FacmNo)
+T(2,@CustNoX,#L2r21CustName)
+E(0,@GuaAmt,#L2r21LineAmt)
+![借戶戶號]
+! 自動顯示不必輸入
+#CustNo=A,7,L
+
+#CustNoX=X,100,L
+
+![額度編號]
+! 自動顯示不必輸入
+#FacmNo=A,3,L
+
+
+#BUF3A=X,17,S
+
+
+!瀏覽 連結 顧客明細資料查詢 L1001
+#BIND3=X,1,S
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF3A;ntxbuf5=type<-1:GuaId<-OOCustId})
+
+#CleanGuaId=X,1,S
+C(3,#FunCd,3,T(3,@GuaId, )T(3,@GuaIdX, ),$)
+
+![保證人統編]
+! 必須輸入
+#GuaId=X,10,I
+C(3,#CHAIN,1,C(2,#FunCd,s,$,s,$,s,s),$) 
+@V(7)A(ID_UNINO,1,#GuaId)
+
+<include src="ROM.icf::L1R01.dec"/>
+!RIM參數使用
+#RimCustId=X,10,S
+
+!調Rim參數
+#RimCustNo=A,7,S
+
+#RimL1r01GuaIdB=X,1,S
+C(3,#CHAIN,1,C(3,#FunCd,5,S,$),S)
+E(0,@RimFunCd,5)
+T(2,@RimCustId,#GuaId)
+RESET_RIM(#RimL1r01GuaIdB,L1R01)
+S(L1R01,1,#RimFunCd,#RimCustId,#RimCustNo)
+R(1,L1R01)
+
+#GuaIdX=X,100,L
+T(2,@GuaIdX,#L1r01CustName)
+
+
+!    L2R35B : 依核准號碼,保證人統編尋找保證人資料
+#RimL2r35B=X,1,S
+C(3,#CHAIN,1,S,$)
+E(0,@RIMApproveNo,#ApplNo)
+T(2,@RimCustId,#GuaId)
+C(3,#FunCd,1,S,$)
+RESET_RIM(#RimL2r35B,L2R35)
+S(L2R35,1,#RimFunCd,#RIMApproveNo,#RimCustId)
+R(1,L2R35)
+
+#checkL2R35B=X,1,S
+C(3,#CHAIN,1,S,$)
+C(3,#FunCd,1,S,$)
+T(2,@RelInd,#L2r35RelInd)
+E(0,@GuaAmt,#L2r35GuaAmt)
+E(0,@GuaType,#L2r35GuaType)
+E(0,@GuaDt,#L2r35GuaDt)
+E(0,@StatCd,#L2r35StatCd)
+E(0,@CancelDt,#L2r35CancelDt)
+
+
+<include src="ROM.icf::L2R42.dec"/>
+! #L2r42=X,1,S
+
+! #RimL2r42=X,1,S
+! RESET_RIM(#RimL2R42,L2R42)
+! S(L2R42,1,#L2r42)
+! R(1,L2R42)
+
+![保證人關係]
+! 下拉式選單
+#RelInd=X,2,I
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
+HELP(#GuaRelHelp,cols:4)
+@
+C(3,#FunCd,2,IF (#RelInd==#L2r35RelInd,s,$),$)
+V(H,#GuaRelHelp)
+
+#RelIndX=X,30,L
+C(4,#RelInd,S,$)
+T(H,#RelInd,#GuaRelHelp)
+
+![保證金額]
+#GuaAmt=m,14,I
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
+@V(2,0)
+
+
+![保證類別]
+! 下拉式選單
+! 2020/9/7 改抓CdGuarantor
+#GuaType=A,2,I
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
+HELP(#GuaTypeHelp)
+@
+C(3,#FunCd,2,IF (#GuaType==#L2r35GuaType,s,$),$)
+V(H,#GuaTypeHelp)
+
+! 2020/9/7 改抓CdGuarantor
+#GuaTypeX=X,30,L
+C(4,#GuaType,S,$)T(H,#GuaType,#GuaTypeHelp)
+
+#CDate=D,7,S
+E(0,#SYSCDATE)
+
+![對保日期]
+#GuaDt=D,7,I
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
+@V(7)A(DATE,0,#GuaDt)
+IF(#GuaDt>#CDate,V(P,不可大於今天日期),$)
+
+
+![保證狀況碼]
+! 下拉式選單
+#StatCd=A,1,I
+C(3,#FunCd,1,s,$)
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
+HELP(#StatCdHelp)
+@
+C(3,#FunCd,2,IF (#StatCd==#L2r35StatCd,s,$),$)
+!IF(#StatCd==0 || #StatCd==2 || #StatCd==3,INVOKEJS(SHOW,p1,11,11,1),INVOKEJS(SHOW,p1,11,11,0))
+V(H,#StatCdHelp)
+
+#StatCdX=X,10,L
+C(4,#StatCd,S,$)T(H,#StatCd,#StatCdHelp)
+
+!必輸標記2
+#WKSTAR2=X,2,S
+IF(#FunCd==1 || #FunCd==2 || #FunCd==3,IF(#StatCd==0 || #StatCd==2 || #StatCd==3,T(3,*),
+                                                      S),S)
+!#FunCd=1,2時#StatCd=2,3.必須輸入否則不必輸入
+#FD_CANCELDT_STAR=X,1,S
+T(2,@FdCancelDt,#WKSTAR2)
+
+![解除日期]
+! 新增,修改時若保證狀況碼=0,2,3必須輸入否則不必輸入
+#CancelDt=D,7,I
+IF(#FunCd==1 || #FunCd==2,IF(#StatCd==0 || #StatCd==2 || #StatCd==3,T(F,@CancelDt,1),T(F,@CancelDt,0)),T(F,@CancelDt,0))
+
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
+C(3,#StatCd,1,S,$)
+@V(7)A(DATE,0,#CancelDt)
+
+
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L2250 ----------
+<sub type="FORM" name="L2250">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L2250,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L2250] 保證人資料登錄)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#FunCd
+#ApplNo
+#CustNo
+#FacmNo
+#GuaId
+#RelInd
+#GuaAmt
+#GuaType
+#GuaDt
+#StatCd
+#CancelDt
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L2250^
+<include src="ROM.icf::L1R01.tom"/>
+<include src="ROM.icf::L2R21.tom"/>
+<include src="ROM.icf::L2R35.tom"/>
+<include src="ROM.icf::L2R42.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="COM.icf::TRCTL.tom"/>
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

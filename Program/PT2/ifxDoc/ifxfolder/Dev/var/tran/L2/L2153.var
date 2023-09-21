@@ -741,7 +741,7 @@ T(2,0000000+#CustId)
 BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1B;ntxbuf5=type<-1:CustId<-OOCustId})
 
 #CheckCustId=X,1,S
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 
 #SendL2r07=X,1,S
 C(3,#FKEY,0,$,s)

@@ -1,0 +1,128 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L5720)
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L5720" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L5720]                                 喘息期資料維護"],
+[#<->#,"@功能",#FUNCTIONCD,#FUNCTIONCDX],
+[#<->#,"@身份證字號",#CUSTID],
+["#grid#,{id:1,expand:true,loop:6,row_height:1,s_cols:[], p_cols:[]}","  ","","",
+["延期繳款年月"],
+[[#DLYPAYMM1]]],
+]
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+! 功能
+#FuncCodeX=x,20,S
+T(3,CdCode.FuncCode1)
+#FuncHelp=x,100,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#FuncCodeX)
+R(1,XXR99)
+CALL(#HelpProc)
+T(B,@FuncHelp,#HelpDesc1+;6:產出)
+
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+#NTXBUF=X,10,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@CUSTID,#NTXBUF,1,10)
+INVOKEJS(SHOW,p1,02,02,1)
+
+#PRECOL=A,1,S
+INVOKEJS(SHOW,L5720_3,0)
+
+
+#FUNCTIONCD=A,1,I
+C(3,#CHAIN,0,$,s)
+HELP(#FuncHelp)
+V(H,#FuncHelp)
+E(0,@FUNCIND,#FUNCTIONCD)
+!HELP(1:新增;
+!     2:修改;
+!     4:刪除;
+!     5:查詢;
+!     6:產出)
+!@V(1,1,2,4,5,6)
+@T(3,@FUNCTIONCDX,)
+
+#FUNCTIONCDX=X,8,L
+T(H,#FUNCTIONCD,#FuncHelp)
+!SWITCH(#FUNCTIONCD,1,T(2,新增),
+!                   2,T(2,修改),
+!                   4,T(2,刪除),
+!                   5,T(2,查詢),
+!                   6,T(2,註銷))
+
+! 身份證字號
+#CUSTID=X,10,I
+@C(4,#CUSTID,S,$)
+A(ID_UNINO,1,#CUSTID)
+
+! 調RIM塞值-----之後寫RIM完刪除
+#RIM_VALUE=A,1,S
+E(0,@DLYPAYMM1,10810)E(0,@DLYPAYMM2,10811)
+
+#COLDIS=A,1,S
+C(3,#DLYPAYMM1,00000,
+INVOKEJS(SHOW,L5720_3,0),
+INVOKEJS(SHOW,L5720_3,1))
+
+##loop{times:6,i:1,j:2,z:0}
+#COLDIS{i}=A,1,S
+C(3,#DLYPAYMM{i},00000,
+INVOKEJS(SHOW,grd1_{j},0),
+INVOKEJS(SHOW,grd1_{j},1))
+! 延期繳款年月
+#DLYPAYMM{i}=A,5,L
+
+##end
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L5720 -----------
+<sub type="FORM" name="L5720">
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#CUSTID
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L5720
+
+^
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+</sub>

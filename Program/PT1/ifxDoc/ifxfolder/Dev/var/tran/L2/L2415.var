@@ -821,7 +821,7 @@ C(4,#BdSubUsageCode,$,V(2,0))
 ! [賣方統編]
 #SellerId=X,10,I
 IF(#FunCd==4,s,$)
-@A(ID_UNINO,0,#SellerId)
+@A(ID_UNINO,1,#SellerId)
 
 #FdSELLER_ID=X,2,L
 
@@ -972,7 +972,7 @@ IF(#PageFg==2,$,CALL(#Show2))
 IF(#FunCd==4,s,$)
 C(3,#PublicBdNoA{i},0,S,$)
 HELP(#PublicBdOwnerIdHelp)
-@A(ID_UNINO,0,#PublicBdOwnerId{i})V(H,#PublicBdOwnerIdHelp)
+@A(ID_UNINO,1,#PublicBdOwnerId{i})V(H,#PublicBdOwnerIdHelp)
 
 
 #RimL1r09PublicBd{i}=X,1,S

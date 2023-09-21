@@ -729,7 +729,7 @@ T(H,#StockType,#StockTypeHelp)
 ! [發行公司統一編號]
 #CompanyId=X,10,I
 IF(#FunCd==4,s,$)
-@A(ID_UNINO,0,#CompanyId)
+@A(ID_UNINO,1,#CompanyId)
 
 
 ! [資料年度]
@@ -812,7 +812,7 @@ IF(#FunCd==4,s,$)
 ! [股票持有人統編]
 #OwnerId=X,10,I
 IF(#FunCd==4,s,$)
-@V(7)A(ID_UNINO,0,#OwnerId)
+@V(7)A(ID_UNINO,1,#OwnerId)
 
 
 #RimL1r09=X,1,S
@@ -891,7 +891,7 @@ T(H,#InsiderPosition,#PositionHelp)
 #LegalPersonId=X,10,I
 C(4,#InsiderPosition,S,$)
 IF(#FunCd==4,s,$)
-@A(ID_UNINO,0,#LegalPersonId)
+@A(ID_UNINO,1,#LegalPersonId)
 
 
 ! #RimL1r09A=X,1,S

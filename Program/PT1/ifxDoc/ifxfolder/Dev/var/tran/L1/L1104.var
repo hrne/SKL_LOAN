@@ -233,7 +233,7 @@ ASGN(AGAIN$)
 !C(3,#CHAIN,1,s,$)
 !@
 !V(7)
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 
 #MRKEY=_,_,S
 T(2,#CustId)
@@ -437,7 +437,7 @@ IF(#BranchNoBef == #BranchNo,T(3,),T(3,X))
 
 #CustIdAfter=X,10,L
 T(2,@CustIdAfter,#CustIdBef)
-@C(4,#CustIdAfter,S,A(ID_UNINO,0,#CustIdAfter))
+@C(4,#CustIdAfter,S,A(ID_UNINO,1,#CustIdAfter))
 
 #CustIdInd=_,_,L
 IF(#CustIdAfter==#CustId || #CustIdAfter == "",T(3,),T(3,X))
@@ -716,11 +716,11 @@ IF(#BussNationalityCodeAft==#BussNationalityCodeBef || #NationalityCodeAft == ""
 P(1,@checkIdlen,#NationalityCodeAft)
 C(5,#NationalityCodeAft,TW,C(4,#SpouseIdAft,V(P,當公司註冊地為TW時，不可空白),$),$)
 !C(3,#checkIdlen,10,$,V(P,當公司註冊地為TW時，不可空白))
-C(4,#SpouseIdAft,1,A(ID_UNINO,0,#SpouseIdAft),s)
+C(4,#SpouseIdAft,1,A(ID_UNINO,1,#SpouseIdAft),s)
 
 !@
 C(5,#FdSpouseId,*,V(7),$)
-C(4,#SpouseIdAft,S,A(ID_UNINO,0,#SpouseIdAft))
+C(4,#SpouseIdAft,S,A(ID_UNINO,1,#SpouseIdAft))
 
 #SpouseIdInd=_,_,L
 IF(#SpouseIdAft==#SpouseIdBef ,T(3,),T(3,X))

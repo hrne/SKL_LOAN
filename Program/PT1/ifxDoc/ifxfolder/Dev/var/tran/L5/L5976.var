@@ -455,7 +455,7 @@ IF(#FunctionCode==#SearchCode,s,$)
 C(3,#CHAIN,0,$,IF(#L5r01CustId!="",s,$))
 @T(3,@CustNo,)
 V(7)
-A(ID_UNINO,0,#CustId)
+A(ID_UNINO,1,#CustId)
 
 ! 調RIM找CustNo及戶名
 <include src="ROM.icf::L5R51.dec"/>
