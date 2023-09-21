@@ -43,7 +43,9 @@ public class LM073ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             , \"FacmNo\"";
 		sql += "  )";
 		sql += "  SELECT";
-		sql += "        Cl.\"CityCode\"";
+		sql += "         Fac.\"RuleCode\"";
+		sql += "       , Cc.\"RuleCodeItem\"";
+		sql += "       , Cl.\"CityCode\"";
 		sql += "       , Fac.\"CustNo\"";
 		sql += "       , Fac.\"FacmNo\"";
 		sql += "       , Fac.\"FirstDrawdownDate\"";
@@ -71,6 +73,7 @@ public class LM073ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  LEFT JOIN \"ClMain\" Cl ON Cl.\"ClCode1\" = Cf.\"ClCode1\"";
 		sql += "                       AND Cl.\"ClCode2\" = Cf.\"ClCode2\"";
 		sql += "                       AND Cl.\"ClNo\" = Cf.\"ClNo\"";
+		sql += "  LEFT JOIN \"CdRuleCode\" Cc ON Cc.\"RuleCode\" = Fac.\"RuleCode\"";
 		sql += "  WHERE Trunc(Fac.\"FirstDrawdownDate\" / 100) = :RptMonth";
 		sql += "        AND";
 		sql += "        Fac.\"CustTypeCode\" = 'S01'";

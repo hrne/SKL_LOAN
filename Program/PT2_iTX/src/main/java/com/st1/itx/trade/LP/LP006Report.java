@@ -266,11 +266,10 @@ public class LP006Report extends MakeReport {
 				makeExcel.setValue(row, 2, t.get("DeptItem")); // 2, "部室"
 				makeExcel.setValue(row, 3, t.get("DistItem")); // 3, "區部"
 				makeExcel.setValue(row, 4, t.get("AreaItem")); // 4, "單位"
-				makeExcel.setValue(row, 5, t.get("Fullname")); // 5, "姓名"
-				makeExcel.setValue(row, 6, t.get("EmpNo")); // 6, "員工代號"
-				makeExcel.setValue(row, 7, t.get("LastEmpClassX")); // 7, "考核前職級"
-				makeExcel.setValue(row, 8, t.get("EmpClassX")); // 8, "考核後職級" row++; } }
-
+				makeExcel.setValue(row, 5, t.get("EmpName")); // 5, "姓名"
+				makeExcel.setValue(row, 6, t.get("Coorgnizer")); // 6, "員工代號"
+				makeExcel.setValue(row, 7, t.get("LastEmpClass")); // 7, "考核前職級"
+				makeExcel.setValue(row, 8, t.get("EmpClass")); // 8, "考核後職級" row++; } }
 				row++;
 			}
 		}

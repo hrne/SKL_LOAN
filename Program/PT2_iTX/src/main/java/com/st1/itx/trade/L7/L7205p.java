@@ -241,6 +241,7 @@ public class L7205p extends TradeBuffer {
 			throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 		}
 
+		this.batchTransaction.commit();
 		changeDBEnv(titaVo);
 
 		try {
@@ -250,6 +251,9 @@ public class L7205p extends TradeBuffer {
 			throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 		}
 
+		
+		
+		this.batchTransaction.commit();
 		changeDBEnv(titaVo);
 
 		for (OccursList tempOccursList : occursList) {
@@ -340,9 +344,7 @@ public class L7205p extends TradeBuffer {
 			}
 		} // for
 
-		this.batchTransaction.commit();
-		changeDBEnv(titaVo);
-		this.batchTransaction.commit();
+
 
 		changeDBEnv(titaVo);
 		updLM052ReportSPAndMonthlyFacBalData(titaVo, iYearMonth);
@@ -353,6 +355,7 @@ public class L7205p extends TradeBuffer {
 		// 更新MonthlyLM055AssetLoss LM055重要放款餘額明細表
 		changeDBEnv(titaVo);
 		updMonthlyLM055AssetLoss(titaVo, iYearMonth);
+		this.batchTransaction.commit();
 
 		changeDBEnv(titaVo);
 		try {
@@ -360,6 +363,7 @@ public class L7205p extends TradeBuffer {
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 		}
+		this.batchTransaction.commit();
 
 		// 重產LM051報表
 		titaVo.setBatchJobId("jLM051");

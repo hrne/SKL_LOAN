@@ -68,7 +68,7 @@ public class LM003Report extends MakeReport {
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "LM003";
-		String fileItem = "撥款／還款金額比較月報表" + rocYMMin + "~" + rocYMMax ;
+		String fileItem = "撥款／還款金額比較月報表" + rocYMMin + "~" + rocYMMax;
 		String fileName = "LM003-撥款／還款金額比較月報表" + rocYMMin + "~" + rocYMMax;
 		String defaultExcel = "LM003_底稿_撥款還款比較月報表.xlsx";
 		String defaultSheet = "還款-撥還款比較";
@@ -205,7 +205,10 @@ public class LM003Report extends MakeReport {
 				+ ent0Amt + "億元";
 		String memo2 = "●依報表：LN6361編製；撥款金額含催收回復，還款金額含轉催收。";
 		String memo3 = "●自行還款含內部代償、借新還舊、大額還款（1月~" + rocM + "月累積數" + memo3Amt + "億)";
-		String memo4 = "●" + rocM + "月實際還款數：" + repayAllTotal + "（帳載） -" + memo3Amt + "（內部轉帳）-" + turnOvduAmt
+
+		String memo33 = memo3Amt.compareTo(BigDecimal.ZERO) < 0 ? "+" + memo3Amt.multiply(new BigDecimal("-1"))
+				: "-" + memo3Amt;
+		String memo4 = "●" + rocM + "月實際還款數：" + repayAllTotal + "（帳載） " + memo33 + "（內部轉帳）-" + turnOvduAmt
 				+ "（轉催收） ＝" + memo4Diff + "億";
 
 		makeExcel.setValue(24, 1, memo1);

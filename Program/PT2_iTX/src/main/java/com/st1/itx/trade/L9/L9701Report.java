@@ -314,29 +314,58 @@ public class L9701Report extends MakeReport {
 
 				// 判斷換頁
 				// 額度相同 且 列數大於52 nextPage(2)表示換下頁時的表頭用表頭2
-				if (isNotSameFacmNo && this.NowRow >= 52) {
-					this.info("type1");
-					this.nextPage(2);
-				}
-				// 額度不同 且 列數大於52，列印總計的列數 nextPage(1)表示換下頁時的表頭用表頭1
-				if (!isNotSameFacmNo && this.NowRow >= 52) {
-					this.info("type2");
-					printFacEnd(this.facmNo);
-					this.nextPage(1);
-				}
+//				if (isNotSameFacmNo && this.NowRow >= 52) {
+//					this.info("type1");
+//					this.nextPage(2);
+//				}
+//				// 額度不同 且 列數大於52，列印總計的列數 nextPage(1)表示換下頁時的表頭用表頭1
+//				if (!isNotSameFacmNo && this.NowRow >= 52) {
+//					this.info("type2");
+//					printFacEnd(this.facmNo);
+//					this.nextPage(1);
+//				}
+//				// 額度不同 且 列數大於46，因36~43列數空間不足以列印總計加錶頭列數所以要換頁用表頭1
+//				if (!isNotSameFacmNo && (this.NowRow > 46)) {
+//					this.info("type3");
+//					printFacEnd(this.facmNo);
+//					this.nextPage(1);
+//				}
+//				// 額度不同 且 列數小於等於46，要列印總計列數加上表頭列數 nextPage(3)表示不用換頁但要印表頭1
+//				if (!isNotSameFacmNo && this.NowRow <= 46) {
+//					this.info("type4");
+//					printFacEnd(this.facmNo);
+//					this.nextPage(11);
+//
+//				}
+
 				// 額度不同 且 列數大於46，因36~43列數空間不足以列印總計加錶頭列數所以要換頁用表頭1
 				if (!isNotSameFacmNo && (this.NowRow > 46)) {
 					this.info("type3");
 					printFacEnd(this.facmNo);
 					this.nextPage(1);
+					continue;
 				}
-				// 額度不同 且 列數小於等於46，要列印總計列數加上表頭列數 nextPage(3)表示不用換頁但要印表頭1
-				if (!isNotSameFacmNo && this.NowRow <= 46) {
-					this.info("type4");
+				if (isNotSameFacmNo && this.NowRow >= 52) {
+					this.info("type1");
+					this.nextPage(1);
+					continue;
+				}
+
+				if (!isNotSameFacmNo && this.NowRow < 52) {
 					printFacEnd(this.facmNo);
-					this.nextPage(11);
+					this.nextPage(1);
+					continue;
 
 				}
+
+				// 額度不同 且 列數大於52，列印總計的列數 nextPage(1)表示換下頁時的表頭用表頭1
+//				if (!isNotSameFacmNo && this.NowRow >= 52) {
+//					this.info("type2");
+//					printFacEnd(this.facmNo);
+//					this.nextPage(1);
+//				}
+
+				// 額度不同 且 列數小於等於46，要列印總計列數加上表頭列數 nextPage(3)表示不用換頁但要印表頭1
 
 				// 最後一筆 列印結束報表
 				if (cntAll == listL9701.size()) {

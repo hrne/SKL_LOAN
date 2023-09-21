@@ -84,7 +84,7 @@ public class LM073Report extends MakeReport {
 			for (Map<String, String> tLDVo : lList) {
 				int colShift = 0;
 
-				for (int i = 0; i <= 13; i++) {
+				for (int i = 0; i <= 15; i++) {
 
 					int col = i + pivotCol; // 1-based for col
 
