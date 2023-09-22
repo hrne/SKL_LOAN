@@ -55,8 +55,11 @@ public class ScheduledL7206 extends SysLogger {
 		titaVo.putParam(ContentName.actfg, "0");
 		titaVo.putParam(ContentName.dataBase, ContentName.onLine);
 		titaVo.putParam(ContentName.empnot, "999999");
-		titaVo.putParam("BRNO", "0000");
+		titaVo.putParam(ContentName.kinbr, "0000");
+		titaVo.setDataBaseOnLine();
 
+		this.mustInfo("titaVo.getBrno()=" + titaVo.getBrno());
+		
 		txBuffer.init(titaVo);
 
 		dateUtil.init();

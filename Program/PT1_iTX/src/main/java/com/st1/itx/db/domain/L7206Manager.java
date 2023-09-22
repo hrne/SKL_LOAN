@@ -2,7 +2,6 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -14,8 +13,6 @@ import javax.persistence.Column;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import com.st1.itx.util.StaticTool;
-import com.st1.itx.Exception.LogicException;
 
 /**
  * L7206Manager 利害關係人負責人檔<br>
@@ -30,7 +27,12 @@ import com.st1.itx.Exception.LogicException;
 public class L7206Manager implements Serializable {
 
 
-  // 序號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7797199057423721844L;
+
+// 序號
   /* 產出LNM63H2P.txt逗點分隔且固定長度8個欄位長度加總為108加上7個逗點為115 */
   @Id
   @Column(name = "`LogNo`")

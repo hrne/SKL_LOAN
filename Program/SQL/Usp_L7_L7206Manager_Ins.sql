@@ -58,8 +58,8 @@ BEGIN
   SELECT "L7206Manager_SEQ".nextval  AS "LogNo" -- 序號 AUTO 
        , S."CustId"               AS "CustId" -- 身分證/統一編號 VARCHAR2 10
        , S."CustName"             AS "CustName" -- 姓名 NVARCHAR2 42
-       , S."CustNo"               AS "CustNo" -- 戶號 Decimal 7
        , S."ManagerId"            AS "ManagerId" -- 負責人身分證/統一編號 VARCHAR2 10
+       , S."CustNo"               AS "CustNo" -- 戶號 Decimal 7
        , S."FacmNo"               AS "FacmNo" -- 額度號碼 Decimal 3
        , S."DataMonth"            AS "DataMonth" -- 資料年月 Decimal 6
        , S."AvgLineAmt"           AS "AvgLineAmt" -- 平均核准額度 Decimal 15

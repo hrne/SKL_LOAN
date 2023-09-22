@@ -1,8 +1,6 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -27,7 +25,12 @@ import com.st1.itx.Exception.LogicException;
 public class CustMain implements Serializable {
 
 
-  // 客戶識別碼
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5416128737194562539L;
+
+// 客戶識別碼
   @Id
   @Column(name = "`CustUKey`", length = 32)
   private String custUKey = " ";
