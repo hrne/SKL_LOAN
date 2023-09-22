@@ -393,7 +393,7 @@ public class L9701Report extends MakeReport {
 		this.print(0, 14, tL9701Vo.get("RepayItem"));
 
 		// 交易內容
-		this.print(0, 26, tL9701Vo.get("Desc"), "C");
+		this.print(0, 22, tL9701Vo.get("Desc"), "L");
 		// 放款本金
 		if (!"0".equals(tL9701Vo.get("Amount"))) {
 			this.print(0, 43, formatAmt(tL9701Vo.get("Amount"), 0), "R");
@@ -452,7 +452,7 @@ public class L9701Report extends MakeReport {
 		// 只抓每個額度的最後一筆
 		for (Map<String, String> tL9701Vo : listL9701) {
 			if (facmNo.equals(tL9701Vo.get("FacmNo"))) {
-				excessive = getBigDecimal(tL9701Vo.get("OverShort"));
+				excessive = getBigDecimal(tL9701Vo.get("Excessive"));
 			}
 		}
 
@@ -464,7 +464,7 @@ public class L9701Report extends MakeReport {
 //		this.print(0, 72, formatAmt(excessive.subtract(shortFall), 0), "R"); // 累溢短收
 		this.print(0, 72, formatAmt(excessive, 0), "R"); // 累溢短收
 		this.print(0, 74, "小計：");
-		this.print(0, 93, formatAmt(principalTotal, 0), "R");
+		this.print(0, 92, formatAmt(principalTotal, 0), "R");
 		this.print(0, 103, formatAmt(interestTotal, 0), "R");
 		this.print(0, 116, formatAmt(breachAmtTotal, 0), "R");
 		this.print(0, 130, formatAmt(feeAmtTotal, 0), "R");

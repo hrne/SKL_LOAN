@@ -69,7 +69,7 @@ T(2,@RepayTypeHelp,#HelpDesc1)
 T(2,@ProcCodeHelp,#HelpDesc2)
 
 #FunctionHelp=x,30,S
-T(3,1:訂正;2:整批轉暫收)
+T(3,1:訂正;2:勾選入帳)
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 

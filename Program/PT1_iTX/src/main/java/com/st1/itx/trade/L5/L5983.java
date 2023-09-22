@@ -84,7 +84,7 @@ public class L5983 extends TradeBuffer {
 				.divide(parse.stringToBigDecimal("365"));
 		tempAmt = tNegMain.getPrincipalBal().add(intAmt).subtract(tNegMain.getAccuOverAmt());
 		BigDecimal revivAmt = tNegMain.getPrincipalBal().add(intAmt);
-		String revivAmtX = df.format(revivAmt) + "(本金：" + df.format(tNegMain.getPrincipalBal()) + "利息："
+		String revivAmtX = df.format(revivAmt) + "(本金：" + df.format(tNegMain.getPrincipalBal()) + "　利息："
 				+ df.format(intAmt) + ")";
 		this.totaVo.putParam("OCustId", iCustId);
 		this.totaVo.putParam("OCustNo", tNegMain.getCustNo());

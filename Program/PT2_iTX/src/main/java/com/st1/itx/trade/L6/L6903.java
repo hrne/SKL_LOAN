@@ -8,21 +8,14 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.AcMain;
-import com.st1.itx.db.domain.CdAcCode;
-import com.st1.itx.db.domain.CdAcCodeId;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.TxTranCode;
-import com.st1.itx.db.service.AcDetailService;
-import com.st1.itx.db.service.AcMainService;
-import com.st1.itx.db.service.CdAcCodeService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.TxTranCodeService;
 import com.st1.itx.db.service.springjpa.cm.L6903ServiceImpl;
@@ -30,10 +23,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita AcBookCode=X,3 BranchNo=X,4 CurrencyCode=X,3 AcNoCode=X,8 AcSubCode=X,5
- * AcDtlCode=X,2 AcDateSt=9,7 AcDateEd=9,7 END=X,1
- */
+
 
 @Service("L6903") // 會計帳務明細查詢
 @Scope("prototype")
@@ -48,13 +38,7 @@ public class L6903 extends TradeBuffer {
 
 	/* DB服務注入 */
 	@Autowired
-	public AcDetailService sAcDetailService;
-	@Autowired
-	public AcMainService sAcMainService;
-	@Autowired
 	public TxTranCodeService sTxTranCodeService;
-	@Autowired
-	public CdAcCodeService sCdAcCodeService;
 	@Autowired
 	public CdEmpService cdEmpService;;
 	@Autowired
@@ -101,39 +85,6 @@ public class L6903 extends TradeBuffer {
 		
 		
 
-		// 查詢會計科子細目設定檔
-		if (!(iAcNoCode.isEmpty())) {
-			CdAcCode tCdAcCode = sCdAcCodeService.findById(new CdAcCodeId(iAcNoCode, iAcSubCode, iAcDtlCode), titaVo);
-			if (tCdAcCode == null) {
-				throw new LogicException(titaVo, "E0001", "會計科子細目設定檔"); // 查無資料
-			}
-			classcode = tCdAcCode.getClassCode(); // 1:下編子細目
-		} else {
-			classcode = 2;
-		}
-
-		// 查詢會計總帳檔
-		Slice<AcMain> slAcMain;
-		if (classcode == 1) {
-			slAcMain = sAcMainService.acmainAcBookCodeRange2(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo,
-					iCurrencyCode, iAcNoCode, iAcSubCode, iFAcDateSt, iFAcDateEd, 0, Integer.MAX_VALUE, titaVo);
-		} else if (classcode == 2) {
-			slAcMain = sAcMainService.acmainAcBookCodeRange3(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo,
-					iCurrencyCode, iFAcDateSt, iFAcDateEd, 0, Integer.MAX_VALUE, titaVo);
-		} else {
-
-			slAcMain = sAcMainService.acmainAcBookCodeRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo,
-					iCurrencyCode, iAcNoCode, iAcSubCode, iAcDtlCode, iFAcDateSt, iFAcDateEd, 0, Integer.MAX_VALUE,
-					titaVo);
-		}
-
-		if (slAcMain != null) {
-			for (AcMain tAcMain : slAcMain.getContent()) {
-				wkBal = wkBal.add(tAcMain.getYdBal());
-				wkDb = wkDb.add(tAcMain.getDbAmt());
-				wkCr = wkCr.add(tAcMain.getCrAmt());
-			}
-		}
 
 		List<Map<String, String>> dList = null;
 		
@@ -183,11 +134,9 @@ public class L6903 extends TradeBuffer {
 			if ("D".equals(d.get("DbCr"))) {
 				occursList.putParam("OODbAmt", d.get("TxAmt"));
 				occursList.putParam("OOCrAmt", 0);
-//				iwkDb = iwkDb.add(parse.stringToBigDecimal(d.get("TxAmt")));
 			} else {
 				occursList.putParam("OODbAmt", 0);
 				occursList.putParam("OOCrAmt", d.get("TxAmt"));
-//				iwkCr = iwkCr.add(parse.stringToBigDecimal(d.get("TxAmt")));
 			}
 			String Odate = parse.stringToStringDateTime(d.get("CreateDate"));
 
@@ -222,14 +171,8 @@ public class L6903 extends TradeBuffer {
 
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
-//			if (cut == dList.size()) {
-//				this.totaVo.putParam("ODbAmt", iwkDb);
-//				this.totaVo.putParam("OCrAmt", iwkCr);
-//			}
 		}
 
-//		this.totaVo.putParam("ODbAmt", wkDb);
-//		this.totaVo.putParam("OCrAmt", wkCr);
 
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 		if (dList != null && dList.size() >= this.limit) {

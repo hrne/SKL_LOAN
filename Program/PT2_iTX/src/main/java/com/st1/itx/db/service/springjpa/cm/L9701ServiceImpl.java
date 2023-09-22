@@ -99,6 +99,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        T.\"FeeAmt\" AS \"FeeAmt\",";
 		sql += "        T.\"Overflow\",";
 		sql += "        T.\"ShortAmt\",";
+		sql += "        T.\"Excessive\" / T.\"ExcessiveCount\" AS \"Excessive\",";
 		sql += "        T.\"OverShort\",";
 		sql += "        T.\"DB\",";
 		sql += "        \"Fn_ParseEOL\"( C.\"CustName\",";
@@ -160,9 +161,9 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                        WHEN (T.\"UnpaidPrincipal\" + T.\"UnpaidInterest\" + T.\"UnpaidCloseBreach\") > 0 THEN";
 		sql += "                            CASE";
 		sql += "                                WHEN T.\"TitaHCode\" IN( 2, 4 ) THEN";
-		sql += "                                    (T.\"UnpaidPrincipal\" + T.\"UnpaidInterest\" + T.\"UnpaidCloseBreach\")";
+		sql += "                                   - (T.\"UnpaidPrincipal\" + T.\"UnpaidInterest\" + T.\"UnpaidCloseBreach\")";
 		sql += "                                ELSE";
-		sql += "                                  - (T.\"UnpaidPrincipal\" + T.\"UnpaidInterest\" + T.\"UnpaidCloseBreach\")";
+		sql += "                                    (T.\"UnpaidPrincipal\" + T.\"UnpaidInterest\" + T.\"UnpaidCloseBreach\")";
 		sql += "                            END";
 		sql += "                        ELSE";
 		sql += "                            0";
@@ -180,6 +181,8 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                            0";
 		sql += "                    END )                                                  AS \"Overflow\",";
 		sql += "                SUM(T.\"Overflow\" - (T.\"UnpaidPrincipal\" + T.\"UnpaidInterest\" + T.\"UnpaidCloseBreach\"))   AS \"OverShort\",";
+		sql += "            	SUM(NVL(JSON_VALUE(T.\"OtherFields\", '$.Excessive'),0)) AS \"Excessive\", ";
+		sql += "            	COUNT(NVL(JSON_VALUE(T.\"OtherFields\", '$.Excessive'),0)) AS \"ExcessiveCount\", ";
 		sql += "                T.\"Desc\",";
 		sql += "                T.\"TxDescCode\",";
 		sql += "                T.\"AcctCode\",";

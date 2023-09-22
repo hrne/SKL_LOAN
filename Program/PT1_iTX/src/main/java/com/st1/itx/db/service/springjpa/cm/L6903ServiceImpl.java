@@ -50,20 +50,27 @@ public class L6903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String iAcSubCode = titaVo.getParam("AcSubCode").trim();
 		String iAcDtlCode = titaVo.getParam("AcDtlCode").trim();
 		int iCustNo = this.parse.stringToInteger(titaVo.getParam("CustNo"));
+		int iEntAc = this.parse.stringToInteger(titaVo.getParam("EntAc"));
 		String iMediaSlipNo = titaVo.getParam("MediaSlipNo").trim();
 		String iRvNo = titaVo.getParam("RvNo").trim();
 		int iAcDateS = this.parse.stringToInteger(titaVo.getParam("AcDateSt")) + 19110000;
 		int iAcDateE = this.parse.stringToInteger(titaVo.getParam("AcDateEd")) + 19110000;
 
-		String sql = "SELECT A.*,B.\"TranItem\" AS \"TranItem\" , C.\"Fullname\" as \"TlrName\" , D.\"Fullname\" as \"SupName\" , E.\"AcNoItem\" AS \"AcNoItem\" ";
+		String sql = "SELECT   ";
+		sql += " A.*, ";
+		sql += "  B.\"TranItem\" AS \"TranItem\" , ";
+		sql += "  C.\"Fullname\" as \"TlrName\" , ";
+		sql += "  D.\"Fullname\" as \"SupName\" , ";
+		sql += " E.\\\"AcNoItem\\\" AS \\\"AcNoItem\\\" ";
 		sql += " FROM \"AcDetail\" A ";
 		sql += " LEFT JOIN \"TxTranCode\" B on B.\"TranNo\"= A.\"TitaTxCd\" ";
 		sql += " LEFT JOIN \"CdEmp\" C on C.\"EmployeeNo\"= A.\"TitaTlrNo\" ";
 		sql += " LEFT JOIN \"CdEmp\" D on D.\"EmployeeNo\"= A.\"TitaSupNo\" ";
 		sql += " LEFT JOIN \"CdAcCode\" E on E.\"AcNoCode\"= A.\"AcNoCode\" and E.\"AcSubCode\"= A.\"AcSubCode\" and E.\"AcDtlCode\"= a.\"AcDtlCode\" ";
 		sql += " WHERE A.\"AcDate\" BETWEEN :AcDateS AND :AcDateE ";
-		sql += " AND A.\"EntAc\" > 0 ";
-
+		if (iEntAc != 99) {
+			sql += " AND A.\"EntAc\" = :entAc ";
+		}
 		if (!iAcBookCode.isEmpty()) {
 			sql += "AND A.\"AcBookCode\" = :AcBookCode ";
 		}
@@ -113,7 +120,9 @@ public class L6903ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		query.setParameter("AcDateS", iAcDateS);
 		query.setParameter("AcDateE", iAcDateE);
-
+		if (iEntAc != 99) {
+			query.setParameter("entAc", iEntAc);
+		}
 		if (!iAcBookCode.isEmpty()) {
 			query.setParameter("AcBookCode", iAcBookCode);
 		}
@@ -174,14 +183,13 @@ public class L6903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String iRvNo = titaVo.getParam("RvNo").trim();
 		int iAcDateS = this.parse.stringToInteger(titaVo.getParam("AcDateSt")) + 19110000;
 		int iAcDateE = this.parse.stringToInteger(titaVo.getParam("AcDateEd")) + 19110000;
-		this.info("AcBookCode   ="+iAcBookCode);
-		this.info("CurrencyCode ="+iCurrencyCode);
-		this.info("BranchNo     ="+iBranchNo);
-		this.info("acdates      ="+iAcDateS);
-		this.info("acdatee      ="+iAcDateE);
+		this.info("AcBookCode   =" + iAcBookCode);
+		this.info("CurrencyCode =" + iCurrencyCode);
+		this.info("BranchNo     =" + iBranchNo);
+		this.info("acdates      =" + iAcDateS);
+		this.info("acdatee      =" + iAcDateE);
 
-
-		String sql = "SELECT  sum(a.\"TxAmt\") AS \"TxAmt\", ";  
+		String sql = "SELECT  sum(a.\"TxAmt\") AS \"TxAmt\", ";
 		sql += "                  a.\"DbCr\"   AS  \"DbCr\" ";
 		sql += " FROM \"AcDetail\" A ";
 		sql += " LEFT JOIN \"TxTranCode\" B on B.\"TranNo\"= A.\"TitaTxCd\" ";
@@ -224,11 +232,7 @@ public class L6903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "GROUP BY A.\"DbCr\" ";
 //		sql += "ORDER BY A.\"AcDate\" ASC ";
 
-
-
 		this.info("FindL6903Amt sql=" + sql);
-		
-
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
@@ -268,7 +272,6 @@ public class L6903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		this.info("L6903Service FindData=" + query);
-
 
 		return this.convertToMap(query);
 	}

@@ -49,8 +49,6 @@ public class L4212Report extends MakeReport {
 
 	private int acdate = 0;
 	private String BatchNo = "";
-	private String RepayCode = "";
-	private String RepayCodeX = "";
 
 	private String AcctCode = "";
 	private String AcctCodeX = "";
@@ -61,7 +59,6 @@ public class L4212Report extends MakeReport {
 //	每頁筆數
 	private int pageIndex = 40;
 
-	private List<CdCode> lCdCode = null;
 	private List<CdCode> lCdCode2 = null;
 
 	@Override
@@ -113,15 +110,8 @@ public class L4212Report extends MakeReport {
 //		this.print(-6, 18,"流程別：" + ProcCode);
 		this.print(-6, 32, "部室別：");
 
-		for (CdCode tCdCode : lCdCode) {
-			if (RepayCode.equals(tCdCode.getCode())) {
-				RepayCodeX = tCdCode.getItem();
-			}
-		}
-		this.print(-7, 2, "扣款代碼：" + RepayCode + " " + RepayCodeX);
-
 		for (CdCode tCdCode : lCdCode2) {
-			if (AcctCode.equals(tCdCode.getCode())) {
+			if (AcctCode != null && AcctCode.equals(tCdCode.getCode())) {
 				AcctCodeX = tCdCode.getItem();
 			}
 		}
@@ -152,10 +142,6 @@ public class L4212Report extends MakeReport {
 
 //		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4520", "員工扣薪總傳票明細表", "", "A4", "L");
 
-		Slice<CdCode> slCdCode = sCdCodeDefService.defItemEq("PerfRepayCode", "%", this.index, this.limit, titaVo);
-
-		lCdCode = slCdCode == null ? null : slCdCode.getContent();
-
 		Slice<CdCode> slCdCode2 = sCdCodeDefService.defItemEq("AcctCode", "%", this.index, this.limit, titaVo);
 
 		lCdCode2 = slCdCode2 == null ? null : slCdCode2.getContent();
@@ -178,7 +164,6 @@ public class L4212Report extends MakeReport {
 //			1.每筆先印出明細
 				i = j - 1;
 				BatchNo = fnAllList.get(i).get("BaTxNo");
-				RepayCode = fnAllList.get(i).get("RepayCode");
 				AcctCode = fnAllList.get(i).get("AcctCode");
 				this.print(1, 1,
 						"                                                                                                                                                                               ");
@@ -243,16 +228,13 @@ public class L4212Report extends MakeReport {
 				if (j != fnAllList.size()) {
 					// 批號 或 扣款代碼 或 流程別 或 科目 不同
 					if (!fnAllList.get(i).get("BaTxNo").equals(fnAllList.get(j).get("BaTxNo"))
-							|| !fnAllList.get(i).get("RepayCode").equals(fnAllList.get(j).get("RepayCode"))
-							|| !fnAllList.get(i).get("AcctCode").equals(fnAllList.get(j).get("AcctCode"))
-							|| !fnAllList.get(i).get("ProcCode").equals(fnAllList.get(j).get("ProcCode"))) {
+							|| !fnAllList.get(i).get("AcctCode").equals(fnAllList.get(j).get("AcctCode"))) {
 						this.info("BatchNo or RepayCode or AcctCode or ProcCode Not Match...");
 
 //					扣除合計的行數
 						this.print(pageIndex - pageCnt - 2, 80, "=====續下頁=====", "C");
 						pageCnt = 0;
 						BatchNo = fnAllList.get(j).get("BaTxNo");
-						RepayCode = fnAllList.get(j).get("RepayCode");
 						AcctCode = fnAllList.get(j).get("AcctCode");
 						this.newPage();
 						continue;

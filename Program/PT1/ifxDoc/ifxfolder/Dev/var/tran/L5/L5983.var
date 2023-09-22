@@ -46,9 +46,6 @@ K(MODIFYBUTTON,試算)
 ["[L5983]                                 結 清 試 算                                 "],
 ["@*@身分證字號",#CustId],
 ["@*@入帳日期",#EntryDate],
-["@*@顯示方式",
-<include src="COM.icf::RPTFG.scr"/>
-],
 ]
 
 !---------- AP TEXT AREA Variables ----------
@@ -83,8 +80,8 @@ E(0,@CaseSeq,#L5r51CaseSeq)
 C(3,#EntryDate,0,E(0,#SYSDATE),$)
 @V(7)V(5,#SYSDATE,9991231)
 
+#RPTFG=A,1,S
 
-<include src="COM.icf::RPTFG.dec"/>
 <include src="ROM.icf::L5R51.dec"/>
 </sub>
 
@@ -101,7 +98,7 @@ C(3,#EntryDate,0,E(0,#SYSDATE),$)
 !C(5,#TXFORM,L5983,$,S)
 
 #SCRTIL=_,_,S
-T(3,[L5983] 貸款試算)
+T(3,[L5983] 結清試算)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
@@ -111,7 +108,7 @@ T(3,[L5983] 貸款試算)
 #OPrincipalBal=m,14,L
 #OAccuOverAmt=m,14,L
 #ODueAmt=m,14,L
-#OIntRate=N,2.4,L
+#OIntRate=N,2.2,L
 #OEntryDate=D,7,L
 #OIsMainFin=X,1,L
 #OTempAmt=m,14,L
@@ -172,7 +169,7 @@ TXFORM=L5983
 [#<->#,"身分證字號",#OCustId],
 ["戶號",#OCustNo],["案件序號",#OCaseSeq],
 ["總本金餘額",#OPrincipalBal],["累溢收金額",#OAccuOverAmt],
-["期款",#ODueAmt],["利率",#OIntRate],
+["期款",#ODueAmt],["利率",#OIntRate,"%"],
 ["入帳日期",#OEntryDate],["是否為最大債權銀行",#OIsMainFin],
 ["暫收抵繳",#OTempAmt],["溢收抵繳",#OAccuOverAmt],
 [#<->#,"應還金額",#ORevivAmtX],
@@ -183,7 +180,7 @@ TXFORM=L5983
 <sub type="SELECT">
 
 #RPTFG=0,QUERY.GRID,L5983
-#any={header:'L5983.part',caption:'[L5983] 結清試算',shrinkToFit:'false',width:1030,rowNum:12, rowList:[12,36,60]}
+#any={header:'L5983.part',caption:'債權分攤機構',shrinkToFit:'false',width:1030,rowNum:12, rowList:[12,36,60]}
 
 #OOFinCode=債權機構
 {width:90,align:'center'}
