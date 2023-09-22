@@ -477,15 +477,8 @@ public class LM051Report extends MakeReport {
 			MonthlyLM052Loss insMonthlyLM052Loss = new MonthlyLM052Loss();
 
 			insMonthlyLM052Loss.setYearMonth(yearMonth);
-			insMonthlyLM052Loss.setApprovedLoss(lossTotal);
-			insMonthlyLM052Loss.setAssetEvaTotal(assetClassTotal);
 			insMonthlyLM052Loss.setLegalLoss(lossTotal);
-			insMonthlyLM052Loss.setCreateDate(
-					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-			insMonthlyLM052Loss.setCreateEmpNo("999999");
-			insMonthlyLM052Loss.setLastUpdate(
-					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-			insMonthlyLM052Loss.setLastUpdateEmpNo("999999");
+
 
 			try {
 
@@ -496,24 +489,7 @@ public class LM051Report extends MakeReport {
 			}
 		} else {
 
-			// 如果不等於0就不用更新
-			if (fMonthlyLM052Loss.getLegalLoss().compareTo(BigDecimal.ZERO) != 0) {
-				this.info("no update");
-				return;
-			}
-
-			this.info("update data");
-
-			fMonthlyLM052Loss.setApprovedLoss(fMonthlyLM052Loss.getApprovedLoss());
-			fMonthlyLM052Loss.setAssetEvaTotal(assetClassTotal);
 			fMonthlyLM052Loss.setLegalLoss(lossTotal);
-
-			fMonthlyLM052Loss.setCreateDate(
-					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-			fMonthlyLM052Loss.setCreateEmpNo("999999");
-			fMonthlyLM052Loss.setLastUpdate(
-					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-			fMonthlyLM052Loss.setLastUpdateEmpNo("999999");
 
 			try {
 

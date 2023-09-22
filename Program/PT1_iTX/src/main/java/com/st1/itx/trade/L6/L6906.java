@@ -70,7 +70,7 @@ public class L6906 extends TradeBuffer {
 		String iTitaTlrNo = titaVo.getParam("TitaTlrNo");
 		String iTitaBatchNo = titaVo.getParam("TitaBatchNo");
 		String iTitaTxCd = titaVo.getParam("TitaTxCd");
-		String iRelTxseq = titaVo.getParam("RelTxseq");
+		int iTitaTxtNo = parse.stringToInteger(titaVo.getParam("TitaTxtNo"));
 		String iTlrItem = "";
 		String iTranItem = "";
 
@@ -113,9 +113,18 @@ public class L6906 extends TradeBuffer {
 		List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 
 		for (AcDetail s : slAcDetail) {
-			if (s.getEntAc() == 1) {
+			if (iTitaTxtNo > 0) {
 				lAcDetail.add(s);
+			} else if (!iTitaBatchNo.isEmpty() || !iTitaTxCd.isEmpty()) {
+				if (s.getEntAc() > 0) {
+					lAcDetail.add(s);
+				}
+			} else {
+				if (s.getEntAc() == 1) {
+					lAcDetail.add(s);
+				}
 			}
+
 		}
 
 		// 排序依 交易序號 戶號 由小到大
@@ -143,15 +152,14 @@ public class L6906 extends TradeBuffer {
 
 		for (AcDetail tAcDetail : lAcDetail) {
 
-			this.info("L6906 RelTxseq : " + iRelTxseq);
+			this.info("L6906 TitaTxtNo : " + iTitaTxtNo);
 
-			// 登放序號有輸入時只查詢登放序號的資料
-			if (!(iRelTxseq.isEmpty()) && !(iRelTxseq.equals(tAcDetail.getRelTxseq()))) {
+			// 交易序號有輸入時只查詢同交易序號的資料
+			if (iTitaTxtNo > 0 && iTitaTxtNo != tAcDetail.getTitaTxtNo()) {
 				continue;
 			}
 
 			OccursList occursList = new OccursList();
-			occursList.putParam("OORelTxseq", tAcDetail.getRelTxseq());
 			occursList.putParam("OOCustNo", tAcDetail.getCustNo());
 			occursList.putParam("OOFacmNo", tAcDetail.getFacmNo());
 			occursList.putParam("OOBormNo", tAcDetail.getBormNo());
@@ -169,6 +177,7 @@ public class L6906 extends TradeBuffer {
 			iTlrItem = inqCdEmp(tAcDetail.getTitaTlrNo(), iTlrItem, titaVo);
 			occursList.putParam("OOTlrItem", iTlrItem);
 			occursList.putParam("OOTitaTlrNo", tAcDetail.getTitaTlrNo());
+			occursList.putParam("OOTitaTxtNo", tAcDetail.getTitaTxtNo());
 
 			iTlrItem = "";
 			iTlrItem = inqCdEmp(tAcDetail.getTitaSupNo(), iTlrItem, titaVo);

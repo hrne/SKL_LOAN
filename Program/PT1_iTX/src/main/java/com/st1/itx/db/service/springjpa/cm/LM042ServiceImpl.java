@@ -131,6 +131,7 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " FROM \"CoreAcMain\"";
 		sql += " WHERE \"AcNoCode\" IN ( '10600304000' ) "; // 擔保放款-折溢價
 		sql += "   AND \"AcDate\" = TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR( :yymm*100+1), 'YYYYMMDD')),'YYYYMMDD')) ";
+		sql += "   AND \"CurrencyCode\" = 'NTD' ";
 		sql += " GROUP BY 'tDisPreRemFees'";
 		// 催收款項
 		sql += " UNION ";
@@ -141,6 +142,7 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "						,'10601302000' ";// 催收款項-火險費用
 		sql += "						,'10601304000') ";// 催收款項-折溢價
 		sql += "   AND \"AcDate\" = TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR( :yymm*100+1), 'YYYYMMDD')),'YYYYMMDD')) ";
+		sql += "   AND \"CurrencyCode\" = 'NTD' ";
 		sql += " GROUP BY 'oDisPreRemFees'";
 		// 備抵呆帳
 		sql += " UNION ";
@@ -150,6 +152,7 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WHERE \"AcNoCode\" IN ( '10620300000' "; // 備抵損失-擔保放款
 		sql += "						,'10604') ";// 催收款項-擔保放款
 		sql += "   AND \"AcDate\" = TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR( :yymm*100+1), 'YYYYMMDD')),'YYYYMMDD')) ";
+		sql += "   AND \"CurrencyCode\" = 'NTD' ";
 		// 應收利息
 		sql += " UNION ";
 		sql += " SELECT 'IntRecv' AS \"Item\" ";
@@ -157,6 +160,7 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " FROM \"MonthlyLoanBal\" ";
 		sql += " WHERE \"LoanBalance\" > 0 ";
 		sql += "   AND \"YearMonth\" = :yymm ";
+		sql += "   AND \"CurrencyCode\" = 'NTD' ";
 		// 專案貸款
 		sql += " UNION ";
 		sql += " SELECT 'ProLoan' AS \"Item\" ";

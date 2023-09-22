@@ -78,6 +78,7 @@ public class L5983 extends TradeBuffer {
 		} else {
 			diffdd = negCom.diffday(iEntryDate, lastPayIntDate);// 利息倒扣區間:本次繳款日~上次繳息止日
 		}
+		this.info("diffdd = " + diffdd);
 		BigDecimal intAmt = tNegMain.getPrincipalBal().multiply(tNegMain.getIntRate())
 				.divide(parse.stringToBigDecimal("100")).multiply(parse.stringToBigDecimal("" + diffdd))
 				.divide(parse.stringToBigDecimal("365"));

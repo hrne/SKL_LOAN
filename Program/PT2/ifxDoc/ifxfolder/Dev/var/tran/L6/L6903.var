@@ -50,6 +50,7 @@ E(0,0)
 ["#FdMediaSlipNo+總帳傳票號碼",#MediaSlipNo],
 ["#FdRvNo+銷帳碼",#RvNo],
 ["#FdAcDate+會計日期",#AcDateSt,"~",#AcDateEd],
+["#FdEntAc+入總帳記號",#EntAc,#EntAcX],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -65,13 +66,13 @@ K(MODIFYBUTTON,查詢)
 T(4,CHAIN$)
 T(2,@RimTxCode,#TXCD)
 
+
+#EntAcHelp=x,1024,S
+T(3,0:不入總帳;1:入總帳;9:全部)
+
 !從L9742帶值進來並自動查詢
 #NTXBUF=X,100,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
-! E(0,@CustNo,0)
-! E(0,@AcDateSt,#SYSDATE)
-! E(0,@AcDateEd,#SYSDATE)
-!XMT()
 
 #CHAIN_AcBookCode=X,3,S
 T(1,#NTXBUF,1,3)
@@ -110,6 +111,8 @@ C(3,#CHAIN,1,T(2,@AcDateEd,#CHAIN_AcDate),)
 #FdRvNo=X,2,L
 #FdAcDate=X,2,L
 C(3,#CHAIN,1,T(3, ),T(3,*))
+#FdEntAc=X,2,L
+T(3,*)
 
 
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
@@ -223,6 +226,17 @@ T(2,#DT_MONTH+#DT_01)
 C(3,#CHAIN,1,s,$)
 T(2,#DT)
 @V(7)A(4,0,#AcDateEd)V(5,#AcDateSt,#DT)
+
+#EntAc=A,1,I
+C(4,#EntAc,E(0,1),$)
+HELP(#EntAcHelp)
+@V(H,#EntAcHelp)
+
+#EntAcX=X,10,L
+T(H,#EntAc,#EntAcHelp)=
+
+
+
 
 #RPTFG=A,1,S
 E(0,0)
@@ -342,6 +356,7 @@ T(2,#OOTitaTxtNo)
 T(2,#OOLastEmp+ +#OOLastEmpName)
 #OOSlipBatNo=A,2,S
 #OOSlipSumNo=A,2,S
+#OOEntAc=A,1,S
 #OOMediaSlipNo=X,12,S
 #OORvNo=X,30,S
 
@@ -365,6 +380,7 @@ T(2,#OOLastEmp+ +#OOLastEmpName)
 #RvNo
 #AcDateSt
 #AcDateEd
+#EntAc
 #END
 </sub>
 
@@ -402,6 +418,7 @@ TXFORM=L6903
 #OOLastUpdate
 #OOSlipBatNo
 #OOSlipSumNo
+#OOEntAc
 #OOMediaSlipNo
 #OORvNo
 #OOAcDate
@@ -445,6 +462,8 @@ TXFORM=L6903
 #OOSlipBatNo=傳票批號
 {width:80,align:'center'}
 #OOSlipSumNo=彙總批號
+{width:80,align:'center'}
+#OOEntAc=入總帳記號
 {width:80,align:'center'}
 #OOMediaSlipNo=總帳傳票號碼
 {width:80,align:'center'}

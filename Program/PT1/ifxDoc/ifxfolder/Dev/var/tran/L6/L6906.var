@@ -48,7 +48,7 @@ E(0,0)
 ["#FdTitaTlrNo+．經辦",#TitaTlrNo],
 ["#FdTitaBatchNo+．整批批號",#TitaBatchNo],
 ["#FdTitaTxCd+．交易代號",#TitaTxCd,],
-["#FdRelSeqNo+登放序號",#RelTlrNo,"-",#RelSeqNo]
+["#FdTitaTxtNo+交易序號",#TitaTxtNo]
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -90,7 +90,7 @@ C(3,#CHAIN,1,T(2,@RelSeqNo,#CHAIN_RelSeqNo),)
 #FdCustNo=X,2,L
 #FdTitaTlrNo=X,2,L
 #FdTitaBatchNo=X,2,L
-#FdRelSeqNo=X,2,L
+#FdTitaTxtNo=X,2,L
 #FdTitaTxCd=X,2,L
 
 
@@ -173,16 +173,9 @@ C(4,#TitaTxCd,V(P,需擇一輸入查詢條件),$)
 !C(3,#TitaTxCd,0,INVOKEJS(SHOW,p1,6,6,0),)
 
 
-!登放序號
-#RelTlrNo=X,6,I
-C(3,#CHAIN,1,s,$)
-
-#RelSeqNo=A,8,I
-C(3,#CHAIN,1,s,$)
-
-#RelTxseq=X,18,S
-C(1,#RelSeqNo,S,S,$)
-T(2,#BranchNo+#RelTlrNo+#RelSeqNo)  
+!交易序號
+#TitaTxtNo=A,8,I
+C(4,#TitaTlrNo,S,$)
 
 #SendXmt=X,1,S
 C(3,#CHAIN,1,XMT(),$)
@@ -207,9 +200,6 @@ T(3,[L6906] 會計分錄)
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 #LOOP=X,1,S
 T(3,1)ASGN(LOOP$)
-
-!交易序號
-#OORelTxseq=X,18,S
 
 
 !戶號
@@ -264,6 +254,8 @@ T(2,#OOTitaTxCd+ +#OOTranItem)
 #OOTlrItem=X,20,S
 #OOTitaTlrNoX=X,27,S
 T(2,#OOTitaTlrNo+ +#OOTlrItem)
+!交易序號
+#OOTitaTxtNo=A,8,S
 
 !主管
 #OOTitaSupNo=X,6,S
@@ -274,9 +266,10 @@ T(2,#OOTitaSupNo+ +#OOSupItem)
 ! 最後修改日期
 #OOLastUpdate=x,20,S
 
+
 !分錄清單
 #OOBUF5=X,32,S
-T(2,#AcDate+0000000+#OORelTxseq)
+T(2,#AcDate+0000000+0000+#OOTitaTlrNo+#OOTitaTxtNo)
 
 #OOBTN5=X,4,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L6901;text=分錄清單;ntxbuf=#OOBUF5})
@@ -293,7 +286,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L6901;text=分錄清單;ntxbuf=#OOBUF5})
 #TitaTlrNo
 #TitaBatchNo
 #TitaTxCd
-#RelTxseq
+#TitaTxtNo
 #END
 </sub>
 
@@ -302,7 +295,6 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L6901;text=分錄清單;ntxbuf=#OOBUF5})
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
 TXFORM=L6906
-#OORelTxseq
 #OOCustNo
 #OOFacmNo
 #OOBormNo
@@ -317,6 +309,7 @@ TXFORM=L6906
 #OOTitaTxCd
 #OOTranItem
 #OOTitaTlrNo
+#OOTitaTxtNo
 #OOTlrItem
 #OOTitaSupNo
 #OOSupItem
@@ -342,8 +335,6 @@ TXFORM=L6906
 #OOBTN5=分錄清單
 {width:90,search:false,formatter:'cust:bind-button:分錄清單',align:'center',canExport:false}
 
-#OORelTxseq=交易序號
-{width:150,align:'left'}
 #OOCustNoX=戶號
 {width:120,align:'left'}
 #OOAcNoCode=科目
@@ -365,6 +356,8 @@ TXFORM=L6906
 #OOTitaTxCdX=交易代號
 {width:160,align:'center'}
 #OOTitaTlrNoX=經辦
+{width:100,align:'center'}
+#OOTitaTxtNo=交易序號
 {width:100,align:'center'}
 #OOTitaSupNoX=主管
 {width:100,align:'center'}

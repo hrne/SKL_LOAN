@@ -140,28 +140,28 @@ TXFORM=L6995
 #any={detail:true, header:'L6064.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
 
-#OOStockCode=代碼檔代碼
+#OOStockCode=股票代號
 {width:150,align:'left'}
 
-#OOStockItem=代碼檔代碼
+#OOStockItem=股票簡稱
 {width:150,align:'left'}
 
-#OOStockCompanyName=代碼檔代碼
+#OOStockCompanyName=股票公司名稱
 {width:150,align:'left'}
 
-#OOCurrency=代碼檔代碼
+#OOCurrency=幣別
 {width:150,align:'left'}
 
-#OOYdClosePrice=代碼檔代碼
+#OOYdClosePrice=前日收盤價
 {width:150,align:'left'}
 
-#OOMonthlyAvg=代碼檔代碼
+#OOMonthlyAvg=一個月平均價
 {width:150,align:'left'}
 
-#OOThreeMonthAvg=代碼檔代碼
+#OOThreeMonthAvg=三個月平均價
 {width:150,align:'left'}
 
-#OOStockType=代碼檔代碼
+#OOStockType=上市上櫃記號
 {width:150,align:'left'}
 
 

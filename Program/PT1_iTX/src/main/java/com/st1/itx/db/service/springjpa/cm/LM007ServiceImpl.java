@@ -46,7 +46,7 @@ public class LM007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      FROM(SELECT A.\"AcSubBookCode\" AS F0";
 		sql += "                 ,MOD(TRUNC(A.\"AcDate\" / 100), 100) AS \"AcMonth\"";
 		sql += "                 ,DECODE (L.\"Status\", 5, '990', F.\"AcctCode\") AS \"AcctCode\"";
-		sql += "                 ,DECODE (C.\"EntCode\", '1', 1, 0) AS \"EntCode\"";
+		sql += "                 ,C.\"EntCode\"";
 		sql += "                 ,DECODE (A.\"DbCr\", 'C', A.\"TxAmt\", -A.\"TxAmt\") AS \"TxAmt\"";
 		sql += "           FROM \"AcDetail\" A";
 		sql += "           LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = A.\"CustNo\"";
