@@ -785,7 +785,7 @@ public class AcRepayCom extends TradeBuffer {
 			// 收付欄對帳費別 ex.匯款轉帳 A1~A6， 銀行扣款:扣款銀行代號
 			if (titaVo.get("RpAcctCode1") != null) {
 				TempVo acTempVo = new TempVo();
-				acTempVo = acTempVo.getVo(tx.getOtherFields());
+				acTempVo = acTempVo.getVo(ac.getJsonFields());
 				acTempVo.putParam("ReconCode", titaVo.get("RpAcctCode1").trim());
 				ac.setJsonFields(acTempVo.getJsonString());
 			}

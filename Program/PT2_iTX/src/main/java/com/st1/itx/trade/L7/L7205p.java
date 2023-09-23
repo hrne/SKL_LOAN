@@ -797,10 +797,10 @@ public class L7205p extends TradeBuffer {
 			case 1:
 			case 2:
 				if ("Y".equals(m.getGovProjectFlag()) || "C".equals(m.getGovProjectFlag())) {
-					loanType = "C";
+					loanType = "G";
 					break;
 				} else {
-					loanType = "G";
+					loanType = "C";
 				}
 				break;
 			case 3:
@@ -954,11 +954,11 @@ public class L7205p extends TradeBuffer {
 						}
 						break;
 					case 1:
-						t.setOverdueAmount(t.getOverdueAmount().add(m.getPrinBalance()));
+						t.setObserveAmount(t.getObserveAmount().add(m.getPrinBalance()));
 						t.setLoanAmount1(t.getLoanAmount1().add(m.getPrinBalance()));
 						break;
 					case 2:
-						t.setOverdueAmount(t.getOverdueAmount().add(m.getPrinBalance()));
+						t.setObserveAmount(t.getObserveAmount().add(m.getPrinBalance()));
 						t.setLoanAmount2(t.getLoanAmount2().add(m.getPrinBalance()));
 						break;
 					case 3:
