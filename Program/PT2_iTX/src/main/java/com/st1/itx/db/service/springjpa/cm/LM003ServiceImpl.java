@@ -120,6 +120,7 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                        0";
 		sql += "                        , 3";
 		sql += "                    )";
+		sql += "                   AND Cm.\"EntCode\" = 0 ";
 		sql += "            )";
 		sql += "        GROUP BY";
 		sql += "            \"YearMonth\"";
@@ -230,8 +231,8 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    ), \"EOMBalanceByEntCode\" AS (";
 		sql += "        SELECT";
 		sql += "            mlb.\"YearMonth\"";
-		sql += "            , SUM(DECODE(mlb.\"EntCode\", 1, 0, mlb.\"LoanBalance\")) \"Ent0Amt\"";
-		sql += "            , SUM(DECODE(mlb.\"EntCode\", 1, mlb.\"LoanBalance\", 0)) \"Ent1Amt\"";
+		sql += "            , SUM(DECODE(mlb.\"EntCode\", 0, mlb.\"LoanBalance\", 0)) \"Ent0Amt\"";
+		sql += "            , SUM(DECODE(mlb.\"EntCode\", 0, 0, mlb.\"LoanBalance\")) \"Ent1Amt\"";
 		sql += "        FROM";
 		sql += "            \"MonthlyLoanBal\" mlb";
 		sql += "        WHERE";
@@ -243,7 +244,6 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                , '330'";
 		sql += "                , '340'";
 		sql += "            )";
-		sql += "            AND mlb.\"EntCode\" <> 2";
 		sql += "        GROUP BY";
 		sql += "            mlb.\"YearMonth\"";
 		sql += "    ), \"NaturalDrawdownAmtYearly\" AS (";

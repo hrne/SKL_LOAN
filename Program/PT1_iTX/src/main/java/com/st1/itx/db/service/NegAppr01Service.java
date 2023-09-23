@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.NegAppr01;
@@ -182,13 +184,16 @@ public interface NegAppr01Service {
   public Slice<NegAppr01> findExporFinCode(int exportDate_0, String finCode_1, int index, int limit, TitaVo... titaVo);
 
   /**
-   * BringUpDate&gt;= 
+   * ReplyCode &lt;&gt; , AND BringUpDate&gt;= 
    *
-   * @param bringUpDate_0 bringUpDate_0
+   * @param replyCode_0 replyCode_0
+   * @param bringUpDate_1 bringUpDate_1
+   * @param index Page Index
+   * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice NegAppr01 NegAppr01 of List
    */
-  public NegAppr01 bringUpDateFirst(int bringUpDate_0, TitaVo... titaVo);
+  public Slice<NegAppr01> findReplyCodeNotEq(String replyCode_0, int bringUpDate_1, int index, int limit, TitaVo... titaVo);
 
   /**
    * CustNo = , AND BringUpDate&gt;= 

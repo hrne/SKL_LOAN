@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -447,22 +450,31 @@ em = null;
   }
 
   @Override
-  public NegAppr01 bringUpDateFirst(int bringUpDate_0, TitaVo... titaVo) {
+  public Slice<NegAppr01> findReplyCodeNotEq(String replyCode_0, int bringUpDate_1, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
+    Slice<NegAppr01> slice = null;
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("bringUpDateFirst " + dbName + " : " + "bringUpDate_0 : " + bringUpDate_0);
-    Optional<NegAppr01> negAppr01T = null;
-    if (dbName.equals(ContentName.onDay))
-      negAppr01T = negAppr01ReposDay.findTopByBringUpDateGreaterThanEqualOrderByBringUpDateDesc(bringUpDate_0);
-    else if (dbName.equals(ContentName.onMon))
-      negAppr01T = negAppr01ReposMon.findTopByBringUpDateGreaterThanEqualOrderByBringUpDateDesc(bringUpDate_0);
-    else if (dbName.equals(ContentName.onHist))
-      negAppr01T = negAppr01ReposHist.findTopByBringUpDateGreaterThanEqualOrderByBringUpDateDesc(bringUpDate_0);
-    else 
-      negAppr01T = negAppr01Repos.findTopByBringUpDateGreaterThanEqualOrderByBringUpDateDesc(bringUpDate_0);
+     Pageable pageable = null;
 
-    return negAppr01T.isPresent() ? negAppr01T.get() : null;
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findReplyCodeNotEq " + dbName + " : " + "replyCode_0 : " + replyCode_0 + " bringUpDate_1 : " +  bringUpDate_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = negAppr01ReposDay.findAllByReplyCodeNotAndBringUpDateGreaterThanEqualOrderByBringUpDateDescFinCodeAsc(replyCode_0, bringUpDate_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = negAppr01ReposMon.findAllByReplyCodeNotAndBringUpDateGreaterThanEqualOrderByBringUpDateDescFinCodeAsc(replyCode_0, bringUpDate_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = negAppr01ReposHist.findAllByReplyCodeNotAndBringUpDateGreaterThanEqualOrderByBringUpDateDescFinCodeAsc(replyCode_0, bringUpDate_1, pageable);
+    else 
+      slice = negAppr01Repos.findAllByReplyCodeNotAndBringUpDateGreaterThanEqualOrderByBringUpDateDescFinCodeAsc(replyCode_0, bringUpDate_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
   }
 
   @Override

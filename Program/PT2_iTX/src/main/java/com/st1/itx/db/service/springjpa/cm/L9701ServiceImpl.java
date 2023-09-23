@@ -115,7 +115,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        (";
 		sql += "            SELECT";
 		sql += "                T.\"CustNo\",";
-		sql += "                DECODE(T.\"FacmNo\",0,NVL(IR.\"FacmNo\",NVL(AC.\"FacmNo\",FF.\"FacmNo\")),T.\"FacmNo\")  AS  \"FacmNo\",";
+		sql += "                MAX(DECODE(T.\"FacmNo\",0,NVL(IR.\"FacmNo\",NVL(AC.\"FacmNo\",FF.\"FacmNo\")),T.\"FacmNo\"))  AS  \"FacmNo\",";
 		sql += "                MAX(DECODE( T.\"EntryDate\", 0, T.\"AcDate\", T.\"EntryDate\" )) AS \"EntryDate\",";
 		sql += "                SUM(T.\"LoanBal\" + T.\"Principal\")                           AS \"Amount\",";
 		sql += "                T.\"IntStartDate\"                                           AS \"IntStartDate\",";
@@ -254,7 +254,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		sql += "            GROUP BY";
-		sql += "                T.\"CustNo\", DECODE(T.\"FacmNo\",0,NVL(IR.\"FacmNo\",NVL(AC.\"FacmNo\",FF.\"FacmNo\")),T.\"FacmNo\") , T.\"AcDate\", T.\"IntStartDate\", T.\"IntEndDate\", T.\"Rate\", T.\"Desc\", T.\"TxDescCode\", T.\"AcctCode\", T.\"TitaTlrNo\", T.\"TitaTxtNo\", T.\"TitaHCode\", T.\"RepayCode\"";
+		sql += "                T.\"CustNo\", T.\"AcDate\", T.\"IntStartDate\", T.\"IntEndDate\", T.\"Rate\", T.\"Desc\", T.\"TxDescCode\", T.\"AcctCode\", T.\"TitaTlrNo\", T.\"TitaTxtNo\", T.\"TitaHCode\", T.\"RepayCode\"";
 		sql += "        )            T";
 		sql += "        LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = T.\"CustNo\"";
 		sql += "        LEFT JOIN \"CdCode\" CC1 ON CC1.\"DefCode\" = 'AcctCode'";

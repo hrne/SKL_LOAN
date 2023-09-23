@@ -3,11 +3,14 @@ package com.st1.itx.db.repository.hist;
 
 import java.util.Optional;
 
+import java.math.BigDecimal;
+import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,8 +61,8 @@ public interface NegAppr01RepositoryHist extends JpaRepository<NegAppr01, NegApp
   // ExportDate= , AND FinCode=
   public Slice<NegAppr01> findAllByExportDateIsAndFinCodeIsOrderByCustNoAsc(int exportDate_0, String finCode_1, Pageable pageable);
 
-  // BringUpDate>= 
-  public Optional<NegAppr01> findTopByBringUpDateGreaterThanEqualOrderByBringUpDateDesc(int bringUpDate_0);
+  // ReplyCode <> , AND BringUpDate>= 
+  public Slice<NegAppr01> findAllByReplyCodeNotAndBringUpDateGreaterThanEqualOrderByBringUpDateDescFinCodeAsc(String replyCode_0, int bringUpDate_1, Pageable pageable);
 
   // CustNo = , AND BringUpDate>= 
   public Optional<NegAppr01> findTopByCustNoIsAndBringUpDateGreaterThanEqualOrderByBringUpDateDesc(int custNo_0, int bringUpDate_1);

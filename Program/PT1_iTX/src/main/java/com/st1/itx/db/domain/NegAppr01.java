@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class NegAppr01 implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 5525079924631880640L;
-
-@EmbeddedId
+  @EmbeddedId
   private NegAppr01Id negAppr01Id;
 
   // 會計日期
@@ -69,6 +65,7 @@ public class NegAppr01 implements Serializable {
   private BigDecimal apprAmt = new BigDecimal("0");
 
   // 累計撥付金額
+  /* BatchTx04回應失敗時倒扣本筆撥付金額 */
   @Column(name = "`AccuApprAmt`")
   private BigDecimal accuApprAmt = new BigDecimal("0");
 
@@ -109,6 +106,7 @@ public class NegAppr01 implements Serializable {
   private int apprAcDate = 0;
 
   // 回應代碼
+  /* 成功:4001,NULL */
   @Column(name = "`ReplyCode`", length = 4)
   private String replyCode;
 
@@ -306,7 +304,7 @@ public class NegAppr01 implements Serializable {
 
 /**
 	* 累計撥付金額<br>
-	* 
+	* BatchTx04回應失敗時倒扣本筆撥付金額
 	* @return BigDecimal
 	*/
   public BigDecimal getAccuApprAmt() {
@@ -315,7 +313,7 @@ public class NegAppr01 implements Serializable {
 
 /**
 	* 累計撥付金額<br>
-	* 
+	* BatchTx04回應失敗時倒扣本筆撥付金額
   *
   * @param accuApprAmt 累計撥付金額
 	*/
@@ -477,7 +475,7 @@ public class NegAppr01 implements Serializable {
 
 /**
 	* 回應代碼<br>
-	* 
+	* 成功:4001,NULL
 	* @return String
 	*/
   public String getReplyCode() {
@@ -486,7 +484,7 @@ public class NegAppr01 implements Serializable {
 
 /**
 	* 回應代碼<br>
-	* 
+	* 成功:4001,NULL
   *
   * @param replyCode 回應代碼
 	*/
