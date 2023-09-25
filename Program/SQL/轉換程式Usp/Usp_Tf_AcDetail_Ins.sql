@@ -176,6 +176,7 @@ BEGIN
             ,TR1."LMSASQ" 
             ,TR1."TRXAMT" 
             ,TR1."TRXMEM" 
+            ,TR1."TRXSAK" -- 還款來源
             ,MIN(CASE 
                    WHEN TR1."TRXIDT" > 20400101 
                    THEN TR1."TRXDAT" 
@@ -214,6 +215,7 @@ BEGIN
               ,TR1."LMSASQ" 
               ,TR1."TRXAMT" 
               ,TR1."TRXMEM" 
+              ,TR1."TRXSAK" -- 還款來源
     ) 
     , S4 AS ( 
       SELECT TR."TRXDAT" 
@@ -226,7 +228,7 @@ BEGIN
              ,TR."TRXAMT" 
              ,TR."TRXTCT" 
              ,TR."TRXIDT" 
-             ,TF."TRXSAK" -- 還款來源
+             ,TR."TRXSAK" -- 還款來源
              ,CASE 
                 WHEN TR."TRXAMT" < 0 AND ATF."DbCr" = 'D' THEN 'C' 
                 WHEN TR."TRXAMT" < 0 AND ATF."DbCr" = 'C' THEN 'D' 
@@ -630,7 +632,6 @@ BEGIN
              , TRXATP 
              , CORVNO 
              , CORVNS 
-             , CORVDS 
         FROM "LA$JORP" 
         WHERE NEWVBN > 90 
     ) 
@@ -806,8 +807,7 @@ BEGIN
              , TRXDAT -- TRXDAT 
              , TRXATP -- TRXATP 
              , ACRNUM -- CORVNO 
-             , ACRSRN -- CORVNS 
-             , CORVDS -- CORVDS 
+             , ACRSRN -- CORVNS  
         FROM DAT_LN$AVRP
         WHERE AGLVBN > 90 
     ) 

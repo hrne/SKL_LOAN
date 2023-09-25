@@ -134,13 +134,13 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            , SUM(DECODE(\"Type\", 'CloseAmt3', \"TxAmt\", 0)) + SUM(DECODE(\"Type\", 'CloseAmt4', \"TxAmt\", 0)) AS \"CloseAmt4\""; // --利率高轉貸(3+4)
 		sql += "            , SUM(DECODE(\"Type\", 'CloseAmt5', \"TxAmt\", 0)) + SUM(DECODE(\"Type\", 'CloseAmt6', \"TxAmt\", 0)) AS \"CloseAmt5\""; // --增貸不准(5+6)
 		sql += "            , SUM(DECODE(\"Type\", 'CloseAmt7', \"TxAmt\", 0)) AS \"CloseAmt7\""; // --內部代償
-		sql += "            , SUM(DECODE(\"Type\", 'CloseAmt8', \"TxAmt\", 0)) AS \"CloseAmt8\""; // --身亡
+		sql += "            , SUM(DECODE(\"Type\", 'CloseAmt8', \"TxAmt\", 0)) AS \"CloseAmt8\""; // --借新還舊
 		sql += "            , SUM(DECODE(\"Type\", 'CloseAmt9', \"TxAmt\", 0)) + SUM(DECODE(\"Type\", 'CloseAmt14', \"TxAmt\", 0)) AS \"CloseAmt9\""; // --其他(9+14)
 		sql += "        FROM";
 		sql += "            (";
-		// --LN6361個金還款金額 - 利率高轉貸 - 軍公教轉貸 - 買賣 - 增貸不准 - 動支不准 - 自行還款 - 綁約期還款 - 不滿意服務 -
+		// --LN6361個金還款金額 - 利率高轉貸 - 軍公教轉貸 - 買賣 - 增貸不准 - 動支不准 - 自行還款 - 綁約期還款 - 不滿服務 -
 		// 身亡- 其他 - 部份還款 - 本金攤提
-		// --4-3-1-5-6-(2)-11-14-9-部分-本金
+		// -- 4-3-1-5-6-(2)-11-14-9-部分-本金
 		sql += "                SELECT";
 		sql += "                    mlb.\"YearMonth\"";
 		sql += "                    , CASE";
@@ -167,7 +167,7 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                        WHEN nvl(fc.\"CloseReasonCode\", fm.\"AdvanceCloseCode\") = 11 THEN";
 		sql += "                            'CloseAmt11'";
 		sql += "                        WHEN nvl(fc.\"CloseReasonCode\", fm.\"AdvanceCloseCode\") = 12 THEN";
-		sql += "                            'CloseAmt11'";
+		sql += "                            'CloseAmt12'";
 		sql += "                        WHEN nvl(fc.\"CloseReasonCode\", fm.\"AdvanceCloseCode\") = 14 THEN";
 		sql += "                            'CloseAmt14'";
 		sql += "                        ELSE";
@@ -345,7 +345,6 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        - \"CloseAmtSeq2\" ";
 		sql += "        - \"CloseAmt5\" ";
 		sql += "        - \"CloseAmt2\" ";
-		sql += "        - \"CloseAmt8\" ";
 		sql += "        - \"CloseAmt9\" ";
 		sql += "        - \"NoCloseAmtSeq1\" ";
 		sql += "        - \"NoCloseAmtSeq2\" AS \"CloseAmt7\"";
@@ -357,7 +356,8 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            SELECT";
 		sql += "                m.\"YearMonth\" AS \"YearMonth\"";
 		sql += "                , round(nvl(drawdownamt.\"DrawdownAmt\", 0) / 100000000, 2) AS \"DrawdownAmt\""; // --撥款
-		sql += "                , round(nvl(closeamt.\"CloseAmt4\", 0) / 100000000, 2) AS \"CloseAmtSeq1\""; // --利率高轉貸(3+4)
+		sql += "                , round(nvl(closeamt.\"CloseAmt3\", 0) / 100000000, 2) "; // --利率高轉貸(3+4)
+		sql += "                + round(nvl(closeamt.\"CloseAmt4\", 0) / 100000000, 2) AS \"CloseAmtSeq1\""; // --利率高轉貸(3+4)
 		sql += "                , round(nvl(closeamt.\"CloseAmt1\", 0) / 100000000, 2) AS \"CloseAmtSeq2\""; // --買賣
 		sql += "                , round(nvl(closeamt.\"CloseAmt5\", 0) / 100000000, 2) AS \"CloseAmt5\""; // --增貸不准(5+6)
 		sql += "                , round(nvl(closeamt.\"CloseAmt8\", 0) / 100000000, 2) AS \"CloseAmt8\""; // --身亡
