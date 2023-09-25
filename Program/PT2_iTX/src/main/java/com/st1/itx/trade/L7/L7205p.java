@@ -257,6 +257,52 @@ public class L7205p extends TradeBuffer {
 
 		changeDBEnv(titaVo);
 
+		lMonthlyFacBal = new ArrayList<MonthlyFacBal>();
+
+		slMothlyFacBal = tMothlyFacBalService.findYearMonthAll(iYearMonth, 0, Integer.MAX_VALUE, titaVo);
+
+		for (OccursList tempOccursList : occursList) {
+
+			int custno = parse.stringToInteger(tempOccursList.get("CustNo"));
+			int facmno = parse.stringToInteger(tempOccursList.get("FacmNo"));
+			String assetclass = tempOccursList.get("AssetClass");
+			BigDecimal lawAmount = BigDecimal.ZERO;
+			String lawAssetClass = "";
+
+			if ("xlsx".equals(extension) || "xls".equals(extension)) {
+				lawAmount = new BigDecimal(tempOccursList.get("LawAmount"));
+				lawAssetClass = tempOccursList.get("LawAssetClass");
+			}
+			MonthlyFacBalId tmpMonthlyFacBalId = new MonthlyFacBalId();
+			tmpMonthlyFacBalId.setCustNo(custno);
+			tmpMonthlyFacBalId.setFacmNo(facmno);
+			tmpMonthlyFacBalId.setYearMonth(iYearMonth);
+
+			MonthlyFacBal tmpMonthlyFacBal = new MonthlyFacBal();
+			tmpMonthlyFacBal.setMonthlyFacBalId(tmpMonthlyFacBalId);
+
+			for (MonthlyFacBal t : lMonthlyFacBal) {
+
+				if (custno == t.getCustNo() && facmno == t.getFacmNo()) {
+					t.setAssetClass(assetclass.substring(0, 1));
+
+					if ("xlsx".equals(extension[extension.length - 1])
+							|| "xls".equals(extension[extension.length - 1])) {
+						t.setLawAmount(lawAmount);
+						t.setLawAssetClass(lawAssetClass);
+						t.setAssetClass2(assetclass);
+
+					}
+
+					tmplMonthlyFacBal.add(t);
+
+					CountS++; // 成功筆數+1
+					continue;
+				}
+			}
+
+		}
+
 		try {
 			tMothlyFacBalService.updateAll(tmplMonthlyFacBal, titaVo);
 		} catch (DBException e) {
@@ -370,8 +416,6 @@ public class L7205p extends TradeBuffer {
 			}
 		} // for
 
-		
-		
 		changeDBEnv(titaVo);
 		updLM052ReportSPAndMonthlyFacBalData(titaVo, iYearMonth);
 		this.batchTransaction.commit();
@@ -646,7 +690,7 @@ public class L7205p extends TradeBuffer {
 		sLM052LoanAssetService.Usp_L9_MonthlyLM052LoanAsset_Ins(yearMonth, empNo, "", titaVo);
 		sLM052OvduService.Usp_L9_MonthlyLM052Ovdu_Ins(yearMonth, empNo, "", titaVo);
 		// 更新MonthlyFacBal GovProjectFlag,BuildingFlag,SpecialAssetFlag
-		
+
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
@@ -654,12 +698,10 @@ public class L7205p extends TradeBuffer {
 			e.printStackTrace();
 		}
 
-		
 		String txcd = titaVo.getTxcd();
 		this.info("txcd=" + txcd);
 		tMothlyFacBalService.Usp_L7_UploadToMonthlyFacBal_Upd(yearMonth, txcd, empNo, "", titaVo);
 
-	
 		this.info("upd LM052 SP finished.");
 	}
 

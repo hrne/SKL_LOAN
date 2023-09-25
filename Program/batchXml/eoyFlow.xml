@@ -8,11 +8,8 @@
 	<!-- 作業名稱 -->
 	<job id="eoyFlow" parent="parentJob"
 		xmlns="http://www.springframework.org/schema/batch">
-		<step id="l9YearlyHouseLoanIntUpd" parent="parentStep" next="startYearlyRptFlow">
+		<step id="l9YearlyHouseLoanIntUpd" parent="parentStep">
 			<tasklet ref="L9YearlyHouseLoanIntUpd" />
-		</step>
-		<step id="startYearlyRptFlow" parent="parentStep">
-			<job ref="yearlyRptFlow" job-launcher="jobLauncher" />
 		</step>
 	</job>
 </beans>

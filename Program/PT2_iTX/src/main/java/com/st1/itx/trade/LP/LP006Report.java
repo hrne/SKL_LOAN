@@ -168,11 +168,11 @@ public class LP006Report extends MakeReport {
 			makeExcel.setValue(row, 2, "無資料");
 		} else {
 			if (fnAllList.size() > 1) {
-				makeExcel.setShiftRow(row + 1, fnAllList.size() - 1);
+				makeExcel.setShiftRow(row, fnAllList.size() - 1);
 			}
 			for (Map<String, String> t : fnAllList) {
 				this.info("t-------->" + t.toString());
-				makeExcel.setValue(row, 1, row - 1); // 1, "序號"
+				makeExcel.setValue(row, 1, row - 2); // 1, "序號"
 				makeExcel.setValue(row, 2, t.get("DeptItem")); // 2, "部室"
 				makeExcel.setValue(row, 3, t.get("DistItem")); // 3, "區部"
 				makeExcel.setValue(row, 4, t.get("AreaItem")); // 4, "單位"
@@ -258,11 +258,11 @@ public class LP006Report extends MakeReport {
 			makeExcel.setValue(row, 2, "無資料");
 		} else {
 			if (fnAllList.size() > 1) {
-				makeExcel.setShiftRow(row + 1, fnAllList.size() - 1);
+				makeExcel.setShiftRow(row, fnAllList.size() - 1);
 			}
 			for (Map<String, String> t : fnAllList) {
 				this.info("t-------->" + t.toString());
-				makeExcel.setValue(row, 1, row - 1); // 1, "序號"
+				makeExcel.setValue(row, 1, row - 2); // 1, "序號"
 				makeExcel.setValue(row, 2, t.get("DeptItem")); // 2, "部室"
 				makeExcel.setValue(row, 3, t.get("DistItem")); // 3, "區部"
 				makeExcel.setValue(row, 4, t.get("AreaItem")); // 4, "單位"

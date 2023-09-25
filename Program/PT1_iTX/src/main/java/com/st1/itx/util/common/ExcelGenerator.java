@@ -1038,11 +1038,21 @@ public class ExcelGenerator extends CommBuffer {
 		}
 	}
 
-	private void shiftRows(Map<String, Object> map) {
+	private void shiftRows(Map<String, Object> map) throws LogicException {
 		int shiftRowFrom = Integer.parseInt(map.get("srf").toString());
 		int shiftCounts = Integer.parseInt(map.get("n").toString());
 		int finalRow = this.sheet.getLastRowNum();
+		try {
 		this.sheet.shiftRows(shiftRowFrom - 1, finalRow, shiftCounts);
+		} catch (Exception e) {
+			this.error("shiftRows Begin row index = " + (shiftRowFrom - 1));
+			this.error("shiftRows End row index = " + finalRow);
+			this.error("shiftRows shiftCounts = " + shiftCounts);
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error(errors.toString());
+			throw new LogicException("E0013", "產製Excel時欲搬移的行不存在或無資料");
+		}
 		copyLastRowCellStyle(shiftRowFrom, shiftCounts);
 	}
 }

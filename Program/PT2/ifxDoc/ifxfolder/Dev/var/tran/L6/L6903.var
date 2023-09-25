@@ -356,7 +356,7 @@ T(2,#OOTitaTxtNo)
 #OOLastEmpX=x,47,S
 T(2,#OOLastEmp+ +#OOLastEmpName)
 #OOSlipBatNo=A,2,S
-#OOSlipSumNo=A,2,S
+#OOSlipSumNo=A,6,S
 #OOEntAc=A,1,S
 #OOMediaSlipNo=X,12,S
 #OORvNo=X,30,S
@@ -462,7 +462,7 @@ TXFORM=L6903
 {width:50,align:'center'}
 #OOSlipBatNo=傳票批號
 {width:80,align:'center'}
-#OOSlipSumNo=彙總批號
+#OOSlipSumNo=彙總傳票號碼
 {width:80,align:'center'}
 #OOEntAc=入總帳記號
 {width:80,align:'center'}

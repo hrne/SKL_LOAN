@@ -226,6 +226,7 @@ BEGIN
              ,TR."TRXAMT" 
              ,TR."TRXTCT" 
              ,TR."TRXIDT" 
+             ,TF."TRXSAK" -- 還款來源
              ,CASE 
                 WHEN TR."TRXAMT" < 0 AND ATF."DbCr" = 'D' THEN 'C' 
                 WHEN TR."TRXAMT" < 0 AND ATF."DbCr" = 'C' THEN 'D' 
@@ -300,7 +301,34 @@ BEGIN
             ,S1."TRXNTX" 
             ,S5."AcNoCode" 
             ,S5."AcSubCode" 
-            ,S5."AcDtlCode" 
+            -- 2023-09-25 Wei 修改 from SKL IT 珮琪 : 新系統有多的細目為什麼不拆?
+            -- from Lai mail
+            -- 暫收及待結轉帳項－擔保放款科目，細目區分
+            -- 01[可抵繳]TAV：客戶之暫收可抵繳餘額
+            --    需轉換
+            -- 02[支票]TCK ：客戶存入支票(期票的金額)餘額
+            --    需轉換
+            -- 03[員工扣薪] TEM ：員工扣薪暫存科目
+            --    需轉換
+            -- 04[AML戶]TAM：AML檢核為可疑或未確定時轉入暫收款的餘額
+            --    新增功能，不需轉換
+            -- 05[借新還舊]；客戶之借新還舊餘額，關帳時檢核餘額應為零
+            --   新增過渡科目，不需轉換
+            -- 07[費用攤提] TSL:客戶之企金費用餘額
+            --   新增功能，不需轉換
+            -- 09[展期]；客戶之展期餘額，關帳時檢核餘額應為零
+            --            新增過渡科目，不需轉換
+            ,CASE
+               WHEN S5."AcNoCode" = '20222020000'
+                    AND S5."AcSubCode" = '     '
+                    AND S4.TRXSAK = 4 -- 還款來源=4:支票兌現
+               THEN '02' -- 暫收款-支票
+               WHEN S5."AcNoCode" = '20222020000'
+                    AND S5."AcSubCode" = '     '
+                    AND S4.TRXSAK = 3 -- 還款來源=3:員工扣薪
+               THEN '03' -- 暫收款-員工扣薪
+             ELSE S5."AcDtlCode" 
+             END AS "AcDtlCode"
             ,S5."AcctCode" 
             ,S5."AcctFlag" 
             ,S5."ReceivableFlag" 
@@ -353,40 +381,46 @@ BEGIN
         -- AND NVL(S1."JLNVNO",0) > 0      -- 傳票檔傳票號碼不為0 *傳票號碼為0者為訂正資料,則排除 
         AND NVL(S5."AcNoCode",' ') != ' ' -- 2021-07-15 新增判斷 有串到最新的11碼會科才寫入 
         -- AND S1."JLNCRC" = '0' 
-        -- AND CASE 
-        --       WHEN NVL(S5."AcctCode",' ') IN ('310','320','330','340','990' 
-        --                                      ,'IC1','IC2','IC3','IC4','IOP','IOV' 
-        --                                      ,'F15','F16' 
-        --                                      ,'TMI','T12' 
-        --                                      ,'F08','F29','F10'
-        --                                      ,'P02') 
-        --            AND NVL(S4."TRXTRN",' ') <> ' ' 
-        --       THEN 1 
-        --       WHEN NVL(S5."AcctCode",' ') NOT IN ('310','320','330','340','990' 
-        --                                          ,'IC1','IC2','IC3','IC4','IOP','IOV' 
-        --                                          ,'F15','F16' 
-        --                                          ,'TMI','T12' 
-        --                                          ,'F08','F29','F10'
-        --                                          ,'P02') 
-        --            AND NVL(S4."LMSACN",0) = 0 
-        --       THEN 1 
-        --       WHEN NVL(S5."AcctCode",' ') IN ('TMI','T12','P02','IC3','330') 
-        --            AND S1."TRXTRN" = '3079' 
-        --       THEN 1 
-        --       WHEN NVL(S5."AcctCode",' ') IN ('TMI','T12') 
-        --            AND NVL(S1."TRXTRN",' ') = ' ' 
-        --            AND S4."TRXTRN" IS NULL 
-        --       THEN 1 
-        --       WHEN NVL(S5."AcctCode",' ') IN ('F25','T13','F13','F07','F27','F24','BCK') 
-        --            AND NVL(S1."TRXTRN",' ') = ' ' 
-        --            AND S4."TRXTRN" = '3037' 
-        --       THEN 1
-        --       WHEN NVL(S5."AcctCode",' ') IN ('C02','OPL') 
-        --            AND NVL(S1."TRXTRN",' ') = ' ' 
-        --            AND S4."TRXTRN" = '3036' 
-        --       THEN 1
-        --     ELSE 0  
-        --     END = 1 
+        AND CASE 
+              -- 必須存在於放款交易內容檔的業務科目
+              WHEN NVL(S5."AcctCode",' ') IN ('310','320','330','340','990' 
+                                             ,'IC1','IC2','IC3','IC4','IOP','IOV' 
+                                             ,'F15','F16' 
+                                             ,'TMI','T12' 
+                                             ,'F08','F29','F10'
+                                             ,'P02') 
+                   AND NVL(S4."TRXTRN",' ') <> ' ' 
+              THEN 1 
+              -- 會計帳務明細檔的交易代號為3079時會產生的業務科目
+              WHEN NVL(S5."AcctCode",' ') IN ('TMI','T12','P02','IC3','330') 
+                   AND S1."TRXTRN" = '3079' 
+              THEN 1 
+              -- 會計帳務明細檔交易代號為空者在放款交易內容檔不得有資料的業務科目
+              WHEN NVL(S5."AcctCode",' ') IN ('TMI','T12') 
+                   AND NVL(S1."TRXTRN",' ') = ' ' 
+                   AND S4."TRXTRN" IS NULL 
+              THEN 1 
+              -- 會計帳務明細檔交易代號為空者在放款交易內容檔的交易代號為3037的業務科目
+              WHEN NVL(S5."AcctCode",' ') IN ('F25','T13','F13','F07','F27','F24','BCK') 
+                   AND NVL(S1."TRXTRN",' ') = ' ' 
+                   AND S4."TRXTRN" = '3037' 
+              THEN 1
+              -- 會計帳務明細檔交易代號為空者在放款交易內容檔的交易代號為3036的業務科目
+              WHEN NVL(S5."AcctCode",' ') IN ('C02','OPL') 
+                   AND NVL(S1."TRXTRN",' ') = ' ' 
+                   AND S4."TRXTRN" = '3036' 
+              THEN 1
+              -- 下列業務科目以外,在放款交易內容檔必須戶號為0或是無資料
+              WHEN NVL(S5."AcctCode",' ') NOT IN ('310','320','330','340','990' 
+                                                 ,'IC1','IC2','IC3','IC4','IOP','IOV' 
+                                                 ,'F15','F16' 
+                                                 ,'TMI','T12' 
+                                                 ,'F08','F29','F10'
+                                                 ,'P02') 
+                   AND NVL(S4."LMSACN",0) = 0 
+              THEN 1 
+            ELSE 0
+            END = 1
     ) 
     , ACT AS ( 
       SELECT "LMSACN" 

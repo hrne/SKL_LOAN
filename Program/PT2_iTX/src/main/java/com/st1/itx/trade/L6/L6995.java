@@ -53,58 +53,54 @@ public class L6995 extends TradeBuffer {
 
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = Integer.MAX_VALUE; // 217 * 200 = 43400
-		List<CdStock> lCdStock = new ArrayList<CdStock>();
-		Slice<CdStock> L6995DateList = null;
 
-		try {
+		if (!iStockCode.equals("")) {
+			CdStock lCdStock2 = sCdStockService.findById(iStockCode, titaVo);
+			OccursList occursList = new OccursList();
+			occursList.putParam("OOStockCode", lCdStock2.getStockCode());
+			occursList.putParam("OOStockItem", lCdStock2.getStockItem());
+			occursList.putParam("OOStockCompanyName", lCdStock2.getStockCompanyName());
+			occursList.putParam("OOCurrency", lCdStock2.getCurrency());
+			occursList.putParam("OOYdClosePrice", lCdStock2.getYdClosePrice());
+			occursList.putParam("OOMonthlyAvg", lCdStock2.getMonthlyAvg());
+			occursList.putParam("OOThreeMonthAvg", lCdStock2.getThreeMonthAvg());
+			occursList.putParam("OOStockType", lCdStock2.getStockType());
+			/* 將每筆資料放入Tota的OcList */
+			this.totaVo.addOccursList(occursList);
+		} else {
+			List<CdStock> lCdStock = new ArrayList<CdStock>();
+			Slice<CdStock> L6995DateList = null;
 
-			L6995DateList = sCdStockService.findAll(this.index, this.limit, titaVo);
+			try {
 
-		} catch (Exception e) {
-			throw new LogicException(titaVo, "E0001", "SQL ERROR");
-		}
+				L6995DateList = sCdStockService.findAll(this.index, this.limit, titaVo);
 
-		lCdStock = L6995DateList == null ? null : L6995DateList.getContent();
-		this.info("count   = "+ L6995DateList.getContent());
-
-		if (lCdStock != null) {
-			if (!iStockCode.equals("")) {
-				for (CdStock t : lCdStock) {
-					if (t.getStockCode().equals(iStockCode)) {
-						OccursList occursList = new OccursList();
-						occursList.putParam("OOStockCode", t.getStockCode());
-						occursList.putParam("OOStockItem", t.getStockItem());
-						occursList.putParam("OOStockCompanyName", t.getStockCompanyName());
-						occursList.putParam("OOCurrency", t.getCurrency());
-						occursList.putParam("OOYdClosePrice", t.getYdClosePrice());
-						occursList.putParam("OOMonthlyAvg", t.getMonthlyAvg());
-						occursList.putParam("OOThreeMonthAvg", t.getThreeMonthAvg());
-						occursList.putParam("OOStockType", t.getStockType());
-						/* 將每筆資料放入Tota的OcList */
-						this.totaVo.addOccursList(occursList);
-					}
-				}
-			} else {
-				for (CdStock t : lCdStock) {
-					OccursList occursList = new OccursList();
-					occursList.putParam("OOStockCode", t.getStockCode());
-					occursList.putParam("OOStockItem", t.getStockItem());
-					occursList.putParam("OOStockCompanyName", t.getStockCompanyName());
-					occursList.putParam("OOCurrency", t.getCurrency());
-					occursList.putParam("OOYdClosePrice", t.getYdClosePrice());
-					occursList.putParam("OOMonthlyAvg", t.getMonthlyAvg());
-					occursList.putParam("OOThreeMonthAvg", t.getThreeMonthAvg());
-					occursList.putParam("OOStockType", t.getStockType());
-					/* 將每筆資料放入Tota的OcList */
-					this.totaVo.addOccursList(occursList);
-				}
+			} catch (Exception e) {
+				throw new LogicException(titaVo, "E0001", "SQL ERROR");
 			}
-		}
 
-		if (lCdStock != null && lCdStock.size() >= 100){
-			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-			titaVo.setReturnIndex(this.setIndexNext());
-			this.totaVo.setMsgEndToEnter();// 手動折返
+			lCdStock = L6995DateList == null ? null : L6995DateList.getContent();
+			this.info("count   = " + L6995DateList.getContent());
+
+			for (CdStock t : lCdStock) {
+				OccursList occursList = new OccursList();
+				occursList.putParam("OOStockCode", t.getStockCode());
+				occursList.putParam("OOStockItem", t.getStockItem());
+				occursList.putParam("OOStockCompanyName", t.getStockCompanyName());
+				occursList.putParam("OOCurrency", t.getCurrency());
+				occursList.putParam("OOYdClosePrice", t.getYdClosePrice());
+				occursList.putParam("OOMonthlyAvg", t.getMonthlyAvg());
+				occursList.putParam("OOThreeMonthAvg", t.getThreeMonthAvg());
+				occursList.putParam("OOStockType", t.getStockType());
+				/* 將每筆資料放入Tota的OcList */
+				this.totaVo.addOccursList(occursList);
+			}
+
+			if (lCdStock != null && lCdStock.size() >= this.limit) {
+				/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
+				titaVo.setReturnIndex(this.setIndexNext());
+				this.totaVo.setMsgEndToEnter();// 手動折返
+			}
 		}
 		this.addList(this.totaVo);
 		return this.sendList();

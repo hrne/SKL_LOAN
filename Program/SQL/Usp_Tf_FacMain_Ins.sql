@@ -193,11 +193,24 @@ BEGIN
           ,APLP."ACTFEE"                  AS "AcctFee"             -- 帳管費 DECIMAL 16 2 
           ,0                              AS "HandlingFee"         -- 手續費 DECIMAL 16 2 
           -- 2023-08-21 Wei 重寫 from 客戶別-央行管制代碼相關by盈如經理.xlsx
+          -- 2023-09-25 Wei 修改 from email
+          -- 寄件者：	陳瀅如 經理 <juliechen@skl.com.tw>
+          -- 收件者：	黃智偉 <cwhuang@sysone.com.tw>
+          -- 副本：	廖淳英 <aliceliao@skl.com.tw>
+          -- 日期：	2023年9月25日 上午8:48
+          -- 主旨：	RE: 提供 資料轉換對照表_by欄位_v0.83
+          -- 智偉好:
+          --   央行管制代號有缺少下述四個，需請協助調整轉檔程式，謝謝
+          -- B0460  Y
+          -- B0471  I
+          -- B0472  Q
+          -- B0490  K
           ,CASE TRIM(APLP."CUSECD")
-          --    WHEN 'I' THEN 'B0471' -- 自然人第3戶以上購屋貸款
+             WHEN 'I' THEN 'B0471' -- 自然人第3戶以上購屋貸款
+             WHEN 'K' THEN 'B0490' -- 自然人特定地區第2戶
              WHEN 'L' THEN 'A0001' -- 增貸管制戶
              WHEN 'O' THEN 'B0421' -- 購地貸款上限6.5成
-          --    WHEN 'Q' THEN 'B0472' -- 自然人第4戶以上購屋貸款
+             WHEN 'Q' THEN 'B0472' -- 自然人第4戶以上購屋貸款
              WHEN 'V' THEN 'B0482' -- 自然人購置高價住宅-3戶以上
              WHEN 'W' THEN 'B0430' -- 餘屋貸款
              WHEN 'X' THEN 'B0481' -- 自然人購置高價住宅-2戶以下
