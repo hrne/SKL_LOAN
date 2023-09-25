@@ -46,7 +46,9 @@ public class L6608 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6608 ");
 		this.totaVo.init(titaVo);
-
+		titaVo.keepOrgDataBase();// 保留原本記號
+		titaVo.setDataBaseOnLine();// 指定連線環境
+		
 		// 取得輸入資料
 		int iFuncCode = this.parse.stringToInteger(titaVo.getParam("FuncCode"));
 		String iFormNo = titaVo.getParam("FormNo");
@@ -105,6 +107,8 @@ public class L6608 extends TradeBuffer {
 			break;
 		}
 		this.info("3");
+
+		titaVo.setDataBaseOnOrg();// 還原原本的環境
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

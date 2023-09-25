@@ -46,7 +46,9 @@ public class L6068 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6068 ");
 		this.totaVo.init(titaVo);
-
+		titaVo.keepOrgDataBase();// 保留原本記號
+		titaVo.setDataBaseOnLine();// 指定連線環境
+		
 		String iFormNo = titaVo.getParam("FormNo");
 		String iFormName = titaVo.getParam("FormName");
 
@@ -99,6 +101,7 @@ public class L6068 extends TradeBuffer {
 			this.totaVo.setMsgEndToEnter();// 手動折返
 		}
 
+		titaVo.setDataBaseOnOrg();// 還原原本的環境
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

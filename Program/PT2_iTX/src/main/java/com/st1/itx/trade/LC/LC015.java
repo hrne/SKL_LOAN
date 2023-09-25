@@ -16,6 +16,7 @@ import com.st1.itx.db.domain.TxFile;
 import com.st1.itx.db.domain.TxPrinter;
 import com.st1.itx.db.service.TxFileService;
 import com.st1.itx.db.service.TxPrinterService;
+import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.TradeBuffer;
 
 @Service("LC015")
@@ -27,18 +28,29 @@ import com.st1.itx.tradeService.TradeBuffer;
  * @version 1.0.0
  */
 public class LC015 extends TradeBuffer {
-	@Autowired
-	public TxPrinterService txPrinterService;
 
 	@Autowired
-	public TxFileService txFileService;
+	private TxPrinterService txPrinterService;
+
+	@Autowired
+	private TxFileService txFileService;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active LC015 ");
 		this.totaVo.init(titaVo);
 
-		Slice<TxPrinter> slTxPrinter = txPrinterService.findByStanIp(titaVo.getParam("StanIp"), 0, Integer.MAX_VALUE, titaVo);
+		// 2023-09-25 Wei 增加 from Lai:
+		// 各環境產表都寫回Online,
+		// 但是各環境在LC009查詢時,只能查到各自環境產製的報表
+		String sourceEnv = getSourceEnv(titaVo.getDataBase());
+
+		// 寫Txfile時需寫回onlineDB,但交易用的titaVo應維持原指向的DB
+		TitaVo tmpTitaVo = (TitaVo) titaVo.clone();
+		tmpTitaVo.putParam(ContentName.dataBase, ContentName.onLine);
+		
+		Slice<TxPrinter> slTxPrinter = txPrinterService.findByStanIpAndSourceEnv(titaVo.getParam("StanIp"), sourceEnv, 0,
+				Integer.MAX_VALUE, tmpTitaVo);
 
 		List<TxPrinter> lTxPrinter = slTxPrinter == null ? null : slTxPrinter.getContent();
 
@@ -53,7 +65,7 @@ public class LC015 extends TradeBuffer {
 			OccursList occursList = new OccursList();
 			occursList.putParam("OFileCode", txPrinter.getFileCode());
 
-			TxFile txFile = txFileService.findByFileCodeFirst(txPrinter.getFileCode(), titaVo);
+			TxFile txFile = txFileService.findByFileCodeFirst(txPrinter.getFileCode(), tmpTitaVo);
 			if (txFile == null) {
 				occursList.putParam("OFileItem", "");
 			} else {
@@ -68,5 +80,20 @@ public class LC015 extends TradeBuffer {
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+
+	private String getSourceEnv(String dataBase) {
+		switch (dataBase) {
+		case ContentName.onLine:
+			return "O";
+		case ContentName.onDay:
+			return "D";
+		case ContentName.onMon:
+			return "M";
+		case ContentName.onHist:
+			return "H";
+		default:
+			return "O";
+		}
 	}
 }
