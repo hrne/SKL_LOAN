@@ -1,18 +1,16 @@
 package com.st1.itx.trade.LY;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.service.springjpa.cm.LY003ServiceImpl;
+import com.st1.itx.db.domain.MonthlyLM055AssetLoss;
+import com.st1.itx.db.service.MonthlyLM055AssetLossService;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
@@ -23,7 +21,7 @@ import com.st1.itx.util.common.data.ReportVo;
 public class LY003Report2 extends MakeReport {
 
 	@Autowired
-	public LY003ServiceImpl lY003ServiceImpl;
+	public MonthlyLM055AssetLossService sLM055AssetLossService;
 
 	@Autowired
 	public MakeExcel makeExcel;
@@ -55,23 +53,16 @@ public class LY003Report2 extends MakeReport {
 
 		makeExcel.setValue(2, 3, (rocYear + 1911) * 100 + rocMonth);
 
-		List<Map<String, String>> lY003List = null;
-
 		boolean isNotEmpty = true;
 
 		int endOfYearMonth = (Integer.valueOf(titaVo.getParam("RocYear")) + 1911) * 100 + 12;
 
-		try {
-
-			lY003List = lY003ServiceImpl.findAll3(titaVo, endOfYearMonth);
-			reportExcelA142(lY003List);
-
-		} catch (Exception e) {
-
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.info("LY003ServiceImpl.findAll error = " + errors.toString());
+		Slice<MonthlyLM055AssetLoss> slMonthlyLM055AssetLoss = sLM055AssetLossService.findYearMonthAll(endOfYearMonth,
+				0, Integer.MAX_VALUE, titaVo);
+		if (slMonthlyLM055AssetLoss == null) {
+			throw new LogicException(titaVo, "E0015", "需先執行 L7205-五類資產分類上傳轉檔作業 "); // 檢查錯誤
 		}
+		reportExcelA142(slMonthlyLM055AssetLoss.getContent());
 
 		makeExcel.close();
 
@@ -79,62 +70,29 @@ public class LY003Report2 extends MakeReport {
 
 	}
 
-	
-	
-	private void reportExcelA142(List<Map<String, String>> listData) throws LogicException {
+	private void reportExcelA142(List<MonthlyLM055AssetLoss> listData) throws LogicException {
 
 		this.info("reportExcelA142 ");
 
 		makeExcel.setSheet("A142放款餘額彙總表");
-		
-		int col = 0;
-		int row = 0;
 
-		String type = "";
-		int kind = 0;
-		BigDecimal amount = BigDecimal.ZERO;
+		int row = 7;
 
-		makeExcel.setValue(12, 2, "C", "C");
-		
-		for (Map<String, String> r : listData) {
-
-			// 會null是因為MonthlyFacBal的AssetClass沒有更新到處於null狀態，需上傳L7205(五類資產分類上傳轉檔作業)
-			if (r.get("F2") == null) {
-				continue;
-			}
-
-			type = r.get("F0");
-			kind = Integer.valueOf(r.get("F1"));
-			amount = new BigDecimal(r.get("F2"));
-			this.info("type=" + type);
-			this.info("kind=" + kind);
-			this.info("amount=" + amount);
-			switch (type) {
-			case "A":
-				row = 8;
-				break;
-			case "B":
-				row = 9;
-				break;
-			case "C":
-				row = 10;
-				break;
-			case "D":
-				row = 11;
-				break;
-			case "Z":
-				row = 12;
-				break;
-			case "ZZ":
-				row = 13;
-				break;
-			default:
-				break;
-			}
-
-			col = kind + 5;
-
-			makeExcel.setValue(row, col, amount, "#,##0");
+		for (MonthlyLM055AssetLoss r : listData) {
+			row++;
+			makeExcel.setValue(row, 6, r.getOverdueAmount(), "#,##0", "R");// 逾期放款
+			makeExcel.setValue(row, 7, r.getObserveAmount(), "#,##0", "R");// 未列入逾期應予評估放款
+			makeExcel.setValue(row, 8, r.getNormalAmount(), "#,##0", "R");// 正常放款
+			makeExcel.setValue(row, 9, r.getLoanAmountClass2(), "#,##0", "R");// 放款金額備呆金額五分類2
+			makeExcel.setValue(row, 10, r.getLoanAmountClass3(), "#,##0", "R");// 放款金額備呆金額五分類3
+			makeExcel.setValue(row, 11, r.getLoanAmountClass4(), "#,##0", "R");// 放款金額備呆金額五分類4
+			makeExcel.setValue(row, 12, r.getLoanAmountClass5(), "#,##0", "R");// 放款金額備呆金額五分類5
+			makeExcel.setValue(row, 13, r.getReserveLossAmt1(), "#,##0", "R");// 備呆金額五分類1
+			makeExcel.setValue(row, 14, r.getReserveLossAmt2(), "#,##0", "R");// 備呆金額五分類2
+			makeExcel.setValue(row, 15, r.getReserveLossAmt3(), "#,##0", "R");// 備呆金額五分類3
+			makeExcel.setValue(row, 16, r.getReserveLossAmt4(), "#,##0", "R");// 備呆金額五分類4
+			makeExcel.setValue(row, 17, r.getReserveLossAmt5(), "#,##0", "R");// 備呆金額五分類5
+			makeExcel.setValue(row, 18, r.getIFRS9AdjustAmt(), "#,##0", "R");// IFRS9增提金額(含應收利息)
 		}
 
 	}

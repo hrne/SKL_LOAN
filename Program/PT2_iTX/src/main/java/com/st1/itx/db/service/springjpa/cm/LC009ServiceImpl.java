@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.eum.ContentName;
 import com.st1.itx.util.parse.Parse;
 
 @Service
@@ -48,6 +49,11 @@ public class LC009ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String iCode = titaVo.get("iCode").trim();
 		String iItem = titaVo.get("iItem").trim();
 
+		// 2023-09-25 Wei 增加 from Lai:
+		// 各環境產表都寫回Online,
+		// 但是各環境在LC009查詢時,只能查到各自環境產製的報表
+		String queryEnv = getQueryEnv(titaVo.getDataBase());
+		
 		String sql = "SELECT  A.\"FileNo\"";
 		sql += ",A.\"FileDate\" - 19110000 as \"FileDate\"";
 		sql += ",A.\"FileCode\"";
@@ -70,6 +76,10 @@ public class LC009ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " left join \"TxPrinter\" E on A.\"FileType\"=6 and E.\"StanIp\"=:stanip and E.\"FileCode\"=A.\"FileCode\" ";
 		sql += " where A.\"FileDate\">=:filedate1 and A.\"FileDate\"<=:filedate2";
 		sql += "   and A.\"BrNo\"=:brno";
+		// 2023-09-25 Wei 增加 from Lai:
+		// 各環境產表都寫回Online,
+		// 但是各環境在LC009查詢時,只能查到各自環境產製的報表
+		sql += "   and A.\"SourceEnv\" = :queryEnv ";
 
 		if (iCreateDate1 > 0) {
 			sql += "   and A.\"CreateDate\" >= to_date(:createdate1,'yyyymmdd hh24:mi:ss') AND A.\"CreateDate\" <= to_date(:createdate2,'yyyymmdd hh24:mi:ss') ";
@@ -91,13 +101,22 @@ public class LC009ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("LC009ServiceImpl sql=" + sql);
 		Query query;
 
-		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		// 寫Txfile時需寫回onlineDB,但交易用的titaVo應維持原指向的DB
+		TitaVo tmpTitaVo = (TitaVo) titaVo.clone();
+		tmpTitaVo.putParam(ContentName.dataBase, ContentName.onLine);
+		
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(tmpTitaVo);
 		query = em.createNativeQuery(sql);
 
 		query.setParameter("filedate1", iFiledate1);
 		query.setParameter("filedate2", iFiledate2);
 		query.setParameter("brno", iBrNo);
 		query.setParameter("stanip", titaVo.getParam("IP"));
+
+		// 2023-09-25 Wei 增加 from Lai:
+		// 各環境產表都寫回Online,
+		// 但是各環境在LC009查詢時,只能查到各自環境產製的報表
+		query.setParameter("queryEnv", queryEnv);
 
 		if (iCreateDate1 > 0) {
 			query.setParameter("createdate1", iCreateDate1 + " 00:00:00");
@@ -117,6 +136,21 @@ public class LC009ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("ThisLimit", limit);
 
 		return this.convertToMap(query);
+	}
+
+	private String getQueryEnv(String dataBase) {
+		switch (dataBase) {
+		case ContentName.onLine:
+			return "O";
+		case ContentName.onDay:
+			return "D";
+		case ContentName.onMon:
+			return "M";
+		case ContentName.onHist:
+			return "H";
+		default:
+			return "O";
+		}
 	}
 
 }

@@ -145,11 +145,7 @@ public class L6903 extends TradeBuffer {
 			String Time = FormatUtil.right(Odate, 8);
 			occursList.putParam("OOLastTime", Time);
 			occursList.putParam("OOSlipBatNo", d.get("SlipBatNo"));
-			if (d.get("TitaBatchNo").length() == 6) {
-				occursList.putParam("OOSlipSumNo", d.get("TitaBatchNo").substring(4, 6));
-			} else {
-				occursList.putParam("OOSlipSumNo", d.get("SlipSumNo"));
-			}
+			occursList.putParam("OOSlipSumNo", d.get("SlipSumNo"));
 			occursList.putParam("OOEntAc", d.get("EntAc"));
 			occursList.putParam("OOMediaSlipNo", d.get("MediaSlipNo"));
 			occursList.putParam("OORvNo", d.get("RvNo"));

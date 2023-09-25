@@ -1,19 +1,18 @@
 package com.st1.itx.trade.LM;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.service.springjpa.cm.LM055ServiceImpl;
+import com.st1.itx.db.domain.MonthlyLM055AssetLoss;
+import com.st1.itx.db.service.MonthlyLM055AssetLossService;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
@@ -29,7 +28,7 @@ import com.st1.itx.util.common.data.ReportVo;
 public class LM055Report extends MakeReport {
 
 	@Autowired
-	LM055ServiceImpl lM055ServiceImpl;
+	public MonthlyLM055AssetLossService sLM055AssetLossService;
 
 	@Autowired
 	MakeExcel makeExcel;
@@ -70,74 +69,36 @@ public class LM055Report extends MakeReport {
 		makeExcel.open(titaVo, reportVo, fileName, defaultName, defaultSheetName);
 
 		makeExcel.setValue(2, 3, yearMonth);
-
-		try {
-
-			fnAllList = lM055ServiceImpl.findAll(titaVo, yearMonth);
-
-		} catch (Exception e) {
-
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.info("LM055ServiceImpl.findAll error = " + errors.toString());
-
+		Slice<MonthlyLM055AssetLoss> slMonthlyLM055AssetLoss = sLM055AssetLossService.findYearMonthAll(yearMonth,
+				0, Integer.MAX_VALUE, titaVo);
+		if (slMonthlyLM055AssetLoss == null) {
+			throw new LogicException(titaVo, "E0015", "需先執行 L7205-五類資產分類上傳轉檔作業 "); // 檢查錯誤
 		}
-		exportExcel(fnAllList);
+		exportExcel(slMonthlyLM055AssetLoss.getContent());
 
 		makeExcel.close();
 
 	}
 
-	private void exportExcel(List<Map<String, String>> listData) throws LogicException {
+	private void exportExcel(List<MonthlyLM055AssetLoss> listData) throws LogicException {
 
-		int col = 0;
-		int row = 0;
+		int row = 7;
 
-		String type = "";
-		int kind = 0;
-		BigDecimal amount = BigDecimal.ZERO;
-
-		makeExcel.setValue(12, 2, "C", "C");
-		
-		for (Map<String, String> r : listData) {
-
-			// 會null是因為MonthlyFacBal的AssetClass沒有更新到處於null狀態，需上傳L7205(五類資產分類上傳轉檔作業)
-			if (r.get("F2") == null) {
-				continue;
-			}
-
-			type = r.get("F0");
-			kind = Integer.valueOf(r.get("F1"));
-			amount = new BigDecimal(r.get("F2"));
-			this.info("type=" + type);
-			this.info("kind=" + kind);
-			this.info("amount=" + amount);
-			switch (type) {
-			case "A":
-				row = 8;
-				break;
-			case "B":
-				row = 9;
-				break;
-			case "C":
-				row = 10;
-				break;
-			case "D":
-				row = 11;
-				break;
-			case "Z":
-				row = 12;
-				break;
-			case "ZZ":
-				row = 13;
-				break;
-			default:
-				break;
-			}
-
-			col = kind + 5;
-
-			makeExcel.setValue(row, col, amount, "#,##0");
+		for (MonthlyLM055AssetLoss r : listData) {
+			row++;
+			makeExcel.setValue(row, 6, r.getOverdueAmount(), "#,##0", "R");// 逾期放款
+			makeExcel.setValue(row, 7, r.getObserveAmount(), "#,##0", "R");// 未列入逾期應予評估放款
+			makeExcel.setValue(row, 8, r.getNormalAmount(), "#,##0", "R");// 正常放款
+			makeExcel.setValue(row, 9, r.getLoanAmountClass2(), "#,##0", "R");// 放款金額備呆金額五分類2
+			makeExcel.setValue(row, 10, r.getLoanAmountClass3(), "#,##0", "R");// 放款金額備呆金額五分類3
+			makeExcel.setValue(row, 11, r.getLoanAmountClass4(), "#,##0", "R");// 放款金額備呆金額五分類4
+			makeExcel.setValue(row, 12, r.getLoanAmountClass5(), "#,##0", "R");// 放款金額備呆金額五分類5
+			makeExcel.setValue(row, 13, r.getReserveLossAmt1(), "#,##0", "R");// 備呆金額五分類1
+			makeExcel.setValue(row, 14, r.getReserveLossAmt2(), "#,##0", "R");// 備呆金額五分類2
+			makeExcel.setValue(row, 15, r.getReserveLossAmt3(), "#,##0", "R");// 備呆金額五分類3
+			makeExcel.setValue(row, 16, r.getReserveLossAmt4(), "#,##0", "R");// 備呆金額五分類4
+			makeExcel.setValue(row, 17, r.getReserveLossAmt5(), "#,##0", "R");// 備呆金額五分類5
+			makeExcel.setValue(row, 18, r.getIFRS9AdjustAmt(), "#,##0", "R");// IFRS9增提金額(含應收利息)
 		}
 
 	}

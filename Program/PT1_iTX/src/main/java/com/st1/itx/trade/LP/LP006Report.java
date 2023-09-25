@@ -168,7 +168,7 @@ public class LP006Report extends MakeReport {
 			makeExcel.setValue(row, 2, "無資料");
 		} else {
 			if (fnAllList.size() > 1) {
-				makeExcel.setShiftRow(row, fnAllList.size() - 1);
+				makeExcel.setShiftRow(row + 1, fnAllList.size() - 1);
 			}
 			for (Map<String, String> t : fnAllList) {
 				this.info("t-------->" + t.toString());
@@ -258,7 +258,7 @@ public class LP006Report extends MakeReport {
 			makeExcel.setValue(row, 2, "無資料");
 		} else {
 			if (fnAllList.size() > 1) {
-				makeExcel.setShiftRow(row, fnAllList.size() - 1);
+				makeExcel.setShiftRow(row + 1, fnAllList.size() - 1);
 			}
 			for (Map<String, String> t : fnAllList) {
 				this.info("t-------->" + t.toString());

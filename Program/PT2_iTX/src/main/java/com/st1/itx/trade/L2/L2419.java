@@ -41,6 +41,7 @@ import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.TxFileService;
 import com.st1.itx.db.service.springjpa.cm.L2419ServiceImpl;
+import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.GSeqCom;
@@ -1197,8 +1198,18 @@ public class L2419 extends TradeBuffer {
 		txFile.setFileZip(zLibUtils.compress(new File(filename)));
 		txFile.setBrNo(titaVo.getKinbr());
 
+		// 2023-09-25 Wei 增加 from Lai:
+		// 各環境產表都寫回Online,
+		// 但是各環境在LC009查詢時,只能查到各自環境產製的報表
+		String sourceEnv = getSourceEnv(titaVo.getDataBase());
+		txFile.setSourceEnv(sourceEnv);
+
+		// 寫Txfile時需寫回onlineDB,但交易用的titaVo應維持原指向的DB
+		TitaVo tmpTitaVo = (TitaVo) titaVo.clone();
+		tmpTitaVo.putParam(ContentName.dataBase, ContentName.onLine);
+		
 		try {
-			txFile = sTxFileService.insert(txFile, titaVo);
+			txFile = sTxFileService.insert(txFile, tmpTitaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "EC002", "輸出檔(TxFile):" + e.getErrorMsg());
 		}
@@ -1206,6 +1217,21 @@ public class L2419 extends TradeBuffer {
 		return txFile.getFileNo();
 	}
 
+	private String getSourceEnv(String dataBase) {
+		switch (dataBase) {
+		case ContentName.onLine:
+			return "O";
+		case ContentName.onDay:
+			return "D";
+		case ContentName.onMon:
+			return "M";
+		case ContentName.onHist:
+			return "H";
+		default:
+			return "O";
+		}
+	}
+	
 	private boolean compareDate(String dtA, String dtB) throws LogicException {
 		boolean r = true;
 		String dtA2 = dtA.replace("/", "");

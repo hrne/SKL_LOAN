@@ -34,21 +34,20 @@ public class LC009 extends TradeBuffer {
 	private TxFileService txFileService;
 
 	@Autowired
-	public CdEmpService cdEmpService;
+	private CdEmpService cdEmpService;
 
 	@Autowired
-	LC009ServiceImpl lc009ServiceImpl;
+	private LC009ServiceImpl lc009ServiceImpl;
 
 	@Autowired
 	private DateUtil dDateUtil;
 
 	@Autowired
-	Parse parse;
+	private Parse parse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active LC009 " + this.getTxBuffer().getTxCom().getTlrLevel() + "/" + this.getTxBuffer().getTxCom().getTlrDept());
-		titaVo.setDataBaseOnLine();
 		this.totaVo.init(titaVo);
 
 		/*

@@ -73,15 +73,13 @@
 	 -->
 	 
    <!-- 連線環境用  -->
-   <import resource="file:${itx_Config}/spring/batch/eodFlow.xml" />
-   <import resource="file:${itx_Config}/spring/batch/eomFlow.xml" />
-   <import resource="file:${itx_Config}/spring/batch/eoyFlow.xml" />
    <import resource="file:${itx_Config}/spring/batch/batchRpt.xml" />
    <import resource="file:${itx_Config}/spring/batch/batchJcic.xml" />
    <import resource="file:${itx_Config}/spring/batch/jcicFlow.xml" />
    <import resource="file:${itx_Config}/spring/batch/dailyRptFlow.xml" />
-   <import resource="file:${itx_Config}/spring/batch/monthlyRptFlow.xml" />
-   <import resource="file:${itx_Config}/spring/batch/yearlyRptFlow.xml" />
+   <import resource="file:${itx_Config}/spring/batch/eodFlow.xml" />
+   <import resource="file:${itx_Config}/spring/batch/eomFlow.xml" />
+   <import resource="file:${itx_Config}/spring/batch/eoyFlow.xml" />
   
    <!-- 本機測試用  -->
    <!--

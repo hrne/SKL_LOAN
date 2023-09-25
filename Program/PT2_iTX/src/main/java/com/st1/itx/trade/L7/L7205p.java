@@ -215,13 +215,6 @@ public class L7205p extends TradeBuffer {
 				lawAmount = new BigDecimal(tempOccursList.get("LawAmount"));
 				lawAssetClass = tempOccursList.get("LawAssetClass");
 			}
-			MonthlyFacBalId tmpMonthlyFacBalId = new MonthlyFacBalId();
-			tmpMonthlyFacBalId.setCustNo(custno);
-			tmpMonthlyFacBalId.setFacmNo(facmno);
-			tmpMonthlyFacBalId.setYearMonth(iYearMonth);
-
-			MonthlyFacBal tmpMonthlyFacBal = new MonthlyFacBal();
-			tmpMonthlyFacBal.setMonthlyFacBalId(tmpMonthlyFacBalId);
 
 			for (MonthlyFacBal t : lMonthlyFacBal) {
 
@@ -238,7 +231,8 @@ public class L7205p extends TradeBuffer {
 
 					tmplMonthlyFacBal.add(t);
 
-					CountS++; // 成功筆數+1
+					CountS++;
+
 					continue;
 				}
 			}
@@ -273,13 +267,6 @@ public class L7205p extends TradeBuffer {
 				lawAmount = new BigDecimal(tempOccursList.get("LawAmount"));
 				lawAssetClass = tempOccursList.get("LawAssetClass");
 			}
-			MonthlyFacBalId tmpMonthlyFacBalId = new MonthlyFacBalId();
-			tmpMonthlyFacBalId.setCustNo(custno);
-			tmpMonthlyFacBalId.setFacmNo(facmno);
-			tmpMonthlyFacBalId.setYearMonth(iYearMonth);
-
-			MonthlyFacBal tmpMonthlyFacBal = new MonthlyFacBal();
-			tmpMonthlyFacBal.setMonthlyFacBalId(tmpMonthlyFacBalId);
 
 			for (MonthlyFacBal t : lMonthlyFacBal) {
 
@@ -296,7 +283,6 @@ public class L7205p extends TradeBuffer {
 
 					tmplMonthlyFacBal.add(t);
 
-					CountS++; // 成功筆數+1
 					continue;
 				}
 			}

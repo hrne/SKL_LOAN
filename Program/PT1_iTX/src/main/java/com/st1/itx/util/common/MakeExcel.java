@@ -178,6 +178,12 @@ public class MakeExcel extends CommBuffer {
 			throw new LogicException("EC009", "資料格式");
 		}
 
+		// 2023-09-25 Wei 增加 from Lai:
+		// 各環境產表都寫回Online,
+		// 但是各環境在LC009查詢時,只能查到各自環境產製的報表
+		String sourceEnv = getSourceEnv(titaVo.getDataBase());
+		tTxFile.setSourceEnv(sourceEnv);
+
 		// 寫Txfile時需寫回onlineDB,但交易用的titaVo應維持原指向的DB
 		TitaVo tmpTitaVo = (TitaVo) this.titaVo.clone();
 
@@ -1626,5 +1632,20 @@ public class MakeExcel extends CommBuffer {
 			}
 		}
 
+	}
+
+	private String getSourceEnv(String dataBase) {
+		switch (dataBase) {
+		case ContentName.onLine:
+			return "O";
+		case ContentName.onDay:
+			return "D";
+		case ContentName.onMon:
+			return "M";
+		case ContentName.onHist:
+			return "H";
+		default:
+			return "O";
+		}
 	}
 }

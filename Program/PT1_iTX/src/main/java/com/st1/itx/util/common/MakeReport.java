@@ -511,6 +511,11 @@ public class MakeReport extends CommBuffer {
 	private long newFile() throws LogicException {
 		TxFile tTxFile = new TxFile();
 
+		// 2023-09-25 Wei 增加 from Lai:
+		// 各環境產表都寫回Online,
+		// 但是各環境在LC009查詢時,只能查到各自環境產製的報表
+		String sourceEnv = getSourceEnv(titaVo.getDataBase());
+
 		// 寫Txfile時需寫回onlineDB,但交易用的titaVo應維持原指向的DB
 		TitaVo tmpTitaVo = (TitaVo) this.titaVo.clone();
 
@@ -522,8 +527,6 @@ public class MakeReport extends CommBuffer {
 		CdReport tCdReport = cdReportService.findById(reportVo.getRptCode(), tmpTitaVo);
 		if (tCdReport == null) {
 			tTxFile.setSignCode("0");
-			if ("1".equals(tmpTitaVo.get("checkCdReport")))
-				throw new LogicException("EC000", "未設定報表代號對照檔，請從L6068入口交易新增報表代號");
 		} else {
 			tTxFile.setSignCode(String.valueOf(tCdReport.getSignCode()));
 			// 2021-1-5 增加判斷 SignCode == 1 才印
@@ -554,6 +557,11 @@ public class MakeReport extends CommBuffer {
 		tTxFile.setFileDate(reportVo.getRptDate());
 		tTxFile.setBatchNo(this.batchNo);
 
+		// 2023-09-25 Wei 增加 from Lai:
+		// 各環境產表都寫回Online,
+		// 但是各環境在LC009查詢時,只能查到各自環境產製的報表
+		tTxFile.setSourceEnv(sourceEnv);
+
 		try {
 			ObjectMapper mapper = new ObjectMapper();
 			tTxFile.setFileData(mapper.writeValueAsString(listMap));
@@ -567,6 +575,21 @@ public class MakeReport extends CommBuffer {
 			throw new LogicException(titaVo, "EC002", "(MakeReport)輸出檔(TxFile):" + e.getErrorMsg());
 		}
 		return tTxFile.getFileNo();
+	}
+
+	private String getSourceEnv(String dataBase) {
+		switch (dataBase) {
+		case ContentName.onLine:
+			return "O";
+		case ContentName.onDay:
+			return "D";
+		case ContentName.onMon:
+			return "M";
+		case ContentName.onHist:
+			return "H";
+		default:
+			return "O";
+		}
 	}
 
 	/**
@@ -1668,7 +1691,7 @@ public class MakeReport extends CommBuffer {
 	 * @param word     要補滿的符號或文字(單字佳)
 	 * @param pos      向左補齊(L)/向右補齊(R) 如果文字字數大於上限位數 自動截斷
 	 * @return str 處理後文字
-	 * @throws LogicException 
+	 * @throws LogicException
 	 *
 	 */
 

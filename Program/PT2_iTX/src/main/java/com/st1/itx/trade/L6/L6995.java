@@ -56,6 +56,9 @@ public class L6995 extends TradeBuffer {
 
 		if (!iStockCode.equals("")) {
 			CdStock lCdStock2 = sCdStockService.findById(iStockCode, titaVo);
+			if(lCdStock2 == null) {
+				throw new LogicException(titaVo, "E0001", "查無資料");
+			}
 			OccursList occursList = new OccursList();
 			occursList.putParam("OOStockCode", lCdStock2.getStockCode());
 			occursList.putParam("OOStockItem", lCdStock2.getStockItem());
