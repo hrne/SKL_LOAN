@@ -30,7 +30,6 @@ import com.st1.itx.db.domain.Ifrs9FacData;
 import com.st1.itx.db.domain.Ifrs9FacDataId;
 import com.st1.itx.db.domain.LoanIfrs9Ap;
 import com.st1.itx.db.domain.MonthlyFacBal;
-import com.st1.itx.db.domain.MonthlyFacBalId;
 import com.st1.itx.db.domain.MonthlyLM052AssetClass;
 import com.st1.itx.db.domain.MonthlyLM052Loss;
 import com.st1.itx.db.domain.MonthlyLM055AssetLoss;
@@ -190,8 +189,6 @@ public class L7205p extends TradeBuffer {
 		Slice<Ias34Ap> sIas34Ap = null;
 		Slice<LoanIfrs9Ap> sLoanIfrs9Ap = null;
 
-		List<MonthlyFacBal> lMonthlyFacBal = new ArrayList<MonthlyFacBal>();
-
 		Slice<MonthlyFacBal> slMothlyFacBal = tMothlyFacBalService.findYearMonthAll(iYearMonth, 0, Integer.MAX_VALUE,
 				titaVo);
 
@@ -199,10 +196,12 @@ public class L7205p extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "MothlyFacBal"); // 查詢資料不存在
 		}
 
+		List<MonthlyFacBal> lMonthlyFacBal = new ArrayList<MonthlyFacBal>();
 		lMonthlyFacBal = slMothlyFacBal.getContent();
 
-		List<MonthlyFacBal> tmplMonthlyFacBal = new ArrayList<MonthlyFacBal>();
+		List<MonthlyFacBal> tmpMonthlyFacBal = new ArrayList<MonthlyFacBal>();
 
+		this.info("lMonthlyFacBal.size1 = " + lMonthlyFacBal.size());
 		for (OccursList tempOccursList : occursList) {
 
 			int custno = parse.stringToInteger(tempOccursList.get("CustNo"));
@@ -211,46 +210,49 @@ public class L7205p extends TradeBuffer {
 			BigDecimal lawAmount = BigDecimal.ZERO;
 			String lawAssetClass = "";
 
-			if ("xlsx".equals(extension) || "xls".equals(extension)) {
-				lawAmount = new BigDecimal(tempOccursList.get("LawAmount"));
-				lawAssetClass = tempOccursList.get("LawAssetClass");
-			}
+			MonthlyFacBal tMonthlyFacBal = new MonthlyFacBal();
 
-			for (MonthlyFacBal t : lMonthlyFacBal) {
+			tMonthlyFacBal.setAssetClass(assetclass.substring(0, 1));
 
-				if (custno == t.getCustNo() && facmno == t.getFacmNo()) {
-					t.setAssetClass(assetclass.substring(0, 1));
+			for (MonthlyFacBal r : lMonthlyFacBal) {
+				if (custno == r.getCustNo() && facmno == r.getFacmNo()) {
 
-					if ("xlsx".equals(extension[extension.length - 1])
-							|| "xls".equals(extension[extension.length - 1])) {
-						t.setLawAmount(lawAmount);
-						t.setLawAssetClass(lawAssetClass);
-						t.setAssetClass2(assetclass);
+					r.setAssetClass(assetclass.substring(0, 1));
+
+					if ("xlsx".equals(extension) || "xls".equals(extension)) {
+						lawAmount = new BigDecimal(tempOccursList.get("LawAmount"));
+						lawAssetClass = tempOccursList.get("LawAssetClass");
+
+						tMonthlyFacBal.setLawAmount(lawAmount);
+						tMonthlyFacBal.setLawAssetClass(lawAssetClass);
 
 					}
 
-					tmplMonthlyFacBal.add(t);
+					tmpMonthlyFacBal.add(r);
 
 					CountS++;
 
 					continue;
+
 				}
+
 			}
 
 		}
 
-		try {
-			tMothlyFacBalService.updateAll(tmplMonthlyFacBal, titaVo);
+		if (tmpMonthlyFacBal.size() > 0) {
 
-		} catch (DBException e) {
+			try {
+				tMothlyFacBalService.updateAll(tmpMonthlyFacBal, titaVo);
+			} catch (DBException e) {
 
-			throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+			}
+
+			this.batchTransaction.commit();
 		}
 
 		changeDBEnv(titaVo);
-
-		
-		lMonthlyFacBal = new ArrayList<MonthlyFacBal>();
 
 		slMothlyFacBal = tMothlyFacBalService.findYearMonthAll(iYearMonth, 0, Integer.MAX_VALUE, titaVo);
 
@@ -258,10 +260,12 @@ public class L7205p extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "MothlyFacBal"); // 查詢資料不存在
 		}
 
+		lMonthlyFacBal = new ArrayList<MonthlyFacBal>();
+		
 		lMonthlyFacBal = slMothlyFacBal.getContent();
 
-		tmplMonthlyFacBal = new ArrayList<MonthlyFacBal>();
-
+		this.info("lMonthlyFacBal.size1 = " + lMonthlyFacBal.size());
+		
 		for (OccursList tempOccursList : occursList) {
 
 			int custno = parse.stringToInteger(tempOccursList.get("CustNo"));
@@ -270,38 +274,46 @@ public class L7205p extends TradeBuffer {
 			BigDecimal lawAmount = BigDecimal.ZERO;
 			String lawAssetClass = "";
 
-			if ("xlsx".equals(extension) || "xls".equals(extension)) {
-				lawAmount = new BigDecimal(tempOccursList.get("LawAmount"));
-				lawAssetClass = tempOccursList.get("LawAssetClass");
-			}
+			MonthlyFacBal tMonthlyFacBal = new MonthlyFacBal();
 
-			for (MonthlyFacBal t : lMonthlyFacBal) {
+			tMonthlyFacBal.setAssetClass(assetclass.substring(0, 1));
 
-				if (custno == t.getCustNo() && facmno == t.getFacmNo()) {
-					t.setAssetClass(assetclass.substring(0, 1));
+			for (MonthlyFacBal r : lMonthlyFacBal) {
+				if (custno == r.getCustNo() && facmno == r.getFacmNo()) {
 
-					if ("xlsx".equals(extension[extension.length - 1])
-							|| "xls".equals(extension[extension.length - 1])) {
-						t.setLawAmount(lawAmount);
-						t.setLawAssetClass(lawAssetClass);
-						t.setAssetClass2(assetclass);
+					r.setAssetClass(assetclass.substring(0, 1));
+
+					if ("xlsx".equals(extension) || "xls".equals(extension)) {
+						lawAmount = new BigDecimal(tempOccursList.get("LawAmount"));
+						lawAssetClass = tempOccursList.get("LawAssetClass");
+
+						tMonthlyFacBal.setLawAmount(lawAmount);
+						tMonthlyFacBal.setLawAssetClass(lawAssetClass);
 
 					}
 
-					tmplMonthlyFacBal.add(t);
+					tmpMonthlyFacBal.add(r);
 
 					continue;
+
 				}
+
 			}
 
 		}
+		
+		if (tmpMonthlyFacBal.size() > 0) {
 
-		try {
-			tMothlyFacBalService.updateAll(tmplMonthlyFacBal, titaVo);
-		} catch (DBException e) {
+			try {
+				tMothlyFacBalService.updateAll(tmpMonthlyFacBal, titaVo);
+			} catch (DBException e) {
 
-			throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+			}
+
+			this.batchTransaction.commit();
 		}
+		
 
 		changeDBEnv(titaVo);
 

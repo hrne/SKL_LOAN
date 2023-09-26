@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class EmpDeductDtl implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -7322691085386636677L;
-
-@EmbeddedId
+  @EmbeddedId
   private EmpDeductDtlId empDeductDtlId;
 
   // 入帳日期
@@ -147,7 +143,7 @@ public class EmpDeductDtl implements Serializable {
   @Column(name = "`Interest`")
   private BigDecimal interest = new BigDecimal("0");
 
-  // 累溢短收
+  // 全戶累溢短收
   @Column(name = "`SumOvpayAmt`")
   private BigDecimal sumOvpayAmt = new BigDecimal("0");
 
@@ -739,7 +735,7 @@ public class EmpDeductDtl implements Serializable {
   }
 
 /**
-	* 累溢短收<br>
+	* 全戶累溢短收<br>
 	* 
 	* @return BigDecimal
 	*/
@@ -748,10 +744,10 @@ public class EmpDeductDtl implements Serializable {
   }
 
 /**
-	* 累溢短收<br>
+	* 全戶累溢短收<br>
 	* 
   *
-  * @param sumOvpayAmt 累溢短收
+  * @param sumOvpayAmt 全戶累溢短收
 	*/
   public void setSumOvpayAmt(BigDecimal sumOvpayAmt) {
     this.sumOvpayAmt = sumOvpayAmt;

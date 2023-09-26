@@ -80,7 +80,7 @@ T(3,CdCode.AmlSex)
 
 !FunCode
 #CDCODEFunCode=x,20,S                  
-T(3,CdCode.FunCode)                  
+T(3,CdCode.AmlFunCode)                  
                                          
 #FunCodeHelp=x,100,S
 

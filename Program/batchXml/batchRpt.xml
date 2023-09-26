@@ -335,6 +335,12 @@
 			<tasklet ref="LM088" />
 		</step>
 	</job>
+	<job id="jLM089" parent="parentJob"
+		xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLM089" parent="parentStep">
+			<tasklet ref="LM089" />
+		</step>
+	</job>
 	<!-- 工作月報 -->
 	<job id="jLP001" parent="parentJob"
 		xmlns="http://www.springframework.org/schema/batch">
@@ -404,15 +410,21 @@
 			<tasklet ref="LQ007" />
 		</step>
 	</job>
+	<job id="jLQ008" parent="parentJob"
+		xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLQ008" parent="parentStep">
+			<tasklet ref="LQ008" />
+		</step>
+	</job>
 
-	<!-- 半年報 -->
+	<!-- 半年報 
 	<job id="jLH001" parent="parentJob"
 		xmlns="http://www.springframework.org/schema/batch">
 		<step id="sLH001" parent="parentStep">
 			<tasklet ref="LH001" />
 		</step>
 	</job>
-
+-->
 	
 	
 

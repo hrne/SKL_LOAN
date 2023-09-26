@@ -29,13 +29,11 @@ public class LM081Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
-	
+
 	@Autowired
 	Parse parse;
-	
-	boolean hasOutputted;
-	
-	private static BigDecimal hundredMillion = new BigDecimal("100000000");
+
+	private int limitAcDate = 20211217;
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
 		this.info("LM081Report exec start ...");
@@ -43,29 +41,26 @@ public class LM081Report extends MakeReport {
 		int iAcDate = titaVo.getEntDyI() + 19110000;
 		this.info("LM081Report exec AcDate = " + iAcDate);
 
-		List<List<Map<String, String>>> lLM081List = new ArrayList<List<Map<String, String>>>();
+		List<Map<String, String>> lLM077List = new ArrayList<Map<String, String>>();
 
 		try {
-			lLM081List.add(lM081ServiceImpl.findAll(titaVo, iAcDate/100, 20210319, 20211216, "01"));
-			lLM081List.add(lM081ServiceImpl.findAll(titaVo, iAcDate/100, 20210319, 20211216, "03"));
-			lLM081List.add(lM081ServiceImpl.findAll(titaVo, iAcDate/100, 20211217, 99999999, "01", "03"));
+			lLM077List = lM081ServiceImpl.findAll(titaVo, iAcDate / 100);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.error("LM081ServiceImpl.findAll error = " + errors.toString());
 		}
 
-		exportExcel(titaVo, lLM081List, iAcDate);
+		exportExcel(titaVo, lLM077List, iAcDate);
 
 		return true;
 
 	}
 
-	private void exportExcel(TitaVo titaVo, List<List<Map<String, String>>> foundList, int date) throws LogicException {
-
+	private void exportExcel(TitaVo titaVo, List<Map<String, String>> list, int date) throws LogicException {
 		this.info("LM081Report exportExcel");
 		int entdy = date - 19110000; // expects date to be in BC Date format.
-		String YearMonth = entdy/10000 + " 年 " + String.format("%02d", entdy/100%100) + " 月";
+		String YearMonth = entdy / 10000 + " 年 " + String.format("%02d", entdy / 100 % 100) + " 月";
 
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
@@ -75,92 +70,53 @@ public class LM081Report extends MakeReport {
 		String defaultExcel = "LM081_底稿_B047金融機構承作「自然人購屋貸款」統計表(110.3.19(含)起辦理案件).xlsx";
 		String defaultSheet = "FOA";
 
-		this.info("reportVo open");
-
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
 				.setRptItem(fileItem).build();
 		// 開啟報表
 		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
-		
-		
-//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM081", "B047金融機構承作「自然人購屋貸款」統計表(110.3.19(含)起辦理案件)",
-//				"LM081_B047金融機構承作「自然人購屋貸款」統計表(110.3.19(含)起辦理案件)" + showRocDate(entdy, 0).substring(0, 7), "LM081_底稿_B047金融機構承作「自然人購屋貸款」統計表(110.3.19(含)起辦理案件).xlsx", 1, "FOA");
 
-		// 資料期間 E3
-		makeExcel.setValue(3, 7, "民國 " + YearMonth, "R");
+		// 資料期間 G2
+		makeExcel.setValue(2, 7, "新光人壽保險股份有限公司", "C");
+		// 民國年月G3
+		makeExcel.setValue(3, 7, "民國 " + YearMonth, "C");
 
-		if (foundList != null && !foundList.isEmpty()) {
+		if (list == null) {
+			makeExcel.setValue(4, 1, "本月無資料");
 
-			for (int i = 0; i < foundList.size(); i++)
-			{
-				doOutput(foundList.get(i), 3 + i*4);
+		} else {
+
+			int row = 0;
+			int col = 0;
+			BigDecimal amt = BigDecimal.ZERO;
+			BigDecimal wLTV = BigDecimal.ZERO;
+			BigDecimal wRate = BigDecimal.ZERO;
+			int count = 0;
+
+			for (Map<String, String> r : list) {
+
+				row = 6 + parse.stringToInteger(r.get("CitySeq"));
+				// 3 or 7 or 11 待B047完整在判斷
+				col = parse.stringToInteger(r.get("ApplDate")) >= limitAcDate ? 11 : 3;
+
+				count = parse.stringToInteger(r.get("Count"));
+				amt = getBigDecimal(r.get("LineAmt"));
+				wLTV = getBigDecimal(r.get("wAvgLTV"));
+				wRate = getBigDecimal(r.get("wAvgRate"));
+
+				makeExcel.setValue(row, col, count, "0", "R");
+				makeExcel.setValue(row, col + 1, amt, "0.00", "R");
+				makeExcel.setValue(row, col + 2, wLTV, "0.00", "R");
+				makeExcel.setValue(row, col + 3, wRate, "0.00", "R");
+
 			}
 
-			for (int i = 3; i < 3 + foundList.size() * 4; i++) {
+			// 處理此日期範圍的全國合計
+			for (int i = 3; i <= 14; i++) {
 				makeExcel.formulaCaculate(15, i);
 			}
-
 		}
-		
-		if (!hasOutputted)
-			makeExcel.setValue(4, 1, "本月無資料");
-		else
-			makeExcel.formulaRangeCalculate(8,15,15,41);
-		
-		// long sno =
+
 		makeExcel.close();
-		//makeExcel.toExcel(sno);
-	}
-	
-	private void doOutput(List<Map<String, String>> lList, int startColumn) throws LogicException 
-	{
-		if (lList == null || lList.isEmpty())
-			return;
-		
-		hasOutputted = true;
-		
-		for (Map<String, String> tLDVo : lList) {
-			int colShift = 0;
-			int rowShift = 0;
 
-			for (int i = 0; i <= 5; i++) {
-
-				int col = startColumn + i; // 1-based
-				int row = 8; // 1-based
-
-				// Query received will have column names in the format of F0, even if no alias
-				// is set in SQL
-				// notice it's 0-based for those names
-				String value = tLDVo.get("F" + i);
-
-				switch (i) {
-				// if specific column needs special treatment, insert case here.
-				case 0:
-					colShift--; // doesn't write
-					break;
-				case 1:
-					// CityCode: already properly converted
-					rowShift = parse.stringToInteger(value) - 1;
-					colShift--; // doesn't write
-					break;
-				case 3:
-					// Newly Drawdown Amount: hundred million 10^8
-					makeExcel.setValue(row + rowShift, col + colShift, getBigDecimal(value).divide(hundredMillion, 2, BigDecimal.ROUND_UP), "R");
-					break;
-				case 4:
-					// Weighted Average of Loan: Percent
-					makeExcel.setValue(row + rowShift, col + colShift, getBigDecimal(value).setScale(2, BigDecimal.ROUND_UP), "R");
-					break;
-				case 5:
-					// Weighted Average of Loan Rate: Percent
-					makeExcel.setValue(row + rowShift, col + colShift, getBigDecimal(value).setScale(2, BigDecimal.ROUND_UP), "R");
-					break;
-				default:
-					makeExcel.setValue(row + rowShift, col + colShift, parse.isNumeric(value) ? getBigDecimal(value) : value, "R");
-					break;
-				}
-			} // for
-
-		} // for
 	}
 }

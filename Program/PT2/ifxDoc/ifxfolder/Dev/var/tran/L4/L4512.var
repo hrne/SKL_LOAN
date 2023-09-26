@@ -31,7 +31,7 @@ E(0,0)
 ["#FdPrincipal+本金",#Principal],["#FdResignCode+離職代碼",#ResignCode],
 ["#FdInterest+利息",#Interest],["#FdPositCode+職務代號",#PositCode],
 [#<->#,"#FdBreachAmt+違約金",#BreachAmt],
-[#<->#,"#FdSumOvpayAmt+累溢短收",#SumOvpayAmt],
+[#<->#,"#FdSumOvpayAmt+全戶累溢短收",#SumOvpayAmt],
 ["#FdIntStartDate+計息起日",#IntStartDate],["#FdBatchNo+批次號碼",#BatchNo],
 ["#FdIntEndDate+計息迄日",#IntEndDate],["#FdErrMsg+失敗原因",#ErrMsg],
 ["#FdAcdate+會計日期",#Acdate],["#FdTitaTxtNo+交易序號",#TitaTxtNo],

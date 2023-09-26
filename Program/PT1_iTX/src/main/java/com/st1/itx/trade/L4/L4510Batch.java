@@ -128,12 +128,10 @@ public class L4510Batch extends TradeBuffer {
 	private HashMap<tmpFacm, BigDecimal> rpAmt41Map = new HashMap<>();
 //	42.欠繳利息
 	private HashMap<tmpFacm, BigDecimal> rpAmt42Map = new HashMap<>();
-//	4D.短收
-	private HashMap<tmpFacm, BigDecimal> rpAmt4DMap = new HashMap<>();
-//	4C.溢收
-	private HashMap<tmpFacm, BigDecimal> rpAmt4CMap = new HashMap<>();
 //	30.暫收抵繳
 	private HashMap<tmpFacm, BigDecimal> rpAmt30Map = new HashMap<>();
+	// 累溢短收
+	private HashMap<tmpFacm, BigDecimal> sumOvpayAmt = new HashMap<>();
 
 	private HashMap<tmpFacm, Integer> mapFlag = new HashMap<>();
 // 火險單
@@ -384,6 +382,15 @@ public class L4510Batch extends TradeBuffer {
 			if (!rpAmt30Map.containsKey(tmpAmtFacmNo)) {
 				rpAmt30Map.put(tmpAmtFacmNo, baTxCom.getExcessive());
 			}
+			BigDecimal sumOvpayAmt = baTxCom.getExcessive();
+			for (BaTxVo tBaTxVo : listBaTxVo) {
+				if (tBaTxVo.getReceivableFlag() == 4) {
+					sumOvpayAmt = sumOvpayAmt.subtract(tBaTxVo.getUnPaidAmt());
+				}
+
+			}
+			this.sumOvpayAmt.put(tmpAmtFacmNo, sumOvpayAmt);
+
 			this.info("listBaTxVo =" + listBaTxVo);
 			setBatxValue(listBaTxVo, flag, procCode);
 		} // for
@@ -636,15 +643,7 @@ public class L4510Batch extends TradeBuffer {
 						rpAmt30Map.put(tmpAmtFacmNo, BigDecimal.ZERO);
 					}
 				}
-//	未使用			4D.短收	4C.溢收
-				if (rpAmt4DMap.get(tmp3) != null) {
-					tEmpDeductDtl.setSumOvpayAmt(rpAmt4DMap.get(tmp3));
-					rpAmt4DMap.put(tmp3, BigDecimal.ZERO);
-				}
-				if (rpAmt4CMap.get(tmp3) != null) {
-					tEmpDeductDtl.setSumOvpayAmt(tEmpDeductDtl.getSumOvpayAmt().subtract(rpAmt4CMap.get(tmp3)));
-					rpAmt4CMap.put(tmp3, BigDecimal.ZERO);
-				}
+
 			} else if (tmp.getAchRepayCode() == 4 && rpAmt04Map.get(tmp) != null) {
 				txAmt = rpAmt04Map.get(tmp);
 			} else if (tmp.getAchRepayCode() == 6 && rpAmt06Map.get(tmp) != null) {
@@ -720,6 +719,7 @@ public class L4510Batch extends TradeBuffer {
 			tEmpDeductDtl.setAcctCode(tEmpDeductDtlId.getAcctCode());
 			tEmpDeductDtl.setFacmNo(tEmpDeductDtlId.getFacmNo());
 			tEmpDeductDtl.setBormNo(tEmpDeductDtlId.getBormNo());
+			tEmpDeductDtl.setSumOvpayAmt(sumOvpayAmt.get(tmpAmtFacmNo));
 
 			if (tCdEmp != null) {
 				tEmpDeductDtl.setEmpNo(tCdEmp.getEmployeeNo());
@@ -894,20 +894,7 @@ public class L4510Batch extends TradeBuffer {
 						rpAmt05Map.put(tmp, rpAmt05Map.get(tmp).add(tBaTxVo.getUnPaidAmt()));
 						insuNoMap.put(tmp, insuNoMap.get(tmp) + "," + tBaTxVo.getRvNo());
 					}
-//					短收 --結算至額度，用tmp3
-				} else if (tBaTxVo.getDataKind() == 4 && "D".equals(tBaTxVo.getDbCr())) {
-					if (!rpAmt4DMap.containsKey(tmp)) {
-						rpAmt4DMap.put(tmp3, tBaTxVo.getUnPaidAmt());
-					} else {
-						rpAmt4DMap.put(tmp3, rpAmt4DMap.get(tmp3).add(tBaTxVo.getUnPaidAmt()));
-					}
-//					溢收
-				} else if (tBaTxVo.getDataKind() == 4 && "C".equals(tBaTxVo.getDbCr())) {
-					if (!rpAmt4CMap.containsKey(tmp3)) {
-						rpAmt4CMap.put(tmp3, tBaTxVo.getUnPaidAmt());
-					} else {
-						rpAmt4CMap.put(tmp3, rpAmt4CMap.get(tmp3).add(tBaTxVo.getUnPaidAmt()));
-					}
+
 				} else if (tBaTxVo.getReceivableFlag() == 4) {
 //					期款
 					if (!rpAmt01Map.containsKey(tmp)) {
