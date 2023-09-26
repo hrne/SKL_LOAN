@@ -239,8 +239,6 @@ public class L7205p extends TradeBuffer {
 
 		}
 
-		this.info("tmplMonthlyFacBal = " + tmplMonthlyFacBal.toString());
-
 		try {
 			tMothlyFacBalService.updateAll(tmplMonthlyFacBal, titaVo);
 
@@ -251,9 +249,18 @@ public class L7205p extends TradeBuffer {
 
 		changeDBEnv(titaVo);
 
+		
 		lMonthlyFacBal = new ArrayList<MonthlyFacBal>();
 
 		slMothlyFacBal = tMothlyFacBalService.findYearMonthAll(iYearMonth, 0, Integer.MAX_VALUE, titaVo);
+
+		if (slMothlyFacBal == null) {
+			throw new LogicException(titaVo, "E0001", "MothlyFacBal"); // 查詢資料不存在
+		}
+
+		lMonthlyFacBal = slMothlyFacBal.getContent();
+
+		tmplMonthlyFacBal = new ArrayList<MonthlyFacBal>();
 
 		for (OccursList tempOccursList : occursList) {
 

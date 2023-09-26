@@ -195,13 +195,11 @@ public class L5407 extends TradeBuffer {
 	public void insertEvalutePfCoOfficerLog(String empNo, int effectiveDate, int evaluteEffectiveDate,
 			String evalueEmpClass, TitaVo titaVo) throws LogicException {
 		this.info("insertPfCoOfficerLog9  ... ");
-		// log無資料，新增最初歷程檔
-		insertPfCoOfficerLogFirst(empNo, titaVo);
 
 		tPfCoOfficerId = new PfCoOfficerId();
 		tPfCoOfficerId.setEffectiveDate(effectiveDate);
 		tPfCoOfficerId.setEmpNo(empNo);
-		tPfCoOfficer = pfCoOfficerService.holdById(tPfCoOfficerId, titaVo);
+		tPfCoOfficer = pfCoOfficerService.findById(tPfCoOfficerId, titaVo);
 		if (tPfCoOfficer == null) {
 			throw new LogicException("E0006", "PfCoOffice資料不存在"); // 鎖定資料時，發生錯誤
 		}

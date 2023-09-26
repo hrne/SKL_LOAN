@@ -61,7 +61,7 @@ public class L6903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  B.\"TranItem\" AS \"TranItem\" , ";
 		sql += "  C.\"Fullname\" as \"TlrName\" , ";
 		sql += "  D.\"Fullname\" as \"SupName\" , ";
-		sql += " E.\\\"AcNoItem\\\" AS \\\"AcNoItem\\\" ";
+		sql += "  E.\"AcNoItem\" AS \"AcNoItem\" ";
 		sql += " FROM \"AcDetail\" A ";
 		sql += " LEFT JOIN \"TxTranCode\" B on B.\"TranNo\"= A.\"TitaTxCd\" ";
 		sql += " LEFT JOIN \"CdEmp\" C on C.\"EmployeeNo\"= A.\"TitaTlrNo\" ";
@@ -183,11 +183,13 @@ public class L6903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String iRvNo = titaVo.getParam("RvNo").trim();
 		int iAcDateS = this.parse.stringToInteger(titaVo.getParam("AcDateSt")) + 19110000;
 		int iAcDateE = this.parse.stringToInteger(titaVo.getParam("AcDateEd")) + 19110000;
+		int iEntAc =parse.stringToInteger(titaVo.getParam("EntAc"));
 		this.info("AcBookCode   =" + iAcBookCode);
 		this.info("CurrencyCode =" + iCurrencyCode);
 		this.info("BranchNo     =" + iBranchNo);
 		this.info("acdates      =" + iAcDateS);
 		this.info("acdatee      =" + iAcDateE);
+		this.info("iEntAc       =" + iEntAc);
 
 		String sql = "SELECT  sum(a.\"TxAmt\") AS \"TxAmt\", ";
 		sql += "                  a.\"DbCr\"   AS  \"DbCr\" ";
@@ -197,8 +199,9 @@ public class L6903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"CdEmp\" D on D.\"EmployeeNo\"= A.\"TitaSupNo\" ";
 		sql += " LEFT JOIN \"CdAcCode\" E on E.\"AcNoCode\"= A.\"AcNoCode\" and E.\"AcSubCode\"= A.\"AcSubCode\" and E.\"AcDtlCode\"= a.\"AcDtlCode\" ";
 		sql += " WHERE A.\"AcDate\" BETWEEN :AcDateS AND :AcDateE ";
-		sql += " AND A.\"EntAc\" > 0 ";
-
+		if (iEntAc != 99) {
+			sql += " AND A.\"EntAc\" = :EntAc " ;
+		}
 		if (!iAcBookCode.isEmpty()) {
 			sql += "AND A.\"AcBookCode\" = :AcBookCode ";
 		}
@@ -230,8 +233,6 @@ public class L6903ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "AND A.\"RvNo\" like :RvNo ";
 		}
 		sql += "GROUP BY A.\"DbCr\" ";
-//		sql += "ORDER BY A.\"AcDate\" ASC ";
-
 		this.info("FindL6903Amt sql=" + sql);
 
 		Query query;
@@ -269,6 +270,9 @@ public class L6903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 		if (!iRvNo.isEmpty()) {
 			query.setParameter("RvNo", iRvNo);
+		}
+		if (iEntAc != 99) {
+			query.setParameter("EntAc", iEntAc);
 		}
 
 		this.info("L6903Service FindData=" + query);

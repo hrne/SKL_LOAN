@@ -64,7 +64,7 @@ public class L9746ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   LEFT JOIN \"CdBcm\" CB2 ON CB2.\"UnitCode\" = PI.\"DistCode\" ";
 		sql += "   LEFT JOIN \"CdBcm\" CB3 ON CB3.\"UnitCode\" = PI.\"UnitCode\" ";
 		sql += "   WHERE PI.\"WorkMonth\" = :inputWorkMonth ";
-		sql += "     AND PI.\"RepayType\" = 0 ";
+		sql += "     AND PI.\"RepayType\" IN (0, 4) ";
 		sql += "     AND (PI.\"PerfEqAmt\" != 0 OR PI.\"PerfReward\" != 0) ";
 		sql += " ) ";
 		sql += " , S1 AS ( ";

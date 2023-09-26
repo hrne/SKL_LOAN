@@ -52,12 +52,12 @@ public class L6995 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = Integer.MAX_VALUE; // 217 * 200 = 43400
+		this.limit = 400; // 217 * 200 = 43400
 
 		if (!iStockCode.equals("")) {
 			CdStock lCdStock2 = sCdStockService.findById(iStockCode, titaVo);
 			if(lCdStock2 == null) {
-				throw new LogicException(titaVo, "E0001", "查無資料");
+				throw new LogicException(titaVo, "E0001", "股票代號檔");
 			}
 			OccursList occursList = new OccursList();
 			occursList.putParam("OOStockCode", lCdStock2.getStockCode());
@@ -99,7 +99,7 @@ public class L6995 extends TradeBuffer {
 				this.totaVo.addOccursList(occursList);
 			}
 
-			if (lCdStock != null && lCdStock.size() >= this.limit) {
+			if (L6995DateList != null && L6995DateList.hasNext()) {
 				/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 				titaVo.setReturnIndex(this.setIndexNext());
 				this.totaVo.setMsgEndToEnter();// 手動折返

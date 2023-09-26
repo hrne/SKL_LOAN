@@ -215,7 +215,7 @@ public class L4701Report extends MakeReport {
 				print(0, 31, tCdBank.getBankItem()); // 支票銀行
 				print(0, 53, tCdBank.getBranchItem());// 支票分行
 			}
-			print(0, 69, FormatUtil.padX("" + tLoanCheque.getChequeAcct(), 9));// 帳號
+			print(0, 69, FormatUtil.pad9("" + tLoanCheque.getChequeAcct(), 9));// 帳號
 			print(0, 80, FormatUtil.padX("" + tLoanCheque.getChequeNo(), 7));// 票號
 			this.print(0, 110, df.format(tLoanCheque.getChequeAmt()), "R");// 票面金額
 			tCdCode = new CdCode();

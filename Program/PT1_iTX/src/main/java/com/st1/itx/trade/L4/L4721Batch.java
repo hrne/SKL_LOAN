@@ -17,10 +17,10 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CustMain;
-import com.st1.itx.db.domain.CustNotice;
+import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.CustMainService;
-import com.st1.itx.db.service.CustNoticeService;
+import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.springjpa.cm.L4721ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.CustNoticeCom;
@@ -60,7 +60,7 @@ public class L4721Batch extends TradeBuffer {
 	private CustMainService custMainService;
 
 	@Autowired
-	private CustNoticeService custNoticeService;
+	private FacMainService sFacMainService;
 
 	@Autowired
 	private TxToDoCom txToDoCom;
@@ -116,11 +116,11 @@ public class L4721Batch extends TradeBuffer {
 		iCustType = parse.stringToInteger(titaVo.getParam("CustType"));
 		wkCalDy = dateUtil.getNowIntegerForBC();
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI() + 19110000).setBrno(titaVo.getBrno())
-				.setRptCode("L8102").setRptItem("期款扣款通知(簡訊)").build();
+				.setRptCode("L4721").setRptItem("期款扣款通知(簡訊)").build();
 		// 開啟報表
 		makeFileText.open(titaVo, reportVo, "簡訊檔.txt");
 		ReportVo mailReportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI() + 19110000).setBrno(titaVo.getBrno())
-				.setRptCode("L8102").setRptItem("期款扣款通知(EMail)").build();
+				.setRptCode("L4721").setRptItem("期款扣款通知(EMail)").build();
 		// 開啟報表
 		makeFileMail.open(titaVo, mailReportVo, "email檔.txt");
 
@@ -169,9 +169,9 @@ public class L4721Batch extends TradeBuffer {
 
 					int cntTrans = 0;
 
-					String isEmail = "Y";
-					String isMsg = "Y";
-					String isLetter = "Y";
+					String isEmail = "N";
+					String isMsg = "N";
+					String isLetter = "N";
 
 					for (Map<String, String> data : custList) {
 
@@ -181,39 +181,29 @@ public class L4721Batch extends TradeBuffer {
 
 						try {
 
-//							TempVo tempVo = new TempVo();
-//							tempVo = custNoticeCom.getCustNotice("L4721", custNoTmp, 0, titaVo);
-
-							Slice<CustNotice> custNoticeSlice = custNoticeService.findCustNoFormNo(custNoTmp, "L4721",
-									0, Integer.MAX_VALUE, titaVo);
-
-							List<CustNotice> listCustNotice = custNoticeSlice == null ? null
-									: custNoticeSlice.getContent();
-
-							// 直接看資料庫
-							// Y 是 要寄 要送 要通知 要列印
-							// N 是 不寄 不送 不通知 不列印
-							// 皆預設Y
-							if (listCustNotice == null) {
-								isEmail = "Y";
-								isMsg = "Y";
-								isLetter = "Y";
+							Slice<FacMain> lFacMainService = sFacMainService.CustNoAll(custNoTmp, 0, Integer.MAX_VALUE,
+									titaVo);
+							// 利率調整通知，看FacMain.getRateAdjNoticeCode
+							if (lFacMainService == null) {
+								isEmail = "N";
+								isMsg = "N";
+								isLetter = "N";
 
 							} else {
-								for (CustNotice r : listCustNotice) {
+								for (FacMain r : lFacMainService) {
+									int rateAdjNoticeCode = parse.stringToInteger(r.getRateAdjNoticeCode());
+									this.info("rateAdjNoticeCode = " + rateAdjNoticeCode + "");
 
-									// *在資料庫的N是不寄送 不發送
-									if ("N".equals(r.getEmailNotice())) {
-										// 有申請表是不要，須改為N
-										isEmail = "N";
+									if (rateAdjNoticeCode == 1) {
+										isEmail = "Y";
 									}
 
-									if ("N".equals(r.getMsgNotice())) {
-										isMsg = "N";
+									if (rateAdjNoticeCode == 2) {
+										isLetter = "Y";
 									}
 
-									if ("N".equals(r.getPaperNotice())) {
-										isLetter = "N";
+									if (rateAdjNoticeCode == 3) {
+										isMsg = "Y";
 									}
 								}
 							}
@@ -256,19 +246,14 @@ public class L4721Batch extends TradeBuffer {
 									setMailMFileVO(data, noticeEmail, titaVo);
 								}
 
-							}
-
-							// 書面通知
-							if ("Y".equals(isLetter)) {
+								// 書面通知
+							} else if ("Y".equals(isLetter)) {
 								if (custNoTmp != custNoLast) {
 									CntPaper = CntPaper + 1;
 									letterCustList.add(data);
 								}
-
-							}
-
-							// 簡訊通知
-							if ("Y".equals(isMsg)) {
+								// 簡訊通知
+							} else if ("Y".equals(isMsg)) {
 								CntMsg = CntMsg + 1;
 								setTextFileVO(titaVo, data);
 							}
@@ -295,6 +280,13 @@ public class L4721Batch extends TradeBuffer {
 			} // if
 
 		} // for
+
+		if (CntEmail == 0) {
+			makeFileMail.put("本日無資料");
+		}
+		if (CntMsg == 0) {
+			makeFileText.put("本日無資料");
+		}
 
 		String msg = "";
 

@@ -13,12 +13,14 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.NegAppr01;
 import com.st1.itx.db.domain.NegFinAcct;
 import com.st1.itx.db.domain.NegFinShare;
 import com.st1.itx.db.domain.NegFinShareLog;
 import com.st1.itx.db.domain.NegMain;
 import com.st1.itx.db.domain.NegMainId;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.NegAppr01Service;
 import com.st1.itx.db.service.NegFinAcctService;
 import com.st1.itx.db.service.NegFinShareLogService;
@@ -40,6 +42,8 @@ public class L5983 extends TradeBuffer {
 
 	@Autowired
 	public NegMainService negMainService;
+	@Autowired
+	public CustMainService custMainService;
 	@Autowired
 	public NegFinShareService negFinShareService;
 	@Autowired
@@ -81,13 +85,25 @@ public class L5983 extends TradeBuffer {
 		this.info("diffdd = " + diffdd);
 		BigDecimal intAmt = tNegMain.getPrincipalBal().multiply(tNegMain.getIntRate())
 				.divide(parse.stringToBigDecimal("100")).multiply(parse.stringToBigDecimal("" + diffdd))
-				.divide(parse.stringToBigDecimal("365"));
+				.divide(parse.stringToBigDecimal("365")).setScale(0, BigDecimal.ROUND_HALF_UP);
 		tempAmt = tNegMain.getPrincipalBal().add(intAmt).subtract(tNegMain.getAccuOverAmt());
 		BigDecimal revivAmt = tNegMain.getPrincipalBal().add(intAmt);
 		String revivAmtX = df.format(revivAmt) + "(本金：" + df.format(tNegMain.getPrincipalBal()) + "　利息："
 				+ df.format(intAmt) + ")";
 		this.totaVo.putParam("OCustId", iCustId);
 		this.totaVo.putParam("OCustNo", tNegMain.getCustNo());
+		String custName = "";
+		if (tNegMain.getCustNo() > 9990000) {
+			custName = tNegMain.getNegCustName();
+		} else {
+			CustMain tCustMain = custMainService.custNoFirst(tNegMain.getCustNo(), tNegMain.getCustNo(), titaVo);
+			if (tCustMain == null) {
+				throw new LogicException("E0001", "戶號不存在客戶主檔主檔");// 查無資料
+			}
+			custName = tCustMain.getCustName();
+		}
+		this.totaVo.putParam("OCustName", custName);
+		this.totaVo.putParam("OApplDate", tNegMain.getApplDate());
 		this.totaVo.putParam("OCaseSeq", tNegMain.getCaseSeq());
 		this.totaVo.putParam("OPrincipalBal", tNegMain.getPrincipalBal());
 		this.totaVo.putParam("OAccuOverAmt", tNegMain.getAccuOverAmt());
@@ -103,25 +119,36 @@ public class L5983 extends TradeBuffer {
 				tNegMain.getCaseSeq(), 0, Integer.MAX_VALUE, titaVo);
 
 		if (slNegFinShare != null && slNegFinShare.getContent().size() > 0) {
+			BigDecimal lastApprAmt = BigDecimal.ZERO;
+			int cnt = 0;
 			for (NegFinShare tNegFinShare : slNegFinShare.getContent()) {
 				OccursList occursList = new OccursList();
 				String FinItem = "";
+				cnt++;
 				BigDecimal accuApprAmt = BigDecimal.ZERO; // 暫收抵繳
 				NegFinAcct tNegFinAcct = negFinAcctService.findById(tNegFinShare.getFinCode(), titaVo);
 				if (tNegFinAcct != null) {
 					FinItem = tNegFinAcct.getFinItem();
 				}
+				BigDecimal apprAmt = tempAmt.multiply(tNegFinShare.getAmtRatio())
+						.divide(parse.stringToBigDecimal("100")).setScale(0, BigDecimal.ROUND_HALF_UP);
+				if (cnt == slNegFinShare.getSize()) {
+					apprAmt = tempAmt.subtract(lastApprAmt);
+				} else {
+					lastApprAmt = lastApprAmt.add(apprAmt);
+				}
 				// 抓該戶該機構最後一筆累計撥付金額
 				NegAppr01 tNegAppr01 = negAppr01Service.findCustNoFinCodeFirst(tNegFinShare.getCustNo(),
 						tNegFinShare.getCaseSeq(), tNegFinShare.getFinCode(), titaVo);
+				accuApprAmt = apprAmt;
 				if (tNegAppr01 != null) {
-					accuApprAmt = tNegAppr01.getAccuApprAmt();
+					accuApprAmt = accuApprAmt.add(tNegAppr01.getAccuApprAmt());
 				}
-				BigDecimal apprAmt = tempAmt.multiply(tNegFinShare.getAmtRatio());
 				occursList.putParam("OOFinCode", tNegFinShare.getFinCode());// 債權機構
 				occursList.putParam("OOFinItem", FinItem); // 機構名稱
 				occursList.putParam("OOApprAmt", apprAmt);// 撥付金額
 				occursList.putParam("OOAccuApprAmt", accuApprAmt);// 累計撥付金額
+				occursList.putParam("OOIsCancel", "");// 是否註銷
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}
@@ -149,6 +176,7 @@ public class L5983 extends TradeBuffer {
 					occursList.putParam("OOFinItem", FinItem); // 機構名稱
 					occursList.putParam("OOApprAmt", "0");// 撥付金額
 					occursList.putParam("OOAccuApprAmt", accuApprAmt);// 累計撥付金額
+					occursList.putParam("OOIsCancel", "Y");// 是否註銷
 					/* 將每筆資料放入Tota的OcList */
 					this.totaVo.addOccursList(occursList);
 				}

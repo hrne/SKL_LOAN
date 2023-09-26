@@ -69,7 +69,7 @@ public class L4701 extends TradeBuffer {
 
 	@Autowired
 	public BatxChequeService batxChequeService;
-	
+
 	@Autowired
 	AcCloseService acCloseService;
 
@@ -132,7 +132,6 @@ public class L4701 extends TradeBuffer {
 //		EntryDate	作帳日期		A	7	78	85	YYYMMDD
 //		CustNo		相關資訊		X	10	85	95	放款戶戶號
 
-
 		totaVo.put("PdfSnoM", "");
 
 		if (lLoanCheque != null && lLoanCheque.size() != 0) {
@@ -151,8 +150,8 @@ public class L4701 extends TradeBuffer {
 				occursList.putParam("ChequeNo", FormatUtil.pad9("" + tLoanCheque.getChequeNo(), 7));
 				occursList.putParam("ChequeDate", FormatUtil.pad9("" + tLoanCheque.getChequeDate(), 7));
 				occursList.putParam("BankCode", FormatUtil.padX("" + tLoanCheque.getBankCode(), 7));
-				occursList.putParam("ChequeAcct", FormatUtil.padX("" + tLoanCheque.getChequeAcct(), 9));
-				occursList.putParam("ChequeAmt", FormatUtil.pad9("" + tLoanCheque.getChequeAmt(), 7));
+				occursList.putParam("ChequeAcct", FormatUtil.pad9("" + tLoanCheque.getChequeAcct(), 9));
+				occursList.putParam("ChequeAmt", FormatUtil.pad9("" + tLoanCheque.getChequeAmt(), 10));
 				occursList.putParam("MediaDate", FormatUtil.pad9("" + iAcDate, 7));
 				occursList.putParam("Teller", FormatUtil.padX(titaVo.getTlrNo(), 6) + "01");
 				occursList.putParam("UnitCode", "10H400");

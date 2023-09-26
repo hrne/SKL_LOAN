@@ -176,7 +176,12 @@ BEGIN
             ,TR1."LMSASQ" 
             ,TR1."TRXAMT" 
             ,TR1."TRXMEM" 
-            ,TR1."TRXSAK" -- 還款來源
+            ,MAX(
+               CASE
+                 WHEN TR1."TRXSAK" IN (3,4)
+                 THEN TR1."TRXSAK"
+               ELSE 0 END
+             ) AS TRXSAK
             ,MIN(CASE 
                    WHEN TR1."TRXIDT" > 20400101 
                    THEN TR1."TRXDAT" 
@@ -215,7 +220,6 @@ BEGIN
               ,TR1."LMSASQ" 
               ,TR1."TRXAMT" 
               ,TR1."TRXMEM" 
-              ,TR1."TRXSAK" -- 還款來源
     ) 
     , S4 AS ( 
       SELECT TR."TRXDAT" 

@@ -47,17 +47,33 @@ BEGIN
       , "LastUpdate"          -- 最後更新日期時間 DATE 8 
       , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
     )
-    SELECT '000'                          AS "AcBookCode"          -- 帳冊別 VARCHAR2 3 -- 2021-07-15 修改: 000:全公司
+    SELECT CASE
+             WHEN FSC."ACTFSC" = 'A' THEN '000'
+           ELSE "Fn_ThrowException"('LN$FSCP.ACTFSC出現 A 以外的值:' || FSC.ACTFSC)
+           END                            AS "AcBookCode"          -- 帳冊別 VARCHAR2 3 -- 2021-07-15 修改: 000:全公司
          , CASE
              WHEN FSC."ACTFSC" = 'A' THEN '201'
            -- 2023-09-15 Wei 修改 from SKL-IT 珮琪 出現A以外的值要提示錯誤,不能寫入
            ELSE "Fn_ThrowException"('LN$FSCP.ACTFSC出現 A 以外的值:' || FSC.ACTFSC)
            END                            AS "AcSubBookCode"       -- 區隔帳冊 VARCHAR2 3 -- 2021-07-15 新增 00A:傳統帳冊、201:利變帳冊
-         , 'TWD'                          AS "CurrencyCode"        -- 幣別
-         , FSC."FSCQTA"                   AS "TargetAmt"           -- 放款目標金額 DECIMAL 16 2
-         , G1."LoanBalSum"                AS "ActualAmt"           -- 放款實際金額 DECIMAL 16 2
-         , FSC."FSCPTY"                   AS "AssignSeq"           -- 分配順序 DECIMAL 2 
-         , 'A'                            AS "AcctSource"          --	VARCHAR2(1 BYTE)	Yes		6	資金來源
+         , CASE
+             WHEN FSC."ACTFSC" = 'A' THEN 'TWD'
+           ELSE "Fn_ThrowException"('LN$FSCP.ACTFSC出現 A 以外的值:' || FSC.ACTFSC)
+           END                            AS "CurrencyCode"        -- 幣別
+         , CASE
+             WHEN FSC."ACTFSC" = 'A' THEN FSC."FSCQTA"
+           ELSE "Fn_ThrowException"('LN$FSCP.ACTFSC出現 A 以外的值:' || FSC.ACTFSC)
+           END                            AS "TargetAmt"           -- 放款目標金額 DECIMAL 16 2
+         -- 2023-09-26 Wei from SKL-IT 盈倩 QC:2371
+         , 0                              AS "ActualAmt"           -- 放款實際金額 DECIMAL 16 2
+         , CASE
+             WHEN FSC."ACTFSC" = 'A' THEN FSC."FSCPTY"
+           ELSE "Fn_ThrowException"('LN$FSCP.ACTFSC出現 A 以外的值:' || FSC.ACTFSC)
+           END                            AS "AssignSeq"           -- 分配順序 DECIMAL 2 
+         , CASE
+             WHEN FSC."ACTFSC" = 'A' THEN 'A'
+           ELSE "Fn_ThrowException"('LN$FSCP.ACTFSC出現 A 以外的值:' || FSC.ACTFSC)
+           END                            AS "AcctSource"          --	VARCHAR2(1 BYTE)	Yes		6	資金來源
          , JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 8 
          , '999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
          , JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 8 

@@ -105,6 +105,8 @@ T(3,[L5983] 結清試算)
 #OCustId=X,10,L
 #OCustNo=A,7,L
 #OCaseSeq=A,3,L
+#OCustName=x,50,L
+#OApplDate=D,7,L
 #OPrincipalBal=m,14,L
 #OAccuOverAmt=m,14,L
 #ODueAmt=m,14,L
@@ -122,7 +124,7 @@ T(3,1)ASGN(LOOP$)
 #OOFinItem=x,50,O
 #OOApprAmt=m,14,O
 #OOAccuApprAmt=m,14,O
-
+#OOIsCancel=X,1,S
 </sub>
 
 
@@ -141,6 +143,8 @@ T(3,1)ASGN(LOOP$)
 TXFORM=L5983
 #OCustId
 #OCustNo
+#OCustName
+#OApplDate
 #OCaseSeq
 #OPrincipalBal
 #OAccuOverAmt
@@ -154,6 +158,7 @@ TXFORM=L5983
 #OOFinItem
 #OOApprAmt
 #OOAccuApprAmt
+#OOIsCancel
 ^
 
 <include src="HELPRIM.icf::HELPRIM.tom"/>
@@ -167,12 +172,13 @@ TXFORM=L5983
 [
 ["[L5983]                                 結 清 試 算"],
 [#<->#,"身分證字號",#OCustId],
-["戶號",#OCustNo],["案件序號",#OCaseSeq],
+["戶號",#OCustNo],["戶名",#OCustName],
+["案件序號",#OCaseSeq],["協商申請日",#OApplDate],
 ["總本金餘額",#OPrincipalBal],["累溢收金額",#OAccuOverAmt],
 ["期款",#ODueAmt],["利率",#OIntRate,"%"],
 ["入帳日期",#OEntryDate],["是否為最大債權銀行",#OIsMainFin],
-["暫收抵繳",#OTempAmt],["溢收抵繳",#OAccuOverAmt],
-[#<->#,"應還金額",#ORevivAmtX],
+["應還金額",#ORevivAmtX],["溢收抵繳",#OAccuOverAmt],
+[#<->#,"暫收抵繳",#OTempAmt],
 ]
 </sub>
 
@@ -193,6 +199,9 @@ TXFORM=L5983
 
 #OOAccuApprAmt=累計撥付金額
 {width:180}
+
+#OOIsCancel=已註銷
+{width:60}
 
 
 ^

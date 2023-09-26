@@ -156,10 +156,10 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 應收利息
 		sql += " UNION ";
 		sql += " SELECT 'IntRecv' AS \"Item\" ";
-		sql += " 	   ,SUM(\"IntAmtAcc\") AS \"Amt\" ";// 應收利息
-		sql += " FROM \"MonthlyLoanBal\" ";
-		sql += " WHERE \"LoanBalance\" > 0 ";
-		sql += "   AND \"YearMonth\" = :yymm ";
+		sql += " 	   ,SUM(\"TdBal\")  AS \"AMT\" ";
+		sql += " FROM \"CoreAcMain\"";
+		sql += " WHERE \"AcNoCode\" IN ( '10240000000' ) "; // 應收利息
+		sql += "   AND \"AcDate\" = TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR( :yymm*100+1), 'YYYYMMDD')),'YYYYMMDD')) ";
 		sql += "   AND \"CurrencyCode\" = 'NTD' ";
 		// 專案貸款
 		sql += " UNION ";
@@ -168,10 +168,17 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " FROM \"MonthlyFacBal\" ";
 		sql += " WHERE \"PrinBalance\" > 0 ";
 		sql += "   AND \"YearMonth\" = :yymm ";
-		sql += "   AND \"ClCode1\" IN (1,2) ";
-		sql += "   AND (\"FacAcctCode\" = 340";
-		sql += "    OR REGEXP_LIKE(\"ProdNo\",'I[A-Z]')";
-		sql += "    OR REGEXP_LIKE(\"ProdNo\",'8[1-8]'))";
+		sql += "   AND \"GovProjectFlag\" IN ('Y','C') ";
+		// 專案差額
+		sql += " UNION ";
+		sql += " SELECT 'ProDiff' AS \"Item\" ";
+		sql += " 	   ,SUM(JSON_VALUE(\"JsonFields\",'$.\"LoanBal\"') ";
+		sql += "		- JSON_VALUE(\"JsonFields\",'$.\"oLoanBal\"') ";
+		sql += "		- JSON_VALUE(\"JsonFields\",'$.\"88LoanBal\"')) AS \"AMT\" ";
+		sql += " FROM \"CdComm\" ";
+		sql += " WHERE \"CdType\" ='02'";
+		sql += "   AND \"CdItem\" = '02'";
+		sql += "   AND \"EffectDate\" =  :yymm * 100 + 1 ";
 		// 利關人_職員數
 		sql += " UNION ";
 		sql += " SELECT 'Stakeholder' AS \"Item\" ";

@@ -53,6 +53,16 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		WHERE M.\"YearMonth\" = :yymm ";
 		sql += "		  AND M.\"PrinBalance\" > 0 ";
 		sql += "		GROUP BY DECODE(M.\"EntCode\",'1','G7','G6')";
+		
+		sql += "		UNION All ";
+		sql += "		SELECT 'G6' AS \"Column\"";
+		sql += "			   ,0   AS \"Value\"";
+		sql += "		FROM dual ";
+				
+		sql += "		UNION All ";
+		sql += "		SELECT 'G7' AS \"Column\"";
+		sql += "			   ,0   AS \"Value\"";
+		sql += "		FROM dual ";
 
 		sql += "		UNION All ";
 		sql += "		SELECT 'H20' AS \"Column\"";
@@ -60,7 +70,10 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		FROM \"MonthlyFacBal\" M ";
 		sql += "		WHERE M.\"YearMonth\" = :yymm ";
 		sql += "		  AND \"DepartmentCode\" ='1' ";
-
+		sql += "		UNION All ";
+		sql += "		SELECT 'H20' AS \"Column\"";
+		sql += "			   ,0   AS \"Value\"";
+		sql += "		FROM dual ";
 		sql += "		UNION All ";
 		sql += "		SELECT 'E9' AS \"Column\"";
 		sql += "			  ,SUM(\"TdBal\") AS \"Value\"";
@@ -68,7 +81,10 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   		WHERE \"AcDate\" = TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR(:yymm*100+1), 'YYYYMMDD')),'YYYYMMDD')) ";
 		sql += "		  AND \"AcNoCode\" IN ('10601301000','10601302000') "; // 催收款項法務費用+催收款項火險費用
 		sql += "		  AND \"CurrencyCode\" = 'NTD' ";
-
+		sql += "		UNION All ";
+		sql += "		SELECT 'E9' AS \"Column\"";
+		sql += "			   ,0   AS \"Value\"";
+		sql += "		FROM dual ";
 		sql += "		UNION All ";
 		sql += "		SELECT 'G24' AS \"Column\"";// 本月新轉催收金額
 		sql += "			  ,SUM(\"PrinBalance\") AS \"Value\"";
@@ -76,7 +92,10 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   		WHERE \"OvduDate\"  BETWEEN :yymm*100+1 AND :yymm*100+31 ";
 		sql += "		  AND \"AcctCode\" = '990' "; // 催收放款
 		sql += "		  AND \"YearMonth\" = :yymm ";
-
+		sql += "		UNION All ";
+		sql += "		SELECT 'G24' AS \"Column\"";
+		sql += "			   ,0   AS \"Value\"";
+		sql += "		FROM dual ";
 		sql += "		UNION All ";
 		sql += "		SELECT 'F24' AS \"Column\""; // 本月新轉催收筆數
 		sql += "			  ,SUM(1) AS \"Value\"";
@@ -85,14 +104,10 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  AND \"AcctCode\" = '990' "; // 催收放款
 		sql += "		  AND \"PrinBalance\" > 0  ";
 		sql += "		  AND \"YearMonth\" = :yymm ";
-
 		sql += "		UNION All ";
-		sql += "		SELECT 'E9' AS \"Column\"";
-		sql += "			  ,SUM(\"TdBal\") AS \"Value\"";
-		sql += "		FROM \"CoreAcMain\"";
-		sql += "   		WHERE \"AcDate\" = TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR(:yymm*100+1), 'YYYYMMDD')),'YYYYMMDD')) ";
-		sql += "		  AND \"AcNoCode\" IN ('10601301000','10601302000') "; // 催收款項法務費用+催收款項火險費用
-		sql += "		  AND \"CurrencyCode\" = 'NTD' ";
+		sql += "		SELECT 'F24' AS \"Column\"";
+		sql += "			   ,0   AS \"Value\"";
+		sql += "		FROM dual ";
 
 		sql += "		UNION All ";
 		sql += "		SELECT 'G8' AS \"Column\"";
@@ -101,7 +116,10 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   		WHERE \"AcDate\" = TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR(:yymm*100+1), 'YYYYMMDD')),'YYYYMMDD')) ";
 		sql += "		  AND \"AcNoCode\" IN ('10600304000','10601304000') "; // 放款折溢價+催收款項折溢價
 		sql += "		  AND \"CurrencyCode\" = 'NTD' ";
-
+		sql += "		UNION All ";
+		sql += "		SELECT 'G8' AS \"Column\"";
+		sql += "			   ,0   AS \"Value\"";
+		sql += "		FROM dual ";
 		sql += "		UNION All ";
 		sql += "		SELECT 'E8' AS \"Column\"";
 		sql += "			  ,SUM(\"TdBal\") AS \"Value\"";
@@ -110,13 +128,20 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  AND \"AcNoCode\" IN ('10601304000') "; // 催收款項折溢價
 		sql += "		  AND \"CurrencyCode\" = 'NTD' ";
 		sql += "		UNION All ";
+		sql += "		SELECT 'E8' AS \"Column\"";
+		sql += "			   ,0   AS \"Value\"";
+		sql += "		FROM dual ";
+		sql += "		UNION All ";
 		sql += "		SELECT 'H26' AS \"Column\"";// 保貸
 		sql += "			  ,SUM(\"TdBal\") AS \"Value\"";
 		sql += "		FROM \"CoreAcMain\"";
 		sql += "   		WHERE \"AcDate\" = TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR(:yymm*100+1), 'YYYYMMDD')),'YYYYMMDD')) ";
 		sql += "		  AND \"AcNoCode\" IN ('10601','10602') ";// 壽險貸款 墊繳保費
 		sql += "		  AND \"CurrencyCode\" = 'TOL' ";// 幣別合計
-
+		sql += "		UNION All ";
+		sql += "		SELECT 'H26' AS \"Column\"";
+		sql += "			   ,0   AS \"Value\"";
+		sql += "		FROM dual ";
 		sql += "		UNION All ";
 		sql += "		SELECT 'B20' AS \"Column\"";
 		sql += "			  ,SUM(\"TdBal\") AS \"Value\"";
@@ -124,6 +149,10 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   		WHERE \"AcDate\" = TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR(:yymm*100+1), 'YYYYMMDD')),'YYYYMMDD')) ";
 		sql += "		  AND \"AcNoCode\" IN ('10623','10624') "; // 備抵損失擔保放款+備抵損失催收款項擔保放款
 		sql += "		  AND \"CurrencyCode\" = 'NTD' ";
+		sql += "		UNION All ";
+		sql += "		SELECT 'B20' AS \"Column\"";
+		sql += "			   ,0   AS \"Value\"";
+		sql += "		FROM dual ";
 		sql += "	),\"tempAmt\" AS (";
 		sql += "		SELECT CASE";
 		sql += "				 WHEN M.\"EntCode\" = '0' AND M.\"AcctCode\" <> '990' AND M.\"OvduTerm\" >=3 ";
@@ -149,6 +178,24 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "				   WHEN M.\"EntCode\" = '1' AND M.\"AcctCode\" = '990' ";
 		sql += "				   THEN 'E7'";
 		sql += "			     ELSE 'N1' END ";
+		sql += "		UNION All ";
+		sql += "		SELECT 'C6' AS \"Column\"";
+		sql += "			   ,0   AS \"Value\"";
+		sql += "		FROM dual ";
+		sql += "		UNION All ";
+		sql += "		SELECT 'C7' AS \"Column\"";
+		sql += "			   ,0   AS \"Value\"";
+		sql += "		FROM dual ";
+		sql += "		UNION All ";
+		sql += "		SELECT 'E6' AS \"Column\"";
+		sql += "			   ,0   AS \"Value\"";
+		sql += "		FROM dual ";
+		sql += "		UNION All ";
+		sql += "		SELECT 'E7' AS \"Column\"";
+		sql += "			   ,0   AS \"Value\"";
+		sql += "		SELECT 'N1' AS \"Column\"";
+		sql += "			   ,0   AS \"Value\"";
+		sql += "		FROM dual ";
 		sql += "	),\"tempCnt\" AS (";
 		sql += "		SELECT CASE";
 		sql += "				 WHEN M.\"EntCode\" = '0' AND M.\"AcctCode\" <> '990' AND M.\"OvduTerm\" >=3 ";
@@ -174,18 +221,38 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "				   WHEN M.\"EntCode\" = '1' AND M.\"AcctCode\" = '990' ";
 		sql += "				   THEN 'D7'";
 		sql += "			     ELSE 'N2' END ";
+		sql += "		UNION All ";
+		sql += "		SELECT 'B6' AS \"Column\"";
+		sql += "			   ,0   AS \"Value\"";
+		sql += "		FROM dual ";
+		sql += "		UNION All ";
+		sql += "		SELECT 'B7' AS \"Column\"";
+		sql += "			   ,0   AS \"Value\"";
+		sql += "		FROM dual ";
+		sql += "		UNION All ";
+		sql += "		SELECT 'D6' AS \"Column\"";
+		sql += "			   ,0   AS \"Value\"";
+		sql += "		FROM dual ";
+		sql += "		UNION All ";
+		sql += "		SELECT 'D7' AS \"Column\"";
+		sql += "			   ,0   AS \"Value\"";
+		sql += "		SELECT 'N2' AS \"Column\"";
+		sql += "			   ,0   AS \"Value\"";
+		sql += "		FROM dual ";
 		sql += "	)";
 		// 表示單位正常顯示
 		if (unit == 0) {
-			sql += "	SELECT \"Column\", \"Value\" FROM \"tempTotal\"";
+			sql += "	SELECT \"Column\", SUM(\"Value\") AS \"Value\" FROM \"tempTotal\" GROUP BY \"Column\"";
 			sql += "	UNION";
-			sql += "	SELECT \"Column\", \"Value\" FROM \"tempAmt\"";
+			sql += "	SELECT \"Column\", SUM(\"Value\") AS \"Value\" FROM \"tempAmt\" GROUP BY \"Column\"";
 			sql += "	UNION";
-			sql += "	SELECT \"Column\", \"Value\" FROM \"tempCnt\"";
+			sql += "	SELECT \"Column\", SUM(\"Value\") AS \"Value\" FROM \"tempCnt\" GROUP BY \"Column\"";
 		} else {
-			sql += "	SELECT \"Column\", ROUND(\"Value\" / " + unit + ",0) AS \"Value\" FROM \"tempTotal\"";
+			sql += "	SELECT \"Column\", ROUND(\"Value\" / " + unit + ",0) AS \"Value\" ";
+			sql += "	FROM (SELECT \"Column\", SUM(\"Value\") AS \"Value\" FROM \"tempTotal\" GROUP BY \"Column\")";
 			sql += "	UNION";
 			sql += "	SELECT \"Column\", ROUND(\"Value\" / " + unit + ",0) AS \"Value\" FROM \"tempAmt\"";
+			sql += "	FROM (SELECT \"Column\", SUM(\"Value\") AS \"Value\" FROM \"tempAmt\" GROUP BY \"Column\")";
 			sql += "	UNION";
 			sql += "	SELECT \"Column\", \"Value\" FROM \"tempCnt\"";
 		}
