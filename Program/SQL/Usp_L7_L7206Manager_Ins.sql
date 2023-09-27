@@ -39,7 +39,7 @@ BEGIN
          , M."CustNo"
          , M."FacmNo"
          , M."YearMonth"    AS "DataMonth"
-         , F."LineAmt"      AS "AvgLineAmt"
+         , NVL(F."LineAmt",0) AS "AvgLineAmt"
          , SUM(M."LoanBalance") AS "SumLoanBal"
     FROM monthData d
     LEFT JOIN "MonthlyLoanBal" M ON M."YearMonth" = d."MaxYearMonth"

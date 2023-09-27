@@ -149,6 +149,7 @@ public class L5505 extends TradeBuffer {
 		pfItDetail.setIntroducer(titaVo.getParam("Introducer")); // 介紹人
 		pfItDetail.setUnitManager(titaVo.getParam("UnitManager")); // 處經理代號
 		pfItDetail.setDistManager(titaVo.getParam("DistManager")); // 區經理代號
+		pfItDetail.setCntingCode(titaVo.getParam("AdjCntingCode"));// 是否計件
 		pfItDetail.setDeptManager(deptManager); // 部經理代號
 		pfItDetail.setDeptCode(titaVo.getParam("DeptCode")); // 部室代號
 		pfItDetail.setDistCode(titaVo.getParam("DistCode")); // 區部代號

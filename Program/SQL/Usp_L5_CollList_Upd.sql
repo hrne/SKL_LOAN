@@ -25,7 +25,19 @@ BEGIN
 
     -- 刪除舊資料
     DELETE FROM "CollListTmp";
-
+    
+    -- 刪除無撥款主檔資料 
+    DELETE "CollList" T
+    WHERE EXISTS
+     (SELECT C.*
+      FROM "CollList" C
+      LEFT JOIN "LoanBorMain" B ON  B."CustNo" = C."CustNo"
+                               AND  B."FacmNo" = C."FacmNo"
+      WHERE C."FacmNo" > 0
+        AND NVL(B."FacmNo", 0) > 0
+        AND T."CustNo" = C."CustNo"
+        AND T."FacmNo" = C."FacmNo"
+     );
      -- step 1  同擔保品取嚴重等級最高者為同擔保品額度
      -- step 2  同額度有多筆同擔保品額度取嚴重等級最高者為新同擔保品額度 
      -- step 3  以新同擔保品額度更新同擔保品額度 

@@ -41,6 +41,7 @@ E(0,0)
 ["#<->#,#FdDistCode+區部",#DistCode,#DistCodeBTN,#DistCodeX],
 ["#<->#,#FdUnitCode+單位",#UnitCode,#UnitCodeBTN,#UnitCodeX],
 ["#<->#,#FdUtilBal+撥款金額",#UtilBal],
+["#<->#,#FdCntingCode+是否計件",#AdjCntingCode],
 ["#<->#,#FdPerfEqAmt+換算業績",#AdjPerfEqAmt],
 ["#<->#,#FdPerfReward+業務報酬",#AdjPerfReward],
 ]
@@ -66,6 +67,7 @@ T(1,@FunCode,#NTXBUF,1,1)
 #FdIntroducer=X,2,L
 #FdBsOfficer=X,2,L
 #FdUtilBal=X,2,L
+#FdCntingCode=X,2,L
 #FdPerfDate=X,2,L
 #FdPerfEqAmt=X,2,L
 C(3,#FunCode,2,T(3,*),T(3, ))
@@ -80,21 +82,15 @@ C(3,#FunCode,2,T(3,*),T(3, ))
 #FdUnitCode=X,2,L
 
 #BTNA=X,4,I,ui:button;value:員工資料查詢;enable:1;tabbable:0
-! #BTNB=X,4,I,ui:button;value:員工資料查詢;enable:1;tabbable:0
-! #BTNC=X,4,I,ui:button;value:員工資料查詢;enable:1;tabbable:0
 
-#CntingCodeH=X,10,S
-T(3,Y:是;N:否)
-
-!#BufEmpNo=X,7,S
-!T(3,      Y)
-!#BindEmpNo=X,1,S
-!BIND(#BtnEmpno,click, {cmd=CHAIN; ntxcd=L5022; ntxbuf=#BufEmpNo;ntxbuf5=type<-1:TempAdjIntroducer<-OOEmpNo:AdjIntroducer<-OOEmpNo:AdjIntroducerName<-OOFullname:L5r28FullName<-OOFullname})
 
 !FuncCode1(1:新增;2:修改;4:刪除;5:查詢)
 #CODEFuncCode1=x,20,S                  
 T(3,CdCode.FuncCode1)
 #FuncCode1Help=x,50,S
+
+#CntingCodeH=X,10,S
+T(3,Y:是;N:否)
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
@@ -103,12 +99,10 @@ R(1,XXR99)
 CALL(#HelpProc)
 T(2,@FuncCode1Help,#HelpDesc1)
 
-! FuncCode1(1:新增;2:修改;4:刪除;5:查詢)
 #FunCode=A,1,S
 
 ![維護記號名稱]
 #FunCodeX=X,4,L
-!C(3,#FunCode,5,T(3,查詢),T(H,#FunCode,#FuncCode1Help))
 T(H,#FunCode,#FuncCode1Help)
 K(MODIFYBUTTON,#FunCodeX)
 C(3,#FunCode,5,K(NOBUTTON,CLOSEY),$)
@@ -174,6 +168,7 @@ T(2,@IntroducerName,#L5r27IntroducerName)
 E(0,@UtilBal,#L5r27UtilBal)
 E(0,@AdjPerfEqAmt,#L5r27AdjPerfEqAmt)
 E(0,@AdjPerfReward,#L5r27AdjPerfReward)
+T(2,@AdjCntingCode,#L5r27AdjCntingCode)
 T(2,@UnitManager,#L5r27UnitManager)
 T(2,@UnitManagerName,#L5r27UnitManagerName)
 T(2,@DistManager,#L5r27DistManager)
@@ -274,9 +269,6 @@ R(1,L2R08)
 T(2,@IntroducerName,#L2r08FullName)
 
 #IntroducerName=X,50,L
-!! 調整後介紹人NM
-!#AdjIntroducer=X,6,S
-!@IF(#AdjIntroducer=="",T(2,@AdjIntroducerName,) T(2,@L5r28FullName,),$)
 
 #TempAdjIntroducer=X,6,S
 
@@ -284,18 +276,8 @@ T(2,@IntroducerName,#L2r08FullName)
 #BUFB=X,74,S
 T(2,      Y)
 
-! #BINDB=X,1,S
-! BIND(#BTNB,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUFB;ntxbuf5=type<-1:
-! UnitManager<-OOEmployeeNo:
-! UnitManagerName<-OOFullname})
-! IF(#InitApplCode == 1,BIND(grid,cancel),$)
-
 ! 處經理
 #UnitManager=X,6,S
-! C(3,#FunCode,4,s,$)
-! C(3,#FunCode,5,s,$)
-! @
-! C(3,#FunCode,1,V(7),$)
 
 
 #SendL2r08B=X,1,S
@@ -437,6 +419,16 @@ T(2,@UnitCodeX,#L2r66UnitItem)
 
 !已用額度
 #UtilBal=+m,15,L
+
+!是否計件
+#AdjCntingCode=X,1,I
+C(3,#FunCode,4,s,$)
+C(3,#FunCode,5,s,$)
+HELP(#CntingCodeH)
+@
+V(H,#CntingCodeH)
+
+
 ! 業績日期
 #PerfDate=D,7,S
 
@@ -503,6 +495,7 @@ IF(#AdjPerfReward==#PerfReward,T(3,),T(3,X))
 #DeptCode
 #DistCode
 #UnitCode
+#AdjCntingCode
 </sub>
 
 !------ 下行電文TOM ------

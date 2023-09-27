@@ -457,12 +457,12 @@ public class L5500Batch extends TradeBuffer {
 				hlThreeLaqhcp.setTGoalNum(new BigDecimal(d.get("SumGoalCnt")));
 				hlThreeLaqhcp.setTGoalAmt(new BigDecimal(d.get("SumGoalAmt")));
 
-				if (d.get("UnitCode").isEmpty() && d.get("DistCode").isEmpty()) {
+				if (d.get("UnitCode") == null && d.get("DistCode") == null) {
 					hlThreeLaqhcp.setActNum(new BigDecimal(d.get("DeptCnt")));
 					hlThreeLaqhcp.setActAmt(new BigDecimal(d.get("DeptAmt")));
 					hlThreeLaqhcp.setTActNum(new BigDecimal(d.get("tDeptCnt")));
 					hlThreeLaqhcp.setTActAmt(new BigDecimal(d.get("tDeptAmt")));
-				} else if (d.get("UnitCode").isEmpty()) {
+				} else if (d.get("UnitCode") == null) {
 					hlThreeLaqhcp.setActNum(new BigDecimal(d.get("DistCnt")));
 					hlThreeLaqhcp.setActAmt(new BigDecimal(d.get("DistAmt")));
 					hlThreeLaqhcp.setTActNum(new BigDecimal(d.get("tDistCnt")));

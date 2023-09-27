@@ -141,7 +141,7 @@ public class L5735ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String cond = "";
 		switch (subTxCD) {
 		case "L5735B":
-			cond += "   AND MLB.\"ProdNo\" IN ('340') ";
+			cond += "   AND MLB.\"AcctCode\" IN ('340') ";
 			cond += "   AND LBM.\"Status\" = 0 ";
 			break;
 		case "L5735D":
@@ -155,8 +155,10 @@ public class L5735ServiceImpl extends ASpringJpaParm implements InitializingBean
 		case "L5735G":
 			cond += "   AND LBM.\"UsageCode\" IN ('02') ";
 			cond += "   AND LBM.\"Status\" = 0 ";
+			break;
 		case "L5735I":
 			cond += "   AND MLB.\"ProdNo\" BETWEEN '81' AND '88' ";
+			break;
 		case "L5735J":
 			cond += "   AND MLB.\"ProdNo\" BETWEEN 'IA' AND 'II' ";
 			break;

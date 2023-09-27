@@ -130,8 +130,6 @@ public class L4510Batch extends TradeBuffer {
 	private HashMap<tmpFacm, BigDecimal> rpAmt42Map = new HashMap<>();
 //	30.暫收抵繳
 	private HashMap<tmpFacm, BigDecimal> rpAmt30Map = new HashMap<>();
-	// 累溢短收
-	private HashMap<tmpFacm, BigDecimal> sumOvpayAmt = new HashMap<>();
 
 	private HashMap<tmpFacm, Integer> mapFlag = new HashMap<>();
 // 火險單
@@ -389,7 +387,6 @@ public class L4510Batch extends TradeBuffer {
 				}
 
 			}
-			this.sumOvpayAmt.put(tmpAmtFacmNo, sumOvpayAmt);
 
 			this.info("listBaTxVo =" + listBaTxVo);
 			setBatxValue(listBaTxVo, flag, procCode);
@@ -609,6 +606,8 @@ public class L4510Batch extends TradeBuffer {
 			int wkTmpFacmNo = tmpFacmNo.get(tmp2);
 			tmpFacm tmpAmtFacmNo = new tmpFacm(tmp.getCustNo(), wkTmpFacmNo, 0, 0, tmp.getFlag(), tmp.getProcCode());
 
+			BigDecimal sumOvpayAmt = BigDecimal.ZERO;
+
 //			暫收抵繳僅寫入第一筆為期款撥款(報表用)
 			tempVo = new TempVo();
 
@@ -617,9 +616,11 @@ public class L4510Batch extends TradeBuffer {
 			}
 			if (rpAmt41Map.get(tmp2) != null) {
 				tempVo.putParam("ShortPri", rpAmt41Map.get(tmp2));
+				sumOvpayAmt = sumOvpayAmt.subtract(rpAmt41Map.get(tmp2));
 			}
 			if (rpAmt42Map.get(tmp2) != null) {
 				tempVo.putParam("ShortInt", rpAmt42Map.get(tmp2));
+				sumOvpayAmt = sumOvpayAmt.subtract(rpAmt42Map.get(tmp2));
 			}
 
 			this.info("tmp.getAchRepayCode() : " + tmp.getAchRepayCode());
@@ -636,10 +637,12 @@ public class L4510Batch extends TradeBuffer {
 					if (rpAmt30Map.get(tmpAmtFacmNo).compareTo(txAmt) >= 0) {
 						rpAmt30Map.put(tmpAmtFacmNo, rpAmt30Map.get(tmpAmtFacmNo).subtract(txAmt));
 						tempVo.putParam("TempAmt", txAmt);
+						sumOvpayAmt = sumOvpayAmt.add(txAmt);
 						txAmt = BigDecimal.ZERO;
 					} else if (rpAmt30Map.get(tmpAmtFacmNo).compareTo(BigDecimal.ZERO) > 0) {
 						txAmt = txAmt.subtract(rpAmt30Map.get(tmpAmtFacmNo));
 						tempVo.putParam("TempAmt", rpAmt30Map.get(tmpAmtFacmNo));
+						sumOvpayAmt = sumOvpayAmt.add(rpAmt30Map.get(tmpAmtFacmNo));
 						rpAmt30Map.put(tmpAmtFacmNo, BigDecimal.ZERO);
 					}
 				}
@@ -719,7 +722,7 @@ public class L4510Batch extends TradeBuffer {
 			tEmpDeductDtl.setAcctCode(tEmpDeductDtlId.getAcctCode());
 			tEmpDeductDtl.setFacmNo(tEmpDeductDtlId.getFacmNo());
 			tEmpDeductDtl.setBormNo(tEmpDeductDtlId.getBormNo());
-			tEmpDeductDtl.setSumOvpayAmt(sumOvpayAmt.get(tmpAmtFacmNo));
+			tEmpDeductDtl.setSumOvpayAmt(sumOvpayAmt);
 
 			if (tCdEmp != null) {
 				tEmpDeductDtl.setEmpNo(tCdEmp.getEmployeeNo());

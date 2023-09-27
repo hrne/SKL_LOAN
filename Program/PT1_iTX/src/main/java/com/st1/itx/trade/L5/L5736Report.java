@@ -48,7 +48,7 @@ public class L5736Report extends MakeReport {
 //		L5736F-催收戶餘額明細
 //		L5736H-住宅貸款餘額明細-催收戶
 
-		resultList = l5736ServiceImpl.getOverdueCustomerLoanData(inputDrawdownDate, titaVo);
+		resultList = l5736ServiceImpl.getOverdueCustomerLoanData(inputDrawdownDate, subTxCD, titaVo);
 
 		// open excel
 

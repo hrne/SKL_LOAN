@@ -27,7 +27,6 @@ import com.st1.itx.db.domain.CdComm;
 import com.st1.itx.db.domain.CdCommId;
 import com.st1.itx.db.domain.Ias34Ap;
 import com.st1.itx.db.domain.Ifrs9FacData;
-import com.st1.itx.db.domain.Ifrs9FacDataId;
 import com.st1.itx.db.domain.LoanIfrs9Ap;
 import com.st1.itx.db.domain.MonthlyFacBal;
 import com.st1.itx.db.domain.MonthlyLM052AssetClass;
@@ -113,7 +112,6 @@ public class L7205p extends TradeBuffer {
 	@Value("${iTXInFolder}")
 	private String inFolder = "";
 
-	private int cnt = 0;
 	private int CountAll = 0;
 	private int CountS = 0;
 	private int CountF = 0;
@@ -193,37 +191,122 @@ public class L7205p extends TradeBuffer {
 		CountS = 0;
 		CountF = 0;
 
-		Slice<Ias34Ap> sIas34Ap = null;
-		Slice<LoanIfrs9Ap> sLoanIfrs9Ap = null;
+		// 維護MonthlyFacBal
+		Slice<MonthlyFacBal> slMothlyFacBal = tMothlyFacBalService.findYearMonthAll(iYearMonth, 0, Integer.MAX_VALUE,
+				titaVo);
 
-		// 維護MonthlyFacBal(連線)
-		updateMonthlyFacBal(titaVo);
+		if (slMothlyFacBal == null) {
+			throw new LogicException(titaVo, "E0001", "MothlyFacBal"); // 查詢資料不存在
+		}
+
+		List<MonthlyFacBal> lMonthlyFacBal = updateMonthlyFacBal(slMothlyFacBal, titaVo);
+
+		if (lMonthlyFacBal.size() > 0) {
+
+			try {
+				tMothlyFacBalService.updateAll(lMonthlyFacBal, titaVo);
+			} catch (DBException e) {
+
+				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+			}
+
+			this.batchTransaction.commit();
+
+			// 切換環境
+			changeDBEnv(titaVo);
+
+			try {
+				tMothlyFacBalService.updateAll(lMonthlyFacBal, titaVo);
+			} catch (DBException e) {
+
+				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+			}
+
+			this.batchTransaction.commit();
+
+		}
 
 		// 切換環境
 		changeDBEnv(titaVo);
-		// 維護MonthlyFacBal(月報)
-		updateMonthlyFacBal(titaVo);
 
-		// 切換環境
-		changeDBEnv(titaVo);
-		// 維護Ifrs9FacData(連線)
-		updateIfrs9FacData(titaVo);
+		// 維護Ifrs9FacData
+		Slice<Ifrs9FacData> sIfrs9FacData = tIfrs9FacDataService.findAll(0, Integer.MAX_VALUE, titaVo);
+
+		if (sIfrs9FacData == null) {
+			throw new LogicException(titaVo, "E0001", "Ifrs9FacData1"); // 查詢資料不存在
+		}
+
+		List<Ifrs9FacData> tIfrs9FacData = updateIfrs9FacData(sIfrs9FacData, titaVo);
+
+		if (tIfrs9FacData.size() > 0) {
+			try {
+				tIfrs9FacDataService.updateAll(tIfrs9FacData, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+			}
+			this.batchTransaction.commit();
+		}
+
 		// 維護Ias34Ap(連線)
-		updateIas34Ap(titaVo);
+		Slice<Ias34Ap> sIas34Ap = tIas34ApService.findAll(0, Integer.MAX_VALUE, titaVo);
+
+		if (sIas34Ap == null) {
+			throw new LogicException(titaVo, "E0001", "Ias34Ap1"); // 查詢資料不存在
+		}
+
+		List<Ias34Ap> tIas34Ap = updateIas34Ap(sIas34Ap, titaVo);
+
+		if (tIas34Ap.size() > 0) {
+
+			try {
+				tIas34ApService.updateAll(tIas34Ap, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+			}
+			this.batchTransaction.commit();
+
+			// 切換環境
+			changeDBEnv(titaVo);
+
+			try {
+				tIas34ApService.updateAll(tIas34Ap, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+			}
+			this.batchTransaction.commit();
+		}
 
 		// 切換環境
 		changeDBEnv(titaVo);
-		// 維護Ias34Ap(月報)
-		updateIas34Ap(titaVo);
 
-		// 切換環境
-		changeDBEnv(titaVo);
-		// 維護LoanIfrs9Ap(連報)
-		updateLoanIfrs9Ap(titaVo);
-		// 切換環境
-		changeDBEnv(titaVo);
-		// 維護LoanIfrs9Ap(月報)
-		updateLoanIfrs9Ap(titaVo);
+		// 維護LoanIfrs9Ap
+		Slice<LoanIfrs9Ap> sLoanIfrs9Ap = tLoanIfrs9ApService.findAll(0, Integer.MAX_VALUE, titaVo);
+
+		if (sLoanIfrs9Ap == null) {
+			throw new LogicException(titaVo, "E0001", "LoanIfrs9Ap1"); // 查詢資料不存在
+		}
+
+		List<LoanIfrs9Ap> tLoanIfrs9Ap = updateLoanIfrs9Ap(sLoanIfrs9Ap, titaVo);
+
+		if (tLoanIfrs9Ap.size() > 0) {
+			try {
+				tLoanIfrs9ApService.updateAll(tLoanIfrs9Ap, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+			}
+			this.batchTransaction.commit();
+
+			// 切換環境
+			changeDBEnv(titaVo);
+
+			try {
+				tLoanIfrs9ApService.updateAll(tLoanIfrs9Ap, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+			}
+			this.batchTransaction.commit();
+
+		}
 
 		changeDBEnv(titaVo);
 		updLM052ReportSPAndMonthlyFacBalData(titaVo, iYearMonth);
@@ -266,11 +349,13 @@ public class L7205p extends TradeBuffer {
 
 		titaVo.setDataBaseOnOrg();// 還原原本的環境
 
+		CountF = CountAll - CountS;
+
 		String note = "總筆數：" + CountAll + ",成功筆數：" + CountS + ",失敗筆數：" + CountF;
 
-		this.totaVo.putParam("ooCountAll", CountAll);
-		this.totaVo.putParam("ooCountS", CountS);
-		this.totaVo.putParam("ooCountF", CountF);
+//		this.totaVo.putParam("ooCountAll", CountAll);
+//		this.totaVo.putParam("ooCountS", CountS);
+//		this.totaVo.putParam("ooCountF", CountF);
 
 		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "",
 				titaVo.getParam("TLRNO"), note, titaVo);
@@ -877,17 +962,17 @@ public class L7205p extends TradeBuffer {
 //		titaVo.setDataBaseOnLine();// 指定連線環境
 	}
 
-	private void limitCommit() {
-
-		this.cnt++;
-
-		if (500 <= this.cnt) {
-			this.batchTransaction.commit();
-			this.cnt = 0;
-
-		}
-
-	}
+//	private void limitCommit() {
+//
+//		this.cnt++;
+//
+//		if (500 <= this.cnt) {
+//			this.batchTransaction.commit();
+//			this.cnt = 0;
+//
+//		}
+//
+//	}
 
 	private void updMonthlyLM052Loss(TitaVo titaVo, int yearMonth) throws LogicException {
 
@@ -969,13 +1054,8 @@ public class L7205p extends TradeBuffer {
 	/**
 	 * 更新 MonthlyFacBal.AssetClass
 	 */
-	private void updateMonthlyFacBal(TitaVo titaVo) throws LogicException {
-		Slice<MonthlyFacBal> slMothlyFacBal = tMothlyFacBalService.findYearMonthAll(iYearMonth, 0, Integer.MAX_VALUE,
-				titaVo);
-
-		if (slMothlyFacBal == null) {
-			throw new LogicException(titaVo, "E0001", "MothlyFacBal"); // 查詢資料不存在
-		}
+	private List<MonthlyFacBal> updateMonthlyFacBal(Slice<MonthlyFacBal> slMothlyFacBal, TitaVo titaVo)
+			throws LogicException {
 
 		List<MonthlyFacBal> lMonthlyFacBal = new ArrayList<MonthlyFacBal>();
 		lMonthlyFacBal = slMothlyFacBal.getContent();
@@ -1021,29 +1101,14 @@ public class L7205p extends TradeBuffer {
 
 		}
 
-		if (tmpMonthlyFacBal.size() > 0) {
-
-			try {
-				tMothlyFacBalService.updateAll(tmpMonthlyFacBal, titaVo);
-			} catch (DBException e) {
-
-				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
-			}
-
-			this.batchTransaction.commit();
-		}
-
+		return tmpMonthlyFacBal;
 	}
 
 	/**
 	 * 更新 frs9FacData.AssetClass
 	 */
-	private void updateIfrs9FacData(TitaVo titaVo) throws LogicException {
-		Slice<Ifrs9FacData> sIfrs9FacData = tIfrs9FacDataService.findAll(0, Integer.MAX_VALUE, titaVo);
-
-		if (sIfrs9FacData == null) {
-			throw new LogicException(titaVo, "E0001", "Ifrs9FacData1"); // 查詢資料不存在
-		}
+	private List<Ifrs9FacData> updateIfrs9FacData(Slice<Ifrs9FacData> sIfrs9FacData, TitaVo titaVo)
+			throws LogicException {
 
 		List<Ifrs9FacData> lIfrs9FacData = new ArrayList<Ifrs9FacData>();
 		lIfrs9FacData = sIfrs9FacData.getContent();
@@ -1056,51 +1121,37 @@ public class L7205p extends TradeBuffer {
 			}
 		}
 
-		if (tmpIfrs9FacData.size() == 0) {
-			throw new LogicException(titaVo, "E0001", "Ifrs9FacData2"); // 查詢資料不存在
-		}
-
 		List<Ifrs9FacData> tmp2Ifrs9FacData = new ArrayList<Ifrs9FacData>();
+		if (tmpIfrs9FacData.size() > 0) {
 
-		for (OccursList tempOccursList : occursList) {
+			for (OccursList tempOccursList : occursList) {
 
-			int custno = parse.stringToInteger(tempOccursList.get("CustNo"));
-			int facmno = parse.stringToInteger(tempOccursList.get("FacmNo"));
-			String assetclass = tempOccursList.get("AssetClass");
+				int custno = parse.stringToInteger(tempOccursList.get("CustNo"));
+				int facmno = parse.stringToInteger(tempOccursList.get("FacmNo"));
+				String assetclass = tempOccursList.get("AssetClass");
 
-			// 維護Ifrs9FacData
+				// 維護Ifrs9FacData
 
-			for (Ifrs9FacData r : tmpIfrs9FacData) {
-				if (custno == r.getCustNo() && facmno == r.getFacmNo()) {
-					r.setAssetClass(parse.stringToInteger(assetclass));
-					tmp2Ifrs9FacData.add(r);
-					continue;
+				for (Ifrs9FacData r : tmpIfrs9FacData) {
+					if (custno == r.getCustNo() && facmno == r.getFacmNo()) {
+						r.setAssetClass(parse.stringToInteger(assetclass));
+						tmp2Ifrs9FacData.add(r);
+						continue;
+
+					}
 
 				}
 
 			}
-
 		}
 
-		if (tmp2Ifrs9FacData.size() > 0) {
-			try {
-				tIfrs9FacDataService.updateAll(tmp2Ifrs9FacData, titaVo);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
-			}
-			this.batchTransaction.commit();
-		}
+		return tmp2Ifrs9FacData;
 	}
 
 	/**
 	 * 更新 Ias34Ap.AssetClass
 	 */
-	private void updateIas34Ap(TitaVo titaVo) throws LogicException {
-		Slice<Ias34Ap> sIas34Ap = tIas34ApService.findAll(0, Integer.MAX_VALUE, titaVo);
-
-		if (sIas34Ap == null) {
-			throw new LogicException(titaVo, "E0001", "Ias34Ap1"); // 查詢資料不存在
-		}
+	private List<Ias34Ap> updateIas34Ap(Slice<Ias34Ap> sIas34Ap, TitaVo titaVo) throws LogicException {
 
 		List<Ias34Ap> lIas34Ap = new ArrayList<Ias34Ap>();
 		lIas34Ap = sIas34Ap.getContent();
@@ -1113,51 +1164,38 @@ public class L7205p extends TradeBuffer {
 			}
 		}
 
-		if (tmpIas34Ap.size() == 0) {
-			throw new LogicException(titaVo, "E0001", "Ias34Ap2"); // 查詢資料不存在
-		}
-
 		List<Ias34Ap> tmp2Ias34Ap = new ArrayList<Ias34Ap>();
 
-		for (OccursList tempOccursList : occursList) {
+		if (tmpIas34Ap.size() > 0) {
 
-			int custno = parse.stringToInteger(tempOccursList.get("CustNo"));
-			int facmno = parse.stringToInteger(tempOccursList.get("FacmNo"));
-			String assetclass = tempOccursList.get("AssetClass");
+			for (OccursList tempOccursList : occursList) {
 
-			// 維護Ifrs9FacData
+				int custno = parse.stringToInteger(tempOccursList.get("CustNo"));
+				int facmno = parse.stringToInteger(tempOccursList.get("FacmNo"));
+				String assetclass = tempOccursList.get("AssetClass");
 
-			for (Ias34Ap r : tmpIas34Ap) {
-				if (custno == r.getCustNo() && facmno == r.getFacmNo()) {
-					r.setAssetClass(parse.stringToInteger(assetclass));
-					tmp2Ias34Ap.add(r);
-					continue;
+				// 維護Ifrs9FacData
+
+				for (Ias34Ap r : tmpIas34Ap) {
+					if (custno == r.getCustNo() && facmno == r.getFacmNo()) {
+						r.setAssetClass(parse.stringToInteger(assetclass));
+						tmp2Ias34Ap.add(r);
+						continue;
+
+					}
 
 				}
-
 			}
 
 		}
 
-		if (tmp2Ias34Ap.size() > 0) {
-			try {
-				tIas34ApService.updateAll(tmp2Ias34Ap, titaVo);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
-			}
-			this.batchTransaction.commit();
-		}
+		return tmp2Ias34Ap;
 	}
 
 	/**
 	 * 更新 LoanIfrs9ApService.AssetClass
 	 */
-	private void updateLoanIfrs9Ap(TitaVo titaVo) throws LogicException {
-		Slice<LoanIfrs9Ap> sLoanIfrs9Ap = tLoanIfrs9ApService.findAll(0, Integer.MAX_VALUE, titaVo);
-
-		if (sLoanIfrs9Ap == null) {
-			throw new LogicException(titaVo, "E0001", "LoanIfrs9Ap1"); // 查詢資料不存在
-		}
+	private List<LoanIfrs9Ap> updateLoanIfrs9Ap(Slice<LoanIfrs9Ap> sLoanIfrs9Ap, TitaVo titaVo) throws LogicException {
 
 		List<LoanIfrs9Ap> lLoanIfrs9Ap = new ArrayList<LoanIfrs9Ap>();
 		lLoanIfrs9Ap = sLoanIfrs9Ap.getContent();
@@ -1170,40 +1208,32 @@ public class L7205p extends TradeBuffer {
 			}
 		}
 
-		if (tmpLoanIfrs9Ap.size() == 0) {
-			throw new LogicException(titaVo, "E0001", "LoanIfrs9Ap2"); // 查詢資料不存在
-		}
-
 		List<LoanIfrs9Ap> tmp2LoanIfrs9Ap = new ArrayList<LoanIfrs9Ap>();
 
-		for (OccursList tempOccursList : occursList) {
+		if (tmpLoanIfrs9Ap.size() > 0) {
 
-			int custno = parse.stringToInteger(tempOccursList.get("CustNo"));
-			int facmno = parse.stringToInteger(tempOccursList.get("FacmNo"));
-			String assetclass = tempOccursList.get("AssetClass");
+			for (OccursList tempOccursList : occursList) {
 
-			// 維護Ifrs9FacData
+				int custno = parse.stringToInteger(tempOccursList.get("CustNo"));
+				int facmno = parse.stringToInteger(tempOccursList.get("FacmNo"));
+				String assetclass = tempOccursList.get("AssetClass");
 
-			for (LoanIfrs9Ap r : tmpLoanIfrs9Ap) {
-				if (custno == r.getCustNo() && facmno == r.getFacmNo()) {
-					r.setAssetClass(parse.stringToInteger(assetclass));
-					tmp2LoanIfrs9Ap.add(r);
-					continue;
+				// 維護Ifrs9FacData
+
+				for (LoanIfrs9Ap r : tmpLoanIfrs9Ap) {
+					if (custno == r.getCustNo() && facmno == r.getFacmNo()) {
+						r.setAssetClass(parse.stringToInteger(assetclass));
+						tmp2LoanIfrs9Ap.add(r);
+						continue;
+
+					}
 
 				}
 
 			}
-
 		}
 
-		if (tmp2LoanIfrs9Ap.size() > 0) {
-			try {
-				tLoanIfrs9ApService.updateAll(tmp2LoanIfrs9Ap, titaVo);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
-			}
-			this.batchTransaction.commit();
-		}
+		return tmp2LoanIfrs9Ap;
 	}
 
 }

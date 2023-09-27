@@ -41,14 +41,6 @@ public class L5735Report extends MakeReport {
 		// 取得輸入值
 		int inputDrawdownDate = parse.stringToInteger(titaVo.getParam("DrawdownDate"));
 
-		// 測試可否直接切環境查詢
-		List<Map<String, String>> resultListOnline = l5735ServiceImpl.getBankOnline(titaVo);
-		this.info("resultListOnline = " + resultListOnline.get(0).get("Int"));
-
-		List<Map<String, String>> resultListMon = l5735ServiceImpl.getBankMonth(titaVo);
-
-		this.info("resultListMon = " + resultListMon.get(0).get("Int"));
-
 		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 //		L5735A-建商餘額明細
 //		L5735B-首購餘額明細

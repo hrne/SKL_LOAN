@@ -143,7 +143,7 @@ public class EmpDeductDtl implements Serializable {
   @Column(name = "`Interest`")
   private BigDecimal interest = new BigDecimal("0");
 
-  // 全戶累溢短收
+  // 累溢短收
   @Column(name = "`SumOvpayAmt`")
   private BigDecimal sumOvpayAmt = new BigDecimal("0");
 
@@ -735,7 +735,7 @@ public class EmpDeductDtl implements Serializable {
   }
 
 /**
-	* 全戶累溢短收<br>
+	* 累溢短收<br>
 	* 
 	* @return BigDecimal
 	*/
@@ -744,10 +744,10 @@ public class EmpDeductDtl implements Serializable {
   }
 
 /**
-	* 全戶累溢短收<br>
+	* 累溢短收<br>
 	* 
   *
-  * @param sumOvpayAmt 全戶累溢短收
+  * @param sumOvpayAmt 累溢短收
 	*/
   public void setSumOvpayAmt(BigDecimal sumOvpayAmt) {
     this.sumOvpayAmt = sumOvpayAmt;

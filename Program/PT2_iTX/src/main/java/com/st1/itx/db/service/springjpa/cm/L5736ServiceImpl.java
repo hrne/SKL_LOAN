@@ -38,7 +38,7 @@ public class L5736ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> getOverdueCustomerLoanData(int inputDrawdownDate, TitaVo titaVo)
+	public List<Map<String, String>> getOverdueCustomerLoanData(int inputDrawdownDate, String subTxCD, TitaVo titaVo)
 			throws LogicException {
 
 		this.info("getOverdueCustomerLoanData");
@@ -53,6 +53,25 @@ public class L5736ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 轉西元年
 		if (inputYearMonth <= 19110000) {
 			inputYearMonth += 19110000;
+		}
+
+//		L5736C-首購餘額明細-催收戶
+//		L5736F-催收戶餘額明細
+//		L5736H-住宅貸款餘額明細-催收戶
+
+		String cond = "";
+		switch (subTxCD) {
+		case "L5736C":
+			cond += "   AND MLB.\"AcctCode\" IN ('340') ";
+			cond += "   AND LBM.\"Status\" != 0 ";
+			break;
+		case "L5736F":
+			cond += "   AND LBM.\"Status\" != 0 ";
+			break;
+		case "L5736H":
+			cond += "   AND LBM.\"UsageCode\" IN ('02') ";
+			cond += "   AND LBM.\"Status\" != 0 ";
+			break;
 		}
 
 		this.info("inputYearMonth =" + inputYearMonth);
@@ -98,7 +117,7 @@ public class L5736ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                    AND CS.\"FacmNo\" = FM.\"FacmNo\" ";
 		sql += " WHERE MLB.\"YearMonth\" = :inputYearMonth ";
 		sql += "   AND MLB.\"LoanBalance\" > 0 ";
-		sql += "   AND LBM.\"Status\" != 0 ";
+		sql += cond;
 		sql += " ORDER BY MLB.\"CustNo\" ";
 		sql += "        , MLB.\"FacmNo\" ";
 		sql += "        , MLB.\"BormNo\" ";

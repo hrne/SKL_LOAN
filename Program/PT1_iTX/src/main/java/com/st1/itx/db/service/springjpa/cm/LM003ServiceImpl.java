@@ -356,8 +356,7 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            SELECT";
 		sql += "                m.\"YearMonth\" AS \"YearMonth\"";
 		sql += "                , round(nvl(drawdownamt.\"DrawdownAmt\", 0) / 100000000, 2) AS \"DrawdownAmt\""; // --撥款
-		sql += "                , round(nvl(closeamt.\"CloseAmt3\", 0) / 100000000, 2) "; // --利率高轉貸(3+4)
-		sql += "                + round(nvl(closeamt.\"CloseAmt4\", 0) / 100000000, 2) AS \"CloseAmtSeq1\""; // --利率高轉貸(3+4)
+		sql += "                , round(nvl(closeamt.\"CloseAmt4\", 0) / 100000000, 2) AS \"CloseAmtSeq1\""; // --利率高轉貸(3+4)
 		sql += "                , round(nvl(closeamt.\"CloseAmt1\", 0) / 100000000, 2) AS \"CloseAmtSeq2\""; // --買賣
 		sql += "                , round(nvl(closeamt.\"CloseAmt5\", 0) / 100000000, 2) AS \"CloseAmt5\""; // --增貸不准(5+6)
 		sql += "                , round(nvl(closeamt.\"CloseAmt8\", 0) / 100000000, 2) AS \"CloseAmt8\""; // --身亡
