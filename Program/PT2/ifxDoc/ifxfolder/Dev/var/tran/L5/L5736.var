@@ -9,7 +9,7 @@
 
 ![資料表頭(HEADER)長度]
 #INQHD=n,3,S
-E(0,0)ASGN(INQHD$)
+E(0,27)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
@@ -35,76 +35,196 @@ E(0,40)ASGN(INQPRT$)
 #ORGFG=_,_,S
 E(0,0)
 
-#BUF2=X,11,S
-T(2,1+          )
-
-#ORGFG=_,_,S
-E(0,0)
-
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=1;screen.width=[140,850];printer.width=[20,20];">
-[
-["[L5736]                                正常戶餘額明細                                                             "],
-["@撥款日期",#DrawdownDate," (含)之前"],
-["@","（本功能請於月底環境執行。產生報表為 ＂L5736_正常戶餘額明細.xlsx＂）"],
-]
-!---------- AP TEXT AREA Variables ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[147,850];printer.width=[20,80];">
 
+[
+["[L5736]                                 公會報送作業明細表-催收戶"],
+["@年月份",#inputYear,"/",#inputMonth],
+["@","（本功能請於月底環境執行。）"],
+["#grid#,{id:1,expand:false,loop:3,row_height:1,s_cols:[150,50], p_cols:[8,8]}","","",
+[],[#TradeName1,#BtnShell1,#TradeCode1],
+],
+]
+
+
+!---------- PREMADE VARIABLES ----------
+! This makes the trades possible to execute on DEV,SIT,UAT
+! 功能 必須輸入(1: 新增;2: 修改;4: 刪除;5: 查詢)
 #FUNCIND=_,_,S
 E(0,5)
 <include src="COM.icf::CheckAuth.rtn"/>
 
+! for later loop use
+
+!催收戶明細以年月輸入
+!其餘皆以日期(月底日)含之前
+#TradeDic1=X,35,S
+T(3,1/L5736C/首購餘額明細-催收戶)
+#TradeDic2=X,35,S
+T(3,1/L5736F/催收戶餘額明細)
+#TradeDic3=X,35,S
+T(3,1/L5736H/住宅貸款餘額明細-催收戶)
 
 
-!撥款日期
-#DrawdownDate=D,7,I
-@V(7)
-A(DATE,0,#DrawdownDate)
+!  loop times
+##loop{times:3,i:1}
+
+! TradeCat: 1st byte of TradeDic. Trade's category.
+#TradeCat{i}=X,1,S
+T(1,#TradeDic{i},1,1)
+
+! TradeCode: 3-7 th bytes of TradeDic. The TXCD of a trade.
+#TradeCode{i}=X,6,L
+T(1,#TradeDic{i},3,6)
+HIDE(#TradeCode{i})
+
+! TradeName: all bytes after 8th in TradeDic. The Chinese Name of a trade.
+#TradeName{i}=X,40,L
+T(1,#TradeDic{i},10,30)
+T(2,#TradeCode{i}+-+#TradeName{i})
+
+#rpName{i}=X,30,L
+T(1,#TradeDic{i},10,30)
+##end
+
+! Clearing the SELECT ALL button, for unselecting a single trade
+! 修改這裡的 loop times
+#FuncClearSelectAll=@,1,S
+
+
+##loop{times:3,i:1}
+
+!---------- BUTTON VISUAL -----------
+
+! BtnShell: Creates visual of button.
+#BtnShell{i}=X,2,I,ui:button;value:　;enable:1;tabbable:0
+
+!---------- BUTTON BINDER -----------
+
+! BtnBind: Bind button to its state machine processor.
+#BtnBind{i}=X,1,S
+BIND(#BtnShell{i},click,{cmd=CALLSEND;DOCODE=Btn{i}FSMP})
+
+!---------- BUTTON STATE MACHINE PROCESSOR -----------
+
+! BtnFSMP: Button Finite-State Machine Processor
+
+! What happens when Button is Clicked?
+! Button State, GoTo, State Visual
+
+! 1, 0, V, also makes its category's Select All go to state 0.
+! 0, 1, empty
+#Btn{i}FSMP=@,1,S
+C(5,#BtnShell{i},V,T(3,@BtnShell{i},　)T(1,@tmpTargetCat,#TradeCat{i},1,1)CALL(#FuncClearSelectAll),T(3,@BtnShell{i},V))
+
+##end
+
+!---------- BUTTON MAKING ----------
+
+
+! Select All in a category
+
+! 修改這裡的 loop times
+#FuncSelectCat=@,1,S
+##loop{times:4,k:1}
+C(5,#TradeCat{k},#tmpTargetCat,T(3,@BtnShell{k},V),$)
+##end
+
+! Unselect All in a category
+
+! 修改這裡的 loop times
+#FuncUnselectCat=@,1,S
+##loop{times:3,i:1}
+C(5,#TradeCat{i},#tmpTargetCat,T(3,@BtnShell{i},　),$)
+##end
+
+#tmpGrd=x,3,S
+T(3,grd)
+
+#tmpGrdId=x,4,S
+
+! Expand (show all in category)
+! Trade grid id = Category * 2
+#FuncExpandCat=@,1,S
+E(0,@tmpTargetCat,#tmpTargetCat*2)
+T(2,@tmpGrdId,#tmpGrd+#tmpTargetCat)
+INVOKEJS(SHOW,#tmpGrdId,1)
+
+! Fold (hide all in category)
+#FuncFoldCat=@,1,S
+E(0,@tmpTargetCat,#tmpTargetCat*2)
+T(2,@tmpGrdId,#tmpGrd+#tmpTargetCat)
+INVOKEJS(SHOW,#tmpGrdId,0)
+
+#tmpTargetCat=X,1,S
+
+#tmpLineCounter=N,3,S
+
+#LastMonthDate=D,8,S
+D(7,3,#SYSDATE,1,0)
+
+#inputYear=N,3,I
+T(1,@inputYear,#LastMonthDate,2,3)
+@V(5,0,999)
+
+#inputMonth=A,2,I
+T(1,@inputMonth,#LastMonthDate,5,2)
+@V(5,1,12)
+
+#inputYearMonth=A,5,S
+T(2,#inputYear+#inputMonth)
+
+
+! 總項目數 4
+#TotalItem=N,3,S
+E(0,3)
 
 
 </sub>
+
 
 !---------- 輸出共用變數宣告區 ----------
 <sub type="RTN" name="AFXMT">
 <include src="PRT.icf::PRTHEAD.rtn"/>
 </sub>
 
+
 !---------- TXFORM = L5736 ----------
 <sub type="FORM" name="L5736">
-
-!#SCRPRT=_,_,S
-!C(5,#TXFORM,L5736,$,S)
-
-#SCRTIL=_,_,S
-T(3,[L5736]            X800)
-
-#LOOP=X,1,S
-T(3,1)ASGN(LOOP$)
 
 </sub>
 
 
 !------ 上行電文 ------
+! 修改這裡的 loop times
 <sub type="TIM">
-#DrawdownDate
+#TotalItem
+##loop{times:3,i:1}
+#BtnShell{i}
+#TradeCode{i}
+#TradeName{i}
+#rpName{i}
+##end
+#inputYearMonth
 </sub>
 
 
 !------ 下行電文TOM ------
 <sub type="TOM">
-
-TXFORM=L5736
-^
-
-<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L5736^
 <include src="COM.icf::TRCTL.tom"/>
 </sub>
 
-
-
+<sub type="PART" name="L5736" layout="cols=3;screen.width=[130,800];printer.width=[15,80];order=1">
+[
+["[L5736]                                公會報送作業明細表-催收戶"], 
+]
+</sub>
 !---------- 單據輸出組合 ----------
 <sub type="SELECT">
+
 <include src="PRT.icf::UPD01.sel"/>
 </sub>

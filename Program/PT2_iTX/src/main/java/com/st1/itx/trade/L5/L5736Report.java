@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L5;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -34,26 +35,28 @@ public class L5736Report extends MakeReport {
 	@Autowired
 	MakeExcel makeExcel;
 
-	String txCD = "L5736";
-	String txName = "正常戶餘額明細";
-
-	boolean isFinished = true;
-
-	public boolean exec(TitaVo titaVo) throws LogicException {
+	public void exec(String subTxCD, String txName, TitaVo titaVo) throws LogicException {
 		this.info("exec ... ");
 
+		int reportDate = titaVo.getEntDyI() + 19110000;
 		// 取得輸入值
-		int inputDrawdownDate = parse.stringToInteger(titaVo.getParam("DrawdownDate"));
+		int inputDrawdownDate = reportDate;
 
-		List<Map<String, String>> resultList = l5736ServiceImpl.getNormalCustomerLoanData(inputDrawdownDate, titaVo);
+
+		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
+//		L5736C-首購餘額明細-催收戶
+//		L5736F-催收戶餘額明細
+//		L5736H-住宅貸款餘額明細-催收戶
+
+		resultList = l5736ServiceImpl.getOverdueCustomerLoanData(inputDrawdownDate, titaVo);
 
 		// open excel
-		int reportDate = titaVo.getEntDyI() + 19110000;
+
 		String brno = titaVo.getBrno();
-		String txcd = this.txCD;
-		String fileItem = this.txName;
-		String fileName = txcd + "_" + fileItem;
-		String defaultExcel = "L5736_底稿_正常戶餘額明細.xlsx";
+		String txcd = titaVo.getTxcd();
+		String fileItem = txName;
+		String fileName = subTxCD + "_" + txName;
+		String defaultExcel = subTxCD + "_底稿_公會報送-" + txName + ".xlsx";
 		String defaultSheet = "yyymmdd";
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
@@ -62,13 +65,12 @@ public class L5736Report extends MakeReport {
 		// 開啟報表
 		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
 
-		makeExcel.setSheet(defaultSheet, titaVo.getParam("DrawdownDate"));
+		makeExcel.setSheet(defaultSheet, titaVo.getEntDyI() + "");
 
 		int row = 2;
 
 		if (resultList == null || resultList.isEmpty()) {
 			makeExcel.setValue(row, 1, "本日無資料", "R");
-			isFinished = false;
 		} else {
 			for (Map<String, String> result : resultList) {
 
@@ -95,7 +97,6 @@ public class L5736Report extends MakeReport {
 
 		makeExcel.close();
 
-		return isFinished;
 	}
 
 }

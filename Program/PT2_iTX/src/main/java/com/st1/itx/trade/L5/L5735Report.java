@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L5;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -34,20 +35,13 @@ public class L5735Report extends MakeReport {
 	@Autowired
 	MakeExcel makeExcel;
 
-	String txCD = "L5735";
-	String txName = "建商餘額明細";
-
-	boolean isFinished = true;
-
-	public boolean exec(TitaVo titaVo) throws LogicException {
+	public void exec(String subTxCD, String txName, TitaVo titaVo) throws LogicException {
 		this.info("exec ... ");
 
 		// 取得輸入值
 		int inputDrawdownDate = parse.stringToInteger(titaVo.getParam("DrawdownDate"));
 
-		List<Map<String, String>> resultList = l5735ServiceImpl.getConstructionCompanyLoanData(inputDrawdownDate,
-				titaVo);
-
+		// 測試可否直接切環境查詢
 		List<Map<String, String>> resultListOnline = l5735ServiceImpl.getBankOnline(titaVo);
 		this.info("resultListOnline = " + resultListOnline.get(0).get("Int"));
 
@@ -55,13 +49,39 @@ public class L5735Report extends MakeReport {
 
 		this.info("resultListMon = " + resultListMon.get(0).get("Int"));
 
+		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
+//		L5735A-建商餘額明細
+//		L5735B-首購餘額明細
+//		L5735D-工業區土地抵押餘額明細
+//		L5735E-正常戶餘額明細
+//		L5735G-住宅貸款餘額明細
+//		L5735I-補助貸款餘額明細
+//		L5735J-政府優惠貸款餘額明細
+//		L5735K-保險業投資不動產及放款情形
+		switch (subTxCD) {
+		case "L5735A":
+			resultList = l5735ServiceImpl.getConstructionCompanyLoanData(inputDrawdownDate, titaVo);
+			break;
+		case "L5735D":
+			resultList = l5735ServiceImpl.getNormalCustomerLoanDataL5735D(inputDrawdownDate, titaVo);
+			break;
+
+		case "L5735K":
+			resultList = null;
+
+		default:
+			resultList = l5735ServiceImpl.getNormalCustomerLoanData(inputDrawdownDate, subTxCD, titaVo);
+			break;
+		}
+
 		// open excel
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
-		String txcd = this.txCD;
-		String fileItem = this.txName;
-		String fileName = txcd + "_" + fileItem;
-		String defaultExcel = "L5735_底稿_建商餘額明細.xlsx";
+		String txcd = titaVo.getTxcd();
+		String fileItem = txName;
+		String fileName = subTxCD + "_" + txName;
+		String defaultExcel = subTxCD + "_底稿_公會報送-" + txName + ".xlsx";
+		this.info("defaultExcel = " + defaultExcel);
 		String defaultSheet = "yyymmdd";
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
@@ -74,10 +94,16 @@ public class L5735Report extends MakeReport {
 
 		int row = 2;
 
+		int tmpCol = 0;
+
+		// L5735D-工業區土地抵押餘額明細 會多一欄擔保品代碼2，需移動欄位
+		if ("L5735D".equals(subTxCD)) {
+			tmpCol = 1;
+		}
+
 		if (resultList == null || resultList.isEmpty()) {
 			makeExcel.setValue(row, 1, "本日無資料", "R");
 
-			isFinished = false;
 		} else {
 			for (Map<String, String> result : resultList) {
 
@@ -89,24 +115,19 @@ public class L5735Report extends MakeReport {
 				makeExcel.setValue(row, 6, parse.stringToBigDecimal(result.get("LineAmt")), "#,###");
 				makeExcel.setValue(row, 7, this.showBcDate(result.get("PrevPayIntDate"), 0), "C");
 				makeExcel.setValue(row, 8, parse.stringToInteger(result.get("ClCode1")));
-				makeExcel.setValue(row, 9, parse.stringToInteger(result.get("UsageCode")));
-				makeExcel.setValue(row, 10, parse.stringToInteger(result.get("AcctCode")));
-				makeExcel.setValue(row, 11, result.get("ProdNo"), "L");
-				makeExcel.setValue(row, 12, parse.stringToInteger(result.get("Status")));
-				makeExcel.setValue(row, 13, this.showBcDate(result.get("DrawdownDate"), 0), "C");
-				makeExcel.setValue(row, 14, parse.stringToBigDecimal(result.get("EvaNetWorth")), "#,##0");
-//				this.info("LoanRatio = " + parse.stringToBigDecimal(result.get("LoanRatio")));
-//				makeExcel.setValue(row, 15, parse.stringToBigDecimal(result.get("LoanRatio")), "0%");
-				makeExcel.setValue(row, 15, parse.stringToBigDecimal(result.get("LoanRatio")),"0%");
 
-//												"0".equals(result.get("EvaNetWorth")) ||  "0".equals(result.get("LineAmt")) ? BigDecimal.ZERO
-//						: parse.stringToBigDecimal(result.get("LineAmt")).divide(
-//								parse.stringToBigDecimal(result.get("EvaNetWorth"))).setScale(2, BigDecimal.ROUND_HALF_UP);
-				// 設公式
-//				makeExcel.setFormula(row, 15, ltv, "ROUND(F" + row + "/N" + row + ",2)", "0%");
+				// L5735D-工業區土地抵押餘額明細 會多一欄擔保品代碼2，需移動欄位
+				if ("L5735D".equals(subTxCD)) {
+					makeExcel.setValue(row, 9, parse.stringToInteger(result.get("ClCode2")));
+				}
 
-				// 重新計算
-//				makeExcel.formulaCaculate(row, 15);
+				makeExcel.setValue(row, 9 + tmpCol, parse.stringToInteger(result.get("UsageCode")));
+				makeExcel.setValue(row, 10 + tmpCol, parse.stringToInteger(result.get("AcctCode")));
+				makeExcel.setValue(row, 11 + tmpCol, result.get("ProdNo"), "L");
+				makeExcel.setValue(row, 12 + tmpCol, parse.stringToInteger(result.get("Status")));
+				makeExcel.setValue(row, 13 + tmpCol, this.showBcDate(result.get("DrawdownDate"), 0), "C");
+				makeExcel.setValue(row, 14 + tmpCol, parse.stringToBigDecimal(result.get("EvaNetWorth")), "#,##0");
+				makeExcel.setValue(row, 15 + tmpCol, parse.stringToBigDecimal(result.get("LoanRatio")), "0%");
 
 				row++;
 			}
@@ -114,7 +135,6 @@ public class L5735Report extends MakeReport {
 
 		makeExcel.close();
 
-		return isFinished;
 	}
 
 }

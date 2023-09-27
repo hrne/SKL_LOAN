@@ -11,12 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.util.parse.Parse;
 
 /**
- * L5736 正常戶餘額明細
+ * L5736
  * 
  * @author ST1-ChihWei
  * @version 1.0.0
@@ -27,65 +29,36 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 public class L5736ServiceImpl extends ASpringJpaParm implements InitializingBean {
 
 	@Autowired
+	Parse parse;
+
+	@Autowired
 	private BaseEntityManager baseEntityManager;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> getNormalCustomerLoanData(int inputDrawdownDate, TitaVo titaVo) {
+	public List<Map<String, String>> getOverdueCustomerLoanData(int inputDrawdownDate, TitaVo titaVo)
+			throws LogicException {
 
-		this.info("getNormalCustomerLoanData");
+		this.info("getOverdueCustomerLoanData");
 
 		// 轉西元年
 		if (inputDrawdownDate <= 19110000) {
 			inputDrawdownDate += 19110000;
 		}
 
-		this.info("inputDrawdownDate = " + inputDrawdownDate);
-
-		int entdy = titaVo.getEntDyI();
+		int inputYearMonth = parse.stringToInteger(titaVo.getParam("inputYearMonth"));
 
 		// 轉西元年
-		if (entdy <= 19110000) {
-			entdy += 19110000;
+		if (inputYearMonth <= 19110000) {
+			inputYearMonth += 19110000;
 		}
 
+		this.info("inputYearMonth =" + inputYearMonth);
+
 		String sql = "  ";
-//		sql += " WITH CF AS ( ";
-//		sql += "   SELECT DISTINCT CF.\"CustNo\" AS \"CustNo\" ";
-//		sql += "        , CF.\"FacmNo\" AS \"FacmNo\" ";
-//		sql += "        , ROW_NUMBER() ";
-//		sql += "          OVER ( ";
-//		sql += "            PARTITION BY CF.\"CustNo\" ";
-//		sql += "                       , CF.\"FacmNo\" ";
-//		sql += "                       , CF.\"ClCode1\" ";
-//		sql += "                       , CF.\"ClCode2\" ";
-//		sql += "                       , CF.\"ClNo\" ";
-//		// 20230522 佳怡說明：擔保品改成鑑價日最接近核准日期的評估
-//		sql += "            ORDER BY ABS(NVL(CAS.\"ApproveDate\",0) - NVL(CE.\"EvaDate\",19110101) ) ASC ";
-//		sql += "        			, CE.\"EvaNo\" DESC  ) AS \"Seq\" ";
-//		sql += "        , NVL(CE.\"EvaNetWorth\",0) AS \"EvaNetWorth\" ";
-//		sql += "   FROM \"ClFac\" CF ";
-//		sql += "   LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = CF.\"CustNo\" ";
-//		sql += "                            AND FAC.\"FacmNo\" = CF.\"FacmNo\" ";
-//		sql += "   LEFT JOIN \"FacCaseAppl\" CAS ON CAS.\"ApplNo\" = CF.\"ApproveNo\" ";
-//		sql += "   LEFT JOIN \"ClEva\" CE ON CE.\"ClCode1\" = CF.\"ClCode1\" ";
-//		sql += "                         AND CE.\"ClCode2\" = CF.\"ClCode2\" ";
-//		sql += "                         AND CE.\"ClNo\" = CF.\"ClNo\" ";
-//		sql += "   WHERE NVL(CAS.\"ApproveDate\",0) > 0 ";
-//		sql += "     AND CF.\"MainFlag\" = 'Y'";
-//		sql += " ) ";
-//		sql += " , \"CFSum\" AS ( ";
-//		sql += "   SELECT \"CustNo\" ";
-//		sql += "        , \"FacmNo\" ";
-//		sql += "        , SUM(NVL(\"EvaNetWorth\",0)) AS \"EvaNetWorth\" ";
-//		sql += "   FROM CF ";
-//		sql += "   WHERE \"Seq\" = 1 "; // 每個擔保品只取一筆
-//		sql += "   GROUP BY \"CustNo\" ";
-//		sql += "          , \"FacmNo\" ";
-//		sql += " )";
-		
+
 		sql += " WITH \"CFSum\" AS ( ";
 		sql += "   SELECT \"CustNo\" ";
 		sql += "        , \"FacmNo\" ";
@@ -121,15 +94,11 @@ public class L5736ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"LoanBorMain\" LBM ON LBM.\"CustNo\" = MLB.\"CustNo\" ";
 		sql += "                            AND LBM.\"FacmNo\" = MLB.\"FacmNo\" ";
 		sql += "                            AND LBM.\"BormNo\" = MLB.\"BormNo\" ";
-//		sql += "LEFT JOIN \"ClFac\" CF ON CF.\"CustNo\" = FM.\"CustNo\" ";
-//		sql += "                    AND CF.\"FacmNo\" = FM.\"FacmNo\" ";
-//		sql += "                    AND CF.\"MainFlag\" = 'Y' ";
 		sql += "LEFT JOIN \"CFSum\" CS ON CS.\"CustNo\" = FM.\"CustNo\" ";
 		sql += "                    AND CS.\"FacmNo\" = FM.\"FacmNo\" ";
 		sql += " WHERE MLB.\"YearMonth\" = :inputYearMonth ";
 		sql += "   AND MLB.\"LoanBalance\" > 0 ";
-		sql += "   AND LBM.\"DrawdownDate\" <= :inputDrawdownDate ";
-		sql += "   AND LBM.\"Status\" = 0 ";
+		sql += "   AND LBM.\"Status\" != 0 ";
 		sql += " ORDER BY MLB.\"CustNo\" ";
 		sql += "        , MLB.\"FacmNo\" ";
 		sql += "        , MLB.\"BormNo\" ";
@@ -139,8 +108,7 @@ public class L5736ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("inputYearMonth", entdy / 100);
-		query.setParameter("inputDrawdownDate", inputDrawdownDate);
+		query.setParameter("inputYearMonth", inputYearMonth);
 
 		return this.convertToMap(query);
 	}

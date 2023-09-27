@@ -33,7 +33,6 @@ public class L5735p extends TradeBuffer {
 	WebClient webClient;
 
 	String txCD = "L5735";
-	String txName = "建商餘額明細";
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -41,21 +40,51 @@ public class L5735p extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		this.info(txCD + "p titaVo.getTxcd() = " + titaVo.getTxcd());
-		String parentTranCode = titaVo.getTxcd();
 
-		l5735Report.setParentTranCode(parentTranCode);
+		l5735Report.setParentTranCode(titaVo.getTxcd());
 
-		boolean isFinish = false;
+		int totalItem = Integer.parseInt(titaVo.getParam("TotalItem"));
 
-		isFinish = l5735Report.exec(titaVo);
-
-		if (isFinish) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), txCD + txName + "已完成", titaVo);
-		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), txCD + txName + "查無資料", titaVo);
+		int cnt = 0;
+		for (int i = 1; i <= totalItem; i++) {
+			if (titaVo.getParam("BtnShell" + i).equals("V")) {
+				cnt++;
+			}
 		}
+
+		if (cnt == 0) {
+			throw new LogicException(titaVo, "E0019", "請勾選報表項目");
+		}
+
+		String tradeName = "";
+		String tradeCode = "";
+		String msg = "";
+
+		for (int i = 1; i <= totalItem; i++) {
+			if (titaVo.getParam("BtnShell" + i).equals("V")) {
+				cnt++;
+
+				tradeCode = titaVo.getParam("TradeCode" + i);
+				tradeName = titaVo.getParam("rpName" + i);
+				//tradeCode - tradeName  
+//				L5735A-建商餘額明細
+//				L5735B-首購餘額明細
+//				L5735D-工業區土地抵押餘額明細
+//				L5735E-正常戶餘額明細
+//				L5735G-住宅貸款餘額明細
+//				L5735I-補助貸款餘額明細
+//				L5735J-政府優惠貸款餘額明細
+//				L5735K-保險業投資不動產及放款情形
+				l5735Report.exec(tradeCode, tradeName, titaVo);
+
+				msg = msg + (tradeCode + "-" + tradeName) + ",";
+			}
+		}
+
+		msg = msg.substring(0, msg.length() - 1);
+
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
+				titaVo.getParam("TLRNO"), msg + "已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

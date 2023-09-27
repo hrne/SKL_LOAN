@@ -28,8 +28,21 @@ public class L5736 extends TradeBuffer {
 		this.info("active " + txcd);
 		this.totaVo.init(titaVo);
 
-		MySpring.newTask(txcd + "p", this.txBuffer, titaVo);
-	
+		int totalItem = Integer.parseInt(titaVo.getParam("TotalItem"));
+
+		int cnt = 0;
+		for (int i = 1; i <= totalItem; i++) {
+			if (titaVo.getParam("BtnShell" + i).equals("V")) {
+				cnt++;
+			}
+		}
+
+		if (cnt == 0) {
+			throw new LogicException(titaVo, "E0019", "請勾選報表項目");
+		} else {
+			MySpring.newTask(txcd + "p", this.txBuffer, titaVo);
+		}
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

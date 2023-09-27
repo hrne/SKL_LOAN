@@ -252,18 +252,10 @@ public class L5501 extends TradeBuffer {
 		pfItDetail.setCntingCode(iAdjCntingCode);
 		pfItDetail.setAdjRange(iAdjRange);
 		this.info("pfItDetail=" + pfItDetail.toString());
-		if (iAdjRange == 2) {
-			try {
-				pfItDetail = pfItDetailService.insert(pfItDetail, titaVo);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0005", e.getErrorMsg());
-			}
-		} else {
-			try {
-				pfItDetail = pfItDetailService.update2(pfItDetail, titaVo);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
-			}
+		try {
+			pfItDetail = pfItDetailService.update2(pfItDetail, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 		}
 		dataLog.setEnv(titaVo, pfItDetail2, pfItDetail);
 		dataLog.exec("修改介紹人業績案件");

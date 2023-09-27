@@ -82,9 +82,10 @@ public class LM089ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             , Round(";
 		sql += "            Cm.\"EvaNetWorth\" / 100000000, 2";
 		sql += "        )                 AS \"EvaNetWorth\"";
-		sql += "             , Round(";
-		sql += "            Fac.\"LineAmt\" / Cm.\"EvaNetWorth\", 4";
-		sql += "        ) * 100           AS \"LTV\"";
+		sql += "             , Decode ( Nvl(Cm.\"EvaNetWorth\",0),0,0,";		
+		sql += "            	 Round(";
+		sql += "            		Fac.\"LineAmt\" / Cm.\"EvaNetWorth\", 4";
+		sql += "        		 ) * 100)           AS \"LTV\"";
 		sql += "             , Fc.\"ApplDate\"";
 		sql += "        FROM \"FacMain\"      Fac";
 		sql += "        LEFT JOIN \"LoanBorMain\"  Lm ON Lm.\"CustNo\" = Fac.\"CustNo\"";
