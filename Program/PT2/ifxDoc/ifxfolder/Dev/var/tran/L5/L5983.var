@@ -73,6 +73,9 @@ R(1,L5R51)
 E(0,@CustNo,#L5r51CustNo)
 E(0,@CaseSeq,#L5r51CaseSeq)
 
+#CHKDATA=X,1,S
+IF(#L5r51hasStatus,Y,V(P,該戶債權戶況非正常),S)
+
 #CustNo=A,7,S
 #CaseSeq=A,3,S
 

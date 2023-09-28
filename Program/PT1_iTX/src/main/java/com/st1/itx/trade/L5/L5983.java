@@ -86,15 +86,10 @@ public class L5983 extends TradeBuffer {
 			intsubtract = true;
 		}
 		this.info("diffdd = " + diffdd);
-		BigDecimal mainIntRate = tNegMain.getIntRate();
-		BigDecimal mainPrincipalBal = tNegMain.getPrincipalBal();
-		BigDecimal intAmt = mainPrincipalBal.multiply(mainIntRate.divide(new BigDecimal(100)))
+		//結清:利息=總本金餘額*利率/100*計息天數/365
+		BigDecimal intAmt = tNegMain.getPrincipalBal().multiply(tNegMain.getIntRate().divide(new BigDecimal(100)))
 				.multiply(new BigDecimal(diffdd)).divide(new BigDecimal(365), 0, RoundingMode.HALF_UP);
 		
-//		BigDecimal intAmt = tNegMain.getPrincipalBal().multiply(mainIntRate.divide(new BigDecimal(100)))
-//				.divide(parse.stringToBigDecimal("100")).multiply(parse.stringToBigDecimal("" + diffdd))
-//				.divide(parse.stringToBigDecimal("365")).setScale(0, BigDecimal.ROUND_HALF_UP);
-
 		if (intsubtract == true) {
 			intAmt = intAmt.multiply(new BigDecimal(-1));// 利息倒扣
 		}

@@ -249,7 +249,7 @@ public class L9701Report extends MakeReport {
 				// 不是額度0後的開始計算
 //				cntFirst++;
 
-				this.facmNo = tL9701Vo.get("FacmNo");
+				this.custName = tL9701Vo.get("CustName");
 				this.facmNo = tL9701Vo.get("FacmNo");
 				this.clAddr = tL9701Vo.get("Location");
 				printHead();

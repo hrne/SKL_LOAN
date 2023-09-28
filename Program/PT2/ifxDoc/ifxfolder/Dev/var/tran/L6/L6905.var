@@ -38,19 +38,19 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=1;screen.width=[170,830];printer.width=[20,20];">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[170,330,170,330];printer.width=[20,20];order=1">
 [
 ["[L6905]                                 日結明細查詢"],
-["#FdAcBookCode+帳冊別",#AcBookCode,#AcBookItem],
-["#FdAcSubBookCode+區隔帳冊",#AcSubBookCode,#AcSubBookItem,"(空白:查詢全部)"],
-["#FdBranchNo+單位別",#BranchNo],
-["#FdCurrencyCode+幣別",#CurrencyCode],
-["#FdAcNoCode+科子細目",#AcNoCode,"-",#AcSubCode,"-",#AcDtlCode,"@",#BTN1,#AcNoItem],
-["#FdRvNo+銷帳編號",#RvNo],
-["#FdAcDate+會計日期",#AcDate],
-["#FdInqType+彙計方式",#InqType,#InqTypeX],
-[#FdInqTypeX2+#InqTypeX2,#InqData,#InqDataX,#InqTypeX3,#InputTitaTxtNoStart,#InqTypeX4,#InputTitaTxtNoEnd],
-["#FdDbCr+借貸別",#DbCr,#DbCrX],
+[#<->#,"#FdAcBookCode+帳冊別",#AcBookCode,#AcBookItem],
+[#<->#,"#FdAcSubBookCode+區隔帳冊",#AcSubBookCode,#AcSubBookItem,"(空白:查詢全部)"],
+[#<->#,"#FdBranchNo+單位別",#BranchNo],
+[#<->#,"#FdCurrencyCode+幣別",#CurrencyCode],
+[#<->#,"#FdAcNoCode+科子細目",#AcNoCode,"-",#AcSubCode,"-",#AcDtlCode,"@",#BTN1,#AcNoItem],
+[#<->#,"#FdRvNo+銷帳編號",#RvNo],
+[#<->#,"#FdAcDate+會計日期",#AcDate],
+["#FdInqType+彙計方式",#InqType,#InqTypeX],[#SlipBatNoX,#SlipBatNo],
+[#<->#,#FdInqTypeX2+#InqTypeX2,#InqData,#InqDataX,#InqTypeX3,#InputTitaTxtNoStart,#InqTypeX4,#InputTitaTxtNoEnd],
+[#<->#,"#FdDbCr+借貸別",#DbCr,#DbCrX],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -104,7 +104,7 @@ E(0,@AcDate,#SYSDATE)
 
 
 
-#NTXBUF=X,62,S
+#NTXBUF=X,71,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
 #CHAIN_AcBookCode=X,3,S
@@ -134,17 +134,20 @@ T(1,#NTXBUF,32,7)
 #CHAIN_InqType=X,1,S
 T(1,#NTXBUF,39,1)
 
-#CHAIN_InqData=X,6,S
-T(1,#NTXBUF,40,6)
+#CHAIN_InqData=X,12,S
+T(1,#NTXBUF,40,12)
 
 #CHAIN_DbCr=X,1,S
-T(1,#NTXBUF,46,1)
+T(1,#NTXBUF,52,1)
 
 #CHAIN_InputTitaTxtNoStart=A,8,S
-T(1,#NTXBUF,47,8)
+T(1,#NTXBUF,53,8)
 
 #CHAIN_InputTitaTxtNoEnd=A,8,S
-T(1,#NTXBUF,55,8)
+T(1,#NTXBUF,61,8)
+
+#CHAIN_SlipBatNo=A,2,S
+T(1,#NTXBUF,69,2)
 
 C(3,#CHAIN,1,T(2,@AcBookCode,#CHAIN_AcBookCode),$)
 C(3,#CHAIN,1,T(2,@AcSubBookCode,#CHAIN_AcSubBookCode),$)
@@ -159,6 +162,7 @@ C(3,#CHAIN,1,T(2,@InqData,#CHAIN_InqData),$)
 C(3,#CHAIN,1,T(2,@DbCr,#CHAIN_DbCr),$)
 C(3,#CHAIN,1,E(0,@InputTitaTxtNoStart,#CHAIN_InputTitaTxtNoStart),$)
 C(3,#CHAIN,1,E(0,@InputTitaTxtNoEnd,#CHAIN_InputTitaTxtNoEnd),$)
+C(3,#CHAIN,1,E(0,@SlipBatNo,#CHAIN_SlipBatNo),$)
 
 
 #FdBranchNo=X,2,L
@@ -273,8 +277,16 @@ T(3,@InqTypeX2,)
 V(H,#InqTypeHelp)
 C(3,#InqType,0,T(3,@FdInqTypeX2, ),T(3,@FdInqTypeX2,*))
 
+
+
 #InqTypeX=X,12,L
 T(H,#InqType,#InqTypeHelp)
+C(3,#InqType,7,SHOW(#SlipBatNoX,#SlipBatNo),C(3,#InqType,8,SHOW(#SlipBatNoX,#SlipBatNo),HIDE(#SlipBatNoX,#SlipBatNo)))
+
+#SlipBatNoX=X,8,L
+T(3,傳票批號)
+#SlipBatNo=A,2,L
+C(3,#InqType,7,$,C(3,#InqType,8,$,S))
 
 #InqTypeX1=X,12,L
 C(3,#InqType,0,T(3, ),T(H,#InqType,#InqTypeHelp))
@@ -290,7 +302,7 @@ C(3,#InqType,0,T(3, ),T(H,#InqType,#InqTypeHelp))
 #InqTypeX2=X,12,L
 T(2,#InqTypeX1)
 
-#InqData=x,6,I
+#InqData=x,12,I
 C(3,#InqType,0,T(F,@InqData,0),T(F,@InqData,1))
 C(3,#InqType,1,HELP(#SumNoTypeHelp),T(2,#InqDataX, ))
 C(3,#InqType,0,S,$)
@@ -483,6 +495,7 @@ T(2,#OOTitaTlrNo+ +#OOTlrItem)
 #DbCr
 #InputTitaTxtNoStart
 #InputTitaTxtNoEnd
+#SlipBatNo
 #END
 </sub>
 

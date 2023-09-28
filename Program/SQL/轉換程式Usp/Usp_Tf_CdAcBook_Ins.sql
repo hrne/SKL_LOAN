@@ -64,8 +64,7 @@ BEGIN
              WHEN FSC."ACTFSC" = 'A' THEN FSC."FSCQTA"
            ELSE "Fn_ThrowException"('LN$FSCP.ACTFSC出現 A 以外的值:' || FSC.ACTFSC)
            END                            AS "TargetAmt"           -- 放款目標金額 DECIMAL 16 2
-         -- 2023-09-26 Wei from SKL-IT 盈倩 QC:2371
-         , 0                              AS "ActualAmt"           -- 放款實際金額 DECIMAL 16 2
+         , G1."LoanBalSum"                AS "ActualAmt"           -- 放款實際金額 DECIMAL 16 2
          , CASE
              WHEN FSC."ACTFSC" = 'A' THEN FSC."FSCPTY"
            ELSE "Fn_ThrowException"('LN$FSCP.ACTFSC出現 A 以外的值:' || FSC.ACTFSC)

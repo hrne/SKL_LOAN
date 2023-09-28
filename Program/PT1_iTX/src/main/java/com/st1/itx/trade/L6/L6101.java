@@ -783,6 +783,10 @@ public class L6101 extends TradeBuffer {
 			if (iClsFg == 2) {
 				txToDoL7400Delete(tAcClose, titaVo);
 			}
+			// 關帳取消時，清除總帳傳票號碼-
+			if (iClsFg == 2) {
+				clearMediaSlipNo(titaVo);
+			}
 		}
 		// 更新會計業務關帳控制檔
 		if (iMsgCode == 0) {
@@ -914,6 +918,24 @@ public class L6101 extends TradeBuffer {
 				this.info("DeleteAll Error : " + e.getErrorMsg());
 			}
 		}
+	}
 
+	// 清除總帳傳票號碼-
+	private void clearMediaSlipNo(TitaVo titaVo) throws LogicException {
+		Slice<AcDetail> slAcDetail = sAcDetailService.findSlipBatNoEntAc(iAcDateF, parse.stringToInteger(iBatNo), 1, 0,
+				1, titaVo);
+		if (slAcDetail == null) {
+			return;
+		}
+		List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
+		for (AcDetail ac : slAcDetail.getContent()) {
+			ac.setMediaSlipNo("");
+			lAcDetail.add(ac);
+		}
+		try {
+			sAcDetailService.updateAll(lAcDetail, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
+		}
 	}
 }

@@ -345,6 +345,16 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "    FROM \"MonthlyLM052Loss\"";
 			sql += "    WHERE \"YearMonth\" = :yymm ";
 
+		} else if (formNum == 6) {
+
+			sql += " SELECT ";
+			sql += " 	   SUM(0-\"TdBal\")  AS \"LossTotal\" ";
+			sql += " FROM \"CoreAcMain\"";
+			sql += " WHERE \"AcNoCode\" IN ( '10623' "; // 備抵損失-擔保放款
+			sql += "						,'10624') ";// 備抵損失-催收款項-擔保放款
+			sql += "   AND \"AcDate\" = TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR( :yymm*100+1), 'YYYYMMDD')),'YYYYMMDD')) ";
+			sql += "   AND \"CurrencyCode\" = 'TOL' ";
+
 		}
 
 		this.info("sql" + formNum + "=" + sql);

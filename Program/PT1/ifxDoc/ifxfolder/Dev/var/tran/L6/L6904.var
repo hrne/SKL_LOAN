@@ -256,14 +256,14 @@ T(2,#OOAcNoCode+-+#OOAcSubCode+-+#OOAcDtlCode)
 !彙計方式為4時,此欄位為"摘要代號" ([0001]現金存入、[1416]ＡＴ自收)
 !彙計方式為5時,此欄位為"傳票批號"
 !彙計方式為6時,此欄位為"業務類別" (撥款匯款、支票繳款、債協、放款)
-#OOInqData=X,6,S
+#OOInqData=X,12,S
 #OOReconCode=X,3,S
 
 #OOSlipBatNo=A,2,S
 #OOInqDataX=x,60,S
 
 #OOSumNoX=X,20,S
-C(2,#InqType,S,T(H,#OOInqData,#SumNoTypeHelp),T(2,#OOInqData+ +#OOInqDataX),T(2,#OOInqData),T(2,#OOInqData+ +#OOInqDataX),T(2,#OOInqData),T(H,#OOInqData,#SecNoTypeHelp),T(2,#OOInqData))
+C(2,#InqType,S,T(H,#OOInqData,#SumNoTypeHelp),T(B,#OOInqData+ +#OOInqDataX),T(2,#OOInqData),T(B,#OOInqData+ +#OOInqDataX),T(2,#OOInqData),T(H,#OOInqData,#SecNoTypeHelp),T(2,#OOInqData),T(2,#OOInqData))
 
 !借方筆數
 #OODbCnt=X,10,L
@@ -296,8 +296,8 @@ X(#OOCrAmt1)
 
 
 !明細
-#OOBUF5=X,46,S
-T(2,#AcBookCode+#AcSubBookCode+#BranchNo+#CurrencyCode+#OOAcNoCode+#OOAcSubCode+#OOAcDtlCode+#AcDate+#InqType+#OOInqData+0)
+#OOBUF5=X,71,S
+T(2,#AcBookCode+#AcSubBookCode+#BranchNo+#CurrencyCode+#OOAcNoCode+#OOAcSubCode+#OOAcDtlCode+#AcDate+#InqType+#OOInqData+0+00000000+00000000+#OOSlipBatNo)
 
 #OOBTN5=X,4,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L6905;text=明細;ntxbuf=#OOBUF5})

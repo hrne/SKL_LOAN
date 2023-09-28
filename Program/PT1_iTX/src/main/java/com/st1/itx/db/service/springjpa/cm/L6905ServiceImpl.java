@@ -57,6 +57,7 @@ public class L6905ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iAcDate = this.parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 
 		int iInqType = this.parse.stringToInteger(titaVo.getParam("InqType"));
+		int iSlipBatNo = this.parse.stringToInteger(titaVo.getParam("SlipBatNo"));
 		int iInputTitaTxtNoStart = this.parse.stringToInteger(titaVo.getParam("InputTitaTxtNoStart"));
 		int iInputTitaTxtNoEnd = this.parse.stringToInteger(titaVo.getParam("InputTitaTxtNoEnd"));
 		if (iInputTitaTxtNoEnd == 0) {
@@ -128,6 +129,14 @@ public class L6905ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "AND \"TitaSecNo\" = :TitaSecNo ";
 		} else if (iInqType == 7) {
 			sql += "AND \"SlipSumNo\" = :SlipSumNo ";
+			sql += "AND \"SlipBatNo\" = :SlipBatNo ";
+		} else if (iInqType == 8) {
+			if (!iInqData.trim().isEmpty()) {
+				sql += "AND \"MediaSlipNo\" = :MediaSlipNo ";
+			} else {
+				sql += "AND \"MediaSlipNo\" IS NULL ";
+			}
+			sql += "AND \"SlipBatNo\" = :SlipBatNo ";
 		}
 		sql += "ORDER BY A.\"SlipNo\" ASC  ";
 
@@ -150,32 +159,35 @@ public class L6905ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		if (!iAcBookCode.isEmpty()) {
 			query.setParameter("AcBookCode", iAcBookCode);
-			this.info("L6905Service 1");
+			this.info("AcBookCode = " + iAcBookCode);
 		}
 		if (!iAcSubBookCode.isEmpty()) {
 			query.setParameter("AcSubBookCode", iAcSubBookCode);
-			this.info("L6905Service 2");
+			this.info("AcSubBookCode = " + iAcSubBookCode);
 		}
 		if (!iBranchNo.isEmpty()) {
 			query.setParameter("BranchNo", iBranchNo);
-			this.info("L6905Service 3");
+			this.info("BranchNo = " + iBranchNo);
 		}
 		if (!iCurrencyCode.isEmpty()) {
 			query.setParameter("CurrencyCode", iCurrencyCode);
-			this.info("L6905Service 4");
+			this.info("CurrencyCode = " + iCurrencyCode);
 		}
 		if (!iAcNoCode.isEmpty()) {
 			query.setParameter("AcNoCode", iAcNoCode);
-			this.info("L6905Service 5");
+			this.info("AcNoCode = " + iAcNoCode);
 		}
 		if (!iAcSubCode.isEmpty()) {
 			query.setParameter("AcSubCode", iAcSubCode);
+			this.info("AcSubCode = " + iAcSubCode);
 		}
 		if (!iAcDtlCode.isEmpty()) {
 			query.setParameter("AcDtlCode", iAcDtlCode);
+			this.info("AcDtlCode = " + iAcDtlCode);
 		}
 		if (!iRvNo.isEmpty()) {
 			query.setParameter("RvNo", iRvNo);
+			this.info("RvNo = " + iRvNo);
 		}
 
 		if (iInqType == 1) {
@@ -183,19 +195,36 @@ public class L6905ServiceImpl extends ASpringJpaParm implements InitializingBean
 		} else if (iInqType == 2) {
 			if (iInqData.length() != 0) {
 				query.setParameter("TitaTlrNo", iInqData);
+				this.info("TitaTlrNo = " + iInqData);
 			}
 			query.setParameter("TitaTxtNoStart", iInputTitaTxtNoStart);
+			this.info("TitaTxtNoStart = " + iInputTitaTxtNoStart);
 			query.setParameter("TitaTxtNoEnd", iInputTitaTxtNoEnd);
+			this.info("TitaTxtNoEnd = " + iInputTitaTxtNoEnd);
 		} else if (iInqType == 3) {
 			query.setParameter("TitaBatchNo", iInqData.trim().isEmpty() ? " " : iInqData);
+			this.info("TitaBatchNo = " + (iInqData.trim().isEmpty() ? " " : iInqData));
 		} else if (iInqType == 4) {
 			query.setParameter("DscptCode", iInqData.trim().isEmpty() ? " " : iInqData);
+			this.info("DscptCode = " + (iInqData.trim().isEmpty() ? " " : iInqData));
 		} else if (iInqType == 5) {
 			query.setParameter("SlipBatNo", iInqData.trim().isEmpty() ? 0 : parse.stringToInteger(iInqData.trim()));
+			this.info("SlipBatNo = " + (iInqData.trim().isEmpty() ? 0 : parse.stringToInteger(iInqData.trim())));
 		} else if (iInqType == 6) {
 			query.setParameter("TitaSecNo", FormatUtil.padX(iInqData, 2));
+			this.info("TitaSecNo = " + (FormatUtil.padX(iInqData, 2)));
 		} else if (iInqType == 7) {
 			query.setParameter("SlipSumNo", iInqData.trim().isEmpty() ? 0 : parse.stringToInteger(iInqData.trim()));
+			this.info("SlipSumNo = " + (iInqData.trim().isEmpty() ? 0 : parse.stringToInteger(iInqData.trim())));
+			query.setParameter("SlipBatNo", iSlipBatNo);
+			this.info("SlipBatNo = " + iSlipBatNo);
+		} else if (iInqType == 8) {
+			if (!iInqData.trim().isEmpty()) {
+				query.setParameter("MediaSlipNo", iInqData);
+				this.info("MediaSlipNo = " + (iInqData.trim().isEmpty() ? "" : iInqData));
+			}
+			query.setParameter("SlipBatNo", iSlipBatNo);
+			this.info("SlipBatNo = " + iSlipBatNo);
 		}
 
 		this.info("L6905Service FindData=" + query);

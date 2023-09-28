@@ -96,24 +96,31 @@ public class L6904ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		switch (iInqType) {
 		case 0: // 全抓
+			sql += "        , TO_CHAR('') AS \"SlipBatNo\" ";
 			sql += "        , ' '  AS \"DataInq\" ";
 			break;
 		case 1: // 彙總別
+			sql += "        , TO_CHAR('') AS \"SlipBatNo\" ";
 			sql += "        , \"SumNo\" AS \"DataInq\" ";
 			break;
 		case 2: // 經辦別
+			sql += "        , TO_CHAR('') AS \"SlipBatNo\" ";
 			sql += "        , \"TitaTlrNo\" AS \"DataInq\" ";
 			break;
 		case 3: // 整批批號
+			sql += "        , TO_CHAR('') AS \"SlipBatNo\" ";
 			sql += "        , \"TitaBatchNo\" AS \"DataInq\" ";
 			break;
 		case 4: // 摘要代號
+			sql += "        , TO_CHAR('') AS \"SlipBatNo\" ";
 			sql += "        , \"DscptCode\" AS \"DataInq\" ";
 			break;
 		case 5: // 傳票批號
+			sql += "        , TO_CHAR('') AS \"SlipBatNo\" ";
 			sql += "        , \"SlipBatNo\" AS \"DataInq\" ";
 			break;
 		case 6: // 業務類別
+			sql += "        , TO_CHAR('') AS \"SlipBatNo\" ";
 			sql += "        , \"TitaSecNo\" AS \"DataInq\" ";
 			break;
 		case 7: // 彙總傳票號碼
@@ -186,6 +193,7 @@ public class L6904ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ,SUM(\"DAMT\")  AS \"SumDAmt\" ";
 		sql += "        ,SUM(\"CAMT\")  AS \"SumCAmt\" ";
 		sql += "        ,TO_NCHAR('')  AS \"AcNoItem\" ";
+		sql += "        ,TO_NCHAR('')  AS \"SlipBatNo\" ";
 		sql += "        ,TO_NCHAR('')  AS \"DataInq\" ";
 		sql += "        ,TO_NCHAR('')  AS \"DataInqX\" ";
 		if (iInqType == 7) {
@@ -202,6 +210,7 @@ public class L6904ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        , d.\"DAMT\" AS \"SumDAmt\" ";
 		sql += "        , d.\"CAMT\" AS \"SumCAmt\"  ";
 		sql += "        , cac.\"AcNoItem\" AS \"AcNoItem\" ";
+		sql += "        , d.\"SlipBatNo\"  AS \"SlipBatNo\" ";
 		switch (iInqType) {
 		case 2: // 經辦別
 			sql += "        , d.\"DataInq\"  AS \"DataInq\" ";
