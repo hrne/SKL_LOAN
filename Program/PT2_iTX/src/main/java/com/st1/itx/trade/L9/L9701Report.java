@@ -96,11 +96,7 @@ public class L9701Report extends MakeReport {
 
 		String iCUSTNO = titaVo.get("CustNo");
 
-		if (this.facmNo.equals("")) {
-			this.print(-6, 1, "戶號　　  : " + iCUSTNO);
-		} else {
-			this.print(-6, 1, "戶號　　 : " + iCUSTNO + " " + custName);
-		}
+		this.print(-6, 1, "戶號　　 : " + iCUSTNO + " " + custName);
 
 		this.setBeginRow(7);
 
@@ -115,11 +111,9 @@ public class L9701Report extends MakeReport {
 
 		this.print(1, 1, " ");
 		this.print(1, 1, "額度　　 : " + tmpFacmNo);
-		if ("0".equals(this.facmNo)) {
-			this.print(0, 22, "(暫收款)");
-		} else {
-			this.print(0, 22, "押品地址 : " + clAddr);
-		}
+
+		this.print(0, 22, "押品地址 : " + clAddr);
+
 		divider();
 		this.print(1, 5, "入帳日期");
 		this.print(0, 14, "繳款方式");

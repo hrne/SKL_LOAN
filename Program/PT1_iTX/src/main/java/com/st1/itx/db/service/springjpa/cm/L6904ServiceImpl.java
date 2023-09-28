@@ -117,11 +117,16 @@ public class L6904ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "        , \"TitaSecNo\" AS \"DataInq\" ";
 			break;
 		case 7: // 彙總傳票號碼
+			sql += "        , \"SlipBatNo\" AS \"SlipBatNo\" ";
 			sql += "        ,   TO_NCHAR(\"SlipSumNo\")    AS \"DataInq\"";
 			sql += "        , case when \"SlipSumNo\" = 0  THEN ''  ";
 			sql += "               when \"SlipSumNo\" > 0  THEN  JSON_VALUE  (\"JsonFields\",'$.ReconCode')    ";
 			sql += "               ELSE ''    ";
 			sql += "        END     AS \"ReconCode\"";
+			break;
+		case 8: // 總帳傳票號碼
+			sql += "        , \"SlipBatNo\" AS \"SlipBatNo\" ";
+			sql += "        ,   TO_NCHAR(\"MediaSlipNo\")    AS \"DataInq\"";
 			break;
 		}
 		sql += "        from \"AcDetail\"  ";
@@ -160,8 +165,13 @@ public class L6904ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "        , \"TitaSecNo\" ";
 			break;
 		case 7: // 彙總傳票號碼
-			sql += "        ,   \"SlipSumNo\"    ";
+			sql += "        , \"SlipBatNo\" ";
+			sql += "        , \"SlipSumNo\" ";
 			sql += "        , JSON_VALUE  (\"JsonFields\",'$.ReconCode') ";
+			break;
+		case 8: // 總帳傳票號碼
+			sql += "        , \"SlipBatNo\" ";
+			sql += "        , \"MediaSlipNo\" ";
 			break;
 		}
 		sql += "        ORDER BY   ";

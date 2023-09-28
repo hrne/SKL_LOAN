@@ -89,7 +89,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        (";
 		sql += "    SELECT";
 		sql += "        T.\"CustNo\",";
-		sql += "        DECODE(T.\"AcctCode\",'900', (SELECT \"FacmNo\" FROM \"tmpMain\") , NVL(T.\"FacmNo\",(SELECT \"FacmNo\" FROM \"tmpMain\"))) AS \"FacmNo\",";
+		sql += "        NVL(T.\"FacmNo\",(SELECT \"FacmNo\" FROM \"tmpMain\")) AS \"FacmNo\",";
 		sql += "        CASE";
 		sql += "            WHEN T.\"TxDescCode\" = '3202' THEN";
 		sql += "                '回收登錄'";
@@ -97,12 +97,10 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                '結案登錄'";
 		sql += "            WHEN T.\"TxDescCode\" IN ( '3101', '3102' ) THEN";
 		sql += "                '契約變更'";
+		sql += "            WHEN T.\"TxDescCode\" IN ( '3100') AND T.\"RenewFlag\" IN ('1','2') THEN";
+		sql += "                '契約變更'";//借新還舊、展期=>顯示契約變更
 		sql += "            WHEN T.\"TxDescCode\" IN ( '3100') AND T.\"RenewFlag\" IN ('0') THEN";
 		sql += "                '撥款'";
-		sql += "            WHEN T.\"TxDescCode\" IN ( '3100') AND T.\"RenewFlag\" IN ('1') THEN";
-		sql += "                '展期'";
-		sql += "            WHEN T.\"TxDescCode\" IN ( '3100') AND T.\"RenewFlag\" IN ('2') THEN";
-		sql += "                '借新還舊'";
 		sql += "            WHEN CC1.\"Code\" IS NOT NULL THEN";
 		sql += "                TO_CHAR( NVL( CC1.\"Item\", '  ' ) )";
 		sql += "            WHEN CC2.\"Code\" IS NOT NULL THEN";
@@ -127,19 +125,41 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        T.\"BreachAmt\",";
 		sql += "        T.\"TxAmt\",";
 		sql += "        T.\"FeeAmt\" AS \"FeeAmt\",";
-		sql += "        T.\"Overflow\",";
-		sql += "        T.\"ShortAmt\",";
+		sql += "        CASE";
+		sql += "          WHEN  T.\"Excessive\" / T.\"ExcessiveCount\" <  0 THEN";
+		sql += "            CASE";
+		sql += "              WHEN T.\"TitaHCode\" IN( 2, 4 ) THEN";
+		sql += "                   T.\"Excessive\" / T.\"ExcessiveCount\"";
+		sql += "              ELSE";
+		sql += "                  -T.\"Excessive\" / T.\"ExcessiveCount\"";
+		sql += "              END";
+		sql += "          ELSE";
+		sql += "             0";
+		sql += "        END        AS \"ShortAmt\",";
+		sql += "        CASE";
+		sql += "          WHEN  T.\"Excessive\" / T.\"ExcessiveCount\" >  0 THEN";
+		sql += "            CASE";
+		sql += "              WHEN T.\"TitaHCode\" IN( 2, 4 ) THEN";
+		sql += "                  -T.\"Excessive\" / T.\"ExcessiveCount\"";
+		sql += "              ELSE";
+		sql += "                   T.\"Excessive\" / T.\"ExcessiveCount\"";
+		sql += "              END";
+		sql += "          ELSE";
+		sql += "             0";
+		sql += "        END        AS \"Overflow\",";
 		sql += "        T.\"Excessive\" / T.\"ExcessiveCount\" AS \"Excessive\",";
 		sql += "        T.\"OverShort\",";
 		sql += "        T.\"DB\",";
 		sql += "        \"Fn_ParseEOL\"( C.\"CustName\",";
 		sql += "        0 ) AS \"CustName\",";
-		sql += "        T.\"TitaHCode\"";
+		sql += "        T.\"TitaHCode\",";
+		sql += "        T.\"TitaCalDy\",";
+		sql += "        T.\"TitaCalTm\"";
 		sql += "    FROM";
 		sql += "        (";
 		sql += "            SELECT";
 		sql += "                T.\"CustNo\",";
-		sql += "                MAX(DECODE(T.\"FacmNo\",0,NVL(IR.\"FacmNo\",NVL(AC.\"FacmNo\",FF.\"FacmNo\")),T.\"FacmNo\"))  AS  \"FacmNo\",";
+		sql += "                DECODE(T.\"FacmNo\",0,NVL(IR.\"FacmNo\",NVL(AC.\"FacmNo\",FF.\"FacmNo\")),T.\"FacmNo\")  AS  \"FacmNo\",";
 		sql += "                MAX(DECODE( T.\"EntryDate\", 0, T.\"AcDate\", T.\"EntryDate\" )) AS \"EntryDate\",";
 		sql += "                SUM(T.\"LoanBal\" + T.\"Principal\")                           AS \"Amount\",";
 		sql += "                T.\"IntStartDate\"                                           AS \"IntStartDate\",";
@@ -180,30 +200,6 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                        ELSE";
 		sql += "                            T.\"FeeAmt\"";
 		sql += "                    END )                                                  AS \"FeeAmt\",";
-		sql += "                SUM(";
-		sql += "                    CASE";
-		sql += "                        WHEN (T.\"UnpaidPrincipal\" + T.\"UnpaidInterest\" + T.\"UnpaidCloseBreach\") > 0 THEN";
-		sql += "                            CASE";
-		sql += "                                WHEN T.\"TitaHCode\" IN( 2, 4 ) THEN";
-		sql += "                                   - (T.\"UnpaidPrincipal\" + T.\"UnpaidInterest\" + T.\"UnpaidCloseBreach\")";
-		sql += "                                ELSE";
-		sql += "                                    (T.\"UnpaidPrincipal\" + T.\"UnpaidInterest\" + T.\"UnpaidCloseBreach\")";
-		sql += "                            END";
-		sql += "                        ELSE";
-		sql += "                            0";
-		sql += "                    END )                                                  AS \"ShortAmt\",";
-		sql += "                SUM(";
-		sql += "                    CASE";
-		sql += "                        WHEN T.\"Overflow\" > 0 THEN";
-		sql += "                            CASE";
-		sql += "                                WHEN T.\"TitaHCode\" IN( 2, 4 ) THEN";
-		sql += "                                    - T.\"Overflow\"";
-		sql += "                                ELSE";
-		sql += "                                      T.\"Overflow\"";
-		sql += "                            END";
-		sql += "                        ELSE";
-		sql += "                            0";
-		sql += "                    END )                                                  AS \"Overflow\",";
 		sql += "                SUM(T.\"Overflow\" - (T.\"UnpaidPrincipal\" + T.\"UnpaidInterest\" + T.\"UnpaidCloseBreach\"))   AS \"OverShort\",";
 		sql += "            	SUM(NVL(JSON_VALUE(T.\"OtherFields\", '$.Excessive'),0)) AS \"Excessive\", ";
 		sql += "            	COUNT(NVL(JSON_VALUE(T.\"OtherFields\", '$.Excessive'),0)) AS \"ExcessiveCount\", ";
@@ -242,6 +238,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		sql += "            LEFT JOIN \"AcReceivable\" AC";
 		sql += "             ON AC.\"TitaTlrNo\" =T.\"TitaTlrNo\"";
+		sql += "            AND AC.\"TitaTxtNo\" = TO_NUMBER(T.\"TitaTxtNo\")";
 		sql += "            AND AC.\"CustNo\" = T.\"CustNo\"";
 		sql += "            AND JSON_VALUE(T.\"OtherFields\", '$.AcctFee') IS NOT NULL ";
 
@@ -278,7 +275,9 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		sql += "            GROUP BY";
-		sql += "                T.\"CustNo\", T.\"AcDate\", T.\"IntStartDate\", T.\"IntEndDate\", T.\"Rate\", T.\"Desc\", T.\"TxDescCode\", T.\"AcctCode\", T.\"TitaTlrNo\", T.\"TitaTxtNo\", T.\"TitaHCode\", T.\"RepayCode\"";
+		sql += "                T.\"CustNo\", ";
+		sql += "                DECODE(T.\"FacmNo\",0,NVL(IR.\"FacmNo\",NVL(AC.\"FacmNo\",FF.\"FacmNo\")),T.\"FacmNo\") ,";
+		sql += "				T.\"AcDate\", T.\"IntStartDate\", T.\"IntEndDate\", T.\"Rate\", T.\"Desc\", T.\"TxDescCode\", T.\"AcctCode\", T.\"TitaTlrNo\", T.\"TitaTxtNo\", T.\"TitaHCode\", T.\"RepayCode\"";
 		sql += "        )            T";
 		sql += "        LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = T.\"CustNo\"";
 		sql += "        LEFT JOIN \"CdCode\" CC1 ON CC1.\"DefCode\" = 'AcctCode'";
@@ -309,7 +308,9 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        					   AND F.\"ClCode1\" = 2";
 		sql += "    ORDER BY T.\"FacmNo\",";
 		sql += "        T.\"DB\",";
-		sql += "        T.\"EntryDate\"";
+		sql += "        T.\"EntryDate\",";
+		sql += "        T.\"TitaCalDy\",";
+		sql += "        T.\"TitaCalTm\"";
 
 
 		this.info("sql=" + sql);

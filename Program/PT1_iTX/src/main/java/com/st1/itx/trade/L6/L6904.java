@@ -129,21 +129,12 @@ public class L6904 extends TradeBuffer {
 			occursList.putParam("OOAcSubCode", d.get("AcSubCode"));// AcSubCode
 			occursList.putParam("OOAcDtlCode", d.get("AcDtlCode"));// AcDtlCode
 			// 彙總傳票號碼,彙總傳票筆數算一筆
-//			if (iInqType == 7 && parse.stringToInteger(d.get("SumDCnt")) > 0 && !"0".equals(d.get("DataInq"))) {
-//				occursList.putParam("OODbCnt", "1/" + d.get("SumDCnt"));
-//			} else {
-//				occursList.putParam("OODbCnt", d.get("SumDCnt"));
-//			}
 			occursList.putParam("OODbCnt", d.get("SumDCnt"));
 			occursList.putParam("OODbAmt", d.get("SumDAmt"));
 			// 彙總傳票號碼,彙總傳票筆數算一筆
-//			if (iInqType == 7 && parse.stringToInteger(d.get("SumCCnt")) > 0 && !"0".equals(d.get("DataInq"))) {
-//				occursList.putParam("OOCrCnt", "1/" + d.get("SumCCnt"));
-//			} else {
-//				occursList.putParam("OOCrCnt", d.get("SumCCnt"));
-//			}
 			occursList.putParam("OOCrCnt", d.get("SumCCnt"));
 			occursList.putParam("OOCrAmt", d.get("SumCAmt"));
+			occursList.putParam("OOSlipBatNo", d.get("SlipBatNo"));
 			if (iInqType == 5) {
 				occursList.putParam("OOInqData", "0".equals(d.get("DataInq")) ? ""
 						: parse.IntegerToString(parse.stringToInteger(d.get("DataInq")), 2));

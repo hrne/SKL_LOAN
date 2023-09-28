@@ -239,8 +239,8 @@ X(#OOTdBal1)
 #OOHasDetail=X,1,S
 
 !明細
-#OOBUF5=X,31,S
-T(2,#OOAcBookCode+#OOAcSubBookCode+#AcNoCode+#AcSubCode+#AcDtlCode+#OOAcDate)
+#OOBUF5=X,33,S
+T(2,#OOAcBookCode+#OOAcSubBookCode+#AcNoCode+#AcSubCode+#AcDtlCode+#OOAcDate+1)
 
 #OOBTN5=X,4,S
 C(5,#OOHasDetail,"Y",BIND(grid,{ cmd=CHAIN; ntxcd=L6903;text=明細;ntxbuf=#OOBUF5}),BIND(grid,cancel))

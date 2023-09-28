@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L5;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
@@ -76,16 +77,27 @@ public class L5983 extends TradeBuffer {
 		}
 		BigDecimal tempAmt = BigDecimal.ZERO; // 暫收抵繳
 		int diffdd = 0;
+		Boolean intsubtract = false;
 		int lastPayIntDate = negCom.getRepayDate(tNegMain.getNextPayDate(), -1, titaVo);// 上次繳息止日
 		if (iEntryDate >= lastPayIntDate) {
 			diffdd = negCom.diffday(lastPayIntDate, iEntryDate);// 計息區間:上次繳息止日~本次繳款日
 		} else {
 			diffdd = negCom.diffday(iEntryDate, lastPayIntDate);// 利息倒扣區間:本次繳款日~上次繳息止日
+			intsubtract = true;
 		}
 		this.info("diffdd = " + diffdd);
-		BigDecimal intAmt = tNegMain.getPrincipalBal().multiply(tNegMain.getIntRate())
-				.divide(parse.stringToBigDecimal("100")).multiply(parse.stringToBigDecimal("" + diffdd))
-				.divide(parse.stringToBigDecimal("365")).setScale(0, BigDecimal.ROUND_HALF_UP);
+		BigDecimal mainIntRate = tNegMain.getIntRate();
+		BigDecimal mainPrincipalBal = tNegMain.getPrincipalBal();
+		BigDecimal intAmt = mainPrincipalBal.multiply(mainIntRate.divide(new BigDecimal(100)))
+				.multiply(new BigDecimal(diffdd)).divide(new BigDecimal(365), 0, RoundingMode.HALF_UP);
+		
+//		BigDecimal intAmt = tNegMain.getPrincipalBal().multiply(mainIntRate.divide(new BigDecimal(100)))
+//				.divide(parse.stringToBigDecimal("100")).multiply(parse.stringToBigDecimal("" + diffdd))
+//				.divide(parse.stringToBigDecimal("365")).setScale(0, BigDecimal.ROUND_HALF_UP);
+
+		if (intsubtract == true) {
+			intAmt = intAmt.multiply(new BigDecimal(-1));// 利息倒扣
+		}
 		tempAmt = tNegMain.getPrincipalBal().add(intAmt).subtract(tNegMain.getAccuOverAmt());
 		BigDecimal revivAmt = tNegMain.getPrincipalBal().add(intAmt);
 		String revivAmtX = df.format(revivAmt) + "(本金：" + df.format(tNegMain.getPrincipalBal()) + "　利息："

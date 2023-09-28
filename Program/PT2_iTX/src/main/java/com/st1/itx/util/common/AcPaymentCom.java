@@ -158,7 +158,7 @@ public class AcPaymentCom extends TradeBuffer {
 //		202:整批匯款				P02	銀行存款－新光
 //		203:單筆匯款				P02	銀行存款－新光
 //		204:退款他行(匯款單)		P02	銀行存款－台新
-//		205:核心匯款(整批匯款)	P02	銀行存款－新光
+//		205:核心退款(核心匯款)	OPR	其他應付款－放款
 //		211:退款新光(存款憑條)	P03	銀行存款－新光
 //		
 
@@ -166,10 +166,7 @@ public class AcPaymentCom extends TradeBuffer {
 //      091:借新還舊				TRO 暫收款－借新還舊
 //	    093:繳抽退票				TCK 暫收款－支票
 //      095:展期					TRE 暫收款－展期
-		if (titaVo.get("BATCHNO") != null && titaVo.get("BATCHNO").trim().length() == 6
-				&& "RESV00".equals(titaVo.get("BATCHNO"))) {
-			acDetail.setSumNo("099");
-		} else if (parse.stringToInteger(titaVo.getParam("RpCode" + i)) >= 90) {
+		if (parse.stringToInteger(titaVo.getParam("RpCode" + i)) >= 90) {
 			acDetail.setSumNo("0" + FormatUtil.pad9(titaVo.getParam("RpCode" + i), 2));
 		} else {
 			acDetail.setSumNo(RpFlag + FormatUtil.pad9(titaVo.getParam("RpCode" + i), 2));
@@ -435,7 +432,7 @@ public class AcPaymentCom extends TradeBuffer {
 		// LN為撥款
 		// RT為退款
 		String batchNo = "";
-		if (drawdownCode == 1 || drawdownCode == 2|| drawdownCode == 3) {
+		if (drawdownCode == 1 || drawdownCode == 2 || drawdownCode == 3) {
 			batchNo = "LN";
 		} else {
 			batchNo = "RT";
@@ -450,7 +447,7 @@ public class AcPaymentCom extends TradeBuffer {
 		} else {
 			batchNo += parse.IntegerToString(tAcClose.getClsNo() + 1, 2);
 		}
-		if (drawdownCode == 1 || drawdownCode == 2|| drawdownCode == 5) {
+		if (drawdownCode == 1 || drawdownCode == 2 || drawdownCode == 5) {
 			batchNo += "  ";
 		} else {
 			batchNo += "00";

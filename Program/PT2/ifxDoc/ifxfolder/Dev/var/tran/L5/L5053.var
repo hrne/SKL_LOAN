@@ -53,7 +53,7 @@ E(0,0)
 
 #BonusTypeHelp=x,50,S
 !T(3,1:介紹獎金;5:協辦獎金;6:專業獎勵金;9:全部)
-T(3,1:介紹獎金;5:協辦獎金;9:全部)
+T(3,0:全部;1:介紹獎金;5:協辦獎金;99:其他)
 
 #FdDateFm=X,2,L
 T(3,*)
@@ -75,7 +75,7 @@ T(4,CHAIN$)
 #NTXBUF=X,22,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@WorkYM,#NTXBUF,1,5)
-T(1,@BonusType,#NTXBUF,6,1)
+T(1,@BonusType,#NTXBUF,6,2)
 
 #Value=A,1,S
 !T(1,@DateFm,#SYSDATE,2,7)
@@ -126,8 +126,7 @@ A(YM13,1,#WorkYM)
 !V(5,#DateFm,#SYSDATE)
 !IF(#DateTo==0,V(P,業績日期不可空白),$)
 
-#BonusType=A,1,I
-C(3,#BonusType,0,E(0,9),$)
+#BonusType=X,2,I
 C(3,#CHAIN,1,s,$)
 HELP(#BonusTypeHelp)
 @T(3,#BonusTypeX,)

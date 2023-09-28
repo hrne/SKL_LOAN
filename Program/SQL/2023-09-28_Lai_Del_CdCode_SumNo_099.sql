@@ -1,0 +1,1 @@
+DELETE FROM "CdCode" WHERE "DefCode" = 'AuthErrorCode' AND "Code" = '  ';

@@ -517,7 +517,7 @@ public class L5511Batch extends TradeBuffer {
 		List<Integer> typeList = new ArrayList<>();
 		typeList.add(1);
 		typeList.add(5);
-		typeList.add(6);
+		typeList.add(99);
 
 		Slice<PfRewardMedia> slPfRewardMedia = pfRewardMediaService.findWorkMonth(iWorkYM, typeList, 0, this.index,
 				this.limit, titaVo);
@@ -527,14 +527,6 @@ public class L5511Batch extends TradeBuffer {
 		int cnt = 0;
 		if (lPfRewardMedia != null) {
 			for (PfRewardMedia pfRewardMedia : lPfRewardMedia) {
-				// 媒體檔格式未定先SKIP
-				if (pfRewardMedia.getBonusType() == 6) {
-					continue;
-				}
-
-//				if (pfRewardMedia.getMediaFg() == 1) {
-//					continue;
-//				}
 
 				BigDecimal bbonus = pfRewardMedia.getAdjustBonus();
 				bbonus = bbonus.setScale(0, RoundingMode.FLOOR);
@@ -548,15 +540,6 @@ public class L5511Batch extends TradeBuffer {
 					throw new LogicException(titaVo, "E0001", "獎金媒體發放檔");
 				}
 
-//				pfRewardMedia2.setBonusDate(iBonusDate);
-//				pfRewardMedia2.setMediaFg(1);
-//				pfRewardMedia2.setMediaDate(this.txBuffer.getTxCom().getTbsdy());
-//				try {
-//					pfRewardMediaService.update(pfRewardMedia2, titaVo);
-//				} catch (DBException e) {
-//					throw new LogicException(titaVo, "E0007", "獎金媒體發放檔");
-//				}
-				//
 				String s = "";
 
 				String workMonth = String.valueOf(pfRewardMedia.getWorkMonth());
@@ -601,6 +584,8 @@ public class L5511Batch extends TradeBuffer {
 					transferDetail = " 介紹獎金";
 				} else if (pfRewardMedia.getBonusType() == 5) {
 					transferDetail = " 協辦獎金";
+				} else {
+					transferDetail = " 其他";
 				}
 				s += FormatUtil.padX(transferDetail, 40);// 轉發明細(40)
 				s += ",";
@@ -656,35 +641,17 @@ public class L5511Batch extends TradeBuffer {
 		List<Integer> typeList = new ArrayList<>();
 		typeList.add(1);
 		typeList.add(5);
-		typeList.add(6);
+		typeList.add(99);
 
 		Slice<PfRewardMedia> slPfRewardMedia = pfRewardMediaService.findWorkMonth(iWorkYM, typeList, 1, this.index,
 				this.limit, titaVo);
-		List<PfRewardMedia> lPfRewardMedia = slPfRewardMedia == null ? null : slPfRewardMedia.getContent();
-
-		int cnt = 0;
-		if (lPfRewardMedia != null) {
-			for (PfRewardMedia pfRewardMedia : lPfRewardMedia) {
-				PfRewardMedia pfRewardMedia2 = pfRewardMediaService.holdById(pfRewardMedia, titaVo);
-				if (pfRewardMedia2 == null) {
-					throw new LogicException(titaVo, "E0001", "獎金媒體發放檔");
-				}
-
-//				pfRewardMedia.setBonusDate(0);
-//				pfRewardMedia2.setMediaFg(0);
-//				pfRewardMedia2.setMediaDate(0);
-//
-//				try {
-//					pfRewardMediaService.update(pfRewardMedia2, titaVo);
-//				} catch (DBException e) {
-//					throw new LogicException(titaVo, "E0007", "獎金媒體發放檔");
-//				}
-				cnt++;
-			}
+		if (slPfRewardMedia == null) {
+			throw new LogicException(titaVo, "E0001", "獎金媒體發放檔");
 		}
+		
+		int cnt = slPfRewardMedia.getSize();
 
 		msg = "共取消" + cnt + "筆資料";
-//		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L5053", workYM+"9", msg, titaVo);
 		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", msg, titaVo);
 
 		// 刪除交易控制檔

@@ -68,7 +68,6 @@ public class L5505 extends TradeBuffer {
 	private String prodCode = "";
 	private BigDecimal drawdownAmt = BigDecimal.ZERO;
 	private BigDecimal perfAmt = BigDecimal.ZERO;
-	private String cntingCode = "";
 	private BigDecimal perfCnt = BigDecimal.ZERO;
 	private String deptManager = "";
 
@@ -170,7 +169,6 @@ public class L5505 extends TradeBuffer {
 		pfItDetail.setPerfEqAmt(iAdjPerfEqAmt);// 換算業績
 		pfItDetail.setPerfReward(iAdjPerfReward);// 業務報酬
 		pfItDetail.setPerfAmt(perfAmt);
-		pfItDetail.setCntingCode(cntingCode);
 		this.info("pfItDetail=" + pfItDetail.toString());
 		try {
 			pfItDetail = pfItDetailService.insert(pfItDetail, titaVo);

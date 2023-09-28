@@ -83,7 +83,7 @@ T(2,@PieceHelp,#HelpDesc1)
 T(3,1:新增;2:修改;3:複製;4:刪除;5:查詢)
 
 #BonusTypeHelp=x,50,S
-T(3,1:介紹獎金;5:協辦獎金)
+T(3,1:介紹獎金;5:協辦獎金;99:其他)
 !T(3,1:介紹獎金;5:協辦獎金;6:專業獎勵金)
 
 #CHAIN=A,1,S
@@ -186,7 +186,7 @@ C(3,#AdjustBonusDate,0,C(3,#FunCode,2,T(3,@FdBonus2,原始獎金),$),T(3,@FdBonu
 #T1=X,1,S
 C(3,#ManualFg,1,T(3,@ManualFgX,是),T(3,@ManualFgX,否))
 
-#BonusType=A,1,I
+#BonusType=X,2,I
 C(2,#FunCode,s,I,s,s,s,s)
 HELP(#BonusTypeHelp)
 @T(3,@BonusTypeX,)
@@ -237,6 +237,7 @@ V(2,0)
 
 #RIM_L5R37B=A,1,S
 C(3,#FunCode,1,$,S)
+C(3,#BonusType,99,S,$)
 RESET_RIM(#RIM_L5R37B,L5R37)
 S(L5R37,01,#FunCode,#BonusType,#CustNo,#FacmNo,#BormNo,#WorkMonth,#END)
 R(1,L5R37)

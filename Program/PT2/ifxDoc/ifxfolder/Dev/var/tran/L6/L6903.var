@@ -92,6 +92,8 @@ T(1,#NTXBUF,23,2)
 #CHAIN_AcDate=X,7,S
 T(1,#NTXBUF,25,7)
 
+#CHAIN_EntAc=X,2,S
+T(1,#NTXBUF,32,2)
 C(3,#CHAIN,1,T(2,@AcBookCode,#CHAIN_AcBookCode),)
 C(3,#CHAIN,1,T(2,@AcSubBookCode,#CHAIN_AcSubBookCode),)
 C(3,#CHAIN,1,T(2,@AcNoCode,#CHAIN_AcNoCode),)
@@ -99,6 +101,7 @@ C(3,#CHAIN,1,T(2,@AcSubCode,#CHAIN_AcSubCode),)
 C(3,#CHAIN,1,T(2,@AcDtlCode,#CHAIN_AcDtlCode),)
 C(3,#CHAIN,1,T(2,@AcDateSt,#CHAIN_AcDate),)
 C(3,#CHAIN,1,T(2,@AcDateEd,#CHAIN_AcDate),)
+C(3,#CHAIN,1,T(2,@EntAc,#CHAIN_EntAc),)
 
 #FdAcBookCode=X,2,L
 #FdAcSubBookCode=X,2,L
@@ -228,13 +231,14 @@ T(2,#DT)
 @V(7)A(4,0,#AcDateEd)V(5,#AcDateSt,#DT)
 
 #EntAc=X,2,I
+C(3,#CHAIN,1,s,$)
 C(4,#EntAc,E(0,1),$)
 HELP(#EntAcHelp)
 @V(H,#EntAcHelp)
 V(7)
 
 #EntAcX=X,10,L
-T(H,#EntAc,#EntAcHelp)=
+T(H,#EntAc,#EntAcHelp)
 
 
 

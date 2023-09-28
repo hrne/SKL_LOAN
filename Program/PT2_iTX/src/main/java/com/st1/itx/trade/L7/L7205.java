@@ -135,8 +135,13 @@ public class L7205 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0014", ErrorMsg);
 		}
 
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "",
+				titaVo.getParam("TLRNO"), "資料更新中...", titaVo);
+		
 		MySpring.newTask("L7205p", this.txBuffer, titaVo);
 
+		
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 

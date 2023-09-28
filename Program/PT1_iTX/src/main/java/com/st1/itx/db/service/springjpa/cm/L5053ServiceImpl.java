@@ -90,8 +90,8 @@ public class L5053ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "LEFT JOIN \"TxControl\" d ON d.\"Code\"=:Code ";
 		sql += "WHERE a.\"WorkMonth\"=:WorkYM ";
 
-		if (iBonusType == 9) {
-			sql += "AND a.\"BonusType\" in (1,5,6) ";
+		if (iBonusType == 0) {
+			sql += "AND a.\"BonusType\" in (1,5,6,99) ";
 		} else {
 			sql += "AND a.\"BonusType\" = :BonusType ";
 		}
@@ -106,7 +106,7 @@ public class L5053ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("WorkYM", iWorkYM);
 		query.setParameter("Code", "L5511." + iWorkYM + ".2");
 
-		if (iBonusType != 9) {
+		if (iBonusType != 0) {
 			query.setParameter("BonusType", iBonusType);
 		}
 
