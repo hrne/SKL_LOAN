@@ -23,8 +23,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
-
-
 @Service("L6903") // 會計帳務明細查詢
 @Scope("prototype")
 /**
@@ -82,12 +80,9 @@ public class L6903 extends TradeBuffer {
 
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 90;
-		
-		
-
 
 		List<Map<String, String>> dList = null;
-		
+
 		try {
 			dList = l6903ServiceImpl.FindData(titaVo, this.index, this.limit);
 		} catch (Exception e) {
@@ -109,7 +104,7 @@ public class L6903 extends TradeBuffer {
 			// E5004 讀取DB時發生問題
 			throw new LogicException(titaVo, "E5004", "FindAmt有誤");
 		}
-		for(Map<String, String> a : aList) {
+		for (Map<String, String> a : aList) {
 			if ("D".equals(a.get("DbCr"))) {
 				iwkDb = parse.stringToBigDecimal(a.get("TxAmt"));
 			} else {
@@ -118,7 +113,7 @@ public class L6903 extends TradeBuffer {
 			this.totaVo.putParam("ODbAmt", iwkDb);
 			this.totaVo.putParam("OCrAmt", iwkCr);
 		}
-		
+
 		for (Map<String, String> d : dList) {
 			// 不含未入帳,例如:未放行之交易
 			cut++;
@@ -169,9 +164,7 @@ public class L6903 extends TradeBuffer {
 			this.totaVo.addOccursList(occursList);
 		}
 
-
-		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-		if (dList != null && dList.size() >= this.limit) {
+		if (l6903ServiceImpl.hasNext()) {
 			titaVo.setReturnIndex(this.setIndexNext());
 			this.totaVo.setMsgEndToEnter();// 手動折返
 //			this.totaVo.setMsgEndToAuto();// 自動折返

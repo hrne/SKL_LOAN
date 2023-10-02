@@ -923,7 +923,7 @@ public class L6101 extends TradeBuffer {
 	// 清除總帳傳票號碼-
 	private void clearMediaSlipNo(TitaVo titaVo) throws LogicException {
 		Slice<AcDetail> slAcDetail = sAcDetailService.findSlipBatNo(iAcDateF, parse.stringToInteger(iBatNo), 0,
-				1, titaVo);
+				Integer.MAX_VALUE, titaVo);
 		if (slAcDetail == null) {
 			return;
 		}

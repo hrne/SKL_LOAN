@@ -1773,7 +1773,7 @@ HELP(#ProdIntCalcCodeHelp)
 T(H,#IntCalcCode,#ProdIntCalcCodeHelp)
 
 
-
+#IsGeneral=A,1,S
 
 ![客戶別]
 !必須輸入
@@ -1787,7 +1787,11 @@ C(3,#CustTypeCode,1,T(2,@RuleCode,00)T(F,@RuleCode,0)T(3,@FdRuleCode,),T(F,@Rule
 
 #CustTypeCodeX=X,20,L
 T(H,#CustTypeCode,#CustTypeCodeHelp)
+IF(#CustTypeCode=="01"||#CustTypeCode=="C01",E(0,@IsGeneral,1),E(0,@IsGeneral,0))
 
+
+
+#IsLandLoan=A,1,S
 
 ![規定管制代碼]
 #FdRuleCode=X,2,L
@@ -1799,6 +1803,8 @@ HELP(#RuleCodeHelp)
 
 #RuleCodeX=X,30,L
 T(H,#RuleCode,#RuleCodeHelp)
+IF(#RuleCode=="08"||#RuleCode=="B0420"||#RuleCode=="B0421"||#RuleCode=="B0422"||#RuleCode=="B0423",E(0,@IsLandLoan,1),E(0,@IsLandLoan,0))
+
 
 ![循環動用]
 !當商品不限制時,才須輸入,否則自動顯示不必輸入
@@ -2635,16 +2641,16 @@ V(H,#YesNoHelp)
 #FdPreStarBuildingYM=X,2,L
 #FdStarBuildingYM=X,2,L
 #HidePreStarBuildingYM=X,1,L
-C(3,#RuleCode,08,T(F,#PreStarBuildingYM,1),T(F,#PreStarBuildingYM,0))
+C(3,#IsLandLoan,1,T(F,#PreStarBuildingYM,1),T(F,#PreStarBuildingYM,0))
 #HideStarBuildingYM=X,1,L
-C(3,#RuleCode,08,T(F,#StarBuildingYM,1),T(F,#StarBuildingYM,0))
+C(3,#IsLandLoan,1,T(F,#StarBuildingYM,1),T(F,#StarBuildingYM,0))
 !約定動工年月
 #PreStarBuildingYM=A,5,I
-IF(#RuleCode==08,$,s)
+C(3,#IsLandLoan,1,$,S)
 @A(YM,0,#PreStarBuildingYM)
 !實際興建年月
 #StarBuildingYM=A,5,I
-IF(#RuleCode==08,$,s)
+C(3,#IsLandLoan,1,$,S)
 @A(YM,0,#StarBuildingYM)
 
 

@@ -1,0 +1,206 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L6911)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+
+</sub>
+
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L6911]                                 風險控管限額標準維護"],
+["#FdYear+生效日期",#EffectDate] ,
+]
+!---------- AP Button AREA ----------
+
+
+#FdYear=X,2,L
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L6091 風險控管限額標準查詢]進入),$)
+
+#tEffectDate=D,7,S
+T(1,#SYSDATE,2,7)
+
+![連動交易]
+#NTXBUF=X,138,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#CHAIN_FuncCode=X,1,S
+T(1,#NTXBUF,1,1)
+
+#CHAIN_EffectDate=D,7,S
+C(3,#CHAIN_FuncCode,1,E(0,#tEffectDate),T(1,#NTXBUF,2,7))
+
+C(2,#CHAIN_FuncCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除))
+
+
+INVOKEJS(SHOW,p2,0)
+
+!---------- AP TEXT AREA Variables ----------
+
+
+
+
+#EffectDate=D,7,I
+T(2,#CHAIN_EffectDate)
+C(3,#CHAIN_FuncCode,1,I,O)
+@C(5,#CHAIN_EffectDate,NULL,K(NOBUTTON,CLOSEY),K(NOBUTTON,SHOWY))
+@V(2,0)
+
+#RimEffectDate=D,7,S
+T(2,#EffectDate)
+
+#TranKey_Tmp=X,1,S
+T(2,#CHAIN_FuncCode)
+
+S(L6R51,0,#RimEffectDate,#TranKey_Tmp)
+R(1,L6R51)
+
+!新增顯示
+IF(#CHAIN_FuncCode == 1 ,INVOKEJS(SHOW,p2,1),INVOKEJS(SHOW,p2,0))
+IF(#CHAIN_FuncCode == 2 ,INVOKEJS(SHOW,p2,1),$)
+IF(#CHAIN_FuncCode == 4 ,INVOKEJS(SHOW,p2,0),$)
+IF(#CHAIN_FuncCode == 4 ,K(MODIFYBUTTON,刪除),$)
+
+##loop {times:3,i:1}
+E(0,@LimitRate{i}1,#ooLimitRate{i}1)
+E(0,@LimitRate{i}2,#ooLimitRate{i}2)
+E(0,@LimitRate{i}3,#ooLimitRate{i}3)
+
+E(0,@LimitLoan{i}1,#ooLimitLoan{i}1)
+E(0,@LimitLoan{i}2,#ooLimitLoan{i}2)
+E(0,@LimitLoan{i}3,#ooLimitLoan{i}3)
+##end
+E(0,@LimitRate43,#ooLimitRate43)
+E(0,@LimitLoan43,#ooLimitLoan43)
+
+
+##loop {times:3,i:1}
+#LimitRate{i}1=m,2.2,I
+#LimitRate{i}2=m,2.2,I
+#LimitRate{i}3=m,2.2,I
+
+#LimitLoan{i}1=M,4,I
+#LimitLoan{i}2=M,4,I
+#LimitLoan{i}3=M,4,I
+##end
+
+#LimitRate43=m,2.2,I
+#LimitLoan43=M,4,I
+
+
+##loop {times:3,i:1}
+#ooLimitRate{i}1=m,2.2,L
+#ooLimitRate{i}2=m,2.2,L
+#ooLimitRate{i}3=m,2.2,L
+
+#ooLimitLoan{i}1=M,4,L
+#ooLimitLoan{i}2=M,4,L
+#ooLimitLoan{i}3=M,4,L
+##end
+
+#ooLimitRate43=m,2.2,L
+#ooLimitLoan43=M,4,L
+
+
+
+</sub>
+
+
+
+<sub type="DC" name="p2" layout="cols=4;screen.width=[150,150,150,150];printer.width=[200,300,300,300];order=1;">
+[
+["風險控管限額標準維護"],
+["控管類型","同一關係企業或集團"],["單一放款授信對象","單一行業別"],
+["信用評等A"],[""],
+["@@@@限額淨值比率",#LimitRate11],[#LimitRate12,#LimitRate13],
+["@@@@限額[單位：億]",#LimitLoan11],[#LimitLoan12,#LimitLoan13],
+["信用評等B"],[""],
+["@@@@限額淨值比率",#LimitRate21],[#LimitRate22,#LimitRate23],
+["@@@@限額[單位：億]",#LimitLoan21],[#LimitLoan22,#LimitLoan23],
+["信用評等C"],[""],
+["@@@@限額淨值比率",#LimitRate31],[#LimitRate32,#LimitRate33],
+["@@@@限額[單位：億]",#LimitLoan31],[#LimitLoan32,#LimitLoan33],
+["信用評等A級與B級"],[""],
+["@@@@限額淨值比率",],[" ",#LimitRate43],
+["@@@@限額[單位：億]",],[" ",#LimitLoan43],
+]
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L6911 ----------
+<sub type="FORM" name="L6911">
+
+
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#RimEffectDate
+#TranKey_Tmp
+##loop {times:3,i:1}
+#LimitRate{i}1
+#LimitRate{i}2
+#LimitRate{i}3
+
+#LimitLoan{i}1
+#LimitLoan{i}2
+#LimitLoan{i}3
+##end
+#LimitRate43
+#LimitLoan43
+
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L6911
+^
+TXFORM=L6R51
+##loop {times:3,i:1}
+#ooLimitRate{i}1
+#ooLimitRate{i}2
+#ooLimitRate{i}3
+#ooLimitLoan{i}1
+#ooLimitLoan{i}2
+#ooLimitLoan{i}3
+##end
+#ooLimitRate43
+#ooLimitLoan43
+^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>
+
+
+
