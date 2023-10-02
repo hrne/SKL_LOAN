@@ -106,7 +106,7 @@ public class LM056ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql+="              , \"RelTitle\"";
 		sql+="              , \"BusTitle\"";
 		sql+="         FROM \"LifeRelHead\"";
-		sql+="         WHERE \"RelWithCompany\" = 'A'";
+		sql+="         WHERE \"RelWithCompany\" IN ('A','B')";
 		sql+="               AND Trunc(\"AcDate\" / 100) = :yymm";
 		sql+="               AND \"LoanBalance\" > 0";
 		sql+="         UNION";

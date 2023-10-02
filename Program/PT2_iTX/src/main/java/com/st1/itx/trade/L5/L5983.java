@@ -121,6 +121,7 @@ public class L5983 extends TradeBuffer {
 		this.totaVo.putParam("OTempAmt", tempAmt);
 		this.totaVo.putParam("OAccuOverAmt", tNegMain.getAccuOverAmt());
 		this.totaVo.putParam("ORevivAmtX", revivAmtX.trim());
+		this.totaVo.putParam("OPayIntDate", tNegMain.getPayIntDate());
 
 		Slice<NegFinShare> slNegFinShare = negFinShareService.findFinCodeAll(tNegMain.getCustNo(),
 				tNegMain.getCaseSeq(), 0, Integer.MAX_VALUE, titaVo);

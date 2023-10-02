@@ -118,6 +118,7 @@ T(3,[L5983] 結清試算)
 #OIsMainFin=X,1,L
 #OTempAmt=m,14,L
 #ORevivAmtX=X,60,L
+#OPayIntDate=D,7,L
 
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 #LOOP=X,1,S
@@ -157,6 +158,7 @@ TXFORM=L5983
 #OIsMainFin
 #OTempAmt
 #ORevivAmtX
+#OPayIntDate
 #OOFinCode
 #OOFinItem
 #OOApprAmt
@@ -180,6 +182,7 @@ TXFORM=L5983
 ["總本金餘額",#OPrincipalBal],["累溢收金額",#OAccuOverAmt],
 ["期款",#ODueAmt],["利率",#OIntRate,"%"],
 ["入帳日期",#OEntryDate],["是否為最大債權銀行",#OIsMainFin],
+[#<->#,"繳息迄日",#OPayIntDate],
 ["應還金額",#ORevivAmtX],["溢收抵繳",#OAccuOverAmt],
 [#<->#,"暫收抵繳",#OTempAmt],
 ]

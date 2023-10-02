@@ -52,18 +52,15 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		FROM \"MonthlyFacBal\" M";
 		sql += "		WHERE M.\"YearMonth\" = :yymm ";
 		sql += "		  AND M.\"PrinBalance\" > 0 ";
-		sql += "		GROUP BY DECODE(M.\"EntCode\",'1','G7','G6')";
-		
+		sql += "		GROUP BY DECODE(M.\"EntCode\",'1','G7','G6')";	
 		sql += "		UNION All ";
 		sql += "		SELECT 'G6' AS \"Column\"";
 		sql += "			   ,0   AS \"Value\"";
-		sql += "		FROM dual ";
-				
+		sql += "		FROM dual ";				
 		sql += "		UNION All ";
 		sql += "		SELECT 'G7' AS \"Column\"";
 		sql += "			   ,0   AS \"Value\"";
 		sql += "		FROM dual ";
-
 		sql += "		UNION All ";
 		sql += "		SELECT 'H20' AS \"Column\"";
 		sql += "			  ,SUM(\"PrinBalance\") AS \"Value\"";
@@ -108,7 +105,6 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		SELECT 'F24' AS \"Column\"";
 		sql += "			   ,0   AS \"Value\"";
 		sql += "		FROM dual ";
-
 		sql += "		UNION All ";
 		sql += "		SELECT 'G8' AS \"Column\"";
 		sql += "			  ,SUM(\"TdBal\") AS \"Value\"";
@@ -193,6 +189,8 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		UNION All ";
 		sql += "		SELECT 'E7' AS \"Column\"";
 		sql += "			   ,0   AS \"Value\"";
+		sql += "		FROM dual ";
+		sql += "		UNION All ";
 		sql += "		SELECT 'N1' AS \"Column\"";
 		sql += "			   ,0   AS \"Value\"";
 		sql += "		FROM dual ";
@@ -236,6 +234,8 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		UNION All ";
 		sql += "		SELECT 'D7' AS \"Column\"";
 		sql += "			   ,0   AS \"Value\"";
+		sql += "		FROM dual ";
+		sql += "		UNION All ";
 		sql += "		SELECT 'N2' AS \"Column\"";
 		sql += "			   ,0   AS \"Value\"";
 		sql += "		FROM dual ";
@@ -291,6 +291,14 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  AND M.\"PrinBalance\" > 0 ";
 		sql += "		  AND M.\"AcctCode\" <> '990' ";
 		sql += "		GROUP BY DECODE(M.\"EntCode\",'1','31','30')";
+		sql += "		UNION All ";
+		sql += "		SELECT '31' AS \"Column\"";
+		sql += "			   ,0   AS \"Value\"";
+		sql += "		FROM dual ";
+		sql += "		UNION All ";
+		sql += "		SELECT '30' AS \"Column\"";
+		sql += "			   ,0   AS \"Value\"";
+		sql += "		FROM dual ";
 
 		sql += "		UNION All ";
 		sql += "		SELECT DECODE(M.\"EntCode\",'1','35','34') AS \"Column\" "; // 1企金
@@ -300,6 +308,14 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  AND M.\"PrinBalance\" > 0 ";
 		sql += "		  AND M.\"AcctCode\" = '990' ";
 		sql += "		GROUP BY DECODE(M.\"EntCode\",'1','35','34')";
+		sql += "		UNION All ";
+		sql += "		SELECT '35' AS \"Column\"";
+		sql += "			   ,0   AS \"Value\"";
+		sql += "		FROM dual ";
+		sql += "		UNION All ";
+		sql += "		SELECT '34' AS \"Column\"";
+		sql += "			   ,0   AS \"Value\"";
+		sql += "		FROM dual ";
 
 		sql += "		UNION All ";
 		sql += "		SELECT '32' AS \"Column\"";
@@ -308,6 +324,10 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   		WHERE \"AcDate\" = TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR(:yymm*100+1), 'YYYYMMDD')),'YYYYMMDD')) ";
 		sql += "		  AND \"AcNoCode\" IN ('10600304000','10601301000','10601302000') "; // 放款折溢價+催收款項法務費用+催收款項火險費用
 		sql += "		  AND \"CurrencyCode\" = 'NTD' ";
+		sql += "		UNION All ";
+		sql += "		SELECT '32' AS \"Column\"";
+		sql += "			   ,0   AS \"Value\"";
+		sql += "		FROM dual ";
 
 		sql += "		UNION All ";
 		sql += "		SELECT '36' AS \"Column\"";
@@ -316,6 +336,10 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   		WHERE \"AcDate\" = TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR(:yymm*100+1), 'YYYYMMDD')),'YYYYMMDD')) ";
 		sql += "		  AND \"AcNoCode\" IN ('10601304000','10601301000','10601302000') "; // 催收款項折溢價+催收款項法務費用+催收款項火險費用
 		sql += "		  AND \"CurrencyCode\" = 'NTD' ";
+		sql += "		UNION All ";
+		sql += "		SELECT '36' AS \"Column\"";
+		sql += "			   ,0   AS \"Value\"";
+		sql += "		FROM dual ";
 
 		sql += "		UNION All ";
 		sql += "		SELECT '37' AS \"Column\""; // 逾期3期(不含催收)
@@ -324,6 +348,10 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   		WHERE \"YearMonth\" = :yymm ";
 		sql += "		  AND \"AcctCode\" <> '990' ";
 		sql += "		  AND \"OvduTerm\" >= 3 ";
+		sql += "		UNION All ";
+		sql += "		SELECT '37' AS \"Column\"";
+		sql += "			   ,0   AS \"Value\"";
+		sql += "		FROM dual ";
 
 		sql += "		UNION All ";
 		sql += "		SELECT '39' AS \"Column\" "; // 逾放總額
@@ -340,6 +368,10 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   			WHERE \"AcDate\" = TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR(:yymm*100+1), 'YYYYMMDD')),'YYYYMMDD')) ";
 		sql += "   			  AND \"CurrencyCode\" = 'NTD' ";
 		sql += "   			  AND \"AcNoCode\" IN ('10604')) "; // 催收及催收費用含折溢價
+		sql += "		UNION All ";
+		sql += "		SELECT '39' AS \"Column\"";
+		sql += "			   ,0   AS \"Value\"";
+		sql += "		FROM dual ";
 
 		sql += "		UNION All ";
 		sql += "		SELECT '40' AS \"Column\" "; // 放款總額
@@ -348,8 +380,12 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   		WHERE \"AcDate\" = TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR(:yymm*100+1), 'YYYYMMDD')),'YYYYMMDD')) ";
 		sql += "   		  AND \"CurrencyCode\" = 'NTD' ";
 		sql += "   		  AND \"AcNoCode\" IN ('10603','10604') "; // 放款含折溢價 催收及催收費用含折溢價
+		sql += "		UNION All ";
+		sql += "		SELECT '40' AS \"Column\"";
+		sql += "			   ,0   AS \"Value\"";
+		sql += "		FROM dual ";
 		sql += "   		  ) ";
-		// 單位元
+	// 單位元
 		sql += "	SELECT \"Column\", \"Value\" FROM \"tempTotal\"";
 
 		this.info("sql=" + sql);

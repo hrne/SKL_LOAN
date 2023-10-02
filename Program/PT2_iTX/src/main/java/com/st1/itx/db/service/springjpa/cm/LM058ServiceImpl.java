@@ -102,7 +102,7 @@ public class LM058ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             ,\"RelTitle\" ";
 		sql += "             ,\"BusTitle\" ";
 		sql += "             FROM \"LifeRelHead\" ";
-		sql += "             WHERE \"RelWithCompany\"='A' ";
+		sql += "             WHERE \"RelWithCompany\"IN ('A','B') ";
 		sql += "             AND TRUNC(\"AcDate\" / 100 ) = :yymm ";
 		sql += "             AND \"LoanBalance\" > 0 ";
 		sql += "             UNION ";
