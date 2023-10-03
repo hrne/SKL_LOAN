@@ -26,10 +26,21 @@ BEGIN
     -- 寫入資料 (債務協商交易序號對照檔)
     INSERT INTO "NegTranNoMapping"
     SELECT BS.ACCOUNT_DATE                         AS "AcDate"         -- 會計日期 decimal(8, 0) default 0 not null,
-          ,NVL(DTYP.CUSEMP,SUBSTR(BS.ModifyUserID,0,6))
-                                                   AS "TitaTlrNo"      -- 經辦 varchar2(6),
+          ,CASE
+             WHEN BS.MODIFYUSERID = 'A227210094'
+             THEN 'EC0416' -- 離職員工
+             WHEN BS.MODIFYUSERID = 'F224601758'
+             THEN '999999'
+           ELSE BS.MODIFYUSERID
+           END                                     AS "TitaTlrNo"      -- 經辦 varchar2(6),
           ,ROW_NUMBER() OVER (PARTITION BY BS.ACCOUNT_DATE
-                                         , NVL(DTYP.CUSEMP,SUBSTR(BS.ModifyUserID,0,6))
+                                         , CASE
+                                             WHEN BS.MODIFYUSERID = 'A227210094'
+                                             THEN 'EC0416' -- 離職員工
+                                             WHEN BS.MODIFYUSERID = 'F224601758'
+                                             THEN '999999'
+                                           ELSE BS.MODIFYUSERID
+                                           END
                               ORDER BY BS.ACCOUNT_DATE
                                      , BS.CustIDN
                                      , BS.RC_DATE
@@ -40,7 +51,6 @@ BEGIN
           ,BS.ACCOUNT_DATE                         AS "ACCOUNT_DATE"   -- 會計日期 decimal(8, 0) default 0 not null,
           ,BS.BUSINESS_CODE                        AS "BUSINESS_CODE"  -- 交易序號 decimal(7, 0) default 0 not null
     FROM REMIN_TBJCICBUSINESS BS
-    LEFT JOIN LN$DTYP DTYP ON DTYP.CUSID1 = BS.ModifyUserID
     ;
 
     -- 記錄寫入筆數

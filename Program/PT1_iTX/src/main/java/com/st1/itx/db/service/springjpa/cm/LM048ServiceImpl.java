@@ -59,7 +59,7 @@ public class LM048ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             , Decode(";
 		sql += "            Cg.\"CustName\", NULL";
 		sql += "         , '        '";
-		sql += "         , To_Char(Cg.\"CustName\" || '���Y���~')";
+		sql += "         , To_Char(Cg.\"CustName\" || '關係企業')";
 		sql += "        ) AS \"CustNameMain\"";
 		sql += "             , Cm.\"IndustryCode\"";
 		sql += "             , Substr(";
@@ -102,14 +102,10 @@ public class LM048ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                SELECT M.\"YearMonth\"";
 		sql += "                     , M.\"CustNo\"";
 		sql += "                     , M.\"FacmNo\"";
-		sql += "                     , MIN(";
-		sql += "                    CASE";
-		sql += "                        WHEN Trunc(M.\"PrevPayIntDate\" / 100) >= :yymm THEN M.\"PrevPayIntDate\"";
-		sql += "                        ELSE 0";
-		sql += "                    END";
-		sql += "                ) AS \"PrevPayIntDate\"";
+		sql += "                     , MIN( M.\"PrevPayIntDate\") AS \"PrevPayIntDate\"";
 		sql += "                FROM \"MonthlyLoanBal\" M";
 		sql += "                WHERE M.\"YearMonth\" = :yymm";
+		sql += "                  AND Trunc(M.\"PrevPayIntDate\" / 100) >= :yymm ";
 		sql += "                GROUP BY M.\"YearMonth\"";
 		sql += "                       , M.\"CustNo\"";
 		sql += "                       , M.\"FacmNo\"";
@@ -124,9 +120,7 @@ public class LM048ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                M2.\"FacmNo\" = M.\"FacmNo\"";
 		sql += "        WHERE M.\"YearMonth\" = :yymm";
 		sql += "              AND";
-		sql += "              ( ( M2.\"PrevPayIntDate\" = 0";
-		sql += "                  AND";
-		sql += "                  Trunc(Fm.\"RecycleDeadline\" / 100) >= :yymm )";
+		sql += "              ( Trunc(Fm.\"RecycleDeadline\" / 100) >= :yymm ";
 		sql += "                OR";
 		sql += "                M2.\"PrevPayIntDate\" > 0 )";
 		sql += "              AND";

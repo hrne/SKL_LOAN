@@ -357,13 +357,6 @@ public class LM042Report extends MakeReport {
 
 				}
 
-				// 專案差異(待修正)
-				if ("ProDiff".equals(item)) {
-					row = 15;
-					col = 3;
-					cN1Amt = cN1Amt.subtract(amt);
-					sProDiff = sProDiff.add(amt);
-				}
 				// 利關人_職員數
 				if ("RelEmpAmt".equals(item)) {
 					row = 16;
@@ -390,6 +383,10 @@ public class LM042Report extends MakeReport {
 //				}
 
 			}
+
+			// 專案差異
+			sProDiff = sProAmt.subtract(sProLoan);
+			makeExcel.setValue(15, 3, sProDiff, "#,##0");
 
 			this.info("C5(C-利關人-1類)=" + cY1Amt);
 			this.info("C6(C-非利關人-1類)=" + cN1Amt);

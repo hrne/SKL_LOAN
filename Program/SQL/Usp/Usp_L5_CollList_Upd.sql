@@ -207,9 +207,9 @@ BEGIN
     MERGE INTO "CollListTmp" T2
     USING (SELECT ROW_NUMBER() Over (Partition By "CustNo", "FacmNo" Order By CASE "Status" 
                                             WHEN  0  THEN  '40'
-                                            WHEN  1  THEN  '91'
+                                            WHEN  1  THEN  '81'
                                             WHEN  2  THEN  '22' 
-                                            WHEN  3  THEN  '83'                          
+                                            WHEN  3  THEN  '93'                          
                                             WHEN  4  THEN  '34'                            
                                             WHEN  5  THEN  '55'
                                             WHEN  6  THEN  '06'
@@ -282,9 +282,9 @@ BEGIN
     MERGE INTO "CollListTmp" T2
     USING (SELECT ROW_NUMBER() Over (Partition By "ClCustNo", "ClFacmNo" Order By CASE "Status" 
                                             WHEN  0  THEN  '40'
-                                            WHEN  1  THEN  '91'
+                                            WHEN  1  THEN  '81'
                                             WHEN  2  THEN  '22' 
-                                            WHEN  3  THEN  '83'                          
+                                            WHEN  3  THEN  '93'                          
                                             WHEN  4  THEN  '34'                            
                                             WHEN  5  THEN  '55'
                                             WHEN  6  THEN  '06'
@@ -434,9 +434,9 @@ BEGIN
                             , "FacmNo"
                  ORDER BY CASE "Status" 
                          WHEN  0  THEN  '40'
-                         WHEN  1  THEN  '91'
+                         WHEN  1  THEN  '81'
                          WHEN  2  THEN  '22' 
-                         WHEN  3  THEN  '83'                          
+                         WHEN  3  THEN  '93'                          
                          WHEN  4  THEN  '34'                            
                          WHEN  5  THEN  '55'
                          WHEN  6  THEN  '06'

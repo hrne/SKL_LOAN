@@ -123,6 +123,8 @@ BEGIN
           , "IsRelated"           -- 是否為利害關係人
           , "IsLnrelNear"         -- 是否為準利害關係人
           , "IsDate"              -- 是否資訊日期
+          , "CustIdErrFg"
+          , "SpouseIdErrFg"
     )
     SELECT TF."CustUKey"                  AS "CustUKey"            -- 客戶識別碼 VARCHAR2 32 
           ,CASE
@@ -317,6 +319,8 @@ BEGIN
           ,'' AS "IsRelated"
           ,'' AS "IsLnrelNear"
           ,0 AS "IsDate"
+          ,CUSP.CUSER1 AS "CustIdErrFg"
+          ,CUSP.CUSER2 AS "SpouseIdErrFg"
     FROM "CU$CUSP" CUSP
     LEFT JOIN "CU$CUAP" CUAP ON CUAP."CUSID1" = CUSP."CUSID1"
     LEFT JOIN "LN$ENPP" ENPP ON ENPP."LMSACN" = CUSP."LMSACN"

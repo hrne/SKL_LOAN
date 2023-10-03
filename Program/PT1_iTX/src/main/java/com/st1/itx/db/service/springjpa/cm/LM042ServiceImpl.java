@@ -160,20 +160,11 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WHERE \"PrinBalance\" > 0 ";
 		sql += "   AND \"YearMonth\" = :yymm ";
 		sql += "   AND \"GovProjectFlag\" IN ('Y','C') ";
-		// 專案差額
-		sql += " UNION ";
-		sql += " SELECT 'ProDiff' AS \"Item\" ";
-		sql += " 	   ,SUM(JSON_VALUE(\"JsonFields\",'$.\"LoanBal\"') ";
-		sql += "		- JSON_VALUE(\"JsonFields\",'$.\"oLoanBal\"') ";
-		sql += "		- JSON_VALUE(\"JsonFields\",'$.\"88LoanBal\"')) AS \"AMT\" ";
-		sql += " FROM \"CdComm\" ";
-		sql += " WHERE \"CdType\" ='02'";
-		sql += "   AND \"CdItem\" = '02'";
-		sql += "   AND \"EffectDate\" =  :yymm * 100 + 1 ";
+
 		// 服務課專案數字
 		sql += " UNION ";
 		sql += " SELECT 'ProAmt' AS \"Item\" ";
-		sql += " 	   ,SUM(JSON_VALUE(\"JsonFields\",'$.\"LoanBal\")  AS \"AMT\" ";
+		sql += " 	   ,SUM(JSON_VALUE(\"JsonFields\",'$.LoanBal'))  AS \"AMT\" ";
 		sql += " FROM \"CdComm\" ";
 		sql += " WHERE \"CdType\" ='02'";
 		sql += "   AND \"CdItem\" = '02'";
@@ -197,10 +188,10 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 利關人_職員數C16
 		sql += " UNION ";
 		sql += " SELECT 'RelEmpAmt' AS \"Item\" ";
-		sql += "       ,SUM(b.\"PrinBalance\") AS \"AMT\" ";
+		sql += "       ,SUM(\"PrinBalance\") AS \"AMT\" ";
 		sql += " FROM ( SELECT b.* FROM (SELECT DISTINCT (\"CustNo\") ";
 		sql += "	FROM \"LifeRelEmp\" l ";
-		sql += "	LEFT JOIN \"CustMain\" cm ON cm.\"CustId\" = TO_CHAR(DECODE(l.\"BusId\" , '-' , DECODE(\"RelId\" ,'-' ,l.\"RelId\"),l.\"BusId\")) ";
+		sql += "	LEFT JOIN \"CustMain\" cm ON cm.\"CustId\" = TO_CHAR(DECODE(l.\"EmpId\" , '-' , l.\"EmpId\")) ";
 		sql += "	WHERE";
 		sql += "	l.\"AcDate\" = TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR( :yymm*100+1), 'YYYYMMDD')),'YYYYMMDD')) ";
 		sql += "	AND l.\"LoanBalance\" > 0 ) a";

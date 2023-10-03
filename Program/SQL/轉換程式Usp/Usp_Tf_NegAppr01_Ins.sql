@@ -68,29 +68,32 @@ BEGIN
           ,NVL(APPR.ACCOUNT_DATE,0)       AS "ApprAcDate"          -- 撥付傳票日 DecimalD 8 0
           ,APPR.REPLY_CODE                AS "ReplyCode"           -- 回應代碼 VARCHAR2 4 0
           ,NULL                           AS "BatchTxtNo"           -- Batch交易序號 VARCHAR2 10 0
-          ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 8 0
-          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
-          ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 8 0
-          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+          ,NVL(APPR.LASTUPDATEDATE,JOB_START_TIME)
+                                          AS "CreateDate"          -- 建檔日期時間 DATE 8 0
+          ,NVL(APPR.MODIFYUSERID,'999999')
+                                          AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+          ,NVL(APPR.LASTUPDATEDATE,JOB_START_TIME)
+                                          AS "LastUpdate"          -- 最後更新日期時間 DATE 8 0
+          ,NVL(APPR.MODIFYUSERID,'999999')
+                                          AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
     FROM "NegTranNoMapping" TNM
     LEFT JOIN "NegTrans" T ON T."AcDate"    = TNM."AcDate"
                           AND T."TitaTlrNo" = TNM."TitaTlrNo"
                           AND T."TitaTxtNo" = TNM."TitaTxtNo"
     LEFT JOIN "NegMain" M ON M."CustNo"  = T."CustNo"
                          AND M."CaseSeq" = T."CaseSeq"
+    LEFT JOIN REMIN_TBJCICAPPR APPR ON APPR.CustIDN      = TNM."CustIDN"
+                                   AND APPR.RC_DATE      = TNM."RC_DATE"
     LEFT JOIN REMIN_TBJCICAMTSHARE AMTSHARE ON AMTSHARE.CustIDN       = TNM."CustIDN"
                                            AND AMTSHARE.RC_DATE       = TNM."RC_DATE"
                                            AND AMTSHARE.ACCOUNT_DATE  = TNM."ACCOUNT_DATE"
                                            AND AMTSHARE.BUSINESS_CODE = TNM."BUSINESS_CODE"
+                                           AND AMTSHARE.BRINGUP_DATE = APPR.BRINGUP_DAT
+                                           AND AMTSHARE.CREDIT_CODE = APPR.CREDIT_CODE
     LEFT JOIN "NegFinShare" FS ON FS."CustNo"  = T."CustNo"
                               AND FS."CaseSeq" = T."CaseSeq"
                               AND FS."FinCode" = AMTSHARE.CREDIT_CODE
-    LEFT JOIN REMIN_TBJCICAPPR APPR ON APPR.CustIDN      = TNM."CustIDN"
-                                   AND APPR.RC_DATE      = TNM."RC_DATE"
-                                   AND APPR.BRINGUP_DATE = AMTSHARE.BRINGUP_DATE
-                                   AND APPR.CREDIT_CODE  = AMTSHARE.CREDIT_CODE
     WHERE M."CustNo" IS NOT NULL
-      AND NVL(AMTSHARE.CREDIT_CODE,'458') != '458' -- 排除 CREDIT_CODE 串不到及458的資料
     ;
 
     -- 記錄寫入筆數

@@ -52,6 +52,7 @@ BEGIN
       , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
       , "LastUpdate"          -- 異動日期 DATE 0 0
       , "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 0
+      , "RelCustIdErrFg"
     )
     WITH rawData AS (
       SELECT MAX(TRXIDT) AS LastTRXIDT
@@ -139,6 +140,8 @@ BEGIN
            ELSE JOB_START_TIME
            END                           AS "LastUpdate"          -- 異動日期 DATE 0 0
           ,NVL(AEM."EmpNo",MBK."CHGEMP") AS "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 0
+          -- 2023-10-03 Wei FROM SKL IT 盈倩 #A01-2
+          ,MBK.LMSPER AS "RelCustIdErrFg"
     FROM "AH$MBKP" MBK
     LEFT JOIN tmpData t on t.LastTRXIDT = MBK."TRXIDT"
     LEFT JOIN "As400EmpNoMapping" AEM ON AEM."As400TellerNo" = MBK."CHGEMP"

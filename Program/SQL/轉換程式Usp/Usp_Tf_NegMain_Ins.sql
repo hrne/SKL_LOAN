@@ -71,9 +71,11 @@ BEGIN
       FROM "LoanBorMain"
     )
     SELECT JM.RC_ACCOUNT                  AS "CustNo"              -- 戶號 DECIMAL 7 0
-          ,ROW_NUMBER() OVER (PARTITION BY JM.RC_ACCOUNT
-                              ORDER BY JM.RC_ACCOUNT,JM.RC_DATE)
-                                          AS "CaseSeq"             -- 案件序號 DECIMAL 3 0
+          ,ROW_NUMBER()
+           OVER (
+            PARTITION BY JM.RC_ACCOUNT
+            ORDER BY JM.RC_DATE
+           )                              AS "CaseSeq"             -- 案件序號 DECIMAL 3 0
           -- 若戶號 在 JCICZ050 存在 則為 1: 協商
           -- 若戶號 在 JCICZ450 存在 則為 2: 調解
           -- 若戶號 在 JCICZ067 存在 則為 3: 更生
@@ -145,10 +147,14 @@ BEGIN
           ,0                              AS "LastAcDate"          -- 上次會計日期 NUMBER(8,0)
           ,NULL                           AS "LastTitaTlrNo"       -- 上次經辦 VARCHAR2(6 BYTE)
           ,0                              AS "LastTitaTxtNo"       -- 上次交易序號 NUMBER(8,0)
-          ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 8 0
-          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
-          ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 8 0
-          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+          ,NVL(JM.LASTUPDATEDATE,JOB_START_TIME)
+                                          AS "CreateDate"          -- 建檔日期時間 DATE 8 0
+          ,NVL(JM.MODIFYUSERID,'999999')
+                                          AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+          ,NVL(JM.LASTUPDATEDATE,JOB_START_TIME)
+                                          AS "LastUpdate"          -- 最後更新日期時間 DATE 8 0
+          ,NVL(JM.MODIFYUSERID,'999999')
+                                          AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
     FROM REMIN_TBJCICMAIN JM
     LEFT JOIN (
       SELECT CustIDN

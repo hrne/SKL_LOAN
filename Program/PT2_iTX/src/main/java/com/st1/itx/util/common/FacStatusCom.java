@@ -173,22 +173,17 @@ public class FacStatusCom {
 		// 6 -- 5.催收結案戶
 		// 7 -- 8.債權轉讓戶
 		// 8 -- 9.呆帳結案戶
-		// 9 -- 3.結案戶
-		// 10 -- 1.展期戶
+		// 9 -- 1.展期戶
+		//10 -- 3.結案戶
 
-		List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
-		Slice<LoanBorMain> slLoanBorMain = null;
 
-		slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, iFacmNo, iFacmNo, 0, 900, 0, Integer.MAX_VALUE,
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, iFacmNo, iFacmNo, 0, 900, 0, Integer.MAX_VALUE,
 				titaVo);
 
-		lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
-
-		// 2022-05-10 智偉增加:防呆
-		if (lLoanBorMain == null || lLoanBorMain.isEmpty()) {
+		if (slLoanBorMain == null ) {
 			return -1;
 		}
-		for (LoanBorMain tmpLoanBorMain : lLoanBorMain) {
+		for (LoanBorMain tmpLoanBorMain : slLoanBorMain.getContent()) {
 			if (tmpLoanBorMain.getStatus() < 90) {
 				switch (tmpLoanBorMain.getStatus()) {
 				case 6:
@@ -243,15 +238,15 @@ public class FacStatusCom {
 						priorty = 8;
 					}
 					break;
-				case 3:
+				case 1:
 					if (priorty > 9) {
-						status = 3;
+						status = 1;
 						priorty = 9;
 					}
 					break;
-				case 1:
+				case 3:
 					if (priorty > 10) {
-						status = 1;
+						status = 3;
 						priorty = 10;
 					}
 					break;

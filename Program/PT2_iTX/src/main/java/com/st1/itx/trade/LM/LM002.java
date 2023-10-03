@@ -23,6 +23,7 @@ import com.st1.itx.db.domain.CdComm;
 import com.st1.itx.db.domain.CdCommId;
 import com.st1.itx.db.service.CdCommService;
 import com.st1.itx.db.service.springjpa.cm.LM002ServiceImpl;
+import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.BatchBase;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -121,8 +122,17 @@ public class LM002 extends BatchBase implements Tasklet, InitializingBean {
 					}
 				}
 
+				
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				
 				this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
-				if ("onLine".equals(titaVo.getDataBase())) {
+				if (ContentName.onLine.equals(titaVo.getDataBase())) {
 					titaVo.setDataBaseOnMon();// 指定月報環境
 				} else {
 					titaVo.setDataBaseOnLine();// 指定連線環境

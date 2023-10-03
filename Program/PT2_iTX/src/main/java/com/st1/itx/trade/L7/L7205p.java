@@ -635,15 +635,20 @@ public class L7205p extends TradeBuffer {
 		}
 		TempVo tTempVo = new TempVo();
 		tTempVo = tTempVo.getVo(tCdComm.getJsonFields());
-		if (tTempVo.get("LoanBal") == null || tTempVo.get("oLoanBal") == null || tTempVo.get("88LoanBal") == null) {
+		if (tTempVo.get("LoanBal") == null) {
 			throw new LogicException(titaVo, "E0001", "CdComm 政策性專案貸款"); // 查詢資料不存在
 		}
+		BigDecimal govProjectBal = BigDecimal.ZERO;
+		for (MonthlyFacBal m : slMothlyFacBal.getContent()) {
+			if ("Y".equals(m.getGovProjectFlag()) || "C".equals(m.getGovProjectFlag())) {
+				govProjectBal = govProjectBal.add(m.getPrinBalance());
+			}
+		}
+	
 		BigDecimal govProjectAdjustAmt = parse.stringToBigDecimal(tTempVo.get("LoanBal"))
-				.subtract(parse.stringToBigDecimal(tTempVo.get("oLoanBal")))
-				.subtract(parse.stringToBigDecimal(tTempVo.get("88LoanBal")));
+				.subtract(govProjectBal);
 		this.info("LoanBal=" + tTempVo.get("LoanBal"));
-		this.info("oLoanBal=" + tTempVo.get("oLoanBal"));
-		this.info("88LoanBal=" + tTempVo.get("88LoanBal"));
+		this.info("govProjectBal=" + govProjectBal);
 		this.info("govProjectAdjustAmt=" + govProjectAdjustAmt);
 // iFRS9AdjustAmt IFRS9增提金額 = 五分類備呆總金額- 會計部核定備抵損失(MonthlyLM052Loss.ApprovedLoss)		                              
 		MonthlyLM052Loss tMonthlyLM052Loss = sLM052LossService.findById(yearMonth, titaVo);

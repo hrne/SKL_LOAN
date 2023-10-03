@@ -46,6 +46,8 @@ BEGIN
       , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
       , "LastUpdate"          -- 最後更新日期時間 DATE  
       , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+      , "RelCustIdErrFg"
+      , "DepCode"
     )
     WITH rawData AS (
       SELECT MAX(TRXIDT) AS LastTRXIDT
@@ -161,6 +163,9 @@ BEGIN
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          -- 2023-10-03 Wei FROM SKL 盈倩 #A10
+          ,MBK.LMSPER AS "RelCustIdErrFg"
+          ,MBK.DPSATC AS "DepCode"
     FROM "LA$MBKP" MBK
     LEFT JOIN aplpData ad ON ad."LMSACN" = MBK."LMSACN"
                          AND ad."LMSPCN" = MBK."LMSPCN"

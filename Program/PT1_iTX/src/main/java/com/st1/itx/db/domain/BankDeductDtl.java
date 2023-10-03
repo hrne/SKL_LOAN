@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class BankDeductDtl implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 6324592265166395278L;
-
-@EmbeddedId
+  @EmbeddedId
   private BankDeductDtlId bankDeductDtlId;
 
   // 入帳日期
@@ -197,6 +193,19 @@ public class BankDeductDtl implements Serializable {
   // 最後更新人員
   @Column(name = "`LastUpdateEmpNo`", length = 6)
   private String lastUpdateEmpNo;
+
+  // 身份證字號/統一編號錯誤註記
+  /* Y:A:舊資料轉換B:舊資料轉換 */
+  @Column(name = "`RelCustIdErrFg`", length = 1)
+  private String relCustIdErrFg;
+
+  // 批號
+  @Column(name = "`BatchNo`", length = 6)
+  private String batchNo;
+
+  // 存摺代號
+  @Column(name = "`DepCode`", length = 2)
+  private String depCode;
 
 
   public BankDeductDtlId getBankDeductDtlId() {
@@ -926,6 +935,67 @@ CdCode.RelationCode
     this.lastUpdateEmpNo = lastUpdateEmpNo;
   }
 
+/**
+	* 身份證字號/統一編號錯誤註記<br>
+	* Y:
+A:舊資料轉換
+B:舊資料轉換
+	* @return String
+	*/
+  public String getRelCustIdErrFg() {
+    return this.relCustIdErrFg == null ? "" : this.relCustIdErrFg;
+  }
+
+/**
+	* 身份證字號/統一編號錯誤註記<br>
+	* Y:
+A:舊資料轉換
+B:舊資料轉換
+  *
+  * @param relCustIdErrFg 身份證字號/統一編號錯誤註記
+	*/
+  public void setRelCustIdErrFg(String relCustIdErrFg) {
+    this.relCustIdErrFg = relCustIdErrFg;
+  }
+
+/**
+	* 批號<br>
+	* 
+	* @return String
+	*/
+  public String getBatchNo() {
+    return this.batchNo == null ? "" : this.batchNo;
+  }
+
+/**
+	* 批號<br>
+	* 
+  *
+  * @param batchNo 批號
+	*/
+  public void setBatchNo(String batchNo) {
+    this.batchNo = batchNo;
+  }
+
+/**
+	* 存摺代號<br>
+	* 
+	* @return String
+	*/
+  public String getDepCode() {
+    return this.depCode == null ? "" : this.depCode;
+  }
+
+/**
+	* 存摺代號<br>
+	* 
+  *
+  * @param depCode 存摺代號
+	*/
+  public void setDepCode(String depCode) {
+    this.depCode = depCode;
+  }
+
 
   @Override
   public String toString() {
@@ -934,6 +1004,7 @@ CdCode.RelationCode
            + ", repayAmt=" + repayAmt + ", intStartDate=" + intStartDate + ", intEndDate=" + intEndDate + ", postCode=" + postCode + ", mediaCode=" + mediaCode + ", relationCode=" + relationCode
            + ", relCustName=" + relCustName + ", relCustId=" + relCustId + ", relAcctBirthday=" + relAcctBirthday + ", relAcctGender=" + relAcctGender + ", mediaDate=" + mediaDate + ", mediaKind=" + mediaKind
            + ", mediaSeq=" + mediaSeq + ", acDate=" + acDate + ", titaTlrNo=" + titaTlrNo + ", titaTxtNo=" + titaTxtNo + ", amlRsp=" + amlRsp + ", returnCode=" + returnCode
-           + ", jsonFields=" + jsonFields + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", jsonFields=" + jsonFields + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", relCustIdErrFg=" + relCustIdErrFg
+           + ", batchNo=" + batchNo + ", depCode=" + depCode + "]";
   }
 }

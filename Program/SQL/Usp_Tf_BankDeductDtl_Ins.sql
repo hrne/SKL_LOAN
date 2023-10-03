@@ -80,6 +80,9 @@ BEGIN
       , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
       , "LastUpdate"          -- 異動日期 DATE 0 0 
       , "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 0 
+      , "RelCustIdErrFg"
+      , "BatchNo"
+      , "DepCode"
     )
     WITH rawPDM AS ( 
       SELECT "MediaDate" 
@@ -216,6 +219,10 @@ BEGIN
           ,NVL(AEM."EmpNo",'999999')      AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
           ,JOB_START_TIME                 AS "LastUpdate"          -- 異動日期 DATE 0 0 
           ,NVL(AEM."EmpNo",'999999')      AS "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 0 
+          -- 2023-10-03 Wei FROM SKL IT 盈倩 #A06
+          ,MBK.LMSPER AS "RelCustIdErrFg"
+          ,MBK.BSTBTN AS "BatchNo"
+          ,'' AS "DepCode"
     FROM "LA$MBKP" MBK 
     LEFT JOIN aplpData ad ON ad."LMSACN" = MBK."LMSACN" 
                          AND ad."LMSPCN" = MBK."LMSPCN" 
@@ -295,6 +302,9 @@ BEGIN
       , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
       , "LastUpdate"          -- 異動日期 DATE 0 0 
       , "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 0 
+      , "RelCustIdErrFg"
+      , "BatchNo"
+      , "DepCode"
     )
     WITH rawADM AS ( 
       SELECT "MediaDate" 
@@ -441,6 +451,10 @@ BEGIN
            ELSE JOB_START_TIME 
            END                            AS "LastUpdate"          -- 異動日期 DATE 0 0 
           ,NVL(AEM."EmpNo",td.TRXMEM)     AS "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 0 
+          -- 2023-10-03 Wei FROM SKL IT 盈倩 #A06
+          ,MBK.LMSPER AS "RelCustIdErrFg"
+          ,MBK.BSTBTN AS "BatchNo"
+          ,MBK.LMSPER AS "DepCode"
     FROM "AH$MBKP" MBK 
     LEFT JOIN aplpData ad ON ad."LMSACN" = MBK."LMSACN" 
                          AND ad."LMSPCN" = MBK."LMSPCN" 

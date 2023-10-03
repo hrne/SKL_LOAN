@@ -91,8 +91,8 @@ public class LM089ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        LEFT JOIN \"LoanBorMain\"  Lm ON Lm.\"CustNo\" = Fac.\"CustNo\"";
 		sql += "                                      AND";
 		sql += "                                      Lm.\"FacmNo\" = Fac.\"FacmNo\"";
-		sql += "                                      AND";
-		sql += "                                      Lm.\"BormNo\" = Fac.\"LastBormNo\"";
+//		sql += "                                      AND";
+//		sql += "                                      Lm.\"BormNo\" = Fac.\"LastBormNo\"";
 		sql += "        LEFT JOIN \"CFSum\"        Cm ON Cm.\"CustNo\" = Fac.\"CustNo\"";
 		sql += "                                AND";
 		sql += "                                Cm.\"FacmNo\" = Fac.\"FacmNo\"";

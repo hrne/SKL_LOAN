@@ -124,7 +124,7 @@ E(0,@LimitLoan43,#ooLimitLoan43)
 
 
 
-<sub type="DC" name="p2" layout="cols=4;screen.width=[150,150,150,150];printer.width=[200,300,300,300];order=1;">
+<sub type="DC" name="p2" layout="cols=4;screen.width=[150,150,150,150];printer.width=[150,150,150,150];order=1;">
 [
 ["風險控管限額標準維護"],
 ["控管類型","同一關係企業或集團"],["單一放款授信對象","單一行業別"],

@@ -307,19 +307,18 @@ public class L9110Report extends MakeReport {
 			this.print(0, 65, formatAmt(tL9110.get("F28"), 3), "R");
 			this.print(0, 69, "用途別 ....... " + tL9110.get("F29"));
 			this.print(0, 105, "循環動用期限 . " + isNullorEmpty(showRocDate(tL9110.get("F30"), 1), titaVo));
-			this.print(0, 135, "介紹人姓名 ... " + isNullorEmpty(tL9110.get("F31"), titaVo));
+			this.print(0, 135, "代繳所得稅 ... " + tL9110.get("F32"));
 
-			this.print(1, 5, "代繳所得稅 ... " + tL9110.get("F32"));
-			this.print(0, 35, "代償碼 ....... " + tL9110.get("F33"));
-			this.print(0, 69, "攤還方式 ..... " + tL9110.get("F34"));
-			this.print(0, 105, "寬限總月數 ... " + tL9110.get("F35") + "月");
-			this.print(0, 135, "首次調整週期 . " + tL9110.get("F36") + "月");
+			this.print(1, 5, "代償碼 ....... " + tL9110.get("F33"));
+			this.print(0, 35, "攤還方式 ..... " + tL9110.get("F34"));
+			this.print(0, 69, "寬限總月數 ... " + tL9110.get("F35") + "月");
+			this.print(0, 105, "首次調整週期 . " + tL9110.get("F36") + "月");
+			this.print(0, 135, "繳款方式 ..... " + tL9110.get("F37"));
 
-			this.print(1, 5, "繳款方式 ..... " + tL9110.get("F37"));
-			this.print(0, 35, "繳息週期 ..... " + tL9110.get("F40"));
-			this.print(0, 69, "利率區分 ..... " + tL9110.get("F41"));
-			this.print(0, 105, "客戶別 ....... " + tL9110.get("F51"));
-			this.print(0, 135, "規定管制代碼 . " + tL9110.get("F56"));
+			this.print(1, 5, "繳息週期 ..... " + tL9110.get("F40"));
+			this.print(0, 35, "利率區分 ..... " + tL9110.get("F41"));
+			this.print(0, 69, "客戶別 ....... " + tL9110.get("F51"));
+			this.print(0, 105, "規定管制代碼 . " + tL9110.get("F56"));
 
 			this.print(1, 5, "扣款銀行 ..... " + isNullorEmpty(tL9110.get("F38"), titaVo));
 			this.print(0, 35, "扣款帳號 ..... " + isNullorEmpty(tL9110.get("F39"), titaVo));
@@ -328,6 +327,7 @@ public class L9110Report extends MakeReport {
 			this.print(0, 135, "團體戶名 ..... " + isNullorEmpty(tL9110.get("F43"), titaVo));
 
 			this.print(1, 5, "計件代碼 ..... " + tL9110.get("F44"));
+			this.print(0, 35, "介紹人姓名 ... " + isNullorEmpty(tL9110.get("F31"), titaVo));
 			this.print(0, 69, "火險服務姓名 . " + isNullorEmpty(tL9110.get("F45"), titaVo));
 			this.print(0, 105, "放款專員 ..... " + isNullorEmpty(tL9110.get("F46"), titaVo));
 			this.print(0, 135, "核決主管 ..... " + isNullorEmpty(tL9110.get("F47"), titaVo));
@@ -674,19 +674,18 @@ public class L9110Report extends MakeReport {
 			this.print(0, 65, formatAmt(tL9110.get("F28"), 3), "R");
 			this.print(0, 69, "用途別 ....... " + tL9110.get("F29"));
 			this.print(0, 105, "循環動用期限 . " + isNullorEmpty(this.showRocDate(tL9110.get("F30"), 1), titaVo));
-			this.print(0, 135, "介紹人姓名 ... " + isNullorEmpty(tL9110.get("F31"), titaVo));
+			this.print(0, 135, "代繳所得稅 ... " + tL9110.get("F32"));
 
-			this.print(1, 5, "代繳所得稅 ... " + tL9110.get("F32"));
-			this.print(0, 35, "代償碼 ....... " + tL9110.get("F33"));
-			this.print(0, 69, "攤還方式 ..... " + tL9110.get("F34"));
-			this.print(0, 105, "寬限總月數 ... " + tL9110.get("F35") + "月");
-			this.print(0, 135, "首次調整週期 . " + tL9110.get("F36") + "月");
+			this.print(1, 5, "代償碼 ....... " + tL9110.get("F33"));
+			this.print(0, 35, "攤還方式 ..... " + tL9110.get("F34"));
+			this.print(0, 69, "寬限總月數 ... " + tL9110.get("F35") + "月");
+			this.print(0, 105, "首次調整週期 . " + tL9110.get("F36") + "月");
+			this.print(0, 135, "繳款方式 ..... " + tL9110.get("F37"));
 
-			this.print(1, 5, "繳款方式 ..... " + tL9110.get("F37"));
-			this.print(0, 35, "繳息週期 ..... " + tL9110.get("F40"));
-			this.print(0, 69, "利率區分 ..... " + tL9110.get("F41"));
-			this.print(0, 105, "客戶別 ....... " + tL9110.get("F51"));
-			this.print(0, 135, "規定管制代碼 . " + tL9110.get("F56"));
+			this.print(1, 5, "繳息週期 ..... " + tL9110.get("F40"));
+			this.print(0, 35, "利率區分 ..... " + tL9110.get("F41"));
+			this.print(0, 69, "客戶別 ....... " + tL9110.get("F51"));
+			this.print(0, 105, "規定管制代碼 . " + tL9110.get("F56"));
 
 			this.print(1, 5, "扣款銀行 ..... " + isNullorEmpty(tL9110.get("F38"), titaVo));
 			this.print(0, 35, "扣款帳號 ..... " + isNullorEmpty(tL9110.get("F39"), titaVo));
@@ -695,6 +694,7 @@ public class L9110Report extends MakeReport {
 			this.print(0, 135, "團體戶名 ..... " + isNullorEmpty(tL9110.get("F43"), titaVo));
 
 			this.print(1, 5, "計件代碼 ..... " + tL9110.get("F44"));
+			this.print(0, 35, "介紹人姓名 ... " + isNullorEmpty(tL9110.get("F31"), titaVo));
 			this.print(0, 69, "火險服務姓名 . " + isNullorEmpty(tL9110.get("F45"), titaVo));
 			this.print(0, 105, "放款專員 ..... " + isNullorEmpty(tL9110.get("F46"), titaVo));
 			this.print(0, 135, "核決主管 ..... " + isNullorEmpty(tL9110.get("F47"), titaVo));

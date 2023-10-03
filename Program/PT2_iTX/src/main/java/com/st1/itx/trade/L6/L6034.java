@@ -60,7 +60,7 @@ public class L6034 extends TradeBuffer {
 		BigDecimal oLoanBal = BigDecimal.ZERO;
 		BigDecimal nLoanBal = BigDecimal.ZERO;
 		BigDecimal dLoanBal = BigDecimal.ZERO;
-		String remark = "放款合計(含催收)";
+		String remark = "放款合計(催收款項為催收本金)";
 
 		// 全部查詢
 		if (sYearMonth == 0 && sYearMonth == 0) {
@@ -72,7 +72,11 @@ public class L6034 extends TradeBuffer {
 			}
 
 			List<CdComm> lCdComm = iCdComm.getContent();
-
+			
+			if(lCdComm.size() == 0) {
+				throw new LogicException(titaVo, "E0001", "查無資料"); // 查無資料
+			}
+			
 			for (CdComm sCdComm : lCdComm) {
 				this.info("getEffectDate =" + sCdComm.getEffectDate());
 

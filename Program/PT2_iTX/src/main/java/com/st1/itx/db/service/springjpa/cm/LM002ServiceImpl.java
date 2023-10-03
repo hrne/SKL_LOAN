@@ -183,12 +183,13 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " FROM \"tmpB\"";
 		sql += " UNION ";
 		sql += " SELECT '' AS \"Type\"";
-		sql += "       ,SUM(\"LoanBal2\") AS \"LoanBal\"";
+		sql += "       ,SUM(\"LoanBal\") AS \"LoanBal\"";
 		sql += " FROM (";
 		sql += " 	SELECT * FROM \"tmpA\"";
 		sql += " 	UNION ";
 		sql += " 	SELECT * FROM \"tmpB\"";
 		sql += " ) ";
+		sql += " WHERE \"Type\" <> '88' ";
 		this.info("sql=" + sql);
 
 		Query query;
