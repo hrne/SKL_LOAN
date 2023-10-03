@@ -31,13 +31,6 @@ public class L6903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// org.junit.Assert.assertNotNull(sPfItDetailService);
 	}
 
-	// *** 折返控制相關 ***
-	private int index;
-
-	// *** 折返控制相關 ***
-	private int limit;
-
-	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
 
 	public List<Map<String, String>> FindData(TitaVo titaVo, int index, int limit) throws Exception {
 		this.info("L6903FindData");
@@ -103,7 +96,7 @@ public class L6903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 		sql += "ORDER BY A.\"AcDate\" ASC ";
 
-		sql += sqlRow;
+		//sql += sqlRow;
 
 		this.info("FindL6903 sql=" + sql);
 
@@ -115,8 +108,6 @@ public class L6903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("ThisIndex", index);
-		query.setParameter("ThisLimit", limit);
 
 		query.setParameter("AcDateS", iAcDateS);
 		query.setParameter("AcDateE", iAcDateE);
@@ -156,16 +147,8 @@ public class L6903ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		this.info("L6903Service FindData=" + query);
 
-		// *** 折返控制相關 ***
-		// 設定從第幾筆開始抓,需在createNativeQuery後設定
-		// query.setFirstResult(this.index*this.limit);
-		query.setFirstResult(0);// 因為已經在語法中下好限制條件(筆數),所以每次都從新查詢即可
+		return switchback(query);
 
-		// *** 折返控制相關 ***
-		// 設定每次撈幾筆,需在createNativeQuery後設定
-		query.setMaxResults(this.limit);
-
-		return this.convertToMap(query);
 	}
 
 	public List<Map<String, String>> FindAmt(TitaVo titaVo) throws Exception {

@@ -44,36 +44,13 @@ public class L6903 extends TradeBuffer {
 
 	@Autowired
 	Parse parse;
-	private String debits[] = { "1", "5", "6", "9" }; // 資產、支出為借方科目，負債、收入為貸方科目
-	private List<String> debitsList = Arrays.asList(debits);
+//	private String debits[] = { "1", "5", "6", "9" }; // 資產、支出為借方科目，負債、收入為貸方科目
+//	private List<String> debitsList = Arrays.asList(debits);
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6903 ");
 		this.totaVo.init(titaVo);
-
-		// 取得輸入資料
-		String iAcBookCode = titaVo.getParam("AcBookCode");
-		String iAcSubBookCode = titaVo.getParam("AcSubBookCode");
-		String iBranchNo = titaVo.getParam("BranchNo");
-		String iCurrencyCode = titaVo.getParam("CurrencyCode");
-		String iAcNoCode = titaVo.getParam("AcNoCode").trim();
-		String iAcSubCode = titaVo.getParam("AcSubCode").trim();
-		String iAcDtlCode = titaVo.getParam("AcDtlCode").trim();
-		int iAcDateSt = this.parse.stringToInteger(titaVo.getParam("AcDateSt"));
-		int iFAcDateSt = iAcDateSt + 19110000;
-		int iAcDateEd = this.parse.stringToInteger(titaVo.getParam("AcDateEd"));
-		int iFAcDateEd = iAcDateEd + 19110000;
-		BigDecimal wkBal = new BigDecimal(0);
-		BigDecimal wkDb = new BigDecimal(0);
-		BigDecimal wkCr = new BigDecimal(0);
-		int classcode = 0;
-		if (iAcSubCode.isEmpty()) {
-			iAcSubCode = "     ";
-		}
-		if (iAcDtlCode.isEmpty()) {
-			iAcDtlCode = "  ";
-		}
 
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
@@ -90,10 +67,15 @@ public class L6903 extends TradeBuffer {
 			throw new LogicException(titaVo, "E5004", "");
 		}
 
-		if (this.index == 0 && (dList == null || dList.size() == 0)) {
+		if (dList != null && l6903ServiceImpl.hasNext() ) {
+			titaVo.setReturnIndex(this.setIndexNext());
+			this.totaVo.setMsgEndToEnter();// 手動折返
+//			this.totaVo.setMsgEndToAuto();// 自動折返
+		}
+		if(dList == null || dList.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "會計帳務明細檔");
 		}
-
+		
 		int cut = 0;
 		BigDecimal iwkDb = new BigDecimal(0);
 		BigDecimal iwkCr = new BigDecimal(0);
@@ -164,11 +146,6 @@ public class L6903 extends TradeBuffer {
 			this.totaVo.addOccursList(occursList);
 		}
 
-		if (l6903ServiceImpl.hasNext()) {
-			titaVo.setReturnIndex(this.setIndexNext());
-			this.totaVo.setMsgEndToEnter();// 手動折返
-//			this.totaVo.setMsgEndToAuto();// 自動折返
-		}
 
 		this.addList(this.totaVo);
 		return this.sendList();

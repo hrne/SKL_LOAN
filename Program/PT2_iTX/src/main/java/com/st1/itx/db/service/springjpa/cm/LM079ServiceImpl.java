@@ -98,7 +98,7 @@ public class LM079ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                 AND";
 		sql += "                                 Cd.\"Code\" = Fac.\"RuleCode\"";
 		sql += "        LEFT JOIN \"FacCaseAppl\"  Fc ON Fc.\"ApplNo\" = Fac.\"ApplNo\"";
-		sql += "        WHERE Trunc(Fac.\"FirstDrawdownDate\" / 100) = :RptMonth";
+		sql += "        WHERE Trunc(Lm.\"DrawdownDate\" / 100) = :RptMonth";
 		sql += "              AND";
 		sql += "              Fac.\"CustTypeCode\" = 'S01'";
 		sql += "              AND";

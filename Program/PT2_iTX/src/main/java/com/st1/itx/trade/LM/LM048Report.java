@@ -31,6 +31,7 @@ public class LM048Report extends MakeReport {
 	@Autowired
 	Parse parse;
 
+	private int iAcDate = 0;
 	// 輸出行數減一
 	// 每個評等的起始列
 	private int startRowA = 4;
@@ -58,9 +59,11 @@ public class LM048Report extends MakeReport {
 
 	private BigDecimal tLoanBalTotal = BigDecimal.ZERO;
 	private BigDecimal tLineAmtTotal = BigDecimal.ZERO;
+	private BigDecimal tAvailableBalTotal = BigDecimal.ZERO;
 
 	private BigDecimal tLineAmtCalculate = BigDecimal.ZERO;
 	private BigDecimal tLoanBalCalculate = BigDecimal.ZERO;
+	private BigDecimal tAvailableBalCalculate = BigDecimal.ZERO;
 
 	private List<Integer> lIndustryRatingListA = new ArrayList<Integer>();
 	private List<Integer> lIndustryRatingListB = new ArrayList<Integer>();
@@ -73,8 +76,11 @@ public class LM048Report extends MakeReport {
 
 		int iYearMonth = Integer.parseInt(titaVo.getParam("YearMonth")) + 191100;
 
+		iAcDate = titaVo.getEntDyI() + 19110000;
+
 		List<Map<String, String>> lLM048List = new ArrayList<Map<String, String>>();
 		List<Map<String, String>> lLM048List2 = new ArrayList<Map<String, String>>();
+		List<Map<String, String>> lLM048List3 = new ArrayList<Map<String, String>>();
 
 		// 明細
 		try {
@@ -101,17 +107,25 @@ public class LM048Report extends MakeReport {
 			this.error("lM048ServiceImpl.groupLineAmt error = " + errors.toString());
 		}
 
-		exportExcel(lLM048List, lLM048List2, iYearMonth, titaVo);
+		// 明細
+		try {
+			lLM048List3 = lM048ServiceImpl.riskLimit(iAcDate, titaVo);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("lM048ServiceImpl.riskLimit error = " + errors.toString());
+		}
+
+		exportExcel(lLM048List, lLM048List2, lLM048List3, iYearMonth, titaVo);
 
 		return true;
 
 	}
 
 	private void exportExcel(List<Map<String, String>> lLM048List, List<Map<String, String>> lLM048List2,
-			int iYearMonth, TitaVo titaVo) throws LogicException {
+			List<Map<String, String>> lLM048List3, int iYearMonth, TitaVo titaVo) throws LogicException {
 		this.info("LM048Report exportExcel");
 
-		int iAcDate = titaVo.getEntDyI() + 19110000;
 		// 去年底日
 		int lastYear12AcDate = iAcDate / 10000 * 10000 + 1231;
 
@@ -136,7 +150,7 @@ public class LM048Report extends MakeReport {
 		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
 		makeExcel.setSheet(defaultSheet, reNameSheet);
 		// 表頭日期
-		makeExcel.setValue(2, 6, rocDateCh, "C");
+		makeExcel.setValue(2, 8, rocDateCh, "C");
 
 		if (lLM048List.isEmpty() || lLM048List == null) {
 			makeExcel.setValue(5, 2, "本日無資料");
@@ -153,6 +167,8 @@ public class LM048Report extends MakeReport {
 			int tCustNo = 0;
 			String tCustName = "";
 			String tmpCustName = "";
+			String tRecycleCode = "";
+			BigDecimal tAvailableBal = BigDecimal.ZERO;
 			BigDecimal tLineAmt = BigDecimal.ZERO;
 			BigDecimal tLoanBal = BigDecimal.ZERO;
 			BigDecimal tStoreRate = BigDecimal.ZERO;
@@ -252,24 +268,31 @@ public class LM048Report extends MakeReport {
 					eCustNoRow = row;
 				}
 
+				tRecycleCode = r.get("RecycleCode");
+				makeExcel.setValue(row, 5, tRecycleCode, "C");
+
 				tLineAmt = getBigDecimal(r.get("LineAmt"));
-				makeExcel.setValue(row, 5, tLineAmt, "#,##0", "L");
+				makeExcel.setValue(row, 6, tLineAmt, "#,##0", "L");
 				tLineAmtCalculate = tLineAmtCalculate.add(tLineAmt);
 
 				tLoanBal = getBigDecimal(r.get("LoanBal"));
-				makeExcel.setValue(row, 6, tLoanBal, "#,##0", "L");
+				makeExcel.setValue(row, 7, tLoanBal, "#,##0", "L");
 				tLoanBalCalculate = tLoanBalCalculate.add(tLoanBal);
 
+				tAvailableBal = getBigDecimal(r.get("AvailableBal"));
+				makeExcel.setValue(row, 8, tAvailableBal, "#,##0", "L");
+				tAvailableBalCalculate = tAvailableBalCalculate.add(tAvailableBal);
+
 				tStoreRate = getBigDecimal(r.get("StoreRate"));
-				makeExcel.setValue(row, 7, tStoreRate, "0.0000", "C");
+				makeExcel.setValue(row, 9, tStoreRate, "0.0000", "C");
 
 				tMaturityDate = this.showBcDate(r.get("MaturityDate"), 0);
-				makeExcel.setValue(row, 8, tMaturityDate, "C");
+				makeExcel.setValue(row, 10, tMaturityDate, "C");
 
 				tPrevPayIntDate = this.showBcDate(r.get("PrevPayIntDate"), 0);
-				makeExcel.setValue(row, 9, tPrevPayIntDate, "C");
+				makeExcel.setValue(row, 11, tPrevPayIntDate, "C");
 
-				makeExcel.setValue(row, 12, tLineAmt.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO
+				makeExcel.setValue(row, 14, tLineAmt.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO
 						: tLineAmt.divide(tNetWorth, 4, BigDecimal.ROUND_HALF_UP), "0.00%", "C");
 
 				tGroupName = r.get("CustNameMain").trim().length() == 0 ? "" : r.get("CustNameMain");
@@ -291,8 +314,8 @@ public class LM048Report extends MakeReport {
 
 						if (isGroup) {
 
-							makeExcel.setMergedRegionValue(sGroupRow, eGroupRow, 10, 10, tmpGroupName, "C");
-							makeExcel.setMergedRegionValue(sGroupRow, eGroupRow, 11, 11,
+							makeExcel.setMergedRegionValue(sGroupRow, eGroupRow, 12, 12, tmpGroupName, "C");
+							makeExcel.setMergedRegionValue(sGroupRow, eGroupRow, 13, 13,
 									tmpLineAmt.divide(tNetWorth, 4, BigDecimal.ROUND_HALF_UP), "0.00%", "C");
 
 							isGroup = false;
@@ -305,8 +328,8 @@ public class LM048Report extends MakeReport {
 					tmpGroupName = tGroupName;
 
 					if (isGroup) {
-						makeExcel.setValue(eGroupRow, 10, tGroupName, "C");
-						makeExcel.setValue(eGroupRow, 11, tmpLineAmt.divide(tNetWorth, 4, BigDecimal.ROUND_HALF_UP),
+						makeExcel.setValue(eGroupRow, 12, tGroupName, "C");
+						makeExcel.setValue(eGroupRow, 13, tmpLineAmt.divide(tNetWorth, 4, BigDecimal.ROUND_HALF_UP),
 								"C");
 					}
 
@@ -324,6 +347,7 @@ public class LM048Report extends MakeReport {
 					if (tInDustryCode != tInDustryCodeNext || lLM048List.size() == count) {
 						tLineAmtTotal = tLineAmtTotal.add(tLineAmtCalculate);
 						tLoanBalTotal = tLoanBalTotal.add(tLoanBalCalculate);
+						tAvailableBalTotal = tAvailableBalTotal.add(tAvailableBalCalculate);
 
 						row = checkIndustryRatingtAddRow(tInDustryRating, true);
 						// 輸出單一合計
@@ -335,49 +359,58 @@ public class LM048Report extends MakeReport {
 
 							this.info("change");
 							row++;
-							makeExcel.setValue(row, 5, tLineAmtTotal, "#,##0", "R");
-							makeExcel.setValue(row, 6, tLoanBalTotal, "#,##0", "R");
+							makeExcel.setValue(row, 6, tLineAmtTotal, "#,##0", "R");
+							makeExcel.setValue(row, 7, tLoanBalTotal, "#,##0", "R");
+							makeExcel.setValue(row, 8, tAvailableBalCalculate, "#,##0", "R");
 
 							tLineAmtTotal = BigDecimal.ZERO;
 							tLoanBalTotal = BigDecimal.ZERO;
+							tAvailableBalCalculate = BigDecimal.ZERO;
 						}
 
 						tLineAmtCalculate = BigDecimal.ZERO;
 						tLoanBalCalculate = BigDecimal.ZERO;
+						tAvailableBalCalculate = BigDecimal.ZERO;
 					}
 				}
 			}
 
 			// 各評等公式
-			String formulaInDustryRatingA = sumInDustryRatingFormulua("A", "E");
-			String formulaInDustryRatingB = sumInDustryRatingFormulua("B", "E");
-			String formulaInDustryRatingC = sumInDustryRatingFormulua("C", "E");
+			String formulaInDustryRatingA = sumInDustryRatingFormulua("A", "F");
+			String formulaInDustryRatingB = sumInDustryRatingFormulua("B", "F");
+			String formulaInDustryRatingC = sumInDustryRatingFormulua("C", "F");
 
 			// 各評等合計
-			makeExcel.setFormula(endRowA, 5, BigDecimal.ZERO, formulaInDustryRatingA, "#,##0");
-			makeExcel.setFormula(endRowB, 5, BigDecimal.ZERO, formulaInDustryRatingB, "#,##0");
-			makeExcel.setFormula(endRowC, 5, BigDecimal.ZERO, formulaInDustryRatingC, "#,##0");
+			makeExcel.setFormula(endRowA, 6, BigDecimal.ZERO, formulaInDustryRatingA, "#,##0");
+			makeExcel.setFormula(endRowB, 6, BigDecimal.ZERO, formulaInDustryRatingB, "#,##0");
+			makeExcel.setFormula(endRowC, 6, BigDecimal.ZERO, formulaInDustryRatingC, "#,##0");
 
-			makeExcel.setFormula(endRowA, 6, BigDecimal.ZERO, sumInDustryRatingFormulua("A", "F"), "#,##0");
-			makeExcel.setFormula(endRowB, 6, BigDecimal.ZERO, sumInDustryRatingFormulua("B", "F"), "#,##0");
-			makeExcel.setFormula(endRowC, 6, BigDecimal.ZERO, sumInDustryRatingFormulua("C", "F"), "#,##0");
+			makeExcel.setFormula(endRowA, 7, BigDecimal.ZERO, sumInDustryRatingFormulua("A", "G"), "#,##0");
+			makeExcel.setFormula(endRowB, 7, BigDecimal.ZERO, sumInDustryRatingFormulua("B", "G"), "#,##0");
+			makeExcel.setFormula(endRowC, 7, BigDecimal.ZERO, sumInDustryRatingFormulua("C", "G"), "#,##0");
+
+			makeExcel.setFormula(endRowA, 8, BigDecimal.ZERO, sumInDustryRatingFormulua("A", "H"), "#,##0");
+			makeExcel.setFormula(endRowB, 8, BigDecimal.ZERO, sumInDustryRatingFormulua("B", "H"), "#,##0");
+			makeExcel.setFormula(endRowC, 8, BigDecimal.ZERO, sumInDustryRatingFormulua("C", "H"), "#,##0");
 
 			// 總合計
 			row = endRowC + 1;
-			String formuLineAmt = "SUM(E" + endRowA + ",E" + endRowB + ",E" + endRowC + ")";
-			makeExcel.setFormula(row, 5, BigDecimal.ZERO, formuLineAmt, "#,##0");
-			String formuLoanBal = "SUM(F" + endRowA + ",F" + endRowB + ",F" + endRowC + ")";
-			makeExcel.setFormula(row, 6, BigDecimal.ZERO, formuLoanBal, "#,##0");
+			String formuLineAmt = "SUM(F" + endRowA + ",F" + endRowB + ",F" + endRowC + ")";
+			makeExcel.setFormula(row, 6, BigDecimal.ZERO, formuLineAmt, "#,##0");
+			String formuLoanBal = "SUM(G" + endRowA + ",G" + endRowB + ",G" + endRowC + ")";
+			makeExcel.setFormula(row, 7, BigDecimal.ZERO, formuLoanBal, "#,##0");
+			String formuAvailableBal = "SUM(H" + endRowA + ",H" + endRowB + ",H" + endRowC + ")";
+			makeExcel.setFormula(row, 8, BigDecimal.ZERO, formuAvailableBal, "#,##0");
 
-			String pbrFornulaA = "E" + endRowA + "/" + "E" + (row + 8);
-			String pbrFornulaB = "E" + endRowB + "/" + "E" + (row + 8);
-			String pbrFornulaC = "E" + endRowC + "/" + "E" + (row + 8);
-			String pbrFornula = "E" + row + "/" + "E" + (row + 8);
+			String pbrFornulaA = "G" + endRowA + "/" + "E" + (row + 8);
+			String pbrFornulaB = "G" + endRowB + "/" + "E" + (row + 8);
+			String pbrFornulaC = "G" + endRowC + "/" + "E" + (row + 8);
+			String pbrFornula = "G" + row + "/" + "E" + (row + 8);
 
-			makeExcel.setFormula(endRowA, 13, BigDecimal.ZERO, pbrFornulaA, "0.00%");
-			makeExcel.setFormula(endRowB, 13, BigDecimal.ZERO, pbrFornulaB, "0.00%");
-			makeExcel.setFormula(endRowC, 13, BigDecimal.ZERO, pbrFornulaC, "0.00%");
-			makeExcel.setFormula(row, 13, BigDecimal.ZERO, pbrFornula, "0.00%");
+			makeExcel.setFormula(endRowA, 15, BigDecimal.ZERO, pbrFornulaA, "0.00%");
+			makeExcel.setFormula(endRowB, 15, BigDecimal.ZERO, pbrFornulaB, "0.00%");
+			makeExcel.setFormula(endRowC, 15, BigDecimal.ZERO, pbrFornulaC, "0.00%");
+			makeExcel.setFormula(row, 15, BigDecimal.ZERO, pbrFornula, "0.00%");
 
 			// 放款總餘額
 			row = row + 7;
@@ -388,7 +421,9 @@ public class LM048Report extends MakeReport {
 			makeExcel.setValue(row, 1, rocLastYear12YDate);
 			makeExcel.setValue(row, 5, tNetWorth, "#,##0", "R");
 
-			riskForm(row);
+			if (lLM048List3.size() != 0) {
+				riskForm(lLM048List3.get(0), row);
+			}
 
 		}
 
@@ -548,8 +583,9 @@ public class LM048Report extends MakeReport {
 	private void makeExcelSetValCal(int trow) {
 		try {
 			makeExcel.setMergedRegionValue(trow, trow, 3, 4, "單一行業小計", "R");
-			makeExcel.setValue(trow, 5, tLineAmtCalculate, "#,##0", "R");
-			makeExcel.setValue(trow, 6, tLoanBalCalculate, "#,##0", "R");
+			makeExcel.setValue(trow, 6, tLineAmtCalculate, "#,##0", "R");
+			makeExcel.setValue(trow, 7, tLoanBalCalculate, "#,##0", "R");
+			makeExcel.setValue(trow, 8, tAvailableBalTotal, "#,##0", "R");
 		} catch (LogicException e) {
 			e.printStackTrace();
 		}
@@ -623,97 +659,127 @@ public class LM048Report extends MakeReport {
 		return result;
 	}
 
-	private void riskForm(int netRow) throws LogicException {
+	/*
+	 * 待新交易[維護評等]處理
+	 */
+	private void riskForm(Map<String, String> result, int netRow) throws LogicException {
 
-		String netRate1 = "淨值 30%";
-		String netRate2 = "淨值 20%";
-		String netRate3 = "淨值 30%";
+		String percent1 = result.get("LimitRateA1") + "%";
+		String percent2 = result.get("LimitRateA2") + "%";
+		String percent3 = result.get("LimitRateA3") + "%";
 
-		String netRateFormula1 = "E" + netRow + "*30%";
-		String netRateFormula2 = "E" + netRow + "*20%";
-		String netRateFormula3 = "E" + netRow + "*30%";
+		String netRate1 = "淨值 " + percent1;
+		String netRate2 = "淨值 " + percent2;
+		String netRate3 = "淨值 " + percent3;
 
-		String mark1 = "放款總額\n不得逾90億元";
-		String mark2 = "放款總額\n不得逾50億元";
-		String mark3 = "";
+		String netRateFormula1 = "E" + netRow + "*" + percent1;
+		String netRateFormula2 = "E" + netRow + "*" + percent2;
+		String netRateFormula3 = "E" + netRow + "*" + percent3;
 
-		makeExcel.setValue(netRowA + 1, 15, netRate1, "C");
-		makeExcel.setValue(netRowA + 1, 16, netRate2, "C");
-		makeExcel.setValue(netRowA + 1, 17, netRate3, "C");
+		String limitLoan1 = result.get("LimitLoanA1");
+		String limitLoan2 = result.get("LimitLoanA2");
+		String limitLoan3 = result.get("LimitLoanA3");
 
-		makeExcel.setFormula(netRowA + 2, 15, BigDecimal.ZERO, netRateFormula1, "#,##0");
-		makeExcel.setFormula(netRowA + 2, 16, BigDecimal.ZERO, netRateFormula2, "#,##0");
-		makeExcel.setFormula(netRowA + 2, 17, BigDecimal.ZERO, netRateFormula3, "#,##0");
+		String mark1 = "0".equals(limitLoan1) ? "" : "放款總額\n不得逾" + limitLoan1 + "億元";
+		String mark2 = "0".equals(limitLoan2) ? "" : "放款總額\n不得逾" + limitLoan2 + "億元";
+		String mark3 = "0".equals(limitLoan3) ? "" : "放款總額\n不得逾" + limitLoan3 + "億元";
 
-		makeExcel.setMergedRegionValue(netRowA + 3, netRowA + 4, 15, 15, mark1, "C");
-		makeExcel.setMergedRegionValue(netRowA + 3, netRowA + 4, 16, 16, mark2, "C");
-		makeExcel.setMergedRegionValue(netRowA + 3, netRowA + 4, 17, 17, mark3, "C");
+		makeExcel.setValue(netRowA + 1, 17, netRate1, "C");
+		makeExcel.setValue(netRowA + 1, 18, netRate2, "C");
+		makeExcel.setValue(netRowA + 1, 19, netRate3, "C");
 
-		makeExcel.formulaCaculate(netRowA + 3, 15);
-		makeExcel.formulaCaculate(netRowA + 3, 16);
+		makeExcel.setFormula(netRowA + 2, 17, BigDecimal.ZERO, netRateFormula1, "#,##0");
+		makeExcel.setFormula(netRowA + 2, 18, BigDecimal.ZERO, netRateFormula2, "#,##0");
+		makeExcel.setFormula(netRowA + 2, 19, BigDecimal.ZERO, netRateFormula3, "#,##0");
 
-		netRate1 = "淨值 25%";
-		netRate2 = "淨值 15%";
-		netRate3 = "淨值 25%";
+		makeExcel.setMergedRegionValue(netRowA + 3, netRowA + 4, 17, 17, mark1, "C");
+		makeExcel.setMergedRegionValue(netRowA + 3, netRowA + 4, 18, 18, mark2, "C");
+		makeExcel.setMergedRegionValue(netRowA + 3, netRowA + 4, 19, 19, mark3, "C");
 
-		netRateFormula1 = "E" + netRow + "*25%";
-		netRateFormula2 = "E" + netRow + "*15%";
-		netRateFormula3 = "E" + netRow + "*25%";
+		makeExcel.formulaCaculate(netRowA + 3, 17);
+		makeExcel.formulaCaculate(netRowA + 3, 18);
 
-		mark1 = "放款總額\n不得逾75億元";
-		mark2 = "放款總額\n不得逾40億元";
-		mark3 = "";
+		percent1 = result.get("LimitRateB1") + "%";
+		percent2 = result.get("LimitRateB2") + "%";
+		percent3 = result.get("LimitRateB3") + "%";
 
-		makeExcel.setValue(netRowB + 1, 15, netRate1, "C");
-		makeExcel.setValue(netRowB + 1, 16, netRate2, "C");
-		makeExcel.setValue(netRowB + 1, 17, netRate3, "C");
+		netRate1 = "淨值 " + percent1;
+		netRate2 = "淨值 " + percent2;
+		netRate3 = "淨值 " + percent3;
 
-		makeExcel.setFormula(netRowB + 2, 15, BigDecimal.ZERO, netRateFormula1, "#,##0");
-		makeExcel.setFormula(netRowB + 2, 16, BigDecimal.ZERO, netRateFormula2, "#,##0");
-		makeExcel.setFormula(netRowB + 2, 17, BigDecimal.ZERO, netRateFormula3, "#,##0");
+		netRateFormula1 = "E" + netRow + "*" + percent1;
+		netRateFormula2 = "E" + netRow + "*" + percent2;
+		netRateFormula3 = "E" + netRow + "*" + percent3;
 
-		makeExcel.setMergedRegionValue(netRowB + 3, netRowB + 4, 15, 15, mark1, "C");
-		makeExcel.setMergedRegionValue(netRowB + 3, netRowB + 4, 16, 16, mark2, "C");
-		makeExcel.setMergedRegionValue(netRowB + 3, netRowB + 4, 17, 17, mark3, "C");
+		limitLoan1 = result.get("LimitLoanB1");
+		limitLoan2 = result.get("LimitLoanB2");
+		limitLoan3 = result.get("LimitLoanB3");
 
-		makeExcel.setMergedRegionValue(netRowB + 8, netRowB + 9, 17, 17, "A級與B級行業別\n之款總額餘額");
-		String bFormulaAB = "F" + (endRowC + 1) + "*75%";
-		makeExcel.setFormula(netRowB + 10, 17, BigDecimal.ZERO, bFormulaAB, "#,##0");
-		makeExcel.setMergedRegionValue(netRowB + 11, netRowB + 12, 17, 17, "不得低於企業\n之款總額餘額之75%");
+		mark1 = "0".equals(limitLoan1) ? "" : "放款總額\n不得逾" + limitLoan1 + "億元";
+		mark2 = "0".equals(limitLoan2) ? "" : "放款總額\n不得逾" + limitLoan2 + "億元";
+		mark3 = "0".equals(limitLoan3) ? "" : "放款總額\n不得逾" + limitLoan3 + "億元";
 
-		makeExcel.formulaCaculate(netRowB + 3, 15);
-		makeExcel.formulaCaculate(netRowB + 3, 16);
+		makeExcel.setValue(netRowB + 1, 17, netRate1, "C");
+		makeExcel.setValue(netRowB + 1, 18, netRate2, "C");
+		makeExcel.setValue(netRowB + 1, 19, netRate3, "C");
+
+		makeExcel.setFormula(netRowB + 2, 17, BigDecimal.ZERO, netRateFormula1, "#,##0");
+		makeExcel.setFormula(netRowB + 2, 18, BigDecimal.ZERO, netRateFormula2, "#,##0");
+		makeExcel.setFormula(netRowB + 2, 19, BigDecimal.ZERO, netRateFormula3, "#,##0");
+
+		makeExcel.setMergedRegionValue(netRowB + 3, netRowB + 4, 17, 17, mark1, "C");
+		makeExcel.setMergedRegionValue(netRowB + 3, netRowB + 4, 18, 18, mark2, "C");
+		makeExcel.setMergedRegionValue(netRowB + 3, netRowB + 4, 19, 19, mark3, "C");
+
+		String rateAB = result.get("LimitRateAB3") + "%";
+//		String limitLoanAB = result.get("LimitLoanAB3");
+
+		makeExcel.setMergedRegionValue(netRowB + 8, netRowB + 9, 19, 19, "A級與B級行業別\n之款總額餘額");
+		String bFormulaAB = "F" + (endRowC + 1) + "*" + rateAB;
+		makeExcel.setFormula(netRowB + 10, 19, BigDecimal.ZERO, bFormulaAB, "#,##0");
+		makeExcel.setMergedRegionValue(netRowB + 11, netRowB + 12, 19, 19, "不得低於企業\n之款總額餘額之" + rateAB);
+
 		makeExcel.formulaCaculate(netRowB + 3, 17);
-		makeExcel.formulaCaculate(netRowB + 8, 17);
-		makeExcel.formulaCaculate(netRowB + 11, 17);
+		makeExcel.formulaCaculate(netRowB + 3, 18);
+		makeExcel.formulaCaculate(netRowB + 3, 19);
+		makeExcel.formulaCaculate(netRowB + 8, 19);
+		makeExcel.formulaCaculate(netRowB + 11, 19);
 
-		netRate1 = "淨值 20%";
-		netRate2 = "淨值 10%";
-		netRate3 = "淨值 20%";
+		percent1 = result.get("LimitRateC1") + "%";
+		percent2 = result.get("LimitRateC2") + "%";
+		percent3 = result.get("LimitRateC3") + "%";
 
-		netRateFormula1 = "E" + netRow + "*20%";
-		netRateFormula2 = "E" + netRow + "*10%";
-		netRateFormula3 = "E" + netRow + "*20%";
+		netRate1 = "淨值 " + percent1;
+		netRate2 = "淨值 " + percent2;
+		netRate3 = "淨值 " + percent3;
 
-		mark1 = "放款總額\n不得逾60億元";
-		mark2 = "放款總額\n不得逾30億元";
-		mark3 = "放款總額\n不得逾80億元";
+		netRateFormula1 = "E" + netRow + "*" + percent1;
+		netRateFormula2 = "E" + netRow + "*" + percent2;
+		netRateFormula3 = "E" + netRow + "*" + percent3;
 
-		makeExcel.setValue(netRowC + 1, 15, netRate1, "C");
-		makeExcel.setValue(netRowC + 1, 16, netRate2, "C");
-		makeExcel.setValue(netRowC + 1, 17, netRate3, "C");
+		limitLoan1 = result.get("LimitLoanC1");
+		limitLoan2 = result.get("LimitLoanC2");
+		limitLoan3 = result.get("LimitLoanC3");
 
-		makeExcel.setFormula(netRowC + 2, 15, BigDecimal.ZERO, netRateFormula1, "#,##0");
-		makeExcel.setFormula(netRowC + 2, 16, BigDecimal.ZERO, netRateFormula2, "#,##0");
-		makeExcel.setFormula(netRowC + 2, 17, BigDecimal.ZERO, netRateFormula3, "#,##0");
+		mark1 = "0".equals(limitLoan1) ? "" : "放款總額\n不得逾" + limitLoan1 + "億元";
+		mark2 = "0".equals(limitLoan2) ? "" : "放款總額\n不得逾" + limitLoan2 + "億元";
+		mark3 = "0".equals(limitLoan3) ? "" : "放款總額\n不得逾" + limitLoan3 + "億元";
 
-		makeExcel.setMergedRegionValue(netRowC + 3, netRowC + 4, 15, 15, mark1, "C");
-		makeExcel.setMergedRegionValue(netRowC + 3, netRowC + 4, 16, 16, mark2, "C");
-		makeExcel.setMergedRegionValue(netRowC + 3, netRowC + 4, 17, 17, mark3, "C");
+		makeExcel.setValue(netRowC + 1, 17, netRate1, "C");
+		makeExcel.setValue(netRowC + 1, 18, netRate2, "C");
+		makeExcel.setValue(netRowC + 1, 19, netRate3, "C");
 
-		makeExcel.setMergedRegionValue(netRowA, endRowA, 14, 14, "V", "C");
-		makeExcel.setMergedRegionValue(netRowB, endRowB, 14, 14, "V", "C");
-		makeExcel.setMergedRegionValue(netRowC, endRowC, 14, 14, "V", "C");
+		makeExcel.setFormula(netRowC + 2, 17, BigDecimal.ZERO, netRateFormula1, "#,##0");
+		makeExcel.setFormula(netRowC + 2, 18, BigDecimal.ZERO, netRateFormula2, "#,##0");
+		makeExcel.setFormula(netRowC + 2, 19, BigDecimal.ZERO, netRateFormula3, "#,##0");
+
+		makeExcel.setMergedRegionValue(netRowC + 3, netRowC + 4, 17, 17, mark1, "C");
+		makeExcel.setMergedRegionValue(netRowC + 3, netRowC + 4, 18, 18, mark2, "C");
+		makeExcel.setMergedRegionValue(netRowC + 3, netRowC + 4, 19, 19, mark3, "C");
+
+		makeExcel.setMergedRegionValue(netRowA, endRowA, 16, 16, "V", "C");
+		makeExcel.setMergedRegionValue(netRowB, endRowB, 16, 16, "V", "C");
+		makeExcel.setMergedRegionValue(netRowC, endRowC, 16, 16, "V", "C");
 
 	}
 

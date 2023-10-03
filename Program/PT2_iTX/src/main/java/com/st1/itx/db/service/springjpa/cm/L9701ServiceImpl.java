@@ -89,6 +89,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        T.\"TitaTxtNo\",";
 		sql += "        T.\"AcSeq\",";
 		sql += "        T.\"CreateDate\"";
+		sql += "        T.\"Displayflag\"";
 		sql += "    FROM";
 		sql += "        (";
 		sql += "    SELECT";
@@ -162,7 +163,8 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        T.\"TitaTlrNo\",";
 		sql += "        T.\"TitaTxtNo\",";
 		sql += "        T.\"AcSeq\",";
-		sql += "        T.\"CreateDate\"";
+		sql += "        T.\"CreateDate\",";
+		sql += "        T.\"Displayflag\"";
 		sql += "    FROM";
 		sql += "        (";
 		sql += "            SELECT";
@@ -222,9 +224,10 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                MAX(T.\"TitaTxtNo\")                                         AS \"TitaTxtNo\",";
 		sql += "                MAX(T.\"AcSeq\")                                         AS \"AcSeq\",";
 		sql += "                MAX(T.\"CreateDate\")                                         AS \"CreateDate\",";
+		sql += "                MIN(L.\"Displayflag\")                                         AS \"Displayflag\",";
 		sql += "                T.\"RepayCode\",";
 		sql += "                MIN(L.\"RenewFlag\")                                         AS \"RenewFlag\",";
-		sql += "                1 AS \"DB\"";
+		
 		sql += "            FROM";
 		sql += "                \"LoanBorTx\" T";
 		sql += "            LEFT JOIN (";
@@ -325,7 +328,9 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        T.\"TitaTlrNo\",";
 		sql += "        T.\"TitaTxtNo\",";
 		sql += "        T.\"AcSeq\",";
-		sql += "        T.\"CreateDate\"";
+		sql += "        T.\"CreateDate\",";
+		sql += "        T.\"Displayflag\"";
+		
 
 
 		this.info("sql=" + sql);

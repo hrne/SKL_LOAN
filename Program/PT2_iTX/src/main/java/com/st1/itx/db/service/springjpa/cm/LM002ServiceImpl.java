@@ -112,6 +112,7 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WITH \"tmpA\" AS (";
 		sql += " SELECT R.\"Type\"";
 		sql += "	   ,SUM(\"LoanBal\") AS \"LoanBal\"";
+		sql += "	   ,SUM(\"LoanBal2\") AS \"LoanBal2\"";
 		sql += " FROM (";
 		sql += " SELECT CASE ";
 		sql += "       	  WHEN M.\"AcctCode\" = '990' AND (FP.\"GovOfferFlag\" <> 'N' OR M.\"FacAcctCode\" = '340' )";
@@ -146,6 +147,7 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ), \"tmpB\" AS (";
 		sql += " SELECT R.\"Type\"";
 		sql += "	   ,SUM(\"LoanBal\") AS \"LoanBal\"";
+		sql += "	   ,SUM(\"LoanBal2\") AS \"LoanBal2\"";
 		sql += " FROM (";
 		sql += " SELECT CASE ";
 		sql += "       	  WHEN M.\"AcctCode\" = '990' AND (FP.\"GovOfferFlag\" <> 'N' OR M.\"FacAcctCode\" = '340' )";

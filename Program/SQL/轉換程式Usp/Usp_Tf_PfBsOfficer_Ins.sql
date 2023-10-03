@@ -55,7 +55,8 @@ BEGIN
           ,"LN$YG5P"."UNTDVC"             AS "DepartItem"          -- 部室中文 NVARCHAR2 12 0
           ,S1."DistCode"                  AS "DistCode"            -- 區部代號 VARCHAR2 6 0
           ,"LN$YG5P"."UNTBRC"             AS "DistItem"            -- 區部中文 NVARCHAR2 30 0
-          ,''                             AS "StationName"         -- 駐在地 NVARCHAR2 30 0
+          -- 2023-10-03 Wei FROM SKL 葛經理 #F05
+          ,"LN$YG5P"."LOCPOT"             AS "StationName"         -- 駐在地 NVARCHAR2 30 0
           ,"LN$YG5P"."GALFLA"             AS "GoalAmt"             -- 目標金額 DECIMAL 16 2
           ,"LN$YG5P"."TGOALAMT"           AS "SmryGoalAmt"         -- 累計目標金額 DECIMAL 16 2
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  

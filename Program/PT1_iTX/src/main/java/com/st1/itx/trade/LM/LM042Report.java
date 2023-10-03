@@ -96,7 +96,7 @@ public class LM042Report extends MakeReport {
 	BigDecimal zTotalAmt = BigDecimal.ZERO;
 	BigDecimal allTotalAmt = BigDecimal.ZERO;
 	BigDecimal oBadDebt = BigDecimal.ZERO;
-	
+
 	/*--------------------------------------------*/
 
 	@Override
@@ -110,10 +110,12 @@ public class LM042Report extends MakeReport {
 	 * @param titaVo
 	 * @param lastYMD 上月底日
 	 * @param thisYMD 當月底日
+	 * @return
+	 * @throws LogicException
 	 */
 	public boolean exec(TitaVo titaVo, int lastYMD, int thisYMD) throws LogicException {
 		this.info("LM042Report.exportExcel");
-		
+
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "LM042";
@@ -281,8 +283,12 @@ public class LM042Report extends MakeReport {
 			BigDecimal oDisPreRemFees = BigDecimal.ZERO;
 			BigDecimal sIntRecv = BigDecimal.ZERO;
 			BigDecimal sProLoan = BigDecimal.ZERO;
+			BigDecimal sTotalLoanAmt = BigDecimal.ZERO;
+			BigDecimal sApprovedLoss = BigDecimal.ZERO;
 			BigDecimal sProDiff = BigDecimal.ZERO;
-			BigDecimal sStakeholder = BigDecimal.ZERO;
+			BigDecimal sProAmt = BigDecimal.ZERO;
+			BigDecimal sRelEmpAmt = BigDecimal.ZERO;
+			BigDecimal sRelAmt = BigDecimal.ZERO;
 
 			for (Map<String, String> lm42Vo2 : statisticsList2) {
 				String item = lm42Vo2.get("F0");
@@ -312,7 +318,7 @@ public class LM042Report extends MakeReport {
 					col = 5;
 					oDisPreRemFees = oDisPreRemFees.add(amt);
 				}
-				//備抵呆帳
+				// 備抵呆帳
 				if ("BadDebt".equals(item)) {
 					oBadDebt = oBadDebt.add(amt);
 				}
@@ -329,6 +335,28 @@ public class LM042Report extends MakeReport {
 					sProLoan = sProLoan.add(amt);
 
 				}
+				// 放款總額 I13
+				if ("TotalLoanAmt".equals(item)) {
+					row = 13;
+					col = 9;
+					sTotalLoanAmt = sTotalLoanAmt.add(amt);
+
+				}
+				// 服務課專案數字
+				if ("ProAmt".equals(item)) {
+					row = 14;
+					col = 9;
+					sProAmt = sProAmt.add(amt);
+
+				}
+				// 會計核准備呆 P13
+				if ("ApprovedLoss".equals(item)) {
+					row = 13;
+					col = 16;
+					sApprovedLoss = sApprovedLoss.add(amt);
+
+				}
+
 				// 專案差異(待修正)
 				if ("ProDiff".equals(item)) {
 					row = 15;
@@ -337,12 +365,19 @@ public class LM042Report extends MakeReport {
 					sProDiff = sProDiff.add(amt);
 				}
 				// 利關人_職員數
-				if ("Stakeholder".equals(item)) {
+				if ("RelEmpAmt".equals(item)) {
 					row = 16;
 					col = 3;
 					cY1Amt = cY1Amt.add(amt);
 					cN1Amt = cN1Amt.subtract(amt);
-					sStakeholder = sStakeholder.add(amt);
+					sRelEmpAmt = sRelEmpAmt.add(amt);
+
+				}
+				// 利關人_金額
+				if ("RelAmt".equals(item)) {
+					row = 17;
+					col = 3;
+					sRelAmt = sRelAmt.add(amt);
 
 				}
 
@@ -598,7 +633,7 @@ public class LM042Report extends MakeReport {
 		makeExcel.formulaCalculate(26, 3);
 		makeExcel.formulaCalculate(27, 3);
 
-		// 08/29 oBadDebt SUM(TdBal)科目10620300000、10604 
+		// 08/29 oBadDebt SUM(TdBal)科目10620300000、10604
 		makeExcel.setValue(28, 1, "註：各類放款總餘額(含催收款)已扣除備抵呆帳(" + oBadDebt + ")。");
 
 		// 更新金額

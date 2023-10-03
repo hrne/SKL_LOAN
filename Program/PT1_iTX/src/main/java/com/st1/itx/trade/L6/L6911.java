@@ -1,10 +1,7 @@
 package com.st1.itx.trade.L6;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -56,28 +53,6 @@ public class L6911 extends TradeBuffer {
 
 	TempVo tTempVo = new TempVo();
 
-//	'{"EffectDate":"20211101"
-//	, "CreditRateIRA":"0.2"
-//	, "CreditLimitLoanIRA":"50"
-//	, "GroupRateIRA":"0.3"
-//	, "GroupLimitLoanIRA":"90"
-//	, "IndustryRateIRA":"0.3"
-//	, "IndustryLimitLoanIRA":"0"
-//	, "CreditRateIRB":"0.15"
-//	, "CreditLimitLoanIRB":"40"
-//	, "GroupRateIRB":"0.25"
-//	, "GroupLimitLoanIRB":"75"
-//	, "IndustryRateIRB":"0.25"
-//	, "IndustryLimitLoanIRB":"0"
-//	, "CreditRateIRC":"0.1"
-//	, "CreditLimitLoanIRC":"30"
-//	, "GroupRateIRC":"0.2"
-//	, "GroupLimitLoanIRC":"60"
-//	, "IndustryRateIRC":"0.2"
-//	, "IndustryLimitLoanIRC":"80"
-//	, "IndustryRateIRAB":"0.75"
-//	, "IndustryLimitLoanIRAB":"0"
-//	'
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6911 ");
@@ -126,23 +101,23 @@ public class L6911 extends TradeBuffer {
 				}
 			}
 
-//			this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
-//			if ("onLine".equals(titaVo.getDataBase())) {
-//				titaVo.setDataBaseOnMon();// 指定月報環境
-//			} else {
-//				titaVo.setDataBaseOnLine();// 指定連線環境
-//			}
-//
-//			try {
-//				sCdCommService.insert(sCdComm, titaVo);
-//
-//			} catch (DBException e) {
-//				if (e.getErrorId() == 2) {
-//					throw new LogicException(titaVo, "E0002", e.getErrorMsg()); // 新增資料已存在
-//				} else {
-//					throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增資料時，發生錯誤
-//				}
-//			}
+			this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
+			if ("onLine".equals(titaVo.getDataBase())) {
+				titaVo.setDataBaseOnMon();// 指定月報環境
+			} else {
+				titaVo.setDataBaseOnLine();// 指定連線環境
+			}
+
+			try {
+				sCdCommService.insert(sCdComm, titaVo);
+
+			} catch (DBException e) {
+				if (e.getErrorId() == 2) {
+					throw new LogicException(titaVo, "E0002", e.getErrorMsg()); // 新增資料已存在
+				} else {
+					throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增資料時，發生錯誤
+				}
+			}
 
 			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", "新增資料成功", titaVo);
 
@@ -163,19 +138,19 @@ public class L6911 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 
-//			this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
-//			if ("onLine".equals(titaVo.getDataBase())) {
-//				titaVo.setDataBaseOnMon();// 指定月報環境
-//			} else {
-//				titaVo.setDataBaseOnLine();// 指定連線環境
-//			}
-//
-//			try {
-//				sCdCommService.update(uCdComm, titaVo);
-//
-//			} catch (DBException e) {
-//				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
-//			}
+			this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
+			if ("onLine".equals(titaVo.getDataBase())) {
+				titaVo.setDataBaseOnMon();// 指定月報環境
+			} else {
+				titaVo.setDataBaseOnLine();// 指定連線環境
+			}
+
+			try {
+				sCdCommService.update(uCdComm, titaVo);
+
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
+			}
 
 			titaVo.setDataBaseOnOrg();// 還原原本的環境
 
@@ -207,21 +182,21 @@ public class L6911 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時，發生錯誤
 			}
 
-//			this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
-//			if ("onLine".equals(titaVo.getDataBase())) {
-//				titaVo.setDataBaseOnMon();// 指定月報環境
-//			} else {
-//				titaVo.setDataBaseOnLine();// 指定連線環境
-//			}
-//
-//			try {
-//				sCdCommService.delete(dCdComm);
-//
-//			} catch (DBException e) {
-//				throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時，發生錯誤
-//			}
-//
-//			titaVo.setDataBaseOnOrg();// 還原原本的環境
+			this.info("titaVo.getDataBase() = " + titaVo.getDataBase().toString());
+			if ("onLine".equals(titaVo.getDataBase())) {
+				titaVo.setDataBaseOnMon();// 指定月報環境
+			} else {
+				titaVo.setDataBaseOnLine();// 指定連線環境
+			}
+
+			try {
+				sCdCommService.delete(dCdComm);
+
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時，發生錯誤
+			}
+
+			titaVo.setDataBaseOnOrg();// 還原原本的環境
 
 			iDataLog.setEnv(titaVo, oldDCdComm, dCdComm);
 			iDataLog.exec("刪除風險控管限額標準");
