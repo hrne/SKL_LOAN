@@ -47,7 +47,8 @@ BEGIN
                        OVER (
                            PARTITION BY HGTP."GroupNo"
                                       , HGTP."SecGroupNo"
-                           ORDER BY CASE
+                           ORDER BY HGTP."LMSACN" -- 2022-03-10 Wei
+                                  , CASE
                                       WHEN HGTP."LoanBalTotal" != 0
                                       THEN 0
                                     ELSE 1 END -- 2022-06-13 Wei 未結案者優先
@@ -88,11 +89,12 @@ BEGIN
                  ,S0."SecGroupNo"
                  ,S1."MaxSecGroupNo"
                  ,ROW_NUMBER() OVER (PARTITION BY S0."GroupNo"
-                                       ORDER BY S2."LMSAPN" DESC -- 2022-03-10 Wei
-                                              , S2."GDRID1"
-                                              , S2."GDRID2"
-                                              , S2."GDRNUM" DESC -- 2022-03-10 Wei
-                                              , S2."LGTSEQ"
+                                     ORDER BY S2."LMSACN" -- 2022-03-10 Wei
+                                            , S2."LMSAPN" DESC -- 2022-03-10 Wei
+                                            , S2."GDRID1"
+                                            , S2."GDRID2"
+                                            , S2."GDRNUM" DESC -- 2022-03-10 Wei
+                                            , S2."LGTSEQ"
                                     ) AS "Seq"
                  ,S2."GDRID1"
                  ,S2."GDRID2"

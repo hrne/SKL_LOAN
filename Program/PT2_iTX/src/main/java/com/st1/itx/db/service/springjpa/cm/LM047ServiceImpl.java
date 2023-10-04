@@ -56,7 +56,7 @@ public class LM047ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      FROM TEMP T ";
 		sql += "      LEFT JOIN \"LoanBorMain\" M ON M.\"CustNo\" = T.\"CustNo\" ";
 		sql += "                                       AND M.\"FacmNo\" = T.\"FacmNo\" ";
-		sql += "                                       AND M.\"Status\" = T.\"Status\"	";
+		sql += "                                       AND M.\"Status\" = DECODE(T.\"Status\",4,0,T.\"Status\")	";
 		sql += " )																		";
 		sql += " , LAW	AS (  ";
 		sql += " SELECT L.\"CustNo\" ";
@@ -155,6 +155,7 @@ public class LM047ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = D.\"CustNo\"";
 		sql += "      LEFT JOIN \"CdEmp\" E ON E.\"EmployeeNo\" = D.\"LegalPsn\"";
 		sql += "      WHERE M.\"ROWNUMBER\" = 1 ";
+		sql += "      ORDER BY D.\"CustNo\", D.\"FacmNo\"";
 		this.info("sql=" + sql);
 
 		Query query;

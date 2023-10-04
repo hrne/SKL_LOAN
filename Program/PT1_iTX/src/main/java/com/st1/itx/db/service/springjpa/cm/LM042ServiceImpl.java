@@ -118,34 +118,35 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "";
 		// 擔保放款-折溢價
 		sql += " SELECT 'tDisPreRemFees' AS \"Item\" ";
-		sql += " 	   ,SUM(\"TdBal\")  AS \"AMT\" ";
-		sql += " FROM \"CoreAcMain\"";
-		sql += " WHERE \"AcNoCode\" IN ( '10600304000' ) "; // 擔保放款-折溢價
-		sql += "   AND \"AcDate\" = TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR( :yymm*100+1), 'YYYYMMDD')),'YYYYMMDD')) ";
-		sql += "   AND \"CurrencyCode\" = 'NTD' ";
-		sql += " GROUP BY 'tDisPreRemFees'";
+		sql += " 	   ,\"LoanBal\"  AS \"AMT\" ";
+		sql += " FROM \"MonthlyLM052AssetClass\"  ";
+		sql += " WHERE \"YearMonth\" =  :yymm ";
+		sql += "   AND \"AssetClassNo\" = '61' ";
+		sql += " UNION  ";
 		// 催收款項
-		sql += " UNION ";
 		sql += " SELECT 'oDisPreRemFees' AS \"Item\" ";
-		sql += " 	   ,SUM(\"TdBal\")  AS \"AMT\" ";
-		sql += " FROM \"CoreAcMain\"";
-		sql += " WHERE \"AcNoCode\" IN ( '10601301000' "; // 催收款項-法務費用
-		sql += "						,'10601302000' ";// 催收款項-火險費用
-		sql += "						,'10601304000') ";// 催收款項-折溢價
-		sql += "   AND \"AcDate\" = TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR( :yymm*100+1), 'YYYYMMDD')),'YYYYMMDD')) ";
-		sql += "   AND \"CurrencyCode\" = 'NTD' ";
-		sql += " GROUP BY 'oDisPreRemFees'";
-		// 備抵呆帳
-		sql += " UNION ";
-		sql += " SELECT 'BadDebt' AS \"Item\" ";
-		sql += " 	   ,SUM(\"TdBal\")  AS \"AMT\" ";
-		sql += " FROM \"CoreAcMain\"";
-		sql += " WHERE \"AcNoCode\" IN ( '10620300000' "; // 備抵損失-擔保放款
-		sql += "						,'10604') ";// 催收款項-擔保放款
-		sql += "   AND \"AcDate\" = TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR( :yymm*100+1), 'YYYYMMDD')),'YYYYMMDD')) ";
-		sql += "   AND \"CurrencyCode\" = 'NTD' ";
-		// 應收利息
-		sql += " UNION ";
+		sql += " 	   ,\"LoanBal\"  AS \"AMT\" ";
+		sql += " FROM \"MonthlyLM052AssetClass\"  ";
+		sql += " WHERE \"YearMonth\" =  :yymm ";
+		sql += "   AND \"AssetClassNo\" = '62' ";
+		sql += " UNION  ";
+//        擔保放款-折溢價 
+		sql += " SELECT  ";
+		sql += "       'tDisPreRemLoss'					AS \"Item\" ";
+		sql += "       ,\"StorageAmt\"  			AS \"Amt\"   ";// (61)擔保品溢折價
+		sql += " FROM \"MonthlyLM052AssetClass\"  ";
+		sql += " WHERE \"YearMonth\" =  :yymm ";
+		sql += "   AND \"AssetClassNo\" = '61' ";
+		sql += " UNION  ";
+		// 催收款項-折溢價與催收費用
+		sql += " SELECT  ";
+		sql += "       'oDisPreRemLoss'					AS \"Item\" ";
+		sql += "       ,\"StorageAmt\"			AS \"Amt\"          "; // (62)折溢價與催收費用
+		sql += " FROM \"MonthlyLM052AssetClass\"  ";
+		sql += " WHERE \"YearMonth\" =  :yymm ";
+		sql += "   AND \"AssetClassNo\" = '62' ";
+		sql += " UNION  ";
+
 		sql += " SELECT 'IntRecv' AS \"Item\" ";
 		sql += " 	   ,SUM(\"TdBal\")  AS \"AMT\" ";
 		sql += " FROM \"CoreAcMain\"";

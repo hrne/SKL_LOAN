@@ -456,7 +456,7 @@ T(3,CdCode.CustTypeCode)
 #CDDEF02=x,20,S
 T(3,CdCode.RuleCode)
 
-#RuleCodeHelp=x,1024,S
+#RuleCodeHelp=x,2048,S
 
 !FacmAdvanceCloseCode
 !#CDDEF03=x,28,S
@@ -635,7 +635,13 @@ T(3,CdCode.ProdBreachCode)
 #CDDEF29=x,30,S
 T(3,CdRuleCode)
 
-#CdRuleCodeHelp=x,1024,S
+#CdRuleCodeHelp=x,2048,S
+
+!CdRuleCode
+#CDDEF30=x,30,S
+T(3,CdRuleCodeY)
+
+#CdRuleCodeYHelp=x,2048,S
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
@@ -671,7 +677,7 @@ T(2,@BaseRate0Help,#HelpDesc10)
 
 #HelpRim3=X,1,S
 RESET_RIM(#HelpRim3,XXR99)
-S(XXR99,01,#CDDEF21,#CDDEF22,#CDDEF23,#CDDEF24,#CDDEF25,#CDDEF26,#CDDEF27,#CDDEF28,#CDDEF29)
+S(XXR99,01,#CDDEF21,#CDDEF22,#CDDEF23,#CDDEF24,#CDDEF25,#CDDEF26,#CDDEF27,#CDDEF28,#CDDEF29,#CDDEF30)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@ProdIntCalcCodeHelp,#HelpDesc1)
@@ -683,6 +689,8 @@ T(2,@GrKindHelp,#HelpDesc6)
 T(2,@EsGKindHelp,#HelpDesc7)
 T(2,@ProdBreachCodeHelp,#HelpDesc8)
 T(2,@CdRuleCodeHelp,#HelpDesc9)
+T(2,@CdRuleCodeYHelp,#HelpDesc10)
+T(B,@CdRuleCodeYHelp,#RuleCodeHelp+;+#CdRuleCodeYHelp)
 T(B,@RuleCodeHelp,#RuleCodeHelp+;+#CdRuleCodeHelp)
 
 #BankCdHelp2=x,1024,S
@@ -1783,12 +1791,11 @@ T(H,#IntCalcCode,#ProdIntCalcCodeHelp)
 C(4,#CustTypeCode,T(3,00),$)
 HELP(#CustTypeCodeHelp)
 @V(H,#CustTypeCodeHelp)
-C(3,#CustTypeCode,1,T(2,@RuleCode,00)T(F,@RuleCode,0)T(3,@FdRuleCode,),T(F,@RuleCode,1)T(3,@FdRuleCode,*))
 
 #CustTypeCodeX=X,20,L
 T(H,#CustTypeCode,#CustTypeCodeHelp)
-IF(#CustTypeCode=="01"||#CustTypeCode=="C01",E(0,@IsGeneral,1),E(0,@IsGeneral,0))
-
+IF(#CustTypeCode=="S01",T(3,@FdRuleCode,*)E(0,@IsGeneral,1),T(3,@FdRuleCode,)E(0,@IsGeneral,0))
+T(F,@RuleCode,#IsGeneral)
 
 
 #IsLandLoan=A,1,S
@@ -1797,11 +1804,13 @@ IF(#CustTypeCode=="01"||#CustTypeCode=="C01",E(0,@IsGeneral,1),E(0,@IsGeneral,0)
 #FdRuleCode=X,2,L
 
 #RuleCode=X,5,I
-C(3,#CustTypeCode,1,s,$)
+T(3,@RuleCodeX,)
+C(5,#CustTypeCode,S01,$,S)
 HELP(#RuleCodeHelp)
 @V(H,#RuleCodeHelp)
 
-#RuleCodeX=X,30,L
+#RuleCodeX=X,40,L
+C(5,#RuleCode,#L2r05RuleCode,s,$)
 T(H,#RuleCode,#RuleCodeHelp)
 IF(#RuleCode=="08"||#RuleCode=="B0420"||#RuleCode=="B0421"||#RuleCode=="B0422"||#RuleCode=="B0423",E(0,@IsLandLoan,1),E(0,@IsLandLoan,0))
 

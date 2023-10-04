@@ -538,7 +538,7 @@ T(3,CdCode.CustTypeCode)
 #CDDEF02=x,20,S
 T(3,CdCode.RuleCode)
 
-#RuleCodeHelp=x,1024,S
+#RuleCodeHelp=x,2048,S
 
 !FacmAdvanceCloseCode
 #CDDEF03=x,28,S
@@ -794,11 +794,16 @@ T(3,CdCode.ProdBreachCode)
 #CDDEF36=x,30,S
 T(3,CdRuleCode)
 
-#CdRuleCodeHelp=x,1024,S
+#CdRuleCodeHelp=x,2048,S
+!CdRuleCodeY
+#CDDEF37=x,30,S
+T(3,CdRuleCodeY)
+
+#CdRuleCodeYHelp=x,2048,S
 
 #HelpRim4=X,1,S
 RESET_RIM(#HelpRim4,XXR99)
-S(XXR99,01,#CDDEF31,#CDDEF32,#CDDEF33,#CDDEF34,#CDDEF35,#CDDEF36)
+S(XXR99,01,#CDDEF31,#CDDEF32,#CDDEF33,#CDDEF34,#CDDEF35,#CDDEF36,#CDDEF37)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@ClTypeCodeHelp,#HelpDesc1)
@@ -807,6 +812,8 @@ T(2,@GrKindHelp,#HelpDesc3)
 T(2,@EsGKindHelp,#HelpDesc4)
 T(2,@ProdBreachCodeHelp,#HelpDesc5)
 T(2,@CdRuleCodeHelp,#HelpDesc6)
+T(2,@CdRuleCodeYHelp,#HelpDesc7)
+T(B,@CdRuleCodeYHelp,#RuleCodeHelp+;+#CdRuleCodeYHelp)
 T(B,@RuleCodeHelp,#RuleCodeHelp+;+#CdRuleCodeHelp)
 
 #FuncCodeHelp=x,40,S
@@ -2465,20 +2472,24 @@ C(3,#CustTypeCode,1,T(2,@RuleCode,00)T(F,@RuleCode,0)T(3,@FdRuleCode,),T(F,@Rule
 
 #CustTypeCodeX=X,20,L
 T(H,#CustTypeCode,#CustTypeCodeHelp)
-IF(#CustTypeCode=="01"||#CustTypeCode=="C01",E(0,@IsGeneral,1),E(0,@IsGeneral,0))
-
+IF(#CustTypeCode=="S01",T(3,@FdRuleCode,*)E(0,@IsGeneral,1),T(3,@FdRuleCode,)E(0,@IsGeneral,0))
+T(F,@RuleCode,#IsGeneral)
 
 #IsLandLoan=A,1,S
+C(3,#IsGeneral,1,$,$)
 ![規定管制代碼]
 #FdRuleCode=X,2,L
 
 #RuleCode=X,5,I
 C(3,#UpdateCode,1,$,s)
-C(3,#CustTypeCode,1,s,$)
-HELP(#RuleCodeHelp)
-@V(H,#RuleCodeHelp)
+T(3,@RuleCodeX,)
+C(5,#CustTypeCode,S01,$,S)
+HELP(#CdRuleCodeYHelp)
+@
+C(4,#RuleCode,$,C(5,#RuleCode,#L2r05RuleCode,s,$))
+V(H,#CdRuleCodeYHelp)
 
-#RuleCodeX=X,30,L
+#RuleCodeX=X,40,L
 T(H,#RuleCode,#RuleCodeHelp)
 IF(#RuleCode=="08"||#RuleCode=="B0420"||#RuleCode=="B0421"||#RuleCode=="B0422"||#RuleCode=="B0423",E(0,@IsLandLoan,1),E(0,@IsLandLoan,0))
 

@@ -115,9 +115,9 @@ BEGIN
            ,MAX(O."AcctCode")          AS "AcctCode"     
            ,MIN(CASE B."Status" 
                      WHEN  0  THEN  '40'
-                     WHEN  1  THEN  '91'
+                     WHEN  1  THEN  '81'
                      WHEN  2  THEN  '22' 
-                     WHEN  3  THEN  '83'                          
+                     WHEN  3  THEN  '93'                          
                      WHEN  4  THEN  '34'                            
                      WHEN  5  THEN  '55'
                      WHEN  6  THEN  '06'
@@ -135,8 +135,8 @@ BEGIN
 		 		 		 		--       5 -- 5.催收結案戶
 		 		 		 		--       6 -- 8.債權轉讓戶
 		 		 		 		--       7 -- 9.呆帳結案戶
-		 		 		 		--       8 -- 3.結案戶
-		 		 		 		--       9 -- 1.展期戶
+		 		 		 		--       8 -- 1.展期戶
+		 		 		 		--       9 -- 3.結案戶
                  -- '戶況';                                  BorMain                Overdue                  NegMain          
                  -- 01: 正常戶                               0: 正常戶                                       0:正常
                  -- 01: 展期戶                               1: 展期                                         

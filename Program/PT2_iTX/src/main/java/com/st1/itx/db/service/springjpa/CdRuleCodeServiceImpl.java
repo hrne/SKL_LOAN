@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -130,6 +133,34 @@ em = null;
       slice = cdRuleCodeReposHist.findAllByRuleStDateGreaterThanEqualOrderByRuleStDateAsc(ruleStDate_0, pageable);
     else 
       slice = cdRuleCodeRepos.findAllByRuleStDateGreaterThanEqualOrderByRuleStDateAsc(ruleStDate_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<CdRuleCode> findEnableMark(String enableMark_0, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<CdRuleCode> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findEnableMark " + dbName + " : " + "enableMark_0 : " + enableMark_0);
+    if (dbName.equals(ContentName.onDay))
+      slice = cdRuleCodeReposDay.findAllByEnableMarkIsOrderByRuleCodeAsc(enableMark_0, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = cdRuleCodeReposMon.findAllByEnableMarkIsOrderByRuleCodeAsc(enableMark_0, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = cdRuleCodeReposHist.findAllByEnableMarkIsOrderByRuleCodeAsc(enableMark_0, pageable);
+    else 
+      slice = cdRuleCodeRepos.findAllByEnableMarkIsOrderByRuleCodeAsc(enableMark_0, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
