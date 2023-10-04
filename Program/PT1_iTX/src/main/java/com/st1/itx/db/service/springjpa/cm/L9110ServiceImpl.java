@@ -900,7 +900,8 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , NVL(\"Fn_GetEmpName\"(FAC.\"Coorgnizer\",1),'無') ";
 		sql += "                                       AS F54協辦姓名 ";
 		sql += "      , NVL(LBM.\"LoanBal\",0)         AS F55本戶目前總額 ";
-		sql += "      , CDR.\"RuleCodeItem\"  		   AS F56規定管制代碼 ";
+		sql += "      , NVL(CRC.\"RuleCodeItem\",\"Fn_GetCdCode\"('RuleCode',FAC.\"RuleCode\")) ";
+		sql += "                                       AS F56規定管制代碼 ";
 		sql += "      , TO_CHAR(\"Fn_GetCdCode\"('BreachGetCode',FAC.\"BreachGetCode\"))  AS F57違約金收取方式 ";
 		sql += "      , FAC.\"BreachCode\"     		   AS F58違約適用方式 ";
 		sql += "      , PROD.\"ProdName\"       	   AS F59商品名稱 ";
@@ -919,7 +920,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           ) LBM ON LBM.\"CustNo\" = CM.\"CustNo\" "; // 計算放款餘額加總
 		sql += " LEFT JOIN \"CustMain\" GROUPCM ON GROUPCM.\"CustUKey\" = FC.\"GroupUKey\" "; // 團體戶
 		sql += " LEFT JOIN \"CdEmp\" CDE ON CDE.\"EmployeeNo\" = CM.\"EmpNo\" "; // 十五日薪判斷相關
-		sql += " LEFT JOIN \"CdRuleCode\" CDR ON CDR.\"RuleCode\" = FAC.\"RuleCode\" "; // 規定管制代碼
+		sql += " LEFT JOIN \"CdRuleCode\" CRC ON CRC.\"RuleCode\" = FAC.\"RuleCode\" "; // 規定管制代碼
 		sql += " WHERE FC.\"ApplNo\" = :applNo";
 
 		this.info("sql=" + sql);

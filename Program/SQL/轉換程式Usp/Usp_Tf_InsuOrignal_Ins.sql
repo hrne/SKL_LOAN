@@ -117,6 +117,7 @@ BEGIN
            , INSP."INSIID"
       FROM "LA$INSP" INSP
     )
+    -- 先做DISTINCT,列出擔保品號碼及序號的明細資料
     , DISTINCT_INSP_FIX AS (
       SELECT DISTINCT
              GDRID1
@@ -125,6 +126,7 @@ BEGIN
            , LGTSEQ
       FROM INSP_FIX
     )
+    -- 計數,找出每一組擔保品有沒有每個序號都有保單
     , COUNT_INSP_FIX AS (
       SELECT GDRID1
            , GDRID2
@@ -135,6 +137,7 @@ BEGIN
              , GDRID2
              , GDRNUM
     )
+    -- 計數,找出有多筆序號的每一組擔保品
     , HGTP_RAW AS (
       SELECT GDRID1
            , GDRID2
@@ -145,6 +148,7 @@ BEGIN
              , GDRNUM
       HAVING COUNT(*) >= 2
     )
+    -- 列出有多筆序號的擔保品資料
     , HGTP AS (
       SELECT R.GDRID1
            , R.GDRID2
@@ -159,7 +163,8 @@ BEGIN
     , INSP_FIX_BY_CASE AS (
       SELECT CASE
                -- 一個擔保品有多個序號,且共用同一張火險單,每個新擔保品編號皆須轉入保險單
-               WHEN NVL(H.LGTSEQ,0) != 0
+               WHEN NVL(H.LGTSEQ,0) != 0 -- 這個擔保品是有多個序號的
+                    AND C.CNT = 1 -- 這擔保品只有一筆序號有保單
                THEN '1'
                -- 一個擔保品有多個序號,且多個序號各自有火險單,各自轉入
                WHEN C.CNT >= 2
@@ -182,6 +187,7 @@ BEGIN
       LEFT JOIN INSP_FIX I ON I.GDRID1 = C.GDRID1
                           AND I.GDRID2 = C.GDRID2
                           AND I.GDRNUM = C.GDRNUM
+                          AND I.INSNUM = C.INSNUM
       LEFT JOIN HGTP H ON H.GDRID1 = C.GDRID1
                       AND H.GDRID2 = C.GDRID2
                       AND H.GDRNUM = C.GDRNUM
@@ -201,12 +207,21 @@ BEGIN
            , INSP.INSEPM
            , INSP.INSIID
            , INSP."Case"
+           , ROW_NUMBER()
+             OVER (
+              PARTITION BY CNM."ClCode1"
+                         , CNM."ClCode2"
+                         , CNM."ClNo"
+                         , INSP.INSNUM
+              ORDER BY INSP.GDRNUM DESC -- 最新的擔保品號碼
+                     , INSP.LGTSEQ -- 最小的擔保品序號
+             )
       FROM INSP_FIX_BY_CASE INSP
       LEFT JOIN "ClNoMap" CNM ON CNM."GdrId1" = INSP.GDRID1
                              AND CNM."GdrId2" = INSP.GDRID2
                              AND CNM."GdrNum" = INSP.GDRNUM
                              AND CNM."LgtSeq" = INSP.LGTSEQ
-      WHERE CNM."TfStatus" IN (1,3) -- 轉換留存排掉
+      WHERE CNM."TfStatus" IN (1,2,3)
     )
     , S AS (
       SELECT NVL(INSP."ClCode1",0)       AS "ClCode1"         -- 擔保品-代號1 DECIMAL 1 0

@@ -17,8 +17,6 @@ import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
 
 /**
- * L5735 建商餘額明細
- * 
  * @author ST1-ChihWei
  * @version 1.0.0
  *
@@ -57,11 +55,17 @@ public class L5735ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WITH \"CFSum\" AS ( ";
 		sql += "   SELECT \"CustNo\" ";
 		sql += "        , \"FacmNo\" ";
+		sql += "        , \"ClCode1\" ";
+		sql += "        , \"ClCode2\" ";
+		sql += "        , \"ClNo\" ";
 		sql += "        , SUM(NVL(\"OriEvaNotWorth\",0)) AS \"EvaNetWorth\" ";
 		sql += "   FROM \"ClFac\"";
 		sql += "   WHERE \"MainFlag\" = 'Y' ";
 		sql += "   GROUP BY \"CustNo\" ";
 		sql += "          , \"FacmNo\" ";
+		sql += "          , \"ClCode1\" ";
+		sql += "          , \"ClCode2\" ";
+		sql += "          , \"ClNo\" ";
 		sql += " )";
 		sql += " SELECT CM.\"CustName\" ";
 		sql += "      , MLB.\"CustNo\" ";
@@ -78,7 +82,7 @@ public class L5735ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , LBM.\"DrawdownDate\" ";
 		sql += "      , NVL(CS.\"EvaNetWorth\", 0) AS \"EvaNetWorth\"";
 		sql += "      , CASE ";
-		sql += "          WHEN NVL(CS.\"EvaNetWorth\", 0) = 0";
+		sql += "          WHEN NVL(CS.\"EvaNetWorth\", 0) = ROUND(NVL(CI.\"LoanToValue\",0) / 100,2)";
 		sql += "          THEN 0 ";
 		sql += "        ELSE ROUND(FM.\"LineAmt\" / CS.\"EvaNetWorth\", 2) ";
 		sql += "        END                        AS \"LoanRatio\" "; // 貸款成數
@@ -90,8 +94,11 @@ public class L5735ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"LoanBorMain\" LBM ON LBM.\"CustNo\" = MLB.\"CustNo\" ";
 		sql += "                            AND LBM.\"FacmNo\" = MLB.\"FacmNo\" ";
 		sql += "                            AND LBM.\"BormNo\" = MLB.\"BormNo\" ";
-		sql += "LEFT JOIN \"CFSum\" CS ON CS.\"CustNo\" = FM.\"CustNo\" ";
-		sql += "                    AND CS.\"FacmNo\" = FM.\"FacmNo\" ";
+		sql += " LEFT JOIN \"CFSum\" CS ON CS.\"CustNo\" = FM.\"CustNo\" ";
+		sql += "                       AND CS.\"FacmNo\" = FM.\"FacmNo\" ";
+		sql += " LEFT JOIN \"ClImm\" CI ON CI.\"ClCode1\" = CS.\"ClCode1\" ";
+		sql += "                       AND CI.\"ClCode2\" = CS.\"ClCode2\" ";
+		sql += "                       AND CI.\"ClNo\" = CS.\"ClNo\" ";
 		sql += " WHERE MLB.\"YearMonth\" = :inputYearMonth ";
 		sql += "   AND MLB.\"LoanBalance\" > 0 ";
 		sql += "   AND NVL(CC.\"DeleteFlag\", ' ') != '*' ";
@@ -144,11 +151,12 @@ public class L5735ServiceImpl extends ASpringJpaParm implements InitializingBean
 			cond += "   AND MLB.\"AcctCode\" IN ('340') ";
 			cond += "   AND LBM.\"Status\" = 0 ";
 			break;
-		case "L5735D":
-			cond += "   AND MLB.\"ClCode1\" IN ('2') ";
-			cond += "   AND MLB.\"ClCode2\" IN ('3') ";
-			cond += "   AND LBM.\"Status\" = 0 ";
-			break;
+			//移到 getNormalCustomerLoanDataL5735D
+//		case "L5735D":
+//			cond += "   AND MLB.\"ClCode1\" IN ('2') ";
+//			cond += "   AND MLB.\"ClCode2\" IN ('3') ";
+//			cond += "   AND LBM.\"Status\" = 0 ";
+//			break;
 		case "L5735E":
 			cond += "   AND LBM.\"Status\" = 0 ";
 			break;
@@ -169,11 +177,17 @@ public class L5735ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WITH \"CFSum\" AS ( ";
 		sql += "   SELECT \"CustNo\" ";
 		sql += "        , \"FacmNo\" ";
+		sql += "        , \"ClCode1\" ";
+		sql += "        , \"ClCode2\" ";
+		sql += "        , \"ClNo\" ";
 		sql += "        , SUM(NVL(\"OriEvaNotWorth\",0)) AS \"EvaNetWorth\" ";
 		sql += "   FROM \"ClFac\"";
 		sql += "   WHERE \"MainFlag\" = 'Y' ";
 		sql += "   GROUP BY \"CustNo\" ";
 		sql += "          , \"FacmNo\" ";
+		sql += "          , \"ClCode1\" ";
+		sql += "          , \"ClCode2\" ";
+		sql += "          , \"ClNo\" ";
 		sql += " )";
 		sql += " SELECT CM.\"CustName\" ";
 		sql += "      , MLB.\"CustNo\" ";
@@ -190,7 +204,7 @@ public class L5735ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , LBM.\"DrawdownDate\" ";
 		sql += "      , NVL(CS.\"EvaNetWorth\", 0) AS \"EvaNetWorth\"";
 		sql += "      , CASE ";
-		sql += "          WHEN NVL(CS.\"EvaNetWorth\", 0) = 0";
+		sql += "          WHEN NVL(CS.\"EvaNetWorth\", 0) = ROUND(NVL(CI.\"LoanToValue\",0) / 100,2)";
 		sql += "          THEN 0 ";
 		sql += "        ELSE ROUND(FM.\"LineAmt\" / CS.\"EvaNetWorth\", 2) ";
 		sql += "        END                        AS \"LoanRatio\" "; // 貸款成數
@@ -203,6 +217,9 @@ public class L5735ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                            AND LBM.\"BormNo\" = MLB.\"BormNo\" ";
 		sql += "LEFT JOIN \"CFSum\" CS ON CS.\"CustNo\" = FM.\"CustNo\" ";
 		sql += "                    AND CS.\"FacmNo\" = FM.\"FacmNo\" ";
+		sql += " LEFT JOIN \"ClImm\" CI ON CI.\"ClCode1\" = CS.\"ClCode1\" ";
+		sql += "                       AND CI.\"ClCode2\" = CS.\"ClCode2\" ";
+		sql += "                       AND CI.\"ClNo\" = CS.\"ClNo\" ";
 		sql += " WHERE MLB.\"YearMonth\" = :inputYearMonth ";
 		sql += "   AND MLB.\"LoanBalance\" > 0 ";
 		sql += "   AND LBM.\"DrawdownDate\" <= :inputDrawdownDate ";
@@ -283,6 +300,9 @@ public class L5735ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WHERE MLB.\"YearMonth\" = :inputYearMonth ";
 		sql += "   AND MLB.\"LoanBalance\" > 0 ";
 		sql += "   AND LBM.\"DrawdownDate\" <= :inputDrawdownDate ";
+		sql += "   AND LBM.\"Status\" = 0 ";
+		sql += "   AND MLB.\"ClCode1\" IN ('2') ";
+		sql += "   AND MLB.\"ClCode2\" IN ('3') ";
 		sql += "   AND LBM.\"Status\" = 0 ";
 		sql += " ORDER BY MLB.\"CustNo\" ";
 		sql += "        , MLB.\"FacmNo\" ";

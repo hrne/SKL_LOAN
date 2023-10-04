@@ -76,7 +76,6 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        T.\"ShortAmt\",";
 		sql += "        T.\"Excessive\",";
 		sql += "        T.\"OverShort\",";
-		sql += "        T.\"DB\",";
 		sql += "        T.\"CustName\",";
 		sql += "        CASE";
 		sql += "            WHEN CB.\"BdLocation\" IS NOT NULL THEN";
@@ -88,7 +87,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        T.\"TitaTlrNo\",";
 		sql += "        T.\"TitaTxtNo\",";
 		sql += "        T.\"AcSeq\",";
-		sql += "        T.\"CreateDate\"";
+		sql += "        T.\"CreateDate\",";
 		sql += "        T.\"Displayflag\"";
 		sql += "    FROM";
 		sql += "        (";
@@ -154,7 +153,6 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        END        AS \"Overflow\",";
 		sql += "        T.\"Excessive\" / T.\"ExcessiveCount\" AS \"Excessive\",";
 		sql += "        T.\"OverShort\",";
-		sql += "        T.\"DB\",";
 		sql += "        \"Fn_ParseEOL\"( C.\"CustName\",";
 		sql += "        0 ) AS \"CustName\",";
 		sql += "        T.\"TitaHCode\",";
@@ -224,10 +222,9 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                MAX(T.\"TitaTxtNo\")                                         AS \"TitaTxtNo\",";
 		sql += "                MAX(T.\"AcSeq\")                                         AS \"AcSeq\",";
 		sql += "                MAX(T.\"CreateDate\")                                         AS \"CreateDate\",";
-		sql += "                MIN(L.\"Displayflag\")                                         AS \"Displayflag\",";
+		sql += "                MIN(T.\"Displayflag\")                                         AS \"Displayflag\",";
 		sql += "                T.\"RepayCode\",";
-		sql += "                MIN(L.\"RenewFlag\")                                         AS \"RenewFlag\",";
-		
+		sql += "                MIN(L.\"RenewFlag\")                                         AS \"RenewFlag\"";
 		sql += "            FROM";
 		sql += "                \"LoanBorTx\" T";
 		sql += "            LEFT JOIN (";

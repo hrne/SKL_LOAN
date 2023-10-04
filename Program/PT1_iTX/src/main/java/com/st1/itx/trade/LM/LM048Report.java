@@ -202,7 +202,6 @@ public class LM048Report extends MakeReport {
 
 			}
 
-			this.info(" lLM048List.size() = " + lLM048List.size());
 			for (Map<String, String> r : lLM048List) {
 
 				tInDustryCode = r.get("IndustryCode") == null ? 0 : parse.stringToInteger(r.get("IndustryCode"));

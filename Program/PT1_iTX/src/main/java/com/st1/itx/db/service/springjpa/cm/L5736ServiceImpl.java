@@ -18,8 +18,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.util.parse.Parse;
 
 /**
- * L5736
- * 
  * @author ST1-ChihWei
  * @version 1.0.0
  *
@@ -51,8 +49,8 @@ public class L5736ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int inputYearMonth = parse.stringToInteger(titaVo.getParam("inputYearMonth"));
 
 		// 轉西元年
-		if (inputYearMonth <= 19110000) {
-			inputYearMonth += 19110000;
+		if (inputYearMonth <= 191100) {
+			inputYearMonth += 191100;
 		}
 
 //		L5736C-首購餘額明細-催收戶
@@ -81,11 +79,17 @@ public class L5736ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WITH \"CFSum\" AS ( ";
 		sql += "   SELECT \"CustNo\" ";
 		sql += "        , \"FacmNo\" ";
+		sql += "        , \"ClCode1\" ";
+		sql += "        , \"ClCode2\" ";
+		sql += "        , \"ClNo\" ";
 		sql += "        , SUM(NVL(\"OriEvaNotWorth\",0)) AS \"EvaNetWorth\" ";
 		sql += "   FROM \"ClFac\"";
 		sql += "   WHERE \"MainFlag\" = 'Y' ";
 		sql += "   GROUP BY \"CustNo\" ";
 		sql += "          , \"FacmNo\" ";
+		sql += "          , \"ClCode1\" ";
+		sql += "          , \"ClCode2\" ";
+		sql += "          , \"ClNo\" ";
 		sql += " )";
 		sql += " SELECT CM.\"CustName\" ";
 		sql += "      , MLB.\"CustNo\" ";
@@ -102,7 +106,7 @@ public class L5736ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , LBM.\"DrawdownDate\" ";
 		sql += "      , NVL(CS.\"EvaNetWorth\", 0) AS \"EvaNetWorth\"";
 		sql += "      , CASE ";
-		sql += "          WHEN NVL(CS.\"EvaNetWorth\", 0) = 0";
+		sql += "          WHEN NVL(CS.\"EvaNetWorth\", 0) = ROUND(NVL(CI.\"LoanToValue\",0) / 100,2)";
 		sql += "          THEN 0 ";
 		sql += "        ELSE ROUND(FM.\"LineAmt\" / CS.\"EvaNetWorth\", 2) ";
 		sql += "        END                        AS \"LoanRatio\" "; // 貸款成數
@@ -115,6 +119,9 @@ public class L5736ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                            AND LBM.\"BormNo\" = MLB.\"BormNo\" ";
 		sql += "LEFT JOIN \"CFSum\" CS ON CS.\"CustNo\" = FM.\"CustNo\" ";
 		sql += "                    AND CS.\"FacmNo\" = FM.\"FacmNo\" ";
+		sql += " LEFT JOIN \"ClImm\" CI ON CI.\"ClCode1\" = CS.\"ClCode1\" ";
+		sql += "                       AND CI.\"ClCode2\" = CS.\"ClCode2\" ";
+		sql += "                       AND CI.\"ClNo\" = CS.\"ClNo\" ";
 		sql += " WHERE MLB.\"YearMonth\" = :inputYearMonth ";
 		sql += "   AND MLB.\"LoanBalance\" > 0 ";
 		sql += cond;

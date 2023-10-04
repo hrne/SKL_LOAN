@@ -33,6 +33,7 @@ public class LM074ServiceImpl extends ASpringJpaParm implements InitializingBean
 		
 		String ruleCode = "'B040%'";
 		
+		
 		String sql = "	";
 		sql += "    WITH \"CFSum\" AS (";
 		sql += "        SELECT Cl.\"CustNo\"";
@@ -99,13 +100,15 @@ public class LM074ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                 AND";
 		sql += "                                 Cd.\"Code\" = Fac.\"RuleCode\"";
 		sql += "        LEFT JOIN \"FacCaseAppl\"  Fc ON Fc.\"ApplNo\" = Fac.\"ApplNo\"";
+		sql += "        LEFT JOIN \"CustMain\"      C ON C.\"CustNo\" = Fac.\"CustNo\"";
 		sql += "        WHERE Trunc(Lm.\"DrawdownDate\" / 100) = :RptMonth";
 		sql += "              AND";
 		sql += "              Fac.\"CustTypeCode\" = 'S01'";
 		sql += "              AND";
 		sql += "              Fac.\"RuleCode\" LIKE " + ruleCode;
 		sql += "              AND";
-		sql += "              Fac.\"CompensateFlag\" = 'N'";
+		sql += "              Case When C.\"EntCode\" = 0 Then 'N' ";
+		sql += "				   Else Fac.\"CompensateFlag\" End = 'N'";
 		sql += "    )";
 		sql += "    SELECT \"CitySeq\"";
 		sql += "         , SUM(\"Count\")                                                     AS \"Count\"";

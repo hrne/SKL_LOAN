@@ -191,7 +191,7 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,SUM(\"PrinBalance\") AS \"AMT\" ";
 		sql += " FROM ( SELECT b.* FROM (SELECT DISTINCT (\"CustNo\") ";
 		sql += "	FROM \"LifeRelEmp\" l ";
-		sql += "	LEFT JOIN \"CustMain\" cm ON cm.\"CustId\" = TO_CHAR(DECODE(l.\"EmpId\" , '-' , l.\"EmpId\")) ";
+		sql += "	LEFT JOIN \"CustMain\" cm ON cm.\"CustId\" = TO_CHAR(DECODE(l.\"EmpId\" , '-' , l.\"EmpId\", l.\"EmpId\")) ";
 		sql += "	WHERE";
 		sql += "	l.\"AcDate\" = TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR( :yymm*100+1), 'YYYYMMDD')),'YYYYMMDD')) ";
 		sql += "	AND l.\"LoanBalance\" > 0 ) a";
@@ -204,7 +204,7 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " 	   ,SUM(\"PrinBalance\")  AS \"AMT\" ";
 		sql += " FROM ( SELECT b.* FROM (SELECT DISTINCT (\"CustNo\") ";
 		sql += "	FROM \"LifeRelHead\" l ";
-		sql += "	LEFT JOIN \"CustMain\" cm ON cm.\"CustId\" = TO_CHAR(DECODE(l.\"BusId\" , '-' , DECODE(\"RelId\" ,'-' ,l.\"RelId\"),l.\"BusId\")) ";
+		sql += "	LEFT JOIN \"CustMain\" cm ON cm.\"CustId\" = TO_CHAR(DECODE(l.\"BusId\" , '-' , DECODE(\"RelId\" ,'-' ,DECODE(\"HeadId\" ,'-' ,l.\"HeadId\",l.\"HeadId\"),l.\"RelId\"),l.\"BusId\")) ";
 		sql += "	WHERE";
 		sql += "	l.\"RelWithCompany\" IN ('A','B')";
 		sql += "	AND l.\"AcDate\" = TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR( :yymm*100+1), 'YYYYMMDD')),'YYYYMMDD')) ";
