@@ -21,7 +21,7 @@ import com.st1.itx.dataVO.TotaVo;
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.MakeExcel;
-import com.st1.itx.util.common.NegReportCom;
+import com.st1.itx.util.common.NegApprCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -45,7 +45,7 @@ import com.st1.itx.util.parse.Parse;
 public class L5710 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
-	public NegReportCom sNegReportNegService;
+	public NegApprCom negApprCom;
 
 	/* 日期工具 */
 	@Autowired
@@ -80,7 +80,7 @@ public class L5710 extends TradeBuffer {
 		int falseamt = 0;
 
 		try {
-			sbData = sNegReportNegService.BatchTx02(titaVo, FilePath, BringUpDate);
+			sbData = negApprCom.BatchTx02(titaVo, FilePath, BringUpDate);
 
 			String ChangeLine = "/n";
 
@@ -163,7 +163,7 @@ public class L5710 extends TradeBuffer {
 		}
 
 		long sno2 = 0L;
-		sno2 = sNegReportNegService.CreateTxt(sbData, "BATCHTX03", titaVo);
+		sno2 = negApprCom.CreateTxt(sbData, "BATCHTX03", titaVo);
 
 		totaVo.put("TxtSnoF", "" + sno2);
 

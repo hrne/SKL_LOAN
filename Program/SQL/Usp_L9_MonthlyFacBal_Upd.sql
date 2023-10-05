@@ -1,135 +1,679 @@
-CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L9_MonthlyLM052LoanAsset_Ins" 
+create or replace NONEDITIONABLE PROCEDURE "Usp_L9_MonthlyFacBal_Upd" 
 (
-    -- åƒæ•¸
-    TYYMM           IN  INT,       -- æœ¬æœˆè³‡æ–™å¹´æœˆ(è¥¿å…ƒ)
-    EmpNo          IN  VARCHAR2,   -- ç¶“è¾¦
-    JobTxSeq       IN  VARCHAR2    -- å•Ÿå‹•æ‰¹æ¬¡çš„äº¤æ˜“åºè™Ÿ
-
+    -- °Ñ¼Æ
+    TBSDYF         IN  INT,        -- ¨t²ÎÀç·~¤é(¦è¤¸)
+    EmpNo          IN  VARCHAR2,   -- ¸g¿ì
+    JobTxSeq       IN  VARCHAR2    -- ±Ò°Ê§å¦¸ªº¥æ©ö§Ç¸¹
 )
 AS
 BEGIN
-  -- åŸ·è¡Œç¯„ä¾‹
-  -- exec "Usp_L9_MonthlyLM052LoanAsset_Ins"(202105,'999999');
   DECLARE
-    INS_CNT        INT;         -- æ–°å¢ç­†æ•¸
-    JOB_START_TIME TIMESTAMP;   -- è¨˜éŒ„ç¨‹å¼èµ·å§‹æ™‚é–“
-    JOB_END_TIME   TIMESTAMP;   -- è¨˜éŒ„ç¨‹å¼çµæŸæ™‚é–“
-
+    INS_CNT        INT;         -- ·s¼Wµ§¼Æ
+    UPD_CNT        INT;         -- §ó·sµ§¼Æ
+    JOB_START_TIME TIMESTAMP;   -- °O¿ıµ{¦¡°_©l®É¶¡
+    JOB_END_TIME   TIMESTAMP;   -- °O¿ıµ{¦¡µ²§ô®É¶¡
+    YYYYMM         INT;         -- ¥»¤ë¦~¤ë
+    LYYYYMM        INT;         -- ¤W¤ë¦~¤ë
+    MM             INT;         -- ¥»¤ë¤ë¥÷
+    YYYY           INT;         -- ¥»¤ë¦~«×
+    "ThisMonthEndDate" INT;     -- ¥»¤ë¤ë©³¤é
   BEGIN
     INS_CNT :=0;
+    UPD_CNT :=0;
 
-    -- è¨˜éŒ„ç¨‹å¼èµ·å§‹æ™‚é–“
+    -- °O¿ıµ{¦¡°_©l®É¶¡
     JOB_START_TIME := SYSTIMESTAMP;
 
-    -- åˆªé™¤èˆŠè³‡æ–™
-    DBMS_OUTPUT.PUT_LINE('DELETE MonthlyLM052LoanAsset');
+    --¡@¥»¤ë¦~¤ë
+    YYYYMM := TBSDYF / 100;
+    --
+    MM := MOD(YYYYMM, 100);
+    YYYY := TRUNC(YYYYMM / 100);
+    IF MM = 1 THEN
+       LYYYYMM := (YYYY - 1) * 100 + 12;
+    ELSE
+       LYYYYMM := YYYYMM - 1;
+    END IF;
 
-    DELETE FROM "MonthlyLM052LoanAsset"
-    WHERE "YearMonth" = TYYMM 
+    SELECT "TmnDyf"
+    INTO "ThisMonthEndDate"
+    FROM "TxBizDate"
+    WHERE "DateCode" = 'ONLINE'
     ;
 
-    -- ç­†æ•¸é è¨­0
-    INS_CNT:=0;
+    -- §R°£ÂÂ¸ê®Æ
+    DBMS_OUTPUT.PUT_LINE('DELETE MonthlyFacBal');
 
-    -- è¨˜éŒ„ç¨‹å¼èµ·å§‹æ™‚é–“
-    JOB_START_TIME := SYSTIMESTAMP;
+    DELETE FROM "MonthlyFacBal"
+    WHERE "YearMonth" = YYYYMM
+    ;
 
-    DBMS_OUTPUT.PUT_LINE('INSERT MonthlyLM052LoanAsset');
+    -- ¼g¤J¸ê®Æ
+    DBMS_OUTPUT.PUT_LINE('INSERT MonthlyFacBal');
 
-    -- å¯«å…¥è³‡æ–™
-    INSERT INTO "MonthlyLM052LoanAsset"
-    SELECT "YearMonth"                            AS "YearMonth"           -- è³‡æ–™å¹´æœˆ
-          ,"LoanAssetCode"                        AS "LoanAssetCode"	     -- æ”¾æ¬¾è³‡ç”¢é …ç›®ä»£è™Ÿ	
-          , SUM("LoanBal")                        AS "LoanBal"	           --	æ”¾æ¬¾é‡‘é¡ 
-          ,JOB_START_TIME                         AS "CreateDate"          -- å»ºæª”æ—¥æœŸæ™‚é–“ DATE 0 0
-          ,EmpNo                                  AS "CreateEmpNo"         -- å»ºæª”äººå“¡ VARCHAR2 6 0
-          ,JOB_START_TIME                         AS "LastUpdate"          -- æœ€å¾Œæ›´æ–°æ—¥æœŸæ™‚é–“ DATE 0 0
-          ,EmpNo                                  AS "LastUpdateEmpNo"     -- æœ€å¾Œæ›´æ–°äººå“¡ VARCHAR2 6 0
-    FROM( SELECT M."YearMonth"
-                , CASE
-                    --å»ºç¯‰è²¸æ¬¾
-                    WHEN CDI."IndustryCode" IS NOT NULL THEN 'S2' 
-                    --æ°‘åœ‹ä¸€ç™¾å¹´å¾Œæ”¿ç­–æ€§è²¸æ¬¾
-                    WHEN (REGEXP_LIKE(M."ProdNo",'I[A-Z]')
-                      OR REGEXP_LIKE(M."ProdNo",'8[1]')
-                      OR (M."AcctCode" = '990' AND M."FacAcctCode" = '340')
-                      OR M."AcctCode" = '340')
-                      AND F."FirstDrawdownDate" >= 20110101 THEN 'NS1' 
-                    --è‚¡ç¥¨è³ªæŠ¼
-                    WHEN M."ClCode1" IN (3,4) THEN 'NS2' 
-                    --è³¼ç½®ä¸å‹•ç”¢+ä¿®ç¹•è²¸æ¬¾
-                    WHEN M."ClCode1" IN (1,2) 
-                      AND F."UsageCode" = '02' 
-                      AND M."ProdNo" NOT IN ('60','61','62') THEN 'S1'
-                    --å€‹é‡‘ä¸å‹•ç”¢æŠµæŠ¼è²¸æ¬¾
-                    ELSE 'NS3'  END        AS "LoanAssetCode"	--æ”¾æ¬¾è³‡ç”¢é …ç›®
-              ,SUM(M."PrinBalance") AS "LoanBal"	  
-          FROM "MonthlyFacBal" M
-          LEFT JOIN "FacMain" F ON F."CustNo" = M."CustNo"
-                               AND F."FacmNo" = M."FacmNo"
-          LEFT JOIN "CustMain" CM ON CM."CustNo" = M."CustNo"
-          LEFT JOIN ( SELECT DISTINCT SUBSTR("IndustryCode",3,4) AS "IndustryCode"
-                            ,"IndustryItem"
-                      FROM "CdIndustry"
-                      WHERE "IndustryItem" LIKE '%ä¸å‹•ç”¢%'
-                         OR "IndustryItem" LIKE '%å»ºç¯‰%'
-                      ) CDI ON CDI."IndustryCode" = SUBSTR(CM."IndustryCode",3,4)
-          WHERE M."PrinBalance" > 0
-            AND M."YearMonth" = TYYMM 
-          GROUP BY  M."YearMonth"
-                , CASE
-                    --å»ºç¯‰è²¸æ¬¾
-                    WHEN CDI."IndustryCode" IS NOT NULL THEN 'S2' 
-                    --æ°‘åœ‹ä¸€ç™¾å¹´å¾Œæ”¿ç­–æ€§è²¸æ¬¾
-                    WHEN (REGEXP_LIKE(M."ProdNo",'I[A-Z]')
-                      OR REGEXP_LIKE(M."ProdNo",'8[1]')
-                      OR (M."AcctCode" = '990' AND M."FacAcctCode" = '340')
-                      OR M."AcctCode" = '340')
-                      AND F."FirstDrawdownDate" >= 20110101 THEN 'NS1' 
-                    --è‚¡ç¥¨è³ªæŠ¼
-                    WHEN M."ClCode1" IN (3,4) THEN 'NS2' 
-                    --è³¼ç½®ä¸å‹•ç”¢+ä¿®ç¹•è²¸æ¬¾
-                    WHEN M."ClCode1" IN (1,2) 
-                      AND F."UsageCode" = '02' 
-                      AND M."ProdNo" NOT IN ('60','61','62') THEN 'S1'
-                    --å€‹é‡‘ä¸å‹•ç”¢æŠµæŠ¼è²¸æ¬¾
-                    ELSE 'NS3'  END 
-          UNION
-          SELECT TRUNC("AcDate" / 100 )   AS "YearMonth"     --è³‡æ–™å¹´æœˆ
-                ,'NS3'             AS "LoanAssetCode" --æ”¾æ¬¾è³‡ç”¢é …ç›®ä»£è™Ÿ
-                ,SUM("TdBal")  AS "LoanBal"       --æŠ˜æº¢åƒ¹èˆ‡å‚¬æ”¶è²»ç”¨
-          FROM "CoreAcMain"
-          WHERE "AcNoCode" IN ( '10600304000'    --æ“”ä¿æ”¾æ¬¾-æŠ˜æº¢åƒ¹
-                               ,'10601301000'    --å‚¬æ”¶æ¬¾é …-æ³•å‹™è²»ç”¨
-                               ,'10601302000'    --å‚¬æ”¶æ¬¾é …-ç«éšªè²»ç”¨
-                               ,'10601304000')   --å‚¬æ”¶æ¬¾é …-æŠ˜æº¢åƒ¹
-                  AND TRUNC("AcDate" / 100 ) = TYYMM
-          GROUP BY TRUNC("AcDate" / 100 )
-            )
-    GROUP BY "YearMonth"
-            ,"LoanAssetCode"
+    INSERT INTO "MonthlyFacBal"
+    SELECT
+           YYYYMM                     AS "YearMonth"           -- ¸ê®Æ¦~¤ë
+          ,L."CustNo"                 AS "CustNo"              -- ¤á¸¹
+          ,L."FacmNo"                 AS "FacmNo"              -- ÃB«×
+          ,L."PrevIntDate"            AS "PrevIntDate"         -- Ãº®§¨´¤é
+          ,L."NextIntDate"            AS "NextIntDate"         -- À³Ãº®§¤é
+          ,NVL(B."DueDate",0)         AS "DueDate"             -- ³ÌªñÀ³Ãº¤é
+          -- ­Y À³Ãº®§¤é < ¨t²ÎÀç·~¤é("ThisMonthEndDate")
+          -- «h ­pºâ¹O´Á´Á¼Æ
+          -- §_«h Â\¹s
+          ,CASE
+             WHEN NVL(B."CustNo",0) = 0
+             THEN L."OvduTerm" 
+             WHEN B."MaturityDate" < "ThisMonthEndDate"
+              AND B."MaturityDate" < B."NextPayIntDate" -- À³Ãº¤é>¨ì´Á¤é®É¥Î¨ì´Á¤é­pºâ
+              AND L."PrinBalance" + L."BadDebtBal" <> 0
+             THEN TRUNC(MONTHS_BETWEEN(TO_DATE("ThisMonthEndDate",'YYYY-MM-DD'), TO_DATE(B."MaturityDate",'YYYY-MM-DD')))
+             WHEN B."NextPayIntDate" < "ThisMonthEndDate" AND B."NextPayIntDate" > 0
+              AND L."PrinBalance" + L."BadDebtBal" <> 0
+             THEN TRUNC(MONTHS_BETWEEN(TO_DATE("ThisMonthEndDate",'YYYY-MM-DD'), TO_DATE(B."NextPayIntDate",'YYYY-MM-DD')))
+           ELSE 0 END                 AS "OvduTerm"            -- '¹O´Á´Á¼Æ';
+          -- ­Y À³Ãº®§¤é <= ¨t²ÎÀç·~¤é("ThisMonthEndDate")
+          -- «h ­pºâ¹O´Á¤Ñ¼Æ
+          -- §_«h Â\¹s
+          ,CASE
+             WHEN NVL(B."CustNo",0) = 0
+             THEN L."OvduDays" 
+             WHEN B."MaturityDate" < "ThisMonthEndDate"
+              AND B."MaturityDate" < B."NextPayIntDate" -- À³Ãº¤é>¨ì´Á¤é®É¥Î¨ì´Á¤é­pºâ
+              AND L."PrinBalance" + L."BadDebtBal" <> 0
+             THEN TO_DATE("ThisMonthEndDate",'YYYY-MM-DD')  - TO_DATE(B."MaturityDate",'YYYY-MM-DD') 
+             WHEN B."NextPayIntDate" <= "ThisMonthEndDate" AND B."NextPayIntDate" > 0
+              AND L."PrinBalance" + L."BadDebtBal" <> 0
+             THEN TO_DATE("ThisMonthEndDate",'YYYY-MM-DD')  - TO_DATE(B."NextPayIntDate",'YYYY-MM-DD') 
+           ELSE 0 END                 AS "OvduDays"            -- '¹O´Á¤Ñ¼Æ';
+          ,L."CurrencyCode"           AS "CurrencyCode"        -- ¹ô§O
+          ,L."PrinBalance"            AS "PrinBalance"         -- ¥»ª÷¾lÃB
+          ,L."BadDebtBal"             AS "BadDebtBal"          -- §b±b¾lÃB
+          ,L."AccCollPsn"             AS "AccCollPsn"          -- ¶Ê¦¬­û
+          ,L."LegalPsn"               AS "LegalPsn"            -- ªk°È¤H­û
+          ,DECODE(L."Status", 4, 0, L."Status")
+                                      AS "Status"              -- ¤áªp
+          ,L."AcctCode"               AS "AcctCode"            -- ·~°È¬ì¥Ø¥N¸¹
+          ,L."FacAcctCode"            AS "FacAcctCode"         -- ÃB«×·~°È¬ì¥Ø
+          ,L."ClCustNo"               AS "ClCustNo"            -- ¦P¾á«O«~¤á¸¹
+          ,L."ClFacmNo"               AS "ClFacmNo"            -- ¦P¾á«O«~ÃB«×
+          ,L."ClRowNo"                AS "ClRowNo"             -- ¦P¾á«O«~§Ç¦C¸¹
+          ,L."RenewCode"              AS "RenewCode"           -- ®i´Á°O¸¹
+          ,FAC."ProdNo"               AS "ProdNo"              -- °Ó«~¥N½X
+          ,'000'                      AS "AcBookCode"          -- ±b¥U§O
+          , NULL                      AS "EntCode"             -- ¥øª÷§O
+          , NULL                      AS "RelsCode"            -- (·Ç)§Q®`Ãö«Y¤HÂ¾ºÙ
+          , NULL                      AS "DepartmentCode"      -- ®×¥óÁõÄİ³æ¦ì
+          , 0                         AS "UnpaidPrincipal"     -- ¤w¨ì´Á¦^¦¬¥»ª÷
+          , 0                         AS "UnpaidInterest"      -- ¤w¨ì´Á§Q®§
+          , 0                         AS "UnpaidBreachAmt"     -- ¤w¨ì´Á¹H¬ùª÷
+          , 0                         AS "UnpaidDelayInt"      -- ¤w¨ì´Á©µº¢®§
+          , 0                         AS "AcdrPrincipal"       -- ¥¼¨ì´Á¦^¦¬¥»ª÷
+          , 0                         AS "AcdrInterest"        -- ¥¼¨ì´Á§Q®§
+          , 0                         AS "AcdrBreachAmt"       -- ¥¼¨ì´Á¹H¬ùª÷
+          , 0                         AS "AcdrDelayInt"        -- ¥¼¨ì´Á©µº¢®§
+          , 0                         AS "FireFee"             -- ¤õÀI¶O¥Î DECIMAL 16 2
+          , 0                         AS "LawFee"              -- ªk°È¶O¥Î DECIMAL 16 2
+          , 0                         AS "ModifyFee"           -- «´ÅÜ¤âÄò¶O DECIMAL 16 2
+          , 0                         AS "AcctFee"             -- ±bºŞ¶O¥Î DECIMAL 16 2
+          , 0                         AS "ShortfallPrin"       -- µuÃº¥»ª÷ DECIMAL 16 2
+          , 0                         AS "ShortfallInt"        -- µuÃº§Q®§ DECIMAL 16 2
+          , 0                         AS "TempAmt"             -- ¼È¦¬ª÷ÃB DECIMAL 16 2
+          , 0                         AS "ClCode1"             -- ¥D­n¾á«O«~¥N¸¹1
+          , 0                         AS "ClCode2"             -- ¥D­n¾á«O«~¥N¸¹2
+          , 0                         AS "ClNo"                -- ¥D­n¾á«O«~½s¸¹
+          , NULL                      AS "CityCode"            -- ¥D­n¾á«O«~¦a°Ï§O 
+          , 0                         as "OvduDate"            -- Âà¶Ê¦¬¤é´Á
+          , 0                         AS "OvduPrinBal"         -- ¶Ê¦¬¥»ª÷¾lÃB           
+          , 0                         AS "OvduIntBal"          -- ¶Ê¦¬§Q®§¾lÃB           
+          , 0                         AS "OvduBreachBal"       -- ¶Ê¦¬¹H¬ùª÷¾lÃB          
+          , 0                         AS "OvduBal"             -- ¶Ê¦¬¾lÃB(§b±b¾lÃB)   
+          , 0                         AS "LawAmount"           -- µL¾á«O¶ÅÅv³]©wª÷ÃB(ªk°È¶i«×:901)
+          , ''                        AS "AssetClass"          -- ¸ê²£¤­¤ÀÃş¥N¸¹
+          , 0                         AS "StoreRate"           -- ­p®§§Q²v
+          ,JOB_START_TIME             AS "CreateDate"          -- «ØÀÉ¤é´Á®É¶¡
+          ,EmpNo                      AS "CreateEmpNo"         -- «ØÀÉ¤H­û
+          ,JOB_START_TIME             AS "LastUpdate"          -- ³Ì«á§ó·s¤é´Á®É¶¡
+          ,EmpNo                      AS "LastUpdateEmpNo"     -- ³Ì«á§ó·s¤H­û
+          ,'00A'                      AS "AcSubBookCode"       -- °Ï¹j±b¥U
+          ,''                         AS "LawAssetClass"       -- µL¾á«O¸ê²£¤ÀÃş¥N¸¹
+          ,''                         AS "AssetClass2"       -- ¸ê²£¤­¤ÀÃş¥N¸¹2(¦³¾á«O³¡¤À)
+          ,''                         AS "BankRelationFlag"       -- ¬O§_¬°§Q®`Ãö«Y¤H
+          ,''                      AS "GovProjectFlag"       -- ¬Fµ¦©Ê±M®×¶U´Ú
+          ,''                      AS "BuildingFlag"       -- «Ø¿v¶U´Ú°O¸¹
+          ,''                      AS "SpecialAssetFlag"       -- ¯S©w¸ê²£°O¸¹
+    FROM "CollList" L
+    LEFT JOIN "FacMain" FAC ON FAC."CustNo" = L."CustNo"
+                           AND FAC."FacmNo" = L."FacmNo"
+    LEFT JOIN (
+      SELECT "CustNo" -- '¤á¸¹'
+           , "FacmNo" -- 'ÃB«×'
+           , MIN(CASE
+                   WHEN "Status" IN (3,5,6,8,9)
+                   THEN  99999999
+                 ELSE "NextPayIntDate" END
+                ) AS "NextPayIntDate" -- 'À³Ãº®§¤é'
+           , MAX("MaturityDate") AS "MaturityDate"
+           -- ³ÌªñÀ³Ãº¤é:¤w¨ì´Á¤S¹O´Á®É,¨Ï¥Î¤ë©³¤é¾ä¤é
+           , MAX(CASE WHEN "Status" > 0 THEN 0
+                      WHEN "MaturityDate" <=  "ThisMonthEndDate" THEN "ThisMonthEndDate" 
+                      WHEN "SpecificDd" = 0  THEN "MaturityDate"
+                      WHEN "SpecificDd" > MOD("ThisMonthEndDate", 100) THEN "ThisMonthEndDate" 
+                      ELSE (TRUNC("ThisMonthEndDate"  / 100) * 100) + "SpecificDd"
+                 END) AS "DueDate"   --'³ÌªñÀ³Ãº¤é'                   
+         FROM "LoanBorMain"
+      WHERE "Status" in (0,2,3,4,5,6,7,8,9)
+        AND "DrawdownDate" <= TBSDYF
+      GROUP BY "CustNo"
+             , "FacmNo"
+    ) B ON B."CustNo" = L."CustNo"
+       AND B."FacmNo" = L."FacmNo"
+    WHERE L."CaseCode" = 1
     ;
 
     INS_CNT := INS_CNT + sql%rowcount;
-    -- è¨˜éŒ„ç¨‹å¼çµæŸæ™‚é–“
+
+--   §ó·s AcBookCode ±b¥U§O
+
+    DBMS_OUTPUT.PUT_LINE('UPDATE AcSubBookCode ');
+
+    MERGE INTO "MonthlyFacBal" M
+    USING (SELECT M."CustNo"
+                , M."FacmNo"
+                , MAX(NVL(A."AcSubBookCode",'00A')) AS "AcSubBookCode" 
+            FROM "MonthlyFacBal" M
+           LEFT JOIN "AcReceivable" A
+            ON  A."AcctCode" = M."AcctCode"
+            AND A."CustNo"   = M."CustNo"
+            AND A."FacmNo"   = M."FacmNo"
+           WHERE M."YearMonth" = YYYYMM
+           GROUP BY M."CustNo", M."FacmNo") B
+    ON (    M."YearMonth" = YYYYMM
+        AND M."CustNo"    = B."CustNo"
+        AND M."FacmNo"    = B."FacmNo")
+    WHEN MATCHED THEN UPDATE SET M."AcSubBookCode" = B."AcSubBookCode";
+
+    UPD_CNT := UPD_CNT + sql%rowcount;
+
+    DBMS_OUTPUT.PUT_LINE('UPDATE AcBookCode END');
+
+--   §ó·s EntCode  ¥øª÷§O, RelsCode (·Ç)§Q®`Ãö«Y¤HÂ¾ºÙ
+
+    DBMS_OUTPUT.PUT_LINE('UPDATE EntCode, RelsCode ');
+
+    MERGE INTO "MonthlyFacBal" M
+    USING (SELECT M."CustNo"
+                , M."FacmNo"
+                , C."EntCode"
+                -- , R."RelsCode"
+            FROM "MonthlyFacBal" M
+            LEFT JOIN "CustMain" C ON C."CustNo" = M."CustNo"
+            -- LEFT JOIN "RelsMain" R ON R."RelsId" = C."CustId"
+            WHERE M."YearMonth" = YYYYMM
+          ) C
+     ON (   M."YearMonth" = YYYYMM
+        AND M."CustNo"    = C."CustNo"
+        AND M."FacmNo"    = C."FacmNo")
+    WHEN MATCHED THEN UPDATE 
+    SET M."EntCode" = C."EntCode"
+      -- , M."RelsCode" = C."RelsCode"
+    ;
+
+    UPD_CNT := UPD_CNT + sql%rowcount;
+
+    DBMS_OUTPUT.PUT_LINE('UPDATE EntCode, RelsCode END');
+
+--   §ó·s DepartmentCode	®×¥óÁõÄİ³æ¦ì
+
+    DBMS_OUTPUT.PUT_LINE('UPDATE DepartmentCode ');
+
+    MERGE INTO "MonthlyFacBal" M
+    USING (SELECT "CustNo"
+                , "FacmNo"
+                , "DepartmentCode"
+           FROM "FacMain"
+          ) F
+     ON (   M."YearMonth" = YYYYMM
+         AND M."CustNo"    = F."CustNo"
+         AND M."FacmNo"    = F."FacmNo"
+         AND F."DepartmentCode" IS NOT NULL
+        )
+    WHEN MATCHED THEN UPDATE
+    SET M."DepartmentCode" = F."DepartmentCode";
+
+    UPD_CNT := UPD_CNT + sql%rowcount;
+
+    DBMS_OUTPUT.PUT_LINE('UPDATE DepartmentCode END');
+
+
+--   §ó·s UnpaidPrincipal ¤w¨ì´Á¦^¦¬¥»ª÷
+
+    DBMS_OUTPUT.PUT_LINE('UPDATE UnpaidPrincipal ');
+
+    MERGE INTO "MonthlyFacBal" M
+    USING ( SELECT "CustNo", "FacmNo"
+                 , NVL(SUM(F1), 0) F1
+                 , NVL(SUM(F2), 0) F2
+                 , NVL(SUM(F3), 0) F3
+                 , NVL(SUM(F4), 0) F4
+                 , NVL(SUM(F5), 0) F5
+                 , NVL(SUM(F6), 0) F6
+                 , NVL(SUM(F7), 0) F7
+                 , NVL(SUM(F8), 0) F8 
+            FROM (
+                    SELECT M."CustNo", M."FacmNo",
+                      CASE WHEN I."PayIntDate" <=  TBSDYF THEN I."Principal"
+                          ELSE 0 END  F1,
+                      CASE WHEN I."PayIntDate" <=  TBSDYF THEN I."Interest"
+                          ELSE 0 END  F2,
+                      CASE WHEN I."PayIntDate" <=  TBSDYF THEN I."BreachAmt"
+                          ELSE 0 END  F3,
+                      CASE WHEN I."PayIntDate" <=  TBSDYF THEN I."DelayInt"
+                          ELSE 0 END  F4,
+                      CASE WHEN I."PayIntDate" <=  TBSDYF THEN 0
+                          ELSE I."Principal" END  F5,
+                      CASE WHEN I."PayIntDate" <=  TBSDYF THEN 0
+                          ELSE I."Interest" END  F6,
+                      CASE WHEN I."PayIntDate" <=  TBSDYF THEN 0
+                          ELSE I."BreachAmt" END  F7,
+                      CASE WHEN I."PayIntDate" <=  TBSDYF THEN 0
+                          ELSE I."DelayInt" END  F8
+                        FROM "MonthlyFacBal" M
+                        LEFT JOIN "AcLoanInt" I
+                          ON  I."YearMonth" = YYYYMM
+                          AND I."CustNo"    = M."CustNo"
+                          AND I."FacmNo"    = M."FacmNo"
+                        WHERE M."YearMonth" = YYYYMM
+                 )
+            GROUP BY "CustNo", "FacmNo" ) I
+     ON (   M."YearMonth" = YYYYMM
+        AND M."CustNo"    = I."CustNo"
+        AND M."FacmNo"    = I."FacmNo")
+    WHEN MATCHED THEN UPDATE SET M."UnpaidPrincipal" = I."F1",
+                                 M."UnpaidInterest"  = I."F2",
+                                 M."UnpaidBreachAmt" = I."F3",
+                                 M."UnpaidDelayInt"  = I."F4",
+                                 M."AcdrPrincipal"   = I."F5",
+                                 M."AcdrInterest"    = I."F6",
+                                 M."AcdrBreachAmt"   = I."F7",
+                                 M."AcdrDelayInt"    = I."F8";
+
+    UPD_CNT := UPD_CNT + sql%rowcount;
+
+    DBMS_OUTPUT.PUT_LINE('UPDATE UnpaidPrincipal END');
+
+--   §ó·s FeeAmt ¶O¥Î
+
+    DBMS_OUTPUT.PUT_LINE('UPDATE FeeAmt ');
+
+    -- 2021-02-19 §ó·s ¶·°t¦X·s¼WÄæ¦ì
+    MERGE INTO "MonthlyFacBal" M
+    USING ( SELECT "CustNo"
+                  ,"FacmNo"
+                  ,NVL(SUM("FireFee"), 0)       AS "FireFee"
+                  ,NVL(SUM("LawFee"), 0)        AS "LawFee"
+                  ,NVL(SUM("ModifyFee"), 0)     AS "ModifyFee"
+                  ,NVL(SUM("AcctFee"), 0)       AS "AcctFee"
+                  ,NVL(SUM("ShortfallPrin"), 0) AS "ShortfallPrin"
+                  ,NVL(SUM("ShortfallInt"), 0)  AS "ShortfallInt"
+                  ,NVL(SUM("TempAmt"), 0)       AS "TempAmt"
+            FROM ( SELECT M."CustNo"
+                         ,M."FacmNo"
+                         ,CASE
+                            WHEN A."AcctCode" IN ('TMI')
+                            THEN A."RvBal"
+                            WHEN A."AcctCode" IN ('F09', 'F25')
+                            THEN A."RvBal"
+                            WHEN IR."CustNo" IS NOT NULL
+                            THEN IR."TotInsuPrem"
+                          ELSE 0 END AS "FireFee" -- ¤õÀI¶O¥Î
+                         ,CASE
+                            WHEN A."AcctCode" IN ('F07', 'F24')
+                            THEN A."RvBal"
+                          ELSE 0 END AS "LawFee" -- ªk°È¶O¥Î
+                         ,CASE
+                            WHEN A."AcctCode" IN ('F29')
+                            THEN A."RvBal"
+                          ELSE 0 END AS "ModifyFee" -- «´ÅÜ¤âÄò¶O
+                         ,CASE
+                            WHEN A."AcctCode" IN ('F10')
+                            THEN A."RvBal"
+                          ELSE 0 END AS "AcctFee" -- ±bºŞ¶O¥Î
+                         ,CASE
+                            WHEN SUBSTR(A."AcctCode",0,1) IN ('Z')
+                            THEN A."RvBal"
+                          ELSE 0 END AS "ShortfallPrin" -- µuÃº¥»ª÷
+                         ,CASE
+                            WHEN SUBSTR(A."AcctCode",0,1) IN ('I')
+                            THEN A."RvBal"
+                          ELSE 0 END AS "ShortfallInt" -- µuÃº§Q®§
+                         ,CASE
+                            WHEN A."AcctCode" = 'TAV'
+                            THEN A."RvBal"
+                          ELSE 0 END AS "TempAmt" -- ¼È¦¬ª÷ÃB
+                   FROM "MonthlyFacBal" M
+                   LEFT JOIN "AcReceivable" A ON A."CustNo" = M."CustNo"
+                                             AND A."FacmNo" = M."FacmNo"
+                   LEFT JOIN "InsuRenew" IR ON IR."CustNo" = A."CustNo"
+                                           AND IR."FacmNo" = A."FacmNo"
+                                           AND IR."PrevInsuNo" = A."RvNo"                
+                   WHERE M."YearMonth" = YYYYMM
+                     AND (A."AcctCode" IN ('F10','F29','TMI', 'F09', 'F25', 'F07', 'F24','TAV')
+                          OR SUBSTR(A."AcctCode",0,1) IN ('I','Z'))
+            )
+            GROUP BY "CustNo", "FacmNo" 
+          ) D
+     ON (   M."YearMonth" = YYYYMM
+        AND M."CustNo"    = D."CustNo"
+        AND M."FacmNo"    = D."FacmNo")
+    WHEN MATCHED THEN UPDATE
+    SET M."FireFee"       = D."FireFee"
+       ,M."LawFee"        = D."LawFee"
+       ,M."ModifyFee"     = D."ModifyFee"
+       ,M."AcctFee"       = D."AcctFee"
+       ,M."ShortfallPrin" = D."ShortfallPrin"
+       ,M."ShortfallInt"  = D."ShortfallInt"
+       ,M."TempAmt"       = D."TempAmt"
+    ;
+
+    UPD_CNT := UPD_CNT + sql%rowcount;
+
+    DBMS_OUTPUT.PUT_LINE('UPDATE FeeAmt END');
+
+--   §ó·s ClCode1	¾á«O«~¥N¸¹1
+
+    DBMS_OUTPUT.PUT_LINE('UPDATE ClCode1 ');
+
+    MERGE INTO "MonthlyFacBal" M1
+    USING (SELECT M."YearMonth"
+                 ,M."CustNo"
+                 ,M."FacmNo"
+                 ,MAX(NVL(F."ClCode1",0))     AS "ClCode1"
+                 ,MAX(NVL(F."ClCode2",0))     AS "ClCode2"
+                 ,MAX(NVL(F."ClNo",0))        AS "ClNo"
+                 ,MAX(NVL(Cl."CityCode",' ')) AS "CityCode"
+            FROM "MonthlyFacBal" M
+            LEFT JOIN "ClFac" F ON F."CustNo" = M."CustNo"
+                               AND F."FacmNo" = M."FacmNo"
+                               AND F."MainFlag" = 'Y'
+            LEFT JOIN "ClMain" Cl ON Cl."ClCode1" = F."ClCode1"
+                                 AND Cl."ClCode2" = F."ClCode2"
+                                 AND Cl."ClNo"    = F."ClNo"
+                                 AND NVL(F."ClNo",0) > 0 
+            WHERE M."YearMonth" = YYYYMM
+              AND (F."ClCode1" IN (3,4,5) OR NVL(Cl."CityCode",' ') <> ' ')
+            GROUP BY  M."YearMonth"
+                     ,M."CustNo"
+                     ,M."FacmNo"          
+           ) F1
+     ON (   M1."YearMonth" = F1."YearMonth"
+        AND M1."CustNo"    = F1."CustNo"
+        AND M1."FacmNo"    = F1."FacmNo")
+    WHEN MATCHED THEN UPDATE SET M1."ClCode1"  = F1."ClCode1"
+                                ,M1."ClCode2"  = F1."ClCode2"
+                                ,M1."ClNo"     = F1."ClNo"
+                                ,M1."CityCode" = F1."CityCode";
+
+    UPD_CNT := UPD_CNT + sql%rowcount;
+
+    DBMS_OUTPUT.PUT_LINE('UPDATE ClCode1 END');
+
+--   §ó·s OvduPrinBal	¶Ê¦¬¥»ª÷¾lÃB
+
+    DBMS_OUTPUT.PUT_LINE('UPDATE OvduPrinBal ');
+
+    MERGE INTO "MonthlyFacBal" M
+    USING ( SELECT M."YearMonth"
+                  ,M."CustNo"
+                  ,M."FacmNo"
+                  ,MIN(NVL(O."OvduDate",99991231)) AS "OvduDate"
+                  ,SUM(NVL(O."OvduPrinAmt",0))   AS "UnpaidPrincipal" 
+                  ,SUM(NVL(O."OvduIntAmt",0))    AS "UnpaidInterest"
+                  ,SUM(NVL(O."OvduBreachAmt",0)) AS "UnpaidBreachAmt"
+                  ,SUM(NVL(O."OvduPrinBal",0))   AS "OvduPrinBal" 
+                  ,SUM(NVL(O."OvduIntBal",0))    AS "OvduIntBal"
+                  ,SUM(NVL(O."OvduBreachBal",0)) AS "OvduBreachBal"
+                  ,SUM(NVL(O."OvduBal",0))       AS "OvduBal"
+              FROM "MonthlyFacBal" M  
+             LEFT JOIN "LoanBorMain" L ON L."CustNo" = M."CustNo" 
+                                      AND L."FacmNo" = M."FacmNo" 
+             LEFT JOIN "LoanOverdue" O ON  O."CustNo" = L."CustNo" 
+                                      AND O."FacmNo" = L."FacmNo"
+                                      AND O."BormNo" = L."BormNo" 
+                                      AND O."OvduNo" = L."LastOvduNo"
+             WHERE M."YearMonth" = YYYYMM 
+               AND L."Status" IN (2, 7) 
+               AND O."Status" IN (1, 2) 
+             GROUP BY M."YearMonth",M."CustNo", M."FacmNo"
+          ) O
+     ON (   M."YearMonth" = O."YearMonth"
+        AND M."CustNo"    = O."CustNo"
+        AND M."FacmNo"    = O."FacmNo")
+    WHEN MATCHED THEN UPDATE SET M."UnpaidPrincipal" = O."UnpaidPrincipal",
+                                 M."UnpaidInterest"  = O."UnpaidInterest",
+                                 M."UnpaidBreachAmt" = O."UnpaidBreachAmt",
+                                 M."OvduPrinBal"     = O."OvduPrinBal",
+                                 M."OvduIntBal"      = O."OvduIntBal",
+                                 M."OvduBreachBal"   = O."OvduBreachBal",
+                                 M."OvduBal"         = O."OvduBal",
+                                 M."OvduDate"        = CASE
+                                                         WHEN O."OvduDate" = 99991231
+                                                         THEN M."OvduDate"
+                                                       ELSE O."OvduDate" END
+                                 ;
+
+    UPD_CNT := UPD_CNT + sql%rowcount;    
+
+--   §ó·s StoreRate ­p®§§Q²v
+
+    DBMS_OUTPUT.PUT_LINE('UPDATE StoreRate ');
+
+    MERGE INTO "MonthlyFacBal" M
+    USING (SELECT M."CustNo", M."FacmNo"
+                , NVL(MIN(L."StoreRate"), 0) "StoreRate" 
+            FROM "MonthlyFacBal" M
+           LEFT JOIN "MonthlyLoanBal" L
+            ON  L."YearMonth" = YYYYMM 
+            AND L."CustNo"   = M."CustNo"
+            AND L."FacmNo"   = M."FacmNo"
+           WHERE M."YearMonth" = YYYYMM
+           GROUP BY M."CustNo", M."FacmNo") B
+    ON (    M."YearMonth" = YYYYMM
+        AND M."CustNo"    = B."CustNo"
+        AND M."FacmNo"    = B."FacmNo")
+    WHEN MATCHED THEN UPDATE SET M."StoreRate" = B."StoreRate";
+
+    UPD_CNT := UPD_CNT + sql%rowcount;
+
+    DBMS_OUTPUT.PUT_LINE('UPDATE StoreRate END');
+
+--  §ó·s  µL¾á«O¶ÅÅv³]©wª÷ÃB(ªk°È¶i«×:901)
+    DBMS_OUTPUT.PUT_LINE('UPDATE LawAmount');
+
+    MERGE INTO "MonthlyFacBal" M
+    USING (SELECT L."CustNo"
+                 ,L."FacmNo"
+                 ,L."Amount"
+           FROM (
+                 SELECT "CustNo"
+                       ,"FacmNo"
+                       ,"LegalProg"
+                       ,"Amount"
+                       ,ROW_NUMBER() OVER (PARTITION BY "CustNo", "FacmNo" 
+                                           ORDER BY "RecordDate" DESC, "LastUpdate" DESC
+                                          ) AS SEQ
+                 FROM "CollLaw"  
+                 WHERE "CaseCode"  = '1'   
+                   AND "LegalProg" = '901' 
+                 ) L
+           WHERE L.SEQ   =  1) D
+     ON (   M."CustNo"    =  D."CustNo"
+        AND M."FacmNo"    =  D."FacmNo")
+    WHEN MATCHED THEN UPDATE 
+      SET M."LawAmount"   =  D."Amount"
+        , M."LawAssetClass"   =  '5'
+    ;
+
+    UPD_CNT := UPD_CNT + sql%rowcount;
+
+    DBMS_OUTPUT.PUT_LINE('UPDATE LawAmount END');
+
+--  §ó·s  ¸ê²£¤­¤ÀÃş(«D1Ãş)
+    DBMS_OUTPUT.PUT_LINE('UPDATE AssetClass1');
+
+    MERGE INTO "MonthlyFacBal" M
+    USING (
+      SELECT M."YearMonth"
+           , M."CustNo"
+           , M."FacmNo" 
+           , CASE
+               WHEN M."PrinBalance" = 1
+                AND M."AcctCode" = '990'
+               THEN '5'        --(5)²Ä¤­Ãş-¦¬¦^µL±æ(À³¬°ªk°È¶i«×901¡A²{¼È¥H¾lÃB±¾1¬°²Ä¤­Ãş)
+                               --   µL¾á«O³¡¤À--¶W¹L²MÀv´Á12¤ëªÌ
+                               --   ©Î©ç­q³f©ç½æµL¹ê¯q¤§·l¥¢ªÌ
+                               --   ©Î©ñ´Ú¸ê²£¸gµû¦ôµLªk¦^¦¬ªÌ    
+               WHEN M."ProdNo" IN ('60','61','62')
+                AND M."OvduTerm" > 12
+               THEN '3'         --(23)²Ä¤TÃş-¥i±æ¦¬¦^¡G
+                                --    ¨óÄ³¥ó¦³¨¬ÃB¾á«O--¹OÃº¶W¹L²MÀv´Á12¤ëªÌ     
+
+               WHEN M."ProdNo" IN ('60','61','62')
+               THEN '2'        --(23)²Ä¤GÃş-À³¤©ª`·N¡G
+                               --    ¨óÄ³¥ó
+                               --    ¨óÄ³¥óÂà¶Ê¦¬«á¦pÃº®§¤£¥¿±`¥Ñ¤H¤u­×¥¿«áL7205¤W¶Ç§ó·s
+               WHEN M."AcctCode" = '990'
+                AND M."OvduTerm" > 12
+               THEN '3'        --(3)²Ä¤TÃş-¥i±æ¦¬¦^¡G
+                               --   ¦³¨¬ÃB¾á«O--¹OÃº¶W¹L²MÀv´Á12¤ëªÌ
+                               --   ©ÎµL¾á«O³¡¤À--¶W¹L²MÀv´Á3-6¤ëªÌ                         
+               WHEN M."AcctCode" = '990'
+               THEN '2'       --(23)²Ä¤GÃş-À³¤©ª`·N¡G
+                               --    ¦³¨¬ÃB¾á«O--¹OÃº¶W¹L²MÀv´Á7-12¤ëªÌ
+                               --    ©ÎµL¾á«O³¡¤À--¶W¹L²MÀv´Á1-3¤ëªÌ
+               WHEN M."OvduTerm" >= 7
+                AND M."OvduTerm" <= 12
+               THEN '2'       --(23)²Ä¤GÃş-À³¤©ª`·N¡G
+                               --    ¦³¨¬ÃB¾á«O--¹OÃº¶W¹L²MÀv´Á7-12¤ëªÌ
+                               --    ©ÎµL¾á«O³¡¤À--¶W¹L²MÀv´Á1-3¤ëªÌ    
+               WHEN M."OvduTerm" >= 1
+                AND M."OvduTerm" <= 6
+               THEN '2'       --(22)²Ä¤GÃş-À³¤©ª`·N¡G
+                               --    ¦³¨¬ÃB¾á«O--¹OÃº¶W¹L²MÀv´Á1-6¤ëªÌ
+               ELSE '1'       -- ¥¿±`Ãº®§
+             END                  AS "AssetClass"	--©ñ´Ú¸ê²£¶µ¥Ø	  
+      FROM "MonthlyFacBal" M
+      LEFT JOIN "FacMain" F ON F."CustNo" = M."CustNo"
+                            AND F."FacmNo" = M."FacmNo"
+      LEFT JOIN "CustMain" CM ON CM."CustNo" = M."CustNo"
+      LEFT JOIN ( SELECT DISTINCT SUBSTR("IndustryCode",3,4) AS "IndustryCode"
+                        ,"IndustryItem"
+                  FROM "CdIndustry" ) CDI ON CDI."IndustryCode" = SUBSTR(CM."IndustryCode",3,4)
+      WHERE M."PrinBalance" > 0 
+        AND M."YearMonth" = YYYYMM
+    ) TMP
+    ON (
+      TMP."YearMonth" = M."YearMonth"
+      AND TMP."CustNo" = M."CustNo"
+      AND TMP."FacmNo" = M."FacmNo"
+    )
+    WHEN MATCHED THEN UPDATE SET
+    "AssetClass" = TMP."AssetClass"
+    ;
+    
+    UPD_CNT := UPD_CNT + sql%rowcount;
+
+    DBMS_OUTPUT.PUT_LINE('UPDATE AssetClass1 END');
+
+    DBMS_OUTPUT.PUT_LINE('UPDATE AssetClass2 START');
+
+    MERGE INTO "MonthlyFacBal" M
+    USING (
+      SELECT M."YearMonth"
+           , M."CustNo"
+           , M."FacmNo" 
+           ,  CASE
+                WHEN M."AssetClass" = 2
+                THEN 
+                  CASE  WHEN M."AcctCode" = '990'
+                      THEN '23'       --(23)²Ä¤GÃş-À³¤©ª`·N¡G
+                                      --    ¦³¨¬µL¾á«O--¹OÃº¶W¹L²MÀv´Á7-12¤ëªÌ
+                                      --    ©ÎµL¾á«O³¡¤À--¶W¹L²MÀv´Á1-3¤ëªÌ        
+                      WHEN M."ProdNo" IN ('60','61','62')
+                      THEN '21'       --(21)²Ä¤GÃş-À³¤©ª`·N¡G
+                                      --    ¦³¨¬ÃB¾á«O--¦ı¶Å«H¥H¤£¨}ªÌ
+                                      --    (¦³¾á«O¤À´Á¨óÄ³¥B¥¿±`ÁÙ´ÚªÌ)
+                      ELSE '22'       --(22)²Ä¤GÃş-À³¤©ª`·N¡G
+                                      --    ¦³¨¬µL¾á«O--¹OÃº¶W¹L²MÀv´Á1-6¤ëªÌ
+                  END
+                WHEN  M."AssetClass" = 1
+                THEN CASE
+                    WHEN M."ClCode1" IN (1,2) 
+                      AND CDI."IndustryItem" LIKE '%¤£°Ê²£%'
+                    THEN '12'              -- ¯S©w¸ê²£©ñ´Ú¡G«Ø¿v¶U´Ú
+                    WHEN M."ClCode1" IN (1,2) 
+                      AND CDI."IndustryItem" LIKE '%«Ø¿v%'
+                    THEN '12'              -- ¯S©w¸ê²£©ñ´Ú¡G«Ø¿v¶U´Ú
+                    WHEN M."ClCode1" IN (1,2) 
+                      AND F."FirstDrawdownDate" >= 20100101 
+                      AND M."FacAcctCode" = 340
+                    THEN '11'               -- ¥¿±`Ãº®§
+                    WHEN M."ClCode1" IN (1,2) 
+                      AND F."FirstDrawdownDate" >= 20100101 
+                      AND REGEXP_LIKE(M."ProdNo",'I[A-Z]')
+                    THEN '11'               -- ¥¿±`Ãº®§
+                    WHEN M."ClCode1" IN (1,2) 
+                      AND F."FirstDrawdownDate" >= 20100101 
+                      AND REGEXP_LIKE(M."ProdNo",'8[1-8]')
+                    THEN '11'               -- ¥¿±`Ãº®§
+                    WHEN M."ClCode1" IN (1,2) 
+                      AND F."UsageCode" = '02' 
+                      AND TRUNC(M."PrevIntDate" / 100) >= LYYYYMM
+                    THEN '12'       -- ¯S©w¸ê²£©ñ´Ú¡GÁÊ¸m¦í¦v+­×Âµ¶U´Ú              
+                    ELSE '11'       
+                    END
+              ELSE "AssetClass"
+              END                  AS "AssetClass2"	--¸ê²£¤ÀÃş2	  
+      FROM "MonthlyFacBal" M
+      LEFT JOIN "FacMain" F ON F."CustNo" = M."CustNo"
+                            AND F."FacmNo" = M."FacmNo"
+      LEFT JOIN "CustMain" CM ON CM."CustNo" = M."CustNo"
+      LEFT JOIN ( SELECT DISTINCT SUBSTR("IndustryCode",3,4) AS "IndustryCode"
+                        ,"IndustryItem"
+                  FROM "CdIndustry" ) CDI ON CDI."IndustryCode" = SUBSTR(CM."IndustryCode",3,4)
+      WHERE M."PrinBalance" > 0 
+        AND M."YearMonth" = YYYYMM
+    ) TMP
+    ON (
+      TMP."YearMonth" = M."YearMonth"
+      AND TMP."CustNo" = M."CustNo"
+      AND TMP."FacmNo" = M."FacmNo"
+    )
+    WHEN MATCHED THEN UPDATE SET
+    "AssetClass2" = TMP."AssetClass2"
+    ;
+   
+    UPD_CNT := UPD_CNT + sql%rowcount;
+
+    DBMS_OUTPUT.PUT_LINE('UPDATE AssetClass2 END');
+
+    COMMIT;
+    -- °O¿ıµ{¦¡µ²§ô®É¶¡
     JOB_END_TIME := SYSTIMESTAMP;
 
-    commit;
-
-    -- ä¾‹å¤–è™•ç†
+    -- ¨Ò¥~³B²z
     Exception
     WHEN OTHERS THEN
     "Usp_L9_UspErrorLog_Ins"(
-        'Usp_L9_MonthlyLM052LoanAsset_Ins' -- UspName é å­˜ç¨‹åºåç¨±
-      , SQLCODE -- Sql Error Code (å›ºå®šå€¼)
-      , SQLERRM -- Sql Error Message (å›ºå®šå€¼)
-      , dbms_utility.format_error_backtrace -- Sql Error Trace (å›ºå®šå€¼)
-      , EmpNo -- ç™¼å‹•é å­˜ç¨‹åºçš„å“¡å·¥ç·¨è™Ÿ
-      , JobTxSeq -- å•Ÿå‹•æ‰¹æ¬¡çš„äº¤æ˜“åºè™Ÿ
+        'Usp_L9_MonthlyFacBal_Upd' -- UspName ¹w¦sµ{§Ç¦WºÙ
+      , SQLCODE -- Sql Error Code (©T©w­È)
+      , SQLERRM -- Sql Error Message (©T©w­È)
+      , dbms_utility.format_error_backtrace -- Sql Error Trace (©T©w­È)
+      , EmpNo -- µo°Ê¹w¦sµ{§Çªº­û¤u½s¸¹
+      , JobTxSeq -- ±Ò°Ê§å¦¸ªº¥æ©ö§Ç¸¹
     );
-    COMMIT; 
-    RAISE; 
+    COMMIT;
+    RAISE;
   END;
 END;
-
-

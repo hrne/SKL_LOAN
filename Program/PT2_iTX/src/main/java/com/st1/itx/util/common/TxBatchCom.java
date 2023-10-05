@@ -55,6 +55,7 @@ import com.st1.itx.db.service.NegMainService;
 import com.st1.itx.db.service.TxErrCodeService;
 import com.st1.itx.db.service.TxRecordService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -469,25 +470,39 @@ public class TxBatchCom extends TradeBuffer {
 		}
 
 		// ---- 執行債一般債權匯入款A7 債權撥付檔檢核 ------------------
-		// 如有MATCH到一般債權撥付檔,則顯示一般債權客戶戶號,若沒有,則顯示[不符一般債權撥付檔]
+		// 如有MATCH到一般債權撥付檔,則顯示一般債權客戶戶號
+		// 如有MATCH到最大債權撥付失敗匯回款,則顯示最大債權客戶戶號
+		// 若沒有,則顯示[不符一般債權撥付檔]
 		if ("A7".equals(tDetail.getReconCode())) {
 			List<AcDetail> lAcDetail = acNegCom.getNegAppr02CustNo(tDetail.getEntryDate(), tDetail.getRepayAmt(),
 					tDetail.getCustNo(), titaVo);
-			if (lAcDetail == null || lAcDetail.size() == 0) {
-				this.checkMsg += " 不符一般債權撥付檔";
-				this.repayType = 9; // 暫收
-				this.procStsCode = "4"; // 4.檢核正常
-			} else {
-				String custNoX = "";
+			if (lAcDetail.size() > 0) {
+				this.checkMsg += " 一般債權客戶戶號:";
 				for (AcDetail ac : lAcDetail) {
-					custNoX += " " + ac.getCustNo();
+					this.checkMsg += " " + ac.getCustNo();
 				}
-				this.checkMsg += " 一般債權客戶戶號:" + custNoX;
+			} else {
+				lAcDetail = acNegCom.getNegAppr01ReRemit(tDetail.getEntryDate(), tDetail.getRepayAmt(),
+						tDetail.getCustNo(), titaVo);
+				if (lAcDetail.size() > 0) {
+					this.checkMsg += " 最大債權撥付失敗匯回戶號:";
+					for (AcDetail ac : lAcDetail) {
+						if(ac.getDbCr().equals("D")) {//該戶整套帳只寫一筆
+							this.checkMsg += " " + ac.getCustNo();
+						}
+					}
+				} else {
+					this.checkMsg += " 非一般債權撥付";
+					this.repayType = 9; // 暫收
+					this.procStsCode = "4"; // 4.檢核正常
+				}
 			}
 		}
 
 		// --------------- 執行債協匯入款戶號檢核 ------------------
-		if ("0".equals(this.procStsCode) && this.repayType == 11) {
+		if ("0".equals(this.procStsCode) && this.repayType == 11)
+
+		{
 			if (acNegCom.isNegCustNo(tDetail.getCustNo(), titaVo)) {
 				this.procStsCode = "4"; // 4.檢核正常
 			} else {
@@ -2187,9 +2202,8 @@ public class TxBatchCom extends TradeBuffer {
 		baTxList = new ArrayList<BaTxVo>();
 		// call 應繳試算，試算至應繳，可預收(批次可預收期數)， 應繳日設定為入帳日
 		try {
-			baTxList = baTxCom.settleUnPaid(tDetail.getEntryDate(), payIntDate, tDetail.getCustNo(),
-					this.repayFacmNo, this.repayBormNo, tDetail.getRepayCode(), this.repayType, tDetail.getRepayAmt(),
-					tTempVo, titaVo);
+			baTxList = baTxCom.settleUnPaid(tDetail.getEntryDate(), payIntDate, tDetail.getCustNo(), this.repayFacmNo,
+					this.repayBormNo, tDetail.getRepayCode(), this.repayType, tDetail.getRepayAmt(), tTempVo, titaVo);
 		} catch (LogicException e) {
 			this.errorMsg = e.getMessage();
 			if (this.errorMsg.length() >= 5) {

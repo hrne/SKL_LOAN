@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -107,6 +110,53 @@ em = null;
 			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<NegFinAcct> newFinCodeEq(String newFinCode_0, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<NegFinAcct> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("newFinCodeEq " + dbName + " : " + "newFinCode_0 : " + newFinCode_0);
+    if (dbName.equals(ContentName.onDay))
+      slice = negFinAcctReposDay.findAllByNewFinCodeIsOrderByFinCodeAsc(newFinCode_0, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = negFinAcctReposMon.findAllByNewFinCodeIsOrderByFinCodeAsc(newFinCode_0, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = negFinAcctReposHist.findAllByNewFinCodeIsOrderByFinCodeAsc(newFinCode_0, pageable);
+    else 
+      slice = negFinAcctRepos.findAllByNewFinCodeIsOrderByFinCodeAsc(newFinCode_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public NegFinAcct mergerDateFirst(int mergerDate_0, int executeDate_1, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("mergerDateFirst " + dbName + " : " + "mergerDate_0 : " + mergerDate_0 + " executeDate_1 : " +  executeDate_1);
+    Optional<NegFinAcct> negFinAcctT = null;
+    if (dbName.equals(ContentName.onDay))
+      negFinAcctT = negFinAcctReposDay.findTopByMergerDateLessThanEqualAndExecuteDateIsOrderByFinCodeAsc(mergerDate_0, executeDate_1);
+    else if (dbName.equals(ContentName.onMon))
+      negFinAcctT = negFinAcctReposMon.findTopByMergerDateLessThanEqualAndExecuteDateIsOrderByFinCodeAsc(mergerDate_0, executeDate_1);
+    else if (dbName.equals(ContentName.onHist))
+      negFinAcctT = negFinAcctReposHist.findTopByMergerDateLessThanEqualAndExecuteDateIsOrderByFinCodeAsc(mergerDate_0, executeDate_1);
+    else 
+      negFinAcctT = negFinAcctRepos.findTopByMergerDateLessThanEqualAndExecuteDateIsOrderByFinCodeAsc(mergerDate_0, executeDate_1);
+
+    return negFinAcctT.isPresent() ? negFinAcctT.get() : null;
   }
 
   @Override

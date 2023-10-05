@@ -33,6 +33,7 @@ import com.st1.itx.util.common.AcPaymentCom;
 import com.st1.itx.util.common.AcRepayCom;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.LoanCom;
+import com.st1.itx.util.common.NegCom;
 import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
@@ -43,9 +44,15 @@ import com.st1.itx.util.parse.Parse;
  * 1.此功能供存入暫收款或存入期票時登錄用.
  * 2.暫收款登錄交易之支票繳款功能，增加支票用途欄，如：還本，期款…，使支票兌現時可自動入帳。
  * 3.支票繳款時需入到該戶的額度編號下(可多個額度)
- * 4.暫收原因為債協暫收款：
- * 4.1.依案件種類出帳：債協暫收款－收款專戶(601776戶號)、 債協暫收款－抵繳款 (債協)、前調暫收款－抵繳款 (調解)、更生暫收款－抵繳款  (更生,清算)
- * 4.2.專戶的匯入款，為一般債權人撥付款(一般債權撥付資料檔，提兌日 = 入帳日，金額相同)時，自動轉入該戶債協暫收款。                           
+ * 4.暫收原因為債協暫收款的入帳科目
+ * 4.1.客戶的匯入款
+ * 4.1.1.最大債權：轉入債協科目(債協暫收款、前調暫收款、更生暫收款)
+ * 4.1.2.一般債權：轉入暫收可抵繳
+ * 4.2.專戶(601776)的匯入款
+ * 4.2.1.一般債權撥付款(一般債權撥付資料檔，提兌日 = 入帳日，金額或總額相同)，轉入客戶的暫收可抵繳
+ * 4.2.2.最大債權撥付失敗匯回款(最大債權撥付資料檔，回應代碼為失敗，加總金額(提兌日+債權機構代號)相同)
+ *       轉入的專戶的債協科目(債協暫收款、前調暫收款、更生暫收款)，再轉出後入應付代收款
+ * 4.2.3.非一般債權人撥付款及最大債權撥付失敗匯回款，則入暫收可抵繳
  */
 
 /**
@@ -82,6 +89,8 @@ public class L3210 extends TradeBuffer {
 	AcPaymentCom acPaymentCom;
 	@Autowired
 	AcDetailCom acDetailCom;
+	@Autowired
+	public NegCom negCom;
 
 	private TitaVo titaVo;
 	private int iCustNo;
@@ -207,6 +216,7 @@ public class L3210 extends TradeBuffer {
 			for (LoanBorTx tx : lLoanBorTx) {
 				loanCom.checkEraseCustNoTxSeqNo(tx.getCustNo(), titaVo);// 檢查到同戶帳務交易需由最近一筆交易開始訂正
 				loanCom.setFacmBorTxHcode(tx.getCustNo(), tx.getFacmNo(), tx.getBorxNo(), titaVo);
+				this.tTempVo = this.tTempVo.getVo(tx.getOtherFields());
 			}
 		}
 
@@ -227,6 +237,12 @@ public class L3210 extends TradeBuffer {
 			} else {
 				acRepayCom.settleTempRun(this.lLoanBorTx, this.baTxList, this.lAcDetail, titaVo);
 			}
+		}
+		// 新增最大債權分攤檔
+		if ("最大債權撥付失敗匯回款".equals(this.tTempVo.getParam("SlipNote"))) {
+			negCom.updAppr01ReRemit(parse.stringToInteger(tTempVo.getParam("BringUpDate")), tTempVo.getParam("FinCode"),
+					iTempAmt, titaVo);
+
 		}
 
 		this.addList(this.totaVo);
@@ -294,12 +310,9 @@ public class L3210 extends TradeBuffer {
 	// 帳務處理
 	private void AcDetailRoutine() throws LogicException {
 		this.info("AcDetailRoutine ...");
-		// 貸方 暫收及待結轉帳項-擔保放款
 		switch (iTempReasonCode) {
 		case 0: // 債協暫收款
-			// 貸方 :最大債權 => 債協暫收款、一般債權 => 暫收可抵繳
-
-			/* 5.找債協專戶的匯入款，為一般債權人撥付款 */
+			// 一般債權人撥付款(一般債權撥付資料檔，提兌日 = 入帳日，金額或總額相同)，轉入客戶的暫收可抵繳
 			boolean havedata = false;
 			if (iCustNo == this.txBuffer.getSystemParas().getNegDeptCustNo()) {
 				List<AcDetail> lAcDetailApp02 = new ArrayList<AcDetail>();
@@ -308,14 +321,35 @@ public class L3210 extends TradeBuffer {
 					havedata = true;
 					lAcDetail.addAll(lAcDetailApp02);
 					acDetail = new AcDetail();
-					for (int i = 0; i < lAcDetailApp02.size(); i++) {
-						acDetail = lAcDetailApp02.get(i);
-						addLoanBorTxRoutine(acDetail);
-						this.info("SlipNote2 = " + acDetail.getSlipNote());
+					for (AcDetail ac : lAcDetailApp02) {
+						addLoanBorTxRoutine(ac);
 					}
 				}
 			}
-			if (!havedata) {// 專戶若找不到一般債權資料,則須出T10入暫收款
+			// 最大債權撥付失敗匯回款(最大債權撥付資料檔，回應代碼為失敗，加總金額(提兌日+債權機構代號)相同)
+			// 轉入的專戶的債協科目(債協暫收款、前調暫收款、更生暫收款)，再轉出後入應付代收款
+			if (!havedata && iCustNo == this.txBuffer.getSystemParas().getNegDeptCustNo()) {
+				List<AcDetail> lAcDetailApp01 = new ArrayList<AcDetail>();
+				lAcDetailApp01 = acNegCom.getNegAppr01ReRemit(iEntryDate, iTempAmt, iCustNo, titaVo);
+				if (lAcDetailApp01.size() > 0) {
+					havedata = true;
+					lAcDetail.addAll(lAcDetailApp01);
+					// 為寫 LoanBorTx 專戶一筆，不會寫入分錄
+					acDetail = new AcDetail();
+					acDetail.setDbCr("C");
+					acDetail.setAcctCode(lAcDetailApp01.get(0).getAcctCode());
+					acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
+					acDetail.setTxAmt(iTempAmt);
+					acDetail.setCustNo(iCustNo);
+					acDetail.setSlipNote("最大債權撥付失敗匯回款");
+					this.tTempVo=this.tTempVo.getVo(lAcDetailApp01.get(0).getJsonFields()); // BringUpDate 提兌日, FinCode 債權機構代號
+					this.tTempVo.putParam("SlipNote", "最大債權撥付失敗匯回款");
+					this.info("this.tTempVo="+this.tTempVo);
+					addLoanBorTxRoutine(acDetail);
+				}
+
+			}
+			if (!havedata) {
 				acDetail = new AcDetail();
 				String acctCode = acNegCom.getAcctCode(iCustNo, titaVo);
 				acDetail.setDbCr("C");
@@ -324,15 +358,17 @@ public class L3210 extends TradeBuffer {
 				acDetail.setTxAmt(iTempAmt);
 				acDetail.setCustNo(iCustNo);
 				if ("TAV".equals(acctCode)) {
+					// 專戶或一般債權客戶
 					TempVo tempVo = new TempVo();
 					tempVo = acNegCom.getReturnAcctCode(iCustNo, titaVo);
-					acDetail.setCustNo(parse.stringToInteger(tempVo.getParam("CustNo")));
-					acDetail.setFacmNo(parse.stringToInteger(tempVo.getParam("FacmNo")));
+					acDetail.setCustNo(parse.stringToInteger(tempVo.getParam("CustNo"))); // 實際借款人戶號
+					acDetail.setFacmNo(parse.stringToInteger(tempVo.getParam("FacmNo"))); // 實際借款人額度
 					acDetail.setSumNo("092"); // 轉暫收款可抵繳
 					if (iCustNo != this.txBuffer.getSystemParas().getNegDeptCustNo()) {
 						acDetail.setSlipNote("一般債權");
 					}
 				} else {
+					// 最大債權客戶
 					acDetail.setSumNo("094"); // 轉債協暫收款
 				}
 				lAcDetail.add(acDetail);
@@ -435,7 +471,8 @@ public class L3210 extends TradeBuffer {
 	// 新增放款交易內容檔
 	private void addLoanBorTxRoutine(AcDetail ac) throws LogicException {
 		this.info("addLoanBorTxRoutine ... ");
-		tTempVo.clear();
+		TempVo txTempVo = new TempVo();
+		txTempVo = txTempVo.getVo(this.tTempVo.getJsonString()); // 放入交易 TempVo
 		tLoanBorTx = new LoanBorTx();
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setFacmBorTx(tLoanBorTx, tLoanBorTxId, ac.getCustNo(), ac.getFacmNo(), titaVo);
@@ -485,9 +522,9 @@ public class L3210 extends TradeBuffer {
 		tLoanBorTx.setAcctCode(ac.getAcctCode()); // 業務科目
 
 		// 其他欄位
-		tTempVo.putParam("TempReasonCode", iTempReasonCode);
+		txTempVo.putParam("TempReasonCode", iTempReasonCode);
 
-		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
+		tLoanBorTx.setOtherFields(txTempVo.getJsonString());
 
 		this.lLoanBorTx.add(tLoanBorTx);
 		if (iTempReasonCode == 3 || iTempReasonCode == 6) {

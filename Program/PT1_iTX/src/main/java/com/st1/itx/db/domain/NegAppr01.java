@@ -48,7 +48,7 @@ public class NegAppr01 implements Serializable {
 
   // 戶號
   /* 保貸戶須建立客戶主檔 */
-  @Column(name = "`CustNo`")
+  @Column(name = "`CustNo`", insertable = false, updatable = false)
   private int custNo = 0;
 
   // 案件序號
@@ -106,7 +106,7 @@ public class NegAppr01 implements Serializable {
   private int apprAcDate = 0;
 
   // 回應代碼
-  /* 成功:4001,NULL */
+  /* 成功:4001(轉換資料有NULL) */
   @Column(name = "`ReplyCode`", length = 4)
   private String replyCode;
 
@@ -475,7 +475,7 @@ public class NegAppr01 implements Serializable {
 
 /**
 	* 回應代碼<br>
-	* 成功:4001,NULL
+	* 成功:4001(轉換資料有NULL)
 	* @return String
 	*/
   public String getReplyCode() {
@@ -484,7 +484,7 @@ public class NegAppr01 implements Serializable {
 
 /**
 	* 回應代碼<br>
-	* 成功:4001,NULL
+	* 成功:4001(轉換資料有NULL)
   *
   * @param replyCode 回應代碼
 	*/
@@ -590,7 +590,7 @@ public class NegAppr01 implements Serializable {
 
   @Override
   public String toString() {
-    return "NegAppr01 [negAppr01Id=" + negAppr01Id + ", custNo=" + custNo + ", caseSeq=" + caseSeq
+    return "NegAppr01 [negAppr01Id=" + negAppr01Id + ", caseSeq=" + caseSeq
            + ", caseKindCode=" + caseKindCode + ", apprAmt=" + apprAmt + ", accuApprAmt=" + accuApprAmt + ", amtRatio=" + amtRatio + ", exportDate=" + exportDate + ", apprDate=" + apprDate
            + ", bringUpDate=" + bringUpDate + ", remitBank=" + remitBank + ", remitAcct=" + remitAcct + ", dataSendUnit=" + dataSendUnit + ", apprAcDate=" + apprAcDate + ", replyCode=" + replyCode
            + ", batchTxtNo=" + batchTxtNo + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";

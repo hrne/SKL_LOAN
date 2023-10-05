@@ -69,8 +69,8 @@ public class LM055Report extends MakeReport {
 		makeExcel.open(titaVo, reportVo, fileName, defaultName, defaultSheetName);
 
 		makeExcel.setValue(2, 3, yearMonth);
-		Slice<MonthlyLM055AssetLoss> slMonthlyLM055AssetLoss = sLM055AssetLossService.findYearMonthAll(yearMonth,
-				0, Integer.MAX_VALUE, titaVo);
+		Slice<MonthlyLM055AssetLoss> slMonthlyLM055AssetLoss = sLM055AssetLossService.findYearMonthAll(yearMonth, 0,
+				Integer.MAX_VALUE, titaVo);
 		if (slMonthlyLM055AssetLoss == null) {
 			throw new LogicException(titaVo, "E0015", "需先執行 L7205-五類資產分類上傳轉檔作業 "); // 檢查錯誤
 		}
@@ -100,6 +100,9 @@ public class LM055Report extends MakeReport {
 			makeExcel.setValue(row, 17, r.getReserveLossAmt5(), "#,##0", "R");// 備呆金額五分類5
 			makeExcel.setValue(row, 18, r.getIFRS9AdjustAmt(), "#,##0", "R");// IFRS9增提金額(含應收利息)
 		}
+
+		// 重整合計公式F15~R15
+		makeExcel.formulaRangeCalculate(15, 15, 6, 18);
 
 	}
 

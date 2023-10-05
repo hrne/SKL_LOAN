@@ -36,14 +36,20 @@ public class NegAppr01Id implements Serializable {
   @Column(name = "`FinCode`", length = 10)
   private String finCode = " ";
 
+  // 戶號
+  /* 保貸戶須建立客戶主檔 */
+  @Column(name = "`CustNo`")
+  private int custNo = 0;
+
   public NegAppr01Id() {
   }
 
-  public NegAppr01Id(int acDate, String titaTlrNo, int titaTxtNo, String finCode) {
+  public NegAppr01Id(int acDate, String titaTlrNo, int titaTxtNo, String finCode, int custNo) {
     this.acDate = acDate;
     this.titaTlrNo = titaTlrNo;
     this.titaTxtNo = titaTxtNo;
     this.finCode = finCode;
+    this.custNo = custNo;
   }
 
 /**
@@ -122,10 +128,29 @@ public class NegAppr01Id implements Serializable {
     this.finCode = finCode;
   }
 
+/**
+	* 戶號<br>
+	* 保貸戶須建立客戶主檔
+	* @return Integer
+	*/
+  public int getCustNo() {
+    return this.custNo;
+  }
+
+/**
+	* 戶號<br>
+	* 保貸戶須建立客戶主檔
+  *
+  * @param custNo 戶號
+	*/
+  public void setCustNo(int custNo) {
+    this.custNo = custNo;
+  }
+
 
   @Override
   public int hashCode() {
-    return Objects.hash(acDate, titaTlrNo, titaTxtNo, finCode);
+    return Objects.hash(acDate, titaTlrNo, titaTxtNo, finCode, custNo);
   }
 
   @Override
@@ -135,11 +160,11 @@ public class NegAppr01Id implements Serializable {
     if(obj == null || getClass() != obj.getClass())
       return false;
     NegAppr01Id negAppr01Id = (NegAppr01Id) obj;
-    return acDate == negAppr01Id.acDate && titaTlrNo.equals(negAppr01Id.titaTlrNo) && titaTxtNo == negAppr01Id.titaTxtNo && finCode.equals(negAppr01Id.finCode);
+    return acDate == negAppr01Id.acDate && titaTlrNo.equals(negAppr01Id.titaTlrNo) && titaTxtNo == negAppr01Id.titaTxtNo && finCode.equals(negAppr01Id.finCode) && custNo == negAppr01Id.custNo;
   }
 
   @Override
   public String toString() {
-    return "NegAppr01Id [acDate=" + acDate + ", titaTlrNo=" + titaTlrNo + ", titaTxtNo=" + titaTxtNo + ", finCode=" + finCode + "]";
+    return "NegAppr01Id [acDate=" + acDate + ", titaTlrNo=" + titaTlrNo + ", titaTxtNo=" + titaTxtNo + ", finCode=" + finCode + ", custNo=" + custNo + "]";
   }
 }

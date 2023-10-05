@@ -15,13 +15,17 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
+import com.st1.itx.db.domain.LoanBorTx;
+import com.st1.itx.db.domain.LoanBorTxId;
 import com.st1.itx.db.domain.LoanOverdue;
 import com.st1.itx.db.domain.NegAppr01;
 import com.st1.itx.db.domain.NegAppr02;
 import com.st1.itx.db.domain.NegAppr02Id;
+import com.st1.itx.db.domain.NegFinShare;
 import com.st1.itx.db.domain.NegMain;
 import com.st1.itx.db.domain.NegTrans;
 import com.st1.itx.db.domain.NegTransId;
+import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.LoanOverdueService;
 import com.st1.itx.db.service.NegAppr02Service;
 import com.st1.itx.db.service.NegAppr01Service;
@@ -41,6 +45,7 @@ import com.st1.itx.util.parse.Parse;
  * 4.ApprAcctCode 以戶號取得債協應付代收款科目call by LXXXX<BR>
  * 5.isNegCustNo 是否為債協暫收款帳戶 call by call by LXXXX <BR>
  * 6.getNegAppr02CustNo 找債協專戶的匯入款，為一般債權匯入款的戶號 call by L3210暫收入帳 <BR>
+ * 7.getNegAppr01CustNo 找債協專戶的匯入款，為最大債權匯入款的戶號 call by L3210暫收入帳 <BR>
  * 
  * @author st1
  *
@@ -57,16 +62,22 @@ public class AcNegCom extends TradeBuffer {
 
 	@Autowired
 	public NegTransService negTransService;
-
 	@Autowired
 	public NegMainService negMainService;
-
 	@Autowired
 	public NegAppr02Service negAppr02Service;
 	@Autowired
 	public NegAppr01Service negAppr01Service;
 	@Autowired
 	public LoanOverdueService loanOverdueService;
+	@Autowired
+	public LoanBorTxService loanBorTxService;
+	@Autowired
+	public NegCom negCom;
+	@Autowired
+	BaTxCom baTxCom;
+	@Autowired
+	LoanCom loanCom;
 
 	@Override
 	/* 產生債協入帳明細 */
@@ -78,16 +89,20 @@ public class AcNegCom extends TradeBuffer {
 			if ("L3210".equals(titaVo.getTxcd()) || "L3230".equals(titaVo.getTxcd())) {
 				if (ac.getAcctCode().equals("T11") || ac.getAcctCode().equals("T12")
 						|| ac.getAcctCode().equals("T13")) {
-					updateNegTrans(ac.getCustNo(), ac.getTxAmt(), titaVo);
+					if ("最大債權撥付失敗匯回款".equals(ac.getSlipNote())) {
+						this.info("最大債權撥付失敗匯回款,不產生債協入帳明細");
+					} else {
+						updateNegTrans(ac.getCustNo(), ac.getTxAmt(), titaVo);
+					}
 				}
-				if (ac.getAcctCode().equals("TAV") && "一般債權".equals(ac.getSlipNote())						) {
+				if (ac.getAcctCode().equals("TAV") && "一般債權".equals(ac.getSlipNote())) {
 					int custNo = this.parse.stringToInteger(titaVo.getParam("TimCustNo"));
 					if ("L3230".equals(titaVo.getTxcd())) {
 						custNo = ac.getCustNo();
 						TempVo tTempVo = new TempVo();
 						tTempVo = tTempVo.getVo(ac.getJsonFields());
-						if(tTempVo.get("RmCustNo") != null) {
-								custNo = parse.stringToInteger(tTempVo.get("RmCustNo"));//使用JsonFields裡存的原戶號才抓的到債協戶號
+						if (tTempVo.get("RmCustNo") != null) {
+							custNo = parse.stringToInteger(tTempVo.get("RmCustNo"));// 使用JsonFields裡存的原戶號才抓的到債協戶號
 						}
 					}
 					updateNegTrans(custNo, ac.getTxAmt(), titaVo);
@@ -154,18 +169,18 @@ public class AcNegCom extends TradeBuffer {
 		// 正常交易新增、訂正交易要刪除
 		if (this.txBuffer.getTxCom().getBookAcHcode() == 0) { // 帳務訂正記號 AcHCode 0.正常 1.訂正 2.3.沖正
 			tNegMain = negMainService.statusFirst("0", custNo, titaVo); // 0-正常
-			if (tNegMain == null) {//無戶況正常且為L3230:若為撥付失敗重撥需再找最新一筆,允許戶況非0正常
-				if(!"L3230".equals(titaVo.getTxcd())) {
+			if (tNegMain == null) {// 無戶況正常且為L3230:若為撥付失敗重撥需再找最新一筆,允許戶況非0正常
+				if (!"L3230".equals(titaVo.getTxcd())) {
 					throw new LogicException(titaVo, "E6003", "acNegCom 非債協戶 " + custNo);
 				}
 				tNegMain = negMainService.custNoFirst(custNo, titaVo);
-				if(tNegMain == null) {
+				if (tNegMain == null) {
 					throw new LogicException(titaVo, "E6003", "acNegCom 非債協戶 " + custNo);
 				}
-				if("N".equals(tNegMain.getIsMainFin())) {
+				if ("N".equals(tNegMain.getIsMainFin())) {
 					throw new LogicException(titaVo, "E6003", "acNegCom 非債協戶 " + custNo);
 				}
-				if (!ishasfincode(custNo,txAmt,titaVo)) {
+				if (!ishasfincode(custNo, txAmt, titaVo)) {
 					throw new LogicException(titaVo, "E6003", "acNegCom 金額與撥付失敗總金額不符,不允許戶況非正常,戶號= " + custNo);
 				}
 			}
@@ -363,7 +378,7 @@ public class AcNegCom extends TradeBuffer {
 	 * 
 	 * @param entryDate 入帳日
 	 * @param txAmt     金額
-	 * @param iCustNo    戶號
+	 * @param iCustNo   戶號
 	 * @param titaVo    TitaVo
 	 * @return TempVo
 	 * @throws LogicException LogicException
@@ -422,25 +437,174 @@ public class AcNegCom extends TradeBuffer {
 	}
 
 	/**
+	 * 債協專戶的匯入款為最大債權撥付失敗匯回款<BR>
+	 * 1.L3210 由債協專戶暫收款轉入最大債權客戶的債協款<BR>
+	 * 2.將客戶的債協款轉入應付代收款
+	 * 
+	 * @param entryDate 入帳日
+	 * @param txAmt     金額
+	 * @param iCustNo   戶號
+	 * @param titaVo    TitaVo
+	 * @return TempVo
+	 * @throws LogicException LogicException
+	 */
+	public List<AcDetail> getNegAppr01ReRemit(int entryDate, BigDecimal txAmt, int iCustNo, TitaVo titaVo)
+			throws LogicException {
+		this.info("NegAppr01 entryDate=" + entryDate + ", txAmt=" + txAmt);
+		List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
+		// NegAppr01最大債權撥付資料檔，回應代碼為失敗且提兌日 >= 入帳日 減二個月 ，若加總(提兌日+債權機構代號)相同，檢核成功
+		Slice<NegAppr01> slNegAppr01 = negAppr01Service.findReplyCodeNotEq("4001", entryDate + 19110000 - 0200, 0,
+				Integer.MAX_VALUE, titaVo);
+		if (slNegAppr01 == null) {
+			return lAcDetail;
+		}
+		BigDecimal appr01Total = BigDecimal.ZERO;
+		List<NegAppr01> lNegAppr01 = new ArrayList<NegAppr01>();
+		int bringUpDate = slNegAppr01.getContent().get(0).getBringUpDate();
+		String finCode = slNegAppr01.getContent().get(0).getFinCode();
+		boolean isFind = false;
+		for (NegAppr01 tNegAppr01 : slNegAppr01.getContent()) {
+			if (tNegAppr01.getBringUpDate() == bringUpDate && tNegAppr01.getFinCode().equals(finCode)) {
+				lNegAppr01.add(tNegAppr01);
+				appr01Total = appr01Total.add(tNegAppr01.getApprAmt());
+			} else {
+				if (appr01Total.compareTo(txAmt) == 0) {
+					isFind = true;
+					break;
+				} else {// 提兌日與分攤機構不符則重新累計
+					appr01Total = BigDecimal.ZERO;
+					lNegAppr01 = new ArrayList<NegAppr01>();
+					// 新key值重新累計
+					lNegAppr01.add(tNegAppr01);
+					bringUpDate = tNegAppr01.getBringUpDate();
+					finCode = tNegAppr01.getFinCode();
+					appr01Total = appr01Total.add(tNegAppr01.getApprAmt());
+				}
+			}
+		}
+		if (appr01Total.compareTo(txAmt) == 0) {
+			isFind = true;
+		}
+		if (isFind) {
+			negCom.setTxBuffer(this.txBuffer);
+			TempVo tTempVo = new TempVo();
+			tTempVo.putParam("BringUpDate", lNegAppr01.get(0).getBringUpDate()); // 提兌日
+			tTempVo.putParam("FinCode", lNegAppr01.get(0).getFinCode()); // 債權機構代號
+			for (NegAppr01 tNegAppr01 : lNegAppr01) {
+				/* 貸：債協暫收款科目 */
+				AcDetail acDetail = new AcDetail();
+				acDetail.setDbCr("C");
+				acDetail.setAcctCode(getAcctCode(tNegAppr01.getCustNo(), titaVo));
+				acDetail.setTxAmt(tNegAppr01.getApprAmt());
+				acDetail.setCustNo(tNegAppr01.getCustNo());
+				acDetail.setSlipNote("最大債權撥付失敗匯回款");
+				acDetail.setJsonFields(tTempVo.getJsonString());
+				lAcDetail.add(acDetail);
+				/* 借：債協暫收款科目 */
+				acDetail = new AcDetail();
+				acDetail.setDbCr("D");
+				acDetail.setAcctCode(getAcctCode(tNegAppr01.getCustNo(), titaVo));
+				acDetail.setTxAmt(tNegAppr01.getApprAmt());
+				acDetail.setCustNo(tNegAppr01.getCustNo());
+				acDetail.setSlipNote("最大債權撥付失敗匯回款");
+				acDetail.setJsonFields(tTempVo.getJsonString());
+				lAcDetail.add(acDetail);
+				/* 貸：應付代收款 */
+				acDetail = new AcDetail();
+				acDetail.setDbCr("C");
+				acDetail.setAcctCode(getApprAcctCode(tNegAppr01.getCustNo(), titaVo));
+				acDetail.setTxAmt(tNegAppr01.getApprAmt());
+				acDetail.setCustNo(tNegAppr01.getCustNo());
+				acDetail.setSlipNote("最大債權撥付失敗匯回款");
+				acDetail.setJsonFields(tTempVo.getJsonString());
+				lAcDetail.add(acDetail);
+			}
+		}
+		return lAcDetail;
+	}
+
+	/**
+	 * L5708 最大債權撥付入帳產生放款交易明細(新壽攤分款、結清退還款轉入客戶暫收可抵繳)
+	 * 
+	 * @param acDetail 帳務分錄
+	 * @param titaVo   TitaVo
+	 * @throws LogicException ....
+	 */
+	public void addL5708LoanBorTxHcodeNormal(AcDetail acDetail, TitaVo titaVo) throws LogicException {
+
+		if (acDetail.getTxAmt().compareTo(BigDecimal.ZERO) == 0) {
+			return;
+		}
+		baTxCom.setTxBuffer(this.txBuffer);
+		loanCom.setTxBuffer(this.txBuffer);
+		LoanBorTx tLoanBorTx = new LoanBorTx();
+		LoanBorTxId tLoanBorTxId = new LoanBorTxId();
+		loanCom.setFacmBorTx(tLoanBorTx, tLoanBorTxId, acDetail.getCustNo(), acDetail.getFacmNo(), titaVo);
+//	      092:暫收轉帳     (戶號+額度)  TAV 暫收款－可抵繳
+		// 3235 轉入放款暫收款
+		tLoanBorTx.setTxDescCode("3235");
+		tLoanBorTx.setEntryDate(titaVo.getEntDyI());
+		tLoanBorTx.setDisplayflag("A"); // A:帳務
+		tLoanBorTx.setTempAmt(BigDecimal.ZERO);
+		tLoanBorTx.setOverflow(acDetail.getTxAmt());
+		tLoanBorTx.setAcctCode(acDetail.getAcctCode());
+
+		TempVo tTempVo = new TempVo();
+		// 新增摘要
+		tTempVo.putParam("Note", acDetail.getSlipNote());
+		baTxCom.settingUnPaid(titaVo.getEntDyI(), acDetail.getCustNo(), acDetail.getFacmNo(), 0, 96,
+				acDetail.getTxAmt(), titaVo);
+		tTempVo.putParam("Excessive", baTxCom.getExcessive().add(baTxCom.getExcessiveOther()));
+
+		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
+		// step 9. 寫入放款交易內容檔
+		try {
+			loanBorTxService.insert(tLoanBorTx);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
+		}
+
+	}
+
+	/**
+	 * L5708 最大債權撥付入帳訂正產生放款交易明細(新壽攤分款、結清退還款轉入客戶暫收可抵繳)
+	 * 
+	 * @param titaVo TitaVo
+	 * @throws LogicException ....
+	 */
+	public void addL5708LoanBorTxHcodeErase(TitaVo titaVo) throws LogicException {
+		loanCom.setTxBuffer(this.txBuffer);
+		Slice<LoanBorTx> slLoanBortx = loanBorTxService.acDateTxtNoEq(titaVo.getOrgEntdyI() + 19110000,
+				titaVo.getOrgKin(), titaVo.getOrgTlr(), titaVo.getOrgTno(), 0, Integer.MAX_VALUE, titaVo);
+		if (slLoanBortx != null) {
+			List<LoanBorTx> lLoanBorTx = new ArrayList<LoanBorTx>(slLoanBortx.getContent());
+			for (LoanBorTx tx : lLoanBorTx) {
+				loanCom.checkEraseCustNoTxSeqNo(tx.getCustNo(), titaVo);// 檢查到同戶帳務交易需由最近一筆交易開始訂正
+				loanCom.setFacmBorTxHcode(tx.getCustNo(), tx.getFacmNo(), tx.getBorxNo(), titaVo);
+			}
+		}
+	}
+
+	/**
 	 * 是否為債協撥付失敗重撥 if (acNegCom.ishasfincode(CustNo,titaVo));
 	 * 
 	 * @param custNo 戶號
-	 * @param txAmt 金額
+	 * @param txAmt  金額
 	 * @param titaVo TitaVo
 	 * @return true/false
 	 * @throws LogicException ...
 	 */
-	public boolean ishasfincode(int custNo, BigDecimal txAmt,TitaVo titaVo) throws LogicException {
+	public boolean ishasfincode(int custNo, BigDecimal txAmt, TitaVo titaVo) throws LogicException {
 
 		NegAppr01 lNegAppr01 = new NegAppr01();
-		boolean hasfincodefg= false;
-		 BigDecimal tshareAmSum = BigDecimal.ZERO;
+		boolean hasfincodefg = false;
+		BigDecimal tshareAmSum = BigDecimal.ZERO;
 		// 本會計日前2個月
 		dDateUtil.init();
 		dDateUtil.setDate_1(titaVo.getEntDyI());
 		dDateUtil.setMons(-2);
-		int	lastmonthDate = dDateUtil.getCalenderDay() +19110000;
-		
+		int lastmonthDate = dDateUtil.getCalenderDay() + 19110000;
+
 		lNegAppr01 = negAppr01Service.bringUpDateCustNoFirst(custNo, lastmonthDate, titaVo);// 找該戶最近一個提兌日
 		if (lNegAppr01 != null) {
 			int bringUpDate = lNegAppr01.getBringUpDate() + 19110000;

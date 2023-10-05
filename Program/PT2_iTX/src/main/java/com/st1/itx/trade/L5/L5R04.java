@@ -19,7 +19,6 @@ import com.st1.itx.db.service.NegFinAcctService;
 
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.common.NegReportCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -35,9 +34,6 @@ public class L5R04 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public NegFinAcctService sNegFinAcctService;
-
-	@Autowired
-	public NegReportCom NegReportCom;
 
 	/* 日期工具 */
 	@Autowired

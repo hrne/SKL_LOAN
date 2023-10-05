@@ -26,6 +26,7 @@ import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.NegAppr01;
+import com.st1.itx.db.domain.NegAppr01Id;
 import com.st1.itx.db.domain.NegMain;
 import com.st1.itx.db.domain.NegMainId;
 /* DB容器 */
@@ -38,7 +39,8 @@ import com.st1.itx.db.service.NegAppr01Service;
 import com.st1.itx.db.service.NegMainService;
 import com.st1.itx.util.common.AcDetailCom;
 import com.st1.itx.util.common.AcNegCom;
-import com.st1.itx.util.common.NegReportCom;
+import com.st1.itx.util.common.NegApprCom;
+import com.st1.itx.db.service.springjpa.cm.L597AServiceImpl;
 
 /**
  * Tita<br>
@@ -64,11 +66,13 @@ public class L5708 extends TradeBuffer {
 	@Autowired
 	public NegAppr01Service sNegAppr01Service;
 	@Autowired
-	NegReportCom NegReportCom;
+	NegApprCom negApprCom;
 	@Autowired
 	AcDetailCom acDetailCom;
 	@Autowired
 	AcNegCom acNegCom;
+	@Autowired
+	private L597AServiceImpl l597AServiceImpl;
 
 	/* 日期工具 */
 	@Autowired
@@ -99,7 +103,7 @@ public class L5708 extends TradeBuffer {
 			throw new LogicException("", "[提兌日]未輸入");
 		}
 
-		// 撥付傳票日
+		// 提兌日
 		int IntBringUpdate = parse.stringToInteger(BringUpDate);
 		if (String.valueOf(IntBringUpdate).length() <= 7) {
 			IntBringUpdate = IntBringUpdate + 19110000;
@@ -109,9 +113,62 @@ public class L5708 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = Integer.MAX_VALUE;// 查全部
 
-//		Slice<NegAppr01> slNegAppr01=sNegAppr01Service.BringUpDateEq(IntBringUpdate,this.index,this.limit);
-//		List<NegAppr01> lNegAppr01=slNegAppr01 == null ? null : slNegAppr01.getContent();
-		List<NegAppr01> lNegAppr01 = NegReportCom.InsUpdNegApprO1(IntBringUpdate, 2, titaVo);
+		Map<Integer, BigDecimal> apprAmtCustNoMap = new HashMap<Integer, BigDecimal>();
+		Map<Integer, BigDecimal> sklAmtCustNoMap = new HashMap<Integer, BigDecimal>();
+		Map<Integer, BigDecimal> returnAmtCustNoMap = new HashMap<Integer, BigDecimal>();
+		Map<Integer, Integer> tempCustNoMap = new HashMap<Integer, Integer>();
+
+		// 匯入專戶失敗重撥資料累計出傳票金額-訂正不需做此段
+		if (titaVo.isHcodeNormal()) {
+			List<Map<String, String>> sNegAppr01 = null;
+			sNegAppr01 = l597AServiceImpl.findNegAppr01(IntBringUpdate, 2, 0, titaVo);
+			if (sNegAppr01 != null) {
+				this.info("***3 findNegAppr01*** has data");
+				for (Map<String, String> tNegAppr01 : sNegAppr01) {
+					int iacdate = parse.stringToInteger(tNegAppr01.get("AcDate"));
+					String iTlrNo = tNegAppr01.get("TitaTlrNo");
+					int iTxtNo = parse.stringToInteger(tNegAppr01.get("TitaTxtNo"));
+					String iFinCode = tNegAppr01.get("FinCode");
+					int iCsutNo = parse.stringToInteger(tNegAppr01.get("CustNo"));
+					NegAppr01 NegAppr01Org = sNegAppr01Service
+							.findById(new NegAppr01Id(iacdate, iTlrNo, iTxtNo, iFinCode, iCsutNo), titaVo);
+					this.info("***4*key=" + iacdate + "," + iTlrNo + "," + iTxtNo + "," + iFinCode + "," + iCsutNo);
+
+					NegMain NegMainVO = sNegMainService
+							.findById(new NegMainId(NegAppr01Org.getCustNo(), NegAppr01Org.getCaseSeq()), titaVo);
+					if (NegMainVO != null) {
+						String IsMainFin = NegMainVO.getIsMainFin();
+						if (("Y").equals(IsMainFin)) {
+							// 最大債權
+							// 異動會計檔
+							int CustNo = NegMainVO.getCustNo();
+							int iPayerCustNo = NegMainVO.getPayerCustNo();// 保證人的付款戶號
+							if (iPayerCustNo > 0) {
+								tempCustNoMap.put(CustNo, iPayerCustNo);
+							} else {
+								tempCustNoMap.put(CustNo, CustNo);
+							}
+							if (!apprAmtCustNoMap.containsKey(CustNo)) {
+								apprAmtCustNoMap.put(CustNo, NegAppr01Org.getApprAmt());
+								sklAmtCustNoMap.put(CustNo, BigDecimal.ZERO);
+								returnAmtCustNoMap.put(CustNo, BigDecimal.ZERO);
+							} else {
+								apprAmtCustNoMap.put(CustNo,
+										apprAmtCustNoMap.get(CustNo).add(NegAppr01Org.getApprAmt()));
+								sklAmtCustNoMap.put(CustNo, sklAmtCustNoMap.get(CustNo).add(BigDecimal.ZERO));
+								returnAmtCustNoMap.put(CustNo, returnAmtCustNoMap.get(CustNo).add(BigDecimal.ZERO));
+							}
+						}
+					} else {
+						// E0006 鎖定資料時，發生錯誤
+						throw new LogicException(titaVo, "E0006", "債務協商案件主檔");
+					}
+				}
+
+			}
+		}
+
+		List<NegAppr01> lNegAppr01 = negApprCom.InsUpdNegApprO1(IntBringUpdate, 2, titaVo);
 		this.info("L5708 lNegAppr01!=null titaVo.isHcodeNormal()=[" + titaVo.isHcodeNormal() + "]");
 		if (titaVo.isHcodeNormal()) {
 			// 正向交易
@@ -133,10 +190,6 @@ public class L5708 extends TradeBuffer {
 					}
 				}
 
-				Map<Integer, BigDecimal> apprAmtCustNoMap = new HashMap<Integer, BigDecimal>();
-				Map<Integer, BigDecimal> sklAmtCustNoMap = new HashMap<Integer, BigDecimal>();
-				Map<Integer, BigDecimal> returnAmtCustNoMap = new HashMap<Integer, BigDecimal>();
-				Map<Integer, Integer> tempCustNoMap = new HashMap<Integer, Integer>();
 				for (NegTransId NegTransIdVO : DistinctNegTransId) {
 					NegTrans NegTransVO = sNegTransService.findById(NegTransIdVO, titaVo);
 					if (NegTransVO != null) {
@@ -153,21 +206,24 @@ public class L5708 extends TradeBuffer {
 								// 最大債權
 								// 異動會計檔
 								int CustNo = NegTransVO.getCustNo();
-								int iPayerCustNo = NegMainVO.getPayerCustNo();//保證人的付款戶號
+								int iPayerCustNo = NegMainVO.getPayerCustNo();// 保證人的付款戶號
 								if (iPayerCustNo > 0) {
-									tempCustNoMap.put(CustNo, iPayerCustNo);				
+									tempCustNoMap.put(CustNo, iPayerCustNo);
 								} else {
-									tempCustNoMap.put(CustNo, CustNo);													
+									tempCustNoMap.put(CustNo, CustNo);
 								}
 								if (!apprAmtCustNoMap.containsKey(CustNo)) {
 									apprAmtCustNoMap.put(CustNo, NegTransVO.getApprAmt());
 									sklAmtCustNoMap.put(CustNo, NegTransVO.getSklShareAmt());
 									returnAmtCustNoMap.put(CustNo, NegTransVO.getReturnAmt());
-									
+
 								} else {
-									apprAmtCustNoMap.put(CustNo, apprAmtCustNoMap.get(CustNo).add(NegTransVO.getApprAmt()));
-									sklAmtCustNoMap.put(CustNo, sklAmtCustNoMap.get(CustNo).add(NegTransVO.getSklShareAmt()));
-									returnAmtCustNoMap.put(CustNo, returnAmtCustNoMap.get(CustNo).add(NegTransVO.getReturnAmt()));
+									apprAmtCustNoMap.put(CustNo,
+											apprAmtCustNoMap.get(CustNo).add(NegTransVO.getApprAmt()));
+									sklAmtCustNoMap.put(CustNo,
+											sklAmtCustNoMap.get(CustNo).add(NegTransVO.getSklShareAmt()));
+									returnAmtCustNoMap.put(CustNo,
+											returnAmtCustNoMap.get(CustNo).add(NegTransVO.getReturnAmt()));
 								}
 
 								int ExportDate = NegTransVO.getExportDate();
@@ -192,10 +248,11 @@ public class L5708 extends TradeBuffer {
 							// E0006 鎖定資料時，發生錯誤
 							throw new LogicException(titaVo, "E0006", "債務協商案件主檔");
 						}
-					} else {
-						// E0006 鎖定資料時，發生錯誤
-						throw new LogicException(titaVo, "E0006", "債務協商交易檔");
+//					} else {
+//						// E0006 鎖定資料時，發生錯誤
+//						throw new LogicException(titaVo, "E0006", "債務協商交易檔");
 					}
+
 				}
 
 				if (apprAmtCustNoMap != null && apprAmtCustNoMap.size() != 0) {
@@ -203,7 +260,7 @@ public class L5708 extends TradeBuffer {
 						BigDecimal apprAmt = apprAmtCustNoMap.get(CustNo);
 						BigDecimal sklAmt = sklAmtCustNoMap.get(CustNo);
 						BigDecimal returnAmt = returnAmtCustNoMap.get(CustNo);
-					/* 帳務 */
+						/* 帳務 */
 						// 經辦登帳非訂正交易
 						if (this.txBuffer.getTxCom().isBookAcYes()) {
 							List<AcDetail> acDetailList = new ArrayList<AcDetail>();
@@ -247,17 +304,20 @@ public class L5708 extends TradeBuffer {
 							acDetail.setTxAmt(sklAmt); // 新壽攤分金額
 							acDetail.setCustNo(CustNo);// 戶號
 							acDetailList.add(acDetail);
-							
+
 							/* 貸：暫收可抵繳科目 */
 							acDetail = new AcDetail();
 							acDetail.setDbCr("C");
 							TempVo tTempVo = new TempVo();
 							tTempVo = acNegCom.getReturnAcctCode(tempCustNoMap.get(CustNo), titaVo);
-							acDetail.setCustNo(tempCustNoMap.get(CustNo));//實際借款人戶號
+							acDetail.setCustNo(tempCustNoMap.get(CustNo));// 實際借款人戶號
 							acDetail.setFacmNo(parse.stringToInteger(tTempVo.getParam("FacmNo")));
 							acDetail.setAcctCode(tTempVo.getParam("AcctCode"));
-							acDetail.setTxAmt(sklAmt); //  新壽攤分金額
+							acDetail.setTxAmt(sklAmt); // 新壽攤分金額
+							acDetail.setSlipNote("最大債權新壽攤分款");
 							acDetailList.add(acDetail);
+							// L5708 最大債權撥付入帳產生放款交易明細(新壽攤分款、結清退還款轉入客戶暫收可抵繳)
+							acNegCom.addL5708LoanBorTxHcodeNormal(acDetail, titaVo);
 
 							/* 借：應付代收款 */
 							acDetail = new AcDetail();
@@ -266,17 +326,20 @@ public class L5708 extends TradeBuffer {
 							acDetail.setTxAmt(returnAmt); // 結清退還款
 							acDetail.setCustNo(CustNo);// 戶號
 							acDetailList.add(acDetail);
-							
+
 							/* 貸：暫收可抵繳科目 */
 							acDetail = new AcDetail();
 							acDetail.setDbCr("C");
 							TempVo tTempVo2 = new TempVo();
 							tTempVo2 = acNegCom.getReturnAcctCode(tempCustNoMap.get(CustNo), titaVo);
-							acDetail.setCustNo(tempCustNoMap.get(CustNo));//實際借款人戶號
+							acDetail.setCustNo(tempCustNoMap.get(CustNo));// 實際借款人戶號
 							acDetail.setFacmNo(parse.stringToInteger(tTempVo2.getParam("FacmNo")));
 							acDetail.setAcctCode(tTempVo.getParam("AcctCode"));
-							acDetail.setTxAmt(returnAmt); //結清退還款
+							acDetail.setTxAmt(returnAmt); // 結清退還款
+							acDetail.setSlipNote("最大債權結清退還款");
 							acDetailList.add(acDetail);
+							// L5708 最大債權撥付入帳產生放款交易明細(新壽攤分款、結清退還款轉入客戶暫收可抵繳)
+							acNegCom.addL5708LoanBorTxHcodeNormal(acDetail, titaVo);
 
 							this.txBuffer.addAllAcDetailList(acDetailList);
 
@@ -294,7 +357,9 @@ public class L5708 extends TradeBuffer {
 			}
 		} else {
 			// 訂正
-			// NegTrans的異動已經寫在 NegReportCom.InsUpdNegApprO1 內了
+			// NegTrans的異動已經寫在 NegApprCom.InsUpdNegApprO1 內了
+			// L5708 最大債權撥付入帳訂正產生放款交易明細(新壽攤分款、結清退還款轉入客戶暫收可抵繳)
+			acNegCom.addL5708LoanBorTxHcodeErase(titaVo);
 		}
 		this.addList(this.totaVo);
 		return this.sendList();

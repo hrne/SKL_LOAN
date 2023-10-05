@@ -84,7 +84,7 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		FROM dual ";
 		sql += "		UNION All ";
 		sql += "		SELECT 'G24' AS \"Column\"";// 本月新轉催收金額
-		sql += "			  ,SUM(\"PrinBalance\") AS \"Value\"";
+		sql += "			  ,SUM(\"UnpaidPrincipal\" + \"UnpaidInterest\" ) AS \"Value\"";
 		sql += "		FROM \"MonthlyFacBal\"";
 		sql += "   		WHERE \"OvduDate\"  BETWEEN :yymm*100+1 AND :yymm*100+31 ";
 		sql += "		  AND \"AcctCode\" = '990' "; // 催收放款
@@ -289,7 +289,6 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		FROM \"MonthlyFacBal\" M";
 		sql += "		WHERE M.\"YearMonth\" = :yymm ";
 		sql += "		  AND M.\"PrinBalance\" > 0 ";
-		sql += "		  AND M.\"AcctCode\" <> '990' ";
 		sql += "		GROUP BY DECODE(M.\"EntCode\",'1','31','30')";
 		sql += "		UNION All ";
 		sql += "		SELECT '31' AS \"Column\"";
@@ -388,7 +387,7 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 	// 單位元
 		sql += "	SELECT ";
 		sql += "	\"Column\"	";
-		sql += "	,SUM\"Value\" AS \"Value\"	";
+		sql += "	,SUM(\"Value\") AS \"Value\"	";
 		sql += "	FROM \"tempTotal\" ";
 		sql += "	GROUP BY \"Column\" ";
 

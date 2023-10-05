@@ -34,7 +34,7 @@ import com.st1.itx.db.service.NegApprService;
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.MakeExcel;
-import com.st1.itx.util.common.NegReportCom;
+import com.st1.itx.util.common.NegApprCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -55,7 +55,7 @@ import com.st1.itx.util.parse.Parse;
 public class L5709 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
-	public NegReportCom NegReportCom;
+	public NegApprCom negApprCom;
 //	@Autowired
 //	public NegTransService sNegTransService;
 	/* 日期工具 */
@@ -98,7 +98,7 @@ public class L5709 extends TradeBuffer {
 		}
 		String FilePath = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo() + File.separatorChar + titaVo.getParam("FILENA").trim();
 
-		NegReportCom.CheckNegArrp(IntBringUpDate, 3, titaVo);
+		negApprCom.CheckNegArrp(IntBringUpDate, 3, titaVo);
 
 		Slice<NegAppr> slNegAppr = sNegApprService.bringUpDateEq(IntBringUpDate, 0, 500, titaVo);
 		List<NegAppr> lNegAppr = slNegAppr == null ? null : slNegAppr.getContent();
@@ -114,7 +114,7 @@ public class L5709 extends TradeBuffer {
 		tApprAcDate = tApprAcDate + 19110000;
 		List<String[]> lDetailData = null;
 		try {
-			lDetailData = NegReportCom.BatchTx04(titaVo, FilePath, BringUpDate);
+			lDetailData = negApprCom.BatchTx04(titaVo, FilePath, BringUpDate);
 		} catch (IOException e) {
 
 		}
@@ -207,7 +207,7 @@ public class L5709 extends TradeBuffer {
 						if (NegAppr01UpdVO != null) {
 							BigDecimal ApprAmt = new BigDecimal(Detail[7]);// 撥付金額
 							BigDecimal Hund = new BigDecimal(100);// 撥付金額
-//							BigDecimal AccuApprAmt = NegAppr01UpdVO.getAccuApprAmt();// 累計撥付金額
+							BigDecimal AccuApprAmt = NegAppr01UpdVO.getAccuApprAmt();// 累計撥付金額
 							ApprAmt = ApprAmt.divide(Hund);
 							this.info("ApprAmt==" + ApprAmt);
 							String ReplyCode = Detail[11];// 回應代碼
@@ -222,10 +222,10 @@ public class L5709 extends TradeBuffer {
 									}
 									NegAppr01UpdVO.setBringUpDate(IntBringUpDate);// 提兌日
 									NegAppr01UpdVO.setReplyCode(ReplyCode);// 回應代碼
-									//2023/7/5:撥付失敗時倒扣累計撥付金額 , 2023/8/26調整為失敗不到扣,重播不累加
-									//if(!"4001".equals(ReplyCode)) {
-									//	NegAppr01UpdVO.setAccuApprAmt(AccuApprAmt.subtract(ApprAmt));
-									//}
+									//2023/10/1:撥付失敗時倒扣累計撥付金額 
+									if(!"4001".equals(ReplyCode)) {
+										NegAppr01UpdVO.setAccuApprAmt(AccuApprAmt.subtract(ApprAmt));
+									}
 									
 								} else {
 									// 撥付日期
@@ -236,10 +236,10 @@ public class L5709 extends TradeBuffer {
 								// 訂正
 								NegAppr01UpdVO.setBringUpDate(0);// 提兌日
 								NegAppr01UpdVO.setReplyCode("");// 回應代碼
-								//2023/7/5:訂正須加回累計撥付金額 ,  2023/8/26調整正向不倒扣故點掉
-								//if(!"4001".equals(ReplyCode)) {
-								//	NegAppr01UpdVO.setAccuApprAmt(AccuApprAmt.add(ApprAmt));
-								//}
+								//2023/10/1:訂正須加回累計撥付金額
+								if(!"4001".equals(ReplyCode)) {
+									NegAppr01UpdVO.setAccuApprAmt(AccuApprAmt.add(ApprAmt));
+								}
 							}
 
 							try {

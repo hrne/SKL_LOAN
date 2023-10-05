@@ -94,9 +94,9 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "AcDate", "TitaTlrNo", "TitaTxtNo", "FinCode"));
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "AcDate", "TitaTlrNo", "TitaTxtNo", "FinCode", "CustNo"));
     else
-         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "AcDate", "TitaTlrNo", "TitaTxtNo", "FinCode"));
+         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "AcDate", "TitaTlrNo", "TitaTxtNo", "FinCode", "CustNo"));
     this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = negAppr01ReposDay.findAll(pageable);
@@ -463,13 +463,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("findReplyCodeNotEq " + dbName + " : " + "replyCode_0 : " + replyCode_0 + " bringUpDate_1 : " +  bringUpDate_1);
     if (dbName.equals(ContentName.onDay))
-      slice = negAppr01ReposDay.findAllByReplyCodeNotAndBringUpDateGreaterThanEqualOrderByBringUpDateDescFinCodeAsc(replyCode_0, bringUpDate_1, pageable);
+      slice = negAppr01ReposDay.findAllByReplyCodeNotAndBringUpDateGreaterThanEqualOrderByBringUpDateDescFinCodeAscCustNoAsc(replyCode_0, bringUpDate_1, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = negAppr01ReposMon.findAllByReplyCodeNotAndBringUpDateGreaterThanEqualOrderByBringUpDateDescFinCodeAsc(replyCode_0, bringUpDate_1, pageable);
+      slice = negAppr01ReposMon.findAllByReplyCodeNotAndBringUpDateGreaterThanEqualOrderByBringUpDateDescFinCodeAscCustNoAsc(replyCode_0, bringUpDate_1, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = negAppr01ReposHist.findAllByReplyCodeNotAndBringUpDateGreaterThanEqualOrderByBringUpDateDescFinCodeAsc(replyCode_0, bringUpDate_1, pageable);
+      slice = negAppr01ReposHist.findAllByReplyCodeNotAndBringUpDateGreaterThanEqualOrderByBringUpDateDescFinCodeAscCustNoAsc(replyCode_0, bringUpDate_1, pageable);
     else 
-      slice = negAppr01Repos.findAllByReplyCodeNotAndBringUpDateGreaterThanEqualOrderByBringUpDateDescFinCodeAsc(replyCode_0, bringUpDate_1, pageable);
+      slice = negAppr01Repos.findAllByReplyCodeNotAndBringUpDateGreaterThanEqualOrderByBringUpDateDescFinCodeAscCustNoAsc(replyCode_0, bringUpDate_1, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

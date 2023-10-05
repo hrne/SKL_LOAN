@@ -56,26 +56,7 @@ public class LM038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,M.\"PrevIntDate\"                            F6 ";
 		sql += "       ,M.\"PrinBalance\"                            F7 ";
 		sql += "       ,F.\"FirstDrawdownDate\"                      F8 ";
-		sql += "       ,CASE WHEN NVL(M.\"DueDate\", 0) != 0 ";
-		sql += "             THEN M.\"DueDate\"  ";
-		sql += "             WHEN M.\"NextIntDate\" > M.\"YearMonth\" * 100 ";
-		sql += "             THEN M.\"NextIntDate\"  ";
-		// 避免兩日期中有非正確格式的情況
-		sql += "             WHEN M.\"NextIntDate\" > 9999999 AND M.\"YearMonth\" > 99999 ";
-		// 此時已確定NextIntDate的年月 < YearMonth
-		//
-		// 將NextIntDate轉為DATE，然後計算NextIntDate與YearMonth之間差幾個月（ABS+CEIL），
-		// 接著將NextIntDate加上此月差後，
-		// 轉回NUMBER，即為新的下次應繳日。
-		// 不考慮月份日數差異時，應該會是YearMonth || NextIntDate的DD。
-		// 考慮時，如20210531/202106，Oracle SQL的邏輯會得出20210630。
-		//
-		// 但這是月曆日，如果要考慮會計日，可能需要等MonthlyFacBal.DueDate邏輯完善。
-		//
-		// 2021.08.09 xiangwei
-		sql += "             THEN TO_NUMBER(TO_CHAR(ADD_MONTHS(TO_DATE(TO_CHAR(M.\"NextIntDate\"),'YYYYMMDD'),CEIL(ABS(MONTHS_BETWEEN(TO_DATE(TO_CHAR(M.\"NextIntDate\"),'YYYYMMDD'), TO_DATE(TO_CHAR(M.\"YearMonth\"),'YYYYMM'))))),'YYYYMMDD')) ";
-		sql += "             ELSE M.\"NextIntDate\"  ";
-		sql += "        END                                        F9 ";
+		sql += "       ,M.\"DueDate\"                                F9 ";
 		sql += "       ,M.\"OvduDays\"                               F10 ";
 		sql += "       ,M.\"UnpaidPrincipal\"                        F11 ";
 		sql += "       ,M.\"UnpaidInterest\"                         F12 ";

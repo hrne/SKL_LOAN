@@ -99,20 +99,8 @@ public class L8082 extends TradeBuffer {
 				occursList.putParam("oUnit", txAmlCredit.getUnit());
 				occursList.putParam("oUnitItem", getUnitItem(txAmlCredit.getUnit().trim(), titaVo));
 				occursList.putParam("oIsStatus", txAmlCredit.getIsStatus());
-//				this.info("txAmlCredit.ProcessType="+txAmlCredit.getProcessType());
 				occursList.putParam("oProcessType", txAmlCredit.getProcessType());
-				occursList.putParam("oProcessCount", txAmlCredit.getProcessCount());
-				
-//				occursList.putParam("oDataDt", txAmlCredit.getDataDt());
-//				occursList.putParam("oCustKey", txAmlCredit.getCustKey());
-//				occursList.putParam("oRRSeq", txAmlCredit.getRRSeq());
-//				occursList.putParam("oReviewType", txAmlCredit.getReviewType());
-////				occursList.putParam("oUnit", txAmlCredit.getUnit());
-//				occursList.putParam("oUnitItem", getUnitItem(txAmlCredit.getUnit().trim(), titaVo));
-//				occursList.putParam("oIsStatus", txAmlCredit.getIsStatus());
-////				this.info("txAmlCredit.ProcessType="+txAmlCredit.getProcessType());
-//				occursList.putParam("oProcessType", txAmlCredit.getProcessType());
-//				occursList.putParam("oProcessCount", txAmlCredit.getProcessCount());
+				occursList.putParam("oProcessCount", txAmlCredit.getProcessCount());	
 
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);

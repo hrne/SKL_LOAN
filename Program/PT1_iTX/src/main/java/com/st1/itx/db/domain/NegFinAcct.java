@@ -1,6 +1,8 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -9,6 +11,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.Id;
 import javax.persistence.Column;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * NegFinAcct 債務協商債權機構帳戶檔<br>
@@ -23,12 +27,7 @@ import javax.persistence.Column;
 public class NegFinAcct implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -7427965392203478303L;
-
-// 債權機構代號
+  // 債權機構代號
   @Id
   @Column(name = "`FinCode`", length = 8)
   private String finCode = " ";
@@ -68,6 +67,22 @@ public class NegFinAcct implements Serializable {
   /* Y:啟用N:停用 */
   @Column(name = "`Enable`", length = 1)
   private String enable;
+
+  // 合併銀行
+  @Column(name = "`NewFinCode`", length = 8)
+  private String newFinCode;
+
+  // 合併日
+  @Column(name = "`MergerDate`")
+  private int mergerDate = 0;
+
+  // 執行日期
+  @Column(name = "`ExecuteDate`")
+  private int executeDate = 0;
+
+  // 備註
+  @Column(name = "`Note`", length = 100)
+  private String note;
 
   // 建檔日期時間
   @CreatedDate
@@ -262,6 +277,82 @@ N:停用
   }
 
 /**
+	* 合併銀行<br>
+	* 
+	* @return String
+	*/
+  public String getNewFinCode() {
+    return this.newFinCode == null ? "" : this.newFinCode;
+  }
+
+/**
+	* 合併銀行<br>
+	* 
+  *
+  * @param newFinCode 合併銀行
+	*/
+  public void setNewFinCode(String newFinCode) {
+    this.newFinCode = newFinCode;
+  }
+
+/**
+	* 合併日<br>
+	* 
+	* @return Integer
+	*/
+  public int getMergerDate() {
+    return StaticTool.bcToRoc(this.mergerDate);
+  }
+
+/**
+	* 合併日<br>
+	* 
+  *
+  * @param mergerDate 合併日
+  * @throws LogicException when Date Is Warn	*/
+  public void setMergerDate(int mergerDate) throws LogicException {
+    this.mergerDate = StaticTool.rocToBc(mergerDate);
+  }
+
+/**
+	* 執行日期<br>
+	* 
+	* @return Integer
+	*/
+  public int getExecuteDate() {
+    return StaticTool.bcToRoc(this.executeDate);
+  }
+
+/**
+	* 執行日期<br>
+	* 
+  *
+  * @param executeDate 執行日期
+  * @throws LogicException when Date Is Warn	*/
+  public void setExecuteDate(int executeDate) throws LogicException {
+    this.executeDate = StaticTool.rocToBc(executeDate);
+  }
+
+/**
+	* 備註<br>
+	* 
+	* @return String
+	*/
+  public String getNote() {
+    return this.note == null ? "" : this.note;
+  }
+
+/**
+	* 備註<br>
+	* 
+  *
+  * @param note 備註
+	*/
+  public void setNote(String note) {
+    this.note = note;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -341,7 +432,7 @@ N:停用
   @Override
   public String toString() {
     return "NegFinAcct [finCode=" + finCode + ", finItem=" + finItem + ", remitBank=" + remitBank + ", remitAcct=" + remitAcct + ", dataSendSection=" + dataSendSection + ", remitAcct2=" + remitAcct2
-           + ", remitAcct3=" + remitAcct3 + ", remitAcct4=" + remitAcct4 + ", enable=" + enable + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", remitAcct3=" + remitAcct3 + ", remitAcct4=" + remitAcct4 + ", enable=" + enable + ", newFinCode=" + newFinCode + ", mergerDate=" + mergerDate + ", executeDate=" + executeDate
+           + ", note=" + note + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

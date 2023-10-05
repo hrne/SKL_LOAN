@@ -37,7 +37,7 @@ public class LM030ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("YearMonth = " + titaVo.getParam("YearMonth"));
 
 		String sql = " ";
-		
+
 		// --找餘5期 跟 餘4期是1號
 		sql += "    WITH \"tmpMain\" AS (";
 		sql += "        SELECT *";
@@ -74,35 +74,18 @@ public class LM030ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        \"Fn_ParseEOL\"(Cm.\"CustName\", 0) AS \"CustName\",";
 		sql += "        F.\"FirstDrawdownDate\" - 19110000 AS \"DrawdownDate\",";
 		sql += "        M.\"PrinBalance\" AS \"LoanBal\",";
-		sql += "        0 AS \"Interest\",";
-		sql += "        Ml.\"StoreRate\" AS \"StoreRate\",";
-		sql += "        F.\"MaturityDate\" - 19110000 AS \"MaturityDate\",";
-		sql += "        M.\"PrevIntDate\" - 19110000 AS \"PrevPayIntDate\",";
-		sql += "        To_Number(";
-		sql += "            To_Char(";
-		sql += "                Add_Months(";
-		sql += "                    To_Date(";
-		sql += "                        To_Char(";
-		sql += "                            Decode(";
-		sql += "                                M.\"DueDate\",";
-		sql += "                                0,";
-		sql += "                                19110101,";
-		sql += "                                M.\"DueDate\"";
-		sql += "                            )";
-		sql += "                        ),";
-		sql += "                        'YYYYMMDD'";
-		sql += "                    ),";
-		sql += "                    6";
-		sql += "                ),";
-		sql += "                'YYYYMMDD'";
-		sql += "            )";
-		sql += "        ) - 19110000 AS \"DueDate\"";
+		sql += "        0 AS \"Interest\", ";
+		sql += "        Ml.\"StoreRate\" AS \"StoreRate\", ";
+		sql += "        F.\"MaturityDate\" - 19110000 AS \"MaturityDate\", ";
+		sql += "        M.\"PrevIntDate\" - 19110000 AS \"PrevPayIntDate\", ";
+		sql += "        DECODE(M.\"DueDate\",0,0,M.\"DueDate\"-19110000) AS \"DueDate\", ";
+		sql += "        DECODE(M.\"NextIntDate\",0,0,Add_Months(To_Date(M.\"NextIntDate\",'YYYYMMDD'))) AS \"NextOvduDate\" ";
 		sql += "    FROM \"Main\" M";
 		sql += "        LEFT JOIN \"CdCity\" Cd ON Cd.\"CityCode\" = M.\"CityCode\"";
 		sql += "        LEFT JOIN \"CustMain\" Cm ON Cm.\"CustNo\" = M.\"CustNo\"";
 		sql += "        LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\"";
-		sql += "        AND F.\"FacmNo\" = M.\"FacmNo\"";
-		sql += "        LEFT JOIN (";
+		sql += "        AND F.\"FacmNo\" = M.\"FacmNo\" ";
+		sql += "        LEFT JOIN ( ";
 		sql += "            SELECT \"CustNo\",";
 		sql += "                \"FacmNo\",";
 		sql += "                MAX(\"StoreRate\") AS \"StoreRate\"";
@@ -114,10 +97,7 @@ public class LM030ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ) Ml ON Ml.\"CustNo\" = M.\"CustNo\"";
 		sql += "        AND Ml.\"FacmNo\" = M.\"FacmNo\"";
 		sql += "    ORDER BY M.\"CustNo\" ASC,";
-		sql += "             M.\"FacmNo\" ASC,";
-
-
-
+		sql += "             M.\"FacmNo\" ASC ";
 
 		this.info("sql=" + sql);
 

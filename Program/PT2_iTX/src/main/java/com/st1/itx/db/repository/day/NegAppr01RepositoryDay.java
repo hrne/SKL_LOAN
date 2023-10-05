@@ -62,7 +62,7 @@ public interface NegAppr01RepositoryDay extends JpaRepository<NegAppr01, NegAppr
   public Slice<NegAppr01> findAllByExportDateIsAndFinCodeIsOrderByCustNoAsc(int exportDate_0, String finCode_1, Pageable pageable);
 
   // ReplyCode <> , AND BringUpDate>= 
-  public Slice<NegAppr01> findAllByReplyCodeNotAndBringUpDateGreaterThanEqualOrderByBringUpDateDescFinCodeAsc(String replyCode_0, int bringUpDate_1, Pageable pageable);
+  public Slice<NegAppr01> findAllByReplyCodeNotAndBringUpDateGreaterThanEqualOrderByBringUpDateDescFinCodeAscCustNoAsc(String replyCode_0, int bringUpDate_1, Pageable pageable);
 
   // CustNo = , AND BringUpDate>= 
   public Optional<NegAppr01> findTopByCustNoIsAndBringUpDateGreaterThanEqualOrderByBringUpDateDesc(int custNo_0, int bringUpDate_1);

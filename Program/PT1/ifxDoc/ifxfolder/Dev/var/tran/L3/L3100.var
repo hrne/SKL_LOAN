@@ -1026,6 +1026,16 @@ C(3,#IsRv,1,E(0,#DrawdownDate)ASGN(SPANDY$),E(0,0)ASGN(SPANDY$),$)
 ! C(3,#DrawdownCode,3,E(0,#DrawdownDate)ASGN(SPANDY$),E(0,0)ASGN(SPANDY$))
 !檢查是否為預撥 0.否 1.是 
 
+!檢查撥款日期是否未超過規定管制代碼生效日
+#SendL3r32=X,1,S
+E(0,@RimCustNo,#TimCustNo)
+E(0,@RimFacmNo,#FacmNo)
+E(0,@RimDrawdownDate,#DrawdownDate)
+RESET_RIM(#SendL3r32,L3R32)
+S(L3R32,1,#RimCustNo,#RimFacmNo,#RimDrawdownDate)
+R(1,L3R32)
+
+
 
 #SendL2r06=X,1,S
 IF(#FKEY==0 || #FKEY==7,$,s)
@@ -2252,19 +2262,9 @@ C(3,#EXPANDFG,0,CALL(#EXPAND),$)
 <include src="ROM.icf::L3Rim.dec"/>
 <include src="ROM.icf::L3R13.dec"/>
 <include src="ROM.icf::L3R16.dec"/>
+<include src="ROM.icf::L3R32.dec"/>
 </sub>
 
-! <include src="ROM.icf::L0Rim.dec"/>
-! <include src="ROM.icf::L2Rim.dec"/>
-! <include src="ROM.icf::L2R01.dec"/>
-! <include src="ROM.icf::L2R05.dec"/>
-! <include src="ROM.icf::L2R06.dec"/>
-! <include src="ROM.icf::L2R07.dec"/>
-! <include src="ROM.icf::L2R09.dec"/>
-! <include src="ROM.icf::L6R28.dec"/>
-! <include src="ROM.icf::L3Rim.dec"/>
-! <include src="ROM.icf::L3R13.dec"/>
-! </sub>
 
 <sub type="DC" name="p4" layout="cols=2;screen.width=[250,300,200,300];printer.width=[15,30];order=1;">
 [
@@ -2520,6 +2520,7 @@ C(3,#DSnoF,0,E(0,0),E(0,1))
 <include src="ROM.icf::L3R13.tom"/>
 <include src="ROM.icf::L3R16.tom"/>
 <include src="ROM.icf::L6R28.tom"/>
+<include src="ROM.icf::L3R32.tom"/>
 <include src="RPDTL.icf::RPDTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L3100

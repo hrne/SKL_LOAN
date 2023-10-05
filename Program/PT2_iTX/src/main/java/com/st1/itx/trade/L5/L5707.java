@@ -23,7 +23,7 @@ import com.st1.itx.db.service.NegTransService;
 
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.common.NegReportCom;
+import com.st1.itx.util.common.NegApprCom;
 import com.st1.itx.util.common.NegCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -44,7 +44,7 @@ import com.st1.itx.util.parse.Parse;
 public class L5707 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
-	public NegReportCom NegReportCom;
+	public NegApprCom negApprCom;
 	@Autowired
 	public NegTransService sNegTransService;
 	@Autowired
@@ -78,12 +78,12 @@ public class L5707 extends TradeBuffer {
 			long sno = 0L;
 			if (titaVo.isHcodeNormal()) {
 				// 正向
-				StringBuffer sbData = NegReportCom.BatchTx01(BringUpDate, titaVo);
-				sno = NegReportCom.CreateTxt(sbData, "BATCHTX01", titaVo);
+				StringBuffer sbData = negApprCom.BatchTx01(BringUpDate, titaVo);
+				sno = negApprCom.CreateTxt(sbData, "BATCHTX01", titaVo);
 				this.info("L5707 sno=[" + sno + "]");
 			} else {
 				// 訂正
-				NegReportCom.BatchTx01(BringUpDate, titaVo);
+				negApprCom.BatchTx01(BringUpDate, titaVo);
 				// InsUpdNegApprO1<-在這裡面處理
 			}
 			totaVo.put("TxtSnoF", "" + sno);

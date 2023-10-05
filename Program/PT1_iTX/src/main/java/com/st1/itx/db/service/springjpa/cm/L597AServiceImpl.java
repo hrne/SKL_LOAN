@@ -16,6 +16,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.util.common.NegCom;
 
 @Service("l597AServiceImpl")
 @Repository
@@ -26,6 +27,9 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	L5051ServiceImpl l5051ServiceImpl;
+
+	@Autowired
+	public NegCom negCom;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -569,5 +573,91 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		return data;
+	}
+	
+	public List<Map<String, String>> findNegAppr01(int intbringupdate, int Status, int iHcode, TitaVo titaVo) throws LogicException {
+		this.info("findNegAppr01");
+		int ilast2month = negCom.getRepayDate(intbringupdate, -2, titaVo) ;//提兌日往前二個月(西元年)
+		int today = titaVo.getOrgEntdyI() + 19110000; // 會計日期
+
+		String sql = "";
+
+		sql = sql + "SELECT n.*  FROM  \"NegAppr01\" n " ;
+		sql = sql + "  LEFT JOIN \"NegAppr\" a  ON a.\"BringUpDate\" = :intbringupdate ";		
+		sql = sql + "  LEFT JOIN \"LoanBorTx\" b  ON b.\"CustNo\" = 601776 ";		
+		sql = sql + "                            AND b.\"AcDate\" = n.\"AcDate\" ";		
+		sql = sql + "                            AND b.\"TitaTlrNo\" = n.\"TitaTlrNo\" ";		
+		sql = sql + "                            AND b.\"TitaTxtNo\" = LPAD(n.\"TitaTxtNo\",8,'0') ";		
+
+		sql = sql + " WHERE n.\"AcDate\"  > :ilast2month " ;
+		sql = sql + "   AND NVL(b.\"CustNo\",0)  > 0 " ;
+
+		if(Status == 1) {// 撥付製檔
+			if(iHcode == 0) {
+				sql = sql + " AND n.\"ExportDate\"  = 0  ";
+				sql = sql + " AND CASE WHEN a.\"ExportDate\"  = :today AND a.\"KindCode\" = 1 AND n.\"CaseKindCode\" IN ('1') THEN 1  ";
+				sql = sql + "          WHEN a.\"ExportDate\"  = :today AND a.\"KindCode\" = 2 AND n.\"CaseKindCode\" IN ('1','2') THEN 1  ";
+				sql = sql + "          WHEN a.\"ExportDate\"  = :today AND a.\"KindCode\" = 3 AND n.\"CaseKindCode\" IN ('3') THEN 1  ";
+				sql = sql + "          WHEN a.\"ExportDate\"  = :today AND a.\"KindCode\" = 4 AND n.\"CaseKindCode\" IN ('4') THEN 1  ";
+				sql = sql + "     ELSE 0 END = 1  ";
+			}else {
+				sql = sql + " AND n.\"ExportDate\"  = a.\"ExportDate\"  ";
+				sql = sql + " AND n.\"ApprDate\"    = 0  ";
+				sql = sql + " AND n.\"BringUpDate\" = 0  ";
+			}
+		}
+		if(Status == 2) {// 撥付傳票日
+			if(iHcode == 0) {
+				sql = sql + " AND n.\"ExportDate\"  > 0  ";
+				sql = sql + " AND n.\"ApprDate\"    = 0  ";
+				sql = sql + " AND CASE WHEN a.\"ApprAcDate\"  = :today AND a.\"KindCode\" = 1 AND n.\"CaseKindCode\" IN ('1') THEN 1  ";
+				sql = sql + "          WHEN a.\"ApprAcDate\"  = :today AND a.\"KindCode\" = 2 AND n.\"CaseKindCode\" IN ('1','2') THEN 1  ";
+				sql = sql + "          WHEN a.\"ApprAcDate\"  = :today AND a.\"KindCode\" = 3 AND n.\"CaseKindCode\" IN ('3') THEN 1  ";
+				sql = sql + "          WHEN a.\"ApprAcDate\"  = :today AND a.\"KindCode\" = 4 AND n.\"CaseKindCode\" IN ('4') THEN 1  ";
+				sql = sql + "     ELSE 0 END = 1  ";
+			}else {
+				sql = sql + " AND n.\"ExportDate\"  > 0  ";
+				sql = sql + " AND n.\"ApprDate\"  = a.\"ApprAcDate\"  ";
+				sql = sql + " AND n.\"BringUpDate\" = 0  ";
+			}
+		}
+		if(Status == 3) {// 撥付提兌日
+			if(iHcode == 0) {
+				sql = sql + " AND CASE WHEN a.\"BringUpDate\"  = :today AND a.\"KindCode\" = 1 AND n.\"ExportDate\" = a.\"ExportDate\" THEN 1 ";
+				sql = sql + "          WHEN a.\"BringUpDate\"  = :today AND a.\"KindCode\" = 2 AND n.\"ExportDate\" = a.\"ExportDate\" THEN 1 ";
+				sql = sql + "          WHEN a.\"BringUpDate\"  = :today AND a.\"KindCode\" = 3 AND n.\"ExportDate\" = a.\"ExportDate\" THEN 1 ";
+				sql = sql + "          WHEN a.\"BringUpDate\"  = :today AND a.\"KindCode\" = 4 AND n.\"ExportDate\" = a.\"ExportDate\" THEN 1 ";
+				sql = sql + "     ELSE 0 END = 1  ";
+				sql = sql + " AND n.\"ApprDate\"    > 0  ";
+				sql = sql + " AND n.\"BringUpDate\" = 0  ";
+				sql = sql + " AND CASE WHEN a.\"BringUpDate\"  = :today AND a.\"KindCode\" = 1 AND n.\"CaseKindCode\" IN ('1') THEN 1  ";
+				sql = sql + "          WHEN a.\"BringUpDate\"  = :today AND a.\"KindCode\" = 2 AND n.\"CaseKindCode\" IN ('1','2') THEN 1  ";
+				sql = sql + "          WHEN a.\"BringUpDate\"  = :today AND a.\"KindCode\" = 3 AND n.\"CaseKindCode\" IN ('3') THEN 1  ";
+				sql = sql + "          WHEN a.\"BringUpDate\"  = :today AND a.\"KindCode\" = 4 AND n.\"CaseKindCode\" IN ('4') THEN 1  ";
+				sql = sql + "     ELSE 0 END = 1  ";
+			}else {
+				sql = sql + " AND n.\"ExportDate\"  > 0  ";
+				sql = sql + " AND n.\"ApprDate\"    > 0  ";
+				sql = sql + " AND n.\"BringUpDate\"  = a.\"BringUpDate\"  ";
+			}
+		}
+
+			
+		sql = sql+ " ORDER BY n.\"CaseKindCode\", n.\"FinCode\", n.\"CustNo\" ";
+
+		this.info("sql=" + sql);
+
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("ilast2month", ilast2month);
+		query.setParameter("intbringupdate", intbringupdate);
+		if (iHcode == 0) {
+			query.setParameter("today", today);
+		}
+
+		// 轉成 List<HashMap<String, String>>
+		return this.convertToMap(query);
+
 	}
 }

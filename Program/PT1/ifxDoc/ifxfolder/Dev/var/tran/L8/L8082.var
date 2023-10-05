@@ -42,7 +42,7 @@ T(3,2:郵寄放款本息攤還表暨繳息通知單;3:簡訊通知;9:全部)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
 ["[L8082]                                 AML定審中風險資料查詢"],
-! ["#FdReviewType+評　　級",#ReviewType,#ReviewTypeX],
+["#FdReviewType+評　　級",#ReviewType,#ReviewTypeX],
 ["#FdProcessType+通知類別",#ProcessType,#ProcessTypeX],
 ["#FdStatus+狀　　態",#Status,#StatusX],
 ["#FdAcDate+定審日期",#AcDate1,'~',#AcDate2],
@@ -131,7 +131,7 @@ T(2,@AMLIsStatusHelp,#HelpDesc1)
 T(2,#KINBR)
 
 !評級
-#ReviewType=X,1,L
+#ReviewType=X,1,I
 C(3,#CHAIN,1,s,$)
 T(3,M)
 HELP(#AMLReviewTypeHelp,cols:1)

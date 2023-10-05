@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.NegFinAcct;
@@ -33,6 +35,27 @@ public interface NegFinAcctService {
    * @return Slice NegFinAcct NegFinAcct of List
    */
   public Slice<NegFinAcct> findAll(int index, int limit, TitaVo... titaVo);
+
+  /**
+   * NewFinCode=
+   *
+   * @param newFinCode_0 newFinCode_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice NegFinAcct NegFinAcct of List
+   */
+  public Slice<NegFinAcct> newFinCodeEq(String newFinCode_0, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * MergerDate&lt;= , AND ExecuteDate=
+   *
+   * @param mergerDate_0 mergerDate_0
+   * @param executeDate_1 executeDate_1
+   * @param titaVo Variable-Length Argument
+   * @return Slice NegFinAcct NegFinAcct of List
+   */
+  public NegFinAcct mergerDateFirst(int mergerDate_0, int executeDate_1, TitaVo... titaVo);
 
   /**
    * hold By NegFinAcct
