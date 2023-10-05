@@ -147,8 +147,8 @@ BEGIN
             ,"AssetClass" 
             ,NVL("AcSubBookCode",'N')  AS "AcSubBookCode" 
             ,CASE  
-               WHEN "AssetClass" ='11' THEN 0.05   
-               WHEN "AssetClass" ='12' THEN 0.15                  
+               WHEN "AssetClass" ='11' THEN 0.005   
+               WHEN "AssetClass" ='12' THEN 0.015                  
                WHEN "AssetClass" ='21' THEN 0.02                  
                WHEN "AssetClass" ='22' THEN 0.02                  
                WHEN "AssetClass" ='23' THEN 0.02                  
@@ -224,17 +224,17 @@ BEGIN
                   ,"AssetClass" 
                   ,NVL("AcSubBookCode",'N')  
                   ,CASE  
-                     WHEN "AssetClass" ='11' THEN 0.05   
-                     WHEN "AssetClass" ='12' THEN 0.15                  
-                     WHEN "AssetClass" ='21' THEN 0.02                  
-                     WHEN "AssetClass" ='22' THEN 0.02                  
-                     WHEN "AssetClass" ='23' THEN 0.02                  
-                     WHEN "AssetClass" ='3' THEN 0.1                  
-                     WHEN "AssetClass" ='4' THEN 0.5                  
-                     WHEN "AssetClass" ='5' THEN 1                  
-                     WHEN "AssetClass" ='61' THEN 0.05 
-                     WHEN "AssetClass" ='62' THEN 0.02 
-                     WHEN "AssetClass" ='7' THEN 0.02  
+                    WHEN "AssetClass" ='11' THEN 0.005   
+                    WHEN "AssetClass" ='12' THEN 0.015                  
+                    WHEN "AssetClass" ='21' THEN 0.02                  
+                    WHEN "AssetClass" ='22' THEN 0.02                  
+                    WHEN "AssetClass" ='23' THEN 0.02                  
+                    WHEN "AssetClass" ='3' THEN 0.1                  
+                    WHEN "AssetClass" ='4' THEN 0.5                  
+                    WHEN "AssetClass" ='5' THEN 1                  
+                    WHEN "AssetClass" ='61' THEN 0.05 
+                    WHEN "AssetClass" ='62' THEN 0.02 
+                    WHEN "AssetClass" ='7' THEN 0.02  
                   ELSE 0 END  
     )               
     ; 

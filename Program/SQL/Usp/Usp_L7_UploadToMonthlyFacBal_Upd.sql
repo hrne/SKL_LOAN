@@ -31,39 +31,32 @@ BEGIN
                , M."FacmNo" 
                , CASE 
                    WHEN R."Id" IS NOT NULL
-                   THEN 'Y'
-                   ELSE 'N'
+                   THEN R."BankRelationFlag"
+                   ELSE ''
                  END AS "BankRelationFlag"
           FROM "MonthlyFacBal" M
           LEFT JOIN "CustMain" CM ON CM."CustNo" = M."CustNo"
           LEFT JOIN(
-              SELECT DISTINCT
-                  "Id"
+              SELECT "Id"
+                    ,"BankRelationFlag"
               FROM
                   (
                       SELECT DISTINCT
-                          "HeadId"     AS "Id"
+                          DECODE("BusId",'-',DECODE("RelId",'-',"HeadId","RelId"),"BusId")  AS "Id"
+                          ,"RelWithCompany" AS "BankRelationFlag"
                       FROM
                           "LifeRelHead"
                       WHERE
-                          trunc("AcDate" / 100) = TYYMM
-                      UNION ALL
+                          "AcDate" = ( SELECT MAX("AcDate") FROM "LifeRelHead" WHERE TRUNC("AcDate"/100) <=  TYYMM )
+                      UNION 
                       SELECT DISTINCT
-                          "RelId"     AS "Id"
+                          "EmpId"     AS "Id"
+                          ,'G' AS "BankRelationFlag"
                       FROM
-                          "LifeRelHead"
+                          "LifeRelEmp"
                       WHERE
-                          trunc("AcDate" / 100) = TYYMM
-                      UNION ALL
-                      SELECT DISTINCT
-                          "BusId"     AS "Id"
-                      FROM
-                          "LifeRelHead"
-                      WHERE
-                          trunc("AcDate" / 100) = TYYMM
+                          "AcDate" = ( SELECT MAX("AcDate") FROM "LifeRelEmp" WHERE TRUNC("AcDate"/100) <=  TYYMM )
                   )
-                  WHERE
-                  "Id" <> '-'
           )  R ON R."Id" = CM."CustId"
           WHERE M."YearMonth" = TYYMM
         ) TMP

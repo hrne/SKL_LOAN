@@ -386,7 +386,11 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		FROM dual ";
 		sql += "   		  ) ";
 	// 單位元
-		sql += "	SELECT \"Column\", \"Value\" FROM \"tempTotal\"";
+		sql += "	SELECT ";
+		sql += "	\"Column\"	";
+		sql += "	,SUM\"Value\" AS \"Value\"	";
+		sql += "	FROM \"tempTotal\" ";
+		sql += "	GROUP BY \"Column\" ";
 
 		this.info("sql=" + sql);
 
@@ -443,9 +447,9 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		FROM OVDATA O ";
 		sql += "   		LEFT JOIN \"CoreAcMain\" C ON C.\"AcDate\" = TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR( O.\"YearMonth\"*100+1), 'YYYYMMDD')),'YYYYMMDD')) ";
 		sql += "   								  AND C.\"CurrencyCode\" = 'NTD' ";
-		sql += "   								  AND \"AcNoCode\" IN ('10604') "; // 催收及催收費用含折溢價
+		sql += "   								  AND \"AcNoCode\" IN ('10603','10604') "; // 催收及催收費用含折溢價
 		sql += "		WHERE C.\"AcDate\" IS NOT NULL ";
-		sql += "		GROUP BY O.\"YearMonth\",C.\"AcNoCode\" ";
+		sql += "		GROUP BY O.\"YearMonth\"  ";
 		sql += "	), BADDATA AS ( "; // 當年度轉呆金額
 		sql += "		SELECT TRUNC(\"AcDate\" / 10000 ) AS \"Year\" ";
 		sql += "			 	,SUM(CASE WHEN \"TitaHCode\" IN ('0','2','4')  THEN \"TxAmt\" ELSE 0 - \"TxAmt\" END  ) AS \"BadAmt\"";
@@ -455,9 +459,9 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	)	 ";
 		sql += "	SELECT 	 ";
 		sql += "	 O.\"YearMonth\" 	 											AS \"YearMonth\"	 ";
-		sql += "	,ROUND(NVL(C.\"LoanBal\",0) / 1000 , 0 )						AS \"LoanBal\" 	 ";
-		sql += "	,ROUND(NVL(O.\"OvAmt\",0) + NVL(C.\"OvduBal\",0) / 1000 , 0 )	AS \"OvduBal\" 	 ";
-		sql += "	,ROUND(NVL(B.\"BadAmt\",0) 	/ 1000 , 0 )				 		AS \"BadAmt\" 	 ";
+		sql += "	,SUM(NVL(C.\"LoanBal\",0)   )						AS \"LoanBal\" 	 ";
+		sql += "	,SUM(NVL(O.\"OvAmt\",0) + NVL(C.\"OvduBal\",0)   )	AS \"OvduBal\" 	 ";
+		sql += "	,SUM(NVL(B.\"BadAmt\",0) 	  )				 		AS \"BadAmt\" 	 ";
 		sql += "	FROM OVDATA	 O ";
 		sql += "	LEFT JOIN  COREDATA	 C ON C.\"YearMonth\" = O.\"YearMonth\" ";
 		sql += "	LEFT JOIN  BADDATA	 B ON B.\"Year\" = TRUNC(O.\"YearMonth\"/100 ) ";

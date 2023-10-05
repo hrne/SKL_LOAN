@@ -101,6 +101,7 @@ BEGIN
                                ,'10601301000'    --催收款項-法務費用
                                ,'10601302000'    --催收款項-火險費用
                                ,'10601304000')   --催收款項-折溢價
+                  AND "CurrencyCode" = 'TOL'
                   AND TRUNC("AcDate" / 100 ) = TYYMM
           GROUP BY TRUNC("AcDate" / 100 )
             )

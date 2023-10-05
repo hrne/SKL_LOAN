@@ -144,7 +144,7 @@ public class LM085Report extends MakeReport {
 
 			col = enToNumber(r.get("F0").toString().substring(0, 1));
 
-			row = Integer.valueOf(r.get("F0").toString().substring(1, 2));
+			row = Integer.valueOf(r.get("F0").toString().substring(1, r.get("F0").length()));
 			amt = getBigDecimal(r.get("F1").toString());
 
 			this.info("col=" + col + ",row=" + row);
@@ -196,7 +196,7 @@ public class LM085Report extends MakeReport {
 			row = Integer.valueOf(r.get("F0").toString());
 			amt = getBigDecimal(r.get("F1").toString());
 
-			this.info("col=" + col + ",row=" + row);
+			this.info("col=" + col + ",row=" + row + ",amt=" + amt);
 
 			makeExcel.setValue(row, col, amt, "#,##0", "R");
 
@@ -298,25 +298,27 @@ public class LM085Report extends MakeReport {
 			makeExcel.setValue(vaRow, 1, yearMonthText, "C");
 
 			// 放款餘額
-			loanBal = getBigDecimal(r.get("LoanBal").toString());
+			loanBal = getBigDecimal(r.get("LoanBal").toString()).divide(getBigDecimal("1000"), 0,
+					BigDecimal.ROUND_HALF_UP);
 
 			makeExcel.setValue(vaRow, 2, loanBal, "#,###.##0", "R");
 
 			// 逾放總額
-			ovduBal = getBigDecimal(r.get("OvduBal").toString());
+			ovduBal = getBigDecimal(r.get("OvduBal").toString()).divide(getBigDecimal("1000"), 0,
+					BigDecimal.ROUND_HALF_UP);
 
 			makeExcel.setValue(vaRow, 4, ovduBal, "#,###.##0", "R");
 
 			// 逾放比
-			if (loanBal.compareTo(BigDecimal.ZERO) == 0) {
+			if (loanBal.compareTo(ovduBal) <= 0) {
 				makeExcel.setValue(vaRow, 6, " ", "R");
 			} else {
 				makeExcel.setValue(vaRow, 6, ovduBal.divide(loanBal, 5, BigDecimal.ROUND_HALF_UP), "0.####0", "R");
 			}
 
 			// 當年度轉呆金額
-			badAmt = getBigDecimal(r.get("BadAmt").toString());
-
+			badAmt = getBigDecimal(r.get("BadAmt").toString()).divide(getBigDecimal("1000"), 0,
+					BigDecimal.ROUND_HALF_UP);
 			makeExcel.setValue(vaRow, 7, badAmt, "#,###.##0", "R");
 
 			vaRow++;

@@ -225,9 +225,9 @@ public class L7205p extends TradeBuffer {
 
 				this.batchTransaction.commit();
 
+				// 切換環境
+				changeDBEnv(titaVo);
 			}
-			// 切換環境
-			changeDBEnv(titaVo);
 
 		}
 
@@ -279,9 +279,9 @@ public class L7205p extends TradeBuffer {
 					throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 				}
 				this.batchTransaction.commit();
+				// 切換環境
+				changeDBEnv(titaVo);
 			}
-			// 切換環境
-			changeDBEnv(titaVo);
 		}
 
 		// 維護LoanIfrs9Ap
@@ -313,8 +313,8 @@ public class L7205p extends TradeBuffer {
 				}
 				this.batchTransaction.commit();
 
+				changeDBEnv(titaVo);
 			}
-			changeDBEnv(titaVo);
 		}
 
 		updLM052ReportSPAndMonthlyFacBalData(titaVo, iYearMonth);
@@ -359,7 +359,7 @@ public class L7205p extends TradeBuffer {
 
 		CountF = CountAll - CountS;
 
-		String note = "總筆數：" + CountAll + ",更新成功筆數：" + CountS + ",沒有在資料庫筆數：" + CountF;
+		String note = "總筆數：" + CountAll + ",更新成功筆數：" + CountS;
 
 		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "",
 				titaVo.getParam("TLRNO"), note, titaVo);
@@ -644,11 +644,10 @@ public class L7205p extends TradeBuffer {
 				govProjectBal = govProjectBal.add(m.getPrinBalance());
 			}
 		}
-	
-		BigDecimal govProjectAdjustAmt = parse.stringToBigDecimal(tTempVo.get("LoanBal"))
-				.subtract(govProjectBal);
-		this.info("LoanBal=" + tTempVo.get("LoanBal"));
-		this.info("govProjectBal=" + govProjectBal);
+
+		BigDecimal govProjectAdjustAmt = parse.stringToBigDecimal(tTempVo.get("LoanBal")).subtract(govProjectBal);
+		this.info("govProjectBal(CdComm)=" + tTempVo.get("LoanBal"));
+		this.info("govProjectBal(FacBal)=" + govProjectBal);
 		this.info("govProjectAdjustAmt=" + govProjectAdjustAmt);
 // iFRS9AdjustAmt IFRS9增提金額 = 五分類備呆總金額- 會計部核定備抵損失(MonthlyLM052Loss.ApprovedLoss)		                              
 		MonthlyLM052Loss tMonthlyLM052Loss = sLM052LossService.findById(yearMonth, titaVo);
@@ -778,7 +777,9 @@ public class L7205p extends TradeBuffer {
 		for (MonthlyFacBal f : this.facBalSumList) {
 			// 借用欄位 : loanType => BuildingFlag
 			// C.不動產抵押放款的正常繳息由總額減去其他計算
-			if (!"C".equals(f.getBuildingFlag())) {
+			if ("C".equals(f.getBuildingFlag())) {
+				addLM052ToLM055List(f.getBuildingFlag(), f.getAssetClass2(), f.getPrinBalance(), BigDecimal.ZERO);
+			} else {
 				computeStorageAmt(f.getBuildingFlag(), f.getAssetClass2(), f.getPrinBalance());
 			}
 		}

@@ -175,7 +175,7 @@ public class LM048Report extends MakeReport {
 			String tMaturityDate = "";
 			String tPrevPayIntDate = "";
 			String tGroupName = "";
-			String tmpGroupName = "";
+
 			int tCustNoMain = 0;
 
 			int tmpInDustryCode = 0;
@@ -294,14 +294,14 @@ public class LM048Report extends MakeReport {
 				makeExcel.setValue(row, 14, tLineAmt.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO
 						: tLineAmt.divide(tNetWorth, 4, BigDecimal.ROUND_HALF_UP), "0.00%", "C");
 
-				tGroupName = r.get("CustNameMain").trim().length() == 0 ? "" : r.get("CustNameMain");
 				tCustNoMain = r.get("CustNoMain") == null ? 0 : parse.stringToInteger(r.get("CustNoMain"));
+	
 
 				// 不同集團
 				if (tmpCustNoMain != tCustNoMain) {
 
 					BigDecimal tmpLineAmt = groupLineAmt(tmpCustNoMain);
-
+					String tmpGroupName = groupName(tmpCustNoMain);
 					boolean isGroup = tmpLineAmt.compareTo(BigDecimal.ZERO) > 0;
 
 					this.info("1.isGroup = " + isGroup);
@@ -324,7 +324,6 @@ public class LM048Report extends MakeReport {
 					}
 
 					tmpCustNoMain = tCustNoMain;
-					tmpGroupName = tGroupName;
 
 					if (isGroup) {
 						makeExcel.setValue(eGroupRow, 12, tGroupName, "C");
@@ -367,10 +366,11 @@ public class LM048Report extends MakeReport {
 							tAvailableBalCalculate = BigDecimal.ZERO;
 						}
 
-						tLineAmtCalculate = BigDecimal.ZERO;
-						tLoanBalCalculate = BigDecimal.ZERO;
-						tAvailableBalCalculate = BigDecimal.ZERO;
 					}
+
+					tLineAmtCalculate = BigDecimal.ZERO;
+					tLoanBalCalculate = BigDecimal.ZERO;
+					tAvailableBalCalculate = BigDecimal.ZERO;
 				}
 			}
 
@@ -650,6 +650,31 @@ public class LM048Report extends MakeReport {
 
 				if (custNoGroup == parse.stringToInteger(r.get("CustNoMain"))) {
 					result = getBigDecimal(r.get("ToTalLineAmt"));
+					continue;
+				}
+			}
+		}
+
+		return result;
+	}
+
+	private String groupName(int custNoGroup) throws LogicException {
+		String result = "";
+
+		this.info("custNoGroup = " + custNoGroup);
+
+		if (custNoGroup == 0) {
+			return result;
+		}
+
+		if (listLineAmt.size() == 0) {
+
+		} else {
+
+			for (Map<String, String> r : listLineAmt) {
+
+				if (custNoGroup == parse.stringToInteger(r.get("CustNoMain"))) {
+					result = r.get("CustNameMain");
 					continue;
 				}
 			}

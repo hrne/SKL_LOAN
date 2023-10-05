@@ -32,7 +32,6 @@ public class LM049ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String sql = "";
 
-
 		sql += " with \"Main\" AS ( ";
 		sql += "   select case  ";
 		sql += "        	when \"CompanyName\" like '新%金%' and length(\"CompanyName\") = 4 then 1 ";
@@ -66,7 +65,7 @@ public class LM049ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        , \"LoanBalance\"";
 		sql += "   from \"FinHoldRel\"  ";
 		sql += "   where trunc(\"AcDate\" / 100 ) = :yymm ";
-		//有半數以上董事與金控公司或其子公司相同之公司 保留(舜雯人工處理)
+		// 有半數以上董事與金控公司或其子公司相同之公司 保留(舜雯人工處理)
 //		sql += "   union ";
 //		sql += "   select 3 as \"comSeq\"";
 //		sql += "         ,1 as \"levSeq\"";
@@ -159,50 +158,25 @@ public class LM049ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 */
 	public List<Map<String, String>> findStockHoldersEqt(int acDate, TitaVo titaVo) throws Exception {
 
-		this.info("lM049.findStockHoldersEqt ");
-
-		String entdy = String.valueOf(acDate);
-		String yy = entdy.substring(0, 4);
-		String mm = entdy.substring(4, 6);
-		String yyqq = "";
-		switch (mm) {
-		case "01":
-		case "02":
-		case "03":
-			yyqq = String.valueOf(Integer.valueOf(yy) - 1) + "12";
-			break;
-		case "04":
-		case "05":
-		case "06":
-			yyqq = yy + "03";
-			break;
-		case "07":
-		case "08":
-		case "09":
-			yyqq = yy + "06";
-			break;
-		case "10":
-		case "11":
-		case "12":
-			yyqq = yy + "09";
-			break;
-		}
-
-		String sql = "";
-		sql += " select \"AcDate\" , \"StockHoldersEqt\" from \"InnFundApl\" ";
-		sql += " where \"AcDate\" = (";
-		sql += " 	select max(\"AcDate\") from \"InnFundApl\" ";
-		sql += " 	where trunc(\"AcDate\"/100) <= :yymm ";
-		sql += " 	  and \"PosbleBorPsn\" > 0 ";
-		sql += " )";
-
+		this.info("lM049.Totalequity acdate=" + acDate);
+		String sql = " ";
+		sql += "     SELECT \"AvailableFunds\" AS \"AvailableFunds\"";
+		sql += "           ,\"AcDate\"  AS \"AcDate\"";
+		sql += "     FROM \"InnFundApl\" ";
+		sql += "     WHERE \"AcDate\" = (";
+		sql += "     	SELECT MAX(\"AcDate\") ";
+		sql += "     	FROM \"InnFundApl\" ";
+		sql += "     	WHERE \"AcDate\" <= :acdate";
+		sql += " 	      AND \"AvailableFunds\" > 0 ";
+		sql += "     )";
 		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("yymm", yyqq);
+		query.setParameter("acdate", acDate);
 		return this.convertToMap(query);
+
 	}
 
 }

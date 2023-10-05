@@ -29,55 +29,31 @@ public class LM050ServiceImpl extends ASpringJpaParm implements InitializingBean
 	/**
 	 * 查詢前一季淨值
 	 * 
-	 * @param iEntdy 西元年月日
+	 * @param acdate 西元年月日
 	 * @param titaVo
 	 * @return
 	 * @throws Exception
 	 **/
-	public List<Map<String, String>> fnEquity(int iEntdy, TitaVo titaVo) throws Exception {
-		String entdy = String.valueOf(iEntdy);
-		String yy = entdy.substring(0, 4);
-		String mm = entdy.substring(4, 6);
-		String yyqq = "";
-		switch (mm) {
-		case "01":
-		case "02":
-		case "03":
-			yyqq = String.valueOf(Integer.valueOf(yy) - 1) + "12";
-			break;
-		case "04":
-		case "05":
-		case "06":
-			yyqq = yy + "03";
-			break;
-		case "07":
-		case "08":
-		case "09":
-			yyqq = yy + "06";
-			break;
-		case "10":
-		case "11":
-		case "12":
-			yyqq = yy + "09";
-			break;
-		}
-		this.info("lM050.Totalequity yyqq=" + yyqq);
+	public List<Map<String, String>> fnEquity(int acdate, TitaVo titaVo) throws Exception {
+		
+
+		this.info("lM050.Totalequity acdate=" + acdate);
 		String sql = " ";
-		sql += "     SELECT \"StockHoldersEqt\" AS \"Totalequity\"";
+		sql += "     SELECT \"AvailableFunds\" AS \"AvailableFunds\"";
 		sql += "           ,\"AcDate\"  AS \"AcDate\"";
 		sql += "     FROM \"InnFundApl\" ";
 		sql += "     WHERE \"AcDate\" = (";
 		sql += "     	SELECT MAX(\"AcDate\") ";
 		sql += "     	FROM \"InnFundApl\" ";
-		sql += "     	WHERE TRUNC(\"AcDate\" / 100) <= :yyqq";
-		sql += " 	      AND \"PosbleBorPsn\" > 0 ";
+		sql += "     	WHERE \"AcDate\" <= :acdate";
+		sql += " 	      AND \"AvailableFunds\" > 0 ";
 		sql += "     )";
 		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("yyqq", yyqq);
+		query.setParameter("acdate", acdate);
 		return this.convertToMap(query);
 
 	}

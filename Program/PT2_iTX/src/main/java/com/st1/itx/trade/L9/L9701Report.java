@@ -282,11 +282,8 @@ public class L9701Report extends MakeReport {
 
 				}
 
-				if (tL9701Vo.get("DB").equals("1")) {
-					printDetail(tL9701Vo);
-					detailCounts++;
-
-				}
+				printDetail(tL9701Vo);
+				detailCounts++;
 
 				// 每一筆都會判斷是否換頁
 				this.headNo = 0;

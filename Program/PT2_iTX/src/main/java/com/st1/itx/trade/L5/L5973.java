@@ -172,7 +172,6 @@ public class L5973 extends TradeBuffer {
 			NegMainId negMainIdVO = new NegMainId();
 			for (NegAppr01 NegAppr01VO : lNegAppr01) {
 				OccursList occursList = new OccursList();
-
 				int ThisCustNo = NegAppr01VO.getCustNo();
 				String tCustId = "";
 				String tCustName ="";		

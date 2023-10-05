@@ -123,7 +123,7 @@ public class LM047ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,D.\"FacmNo\"                                                           F1";
 		sql += "            ,\"Fn_ParseEOL\"(C.\"CustName\", 0)                                     F2";
 		sql += "            ,F.\"LineAmt\"                                                          F3";
-		sql += "            ,D.\"Status\"                                                           F4";
+		sql += "            ,NVL(CD.\"Item\", D.\"Status\")                                         F4";
 		sql += "            ,O.\"OvduPrinAmt\"                                                      F5";
 		sql += "            ,O.\"OvduIntAmt\"                                                       F6";
 		sql += "            ,O.\"BadDebtAmt\"                                                       F7";
@@ -154,6 +154,8 @@ public class LM047ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                             AND F.\"FacmNo\" = D.\"FacmNo\"";
 		sql += "      LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = D.\"CustNo\"";
 		sql += "      LEFT JOIN \"CdEmp\" E ON E.\"EmployeeNo\" = D.\"LegalPsn\"";
+		sql += "      LEFT JOIN \"CdCode\" CD ON CD.\"DefCode\" = 'ColStatus'   									     ";
+		sql += "                             AND TO_NUMBER(CD.\"Code\")  = D.\"Status\" 									 ";
 		sql += "      WHERE M.\"ROWNUMBER\" = 1 ";
 		sql += "      ORDER BY D.\"CustNo\", D.\"FacmNo\"";
 		this.info("sql=" + sql);

@@ -29,6 +29,7 @@ import com.st1.itx.db.service.LifeRelHeadService;
 import com.st1.itx.db.service.MonthlyFacBalService;
 import com.st1.itx.db.service.StakeholdersStaffService;
 import com.st1.itx.util.format.StringCut;
+import com.st1.itx.util.http.WebClient;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.FileCom;
@@ -64,8 +65,14 @@ public class L7206 extends TradeBuffer {
 	public MonthlyFacBalService tMonthlyFacBalService;
 	@Autowired
 	MakeExcel makeExcel;
+	@Autowired
+	public WebClient webClient;
+	@Autowired
+	DateUtil dDateUtil;
 
 	StringCut sStringCut;
+
+	private int inputAcDate = 0;
 
 	@Value("${iTXInFolder}")
 	private String inFolder = "";
@@ -77,6 +84,11 @@ public class L7206 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L7206 ");
 		this.totaVo.init(titaVo);
+
+		inputAcDate = Integer.valueOf(titaVo.getParam("inputAcDate")) + 19110000;
+		if (inputAcDate == 19110000) {
+			throw new LogicException(titaVo, "E0014", "請輸入會計日期");
+		}
 
 		// 上傳檔案
 		// 0:人壽利關人職員名單[LA$RLTP] ;csv xlsx xls
@@ -91,9 +103,9 @@ public class L7206 extends TradeBuffer {
 		} else {
 			// 2023-08-21 Wei 新增 from SKL-IT 葛經理
 			MySpring.newTask("L7206p", this.txBuffer, titaVo);
-
-			updL7UploadData(titaVo);
 		}
+
+		isLatestData(titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -119,7 +131,6 @@ public class L7206 extends TradeBuffer {
 		String iFunctionName = titaVo.getParam("FunctionCodeX").toString();
 
 		this.info("iFunctionCode=" + iFunctionCode);
-		this.info("iFunctionName=" + iFunctionName);
 
 		// 路徑
 		String[] extension = null;
@@ -142,7 +153,8 @@ public class L7206 extends TradeBuffer {
 		// 月底營業日
 		// 20220101
 		// 10 17
-		int acDate = parse.stringToInteger(tmpName.substring(tmpName.length() - 8, tmpName.length()));
+//		int acDate = parse.stringToInteger(tmpName.substring(tmpName.length() - 8, tmpName.length()));
+		int acDate = inputAcDate;
 
 		this.info("acDate=" + acDate);
 		// 判斷選擇上傳的項目與實際上傳的檔案名稱要相符(避免上傳錯檔案，欄位不符會報錯)
@@ -210,6 +222,7 @@ public class L7206 extends TradeBuffer {
 					titaVo);
 
 			delStakeholdersStaff = tStakeholdersStaff == null ? null : tStakeholdersStaff.getContent();
+
 			this.info("delStakeholdersStaff = " + delStakeholdersStaff);
 
 			for (OccursList tempOccursList : occursList) {
@@ -243,7 +256,7 @@ public class L7206 extends TradeBuffer {
 			}
 
 			changeDBEnv(titaVo);
-			
+
 			try {
 
 				if (delStakeholdersStaff != null) {
@@ -389,8 +402,6 @@ public class L7206 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
 
-			updL7UploadData(titaVo);
-
 			// 2:人壽利關人職員名單[T07_2];xlsx xls
 		} else if (iFunctionCode == 2) {
 
@@ -523,8 +534,6 @@ public class L7206 extends TradeBuffer {
 			}
 
 		}
-
-		titaVo.setDataBaseOnOrg();// 還原原本的環境
 
 		this.totaVo.putParam("CountAll", CountAll);
 		this.totaVo.putParam("Count", CountS);
@@ -862,7 +871,8 @@ public class L7206 extends TradeBuffer {
 		this.info("upd updL7UploadData start.");
 
 		// 2023-09-12 更新MonthlyFacBal BankRelationFlag
-		int iYYMM = Integer.valueOf(titaVo.getParam("inputAcDate")) / 100 + 191100;
+
+		int iYYMM = inputAcDate / 100;
 		String tlrno = titaVo.getTlrNo();
 		String txcd = titaVo.getTxcd();
 		this.info("txcd =" + txcd);
@@ -895,4 +905,36 @@ public class L7206 extends TradeBuffer {
 
 	}
 
+	/**
+	 * 檢查LifeRelHead和LifeRelEmp 是否在同一天有資料，有的話才同步更新MonthlyFacBal
+	 * 
+	 * @throws LogicException
+	 */
+	private void isLatestData(TitaVo titaVo) throws LogicException {
+
+		// 判斷LifeRelHead和LifeRelEmp 是否在同一天有資料，有的話才更新
+		Slice<LifeRelHead> head = tLifeRelHeadService.findAcDate(inputAcDate, 0, Integer.MAX_VALUE, titaVo);
+		int lifeRelHeadSize = head == null ? 0 : head.getContent().size();
+
+		if (lifeRelHeadSize == 0) {
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "",
+					titaVo.getParam("TLRNO"), "請同步上傳利關人負責人檔[T07]，以利更新每月額度檔", titaVo);
+		}
+
+		Slice<LifeRelEmp> emp = tLifeRelEmpService.findAcDate(inputAcDate, 0, Integer.MAX_VALUE, titaVo);
+		int lifeRelEmpSize = emp == null ? 0 : emp.getContent().size();
+		if (lifeRelHeadSize == 0) {
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "",
+					titaVo.getParam("TLRNO"), "請同步上傳利關人職員檔[T07_2]，以利更新每月額度檔", titaVo);
+		}
+
+		if (lifeRelEmpSize > 0 && lifeRelHeadSize > 0) {
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "",
+					titaVo.getParam("TLRNO"), "每月額度檔同步更新中", titaVo);
+			titaVo.keepOrgDataBase();
+			updL7UploadData(titaVo);
+			titaVo.setDataBaseOnOrg();
+		}
+
+	}
 }

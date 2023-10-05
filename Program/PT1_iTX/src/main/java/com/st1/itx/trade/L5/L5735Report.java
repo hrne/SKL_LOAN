@@ -57,10 +57,10 @@ public class L5735Report extends MakeReport {
 		case "L5735D":
 			resultList = l5735ServiceImpl.getNormalCustomerLoanDataL5735D(inputDrawdownDate, titaVo);
 			break;
-
-		case "L5735K":
-			resultList = null;
-
+		case "L5735K":// 此表格式與其他不同，需另外寫
+			resultList = l5735ServiceImpl.getL5735K(inputDrawdownDate, titaVo);
+			exportL5735K(resultList, inputDrawdownDate, subTxCD, txName, titaVo);
+			return;
 		default:
 			resultList = l5735ServiceImpl.getNormalCustomerLoanData(inputDrawdownDate, subTxCD, titaVo);
 			break;
@@ -97,6 +97,7 @@ public class L5735Report extends MakeReport {
 			makeExcel.setValue(row, 1, "本日無資料", "R");
 
 		} else {
+
 			for (Map<String, String> result : resultList) {
 
 				makeExcel.setValue(row, 1, result.get("CustName"), "L");
@@ -127,6 +128,133 @@ public class L5735Report extends MakeReport {
 
 		makeExcel.close();
 
+	}
+
+	private void exportL5735K(List<Map<String, String>> resultList, int inputDrawdownDate, String subTxCD,
+			String txName, TitaVo titaVo) throws LogicException {
+
+		// open excel
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = titaVo.getTxcd();
+		String fileItem = txName;
+		String fileName = subTxCD + "_" + txName;
+		String defaultExcel = subTxCD + "_底稿_公會報送-" + txName + ".xlsx";
+		this.info("defaultExcel = " + defaultExcel);
+		String defaultSheet = "不動產擔保放款";
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+
+		String rocYM = this.showRocDate(inputDrawdownDate, 5);
+
+		makeExcel.setValue(1, 2, txName + "(" + rocYM + "底)");
+
+		if (resultList == null || resultList.isEmpty() || resultList.size() == 2) {
+			makeExcel.setValue(1, 1, "本日無資料", "R");
+
+		} else {
+			int col = 0;
+
+			String availableFundsAcDate = "";
+			for (Map<String, String> result : resultList) {
+				String clcode1 = result.get("ClCode1");
+				String usageCode = result.get("UsageCode");
+
+				// 用途別02 購置不動產
+				if ("02".equals(usageCode)) {
+					col = 5;
+
+					// 土地建物
+					if ("1".equals(clcode1)) {
+						makeExcel.setValue(8, col, parse.stringToBigDecimal(result.get("LoanBalance")), "#,###", "R");
+						makeExcel.setValue(9, col, parse.stringToBigDecimal(result.get("LineAmt")), "#,###", "R");
+						makeExcel.setValue(12, col, parse.stringToBigDecimal(result.get("AllNetWorth")), "#,###", "R");
+					}
+
+					// 土地
+					if ("2".equals(clcode1)) {
+						makeExcel.setValue(10, col, parse.stringToBigDecimal(result.get("LoanBalance")), "#,###", "R");
+						makeExcel.setValue(11, col, parse.stringToBigDecimal(result.get("LineAmt")), "#,###", "R");
+						makeExcel.setValue(13, col, parse.stringToBigDecimal(result.get("AllNetWorth")), "#,###", "R");
+					}
+
+				}
+
+				// 用途別01 週轉金
+				if ("01".equals(usageCode)) {
+					col = 9;
+
+					// 土地建物
+					if ("1".equals(clcode1)) {
+						makeExcel.setValue(8, col, parse.stringToBigDecimal(result.get("LoanBalance")), "#,###", "R");
+						makeExcel.setValue(9, col, parse.stringToBigDecimal(result.get("LineAmt")), "#,###", "R");
+						makeExcel.setValue(12, col, parse.stringToBigDecimal(result.get("AllNetWorth")), "#,###", "R");
+					}
+
+					// 土地
+					if ("2".equals(clcode1)) {
+						makeExcel.setValue(10, col, parse.stringToBigDecimal(result.get("LoanBalance")), "#,###", "R");
+						makeExcel.setValue(11, col, parse.stringToBigDecimal(result.get("LineAmt")), "#,###", "R");
+						makeExcel.setValue(13, col, parse.stringToBigDecimal(result.get("AllNetWorth")), "#,###", "R");
+					}
+
+				}
+
+				// 用途別 其它 (UsageCode=99 ClCode1=99)
+				if ("99".equals(usageCode) && "99".equals(clcode1)) {
+					col = 12;
+
+					makeExcel.setValue(8, col, parse.stringToBigDecimal(result.get("LoanBalance")), "#,###", "R");
+					makeExcel.setValue(9, col, parse.stringToBigDecimal(result.get("LineAmt")), "#,###", "R");
+					makeExcel.setValue(12, col, parse.stringToBigDecimal(result.get("AllNetWorth")), "#,###", "R");
+
+				}
+
+				// 用途別全部：押品為非土地及土地建物(UsageCode=1 ClCode1=3)
+				if ("01".equals(usageCode) && "3".equals(clcode1)) {
+					col = 16;
+
+					makeExcel.setValue(8, col, parse.stringToBigDecimal(result.get("LoanBalance")), "#,###", "R");
+					makeExcel.setValue(9, col, parse.stringToBigDecimal(result.get("LineAmt")), "#,###", "R");
+
+				}
+
+				// 建商餘額貸款(P欄)(UsageCode=12 ClCode1=12)
+				if ("12".equals(usageCode) && "12".equals(clcode1)) {
+					col = 16;
+					makeExcel.setValue(5, col, parse.stringToBigDecimal(result.get("LoanBalance")), "#,###", "R");
+
+				}
+
+				// 可運用資金(P欄)(UsageCode=11 ClCode1=11)
+				if ("11".equals(usageCode) && "11".equals(clcode1)) {
+					col = 16;
+					makeExcel.setValue(4, col, parse.stringToBigDecimal(result.get("LoanBalance")), "#,###", "R");
+
+					// 可運用資金的會計日期 用 CustNoCount欄位取代
+					availableFundsAcDate = result.get("CustNoCount");
+
+				}
+
+			} // for
+
+			for (int c = 2; c <= 14; c++) {
+				makeExcel.formulaCaculate(6, c);
+			}
+
+			availableFundsAcDate = this.showRocDate(availableFundsAcDate, 0);
+
+			String memo = "備註：1.放款於建商之金額已包含於住宅抵押貸款大類及以不動產為擔保品之其他擔保放款大類。\r\n";
+			memo += "      2.可運用資金總額係" + availableFundsAcDate + "會計師核閱數。";
+			makeExcel.setValue(7, 1, memo);
+
+		} // if
+
+		makeExcel.close();
 	}
 
 }

@@ -151,7 +151,7 @@ public class L5735ServiceImpl extends ASpringJpaParm implements InitializingBean
 			cond += "   AND MLB.\"AcctCode\" IN ('340') ";
 			cond += "   AND LBM.\"Status\" = 0 ";
 			break;
-			//移到 getNormalCustomerLoanDataL5735D
+		// 移到 getNormalCustomerLoanDataL5735D
 //		case "L5735D":
 //			cond += "   AND MLB.\"ClCode1\" IN ('2') ";
 //			cond += "   AND MLB.\"ClCode2\" IN ('3') ";
@@ -307,6 +307,316 @@ public class L5735ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ORDER BY MLB.\"CustNo\" ";
 		sql += "        , MLB.\"FacmNo\" ";
 		sql += "        , MLB.\"BormNo\" ";
+
+		this.info("sql=" + sql);
+
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("inputYearMonth", entdy / 100);
+		query.setParameter("inputDrawdownDate", inputDrawdownDate);
+
+		return this.convertToMap(query);
+	}
+
+	public List<Map<String, String>> getL5735K(int inputDrawdownDate, TitaVo titaVo) {
+
+		this.info("getL5735K");
+
+		// 轉西元年
+		if (inputDrawdownDate <= 19110000) {
+			inputDrawdownDate += 19110000;
+		}
+
+		this.info("inputDrawdownDate = " + inputDrawdownDate);
+
+		int entdy = titaVo.getEntDyI();
+
+		// 轉西元年
+		if (entdy <= 19110000) {
+			entdy += 19110000;
+		}
+
+		String sql = "  ";
+		// --評估淨值(企金目前為0)
+		sql += " WITH \"CFSum\" AS (";
+		sql += "     SELECT \"CustNo\"";
+		sql += "          , \"FacmNo\"";
+		sql += "          , \"ClCode1\"";
+		sql += "          , \"ClCode2\"";
+		sql += "          , \"ClNo\"";
+		sql += "          , SUM(Nvl(";
+		sql += "             \"OriEvaNotWorth\", 0";
+		sql += "             )) AS \"EvaNetWorth\"";
+		sql += "     FROM \"ClFac\"";
+		sql += "     WHERE \"MainFlag\" = 'Y'";
+		sql += "     GROUP BY \"CustNo\"";
+		sql += "            , \"FacmNo\"";
+		sql += "            , \"ClCode1\"";
+		sql += "            , \"ClCode2\"";
+		sql += "            , \"ClNo\"";
+		sql += " )";
+		// --主要明細資料
+		sql += " , \"Main\" AS (";
+		sql += "     SELECT Cm.\"CustName\"";
+		sql += "          , Mlb.\"CustNo\"";
+		sql += "          , Mlb.\"FacmNo\"";
+		sql += "          , Mlb.\"BormNo\"";
+		sql += "          , Mlb.\"LoanBalance\"";
+		sql += "          , Fm.\"LineAmt\"";
+		sql += "          , Lbm.\"PrevPayIntDate\"";
+		sql += "          , Mlb.\"ClCode1\"";
+		sql += "          , Fm.\"UsageCode\"";
+		sql += "          , Mlb.\"AcctCode\"";
+		sql += "          , Mlb.\"ProdNo\"";
+		sql += "          , Lbm.\"Status\"";
+		sql += "          , Lbm.\"DrawdownDate\"";
+		sql += "          , Nvl(";
+		sql += "             Cs.\"EvaNetWorth\", 0";
+		sql += "             ) AS \"EvaNetWorth\"";
+		sql += "          , CASE";
+		sql += "             WHEN Nvl(";
+		sql += "                 Cs.\"EvaNetWorth\", 0";
+		sql += "             ) = 0 THEN Round(";
+		sql += "                 Nvl(";
+		sql += "                     Ci.\"LoanToValue\", 0";
+		sql += "                 ) / 100, 2";
+		sql += "             )";
+		sql += "         ELSE Round(";
+		sql += "             Fm.\"LineAmt\" / Cs.\"EvaNetWorth\", 2";
+		sql += "         )";
+		sql += "     END AS \"LoanRatio\"";
+		sql += "     FROM \"MonthlyLoanBal\"  Mlb";
+		sql += "     LEFT JOIN \"CustMain\"        Cm ON Cm.\"CustNo\" = Mlb.\"CustNo\"";
+		sql += "     LEFT JOIN \"FacMain\"         Fm ON Fm.\"CustNo\" = Mlb.\"CustNo\"";
+		sql += "                               AND";
+		sql += "                               Fm.\"FacmNo\" = Mlb.\"FacmNo\"";
+		sql += "     LEFT JOIN \"LoanBorMain\"     Lbm ON Lbm.\"CustNo\" = Mlb.\"CustNo\"";
+		sql += "                                    AND";
+		sql += "                                    Lbm.\"FacmNo\" = Mlb.\"FacmNo\"";
+		sql += "                                    AND";
+		sql += "                                    Lbm.\"BormNo\" = Mlb.\"BormNo\"";
+		sql += "     LEFT JOIN \"CFSum\"           Cs ON Cs.\"CustNo\" = Fm.\"CustNo\"";
+		sql += "                             AND";
+		sql += "                             Cs.\"FacmNo\" = Fm.\"FacmNo\"";
+		// --若CFSum評估淨值0會找ClImm的貸放成數";
+		sql += "     LEFT JOIN \"ClImm\"           Ci ON Ci.\"ClCode1\" = Cs.\"ClCode1\"";
+		sql += "                             AND";
+		sql += "                             Ci.\"ClCode2\" = Cs.\"ClCode2\"";
+		sql += "                             AND";
+		sql += "                             Ci.\"ClNo\" = Cs.\"ClNo\"";
+		sql += "     WHERE Mlb.\"YearMonth\" = :inputYearMonth";
+		sql += "           AND";
+		sql += "           Mlb.\"LoanBalance\" > 0";
+		sql += "           AND";
+		sql += "           Lbm.\"DrawdownDate\" <= :inputDrawdownDate";
+		sql += "     ORDER BY Mlb.\"CustNo\"";
+		sql += "            , Mlb.\"FacmNo\"";
+		sql += "            , Mlb.\"BormNo\"";
+		sql += " )";
+		sql += " , \"ConsCompany\" AS (";
+		sql += "     SELECT 12 AS\"ClCode1\"";
+		sql += "          , '12' AS \"UsageCode\"";
+		sql += "          , 0    AS \"CustNoCount\"";
+		sql += " 		 , NVL(SUM(MLB.\"LoanBalance\"),0) AS \"LoanBalance\" ";
+		sql += "          , 0    AS \"LineAmt\"";
+		sql += "          , 0    AS \"LoanRatio\"";
+		sql += "          , 0    AS \"Count\"   ";
+		sql += " 	FROM \"ConstructionCompany\" CC ";
+		sql += " 	LEFT JOIN \"MonthlyLoanBal\" MLB ON MLB.\"CustNo\" = CC.\"CustNo\" ";
+		sql += " 	LEFT JOIN \"LoanBorMain\" LBM ON LBM.\"CustNo\" = MLB.\"CustNo\" ";
+		sql += "                            AND LBM.\"FacmNo\" = MLB.\"FacmNo\" ";
+		sql += "                            AND LBM.\"BormNo\" = MLB.\"BormNo\" ";
+		sql += "	WHERE MLB.\"YearMonth\" = :inputYearMonth ";
+		sql += "   	AND MLB.\"LoanBalance\" > 0 ";
+		sql += "   	AND NVL(CC.\"DeleteFlag\", ' ') != '*' ";
+		sql += "   	AND LBM.\"DrawdownDate\" <= :inputDrawdownDate ";
+		sql += " )";
+		// --押品1-用途別：用途別2的土地及建物(住宅抵押貸款)
+		sql += " , \"tmpMainUsage2\" AS (";
+		sql += "     SELECT \"ClCode1\"";
+		sql += "          , \"UsageCode\"";
+		sql += "          , COUNT(\"CustNo\")        AS \"CustNoCount\"";
+		sql += "          , SUM(\"LoanBalance\")     AS \"LoanBalance\"";
+		sql += "          , SUM(\"LineAmt\")         AS \"LineAmt\"";
+		sql += "          , SUM(\"LoanRatio\")       AS \"LoanRatio\"";
+		sql += "          , Decode(";
+		sql += "         \"LoanRatio\", 0";
+		sql += "      , 0";
+		sql += "      , 1";
+		sql += "     ) AS \"Count\"";
+		sql += "     FROM \"Main\"";
+		sql += "     WHERE \"ClCode1\" IN (";
+		sql += "         '01'";
+		sql += "       , '02'";
+		sql += "     )";
+		sql += "           AND";
+		sql += "           \"UsageCode\" = '02'";
+		sql += "     GROUP BY \"CustNo\"";
+		sql += "            , \"FacmNo\"";
+		sql += "            , \"ClCode1\"";
+		sql += "            , \"UsageCode\"";
+		sql += "            , Decode(";
+		sql += "         \"LoanRatio\", 0";
+		sql += "            , 0";
+		sql += "            , 1";
+		sql += "     )";
+		sql += " )";
+		// --押品1-用途別：用途別1的土地及土地建物
+		sql += " , \"tmpMainUsage1\" AS (";
+		sql += "     SELECT \"ClCode1\"";
+		sql += "          , \"UsageCode\"";
+		sql += "          , COUNT(\"CustNo\")        AS \"CustNoCount\"";
+		sql += "          , SUM(\"LoanBalance\")     AS \"LoanBalance\"";
+		sql += "          , SUM(\"LineAmt\")         AS \"LineAmt\"";
+		sql += "          , SUM(\"LoanRatio\")       AS \"LoanRatio\"";
+		sql += "          , Decode(";
+		sql += "         \"LoanRatio\", 0";
+		sql += "      , 0";
+		sql += "      , 1";
+		sql += "     ) AS \"Count\"";
+		sql += "     FROM \"Main\"";
+		sql += "     WHERE \"ClCode1\" IN (";
+		sql += "         '01'";
+		sql += "       , '02'";
+		sql += "     )";
+		sql += "           AND";
+		sql += "           \"UsageCode\" = '01'";
+		sql += "     GROUP BY \"CustNo\"";
+		sql += "            , \"FacmNo\"";
+		sql += "            , \"ClCode1\"";
+		sql += "            , \"UsageCode\"";
+		sql += "            , Decode(";
+		sql += "         \"LoanRatio\", 0";
+		sql += "            , 0";
+		sql += "            , 1";
+		sql += "     )";
+		sql += " )";
+		// --押品1-用途別：用途別1的股票質押
+		sql += " , \"tmpMainUsage13\" AS (";
+		sql += "     SELECT \"ClCode1\"";
+		sql += "          , \"UsageCode\"";
+		sql += "          , COUNT(\"CustNo\")        AS \"CustNoCount\"";
+		sql += "          , SUM(\"LoanBalance\")     AS \"LoanBalance\"";
+		sql += "          , SUM(\"LineAmt\")         AS \"LineAmt\"";
+		sql += "          , SUM(\"LoanRatio\")       AS \"LoanRatio\"";
+		sql += "          , Decode(";
+		sql += "         \"LoanRatio\", 0";
+		sql += "      , 0";
+		sql += "      , 1";
+		sql += "     ) AS \"Count\"";
+		sql += "     FROM \"Main\"";
+		sql += "     WHERE \"ClCode1\" IN (";
+		sql += "         '03'";
+		sql += "     )";
+		sql += "           AND";
+		sql += "           \"UsageCode\" = '01'";
+		sql += "     GROUP BY \"CustNo\"";
+		sql += "            , \"FacmNo\"";
+		sql += "            , \"ClCode1\"";
+		sql += "            , \"UsageCode\"";
+		sql += "            , Decode(";
+		sql += "         \"LoanRatio\", 0";
+		sql += "            , 0";
+		sql += "            , 1";
+		sql += "     )";
+		sql += " )";
+		// --押品1-用途別：用途別大於3的";
+		sql += " , \"tmpMainUsageOther\" AS (";
+		sql += "     SELECT 99                     AS \"ClCode1\"";
+		sql += "          , '99'                   AS \"UsageCode\"";
+		sql += "          , COUNT(\"CustNo\")        AS \"CustNoCount\"";
+		sql += "          , SUM(\"LoanBalance\")     AS \"LoanBalance\"";
+		sql += "          , SUM(\"LineAmt\")         AS \"LineAmt\"";
+		sql += "          , SUM(\"LoanRatio\")       AS \"LoanRatio\"";
+		sql += "          , Decode(";
+		sql += "         \"LoanRatio\", 0";
+		sql += "      , 0";
+		sql += "      , 1";
+		sql += "     ) AS \"Count\"";
+		sql += "     FROM \"Main\"";
+		sql += "     WHERE \"UsageCode\" BETWEEN '03' AND '99'";
+		sql += "     GROUP BY \"CustNo\"";
+		sql += "            , \"FacmNo\"";
+		sql += "            , \"ClCode1\"";
+		sql += "            , \"UsageCode\"";
+		sql += "            , Decode(";
+		sql += "         \"LoanRatio\", 0";
+		sql += "            , 0";
+		sql += "            , 1";
+		sql += "     )";
+		sql += " ), \"AvailableFund\" AS (";
+		sql += "     SELECT 11 AS\"ClCode1\"";
+		sql += "          , '11' AS \"UsageCode\"";
+		// --為取得可運用資金的會計日期
+		sql += "          , NVL(\"AcDate\",0)    AS \"CustNoCount\"";
+		sql += "          , NVL(\"AvailableFunds\",0) AS \"LoanBalance\"";
+		sql += "          , 0    AS \"LineAmt\"";
+		sql += "          , 0    AS \"LoanRatio\"";
+		sql += "          , 0    AS \"Count\"   ";
+		sql += "     FROM \"InnFundApl\"";
+		sql += "     WHERE \"AcDate\" = (";
+		sql += "         SELECT MAX(\"AcDate\")";
+		sql += "         FROM \"InnFundApl\"";
+		sql += "         WHERE Trunc(\"AcDate\" / 100) <= :inputYearMonth";
+		sql += "           AND \"AvailableFunds\" > 0 ";
+		sql += "     )";
+		sql += " ),  \"resultMain\" AS (";
+		sql += "     SELECT \"ClCode1\"";
+		sql += "          , \"UsageCode\"";
+		sql += "          , \"LoanBalance\"  AS \"LoanBalance\"";
+		// --戶號筆數
+		sql += "          , \"CustNoCount\"  AS \"CustNoCount\" ";
+		sql += "          , Decode(";
+		sql += "         \"CustNoCount\", 0";
+		sql += "      , 0";
+		sql += "      , \"LineAmt\" / \"CustNoCount\"";
+		sql += "     ) AS \"LineAmt\"";
+		// --有效筆數(貸放成數大於0%)
+		sql += "          , \"Count\"        AS \"effectiveCount\" ";
+		sql += "          , Decode(";
+		sql += "         \"CustNoCount\", 0";
+		sql += "      , 0";
+		sql += "      , \"LoanRatio\" / \"CustNoCount\"";
+		sql += "     ) AS \"totalLTV\"";
+		sql += "     FROM (";
+		sql += "         SELECT *";
+		sql += "         FROM \"tmpMainUsage2\"";
+		sql += "         UNION ALL";
+		sql += "         SELECT *";
+		sql += "         FROM \"tmpMainUsage1\"";
+		sql += "         UNION ALL";
+		sql += "         SELECT *";
+		sql += "         FROM \"tmpMainUsage13\"";
+		sql += "         UNION ALL";
+		sql += "         SELECT *";
+		sql += "         FROM \"tmpMainUsageOther\"";
+		sql += "         UNION ALL";
+		sql += "         SELECT *";
+		sql += "         FROM \"tmpMainUsageOther\"";
+		sql += "         UNION ALL";
+		sql += "         SELECT *";
+		sql += "         FROM \"AvailableFund\"";
+		sql += "         UNION ALL";
+		sql += "         SELECT *";
+		sql += "         FROM \"ConsCompany\"";
+		sql += "     )";
+		sql += " )";
+		sql += " SELECT \"ClCode1\"";
+		sql += "      , \"UsageCode\"";
+		sql += "      , SUM(\"LoanBalance\")        AS \"LoanBalance\"";
+		sql += "      , SUM(\"LineAmt\")            AS \"LineAmt\"";
+		sql += "      , SUM(\"effectiveCount\")     AS \"effectiveCount\"";
+		sql += "      , SUM(\"totalLTV\")           AS \"totalLTV\"";
+		sql += "      , CASE";
+		sql += "     WHEN SUM(\"effectiveCount\") = 0     THEN 0";
+		sql += "     WHEN SUM(\"totalLTV\") = 0           THEN 0";
+		sql += "     ELSE Round(SUM(\"LineAmt\") /(SUM(\"totalLTV\") / SUM(\"effectiveCount\")))";
+		sql += " END AS \"AllNetWorth\"";
+		sql += " FROM \"resultMain\"";
+		sql += " GROUP BY \"ClCode1\"";
+		sql += "        , \"UsageCode\"";
+		sql += " ORDER BY \"ClCode1\"";
 
 		this.info("sql=" + sql);
 

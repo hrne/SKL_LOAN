@@ -137,12 +137,15 @@ public class LM048ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sqlMain += "            	\"MainApplNo\", \"ApplNo\"";
 		sqlMain += "        		)       AS \"ApplNo\"";
 		sqlMain += "             , \"CustNoMain\"";
+		sqlMain += "             , \"CustNameMain\"";
 		sqlMain += "        FROM \"tmpData\"";
 		sqlMain += "        GROUP BY Nvl(";
 		sqlMain += "            \"MainApplNo\", \"ApplNo\"";
 		sqlMain += "        ) , \"CustNoMain\"";
+		sqlMain += "          , \"CustNameMain\"";
 		sqlMain += "    ), \"tmpData3\" AS (";
 		sqlMain += "        SELECT Distinct \"CustNoMain\"";
+		sqlMain += "             , \"CustNameMain\" ";
 		sqlMain += "             , SUM(\"LineAmt\")               AS \"LineAmt\"";
 		sqlMain += "        FROM \"tmpData2\"";
 		sqlMain += "        GROUP BY \"CustNoMain\"";
@@ -224,6 +227,7 @@ public class LM048ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = " ";
 		sql += sqlMain();
 		sql += "    SELECT \"CustNoMain\" AS \"CustNoMain\" ";
+		sql += "     	 , \"CustNameMain\" AS \"CustNameMain\" ";
 		sql += "     	 , \"LineAmt\" AS \"ToTalLineAmt\" ";
 		sql += "    FROM \"tmpData3\"";
 

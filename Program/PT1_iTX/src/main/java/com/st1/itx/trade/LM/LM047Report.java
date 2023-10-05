@@ -108,7 +108,7 @@ public class LM047Report extends MakeReport {
 						}
 						break;
 					case 4:
-						makeExcel.setValue(row, i + 3, showStatus(value));
+						makeExcel.setValue(row, i + 3, value);
 						break;
 					case 13:
 						makeExcel.setValue(row, i + 3, showTerm(value));
@@ -124,45 +124,6 @@ public class LM047Report extends MakeReport {
 				}
 			}
 		}
-	}
-
-	private String showStatus(String xstatus) throws LogicException {
-		String tmp = "";
-		switch (xstatus) {
-		case "0":
-			tmp = "正常";
-			break;
-		case "1":
-			tmp = "展期";
-			break;
-		case "2":
-			tmp = "催收";
-			break;
-		case "3":
-			tmp = "結案";
-			break;
-		case "4":
-			tmp = "正常";
-			break;
-		case "5":
-			tmp = "催結";
-			break;
-		case "6":
-			tmp = "呆帳";
-			break;
-		case "7":
-			tmp = "部呆";
-			break;
-		case "8":
-			tmp = "債轉";
-			break;
-		case "9":
-			tmp = "呆結";
-			break;
-		default:
-			break;
-		}
-		return tmp;
 	}
 
 	private String showTerm(String data) throws LogicException {

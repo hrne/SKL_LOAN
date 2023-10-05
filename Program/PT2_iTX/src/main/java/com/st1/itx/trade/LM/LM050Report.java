@@ -137,15 +137,23 @@ public class LM050Report extends MakeReport {
 
 		for (Map<String, String> tLM050 : listLM050) {
 			String rptType = tLM050.get("RptType");
+			String custNo = tLM050.get("CustNo");
 			if (rptType.equals("1")) {
+				if (!custNo.equals(tmpCustNo)) {
+					tmpCustNo = custNo;
+
+				} else {
+					continue;
+				}
 				size++;
 			}
 
 		}
-		makeExcel.setShiftRow(rowCursor + 1, size - 2);
+		makeExcel.setShiftRow(rowCursor + 1, size);
 
 		makeExcel.setIBU("");
 
+		tmpCustNo = "";
 		for (Map<String, String> tLM050 : listLM050) {
 
 			String rptType = tLM050.get("RptType");
@@ -172,7 +180,9 @@ public class LM050Report extends MakeReport {
 				this.info("淨值:" + equity);
 				this.info("占淨比值:" + this.computeDivide(loanBal, equity, 6));
 
-				makeExcel.setValue(rowCursor, 6, "1".equals(tLM050.get("EntCode")) ? "10%" : "2%"); // 限額標準 法人10% 個人2%
+				String limitPercent = "1".equals(tLM050.get("EntCode")) ? "10%" : "2%";
+
+				makeExcel.setValue(rowCursor, 6, limitPercent); // 限額標準 法人10% 個人2%
 				makeExcel.setValue(rowCursor, 7, remark); // 備註
 
 				detailTotal = detailTotal.add(loanBal);

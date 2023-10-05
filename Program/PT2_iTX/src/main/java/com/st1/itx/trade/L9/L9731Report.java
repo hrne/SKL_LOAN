@@ -437,7 +437,7 @@ public class L9731Report extends MakeReport {
 					case 14:// 核貸金額
 					case 15:// 撥款金額
 					case 16:// 放款餘額
-					case 28:// 無擔保金額
+					case 31:// 無擔保金額
 						BigDecimal amt = getBigDecimal(fieldValue);
 						makeExcel.setValue(row, col, amt, "#,##0", "R");
 						break;
@@ -450,12 +450,14 @@ public class L9731Report extends MakeReport {
 					case 20:// 初貸日
 					case 21:// 政策性_專案貸款
 					case 22:// 擔保品類別
-					case 23:// 案件隸屬單位
+					case 23://案件利署單位
 					case 24:// 企金別
-					case 25:// 建築貸款
-					case 26:// 資產分類
-					case 27:// 資產分類2
-					case 29:// 無擔保資產分類
+					case 25://建築貸款
+					case 26:// 是否為特定資產
+					case 27:// 是否為關係人
+					case 28://資產分類
+					case 29://資產分類2
+					case 30://無擔保金額
 						makeExcel.setValue(row, col, fieldValue, "C");
 						break;
 
