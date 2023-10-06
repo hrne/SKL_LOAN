@@ -26,12 +26,12 @@ public class LM047ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, int tmndyF) throws Exception {
 		this.info("lM047.findAll ");
 		String sql = " ";
 		sql += " WITH TEMP AS (															";
 		sql += "	SELECT l.*															";
-		sql += " 	FROM \"FacMain\" f													"; 
+		sql += " 	FROM \"FacMain\" f									        		";
 		sql += "    LEFT JOIN \"CollList\" l ON l.\"CustNo\" = f.\"CustNo\"             ";
 		sql += "                            AND l.\"FacmNo\" = f.\"FacmNo\"             ";
 		sql += "    WHERE f.\"ProdNo\"  IN ('60','61','62')		                    	";
@@ -102,15 +102,13 @@ public class LM047ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " 					,T.\"FacmNo\" ";
 		sql += " 					,T.\"Status\" ";
 		sql += " 					,T.\"LegalPsn\" ";
-		sql += " 					,T.\"PrevIntDate\" ";
 		sql += " 	FROM TEMP T ";
-		sql += "	WHERE T.\"Status\" IN (0,2,4,7)   ";     // 額度 0:正常戶 2:催收戶 4 :逾期戶 7:部分轉呆戶
-		sql += " 	UNION 			";                       
+		sql += "	WHERE T.\"Status\" IN (0,2,4,7)   "; // 額度 0:正常戶 2:催收戶 4 :逾期戶 7:部分轉呆戶
+		sql += " 	UNION 			";
 		sql += " 	SELECT DISTINCT T.\"CustNo\"  ";
 		sql += " 					,T.\"FacmNo\" ";
 		sql += " 					,T.\"Status\" ";
 		sql += " 					,T.\"LegalPsn\" ";
-		sql += " 					,T.\"PrevIntDate\" ";
 		sql += " 	FROM TEMP T ";
 		sql += "    LEFT JOIN \"AcLoanRenew\" R ON R.\"CustNo\" = T.\"CustNo\" ";
 		sql += " 								AND R.\"NewFacmNo\"  <> R.\"OldFacmNo\" ";
@@ -138,7 +136,11 @@ public class LM047ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,M.\"DrawdownDate\"                                                     F14";
 		sql += "            ,M.\"MaturityDate\"                                                     F15";
 		sql += "            ,M.\"TotalPeriod\"                                                      F16";
-		sql += "            ,M.\"RepaidPeriod\"                                                     F17";
+		sql += "            ,CASE WHEN M.\"Status\" NOT IN (0,2,4,7)  THEN ' '                       ";
+		sql += "                  WHEN M.\"MaturityDate\" <= :TMNDYF                                 ";
+		sql += "                       THEN TO_CHAR(M.\"TotalPeriod\")                               ";
+		sql += "                  ELSE TO_CHAR(TRUNC(MONTHS_BETWEEN(TO_DATE(:TMNDYF,'YYYYMMDD'), TO_DATE(M.\"PrevPayIntDate\",'YYYYMMDD')))  ";
+		sql += "                       + M.\"PaidTerms\")                         END           AS  F17";
 		sql += "            ,M.\"PaidTerms\"                                                        F18";
 		sql += "            ,CASE WHEN NVL(L.\"Memo2\", ' ') = ' ' THEN M.\"CompensateAcct\"  ";
 		sql += "    			ELSE L.\"Memo2\" || ' ' || M.\"CompensateAcct\"   END 			AS  F19";
@@ -163,6 +165,7 @@ public class LM047ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
+		query.setParameter("TMNDYF", tmndyF);
 
 		return this.convertToMap(query);
 	}

@@ -1,5 +1,7 @@
 package com.st1.itx.util.common;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Path;
@@ -128,7 +130,8 @@ public class SftpClient extends CommBuffer {
 			ChannelSftp sftpChannel = (ChannelSftp) channel;
 
 			// 下載檔案
-			sftpChannel.get(remoteFile, localFile);
+			FileOutputStream fos = new FileOutputStream(localFile);
+			sftpChannel.get(remoteFile, fos);
 
 			// 關閉連線
 			sftpChannel.exit();
@@ -137,6 +140,11 @@ public class SftpClient extends CommBuffer {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.error("SftpClient download error = " + errors.toString());
+			return false;
+		} catch (FileNotFoundException e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("SftpClient download FileNotFoundException error = " + errors.toString());
 			return false;
 		}
 		return true;

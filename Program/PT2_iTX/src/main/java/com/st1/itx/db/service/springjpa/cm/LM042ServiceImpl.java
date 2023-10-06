@@ -194,7 +194,7 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	FROM \"LifeRelEmp\" l ";
 		sql += "	LEFT JOIN \"CustMain\" cm ON cm.\"CustId\" = TO_CHAR(DECODE(l.\"EmpId\" , '-' , l.\"EmpId\", l.\"EmpId\")) ";
 		sql += "	WHERE";
-		sql += "	l.\"AcDate\" = TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR( :yymm*100+1), 'YYYYMMDD')),'YYYYMMDD')) ";
+		sql += "	l.\"AcDate\" = (SELECT MAX(\"AcDate\") FROM \"LifeRelEmp\" WHERE TRUNC(\"AcDate\" / 100 ) = :yymm ) ";
 		sql += "	AND l.\"LoanBalance\" > 0 ) a";
 		sql += "	LEFT JOIN \"MonthlyFacBal\" b ON b.\"CustNo\" = a.\"CustNo\" ";
 		sql += "	WHERE b.\"YearMonth\" = :yymm ) ";
@@ -208,7 +208,7 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	LEFT JOIN \"CustMain\" cm ON cm.\"CustId\" = TO_CHAR(DECODE(l.\"BusId\" , '-' , DECODE(\"RelId\" ,'-' ,DECODE(\"HeadId\" ,'-' ,l.\"HeadId\",l.\"HeadId\"),l.\"RelId\"),l.\"BusId\")) ";
 		sql += "	WHERE";
 		sql += "	l.\"RelWithCompany\" IN ('A','B')";
-		sql += "	AND l.\"AcDate\" = TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR( :yymm*100+1), 'YYYYMMDD')),'YYYYMMDD')) ";
+		sql += "	AND l.\"AcDate\" =  (SELECT MAX(\"AcDate\") FROM \"LifeRelHead\" WHERE TRUNC(\"AcDate\" / 100 ) = :yymm ) ";
 		sql += "	AND l.\"LoanBalance\" > 0 ) a";
 		sql += "	LEFT JOIN \"MonthlyFacBal\" b ON b.\"CustNo\" = a.\"CustNo\" ";
 		sql += "	WHERE b.\"YearMonth\" = :yymm ) ";

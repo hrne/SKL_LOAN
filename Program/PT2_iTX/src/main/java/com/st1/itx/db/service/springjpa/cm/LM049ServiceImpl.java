@@ -104,8 +104,12 @@ public class LM049ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   where m.\"Seq\" = 1 ";
 		sql += "     and m.\"comSeq\" in (1,2,3,4)";
 		sql += "   group by m.\"Id\"";
-		sql += " )";
-		sql += "   select m.\"comSeq\"";
+		sql += " ), \"LifeRel\" AS ( ";
+		sql += "   select * ";
+		sql += "   from \"LifeRelHead\" ";
+		sql += "			WHERE \"AcDate\" = (SELECT MAX(\"AcDate\") FROM \"LifeRelHead\" WHERE TRUNC(\"AcDate\" / 100 ) = :yymm )";
+  	sql += " ) ";
+  	sql += "   select m.\"comSeq\"";
 		sql += "		, m.\"Id\" ";
 		sql += "        , m.\"Name\"";
 		sql += "        , m.\"CompanyName\" || '(' || m.\"BusTitle\" || ')' as \"BusName\"";
@@ -139,7 +143,7 @@ public class LM049ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   						 and cl.\"MainFlag\" = 'Y' ";
 		sql += "   left join \"LTV\" ltv on ltv.\"Id\" = m.\"Id\"";
 		sql += "   left join \"CdEmp\" ce on ce.\"EmployeeNo\" = f.\"Supervisor\"";
-		sql += "   left join \"LifeRelHead\" lr on lr.\"HeadId\" = substr(ce.\"AgentCode\",1,10)";
+		sql += "   left join \"LifeRel\" lr on lr.\"HeadId\" = substr(ce.\"AgentCode\",1,10)";
 		sql += "   where m.\"Seq\" = 1 ";
 		sql += "     and m.\"comSeq\" in (1,2,3,4)";
 		sql += "   order by m.\"comSeq\" asc , m.\"levSeq\" asc , f.\"CustNo\" asc , f.\"FacmNo\" asc";

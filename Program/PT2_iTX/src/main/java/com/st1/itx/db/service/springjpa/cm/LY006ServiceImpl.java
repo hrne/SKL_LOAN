@@ -69,7 +69,7 @@ public class LY006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " \"LineAmt\", ";
 		sql += " \"LoanBalance\" ";
 		sql += " from \"LifeRelHead\" ";
-		sql += " WHERE TRUNC(\"AcDate\" / 100 ) = :inputYearMonth ";
+	  sql += " WHERE \"AcDate\" = (SELECT MAX(\"AcDate\") FROM \"LifeRelHead\" WHERE TRUNC(\"AcDate\" / 100 ) = :inputYearMonth )";
 		sql += "   AND \"RelWithCompany\" <> 'E' ";
 		sql += " order by (case ";
 		sql += "			when\"RelWithCompany\"='C' then 0 ";

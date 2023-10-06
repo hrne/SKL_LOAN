@@ -83,8 +83,8 @@ public class LY005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                    ,\"RelTitle\" ";
 		sql += "                    ,\"BusTitle\" ";
 		sql += "              FROM \"LifeRelHead\" ";
-		sql += "              WHERE \"RelWithCompany\" IN ('A','B') ";
-		sql += "                AND TRUNC(\"AcDate\" / 100 ) = :inputYearMonth ";
+	  sql += "		          WHERE \"AcDate\" = (SELECT MAX(\"AcDate\") FROM \"LifeRelHead\" WHERE TRUNC(\"AcDate\" / 100 ) = :inputYearMonth )";
+		sql += "                AND \"RelWithCompany\" IN ('A','B') ";
 		sql += "                AND \"LoanBalance\" > 0 ";
 		sql += "              UNION ";
 		sql += "              SELECT \"EmpName\" AS \"CustName\" ";
@@ -96,7 +96,7 @@ public class LY005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                    ,NULL AS \"RelTitle\" ";
 		sql += "                    ,NULL AS \"BusTitle\" ";
 		sql += "              FROM \"LifeRelEmp\" ";
-		sql += "              WHERE TRUNC(\"AcDate\" / 100 ) = :inputYearMonth ";
+	  sql += "		          WHERE \"AcDate\" = (SELECT MAX(\"AcDate\") FROM \"LifeRelEmp\" WHERE TRUNC(\"AcDate\" / 100 ) = :inputYearMonth )";
 		sql += "              ) s1 ON s1.\"RptId\" = cm.\"CustId\" ";
 		sql += "          LEFT JOIN \"ClBuilding\" s3 ON s3.\"ClCode1\" = s0.\"ClCode1\" ";
 		sql += "                                     AND s3.\"ClCode2\" = s0.\"ClCode2\" ";

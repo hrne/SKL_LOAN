@@ -61,14 +61,9 @@ public class LY007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                ELSE \"HeadId\"";
 		sql += "            END AS \"Id\"";
 		sql += "            FROM \"LifeRelHead\"";
-		sql += "            WHERE \"LoanBalance\" > 0";
-		sql += "                  AND";
-		sql += "                  Trunc(\"AcDate\" / 100) = :Yymm";
-		sql += "                  AND";
-		sql += "                  \"RelWithCompany\" IN (";
-		sql += "                      'A'";
-		sql += "                    , 'G'";
-		sql += "                  )";
+	  sql += "		        WHERE \"AcDate\" = (SELECT MAX(\"AcDate\") FROM \"LifeRelHead\" WHERE TRUNC(\"AcDate\" / 100 ) = :Yymm )";
+		sql += "              AND \"LoanBalance\" > 0";
+		sql += "              AND \"RelWithCompany\" IN ('A', 'G' )";
 		sql += "        ) M";
 		sql += "        LEFT JOIN \"CustMain\" C ON C.\"CustId\" = M.\"Id\"";
 		sql += "    ), \"tmpLocation\" AS (";

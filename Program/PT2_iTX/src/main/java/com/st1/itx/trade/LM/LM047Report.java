@@ -15,6 +15,7 @@ import com.st1.itx.db.service.springjpa.cm.LM047ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
+import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Component
@@ -27,6 +28,9 @@ public class LM047Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
+
+	@Autowired
+	DateUtil dateUtil;
 
 	@Autowired
 	Parse parse;
@@ -52,18 +56,20 @@ public class LM047Report extends MakeReport {
 				.setRptItem(fileItem).build();
 		// 開啟報表
 		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
-		
+
 //		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM047", "放款分期協議案件明細_內部控管",
 //				"LM047_放款分期協議案件明細_內部控管", "LM047放款分期協議案件明細_內部控管.xlsx", "協議控管表");
 
 		int iEntdy = parse.stringToInteger(titaVo.get("ENTDY"));
 		makeExcel.setValue(1, 2, "         " + iEntdy / 10000 + "年 " + iEntdy / 100 % 100 + "月 分期協議案件明細表");
-		makeExcel.setValue(1, 23, "機密等級："+makeExcel.getSecurity()+"\n單位：元\n" + this.showRocDate(6) + "止");
+		makeExcel.setValue(1, 23, "機密等級：" + makeExcel.getSecurity() + "\n單位：元\n" + this.showRocDate(6) + "止");
 
 		List<Map<String, String>> LM047List = null;
-
+		dateUtil.init();
+		dateUtil.setDate_1(iEntdy);
+		int tmndyF = (iEntdy / 100) * 100 + dateUtil.getMonLimit() + 19110000;
 		try {
-			LM047List = lM047ServiceImpl.findAll(titaVo);
+			LM047List = lM047ServiceImpl.findAll(titaVo, tmndyF);
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -73,7 +79,7 @@ public class LM047Report extends MakeReport {
 		}
 		exportExcel(LM047List);
 		makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
 
 	private void exportExcel(List<Map<String, String>> LDList) throws LogicException {
