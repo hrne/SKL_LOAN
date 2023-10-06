@@ -107,8 +107,13 @@ public class LM074ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              AND";
 		sql += "              Fac.\"RuleCode\" LIKE " + ruleCode;
 		sql += "              AND";
-		sql += "              Case When C.\"EntCode\" = 0 Then 'N' ";
-		sql += "				   Else Fac.\"CompensateFlag\" End = 'N'";
+		sql += "			  Fac.\"CompensateFlag\" LIKE ";
+		sql += "              		Case When C.\"EntCode\" = 0 Then '%' ";
+		sql += "				   		 Else 'N' End ";
+		sql += "              AND";
+		sql += "			  Lm.\"RenewFlag\" LIKE ";
+		sql += "              		Case When C.\"EntCode\" = 0 Then '%' ";
+		sql += "				   		 Else '0' End ";
 		sql += "    )";
 		sql += "    SELECT \"CitySeq\"";
 		sql += "         , SUM(\"Count\")                                                     AS \"Count\"";

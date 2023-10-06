@@ -549,11 +549,11 @@ public class L5735ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     SELECT 11 AS\"ClCode1\"";
 		sql += "          , '11' AS \"UsageCode\"";
 		// --為取得可運用資金的會計日期
-		sql += "          , NVL(\"AcDate\",0)    AS \"CustNoCount\"";
+		sql += "          , 0    AS \"CustNoCount\"";
 		sql += "          , NVL(\"AvailableFunds\",0) AS \"LoanBalance\"";
 		sql += "          , 0    AS \"LineAmt\"";
 		sql += "          , 0    AS \"LoanRatio\"";
-		sql += "          , 0    AS \"Count\"   ";
+		sql += "          , NVL(\"AcDate\",0)    AS \"Count\"";
 		sql += "     FROM \"InnFundApl\"";
 		sql += "     WHERE \"AcDate\" = (";
 		sql += "         SELECT MAX(\"AcDate\")";
@@ -593,9 +593,6 @@ public class L5735ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         FROM \"tmpMainUsageOther\"";
 		sql += "         UNION ALL";
 		sql += "         SELECT *";
-		sql += "         FROM \"tmpMainUsageOther\"";
-		sql += "         UNION ALL";
-		sql += "         SELECT *";
 		sql += "         FROM \"AvailableFund\"";
 		sql += "         UNION ALL";
 		sql += "         SELECT *";
@@ -609,10 +606,10 @@ public class L5735ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , SUM(\"effectiveCount\")     AS \"effectiveCount\"";
 		sql += "      , SUM(\"totalLTV\")           AS \"totalLTV\"";
 		sql += "      , CASE";
-		sql += "     WHEN SUM(\"effectiveCount\") = 0     THEN 0";
-		sql += "     WHEN SUM(\"totalLTV\") = 0           THEN 0";
-		sql += "     ELSE Round(SUM(\"LineAmt\") /(SUM(\"totalLTV\") / SUM(\"effectiveCount\")))";
-		sql += " END AS \"AllNetWorth\"";
+		sql += "     		WHEN SUM(\"effectiveCount\") = 0     THEN 0";
+		sql += "     		WHEN SUM(\"totalLTV\") = 0           THEN 0";
+		sql += "     		ELSE Round(SUM(\"LineAmt\") /(SUM(\"totalLTV\") / SUM(\"effectiveCount\")))";
+		sql += "		 END AS \"AllNetWorth\"";
 		sql += " FROM \"resultMain\"";
 		sql += " GROUP BY \"ClCode1\"";
 		sql += "        , \"UsageCode\"";

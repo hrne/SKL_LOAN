@@ -149,6 +149,7 @@ public class LM048ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sqlMain += "             , SUM(\"LineAmt\")               AS \"LineAmt\"";
 		sqlMain += "        FROM \"tmpData2\"";
 		sqlMain += "        GROUP BY \"CustNoMain\"";
+		sqlMain += "               , \"CustNameMain\" ";
 		sqlMain += "    )";
 
 		return sqlMain;

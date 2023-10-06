@@ -923,7 +923,7 @@ public class L7206 extends TradeBuffer {
 
 		Slice<LifeRelEmp> emp = tLifeRelEmpService.findAcDate(inputAcDate, 0, Integer.MAX_VALUE, titaVo);
 		int lifeRelEmpSize = emp == null ? 0 : emp.getContent().size();
-		if (lifeRelHeadSize == 0) {
+		if (lifeRelEmpSize == 0) {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "",
 					titaVo.getParam("TLRNO"), "請同步上傳利關人職員檔[T07_2]，以利更新每月額度檔", titaVo);
 		}

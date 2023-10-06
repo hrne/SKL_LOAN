@@ -235,8 +235,8 @@ public class L5735Report extends MakeReport {
 					col = 16;
 					makeExcel.setValue(4, col, parse.stringToBigDecimal(result.get("LoanBalance")), "#,###", "R");
 
-					// 可運用資金的會計日期 用 CustNoCount欄位取代
-					availableFundsAcDate = result.get("CustNoCount");
+					// 可運用資金的會計日期 用 effectiveCount欄位取代
+					availableFundsAcDate = result.get("effectiveCount");
 
 				}
 

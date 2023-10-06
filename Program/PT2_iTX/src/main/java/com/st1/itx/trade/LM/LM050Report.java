@@ -86,7 +86,7 @@ public class LM050Report extends MakeReport {
 
 		if (equityList != null && equityList.size() > 0) {
 
-			String value = equityList.get(0).get("Totalequity");
+			String value = equityList.get(0).get("AvailableFunds");
 
 			BigDecimal amt = getBigDecimal(value);
 			String acDate = String.valueOf(Integer.valueOf(equityList.get(0).get("AcDate")) - 19110000);
