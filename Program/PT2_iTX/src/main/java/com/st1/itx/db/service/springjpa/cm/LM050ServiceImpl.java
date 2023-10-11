@@ -35,18 +35,17 @@ public class LM050ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @throws Exception
 	 **/
 	public List<Map<String, String>> fnEquity(int acdate, TitaVo titaVo) throws Exception {
-		
 
 		this.info("lM050.Totalequity acdate=" + acdate);
 		String sql = " ";
-		sql += "     SELECT \"AvailableFunds\" AS \"AvailableFunds\"";
+		sql += "     SELECT \"ResrvStndrd\" AS \"AvailableFunds\"";
 		sql += "           ,\"AcDate\"  AS \"AcDate\"";
 		sql += "     FROM \"InnFundApl\" ";
 		sql += "     WHERE \"AcDate\" = (";
 		sql += "     	SELECT MAX(\"AcDate\") ";
 		sql += "     	FROM \"InnFundApl\" ";
 		sql += "     	WHERE \"AcDate\" <= :acdate";
-		sql += " 	      AND \"AvailableFunds\" > 0 ";
+		sql += " 	      AND \"ResrvStndrd\" > 0 ";
 		sql += "     )";
 		this.info("sql=" + sql);
 
@@ -61,98 +60,169 @@ public class LM050ServiceImpl extends ASpringJpaParm implements InitializingBean
 	/**
 	 * 查詢所有資料
 	 * 
-	 * @param iEntdy 西元年月日
+	 * @param iEntdy  西元年月日
+	 * @param rptType 關係人分群記號(1:負責人,2:職員,3:一般客戶)
 	 * @param titaVo
 	 * @return
 	 * @throws Exception
 	 **/
-	public List<Map<String, String>> findAll(int iEntdy, TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(int iEntdy, String rptType, TitaVo titaVo) throws Exception {
 
 		int inputYearMonth = iEntdy / 100;
 
 		this.info("LM050ServiceImpl findAll inputYearMonth=" + inputYearMonth);
 
 		String sql = " ";
-		sql += " SELECT CASE ";
-		sql += "          WHEN NVL(S1.\"Rel\",' ') = ' ' ";
-		sql += "          THEN '3' "; // -- 一般客戶
-		sql += "          WHEN S1.\"Rel\" = 'N' ";
-		sql += "          THEN '2' "; // -- 職員
-		sql += "          WHEN S1.\"Rel\" = 'A' ";
-		sql += "          THEN '1' "; // -- A
-		sql += "        ELSE '3' "; // -- 保險業利害關係人放款管理辦法第3條利害關係人
-		sql += "        END               AS \"RptType\" "; // F0
-		sql += "      , CASE ";
-		sql += "          WHEN NVL(S1.\"RptId\",' ') != ' ' ";
-		sql += "          THEN S0.\"CustNo\" ";
-		sql += "        ELSE 0 END        AS \"CustNo\"  "; // F1
-		sql += "      , CASE ";
-		sql += "          WHEN NVL(S1.\"RptId\",' ') != ' ' ";
-		sql += "          THEN CM.\"CustName\" ";
-		sql += "        ELSE N' ' END      AS \"CustName\"  "; // F2
-		sql += "      , SUM(S0.\"LoanBal\") AS \"LoanBal\" "; // F3
-		sql += "      ,decode(s1.\"BusTitle\",NULL,decode(\"RelName\",NULL";
-		sql += "      ,'為本公司負責人' || \"HeadTitle\" ";
-		sql += "      ,'為本公司負責人' ||'('|| \"HeadTitle\" || decode(\"RelTitle\",'本人',' ',\"HeadName\") || ')' || decode(\"RelTitle\",'本人',' ','之'||\"RelTitle\"))  ";
-		sql += "      ,'該公司' ||\"BusTitle\" ||'('|| \"RelName\" || ')'||'為本公司'||\"HeadTitle\" ||'之'||\"RelTitle\" )AS 	\"Remark\"  ";
-		sql += "      ,decode(S1.\"Rel\",'A',CM.\"EntCode\",0) AS \"EntCode\"";
-		sql += " FROM ( SELECT \"CustNo\" ";
-		sql += "             , SUM(\"LoanBalance\") AS \"LoanBal\" ";
-		sql += "        FROM \"MonthlyLoanBal\" ";
-		sql += "        WHERE \"YearMonth\" = :inputYearMonth  ";
-		sql += "          AND \"LoanBalance\" > 0 ";
-		sql += "        GROUP BY \"CustNo\" ";
-		sql += "      ) S0 ";
-		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = S0.\"CustNo\" ";
-		sql += " LEFT JOIN ( SELECT ";
-		sql += "             decode(\"BusId\",'-',decode(\"RelId\",'-',\"HeadName\",\"RelName\"),\"BusName\")as \"CustName\"  ";
-		sql += "             ,to_char(decode(\"BusId\",'-',decode(\"RelId\",'-',\"HeadId\",\"RelId\"),\"BusId\"))as \"RptId\"  ";
-		sql += "             ,\"RelWithCompany\" as \"Rel\"";
-		sql += "             ,\"HeadName\" ";
-		sql += "             ,\"HeadTitle\" ";
-		sql += "             ,\"RelName\" ";
-		sql += "             ,\"RelTitle\" ";
-		sql += "             ,\"BusTitle\" ";
-		sql += "             FROM \"LifeRelHead\" ";
-		sql += "             WHERE \"RelWithCompany\"IN ('A','B') ";
-		sql += "             AND \"AcDate\" = (SELECT MAX(\"AcDate\") FROM \"LifeRelHead\" WHERE TRUNC(\"AcDate\" / 100 ) = :inputYearMonth )";
-		sql += "             AND \"LoanBalance\" > 0 ";
-		sql += "             UNION ";
-		sql += "             SELECT \"EmpName\" AS \"CustName\" ";
-		sql += "              ,TO_CHAR(\"EmpId\") AS \"RptId\" ";
-		sql += "                      ,'N' AS \"Rel\"  ";
-		sql += "              ,NULL AS \"HeadName\"  ";
-		sql += "              ,NULL AS \"HeadTitle\"  ";
-		sql += "              ,NULL AS \"RelName\"  ";
-		sql += "              ,NULL AS \"RelTitle\"  ";
-		sql += "              ,NULL AS \"BusTitle\"  ";
-		sql += "             FROM \"LifeRelEmp\" ";
-		sql += "             WHERE \"AcDate\" = (SELECT MAX(\"AcDate\") FROM \"LifeRelEmp\" WHERE TRUNC(\"AcDate\" / 100 ) = :inputYearMonth )";
-		sql += "           ) S1 ON S1.\"RptId\" = CM.\"CustId\" ";
-		sql += " GROUP BY CASE ";
-		sql += "            WHEN NVL(S1.\"Rel\",' ') = ' ' ";
-		sql += "            THEN '3' "; // -- 一般客戶
-		sql += "            WHEN S1.\"Rel\" ='N' ";
-		sql += "            THEN '2' "; // -- 職員
-		sql += "          WHEN S1.\"Rel\" = 'A' ";
-		sql += "          THEN '1' "; // -- A
-		sql += "          ELSE '3' "; // -- 保險業利害關係人放款管理辦法第3條利害關係人
-		sql += "          END ";
-		sql += "        , CASE ";
-		sql += "            WHEN NVL(S1.\"RptId\",' ') != ' ' ";
-		sql += "            THEN S0.\"CustNo\" ";
-		sql += "          ELSE 0 END ";
-		sql += "        , CASE ";
-		sql += "            WHEN NVL(S1.\"RptId\",' ') != ' ' ";
-		sql += "            THEN CM.\"CustName\" ";
-		sql += "          ELSE N' ' END ";
-		sql += "      ,decode(s1.\"BusTitle\",NULL,decode(\"RelName\",NULL";
-		sql += "      ,'為本公司負責人' || \"HeadTitle\" ";
-		sql += "      ,'為本公司負責人' ||'('|| \"HeadTitle\" || decode(\"RelTitle\",'本人',' ',\"HeadName\")|| ')' ||decode(\"RelTitle\",'本人',' ','之'||\"RelTitle\"))  ";
-		sql += "      ,'該公司' ||\"BusTitle\" ||'('|| \"RelName\" || ')'||'為本公司'||\"HeadTitle\" ||'之'||\"RelTitle\")  ";
-		sql += "      ,decode(S1.\"Rel\",'A',CM.\"EntCode\",0) ";
-		sql += " ORDER BY \"RptType\" ";
-		sql += "        , \"LoanBal\" DESC  ";
+		sql += " with \"Main\" as (";
+		sql += " SELECT ";
+		sql += " row_number()over (";
+		sql += "     partition by S0.\"CustNo\" ";
+		sql += "     order by S1.\"Rel\") as \"Seq\",";
+		sql += " CASE";
+		sql += "     WHEN Nvl(";
+		sql += "         S1.\"Rel\", ' '";
+		sql += "     ) = ' '         THEN '3'";
+		sql += "     WHEN S1.\"Rel\" = 'N'                  THEN '2'";
+		sql += "     WHEN S1.\"Rel\" IN ('A','B')                  THEN '1'";
+		sql += "     ELSE '3'";
+		sql += " END                                                                                                                                                                   AS \"RptType\"";
+		sql += "      , CASE";
+		sql += "     WHEN Nvl(";
+		sql += "         S1.\"RptId\", ' '";
+		sql += "     ) != ' ' THEN S0.\"CustNo\"";
+		sql += "     ELSE 0";
+		sql += " END                                                                                                                                                                                                                                                                    AS \"CustNo\"";
+		sql += "      , CASE";
+		sql += "     WHEN Nvl(";
+		sql += "         S1.\"RptId\", ' '";
+		sql += "     ) != ' ' THEN Cm.\"CustName\"";
+		sql += "     ELSE N' '";
+		sql += " END                                                                                                                                                                                                                                                               AS \"CustName\"";
+		sql += "      , S0.\"LoanBal\"                                                                                                                                                                                                                                                                                                                                               AS \"LoanBal\"";
+		sql += "      , Decode(";
+		sql += "     S1.\"BusTitle\", NULL";
+		sql += "      , Decode(";
+		sql += "         \"RelName\", NULL";
+		sql += "      , '為本公司負責人' || \"HeadTitle\"";
+		sql += "      , '為本公司負責人' || '(' || \"HeadTitle\" || Decode(";
+		sql += "             \"RelTitle\", '本人'";
+		sql += "      , ' '";
+		sql += "      , \"HeadName\"";
+		sql += "         ) || ')' || Decode(";
+		sql += "             \"RelTitle\", '本人'";
+		sql += "      , ' '";
+		sql += "      , '之' || \"RelTitle\"";
+		sql += "         )";
+		sql += "     ), '該公司' || \"BusTitle\" || '(' || \"RelName\" || ')' || '為本公司' || \"HeadTitle\" || '之' || \"RelTitle\"";
+		sql += " )                                               AS \"Remark\"";
+		sql += "      , Decode(";
+		sql += "     S1.\"Rel\", 'A'";
+		sql += "      , Cm.\"EntCode\"";
+		sql += "      , 0";
+		sql += " )                                                                                                                                                                                                                                                                                                                             AS \"EntCode\"";
+		sql += " FROM (";
+		sql += "     SELECT \"CustNo\"";
+		sql += "          , SUM(\"LoanBalance\") AS \"LoanBal\"";
+		sql += "     FROM \"MonthlyLoanBal\"";
+		sql += "     WHERE \"YearMonth\" = :Inputyearmonth";
+		sql += "           AND";
+		sql += "           \"LoanBalance\" > 0";
+		sql += "     GROUP BY \"CustNo\"";
+		sql += " )                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 S0";
+		sql += " LEFT JOIN \"CustMain\"                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    Cm ON Cm.\"CustNo\" = S0.\"CustNo\"";
+		sql += " LEFT JOIN (";
+		sql += "     SELECT Decode(";
+		sql += "         \"BusId\", '-'";
+		sql += "      , Decode(";
+		sql += "             \"RelId\", '-'";
+		sql += "      , \"HeadName\"";
+		sql += "      , \"RelName\"";
+		sql += "         ), \"BusName\"";
+		sql += "     )                          AS \"CustName\"";
+		sql += "          , To_Char(";
+		sql += "         Decode(";
+		sql += "             \"BusId\", '-'";
+		sql += "              , Decode(";
+		sql += "                 \"RelId\", '-'";
+		sql += "      , \"HeadId\"";
+		sql += "      , \"RelId\"";
+		sql += "             ), \"BusId\"";
+		sql += "         )";
+		sql += "     )                       AS \"RptId\"";
+		sql += "          , \"RelWithCompany\"                                                                                AS \"Rel\"";
+		sql += "          , \"HeadName\"";
+		sql += "          , \"HeadTitle\"";
+		sql += "          , \"RelName\"";
+		sql += "          , \"RelTitle\"";
+		sql += "          , \"BusTitle\"";
+		sql += "     FROM \"LifeRelHead\"";
+		sql += "     WHERE \"RelWithCompany\" IN (";
+		sql += "         'A'";
+		sql += "       , 'B'";
+		sql += "     )";
+		sql += "           AND";
+		sql += "           \"AcDate\" = (";
+		sql += "               SELECT MAX(\"AcDate\")";
+		sql += "               FROM \"LifeRelHead\"";
+		sql += "               WHERE Trunc(\"AcDate\" / 100) = :inputYearMonth";
+		sql += "           )";
+		sql += "           AND";
+		sql += "           \"LoanBalance\" > 0";
+		sql += "     UNION";
+		sql += "     SELECT \"EmpName\"            AS \"CustName\"";
+		sql += "          , To_Char(\"EmpId\")     AS \"RptId\"";
+		sql += "          , 'N'                  AS \"Rel\"";
+		sql += "          , NULL                 AS \"HeadName\"";
+		sql += "          , NULL                 AS \"HeadTitle\"";
+		sql += "          , NULL                 AS \"RelName\"";
+		sql += "          , NULL                 AS \"RelTitle\"";
+		sql += "          , NULL                 AS \"BusTitle\"";
+		sql += "     FROM \"LifeRelEmp\"";
+		sql += "     WHERE \"AcDate\" = (";
+		sql += "         SELECT MAX(\"AcDate\")";
+		sql += "         FROM \"LifeRelEmp\"";
+		sql += "         WHERE Trunc(\"AcDate\" / 100) = :inputYearMonth";
+		sql += "     )";
+		sql += " ) S1 ON S1.\"RptId\" = Cm.\"CustId\"";
+		sql += " ORDER BY \"RptType\"";
+		sql += "        , \"LoanBal\" DESC";
+		sql += " )";
+
+		// 負責人(名單)
+		if ("1".equals(rptType)) {
+			sql += " SELECT";
+			sql += "     \"RptType\"";
+			sql += "     , \"CustNo\"";
+			sql += "     , \"CustName\"";
+			sql += "     , \"LoanBal\"";
+			sql += "     , \"Remark\"";
+			sql += "     , \"EntCode\"";
+			sql += " FROM";
+			sql += "     \"Main\"";
+			sql += " WHERE";
+			sql += "     \"Seq\" = 1";
+			sql += "     AND \"RptType\" = '1'";
+		}
+		// 職員(放款總額)
+		if ("2".equals(rptType)) {
+			sql += " SELECT";
+			sql += "     SUM(\"LoanBal\") AS \"LoanBal\"";
+			sql += " FROM";
+			sql += "     \"Main\" m";
+			sql += " WHERE";
+			sql += "     \"Seq\" = 1";
+			sql += "     AND \"RptType\" = '2'";
+		}
+		// 一般客戶(放款總額)
+		if ("3".equals(rptType)) {
+			sql += " SELECT";
+			sql += "     SUM(\"LoanBal\") AS \"LoanBal\"";
+			sql += " FROM";
+			sql += "     \"Main\" m";
+			sql += " WHERE";
+			sql += "     \"Seq\" = 1";
+			sql += "     AND \"RptType\" = '3';";
+		}
 		this.info("sql=" + sql);
 
 		Query query;

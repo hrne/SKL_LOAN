@@ -101,15 +101,18 @@ public class LM049Report extends MakeReport {
 
 		// 寫入淨值
 		// 年.月 淨值（核閱數）
-		String outputNetValueDataDate = String
-				.valueOf(parse.stringToInteger(findStockHoldersEqt.get(0).get("AcDate")) - 19110000);
-		outputNetValueDataDate = outputNetValueDataDate.substring(0, 3) + "." + outputNetValueDataDate.substring(3, 5)
-				+ "." + outputNetValueDataDate.substring(5);
+		String outputNetValueDataDate = "";
+		BigDecimal stockHoldersEqt = BigDecimal.ZERO;
+		if (findStockHoldersEqt.size() > 0) {
+			outputNetValueDataDate = String
+					.valueOf(parse.stringToInteger(findStockHoldersEqt.get(0).get("AcDate")) - 19110000);
+			outputNetValueDataDate = outputNetValueDataDate.substring(0, 3) + "."
+					+ outputNetValueDataDate.substring(3, 5) + "." + outputNetValueDataDate.substring(5);
+			stockHoldersEqt = divThousand(new BigDecimal(findStockHoldersEqt.get(0).get("AvailableFunds")));
+		}
 
 		makeExcel.setValue(2, 5, outputNetValueDataDate + " 淨值（核閱數）");
-		makeExcel.setValue(2, 7, divThousand(new BigDecimal(findStockHoldersEqt.get(0).get("StockHoldersEqt"))),
-				"#,##0");
-
+		makeExcel.setValue(2, 7, stockHoldersEqt, "#,##0");
 		// 整理資料
 		// 根據CusType & CusSCD 區分大類 A B C D
 		// CusType = 1 = 金控公司負責人及大股東 = A

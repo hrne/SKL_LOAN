@@ -106,6 +106,7 @@ public class LM074ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              Fac.\"CustTypeCode\" = 'S01'";
 		sql += "              AND";
 		sql += "              Fac.\"RuleCode\" LIKE " + ruleCode;
+		//EntCode為企金，需判斷代償碼以及展期或借新還舊記號
 		sql += "              AND";
 		sql += "			  Fac.\"CompensateFlag\" LIKE ";
 		sql += "              		Case When C.\"EntCode\" = 0 Then '%' ";
@@ -118,6 +119,7 @@ public class LM074ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    SELECT \"CitySeq\"";
 		sql += "         , SUM(\"Count\")                                                     AS \"Count\"";
 		sql += "         , SUM(\"LineAmt\")                                                   AS \"LineAmt\"";
+		sql += "         , SUM(\"DrawdownAmt\")                                               AS \"DrawdownAmt\"";
 		sql += "         , SUM(\"ApproveRate\")                                               AS \"ApproveRate\"";
 		sql += "         , SUM(\"LTV\")                                                       AS \"LTV\"";
 		sql += "         , SUM(\"LineAmt\" * \"ApproveRate\" / \"LineAmt\") / SUM(\"Count\")        AS \"wAvgRate\"";

@@ -101,7 +101,7 @@ public class LM078Report extends MakeReport {
 				col = 3;
 						
 				count = parse.stringToInteger(r.get("Count"));
-				amt = getBigDecimal(r.get("LineAmt"));
+				amt = getBigDecimal(r.get("DrawdownAmt"));
 
 				makeExcel.setValue(row, col, count, "0", "R");
 				makeExcel.setValue(row, col + 1, amt, "0.00", "R");

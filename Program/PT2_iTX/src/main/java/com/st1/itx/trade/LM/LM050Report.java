@@ -3,7 +3,6 @@ package com.st1.itx.trade.LM;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
-
 import java.util.List;
 import java.util.Map;
 
@@ -48,6 +47,11 @@ public class LM050Report extends MakeReport {
 	// 放款總額
 	BigDecimal total = BigDecimal.ZERO;
 
+	private List<Map<String, String>> lM050list1 = null;
+	private List<Map<String, String>> lM050list2 = null;
+	private List<Map<String, String>> lM050list3 = null;
+	private List<Map<String, String>> lM050list4 = null;
+
 	public void exec(TitaVo titaVo) throws LogicException {
 		this.info("LM050Report exec");
 
@@ -86,7 +90,7 @@ public class LM050Report extends MakeReport {
 
 		if (equityList != null && equityList.size() > 0) {
 
-			String value = equityList.get(0).get("AvailableFunds");
+			String value = equityList.get(0).get("Totalequity");
 
 			BigDecimal amt = getBigDecimal(value);
 			String acDate = String.valueOf(Integer.valueOf(equityList.get(0).get("AcDate")) - 19110000);
@@ -99,119 +103,93 @@ public class LM050Report extends MakeReport {
 			makeExcel.setValue(2, 6, formatThousand(amt), "#,##0");
 		}
 
-		fnAll(entdyBc, titaVo);
-
+		// 找資料
+		findData(entdyBc, titaVo);
+		// 輸出檔案
+		exportExcel(entdyBc, titaVo);
 		makeExcel.close();
 
 	}
 
-	private void fnAll(int entdyBc, TitaVo titaVo) throws LogicException {
-
-		List<Map<String, String>> listLM050 = null;
+	private void findData(int entdyBc, TitaVo titaVo) throws LogicException {
 
 		try {
+			// 負責人明細
+			lM050list1 = lM050ServiceImpl.findAll(entdyBc, "1", titaVo);
+			// 職員放款總額
+			lM050list2 = lM050ServiceImpl.findAll(entdyBc, "2", titaVo);
+			// 一般客戶放款總額
+			lM050list3 = lM050ServiceImpl.findAll(entdyBc, "3", titaVo);
+			// 哲溢價與催收費用
+			lM050list4 = lM050ServiceImpl.findAmtTotal(entdyBc, titaVo);
 
-			listLM050 = lM050ServiceImpl.findAll(entdyBc, titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.error("LM050ServiceImpl.findAll error = " + errors.toString());
 		}
 
-		exportExcel(listLM050, entdyBc, titaVo);
 	}
 
-	private void exportExcel(List<Map<String, String>> listLM050, int entdyBc, TitaVo titaVo) throws LogicException {
+	private void exportExcel(int entdyBc, TitaVo titaVo) throws LogicException {
 		this.info("LM050Report exportExcel");
 
-		if (listLM050 == null || listLM050.isEmpty()) {
+		// 明細沒有列印本日無資料
+		if (lM050list1 == null) {
 			makeExcel.setValue(4, 2, "本日無資料", "C");
 			return;
 		}
 
 		int rowCursor = 4;
 
-		String tmpCustNo = "";
-
-		int size = 0;
-
-		for (Map<String, String> tLM050 : listLM050) {
-			String rptType = tLM050.get("RptType");
-			String custNo = tLM050.get("CustNo");
-			if (rptType.equals("1")) {
-				if (!custNo.equals(tmpCustNo)) {
-					tmpCustNo = custNo;
-
-				} else {
-					continue;
-				}
-				size++;
-			}
-
-		}
-		makeExcel.setShiftRow(rowCursor + 1, size);
+		makeExcel.setShiftRow(rowCursor + 1, lM050list1.size());
 
 		makeExcel.setIBU("");
 
-		tmpCustNo = "";
-		for (Map<String, String> tLM050 : listLM050) {
+		// 負責人
+		for (Map<String, String> tLM050 : lM050list1) {
 
-			String rptType = tLM050.get("RptType");
 			BigDecimal loanBal = getBigDecimal(tLM050.get("LoanBal"));
 
-			if (rptType.equals("1")) { // 保險業利害關係人放款管理辦法第3條利害關係人
+			String custNo = tLM050.get("CustNo");
+			String custName = tLM050.get("CustName");
+			String remark = tLM050.get("Remark");
 
-				String custNo = tLM050.get("CustNo");
-				String custName = tLM050.get("CustName");
-				String remark = tLM050.get("Remark");
+			makeExcel.setValue(rowCursor, 2, custNo);
+			makeExcel.setValue(rowCursor, 3, custName);
+			makeExcel.setValue(rowCursor, 4, formatThousand(loanBal), "#,##0", "R");
+			makeExcel.setValue(rowCursor, 5, this.computeDivide(loanBal, equity, 6), "##0.0000%");
+			this.info("bal:" + loanBal);
+			this.info("淨值:" + equity);
+			this.info("占淨比值:" + this.computeDivide(loanBal, equity, 6));
 
-				if (!custNo.equals(tmpCustNo)) {
-					tmpCustNo = custNo;
+			String limitPercent = "1".equals(tLM050.get("EntCode")) ? "10%" : "2%";
 
-				} else {
-					continue;
-				}
+			makeExcel.setValue(rowCursor, 6, limitPercent); // 限額標準 法人10% 個人2%
+			makeExcel.setValue(rowCursor, 7, remark); // 備註
 
-				makeExcel.setValue(rowCursor, 2, custNo);
-				makeExcel.setValue(rowCursor, 3, custName);
-				makeExcel.setValue(rowCursor, 4, formatThousand(loanBal), "#,##0", "R");
-				makeExcel.setValue(rowCursor, 5, this.computeDivide(loanBal, equity, 6), "##0.0000%");
-				this.info("bal:" + loanBal);
-				this.info("淨值:" + equity);
-				this.info("占淨比值:" + this.computeDivide(loanBal, equity, 6));
+			detailTotal = detailTotal.add(loanBal);
+			rowCursor++;
 
-				String limitPercent = "1".equals(tLM050.get("EntCode")) ? "10%" : "2%";
-
-				makeExcel.setValue(rowCursor, 6, limitPercent); // 限額標準 法人10% 個人2%
-				makeExcel.setValue(rowCursor, 7, remark); // 備註
-
-				detailTotal = detailTotal.add(loanBal);
-				rowCursor++;
-
-			} else if (rptType.equals("2")) { // 職員
-				empLoanBal = empLoanBal.add(loanBal);
-			} else if (rptType.equals("3")) { // 一般客戶
-				custLoanBal = custLoanBal.add(loanBal);
-			}
 		}
 
-		List<Map<String, String>> findAmtTotal = null;
-
-		try {
-
-			findAmtTotal = lM050ServiceImpl.findAmtTotal(entdyBc, titaVo);
-
-		} catch (Exception e) {
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.error("LM050ServiceImpl.findAmtTotal error = " + errors.toString());
+		// 職員
+		if (lM050list2.size() > 0) {
+			empLoanBal = getBigDecimal(lM050list2.get(0).get("LoanBal"));
 		}
 
-		custLoanBal = custLoanBal.add(new BigDecimal(findAmtTotal.get(0).get("LoanBal")));
+		// 一般客戶 加 折溢價與催收費用
+		if (lM050list3.size() > 0 && lM050list4.size() > 0) {
+			custLoanBal = getBigDecimal(lM050list3.get(0).get("LoanBal"));
 
-		relLoanBal = relLoanBal.add(detailTotal);
-		relLoanBal = relLoanBal.add(empLoanBal);
-		total = relLoanBal.add(custLoanBal);
+			custLoanBal = custLoanBal.add(getBigDecimal(lM050list4.get(0).get("LoanBal")));
+		}
+
+		// 關係人放款總額 = 負責人 + 職員
+		relLoanBal = detailTotal.add(empLoanBal);
+
+		// 放款總額 =負責人 + 職員 + (一般客戶 + 折溢價與催收費用)
+		total = empLoanBal.add(custLoanBal).add(custLoanBal);
 
 		printTotal(rowCursor + 1);
 	}

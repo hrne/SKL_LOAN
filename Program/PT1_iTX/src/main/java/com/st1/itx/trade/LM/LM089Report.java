@@ -106,7 +106,7 @@ public class LM089Report extends MakeReport {
 				col =  3;
 
 				count = parse.stringToInteger(r.get("Count"));
-				amt = getBigDecimal(r.get("LineAmt"));
+				amt = getBigDecimal(r.get("DrawdownAmt"));
 				
 				wLTV = getBigDecimal(r.get("wAvgLTV"));
 				maxLTV = getBigDecimal(r.get("maxLTV"));

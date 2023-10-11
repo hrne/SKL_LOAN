@@ -464,6 +464,7 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	FROM OVDATA	 O ";
 		sql += "	LEFT JOIN  COREDATA	 C ON C.\"YearMonth\" = O.\"YearMonth\" ";
 		sql += "	LEFT JOIN  BADDATA	 B ON B.\"Year\" = TRUNC(O.\"YearMonth\"/100 ) ";
+		sql += "	GROUP BY O.\"YearMonth\" ";
 		sql += "	ORDER BY O.\"YearMonth\" ASC";
 
 		this.info("sql=" + sql);

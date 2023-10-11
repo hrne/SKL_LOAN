@@ -96,7 +96,7 @@ public class LM077Report extends MakeReport {
 				row = 6 + parse.stringToInteger(r.get("CitySeq"));
 				col = parse.stringToInteger(r.get("ApplDate")) >= limitAcDate ? 6 : 3;
 
-				amt = getBigDecimal(r.get("LineAmt"));
+				amt = getBigDecimal(r.get("DrawdownAmt"));
 				wLTV = getBigDecimal(r.get("wAvgLTV"));
 				wRate = getBigDecimal(r.get("wAvgRate"));
 
