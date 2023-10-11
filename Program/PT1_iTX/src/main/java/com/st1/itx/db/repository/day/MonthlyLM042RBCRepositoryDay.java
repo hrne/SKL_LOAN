@@ -3,11 +3,14 @@ package com.st1.itx.db.repository.day;
 
 import java.util.Optional;
 
+import java.math.BigDecimal;
+import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,8 +28,8 @@ public interface MonthlyLM042RBCRepositoryDay extends JpaRepository<MonthlyLM042
   // YearMonth = 
   public Slice<MonthlyLM042RBC> findAllByYearMonthIs(int yearMonth_0, Pageable pageable);
 
-  // YearMonth = ,AND LoanType = ,AND LoanItem = ,AND RelatedCode = 
-  public Slice<MonthlyLM042RBC> findAllByYearMonthIsAndLoanTypeIsAndLoanItemIsAndRelatedCodeIs(int yearMonth_0, String loanType_1, String loanItem_2, String relatedCode_3, Pageable pageable);
+  // YearMonth = ,AND LoanType = ,AND LoanItem = 
+  public Slice<MonthlyLM042RBC> findAllByYearMonthIsAndLoanTypeIsAndLoanItemIs(int yearMonth_0, String loanType_1, String loanItem_2, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

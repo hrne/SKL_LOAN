@@ -93,6 +93,13 @@ public class L6608 extends TradeBuffer {
 			break;
 		case 4: // 刪除
 			tCdReport = sCdReportService.holdById(iFormNo);
+			
+			if ("onLine".equals(titaVo.getDataBase())) {
+				titaVo.setDataBaseOnMon();// 指定月報環境
+			} else {
+				titaVo.setDataBaseOnLine();// 指定連線環境
+			}
+			
 			if (tCdReport != null) {
 				try {
 					sCdReportService.delete(tCdReport);
@@ -102,8 +109,11 @@ public class L6608 extends TradeBuffer {
 			} else {
 				throw new LogicException(titaVo, "E0004", iFormNo); // 刪除資料不存在
 			}
+
 			dataLog.setEnv(titaVo, tCdReport, tCdReport); ////
 			dataLog.exec("刪除報表代號對照檔"); ////
+
+			titaVo.setDataBaseOnOrg();// 還原原本的環境
 			break;
 		}
 		this.info("3");
@@ -115,6 +125,12 @@ public class L6608 extends TradeBuffer {
 
 	private void moveCdReport(CdReport mCdReport, int mFuncCode, String mFormNo, TitaVo titaVo) throws LogicException {
 
+		if ("onLine".equals(titaVo.getDataBase())) {
+			titaVo.setDataBaseOnMon();// 指定月報環境
+		} else {
+			titaVo.setDataBaseOnLine();// 指定連線環境
+		}
+		
 		mCdReport.setFormNo(titaVo.getParam("FormNo"));
 		mCdReport.setFormName(titaVo.getParam("FormName"));
 		mCdReport.setCycle(this.parse.stringToInteger((titaVo.getParam("Cycle"))));
@@ -141,5 +157,7 @@ public class L6608 extends TradeBuffer {
 		}
 		mCdReport.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 		mCdReport.setLastUpdateEmpNo(titaVo.getTlrNo());
+		
+		titaVo.setDataBaseOnOrg();// 還原原本的環境
 	}
 }

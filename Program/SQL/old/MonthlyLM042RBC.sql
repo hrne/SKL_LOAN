@@ -7,6 +7,10 @@ create table "MonthlyLM042RBC" (
   "RelatedCode" varchar2(1),
   "LoanAmount" decimal(16, 2) default 0 not null,
   "RiskFactor" decimal(6, 4) default 0 not null,
+  "StockLoanBal" decimal(16, 2) default 0 not null,
+  "OtherLoanbal" decimal(16, 2) default 0 not null,
+  "AmortizeTotal" decimal(16, 2) default 0 not null,
+  "OvduExpense" decimal(16, 2) default 0 not null,
   "CreateDate" timestamp,
   "CreateEmpNo" varchar2(6),
   "LastUpdate" timestamp,
@@ -22,6 +26,10 @@ comment on column "MonthlyLM042RBC"."LoanItem" is '放款項目';
 comment on column "MonthlyLM042RBC"."RelatedCode" is '對象關係人';
 comment on column "MonthlyLM042RBC"."LoanAmount" is '放款金額';
 comment on column "MonthlyLM042RBC"."RiskFactor" is '風險係數';
+comment on column "MonthlyLM042RBC"."StockLoanBal" is '股票質押';
+comment on column "MonthlyLM042RBC"."OtherLoanbal" is '一般法人放款';
+comment on column "MonthlyLM042RBC"."AmortizeTotal" is '溢折價';
+comment on column "MonthlyLM042RBC"."OvduExpense" is '催收費用';
 comment on column "MonthlyLM042RBC"."CreateDate" is '建檔日期時間';
 comment on column "MonthlyLM042RBC"."CreateEmpNo" is '建檔人員';
 comment on column "MonthlyLM042RBC"."LastUpdate" is '最後更新日期時間';

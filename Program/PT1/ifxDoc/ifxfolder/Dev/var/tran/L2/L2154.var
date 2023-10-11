@@ -2483,7 +2483,7 @@ C(3,#IsGeneral,1,$,$)
 #RuleCode=X,5,I
 C(3,#UpdateCode,1,$,s)
 T(3,@RuleCodeX,)
-C(5,#CustTypeCode,S01,$,S)
+C(5,#CustTypeCode,S01,$,C(5,#CustTypeCode,#L2r05CustTypeCode,s,S))
 HELP(#CdRuleCodeYHelp)
 @
 C(4,#RuleCode,$,C(5,#RuleCode,#L2r05RuleCode,s,$))
@@ -3374,6 +3374,7 @@ C(4,#GrKind,S,$)
 T(H,#GrKind,#GrKindHelp)
 
 #LbEsGcd=X,1,L
+
 #EsGcd=X,1,I
 C(3,#UpdateCode,1,$,s)
 C(3,#Hide7Fg,0,CALL(#HideP7),$)
@@ -3421,6 +3422,7 @@ C(3,#UpdateCode,1,$,s)
 C(3,#Hide7Fg,0,CALL(#HideP7),$)
 C(3,#IsLandLoan,1,$,S)
 @A(YM,0,#PreStarBuildingYM)
+
 !實際興建年月
 #LbStarBuildingYM=A,5,L
 #StarBuildingYM=A,5,I
@@ -3429,12 +3431,10 @@ C(3,#Hide7Fg,0,CALL(#HideP7),$)
 C(3,#IsLandLoan,1,$,S)
 @A(YM,0,#StarBuildingYM)
 
-
 !--- P7 清償金類型
 #INVK7=X,1,S
 ENABLE(#BTNHideP8)
 C(3,#Hide8Fg,0,CALL(#HideP8),$)
-
 
 #BreachSwitch=N,1,S
 
@@ -3468,7 +3468,6 @@ T(H,#BreachFlag,#YesNoHelp)
 !是否適用違約適用方式
 #FdProdBreachFlag=X,2,L
 
-
 #ProdBreachFlag=X,1,I
 C(3,#Hide8Fg,0,CALL(#HideP8),$)
 C(3,#UpdateCode,1,$,s)
@@ -3480,7 +3479,6 @@ C(3,#DepartmentCode,0,s,$)
 HELP(#ProdBreachFlagHelp)
 T(3,@ProdBreachFlagX,)
 @V(H,#ProdBreachFlagHelp)
-
 
 #ProdBreachFlagX=X,10,L
 C(4,#ProdBreachFlag,S,$)
@@ -3505,8 +3503,6 @@ IF(#BreachCode=="005",E(0,@BreachDecreaseMonth,0),$)
 T(H,#BreachCode,#ProdBreachCodeHelp)
 C(5,#BreachFlag,#L2r05BreachFlag,$,C(5,#BreachFlag,N,T(3,無),$))
 C(5,#BreachFlag,#L2r05BreachFlag,$,C(5,#ProdBreachFlag,N,T(3,無),$))
-
-
 
 !綁約期間
 #FdProhibitMonth=X,2,L
@@ -3533,8 +3529,6 @@ T(H,#BreachGetCode,#BreachGetCodeHelp)
 C(5,#BreachFlag,#L2r05BreachFlag,$,C(5,#BreachFlag,N,T(3,@BreachGetCodeX,無),$))
 C(5,#BreachFlag,#L2r05BreachFlag,$,C(5,#ProdBreachFlag,N,T(3,@BreachGetCodeX,無),$))
 C(5,#BreachGetCode,0,T(3,@BreachGetCodeX,無),$)
-
-
 
 !違約金百分比
 #FdBreachPercent=X,2,L

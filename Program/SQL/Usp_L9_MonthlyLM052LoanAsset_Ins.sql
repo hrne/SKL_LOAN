@@ -45,6 +45,17 @@ BEGIN
           ,EmpNo                                  AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
           ,JOB_START_TIME                         AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0
           ,EmpNo                                  AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+          ,CASE 
+                   WHEN "LoanAssetCode" IN ('S1','S2') 
+                   THEN 0.015  
+                   ELSE 0.01
+           END AS "StorageRate" 
+          ,ROUND (
+            SUM( CASE 
+                   WHEN "LoanAssetCode" IN ('S1','S2') 
+                   THEN 0.015  
+                   ELSE 0.01
+                 END  * "LoanBal" )) AS "StorageAmt" 
     FROM( SELECT M."YearMonth"
                 , CASE
                     --建築貸款
@@ -107,6 +118,11 @@ BEGIN
             )
     GROUP BY "YearMonth"
             ,"LoanAssetCode"
+            ,CASE 
+                   WHEN "LoanAssetCode" IN ('S1','S2') 
+                   THEN 0.015  
+                   ELSE 0.01
+           END 
     ;
 
     INS_CNT := INS_CNT + sql%rowcount;

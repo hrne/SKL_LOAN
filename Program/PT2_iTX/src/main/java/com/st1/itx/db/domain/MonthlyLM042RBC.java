@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -10,6 +11,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Column;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * MonthlyLM042RBC LM042RBC會計報表<br>
@@ -24,12 +27,7 @@ import javax.persistence.Column;
 public class MonthlyLM042RBC implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -964594370167453277L;
-
-@EmbeddedId
+  @EmbeddedId
   private MonthlyLM042RBCId monthlyLM042RBCId;
 
   // 資料年月
@@ -46,11 +44,6 @@ public class MonthlyLM042RBC implements Serializable {
   @Column(name = "`LoanItem`", length = 1, insertable = false, updatable = false)
   private String loanItem;
 
-  // 是否為利害關係人
-  /* Y/N */
-  @Column(name = "`RelatedCode`", length = 1, insertable = false, updatable = false)
-  private String relatedCode;
-
   // 放款金額
   /* 放款餘額扣除備呆 */
   @Column(name = "`LoanAmount`")
@@ -64,18 +57,6 @@ public class MonthlyLM042RBC implements Serializable {
   /* 放款金額*風險係數=LoanAmount * RiskFactor */
   @Column(name = "`RiskFactorAmount`")
   private BigDecimal riskFactorAmount = new BigDecimal("0");
-
-  // 放款餘額
-  @Column(name = "`LoanBal`")
-  private BigDecimal loanBal = new BigDecimal("0");
-
-  // 備呆提存比率
-  @Column(name = "`ReserveLossRate`")
-  private BigDecimal reserveLossRate = new BigDecimal("0");
-
-  // 備呆金額
-  @Column(name = "`ReserveLossAmt`")
-  private BigDecimal reserveLossAmt = new BigDecimal("0");
 
   // 建檔日期時間
   @CreatedDate
@@ -174,25 +155,6 @@ F：授信限制對象-具控制與從屬關係
   }
 
 /**
-	* 是否為利害關係人<br>
-	* Y/N
-	* @return String
-	*/
-  public String getRelatedCode() {
-    return this.relatedCode == null ? "" : this.relatedCode;
-  }
-
-/**
-	* 是否為利害關係人<br>
-	* Y/N
-  *
-  * @param relatedCode 是否為利害關係人
-	*/
-  public void setRelatedCode(String relatedCode) {
-    this.relatedCode = relatedCode;
-  }
-
-/**
 	* 放款金額<br>
 	* 放款餘額扣除備呆
 	* @return BigDecimal
@@ -247,63 +209,6 @@ F：授信限制對象-具控制與從屬關係
 	*/
   public void setRiskFactorAmount(BigDecimal riskFactorAmount) {
     this.riskFactorAmount = riskFactorAmount;
-  }
-
-/**
-	* 放款餘額<br>
-	* 
-	* @return BigDecimal
-	*/
-  public BigDecimal getLoanBal() {
-    return this.loanBal;
-  }
-
-/**
-	* 放款餘額<br>
-	* 
-  *
-  * @param loanBal 放款餘額
-	*/
-  public void setLoanBal(BigDecimal loanBal) {
-    this.loanBal = loanBal;
-  }
-
-/**
-	* 備呆提存比率<br>
-	* 
-	* @return BigDecimal
-	*/
-  public BigDecimal getReserveLossRate() {
-    return this.reserveLossRate;
-  }
-
-/**
-	* 備呆提存比率<br>
-	* 
-  *
-  * @param reserveLossRate 備呆提存比率
-	*/
-  public void setReserveLossRate(BigDecimal reserveLossRate) {
-    this.reserveLossRate = reserveLossRate;
-  }
-
-/**
-	* 備呆金額<br>
-	* 
-	* @return BigDecimal
-	*/
-  public BigDecimal getReserveLossAmt() {
-    return this.reserveLossAmt;
-  }
-
-/**
-	* 備呆金額<br>
-	* 
-  *
-  * @param reserveLossAmt 備呆金額
-	*/
-  public void setReserveLossAmt(BigDecimal reserveLossAmt) {
-    this.reserveLossAmt = reserveLossAmt;
   }
 
 /**
@@ -385,8 +290,7 @@ F：授信限制對象-具控制與從屬關係
 
   @Override
   public String toString() {
-    return "MonthlyLM042RBC [monthlyLM042RBCId=" + monthlyLM042RBCId + ", loanAmount=" + loanAmount + ", riskFactor=" + riskFactor
-           + ", riskFactorAmount=" + riskFactorAmount + ", loanBal=" + loanBal + ", reserveLossRate=" + reserveLossRate + ", reserveLossAmt=" + reserveLossAmt + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
-           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "MonthlyLM042RBC [monthlyLM042RBCId=" + monthlyLM042RBCId + ", loanAmount=" + loanAmount + ", riskFactor=" + riskFactor + ", riskFactorAmount=" + riskFactorAmount
+           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

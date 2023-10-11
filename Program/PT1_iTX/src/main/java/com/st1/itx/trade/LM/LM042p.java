@@ -1,10 +1,8 @@
 package com.st1.itx.trade.LM;
 
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -16,8 +14,10 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.MonthlyLM042RBC;
-import com.st1.itx.db.domain.MonthlyLM042RBCId;
+import com.st1.itx.db.domain.MonthlyLM042Statis;
 import com.st1.itx.db.service.MonthlyLM042RBCService;
+import com.st1.itx.db.service.MonthlyLM042StatisService;
+import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
@@ -37,6 +37,8 @@ public class LM042p extends TradeBuffer {
 	@Autowired
 	LM042Report LM042Report;
 
+	@Autowired
+	MonthlyLM042StatisService sMonthlyLM042StatisService;
 	@Autowired
 	MonthlyLM042RBCService sMonthlyLM042RBCService;
 
@@ -78,8 +80,6 @@ public class LM042p extends TradeBuffer {
 		int tYMD = ymd(yearMonth, 0);// 本月底日
 		int lYMD = ymd(yearMonth, -1);// 上月底日
 
-		checkAndUpdateData(titaVo, yearMonth);
-
 		this.info("LM042p titaVo.getTxcd() = " + titaVo.getTxcd());
 		String parentTranCode = titaVo.getTxcd();
 		LM042Report.setParentTranCode(parentTranCode);
@@ -93,155 +93,34 @@ public class LM042p extends TradeBuffer {
 
 		boolean isFinish = LM042Report.exec(titaVo, lYMD, tYMD);
 		if (isFinish) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf, "LM042RBC表_會計部報表 已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf,
+					"LM042RBC表_會計部報表 已完成", titaVo);
 		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf, "LM042RBC表_會計部報表 查無資料", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf,
+					"LM042RBC表_會計部報表 查無資料", titaVo);
+		}
+		Slice<MonthlyLM042Statis> slMonthlyLM042Statis = sMonthlyLM042StatisService.findYearMonthAll(yearMonth, 0,
+				Integer.MAX_VALUE, titaVo);
+		Slice<MonthlyLM042RBC> slMonthlyLM042RBC = sMonthlyLM042RBCService.findYearMonthAll(yearMonth, 0,
+				Integer.MAX_VALUE, titaVo);
+
+		changeDBEnv(titaVo);
+		try {
+			sMonthlyLM042StatisService.insertAll(slMonthlyLM042Statis.getContent(), titaVo);
+		} catch (DBException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			sMonthlyLM042RBCService.insertAll(slMonthlyLM042RBC.getContent(), titaVo);
+		} catch (DBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
+		titaVo.setDataBaseOnOrg();// 還原原本的環境
 		this.addList(this.totaVo);
 		return this.sendList();
-	}
-
-	private void checkAndUpdateData(TitaVo titaVo, int yearMonth) throws LogicException {
-
-		Slice<MonthlyLM042RBC> sMonthlyLM042RBC;
-
-		sMonthlyLM042RBC = sMonthlyLM042RBCService.findYearMonthAll(yearMonth, 0, 12, titaVo);
-
-		// 判斷有無當月資料
-		if (sMonthlyLM042RBC == null) {
-			this.info("insert data");
-			// 新增當月資料
-			insertData(titaVo, yearMonth);
-
-			// 新增後再次搜尋
-			sMonthlyLM042RBC = sMonthlyLM042RBCService.findYearMonthAll(yearMonth, 0, 12, titaVo);
-		}
-
-		List<MonthlyLM042RBC> lMonthlyLM042RBC = sMonthlyLM042RBC == null ? null : sMonthlyLM042RBC.getContent();
-
-		this.info("lMonthlyLM042RBC=" + lMonthlyLM042RBC.toString());
-
-		for (MonthlyLM042RBC tMonthlyLM042RBC : lMonthlyLM042RBC) {
-
-			switch (tMonthlyLM042RBC.getLoanItem()) {
-			case "A":
-				tMonthlyLM042RBC.setRiskFactor(new BigDecimal(titaVo.getParam("RiskFactor1")));
-				break;
-			case "B":
-				tMonthlyLM042RBC.setRiskFactor(new BigDecimal(titaVo.getParam("RiskFactor2")));
-				break;
-			case "C":
-				tMonthlyLM042RBC.setRiskFactor(new BigDecimal(titaVo.getParam("RiskFactor3")));
-				break;
-			case "D":
-				tMonthlyLM042RBC.setRiskFactor(new BigDecimal(titaVo.getParam("RiskFactor4")));
-				break;
-			case "E":
-				tMonthlyLM042RBC.setRiskFactor(new BigDecimal(titaVo.getParam("RiskFactor5")));
-				break;
-			case "F":
-				tMonthlyLM042RBC.setRiskFactor(new BigDecimal(titaVo.getParam("RiskFactor6")));
-				break;
-			}
-
-		}
-
-//		this.info("lMonthlyLM042RBC=" + lMonthlyLM042RBC.toString());
-
-		try {
-			sMonthlyLM042RBCService.updateAll(lMonthlyLM042RBC, titaVo);
-		} catch (DBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		this.info("update done");
-	}
-
-	public void insertData(TitaVo titaVo, int yearMonth) throws LogicException {
-		List<MonthlyLM042RBC> insMonthlyLM042RBC = new ArrayList<MonthlyLM042RBC>();
-
-		MonthlyLM042RBC mMonthlyLM042RBC = new MonthlyLM042RBC();
-		MonthlyLM042RBCId monthlyLM042RBCId = new MonthlyLM042RBCId();
-
-		for (int i = 1; i <= 2; i++) {
-			mMonthlyLM042RBC = new MonthlyLM042RBC();
-			monthlyLM042RBCId = new MonthlyLM042RBCId();
-			monthlyLM042RBCId.setYearMonth(yearMonth);
-			monthlyLM042RBCId.setLoanType(String.valueOf(i));
-			monthlyLM042RBCId.setLoanItem("A");
-			monthlyLM042RBCId.setRelatedCode("N");
-			mMonthlyLM042RBC.setMonthlyLM042RBCId(monthlyLM042RBCId);
-			mMonthlyLM042RBC.setRiskFactor(new BigDecimal(titaVo.getParam("RiskFactor1")));
-			mMonthlyLM042RBC.setLoanAmount(new BigDecimal("0"));
-			insMonthlyLM042RBC.add(mMonthlyLM042RBC);
-
-			mMonthlyLM042RBC = new MonthlyLM042RBC();
-			monthlyLM042RBCId = new MonthlyLM042RBCId();
-			monthlyLM042RBCId.setYearMonth(yearMonth);
-			monthlyLM042RBCId.setLoanType(String.valueOf(i));
-			monthlyLM042RBCId.setLoanItem("B");
-			monthlyLM042RBCId.setRelatedCode("N");
-			mMonthlyLM042RBC.setMonthlyLM042RBCId(monthlyLM042RBCId);
-			mMonthlyLM042RBC.setRiskFactor(new BigDecimal(titaVo.getParam("RiskFactor2")));
-			mMonthlyLM042RBC.setLoanAmount(new BigDecimal("0"));
-			insMonthlyLM042RBC.add(mMonthlyLM042RBC);
-
-			mMonthlyLM042RBC = new MonthlyLM042RBC();
-			monthlyLM042RBCId = new MonthlyLM042RBCId();
-			monthlyLM042RBCId.setYearMonth(yearMonth);
-			monthlyLM042RBCId.setLoanType(String.valueOf(i));
-			monthlyLM042RBCId.setLoanItem("C");
-			monthlyLM042RBCId.setRelatedCode("N");
-			mMonthlyLM042RBC.setMonthlyLM042RBCId(monthlyLM042RBCId);
-			mMonthlyLM042RBC.setRiskFactor(new BigDecimal(titaVo.getParam("RiskFactor3")));
-			mMonthlyLM042RBC.setLoanAmount(new BigDecimal("0"));
-			insMonthlyLM042RBC.add(mMonthlyLM042RBC);
-
-			mMonthlyLM042RBC = new MonthlyLM042RBC();
-			monthlyLM042RBCId = new MonthlyLM042RBCId();
-			monthlyLM042RBCId.setYearMonth(yearMonth);
-			monthlyLM042RBCId.setLoanType(String.valueOf(i));
-			monthlyLM042RBCId.setLoanItem("D");
-			monthlyLM042RBCId.setRelatedCode("N");
-			mMonthlyLM042RBC.setMonthlyLM042RBCId(monthlyLM042RBCId);
-			mMonthlyLM042RBC.setRiskFactor(new BigDecimal(titaVo.getParam("RiskFactor4")));
-			mMonthlyLM042RBC.setLoanAmount(new BigDecimal("0"));
-			insMonthlyLM042RBC.add(mMonthlyLM042RBC);
-
-			mMonthlyLM042RBC = new MonthlyLM042RBC();
-			monthlyLM042RBCId = new MonthlyLM042RBCId();
-			monthlyLM042RBCId.setYearMonth(yearMonth);
-			monthlyLM042RBCId.setLoanType(String.valueOf(i));
-			monthlyLM042RBCId.setLoanItem("E");
-			monthlyLM042RBCId.setRelatedCode("Y");
-			mMonthlyLM042RBC.setMonthlyLM042RBCId(monthlyLM042RBCId);
-			mMonthlyLM042RBC.setRiskFactor(new BigDecimal(titaVo.getParam("RiskFactor5")));
-			mMonthlyLM042RBC.setLoanAmount(new BigDecimal("0"));
-			insMonthlyLM042RBC.add(mMonthlyLM042RBC);
-
-			mMonthlyLM042RBC = new MonthlyLM042RBC();
-			monthlyLM042RBCId = new MonthlyLM042RBCId();
-			monthlyLM042RBCId.setYearMonth(yearMonth);
-			monthlyLM042RBCId.setLoanType(String.valueOf(i));
-			monthlyLM042RBCId.setLoanItem("F");
-			monthlyLM042RBCId.setRelatedCode("Y");
-			mMonthlyLM042RBC.setMonthlyLM042RBCId(monthlyLM042RBCId);
-			mMonthlyLM042RBC.setRiskFactor(new BigDecimal(titaVo.getParam("RiskFactor6")));
-			mMonthlyLM042RBC.setLoanAmount(new BigDecimal("0"));
-			insMonthlyLM042RBC.add(mMonthlyLM042RBC);
-		}
-
-		try {
-
-			sMonthlyLM042RBCService.insertAll(insMonthlyLM042RBC, titaVo);
-		} catch (DBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		this.info("insert done");
-
 	}
 
 	/**
@@ -266,5 +145,26 @@ public class LM042p extends TradeBuffer {
 		calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
 
 		return Integer.valueOf(dateFormat.format(calendar.getTime()));
+	}
+
+	/**
+	 * 切換環境
+	 */
+	private void changeDBEnv(TitaVo titaVo) {
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		this.info("now env = " + ContentName.onLine);
+		this.info("now getDataBase = " + titaVo.getDataBase());
+		if (ContentName.onLine.equals(titaVo.getDataBase())) {
+			titaVo.setDataBaseOnMon();// 指定月報環境
+		} else {
+			titaVo.setDataBaseOnLine();// 指定連線環境
+		}
+//		titaVo.setDataBaseOnLine();// 指定連線環境
 	}
 }

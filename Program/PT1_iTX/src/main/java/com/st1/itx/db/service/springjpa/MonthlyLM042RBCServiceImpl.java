@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -91,9 +94,9 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "YearMonth", "LoanType", "LoanItem", "RelatedCode"));
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "YearMonth", "LoanType", "LoanItem"));
     else
-         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "YearMonth", "LoanType", "LoanItem", "RelatedCode"));
+         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "YearMonth", "LoanType", "LoanItem"));
     this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = monthlyLM042RBCReposDay.findAll(pageable);
@@ -139,7 +142,7 @@ em = null;
   }
 
   @Override
-  public Slice<MonthlyLM042RBC> findItem(int yearMonth_0, String loanType_1, String loanItem_2, String relatedCode_3, int index, int limit, TitaVo... titaVo) {
+  public Slice<MonthlyLM042RBC> findItem(int yearMonth_0, String loanType_1, String loanItem_2, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<MonthlyLM042RBC> slice = null;
     if (titaVo.length != 0)
@@ -150,15 +153,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("findItem " + dbName + " : " + "yearMonth_0 : " + yearMonth_0 + " loanType_1 : " +  loanType_1 + " loanItem_2 : " +  loanItem_2 + " relatedCode_3 : " +  relatedCode_3);
+    this.info("findItem " + dbName + " : " + "yearMonth_0 : " + yearMonth_0 + " loanType_1 : " +  loanType_1 + " loanItem_2 : " +  loanItem_2);
     if (dbName.equals(ContentName.onDay))
-      slice = monthlyLM042RBCReposDay.findAllByYearMonthIsAndLoanTypeIsAndLoanItemIsAndRelatedCodeIs(yearMonth_0, loanType_1, loanItem_2, relatedCode_3, pageable);
+      slice = monthlyLM042RBCReposDay.findAllByYearMonthIsAndLoanTypeIsAndLoanItemIs(yearMonth_0, loanType_1, loanItem_2, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = monthlyLM042RBCReposMon.findAllByYearMonthIsAndLoanTypeIsAndLoanItemIsAndRelatedCodeIs(yearMonth_0, loanType_1, loanItem_2, relatedCode_3, pageable);
+      slice = monthlyLM042RBCReposMon.findAllByYearMonthIsAndLoanTypeIsAndLoanItemIs(yearMonth_0, loanType_1, loanItem_2, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = monthlyLM042RBCReposHist.findAllByYearMonthIsAndLoanTypeIsAndLoanItemIsAndRelatedCodeIs(yearMonth_0, loanType_1, loanItem_2, relatedCode_3, pageable);
+      slice = monthlyLM042RBCReposHist.findAllByYearMonthIsAndLoanTypeIsAndLoanItemIs(yearMonth_0, loanType_1, loanItem_2, pageable);
     else 
-      slice = monthlyLM042RBCRepos.findAllByYearMonthIsAndLoanTypeIsAndLoanItemIsAndRelatedCodeIs(yearMonth_0, loanType_1, loanItem_2, relatedCode_3, pageable);
+      slice = monthlyLM042RBCRepos.findAllByYearMonthIsAndLoanTypeIsAndLoanItemIs(yearMonth_0, loanType_1, loanItem_2, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

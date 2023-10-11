@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.MonthlyLM042RBC;
@@ -47,18 +49,17 @@ public interface MonthlyLM042RBCService {
   public Slice<MonthlyLM042RBC> findYearMonthAll(int yearMonth_0, int index, int limit, TitaVo... titaVo);
 
   /**
-   * YearMonth = ,AND LoanType = ,AND LoanItem = ,AND RelatedCode = 
+   * YearMonth = ,AND LoanType = ,AND LoanItem = 
    *
    * @param yearMonth_0 yearMonth_0
    * @param loanType_1 loanType_1
    * @param loanItem_2 loanItem_2
-   * @param relatedCode_3 relatedCode_3
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice MonthlyLM042RBC MonthlyLM042RBC of List
    */
-  public Slice<MonthlyLM042RBC> findItem(int yearMonth_0, String loanType_1, String loanItem_2, String relatedCode_3, int index, int limit, TitaVo... titaVo);
+  public Slice<MonthlyLM042RBC> findItem(int yearMonth_0, String loanType_1, String loanItem_2, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By MonthlyLM042RBC

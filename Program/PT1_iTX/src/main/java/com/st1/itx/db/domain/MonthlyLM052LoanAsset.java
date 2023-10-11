@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -10,6 +11,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Column;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * MonthlyLM052LoanAsset LM052放款資產表<br>
@@ -24,12 +27,7 @@ import javax.persistence.Column;
 public class MonthlyLM052LoanAsset implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 4470696799520972403L;
-
-@EmbeddedId
+  @EmbeddedId
   private MonthlyLM052LoanAssetId monthlyLM052LoanAssetId;
 
   // 資料年月
@@ -44,6 +42,14 @@ public class MonthlyLM052LoanAsset implements Serializable {
   // 放款餘額
   @Column(name = "`LoanBal`")
   private BigDecimal loanBal = new BigDecimal("0");
+
+  // 提存比率
+  @Column(name = "`StorageRate`")
+  private BigDecimal storageRate = new BigDecimal("0");
+
+  // 提存金額
+  @Column(name = "`StorageAmt`")
+  private BigDecimal storageAmt = new BigDecimal("0");
 
   // 建檔日期時間
   @CreatedDate
@@ -144,6 +150,44 @@ NS3:不動產抵押貸款
   }
 
 /**
+	* 提存比率<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getStorageRate() {
+    return this.storageRate;
+  }
+
+/**
+	* 提存比率<br>
+	* 
+  *
+  * @param storageRate 提存比率
+	*/
+  public void setStorageRate(BigDecimal storageRate) {
+    this.storageRate = storageRate;
+  }
+
+/**
+	* 提存金額<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getStorageAmt() {
+    return this.storageAmt;
+  }
+
+/**
+	* 提存金額<br>
+	* 
+  *
+  * @param storageAmt 提存金額
+	*/
+  public void setStorageAmt(BigDecimal storageAmt) {
+    this.storageAmt = storageAmt;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -222,7 +266,7 @@ NS3:不動產抵押貸款
 
   @Override
   public String toString() {
-    return "MonthlyLM052LoanAsset [monthlyLM052LoanAssetId=" + monthlyLM052LoanAssetId + ", loanBal=" + loanBal + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "MonthlyLM052LoanAsset [monthlyLM052LoanAssetId=" + monthlyLM052LoanAssetId + ", loanBal=" + loanBal + ", storageRate=" + storageRate + ", storageAmt=" + storageAmt + ", createDate=" + createDate
+           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

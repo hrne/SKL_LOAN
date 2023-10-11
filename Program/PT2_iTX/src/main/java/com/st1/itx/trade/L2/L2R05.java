@@ -472,7 +472,7 @@ public class L2R05 extends TradeBuffer {
 
 		this.totaVo.putParam("L2r05ProdBreachFlag", tFacMain.getProdBreachFlag());
 		this.totaVo.putParam("L2r05BreachCode",
-				FormatUtil.pad9(tFacMain.getBreachCode() == null ? "0" : tFacMain.getBreachCode(), 3));
+				tFacMain.getBreachCode() == null ? "" : FormatUtil.pad9(tFacMain.getBreachCode(), 3));
 		this.totaVo.putParam("L2r05BreachGetCode", tFacMain.getBreachGetCode());
 
 		this.totaVo.putParam("L2r05Breach", tFacMain.getBreachDescription());

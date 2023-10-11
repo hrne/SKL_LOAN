@@ -2,8 +2,12 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * MonthlyLM042RBC LM042RBC會計報表<br>
@@ -16,12 +20,7 @@ import javax.persistence.Embeddable;
 public class MonthlyLM042RBCId implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -8934106641639033698L;
-
-// 資料年月
+  // 資料年月
   @Column(name = "`YearMonth`")
   private int yearMonth = 0;
 
@@ -35,19 +34,13 @@ public class MonthlyLM042RBCId implements Serializable {
   @Column(name = "`LoanItem`", length = 1)
   private String loanItem = " ";
 
-  // 是否為利害關係人
-  /* Y/N */
-  @Column(name = "`RelatedCode`", length = 1)
-  private String relatedCode = " ";
-
   public MonthlyLM042RBCId() {
   }
 
-  public MonthlyLM042RBCId(int yearMonth, String loanType, String loanItem, String relatedCode) {
+  public MonthlyLM042RBCId(int yearMonth, String loanType, String loanItem) {
     this.yearMonth = yearMonth;
     this.loanType = loanType;
     this.loanItem = loanItem;
-    this.relatedCode = relatedCode;
   }
 
 /**
@@ -119,29 +112,10 @@ F：授信限制對象-具控制與從屬關係
     this.loanItem = loanItem;
   }
 
-/**
-	* 是否為利害關係人<br>
-	* Y/N
-	* @return String
-	*/
-  public String getRelatedCode() {
-    return this.relatedCode == null ? "" : this.relatedCode;
-  }
-
-/**
-	* 是否為利害關係人<br>
-	* Y/N
-  *
-  * @param relatedCode 是否為利害關係人
-	*/
-  public void setRelatedCode(String relatedCode) {
-    this.relatedCode = relatedCode;
-  }
-
 
   @Override
   public int hashCode() {
-    return Objects.hash(yearMonth, loanType, loanItem, relatedCode);
+    return Objects.hash(yearMonth, loanType, loanItem);
   }
 
   @Override
@@ -151,11 +125,11 @@ F：授信限制對象-具控制與從屬關係
     if(obj == null || getClass() != obj.getClass())
       return false;
     MonthlyLM042RBCId monthlyLM042RBCId = (MonthlyLM042RBCId) obj;
-    return yearMonth == monthlyLM042RBCId.yearMonth && loanType.equals(monthlyLM042RBCId.loanType) && loanItem.equals(monthlyLM042RBCId.loanItem) && relatedCode.equals(monthlyLM042RBCId.relatedCode);
+    return yearMonth == monthlyLM042RBCId.yearMonth && loanType.equals(monthlyLM042RBCId.loanType) && loanItem.equals(monthlyLM042RBCId.loanItem);
   }
 
   @Override
   public String toString() {
-    return "MonthlyLM042RBCId [yearMonth=" + yearMonth + ", loanType=" + loanType + ", loanItem=" + loanItem + ", relatedCode=" + relatedCode + "]";
+    return "MonthlyLM042RBCId [yearMonth=" + yearMonth + ", loanType=" + loanType + ", loanItem=" + loanItem + "]";
   }
 }
