@@ -1,4 +1,0 @@
-Insert into "TxTranCode" ("TranNo","TranItem","Desc","TypeFg","CancelFg","ModifyFg","MenuNo","SubMenuNo","MenuFg","Status","CreateDate","CreateEmpNo","LastUpdate","LastUpdateEmpNo","SubmitFg","CustDataCtrlFg","CustRmkFg","ChainTranMsg","ApLogFlag","ApLogRim") 
-values ('L4928','同額度不同繳息迄日查詢','同額度不同繳息迄日查詢',1,0,0,'L4','7',1,0,to_timestamp('02-6月 -23 11.50.56.981000000 上午','DD-MON-RR HH.MI.SSXFF AM'),'001703',to_timestamp('02-6月 -23 11.50.56.981000000 上午','DD-MON-RR HH.MI.SSXFF AM'),'001703',0,0,0,null,0,null);
-Insert into "TxAuthority" ("AuthNo","TranNo","AuthFg","CreateDate","CreateEmpNo","LastUpdate","LastUpdateEmpNo") 
-values ('0000T1','L4928',2,to_date('01-5月 -23','DD-MON-RR'),'001722',to_date('01-5月 -23','DD-MON-RR'),'001722');

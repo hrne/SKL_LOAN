@@ -1,2 +1,0 @@
-Insert into "CdReport" ("FormNo","FormName","Cycle","SendCode","Letter","Message","Email","UsageDesc","Enable","CreateDate","CreateEmpNo","LastUpdate","LastUpdateEmpNo","SignCode","WatermarkFlag","MessageFg","EmailFg","LetterFg","Confidentiality","ApLogFlag","GroupNo") values ('LP006','房貸協辦人員異動名單',4,0,0,0,0,'房貸協辦人員異動名單','Y',to_timestamp('10-8月 -23 07.45.38.471000000 下午','DD-MON-RR HH.MI.SSXFF AM'),'001722',to_timestamp('10-8月 -23 07.45.38.471000000 下午','DD-MON-RR HH.MI.SSXFF AM'),'001722',0,0,null,null,null,'2',0,'0');
-commit;

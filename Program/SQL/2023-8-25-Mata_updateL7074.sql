@@ -1,2 +1,0 @@
-SET DEFINE OFF;
-Insert into "TxTranCode" ("TranNo","TranItem","Desc","TypeFg","CancelFg","ModifyFg","MenuNo","SubMenuNo","MenuFg","Status","CreateDate","CreateEmpNo","LastUpdate","LastUpdateEmpNo","SubmitFg","CustDataCtrlFg","CustRmkFg","ChainTranMsg","ApLogFlag","ApLogRim") values ('L7974','總帳傳票資料明細','總帳傳票資料明細',1,0,0,'L7','4',0,0,to_timestamp('17-7月 -23 02.43.48.941000000 下午','DD-MON-RR HH.MI.SSXFF AM'),'001719',to_timestamp('04-8月 -23 02.32.41.253000000 下午','DD-MON-RR HH.MI.SSXFF AM'),'001719',0,0,0,'此交易須從L7074進入',0,null);

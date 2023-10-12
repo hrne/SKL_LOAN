@@ -1,1 +1,0 @@
-COMMENT ON COLUMN "NegFinAcct"."Enable" IS '啟用記號';

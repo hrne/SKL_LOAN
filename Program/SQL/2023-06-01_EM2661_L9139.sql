@@ -1,6 +1,0 @@
-delete from "TxTranCode" where "TranNo"='L9139';
-Insert into "TxTranCode" ("TranNo","TranItem","Desc","TypeFg","CancelFg","ModifyFg","MenuNo","SubMenuNo","MenuFg","Status","CreateDate","CreateEmpNo","LastUpdate","LastUpdateEmpNo","SubmitFg","CustDataCtrlFg","CustRmkFg","ChainTranMsg","ApLogFlag","ApLogRim") values ('L9139','暫收款日餘額前後差異比較表',null,2,0,0,'L9','1',1,0,sysdate,'EM2661',sysdate,'EM2661',0,0,0,null,0,null);
-delete from "TxAuthority" where "TranNo"='L9139';
-Insert into "TxAuthority" ("AuthNo","TranNo","AuthFg","CreateDate","CreateEmpNo","LastUpdate","LastUpdateEmpNo") values ('0000T1','L9139',2,to_date('31-5月 -23','DD-MON-RR'),'EM2661',to_date('31-5月 -23','DD-MON-RR'),'EM2661');
-delete from "CdReport" where "FormNo"='L9139';
-Insert into "CdReport" ("FormNo","FormName","Cycle","SendCode","Letter","Message","Email","UsageDesc","Enable","CreateDate","CreateEmpNo","LastUpdate","LastUpdateEmpNo","SignCode","WatermarkFlag","MessageFg","EmailFg","LetterFg","Confidentiality","ApLogFlag","GroupNo") values ('L9139','暫收款日餘額前後差異比較表',1,0,0,0,0,'暫收款日餘額前後差異比較表','Y',to_timestamp('31-5月 -23 03.40.51.079000000 下午','DD-MON-RR HH.MI.SSXFF AM'),'EM2661',to_timestamp('31-5月 -23 03.45.13.756000000 下午','DD-MON-RR HH.MI.SSXFF AM'),'EM2661',0,0,null,null,null,'0',1,'0');

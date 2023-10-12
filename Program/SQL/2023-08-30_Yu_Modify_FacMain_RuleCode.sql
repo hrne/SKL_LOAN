@@ -1,1 +1,0 @@
-    ALTER TABLE "FacMain" MODIFY    "RuleCode" VARCHAR2(5);

@@ -1,1 +1,0 @@
-    ALTER TABLE "TxToDoDetail" MODIFY "ProcessNote" nvarchar2(2000);

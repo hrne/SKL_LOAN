@@ -1,1 +1,0 @@
-alter table "PfRewardMedia" modify "BonusType" DECIMAL(2,0);

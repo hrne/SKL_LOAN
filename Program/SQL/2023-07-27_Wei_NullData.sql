@@ -1,3 +1,0 @@
-CREATE TABLE "NullData" (
-    "TableName" VARCHAR2(100) NOT NULL PRIMARY KEY
-)

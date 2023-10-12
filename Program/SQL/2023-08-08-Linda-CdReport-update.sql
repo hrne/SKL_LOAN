@@ -1,3 +1,0 @@
-delete from "CdReport" where "FormNo"='L6101';
-Insert into "CdReport" ("FormNo","FormName","Cycle","SendCode","Letter","Message","Email","UsageDesc","Enable","CreateDate","CreateEmpNo","LastUpdate","LastUpdateEmpNo","SignCode","WatermarkFlag","MessageFg","EmailFg","LetterFg","Confidentiality","ApLogFlag","GroupNo") values ('L9140','結清戶滿五年查詢清單',7,0,0,0,0,'結清戶滿五年查詢清單','Y',to_timestamp('21-7月 -23 11.29.50.074000000 上午','DD-MON-RR HH.MI.SSXFF AM'),'001703',to_timestamp('21-7月 -23 11.29.50.074000000 上午','DD-MON-RR HH.MI.SSXFF AM'),'001703',1,0,null,null,null,'2',0,'0');
-commit;

@@ -1,3 +1,0 @@
-Insert into "TxTranCode" ("TranNo","TranItem","Desc","TypeFg","CancelFg","ModifyFg","MenuNo","SubMenuNo","MenuFg","Status","CreateDate","CreateEmpNo","LastUpdate","LastUpdateEmpNo","SubmitFg","CustDataCtrlFg","CustRmkFg","ChainTranMsg","ApLogFlag","ApLogRim") values ('L5108','檔案借閱內容維護','限檔案借閱管理人維護',2,0,0,'L5','1',0,0,to_timestamp('05-6月 -23 01.56.11.992000000 上午','DD-MON-RR HH.MI.SSXFF AM'),'001722',to_timestamp('05-6月 -23 01.56.11.992000000 上午','DD-MON-RR HH.MI.SSXFF AM'),'001722',0,0,0,'此為連動交易，請從交易：[L5903 檔案借閱查詢]進入',1,null);
-Insert into "TxAuthority" ("AuthNo","TranNo","AuthFg","CreateDate","CreateEmpNo","LastUpdate","LastUpdateEmpNo") values ('0000T1','L5108',2,to_date('05-6月 -23','DD-MON-RR'),'001722',to_date('05-6月 -23','DD-MON-RR'),'001722');
-commit;

@@ -1,1 +1,0 @@
-Insert into "CdCode" ("DefCode","DefType","Code","Item","Enable","EffectFlag","CreateDate","CreateEmpNo","LastUpdate","LastUpdateEmpNo","MinCodeLength","MaxCodeLength","IsNumeric") values ('InqType',6,'8','總帳傳票號碼','Y',0,null,null,null,null,0,0,null);

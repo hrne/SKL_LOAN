@@ -1,1 +1,0 @@
-update "TxTranCode" SET "TypeFg" = 2,"ChainTranMsg" = '本交易為連動交易，請由L5055連動進入' WHERE "TranNo" = 'L5505';
