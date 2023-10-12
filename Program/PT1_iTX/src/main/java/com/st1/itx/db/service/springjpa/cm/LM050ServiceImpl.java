@@ -38,14 +38,14 @@ public class LM050ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		this.info("lM050.Totalequity acdate=" + acdate);
 		String sql = " ";
-		sql += "     SELECT \"ResrvStndrd\" AS \"AvailableFunds\"";
+		sql += "     SELECT \"StockHoldersEqt\" AS \"AvailableFunds\"";
 		sql += "           ,\"AcDate\"  AS \"AcDate\"";
 		sql += "     FROM \"InnFundApl\" ";
 		sql += "     WHERE \"AcDate\" = (";
 		sql += "     	SELECT MAX(\"AcDate\") ";
 		sql += "     	FROM \"InnFundApl\" ";
 		sql += "     	WHERE \"AcDate\" <= :acdate";
-		sql += " 	      AND \"ResrvStndrd\" > 0 ";
+		sql += " 	      AND \"StockHoldersEqt\" > 0 ";
 		sql += "     )";
 		this.info("sql=" + sql);
 

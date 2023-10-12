@@ -360,7 +360,7 @@ BEGIN
                                           AS "Remark"              -- 附言 NVARCHAR2 40  
           ,0                              AS "AcDate"              -- 會計日期 DECIMALD 8  
           ,0                              AS "NextAcDate"          -- 次日交易會計日期 DECIMALD 8  
-          ,'0000'                         AS "BranchNo" 
+          ,LPAD(LMSP.CUSBRH,4,'0')        AS "BranchNo" 
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE   
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE   

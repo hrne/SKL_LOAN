@@ -99,26 +99,31 @@ public class LM042p extends TradeBuffer {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf,
 					"LM042RBC表_會計部報表 查無資料", titaVo);
 		}
-		Slice<MonthlyLM042Statis> slMonthlyLM042Statis = sMonthlyLM042StatisService.findYearMonthAll(yearMonth, 0,
-				Integer.MAX_VALUE, titaVo);
-		Slice<MonthlyLM042RBC> slMonthlyLM042RBC = sMonthlyLM042RBCService.findYearMonthAll(yearMonth, 0,
-				Integer.MAX_VALUE, titaVo);
+		if (isFinish) {
+			this.batchTransaction.commit();
 
-		changeDBEnv(titaVo);
-		try {
-			sMonthlyLM042StatisService.insertAll(slMonthlyLM042Statis.getContent(), titaVo);
-		} catch (DBException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		try {
-			sMonthlyLM042RBCService.insertAll(slMonthlyLM042RBC.getContent(), titaVo);
-		} catch (DBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+			Slice<MonthlyLM042Statis> slMonthlyLM042Statis = sMonthlyLM042StatisService.findYearMonthAll(yearMonth, 0,
+					Integer.MAX_VALUE, titaVo);
+			Slice<MonthlyLM042RBC> slMonthlyLM042RBC = sMonthlyLM042RBCService.findYearMonthAll(yearMonth, 0,
+					Integer.MAX_VALUE, titaVo);
 
-		titaVo.setDataBaseOnOrg();// 還原原本的環境
+			changeDBEnv(titaVo);
+			try {
+				sMonthlyLM042StatisService.insertAll(slMonthlyLM042Statis.getContent(), titaVo);
+			} catch (DBException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			try {
+				sMonthlyLM042RBCService.insertAll(slMonthlyLM042RBC.getContent(), titaVo);
+			} catch (DBException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			this.batchTransaction.commit();
+
+			titaVo.setDataBaseOnOrg();// 還原原本的環境
+		}
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

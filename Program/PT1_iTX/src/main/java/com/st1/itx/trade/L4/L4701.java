@@ -128,9 +128,9 @@ public class L4701 extends TradeBuffer {
 //		UnitCode	部門代號		X	6	55	61	部門代號=來源單位
 //		SrcCode		支票來源碼2		X	1	61	62	* ----->
 //		SrcUnit		來源單位		X	6	62	68	
-//		RecipeNo	傳票號碼		X	10	68	78	
-//		EntryDate	作帳日期		A	7	78	85	YYYMMDD
-//		CustNo		相關資訊		X	10	85	95	放款戶戶號
+//		RecipeNo	傳票號碼		X	12	68	80	
+//		EntryDate	作帳日期		A	7	80	87	YYYMMDD
+//		CustNo		相關資訊		X	15	87	102	放款戶戶號7位+8位空白
 
 		totaVo.put("PdfSnoM", "");
 
@@ -159,7 +159,7 @@ public class L4701 extends TradeBuffer {
 				occursList.putParam("SrcUnit", "10H400");
 				occursList.putParam("RecipeNo", FormatUtil.padX("" + slipNo, 12));
 				occursList.putParam("EntryDate", FormatUtil.pad9("" + tLoanCheque.getReceiveDate(), 7));
-				occursList.putParam("CustNo", FormatUtil.pad9("" + tLoanCheque.getCustNo(), 7));
+				occursList.putParam("CustNo", FormatUtil.pad9("" + tLoanCheque.getCustNo(), 7)+"        ");
 
 				tmp.add(occursList);
 

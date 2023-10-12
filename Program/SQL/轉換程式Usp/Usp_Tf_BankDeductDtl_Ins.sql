@@ -222,7 +222,7 @@ BEGIN
           -- 2023-10-03 Wei FROM SKL IT 盈倩 #A06
           ,MBK.LMSPER AS "RelCustIdErrFg"
           ,MBK.BSTBTN AS "BatchNo"
-          ,'' AS "DepCode"
+          ,MBK.DPSATC AS "DepCode"
     FROM "LA$MBKP" MBK 
     LEFT JOIN aplpData ad ON ad."LMSACN" = MBK."LMSACN" 
                          AND ad."LMSPCN" = MBK."LMSPCN" 
@@ -454,7 +454,7 @@ BEGIN
           -- 2023-10-03 Wei FROM SKL IT 盈倩 #A06
           ,MBK.LMSPER AS "RelCustIdErrFg"
           ,MBK.BSTBTN AS "BatchNo"
-          ,MBK.LMSPER AS "DepCode"
+          ,'' AS "DepCode"
     FROM "AH$MBKP" MBK 
     LEFT JOIN aplpData ad ON ad."LMSACN" = MBK."LMSACN" 
                          AND ad."LMSPCN" = MBK."LMSPCN" 

@@ -369,18 +369,17 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("yearMonth=" + yearMonth);
 
 		String sql = "";
-		sql += " SELECT \"YearMonth\" AS F0";
-		sql += "	   ,\"LoanType\" AS F1";
-		sql += "	   ,\"LoanItem\" AS F2";
-		sql += "	   ,\"RelatedCode\" AS F3";
-		sql += "	   ,\"LoanAmount\" AS F4";
-		sql += "	   ,\"RiskFactor\" AS F5";
+		sql += " SELECT \"YearMonth\"  ";
+		sql += "	   ,\"LoanType\"   ";
+		sql += "	   ,\"LoanItem\"   ";
+		sql += "	   ,\"LoanAmount\" ";
+		sql += "	   ,\"RiskFactor\" ";
+		sql += "	   ,\"RiskFactorAmount\" ";
 		sql += " FROM \"MonthlyLM042RBC\"";
 		sql += " WHERE \"YearMonth\" IN ( :leyymm , :lyymm , :yymm )";
 		sql += " ORDER BY \"YearMonth\" ASC ";
 		sql += " 	 	 ,\"LoanType\" ASC ";
 		sql += " 	 	 ,\"LoanItem\" ASC ";
-		sql += " 	 	 ,\"RelatedCode\" ASC ";
 
 		this.info("sql=" + sql);
 

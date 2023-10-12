@@ -3,6 +3,7 @@ package com.st1.itx.trade.LM;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -54,52 +55,12 @@ public class LM042Report extends MakeReport {
 	public int iYear = 0;
 	public int iMonth = 0;
 	public int yearMonth = 0;
-	/* 統計數--------------------------------------- */
-	/*--------------------------------------------*/
-
-	/* 統計表(左上合計)-------------------------------------------- */
-	BigDecimal cYToTalAmt = BigDecimal.ZERO;
-	BigDecimal cNToTalAmt = BigDecimal.ZERO;
-	BigDecimal dNToTalAmt = BigDecimal.ZERO;
-	BigDecimal zYToTalAmt = BigDecimal.ZERO;
-	BigDecimal zNToTalAmt = BigDecimal.ZERO;
-	BigDecimal i10ToTalAmt = BigDecimal.ZERO;
-	/*--------------------------------------------*/
-
-	/* 統計表右上(合計)-------------------------------------------- */
-	BigDecimal cYloseToTalAmt = BigDecimal.ZERO;
-	BigDecimal cNloseToTalAmt = BigDecimal.ZERO;
-	BigDecimal dNloseToTalAmt = BigDecimal.ZERO;
-	BigDecimal zYloseToTalAmt = BigDecimal.ZERO;
-	BigDecimal zNloseToTalAmt = BigDecimal.ZERO;
-	/*--------------------------------------------*/
-
-	/* 明細表-------------------------------------------- */
-	BigDecimal cN1Total = BigDecimal.ZERO;
-	BigDecimal cN2Total = BigDecimal.ZERO;
-	BigDecimal cN3Total = BigDecimal.ZERO;
-	BigDecimal cN4Total = BigDecimal.ZERO;
-	BigDecimal cNTotalAmt = BigDecimal.ZERO;
-	BigDecimal cY1Total = BigDecimal.ZERO;
-	BigDecimal cY2Total = BigDecimal.ZERO;
-	BigDecimal cYTotalAmt = BigDecimal.ZERO;
-	BigDecimal cTotalAmt = BigDecimal.ZERO;
-	BigDecimal zN1Total = BigDecimal.ZERO;
-	BigDecimal zN2Total = BigDecimal.ZERO;
-	BigDecimal zN3Total = BigDecimal.ZERO;
-	BigDecimal zN4Total = BigDecimal.ZERO;
-	BigDecimal zNTotalAmt = BigDecimal.ZERO;
-	BigDecimal zY1Total = BigDecimal.ZERO;
-	BigDecimal zY2Total = BigDecimal.ZERO;
-	BigDecimal zYTotalAmt = BigDecimal.ZERO;
-	BigDecimal zTotalAmt = BigDecimal.ZERO;
-	BigDecimal allTotalAmt = BigDecimal.ZERO;
-	BigDecimal oBadDebt = BigDecimal.ZERO;
-
+	private BigDecimal oApprovedLoss = BigDecimal.ZERO;
+	private BigDecimal oProDiff = BigDecimal.ZERO;
+	private BigDecimal oApprovedLossDiff = BigDecimal.ZERO;
 	private ArrayList<MonthlyLM042Statis> lMonthlyLM042Statis = new ArrayList<>();
 	private ArrayList<MonthlyLM042RBC> lMonthlyLM042RBC = new ArrayList<>();
-
-	/*--------------------------------------------*/
+	private DecimalFormat df = new DecimalFormat("##,###,###,###,##0");
 
 	@Override
 	public void printTitle() {
@@ -144,7 +105,9 @@ public class LM042Report extends MakeReport {
 		// 工作表:統計表
 		exportFindStatistics(titaVo, thisYMD / 100);
 		// 更新LM042RBC統計數
-		updateStatis(titaVo, iYear * 100 + iMonth);
+		updateStatis(titaVo);
+		// 更新LM042RBC
+		updateRBC(titaVo);
 		// 工作表:明細表
 		exportLoanSchedule(titaVo, thisYMD);
 		// 工作表:RBC
@@ -162,10 +125,14 @@ public class LM042Report extends MakeReport {
 	 */
 	private void exportFindStatistics(TitaVo titaVo, int yearMonth) throws LogicException {
 
+		Slice<MonthlyLM052AssetClass> slMonthlyLM052AssetClass = sMonthlyLM052AssetClassService
+				.findYearMonthAll(yearMonth, 0, Integer.MAX_VALUE, titaVo);
+		if (slMonthlyLM052AssetClass == null) {
+			throw new LogicException(titaVo, "E0015", "需先執行 L7205-五類資產分類上傳轉檔作業 "); // 檢查錯誤
+		}
 		List<Map<String, String>> statisticsList1 = null;
 		List<Map<String, String>> statisticsList2 = null;
 		List<Map<String, String>> statisticsList3 = null;
-		List<Map<String, BigDecimal>> t = null;
 
 		try {
 
@@ -184,6 +151,9 @@ public class LM042Report extends MakeReport {
 		if (statisticsList1.size() == 0 && statisticsList2.size() == 0 && statisticsList3.size() == 0) {
 			return;
 		}
+		// 專案貸款
+		BigDecimal sProAmt = BigDecimal.ZERO;
+		BigDecimal sProLoan = BigDecimal.ZERO;
 
 		if (statisticsList1.size() > 0 && statisticsList2.size() > 0 && statisticsList3.size() > 0) {
 
@@ -265,17 +235,6 @@ public class LM042Report extends MakeReport {
 				makeExcel.formulaCaculate(i, 8);
 			}
 
-			BigDecimal tDisPreRemFees = BigDecimal.ZERO;
-			BigDecimal oDisPreRemFees = BigDecimal.ZERO;
-			BigDecimal sIntRecv = BigDecimal.ZERO;
-			BigDecimal sProLoan = BigDecimal.ZERO;
-			BigDecimal sTotalLoanAmt = BigDecimal.ZERO;
-			BigDecimal sApprovedLoss = BigDecimal.ZERO;
-			BigDecimal sProDiff = BigDecimal.ZERO;
-			BigDecimal sProAmt = BigDecimal.ZERO;
-			BigDecimal sRelEmpAmt = BigDecimal.ZERO;
-			BigDecimal sRelAmt = BigDecimal.ZERO;
-
 			for (Map<String, String> lm42Vo2 : statisticsList2) {
 				String item = lm42Vo2.get("F0");
 				String rptId = lm42Vo2.get("F1");
@@ -288,13 +247,11 @@ public class LM042Report extends MakeReport {
 					tMonthlyLM042Statis.setAssetClass("" + assetClass);
 					tMonthlyLM042Statis.setLoanBal(amt);
 					addStatis(tMonthlyLM042Statis, titaVo);
-
 				}
 				// 應收利息
 				if ("IntRecv".equals(item)) {
 					row = 13;
 					col = 3;
-					sIntRecv = sIntRecv.add(amt);
 				}
 				// 專案貸款
 				if ("ProLoan".equals(item)) {
@@ -307,8 +264,6 @@ public class LM042Report extends MakeReport {
 				if ("TotalLoanAmt".equals(item)) {
 					row = 13;
 					col = 9;
-					sTotalLoanAmt = sTotalLoanAmt.add(amt);
-
 				}
 				// 服務課專案數字
 				if ("ProAmt".equals(item)) {
@@ -321,7 +276,7 @@ public class LM042Report extends MakeReport {
 				if ("ApprovedLoss".equals(item)) {
 					row = 13;
 					col = 16;
-					sApprovedLoss = sApprovedLoss.add(amt);
+					oApprovedLoss = oApprovedLoss.add(amt);
 
 				}
 
@@ -329,41 +284,43 @@ public class LM042Report extends MakeReport {
 				if ("RelEmp".equals(item.substring(0, 6))) {
 					row = 16;
 					col = 2 + assetClass;
-					sRelEmpAmt = sRelEmpAmt.add(amt);
 
 				}
 				// 利關人_金額
 				if ("RelAmt".equals(item)) {
 					row = 17;
 					col = 2 + assetClass;
-					sRelAmt = sRelAmt.add(amt);
 
 				}
 				// 科子目淨額O14
 				if ("NetLoanAmt".equals(item)) {
 					row = 14;
 					col = 15;
-
 				}
 
 				makeExcel.setValue(row, col, amt, "#,##0");
-
-				// 專案差異
-				sProDiff = sProAmt.subtract(sProLoan);
-				makeExcel.setValue(15, 3, sProDiff, "#,##0");
-
+			}
+			// 專案差異
+			oProDiff = sProAmt.subtract(sProLoan);
+			makeExcel.setValue(15, 3, oProDiff, "#,##0");
+			// 1.5% 提存差異 oApprovedLossDiff(會計室備呆減不含應付利息的五分類提存數(MonthlyAssetClass)
+			oApprovedLossDiff = oApprovedLoss;
+			for (MonthlyLM052AssetClass t : slMonthlyLM052AssetClass.getContent()) {
+				if ("7".equals(t.getAssetClassNo())) {
+					oApprovedLossDiff = oApprovedLossDiff.subtract(t.getStorageAmt());
+				}
 			}
 			MonthlyLM042Statis tMonthlyLM042Statis = new MonthlyLM042Statis();
 			tMonthlyLM042Statis.setLoanItem("C");
 			tMonthlyLM042Statis.setRelatedCode("N");
 			tMonthlyLM042Statis.setAssetClass("1");
-			tMonthlyLM042Statis.setLoanBal(BigDecimal.ZERO.subtract(sProDiff));
+			tMonthlyLM042Statis.setLoanBal(BigDecimal.ZERO.subtract(oProDiff));
 			addStatis(tMonthlyLM042Statis, titaVo);
 			tMonthlyLM042Statis = new MonthlyLM042Statis();
 			tMonthlyLM042Statis.setLoanItem("Z");
 			tMonthlyLM042Statis.setRelatedCode("N");
 			tMonthlyLM042Statis.setAssetClass("1");
-			tMonthlyLM042Statis.setLoanBal(BigDecimal.ZERO.add(sProDiff));
+			tMonthlyLM042Statis.setLoanBal(BigDecimal.ZERO.add(oProDiff));
 			addStatis(tMonthlyLM042Statis, titaVo);
 
 			for (MonthlyLM042Statis t1 : lMonthlyLM042Statis) {
@@ -401,12 +358,9 @@ public class LM042Report extends MakeReport {
 
 					row = 12;
 					col = assetClass == 1 ? 3 : 5;
-
-					tDisPreRemFees = tDisPreRemFees.add(amt);
 				}
 				// 折溢價與費用 備抵損失I
 				if ("6".equals(item)) {
-
 					row = 10;
 					col = 9 + assetClass;
 					makeExcel.setValue(row, col, amt, "#,##0");
@@ -458,43 +412,51 @@ public class LM042Report extends MakeReport {
 				String item = t2.getLoanItem();
 				String rptId = t2.getRelatedCode();
 				BigDecimal lossAmt = BigDecimal.ZERO;
-				BigDecimal priBal = t2.getLoanBal();
+				BigDecimal loanBal = t2.getLoanBal();
 				switch (assetClass) {
 				case 1:
 					if ("C".equals(item) && "N".equals(rptId)) {
-						lossAmt = (priBal.subtract(cHouseAndRepair)).multiply(percent0_005)
+						lossAmt = (loanBal.subtract(cHouseAndRepair)).multiply(percent0_005)
 								.add((cHouseAndRepair).multiply(percent0_015)).setScale(0, BigDecimal.ROUND_HALF_UP);
 					} else if ("Z".equals(item) && "N".equals(rptId)) {
-						lossAmt = (priBal.subtract(zHouseAndRepair)).multiply(percent0_005)
+						lossAmt = (loanBal.subtract(zHouseAndRepair)).multiply(percent0_005)
 								.add((zHouseAndRepair).multiply(percent0_015)).setScale(0, BigDecimal.ROUND_HALF_UP);
 					} else {
-						lossAmt = priBal.multiply(percent0_005).setScale(0, BigDecimal.ROUND_HALF_UP);
+						lossAmt = loanBal.multiply(percent0_005).setScale(0, BigDecimal.ROUND_HALF_UP);
 					}
 					break;
 				case 2:
-					lossAmt = priBal.multiply(percent0_02).setScale(0, BigDecimal.ROUND_HALF_UP);
+					lossAmt = loanBal.multiply(percent0_02).setScale(0, BigDecimal.ROUND_HALF_UP);
 					break;
 				case 3:
-					lossAmt = priBal.multiply(percent0_1).setScale(0, BigDecimal.ROUND_HALF_UP);
+					lossAmt = loanBal.multiply(percent0_1).setScale(0, BigDecimal.ROUND_HALF_UP);
 					break;
 				case 4:
-					lossAmt = priBal.multiply(percent0_5).setScale(0, BigDecimal.ROUND_HALF_UP);
+					lossAmt = loanBal.multiply(percent0_5).setScale(0, BigDecimal.ROUND_HALF_UP);
 					break;
 				case 5:
-					lossAmt = priBal.multiply(percent1).setScale(0, BigDecimal.ROUND_HALF_UP);
+					lossAmt = loanBal.multiply(percent1).setScale(0, BigDecimal.ROUND_HALF_UP);
 					break;
 				}
 				t2.setReserveLossAmt(lossAmt);
-			}
-			Slice<MonthlyLM052AssetClass> slMonthlyLM052AssetClass = sMonthlyLM052AssetClassService
-					.findYearMonthAll(yearMonth, 0, Integer.MAX_VALUE, titaVo);
-			for (MonthlyLM042Statis t4 : lMonthlyLM042Statis) {
-
-				int assetClass = parse.stringToInteger(t4.getAssetClass());
-				String item = t4.getLoanItem();
-				String rptId = t4.getRelatedCode();
-
+				// 放款餘額扣除備呆,
+				// LoanItem=C RelatedCode=N 減1.5%差異數(會計室備呆減不含應付利息的五分類提存數(MonthlyAssetClass)
+				t2.setNetAmt(loanBal.subtract(lossAmt));
 				if ("C".equals(item) && "N".equals(rptId)) {
+					t2.setNetAmt(t2.getNetAmt().subtract(oApprovedLossDiff));
+				}
+			}
+
+			// 提存差額
+			for (MonthlyLM042Statis t4 : lMonthlyLM042Statis) {
+				int assetClass = parse.stringToInteger(t4.getAssetClass());
+				if ("C".equals(t4.getLoanItem()) && "N".equals(t4.getRelatedCode())) {
+					BigDecimal lm042StoreAmt = BigDecimal.ZERO;
+					for (MonthlyLM042Statis t5 : lMonthlyLM042Statis) {
+						if (parse.stringToInteger(t5.getAssetClass()) == assetClass) {
+							lm042StoreAmt = lm042StoreAmt.add(t5.getReserveLossAmt());
+						}
+					}
 					BigDecimal lm052StoreAmt = BigDecimal.ZERO;
 					for (MonthlyLM052AssetClass t1 : slMonthlyLM052AssetClass.getContent()) {
 						switch (assetClass) {
@@ -525,17 +487,15 @@ public class LM042Report extends MakeReport {
 							break;
 						}
 					}
-					t4.setReserveLossDiff(t4.getReserveLossAmt().subtract(lm052StoreAmt));
+					t4.setReserveLossDiff(lm042StoreAmt.subtract(lm052StoreAmt));
 				}
-
 			}
 
 			for (MonthlyLM042Statis t3 : lMonthlyLM042Statis) {
 				int assetClass = parse.stringToInteger(t3.getAssetClass());
 				String item = t3.getLoanItem();
 				String rptId = t3.getRelatedCode();
-				BigDecimal lossAmt = t3.getReserveLossAmt().add(t3.getReserveLossDiff());
-
+				BigDecimal lossAmt = t3.getReserveLossAmt();
 				switch (item) {
 				case "C":
 					if ("Y".equals(rptId)) {
@@ -587,6 +547,247 @@ public class LM042Report extends MakeReport {
 	 * @param tYMD   當月底日
 	 */
 	private void exportLoanSchedule(TitaVo titaVo, int tYMD) throws LogicException {
+
+		makeExcel.setSheet("明細表");
+
+		makeExcel.setValue(2, 2, this.showRocDate(tYMD, 6), "C");
+		int row = 5;
+		for (MonthlyLM042RBC t : lMonthlyLM042RBC) {
+			switch (t.getLoanType()) {
+			case "1":
+				switch (t.getLoanItem()) {
+				case "C":
+					row = 5;
+				case "B":
+					row = 6;
+				case "D":
+					row = 7;
+				case "A":
+					row = 8;
+				case "E":
+					row = 11;
+				case "F":
+					row = 12;
+				}
+				break;
+			case "2":
+				switch (t.getLoanItem()) {
+				case "C":
+					row = 17;
+				case "B":
+					row = 18;
+				case "D":
+					row = 19;
+				case "A":
+					row = 20;
+				case "E":
+					row = 23;
+				case "F":
+					row = 24;
+				}
+				break;
+			}
+			makeExcel.setValue(row, 3, t.getLoanAmount(), "#,##0");
+		}
+
+		makeExcel.formulaCalculate(9, 3);
+		makeExcel.formulaCalculate(13, 3);
+		makeExcel.formulaCalculate(14, 3);
+		makeExcel.formulaCalculate(21, 3);
+		makeExcel.formulaCalculate(25, 3);
+		makeExcel.formulaCalculate(26, 3);
+		makeExcel.formulaCalculate(27, 3);
+
+		makeExcel.setValue(28, 1, "註：各類放款總餘額(含催收款)已扣除備抵呆帳(" + df.format(oApprovedLoss) + ")。");
+
+	}
+
+	/**
+	 * 輸出表單"RBC"
+	 * 
+	 * @param titaVo
+	 * @param lYMD   上月底日
+	 * @param tYMD   當月底日
+	 */
+	private void exportRBC(TitaVo titaVo, int lYMD, int tYMD) throws LogicException {
+
+		makeExcel.setSheet("YYYMMRBC", (tYMD / 100) + "RBC");
+
+		// 20200530
+		// 去年底
+		int leYMD = ((tYMD / 10000) - 1) * 10000 + 1231;
+
+		makeExcel.setValue(2, 1, this.showRocDate(tYMD, 1), "C");
+		makeExcel.setValue(4, 4, this.showRocDate(leYMD, 6), "C");
+		makeExcel.setValue(4, 6, this.showRocDate(lYMD, 6), "C");
+		makeExcel.setValue(4, 8, this.showRocDate(tYMD, 6), "C");
+
+		List<Map<String, String>> leYMlm042RBCList = null;
+		List<Map<String, String>> lYMlm042RBCList = null;
+		List<Map<String, String>> tYMlm042RBCList = null;
+
+		try {
+
+			leYMlm042RBCList = lM042ServiceImpl.findRBC(titaVo, tYMD, lYMD);
+			lYMlm042RBCList = lM042ServiceImpl.findRBC(titaVo, tYMD, lYMD);
+			tYMlm042RBCList = lM042ServiceImpl.findRBC(titaVo, tYMD, lYMD);
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.info("LM042ServiceImpl.exportExcel error = " + errors.toString());
+
+		}
+
+		if (leYMlm042RBCList.size() == 0 && lYMlm042RBCList.size() == 0 && tYMlm042RBCList.size() == 0) {
+			return;
+		}
+
+		if (leYMlm042RBCList.size() > 0 || lYMlm042RBCList.size() > 0 || tYMlm042RBCList.size() > 0) {
+
+			dataProcess(leYMlm042RBCList, 0);
+			dataProcess(lYMlm042RBCList, 1);
+			dataProcess(tYMlm042RBCList, 2);
+
+		}
+
+		makeExcel.setValue(26, 1, "註1：各類放款總餘額(含催收款)已扣除備抵損失 （ " +  df.format(oApprovedLoss) + "）。");
+
+		// 重整公式
+		for (int x = 4; x <= 9; x++) {
+			makeExcel.formulaCaculate(11, x);
+			makeExcel.formulaCaculate(15, x);
+			makeExcel.formulaCaculate(16, x);
+			makeExcel.formulaCaculate(17, x);
+			makeExcel.formulaCaculate(20, x);
+			makeExcel.formulaCaculate(24, x);
+			makeExcel.formulaCaculate(25, x);
+		}
+		// 重整公式
+		for (int y = 7; y <= 25; y++) {
+			makeExcel.formulaCaculate(y, 10);
+			makeExcel.formulaCaculate(y, 11);
+		}
+
+	}
+
+	/**
+	 * 工作表 RBC資料處理
+	 * 
+	 * @param lm042RBCList 月份資料
+	 * @param colNo        欄位間隔控制
+	 */
+	private void dataProcess(List<Map<String, String>> lm042RBCList, int colNo) throws LogicException {
+
+		String loanType = "";
+		String loanItem = "";
+		BigDecimal amt = BigDecimal.ZERO;
+		BigDecimal risk = BigDecimal.ZERO;
+		BigDecimal riskAmt = BigDecimal.ZERO;
+
+		int row = 2 * colNo;
+		this.info("lm042RBCList=" + lm042RBCList.toString());
+		for (Map<String, String> lm42RBCVo : lm042RBCList) {
+
+			loanType = lm42RBCVo.get("LoanType");
+			loanItem = lm42RBCVo.get("LoanItem");
+			amt = new BigDecimal(lm42RBCVo.get("LoanAmount"));
+			risk = new BigDecimal(lm42RBCVo.get("RiskFactor"));
+			riskAmt = new BigDecimal(lm42RBCVo.get("RiskFactorAmount"));
+
+			// 一般
+			if ("1".equals(loanType)) {
+				// 非授信限制對象
+				// 不動產
+				if ("C".equals(loanItem)) {
+					makeExcel.setValue(7, 3, risk, "0.0000");
+					makeExcel.setValue(7, 4 + row, amt, "#,##0");
+					makeExcel.setValue(7, 5 + row, riskAmt, "#,##0");
+				}
+				// 動產
+				if ("B".equals(loanItem)) {
+					makeExcel.setValue(8, 3, risk, "0.0000");
+					makeExcel.setValue(8, 4 + row, amt, "#,##0");
+					makeExcel.setValue(8, 5 + row, riskAmt, "#,##0");
+				}
+				// 有價證券
+				if ("D".equals(loanItem)) {
+					makeExcel.setValue(9, 3, risk, "0.0000");
+					makeExcel.setValue(9, 4 + row, amt, "#,##0");
+					makeExcel.setValue(9, 5 + row, riskAmt, "#,##0");
+
+				}
+				// 銀行
+				if ("A".equals(loanItem)) {
+					makeExcel.setValue(10, 3, risk, "0.0000");
+					makeExcel.setValue(10, 4 + row, amt, "#,##0");
+					makeExcel.setValue(10, 5 + row, riskAmt, "#,##0");
+
+				}
+				// 具控制
+				if ("E".equals(loanItem)) {
+					makeExcel.setValue(13, 3, risk, "0.0000");
+					makeExcel.setValue(13, 4 + row, amt, "#,##0");
+					makeExcel.setValue(13, 5 + row, riskAmt, "#,##0");
+				}
+				// 非據控制
+				if ("F".equals(loanItem)) {
+					makeExcel.setValue(14, 3, risk, "0.0000");
+					makeExcel.setValue(14, 4 + row, amt, "#,##0");
+					makeExcel.setValue(14, 5 + row, riskAmt, "#,##0");
+				}
+			}
+			// 專案
+			if ("2".equals(loanType)) {
+				// 非授信限制對象
+				// 不動產
+				if ("C".equals(loanItem)) {
+					makeExcel.setValue(19, 3, risk, "0.0000");
+					makeExcel.setValue(19, 4 + row, amt, "#,##0");
+					makeExcel.setValue(19, 5 + row, riskAmt, "#,##0");
+				}
+				// 具控制
+				if ("E".equals(loanItem)) {
+					makeExcel.setValue(22, 3, risk, "0.0000");
+					makeExcel.setValue(22, 4 + row, amt, "#,##0");
+					makeExcel.setValue(22, 5 + row, riskAmt, "#,##0");
+				}
+				// 非據控制
+				if ("F".equals(loanItem)) {
+					makeExcel.setValue(23, 3, risk, "0.0000");
+					makeExcel.setValue(23, 4 + row, amt, "#,##0");
+					makeExcel.setValue(23, 5 + row, riskAmt, "#,##0");
+				}
+			}
+
+		}
+
+	}
+
+	private void updateStatis(TitaVo titaVo) throws LogicException {
+
+		Slice<MonthlyLM042Statis> slMonthlyLM042Statis = sMonthlyLM042StatisService.findYearMonthAll(yearMonth, 0,
+				Integer.MAX_VALUE, titaVo);
+		if (slMonthlyLM042Statis != null) {
+			try {
+				sMonthlyLM042StatisService.deleteAll(slMonthlyLM042Statis.getContent(), titaVo);
+			} catch (DBException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		try {
+			sMonthlyLM042StatisService.insertAll(lMonthlyLM042Statis, titaVo);
+		} catch (DBException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+	}
+
+	private void updateRBC(TitaVo titaVo) throws LogicException {
 		MonthlyLM042RBC tMonthlyLM042RBC = new MonthlyLM042RBC();
 		tMonthlyLM042RBC.setYearMonth(this.yearMonth);
 		tMonthlyLM042RBC.setLoanType("1");
@@ -659,302 +860,33 @@ public class LM042Report extends MakeReport {
 		tMonthlyLM042RBC.setLoanItem("F");
 		tMonthlyLM042RBC.setRiskFactor(parse.stringToBigDecimal(titaVo.get("RiskFactor6")));
 		lMonthlyLM042RBC.add(tMonthlyLM042RBC);
-
-		updateRBC(titaVo);
-
-		makeExcel.setSheet("明細表");
-
-		makeExcel.setValue(2, 2, this.showRocDate(tYMD, 6), "C");
-
-		// (缺扣除備抵呆帳)
-		// 擔保品C/非利關人總計餘額 + 折溢價與費用 - 擔保品C/非利關人/備抵損失總計 - (備抵呆帳-全擔保品備抵損失) - 折溢價與費用的備抵損失
-		cN1Total = cNToTalAmt.subtract(cNloseToTalAmt);
-		makeExcel.setValue(5, 3, cN1Total, "#,##0");
-		// 擔保品D 總計餘額 - 擔保品D 備抵損失總計
-		cN3Total = dNToTalAmt.subtract(dNloseToTalAmt);
-		makeExcel.setValue(7, 3, cN3Total, "#,##0");
-
-		cNTotalAmt = cN1Total.add(cN3Total);
-		makeExcel.setValue(9, 3, cNTotalAmt, "#,##0");
-
-		cY2Total = cYToTalAmt.subtract(cYloseToTalAmt);
-		makeExcel.setValue(12, 3, cY2Total, "#,##0");
-
-		cYTotalAmt = cY2Total;
-		makeExcel.setValue(13, 3, cYTotalAmt, "#,##0");
-
-		cTotalAmt = cNTotalAmt.add(cYTotalAmt);
-		makeExcel.setValue(14, 3, cTotalAmt, "#,##0");
-
-		zN1Total = zNToTalAmt.subtract(zNloseToTalAmt);
-		makeExcel.setValue(17, 3, zN1Total, "#,##0");
-
-		zNTotalAmt = zN1Total;
-		makeExcel.setValue(21, 3, zNTotalAmt, "#,##0");
-
-		zY2Total = zYToTalAmt.subtract(zYloseToTalAmt);
-		makeExcel.setValue(24, 3, zY2Total, "#,##0");
-
-		zYTotalAmt = zY2Total;
-		makeExcel.setValue(25, 3, zYTotalAmt, "#,##0");
-
-		zTotalAmt = zNTotalAmt.add(zYTotalAmt);
-		makeExcel.setValue(26, 3, zYTotalAmt, "#,##0");
-
-		allTotalAmt = cTotalAmt.add(zTotalAmt);
-		makeExcel.setValue(27, 3, allTotalAmt, "#,##0");
-
-		makeExcel.formulaCalculate(9, 3);
-		makeExcel.formulaCalculate(13, 3);
-		makeExcel.formulaCalculate(14, 3);
-		makeExcel.formulaCalculate(21, 3);
-		makeExcel.formulaCalculate(25, 3);
-		makeExcel.formulaCalculate(26, 3);
-		makeExcel.formulaCalculate(27, 3);
-
-		// 08/29 oBadDebt SUM(TdBal)科目10620300000、10604
-		makeExcel.setValue(28, 1, "註：各類放款總餘額(含催收款)已扣除備抵呆帳(" + oBadDebt + ")。");
-
-	}
-
-	/**
-	 * 輸出表單"RBC"
-	 * 
-	 * @param titaVo
-	 * @param lYMD   上月底日
-	 * @param tYMD   當月底日
-	 */
-	private void exportRBC(TitaVo titaVo, int lYMD, int tYMD) throws LogicException {
-
-		makeExcel.setSheet("YYYMMRBC", (tYMD / 100) + "RBC");
-
-		// 20200530
-		// 去年底
-		int leYMD = ((tYMD / 10000) - 1) * 10000 + 1231;
-
-		makeExcel.setValue(2, 1, this.showRocDate(tYMD, 1), "C");
-		makeExcel.setValue(4, 4, this.showRocDate(leYMD, 6), "C");
-		makeExcel.setValue(4, 6, this.showRocDate(lYMD, 6), "C");
-		makeExcel.setValue(4, 8, this.showRocDate(tYMD, 6), "C");
-
-		List<Map<String, String>> leYMlm042RBCList = null;
-		List<Map<String, String>> lYMlm042RBCList = null;
-		List<Map<String, String>> tYMlm042RBCList = null;
-
-		try {
-
-			leYMlm042RBCList = lM042ServiceImpl.findRBC(titaVo, tYMD, lYMD);
-			lYMlm042RBCList = lM042ServiceImpl.findRBC(titaVo, tYMD, lYMD);
-			tYMlm042RBCList = lM042ServiceImpl.findRBC(titaVo, tYMD, lYMD);
-
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.info("LM042ServiceImpl.exportExcel error = " + errors.toString());
-
-		}
-
-		if (leYMlm042RBCList.size() == 0 && lYMlm042RBCList.size() == 0 && tYMlm042RBCList.size() == 0) {
-			return;
-		}
-
-		if (leYMlm042RBCList.size() > 0 || lYMlm042RBCList.size() > 0 || tYMlm042RBCList.size() > 0) {
-
-			dataProcess(leYMlm042RBCList, 0);
-			dataProcess(lYMlm042RBCList, 1);
-			dataProcess(tYMlm042RBCList, 2);
-
-		}
-
-		BigDecimal loss = BigDecimal.ZERO;
-		makeExcel.setValue(26, 1, "註1：各類放款總餘額(含催收款)已扣除備抵損失 （ " + loss + "）。");
-
-		// 重整公式
-		for (int x = 4; x <= 9; x++) {
-			makeExcel.formulaCaculate(11, x);
-			makeExcel.formulaCaculate(15, x);
-			makeExcel.formulaCaculate(16, x);
-			makeExcel.formulaCaculate(17, x);
-			makeExcel.formulaCaculate(20, x);
-			makeExcel.formulaCaculate(24, x);
-			makeExcel.formulaCaculate(25, x);
-		}
-		// 重整公式
-		for (int y = 7; y <= 25; y++) {
-			makeExcel.formulaCaculate(y, 10);
-			makeExcel.formulaCaculate(y, 11);
-		}
-
-	}
-
-	/**
-	 * 工作表 RBC資料處理
-	 * 
-	 * @param lm042RBCList 月份資料
-	 * @param colNo        欄位間隔控制
-	 */
-	private void dataProcess(List<Map<String, String>> lm042RBCList, int colNo) throws LogicException {
-
-		String loanType = "";
-		String loanItem = "";
-		String RelatedCode = "";
-		BigDecimal amt = BigDecimal.ZERO;
-		BigDecimal risk = BigDecimal.ZERO;
-		BigDecimal riskAmt = BigDecimal.ZERO;
-
-		int row = 2 * colNo;
-		this.info("lm042RBCList=" + lm042RBCList.toString());
-		for (Map<String, String> lm42RBCVo : lm042RBCList) {
-
-			loanType = lm42RBCVo.get("F1");
-			loanItem = lm42RBCVo.get("F2");
-			RelatedCode = lm42RBCVo.get("F3");
-			amt = new BigDecimal(lm42RBCVo.get("F4"));
-			risk = new BigDecimal(lm42RBCVo.get("F5"));
-			riskAmt = amt.multiply(risk).setScale(0, BigDecimal.ROUND_FLOOR);
-
-			// 一般
-			if ("1".equals(loanType)) {
-				// 非授信限制對象
-				if ("N".equals(RelatedCode)) {
-					// 不動產
-					if ("C".equals(loanItem)) {
-						makeExcel.setValue(7, 3, risk, "0.0000");
-						makeExcel.setValue(7, 4 + row, amt, "#,##0");
-						makeExcel.setValue(7, 5 + row, riskAmt, "#,##0");
-					}
-					// 動產
-					if ("B".equals(loanItem)) {
-						makeExcel.setValue(8, 3, risk, "0.0000");
-						makeExcel.setValue(8, 4 + row, amt, "#,##0");
-						makeExcel.setValue(8, 5 + row, riskAmt, "#,##0");
-					}
-					// 有價證券
-					if ("D".equals(loanItem)) {
-						makeExcel.setValue(9, 3, risk, "0.0000");
-						makeExcel.setValue(9, 4 + row, amt, "#,##0");
-						makeExcel.setValue(9, 5 + row, riskAmt, "#,##0");
-
-					}
-					// 銀行
-					if ("A".equals(loanItem)) {
-						makeExcel.setValue(10, 3, risk, "0.0000");
-						makeExcel.setValue(10, 4 + row, amt, "#,##0");
-						makeExcel.setValue(10, 5 + row, riskAmt, "#,##0");
-
-					}
-				}
-				// 授信限制對象
-				if ("Y".equals(RelatedCode)) {
-					// 具控制
-					if ("F".equals(loanItem)) {
-						makeExcel.setValue(13, 3, risk, "0.0000");
-						makeExcel.setValue(13, 4 + row, amt, "#,##0");
-						makeExcel.setValue(13, 5 + row, riskAmt, "#,##0");
-					}
-					// 非據控制
-					if ("E".equals(loanItem)) {
-						makeExcel.setValue(14, 3, risk, "0.0000");
-						makeExcel.setValue(14, 4 + row, amt, "#,##0");
-						makeExcel.setValue(14, 5 + row, riskAmt, "#,##0");
-					}
-				}
-
-			}
-			// 專案
-			if ("2".equals(loanType)) {
-				// 非授信限制對象
-				if ("N".equals(RelatedCode)) {
-					// 不動產
-					if ("C".equals(loanItem)) {
-						makeExcel.setValue(19, 3, risk, "0.0000");
-						makeExcel.setValue(19, 4 + row, amt, "#,##0");
-						makeExcel.setValue(19, 5 + row, riskAmt, "#,##0");
-					}
-					// 動產
-					if ("B".equals(loanItem)) {
-//							makeExcel.setValue(8, 3 + row, risk, "0.0000");
-//							makeExcel.setValue(8, 4 + row, amt, "#,##0");
-//							makeExcel.setValue(8, 5 + row, riskAmt, "#,##0");
-					}
-					// 有價證券
-					if ("D".equals(loanItem)) {
-//							makeExcel.setValue(9, 3 + row, risk, "0.0000");
-//							makeExcel.setValue(9, 4 + row, amt, "#,##0");
-//							makeExcel.setValue(9, 5 + row, riskAmt, "#,##0");
-
-					}
-					// 銀行
-					if ("A".equals(loanItem)) {
-//							makeExcel.setValue(10, 3 + row, risk, "0.0000");
-//							makeExcel.setValue(10, 4 + row, amt, "#,##0");
-//							makeExcel.setValue(10, 5 + row, riskAmt, "#,##0");
-
-					}
-				}
-				// 授信限制對象
-				if ("Y".equals(RelatedCode)) {
-					// 具控制
-					if ("F".equals(loanItem)) {
-						makeExcel.setValue(22, 3, risk, "0.0000");
-						makeExcel.setValue(22, 4 + row, amt, "#,##0");
-						makeExcel.setValue(22, 5 + row, riskAmt, "#,##0");
-					}
-					// 非據控制
-					if ("E".equals(loanItem)) {
-						makeExcel.setValue(23, 3, risk, "0.0000");
-						makeExcel.setValue(23, 4 + row, amt, "#,##0");
-						makeExcel.setValue(23, 5 + row, riskAmt, "#,##0");
-					}
-				}
-
-			}
-
-		}
-
-	}
-
-	private void updateStatis(TitaVo titaVo, int yearMonth) throws LogicException {
-
-		Slice<MonthlyLM042Statis> slMonthlyLM042Statis = sMonthlyLM042StatisService.findYearMonthAll(yearMonth, 0,
-				Integer.MAX_VALUE, titaVo);
-		if (slMonthlyLM042Statis != null) {
-			try {
-				sMonthlyLM042StatisService.deleteAll(slMonthlyLM042Statis.getContent(), titaVo);
-			} catch (DBException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
-		try {
-			sMonthlyLM042StatisService.insertAll(lMonthlyLM042Statis, titaVo);
-		} catch (DBException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-
-	}
-
-	private void updateRBC(TitaVo titaVo) throws LogicException {
-
 		for (MonthlyLM042Statis t : lMonthlyLM042Statis) {
-			if ("6".equals(t.getLoanItem())) {
-				continue;
-			}
 			MonthlyLM042RBC cMonthlyLM042RBC = new MonthlyLM042RBC();
 			cMonthlyLM042RBC.setYearMonth(t.getYearMonth());
-			cMonthlyLM042RBC.setLoanType("Z".equals(t.getLoanItem()) ? "2" : "1");
-			cMonthlyLM042RBC.setLoanItem("Y".equals(t.getRelatedCode()) ? "E" : t.getLoanItem());
-			cMonthlyLM042RBC.setLoanAmount(t.getLoanBal().subtract(t.getReserveLossAmt()));
-
+			// LoanType=1,LoanItem=C 含折溢價及費用
+			if ("6".equals(t.getLoanItem())) {
+				cMonthlyLM042RBC.setLoanType("1");
+				cMonthlyLM042RBC.setLoanItem("C");
+			} else {
+				if ("Z".equals(t.getLoanItem())) {
+					cMonthlyLM042RBC.setLoanType("2");
+				} else {
+					cMonthlyLM042RBC.setLoanType("1");
+				}
+				if ("Y".equals(t.getRelatedCode())) {
+					cMonthlyLM042RBC.setLoanItem("F");
+				} else {
+					cMonthlyLM042RBC.setLoanItem(t.getLoanItem());
+				}
+			}
+			// 放款餘額扣除備呆
+			cMonthlyLM042RBC.setLoanAmount(t.getNetAmt());
 			addRBC(cMonthlyLM042RBC, titaVo);
 		}
 
-		for (MonthlyLM042RBC tMonthlyLM042RBC : lMonthlyLM042RBC) {
-			tMonthlyLM042RBC.setRiskFactorAmount(tMonthlyLM042RBC.getLoanAmount()
-					.multiply(tMonthlyLM042RBC.getRiskFactor()).setScale(0, BigDecimal.ROUND_FLOOR));
+		// 放款金額*風險係數
+		for (MonthlyLM042RBC t : lMonthlyLM042RBC) {
+			t.setRiskFactorAmount(t.getLoanAmount().multiply(t.getRiskFactor()).setScale(0, BigDecimal.ROUND_FLOOR));
 		}
 		try {
 			sMonthlyLM042RBCService.insertAll(lMonthlyLM042RBC, titaVo);

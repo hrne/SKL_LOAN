@@ -297,6 +297,8 @@ T(2,L6401+CODE:+#OTlrNo)
 
 #OPermitory=X,1,S
 
+#OFIndFage=X,1,S
+
 #OBTN6=X,4,S
 
 !BIND(grid,{cmd=CHAIN;ntxcd=L6933;text=歷程;ntxbuf=#OBUF6})
@@ -309,7 +311,8 @@ E(0,5)
 T(2,#OFunc7+#OTlrNo)
 
 #OBTN7=X,4,S
-C(5,#OPermitory,"Y",BIND(grid,{cmd=CHAIN;ntxcd=L6080;text=查詢;ntxbuf=#OBUF7}),BIND(grid,cancel))    
+!C(5,#OPermitory,"Y",BIND(grid,{cmd=CHAIN;ntxcd=L6080;text=查詢;ntxbuf=#OBUF7}),BIND(grid,cancel))    
+C(3,#OFIndFage,1,BIND(grid,{cmd=CHAIN;ntxcd=L6080;text=查詢;ntxbuf=#OBUF7}),BIND(grid,cancel))    
 
 ! 修改的按鈕
 #OFunc2=A,1,S
@@ -367,6 +370,7 @@ TXFORM=L6041
 #OLastUpdateEmpNo
 #OHasHistory
 #OPermitory
+#OFIndFage
 ^
 <include src="ROM.icf::L6R44.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
