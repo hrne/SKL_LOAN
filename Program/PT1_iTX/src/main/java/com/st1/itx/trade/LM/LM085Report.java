@@ -247,6 +247,18 @@ public class LM085Report extends MakeReport {
 		makeExcel.formulaCalculate(36, 7);
 		makeExcel.formulaCalculate(37, 7);
 		makeExcel.formulaCalculate(38, 7);
+
+		// H、J、L、O欄
+		makeExcel.formulaCalculate(29, 8);//H
+		makeExcel.formulaCalculate(33, 8);
+		makeExcel.formulaCalculate(38, 8);
+		makeExcel.formulaRangeCalculate(29, 38, 10, 10);//J
+		makeExcel.formulaCalculate(29, 12);//L
+		makeExcel.formulaCalculate(33, 12);
+		makeExcel.formulaCalculate(38, 12);
+		makeExcel.formulaCalculate(29, 15);//O
+		makeExcel.formulaCalculate(33, 15);
+		makeExcel.formulaCalculate(38, 15);
 	}
 
 	/**

@@ -7,6 +7,8 @@ create table "MonthlyLM042Statis" (
   "AssetClass" varchar2(1),
   "LoanBal" decimal(16, 2) default 0 not null,
   "ReserveLossAmt" decimal(16, 2) default 0 not null,
+  "ReserveLossDiff" decimal(16, 2) default 0 not null,
+  "NetAmt" decimal(16, 2) default 0 not null,
   "CreateDate" timestamp,
   "CreateEmpNo" varchar2(6),
   "LastUpdate" timestamp,
@@ -22,6 +24,8 @@ comment on column "MonthlyLM042Statis"."RelatedCode" is '是否為利害關係�
 comment on column "MonthlyLM042Statis"."AssetClass" is '資產五分類代號';
 comment on column "MonthlyLM042Statis"."LoanBal" is '放款餘額';
 comment on column "MonthlyLM042Statis"."ReserveLossAmt" is '備呆金額';
+comment on column "MonthlyLM042Statis"."ReserveLossDiff" is '調整數';
+comment on column "MonthlyLM042Statis"."NetAmt" is '淨額';
 comment on column "MonthlyLM042Statis"."CreateDate" is '建檔日期時間';
 comment on column "MonthlyLM042Statis"."CreateEmpNo" is '建檔人員';
 comment on column "MonthlyLM042Statis"."LastUpdate" is '最後更新日期時間';

@@ -124,7 +124,7 @@ public class LM050ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     SELECT \"CustNo\"";
 		sql += "          , SUM(\"LoanBalance\") AS \"LoanBal\"";
 		sql += "     FROM \"MonthlyLoanBal\"";
-		sql += "     WHERE \"YearMonth\" = :Inputyearmonth";
+		sql += "     WHERE \"YearMonth\" = :inputYearMonth";
 		sql += "           AND";
 		sql += "           \"LoanBalance\" > 0";
 		sql += "     GROUP BY \"CustNo\"";

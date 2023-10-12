@@ -119,8 +119,8 @@ public class LM082ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         , SUM(\"DrawdownAmt\")                                               AS \"DrawdownAmt\"";
 		sql += "         , SUM(\"ApproveRate\")                                               AS \"ApproveRate\"";
 		sql += "         , SUM(\"LTV\")                                                       AS \"LTV\"";
-		sql += "         , SUM(\"LineAmt\" * \"ApproveRate\" / \"LineAmt\") / SUM(\"Count\")        AS \"wAvgRate\"";
-		sql += "         , SUM(\"LineAmt\" * \"LTV\" / \"LineAmt\") / SUM(\"Count\")               AS \"wAvgLTV\"";
+		sql += "         , SUM(\"DrawdownAmt\" * \"LTV\" ) / SUM(\"DrawdownAmt\")       	  AS \"wAvgRate\"";
+		sql += "         , SUM(\"DrawdownAmt\" * \"ApproveRate\")  / SUM(\"ApproveRate\")     AS \"wAvgLTV\"";
 		sql += "         , MAX(\"ApplDate\")                                                     AS \"ApplDate\"";
 		sql += "    FROM \"Tmp\"";
 		sql += "    GROUP BY \"CitySeq\"";

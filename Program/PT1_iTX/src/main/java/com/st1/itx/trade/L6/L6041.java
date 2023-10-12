@@ -149,6 +149,11 @@ public class L6041 extends TradeBuffer {
 						1, titaVo);
 				List<TxDataLog> lTxDataLog = slTxDataLog != null ? slTxDataLog.getContent() : null;
 				occursList.putParam("OHasHistory", lTxDataLog != null && !lTxDataLog.isEmpty() ? "Y" : "N");
+				int fIndFage = 0;
+				if (sL6041ServiceImpl.size() == 1) {
+					fIndFage = 1;
+				}
+				occursList.putParam("OFIndFage", fIndFage);
 //				occursList.putParam("OAuthNo", tTxTeller.getAuthNo());
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);

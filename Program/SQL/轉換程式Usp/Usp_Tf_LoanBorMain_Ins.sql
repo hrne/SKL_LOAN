@@ -213,7 +213,9 @@ BEGIN
            ELSE 0 -- 2023-06-19 Wei修改 from 家興:ELSE 擺0 原為NVL(A1."ASCRAT",0)
            END                            AS "IndividualIncr"      -- 個別加碼利率 DECIMAL 6 4 
           ,NVL(APLP."APLRAT",0)           AS "ApproveRate"         -- 核准利率 DECIMAL 6 4 
-          ,NVL(IRTP."IRTRAT",NVL(APLP."APLRAT",0)) 
+          -- 2023-10-12 Wei 修改 from 新壽IT 佳怡 直接用LA$LMSP.IRTRAT轉入即可
+          ,LMSP.IRTRAT
+          -- ,NVL(IRTP."IRTRAT",NVL(APLP."APLRAT",0))
                                           AS "StoreRate"           -- 實際計息利率 DECIMAL 6 4 
           ,LMSP."AILIRT"                  AS "RateCode"            -- 利率區分 VARCHAR2 1  
           ,LMSP."IRTMSC"                  AS "RateAdjFreq"         -- 利率調整週期 DECIMAL 2  

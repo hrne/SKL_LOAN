@@ -326,7 +326,7 @@ public class LM048Report extends MakeReport {
 					tmpCustNoMain = tCustNoMain;
 
 					if (isGroup) {
-						makeExcel.setValue(eGroupRow, 12, tGroupName, "C");
+						makeExcel.setValue(eGroupRow, 12, tmpGroupName, "C");
 						makeExcel.setValue(eGroupRow, 13, tmpLineAmt.divide(tNetWorth, 4, BigDecimal.ROUND_HALF_UP),
 								"C");
 					}

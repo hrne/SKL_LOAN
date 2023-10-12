@@ -30,7 +30,7 @@ public class MonthlyLM042RBCId implements Serializable {
   private String loanType = " ";
 
   // 放款項目
-  /* A：非授信限制對象-銀行保證放款B：非授信限制對象-動產擔保放款C： 非授信限制對象-不動產擔保放款D：非授信限制對象-有價證券質押放款E： 授信限制對象-非具控制與從屬關係F：授信限制對象-具控制與從屬關係 */
+  /* A：非授信限制對象-銀行保證放款B：非授信限制對象-動產擔保放款C： 非授信限制對象-不動產擔保放款D：非授信限制對象-有價證券質押放款E： 授信限制對象-具控制與從屬關係F：授信限制對象-非具控制與從屬關係 */
   @Column(name = "`LoanItem`", length = 1)
   private String loanItem = " ";
 
@@ -89,8 +89,8 @@ public class MonthlyLM042RBCId implements Serializable {
 B：非授信限制對象-動產擔保放款
 C： 非授信限制對象-不動產擔保放款
 D：非授信限制對象-有價證券質押放款
-E： 授信限制對象-非具控制與從屬關係
-F：授信限制對象-具控制與從屬關係
+E： 授信限制對象-具控制與從屬關係
+F：授信限制對象-非具控制與從屬關係
 	* @return String
 	*/
   public String getLoanItem() {
@@ -103,8 +103,8 @@ F：授信限制對象-具控制與從屬關係
 B：非授信限制對象-動產擔保放款
 C： 非授信限制對象-不動產擔保放款
 D：非授信限制對象-有價證券質押放款
-E： 授信限制對象-非具控制與從屬關係
-F：授信限制對象-具控制與從屬關係
+E： 授信限制對象-具控制與從屬關係
+F：授信限制對象-非具控制與從屬關係
   *
   * @param loanItem 放款項目
 	*/

@@ -3,6 +3,8 @@ package com.st1.itx.trade.L8;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,18 +21,24 @@ import com.st1.itx.db.domain.CdBcm;
 import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.JcicZ040;
 import com.st1.itx.db.domain.TxAmlCredit;
 import com.st1.itx.db.domain.TxAmlCreditId;
 import com.st1.itx.db.domain.TxAmlNotice;
+import com.st1.itx.db.domain.TxAmlNoticeId;
 import com.st1.itx.db.domain.TxToDoDetail;
+import com.st1.itx.db.domain.TxToDoDetailId;
 import com.st1.itx.db.service.CdBcmService;
 import com.st1.itx.db.service.CdCodeService;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.CustTelNoService;
 import com.st1.itx.db.service.TxAmlCreditService;
 import com.st1.itx.db.service.TxAmlNoticeService;
+import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.db.service.TxToDoMainService;
+import com.st1.itx.db.service.springjpa.cm.L8102ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.CustNoticeCom;
@@ -39,6 +47,7 @@ import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.TxToDoCom;
 import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.mail.MailService;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L8102")
@@ -78,23 +87,35 @@ public class L8102 extends TradeBuffer {
 	public TxToDoDetailService txToDoDetailService;
 
 	@Autowired
+	public TxTellerService txTellerService;
+
+	@Autowired
 	public CdBcmService cdBcmService;
 
 	@Autowired
 	public CdCodeService cdCodeService;
 
 	@Autowired
-
 	public CustNoticeCom custNoticeCom;
 
-//	@Autowired
+	@Autowired
+	public CdEmpService cdEmpService;
+
+	@Autowired
+	public L8102ServiceImpl sL8102ServiceImpl;
+
+	@Autowired
 	private MakeExcel makeExcel1;
+	@Autowired
 	private MakeExcel makeExcel2;
 	@Autowired
-	MakeFile makeFileText;
+	private MakeFile makeFileText;
 	@Autowired
-	MakeFile makeFileMail;
+	private MakeFile makeFileMail;
 	private int wkCalDy = 0;
+
+	@Autowired
+	private MailService mailService;
 
 	@Autowired
 	Parse parse;
@@ -113,7 +134,6 @@ public class L8102 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8102 ");
 		this.totaVo.init(titaVo);
-
 		wkCalDy = dateUtil.getNowIntegerForBC();
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI() + 19110000).setBrno(titaVo.getBrno())
 				.setRptCode("L8102").setRptItem("期款扣款通知(簡訊)").build();
@@ -146,16 +166,12 @@ public class L8102 extends TradeBuffer {
 
 		List<TxAmlCredit> lTxAmlCredit = slTxAmlCredit == null ? null : slTxAmlCredit.getContent();
 
-//		this.info("L8102 lTxAmlCredit count = " + lTxAmlCredit.size());
-
 		// delete TxAmlNotice
 		Slice<TxAmlNotice> slTxAmlNotice = null;
 
 		slTxAmlNotice = txAmlNoticeService.dataDtAll(dataDt8, this.index, this.limit, titaVo);
 
 		List<TxAmlNotice> lTxAmlNotice = slTxAmlNotice == null ? null : slTxAmlNotice.getContent();
-
-//		this.info("L8102 lTxAmlNotice count = " + lTxAmlNotice.size());
 
 		// 人工輸入測試資料,會刪除定審及通知資料
 		if (dataSource == 2) {
@@ -183,7 +199,7 @@ public class L8102 extends TradeBuffer {
 		deleteTxToDoDetail("AMLH", "ReBuild Data", titaVo);
 		deleteTxToDoDetail("AMLM", "ReBuild Data", titaVo);
 		deleteTxToDoDetail("AMLL", "ReBuild Data", titaVo);
-
+//		String reviewType = "";
 		if (dataSource == 2) {
 			for (int i = 1; i < 10; i++) {
 				String custKey = titaVo.get("CustKey" + i).trim();
@@ -212,10 +228,36 @@ public class L8102 extends TradeBuffer {
 		} else {
 			if (lTxAmlCredit != null && lTxAmlCredit.size() > 0) {
 				this.info("L8102 lTxAmlCredit.size = " + lTxAmlCredit.size());
+
+				int l = 0;
+				int m = 0;
+				int h = 0;
+
 				for (TxAmlCredit txAmlCredit : lTxAmlCredit) {
 					processDetail(titaVo, txAmlCredit, false);
+					String iReviewType = txAmlCredit.getReviewType();
+
+					if ("L".equals(iReviewType) && l == 0) {
+						l++;
+						String X = "L";
+						findemail(X, titaVo, txAmlCredit, false);
+
+					}
+					if ("M".equals(iReviewType) && m == 0) {
+						m++;
+						String X = "M";
+						findemail(X, titaVo, txAmlCredit, false);
+
+					}
+					if ("H".equals(iReviewType) && h == 0) {
+						h++;
+						String X = "H";
+						findemail(X, titaVo, txAmlCredit, false);
+					}
+
 				}
 			}
+
 		}
 
 		if (excelRow > 0) {
@@ -226,6 +268,34 @@ public class L8102 extends TradeBuffer {
 		makeFileMail.close();
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+
+	private void findemail(String X, TitaVo titaVo, TxAmlCredit txAmlCredit, boolean newflag) throws LogicException {
+		List<Map<String, String>> L8102DateList = null;
+		// 寄送main 要依照高中低人員分別寄送
+		if (X.equals("L")) {
+			L8102DateList = sL8102ServiceImpl.findAll(X, titaVo);
+		}
+		if (X.equals("M")) {
+			L8102DateList = sL8102ServiceImpl.findAll(X, titaVo);
+		}
+		if (X.equals("H")) {
+			L8102DateList = sL8102ServiceImpl.findAll(X, titaVo);
+		}
+		//email  含要再修改 先測試是否有正常傳送
+		String keeperemail = "";
+		for (Map<String, String> t : L8102DateList) {
+			keeperemail = t.get("Email");
+		}
+
+		String subject1 = "[放款帳務系統]AML定期審查案件通知 ";
+		String bodyText = "";
+		bodyText += "新增客戶定期審查案件，請登入放款帳務系統進行定期審查作業。";
+		bodyText += "AML作業路徑:定期審查功能>定期審查問卷作業";
+		
+		mailService.setParams(keeperemail, subject1, bodyText);
+		mailService.exec();
+
 	}
 
 	private void processDetail(TitaVo titaVo, TxAmlCredit txAmlCredit, boolean newflag) throws LogicException {
@@ -241,11 +311,66 @@ public class L8102 extends TradeBuffer {
 		this.info("TxAmlCredit.ProcessType = " + txAmlCredit.getProcessType());
 		txAmlCredit.setProcessCount(0);
 
-		try {
+		try {// 判斷分法人且有手機 FLAG 3 要 insert TxAmlNotice
 			if (newflag) {
 				txAmlCreditService.insert(txAmlCredit, titaVo);
 			} else {
+				int count = txAmlCredit.getProcessCount();
+				txAmlCredit.setProcessCount(count + 1);
 				txAmlCredit = txAmlCreditService.update2(txAmlCredit, titaVo);
+
+				int iDataDt = txAmlCredit.getDataDt();
+				String iCustKey = txAmlCredit.getCustKey();
+				String iProcessType = txAmlCredit.getProcessType();
+				String iReviewType = txAmlCredit.getReviewType();
+//				String iProcessType =txAmlCredit.getProcessType();
+				String iProcessBrNo = txAmlCredit.getProcessBrNo();
+				String iProcessGroupNo = txAmlCredit.getProcessGroupNo();
+				String iProcessTlrNo = txAmlCredit.getProcessTlrNo();
+				int iProcessDate = 0;
+				if(txAmlCredit.getProcessDate() == 0 ) {
+					iProcessDate = 19110101;
+				}
+				String iProcessMobile = txAmlCredit.getProcessMobile();
+				String iProcessAddress = txAmlCredit.getProcessAddress();
+				String iProcessName = txAmlCredit.getProcessName();
+				String iProcessNote = txAmlCredit.getProcessNote();
+				int iProcessCount = txAmlCredit.getProcessCount();
+
+				if (iProcessType.equals("3")) {
+					TxAmlNotice itxAmlNotice = new TxAmlNotice();
+					TxAmlNotice txAmlNotice = null;
+					TxAmlNoticeId txAmlNoticeId = new TxAmlNoticeId();
+					txAmlNoticeId.setCustKey(iCustKey);
+					txAmlNoticeId.setDataDt(iDataDt);
+					txAmlNoticeId.setProcessSno(iProcessCount);
+					txAmlNotice = txAmlNoticeService.findById(txAmlNoticeId, titaVo);
+					if (txAmlNotice != null) {
+						throw new LogicException("E0002", "已有相同資料");
+					}
+					itxAmlNotice.setTxAmlNoticeId(txAmlNoticeId);
+//					itxAmlNotice.setDataDt(iDataDt);
+//					itxAmlNotice.setCustKey(iCustKey);
+//					itxAmlNotice.setProcessSno(iProcessCount);
+					itxAmlNotice.setReviewType(iReviewType);
+					itxAmlNotice.setProcessType(iProcessType);
+					itxAmlNotice.setProcessBrNo(iProcessBrNo);
+					itxAmlNotice.setProcessGroupNo(iProcessGroupNo);
+					itxAmlNotice.setProcessTlrNo(iProcessTlrNo);
+					itxAmlNotice.setProcessDate(iProcessDate);
+					itxAmlNotice.setProcessMobile(iProcessMobile);
+					itxAmlNotice.setProcessAddress(iProcessAddress);
+					itxAmlNotice.setProcessName(iProcessName);
+					itxAmlNotice.setProcessNote(iProcessNote);
+
+					try {
+						txAmlNoticeService.insert(itxAmlNotice, titaVo);
+					} catch (DBException e) {
+						throw new LogicException("E0005", "新增資料有誤");
+					}
+
+				}
+
 			}
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007", "TxAmlCredit=" + e.getErrorMsg());
@@ -257,6 +382,7 @@ public class L8102 extends TradeBuffer {
 		}
 
 		// 發送簡訊內容,待處理
+		this.info("ProcessType   = " + txAmlCredit.getProcessType());
 		if ("3".equals(txAmlCredit.getProcessType())) {
 			String dataLines = txToDoCom.getProcessNoteForText(messagePhone,
 					"房貸客戶提醒：為維護您的權益，戶籍或通訊地址、電子信箱及連絡電話，或姓名、身分證統一編號等重要資訊有異動時，敬請洽詢公司服務人員或客戶服務部（０８００—０３１１１５）辦理變更。",
@@ -274,6 +400,7 @@ public class L8102 extends TradeBuffer {
 					parse.IntegerToString(custMain.getCustNo(), 7) + "-" + parse.IntegerToString(0, 3) + dataLines);
 
 			txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo);
+
 		}
 
 		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
@@ -281,7 +408,9 @@ public class L8102 extends TradeBuffer {
 		tTxToDoDetail.setFacmNo(0);
 		tTxToDoDetail.setBormNo(0);
 		tTxToDoDetail.setDtlValue(dataDt7 + "-" + txAmlCredit.getCustKey());
+
 		String itemCode = "";
+
 		if ("H".equals(txAmlCredit.getReviewType())) {
 			itemCode = "AMLH";
 		} else {
@@ -298,7 +427,6 @@ public class L8102 extends TradeBuffer {
 //  產製高風險定期審查郵寄名單.xlsx , 高風險定期審查明細.xlsx
 	private void toExcle(TitaVo titaVo, TxAmlCredit txAmlCredit) throws LogicException {
 
-//		int dataDt8 = dataDt7 + 19110000;
 		String dataDtX = String.valueOf(dataDt7);
 
 		this.info("L8102.toExcle = " + dataDt7);
@@ -431,15 +559,9 @@ public class L8102 extends TradeBuffer {
 		}
 	}
 
+	// 判別AML記號
 	private TxAmlCredit checkProcessType(TitaVo titaVo, String custKey, TxAmlCredit txAmlCredit) {
 		this.info("L8102.checkProcessType CustKey = " + custKey + "/" + txAmlCredit.getReviewType());
-
-//		custMain = custMainService.custIdFirst(custKey);
-//		if (custMain == null) {
-//			custMain = new CustMain();
-//		} else {
-//			custNo = custMain.getCustNo();
-//		}
 
 		if ("H".equals(txAmlCredit.getReviewType())) {
 			this.info("L8102.checkProcessType 1");

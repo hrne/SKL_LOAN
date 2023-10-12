@@ -321,7 +321,7 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			  ,SUM(\"TdBal\") AS \"Value\"";
 		sql += "		FROM \"CoreAcMain\"";
 		sql += "   		WHERE \"AcDate\" = TO_NUMBER(TO_CHAR(last_day(TO_DATE(TO_CHAR(:yymm*100+1), 'YYYYMMDD')),'YYYYMMDD')) ";
-		sql += "		  AND \"AcNoCode\" IN ('10600304000','10601301000','10601302000') "; // 放款折溢價+催收款項法務費用+催收款項火險費用
+		sql += "		  AND \"AcNoCode\" IN ('10600304000','10601301000','10601302000','10601304000') "; // 放款折溢價+催收款項法務費用+催收款項火險費用+折溢價
 		sql += "		  AND \"CurrencyCode\" = 'NTD' ";
 		sql += "		UNION All ";
 		sql += "		SELECT '32' AS \"Column\"";
@@ -451,7 +451,7 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		GROUP BY O.\"YearMonth\"  ";
 		sql += "	), BADDATA AS ( "; // 當年度轉呆金額
 		sql += "		SELECT TRUNC(\"AcDate\" / 10000 ) AS \"Year\" ";
-		sql += "			 	,SUM(CASE WHEN \"TitaHCode\" IN ('0','2','4')  THEN \"TxAmt\" ELSE 0 - \"TxAmt\" END  ) AS \"BadAmt\"";
+		sql += "			 	,SUM(CASE WHEN \"TitaHCode\" IN ('0','2','4')  THEN \"TxAmt\" ELSE 0 - \"TxAmt\" END  ) AS \"BadAmt\" ";
 		sql += "		FROM 	\"LoanBorTx\"   ";
 		sql += "		WHERE \"TxDescCode\" IN ('3427','3428') ";
 		sql += "		GROUP BY TRUNC(\"AcDate\" / 10000 )  ";
