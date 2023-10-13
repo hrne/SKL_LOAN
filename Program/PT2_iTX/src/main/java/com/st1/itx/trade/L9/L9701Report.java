@@ -117,7 +117,7 @@ public class L9701Report extends MakeReport {
 		divider();
 		this.print(1, 1, "");
 		this.print(0, 5, "0".equals(titaVo.get("CorrectType")) ? "" : "會計日期");// 未訂正的時候顯示
-		this.print(0, 17, "入帳日期");
+		this.print(0, 16, "入帳日期");
 		this.print(0, 26, "繳款方式");
 		this.print(0, 38, "交易內容", "C");
 		this.print(0, 47, "放款本金");
@@ -141,7 +141,7 @@ public class L9701Report extends MakeReport {
 		divider();
 		this.print(1, 1, "");
 		this.print(0, 5, "0".equals(titaVo.get("CorrectType")) ? "" : "會計日期");// 未訂正的時候顯示
-		this.print(0, 17, "入帳日期");
+		this.print(0, 16, "入帳日期");
 		this.print(0, 26, "繳款方式");
 		this.print(0, 38, "交易內容", "C");
 		this.print(0, 47, "放款本金");
@@ -347,7 +347,7 @@ public class L9701Report extends MakeReport {
 		this.print(0, 4, "0".equals(titaVo.get("CorrectType")) ? "  " : showRocDate(tL9701Vo.get("AcDate"), 1));
 
 		// 入帳日
-		this.print(0, 16, showRocDate(tL9701Vo.get("EntryDate"), 1));
+		this.print(0, 15, showRocDate(tL9701Vo.get("EntryDate"), 1));
 
 		// 繳款方式RepayItem
 		this.print(0, 26, tL9701Vo.get("RepayItem"));
@@ -376,10 +376,12 @@ public class L9701Report extends MakeReport {
 		this.print(0, 128, formatAmt(tL9701Vo.get("BreachAmt"), 0), "R");
 		// 費用
 		this.print(0, 142, formatAmt(tL9701Vo.get("FeeAmt"), 0), "R");
-		// 短繳
-		this.print(0, 156, formatAmt(tL9701Vo.get("ShortAmt"), 0), "R");
-		// 溢繳
-		this.print(0, 170, formatAmt(tL9701Vo.get("Overflow"), 0), "R");
+		//累溢短收
+		this.print(0, 156, formatAmt(tL9701Vo.get("Excessive"), 0), "R");
+//		// 短繳
+//		this.print(0, 156, formatAmt(tL9701Vo.get("ShortAmt"), 0), "R");
+//		// 溢繳
+//		this.print(0, 170, formatAmt(tL9701Vo.get("Overflow"), 0), "R");
 		// 訂正別TitaHCode
 
 		this.print(0, 177, "0".equals(titaVo.get("CorrectType")) ? "  " : tL9701Vo.get("TitaHCode"), "R");

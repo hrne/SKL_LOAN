@@ -12,6 +12,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdReport;
 import com.st1.itx.db.service.CdReportService;
+import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -47,7 +48,6 @@ public class L6608 extends TradeBuffer {
 		this.info("active L6608 ");
 		this.totaVo.init(titaVo);
 		titaVo.keepOrgDataBase();// 保留原本記號
-		titaVo.setDataBaseOnLine();// 指定連線環境
 
 		// 取得輸入資料
 		int iFuncCode = this.parse.stringToInteger(titaVo.getParam("FuncCode"));
@@ -79,51 +79,35 @@ public class L6608 extends TradeBuffer {
 			break;
 
 		case 2: // 修改
-			tCdReport = sCdReportService.holdById(iFormNo);
-
-			if (tCdReport == null) {
-				throw new LogicException(titaVo, "E0003", iFormNo); // 修改資料不存在
-			}
-			CdReport tCdReport2 = (CdReport) dataLog.clone(tCdReport);
 
 			// set value
 			moveCdReport(tCdReport, iFuncCode, iFormNo, titaVo);
 
 			// 連線環境(預設)
-			updateData(tCdReport, titaVo);
-			dataLog.setEnv(titaVo, tCdReport2, tCdReport);
-			dataLog.exec("修改報表代號對照檔");
+			updateData(tCdReport, iFormNo, titaVo);
 
 			// 月報環境
 			titaVo.setDataBaseOnMon();
-			updateData(tCdReport, titaVo);
+			updateData(tCdReport, iFormNo, titaVo);
 
 			// 日報環境
 			titaVo.setDataBaseOnDay();
-			updateData(tCdReport, titaVo);
+			updateData(tCdReport, iFormNo, titaVo);
 
 			break;
 		case 4: // 刪除
-			tCdReport = sCdReportService.holdById(iFormNo);
 
-			if (tCdReport != null) {
+			// 連線環境(預設)
+			deleteData(tCdReport, iFormNo, titaVo);
 
-				// 連線環境(預設)
-				deleteData(tCdReport, titaVo);
-				dataLog.setEnv(titaVo, tCdReport, tCdReport);
-				dataLog.exec("刪除報表代號對照檔");
+			// 月報環境
+			titaVo.setDataBaseOnMon();
+			deleteData(tCdReport, iFormNo, titaVo);
 
-				// 月報環境
-				titaVo.setDataBaseOnMon();
-				deleteData(tCdReport, titaVo);
+			// 日報環境
+			titaVo.setDataBaseOnDay();
+			deleteData(tCdReport, iFormNo, titaVo);
 
-				// 日報環境
-				titaVo.setDataBaseOnDay();
-				deleteData(tCdReport, titaVo);
-
-			} else {
-				throw new LogicException(titaVo, "E0004", iFormNo); // 刪除資料不存在
-			}
 			break;
 		}
 
@@ -163,7 +147,6 @@ public class L6608 extends TradeBuffer {
 
 	}
 
-
 	private void insertData(CdReport tCdReport, String iFormNo, TitaVo titaVo) throws LogicException {
 		try {
 			sCdReportService.insert(tCdReport, titaVo);
@@ -176,7 +159,21 @@ public class L6608 extends TradeBuffer {
 		}
 	}
 
-	private void updateData(CdReport tCdReport, TitaVo titaVo) throws LogicException {
+	private void updateData(CdReport tCdReport, String iFormNo, TitaVo titaVo) throws LogicException {
+
+		tCdReport = sCdReportService.holdById(iFormNo);
+
+		if (tCdReport == null) {
+			throw new LogicException(titaVo, "E0003", iFormNo); // 修改資料不存在
+		}
+
+		// datalog 寫在連線環境
+		if (ContentName.onLine.equals(titaVo.getDataBase())) {
+			CdReport tCdReport2 = (CdReport) dataLog.clone(tCdReport);
+			dataLog.setEnv(titaVo, tCdReport2, tCdReport);
+			dataLog.exec("修改報表代號對照檔");
+		}
+
 		try {
 			tCdReport = sCdReportService.update2(tCdReport, titaVo);
 		} catch (DBException e) {
@@ -184,7 +181,20 @@ public class L6608 extends TradeBuffer {
 		}
 	}
 
-	private void deleteData(CdReport tCdReport, TitaVo titaVo) throws LogicException {
+	private void deleteData(CdReport tCdReport, String iFormNo, TitaVo titaVo) throws LogicException {
+
+		tCdReport = sCdReportService.holdById(iFormNo);
+
+		if (tCdReport == null) {
+			throw new LogicException(titaVo, "E0004", iFormNo); // 刪除資料不存在
+		}
+
+		// datalog 寫在連線環境
+		if (ContentName.onLine.equals(titaVo.getDataBase())) {
+			dataLog.setEnv(titaVo, tCdReport, tCdReport);
+			dataLog.exec("刪除報表代號對照檔");
+		}
+
 		try {
 			sCdReportService.delete(tCdReport);
 		} catch (DBException e) {

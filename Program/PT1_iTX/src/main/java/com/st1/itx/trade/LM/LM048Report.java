@@ -295,7 +295,6 @@ public class LM048Report extends MakeReport {
 						: tLineAmt.divide(tNetWorth, 4, BigDecimal.ROUND_HALF_UP), "0.00%", "C");
 
 				tCustNoMain = r.get("CustNoMain") == null ? 0 : parse.stringToInteger(r.get("CustNoMain"));
-	
 
 				// 不同集團
 				if (tmpCustNoMain != tCustNoMain) {
@@ -360,6 +359,9 @@ public class LM048Report extends MakeReport {
 							makeExcel.setValue(row, 6, tLineAmtTotal, "#,##0", "R");
 							makeExcel.setValue(row, 7, tLoanBalTotal, "#,##0", "R");
 							makeExcel.setValue(row, 8, tAvailableBalCalculate, "#,##0", "R");
+							// 單一行業核貸金額占淨值比
+							String sDustryRate = "F" + row + "/" + "E" + (endRowC + 9);
+							makeExcel.setFormula(row, 15, BigDecimal.ZERO, sDustryRate, "0.00%");
 
 							tLineAmtTotal = BigDecimal.ZERO;
 							tLoanBalTotal = BigDecimal.ZERO;
@@ -380,14 +382,15 @@ public class LM048Report extends MakeReport {
 			String formulaInDustryRatingC = sumInDustryRatingFormulua("C", "F");
 
 			// 各評等合計
+			// 核貸金額
 			makeExcel.setFormula(endRowA, 6, BigDecimal.ZERO, formulaInDustryRatingA, "#,##0");
 			makeExcel.setFormula(endRowB, 6, BigDecimal.ZERO, formulaInDustryRatingB, "#,##0");
 			makeExcel.setFormula(endRowC, 6, BigDecimal.ZERO, formulaInDustryRatingC, "#,##0");
-
+			// 放款金額
 			makeExcel.setFormula(endRowA, 7, BigDecimal.ZERO, sumInDustryRatingFormulua("A", "G"), "#,##0");
 			makeExcel.setFormula(endRowB, 7, BigDecimal.ZERO, sumInDustryRatingFormulua("B", "G"), "#,##0");
 			makeExcel.setFormula(endRowC, 7, BigDecimal.ZERO, sumInDustryRatingFormulua("C", "G"), "#,##0");
-
+			// 可用餘額
 			makeExcel.setFormula(endRowA, 8, BigDecimal.ZERO, sumInDustryRatingFormulua("A", "H"), "#,##0");
 			makeExcel.setFormula(endRowB, 8, BigDecimal.ZERO, sumInDustryRatingFormulua("B", "H"), "#,##0");
 			makeExcel.setFormula(endRowC, 8, BigDecimal.ZERO, sumInDustryRatingFormulua("C", "H"), "#,##0");
@@ -401,6 +404,7 @@ public class LM048Report extends MakeReport {
 			String formuAvailableBal = "SUM(H" + endRowA + ",H" + endRowB + ",H" + endRowC + ")";
 			makeExcel.setFormula(row, 8, BigDecimal.ZERO, formuAvailableBal, "#,##0");
 
+			// 單一行業核貸金額占淨值比 合計
 			String pbrFornulaA = "F" + endRowA + "/" + "E" + (row + 8);
 			String pbrFornulaB = "F" + endRowB + "/" + "E" + (row + 8);
 			String pbrFornulaC = "F" + endRowC + "/" + "E" + (row + 8);
@@ -420,6 +424,7 @@ public class LM048Report extends MakeReport {
 			makeExcel.setValue(row, 1, rocLastYear12YDate);
 			makeExcel.setValue(row, 5, tNetWorth, "#,##0", "R");
 
+			// 風險控管限額表準(表格右側)
 			if (lLM048List3.size() != 0) {
 				riskForm(lLM048List3.get(0), row);
 			}
@@ -621,13 +626,13 @@ public class LM048Report extends MakeReport {
 			break;
 		}
 
+		// 去除最後一個逗號
 		if (result.length() > 4) {
-
-			result = result.substring(0, result.length() - 1);
-
+			result = result.substring(0, result.length() - 1) + ")";
+		} else {
+			result = "";
 		}
 
-		result = result + ")";
 		this.info("result = " + result);
 
 		return result;

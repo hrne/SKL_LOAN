@@ -38,7 +38,7 @@ public class LM050ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		this.info("lM050.Totalequity acdate=" + acdate);
 		String sql = " ";
-		sql += "     SELECT \"StockHoldersEqt\" AS \"AvailableFunds\"";
+		sql += "     SELECT \"StockHoldersEqt\" AS \"StockHoldersEqt\"";
 		sql += "           ,\"AcDate\"  AS \"AcDate\"";
 		sql += "     FROM \"InnFundApl\" ";
 		sql += "     WHERE \"AcDate\" = (";
