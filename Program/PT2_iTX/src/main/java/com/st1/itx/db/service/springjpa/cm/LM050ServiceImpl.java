@@ -221,7 +221,7 @@ public class LM050ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "     \"Main\" m";
 			sql += " WHERE";
 			sql += "     \"Seq\" = 1";
-			sql += "     AND \"RptType\" = '3';";
+			sql += "     AND \"RptType\" = '3'";
 		}
 		this.info("sql=" + sql);
 

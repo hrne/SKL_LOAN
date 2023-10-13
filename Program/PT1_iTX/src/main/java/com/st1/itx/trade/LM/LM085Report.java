@@ -96,15 +96,15 @@ public class LM085Report extends MakeReport {
 			// 上個月變動表
 			fnAllList = lm085ServiceImpl.findPart2(titaVo, lastYearMonth);
 			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
-			exportPart2(fnAllList, 8); // H欄
+			exportPart2(fnAllList, 8, lastYearMonth); // H欄
 			// 本月變動表
 			fnAllList = lm085ServiceImpl.findPart2(titaVo, yearMonth);
 			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
-			exportPart2(fnAllList, 15); // O欄
+			exportPart2(fnAllList, 15, yearMonth); // O欄
 			// 去年同期變動表
 			fnAllList = lm085ServiceImpl.findPart2(titaVo, yearMonth - 100);
 			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
-			exportPart2(fnAllList, 12); // L欄
+			exportPart2(fnAllList, 12, yearMonth - 100); // L欄
 			fnAllList = lm085ServiceImpl.findPart4(titaVo, tranAllYearData(yearMonth, lastYearMonth), unitCode);
 			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
 			// 重新計算
@@ -186,10 +186,20 @@ public class LM085Report extends MakeReport {
 		makeExcel.formulaCalculate(20, 6);
 	}
 
-	private void exportPart2(List<Map<String, String>> dataList, int col) throws LogicException {
+	private void exportPart2(List<Map<String, String>> dataList, int col, int yearMonth) throws LogicException {
 
 		int row = 0;
 		BigDecimal amt = BigDecimal.ZERO;
+		if (col == 8 || col == 12) {
+			String rocYear = String.valueOf((yearMonth - 191100) / 100);
+			String rocMonth = String.format("%02d", yearMonth % 100);
+			if (col == 8) {
+				makeExcel.setValue(27, 2, rocYear + "." + rocMonth + "(B)", "C");
+			}
+			if (col == 12) {
+				makeExcel.setValue(27, 6, rocYear + "." + rocMonth + "(C)", "C");
+			}
+		}
 
 		for (Map<String, String> r : dataList) {
 
@@ -249,14 +259,14 @@ public class LM085Report extends MakeReport {
 		makeExcel.formulaCalculate(38, 7);
 
 		// H、J、L、O欄
-		makeExcel.formulaCalculate(29, 8);//H
+		makeExcel.formulaCalculate(29, 8);// H
 		makeExcel.formulaCalculate(33, 8);
 		makeExcel.formulaCalculate(38, 8);
-		makeExcel.formulaRangeCalculate(29, 38, 10, 10);//J
-		makeExcel.formulaCalculate(29, 12);//L
+		makeExcel.formulaRangeCalculate(29, 38, 10, 10);// J
+		makeExcel.formulaCalculate(29, 12);// L
 		makeExcel.formulaCalculate(33, 12);
 		makeExcel.formulaCalculate(38, 12);
-		makeExcel.formulaCalculate(29, 15);//O
+		makeExcel.formulaCalculate(29, 15);// O
 		makeExcel.formulaCalculate(33, 15);
 		makeExcel.formulaCalculate(38, 15);
 	}

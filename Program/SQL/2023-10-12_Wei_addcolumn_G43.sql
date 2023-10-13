@@ -1,0 +1,21 @@
+
+  alter table "LoanBorMain" add "Aplne2" decimal(8, 0) default 0 not null;
+  alter table "LoanBorMain" add "Lmslbc" decimal(7, 0) default 0 not null;
+  alter table "LoanBorMain" add "Lmspbk" decimal(4, 0) default 0 not null;
+  alter table "LoanBorMain" add "Lmspcn" decimal(14, 0) default 0 not null;
+  alter table "LoanBorMain" add "Lmsper" varchar2(20);
+  alter table "LoanBorMain" add "Lmspys" decimal(1, 0) default 0 not null;
+  alter table "LoanBorMain" add "Lmssrp" decimal(11, 0) default 0 not null;
+  alter table "LoanBorMain" add "Lmstrn" varchar2(20);
+  alter table "LoanBorMain" add "Poscde" varchar2(20);
+  alter table "LoanBorMain" add "Tailmt" decimal(7, 0) default 0 not null;
+comment on column "LoanBorMain"."Aplne2" is '禁領清償期限';
+comment on column "LoanBorMain"."Lmslbc" is '欠繳違約金';
+comment on column "LoanBorMain"."Lmspbk" is '扣款銀行';
+comment on column "LoanBorMain"."Lmspcn" is '扣款帳號';
+comment on column "LoanBorMain"."Lmsper" is '錯誤註記';
+comment on column "LoanBorMain"."Lmspys" is '繳款方式';
+comment on column "LoanBorMain"."Lmssrp" is '累提前還本';
+comment on column "LoanBorMain"."Lmstrn" is '更新交易代號';
+comment on column "LoanBorMain"."Poscde" is '郵局存款別';
+comment on column "LoanBorMain"."Tailmt" is '欠繳管理費';

@@ -1,7 +1,9 @@
 package com.st1.itx.util.common;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Path;
@@ -96,13 +98,13 @@ public class SftpClient extends CommBuffer {
 	 * @param url        SFTP server url
 	 * @param port       SFTP server port
 	 * @param auth       username:password
-	 * @param localFile  localFile
+	 * @param localFilePath  localFilePath
 	 * @param remoteFile remoteFile
 	 * @param titaVo     titaVo
 	 * @return true when upload success else false
 	 * @throws LogicException parse exception
 	 */
-	public boolean download(String url, String port, String[] auth, String localFile, String remoteFile, TitaVo titaVo)
+	public boolean download(String url, String port, String[] auth, String localFilePath, String remoteFile, TitaVo titaVo)
 			throws LogicException {
 
 		this.setTitaVo(titaVo);
@@ -130,6 +132,21 @@ public class SftpClient extends CommBuffer {
 			ChannelSftp sftpChannel = (ChannelSftp) channel;
 
 			// 下載檔案
+	        File localFile = new File(localFilePath);
+	        if (!localFile.exists()) {
+	            // 確保上層目錄存在
+	        	localFile.getParentFile().mkdirs();
+	            
+	            try {
+	                // 嘗試建立檔案
+	            	localFile.createNewFile();
+	            } catch (IOException e) {
+	    			StringWriter errors = new StringWriter();
+	    			e.printStackTrace(new PrintWriter(errors));
+	    			this.error("SftpClient createNewFile error = " + errors.toString());
+	    			return false;
+	            }
+	        }
 			FileOutputStream fos = new FileOutputStream(localFile);
 			sftpChannel.get(remoteFile, fos);
 

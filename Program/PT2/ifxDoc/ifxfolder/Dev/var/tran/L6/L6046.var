@@ -178,7 +178,11 @@ T(3,1)ASGN(LOOP$)
 
 #OOSetDate=X,18,S
 
-#OOSetEmpNo=X,6,S
+#OOSetEmpNo=X,6,O
+
+#OOEmpName=X,50,O
+
+#OOEmpNo2=X,60,O
 
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 
@@ -203,6 +207,8 @@ TXFORM=L6046
 #OOTlrNo
 #OOSetEmpNo
 #OOSetDate
+#OOEmpName
+#OOEmpNo2
 ^
 <include src="ROM.icf::L1R09.tom"/>
 <include src="ROM.icf::L2R47.tom"/>
@@ -229,8 +235,8 @@ TXFORM=L6046
 #OOCustName=戶名
 {width:300,align:'left'}
 
-#OOSetEmpNo=建立人員
-{width:120,align:'center'}
+#OOEmpNo2=建立人員
+{width:200,align:'center'}
 
 #OOSetDate=建立時間
 {width:140,align:'center'}

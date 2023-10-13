@@ -110,6 +110,17 @@ BEGIN
       , "LastUpdate"          -- 最後更新日期時間 DATE   
       , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6  
       , "GraceFlag"           -- 寬限區分 DECIMAL 1 
+      , "Aplne2" -- 禁領清償期限 DECIMAL 8
+      , "Lmslbc" -- 欠繳違約金 DECIMAL 7
+      , "Lmspbk" -- 扣款銀行 DECIMAL 4
+      , "Lmspcn" -- 扣款帳號 DECIMAL 14
+      , "Lmsper" -- 錯誤註記 VARCHAR2 20
+      , "Lmspys" -- 繳款方式 DECIMAL 1
+      , "Lmssrp" -- 累提前還本 DECIMAL 11
+      , "Lmstrn" -- 更新交易代號 VARCHAR2 20
+      , "Poscde" -- 郵局存款別 VARCHAR2 20
+      , "Tailmt" -- 欠繳管理費 DECIMAL 7
+
     )
     WITH T1 AS ( 
       SELECT DISTINCT 
@@ -370,6 +381,17 @@ BEGIN
           -- 賴桑說AS400的LA$LMSP.LMSGTP寬限區分要轉資料進來,需要在LoanBorMain加一個欄位, 
           -- 賴桑會調整程式維護欄位(撥款主檔寬限區分欄位為隱藏欄位,判斷是否案件核准時有寬限期) 
           ,LMSP."LMSGTP"                  AS "GraceFlag"           -- 寬限區分 DECIMAL 1 
+          -- 2023-10-12 Wei 新增 from SKL IT 佳怡 #G43-1
+          ,LMSP.Aplne2                    AS "Aplne2" -- 禁領清償期限 DECIMAL 8
+          ,LMSP.Lmslbc                    AS "Lmslbc" -- 欠繳違約金 DECIMAL 7
+          ,LMSP.Lmspbk                    AS "Lmspbk" -- 扣款銀行 DECIMAL 4
+          ,LMSP.Lmspcn                    AS "Lmspcn" -- 扣款帳號 DECIMAL 14
+          ,LMSP.Lmsper                    AS "Lmsper" -- 錯誤註記 VARCHAR2 20
+          ,LMSP.Lmspys                    AS "Lmspys" -- 繳款方式 DECIMAL 1
+          ,LMSP.Lmssrp                    AS "Lmssrp" -- 累提前還本 DECIMAL 11
+          ,LMSP.Lmstrn                    AS "Lmstrn" -- 更新交易代號 VARCHAR2 20
+          ,LMSP.Poscde                    AS "Poscde" -- 郵局存款別 VARCHAR2 20
+          ,LMSP.Tailmt                    AS "Tailmt" -- 欠繳管理費 DECIMAL 7
     FROM "LA$LMSP" LMSP 
     LEFT JOIN "LN$CLMP" ON "LN$CLMP"."LMSACN" = LMSP."LMSACN" 
                        AND "LN$CLMP"."LMSAPN" = LMSP."LMSAPN" 

@@ -196,6 +196,9 @@ public class L6046 extends TradeBuffer {
 //			occurslist.putParam("OOReason", tCustDataCtrl.getReason());
 //			occurslist.putParam("OOApplMark", tCustDataCtrl.getApplMark());
 			occurslist.putParam("OOSetEmpNo", tCustDataCtrl.getCreateEmpNo());
+			occurslist.putParam("OOEmpNo2", tCustDataCtrl.getCreateEmpNo()+EmpName);
+			
+			
 			occurslist.putParam("OOSetDate", parse.timeStampToString(tCustDataCtrl.getCreateDate()));
 
 

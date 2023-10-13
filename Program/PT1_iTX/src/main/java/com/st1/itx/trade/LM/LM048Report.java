@@ -174,7 +174,7 @@ public class LM048Report extends MakeReport {
 			BigDecimal tStoreRate = BigDecimal.ZERO;
 			String tMaturityDate = "";
 			String tPrevPayIntDate = "";
-			String tGroupName = "";
+//			String tGroupName = "";
 
 			int tCustNoMain = 0;
 
@@ -401,10 +401,10 @@ public class LM048Report extends MakeReport {
 			String formuAvailableBal = "SUM(H" + endRowA + ",H" + endRowB + ",H" + endRowC + ")";
 			makeExcel.setFormula(row, 8, BigDecimal.ZERO, formuAvailableBal, "#,##0");
 
-			String pbrFornulaA = "G" + endRowA + "/" + "E" + (row + 8);
-			String pbrFornulaB = "G" + endRowB + "/" + "E" + (row + 8);
-			String pbrFornulaC = "G" + endRowC + "/" + "E" + (row + 8);
-			String pbrFornula = "G" + row + "/" + "E" + (row + 8);
+			String pbrFornulaA = "F" + endRowA + "/" + "E" + (row + 8);
+			String pbrFornulaB = "F" + endRowB + "/" + "E" + (row + 8);
+			String pbrFornulaC = "F" + endRowC + "/" + "E" + (row + 8);
+			String pbrFornula = "F" + row + "/" + "E" + (row + 8);
 
 			makeExcel.setFormula(endRowA, 15, BigDecimal.ZERO, pbrFornulaA, "0.00%");
 			makeExcel.setFormula(endRowB, 15, BigDecimal.ZERO, pbrFornulaB, "0.00%");

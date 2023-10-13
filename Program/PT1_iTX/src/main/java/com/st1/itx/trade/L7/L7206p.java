@@ -350,7 +350,7 @@ public class L7206p extends TradeBuffer {
 
 		String remoteDir = systemParas.getL7206SftpDir();
 
-		String localFile = inFolder + "/L7206/" + fileName;
+		String localFile = inFolder + "/FTP/L7206/" + fileName;
 		String remoteFile = remoteDir + fileName;
 
 		// 呼叫SFTPCient

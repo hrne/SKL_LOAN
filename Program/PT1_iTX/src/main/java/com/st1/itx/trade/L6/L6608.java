@@ -48,7 +48,7 @@ public class L6608 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 		titaVo.keepOrgDataBase();// 保留原本記號
 		titaVo.setDataBaseOnLine();// 指定連線環境
-		
+
 		// 取得輸入資料
 		int iFuncCode = this.parse.stringToInteger(titaVo.getParam("FuncCode"));
 		String iFormNo = titaVo.getParam("FormNo");
@@ -62,61 +62,70 @@ public class L6608 extends TradeBuffer {
 		CdReport tCdReport = new CdReport();
 		switch (iFuncCode) {
 		case 1: // 新增
+			// set value
 			moveCdReport(tCdReport, iFuncCode, iFormNo, titaVo);
-			try {
-				this.info("1");
-				sCdReportService.insert(tCdReport, titaVo);
-				this.info("2");
-			} catch (DBException e) {
-				if (e.getErrorId() == 2) {
-					throw new LogicException(titaVo, "E0002", iFormNo); // 新增資料已存在
-				} else {
-					throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增資料時，發生錯誤
-				}
-			}
+
+			// 連線環境(預設)
+			insertData(tCdReport, iFormNo, titaVo);
+
+			// 月報環境
+			titaVo.setDataBaseOnMon();
+			insertData(tCdReport, iFormNo, titaVo);
+
+			// 日報環境
+			titaVo.setDataBaseOnDay();
+			insertData(tCdReport, iFormNo, titaVo);
+
 			break;
 
 		case 2: // 修改
 			tCdReport = sCdReportService.holdById(iFormNo);
+
 			if (tCdReport == null) {
 				throw new LogicException(titaVo, "E0003", iFormNo); // 修改資料不存在
 			}
-			CdReport tCdReport2 = (CdReport) dataLog.clone(tCdReport); ////
-			try {
-				moveCdReport(tCdReport, iFuncCode, iFormNo, titaVo);
-				tCdReport = sCdReportService.update2(tCdReport, titaVo); ////
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
-			}
-			dataLog.setEnv(titaVo, tCdReport2, tCdReport); ////
-			dataLog.exec("修改報表代號對照檔"); ////
+			CdReport tCdReport2 = (CdReport) dataLog.clone(tCdReport);
+
+			// set value
+			moveCdReport(tCdReport, iFuncCode, iFormNo, titaVo);
+
+			// 連線環境(預設)
+			updateData(tCdReport, titaVo);
+			dataLog.setEnv(titaVo, tCdReport2, tCdReport);
+			dataLog.exec("修改報表代號對照檔");
+
+			// 月報環境
+			titaVo.setDataBaseOnMon();
+			updateData(tCdReport, titaVo);
+
+			// 日報環境
+			titaVo.setDataBaseOnDay();
+			updateData(tCdReport, titaVo);
+
 			break;
 		case 4: // 刪除
 			tCdReport = sCdReportService.holdById(iFormNo);
-			
-			if ("onLine".equals(titaVo.getDataBase())) {
-				titaVo.setDataBaseOnMon();// 指定月報環境
-			} else {
-				titaVo.setDataBaseOnLine();// 指定連線環境
-			}
-			
+
 			if (tCdReport != null) {
-				try {
-					sCdReportService.delete(tCdReport);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時，發生錯誤
-				}
+
+				// 連線環境(預設)
+				deleteData(tCdReport, titaVo);
+				dataLog.setEnv(titaVo, tCdReport, tCdReport);
+				dataLog.exec("刪除報表代號對照檔");
+
+				// 月報環境
+				titaVo.setDataBaseOnMon();
+				deleteData(tCdReport, titaVo);
+
+				// 日報環境
+				titaVo.setDataBaseOnDay();
+				deleteData(tCdReport, titaVo);
+
 			} else {
 				throw new LogicException(titaVo, "E0004", iFormNo); // 刪除資料不存在
 			}
-
-			dataLog.setEnv(titaVo, tCdReport, tCdReport); ////
-			dataLog.exec("刪除報表代號對照檔"); ////
-
-			titaVo.setDataBaseOnOrg();// 還原原本的環境
 			break;
 		}
-		this.info("3");
 
 		titaVo.setDataBaseOnOrg();// 還原原本的環境
 		this.addList(this.totaVo);
@@ -125,12 +134,6 @@ public class L6608 extends TradeBuffer {
 
 	private void moveCdReport(CdReport mCdReport, int mFuncCode, String mFormNo, TitaVo titaVo) throws LogicException {
 
-		if ("onLine".equals(titaVo.getDataBase())) {
-			titaVo.setDataBaseOnMon();// 指定月報環境
-		} else {
-			titaVo.setDataBaseOnLine();// 指定連線環境
-		}
-		
 		mCdReport.setFormNo(titaVo.getParam("FormNo"));
 		mCdReport.setFormName(titaVo.getParam("FormName"));
 		mCdReport.setCycle(this.parse.stringToInteger((titaVo.getParam("Cycle"))));
@@ -157,7 +160,37 @@ public class L6608 extends TradeBuffer {
 		}
 		mCdReport.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 		mCdReport.setLastUpdateEmpNo(titaVo.getTlrNo());
-		
-		titaVo.setDataBaseOnOrg();// 還原原本的環境
+
 	}
+
+
+	private void insertData(CdReport tCdReport, String iFormNo, TitaVo titaVo) throws LogicException {
+		try {
+			sCdReportService.insert(tCdReport, titaVo);
+		} catch (DBException e) {
+			if (e.getErrorId() == 2) {
+				throw new LogicException(titaVo, "E0002", iFormNo); // 新增資料已存在
+			} else {
+				throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增資料時，發生錯誤
+			}
+		}
+	}
+
+	private void updateData(CdReport tCdReport, TitaVo titaVo) throws LogicException {
+		try {
+			tCdReport = sCdReportService.update2(tCdReport, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
+		}
+	}
+
+	private void deleteData(CdReport tCdReport, TitaVo titaVo) throws LogicException {
+		try {
+			sCdReportService.delete(tCdReport);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時，發生錯誤
+		}
+
+	}
+
 }

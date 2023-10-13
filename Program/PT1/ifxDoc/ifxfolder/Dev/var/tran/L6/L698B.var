@@ -79,6 +79,10 @@ C(2,#SelectCode,T(3,),
 
 #AutoFg=X,1,S
 
+#StatusHelp=x,1024,S
+T(3,0:未處理;1:已保留;2:已處理;3:已刪除)
+C(5,#ItemCode,L7400,T(3,0:未處理;1:已保留;2:成功;3:已刪除),$)
+
 
 #RPTFG=A,1,S
 C(2,#SelectCode,
@@ -132,11 +136,12 @@ T(3,1)ASGN(LOOP$)
 ! 狀態
 #OOStatus=A,1,S
 #OOStatus_LB=X,16,L
-SWITCH(#OOStatus,0,T(3,0.未處理),
-                          1,T(3,1.已保留),
-                          2,T(3,2.已處理),
-                          3,T(3,3.已刪除),
-)
+T(H,#OOStatus,#StatusHelp)
+! SWITCH(#OOStatus,0,T(3,0.未處理),
+!                           1,T(3,1.已保留),
+!                           2,T(3,2.已處理),
+!                           3,T(3,3.已刪除),
+! )
 ! 戶號
 #OOCustNo=A,7,S
 #OOFacmNo=A,3,S
@@ -236,8 +241,8 @@ C(5,#OOExcuteTxcd,L3731,BIND(grid,{ cmd=CHAIN; ntxcd=#OOExcuteTxcd;text=改呆�
 T(2,#OODtlValue)
 
 !L7400
-#OOBTN6=X,1,S
-BIND(grid,{ cmd=CHAIN; ntxcd=#OOExcuteTxcd; ntxcd=#OOExcuteTxcd;ntxbuf=#OOBUF6})
+#OOBTN6=X,20,S
+BIND(grid,{ cmd=CHAIN; ntxcd=#OOExcuteTxcd; ntxcd=#OOExcuteTxcd;text=總帳傳票資料傳輸;ntxbuf=#OOBUF6})
 
 
 </sub>
@@ -528,7 +533,7 @@ ifxBatch:{
 #any={detail:true, caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
 #OOBTN6=
-{width:100,search:false,formatter:'cust:bind-button:;',align:'center',canExport:false}
+{width:100,search:false,formatter:'cust:bind-button:;#OOBTN6',align:'center',canExport:false}
 
 #OOStatus_LB=狀態
 {width:80,align:'center'}

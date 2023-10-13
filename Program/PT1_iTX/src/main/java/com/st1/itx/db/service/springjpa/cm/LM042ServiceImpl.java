@@ -45,33 +45,33 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("yearMonth=" + yearMonth);
 
 		String sql = "";
-		sql += " WITH FACBAL ( ";
+		sql += " WITH FACBAL AS ( ";
 		sql += "		SELECT ";
 		sql += "				\"YearMonth\" ";
-		sql += "				\"AssetClass\" ";
-		sql += "				\"GovProjectFlag\" ";
-		sql += "				\"ClCode1\" ";
-		sql += "				\"BankRelationFlag\" ";
-		sql += "				\"PrinBalance\"-\"LawAmount\"  AS \"PrinBalance\" ";
+		sql += "			   ,\"AssetClass\" ";
+		sql += "			   ,\"GovProjectFlag\" ";
+		sql += "			   ,\"ClCode1\" ";
+		sql += "			   ,\"BankRelationFlag\" ";
+		sql += "			   ,\"PrinBalance\"-\"LawAmount\"  AS \"PrinBalance\" ";
 		sql += "   		FROM \"MonthlyFacBal\"  ";
 		sql += "   		WHERE \"YearMonth\" = :yymm  ";
 		sql += "   	 	AND \"PrinBalance\" > 0 ";
 		sql += " 		UNION ALL ";
 		sql += "		SELECT ";
 		sql += "				\"YearMonth\" ";
-		sql += "				\"AssetClass\" ";
-		sql += "				\"GovProjectFlag\" ";
-		sql += "				\"ClCode1\" ";
-		sql += "				\"BankRelationFlag\" ";
-		sql += "				\"LawAmount\"  AS \"PrinBalance\" ";
+		sql += "			   ,SUBSTR(\"LawAssetClass\",1,1)  AS AssetClass";
+		sql += "			   ,\"GovProjectFlag\" ";
+		sql += "			   ,\"ClCode1\" ";
+		sql += "			   ,\"BankRelationFlag\" ";
+		sql += "			   ,\"LawAmount\"  AS \"PrinBalance\" ";
 		sql += "   		FROM \"MonthlyFacBal\"  ";
 		sql += "   		WHERE \"YearMonth\" = :yymm  ";
-		sql += "   	 	AND \"PrinBalance\" > 0 ";
+		sql += "   	 	AND   \"LawAmount\" > 0 ";
 		sql += " ) ";
 		sql += " SELECT \"YearMonth\" ";
 		sql += " 	   ,\"KIND\" ";
-		sql += "       ,\"RPTID\" ";
-		sql += " 	   ,\"AssetClass\" AS \"AssetClass\" ";
+		sql += "       ,\"RelCd\" ";
+		sql += " 	   ,\"AssetClass\" ";
 		sql += " 	   ,SUM(\"AMT\") AS \"AMT\" ";
 		sql += " FROM ( ";
 		sql += "   SELECT \"YearMonth\" ";
@@ -84,15 +84,14 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " 			WHEN \"ClCode1\" IN (3,4) ";
 		sql += " 			THEN 'D' ";
 		sql += " 		  END AS \"KIND\" ";
-		sql += " 		 ,CASE WHEN \"BankRelationFlag\" IN ('A','B') THEN  'Y' ELSE 'N' END  AS \"RPTID\" ";
+		sql += " 		 ,CASE WHEN \"BankRelationFlag\" IN ('A','B') THEN  'Y' ELSE 'N' END  AS \"RelCd\" ";
 		sql += " 		 ,\"PrinBalance\" AS \"AMT\" ";
 		sql += "   FROM FACBAL  ";
-		sql += "   WHERE \"YearMonth\" = :yymm  ";
-		sql += "   	 AND \"PrinBalance\" > 0 )";
+		sql += "   )";
 		sql += "   GROUP BY \"YearMonth\" ";
 		sql += "           ,\"AssetClass\" ";
 		sql += "           ,\"KIND\" ";
-		sql += "           ,\"RPTID\" ";
+		sql += "           ,\"RelCd\" ";
 
 		this.info("sql=" + sql);
 
@@ -118,32 +117,32 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String sql = "";
 
-		sql += " WITH FACBAL ( ";
+		sql += " WITH FACBAL AS ( ";
 		sql += "		SELECT ";
 		sql += "				\"YearMonth\" ";
-		sql += "				\"AssetClass\" ";
-		sql += "				\"GovProjectFlag\" ";
-		sql += "				\"ClCode1\" ";
-		sql += "				\"BankRelationFlag\" ";
-		sql += "				\"PrinBalance\"-\"LawAmount\"  AS \"PrinBalance\" ";
+		sql += "			   ,\"AssetClass\" ";
+		sql += "			   ,\"GovProjectFlag\" ";
+		sql += "			   ,\"ClCode1\" ";
+		sql += "			   ,\"BankRelationFlag\" ";
+		sql += "			   ,\"PrinBalance\"-\"LawAmount\"  AS \"PrinBalance\" ";
 		sql += "   		FROM \"MonthlyFacBal\"  ";
 		sql += "   		WHERE \"YearMonth\" = :yymm  ";
 		sql += "   	 	AND \"PrinBalance\" > 0 ";
 		sql += " 		UNION ALL ";
 		sql += "		SELECT ";
 		sql += "				\"YearMonth\" ";
-		sql += "				\"AssetClass\" ";
-		sql += "				\"GovProjectFlag\" ";
-		sql += "				\"ClCode1\" ";
-		sql += "				\"BankRelationFlag\" ";
-		sql += "				\"LawAmount\"  AS \"PrinBalance\" ";
+		sql += "			   ,SUBSTR(\"LawAssetClass\",1,1)  AS AssetClass";
+		sql += "			   ,\"GovProjectFlag\" ";
+		sql += "			   ,\"ClCode1\" ";
+		sql += "			   ,\"BankRelationFlag\" ";
+		sql += "			   ,\"LawAmount\"  AS \"PrinBalance\" ";
 		sql += "   		FROM \"MonthlyFacBal\"  ";
 		sql += "   		WHERE \"YearMonth\" = :yymm  ";
-		sql += "   	 	AND \"PrinBalance\" > 0 ";
+		sql += "   	 	AND   \"LawAmount\" > 0 ";
 		sql += " ) ";
 		sql += " SELECT \"Item\" ";
-		sql += "       ,\"RPTID\" ";
-		sql += " 	   ,\"AssetClass\" AS \"AssetClass\" ";
+		sql += "       ,\"RelCd\" ";
+		sql += " 	   ,\"AssetClass\"  ";
 		sql += " 	   ,SUM(\"AMT\") AS \"AMT\" ";
 		sql += " FROM ( ";
 		sql += "   SELECT CASE ";
@@ -154,54 +153,39 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " 			WHEN \"ClCode1\" IN (3,4) ";
 		sql += " 			THEN 'D' ";
 		sql += " 		  END AS \"Item\" ";
-		sql += " 		 ,CASE WHEN \"BankRelationFlag\" IN ('A','B','G') THEN  'Y' ELSE 'N' END  AS \"RPTID\" ";
-		sql += " 		 ,\"AssetClass\"  AS \"AssetClass\" ";
+		sql += " 		 ,CASE WHEN \"BankRelationFlag\" IN ('A','B','G') THEN  'Y' ELSE 'N' END  AS \"RelCd\" ";
+		sql += " 		 ,\"AssetClass\" ";
 		sql += " 		 ,\"PrinBalance\" AS \"AMT\" ";
 		sql += "   FROM FACBAL  ";
 		sql += "   WHERE \"YearMonth\" = :yymm  ";
-		sql += "   	 AND \"PrinBalance\" > 0 )";
+		sql += "   	 AND \"PrinBalance\" > 0 ";
+		sql += "     )";
+		sql += " GROUP BY \"Item\" ";
+		sql += "         ,\"RelCd\" ";
+		sql += "         ,\"AssetClass\" ";
 		// 擔保放款-折溢價C10
+		sql += " UNION  ";
 		sql += " SELECT '6' AS \"Item\" ";
-		sql += " 		 ,'N'  AS \"RPTID\" ";
-		sql += " 		 ,1  AS \"AssetClass\" ";
+		sql += " 		 ,'N'  AS \"RelCd\" ";
+		sql += " 		 ,'1'  AS \"AssetClass\" ";
 		sql += " 	   ,\"LoanBal\"  AS \"AMT\" ";
 		sql += " FROM \"MonthlyLM052AssetClass\"  ";
 		sql += " WHERE \"YearMonth\" =  :yymm ";
 		sql += "   AND \"AssetClassNo\" = '61' ";
 		sql += " UNION  ";
-		// 催收款項D10
+		// 催收款項-折溢價D10
 		sql += " SELECT '6' AS \"Item\" ";
-		sql += " 		 ,'N'  AS \"RPTID\" ";
-		sql += " 		 ,2  AS \"AssetClass\" ";
+		sql += " 		 ,'N'  AS \"RelCd\" ";
+		sql += " 		 ,'2'  AS \"AssetClass\" ";
 		sql += " 	   ,\"LoanBal\"  AS \"AMT\" ";
-		sql += " FROM \"MonthlyLM052AssetClass\"  ";
-		sql += " WHERE \"YearMonth\" =  :yymm ";
-		sql += "   AND \"AssetClassNo\" = '62' ";
-		sql += " UNION  ";
-//        擔保放款-折溢價 
-		sql += " SELECT  ";
-		sql += "       '6'					AS \"Item\" ";
-		sql += "		,'N'  AS \"RPTID\" ";
-		sql += "		,1  AS \"AssetClass\" ";
-		sql += "		,\"StorageAmt\"  			AS \"Amt\"   ";// (61)擔保品溢折價
-		sql += " FROM \"MonthlyLM052AssetClass\"  ";
-		sql += " WHERE \"YearMonth\" =  :yymm ";
-		sql += "   AND \"AssetClassNo\" = '61' ";
-		sql += " UNION  ";
-		// 催收款項-折溢價與催收費用
-		sql += " SELECT  ";
-		sql += "       '6'					AS \"Item\" ";
-		sql += " 		,'N'  AS \"RPTID\" ";
-		sql += " 		,2  AS \"AssetClass\" ";
-		sql += "		,\"StorageAmt\"			AS \"Amt\"          "; // (62)折溢價與催收費用
 		sql += " FROM \"MonthlyLM052AssetClass\"  ";
 		sql += " WHERE \"YearMonth\" =  :yymm ";
 		sql += "   AND \"AssetClassNo\" = '62' ";
 		sql += " UNION  ";
 		// 應收利息 I13
 		sql += " SELECT 'IntRecv' AS \"Item\" ";
-		sql += " 		,''  AS \"RPTID\" ";
-		sql += " 		,1  AS \"AssetClass\" ";
+		sql += " 		,''   AS \"RelCd\" ";
+		sql += " 		,'1'  AS \"AssetClass\" ";
 		sql += " 	   ,SUM(\"TdBal\")  AS \"AMT\" ";
 		sql += " FROM \"CoreAcMain\"";
 		sql += " WHERE \"AcNoCode\" IN ( '10240000000' ) "; // 應收利息
@@ -210,8 +194,8 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 專案貸款 
 		sql += " UNION ";
 		sql += " SELECT 'ProLoan' AS \"Item\" ";
-		sql += " 		,''  AS \"RPTID\" ";
-		sql += " 		,1  AS \"AssetClass\" ";
+		sql += " 		,''  AS \"RelCd\" ";
+		sql += " 		,'1' AS \"AssetClass\" ";
 		sql += " 	   ,SUM(\"PrinBalance\") AS \"AMT\" ";
 		sql += " FROM \"MonthlyFacBal\" ";
 		sql += " WHERE \"PrinBalance\" > 0 ";
@@ -221,8 +205,8 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 服務課專案數字
 		sql += " UNION ";
 		sql += " SELECT 'ProAmt' AS \"Item\" ";
-		sql += " 		,''  AS \"RPTID\" ";
-		sql += " 		,1  AS \"AssetClass\" ";
+		sql += " 		,''  AS \"RelCd\" ";
+		sql += " 		,'1' AS \"AssetClass\" ";
 		sql += " 	   ,SUM(JSON_VALUE(\"JsonFields\",'$.LoanBal'))  AS \"AMT\" ";
 		sql += " FROM \"CdComm\" ";
 		sql += " WHERE \"CdType\" ='02'";
@@ -231,8 +215,8 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 放款總額 I13
 		sql += " UNION ";
 		sql += " SELECT 'TotalLoanAmt' AS \"Item\" ";
-		sql += " 		,''  AS \"RPTID\" ";
-		sql += " 		,0  AS \"AssetClass\" ";
+		sql += " 		,''  AS \"RelCd\" ";
+		sql += " 		,'0' AS \"AssetClass\" ";
 		sql += " 	   ,SUM(\"TdBal\")  AS \"AMT\" ";
 		sql += " FROM \"CoreAcMain\" ";
 		sql += " WHERE \"AcNoCode\" IN ( '10603','10604' ) ";
@@ -241,8 +225,8 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 備呆 P13
 		sql += " UNION ";
 		sql += " SELECT 'ApprovedLoss' AS \"Item\" ";
-		sql += " 		,''  AS \"RPTID\" ";
-		sql += " 		,0  AS \"AssetClass\" ";
+		sql += " 		,''  AS \"RelCd\" ";
+		sql += " 		,'0' AS \"AssetClass\" ";
 		sql += " 	   ,SUM(0-\"TdBal\")  AS \"AMT\" ";
 		sql += " FROM \"CoreAcMain\" ";
 		sql += " WHERE \"AcNoCode\" IN ( '10623','10624' ) ";
@@ -252,28 +236,30 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 利關人_職員數C16~G16
 		sql += " UNION ";
 		sql += " SELECT 'RelEmp' AS \"Item\" ";
-		sql += " 		,'Y'  AS \"RPTID\" ";
+		sql += " 		,'Y'  AS \"RelCd\" ";
 		sql += " 		,\"AssetClass\"  AS \"AssetClass\" ";
 		sql += " 	   	,SUM(\"PrinBalance\")  AS \"AMT\" ";
 		sql += " FROM  \"MonthlyFacBal\"  ";
 		sql += " WHERE \"YearMonth\" = :yymm  ";
 		sql += "   AND \"BankRelationFlag\" IN ('G')  ";
+		sql += " GROUP BY \"AssetClass\" ";
 
 		// 利關人金額C17~G17
 		sql += " UNION ";
 		sql += " SELECT 'RelAmt' AS \"Item\" ";
-		sql += " 		,'Y'  AS \"RPTID\" ";
+		sql += " 		,'Y'  AS \"RelCd\" ";
 		sql += " 		,\"AssetClass\"  AS \"AssetClass\" ";
 		sql += " 	   	,SUM(\"PrinBalance\")  AS \"AMT\" ";
 		sql += " FROM  \"MonthlyFacBal\"  ";
 		sql += " WHERE \"YearMonth\" = :yymm  ";
 		sql += "   AND \"BankRelationFlag\" IN ('A','B')  ";
+		sql += " GROUP BY \"AssetClass\" ";
 
 		// 科子目淨額O14 
 		sql += " UNION ";
 		sql += " SELECT 'NetLoanAmt' AS \"Item\" ";
-		sql += " 		,''  AS \"RPTID\" ";
-		sql += " 		,0  AS \"AssetClass\" ";
+		sql += " 		,''  AS \"RelCd\" ";
+		sql += " 		,'0' AS \"AssetClass\" ";
 		sql += " 	   	,SUM(\"TdBal\")  AS \"AMT\" ";
 		sql += " FROM \"CoreAcMain\" ";
 		sql += " WHERE \"AcNoCode\" IN ('10603','10604', '10623','10624' ) ";
