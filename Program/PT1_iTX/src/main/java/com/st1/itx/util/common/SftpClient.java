@@ -95,17 +95,17 @@ public class SftpClient extends CommBuffer {
 	/**
 	 * download
 	 * 
-	 * @param url        SFTP server url
-	 * @param port       SFTP server port
-	 * @param auth       username:password
-	 * @param localFilePath  localFilePath
-	 * @param remoteFile remoteFile
-	 * @param titaVo     titaVo
+	 * @param url           SFTP server url
+	 * @param port          SFTP server port
+	 * @param auth          username:password
+	 * @param localFilePath localFilePath
+	 * @param remoteFile    remoteFile
+	 * @param titaVo        titaVo
 	 * @return true when upload success else false
 	 * @throws LogicException parse exception
 	 */
-	public boolean download(String url, String port, String[] auth, String localFilePath, String remoteFile, TitaVo titaVo)
-			throws LogicException {
+	public boolean download(String url, String port, String[] auth, String localFilePath, String remoteFile,
+			TitaVo titaVo) throws LogicException {
 
 		this.setTitaVo(titaVo);
 
@@ -132,21 +132,23 @@ public class SftpClient extends CommBuffer {
 			ChannelSftp sftpChannel = (ChannelSftp) channel;
 
 			// 下載檔案
-	        File localFile = new File(localFilePath);
-	        if (!localFile.exists()) {
-	            // 確保上層目錄存在
-	        	localFile.getParentFile().mkdirs();
-	            
-	            try {
-	                // 嘗試建立檔案
-	            	localFile.createNewFile();
-	            } catch (IOException e) {
-	    			StringWriter errors = new StringWriter();
-	    			e.printStackTrace(new PrintWriter(errors));
-	    			this.error("SftpClient createNewFile error = " + errors.toString());
-	    			return false;
-	            }
-	        }
+			File localFile = new File(localFilePath);
+			if (!localFile.exists()) {
+				// 確保上層目錄存在
+				localFile.getParentFile().mkdirs();
+
+				try {
+					// 嘗試建立檔案
+					localFile.createNewFile();
+				} catch (IOException e) {
+					StringWriter errors = new StringWriter();
+					e.printStackTrace(new PrintWriter(errors));
+					this.error("SftpClient createNewFile error = " + errors.toString());
+					return false;
+				}
+			}
+			this.info("localFilePath=" + localFilePath);
+			this.info("remoteFile=" + remoteFile);
 			FileOutputStream fos = new FileOutputStream(localFile);
 			sftpChannel.get(remoteFile, fos);
 

@@ -147,9 +147,6 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           , T.\"TitaHCode\"                                                                                        AS \"TitaHCode\"";
 		sql += "           , T.\"TitaTlrNo\"                                                                                        AS \"TitaTlrNo\"";
 		sql += "           , T.\"TitaTxtNo\"                                                                                        AS \"TitaTxtNo\"";
-		sql += "           , T.\"AcSeq\"                                                                                            AS \"AcSeq\"";
-		sql += "           , MAX(T.\"CreateDate\")                                                                                  AS \"CreateDate\"";
-		sql += "           , T.\"Displayflag\"                                                                                      AS \"Displayflag\"";
 		sql += "           , T.\"RepayCode\"";
 		sql += "           , L.\"RenewFlag\"                                                                                        AS \"RenewFlag\"";
 		sql += "      FROM \"LoanBorTx\"     T";
@@ -264,8 +261,6 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             , T.\"TitaHCode\"";
 		sql += "             , T.\"TitaTlrNo\"";
 		sql += "             , T.\"TitaTxtNo\"";
-		sql += "             , T.\"AcSeq\"";
-		sql += "             , T.\"Displayflag\"";
 		sql += "             , T.\"RepayCode\"";
 		sql += "             , L.\"RenewFlag\"";
 		sql += "  )";
@@ -310,9 +305,6 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       , T.\"TitaHCode\"";
 		sql += "       , T.\"TitaTlrNo\"";
 		sql += "       , T.\"TitaTxtNo\"";
-		sql += "       , T.\"AcSeq\"";
-		sql += "       , T.\"CreateDate\"";
-		sql += "       , T.\"Displayflag\"";
 		sql += "  FROM (";
 		sql += "      SELECT T.\"CustNo\"";
 		sql += "           , Nvl(";
@@ -400,9 +392,6 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           , T.\"TitaCalTm\"";
 		sql += "           , T.\"TitaTlrNo\"";
 		sql += "           , T.\"TitaTxtNo\"";
-		sql += "           , T.\"AcSeq\"";
-		sql += "           , T.\"CreateDate\"";
-		sql += "           , T.\"Displayflag\"";
 		sql += "           , T.\"RepayCode\"";
 		sql += "      FROM \"Main\"      T";
 		sql += "      LEFT JOIN \"CustMain\"  C ON C.\"CustNo\" = T.\"CustNo\"";
@@ -462,9 +451,6 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         , T.\"TitaCalTm\"";
 		sql += "         , T.\"TitaTlrNo\"";
 		sql += "         , T.\"TitaTxtNo\"";
-		sql += "         , T.\"AcSeq\"";
-		sql += "         , T.\"CreateDate\"";
-		sql += "         , T.\"Displayflag\"";
 
 		this.info("sql=" + sql);
 		Query query;
@@ -515,7 +501,6 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               WHEN CB.\"BdLocation\" IS NOT NULL ";
 		sql += "               THEN CB.\"BdLocation\" ";
 		sql += "             ELSE CL.\"LandLocation\" END AS \"Location\"";
-		sql += "			,T.\"Displayflag\" AS \"Displayflag\"";
 		sql += "      FROM (SELECT \"CustNo\"";
 		sql += "                  ,\"FacmNo\"";
 		sql += "                  ,\"BormNo\"";
@@ -544,7 +529,6 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                  ,\"TitaCalDy\"  ";
 		sql += "                  ,\"TitaCalTm\"  ";
 		sql += "                  ,1                 AS \"DB\"   ";
-		sql += "				  ,\"Displayflag\" AS \"Displayflag\"";
 		sql += "            FROM \"LoanBorTx\" ";
 		sql += "            WHERE \"CustNo\" = :ICUSTNO";
 		sql += "             AND NVL(JSON_VALUE(\"OtherFields\",'$.TempReasonCode'),' ') NOT IN ('03','06')";// --03期票
@@ -588,7 +572,6 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                  ,0    AS \"TitaCalDy\" ";
 		sql += "                  ,0    AS \"TitaCalTm\" ";
 		sql += "                  ,2    AS \"DB\"   ";
-		sql += "                  ,NULL AS \"Displayflag\"   ";
 		sql += "            FROM  \"FacMain\" F";
 		sql += "            LEFT JOIN \"LoanBorMain\" M ON M.\"CustNo\" = F.\"CustNo\"";
 		sql += "                                       AND M.\"FacmNo\" = F.\"FacmNo\"";
@@ -616,7 +599,6 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                             AND CL.\"LandSeq\" = 0 ";
 		sql += "                             AND F.\"ClCode1\"  = 2 ";
 		sql += "      ORDER BY T.\"FacmNo\",T.\"DB\" ,T.\"BormNo\", T.\"TitaCalDy\", T.\"TitaCalTm\"";
-		sql += "              ,T.\"Displayflag\" ";
 		sql += "              ,CASE WHEN T.\"TxAmt\" > 0  THEN 0 ELSE 1 END  ";
 
 		this.info("sql=" + sql);

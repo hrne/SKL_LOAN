@@ -84,6 +84,7 @@ public class LP006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,\"LogNo\"						";
 		sql += "            ,ROW_NUMBER() OVER (Partition By \"EmpNo\"				";
 		sql += "                       	        ORDER BY \"EffectiveDate\" Desc		";
+		sql += "                       	                ,\"LogNo\" Desc		        ";
 		sql += "      	                       ) AS \"ROWNUMBER\"					";
 		sql += "            from \"PfCoOfficerLog\"									";
 		sql += "            where case when \"EffectiveDate\" > :startdate and \"EffectiveDate\" <= :enddate then 1   ";
@@ -144,10 +145,13 @@ public class LP006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,l.\"FunctionCode\"                     ";
 		sql += "            ,l.\"LogNo\"                                                                          ";
 		sql += "            ,ROW_NUMBER() OVER (Partition By l.\"EmpNo\"                                            ";
+		sql += "                       	        ORDER BY l.\"EffectiveDate\" Desc		";
+		sql += "                       	                ,l.\"LogNo\" Desc		        ";
 		sql += "                       	    ORDER BY l.\"LogNo\" Desc                                 ";
 		sql += "      	                       ) AS \"ROWNUMBER\"                                                  ";
 		sql += "            from DATA d";
 		sql += "            left join \"PfCoOfficerLog\" l on l.\"EmpNo\" = d.\"EmpNo\"";
+		sql += "                                        and l.\"EffectiveDate\" <= d.\"effectiveDateS\"  ";
 		sql += "                                        and l.\"LogNo\" < d.\"LogNo\"  ";
 		sql += "                                        and l.\"FunctionCode\" between 1 and 8    ";
 		sql += "           )            where ROWNUMBER = 1  )";

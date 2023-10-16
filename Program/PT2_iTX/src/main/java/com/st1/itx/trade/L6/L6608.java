@@ -43,6 +43,9 @@ public class L6608 extends TradeBuffer {
 	@Autowired
 	private DataLog dataLog;
 
+	private int iFuncCode = 0;
+	private String iFormNo = "";
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6608 ");
@@ -50,63 +53,55 @@ public class L6608 extends TradeBuffer {
 		titaVo.keepOrgDataBase();// 保留原本記號
 
 		// 取得輸入資料
-		int iFuncCode = this.parse.stringToInteger(titaVo.getParam("FuncCode"));
-		String iFormNo = titaVo.getParam("FormNo");
+		iFuncCode = this.parse.stringToInteger(titaVo.getParam("FuncCode"));
+		iFormNo = titaVo.getParam("FormNo");
 
 		// 檢查輸入資料
 		if (!(iFuncCode >= 1 && iFuncCode <= 5)) {
 			throw new LogicException(titaVo, "E0010", "L6608"); // 功能選擇錯誤
 		}
 
-		// 更新報表代號對照檔
-		CdReport tCdReport = new CdReport();
 		switch (iFuncCode) {
 		case 1: // 新增
-			// set value
-			moveCdReport(tCdReport, iFuncCode, iFormNo, titaVo);
 
 			// 連線環境(預設)
-			insertData(tCdReport, iFormNo, titaVo);
+			insertData(titaVo);
 
 			// 月報環境
 			titaVo.setDataBaseOnMon();
-			insertData(tCdReport, iFormNo, titaVo);
+			insertData(titaVo);
 
 			// 日報環境
 			titaVo.setDataBaseOnDay();
-			insertData(tCdReport, iFormNo, titaVo);
+			insertData(titaVo);
 
 			break;
-
 		case 2: // 修改
 
-			// set value
-			moveCdReport(tCdReport, iFuncCode, iFormNo, titaVo);
-
 			// 連線環境(預設)
-			updateData(tCdReport, iFormNo, titaVo);
+			updateData(titaVo);
 
 			// 月報環境
 			titaVo.setDataBaseOnMon();
-			updateData(tCdReport, iFormNo, titaVo);
-
+			updateData(titaVo);
+			
 			// 日報環境
 			titaVo.setDataBaseOnDay();
-			updateData(tCdReport, iFormNo, titaVo);
-
+			updateData(titaVo);
+			
 			break;
 		case 4: // 刪除
 
 			// 連線環境(預設)
-			deleteData(tCdReport, iFormNo, titaVo);
+			deleteData(titaVo);
 
 			// 月報環境
 			titaVo.setDataBaseOnMon();
-			deleteData(tCdReport, iFormNo, titaVo);
+			deleteData(titaVo);
 
 			// 日報環境
 			titaVo.setDataBaseOnDay();
-			deleteData(tCdReport, iFormNo, titaVo);
+			deleteData(titaVo);
 
 			break;
 		}
@@ -116,7 +111,7 @@ public class L6608 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private void moveCdReport(CdReport mCdReport, int mFuncCode, String mFormNo, TitaVo titaVo) throws LogicException {
+	private void moveCdReport(CdReport mCdReport, TitaVo titaVo) throws LogicException {
 
 		mCdReport.setFormNo(titaVo.getParam("FormNo"));
 		mCdReport.setFormName(titaVo.getParam("FormName"));
@@ -137,7 +132,7 @@ public class L6608 extends TradeBuffer {
 		mCdReport.setMessageFg(titaVo.getParam("MessageFg"));
 		mCdReport.setEmailFg(titaVo.getParam("EmailFg"));
 
-		if (mFuncCode != 2) {
+		if (iFuncCode != 2) {
 			mCdReport.setCreateDate(
 					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			mCdReport.setCreateEmpNo(titaVo.getTlrNo());
@@ -147,7 +142,12 @@ public class L6608 extends TradeBuffer {
 
 	}
 
-	private void insertData(CdReport tCdReport, String iFormNo, TitaVo titaVo) throws LogicException {
+	private void insertData(TitaVo titaVo) throws LogicException {
+
+		CdReport tCdReport = new CdReport();
+		// set value
+		moveCdReport(tCdReport, titaVo);
+
 		try {
 			sCdReportService.insert(tCdReport, titaVo);
 		} catch (DBException e) {
@@ -159,9 +159,12 @@ public class L6608 extends TradeBuffer {
 		}
 	}
 
-	private void updateData(CdReport tCdReport, String iFormNo, TitaVo titaVo) throws LogicException {
+	private void updateData(TitaVo titaVo) throws LogicException {
 
-		tCdReport = sCdReportService.holdById(iFormNo);
+		CdReport tCdReport = sCdReportService.holdById(iFormNo);
+
+		// set value
+		moveCdReport(tCdReport, titaVo);
 
 		if (tCdReport == null) {
 			throw new LogicException(titaVo, "E0003", iFormNo); // 修改資料不存在
@@ -181,9 +184,9 @@ public class L6608 extends TradeBuffer {
 		}
 	}
 
-	private void deleteData(CdReport tCdReport, String iFormNo, TitaVo titaVo) throws LogicException {
+	private void deleteData(TitaVo titaVo) throws LogicException {
 
-		tCdReport = sCdReportService.holdById(iFormNo);
+		CdReport tCdReport = sCdReportService.holdById(iFormNo);
 
 		if (tCdReport == null) {
 			throw new LogicException(titaVo, "E0004", iFormNo); // 刪除資料不存在

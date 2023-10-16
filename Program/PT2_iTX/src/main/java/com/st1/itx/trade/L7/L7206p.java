@@ -173,7 +173,7 @@ public class L7206p extends TradeBuffer {
 			// 關係人親屬代號,關係人親屬姓名,關係人親屬親等,關係人親屬稱謂,
 			// 事業代號,事業名稱,事業持股比率％,事業擔任職務,備註放款金額
 			String[] columns = t07Data.split(",");
-			if (columns != null && columns.length == 14) {
+			if (columns != null && columns.length >= 14) {
 				LifeRelHead lifeRelHead = new LifeRelHead();
 				LifeRelHeadId lifeRelHeadId = new LifeRelHeadId();
 				lifeRelHeadId.setAcDate(acDate);
@@ -219,7 +219,7 @@ public class L7206p extends TradeBuffer {
 			// 關係人親屬代號,關係人親屬姓名,關係人親屬親等,關係人親屬稱謂,
 			// 事業代號,事業名稱,事業持股比率％,事業擔任職務,備註放款金額
 			String[] columns = t072Data.split(",");
-			if (columns != null && columns.length == 14) {
+			if (columns != null && columns.length >= 14) {
 				LifeRelEmp lifeRelEmp = new LifeRelEmp();
 				LifeRelEmpId lifeRelEmpID = new LifeRelEmpId();
 				lifeRelEmpID.setAcDate(acDate);
@@ -251,7 +251,7 @@ public class L7206p extends TradeBuffer {
 			this.info("t044Data = " + t044Data);
 			// 所在公司,身分證,姓名,職務,放款金額餘額
 			String[] columns = t044Data.split(",");
-			if (columns != null && columns.length == 14) {
+			if (columns != null && columns.length >= 14) {
 				FinHoldRel finHoldRel = new FinHoldRel();
 				FinHoldRelId finHoldRelId = new FinHoldRelId();
 				finHoldRelId.setId(columns[1]); // 身分證

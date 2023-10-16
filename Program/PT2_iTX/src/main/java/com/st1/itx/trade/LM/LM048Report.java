@@ -630,7 +630,7 @@ public class LM048Report extends MakeReport {
 		if (result.length() > 4) {
 			result = result.substring(0, result.length() - 1) + ")";
 		} else {
-			result = "";
+			result = "SUM(0)";
 		}
 
 		this.info("result = " + result);

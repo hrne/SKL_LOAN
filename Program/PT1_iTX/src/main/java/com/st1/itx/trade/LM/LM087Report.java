@@ -166,19 +166,19 @@ public class LM087Report extends MakeReport {
 
 					switch (r.get("Group")) {
 					case "0":
-						row = 8;
+						row = 14;
 						break;
 					case "1":
-						row = 9;
+						row = 15;
 						break;
 					case "2":
-						row = 10;
+						row = 16;
 						break;
 					case "3":
-						row = 11;
+						row = 17;
 						break;
 					case "4":
-						row = 12;
+						row = 18;
 						break;
 					default:
 						break;
@@ -287,8 +287,8 @@ public class LM087Report extends MakeReport {
 
 			// C28~D29
 			makeExcel.formulaCaculate(28, 3);
-			makeExcel.formulaCaculate(28, 3);
-			makeExcel.formulaCaculate(29, 4);
+			makeExcel.formulaCaculate(28, 4);
+			makeExcel.formulaCaculate(29, 3);
 			makeExcel.formulaCaculate(29, 4);
 
 			// M28,M29

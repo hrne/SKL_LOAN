@@ -681,8 +681,8 @@ public class LM087ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("LM087ServiceImpl fnEquity=" + yearMonth);
 
 		String sql = " ";
-		sql += "     SELECT \"StockHoldersEqt\" AS \"StockHoldersEqt\"";
-		sql += "           ,\"AvailableFunds\"  AS \"AvailableFunds\"";
+		sql += "     SELECT ROUND(\"StockHoldersEqt\"/1000000,2) AS \"StockHoldersEqt\"";
+		sql += "           ,ROUND(\"AvailableFunds\"/1000000,2)  AS \"AvailableFunds\"";
 		sql += "           ,\"AcDate\"  AS \"AcDate\"";
 		sql += "     FROM \"InnFundApl\" ";
 		sql += "     WHERE \"AcDate\" = (";
@@ -802,10 +802,10 @@ public class LM087ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          ) AS \"YearMonth\"";
 		sql += "       , Round(";
 		sql += "      		M.\"LoanBal\" / 1000000, 2";
-		sql += "  		) AS \"LoanBal\"";
+		sql += "  		)/100 AS \"LoanBal\"";
 		sql += "       , NVL(Round(";
 		sql += "      		M2.\"RiskFactorAmount\" / 1000000, 2";
-		sql += "  		),0) AS \"RiskFactorAmount\"";
+		sql += "  		),0)/100 AS \"RiskFactorAmount\"";
 		sql += "  FROM \"tempMain\" M";
 		sql += "  LEFT JOIN (";
 		sql += "      SELECT \"YearMonth\"";

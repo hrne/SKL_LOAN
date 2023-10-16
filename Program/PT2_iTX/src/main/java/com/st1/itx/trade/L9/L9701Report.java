@@ -384,7 +384,7 @@ public class L9701Report extends MakeReport {
 //		this.print(0, 170, formatAmt(tL9701Vo.get("Overflow"), 0), "R");
 		// 訂正別TitaHCode
 
-		this.print(0, 177, "0".equals(titaVo.get("CorrectType")) ? "  " : tL9701Vo.get("TitaHCode"), "R");
+		this.print(0, 165, "0".equals(titaVo.get("CorrectType")) ? "  " : tL9701Vo.get("TitaHCode"), "R");
 
 		BigDecimal tmpLoanBal = new BigDecimal(tL9701Vo.get("Amount"));
 
