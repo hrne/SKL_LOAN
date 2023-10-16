@@ -84,11 +84,11 @@ public class L6608 extends TradeBuffer {
 			// 月報環境
 			titaVo.setDataBaseOnMon();
 			updateData(titaVo);
-			
+
 			// 日報環境
 			titaVo.setDataBaseOnDay();
 			updateData(titaVo);
-			
+
 			break;
 		case 4: // 刪除
 
@@ -186,7 +186,7 @@ public class L6608 extends TradeBuffer {
 
 	private void deleteData(TitaVo titaVo) throws LogicException {
 
-		CdReport tCdReport = sCdReportService.holdById(iFormNo);
+		CdReport tCdReport = sCdReportService.findById(iFormNo, titaVo);
 
 		if (tCdReport == null) {
 			throw new LogicException(titaVo, "E0004", iFormNo); // 刪除資料不存在

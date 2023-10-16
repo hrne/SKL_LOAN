@@ -19,11 +19,17 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.AcClose;
+import com.st1.itx.db.domain.AcCloseId;
 import com.st1.itx.db.domain.SlipMedia2022;
+import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.domain.TxToDoDetailId;
+import com.st1.itx.db.service.AcCloseService;
 import com.st1.itx.db.service.SlipMedia2022Service;
+import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.StaticTool;
 import com.st1.itx.util.common.EbsCom;
@@ -46,6 +52,10 @@ public class L7400 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	private SlipMedia2022Service sSlipMedia2022Service;
+	@Autowired
+	AcCloseService sAcCloseService;
+	@Autowired
+	TxToDoDetailService sTxToDoDetailService;
 
 	@Autowired
 	private EbsCom ebsCom;
@@ -71,6 +81,7 @@ public class L7400 extends TradeBuffer {
 
 	// For EBS WS JE_LINE_NUM
 	private int lineNum;
+	private int iMediaSeq = 0;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -87,18 +98,8 @@ public class L7400 extends TradeBuffer {
 		int iBatchNo = Integer.parseInt(titaVo.getParam("BatchNo"));
 
 		// 核心傳票媒體上傳序號 #MediaSeq=A,3,I
-		int iMediaSeq = Integer.parseInt(titaVo.getParam("MediaSeq"));
-
-		this.info("L7400 iAcDate = " + iAcDate);
-		this.info("L7400 iBatchNo = " + iBatchNo);
-		this.info("L7400 iMediaSeq = " + iMediaSeq);
-		titaVo.putParam("MRKEY", titaVo.getParam("AcDate") + "-" + titaVo.getParam("BatchNo") + "-" + titaVo.getParam("MediaSeq"));
-
-		BigDecimal tmpGroupId = new BigDecimal(iAcDate + 19110000).multiply(new BigDecimal(1000))
-				.add(new BigDecimal(iMediaSeq));
-
-		groupId = tmpGroupId.toBigInteger();
-
+		iMediaSeq = Integer.parseInt(titaVo.getParam("MediaSeq"));
+		
 		Slice<SlipMedia2022> sSlipMedia2022 = sSlipMedia2022Service.findMediaSeq(iAcDate + 19110000, iBatchNo,
 				iMediaSeq, "Y", 0, Integer.MAX_VALUE, titaVo);
 
@@ -108,6 +109,40 @@ public class L7400 extends TradeBuffer {
 			this.info("無資料");
 			throw new LogicException("E0001", "總帳傳票檔");
 		}
+
+		AcClose tAcClose = new AcClose();
+		AcCloseId tAcCloseId = new AcCloseId();
+
+		tAcCloseId.setAcDate(iAcDate);
+		tAcCloseId.setBranchNo(titaVo.getAcbrNo());
+		tAcCloseId.setSecNo("09"); // 業務類別: 09-放款
+
+		tAcClose = sAcCloseService.holdById(tAcCloseId);
+
+		if (tAcClose == null) {
+			throw new LogicException(titaVo, "E0003", "更新上傳核心序號(09:放款)"); // 修改資料不存在
+		}
+		// 只更新特定筆(09：放款)預設為0，L74000-總帳傳票資料傳輸+1
+		iMediaSeq = tAcClose.getCoreSeqNo() + 1;
+		tAcClose.setCoreSeqNo(iMediaSeq);
+
+		try {
+			sAcCloseService.update(tAcClose);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0007", "更新上傳核心序號(09:放款)"); // 更新資料時，發生錯誤
+		}
+		
+		this.totaVo.putParam("OMediaSeq", iMediaSeq);
+
+		this.info("L7400 iAcDate = " + iAcDate);
+		this.info("L7400 iBatchNo = " + iBatchNo);
+		this.info("L7400 iMediaSeq = " + iMediaSeq);
+		titaVo.putParam("MRKEY",
+				titaVo.getParam("AcDate") + "-" + titaVo.getParam("BatchNo") + "-" + titaVo.getParam("MediaSeq"));
+		BigDecimal tmpGroupId = new BigDecimal(iAcDate + 19110000).multiply(new BigDecimal(1000))
+				.add(new BigDecimal(iMediaSeq));
+
+		groupId = tmpGroupId.toBigInteger();
 
 		lineNum = 1;
 		drAmtTotal = BigDecimal.ZERO;
@@ -149,9 +184,9 @@ public class L7400 extends TradeBuffer {
 		} else {
 			totaVo.putParam("SendStatus", "F");
 			for (SlipMedia2022 slipMedia : listSlipMedia2022) {
-				slipMedia.setTransferFlag("Y");						
+				slipMedia.setTransferFlag("Y");
 				slipMedia.setErrorCode("");
-				slipMedia.setErrorMsg("");				
+				slipMedia.setErrorMsg("");
 			}
 			List<Map<String, String>> errorList = ebsCom.getErrorList();
 			for (Map<String, String> error : errorList) {
@@ -164,7 +199,7 @@ public class L7400 extends TradeBuffer {
 				this.totaVo.addOccursList(occurslist);
 				for (SlipMedia2022 slipMedia : listSlipMedia2022) {
 					if (parse.stringToInteger(error.get("JeLineNum")) == slipMedia.getSeq()) {
-						slipMedia.setTransferFlag("N");						
+						slipMedia.setTransferFlag("N");
 						slipMedia.setErrorCode(error.get("ErrorCode"));
 						slipMedia.setErrorMsg(error.get("ErrorMessage"));
 					}
@@ -213,6 +248,7 @@ public class L7400 extends TradeBuffer {
 	private void updateSlipMediaAll(List<SlipMedia2022> listSlipMedia2022, TitaVo titaVo) throws LogicException {
 		for (SlipMedia2022 slipMedia : listSlipMedia2022) {
 			slipMedia.setTransferFlag("Y");
+			slipMedia.setMediaSeq(iMediaSeq);
 		}
 		try {
 			sSlipMedia2022Service.updateAll(listSlipMedia2022, titaVo);
@@ -226,8 +262,33 @@ public class L7400 extends TradeBuffer {
 		tTxToDoDetailId.setCustNo(0);
 		tTxToDoDetailId.setFacmNo(0);
 		tTxToDoDetailId.setBormNo(0);
-		tTxToDoDetailId.setDtlValue(iAcDate + parse.IntegerToString(iBatchNo, 2) + parse.IntegerToString(iMediaSeq, 3));
+		tTxToDoDetailId.setDtlValue(iAcDate + parse.IntegerToString(iBatchNo, 2) + "000");
 		tTxToDoDetailId.setItemCode("L7400");
+		TxToDoDetail tTxToDoDetail = sTxToDoDetailService.holdById(tTxToDoDetailId, titaVo);
+		if (tTxToDoDetail != null) {
+			try {
+				sTxToDoDetailService.delete(tTxToDoDetail, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0008", "TxToDoDetail " + e.getErrorMsg());
+			}
+		}
+		tTxToDoDetailId.setDtlValue(iAcDate + parse.IntegerToString(iBatchNo, 2) + parse.IntegerToString(iMediaSeq, 3));
+		tTxToDoDetail.setTxToDoDetailId(tTxToDoDetailId);
+		tTxToDoDetail.setDtlValue(tTxToDoDetailId.getDtlValue());
+		TempVo tTempVo = new TempVo();
+		tTxToDoDetail.setDtlValue(
+				this.txBuffer.getTxCom().getTbsdy() + titaVo.getParam("BatchNo") + parse.IntegerToString(iMediaSeq, 3));
+		tTempVo.clear();
+		tTempVo.putParam("會計日期：", this.txBuffer.getTxCom().getTbsdy());
+		tTempVo.putParam("業務批號：", titaVo.getParam("BatchNo"));
+		tTempVo.putParam("上傳核心序號：", parse.IntegerToString(iMediaSeq, 3));
+		tTxToDoDetail.setProcessNote(tTempVo.getJsonString());
+		try {
+			sTxToDoDetailService.insert(tTxToDoDetail, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0005", "TxToDoDetail " + e.getErrorMsg());
+		}
+
 		txToDoCom.setTxBuffer(txBuffer);
 		txToDoCom.updDetailStatus(2, tTxToDoDetailId, titaVo);
 	}

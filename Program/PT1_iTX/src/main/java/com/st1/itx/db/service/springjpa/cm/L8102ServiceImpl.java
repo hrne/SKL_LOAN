@@ -32,17 +32,17 @@ public class L8102ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("L8102");
 
 		String sql = " select  ";
-		sql += "      A.\"ReviewType\"  as \"ReviewType\",  ";
-		sql += "      A.\"ProcessTlrNo\" as \"ProcessTlrNo\",  ";
+		sql += "      A.\"Code\"  as \"Code\",    ";
+		sql += "      A.\"Item\"  as \"Item\",   ";
 		sql += "      B.\"Email\"  as \"Email\"  ";
-		sql += "     from \"TxAmlCredit\" a";
-		sql += "     left join \"CdEmp\" b on a.\"ProcessTlrNo\" = b.\"EmployeeNo\" ";
-		sql += "     where  A.\"ReviewType\"   is not null  ";
-		sql += "   	   and  A.\"ProcessTlrNo\" is not null  ";
-		sql += "       and  A.\"ReviewType\" = :ReviewType ";
-		sql += "    group by A.\"ReviewType\", A.\"ProcessTlrNo\" , B.\"Email\"  "; 
+		sql += "     from \"CdCode\" a " ;
+		sql += "     left join \"CdEmp\" b on a.\"Item\" = b.\"EmployeeNo\" ";
+		sql += "     where  A.\"DefType\" = '08'  ";
+		sql += "   	   and A.\"DefCode\" = 'HMLCode'  ";
+		sql += "       and A.\"Code\" like  :ReviewType ";
+		sql += "    group by A.\"Code\", A.\"Item\" , B.\"Email\"    "; 
 
-	this.info("sql="+sql);
+	this.info("L8102sql="+sql);
 
 	Query query;
 //		query = em.createNativeQuery(sql,L5051Vo.class);//進SQL 所以不要用.class (要用.class 就要使用HQL)
@@ -50,7 +50,7 @@ public class L8102ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	if(!"".equals(iReviewType))
 	{
-		query.setParameter("ReviewType", iReviewType);
+		query.setParameter("ReviewType","%" + iReviewType + "%");
 	}
 
 	return this.convertToMap(query);

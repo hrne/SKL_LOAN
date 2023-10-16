@@ -9,17 +9,22 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdReport;
 import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.CustNotice;
+import com.st1.itx.db.domain.CustNoticeId;
 import com.st1.itx.db.domain.FacMain;
+import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.TxToDoDetail;
+import com.st1.itx.db.service.CdReportService;
 import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.CustNoticeService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.springjpa.cm.L4721ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -63,6 +68,9 @@ public class L4721Batch extends TradeBuffer {
 	private FacMainService sFacMainService;
 
 	@Autowired
+	public CustNoticeService sCustNoticeService;
+
+	@Autowired
 	private TxToDoCom txToDoCom;
 
 	@Autowired
@@ -71,6 +79,8 @@ public class L4721Batch extends TradeBuffer {
 	public L4721Report2 l4721Report2;
 	@Autowired
 	public L4721ServiceImpl sL4721ServiceImpl;
+	@Autowired
+	public CdReportService sCdReportService;
 	@Autowired
 	private MakeReport makeReport;
 	@Autowired
@@ -127,26 +137,30 @@ public class L4721Batch extends TradeBuffer {
 		isAdjDate = Integer.parseInt(titaVo.getParam("sAdjDate")) + 19110000;
 		ieAdjDate = Integer.parseInt(titaVo.getParam("eAdjDate")) + 19110000;
 		eEntryDate = titaVo.getEntDyI() + 19110000;
+		eEntryDate = ieAdjDate;
 
 		dateUtil.setDate_1(eEntryDate);
 		dateUtil.setMons(-6);
 		sEntryDate = Integer.parseInt(String.valueOf(dateUtil.getCalenderDay()).substring(0, 6) + "01");
 
+		String tranCode = titaVo.getTxcd();
+
+		int checkSendCode = checkSendCode(tranCode, titaVo);
+		// 利率調整名稱
 		for (int i = 1; i <= 50; i++) {
 			if (titaVo.getParam("ProdNo" + i).length() != 0) {
 				prodNos = prodNos + "'" + titaVo.getParam("ProdNo" + i) + "',";
 			}
 		}
-
 		if (prodNos.length() == 0) {
 			prodNos = "";
-
 		} else {
 			prodNos = prodNos.substring(0, prodNos.length() - 1);
 		}
-		this.info("this.prodNos=" + prodNos);
 
+		// txkind = 0 表示全選
 		this.kindItem = this.iTxKind == 0 ? "定期機動利率、指數型利率、機動利率、員工利率、按商品別利率變動利率" : titaVo.getParam("TxKindX");
+
 		String[] tmpKindItem = this.kindItem.split("、");
 
 		for (int txkind = 1; txkind <= 5; txkind++) {
@@ -154,116 +168,61 @@ public class L4721Batch extends TradeBuffer {
 			if (this.iTxKind == 0 || txkind == this.iTxKind) {
 				List<Map<String, String>> custList = new ArrayList<Map<String, String>>();
 				try {
-
+					// 查詢 指定利率調整期間的資料清單
 					custList = sL4721ServiceImpl.findAll(txkind, iCustType, isAdjDate, ieAdjDate, prodNos, titaVo);
-
 				} catch (Exception e) {
-
 					StringWriter errors = new StringWriter();
 					e.printStackTrace(new PrintWriter(errors));
 					this.info("L4721ServiceImpl error = " + errors.toString());
-
 				}
 
 				if (custList != null) {
 
 					int cntTrans = 0;
-
-					String isEmail = "N";
-					String isMsg = "N";
-					String isLetter = "N";
-
+					// custNo 已distinct
 					for (Map<String, String> data : custList) {
-
 						// 序號初始化
 						this.sno = 0;
-						int custNoTmp = parse.stringToInteger(data.get("CustNo"));
+						int custNo = parse.stringToInteger(data.get("CustNo"));
+						// 先判斷是否為email，才產表，最後才設定寄信
+//							if ("Y".equals(isEmail)) {
+						this.info("isEmailCust : " + custNo);
 
-						try {
+						this.sno = l4721Report.exec(titaVo, this.txBuffer, custNo, tmpKindItem[txkind - 1], isAdjDate,
+								ieAdjDate, sEntryDate, eEntryDate);
 
-							Slice<FacMain> lFacMainService = sFacMainService.CustNoAll(custNoTmp, 0, Integer.MAX_VALUE,
-									titaVo);
-							// 利率調整通知，看FacMain.getRateAdjNoticeCode
-							if (lFacMainService == null) {
-								isEmail = "N";
-								isMsg = "N";
-								isLetter = "N";
+						this.info("sno =" + this.sno);
 
-							} else {
-								for (FacMain r : lFacMainService) {
-									int rateAdjNoticeCode = parse.stringToInteger(r.getRateAdjNoticeCode());
-									this.info("rateAdjNoticeCode = " + rateAdjNoticeCode + "");
-
-									if (rateAdjNoticeCode == 1) {
-										isEmail = "Y";
-									}
-
-									if (rateAdjNoticeCode == 2) {
-										isLetter = "Y";
-									}
-
-									if (rateAdjNoticeCode == 3) {
-										isMsg = "Y";
-									}
-								}
-							}
-							this.info("CustNo =" + custNoTmp);
-							this.info("isMsg =" + isMsg);
-							this.info("isEmail =" + isEmail);
-							this.info("isLetter =" + isLetter);
-
-							// 先判斷是否為email，才產表，最後才設定寄信
-							if ("Y".equals(isEmail)) {
-								this.info("isEmailCust : " + custNoTmp);
-								this.info("isEmailLastCust : " + custNoLast);
-
-								if (custNoTmp != custNoLast) {
-									CntEmail = CntEmail + 1;
-
-									this.sno = l4721Report.exec(titaVo, this.txBuffer, custNoTmp,
-											tmpKindItem[txkind - 1], isAdjDate, ieAdjDate, sEntryDate, eEntryDate);
-
-									this.info("sno =" + this.sno);
-
-									cntTrans++;
-
-									if (cntTrans > this.commitCnt) {
-										cntTrans = 0;
-										this.batchTransaction.commit();
-									}
-
-								}
-
-								if (this.sno > 0) {
-
-									CustMain tCustMain = custMainService.custNoFirst(custNoTmp, custNoTmp, titaVo);
-									if (tCustMain == null) {
-										continue;
-									}
-
-									String noticeEmail = tCustMain.getEmail();
-
-									setMailMFileVO(data, noticeEmail, titaVo);
-								}
-
-								// 書面通知
-							} else if ("Y".equals(isLetter)) {
-								if (custNoTmp != custNoLast) {
-									CntPaper = CntPaper + 1;
-									letterCustList.add(data);
-								}
-								// 簡訊通知
-							} else if ("Y".equals(isMsg)) {
-								CntMsg = CntMsg + 1;
-								setTextFileVO(titaVo, data);
-							}
-
-						} catch (LogicException e) {
-							sendMsg = e.getErrorMsg();
-							flag = false;
+						cntTrans++;
+						if (cntTrans > this.commitCnt) {
+							cntTrans = 0;
+							this.batchTransaction.commit();
 						}
 
-						custNoLast = custNoTmp;
+						if (this.sno > 0) {
+							CntEmail = CntEmail + 1;
+
+							CustMain tCustMain = custMainService.custNoFirst(custNo, custNo, titaVo);
+							if (tCustMain == null) {
+								continue;
+							}
+
+							String noticeEmail = tCustMain.getEmail();
+
+							setMailMFileVO(data, noticeEmail, titaVo);
+						}
+
+						// 書面通知
+						if (checkNotice(1, checkSendCode, tranCode, data, titaVo) != null) {
+							CntPaper = CntPaper + 1;
+							letterCustList.add(data);
+						}
+
+						// 簡訊通知
+						if (checkNotice(2, checkSendCode, tranCode, data, titaVo) != null) {
+							CntMsg = CntMsg + 1;
+							setTextFileVO(titaVo, data);
+						}
 
 					} // for
 				} // if
@@ -437,6 +396,150 @@ public class L4721Batch extends TradeBuffer {
 				+ parse.IntegerToString(0, 3) + processNote);
 
 		txToDoCom.addDetail(true, 9, tTxToDoDetail, titaVo);
+	}
+
+	/**
+	 * 檢查寄送通知(只檢查指定一種通知)
+	 * 
+	 * @param noticeType 通知種類(1=Letter,2=Message,3=Email)
+	 * @param sendCode   寄送記號
+	 * @param formNo     交易代號
+	 * @param list       (必須有戶號,額度,交易代號)
+	 * @param titaVo
+	 * @throws LogicException
+	 * @return
+	 * 
+	 */
+	@SuppressWarnings("unused")
+	private Map<String, String> checkNotice(int noticeType, int sendCode, String formNo, Map<String, String> list,
+			TitaVo titaVo) throws LogicException {
+		// 預設三種通知方式皆為[要通知]
+		String emailFg = "Y";
+		String messageFg = "Y";
+		String letterFg = "Y";
+
+		int custNo = 0;
+		int facmNo = 0;
+
+		if (noticeType != 1 || noticeType != 2 || noticeType != 3) {
+			this.info("NoticeType is null");
+			return null;
+		}
+		if (sendCode != 0 || sendCode != 1 || sendCode != 2) {
+			this.info("SendCode is null");
+			return null;
+		}
+		if (formNo == "") {
+			this.info("FormNo is null");
+			return null;
+		}
+		if (list.get("CustNo") == null) {
+			this.info("CustNo is null");
+			return null;
+		}
+		if (list.get("FacmNo") == null) {
+			this.info("FacmNo is null");
+			return null;
+		}
+
+		custNo = parse.stringToInteger(list.get("CustNo"));
+		facmNo = parse.stringToInteger(list.get("FacmNo"));
+
+		Map<String, String> result = new HashMap<String, String>();
+
+		// 利率調整通知(只會有一種通知)
+		if (sendCode == 1) {
+			this.info("find FacMain.Notice...");
+			FacMainId facMainId = new FacMainId();
+			facMainId.setCustNo(custNo);
+			facMainId.setFacmNo(facmNo);
+			FacMain facMain = sFacMainService.findById(facMainId, titaVo);
+
+//			1: 電子郵件 
+//			2: 書面通知 
+//			3: 簡訊通知
+			// 一定只有一種通知是Y
+			if ("1".equals(facMain.getRateAdjNoticeCode())) {
+				emailFg = "Y";
+				letterFg = "N";
+				messageFg = "N";
+			}
+
+			if ("2".equals(facMain.getRateAdjNoticeCode())) {
+				emailFg = "N";
+				letterFg = "Y";
+				messageFg = "N";
+			}
+
+			if ("3".equals(facMain.getRateAdjNoticeCode())) {
+				emailFg = "N";
+				letterFg = "N";
+				messageFg = "Y";
+			}
+
+		}
+		this.info("find CustNotice.Notice...");
+		// 最後檢查CustNotice是否通知
+		CustNoticeId custNoticeId = new CustNoticeId();
+		custNoticeId.setCustNo(custNo);
+		custNoticeId.setFacmNo(facmNo);
+		custNoticeId.setFormNo(formNo);
+		CustNotice custNotice = sCustNoticeService.findById(custNoticeId, titaVo);
+
+		// 除了custNotice為N以外 其它都為[要通知]
+		if ("N".equals(emailFg) && "N".equals(custNotice.getEmailNotice())) {
+			result = null;
+		} else if (noticeType == 3) {
+			result = list;
+		}
+
+		if ("N".equals(letterFg) && "N".equals(custNotice.getPaperNotice())) {
+			result = null;
+		} else if (noticeType == 1) {
+			result = list;
+		}
+
+		if ("N".equals(messageFg) && "N".equals(custNotice.getMsgNotice())) {
+			result = null;
+		} else if (noticeType == 2) {
+			result = list;
+		}
+
+		return result;
+
+	}
+
+	/**
+	 * 檢查CdReport通知方式
+	 * 
+	 */
+	private int checkSendCode(String tranCode, TitaVo titaVo) throws LogicException {
+
+		this.info("checkSendCode tranCode=" + tranCode);
+
+//		Map<String, String> result = new HashMap<String, String>();
+
+		CdReport cdReport = sCdReportService.FormNoFirst(tranCode, titaVo);
+
+		if (cdReport != null) {
+			// 利率調整通知記號SendCode=1
+			if (cdReport.getSendCode() == 1) {
+				// 利率調整通知 一定是Y
+				if ("Y".equals(cdReport.getLetterFg()) && "Y".equals(cdReport.getMessageFg())
+						&& "Y".equals(cdReport.getEmailFg())) {
+				} else {
+					throw new LogicException("E004", "利率調整通知的簡訊,電子郵件,書面應皆為開啟");
+
+				}
+			}
+//			result.put("SendCode", cdReport.getSendCode() + "");
+//			result.put("LetterFg", cdReport.getLetterFg());
+//			result.put("MessageFg", cdReport.getMessageFg());
+//			result.put("EmailFg", cdReport.getEmailFg());
+		}
+
+		return cdReport.getSendCode();
+
 	}
 
 }

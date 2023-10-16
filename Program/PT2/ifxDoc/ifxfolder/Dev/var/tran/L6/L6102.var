@@ -62,10 +62,9 @@ E(0,1)ASGN(AGAIN$)
 #SCRTIL=_,_,S
 T(3,[L6102] 核心傳票相關單獨作業)
 
-#OOCoreSeqNo=A,3,S
 
 #BUF1=X,12,S
-T(2,#AcDate+#BatchNo+#OOCoreSeqNo)
+T(2,#AcDate+#BatchNo)
 
 #button=x,100,S
 T(2,{ cmd=CHAIN; ntxcd=L7400; ntxbuf=#BUF1})ASGN(BTN_NEW1$)
@@ -92,7 +91,6 @@ K(MODIFYBUTTON,1,總帳傳票資料傳輸)
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
 TXFORM=L6102
-#OOCoreSeqNo
 ^
 </sub>
 

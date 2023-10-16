@@ -77,7 +77,6 @@ T(1,@FunCode,#NTXBUF,1,1)
 T(1,@AmlHMLFg,#NTXBUF,2,1)
 T(1,@AmlHMLX,#NTXBUF,3,2)
 T(1,@AmlEmp,#NTXBUF,22,100)
-ALERT(#NTXBUF)
 
 #AmlHMLX = X,2,L
 

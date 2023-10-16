@@ -38,7 +38,7 @@ E(0,0)
 
 #button=x,100,S
 T(2,{cmd=CHAIN; ntxcd=L8502; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
-K(MODIFYBUTTON,1,新增代碼)
+K(MODIFYBUTTON,1,新增)
 
 </sub>
 

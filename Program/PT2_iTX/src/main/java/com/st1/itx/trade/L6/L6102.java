@@ -94,7 +94,6 @@ public class L6102 extends TradeBuffer {
 		// 檢查同傳票批號不可有未完成上傳
 		CheckSlipMedia2022(titaVo);
 
-		// 更新上傳核心序號(09:放款)
 		AcClose tAcClose = new AcClose();
 		AcCloseId tAcCloseId = new AcCloseId();
 
@@ -109,29 +108,20 @@ public class L6102 extends TradeBuffer {
 			tAcClose.setAcCloseId(tAcCloseId);
 			tAcClose.setClsFg(0);
 			tAcClose.setBatNo(1);
-			tAcClose.setCoreSeqNo(1);
 			try {
 				sAcCloseService.insert(tAcClose, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E6003", "Acclose insert " + e.getErrorMsg());
 			}
-		} else {
-			tAcClose.setCoreSeqNo(tAcClose.getCoreSeqNo() + 1);
-			try {
-				sAcCloseService.update(tAcClose);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0007", "更新上傳核心序號(09:放款)"); // 更新資料時，發生錯誤
-			}
 		}
 
 		// 啟動 L9130核心傳票媒體檔產生作業 ; L9131核心日結單代傳票列印 ; L9132傳票媒體明細表(核心) ; L9133會計與主檔餘額檢核表
 		// 下行電文
-		coreSeqNo = tAcClose.getCoreSeqNo();
 		this.info("coreSeqNo = " + coreSeqNo);
 		this.totaVo.putParam("OOCoreSeqNo", coreSeqNo);
 
-		titaVo.putParam("MediaSeq", tAcClose.getCoreSeqNo()); // 核心傳票
-		titaVo.putParam("MediaType", tAcClose.getCoreSeqNo()); // 核心傳票
+		titaVo.putParam("MediaSeq", coreSeqNo); // 核心傳票
+		titaVo.putParam("MediaType", coreSeqNo); // 核心傳票
 		titaVo.putParam("DoL9133", "N");
 
 		// 透過L9130 控制 L9130、L9131、L9132、L9133

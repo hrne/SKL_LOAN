@@ -50,7 +50,8 @@ public class L7074ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     END  AS \"SendStatusX\" "; // 0.未上傳,1.上傳成功, 2.上傳失敗,3.關帳取消
 		sql += "from (     ";
 		sql += "   select  ";
-		sql += "     CONCAT(LPAD(\"AcDate\", 8,'0'),LPAD(\"MediaSeq\", 3,'0')) AS \"GroupId\"  ";
+		sql += "     CASE WHEN \"MediaSeq\" = 0 THEN ' '    ";
+		sql += "          ELSE CONCAT(LPAD(\"AcDate\", 8,'0'),LPAD(\"MediaSeq\", 3,'0')) END AS \"GroupId\"  ";
 		sql += "   , SUM(1) AS  \"TotalLines\"   ";
 		sql += "   , \"CurrencyCode\"  ";
 		sql += "   , SUM(CASE WHEN \"DbCr\" = 'D' THEN \"TxAmt\" ELSE 0 END) AS \"TotalAmount\" ";

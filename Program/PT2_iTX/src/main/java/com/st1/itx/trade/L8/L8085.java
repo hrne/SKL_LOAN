@@ -86,7 +86,17 @@ public class L8085 extends TradeBuffer {
 				OccursList occursList = new OccursList();
 				occursList.putParam("OODDefItem", t.get("CI"));
 				occursList.putParam("OODefCode", t.get("DefCode"));
-				occursList.putParam("OOCode", t.get("Code"));
+				String ixCode = t.get("Code").substring(0, 1);
+				if(ixCode.equals("L")) {
+					occursList.putParam("OOCode", "低風險");					
+				}
+				if(ixCode.equals("M")) {
+					occursList.putParam("OOCode", "中風險");					
+				}
+				if(ixCode.equals("H")) {
+					occursList.putParam("OOCode", "高風險");					
+				}
+		
 				occursList.putParam("OOItem", t.get("Item"));
 				occursList.putParam("OOType", t.get("DefType"));
 				occursList.putParam("OOEnable", t.get("Enable"));

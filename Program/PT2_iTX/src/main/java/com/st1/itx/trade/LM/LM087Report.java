@@ -280,8 +280,10 @@ public class LM087Report extends MakeReport {
 				makeExcel.formulaCaculate(i, 5);
 				makeExcel.formulaCaculate(i, 9);
 			}
-			// 單一借戶名稱 G20
+			// 單一借戶名稱 G20 H20
 			makeExcel.formulaCaculate(20, 7);
+			makeExcel.formulaCaculate(20, 8);
+			
 			// 放款總餘額數字 D25
 			makeExcel.formulaCaculate(25, 4);
 

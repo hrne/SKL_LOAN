@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,13 +20,11 @@ import com.st1.itx.db.domain.CdBcm;
 import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.domain.CustMain;
-import com.st1.itx.db.domain.JcicZ040;
 import com.st1.itx.db.domain.TxAmlCredit;
 import com.st1.itx.db.domain.TxAmlCreditId;
 import com.st1.itx.db.domain.TxAmlNotice;
 import com.st1.itx.db.domain.TxAmlNoticeId;
 import com.st1.itx.db.domain.TxToDoDetail;
-import com.st1.itx.db.domain.TxToDoDetailId;
 import com.st1.itx.db.service.CdBcmService;
 import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdEmpService;
@@ -272,6 +269,7 @@ public class L8102 extends TradeBuffer {
 
 	private void findemail(String X, TitaVo titaVo, TxAmlCredit txAmlCredit, boolean newflag) throws LogicException {
 		List<Map<String, String>> L8102DateList = null;
+
 		// 寄送main 要依照高中低人員分別寄送
 		if (X.equals("L")) {
 			L8102DateList = sL8102ServiceImpl.findAll(X, titaVo);
@@ -282,20 +280,20 @@ public class L8102 extends TradeBuffer {
 		if (X.equals("H")) {
 			L8102DateList = sL8102ServiceImpl.findAll(X, titaVo);
 		}
-		//email  含要再修改 先測試是否有正常傳送
+		// email 含要再修改 先測試是否有正常傳送
 		String keeperemail = "";
 		for (Map<String, String> t : L8102DateList) {
 			keeperemail = t.get("Email");
 		}
+		if (keeperemail.equals("")) {
+			String subject1 = "[放款帳務系統]AML定期審查案件通知 ";
+			String bodyText = "";
+			bodyText += "新增客戶定期審查案件，請登入放款帳務系統進行定期審查作業。";
+			bodyText += "AML作業路徑:定期審查功能>定期審查問卷作業";
 
-		String subject1 = "[放款帳務系統]AML定期審查案件通知 ";
-		String bodyText = "";
-		bodyText += "新增客戶定期審查案件，請登入放款帳務系統進行定期審查作業。";
-		bodyText += "AML作業路徑:定期審查功能>定期審查問卷作業";
-		
-		mailService.setParams(keeperemail, subject1, bodyText);
-		mailService.exec();
-
+			mailService.setParams(keeperemail, subject1, bodyText);
+			mailService.exec();
+		}
 	}
 
 	private void processDetail(TitaVo titaVo, TxAmlCredit txAmlCredit, boolean newflag) throws LogicException {
@@ -319,7 +317,7 @@ public class L8102 extends TradeBuffer {
 				txAmlCredit.setProcessCount(count + 1);
 				txAmlCredit = txAmlCreditService.update2(txAmlCredit, titaVo);
 
-				int iDataDt = txAmlCredit.getDataDt();
+				int iDataDt = txAmlCredit.getDataDt()+19110000;
 				String iCustKey = txAmlCredit.getCustKey();
 				String iProcessType = txAmlCredit.getProcessType();
 				String iReviewType = txAmlCredit.getReviewType();
@@ -327,10 +325,13 @@ public class L8102 extends TradeBuffer {
 				String iProcessBrNo = txAmlCredit.getProcessBrNo();
 				String iProcessGroupNo = txAmlCredit.getProcessGroupNo();
 				String iProcessTlrNo = txAmlCredit.getProcessTlrNo();
-				int iProcessDate = 0;
-				if(txAmlCredit.getProcessDate() == 0 ) {
+				int iProcessDate = txAmlCredit.getProcessDate();
+				if (txAmlCredit.getProcessDate() == 0) {
 					iProcessDate = 19110101;
+				}else {
+					iProcessDate = iProcessDate+19110000;
 				}
+				this.info("iProcessDate   = " + iProcessDate);
 				String iProcessMobile = txAmlCredit.getProcessMobile();
 				String iProcessAddress = txAmlCredit.getProcessAddress();
 				String iProcessName = txAmlCredit.getProcessName();
@@ -570,10 +571,10 @@ public class L8102 extends TradeBuffer {
 			this.info("L8102.checkProcessType 3");
 			txAmlCredit.setProcessType("2");
 		} else {
-			if (custMain == null) {
-				this.info("L8102.checkProcessType 3");
-				txAmlCredit.setProcessType("2");
-			} else {
+//			if (custMain == null) {
+//				this.info("L8102.checkProcessType 3");
+//				txAmlCredit.setProcessType("2");
+//			} else {
 				messagePhone = custNoticeCom.getPhone(custMain, titaVo);
 				if (messagePhone.isEmpty()) {
 					this.info("L8102.checkProcessType 4");
@@ -581,7 +582,7 @@ public class L8102 extends TradeBuffer {
 				} else {
 					this.info("L8102.checkProcessType 5");
 					txAmlCredit.setProcessType("3");
-				}
+//				}
 
 			}
 		}

@@ -147,11 +147,10 @@ public class LP006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,ROW_NUMBER() OVER (Partition By l.\"EmpNo\"                                            ";
 		sql += "                       	        ORDER BY l.\"EffectiveDate\" Desc		";
 		sql += "                       	                ,l.\"LogNo\" Desc		        ";
-		sql += "                       	    ORDER BY l.\"LogNo\" Desc                                 ";
 		sql += "      	                       ) AS \"ROWNUMBER\"                                                  ";
 		sql += "            from DATA d";
 		sql += "            left join \"PfCoOfficerLog\" l on l.\"EmpNo\" = d.\"EmpNo\"";
-		sql += "                                        and l.\"EffectiveDate\" <= d.\"effectiveDateS\"  ";
+		sql += "                                        and l.\"EffectiveDate\" < :startdate  ";
 		sql += "                                        and l.\"LogNo\" < d.\"LogNo\"  ";
 		sql += "                                        and l.\"FunctionCode\" between 1 and 8    ";
 		sql += "           )            where ROWNUMBER = 1  )";

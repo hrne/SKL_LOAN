@@ -42,7 +42,6 @@ E(0,0)
 ["#FdSecNo+業務類別",#SecNo,#SecNoX],
 ["#FdClsFg+關帳狀態",#ClsFg,#ClsFgX],
 ["#FdBatNo+業務批號",#BatNo],
-["#FdCoreSeqNo+上傳核心序號",#CoreSeqNo],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -93,7 +92,7 @@ T(3,*)
 E(0,#SYSDATE)
 ! 顯示框線
 #WKTF=X,1,S
-T(F,@SecNo,1)T(F,@ClsFg,1)T(F,@BatNo,0)T(F,@CoreSeqNo,0))
+T(F,@SecNo,1)T(F,@ClsFg,1)T(F,@BatNo,0))
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -113,10 +112,8 @@ T(2,@RimSecNo,#SecNo)
 RESET_RIM(#SendL6R27,L6R27)
 S(L6R27,1,#RimSecNo)
 R(1,L6R27)
-
 E(0,@ClsFg,#L6R27ClsFg)
 E(0,@BatNo,#L6R27BatNo)
-E(0,@CoreSeqNo,#L6R27CoreSeqNo)
 
 !關帳狀態   !02支票繳款不可選[開帳]，限選[關帳]及[關帳取消)
 #ClsFg=A,1,I
@@ -136,10 +133,6 @@ C(3,#ClsFg,0,E(0,#L6R27BatNo+1),E(0,#L6R27BatNo))
 !業務關帳次數 未用畫面拿掉
 !#ClsNo=A,2,L
 
-!上傳核心序號 ! 02支票繳款/09放款 關帳時＋１ , 上傳核心序號都是更新在 09 那筆
-#CoreSeqNo=A,3,L
-!C(3,#SecNo,9,$,S))
-@C(3,#ClsFg,1,E(0,#L6R27CoreSeqNo+1),S))
 
 
 #RPTFG=A,1,S
@@ -170,7 +163,7 @@ E(0,0)
 T(3,[L6101] 業務關帳作業)
 
 #BUF1=X,12,S
-T(2,#sysDateD7+#BatNo+#CoreSeqNo)
+T(2,#sysDateD7+#BatNo)
 
 #button=x,100,S
 T(2,{ cmd=CHAIN; ntxcd=L7400; ntxbuf=#BUF1})ASGN(BTN_NEW1$)
@@ -201,7 +194,6 @@ T(3,1)ASGN(LOOP$)
 #SecNo
 #ClsFg
 #BatNo
-#CoreSeqNo
 #END
 </sub>
 
@@ -241,7 +233,6 @@ TXFORM=L6101
 #SecNo#SecNoX
 #ClsFg#ClsFgX
 #BatNo
-#CoreSeqNo
 #OOResult
 %
 #OOMsgCode

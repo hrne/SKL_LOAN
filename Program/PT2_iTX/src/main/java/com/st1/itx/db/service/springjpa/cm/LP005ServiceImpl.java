@@ -202,6 +202,7 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       , \"EmpClass\"      ";
 		sql += "       , \"EffectiveDate\"      ";
 		sql += "       , \"IneffectiveDate\"    ";
+		sql += "       , \"AreaCode\"      ";
 		sql += "       , ROW_NUMBER() OVER (Partition By \"EmpNo\"              ";
 		sql += "    	                   	    ORDER BY \"EffectiveDate\" Desc      ";
 		sql += "	                       ) AS ROWNUMBER                            ";
@@ -245,6 +246,7 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , CASE WHEN NVL(EMP.\"AgStatusCode\", ' ') in ('1') then 0 else NVL(EMP.\"QuitDate\",0)  end  AS \"QuitDate\"   "; // 離職/停約日
 		sql += "      , CASE WHEN NVL(EMP.\"AgStatusCode\", ' ') in ('1') then NVL(EMP.\"AgPostChgDate\",0)  else 0 end AS \"AgPostChgDate\" "; // 職務異動日
 		sql += "      , NVL(EMP.\"CenterCode\",' ') AS \"CenterCode\"  "; // 單位代號
+		sql += "      , PCO.\"AreaCode\"         AS \"AreaCode\"       "; // 單位代號
 		sql += "      , NVL(LCO.\"EmpClass\",' ')   AS \"LastEmpClass\"  "; // -- 前季職級
 		sql += " FROM COOFFICER PCO ";
 		sql += " LEFT JOIN \"CdEmp\" EMP on EMP.\"EmployeeNo\" = PCO.\"EmpNo\" ";

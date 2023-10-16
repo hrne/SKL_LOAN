@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.SlipMedia2022;
@@ -72,7 +73,7 @@ public class L9130Report2022 extends MakeReport {
 	@Autowired
 	private GSeqCom gGSeqCom;
 
-	private BigInteger groupId;
+	private String groupId = "";
 
 	// 會計日期 #AcDate=D,7,I
 	private int iAcDate;
@@ -184,11 +185,12 @@ public class L9130Report2022 extends MakeReport {
 		this.info("L9130Report2022 iMediaSeq = " + iMediaSeq);
 		this.info("L9130Report2022 slipNo = " + slipNo);
 
-		BigDecimal tmpGroupId = new BigDecimal(iAcDate + 19110000).multiply(new BigDecimal(1000))
-				.add(new BigDecimal(iMediaSeq));
+		if (iMediaSeq > 0) {
+			BigDecimal tmpGroupId = new BigDecimal(iAcDate + 19110000).multiply(new BigDecimal(1000))
+					.add(new BigDecimal(iMediaSeq));
 
-		groupId = tmpGroupId.toBigInteger();
-
+			groupId = tmpGroupId.toString();
+		}
 		Slice<SlipMedia2022> sSlipMedia2022 = sSlipMedia2022Service.findBatchNo(iAcDate + 19110000, iBatchNo, 0,
 				Integer.MAX_VALUE, titaVo);
 

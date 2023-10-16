@@ -331,10 +331,10 @@ BEGIN
                   AND NVL(ALR."RenewFlag",0) != 0 -- 2023-06-27 智偉修改:要跟AcLoanRenew一樣
              THEN ALR."RenewFlag" 
              WHEN LMSP."LMSNEW" = '1' -- 2023-01-18 智偉修改:要跟舊系統一樣
-             THEN 1 
+             THEN '1' 
              WHEN NVL(ALR."RenewFlag",0) != 0 -- 2023-06-27 智偉修改:要跟AcLoanRenew一樣
              THEN ALR."RenewFlag" 
-           ELSE 0 END                     AS "RenewFlag"           -- 借新還舊 DECIMAL 1  
+           ELSE '0' END                     AS "RenewFlag"           -- 借新還舊 DECIMAL 1  
           ,NVL(APLP."CASCDE",' ')         AS "PieceCode"           -- 計件代碼 VARCHAR2 1  
           ,''                             AS "PieceCodeSecond" 
           ,0                              AS "PieceCodeSecondAmt" 
@@ -399,9 +399,9 @@ BEGIN
     LEFT JOIN T1 ON T1."LMSACN" = LMSP."LMSACN" 
                 AND T1."LMSAPN1" = LMSP."LMSAPN" 
                 AND T1."LMSASQ1" = LMSP."LMSASQ" 
-    LEFT JOIN ALR ON ALR."LMSACN" = LMSP."LMSACN" 
-                 AND ALR."LMSAPN" = LMSP."LMSAPN" 
-                 AND ALR."LMSASQ" = LMSP."LMSASQ" 
+    LEFT JOIN ALR ON ALR."CustNo" = LMSP."LMSACN" 
+                 AND ALR."NewFacmNo" = LMSP."LMSAPN" 
+                 AND ALR."NewBormNo" = LMSP."LMSASQ" 
     LEFT JOIN "LA$APLP" APLP ON APLP."LMSACN" = LMSP."LMSACN" 
                             AND APLP."LMSAPN" = LMSP."LMSAPN" 
     LEFT JOIN "FacProd" PROD ON PROD."ProdNo" = APLP."IRTBCD" 

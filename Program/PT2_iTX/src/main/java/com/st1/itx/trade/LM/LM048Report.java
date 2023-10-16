@@ -368,11 +368,12 @@ public class LM048Report extends MakeReport {
 							tAvailableBalCalculate = BigDecimal.ZERO;
 						}
 
+						tLineAmtCalculate = BigDecimal.ZERO;
+						tLoanBalCalculate = BigDecimal.ZERO;
+						tAvailableBalCalculate = BigDecimal.ZERO;
+
 					}
 
-					tLineAmtCalculate = BigDecimal.ZERO;
-					tLoanBalCalculate = BigDecimal.ZERO;
-					tAvailableBalCalculate = BigDecimal.ZERO;
 				}
 			}
 
@@ -394,6 +395,16 @@ public class LM048Report extends MakeReport {
 			makeExcel.setFormula(endRowA, 8, BigDecimal.ZERO, sumInDustryRatingFormulua("A", "H"), "#,##0");
 			makeExcel.setFormula(endRowB, 8, BigDecimal.ZERO, sumInDustryRatingFormulua("B", "H"), "#,##0");
 			makeExcel.setFormula(endRowC, 8, BigDecimal.ZERO, sumInDustryRatingFormulua("C", "H"), "#,##0");
+
+			makeExcel.formulaCaculate(endRowA, 6);
+			makeExcel.formulaCaculate(endRowB, 6);
+			makeExcel.formulaCaculate(endRowC, 6);
+			makeExcel.formulaCaculate(endRowA, 7);
+			makeExcel.formulaCaculate(endRowB, 7);
+			makeExcel.formulaCaculate(endRowC, 7);
+			makeExcel.formulaCaculate(endRowA, 8);
+			makeExcel.formulaCaculate(endRowB, 8);
+			makeExcel.formulaCaculate(endRowC, 8);
 
 			// 總合計
 			row = endRowC + 1;

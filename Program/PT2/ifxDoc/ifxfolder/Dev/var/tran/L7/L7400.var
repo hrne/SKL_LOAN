@@ -24,7 +24,13 @@ E(0,1)ASGN(LOOPHEIGHT$)
 #INQPRT=n,2,S
 E(0,40)ASGN(INQPRT$)
 
+#button=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L7074; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,查詢)
+
 </sub>
+
+
 
 <sub type="DC" name="BFHEAD">
 <include src="COM.icf::BFHEAD.dec"/>
@@ -96,7 +102,6 @@ A(DATE,0,#AcDate)
 
 !傳票資料上傳序號
 #MediaSeq=A,3,I
-@V(2,0)
 
 #RPTFG=A,1,S
 E(0,0)
@@ -120,6 +125,8 @@ T(3,[L7400] 總帳傳票資料傳輸)
 IF(#SendStatus=="S",E(0,@RPTFG,0),$)
 IF(#SendStatus=="F",E(0,@RPTFG,1),$)
 
+#OMediaSeq=A,3,S
+E(0,@MediaSeq,#OMediaSeq)
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 #LOOP=X,1,S
 T(3,1)ASGN(LOOP$)
@@ -143,6 +150,7 @@ T(3,1)ASGN(LOOP$)
 !------ 下行電文TOM ------
 <sub type="TOM">
 TXFORM=L7400
+#OMediaSeq
 #SendStatus
 #GroupId
 #JournalName

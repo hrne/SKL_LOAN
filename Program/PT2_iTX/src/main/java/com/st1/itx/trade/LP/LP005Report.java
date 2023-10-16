@@ -245,12 +245,12 @@ public class LP005Report extends MakeReport {
 		Map<String, String> mapEmpClass = new HashMap<>();
 
 		mapEmpClass.put("Dept", deptSheetName + "部"); // 部室
-		mapEmpClass.put("Dist", m.get("F0")); // 區部
-		mapEmpClass.put("Unit", m.get("F1")); // 單位
-		mapEmpClass.put("EmpName", m.get("F2")); // 姓名
-		mapEmpClass.put("EmpNo", m.get("F3")); // 員工代號
-		mapEmpClass.put("EffectiveDate", m.get("F15")); // 生效日期
-		mapEmpClass.put("IneffectiveDate", m.get("F16")); // 停效日期
+		mapEmpClass.put("Dist", m.get("Dist")); // 區部
+		mapEmpClass.put("Unit", m.get("Area")); // 單位
+		mapEmpClass.put("EmpName", m.get("EmpName")); // 姓名
+		mapEmpClass.put("EmpNo", m.get("Coorgnizer")); // 員工代號
+		mapEmpClass.put("EffectiveDate", m.get("EffectiveDate")); // 生效日期
+		mapEmpClass.put("IneffectiveDate", m.get("IneffectiveDate")); // 停效日期
 		mapEmpClass.put("OriEmpClass", oriEmpClass); // 考核前職級
 		mapEmpClass.put("AfterEmpClass", afterEmpClass); // 考核後職級
 		int effectiveDate = Integer.valueOf(m.get("EffectiveDate"));
@@ -266,7 +266,7 @@ public class LP005Report extends MakeReport {
 			remark = "離職/停約日：" + (quitDate - 19110000);
 		} else if (!m.get("CenterCode").equals(m.get("AreaCode"))) {
 			if (effectiveDate < agPostChgDate && ineffectiveDate > agPostChgDate) {
-				remark = "職務異動日：" + (agPostChgDate - 19110000);
+				remark = "調職異動日：" + (agPostChgDate - 19110000);
 			}
 		}
 		mapEmpClass.put("Remark", remark);

@@ -13,8 +13,16 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.buffer.TxBuffer;
 import com.st1.itx.dataVO.TitaVo;
-
+import com.st1.itx.db.domain.CdReport;
+import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.CustNotice;
+import com.st1.itx.db.domain.CustNoticeId;
+import com.st1.itx.db.domain.FacMain;
+import com.st1.itx.db.domain.FacMainId;
+import com.st1.itx.db.service.CdReportService;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.CustNoticeService;
+import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.springjpa.cm.L4721ServiceImpl;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.CustNoticeCom;
@@ -42,11 +50,18 @@ public class L4721Report extends MakeReport {
 	public BaTxCom baTxCom;
 
 	@Autowired
+	private CustMainService custMainService;
+
+	@Autowired
 	CustNoticeCom custNoticeCom;
 
 	@Autowired
-	public CustNoticeService custNoticeService;
+	public CustNoticeService sCustNoticeService;
+	@Autowired
+	public FacMainService sFacMainService;
 
+	@Autowired
+	public CdReportService sCdReportService;
 	@Autowired
 	Parse parse;
 
@@ -167,38 +182,11 @@ public class L4721Report extends MakeReport {
 	public Long exec(TitaVo titaVo, TxBuffer txbuffer, int iCustNo, String kindItem, int sAdjDate, int eAdjDate,
 			int sEntryDate, int eEntryDate) throws LogicException {
 		this.info("L4721Report.printHeader");
-
-//		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
-		this.index = titaVo.getReturnIndex();
-//		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = Integer.MAX_VALUE;
-
 		this.setTxBuffer(txbuffer);
 		baTxCom.setTxBuffer(txbuffer);
 
-//		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
-//				.setRptCode("L4721").setRptItem("放款本息對帳單暨繳息通知單(" + kindItem + ")").setSecurity("密")
-//				.setRptSize("inch,8.5,12").setPageOrientation("P").build();
-//
-//		this.openForm(titaVo, reportVo);
-
-		String fileName = "繳息通知單(" + kindItem + ")";
-
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4721E", fileName, "密", "8.5,12", "P");
-
-		Boolean Firstfg = false;
-
-		lTmpCustFacm = new ArrayList<Map<String, String>>();
-
 		List<Map<String, String>> listL4721Temp = new ArrayList<Map<String, String>>();
 		List<Map<String, String>> listL4721Head = new ArrayList<Map<String, String>>();
-
-		try {
-			listL4721Temp = l4721ServiceImpl.isTempQuery(iCustNo, sEntryDate, eEntryDate, true, titaVo);
-		} catch (Exception e) {
-			this.error("l4721ServiceImpl TempQuery = " + e.getMessage());
-			throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
-		}
 
 		try {
 			listL4721Head = l4721ServiceImpl.doQuery(iCustNo, sAdjDate, eAdjDate, titaVo);
@@ -207,9 +195,58 @@ public class L4721Report extends MakeReport {
 			throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
 		}
 
+		String tranCode = titaVo.getTxcd();
+
+		int checkSendCode = checkSendCode(tranCode, titaVo);
+
+		this.info("listL4721Head.size before=" + listL4721Head.size());
+
+		listL4721Head = new ArrayList<Map<String, String>>();
+		for (Map<String, String> r : listL4721Head) {
+			listL4721Head.add(checkNotice(3, checkSendCode, tranCode, r, titaVo));
+		}
+
+		this.info("listL4721Head.size after=" + listL4721Head.size());
+
+		try {
+			listL4721Temp = l4721ServiceImpl.isTempQuery(iCustNo, sEntryDate, eEntryDate, true, titaVo);
+		} catch (Exception e) {
+			this.error("l4721ServiceImpl TempQuery = " + e.getMessage());
+			throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
+		}
+
+		this.info("listL4721Temp.size before=" + listL4721Temp.size());
+
+		listL4721Temp = new ArrayList<Map<String, String>>();
+		for (Map<String, String> r : listL4721Temp) {
+			listL4721Temp.add(checkNotice(3, checkSendCode, tranCode, r, titaVo));
+		}
+
+		this.info("listL4721Temp.size after=" + listL4721Temp.size());
+
+		if (listL4721Temp.size() == 0 && listL4721Head.size() == 0) {
+			return 0l;
+		}
+
+		CustMain tCustMain = custMainService.custNoFirst(iCustNo, iCustNo, titaVo);
+
+		this.setPassword(tCustMain.getCustId());
+
+		// XXXX利率 , length=6
+		// 012345
+		kindItem = kindItem.substring(0, kindItem.length() - 2);
+		
+		String fileName = "繳息通知單-" + kindItem + "-" + iCustNo;
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4721E", fileName, "密", "8.5,12", "P");
+
+		Boolean Firstfg = false;
+
+		lTmpCustFacm = new ArrayList<Map<String, String>>();
+
 		// 印出有 暫收款額度000的資料 下方帶出利率變動額度
 		Boolean HeadFlag = false;
-		if (listL4721Temp != null && !listL4721Temp.isEmpty() && listL4721Head != null && !listL4721Head.isEmpty()) {
+		// 全部
+		if (listL4721Temp != null && listL4721Head != null) {
 
 			HeadFlag = true;
 			first = true;
@@ -277,6 +314,8 @@ public class L4721Report extends MakeReport {
 		}
 
 		first = false;
+
+		// 各額度分別輸出
 		List<Map<String, String>> listL4721Detail = new ArrayList<Map<String, String>>();
 
 		try {
@@ -409,6 +448,7 @@ public class L4721Report extends MakeReport {
 
 		headerDueAmt = "";
 		headerExcessive = "";
+
 		if (effectDate != 0) {
 			baTxCom.getDueAmt(titaVo.getEntDyI(), custNo, facmNo, 0, titaVo);
 			headerDueAmt = "" + (baTxCom.getPrincipal().add(baTxCom.getInterest()));
@@ -583,5 +623,149 @@ public class L4721Report extends MakeReport {
 		// 現在利率
 		String newRate = formatAmt(adjustedrate, 2) + "%";
 		print(0, 55, newRate, "R");
+	}
+
+	/**
+	 * 檢查寄送通知(只檢查指定一種通知)
+	 * 
+	 * @param noticeType 通知種類(1=Letter,2=Message,3=Email)
+	 * @param sendCode   寄送記號
+	 * @param formNo     交易代號
+	 * @param list       (必須有戶號,額度,交易代號)
+	 * @param titaVo
+	 * @throws LogicException
+	 * @return
+	 * 
+	 */
+	@SuppressWarnings("unused")
+	private Map<String, String> checkNotice(int noticeType, int sendCode, String formNo, Map<String, String> list,
+			TitaVo titaVo) throws LogicException {
+		// 預設三種通知方式皆為[要通知]
+		String emailFg = "Y";
+		String messageFg = "Y";
+		String letterFg = "Y";
+
+		int custNo = 0;
+		int facmNo = 0;
+
+		if (noticeType != 1 || noticeType != 2 || noticeType != 3) {
+			this.info("NoticeType is null");
+			return null;
+		}
+		if (sendCode != 0 || sendCode != 1 || sendCode != 2) {
+			this.info("SendCode is null");
+			return null;
+		}
+		if (formNo == "") {
+			this.info("FormNo is null");
+			return null;
+		}
+		if (list.get("CustNo") == null) {
+			this.info("CustNo is null");
+			return null;
+		}
+		if (list.get("FacmNo") == null) {
+			this.info("FacmNo is null");
+			return null;
+		}
+
+		custNo = parse.stringToInteger(list.get("CustNo"));
+		facmNo = parse.stringToInteger(list.get("FacmNo"));
+
+		Map<String, String> result = new HashMap<String, String>();
+
+		// 利率調整通知(只會有一種通知)
+		if (sendCode == 1) {
+			this.info("find FacMain.Notice...");
+			FacMainId facMainId = new FacMainId();
+			facMainId.setCustNo(custNo);
+			facMainId.setFacmNo(facmNo);
+			FacMain facMain = sFacMainService.findById(facMainId, titaVo);
+
+//			1: 電子郵件 
+//			2: 書面通知 
+//			3: 簡訊通知
+			// 一定只有一種通知是Y
+			if ("1".equals(facMain.getRateAdjNoticeCode())) {
+				emailFg = "Y";
+				letterFg = "N";
+				messageFg = "N";
+			}
+
+			if ("2".equals(facMain.getRateAdjNoticeCode())) {
+				emailFg = "N";
+				letterFg = "Y";
+				messageFg = "N";
+			}
+
+			if ("3".equals(facMain.getRateAdjNoticeCode())) {
+				emailFg = "N";
+				letterFg = "N";
+				messageFg = "Y";
+			}
+
+		}
+		this.info("find CustNotice.Notice...");
+		// 最後檢查CustNotice是否通知
+		CustNoticeId custNoticeId = new CustNoticeId();
+		custNoticeId.setCustNo(custNo);
+		custNoticeId.setFacmNo(facmNo);
+		custNoticeId.setFormNo(formNo);
+		CustNotice custNotice = sCustNoticeService.findById(custNoticeId, titaVo);
+
+		// 除了custNotice為N以外 其它都為[要通知]
+		if ("N".equals(emailFg) && "N".equals(custNotice.getEmailNotice())) {
+			result = null;
+		} else if (noticeType == 3) {
+			result = list;
+		}
+
+		if ("N".equals(letterFg) && "N".equals(custNotice.getPaperNotice())) {
+			result = null;
+		} else if (noticeType == 1) {
+			result = list;
+		}
+
+		if ("N".equals(messageFg) && "N".equals(custNotice.getMsgNotice())) {
+			result = null;
+		} else if (noticeType == 2) {
+			result = list;
+		}
+
+		return result;
+
+	}
+
+	/**
+	 * 檢查CdReport通知方式
+	 * 
+	 */
+	private int checkSendCode(String tranCode, TitaVo titaVo) throws LogicException {
+
+		this.info("checkSendCode tranCode=" + tranCode);
+
+//		Map<String, String> result = new HashMap<String, String>();
+
+		CdReport cdReport = sCdReportService.FormNoFirst(tranCode, titaVo);
+
+		if (cdReport != null) {
+			// 利率調整通知記號SendCode=1
+			if (cdReport.getSendCode() == 1) {
+				// 利率調整通知 一定是Y
+				if ("Y".equals(cdReport.getLetterFg()) && "Y".equals(cdReport.getMessageFg())
+						&& "Y".equals(cdReport.getEmailFg())) {
+				} else {
+					throw new LogicException("E004", "利率調整通知的簡訊,電子郵件,書面應皆為開啟");
+
+				}
+			}
+//			result.put("SendCode", cdReport.getSendCode() + "");
+//			result.put("LetterFg", cdReport.getLetterFg());
+//			result.put("MessageFg", cdReport.getMessageFg());
+//			result.put("EmailFg", cdReport.getEmailFg());
+		}
+
+		return cdReport.getSendCode();
+
 	}
 }

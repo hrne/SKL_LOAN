@@ -189,12 +189,11 @@ public class L6101 extends TradeBuffer {
 		iSecNo = titaVo.getParam("SecNo");
 		iBatNo = titaVo.getParam("BatNo");
 		iClsFg = this.parse.stringToInteger(titaVo.getParam("ClsFg"));
-		iCoreSeqNo = this.parse.stringToInteger(titaVo.getParam("CoreSeqNo"));
+		iCoreSeqNo = 0;
 		iMsgCode = 0;
 		iClsNo = 0;
 		this.info("SecNo = " + iSecNo);
 		this.info("ClsFg = " + iClsFg);
-		this.info("CoreSeqNo = " + iCoreSeqNo);
 
 		// 1:業務關帳作業
 		acClose(titaVo);
@@ -569,9 +568,6 @@ public class L6101 extends TradeBuffer {
 			if ("09".equals(uSecNo) && tAcClose.getClsNo() == 10) {
 				tAcClose.setClsNo(11);
 			}
-			if ("02".equals(uSecNo)) {// 關帳時使用畫面上傳序號
-				tAcClose.setCoreSeqNo(iCoreSeqNo);
-			}
 		}
 
 		if (uClsFg == 2) {
@@ -597,8 +593,6 @@ public class L6101 extends TradeBuffer {
 
 		batNo = findBatNo("09", batNo, titaVo);
 		this.totaVo.putParam("OOBatNo09", batNo); // 9-放款_批號
-		this.totaVo.putParam("OOBatNo01", tAcClose.getBatNo()); // 1-撥款匯款_批號
-		this.totaVo.putParam("OOCoreSeqNo", tAcClose.getCoreSeqNo());
 
 		uClsNo = tAcClose.getClsNo();
 
@@ -630,36 +624,8 @@ public class L6101 extends TradeBuffer {
 		return fBatNo;
 	}
 
-	// 更新上傳核心序號(09:放款)
 	// 啟動 L9130核心傳票媒體檔產生作業 ; L9131核心日結單代傳票列印 ; L9132傳票媒體明細表(核心) ; L9133會計與主檔餘額檢核表
-	private void updCoreSeq(String uSecNo, int uClsFg, int uClsNo, TitaVo titaVo) throws LogicException {
-
-		AcClose tAcClose = new AcClose();
-		AcCloseId tAcCloseId = new AcCloseId();
-
-		tAcCloseId.setAcDate(iAcDate);
-		tAcCloseId.setBranchNo(titaVo.getAcbrNo());
-		tAcCloseId.setSecNo("09"); // 業務類別: 09-放款
-
-		tAcClose = sAcCloseService.holdById(tAcCloseId);
-
-		if (tAcClose == null) {
-			throw new LogicException(titaVo, "E0003", "更新上傳核心序號(09:放款)"); // 修改資料不存在
-		}
-
-		// 只更新特定筆(09:放款)預設為000，產生上傳媒體(02:支票繳款，09:放款)關帳時＋１
-		if (uClsFg == 1) {
-			tAcClose.setCoreSeqNo(iCoreSeqNo);
-		}
-
-		try {
-			sAcCloseService.update(tAcClose);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0007", "更新上傳核心序號(09:放款)"); // 更新資料時，發生錯誤
-		}
-
-		// 下行電文
-		this.totaVo.putParam("OOCoreSeqNo", tAcClose.getCoreSeqNo());
+	private void doL9130(String uSecNo, int uClsFg, int uClsNo, TitaVo titaVo) throws LogicException {
 
 		// 2:取消關帳 不產生報表
 		if (uClsFg == 2) {
@@ -673,8 +639,9 @@ public class L6101 extends TradeBuffer {
 		} else {
 			titaVo.putParam("BatchNo", uClsNo); // 傳票批號 , 09:放款時為業務關帳之次數
 		}
-		titaVo.putParam("MediaSeq", tAcClose.getCoreSeqNo()); // 核心傳票
-		titaVo.putParam("MediaType", tAcClose.getCoreSeqNo()); // 核心傳票
+		// 上傳核心序號於L74000-總帳傳票資料傳輸時編
+		titaVo.putParam("MediaSeq", "000"); 
+		titaVo.putParam("MediaType", "000"); 
 		if ("09".equals(uSecNo)) {
 			// uSecNo = 09 時，才執行L9133
 			titaVo.putParam("DoL9133", "Y");
@@ -794,11 +761,10 @@ public class L6101 extends TradeBuffer {
 			this.info("L6101 after updAcClose iClsNo : " + iClsNo);
 		}
 
-		// 更新上傳核心序號(09:放款)
 		// 啟動 L9130核心傳票媒體檔產生作業 ; L9131核心日結單代傳票列印 ; L9132傳票媒體明細表(核心) ; L9133會計與主檔餘額檢核表
 		if (iMsgCode == 0 && (iClsFg == 1 || iClsFg == 2)) {
 			if ("02".equals(iSecNo) || "09".equals(iSecNo)) {
-				updCoreSeq(iSecNo, iClsFg, iClsNo, titaVo);
+				doL9130(iSecNo, iClsFg, iClsNo, titaVo);
 			}
 		}
 
@@ -907,7 +873,7 @@ public class L6101 extends TradeBuffer {
 
 		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 		tTxToDoDetail = txToDoDetailService.findById(new TxToDoDetailId("L7400", 0, 0, 0,
-				tAcClose.getAcDate() + titaVo.getParam("BatNo") + parse.IntegerToString(tAcClose.getCoreSeqNo(), 3)),
+				tAcClose.getAcDate() + titaVo.getParam("BatNo") + parse.IntegerToString(iCoreSeqNo, 3)),
 				titaVo);
 		if (tTxToDoDetail != null) {
 			try {
