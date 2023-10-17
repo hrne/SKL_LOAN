@@ -1,6 +1,0 @@
-#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
-#Thu Jul 29 10:24:30 CST 2021
-querydsl-jpa-4.2.1.jar>central=
-querydsl-jpa-4.2.1.pom>central=
-querydsl-jpa-4.2.1-javadoc.jar>central=
-querydsl-jpa-4.2.1-sources.jar>central=

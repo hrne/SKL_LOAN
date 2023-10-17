@@ -1,9 +1,0 @@
-[L4201]
-
-" 
-
-   經辦:{{#TLRNO}} {{#EMPNM}} ^ 日期:{{#SYSDATE007}} 時間:{{#now!}}
-
-  
-
-{{#batch-detail}}
