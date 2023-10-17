@@ -31,8 +31,8 @@ T(3,LM042)
 ["@@@非授信限制對象-動產擔保放款",#RiskFactor2],
 ["@@@非授信限制對象-不動產擔保放款",#RiskFactor3],
 ["@@@非授信限制對象-有價證券質押放款",#RiskFactor4],
-["@@@授信限制對象-非具控制與從屬關係",#RiskFactor5],
-["@@@授信限制對象-具控制與從屬關係",#RiskFactor6],
+["@@@授信限制對象-具控制與從屬關係",#RiskFactor5],
+["@@@授信限制對象-非具控制與從屬關係",#RiskFactor6],
 ]
 
 !---------- AP TEXT AREA Variables ----------
@@ -50,8 +50,8 @@ C(3,#RiskFactor1,0,E(0,@RiskFactor1,0.0048),$)
 C(3,#RiskFactor2,0,E(0,@RiskFactor2,0.0108),$)
 C(3,#RiskFactor3,0,E(0,@RiskFactor3,0.0072),$)
 C(3,#RiskFactor4,0,E(0,@RiskFactor4,0.0396),$)
-C(3,#RiskFactor5,0,E(0,@RiskFactor5,0.2371),$)
-C(3,#RiskFactor6,0,E(0,@RiskFactor6,0),$)
+C(3,#RiskFactor5,0,E(0,@RiskFactor5,0),$)
+C(3,#RiskFactor6,0,E(0,@RiskFactor6,0.2371),$)
 
 
 #YearMonth=A,5,I
@@ -71,7 +71,6 @@ C(3,#YearMonth,0,T(1,@YearMonth,#SYSDATE,2,5),$)
 @V(5,0.0000,0.9999)
 #RiskFactor6=n,1.4,I
 @V(5,0.0000,0.9999)
-
 
 
 

@@ -150,7 +150,7 @@ public class LP006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      	                       ) AS \"ROWNUMBER\"                                                  ";
 		sql += "            from DATA d";
 		sql += "            left join \"PfCoOfficerLog\" l on l.\"EmpNo\" = d.\"EmpNo\"";
-		sql += "                                        and l.\"EffectiveDate\" < :startdate  ";
+		sql += "                                        and l.\"EffectiveDate\" < :enddate  ";
 		sql += "                                        and l.\"LogNo\" < d.\"LogNo\"  ";
 		sql += "                                        and l.\"FunctionCode\" between 1 and 8    ";
 		sql += "           )            where ROWNUMBER = 1  )";

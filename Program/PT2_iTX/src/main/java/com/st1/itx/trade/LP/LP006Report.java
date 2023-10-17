@@ -62,6 +62,8 @@ public class LP006Report extends MakeReport {
 	private List<Map<String, String>> fnAllList = new ArrayList<>();
 	private int workSeasonYY = 0;
 	private int workSeasonSS = 0;
+	private int effectiveDateS = 0;
+	private int effectiveDateE = 0;
 
 	public void exec(TitaVo titaVo) throws LogicException {
 		this.info("LP006Report exec ...");
@@ -85,14 +87,12 @@ public class LP006Report extends MakeReport {
 		}
 
 		// 起日(季初日)
-		int effectiveDateS = 0;
+
 		CdWorkMonth tCdWorkMonth = sCdWorkMonthService.findById(new CdWorkMonthId(pfYear, pfMonths), titaVo);
 		if (tCdWorkMonth != null) {
 			effectiveDateS = tCdWorkMonth.getStartDate() + 19110000;
 		}
 
-		// 止日(下季起日)
-		int effectiveDateE = 0;
 		if (workSeasonSS == 1) {
 			pfMonths = 4;
 		} else if (workSeasonSS == 2) {
@@ -104,6 +104,7 @@ public class LP006Report extends MakeReport {
 			pfMonths = 1;
 		}
 
+		// 止日(下季起日)
 		tCdWorkMonth = sCdWorkMonthService.findById(new CdWorkMonthId(pfYear, pfMonths), titaVo);
 		if (tCdWorkMonth != null) {
 			effectiveDateE = tCdWorkMonth.getStartDate() + 19110000;
@@ -122,7 +123,7 @@ public class LP006Report extends MakeReport {
 
 	private void exportChangeExcel(int effectiveDateS, int effectiveDateE, TitaVo titaVo) throws LogicException {
 		int reportDate = titaVo.getEntDyI() + 19110000;
-		String fileNm = titaVo.get("WorkSeasonYY") + "年第" + titaVo.get("WorkSeasonSS") + "季房貸協辦人員異動名單";
+		String fileNm = "LP006_" + titaVo.get("WorkSeasonYY") + "年第" + titaVo.get("WorkSeasonSS") + "季房貸協辦人員異動名單";
 		String defaultExcel = "LP006_底稿_房貸協辦人員異動名單.xlsx";
 		String defualtSheet = "異動名單";
 		String newSheetName = workSeasonYY + "Q" + workSeasonSS;
@@ -178,15 +179,14 @@ public class LP006Report extends MakeReport {
 				makeExcel.setValue(row, 4, t.get("AreaItem")); // 4, "單位"
 				makeExcel.setValue(row, 5, t.get("Fullname")); // 5, "姓名"
 				makeExcel.setValue(row, 6, t.get("EmpNo")); // 6, "員工代號"
-				if (t.get("EmpClass").trim().isEmpty() || t.get("LastEmpClass").trim().isEmpty()
-						|| t.get("EmpClass").equals(t.get("LastEmpClass"))) {
-					makeExcel.setValue(row, 7, ""); // 7, "考核前職級"
-					makeExcel.setValue(row, 8, ""); // 8, "考核後職級"
+				if (t.get("LastEmpClass").trim().isEmpty()
+						&& parse.stringToInteger(t.get("EffectiveDate")) < effectiveDateE) {
+					makeExcel.setValue(row, 7, t.get("EmpClassX")); // 7, "考核前職級"
 				} else {
 					makeExcel.setValue(row, 7, t.get("LastEmpClassX")); // 7, "考核前職級"
-					makeExcel.setValue(row, 8, t.get("EmpClassX")); // 8, "考核後職級"
-
 				}
+				makeExcel.setValue(row, 8, t.get("EmpClassX")); // 8, "考核後職級"
+
 				String changeReason = "";
 				switch (t.get("FunctionCode")) {
 				case "1":
@@ -235,7 +235,7 @@ public class LP006Report extends MakeReport {
 
 	private void exportAllExcel(int effectiveDateS, int effectiveDateE, TitaVo titaVo) throws LogicException {
 		int reportDate = titaVo.getEntDyI() + 19110000;
-		String fileNm = titaVo.get("WorkSeasonYY") + "年第" + titaVo.get("WorkSeasonSS") + "季房貸協辦人員職級名冊";
+		String fileNm = "LP006_" + titaVo.get("WorkSeasonYY") + "年第" + titaVo.get("WorkSeasonSS") + "季房貸協辦人員職級名冊";
 		String defaultExcel = "LP006_底稿_房貸協辦人員職級名冊.xlsx";
 		String defualtSheet = "職級名冊";
 		String newSheetName = workSeasonYY + "Q" + workSeasonSS;

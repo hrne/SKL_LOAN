@@ -359,9 +359,6 @@ public class LM048Report extends MakeReport {
 							makeExcel.setValue(row, 6, tLineAmtTotal, "#,##0", "R");
 							makeExcel.setValue(row, 7, tLoanBalTotal, "#,##0", "R");
 							makeExcel.setValue(row, 8, tAvailableBalCalculate, "#,##0", "R");
-							// 單一行業核貸金額占淨值比
-							String sDustryRate = "F" + row + "/" + "E" + (endRowC + 9);
-							makeExcel.setFormula(row, 15, BigDecimal.ZERO, sDustryRate, "0.00%");
 
 							tLineAmtTotal = BigDecimal.ZERO;
 							tLoanBalTotal = BigDecimal.ZERO;
@@ -415,6 +412,10 @@ public class LM048Report extends MakeReport {
 			String formuAvailableBal = "SUM(H" + endRowA + ",H" + endRowB + ",H" + endRowC + ")";
 			makeExcel.setFormula(row, 8, BigDecimal.ZERO, formuAvailableBal, "#,##0");
 
+			makeExcel.formulaCaculate(row, 6);
+			makeExcel.formulaCaculate(row, 7);
+			makeExcel.formulaCaculate(row, 8);
+
 			// 單一行業核貸金額占淨值比 合計
 			String pbrFornulaA = "F" + endRowA + "/" + "E" + (row + 8);
 			String pbrFornulaB = "F" + endRowB + "/" + "E" + (row + 8);
@@ -425,6 +426,11 @@ public class LM048Report extends MakeReport {
 			makeExcel.setFormula(endRowB, 15, BigDecimal.ZERO, pbrFornulaB, "0.00%");
 			makeExcel.setFormula(endRowC, 15, BigDecimal.ZERO, pbrFornulaC, "0.00%");
 			makeExcel.setFormula(row, 15, BigDecimal.ZERO, pbrFornula, "0.00%");
+
+			//單一行業核貸金額占淨值比 G欄
+			for (int r = 5; r <= row; r++) {
+				makeExcel.formulaCaculate(r, 15);
+			}
 
 			// 放款總餘額
 			row = row + 7;
@@ -601,6 +607,9 @@ public class LM048Report extends MakeReport {
 			makeExcel.setValue(trow, 6, tLineAmtCalculate, "#,##0", "R");
 			makeExcel.setValue(trow, 7, tLoanBalCalculate, "#,##0", "R");
 			makeExcel.setValue(trow, 8, tAvailableBalTotal, "#,##0", "R");
+			// 單一行業核貸金額占淨值比
+			String sDustryRate = "F" + trow + "/" + "E" + (endRowC + 9);
+			makeExcel.setFormula(trow, 15, BigDecimal.ZERO, sDustryRate, "0.00%");
 		} catch (LogicException e) {
 			e.printStackTrace();
 		}

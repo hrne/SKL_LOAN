@@ -60,7 +60,7 @@ public class L4711 extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("active L4711 ");
+		this.mustInfo("active L4711 ");
 		this.totaVo.init(titaVo);
 		txToDoCom.setTxBuffer(this.txBuffer);
 
@@ -84,7 +84,7 @@ public class L4711 extends TradeBuffer {
 				titaVo);
 
 		if (sTxToDoDetail == null || sTxToDoDetail.isEmpty()) {
-			this.info("電子郵件媒體檔,本日無資料");
+			this.mustInfo("電子郵件媒體檔,本日無資料");
 			return new ArrayList<>();
 		}
 
@@ -96,7 +96,7 @@ public class L4711 extends TradeBuffer {
 			emailFlag = systemParas.getEmailFlag();
 		}
 
-		this.info("L4711 emailFlag = " + emailFlag);
+		this.mustInfo("L4711 emailFlag = " + emailFlag);
 
 		for (TxToDoDetail tTxToDoDetail : sTxToDoDetail) {
 
@@ -108,34 +108,34 @@ public class L4711 extends TradeBuffer {
 			String executeTxcd = tTxToDoDetail.getExcuteTxcd();
 			String titaTlrNo = tTxToDoDetail.getTitaTlrNo();
 
-			this.info("tTxToDoDetail foreach ...");
-			this.info("custNo = " + custNo);
-			this.info("facmNo = " + facmNo);
-			this.info("bormNo = " + bormNo);
-			this.info("dtlValue = " + dtlValue);
-			this.info("itemCode = " + itemCode);
-			this.info("executeTxcd = " + executeTxcd);
-			this.info("titaTlrNo = " + titaTlrNo);
+			this.mustInfo("tTxToDoDetail foreach ...");
+			this.mustInfo("custNo = " + custNo);
+			this.mustInfo("facmNo = " + facmNo);
+			this.mustInfo("bormNo = " + bormNo);
+			this.mustInfo("dtlValue = " + dtlValue);
+			this.mustInfo("itemCode = " + itemCode);
+			this.mustInfo("executeTxcd = " + executeTxcd);
+			this.mustInfo("titaTlrNo = " + titaTlrNo);
 
 			String processNotes = tTxToDoDetail.getProcessNote();
 
 			if (processNotes == null || processNotes.trim().isEmpty()) {
-				this.info("processNotes 為空,跳過,讀下一筆");
+				this.mustInfo("processNotes 為空,跳過,讀下一筆");
 				continue;
 			}
 
-			this.info("processNotes = " + processNotes);
+			this.mustInfo("processNotes = " + processNotes);
 
 			if (emailFlag.equals("Y") || emailFlag.equals("T")) {
 				if (!processNotes.contains("<s>")) {
-					this.info("processNotes 無項目區分標籤<s>,格式不合,跳過,讀下一筆");
+					this.mustInfo("processNotes 無項目區分標籤<s>,格式不合,跳過,讀下一筆");
 					continue;
 				}
 
 				MailVo mailVo = new MailVo();
 
 				if (!mailVo.splitProcessNotes(processNotes)) {
-					this.info("processNotes 應有3~4個項目,格式不合,跳過,讀下一筆");
+					this.mustInfo("processNotes 應有3~4個項目,格式不合,跳過,讀下一筆");
 					continue;
 				}
 				sendMail(emailFlag, mailVo);
@@ -156,14 +156,14 @@ public class L4711 extends TradeBuffer {
 
 		// 輸出makeFile
 		long sno = makeFile.close();
-		this.info("sno : " + sno);
+		this.mustInfo("sno : " + sno);
 
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
 
 	private void sendMail(String emailFlag, MailVo mailVo) throws LogicException {
-		this.info("sendMail ... ");
+		this.mustInfo("sendMail ... ");
 
 		// 收件信箱
 		String email = mailVo.getEmail();
@@ -206,9 +206,9 @@ public class L4711 extends TradeBuffer {
 		Matcher matcher = pattern.matcher(email);
 
 		if (matcher.matches()) {
-			this.info(email + " 是有效的電子郵件地址");
+			this.mustInfo(email + " 是有效的電子郵件地址");
 		} else {
-			this.info(email + " 不是有效的電子郵件地址");
+			this.mustInfo(email + " 不是有效的電子郵件地址");
 		}
 	}
 }

@@ -49,23 +49,27 @@ public class MonthlyLM042Statis implements Serializable {
   private String assetClass;
 
   // 放款餘額
+  /* LoanItem=C,Z 含專案差異數 */
   @Column(name = "`LoanBal`")
   private BigDecimal loanBal = new BigDecimal("0");
 
   // 備呆金額
-  /* 調整尾數AssetClass=2LoanItem=CRelatedCode=N調整金額後為全部Class2的加總應為MonthlyLM052AssetClassAssetClassNo=21,22,23,62,7 */
   @Column(name = "`ReserveLossAmt`")
   private BigDecimal reserveLossAmt = new BigDecimal("0");
 
-  // 調整數
-  /* 調整數LoanItem=CRelatedCode=N調整金額為ReserveLossAmt-MonthlyLM052AssetClass.StorageAmtAssetClass=1(11.12.61)、AssetClass=2(21.22.23.7)、AssetClass=3(3)、AssetClass=4(4)、AssetClass=5(5)、 */
+  // 備呆差額
+  /* 備呆差額ReserveLossAmt-MonthlyLM052AssetClass.StorageAmtAssetClass=1(11.12.61)、AssetClass=2(21.22.23.7)、AssetClass=3(3)、AssetClass=4(4)、AssetClass=5(5)、 */
   @Column(name = "`ReserveLossDiff`")
   private BigDecimal reserveLossDiff = new BigDecimal("0");
 
   // 淨額
-  /* 放款餘額扣除備呆LoanItem=CRelatedCode=N+1.5%差異數(會計室備呆減不含應付利息的五分類提存數(MonthlyAssetClass) */
+  /* 放款餘額扣除備呆LoanItem=CRelatedCode=N減1.5%差異數(會計室備呆減不含應付利息的五分類提存數(MonthlyAssetClass) */
   @Column(name = "`NetAmt`")
   private BigDecimal netAmt = new BigDecimal("0");
+
+  // (購置住宅+修繕貸款)餘額
+  @Column(name = "`HouseAndRepairBal`")
+  private BigDecimal houseAndRepairBal = new BigDecimal("0");
 
   // 建檔日期時間
   @CreatedDate
@@ -182,7 +186,7 @@ Z：政策性專案貸款
 
 /**
 	* 放款餘額<br>
-	* 
+	* LoanItem=C,Z 含專案差異數
 	* @return BigDecimal
 	*/
   public BigDecimal getLoanBal() {
@@ -191,7 +195,7 @@ Z：政策性專案貸款
 
 /**
 	* 放款餘額<br>
-	* 
+	* LoanItem=C,Z 含專案差異數
   *
   * @param loanBal 放款餘額
 	*/
@@ -201,13 +205,7 @@ Z：政策性專案貸款
 
 /**
 	* 備呆金額<br>
-	* 調整尾數
-AssetClass=2
-LoanItem=C
-RelatedCode=N
-調整金額後為全部Class2的加總應為
-MonthlyLM052AssetClass
-AssetClassNo=21,22,23,62,7
+	* 
 	* @return BigDecimal
 	*/
   public BigDecimal getReserveLossAmt() {
@@ -216,13 +214,7 @@ AssetClassNo=21,22,23,62,7
 
 /**
 	* 備呆金額<br>
-	* 調整尾數
-AssetClass=2
-LoanItem=C
-RelatedCode=N
-調整金額後為全部Class2的加總應為
-MonthlyLM052AssetClass
-AssetClassNo=21,22,23,62,7
+	* 
   *
   * @param reserveLossAmt 備呆金額
 	*/
@@ -231,11 +223,9 @@ AssetClassNo=21,22,23,62,7
   }
 
 /**
-	* 調整數<br>
-	* 調整數
-LoanItem=C
-RelatedCode=N
-調整金額為ReserveLossAmt-MonthlyLM052AssetClass.StorageAmt
+	* 備呆差額<br>
+	* 備呆差額
+ReserveLossAmt-MonthlyLM052AssetClass.StorageAmt
 AssetClass=1(11.12.61)、AssetClass=2(21.22.23.7)、AssetClass=3(3)、
 AssetClass=4(4)、
 AssetClass=5(5)、
@@ -246,16 +236,14 @@ AssetClass=5(5)、
   }
 
 /**
-	* 調整數<br>
-	* 調整數
-LoanItem=C
-RelatedCode=N
-調整金額為ReserveLossAmt-MonthlyLM052AssetClass.StorageAmt
+	* 備呆差額<br>
+	* 備呆差額
+ReserveLossAmt-MonthlyLM052AssetClass.StorageAmt
 AssetClass=1(11.12.61)、AssetClass=2(21.22.23.7)、AssetClass=3(3)、
 AssetClass=4(4)、
 AssetClass=5(5)、
   *
-  * @param reserveLossDiff 調整數
+  * @param reserveLossDiff 備呆差額
 	*/
   public void setReserveLossDiff(BigDecimal reserveLossDiff) {
     this.reserveLossDiff = reserveLossDiff;
@@ -266,7 +254,7 @@ AssetClass=5(5)、
 	* 放款餘額扣除備呆
 LoanItem=C
 RelatedCode=N
-+1.5%差異數(會計室備呆減不含應付利息的五分類提存數(MonthlyAssetClass)
+減1.5%差異數(會計室備呆減不含應付利息的五分類提存數(MonthlyAssetClass)
 	* @return BigDecimal
 	*/
   public BigDecimal getNetAmt() {
@@ -278,12 +266,31 @@ RelatedCode=N
 	* 放款餘額扣除備呆
 LoanItem=C
 RelatedCode=N
-+1.5%差異數(會計室備呆減不含應付利息的五分類提存數(MonthlyAssetClass)
+減1.5%差異數(會計室備呆減不含應付利息的五分類提存數(MonthlyAssetClass)
   *
   * @param netAmt 淨額
 	*/
   public void setNetAmt(BigDecimal netAmt) {
     this.netAmt = netAmt;
+  }
+
+/**
+	* (購置住宅+修繕貸款)餘額<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getHouseAndRepairBal() {
+    return this.houseAndRepairBal;
+  }
+
+/**
+	* (購置住宅+修繕貸款)餘額<br>
+	* 
+  *
+  * @param houseAndRepairBal (購置住宅+修繕貸款)餘額
+	*/
+  public void setHouseAndRepairBal(BigDecimal houseAndRepairBal) {
+    this.houseAndRepairBal = houseAndRepairBal;
   }
 
 /**
@@ -366,7 +373,7 @@ RelatedCode=N
   @Override
   public String toString() {
     return "MonthlyLM042Statis [monthlyLM042StatisId=" + monthlyLM042StatisId + ", loanBal=" + loanBal + ", reserveLossAmt=" + reserveLossAmt
-           + ", reserveLossDiff=" + reserveLossDiff + ", netAmt=" + netAmt + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
-           + "]";
+           + ", reserveLossDiff=" + reserveLossDiff + ", netAmt=" + netAmt + ", houseAndRepairBal=" + houseAndRepairBal + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

@@ -289,13 +289,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       , T.\"BreachAmt\"";
 		sql += "       , T.\"TxAmt\"";
 		sql += "       , T.\"FeeAmt\"";
-		sql += "       , CASE";
-		sql += "      WHEN T.\"TitaHCode\" IN (";
-		sql += "          1";
-		sql += "        , 3";
-		sql += "      ) THEN 0 - T.\"Excessive\"";
-		sql += "      ELSE T.\"Excessive\"";
-		sql += "  END AS \"Excessive\"";
+		sql += "       , T.\"Excessive\"";
 		sql += "       , T.\"OverShort\"";
 		sql += "       , T.\"CustName\"";
 		sql += "       , CASE";
@@ -374,13 +368,14 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           , T.\"BreachAmt\"";
 		sql += "           , T.\"TxAmt\"";
 		sql += "           , T.\"FeeAmt\"                              AS \"FeeAmt\"";
-		sql += "           , CASE";
-		sql += "          WHEN T.\"TitaHCode\" IN (";
-		sql += "              1";
-		sql += "            , 3";
-		sql += "          ) THEN 0 - T.\"Excessive\"";
-		sql += "          ELSE T.\"Excessive\"";
-		sql += "      END AS \"Excessive\"";
+//		sql += "           , CASE";
+//		sql += "          WHEN T.\"TitaHCode\" IN (";
+//		sql += "              1";
+//		sql += "            , 3";
+//		sql += "          ) THEN 0 - T.\"Excessive\"";
+//		sql += "          ELSE T.\"Excessive\"";
+//		sql += "      END AS \"Excessive\"";
+		sql += "           , T.\"Excessive\" / T.\"ExcessiveCount\" AS  \"Excessive\"";
 		sql += "           , T.\"ExcessiveCount\"";
 		sql += "           , T.\"Excessive\" / T.\"ExcessiveCount\"      AS \"Excessive2\"";
 		sql += "           , T.\"OverShort\"";
@@ -442,11 +437,11 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		if (iHFG.equals("0")) {
 			if (!isCalcuExcessive) {
-				sql += "         , T.\"AcDate\"";
+				sql += "         , T.\"EntryDate\"";
 			}
+		} else {
+			sql += "         , T.\"AcDate\"";
 		}
-
-		sql += "         , T.\"EntryDate\"";
 		sql += "         , T.\"TitaCalDy\"";
 		sql += "         , T.\"TitaCalTm\"";
 		sql += "         , T.\"TitaTlrNo\"";

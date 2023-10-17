@@ -327,7 +327,7 @@ public class L8102 extends TradeBuffer {
 				String iProcessTlrNo = txAmlCredit.getProcessTlrNo();
 				int iProcessDate = txAmlCredit.getProcessDate();
 				if (txAmlCredit.getProcessDate() == 0) {
-					iProcessDate = 19110101;
+					iProcessDate = 0;
 				}else {
 					iProcessDate = iProcessDate+19110000;
 				}
@@ -347,7 +347,7 @@ public class L8102 extends TradeBuffer {
 					txAmlNoticeId.setProcessSno(iProcessCount);
 					txAmlNotice = txAmlNoticeService.findById(txAmlNoticeId, titaVo);
 					if (txAmlNotice != null) {
-						throw new LogicException("E0002", "已有相同資料");
+						throw new LogicException("0E0002", "已有相同資料");
 					}
 					itxAmlNotice.setTxAmlNoticeId(txAmlNoticeId);
 //					itxAmlNotice.setDataDt(iDataDt);
@@ -576,7 +576,7 @@ public class L8102 extends TradeBuffer {
 //				txAmlCredit.setProcessType("2");
 //			} else {
 				messagePhone = custNoticeCom.getPhone(custMain, titaVo);
-				if (messagePhone.isEmpty()) {
+				if ((messagePhone.isEmpty()&& custKey.length() > 8) || custKey.length() <= 8 ) {
 					this.info("L8102.checkProcessType 4");
 					txAmlCredit.setProcessType("2");
 				} else {

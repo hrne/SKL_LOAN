@@ -35,10 +35,10 @@ public class BST05 extends TradeBuffer {
 		String[] strAr = titaVo.getParam("Parm").split(",");
 		int iYearMonth = this.parse.stringToInteger(strAr[0]);
 		this.info("iYearMonth=" + iYearMonth);
+		l7205p.updMonthlyLM042Statis(titaVo, iYearMonth + 191100);
 		l7205p.updMonthlyLM055AssetLoss(titaVo, iYearMonth + 191100);
 		return null;
 
 	}
-
 
 }

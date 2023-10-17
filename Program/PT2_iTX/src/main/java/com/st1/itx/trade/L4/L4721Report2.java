@@ -2,18 +2,28 @@ package com.st1.itx.trade.L4;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.buffer.TxBuffer;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdReport;
+import com.st1.itx.db.domain.CustNotice;
+import com.st1.itx.db.domain.CustNoticeId;
+import com.st1.itx.db.domain.FacMain;
+import com.st1.itx.db.domain.FacMainId;
+import com.st1.itx.db.service.CdReportService;
+import com.st1.itx.db.service.CustNoticeService;
+import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.springjpa.cm.L4721ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BaTxCom;
@@ -54,7 +64,12 @@ public class L4721Report2 extends TradeBuffer {
 
 	@Autowired
 	public L4721ServiceImpl l4721ServiceImpl;
-
+	@Autowired
+	public CdReportService sCdReportService;
+	@Autowired
+	public CustNoticeService sCustNoticeService;
+	@Autowired
+	public FacMainService sFacMainService;
 	@Autowired
 	public BaTxCom baTxCom;
 
@@ -502,7 +517,198 @@ public class L4721Report2 extends TradeBuffer {
 		}
 		return x;
 	}
+	/**
+	 * 檢查寄送通知(只檢查指定一種通知)
+	 * 
+	 * @param noticeType 通知種類(1=Email,2=Letter,3=Message)
+	 * @param sendCode   寄送記號(0=不送,1=利率變動通知,2=優先序)
+	 * @param formNo     交易代號
+	 * @param list       (必須有戶號,額度,交易代號)
+	 * @param titaVo
+	 * @throws LogicException
+	 * @return List<Map<String, String>> (必須有戶號,額度,交易代號)
+	 * 
+	 */
 
+	// 注意：可能要用複寫
+	// 就是如果只有custno 就必須走多筆然後回傳 所以可能要用 for 迴圈 回傳 List
+	// 單筆單筆就照就
+
+	private List<Map<String, String>> checkNotice(int noticeType, int sendCode, String formNo,
+			List<Map<String, String>> list, TitaVo titaVo) throws LogicException {
+
+		List<Map<String, String>> result = new ArrayList<Map<String, String>>();
+
+		for (Map<String, String> r : list) {
+			// 預設三種通知方式皆為[要通知]
+			boolean emailFg = true;
+			boolean messageFg = true;
+			boolean letterFg = true;
+
+			int custNo = 0;
+			int facmNo = 0;
+
+			if (noticeType != 1 || noticeType != 2 || noticeType != 3) {
+				this.info("NoticeType is null");
+				break;
+//				return null;
+			}
+			if (sendCode != 0 || sendCode != 1 || sendCode != 2) {
+				this.info("SendCode is null");
+				break;
+//				return null;
+			}
+			if (formNo == "") {
+				this.info("FormNo is null");
+				break;
+//				return null;
+			}
+			if (r.get("CustNo") == null) {
+				this.info("CustNo is null");
+				continue;
+//				return null;
+			}
+			if (r.get("FacmNo") == null) {
+				this.info("FacmNo is null");
+				continue;
+//				return null;
+			}
+
+			custNo = parse.stringToInteger(r.get("CustNo"));
+			facmNo = parse.stringToInteger(r.get("FacmNo"));
+
+			Map<String, String> mapResult = new HashMap<String, String>();
+
+			// 利率調整通知(只會有一種通知)
+			if (sendCode == 1) {
+				this.info("find FacMain.Notice...");
+				FacMainId facMainId = new FacMainId();
+				facMainId.setCustNo(custNo);
+				facMainId.setFacmNo(facmNo);
+				FacMain facMain = sFacMainService.findById(facMainId, titaVo);
+
+				String rateAdjNoticeCode = facMain.getRateAdjNoticeCode();
+				this.info("rateAdjNoticeCode = " + rateAdjNoticeCode);
+//			1: 電子郵件 
+//			2: 書面通知 
+//			3: 簡訊通知
+
+				if ("1".equals(rateAdjNoticeCode)) {
+					emailFg = true;
+					letterFg = false;
+					messageFg = false;
+				}
+
+				if ("2".equals(rateAdjNoticeCode)) {
+					emailFg = false;
+					letterFg = true;
+					messageFg = false;
+				}
+
+				if ("3".equals(rateAdjNoticeCode)) {
+					emailFg = false;
+					letterFg = false;
+					messageFg = true;
+				}
+
+			}
+			this.info("find CustNotice.Notice...");
+
+			CustNotice custNotice = new CustNotice();
+
+			Slice<CustNotice> sCustNotice = null;
+			// 判斷by戶號 by額度
+			if (facmNo == 0) {
+//			sCustNotice = sCustNoticeService.findCustNoFormNo(custNo, formNo, 0, 999, titaVo);
+//			if (sCustNotice != null) {
+//				for (CustNotice r : sCustNotice.getContent()) {
+//					Map<String, String> t = new HashMap<String, String>();
+//					
+//					
+//					
+//				}
+//			}
+
+			} else {
+				// 最後檢查CustNotice是否通知
+				CustNoticeId custNoticeId = new CustNoticeId();
+				custNoticeId.setCustNo(custNo);
+				custNoticeId.setFacmNo(facmNo);
+				custNoticeId.setFormNo(formNo);
+				custNotice = sCustNoticeService.findById(custNoticeId, titaVo);
+			}
+			// 除了custNotice為N以外 其它都為[要通知]
+
+			// Email
+			if (emailFg && noticeType == 1) {
+				if (custNotice == null || "Y".equals(custNotice.getEmailNotice())) {
+					mapResult = r;
+				} else {
+					mapResult = null;
+				}
+			}
+
+			// 書面
+			if (letterFg && noticeType == 2) {
+				if (custNotice == null || "Y".equals(custNotice.getEmailNotice())) {
+					mapResult = r;
+				} else {
+					mapResult = null;
+				}
+			}
+
+			// 簡訊
+			if (messageFg && noticeType == 3) {
+				if (custNotice == null || "Y".equals(custNotice.getEmailNotice())) {
+					mapResult = r;
+				} else {
+					mapResult = null;
+				}
+			}
+
+			// map有值才add
+			if (mapResult != null) {
+				result.add(mapResult);
+			}
+
+		}
+
+		return result;
+
+	}
+
+	/**
+	 * 檢查CdReport通知方式
+	 * 
+	 */
+	private int checkSendCode(String tranCode, TitaVo titaVo) throws LogicException {
+
+		this.info("checkSendCode tranCode=" + tranCode);
+
+//		Map<String, String> result = new HashMap<String, String>();
+
+		CdReport cdReport = sCdReportService.FormNoFirst(tranCode, titaVo);
+
+		if (cdReport != null) {
+			// 利率調整通知記號SendCode=1
+			if (cdReport.getSendCode() == 1) {
+				// 利率調整通知 一定是Y
+				if ("Y".equals(cdReport.getLetterFg()) && "Y".equals(cdReport.getMessageFg())
+						&& "Y".equals(cdReport.getEmailFg())) {
+				} else {
+					throw new LogicException("E004", "利率調整通知的簡訊,電子郵件,書面應皆為開啟");
+
+				}
+			}
+//			result.put("SendCode", cdReport.getSendCode() + "");
+//			result.put("LetterFg", cdReport.getLetterFg());
+//			result.put("MessageFg", cdReport.getMessageFg());
+//			result.put("EmailFg", cdReport.getEmailFg());
+		}
+
+		return cdReport.getSendCode();
+
+	}
 //	向左補特定字元
 //	str 原本的字串
 //	length 填補後的總長度

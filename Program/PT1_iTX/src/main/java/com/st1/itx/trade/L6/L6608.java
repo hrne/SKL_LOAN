@@ -199,7 +199,7 @@ public class L6608 extends TradeBuffer {
 		}
 
 		try {
-			sCdReportService.delete(tCdReport);
+			sCdReportService.delete(tCdReport, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時，發生錯誤
 		}

@@ -63,8 +63,6 @@ public class LM042p extends TradeBuffer {
 		int iYear = mfbsdy / 10000;
 		// 月
 		int iMonth = (mfbsdy / 100) % 100;
-		// 當年月
-		int thisYM = 0;
 
 		// 判斷帳務日與月底日是否同一天
 		if (tbsdy < mfbsdy) {
@@ -72,7 +70,6 @@ public class LM042p extends TradeBuffer {
 			iMonth = iMonth - 1 == 0 ? 12 : iMonth - 1;
 		}
 
-		thisYM = iYear * 100 + iMonth;
 
 //		int yearMonth = thisYM;
 		int yearMonth = this.parse.stringToInteger(titaVo.getParam("YearMonth")) + 191100;
@@ -102,18 +99,10 @@ public class LM042p extends TradeBuffer {
 		if (isFinish) {
 			this.batchTransaction.commit();
 
-			Slice<MonthlyLM042Statis> slMonthlyLM042Statis = sMonthlyLM042StatisService.findYearMonthAll(yearMonth, 0,
-					Integer.MAX_VALUE, titaVo);
 			Slice<MonthlyLM042RBC> slMonthlyLM042RBC = sMonthlyLM042RBCService.findYearMonthAll(yearMonth, 0,
 					Integer.MAX_VALUE, titaVo);
 
 			changeDBEnv(titaVo);
-			try {
-				sMonthlyLM042StatisService.insertAll(slMonthlyLM042Statis.getContent(), titaVo);
-			} catch (DBException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
 			try {
 				sMonthlyLM042RBCService.insertAll(slMonthlyLM042RBC.getContent(), titaVo);
 			} catch (DBException e) {

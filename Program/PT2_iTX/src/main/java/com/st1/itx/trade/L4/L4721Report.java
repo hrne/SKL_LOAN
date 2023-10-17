@@ -203,7 +203,7 @@ public class L4721Report extends MakeReport {
 
 		listL4721Head = new ArrayList<Map<String, String>>();
 		for (Map<String, String> r : listL4721Head) {
-			listL4721Head.add(checkNotice(3, checkSendCode, tranCode, r, titaVo));
+			listL4721Head.add(checkNotice(1, checkSendCode, tranCode, r, titaVo));
 		}
 
 		this.info("listL4721Head.size after=" + listL4721Head.size());
@@ -219,7 +219,7 @@ public class L4721Report extends MakeReport {
 
 		listL4721Temp = new ArrayList<Map<String, String>>();
 		for (Map<String, String> r : listL4721Temp) {
-			listL4721Temp.add(checkNotice(3, checkSendCode, tranCode, r, titaVo));
+			listL4721Temp.add(checkNotice(1, checkSendCode, tranCode, r, titaVo));
 		}
 
 		this.info("listL4721Temp.size after=" + listL4721Temp.size());
@@ -235,7 +235,7 @@ public class L4721Report extends MakeReport {
 		// XXXX利率 , length=6
 		// 012345
 		kindItem = kindItem.substring(0, kindItem.length() - 2);
-		
+
 		String fileName = "繳息通知單-" + kindItem + "-" + iCustNo;
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4721E", fileName, "密", "8.5,12", "P");
 
@@ -628,22 +628,22 @@ public class L4721Report extends MakeReport {
 	/**
 	 * 檢查寄送通知(只檢查指定一種通知)
 	 * 
-	 * @param noticeType 通知種類(1=Letter,2=Message,3=Email)
+	 * @param noticeType 通知種類(1=Email,2=Letter,3=Message)
 	 * @param sendCode   寄送記號
 	 * @param formNo     交易代號
 	 * @param list       (必須有戶號,額度,交易代號)
 	 * @param titaVo
 	 * @throws LogicException
-	 * @return
+	 * @return list or null(必須有戶號,額度,交易代號)
 	 * 
 	 */
-	@SuppressWarnings("unused")
+
 	private Map<String, String> checkNotice(int noticeType, int sendCode, String formNo, Map<String, String> list,
 			TitaVo titaVo) throws LogicException {
 		// 預設三種通知方式皆為[要通知]
-		String emailFg = "Y";
-		String messageFg = "Y";
-		String letterFg = "Y";
+		boolean emailFg = true;
+		boolean messageFg = true;
+		boolean letterFg = true;
 
 		int custNo = 0;
 		int facmNo = 0;
@@ -682,30 +682,33 @@ public class L4721Report extends MakeReport {
 			facMainId.setFacmNo(facmNo);
 			FacMain facMain = sFacMainService.findById(facMainId, titaVo);
 
+			String rateAdjNoticeCode = facMain.getRateAdjNoticeCode();
+			this.info("rateAdjNoticeCode = " + rateAdjNoticeCode);
 //			1: 電子郵件 
 //			2: 書面通知 
 //			3: 簡訊通知
-			// 一定只有一種通知是Y
-			if ("1".equals(facMain.getRateAdjNoticeCode())) {
-				emailFg = "Y";
-				letterFg = "N";
-				messageFg = "N";
+
+			if ("1".equals(rateAdjNoticeCode)) {
+				emailFg = true;
+				letterFg = false;
+				messageFg = false;
 			}
 
-			if ("2".equals(facMain.getRateAdjNoticeCode())) {
-				emailFg = "N";
-				letterFg = "Y";
-				messageFg = "N";
+			if ("2".equals(rateAdjNoticeCode)) {
+				emailFg = false;
+				letterFg = true;
+				messageFg = false;
 			}
 
-			if ("3".equals(facMain.getRateAdjNoticeCode())) {
-				emailFg = "N";
-				letterFg = "N";
-				messageFg = "Y";
+			if ("3".equals(rateAdjNoticeCode)) {
+				emailFg = false;
+				letterFg = false;
+				messageFg = true;
 			}
 
 		}
 		this.info("find CustNotice.Notice...");
+
 		// 最後檢查CustNotice是否通知
 		CustNoticeId custNoticeId = new CustNoticeId();
 		custNoticeId.setCustNo(custNo);
@@ -714,27 +717,38 @@ public class L4721Report extends MakeReport {
 		CustNotice custNotice = sCustNoticeService.findById(custNoticeId, titaVo);
 
 		// 除了custNotice為N以外 其它都為[要通知]
-		if ("N".equals(emailFg) && "N".equals(custNotice.getEmailNotice())) {
-			result = null;
-		} else if (noticeType == 3) {
-			result = list;
+
+		// Email
+		if (emailFg && noticeType == 1) {
+			if (custNotice == null || "Y".equals(custNotice.getEmailNotice())) {
+				result = list;
+			} else {
+				result = null;
+			}
 		}
 
-		if ("N".equals(letterFg) && "N".equals(custNotice.getPaperNotice())) {
-			result = null;
-		} else if (noticeType == 1) {
-			result = list;
+		// 書面
+		if (letterFg && noticeType == 2) {
+			if (custNotice == null || "Y".equals(custNotice.getEmailNotice())) {
+				result = list;
+			} else {
+				result = null;
+			}
 		}
 
-		if ("N".equals(messageFg) && "N".equals(custNotice.getMsgNotice())) {
-			result = null;
-		} else if (noticeType == 2) {
-			result = list;
+		// 簡訊
+		if (messageFg && noticeType == 3) {
+			if (custNotice == null || "Y".equals(custNotice.getEmailNotice())) {
+				result = list;
+			} else {
+				result = null;
+			}
 		}
 
 		return result;
 
 	}
+
 
 	/**
 	 * 檢查CdReport通知方式

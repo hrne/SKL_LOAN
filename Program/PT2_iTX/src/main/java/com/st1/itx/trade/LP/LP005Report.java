@@ -258,7 +258,7 @@ public class LP005Report extends MakeReport {
 		int quitDate = Integer.valueOf(m.get("QuitDate"));// 離職/停約日
 		int agPostChgDate = Integer.valueOf(m.get("AgPostChgDate")); // 職務異動日
 		String remark = "";
-		if (!m.get("OriEmpClass").equals(m.get("AfterEmpClass"))) {
+		if (!oriEmpClass.equals(afterEmpClass)) {
 			remark = "職級異動：Yes";
 		}
 		// 離職/停約日在有在有效期間、 單位不同且職務異動日在有效期間

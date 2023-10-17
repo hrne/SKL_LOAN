@@ -79,7 +79,9 @@ public class BSU03 extends TradeBuffer {
 			iCustNoE = 9999999;
 		}
 		loadPfItDetail(titaVo);
-		updatePfItDetail(titaVo);
+		if (lPfItDetail.size() > 0) {
+			updatePfItDetail(titaVo);
+		}
 		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", "已完成更新業績明細檔", titaVo);
 
 		this.batchTransaction.commit();
@@ -120,7 +122,8 @@ public class BSU03 extends TradeBuffer {
 				Integer.MAX_VALUE, titaVo);
 		if (slItDetail != null) {
 			for (PfItDetail it : slItDetail.getContent()) {
-				if (it.getCustNo() >= iCustNoS && it.getCustNo() <= iCustNoE && it.getRepayType() == 0 && it.getAdjRange()==0) {
+				if (it.getCustNo() >= iCustNoS && it.getCustNo() <= iCustNoE && it.getRepayType() == 0
+						&& it.getAdjRange() == 0) {
 					it.setCntingCode(""); // 是否計件
 					it.setPerfEqAmt(BigDecimal.ZERO); // 換算業績
 					it.setPerfReward(BigDecimal.ZERO); // 業務報酬
@@ -133,13 +136,9 @@ public class BSU03 extends TradeBuffer {
 
 	private void updatePfItDetail(TitaVo titaVo) throws LogicException {
 
-		int custNo = 0;
-		int facmNo = 0;
+		int custNo = lPfItDetail.get(0).getCustNo();
+		int facmNo = lPfItDetail.get(0).getFacmNo();
 		for (PfItDetail it : lPfItDetail) {
-			if (custNo == 0) {
-				custNo = it.getCustNo();
-				facmNo = it.getFacmNo();
-			}
 			if (it.getCustNo() != custNo || it.getFacmNo() != facmNo) {
 				if (lPfItDetailUpdate.size() > 0) {
 					this.info("not update size=" + lPfItDetailUpdate.size());
@@ -163,12 +162,32 @@ public class BSU03 extends TradeBuffer {
 			}
 		}
 
+		custNo = lPfItDetail.get(0).getCustNo();
+		facmNo = lPfItDetail.get(0).getFacmNo();
+		int workMonth = lPfItDetail.get(0).getWorkMonth();
+		String cntingCode = lPfItDetail.get(0).getCntingCode();
 		for (PfItDetail it : lPfItDetail) {
 			if (it.getCntingCode().isEmpty()) {
 				this.info("not update " + it.toString());
+			} else {
+				if (it.getCustNo() == custNo && it.getFacmNo() == facmNo) {
+					if (it.getWorkMonth() > workMonth) {
+						if ("Y".equals(cntingCode) && "Y".equals(it.getCntingCode())) {
+							it.setCntingCode("N");
+						}
+					}
+					if ("Y".equals(it.getCntingCode())) {
+						cntingCode = "Y";
+						workMonth = it.getWorkMonth();
+					}
+				} else {
+					custNo = it.getCustNo();
+					facmNo = it.getFacmNo();
+					workMonth = it.getWorkMonth();
+					cntingCode = it.getCntingCode();
+				}
 			}
 		}
-
 	}
 
 	private boolean checkPf(PfItDetail it, TitaVo titaVo) throws LogicException {
@@ -205,6 +224,7 @@ public class BSU03 extends TradeBuffer {
 		BigDecimal rmdPerfEqAmt = t.getPerfEqAmt();
 		BigDecimal rmdPerfReward = t.getPerfReward();
 		BigDecimal rmdPerfAmt = t.getPerfAmt();
+		boolean isAlredyCnting = false;
 		for (PfItDetail it : lPfItDetailUpate) {
 			it.setCntingCode(t.getCntingCode()); // 是否計件
 			it.setIntroducer(t.getIntroducer()); // 介紹人

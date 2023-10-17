@@ -58,8 +58,8 @@ public class LM042Report extends MakeReport {
 	private BigDecimal oApprovedLoss = BigDecimal.ZERO;
 	private BigDecimal oProDiff = BigDecimal.ZERO;
 	private BigDecimal oApprovedLossDiff = BigDecimal.ZERO;
-	private ArrayList<MonthlyLM042Statis> lMonthlyLM042Statis = new ArrayList<>();
-	private ArrayList<MonthlyLM042RBC> lMonthlyLM042RBC = new ArrayList<>();
+	private List<MonthlyLM042Statis> lMonthlyLM042Statis = new ArrayList<MonthlyLM042Statis>();
+	private List<MonthlyLM042RBC> lMonthlyLM042RBC = new ArrayList<MonthlyLM042RBC>();
 	private DecimalFormat df = new DecimalFormat("##,###,###,###,##0");
 
 	@Override
@@ -104,8 +104,14 @@ public class LM042Report extends MakeReport {
 //		this.info("yearMonth=" + yearMonth);
 		// 工作表:統計表
 		exportFindStatistics(titaVo, thisYMD / 100);
-		// 更新LM042RBC統計數
-		updateStatis(titaVo);
+		// Load MonthlyLM042Statis LM042RBC統計數 (update by L7205)
+		Slice<MonthlyLM042Statis> slMonthlyLM042Statis = sMonthlyLM042StatisService.findYearMonthAll(yearMonth, 0,
+				Integer.MAX_VALUE, titaVo);
+		if (slMonthlyLM042Statis == null) {
+			throw new LogicException(titaVo, "E0001", "MonthlyLM042Statis LM042RBC統計數"); // 查詢資料不存在
+		}
+		this.lMonthlyLM042Statis = slMonthlyLM042Statis.getContent();
+
 		// 更新LM042RBC
 		updateRBC(titaVo);
 		// 工作表:明細表
@@ -161,63 +167,63 @@ public class LM042Report extends MakeReport {
 			int col = 0;
 
 			for (Map<String, String> lm42Vo1 : statisticsList1) {
-				int assetClass = Integer.valueOf(lm42Vo1.get("F1"));
-				String kind = lm42Vo1.get("F2");
-				String rptId = lm42Vo1.get("F3");
-				BigDecimal amt = getBigDecimal(lm42Vo1.get("F4"));
+				int assetClass = Integer.valueOf(lm42Vo1.get("AssetClass"));
+				String kind = lm42Vo1.get("KIND");
+				String relCd = lm42Vo1.get("RelCd");
+				BigDecimal amt = getBigDecimal(lm42Vo1.get("AMT"));
 
 				// 擔保品C 利關人 資產分類1
-				if ("C".equals(kind) && "Y".equals(rptId) && assetClass == 1) {
+				if ("C".equals(kind) && "Y".equals(relCd) && assetClass == 1) {
 					row = 21;
 					col = 3;
 				}
 				// 擔保品C 非利關人 資產分類1
-				if ("C".equals(kind) && "N".equals(rptId) && assetClass == 1) {
+				if ("C".equals(kind) && "N".equals(relCd) && assetClass == 1) {
 					row = 22;
 					col = 3;
 				}
 				// 擔保品C 利關人 資產分類2
-				if ("C".equals(kind) && "N".equals(rptId) && assetClass == 2) {
+				if ("C".equals(kind) && "N".equals(relCd) && assetClass == 2) {
 					row = 22;
 					col = 4;
 				}
 				// 擔保品C 非利關人 資產分類3
-				if ("C".equals(kind) && "N".equals(rptId) && assetClass == 3) {
+				if ("C".equals(kind) && "N".equals(relCd) && assetClass == 3) {
 					row = 22;
 					col = 5;
 				}
 				// 擔保品C 非利關人 資產分類5
-				if ("C".equals(kind) && "N".equals(rptId) && assetClass == 5) {
+				if ("C".equals(kind) && "N".equals(relCd) && assetClass == 5) {
 					row = 22;
 					col = 6;
 				}
 				// 擔保品D 非利關人 資產分類1
-				if ("D".equals(kind) && "N".equals(rptId) && assetClass == 1) {
+				if ("D".equals(kind) && "N".equals(relCd) && assetClass == 1) {
 					row = 23;
 					col = 3;
 				}
 				// 擔保品Z 利關人 資產分類1
-				if ("Z".equals(kind) && "Y".equals(rptId) && assetClass == 1) {
+				if ("Z".equals(kind) && "Y".equals(relCd) && assetClass == 1) {
 					row = 24;
 					col = 3;
 				}
 				// 擔保品Z 非利關人 資產分類1
-				if ("Z".equals(kind) && "N".equals(rptId) && assetClass == 1) {
+				if ("Z".equals(kind) && "N".equals(relCd) && assetClass == 1) {
 					row = 25;
 					col = 3;
 				}
 				// 擔保品Z 非利關人 資產分類2
-				if ("Z".equals(kind) && "N".equals(rptId) && assetClass == 2) {
+				if ("Z".equals(kind) && "N".equals(relCd) && assetClass == 2) {
 					row = 25;
 					col = 4;
 				}
 				// 擔保品Z 非利關人 資產分類3
-				if ("Z".equals(kind) && "N".equals(rptId) && assetClass == 3) {
+				if ("Z".equals(kind) && "N".equals(relCd) && assetClass == 3) {
 					row = 25;
 					col = 4;
 				}
 				// 擔保品Z 非利關人 資產分類5
-				if ("Z".equals(kind) && "N".equals(rptId) && assetClass == 5) {
+				if ("Z".equals(kind) && "N".equals(relCd) && assetClass == 5) {
 					row = 25;
 					col = 7;
 				}
@@ -236,18 +242,10 @@ public class LM042Report extends MakeReport {
 			}
 
 			for (Map<String, String> lm42Vo2 : statisticsList2) {
-				String item = lm42Vo2.get("F0");
-				String rptId = lm42Vo2.get("F1");
-				int assetClass = parse.stringToInteger(lm42Vo2.get("F2"));
-				BigDecimal amt = getBigDecimal(lm42Vo2.get("F3"));
-				if (item.length() == 1) {
-					MonthlyLM042Statis tMonthlyLM042Statis = new MonthlyLM042Statis();
-					tMonthlyLM042Statis.setLoanItem(item);
-					tMonthlyLM042Statis.setRelatedCode(rptId);
-					tMonthlyLM042Statis.setAssetClass("" + assetClass);
-					tMonthlyLM042Statis.setLoanBal(amt);
-					addStatis(tMonthlyLM042Statis, titaVo);
-				}
+				String item = lm42Vo2.get("Item");
+				String relCd = lm42Vo2.get("RelCd");
+				int assetClass = parse.stringToInteger(lm42Vo2.get("AssetClass"));
+				BigDecimal amt = getBigDecimal(lm42Vo2.get("AMT"));
 				// 應收利息
 				if ("IntRecv".equals(item)) {
 					row = 13;
@@ -306,31 +304,18 @@ public class LM042Report extends MakeReport {
 			// 1.5% 提存差異 oApprovedLossDiff(會計室備呆減不含應付利息的五分類提存數(MonthlyAssetClass)
 			oApprovedLossDiff = oApprovedLoss;
 			for (MonthlyLM052AssetClass t : slMonthlyLM052AssetClass.getContent()) {
-				if ("7".equals(t.getAssetClassNo())) {
+				if (!"7".equals(t.getAssetClassNo())) {
 					oApprovedLossDiff = oApprovedLossDiff.subtract(t.getStorageAmt());
 				}
 			}
-			MonthlyLM042Statis tMonthlyLM042Statis = new MonthlyLM042Statis();
-			tMonthlyLM042Statis.setLoanItem("C");
-			tMonthlyLM042Statis.setRelatedCode("N");
-			tMonthlyLM042Statis.setAssetClass("1");
-			tMonthlyLM042Statis.setLoanBal(BigDecimal.ZERO.subtract(oProDiff));
-			addStatis(tMonthlyLM042Statis, titaVo);
-			tMonthlyLM042Statis = new MonthlyLM042Statis();
-			tMonthlyLM042Statis.setLoanItem("Z");
-			tMonthlyLM042Statis.setRelatedCode("N");
-			tMonthlyLM042Statis.setAssetClass("1");
-			tMonthlyLM042Statis.setLoanBal(BigDecimal.ZERO.add(oProDiff));
-			addStatis(tMonthlyLM042Statis, titaVo);
-
-			for (MonthlyLM042Statis t1 : lMonthlyLM042Statis) {
+			for (MonthlyLM042Statis t1 : this.lMonthlyLM042Statis) {
 				String item = t1.getLoanItem();
-				String rptId = t1.getRelatedCode();
+				String relCd = t1.getRelatedCode();
 				int assetClass = parse.stringToInteger(t1.getAssetClass());
 				BigDecimal amt = t1.getLoanBal();
 				// 統計數 C
 				if ("C".equals(item)) {
-					if ("Y".equals(rptId)) {
+					if ("Y".equals(relCd)) {
 						row = 5;
 					} else {
 						row = 6;
@@ -342,7 +327,7 @@ public class LM042Report extends MakeReport {
 					col = 2 + assetClass;
 				}
 				if ("Z".equals(item)) {
-					if ("Y".equals(rptId)) {
+					if ("Y".equals(relCd)) {
 						row = 8;
 					} else {
 						row = 9;
@@ -382,8 +367,8 @@ public class LM042Report extends MakeReport {
 			// P欄位 (購置住宅+修繕貸款)
 			for (Map<String, String> lm42Vo3 : statisticsList3) {
 
-				String type = lm42Vo3.get("F0");
-				BigDecimal amt = getBigDecimal(lm42Vo3.get("F2"));
+				String type = lm42Vo3.get("TYPE");
+				BigDecimal amt = getBigDecimal(lm42Vo3.get("AMT"));
 
 				// 擔保品類別
 				switch (type) {
@@ -400,105 +385,14 @@ public class LM042Report extends MakeReport {
 				makeExcel.setValue(row, col, amt, "#,##0");
 			}
 
-			BigDecimal percent0_005 = new BigDecimal("0.005"); // 0.5%
-			BigDecimal percent0_015 = new BigDecimal("0.015");// 1.5%
-			BigDecimal percent0_02 = new BigDecimal("0.02");// 2%
-			BigDecimal percent0_1 = new BigDecimal("0.1");// 10%
-			BigDecimal percent0_5 = new BigDecimal("0.5");// 50%
-			BigDecimal percent1 = new BigDecimal("1");// 100%
-
-			for (MonthlyLM042Statis t2 : lMonthlyLM042Statis) {
-				int assetClass = parse.stringToInteger(t2.getAssetClass());
-				String item = t2.getLoanItem();
-				String rptId = t2.getRelatedCode();
-				BigDecimal lossAmt = BigDecimal.ZERO;
-				BigDecimal loanBal = t2.getLoanBal();
-				switch (assetClass) {
-				case 1:
-					if ("C".equals(item) && "N".equals(rptId)) {
-						lossAmt = (loanBal.subtract(cHouseAndRepair)).multiply(percent0_005)
-								.add((cHouseAndRepair).multiply(percent0_015)).setScale(0, BigDecimal.ROUND_HALF_UP);
-					} else if ("Z".equals(item) && "N".equals(rptId)) {
-						lossAmt = (loanBal.subtract(zHouseAndRepair)).multiply(percent0_005)
-								.add((zHouseAndRepair).multiply(percent0_015)).setScale(0, BigDecimal.ROUND_HALF_UP);
-					} else {
-						lossAmt = loanBal.multiply(percent0_005).setScale(0, BigDecimal.ROUND_HALF_UP);
-					}
-					break;
-				case 2:
-					lossAmt = loanBal.multiply(percent0_02).setScale(0, BigDecimal.ROUND_HALF_UP);
-					break;
-				case 3:
-					lossAmt = loanBal.multiply(percent0_1).setScale(0, BigDecimal.ROUND_HALF_UP);
-					break;
-				case 4:
-					lossAmt = loanBal.multiply(percent0_5).setScale(0, BigDecimal.ROUND_HALF_UP);
-					break;
-				case 5:
-					lossAmt = loanBal.multiply(percent1).setScale(0, BigDecimal.ROUND_HALF_UP);
-					break;
-				}
-				t2.setReserveLossAmt(lossAmt);
-				// 放款餘額扣除備呆,
-				// LoanItem=C RelatedCode=N 減1.5%差異數(會計室備呆減不含應付利息的五分類提存數(MonthlyAssetClass)
-				t2.setNetAmt(loanBal.subtract(lossAmt));
-				if ("C".equals(item) && "N".equals(rptId)) {
-					t2.setNetAmt(t2.getNetAmt().subtract(oApprovedLossDiff));
-				}
-			}
-
-			// 提存差額
-			for (MonthlyLM042Statis t4 : lMonthlyLM042Statis) {
-				int assetClass = parse.stringToInteger(t4.getAssetClass());
-				if ("C".equals(t4.getLoanItem()) && "N".equals(t4.getRelatedCode())) {
-					BigDecimal lm042StoreAmt = BigDecimal.ZERO;
-					for (MonthlyLM042Statis t5 : lMonthlyLM042Statis) {
-						if (parse.stringToInteger(t5.getAssetClass()) == assetClass) {
-							lm042StoreAmt = lm042StoreAmt.add(t5.getReserveLossAmt());
-						}
-					}
-					BigDecimal lm052StoreAmt = BigDecimal.ZERO;
-					for (MonthlyLM052AssetClass t1 : slMonthlyLM052AssetClass.getContent()) {
-						switch (assetClass) {
-						case 1:
-							if ("1".equals(t1.getAssetClassNo().substring(0, 1)) || "61".equals(t1.getAssetClassNo())) {
-								lm052StoreAmt = lm052StoreAmt.add(t1.getStorageAmt());
-							}
-							break;
-						case 2:
-							if ("2".equals(t1.getAssetClassNo().substring(0, 1)) || "7".equals(t1.getAssetClassNo())) {
-								lm052StoreAmt = lm052StoreAmt.add(t1.getStorageAmt());
-							}
-							break;
-						case 3:
-							if ("3".equals(t1.getAssetClassNo())) {
-								lm052StoreAmt = lm052StoreAmt.add(t1.getStorageAmt());
-							}
-							break;
-						case 4:
-							if ("4".equals(t1.getAssetClassNo())) {
-								lm052StoreAmt = lm052StoreAmt.add(t1.getStorageAmt());
-							}
-							break;
-						case 5:
-							if ("5".equals(t1.getAssetClassNo())) {
-								lm052StoreAmt = lm052StoreAmt.add(t1.getStorageAmt());
-							}
-							break;
-						}
-					}
-					t4.setReserveLossDiff(lm042StoreAmt.subtract(lm052StoreAmt));
-				}
-			}
-
 			for (MonthlyLM042Statis t3 : lMonthlyLM042Statis) {
 				int assetClass = parse.stringToInteger(t3.getAssetClass());
 				String item = t3.getLoanItem();
-				String rptId = t3.getRelatedCode();
+				String relCd = t3.getRelatedCode();
 				BigDecimal lossAmt = t3.getReserveLossAmt();
 				switch (item) {
 				case "C":
-					if ("Y".equals(rptId)) {
+					if ("Y".equals(relCd)) {
 						row = 5;
 					} else {
 						row = 6;
@@ -509,7 +403,7 @@ public class LM042Report extends MakeReport {
 					row = 7;
 					break;
 				case "Z":
-					if ("Y".equals(rptId)) {
+					if ("Y".equals(relCd)) {
 						row = 8;
 					} else {
 						row = 9;
@@ -522,6 +416,11 @@ public class LM042Report extends MakeReport {
 				col = 9 + assetClass;
 
 				makeExcel.setValue(row, col, lossAmt, "#,##0");
+				
+				// P欄位 (購置住宅+修繕貸款)
+				if (t3.getHouseAndRepairBal().compareTo(BigDecimal.ZERO) != 0) {
+					makeExcel.setValue(row, 16, t3.getHouseAndRepairBal(), "#,##0");
+				}
 			}
 			// 重整合計公式J11~P11
 			for (int j = 5; j <= 11; j++) {
@@ -652,7 +551,7 @@ public class LM042Report extends MakeReport {
 
 		}
 
-		makeExcel.setValue(26, 1, "註1：各類放款總餘額(含催收款)已扣除備抵損失 （ " +  df.format(oApprovedLoss) + "）。");
+		makeExcel.setValue(26, 1, "註1：各類放款總餘額(含催收款)已扣除備抵損失 （ " + df.format(oApprovedLoss) + "）。");
 
 		// 重整公式
 		for (int x = 4; x <= 9; x++) {
@@ -761,28 +660,6 @@ public class LM042Report extends MakeReport {
 				}
 			}
 
-		}
-
-	}
-
-	private void updateStatis(TitaVo titaVo) throws LogicException {
-
-		Slice<MonthlyLM042Statis> slMonthlyLM042Statis = sMonthlyLM042StatisService.findYearMonthAll(yearMonth, 0,
-				Integer.MAX_VALUE, titaVo);
-		if (slMonthlyLM042Statis != null) {
-			try {
-				sMonthlyLM042StatisService.deleteAll(slMonthlyLM042Statis.getContent(), titaVo);
-			} catch (DBException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
-		try {
-			sMonthlyLM042StatisService.insertAll(lMonthlyLM042Statis, titaVo);
-		} catch (DBException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
 		}
 
 	}
